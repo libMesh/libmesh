@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.10 2004-12-07 22:47:42 benkirk Exp $ */
+/* $Id: ex14.C,v 1.11 2004-12-10 13:54:26 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -419,19 +419,6 @@ void assemble_laplace(EquationSystems& es,
 
   // Tell the finite element object to use our quadrature rule.
   fe->attach_quadrature_rule (&qrule);
-
-  // Declare a special finite element object for
-  // boundary integration.
-  AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
-	      
-  // Boundary integration requires one quadraure rule,
-  // with dimensionality one less than the dimensionality
-  // of the element.
-  QGauss qface(dim-1, FIFTH);
-  
-  // Tell the finte element object to use our
-  // quadrature rule.
-  fe_face->attach_quadrature_rule (&qface);
 
   // Here we define some references to cell-specific data that
   // will be used to assemble the linear system.
