@@ -1,4 +1,4 @@
-// $Id: error_vector.C,v 1.6 2004-05-12 18:28:25 jwpeterson Exp $
+// $Id: error_vector.C,v 1.7 2004-08-09 17:34:58 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -19,6 +19,7 @@
 
 
 // C++ includes
+#include <assert.h>
 
 // Local includes
 #include "error_vector.h"

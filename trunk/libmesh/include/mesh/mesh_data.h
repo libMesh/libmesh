@@ -1,4 +1,4 @@
-// $Id: mesh_data.h,v 1.6 2004-07-26 16:27:47 jwpeterson Exp $
+// $Id: mesh_data.h,v 1.7 2004-08-09 17:34:57 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,7 @@
 // C++ includes
 #include <map>
 #include <vector>
-
+#include <assert.h>
 
 // Local Includes
 #include "libmesh.h"

@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.26 2004-08-02 22:08:14 benkirk Exp $
+// $Id: mesh_base.h,v 1.27 2004-08-09 17:34:57 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -29,7 +29,7 @@
 #include <vector>
 #include <set>
 #include <string>
-
+#include <assert.h>
 
 
 // forward declarations
@@ -62,7 +62,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.26 $
+ * \version $Revision: 1.27 $
  */
 
 
