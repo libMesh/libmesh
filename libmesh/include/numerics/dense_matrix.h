@@ -1,4 +1,4 @@
-// $Id: dense_matrix.h,v 1.5 2004-02-27 13:30:18 benkirk Exp $
+// $Id: dense_matrix.h,v 1.6 2004-03-01 09:26:25 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -341,7 +341,7 @@ void DenseMatrix<T>::zero()
 {
   _decomposition_type = NONE;
 
-  std::fill (_val.begin(), _val.end(), libMesh::zero);
+  std::fill (_val.begin(), _val.end(), 0.);
 }
 
 
