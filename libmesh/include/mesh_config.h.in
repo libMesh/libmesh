@@ -54,7 +54,7 @@
 /* Flag indicating whether or not LASPACK iterative solvers are available */
 #undef HAVE_LASPACK
 
-/* define if the compiler has stringstream */
+/* define if the compiler has locale */
 #undef HAVE_LOCALE
 
 /* Define to 1 if you have the <memory.h> header file. */
