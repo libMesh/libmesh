@@ -1,4 +1,4 @@
-//    $Id: petsc_matrix.h,v 1.30 2003-10-01 16:28:51 benkirk Exp $
+//    $Id: petsc_matrix.h,v 1.31 2003-10-01 17:48:25 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -31,6 +31,7 @@
 
 
 // C++ includes
+#include <algorithm>
 
 // Local includes
 #include "sparse_matrix.h"
@@ -421,8 +422,6 @@ void PetscMatrix<T>::add (const unsigned int i,
   PetscScalar petsc_value = static_cast<PetscScalar>(value);
   ierr = MatSetValues(mat, 1, &i_val, 1, &j_val,
 		      &petsc_value, ADD_VALUES); CHKERRQ(ierr);
-  
-  return;
 }
 
 
@@ -432,7 +431,7 @@ inline
 void PetscMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 				const std::vector<unsigned int>& dof_indices)
 {
-  add_matrix (dm, dof_indices, dof_indices);
+  this->add_matrix (dm, dof_indices, dof_indices);
 }
 
 
@@ -453,23 +452,12 @@ void PetscMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
   
   int ierr=0;
 
-//   // make this static to the function to aviod repeated allocations
-//   static std::vector<PetscScalar> values;
-
-//   values.resize (m*n);
-
-//   // notice values is row-major by default in Petsc
-//   for (unsigned int i=0; i<m; i++)
-//     for (unsigned int j=0; j<n; j++)
-//       values[(i)*(n) + (j)] = static_cast<PetscScalar>(dm(i,j)); 
-
+  // These casts are required for PETSc <= 2.1.5
   ierr = MatSetValues(mat,
-		      m, &rows[0],
-		      n, &cols[0],
-		      &dm.get_values()[0],
+		      m, (int*) &rows[0],
+		      n, (int*) &cols[0],
+		      (PetscScalar*) &dm.get_values()[0],
 		      ADD_VALUES);   CHKERRQ(ierr);
-
-  return;
 }
 
 
@@ -494,7 +482,6 @@ void PetscMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
   X.close ();
 
   ierr = MatAXPY(&a,  X.mat, mat, SAME_NONZERO_PATTERN);   CHKERRQ(ierr);
-  return;
 }
 
 
@@ -509,36 +496,50 @@ T PetscMatrix<T>::operator () (const unsigned int i,
   
   PetscScalar *petsc_row;
   T value=0.;
-  bool found=false;
   int ierr=0, ncols=0, *petsc_cols,
     i_val=static_cast<int>(i),
     j_val=static_cast<int>(j);
   
 
   // the matrix needs to be closed for this to work
-  close();
-
+  this->close();
   
   ierr = MatGetRow(mat, i_val, &ncols, &petsc_cols, &petsc_row); CHKERRQ(ierr);
 
-
   //TODO:[BSK] A binary search on petsc_cols would be faster!
+  // Perform a linear search to find the contiguous index in
+  // petsc_cols (resp. petsc_row) corresponding to global index j_val
   for (int entry=0; entry<ncols; entry++)
     if (petsc_cols[entry] == j_val)
       {
-	found = true;
-	  
-	value = static_cast<T>(petsc_row[entry]);
-	  
-	ierr = MatRestoreRow(mat, i_val,
-			     &ncols, &petsc_cols, &petsc_row); CHKERRQ(ierr);
-	  
-	return value;
+        value = static_cast<T>(petsc_row[entry]);
+           
+        ierr = MatRestoreRow(mat, i_val,
+                             &ncols, &petsc_cols, &petsc_row); CHKERRQ(ierr);
+           
+        return value;
       }
   
-  // Otherwise the entry is not in the sparse matrix,
-  // i.e. it is 0.
+//   // Perform a binary search to find the contiguous index in
+//   // petsc_cols (resp. petsc_row) corresponding to global index j_val
+//   std::pair<int*, int*> p =
+//     std::equal_range (&petsc_cols[0], &petsc_cols[0] + ncols, j_val);
+
+//   // Found an entry for j_val
+//   if (p.first != p.second)
+//     {
+//       assert (*(p.first) < ncols);
+      
+//       value = static_cast<T> (petsc_row[*(p.first)]);
+      
+//       ierr  = MatRestoreRow(mat, i_val,
+// 			    &ncols, &petsc_cols, &petsc_row); CHKERRQ(ierr);
+	  
+//       return value;
+//     }
   
+  // Otherwise the entry is not in the sparse matrix,
+  // i.e. it is 0.  
   return 0.;
 }
 
