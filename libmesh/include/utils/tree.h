@@ -1,4 +1,4 @@
-// $Id: tree.h,v 1.5 2004-04-19 17:36:11 benkirk Exp $
+// $Id: tree.h,v 1.6 2004-07-26 15:01:30 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -54,7 +54,7 @@ public:
 		  INVALID_BUILD_TYPE };
   
   /**
-   * Constructor.  Does nothing at the moment.
+   * Constructor.
    */
   Tree (const MeshBase& m, const unsigned int level, BuildType bt=NODES);
 

@@ -1,4 +1,4 @@
-// $Id: point_locator_base.h,v 1.3 2004-03-21 07:23:00 jwpeterson Exp $
+// $Id: point_locator_base.h,v 1.4 2004-07-26 15:01:30 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -61,7 +61,7 @@ protected:
   /**
    * Constructor.  Protected so that this base class 
    * cannot be explicitly instantiated.  Takes a master
-   * pointLocator that helps in saving memory.
+   * PointLocator that helps in saving memory.
    */
   PointLocatorBase (const Mesh& mesh,
 		    const PointLocatorBase* master);
@@ -75,9 +75,8 @@ public:
   virtual ~PointLocatorBase ();
 
   /**
-   * Builds an pointLocator for the vector \p vec that belongs to the
-   * \p dim dimensional mesh \p mesh and \p DofMap \p dof_map.  
-   * Optionally takes a master pointLocator to save memory.
+   * Builds an PointLocator for the mesh \p mesh.  
+   * Optionally takes a master PointLocator to save memory.
    * An \p AutoPtr<PointLocatorBase> is returned to prevent memory leak. 
    * This way the user need not remember to delete the object.
    */
@@ -92,13 +91,13 @@ public:
 
   /**
    * Initializes the point locator, so that the \p operator() methods can
-   * be used.  Purely virtual.
+   * be used.  Pure virtual.
    */
   virtual void init() = 0;
 
   /**
    * Locates the element in which the point with global coordinates
-   * \p p is located.  Purely virtual.  
+   * \p p is located.  Pure virtual.  
    */
   virtual const Elem* operator() (const Point& p) const = 0;
 
@@ -112,11 +111,12 @@ protected:
 
   /**
    * Const pointer to our master, initialized to \p NULL if none
-   * given.  When using multiple pointLocators, one can be assigned
+   * given.  When using multiple PointLocators, one can be assigned
    * master and be in charge of something that all can have access to.
    */
   const PointLocatorBase* _master;
- /**
+  
+  /**
    * constant reference to the mesh in which the point is looked for.
    */
   const Mesh& _mesh;

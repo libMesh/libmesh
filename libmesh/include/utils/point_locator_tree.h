@@ -1,4 +1,4 @@
-// $Id: point_locator_tree.h,v 1.4 2004-03-22 22:41:46 benkirk Exp $
+// $Id: point_locator_tree.h,v 1.5 2004-07-26 15:01:30 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -74,15 +74,15 @@ public:
   ~PointLocatorTree ();
 
   /**
-   * Clears the locator.
+   * Clears the locator.  This function frees dynamic memory with "delete".
    */
-  void clear();
+  virtual void clear();
 
   /**
    * Initializes the locator, so that the \p operator() methods can
-   * be used.
+   * be used.  This function allocates dynamic memory with "new".
    */
-  void init();
+  virtual void init();
 
   /**
    * Locates the element in which the point with global coordinates
@@ -90,7 +90,7 @@ public:
    * the result and allow it to be used during the next call to
    * operator().
    */
-  const Elem* operator() (const Point& p) const;
+  virtual const Elem* operator() (const Point& p) const;
 
 protected:
 

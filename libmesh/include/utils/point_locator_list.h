@@ -1,4 +1,4 @@
-// $Id: point_locator_list.h,v 1.3 2004-03-21 07:23:00 jwpeterson Exp $
+// $Id: point_locator_list.h,v 1.4 2004-07-26 15:01:30 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -88,21 +88,23 @@ public:
   ~PointLocatorList ();
 
   /**
-   * Clears the locator.
+   * Clears the locator.  Overloaded from base class.  This method
+   * frees dynamic memory using "delete".
    */
-  void clear();
+  virtual void clear();
 
   /**
    * Initializes the locator, so that the \p operator() methods can
-   * be used.
+   * be used.  Overloaded from base class.  This method allocates dynamic
+   * memory using "new".
    */
-  void init();
+  virtual void init();
 
   /**
    * Locates the element in which the point with global coordinates
-   * \p p is located.  
+   * \p p is located.  Overloaded from base class.
    */
-  const Elem* operator() (const Point& p) const;
+  virtual const Elem* operator() (const Point& p) const;
 
 
 protected:
@@ -110,7 +112,8 @@ protected:
   /**
    * Pointer to the list of element centroids.  Only the
    * master @e has such a list.  For servants, this
-   * pointer points to the list of the master.
+   * pointer points to the list of the master.   Note that
+   * it's not a std::list as the name might suggest, but a std::vector.
    */
   std::vector<Point>* _list;
 
