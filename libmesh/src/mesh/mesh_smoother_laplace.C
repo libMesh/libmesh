@@ -1,4 +1,4 @@
-// $Id: mesh_smoother_laplace.C,v 1.12 2004-11-14 18:51:59 jwpeterson Exp $
+// $Id: mesh_smoother_laplace.C,v 1.13 2004-11-15 22:09:14 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -25,6 +25,7 @@
 
 // Local includes
 #include "mesh_smoother_laplace.h"
+#include "mesh_tools.h"
 #include "elem.h"
 
 
@@ -38,7 +39,7 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
   // this would change the mesh geometry which
   // is probably not something we want!
   std::vector<bool> on_boundary;
-  _mesh.find_boundary_nodes(on_boundary);
+  MeshTools::find_boundary_nodes(_mesh, on_boundary);
 
   for (unsigned int n=0; n<n_iterations; n++)
     {

@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.38 2004-11-15 22:09:13 benkirk Exp $
+// $Id: elem.C,v 1.39 2004-11-15 22:14:24 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -63,56 +63,6 @@
 
 // ------------------------------------------------------------
 // Elem class member funcions
-const Point & Elem::point (const unsigned int i) const
-{
-  assert (i < this->n_nodes());
-  assert (_nodes[i] != NULL);
-  assert (_nodes[i]->id() != Node::invalid_id);
-
-  return *_nodes[i];
-}
-
-
-
-Point & Elem::point (const unsigned int i)
-{
-  assert (i < this->n_nodes());
-
-  return *_nodes[i];
-}
-
-
-
-unsigned int Elem::node (const unsigned int i) const
-{
-  assert (i < this->n_nodes());
-  assert (_nodes[i] != NULL);
-  assert (_nodes[i]->id() != Node::invalid_id);
-
-  return _nodes[i]->id();
-}
-
-
-
-Node* Elem::get_node (const unsigned int i) const
-{
-  assert (i < this->n_nodes());
-  assert (_nodes[i] != NULL);
-
-  return _nodes[i];
-}
-
-
-
-Node* & Elem::set_node (const unsigned int i)
-{
-  assert (i < this->n_nodes());
-
-  return _nodes[i];
-}
-
-
-
 AutoPtr<Elem> Elem::build(const ElemType type,
 			  const Elem* p)
 {

@@ -1,4 +1,4 @@
-// $Id: xdr_io.C,v 1.4 2004-11-15 00:20:52 benkirk Exp $
+// $Id: xdr_io.C,v 1.5 2004-11-15 22:09:14 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -30,6 +30,7 @@
 // Local includes
 #include "mesh.h"
 #include "mesh_data.h"
+#include "mesh_tools.h"
 #include "cell_hex27.h" // Needed for MGF-style Hex27 meshes
 #include "xdr_io.h"
 #include "enum_elem_type.h"
@@ -2251,9 +2252,9 @@ void XdrIO::write_mesh (const std::string& name,
   mh.setStrSize(65536);
   
   if (m.get_orig_flag() == 0)
-    mh.setSumWghts(mesh.total_weight());
+    mh.setSumWghts(MeshTools::total_weight(mesh));
   else if (m.get_orig_flag() == 1)
-    mh.setSumWghts(mesh.total_weight()+2*numElem);
+    mh.setSumWghts(MeshTools::total_weight(mesh)+2*numElem);
   else
     error();
         
@@ -2273,9 +2274,9 @@ void XdrIO::write_mesh (const std::string& name,
     int totalWeight =0;
     
     if (orig_type == 0)
-      totalWeight = mesh.total_weight();
+      totalWeight = MeshTools::total_weight(mesh);
     else if(orig_type == 1)
-      totalWeight = mesh.total_weight()+2*mh.getNumEl();
+      totalWeight = MeshTools::total_weight(mesh)+2*mh.getNumEl();
     else
       error();
     

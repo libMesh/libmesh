@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.10 2004-11-15 22:09:11 benkirk Exp $
+// $Id: elem.h,v 1.11 2004-11-15 22:14:14 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -718,6 +718,61 @@ Elem::~Elem()
   _children = NULL;
   
 #endif
+}
+
+
+
+inline
+const Point & Elem::point (const unsigned int i) const
+{
+  assert (i < this->n_nodes());
+  assert (_nodes[i] != NULL);
+  assert (_nodes[i]->id() != Node::invalid_id);
+
+  return *_nodes[i];
+}
+
+
+
+inline
+Point & Elem::point (const unsigned int i)
+{
+  assert (i < this->n_nodes());
+
+  return *_nodes[i];
+}
+
+
+
+inline
+unsigned int Elem::node (const unsigned int i) const
+{
+  assert (i < this->n_nodes());
+  assert (_nodes[i] != NULL);
+  assert (_nodes[i]->id() != Node::invalid_id);
+
+  return _nodes[i]->id();
+}
+
+
+
+inline
+Node* Elem::get_node (const unsigned int i) const
+{
+  assert (i < this->n_nodes());
+  assert (_nodes[i] != NULL);
+
+  return _nodes[i];
+}
+
+
+
+inline
+Node* & Elem::set_node (const unsigned int i)
+{
+  assert (i < this->n_nodes());
+
+  return _nodes[i];
 }
 
 

@@ -1,4 +1,4 @@
-// $Id: partitioner.C,v 1.8 2004-11-14 18:51:59 jwpeterson Exp $
+// $Id: partitioner.C,v 1.9 2004-11-15 22:09:15 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -69,5 +69,5 @@ void Partitioner::single_partition (MeshBase& mesh)
   const MeshBase::element_iterator elem_end = mesh.elements_end(); 
 
   for ( ; elem_it != elem_end; ++elem_it)
-    (*elem_it)->set_processor_id() = 0;
+    (*elem_it)->processor_id() = 0;
 }

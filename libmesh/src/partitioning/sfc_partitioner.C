@@ -1,4 +1,4 @@
-// $Id: sfc_partitioner.C,v 1.14 2004-11-14 18:51:59 jwpeterson Exp $
+// $Id: sfc_partitioner.C,v 1.15 2004-11-15 22:09:15 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -178,7 +178,7 @@ void SFCPartitioner::_do_partition (MeshBase& mesh,
 	  
 	Elem* elem = reverse_map[table[i]-1];
 
-	elem->set_processor_id() = i/blksize;
+	elem->processor_id() = i/blksize;
       }
   }
   

@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.37 2004-11-14 18:51:58 jwpeterson Exp $
+// $Id: boundary_info.C,v 1.38 2004-11-15 22:09:13 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -130,10 +130,10 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
 	      {
 		if (pos.first->second.first == s) // already flagged with a boundary condition
 		  {
-		    side->set_subdomain_id() =
+		    side->subdomain_id() =
 		      id_map[pos.first->second.second];
 		    
-		    side->set_processor_id() =
+		    side->processor_id() =
 		      side->subdomain_id();
 		    break;
 		  }
@@ -145,7 +145,7 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
 	    // doesn't have a booundary condition
 	    if (pos.first == pos.second)
 	      {
-		side->set_subdomain_id() = id_map[invalid_id];
+		side->subdomain_id() = id_map[invalid_id];
 	      }
 	    
 	    // Add the side

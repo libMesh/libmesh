@@ -1,4 +1,4 @@
-// $Id: centroid_partitioner.C,v 1.11 2004-11-14 18:51:59 jwpeterson Exp $
+// $Id: centroid_partitioner.C,v 1.12 2004-11-15 22:09:15 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -108,7 +108,7 @@ void CentroidPartitioner::_do_partition (MeshBase& mesh,
     {
       Elem* elem = _elem_centroids[i].second;
 
-      elem->set_processor_id() = std::min (i / target_size, n-1);
+      elem->processor_id() = std::min (i / target_size, n-1);
     }	
 }
 

@@ -1,4 +1,4 @@
-// $Id: mesh_communication.C,v 1.11 2004-11-14 18:51:59 jwpeterson Exp $
+// $Id: mesh_communication.C,v 1.12 2004-11-15 22:09:14 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -26,6 +26,7 @@
 #include "libmesh_common.h"
 #include "mesh.h"
 #include "mesh_base.h"
+#include "mesh_tools.h"
 #include "boundary_info.h"
 #include "mesh_communication.h"
 #include "elem.h"
@@ -68,7 +69,7 @@ void MeshCommunication::distribute_mesh (MeshBase& mesh) const
   // Get important sizes
   unsigned int n_nodes      = mesh.n_nodes();
   unsigned int n_elem       = mesh.n_elem();
-  unsigned int total_weight = mesh.total_weight();
+  unsigned int total_weight = MeshTools::total_weight(mesh);
 
   // Broadcast the number of nodes
   MPI_Bcast (&n_nodes,      1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
