@@ -1,4 +1,4 @@
-// $Id: quadrature_build.C,v 1.3 2003-02-13 22:56:13 benkirk Exp $
+// $Id: quadrature_build.C,v 1.4 2003-08-27 15:22:51 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -42,10 +42,10 @@ AutoPtr<QBase> QBase::build(const QuadratureType _qt,
       {
 
 #ifdef DEBUG
-	if (_order > TWENTYTHIRD)
+	if (_order > FOURTYTHIRD)
 	  {
 	    std::cout << "WARNING: Gauss quadrature implemented" << std::endl
-		      << " up to TWENTYTHIRD order." << std::endl;
+		      << " up to FOURTYTHIRD order." << std::endl;
 	  }
 #endif
 
