@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.6 2004-06-01 14:24:17 spetersen Exp $ */
+/* $Id: ex14.C,v 1.7 2004-06-02 15:05:06 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -117,12 +117,22 @@ int main(int argc, char** argv)
     const Real refine_percentage   = input_file("refine_percentage", 0.5);
     const Real coarsen_percentage  = input_file("coarsen_percentage", 0.5);
     const unsigned int uniform_refine = input_file("uniform_refine",0);
+    const std::string approx_order    = input_file("approx_order", "FIRST");
     
     // Output file for plotting the error as a function of
     // the number of degrees of freedom.
-    std::ofstream out ("ex14.m");
-    out << "clear all" << std::endl;
-    out << "clf" << std::endl;
+    std::string output_file = "bi";
+    if (approx_order == "FIRST")
+      output_file += "linear_";
+    else
+      output_file += "quadratic_";
+
+    if (uniform_refine == 0)
+      output_file += "adaptive.m";
+    else
+      output_file += "uniform.m";
+    
+    std::ofstream out (output_file.c_str());
     out << "% dofs     L2-error     H1-error" << std::endl;
     out << "e = [" << std::endl;
     
@@ -142,8 +152,11 @@ int main(int argc, char** argv)
 
       // Adds the variable "u" to "Laplace".  "u"
       // will be approximated using second-order approximation.
-      equation_systems("Laplace").add_variable("u", SECOND);
-
+      if (approx_order == "FIRST")
+	equation_systems("Laplace").add_variable("u", FIRST);
+      else
+	equation_systems("Laplace").add_variable("u", SECOND);
+      
       // Give the system a pointer to the matrix assembly
       // function.
       equation_systems("Laplace").attach_assemble_function (assemble_laplace);
@@ -177,7 +190,7 @@ int main(int argc, char** argv)
 	// Solve the system "Laplace", just like example 2.
 	equation_systems("Laplace").solve();
 
-	std::cout << "System has: " << equation_systems.n_dofs()
+	std::cout << "System has: " << equation_systems.n_active_dofs()
 		  << " degrees of freedom."
 		  << std::endl;
 	
@@ -199,7 +212,7 @@ int main(int argc, char** argv)
 		  << std::endl;
 
 	// Print to output file
-	out << equation_systems.n_dofs() << " "
+	out << equation_systems.n_active_dofs() << " "
 	    << exact_sol.l2_error("Laplace", "u") << " "
 	    << exact_sol.h1_error("Laplace", "u") << std::endl;
 
@@ -272,14 +285,18 @@ int main(int argc, char** argv)
     out << "hold on" << std::endl;
     out << "plot(e(:,1), e(:,2), 'bo-');" << std::endl;
     out << "plot(e(:,1), e(:,3), 'ro-');" << std::endl;
-    out << "set(gca,'XScale', 'Log');" << std::endl;
-    out << "set(gca,'YScale', 'Log');" << std::endl;
+    //    out << "set(gca,'XScale', 'Log');" << std::endl;
+    //    out << "set(gca,'YScale', 'Log');" << std::endl;
     out << "xlabel('dofs');" << std::endl;
+    if (approx_order == "FIRST")
+      out << "title('Bilinear elements');" << std::endl;
+    else
+      out  << "title('Biquadratic elements');" << std::endl;
     out << "legend('L2-error', 'H1-error');" << std::endl;
-    out << "disp('L2-error linear fit');" << std::endl;
-    out << "polyfit(log10(e(:,1)), log10(e(:,2)), 1)" << std::endl;
-    out << "disp('H1-error linear fit');" << std::endl;
-    out << "polyfit(log10(e(:,1)), log10(e(:,3)), 1)" << std::endl;
+    //     out << "disp('L2-error linear fit');" << std::endl;
+    //     out << "polyfit(log10(e(:,1)), log10(e(:,2)), 1)" << std::endl;
+    //     out << "disp('H1-error linear fit');" << std::endl;
+    //     out << "polyfit(log10(e(:,1)), log10(e(:,3)), 1)" << std::endl;
   }
 
   
@@ -565,7 +582,7 @@ void assemble_laplace(EquationSystems& es,
 		  // Find the node on the element matching this node on
 		  // the side.  That defines where in the element matrix
 		  // the boundary condition will be applied.
-		  for (unsigned int n=0; n<elem->n_nodes(); n++)
+		  for (unsigned int n=0; n<dof_indices.size(); n++)
 		    if (elem->node(n) == side->node(ns))
 		      {
 			// Matrix contribution.
