@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.48 2003-11-30 06:35:11 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.49 2003-11-30 06:38:40 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -1342,8 +1342,8 @@ if (test -e $MPI_LIBS_PATH/libmpich.a || test -e $MPI_LIBS_PATH/libmpich.so) ; t
           AC_CHECK_LIB([gm],
 	               [gm_open],
 	               [
-                         LIBS="-lgm $LIBS"
-                         MPI_LIBS="-lgm $MPI_LIBS"
+                         LIBS="$LIBS -lgm"
+                         MPI_LIBS="$MPI_LIBS -lgm"
                        ],
 	               [AC_MSG_ERROR( [Could not find gm library... exiting] )] )
 	fi
@@ -1352,7 +1352,7 @@ if (test -e $MPI_LIBS_PATH/libmpich.a || test -e $MPI_LIBS_PATH/libmpich.so) ; t
 	AC_CHECK_LIB([mpich],
 		     [MPI_Init],
 		     [
-		       MPI_LIBS="-lmpich"
+		       MPI_LIBS="-lmpich $MPI_LIBS"
 		       MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
                        AC_MSG_RESULT([Found valid MPICH installlaion...])
                      ],
