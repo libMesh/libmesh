@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.13 2003-11-06 20:30:20 benkirk Exp $
+# $Id: Makefile,v 1.14 2004-07-13 17:31:30 jwpeterson Exp $
 
 
 # The location of the mesh library
@@ -56,13 +56,14 @@ distclean:
 	@$(MAKE) clobber
 	@rm -f *.o *.g.o *.pg.o
 
+# Warning, the 3D problem may be extremely slow if you are running in debug mode.
 run: $(target)
 	@echo "***************************************************************"
 	@echo "* Running Example " $(target)
 	@echo "***************************************************************"
 	@echo " "
-	@$(target) -d 2
-	@$(target) -d 3
+	@$(target) -d 2 -n 15
+	@$(target) -d 3 -n 6
 	@echo " "
 	@echo "***************************************************************"
 	@echo "* Done Running Example " $(target)

@@ -1,4 +1,4 @@
-/* $Id: ex4.C,v 1.37 2004-03-20 15:16:56 benkirk Exp $ */
+/* $Id: ex4.C,v 1.38 2004-07-13 17:31:31 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -92,13 +92,15 @@ int main (int argc, char** argv)
   // Initialize libMesh and any dependent libaries, like in example 2.
   libMesh::init (argc, argv);
 
+  // Declare a performance log for the main program
+  // PerfLog perf_main("Main Program");
   
   // Braces are used to force object scope, like in example 2
   {
     // Check for proper calling arguments.
     if (argc < 3)
       {
-	std::cerr << "Usage: " << argv[0] << " -d 2"
+	std::cerr << "Usage: " << argv[0] << " -d 2(3)" << " -n 15"
 		  << std::endl;
 
 	// This handy function will print the file name, line number,
@@ -122,6 +124,9 @@ int main (int argc, char** argv)
     // Get the dimensionality of the mesh from argv[2]
     const unsigned int dim = atoi(argv[2]);     
     
+    // Get the problem size from argv[4]
+    const unsigned int ps = atoi(argv[4]);
+    // std::cout << "problem_size=" << ps << std::endl;
     
     // Create a mesh with user-defined dimension.
     Mesh mesh (dim);
@@ -132,7 +137,7 @@ int main (int argc, char** argv)
     // to build a mesh of 8x8 \p Quad9 elements in 2D, or \p Hex27
     // elements in 3D.  Building these higher-order elements allows
     // us to use higher-order approximation, as in example 3.
-    mesh.build_cube (15, 15, 15,
+    mesh.build_cube (ps, ps, ps,
 		     -1., 1.,
 		     -1., 1.,
 		     -1., 1.,
