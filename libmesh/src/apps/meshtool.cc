@@ -148,7 +148,7 @@ void usage(char *progName)
   fflush(stderr);
 
   abort();
-};
+}
 
 
 
@@ -426,7 +426,7 @@ void process_cmd_line(int argc, char **argv,
 	};
     };
 
-};
+}
 
 
 
@@ -875,5 +875,5 @@ int main (int argc, char** argv)
 
   
   return libMesh::close();
-};
+}
   
