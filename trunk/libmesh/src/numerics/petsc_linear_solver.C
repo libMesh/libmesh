@@ -1,4 +1,4 @@
-// $Id: petsc_linear_solver.C,v 1.2 2005-01-03 20:16:07 benkirk Exp $
+// $Id: petsc_linear_solver.C,v 1.3 2005-01-05 18:00:18 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -250,11 +250,11 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
 
 
   // Set the solution vector to use
-  ierr = KSPSetSolution (_ksp, solution->vec);
+  ierr = KSPSetSolution (_ksp, solution->vec());
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 	 
   // Set the RHS vector to use
-  ierr = KSPSetRhs (_ksp, rhs->vec);
+  ierr = KSPSetRhs (_ksp, rhs->vec());
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
    
   // Solve the linear system
