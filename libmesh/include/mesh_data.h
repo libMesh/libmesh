@@ -1,4 +1,4 @@
-// $Id: mesh_data.h,v 1.5 2003-05-22 19:10:38 ddreyer Exp $
+// $Id: mesh_data.h,v 1.6 2003-06-07 14:36:08 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -177,6 +177,30 @@ public:
    * and ready for use for @e nodal data, \p false otherwise.
    */
   bool node_initialized () const;
+
+
+  //----------------------------------------------------------
+  // Methods for accessing the node and element maps.
+  // Heavily used by the \p read() and \p write() methods.
+  /**
+   * @returns the \p Node* that this foreign id maps to.
+   */
+  const Node* foreign_id_to_node (const unsigned int fid) const;
+
+  /**
+   * @returns the \p Elem* that this foreign id maps to.
+   */
+  const Elem* foreign_id_to_elem (const unsigned int fid) const;
+
+  /**
+   * @returns the foreign id this \p Node* maps to.
+   */
+  unsigned int node_to_foreign_id (const Node* n) const;
+
+  /**
+   * @returns the foreign id this \p Elem* maps to.
+   */
+  unsigned int elem_to_foreign_id (const Elem* n) const;
 
 
 protected:
@@ -361,33 +385,6 @@ protected:
    * that it can communicate foreign node ids to this class.
    */
   friend class XdrInterface;
-
-
-private:
-
-
-  //----------------------------------------------------------
-  // Methods for accessing the node and element maps.
-  // Heavily used by the \p read() and \p write() methods.
-  /**
-   * @returns the \p Node* that this foreign id maps to.
-   */
-  const Node* foreign_id_to_node (const unsigned int fid) const;
-
-  /**
-   * @returns the foreign id this \p Node* maps to.
-   */
-  unsigned int node_to_foreign_id (const Node* n) const;
-
-  /**
-   * @returns the \p Elem* that this foreign id maps to.
-   */
-  const Elem* foreign_id_to_elem (const unsigned int fid) const;
-
-  /**
-   * @returns the foreign id this \p Elem* maps to.
-   */
-  unsigned int elem_to_foreign_id (const Elem* n) const;
 
 };
 
