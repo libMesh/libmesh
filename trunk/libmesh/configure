@@ -7825,7 +7825,7 @@ echo "${ECHO_T}<<< Configuring library with PETSc version $petscversion support 
 
 
 # if MPIHOME is empty, set it to /usr
-if (test -z $MPIHOME) ; then
+if (test "x$MPIHOME" = x) ; then
   MPIHOME="/usr"
 fi
 
@@ -8415,7 +8415,7 @@ fi
 
 
 # if MPIHOME is empty, set it to /usr
-if (test -z $MPIHOME) ; then
+if (test "x$MPIHOME" = x) ; then
   MPIHOME="/usr"
 fi
 

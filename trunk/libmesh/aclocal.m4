@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.43 2003-11-30 06:01:17 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.44 2003-11-30 06:07:41 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -1234,7 +1234,7 @@ dnl ---------------------------------------------------------------------------
 AC_DEFUN([ACX_MPI], [
 
 # if MPIHOME is empty, set it to /usr
-if (test -z $MPIHOME) ; then
+if (test "x$MPIHOME" = x) ; then
   MPIHOME="/usr"
 fi
 
