@@ -1,4 +1,4 @@
-// $Id: inf_fe_map.C,v 1.3 2003-04-18 15:46:23 spetersen Exp $
+// $Id: inf_fe_map.C,v 1.4 2003-04-29 19:48:09 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -110,7 +110,15 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
   const unsigned int n_base_mapping_sf = Base::n_base_mapping_sf (base_mapping_elem_type,
 								  base_mapping_order);
 
-
+  const ElemType inf_elem_type = inf_elem->type();
+  if (inf_elem_type != INFHEX8 &&
+      inf_elem_type != INFPRISM6)
+    {
+      here();
+      std::cerr << "ERROR: InfFE::inverse_map is currently implemented only for\n"
+		<< " infinite elments of type InfHex8 and InfPrism6." << std::endl;
+      error();
+    }
 
   /*
    * 2.
@@ -138,7 +146,118 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
    */
   Point p; // the zero point.  No computation required
 
+
   /**
+   * Now find the intersection of a plane represented by the base
+   * element nodes and the line given by the origin of the infinite
+   * element and the physical point.
+   */
+
+  Point intersection;
+
+  // the origin of the infinite lement
+  const Point o = inf_elem->origin(); 
+
+  switch (Dim)
+    {
+
+      // unnecessary for 1D
+    case 1:
+      {
+	break;
+      }
+
+    case 2:
+      {
+	here();
+	std::cerr << "ERROR: InfFE::inverse_map is not yet implemented"
+		  << " in 2d" << std::endl;
+	error();
+	break;
+      }
+
+
+    case 3:
+      {
+	// references to the nodal points of the base element
+	const Point& p0 = base_elem->point(0);
+	const Point& p1 = base_elem->point(1);
+	const Point& p2 = base_elem->point(2);
+	
+	// a reference to the physical point
+	const Point& fp = physical_point;
+	
+	// The intersection of the plane and the line is given by
+	// can be computed solving a linear 3x3 system
+	// a*({p1}-{p0})+b*({p2}-{p0})-c*({fp}-{o})={fp}-{p0}.
+	
+	// old code works only if the origin of the infinite element is (0,0,0)	    
+	/*
+	  const Real c_factor = (p1(0)*fp(2)*p0(1)-p1(1)*fp(2)*p0(0)
+	  +p1(1)*fp(2)*p2(0)-p1(0)*fp(2)*p2(1)
+	  -p0(1)*fp(2)*p2(0)+p1(0)*fp(1)*p2(2)
+	  +p1(2)*fp(0)*p2(1)-p1(2)*fp(0)*p0(1)
+	  -p1(0)*fp(1)*p0(2)+p1(1)*fp(0)*p0(2)
+	  +p1(2)*fp(1)*p0(0)-p1(2)*p0(0)*p2(1)
+	  +p1(2)*p0(1)*p2(0)+p2(2)*p1(1)*p0(0)
+	  -p2(2)*p1(0)*p0(1)-p1(1)*fp(0)*p2(2)
+	  -p1(2)*fp(1)*p2(0)+p0(2)*p1(0)*p2(1)
+	  -p0(2)*p1(1)*p2(0)+p0(0)*fp(2)*p2(1)
+	  +p0(2)*fp(1)*p2(0)+p0(1)*fp(0)*p2(2)
+	  -p0(0)*fp(1)*p2(2)-p0(2)*fp(0)*p2(1))/
+	  (p1(0)*fp(2)*p2(1)-p1(0)*fp(2)*p0(1)
+	  -p1(0)*fp(1)*p2(2)+p1(0)*fp(1)*p0(2)
+	  -p0(0)*fp(2)*p2(1)+p0(0)*fp(1)*p2(2)
+	  -p1(1)*fp(2)*p2(0)+p1(1)*fp(2)*p0(0)
+	  +p1(1)*fp(0)*p2(2)-p1(1)*fp(0)*p0(2)
+	  +p0(1)*fp(2)*p2(0)-p0(1)*fp(0)*p2(2)
+	  +p1(2)*fp(1)*p2(0)-p1(2)*fp(1)*p0(0)
+	  -p1(2)*fp(0)*p2(1)+p1(2)*fp(0)*p0(1)
+	  -p0(2)*fp(1)*p2(0)+p0(2)*fp(0)*p2(1));
+	*/
+	
+	const Real c_factor = -(p1(0)*fp(1)*p0(2)-p1(0)*fp(2)*p0(1)
+				+fp(0)*p1(2)*p0(1)-p0(0)*fp(1)*p1(2)
+				+p0(0)*fp(2)*p1(1)+p2(0)*fp(2)*p0(1)
+				-p2(0)*fp(1)*p0(2)-fp(0)*p2(2)*p0(1)
+				+fp(0)*p0(2)*p2(1)+p0(0)*fp(1)*p2(2)
+				-p0(0)*fp(2)*p2(1)-fp(0)*p0(2)*p1(1)
+				+p0(2)*p2(0)*p1(1)-p0(1)*p2(0)*p1(2)
+				-fp(0)*p1(2)*p2(1)+p2(1)*p0(0)*p1(2)
+				-p2(0)*fp(2)*p1(1)-p1(0)*fp(1)*p2(2)
+				+p2(2)*p1(0)*p0(1)+p1(0)*fp(2)*p2(1)
+				-p0(2)*p1(0)*p2(1)-p2(2)*p0(0)*p1(1)
+				+fp(0)*p2(2)*p1(1)+p2(0)*fp(1)*p1(2))/
+	                        (fp(0)*p1(2)*p0(1)-p1(0)*fp(2)*p0(1)
+				 +p1(0)*fp(1)*p0(2)-p1(0)*o(1)*p0(2)
+				 +o(0)*p2(2)*p0(1)-p0(0)*fp(2)*p2(1)
+				 +p1(0)*o(1)*p2(2)+fp(0)*p0(2)*p2(1)
+				 -fp(0)*p1(2)*p2(1)-p0(0)*o(1)*p2(2)
+				 +p0(0)*fp(1)*p2(2)-o(0)*p0(2)*p2(1)
+				 +o(0)*p1(2)*p2(1)-p2(0)*fp(2)*p1(1)
+				 +fp(0)*p2(2)*p1(1)-p2(0)*fp(1)*p0(2)
+				 -o(2)*p0(0)*p1(1)-fp(0)*p0(2)*p1(1)
+				 +p0(0)*o(1)*p1(2)+p0(0)*fp(2)*p1(1)
+				 -p0(0)*fp(1)*p1(2)-o(0)*p1(2)*p0(1)
+				 -p2(0)*o(1)*p1(2)-o(2)*p2(0)*p0(1)
+				 -o(2)*p1(0)*p2(1)+o(2)*p0(0)*p2(1)
+				 -fp(0)*p2(2)*p0(1)+o(2)*p2(0)*p1(1)
+				 +p2(0)*o(1)*p0(2)+p2(0)*fp(1)*p1(2)
+				 +p2(0)*fp(2)*p0(1)-p1(0)*fp(1)*p2(2)
+				 +p1(0)*fp(2)*p2(1)-o(0)*p2(2)*p1(1)
+				 +o(2)*p1(0)*p0(1)+o(0)*p0(2)*p1(1));
+	
+
+	// Compute the intersection with
+	// {intersection} = {fp} + c*({fp}-{o}).
+	intersection.add_scaled(fp,1.+c_factor);
+	intersection.add_scaled(o,-c_factor);
+
+	break;
+      }
+    }
+
+   /**
    * The number of iterations in the map inversion process.
    */
   unsigned int cnt = 0;
@@ -229,15 +348,18 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 	   */
 	case 3:
 	  {
+
 	    /**
 	     * Where our current iterate \p p maps to.
 	     */
 	    const Point physical_guess = FE<2,LAGRANGE>::map (base_elem.get(), p);
 
+
 	    /**
 	     * How far our current iterate is from the actual point.
 	     */
-	    const Point delta = physical_point - physical_guess;
+	    // const Point delta = physical_point - physical_guess;
+	    const Point delta = intersection - physical_guess;
 
 
 	    const Point dxi  = FE<2,LAGRANGE>::map_xi  (base_elem.get(), p);
@@ -310,7 +432,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
        */
       if (cnt > 10)
 	{
-	  if (secure)
+	  if (secure || !secure)
 	    {
 	      here();
 	      {
@@ -333,7 +455,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 	      }
 	    }
 
-	  if (cnt > 2000)
+	  if (cnt > 20)
 	    {
 	      std::cerr << "ERROR: Newton scheme FAILED to converge in "
 			<< cnt << " iterations!" << std::endl;
@@ -347,8 +469,6 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 	}
     }
   while (error > tolerance);
-
-
 
   /*
    * 4.
@@ -425,14 +545,18 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 	    // the radial distance of the i-th base mapping point
 	    const Real dist_i = Point( inf_elem->point(i) 
 				       - inf_elem->point(i+n_base_mapping_sf) ).size();
+
 	    // weight with the corresponding shape function
 	    a_interpolated += dist_i * FE<2,LAGRANGE>::shape(base_mapping_elem_type,
 							     base_mapping_order,
 							     i,
 							     p);
+
 	  }
 
-	p(2) = 1. - 2*a_interpolated/physical_point(2);
+	p(2) = 1. - 2*a_interpolated/physical_point.size();
+
+
 
 #ifdef DEBUG
 	// the radial distance should always be >= -1.
@@ -479,6 +603,9 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
    * Stop logging the map inversion.
    */
   STOP_LOG("inverse_map()", "InfFE");
+
+  // std::cout << "This is the point we found: " << std::endl;
+  // p.print();
   
   return p;
 }
