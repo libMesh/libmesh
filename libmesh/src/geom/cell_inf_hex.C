@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex.C,v 1.2 2003-05-23 23:17:56 benkirk Exp $
+// $Id: cell_inf_hex.C,v 1.3 2003-07-12 16:33:18 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -120,12 +120,6 @@ AutoPtr<Elem> InfHex::side (const unsigned int i) const
 	face->set_node(1) = this->get_node(1);
 	face->set_node(2) = this->get_node(2);
 	face->set_node(3) = this->get_node(3);
-/* old code
-	face->set_node(0) = this->get_node(0);
-	face->set_node(1) = this->get_node(3);
-	face->set_node(2) = this->get_node(2);
-	face->set_node(3) = this->get_node(1);
-*/
 
 	return face;
       }
@@ -137,8 +131,8 @@ AutoPtr<Elem> InfHex::side (const unsigned int i) const
 
 	face->set_node(0) = this->get_node(0);
 	face->set_node(1) = this->get_node(1);
-	face->set_node(2) = this->get_node(5);
-	face->set_node(3) = this->get_node(4);
+	face->set_node(2) = this->get_node(4);
+	face->set_node(3) = this->get_node(5);
 	
 	return face;
       }
@@ -150,8 +144,8 @@ AutoPtr<Elem> InfHex::side (const unsigned int i) const
 
 	face->set_node(0) = this->get_node(1);
 	face->set_node(1) = this->get_node(2);
-	face->set_node(2) = this->get_node(6);
-	face->set_node(3) = this->get_node(5);
+	face->set_node(2) = this->get_node(5);
+	face->set_node(3) = this->get_node(6);
 
 	return face;
       }
@@ -163,8 +157,8 @@ AutoPtr<Elem> InfHex::side (const unsigned int i) const
 
 	face->set_node(0) = this->get_node(2);
 	face->set_node(1) = this->get_node(3);
-	face->set_node(2) = this->get_node(7);
-	face->set_node(3) = this->get_node(6);
+	face->set_node(2) = this->get_node(6);
+	face->set_node(3) = this->get_node(7);
 	
 	return face;
       }
@@ -176,8 +170,8 @@ AutoPtr<Elem> InfHex::side (const unsigned int i) const
 
 	face->set_node(0) = this->get_node(3);
 	face->set_node(1) = this->get_node(0);
-	face->set_node(2) = this->get_node(4);
-	face->set_node(3) = this->get_node(7);
+	face->set_node(2) = this->get_node(7);
+	face->set_node(3) = this->get_node(4);
 
 	return face;
       }

@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex16.C,v 1.15 2003-03-11 00:47:41 ddreyer Exp $
+// $Id: cell_inf_hex16.C,v 1.16 2003-07-12 16:33:18 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -52,16 +52,7 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i) const
 	face->set_node(5) = this->get_node(9);
 	face->set_node(6) = this->get_node(10);
 	face->set_node(7) = this->get_node(11);
-/* old code
-	face->set_node(0) = this->get_node(0);
-	face->set_node(1) = this->get_node(3);
-	face->set_node(2) = this->get_node(2);
-	face->set_node(3) = this->get_node(1);
-	face->set_node(4) = this->get_node(11);
-	face->set_node(5) = this->get_node(10);
-	face->set_node(6) = this->get_node(9);
-	face->set_node(7) = this->get_node(8);
-*/
+
 	return face;
       }
 
@@ -71,8 +62,8 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i) const
 
 	face->set_node(0) = this->get_node(0);
 	face->set_node(1) = this->get_node(1);
-	face->set_node(2) = this->get_node(5);
-	face->set_node(3) = this->get_node(4);
+	face->set_node(2) = this->get_node(4);
+	face->set_node(3) = this->get_node(5);
 	face->set_node(4) = this->get_node(8);
 	face->set_node(5) = this->get_node(12);
 
@@ -85,8 +76,8 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i) const
 
 	face->set_node(0) = this->get_node(1);
 	face->set_node(1) = this->get_node(2);
-	face->set_node(2) = this->get_node(6);
-	face->set_node(3) = this->get_node(5);
+	face->set_node(2) = this->get_node(5);
+	face->set_node(3) = this->get_node(6);
 	face->set_node(4) = this->get_node(9);
 	face->set_node(5) = this->get_node(13);
 
@@ -99,8 +90,8 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i) const
 	
 	face->set_node(0) = this->get_node(2);
 	face->set_node(1) = this->get_node(3);
-	face->set_node(2) = this->get_node(7);
-	face->set_node(3) = this->get_node(6);
+	face->set_node(2) = this->get_node(6);
+	face->set_node(3) = this->get_node(7);
 	face->set_node(4) = this->get_node(10);
 	face->set_node(5) = this->get_node(14);
 
@@ -113,8 +104,8 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i) const
 
 	face->set_node(0) = this->get_node(3);
 	face->set_node(1) = this->get_node(0);
-	face->set_node(2) = this->get_node(4);
-	face->set_node(3) = this->get_node(7);
+	face->set_node(2) = this->get_node(7);
+	face->set_node(3) = this->get_node(4);
 	face->set_node(4) = this->get_node(11);
 	face->set_node(5) = this->get_node(15);
 
