@@ -1,4 +1,4 @@
-// $Id: partitioner_factory.C,v 1.3 2003-10-02 01:05:08 benkirk Exp $
+// $Id: partitioner_factory.C,v 1.4 2003-11-15 20:12:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -37,13 +37,15 @@
 
 // ------------------------------------------------------------
 // Explicit instantiation of a Partitioner factory
-// #if defined(__IBMCPP__) || defined(__sgi)
-//   template <class Partitioner> std::map<std::string, Factory<Partitioner>* > Factory<Partitioner>::factory_map;
-//   template class Factory<Partitioner>;
-// #else
+#if defined(__IBMCPP__)
+
+  template <class Partitioner> std::map<std::string, FactoryBase* > Factory<Partitioner>::factory_map;
+  template class Factory<Partitioner>;
+
+#else
   
   std::map<std::string, FactoryBase* > Factory<Partitioner>::factory_map;
-// #endif
+#endif
 
 
 
