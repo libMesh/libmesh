@@ -1,4 +1,4 @@
-// $Id: system_base.C,v 1.8 2003-02-28 23:37:46 benkirk Exp $
+// $Id: system_base.C,v 1.9 2003-03-17 11:35:00 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,10 +24,15 @@
 #include <algorithm>
 
 // Local includes
-#include "mesh_config.h"  /*  doxygen needs this for #ifdef ENABLE_AMR ??? */
 #include "mesh.h"
 #include "libmesh.h"
 #include "system_base.h"
+
+// typedef
+typedef std::map<std::string, SparseMatrix<Number>* >::iterator        other_matrices_iterator;
+typedef std::map<std::string, SparseMatrix<Number>* >::const_iterator  other_matrices_const_iterator;
+typedef std::map<std::string, NumericVector<Number>* >::iterator       other_vectors_iterator;
+typedef std::map<std::string, NumericVector<Number>* >::const_iterator other_vectors_const_iterator;
 
 
 // ------------------------------------------------------------
@@ -44,6 +49,9 @@ SystemBase::SystemBase (Mesh& mesh,
   linear_solver_interface (LinearSolverInterface<Number>::build(solver_package)),
   _sys_name               (name),
   _sys_number             (number),
+  _can_add_matrices       (true),
+  _can_add_vectors        (true),
+  _solver_package         (solver_package),
   _dof_map                (number),
   _mesh                   (mesh)
 {
@@ -74,6 +82,35 @@ void SystemBase::clear ()
   rhs->clear ();
 
   matrix->clear ();
+
+  // clear other matrices, if existent
+  {
+    other_matrices_iterator pos = _other_matrices.begin();
+    while (pos != _other_matrices.end())
+      {
+        // clear matrix, delete pointer, erase entry in map & get next entry
+        pos->second->clear ();
+	delete pos->second;
+	_other_matrices.erase(pos);
+	pos = _other_matrices.begin();
+      }
+
+    _can_add_matrices=true;
+  }
+
+  // clear other vectors, if existent
+  {
+    other_vectors_iterator pos = _other_vectors.begin();
+    while (pos != _other_vectors.end())
+      {
+        pos->second->clear();
+	delete pos->second;
+	_other_vectors.erase(pos);
+	pos = _other_vectors.begin();
+      }
+
+    _can_add_vectors=true;
+  }
 }
 
 
@@ -94,6 +131,14 @@ void SystemBase::init ()
   solution->init (n_dofs(), n_local_dofs());
 
   rhs->init      (n_dofs(), n_local_dofs());
+
+  // from now on, no chance to add additional vectors
+  _can_add_vectors=false;
+
+  // initialize other vectors, if necessary
+  for(other_vectors_iterator pos = _other_vectors.begin();
+      pos != _other_vectors.end(); ++pos)
+      pos->second->init (n_dofs(), n_local_dofs());
 }
 
 
@@ -101,6 +146,9 @@ void SystemBase::init ()
 
 void SystemBase::assemble ()
 {
+  // no chance to add other matrices
+  _can_add_matrices=false;
+  
   // initialize the matrix if not 
   // already initialized
   if (!matrix->initialized())
@@ -114,17 +162,57 @@ void SystemBase::assemble ()
       matrix->attach_dof_map (_dof_map);
 
       // Compute the sparisty pattern for the current
-      // mesh and DOF distribution
+      // mesh and DOF distribution.  This also updates
+      // additional matrices, \p DofMap knows them
       _dof_map.compute_sparsity (_mesh);
 
       // Initialize the matrix conformal to this
       // sparsity pattern
       matrix->init ();
+
+      // Initialize additional matrices conformal
+      // to this sparsity pattern, if not already done
+      for(other_matrices_iterator pos = _other_matrices.begin(); 
+	  pos != _other_matrices.end(); ++pos)
+	if (pos->second->initialized())
+	  {
+	    // theoretically, with the proper access tests in get_matrix(),
+	    // this cannot happen.  But, who knows?
+	    std::cerr << "ERROR: Mayor matrix is not initialized, but additional matrix "
+		      << pos->first
+		      << " is!"
+		      << std::endl;
+	    error();
+	  }
+	else
+	    pos->second->init ();
+	    
+    }
+  else
+    {
+      // Better check whether the other matrices are also initialized
+      for(other_matrices_const_iterator pos = _other_matrices.begin(); 
+	  pos != _other_matrices.end(); ++pos)
+	if (!pos->second->initialized())
+	  {
+	    // theoretically, with the proper access tests in get_matrix(),
+	    // this cannot happen.  But, who knows?
+	    std::cerr << "ERROR: Mayor matrix is initialized, but additional matrix "
+		      << pos->first
+		      << " is not!"
+		      << std::endl;
+	    error();
+	  }
     }
 
   // Clear the matrix and right-hand side.
   matrix->zero ();
   rhs->zero    ();
+
+  // Clear the additional matrices
+  for(other_matrices_iterator pos = _other_matrices.begin(); 
+      pos != _other_matrices.end(); ++pos)
+    pos->second->zero ();
 
   // Now everything is set up and ready for matrix assembly
 }
@@ -150,6 +238,155 @@ void SystemBase::update_global_solution (std::vector<Number>& global_soln,
   solution->localize_to_one (global_soln, dest_proc);
 }
 
+
+
+
+void SystemBase::add_matrix (const std::string& mat_name)
+{
+  // only add matrices _before_ assembly...
+  if (!_can_add_matrices)
+    {
+      std::cerr << "ERROR: Too late.  Cannot add matrices to the system"
+		<< std::endl
+		<< " any more.  You should have done this earlier."
+		<< std::endl;
+      error();
+    }
+
+  // Make sure the matrix isn't there already
+  if (_other_matrices.count(mat_name))
+    {
+      std::cerr << "ERROR: matrix "
+		<< mat_name
+		<< " has already been added to this system!"
+		<< std::endl;
+      error();
+    }
+  
+  // build the matrix, add it to the map
+  SparseMatrix<Number>* buf(SparseMatrix<Number>::build(_solver_package).release());
+  _other_matrices[mat_name] = buf;
+
+  // Add the matrix to the _dof_map
+  _dof_map.attach_other_matrix (*(_other_matrices[mat_name]));
+}
+
+
+
+
+SparseMatrix<Number> &  SystemBase::get_matrix(const std::string& mat_name)
+{
+  // only enable access _after_ the matrices are properly initialized
+  if (_can_add_matrices)
+    {
+      std::cerr << "ERROR: Too early.  Access to additional matrices granted only when "
+		<< std::endl
+		<< "these are already properly initialized."
+		<< std::endl;
+      error();
+    }
+
+   // Make sure the matrix exists
+  other_matrices_const_iterator pos = _other_matrices.find(mat_name);  
+  if (pos == _other_matrices.end())
+    {
+      std::cerr << "ERROR: matrix "
+		<< mat_name
+		<< " does not exist in this system!"
+		<< std::endl;      
+      error();
+    }
+  
+  return *(pos->second);
+}
+
+
+
+
+void SystemBase::add_vector (const std::string& vec_name)
+{
+  // only add vectors before initializing...
+  if (!_can_add_vectors)
+    {
+      std::cerr << "ERROR: Too late.  Cannot add vectors to the system"
+		<< std::endl
+		<< " any more.  You should have done this earlier."
+		<< std::endl;
+      error();
+    }
+
+  // Make sure the vector isn't there already
+  if (_other_vectors.count(vec_name))
+    {
+      std::cerr << "ERROR: vector "
+		<< vec_name
+		<< " has already been added for this system!"
+		<< std::endl;
+      error();
+    }
+  
+  // Add the vector to the map
+  NumericVector<Number>* buf(NumericVector<Number>::build(_solver_package).release());
+  _other_vectors[vec_name] = buf;
+}
+
+
+
+
+NumericVector<Number> &  SystemBase::get_vector(const std::string& vec_name)
+{
+  // only enable access after the vectors are properly initialized
+  if (_can_add_vectors)
+    {
+      std::cerr << "ERROR: Too early.  Access to vectors granted only when "
+		<< std::endl
+		<< "these are already properly initialized."
+		<< std::endl;
+      error();
+    }
+
+  // Make sure the vector exists
+  other_vectors_const_iterator pos = _other_vectors.find(vec_name);
+  
+  if (pos == _other_vectors.end())
+    {
+      std::cerr << "ERROR: vector "
+		<< vec_name
+		<< " does not exist in this system!"
+		<< std::endl;      
+      error();
+    }
+  
+  return *(pos->second);
+}
+
+
+
+void SystemBase::zero_vectors()
+{
+  // do this only when we cannot add vectors anymore, since
+  // then the vectors are already initialized
+  if (_can_add_vectors)
+    {
+      std::cerr << "ERROR: Too early.  Can only zero the vectors when"
+		<< std::endl
+		<< "these are already properly initialized."
+		<< std::endl;
+      error();
+    }
+
+  other_vectors_iterator pos = _other_vectors.begin();
+  if (pos == _other_vectors.end())
+    {
+      std::cerr << "ERROR: No additional vectors to zero!"
+		<< std::endl;      
+      error(); 
+    }
+  else
+    // zero the other vectors
+    for(; pos != _other_vectors.end(); ++pos)
+	pos->second->zero ();
+}
 
 
 
@@ -204,3 +441,4 @@ unsigned short int SystemBase::variable_number (const std::string& var) const
   
   return pos->second;
 }
+

@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.30 2003-03-16 19:10:23 benkirk Exp $
+// $Id: dof_map.C,v 1.31 2003-03-17 11:35:00 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -48,6 +48,14 @@ void DofMap::attach_matrix (SparseMatrix<Number>& matrix)
   _matrix->attach_dof_map (*this);
 }
 
+
+
+void DofMap::attach_other_matrix (SparseMatrix<Number>& mat)
+{
+  _other_matrices.push_back(&mat);
+
+  _other_matrices.back()->attach_dof_map(*this);
+}
 
 
 void DofMap::reinit(MeshBase& mesh)
@@ -143,6 +151,8 @@ void DofMap::clear()
 
   _matrix = NULL;
   
+  _other_matrices.clear();
+
   _n_dfs =
     _n_nodes =
     _n_elem =
@@ -452,13 +462,26 @@ void DofMap::compute_sparsity(MeshBase& mesh)
   // \p SparseMatrix implementations want to see it.  Let them
   // see it before we throw it away.
   //
-  // NOTE:  The \p SparseMatrix::update_sparsity_pattern() is NOT
-  // const, so the \p SparseMatrix may freely trash the
-  // sparsity_pattern.  DO NOT expect to use it any more after
-  // this call.
+  // When additional matrices are handled, let the mayor matrix
+  // be the first to get to know the sparsity pattern, so that
+  // it has the best chance to be allocated successfully...
   {
-    if (_matrix != NULL)
-      _matrix->update_sparsity_pattern (sparsity_pattern);
+    if (!_other_matrices.empty())
+      {
+        // use the const version of the update_sparsity_pattern()
+        if (_matrix != NULL)
+          _matrix->const_update_sparsity_pattern (sparsity_pattern);
+
+	for (unsigned int n=0; n<_other_matrices.size(); n++)
+          _other_matrices[n]->const_update_sparsity_pattern (sparsity_pattern);
+      }     
+    else
+      // NOTE:  The \p SparseMatrix::update_sparsity_pattern() is NOT
+      // const, so the \p SparseMatrix may freely trash the
+      // sparsity_pattern.  DO NOT expect to use it any more after
+      // this call.
+      if (_matrix != NULL)
+        _matrix->update_sparsity_pattern (sparsity_pattern);
     
     // Explicity clear the sparsity pattern now.
     // it is about to go out of scope, but maybe this

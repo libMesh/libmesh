@@ -1,4 +1,4 @@
-// $Id: system_base.h,v 1.6 2003-02-20 04:59:58 benkirk Exp $
+// $Id: system_base.h,v 1.7 2003-03-17 11:34:54 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -138,6 +138,45 @@ public:
   DofMap & get_dof_map() { return _dof_map; }
 
   /**
+   * Adds the additional matrix \p mat_name to this system.  Only
+   * allowed @e prior to \p assemble().  All additional matrices
+   * have the same sparsity pattern as the matrix used during
+   * solution.  When not \p SystemBase but the @e user wants to
+   * initialize the mayor matrix, then all the additional matrices,
+   * if existent, have to be initialized by the user, too.
+   */
+  void add_matrix (const std::string& mat_name);
+
+  /**
+   * @returns a writeable reference to this system's @e additional matrix
+   * named \p mat_name.  @e None of these matrices is involved in the 
+   * solution process.  Access is only granted when the matrix is already
+   * properly initialized.
+   */
+  SparseMatrix<Number> & get_matrix(const std::string& mat_name);
+
+  /**
+   * Adds the additional vector \p vec_name to this system.  Only
+   * allowed @e prior to \p init().  All the additional vectors
+   * are similarly distributed, like \p rhs and \p solution. 
+   * After initialization, these vectors are not zero'ed.  Use
+   * \p zero_vectors() for this.
+   */
+  void add_vector (const std::string& vec_name);
+
+  /**
+   * @returns a writeable reference to this system's @e additional vector
+   * named \p vec_name.  Access is only granted when the vector is already
+   * properly initialized.
+   */
+  NumericVector<Number> & get_vector(const std::string& vec_name);
+
+  /**
+   * Zeros the additional vectors.  Gives an error when none exist.
+   */
+  void zero_vectors();
+
+  /**
    * @returns the number of variables in the system
    */
   unsigned int n_vars() const;
@@ -246,6 +285,32 @@ protected:
    */
   std::map<std::string, unsigned short int> _var_num;
   
+  /**
+   * Some systems need multiple matrices.
+   */
+  std::map<std::string, SparseMatrix<Number>* > _other_matrices;
+
+  /**
+   * \p true when additional matrices may still be added, \p false otherwise.
+   */
+  bool _can_add_matrices;
+  
+  /**
+   * Some systems need multiple vectors.  
+   */
+  std::map<std::string, NumericVector<Number>* > _other_vectors;
+
+  /**
+   * \p true when additional vectors may still be added, \p false otherwise.
+   */
+  bool _can_add_vectors;
+
+  /**
+   * remember the solver package, in case we have to add additional
+   * vectors/matrices.
+   */
+  SolverPackage _solver_package;
+
   /**
    * Data structure describing the relationship between
    * nodes, variables, etc... and degrees of freedom.
