@@ -1,4 +1,4 @@
-/* $Id: ex6.C,v 1.31 2004-01-03 15:37:41 benkirk Exp $ */
+/* $Id: ex6.C,v 1.32 2004-03-20 15:16:56 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -42,6 +42,7 @@
 // Basic include file needed for the mesh functionality.
 #include "libmesh.h"
 #include "mesh.h"
+#include "gmv_io.h"
 #include "implicit_system.h"
 #include "equation_systems.h"
 

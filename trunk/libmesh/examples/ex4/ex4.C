@@ -1,4 +1,4 @@
-/* $Id: ex4.C,v 1.36 2004-01-03 15:37:41 benkirk Exp $ */
+/* $Id: ex4.C,v 1.37 2004-03-20 15:16:56 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -45,6 +45,7 @@
 // Basic include file needed for the mesh functionality.
 #include "libmesh.h"
 #include "mesh.h"
+#include "gmv_io.h"
 #include "implicit_system.h"
 #include "equation_systems.h"
 
@@ -170,8 +171,8 @@ int main (int argc, char** argv)
 
     // After solving the system write the solution
     // to a GMV-formatted plot file.
-    mesh.write_gmv ((dim == 3) ? "out_3.gmv" : "out_2.gmv",
-		    equation_systems);
+    GMVIO (mesh).write_equation_systems ((dim == 3) ? "out_3.gmv" : "out_2.gmv",
+					 equation_systems);
   }
   
   // All done.  
@@ -451,16 +452,12 @@ void assemble_poisson(EquationSystems& es,
 		  // Matrix contribution of the L2 projection. 
 		  for (unsigned int i=0; i<phi_face.size(); i++)
 		    for (unsigned int j=0; j<phi_face.size(); j++)
-		      {
-			Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
-		      }
-
+		      Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
+		  
 		  // Right-hand-side contribution of the L2
 		  // projection.
 		  for (unsigned int i=0; i<phi_face.size(); i++)
-		    {
-		      Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
-		    }
+		    Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
 		} 
 	    } 
 	

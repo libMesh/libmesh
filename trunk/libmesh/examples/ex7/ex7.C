@@ -1,4 +1,4 @@
-/* $Id: ex7.C,v 1.31 2004-01-03 15:37:41 benkirk Exp $ */
+/* $Id: ex7.C,v 1.32 2004-03-20 15:16:56 benkirk Exp $ */
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
 
@@ -44,6 +44,7 @@
 #include "libmesh.h"
 #include "libmesh_logging.h"
 #include "mesh.h"
+#include "gmv_io.h"
 #include "equation_systems.h"
 
 // Include FrequencySystem.  Compared to GeneralSystem,
@@ -237,7 +238,8 @@ int main (int argc, char** argv)
 	// respectively.
 	char buf[14];
 	sprintf (buf, "out%04d.gmv", n);
-	mesh.write_gmv (buf, equation_systems);
+	GMVIO(mesh).write_equation_systems (buf,
+					    equation_systems);
       }
     
     // Alternatively, the whole EquationSystems object can be

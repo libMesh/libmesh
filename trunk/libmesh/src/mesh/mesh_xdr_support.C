@@ -1,4 +1,4 @@
-// $Id: mesh_xdr_support.C,v 1.19 2004-03-07 23:11:33 benkirk Exp $
+// $Id: mesh_xdr_support.C,v 1.20 2004-03-20 15:16:57 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -34,6 +34,8 @@
 #include "mesh_xdr_support.h"
 #include "elem.h"
 #include "cell_hex27.h"
+#include "utility.h"
+
 
 
 void XdrInterface::mesh_interface(const std::string& name,
@@ -563,15 +565,15 @@ void XdrInterface::soln_interface(const std::string& name,
   std::vector<Real> Real_soln;
   std::vector<Real> imag_soln;
 
-  mesh.prepare_complex_data(&soln, &Real_soln, &imag_soln);
+  Utility::prepare_complex_data(soln, Real_soln, imag_soln);
 
-  soln_interface_impl(mesh.complex_filename(name, 0), 
+  soln_interface_impl(Utility::complex_filename(name, 0), 
 		      access, 
 		      Real_soln, 
 		      var_names, 
 		      mesh);
 
-  soln_interface_impl(mesh.complex_filename(name, 1), 
+  soln_interface_impl(Utility::complex_filename(name, 1), 
 		      access, 
 		      imag_soln, 
 		      var_names, 

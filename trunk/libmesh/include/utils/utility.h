@@ -1,4 +1,4 @@
-// $Id: utility.h,v 1.5 2004-02-10 13:28:06 benkirk Exp $
+// $Id: utility.h,v 1.6 2004-03-20 15:16:56 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -21,11 +21,12 @@
 #ifndef __utility_h__
 #define __utility_h__
 
-// Local includes
-#include "libmesh_common.h" // for Real
-
 // System includes
 #include <string>
+#include <vector>
+
+// Local includes
+#include "libmesh_common.h" // for Real
 
 
 // ------------------------------------------------------------
@@ -63,7 +64,7 @@ namespace Utility
    */
   template <int N>
   inline
-  Real pow(const Real x) { return x * pow<N-1>(x); }
+  Real pow(const Real x) { assert(N>0); return x * pow<N-1>(x); }
 
   /**
    * You have to also provide a full specialization for
@@ -75,6 +76,30 @@ namespace Utility
   template <>
   inline
   Real pow<0>(const Real) { return 1.; }
+
+
+  //-------------------------------------------------------------------
+  // Utility functions useful when dealing with complex numbers.
+  
+#ifdef USE_COMPLEX_NUMBERS
+
+  /**
+   * @returns for \p r_o_c = 0 the filename for output of the real part
+   * of complex data, and for  \p r_o_c = 1 the filename for the imaginary 
+   * part.
+   */
+  const char* complex_filename (std::string name,
+				unsigned int r_o_c=0);
+
+  /**
+   * Prepare complex data for writing.
+   */
+  void prepare_complex_data (const std::vector<Complex>& source,
+			     std::vector<Real>& real_part,
+			     std::vector<Real>& imag_part);
+
+#endif // #ifdef USE_COMPLEX_NUMBERS
+
 }
 
-#endif
+#endif // #define __utility_h__

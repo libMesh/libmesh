@@ -1,4 +1,4 @@
-/* $Id: ex5.C,v 1.26 2004-01-03 15:37:41 benkirk Exp $ */
+/* $Id: ex5.C,v 1.27 2004-03-20 15:16:56 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -37,6 +37,7 @@
 // Basic include file needed for the mesh functionality.
 #include "libmesh.h"
 #include "mesh.h"
+#include "gmv_io.h"
 #include "implicit_system.h"
 #include "equation_systems.h"
 
@@ -178,7 +179,8 @@ int main (int argc, char** argv)
     std::ostringstream f_name;
     f_name << "out_" << quad_type << ".gmv";
 
-    mesh.write_gmv (f_name.str(), equation_systems);
+    GMVIO(mesh).write_equation_systems (f_name.str(),
+					equation_systems);
   }
 
 

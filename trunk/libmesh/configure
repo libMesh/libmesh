@@ -6852,7 +6852,7 @@ if test "${enable_pfem+set}" = set; then
   enableval="$enable_pfem"
   enablepfem=$enableval
 else
-  enablepfem=no
+  enablepfem=yes
 fi;
 
 if test "$enablepfem" != no ; then

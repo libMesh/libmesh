@@ -1,4 +1,4 @@
-/* $Id: ex12.C,v 1.6 2003-11-11 04:58:33 benkirk Exp $ */
+/* $Id: ex12.C,v 1.7 2004-03-20 15:16:56 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -74,6 +74,9 @@
 // Basic include files needed for the mesh and 
 // <code> MeshData </code> functionality.
 #include "mesh.h"
+#include "gmv_io.h"
+
+
 
 // Function prototype for creating artificial nodal data
 // that can be inserted into a <code>MeshData</code> object.
@@ -437,9 +440,9 @@ int main (int argc, char** argv)
 		  << "------------------------------------------------------------------------" 
 		  << std::endl;
 	
-	mesh.write_gmv_binary (gmv_file,
-			       &translated_data,
-			       &data_names);
+	GMVIO(mesh).write_nodal_data (gmv_file,
+				      translated_data,
+				      data_names);
 	
 	 // Let the vectors with translated data
 	 // go out of scope.
