@@ -1,4 +1,4 @@
-// $Id: mesh_tetgen_support.h,v 1.13 2004-11-12 00:42:40 jwpeterson Exp $
+// $Id: mesh_tetgen_support.h,v 1.14 2004-11-12 01:57:26 jwpeterson Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -54,7 +54,7 @@ class TetGenWrapper
   /**
    * Method set TetGen commandline switches
    */
-  virtual void set_switches(std::string s) = 0;
+  virtual void set_switches(const std::string& s) = 0;
 
   /**
    * Method starts triangulization.
@@ -99,17 +99,17 @@ class TetGenWrapper
   /**
    * Method allocates memory, sets number of facets, holes in TetGen input.
    */
-  virtual void set_facetlist(int numoffacets, int numofholes) = 0;
+  virtual void set_facetlist(const int numoffacets, const int numofholes) = 0;
 
   /**
    * Method sets coordinates of point i in TetGen input.
    */
-  virtual void set_node(int i, REAL x, REAL y, REAL z) = 0;
+  virtual void set_node(const int i, const REAL x, const REAL y, const REAL z) = 0;
 
   /**
    * Method returns coordinates of point i in TetGen output.
    */
-  virtual void get_output_node(int i, REAL& x, REAL& y, REAL& z) = 0;
+  virtual void get_output_node(const int i, REAL& x, REAL& y, REAL& z) = 0;
 
   /**
    * Method returns index of jth node from element i in TetGen output.
@@ -124,40 +124,40 @@ class TetGenWrapper
   /**
    * Method sets coordinates of hole i in TetGen input.
    */
-  virtual void set_hole(int i, REAL x, REAL y, REAL z) = 0;
+  virtual void set_hole(const int i, const REAL x, const REAL y, const REAL z) = 0;
 
   /**
    * Method sets number of polygons for facet i in TetGen input.
    */
-  virtual void set_facet_numberofpolygons(int i, int num) = 0;
+  virtual void set_facet_numberofpolygons(const int i, const int num) = 0;
 
   /**
    * Method sets number of holes for facet i in TetGen input.
    */
-  virtual void set_facet_numberofholes(int i, int num) = 0;
+  virtual void set_facet_numberofholes(const int i, const int num) = 0;
 
   /**
    * Method allocates memory, sets number of polygons for facet i
    * in TetGen input.
    */
-  virtual void set_facet_polygonlist(int i, int numofpolygons) = 0;
+  virtual void set_facet_polygonlist(const int i, const int numofpolygons) = 0;
 
   /**
    * Method sets number of vertices for polygon j, facet i in TetGen input.
    */
-  virtual void set_polygon_numberofvertices(int i, int j, int num) = 0;
+  virtual void set_polygon_numberofvertices(const int i, const int j, const int num) = 0;
 
   /**
    * Method allocates memory, sets number of vertices for polygon j,
    * facet i in TetGen input.
    */
-  virtual void set_polygon_vertexlist(int i, int j, int numofvertices) = 0;
+  virtual void set_polygon_vertexlist(const int i, const int j, const int numofvertices) = 0;
 
   /**
    * Method sets index of ith facet, jth polygon, kth vertex in
    * TetGen input.
    */
-  virtual void set_vertex(int i, int j, int k, int nodeindex) = 0;
+  virtual void set_vertex(const int i, const int j, const int k, const int nodeindex) = 0;
 };
 
 
@@ -199,12 +199,12 @@ class TetGen1_wrapper : public TetGenWrapper
    */
   virtual ~TetGen1_wrapper();
 
-  void set_node(int i, REAL x, REAL y, REAL z);
-  void set_hole(int i, REAL x, REAL y, REAL z);
+  void set_node(const int i, const REAL x, const REAL y, const REAL z);
+  void set_hole(const int i, const REAL x, const REAL y, const REAL z);
   void set_numberofpoints(const int i);
   int  get_numberofpoints();
 
-  void get_output_node(int i, REAL& x, REAL& y, REAL& z);
+  void get_output_node(const int i, REAL& x, REAL& y, REAL& z);
   int  get_numberoftetrahedra();
   int  get_numberoftrifaces();
   int  get_element_node(const int i, const int j);
@@ -239,11 +239,6 @@ class TetGen13_wrapper : public TetGen1_wrapper
   tetgenbehavior  tetgen_be; 
 
   /**
-   * String holding commandline switches for TetGen.
-   */
-  char*           switches;
-
-  /**
    * Constructor.
    */
   TetGen13_wrapper();
@@ -253,20 +248,20 @@ class TetGen13_wrapper : public TetGen1_wrapper
    */
   ~TetGen13_wrapper();
 
-  void set_switches(std::string s);
+  void set_switches(const std::string& s);
   void run_tetgen();
   void set_pointlist(const int numofpoints);
 
   void set_numberoffacets(const int i);
   void set_numberofholes(const int i);
-  void set_facetlist(int numoffacets, int numofholes);
+  void set_facetlist(const int numoffacets, const int numofholes);
 
-  void set_facet_numberofpolygons(int i, int num);
-  void set_facet_numberofholes(int i, int num);
-  void set_facet_polygonlist(int i, int numofpolygons);
-  void set_polygon_numberofvertices(int i, int j, int num);
-  void set_polygon_vertexlist(int i, int j, int numofvertices);
-  void set_vertex(int i, int j, int k, int nodeindex);
+  void set_facet_numberofpolygons(const int i, const int num);
+  void set_facet_numberofholes(const int i, const int num);
+  void set_facet_polygonlist(const int i, const int numofpolygons);
+  void set_polygon_numberofvertices(const int i, const int j, const int num);
+  void set_polygon_vertexlist(const int i, const int j, const int numofvertices);
+  void set_vertex(const int i, const int j, const int k, const int nodeindex);
 };
 
 #endif // TETGEN_13
@@ -330,7 +325,7 @@ public:
   /**
    * Help function. Returns _nodes index for *Node. 
    */
-  int get_node_index (Node* inode);
+  int get_node_index (const Node* inode);
 
   /**
    * Destructor.
