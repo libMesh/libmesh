@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.6 2004-01-14 22:34:24 benkirk Exp $
+// $Id: mesh_base.h,v 1.7 2004-02-13 21:36:49 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -62,7 +62,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.6 $
+ * \version $Revision: 1.7 $
  */
 
 
@@ -206,11 +206,6 @@ public:
    * \f$ i^{th} \f$ point.
    */  
   const Point& point (const unsigned int i) const;
-  
-  /**
-   * Return a reference to the \f$ i^{th} \f$ node.
-   */  
-  Node& node (const unsigned int i);
 
   /**
    * Return a constant reference (for reading only) to the
@@ -219,9 +214,19 @@ public:
   const Node& node (const unsigned int i) const;
   
   /**
+   * Return a reference to the \f$ i^{th} \f$ node.
+   */  
+  Node& node (const unsigned int i);
+  
+  /**
    * Return a pointer to the \f$ i^{th} \f$ node.
    */  
   const Node* node_ptr (const unsigned int i) const;
+
+  /**
+   * Return a pointer to the \f$ i^{th} \f$ node.
+   */  
+  Node* & node_ptr (const unsigned int i);
 
   /**
    * Return a constant reference to the \p nodes vector holding the nodes.
@@ -714,11 +719,6 @@ protected:
    *  3.) call \p renumber_nodes_and_elements() 
    */
   virtual void prepare_for_use ();
-
-  /**
-   * Return a pointer to the \f$ i^{th} \f$ node.
-   */  
-  Node* & node_ptr (const unsigned int i);
     
   /**
    * Return a reference to the \p nodes vector holding the nodes.
