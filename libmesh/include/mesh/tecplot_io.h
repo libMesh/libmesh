@@ -1,4 +1,4 @@
-// $Id: tecplot_io.h,v 1.2 2004-04-07 21:42:31 benkirk Exp $
+// $Id: tecplot_io.h,v 1.3 2004-11-12 20:55:20 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -46,8 +46,11 @@ class TecplotIO : public MeshIO<MeshBase>
   /**
    * Constructor.  Takes a reference to a constant mesh object.
    * This constructor will only allow us to write the mesh.
+   * The optional parameter \p binary can be used to switch
+   * between ASCII (\p false, the default) or binary (\p true)
+   * output files.
    */
-  TecplotIO (const MeshBase&);
+  TecplotIO (const MeshBase&, const bool binary=false);
   
   /**
    * This method implements writing a mesh to a specified file.
@@ -68,6 +71,7 @@ class TecplotIO : public MeshIO<MeshBase>
    */
   bool & binary ();
   
+  
  private:
 
   /**
@@ -75,10 +79,10 @@ class TecplotIO : public MeshIO<MeshBase>
    * specified file where the nodal data and variable names are optionally
    * provided.  This will write an ASCII file.
    */
-  virtual void write_ascii (const std::string&,
-			    const std::vector<Number>* = NULL,
-			    const std::vector<std::string>* = NULL);
-
+  void write_ascii (const std::string&,
+		    const std::vector<Number>* = NULL,
+		    const std::vector<std::string>* = NULL);
+  
   /**
    * This method implements writing a mesh with nodal data to a
    * specified file where the nodal data and variable names are optionally
@@ -86,10 +90,13 @@ class TecplotIO : public MeshIO<MeshBase>
    * found at compile time, otherwise a warning message will be printed and
    * an ASCII file will be created.
    */
-  virtual void write_binary (const std::string&,
-			     const std::vector<Number>* = NULL,
-			     const std::vector<std::string>* = NULL);
+  void write_binary (const std::string&,
+		     const std::vector<Number>* = NULL,
+		     const std::vector<std::string>* = NULL);
 
+  //---------------------------------------------------------------------------
+  // local data
+  
   /**
    * Flag to write binary data.
    */
@@ -101,9 +108,9 @@ class TecplotIO : public MeshIO<MeshBase>
 // ------------------------------------------------------------
 // TecplotIO inline members
 inline
-TecplotIO::TecplotIO (const MeshBase& mesh) :
+TecplotIO::TecplotIO (const MeshBase& mesh, const bool binary) :
   MeshIO<MeshBase> (mesh),
-  _binary (true)
+  _binary (binary)
 {
 }
 

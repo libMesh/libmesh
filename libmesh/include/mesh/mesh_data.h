@@ -1,4 +1,4 @@
-// $Id: mesh_data.h,v 1.9 2004-10-26 15:31:16 jwpeterson Exp $
+// $Id: mesh_data.h,v 1.10 2004-11-12 20:55:20 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -38,7 +38,6 @@ class Elem;
 class MeshBase;
 class UNVIO;
 class TetGenIO;
-class XdrInterface;
 class MeshDataUnvHeader;
 class MeshData;
 class BoundaryInfo;
@@ -402,8 +401,6 @@ public:
   void set_unv_header(MeshDataUnvHeader* unv_header);
 
 
-protected:
-
   /**
    * Assign to \p this the data from the other \p MeshData.
    * Used by \p BoundaryInfo when copying the \p MeshData
@@ -416,6 +413,7 @@ protected:
   //----------------------------------------------------------
   // Methods used by mesh importes to communicate node/element
   // labels to this \p MeshData
+  
   /**
    * In general, \p MeshData gathers nodal data
    * from a file, but it needs to relate this data
@@ -442,6 +440,8 @@ protected:
    */
   void close_foreign_id_maps ();
 
+
+protected:
 
 
   //----------------------------------------------------------
@@ -628,13 +628,7 @@ protected:
    * that it can communicate foreign node ids to this class.
    */
   friend class TetGenIO;
-
-  /**
-   * Make the mesh importer class \p XdrInterface friend, so
-   * that it can communicate foreign node ids to this class.
-   */
-  friend class XdrInterface;
-
+  
   /**
    * Make the \p MeshDataUnvHeader class a friend.
    */

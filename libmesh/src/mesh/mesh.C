@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.45 2004-11-08 00:11:05 jwpeterson Exp $
+// $Id: mesh.C,v 1.46 2004-11-12 20:55:20 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -29,6 +29,7 @@
 
 
 #include "diva_io.h"
+#include "exodusII_io.h"
 #include "gmv_io.h"
 #include "tecplot_io.h"
 #include "tetgen_io.h"
@@ -39,6 +40,9 @@
 #include "shanee_io.h"
 #include "medit_io.h"
 #include "gmsh_io.h"
+#include "xdr_io.h"
+
+
 
 // ------------------------------------------------------------
 // Mesh class member functions
@@ -79,31 +83,31 @@ void Mesh::read (const std::string& name,
   if (libMesh::processor_id() == 0)
     {
       if (name.rfind(".mat") < name.size())
-	MatlabIO (*this).read(name);
+	MatlabIO(*this).read(name);
       
       else if (name.rfind(".ucd") < name.size())
-	UCDIO (*this).read (name);
+	UCDIO(*this).read (name);
       
       else if (name.rfind(".exd") < name.size())
-	this->read_exd (name);
-      
-      else if (name.rfind(".xda") < name.size())
-	this->read_xdr (name);
+	ExodusII_IO(*this).read (name);
       
       else if ((name.rfind(".off")  < name.size()) ||
 	       (name.rfind(".ogl")  < name.size()) ||
 	       (name.rfind(".oogl") < name.size()))
-	OFFIO (*this).read (name);
+	OFFIO(*this).read (name);
+      
+      else if (name.rfind(".xda") < name.size())
+	XdrIO(*this).read (name);
       
       else if (name.rfind(".xdr")  < name.size())
-	this->read_xdr_binary (name);
+	XdrIO(*this,true).read (name);
       
       else if ((name.rfind(".mgf")  < name.size()) ||
 	       (name.rfind(".0000") < name.size()))
-	this->read_xdr_binary (name,1);
-
+	XdrIO(*this,true).read_mgf (name);
+      
       else if (name.rfind(".mesh") < name.size())
-	ShaneeIO (*this).read (name);
+	ShaneeIO(*this).read (name);
       
       else if (name.rfind(".unv") < name.size())
 	{
@@ -114,8 +118,7 @@ void Mesh::read (const std::string& name,
 			<< "read UNV files!" << std::endl;
 	      error();
 	    }
-	  UNVIO unvio(*this, *mesh_data);
-	  unvio.read (name);
+	  UNVIO(*this, *mesh_data).read (name);
 	}
       
       else if ((name.rfind(".node")  < name.size()) ||
@@ -166,89 +169,76 @@ void Mesh::write (const std::string& name,
   START_LOG("write()", "Mesh");
   
   // Write the file based on extension
-  {
-    if (name.rfind(".dat") < name.size())
-      {
-	TecplotIO io(*this);
-	io.binary() = false;
-	io.write (name);
-      }
+  if (name.rfind(".dat") < name.size())
+    TecplotIO(*this).write (name);
     
-    else if (name.rfind(".plt") < name.size())
-      {
-	TecplotIO io(*this);
-	io.binary() = true;
-	io.write (name);
-      }
+  else if (name.rfind(".plt") < name.size())
+    TecplotIO(*this,true).write (name);
     
-    else if (name.rfind(".ucd") < name.size())
-      UCDIO (*this).write (name);
-
-    else if (name.rfind(".gmv") < name.size())
-      {
-	if (this->n_partitions() > 1)
-	  GMVIO(*this).write (name);
-	else
-	  {
-	    GMVIO io(*this);
-	    io.partitioning() = false;
-	    io.write (name);
-	  }
-      }
-
-    else if (name.rfind(".ugrid") < name.size())
-      DivaIO (*this).write(name);
+  else if (name.rfind(".ucd") < name.size())
+    UCDIO (*this).write (name);
     
-    else if (name.rfind(".xda") < name.size())
-      this->write_xdr (name);
-    
-    else if (name.rfind(".xdr") < name.size())
-      this->write_xdr_binary (name);
-
-    else if (name.rfind(".mgf")  < name.size())
-      this->write_xdr_binary (name,1);
-
-    else if (name.rfind(".unv") < name.size())
-      {
-	if (mesh_data == NULL)
-	  {
-	    std::cerr << "Error! You must pass a "
-		      << "valid MeshData pointer to "
-		      << "write UNV files!" << std::endl;
-	    error();
-	  }
-	UNVIO unvio(*this, *mesh_data);
-	unvio.write (name);
-      }
-
-    else if (name.rfind(".mesh") < name.size())
-      MEDITIO (*this).write (name);
-
-    else if (name.rfind(".poly") < name.size())
-      TetGenIO (*this).write (name);
-
-    else if (name.rfind(".msh") < name.size())
-      GmshIO (*this).write (name);
-    
+  else if (name.rfind(".gmv") < name.size())
+    if (this->n_partitions() > 1)
+      GMVIO(*this).write (name);
     else
       {
-	std::cerr << " ERROR: Unrecognized file extension: " << name
-		  << "\n   I understand the following:\n\n"
-		  << "     *.dat   -- Tecplot ASCII file\n"
-		  << "     *.plt   -- Tecplot binary file\n"
-		  << "     *.ucd   -- AVS's ASCII UCD format\n"
-		  << "     *.ugrid -- Kelly's DIVA ASCII format\n"
-		  << "     *.gmv   -- LANL's GMV (General Mesh Viewer) format\n"
-		  << "     *.xda   -- Internal ASCII format\n"
-		  << "     *.xdr   -- Internal binary format,\n"
-		  << "                compatible with XdrMGF\n"
-		  << "     *.unv   -- I-deas Universal format\n"
-	          << "     *.mesh  -- MEdit mesh format\n"
-	          << "     *.poly  -- TetGen ASCII file\n"
-		  << std::endl
-		  << "\n Exiting without writing output\n";
-      }    
-  }
+	GMVIO io(*this);
+	io.partitioning() = false;
+	io.write (name);
+      }
+    
+  else if (name.rfind(".ugrid") < name.size())
+    DivaIO(*this).write(name);
+    
+  else if (name.rfind(".xda") < name.size())
+    XdrIO(*this).write(name);
+    
+  else if (name.rfind(".xdr") < name.size())
+    XdrIO(*this,true).write(name);
+    
+  else if (name.rfind(".mgf")  < name.size())
+    XdrIO(*this,true).write_mgf(name);
+    
+  else if (name.rfind(".unv") < name.size())
+    {
+      if (mesh_data == NULL)
+	{
+	  std::cerr << "Error! You must pass a "
+		    << "valid MeshData pointer to "
+		    << "write UNV files!" << std::endl;
+	  error();
+	}
+      UNVIO(*this, *mesh_data).write (name);
+    }
+
+  else if (name.rfind(".mesh") < name.size())
+    MEDITIO(*this).write (name);
+
+  else if (name.rfind(".poly") < name.size())
+    TetGenIO(*this).write (name);
+
+  else if (name.rfind(".msh") < name.size())
+    GmshIO(*this).write (name);
+    
+  else
+    {
+      std::cerr << " ERROR: Unrecognized file extension: " << name
+		<< "\n   I understand the following:\n\n"
+		<< "     *.dat   -- Tecplot ASCII file\n"
+		<< "     *.plt   -- Tecplot binary file\n"
+		<< "     *.ucd   -- AVS's ASCII UCD format\n"
+		<< "     *.ugrid -- Kelly's DIVA ASCII format\n"
+		<< "     *.gmv   -- LANL's GMV (General Mesh Viewer) format\n"
+		<< "     *.xda   -- Internal ASCII format\n"
+		<< "     *.xdr   -- Internal binary format,\n"
+		<< "                compatible with XdrMGF\n"
+		<< "     *.unv   -- I-deas Universal format\n"
+		<< "     *.mesh  -- MEdit mesh format\n"
+		<< "     *.poly  -- TetGen ASCII file\n"
+		<< std::endl
+		<< "\n Exiting without writing output\n";
+    }    
   
   STOP_LOG("write()", "Mesh");
 }
@@ -262,42 +252,32 @@ void Mesh::write (const std::string& name,
   START_LOG("write()", "Mesh");
 
   // Write the file based on extension
-  {
-    if (name.rfind(".dat") < name.size())
-      {
-	TecplotIO io(*this);
-	io.binary() = false;
-	io.write_nodal_data (name, v, vn);
-      }
-
-    if (name.rfind(".plt") < name.size())
-      {
-	TecplotIO io(*this);
-	io.binary() = true;
-	io.write_nodal_data (name, v, vn);
-      }
-
-    else if (name.rfind(".gmv") < name.size())
-      {
-	if (n_subdomains() > 1)
-	  GMVIO(*this).write_nodal_data (name, v, vn);
-	else
-	  {
-	    GMVIO io(*this);
-	    io.partitioning() = false;
-	    io.write_nodal_data (name, v, vn);
-	  }
-      }    
-    else
-      {
-	std::cerr << " ERROR: Unrecognized file extension: " << name
-		  << "\n   I understand the following:\n\n"
-		  << "     *.dat  -- Tecplot ASCII file\n"
-		  << "     *.plt  -- Tecplot binary file\n"
-		  << "     *.gmv  -- LANL's GMV (General Mesh Viewer) format\n"
-		  << "\n Exiting without writing output\n";
-      }
-  }
+  if (name.rfind(".dat") < name.size())
+    TecplotIO(*this).write_nodal_data (name, v, vn);
+  
+  if (name.rfind(".plt") < name.size())
+    TecplotIO(*this,true).write_nodal_data (name, v, vn);
+  
+  else if (name.rfind(".gmv") < name.size())
+    {
+      if (n_subdomains() > 1)
+	GMVIO(*this).write_nodal_data (name, v, vn);
+      else
+	{
+	  GMVIO io(*this);
+	  io.partitioning() = false;
+	  io.write_nodal_data (name, v, vn);
+	}
+    }    
+  else
+    {
+      std::cerr << " ERROR: Unrecognized file extension: " << name
+		<< "\n   I understand the following:\n\n"
+		<< "     *.dat  -- Tecplot ASCII file\n"
+		<< "     *.plt  -- Tecplot binary file\n"
+		<< "     *.gmv  -- LANL's GMV (General Mesh Viewer) format\n"
+		<< "\n Exiting without writing output\n";
+    }
 
   STOP_LOG("write()", "Mesh");
 }
