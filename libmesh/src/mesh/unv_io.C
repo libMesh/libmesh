@@ -1,4 +1,4 @@
-// $Id: unv_io.C,v 1.10 2004-10-19 22:31:05 benkirk Exp $
+// $Id: unv_io.C,v 1.11 2004-10-21 14:39:20 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -994,7 +994,7 @@ void UNVIO::element_out(std::ostream& out_file)
 	   << _label_dataset_elements
 	   << "\n";
 
-  unsigned long int fe_descriptor_id;        // FE descriptor id 
+  unsigned long int fe_descriptor_id = 0;    // FE descriptor id 
   unsigned long int phys_prop_tab_dummy = 2; // physical property (not supported yet)
   unsigned long int mat_prop_tab_dummy = 1;  // material property (not supported yet)
   unsigned long int color_dummy = 7;         // color (not supported yet)
