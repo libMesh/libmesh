@@ -1,4 +1,4 @@
-// $Id: dof_object.h,v 1.14 2003-05-28 03:17:47 benkirk Exp $
+// $Id: dof_object.h,v 1.15 2003-07-27 17:16:42 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -48,7 +48,7 @@
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.14 $
+ * \version $Revision: 1.15 $
  */
 
 class DofObject
@@ -192,7 +192,12 @@ public:
   
   /**
    * @returns the number of components for variable \p var
-   * of system \p s associated with this \p DofObject
+   * of system \p s associated with this \p DofObject. 
+   * For example, the \p HIERARCHIC shape functions may
+   * have @e multiple dof's associated with @e one node.  Another
+   * examples are the \p MONOMIALs, where only the elements
+   * hold the dof's, but for the different spatial directions,
+   * and orders, see \p FE.
    */
   unsigned int n_comp(const unsigned int s,
 		      const unsigned int var) const;
