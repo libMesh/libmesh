@@ -3,7 +3,7 @@
 #include "quadrature_gauss.h"
 #include "mesh.h"
 #include "dof_map.h"
-#include "system_data.h"
+#include "general_system.h"
 #include "equation_systems.h"
 #include "mesh_refinement.h"
 
@@ -52,16 +52,16 @@ int main (int argc, char** argv)
     es("primary").add_variable("U", FIRST);
     es("primary").add_variable("V", FIRST);
 
-    es("primary").dof_map.dof_coupling.resize(2);      
-    es("primary").dof_map.dof_coupling(0,0) = 1;
-    es("primary").dof_map.dof_coupling(1,1) = 1;
+    es("primary").get_dof_map().dof_coupling.resize(2);      
+    es("primary").get_dof_map().dof_coupling(0,0) = 1;
+    es("primary").get_dof_map().dof_coupling(1,1) = 1;
     
     es("primary").attach_assemble_function(assemble);
     
     es.init();
     
     es.print_info();
-    es("primary").dof_map.print_dof_constraints();
+    es("primary").get_dof_map().print_dof_constraints();
     
     // call the solver.
     es("primary").solve ();

@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.8 2003-02-10 03:55:50 benkirk Exp $
+// $Id: dof_map.h,v 1.9 2003-02-13 01:49:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,10 +24,10 @@
 
 // C++ Includes   -----------------------------------
 
-// Forward Declarations 
+// Forward Declarations
+class Elem;
 class MeshBase;
 class SparseMatrix;
-
 
 
 // Local Includes -----------------------------------
@@ -37,6 +37,8 @@ class SparseMatrix;
 #include "perf_log.h"
 #include "dense_matrix.h"
 #include "coupling_matrix.h"
+
+
 
 /**
  * This class handles the numbering of degrees of freedom on a mesh.
@@ -56,12 +58,12 @@ class DofMap
  public:
 
   /**
-   * Constructor.  Requires a reference to the mesh.
+   * Constructor.
    */
-  DofMap(const MeshBase& mesh);
+  DofMap();
 
   /**
-   * Destructor
+   * Destructor.
    */
   ~DofMap();
 
@@ -91,14 +93,14 @@ class DofMap
    * processor \p proc_id, which defaults to 0 for ease of use in serial
    * applications. 
    */
-  void distribute_dofs(const unsigned int proc_id);
+  void distribute_dofs(MeshBase&);
 
   /**
    * Computes the sparsity pattern for the matrix corresponding
    * to \p proc_id.  Produces data that can be fed to Petsc for
    * preallocation of sparse matrices.
    */
-  void compute_sparsity (const unsigned int proc_id);
+  void compute_sparsity (MeshBase&);
 
   /**
    * Returns a constant reference to the \p _send_list for this processor.  The
@@ -130,10 +132,7 @@ class DofMap
    * \p type to the system of equations.
    */
   void add_component (const FEType& type)
-  {
-    _component_types.push_back (type);
-    return;
-  };
+  { _component_types.push_back (type); };
   
   /**
    * @returns the approximation order for component \p c.
@@ -153,25 +152,7 @@ class DofMap
    * Stokes (u,v,p), etc...
    */  
   unsigned int n_components() const
-  {
-    return _component_types.size();
-  };
-
-  /**
-   * Return the global degree of freedom number for \p component located
-   * at \p node.
-   */
-  unsigned int node_dof_number(const unsigned int node,
-			       const unsigned int component=0,
-			       const unsigned int index=0) const;
-
-  /**
-   * Return the global degree of freedom number for \p component located
-   * at \p elem.
-   */
-  unsigned int elem_dof_number(const unsigned int elem,
-			       const unsigned int component=0,
-			       const unsigned int index=0) const;
+  { return _component_types.size(); };
 
   /**
    * @returns the total number of degrees of freedom in the problem.
@@ -194,24 +175,7 @@ class DofMap
    * Returns the last dof index that is local to subdomain \p proc.
    */
   unsigned int last_dof(unsigned int proc) const
-  { assert(proc < _last_df.size()); return _last_df[proc]; };
-
-  /**
-   * @returns the total number of degrees of freedom at node n.
-   * If no component is specified then the sum over all components
-   * is returned.
-   */
-  unsigned int n_dofs_at_node(const unsigned int n,
-  			      const unsigned int c=invalid_number) const;
-  
-  /**
-   * @returns the total number of degrees of freedom internl to element e.
-   * If no component is specified then the sum over all components
-   * is returned.
-   */
-  unsigned int n_dofs_on_elem(const unsigned int e,
-  			      const unsigned int c=invalid_number) const;
-  
+  { assert(proc < _last_df.size()); return _last_df[proc]; };  
 
 
 #ifdef ENABLE_AMR
@@ -230,9 +194,9 @@ class DofMap
    * for the element. If no component number is specified then all
    * components are returned.
    */
-  void dof_indices (const unsigned int e,
+  void dof_indices (const Elem* elem,
 		    std::vector<unsigned int>& di,
-		    const unsigned int cn=invalid_number) const;
+		    const unsigned int cn = static_cast<unsigned int>(-1)) const;
 
 
 
@@ -241,7 +205,7 @@ class DofMap
   /**
    * Rebuilds the degree of freedom constraints.
    */ 
-  void create_dof_constraints ();
+  void create_dof_constraints (MeshBase& mesh);
 
   /**
    * Adds the user-defined row to the constraint matrix.
@@ -302,7 +266,7 @@ class DofMap
   /**
    * Reinitialize the underlying data strucures conformal to the current mesh.
    */
-  void reinit ();
+  void reinit (MeshBase& mesh);
   
   /**
    * Free all memory associated with the object, but keep the mesh pointer.
@@ -321,12 +285,6 @@ class DofMap
 #endif
   
   /**
-   * An invalid DOF index used to initialize data structures.  ONLY refer to
-   * \p invalid_entry, and the numerical value may change.
-   */
-  static const unsigned int invalid_number;
-
-  /**
    * Degree of freedom coupling.  If left empty each DOF
    * couples to all others.  Can be used to reduce memory
    * requirements for sparse matrices.  DOF 0 might only
@@ -340,22 +298,6 @@ class DofMap
  private:
 
 
-  /**
-   * Return the global degree of freedom number for \p component located
-   * at \p node as a writeable reference.
-   */
-  unsigned int & set_node_dof_number(const unsigned int node,
-				     const unsigned int component,
-				     const unsigned int index=0);
-  
-  /**
-   * Return the global degree of freedom number for \p component located
-   * at \p elem as a writeable reference.
-   */
-  unsigned int & set_elem_dof_number(const unsigned int elem,
-				     const unsigned int component,
-				     const unsigned int index=0);
-  
 
 #ifdef ENABLE_AMR
 
@@ -375,50 +317,10 @@ class DofMap
    */
   void find_connected_dofs (std::vector<unsigned int>& elem_dofs) const;
   
-#ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
-
-  /**
-   * Data structure defining the nodal degrees of freedom.  This structure
-   * allows for multiple DOFS per node for each component.
-   */
-  std::vector<std::vector<std::vector<unsigned int> > > _node_dofs;
-  
-  /**
-   * Data structure defining the element degrees of freedom.  This structure
-   * allows for multiple DOFS per element for each component.
-   */
-  std::vector<std::vector<std::vector<unsigned int> > > _elem_dofs;
-  
-#else
-  
-  /**
-   * Data structure that holds DOF numbers for entities in the mesh
-   * that live at the nodes.
-   */
-  std::vector<unsigned int> _node_id_map;
-  
-  /**
-   * Data structure that holds DOF numbers for entities in the mesh
-   * that live on the element.
-   */
-  std::vector<unsigned int> _elem_id_map;
-  
-#endif
-  
   /**
    * The finite element type for each component.
    */
   std::vector<FEType> _component_types;
-  
-  /**
-   * Constant reference to the computational mesh.
-   */
-  const MeshBase& _mesh;
-
-  /**
-   * The dimensionality of the mesh.
-   */
-  const unsigned int _dim;
   
   /**
    * Pointer to the matrix used with this object.
@@ -485,242 +387,12 @@ class DofMap
    * Object to use for performance logging.
    */
   PerfLog perf_log;
-
 };
 
 
 
 // ------------------------------------------------------------
 // Dof Map inline member functions
-inline
-unsigned int DofMap::node_dof_number(const unsigned int node,
-				     const unsigned int component,
-				     const unsigned int index) const
-{
-#ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
-
-  assert (node < _n_nodes);
-  assert (component < n_components());
-  
-
-  if (_node_dofs[component].empty())
-    {
-      return invalid_number;
-    }
-  else
-    {
-      assert (index < _node_dofs[component][node].size());
-      return _node_dofs[component][node][index];
-    };
-  
-#else
-  
-  // If this assert fails then you are trying to use
-  // objects with mulitple DOFs per node and the library
-  // has not been compiled to support this!
-  assert (index == 0);
-  assert (node < _n_nodes);
-  assert (component < n_components());
-
-  return _node_id_map[(node) + (component)*(_n_nodes)];
-  
-#endif
-};
-
-
-
-inline
-unsigned int & DofMap::set_node_dof_number(const unsigned int node,
-					   const unsigned int component,
-					   const unsigned int index)
-{
-#ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
-
-  assert (node < _n_nodes);
-  assert (component < n_components());
-  
-
-  if (_node_dofs[component].empty())
-    {
-      error();
-      return _node_dofs[component][node][index];
-    }
-  else
-    {
-      assert (index < _node_dofs[component][node].size());
-      return _node_dofs[component][node][index];
-    };
-  
-#else
-  
-  // If this assert fails then you are trying to use
-  // objects with mulitple DOFs per node and the library
-  // has not been compiled to support this!
-  assert (index == 0);
-  assert (node < _n_nodes);
-  assert (component < n_components());
-
-  return _node_id_map[(node) + (component)*(_n_nodes)];
-
-#endif
-};
-
-
-
-inline
-unsigned int DofMap::elem_dof_number(const unsigned int elem,
-				     const unsigned int component,
-				     const unsigned int index) const
-{
-#ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
-
-  assert (elem < _n_elem);
-  assert (component < n_components());
- 
-  if (_elem_dofs[component].empty())
-    {
-      return invalid_number;
-    }
-  else
-    {
-      assert (index < _elem_dofs[component][elem].size()); 
-      return _elem_dofs[component][elem][index];
-    }
-  
-#else
-  
-  // If this assert fails then you are trying to use
-  // objects with mulitple DOFs per node and the library
-  // has not been compiled to support this!
-  assert (index == 0);
-  assert (elem < _n_elem);
-  assert (component < n_components());
-
-  return _elem_id_map[(elem) + (component)*(_n_elem)];
-  
-#endif
-};
-
-
-
-inline
-unsigned int & DofMap::set_elem_dof_number(const unsigned int elem,
-					   const unsigned int component,
-					   const unsigned int index)
-{
-#ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
-
-  assert (elem < _n_elem);
-  assert (component < n_components());
- 
-  if (_elem_dofs[component].empty())
-    {
-      error();
-      return _elem_dofs[component][elem][index];
-    }
-  else
-    {
-      assert (index < _elem_dofs[component][elem].size()); 
-      return _elem_dofs[component][elem][index];
-    }
-  
-#else
-  
-  // If this assert fails then you are trying to use
-  // objects with mulitple DOFs per node and the library
-  // has not been compiled to support this!
-  assert (index == 0);
-  assert (elem < _n_elem);
-  assert (component < n_components());
-
-  return _elem_id_map[(elem) + (component)*(_n_elem)];
-
-#endif
-};
-
-
-
-inline
-unsigned int DofMap::n_dofs_at_node (const unsigned int n,
-				     const unsigned int cn) const
-{
-#ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
-
-  assert (!_node_dofs.empty());
-
-  unsigned int sum=0;
-
-  for (unsigned int c=0; c<n_components(); c++)
-    if (!_node_dofs[c].empty())
-      if ((c == cn) || (cn == invalid_number))
-	{
-	  assert (n < _node_dofs[c].size());
-	  
-	  sum += _node_dofs[c][n].size();
-	};
-  
-
-  return sum;
-  
-#else
-
-  assert (n < _n_nodes);
-  assert (n*n_components() < _node_id_map.size());
-
-  unsigned int sum = 0;
-
-  for (unsigned int c=0; c<n_components(); c++)
-    if ((c == cn) || (cn == invalid_number))
-      if (node_dof_number(n,c) != invalid_number)
-	sum++;
-
-  return sum;
-  
-#endif  
-};
-
-
-
-inline
-unsigned int DofMap::n_dofs_on_elem (const unsigned int e,
-				     const unsigned int cn) const
-{
-#ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
-
-  assert (!_elem_dofs.empty());
-
-  unsigned int sum=0;
-
-  for (unsigned int c=0; c<n_components(); c++)
-    if (!_elem_dofs[c].empty())
-      if ((c == cn) || (cn == invalid_number))
-	{
-	  assert (e < _elem_dofs[c].size());
-	  
-	  sum += _elem_dofs[c][e].size();
-	};
-
-  return sum;
-  
-#else
-
-  assert (e < _n_elem);
-  assert (e*n_components() < _elem_id_map.size());
-
-  unsigned int sum = 0;
-
-  for (unsigned int c=0; c<n_components(); c++)
-    if ((c == cn) || (cn == invalid_number))
-      if (elem_dof_number(e,c) != invalid_number)
-	sum++;
-
-  return sum;
-  
-#endif  
-};
-
-
-
 #ifdef ENABLE_AMR
 
 inline

@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.9 2003-02-09 22:47:17 ddreyer Exp $
+// $Id: fe.C,v 1.10 2003-02-13 01:49:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -172,8 +172,8 @@ void FE<Dim,T>::init_shape_functions(const QBase* qrule,
     for (unsigned int p=0; p<n_qp; p++)
       {
         weight[p] = 1.;
-	dweight[p].clear();
-	dphase[p].clear();
+	dweight[p].zero();
+	dphase[p].zero();
       };
 
  }

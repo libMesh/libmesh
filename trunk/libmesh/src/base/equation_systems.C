@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.11 2003-02-12 02:03:48 ddreyer Exp $
+// $Id: equation_systems.C,v 1.12 2003-02-13 01:49:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -38,7 +38,7 @@
 
 // ------------------------------------------------------------
 // EquationSystem class implementation
-EquationSystems::EquationSystems (const Mesh& m,
+EquationSystems::EquationSystems (Mesh& m,
 				  const SolverPackage sp) :
   _mesh(m),
   _solver_package(sp)
@@ -441,7 +441,7 @@ void EquationSystems::build_solution_vector (std::vector<Complex>& soln)
 		if (_mesh.elem(e)->active())
 		  {
 		    const Elem* elem = _mesh.elem(e);
-		    system.get_dof_map().dof_indices (e, dof_indices, var);
+		    system.get_dof_map().dof_indices (elem, dof_indices, var);
 		    
 		    elem_soln.resize(dof_indices.size());
 

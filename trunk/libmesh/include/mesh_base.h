@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.12 2003-02-13 00:16:48 jwpeterson Exp $
+// $Id: mesh_base.h,v 1.13 2003-02-13 01:49:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -59,7 +59,7 @@ class PetscMatrix;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.12 $
+ * \version $Revision: 1.13 $
  */
 
 
@@ -160,6 +160,11 @@ public:
    */  
   const Point& point(const unsigned int i) const;
   
+  /**
+   * Return a reference to the \f$ i^{th} \f$ node.
+   */  
+  Node& node(const unsigned int i);
+
   /**
    * Return a constant reference (for reading only) to the
    * \f$ i^{th} \f$ node.
@@ -617,11 +622,6 @@ public:
   
   
 protected:
-
-  /**
-   * Return a read/write reference to the \f$ i^{th} \f$ node.
-   */  
-  Node& node(const unsigned int i);
 
   /**
    * Return a pointer to the \f$ i^{th} \f$ node.

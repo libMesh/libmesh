@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.10 2003-02-07 04:00:42 jwpeterson Exp $
+// $Id: fe_map.C,v 1.11 2003-02-13 01:49:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -65,8 +65,8 @@ void FEBase::compute_map(const QBase* qrule,
 	// Clear the entities that will be summed
 	for (unsigned int p=0; p<n_qp; p++)
 	  {
-	    xyz[p].clear();
-	    dxyzdxi_map[p].clear();
+	    xyz[p].zero();
+	    dxyzdxi_map[p].zero();
 	  };
 	
 	
@@ -153,9 +153,9 @@ void FEBase::compute_map(const QBase* qrule,
 	// Clear the entities that will be summed
 	for (unsigned int p=0; p<n_qp; p++)
 	  {
-	    xyz[p].clear();
-	    dxyzdxi_map[p].clear();
-	    dxyzdeta_map[p].clear();
+	    xyz[p].zero();
+	    dxyzdxi_map[p].zero();
+	    dxyzdeta_map[p].zero();
 	  };
 	
 	
@@ -262,10 +262,10 @@ void FEBase::compute_map(const QBase* qrule,
 	// Clear the entities that will be summed
 	for (unsigned int p=0; p<n_qp; p++)
 	  {
-	    xyz[p].clear           ();
-	    dxyzdxi_map[p].clear   ();
-	    dxyzdeta_map[p].clear  ();
-	    dxyzdzeta_map[p].clear ();
+	    xyz[p].zero           ();
+	    dxyzdxi_map[p].zero   ();
+	    dxyzdeta_map[p].zero  ();
+	    dxyzdzeta_map[p].zero ();
 	  };
 	
 	

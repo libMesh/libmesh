@@ -16,7 +16,7 @@
 #include "boundary_info.h"
 #include "elem.h"
 #include "point.h"
-#include "system_data.h"
+#include "general_system.h"
 #include "equation_systems.h"
 #include "perfmon.h"
 
@@ -126,9 +126,9 @@ int main (int argc, char** argv)
 	es("primary").add_variable("U", SECOND);
 	es("primary").add_variable("V", SECOND);
       
-	es("primary").dof_map.dof_coupling.resize(2);      
-	es("primary").dof_map.dof_coupling(0,0) = 1;
-	es("primary").dof_map.dof_coupling(1,1) = 1;
+	es("primary").get_dof_map().dof_coupling.resize(2);      
+	es("primary").get_dof_map().dof_coupling(0,0) = 1;
+	es("primary").get_dof_map().dof_coupling(1,1) = 1;
 	
 	es("primary").attach_assemble_function(assemble_primary);
       };
@@ -354,7 +354,7 @@ void assemble_secondary(EquationSystems& es,
   PerfMon pm("Matrix Assembly (secondary)");
 
   // The Finite Element type.
-  FEType fe_type (es("secondary").dof_map.component_type(0));
+  FEType fe_type (es("secondary").get_dof_map().component_type(0));
   
   AutoPtr<FEBase> fe(FEBase::build(dim, fe_type));
   QGauss qrule(dim, FIFTH);

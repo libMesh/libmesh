@@ -1,4 +1,4 @@
-// $Id: point.h,v 1.7 2003-02-06 23:02:32 benkirk Exp $
+// $Id: point.h,v 1.8 2003-02-13 01:49:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -168,7 +168,7 @@ class Point
   /**
    * Zero the point in any dimension.
    */
-  void clear();
+  void zero();
 
   /**
    * @returns \p true if two points occupy the same
@@ -513,6 +513,15 @@ inline
 Real Point::size() const
 {
   return sqrt(size_sq());  
+};
+
+
+
+inline
+void Point::zero()
+{
+  for (unsigned int i=0; i<DIM; i++)
+    _coords[i] = 0;
 };
 
 

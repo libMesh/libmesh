@@ -1,4 +1,4 @@
-// $Id: node.h,v 1.5 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: node.h,v 1.6 2003-02-13 01:49:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,6 +26,7 @@
 
 // Local includes
 #include "point.h"
+#include "dof_object.h"
 #include "reference_counted_object.h"
 
 
@@ -43,10 +44,12 @@ class Node;
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.5 $
+ * \version $Revision: 1.6 $
  */
 
-class Node : public Point, public ReferenceCountedObject<Node>
+class Node : public Point,
+	     public DofObject,      
+	     public ReferenceCountedObject<Node>
 {
   
 public:
@@ -98,29 +101,29 @@ public:
    */ 
   ~Node ();
   
-  /**
-   * \returns the \p id for this \p Node
-   */
-  const unsigned int & id () const { return _id; };
+//   /**
+//    * \returns the \p id for this \p Node
+//    */
+//   const unsigned int & id () const { return _id; };
 
-  /**
-   * \returns the \p id for this \p Node as a writeable reference.
-   */
-  unsigned int & set_id () { return _id; };
+//   /**
+//    * \returns the \p id for this \p Node as a writeable reference.
+//    */
+//   unsigned int & set_id () { return _id; };
 
-  /**
-   * An invaild \p id to distinguish an uninitialized \p Node
-   */
-  static const unsigned int invalid_id;
+//   /**
+//    * An invaild \p id to distinguish an uninitialized \p Node
+//    */
+//   static const unsigned int invalid_id;
 
   
 private:
 
   
-  /**
-   * The \p id of the \p Node
-   */
-  unsigned int _id;
+//   /**
+//    * The \p id of the \p Node
+//    */
+//   unsigned int _id;
 
 };
 
@@ -133,9 +136,9 @@ Node::Node (const Real x,
 	    const Real y,
 	    const Real z,
 	    const unsigned int id) :
-  Point(x,y,z),
-  _id(id)
+  Point(x,y,z)
 {
+  set_id() = id;
 };
 
 
@@ -143,9 +146,10 @@ Node::Node (const Real x,
 inline
 Node::Node (const Node& n) :
   Point(n),
+  DofObject(n),
   ReferenceCountedObject<Node>()
 {
-  _id = n._id;
+//  _id = n._id;
 };
 
 
@@ -160,7 +164,8 @@ Node::Node (const Point& p,
   // Node n = Point p would erase
   // the id!
   if (id != invalid_id)
-    _id = id;
+    set_id() = id;
+//    _id = id;
 };
 
 
