@@ -1,4 +1,4 @@
-// $Id: inf_fe.h,v 1.22 2003-02-27 01:44:48 ddreyer Exp $
+// $Id: inf_fe.h,v 1.23 2003-03-04 18:09:34 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -95,7 +95,7 @@ class Elem;
  *
  * \author Daniel Dreyer
  * \date 2003
- * \version $Revision: 1.22 $
+ * \version $Revision: 1.23 $
  */
 
 //-------------------------------------------------------------
@@ -118,7 +118,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.22 $
+   * \version $Revision: 1.23 $
    */
   //-------------------------------------------------------------
   // InfFE::Radial class definition
@@ -141,7 +141,7 @@ protected:
      * @returns the first (local) derivative of the
      * decay in radial direction of the infinite element.
      */
-    static Real decay_deriv(const Real) { return .5; }
+    static Real decay_deriv(const Real) { return -.5; }
 
     /**
      * @returns the radial weight D, used as an additional weight
@@ -243,7 +243,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.22 $
+   * \version $Revision: 1.23 $
    */
   //-------------------------------------------------------------
   // InfFE::Base class definition

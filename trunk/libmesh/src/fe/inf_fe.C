@@ -1,4 +1,4 @@
-// $Id: inf_fe.C,v 1.15 2003-02-27 00:15:13 ddreyer Exp $
+// $Id: inf_fe.C,v 1.16 2003-03-04 18:09:47 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -118,6 +118,7 @@ void InfFE<Dim,T_radial,T_map>:: attach_quadrature_rule (QBase* q)
 
   Order base_int_order   = q->get_order();
   //Order radial_int_order = static_cast<Order>( static_cast<unsigned int>(fe_type.radial_order) + 2 );
+
   Order radial_int_order = static_cast<Order>( 2*(static_cast<unsigned int>(fe_type.radial_order) + 1) );
   // radial order rather conservative, may also work with other values...? check this radial order again!!!!
 
@@ -131,6 +132,7 @@ void InfFE<Dim,T_radial,T_map>:: attach_quadrature_rule (QBase* q)
   
   // in radial direction, always use Gauss quadrature
   radial_qrule = new QGauss(1, radial_int_order);
+
 
   /* currently not used. But maybe helpful to store the QBase*
    * with which we initialized our own quadrature rules */
@@ -631,11 +633,12 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
 	      for (unsigned int bi=0; bi<n_base_approx_sf; bi++)  // over base   approx shapes
 	        {
 		  // form the total shape function data fields
-		  phi      [ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = S [bi][bp] * mode[ri][rp] * som[ri];
-		  dphidxi  [ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = Ss[bi][bp] * mode[ri][rp] * som[ri];
-		  dphideta [ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = St[bi][bp] * mode[ri][rp] * som[ri];
+		  phi      [ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = S [bi][bp] * mode[ri][rp] * som[rp];
+		  dphidxi  [ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = Ss[bi][bp] * mode[ri][rp] * som[rp];
+		  dphideta [ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = St[bi][bp] * mode[ri][rp] * som[rp];
 		  dphidzeta[ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = S [bi][bp] 
-		      * (dmodedv[ri][rp] * som[ri] + mode[ri][rp] * dsomdv[ri]);
+		      * (dmodedv[ri][rp] * som[rp] + mode[ri][rp] * dsomdv[rp]);
+
 		}
 
 	
