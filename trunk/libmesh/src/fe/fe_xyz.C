@@ -1,4 +1,4 @@
-// $Id: fe_xyz.C,v 1.4 2004-05-17 02:18:02 benkirk Exp $
+// $Id: fe_xyz.C,v 1.5 2004-10-15 04:31:07 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -210,7 +210,7 @@ void FEXYZ<Dim>::compute_shape_functions (const Elem* elem)
   // Start logging the shape function computation
   START_LOG("compute_shape_functions()", "FE");
 
-  const std::vector<Point>& xyz = this->get_xyz();
+  const std::vector<Point>& xyz_qp = this->get_xyz();
   
   // Compute the value of the derivative shape function i at quadrature point p
   switch (this->dim)
@@ -221,10 +221,10 @@ void FEXYZ<Dim>::compute_shape_functions (const Elem* elem)
 	for (unsigned int i=0; i<this->phi.size(); i++)
 	  for (unsigned int p=0; p<this->phi[i].size(); p++)
 	    {
-	      this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->get_order(), i, xyz[p]);
+	      this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->get_order(), i, xyz_qp[p]);
 	      
 	      this->dphi[i][p](0) =
-		this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 0, xyz[p]);
+		this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 0, xyz_qp[p]);
 	      
 	      this->dphi[i][p](1) = this->dphidy[i][p] = 0.;
 	      this->dphi[i][p](2) = this->dphidz[i][p] = 0.;
@@ -239,13 +239,13 @@ void FEXYZ<Dim>::compute_shape_functions (const Elem* elem)
 	for (unsigned int i=0; i<this->phi.size(); i++)
 	  for (unsigned int p=0; p<this->phi[i].size(); p++)
 	    {
-	      this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->get_order(), i, xyz[p]);
+	      this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->get_order(), i, xyz_qp[p]);
 
 	      this->dphi[i][p](0) =
-		this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 0, xyz[p]);
+		this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 0, xyz_qp[p]);
 	      
 	      this->dphi[i][p](1) =
-		this->dphidy[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 1, xyz[p]);
+		this->dphidy[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 1, xyz_qp[p]);
 	      
 #if DIM == 3  
 	      this->dphi[i][p](2) = // can only assign to the Z component if DIM==3
@@ -262,16 +262,16 @@ void FEXYZ<Dim>::compute_shape_functions (const Elem* elem)
 	for (unsigned int i=0; i<this->phi.size(); i++)
 	  for (unsigned int p=0; p<this->phi[i].size(); p++)
 	    {
-	      this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->get_order(), i, xyz[p]);
+	      this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->get_order(), i, xyz_qp[p]);
 	       
 	      this->dphi[i][p](0) =
-		this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 0, xyz[p]);
+		this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 0, xyz_qp[p]);
 		
 	      this->dphi[i][p](1) =
-		this->dphidy[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 1, xyz[p]);
+		this->dphidy[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 1, xyz_qp[p]);
 		
 	      this->dphi[i][p](2) =
-		this->dphidz[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 2, xyz[p]);	      
+		this->dphidz[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 2, xyz_qp[p]);	      
 	    }
 
 	// All done
