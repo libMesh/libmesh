@@ -1,4 +1,4 @@
-// $Id: system_base.C,v 1.9 2003-03-17 11:35:00 ddreyer Exp $
+// $Id: system_base.C,v 1.10 2003-03-20 11:51:25 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -135,10 +135,13 @@ void SystemBase::init ()
   // from now on, no chance to add additional vectors
   _can_add_vectors=false;
 
-  // initialize other vectors, if necessary
+  // initialize & zero other vectors, if necessary
   for(other_vectors_iterator pos = _other_vectors.begin();
       pos != _other_vectors.end(); ++pos)
+    {
       pos->second->init (n_dofs(), n_local_dofs());
+      pos->second->zero ();
+    }
 }
 
 
@@ -159,32 +162,44 @@ void SystemBase::assemble ()
       // information with the matrix during the
       // sparsity computation phase
       _dof_map.attach_matrix (*matrix.get());
-      matrix->attach_dof_map (_dof_map);
+//      matrix->attach_dof_map (_dof_map);
 
-      // Compute the sparisty pattern for the current
+      // Also tell the additional matrices about
+      // the dof map, and vice versa
+      for(other_matrices_iterator pos = _other_matrices.begin(); 
+	  pos != _other_matrices.end(); ++pos)
+	if (!pos->second->initialized())
+	  {
+	    _dof_map.attach_other_matrix (*pos);
+//	    pos->second->attach_dof_map (_dof_map);
+	  }
+	else
+	  {
+	    std::cerr << "ERROR: Something wrong: Mayor matrix is not initialized, "
+		      << std::endl  << " but additional matrix "
+		      << pos->first << " is!" << std::endl;
+	    error();
+	  }  
+
+
+
+      // Compute the sparsity pattern for the current
       // mesh and DOF distribution.  This also updates
       // additional matrices, \p DofMap knows them
       _dof_map.compute_sparsity (_mesh);
 
+
       // Initialize the matrix conformal to this
-      // sparsity pattern
+      // sparsity pattern, though normally, _dof_map.compute_sparsity()
+      // already did this
       matrix->init ();
 
+
       // Initialize additional matrices conformal
-      // to this sparsity pattern, if not already done
+      // to this sparsity pattern, though normally, _dof_map.compute_sparsity()
+      // already did this
       for(other_matrices_iterator pos = _other_matrices.begin(); 
 	  pos != _other_matrices.end(); ++pos)
-	if (pos->second->initialized())
-	  {
-	    // theoretically, with the proper access tests in get_matrix(),
-	    // this cannot happen.  But, who knows?
-	    std::cerr << "ERROR: Mayor matrix is not initialized, but additional matrix "
-		      << pos->first
-		      << " is!"
-		      << std::endl;
-	    error();
-	  }
-	else
 	    pos->second->init ();
 	    
     }
@@ -205,6 +220,7 @@ void SystemBase::assemble ()
 	  }
     }
 
+
   // Clear the matrix and right-hand side.
   matrix->zero ();
   rhs->zero    ();
@@ -212,7 +228,7 @@ void SystemBase::assemble ()
   // Clear the additional matrices
   for(other_matrices_iterator pos = _other_matrices.begin(); 
       pos != _other_matrices.end(); ++pos)
-    pos->second->zero ();
+        pos->second->zero ();
 
   // Now everything is set up and ready for matrix assembly
 }
@@ -267,8 +283,7 @@ void SystemBase::add_matrix (const std::string& mat_name)
   SparseMatrix<Number>* buf(SparseMatrix<Number>::build(_solver_package).release());
   _other_matrices[mat_name] = buf;
 
-  // Add the matrix to the _dof_map
-  _dof_map.attach_other_matrix (*(_other_matrices[mat_name]));
+  // assemble() adds the matrix to the _dof_map
 }
 
 
@@ -362,31 +377,31 @@ NumericVector<Number> &  SystemBase::get_vector(const std::string& vec_name)
 
 
 
-void SystemBase::zero_vectors()
-{
-  // do this only when we cannot add vectors anymore, since
-  // then the vectors are already initialized
-  if (_can_add_vectors)
-    {
-      std::cerr << "ERROR: Too early.  Can only zero the vectors when"
-		<< std::endl
-		<< "these are already properly initialized."
-		<< std::endl;
-      error();
-    }
+// void SystemBase::zero_vectors()
+// {
+//   // do this only when we cannot add vectors anymore, since
+//   // then the vectors are already initialized
+//   if (_can_add_vectors)
+//     {
+//       std::cerr << "ERROR: Too early.  Can only zero the vectors when"
+// 		<< std::endl
+// 		<< "these are already properly initialized."
+// 		<< std::endl;
+//       error();
+//     }
 
-  other_vectors_iterator pos = _other_vectors.begin();
-  if (pos == _other_vectors.end())
-    {
-      std::cerr << "ERROR: No additional vectors to zero!"
-		<< std::endl;      
-      error(); 
-    }
-  else
-    // zero the other vectors
-    for(; pos != _other_vectors.end(); ++pos)
-	pos->second->zero ();
-}
+//   other_vectors_iterator pos = _other_vectors.begin();
+//   if (pos == _other_vectors.end())
+//     {
+//       std::cerr << "ERROR: No additional vectors to zero!"
+// 		<< std::endl;      
+//       error(); 
+//     }
+//   else
+//     // zero the other vectors
+//     for(; pos != _other_vectors.end(); ++pos)
+// 	pos->second->zero ();
+// }
 
 
 

@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.31 2003-03-17 11:35:00 ddreyer Exp $
+// $Id: dof_map.C,v 1.32 2003-03-20 11:51:24 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -50,11 +50,21 @@ void DofMap::attach_matrix (SparseMatrix<Number>& matrix)
 
 
 
-void DofMap::attach_other_matrix (SparseMatrix<Number>& mat)
+void DofMap::attach_other_matrix (std::pair<std::string, SparseMatrix<Number>*> _new)
 {
-  _other_matrices.push_back(&mat);
-
-  _other_matrices.back()->attach_dof_map(*this);
+  if (_other_matrices.count(_new.first))
+    {
+      std::cerr << "ERROR: matrix "
+		<< _new.first
+		<< " has already been added to this system!"
+		<< std::endl;
+      error();
+    }
+  else
+    {
+      _other_matrices.insert(_new);
+      _new.second->attach_dof_map(*this);
+    }
 }
 
 
@@ -150,7 +160,7 @@ void DofMap::clear()
 #endif
 
   _matrix = NULL;
-  
+
   _other_matrices.clear();
 
   _n_dfs =
@@ -466,23 +476,27 @@ void DofMap::compute_sparsity(MeshBase& mesh)
   // be the first to get to know the sparsity pattern, so that
   // it has the best chance to be allocated successfully...
   {
-    if (!_other_matrices.empty())
+    if (_other_matrices.empty())
       {
-        // use the const version of the update_sparsity_pattern()
-        if (_matrix != NULL)
-          _matrix->const_update_sparsity_pattern (sparsity_pattern);
-
-	for (unsigned int n=0; n<_other_matrices.size(); n++)
-          _other_matrices[n]->const_update_sparsity_pattern (sparsity_pattern);
-      }     
-    else
       // NOTE:  The \p SparseMatrix::update_sparsity_pattern() is NOT
       // const, so the \p SparseMatrix may freely trash the
       // sparsity_pattern.  DO NOT expect to use it any more after
       // this call.
       if (_matrix != NULL)
         _matrix->update_sparsity_pattern (sparsity_pattern);
-    
+      }
+    else
+      {
+        // use the const version of the update_sparsity_pattern()
+        if (_matrix != NULL)
+          _matrix->const_update_sparsity_pattern (sparsity_pattern);
+
+	std::map<std::string, SparseMatrix<Number>* >::iterator pos = _other_matrices.begin();
+	for (; pos != _other_matrices.end(); ++pos)
+	  pos->second->const_update_sparsity_pattern (sparsity_pattern);
+      }     
+
+
     // Explicity clear the sparsity pattern now.
     // it is about to go out of scope, but maybe this
     // will expedite freeing up its memory?

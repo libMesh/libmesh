@@ -1,4 +1,4 @@
-// $Id: frequency_system.h,v 1.5 2003-03-11 04:35:18 ddreyer Exp $
+// $Id: frequency_system.h,v 1.6 2003-03-20 11:51:23 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,30 +23,49 @@
 #define __frequency_system_h__
 
 // C++ includes
+#include <string>
+#include <vector>
+
 
 // Local Includes
-#include "mesh_config.h"
-#include "equation_systems.h"
+#include "libmesh.h"
 #include "system_base.h"
+
 
 // Forward Declarations
 class FrequencySystem;
-
+template <class T_sys> class EquationSystems;
 
 
 /*
- * For the moment, only PETSc provides complex support
+ * Frequency domain solutions only possible with complex arithmetic
  */
-#if defined(USE_COMPLEX_NUMBERS) && defined(HAVE_PETSC)
+#if defined(USE_COMPLEX_NUMBERS)
 
 
 
 /**
  * \p FrequencySystem provides a specific system class
- * for frequency-dependent (linear) systems, providing
- * the typical setting of mass, damping and stiffness
- * matrices.  This class only appears when complex numbers
- * are enabled.
+ * for frequency-dependent (linear) systems. 
+ * Generally two solution flavors are possible:
+ *
+ * - @e fast solution of moderately-sized systems:
+ *   For moderate numbers of dof, it is possible to keep the mass, 
+ *   damping and stiffness contribution of all elements in memory.
+ *   These values may be stored in additional matrices.  The user-provided
+ *   functions \p _assemble_fptr and \p _solve_fptr then should compute
+ *   the element contributions, and simply add these contributions
+ *   to give the frequency-dependent overall matrix, respectively.
+ *   For details refer to the examples section.
+ *
+ * - solution of @e large systems with some support for multiple frequencies:
+ *   When there is not enough space to keep the frequency-independent
+ *   contributions in memory, the user need only provide a function
+ *   \p _solve_fptr which assembles the overall, frequency-dependent
+ *   matrix for the current frequency given in the parameter section
+ *   of \p EquationSystems<FrequencySystem> named \p current_frequency.
+ *
+ * \author Daniel Dreyer, 2003
  */
 
 // ------------------------------------------------------------
@@ -77,14 +96,10 @@ public:
   void clear ();
 
   /**
-   * Clears only the frequency-related data.
-   */
-  void clear_frequencies ();
-
-  /**
-   * Calls \p SystemBase::init() (check its documentation
-   * concerning matrix initialization) and initializes the 
-   * member data fields.  
+   * Initializes the member data fields associated with
+   * the system, so that, e.g., \p assemble() may be used.  
+   * The frequenices have to be set @e prior to calling 
+   * \p init().
    */
   void init ();
  
@@ -96,117 +111,147 @@ public:
   
   /**
    * Set the frequency range for which the
-   * system should be solved, must be called
-   * prior to solution.  Also initializes
-   * the \p _solutions vectors.
+   * system should be solved.  \p n_freq frequencies
+   * are created, where the lowest and highest frequencies
+   * are \p base_freq, and \p base_freq+freq_step*(n_freq-1),
+   * respectively.  Calls to this of the form
+   * \p set_frequencies_by_steps(30.) lets this object
+   * solve the system for only this single frequency.
    */
-  void set_frequencies (const Real base_freq,
-			const Real freq_step,
-			const unsigned int n_steps);
+  void set_frequencies_by_steps (const Real base_freq,
+				 const Real freq_step=0.,
+				 const unsigned int n_freq=0);
 
+  /**
+   * Set the frequency range for which the system should 
+   * be solved.  \p n_freq frequencies are equally 
+   * distributed in the interval 
+   * \f$ [ \texttt{min\_freq, max\_freq} ] \f$ .
+   */
+  void set_frequencies_by_range (const Real min_freq,
+				 const Real max_freq,
+				 const unsigned int n_freq);
 
   /**
    * @returns the number of frequencies to solve
    */
-  unsigned int n_frequencies () const 
-    { assert (_have_freq); return _n_freq; }
-
-  /**
-   * Solve the linear system.  Prior to solving
-   * the system, will check whether the mass, damping
-   * stiffness matrices have already been assembled.
-   */
-  std::vector< std::pair<unsigned int, Real> > solve ();
+  unsigned int n_frequencies () const { return _frequencies.size(); }
 
   /**
    * @returns a const reference to the frequencies to solve
    */
   const std::vector<Real>& get_frequencies () const
-    { assert (_have_freq); return _frequencies; }
+    { assert (_finished_set_frequencies); return _frequencies; }
 
   /**
-   * Register a user function to use in initializing the system.
+   * Solves the linear system for the \f$ [ \texttt{n\_start\_in, n\_stop\_in} ]^{th} \f$ 
+   * frequencies.  When neither \p n_start nor \p n_stop are given, solves for all 
+   * frequencies.  The solution vectors are stored in automatically allocated
+   * vectors named \p solution_nnnn.  For access to these vectors, see \p SystemBase.
+   * When calling this, the frequency range should better be already set.
    */
-  void attach_init_function(void fptr(EquationSystems<FrequencySystem>& es,
-				      const std::string& name));
+  std::vector< std::pair<unsigned int, Real> > solve (const unsigned int n_start_in = static_cast<unsigned int>(-1),
+						      const unsigned int n_stop_in  = static_cast<unsigned int>(-1));
   
   /**
-   * Register a user function to use in assembling the system
-   * matrix and RHS.
+   * @returns "Frequency".  Helps in identifying
+   * the system type in an equation system file.
+   */
+  static const std::string system_type () { return "Frequency"; }
+  
+  /**
+   * Register an optional user function to use in pre-assembling the system
+   * matrix and RHS.  Since this function is called only once
+   * for multiple frequencies, this function should better compute
+   * only @e frequency-independent data.
    */
   void attach_assemble_function(void fptr(EquationSystems<FrequencySystem>& es,
 					  const std::string& name));
-  
-  /**
-   * Function that initializes the system.
-   */
-  void (* init_system_fptr) (EquationSystems<FrequencySystem>& es,
-			     const std::string& name);
-  
-  /**
-   * Function that assembles the system.
-   */
-  void (* assemble_fptr) (EquationSystems<FrequencySystem>& es,
-			  const std::string& name);
-  
-  /**
-   * Data structure to hold the mass matrix
-   */
-  AutoPtr<SparseMatrix<Number> > mass;
-  
-  /**
-   * Data structure to hold the damping matrix
-   */
-  AutoPtr<SparseMatrix<Number> > damping;
 
   /**
-   * Data structure to hold the stiffness matrix.
+   * Register a required user function to use in assembling/solving the system.  
+   * Right before solving for a new frequency, this function is called.
+   * It is intended to compute @e frequency-dependent data.  For proper
+   * work of \p FrequencySystem, at least @e this function has to be provided 
+   * by the user.
    */
-  AutoPtr<SparseMatrix<Number> > stiffness;
+  void attach_solve_function(void fptr(EquationSystems<FrequencySystem>& es,
+				      const std::string& name));
+  
+  /**
+   * Function that computes frequency-independent data of the system.
+   */
+  void (* _assemble_fptr) (EquationSystems<FrequencySystem>& es,
+			   const std::string& name);
+  
+  /**
+   * Function that computes frequency-dependent data of the system.
+   */
+  void (* _solve_fptr) (EquationSystems<FrequencySystem>& es,
+			const std::string& name);
+
+  /**
+   * @returns a string of the form \p "frequency_x", where \p x is
+   * the integer \p n.  Useful for identifying frequencies and 
+   * solution vectors in the parameters set of \p _equation_systems.
+   */
+  std::string form_freq_param_name(const unsigned int n) const;
+
+  /**
+   * @returns a string of the form \p "solution_x", where \p x is
+   * the integer \p n.  Useful for identifying frequencies and 
+   * solution vectors in the vectors map of \p SystemBase.
+   */
+  std::string form_solu_vec_name(const unsigned int n) const;
 
 
 protected:
 
   /**
-   * Reference to the \p equation_systems data structure 
+   * Sets the current frequency to the \p n-th entry in the vector
+   * \p _frequencies.
+   */
+  void set_current_frequency(unsigned int n);
+
+  /**
+   * Reference to the \p _equation_systems data structure 
    * that handles us.   
    */
-  EquationSystems<FrequencySystem>& equation_systems;
-
+  EquationSystems<FrequencySystem>& _equation_systems;
 
   /**
-   * vector containing the solutions for the given
-   * frequencies
+   * true when we have frequencies to solve for. 
+   * Setting the frequencies is the first step after
+   * creating/adding a \p FrequencySystem.
    */
-  std::vector< NumericVector<Number>* > _solutions;
+  bool _finished_set_frequencies;
 
   /**
+   * true when we have finished the \p init() phase.
+   * This is the second step, and requires that
+   * frequencies have already been set.
+   */
+  bool _finished_init;
+
+  /**
+   * true when we have finished the \p assemble() phase.
+   * This is the third step and requires that
+   * a) frequencies have already been set, and 
+   * b) the system has been initialized.
+   *
    * In this linear, frequency-dependent setting,
    * the overall system matrices \p mass, \p damping
    * and \p stiffness only have to be assembled once,
    * before multiple solutions may be obtained for
-   * different frequencies.  When the matrices already 
-   * have been asssembled, this \p bool is \p true,
-   * otherwise \p false.
+   * different frequencies. 
    */
-  bool _is_assembled;
+  bool _finished_assemble;
 
   /**
-   * is \p true when the frequency vector is set,
-   * otherwise false.
-   */
-  bool _have_freq;
-
-  /**
-   * the frequencies at which to solve the system
+   * The frequencies for which to solve the frequency-dependent
+   * system.
    */
   std::vector<Real> _frequencies;
-
-  /**
-   * the number of frequencies to solve
-   */
-  unsigned int _n_freq;
-
 };
 
 
@@ -216,10 +261,7 @@ protected:
 
 
 
-
-
-
-#endif // if defined(USE_COMPLEX_NUMBERS) && defined(HAVE_PETSC)
+#endif // if defined(USE_COMPLEX_NUMBERS)
 
 
 #endif // ifndef __frequency_system_h__

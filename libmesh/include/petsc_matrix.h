@@ -1,4 +1,4 @@
-//    $Id: petsc_matrix.h,v 1.20 2003-03-08 07:30:56 benkirk Exp $
+//    $Id: petsc_matrix.h,v 1.21 2003-03-20 11:51:24 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -127,7 +127,8 @@ public:
   void clear ();
 
   /**
-   * Set all entries to 0.
+   * Set all entries to 0. This method retains 
+   * sparsity structure.
    */
   void zero ();
   
@@ -201,6 +202,19 @@ public:
    */
   void add_matrix (const DenseMatrix<T> &dm,
 		   const std::vector<unsigned int> &dof_indices);	     
+      
+  /**
+   * Add a Sparse matrix \p _X, scaled with \p _a, to \p this,
+   * stores the result in \p this: 
+   * \f$\texttt{this} = \_a*\_X + \texttt{this} \f$.
+   * Use this with caution, the sparse matrices need to have the
+   * same nonzero pattern, otherwise \p PETSc will crash! 
+   * It is advisable to not only allocate appropriate memory with 
+   * \p init() , but also explicitly zero the terms of \p this
+   * whenever you add a non-zero value to \p _X.  Note: \p _X will 
+   * be closed, if not already done, before performing any work.
+   */
+  void add (const T _a, SparseMatrix<T> &_X);
     
   /**
    * Return the value of the entry
@@ -256,6 +270,12 @@ public:
    */
   bool closed() const;
   
+  /**
+   * Print the contents of the matrix to the screen
+   * with the PETSc viewer.
+   */
+  void print_personal() const;
+
   /**
    * Print the contents of the matrix in Matlab's
    * sparse matrix format. Optionally prints the
@@ -462,6 +482,31 @@ void PetscMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 
 
 
+
+template <typename T>
+void PetscMatrix<T>::add (const T _a, SparseMatrix<T> &_X)
+{
+  assert (this->initialized());
+
+  // sanity check. but this cannot avoid 
+  // crash due to incompatible sparsity structure...
+  assert (this->m() == _X.m());
+  assert (this->n() == _X.n());
+
+  PetscScalar     a = static_cast<PetscScalar>      (_a);
+  PetscMatrix<T>& X = dynamic_cast<PetscMatrix<T>&> (_X);
+  int ierr=0;
+
+  // the matrix from which we copy the values has to be assembled/closed
+  X.close ();
+
+  ierr = MatAXPY(&a,  X.mat, mat, SAME_NONZERO_PATTERN);   CHKERRQ(ierr);
+  return;
+}
+
+
+
+
 template <typename T>
 inline
 T PetscMatrix<T>::operator () (const unsigned int i,
@@ -522,6 +567,18 @@ bool PetscMatrix<T>::closed() const
 }
 
 
+
+
+template <typename T>
+inline
+void PetscMatrix<T>::print_personal() const
+{
+  assert (this->initialized());
+  
+  int ierr=0;
+
+  ierr = MatView(mat, PETSC_VIEWER_STDOUT_SELF); CHKERRQ(ierr);
+}
 
 #endif // #ifdef HAVE_PETSC
 #endif // #ifdef __petsc_matrix_h__

@@ -1,4 +1,4 @@
-// $Id: system_base.h,v 1.9 2003-03-19 22:43:30 benkirk Exp $
+// $Id: system_base.h,v 1.10 2003-03-20 11:51:24 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -108,6 +108,13 @@ public:
   const std::string & name () const;
 
   /**
+   * @returns the type of system, helpful in identifying
+   * which system type to use when reading equation system
+   * data from file.  Has to be overloaded in derived classes.
+   */
+  static const std::string system_type () { error(); return ""; }
+
+  /**
    * @returns the system number.   
    */
   unsigned int number () const;
@@ -163,9 +170,8 @@ public:
   /**
    * Adds the additional vector \p vec_name to this system.  Only
    * allowed @e prior to \p init().  All the additional vectors
-   * are similarly distributed, like \p rhs and \p solution. 
-   * After initialization, these vectors are not zero'ed.  Use
-   * \p zero_vectors() for this.
+   * are similarly distributed, like \p rhs and \p solution,
+   * and inititialized to zero.
    */
   void add_vector (const std::string& vec_name);
 
@@ -176,10 +182,10 @@ public:
    */
   NumericVector<Number> & get_vector(const std::string& vec_name);
 
-  /**
-   * Zeros the additional vectors.  Gives an error when none exist.
-   */
-  void zero_vectors();
+/*   /\** */
+/*    * Zeros the additional vectors.  Gives an error when none exist. */
+/*    *\/ */
+/*   void zero_vectors(); */
 
   /**
    * @returns the number of variables in the system
@@ -212,8 +218,8 @@ public:
 
   /**
    * Adds the variable \p var to the list of variables
-   * for this system.  Same as before, but assumes LAGRANGE
-   * as default value for FEType.family.
+   * for this system.  Same as before, but assumes \p LAGRANGE
+   * as default value for \p FEType.family.
    */
   void add_variable (const std::string& var,
 		     const Order order);

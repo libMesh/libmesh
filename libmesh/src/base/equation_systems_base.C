@@ -1,4 +1,4 @@
-// $Id: equation_systems_base.C,v 1.1 2003-03-11 04:35:18 ddreyer Exp $
+// $Id: equation_systems_base.C,v 1.2 2003-03-20 11:51:24 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -38,9 +38,6 @@ EquationSystemsBase::EquationSystemsBase (Mesh& m,
   _mesh(m),
   _solver_package(sp)
 {
-  // Default parameters
-  this->set_parameter("linear solver tolerance")          = 1.e-12;
-  this->set_parameter("linear solver maximum iterations") = 5000;
 }
 
 

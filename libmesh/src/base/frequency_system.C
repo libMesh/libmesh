@@ -1,4 +1,4 @@
-// $Id: frequency_system.C,v 1.6 2003-03-11 04:35:19 ddreyer Exp $
+// $Id: frequency_system.C,v 1.7 2003-03-20 11:51:25 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -20,16 +20,17 @@
 
 
 // C++ includes
+#include <stdio.h>          /* avoid the ostringstream */
 
 // Local includes
 #include "frequency_system.h"
+#include "equation_systems.h"
 
 
 /*
- * For the moment, only PETSc provides complex support
+ * Require complex arithmetic
  */
-#if defined(USE_COMPLEX_NUMBERS) && defined(HAVE_PETSC)
-
+#if defined(USE_COMPLEX_NUMBERS)
 
 
 // ------------------------------------------------------------
@@ -38,52 +39,45 @@ FrequencySystem::FrequencySystem (EquationSystems<FrequencySystem>& es,
 				  const std::string&  name,
 				  const unsigned int  number,
 				  const SolverPackage solver_package) :
-  SystemBase       (es.get_mesh(), name, number, solver_package),
-  init_system_fptr (NULL),
-  assemble_fptr    (NULL),
-  mass             (SparseMatrix<Number>::build (solver_package)),
-  damping          (SparseMatrix<Number>::build (solver_package)),
-  stiffness        (SparseMatrix<Number>::build (solver_package)),
-  equation_systems (es),
-  /* set_frequency() initializes the _solutions vectors */
-  _is_assembled    (false),
-  _have_freq       (false),
-  _n_freq          (0)
+  SystemBase                (es.get_mesh(), name, number, solver_package),
+  _assemble_fptr            (NULL),
+  _solve_fptr               (NULL),
+  _equation_systems         (es),
+  _finished_set_frequencies (false),
+  _finished_init            (false),
+  _finished_assemble        (false)
 {
-  std::cerr << "ERROR: Not working (yet)." << std::endl;
+  // dumb safety: clear the frequency vector
+  _frequencies.clear();
 
-  error ();
+  // initialize additional matrices to store the (inherently) real-valued
+  // mass and stiffness as real and imaginary part, respectively, and
+  // the damping in another separate matrix
+//  SystemBase::add_matrix("mass_stiffness");
+//  SystemBase::add_matrix("damping");
+
+  // default value for wave speed & fluid density
+  _equation_systems.set_parameter("wave speed") = 340.;
+  _equation_systems.set_parameter("rho")        = 1.225;
 }
 
 
 
 FrequencySystem::~FrequencySystem ()
 {
-  //init_system_fptr = assemble_fptr = NULL;
+  //_assemble_fptr = _solve_fptr = NULL;
 
-  mass->clear ();
+  // clear frequencies: 
+  // 1. in the parameters section of the 
+  //    EquationSystems<FrequencySystem> object
+  // 2. in the local vector
+  for (unsigned int n=0; n < this->n_frequencies(); n++)
+      _equation_systems.unset_parameter(this->form_freq_param_name(n));
+  _equation_systems.unset_parameter("current_frequency");
 
-  damping->clear ();
+  this->_frequencies.clear();
 
-  stiffness->clear ();
-
-  this->clear_frequencies ();
-}
-
-
-
-
-void  FrequencySystem::clear_frequencies ()
-{
-  if (_have_freq)
-    {
-      for (unsigned int n=0; n<_n_freq; n++)
-	_solutions[n]->clear ();
-
-      _frequencies.clear ();
-
-      _have_freq = false;
-    }
+  // the additional matrices and vectors are cleared and zero'ed in SystemBase
 }
 
 
@@ -93,17 +87,21 @@ void FrequencySystem::clear ()
 {
   SystemBase::clear();
 
-  //init_system_fptr = assemble_fptr = NULL;
+  //_assemble_fptr = _solve_fptr = NULL;
 
-  mass->clear ();
+  _finished_set_frequencies = false;
+  _finished_init            = false;
+  _finished_assemble        = false;
 
-  damping->clear ();
+  // clear frequencies: 
+  // 1. in the parameters section of the 
+  //    EquationSystems<FrequencySystem> object
+  // 2. in the local vector
+  for (unsigned int n=0; n < this->n_frequencies(); n++)
+      _equation_systems.unset_parameter(this->form_freq_param_name(n));
+  _equation_systems.unset_parameter("current_frequency");
 
-  stiffness->clear ();
-
-  _is_assembled = false;
-
-  this->clear_frequencies ();
+  this->_frequencies.clear();
 }
 
 
@@ -111,151 +109,270 @@ void FrequencySystem::clear ()
 
 void FrequencySystem::init ()
 {
-  // initialize parent data
+  // Log how long initializing the system takes
+  START_LOG("init()", "FrequencySystem");
+
+  // make sure we have frequencies to solve for
+  if (!_finished_set_frequencies)
+    {
+      std::cerr << "ERROR: Need to set frequencies before calling init(). " << std::endl;
+      error();
+    }
+
+  // initialize parent data and additional solution vectors
   SystemBase::init();
 
-  // Possibly call a user-supplied initialization
-  // method.
-  if (init_system_fptr != NULL)
-    {
-      this->init_system_fptr (equation_systems, this->name());
-    }
+  _finished_init = true;
+
+  // Stop logging init()
+  STOP_LOG("init()", "FrequencySystem");
 }
 
 
 
 void FrequencySystem::assemble ()
 {
-  assert (assemble_fptr != NULL);
+  assert (_finished_init);
 
-  if (_is_assembled)  
+  if (_finished_assemble)  
     {
       std::cerr << "ERROR: Matrices already assembled." << std::endl;
       error (); 
     }
 
-  _is_assembled = true;
+  // Log how long assemble() takes
+  START_LOG("assemble()", "FrequencySystem");
 
   // prepare matrix with the help of the _dof_map, 
-  // fill with sparsity pattern
+  // fill with sparsity pattern, initialize the
+  // additional matrices
   SystemBase::assemble();
 
-
-  std::cerr << "ERROR: Have to initialize the mass, damping and" << std::endl
-	    << " stiffness matrices somehow. PETSc's MatDuplicate() does not " << std::endl
-	    << " work, since the matrix from which to duplicate has to be assembled first"
-	    << std::endl;
-  error ();
-
-  // ...
-
-  // Call the user-specified matrix assembly function
-  this->assemble_fptr (equation_systems, this->name());
+  // Optionally call the user-specified matrix assembly function,
+  // if the user provided it.  Note that \p FrequencySystem also
+  // works without an _assemble_fptr function
+  if (_assemble_fptr != NULL)
+    this->_assemble_fptr (_equation_systems, this->name());
 
   //matrix.print ();
   //rhs.print    ();
+
+  _finished_assemble = true;
+
+  // Log how long assemble() takes
+  STOP_LOG("assemble()", "FrequencySystem");
 }
 
 
 
-void FrequencySystem::set_frequencies (const Real base_freq,
-				       const Real freq_step,
-				       const unsigned int n_steps)
+void FrequencySystem::set_frequencies_by_steps (const Real base_freq,
+						const Real freq_step,
+						const unsigned int n_freq)
 {
-  if (_have_freq)
-    {
-      std::cerr << "WARNING: frequencies already initialized, " << std::endl
-		<< " have to clear up first." << std::endl;
+  // sanity check
+  assert(this->n_frequencies() == 0);
 
-      this->clear_frequencies ();
+  if (_finished_set_frequencies)
+    {
+      std::cerr << "ERROR: frequencies already initialized. " << std::endl;
+      error();
     }
 
-  _have_freq = true;
+  _frequencies.resize (n_freq);
 
-  _n_freq = n_steps;
-
-  _frequencies.resize (n_steps);
-
-  // set frequencies, build solution storage
-  for (unsigned int n=0; n<n_steps; n++)
+  for (unsigned int n=0; n<n_freq; n++)
     {
-      AutoPtr<NumericVector<Number> > ap (NumericVector<Number>::build(equation_systems.get_solver_package()));
-      _solutions.insert(_solutions.end(), ap.release() );
-
+      // local storage of frequencies
       _frequencies[n] = base_freq + n * freq_step;
+      // remember frequencies as parameters, so that they
+      // are saved, once the EquationSystems object is written
+      _equation_systems.set_parameter(this->form_freq_param_name(n)) = _frequencies[n];
+
+      // build storage for solution vector
+      SystemBase::add_vector(this->form_solu_vec_name(n));
     }  
 
+  // set the current frequency
+  this->set_current_frequency(0);
+
+  _finished_set_frequencies = true;
+}
+
+
+
+void FrequencySystem::set_frequencies_by_range (const Real min_freq,
+						const Real max_freq,
+						const unsigned int n_freq)
+{
+  // sanity checks
+  assert(this->n_frequencies() == 0);
+  assert(max_freq > min_freq);
+  assert(n_freq > 0);
+
+  if (_finished_set_frequencies)
+    {
+      std::cerr << "ERROR: frequencies already initialized. " << std::endl;
+      error();
+    }
+
+  _frequencies.resize (n_freq);
+
+  // set frequencies, build solution storage
+  for (unsigned int n=0; n<n_freq; n++)
+    {
+      // local storage of frequencies
+      _frequencies[n] = min_freq + n*(max_freq-min_freq)/(n_freq-1);
+      // remember frequencies as parameters, so that they
+      // are saved, once the EquationSystems object is written
+      _equation_systems.set_parameter(this->form_freq_param_name(n)) = _frequencies[n];
+      
+      // build storage for solution vector
+      SystemBase::add_vector(this->form_solu_vec_name(n));
+    }  
+
+  // set the current frequency
+  this->set_current_frequency(0);
+
+  _finished_set_frequencies = true;
 }
 
 
 
 std::vector< std::pair<unsigned int, Real> >
-FrequencySystem::solve ()
+FrequencySystem::solve (const unsigned int n_start_in, 
+			const unsigned int n_stop_in)
 {
   // Assemble the linear system, if not already done
-  if (_is_assembled != true)
-    {
-      std::cerr << "WARNING: matrices not assembled yet," << std::endl
-		<< " have to assemble first." << std::endl;
+  if (!_finished_assemble)
+    this->assemble (); 
 
-      assemble (); 
+  // the user-supplied solve method _has_ to be provided by the user
+  assert (_solve_fptr != NULL);
+
+//  Do not call this, otherwise perflog may count the time twice,
+//  due to the additional START/STOP_LOGs below
+//  // Log how long solve() takes
+//  START_LOG("solve()", "FrequencySystem");
+
+
+  // default values, solve for whole frequency range
+  unsigned int n_start = 0;
+  unsigned int n_stop  = this->n_frequencies()-1;
+
+  if ((n_start_in!=static_cast<unsigned int>(-1)) &&
+      (n_stop_in !=static_cast<unsigned int>(-1)))
+    {
+      n_start = n_start_in;
+      n_stop  = n_stop_in;
+    }
+  else if (n_stop ==static_cast<unsigned int>(-1))
+    {
+      std::cerr << "ERROR: Forgot to set n_stop." << std::endl;
+      error();
     }
 
-  // Get the user-specifiied linear solver tolerance
-  const Real tol            =
-    equation_systems.parameter("linear solver tolerance");
+  // existence & range checks
+  assert(n_frequencies() > 0);
+  assert(n_stop < n_frequencies());
 
-  // Get the user-specified maximum # of linear solver iterations
+
+  // Get the user-specified linear solver tolerance,
+  //     the user-specified maximum # of linear solver iterations,
+  //     the user-specified wave speed
+  const Real tol            =
+    _equation_systems.parameter("linear solver tolerance");
   const unsigned int maxits =
-    static_cast<unsigned int>(equation_systems.parameter("linear solver maximum iterations"));
+    static_cast<unsigned int>(_equation_systems.parameter("linear solver maximum iterations"));
+
 
   // return values
   std::vector< std::pair<unsigned int, Real> > vec_rval;
 
-
-  for (unsigned int n=0; n<_n_freq; n++)
+  // start solver loop
+  for (unsigned int n=n_start; n<= n_stop; n++)
     {
-      //Real f = _frequencies[n];
-      //Real omega = 2*pi???
+      // set the current frequency
+      this->set_current_frequency(n);
 
-      std::cerr << "ERROR: missing how to combine the matrices" << std::endl;
-      error ();
-      // ...
+      // Call the user-supplied pre-solve method
+      START_LOG("user_pre_solve()", "FrequencySystem");
+      
+      this->_solve_fptr (_equation_systems, this->name());
+      
+      STOP_LOG("user_pre_solve()", "FrequencySystem");
+
+
+      START_LOG("linear_equation_solve()", "FrequencySystem");
 
       // Solve the linear system for this specific frequency
       const std::pair<unsigned int, Real> rval = 
 	linear_solver_interface->solve (*matrix, *solution, *rhs, tol, maxits);
 
-      vec_rval.insert(vec_rval.end(), rval);
-   }  
+      STOP_LOG("linear_equation_solve()", "FrequencySystem");
 
-  // sanity
-  assert (vec_rval.size() == _n_freq);
+      vec_rval.push_back(rval);      
+    }  
+
+  // sanity check
+  assert (vec_rval.size() == (n_stop-n_start+1));
+
+//  Do not call this, otherwise perflog may count the time twice,
+//  due to the additional START/STOP_LOGs below
+//  // Log how long solve() takes
+//  STOP_LOG("solve()", "FrequencySystem");
 
   return vec_rval; 
 }
 
 
 
-void FrequencySystem::attach_init_function(void fptr(EquationSystems<FrequencySystem>& es,
-						   const std::string& name))
-{
-  assert (fptr != NULL);
-  
-  init_system_fptr = fptr;
-}
-
-
-
 void FrequencySystem::attach_assemble_function(void fptr(EquationSystems<FrequencySystem>& es,
-						       const std::string& name))
+							 const std::string& name))
 {
   assert (fptr != NULL);
   
-  assemble_fptr = fptr;  
+  _assemble_fptr = fptr;  
 }
 
 
 
 
-#endif // if defined(USE_COMPLEX_NUMBERS) && defined(HAVE_PETSC)
+void FrequencySystem::attach_solve_function(void fptr(EquationSystems<FrequencySystem>& es,
+						      const std::string& name))
+{
+  assert (fptr != NULL);
+  
+  _solve_fptr = fptr;
+}
+
+
+
+void FrequencySystem::set_current_frequency(unsigned int n)
+{
+  assert(n < _frequencies.size());
+  _equation_systems.set_parameter("current_frequency") = _frequencies[n];
+}
+
+
+
+std::string FrequencySystem::form_freq_param_name(const unsigned int n) const
+{
+  assert (n < 9999);
+  char buf[15];
+  sprintf(buf, "frequency_%04d", n);
+  return (buf);
+}
+
+
+
+
+std::string FrequencySystem::form_solu_vec_name(const unsigned int n) const
+{
+  assert (n < 9999);
+  char buf[15];
+  sprintf(buf, "solution_%04d", n);
+  return (buf);
+}
+
+
+#endif // if defined(USE_COMPLEX_NUMBERS)

@@ -1,4 +1,4 @@
-// $Id: sparse_matrix.h,v 1.8 2003-03-17 11:34:54 ddreyer Exp $
+// $Id: sparse_matrix.h,v 1.9 2003-03-20 11:51:24 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -209,7 +209,6 @@ public:
    * for adding an element matrix
    * at assembly time
    */
-    
   virtual void add_matrix (const DenseMatrix<T> &dm,
 			   const std::vector<unsigned int> &rows,
 			   const std::vector<unsigned int> &cols) = 0;
@@ -221,6 +220,13 @@ public:
   virtual void add_matrix (const DenseMatrix<T> &dm,
 			   const std::vector<unsigned int> &dof_indices) = 0;
       
+  /**
+   * Add a Sparse matrix \p _X, scaled with \p _a, to \p this,
+   * stores the result in \p this: 
+   * \f$\texttt{this} = \_a*\_X + \texttt{this} \f$.
+   */
+  virtual void add (const T, SparseMatrix<T> &) = 0;
+
   /**
    * Return the value of the entry
    * \p (i,j).  This may be an
@@ -274,9 +280,17 @@ public:
   virtual bool closed() const = 0;
 
   /**
-   * Print the contents of the matrix to the screen.
+   * Print the contents of the matrix to the screen
+   * in a uniform style, regardless of matrix/solver
+   * package being used.
    */
-  virtual void print() const;
+  void print() const;
+  
+  /**
+   * Print the contents of the matrix to the screen
+   * in a package-personalized style, if available.
+   */
+  virtual void print_personal() const = 0;
   
   /**
    * Print the contents of the matrix in Matlab's
@@ -352,7 +366,7 @@ void SparseMatrix<Complex>::print() const
   for (unsigned int i=0; i<m(); i++)
     {
       for (unsigned int j=0; j<n(); j++)
-	std::cout << std::setw(14) << (*this)(i,j).real() << " ";
+	std::cout << std::setw(8) << (*this)(i,j).real() << " ";
       std::cout << std::endl;
     }
 

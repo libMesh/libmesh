@@ -1,4 +1,4 @@
-// $Id: general_system.h,v 1.6 2003-03-11 04:35:18 ddreyer Exp $
+// $Id: general_system.h,v 1.7 2003-03-20 11:51:23 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -67,9 +67,8 @@ public:
   void clear ();
 
   /**
-   * Calls \p SystemBase::init() (check its documentation
-   * concerning matrix initialization) and initializes the 
-   * member data fields.  
+   * Initializes the member data fields associated with
+   * the system, so that, e.g., \p assemble() may be used.
    */
   void init ();
 
@@ -100,7 +99,11 @@ public:
   /*    *\/ */
   /*   Order variable_order (const std::string& var) const; */
   
-
+  /**
+   * @returns "General System".  Helps in identifying
+   * the system type in an equation system file.
+   */
+  static const std::string system_type () { return "General"; }
 
   //-----------------------------------------------------------------
   // access to the solution data fields

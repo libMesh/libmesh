@@ -1,4 +1,4 @@
-// $Id: laspack_matrix.C,v 1.8 2003-03-17 11:35:00 ddreyer Exp $
+// $Id: laspack_matrix.C,v 1.9 2003-03-20 11:51:25 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -176,7 +176,6 @@ void LaspackMatrix<T>::init ()
   // Ignore calls on initialized objects
   if (initialized())
     return;
-  
   
   // We need the DofMap for this!
   assert (_dof_map != NULL);
