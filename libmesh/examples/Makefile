@@ -3,12 +3,18 @@ all:: examples
 #
 # Build the example programs
 examples:
-	@$(MAKE) -C ex1
-	@$(MAKE) -C ex2
-	@$(MAKE) -C ex3
-	@$(MAKE) -C ex4
-	@$(MAKE) -C ex5
-	@$(MAKE) -C ex7
+	@echo "----------------------------------------------"
+	@echo "--------- Building Example Programs ----------"
+	@echo "----------------------------------------------"
+	@$(MAKE) -C ex1 $(MAKECMDGOALS)
+	@$(MAKE) -C ex2 $(MAKECMDGOALS)
+	@$(MAKE) -C ex3 $(MAKECMDGOALS)
+	@$(MAKE) -C ex4 $(MAKECMDGOALS)
+	@$(MAKE) -C ex5 $(MAKECMDGOALS)
+	@$(MAKE) -C ex7 $(MAKECMDGOALS)
+	@echo "----------------------------------------------"
+	@echo "------- Done Building Example Programs -------"
+	@echo "----------------------------------------------"
 
 
 .PHONY: clean clobber distclean

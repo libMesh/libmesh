@@ -2,9 +2,15 @@
 # How to make the dependencies
 #
 all:
+	@echo "----------------------------------------------"
+	@echo "------- Building Contributed Packages --------"
+	@echo "----------------------------------------------"
 	@$(MAKE) -C laspack   $(MAKECMDGOALS)
 	@$(MAKE) -C metis/Lib $(MAKECMDGOALS)
 	@$(MAKE) -C sfcurves  $(MAKECMDGOALS)
+	@echo "----------------------------------------------"
+	@echo "----- Done Building Contributed Packages -----"
+	@echo "----------------------------------------------"
 
 
 
