@@ -1,4 +1,4 @@
-// $Id: mesh_misc_support.C,v 1.9 2003-04-09 01:20:25 benkirk Exp $
+// $Id: mesh_misc_support.C,v 1.10 2003-07-23 21:32:26 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -53,7 +53,7 @@ void MeshBase::read_shanee (std::istream &in)
   clear();
   
   // Check input buffer
-  assert (!in.bad());
+  assert (in.good());
 
   // Shanee only works in 2D
   assert (_dim == 2);
@@ -177,7 +177,7 @@ void MeshBase::read_matlab(std::istream& in)
   assert(_dim == 2);
 
   // Check the input buffer
-  assert (!in.bad());
+  assert (in.good());
 
   unsigned int nNodes=0, nElem=0;
 
@@ -254,7 +254,7 @@ void MeshBase::read_off(std::istream& in)
   assert (_dim == 2);
 
   // Check the input buffer
-  assert (!in.bad());
+  assert (in.good());
 
   unsigned int nn, ne, nf;
 
@@ -278,7 +278,7 @@ void MeshBase::read_off(std::istream& in)
   // Read the nodes
   for (unsigned int n=0; n<nn; n++)
     {
-      assert (!in.bad());
+      assert (in.good());
 
       in >> x
 	 >> y
@@ -292,7 +292,7 @@ void MeshBase::read_off(std::istream& in)
   // Read the triangles
   for (unsigned int e=0; e<nf; e++)
     {
-      assert (!in.bad());
+      assert (in.good());
       
       _elements[e] = new Tri3;
 
