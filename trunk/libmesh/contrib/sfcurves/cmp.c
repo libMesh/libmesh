@@ -15,5 +15,6 @@ int cmp_indx(const void *a, const void *b)
     }
   }
   
-  else return(0);      
+  /* else return(0); */      
+  return (0);      
 }
