@@ -1,4 +1,4 @@
-// $Id: ex9.C,v 1.7 2003-06-10 19:04:47 benkirk Exp $
+// $Id: ex9.C,v 1.8 2003-09-30 18:22:18 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -32,6 +32,7 @@
  */
 #include "libmesh.h"
 #include "mesh.h"
+#include "mesh_refinement.h"
 #include "equation_systems.h"
 #include "fe.h"
 #include "quadrature_gauss.h"
@@ -141,11 +142,17 @@ int main (int argc, char** argv)
     mesh.read ("../ex10/mesh.xda");
 
     /**
+     * Create a \p MeshRefinement object to handle refinement of our mesh.
+     * This class handles all the details of mesh refinement and coarsening.
+     */
+    MeshRefinement mesh_refinement (mesh);
+    
+    /**
      * Uniformly refine the mesh 5 times.  This is the
      * first time we use the mesh refinement capabilities
      * of the library.
      */
-    mesh.mesh_refinement.uniformly_refine (5);
+    mesh_refinement.uniformly_refine (5);
     
     /**
      * Print information about the mesh to the screen.

@@ -1,4 +1,4 @@
-// $Id: mesh_refinement_smoothing.C,v 1.4 2003-09-25 21:46:56 benkirk Exp $
+// $Id: mesh_refinement_smoothing.C,v 1.5 2003-09-30 18:22:18 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -39,13 +39,13 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
 
 
   // Vector holding the maximum element level that touches a node.
-  std::vector<unsigned char> max_level_at_node (mesh.n_nodes(), 0);
+  std::vector<unsigned char> max_level_at_node (_mesh.n_nodes(), 0);
 
 
   // Loop over all the active elements & fill the vector
   {
-    active_elem_iterator       elem_it (mesh.elements_begin());
-    const active_elem_iterator elem_end(mesh.elements_end());
+    active_elem_iterator       elem_it (_mesh.elements_begin());
+    const active_elem_iterator elem_end(_mesh.elements_end());
     
     for (; elem_it != elem_end; ++elem_it)
       {
@@ -70,8 +70,8 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
   // Now loop over the active elements and flag the elements
   // who violate the requested level mismatch
   {
-    active_elem_iterator       elem_it (mesh.elements_begin());
-    const active_elem_iterator elem_end(mesh.elements_end());
+    active_elem_iterator       elem_it (_mesh.elements_begin());
+    const active_elem_iterator elem_end(_mesh.elements_end());
     
     for (; elem_it != elem_end; ++elem_it)
       {
@@ -109,8 +109,8 @@ bool MeshRefinement::eliminate_unrefined_patches ()
   bool flags_changed = false;
   
   
-  active_elem_iterator       elem_it (mesh.elements_begin());
-  const active_elem_iterator elem_end(mesh.elements_end());
+  active_elem_iterator       elem_it (_mesh.elements_begin());
+  const active_elem_iterator elem_end(_mesh.elements_end());
 
   for (; elem_it != elem_end; ++elem_it)
     {

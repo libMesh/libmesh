@@ -2,7 +2,6 @@ ex9.$(obj-suffix):\
     ex9.C\
     ../../include/auto_ptr.h\
     ../../include/boundary_info.h\
-    ../../include/boundary_mesh.h\
     ../../include/coupling_matrix.h\
     ../../include/data_map.h\
     ../../include/data_object.h\
@@ -54,6 +53,7 @@ ex9.$(obj-suffix):\
     ../../include/system_base.h\
     ../../include/transient_system.h\
     ../../include/type_vector.h\
+    ../../include/utility.h\
     ../../include/vector_value.h
 exact_solution.$(obj-suffix):\
     exact_solution.C\

@@ -1,4 +1,4 @@
-// $Id: elem_refinement.C,v 1.6 2003-09-27 00:54:57 benkirk Exp $
+// $Id: elem_refinement.C,v 1.7 2003-09-30 18:22:18 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -26,7 +26,8 @@
 
 // Local includes
 #include "elem.h"
-#include "mesh_base.h"
+//#include "mesh_base.h"
+#include "mesh_refinement.h"
 
 
 //--------------------------------------------------------------------
@@ -39,12 +40,12 @@
  */ 
 #ifdef ENABLE_AMR
 
-void Elem::refine (MeshBase& mesh)
+void Elem::refine (MeshRefinement& mesh_refinement)
 {
   assert (this->refinement_flag() == Elem::REFINE);
   assert (this->active());
   assert (_children == NULL);
-
+  
   // Two big prime numbers less than
   // sqrt(max_unsigned_int) for key creation.
   const unsigned int bp1 = 65449;
@@ -150,29 +151,31 @@ void Elem::refine (MeshBase& mesh)
 	    else
 	      {
 		this->child(c)->set_node(nc) =
-		  mesh.mesh_refinement.add_point(p[c][nc],
-						 keys[c][nc]);
+		  mesh_refinement.add_point(p[c][nc],
+					    keys[c][nc]);
 	      }
 	  }
       
-	mesh.mesh_refinement.add_elem (this->child(c));
+	mesh_refinement.add_elem (this->child(c));
       }
   }
 
 
-  
-  // Possibly add boundary information
-  for (unsigned int s=0; s<this->n_neighbors(); s++)
-    if (this->neighbor(s) == NULL)
-      {
-	const short int id = mesh.boundary_info.boundary_id(this, s);
+
+  // Note (9/30/2003) No longer necessary.  BCs are stored for the level-0
+  // elements and inferred for the children
+//   // Possibly add boundary information
+//   for (unsigned int s=0; s<this->n_neighbors(); s++)
+//     if (this->neighbor(s) == NULL)
+//       {
+// 	const short int id = mesh.boundary_info.boundary_id(this, s);
 	
-	if (id != mesh.boundary_info.invalid_id)
-	  for (unsigned int sc=0; sc<this->n_children_per_side(s); sc++)
-	    mesh.boundary_info.add_side(this->child(this->side_children_matrix(s,sc)),
-					s,
-					id);
-      }
+// 	if (id != mesh.boundary_info.invalid_id)
+// 	  for (unsigned int sc=0; sc<this->n_children_per_side(s); sc++)
+// 	    mesh.boundary_info.add_side(this->child(this->side_children_matrix(s,sc)),
+// 					s,
+// 					id);
+//       }
 
   
   // Un-set my refinement flag now

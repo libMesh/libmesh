@@ -1,4 +1,4 @@
-// $Id: mesh_data.h,v 1.22 2003-09-16 16:44:04 ddreyer Exp $
+// $Id: mesh_data.h,v 1.23 2003-09-30 18:22:18 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -850,8 +850,8 @@ Number MeshData::operator() (const Node* node,
       return libMesh::zero;
 
   // we only get here when pos != _node_data.end()
-  assert (i < (*pos).second.size());
-  return (*pos).second[i];
+  assert (i < pos->second.size());
+  return pos->second[i];
 }
 
 
@@ -887,7 +887,7 @@ const std::vector<Number>& MeshData::get_data (const Node* node) const
     }
 #endif
 
-  return (*pos).second;
+  return pos->second;
 }
 
 
@@ -924,8 +924,8 @@ Number MeshData::operator() (const Elem* elem,
     return libMesh::zero;
   
   // we only get here when pos != _elem_data.end()  
-  assert (i < (*pos).second.size());
-  return (*pos).second[i];
+  assert (i < pos->second.size());
+  return pos->second[i];
 }
 
 

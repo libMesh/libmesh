@@ -1,4 +1,4 @@
-// $Id: mesh.h,v 1.23 2003-09-16 15:59:31 benkirk Exp $
+// $Id: mesh.h,v 1.24 2003-09-30 18:22:18 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -26,7 +26,6 @@
 
 // Local Includes -----------------------------------
 #include "mesh_base.h"
-#include "boundary_mesh.h"
 
 
 
@@ -54,11 +53,6 @@ class Mesh : public MeshBase
    * Destructor.
    */
   ~Mesh();
-    
-  /**
-   * A mesh describing just the boundary.
-   */
-  BoundaryMesh boundary_mesh;
 
   /**
    * Builds a \f$ nx \times ny \times nz \f$ (elements) cube.

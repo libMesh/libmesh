@@ -2,7 +2,6 @@ ex1.$(obj-suffix):\
     ex1.C\
     ../../include/auto_ptr.h\
     ../../include/boundary_info.h\
-    ../../include/boundary_mesh.h\
     ../../include/dof_object.h\
     ../../include/elem.h\
     ../../include/elem_iterators.h\
@@ -18,7 +17,6 @@ ex1.$(obj-suffix):\
     ../../include/mesh.h\
     ../../include/mesh_base.h\
     ../../include/mesh_data.h\
-    ../../include/mesh_refinement.h\
     ../../include/node.h\
     ../../include/node_iterators.h\
     ../../include/perf_log.h\
@@ -28,4 +26,5 @@ ex1.$(obj-suffix):\
     ../../include/reference_counter.h\
     ../../include/sphere.h\
     ../../include/surface.h\
-    ../../include/type_vector.h
+    ../../include/type_vector.h\
+    ../../include/utility.h

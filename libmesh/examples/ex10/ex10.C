@@ -1,4 +1,4 @@
-// $Id: ex10.C,v 1.6 2003-08-29 16:47:26 benkirk Exp $
+// $Id: ex10.C,v 1.7 2003-09-30 18:22:17 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -32,6 +32,7 @@
  */
 #include "libmesh.h"
 #include "mesh.h"
+#include "mesh_refinement.h"
 #include "equation_systems.h"
 #include "fe.h"
 #include "quadrature_gauss.h"
@@ -146,9 +147,14 @@ int main (int argc, char** argv)
     mesh.read ("mesh.xda");
 
     /**
+     * Create an object to handle mesh refinement.
+     */
+    MeshRefinement mesh_refinement (mesh);
+
+    /**
      * Uniformly refine the mesh 5 times.
      */
-    mesh.mesh_refinement.uniformly_refine (5);
+    mesh_refinement.uniformly_refine (5);
     
     /**
      * Print information about the mesh to the screen.
@@ -319,16 +325,16 @@ int main (int argc, char** argv)
 		 * will be refined, but those flagged for coarsening _might_ be
 		 * coarsened.
 		 */
-		mesh.mesh_refinement.flag_elements_by_error_fraction (error,
-								      0.80,
-								      0.07,
-								      5);
+		mesh_refinement.flag_elements_by_error_fraction (error,
+								 0.80,
+								 0.07,
+								 5);
 		
 		/**
 		 * This call actually refines and coarsens the flagged
 		 * elements.
 		 */
-		mesh.mesh_refinement.refine_and_coarsen_elements();
+		mesh_refinement.refine_and_coarsen_elements();
 
 		/**
 		 * This call reinitializes the \p EquationSystems object for

@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.26 2003-09-27 00:54:57 benkirk Exp $
+// $Id: mesh.C,v 1.27 2003-09-30 18:22:18 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -42,8 +42,7 @@ namespace sfc {
 // ------------------------------------------------------------
 // Mesh class member functions
 Mesh::Mesh (unsigned int d) :
-  MeshBase      (d),
-  boundary_mesh (d-1)
+  MeshBase      (d)
 {
   assert (libMesh::initialized());
 }
@@ -62,8 +61,6 @@ Mesh::~Mesh ()
 void Mesh::clear ()
 {
   // Clear other data structures
-  boundary_mesh.clear();
-
   MeshBase::clear();
 }
 

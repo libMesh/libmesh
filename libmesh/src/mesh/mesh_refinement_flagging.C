@@ -1,4 +1,4 @@
-// $Id: mesh_refinement_flagging.C,v 1.6 2003-09-25 21:46:56 benkirk Exp $
+// $Id: mesh_refinement_flagging.C,v 1.7 2003-09-30 18:22:18 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -60,8 +60,8 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_p
 //   // Set the error_per_cell to zero for elements at the
 //   // maximum allowable refinement level
 //   {
-//     active_elem_iterator       elem_it (mesh.elements_begin());
-//     const active_elem_iterator elem_end(mesh.elements_end());
+//     active_elem_iterator       elem_it (_mesh.elements_begin());
+//     const active_elem_iterator elem_end(_mesh.elements_end());
 
 //     for (; elem_it != elem_end; ++elem_it)
 //       {
@@ -100,8 +100,8 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_p
 
   // Loop over the elements and flag them for coarsening or
   // refinement based on the element error
-  active_elem_iterator       elem_it (mesh.elements_begin());
-  const active_elem_iterator elem_end(mesh.elements_end());
+  active_elem_iterator       elem_it (_mesh.elements_begin());
+  const active_elem_iterator elem_end(_mesh.elements_end());
 
   for (; elem_it != elem_end; ++elem_it)
     {
@@ -143,7 +143,7 @@ void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector& error_pe
   assert (coarsen_fraction >= 0.);  assert (coarsen_fraction <= 1.);
 
   // The number of active elements in the mesh
-  const unsigned int n_active_elem  = mesh.n_elem();
+  const unsigned int n_active_elem  = _mesh.n_elem();
 
   // The number of elements to flag for coarsening
   const unsigned int n_elem_coarsen = static_cast<unsigned int>(coarsen_fraction * n_active_elem);
@@ -162,8 +162,8 @@ void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector& error_pe
 //   // Set the error_per_cell to zero for elements at the
 //   // maximum allowable refinement level
 //   {
-//     active_elem_iterator       elem_it (mesh.elements_begin());
-//     const active_elem_iterator elem_end(mesh.elements_end());
+//     active_elem_iterator       elem_it (_mesh.elements_begin());
+//     const active_elem_iterator elem_end(_mesh.elements_end());
 
 //     for (; elem_it != elem_end; ++elem_it)
 //       {
@@ -187,8 +187,8 @@ void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector& error_pe
 
   // Loop over the active elements and create the entry
   // in the sorted_error vector
-  active_elem_iterator       elem_it (mesh.elements_begin());
-  const active_elem_iterator elem_end(mesh.elements_end());
+  active_elem_iterator       elem_it (_mesh.elements_begin());
+  const active_elem_iterator elem_end(_mesh.elements_end());
 
   for (; elem_it != elem_end; ++elem_it)
     {
@@ -259,8 +259,8 @@ void MeshRefinement::flag_elements_by_mean_stddev (const ErrorVector& error_per_
 //   // Set the error_per_cell to zero for elements at the
 //   // maximum allowable refinement level
 //   {
-//     active_elem_iterator       elem_it (mesh.elements_begin());
-//     const active_elem_iterator elem_end(mesh.elements_end());
+//     active_elem_iterator       elem_it (_mesh.elements_begin());
+//     const active_elem_iterator elem_end(_mesh.elements_end());
 
 //     for (; elem_it != elem_end; ++elem_it)
 //       {
@@ -295,8 +295,8 @@ void MeshRefinement::flag_elements_by_mean_stddev (const ErrorVector& error_per_
 
   // Loop over the elements and flag them for coarsening or
   // refinement based on the element error
-  active_elem_iterator       elem_it (mesh.elements_begin());
-  const active_elem_iterator elem_end(mesh.elements_end());
+  active_elem_iterator       elem_it (_mesh.elements_begin());
+  const active_elem_iterator elem_end(_mesh.elements_end());
 
   for (; elem_it != elem_end; ++elem_it)
     {
@@ -328,8 +328,8 @@ void MeshRefinement::clean_refinement_flags ()
 {
   // Possibly clean up the refinement flags from
   // a previous step
-  elem_iterator       elem_it (mesh.elements_begin());
-  const elem_iterator elem_end(mesh.elements_end());
+  elem_iterator       elem_it (_mesh.elements_begin());
+  const elem_iterator elem_end(_mesh.elements_end());
 
   for ( ; elem_it != elem_end; ++elem_it)
     (*elem_it)->set_refinement_flag(Elem::DO_NOTHING);

@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.56 2003-09-27 00:54:57 benkirk Exp $
+// $Id: mesh_base.C,v 1.57 2003-09-30 18:22:18 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -56,9 +56,6 @@
 // ------------------------------------------------------------
 // MeshBase class member functions
 MeshBase::MeshBase (unsigned int d) :
-#ifdef ENABLE_AMR
-  mesh_refinement    (*this),
-#endif
   boundary_info      (*this),
   data               (*this),
   _n_sbd             (1),
@@ -73,9 +70,6 @@ MeshBase::MeshBase (unsigned int d) :
 
 
 MeshBase::MeshBase (const MeshBase& other_mesh) :
-#ifdef ENABLE_AMR
-  mesh_refinement    (*this),
-#endif
   boundary_info      (*this),
   data               (*this),
   _nodes             (other_mesh._nodes),
@@ -150,44 +144,41 @@ unsigned int MeshBase::n_active_elem () const
   return num;
 }
 
-
+ 
 
 void MeshBase::clear ()
 {
   // Clear other data structures
-#ifdef ENABLE_AMR
-  
-  this->mesh_refinement.clear();
-  
-#endif
-
   this->boundary_info.clear();
 
   
-  // Reset the number of subdomains and the
-  // number of processors
+  // Reset the number of subdomains
   _n_sbd  = 1;
 
   // Clear the elements data structure
   {
-    for (unsigned int e=0; e<_elements.size(); e++)
-      if (_elements[e] != NULL)
-	{
-	  delete _elements[e];
-	  _elements[e] = NULL;
-	}
-    
+    std::vector<Elem*>::iterator       it  = _elements.begin();
+    const std::vector<Elem*>::iterator end = _elements.end();
+
+    // There is no need to remove the elements from
+    // the BoundaryInfo data structure since we
+    // already cleared it.
+    for (; it != end; ++it)
+      delete *it;
+
     _elements.clear();
   }
 
   // clear the nodes data structure
   {
-    for (unsigned int n=0; n<_nodes.size(); n++)
-      if (_nodes[n] != NULL)
-	{
-	  delete _nodes[n];
-	  _nodes[n] = NULL;
-	}
+    std::vector<Node*>::iterator       it  = _nodes.begin();
+    const std::vector<Node*>::iterator end = _nodes.end();
+
+    // There is no need to remove the nodes from
+    // the BoundaryInfo data structure since we
+    // already cleared it.
+    for (; it != end; ++it)
+      delete *it;
     
     _nodes.clear();
   }
@@ -678,7 +669,12 @@ void MeshBase::renumber_nodes_and_elements ()
 	 it != end; ++it)
       {
 	assert (*it != NULL);
+
+	// remove any boundary information associated with
+	// this node
+	this->boundary_info.remove (*it);
 	
+	// delete the node
 	delete *it;
 	*it = NULL;
       }

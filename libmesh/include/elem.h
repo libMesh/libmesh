@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.38 2003-09-27 00:54:57 benkirk Exp $
+// $Id: elem.h,v 1.39 2003-09-30 18:22:18 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -386,6 +386,14 @@ class Elem : public ReferenceCountedObject<Elem>,
    * the element was not created via refinement, i.e. was read from file.
    */
   const Elem* parent () const;
+
+  /**
+   * @returns a pointer to the element's top-most (i.e. level-0) parent.
+   * Returns \p this if this is a level-0 element, this element's parent
+   * if this is a level-1 element, this element's grandparent if this is
+   * a level-2 element, etc...
+   */
+  const Elem* top_parent () const;
   
   /**
    * @returns the magnitude of the distance between nodes n1 and n2.
@@ -486,7 +494,7 @@ class Elem : public ReferenceCountedObject<Elem>,
   /**
    * Refine the element.
    */
-  virtual void refine (MeshBase& mesh);
+  virtual void refine (MeshRefinement& mesh_refinement);
   
   /**
    * Coarsen the element.  This is not
@@ -900,6 +908,24 @@ inline
 const Elem* Elem::parent () const
 {
   return _parent;
+}
+
+
+
+inline
+const Elem* Elem::top_parent () const
+{
+  const Elem* tp = this;
+
+  // Keep getting the element's parent
+  // until that parent is at level-0
+  while (tp->parent() != NULL)
+    tp = tp->parent();
+  
+  assert (tp != NULL);
+  assert (tp->level() == 0);
+
+  return tp;  
 }
 
 

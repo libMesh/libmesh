@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.49 2003-09-27 00:54:57 benkirk Exp $
+// $Id: mesh_base.h,v 1.50 2003-09-30 18:22:18 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -39,7 +39,6 @@ class EquationSystems;
 
 // Local Includes -----------------------------------
 #include "libmesh_common.h"
-#include "mesh_refinement.h"
 #include "boundary_info.h"
 #include "mesh_data.h"
 #include "node.h"
@@ -63,7 +62,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.49 $
+ * \version $Revision: 1.50 $
  */
 
 
@@ -92,15 +91,6 @@ public:
    * Deletes all the data that are currently stored.
    */
   virtual void clear ();
-  
-#ifdef ENABLE_AMR
-
-  /**
-   * Class that handles adaptive mesh refinement implementation.
-   */  
-  MeshRefinement mesh_refinement;
-  
-#endif
   
   /**
    * This class holds the boundary information.  It can store nodes, edges,

@@ -1,4 +1,4 @@
-// $Id: boundary_info.h,v 1.20 2003-09-11 19:10:52 benkirk Exp $
+// $Id: boundary_info.h,v 1.21 2003-09-30 18:22:18 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -287,6 +287,25 @@ class BoundaryInfo
 
 // ------------------------------------------------------------
 // BoundaryData inline methods
+inline
+void BoundaryInfo::remove (const Node* node)
+{
+  assert (node != NULL);
+  
+  // Erase everything associated with node
+  _boundary_node_id.erase (node);
+}
+
+
+
+inline
+void BoundaryInfo::remove (const Elem* elem)
+{
+  assert (elem != NULL);
+  
+  // Erase everything associated with elem
+  _boundary_side_id.erase (elem);
+}
 
 
 #endif

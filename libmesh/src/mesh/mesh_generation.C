@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.22 2003-09-02 18:02:43 benkirk Exp $
+// $Id: mesh_generation.C,v 1.23 2003-09-30 18:22:18 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -25,6 +25,7 @@
 
 // Local includes
 #include "mesh.h"
+#include "mesh_refinement.h"
 #include "libmesh.h"
 #include "edge_edge2.h"
 #include "edge_edge3.h"
@@ -940,6 +941,8 @@ void Mesh::build_sphere (const Real rad,
 	// Add some more elements
 	for (unsigned int r=0; r<nr; r++)
 	  {
+	    MeshRefinement mesh_refinement (*this);
+	    
 	    mesh_refinement.uniformly_refine(1);
 	    
 	    for (unsigned int e=0; e<n_elem(); e++)
@@ -958,8 +961,6 @@ void Mesh::build_sphere (const Real rad,
 	
 	// Copy only the active elements to the current mesh
 	{
-	  mesh_refinement.clear();
-	  
  	  std::vector<Elem*> new_elements;
 
 	  new_elements.reserve (n_active_elem());
