@@ -1,4 +1,4 @@
-// $Id: mesh_data.h,v 1.8 2003-07-09 10:10:13 spetersen Exp $
+// $Id: mesh_data.h,v 1.9 2003-07-10 07:38:01 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -112,6 +112,8 @@ public:
    */
   void write (const std::string& name);
 
+  //----------------------------------------------------------
+  // Node-associated data
   /**
    * @returns the \f$ i^{th} \f$ value (defaults to 0) associated 
    * with node \p node.  Returns \p libMesh::zero when there
@@ -128,11 +130,43 @@ public:
 
   /**
    * Stores @e all data associated with the node \p node 
-   * in the vector \p data.  May resize \p data.
+   * in the vector \p data.  May resize \p data.  Clears
+   * \p data when there is no data associated with \p node.
    */
   void operator() (const Node* node,
 		   std::vector<Number>& data) const;
 
+  /**
+   * @returns the number of \p Number -type data 
+   * (i.e., the size of the \p std::vector<Number>
+   * returned through the \p operator() methods)
+   * associated with a node.  Returns 0 when no
+   * nodal data exists.
+   */
+  unsigned int n_val_per_node () const;
+
+  /**
+   * For the desperate user, nodal boundary conditions 
+   * may be inserted directly through the map \p nd.
+   * It is mandatory that there does not yet exist any
+   * other node data in this object, that the id maps
+   * are closed, that the size of the std::vector's of 
+   * each map have identical length and that the Node* 
+   * point to nodes of the associated mesh.  
+   * Note that this method takes a non-const reference 
+   * and essentially clears the passed-in data.
+   * If \p close_elem_data is \p true (default), then
+   * this \p MeshData is ready for use: write to file,
+   * use the operator() methods etc. If \p false, the 
+   * user @e has to add element-associated data, too.
+   */
+  void insert_node_data (std::map<const Node*,
+			          std::vector<Number> >& nd,
+			 const bool close_elem_data = true);
+
+
+  //----------------------------------------------------------
+  // Element-associated data
   /**
    * @returns the \f$ i^{th} \f$ value (defaults to 0) associated 
    * with element \p elem.  Returns \p libMesh::zero when there
@@ -149,11 +183,43 @@ public:
 
   /**
    * Stores @e all data associated with the element \p elem
-   * in the vector \p data.  May resize \p data.
+   * in the vector \p data.  May resize \p data.  Clears
+   * \p data when there is no data associated with \p elem.
    */
   void operator() (const Elem* elem,
 		   std::vector<Number>& data) const;
 
+  /**
+   * @returns the number of \p Number -type data 
+   * (i.e., the size of the \p std::vector<Number>
+   * returned through the \p operator() methods)
+   * associated with an element.  Returns 0 when
+   * there is no element-associated data.
+   */
+  unsigned int n_val_per_elem () const;
+
+  /**
+   * For the desperate user, element-associated boundary 
+   * conditions may be inserted directly through the 
+   * map \p ed.  Similar to the version for nodal data, 
+   * it is imperative that the local \p _elem_data is empty, 
+   * that the id maps are closed, that the size of the 
+   * \p std::vector's of each map have identical length 
+   * and that the \p Elem* point to elements of the 
+   * associated mesh.  
+   * Note that this method takes a non-const reference 
+   * and essentially clears the passed-in data.
+   * If \p close_node_data is \p true (default), then
+   * this \p MeshData is ready for use: write to file,
+   * use the operator() methods etc. If \p false, the 
+   * user @e has to add nodal data, too.
+   */
+  void insert_elem_data (std::map<const Elem*,
+			          std::vector<Number> >& ed,
+			 const bool close_node_data = true);
+
+
+  //----------------------------------------------------------
   /**
    * @returns \p true when this object is active and working.
    * Use \p activate() to bring this object alive.
@@ -314,11 +380,6 @@ protected:
   std::map<unsigned int,
            const Node*> _id_node;
 
-  /**
-   * The number of real values that are stored per node
-   */
-  unsigned int _n_val_per_node;
-
 
 
   //--------------------------------------------------
@@ -341,11 +402,6 @@ protected:
    */
   std::map<unsigned int,
            const Elem*> _id_elem;
-
-  /**
-   * The number of real values that are stored per element
-   */
-  unsigned int _n_val_per_elem;
 
 
 
@@ -537,11 +593,10 @@ Number MeshData::operator() (const Node* node,
 
   if (pos == _node_data.end())
       return libMesh::zero;
-  else
-    {
-      assert (i < (*pos).second.size());
-      return (*pos).second[i];
-    }
+
+  // we only get here when pos != _node_data.end()
+  assert (i < (*pos).second.size());
+  return (*pos).second[i];
 }
 
 
@@ -580,7 +635,26 @@ void MeshData::operator() (const Node* node,
     {
       data = (*pos).second;
     }
-  return;
+}
+
+
+
+inline
+unsigned int MeshData::n_val_per_node () const
+{
+  assert (_active);
+  assert (_node_id_map_closed);
+  assert (_node_data_closed);
+
+  if (!_node_data.empty())
+    {
+      std::map<const Node*, 
+	       std::vector<Number> >::const_iterator pos = _node_data.begin();
+      assert (pos != _node_data.end());
+      return ((*pos).second.size());
+    }
+  else
+      return 0;
 }
 
 
@@ -599,7 +673,7 @@ Number MeshData::operator() (const Elem* elem,
   if (pos == _elem_data.end())
     return libMesh::zero;
   
-  
+  // we only get here when pos != _elem_data.end()  
   assert (i < (*pos).second.size());
   return (*pos).second[i];
 }
@@ -640,7 +714,26 @@ void MeshData::operator() (const Elem* elem,
     {
       data = (*pos).second;
     }
-  return;
+}
+
+
+
+inline
+unsigned int MeshData::n_val_per_elem () const
+{
+  assert (_active);
+  assert (_elem_id_map_closed);
+  assert (_elem_data_closed);
+
+  if (!_elem_data.empty())
+    {
+      std::map<const Elem*, 
+	       std::vector<Number> >::const_iterator pos = _elem_data.begin();
+      assert (pos != _elem_data.end());
+      return ((*pos).second.size());
+    }
+  else
+      return 0;
 }
 
 

@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.h,v 1.10 2003-05-20 09:28:44 ddreyer Exp $
+// $Id: mesh_unv_support.h,v 1.11 2003-07-10 07:38:01 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -65,7 +65,7 @@ public:
    * reports if desired using \p verbose.
    */
   void read (std::istream& in_stream,
-	     bool verbose = false);
+	     const bool verbose = false);
 
   /**
    * Writes a mesh (nodes & elements) to the file
