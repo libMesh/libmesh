@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.45 2005-03-02 22:09:40 benkirk Exp $
+# $Id: Makefile,v 1.46 2005-03-08 15:47:15 benkirk Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -155,12 +155,17 @@ distclean:
 	@$(MAKE) clobber
 	@$(MAKE) -C contrib $(MAKECMDGOALS)
 	@$(MAKE) -C examples $(MAKECMDGOALS)
-	@rm -rf doc/latex/doxygen \
-                doc/man/man3 \
-		doc/html/doxygen/*.html doc/html/doxygen/*.png doc/html/doxygen/*.gif \
-		doc/latex/*/*.aux doc/latex/*/*~ doc/latex/*/*.log doc/latex/*/*.out \
-	        src/*/*.o \
-	        lib/*_opt lib/*_dbg lib/*_pro
+	@rm -rf doc/man/man3
+	@rm -rf doc/html/doxygen/*.html # split these up, otherwise command line gets too long
+	@rm -rf doc/html/doxygen/*.png
+	@rm -rf doc/html/doxygen/*.gif
+	@rm -rf doc/html/doxygen/*.map
+	@rm -rf doc/html/doxygen/*.md5
+	@rm -rf doc/html/doxygen/formula.repository doc/html/doxygen/graph_legend.dot
+	@rm -rf doc/latex/doxygen
+	@rm -rf doc/latex/*/*.aux doc/latex/*/*~ doc/latex/*/*.log doc/latex/*/*.out
+	@rm -rf src/*/*.o
+	@rm -rf lib/*_opt lib/*_dbg lib/*_pro
 
 
 
