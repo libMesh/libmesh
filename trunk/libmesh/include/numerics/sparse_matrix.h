@@ -1,4 +1,4 @@
-// $Id: sparse_matrix.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: sparse_matrix.h,v 1.3 2004-03-13 20:21:59 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -110,7 +110,7 @@ public:
    * \f$ m_l \times n_l \f$.  \p nnz is the number of on-processor
    * nonzeros per row (defaults to 30).
    * \p noz is the number of on-processor
-   * nonzeros per row (defaults to 30).
+   * nonzeros per row (defaults to 10).
    */
   virtual void init (const unsigned int m,
 		     const unsigned int n,

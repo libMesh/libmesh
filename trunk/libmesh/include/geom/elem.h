@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.3 2004-02-10 13:28:06 benkirk Exp $
+// $Id: elem.h,v 1.4 2004-03-13 20:21:51 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -366,7 +366,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    * for an abstract Elem, it is an error.
    */
   virtual std::pair<Real,Real> qual_bounds (const ElemQuality) const
-  { error(); std::pair<Real,Real> p(0,0); return p; }
+  { error(); return std::make_pair(0.,0.); }
   
   /**
    * @returns true if the point p is contained in this element, 
