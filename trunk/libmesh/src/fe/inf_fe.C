@@ -1,4 +1,4 @@
-// $Id: inf_fe.C,v 1.12 2003-02-20 12:54:57 spetersen Exp $
+// $Id: inf_fe.C,v 1.13 2003-02-20 17:09:30 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -189,7 +189,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem)
 
 
   // -----------------------------------------------------------------
-  // the radial part only needs to be re-initialized with
+  // most of the radial part only needs to be re-initialized with
   // init_shape_functions() when the radial order changed
   if (current_fe_type.radial_order != fe_type.radial_order)
     {
@@ -214,6 +214,8 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem)
       init_shape_functions (inf_elem);
     }
 
+  // Update the radial distances
+  compute_dist(inf_elem);
 
   // -----------------------------------------------------------------
   // Now that both the base and radial parts are properly initialized,
@@ -264,7 +266,7 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 
   // Number of base shape functions used to construct the map
   // (Lagrange shape functions are used for mapping in the base)
-  unsigned int n_base_mapping_shape_functions;
+  // unsigned int n_base_mapping_shape_functions;
 
   // Note that the test used to be
   //if (Dim > 1)
@@ -350,7 +352,7 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
   // most of this has already been done in base_fe->init_shape_functions().
   // but e.g. we need the radial distance from the origin for _each_
   // base mapping node
-  dist.resize(n_base_mapping_shape_functions);
+  // dist.resize(n_base_mapping_shape_functions);
 
  
 
@@ -499,17 +501,15 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 
   // -----------------------------------------------------------------
   // compute the radial distances
-  for (unsigned int i=0; i<n_base_mapping_shape_functions; i++)
-    {
+  // for (unsigned int i=0; i<n_base_mapping_shape_functions; i++)
+  //  {
       // this works, since the _base_ nodes are numbered in the 
       // same manner for the base element as for the infinite element
 
+  //   dist[i] = Point( inf_elem->point(i) 
+  //		       - inf_elem->point(i+n_base_mapping_shape_functions) ).size();
 
-      dist[i] = Point( inf_elem->point(i) 
-		       - inf_elem->point(i+n_base_mapping_shape_functions) ).size();
-
-
-    }
+  // }
   
 
 
@@ -559,9 +559,23 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 }
 
 
+template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
+void InfFE<Dim,T_radial,T_map>::compute_dist(const Elem* inf_elem)
+{
+  dist.resize(n_base_mapping_shape_functions);
+
+  // compute the radial distances
+  for (unsigned int i=0; i<n_base_mapping_shape_functions; i++)
+    {
+      // this works, since the _base_ nodes are numbered in the 
+      // same manner for the base element as for the infinite element
 
 
+      dist[i] = Point( inf_elem->point(i) 
+		       - inf_elem->point(i+n_base_mapping_shape_functions) ).size();
 
+    }
+}
 
 
 
