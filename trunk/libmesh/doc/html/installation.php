@@ -62,18 +62,22 @@ The library is known to work with the following compilers:
     </ul>
   <li>Intel ICC/ECC</li>
     <ul>
-      <li><code>icc/ifort</code> 8.x (CXXFLAGS=-no-gcc ./configure [...])</li>
+      <li><code>icc/ifort</code> 8.x <code>(CXXFLAGS=-no-gcc ./configure [...])</code></li>
       <li><code>icc/ifc</code> 7.x</li>
       <li><code>icc/ifc</code> 6.0</li>
       <li>Earlier versions (&lt;= 5.0) not supported</li>
     </ul>
   <li>SGI MIPSPro Compilers</li>
     <ul>
-      <li>Version 7.30(CXXFLAGS=-LANG:std ./configure [...])</li>
+      <li>Version 7.30 <code>(CXXFLAGS=-LANG:std CXX=CC ./configure [...])</code></li>
       <li>Not tested (but will likely work) with others</li>
     </ul>
-  <li>HP, use <code>CXX="aCC</code> <code>-AA</code>"
-      and <code>CC="cc</code> <code>-Aa</code>" to get full std support</li>
+  <li>Sun ONE Studio Compilers</li>
+    <ul>
+      <li>Version 5.5 tested <code>(CXXFLAGS=-library=stlport4 CPPFLAGS=-library=stlport4 CXX=CC ./configure [...])</code></li>
+      <li>Must use the STLPort C++ standard library provided with the compiler</li>
+    </ul>
+  <li>HP, use <code>CXX="aCC -AA" CC="cc -Aa"</code> to get full std support</li>
     <ul>
       <li><code>aCC</code> A.03.37</li>
     </ul>
