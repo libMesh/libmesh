@@ -1,4 +1,4 @@
-// $Id: face_tri3.C,v 1.19 2005-02-25 19:16:39 roystgnr Exp $
+// $Id: face_tri3.C,v 1.20 2005-03-01 14:21:58 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -156,7 +156,6 @@ void Tri3::connectivity(const unsigned int sf,
 			std::vector<unsigned int>& conn) const
 {
   assert (sf <this->n_sub_elem());
-  assert (_nodes != NULL);
   assert (iop != INVALID_IO_PACKAGE);
   
   switch (iop)
@@ -186,39 +185,3 @@ void Tri3::connectivity(const unsigned int sf,
 
   error();
 }
-
-
-
-// void Tri3::tecplot_connectivity(const unsigned int sf,
-// 				std::vector<unsigned int>& conn) const
-// {
-//   assert (sf <this->n_sub_elem());
-  
-//   // std::vector<unsigned int> conn(4);
-//   conn.resize(4);
-  
-//   conn[0] = this->node(0)+1;
-//   conn[1] = this->node(1)+1;
-//   conn[2] = this->node(2)+1;
-//   conn[3] = this->node(2)+1;
-// }
-
-
-
-// void Tri3::vtk_connectivity(const unsigned int sf,
-// 			    std::vector<unsigned int> *conn) const
-// {
-//   assert (_nodes != NULL);
-//   assert (sf < this->n_sub_elem());
-  
-//   if (conn == NULL)
-//     conn = new std::vector<unsigned int>;
-
-//   conn->resize(3);
-
-//   (*conn)[0] = this->node(0);
-//   (*conn)[1] = this->node(1);
-//   (*conn)[2] = this->node(2);
-
-//   return;
-// }

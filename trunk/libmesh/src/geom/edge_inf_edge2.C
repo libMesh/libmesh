@@ -1,4 +1,4 @@
-// $Id: edge_inf_edge2.C,v 1.18 2005-02-25 19:16:38 roystgnr Exp $
+// $Id: edge_inf_edge2.C,v 1.19 2005-03-01 14:21:41 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -60,7 +60,6 @@ void InfEdge2::connectivity(const unsigned int se,
 			    std::vector<unsigned int>& conn) const
 {
   assert (se == 0);
-  assert (_nodes != NULL);
   assert (se < this->n_sub_elem());
   assert (iop != INVALID_IO_PACKAGE);
 
@@ -88,38 +87,6 @@ void InfEdge2::connectivity(const unsigned int se,
 
   error();
 }
-
-
-
-// const std::vector<unsigned int> InfEdge2::tecplot_connectivity(const unsigned int se) const
-// {
-//   assert (se == 0);
-
-//   std::vector<unsigned int> conn(2);
-
-//   conn[0] = this->node(0)+1;
-//   conn[1] = this->node(1)+1;
-
-//   return conn;
-// }
-
-
-// void InfEdge2::vtk_connectivity(const unsigned int se,
-// 				std::vector<unsigned int> *conn) const
-// {
-//   assert (_nodes != NULL);
-//   assert (se < this->n_sub_elem());
-  
-//   if (conn == NULL)
-//     conn = new std::vector<unsigned int>;
-
-//   conn->resize(2);
-
-//   (*conn)[0] = this->node(0);
-//   (*conn)[1] = this->node(1);
-
-//   return;
-// }
 
 
 #endif

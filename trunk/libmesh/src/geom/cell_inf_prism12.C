@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism12.C,v 1.27 2005-02-25 19:16:23 roystgnr Exp $
+// $Id: cell_inf_prism12.C,v 1.28 2005-03-01 14:21:40 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -235,81 +235,6 @@ void InfPrism12::connectivity(const unsigned int sc,
 
   error();
 }
-
-
-
-
-// void InfPrism12::tecplot_connectivity(const unsigned int sc,
-// 				      std::vector<unsigned int>& conn) const
-// {
-//   assert (_nodes != NULL);
-//   assert (sc < this->n_sub_elem());
-
-//   // std::vector<unsigned int> conn(8);
-//   conn.resize(8);
-
-//   switch (sc)
-//     {
-//     case 0:
-
-//       // guess this is a collapsed hex8
-//       conn[0] = this->node(0)+1;
-//       conn[1] = this->node(6)+1;
-//       conn[2] = this->node(8)+1;
-//       conn[3] = this->node(8)+1;
-//       conn[4] = this->node(3)+1;
-//       conn[5] = this->node(9)+1;
-//       conn[6] = this->node(11)+1;
-//       conn[7] = this->node(11)+1;
-
-//       return;
-
-//     case 1:
-
-//       conn[0] = this->node(6)+1;
-//       conn[1] = this->node(7)+1;
-//       conn[2] = this->node(8)+1;
-//       conn[3] = this->node(8)+1;
-//       conn[4] = this->node(9)+1;
-//       conn[5] = this->node(10)+1;
-//       conn[6] = this->node(11)+1;
-//       conn[7] = this->node(11)+1;
-
-//       return;
-
-//     case 2:
-
-//       conn[0] = this->node(6)+1;
-//       conn[1] = this->node(1)+1;
-//       conn[2] = this->node(7)+1;
-//       conn[3] = this->node(7)+1;
-//       conn[4] = this->node(9)+1;
-//       conn[5] = this->node(4)+1;
-//       conn[6] = this->node(10)+1;
-//       conn[7] = this->node(10)+1;
-
-//       return;
-
-//     case 3:
-
-//       conn[0] = this->node(8)+1;
-//       conn[1] = this->node(7)+1;
-//       conn[2] = this->node(2)+1;
-//       conn[3] = this->node(2)+1;
-//       conn[4] = this->node(11)+1;
-//       conn[5] = this->node(10)+1;
-//       conn[6] = this->node(5)+1;
-//       conn[7] = this->node(5)+1;
-
-//       return;
-
-//     default:
-//       error();
-      
-//     }
-
-//   error();
-// }
 
 
 
