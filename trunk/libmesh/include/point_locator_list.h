@@ -1,4 +1,4 @@
-// $Id: point_locator_list.h,v 1.1 2003-07-05 14:58:56 ddreyer Exp $
+// $Id: point_locator_list.h,v 1.2 2003-07-25 20:58:24 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -50,7 +50,7 @@ class Elem;
  * @e reliable for the case of finding the @e closest 
  * dim-1 element (nearest-surface-element, e.g. used
  * for projecting boundary conditions from a surface
- * mesh onto a volumtric mesh).
+ * mesh onto a volumetric mesh).
  * It should be noted that this class only works when
  * the element list in the associated mesh object is
  * @e not modified (like refinement etc).  Otherwise,

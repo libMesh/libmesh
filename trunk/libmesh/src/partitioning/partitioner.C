@@ -1,4 +1,4 @@
-// $Id: linear_partitioner.C,v 1.2 2003-07-25 20:58:24 benkirk Exp $
+// $Id: partitioner.C,v 1.1 2003-07-25 20:58:24 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -22,46 +22,21 @@
 // C++ Includes   -----------------------------------
 
 // Local Includes -----------------------------------
-#include "mesh.h"
-#include "linear_partitioner.h"
-#include "mesh_logging.h"
+#include "partitioner.h"
+#include "mesh_base.h"
 
 
 
 // ------------------------------------------------------------
-// LinearPartitioner implementation
-void LinearPartitioner::partition (const unsigned int n_sbdmns)
+// Partitioner implementation
+void Partitioner::single_partition ()
 {
-  assert (n_sbdmns > 0);
-
-  // Check for an easy return
-  if (n_sbdmns == 1)
-    {
-      this->single_partition ();
-      return;
-    }
-  
-  // Create a simple linear partitioning
-  {
-    START_LOG ("partition()", "LinearPartitioner");
-    
-    const unsigned int n_active_elem = _mesh.n_active_elem();
-    const unsigned int blksize       = n_active_elem/n_sbdmns;
-    
-    unsigned int e = 0;
-        
-    active_elem_iterator       elem_it (_mesh.elements_begin());
-    const active_elem_iterator elem_end(_mesh.elements_end());
-    
-    for ( ; elem_it != elem_end; ++elem_it)
-      {
-	(*elem_it)->set_subdomain_id() = 
-	  (*elem_it)->set_processor_id() = 
-	  e/blksize;
-	
-	e++;
-      }
-    
-    STOP_LOG ("partition()", "LinearPartitioner");
-  }
+  // Loop over all the elements and assign them to processor 0.
+  elem_iterator       elem_it (_mesh.elements_begin());
+  const elem_iterator elem_end(_mesh.elements_end());
+      
+  for ( ; elem_it != elem_end; ++elem_it)
+    (*elem_it)->set_subdomain_id() = 
+      (*elem_it)->set_processor_id() = 
+      0;
 }

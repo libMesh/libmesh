@@ -1,4 +1,4 @@
-// $Id: metis_partitioner.h,v 1.1 2003-06-24 05:33:51 benkirk Exp $
+// $Id: metis_partitioner.h,v 1.2 2003-07-25 20:58:24 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,7 +23,6 @@
 #define __metis_partitioner_h__
 
 // C++ Includes   -----------------------------------
-#include <string>
 
 // Local Includes -----------------------------------
 #include "partitioner.h"

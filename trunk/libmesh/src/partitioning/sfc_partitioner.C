@@ -1,4 +1,4 @@
-// $Id: sfc_partitioner.C,v 1.1 2003-06-24 05:33:51 benkirk Exp $
+// $Id: sfc_partitioner.C,v 1.2 2003-07-25 20:58:24 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -47,14 +47,7 @@ void SFCPartitioner::partition (const unsigned int n_sbdmns)
   // Check for an easy return
   if (n_sbdmns == 1)
     {
-      elem_iterator       elem_it (_mesh.elements_begin());
-      const elem_iterator elem_end(_mesh.elements_end());
-      
-      for ( ; elem_it != elem_end; ++elem_it)
-	(*elem_it)->set_subdomain_id() = 
-	  (*elem_it)->set_processor_id() =
-	  0;
-      
+      this->single_partition ();
       return;
     }
 

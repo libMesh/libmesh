@@ -1,4 +1,4 @@
-// $Id: parmetis_partitioner.C,v 1.3 2003-07-16 18:42:12 benkirk Exp $
+// $Id: parmetis_partitioner.C,v 1.4 2003-07-25 20:58:24 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -56,14 +56,7 @@ void ParmetisPartitioner::partition (const unsigned int n_sbdmns)
   // Check for an easy return
   if (n_sbdmns == 1)
     {
-      elem_iterator       elem_it (_mesh.elements_begin());
-      const elem_iterator elem_end(_mesh.elements_end());
-      
-      for ( ; elem_it != elem_end; ++elem_it)
-	(*elem_it)->set_subdomain_id() = 
-	  (*elem_it)->set_processor_id() =
-	  0;
-      
+      this->single_partition ();
       return;
     }
 
@@ -95,6 +88,7 @@ void ParmetisPartitioner::partition (const unsigned int n_sbdmns)
   std::vector<int>  local_part(_part);
   MPI_Comm mpi_comm = MPI_COMM_WORLD;
   
+  // Call the ParMETIS k-way partitioning algorithm.
   Parmetis::ParMETIS_V3_PartKway(&_vtxdist[0], &_xadj[0], &_adjncy[0], &_vwgt[0], NULL,
 				 &_wgtflag, &_numflag, &_ncon, &_nparts, &_tpwgts[0],
 				 &_ubvec[0], &_options[0], &_edgecut,
@@ -110,7 +104,7 @@ void ParmetisPartitioner::partition (const unsigned int n_sbdmns)
   this->assign_partitioning ();
   
 
-  STOP_LOG("partition()", "ParmetisPartitioner");
+  STOP_LOG ("partition()", "ParmetisPartitioner");
   
 #endif // #ifndef HAVE_PARMETIS ... else ...
   
@@ -155,7 +149,40 @@ void ParmetisPartitioner::repartition (const unsigned int n_sbdmns)
   
   START_LOG("repartition()", "ParmetisPartitioner");
 
-  STOP_LOG("repartition()", "ParmetisPartitioner");
+  // Initialize the data structures required by ParMETIS
+  this->initialize (n_sbdmns);
+
+  // build the graph corresponding to the _mesh
+  this->build_graph ();
+  
+
+  // Partition the graph
+  std::vector<int> local_part(_part);
+  std::vector<int> vsize(_vwgt.size(), 1);
+  float itr = 1000.0;
+  MPI_Comm mpi_comm = MPI_COMM_WORLD;
+
+  // Call the ParMETIS adaptive repartitioning method.  This respects the
+  // original partitioning when computing the new partitioning so as to
+  // minimize the required data redistribution.
+  Parmetis::ParMETIS_V3_AdaptiveRepart(&_vtxdist[0], &_xadj[0], &_adjncy[0],
+				       &_vwgt[0], &vsize[0], NULL,
+				       &_wgtflag, &_numflag, &_ncon,
+				       &_nparts, &_tpwgts[0],
+				       &_ubvec[0], & itr, &_options[0],
+				       &_edgecut, &local_part[_first_local_elem],
+				       &mpi_comm);
+
+  // Collect the partioning information from all the processors.
+  assert (_part.size() == local_part.size());
+  MPI_Allreduce (&local_part[0], &_part[0], _part.size(), MPI_INT, MPI_SUM,
+		 MPI_COMM_WORLD);
+  
+  // Assign the returned processor ids
+  this->assign_partitioning ();
+  
+
+  STOP_LOG ("repartition()", "ParmetisPartitioner");
   
 #endif // #ifndef HAVE_PARMETIS ... else ...
   
@@ -163,6 +190,7 @@ void ParmetisPartitioner::repartition (const unsigned int n_sbdmns)
 
 
 
+// Only need to compile these methods if ParMETIS is present
 #ifdef HAVE_PARMETIS
 
 void ParmetisPartitioner::initialize (const unsigned int n_sbdmns)
