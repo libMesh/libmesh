@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.C,v 1.3 2003-01-20 17:06:44 jwpeterson Exp $
+// $Id: mesh_unv_support.C,v 1.4 2003-01-21 19:24:37 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -40,7 +40,7 @@ void Mesh::read_unv(const std::string& name){
 
 
 void Mesh::read_unv(std::istream& in){
-  UnvInterface i(in,_nodes,_elements);
+  UnvInterface i(in,_nodes,_elements,boundary_info);
 };
 
 
@@ -49,7 +49,8 @@ void Mesh::read_unv(std::istream& in){
 
 UnvInterface::UnvInterface(std::istream& _in,
 			   std::vector<Node*>& _nodes,
-			   std::vector<Elem*>& _elements):
+			   std::vector<Elem*>& _elements,
+			   BoundaryInfo& boundary_info):
   phys_file(_in),
   nodes(_nodes),
   elements(_elements)
@@ -62,8 +63,10 @@ UnvInterface::UnvInterface(std::istream& _in,
 
   label_dataset_nodes = "2411";
   label_dataset_elms  = "2412";
+  label_dataset_bcs   = "2414";
   num_nodes = 0;
   num_elements = 0;
+  num_bcs = 0;
   need_D_to_e = true;
 
 
@@ -96,6 +99,26 @@ UnvInterface::UnvInterface(std::istream& _in,
 
   node_in();
   element_in();
+  bcs_in(boundary_info);
+
+  // added for testing bcs import only
+
+  // const vector<std::pair<unsigned int,
+  //    std::vector<real> > >&  testvalues = boundary_info.get_boundary_values();
+
+  // std::cout << "List of Boundary Values:" << std::endl;
+
+  // for(unsigned int bc_cnt=0; bc_cnt < num_bcs; bc_cnt++){
+  // std::cout <<  "Node " << testvalues[bc_cnt].first << ":" << std::endl;
+  // std::cout << testvalues[bc_cnt].second[0] << " "
+  //      << testvalues[bc_cnt].second[1] << " "
+  //      << testvalues[bc_cnt].second[2] << " "
+  //      << testvalues[bc_cnt].second[3] << " "
+  //      << testvalues[bc_cnt].second[4] << " "
+  //      << testvalues[bc_cnt].second[5] << " "
+  //      << std::endl;}
+
+
 };
 
 
@@ -273,6 +296,108 @@ void UnvInterface::scan_dataset(std::string ds_num){
 	};
     }
 
+  // dataset containing the boundary conditions
+  else if (ds_num == label_dataset_bcs)
+    {
+      //Write beginning of dataset to virtual file
+      temporary_file << "    -1\n"
+		     << "  " << ds_num << "\n";
+
+      // store the position of the dataset in the virtual file
+      ds_position[ds_num]=temporary_file.tellp();
+
+      // if num_elements is not 0 the dataset has already been scanned
+      if (num_bcs != 0)
+	{
+	  std::cerr << "Error: UnvInterface::scan_dataset():\n"
+		    << "Trying to scan boundary conditions twice!" << std::endl;
+	  error();
+	  return;
+	}
+      
+      phys_file.ignore(256,'\n');
+
+      // ignore analysis dataset label
+      phys_file.ignore(256,'\n');
+      temporary_file << "NONE" << "\n";
+
+      // ignore analysis dataset name
+      phys_file.ignore(256,'\n');
+      temporary_file << "NONE" << "\n";
+
+      // location of data
+      phys_file >> bcs_dataset_location;
+      temporary_file << bcs_dataset_location << "\n";
+      if (bcs_dataset_location != 1){
+	std::cerr << "Error: UnvInterface::scan_dataset():\n"
+		  << "Currently ONLY boundary data at nodes supported!"
+		  << std::endl;}
+
+      // ignore the ID lines
+      for(char i=0;i<6;i++){
+	phys_file.ignore(256,'\n');
+	temporary_file << "NONE" << "\n";}
+
+      std::string data;                  // Sets of data to be read from file
+
+      // for further information on ignored data 
+      // read comments in UnvInterface::bcs_in
+
+      // ignore Record 9 
+      for(char i=0;i<6;i++){
+	phys_file >> data;
+	temporary_file << "\t" << data;}
+
+      temporary_file << "\n";
+
+      // ignore Record 10
+      for(char i=0;i<8;i++){
+	phys_file >> data;
+	temporary_file << "\t" << data;}
+
+      temporary_file << "\n";
+
+      // ignore Record 11
+      for(char i=0;i<2;i++){
+	phys_file >> data;
+	temporary_file << "\t" << data;}
+
+      temporary_file << "\n";
+
+      // ignore record 12
+      for(char i=0;i<6;i++){
+	phys_file >> data;
+	temporary_file << data << "\t";}
+
+      temporary_file << "\n";
+
+      // ignore record 13
+      for(char i=0;i<6;i++){
+	phys_file >> data;
+	temporary_file << data << "\t";}
+
+      temporary_file << "\n";
+
+      if (bcs_dataset_location == 1){
+      while (true)                       // scan data until break
+	{
+	  phys_file >> data;             // read node number
+	  if (data == "-1") {            // end of dataset is reached
+	    temporary_file << "    -1\n";
+	    break;}
+
+	  temporary_file << "\t" << data << "\n"; // write node number
+
+	  for(char i=0;i<6;i++){
+	    phys_file >> data;
+	    temporary_file << data << "\t";}
+	  temporary_file << "\n";
+
+	  num_bcs++;                 // count boundary conditions
+	};
+      }
+    }
+
   // datasets that are not of special interest are ignored
   else
     {
@@ -292,11 +417,22 @@ void UnvInterface::set_stream_pointer(std::string ds_num)
   // dataset does not exist
   if (static_cast<int>(ds_position[ds_num]) == 0)
     {
-      std::cerr
-	<< "Error: UnvInterface::set_stream_pointer(std::string ds_num):\n"
-	<< "Dataset #" << ds_num << " not found in file." << std::endl;
-      error();
-      return;
+      if (ds_num == "2414")
+	{
+	  std::cout
+	    << "UnvInterface::set_stream_pointer(std::string ds_num):\n"
+	    << "Dataset #" << ds_num << " not found in file.\n"
+	    << "No boundary conditions specified.\n" << std::endl;
+	  return;
+	}
+      else
+	{
+	  std::cerr
+	    << "Error: UnvInterface::set_stream_pointer(std::string ds_num):\n"
+	    << "Dataset #" << ds_num << " not found in file." << std::endl;
+	  error();
+	  return;
+	 }
     }
 
   // Move file pointer
@@ -547,6 +683,70 @@ void UnvInterface::element_in()
 	elements[i]->set_node(assign_elm_nodes[j]) = nodes[assign_nodes[node_labels[j]]];
 
     }
+};
+
+void UnvInterface::bcs_in(BoundaryInfo& boundary_info)
+{
+  // put the file-pointer at the beginning of the dataset
+  set_stream_pointer(label_dataset_bcs);
+
+  // ignore header
+  for(char i=0;i<9;i++){
+    temporary_file.ignore(256,'\n');}
+
+  unsigned int Model_type,          
+               Analysis_type,
+               Data_characteristic,
+               Result_type,
+               Data_type,
+               NVALDC,
+               dummy_u_int;
+
+  real dummy_real;
+
+  temporary_file >> Model_type           // not supported yet
+		 >> Analysis_type        // not supported yet
+		 >> Data_characteristic  // not supported yet
+		 >> Result_type          // not supported yet
+		 >> Data_type            // not supported yet
+		 >> NVALDC;              // not supported yet
+
+  // Record 10 and 11: Integer analysis type specific data
+  // (not supported yet)
+  for (char i=0;i<10;i++){
+    temporary_file >> dummy_u_int;}
+
+  // Record 12 and 13: Real analysis type specific data
+  // (not supported yet)
+  for(char i=0;i<12;i++){
+    temporary_file >> dummy_real;}
+
+  // boundary_values.resize(num_bcs);
+
+  unsigned int       bc_node;
+  std::vector<real>  boundary_data;
+  // complex data in 3 directions, should be generalized to
+  // other formats later (using record 9) 
+  boundary_data.resize(6);
+
+
+  // Reading real data
+  for(unsigned int i=0;i<num_bcs;i++){
+    temporary_file >> dummy_u_int;
+
+    bc_node = assign_nodes[dummy_u_int];
+    temporary_file >> boundary_data[0]
+		   >> boundary_data[1]
+		   >> boundary_data[2]
+		   >> boundary_data[3]
+		   >> boundary_data[4]
+		   >> boundary_data[5];
+
+    // add boundary data to the boundary info data structure
+    boundary_info.add_boundary_values(bc_node, boundary_data, 1);
+
+  }
+
 };
 
 

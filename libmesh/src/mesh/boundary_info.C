@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.3 2003-01-20 17:06:41 jwpeterson Exp $
+// $Id: boundary_info.C,v 1.4 2003-01-21 19:24:37 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -58,6 +58,7 @@ void BoundaryInfo::clear()
   boundary_node_id.clear();
   boundary_side_id.clear();
   boundary_ids.clear();
+  boundary_values.clear();
   
   node_list.clear();
   elem_list.clear();
@@ -361,6 +362,15 @@ void BoundaryInfo::read_shanee_boundary(std::istream& in)
     }    
 };
 
+
+
+void BoundaryInfo::add_boundary_values(const unsigned int node,
+				       const std::vector<real> values,
+				       const short int id)
+{
+  add_node(node, id);
+  boundary_values.push_back(std::make_pair(node, values));
+};
 
 
 

@@ -9,7 +9,7 @@
  * Started 7/29/97
  * George
  *
- * $Id: balance.c,v 1.1 2003-01-21 17:35:25 benkirk Exp $
+ * $Id: balance.c,v 1.2 2003-01-21 19:24:24 benkirk Exp $
  *
  */
 

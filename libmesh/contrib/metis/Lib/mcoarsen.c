@@ -6,7 +6,7 @@
  * Started 7/23/97
  * George
  *
- * $Id: mcoarsen.c,v 1.1 2003-01-21 17:35:32 benkirk Exp $
+ * $Id: mcoarsen.c,v 1.2 2003-01-21 19:24:27 benkirk Exp $
  *
  */
 

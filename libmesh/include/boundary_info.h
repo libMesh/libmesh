@@ -1,4 +1,4 @@
-// $Id: boundary_info.h,v 1.3 2003-01-20 17:06:00 jwpeterson Exp $
+// $Id: boundary_info.h,v 1.4 2003-01-21 19:24:34 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -33,8 +33,6 @@
 
 // Forward declarations
 class Mesh;
-
-
 
 
 
@@ -192,6 +190,21 @@ class BoundaryInfo
   { return boundary_ids; };
 
   /**
+   * Add boundary values for node \p node with id \p id to the boundary
+   * information data structures.
+   */
+  void add_boundary_values(const unsigned int node,
+			   const std::vector<real> values,
+			   const short int id);
+
+  /**
+   * @returns a reference to the user-specified boundary values.
+   */
+  const std::vector<std::pair<unsigned int,
+                 std::vector<real> > >& get_boundary_values() const
+  { return  boundary_values; };
+
+  /**
    * Print the boundary information data structure.
    */
   void print_info() const;
@@ -231,7 +244,10 @@ class BoundaryInfo
   std::vector<unsigned short int> side_list;
   std::vector<short int>          elem_id_list;
 
-
+  // a vector for boundary values
+  std::vector<std::pair<unsigned int,
+              std::vector<real> > >   boundary_values;
+  
 
   // New code
   
@@ -312,7 +328,6 @@ class BoundaryInfo
   };
   
 };
-
 
 
 #endif

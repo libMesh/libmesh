@@ -9,7 +9,7 @@
  * Started 7/24/97
  * George
  *
- * $Id: ometis.c,v 1.1 2003-01-21 17:35:41 benkirk Exp $
+ * $Id: ometis.c,v 1.2 2003-01-21 19:24:32 benkirk Exp $
  *
  */
 

@@ -8,7 +8,7 @@
  * Started 9/25/94
  * George
  *
- * $Id: macros.h,v 1.1 2003-01-21 17:35:31 benkirk Exp $
+ * $Id: macros.h,v 1.2 2003-01-21 19:24:26 benkirk Exp $
  *
  */
 

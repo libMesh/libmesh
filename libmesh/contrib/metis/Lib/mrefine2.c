@@ -8,7 +8,7 @@
  * Started 7/24/97
  * George
  *
- * $Id: mrefine2.c,v 1.1 2003-01-21 17:35:39 benkirk Exp $
+ * $Id: mrefine2.c,v 1.2 2003-01-21 19:24:32 benkirk Exp $
  */
 
 #include <metis.h>

@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.h,v 1.3 2003-01-20 17:06:12 jwpeterson Exp $
+// $Id: mesh_unv_support.h,v 1.4 2003-01-21 19:24:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -49,7 +49,8 @@ public:
    */
   UnvInterface(std::istream& _in,
 	       std::vector<Node*>&  _nodes,
-	       std::vector<Elem*>& _elements);
+	       std::vector<Elem*>& _elements,
+	       BoundaryInfo& boundary_info);
   
   /**
    * Destructor.
@@ -89,6 +90,10 @@ protected:
    */
   void element_in();
 
+  /**
+   * Method for reading boundary conditions (dataset "2414").
+   */
+  void bcs_in(BoundaryInfo& boundary_info);
 
   /**
    * Method for converting exponential notation
@@ -123,10 +128,14 @@ protected:
   std::map<std::string,std::streampos> ds_position;
 
   /**
-   * store the total number of nodes and elements
+   * store the total number of nodes, elements and boundary conditions
    */
   unsigned int num_nodes,
-               num_elements;
+               num_elements,
+               num_bcs;
+
+  // location of boundary conditions
+  unsigned short int bcs_dataset_location;
 
 
 private:
@@ -135,8 +144,8 @@ private:
    * labels for the node and element datasets
    */
   std::string label_dataset_nodes,                  
-              label_dataset_elms;                   
-
+              label_dataset_elms,  
+              label_dataset_bcs;        
     
   /**
    * temporary fstream buffer
@@ -153,6 +162,7 @@ private:
    * whether we need to convert notation of exponentials
    */
   bool need_D_to_e;
+
 };
 
 #endif

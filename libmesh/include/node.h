@@ -1,4 +1,4 @@
-// $Id: node.h,v 1.2 2003-01-20 17:06:12 jwpeterson Exp $
+// $Id: node.h,v 1.3 2003-01-21 19:24:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -43,7 +43,7 @@ class Node;
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.2 $
+ * \version $Revision: 1.3 $
  */
 
 class Node : public Point, public ReferenceCountedObject<Node>

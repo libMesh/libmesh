@@ -8,7 +8,7 @@
  * Started 8/27/94
  * George
  *
- * $Id: defs.h,v 1.1 2003-01-21 17:35:26 benkirk Exp $
+ * $Id: defs.h,v 1.2 2003-01-21 19:24:25 benkirk Exp $
  *
  */
 
