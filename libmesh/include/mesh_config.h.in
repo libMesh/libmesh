@@ -149,8 +149,8 @@
 /* The size of a `long int', as computed by sizeof. */
 #undef SIZEOF_LONG_INT
 
-/* The size of a `long long int', as computed by sizeof. */
-#undef SIZEOF_LONG_LONG_INT
+/* The size of a `short int', as computed by sizeof. */
+#undef SIZEOF_SHORT_INT
 
 /* The size of a `void *', as computed by sizeof. */
 #undef SIZEOF_VOID_P
