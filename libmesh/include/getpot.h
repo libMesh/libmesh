@@ -1,4 +1,4 @@
-// $Id: getpot.h,v 1.5 2003-04-08 22:54:10 benkirk Exp $
+// $Id: getpot.h,v 1.6 2003-04-09 03:25:00 benkirk Exp $
 //
 // (with patches from Michael Anderson for more general variable types)
 
@@ -437,7 +437,7 @@ GetPot::__parse_argument_vector(const std::vector<std::string>& ARGV)
       const std::string Name = __DBE_expand_string(arg.substr(1, arg.length()-2));
       section = __process_section_label(Name, section_stack);
       // new section --> append to list of sections
-      if( find(section_list.begin(), section_list.end(), section) == section_list.end() )
+      if( std::find(section_list.begin(), section_list.end(), section) == section_list.end() )
 	if( section.length() != 0 ) section_list.push_back(section);
       argv.push_back(arg);
     }
