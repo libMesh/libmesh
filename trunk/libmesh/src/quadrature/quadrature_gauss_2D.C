@@ -1,4 +1,4 @@
-// $Id: quadrature_gauss_2D.C,v 1.7 2003-02-04 17:02:29 jwpeterson Exp $
+// $Id: quadrature_gauss_2D.C,v 1.8 2003-02-06 06:02:42 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -21,7 +21,7 @@
 
 // Local includes
 #include "quadrature_gauss.h"
-
+#include "quadrature_jacobi.h"
 
 
 void QGauss::init_2D(const ElemType _type)
@@ -167,44 +167,44 @@ void QGauss::init_2D(const ElemType _type)
 
 	  case SIXTH:
 	  case SEVENTH:
+	  case EIGHTH:
+	  case NINTH:     
+	  case TENTH:        
+	  case ELEVENTH:     
+	  case TWELFTH:      
+	  case THIRTEENTH:   
+	  case FOURTEENTH:   
+	  case FIFTEENTH:    
+	  case SIXTEENTH:    
+	  case SEVENTEENTH:  
+	  case EIGHTTEENTH:  
+	  case NINTEENTH:    
+	  case TWENTIETH:    
+	  case TWENTYFIRST:  
+	  case TWENTYSECOND: 
+	  case TWENTYTHIRD:  
 	    {
-	      // This quadrature rule combines two
-	      // four-point rules on the unit interval
-	      // to create a 16-point, 7th-order accurate
-	      // quadrature rule.  For information, see
-	      // Approximate Calculation of Multiple Integrals,
-	      // Stroud, A. H. p 314
-	      std::vector<Real> r(4);
-	      std::vector<Real> s(4);
-	      std::vector<Real> A(4);
-	      std::vector<Real> B(4);
+	      // The following quadrature rules are
+	      // generated as conical products.  These
+	      // tend to be non-optimal (use too many
+	      // points, cluster points in certain
+	      // regions of the domain) but they are
+	      // quite easy to automatically generate
+	      // using a 1D Gauss rule on [0,1] and a
+	      // 1D Jacobi-Gauss rule on [0,1].
 
-	      // Interval Quadrature points
-	      // Gauss Points        // Jacobi-Gauss Points
-	      r[0] = 0.0694318422;   s[0] = 0.0571041961;
-	      r[1] = 0.3300094782;   s[1] = 0.2768430136;
-	      r[2] = 0.6699905218;   s[2] = 0.5835904324;
-	      r[3] = 0.9305681558;   s[3] = 0.8602401357;
+	      // Define the quadrature rules...
+	      QGauss  gauss1D(1,_order);
+	      QJacobi jac1D(1,_order,1,0);
+	      
+	      // The Gauss rule needs to be scaled to [0,1]
+	      std::pair<Real, Real> old_range(-1,1);
+	      std::pair<Real, Real> new_range(0,1);
+	      gauss1D.scale(old_range,
+			    new_range);
 
-	      // Interval Quadrature Weights
-	      // Gauss Weights       // Jacobi-Gauss Weights
-	      A[0] = 0.1739274226;   B[0] = 0.1355069134;
-	      A[1] = 0.3260725774;   B[1] = 0.2034645680;
-	      A[2] = 0.3260725774;   B[2] = 0.1298475476;
-	      A[3] = 0.1739274226;   B[3] = 0.0311809709;
-
-	      // Compute the conical products
-	      _points.resize(16);
-	      _weights.resize(16);
-	      unsigned int gp = 0;
-	      for (unsigned int i=0; i<4; i++)
-		for (unsigned int j=0; j<4; j++)
-		  {
-		    _points[gp](0) = s[j];
-		    _points[gp](1) = r[i]*(1.-s[j]);
-		    _weights[gp]   = A[i]*B[j];
-		    gp++;
-		  }
+	      // Compute the tensor product
+	      tensor_product_tri(&gauss1D, &jac1D);
 	      return;
 	    }
 	    

@@ -1,4 +1,4 @@
-// $Id: quadrature_trap.h,v 1.5 2003-02-06 06:02:42 jwpeterson Exp $
+// $Id: quadrature_jacobi.h,v 1.1 2003-02-06 06:02:41 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -19,8 +19,8 @@
 
 
 
-#ifndef __quadrature_trap_h__
-#define __quadrature_trap_h__
+#ifndef __quadrature_jacobi_h__
+#define __quadrature_jacobi_h__
 
 // C++ includes
 
@@ -29,45 +29,56 @@
 
 
 // ------------------------------------------------------------
-// QTrap class definition
+// QJacobi class definition
 
 
 /**
- * This class implemenets trapezoidal quadratue.  Sometimes
- * also known as Newton-Cotes quadrature with two points.  These rules
- * sample at the corners and will integrate linears exactly.
+ * This class implemenets two (for now) Jacobi-Gauss quadrature
+ * rules.  These rules have the same order of accuracy as the
+ * normal Gauss quadrature rules, but instead of integrating
+ * a weight function w(x)=1, they integrate w(x)=(1-x)^alpha * (1+x)^beta.
+ * The reason that they are useful is that they allow you to
+ * implement conical product rules for triangles and tetrahedra.
+ * Although these product rules are non-optimal (use more points
+ * than necessary) they are automatically constructable for high
+ * orders of accuracy where other formulae may not exist. 
  */
-class QTrap : public QBase
+class QJacobi : public QBase
 {
  public:
 
   /**
    * Constructor.  Declares the dimension of the quadrature rule.
+   * Also 
    */
-  QTrap (const unsigned int _dim);
+  QJacobi (const unsigned int _dim,
+	   const Order _order=INVALID_ORDER,
+	   const unsigned int _alpha=1,
+	   const unsigned int _beta=0);
 
   /**
    * Destructor. Empty.
    */
-  ~QTrap() {};
+  ~QJacobi() {};
 
  private:
-
-  void init_1D (const ElemType _type=INVALID_ELEM);
-  void init_2D (const ElemType _type=INVALID_ELEM);
-  void init_3D (const ElemType _type=INVALID_ELEM);
+  const unsigned int _alpha;
+  const unsigned int _beta;
   
-  void init_2D (const ElemType _type,
-		const unsigned int side);
-  void init_3D (const ElemType _type,
-		const unsigned int side);
+  void init_1D (const ElemType _type=INVALID_ELEM);
 
 };
 
+
+
+
 // ------------------------------------------------------------
-// QTrap class members
+// QJacobi class members
 inline
-QTrap::QTrap(const unsigned int d) : QBase(d,FIRST)
+QJacobi::QJacobi(const unsigned int d,
+		 const Order o,
+		 const unsigned int a,
+		 const unsigned int b) : QBase(d,o), _alpha(a), _beta(b)
 {
   // explicitly call the init function in 1D since the
   // other tensor-product rules require this one.

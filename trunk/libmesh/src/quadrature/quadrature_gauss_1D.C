@@ -1,4 +1,4 @@
-// $Id: quadrature_gauss_1D.C,v 1.4 2003-01-24 17:24:45 jwpeterson Exp $
+// $Id: quadrature_gauss_1D.C,v 1.5 2003-02-06 06:02:42 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -18,6 +18,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
+
+// C++ includes
 
 // Local includes
 #include "quadrature_gauss.h"
@@ -40,7 +42,7 @@ void QGauss::init_1D(const ElemType)
 	
 	_weights[0]    = 2.;
 	
-	return;
+	break;
       };
     case SECOND:
     case THIRD:
@@ -54,7 +56,7 @@ void QGauss::init_1D(const ElemType)
 	_weights[0]   = 1.;
 	_weights[1]   = _weights[0];
 
-	return;
+	break;
       };
     case FOURTH:
     case FIFTH:
@@ -70,7 +72,7 @@ void QGauss::init_1D(const ElemType)
 	_weights[1]   = 0.888888888888888888888888888889;
 	_weights[2]   = _weights[0];
 
-	return;
+	break;
       };
     case SIXTH:
     case SEVENTH:
@@ -88,7 +90,7 @@ void QGauss::init_1D(const ElemType)
 	_weights[2]   = _weights[1];
 	_weights[3]   = _weights[0];
 
-	return;
+	break;
       };
     case EIGHTH:
     case NINTH:
@@ -108,17 +110,11 @@ void QGauss::init_1D(const ElemType)
 	_weights[3]   = _weights[1];
 	_weights[4]   = _weights[0];
 
-	return;
+	break;
       };
     case TENTH:
     case ELEVENTH:
       {
-	std::cerr << "Check this one!  I noticed trouble with it\n"
-		  << "on 1/9/2003.  -Ben"
-		  << std::endl;		  
-	error();
-
-	
 	_points.resize (6);
 	_weights.resize(6);
 	      
@@ -136,7 +132,7 @@ void QGauss::init_1D(const ElemType)
 	_weights[4]   = _weights[1];
 	_weights[5]   = _weights[0];
 
-	return;
+	break;
       };
     case TWELFTH:
     case THIRTEENTH:
@@ -152,15 +148,15 @@ void QGauss::init_1D(const ElemType)
 	_points[5]    = -_points[1];
 	_points[6]    = -_points[0];
 
-	_weights[0]   = 0.129484966168869693270611432679;
-	_weights[1]   = 0.219705391489276667901467771424;
-	_weights[2]   = 0.381830050505118944950369775489;
-	_weights[3]   = 0.417959183673469387755102040816;
+	_weights[0]   = 0.12948496616887;
+	_weights[1]   = 0.27970539148928;
+	_weights[2]   = 0.38183005050512;
+	_weights[3]   = 0.41795918367347;
 	_weights[4]   = _weights[2];
 	_weights[5]   = _weights[1];
 	_weights[6]   = _weights[0];
 
-	return;
+	break;
       };
     case FOURTEENTH:
     case FIFTEENTH:
@@ -186,7 +182,7 @@ void QGauss::init_1D(const ElemType)
 	_weights[6]   = _weights[1];
 	_weights[7]   = _weights[0];
 
-	return;
+	break;
       };
     case SIXTEENTH:
     case SEVENTEENTH:
@@ -214,7 +210,7 @@ void QGauss::init_1D(const ElemType)
 	_weights[7]   = _weights[1];
 	_weights[8]   = _weights[0];
 
-	return;
+	break;
       };
     case EIGHTTEENTH:
     case NINTEENTH:
@@ -244,7 +240,7 @@ void QGauss::init_1D(const ElemType)
 	_weights[8]   = _weights[1];
 	_weights[9]   = _weights[0];
 
-	return;
+	break;
       };      
     case TWENTIETH:
     case TWENTYFIRST:
@@ -280,7 +276,7 @@ void QGauss::init_1D(const ElemType)
 	_weights[10]  = _weights[1];
 	_weights[11]  = _weights[0];
 
-	return;
+	break;
       };      
     default:
       {
@@ -291,7 +287,7 @@ void QGauss::init_1D(const ElemType)
       };
     };
 
-  error();
+
 
   return;
 };

@@ -1,4 +1,4 @@
-// $Id: quadrature.C,v 1.6 2003-02-03 03:51:50 ddreyer Exp $
+// $Id: quadrature.C,v 1.7 2003-02-06 06:02:42 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -18,6 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
+#include <numeric>
 
 #include "quadrature.h"
 
@@ -107,6 +108,39 @@ void QBase::init(const ElemType t,
 
 
 
+void QBase::scale(std::pair<Real, Real> old_range,
+		  std::pair<Real, Real> new_range)
+{
+  // Make sure we are in 1D
+  assert(_dim == 1);
+  
+  // Make sure that we have sane ranges 
+  assert(new_range.second > new_range.first);
+  assert(old_range.second > old_range.first);
+
+  // Make sure there are some points
+  assert(_points.size() > 0);
+
+  // We're mapping from old_range -> new_range 
+  for (unsigned int i=0; i<_points.size(); i++)
+    {
+      //_points[i](0) = (_points[i](0)-y1) * (x2-x1) / (y2-y1) + x1;
+      _points[i](0) = (_points[i](0) - old_range.first) *
+	              (new_range.second - new_range.first) /
+	              (old_range.second - old_range.first) +
+	              new_range.first;
+    }
+
+  // Compute the scale factor and scale the weights
+  const Real scfact = (new_range.second - new_range.first) /
+                      (old_range.second - old_range.first);
+  for (unsigned int i=0; i<_points.size(); i++)
+    _weights[i] *= scfact;
+}
+
+
+
+
 void QBase::tensor_product_quad(QBase* q1D)
 {
   
@@ -130,6 +164,39 @@ void QBase::tensor_product_quad(QBase* q1D)
       };
 
 }
+
+
+
+
+void QBase::tensor_product_tri(QBase* gauss1D, QBase* jac1D)
+{
+  
+  // Both rules should be of the same order
+  assert(gauss1D->n_points() == jac1D->n_points());
+
+  // Save the number of points as a convenient variable
+  const unsigned int n_points = gauss1D->n_points();
+  
+  // Both rules should be between x=0 and x=1
+  assert(gauss1D->qp(0)(0) >= 0.0); assert(gauss1D->qp(n_points-1)(0) <= 1.0);
+  assert(jac1D->qp(0)(0)   >= 0.0); assert(jac1D->qp(n_points-1)(0) <= 1.0);
+
+  // Resize the points and weights vectors
+  _points.resize(n_points * n_points);
+  _weights.resize(n_points * n_points);
+
+  // Compute the conical product
+  unsigned int gp = 0;
+  for (unsigned int i=0; i<n_points; i++)
+    for (unsigned int j=0; j<n_points; j++)
+      {
+	_points[gp](0) = jac1D->qp(j)(0);                          //s[j];
+	_points[gp](1) = gauss1D->qp(i)(0) * (1.-jac1D->qp(j)(0)); //r[i]*(1.-s[j]);
+	_weights[gp]   = gauss1D->w(i) * jac1D->w(j);              //A[i]*B[j];
+	gp++;
+      }
+}
+
 
 
 
@@ -185,6 +252,44 @@ void QBase::tensor_product_prism(QBase* q1D, QBase* q2D)
 }
 
 
+
+
+void QBase::tensor_product_tet(QBase* gauss1D, QBase* jacA1D, QBase* jacB1D)
+{
+  here();
+
+  // All rules should be of the same order
+  assert(gauss1D->n_points() == jacA1D->n_points());
+  assert(jacA1D->n_points()  == jacB1D->n_points());
+  
+  // Save the number of points as a convenient variable
+  const unsigned int n_points = gauss1D->n_points();
+  
+  // All rules should be between x=0 and x=1
+  assert(gauss1D->qp(0)(0) >= 0.0); assert(gauss1D->qp(n_points-1)(0) <= 1.0);
+  assert(jacA1D->qp(0)(0)  >= 0.0); assert(jacA1D->qp(n_points-1)(0)  <= 1.0);
+  assert(jacB1D->qp(0)(0)  >= 0.0); assert(jacB1D->qp(n_points-1)(0)  <= 1.0);
+
+  // Resize the points and weights vectors
+  _points.resize(n_points * n_points * n_points);
+  _weights.resize(n_points * n_points * n_points);
+
+  // Compute the conical product
+  unsigned int gp = 0;
+  for (unsigned int i=0; i<n_points; i++)
+    for (unsigned int j=0; j<n_points; j++)
+      for (unsigned int k=0; k<n_points; k++)
+      {
+	_points[gp](0) = jacB1D->qp(k)(0);                                                  //t[k];
+	_points[gp](1) = jacA1D->qp(j)(0)  * (1.-jacB1D->qp(k)(0));                         //s[j]*(1.-t[k]);
+	_points[gp](2) = gauss1D->qp(i)(0) * (1.-jacA1D->qp(j)(0)) * (1.-jacB1D->qp(k)(0)); //r[i]*(1.-s[j])*(1.-t[k]);
+	_weights[gp]   = gauss1D->w(i)     * jacA1D->w(j)          * jacB1D->w(k);          //A[i]*B[j]*C[k];
+	gp++;
+      }
+  
+  std::cout << "Sum of weights is: "
+	    << std::accumulate(_weights.begin(), _weights.end(), 0., std::plus<Real>()) << std::endl;
+}
 
 
 

@@ -1856,6 +1856,17 @@ src/quadrature/quadrature_gauss_3D.$(obj-suffix):\
     include/point.h\
     include/quadrature.h\
     include/quadrature_gauss.h
+src/quadrature/quadrature_jacobi.$(obj-suffix):\
+    src/quadrature/quadrature_jacobi.C
+src/quadrature/quadrature_jacobi_1D.$(obj-suffix):\
+    src/quadrature/quadrature_jacobi_1D.C\
+    include/enum_elem_type.h\
+    include/enum_order.h\
+    include/mesh_common.h\
+    include/mesh_config.h\
+    include/point.h\
+    include/quadrature.h\
+    include/quadrature_jacobi.h
 src/quadrature/quadrature_simpson.$(obj-suffix):\
     src/quadrature/quadrature_simpson.C
 src/quadrature/quadrature_simpson_1D.$(obj-suffix):\
