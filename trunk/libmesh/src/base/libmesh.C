@@ -1,4 +1,4 @@
-// $Id: libmesh.C,v 1.6 2003-03-14 09:56:40 ddreyer Exp $
+// $Id: libmesh.C,v 1.7 2003-03-16 19:10:23 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -72,10 +72,10 @@ bool         libMesh::_is_initialized = false;
 
 // ------------------------------------------------------------
 // libMesh member functions
-#if defined(HAVE_PETSC)
+#if defined(HAVE_MPI)
 void libMesh::init (int & argc, char** & argv)
 #else
-void libMesh::init (int &, char** &)
+void libMesh::init (int &     , char** &     )
 #endif
 {
 #if defined(HAVE_PETSC)
@@ -136,16 +136,12 @@ int libMesh::close ()
   // us to find memory leaks.  By default the
   // \p ReferenceCounter only prints its information
   // when the last created object has been destroyed.
-  // That does not good if we are leaking memory!
+  // That does no good if we are leaking memory!
   ReferenceCounter::print_info ();
   
 
   _is_initialized = false;
   
-  // Return the number of outstanding objects.
-  // This is equivalent to return 0 if all of
-  // the reference counted objects have been
-  // deleted.
 
   if (ReferenceCounter::n_objects() != 0)
     {
@@ -162,5 +158,9 @@ int libMesh::close ()
   
     }
   
+  // Return the number of outstanding objects.
+  // This is equivalent to return 0 if all of
+  // the reference counted objects have been
+  // deleted.
   return static_cast<int>(ReferenceCounter::n_objects());
 }

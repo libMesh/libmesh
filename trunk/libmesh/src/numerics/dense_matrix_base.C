@@ -1,4 +1,4 @@
-// $Id: dense_matrix_base.C,v 1.2 2003-03-08 07:30:56 benkirk Exp $
+// $Id: dense_matrix_base.C,v 1.3 2003-03-16 19:10:22 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -40,11 +40,11 @@ void DenseMatrixBase<T>::multiply (DenseMatrixBase<T>& M1,
   
   // Do it this way because there is a
   // decent chance (at least for constraint matrices)
-  // that A(i,k) = 0.
-  for (unsigned int i=0; i<m_s; i++)
-    for (unsigned int k=0; k<p_s; k++)
-      if (M2(i,k) != 0.)
-	for (unsigned int j=0; j<n_s; j++)
+  // that M3(k,j) = 0. when right-multiplying.
+  for (unsigned int k=0; k<p_s; k++)
+    for (unsigned int j=0; j<n_s; j++)
+      if (M3(k,j) != 0.)
+	for (unsigned int i=0; i<m_s; i++)
 	  M1(i,j) += M2(i,k) * M3(k,j);	          
 }
 
