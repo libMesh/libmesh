@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.11 2003-02-24 14:35:50 benkirk Exp $
+// $Id: fe_base.h,v 1.12 2003-05-15 23:34:33 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -116,13 +116,18 @@ public:
    * This is at the core of this class. Use this for each
    * new element in the mesh.  Reinitializes all the physical 
    * element-dependent data based on the current element 
-   * \p elem.
+   * \p elem. By default the shape functions and associated
+   * data are computed at the quadrature points specified
+   * by the quadrature rule \p qrule, but may be any points
+   * specified on the reference element specified in the optional
+   * argument \p pts.
    */
-  virtual void reinit (const Elem* elem) = 0;
+  virtual void reinit (const Elem* elem,
+		       const std::vector<Point>* const pts = NULL) = 0;
     
   /**
    * Reinitializes all the physical element-dependent data based on
-   * the \p side of \p face.
+   * the \p side of the element \p elem.
    */
   virtual void reinit (const Elem* elem,
 		       const unsigned int side) = 0;

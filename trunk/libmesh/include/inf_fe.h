@@ -1,4 +1,4 @@
-// $Id: inf_fe.h,v 1.26 2003-04-18 15:46:32 spetersen Exp $
+// $Id: inf_fe.h,v 1.27 2003-05-15 23:34:33 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -66,7 +66,7 @@ class FEComputeData;
  *
  * \author Daniel Dreyer
  * \date 2003
- * \version $Revision: 1.26 $
+ * \version $Revision: 1.27 $
  */
 
 //-------------------------------------------------------------
@@ -89,7 +89,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.26 $
+   * \version $Revision: 1.27 $
    */
   //-------------------------------------------------------------
   // InfFE::Radial class definition
@@ -181,7 +181,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.26 $
+   * \version $Revision: 1.27 $
    */
   //-------------------------------------------------------------
   // InfFE::Base class definition
@@ -370,7 +370,8 @@ public:
    * element-dependent data based on the current element 
    * \p elem.
    */
-  void reinit (const Elem* elem);
+  void reinit (const Elem* elem,
+	       const std::vector<Point>* const pts);
     
   /**
    * Not implemented yet.  Reinitializes all the physical 

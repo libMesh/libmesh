@@ -1,4 +1,4 @@
-// $Id: point.h,v 1.13 2003-05-02 20:32:34 benkirk Exp $
+// $Id: point.h,v 1.14 2003-05-15 23:34:34 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -595,7 +595,7 @@ Real Point::size_sq() const
 inline
 bool Point::operator == (const Point& rhs) const
 {
-  static Real tol_sq = TOLERANCE*TOLERANCE;
+  static const Real tol_sq = TOLERANCE*TOLERANCE;
   
 #if DIM == 1
   return ((_coords[0] - rhs._coords[0])*(_coords[0] - rhs._coords[0])

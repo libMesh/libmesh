@@ -1,4 +1,4 @@
-// $Id: enum_elem_type.h,v 1.6 2003-02-25 18:34:42 benkirk Exp $
+// $Id: enum_elem_type.h,v 1.7 2003-05-15 23:34:33 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,13 +31,13 @@
 
 
 /**
- * The \p MeshEnums namespace is the namespace all \p enum definitions
+ * The \p libMeshEnums namespace is the namespace all \p enum definitions
  * should be put into.
  */
 
 // ------------------------------------------------------------
 // enum ElemType definition
-namespace MeshEnums {
+namespace libMeshEnums {
   
   /**
    * Defines an \p enum for geometric element types.
@@ -83,7 +83,7 @@ namespace MeshEnums {
 		 INVALID_ELEM};
 }
 
-using namespace MeshEnums;
+using namespace libMeshEnums;
 
 
 

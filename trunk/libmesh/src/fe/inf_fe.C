@@ -1,4 +1,4 @@
-// $Id: inf_fe.C,v 1.20 2003-04-11 19:09:32 spetersen Exp $
+// $Id: inf_fe.C,v 1.21 2003-05-15 23:34:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -160,13 +160,16 @@ void InfFE<Dim,T_radial,T_base>::update_base_elem (const Elem* inf_elem)
 
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem)
+void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem,
+				       const std::vector<Point>* const pts)
 {
   assert (base_fe        != NULL);
   assert (base_fe->qrule != NULL);
   assert (base_fe->qrule == base_qrule);
   assert (radial_qrule   != NULL);
   assert (inf_elem       != NULL);
+  assert (pts            == NULL);
+  
 
   // see below
   bool init_shape_functions_required = false;

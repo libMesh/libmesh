@@ -1,4 +1,4 @@
-// $Id: mesh_function.C,v 1.2 2003-05-10 22:19:41 ddreyer Exp $
+// $Id: mesh_function.C,v 1.3 2003-05-15 23:34:36 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,7 @@
 
 // Local Includes
 #include "mesh_function.h"
-#include "equation_systems_base.h"
+#include "equation_systems.h"
 #include "numeric_vector.h"
 #include "dof_map.h"
 #include "point_locator_base.h"
@@ -37,7 +37,7 @@
 
 //------------------------------------------------------------------
 // MeshFunction methods
-MeshFunction::MeshFunction (const EquationSystemsBase& eqn_systems,
+MeshFunction::MeshFunction (const EquationSystems& eqn_systems,
 			    const NumericVector<Number>& vec,
 			    const DofMap& dof_map,
 			    const std::vector<unsigned int>& vars,
@@ -53,7 +53,7 @@ MeshFunction::MeshFunction (const EquationSystemsBase& eqn_systems,
 
 
 
-MeshFunction::MeshFunction (const EquationSystemsBase& eqn_systems,
+MeshFunction::MeshFunction (const EquationSystems& eqn_systems,
 			    const NumericVector<Number>& vec,
 			    const DofMap& dof_map,
 			    const unsigned int var,
@@ -107,7 +107,8 @@ void MeshFunction::init ()
   if (this->_master != NULL)
     {
       // we aren't the master
-      const MeshFunction* master = static_cast<const MeshFunction*>(this->_master);
+      const MeshFunction* master =
+	dynamic_cast<const MeshFunction*>(this->_master);
       
       if (master->_point_locator == NULL)
         {
@@ -149,18 +150,20 @@ Number MeshFunction::operator() (const Point& p,
 				 const Real time)
 {
   assert (this->initialized());
-
+  // At the moment the function we call ignores the time
+  assert (time == 0.);
+  
   DenseVector<Number> buf (1);
-  this->operator() (buf, p, time);
+  this->operator() (p, time, buf);
   return buf(0);
 }
 
 
 
 
-void MeshFunction::operator() (DenseVector<Number>& output,
-			       const Point& p,
-			       const Real)
+void MeshFunction::operator() (const Point& p,
+			       const Real,
+			       DenseVector<Number>& output)
 {
   assert (this->initialized());
 
@@ -214,7 +217,7 @@ void MeshFunction::operator() (DenseVector<Number>& output,
 	    Number value = 0.;
 
 	    for (unsigned int i=0; i<dof_indices.size(); i++)
-		value += this->_vector(dof_indices[i]) * data.shape[i];
+	      value += this->_vector(dof_indices[i]) * data.shape[i];
 
 	    output(index) = value;
 	  }

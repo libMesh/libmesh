@@ -1,4 +1,4 @@
-// $Id: distributed_vector.C,v 1.10 2003-05-05 22:23:09 benkirk Exp $
+// $Id: distributed_vector.C,v 1.11 2003-05-15 23:34:36 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson

@@ -1,4 +1,4 @@
-// $Id: linear_solver_interface.C,v 1.9 2003-05-04 23:59:00 benkirk Exp $
+// $Id: linear_solver_interface.C,v 1.10 2003-05-15 23:34:36 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,6 +26,9 @@
 #include "linear_solver_interface.h"
 #include "laspack_interface.h"
 #include "petsc_interface.h"
+#include "auto_ptr.h"
+#include "numeric_vector.h"
+#include "sparse_matrix.h"
 
 
 

@@ -1,4 +1,4 @@
-// $Id: mesh_common.h,v 1.12 2003-04-02 21:58:38 benkirk Exp $
+// $Id: mesh_common.h,v 1.13 2003-05-15 23:34:33 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -120,31 +120,6 @@ typedef std::complex<double> COMPLEX;
 // when doing floating point comparisons.  For example, v == 0 is
 // changed to fabs(v) < TOLERANCE.
 #define TOLERANCE 1.e-6
-
-
-
-
-// Macros for performance logging.  This allows us
-// to add performance monitors to the code without
-// impacting performance when performance logging
-// is disabled.
-#ifdef ENABLE_PERFORMANCE_LOGGING
-
-// Note the log is in libMesh, so we need to include it.
-#  include "libmesh.h"
-#  define START_LOG(a,b)   { libMesh::log.start_event(a,b); }
-#  define STOP_LOG(a,b)    { libMesh::log.stop_event(a,b); }
-#  define PAUSE_LOG(a,b)   { libMesh::log.pause_event(a,b); }
-#  define RESTART_LOG(a,b) { libMesh::log.restart_event(a,b); }
-
-#else
-
-#  define START_LOG(a,b)   {}
-#  define STOP_LOG(a,b)    {}
-#  define PAUSE_LOG(a,b)   {}
-#  define RESTART_LOG(a,b) {}
-
-#endif
 
 
 

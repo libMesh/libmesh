@@ -1,4 +1,4 @@
-// $Id: mesh_smoother_laplace.h,v 1.1 2003-05-14 02:27:08 jwpeterson Exp $
+// $Id: mesh_smoother_laplace.h,v 1.2 2003-05-15 23:34:34 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -41,7 +41,7 @@
  *
  * \author John W. Peterson
  * \date 2002-2003
- * \version $Revision: 1.1 $
+ * \version $Revision: 1.2 $
  */
 
 

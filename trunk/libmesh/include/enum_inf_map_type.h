@@ -1,4 +1,4 @@
-// $Id: enum_inf_map_type.h,v 1.2 2003-02-13 22:56:07 benkirk Exp $
+// $Id: enum_inf_map_type.h,v 1.3 2003-05-15 23:34:33 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,10 +30,10 @@
 
 // ------------------------------------------------------------
 // enum Order definition
-namespace MeshEnums {
+namespace libMeshEnums {
 
   /**
-   * \enum MeshEnums::InfMapType defines an \p enum for the
+   * \enum libMeshEnums::InfMapType defines an \p enum for the
    * types of coordinate mappings available in infinite elements.
    */
   enum InfMapType {CARTESIAN=0,
@@ -43,7 +43,7 @@ namespace MeshEnums {
 
 }
 
-using namespace MeshEnums;
+using namespace libMeshEnums;
 
 #endif //ifdef ENABLE_INFINITE_ELEMENTS
 

@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.12 2003-05-01 18:44:31 benkirk Exp $
+// $Id: mesh_refinement.C,v 1.13 2003-05-15 23:34:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -139,6 +139,8 @@ void MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
   bool satisfied = false;
 
 
+  // Possibly clean up the refinement flags from
+  // a previous step
   elem_iterator       elem_it (mesh.elements_begin());
   const elem_iterator elem_end(mesh.elements_end());
 
@@ -545,6 +547,25 @@ void MeshRefinement::refine_elements ()
 
 void MeshRefinement::uniformly_refine (unsigned int n)
 {
+  // Possibly clean up the refinement flags from
+  // a previous step
+  elem_iterator       elem_it (mesh.elements_begin());
+  const elem_iterator elem_end(mesh.elements_end());
+
+  for ( ; elem_it != elem_end; ++elem_it)
+    {
+      // Set refinement flag to DO_NOTHING if the
+      // element isn't active
+      if ( !(*elem_it)->active())
+	(*elem_it)->set_refinement_flag(Elem::DO_NOTHING);
+
+      // This might be left over from the last step
+      if ((*elem_it)->refinement_flag() == Elem::JUST_REFINED)
+	(*elem_it)->set_refinement_flag(Elem::DO_NOTHING);
+    }
+
+
+  // Refine n times
   for (unsigned int rstep=0; rstep<n; rstep++)
     {
       for (unsigned int e=0; e<mesh.n_elem(); e++)

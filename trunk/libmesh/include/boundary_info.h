@@ -1,4 +1,4 @@
-// $Id: boundary_info.h,v 1.15 2003-05-15 19:43:33 ddreyer Exp $
+// $Id: boundary_info.h,v 1.16 2003-05-15 23:34:33 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson

@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.18 2003-04-09 19:26:59 ddreyer Exp $
+// $Id: fe.C,v 1.19 2003-05-15 23:34:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,9 @@
 #include "libmesh.h"
 #include "quadrature.h"
 #include "elem.h"
+#include "mesh_logging.h"
 #include "fe_macro.h"
+
 
 
 // ------------------------------------------------------------
@@ -38,21 +40,29 @@ unsigned int FE<Dim,T>::n_quadrature_points () const
 
 
 
-
 template <unsigned int Dim, FEFamily T>
-void FE<Dim,T>::reinit(const Elem* elem)
+void FE<Dim,T>::reinit(const Elem* elem,
+		       const std::vector<Point>* const pts)
 {
   assert (qrule   != NULL);
   assert (elem    != NULL);
 
   qrule->init(elem->type());
-    
+
+  // Initialize the shape functions at the user-specified
+  // points
+  if (pts != NULL)
+    {
+      elem_type = elem->type();
+      init_shape_functions (*pts, elem);      
+    }
+  
   // update the type in accordance to the current cell
   // and reinit if the cell type has changed or (as in
   // the case of the hierarchics) the shape functions
   // depend on the particular element
-  if ((get_type() != elem->type()) ||
-      (T == HIERARCHIC))
+  else if ((get_type() != elem->type()) ||
+	   (T == HIERARCHIC))
     {
       elem_type = elem->type();
       init_shape_functions (qrule->get_points(), elem);
@@ -60,13 +70,21 @@ void FE<Dim,T>::reinit(const Elem* elem)
   
   // Compute the map for this element.  In the future we can specify
   // different types of maps
-  compute_map (qrule->get_weights(), elem);
+  if (pts != NULL)
+    {
+      std::vector<Real> dummy_weights (pts->size(), 1.);
+      
+      compute_map (dummy_weights, elem);
+    }
+  else
+    {
+      compute_map (qrule->get_weights(), elem);
+    }
 
   // Compute the shape functions and the derivatives at all of the
   // quadrature points.
   compute_shape_functions ();
 }
-
 
 
 

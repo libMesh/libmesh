@@ -1,4 +1,4 @@
-// $Id: ex6.C,v 1.23 2003-05-14 19:45:36 ddreyer Exp $
+// $Id: ex6.C,v 1.24 2003-05-15 23:34:32 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -31,7 +31,7 @@
  */
 #include "libmesh.h"
 #include "mesh.h"
-#include "thin_system.h"
+#include "steady_system.h"
 #include "equation_systems.h"
 
 /**
@@ -49,6 +49,8 @@
  * Define useful datatypes for finite element
  * matrix and vector components.
  */
+#include "sparse_matrix.h"
+#include "numeric_vector.h"
 #include "dense_matrix.h"
 #include "dense_vector.h"
 
@@ -87,7 +89,7 @@
  * Function prototype.  This is similar to the Poisson
  * assemble function of example 4. 
  */
-void assemble_wave(EquationSystems<ThinSystem>& es,
+void assemble_wave(EquationSystems& es,
 		   const std::string& system_name);
 
 
@@ -126,7 +128,7 @@ int main (int argc, char** argv)
   /**
    * This example is designed for real numbers only.
    */
-# ifdef USE_COMPLEX_NUMBERS
+#ifdef USE_COMPLEX_NUMBERS
 
   std::cerr << "ERROR: This example is not intended for " << std::endl
 	    << " use with complex numbers." << std::endl;
@@ -134,7 +136,7 @@ int main (int argc, char** argv)
 
   return 0;
 
-# endif
+#endif
 
 
   /**
@@ -212,16 +214,17 @@ int main (int argc, char** argv)
      * system.  Use \p ThinSystem when you want the sleekest
      * system possible.
      */
-    EquationSystems<ThinSystem> equation_systems (mesh);
+    EquationSystems equation_systems (mesh);
 
     /**
      * Declare the system and its variables.
      */
     {
       /**
-       * Create a system named "Wave"
+       * Create a system named "Wave".  This can
+       * be a simple, steady system
        */
-      equation_systems.add_system("Wave");
+      equation_systems.add_system<SteadySystem> ("Wave");
       
       /**
        * Create an FEType describing the approximation
@@ -284,7 +287,7 @@ int main (int argc, char** argv)
      * determine physically correct results within an
      * infinite element.
      */
-    equation_systems.write ("eqn_sys.dat", Xdr::WRITE);
+    equation_systems.write ("eqn_sys.dat", libMeshEnums::WRITE);
   }
 
   
@@ -300,7 +303,7 @@ int main (int argc, char** argv)
 
 
 
-void assemble_wave(EquationSystems<ThinSystem>& es,
+void assemble_wave(EquationSystems& es,
 		   const std::string& system_name)
 {
 
@@ -320,6 +323,14 @@ void assemble_wave(EquationSystems<ThinSystem>& es,
   const Mesh& mesh = es.get_mesh();
 
   /**
+   * A reference to the \p DofMap object for this system.  The \p DofMap
+   * object handles the index translation from node and element numbers
+   * to degree of freedom numbers.  We will talk more about the \p DofMap
+   * in future examples.
+   */
+  const DofMap& dof_map = es("Wave").get_dof_map();
+
+  /**
    * The dimension that we are running.
    */
   const unsigned int dim = mesh.mesh_dimension();
@@ -334,7 +345,7 @@ void assemble_wave(EquationSystems<ThinSystem>& es,
    * Get a constant reference to the Finite Element type
    * for the first (and only) variable in the system.
    */
-  FEType fe_type = es("Wave").get_dof_map().variable_type(0);
+  const FEType& fe_type = dof_map.variable_type(0);
 
   /**
    * Build a Finite Element object of the specified type.  Since the
@@ -371,15 +382,8 @@ void assemble_wave(EquationSystems<ThinSystem>& es,
    */
   inf_fe->attach_quadrature_rule (&qrule);
 
-
-  /**
-   * A reference to the \p DofMap object for this system.  The \p DofMap
-   * object handles the index translation from node and element numbers
-   * to degree of freedom numbers.  We will talk more about the \p DofMap
-   * in future examples.
-   */
-  const DofMap& dof_map = es("Wave").get_dof_map();
-
+  
+  
   /**
    * Define data structures to contain the element matrix
    * and right-hand-side vector contribution.  Following
@@ -484,7 +488,7 @@ void assemble_wave(EquationSystems<ThinSystem>& es,
 	       */
 	      Fe.resize (dof_indices.size());
 
-	      es("Wave").rhs->add_vector    (Fe, dof_indices);
+	      es("Wave").rhs->add_vector (Fe, dof_indices);
 
 	    } // end boundary condition section	     
 

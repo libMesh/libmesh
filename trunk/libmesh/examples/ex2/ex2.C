@@ -1,4 +1,4 @@
-// $Id: ex2.C,v 1.8 2003-04-05 02:25:38 ddreyer Exp $
+// $Id: ex2.C,v 1.9 2003-05-15 23:34:32 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -32,14 +32,14 @@
 #include "mesh.h"
 
 /**
- * Include file that defines a system
- */
-#include "general_system.h"
-
-/**
  * Include file that defines (possibly multiple) systems of equations.
  */
 #include "equation_systems.h"
+
+/**
+ * Include file that defines a simple steady system
+ */
+#include "steady_system.h"
 
 
 
@@ -130,7 +130,7 @@ int main (int argc, char** argv)
      * The EquationSystems object needs a reference to the mesh
      * object, so the order of construction here is important.
      */
-    EquationSystems<GeneralSystem> equation_systems (mesh);
+    EquationSystems equation_systems (mesh);
 
     /**
      * Add a flag "test" that is visible for all systems.  This
@@ -156,7 +156,7 @@ int main (int argc, char** argv)
       /**
        * Creates a system named "Simple System"
        */
-      equation_systems.add_system("Simple System");
+      equation_systems.add_system<SteadySystem> ("Simple System");
       
       /**
        * Adds the variable "u" to "Simple System".  "u"
@@ -179,9 +179,9 @@ int main (int argc, char** argv)
     /**
      * Write the equation system if the user specified an
      * output file name.  Note that there are two possible
-     * formats to write to.  Specifying \p Xdr::WRITE will create
-     * a formatted ASCII file.  Optionally, you can specify
-     * \p Xdr::ENCODE and get an XDR-encoded binary file.
+     * formats to write to.  Specifying \p libMeshEnums::WRITE will
+     * create a formatted ASCII file.  Optionally, you can specify
+     * \p libMeshEnums::ENCODE and get an XDR-encoded binary file.
      *
      * We will write the data, clear the object, and read the file
      * we just wrote.  This is simply to demonstrate capability.
@@ -198,7 +198,7 @@ int main (int argc, char** argv)
 	  /**
 	   * Write the system.
 	   */
-	  equation_systems.write (argv[1], Xdr::WRITE);
+	  equation_systems.write (argv[1], libMeshEnums::WRITE);
 
 
 	  /**
@@ -212,7 +212,7 @@ int main (int argc, char** argv)
 	   * Read the file we just wrote.  This better
 	   * work!
 	   */
-	  equation_systems.read (argv[1], Xdr::READ);
+	  equation_systems.read (argv[1], libMeshEnums::READ);
 
 	  /**
 	   * Print the information again.

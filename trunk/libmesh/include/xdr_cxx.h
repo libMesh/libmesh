@@ -1,4 +1,4 @@
-// $Id: xdr_cxx.h,v 1.10 2003-04-02 21:58:41 benkirk Exp $
+// $Id: xdr_cxx.h,v 1.11 2003-05-15 23:34:34 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,6 +24,7 @@
 
 // Local includes
 #include "mesh_common.h"
+#include "enum_xdr_mode.h"
 #include "o_f_stream.h"
 
 // C++ includes
@@ -64,15 +65,10 @@ class Xdr
 public:
 
   /**
-   * Defines the method used to access the file.
-   */  
-  enum XdrMODE {UNKNOWN = -1, ENCODE=0, DECODE, WRITE, READ};
-
-  /**
    * Constructor.  Takes the filename and the mode.
    * Valid modes are ENCODE, DECODE, READ, and WRITE.
    */
-  Xdr (const std::string& name="", const XdrMODE m=UNKNOWN);
+  Xdr (const std::string& name="", const libMeshEnums::XdrMODE m=UNKNOWN);
 
   /**
    * Destructor.  Closes the file if it is open.
@@ -111,7 +107,7 @@ public:
    * Returns the mode used to access the file.  Valid modes
    * are ENCODE, DECODE, READ, or WRITE.
    */
-  XdrMODE access_mode() const { return mode; }
+  XdrMODE access_mode () const { return mode; }
 
   // Data access methods
 

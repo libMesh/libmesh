@@ -1,4 +1,4 @@
-// $Id: fe_base.C,v 1.14 2003-04-18 17:10:38 benkirk Exp $
+// $Id: fe_base.C,v 1.15 2003-05-15 23:34:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,6 +24,9 @@
 #include "libmesh.h"
 #include "quadrature.h"
 #include "inf_fe.h"
+#include "mesh_logging.h"
+
+
 
 // ------------------------------------------------------------
 // FEBase class members

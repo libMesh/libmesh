@@ -1,4 +1,4 @@
-// $Id: system_base.C,v 1.15 2003-05-12 14:16:48 ddreyer Exp $
+// $Id: system_base.C,v 1.16 2003-05-15 23:34:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,12 +26,16 @@
 
 
 // Local includes
-#include "mesh.h"
-#include "libmesh.h"
 #include "system_base.h"
+#include "equation_systems.h"
+#include "libmesh.h"
+#include "mesh.h"
+#include "sparse_matrix.h"
+#include "numeric_vector.h"
+#include "linear_solver_interface.h"
+#include "mesh_logging.h"
 
-
-// typedef
+// typedefs
 typedef std::map<std::string, SparseMatrix<Number>* >::iterator        other_matrices_iterator;
 typedef std::map<std::string, SparseMatrix<Number>* >::const_iterator  other_matrices_const_iterator;
 typedef std::map<std::string, NumericVector<Number>* >::iterator       other_vectors_iterator;
@@ -40,21 +44,24 @@ typedef std::map<std::string, NumericVector<Number>* >::const_iterator other_vec
 
 // ------------------------------------------------------------
 // SystemBase implementation
-
-SystemBase::SystemBase (Mesh& mesh,
-			const std::string&  name,
-			const unsigned int  number) :
+SystemBase::SystemBase (EquationSystems& es,
+			const std::string& name,
+			const unsigned int number) :
   
+  init_system             (NULL),
+  assemble_system         (NULL),
   solution                (NumericVector<Number>::build()),
   rhs                     (NumericVector<Number>::build()),
-  matrix                  (SparseMatrix<Number>::build ()),
+  matrix                  (SparseMatrix<Number>::build()),
   linear_solver_interface (LinearSolverInterface<Number>::build()),
   _sys_name               (name),
   _sys_number             (number),
+  _active                 (true),
   _can_add_matrices       (true),
   _can_add_vectors        (true),
   _dof_map                (number),
-  _mesh                   (mesh)
+  _equation_systems       (es),
+  _mesh                   (es.get_mesh())
 {
 }
 
@@ -62,10 +69,17 @@ SystemBase::SystemBase (Mesh& mesh,
 
 SystemBase::~SystemBase ()
 {
+  // Null-out the function pointers.  Since this
+  // class is getting destructed it is pointless,
+  // but a good habit.
+  init_system = assemble_system = NULL;
+
+  // Clear data
   SystemBase::clear ();
 
   assert (!libMesh::closed());
 }
+
 
 
 void SystemBase::clear ()
@@ -116,59 +130,63 @@ void SystemBase::clear ()
 
 
 
-
 void SystemBase::init ()
 {
-  assert (_mesh.is_prepared());
-  
+  // First initialize any required data
+  this->init_data();
+
+  // Then call the user-provided intialization function,
+  // if it was provided
+  if (init_system != NULL)
+    this->init_system (_equation_systems, this->name()); 
+}
+
+
+
+void SystemBase::init_data ()
+{
+  // Distribute the degrees of freedom on the mesh
   _dof_map.distribute_dofs (_mesh);
 
 #ifdef ENABLE_AMR
 
+  // Recreate any hanging node constraints
   _dof_map.create_dof_constraints(_mesh);
 
 #endif
 
-  solution->init (n_dofs(), n_local_dofs());
-
-  rhs->init      (n_dofs(), n_local_dofs());
+  // Resize the solution & RHS conformal to the current mesh
+  solution->init (this->n_dofs(), this->n_local_dofs());
+  rhs->init      (this->n_dofs(), this->n_local_dofs());
 
   // from now on, no chance to add additional vectors
   _can_add_vectors=false;
 
   // initialize & zero other vectors, if necessary
-  for(other_vectors_iterator pos = _other_vectors.begin();
-      pos != _other_vectors.end(); ++pos)
+  for (other_vectors_iterator pos = _other_vectors.begin();
+       pos != _other_vectors.end(); ++pos)
     {
-      pos->second->init (n_dofs(), n_local_dofs());
+      pos->second->init (this->n_dofs(), this->n_local_dofs());
       pos->second->zero ();
     }
 }
 
 
 
-
 void SystemBase::reinit ()
 {
-  assert (_mesh.is_prepared());
-  
+  // Distribute the degrees of freedom on the mesh
   _dof_map.distribute_dofs (_mesh);
   
 #ifdef ENABLE_AMR
-  
+
+  // Recreate any hanging node constraints
   _dof_map.create_dof_constraints(_mesh);
   
 #endif
 
-  rhs->init      (n_dofs(), n_local_dofs());
-
-  // initialize & zero other vectors, if necessary
-  for(other_vectors_iterator pos = _other_vectors.begin();
-      pos != _other_vectors.end(); ++pos)
-    {
-      pos->second->init (n_dofs(), n_local_dofs());
-      pos->second->zero ();
-    }
+  // Resize the RHS conformal to the current mesh
+  rhs->init      (this->n_dofs(), this->n_local_dofs());
 
   // Clear the matrices
   matrix->clear();
@@ -177,99 +195,144 @@ void SystemBase::reinit ()
        pos != _other_matrices.end(); ++pos)
     pos->second->clear();
 
-
-  // Call the SystemBase::assemble() member to
-  // construct the system matrices
-  SystemBase::assemble();
+  
+  // Clear the linear solver interface
+  linear_solver_interface->clear();
 }
-
 
 
 
 void SystemBase::assemble ()
 {
-  // no chance to add other matrices
-  _can_add_matrices=false;
-  
-  // initialize the matrix if not 
-  // already initialized
-  if (!matrix->initialized())
-    {
-      // Tell the matrix and the dof map
-      // about each other.  This is necessary
-      // because the _dof_map needs to share
-      // information with the matrix during the
-      // sparsity computation phase
-      _dof_map.attach_matrix (*matrix.get());
-//      matrix->attach_dof_map (_dof_map);
+  assert (assemble_system != NULL);
 
-      // Also tell the additional matrices about
-      // the dof map, and vice versa
-      for(other_matrices_iterator pos = _other_matrices.begin(); 
-	  pos != _other_matrices.end(); ++pos)
-	if (!pos->second->initialized())
-	  {
+  // Initiaize the matrices if not already done
+  { 
+    // no chance to add other matrices
+    _can_add_matrices=false;
+    
+    // initialize the matrix if not 
+    // already initialized
+    if (!matrix->initialized())
+      {
+	// Tell the matrix and the dof map
+	// about each other.  This is necessary
+	// because the _dof_map needs to share
+	// information with the matrix during the
+	// sparsity computation phase
+	_dof_map.attach_matrix (*matrix.get());
+	
+	// Also tell the additional matrices about
+	// the dof map, and vice versa
+	for (other_matrices_iterator pos = _other_matrices.begin(); 
+	     pos != _other_matrices.end(); ++pos)
+	  if (!pos->second->initialized())
+	    {
 	    _dof_map.attach_other_matrix (*pos);
-//	    pos->second->attach_dof_map (_dof_map);
-	  }
-	else
-	  {
-	    std::cerr << "ERROR: Something wrong: Mayor matrix is not initialized, "
-		      << std::endl  << " but additional matrix "
-		      << pos->first << " is!" << std::endl;
-	    error();
-	  }  
-
-
-
-      // Compute the sparsity pattern for the current
-      // mesh and DOF distribution.  This also updates
-      // additional matrices, \p DofMap knows them
-      _dof_map.compute_sparsity (_mesh);
-
-
-      // Initialize the matrix conformal to this
-      // sparsity pattern, though normally, _dof_map.compute_sparsity()
-      // already did this
-      matrix->init ();
-
-
-      // Initialize additional matrices conformal
-      // to this sparsity pattern, though normally, _dof_map.compute_sparsity()
-      // already did this
-      for(other_matrices_iterator pos = _other_matrices.begin(); 
-	  pos != _other_matrices.end(); ++pos)
+	    }
+	  else
+	    {
+	      std::cerr << "ERROR: Something wrong: Major matrix is not initialized, "
+			<< std::endl  << " but additional matrix "
+			<< pos->first << " is!" << std::endl;
+	      error();
+	    }  
+	
+	
+	
+	// Compute the sparsity pattern for the current
+	// mesh and DOF distribution.  This also updates
+	// additional matrices, \p DofMap knows them
+	_dof_map.compute_sparsity (_mesh);
+	
+	
+	// Initialize the matrix conformal to this
+	// sparsity pattern, though normally, _dof_map.compute_sparsity()
+	// already did this
+	matrix->init ();
+	
+	
+	// Initialize additional matrices conformal
+	// to this sparsity pattern, though normally, _dof_map.compute_sparsity()
+	// already did this
+	for(other_matrices_iterator pos = _other_matrices.begin(); 
+	    pos != _other_matrices.end(); ++pos)
 	    pos->second->init ();
 	    
-    }
-  else
-    {
-      // Better check whether the other matrices are also initialized
-      for(other_matrices_const_iterator pos = _other_matrices.begin(); 
-	  pos != _other_matrices.end(); ++pos)
-	if (!pos->second->initialized())
-	  {
-	    // theoretically, with the proper access tests in get_matrix(),
-	    // this cannot happen.  But, who knows?
-	    std::cerr << "ERROR: Mayor matrix is initialized, but additional matrix "
-		      << pos->first
-		      << " is not!"
-		      << std::endl;
-	    error();
-	  }
-    }
+      }
+    else
+      {
+	// Better check whether the other matrices are also initialized
+	for (other_matrices_const_iterator pos = _other_matrices.begin(); 
+	     pos != _other_matrices.end(); ++pos)
+	  if (!pos->second->initialized())
+	    {
+	      // theoretically, with the proper access tests in get_matrix(),
+	      // this cannot happen.  But, who knows?
+	      std::cerr << "ERROR: Mayor matrix is initialized, but additional matrix "
+			<< pos->first
+			<< " is not!"
+			<< std::endl;
+	      error();
+	    }
+      }
 
-
-  // Clear the matrix and right-hand side.
-  matrix->zero ();
-  rhs->zero    ();
-
-  // Clear the additional matrices
-  for(other_matrices_iterator pos = _other_matrices.begin(); 
-      pos != _other_matrices.end(); ++pos)
-        pos->second->zero ();
-
+    
+    // Clear the matrix and right-hand side.
+    matrix->zero ();
+    rhs->zero    ();
+    
+    // Clear the additional matrices
+    for (other_matrices_iterator pos = _other_matrices.begin(); 
+	 pos != _other_matrices.end(); ++pos)
+      pos->second->zero ();
+  }
   // Now everything is set up and ready for matrix assembly
+
+
+
+  
+  // Log how long the user's matrix assembly code takes
+  START_LOG("assemble()", "SystemBase");
+  
+  // Call the user-specified matrix assembly function
+  if (this->assemble_system != NULL)
+    this->assemble_system (_equation_systems, this->name());
+
+  // Stop logging the user code
+  STOP_LOG("assemble()", "SystemBase");
+}
+
+
+
+std::pair<unsigned int, Real>
+SystemBase::solve ()
+{
+  // Assemble the linear system
+  this->assemble (); 
+
+  // Log how long the linear solve takes.
+  START_LOG("solve()", "SystemBase");
+  
+  // Get the user-specifiied linear solver tolerance
+  const Real tol            =
+    _equation_systems.parameter("linear solver tolerance");
+
+  // Get the user-specified maximum # of linear solver iterations
+  const unsigned int maxits =
+    static_cast<unsigned int>(_equation_systems.parameter("linear solver maximum iterations"));
+
+  // Solve the linear system
+  const std::pair<unsigned int, Real> rval = 
+    linear_solver_interface->solve (*matrix, *solution, *rhs, tol, maxits);
+
+  // Stop logging the linear solve
+  STOP_LOG("solve()", "SystemBase");
+
+  // Update the system after the solve
+  this->update();
+  
+  return rval; 
 }
 
 
@@ -340,8 +403,8 @@ bool SystemBase::compare (const SystemBase& other_system,
   else
     {
       // compare other vectors
-      for(other_vectors_const_iterator pos = _other_vectors.begin();
-	  pos != _other_vectors.end(); ++pos)
+      for (other_vectors_const_iterator pos = _other_vectors.begin();
+	   pos != _other_vectors.end(); ++pos)
         {
 	  if (verbose)
 	      std::cout << "   comparing vector \""
@@ -456,7 +519,6 @@ void SystemBase::add_matrix (const std::string& mat_name)
 
 
 
-
 const SparseMatrix<Number> &  SystemBase::get_matrix(const std::string& mat_name) const
 {
   // only enable access _after_ the matrices are properly initialized
@@ -482,7 +544,6 @@ const SparseMatrix<Number> &  SystemBase::get_matrix(const std::string& mat_name
   
   return *(pos->second);
 }
-
 
 
 
@@ -514,7 +575,6 @@ SparseMatrix<Number> &  SystemBase::get_matrix(const std::string& mat_name)
 
 
 
-
 void SystemBase::add_vector (const std::string& vec_name)
 {
   // only add vectors before initializing...
@@ -541,7 +601,6 @@ void SystemBase::add_vector (const std::string& vec_name)
   NumericVector<Number>* buf(NumericVector<Number>::build().release());
   _other_vectors[vec_name] = buf;
 }
-
 
 
 
@@ -603,7 +662,6 @@ NumericVector<Number> &  SystemBase::get_vector(const std::string& vec_name)
 
 
 
-
 void SystemBase::add_variable (const std::string& var,
 			       const FEType& type)
 {  
@@ -658,10 +716,6 @@ unsigned short int SystemBase::variable_number (const std::string& var) const
 
 
 
-
-
-
-
 std::string SystemBase::get_info() const
 {
   std::ostringstream out;
@@ -670,7 +724,9 @@ std::string SystemBase::get_info() const
   const std::string& sys_name = this->name();
       
   out << "   System \"" << sys_name << "\"" << std::endl
+      << "    Type \""  << this->system_type() << "\"" << std::endl
       << "    Variables=";
+  
   for (unsigned int vn=0; vn<this->n_vars(); vn++)
       out << "\"" << this->variable_name(vn) << "\" ";
      
@@ -722,4 +778,24 @@ std::string SystemBase::get_info() const
   out << "    " << "n_additional_matrices()=" << this->n_additional_matrices() << std::endl;
   
   return out.str();
+}
+
+
+
+void SystemBase::attach_init_function (void fptr(EquationSystems& es,
+						 const std::string& name))
+{
+  assert (fptr != NULL);
+  
+  init_system = fptr;
+}
+
+
+
+void SystemBase::attach_assemble_function (void fptr(EquationSystems& es,
+						     const std::string& name))
+{
+  assert (fptr != NULL);
+  
+  assemble_system = fptr;  
 }

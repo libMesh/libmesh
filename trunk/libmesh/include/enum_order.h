@@ -1,4 +1,4 @@
-// $Id: enum_order.h,v 1.5 2003-02-13 22:56:07 benkirk Exp $
+// $Id: enum_order.h,v 1.6 2003-05-15 23:34:33 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -27,10 +27,10 @@
 
 // ------------------------------------------------------------
 // enum Order definition
-namespace MeshEnums {
+namespace libMeshEnums {
 
   /**
-   * \enum MeshEnums::Order defines an \p enum for polynomial orders.
+   * \enum libMeshEnums::Order defines an \p enum for polynomial orders.
    * Fixing each label to a specific int, since \p InfFE uses 
    * \p static_cast<unsigned int>.
    */
@@ -62,6 +62,6 @@ namespace MeshEnums {
 
 }
 
-using namespace MeshEnums;
+using namespace libMeshEnums;
 
 #endif

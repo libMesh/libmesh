@@ -1,4 +1,4 @@
-// $Id: newmark_system.C,v 1.4 2003-05-04 23:59:00 benkirk Exp $
+// $Id: newmark_system.C,v 1.5 2003-05-15 23:34:34 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -21,23 +21,24 @@
 
 // C++ includes
 
-
 // Local includes
 #include "newmark_system.h"
 #include "equation_systems.h"
+#include "sparse_matrix.h"
+#include "mesh_logging.h"
+
 
 
 
 // ------------------------------------------------------------
 // NewmarkSystem implementation
-NewmarkSystem::NewmarkSystem (EquationSystems<NewmarkSystem>& es,
-			      const std::string&           name,
-			      const unsigned int           number) :
-  SystemBase             (es.get_mesh(), name, number),
-  init_cond_fptr         (NULL),
-  assemble_fptr          (NULL),
-  solve_fptr             (NULL),
-  _equation_systems      (es)
+NewmarkSystem::NewmarkSystem (EquationSystems& es,
+			      const std::string& name,
+			      const unsigned int number) :
+  
+  TransientSystem    (es, name, number),
+  _finished_assemble (false)
+  
 {
   // default values of the newmark parameters
   _equation_systems.set_parameter("Newmark alpha") = .25;
@@ -45,7 +46,7 @@ NewmarkSystem::NewmarkSystem (EquationSystems<NewmarkSystem>& es,
 
   // add additional matrices and vectors that will be used in the
   // newmark algorithm to the data structure
-  // functions SystemBase::add_matrix and SystemBase::add_vector
+  // functions TransientSystem::add_matrix and TransientSystem::add_vector
   // are used so we do not have to bother about initialization and
   // dof mapping
 
@@ -69,20 +70,15 @@ NewmarkSystem::NewmarkSystem (EquationSystems<NewmarkSystem>& es,
   // results from the previous time step
   this->add_vector ("old_solution");
   this->add_vector ("old_acceleration");
-
-  // set bool to false
-  _finished_assemble =false;
 }
 
 
 
 NewmarkSystem::~NewmarkSystem ()
 {
-  //init_system_fptr = assemble_fptr = NULL;
   // clear the parameters and integration constants
   _equation_systems.unset_parameter("Newmark alpha");
   _equation_systems.unset_parameter("Newmark delta");
-
 }
 
 
@@ -91,12 +87,11 @@ void NewmarkSystem::clear ()
 {
   // use parent clear this will also clear the
   // matrices and vectors added in the constructor
-  SystemBase::clear();
+  TransientSystem::clear();
 
   // clear the parameters and integration constants
   _equation_systems.unset_parameter("Newmark alpha");
   _equation_systems.unset_parameter("Newmark delta");
-
 
   // set bool to false
   _finished_assemble = false;
@@ -104,55 +99,43 @@ void NewmarkSystem::clear ()
 
 
 
-
-void NewmarkSystem::init ()
-{
-  assert (_mesh.is_prepared());
-  
-  // initialize parent data
-  SystemBase::init();
-}
-
-
-
 void NewmarkSystem::reinit ()
 {
-  assert (_mesh.is_prepared());
+  error();
   
   // initialize parent data
-  SystemBase::reinit();
-
-  error();
+  TransientSystem::reinit();
 }
 
 
 
 void NewmarkSystem::assemble ()
 {
-  assert (assemble_fptr != NULL);
-  assert (!_finished_assemble);
+  assert (assemble_system != NULL);
 
-  // prepare matrix with the help of the _dof_map, 
-  // fill with sparsity pattern
-  SystemBase::assemble();
-
-  // Log how long the user's matrix assembly code takes
-  START_LOG("assemble()", "NewmarkSystem");
-  
-  // Call the user-specified matrix assembly function
-  this->assemble_fptr (_equation_systems, this->name());
-
-  // Stop logging the user code
-  STOP_LOG("assemble()", "NewmarkSystem");
-
-  // compute the effective system matrix
-  this->compute_matrix();
-
-  // apply initial conditions
-  this->initial_conditions();
-
-  _finished_assemble = true;
-
+  if (!_finished_assemble)
+    {
+      // prepare matrix with the help of the _dof_map, 
+      // fill with sparsity pattern
+      TransientSystem::assemble();
+      
+      // Log how long the user's matrix assembly code takes
+      START_LOG("assemble()", "NewmarkSystem");
+      
+      // Call the user-specified matrix assembly function
+      this->assemble_system (_equation_systems, this->name());
+      
+      // Stop logging the user code
+      STOP_LOG("assemble()", "NewmarkSystem");
+      
+      // compute the effective system matrix
+      this->compute_matrix();
+      
+      // apply initial conditions
+      this->initial_conditions();
+      
+      _finished_assemble = true;
+    }
 }
 
 
@@ -166,8 +149,8 @@ void NewmarkSystem::initial_conditions ()
   // Call the user-specified function for initial conditions.
   // If this function is not provided by the user
   // we simply assume at rest conditions and zero the vectors.
-  if (init_cond_fptr != NULL)
-    this->init_cond_fptr (_equation_systems, this->name());
+  if (init_system != NULL)
+    this->init_system (_equation_systems, this->name());
   else
     { 
       this->get_vector("displacement").zero();
@@ -177,14 +160,12 @@ void NewmarkSystem::initial_conditions ()
 
   // Stop logging the user code
   STOP_LOG("initial_conditions ()", "NewmarkSystem");
-
-
 }
+
 
 
 void NewmarkSystem::compute_matrix ()
 {
-
   // zero the global matrix
   this->matrix->zero();
 
@@ -194,22 +175,25 @@ void NewmarkSystem::compute_matrix ()
   // this->mass->close      ();
 
   // add up the matrices
-  this->matrix->add (1., this->get_matrix ("stiffness"));
+  this->matrix->add (1.,   this->get_matrix ("stiffness"));
   this->matrix->add (_a_0, this->get_matrix ("mass"));
   this->matrix->add (_a_1, this->get_matrix ("damping"));
 
 }
 
 
+
 void NewmarkSystem::update_rhs ()
 {
+  START_LOG("update_rhs ()", "NewmarkSystem");
+  
   // zero the rhs-vector
   NumericVector<Number>& rhs = *this->rhs;
   rhs.zero();
 
   // get writable references to some vectors
-  NumericVector<Number>&  rhs_m          = this->get_vector("rhs_m");
-  NumericVector<Number>&  rhs_c          = this->get_vector("rhs_c");
+  NumericVector<Number>& rhs_m = this->get_vector("rhs_m");
+  NumericVector<Number>& rhs_c = this->get_vector("rhs_c");
 
 
   // zero the vectors for matrix-vector product
@@ -229,25 +213,29 @@ void NewmarkSystem::update_rhs ()
   rhs.add(this->get_vector("force"));
   rhs.add_vector(rhs_m, this->get_matrix("mass"));
   rhs.add_vector(rhs_c, this->get_matrix("damping"));
-
+  
+  STOP_LOG("update_rhs ()", "NewmarkSystem");
 }
+
 
 
 void NewmarkSystem::update_u_v_a ()
 {
+  START_LOG("update_u_v_a ()", "NewmarkSystem");
+  
   // get some references for convenience
-  const NumericVector<Number>&  solu     = *this->solution;
+  const NumericVector<Number>&  solu = *this->solution;
 
-  NumericVector<Number>&  disp_vec       = this->get_vector("displacement");
-  NumericVector<Number>&  vel_vec        = this->get_vector("velocity");
-  NumericVector<Number>&  acc_vec        = this->get_vector("acceleration");
-  NumericVector<Number>&  old_acc        = this->get_vector("old_acceleration");
-  NumericVector<Number>&  old_solu       = this->get_vector("old_solution");
+  NumericVector<Number>&  disp_vec   = this->get_vector("displacement");
+  NumericVector<Number>&  vel_vec    = this->get_vector("velocity");
+  NumericVector<Number>&  acc_vec    = this->get_vector("acceleration");
+  NumericVector<Number>&  old_acc    = this->get_vector("old_acceleration");
+  NumericVector<Number>&  old_solu   = this->get_vector("old_solution");
 
   // copy data
   old_solu = disp_vec;
   disp_vec = solu;
-  old_acc = acc_vec;
+  old_acc  = acc_vec;
 
   // compute the new acceleration vector
   acc_vec.scale(-_a_3);
@@ -258,48 +246,8 @@ void NewmarkSystem::update_u_v_a ()
   // compute the new velocity vector
   vel_vec.add(_a_6,old_acc);
   vel_vec.add(_a_7,acc_vec);
-
-}
-
-std::pair<unsigned int, Real>
-NewmarkSystem::solve ()
-{
-
-  // make sure that the system is assembled
-  if(!_finished_assemble)
-    {
-      std::cerr << "ERROR: Need to assemble the system before calling solve(). " << std::endl;
-      error();
-    }
-
-
-  // Assemble the linear system
-  // this->assemble ();
-
-  // Call the user specified pre-solve method
-  // if it is provided
-  // if(this->solve_fptr != NULL)
-  //    this->solve_fptr (_equation_systems, this->name());
-
-  // Log how long the linear solve takes.
-  START_LOG("solve()", "NewmarkSystem");
   
-  // Get the user-specifiied linear solver tolerance
-  const Real tol            =
-    _equation_systems.parameter("linear solver tolerance");
-
-  // Get the user-specified maximum # of linear solver iterations
-  const unsigned int maxits =
-    static_cast<unsigned int>(_equation_systems.parameter("linear solver maximum iterations"));
-
-  // Solve the linear system
-  const std::pair<unsigned int, Real> rval = 
-    linear_solver_interface->solve (*matrix, *solution, *rhs, tol, maxits);
-
-  // Stop logging the linear solve
-  STOP_LOG("solve()", "NewmarkSystem");
-
-  return rval; 
+  STOP_LOG("update_u_v_a ()", "NewmarkSystem");
 }
 
 
@@ -326,52 +274,4 @@ void NewmarkSystem::set_newmark_parameters (const Real delta_T,
   _a_5 = delta_T/2.*(delta/alpha-2.);
   _a_6 = delta_T*(1.-delta);
   _a_7 = delta*delta_T;
-
-
-}
-
-
-
-
-bool NewmarkSystem::compare (const NewmarkSystem& other_system, 
-			     const Real threshold,
-			     const bool verbose) const
-{
-  /* provided the parameters alpha and delta are identical
-   * (what EquationSystems will check, since it owns the parameters),
-   * we have no additional data to compare, so let SystemBase do the job
-   */
-  const SystemBase& other_system_base = static_cast<const SystemBase&>(other_system);
-  return SystemBase::compare (other_system_base, threshold, verbose);
-}
-
-
-
-
-void NewmarkSystem::attach_init_cond_function(void fptr(EquationSystems<NewmarkSystem>& es,
-							const std::string& name))
-{
-  assert (fptr != NULL);
-  
-  init_cond_fptr = fptr;
-}
-
-
-
-void NewmarkSystem::attach_assemble_function(void fptr(EquationSystems<NewmarkSystem>& es,
-						    const std::string& name))
-{
-  assert (fptr != NULL);
-  
-  assemble_fptr = fptr;  
-}
-
-
-
-void NewmarkSystem::attach_solve_function(void fptr(EquationSystems<NewmarkSystem>& es,
-						      const std::string& name))
-{
-  assert (fptr != NULL);
-  
-  solve_fptr = fptr;
 }

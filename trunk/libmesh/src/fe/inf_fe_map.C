@@ -1,4 +1,4 @@
-// $Id: inf_fe_map.C,v 1.4 2003-04-29 19:48:09 spetersen Exp $
+// $Id: inf_fe_map.C,v 1.5 2003-05-15 23:34:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,7 +26,7 @@
 #include "fe.h"
 #include "elem.h"
 #include "inf_fe_macro.h"
-
+#include "mesh_logging.h"
 
 
 

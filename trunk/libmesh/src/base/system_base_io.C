@@ -1,4 +1,4 @@
-// $Id: system_base_io.C,v 1.1 2003-04-05 02:27:35 ddreyer Exp $
+// $Id: system_base_io.C,v 1.2 2003-05-15 23:34:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -22,18 +22,13 @@
 
 
 // System Includes
-#ifdef HAVE_RPC_RPC_H
-# include <rpc/rpc.h>
-#endif
-
-
 
 // Local Includes
-#include "libmesh.h"
-#include "fe_type.h"
-#include "petsc_interface.h"
-#include "xdr_cxx.h"
 #include "system_base.h"
+#include "numeric_vector.h"
+#include "libmesh.h"
+#include "mesh.h"
+#include "xdr_cxx.h"
 
 // Forward Declarations
 
@@ -314,10 +309,10 @@ void SystemBase::read_data (Xdr& io,
    * simply go through the list
    */
 
-  typedef std::map<std::string, NumericVector<Number>* >::iterator other_vectors_iterator;
+  std::map<std::string, NumericVector<Number>* >::iterator
+    pos = this->_other_vectors.begin();
   
-  for(other_vectors_iterator pos = this->_other_vectors.begin();
-      pos != this->_other_vectors.end(); ++pos)
+  for(; pos != this->_other_vectors.end(); ++pos)
     {
 
 
@@ -398,7 +393,7 @@ void SystemBase::read_data (Xdr& io,
 
 
 
-void SystemBase::write(Xdr& io)
+void SystemBase::write(Xdr& io) const
 {
   /**
    * This program implements the output of a
@@ -615,11 +610,12 @@ void SystemBase::write(Xdr& io)
 
 
   {
-    typedef std::map<std::string, NumericVector<Number>* >::iterator other_vectors_iterator;  
+    std::map<std::string, NumericVector<Number>* >::const_iterator
+      vec_pos = this->_other_vectors.begin();
+    
     unsigned int cnt=0;
 
-    for(other_vectors_iterator vec_pos = this->_other_vectors.begin();
-	vec_pos != this->_other_vectors.end(); ++vec_pos)
+    for(;  vec_pos != this->_other_vectors.end(); ++vec_pos)
       {
 	/**
 	 * 5.)
@@ -648,7 +644,7 @@ void SystemBase::write(Xdr& io)
 
 
 void SystemBase::write_data (Xdr& io,
-			     const bool write_additional_data)
+			     const bool write_additional_data) const
 {
   /**
    * This program implements the output of the vectors
@@ -770,10 +766,10 @@ void SystemBase::write_data (Xdr& io,
   if (write_additional_data)
     {	  
 
-      typedef std::map<std::string, NumericVector<Number>* >::iterator other_vectors_iterator;
+      std::map<std::string, NumericVector<Number>* >::const_iterator
+	pos = _other_vectors.begin();
   
-      for(other_vectors_iterator pos = this->_other_vectors.begin();
-	  pos != this->_other_vectors.end(); ++pos)
+      for(; pos != this->_other_vectors.end(); ++pos)
         {
 	  /**
 	   * fill with zero.  In general, a resize is not necessary

@@ -1,4 +1,4 @@
-// $Id: laspack_vector.h,v 1.15 2003-05-05 22:23:07 benkirk Exp $
+// $Id: laspack_vector.h,v 1.16 2003-05-15 23:34:33 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson

@@ -1,4 +1,4 @@
-// $Id: ex7.C,v 1.23 2003-04-08 22:54:09 benkirk Exp $
+// $Id: ex7.C,v 1.24 2003-05-15 23:34:32 benkirk Exp $
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
   
@@ -31,6 +31,7 @@
  */
 #include "libmesh.h"
 #include "mesh.h"
+#include "mesh_logging.h"
 #include "equation_systems.h"
 
 
@@ -106,7 +107,7 @@
  * the mass, damping and stiffness matrices.  It will @e not
  * form an overall system matrix ready for solution.
  */
-void assemble_helmholtz(EquationSystems<FrequencySystem>& es,
+void assemble_helmholtz(EquationSystems& es,
 			const std::string& system_name);
 
 /**
@@ -114,7 +115,7 @@ void assemble_helmholtz(EquationSystems<FrequencySystem>& es,
  * the previously-assembled mass, damping and stiffness matrices
  * to the overall matrix, which then renders ready for solution.
  */
-void add_M_C_K_helmholtz(EquationSystems<FrequencySystem>& es,
+void add_M_C_K_helmholtz(EquationSystems& es,
 			 const std::string& system_name);
 
 
@@ -228,18 +229,19 @@ int main (int argc, char** argv)
      * Create an equation systems object, which now handles
      * a frequency system, as opposed to previous examples.
      */
-    EquationSystems<FrequencySystem> equation_systems (mesh);
+    EquationSystems equation_systems (mesh);
     
 
     /**
      * Create a system named "Helmholtz"
      */
-    equation_systems.add_system ("Helmholtz");
+    equation_systems.add_system<FrequencySystem> ("Helmholtz");
     
     /**
      * Use a handy reference to this system
      */
-    FrequencySystem & f_system = equation_systems ("Helmholtz");
+    FrequencySystem & f_system =
+      equation_systems.get_system<FrequencySystem> ("Helmholtz");
 
 
     /**
@@ -338,7 +340,7 @@ int main (int argc, char** argv)
      * written to disk.  By default, the additional vectors are also
      * saved.
      */
-    equation_systems.write ("eqn_sys.dat", Xdr::WRITE);
+    equation_systems.write ("eqn_sys.dat", libMeshEnums::WRITE);
 
   }
 
@@ -356,7 +358,7 @@ int main (int argc, char** argv)
 
 
 
-void assemble_helmholtz(EquationSystems<FrequencySystem>& es,
+void assemble_helmholtz(EquationSystems& es,
 			const std::string& system_name)
 {
 #ifdef USE_COMPLEX_NUMBERS
@@ -380,7 +382,8 @@ void assemble_helmholtz(EquationSystems<FrequencySystem>& es,
   /**
    * Get a reference to our system, as before
    */
-  FrequencySystem & f_system = es (system_name);
+  FrequencySystem & f_system =
+    es.get_system<FrequencySystem> (system_name);
 
   /**
    * A const reference to the \p DofMap object for this system.  The \p DofMap
@@ -618,7 +621,8 @@ void assemble_helmholtz(EquationSystems<FrequencySystem>& es,
 	       * The value of the shape functions at the quadrature
 	       * points.
 	       */
-	      const std::vector<std::vector<Real> >&  phi_face = fe_face->get_phi();
+	      const std::vector<std::vector<Real> >&  phi_face =
+		fe_face->get_phi();
 	      
 	      /**
 	       * The Jacobian * Quadrature Weight at the quadrature
@@ -712,7 +716,7 @@ void assemble_helmholtz(EquationSystems<FrequencySystem>& es,
 
 
 
-void add_M_C_K_helmholtz(EquationSystems<FrequencySystem>& es,
+void add_M_C_K_helmholtz(EquationSystems& es,
 			 const std::string& system_name)
 {
 #ifdef USE_COMPLEX_NUMBERS
@@ -728,7 +732,8 @@ void add_M_C_K_helmholtz(EquationSystems<FrequencySystem>& es,
   /**
    * Get a reference to our system, as before
    */
-  FrequencySystem & f_system = es (system_name);
+  FrequencySystem & f_system =
+    es.get_system<FrequencySystem> (system_name);
 
   /**
    * Get the frequency, fluid density, and speed of sound
@@ -748,8 +753,8 @@ void add_M_C_K_helmholtz(EquationSystems<FrequencySystem>& es,
    * Get writable references to the overall matrix and vector, where the 
    * frequency-dependent system is to be collected
    */
-  SparseMatrix<Number>&  matrix                = *f_system.matrix;
-  NumericVector<Number>& rhs                   = *f_system.rhs;
+  SparseMatrix<Number>&  matrix          = *f_system.matrix;
+  NumericVector<Number>& rhs             = *f_system.rhs;
 
 
   /**
