@@ -1,4 +1,4 @@
-// $Id: system.h,v 1.4 2004-09-27 13:41:46 jwpeterson Exp $
+// $Id: system.h,v 1.5 2004-09-27 15:56:44 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -458,8 +458,13 @@ protected:
    */
   bool _can_add_vectors;
 
-
-
+  /**
+   * This flag is used only when *reading* in a system from file.
+   * Based on the system header, it keeps track of whether or not
+   * additional vectors were actually written for this file.
+   */
+  bool _additional_data_written;
+  
   // -------------------------------------------------
   // Necessary classes
   //

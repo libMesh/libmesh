@@ -1,4 +1,4 @@
-// "$Id: xdr_cxx.C,v 1.18 2004-08-06 16:48:41 jwpeterson Exp $\n"
+// "$Id: xdr_cxx.C,v 1.19 2004-09-27 15:56:49 jwpeterson Exp $\n"
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -269,7 +269,7 @@ void Xdr::data (unsigned int& a, const char* comment)
       {
 #ifdef HAVE_XDR
 
-	assert (is_open());
+	assert (this->is_open());
 
 	xdr_u_int(xdrs, &a);
 
@@ -1158,11 +1158,11 @@ void Xdr::data (std::vector<double>& v, const char* comment)
       {
 #ifdef HAVE_XDR
 
-	assert (is_open());
+	assert (this->is_open());
 
 	unsigned int length = v.size();
 
-	data(length, "# vector length");
+	this->data(length, "# vector length");
 
 	xdr_vector(xdrs, 
 		   (char*) &v[0],
@@ -1188,11 +1188,11 @@ void Xdr::data (std::vector<double>& v, const char* comment)
       {
 #ifdef HAVE_XDR
 
-	assert (is_open());
+	assert (this->is_open());
 
 	unsigned int length=0;
 
-	data(length, "# vector length");
+	this->data(length, "# vector length");
 
 	v.resize(length);
 
@@ -1225,8 +1225,12 @@ void Xdr::data (std::vector<double>& v, const char* comment)
 
 	unsigned int length=0;
 
-	data(length, "# vector length");
-
+	this->data(length, "# vector length");
+	
+	// If you were expecting to read in a vector at this
+	// point, it's not going to happen if length == 0!
+	// assert (length != 0);
+	
 	v.resize(length);
 
 	for (unsigned int i=0; i<v.size(); i++)
