@@ -1,4 +1,4 @@
-// $Id: equation_systems_io.C,v 1.18 2003-03-12 00:33:20 jwpeterson Exp $
+// $Id: equation_systems_io.C,v 1.19 2003-03-12 20:15:11 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -182,7 +182,6 @@ void EquationSystems<T_sys>::read(const std::string& name,
 
 #else
 
-//TODO:[DD] flag the use of infinite elements, somewhere in the outfile?
 	  int radial_fam=0;
 	  int i_map=0;
 	  
@@ -446,9 +445,18 @@ void EquationSystems<T_sys>::write(const std::string& name,
 	      /**
 	       * do the same for radial_order
 	       */
+	      {
+		comment = "# Variable \"";
+		sprintf(buf, "%s", var_name.c_str());
+		comment += buf;
+		comment += "\", system \"";
+		sprintf(buf, "%s\"", sys_name.c_str());
+		comment += buf;
+		comment += ", radial approximation order";
+	      }
 	      int rad_order = static_cast<int>(system.variable_type(var).radial_order);
 	      
-	      io.data (rad_order);
+	      io.data (rad_order, comment.c_str());
 
 #endif
    
@@ -481,11 +489,31 @@ void EquationSystems<T_sys>::write(const std::string& name,
 
 #ifdef ENABLE_INFINITE_ELEMENTS
 
+	      {
+		comment = "# Variable \"";
+		sprintf(buf, "%s", var_name.c_str());
+		comment += buf;
+		comment += "\", system \"";
+		sprintf(buf, "%s\"", sys_name.c_str());
+		comment += buf;
+		comment += ", radial finite element type";
+	      }
+
 	      int radial_fam = static_cast<int>(type.radial_family);
 	      int i_map = static_cast<int>(type.inf_map);
 	      
-	      io.data (radial_fam);
-	      io.data (i_map);
+	      io.data (radial_fam, comment.c_str());
+
+	      {
+		comment = "# Variable \"";
+		sprintf(buf, "%s", var_name.c_str());
+		comment += buf;
+		comment += "\", system \"";
+		sprintf(buf, "%s\"", sys_name.c_str());
+		comment += buf;
+		comment += ", infinite mapping type";
+	      }
+	      io.data (i_map, comment.c_str());
 
 #endif
 

@@ -1,4 +1,4 @@
-// $Id: ex6.C,v 1.16 2003-03-11 04:35:18 ddreyer Exp $
+// $Id: ex6.C,v 1.17 2003-03-12 20:14:59 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -176,7 +176,8 @@ int main (int argc, char** argv)
 		     -1., 1.,
 		     -1., 1.,
 		     -1., 1.,
-		     (dim == 2) ? QUAD4 : HEX8); //HEX20); //HEX27);
+		     (dim == 2) ? QUAD8 : HEX27);
+//		     (dim == 2) ? QUAD4 : HEX8); //HEX20); //HEX27);
 
     /**
      * Print information about the mesh to the screen.

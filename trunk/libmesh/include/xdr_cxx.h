@@ -1,4 +1,4 @@
-// $Id: xdr_cxx.h,v 1.6 2003-02-13 22:56:08 benkirk Exp $
+// $Id: xdr_cxx.h,v 1.7 2003-03-12 20:15:10 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -210,21 +210,6 @@ public:
 #ifdef USE_COMPLEX_NUMBERS
 
   /**
-   * Inputs or outputs a single complex<float>.
-   */
-  void data(std::complex<float>& a, const char* comment="");
-
-  /**
-   * Same, but provides an \p ostream like interface.
-   */
-  Xdr& operator << (std::complex<float>& a) { assert (writing()); data(a); return *this; }
-
-  /**
-   * Same, but provides an \p istream like interface.
-   */
-  Xdr& operator >> (std::complex<float>& a) { assert (reading()); data(a); return *this; }
-
-  /**
    * Inputs or outputs a single complex<double>.
    */
   void data(std::complex<double>& a, const char* comment="");
@@ -239,8 +224,8 @@ public:
    */
   Xdr& operator >> (std::complex<double>& a) { assert (reading()); data(a); return *this; }
 
-
 #endif
+
 
   /**
    * Inputs or outputs a vector of integers.
@@ -334,21 +319,6 @@ public:
 
 
 #ifdef USE_COMPLEX_NUMBERS
-
-  /**
-   * Inputs or outputs a vector of complex<float>.
-   */
-  void data(std::vector< std::complex<float> >& v, const char* comment="");
-
-  /**
-   * Same, but provides an \p ostream like interface.
-   */
-  Xdr& operator << (std::vector< std::complex<float> >& v) { assert (writing()); data(v); return *this; }
-
-  /**
-   * Same, but provides an \p istream like interface.
-   */
-  Xdr& operator >> (std::vector< std::complex<float> >& v) { assert (reading()); data(v); return *this; }
 
   /**
    * Inputs or outputs a vector of complex<double>.
