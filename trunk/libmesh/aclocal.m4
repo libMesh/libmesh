@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.28 2003-04-18 14:02:59 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.29 2003-04-18 14:11:12 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -794,7 +794,7 @@ using namespace std;
  AC_LANG_RESTORE
 ])
 if test "$ac_cv_cxx_have_locale" = yes; then
-  AC_DEFINE(HAVE_LOCALE,,[define if the compiler has stringstream])
+  AC_DEFINE(HAVE_LOCALE,,[define if the compiler has locale])
 fi
 ])
 dnl -------------------------------------------------------------
