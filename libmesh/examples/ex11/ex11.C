@@ -1,4 +1,4 @@
-// $Id: ex11.C,v 1.1 2003-06-06 14:42:45 benkirk Exp $
+// $Id: ex11.C,v 1.2 2003-06-10 19:04:45 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -455,8 +455,9 @@ void assemble_stokes (EquationSystems& es,
        * boundary conditions.  For this example we will only
        * consider simple Dirichlet boundary conditions imposed
        * via the penalty method. The penalty method used here
-       * is equivalent to lumping the matrix resulting from the
-       * L2 projection penalty approach introduced in example 3.
+       * is equivalent (for Lagrange basis functions) to lumping
+       * the matrix resulting from the L2 projection penalty
+       * approach introduced in example 3.
        */      
       {
 	

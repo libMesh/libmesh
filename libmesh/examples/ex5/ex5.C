@@ -1,4 +1,4 @@
-// $Id: ex5.C,v 1.22 2003-06-04 14:59:24 ddreyer Exp $
+// $Id: ex5.C,v 1.23 2003-06-10 19:04:47 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -367,27 +367,27 @@ void assemble_poisson(EquationSystems& es,
 	      }
 
 
+	  const Real x = q_point[qp](0);
+	  const Real y = q_point[qp](1);
+	  const Real z = q_point[qp](2);
+	  const Real eps = 1.e-3;
+	       
+	  const Real uxx = (exact_solution(x-eps,y,z) +
+			    exact_solution(x+eps,y,z) +
+			    -2.*exact_solution(x,y,z))/eps/eps;
+	      
+	  const Real uyy = (exact_solution(x,y-eps,z) +
+			    exact_solution(x,y+eps,z) +
+			    -2.*exact_solution(x,y,z))/eps/eps;
+	      
+	  const Real uzz = (exact_solution(x,y,z-eps) +
+			    exact_solution(x,y,z+eps) +
+			    -2.*exact_solution(x,y,z))/eps/eps;
+
+	  const Real fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
+	      
 	  for (unsigned int i=0; i<phi.size(); i++)
 	    {
-	      const Real x = q_point[qp](0);
-	      const Real y = q_point[qp](1);
-	      const Real z = q_point[qp](2);
-	      const Real eps = 1.e-3;
-	       
-	      const Real uxx = (exact_solution(x-eps,y,z) +
-				exact_solution(x+eps,y,z) +
-				-2.*exact_solution(x,y,z))/eps/eps;
-	      
-	      const Real uyy = (exact_solution(x,y-eps,z) +
-				exact_solution(x,y+eps,z) +
-				-2.*exact_solution(x,y,z))/eps/eps;
-	      
-	      const Real uzz = (exact_solution(x,y,z-eps) +
-				exact_solution(x,y,z+eps) +
-				-2.*exact_solution(x,y,z))/eps/eps;
-
-	      const Real fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
-	      
 	      Fe(i) += JxW[qp]*fxy*phi[i][qp];
 	    } // end of the RHS summation loop
 	  
