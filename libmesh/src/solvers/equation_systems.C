@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.13 2004-11-14 18:51:59 jwpeterson Exp $
+// $Id: equation_systems.C,v 1.14 2004-11-14 20:16:10 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,6 @@
 // Local Includes
 #include "fe_interface.h"
 #include "libmesh.h"
-#include "elem.h"
 #include "system.h"
 #include "frequency_system.h"
 #include "newmark_system.h"

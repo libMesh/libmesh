@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.9 2004-11-08 00:11:03 jwpeterson Exp $
+// $Id: equation_systems.h,v 1.10 2004-11-14 20:16:08 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -34,7 +34,7 @@
 #include "mesh.h"
 #include "data_map.h"
 #include "enum_xdr_mode.h"
-//#include "node_iterators.h"
+#include "elem.h"
 
 // HP aCC needs these for some reason
 #ifdef __HP_aCC
