@@ -1,4 +1,4 @@
-// $Id: cell_hex.C,v 1.5 2003-01-24 17:24:42 jwpeterson Exp $
+// $Id: cell_hex.C,v 1.6 2003-01-25 01:42:46 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,6 +23,7 @@
 
 // Local includes
 #include "cell_hex.h"
+#include "face_quad4.h"
 
 
 
@@ -35,7 +36,7 @@ AutoPtr<Elem> Hex::side (const unsigned int i) const
 
 
   
-  AutoPtr<Elem> face(Elem::build(QUAD4));
+  AutoPtr<Elem> face(new Quad4);
 
   // Think of a unit cube: (-1,1) x (-1,1)x (-1,1)
   switch (i)

@@ -1,4 +1,4 @@
-// $Id: mesh_xdr_support.C,v 1.5 2003-01-24 17:24:44 jwpeterson Exp $
+// $Id: mesh_xdr_support.C,v 1.6 2003-01-25 01:42:46 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -33,7 +33,7 @@
 #include "xdrIO.h"
 #include "mesh_xdr_support.h"
 #include "elem.h"
-
+#include "cell_hex27.h"
 
 
 void XdrInterface::mesh_interface(const std::string& name,
@@ -417,7 +417,7 @@ void XdrInterface::mesh_interface(const std::string& name,
 	  {
 	    for (int ielm=0; ielm < numElem; ++ielm)
 	      {
-		elements[ielm] = Elem::build(HEX27);
+		elements[ielm] = new Hex27;
 		for (int innd=0; innd < 27; ++innd)
 		  elements[ielm]->set_node(innd) = nodes[conn[innd+2+(27+2)*ielm]];	
 	      };

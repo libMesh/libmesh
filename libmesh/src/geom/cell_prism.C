@@ -1,4 +1,4 @@
-// $Id: cell_prism.C,v 1.5 2003-01-24 17:24:43 jwpeterson Exp $
+// $Id: cell_prism.C,v 1.6 2003-01-25 01:42:46 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -22,8 +22,8 @@
 
 // Local includes
 #include "cell_prism.h"
-
-
+#include "face_quad4.h"
+#include "face_tri3.h"
 
 
 // ------------------------------------------------------------
@@ -34,8 +34,8 @@ AutoPtr<Elem> Prism::side (const unsigned int i) const
 
 
   
-  AutoPtr<Elem> faceq(Elem::build(QUAD4));
-  AutoPtr<Elem> facet(Elem::build(TRI3));
+  AutoPtr<Elem> faceq(new Quad4);
+  AutoPtr<Elem> facet(new Tri3);
 
   switch (i)
     {

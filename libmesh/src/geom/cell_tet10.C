@@ -1,4 +1,4 @@
-// $Id: cell_tet10.C,v 1.5 2003-01-24 17:24:43 jwpeterson Exp $
+// $Id: cell_tet10.C,v 1.6 2003-01-25 01:42:46 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,7 +23,7 @@
 // Local includes
 #include "mesh.h"
 #include "cell_tet10.h"
-
+#include "face_tri6.h"
 
 
 
@@ -35,7 +35,7 @@ AutoPtr<Elem> Tet10::build_side (const unsigned int i) const
 
 
   
-  AutoPtr<Elem> face(Elem::build(TRI6));
+  AutoPtr<Elem> face(new Tri6);
   
   switch (i)
     {

@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex8.C,v 1.6 2003-01-24 21:19:54 jwpeterson Exp $
+// $Id: cell_inf_hex8.C,v 1.7 2003-01-25 01:42:46 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -27,8 +27,8 @@
 // Local includes cont'd
 #include "mesh.h"
 #include "cell_inf_hex8.h"
-
-
+#include "face_quad4.h"
+#include "face_inf_quad4.h"
 
 
 // ------------------------------------------------------------
@@ -48,7 +48,7 @@ AutoPtr<Elem> InfHex8::build_side (const unsigned int i) const
       // the base, where the infinite element couples to conventional
       // elements
       {  
-        AutoPtr<Elem> face(Elem::build(QUAD4));
+        AutoPtr<Elem> face(new Quad4);
 
 	face->set_node(0) = get_node(0);
 	face->set_node(1) = get_node(1);
@@ -66,7 +66,7 @@ AutoPtr<Elem> InfHex8::build_side (const unsigned int i) const
     case 1:  // the face at y = -1
       // this face connects to another infinite element
       {
-	AutoPtr<Elem> face(Elem::build(INFQUAD4));
+	AutoPtr<Elem> face(new InfQuad4);
 
 	face->set_node(0) = get_node(0);
 	face->set_node(1) = get_node(1);
@@ -78,7 +78,7 @@ AutoPtr<Elem> InfHex8::build_side (const unsigned int i) const
     case 2:  // the face at x = 1
       // this face connects to another infinite element
       {
-	AutoPtr<Elem> face(Elem::build(INFQUAD4));
+	AutoPtr<Elem> face(new InfQuad4);
 
 	face->set_node(0) = get_node(1);
 	face->set_node(1) = get_node(2);
@@ -90,7 +90,7 @@ AutoPtr<Elem> InfHex8::build_side (const unsigned int i) const
     case 3: // the face at y = 1
       // this face connects to another infinite element
       {
-	AutoPtr<Elem> face(Elem::build(INFQUAD4));
+	AutoPtr<Elem> face(new InfQuad4);
 
 	face->set_node(0) = get_node(2);
 	face->set_node(1) = get_node(3);
@@ -102,7 +102,7 @@ AutoPtr<Elem> InfHex8::build_side (const unsigned int i) const
     case 4: // the face at x = -1
       // this face connects to another infinite element
       {  
-	AutoPtr<Elem> face(Elem::build(INFQUAD4));
+	AutoPtr<Elem> face(new InfQuad4);
 
 	face->set_node(0) = get_node(3);
 	face->set_node(1) = get_node(0);

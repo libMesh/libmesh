@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.4 2003-01-24 17:24:44 jwpeterson Exp $
+// $Id: mesh_generation.C,v 1.5 2003-01-25 01:42:46 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -549,7 +549,7 @@ void Mesh::build_sphere (const real rad,
 	    _elements.resize(5);
 	    
 	    for (unsigned int e=0; e<n_elem(); e++)
-	      _elements[e] = Elem::build(QUAD4);
+	      _elements[e] = new Quad4;
 	    
 	    // Element 0
 	    elem(0)->set_node(0) = _nodes[0];
@@ -673,10 +673,10 @@ void Mesh::build_sphere (const real rad,
 	    if ((type == QUAD9) ||
 		(type == TRI6))
 	      for (unsigned int e=0; e<n_elem(); e++)
-		_elements[e] = Elem::build(QUAD9);
+		_elements[e] = new Quad9;
 	    else
 	      for (unsigned int e=0; e<n_elem(); e++)
-		_elements[e] = Elem::build(QUAD8);
+		_elements[e] = new Quad8;
 		
 	    // Element 0
 	    elem(0)->set_node(0) = _nodes[0];

@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.5 2003-01-24 17:24:44 jwpeterson Exp $
+// $Id: mesh_base.C,v 1.6 2003-01-25 01:42:46 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -29,6 +29,11 @@
 #include "mesh_base.h"
 #include "face_tri3.h"
 #include "face_tri6.h"
+#include "cell_inf_prism6.h"
+#include "cell_inf_prism12.h"
+#include "cell_inf_hex8.h"
+#include "cell_inf_hex16.h"
+#include "cell_inf_hex18.h"
 
 
 #ifdef HAVE_SFCURVES
@@ -681,24 +686,24 @@ void MeshBase::build_inf_elem(const Point& origin,
 	{
 	  // TRIs					
 	case 3:	
-	  el=Elem::build(INFPRISM6);
+	  el=new InfPrism6;
 	  break;
 					 		
 	case 6: 
-	  el=Elem::build(INFPRISM12);
+	  el=new InfPrism12; 
 	  break;
 							
 	  // QUADs					
 	case 4: 
-	  el=Elem::build(INFHEX8);
+	  el=new InfHex8;
 	  break;
 							
 	case 8: 
-	  el=Elem::build(INFHEX16);
+	  el=new InfHex16;
 	  break;
 							
 	case 9: 
-	  el=Elem::build(INFHEX18);
+	  el=new InfHex18;
 	  break;
 
 	default: 

@@ -1,4 +1,4 @@
-// $Id: cell_prism6.C,v 1.6 2003-01-24 21:19:54 jwpeterson Exp $
+// $Id: cell_prism6.C,v 1.7 2003-01-25 01:42:46 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,8 +23,8 @@
 // Local includes
 #include "mesh.h"
 #include "cell_prism6.h"
-
-
+#include "face_quad4.h"
+#include "face_tri3.h"
 
 
 // ------------------------------------------------------------
@@ -39,7 +39,7 @@ AutoPtr<Elem> Prism6::build_side (const unsigned int i) const
     {
     case 0:  // the triangular face at z=-1
       {
-	AutoPtr<Elem> face(Elem::build(TRI3));
+	AutoPtr<Elem> face(new Tri3);
 
 	face->set_node(0) = get_node(0);
 	face->set_node(1) = get_node(2);
@@ -49,7 +49,7 @@ AutoPtr<Elem> Prism6::build_side (const unsigned int i) const
       }
     case 1:  // the quad face at y=0
       {
-	AutoPtr<Elem> face(Elem::build(QUAD4));
+	AutoPtr<Elem> face(new Quad4);
 	
 	face->set_node(0) = get_node(0);
 	face->set_node(1) = get_node(1);
@@ -60,7 +60,7 @@ AutoPtr<Elem> Prism6::build_side (const unsigned int i) const
       }
     case 2:  // the other quad face
       {
-	AutoPtr<Elem> face(Elem::build(QUAD4));
+	AutoPtr<Elem> face(new Quad4);
 
 	face->set_node(0) = get_node(1);
 	face->set_node(1) = get_node(2);
@@ -71,7 +71,7 @@ AutoPtr<Elem> Prism6::build_side (const unsigned int i) const
       }
     case 3: // the quad face at x=0
       {
-	AutoPtr<Elem> face(Elem::build(QUAD4));
+	AutoPtr<Elem> face(new Quad4);
 
 	face->set_node(0) = get_node(2);
 	face->set_node(1) = get_node(0);
@@ -82,7 +82,7 @@ AutoPtr<Elem> Prism6::build_side (const unsigned int i) const
       }
     case 4: // the triangular face at z=1
       {
-	AutoPtr<Elem> face(Elem::build(TRI3));
+	AutoPtr<Elem> face(new Tri3);
 
 	face->set_node(0) = get_node(3);
 	face->set_node(1) = get_node(4);

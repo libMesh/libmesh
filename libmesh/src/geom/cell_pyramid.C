@@ -1,4 +1,4 @@
-// $Id: cell_pyramid.C,v 1.5 2003-01-24 17:24:43 jwpeterson Exp $
+// $Id: cell_pyramid.C,v 1.6 2003-01-25 01:42:46 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,8 +23,8 @@
 // Local includes
 #include "mesh.h"
 #include "cell_pyramid.h"
-
-
+#include "face_tri3.h"
+#include "face_quad4.h"
 
 
 // ------------------------------------------------------------
@@ -39,7 +39,7 @@ AutoPtr<Elem> Pyramid::side (const unsigned int i) const
     {
     case 0:  // triangular face 1
       {
-	AutoPtr<Elem> face(Elem::build(TRI3));
+	AutoPtr<Elem> face(new Tri3); 
 
 	face->set_node(0) = get_node(0);
 	face->set_node(1) = get_node(1);
@@ -49,7 +49,7 @@ AutoPtr<Elem> Pyramid::side (const unsigned int i) const
       }
     case 1:  // triangular face 2
       {
-	AutoPtr<Elem> face(Elem::build(TRI3));
+	AutoPtr<Elem> face(new Tri3);
 
 	face->set_node(0) = get_node(1);
 	face->set_node(1) = get_node(2);
@@ -59,7 +59,7 @@ AutoPtr<Elem> Pyramid::side (const unsigned int i) const
       }
     case 2:  // triangular face 3
       {
-	AutoPtr<Elem> face(Elem::build(TRI3));
+	AutoPtr<Elem> face(new Tri3);
 
 	face->set_node(0) = get_node(2);
 	face->set_node(1) = get_node(3);
@@ -69,7 +69,7 @@ AutoPtr<Elem> Pyramid::side (const unsigned int i) const
       }
     case 3:  // triangular face 4
       {
-	AutoPtr<Elem> face(Elem::build(TRI3));
+	AutoPtr<Elem> face(new Tri3);
 
 	face->set_node(0) = get_node(3);
 	face->set_node(1) = get_node(0);
@@ -79,7 +79,7 @@ AutoPtr<Elem> Pyramid::side (const unsigned int i) const
       }
     case 4:  // the quad face at z=0
       {
-	AutoPtr<Elem> face(Elem::build(QUAD4));
+	AutoPtr<Elem> face(new Quad4);
 	
 	face->set_node(0) = get_node(0);
 	face->set_node(1) = get_node(3);

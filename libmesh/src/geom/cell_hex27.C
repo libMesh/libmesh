@@ -1,4 +1,4 @@
-// $Id: cell_hex27.C,v 1.6 2003-01-24 21:19:52 jwpeterson Exp $
+// $Id: cell_hex27.C,v 1.7 2003-01-25 01:42:46 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,7 +23,7 @@
 // Local includes
 #include "mesh.h"
 #include "cell_hex27.h"
-
+#include "face_quad9.h"
 
 
 
@@ -35,7 +35,7 @@ AutoPtr<Elem> Hex27::build_side (const unsigned int i) const
 
 
   
-  AutoPtr<Elem> face(Elem::build(QUAD9));
+  AutoPtr<Elem> face(new Quad9);
 
   // Think of a unit cube: (-1,1) x (-1,1) x (1,1)
   switch (i)
