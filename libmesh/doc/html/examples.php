@@ -181,6 +181,21 @@ refinement after the solve.  In the input file "ex14.in", the variable
 "refine_percentage" / "coarsen_percentage" determine the number of
 elements which will be refined / coarsened at each step.
 
+<h2><a href="ex15.php">Example 15</a> - Biharmonic Equation</h2>
+This example solves the Biharmonic equation on a square domain using a
+Galerkin formulation with C1 elements approximating the H^2_0 function
+space.  The initial mesh contains two TRI6 elements.  The mesh is
+provided in the standard libMesh ASCII format file named "domain.xda".
+In addition, an input file named "ex15.in" is provided which allows
+the user to set several parameters for the solution so that the
+problem can be re-run without a re-compile.  The solution technique
+employed is to have a refinement loop with a linear solve inside
+followed by a refinement of the grid and projection of the solution to
+the new grid In the final loop iteration, there is no additional
+refinement after the solve.  In the input file "ex15.in", the variable
+"max_r_steps" controls the number of refinement steps, and
+"max_r_level" controls the maximum element refinement level.
+
 
 </div>
 
