@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.54 2004-02-03 01:39:57 benkirk Exp $
+// $Id: dof_map.C,v 1.55 2004-02-26 14:15:48 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -358,7 +358,7 @@ void DofMap::distribute_dofs(const MeshBase& mesh)
 	for (unsigned int s=0; s<elem->n_neighbors(); s++)
 	  if (elem->neighbor(s) != NULL)
 	    
-	    // If the neighbor lives on a different processoe
+	    // If the neighbor lives on a different processor
 	    if (elem->neighbor(s)->processor_id() != libMesh::processor_id())
 	      {
 		// Get the DOF indices for this neighboring element
