@@ -1,4 +1,4 @@
-// $Id: ex8.C,v 1.2.2.1 2003-05-06 17:13:31 benkirk Exp $
+// $Id: ex8.C,v 1.2.2.2 2003-05-09 12:55:39 benkirk Exp $
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
   
@@ -25,6 +25,7 @@
 #include <iostream>
 #include <fstream>
 #include <algorithm>
+#include <stdio.h>
 #include <math.h>
 
 /**
