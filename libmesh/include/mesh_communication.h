@@ -1,4 +1,4 @@
-// $Id: mesh_communication.h,v 1.4 2003-09-16 15:59:31 benkirk Exp $
+// $Id: mesh_communication.h,v 1.5 2003-09-25 21:46:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -27,7 +27,7 @@
 // C++ Includes   -----------------------------------
 
 // Local Includes -----------------------------------
-#include "mesh_common.h"
+#include "libmesh_common.h"
 
 
 // Forward declarations

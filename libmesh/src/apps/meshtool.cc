@@ -1,4 +1,4 @@
-#include "mesh_config.h"
+#include "libmesh_config.h"
 
 // C++ includes
 #include <iostream>

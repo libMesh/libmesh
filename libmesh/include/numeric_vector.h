@@ -1,4 +1,4 @@
-// $Id: numeric_vector.h,v 1.19 2003-09-02 18:02:38 benkirk Exp $
+// $Id: numeric_vector.h,v 1.20 2003-09-25 21:46:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -27,7 +27,7 @@
 #include <vector>
 
 // Local includes
-#include "mesh_common.h"
+#include "libmesh_common.h"
 #include "auto_ptr.h"
 #include "enum_solver_package.h"
 #include "reference_counted_object.h"

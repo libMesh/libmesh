@@ -1,4 +1,4 @@
-// $Id: fe_type.h,v 1.10 2003-09-02 18:02:38 benkirk Exp $
+// $Id: fe_type.h,v 1.11 2003-09-25 21:46:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,7 @@
 // C++ includes
 
 // Local includes
-#include "mesh_config.h"
+#include "libmesh_config.h"
 #include "enum_order.h"
 #include "enum_fe_family.h"
 #include "enum_inf_map_type.h"

@@ -1,4 +1,3 @@
-mesh_config.h
-config.h
+libmesh_config.h
 ii_files
 so_locations

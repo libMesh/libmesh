@@ -1,4 +1,4 @@
-// $Id: factory.h,v 1.8 2003-09-02 18:02:38 benkirk Exp $
+// $Id: factory.h,v 1.9 2003-09-25 21:46:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -28,7 +28,7 @@
 #include <map>
 
 // Local includes
-#include "mesh_common.h"
+#include "libmesh_common.h"
 #include "auto_ptr.h"
 
 

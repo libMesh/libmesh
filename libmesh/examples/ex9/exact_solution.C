@@ -1,4 +1,4 @@
-// $Id: exact_solution.C,v 1.1 2003-05-30 14:48:30 benkirk Exp $
+// $Id: exact_solution.C,v 1.2 2003-09-25 21:46:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -23,7 +23,7 @@
 #include <math.h>
 
 // Mesh library includes
-#include "mesh_common.h"
+#include "libmesh_common.h"
 
 
 

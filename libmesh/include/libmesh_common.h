@@ -1,4 +1,4 @@
-// $Id: mesh_common.h,v 1.18 2003-09-16 15:59:31 benkirk Exp $
+// $Id: libmesh_common.h,v 1.1 2003-09-25 21:46:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -19,12 +19,12 @@
 
 
 
-#ifndef __mesh_common_h__
-#define __mesh_common_h__
+#ifndef __libmesh_common_h__
+#define __libmesh_common_h__
 
 
 // The library configuration options
-#include "mesh_config.h"
+#include "libmesh_config.h"
 
 // C++ includes everyone should know about
 #include <iostream>
@@ -109,13 +109,13 @@ typedef std::complex<double> COMPLEX;
 // If you want to make sure you are accessing a section of code just
 // stick a here(); in it, for example
 #undef here
-#define here()     { std::cout << "[" << libMeshBase::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; }
+#define here()     { std::cout << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; }
 
 #undef error
 #ifdef HAVE_MPI
-#  define error()    { std::cerr << "[" << libMeshBase::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; abort(); }
+#  define error()    { std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; abort(); }
 #else
-#  define error()    { std::cerr << "[" << libMeshBase::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; abort(); }
+#  define error()    { std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; abort(); }
 #endif
 
 #undef untested
@@ -140,4 +140,4 @@ typedef std::complex<double> COMPLEX;
 
 
 
-#endif // #define __mesh_common_h__
+#endif // #define __libmesh_common_h__

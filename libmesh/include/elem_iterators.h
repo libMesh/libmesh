@@ -1,4 +1,4 @@
-// $Id: elem_iterators.h,v 1.12 2003-09-02 18:02:37 benkirk Exp $
+// $Id: elem_iterators.h,v 1.13 2003-09-25 21:46:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -791,7 +791,7 @@ public:
    */
   basic_local_elem_iterator(const std::pair<T,T>& p,
 			    const bool b=true)
-    : basic_pid_elem_iterator<T>(p, libMeshBase::processor_id(), false)
+    : basic_pid_elem_iterator<T>(p, libMesh::processor_id(), false)
   {
     if (b) this->advance();
   }
@@ -848,7 +848,7 @@ public:
    */
   basic_active_local_elem_iterator(const std::pair<T,T>& p,
 				   const bool b=true)
-    : basic_active_pid_elem_iterator<T>(p, libMeshBase::processor_id(), false)
+    : basic_active_pid_elem_iterator<T>(p, libMesh::processor_id(), false)
   {
     if (b) this->advance();
   }

@@ -1,4 +1,4 @@
-// $Id: inf_fe_lagrange_eval.C,v 1.5 2003-09-02 18:02:41 benkirk Exp $
+// $Id: inf_fe_lagrange_eval.C,v 1.6 2003-09-25 21:46:56 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -19,7 +19,7 @@
 
 
 // Local Includes
-#include "mesh_config.h"
+#include "libmesh_config.h"
 #ifdef ENABLE_INFINITE_ELEMENTS
 #include "inf_fe.h"
 

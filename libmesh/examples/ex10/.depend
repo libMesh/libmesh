@@ -24,23 +24,24 @@ ex10.$(obj-suffix):\
     ../../include/enum_xdr_mode.h\
     ../../include/equation_systems.h\
     ../../include/error_estimator.h\
+    ../../include/error_vector.h\
     ../../include/fe.h\
     ../../include/fe_base.h\
     ../../include/fe_type.h\
     ../../include/frequency_system.h\
     ../../include/libmesh.h\
     ../../include/libmesh_base.h\
+    ../../include/libmesh_common.h\
+    ../../include/libmesh_config.h\
     ../../include/mesh.h\
     ../../include/mesh_base.h\
-    ../../include/mesh_common.h\
-    ../../include/mesh_communication.h\
-    ../../include/mesh_config.h\
     ../../include/mesh_data.h\
     ../../include/mesh_refinement.h\
     ../../include/newmark_system.h\
     ../../include/node.h\
     ../../include/node_iterators.h\
     ../../include/numeric_vector.h\
+    ../../include/o_string_stream.h\
     ../../include/perf_log.h\
     ../../include/point.h\
     ../../include/predicated_iterator.h\
@@ -50,6 +51,7 @@ ex10.$(obj-suffix):\
     ../../include/reference_counter.h\
     ../../include/sparse_matrix.h\
     ../../include/sphere.h\
+    ../../include/statistics.h\
     ../../include/steady_system.h\
     ../../include/surface.h\
     ../../include/system_base.h\
@@ -59,5 +61,5 @@ ex10.$(obj-suffix):\
 ../ex9/exact_solution.$(obj-suffix):\
     ../ex9/exact_solution.C\
     ../../include/libmesh_base.h\
-    ../../include/mesh_common.h\
-    ../../include/mesh_config.h
+    ../../include/libmesh_common.h\
+    ../../include/libmesh_config.h

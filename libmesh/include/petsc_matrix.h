@@ -1,4 +1,4 @@
-//    $Id: petsc_matrix.h,v 1.28 2003-09-02 18:02:38 benkirk Exp $
+//    $Id: petsc_matrix.h,v 1.29 2003-09-25 21:46:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -22,7 +22,7 @@
 #ifndef __petsc_matrix_h__
 #define __petsc_matrix_h__
 
-#include "mesh_common.h"
+#include "libmesh_common.h"
 
 #ifdef HAVE_PETSC
 
@@ -38,20 +38,15 @@
 
 
 
-/*
- * Petsc include files.  PETSc with complex numbers 
- * is actually C++.
+/**
+ * Petsc include files.
  */
 #ifndef USE_COMPLEX_NUMBERS
-
 extern "C" {
-#include <petscmat.h>
-} 
-
+# include <petscmat.h>
+}
 #else
-
-#include <petscmat.h>
-
+# include <petscmat.h>
 #endif
 
 

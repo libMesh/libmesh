@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.37 2003-09-16 00:41:29 jwpeterson Exp $
+dnl $Id: aclocal.m4,v 1.38 2003-09-25 21:46:51 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -827,7 +827,7 @@ dnl -------------------------------------------------------------
 
 
 dnl -------------------------------------------------------------
-dnl AC_CXX_HAVE_SSTREAM
+dnl AC_CXX_HAVE_NAMESPACES
 dnl -------------------------------------------------------------
 AC_DEFUN([AC_CXX_NAMESPACES],
 [AC_CACHE_CHECK(whether the compiler implements namespaces,

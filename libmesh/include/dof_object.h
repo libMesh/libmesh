@@ -1,4 +1,4 @@
-// $Id: dof_object.h,v 1.18 2003-09-16 15:59:30 benkirk Exp $
+// $Id: dof_object.h,v 1.19 2003-09-25 21:46:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -25,8 +25,8 @@
 // C++ includes
 
 // Local includes
-#include "mesh_config.h"
-#include "mesh_common.h"
+#include "libmesh_config.h"
+#include "libmesh_common.h"
 #include "libmesh.h" // libMesh::invalid_uint
 
 // Forward declarations
@@ -48,7 +48,7 @@
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.18 $
+ * \version $Revision: 1.19 $
  */
 
 class DofObject
@@ -145,6 +145,12 @@ public:
   { this->set_id() = id; }
 
   /**
+   * @returns \p true if this \p DofObject has a valid \p id set,
+   * \p false otherwise.
+   */
+  bool valid_id () const;
+  
+  /**
    * @returns the processor that this element belongs to.
    * To conserve space this is stored as a short integer.
    */
@@ -160,6 +166,12 @@ public:
    * Sets the \p processor_id for this \p DofObject.
    */  
   void set_processor_id (const unsigned int id);
+
+  /**
+   * @returns \p true if this \p DofObject has a valid \p id set,
+   * \p false otherwise.
+   */
+  bool valid_processor_id () const;
   
   /**
    * @returns the number of systes associated with this
@@ -550,7 +562,7 @@ unsigned int DofObject::n_dofs (const unsigned int s,
 inline
 unsigned int DofObject::id () const
 {
-  assert (_id != this->invalid_id);
+  assert (this->valid_id());
   return _id;
 }
 
@@ -565,9 +577,16 @@ unsigned int & DofObject::set_id ()
 
 
 inline
+bool DofObject::valid_id () const
+{
+  return (DofObject::invalid_id != _id);
+}
+
+
+inline
 unsigned short int DofObject::processor_id () const
 {
-  assert (_processor_id != this->invalid_processor_id);
+  assert (this->valid_processor_id());
   return _processor_id;
 }
 
@@ -597,6 +616,14 @@ void DofObject::set_processor_id (const unsigned int id)
 #endif
   
   this->set_processor_id() = id;
+}
+
+
+
+inline
+bool DofObject::valid_processor_id () const
+{
+  return (DofObject::invalid_processor_id != _processor_id);
 }
 
 

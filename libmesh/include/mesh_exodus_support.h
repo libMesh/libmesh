@@ -1,4 +1,4 @@
-// $Id: mesh_exodus_support.h,v 1.7 2003-09-02 18:02:38 benkirk Exp $
+// $Id: mesh_exodus_support.h,v 1.8 2003-09-25 21:46:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,7 @@
 #ifndef __mesh_exodus_support_h__
 #define __mesh_exodus_support_h__
 
-#include "mesh_common.h"
+#include "libmesh_common.h"
 
 #ifdef HAVE_EXODUS_API
 

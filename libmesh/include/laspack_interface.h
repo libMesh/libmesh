@@ -1,4 +1,4 @@
-// $Id: laspack_interface.h,v 1.8 2003-09-02 18:02:38 benkirk Exp $
+// $Id: laspack_interface.h,v 1.9 2003-09-25 21:46:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -22,7 +22,7 @@
 #ifndef __laspack_interface_h__
 #define __laspack_interface_h__
 
-#include "mesh_common.h"
+#include "libmesh_common.h"
 
 #if defined(HAVE_LASPACK)
 //#if defined(HAVE_LASPACK) && !defined(USE_COMPLEX_NUMBERS)

@@ -1,4 +1,4 @@
-// $Id: mesh_logging.h,v 1.3 2003-09-02 18:02:38 benkirk Exp $
+// $Id: mesh_logging.h,v 1.4 2003-09-25 21:46:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,7 @@
 
 
 // The library configuration options
-#include "mesh_common.h"
+#include "libmesh_common.h"
 
 // Macros for performance logging.  This allows us
 // to add performance monitors to the code without

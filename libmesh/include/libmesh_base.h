@@ -1,4 +1,4 @@
-// $Id: libmesh_base.h,v 1.2 2003-09-02 18:02:38 benkirk Exp $
+// $Id: libmesh_base.h,v 1.3 2003-09-25 21:46:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -23,75 +23,55 @@
 #define __libmesh_base_h__
 
 
-// C++ includes
 
-// Local includes
-
-
-
-
-
-/**
- * The \p libMeshBase is the base class for \p libMesh, however it is
- * separate for a reason.  \p libMeshBase provides the local processor id
- * and the number of processors in the simulation, which is in turn used
- * in the \p here() macro (and many other places).  However, we need to
- * split this off from \p libMesh, otherwise circular dependencies would arise
- * because \p libMesh depends on \p here(), get it?
- */
-class libMeshBase
-{
-
-protected:
-
-  /**
-   * This class only contains static members and should never be
-   * instantiated, so it has a protected default constructor.
-   */
-  libMeshBase() {}
-  
-public:
-  
+namespace libMesh {  
   /**
    * @returns the number of processors used in the current simulation.
    */
-  static unsigned int n_processors();
+  unsigned int n_processors();
 
   /**
    * @returns the index of the local processor.
    */
-  static unsigned int processor_id();
+  unsigned int processor_id();
 
-  
-protected:
 
   /**
-   * Total number of processors used.
+   * Namespaces don't provide private data,
+   * so let's take the data we would like
+   * private and put it in an obnoxious
+   * namespace.  At least that way it is a
+   * pain to use, thus discouraging errors.
    */
-  static int _n_processors;
-
-  /**
-   * The local processor id.
-   */
-  static int _processor_id;
-};
+  namespace libMeshPrivateData {
+    /**
+     * Total number of processors used.
+     */
+    extern int _n_processors;
+    
+    /**
+     * The local processor id.
+     */
+    extern int _processor_id;
+  }
+}
 
 
 
 // ------------------------------------------------------------
-// libMeshBase inline member functions
+// libMesh inline member functions
 inline
-unsigned int libMeshBase::n_processors()
+unsigned int libMesh::n_processors()
 {
-  return static_cast<unsigned int>(_n_processors);
+  return static_cast<unsigned int>(libMeshPrivateData::_n_processors);
 }
 
 
 
 inline
-unsigned int libMeshBase::processor_id()
+unsigned int libMesh::processor_id()
 {
-  return static_cast<unsigned int>(_processor_id);
+  return static_cast<unsigned int>(libMeshPrivateData::_processor_id);
 }
 
 

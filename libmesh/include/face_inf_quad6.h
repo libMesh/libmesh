@@ -1,4 +1,4 @@
-// $Id: face_inf_quad6.h,v 1.17 2003-09-02 18:02:37 benkirk Exp $
+// $Id: face_inf_quad6.h,v 1.18 2003-09-25 21:46:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -23,7 +23,7 @@
 #define __inf_quad6_h__
 
 
-#include "mesh_config.h"
+#include "libmesh_config.h"
 #ifdef ENABLE_INFINITE_ELEMENTS
 
 

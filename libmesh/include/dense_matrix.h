@@ -1,4 +1,4 @@
-// $Id: dense_matrix.h,v 1.20 2003-09-02 18:02:36 benkirk Exp $
+// $Id: dense_matrix.h,v 1.21 2003-09-25 21:46:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -26,7 +26,7 @@
 #include <vector>
 
 // Local Includes
-#include "mesh_common.h"
+#include "libmesh_common.h"
 #include "dense_vector.h"
 #include "dense_matrix_base.h"
 
@@ -192,7 +192,7 @@ namespace DenseMatrices
    * Note that this typedef may be either
    * a real-only matrix, or a truly complex
    * matrix, depending on how \p Number
-   * was defined in \p mesh_common.h.
+   * was defined in \p libmesh_common.h.
    * Be also aware of the fact that \p DenseMatrix<T>
    * is likely to be more efficient for
    * real than for complex data.

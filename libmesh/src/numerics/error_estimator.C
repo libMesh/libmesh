@@ -1,4 +1,4 @@
-// $Id: error_estimator.C,v 1.10 2003-09-02 18:02:44 benkirk Exp $
+// $Id: error_estimator.C,v 1.11 2003-09-25 21:46:56 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -19,19 +19,14 @@
 
 
 // libMesh Configuration
-#include "mesh_config.h"
+#include "libmesh_config.h"
 
 // C++ includes
 #include <algorithm>
 #include <math.h>
 
 #ifdef HAVE_MPI
-namespace Mpi
-{
-  extern "C"{
-#include <mpi.h>
-  }
-}
+# include <mpi.h>
 #endif
 
 
@@ -288,8 +283,6 @@ void ErrorEstimator::flux_jump (const EquationSystems& es,
 #ifdef HAVE_MPI
   if (libMesh::n_processors() > 1)
     {
-      using namespace Mpi;
-
       // Allreduce requires 2 buffers.  Copy the
       // error_per_cell vector into the epc vector
       std::vector<float> epc (error_per_cell);

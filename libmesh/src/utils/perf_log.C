@@ -1,4 +1,4 @@
-// $Id: perf_log.C,v 1.17 2003-09-02 18:02:45 benkirk Exp $
+// $Id: perf_log.C,v 1.18 2003-09-25 21:46:56 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -116,10 +116,10 @@ std::string PerfLog::get_info_header() const
       out << std::endl
 	  << " ----------------------------------------------------------------------------" << std::endl;
       
-      if (libMeshBase::n_processors() > 1)
+      if (libMesh::n_processors() > 1)
 	{
-      out << "| Processor id:   " << libMeshBase::processor_id() << std::endl
-	  << "| Num Processors: " << libMeshBase::n_processors() << std::endl;
+      out << "| Processor id:   " << libMesh::processor_id() << std::endl
+	  << "| Num Processors: " << libMesh::n_processors() << std::endl;
 	}
       
 #ifdef HAVE_LOCALE

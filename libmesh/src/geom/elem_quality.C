@@ -1,4 +1,4 @@
-// $Id: elem_quality.C,v 1.6 2003-09-02 18:02:42 benkirk Exp $
+// $Id: elem_quality.C,v 1.7 2003-09-25 21:46:56 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -21,7 +21,7 @@
 #include <sstream> 
 
 // Local includes
-#include "mesh_common.h"
+#include "libmesh_common.h"
 #include "enum_elem_quality.h"
 #include "elem_quality.h"
 

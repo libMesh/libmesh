@@ -1,4 +1,4 @@
-// $Id: inf_fe.h,v 1.30 2003-09-02 18:02:38 benkirk Exp $
+// $Id: inf_fe.h,v 1.31 2003-09-25 21:46:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,7 @@
 // C++ includes
 
 // Local includes
-#include "mesh_config.h"
+#include "libmesh_config.h"
 #ifdef ENABLE_INFINITE_ELEMENTS
 
 #include "fe_base.h"
@@ -66,7 +66,7 @@ class FEComputeData;
  *
  * \author Daniel Dreyer
  * \date 2003
- * \version $Revision: 1.30 $
+ * \version $Revision: 1.31 $
  */
 
 //-------------------------------------------------------------
@@ -89,7 +89,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.30 $
+   * \version $Revision: 1.31 $
    */
   //-------------------------------------------------------------
   // InfFE::Radial class definition
@@ -181,7 +181,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.30 $
+   * \version $Revision: 1.31 $
    */
   //-------------------------------------------------------------
   // InfFE::Base class definition

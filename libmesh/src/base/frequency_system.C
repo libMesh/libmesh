@@ -1,4 +1,4 @@
-// $Id: frequency_system.C,v 1.20 2003-09-02 18:02:40 benkirk Exp $
+// $Id: frequency_system.C,v 1.21 2003-09-25 21:46:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -20,7 +20,7 @@
 
 
 // Local includes
-#include "mesh_config.h"
+#include "libmesh_config.h"
 
 /*
  * Require complex arithmetic

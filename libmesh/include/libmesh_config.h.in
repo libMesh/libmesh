@@ -1,4 +1,4 @@
-/* include/mesh_config.h.in.  Generated from configure.in by autoheader.  */
+/* include/libmesh_config.h.in.  Generated from configure.in by autoheader.  */
 
 /* This compiler is known not to support some iostream functionality */
 #undef BROKEN_IOSTREAM

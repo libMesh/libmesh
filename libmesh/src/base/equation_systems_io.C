@@ -1,4 +1,4 @@
-// $Id: equation_systems_io.C,v 1.27 2003-09-02 18:02:40 benkirk Exp $
+// $Id: equation_systems_io.C,v 1.28 2003-09-25 21:46:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include "mesh_common.h"
+#include "libmesh_common.h"
 
 
 // System Includes
@@ -392,7 +392,7 @@ void EquationSystems::write(const std::string& name,
 
   assert (io.writing());
 
-  const unsigned int proc_id = libMeshBase::processor_id();
+  const unsigned int proc_id = libMesh::processor_id();
   unsigned int n_sys         = this->n_systems();
 
   std::map<std::string, SystemBase*>::const_iterator

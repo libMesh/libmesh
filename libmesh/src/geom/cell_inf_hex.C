@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex.C,v 1.6 2003-09-02 18:02:42 benkirk Exp $
+// $Id: cell_inf_hex.C,v 1.7 2003-09-25 21:46:56 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // Local includes
-#include "mesh_config.h"
+#include "libmesh_config.h"
 
 #ifdef ENABLE_INFINITE_ELEMENTS
 

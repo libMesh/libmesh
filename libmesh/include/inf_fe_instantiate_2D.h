@@ -1,4 +1,4 @@
-// $Id: inf_fe_instantiate_2D.h,v 1.4 2003-09-02 18:02:38 benkirk Exp $
+// $Id: inf_fe_instantiate_2D.h,v 1.5 2003-09-25 21:46:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -23,7 +23,7 @@
 
 
 /**
- * Sanity check, _without_ prior inclusion of mesh_config.h.
+ * Sanity check, _without_ prior inclusion of libmesh_config.h.
  *
  * This file is no typical header file. It is only to be 
  * included at the _end_ of an implementation file, so that 

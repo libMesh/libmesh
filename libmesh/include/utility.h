@@ -1,4 +1,4 @@
-// $Id: utility.h,v 1.8 2003-09-02 18:02:40 benkirk Exp $
+// $Id: utility.h,v 1.9 2003-09-25 21:46:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -22,7 +22,7 @@
 #define __utility_h__
 
 // Local includes
-#include "mesh_config.h"
+#include "libmesh_config.h"
 
 // System includes
 #ifdef HAVE_LOCALE

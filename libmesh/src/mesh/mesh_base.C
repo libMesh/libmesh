@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.54 2003-09-16 15:59:31 benkirk Exp $
+// $Id: mesh_base.C,v 1.55 2003-09-25 21:46:56 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -20,7 +20,7 @@
 
 
 // library configuration
-#include "mesh_config.h"
+#include "libmesh_config.h"
 
 // C++ includes
 #include <algorithm>
@@ -245,7 +245,7 @@ void MeshBase::clear ()
 
 unsigned int MeshBase::n_elem_on_proc (const unsigned int proc_id) const
 {
-  assert (proc_id < libMeshBase::n_processors());
+  assert (proc_id < libMesh::n_processors());
 
   unsigned int ne=0;
   
@@ -262,7 +262,7 @@ unsigned int MeshBase::n_elem_on_proc (const unsigned int proc_id) const
 
 unsigned int MeshBase::n_active_elem_on_proc (const unsigned int proc_id) const
 {
-  assert (proc_id < libMeshBase::n_processors());
+  assert (proc_id < libMesh::n_processors());
 
   unsigned int ne=0;
   

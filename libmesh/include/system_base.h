@@ -1,4 +1,4 @@
-// $Id: system_base.h,v 1.17 2003-09-02 18:02:39 benkirk Exp $
+// $Id: system_base.h,v 1.18 2003-09-25 21:46:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,7 @@
 // C++ includes
 
 // Local Includes
-#include "mesh_common.h"
+#include "libmesh_common.h"
 #include "fe_type.h"
 #include "dof_map.h"
 #include "auto_ptr.h"
@@ -638,7 +638,7 @@ unsigned int SystemBase::n_constrained_dofs() const
 inline
 unsigned int SystemBase::n_local_dofs() const
 {
-  return _dof_map.n_dofs_on_processor(libMeshBase::processor_id());
+  return _dof_map.n_dofs_on_processor(libMesh::processor_id());
 }
 
 
