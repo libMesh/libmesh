@@ -1,4 +1,4 @@
-// $Id: fe_interface.h,v 1.3 2005-02-22 22:17:30 jwpeterson Exp $
+// $Id: fe_interface.h,v 1.4 2005-02-22 23:11:58 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -207,6 +207,13 @@ public:
 				   const unsigned int variable_number,
 				   const FEType& fe_t,
 				   const Elem* elem);
+
+  /**
+   * Returns true if separate degrees of freedom must be allocated for
+   * vertex DoFs and edge/face DoFs at a hanging node.
+   */
+  static bool extra_hanging_dofs (const FEType& fe_t);
+
 private:
 
 
