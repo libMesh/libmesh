@@ -1,4 +1,4 @@
-// $Id: gmv_io.C,v 1.19 2005-02-22 22:17:39 jwpeterson Exp $
+// $Id: gmv_io.C,v 1.20 2005-03-02 20:52:29 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -66,7 +66,6 @@ namespace
 	// is called the eletypes data struture will be empty, and
 	// we will fill it.  Any subsequent calls will find an initialized
 	// eletypes map and will do nothing.
-	here();
 
 	//==============================
 	// setup the element definitions
@@ -108,7 +107,7 @@ namespace
 	// TRI6
 	{
 	  eledef.label = "6tri 6";
-	  const unsigned int nodes[] = {0,1,2,3,4,5,6};
+	  const unsigned int nodes[] = {0,1,2,3,4,5};
 	  const unsigned int nnodes = sizeof(nodes)/sizeof(nodes[0]);
 	  std::vector<unsigned int>(nodes, nodes+nnodes).swap(eledef.nodes);
 
@@ -212,7 +211,7 @@ void GMVIO::write (const std::string& fname)
     if (this->binary())
       this->write_binary (fname);
     else
-      this->write_ascii_old_impl  (fname);
+      this->write_ascii_new_impl  (fname);
 }
 
 
@@ -225,7 +224,7 @@ void GMVIO::write_nodal_data (const std::string& fname,
     if (this->binary())
       this->write_binary (fname, &soln, &names);
     else
-      this->write_ascii_old_impl  (fname, &soln, &names);
+      this->write_ascii_new_impl  (fname, &soln, &names);
 }
 
 
@@ -280,6 +279,10 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
 	assert (eletypes.count(elem->type()));
 
         const elementDefinition& ele = eletypes[elem->type()];
+
+	// The element mapper better not require any more nodes
+	// than are present in the current element!
+	assert (ele.nodes.size() <= elem->n_nodes());
 	
         out << ele.label << "\n";
         for (unsigned int i=0; i < ele.nodes.size(); i++)
@@ -418,9 +421,6 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
     // write the connectivity
     
     out << "cells " << mesh.n_active_sub_elem() << '\n';
-
-//     const_active_elem_iterator       it (mesh.elements_begin());
-//     const const_active_elem_iterator end(mesh.elements_end());
 
     MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
     const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
@@ -620,9 +620,6 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
       for (unsigned int proc=0; proc<mesh.n_partitions(); proc++)
 	out << "proc_" << proc << '\n';
       
-//       const_active_elem_iterator       it (mesh.elements_begin());
-//       const const_active_elem_iterator end(mesh.elements_end());
-
       MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
       const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
 
@@ -863,9 +860,6 @@ void GMVIO::write_binary (const std::string& fname,
       
       unsigned int n=0;
       
-      //       const_active_elem_iterator       it (mesh.elements_begin());
-      //       const const_active_elem_iterator end(mesh.elements_end());
-
       MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
       const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
 
@@ -1006,9 +1000,6 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
     
     // Compute the total weight
     {
-      //       const_active_elem_iterator       it (mesh.elements_begin());
-      //       const const_active_elem_iterator end(mesh.elements_end());
-
       MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
       const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
 
@@ -1024,9 +1015,6 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
 
     // Write all the x values
     {
-      //       const_active_elem_iterator       it (mesh.elements_begin());
-      //       const const_active_elem_iterator end(mesh.elements_end());
-
       MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
       const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
       
@@ -1040,9 +1028,6 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
     
     // Write all the y values
     {
-      //       const_active_elem_iterator       it (mesh.elements_begin());
-      //       const const_active_elem_iterator end(mesh.elements_end());
-
       MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
       const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
 
@@ -1056,9 +1041,6 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
     
     // Write all the z values
     {
-      //       const_active_elem_iterator       it (mesh.elements_begin());
-      //       const const_active_elem_iterator end(mesh.elements_end());
-
       MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
       const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
       
@@ -1076,9 +1058,6 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
     // write the connectivity
     
     out << "cells " << mesh.n_active_elem() << std::endl;
-
-    //     const_active_elem_iterator       it (mesh.elements_begin());
-    //     const const_active_elem_iterator end(mesh.elements_end());
 
     MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
     const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
@@ -1157,9 +1136,6 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
       for (unsigned int proc=0; proc<mesh.n_processors(); proc++)
 	out << "proc_" << proc << std::endl;
       
-      //       const_active_elem_iterator       it (mesh.elements_begin());
-      //       const const_active_elem_iterator end(mesh.elements_end());
-
       MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
       const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
 
@@ -1191,9 +1167,6 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
         // this is the real part
         out << "r_" << solution_names[c] << " 1" << std::endl;
         {
-          // 	    const_active_elem_iterator       it (mesh.elements_begin());
-          // 	    const const_active_elem_iterator end(mesh.elements_end());
-
           MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
           const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
 
@@ -1207,9 +1180,6 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
         // this is the imaginary part
         out << "i_" << solution_names[c] << " 1" << std::endl;	  
         {
-          // 	    const_active_elem_iterator       it (mesh.elements_begin());
-          // 	    const const_active_elem_iterator end(mesh.elements_end());
-
           MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
           const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
 	    
@@ -1222,9 +1192,6 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
         // this is the magnitude
         out << "a_" << solution_names[c] << " 1" << std::endl;
         {
-          // 	    const_active_elem_iterator       it (mesh.elements_begin());
-          // 	    const const_active_elem_iterator end(mesh.elements_end());
-
           MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
           const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
 	    
@@ -1239,9 +1206,6 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
 
         out << solution_names[c] << " 1" << std::endl;
         {
-          // 	    const_active_elem_iterator       it (mesh.elements_begin());
-          // 	    const const_active_elem_iterator end(mesh.elements_end());
-
           MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
           const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
 	    
