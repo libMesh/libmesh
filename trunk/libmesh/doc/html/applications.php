@@ -22,10 +22,10 @@
   <li> <a href="http://cfdlab.ae.utexas.edu/~benkirk/adv_flows_project.pdf">Ben's Adavnced Flows Class Project</a> </li>
 </ul>
 
-<h2>Sub-Heading 2 </h2>
+<h2>Exterior Acoustics</h2>
 <ul>
-  <li> Foo </li>
-  <li> Bar </li>
+  <li> <a href="http://www.mum.tu-harburg.de/ddreyer/project.html">Acoustic Radiation of Ocean Engineering Structures</a> </li>
+  <li> <a href="http://www.mum.tu-harburg.de/spetersen/project.html">Tire Rolling Noise</a> </li>
 </ul>
 
 </div>
