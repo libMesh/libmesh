@@ -1,4 +1,4 @@
-// $Id: linear_solver_interface.h,v 1.4 2003-02-20 23:18:06 benkirk Exp $
+// $Id: linear_solver_interface.h,v 1.5 2003-03-25 04:26:55 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -112,6 +112,8 @@ public:
   
 
   /**
+   * @returns A pair containing the number of iterations taken
+   * and the final residual.
    * Call the Solver solver
    */    
   virtual std::pair<unsigned int, Real> 
