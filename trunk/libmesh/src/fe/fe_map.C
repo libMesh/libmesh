@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.26 2004-03-24 05:49:11 jwpeterson Exp $
+// $Id: fe_map.C,v 1.27 2004-04-19 17:41:07 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -838,19 +838,22 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
   //  the point \p p on the reference element actually does
   //  map to the point \p physical_point within a tolerance.
 #ifdef DEBUG
-	
-  const Point check = FE<Dim,T>::map (elem, p);
-  const Point diff  = physical_point - check;
   
-  if (diff.size() > tolerance)
-    {
-      here();
-      std::cerr << "WARNING:  diff is "
-		<< diff.size()
-		<< std::endl
-		<< " point="; physical_point.print();
-      std::cerr << " local="; check.print();
-      std::cerr << " lref= "; p.print(); 
+  if (secure)
+    {  
+      const Point check = FE<Dim,T>::map (elem, p);
+      const Point diff  = physical_point - check;
+      
+      if (diff.size() > tolerance)
+	{
+	  here();
+	  std::cerr << "WARNING:  diff is "
+		    << diff.size()
+		    << std::endl
+		    << " point="; physical_point.print();
+	  std::cerr << " local="; check.print();
+	  std::cerr << " lref= "; p.print(); 
+	}
     }
   
 #endif
