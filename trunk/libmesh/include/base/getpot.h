@@ -1,4 +1,4 @@
-// $Id: getpot.h,v 1.6 2004-12-02 18:18:54 benkirk Exp $
+// $Id: getpot.h,v 1.7 2004-12-03 22:34:10 benkirk Exp $
 //
 // (with patches from Michael Anderson for more general variable types)
 
@@ -88,6 +88,8 @@ class GetPot {
   inline bool         argument_contains(unsigned Idx, const char* FlagList) const;
 
   // (*) variables -----------------------------------------------------------
+  //     -- check for a variable
+  inline bool         have_variable (const char* VarName) const;
   //     -- scalar values
   inline bool         operator()(const char* VarName, bool        Default) const;
   inline int          operator()(const char* VarName, int         Default) const;
@@ -151,10 +153,10 @@ class GetPot {
   inline const char*  direct_follow(const char*   Default, const char* Option);
 
   // (*) nominus arguments ---------------------------------------------------
-  inline void            reset_nominus_cursor();
+  inline void                      reset_nominus_cursor();
   inline std::vector<std::string>  nominus_vector() const;
-  inline unsigned        nominus_size() const  { return idx_nominus.size(); }
-  inline const char*     next_nominus();
+  inline unsigned                  nominus_size() const  { return idx_nominus.size(); }
+  inline const char*               next_nominus();
 
   // (*) unidentified flying objects -----------------------------------------
   inline std::vector<std::string>  unidentified_arguments(const std::vector<std::string>& Knowns) const;
@@ -1186,6 +1188,14 @@ GetPot::reset_nominus_cursor()
 // (*) variables
 //.............................................................................
 //
+inline bool
+GetPot::have_variable(const char* VarName) const
+{
+  const variable* sv = __find_variable(VarName);
+  if (sv == 0) return false;
+  return true;
+}
+
 inline bool
 GetPot::operator()(const char* VarName, bool Default) const
 {
