@@ -338,6 +338,55 @@ src/base/system_base.$(obj-suffix):\
     include/sphere.h\
     include/surface.h\
     include/system_base.h
+src/base/system_base_io.$(obj-suffix):\
+    src/base/system_base_io.C\
+    include/auto_ptr.h\
+    include/boundary_info.h\
+    include/boundary_mesh.h\
+    include/coupling_matrix.h\
+    include/dense_matrix.h\
+    include/dense_matrix_base.h\
+    include/dense_vector.h\
+    include/dense_vector_base.h\
+    include/dof_map.h\
+    include/dof_object.h\
+    include/elem.h\
+    include/elem_iterators.h\
+    include/enum_elem_quality.h\
+    include/enum_elem_type.h\
+    include/enum_fe_family.h\
+    include/enum_inf_map_type.h\
+    include/enum_order.h\
+    include/enum_preconditioner_type.h\
+    include/enum_solver_package.h\
+    include/enum_solver_type.h\
+    include/fe_type.h\
+    include/libmesh.h\
+    include/libmesh_base.h\
+    include/linear_solver_interface.h\
+    include/mesh.h\
+    include/mesh_base.h\
+    include/mesh_common.h\
+    include/mesh_communication.h\
+    include/mesh_config.h\
+    include/mesh_refinement.h\
+    include/node.h\
+    include/node_iterators.h\
+    include/numeric_vector.h\
+    include/o_f_stream.h\
+    include/perf_log.h\
+    include/petsc_interface.h\
+    include/petsc_matrix.h\
+    include/petsc_vector.h\
+    include/point.h\
+    include/predicated_iterator.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h\
+    include/sparse_matrix.h\
+    include/sphere.h\
+    include/surface.h\
+    include/system_base.h\
+    include/xdr_cxx.h
 src/base/thin_system.$(obj-suffix):\
     src/base/thin_system.C\
     include/auto_ptr.h\
