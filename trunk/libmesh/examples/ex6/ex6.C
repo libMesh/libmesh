@@ -1,4 +1,4 @@
-// $Id: ex6.C,v 1.17 2003-03-12 20:14:59 ddreyer Exp $
+// $Id: ex6.C,v 1.18 2003-03-26 13:55:24 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -258,7 +258,7 @@ int main (int argc, char** argv)
        * Prints information about the system to the screen.
        */
       equation_systems.print_info();
-    };
+    }
 
 
 
@@ -274,7 +274,7 @@ int main (int argc, char** argv)
      * to a GMV-formatted plot file.
      */
     mesh.write_gmv ("out.gmv", equation_systems);
-  };
+  }
 
   
   /**
@@ -284,7 +284,7 @@ int main (int argc, char** argv)
 
 
 #endif // else part of ifndef ENABLE_INFINITE_ELEMENTS
-};
+}
 
 
 
@@ -543,18 +543,18 @@ void assemble_wave(EquationSystems<GeneralSystem>& es,
 			  for (unsigned int i=0; i<fe_face->n_shape_functions(); i++)
 			    {
 			      Fe(i) += JxW_face[qp]*value*phi_face[i][qp];
-			    };
+			    }
 		  
-			}; // end face quadrature point loop	  
+			} // end face quadrature point loop	  
 
 
 		      es("Wave").rhs->add_vector    (Fe, dof_indices);
 
-		    }; // end if (elem->neighbor(side) == NULL)
+		    } // end if (elem->neighbor(side) == NULL)
 
 	    } // end boundary condition section	     
 
-	}; // else ( if (FEInterface::is_InfFE_elem(elem->type())) )
+	} // else ( if (FEInterface::is_InfFE_elem(elem->type())) )
 
 
 
@@ -688,9 +688,9 @@ void assemble_wave(EquationSystems<GeneralSystem>& es,
 			* phi[i][qp] * phi[j][qp] * weight[qp] /*      * Real *  Real  * Real    = Real */
 		    ) * JxW[qp];                               /*    ) * Real                    = Real */
 
-	      }; // end of the matrix summation loop
+	      } // end of the matrix summation loop
 
-	}; // end of quadrature point loop
+	} // end of quadrature point loop
 
           
       /**
@@ -707,7 +707,7 @@ void assemble_wave(EquationSystems<GeneralSystem>& es,
       es("Wave").matrix->add_matrix (Ke, dof_indices);
 
       
-    }; // end of element loop
+    } // end of element loop
 
   _p(Finished element loop);
 
@@ -724,6 +724,5 @@ void assemble_wave(EquationSystems<GeneralSystem>& es,
    * All done!
    */
   return;
-
-};
+}
 

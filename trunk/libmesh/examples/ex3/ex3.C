@@ -1,4 +1,4 @@
-// $Id: ex3.C,v 1.19 2003-03-11 04:35:17 ddreyer Exp $
+// $Id: ex3.C,v 1.20 2003-03-26 13:55:23 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -215,7 +215,7 @@ int main (int argc, char** argv)
    * All done.  
    */
   return libMesh::close();
-};
+}
 
 
 
@@ -595,4 +595,4 @@ void assemble_poisson(EquationSystems<GeneralSystem>& es,
    * All done!
    */
   return;
-};
+}

@@ -1,4 +1,4 @@
-// $Id: ex1.C,v 1.2 2003-02-14 15:22:33 benkirk Exp $
+// $Id: ex1.C,v 1.3 2003-03-26 13:55:21 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -127,4 +127,4 @@ int main (int argc, char** argv)
    * can be useful for testing purposes.
    */
   return libMesh::close();
-};
+}

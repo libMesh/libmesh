@@ -1,4 +1,4 @@
-// $Id: petsc_vector.h,v 1.18 2003-03-23 01:39:11 ddreyer Exp $
+// $Id: petsc_vector.h,v 1.19 2003-03-26 13:55:24 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -32,7 +32,7 @@
 
 
 // TODO:[BSK} This seems necessary to use petsc on IBM Power3 at NERSC, but only there?  This will need to be wrapped in an ifdef with a variable set by configure
-#include <cmath>
+//#include <cmath>
 
 
 // C++ includes
