@@ -1,4 +1,4 @@
-// $Id: mesh_refinement_smoothing.C,v 1.6 2004-01-03 15:37:43 benkirk Exp $
+// $Id: mesh_refinement_smoothing.C,v 1.7 2004-03-22 01:11:59 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -44,8 +44,8 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
 
   // Loop over all the active elements & fill the vector
   {
-    active_elem_iterator       elem_it (_mesh.elements_begin());
-    const active_elem_iterator elem_end(_mesh.elements_end());
+    const_active_elem_iterator       elem_it (_mesh.const_elements_begin());
+    const const_active_elem_iterator elem_end(_mesh.const_elements_end());
     
     for (; elem_it != elem_end; ++elem_it)
       {

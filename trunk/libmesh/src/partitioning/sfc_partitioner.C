@@ -1,4 +1,4 @@
-// $Id: sfc_partitioner.C,v 1.10 2004-02-10 22:48:14 benkirk Exp $
+// $Id: sfc_partitioner.C,v 1.11 2004-03-22 01:11:59 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -112,8 +112,8 @@ void SFCPartitioner::partition (MeshBase& mesh,
 
   // Get the centroid for each active element
   {
-    active_elem_iterator       elem_it (mesh.elements_begin());
-    const active_elem_iterator elem_end(mesh.elements_end());
+    const_active_elem_iterator       elem_it (mesh.const_elements_begin());
+    const const_active_elem_iterator elem_end(mesh.const_elements_end());
     
     for (; elem_it != elem_end; ++elem_it)
       {
