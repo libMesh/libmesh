@@ -1,4 +1,4 @@
-// $Id: inf_fe_static.C,v 1.17 2003-04-05 12:16:35 ddreyer Exp $
+// $Id: inf_fe_static.C,v 1.18 2003-05-14 19:45:36 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -318,11 +318,6 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType& fet,
       * wavenumber                                                                      /* k                         */
       * interpolated_dist                                                               /* together with next line:  */
       * InfFE<Dim,INFINITE_MAP,T_map>::eval(v, radial_mapping_order, 1);                /* phase(s,t,v)              */
-// OLD CODE
-//   const Real exponent = data.sign
-//       * data.wavenumber  
-//       *  interpolated_dist * (1.+v)/(1.-v); 
-
 
   const Number time_harmonic = Number(cos(exponent), sin(exponent));                    /* e^(sign*i*k*phase(s,t,v)) */
 
@@ -355,7 +350,7 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType& fet,
 #else
 
   //TODO:[DD/SP] fix this for time-dependency
-  const Real time = data.equation_systems.parameter("current time");
+  //const Real time = data.equation_systems.parameter("current time");
 
   data.phase = interpolated_dist                                                        /* phase(s,t,v)              */
       * InfFE<Dim,INFINITE_MAP,T_map>::eval(v, radial_mapping_order, 1); 
