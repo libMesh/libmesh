@@ -1,4 +1,4 @@
-// $Id: metis_partitioner.C,v 1.13 2004-03-10 07:11:27 benkirk Exp $
+// $Id: metis_partitioner.C,v 1.14 2004-03-22 01:11:59 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -126,8 +126,8 @@ void MetisPartitioner::partition (MeshBase& mesh,
   {
     std::vector<const Elem*> neighbors_offspring;
     
-    active_elem_iterator       elem_it (mesh.elements_begin());
-    const active_elem_iterator elem_end(mesh.elements_end());
+    const_active_elem_iterator       elem_it (mesh.const_elements_begin());
+    const const_active_elem_iterator elem_end(mesh.const_elements_end());
 
     // This will be exact when there is no refinement and all the
     // elements are of the same type.

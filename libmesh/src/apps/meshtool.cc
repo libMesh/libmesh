@@ -813,8 +813,8 @@ int main (int argc, char** argv)
 
 	      Mesh new_mesh (dim);
 
-	      const_active_elem_iterator       it     (mesh.elements_begin());
-	      const const_active_elem_iterator it_end (mesh.elements_end());
+	      const_active_elem_iterator       it     (mesh.const_elements_begin());
+	      const const_active_elem_iterator it_end (mesh.const_elements_end());
 	      mesh.create_submesh(new_mesh, it, it_end);
 
 	      // now write the new_mesh
