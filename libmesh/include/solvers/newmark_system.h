@@ -1,4 +1,4 @@
-// $Id: newmark_system.h,v 1.1 2004-01-03 15:37:42 benkirk Exp $
+// $Id: newmark_system.h,v 1.2 2004-10-20 21:42:33 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -132,6 +132,7 @@ public:
 			       const Real alpha   = _default_alpha,
 			       const Real delta   = _default_delta);
 
+protected:
 
 
 private:

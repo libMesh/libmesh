@@ -1,4 +1,4 @@
-// $Id: newmark_system.C,v 1.1 2004-01-03 15:37:44 benkirk Exp $
+// $Id: newmark_system.C,v 1.2 2004-10-20 21:42:34 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -137,10 +137,10 @@ void NewmarkSystem::assemble ()
       // prepare matrix with the help of the _dof_map, 
       // fill with sparsity pattern
       ImplicitSystem::assemble();
-      
+
       // compute the effective system matrix
       this->compute_matrix();
-      
+
       // apply initial conditions
       this->initial_conditions();
       
@@ -176,13 +176,13 @@ void NewmarkSystem::initial_conditions ()
 
 void NewmarkSystem::compute_matrix ()
 {
-  // zero the global matrix
-  this->matrix->zero();
+  // close the component matrices
+  this->get_matrix ("stiffness").close();
+  this->get_matrix ("mass"     ).close();
+  this->get_matrix ("damping"  ).close();
 
-  // close the system matrices
-  // this->stiffness->close ();
-  // this->damping->close   ();
-  // this->mass->close      ();
+  // close & zero the system matrix
+  this->matrix->close (); this->matrix->zero();
 
   // add up the matrices
   this->matrix->add (1.,   this->get_matrix ("stiffness"));
