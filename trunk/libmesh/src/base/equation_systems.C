@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.8 2003-02-06 05:41:14 ddreyer Exp $
+// $Id: equation_systems.C,v 1.9 2003-02-10 03:55:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -49,12 +49,18 @@ EquationSystems::EquationSystems (const Mesh& m, const bool up) :
 
 EquationSystems::~EquationSystems ()
 {
+  clear();
 };
 
 
 
 void EquationSystems::clear ()
 {
+  for (std::map<std::string, SystemData*>::iterator
+	 pos = systems.begin(); pos != systems.end();
+       ++pos)
+    delete pos->second;
+  
   systems.clear ();
 
   flags.clear ();
@@ -69,31 +75,14 @@ void EquationSystems::init ()
   assert (!systems.empty());
 
 
-  for (std::map<std::string, SystemData>::iterator
+  for (std::map<std::string, SystemData*>::iterator
 	 sys = systems.begin(); sys != systems.end();
        ++sys)
     {
-//        /**
-//         * Pass our parameters on to the system
-//         */
-//        for (std::map<std::string, Real>::const_iterator
-//  	     param = parameters.begin();
-//  	   param != parameters.end(); ++param)
-//  	sys->second.set_parameter(param->first) =
-//  	  param->second;
-
-//        /**
-//         * Pass our flags on to the system
-//         */
-//        for (std::set<std::string>::const_iterator
-//  	     fl = flags.begin(); fl != flags.end();
-//  	   ++fl)
-//  	sys->second.set_flag(*fl);
-
       /**
        * Initialize the system.
        */
-      sys->second.init();
+      sys->second->init();
     };
 };
 
@@ -102,13 +91,19 @@ void EquationSystems::init ()
 void EquationSystems::add_system (const std::string& name)
 {
   if (!systems.count(name))
-    {  
-      SystemData sd(*this, name);
+    {
+      // Requires a number of temporaries
       
-      std::pair<std::string, SystemData>
-	kv(name, sd);
+//       SystemData sd(*this, name);
       
-      systems.insert (kv);
+//       std::pair<std::string, SystemData>
+// 	kv(name, sd);
+      
+//       systems.insert (kv);
+      
+      // Requires no unnecessary temporaries
+      systems.insert (std::pair<std::string, SystemData*>(name,
+							  new SystemData(*this, name)));
     }
   else
     {
@@ -129,7 +124,9 @@ void EquationSystems::delete_system (const std::string& name)
 
       error();
     }
-
+  
+  delete systems[name];
+  
   systems.erase (name);
 };
 
@@ -142,9 +139,9 @@ unsigned int EquationSystems::n_vars () const
 
   unsigned int tot=0;
   
-  for (std::map<std::string, SystemData>::const_iterator
+  for (std::map<std::string, SystemData*>::const_iterator
 	 pos = systems.begin(); pos != systems.end(); ++pos)
-    tot += pos->second.n_vars();
+    tot += pos->second->n_vars();
 
   return tot;      
 };
@@ -158,9 +155,9 @@ unsigned int EquationSystems::n_dofs () const
 
   unsigned int tot=0;
   
-  for (std::map<std::string, SystemData>::const_iterator
+  for (std::map<std::string, SystemData*>::const_iterator
 	 pos = systems.begin(); pos != systems.end(); ++pos)
-    tot += pos->second.n_dofs();
+    tot += pos->second->n_dofs();
 
   return tot;      
 };
@@ -169,7 +166,7 @@ unsigned int EquationSystems::n_dofs () const
 
 SystemData & EquationSystems::operator () (const std::string& name)
 {
-  std::map<std::string, SystemData>::iterator
+  std::map<std::string, SystemData*>::iterator
     pos = systems.find(name);
   
   if (pos == systems.end())
@@ -182,14 +179,14 @@ SystemData & EquationSystems::operator () (const std::string& name)
       error();
     }
 
-  return pos->second;
+  return *pos->second;
 };
 
 
 
 const SystemData & EquationSystems::operator () (const std::string& name) const
 {
-  std::map<std::string, SystemData>::const_iterator
+  std::map<std::string, SystemData*>::const_iterator
     pos = systems.find(name);
   
   if (pos == systems.end())
@@ -202,7 +199,7 @@ const SystemData & EquationSystems::operator () (const std::string& name) const
       error();
     }
 
-  return pos->second;
+  return *pos->second;
 };
 
 
@@ -212,7 +209,7 @@ const std::string & EquationSystems::name (const unsigned int num) const
 {
   assert (num < n_systems());
 
-  std::map<std::string, SystemData>::const_iterator
+  std::map<std::string, SystemData*>::const_iterator
     pos = systems.begin();
   
   for (unsigned int i=0; i<num; i++)
@@ -228,13 +225,13 @@ SystemData & EquationSystems::operator () (const unsigned int num)
 {
   assert (num < n_systems());
 
-  std::map<std::string, SystemData>::iterator
+  std::map<std::string, SystemData*>::iterator
     pos = systems.begin();
   
   for (unsigned int i=0; i<num; i++)
     ++pos;
 
-  return pos->second;
+  return *pos->second;
 };
 
 
@@ -243,13 +240,13 @@ const SystemData & EquationSystems::operator ()  (const unsigned int num) const
 {
   assert (num < n_systems());
 
-  std::map<std::string, SystemData>::const_iterator
+  std::map<std::string, SystemData*>::const_iterator
     pos = systems.begin();
   
   for (unsigned int i=0; i<num; i++)
     ++pos;
 
-  return pos->second;
+  return *pos->second;
 };
 
 
@@ -393,25 +390,26 @@ void EquationSystems::build_solution_vector (std::vector<Complex>& soln)
 
   for (unsigned int sys=0; sys<n_systems(); sys++)
     {
-      const unsigned int nv_sys = (*this)(sys).n_vars();
+      const SystemData& system  = (*this)(sys);	      
+      const unsigned int nv_sys = system.n_vars();
       
-      (*this)(sys).update_global_solution (sys_soln);
+      system.update_global_solution (sys_soln);
 
       if (mesh.processor_id() == 0)
 	{
-	  std::vector<Complex>      elem_soln; // The finite element solution
+	  std::vector<Complex>      elem_soln;   // The finite element solution
 	  std::vector<Complex>      nodal_soln;  // The finite elemnt solution interpolated to the nodes
 	  std::vector<unsigned int> dof_indices; // The DOF indices for the finite element 
 	      
 	  for (unsigned int var=0; var<nv_sys; var++)
 	    {
-	      const FEType fe_type = (*this)(sys).variable_type(var);
+	      const FEType& fe_type    = system.variable_type(var);
 	      
 	      for (unsigned int e=0; e<mesh.n_elem(); e++)
 		if (mesh.elem(e)->active())
 		  {
 		    const Elem* elem = mesh.elem(e);
-		    (*this)(sys).dof_map.dof_indices (e, dof_indices, var);
+		    system.dof_map.dof_indices (e, dof_indices, var);
 		    
 		    elem_soln.resize(dof_indices.size());
 
@@ -443,11 +441,11 @@ std::string EquationSystems::get_info () const
   out << " EquationSystems:" << std::endl
       << "  n_systems()=" << n_systems() << std::endl;
   
-  for (std::map<std::string, SystemData>::const_iterator it=systems.begin();
+  for (std::map<std::string, SystemData*>::const_iterator it=systems.begin();
        it != systems.end(); ++it)
     {
       const std::string& sys_name = it->first;
-      const SystemData&  system   = it->second;
+      const SystemData&  system   = *it->second;
       
       out << "   System \"" << sys_name << "\"" << std::endl
 	  << "    Variables=";

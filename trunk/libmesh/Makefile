@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.12 2003-02-09 22:47:16 ddreyer Exp $
+# $Id: Makefile,v 1.13 2003-02-10 03:55:49 benkirk Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -80,6 +80,12 @@ $(mesh_library_dir)/libmesh.so: $(objects)
 #
 examples: $(mesh_library) $(examplesrcfiles)
 	@$(MAKE) -C examples
+
+#
+# Run the examples
+#
+run_examples: $(mesh_library)
+	@$(MAKE) -C examples run
 
 
 #

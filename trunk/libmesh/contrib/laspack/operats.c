@@ -29,10 +29,10 @@
 #define for_AllCmp for(Ind = Dim; Ind > 0; Ind--)
 #endif   
 
-Vector *Asgn_VV(Vector *V1, Vector *V2)
+QVector *Asgn_VV(QVector *V1, QVector *V2)
 /* VRes = V1 = V2 */
 {
-    Vector *VRes;
+    QVector *VRes;
 
     double Multipl;
     size_t Dim, Ind;
@@ -84,10 +84,10 @@ Vector *Asgn_VV(Vector *V1, Vector *V2)
     return(VRes);
 }
 
-Vector *AddAsgn_VV(Vector *V1, Vector *V2)
+QVector *AddAsgn_VV(QVector *V1, QVector *V2)
 /* VRes = V1 += V2 */
 {
-    Vector *VRes;
+    QVector *VRes;
 
     double Multipl;
     size_t Dim, Ind;
@@ -127,10 +127,10 @@ Vector *AddAsgn_VV(Vector *V1, Vector *V2)
     return(VRes);
 }
 
-Vector *SubAsgn_VV(Vector *V1, Vector *V2)
+QVector *SubAsgn_VV(QVector *V1, QVector *V2)
 /* VRes = V1 -= V2 */
 {
-    Vector *VRes;
+    QVector *VRes;
 
     double Multipl;
     size_t Dim, Ind;
@@ -170,10 +170,10 @@ Vector *SubAsgn_VV(Vector *V1, Vector *V2)
     return(VRes);
 }
 
-Vector *MulAsgn_VS(Vector *V, double S)
+QVector *MulAsgn_VS(QVector *V, double S)
 /* VRes = V *= S */
 {
-    Vector *VRes;
+    QVector *VRes;
 
     size_t Dim, Ind;
     Real *VCmp;
@@ -200,10 +200,10 @@ Vector *MulAsgn_VS(Vector *V, double S)
     return(VRes);
 }
 
-Vector *Add_VV(Vector *V1, Vector *V2)
+QVector *Add_VV(QVector *V1, QVector *V2)
 /* VRes = V1 + V2 */
 {
-    Vector *VRes;
+    QVector *VRes;
 
     char *VResName;
     double Multipl1, Multipl2;
@@ -216,7 +216,7 @@ Vector *Add_VV(Vector *V1, Vector *V2)
     if (LASResult() == LASOK) {
         if (V1->Dim == V2->Dim) {
             Dim = V1->Dim;
-            VRes = (Vector *)malloc(sizeof(Vector));
+            VRes = (QVector *)malloc(sizeof(QVector));
 	    VResName = (char *)malloc((strlen(V_GetName(V1)) + strlen(V_GetName(V2)) + 10)
 		           * sizeof(char));
             if (VRes != NULL && VResName != NULL) {
@@ -336,10 +336,10 @@ QMatrix *Add_QQ(QMatrix *Q1, QMatrix *Q2)
     return(QRes);
 }
 
-Vector *Sub_VV(Vector *V1, Vector *V2)
+QVector *Sub_VV(QVector *V1, QVector *V2)
 /* VRes = V1 - V2 */
 {
-    Vector *VRes;
+    QVector *VRes;
 
     char *VResName;
     double Multipl1, Multipl2;
@@ -352,7 +352,7 @@ Vector *Sub_VV(Vector *V1, Vector *V2)
     if (LASResult() == LASOK) {
         if (V1->Dim == V2->Dim) {
             Dim = V1->Dim;
-            VRes = (Vector *)malloc(sizeof(Vector));
+            VRes = (QVector *)malloc(sizeof(QVector));
 	    VResName = (char *)malloc((strlen(V_GetName(V1)) + strlen(V_GetName(V2)) + 10)
 		           * sizeof(char));
             if (VRes != NULL && VResName != NULL) {
@@ -472,17 +472,17 @@ QMatrix *Sub_QQ(QMatrix *Q1, QMatrix *Q2)
     return(QRes);
 }
 
-Vector *Mul_SV(double S, Vector *V)
+QVector *Mul_SV(double S, QVector *V)
 /* VRes = S * V */
 {
-    Vector *VRes;
+    QVector *VRes;
 
     char *VResName;
 
     V_Lock(V);
     
     if (LASResult() == LASOK) {
-        VRes = (Vector *)malloc(sizeof(Vector));
+        VRes = (QVector *)malloc(sizeof(QVector));
 	VResName = (char *)malloc((strlen(V_GetName(V)) + 20) * sizeof(char));
         if (VRes != NULL && VResName != NULL) {
 	    sprintf(VResName, "%12.5e * (%s)", S, V_GetName(V));
@@ -604,7 +604,7 @@ QMatrix *Mul_SQ(double S, QMatrix *Q)
     return(QRes);
 }
 
-double Mul_VV(Vector *V1, Vector *V2)
+double Mul_VV(QVector *V1, QVector *V2)
 /* S = V1 * V2 */
 {
     double SRes;
@@ -638,10 +638,10 @@ double Mul_VV(Vector *V1, Vector *V2)
     return(SRes);
 }
 
-Vector *Mul_MV(Matrix *M, Vector *V)
+QVector *Mul_MV(Matrix *M, QVector *V)
 /* VRes = M * V */
 {
-    Vector *VRes;
+    QVector *VRes;
 
     char *VResName;
     double MultiplMV;
@@ -659,7 +659,7 @@ Vector *Mul_MV(Matrix *M, Vector *V)
 	if (M->ClmDim == V->Dim) {
             RowDim = M->RowDim;
             ClmDim = M->ClmDim;
-	    VRes = (Vector *)malloc(sizeof(Vector));
+	    VRes = (QVector *)malloc(sizeof(QVector));
 	    VResName = (char *)malloc((strlen(M_GetName(M)) + strlen(V_GetName(V)) + 10)
 		           * sizeof(char));
             if (VRes != NULL && VResName != NULL) {
@@ -737,10 +737,10 @@ Vector *Mul_MV(Matrix *M, Vector *V)
     return(VRes);
 }
 
-Vector *Mul_QV(QMatrix *Q, Vector *V)
+QVector *Mul_QV(QMatrix *Q, QVector *V)
 /* VRes = Q * V */
 {
-    Vector *VRes;
+    QVector *VRes;
 
     char *VResName;
     double MultiplDV, MultiplUV, MultiplLV;
@@ -759,7 +759,7 @@ Vector *Mul_QV(QMatrix *Q, Vector *V)
     if (LASResult() == LASOK) {
 	if (Q->Dim == V->Dim) {
 	    Dim = V->Dim;
-	    VRes = (Vector *)malloc(sizeof(Vector));
+	    VRes = (QVector *)malloc(sizeof(QVector));
 	    VResName = (char *)malloc((strlen(Q_GetName(Q)) + strlen(V_GetName(V)) + 10)
 		           * sizeof(char));
             if (VRes != NULL && VResName != NULL) {
@@ -999,11 +999,11 @@ Vector *Mul_QV(QMatrix *Q, Vector *V)
     return(VRes);
 }
 
-Vector *MulInv_QV(QMatrix *Q, Vector *V)
+QVector *MulInv_QV(QMatrix *Q, QVector *V)
 /* VRes = Q^(-1) * V, this operation is limited to diagonal or triangular
    matrices */
 {
-    Vector *VRes;
+    QVector *VRes;
 
     char *VResName;
     double MultiplD, MultiplU, MultiplL, MultiplV, MultiplDV;
@@ -1023,7 +1023,7 @@ Vector *MulInv_QV(QMatrix *Q, Vector *V)
     if (LASResult() == LASOK) {
 	if (Q->Dim == V->Dim) {
 	    Dim = V->Dim;
-	    VRes = (Vector *)malloc(sizeof(Vector));
+	    VRes = (QVector *)malloc(sizeof(QVector));
 	    VResName = (char *)malloc((strlen(Q_GetName(Q)) + strlen(V_GetName(V)) + 20)
 		           * sizeof(char));
             if (VRes != NULL && VResName != NULL) {
@@ -1491,7 +1491,7 @@ QMatrix *Lower_Q(QMatrix *Q)
     return(QRes);
 }
 
-double l1Norm_V(Vector *V)
+double l1Norm_V(QVector *V)
 /* SRes = l1-Norm of the vector V */
 {
     double SRes;
@@ -1519,7 +1519,7 @@ double l1Norm_V(Vector *V)
     return(SRes);
 }
 
-double l2Norm_V(Vector *V)
+double l2Norm_V(QVector *V)
 /* SRes = l2-Norm of the vector V */
 {
     double SRes;
@@ -1549,7 +1549,7 @@ double l2Norm_V(Vector *V)
     return(SRes);
 }
 
-double MaxNorm_V(Vector *V)
+double MaxNorm_V(QVector *V)
 /* SRes = max-Norm of the vector V */
 {
     double SRes;
@@ -1580,10 +1580,10 @@ double MaxNorm_V(Vector *V)
     return(SRes);
 }
 
-Vector *OrthoRightKer_VQ(Vector *V, QMatrix *Q)
+QVector *OrthoRightKer_VQ(QVector *V, QMatrix *Q)
 /* orthogonalize vector V to the "right" null space of matrix Q */
 {
-    Vector *VRes;
+    QVector *VRes;
 
     double Sum, Mean;
     size_t Dim, Ind;
@@ -1633,10 +1633,10 @@ Vector *OrthoRightKer_VQ(Vector *V, QMatrix *Q)
     return(VRes);
 }
 
-Vector *OrthoLeftKer_VQ(Vector *V, QMatrix *Q)
+QVector *OrthoLeftKer_VQ(QVector *V, QMatrix *Q)
 /* orthogonalize vector V to the "left" null space of matrix Q */
 {
-    Vector *VRes;
+    QVector *VRes;
 
     double Sum, Mean;
     size_t Dim, Ind;

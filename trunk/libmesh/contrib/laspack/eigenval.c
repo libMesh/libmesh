@@ -145,7 +145,7 @@ static void EstimEigenvals(QMatrix *A, PrecondProcType PrecondProc, double Omega
     double *Alpha, *Beta;
     size_t Dim, j;
     Boolean Found;
-    Vector q, qOld, h, p;
+    QVector q, qOld, h, p;
 
     Q_Lock(A);
     

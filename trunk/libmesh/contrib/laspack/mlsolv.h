@@ -16,47 +16,56 @@
 #ifndef MLSOLV_H
 #define MLSOLV_H
 
-#include "vector.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+  
+#include "qvector.h"
 #include "matrix.h"
 #include "qmatrix.h"
 #include "itersolv.h"
 #include "copyrght.h"
 
-Vector *MGStep(int NoLevels, QMatrix *A, Vector *x, Vector *b,
+QVector *MGStep(int NoLevels, QMatrix *A, QVector *x, QVector *b,
 	    Matrix *R, Matrix *P, int Level, int Gamma,
             IterProcType SmoothProc, int Nu1, int Nu2, 
      	    PrecondProcType PrecondProc, double Omega,
             IterProcType SolvProc, int NuC,
 	    PrecondProcType PrecondProcC, double OmegaC);
-Vector *MGIter(int NoLevels, QMatrix *A, Vector *x, Vector *b,
+QVector *MGIter(int NoLevels, QMatrix *A, QVector *x, QVector *b,
 	    Matrix *R, Matrix *P, int MaxIter, int Gamma,
             IterProcType SmoothProc, int Nu1, int Nu2, 
 	    PrecondProcType PrecondProc, double Omega,
             IterProcType SolvProc, int NuC,
 	    PrecondProcType PrecondProcC, double OmegaC);
-Vector *NestedMGIter(int NoLevels, QMatrix *A, Vector *x, Vector *b,
+QVector *NestedMGIter(int NoLevels, QMatrix *A, QVector *x, QVector *b,
 	    Matrix *R, Matrix *P, int Gamma,
             IterProcType SmoothProc, int Nu1, int Nu2, 
 	    PrecondProcType PrecondProc, double Omega,
             IterProcType SolvProc, int NuC,
 	    PrecondProcType PrecondProcC, double OmegaC);
-Vector *MGPCGIter(int NoLevels, QMatrix *A, Vector *x, Vector *b,
+QVector *MGPCGIter(int NoLevels, QMatrix *A, QVector *x, QVector *b,
 	    Matrix *R, Matrix *P, int MaxIter, int NoMGIter, int Gamma,
             IterProcType SmoothProc, int Nu1, int Nu2, 
 	    PrecondProcType PrecondProc, double Omega,
             IterProcType SolvProc, int NuC,
 	    PrecondProcType PrecondProcC, double OmegaC);
-Vector *BPXPrecond(int NoLevels, QMatrix *A, Vector *y, Vector *c,
+QVector *BPXPrecond(int NoLevels, QMatrix *A, QVector *y, QVector *c,
             Matrix *R, Matrix *P, int Level,
             IterProcType SmoothProc, int Nu, 
 	    PrecondProcType PrecondProc, double Omega,
             IterProcType SmoothProcC, int NuC,
 	    PrecondProcType PrecondProcC, double OmegaC);
-Vector *BPXPCGIter(int NoLevels, QMatrix *A, Vector *x, Vector *b,
+QVector *BPXPCGIter(int NoLevels, QMatrix *A, QVector *x, QVector *b,
 	    Matrix *R, Matrix *P, int MaxIter,
             IterProcType SmoothProc, int Nu, 
 	    PrecondProcType PrecondProc, double Omega,
             IterProcType SmoothProcC, int NuC,
 	    PrecondProcType PrecondProcC, double OmegaC);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* MLSOLV_H */

@@ -16,11 +16,16 @@
 #ifndef QMATRIX_H
 #define QMATRIX_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+  
 #include <stdlib.h>
 
 #include "lastypes.h"
 #include "elcmp.h"
-#include "vector.h"
+#include "qvector.h"
 #include "copyrght.h"
 
 typedef struct QMatrixType {
@@ -81,12 +86,16 @@ Real Q_GetEl(QMatrix *Q, size_t Row, size_t Clm);
 void Q_SortEl(QMatrix *Q);
 void Q_AllocInvDiagEl(QMatrix *Q);
 
-void Q_SetKer(QMatrix *Q, Vector *RightKer, Vector *LeftKer);
+void Q_SetKer(QMatrix *Q, QVector *RightKer, QVector *LeftKer);
 Boolean Q_KerDefined(QMatrix *Q);
 
 void **Q_EigenvalInfo(QMatrix *Q);
 
 void Q_Lock(QMatrix *Q);
 void Q_Unlock(QMatrix *Q);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* QMATRIX_H */

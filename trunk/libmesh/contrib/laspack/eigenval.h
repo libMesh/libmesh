@@ -16,7 +16,12 @@
 #ifndef EIGENVAL_H
 #define EIGENVAL_H
 
-#include "vector.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+  
+#include "qvector.h"
 #include "qmatrix.h"
 #include "precond.h"
 #include "copyrght.h"
@@ -26,5 +31,9 @@
 void SetEigenvalAccuracy(double Eps);
 double GetMinEigenval(QMatrix *Q, PrecondProcType PrecondProc, double OmegaPrecond);
 double GetMaxEigenval(QMatrix *Q, PrecondProcType PrecondProc, double OmegaPrecond);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* EIGENVAL_H */

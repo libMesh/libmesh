@@ -16,8 +16,13 @@
 #ifndef RTC_H
 #define RTC_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+  
 #include "lastypes.h"
-#include "vector.h"
+#include "qvector.h"
 #include "itersolv.h"
 #include "copyrght.h"
 
@@ -56,5 +61,10 @@ void SetRTCAuxProc(RTCAuxProcType AuxProc);
 Boolean RTCResult(int Iter, double rNorm, double bNorm, IterIdType IterId);
 int GetLastNoIter(void);
 double GetLastAccuracy(void);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* RTC_H */

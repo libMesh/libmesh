@@ -1,4 +1,4 @@
-// $Id: petsc_vector.h,v 1.9 2003-02-10 03:55:51 benkirk Exp $
+// $Id: laspack_vector.h,v 1.1 2003-02-10 03:55:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -19,93 +19,83 @@
 
 
 
+
+#ifndef __laspack_vector_h__
+#define __laspack_vector_h__
+
+
+
 #include "mesh_common.h"
 
-
-#ifdef HAVE_PETSC
-
-#ifndef __petsc_vector_h__
-#define __petsc_vector_h__
-
-
-// TODO:[BSK} This seems necessary to use petsc on IBM Power3 at NERSC, but only there?  This will need to be wrapped in an ifdef with a variable set by configure
-#include <cmath>
+#if  defined(HAVE_LASPACK) && !defined(USE_COMPLEX_NUMBERS)
 
 
 // C++ includes
-#include <vector>
 
 // Local includes
 #include "numeric_vector.h"
 
-/*
- * Petsc include files.  PETSc with complex numbers 
- * is actually C++.
- */
-# ifndef USE_COMPLEX_NUMBERS
-
-namespace Petsc {
-extern "C" {
-#include <petscvec.h>
-}
-// for easy switching between Petsc 2.1.0/2.1.1
-// typedef Scalar PetscScalar;
-} 
-using namespace Petsc;
-
-#else
-
-#include <petscvec.h>
-
-#endif
 
 
 
-// forward declarations
-class PetscInterface;
+namespace Laspack {
+#include <qvector.h>
+#include <operats.h>
+}  
+
+
+// Forward declarations
+class LaspackInterface;
+
 
 
 /**
- * Petsc vector. Provides a nice interface to the
- * Petsc C-based data structures for parallel vectors.
+ * Laspack vector. Provides a nice interface to the
+ * Laspack C-based data structures for parallel vectors.
  *
  * @author Benjamin S. Kirk, 2002
  */
 
-class PetscVector : public NumericVector
+class LaspackVector : public NumericVector
 {
  public:
 
   /**
    *  Dummy-Constructor. Dimension=0
    */
-  PetscVector ();
+  LaspackVector ();
   
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
-  PetscVector (const unsigned int n);
+  LaspackVector (const unsigned int n);
     
   /**
    * Constructor. Set local dimension to \p n_local, the global dimension
    * to \p n, and initialize all elements with zero.
    */
-  PetscVector (const unsigned n,
+  LaspackVector (const unsigned n,
 	       const unsigned int n_local);
     
   /**
    * Destructor, deallocates memory. Made virtual to allow
    * for derived classes to behave properly.
    */
-  ~PetscVector ();
+  ~LaspackVector ();
 
+  /**
+   * @returns true if the vector has been initialized,
+   * false otherwise.
+   */
+  bool initialized() const { return (_vec != NULL); };
+  
   /**
    * Call the assemble functions
    */
   void close (); 
 
   /**
-   * @returns the \p PetscVector to a pristine state.
+   * @returns the \p LaspackVector to a pristine state.
    */
   void clear ();
   
@@ -202,7 +192,7 @@ class PetscVector : public NumericVector
   /**
    * @returns dimension of the vector. This
    * function was formerly called \p n(), but
-   * was renamed to get the \p PetscVector class
+   * was renamed to get the \p LaspackVector class
    * closer to the C++ standard library's
    * \p std::vector container.
    */
@@ -316,7 +306,7 @@ class PetscVector : public NumericVector
    */
   void localize (NumericVector& v_local,
 		 const std::vector<unsigned int>& send_list) const;
-
+  
   /**
    * Creates a local copy of the global vector in
    * \p v_local only on processor \p proc_id.  By
@@ -329,27 +319,30 @@ class PetscVector : public NumericVector
  private:
 
   /**
-   * Actual Petsc vector datatype
+   * Actual Laspack vector datatype
    * to hold vector entries
    */
-  Vec vec;
-  
-  friend class PetscInterface;
+  Laspack::QVector *_vec;
+
+  /**
+   * Make other Laspack datatypes friends
+   */
+  friend class LaspackInterface;
 };
 
 
-/*----------------------- Inline functions ----------------------------------*/
 
-
-
+//----------------------- ----------------------------------
+// LaspackVector inline methods
 inline
-PetscVector::PetscVector ()
+LaspackVector::LaspackVector () :
+  _vec(NULL)
 {};
 
 
 
 inline
-PetscVector::PetscVector (const unsigned int n)
+LaspackVector::LaspackVector (const unsigned int n)
 {
   init(n, n, false);
 };
@@ -357,8 +350,8 @@ PetscVector::PetscVector (const unsigned int n)
 
 
 inline
-PetscVector::PetscVector (const unsigned int n,
-			  const unsigned int n_local)
+LaspackVector::LaspackVector (const unsigned int n,
+			      const unsigned int n_local)
 {
   init(n, n_local, false);
 };
@@ -366,7 +359,7 @@ PetscVector::PetscVector (const unsigned int n,
 
 
 inline
-PetscVector::~PetscVector ()
+LaspackVector::~LaspackVector ()
 {
   clear ();
 };
@@ -374,49 +367,35 @@ PetscVector::~PetscVector ()
 
 
 inline
-void PetscVector::init (const unsigned int n,
-			const unsigned int n_local,
-			const bool fast)
+void LaspackVector::init (const unsigned int n,
+			  const unsigned int n_local,
+			  const bool fast)
 {
-  int ierr=0;
-  int petsc_n=static_cast<int>(n);
-  int petsc_n_local=static_cast<int>(n_local);
+  // Laspack vectors only for serial cases.
+  assert (n == n_local);
 
-
-  
+  // Only for uninitialized vectors
   if (initialized())
     {
       std::cerr << "ERROR: Vector already initialized!"
-		<< std::endl;
-      
+		<< std::endl;      
       error();
-    }
+    };
 
-  
-  // create a sequential vector if on only 1 processor 
-  if (n_local == n)
-    {
-      ierr = VecCreateSeq (PETSC_COMM_SELF, petsc_n, &vec);      CHKERRQ(ierr);
-      ierr = VecSetFromOptions (vec);                            CHKERRQ(ierr);
-    }
-  // otherwise create an MPI-enabled vector
-  else
-    {
-      assert (n_local < n);
-      
-      ierr = VecCreateMPI (PETSC_COMM_WORLD, petsc_n_local, petsc_n,
-			   &vec);                       CHKERRQ(ierr);
-      
-      ierr = VecSetFromOptions (vec);                   CHKERRQ(ierr);
-    }  
-  
-  _is_initialized = true;
+  // create a sequential vector
+  {
+    using namespace Laspack;
+    
+    _vec = new QVector;
+    
+    V_Constr(_vec, "vec", n, Normal, True);
+    
+    _is_initialized = true;
+  };
 
-  
+  // Optionally zero out all components
   if (fast == false)
     zero ();
-
-  
   
   return;
 };
@@ -424,8 +403,8 @@ void PetscVector::init (const unsigned int n,
 
 
 inline
-void PetscVector::init (const unsigned int n,
-			const bool fast)
+void LaspackVector::init (const unsigned int n,
+			  const bool fast)
 {
   init(n,n,fast);
 };
@@ -433,15 +412,10 @@ void PetscVector::init (const unsigned int n,
 
 
 inline
-void PetscVector::close ()
+void LaspackVector::close ()
 {
   assert (initialized());
   
-  int ierr=0;
-  
-  ierr = VecAssemblyBegin(vec); CHKERRQ(ierr);
-  ierr = VecAssemblyEnd(vec);   CHKERRQ(ierr);
-
   _is_closed = true;
   
   return;
@@ -450,13 +424,15 @@ void PetscVector::close ()
 
 
 inline
-void PetscVector::clear ()
+void LaspackVector::clear ()
 {
   if (initialized())
     {
-      int ierr=0;
+      Laspack::V_Destr (_vec);
 
-      ierr = VecDestroy(vec); CHKERRQ(ierr);
+      delete _vec;
+
+      _vec = NULL;
     };
 
   _is_closed = _is_initialized = false;
@@ -465,130 +441,138 @@ void PetscVector::clear ()
 
 
 inline
-void PetscVector::zero ()
+void LaspackVector::zero ()
 {
   assert (initialized());
-  
-  int ierr=0;
 
-  PetscScalar z=0.;
-  
-  ierr = VecSet (&z, vec); CHKERRQ(ierr);
+  Laspack::V_SetAllCmp (_vec, 0.);
 };
 
 
 
 inline
-unsigned int PetscVector::size () const
+unsigned int LaspackVector::size () const
 {
   assert (initialized());
-  
-  int ierr=0, petsc_size=0;
-  
-  if (!initialized())
-    return 0;
-  
-  ierr = VecGetSize(vec, &petsc_size); CHKERRQ(ierr);
 
-  return static_cast<unsigned int>(petsc_size);
+  return static_cast<unsigned int>(Laspack::V_GetDim(_vec));
 };
 
 
 
 inline
-unsigned int PetscVector::local_size () const
+unsigned int LaspackVector::local_size () const
 {
   assert (initialized());
   
-  int ierr=0, petsc_size=0;
-  
-  ierr = VecGetLocalSize(vec, &petsc_size); CHKERRQ(ierr);
-  
-  return static_cast<unsigned int>(petsc_size);
+  return size();
 };
 
 
 
 inline
-unsigned int PetscVector::first_local_index () const
+unsigned int LaspackVector::first_local_index () const
 {
   assert (initialized());
   
-  int ierr=0, petsc_first=0, petsc_last=0;
-  
-  ierr = VecGetOwnershipRange (vec, &petsc_first, &petsc_last); CHKERRQ(ierr);
-  
-  return static_cast<unsigned int>(petsc_first);
+  return 0;
 };
 
 
 
 inline
-unsigned int PetscVector::last_local_index () const
+unsigned int LaspackVector::last_local_index () const
 {
   assert (initialized());
   
-  int ierr=0, petsc_first=0, petsc_last=0;
-  
-  ierr = VecGetOwnershipRange (vec, &petsc_first, &petsc_last); CHKERRQ(ierr);
-  
-  return static_cast<unsigned int>(petsc_last);
+  return size();
 };
 
 
 
 inline
-Complex PetscVector::operator() (const unsigned int i) const
+void LaspackVector::set (const unsigned int i, const Complex value)
+{
+  assert(initialized());
+  assert(i<size());
+  
+  Laspack::V_SetCmp (_vec, i+1, value);
+};
+
+
+
+inline
+void LaspackVector::add (const unsigned int i, const Complex value)
+{
+  assert(initialized());
+  assert(i<size());
+  
+  Laspack::V_AddCmp (_vec, i+1, value);
+};
+
+
+
+inline
+Complex LaspackVector::operator() (const unsigned int i) const
 {
   assert (initialized());
   assert ( ((i >= first_local_index()) &&
 	    (i <  last_local_index())) );
 
-  int ierr=0;
-  PetscScalar *values, value=0.;
   
-
-  ierr = VecGetArray(vec, &values); CHKERRQ(ierr);
-  
-  value = values[i];
-  
-  ierr = VecRestoreArray (vec, &values); CHKERRQ(ierr);
-  
-  return static_cast<Complex>(value);
+  return static_cast<Complex>(Laspack::V_GetCmp(_vec, i+1));
 };
 
 
 
 inline
-Real PetscVector::min () const
+void LaspackVector::add_vector (const std::vector<Complex>& v,
+				const std::vector<unsigned int>& dof_indices)
 {
-  assert (initialized());
+  assert (!v.empty());
+  assert (v.size() == dof_indices.size());
+  
+  for (unsigned int i=0; i<v.size(); i++)
+    add (dof_indices[i], v[i]);
+};
 
-  int index=0, ierr=0;
-  PetscReal min=0.;
 
-  ierr = VecMin (vec, &index, &min); CHKERRQ(ierr);
+inline
+void LaspackVector::add_vector (const NumericVector& V,
+				const std::vector<unsigned int>& dof_indices)
+{
+  assert (V.size() == dof_indices.size());
 
-  // this return value is correct: VecMin returns a PetscReal
-  return static_cast<Real>(min);
+  for (unsigned int i=0; i<V.size(); i++)
+    add (dof_indices[i], V(i));
 };
 
 
 
 inline
-Real PetscVector::max() const
+Real LaspackVector::min () const
 {
   assert (initialized());
 
-  int index=0, ierr=0;
-  PetscReal max=0.;
+  Real min = 1.e30;
 
-  ierr = VecMax (vec, &index, &max); CHKERRQ(ierr);
+  for (unsigned int i=0; i<size(); i++)
+    min = std::min (min, (*this)(i));
 
-  // this return value is correct: VecMax returns a PetscReal
-  return static_cast<Real>(max);
+  return min;
 };
 
 
-#endif
-#endif
+
+inline
+Real LaspackVector::max() const
+{
+  assert (initialized());
+
+  return static_cast<Real>(Laspack::MaxNorm_V(_vec));
+};
+
+
+
+#endif // #ifdef HAVE_LASPACK
+#endif // #ifdef __laspack_vector_h__

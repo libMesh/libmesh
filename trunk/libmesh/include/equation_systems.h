@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.7 2003-02-10 01:23:11 ddreyer Exp $
+// $Id: equation_systems.h,v 1.8 2003-02-10 03:55:50 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -234,7 +234,7 @@ public:
   /**     
    * Data structure that holds the systems.
    */
-  std::map<std::string, SystemData> systems;
+  std::map<std::string, SystemData*> systems;
   
   /**
    * Data structure to hold user-specified flags.

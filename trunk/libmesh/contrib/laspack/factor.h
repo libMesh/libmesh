@@ -16,11 +16,20 @@
 #ifndef FACTOR_H
 #define FACTOR_H
 
-#include "vector.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+  
+#include "qvector.h"
 #include "qmatrix.h"
 #include "copyrght.h"
 
 QMatrix *ILUFactor(QMatrix *Q);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* FACTOR_H */
 

@@ -1,4 +1,4 @@
-//    $Id: sparse_matrix.h,v 1.1 2003-02-07 22:18:53 benkirk Exp $
+//    $Id: sparse_matrix.h,v 1.2 2003-02-10 03:55:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,10 +24,17 @@
 
 
 // C++ includes
+#include <vector>
+#include <set>
 
 // Local includes
 #include "mesh_common.h"
 #include "dof_map.h"
+#include "reference_counted_object.h"
+
+
+// forward declarations
+class SparseMatrix;
 
 
 
@@ -43,7 +50,7 @@
  * @author Benjamin S. Kirk, 2003
  */
 
-class SparseMatrix 
+class SparseMatrix : public ReferenceCountedObject<SparseMatrix>
 {
  public:
   /**
@@ -74,7 +81,23 @@ class SparseMatrix
    * @returns true if the matrix has been initialized,
    * false otherwise.
    */
-  bool initialized() const { return is_initialized; };
+  virtual bool initialized() const { return _is_initialized; };
+
+  /**
+   * Get a pointer to the \p DofMap to use.
+   */
+  void attach_dof_map (const DofMap& dof_map)
+  { _dof_map = &dof_map; };
+  
+
+  /**
+   * Updates the matrix sparsity pattern.  This method is
+   * included because some sparse matrix storage schemes
+   * (e.g. LASPACK) need it.  If your \p SparseMatrix
+   * implementation does not need this data simply do
+   * not overload this method.
+   */
+  virtual void update_sparsity_pattern (std::vector<std::set<unsigned int> >&) {};
 
   
   /**
@@ -95,7 +118,7 @@ class SparseMatrix
   /**
    * Initialize using sparsity structure computed by \p dof_map.
    */   
-  virtual void init (const DofMap& dof_map) = 0;
+  virtual void init () = 0;
   
   /**
    * Release all memory and return
@@ -236,8 +259,7 @@ class SparseMatrix
   /**
    * Print the contents of the matrix to the screen.
    */
-  virtual void print() const
-  { error(); };
+  virtual void print() const;
   
   /**
    * Print the contents of the matrix in Matlab's
@@ -255,10 +277,15 @@ class SparseMatrix
 protected:
   
   /**
+   * The \p DofMap object associated with this object.
+   */
+  DofMap const *_dof_map;
+  
+  /**
    * Flag indicating whether or not the matrix
    * has been initialized.
    */
-  bool is_initialized;
+  bool _is_initialized;
 };
 
 
@@ -267,7 +294,8 @@ protected:
 // SparseMatrix inline members
 inline
 SparseMatrix::SparseMatrix () :
-  is_initialized(false)
+  _dof_map(NULL),
+  _is_initialized(false)
 {};
 
 
@@ -275,6 +303,45 @@ SparseMatrix::SparseMatrix () :
 inline
 SparseMatrix::~SparseMatrix ()
 {};
+
+
+
+inline
+void SparseMatrix::print() const
+{
+  assert (initialized());
+
+#ifndef USE_COMPLEX_NUMBERS
+
+  for (unsigned int i=0; i<m(); i++)
+    {
+      for (unsigned int j=0; j<n(); j++)
+	std::cout << std::setw(8) << (*this)(i,j) << " ";
+      std::cout << std::endl;
+    }
+
+#else
+  // std::complex<>::operator<<() is defined, but use this form
+
+  std::cout << "Real part:" << std::endl;
+  for (unsigned int i=0; i<m(); i++)
+    {
+      for (unsigned int j=0; j<n(); j++)
+	std::cout << std::setw(14) << (*this)(i,j).real() << " ";
+      std::cout << std::endl;
+    }
+
+  std::cout << std::endl << "Imaginary part:" << std::endl;
+  for (unsigned int i=0; i<m(); i++)
+    {
+      for (unsigned int j=0; j<n(); j++)
+	std::cout << std::setw(8) << (*this)(i,j).imag() << " ";
+      std::cout << std::endl;
+    }
+
+#endif
+
+};
 
 
 

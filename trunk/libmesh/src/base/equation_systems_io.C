@@ -1,4 +1,4 @@
-// $Id: equation_systems_io.C,v 1.7 2003-02-05 20:51:43 ddreyer Exp $
+// $Id: equation_systems_io.C,v 1.8 2003-02-10 03:55:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -349,7 +349,7 @@ void EquationSystems::write(const std::string& name,
   const unsigned int proc_id = mesh.processor_id();
   unsigned int n_sys         = n_systems();
 
-  std::map<std::string, SystemData>::iterator
+  std::map<std::string, SystemData*>::iterator
     pos = systems.begin();
   
   unsigned int sys_num=0;
@@ -374,7 +374,7 @@ void EquationSystems::write(const std::string& name,
       while (pos != systems.end())
 	{
 	  std::string sys_name = pos->first;
-	  SystemData& system   = pos->second;
+	  SystemData& system   = *pos->second;
 	  
 
 
@@ -529,7 +529,7 @@ void EquationSystems::write(const std::string& name,
       {
 	// Convenient references
 	std::string sys_name   = pos->first;
-	SystemData& system     = pos->second;
+	SystemData& system     = *pos->second;
 	DofMap&     dof_map    = system.dof_map;
 
 	std::vector<Complex> global_soln;

@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.10 2003-02-07 15:21:55 benkirk Exp $
+// $Id: dof_map.C,v 1.11 2003-02-10 03:55:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,6 +30,7 @@
 #include "elem.h"
 #include "mesh_base.h"
 #include "fe_interface.h"
+#include "sparse_matrix.h"
 
 
 
@@ -46,6 +47,7 @@ const unsigned int DofMap::invalid_number = static_cast<unsigned int>(-1);
 DofMap::DofMap(const MeshBase& m) :
   _mesh(m),
   _dim(_mesh.mesh_dimension()),
+  _matrix(NULL),
   _n_nodes(0),
   _n_elem(0),
   _n_dfs(0),
@@ -62,6 +64,15 @@ DofMap::DofMap(const MeshBase& m) :
 
 DofMap::~DofMap()
 {
+};
+
+
+
+void DofMap::attach_matrix (SparseMatrix& matrix)
+{
+  _matrix = &matrix;
+  
+  _matrix->attach_dof_map (*this);
 };
 
 
@@ -237,6 +248,8 @@ void DofMap::clear()
   _dof_constraints.clear();
 
 #endif
+
+  _matrix = NULL;
   
   _n_dfs =
     _n_nodes =
@@ -540,10 +553,25 @@ void DofMap::compute_sparsity(const unsigned int proc_id)
     };
 
 
-  // Explicity clear the sparsity pattern now.
-  // it is about to go out of scope, but maybe this
-  // will expedite freeing up its memory?
-  sparsity_pattern.clear();
+  // We are done with the sparsity_pattern.  However, quite a
+  // lot has gone into computing it.  It is possible that some
+  // \p SparseMatrix implementations want to see it.  Let them
+  // see it before we throw it away.
+  //
+  // NOTE:  The \p SparseMatrix::update_sparsity_pattern() is NOT
+  // const, so the \p SparseMatrix may freely trash the
+  // sparsity_pattern.  DO NOT expect to use it any more after
+  // this call.
+  {
+    if (_matrix != NULL)
+      _matrix->update_sparsity_pattern (sparsity_pattern);
+    
+    // Explicity clear the sparsity pattern now.
+    // it is about to go out of scope, but maybe this
+    // will expedite freeing up its memory?
+    sparsity_pattern.clear();
+  };
+
   
   perf_log.stop_event("compute_sparsity()");
 };

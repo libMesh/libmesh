@@ -1,4 +1,4 @@
-// $Id: ex3.C,v 1.7 2003-02-06 17:58:33 ddreyer Exp $
+// $Id: ex3.C,v 1.8 2003-02-10 03:55:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -30,6 +30,7 @@
 /**
  * Basic include file needed for the mesh functionality.
  */
+#include "mesh_init.h"
 #include "mesh.h"
 #include "system_data.h"
 #include "equation_systems.h"
@@ -96,16 +97,7 @@ int main (int argc, char** argv)
   /**
    * Initialize Petsc, like in example 2.
    */
-#ifdef HAVE_PETSC
-  
-  const bool have_petsc = true;
-  PetscInitialize (&argc, &argv, NULL, NULL);
-  
-#else
-  
-  const bool have_petsc = false;
-  
-#endif
+  libMesh::init (argc, argv);
 
   /**
    * This example is designed for real numbers only.
@@ -175,7 +167,7 @@ int main (int argc, char** argv)
     /**
      * Create an equation systems object.
      */
-    EquationSystems equation_systems (mesh, have_petsc);
+    EquationSystems equation_systems (mesh);
     
     /**
      * Declare the system and its variables.
@@ -236,12 +228,7 @@ int main (int argc, char** argv)
   };
 
 
-#ifdef HAVE_PETSC
-
-  PetscFinalize();
-  
-#endif
-
+  libMesh::close();
   
   /**
    * All done.  

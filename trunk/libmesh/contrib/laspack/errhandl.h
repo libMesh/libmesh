@@ -16,6 +16,11 @@
 #ifndef ERRHANDL_H
 #define ERRHANDL_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+  
 #include <stdio.h>
 
 #include "copyrght.h"
@@ -42,5 +47,9 @@ void LASError(LASErrIdType ErrId, char *ProcName, char *Object1Name,
 void LASBreak(void);
 LASErrIdType LASResult(void);
 void WriteLASErrDescr(FILE *File);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* ERRHANDL_H */

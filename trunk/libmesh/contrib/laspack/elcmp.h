@@ -16,6 +16,11 @@
 #ifndef ELCMP_H
 #define ELCMP_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+  
 #include <float.h>
 #include <math.h>
 
@@ -36,5 +41,9 @@ typedef struct {
     size_t Pos;
     Real Val;
 } ElType;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* ELCMP_H */

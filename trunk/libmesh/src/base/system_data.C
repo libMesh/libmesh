@@ -1,4 +1,4 @@
-// $Id: system_data.C,v 1.8 2003-02-10 01:23:15 ddreyer Exp $
+// $Id: system_data.C,v 1.9 2003-02-10 03:55:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -20,9 +20,11 @@
 
 
 // C++ includes
+#include <math.h>
 #include <algorithm>
 
 // Local includes
+#include "mesh_config.h"
 #include "petsc_interface.h"
 #include "system_data.h"
 #include "equation_systems.h"
@@ -159,16 +161,18 @@ void GeneralSystem::init ()
   
   solution.init (n_dofs(), n_local_dofs());
 
-  rhs.init (n_dofs(), n_local_dofs());
+  rhs.init      (n_dofs(), n_local_dofs());
 
   current_local_solution.init (n_dofs ());
 
-  old_local_solution.init (n_dofs ());
+  old_local_solution.init     (n_dofs ());
   
-  older_local_solution.init (n_dofs ());
+  older_local_solution.init   (n_dofs ());
   
 #endif
 
+  // Possibly call a user-supplied initialization
+  // method.
   if (init_system_fptr != NULL)
     {
       init_system_fptr (equation_systems, name());
@@ -186,8 +190,7 @@ void GeneralSystem::init ()
 
 void SystemBase::add_variable (const std::string& var,
 			       const FEType& type)
-{
-  
+{  
   // Make sure the variable isn't there already
   if (var_num.count(var))
     {
@@ -249,17 +252,32 @@ void GeneralSystem::assemble ()
   // already initialized
   if (!matrix.initialized())
     {
+      // Tell the matrix and the dof map
+      // about each other.  This is necessary
+      // because the dof_map needs to share
+      // information with the matrix during the
+      // sparsity computation phase
+      dof_map.attach_matrix (matrix);
+      matrix.attach_dof_map (dof_map);
+
+      // Compute the sparisty pattern for the current
+      // mesh and DOF distribution
       dof_map.compute_sparsity (mesh.processor_id());
-      
-      matrix.init (dof_map);
+
+      // Initialize the matrix conformal to this
+      // sparsity pattern
+      matrix.init ();
     };
 
+  // Clear the matrix and right-hand side.
   matrix.zero ();
   rhs.zero    ();
-  
+
+  // Call the user-specified matrix assembly function
   assemble_fptr (equation_systems, name());
 
-  return;
+  //matrix.print ();
+  //rhs.print    ();
 };
 
 
@@ -267,15 +285,18 @@ void GeneralSystem::assemble ()
 std::pair<unsigned int, Real>
 GeneralSystem::solve ()
 {
-  
+  // Assemble the linear system
   assemble (); 
-  
+
+  // Get the user-specifiied linear solver tolerance
   const Real tol            =
     equation_systems.parameter("linear solver tolerance");
-  
+
+  // Get the user-specified maximum # of linear solver iterations
   const unsigned int maxits =
     static_cast<unsigned int>(equation_systems.parameter("linear solver maximum iterations"));
 
+  // Solve the linear system
   const std::pair<unsigned int, Real> rval = 
     petsc_interface.solve (matrix, solution, rhs, tol, maxits);
 

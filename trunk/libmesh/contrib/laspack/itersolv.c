@@ -26,13 +26,13 @@
 /* number of GMRES steps bevore restart */
 static int GMRESSteps = 10;
 
-Vector *JacobiIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
+QVector *JacobiIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
             PrecondProcType Dummy, double Omega)
 {
     int Iter;
     double bNorm;
     size_t Dim;
-    Vector r;
+    QVector r;
 
     Q_Lock(A);
     V_Lock(x);
@@ -75,13 +75,13 @@ Vector *JacobiIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
     return(x);
 }
 
-Vector *SORForwIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
+QVector *SORForwIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
             PrecondProcType Dummy, double Omega)
 {
     int Iter;
     double bNorm;
     size_t Dim;
-    Vector r;
+    QVector r;
 
     Q_Lock(A);
     V_Lock(x);
@@ -124,13 +124,13 @@ Vector *SORForwIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
     return(x);
 }
 
-Vector *SORBackwIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
+QVector *SORBackwIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
             PrecondProcType Dummy, double Omega)
 {
     int Iter;
     double bNorm;
     size_t Dim;
-    Vector r;
+    QVector r;
 
     Q_Lock(A);
     V_Lock(x);
@@ -173,13 +173,13 @@ Vector *SORBackwIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
     return(x);
 }
 
-Vector *SSORIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
+QVector *SSORIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
             PrecondProcType Dummy, double Omega)
 {
     int Iter;
     double bNorm;
     size_t Dim;
-    Vector r;
+    QVector r;
 
     Q_Lock(A);
     V_Lock(x);
@@ -226,7 +226,7 @@ Vector *SSORIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
     return(x);
 }
 
-Vector *ChebyshevIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
+QVector *ChebyshevIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
             PrecondProcType PrecondProc, double OmegaPrecond)
 {
     /*
@@ -254,7 +254,7 @@ Vector *ChebyshevIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
     double T = 0.0, TOld = 0.0, TNew; /* values of Chebyshev polynomials */
     double bNorm;
     size_t Dim;
-    Vector r, p, z;
+    QVector r, p, z;
     
 
     Q_Lock(A);
@@ -352,7 +352,7 @@ Vector *ChebyshevIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
     return(x);
 }
 
-Vector *CGIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
+QVector *CGIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
             PrecondProcType PrecondProc, double OmegaPrecond)
 {
     /*
@@ -370,7 +370,7 @@ Vector *CGIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
     double Alpha, Beta, Rho, RhoOld = 0.0;
     double bNorm;
     size_t Dim;
-    Vector r, p, q, z;
+    QVector r, p, q, z;
 
     Q_Lock(A);
     V_Lock(x);
@@ -455,14 +455,14 @@ Vector *CGIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
     return(x);
 }
 
-Vector *CGNIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
+QVector *CGNIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
             PrecondProcType PrecondProc, double OmegaPrecond)
 {
     int Iter;
     double Alpha, Beta, Rho, RhoOld = 0.0;
     double bNorm;
     size_t Dim;
-    Vector r, p, q, s, z;
+    QVector r, p, q, s, z;
 
     Q_Lock(A);
     V_Lock(x);
@@ -559,7 +559,7 @@ Vector *CGNIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
     return(x);
 }
 
-Vector *GMRESIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
+QVector *GMRESIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
             PrecondProcType PrecondProc, double OmegaPrecond)
 {
     /*
@@ -580,7 +580,7 @@ Vector *GMRESIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
     double **h, *y, *s, *c1, *c2;
     size_t Dim;
     Boolean AllocOK;
-    Vector *v;
+    QVector *v;
 
     Q_Lock(A);
     V_Lock(x);
@@ -613,7 +613,7 @@ Vector *GMRESIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
 
     /* ... and vectors u */    
     Dim = Q_GetDim(A);
-    v = (Vector *)malloc((GMRESSteps + 2) * sizeof(Vector));
+    v = (QVector *)malloc((GMRESSteps + 2) * sizeof(QVector));
     if (v == NULL)
         AllocOK = False;
     else
@@ -729,7 +729,7 @@ Vector *GMRESIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
     return(x);
 }
 
-Vector *BiCGIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
+QVector *BiCGIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
             PrecondProcType PrecondProc, double OmegaPrecond)
 {
     /*
@@ -747,7 +747,7 @@ Vector *BiCGIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
     double Alpha, Beta, Rho, RhoOld = 0.0;
     double bNorm;
     size_t Dim;
-    Vector r, r_, p, p_, q, z, z_;
+    QVector r, r_, p, p_, q, z, z_;
 
     Q_Lock(A);
     V_Lock(x);
@@ -862,7 +862,7 @@ Vector *BiCGIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
     return(x);
 }
 
-Vector *QMRIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
+QVector *QMRIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
             PrecondProcType PrecondProc, double OmegaPrecond)
 {
     /*
@@ -881,7 +881,7 @@ Vector *QMRIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
         Theta, ThetaOld = 0.0;
     double bNorm;
     size_t Dim;
-    Vector r, p, p_, q, y, y_, v, v_, w, w_, z, z_, s, d;
+    QVector r, p, p_, q, y, y_, v, v_, w, w_, z, z_, s, d;
 
     Q_Lock(A);
     V_Lock(x);
@@ -1105,7 +1105,7 @@ Vector *QMRIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
     return(x);
 }
 
-Vector *CGSIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
+QVector *CGSIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
             PrecondProcType PrecondProc, double OmegaPrecond)
 {
     /*
@@ -1123,7 +1123,7 @@ Vector *CGSIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
     double Alpha, Beta, Rho, RhoOld = 0.0;
     double bNorm;
     size_t Dim;
-    Vector r, r_, p, p_, q, u, u_, v_;
+    QVector r, r_, p, p_, q, u, u_, v_;
 
     Q_Lock(A);
     V_Lock(x);
@@ -1239,7 +1239,7 @@ Vector *CGSIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
     return(x);
 }
 
-Vector *BiCGSTABIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
+QVector *BiCGSTABIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
             PrecondProcType PrecondProc, double OmegaPrecond)
 {
     /*
@@ -1257,7 +1257,7 @@ Vector *BiCGSTABIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
     double Alpha = 0.0, Beta, Rho, RhoOld = 0.0, Omega = 0.0;
     double bNorm;
     size_t Dim;
-    Vector r, r_, p, p_, v, s, s_, t;
+    QVector r, r_, p, p_, v, s, s_, t;
 
     Q_Lock(A);
     V_Lock(x);

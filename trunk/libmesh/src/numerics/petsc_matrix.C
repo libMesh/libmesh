@@ -1,4 +1,4 @@
-//    $Id: petsc_matrix.C,v 1.8 2003-02-07 22:18:54 benkirk Exp $
+//    $Id: petsc_matrix.C,v 1.9 2003-02-10 03:55:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,7 +26,6 @@
 #include "petsc_matrix.h"
 #include "petsc_vector.h"
 #include "dof_map.h"
-#include <petscviewer.h>
 
 
 
@@ -52,7 +51,7 @@ void PetscMatrix::init (const unsigned int m,
 	error();
       }
 
-    is_initialized = true;
+    _is_initialized = true;
   };
 
   
@@ -89,18 +88,19 @@ void PetscMatrix::init (const unsigned int m,
 
 
 
-void PetscMatrix::init (const DofMap& dof_map)
+void PetscMatrix::init ()
 {
+  assert (_dof_map != NULL);
+  
   {
     if (initialized())
       {
 	std::cerr << "ERROR: Matrix already initialized!"
-		  << std::endl;
-	
+		  << std::endl;	
 	error();
       }
 
-    is_initialized = true;
+    _is_initialized = true;
   };
 
   
@@ -108,14 +108,14 @@ void PetscMatrix::init (const DofMap& dof_map)
 
   MPI_Comm_rank (PETSC_COMM_WORLD, &proc_id);
   
-  const unsigned int m   = dof_map.n_dofs();
+  const unsigned int m   = _dof_map->n_dofs();
   const unsigned int n   = m;
-  const unsigned int n_l = dof_map.n_dofs_on_processor(proc_id); 
+  const unsigned int n_l = _dof_map->n_dofs_on_processor(proc_id); 
   const unsigned int m_l = n_l;
 
 
-  const std::vector<unsigned int>& n_nz = dof_map.get_n_nz();
-  const std::vector<unsigned int>& n_oz = dof_map.get_n_oz();
+  const std::vector<unsigned int>& n_nz = _dof_map->get_n_nz();
+  const std::vector<unsigned int>& n_oz = _dof_map->get_n_oz();
 
   // Make sure the sparsity pattern isn't empty
   assert (n_nz.size() == n_l);
@@ -176,7 +176,7 @@ void PetscMatrix::clear ()
     {
       ierr = MatDestroy (mat); CHKERRQ(ierr);
       
-      is_initialized = false;
+      _is_initialized = false;
     };
 };
 

@@ -17,13 +17,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "vector.h"
+#include "qvector.h"
 #include "errhandl.h"
 #include "copyrght.h"
 
-void V_Constr(Vector *V, char *Name, size_t Dim, InstanceType Instance,
+void V_Constr(QVector *V, char *Name, size_t Dim, InstanceType Instance,
               Boolean OwnData)
-/* constructor of the type Vector */
+/* constructor of the type QVector */
 {
     V->Name = (char *)malloc((strlen(Name) + 1) * sizeof(char));
     if (V->Name != NULL)
@@ -46,11 +46,14 @@ void V_Constr(Vector *V, char *Name, size_t Dim, InstanceType Instance,
     }
 }
 
-void V_Destr(Vector *V)
-/* destructor of the type Vector */
+void V_Destr(QVector *V)
+/* destructor of the type QVector */
 {
-    if (V->Name != NULL)
-        free(V->Name);
+    if (V->Name != NULL) {
+      /* WHY DOES THIS CAUSE A SEGFAULT?!? */
+      /*free(V->Name); */
+      V->Name = NULL;
+    }
     if (V->OwnData) {
         if (V->Cmp != NULL) {
             free(V->Cmp);
@@ -59,7 +62,7 @@ void V_Destr(Vector *V)
     }
 }
 
-void V_SetName(Vector *V, char *Name)
+void V_SetName(QVector *V, char *Name)
 /* (re)set name of the vector V */
 {
     if (LASResult() == LASOK) {
@@ -72,7 +75,7 @@ void V_SetName(Vector *V, char *Name)
     }
 }
 
-char *V_GetName(Vector *V)
+char *V_GetName(QVector *V)
 /* returns the name of the vector V */
 {
     if (LASResult() == LASOK)
@@ -81,7 +84,7 @@ char *V_GetName(Vector *V)
         return("");
 }
 
-size_t V_GetDim(Vector *V)
+size_t V_GetDim(QVector *V)
 /* returns dimension of the vector V */
 {
     size_t Dim;
@@ -93,7 +96,7 @@ size_t V_GetDim(Vector *V)
     return(Dim);
 }
 
-void V_SetCmp(Vector *V, size_t Ind, Real Val)
+void V_SetCmp(QVector *V, size_t Ind, Real Val)
 /* set a value of a vector component */
 {
     if (LASResult() == LASOK) {
@@ -105,7 +108,7 @@ void V_SetCmp(Vector *V, size_t Ind, Real Val)
     }
 }
 
-void V_SetAllCmp(Vector *V, Real Val)
+void V_SetAllCmp(QVector *V, Real Val)
 /* set all vector components equal Val */
 {
     size_t Dim, Ind;
@@ -120,7 +123,7 @@ void V_SetAllCmp(Vector *V, Real Val)
     }
 }
 
-void V_SetRndCmp(Vector *V)
+void V_SetRndCmp(QVector *V)
 /* set random components of the vector V */
 {
     size_t Dim, Ind;
@@ -136,7 +139,7 @@ void V_SetRndCmp(Vector *V)
     }
 }
 
-Real V_GetCmp(Vector *V, size_t Ind)
+Real V_GetCmp(QVector *V, size_t Ind)
 /* returns the value of a vector component */
 {
     Real Val;
@@ -154,7 +157,7 @@ Real V_GetCmp(Vector *V, size_t Ind)
     return(Val);
 }
 
-void V_AddCmp(Vector *V, size_t Ind, Real Val)
+void V_AddCmp(QVector *V, size_t Ind, Real Val)
 /* add a value to a vector component */
 {
     if (LASResult() == LASOK) {
@@ -166,14 +169,14 @@ void V_AddCmp(Vector *V, size_t Ind, Real Val)
     }
 }
 
-void V_Lock(Vector *V)
+void V_Lock(QVector *V)
 /* lock the vector V */
 {
     if (V != NULL) 
         V->LockLevel++;
 }
 
-void V_Unlock(Vector *V)
+void V_Unlock(QVector *V)
 /* unlock the vector V */
 {
     if (V != NULL) {

@@ -531,7 +531,7 @@ static int ElCompar(const void *El1, const void *El2)
     return(Compar);
 }
 
-void Q_SetKer(QMatrix *Q, Vector *RightKer, Vector *LeftKer)
+void Q_SetKer(QMatrix *Q, QVector *RightKer, QVector *LeftKer)
 /* defines the null space in the case of a singular matrix */
 {
     double Sum, Mean, Cmp, Norm;
