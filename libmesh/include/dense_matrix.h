@@ -1,4 +1,4 @@
-// $Id: dense_matrix.h,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: dense_matrix.h,v 1.7 2003-02-07 18:07:45 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -105,6 +105,20 @@ class DenseMatrix
    */
   void add (const Tp factor,
 	    const DenseMatrix<Tp>& mat);
+
+
+#ifdef USE_COMPLEX_NUMBERS
+
+  /**
+   * For a complex-valued matrix, let a real-valued
+   * matrix being added to us (Note that the other
+   * way around would be wrong!). 
+   */
+  void add (const Complex factor,
+	    const DenseMatrix<Real>& mat);
+
+#endif
+
 
   /**
    * Left multipliess by the matrix \p M.
@@ -417,6 +431,32 @@ void DenseMatrix<Tp>::add (const Tp factor,
 };
 
 
+
+#ifdef USE_COMPLEX_NUMBERS
+
+/*
+ * For complex numbers, also offer a method
+ * to add a real-valued matrix to a complex-
+ * valued matrix (but not the other way around)!
+ */
+
+template<>
+inline
+void DenseMatrix<Complex>::add (const Complex factor,
+				const DenseMatrix<Real>& mat)
+{
+  assert (m() == mat.m());
+  assert (n() == mat.n());
+
+  for (unsigned int j=0; j<n(); j++)
+    for (unsigned int i=0; i<m(); i++)
+      (*this)(i,j) += factor*mat(i,j);
+
+  return;
+};
+
+
+#endif
 
 
 template<typename Tp>

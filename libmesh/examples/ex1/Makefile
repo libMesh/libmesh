@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.5 2003-02-04 17:35:33 benkirk Exp $
+# $Id: Makefile,v 1.6 2003-02-07 18:07:42 ddreyer Exp $
 
 
 # The location of the mesh library
@@ -52,4 +52,7 @@ clobber:
 distclean:
 	@$(MAKE) clobber
 	@rm -f *.o *.g.o *.pg.o
+
+run:
+	@$(target) -d 3 $(meshdir)/reference_elements/3D/one_hex27.xda
 ###############################################################################

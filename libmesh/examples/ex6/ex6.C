@@ -1,4 +1,4 @@
-// $Id: ex6.C,v 1.1 2003-02-06 17:58:34 ddreyer Exp $
+// $Id: ex6.C,v 1.2 2003-02-07 18:07:44 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -70,14 +70,14 @@
 
 
 /**
- * \mainpage Example 5
+ * \mainpage Example 6
  *
  * \section Introduction
  *
- * WARNING! -- This example is under development.
- * Do not use it!
+ * WARNING! This example is under development.
+ * Better do NOT use it!
  *
- * This is the fifth example program.  It builds on
+ * This is the sixth example program.  It builds on
  * the previous examples, and introduces the Infinite
  * Element class.  Note that the library must be compiled
  * with Infinite Elements enabled.  Otherwise, this
@@ -98,6 +98,12 @@ void assemble_wave(EquationSystems& es,
 
 int main (int argc, char** argv)
 {
+  /**
+   * This short nice macro indicates the user
+   * that the following code may be neither
+   *  stable nor correct.
+   */
+  untested();
 
   /**
    * This example requires Infinite Elements
@@ -182,7 +188,6 @@ int main (int argc, char** argv)
      * origin of the infinite elements.  The \p bool determines
      * whether to be verbose.
      */
-//TODO:[HVDH] Does not work with HEX27...?
     mesh.build_inf_elem(true);
 
     /**

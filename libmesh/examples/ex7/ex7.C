@@ -1,4 +1,4 @@
-// $Id: ex7.C,v 1.2 2003-02-07 16:19:11 spetersen Exp $
+// $Id: ex7.C,v 1.3 2003-02-07 18:07:44 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -58,12 +58,12 @@
  *
  * Warning: This example is still under cunstruction.
  *
- * This is the sixth example program.  It builds on
- * the privious example programs. This example now sows how
- * to deal with complex numbers by solving the Helmholtz
- * equation grad(p)*grad(p)+(omega/c)^2*p=0.
+ * This is the seventh example program.  It builds on
+ * the previous example programs.  It introduces complex
+ * numbers and solves a simple Helmholtz equation 
+ * grad(p)*grad(p)+(omega/c)^2*p=0.
  * For this example the library has to be compiled with
- * complex numbers enabled.
+ * complex numbers enabled. 
  */
 
 
@@ -73,11 +73,57 @@
  */
 void assemble_helmholtz(EquationSystems& es,
 			const std::string& system_name);
+
+
+
 /**
+ *--------------------------------------------------------------------
+ * Initialize some (global) handy constants and variables
+ *
  * The frequency for which we are solving the Helmholtz
  * equation.
  */
 Real frequency;
+
+
+/**
+ * Define the fluid properties. Here (for simplicity) 
+ * we define the density rho = 1. and the speed of sound
+ * c = 1.
+ */
+const Real c   = 1.;
+const Real rho = 1.;
+
+
+/**
+ * When we have PETSc, use their pi.  If not, define our own.
+ */
+#ifdef HAVE_PETSC
+const Real libmesh_pi = PETSC_PI;
+#else
+const Real libmesh_pi = 3.141592653589793;
+#endif
+
+
+/**
+ * Define the imaginary unit
+ * I = 0. + i*1.
+ */ 
+#ifdef USE_COMPLEX_NUMBERS
+Complex I(0.0, 1.0);
+#else
+/**
+ * Do this for compatibility, so that main() can catch
+ * the error of compiling this example without complex support.
+ */
+Complex I(0.);
+#endif
+
+
+
+
+
+
 
 
 int main (int argc, char** argv)
@@ -117,7 +163,7 @@ int main (int argc, char** argv)
      */
     if (argc != 5)
       {
-	std::cerr << "Usage: " << argv[0] << " -d 2"
+	std::cerr << "Usage: " << argv[0] << " -d [dim]"
 		  << " -f [frequency]"
 		  << std::endl;
 	
@@ -154,15 +200,7 @@ int main (int argc, char** argv)
     frequency = atoi(argv[4]);
 
     /**
-     * Define the fluid properties. Here (for simplicity) 
-     * we define the density rho = 1 and the speed of sound
-     * c = 1.
-     */
-    // const Real   c = 1.0;
-    // const Real rho = 1.0;
-
-    /**
-     * Create a 2D mesh.
+     * Create a dim-dimensional mesh.
      */
     Mesh mesh (dim);
     
@@ -172,7 +210,7 @@ int main (int argc, char** argv)
      * to build a mesh of 5x5 \p Quad4 elements in 2D, or \p Hex8
      * elements in 3D.
      */
-    mesh.build_cube (5, 5, 5,
+    mesh.build_cube (20, 20, 20,
 		     -1., 1.,
 		     -1., 1.,
 		     -1., 1.,
@@ -233,8 +271,13 @@ int main (int argc, char** argv)
 
 
     /**
-     * After solving the system write the solution
-     * to a GMV-formatted plot file.
+     * After solving the system, write the solution
+     * to a GMV-formatted plot file.  Now this is 
+     * nice ;-) : we have the @e identical interface 
+     * to the mesh write method as in the real-only 
+     * case, but we output both the real and imaginary 
+     * part, the variable "p" prepended with "r_"
+     * and "i_", respectively.
      */
     mesh.write_gmv ("out.gmv", equation_systems);
   };
@@ -324,28 +367,26 @@ void assemble_helmholtz(EquationSystems& es,
   const DofMap& dof_map = es("Helmholtz").get_dof_map();
 
   /**
-   * Define data structures to contain the element matrix
-   * [Ae] and right-hand-side vector [Fe] contribution.
-   * Here [Ae] is computed using the element stiffness [Ke],
-   * mass [Me] and damping [Ce]  matrices, where
-   * [Ae] = [Ke]+i*omega*[Ce]-(omega/c)^2*[Me].
+   * Now this is slightly different from example 4.
+   * The matrix that we finally add to the PETSc matrix
+   * must be complex-valued: this is \p Ae.
+   * The right-hand-side vector \p Fe is also required to be
+   * complex-valued, as we will see later on.
+   * The mass, damping and stiffness matrices, however, are inherently
+   * real.  And since \p DenseMatrix<> offers a method
+   * to add a real matrix to a complex matrix, we can safely
+   * define element stiffness Ke and mass matrix Me as real. 
    */
-  ComplexDenseMatrix   Ae, Ke, Me, Ce;
+  ComplexDenseMatrix   Ae;
+  RealDenseMatrix      Ke, Ce, Me;
   std::vector<Complex> Fe;
 
   /**
    * Calculate the circular frequency omega and define the fluid
    * properties (here: density roh and speed of sound c). 
    */
-  const Real omega = frequency*2*3.141592653589793;
+  const Real omega = frequency*2*libmesh_pi;
 
-  const Real c   = 1.0;
-  const Real rho = 1.0;
-
-  /**
-   * Define I = 0 + i*1.0
-   */ 
-  Complex I(0.0, 1.0);
 
   /**
    * This vector will hold the degree of freedom indices for
@@ -438,8 +479,7 @@ void assemble_helmholtz(EquationSystems& es,
 	}; // end of quadrature point loop
 
 
-
-      /**
+      /**       
        *----------------------------------------------------------------
        * Now compute the contribution to the element matrix and the
        * right-hand-side vector if the current element lies on the
@@ -536,9 +576,13 @@ void assemble_helmholtz(EquationSystems& es,
       }; // end boundary condition section	  
 
       /**
-       * Compute [Ae]
+       * Compute the total, frequency-dependent element
+       * matrix  \f$  Ae = Ke - (\omega / c)^2 Me \f$.
+       * Note that real matrices are added to a complex
+       * matrix (see above).  The class \p DenseMatrix<>
+       * offers this feature.
        */
-      Ae.add( 1, Ke);
+      Ae.add( 1., Ke);
       Ae.add(I*omega, Ce);
       Ae.add(-omega*omega/(c*c), Me);      
       

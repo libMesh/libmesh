@@ -1,4 +1,4 @@
-// $Id: fe_interface.h,v 1.8 2003-02-06 17:13:34 benkirk Exp $
+// $Id: fe_interface.h,v 1.9 2003-02-07 18:07:45 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -36,18 +36,10 @@ class FEType;
 
 
 /**
- * This class provides an encapsulated access to all static
+ * This class provides an encapsulated access to all @e static
  * public member functions of finite element classes.
  * Using this class, one need not worry about the correct
- * finite element class, or modify all the various switch 
- * statements to account for new elements.  Instead, these 
- * different elements are caught here, and passed to the appropriate 
- * static class member.  By default, the FEBase class methods are used.
- *
- * Currently, only static access is provided.  A possible
- * extension might be to enable the finite element classes
- * access to the EquationSystems object, without
- * much hassle of redefining a lot.
+ * finite element class.
  *
  * @author Daniel Dreyer, 2002
  */
