@@ -1,4 +1,4 @@
-// $Id: mesh_communication.C,v 1.2 2003-09-25 21:46:56 benkirk Exp $
+// $Id: mesh_communication.C,v 1.3 2003-11-18 23:04:20 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -122,9 +122,9 @@ void MeshCommunication::distribute_mesh (MeshBase& mesh)
 	
 	for (unsigned int i=0; i<pts.size(); i += 3)
 	  mesh.add_point (Point(pts[i+0],
-				 pts[i+1],
-				 pts[i+2])
-			   );
+				pts[i+1],
+				pts[i+2])
+			  );
       }
     
     assert (mesh.n_nodes() == n_nodes);
@@ -148,7 +148,7 @@ void MeshCommunication::distribute_mesh (MeshBase& mesh)
 	for (; it != it_end; ++it)
 	  {
 	    const Elem* elem = *it;
-
+	    
 	    assert (elem != NULL);
 	    
 	    conn.push_back (static_cast<unsigned int>(elem->type()));
@@ -159,7 +159,7 @@ void MeshCommunication::distribute_mesh (MeshBase& mesh)
       }
     else
       conn.resize (n_elem + total_weight);
-
+    
     // Sanity check for all processors
     assert (conn.size() == (n_elem + total_weight));
     
@@ -191,10 +191,8 @@ void MeshCommunication::distribute_mesh (MeshBase& mesh)
     assert (mesh.n_elem() == n_elem);
   } // Done distributing the elements
 
-
-
   // Print the information in the mesh for sanity.
-  mesh.print_info();
+  // mesh.print_info();
   
 #else
 
