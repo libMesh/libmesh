@@ -1,4 +1,4 @@
-// $Id: mesh_data.C,v 1.7 2003-07-12 14:02:59 ddreyer Exp $
+// $Id: mesh_data.C,v 1.8 2003-07-30 16:14:05 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -106,6 +106,85 @@ void  MeshData::slim (const bool node_id_map,
     }
 }
 
+
+
+
+void MeshData::translate (const MeshBase& out_mesh,
+			  std::vector<Number>& values,
+			  std::vector<std::string>& names) const
+{
+  const unsigned int n_comp = this->n_val_per_node();
+
+  /*
+   * transfer our nodal data to a vector
+   * that may be written concurrently
+   * with the \p out_mesh.
+   */
+  {
+    // reserve memory for the nodal data
+    values.reserve(n_comp*out_mesh.n_nodes());
+
+    std::vector<Number>::iterator values_it = values.begin();
+
+    // iterate over the mesh's nodes
+    const std::vector<Node*>& mesh_nodes = out_mesh.get_nodes();
+
+    std::vector<Node*>::const_iterator nodes_it = mesh_nodes.begin();
+    const std::vector<Node*>::const_iterator nodes_end = mesh_nodes.end();
+
+    /*
+     * the buffer vector. The MeshData _always_ returns the
+     * same data_buf size, so we could have defined \p buf_end
+     * already here.  But defining it in the loop is safer,
+     * and this program is not truly aimed at performance.
+     */
+    std::vector<Number> data_buf;
+    data_buf.reserve (n_comp);
+
+    for (; nodes_it != nodes_end; ++nodes_it)
+      {
+	const Node* node = *nodes_it;
+
+	// get the data
+	this->operator()(node, data_buf);
+
+	// store consecutively
+	std::vector<Number>::const_iterator buf_it = data_buf.begin();
+	const std::vector<Number>::const_iterator buf_end = data_buf.end();
+
+	for (; buf_it != buf_end; ++buf_it)
+	  {
+	    *values_it = *buf_it;
+	    ++values_it;
+	  }
+      }
+  }
+
+
+
+  /*
+   * Now we have the data, nicely stored in \p values.
+   * It remains to give names to the data, then write to
+   * file.
+   */
+  {
+    names.reserve(n_comp);
+
+    /*
+     * this naming scheme only works up to n_comp=100
+     * (at least for gmv-accepted variable names)
+     */
+    assert(n_comp < 100);
+
+    for (unsigned int n=0; n<n_comp; n++)
+      {
+	std::ostringstream name_buf;
+	name_buf << "bc_" << n;
+	names.push_back(name_buf.str());
+      }
+  }
+
+}
 
 
 

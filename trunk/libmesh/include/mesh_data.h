@@ -1,4 +1,4 @@
-// $Id: mesh_data.h,v 1.11 2003-07-27 14:56:11 ddreyer Exp $
+// $Id: mesh_data.h,v 1.12 2003-07-30 16:14:04 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -97,6 +97,24 @@ public:
    */
   void slim (const bool node_id_map = true,
 	     const bool elem_id_map = true);
+
+  /**
+   * Translates the @e nodal data contained in this object
+   * to \p data_values and \p data_names.  These two
+   * vectors are particularly suitable for use with
+   * the \p MeshBase::write method that takes nodal
+   * data.  E.g., the export method may be used for
+   * inspecting boundary conditions.  A reference
+   * to the mesh for which the data should be written
+   * has to be provided.  Note that this mesh @e has 
+   * to contain the nodes for which this \p MeshData 
+   * holds data.  I.e., \p out_mesh may only refer to 
+   * the \p MeshBase itself (that this \p MeshData belongs 
+   * to), or its \p BoundaryMesh, cf. \p Mesh.  
+   */
+  void translate (const MeshBase& out_mesh,
+		  std::vector<Number>& data_values,
+		  std::vector<std::string>& data_names) const;
 
   /**
    * Read mesh data from file named \p name.  
