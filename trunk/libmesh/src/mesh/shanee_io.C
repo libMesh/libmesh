@@ -1,4 +1,4 @@
-// $Id: shanee_io.C,v 1.2 2004-04-07 21:42:39 benkirk Exp $
+// $Id: shanee_io.C,v 1.3 2004-07-26 16:27:48 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -18,6 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // C++ includes
+#include <fstream>
 
 // Local includes
 #include "shanee_io.h"

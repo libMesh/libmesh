@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.32 2004-03-24 04:32:59 jwpeterson Exp $
+// $Id: boundary_info.C,v 1.33 2004-07-26 16:27:48 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -26,7 +26,6 @@
 #include "libmesh_config.h"
 #include "boundary_info.h"
 #include "boundary_mesh.h"
-
 
 
 //------------------------------------------------------
@@ -347,20 +346,40 @@ void BoundaryInfo::print_info() const
 		<< "--------------------------" << std::endl
 		<< "  (Node No., ID)               " << std::endl;
 
-      std::for_each(_boundary_node_id.begin(),
-		    _boundary_node_id.end(),
-		    PrintNodeInfo());
-    }
+//       std::for_each(_boundary_node_id.begin(),
+// 		    _boundary_node_id.end(),
+// 		    PrintNodeInfo());
 
+      std::map<const Node*, short int>::const_iterator it        = _boundary_node_id.begin();
+      const std::map<const Node*, short int>::const_iterator end = _boundary_node_id.end();
+
+      for (; it != end; ++it)
+	std::cout << "  (" << (*it).first->id()
+		  << ", "  << (*it).second
+		  << ")"  << std::endl;
+    }
+  
   // Print out the element BCs
   if (!_boundary_side_id.empty())
     {
-      std::cout << "Side Boundary conditions:" << std::endl
+      std::cout << std::endl
+		<< "Side Boundary conditions:" << std::endl
 		<< "-------------------------" << std::endl
 		<< "  (Elem No., Side No., ID)      " << std::endl;
 
-      std::for_each(_boundary_side_id.begin(),
-		    _boundary_side_id.end(),
-  		    PrintSideInfo()); 
+//       std::for_each(_boundary_side_id.begin(),
+// 		    _boundary_side_id.end(),
+//   		    PrintSideInfo());
+
+      std::multimap<const Elem*,
+	std::pair<unsigned short int, short int> >::const_iterator it = _boundary_side_id.begin();
+      const std::multimap<const Elem*,
+	std::pair<unsigned short int, short int> >::const_iterator end = _boundary_side_id.end();
+
+     for (; it != end; ++it)
+       std::cout << "  (" << (*it).first->id()
+		 << ", "  << (*it).second.first
+		 << ", "  << (*it).second.second 
+		 << ")"   << std::endl;
     }
 }

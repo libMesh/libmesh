@@ -1,4 +1,4 @@
-// $Id: mesh_data.C,v 1.20 2004-04-18 00:51:50 jwpeterson Exp $
+// $Id: mesh_data.C,v 1.21 2004-07-26 16:27:48 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -20,7 +20,6 @@
 
 
 // C++ includes
-#include <map>
 #include <sstream>
 
 // Local includes

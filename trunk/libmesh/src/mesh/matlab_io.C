@@ -1,4 +1,4 @@
-// $Id: matlab_io.C,v 1.2 2004-04-07 21:42:38 benkirk Exp $
+// $Id: matlab_io.C,v 1.3 2004-07-26 16:27:48 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -19,7 +19,7 @@
 
 
 // C++ includes
-
+#include <fstream>
 
 // Local includes
 #include "matlab_io.h"

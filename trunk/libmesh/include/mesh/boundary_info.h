@@ -1,4 +1,4 @@
-// $Id: boundary_info.h,v 1.5 2004-03-18 16:40:59 jwpeterson Exp $
+// $Id: boundary_info.h,v 1.6 2004-07-26 16:27:47 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -23,15 +23,18 @@
 #define __boundary_info_h__
 
 // C++ includes
+#include <vector>
+#include <iostream>
 #include <map>
 #include <set>
 
 // Local includes
-#include "elem.h"
 
 
 
 // Forward declarations
+class Elem;
+class Node;
 class MeshBase;
 class BoundaryMesh;
 
@@ -218,45 +221,40 @@ public:
 
 
 
-  /**
-   * Functor class for printing a single node's info
-   * To be used with "for_each".
-   */
-  class PrintNodeInfo 
-  {
-  public:
-    
-    inline
-    void operator() (const std::pair<const Node*, short int>& np) const
-    {
-      std::cout << "  (" << np.first->id()
-		<< ", "  << np.second
-		<< ")"  << std::endl;
-    }
-    
-  };
+//   /**
+//    * Functor class for printing a single node's info
+//    * To be used with "for_each".
+//    */
+//   class PrintNodeInfo 
+//   {
+//   public:
+//     inline
+//     void operator() (const std::pair<const Node*, short int>& np) const
+//     {
+//       std::cout << "  (" << np.first->id()
+// 		<< ", "  << np.second
+// 		<< ")"  << std::endl;
+//     }
+//   };
 
 
-  /**
-   * Functor class for printing a single side's info.
-   * To be used with "for_each".
-   */
-  class PrintSideInfo
-  {
-  public:
-    PrintSideInfo() {}
-    
-    inline
-    void operator() (const std::pair<const Elem*, std::pair<unsigned short int,short int> >& sp) const
-    {
-      std::cout << "  (" << sp.first->id()
-		<< ", "  << sp.second.first
-		<< ", "  << sp.second.second 
-		<< ")"   << std::endl;
-    }
-
-  private:
-  };
+//   /**
+//    * Functor class for printing a single side's info.
+//    * To be used with "for_each".
+//    */
+//   class PrintSideInfo
+//   {
+//   public:
+//     PrintSideInfo() {}
+//     inline
+//     void operator() (const std::pair<const Elem*, std::pair<unsigned short int,short int> >& sp) const
+//     {
+//       std::cout << "  (" << sp.first->id()
+// 		<< ", "  << sp.second.first
+// 		<< ", "  << sp.second.second 
+// 		<< ")"   << std::endl;
+//     }
+//   };
 
 
   
@@ -291,8 +289,12 @@ public:
 };
 
 
+
+
+
+
 // ------------------------------------------------------------
-// BoundaryData inline methods
+// BoundaryInfo inline methods
 inline
 void BoundaryInfo::remove (const Node* node)
 {
