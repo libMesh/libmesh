@@ -1,4 +1,4 @@
-// $Id: mesh.h,v 1.9 2004-11-08 00:11:03 jwpeterson Exp $
+// $Id: mesh.h,v 1.10 2004-11-12 20:55:19 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -102,28 +102,6 @@ class Mesh : public MeshBase
    */
   void read (const std::string& name,
 	     MeshData* mesh_data=NULL);
-  
-  /**
-   * Read solutions in mgflo's XDR format.
-   * Should be compatible with the MGF
-   * solution file format. This method expects
-   * an ASCII file.  What is MGF?  It was a microgravity
-   * fluid physics code developed under a NASA ESS Grand
-   * Challenge Grant.  This method exists solely for
-   * backwards compatiblity with MGF and could be
-   * deprecated at any time.
-   */
-  void read_xdr_soln (const std::string& name,
-		      std::vector<Number>& soln,
-		      std::vector<std::string>& var_names);
-
-  /**
-   * Same, but expects a true XDR-Encoded binary file.
-   */
-  void read_xdr_soln_binary (const std::string& name,
-			     std::vector<Number>& soln,
-			     std::vector<std::string>& var_names);
-  
   /**
    * Write the file specified by \p name.  Attempts to figure out the
    * proper method by the file extension.
@@ -142,38 +120,6 @@ class Mesh : public MeshBase
   void write (const std::string& name,
 	      const std::vector<Number>& values,
 	      const std::vector<std::string>& variable_names);
-  
-  /**
-   * Write meshes in mgflo's XDR format.
-   * Note: MGF won't be able to read these
-   * meshes in general since they will be
-   * hybrid meshes.
-   */
-  void write_xdr (const std::string& name);
-
-  /**
-   * Write meshes in mgflo's binary XDR format.
-   * Note: MGF won't be able to read these
-   * meshes in general since they will be
-   * hybrid meshes.
-   */
-  void write_xdr_binary (const std::string& name, const unsigned int mgf_originator=0);
-
-  /**
-   * Write solutions in mgflo's XDR format.
-   * Should be compatible with the mgf
-   * solution file format.  Writes an ASCII file.
-   */
-  void write_xdr_soln (const std::string& name,
-		       std::vector<Number>& soln,
-		       std::vector<std::string>& var_names);
-  
-  /**
-   * Same, but writes an XDR-Encoded binary file.
-   */
-  void write_xdr_soln_binary (const std::string& name,
-			      std::vector<Number>& soln,
-			      std::vector<std::string>& var_names);
 
   /**
    * Clear all internal data.
@@ -212,31 +158,6 @@ class Mesh : public MeshBase
 		       const const_element_iterator& it_end) const;
 
 
-  
- protected:
-
-  /**
-   * Open the file named \p name and read the mesh in Sandia National Lab's
-   * ExodusII format. This is the method to use for reading in meshes generated
-   * by cubit.  Works in 2D for \p TRIs, \p TRI6s, \p QUAD s, and \p QUAD9s.
-   * Works in 3D for \p TET4s, \p TET10s, \p HEX8s, and \p HEX27s.  This only
-   * works for \p Mesh since it needs access to the \p boundary_info
-   * structure.
-   */
-  void read_exd (const std::string& name);
-
-  /**
-   * Read meshes in mgflo's XDR format.
-   * Should be compatible with the mgf
-   * mesh file formats.  This method actualy
-   * expects an ASCII-file.
-   */
-  void read_xdr (const std::string& name);
-
-  /**
-   * Same, but expects a true XDR-Encoded binary file.
-   */
-  void read_xdr_binary (const std::string& name, const unsigned int mgf_originator = 0);
   
  private:
 };

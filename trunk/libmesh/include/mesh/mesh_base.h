@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.33 2004-11-12 00:42:40 jwpeterson Exp $
+// $Id: mesh_base.h,v 1.34 2004-11-12 20:55:19 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -43,8 +43,6 @@ class EquationSystems;
 #include "enum_elem_type.h"
 #include "sphere.h"
 #include "enum_order.h"
-//#include "elem_iterators.h"
-//#include "node_iterators.h"
 #include "partitioner.h"
 
 #include "variant_filter_iterator.h"
@@ -64,7 +62,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.33 $
+ * \version $Revision: 1.34 $
  */
 
 
@@ -127,9 +125,27 @@ public:
   unsigned int n_nodes () const { return _nodes.size(); }
 
   /**
+   * Reserves space for a known number of nodes.
+   * Note that this method may or may not do anything, depending
+   * on the actual \p Mesh implementation.  If you know the number
+   * of nodes you will add and call this method before repeatedly
+   * calling \p add_point() the implementation will be more efficient.
+   */
+  void reserve_nodes (const unsigned int nn) { _nodes.reserve (nn); }
+  
+  /**
    * Returns the number of elements in the mesh.
    */
   unsigned int n_elem ()  const { return _elements.size(); }
+
+  /**
+   * Reserves space for a known number of elements.
+   * Note that this method may or may not do anything, depending
+   * on the actual \p Mesh implementation.  If you know the number
+   * of elements you will add and call this method before repeatedly
+   * calling \p add_point() the implementation will be more efficient.
+   */
+  void reserve_elem (const unsigned int ne) { _elements.reserve (ne); }
 
   /**
    * Returns the number of active elements in the mesh.

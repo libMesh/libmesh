@@ -27,13 +27,10 @@
 #include "point.h"
 #include "elem_quality.h"
 #include "gmv_io.h"
+#include "xdr_io.h"
 #include "statistics.h"
 
-// Conditionally include Petsc stuff
-// #ifdef HAVE_PETSC
-// #include "petsc_interface.h"
-// #include "petsc_matrix.h"
-// #endif
+
 
 /*
  * convenient enum for the mode in which the boundary mesh
@@ -594,11 +591,9 @@ int main (int argc, char** argv)
      * Possibly read the solution
      */
     if (names.size() == 3)
-      {
-	mesh.read_xdr_soln_binary(names[2],
-				  soln,
-				  var_names);
-      }
+      XdrIO(mesh,true).read_mgf_soln(names[2],
+				     soln,
+				     var_names);
 
 
     /**

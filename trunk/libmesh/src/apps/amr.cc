@@ -40,6 +40,8 @@ int main (int argc, char** argv)
     // Read a mesh
     mesh.read(meshname);
 
+    GMVIO(mesh).write ("out_0.gmv");
+    
     mesh.elem(0)->set_refinement_flag (Elem::REFINE);
 
     MeshRefinement mesh_refinement (mesh);
@@ -55,17 +57,17 @@ int main (int argc, char** argv)
 
     SteadySystem& primary = es.add_system<SteadySystem>("primary");
 
-    es("primary").add_variable ("U", FIRST);
-    es("primary").add_variable ("V", FIRST);
+    primary.add_variable ("U", FIRST);
+    primary.add_variable ("V", FIRST);
 
-    es("primary").get_dof_map()._dof_coupling.resize(2);      
-    es("primary").get_dof_map()._dof_coupling(0,0) = 1;
-    es("primary").get_dof_map()._dof_coupling(1,1) = 1;
+    primary.get_dof_map()._dof_coupling.resize(2);      
+    primary.get_dof_map()._dof_coupling(0,0) = 1;
+    primary.get_dof_map()._dof_coupling(1,1) = 1;
     
-    es("primary").attach_assemble_function(assemble);
+    primary.attach_assemble_function(assemble);
     
     es.init ();
-    
+        
     es.print_info ();
     primary.get_dof_map().print_dof_constraints ();
 
