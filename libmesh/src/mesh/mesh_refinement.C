@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.10 2003-04-29 21:41:12 benkirk Exp $
+// $Id: mesh_refinement.C,v 1.11 2003-04-30 21:09:30 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -61,7 +61,7 @@ Node* MeshRefinement::add_point(const Point& p)
   if (new_nodes.empty())
     for (unsigned int n=0; n<mesh.n_nodes(); n++)
       new_nodes.insert(std::pair<unsigned int,
-		       unsigned int>(mesh.point(n).key(),n));
+		                 unsigned int>(mesh.point(n).key(),n));
 
   
   unsigned int n;

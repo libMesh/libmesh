@@ -1,4 +1,4 @@
-// $Id: thin_system.C,v 1.1 2003-03-21 15:29:29 ddreyer Exp $
+// $Id: thin_system.C,v 1.2 2003-04-30 21:09:29 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -70,6 +70,18 @@ void ThinSystem::init ()
   // method.
   if (init_system_fptr != NULL)
     this->init_system_fptr (_equation_systems, this->name());
+}
+
+
+
+void ThinSystem::reinit ()
+{
+  assert (_mesh.is_prepared());
+  
+  // initialize parent data
+  SystemBase::reinit();
+
+  error();
 }
 
 

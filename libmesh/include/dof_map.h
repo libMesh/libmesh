@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.24 2003-04-30 13:55:55 benkirk Exp $
+// $Id: dof_map.h,v 1.25 2003-04-30 21:09:20 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -209,6 +209,16 @@ public:
   void dof_indices (const Elem* elem,
 		    std::vector<unsigned int>& di,
 		    const unsigned int vn = static_cast<unsigned int>(-1)) const;
+
+  /**
+   * Fills the vector di with the global degree of freedom indices
+   * for the element using the \p DofMap::old_dof_object.
+   * If no variable number is specified then all
+   * variables are returned.
+   */
+  void old_dof_indices (const Elem* elem,
+			std::vector<unsigned int>& di,
+			const unsigned int vn = static_cast<unsigned int>(-1)) const;
 
 
 

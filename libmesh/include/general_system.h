@@ -1,4 +1,4 @@
-// $Id: general_system.h,v 1.8 2003-03-21 15:29:08 ddreyer Exp $
+// $Id: general_system.h,v 1.9 2003-04-30 21:09:23 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -71,6 +71,12 @@ public:
    * the system, so that, e.g., \p assemble() may be used.
    */
   void init ();
+
+  /**
+   * Reinitializes the member data fields associated with
+   * the system, so that, e.g., \p assemble() may be used.
+   */
+  void reinit ();
 
   /**
    * Update the local values to reflect the solution

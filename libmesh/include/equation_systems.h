@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.21 2003-04-09 02:30:14 jwpeterson Exp $
+// $Id: equation_systems.h,v 1.22 2003-04-30 21:09:23 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -90,6 +90,11 @@ public:
    * Initialize all the systems
    */
   void init ();
+
+  /**
+   * Reinitialize all the systems
+   */
+  void reinit ();
 
   /**
    * @returns the number of equation systems.
