@@ -493,13 +493,13 @@ int main (int argc, char** argv)
 	 * activate the MeshData of the dim mesh,
 	 * so that it can be copied to the boundary
 	 */
-	if (write_bndry == BM_WITH_MESHDATA)
-	  {
-	    mesh.data.activate();
-
-	    if (verbose)
-		mesh.data.print_info();
-	  }
+//	if (write_bndry == BM_WITH_MESHDATA)
+//	  {
+//	    mesh.data.activate();
+//
+//	    if (verbose)
+//		mesh.data.print_info();
+//	  }
 
 
 	mesh.read(names[0]);
@@ -852,8 +852,8 @@ int main (int argc, char** argv)
 	      
 	      if (write_bndry == BM_MESH_ONLY)
 		mesh.boundary_info.sync(boundary_mesh, false);
-	      else if  (write_bndry == BM_WITH_MESHDATA)
-		mesh.boundary_info.sync(boundary_mesh, true);
+//	      else if  (write_bndry == BM_WITH_MESHDATA)
+//		mesh.boundary_info.sync(boundary_mesh, true);
 	      else
 		error();
 	      
