@@ -1,4 +1,4 @@
-// $Id: ex4.C,v 1.15 2003-02-26 13:59:51 benkirk Exp $
+// $Id: ex4.C,v 1.16 2003-02-27 00:15:06 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -79,7 +79,7 @@
  *
  * This example also shows how to extend example 3 to run in
  * parallel.  Notice how litte has changed!  The significant
- * differences are marked with ----- PARALELL CHANGE -----
+ * differences are marked with ----- PARALLEL CHANGE -----
  */
 
 

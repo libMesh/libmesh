@@ -1,4 +1,4 @@
-// $Id: inf_fe_static.C,v 1.10 2003-02-20 04:59:58 benkirk Exp $
+// $Id: inf_fe_static.C,v 1.11 2003-02-27 00:15:14 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -195,9 +195,9 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs(const FEType& fet,
   const ElemType base_et(Base::get_elem_type(inf_elem_type));
     
   if (Dim > 1)
-    return FEInterface::n_dofs(Dim-1, fet, base_et) * Radial::n_dofs(inf_elem_type, fet.radial_order);
+    return FEInterface::n_dofs(Dim-1, fet, base_et) * Radial::n_dofs(fet.radial_order);
   else
-    return Radial::n_dofs(inf_elem_type, fet.radial_order);
+    return Radial::n_dofs(fet.radial_order);
 }
 		
 
@@ -216,13 +216,12 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_at_node(const FEType& fet,
   const unsigned int n_base   ( Base::index  (fet, base_et, n) );
   const unsigned int n_radial ( Radial::index(fet, base_et, n) );
 
-//  std::cout << "n_base=" << n_base << ", n_radial=" << n_radial << ", n=" << n << std::endl;
-
+  //TODO:[DD] Does icc7.0 here also complain???
   if (Dim > 1)
     return FEInterface::n_dofs_at_node(Dim-1, fet, base_et, n_base) 
-        * Radial::n_dofs_at_node(inf_elem_type, fet.radial_order, n_radial);
+        * Radial::n_dofs_at_node(fet.radial_order, n_radial);
   else
-    return Radial::n_dofs_at_node(inf_elem_type, fet.radial_order, n_radial);
+    return Radial::n_dofs_at_node(fet.radial_order, n_radial);
 }
 
 
@@ -238,9 +237,9 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_per_elem(const FEType& fet,
 
   if (Dim > 1)
     return FEInterface::n_dofs_per_elem(Dim-1, fet, base_et) 
-        * Radial::n_dofs_per_elem(inf_elem_type, fet.radial_order);
+        * Radial::n_dofs_per_elem(fet.radial_order);
   else
-    return Radial::n_dofs_per_elem(inf_elem_type, fet.radial_order);
+    return Radial::n_dofs_per_elem(fet.radial_order);
 }
 
 
@@ -314,6 +313,7 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
   const Real         v        ( p(Dim-1) );  // holds for all Dim, except for 0, but we don't inst Dim=0 ;-)
 
 
+  //TODO:[DD]  exp(ikr) is still missing here!
   if (Dim > 1)
     return FEInterface::shape (Dim-1, fet, base_et, i_base, p)
         * InfFE<Dim,T_radial,T_map>::eval (v, o_radial, i_radial)
