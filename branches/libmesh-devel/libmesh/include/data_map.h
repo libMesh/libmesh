@@ -1,4 +1,4 @@
-// $Id: data_map.h,v 1.1.2.2 2003-05-09 14:18:51 benkirk Exp $
+// $Id: data_map.h,v 1.1.2.3 2003-05-09 21:27:47 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -156,7 +156,7 @@ private:
  * \p dynamic_cast<>
  */
 template <class T>
-class DataObjectPtr : public DataObjectBase, public T
+class DataObjectPtr : public T, public DataObjectBase
 { 
 private:
 
