@@ -1,7 +1,7 @@
-// $Id: error_estimator.C,v 1.9 2003-06-03 22:10:07 benkirk Exp $
+// $Id: error_estimator.C,v 1.10 2003-09-02 18:02:44 benkirk Exp $
 
 // The Next Great Finite Element Library.
-// Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

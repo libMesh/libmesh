@@ -1,7 +1,7 @@
-// $Id: node.h,v 1.10 2003-05-28 03:17:48 benkirk Exp $
+// $Id: node.h,v 1.11 2003-09-02 18:02:38 benkirk Exp $
 
 // The Next Great Finite Element Library.
-// Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -44,7 +44,7 @@ class Node;
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.10 $
+ * \version $Revision: 1.11 $
  */
 
 class Node : public Point,

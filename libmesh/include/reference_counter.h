@@ -1,7 +1,7 @@
- // $Id: reference_counter.h,v 1.10 2003-03-05 13:11:57 benkirk Exp $
+ // $Id: reference_counter.h,v 1.11 2003-09-02 18:02:39 benkirk Exp $
 
 // The Next Great Finite Element Library.
-// Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

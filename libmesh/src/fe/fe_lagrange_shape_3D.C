@@ -1,7 +1,7 @@
-// $Id: fe_lagrange_shape_3D.C,v 1.10 2003-03-05 17:01:21 benkirk Exp $
+// $Id: fe_lagrange_shape_3D.C,v 1.11 2003-09-02 18:02:41 benkirk Exp $
 
 // The Next Great Finite Element Library.
-// Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
