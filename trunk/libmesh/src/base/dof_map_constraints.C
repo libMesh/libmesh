@@ -1,4 +1,4 @@
-// $Id: dof_map_constraints.C,v 1.11 2004-11-19 13:57:52 benkirk Exp $
+// $Id: dof_map_constraints.C,v 1.12 2004-12-10 14:49:32 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -90,7 +90,7 @@ void DofMap::add_constraint_row (const unsigned int dof_number,
 				 const DofConstraintRow& constraint_row)
 {
 
-  if (!_dof_constraints.count(dof_number))
+  if (this->is_constrained_dof(dof_number))
     std::cerr << "WARNING: DOF " << dof_number << " was already constrained!"
 	      << std::endl;
 
