@@ -216,6 +216,10 @@ can be useful for testing purposes.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+Compiling C++ (in debug mode) ex1.C...
+Linking ex1...
+/home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
+: the use of `mktemp' is dangerous, better use `mkstemp'
 ***************************************************************
 * Running Example  ./ex1
 ***************************************************************
@@ -245,34 +249,6 @@ can be useful for testing purposes.
 WARNING! There are options you set that were not used!
 WARNING! could be spelling mistake, etc!
 Option left: name:-d value: 3
-
- ----------------------------------------------------------------------------
-| Time:           Mon Nov 10 22:54:14 2003
-| OS:             Linux
-| HostName:       ariel
-| OS Release      2.4.20-19.9smp
-| OS Version:     #1 SMP Tue Jul 15 17:04:18 EDT 2003
-| Machine:        i686
-| Username:       benkirk
- ----------------------------------------------------------------------------
- ----------------------------------------------------------------------------
-| libMesh Performance: Alive time=0.079192, Active time=0.002877
- ----------------------------------------------------------------------------
-| Event                         nCalls  Total       Avg         Percent of   |
-|                                       Time        Time        Active Time  |
-|----------------------------------------------------------------------------|
-|                                                                            |
-|                                                                            |
-| Mesh                                                                       |
-|   read()                      1       0.0028      0.002804    97.46        |
-|                                                                            |
-| MeshBase                                                                   |
-|   find_neighbors()            1       0.0001      0.000063    2.19         |
-|   renumber_nodes_and_elem()   1       0.0000      0.000010    0.35         |
- ----------------------------------------------------------------------------
-| Totals:                       3       0.0029                  100.00       |
- ----------------------------------------------------------------------------
-
  
 ***************************************************************
 * Done Running Example  ./ex1
