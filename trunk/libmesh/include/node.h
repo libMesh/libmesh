@@ -1,4 +1,4 @@
-// $Id: node.h,v 1.11 2003-09-02 18:02:38 benkirk Exp $
+// $Id: node.h,v 1.12 2003-09-27 00:54:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -32,7 +32,7 @@
 
 // forward declarations
 class Node;
-
+class MeshRefinement;
 
 
 /**
@@ -44,7 +44,7 @@ class Node;
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.11 $
+ * \version $Revision: 1.12 $
  */
 
 class Node : public Point,
@@ -114,9 +114,34 @@ public:
    */
   bool active () const;
 
+
   
 private:
 
+  /**
+   * @returns the \p key for this node. The key is an arbitrary,
+   * not necessarily unique value associated with this \p Node.
+   * Don't use it, unless you know what you are doing.
+   */
+  unsigned int key () const;
+
+  /**
+   * @returns a writeable reference to the \p key for
+   * this \p Node.
+   */
+  unsigned int & set_key ();
+
+  /**
+   * The \p key value.
+   */
+  unsigned int _key;
+
+
+  /**
+   * This class need access to the node key information,
+   * but no one else should be able to mess with it.
+   */
+  friend class MeshRefinement;
 };
 
 
@@ -128,7 +153,8 @@ Node::Node (const Real x,
 	    const Real y,
 	    const Real z,
 	    const unsigned int id) :
-  Point(x,y,z)
+  Point(x,y,z),
+  _key (0)
 {
   this->set_id() = id;
 }
@@ -139,7 +165,8 @@ inline
 Node::Node (const Node& n) :
   Point(n),
   DofObject(n),
-  ReferenceCountedObject<Node>()
+  ReferenceCountedObject<Node>(),
+  _key (n._key)
 {
 }
 
@@ -148,7 +175,8 @@ Node::Node (const Node& n) :
 inline
 Node::Node (const Point& p,
 	    const unsigned int id) :
-  Point(p)
+  Point(p),
+  _key (0)
 {
   // optionally assign the id.  We have
   // to do it like this otherwise
@@ -174,6 +202,8 @@ Node & Node::operator= (const Point& p)
   (*this)(1) = p(1);
   (*this)(2) = p(2);
 
+  _key = 0;
+  
   return *this;
 }
 
@@ -211,6 +241,22 @@ inline
 bool Node::active () const
 {
   return (this->id() != Node::invalid_id);
+}
+
+
+
+inline
+unsigned int Node::key () const
+{
+  return _key;
+}
+
+
+
+inline
+unsigned int & Node::set_key ()
+{
+  return _key;
 }
 
 

@@ -1,4 +1,4 @@
-// $Id: utility.C,v 1.10 2003-09-02 18:02:45 benkirk Exp $
+// $Id: utility.C,v 1.11 2003-09-27 00:54:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -18,6 +18,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
+// library configuration
+#include "libmesh_config.h"
 
 // System includes
 #include <iostream>
@@ -26,6 +28,9 @@
 #include <unistd.h>
 #include <sys/utsname.h>
 
+#ifdef HAVE_LOCALE
+# include <locale>
+#endif
 
 // Local includes
 #include "o_string_stream.h"
@@ -47,12 +52,15 @@ std::string Utility::system_info()
   
 #ifdef HAVE_LOCALE
     
+  typedef std::ostreambuf_iterator<char, std::char_traits<char> > TimeIter;
+  typedef std::time_put<char, TimeIter>                           TimePut;
+ 
   std::locale loc;
   OStringStream dateStr;
   std::ostreambuf_iterator<char, std::char_traits<char> > begin(dateStr);
-  time_t tm                  = time(NULL);
-  struct tm* tmb             = localtime(&tm);
-  const Utility::TimePut& tp = std::use_facet<TimePut>(loc);
+  time_t tm         = time(NULL);
+  struct tm* tmb    = localtime(&tm);
+  const TimePut& tp = std::use_facet<TimePut>(loc);
   tp.put(begin,
 	 dateStr,
 	 dateStr.fill(),

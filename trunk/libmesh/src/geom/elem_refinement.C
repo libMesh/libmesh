@@ -1,4 +1,4 @@
-// $Id: elem_refinement.C,v 1.5 2003-09-02 18:02:42 benkirk Exp $
+// $Id: elem_refinement.C,v 1.6 2003-09-27 00:54:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -81,82 +81,81 @@ void Elem::refine (MeshBase& mesh)
 	keys[c].resize (this->child(c)->n_nodes());
 	nodes[c].resize(this->child(c)->n_nodes());
 	
-      for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
-	{
-	  // zero entries
-	  p[c][nc].zero();
-	  keys[c][nc]  = 0;
-	  nodes[c][nc] = NULL;
+	for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
+	  {
+	    // zero entries
+	    p[c][nc].zero();
+	    keys[c][nc]  = 0;
+	    nodes[c][nc] = NULL;
 	  
-	  for (unsigned int n=0; n<this->n_nodes(); n++)
-	    {
-	      // The value from the embedding matrix
-	      const float em_val = this->embedding_matrix(c,nc,n);
+	    for (unsigned int n=0; n<this->n_nodes(); n++)
+	      {
+		// The value from the embedding matrix
+		const float em_val = this->embedding_matrix(c,nc,n);
 	      
-	      if (em_val != 0.)
-		{
-		  p[c][nc].add_scaled (this->point(n), em_val);
+		if (em_val != 0.)
+		  {
+		    p[c][nc].add_scaled (this->point(n), em_val);
 		  
-		  // We may have found the node, in which case we
-		  // won't need to look it up later.
-		  if (em_val == 1.)
-		    nodes[c][nc] = this->get_node(n);
+		    // We may have found the node, in which case we
+		    // won't need to look it up later.
+		    if (em_val == 1.)
+		      nodes[c][nc] = this->get_node(n);
 		  
-		  // Otherwise build the key to look for the node
-		  else
-		    {
-		      // An unsigned int associated with the
-		      // address of the node n.  We can't use the
-		      // node number since they can change.
+		    // Otherwise build the key to look for the node
+		    else
+		      {
+			// An unsigned int associated with the
+			// address of the node n.  We can't use the
+			// node number since they can change.
 			
 #if SIZEOF_INT == SIZEOF_VOID_P
 			
-		      // 32-bit machines
-		      const unsigned int n_id =
-			reinterpret_cast<unsigned int>(this->get_node(n));
+			// 32-bit machines
+			const unsigned int n_id =
+			  reinterpret_cast<unsigned int>(this->get_node(n));
 		      
 #elif SIZEOF_LONG_INT == SIZEOF_VOID_P
 
-		      // 64-bit machines 
-		      // Another big prime number less than max_unsigned_int
-		      // for key creation on 64-bit machines
-		      const unsigned int bp3 = 4294967291;
-		      const unsigned int n_id =			
-		        reinterpret_cast<long unsigned int>(this->get_node(n))%bp3;
+			// 64-bit machines 
+			// Another big prime number less than max_unsigned_int
+			// for key creation on 64-bit machines
+			const unsigned int bp3 = 4294967291;
+			const unsigned int n_id =			
+			  reinterpret_cast<long unsigned int>(this->get_node(n))%bp3;
 			
 #else
-		      // Huh?
-		      WHAT KIND OF CRAZY MACHINE IS THIS? CANNOT COMPILE
+			// Huh?
+			WHAT KIND OF CRAZY MACHINE IS THIS? CANNOT COMPILE
 			
 #endif
-		      // Compute the key for this new node nc.  This will
-		      // be used to locate the node if it already exists
-		      // in the mesh.
-			keys[c][nc] +=
-			(((static_cast<unsigned int>(em_val*100000.)%bp1) *
-			  (n_id%bp1))%bp1)*bp2;
-		    }
-		}
-	    }
-	}
-
-      // assign nodes to children & add them to the mesh
-      for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
-	{
-	  if (nodes[c][nc] != NULL)
-	    {
-	      this->child(c)->set_node(nc) = nodes[c][nc];
-	    }
-	  else
-	    {
-	      this->child(c)->set_node(nc) =
-		mesh.mesh_refinement.add_point(p[c][nc],
-					       keys[c][nc]);
-	    }
-	}
-	
-	mesh.add_elem(this->child(c),
-		      mesh.mesh_refinement.new_element_number());
+			  // Compute the key for this new node nc.  This will
+			  // be used to locate the node if it already exists
+			  // in the mesh.
+			  keys[c][nc] +=
+			  (((static_cast<unsigned int>(em_val*100000.)%bp1) *
+			    (n_id%bp1))%bp1)*bp2;
+		      }
+		  }
+	      }
+	  }
+      
+	// assign nodes to children & add them to the mesh
+	for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
+	  {
+	    if (nodes[c][nc] != NULL)
+	      {
+		this->child(c)->set_node(nc) = nodes[c][nc];
+	      }
+	    else
+	      {
+		this->child(c)->set_node(nc) =
+		  mesh.mesh_refinement.add_point(p[c][nc],
+						 keys[c][nc]);
+	      }
+	  }
+      
+	mesh.mesh_refinement.add_elem (this->child(c));
       }
   }
 

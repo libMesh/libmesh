@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.h,v 1.17 2003-09-25 21:46:55 benkirk Exp $
+// $Id: mesh_refinement.h,v 1.18 2003-09-27 00:54:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -30,7 +30,7 @@
 
 // C++ Includes   -----------------------------------
 #include <vector>
-#include <set>
+#include <list>
 
 #if   defined(HAVE_HASH_MAP)
 # include <hash_map>
@@ -47,6 +47,7 @@
 class MeshBase;
 class Point;
 class Node;
+class Elem;
 class ErrorVector;
 
 
@@ -143,13 +144,11 @@ public:
    * the new node.  The \p key tells the method where to look.
    */
   Node* add_point (const Point& p, const unsigned int key);
-  
+
   /**
-   * @returns The index of the next unused element number
-   * in the \p element vector.  If all the entries are
-   * full it returns the size of the vector.
+   * Adds the element \p elem to the mesh.
    */
-  unsigned int new_element_number ();
+  Elem* add_elem (Elem* elem);
 
 
 
@@ -280,30 +279,15 @@ private:
    
    */
   bool eliminate_unrefined_patches ();
-				     
-  /**
-   * @returns The index of the next unused node number
-   * in the \p nodes vector.  If all the entries are
-   * full it returns the size of the vector.
-   */
-  unsigned int new_node_number ();
-
 
 
   //---------------------------------------------
   // Utility algorithms
-  
+
   /**
-   * Updates the \p unused_elements data structure to
-   * be compatible with the current state of the mesh.
+   * Updates the \p _new_nodes_map
    */
-  void update_unused_elements ();
-  
-  /**
-   * Updates the \p unused_nodes data structure to
-   * be compatible with the current state of the mesh.
-   */
-  void update_unused_nodes () {}
+  void update_nodes_map ();
 
   /**
    * Sets the refinement flag to \p Elem::DO_NOTHING
@@ -344,11 +328,11 @@ private:
   map_type _new_nodes_map;
 
   /**
-   * Data structure that holds the indices of elements
+   * Data structure that holds iterators to elements
    * that have been removed from the mesh but not
    * yet removed from the \p _elements vector.
    */
-  std::set<unsigned int> _unused_elements;
+  std::list<std::vector<Elem*>::iterator> _unused_elements;
 
   /**
    * Reference to the mesh.

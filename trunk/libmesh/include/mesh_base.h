@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.48 2003-09-25 21:46:55 benkirk Exp $
+// $Id: mesh_base.h,v 1.49 2003-09-27 00:54:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -63,7 +63,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.48 $
+ * \version $Revision: 1.49 $
  */
 
 
@@ -74,7 +74,7 @@ class MeshBase
 public:
 
   /**
-   * Constructor.
+   * Constructor.  Requires \p d, the dimension of the mesh.
    */
   MeshBase (unsigned int d);
   
@@ -84,7 +84,7 @@ public:
   MeshBase (const MeshBase& other_mesh);
 
   /**
-   * Destructor. Deletes all the elements that are currently stored.
+   * Destructor.
    */
   virtual ~MeshBase ();
 
@@ -240,8 +240,7 @@ public:
   /**
    * Add \p Node \p n to the vertex array, optionally at the specified position \p nn.
    */
-  Node* add_point (const Point& n,
-		   const unsigned int nn=libMesh::invalid_uint);
+  Node* add_point (const Point& n);
 
   /**
    * Return a pointer to the \f$ i^{th} \f$ element.
@@ -254,10 +253,9 @@ public:
   const std::vector<Elem*> & get_elem () const { return _elements; }
 
   /**
-   * Add elem \p e to the elem array.
+   * Add elem \p e to the end of the element array.
    */
-  Elem* add_elem (Elem* e,
-		  const unsigned int n=libMesh::invalid_uint);
+  Elem* add_elem (Elem* e);
 
 #ifdef ENABLE_INFINITE_ELEMENTS
 
@@ -719,6 +717,16 @@ protected:
   Node* & node_ptr (const unsigned int i);
     
   /**
+   * Return a reference to the \p nodes vector holding the nodes.
+   */
+  std::vector<Node*> & get_nodes () { return _nodes; }
+
+  /**
+   * Return a reference to the \p cells vector holding the elements.
+   */
+  std::vector<Elem*> & get_elem () { return _elements; }
+
+  /**
    * Reads an unstructured 2D triangular mesh from the file
    * specified by \p name.  The format is described in the 
    * implementation.  This function facilitates reading meshes 
@@ -833,22 +841,6 @@ protected:
 			 const std::vector<std::string>* solution_names=NULL,
 			 const bool write_partitioning=false);
 
-  
-  
-#ifdef ENABLE_AMR
-
-  /**
-   * After coarsening a mesh it is possible that
-   * there are some voids in the \p nodes and
-   * \p elements vectors that need to be cleaned
-   * up.  This functions does that.  The indices
-   * of the entities to be removed are contained
-   * in the two input sets.
-   */
-  void trim_unused_elements(std::set<unsigned int>& unused_elements);
-
-#endif
-
   /**
    * Returns a writeable reference to the number of subdomains.
    */
@@ -901,8 +893,8 @@ protected:
 #ifdef ENABLE_AMR
   
   /**
-   * The \p MeshRefinement functions need to be able to
-   * call trim_unused_elements()
+   * The \p MeshRefinement functions needs read/write access
+   * to our \p _nodes and \p _elements arrays.
    */
   friend class MeshRefinement;
   

@@ -1,4 +1,4 @@
-// $Id: laspack_interface.C,v 1.10 2003-09-25 21:46:56 benkirk Exp $
+// $Id: laspack_interface.C,v 1.11 2003-09-27 00:54:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -30,48 +30,48 @@
 // Local Includes
 #include "laspack_interface.h"
 
-#ifndef USE_COMPLEX_NUMBERS
-extern "C"
-{
-#endif
+// #ifndef USE_COMPLEX_NUMBERS
+// extern "C"
+// {
+// #endif
 
-  void print_iter_accuracy(int Iter,
-			   _LPReal rNorm,
-			   _LPReal bNorm,
-			   IterIdType IterId)
-    /* put out accuracy reached after each solver iteration */
-  {
+//   void print_iter_accuracy(int Iter,
+// 			   _LPReal rNorm,
+// 			   _LPReal bNorm,
+// 			   IterIdType IterId)
+//     /* put out accuracy reached after each solver iteration */
+//   {
     
-    //FILE* out = fopen("residual.hist", "a");
-    static int icall=0;
+//     //FILE* out = fopen("residual.hist", "a");
+//     static int icall=0;
     
-    if (!icall)
-      {
-	printf("Iter   ||r||/||f||\n");
-	printf("------------------\n");
-	icall=1;
-      }
+//     if (!icall)
+//       {
+// 	printf("Iter   ||r||/||f||\n");
+// 	printf("------------------\n");
+// 	icall=1;
+//       }
     
-    if ( Iter%1==0 && (IterId == CGIterId ||
-		       IterId == CGNIterId ||
-		       IterId == GMRESIterId ||
-		       IterId == BiCGIterId ||
-		       IterId == QMRIterId ||
-		       IterId == CGSIterId ||
-		       IterId == BiCGSTABIterId)  )
-      {
-	if (!_LPIsZeroReal(bNorm))
-	  printf("%d    \t %g\n", Iter, rNorm/bNorm);
-	else
-	  printf("%d     (fnorm == 0)\n", Iter);
-      }
+//     if ( Iter%1==0 && (IterId == CGIterId ||
+// 		       IterId == CGNIterId ||
+// 		       IterId == GMRESIterId ||
+// 		       IterId == BiCGIterId ||
+// 		       IterId == QMRIterId ||
+// 		       IterId == CGSIterId ||
+// 		       IterId == BiCGSTABIterId)  )
+//       {
+// 	if (!_LPIsZeroReal(bNorm))
+// 	  printf("%d    \t %g\n", Iter, rNorm/bNorm);
+// 	else
+// 	  printf("%d     (fnorm == 0)\n", Iter);
+//       }
     
-    //fclose(out);
-  }
+//     //fclose(out);
+//   }
 
-#ifndef USE_COMPLEX_NUMBERS
-}
-#endif  
+// #ifndef USE_COMPLEX_NUMBERS
+// }
+// #endif  
 
 /*----------------------- functions ----------------------------------*/
 template <typename T>
@@ -97,7 +97,7 @@ void LaspackInterface<T>::init ()
       this->_is_initialized = true;
     }
 
-  SetRTCAuxProc (print_iter_accuracy);
+ // SetRTCAuxProc (print_iter_accuracy);
 }
 
 

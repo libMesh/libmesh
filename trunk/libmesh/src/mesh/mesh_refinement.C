@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.26 2003-09-25 21:46:56 benkirk Exp $
+// $Id: mesh_refinement.C,v 1.27 2003-09-27 00:54:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -25,8 +25,8 @@
 // only compile these functions if the user requests AMR support
 #ifdef ENABLE_AMR
 
-#include "mesh_refinement.h"
 #include "mesh_base.h"
+#include "mesh_refinement.h"
 #include "elem.h"
 #include "mesh_logging.h"
 
@@ -56,7 +56,7 @@ void MeshRefinement::clear ()
 
 
 
-Node* MeshRefinement::add_point(const Point& p, const unsigned int key)
+Node* MeshRefinement::add_point (const Point& p, const unsigned int key)
 {
   // Look for the key in the multimap  
   std::pair<map_type::iterator, map_type::iterator>
@@ -84,6 +84,9 @@ Node* MeshRefinement::add_point(const Point& p, const unsigned int key)
 #else
   _new_nodes_map.insert(pos.first, std::make_pair(key, node));
 #endif			    
+
+  // Set the key for this node
+  node->set_key() = key;
   
   // Return the address of the new node
   return node;
@@ -91,45 +94,55 @@ Node* MeshRefinement::add_point(const Point& p, const unsigned int key)
 
 
 
-unsigned int MeshRefinement::new_element_number()
+Elem* MeshRefinement::add_elem (Elem* elem)
 {
-  unsigned int n=0;
+  assert (elem != NULL);
   
-  if (_unused_elements.empty())      
-    n = mesh.n_elem();
-  else
+  // If the unused_elements has any iterators from
+  // old elements, take the first one
+  if (!_unused_elements.empty())
     {
-      n = *_unused_elements.begin();
-      _unused_elements.erase(_unused_elements.begin());
+      std::vector<Elem*>::iterator it = _unused_elements.front();
+
+      *it = elem;
+
+      _unused_elements.pop_front();
     }
 
-  return n;
+  // Otherwise, use the conventional add method
+  else
+    {
+      mesh.add_elem (elem);
+    }
+
+  return elem;
 }
 
 
 
-void MeshRefinement::update_unused_elements()
+void MeshRefinement::update_nodes_map ()
 {
-  /**
-   * Update the unused_elements data structure
-   */
-  
-  // clear and start from scratch
-  _unused_elements.clear();
-  
-  // find NULL elements and add the index to the database.
-  // Note that we can't use the mesh.elem(e) approach here
-  // since it asserts the element is not NULL.
-  const std::vector<Elem*>& elements = mesh.get_elem();
+  START_LOG("update_nodes_map()", "MeshRefinement");
 
-  // Loop over the entries in the elements vector &
-  // add any NULL elements to the set.
-  for (unsigned int e=0; e<elements.size(); e++)
-    if (elements[e] == NULL)
-      // Insert at the end.
-      _unused_elements.insert(_unused_elements.end(),e);
-}
+  _new_nodes_map.clear();
+  
+  std::vector<Node*> & nodes = mesh.get_nodes();
 
+  std::vector<Node*>::iterator       it  = nodes.begin();
+  const std::vector<Node*>::iterator end = nodes.end();
+
+  for (; it != end; ++it)
+    {
+      Node* node = *it;
+
+      assert (node != NULL);
+      
+      // Add the node to the map.
+      _new_nodes_map.insert(std::make_pair(node->key(), node));
+    }
+
+  STOP_LOG("update_nodes_map()", "MeshRefinement");
+} 
 
 
 
@@ -186,38 +199,10 @@ void MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
   this->coarsen_elements ();
 
   /**
-   * Find any NULL elements from the coarsening step.
-   * We will fill these before allocating new space.
-   */
-  this->update_unused_elements ();
-  
-  /**
    * Now refine the flagged elements.  This will
    * take up some space, maybe more than what was freed.
    */
   this->refine_elements();
-
-  /**
-   * Find any nodes that were orphaned by the coarsening
-   * step and not reconnected during the refinement step.
-   */
-  this->update_unused_nodes();
-  
-  /**
-   * We need contiguous elements, so
-   * better trim the vector in case
-   * we didn't fill up the coarsened
-   * space.
-   */
-  mesh.trim_unused_elements (_unused_elements);
-  
-  assert (_unused_elements.empty());
-  
-  for (unsigned int e=0; e<mesh.n_elem(); e++)
-    {
-      assert (mesh.elem(e) != NULL);
-      //mesh.elem(e)->set_refinement_flag(Elem::DO_NOTHING);
-    }
   
   /**
    * Finally, the new mesh needs to be prepared for use
@@ -319,11 +304,11 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 			      level_one_satisfied = false;
 			    }
 			}
-		      else  // I have a neighbor and it is not active. That means it has children.
-			{   // While it _may_ be possible to coarsen us if all the children of
-			  // that element want to be refined, it is impossible to know at this
-			  // stage.  Forget about it for the moment...  This can be handled in
-			  // two steps.
+		      else // I have a neighbor and it is not active. That means it has children.
+			{  // While it _may_ be possible to coarsen us if all the children of
+			   // that element want to be refined, it is impossible to know at this
+			   // stage.  Forget about it for the moment...  This can be handled in
+			   // two steps.
 			  elem->set_refinement_flag(Elem::DO_NOTHING);
 			  level_one_satisfied = false;
 			}
@@ -517,29 +502,55 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 
 void MeshRefinement::coarsen_elements ()
 {
-  START_LOG ("coarsen_elements()", "MeshRefinement");  
-  
-  for (unsigned int e=0; e<mesh.n_elem(); e++)
-    if (mesh.elem(e)->refinement_flag() == Elem::COARSEN)
-      {
-	if (mesh.elem(e)->active())
+  START_LOG ("coarsen_elements()", "MeshRefinement");
+
+  // Clear the unused_elements data structure.
+  // The elements have been packed since it was built,
+  // so there are _no_ unused elements.  We cannot trust
+  // any iterators currently in this data structure.
+  _unused_elements.clear();
+
+  std::vector<Elem*>& elements = mesh.get_elem();
+
+  // Loop over the elements.   
+  for (std::vector<Elem*>::iterator it = elements.begin();
+       it != elements.end(); ++it)
+    {
+      Elem* elem = *it;
+
+      assert (elem != NULL);
+      
+      if (elem->refinement_flag() == Elem::COARSEN)
+	// active elements flagged for coarsening will
+	// truly be deleted
+	if (elem->active()) 
 	  {
-	    assert (mesh.elem(e)->level() != 0);
+	    // Huh?  no level-0 element should be active
+	    // and flagged for coarsening.
+	    assert (elem->level() != 0);
 
 	    // Remove this element from any neighbor
 	    // lists that point to it.
-	    mesh.elem(e)->nullify_neighbors();
+	    elem->nullify_neighbors();
+
+	    // Delete the element, make sure the corresponding
+	    // entry in the vector is set to NULL
+	    delete elem;
+
+	    *it = NULL;
 	    
-	    delete mesh.elem(e);
-	    
-	    mesh.add_elem(NULL, e);
+	    // Add this iterator to the _unused_elements
+	    // data structure so we might fill it.
+	    _unused_elements.push_back (it);
 	  }
+        // inactive elements flagged for coarsening
+        // will become active
 	else
 	  {
-	    mesh.elem(e)->coarsen();
-	    assert (mesh.elem(e)->active());
+	    elem->coarsen();
+	    assert (elem->active());
 	  }
-      }
+    }
   
   STOP_LOG ("coarsen_elements()", "MeshRefinement");  
 }
@@ -548,20 +559,29 @@ void MeshRefinement::coarsen_elements ()
 
 void MeshRefinement::refine_elements ()
 {
+  // Update the _new_nodes_map so that elements can
+  // find nodes to connect to.
+  this->update_nodes_map ();
+
   START_LOG ("refine_elements()", "MeshRefinement");
   
+  // Careful!  We can't use iterators here.  When
+  // an element is refined reallocation in the elements
+  // vector may be forced, which might invalidate
+  // any iterators we have.
   const unsigned int orig_n_elem = mesh.n_elem();
 
-
+  std::vector<Elem*>& elements = mesh.get_elem();
+  
   // Loop over the elements in the mesh, refine
   // those whose flags are set to Elem::REFINE
-  const std::vector<Elem*>& elements = mesh.get_elem();
-
   for (unsigned int e=0; e<orig_n_elem; e++)
     if (elements[e] != NULL)
       if (elements[e]->refinement_flag() == Elem::REFINE)
 	elements[e]->refine (mesh);
 
+  this->clear();
+  
   STOP_LOG ("refine_elements()", "MeshRefinement");
 }
 
