@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.19 2003-08-26 22:58:45 jwpeterson Exp $
+// $Id: mesh.C,v 1.20 2003-08-27 02:04:23 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -238,6 +238,7 @@ void Mesh::create_pid_mesh(Mesh& pid_mesh,
   // partitioning.  This is not necessarily an error since
   // you may run on one processor and still partition the
   // mesh into several partitions.
+#ifdef DEBUG
   if (this->n_processors() < pid)
     {
       std::cout << "WARNING:  You are creating a "
@@ -250,6 +251,7 @@ void Mesh::create_pid_mesh(Mesh& pid_mesh,
 		<< ")."
 		<< std::endl;
     }
+#endif
   
   // Create iterators to loop over the list of elements
   const_active_pid_elem_iterator       it(this->elements_begin(),   pid);
@@ -257,6 +259,10 @@ void Mesh::create_pid_mesh(Mesh& pid_mesh,
 
   this->create_submesh (pid_mesh, it, it_end);
 }
+
+
+
+
 
 
 
@@ -295,7 +301,7 @@ void Mesh::create_submesh (Mesh& new_mesh,
 
 	assert (new_elem != NULL);
 	
-	// Loop over the nodes on this element.  Map 
+	// Loop over the nodes on this element.  
 	for (unsigned int n=0; n<old_elem->n_nodes(); n++)
 	  {
 	    assert (old_elem->node(n) < new_node_numbers.size());
@@ -319,16 +325,16 @@ void Mesh::create_submesh (Mesh& new_mesh,
       }
   
     // Test out what we have
-    std::cout << "number of elements in the new_mesh will be = "
-	      << n_new_elem
-	      << std::endl;
+//     std::cout << "number of elements in the new_mesh will be = "
+// 	      << n_new_elem
+// 	      << std::endl;
   
-    std::cout << "number of nodes in the new_mesh will be = "
-	      << n_new_nodes
-	      << std::endl;
+//     std::cout << "number of nodes in the new_mesh will be = "
+// 	      << n_new_nodes
+// 	      << std::endl;
   
-    for (unsigned int i=0; i<new_node_numbers.size(); ++i)
-      std::cout << new_node_numbers[i] << std::endl;
+//     for (unsigned int i=0; i<new_node_numbers.size(); ++i)
+//       std::cout << new_node_numbers[i] << std::endl;
 
   }
 
