@@ -8,14 +8,17 @@ ex14.$(obj-suffix):\
     ../../include/base/libmesh_base.h\
     ../../include/base/libmesh_common.h\
     ../../include/base/libmesh_config.h\
+    ../../include/base/multi_predicates.h\
     ../../include/base/node.h\
-    ../../include/base/predicated_iterator.h\
     ../../include/base/reference_counted_object.h\
     ../../include/base/reference_counter.h\
+    ../../include/base/single_predicates.h\
+    ../../include/base/variant_filter_iterator.h\
     ../../include/enums/enum_elem_quality.h\
     ../../include/enums/enum_elem_type.h\
     ../../include/enums/enum_fe_family.h\
     ../../include/enums/enum_inf_map_type.h\
+    ../../include/enums/enum_io_package.h\
     ../../include/enums/enum_order.h\
     ../../include/enums/enum_quadrature_type.h\
     ../../include/enums/enum_solver_package.h\
@@ -28,14 +31,12 @@ ex14.$(obj-suffix):\
     ../../include/geom/sphere.h\
     ../../include/geom/surface.h\
     ../../include/mesh/boundary_info.h\
-    ../../include/mesh/elem_iterators.h\
     ../../include/mesh/gmv_io.h\
     ../../include/mesh/mesh.h\
     ../../include/mesh/mesh_base.h\
     ../../include/mesh/mesh_data.h\
     ../../include/mesh/mesh_io.h\
     ../../include/mesh/mesh_refinement.h\
-    ../../include/mesh/node_iterators.h\
     ../../include/mesh/tecplot_io.h\
     ../../include/numerics/coupling_matrix.h\
     ../../include/numerics/dense_matrix.h\
