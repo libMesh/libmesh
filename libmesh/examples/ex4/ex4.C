@@ -1,4 +1,4 @@
-/* $Id: ex4.C,v 1.41 2004-12-17 20:54:57 benkirk Exp $ */
+/* $Id: ex4.C,v 1.42 2005-01-14 19:29:08 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -47,7 +47,7 @@
 #include "mesh.h"
 #include "mesh_generation.h"
 #include "gmv_io.h"
-#include "implicit_system.h"
+#include "linear_implicit_system.h"
 #include "equation_systems.h"
 
 // Define the Finite Element object.
@@ -154,7 +154,7 @@ int main (int argc, char** argv)
     // Declare the system and its variables.
     {
       // Creates a system named "Poisson"
-      equation_systems.add_system<ImplicitSystem> ("Poisson");
+      equation_systems.add_system<LinearImplicitSystem> ("Poisson");
       
 
       // Adds the variable "u" to "Poisson".  "u"
@@ -216,8 +216,8 @@ void assemble_poisson(EquationSystems& es,
   // The dimension that we are running
   const unsigned int dim = mesh.mesh_dimension();
 
-  // Get a reference to the ImplicitSystem we are solving
-  ImplicitSystem& system = es.get_system<ImplicitSystem>("Poisson");
+  // Get a reference to the LinearImplicitSystem we are solving
+  LinearImplicitSystem& system = es.get_system<LinearImplicitSystem>("Poisson");
   
   // A reference to the \p DofMap object for this system.  The \p DofMap
   // object handles the index translation from node and element numbers

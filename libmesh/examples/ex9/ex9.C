@@ -1,4 +1,4 @@
-/* $Id: ex9.C,v 1.16 2004-12-07 22:47:45 benkirk Exp $ */
+/* $Id: ex9.C,v 1.17 2005-01-14 19:29:43 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -52,7 +52,7 @@
 #include "o_string_stream.h"
 
 // This example will solve a linear transient system,
-// so we need to include the \p TransientImplicitSystem definition.
+// so we need to include the \p TransientLinearImplicitSystem definition.
 #include "transient_system.h"
 #include "vector_value.h"
 
@@ -117,8 +117,8 @@ int main (int argc, char** argv)
     
     // Add a transient system to the EquationSystems
     // object named "Convection-Diffusion".
-    TransientImplicitSystem & system = 
-      equation_systems.add_system<TransientImplicitSystem> ("Convection-Diffusion");
+    TransientLinearImplicitSystem & system = 
+      equation_systems.add_system<TransientLinearImplicitSystem> ("Convection-Diffusion");
       
     // Adds the variable "u" to "Convection-Diffusion".  "u"
     // will be approximated using first-order approximation.
@@ -190,8 +190,8 @@ int main (int argc, char** argv)
 	// vector assignment.  Since only \p TransientSystems
 	// (and systems derived from them) contain old solutions
 	// we need to specify the system type when we ask for it.
-	TransientImplicitSystem&  system =
-	  equation_systems.get_system<TransientImplicitSystem>("Convection-Diffusion");
+	TransientLinearImplicitSystem&  system =
+	  equation_systems.get_system<TransientLinearImplicitSystem>("Convection-Diffusion");
 
 	*system.old_local_solution = *system.current_local_solution;
 	
@@ -232,8 +232,8 @@ void init_cd (EquationSystems& es,
   const Mesh& mesh = es.get_mesh();
   
   // Get a reference to the Convection-Diffusion system object.
-  TransientImplicitSystem & system =
-    es.get_system<TransientImplicitSystem> ("Convection-Diffusion");
+  TransientLinearImplicitSystem & system =
+    es.get_system<TransientLinearImplicitSystem> ("Convection-Diffusion");
   
   // Get a reference to the \p DofMap for this system.
   const DofMap& dof_map = system.get_dof_map();
@@ -311,8 +311,8 @@ void assemble_cd (EquationSystems& es,
   const unsigned int dim = mesh.mesh_dimension();
   
   // Get a reference to the Convection-Diffusion system object.
-  TransientImplicitSystem & system =
-    es.get_system<TransientImplicitSystem> ("Convection-Diffusion");
+  TransientLinearImplicitSystem & system =
+    es.get_system<TransientLinearImplicitSystem> ("Convection-Diffusion");
   
   // Get a constant reference to the Finite Element type
   // for the first (and only) variable in the system.
