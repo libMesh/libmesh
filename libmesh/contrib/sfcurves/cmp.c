@@ -3,18 +3,15 @@
 int cmp_indx(const void *a, const void *b)
 {    
   const struct m_str *tmpa=a,*tmpb=b;
+
+  if (tmpa->index[0] > tmpb->index[0]) return  1;
+  if (tmpa->index[0] < tmpb->index[0]) return -1;
   
-  if      (tmpa[0].index[2] > tmpb[0].index[2]) return(1);
-  else if (tmpa[0].index[2] < tmpb[0].index[2]) return(-1);
-  else if (tmpa[0].index[2] == tmpb[0].index[2]) {
-    if      (tmpa[0].index[1] > tmpb[0].index[1]) return(1);
-    else if (tmpa[0].index[1] < tmpb[0].index[1]) return(-1);
-    else if (tmpa[0].index[1] == tmpb[0].index[1]) {
-      if      (tmpa[0].index[0] > tmpb[0].index[0]) return(1);
-      else if (tmpa[0].index[0] < tmpb[0].index[0]) return(-1);
-    }
-  }
+  if (tmpa->index[1] > tmpb->index[1]) return  1;
+  if (tmpa->index[1] < tmpb->index[1]) return -1;
   
-  /* else return(0); */      
-  return (0);      
+  if (tmpa->index[2] > tmpb->index[2]) return  1;
+  if (tmpa->index[2] < tmpb->index[2]) return -1;
+  
+  return 0;      
 }
