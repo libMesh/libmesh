@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.29 2003-03-07 04:44:38 jwpeterson Exp $
+// $Id: dof_map.C,v 1.30 2003-03-16 19:10:23 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -473,8 +473,9 @@ void DofMap::dof_indices (const Elem* elem,
 			  std::vector<unsigned int>& di,
 			  const unsigned int vn) const
 {
+  START_LOG("dof_indices()", "DofMap");
+  
   assert (elem != NULL);
-
 
   const unsigned int n_nodes = elem->n_nodes();
   const ElemType type        = elem->type();
@@ -522,6 +523,8 @@ void DofMap::dof_indices (const Elem* elem,
       }
 
   assert (tot_size == di.size());
+  
+  STOP_LOG("dof_indices()", "DofMap");  
 }
 
 
@@ -536,10 +539,10 @@ void DofMap::dof_indices (const Elem* elem,
 
 void DofMap::create_dof_constraints(MeshBase& mesh)
 {
-  assert (mesh.is_prepared());
-  
   START_LOG("create_dof_constraints()", "DofMap");
 
+  assert (mesh.is_prepared());
+  
   const unsigned int dim = mesh.mesh_dimension();
 
   // Constraints are not necessary in 1D
@@ -691,6 +694,8 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
   
   this->build_constraint_matrix (C, elem_dofs);
 
+  START_LOG("constrain_elem_matrix()", "DofMap");
+  
   // It is possible that the matrix is not constrained at all.
   if ((C.m() == matrix.m()) &&
       (C.n() == elem_dofs.size())) // It the matrix is constrained
@@ -735,6 +740,8 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
 		  matrix(i,j) = -it->second;	
 	  }
     } // end if is constrained...
+  
+  STOP_LOG("constrain_elem_matrix()", "DofMap");  
 }
 
 
@@ -752,7 +759,8 @@ void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
   DenseMatrix<Number> C;
   
   this->build_constraint_matrix (C, elem_dofs);
-
+  
+  START_LOG("cnstrn_elem_mat_vec()", "DofMap");
   
   // It is possible that the matrix is not constrained at all.
   if ((C.m() == matrix.m()) &&
@@ -823,6 +831,8 @@ void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
 	    rhs[i] = 0.;
 	  }
     } // end if is constrained...
+  
+  STOP_LOG("cnstrn_elem_mat_vec()", "DofMap");  
 }
 
 
@@ -835,10 +845,6 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
   assert (col_dofs.size() == matrix.n());
   
   // The constrained matrix is built up as R^T K C.
-
-
-  
-  
   DenseMatrix<Number> R;
   DenseMatrix<Number> C;
 
@@ -851,6 +857,8 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
   this->build_constraint_matrix (R, orig_row_dofs);
   this->build_constraint_matrix (C, orig_col_dofs);
 
+  START_LOG("constrain_elem_matrix()", "DofMap");
+  
   row_dofs = orig_row_dofs;
   col_dofs = orig_col_dofs;
   
@@ -900,6 +908,8 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
 		  matrix(i,j) = -it->second;	
 	  }
     } // end if is constrained...
+  
+  STOP_LOG("constrain_elem_matrix()", "DofMap");  
 }
 
 
@@ -908,14 +918,14 @@ void DofMap::constrain_element_vector (std::vector<Number>&       rhs,
 				       std::vector<unsigned int>& row_dofs) const
 {
   assert (rhs.size() == row_dofs.size());
-
   
   // The constrained RHS is built up as R^T F.  
   DenseMatrix<Number> R;
 
   this->build_constraint_matrix (R, row_dofs);
 
-  
+  START_LOG("constrain_elem_vector()", "DofMap");
+    
   // It is possible that the vector is not constrained at all.
   if ((R.m() == rhs.size()) &&
       (R.n() == row_dofs.size())) // if the RHS is constrained
@@ -945,6 +955,8 @@ void DofMap::constrain_element_vector (std::vector<Number>&       rhs,
 	    rhs[i] = 0.;
 	  }
     } // end if the RHS is constrained.
+  
+  STOP_LOG("constrain_elem_vector()", "DofMap");  
 }
 
 
@@ -952,6 +964,8 @@ void DofMap::constrain_element_vector (std::vector<Number>&       rhs,
 void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
 				      std::vector<unsigned int>& elem_dofs) const
 {
+  START_LOG("build_constraint_matrix()", "DofMap");
+  
   typedef std::set<unsigned int> RCSet;
   RCSet dof_set;
 
@@ -1057,7 +1071,11 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
       
       DenseMatrix<Number> Cnew;
       
+      STOP_LOG("build_constraint_matrix()", "DofMap");
+      
       this->build_constraint_matrix (Cnew, elem_dofs);
+      
+      START_LOG("build_constraint_matrix()", "DofMap");  
 
       if ((C.n() == Cnew.m()) &&
 	  (Cnew.n() == elem_dofs.size())) // If the constraint matrix
@@ -1069,6 +1087,8 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
       
       assert (C.n() == elem_dofs.size());
     } // end if (!done)
+  
+  STOP_LOG("build_constraint_matrix()", "DofMap");  
 }
 
 #endif // #ifdef ENABLE_AMR

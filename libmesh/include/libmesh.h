@@ -1,4 +1,4 @@
-// $Id: libmesh.h,v 1.3 2003-02-24 14:35:50 benkirk Exp $
+// $Id: libmesh.h,v 1.4 2003-03-16 19:10:23 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -32,6 +32,13 @@
 
 
 
+// Forward declaration, required when included
+// in perf_log.{C,h} because the preceeding
+// #include "perf_log.h" is ineffective.
+// Multiple inclusion avoidance problem...
+// __perf_log_h__ already #define'd, but the
+// class has not been declared yet!.
+class PerfLog;
 
 
 /**
