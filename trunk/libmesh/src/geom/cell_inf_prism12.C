@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism12.C,v 1.24 2005-02-22 22:17:39 jwpeterson Exp $
+// $Id: cell_inf_prism12.C,v 1.25 2005-02-23 04:33:20 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -35,20 +35,24 @@
 
 bool InfPrism12::is_vertex(const unsigned int i) const
 {
-  if (i < 6)
+  if (i < 3)
     return true;
   return false;
 }
 
 bool InfPrism12::is_edge(const unsigned int i) const
 {
-  if (i < 6)
+  if (i < 3)
+    return false;
+  if (i > 8)
     return false;
   return true;
 }
 
 bool InfPrism12::is_face(const unsigned int) const
 {
+  if (i > 8)
+    return true;
   return false;
 }
 
