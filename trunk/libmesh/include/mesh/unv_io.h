@@ -1,4 +1,4 @@
-// $Id: unv_io.h,v 1.3 2004-04-07 21:42:31 benkirk Exp $
+// $Id: unv_io.h,v 1.4 2004-10-26 22:00:43 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -52,13 +52,13 @@ class UNVIO : public MeshIO<Mesh>
    * Constructor.  Takes a writeable reference to a mesh object.
    * This is the constructor required to read a mesh.
    */
-  UNVIO (Mesh&);
+  UNVIO (Mesh& mesh, MeshData& mesh_data);
 
   /**
    * Constructor.  Takes a reference to a constant mesh object.
    * This constructor will only allow us to write the mesh.
    */
-  UNVIO (const Mesh&);
+  UNVIO (const Mesh& mesh, MeshData& mesh_data);
   
   /**
    * Destructor.
@@ -74,6 +74,11 @@ class UNVIO : public MeshIO<Mesh>
    * This method implements writing a mesh to a specified file.
    */
   virtual void write (const std::string& );
+
+  /**
+   * Set the flag indicationg if we should be verbose.
+   */
+  bool & verbose ();
 
   
  private:
@@ -99,10 +104,6 @@ class UNVIO : public MeshIO<Mesh>
    */
   void clear();
 
-  /**
-   * Flag indicationg if we should be verbose.
-   */
-  bool & verbose ();
 
   //-------------------------------------------------------------
   // read support methods
@@ -222,6 +223,12 @@ class UNVIO : public MeshIO<Mesh>
    */
   bool _need_D_to_e;
 
+  /**
+   * A pointer to the MeshData object you would like to use.
+   * with this UNVIO object.  Can be NULL.
+   */
+  MeshData& _mesh_data;
+
 };
 
 
@@ -229,17 +236,20 @@ class UNVIO : public MeshIO<Mesh>
 // ------------------------------------------------------------
 // MeshIO inline members
 inline
-UNVIO::UNVIO (Mesh& mesh) :
-  MeshIO<Mesh> (mesh)
+UNVIO::UNVIO (Mesh& mesh, MeshData& mesh_data) :
+  MeshIO<Mesh> (mesh),
+  _verbose (false),
+  _mesh_data (mesh_data)
 {
-  
 }
 
 
 
 inline
-UNVIO::UNVIO (const Mesh& mesh) :
-  MeshIO<Mesh> (mesh)
+UNVIO::UNVIO (const Mesh& mesh, MeshData& mesh_data) :
+  MeshIO<Mesh> (mesh),
+  _verbose (false),
+  _mesh_data (mesh_data)
 {
 }
 

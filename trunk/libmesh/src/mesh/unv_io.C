@@ -1,4 +1,4 @@
-// $Id: unv_io.C,v 1.11 2004-10-21 14:39:20 jwpeterson Exp $
+// $Id: unv_io.C,v 1.12 2004-10-26 22:00:46 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -253,7 +253,7 @@ void UNVIO::read_implementation (std::istream& in_stream)
 
     // tell the MeshData object that we are finished 
     // reading data
-    this->mesh().data.close_foreign_id_maps ();
+    this->_mesh_data.close_foreign_id_maps ();
 
     if (this->verbose())
       std::cout << "  Finished." << std::endl << std::endl;
@@ -323,20 +323,19 @@ void UNVIO::write_implementation (std::ostream& out_file)
  
   // we need the MeshData, otherwise we do not
   // know the foreign node id
-  if (!mesh.data.active())
-    {
-      if (!mesh.data.compatibility_mode())
-        {
-	  std::cerr << std::endl
-		    << "*************************************************************************" << std::endl
-		    << "* WARNING: MeshData neither active nor in compatibility mode.           *" << std::endl
-		    << "*          Enable compatibility mode for MeshData.  Use this Universal  *" << std::endl
-		    << "*          file with caution: libMesh node and element ids are used.    *" << std::endl
-		    << "*************************************************************************" << std::endl
-		    << std::endl;
-	  mesh.data.enable_compatibility_mode();
-	}
-    }
+  if (!this->_mesh_data.active())
+    if (!this->_mesh_data.compatibility_mode())
+      {
+	std::cerr << std::endl
+		  << "*************************************************************************" << std::endl
+		  << "* WARNING: MeshData neither active nor in compatibility mode.           *" << std::endl
+		  << "*          Enable compatibility mode for MeshData.  Use this Universal  *" << std::endl
+		  << "*          file with caution: libMesh node and element ids are used.    *" << std::endl
+		  << "*************************************************************************" << std::endl
+		  << std::endl;
+	this->_mesh_data.enable_compatibility_mode();
+      }
+
 
 
   // write the nodes,  then the elements
@@ -584,7 +583,7 @@ void UNVIO::node_in (std::istream& in_file)
 	  // add node to the Mesh & 
 	  // tell the MeshData object the foreign node id
 	  // (note that mesh.add_point() returns a pointer to the new node)
-	  mesh.data.add_foreign_node_id (mesh.add_point(xyz), node_lab);
+	  this->_mesh_data.add_foreign_node_id (mesh.add_point(xyz), node_lab);
 	}
     }
 
@@ -610,7 +609,7 @@ void UNVIO::node_in (std::istream& in_file)
 	  // add node to the Mesh & 
 	  // tell the MeshData object the foreign node id
 	  // (note that mesh.add_point() returns a pointer to the new node)
-	  mesh.data.add_foreign_node_id (mesh.add_point(xyz), node_lab);
+	  this->_mesh_data.add_foreign_node_id (mesh.add_point(xyz), node_lab);
 	}
     }
 
@@ -904,7 +903,7 @@ void UNVIO::element_in (std::istream& in_file)
       // add elem to the Mesh & 
       // tell the MeshData object the foreign elem id
       // (note that mesh.add_elem() returns a pointer to the new element)
-      mesh.data.add_foreign_elem_id (mesh.add_elem(elem), element_lab);
+      this->_mesh_data.add_foreign_elem_id (mesh.add_elem(elem), element_lab);
     }
 }
 
@@ -915,10 +914,9 @@ void UNVIO::element_in (std::istream& in_file)
 
 void UNVIO::node_out (std::ostream& out_file)
 {
-  const Mesh& mesh = this->cmesh();
   
-  assert (mesh.data.active() ||
-	  mesh.data.compatibility_mode());
+  assert (this->_mesh_data.active() ||
+	  this->_mesh_data.compatibility_mode());
 
 
   if (this->verbose())
@@ -935,6 +933,8 @@ void UNVIO::node_out (std::ostream& out_file)
   unsigned int disp_coord_sys_dummy = 0; // displacement coordinate sys. (not supp. yet)
   unsigned int color_dummy          = 0; // color(not supported yet)
 
+  // A reference to the parent class's mesh
+  const Mesh& mesh = this->cmesh();
 
   const_node_iterator       nd  (mesh.nodes_begin());
   const const_node_iterator end (mesh.nodes_end());
@@ -945,7 +945,7 @@ void UNVIO::node_out (std::ostream& out_file)
       
       char buf[78];
       sprintf(buf, "%10d%10d%10d%10d\n", 
-	      mesh.data.node_to_foreign_id(current_node),
+	      this->_mesh_data.node_to_foreign_id(current_node),
 	      exp_coord_sys_dummy,
 	      disp_coord_sys_dummy,
 	      color_dummy);
@@ -980,10 +980,8 @@ void UNVIO::node_out (std::ostream& out_file)
 
 void UNVIO::element_out(std::ostream& out_file)
 {
-  const Mesh& mesh = this->cmesh();
-  
-  assert (mesh.data.active() ||
-	  mesh.data.compatibility_mode());
+  assert (this->_mesh_data.active() ||
+	  this->_mesh_data.compatibility_mode());
 
   if (this->verbose())
     std::cout << "  Writing elements" << std::endl;
@@ -1016,6 +1014,9 @@ void UNVIO::element_out(std::ostream& out_file)
   unsigned int assign_elem_nodes[20];
 
   unsigned int n_elem_written=0;
+
+  // A reference to the parent class's mesh
+  const Mesh& mesh = this->cmesh();
 
   const_elem_iterator        it  (mesh.elements_begin());
   const const_elem_iterator  end (mesh.elements_end());
@@ -1168,12 +1169,12 @@ void UNVIO::element_out(std::ostream& out_file)
 	}
 
 
-      out_file << std::setw(10) << mesh.data.elem_to_foreign_id(elem) // element ID
-	       << std::setw(10) << fe_descriptor_id                   // type of element
-	       << std::setw(10) << phys_prop_tab_dummy                // not supported 
-	       << std::setw(10) << mat_prop_tab_dummy                 // not supported 
-	       << std::setw(10) << color_dummy                        // not supported 
-	       << std::setw(10) << elem->n_nodes()                    // No. of nodes per element
+      out_file << std::setw(10) << this->_mesh_data.elem_to_foreign_id(elem)  // element ID
+	       << std::setw(10) << fe_descriptor_id                           // type of element
+	       << std::setw(10) << phys_prop_tab_dummy                        // not supported 
+	       << std::setw(10) << mat_prop_tab_dummy                         // not supported 
+	       << std::setw(10) << color_dummy                                // not supported 
+	       << std::setw(10) << elem->n_nodes()                            // No. of nodes per element
 	       << '\n';
 
       for (unsigned int j=0; j<elem->n_nodes(); j++)
@@ -1184,7 +1185,7 @@ void UNVIO::element_out(std::ostream& out_file)
 	  const Node* node_in_unv_order = elem->get_node(assign_elem_nodes[j]-1);
 
 	  // write foreign label for this node
-	  out_file << std::setw(10) << mesh.data.node_to_foreign_id(node_in_unv_order);
+	  out_file << std::setw(10) << this->_mesh_data.node_to_foreign_id(node_in_unv_order);
 	}
 
       out_file << '\n';

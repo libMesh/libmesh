@@ -1,4 +1,4 @@
-// $Id: mesh_xdr_support.C,v 1.26 2004-09-30 20:10:31 benkirk Exp $
+// $Id: mesh_xdr_support.C,v 1.27 2004-10-26 22:00:45 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -42,7 +42,8 @@ void XdrInterface::mesh_interface(const std::string& name,
 				  std::vector<Elem*>& elements,
 				  BoundaryInfo& boundary_info,
 				  Mesh& mesh,
-                                  const unsigned int mgf_originator)
+                                  const unsigned int mgf_originator,
+				  MeshData* mesh_data)
 {
 #ifdef DEBUG
   /**
@@ -341,31 +342,26 @@ void XdrInterface::mesh_interface(const std::string& name,
 	   * add the nodes and ids also          
 	   * to its map.
 	   */	
-	  if (mesh.data.active())   
-	    {     
-	      for (int innd=0; innd<numNodes; ++innd)      
-	        {          
-		  nodes[innd] = Node::build(coords[0+innd*3],  
-					    coords[1+innd*3],
-					    coords[2+innd*3],
-					    innd);
-                      
-		  /*                  
-		   * add the id to the MeshData, so that
-		   * it knows the foreign id, even when 
-		   * the underlying mesh got re-numbered,
-		   * refined, elements/nodes added...   
-                   */                 
-		  mesh.data.add_foreign_node_id(nodes[innd],
-						innd); 
+	  for (int innd=0; innd<numNodes; ++innd)      
+	    {          
+	      nodes[innd] = Node::build(coords[0+innd*3],  
+					coords[1+innd*3],
+					coords[2+innd*3],
+					innd);
+	      if (mesh_data != NULL)
+		{     
+		  if (mesh_data->active())
+		    {
+		      /*                  
+		       * add the id to the MeshData, so that
+		       * it knows the foreign id, even when 
+		       * the underlying mesh got re-numbered,
+		       * refined, elements/nodes added...   
+		       */                 
+		      mesh_data->add_foreign_node_id(nodes[innd], innd);
+		    }
 		}  
 	    }   
-          else
-	      for (int innd=0; innd<numNodes; ++innd)
-		  nodes[innd] = Node::build(coords[0+innd*3],
-					    coords[1+innd*3],
-					    coords[2+innd*3],
-					    innd);
 	  
 	  break;
 	}
@@ -446,9 +442,9 @@ void XdrInterface::mesh_interface(const std::string& name,
 		     * should work properly.  This is an inline
 		     * function, so that for disabled MeshData, this
 		     * should not induce too much cost
-		     */                   
-		    mesh.data.add_foreign_elem_id (elements[e],      
-						   e);
+		     */
+		    if (mesh_data != NULL)
+		      mesh_data->add_foreign_elem_id (elements[e], e);
 
 		    for (unsigned int innd=0; innd < elements[e]->n_nodes(); innd++)
 			elements[e]->set_node(innd) = nodes[conn[innd+lastConnIndex]];
@@ -464,12 +460,13 @@ void XdrInterface::mesh_interface(const std::string& name,
 	  {
 
 #ifdef DEBUG
-	    if (mesh.data.active())
-	      {
+	    if (mesh_data != NULL)
+	      if (mesh_data->active())
+		{
 		  std::cerr << "ERROR: MeshData not implemented for MGF-style mesh."
 			    << std::endl;
 		  error();
-	      }
+		}
 #endif
 
 	    for (int ielm=0; ielm < numElem; ++ielm)
@@ -487,7 +484,8 @@ void XdrInterface::mesh_interface(const std::string& name,
 	 * tell the MeshData object that we are finished 
 	 * reading data
 	 */
-	mesh.data.close_foreign_id_maps ();
+	if (mesh_data != NULL)
+	  mesh_data->close_foreign_id_maps ();
       }
   
     /**

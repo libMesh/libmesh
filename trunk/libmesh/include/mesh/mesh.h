@@ -1,4 +1,4 @@
-// $Id: mesh.h,v 1.7 2004-09-30 17:17:48 benkirk Exp $
+// $Id: mesh.h,v 1.8 2004-10-26 22:00:43 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -95,8 +95,13 @@ class Mesh : public MeshBase
    * proper method by the file extension.  This is now the only
    * way to read a mesh.  The \p Mesh then initializes its data
    * structures and is ready for use.
+   *
+   * In order to read the UNV and TetGen file types, you must
+   * also pass a separate pointer to the MeshData object you will
+   * use with this mesh, since these read methods expect it.
    */
-  void read (const std::string& name);
+  void read (const std::string& name,
+	     MeshData* mesh_data=NULL);
   
   /**
    * Read solutions in mgflo's XDR format.
@@ -122,8 +127,13 @@ class Mesh : public MeshBase
   /**
    * Write the file specified by \p name.  Attempts to figure out the
    * proper method by the file extension.
+   *
+   * In order to write the UNV and TetGen file types, you must
+   * also pass a separate pointer to the MeshData object you have been
+   * using with this mesh, since these write methods expect it.
    */
-  void write (const std::string& name);
+  void write (const std::string& name,
+	      MeshData* mesh_data=NULL);
   
   /**
    * Write to the file specified by \p name.  Attempts to figure out the

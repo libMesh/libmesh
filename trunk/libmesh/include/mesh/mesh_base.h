@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.29 2004-10-26 15:31:16 jwpeterson Exp $
+// $Id: mesh_base.h,v 1.30 2004-10-26 22:00:43 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -39,7 +39,6 @@ class EquationSystems;
 // Local Includes -----------------------------------
 #include "libmesh_common.h"
 #include "boundary_info.h"
-#include "mesh_data.h"
 #include "node.h"
 #include "enum_elem_type.h"
 #include "sphere.h"
@@ -61,7 +60,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.29 $
+ * \version $Revision: 1.30 $
  */
 
 
@@ -98,14 +97,6 @@ public:
    */
   BoundaryInfo boundary_info;
   
-  /**
-   * This class holds arbitrary (floating point) data associated with 
-   * nodes or elements, commonly imported from files.  When this class
-   * should be used, it has to be activated @e prior to using any
-   * of \p MeshBase or \p Mesh \p read() methods.
-   */
-  MeshData data;
-
   /**
    * @returns \p true if the mesh has been prepared via a call
    * to \p prepare_for_use, \p false otherwise.
@@ -698,13 +689,6 @@ protected:
    * Returns a writeable reference to the number of partitions.
    */
   unsigned int& set_n_partitions () { return _n_parts; }
-  
-  /**
-   * Reads input from \p in, skipping all the lines
-   * that start with the character \p comment_start.
-   */
-  void skip_comment_lines (std::istream& in,
-			   const char comment_start) const;
   
   /**
    * The verices (spatial coordinates) of the mesh.

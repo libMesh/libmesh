@@ -1,4 +1,4 @@
-// $Id: tetgen_io.h,v 1.4 2004-05-09 15:40:22 fprill Exp $
+// $Id: tetgen_io.h,v 1.5 2004-10-26 22:00:43 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -49,7 +49,7 @@ class TetGenIO : public MeshIO<Mesh>
    * Constructor.  Takes a writeable reference to a mesh object.
    * This is the constructor required to read a mesh.
    */
-  TetGenIO (Mesh&);
+  TetGenIO (Mesh& mesh, MeshData* mesh_data=NULL);
   
   /**
    * This method implements reading a mesh from a specified file
@@ -113,7 +113,12 @@ class TetGenIO : public MeshIO<Mesh>
    * total number of elements. Primarily used when reading.
    */
   unsigned int _num_elements;
- 
+
+  /**
+   * A pointer to the MeshData object you would like to use.
+   * with this TetGenIO object.  Can be NULL.
+   */
+  MeshData* _mesh_data;
 };
 
 
@@ -121,8 +126,9 @@ class TetGenIO : public MeshIO<Mesh>
 // ------------------------------------------------------------
 // TetGenIO inline members
 inline
-TetGenIO::TetGenIO (Mesh& mesh) :
-  MeshIO<Mesh> (mesh)
+TetGenIO::TetGenIO (Mesh& mesh, MeshData* mesh_data) :
+  MeshIO<Mesh> (mesh),
+  _mesh_data(mesh_data)
 {
 }
 

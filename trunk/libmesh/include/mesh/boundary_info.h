@@ -1,4 +1,4 @@
-// $Id: boundary_info.h,v 1.10 2004-08-17 03:03:48 benkirk Exp $
+// $Id: boundary_info.h,v 1.11 2004-10-26 22:00:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -29,7 +29,7 @@
 
 // Local includes
 #include "libmesh_common.h"
-
+#include "mesh_data.h"
 
 
 // Forward declarations
@@ -84,11 +84,15 @@ public:
    * data structures with the \p mesh data structures.
    * Allows the \p boundary_mesh to be used like any other mesh.
    * Before this is called the \p boundary_mesh data structure is
-   * empty.  Optionally synchronizes also the \p boundary_mesh's 
-   * \p MeshData (disabled by default).
+   * empty.
+   *
+   * If you are using a MeshData class with this Mesh, you can
+   * pass a pointer to both the boundary_mesh's MeshData object,
+   * and the MeshData object used for this mesh.
    */
   void sync (BoundaryMesh& boundary_mesh,
-	     const bool transfer_mesh_data = false);
+	     MeshData* boundary_mesh_data=NULL,
+	     MeshData* this_mesh_data=NULL);
   
   /**
    * Add \p Node \p node with boundary id \p id to the boundary

@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.34 2004-09-29 21:45:21 benkirk Exp $
+// $Id: boundary_info.C,v 1.35 2004-10-26 22:00:43 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -60,7 +60,8 @@ void BoundaryInfo::clear()
 
 
 void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
-			const bool transfer_mesh_data)
+			MeshData*     boundary_mesh_data,
+			MeshData*     this_mesh_data)
 {
   boundary_mesh.clear();
 
@@ -154,8 +155,8 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
 
   // When desired, copy the MeshData
   // to the boundary_mesh
-  if (transfer_mesh_data)
-    boundary_mesh.data.assign(_mesh.data);
+  if ((boundary_mesh_data != NULL) && (this_mesh_data != NULL))
+    boundary_mesh_data->assign(*this_mesh_data);
 }
 
 
