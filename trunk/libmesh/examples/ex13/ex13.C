@@ -1,4 +1,4 @@
-/* $Id: ex13.C,v 1.9 2004-12-07 22:47:42 benkirk Exp $ */
+/* $Id: ex13.C,v 1.10 2005-01-14 19:29:26 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -51,7 +51,7 @@
 #include "numeric_vector.h"
 #include "dense_matrix.h"
 #include "dense_vector.h"
-#include "implicit_system.h"
+#include "linear_implicit_system.h"
 #include "error_vector.h"
 #include "error_estimator.h"
 #include "transient_system.h"
@@ -105,8 +105,8 @@ int main (int argc, char** argv)
     // Declare the system and its variables.
     {
       // Creates a transient system named "Navier-Stokes"
-      TransientImplicitSystem & system = 
-	equation_systems.add_system<TransientImplicitSystem> ("Navier-Stokes");
+      TransientLinearImplicitSystem & system = 
+	equation_systems.add_system<TransientLinearImplicitSystem> ("Navier-Stokes");
       
       // Add the variables "u" & "v" to "Navier-Stokes".  They
       // will be approximated using second-order approximation.
@@ -152,8 +152,8 @@ int main (int argc, char** argv)
     equation_systems.parameters.set<Real> ("dt")   = dt;
 
     // Get a reference to the Stokes system to use later.
-    TransientImplicitSystem&  stokes_system =
-	  equation_systems.get_system<TransientImplicitSystem>("Navier-Stokes");
+    TransientLinearImplicitSystem&  stokes_system =
+	  equation_systems.get_system<TransientLinearImplicitSystem>("Navier-Stokes");
 
     // The first thing to do is to get a copy of the solution at
     // the current nonlinear iteration.  This value will be used to
@@ -266,8 +266,8 @@ void assemble_stokes (EquationSystems& es,
   const unsigned int dim = mesh.mesh_dimension();
   
   // Get a reference to the Stokes system object.
-  TransientImplicitSystem & stokes_system =
-    es.get_system<TransientImplicitSystem> ("Navier-Stokes");
+  TransientLinearImplicitSystem & stokes_system =
+    es.get_system<TransientLinearImplicitSystem> ("Navier-Stokes");
 
   // Numeric ids corresponding to each variable in the system
   const unsigned int u_var = stokes_system.variable_number ("u");

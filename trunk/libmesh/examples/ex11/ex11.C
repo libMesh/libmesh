@@ -1,4 +1,4 @@
-/* $Id: ex11.C,v 1.9 2004-12-07 22:47:42 benkirk Exp $ */
+/* $Id: ex11.C,v 1.10 2005-01-14 19:29:25 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -41,7 +41,7 @@
 #include "numeric_vector.h"
 #include "dense_matrix.h"
 #include "dense_vector.h"
-#include "implicit_system.h"
+#include "linear_implicit_system.h"
 #include "error_vector.h"
 #include "error_estimator.h"
 
@@ -89,8 +89,8 @@ int main (int argc, char** argv)
     // Declare the system and its variables.
     {
       // Creates a transient system named "Convection-Diffusion"
-      ImplicitSystem & system = 
-	equation_systems.add_system<ImplicitSystem> ("Stokes");
+      LinearImplicitSystem & system = 
+	equation_systems.add_system<LinearImplicitSystem> ("Stokes");
       
       // Add the variables "u" & "v" to "Stokes".  They
       // will be approximated using second-order approximation.
@@ -142,8 +142,8 @@ void assemble_stokes (EquationSystems& es,
   const unsigned int dim = mesh.mesh_dimension();
   
   // Get a reference to the Convection-Diffusion system object.
-  ImplicitSystem & system =
-    es.get_system<ImplicitSystem> ("Stokes");
+  LinearImplicitSystem & system =
+    es.get_system<LinearImplicitSystem> ("Stokes");
 
   // Numeric ids corresponding to each variable in the system
   const unsigned int u_var = system.variable_number ("u");

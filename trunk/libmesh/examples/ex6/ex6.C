@@ -1,4 +1,4 @@
-/* $Id: ex6.C,v 1.37 2004-12-07 22:47:43 benkirk Exp $ */
+/* $Id: ex6.C,v 1.38 2005-01-14 19:29:42 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -44,7 +44,7 @@
 #include "mesh.h"
 #include "mesh_generation.h"
 #include "gmv_io.h"
-#include "implicit_system.h"
+#include "linear_implicit_system.h"
 #include "equation_systems.h"
 
 // Define the Finite and Infinite Element object.
@@ -153,7 +153,7 @@ int main (int argc, char** argv)
     {
       // Create a system named "Wave".  This can
       // be a simple, steady system
-      equation_systems.add_system<ImplicitSystem> ("Wave");
+      equation_systems.add_system<LinearImplicitSystem> ("Wave");
             
       // Create an FEType describing the approximation
       // characteristics of the InfFE object.  Note that
@@ -222,7 +222,7 @@ void assemble_wave(EquationSystems& es,
   const Mesh& mesh = es.get_mesh();
 
   // Get a reference to the system we are solving.
-  ImplicitSystem & system = es.get_system<ImplicitSystem>("Wave");
+  LinearImplicitSystem & system = es.get_system<LinearImplicitSystem>("Wave");
   
   // A reference to the \p DofMap object for this system.  The \p DofMap
   // object handles the index translation from node and element numbers

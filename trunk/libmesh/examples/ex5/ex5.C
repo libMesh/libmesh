@@ -1,4 +1,4 @@
-/* $Id: ex5.C,v 1.30 2004-12-17 20:55:06 benkirk Exp $ */
+/* $Id: ex5.C,v 1.31 2005-01-14 19:29:42 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -39,7 +39,7 @@
 #include "mesh.h"
 #include "mesh_generation.h"
 #include "gmv_io.h"
-#include "implicit_system.h"
+#include "linear_implicit_system.h"
 #include "equation_systems.h"
 
 // Define the Finite Element object.
@@ -163,7 +163,7 @@ int main (int argc, char** argv)
     EquationSystems equation_systems (mesh);
     
     {
-      equation_systems.add_system<ImplicitSystem> ("Poisson");
+      equation_systems.add_system<LinearImplicitSystem> ("Poisson");
       
       equation_systems("Poisson").add_variable("u", FIRST);
 
@@ -202,7 +202,7 @@ void assemble_poisson(EquationSystems& es,
 
   const unsigned int dim = mesh.mesh_dimension();
 
-  ImplicitSystem& system = es.get_system<ImplicitSystem>("Poisson");
+  LinearImplicitSystem& system = es.get_system<LinearImplicitSystem>("Poisson");
   
   const DofMap& dof_map = system.get_dof_map();
   

@@ -1,4 +1,4 @@
-/* $Id: ex15.C,v 1.1 2005-01-13 23:37:08 roystgnr Exp $ */
+/* $Id: ex15.C,v 1.2 2005-01-14 19:29:41 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -165,7 +165,7 @@ int main(int argc, char** argv)
 
     // Convenient reference to the system
     LinearImplicitSystem& system = 
-		    equation_systems.get_system<LinearImplicitSystem>("Biharmonic");
+      equation_systems.get_system<LinearImplicitSystem>("Biharmonic");
 
     // A refinement loop.
     for (unsigned int r_step=0; r_step<max_r_steps; r_step++)
@@ -327,8 +327,8 @@ void assemble_biharmonic(EquationSystems& es,
   // The dimension that we are running
   const unsigned int dim = mesh.mesh_dimension();
 
-  // Get a reference to the ImplicitSystem we are solving
-  ImplicitSystem& system = es.get_system<ImplicitSystem>("Biharmonic");
+  // Get a reference to the LinearImplicitSystem we are solving
+  LinearImplicitSystem& system = es.get_system<LinearImplicitSystem>("Biharmonic");
   
   // A reference to the \p DofMap object for this system.  The \p DofMap
   // object handles the index translation from node and element numbers

@@ -1,4 +1,4 @@
-/* $Id: ex2.C,v 1.16 2004-12-07 22:47:42 benkirk Exp $ */
+/* $Id: ex2.C,v 1.17 2005-01-14 19:29:41 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -107,7 +107,7 @@ int main (int argc, char** argv)
     // We begin by adding a "SteadyStytem" to the
     // EquationSystems object, and we give it the name
     // "Simple System".
-    equation_systems.add_system<TransientImplicitSystem> ("Simple System");
+    equation_systems.add_system<TransientLinearImplicitSystem> ("Simple System");
       
     // Adds the variable "u" to "Simple System".  "u"
     // will be approximated using first-order approximation.

@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.12 2005-01-06 21:54:58 benkirk Exp $ */
+/* $Id: ex14.C,v 1.13 2005-01-14 19:29:40 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -396,8 +396,8 @@ void assemble_laplace(EquationSystems& es,
   // The dimension that we are running
   const unsigned int dim = mesh.mesh_dimension();
 
-  // Get a reference to the ImplicitSystem we are solving
-  ImplicitSystem& system = es.get_system<ImplicitSystem>("Laplace");
+  // Get a reference to the LinearImplicitSystem we are solving
+  LinearImplicitSystem& system = es.get_system<LinearImplicitSystem>("Laplace");
   
   // A reference to the \p DofMap object for this system.  The \p DofMap
   // object handles the index translation from node and element numbers
