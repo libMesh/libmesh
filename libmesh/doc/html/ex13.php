@@ -372,7 +372,7 @@ the reference to the Stokes system.
 
 <div class ="fragment">
 <pre>
-                *stokes_system.old_local_solution = *stokes_system.solution;
+                *stokes_system.old_local_solution = *stokes_system.current_local_solution;
         
 </pre>
 </div>
@@ -985,12 +985,12 @@ dot product if you have the full vector at your disposal.
 
 <div class ="fragment">
 <pre>
-                  const Point U_old (u_old, v_old);
-        	  const Point U     (u,     v);
-        	  const Real  u_x = grad_u(0);
-        	  const Real  u_y = grad_u(1);
-        	  const Real  v_x = grad_v(0);
-        	  const Real  v_y = grad_v(1);
+                  const NumberVectorValue U_old (u_old, v_old);
+        	  const NumberVectorValue U     (u,     v);
+        	  const Number  u_x = grad_u(0);
+        	  const Number  u_y = grad_u(1);
+        	  const Number  v_x = grad_v(0);
+        	  const Number  v_y = grad_v(1);
         	  
 </pre>
 </div>
@@ -1350,7 +1350,7 @@ That's it.
   
   	std::cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; Solving time step &quot;</FONT></B> &lt;&lt; t_step &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;, time = &quot;</FONT></B> &lt;&lt; time &lt;&lt; std::endl;
   
-  	*stokes_system.old_local_solution = *stokes_system.solution;
+  	*stokes_system.old_local_solution = *stokes_system.current_local_solution;
   
   	<B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> l=0; l&lt;n_nonlinear_steps; ++l)
   	  {
@@ -1534,12 +1534,12 @@ That's it.
   	      p_old += psi[l][qp]*stokes_system.old_solution (dof_indices_p[l]);
   	    }
   
-  	  <FONT COLOR="#228B22"><B>const</FONT></B> Point U_old (u_old, v_old);
-  	  <FONT COLOR="#228B22"><B>const</FONT></B> Point U     (u,     v);
-  	  <FONT COLOR="#228B22"><B>const</FONT></B> Real  u_x = grad_u(0);
-  	  <FONT COLOR="#228B22"><B>const</FONT></B> Real  u_y = grad_u(1);
-  	  <FONT COLOR="#228B22"><B>const</FONT></B> Real  v_x = grad_v(0);
-  	  <FONT COLOR="#228B22"><B>const</FONT></B> Real  v_y = grad_v(1);
+  	  <FONT COLOR="#228B22"><B>const</FONT></B> NumberVectorValue U_old (u_old, v_old);
+  	  <FONT COLOR="#228B22"><B>const</FONT></B> NumberVectorValue U     (u,     v);
+  	  <FONT COLOR="#228B22"><B>const</FONT></B> Number  u_x = grad_u(0);
+  	  <FONT COLOR="#228B22"><B>const</FONT></B> Number  u_y = grad_u(1);
+  	  <FONT COLOR="#228B22"><B>const</FONT></B> Number  v_x = grad_v(0);
+  	  <FONT COLOR="#228B22"><B>const</FONT></B> Number  v_y = grad_v(1);
   	  
   	  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i&lt;n_u_dofs; i++)
   	    {
@@ -1636,6 +1636,9 @@ That's it.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+Linking ex13...
+/home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
+: the use of `mktemp' is dangerous, better use `mkstemp'
 ***************************************************************
 * Running Example  ./ex13
 ***************************************************************
@@ -1732,7 +1735,7 @@ Linear solver converged at step: 28, final residual: 1.17971e-08  Nonlinear conv
  Nonlinear solver converged at step 1
 
  ----------------------------------------------------------------------------
-| Time:           Mon Apr 19 12:06:05 2004
+| Time:           Thu May 20 17:41:20 2004
 | OS:             Linux
 | HostName:       arthur
 | OS Release      2.4.20-19.9smp
@@ -1741,15 +1744,15 @@ Linear solver converged at step: 28, final residual: 1.17971e-08  Nonlinear conv
 | Username:       peterson
  ----------------------------------------------------------------------------
  ----------------------------------------------------------------------------
-| Example 13 Performance: Alive time=53.0525, Active time=50.2831
+| Example 13 Performance: Alive time=46.7428, Active time=45.282
  ----------------------------------------------------------------------------
 | Event                         nCalls  Total       Avg         Percent of   |
 |                                       Time        Time        Active Time  |
 |----------------------------------------------------------------------------|
 |                                                                            |
-| linear solve                  33      50.2831     1.523732    100.00       |
+| linear solve                  33      45.2820     1.372182    100.00       |
  ----------------------------------------------------------------------------
-| Totals:                       33      50.2831                 100.00       |
+| Totals:                       33      45.2820                 100.00       |
  ----------------------------------------------------------------------------
 
 

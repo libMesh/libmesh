@@ -1398,6 +1398,10 @@ That concludes the system matrix assembly routine.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+Compiling C++ (in debug mode) exact_solution.C...
+Linking ex9...
+/home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
+: the use of `mktemp' is dangerous, better use `mkstemp'
 ***************************************************************
 * Running Example  ./ex9
 ***************************************************************
@@ -1493,8 +1497,8 @@ That concludes the system matrix assembly routine.
 | Creations:    1
 | Destructions: 1
 | 4Elem reference count information:
-| Creations:    70015
-| Destructions: 70015
+| Creations:    70112
+| Destructions: 70112
 | 4Node reference count information:
 | Creations:    6273
 | Destructions: 6273

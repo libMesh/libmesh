@@ -33,8 +33,8 @@ used.
 <div class ="fragment">
 <pre>
         #include &lt;iostream&gt;
-        #include <algorithm>
-        #include <math.h>
+        #include &lt;algorithm&gt;
+        #include &lt;math.h&gt;
         
 </pre>
 </div>
@@ -46,7 +46,8 @@ Basic include file needed for the mesh functionality.
 <pre>
         #include "libmesh.h"
         #include "mesh.h"
-        #include "steady_system.h"
+        #include "gmv_io.h"
+        #include "implicit_system.h"
         #include "equation_systems.h"
         
 </pre>
@@ -104,8 +105,8 @@ assemble function of example 4.
 
 <div class ="fragment">
 <pre>
-        void assemble_wave(EquationSystems&amp; es,
-        		   const std::string& system_name);
+        void assemble_wave (EquationSystems& es,
+        		    const std::string& system_name);
         
 </pre>
 </div>
@@ -137,8 +138,8 @@ This example requires Infinite Elements
 <pre>
         #ifndef ENABLE_INFINITE_ELEMENTS
         
-          std::cerr << "ERROR: This example requires the library to be compiled with Infinite Element support!"
-        	    << std::endl;
+          std::cerr &lt;&lt; "ERROR: This example requires the library to be compiled with Infinite Element support!"
+        	    &lt;&lt; std::endl;
           here();
         
           return 0;
@@ -217,7 +218,7 @@ Write the mesh before the infinite elements are added
 
 <div class ="fragment">
 <pre>
-            mesh.write_gmv ("orig_mesh.gmv");
+            GMVIO(mesh).write ("orig_mesh.gmv");
             
 </pre>
 </div>
@@ -262,7 +263,7 @@ Compare this to the original mesh.
 
 <div class ="fragment">
 <pre>
-            mesh.write_gmv ("ifems_added.gmv");
+            GMVIO(mesh).write ("ifems_added.gmv");
             
 </pre>
 </div>
@@ -306,7 +307,7 @@ be a simple, steady system
 
 <div class ="fragment">
 <pre>
-              equation_systems.add_system&lt;SteadySystem&gt; ("Wave");
+              equation_systems.add_system&lt;ImplicitSystem&gt; ("Wave");
                     
 </pre>
 </div>
@@ -431,7 +432,7 @@ for the discrete form of our wave equation.
 
 <div class ="fragment">
 <pre>
-        void assemble_wave(EquationSystems&amp; es,
+        void assemble_wave(EquationSystems& es,
         		   const std::string& system_name)
         {
 </pre>
@@ -456,8 +457,18 @@ Get a constant reference to the mesh object.
 
 <div class ="fragment">
 <pre>
-          const Mesh&amp; mesh = es.get_mesh();
+          const Mesh& mesh = es.get_mesh();
         
+</pre>
+</div>
+<div class = "comment">
+Get a reference to the system we are solving.
+</div>
+
+<div class ="fragment">
+<pre>
+          ImplicitSystem & system = es.get_system&lt;ImplicitSystem&gt;("Wave");
+          
 </pre>
 </div>
 <div class = "comment">
@@ -468,7 +479,7 @@ to degree of freedom numbers.
 
 <div class ="fragment">
 <pre>
-          const DofMap&amp; dof_map = es("Wave").get_dof_map();
+          const DofMap& dof_map = system.get_dof_map();
           
 </pre>
 </div>
@@ -499,7 +510,7 @@ for the first (and only) variable in the system.
 
 <div class ="fragment">
 <pre>
-          const FEType&amp; fe_type = dof_map.variable_type(0);
+          const FEType& fe_type = dof_map.variable_type(0);
           
 </pre>
 </div>
@@ -541,7 +552,7 @@ Tell the finite element object to use our quadrature rule.
 
 <div class ="fragment">
 <pre>
-          fe-&gt;attach_quadrature_rule (&amp;qrule);
+          fe-&gt;attach_quadrature_rule (&qrule);
           
 </pre>
 </div>
@@ -555,7 +566,7 @@ need not worry about this.
 
 <div class ="fragment">
 <pre>
-          inf_fe-&gt;attach_quadrature_rule (&amp;qrule);
+          inf_fe-&gt;attach_quadrature_rule (&qrule);
           
 </pre>
 </div>
@@ -574,9 +585,9 @@ notation again.
 <div class ="fragment">
 <pre>
           DenseMatrix&lt;Number&gt; Ke;
-          DenseMatrix<Number> Ce;
-          DenseMatrix<Number> Me;
-          DenseVector<Number> Fe;
+          DenseMatrix&lt;Number&gt; Ce;
+          DenseMatrix&lt;Number&gt; Me;
+          DenseVector&lt;Number&gt; Fe;
           
 </pre>
 </div>
@@ -709,9 +720,9 @@ Zero the RHS for this element.
 <pre>
                     Fe.resize (dof_indices.size());
         	    
-        	    es("Wave").rhs->add_vector (Fe, dof_indices);
+        	    system.rhs-&gt;add_vector (Fe, dof_indices);
         	  } // end boundary condition section	     
-        	} // else ( if (elem->infinite())) )
+        	} // else ( if (elem-&gt;infinite())) )
         
 </pre>
 </div>
@@ -740,7 +751,7 @@ each time again, when a new element is processed.
 
 <div class ="fragment">
 <pre>
-              const std::vector&lt;Real&gt;&amp; JxW = cfe-&gt;get_JxW();
+              const std::vector&lt;Real&gt;& JxW = cfe-&gt;get_JxW();
               
 </pre>
 </div>
@@ -750,7 +761,7 @@ The element shape functions evaluated at the quadrature points.
 
 <div class ="fragment">
 <pre>
-              const std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi = cfe-&gt;get_phi();
+              const std::vector&lt;std::vector&lt;Real&gt; &gt;& phi = cfe-&gt;get_phi();
               
 </pre>
 </div>
@@ -761,7 +772,7 @@ points.
 
 <div class ="fragment">
 <pre>
-              const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = cfe-&gt;get_dphi();
+              const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;& dphi = cfe-&gt;get_dphi();
         
 </pre>
 </div>
@@ -778,9 +789,9 @@ finite and infinite elements.
 
 <div class ="fragment">
 <pre>
-              const std::vector&lt;RealGradient&gt;&amp; dphase  = cfe-&gt;get_dphase();
-              const std::vector<Real>&         weight  = cfe->get_Sobolev_weight();
-              const std::vector<RealGradient>& dweight = cfe->get_Sobolev_dweight();
+              const std::vector&lt;RealGradient&gt;& dphase  = cfe-&gt;get_dphase();
+              const std::vector&lt;Real&gt;&         weight  = cfe-&gt;get_Sobolev_weight();
+              const std::vector&lt;RealGradient&gt;& dweight = cfe-&gt;get_Sobolev_dweight();
         
 </pre>
 </div>
@@ -856,7 +867,7 @@ Point, not of type Real.
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;n_sf; i++)
-        	    for (unsigned int j=0; j<n_sf; j++)
+        	    for (unsigned int j=0; j&lt;n_sf; j++)
         	      {
 </pre>
 </div>
@@ -925,7 +936,7 @@ The \p SparseMatrix::add_matrix() member does this for us.
               Ke.add(1./speed        , Ce);
               Ke.add(1./(speed*speed), Me);
         
-              es("Wave").matrix->add_matrix (Ke, dof_indices);
+              system.matrix-&gt;add_matrix (Ke, dof_indices);
             } // end of element loop
         
 </pre>
@@ -948,7 +959,7 @@ Number of nodes in the mesh.
 <pre>
             const unsigned int n_nodes = mesh.n_nodes();
             
-            for (unsigned int n_cnt=0; n_cnt<n_nodes; n_cnt++)
+            for (unsigned int n_cnt=0; n_cnt&lt;n_nodes; n_cnt++)
               {	
 </pre>
 </div>
@@ -958,7 +969,7 @@ Get a reference to the current node.
 
 <div class ="fragment">
 <pre>
-                const Node&amp; curr_node = mesh.node(n_cnt);
+                const Node& curr_node = mesh.node(n_cnt);
         	
 </pre>
 </div>
@@ -968,9 +979,9 @@ Check the location of the current node.
 
 <div class ="fragment">
 <pre>
-                if (fabs(curr_node(0)) &lt; TOLERANCE &amp;&amp;
-        	    fabs(curr_node(1)) < TOLERANCE &&
-        	    fabs(curr_node(2)) < TOLERANCE)
+                if (fabs(curr_node(0)) &lt; TOLERANCE &&
+        	    fabs(curr_node(1)) &lt; TOLERANCE &&
+        	    fabs(curr_node(2)) &lt; TOLERANCE)
         	  {
 </pre>
 </div>
@@ -982,7 +993,7 @@ The global number of the respective degree of freedom.
 <pre>
                     unsigned int dn = curr_node.dof_number(0,0,0);
         
-        	    es("Wave").rhs->add (dn, 1.);
+        	    system.rhs-&gt;add (dn, 1.);
         	  }
               }
           }
@@ -1017,153 +1028,266 @@ All done!
 
 <a name="nocomments"></a> 
 <br><br><br> <h1> The program without comments: </h1> 
+<pre> 
+  
+  #include &lt;iostream&gt;
+  #include &lt;algorithm&gt;
+  #include &lt;math.h&gt;
+  
+  #include <FONT COLOR="#BC8F8F"><B>&quot;libmesh.h&quot;</FONT></B>
+  #include <FONT COLOR="#BC8F8F"><B>&quot;mesh.h&quot;</FONT></B>
+  #include <FONT COLOR="#BC8F8F"><B>&quot;gmv_io.h&quot;</FONT></B>
+  #include <FONT COLOR="#BC8F8F"><B>&quot;implicit_system.h&quot;</FONT></B>
+  #include <FONT COLOR="#BC8F8F"><B>&quot;equation_systems.h&quot;</FONT></B>
+  
+  #include <FONT COLOR="#BC8F8F"><B>&quot;fe.h&quot;</FONT></B>
+  #include <FONT COLOR="#BC8F8F"><B>&quot;inf_fe.h&quot;</FONT></B>
+  
+  #include <FONT COLOR="#BC8F8F"><B>&quot;quadrature_gauss.h&quot;</FONT></B>
+  
+  #include <FONT COLOR="#BC8F8F"><B>&quot;sparse_matrix.h&quot;</FONT></B>
+  #include <FONT COLOR="#BC8F8F"><B>&quot;numeric_vector.h&quot;</FONT></B>
+  #include <FONT COLOR="#BC8F8F"><B>&quot;dense_matrix.h&quot;</FONT></B>
+  #include <FONT COLOR="#BC8F8F"><B>&quot;dense_vector.h&quot;</FONT></B>
+  
+  #include <FONT COLOR="#BC8F8F"><B>&quot;dof_map.h&quot;</FONT></B>
+  
+  <FONT COLOR="#228B22"><B>void</FONT></B> assemble_wave (EquationSystems&amp; es,
+  		    <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp; system_name);
+  
+  <FONT COLOR="#228B22"><B>int</FONT></B> main (<FONT COLOR="#228B22"><B>int</FONT></B> argc, <FONT COLOR="#228B22"><B>char</FONT></B>** argv)
+  {
+    libMesh::init (argc, argv);
+    
+  #ifndef ENABLE_INFINITE_ELEMENTS
+  
+    std::cerr &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;ERROR: This example requires the library to be compiled with Infinite Element support!&quot;</FONT></B>
+  	    &lt;&lt; std::endl;
+    here();
+  
+    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+  
+  #<B><FONT COLOR="#A020F0">else</FONT></B>
+    
+    {        
+      <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> dim = 3; 
+      
+      std::cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;Running ex6 with dim = &quot;</FONT></B> &lt;&lt; dim &lt;&lt; std::endl &lt;&lt; std::endl;        
+      
+      Mesh mesh (dim);
+  
+      mesh.build_cube (4, 4, 4,
+  		     -1., 1.,
+  		     -1., 1.,
+  		     -1., 1.,
+  		     HEX8);
+      
+      mesh.print_info();
+  
+      GMVIO(mesh).write (<FONT COLOR="#BC8F8F"><B>&quot;orig_mesh.gmv&quot;</FONT></B>);
+      
+      mesh.build_inf_elem(true);
+  
+      mesh.print_info();
+  
+      GMVIO(mesh).write (<FONT COLOR="#BC8F8F"><B>&quot;ifems_added.gmv&quot;</FONT></B>);
+      
+      mesh.find_neighbors();
+      
+      EquationSystems equation_systems (mesh);
+      
+      {
+        equation_systems.add_system&lt;ImplicitSystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Wave&quot;</FONT></B>);
+              
+        FEType fe_type(FIRST);
+        
+        equation_systems(<FONT COLOR="#BC8F8F"><B>&quot;Wave&quot;</FONT></B>).add_variable(<FONT COLOR="#BC8F8F"><B>&quot;p&quot;</FONT></B>, fe_type);
+        
+        equation_systems(<FONT COLOR="#BC8F8F"><B>&quot;Wave&quot;</FONT></B>).attach_assemble_function (assemble_wave);
+        
+        equation_systems.set_parameter(<FONT COLOR="#BC8F8F"><B>&quot;speed&quot;</FONT></B>)          = 1.;
+        equation_systems.set_parameter(<FONT COLOR="#BC8F8F"><B>&quot;fluid density&quot;</FONT></B>)  = 1.;
+        
+        equation_systems.init();
+        
+        equation_systems.print_info();
+      }
+      
+      equation_systems(<FONT COLOR="#BC8F8F"><B>&quot;Wave&quot;</FONT></B>).solve();
+      
+      equation_systems.write (<FONT COLOR="#BC8F8F"><B>&quot;eqn_sys.dat&quot;</FONT></B>, libMeshEnums::WRITE);
+    }
+    
+    <B><FONT COLOR="#A020F0">return</FONT></B> libMesh::close ();
+  
+  #endif <I><FONT COLOR="#B22222">// else part of ifndef ENABLE_INFINITE_ELEMENTS
+</FONT></I>  }
+  
+  <FONT COLOR="#228B22"><B>void</FONT></B> assemble_wave(EquationSystems&amp; es,
+  		   <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp; system_name)
+  {
+    assert (system_name == <FONT COLOR="#BC8F8F"><B>&quot;Wave&quot;</FONT></B>);
+  
+  
+  #ifdef ENABLE_INFINITE_ELEMENTS
+    
+    <FONT COLOR="#228B22"><B>const</FONT></B> Mesh&amp; mesh = es.get_mesh();
+  
+    ImplicitSystem &amp; system = es.get_system&lt;ImplicitSystem&gt;(<FONT COLOR="#BC8F8F"><B>&quot;Wave&quot;</FONT></B>);
+    
+    <FONT COLOR="#228B22"><B>const</FONT></B> DofMap&amp; dof_map = system.get_dof_map();
+    
+    <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> dim = mesh.mesh_dimension();
+    
+    <FONT COLOR="#228B22"><B>const</FONT></B> Real speed = es.parameter(<FONT COLOR="#BC8F8F"><B>&quot;speed&quot;</FONT></B>);
+    
+    <FONT COLOR="#228B22"><B>const</FONT></B> FEType&amp; fe_type = dof_map.variable_type(0);
+    
+    AutoPtr&lt;FEBase&gt; fe (FEBase::build(dim, fe_type));
+    
+    AutoPtr&lt;FEBase&gt; inf_fe (FEBase::build_InfFE(dim, fe_type));
+    
+    QGauss qrule (dim, SECOND);
+    
+    fe-&gt;attach_quadrature_rule (&amp;qrule);
+    
+    inf_fe-&gt;attach_quadrature_rule (&amp;qrule);
+    
+    DenseMatrix&lt;Number&gt; Ke;
+    DenseMatrix&lt;Number&gt; Ce;
+    DenseMatrix&lt;Number&gt; Me;
+    DenseVector&lt;Number&gt; Fe;
+    
+    std::vector&lt;<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B>&gt; dof_indices;
+    
+    const_local_elem_iterator           el (mesh.elements_begin());
+    <FONT COLOR="#228B22"><B>const</FONT></B> const_local_elem_iterator end_el (mesh.elements_end());
+    
+    <B><FONT COLOR="#A020F0">for</FONT></B> ( ; el != end_el; ++el)
+      {      
+        <FONT COLOR="#228B22"><B>const</FONT></B> Elem* elem = *el;
+        
+        dof_map.dof_indices (elem, dof_indices);
+  
+        
+        FEBase* cfe=NULL;
+        
+        <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;infinite())
+          {	   
+  	  cfe = inf_fe.get(); 
+  	}
+        <B><FONT COLOR="#A020F0">else</FONT></B>
+          {
+    	  cfe = fe.get();
+  	  
+  	  {	      
+  	    Fe.resize (dof_indices.size());
+  	    
+  	    system.rhs-&gt;add_vector (Fe, dof_indices);
+  	  } <I><FONT COLOR="#B22222">// end boundary condition section	     
+</FONT></I>  	} <I><FONT COLOR="#B22222">// else ( if (elem-&gt;infinite())) )
+</FONT></I>  
+        cfe-&gt;reinit (elem);
+        
+        <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;Real&gt;&amp; JxW = cfe-&gt;get_JxW();
+        
+        <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi = cfe-&gt;get_phi();
+        
+        <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = cfe-&gt;get_dphi();
+  
+        <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;RealGradient&gt;&amp; dphase  = cfe-&gt;get_dphase();
+        <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;Real&gt;&amp;         weight  = cfe-&gt;get_Sobolev_weight();
+        <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;RealGradient&gt;&amp; dweight = cfe-&gt;get_Sobolev_dweight();
+  
+        Ke.resize (dof_indices.size(), dof_indices.size());
+        Ce.resize (dof_indices.size(), dof_indices.size());
+        Me.resize (dof_indices.size(), dof_indices.size());
+        
+        <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> max_qp = cfe-&gt;n_quadrature_points();
+        
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> qp=0; qp&lt;max_qp; qp++)
+          {	  
+  	  <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n_sf = cfe-&gt;n_shape_functions();
+  
+  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i&lt;n_sf; i++)
+  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> j=0; j&lt;n_sf; j++)
+  	      {
+  		Ke(i,j) +=
+  		  (                            <I><FONT COLOR="#B22222">//    (                         
+</FONT></I>  		   (                           <I><FONT COLOR="#B22222">//      (                       
+</FONT></I>  		    dweight[qp] * phi[i][qp]   <I><FONT COLOR="#B22222">//        Point * Real  = Point 
+</FONT></I>  		    +                          <I><FONT COLOR="#B22222">//        +                     
+</FONT></I>  		    dphi[i][qp] * weight[qp]   <I><FONT COLOR="#B22222">//        Point * Real  = Point 
+</FONT></I>  		    ) * dphi[j][qp]            <I><FONT COLOR="#B22222">//      )       * Point = Real  
+</FONT></I>  		   ) * JxW[qp];                <I><FONT COLOR="#B22222">//    )         * Real  = Real  
+</FONT></I>  
+  		Ce(i,j) +=
+  		  (                                <I><FONT COLOR="#B22222">//    (                         
+</FONT></I>  		   (dphase[qp] * dphi[j][qp])      <I><FONT COLOR="#B22222">//      (Point * Point) = Real  
+</FONT></I>  		   * weight[qp] * phi[i][qp]       <I><FONT COLOR="#B22222">//      * Real * Real   = Real  
+</FONT></I>  		   -                               <I><FONT COLOR="#B22222">//      -                       
+</FONT></I>  		   (dweight[qp] * dphase[qp])      <I><FONT COLOR="#B22222">//      (Point * Point) = Real  
+</FONT></I>  		   * phi[i][qp] * phi[j][qp]       <I><FONT COLOR="#B22222">//      * Real * Real   = Real  
+</FONT></I>  		   -                               <I><FONT COLOR="#B22222">//      -                       
+</FONT></I>  		   (dphi[i][qp] * dphase[qp])      <I><FONT COLOR="#B22222">//      (Point * Point) = Real  
+</FONT></I>  		   * weight[qp] * phi[j][qp]       <I><FONT COLOR="#B22222">//      * Real * Real   = Real  
+</FONT></I>  		   ) * JxW[qp];                    <I><FONT COLOR="#B22222">//    )         * Real  = Real  
+</FONT></I>  		
+  		Me(i,j) +=
+  		  (                                       <I><FONT COLOR="#B22222">//    (                                  
+</FONT></I>  		   (1. - (dphase[qp] * dphase[qp]))       <I><FONT COLOR="#B22222">//      (Real  - (Point * Point)) = Real 
+</FONT></I>  		   * phi[i][qp] * phi[j][qp] * weight[qp] <I><FONT COLOR="#B22222">//      * Real *  Real  * Real    = Real 
+</FONT></I>  		   ) * JxW[qp];                           <I><FONT COLOR="#B22222">//    ) * Real                    = Real 
+</FONT></I>  
+  	      } <I><FONT COLOR="#B22222">// end of the matrix summation loop
+</FONT></I>  	} <I><FONT COLOR="#B22222">// end of quadrature point loop
+</FONT></I>  
+        Ke.add(1./speed        , Ce);
+        Ke.add(1./(speed*speed), Me);
+  
+        system.matrix-&gt;add_matrix (Ke, dof_indices);
+      } <I><FONT COLOR="#B22222">// end of element loop
+</FONT></I>  
+    {
+      <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n_nodes = mesh.n_nodes();
+      
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n_cnt=0; n_cnt&lt;n_nodes; n_cnt++)
+        {	
+  	<FONT COLOR="#228B22"><B>const</FONT></B> Node&amp; curr_node = mesh.node(n_cnt);
+  	
+  	<B><FONT COLOR="#A020F0">if</FONT></B> (fabs(curr_node(0)) &lt; TOLERANCE &amp;&amp;
+  	    fabs(curr_node(1)) &lt; TOLERANCE &amp;&amp;
+  	    fabs(curr_node(2)) &lt; TOLERANCE)
+  	  {
+  	    <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> dn = curr_node.dof_number(0,0,0);
+  
+  	    system.rhs-&gt;add (dn, 1.);
+  	  }
+        }
+    }
+  
+  #<B><FONT COLOR="#A020F0">else</FONT></B>
+  
+    assert(es.get_mesh().mesh_dimension() != 1);
+  
+  #endif <I><FONT COLOR="#B22222">//ifdef ENABLE_INFINITE_ELEMENTS
+</FONT></I>    
+    <B><FONT COLOR="#A020F0">return</FONT></B>;
+  }
+  
+</pre> 
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-Compiling C++ (in debug mode) ex6.C...
 Linking ex6...
-/home/benkirk/phd/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
+/home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
 : the use of `mktemp' is dangerous, better use `mkstemp'
 ***************************************************************
 * Running Example  ./ex6
 ***************************************************************
  
-Running ex6 with dim = 3
-
- Mesh Information:
-  mesh_dimension()=3
-  spatial_dimension()=3
-  n_nodes()=125
-  n_elem()=64
-   n_local_elem()=64
-   n_active_elem()=64
-  n_subdomains()=1
-  n_processors()=1
-  processor_id()=0
-
- Determined origin for Infinite Elements:
-  0.00000 0.00000 0.00000 
-
- Building Infinite Elements:
-  updating element neighbor tables...
-  collecting boundary sides...
-  found 0 inner and 96 outer boundary faces
-  added 96 infinite elements and 98 nodes to the mesh
-
- Mesh Information:
-  mesh_dimension()=3
-  spatial_dimension()=3
-  n_nodes()=223
-  n_elem()=160
-   n_local_elem()=160
-   n_active_elem()=160
-  n_subdomains()=1
-  n_processors()=1
-  processor_id()=0
-
- EquationSystems
-  n_systems()=1
-   System "Wave"
-    Type "Steady"
-    Variables="p" 
-    Finite Element Types="0", "12" 
-    Infinite Element Mapping="0" 
-    Approximation Orders="1", "3" 
-    n_dofs()=419
-    n_local_dofs()=419
-    n_constrained_dofs()=0
-    n_additional_vectors()=0
-    n_additional_matrices()=0
-  n_parameters()=4
-   Parameters:
-    "fluid density"=1
-    "linear solver maximum iterations"=5000
-    "linear solver tolerance"=1e-12
-    "speed"=1
-
-
- ---------------------------------------------------------------------------- 
-| Reference count information                                                |
- ---------------------------------------------------------------------------- 
-| 10SystemBase reference count information:
-| Creations:    1
-| Destructions: 1
-| 12SparseMatrixISt7complexIdEE reference count information:
-| Creations:    1
-| Destructions: 1
-| 13NumericVectorISt7complexIdEE reference count information:
-| Creations:    3
-| Destructions: 3
-| 21LinearSolverInterfaceISt7complexIdEE reference count information:
-| Creations:    1
-| Destructions: 1
-| 4Elem reference count information:
-| Creations:    3207
-| Destructions: 3207
-| 4Node reference count information:
-| Creations:    223
-| Destructions: 223
-| 5QBase reference count information:
-| Creations:    5
-| Destructions: 5
-| 6DofMap reference count information:
-| Creations:    1
-| Destructions: 1
-| 6FEBase reference count information:
-| Creations:    3
-| Destructions: 3
- ---------------------------------------------------------------------------- 
-
- ----------------------------------------------------------------------------
-| Time:           Tue Nov 18 07:41:39 2003
-| OS:             Linux
-| HostName:       voyager.home.net
-| OS Release      2.4.20-20.9
-| OS Version:     #1 Mon Aug 18 11:45:58 EDT 2003
-| Machine:        i686
-| Username:       benkirk
- ----------------------------------------------------------------------------
- ----------------------------------------------------------------------------
-| libMesh Performance: Alive time=0.436066, Active time=0.373535
- ----------------------------------------------------------------------------
-| Event                         nCalls  Total       Avg         Percent of   |
-|                                       Time        Time        Active Time  |
-|----------------------------------------------------------------------------|
-|                                                                            |
-|                                                                            |
-| DofMap                                                                     |
-|   compute_sparsity()          1       0.0120      0.012025    3.22         |
-|   create_dof_constraints()    1       0.0001      0.000088    0.02         |
-|   distribute_dofs()           1       0.0005      0.000507    0.14         |
-|   dof_indices()               320     0.0037      0.000012    0.99         |
-|   reinit()                    1       0.0013      0.001250    0.33         |
-|                                                                            |
-| FE                                                                         |
-|   compute_map()               160     0.0055      0.000034    1.47         |
-|   compute_shape_functions()   64      0.0006      0.000010    0.17         |
-|   init_shape_functions()      2       0.0004      0.000181    0.10         |
-|                                                                            |
-| InfFE                                                                      |
-|   combine_base_radial()       96      0.0057      0.000060    1.53         |
-|   compute_shape_functions()   96      0.0036      0.000038    0.97         |
-|   init_radial_shape_functions()1       0.0001      0.000071    0.02         |
-|   init_shape_functions()      1       0.0002      0.000248    0.07         |
-|                                                                            |
-| Mesh                                                                       |
-|   build_cube()                1       0.0011      0.001093    0.29         |
-|                                                                            |
-| MeshBase                                                                   |
-|   build_inf_elem()            1       0.0035      0.003458    0.93         |
-|   find_neighbors()            4       0.0112      0.002809    3.01         |
-|   renumber_nodes_and_elem()   2       0.0002      0.000085    0.05         |
-|                                                                            |
-| SystemBase                                                                 |
-|   assemble()                  1       0.1991      0.199150    53.31        |
-|   solve()                     1       0.1247      0.124697    33.38        |
- ----------------------------------------------------------------------------
-| Totals:                       754     0.3735                  100.00       |
- ----------------------------------------------------------------------------
-
+ERROR: This example requires the library to be compiled with Infinite Element support!
+[0] ex6.C, line 83, compiled May 20 2004 at 15:19:42
  
 ***************************************************************
 * Done Running Example  ./ex6
