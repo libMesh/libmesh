@@ -1,4 +1,4 @@
-// $Id: sparse_matrix.h,v 1.4 2004-04-18 00:51:50 jwpeterson Exp $
+// $Id: sparse_matrix.h,v 1.5 2004-08-20 14:07:11 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -83,7 +83,8 @@ public:
    * Builds a \p SparseMatrix<T> using the linear solver package specified by
    * \p solver_package
    */
-  static AutoPtr<SparseMatrix<T> > build(const SolverPackage solver_package = libMesh::default_solver_package());
+  static AutoPtr<SparseMatrix<T> >
+  build(const SolverPackage solver_package = libMesh::default_solver_package());
   
   /**
    * @returns true if the matrix has been initialized,
@@ -301,8 +302,54 @@ public:
     std::cerr << "ERROR writing MATLAB file " << name << std::endl;
     error();
   }
+
+  /**
+   * This function creates a matrix called "submatrix" which is defined
+   * by the row and column indices given in the "rows" and "cols" entries.
+   * Currently this operation is only defined for the PetscMatrix type.
+   */
+  virtual void create_submatrix(SparseMatrix<T>& submatrix,
+				const std::vector<unsigned int>& rows,
+				const std::vector<unsigned int>& cols) const
+  {
+    this->_get_submatrix(submatrix,
+			 rows,
+			 cols,
+			 false); // false means DO NOT REUSE submatrix
+  }
+
+  /**
+   * This function is similar to the one above, but it allows you to reuse
+   * the existing sparsity pattern of "submatrix" instead of reallocating
+   * it again.  This should hopefully be more efficient if you are frequently
+   * extracting submatrices of the same size.
+   */
+  virtual void reinit_submatrix(SparseMatrix<T>& submatrix,
+				const std::vector<unsigned int>& rows,
+				const std::vector<unsigned int>& cols) const
+  {
+    this->_get_submatrix(submatrix,
+			 rows,
+			 cols,
+			 true); // true means REUSE submatrix
+  }
   
 protected:
+
+  /**
+   * Protected implementation of the create_submatrix and reinit_submatrix
+   * routines.  Note that this function must be redefined in derived classes
+   * for it to work properly!
+   */
+  virtual void _get_submatrix(SparseMatrix<T>& ,
+			      const std::vector<unsigned int>& ,
+			      const std::vector<unsigned int>& ,
+			      const bool) const
+  {
+    std::cerr << "Error! This function is not yet implemented in the base class!"
+	      << std::endl;
+    error();
+  }
   
   /**
    * The \p DofMap object associated with this object.
