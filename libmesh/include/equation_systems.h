@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: equation_systems.h,v 1.7 2003-02-10 01:23:11 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,6 +31,7 @@
 #include "xdr_cxx.h"
 
 // Forward Declarations
+#define SystemData GeneralSystem
 class SystemData;
 class Mesh;
 

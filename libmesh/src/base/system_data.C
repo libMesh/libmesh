@@ -1,4 +1,4 @@
-// $Id: system_data.C,v 1.7 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: system_data.C,v 1.8 2003-02-10 01:23:15 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -29,9 +29,9 @@
 
 
 // ------------------------------------------------------------
-// SystemData implementation
+// SystemBase implementation
 
-SystemData::SystemData (EquationSystems& es,
+SystemBase::SystemBase (EquationSystems& es,
 			const std::string& name) :
   dof_map(es.get_mesh()),
   init_system_fptr(NULL),
@@ -44,13 +44,13 @@ SystemData::SystemData (EquationSystems& es,
 
 
 
-SystemData::~SystemData ()
+SystemBase::~SystemBase ()
 {
 };
 
 
 
-void SystemData::clear ()
+void GeneralSystem::clear ()
 {
   var_names.clear ();
 
@@ -81,7 +81,7 @@ void SystemData::clear ()
 
 
 
-void SystemData::update ()
+void GeneralSystem::update ()
 {
 #ifndef HAVE_PETSC
 
@@ -106,7 +106,7 @@ void SystemData::update ()
 
 
 
-void SystemData::update_global_solution (std::vector<Complex>& global_soln) const
+void SystemBase::update_global_solution (std::vector<Complex>& global_soln) const
 {
 #ifndef HAVE_PETSC
 
@@ -125,7 +125,7 @@ void SystemData::update_global_solution (std::vector<Complex>& global_soln) cons
 
 
 
-void SystemData::update_global_solution (std::vector<Complex>& global_soln,
+void SystemBase::update_global_solution (std::vector<Complex>& global_soln,
 					 const unsigned int dest_proc) const
 {
 #ifndef HAVE_PETSC
@@ -145,7 +145,7 @@ void SystemData::update_global_solution (std::vector<Complex>& global_soln,
 
 
 
-void SystemData::init ()
+void GeneralSystem::init ()
 {
   dof_map.distribute_dofs (mesh.processor_id());
 
@@ -184,7 +184,7 @@ void SystemData::init ()
 
 
 
-void SystemData::add_variable (const std::string& var,
+void SystemBase::add_variable (const std::string& var,
 			       const FEType& type)
 {
   
@@ -209,7 +209,7 @@ void SystemData::add_variable (const std::string& var,
 
 
 
-void SystemData::add_variable (const std::string& var,
+void SystemBase::add_variable (const std::string& var,
 			       const Order order)
 {
   FEType fe_type(order, LAGRANGE);
@@ -219,7 +219,7 @@ void SystemData::add_variable (const std::string& var,
 
 
 
-unsigned short int SystemData::variable_number (const std::string& var) const
+unsigned short int SystemBase::variable_number (const std::string& var) const
 {
   // Make sure the variable exists
   std::map<std::string, unsigned short int>::const_iterator
@@ -241,7 +241,7 @@ unsigned short int SystemData::variable_number (const std::string& var) const
 
 #ifdef HAVE_PETSC
 
-void SystemData::assemble ()
+void GeneralSystem::assemble ()
 {
   assert (assemble_fptr != NULL);
 
@@ -265,7 +265,7 @@ void SystemData::assemble ()
 
 
 std::pair<unsigned int, Real>
-SystemData::solve ()
+GeneralSystem::solve ()
 {
   
   assemble (); 
@@ -289,7 +289,7 @@ SystemData::solve ()
 
 
 
-void SystemData::attach_init_function(void fptr(EquationSystems& es,
+void SystemBase::attach_init_function(void fptr(EquationSystems& es,
 						const std::string& name))
 {
   assert (fptr != NULL);
@@ -299,7 +299,7 @@ void SystemData::attach_init_function(void fptr(EquationSystems& es,
 
 
 
-void SystemData::attach_assemble_function(void fptr(EquationSystems& es,
+void SystemBase::attach_assemble_function(void fptr(EquationSystems& es,
 						    const std::string& name))
 {
   assert (fptr != NULL);

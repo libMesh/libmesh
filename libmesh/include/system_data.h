@@ -1,4 +1,4 @@
-// $Id: system_data.h,v 1.8 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: system_data.h,v 1.9 2003-02-10 01:23:12 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -32,40 +32,59 @@
 #include "fe_type.h"
 #include "petsc_interface.h"
 #include "equation_systems.h"
+#include "enum_system_type.h"
 
 // Forward Declarations
+
+// For backward compatibility, provide this; didn't work with typedef
+#define SystemData GeneralSystem
+//typedef GeneralSystem SystemData;
 
 
 
 /**
- * This class contains information related to any physical
- * process that might be simulated.  Such information may
- * range from the actual solution values to algorithmic
- * flags that may be used to control the numerical methods
- * employed.
+ * This is the purely virtual base class for classes which contain 
+ * information related to any physical process that might be simulated.  
+ * Such information may range from the actual solution values to 
+ * algorithmic flags that may be used to control the numerical methods
+ * employed.  In general, use an \p EquationSystems object to handle
+ * one or more of the children of this class.
  *
  * @author Benjamin S. Kirk, 2002
  */
 
 // ------------------------------------------------------------
-// SystemData class definition
+// SystemBase class definition
 
-class SystemData
+class SystemBase
 {
-public:
+protected:
 
   /**
    * Constructor.  Optionally initializes required
-   * data structures.
+   * data structures.  Protected so that this base class
+   * cannot be explicitly instantiated.
    */
-  SystemData (EquationSystems& es,
+  SystemBase (EquationSystems& es,
 	      const std::string& name);
+
+public:
 
   /**
    * Destructor.
    */
-  ~SystemData ();
+  virtual ~SystemBase ();
 
+/*   /\** */
+/*    * Builds a specific equation system container type.  A  */
+/*    * \p AutoPtr<SystemBase> is returned to prevent a memory leak.  */
+/*    * Note that this makes only sense when we have @e all the  */
+/*    * relevant methods made virtual.  This may become messy within SystemBase.  */
+/*    *\/ */
+/*   static AutoPtr<SystemBase> build (EquationSystems& es, */
+/* 				    const std::string& name, */
+/* 				    const SystemType st=GENERAL); */
+  
   /**
    * @returns the system name.
    */
@@ -75,13 +94,13 @@ public:
    * Clear all the data structures associated with
    * the system. 
    */
-  void clear ();
+  virtual void clear () = 0;
 
   /**
    * Update the local values to reflect the solution
    * on neighboring processors.
    */
-  void update ();
+  virtual void update () = 0;
 
   /**
    * Fill the input vector \p global_soln so that it contains
@@ -114,7 +133,7 @@ public:
    * is not initialized at this time since it may not be required
    * for all applications.
    */
-  void init ();
+  virtual void init () = 0;
   
   /**
    * @returns the number of variables in the system
@@ -165,16 +184,6 @@ public:
   unsigned short int variable_number (const std::string& var) const;
 
   /**
-   * @returns the approximation order of variable number \p i.
-   */
-  Order variable_order (const unsigned int i) const;
-
-  /**
-   * @returns the approximation order of variable \p var.
-   */
-  Order variable_order (const std::string& var) const;
-
-  /**
    * @returns the finite element type variable number \p i.
    */
   FEType variable_type (const unsigned int i) const;
@@ -189,18 +198,6 @@ public:
    * DOF.
    */
   Complex current_solution (const unsigned int global_dof_number) const;
-  
-  /**
-   * @returns the old solution for the specified global
-   * DOF.
-   */
-  Complex old_solution (const unsigned int global_dof_number) const;
-  
-  /**
-   * @returns the older solution for the specified global
-   * DOF.
-   */
-  Complex older_solution (const unsigned int global_dof_number) const;
   
   /**
    * @returns the value of variable \p var at node point
@@ -220,44 +217,6 @@ public:
   Complex current_nodal_solution (const unsigned int node,
 				  const unsigned short int var=0,
 				  const unsigned int index=0) const;
-  
-  /**
-   * @returns the value of variable \p var at node point
-   * \p node in the mesh for the old solution.
-   * Slower than using the integer id for the variable
-   * since this requires a lookup.
-   */
-  Complex old_nodal_solution (const unsigned int node,
-			      const std::string& var,
-			      const unsigned int index=0) const;
-  
-  /**
-   * @returns the value of variable number \p var at
-   * node point \p node in the mesh for the old
-   * solution.
-   */
-  Complex old_nodal_solution (const unsigned int node,
-			      const unsigned short int var=0,
-			      const unsigned int index=0) const;
-
-  /**
-   * @returns the value of variable \p var at node point
-   * \p node in the mesh for the older solution.
-   * Slower than using the integer id for the variable
-   * since this requires a lookup.
-   */
-  Complex older_nodal_solution (const unsigned int node,
-				const std::string& var,
-				const unsigned int index=0) const;
-  
-  /**
-   * @returns the value of variable number \p var at
-   * node point \p node in the mesh for the older
-   * solution.
-   */
-  Complex older_nodal_solution (const unsigned int node,
-				const unsigned short int var=0,
-				const unsigned int index=0) const;
 
   /**
    * @returns the value of variable \p var at elem point
@@ -277,44 +236,6 @@ public:
   Complex current_elem_solution (const unsigned int elem,
 				 const unsigned short int var=0,
 				 const unsigned int index=0) const;
-  
-  /**
-   * @returns the value of variable \p var at elem point
-   * \p elem in the mesh for the old solution.
-   * Slower than using the integer id for the variable
-   * since this requires a lookup.
-   */
-  Complex old_elem_solution (const unsigned int elem,
-			     const std::string& var,
-			     const unsigned int index=0) const;
-  
-  /**
-   * @returns the value of variable number \p var at
-   * elem point \p elem in the mesh for the old
-   * solution.
-   */
-  Complex old_elem_solution (const unsigned int elem,
-			     const unsigned short int var=0,
-			     const unsigned int index=0) const;
-
-  /**
-   * @returns the value of variable \p var at elem point
-   * \p elem in the mesh for the older solution.
-   * Slower than using the integer id for the variable
-   * since this requires a lookup.
-   */
-  Complex older_elem_solution (const unsigned int elem,
-			       const std::string& var,
-			       const unsigned int index=0) const;
-  
-  /**
-   * @returns the value of variable number \p var at
-   * elem point \p elem in the mesh for the older
-   * solution.
-   */
-  Complex older_elem_solution (const unsigned int elem,
-			       const unsigned short int var=0,
-			       const unsigned int index=0) const;
   
   /**
    * Data structure describing the relationship between
@@ -353,12 +274,12 @@ public:
    * Assemble the linear system.  Does not
    * actually call the solver.
    */
-  void assemble ();
+  virtual void assemble () = 0;
   
   /**
    * Assemble & solve the linear system.
    */
-  std::pair<unsigned int, Real> solve ();
+  virtual std::pair<unsigned int, Real> solve () = 0;
   
   /**
    * Data structure to hold solution values.
@@ -387,22 +308,10 @@ public:
    * other processors.
    */
   PetscVector current_local_solution;
-  
-  /**
-   * All the values I need to compute my contribution
-   * to the simulation at hand for the previous time step.
-   */
-  PetscVector old_local_solution;
-  
-  /**
-   * All the values I need to compute my contribution
-   * to the simulation at hand two time steps ago.
-   */
-  PetscVector older_local_solution;
-  
+    
 #endif
 
-private:
+protected:
 
 
   /**
@@ -444,9 +353,9 @@ private:
 
 
 // ------------------------------------------------------------
-// SystemData inline methods
+// SystemBase inline methods
 inline
-std::string SystemData::name() const
+std::string SystemBase::name() const
 {
   return sys_name;
 };
@@ -454,7 +363,7 @@ std::string SystemData::name() const
 
 
 inline
-unsigned int SystemData::n_vars() const
+unsigned int SystemBase::n_vars() const
 {
   assert (!var_names.empty());
 
@@ -464,7 +373,7 @@ unsigned int SystemData::n_vars() const
 
 
 inline
-std::string SystemData::variable_name (const unsigned int i) const
+std::string SystemBase::variable_name (const unsigned int i) const
 {
   assert (i < n_vars());
 
@@ -474,28 +383,7 @@ std::string SystemData::variable_name (const unsigned int i) const
 
 
 inline
-Order SystemData::variable_order (const unsigned int i) const
-{
-  return variable_type(var_names[i]).order;
-};
-
-
-
-inline
-Order SystemData::variable_order (const std::string& var) const
-{
-  std::map<std::string, FEType>::const_iterator
-    pos = var_type.find(var);
-
-  assert (pos != var_type.end());
-  
-  return pos->second.order;
-};
-
-
-
-inline
-FEType SystemData::variable_type (const unsigned int i) const
+FEType SystemBase::variable_type (const unsigned int i) const
 {
   return variable_type(var_names[i]);
 };
@@ -503,7 +391,7 @@ FEType SystemData::variable_type (const unsigned int i) const
 
 
 inline
-FEType SystemData::variable_type (const std::string& var) const
+FEType SystemBase::variable_type (const std::string& var) const
 {
   std::map<std::string, FEType>::const_iterator
     pos = var_type.find(var);
@@ -516,7 +404,7 @@ FEType SystemData::variable_type (const std::string& var) const
 
 
 inline
-unsigned int SystemData::n_dofs() const
+unsigned int SystemBase::n_dofs() const
 {
   return dof_map.n_dofs();
 };
@@ -526,7 +414,7 @@ unsigned int SystemData::n_dofs() const
 
 
 inline
-unsigned int SystemData::n_constrained_dofs() const
+unsigned int SystemBase::n_constrained_dofs() const
 {
 #ifdef ENABLE_AMR
 
@@ -545,7 +433,7 @@ unsigned int SystemData::n_constrained_dofs() const
 
 
 inline
-unsigned int SystemData::n_local_dofs() const
+unsigned int SystemBase::n_local_dofs() const
 {
   return dof_map.n_dofs_on_processor(mesh.processor_id());
 };
@@ -553,7 +441,7 @@ unsigned int SystemData::n_local_dofs() const
 
 
 inline
-Complex SystemData::current_solution (const unsigned int global_dof_number) const
+Complex SystemBase::current_solution (const unsigned int global_dof_number) const
 {
 #ifndef HAVE_PETSC
 
@@ -576,7 +464,299 @@ Complex SystemData::current_solution (const unsigned int global_dof_number) cons
 
 
 inline
-Complex SystemData::old_solution (const unsigned int global_dof_number) const
+Complex SystemBase::current_nodal_solution (const unsigned int node,
+					    const std::string& var,
+					    const unsigned int index) const
+{
+  return current_nodal_solution (node, variable_number(var), index);
+};
+
+
+
+inline
+Complex SystemBase::current_nodal_solution (const unsigned int node,
+					    const unsigned short int var,
+					    const unsigned int index) const
+{
+#ifndef HAVE_PETSC
+
+  std::cerr << "ERROR: this feature requires Petsc support!"
+	    << std::endl;
+
+  error();
+
+  return 0.;
+  
+#else
+
+  return current_local_solution(dof_map.node_dof_number(node, var, index));
+
+#endif
+};
+
+
+
+inline
+Complex SystemBase::current_elem_solution (const unsigned int elem,
+					   const std::string& var,
+					   const unsigned int index) const
+{
+  return current_elem_solution (elem, variable_number(var), index);
+};
+
+
+
+inline
+Complex SystemBase::current_elem_solution (const unsigned int elem,
+					   const unsigned short int var,
+					   const unsigned int index) const
+{
+#ifndef HAVE_PETSC
+
+  std::cerr << "ERROR: this feature requires Petsc support!"
+	    << std::endl;
+
+  error();
+
+  return 0.;
+  
+#else
+
+  return current_elem_solution(dof_map.elem_dof_number(elem, var, index));
+
+#endif
+};
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * This class provides a specific system class.  It aims
+ * at general systems, offering some backward memory,
+ * likely suitable for nonlinear problems.
+ *
+ * @author  Daniel Dreyer, 2003
+ */
+
+// ------------------------------------------------------------
+// GeneralSystem class definition
+
+class GeneralSystem : public SystemBase
+{
+public:
+
+  /**
+   * Constructor.  Optionally initializes required
+   * data structures.
+   */
+  GeneralSystem (EquationSystems& es,
+		 const std::string& name);
+
+  /**
+   * Destructor.
+   */
+  ~GeneralSystem ();
+  
+  /**
+   * Clear all the data structures associated with
+   * the system. 
+   */
+  void clear ();
+
+  /**
+   * Update the local values to reflect the solution
+   * on neighboring processors.
+   */
+  void update ();
+
+  /**
+   * Initialize the degrees of freedom and other 
+   * required data on the current mesh.  Note that the matrix
+   * is not initialized at this time since it may not be required
+   * for all applications.
+   */
+  void init ();
+
+  /**
+   * @returns the approximation order of variable number \p i.
+   */
+  Order variable_order (const unsigned int i) const;
+
+  /**
+   * @returns the approximation order of variable \p var.
+   */
+  Order variable_order (const std::string& var) const;
+  
+  /**
+   * @returns the old solution for the specified global
+   * DOF.
+   */
+  Complex old_solution (const unsigned int global_dof_number) const;
+  
+  /**
+   * @returns the older solution for the specified global
+   * DOF.
+   */
+  Complex older_solution (const unsigned int global_dof_number) const;
+  
+  /**
+   * @returns the value of variable \p var at node point
+   * \p node in the mesh for the old solution.
+   * Slower than using the integer id for the variable
+   * since this requires a lookup.
+   */
+  Complex old_nodal_solution (const unsigned int node,
+			      const std::string& var,
+			      const unsigned int index=0) const;
+  
+  /**
+   * @returns the value of variable number \p var at
+   * node point \p node in the mesh for the old
+   * solution.
+   */
+  Complex old_nodal_solution (const unsigned int node,
+			      const unsigned short int var=0,
+			      const unsigned int index=0) const;
+
+  /**
+   * @returns the value of variable \p var at node point
+   * \p node in the mesh for the older solution.
+   * Slower than using the integer id for the variable
+   * since this requires a lookup.
+   */
+  Complex older_nodal_solution (const unsigned int node,
+				const std::string& var,
+				const unsigned int index=0) const;
+  
+  /**
+   * @returns the value of variable number \p var at
+   * node point \p node in the mesh for the older
+   * solution.
+   */
+  Complex older_nodal_solution (const unsigned int node,
+				const unsigned short int var=0,
+				const unsigned int index=0) const;
+
+  /**
+   * @returns the value of variable \p var at elem point
+   * \p elem in the mesh for the old solution.
+   * Slower than using the integer id for the variable
+   * since this requires a lookup.
+   */
+  Complex old_elem_solution (const unsigned int elem,
+			     const std::string& var,
+			     const unsigned int index=0) const;
+  
+  /**
+   * @returns the value of variable number \p var at
+   * elem point \p elem in the mesh for the old
+   * solution.
+   */
+  Complex old_elem_solution (const unsigned int elem,
+			     const unsigned short int var=0,
+			     const unsigned int index=0) const;
+
+  /**
+   * @returns the value of variable \p var at elem point
+   * \p elem in the mesh for the older solution.
+   * Slower than using the integer id for the variable
+   * since this requires a lookup.
+   */
+  Complex older_elem_solution (const unsigned int elem,
+			       const std::string& var,
+			       const unsigned int index=0) const;
+  
+  /**
+   * @returns the value of variable number \p var at
+   * elem point \p elem in the mesh for the older
+   * solution.
+   */
+  Complex older_elem_solution (const unsigned int elem,
+			       const unsigned short int var=0,
+			       const unsigned int index=0) const;
+
+ 
+#ifdef HAVE_PETSC
+
+  /**
+   * Assemble the linear system.  Does not
+   * actually call the solver.
+   */
+  void assemble ();
+  
+  /**
+   * Assemble & solve the linear system.
+   */
+  std::pair<unsigned int, Real> solve ();
+  
+  /**
+   * All the values I need to compute my contribution
+   * to the simulation at hand for the previous time step.
+   */
+  PetscVector old_local_solution;
+  
+  /**
+   * All the values I need to compute my contribution
+   * to the simulation at hand two time steps ago.
+   */
+  PetscVector older_local_solution;
+  
+#endif
+
+private:
+
+};
+
+
+
+// ------------------------------------------------------------
+// GeneralSystem inline methods
+inline
+GeneralSystem::GeneralSystem (EquationSystems& es,
+			      const std::string& name) :
+    SystemBase(es, name)
+{
+};
+
+
+
+inline
+GeneralSystem::~GeneralSystem ()
+{
+};
+
+
+
+inline
+Order GeneralSystem::variable_order (const unsigned int i) const
+{
+  return variable_type(var_names[i]).order;
+};
+
+
+
+inline
+Order GeneralSystem::variable_order (const std::string& var) const
+{
+  std::map<std::string, FEType>::const_iterator
+    pos = var_type.find(var);
+
+  assert (pos != var_type.end());
+  
+  return pos->second.order;
+};
+
+
+
+inline
+Complex GeneralSystem::old_solution (const unsigned int global_dof_number) const
 {
 #ifndef HAVE_PETSC
 
@@ -599,7 +779,7 @@ Complex SystemData::old_solution (const unsigned int global_dof_number) const
 
 
 inline
-Complex SystemData::older_solution (const unsigned int global_dof_number) const
+Complex GeneralSystem::older_solution (const unsigned int global_dof_number) const
 {
 #ifndef HAVE_PETSC
 
@@ -622,42 +802,9 @@ Complex SystemData::older_solution (const unsigned int global_dof_number) const
 
 
 inline
-Complex SystemData::current_nodal_solution (const unsigned int node,
+Complex GeneralSystem::old_nodal_solution (const unsigned int node,
 					   const std::string& var,
 					   const unsigned int index) const
-{
-  return current_nodal_solution (node, variable_number(var), index);
-};
-
-
-
-inline
-Complex SystemData::current_nodal_solution (const unsigned int node,
-					   const unsigned short int var,
-					   const unsigned int index) const
-{
-#ifndef HAVE_PETSC
-
-  std::cerr << "ERROR: this feature requires Petsc support!"
-	    << std::endl;
-
-  error();
-
-  return 0.;
-  
-#else
-
-  return current_local_solution(dof_map.node_dof_number(node, var, index));
-
-#endif
-};
-
-
-
-inline
-Complex SystemData::old_nodal_solution (const unsigned int node,
-				       const std::string& var,
-				       const unsigned int index) const
 {
   return old_nodal_solution (node, variable_number(var), index);
 };
@@ -665,9 +812,9 @@ Complex SystemData::old_nodal_solution (const unsigned int node,
 
 
 inline
-Complex SystemData::old_nodal_solution (const unsigned int node,
-				       const unsigned short int var,
-				       const unsigned int index) const
+Complex GeneralSystem::old_nodal_solution (const unsigned int node,
+					   const unsigned short int var,
+					   const unsigned int index) const
 {
 #ifndef HAVE_PETSC
 
@@ -688,9 +835,9 @@ Complex SystemData::old_nodal_solution (const unsigned int node,
 
 
 inline
-Complex SystemData::older_nodal_solution (const unsigned int node,
-					 const std::string& var,
-					 const unsigned int index) const
+Complex GeneralSystem::older_nodal_solution (const unsigned int node,
+					     const std::string& var,
+					     const unsigned int index) const
 {
   return older_nodal_solution (node, variable_number(var), index);
 };
@@ -698,9 +845,9 @@ Complex SystemData::older_nodal_solution (const unsigned int node,
 
 
 inline
-Complex SystemData::older_nodal_solution (const unsigned int node,
-					 const unsigned short int var,
-					 const unsigned int index) const
+Complex GeneralSystem::older_nodal_solution (const unsigned int node,
+					     const unsigned short int var,
+					     const unsigned int index) const
 {
 #ifndef HAVE_PETSC
 
@@ -721,42 +868,9 @@ Complex SystemData::older_nodal_solution (const unsigned int node,
 
 
 inline
-Complex SystemData::current_elem_solution (const unsigned int elem,
+Complex GeneralSystem::old_elem_solution (const unsigned int elem,
 					  const std::string& var,
 					  const unsigned int index) const
-{
-  return current_elem_solution (elem, variable_number(var), index);
-};
-
-
-
-inline
-Complex SystemData::current_elem_solution (const unsigned int elem,
-					  const unsigned short int var,
-					  const unsigned int index) const
-{
-#ifndef HAVE_PETSC
-
-  std::cerr << "ERROR: this feature requires Petsc support!"
-	    << std::endl;
-
-  error();
-
-  return 0.;
-  
-#else
-
-  return current_elem_solution(dof_map.elem_dof_number(elem, var, index));
-
-#endif
-};
-
-
-
-inline
-Complex SystemData::old_elem_solution (const unsigned int elem,
-				      const std::string& var,
-				      const unsigned int index) const
 {
   return old_elem_solution (elem, variable_number(var), index);
 };
@@ -764,9 +878,9 @@ Complex SystemData::old_elem_solution (const unsigned int elem,
 
 
 inline
-Complex SystemData::old_elem_solution (const unsigned int elem,
-				      const unsigned short int var,
-				      const unsigned int index) const
+Complex GeneralSystem::old_elem_solution (const unsigned int elem,
+					  const unsigned short int var,
+					  const unsigned int index) const
 {
 #ifndef HAVE_PETSC
 
@@ -787,9 +901,9 @@ Complex SystemData::old_elem_solution (const unsigned int elem,
 
 
 inline
-Complex SystemData::older_elem_solution (const unsigned int elem,
-					const std::string& var,
-					const unsigned int index) const
+Complex GeneralSystem::older_elem_solution (const unsigned int elem,
+					    const std::string& var,
+					    const unsigned int index) const
 {
   return older_elem_solution (elem, variable_number(var), index);
 };
@@ -797,9 +911,9 @@ Complex SystemData::older_elem_solution (const unsigned int elem,
 
 
 inline
-Complex SystemData::older_elem_solution (const unsigned int elem,
-					const unsigned short int var,
-					const unsigned int index) const
+Complex GeneralSystem::older_elem_solution (const unsigned int elem,
+					    const unsigned short int var,
+					    const unsigned int index) const
 {
 #ifndef HAVE_PETSC
 
@@ -816,6 +930,10 @@ Complex SystemData::older_elem_solution (const unsigned int elem,
 
 #endif
 };
+
+
+
+
 
 
 #endif
