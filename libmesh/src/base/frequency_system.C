@@ -1,4 +1,4 @@
-// $Id: frequency_system.C,v 1.14 2003-05-22 18:31:19 ddreyer Exp $
+// $Id: frequency_system.C,v 1.15 2003-07-07 21:01:30 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -50,15 +50,6 @@ FrequencySystem::FrequencySystem (EquationSystems& es,
   _finished_init            (false),
   _finished_assemble        (false)
 {
-  // dumb safety: clear the frequency vector
-  _frequencies.clear();
-
-  // initialize additional matrices to store the (inherently) real-valued
-  // mass and stiffness as real and imaginary part, respectively, and
-  // the damping in another separate matrix
-//  SystemBase::add_matrix("mass_stiffness");
-//  SystemBase::add_matrix("damping");
-
   // default value for wave speed & fluid density
   _equation_systems.set_parameter("wave speed") = 340.;
   _equation_systems.set_parameter("rho")        = 1.225;
@@ -88,11 +79,12 @@ void FrequencySystem::clear ()
   // 1. in the parameters section of the 
   //    EquationSystems<FrequencySystem> object
   // 2. in the local vector
-  for (unsigned int n=0; n < this->n_frequencies(); n++)
-      _equation_systems.unset_parameter(this->form_freq_param_name(n));
-  _equation_systems.unset_parameter("current frequency");
-
-  this->_frequencies.clear();
+  if (_equation_systems.parameter_exists ("n_frequencies"))
+    {
+      for (unsigned int n=0; n < _equation_systems.parameter("n_frequencies"); n++)
+	  _equation_systems.unset_parameter(this->form_freq_param_name(n));
+      _equation_systems.unset_parameter("current frequency");
+    }
 }
 
 
@@ -119,18 +111,9 @@ void FrequencySystem::init_data ()
 	  assert(this->n_frequencies() == 0);
 	  assert(n_freq > 0);
 
-	  _frequencies.resize (n_freq);
-
-	  /*
-	   * set frequencies.  No need to build solution storage,
-	   * since the additional vectors were already read from file
-	   */
-	  for (unsigned int n=0; n<n_freq; n++)
-	      _frequencies[n] = _equation_systems.parameter(this->form_freq_param_name(n));
+	  _finished_set_frequencies = true;
 
 	  this->set_current_frequency(0);
-
-	  _finished_set_frequencies = true;
         }
       else
         {
@@ -190,36 +173,30 @@ void FrequencySystem::set_frequencies_by_steps (const Real base_freq,
 						const unsigned int n_freq)
 {
   // sanity check
-  assert(this->n_frequencies() == 0);
-
   if (_finished_set_frequencies)
     {
-      std::cerr << "ERROR: frequencies already initialized. " << std::endl;
+      std::cerr << "ERROR: frequencies already initialized." 
+		<< std::endl;
       error();
     }
 
-  _frequencies.resize (n_freq);
-
   // store number of frequencies as parameter
   _equation_systems.set_parameter("n_frequencies") = n_freq;
-  
 
   for (unsigned int n=0; n<n_freq; n++)
     {
-      // local storage of frequencies
-      _frequencies[n] = base_freq + n * freq_step;
-      // remember frequencies as parameters, so that they
-      // are saved, once the EquationSystems object is written
-      _equation_systems.set_parameter(this->form_freq_param_name(n)) = _frequencies[n];
+      // remember frequencies as parameters
+      _equation_systems.set_parameter(this->form_freq_param_name(n)) = 
+	  base_freq + n * freq_step;
 
       // build storage for solution vector
       SystemBase::add_vector(this->form_solu_vec_name(n));
     }  
 
+  _finished_set_frequencies = true;
+
   // set the current frequency
   this->set_current_frequency(0);
-
-  _finished_set_frequencies = true;
 }
 
 
@@ -229,7 +206,6 @@ void FrequencySystem::set_frequencies_by_range (const Real min_freq,
 						const unsigned int n_freq)
 {
   // sanity checks
-  assert(this->n_frequencies() == 0);
   assert(max_freq > min_freq);
   assert(n_freq > 0);
 
@@ -239,29 +215,68 @@ void FrequencySystem::set_frequencies_by_range (const Real min_freq,
       error();
     }
 
-  _frequencies.resize (n_freq);
-
   // store number of frequencies as parameter
   _equation_systems.set_parameter("n_frequencies") = n_freq;
 
   // set frequencies, build solution storage
   for (unsigned int n=0; n<n_freq; n++)
     {
-      // local storage of frequencies
-      _frequencies[n] = min_freq + n*(max_freq-min_freq)/(n_freq-1);
-      // remember frequencies as parameters, so that they
-      // are saved, once the EquationSystems object is written
-      _equation_systems.set_parameter(this->form_freq_param_name(n)) = _frequencies[n];
+      // remember frequencies as parameters
+      _equation_systems.set_parameter(this->form_freq_param_name(n)) = 
+	  min_freq + n*(max_freq-min_freq)/(n_freq-1);
       
       // build storage for solution vector
       SystemBase::add_vector(this->form_solu_vec_name(n));
     }  
 
+  _finished_set_frequencies = true;
+
   // set the current frequency
   this->set_current_frequency(0);
+}
+
+
+
+void FrequencySystem::set_frequencies (const std::vector<Real>& frequencies)
+{
+  // sanity checks
+  assert(!frequencies.empty());
+
+  if (_finished_set_frequencies)
+    {
+      std::cerr << "ERROR: frequencies already initialized. " << std::endl;
+      error();
+    }
+
+  // store number of frequencies as parameter
+  _equation_systems.set_parameter("n_frequencies") = frequencies.size();
+
+  // set frequencies, build solution storage
+  for (unsigned int n=0; n<frequencies.size(); n++)
+    {
+      // remember frequencies as parameters
+      _equation_systems.set_parameter(this->form_freq_param_name(n)) = frequencies[n];
+      
+      // build storage for solution vector
+      SystemBase::add_vector(this->form_solu_vec_name(n));
+    }  
 
   _finished_set_frequencies = true;
+
+  // set the current frequency
+  this->set_current_frequency(0);
 }
+
+
+
+
+unsigned int FrequencySystem::n_frequencies () const
+{
+  assert(_finished_set_frequencies);
+  return (static_cast<unsigned int>(_equation_systems.parameter("n_frequencies")));
+}
+
+
 
 
 
@@ -371,8 +386,9 @@ void FrequencySystem::attach_solve_function(void fptr(EquationSystems& es,
 
 void FrequencySystem::set_current_frequency(unsigned int n)
 {
-  assert(n < _frequencies.size());
-  _equation_systems.set_parameter("current frequency") = _frequencies[n];
+  assert(n < n_frequencies());
+  _equation_systems.set_parameter("current frequency") = 
+      _equation_systems.parameter(this->form_freq_param_name(n));
 }
 
 
@@ -381,7 +397,7 @@ std::string FrequencySystem::form_freq_param_name(const unsigned int n) const
 {
   assert (n < 9999);
   char buf[15];
-  sprintf(buf, "frequency_%04d", n);
+  sprintf(buf, "frequency %04d", n);
   return (buf);
 }
 
@@ -391,7 +407,7 @@ std::string FrequencySystem::form_solu_vec_name(const unsigned int n) const
 {
   assert (n < 9999);
   char buf[15];
-  sprintf(buf, "solution_%04d", n);
+  sprintf(buf, "solution %04d", n);
   return (buf);
 }
 
