@@ -1,4 +1,4 @@
-// $Id: cell_tet4.C,v 1.5 2003-01-24 17:24:43 jwpeterson Exp $
+// $Id: cell_tet4.C,v 1.6 2003-01-24 21:19:55 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -278,18 +278,5 @@ void Tet4::refine(Mesh& mesh)
   set_refinement_flag() = Elem::DO_NOTHING;
 };
 
-
-
-void Tet4::coarsen()
-{
-  assert (refinement_flag() == Elem::COARSEN);
-  assert (!active());
-  
-  delete [] _children;
-
-  _children = NULL;
-
-  set_refinement_flag() = Elem::DO_NOTHING;
-};
 
 #endif

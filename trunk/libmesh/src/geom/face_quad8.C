@@ -1,4 +1,4 @@
-// $Id: face_quad8.C,v 1.5 2003-01-24 17:24:43 jwpeterson Exp $
+// $Id: face_quad8.C,v 1.6 2003-01-24 21:19:56 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -365,18 +365,6 @@ void Quad8::refine(Mesh& mesh)
 };
 
 
-
-void Quad8::coarsen()
-{
-  assert (refinement_flag() == Elem::COARSEN);
-  assert (!active());
-  
-  delete [] _children;
-
-  _children = NULL;
-
-  set_refinement_flag() = Elem::DO_NOTHING;
-};
 
 #endif
 

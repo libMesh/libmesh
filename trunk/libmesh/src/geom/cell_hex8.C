@@ -1,4 +1,4 @@
-// $Id: cell_hex8.C,v 1.5 2003-01-24 17:24:43 jwpeterson Exp $
+// $Id: cell_hex8.C,v 1.6 2003-01-24 21:19:52 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -342,20 +342,6 @@ void Hex8::refine(Mesh& mesh)
 
 
   // Un-set my refinement flag now
-  set_refinement_flag() = Elem::DO_NOTHING;
-};
-
-
-
-void Hex8::coarsen()
-{
-  assert (refinement_flag() == Elem::COARSEN);
-  assert (!active());
-  
-  delete [] _children;
-
-  _children = NULL;
-
   set_refinement_flag() = Elem::DO_NOTHING;
 };
 
