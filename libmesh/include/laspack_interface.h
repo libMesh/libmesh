@@ -1,4 +1,4 @@
-// $Id: laspack_interface.h,v 1.6 2003-03-14 09:56:40 ddreyer Exp $
+// $Id: laspack_interface.h,v 1.7 2003-08-29 13:54:03 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -78,7 +78,7 @@ class LaspackInterface : public LinearSolverInterface<T>
    */
     
   std::pair<unsigned int, Real> 
-    solve (SparseMatrix<T> &matrix,
+    solve (SparseMatrix<T>  &matrix,
 	   NumericVector<T> &solution,
 	   NumericVector<T> &rhs,
 	   const double tol,
@@ -113,7 +113,7 @@ template <typename T>
 inline
 LaspackInterface<T>::~LaspackInterface ()
 {
-  clear ();
+  this->clear ();
 }
 
 

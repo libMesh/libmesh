@@ -1,4 +1,4 @@
-// $Id: laspack_interface.C,v 1.7 2003-03-23 01:39:14 ddreyer Exp $
+// $Id: laspack_interface.C,v 1.8 2003-08-29 13:54:03 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -81,7 +81,7 @@ void LaspackInterface<T>::clear ()
     {
       this->_is_initialized = false;
       
-      this->_solver_type = GMRES;
+      this->_solver_type         = GMRES;
       this->_preconditioner_type = ILU_PRECOND;
     }
 }
@@ -105,12 +105,12 @@ void LaspackInterface<T>::init ()
 template <typename T>
 std::pair<unsigned int, Real> 
 LaspackInterface<T>::solve (SparseMatrix<T> &matrix_in,
-			 NumericVector<T> &solution_in,
-			 NumericVector<T> &rhs_in,
-			 const double tol,
-			 const unsigned int m_its)
+			    NumericVector<T> &solution_in,
+			    NumericVector<T> &rhs_in,
+			    const double tol,
+			    const unsigned int m_its)
 {
-  init ();
+  this->init ();
 
   LaspackMatrix<T>& matrix   = dynamic_cast<LaspackMatrix<T>&>(matrix_in);
   LaspackVector<T>& solution = dynamic_cast<LaspackVector<T>&>(solution_in);
@@ -122,108 +122,147 @@ LaspackInterface<T>::solve (SparseMatrix<T> &matrix_in,
   rhs.close ();
 
   // Set the preconditioner type
-  this->set_preconditioner_type(JACOBI_PRECOND);
-  this->set_solver_type(CG);
-  set_laspack_preconditioner_type ();
+  this->set_laspack_preconditioner_type ();
 
 
   // Solve the linear system
   switch (this->_solver_type)
     {
+      // Conjugate-Gradient
     case CG:
-      CGIter (&matrix._QMat,
-		       &solution._vec,
-		       &rhs._vec,
-		       m_its,
-		       _precond_type,
-		       1.); break;
+      {
+	CGIter (&matrix._QMat,
+		&solution._vec,
+		&rhs._vec,
+		m_its,
+		_precond_type,
+		1.);
+	break;
+      }
 
+      // Conjugate-Gradient Normalized
     case CGN:
-      CGNIter (&matrix._QMat,
-			&solution._vec,
-			&rhs._vec,
-			m_its,
-			_precond_type,
-			1.); break;
-      
+      {
+	CGNIter (&matrix._QMat,
+		 &solution._vec,
+		 &rhs._vec,
+		 m_its,
+		 _precond_type,
+		 1.);
+	break;
+      }
+
+      // Conjugate-Gradient Squared
     case CGS:
-      CGSIter (&matrix._QMat,
-			&solution._vec,
-			&rhs._vec,
-			m_its,
-			_precond_type,
-			1.); break;
+      {
+	CGSIter (&matrix._QMat,
+		 &solution._vec,
+		 &rhs._vec,
+		 m_its,
+		 _precond_type,
+		 1.);
+	break;
+      }
 
+      // Bi-Conjugate Gradient
     case BICG:
-      BiCGIter (&matrix._QMat,
-			 &solution._vec,
-			 &rhs._vec,
-			 m_its,
-			 _precond_type,
-			 1.); break;
+      {
+	BiCGIter (&matrix._QMat,
+		  &solution._vec,
+		  &rhs._vec,
+		  m_its,
+		  _precond_type,
+		  1.);
+	break;
+      }
 
+      // Bi-Conjugate Gradient Stabilized
     case BICGSTAB:
-      BiCGSTABIter (&matrix._QMat,
-			     &solution._vec,
-			     &rhs._vec,
-			     m_its,
-			     _precond_type,
-			     1.); break;
+      {
+	BiCGSTABIter (&matrix._QMat,
+		      &solution._vec,
+		      &rhs._vec,
+		      m_its,
+		      _precond_type,
+		      1.);
+	break;
+      }
 
+      // Quasi-Minimum Residual
     case QMR:
-      QMRIter (&matrix._QMat,
-			&solution._vec,
-			&rhs._vec,
-			m_its,
-			_precond_type,
-			1.); break;
+      {
+	QMRIter (&matrix._QMat,
+		 &solution._vec,
+		 &rhs._vec,
+		 m_its,
+		 _precond_type,
+		 1.);
+	break;
+      }
 
+      // Symmetric over-relaxation
     case SSOR:
-      SSORIter (&matrix._QMat,
-			 &solution._vec,
-			 &rhs._vec,
-			 m_its,
-			 _precond_type,
-			 1.); break;
+      {
+	SSORIter (&matrix._QMat,
+		  &solution._vec,
+		  &rhs._vec,
+		  m_its,
+		  _precond_type,
+		  1.);
+	break;
+      }
 
+      // Jacobi Relaxation
     case JACOBI:
-      JacobiIter (&matrix._QMat,
-			   &solution._vec,
-			   &rhs._vec,
-			   m_its,
-			   _precond_type,
-			   1.); break;
+      {
+	JacobiIter (&matrix._QMat,
+		    &solution._vec,
+		    &rhs._vec,
+		    m_its,
+		    _precond_type,
+		    1.);
+	break;
+      }
 
-     case GMRES:
-       SetGMRESRestart (30);
-       GMRESIter (&matrix._QMat,
-			   &solution._vec,
-			   &rhs._vec,
-			   m_its,
-			   _precond_type,
-			   1.); break;
-      
+      // Generalized Minimum Residual
+    case GMRES:
+      {
+	SetGMRESRestart (30);
+	GMRESIter (&matrix._QMat,
+		   &solution._vec,
+		   &rhs._vec,
+		   m_its,
+		   _precond_type,
+		   1.);
+	break;
+      }
+
+      // Unknown solver, use GMRES
     default:
-      std::cerr << "ERROR:  Unsupported LASPACK Solver: "
-		<< this->_solver_type      << std::endl
-		<< "Continuing with GMRES" << std::endl;
-      
-      this->_solver_type = GMRES;
-      
-      return solve (matrix,
-		    solution,
-		    rhs,
-		    tol,
-		    m_its);
+      {
+	std::cerr << "ERROR:  Unsupported LASPACK Solver: "
+		  << this->_solver_type      << std::endl
+		  << "Continuing with GMRES" << std::endl;
+	
+	this->_solver_type = GMRES;
+	
+	return this->solve (matrix,
+			    solution,
+			    rhs,
+			    tol,
+			    m_its);
+      }
     }
 
+  // Check for an error
   if (LASResult() != LASOK)
     {
       std::cerr << "ERROR:  LASPACK Error: " << std::endl;
       WriteLASErrDescr(stdout);
       error();
     }
-        
+
+  // Get the convergence step # and residual 
   std::pair<unsigned int, Real> p (GetLastNoIter(),
 				   GetLastAccuracy());
   
@@ -255,7 +294,7 @@ void LaspackInterface<T>::set_laspack_preconditioner_type ()
 		<< this->_preconditioner_type << std::endl
 		<< "Continuing with ILU"      << std::endl;
       this->_preconditioner_type = ILU_PRECOND;
-      set_laspack_preconditioner_type();      
+      this->set_laspack_preconditioner_type();      
     }
 }
 
