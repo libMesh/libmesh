@@ -1,4 +1,4 @@
-// $Id: implicit_system.h,v 1.2 2004-03-01 14:40:19 benkirk Exp $
+// $Id: implicit_system.h,v 1.3 2004-03-05 21:07:00 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -147,7 +147,17 @@ public:
    */
   AutoPtr<LinearSolverInterface<Number> > linear_solver_interface;
   
+  /**
+   * Returns  the number of iterations 
+   * taken for the most recent linear solve.
+   */
+  unsigned int n_linear_iterations() const { return _n_linear_iterations; }
 
+  /**
+   * Returns the final residual for the linear system solve.
+   */
+  Real final_linear_residual() const { return _final_linear_residual; }
+  
 protected:
 
   
@@ -172,6 +182,16 @@ protected:
    */
   bool _can_add_matrices;
 
+  /**
+   * The number of linear iterations required to solve the linear
+   * system Ax=b.
+   */
+  unsigned int _n_linear_iterations;
+
+  /**
+   * The final residual for the linear system Ax=b.
+   */
+  Real _final_linear_residual;
   
 private:
 

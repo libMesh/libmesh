@@ -1,4 +1,4 @@
-// $Id: implicit_system.C,v 1.2 2004-03-01 14:40:24 benkirk Exp $
+// $Id: implicit_system.C,v 1.3 2004-03-05 21:07:00 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -44,7 +44,9 @@ ImplicitSystem::ImplicitSystem (EquationSystems& es,
   ExplicitSystem          (es, name, number),
   matrix                  (NULL),
   linear_solver_interface (LinearSolverInterface<Number>::build()),
-  _can_add_matrices       (true)
+  _can_add_matrices       (true),
+  _n_linear_iterations    (0),
+  _final_linear_residual         (1.e20)
 {
 }
 
@@ -192,6 +194,11 @@ void ImplicitSystem::solve ()
   const std::pair<unsigned int, Real> rval = 
     linear_solver_interface->solve (*matrix, *solution, *rhs, tol, maxits);
 
+  // Store the number of linear iterations required to
+  // solve and the final residual.
+  _n_linear_iterations   = rval.first;
+  _final_linear_residual = rval.second;
+    
   // Stop logging the linear solve
   STOP_LOG("solve()", "System");
 

@@ -1,4 +1,4 @@
-/* $Id: ex13.C,v 1.1 2004-02-09 18:32:46 jwpeterson Exp $ */
+/* $Id: ex13.C,v 1.2 2004-03-05 21:06:59 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -151,7 +151,13 @@ int main (int argc, char** argv)
     // Get a reference to the Stokes system to use later.
     TransientImplicitSystem&  stokes_system =
 	  equation_systems.get_system<TransientImplicitSystem>("Navier-Stokes");
-    
+
+    // The first thing to do is to get a copy of the solution at
+    // the current nonlinear iteration.  This value will be used to
+    // determine if we can exit the nonlinear loop.
+    AutoPtr<NumericVector<Number> >
+      last_nonlinear_soln (stokes_system.solution->clone());
+
     for (unsigned int t_step=0; t_step<n_timesteps; ++t_step)
       {
 	// Incremenet the time counter, set the time and the
@@ -169,25 +175,23 @@ int main (int argc, char** argv)
 	// Now we need to update the solution vector from the
 	// previous time step.  This is done directly through
 	// the reference to the Stokes system.
-	*stokes_system.old_local_solution = *stokes_system.current_local_solution;
+	*stokes_system.old_local_solution = *stokes_system.solution;
 
 	// Now we begin the nonlinear loop
 	for (unsigned int l=0; l<n_nonlinear_steps; ++l)
 	  {
-	    // The first thing to do is to get a copy of the solution at
-	    // the current nonlinear iteration.  This value will be used to
-	    // determine if we can exit the nonlinear loop.
-	    AutoPtr<NumericVector<Number> >
-	      last_nonlinear_soln (stokes_system.current_local_solution->clone());
+	    // Update the nonlinear solution.
+	    last_nonlinear_soln->zero();
+	    last_nonlinear_soln->add(*stokes_system.solution);
 	    
 	    // Assemble & solve the linear system.
 	    perf_log.start_event("linear solve");
 	    equation_systems("Navier-Stokes").solve();
 	    perf_log.stop_event("linear solve");
-	    
+
 	    // Compute the difference between this solution and the last
 	    // nonlinear iterate.
-	    last_nonlinear_soln->add (-1., *stokes_system.current_local_solution);
+	    last_nonlinear_soln->add (-1., *stokes_system.solution);
 
 	    // Close the vector before computing its norm
 	    last_nonlinear_soln->close();
@@ -195,8 +199,13 @@ int main (int argc, char** argv)
 	    // Compute the l2 norm of the difference
 	    const Real norm_delta = last_nonlinear_soln->l2_norm();
 
-	    // Print out convergence information
-	    std::cout << "Nonlinear convergence: ||u - u_old|| = "
+	    // Print out convergence information for the linear and
+	    // nonlinear iterations.
+	    std::cout << "Linear solver converged at step: "
+		      << stokes_system.n_linear_iterations()
+		      << ", final residual: "
+		      << stokes_system.final_linear_residual()
+		      << "  Nonlinear convergence: ||u - u_old|| = "
 		      << norm_delta
 		      << std::endl;
 
