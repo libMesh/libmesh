@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.38 2004-08-05 14:44:13 jwpeterson Exp $
+# $Id: Make.common.in,v 1.39 2005-01-03 22:10:07 benkirk Exp $
 
 
 ###############################################################################
@@ -310,6 +310,7 @@ ifeq ($(enable-optional),yes)
     # Depending on petsc version, we link with different libs :-(
     ifeq ($(petsc-major-minor),2.2.x)  # 2.2.x & newer style
       libs-PETSC = -L$(PETSC_LIB) \
+                   -lpetscsnes \
 	           -lpetscksp \
 		   -lpetscdm \
 		   -lpetscmat \
@@ -317,6 +318,7 @@ ifeq ($(enable-optional),yes)
 		   -lpetsc
     else                           # 2.1.6 & older style
       libs-PETSC = -L$(PETSC_LIB) \
+                   -lpetscsnes \
 	           -lpetscsles \
 		   -lpetscdm \
 		   -lpetscmat \

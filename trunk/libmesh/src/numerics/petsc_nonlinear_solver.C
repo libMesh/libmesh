@@ -1,4 +1,4 @@
-// $Id: petsc_nonlinear_solver.C,v 1.1 2005-01-03 20:14:41 benkirk Exp $
+// $Id: petsc_nonlinear_solver.C,v 1.2 2005-01-03 22:10:10 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -28,18 +28,42 @@
 
 // Local Includes
 #include "petsc_nonlinear_solver.h"
+#include "petsc_vector.h"
+#include "petsc_matrix.h"
 
 
 
 //--------------------------------------------------------------------
 // Functions with C linkage to pass to PETSc.  PETSc will call these
-// methods,
+// methods as needed.
+// 
+// Since they must have C linkage they have no knowledge of a namespace.
+// Give them an obscure name to avoid namespace pollution.
 extern "C"
 {
   //-------------------------------------------------------------------
   // this function is called by PETSc at the end of each nonlinear step  
   PetscErrorCode
-  __libmesh_petsc_snes_monitor (SNES, PetscInt its, PetscReal fnorm, void *ctx)
+  __libmesh_petsc_snes_monitor (SNES, PetscInt its, PetscReal fnorm, void *)
+  {
+    //int ierr=0;
+    
+    std::cout << "  NL conv: step " << its
+	      << std::scientific
+	      << ", |u|_oo = "      << 0
+	      << ", |resid|_2 = "   << fnorm
+              << std::endl;
+
+    //return ierr;
+    return 0;
+  }
+
+
+
+  //---------------------------------------------------------------
+  // this function is called by PETSc to evaluate the residual at X
+  PetscErrorCode
+  __libmesh_petsc_snes_residual (SNES, Vec x, Vec r, void *ctx)
   {
     int ierr=0;
     
@@ -48,24 +72,17 @@ extern "C"
     PetscNonlinearSolver<Number>* solver =
       static_cast<PetscNonlinearSolver<Number>*> (ctx);
     
-    std::cout << "  NL conv: step " << its
-	      << std::scientific
-	      << ", |u|_oo = "      << 0
-	      << ", |resid|_2 = "   << fnorm
-              << std::endl;
+    assert (solver->residual != NULL);
 
-    return ierr;
-  }
+    PetscVector<Number> X_global(x), R(r);
+    PetscVector<Number> X_local(X_global.size());
 
+    X_global.localize (X_local);
+    
+    solver->residual (X_local, R);
 
-
-  //---------------------------------------------------------------
-  // this function is called by PETSc to evaluate the residual at X
-  PetscErrorCode
-  __libmesh_petsc_snes_function (SNES,Vec,Vec,void*)
-  {
-    int ierr=0;
-
+    R.close();
+    
     return ierr;
   }
 
@@ -74,17 +91,37 @@ extern "C"
   //---------------------------------------------------------------
   // this function is called by PETSc to evaluate the Jacobian at X
   PetscErrorCode
-  __libmesh_petsc_snes_jacobian (SNES, Vec, Mat*, Mat*, MatStructure*, void*)
+  __libmesh_petsc_snes_jacobian (SNES, Vec x, Mat *jac, Mat *, MatStructure*, void *ctx)
   {
     int ierr=0;
+    
+    assert (ctx != NULL);
+    
+    PetscNonlinearSolver<Number>* solver =
+      static_cast<PetscNonlinearSolver<Number>*> (ctx);
+    
+    assert (solver->jacobian != NULL);
 
+    PetscMatrix<Number> Jac(*jac);
+    PetscVector<Number> X_global(x);
+    PetscVector<Number> X_local (X_global.size());
+
+    X_global.localize (X_local);
+    
+    solver->jacobian (X_local, Jac);
+
+    Jac.close();
+    
     return ierr;
   }
     
 } // end extern "C"
+//---------------------------------------------------------------------
 
 
-/*----------------------- functions ----------------------------------*/
+
+//---------------------------------------------------------------------
+// PetscNonlinearSolver<> methods
 template <typename T>
 void PetscNonlinearSolver<T>::clear ()
 {
@@ -132,11 +169,32 @@ void PetscNonlinearSolver<T>::init ()
 
 template <typename T>
 std::pair<unsigned int, Real> 
-PetscNonlinearSolver<T>::solve () 
+PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Matrix
+				NumericVector<T>& x_in,    // Solution vector
+				NumericVector<T>& r_in,    // Residual vector
+				const double,              // Stopping tolerance
+				const unsigned int) 
 {
   this->init ();
   
+  PetscMatrix<T>* jac = dynamic_cast<PetscMatrix<T>*>(&jac_in);
+  PetscVector<T>* x   = dynamic_cast<PetscVector<T>*>(&x_in);
+  PetscVector<T>* r   = dynamic_cast<PetscVector<T>*>(&r_in);
 
+  // We cast to pointers so we can be sure that they succeeded
+  // by comparing the result against NULL.
+  assert(jac != NULL);
+  assert(x   != NULL);
+  assert(r   != NULL);
+
+  int ierr=0;
+
+  ierr = SNESSetFunction (_snes, r->vec(), __libmesh_petsc_snes_residual, this);
+         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+
+  ierr = SNESSetJacobian (_snes, jac->mat(), jac->mat(), __libmesh_petsc_snes_jacobian, this);
+         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+	 
   // return the # of its. and the final residual norm.
   return std::make_pair(0, 0.);
 }

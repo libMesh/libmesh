@@ -3834,6 +3834,19 @@ src/numerics/mesh_function.$(obj-suffix):\
     include/utils/parameters.h\
     include/utils/perf_log.h\
     include/utils/point_locator_base.h
+src/numerics/nonlinear_solver.$(obj-suffix):\
+    src/numerics/nonlinear_solver.C\
+    include/base/auto_ptr.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/enums/enum_solver_package.h\
+    include/numerics/nonlinear_solver.h\
+    include/numerics/petsc_nonlinear_solver.h\
+    include/utils/perf_log.h
 src/numerics/numeric_vector.$(obj-suffix):\
     src/numerics/numeric_vector.C\
     include/base/auto_ptr.h\
@@ -3958,6 +3971,33 @@ src/numerics/petsc_matrix.$(obj-suffix):\
     include/numerics/dense_vector_base.h\
     include/numerics/numeric_vector.h\
     include/numerics/petsc_matrix.h\
+    include/numerics/petsc_vector.h\
+    include/numerics/sparse_matrix.h\
+    include/utils/perf_log.h
+src/numerics/petsc_nonlinear_solver.$(obj-suffix):\
+    src/numerics/petsc_nonlinear_solver.C\
+    include/base/auto_ptr.h\
+    include/base/dof_map.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
+    include/enums/enum_order.h\
+    include/enums/enum_solver_package.h\
+    include/fe/fe_type.h\
+    include/numerics/coupling_matrix.h\
+    include/numerics/dense_matrix.h\
+    include/numerics/dense_matrix_base.h\
+    include/numerics/dense_vector.h\
+    include/numerics/dense_vector_base.h\
+    include/numerics/nonlinear_solver.h\
+    include/numerics/numeric_vector.h\
+    include/numerics/petsc_matrix.h\
+    include/numerics/petsc_nonlinear_solver.h\
     include/numerics/petsc_vector.h\
     include/numerics/sparse_matrix.h\
     include/utils/perf_log.h
