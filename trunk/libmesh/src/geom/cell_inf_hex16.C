@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex16.C,v 1.25 2005-02-23 04:33:20 roystgnr Exp $
+// $Id: cell_inf_hex16.C,v 1.26 2005-02-23 04:40:36 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -49,7 +49,7 @@ bool InfHex16::is_edge(const unsigned int i) const
   return true;
 }
 
-bool InfHex16::is_face(const unsigned int) const
+bool InfHex16::is_face(const unsigned int i) const
 {
   if (i > 11)
     return true;
