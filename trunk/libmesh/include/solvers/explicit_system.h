@@ -1,4 +1,4 @@
-// $Id: explicit_system.h,v 1.1 2004-01-03 15:37:42 benkirk Exp $
+// $Id: explicit_system.h,v 1.2 2004-02-29 18:28:09 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -80,6 +80,13 @@ public:
    * the system type in an equation system file.
    */
   virtual std::string system_type () const { return "Explicit"; }
+
+  /**
+   * The system matrix.  Implicit systems are characterized by
+   * the need to solve the linear system Ax=b.  This is the
+   * right-hand-side vector b.
+   */
+  NumericVector<Number> * rhs;
   
 
 protected:
