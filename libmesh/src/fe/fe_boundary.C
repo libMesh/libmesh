@@ -1,4 +1,4 @@
-// $Id: fe_boundary.C,v 1.15 2003-05-15 23:34:35 benkirk Exp $
+// $Id: fe_boundary.C,v 1.16 2003-05-21 15:27:34 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -174,7 +174,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
   normals.resize(n_qp);
   for (unsigned int p=0; p<n_qp; p++)
     {
-      tangents[p].resize(2);
+      tangents[p].resize(DIM-1); // 1 Tangent in 2D, 2 in 3D
       
       if (Dim == 2)
 	{
@@ -189,7 +189,9 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
 	  
 	  normals[p]     = n.unit();
 	  tangents[p][0] = dxyzdxi_map.unit();
+#if DIM == 3  // Only good in 3D space
 	  tangents[p][1] = dxyzdxi_map.cross(n).unit();
+#endif
 	}
 	
       else if (Dim == 3)

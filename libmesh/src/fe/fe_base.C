@@ -1,4 +1,4 @@
-// $Id: fe_base.C,v 1.15 2003-05-15 23:34:35 benkirk Exp $
+// $Id: fe_base.C,v 1.16 2003-05-21 15:27:34 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -486,7 +486,8 @@ void FEBase::compute_shape_functions ()
 		dphidy[i][p] = (dphidxi[i][p]*dxidy_map[p] +
 				dphideta[i][p]*detady_map[p]);
 
-	      dphi[i][p](2) = dphidz[i][p] = 0.;
+	      // dphi[i][p](2) = Can't assign to this if DIM != 3
+		dphidz[i][p] = 0.;
 	    }
 
 	// All done
