@@ -1,4 +1,4 @@
-// $Id: sfc_partitioner.C,v 1.9 2004-01-03 15:37:44 benkirk Exp $
+// $Id: sfc_partitioner.C,v 1.10 2004-02-10 22:48:14 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -129,7 +129,6 @@ void SFCPartitioner::partition (MeshBase& mesh,
       }
   }
 
-
   // build the space-filling curve
   if (_sfc_type == "Hilbert")
     Sfc::hilbert (&x[0], &y[0], &z[0], &size, &table[0]);
@@ -153,12 +152,23 @@ void SFCPartitioner::partition (MeshBase& mesh,
   
   // Assign the partitioning to the active elements
   {
+//      {
+//        std::ofstream out ("sfc.dat");
+//        out << "variables=x,y,z" << std::endl;
+//        out << "zone f=point" << std::endl;
+    
+//        for (unsigned int i=0; i<n_active_elem; i++)
+//  	out << x[i] << " "
+//  	    << y[i] << " "
+//  	    << z[i] << std::endl;
+//      }      
+    
     const unsigned int blksize = n_active_elem/n; 
 
     for (unsigned int i=0; i<n_active_elem; i++)
       {
 	assert (static_cast<unsigned int>(table[i]-1) < reverse_map.size());
-		
+	  
 	Elem* elem = reverse_map[table[i]-1];
 
 	elem->set_processor_id() = i/blksize;
