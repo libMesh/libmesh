@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.20 2003-03-25 15:19:02 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.21 2003-03-26 05:07:31 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -216,7 +216,7 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
       CFLAGSG="$CFLAGSG -fPIC"
       CFLAGSP="$CFLAGSP -fPIC"
 
-      LDFLAGS="$LDFLAGS -fPIC"
+      dnl LDFLAGS="$LDFLAGS -fPIC"
     fi
 
     dnl set some flags that are specific to some versions of the
@@ -412,7 +412,7 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
   
           dnl If we use -model ansi to compile the files, we also have to
           dnl specify it for linking
-          LDFLAGS="$LDFLAGS -model ansi"
+          dnl LDFLAGS="$LDFLAGS -model ansi"
   
           dnl For some reason, cxx also forgets to add the math lib to the
           dnl linker line, so we do that ourselves
