@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.24 2004-03-08 01:12:51 benkirk Exp $
+// $Id: fe_interface.C,v 1.25 2005-01-07 16:02:59 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -1192,6 +1192,7 @@ void FEInterface::compute_data(const unsigned int dim,
 
   if ( is_InfFE_elem(elem->type()) )
     {
+      data.init();
       ifem_compute_data(dim, fe_t, elem, data);
       return;
     }

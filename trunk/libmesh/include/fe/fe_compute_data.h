@@ -1,4 +1,4 @@
-// $Id: fe_compute_data.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: fe_compute_data.h,v 1.3 2005-01-07 16:03:27 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -28,10 +28,10 @@
 // Local includes
 #include "libmesh.h"
 #include "point.h"
-
+#include "equation_systems.h"
 
 // Forward declarations
-class EquationSystems;
+// class EquationSystems;
 
 
 /**
@@ -92,8 +92,25 @@ public:
    * Storage for the computed phase lag
    */
   Real phase;
+
 #endif
 
+#ifdef ENABLE_INFINITE_ELEMENTS
+  /**
+   * The wave speed.
+   */
+  Real speed;
+
+#endif
+
+#if defined ENABLE_INFINITE_ELEMENTS && defined(USE_COMPLEX_NUMBERS)
+  /**
+   * The frequency to evaluate shape functions
+   * including the wave number depending terms
+   */
+  Real frequency;
+
+#endif
 
   /**
    * Clears the @e output data completely.
@@ -103,7 +120,16 @@ public:
       this->shape.clear();
 #if defined(ENABLE_INFINITE_ELEMENTS) && !defined(USE_COMPLEX_NUMBERS)
       this->phase = 0.;
+      this->speed = 0.;
 #endif
+
+#if defined (ENABLE_INFINITE_ELEMENTS) && defined(USE_COMPLEX_NUMBERS)
+      this->speed = 0.;
+      this->frequency = 0.;
+
+#endif
+
+
       return; 
     }
 
@@ -118,7 +144,15 @@ public:
         std::fill (this->shape.begin(),   this->shape.end(),   0.);
 #if defined(ENABLE_INFINITE_ELEMENTS) && !defined(USE_COMPLEX_NUMBERS)
       this->phase = 0.;
+      this->speed = this->equation_systems.parameters.get<Real>("speed");
 #endif
+
+#if defined (ENABLE_INFINITE_ELEMENTS) && defined(USE_COMPLEX_NUMBERS)
+      this->speed = this->equation_systems.parameters.get<Real>("speed");
+      this->frequency = this->equation_systems.parameters.get<Real>("current frequency");
+
+#endif
+
       return; 
     }
 
