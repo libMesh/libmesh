@@ -1,4 +1,4 @@
-// $Id: point.h,v 1.14 2003-05-15 23:34:34 benkirk Exp $
+// $Id: point.h,v 1.15 2003-05-21 13:50:19 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -286,6 +286,21 @@ Real Point::operator () (const unsigned int i) const
 inline
 Real & Point::operator () (const unsigned int i)
 {
+#if DIM < 3
+
+  if (i >= DIM)
+    {
+      std::cerr << "ERROR:  You are assigning to a point component"
+		<< std::endl
+		<< "that is out of range for the compiled DIM!"
+		<< std::endl
+		<< " DIM=" << DIM << " , i=" << i
+		<< std::endl;
+      error();
+    }
+  
+#endif
+  
   assert (i<DIM);
   
   return _coords[i];

@@ -1,4 +1,4 @@
-// $Id: numeric_vector.C,v 1.9 2003-05-04 23:59:00 benkirk Exp $
+// $Id: numeric_vector.C,v 1.10 2003-05-21 13:50:23 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -73,6 +73,10 @@ NumericVector<T>::build(const SolverPackage solver_package)
 
 
 // Full specialization for float datatypes (DistributedVector wants this)
+// Only do this when not using SINGLE_PRECISION, otherwise a Real and a float
+// are equivaluent and this will look like a redefinition
+#ifndef SINGLE_PRECISION
+
 template <>
 int NumericVector<float>::compare (const NumericVector<float> &other_vector,
 				   const Real threshold) const
@@ -97,6 +101,7 @@ int NumericVector<float>::compare (const NumericVector<float> &other_vector,
   return rvalue;
 }
 
+#endif
 
 
 // Full specialization for Real datatypes

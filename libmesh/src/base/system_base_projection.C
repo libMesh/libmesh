@@ -1,4 +1,4 @@
-// $Id: system_base_projection.C,v 1.2 2003-05-15 23:34:35 benkirk Exp $
+// $Id: system_base_projection.C,v 1.3 2003-05-21 13:50:23 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -234,6 +234,12 @@ void SystemBase::project_vector (const NumericVector<Number>& old_vector,
     } // end variables loop
   
   STOP_LOG ("project_vector()", "SystemBase");
+
+
+#else
+
+  // AMR is disabled...  Simply copy the vector
+  new_vector = old_vector;
   
 #endif // #ifdef ENABLE_AMR
 }

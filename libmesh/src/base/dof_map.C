@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.40 2003-05-16 19:29:12 benkirk Exp $
+// $Id: dof_map.C,v 1.41 2003-05-21 13:50:23 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -80,6 +80,8 @@ void DofMap::reinit(const MeshBase& mesh)
   const unsigned int dim   = mesh.mesh_dimension();
 
 
+#ifdef ENABLE_AMR
+  
   //------------------------------------------------------------
   // Clear the old_dof_objects for all the nodes
   // and elements so that we can overwrite them
@@ -130,6 +132,8 @@ void DofMap::reinit(const MeshBase& mesh)
 	elem->set_old_dof_object();
       }
   }
+
+#endif // #ifdef ENABLE_AMR
 
   
   //------------------------------------------------------------
@@ -639,6 +643,8 @@ void DofMap::dof_indices (const Elem* elem,
  
 
 
+#ifdef ENABLE_AMR
+
 void DofMap::old_dof_indices (const Elem* elem,
 			      std::vector<unsigned int>& di,
 			      const unsigned int vn) const
@@ -701,14 +707,6 @@ void DofMap::old_dof_indices (const Elem* elem,
   STOP_LOG("old_dof_indices()", "DofMap");  
 }
 
-
-
-
-
-
-
-
-#ifdef ENABLE_AMR
 
 
 void DofMap::create_dof_constraints(const MeshBase& mesh)
