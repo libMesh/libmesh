@@ -1,4 +1,4 @@
-// $Id: gmv_io.h,v 1.3 2004-06-15 20:17:20 benkirk Exp $
+// $Id: gmv_io.h,v 1.4 2004-08-05 20:20:09 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -21,6 +21,9 @@
 
 #ifndef __gmv_io_h__
 #define __gmv_io_h__
+
+// C++ includes
+#include <string.h>  // for memcpy
 
 // Local includes
 #include "libmesh_common.h"
@@ -66,8 +69,14 @@ class GMVIO : public MeshIO<MeshBase>
 				 const std::vector<std::string>&);
 
   /**
-   * Flag indicating whether or not to write a binary file
-   * (if the tecio.a library was found by \p configure).
+   * Flag indicating whether or not to write a binary file.  While binary
+   * files may end up being smaller than equivalent ASCII files, they will
+   * almost certainly take longer to write.  The reason for this is that
+   * the ostream::write() function which is used to write "binary" data to
+   * streams, only takes a pointer to char as its first argument.  This means
+   * if you want to write anything other than a buffer of chars, you first
+   * have to use a strange memcpy hack to get the data into the desired format.
+   * See the templated to_binary_stream() function below.
    */
   bool & binary ();
    
@@ -114,14 +123,20 @@ private:
   /**
    * This method implements writing a mesh with nodal data to a
    * specified file where the nodal data and variable names are optionally
-   * provided.  This will write a binary file if the tecio.a library was
-   * found at compile time, otherwise a warning message will be printed and
-   * an ASCII file will be created.
+   * provided.  
    */
   virtual void write_binary (const std::string&,
 			     const std::vector<Number>* = NULL,
 			     const std::vector<std::string>* = NULL);
 
+  /**
+   * Helper function for writing unsigned ints to an ostream in binary format.
+   * Implemented via memcpy as suggested in the standard.
+   */
+  template <typename T>
+  void to_binary_stream(std::ostream& out,
+			const T i);
+  
   /**
    * Flag to write binary data.
    */
@@ -175,6 +190,15 @@ bool & GMVIO::partitioning ()
   return _partitioning;
 }
 
+
+template <typename T>
+void GMVIO::to_binary_stream(std::ostream& out,
+			     const T i)
+{
+  static char buf[sizeof(T)];
+  memcpy(buf, &i, sizeof(T));
+  out.write(buf, sizeof(T));
+}
 
 
 #endif // #define __gmv_io_h__
