@@ -78,6 +78,22 @@ work you must have configured the library with the --enable-ifem option</i>
 
 
 
+<h2><a href="ex7.php">Example 7</a> -- Introduction to Complex Numbers and the "FrequencySystem"</h2>
+This is the seventh example program.  It builds on
+the previous example programs, introduces complex
+numbers and the FrequencySystem class to solve a 
+simple Helmholtz equation grad(p)*grad(p)+(omega/c)^2*p=0,
+for multiple frequencies rather efficiently.
+The FrequencySystem class offers two solution styles,
+namely to solve large systems, or to solve
+moderately-sized systems fast, for multiple frequencies.
+The latter approach is implemented here.
+For this example the library has to be compiled with
+complex numbers enabled. 
+
+
+
+
 <h2><a href="ex8.php">Example 8</a> -- The Newmark System and the Wave Equation</h2>
 This example solves the wave equation in a hybrid-mesh pipe.  The mesh consists of
 <code>HEX8</code> and <code>PRISM6</code> element types.  The pressure at a point
