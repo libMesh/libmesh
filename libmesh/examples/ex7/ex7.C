@@ -1,4 +1,4 @@
-// $Id: ex7.C,v 1.11 2003-02-20 04:59:58 benkirk Exp $
+// $Id: ex7.C,v 1.12 2003-02-24 14:35:50 benkirk Exp $
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
   
@@ -491,18 +491,17 @@ void assemble_helmholtz(EquationSystems& es,
 	      AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
 	      
 	      /**
-	       * Boundary integration requires TWO quadraure rules:
-	       * one the dimensionality of the element and another
-	       * one less than the dimensionality of the element.
+	       * Boundary integration requires one quadraure rule,
+	       * with dimensionality one less than the dimensionality
+	       * of the element.
 	       */
-	      QGauss qface0(dim,   SECOND);
-	      QGauss qface1(dim-1, SECOND);
+	      QGauss qface(dim-1, SECOND);
 	      
 	      /**
 	       * Tell the finte element object to use our
 	       * quadrature rule.
 	       */
-	      fe_face->attach_quadrature_rule (&qface0);
+	      fe_face->attach_quadrature_rule (&qface);
 	      
 	      /**
 	       * The value of the shape functions at the quadrature
@@ -520,7 +519,7 @@ void assemble_helmholtz(EquationSystems& es,
 	       * Compute the shape function values on the element
 	       * face.
 	       */
-	      fe_face->reinit(&qface1, elem, side);
+	      fe_face->reinit(elem, side);
 
 	      /**
 	       * Here we consider a normal velocity vn=1 applied to
@@ -537,7 +536,7 @@ void assemble_helmholtz(EquationSystems& es,
 	      /**
 	       * Loop over the face quagrature points for integration.
 	       */
-	      for (unsigned int qp=0; qp<qface0.n_points(); qp++)
+	      for (unsigned int qp=0; qp<qface.n_points(); qp++)
 		{
 
 		  /**

@@ -1,4 +1,4 @@
-// $Id: elem_iterators.h,v 1.5 2003-02-21 22:40:59 jwpeterson Exp $
+// $Id: elem_iterators.h,v 1.6 2003-02-24 14:35:50 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,6 +24,7 @@
 
 // Local includes
 #include "predicated_iterator.h"
+#include "libmesh_base.h"
 #include "elem.h"
 
 
@@ -51,10 +52,11 @@ public:
   }
 
 protected:
+  
   /**
    * Redefinition of the predicate
    */
-  virtual bool predicate() const { return *_current != NULL; }
+  virtual bool predicate() const { return (*_current != NULL); }
 };
 
 
@@ -112,11 +114,9 @@ typedef basic_elem_iterator<const Elem**> const_neighbor_iterator;
  * to instantiate non-const and const versions of the iterator,
  * respectively.  Note the "false" argument to the basic_elem_iterator
  * constructor.  This basically tells that constructor to NOT advance();
- * This class uses virtual inheritance because it will eventually
- * be used in a "diamond" inheritance hierarchy.
  */
 template <class T>
-class basic_active_elem_iterator : virtual public basic_elem_iterator<T>
+class basic_active_elem_iterator : public basic_elem_iterator<T>
 {
 public:
 
@@ -132,10 +132,13 @@ public:
 
   
 protected:
+ 
   /**
-   * Re-Definition of the predicate.
+   * Re-Definition of the predicate.  Test the base class predicate
+   * first, this will avoid calling the \p active member on \p NULL
+   * elements.
    */
-  virtual bool predicate() const { return (*_current)->active(); }
+  virtual bool predicate() const { return (basic_elem_iterator<T>::predicate() && (*_current)->active()); }
 };
 
 
@@ -176,7 +179,7 @@ typedef basic_active_elem_iterator<std::vector<Elem*>::const_iterator> const_act
  * respectively.  Note the "false" argument to the basic_active_elem_iterator
  * constructor.  This basically tells that constructor to NOT advance();
  * Note that this class needs to explicilty instantiate the basic_elem_iterator
- * in its initialization list since its parent is a virtual public basic_elem_iterator.
+ * in its initialization list since its parent is a public basic_elem_iterator.
  */
 template <class T>
 class basic_not_active_elem_iterator : public basic_active_elem_iterator<T>
@@ -188,18 +191,18 @@ public:
    * does not call the advance() function.
    */
   basic_not_active_elem_iterator(const std::pair<T,T>& p)
-    : basic_elem_iterator<T>(p, false),
-      basic_active_elem_iterator<T>(p, false)
+    : basic_active_elem_iterator<T>(p, false)
   {
     advance();
   }
   
 protected:
+  
   /**
    * Re-definition of the predicate.  Returns the negation of the
    * basic_active_elem_iterator predicate.
    */
-  virtual bool predicate() const { return !(basic_active_elem_iterator<T>::predicate()); }
+  virtual bool predicate() const { return !basic_active_elem_iterator<T>::predicate(); }
 };
 
 
@@ -238,7 +241,7 @@ typedef basic_not_active_elem_iterator<std::vector<Elem*>::const_iterator> const
  * This class uses virtual inheritance 
  */
 template <class T>
-class basic_type_elem_iterator : virtual public basic_elem_iterator<T>
+class basic_type_elem_iterator : public basic_elem_iterator<T>
 {
 public:
   /**
@@ -254,10 +257,14 @@ public:
   }
   
 protected:
+  
   /**
-   * Definition of the predicate.
+   * Definition of the predicate.  Test the base class predicate
+   * first, this will avoid calling the \p type member on \p NULL
+   * elements.
    */
-  virtual bool predicate() const { return (*_current)->type() == _type; }
+  virtual bool predicate() const { return (basic_elem_iterator<T>::predicate() &&
+					   ((*_current)->type() == _type)); }
 
   const ElemType _type;
 };
@@ -295,9 +302,6 @@ typedef basic_type_elem_iterator<std::vector<Elem*>::const_iterator> const_type_
  * adds the additional internal state which describes the type
  * of element.  Note the "false" argument to the basic_elem_iterator
  * constructor.  This basically tells that constructor to NOT advance();
- * Note that this class needs to explicitly instantiate the basic_elem_iterator
- * in its initialization list since its parent is a virtual public
- * basic_elem_iterator.
  */
 template <class T>
 class basic_not_type_elem_iterator : public basic_type_elem_iterator<T>
@@ -309,13 +313,13 @@ public:
   basic_not_type_elem_iterator(const std::pair<T,T>& p,
 			       const ElemType t,
 			       const bool b=true)
-    : basic_elem_iterator<T>(p, false),
-      basic_type_elem_iterator<T>(p, t, false)
+    : basic_type_elem_iterator<T>(p, t, false)
   {
     if (b) advance();
   }
   
 protected:
+
   /**
    * Definition of the predicate.
    */
@@ -348,15 +352,9 @@ typedef basic_not_type_elem_iterator<std::vector<Elem*>::const_iterator> const_n
  * iterator which can be used to iterate only over active elements
  * of a specific type.  The typedefs active_type_elem_iterator
  * and const_active_type_elem_iterator should be used to instantiate
- * actual iterators.  This class uses multiple inheritance (in a diamond
- * pattern no less) so that it can mimic the behavior of both the
- * active_elem_iterator and type_elem_iterator classes without
- * reimplementing those functions.  Because its base classes use virtual
- * inheritance, we must explicitly call the constructor for their
- * common parent, the basic_elem_iterator, here.
- */
+ * actual iterators. */
 template <class T>
-class basic_active_type_elem_iterator : public basic_type_elem_iterator<T>, public basic_active_elem_iterator<T>
+class basic_active_type_elem_iterator : public basic_type_elem_iterator<T>
 {
 public:
   /**
@@ -364,20 +362,19 @@ public:
    */
   basic_active_type_elem_iterator(const std::pair<T,T>& p,
 				  const ElemType t)
-    : basic_elem_iterator<T>(p,false),
-      basic_type_elem_iterator<T>(p, t, false),
-      basic_active_elem_iterator<T>(p, false) 
+    : basic_type_elem_iterator<T>(p, t, false)
   {
     advance();
   }
   
 protected:
+
   /**
    * Definition of the predicate
    */
   virtual bool predicate() const
   {
-    return (basic_active_elem_iterator<T>::predicate() && basic_type_elem_iterator<T>::predicate());
+    return (basic_type_elem_iterator<T>::predicate() && (*_current)->active() );
   }
 };
 
@@ -437,10 +434,13 @@ public:
   }
 
 protected:
+  
   /**
-   * Definition of the predicate
+   * Definition of the predicate.  Test the base class predicate
+   * first, this will avoid calling the \p active member on \p NULL
+   * elements.
    */
-  virtual bool predicate() const { return (*_current)->level() == _level; }
+  virtual bool predicate() const { return (basic_elem_iterator<T>::predicate() && (*_current)->level() == _level); }
   
   const unsigned int _level;
 };
@@ -493,6 +493,7 @@ public:
   }
   
 protected:
+
   /**
    * Redefinition of the predicate.  Simply negate the
    * predicate in the parent class.
@@ -540,7 +541,7 @@ typedef basic_not_level_elem_iterator<std::vector<Elem*>::const_iterator> const_
  * under the wrong predicate!
  */
 template <class T>
-class basic_pid_elem_iterator : virtual public basic_elem_iterator<T>
+class basic_pid_elem_iterator : public basic_elem_iterator<T>
 {
 public:
   basic_pid_elem_iterator(const std::pair<T,T>& p,
@@ -553,10 +554,13 @@ public:
   }
 
 protected:
+  
   /**
-   * Definition of the predicate
+   * Definition of the predicate.  Test the base class predicate
+   * first, this will avoid calling the \p active member on \p NULL
+   * elements.
    */
-  virtual bool predicate() const { return (*_current)->processor_id() == _pid; }
+  virtual bool predicate() const { return (basic_elem_iterator<T>::predicate() && (*_current)->processor_id() == _pid); }
 
   const unsigned int _pid;
 };
@@ -594,7 +598,7 @@ typedef basic_pid_elem_iterator<std::vector<Elem*>::const_iterator> const_pid_el
  * will want to set this to false so that advance() is not called
  * under the wrong predicate!  Note that we need to explicitly
  * instantiate the base class since the basic_pid_iterator is
- * a virtual public basic_elem_iterator.
+ * a public basic_elem_iterator.
  */
 template <class T>
 class basic_not_pid_elem_iterator : public basic_pid_elem_iterator<T>
@@ -602,13 +606,13 @@ class basic_not_pid_elem_iterator : public basic_pid_elem_iterator<T>
 public:
   basic_not_pid_elem_iterator(const std::pair<T,T>& p,
 			      const unsigned int pid)
-    : basic_elem_iterator<T>(p, false),
-      basic_pid_elem_iterator<T>(p, pid, false)
+    : basic_pid_elem_iterator<T>(p, pid, false)
   {
     advance();
   }
 
 protected:
+
   /**
    * Definition of the predicate - negates the predicate of the parent class.
    */
@@ -640,36 +644,31 @@ typedef basic_not_pid_elem_iterator<std::vector<Elem*>::const_iterator> const_no
  * iterator which can be used to iterate only over active elements
  * on a specific processor.  The typedefs active_pid_elem_iterator
  * and const_active_pid_elem_iterator should be used to instantiate
- * actual iterators.  This class uses multiple inheritance (in a diamond
- * pattern no less) so that it can mimic the behavior of both the
- * active_elem_iterator and pid_elem_iterator classes without
- * reimplementing those functions.  Because its base classes use virtual
- * inheritance, we must explicitly call the constructor for their
- * common parent, the basic_elem_iterator, here.
+ * actual iterators.
  */
 template <class T>
-class basic_active_pid_elem_iterator : public basic_pid_elem_iterator<T>, public basic_active_elem_iterator<T>
+class basic_active_pid_elem_iterator : public basic_pid_elem_iterator<T>
 {
 public:
   /**
    * Constructor.
    */
   basic_active_pid_elem_iterator(const std::pair<T,T>& p,
-				  const unsigned int pid)
-    : basic_elem_iterator<T>(p,false),
-      basic_pid_elem_iterator<T>(p, pid, false),
-      basic_active_elem_iterator<T>(p, false)
+				 const unsigned int pid,
+				 const bool b=true)
+    : basic_pid_elem_iterator<T>(p, pid, false)
   {
-    advance();
+    if (b) advance();
   }
 
 protected:
+  
   /**
    * Definition of the predicate
    */
   virtual bool predicate() const
   {
-    return (basic_active_elem_iterator<T>::predicate() && basic_pid_elem_iterator<T>::predicate());
+    return (basic_pid_elem_iterator<T>::predicate() && (*_current)->active());
   }
 };
 
@@ -690,6 +689,57 @@ typedef basic_active_pid_elem_iterator<std::vector<Elem*>::iterator> active_pid_
  * that have a specific processor id in const functions.
  */
 typedef basic_active_pid_elem_iterator<std::vector<Elem*>::const_iterator> const_active_pid_elem_iterator;
+
+
+
+/**
+ * The basic_active_local_elem_iterator is a templated unspecialized
+ * iterator which can be used to iterate only over active elements
+ * on the local processor.  The typedefs active_local_elem_iterator
+ * and const_active_local_elem_iterator should be used to instantiate
+ * actual iterators.
+ */
+template <class T>
+class basic_active_local_elem_iterator : public basic_active_pid_elem_iterator<T>
+{
+public:
+  /**
+   * Constructor.
+   */
+  basic_active_local_elem_iterator(const std::pair<T,T>& p)
+    : basic_active_pid_elem_iterator<T>(p, libMeshBase::processor_id(), false)
+  {
+    advance();
+  }
+
+protected:
+  
+  /**
+   * Definition of the predicate
+   */
+  virtual bool predicate() const
+  {
+    return basic_active_pid_elem_iterator<T>::predicate();
+  }
+};
+
+
+/**
+ * Specialization of the basic_active_local_elem_iterator for
+ * \p std::vector<Elem*>::iterator.  This is what users
+ * create when they want to iterate over all active elements
+ * on the local processor in non-const functions.
+ */
+typedef basic_active_local_elem_iterator<std::vector<Elem*>::iterator> active_local_elem_iterator;
+
+
+/**
+ * Specialization of the basic_active_local_elem_iterator for
+ * \p std::vector<Elem*>::const_iterator.  This is what users
+ * create when they want to iterate over all active elements
+ * on the local processor in const functions.
+ */
+typedef basic_active_local_elem_iterator<std::vector<Elem*>::const_iterator> const_active_local_elem_iterator;
 
 #endif
 

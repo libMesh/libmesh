@@ -1,4 +1,4 @@
-// $Id: point.h,v 1.10 2003-02-21 18:31:30 benkirk Exp $
+// $Id: point.h,v 1.11 2003-02-24 14:35:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -536,6 +536,20 @@ Real Point::size_sq() const
     val += _coords[i]*_coords[i];
 
   return val;  
+}
+
+
+
+
+inline
+bool Point::operator == (const Point& rhs) const
+{
+  Point res((*this) - rhs);
+
+  if (res.size_sq() < TOLERANCE*TOLERANCE)
+    return true;
+  
+  return false;
 }
 
 

@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.19 2003-02-21 18:31:29 benkirk Exp $
+// $Id: mesh_base.h,v 1.20 2003-02-24 14:35:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -59,7 +59,7 @@ template <typename T> class PetscMatrix;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.19 $
+ * \version $Revision: 1.20 $
  */
 
 
@@ -73,7 +73,7 @@ public:
    * Constructor.
    */
   MeshBase (unsigned int d,
-	    unsigned int proc_id=0);
+	    unsigned int proc_id=libMeshBase::processor_id());
 
   /**
    * Copy-constructor.
@@ -267,14 +267,14 @@ public:
    * uses Bill Barth's space-filling curve library to do the partitioning,
    * and the default is a \p hilbert curve, but \p morton is also supported.
    */
-  virtual void sfc_partition(const unsigned int n_sbdmns=1,
+  virtual void sfc_partition(const unsigned int n_sbdmns=libMeshBase::n_processors(),
 			     const std::string& type="hilbert");
 
   /**
    * Partition the mesh using the Metis library. Only works if \p ./configure
    * detected the library.
    */
-  virtual void metis_partition(const unsigned int n_sbdmns=1,
+  virtual void metis_partition(const unsigned int n_sbdmns=libMeshBase::n_processors(),
 			       const std::string& type="kway");
 
 
@@ -497,7 +497,7 @@ public:
    */
   void write_gmv(const std::string& name,
 		 EquationSystems& es,
-		 const bool write_partitioning=false);
+		 const bool write_partitioning=true);
 
   /**
    * Write the mesh in the GMV ASCII format to a file specified by \p name.
@@ -509,7 +509,7 @@ public:
   void write_gmv(const std::string& name,
 		 const std::vector<Number>* v=NULL,
 		 const std::vector<std::string>* solution_names=NULL,
-		 const bool write_partitioning=false);
+		 const bool write_partitioning=true);
   
   /**
    * Write the mesh in the GMV binary format to  a file specified by \p name.
@@ -520,7 +520,7 @@ public:
    */
   void write_gmv_binary(const std::string& name,
 			EquationSystems& es,
-			const bool write_partitioning=false);
+			const bool write_partitioning=true);
 
   /**
    * Write the mesh in the GMV binary format to  a file specified by \p name.
@@ -532,7 +532,7 @@ public:
   void write_gmv_binary(const std::string& name,
 			const std::vector<Number>* v=NULL,
 			const std::vector<std::string>* solution_names=NULL,
-			const bool write_partitioning=false);
+			const bool write_partitioning=true);
 
 
   /**

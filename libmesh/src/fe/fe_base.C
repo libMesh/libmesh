@@ -1,4 +1,4 @@
-// $Id: fe_base.C,v 1.7 2003-02-22 16:01:11 benkirk Exp $
+// $Id: fe_base.C,v 1.8 2003-02-24 14:35:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -21,6 +21,7 @@
 
 // Local includes
 #include "fe.h"
+#include "libmesh.h"
 #include "quadrature.h"
 #include "inf_fe.h"
 
@@ -441,6 +442,11 @@ void FEBase::compute_shape_functions ()
   // at the Quadrature points.  Note that the actual values
   // have already been computed via init_shape_functions
 
+  /**
+   * Start logging the shape function computation
+   */
+  libMesh::log.start_event("compute_shape_functions()");
+
   // Compute the value of the derivative shape function i at quadrature point p
   switch (dim)
     {
@@ -459,7 +465,7 @@ void FEBase::compute_shape_functions ()
 	    }
 
 	// All done
-	return;
+	break;
       }
 
     case 2:
@@ -481,7 +487,7 @@ void FEBase::compute_shape_functions ()
 	    }
 
 	// All done
-	return;
+	break;
       }
     
     case 3:
@@ -509,7 +515,7 @@ void FEBase::compute_shape_functions ()
 	    }
 
 	// All done
-	return;
+	break;
       }
 
     default:
@@ -517,6 +523,11 @@ void FEBase::compute_shape_functions ()
 	error();
       }
     }
+  
+  /**
+   * Stop logging the shape function computation
+   */
+  libMesh::log.stop_event("compute_shape_functions()");
 }
 
 

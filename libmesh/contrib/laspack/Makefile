@@ -24,7 +24,7 @@ all:: $(target)
 ../lib/$(hosttype)_$(METHOD)/liblaspack.so: $(OBJS)
 	@echo "Linking "$@
 	@$(shell mkdir -p ../lib/$(hosttype)_$(METHOD))
-	@$(CC) $(CSHAREDFLAG) -o $@ $(OBJS)
+	@$(CC) $(CSHAREDFLAG) -o $@ $(OBJS) $(LDFLAGS)
 
 
 .PHONY: clean clobber distclean

@@ -1,4 +1,4 @@
-// $Id: mesh.h,v 1.9 2003-02-20 04:59:58 benkirk Exp $
+// $Id: mesh.h,v 1.10 2003-02-24 14:35:50 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -51,7 +51,7 @@ class Mesh : public MeshBase
    * be provided for multiprocessor applications.
    */
   Mesh(unsigned int d,
-       unsigned int proc_id=0);
+       unsigned int proc_id=libMeshBase::processor_id());
 
   /**
    * Destructor.

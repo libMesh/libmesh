@@ -1,4 +1,4 @@
-// $Id: ex4.C,v 1.12 2003-02-20 04:59:58 benkirk Exp $
+// $Id: ex4.C,v 1.13 2003-02-24 14:35:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -141,7 +141,7 @@ int main (int argc, char** argv)
 	  std::cout << " " << argv[i];
 	
 	std::cout << std::endl << std::endl;
-      };
+      }
     
 
     /**
@@ -212,7 +212,7 @@ int main (int argc, char** argv)
        * Prints information about the system to the screen.
        */
       equation_systems.print_info();
-    };
+    }
 
 
     /**
@@ -227,14 +227,14 @@ int main (int argc, char** argv)
      */
     mesh.write_gmv ((dim == 3) ? "out_3.gmv" : "out_2.gmv",
 		    equation_systems);
-  };
+  }
 
 
   /**
    * All done.  
    */
   return libMesh::close ();
-};
+}
 
 
 
@@ -486,7 +486,7 @@ void assemble_poisson(EquationSystems& es,
 	    const Real fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
 	    
 	    Fe[i] += JxW[qp]*fxy*phi[i][qp];
-	  }; // end of the RHS summation loop
+	  } // end of the RHS summation loop
 	  
       /**
        * Stop logging the right-hand-side computation
@@ -525,18 +525,17 @@ void assemble_poisson(EquationSystems& es,
 	      AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
 	      
 	      /**
-	       * Boundary integration requires TWO quadraure rules:
-	       * one the dimensionality of the element and another
-	       * one less than the dimensionality of the element.
+	       * Boundary integration requires one quadraure rule,
+	       * with dimensionality one less than the dimensionality
+	       * of the element.
 	       */
-	      QGauss qface0(dim,   FIFTH);
-	      QGauss qface1(dim-1, FIFTH);
+	      QGauss qface(dim-1, FIFTH);
 	      
 	      /**
 	       * Tell the finte element object to use our
 	       * quadrature rule.
 	       */
-	      fe_face->attach_quadrature_rule (&qface0);
+	      fe_face->attach_quadrature_rule (&qface);
 	      
 	      /**
 	       * The value of the shape functions at the quadrature
@@ -561,12 +560,12 @@ void assemble_poisson(EquationSystems& es,
 	       * Compute the shape function values on the element
 	       * face.
 	       */
-	      fe_face->reinit(&qface1, elem, side);
+	      fe_face->reinit(elem, side);
 	      
 	      /**
 	       * Loop over the face quagrature points for integration.
 	       */
-	      for (unsigned int qp=0; qp<qface0.n_points(); qp++)
+	      for (unsigned int qp=0; qp<qface.n_points(); qp++)
 		{
 		  /**
 		   * The location on the boundary of the current
@@ -594,7 +593,7 @@ void assemble_poisson(EquationSystems& es,
 		    for (unsigned int j=0; j<phi_face.size(); j++)
 		      {
 			Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
-		      };
+		      }
 		  
 		  /**
 		   * Right-hand-side contribution of the L2
@@ -603,17 +602,17 @@ void assemble_poisson(EquationSystems& es,
 		  for (unsigned int i=0; i<phi_face.size(); i++)
 		    {
 		      Fe[i] += JxW_face[qp]*penalty*value*phi_face[i][qp];
-		    };
+		    }
 		  
-		}; // end face quadrature point loop	  
-	    }; // end if (elem->neighbor(side) == NULL)
+		} // end face quadrature point loop	  
+	    } // end if (elem->neighbor(side) == NULL)
 	
 	/**
 	 * Start logging the boundary condition computation
 	 */
 	perf_log.stop_event ("BCs");
 
-      }; // end boundary condition section	  
+      } // end boundary condition section	  
 
 
       
@@ -642,7 +641,7 @@ void assemble_poisson(EquationSystems& es,
        */
       perf_log.stop_event ("matrix insertion");
       
-    }; // end of element loop
+    } // end of element loop
 
 
 
@@ -653,4 +652,4 @@ void assemble_poisson(EquationSystems& es,
    * it will print its log to the screen. Pretty easy, huh?
    */
   return;
-};
+}

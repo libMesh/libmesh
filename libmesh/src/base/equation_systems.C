@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.19 2003-02-20 04:59:58 benkirk Exp $
+// $Id: equation_systems.C,v 1.20 2003-02-24 14:35:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -460,9 +460,9 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln)
     {
       const GeneralSystem& system  = (*this)(sys);	      
       const unsigned int nv_sys    = system.n_vars();
-      
-      system.update_global_solution (sys_soln);
 
+      system.update_global_solution (sys_soln, 0);
+      
       if (_mesh.processor_id() == 0)
 	{
 	  std::vector<Number>      elem_soln;   // The finite element solution
@@ -472,27 +472,29 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln)
 	  for (unsigned int var=0; var<nv_sys; var++)
 	    {
 	      const FEType& fe_type    = system.variable_type(var);
-	      
-	      for (unsigned int e=0; e<_mesh.n_elem(); e++)
-		if (_mesh.elem(e)->active())
-		  {
-		    const Elem* elem = _mesh.elem(e);
-		    system.get_dof_map().dof_indices (elem, dof_indices, var);
-		    
-		    elem_soln.resize(dof_indices.size());
 
-		    for (unsigned int i=0; i<dof_indices.size(); i++)
-		      elem_soln[i] = sys_soln[dof_indices[i]];
-		    
-		    FEInterface::nodal_soln (dim, fe_type, elem,
-					     elem_soln, nodal_soln);
+	      active_elem_iterator       it (_mesh.elements_begin());
+	      const active_elem_iterator end(_mesh.elements_end());
 
-		    assert (nodal_soln.size() == elem->n_nodes());
-		    
-		    for (unsigned int n=0; n<elem->n_nodes(); n++)
-		      soln[nv*(elem->node(n)) + (var + var_num)] =
-			nodal_soln[n];
-		  }
+	      for ( ; it != end; ++it)
+		{
+		  const Elem* elem = *it;
+		  system.get_dof_map().dof_indices (elem, dof_indices, var);
+		  
+		  elem_soln.resize(dof_indices.size());
+		  
+		  for (unsigned int i=0; i<dof_indices.size(); i++)
+		    elem_soln[i] = sys_soln[dof_indices[i]];
+		  
+		  FEInterface::nodal_soln (dim, fe_type, elem,
+					   elem_soln, nodal_soln);
+		  
+		  assert (nodal_soln.size() == elem->n_nodes());
+		  
+		  for (unsigned int n=0; n<elem->n_nodes(); n++)
+		    soln[nv*(elem->node(n)) + (var + var_num)] =
+		      nodal_soln[n];
+		}
 	    }	 
 	}
 

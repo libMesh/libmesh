@@ -1217,6 +1217,13 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 ac_config_headers="$ac_config_headers include/mesh_config.h:include/mesh_config.h.in"
 
 
+echo "$as_me:$LINENO: result: ---------------------------------------------" >&5
+echo "${ECHO_T}---------------------------------------------" >&6
+echo "$as_me:$LINENO: result: ----------- Configuring libMesh -------------" >&5
+echo "${ECHO_T}----------- Configuring libMesh -------------" >&6
+echo "$as_me:$LINENO: result: ---------------------------------------------" >&5
+echo "${ECHO_T}---------------------------------------------" >&6
+
 ac_aux_dir=
 for ac_dir in $srcdir $srcdir/.. $srcdir/../..; do
   if test -f $ac_dir/install-sh; then
@@ -2414,6 +2421,16 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
 
+# Check whether --enable-shared or --disable-shared was given.
+if test "${enable_shared+set}" = set; then
+  enableval="$enable_shared"
+  enableshared=$enableval
+else
+  enableshared=yes
+fi;
+
+
+
   if test "$GXX" = yes ; then
         GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
     case "$GXX_VERSION_STRING" in
@@ -2576,13 +2593,25 @@ echo "$as_me: error: Unrecognized compiler" >&2;}
     if test "$GXX" = yes ; then
     CXXFLAGSO="-O2 -felide-constructors -DNDEBUG"
     CXXFLAGSG="-g -ansi -pedantic -W -Wall -Wunused -Wpointer-arith -Wimplicit -Wformat -Wparentheses -O -Wuninitialized -DDEBUG"
-    CXXFLAGSP="-O2 -felide-constructors -DNDEBUG -g -pg"
+    CXXFLAGSP="$CXXFLAGSO -g -pg"
     CXXFLAGSS="-fsyntax-only"
 
     CFLAGSO="-O2 -DNDEBUG"
     CFLAGSG="-g -DDEBUG"
-    CFLAGSP="-O2 -DNDEBUG -g -pg"
+    CFLAGSP="$CFLAGSO -g -pg"
     CFLAGSS="-fsyntax-only"
+
+        if test "$enableshared" = yes ; then
+      CXXFLAGSO="$CXXFLAGSO -fPIC"
+      CXXFLAGSG="$CXXFLAGSG -fPIC"
+      CXXFLAGSP="$CXXFLAGSP -fPIC"
+
+      CFLAGSO="$CFLAGSO -fPIC"
+      CFLAGSG="$CFLAGSG -fPIC"
+      CFLAGSP="$CFLAGSP -fPIC"
+
+      LDFLAGS="$LDFLAGS -fPIC"
+    fi
 
 
     case "$GXX_VERSION" in
@@ -2626,10 +2655,10 @@ echo "$as_me: error: Unrecognized compiler" >&2;}
       ibm_xlc)
           CXXFLAGSG="-DDEBUG -check=bounds -info=all -qrtti=all"
           CXXFLAGSO="-DNDEBUG -O3 -qmaxmem=-1 -w -qansialias -qrtti=all -Q"
-          CXXFLAGSP="-DNDEBUG -O3 -qmaxmem=-1 -w -qansialias -qrtti=all -Q -g -pg"
+          CXXFLAGSP="$CXXFLAGSO -g -pg"
           CFLAGSG="-DDEBUG -check=bounds -info=all -qrtti=all"
           CFLAGSO="-DNDEBUG -O2 -w -qansialias"
-          CFLAGSP="-DNDEBUG -O2 -w -qansialias -g -pg"
+          CFLAGSP="$CFLAGSO -g -pg"
 	  CXXSHAREDFLAG="-qmkshrobj"
 	  CXXDEPFLAG="-qmakedep"
           ;;
@@ -2638,26 +2667,64 @@ echo "$as_me: error: Unrecognized compiler" >&2;}
           CXXFLAGSG="-DDEBUG -LANG:std -no_auto_include -ansi -g -woff 1460"
           CXXFLAGSO="-DNDEBUG -LANG:std -no_auto_include -ansi -O2 -w"
           CFLAGSG="-DDEBUG"
-          CFLAGSO="-DNDEBUG -w"
+          CFLAGSO="-DNDEBUG -O2 -w"
           CXXDEPFLAG="-M"
 
                               LDFLAGS="$LDFLAGS -lm"
+
+                    if test "$enableshared" = yes ; then
+            CXXFLAGSO="$CXXFLAGSO -KPIC"
+            CXXFLAGSG="$CXXFLAGSG -KPIC"
+            CXXFLAGSP="$CXXFLAGSP -KPIC"
+
+            CFLAGSO="$CFLAGSO -KPIC"
+            CFLAGSG="$CFLAGSG -KPIC"
+            CFLAGSP="$CFLAGSP -KPIC"
+
+            LDFLAGS="$LDFLAGS -KPIC"
+          fi
           ;;
 
       intel_icc)
                                                   CXXFLAGSG="-Kc++eh -Krtti -w1 -DDEBUG -inline_debug_info -g -wd504"
-          CXXFLAGSO="-Kc++eh -Krtti -O2 -Ob2 -DNDEBUG -tpp6 -axiMK -unroll -w0 -vec_report0 -parallel -par_report0"
-          CXXFLAGSP="-Kc++eh -Krtti -O2 -Ob2 -DNDEBUG -tpp6 -axiMK -unroll -w0 -vec_report0 -parallel -par_report0 -g -pg"
+          CXXFLAGSO="-Kc++eh -Krtti -O2 -Ob2 -DNDEBUG -tpp6 -axiMK -unroll -w0 -vec"
+          CXXFLAGSP="$CXXFLAGSO -g -pg"
           CFLAGSG="-w1 -DDEBUG -inline_debug_info -wd266"
-          CFLAGSO="-O2 -DNDEBUG -tpp6 -axiMK -unroll -w0"
-          CFLAGSP="-O2 -DNDEBUG -tpp6 -axiMK -unroll -w0 -g -pg"
+          CFLAGSO="-O2 -Ob2 -DNDEBUG -tpp6 -axiMK -unroll -w0 -vec"
+          CFLAGSP="$CFLAGSO -g -pg"
+
+                    if test "$enableshared" = yes ; then
+            CXXFLAGSO="$CXXFLAGSO -KPIC"
+            CXXFLAGSG="$CXXFLAGSG -KPIC"
+            CXXFLAGSP="$CXXFLAGSP -KPIC"
+
+            CFLAGSO="$CFLAGSO -KPIC"
+            CFLAGSG="$CFLAGSG -KPIC"
+            CFLAGSP="$CFLAGSP -KPIC"
+
+            LDFLAGS="$LDFLAGS -KPIC"
+          fi
           ;;
 
       intel_ecc)
                                                   CXXFLAGSG="-Kc++eh -Krtti -w1 -DDEBUG -inline_debug_info -g"
           CXXFLAGSO="-Kc++eh -Krtti -O2 -DNDEBUG -unroll -w0"
+          CXXFLAGSP="$CXXFLAGSO -g -pg"
           CFLAGSG="-w1 -DDEBUG -inline_debug_info -wd266"
           CFLAGSO="-O2 -DNDEBUG -axiMK -unroll -w0"
+          CFLAGSP="$CFLAGSO -g -pg"
+
+                    if test "$enableshared" = yes ; then
+            CXXFLAGSO="$CXXFLAGSO -KPIC"
+            CXXFLAGSG="$CXXFLAGSG -KPIC"
+            CXXFLAGSP="$CXXFLAGSP -KPIC"
+
+            CFLAGSO="$CFLAGSO -KPIC"
+            CFLAGSG="$CFLAGSG -KPIC"
+            CFLAGSP="$CFLAGSP -KPIC"
+
+            LDFLAGS="$LDFLAGS -KPIC"
+          fi
           ;;
 
       compaq_cxx)
@@ -2670,13 +2737,24 @@ echo "$as_me: error: Unrecognized compiler" >&2;}
           for i in 175 236 237 487 1136 1156 111 1182 265 ; do
             CXXFLAGSG="$CXXFLAGSG -msg_disable $i"
             CXXFLAGSO="$CXXFLAGSO -msg_disable $i"
-                                  done
+          done
 
                               LDFLAGS="$LDFLAGS -model ansi"
 
                               LDFLAGS="$LDFLAGS -lm"
 
 
+                    if test "$enableshared" = yes ; then
+            CXXFLAGSO="$CXXFLAGSO -shared"
+            CXXFLAGSG="$CXXFLAGSG -shared"
+            CXXFLAGSP="$CXXFLAGSP -shared"
+
+            CFLAGSO="$CFLAGSO -shared"
+            CFLAGSG="$CFLAGSG -shared"
+            CFLAGSP="$CFLAGSP -shared"
+
+            LDFLAGS="$LDFLAGS -shared"
+          fi
           ;;
 
       sun_workshop | sun_forte)
@@ -2684,6 +2762,18 @@ echo "$as_me: error: Unrecognized compiler" >&2;}
           CXXFLAGSO="-DNDEBUG -w"
           CFLAGSG="-DDEBUG -w"
           CFLAGSO="-DNDEBUG -w"
+
+                    if test "$enableshared" = yes ; then
+            CXXFLAGSO="$CXXFLAGSO -KPIC"
+            CXXFLAGSG="$CXXFLAGSG -KPIC"
+            CXXFLAGSP="$CXXFLAGSP -KPIC"
+
+            CFLAGSO="$CFLAGSO -KPIC"
+            CFLAGSG="$CFLAGSG -KPIC"
+            CFLAGSP="$CFLAGSP -KPIC"
+
+            LDFLAGS="$LDFLAGS -KPIC"
+          fi
           ;;
 
       portland_group)
@@ -3583,17 +3673,6 @@ done
 
 
 PWD=`pwd`
-
-
-
-
-# Check whether --enable-shared or --disable-shared was given.
-if test "${enable_shared+set}" = set; then
-  enableval="$enable_shared"
-  enableshared=$enableval
-else
-  enableshared=yes
-fi;
 
 
 
@@ -4539,7 +4618,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:4542:" \
+echo "$as_me:4621:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -4705,7 +4784,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_verb"
-(eval echo $as_me:4708: \"$ac_link\") >&5
+(eval echo $as_me:4787: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -4784,7 +4863,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_cv_prog_f77_v"
-(eval echo $as_me:4787: \"$ac_link\") >&5
+(eval echo $as_me:4866: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -4967,8 +5046,8 @@ _ACEOF
     petscminor=`grep "define PETSC_VERSION_MINOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_MINOR[ ]*//g"`
     petscsubminor=`grep "define PETSC_VERSION_SUBMINOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_SUBMINOR[ ]*//g"`
     petscversion=$petscmajor.$petscminor.$petscsubminor
-    echo "$as_me:$LINENO: result: <<< Configuring library with petsc version $petscversion support >>>" >&5
-echo "${ECHO_T}<<< Configuring library with petsc version $petscversion support >>>" >&6
+    echo "$as_me:$LINENO: result: <<< Configuring library with PETSc version $petscversion support >>>" >&5
+echo "${ECHO_T}<<< Configuring library with PETSc version $petscversion support >>>" >&6
 
   else
     enablepetsc=no
@@ -5726,6 +5805,7 @@ s,@OBJEXT@,$OBJEXT,;t t
 s,@CC@,$CC,;t t
 s,@CFLAGS@,$CFLAGS,;t t
 s,@ac_ct_CC@,$ac_ct_CC,;t t
+s,@enableshared@,$enableshared,;t t
 s,@GXX_VERSION@,$GXX_VERSION,;t t
 s,@CXXFLAGSG@,$CXXFLAGSG,;t t
 s,@CXXFLAGSO@,$CXXFLAGSO,;t t
@@ -5739,7 +5819,6 @@ s,@CXXDEPFLAG@,$CXXDEPFLAG,;t t
 s,@CXXSHAREDFLAG@,$CXXSHAREDFLAG,;t t
 s,@CXXCPP@,$CXXCPP,;t t
 s,@PWD@,$PWD,;t t
-s,@enableshared@,$enableshared,;t t
 s,@enablexdr@,$enablexdr,;t t
 s,@enablecomplex@,$enablecomplex,;t t
 s,@LASPACK_INCLUDE_PATH@,$LASPACK_INCLUDE_PATH,;t t
@@ -6740,6 +6819,7 @@ s,@OBJEXT@,$OBJEXT,;t t
 s,@CC@,$CC,;t t
 s,@CFLAGS@,$CFLAGS,;t t
 s,@ac_ct_CC@,$ac_ct_CC,;t t
+s,@enableshared@,$enableshared,;t t
 s,@GXX_VERSION@,$GXX_VERSION,;t t
 s,@CXXFLAGSG@,$CXXFLAGSG,;t t
 s,@CXXFLAGSO@,$CXXFLAGSO,;t t
@@ -6753,7 +6833,6 @@ s,@CXXDEPFLAG@,$CXXDEPFLAG,;t t
 s,@CXXSHAREDFLAG@,$CXXSHAREDFLAG,;t t
 s,@CXXCPP@,$CXXCPP,;t t
 s,@PWD@,$PWD,;t t
-s,@enableshared@,$enableshared,;t t
 s,@enablexdr@,$enablexdr,;t t
 s,@enablecomplex@,$enablecomplex,;t t
 s,@LASPACK_INCLUDE_PATH@,$LASPACK_INCLUDE_PATH,;t t
@@ -7231,5 +7310,13 @@ if test "$no_create" != yes; then
 fi
 
 rm -f conftest* config.cache config.status
+
+
+echo "$as_me:$LINENO: result: ---------------------------------------------" >&5
+echo "${ECHO_T}---------------------------------------------" >&6
+echo "$as_me:$LINENO: result: --------- Done Configuring libMesh ----------" >&5
+echo "${ECHO_T}--------- Done Configuring libMesh ----------" >&6
+echo "$as_me:$LINENO: result: ---------------------------------------------" >&5
+echo "${ECHO_T}---------------------------------------------" >&6
 
 

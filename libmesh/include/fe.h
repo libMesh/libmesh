@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.13 2003-02-20 15:22:15 benkirk Exp $
+// $Id: fe.h,v 1.14 2003-02-24 14:35:50 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -47,7 +47,7 @@
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.13 $
+ * \version $Revision: 1.14 $
  */
 
 //-------------------------------------------------------------
@@ -161,7 +161,7 @@ public:
    */
   static Point inverse_map (const Elem* elem,
 			    const Point& p,
-			    const Real tolerance = 1.e-6);
+			    const Real tolerance = TOLERANCE);
   
   /**
    * This is at the core of this class. Use this for each
@@ -175,8 +175,7 @@ public:
    * Reinitializes all the physical element-dependent data based on
    * the \p side of \p face.
    */
-  void reinit (QBase* qside,
-	       const Elem* elem,
+  void reinit (const Elem* elem,
 	       const unsigned int side);
 
   /**
@@ -197,16 +196,14 @@ public:
     
 #ifdef ENABLE_INFINITE_ELEMENTS
 
-
 protected:
 
   /**
    * Initialize the data fields for the base of an
    * an infinite element.
    */
-  void init_base_shape_functions(const QBase* q,
+  void init_base_shape_functions(const std::vector<Point>& qp,
 				 const Elem* e);
-
 
 #endif
 
@@ -218,15 +215,18 @@ private:
   /** 
    * Update the various member data fields \p phi,
    * \p dphidxi, \p dphideta, \p dphidzeta, etc.
-   * for the current element.
+   * for the current element.  These data will be computed
+   * at the points \p qp, which are generally (but need not be)
+   * the quadrature points.
    */
-  void init_shape_functions(const QBase* q,
+  void init_shape_functions(const std::vector<Point>& qp,
 			    const Elem* e);
 
   /** 
-   * Same as before, but for a side.
+   * Same as before, but for a side. This is used for boundary
+   * integration.
    */  
-  void init_shape_functions(const QBase* q,
+  void init_shape_functions(const std::vector<Point>& qp,
 			    const Elem* e,
 			    const unsigned int s);
 
@@ -268,7 +268,7 @@ private:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.13 $
+ * \version $Revision: 1.14 $
  */
 
 //-------------------------------------------------------------
@@ -293,7 +293,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.13 $
+ * \version $Revision: 1.14 $
  */
 
 //-------------------------------------------------------------
@@ -318,7 +318,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.13 $
+ * \version $Revision: 1.14 $
  */
 
 //-------------------------------------------------------------

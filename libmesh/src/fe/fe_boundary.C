@@ -1,4 +1,4 @@
-// $Id: fe_boundary.C,v 1.12 2003-02-22 16:01:11 benkirk Exp $
+// $Id: fe_boundary.C,v 1.13 2003-02-24 14:35:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -34,8 +34,7 @@
 //-------------------------------------------------------
 // Full specialization for 1D when this is a useless method
 template <>
-void FE<1,HIERARCHIC>::reinit(QBase*,
-			      const Elem*,
+void FE<1,HIERARCHIC>::reinit(const Elem*,
 			      const unsigned int)
 {
   std::cerr << "ERROR: This method only makes sense for 2D, 3D elements!"
@@ -48,8 +47,7 @@ void FE<1,HIERARCHIC>::reinit(QBase*,
 //-------------------------------------------------------
 // Full specialization for 1D when this is a useless method
 template <>
-void FE<1,LAGRANGE>::reinit(QBase*,
-			    const Elem*,
+void FE<1,LAGRANGE>::reinit(const Elem*,
 			    const unsigned int)
 {
   std::cerr << "ERROR: This method only makes sense for 2D, 3D elements!"
@@ -62,8 +60,7 @@ void FE<1,LAGRANGE>::reinit(QBase*,
 //-------------------------------------------------------
 // Full specialization for 1D when this is a useless method
 template <>
-void FE<1,MONOMIAL>::reinit(QBase*,
-			    const Elem*,
+void FE<1,MONOMIAL>::reinit(const Elem*,
 			    const unsigned int)
 {
   std::cerr << "ERROR: This method only makes sense for 2D, 3D elements!"
@@ -76,61 +73,57 @@ void FE<1,MONOMIAL>::reinit(QBase*,
 //-------------------------------------------------------
 // Method for 2D, 3D
 template <unsigned int Dim, FEFamily T>
-void FE<Dim,T>::reinit(QBase* qside,
-		       const Elem* elem,
+void FE<Dim,T>::reinit(const Elem* elem,
 		       const unsigned int s)
 {
-  assert (elem != NULL);
-  assert (qside != NULL);
+  assert (elem  != NULL);
+  assert (qrule != NULL);
   // We don't do this for 1D elements!
   assert (Dim != 1);
   
   const AutoPtr<Elem> side(elem->build_side(s));
-  
-  assert (qside   != NULL);
-  assert (qrule   != NULL);
-  
-  
-  qrule->init(elem->type(), s);
-  qside->init(side->type());
-
-  assert (qrule->n_points() == qside->n_points());
+      
+  qrule->init(side->type());
   
   
   // Compute the Jacobian*Weight on the face for integration
   {
     elem_type = side->type();
-    init_shape_functions (qside, elem, s);
-    compute_map          (qside, elem, s);
+    init_shape_functions (qrule->get_points(),  elem, s);
+    compute_map          (qrule->get_weights(), elem, s);
   }
-  
+
   // make a copy of the Jacobian for integration
   const std::vector<Real>  JxW_int(JxW);
-  const std::vector<Point> xyz_int(xyz);
+
+
+  // Find where the integration points are located on the
+  // full element.
+  std::vector<Point> qp(xyz);
+  
+  for (unsigned int p=0; p<qp.size(); p++)
+    qp[p] = inverse_map (elem, qp[p]);
+  
 
   // compute the shape function and derivative values
   {
     elem_type = elem->type();
-    init_shape_functions    (qrule, elem);
-    compute_map             (qrule, elem);
+    init_shape_functions    (qp, elem);
+    compute_map             (qrule->get_weights(), elem);
     compute_shape_functions ();
   }  
   
   // copy back old data
-  {
-    JxW = JxW_int;
-    xyz = xyz_int;
-  }
+  JxW = JxW_int;
 }
 
 
 
 template <unsigned int Dim, FEFamily T>
-void FE<Dim,T>::init_shape_functions(const QBase* qrule,
+void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
 				     const Elem* elem,
 				     const unsigned int s)
 {
-  assert (qrule != NULL);
   assert (elem  != NULL);
   
   const AutoPtr<Elem> side(elem->build_side(s));
@@ -139,9 +132,9 @@ void FE<Dim,T>::init_shape_functions(const QBase* qrule,
   // the map
   const Order    mapping_order     (side->default_order()); 
   const ElemType mapping_elem_type (side->type());
-  
-  const unsigned int      n_qp = qrule->n_points();
-  const std::vector<Point>& qp = qrule->get_points();
+
+  // The number of quadrature points.
+  const unsigned int n_qp = qp.size();
 	
   const unsigned int n_mapping_shape_functions =
     n_shape_functions (mapping_elem_type,
@@ -222,153 +215,135 @@ void FE<Dim,T>::init_shape_functions(const QBase* qrule,
 
   
 
-void FEBase::compute_map(const QBase* qrule,
+void FEBase::compute_map(const std::vector<Real>& qw,
 			 const Elem* elem,
 			 const unsigned int s)
 {
+  assert (elem  != NULL);
+
+  // Get an AutoPtr to the side.  Don't worry about deleting it.
+  const AutoPtr<Elem> side(elem->build_side(s));       
+  const unsigned int n_qp = qw.size();
+
   switch (dim)
     {
       
     case 2:
       {
-	assert (qrule != NULL);
-	assert (elem  != NULL);
-
-	const AutoPtr<Elem> side(elem->build_side(s));
+	//-------------------------------------------------------------
+	// Resize the vectors to hold data at the quadrature points
+	{  
+	  xyz.resize(n_qp);
+	  dxyzdxi_map.resize(n_qp);
+	  
+	  JxW.resize(n_qp);
+	}
 	
-	const unsigned int      n_qp = qrule->n_points();
-	const std::vector<Real> & qw = qrule->get_weights();
+	// Clear the entities that will be summed
+	for (unsigned int p=0; p<n_qp; p++)
+	  {
+	    xyz[p].zero();
+	    dxyzdxi_map[p].zero();
+	  }
 	
-	
-	{
-	  //-------------------------------------------------------------
-	  // Resize the vectors to hold data at the quadrature points
-	  {  
-	    xyz.resize(n_qp);
-	    dxyzdxi_map.resize(n_qp);
+	// compute x, dxdxi at the quadrature points    
+	for (unsigned int i=0; i<psi_map.size(); i++) // sum over the nodes
+	  {
+	    const Point& side_point = side->point(i);
 	    
-	    JxW.resize(n_qp);
+	    for (unsigned int p=0; p<n_qp; p++) // for each quadrature point...
+	      {	  
+		xyz[p].add_scaled        (side_point, psi_map[i][p]);
+		dxyzdxi_map[p].add_scaled(side_point, dpsidxi_map[i][p]);
+	      }
 	  }
 	  
-	  // Clear the entities that will be summed
-	  for (unsigned int p=0; p<n_qp; p++)
-	    {
-	      xyz[p].zero();
-	      dxyzdxi_map[p].zero();
-	    }
-	  
-	  // compute x, dxdxi at the quadrature points    
-	  for (unsigned int i=0; i<psi_map.size(); i++) // sum over the nodes
-	    {
-	      const Point& side_point = side->point(i);
-	      
-	      for (unsigned int p=0; p<n_qp; p++) // for each quadrature point...
-		{	  
-		  xyz[p].add_scaled        (side_point, psi_map[i][p]);
-		  dxyzdxi_map[p].add_scaled(side_point, dpsidxi_map[i][p]);
-		}
-	    }
-	  
-	  
-	  // compute the jacobian at the quadrature points
-	  for (unsigned int p=0; p<n_qp; p++)
-	    {
-	      
-	      const Real jac = sqrt(dxdxi_map(p)*dxdxi_map(p) +
-				    dydxi_map(p)*dydxi_map(p));
-	      
-	      assert (jac > 0.);
-	      
-	      JxW[p] = jac*qw[p];
-	    }
-	}
-	// done computing the map
 	
+	// compute the jacobian at the quadrature points
+	for (unsigned int p=0; p<n_qp; p++)
+	  {
+	    const Real jac = sqrt(dxdxi_map(p)*dxdxi_map(p) +
+				  dydxi_map(p)*dydxi_map(p));
+	    
+	    assert (jac > 0.);
+	    
+	    JxW[p] = jac*qw[p];
+	  }
+	
+	// done computing the map	
 	return;
       }
 
 
     case 3:
       {
-	assert (qrule != NULL);
-	assert (elem  != NULL);
-
-	const AutoPtr<Elem> side(elem->build_side(s));
-  
-	const unsigned int      n_qp = qrule->n_points();
-	const std::vector<Real> & qw = qrule->get_weights();
-
-
-	{
-	  //----------------------------------------------------------------
-	  // Resize the vectors to hold data at the quadrature points
-	  {  
-	    xyz.resize(n_qp);
-	    dxyzdxi_map.resize(n_qp);
-	    dxyzdeta_map.resize(n_qp);
-      
-	    JxW.resize(n_qp);
+	//----------------------------------------------------------------
+	// Resize the vectors to hold data at the quadrature points
+	{  
+	  xyz.resize(n_qp);
+	  dxyzdxi_map.resize(n_qp);
+	  dxyzdeta_map.resize(n_qp);
+	  
+	  JxW.resize(n_qp);
+	}
+    
+	// Clear the entities that will be summed
+	for (unsigned int p=0; p<n_qp; p++)
+	  {
+	    xyz[p].zero();
+	    dxyzdxi_map[p].zero();
+	    dxyzdeta_map[p].zero();
+	  }
+	
+	// compute x, dxdxi at the quadrature points    
+	for (unsigned int i=0; i<psi_map.size(); i++) // sum over the nodes
+	  {
+	    const Point& side_point = side->point(i);
+	    
+	    for (unsigned int p=0; p<n_qp; p++) // for each quadrature point...
+	      {
+		xyz[p].add_scaled         (side_point, psi_map[i][p]);
+		dxyzdxi_map[p].add_scaled (side_point, dpsidxi_map[i][p]);
+		dxyzdeta_map[p].add_scaled(side_point, dpsideta_map[i][p]);
+	      }
 	  }
     
-	  // Clear the entities that will be summed
-	  for (unsigned int p=0; p<n_qp; p++)
-	    {
-	      xyz[p].zero();
-	      dxyzdxi_map[p].zero();
-	      dxyzdeta_map[p].zero();
-	    }
     
-	  // compute x, dxdxi at the quadrature points    
-	  for (unsigned int i=0; i<psi_map.size(); i++) // sum over the nodes
-	    {
-	      const Point& side_point = side->point(i);
-	      
-	      for (unsigned int p=0; p<n_qp; p++) // for each quadrature point...
-		{
-		  xyz[p].add_scaled         (side_point, psi_map[i][p]);
-		  dxyzdxi_map[p].add_scaled (side_point, dpsidxi_map[i][p]);
-		  dxyzdeta_map[p].add_scaled(side_point, dpsideta_map[i][p]);
-		}
-	    }
-    
-    
+	
+	// compute the jacobian at the quadrature points, see
+	// http://sp81.msi.umn.edu:999/fluent/fidap/help/theory/thtoc.htm
+	for (unsigned int p=0; p<n_qp; p++)
+	  {
+	    const Real g11 = (dxdxi_map(p)*dxdxi_map(p) +
+			      dydxi_map(p)*dydxi_map(p) +
+			      dzdxi_map(p)*dzdxi_map(p));
+	    
+	    const Real g12 = (dxdxi_map(p)*dxdeta_map(p) +
+			      dydxi_map(p)*dydeta_map(p) +
+			      dzdxi_map(p)*dzdeta_map(p));
+	    
+	    const Real g21 = g12;
+	    
+	    const Real g22 = (dxdeta_map(p)*dxdeta_map(p) +
+			      dydeta_map(p)*dydeta_map(p) +
+			      dzdeta_map(p)*dzdeta_map(p));
+	    
+	    
+	    const Real jac = sqrt(g11*g22 - g12*g21);
+	    
+	    assert (jac > 0.);
 
-	  // compute the jacobian at the quadrature points, see
-	  // http://sp81.msi.umn.edu:999/fluent/fidap/help/theory/thtoc.htm
-	  for (unsigned int p=0; p<n_qp; p++)
-	    {
-
-	      const Real g11 = (dxdxi_map(p)*dxdxi_map(p) +
-				dydxi_map(p)*dydxi_map(p) +
-				dzdxi_map(p)*dzdxi_map(p));
+	    JxW[p] = jac*qw[p];
+	  }
 	
-	      const Real g12 = (dxdxi_map(p)*dxdeta_map(p) +
-				dydxi_map(p)*dydeta_map(p) +
-				dzdxi_map(p)*dzdeta_map(p));
-	
-	      const Real g21 = g12;
-	
-	      const Real g22 = (dxdeta_map(p)*dxdeta_map(p) +
-				dydeta_map(p)*dydeta_map(p) +
-				dzdeta_map(p)*dzdeta_map(p));
-	
-	
-	      const Real jac = sqrt(g11*g22 - g12*g21);
-	
-	      assert (jac > 0.);
-
-	      JxW[p] = jac*qw[p];
-	    }
-	}
 	// done computing the map
-
 	return;  
       }
 
 
     default:
       error();
-
+      
     }
 }
 

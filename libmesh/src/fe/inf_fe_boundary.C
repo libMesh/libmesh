@@ -1,4 +1,4 @@
-// $Id: inf_fe_boundary.C,v 1.3 2003-02-13 22:56:10 benkirk Exp $
+// $Id: inf_fe_boundary.C,v 1.4 2003-02-24 14:35:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -33,8 +33,7 @@
 //-------------------------------------------------------
 // Method for 2D, 3D -- see inf_fe_1D.C for a 1D version of this
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
-void InfFE<Dim,T_radial,T_base>::reinit(QBase*,
-					const Elem*,
+void InfFE<Dim,T_radial,T_base>::reinit(const Elem*,
 					const unsigned int)
 {
   // We don't do this for 1D elements!
@@ -49,7 +48,7 @@ void InfFE<Dim,T_radial,T_base>::reinit(QBase*,
 
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
-void InfFE<Dim,T_radial,T_base>::init_shape_functions(const QBase*,
+void InfFE<Dim,T_radial,T_base>::init_shape_functions(const std::vector<Point>&,
 						      const Elem*,
 						      const unsigned int)
 {

@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.14 2003-02-20 04:59:57 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.15 2003-02-24 14:35:52 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -177,10 +177,6 @@ dnl CXXFLAGSS  : flags for syntax-checking mode
 dnl CXXFLAGSP  : flags for profiler mode (only tested with GCC 3.2.1 but
 dnl              should work with most versions.)  Note: the -a option
 dnl              has been removed as of this version of GCC.
-dnl CXXFLAGSPIC: flags for generation of object files that are suitable
-dnl              for shared libs
-dnl LDFLAGSPIC : flags needed for linking of object files to shared
-dnl              libraries
 dnl CXXDEPFLAG : flag for creating dependency info
 dnl
 dnl Usage: SET_CXX_FLAGS
@@ -198,13 +194,26 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
   if test "$GXX" = yes ; then
     CXXFLAGSO="-O2 -felide-constructors -DNDEBUG"
     CXXFLAGSG="-g -ansi -pedantic -W -Wall -Wunused -Wpointer-arith -Wimplicit -Wformat -Wparentheses -O -Wuninitialized -DDEBUG"
-    CXXFLAGSP="-O2 -felide-constructors -DNDEBUG -g -pg"
+    CXXFLAGSP="$CXXFLAGSO -g -pg"
     CXXFLAGSS="-fsyntax-only"
 
     CFLAGSO="-O2 -DNDEBUG"
     CFLAGSG="-g -DDEBUG"
-    CFLAGSP="-O2 -DNDEBUG -g -pg"
+    CFLAGSP="$CFLAGSO -g -pg"
     CFLAGSS="-fsyntax-only"
+
+    dnl Position-independent code for shared libraries
+    if test "$enableshared" = yes ; then
+      CXXFLAGSO="$CXXFLAGSO -fPIC"
+      CXXFLAGSG="$CXXFLAGSG -fPIC"
+      CXXFLAGSP="$CXXFLAGSP -fPIC"
+
+      CFLAGSO="$CFLAGSO -fPIC"
+      CFLAGSG="$CFLAGSG -fPIC"
+      CFLAGSP="$CFLAGSP -fPIC"
+
+      LDFLAGS="$LDFLAGS -fPIC"
+    fi
 
     dnl set some flags that are specific to some versions of the
     dnl compiler:
@@ -264,10 +273,10 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
       ibm_xlc)
           CXXFLAGSG="-DDEBUG -check=bounds -info=all -qrtti=all"
           CXXFLAGSO="-DNDEBUG -O3 -qmaxmem=-1 -w -qansialias -qrtti=all -Q"
-          CXXFLAGSP="-DNDEBUG -O3 -qmaxmem=-1 -w -qansialias -qrtti=all -Q -g -pg"
+          CXXFLAGSP="$CXXFLAGSO -g -pg"
           CFLAGSG="-DDEBUG -check=bounds -info=all -qrtti=all"
           CFLAGSO="-DNDEBUG -O2 -w -qansialias"
-          CFLAGSP="-DNDEBUG -O2 -w -qansialias -g -pg"
+          CFLAGSP="$CFLAGSO -g -pg"
 	  CXXSHAREDFLAG="-qmkshrobj"
 	  CXXDEPFLAG="-qmakedep"
           ;;
@@ -276,12 +285,25 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           CXXFLAGSG="-DDEBUG -LANG:std -no_auto_include -ansi -g -woff 1460"
           CXXFLAGSO="-DNDEBUG -LANG:std -no_auto_include -ansi -O2 -w"
           CFLAGSG="-DDEBUG"
-          CFLAGSO="-DNDEBUG -w"
+          CFLAGSO="-DNDEBUG -O2 -w"
           CXXDEPFLAG="-M"
 
           dnl For some reason, CC forgets to add the math lib to the
           dnl linker line, so we do that ourselves
           LDFLAGS="$LDFLAGS -lm"
+
+          dnl Position-independent code for shared libraries
+          if test "$enableshared" = yes ; then
+            CXXFLAGSO="$CXXFLAGSO -KPIC"
+            CXXFLAGSG="$CXXFLAGSG -KPIC"
+            CXXFLAGSP="$CXXFLAGSP -KPIC"
+
+            CFLAGSO="$CFLAGSO -KPIC"
+            CFLAGSG="$CFLAGSG -KPIC"
+            CFLAGSP="$CFLAGSP -KPIC"
+
+            LDFLAGS="$LDFLAGS -KPIC"
+          fi
           ;;
   
       intel_icc)
@@ -290,11 +312,24 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           dnl       Metis function "GKfree" caused this error
           dnl       in almost every file.
           CXXFLAGSG="-Kc++eh -Krtti -w1 -DDEBUG -inline_debug_info -g -wd504"
-          CXXFLAGSO="-Kc++eh -Krtti -O2 -Ob2 -DNDEBUG -tpp6 -axiMK -unroll -w0 -vec_report0 -parallel -par_report0"
-          CXXFLAGSP="-Kc++eh -Krtti -O2 -Ob2 -DNDEBUG -tpp6 -axiMK -unroll -w0 -vec_report0 -parallel -par_report0 -g -pg"
+          CXXFLAGSO="-Kc++eh -Krtti -O2 -Ob2 -DNDEBUG -tpp6 -axiMK -unroll -w0 -vec"
+          CXXFLAGSP="$CXXFLAGSO -g -pg"
           CFLAGSG="-w1 -DDEBUG -inline_debug_info -wd266"
-          CFLAGSO="-O2 -DNDEBUG -tpp6 -axiMK -unroll -w0"
-          CFLAGSP="-O2 -DNDEBUG -tpp6 -axiMK -unroll -w0 -g -pg"
+          CFLAGSO="-O2 -Ob2 -DNDEBUG -tpp6 -axiMK -unroll -w0 -vec"
+          CFLAGSP="$CFLAGSO -g -pg"
+
+          dnl Position-independent code for shared libraries
+          if test "$enableshared" = yes ; then
+            CXXFLAGSO="$CXXFLAGSO -KPIC"
+            CXXFLAGSG="$CXXFLAGSG -KPIC"
+            CXXFLAGSP="$CXXFLAGSP -KPIC"
+
+            CFLAGSO="$CFLAGSO -KPIC"
+            CFLAGSG="$CFLAGSG -KPIC"
+            CFLAGSP="$CFLAGSP -KPIC"
+
+            LDFLAGS="$LDFLAGS -KPIC"
+          fi
           ;;
   
       intel_ecc)
@@ -304,8 +339,23 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           dnl       in almost every file.
           CXXFLAGSG="-Kc++eh -Krtti -w1 -DDEBUG -inline_debug_info -g"
           CXXFLAGSO="-Kc++eh -Krtti -O2 -DNDEBUG -unroll -w0"
+          CXXFLAGSP="$CXXFLAGSO -g -pg"
           CFLAGSG="-w1 -DDEBUG -inline_debug_info -wd266"
           CFLAGSO="-O2 -DNDEBUG -axiMK -unroll -w0"
+          CFLAGSP="$CFLAGSO -g -pg"
+
+          dnl Position-independent code for shared libraries
+          if test "$enableshared" = yes ; then
+            CXXFLAGSO="$CXXFLAGSO -KPIC"
+            CXXFLAGSG="$CXXFLAGSG -KPIC"
+            CXXFLAGSP="$CXXFLAGSP -KPIC"
+
+            CFLAGSO="$CFLAGSO -KPIC"
+            CFLAGSG="$CFLAGSG -KPIC"
+            CFLAGSP="$CFLAGSP -KPIC"
+
+            LDFLAGS="$LDFLAGS -KPIC"
+          fi
           ;;
   
       compaq_cxx)
@@ -352,8 +402,6 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           for i in 175 236 237 487 1136 1156 111 1182 265 ; do
             CXXFLAGSG="$CXXFLAGSG -msg_disable $i"
             CXXFLAGSO="$CXXFLAGSO -msg_disable $i"
-            dnl CFLAGSG="$CXXFLAGSG -msg_disable $i"
-            dnl FLAGSO="$CXXFLAGSO -msg_disable $i"
           done
   
           dnl If we use -model ansi to compile the files, we also have to
@@ -363,11 +411,20 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           dnl For some reason, cxx also forgets to add the math lib to the
           dnl linker line, so we do that ourselves
           LDFLAGS="$LDFLAGS -lm"
-  
-          dnl if necessary: -shared, -pthread 
-          dnl Should one use -compress? -distinguish_nested_enums?
-          dnl                -nousing_std? -pch? -noimplicit_include?
 
+
+          dnl Position-independent code for shared libraries
+          if test "$enableshared" = yes ; then
+            CXXFLAGSO="$CXXFLAGSO -shared"
+            CXXFLAGSG="$CXXFLAGSG -shared"
+            CXXFLAGSP="$CXXFLAGSP -shared"
+
+            CFLAGSO="$CFLAGSO -shared"
+            CFLAGSG="$CFLAGSG -shared"
+            CFLAGSP="$CFLAGSP -shared"
+
+            LDFLAGS="$LDFLAGS -shared"
+          fi
           ;;
   
       sun_workshop | sun_forte)
@@ -375,6 +432,19 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           CXXFLAGSO="-DNDEBUG -w"
           CFLAGSG="-DDEBUG -w"
           CFLAGSO="-DNDEBUG -w"
+
+          dnl Position-independent code for shared libraries
+          if test "$enableshared" = yes ; then
+            CXXFLAGSO="$CXXFLAGSO -KPIC"
+            CXXFLAGSG="$CXXFLAGSG -KPIC"
+            CXXFLAGSP="$CXXFLAGSP -KPIC"
+
+            CFLAGSO="$CFLAGSO -KPIC"
+            CFLAGSG="$CFLAGSG -KPIC"
+            CFLAGSP="$CFLAGSP -KPIC"
+
+            LDFLAGS="$LDFLAGS -KPIC"
+          fi
           ;;
   
       portland_group)
@@ -439,7 +509,7 @@ AC_DEFUN(CONFIGURE_PETSC,
     petscminor=`grep "define PETSC_VERSION_MINOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_MINOR[ ]*//g"`
     petscsubminor=`grep "define PETSC_VERSION_SUBMINOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_SUBMINOR[ ]*//g"`
     petscversion=$petscmajor.$petscminor.$petscsubminor
-    AC_MSG_RESULT(<<< Configuring library with petsc version $petscversion support >>>)
+    AC_MSG_RESULT(<<< Configuring library with PETSc version $petscversion support >>>)
     AC_SUBST(petscversion)
   else
     enablepetsc=no  

@@ -1,4 +1,4 @@
-// $Id: mesh_common.h,v 1.8 2003-02-20 04:59:58 benkirk Exp $
+// $Id: mesh_common.h,v 1.9 2003-02-24 14:35:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,6 +31,7 @@
 
 // The library configuration options
 #include "mesh_config.h"
+#include "libmesh_base.h"
 
 
 
@@ -51,7 +52,15 @@
 #  undef COMPLEX
 #endif
 
+// Check to see if TOLERANCE has been defined by another
+// package, if so we might want to change the name...
+#ifdef TOLERANCE
+   DIE A HORRIBLE DEATH HERE...
+#  undef TOLERANCE
+#endif
 
+
+   
 // Define the type to use for real numbers
 #ifndef SINGLE_PRECISION
   typedef double Real;
@@ -80,16 +89,29 @@ typedef std::complex<double> COMPLEX;
 
 
 
+// These are useful macros that behave lilke functions in the code.
+// If you want to make sure you are accessing a section of code just
+// stick a here(); in it, for example
 #undef here
+#define here()     { std::cout << "[" << libMeshBase::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled on " << __DATE__ << " at " << __TIME__ << std::endl; }
+
 #undef error
-#define here()     { std::cout << __FILE__ << ", line " << __LINE__ << std::endl; }
-#define error()    { here(); abort(); }
-#define untested() { std::cout << "*** Using untested code: " << __FILE__ << ", line " << __LINE__ << " ***" << std::endl; }
+#define error()    { std::cerr << "[" << libMeshBase::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled on " << __DATE__ << " at " << __TIME__ << std::endl; abort(); }
+
+#undef untested
+#define untested() { std::cout << "*** Using untested code: " << __FILE__ << ", line " << __LINE__ << ", compiled on " << __DATE__ << " at " << __TIME__ << " ***" << std::endl; }
 
 
 // 3D spatial dimension unless otherwise specified
 #ifndef DIM
 #  define DIM 3
 #endif
+
+// Define a tolerance.  This is what should be considered "good enough"
+// when doing floating point comparisons.  For example, v == 0 is
+// changed to fabs(v) < TOLERANCE.
+#define TOLERANCE 1.e-6
+
+
 
 #endif // #define __mesh_common_h__

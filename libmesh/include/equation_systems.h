@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.13 2003-02-20 04:59:58 benkirk Exp $
+// $Id: equation_systems.h,v 1.14 2003-02-24 14:35:50 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -189,7 +189,9 @@ public:
   /**
    * Fill the input vector \p soln with solution values.  The
    * entries will be in variable-major format (corresponding to
-   * the names from \p build_variable_names())
+   * the names from \p build_variable_names()).  Note that the input
+   * vector \p soln will only be assembled on processor 0, so this
+   * method is only applicable to outputting plot files from processor 0.
    */
   void build_solution_vector (std::vector<Number>& soln);
 

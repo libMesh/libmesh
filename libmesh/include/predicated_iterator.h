@@ -1,4 +1,4 @@
-// $Id: predicated_iterator.h,v 1.5 2003-02-21 22:40:59 jwpeterson Exp $
+// $Id: predicated_iterator.h,v 1.6 2003-02-24 14:35:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -221,6 +221,7 @@ protected:
   T _end;
 
 private:
+  
   /**
    * This private variable, which is inaccesible to
    * derived classes, can be used to simulate the

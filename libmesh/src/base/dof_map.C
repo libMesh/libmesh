@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.22 2003-02-22 16:38:21 benkirk Exp $
+// $Id: dof_map.C,v 1.23 2003-02-24 14:35:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -58,7 +58,7 @@ void DofMap::reinit(MeshBase& mesh)
   _n_elem  = mesh.n_elem();
 
   const unsigned int n_var = n_variables();
-  const unsigned int dim    = mesh.mesh_dimension();
+  const unsigned int dim   = mesh.mesh_dimension();
 
   // First set the number of variables for each \p DofObject
   // equal to n_variables() for this system.
@@ -514,7 +514,7 @@ void DofMap::dof_indices (const Elem* elem,
 	  }
       }
 
-  assert (tot_size = di.size());
+  assert (tot_size == di.size());
 }
 
 

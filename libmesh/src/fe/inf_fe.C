@@ -1,4 +1,4 @@
-// $Id: inf_fe.C,v 1.13 2003-02-20 17:09:30 spetersen Exp $
+// $Id: inf_fe.C,v 1.14 2003-02-24 14:35:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -82,16 +82,28 @@ InfFE<Dim,T_radial,T_map>::~InfFE ()
 {
   // delete pointers, if necessary
   if (base_qrule != NULL)
-    delete base_qrule;
-
+    {
+      delete base_qrule;
+      base_qrule = NULL;
+    }
+  
   if (radial_qrule != NULL)
-    delete radial_qrule;
+    {
+      delete radial_qrule;
+      radial_qrule = NULL;
+    }
 
   if (base_elem != NULL)
-    delete base_elem;
-
+    {
+      delete base_elem;
+      base_elem = NULL;
+    }
+  
   if (base_fe != NULL)
-    delete base_fe;
+    {
+      delete base_fe;
+      base_fe = NULL;
+    }
 }
 
 
@@ -112,13 +124,13 @@ void InfFE<Dim,T_radial,T_map>:: attach_quadrature_rule (QBase* q)
   // check this radial order again!!!!
 
   if (Dim != 1)
-  {
-    // build a Dim-1 quadrature rule of the type that we received
-    AutoPtr<QBase> apq( QBase::build(q->type(), Dim-1, base_int_order) );
-    base_qrule = apq.release();
-    base_fe->attach_quadrature_rule(base_qrule);
-  }
-
+    {
+      // build a Dim-1 quadrature rule of the type that we received
+      AutoPtr<QBase> apq( QBase::build(q->type(), Dim-1, base_int_order) );
+      base_qrule = apq.release();
+      base_fe->attach_quadrature_rule(base_qrule);
+    }
+  
   // in radial direction, always use Gauss quadrature
   radial_qrule = new QGauss(1, radial_int_order);
 
@@ -183,7 +195,8 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem)
       base_qrule->init( base_elem->type() );
 
       // initialize the shape functions in the base
-      base_fe->init_base_shape_functions( base_fe->qrule, base_elem );
+      base_fe->init_base_shape_functions( base_fe->qrule->get_points(),
+					  base_elem );
 
     }
 
@@ -226,7 +239,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem)
 
   // Compute the map for this element.  In the future we can specify
   // different types of maps
-  compute_map (qrule, inf_elem);
+  compute_map (qrule->get_weights(), inf_elem);
 
 
   // Compute the shape functions and the derivatives at all of the

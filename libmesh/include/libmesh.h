@@ -1,4 +1,4 @@
-// $Id: libmesh.h,v 1.2 2003-02-17 04:05:39 benkirk Exp $
+// $Id: libmesh.h,v 1.3 2003-02-24 14:35:50 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -27,6 +27,7 @@
 
 // Local includes
 #include "mesh_common.h"
+#include "libmesh_base.h"
 #include "perf_log.h"
 
 
@@ -41,14 +42,14 @@
  * provides a centralized place for performance logging and other
  * functionality.
  */
-class libMesh
+class libMesh : public libMeshBase
 {
 
 private:
 
   /**
    * This class only contains static members and should never be
-   * instantiated, so it has a private default constructor.
+   * instantiated nor derived from, so it has a private default constructor.
    */
   libMesh () {}
   
@@ -85,16 +86,6 @@ public:
    * object destructors.
    */
   static bool closed ();
-
-  /**
-   * @returns the number of processors used in the current simulation.
-   */
-  static unsigned int n_processors();
-
-  /**
-   * @returns the index of the local processor.
-   */
-  static unsigned int processor_id();
   
   /**
    * A \p PerfLog object to log performance.  If the library is configured
@@ -108,16 +99,6 @@ private:
    * Flag that tells if \p init() has been called.
    */
   static bool _is_initialized;
-
-  /**
-   * Total number of processors used.
-   */
-  static int _n_processors;
-
-  /**
-   * The local processor id.
-   */
-  static int _processor_id;
 };
 
 
@@ -156,22 +137,6 @@ bool libMesh::closed()
 
   // Note we can only get here if the library is initialized
   return false;
-}
-
-
-
-inline
-unsigned int libMesh::n_processors()
-{
-  return static_cast<unsigned int>(_n_processors);
-}
-
-
-
-inline
-unsigned int libMesh::processor_id()
-{
-  return static_cast<unsigned int>(_processor_id);
 }
 
 

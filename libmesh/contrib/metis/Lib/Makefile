@@ -27,7 +27,7 @@ all:: $(target)
 ../../lib/$(hosttype)_$(METHOD)/libmetis.so: $(OBJS)
 	@echo "Linking "$@
 	@$(shell mkdir -p ../../lib/$(hosttype)_$(METHOD))
-	@$(CC) -shared -o $@ $(OBJS)
+	@$(CC) -shared -o $@ $(OBJS) $(LDFLAGS)
 
 clean:
 	@rm -f $(OBJS) *~

@@ -1,4 +1,4 @@
-// $Id: point.C,v 1.10 2003-02-21 18:31:30 benkirk Exp $
+// $Id: point.C,v 1.11 2003-02-24 14:35:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -112,19 +112,6 @@ void Point::write_unformatted (std::ostream &out,
 
   if (newline)
     out << std::endl;      
-}
-
-
-
-
-bool Point::operator == (const Point& rhs) const
-{
-  Point res = (*this) - rhs;
-
-  if (res.size_sq() < 1.e-12)
-    return true;
-  
-  return false;
 }
 
 

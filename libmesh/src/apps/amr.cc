@@ -100,15 +100,10 @@ void assemble(EquationSystems& es,
   fe->attach_quadrature_rule (&qrule);
   
   AutoPtr<FEBase> fe_face(FEBase::build(dim, fe_type));
-  QGauss   qface0(dim, FIFTH);
-  //QTrap   qface0(dim);
-  //QSimpson   qface0(dim);
   
-  QGauss   qface1(dim-1, FIFTH);
-  //QTrap   qface1(dim-1);
-  //QSimpson   qface1(dim-1);
+  QGauss   qface(dim-1, FIFTH);
   
-  fe_face->attach_quadrature_rule(&qface0);
+  fe_face->attach_quadrature_rule(&qface);
   
   
   // These are references to cell-specific data
@@ -199,7 +194,7 @@ void assemble(EquationSystems& es,
 	  for (unsigned int side=0; side<elem->n_sides(); side++)
 	    if (elem->neighbor(side) == NULL)
 	      {
-		fe_face->reinit (&qface1, elem, side);
+		fe_face->reinit (elem, side);
 	    
 		//fe_face->print_info();
 	    

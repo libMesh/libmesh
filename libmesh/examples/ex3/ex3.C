@@ -1,4 +1,4 @@
-// $Id: ex3.C,v 1.14 2003-02-20 04:59:58 benkirk Exp $
+// $Id: ex3.C,v 1.15 2003-02-24 14:35:52 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -483,18 +483,17 @@ void assemble_poisson(EquationSystems& es,
 	      AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
 	      
 	      /**
-	       * Boundary integration requires TWO quadraure rules:
-	       * one the dimensionality of the element and another
-	       * one less than the dimensionality of the element.
+	       * Boundary integration requires one quadraure rule,
+	       * with dimensionality one less than the dimensionality
+	       * of the element.
 	       */
-	      QGauss qface0(dim,   FIFTH);
-	      QGauss qface1(dim-1, FIFTH);
+	      QGauss qface(dim-1, FIFTH);
 	      
 	      /**
 	       * Tell the finte element object to use our
 	       * quadrature rule.
 	       */
-	      fe_face->attach_quadrature_rule (&qface0);
+	      fe_face->attach_quadrature_rule (&qface);
 	      
 	      /**
 	       * The value of the shape functions at the quadrature
@@ -519,12 +518,12 @@ void assemble_poisson(EquationSystems& es,
 	       * Compute the shape function values on the element
 	       * face.
 	       */
-	      fe_face->reinit(&qface1, elem, side);
+	      fe_face->reinit(elem, side);
 	      
 	      /**
 	       * Loop over the face quagrature points for integration.
 	       */
-	      for (unsigned int qp=0; qp<qface0.n_points(); qp++)
+	      for (unsigned int qp=0; qp<qface.n_points(); qp++)
 		{
 		  /**
 		   * The location on the boundary of the current
@@ -560,11 +559,10 @@ void assemble_poisson(EquationSystems& es,
 		  for (unsigned int i=0; i<phi_face.size(); i++)
 		    {
 		      Fe[i] += JxW_face[qp]*penalty*value*phi_face[i][qp];
-		    };
-		  
-		}; // end face quadrature point loop	  
-	    }; // end if (elem->neighbor(side) == NULL)
-      }; // end boundary condition section	  
+		    }		  
+		} // end face quadrature point loop	  
+	    } // end if (elem->neighbor(side) == NULL)
+      } // end boundary condition section	  
 
 
       
