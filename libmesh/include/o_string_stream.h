@@ -1,4 +1,4 @@
-// $Id: o_string_stream.h,v 1.4 2003-03-23 15:23:30 ddreyer Exp $
+// $Id: o_string_stream.h,v 1.5 2003-04-02 21:58:39 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -21,6 +21,15 @@
 
 #ifndef __o_string_stream_h__
 #define __o_string_stream_h__
+
+
+
+// Mesh configuration options
+#include "mesh_config.h"
+
+
+
+#ifdef HAVE_SSTREAM
 
 // C++ includes
 #include <sstream>
@@ -80,7 +89,7 @@
  /*
   * class alias
   */
-# define OSSOStringStream           std::ostringstream
+# define OStringStream           std::ostringstream
 
 
 
@@ -124,10 +133,10 @@
   */
 # define OSSInt(o,v,d)              (o).left( (v), (d) )
 
- /*
-  * class alias
-  */
-# define OSSOStringStream           OStringStream
+//  /*
+//   * class alias
+//   */
+// # define OSSOStringStream           OStringStream
 
 
 
@@ -293,6 +302,8 @@
 
 
 
+
+#endif // ifdef HAVE_SSTREAM
 
 #endif // ifndef __o_string_stream_h__
 

@@ -1,4 +1,4 @@
-// $Id: fe_lagrange.C,v 1.12 2003-04-02 14:55:12 benkirk Exp $
+// $Id: fe_lagrange.C,v 1.13 2003-04-02 21:58:43 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -556,17 +556,9 @@ void FE<Dim,T>::compute_constraints (std::map<unsigned int,
   // Only constrain elements in 2,3D.
   if (Dim == 1)
     return;
-
   	      
-  // Get pointers to the elements of interest and its parent.
   assert (elem != NULL);
-  const Elem* parent = elem->parent();
 
-  // This can't happen...  Only level-0 elements have NULL
-  // parents, and no level-0 elements can be at a higher
-  // level than their neighbors!
-  assert (parent != NULL);
-	      
   // Look at the element faces.  Check to see if we need to 
   // build constraints.
   for (unsigned int s=0; s<elem->n_sides(); s++)
@@ -574,6 +566,14 @@ void FE<Dim,T>::compute_constraints (std::map<unsigned int,
       if (elem->neighbor(s)->level() < elem->level()) // constrain dofs shared between
 	{                                                     // this element and ones coarser
 	                                                      // than this element.
+	  // Get pointers to the elements of interest and its parent.
+	  const Elem* parent = elem->parent();
+	  
+	  // This can't happen...  Only level-0 elements have NULL
+	  // parents, and no level-0 elements can be at a higher
+	  // level than their neighbors!
+	  assert (parent != NULL);
+	  
 	  const AutoPtr<Elem> my_side     (elem->build_side(s));
 	  const AutoPtr<Elem> parent_side (parent->build_side(s));
   

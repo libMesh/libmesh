@@ -1,4 +1,4 @@
-// $Id: utility.C,v 1.7 2003-03-23 15:09:19 ddreyer Exp $
+// $Id: utility.C,v 1.8 2003-04-02 21:58:46 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -38,12 +38,12 @@
 // system without creating a perf_log object.
 std::string Utility::system_info()
 {
-  OSSOStringStream out;
+  OStringStream out;
   
 #ifdef HAVE_LOCALE
     
   std::locale loc;
-  OSSOStringStream dateStr;
+  OStringStream dateStr;
   std::ostreambuf_iterator<char, std::char_traits<char> > begin(dateStr);
   time_t tm                  = time(NULL);
   struct tm* tmb             = localtime(&tm);

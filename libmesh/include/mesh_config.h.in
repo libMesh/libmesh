@@ -29,8 +29,20 @@
    interface */
 #undef HAVE_EXODUS_API
 
+/* Define to 1 if you have the <ext/hash_map> header file. */
+#undef HAVE_EXT_HASH_MAP
+
+/* Define to 1 if you have the <ext/hash_set> header file. */
+#undef HAVE_EXT_HASH_SET
+
 /* Define to 1 if you have the <getopt.h> header file. */
 #undef HAVE_GETOPT_H
+
+/* Define to 1 if you have the <hash_map> header file. */
+#undef HAVE_HASH_MAP
+
+/* Define to 1 if you have the <hash_set> header file. */
+#undef HAVE_HASH_SET
 
 /* Flag indicating whether the library shall be compiled to support hdf4 files
    */
@@ -42,7 +54,7 @@
 /* Flag indicating whether or not LASPACK iterative solvers are available */
 #undef HAVE_LASPACK
 
-/* Define to 1 if you have the <locale> header file. */
+/* define if the compiler has stringstream */
 #undef HAVE_LOCALE
 
 /* Define to 1 if you have the <memory.h> header file. */
@@ -54,12 +66,12 @@
 /* Flag indicating whether or not MPI is available */
 #undef HAVE_MPI
 
+/* define if the compiler implements namespaces */
+#undef HAVE_NAMESPACES
+
 /* Flag indicating whether the library shall be compiled to support netcdf
    files */
 #undef HAVE_NETCDF
-
-/* Define to 1 if you have the <ostream> header file. */
-#undef HAVE_OSTREAM
 
 /* Flag indicating whether or not Petsc is available */
 #undef HAVE_PETSC
@@ -70,7 +82,7 @@
 /* Flag indicating whether or not Space filling curves are available */
 #undef HAVE_SFCURVES
 
-/* Define to 1 if you have the <sstream> header file. */
+/* define if the compiler has locale */
 #undef HAVE_SSTREAM
 
 /* Define to 1 if you have the <stdint.h> header file. */

@@ -1,4 +1,4 @@
-// $Id: xdr_cxx.h,v 1.9 2003-03-23 15:09:00 ddreyer Exp $
+// $Id: xdr_cxx.h,v 1.10 2003-04-02 21:58:41 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,8 +31,6 @@
 #  include <rpc/rpc.h>
 #endif
 
-//#include <fstream>
-//#include <iomanip>
 #include <vector>
 #include <string>
 #ifdef USE_COMPLEX_NUMBERS
@@ -385,7 +383,7 @@ private:
    * features also for compilers with broken
    * iostream
    */
-  OFSOFStream out;
+  OFStream out;
 
   /**
    * The input file stream.
