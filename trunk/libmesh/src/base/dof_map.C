@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.57 2004-03-21 04:19:29 benkirk Exp $
+// $Id: dof_map.C,v 1.58 2004-03-21 04:27:06 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -344,8 +344,8 @@ void DofMap::distribute_dofs(MeshBase& mesh)
   // that are neighbors of the elements on the local processor
   // (for discontinuous elements)
   {
-    const_active_local_elem_iterator       elem_it (mesh.elements_begin());
-    const const_active_local_elem_iterator elem_end(mesh.elements_end());
+    active_local_elem_iterator       elem_it (mesh.elements_begin());
+    const active_local_elem_iterator elem_end(mesh.elements_end());
 
     std::vector<unsigned int> di;
 
