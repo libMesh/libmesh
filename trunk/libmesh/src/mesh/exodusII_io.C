@@ -1,4 +1,4 @@
-// $Id: exodusII_io.C,v 1.4 2004-11-15 09:30:54 spetersen Exp $
+// $Id: exodusII_io.C,v 1.5 2004-11-17 07:52:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -23,6 +23,7 @@
 
 // Local includes
 #include "exodusII_io.h"
+#include "mesh_base.h"
 #include "enum_elem_type.h"
 #include "elem.h"
 
@@ -1007,7 +1008,7 @@ void ExodusII_IO::read (const std::string& fname)
 #else
   
   // Get a reference to the mesh we are reading
-  Mesh& mesh = this->mesh();
+  MeshBase& mesh = MeshInput<MeshBase>::mesh();
   
   // Clear any existing mesh data
   mesh.clear();

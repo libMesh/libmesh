@@ -1,0 +1,162 @@
+// $Id: mesh_output.h,v 1.1 2004-11-17 07:52:17 benkirk Exp $
+
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
+  
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+  
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+  
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+
+#ifndef __mesh_output_h__
+#define __mesh_output_h__
+
+
+// C++ inludes
+#include <string>
+#include <vector>
+
+// Local includes
+#include "libmesh_common.h"
+#include "equation_systems.h"
+
+
+
+/**
+ * This class defines an abstract interface for \p Mesh output.
+ * Specific classes derived from this class actually implement
+ * writing various mesh formats.
+ *
+ * \author Benjamin S. Kirk
+ * \date 2004
+ * \version $Revision: 1.1 $
+ */
+
+// ------------------------------------------------------------
+// MeshOutput class definition
+template <class MT>
+class MeshOutput
+{
+ protected:
+
+  /**
+   * Default constructor. Will set the _obj to NULL, effectively
+   * rendering this object useless.
+   */
+  MeshOutput ();
+  
+  /**
+   * Constructor.  Takes a reference to a constant object.
+   * This constructor will only allow us to write the object.
+   */
+  MeshOutput (const MT&);
+
+  
+ public:
+
+  /**
+   * Destructor.
+   */
+  virtual ~MeshOutput ();
+  
+  /**
+   * This method implements writing a mesh to a specified file.
+   */
+  virtual void write (const std::string&) = 0;
+
+  /**
+   * This method implements writing a mesh with data to a specified file
+   * where the data is taken from the \p EquationSystems object.
+   */
+  virtual void write_equation_systems (const std::string&,
+				       const EquationSystems&);
+
+  /**
+   * This method implements writing a mesh with nodal data to a
+   * specified file where the nodal data and variable names are provided.
+   */
+  virtual void write_nodal_data (const std::string&,
+				 const std::vector<Number>&,
+				 const std::vector<std::string>&) { error(); }
+
+  
+ protected:
+
+
+  /**
+   * Returns the object as a read-only reference.
+   */
+  const MT& mesh() const;
+
+  
+ private:
+  
+
+  /**
+   *  A pointer to a constant object.
+   * This allows us to write the object to file.
+   */
+  const MT* const _obj;
+  
+};
+
+
+
+// ------------------------------------------------------------
+// MeshOutput inline members
+template <class MT>
+inline
+MeshOutput<MT>::MeshOutput (const MT& obj) :
+  _obj (&obj)
+{
+}
+
+
+
+template <class MT>
+inline
+MeshOutput<MT>::~MeshOutput ()
+{
+}
+
+
+
+template <class MT>
+inline
+void MeshOutput<MT>::write_equation_systems (const std::string& fname,
+					     const EquationSystems& es)
+{
+  // Build the nodal solution values & get the variable
+  // names from the EquationSystems object
+  std::vector<Number>      soln;
+  std::vector<std::string> names;
+
+  es.build_variable_names  (names);
+  es.build_solution_vector (soln);
+
+  this->write_nodal_data (fname, soln, names);  
+}
+
+
+
+template <class MT>
+inline
+const MT& MeshOutput<MT>::mesh () const
+{
+  assert (_obj != NULL);
+  return *_obj;
+}
+
+
+#endif // #define __mesh_io_h__

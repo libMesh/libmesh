@@ -1,4 +1,4 @@
-// $Id: ucd_io.h,v 1.2 2004-04-07 21:42:31 benkirk Exp $
+// $Id: ucd_io.h,v 1.3 2004-11-17 07:52:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,8 @@
 
 // Local includes
 #include "libmesh_common.h"
-#include "mesh_io.h"
+#include "mesh_input.h"
+#include "mesh_output.h"
 
 // Forward declarations
 class MeshBase;
@@ -32,14 +33,15 @@ class MeshBase;
 
 
 /**
- * This class implements writing meshes in the AVS's UCD format.
+ * This class implements reading & writing meshes in the AVS's UCD format.
  *
  * @author Benjamin S. Kirk, 2004
  */
 
 // ------------------------------------------------------------
 // UCDIO class definition
-class UCDIO : public MeshIO<MeshBase>
+class UCDIO : public MeshInput<MeshBase>,
+	      public MeshOutput<MeshBase>
 {
  public:
   
@@ -92,7 +94,8 @@ class UCDIO : public MeshIO<MeshBase>
 // UCDIO inline members
 inline
 UCDIO::UCDIO (MeshBase& mesh) :
-  MeshIO<MeshBase> (mesh)
+  MeshInput<MeshBase> (mesh),
+  MeshOutput<MeshBase>(mesh)
 {
 }
 
@@ -100,7 +103,7 @@ UCDIO::UCDIO (MeshBase& mesh) :
 
 inline
 UCDIO::UCDIO (const MeshBase& mesh) :
-  MeshIO<MeshBase> (mesh)
+  MeshOutput<MeshBase> (mesh)
 {
 }
 

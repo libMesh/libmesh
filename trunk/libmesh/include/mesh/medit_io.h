@@ -22,7 +22,7 @@
 
 // Local includes
 #include "libmesh_common.h"
-#include "mesh_io.h"
+#include "mesh_output.h"
 
 // Forward declarations:
 class MeshBase;
@@ -42,7 +42,7 @@ class MeshBase;
 
 // ------------------------------------------------------------
 // medit_io class definition
-class MEDITIO : public MeshIO<MeshBase>
+class MEDITIO : public MeshOutput<MeshBase>
 {
  public:
 
@@ -102,16 +102,16 @@ private:
 // medit_io inline members
 inline
 MEDITIO::MEDITIO (const MeshBase& mesh) :
-  MeshIO<MeshBase>  (mesh),
-  _binary        (false)
+  MeshOutput<MeshBase> (mesh),
+  _binary (false)
 {
 }
 
 inline
 MEDITIO::MEDITIO (const MeshBase& mesh, unsigned int c) :
-  MeshIO<MeshBase>  (mesh),
-  _binary        (false),
-  scalar_idx     (c)
+  MeshOutput<MeshBase> (mesh),
+  _binary    (false),
+  scalar_idx (c)
 {
 }
 

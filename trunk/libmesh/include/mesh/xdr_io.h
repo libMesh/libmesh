@@ -1,4 +1,4 @@
-// $Id: xdr_io.h,v 1.2 2004-11-13 02:10:14 benkirk Exp $
+// $Id: xdr_io.h,v 1.3 2004-11-17 07:52:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -26,10 +26,11 @@
 // C++ inludes
 
 // Local includes
-#include "mesh_io.h"
+#include "mesh_input.h"
+#include "mesh_output.h"
 
 // Forward declarations
-class Mesh;
+class MeshBase;
 
 
 /**
@@ -39,7 +40,8 @@ class Mesh;
 
 // ------------------------------------------------------------
 // XdrIO class definition
-class XdrIO : public MeshIO<Mesh>
+class XdrIO : public MeshInput<MeshBase>,
+	      public MeshOutput<MeshBase>
 {
 
  public:
@@ -51,7 +53,7 @@ class XdrIO : public MeshIO<Mesh>
    * between ASCII (\p false, the default) or binary (\p true)
    * files.
    */
-  XdrIO (Mesh&,       const bool=false);
+  XdrIO (MeshBase&,       const bool=false);
 
   /**
    * Constructor.  Takes a reference to a constant mesh object.
@@ -60,7 +62,7 @@ class XdrIO : public MeshIO<Mesh>
    * between ASCII (\p false, the default) or binary (\p true)
    * files.
    */
-  XdrIO (const Mesh&, const bool=false);
+  XdrIO (const MeshBase&, const bool=false);
   
   /**
    * Destructor.
@@ -205,8 +207,9 @@ class XdrIO : public MeshIO<Mesh>
 // ------------------------------------------------------------
 // MeshIO inline members
 inline
-XdrIO::XdrIO (Mesh& mesh, const bool binary) :
-  MeshIO<Mesh> (mesh),
+XdrIO::XdrIO (MeshBase& mesh, const bool binary) :
+  MeshInput<MeshBase> (mesh),
+  MeshOutput<MeshBase>(mesh),
   _binary (binary)
 {
 }
@@ -214,8 +217,8 @@ XdrIO::XdrIO (Mesh& mesh, const bool binary) :
 
 
 inline
-XdrIO::XdrIO (const Mesh& mesh, const bool binary) :
-  MeshIO<Mesh> (mesh),
+XdrIO::XdrIO (const MeshBase& mesh, const bool binary) :
+  MeshOutput<MeshBase>(mesh),
   _binary (binary)
 {
 }

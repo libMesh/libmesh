@@ -1,4 +1,4 @@
-// $Id: unv_io.h,v 1.4 2004-10-26 22:00:43 jwpeterson Exp $
+// $Id: unv_io.h,v 1.5 2004-11-17 07:52:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -29,10 +29,11 @@
 #include <string>
 
 // Local includes
-#include "mesh_io.h"
+#include "mesh_input.h"
+#include "mesh_output.h"
 
 // Forward declarations
-class Mesh;
+class MeshBase;
 
 
 /**
@@ -43,7 +44,8 @@ class Mesh;
 
 // ------------------------------------------------------------
 // UNVIO class definition
-class UNVIO : public MeshIO<Mesh>
+class UNVIO : public MeshInput<MeshBase>,
+	      public MeshOutput<MeshBase>
 {
 
  public:
@@ -52,13 +54,13 @@ class UNVIO : public MeshIO<Mesh>
    * Constructor.  Takes a writeable reference to a mesh object.
    * This is the constructor required to read a mesh.
    */
-  UNVIO (Mesh& mesh, MeshData& mesh_data);
+  UNVIO (MeshBase& mesh, MeshData& mesh_data);
 
   /**
    * Constructor.  Takes a reference to a constant mesh object.
    * This constructor will only allow us to write the mesh.
    */
-  UNVIO (const Mesh& mesh, MeshData& mesh_data);
+  UNVIO (const MeshBase& mesh, MeshData& mesh_data);
   
   /**
    * Destructor.
@@ -162,7 +164,7 @@ class UNVIO : public MeshIO<Mesh>
   /**
    * Outputs nodes to the file \p out_file.
    * For this to work, the \p MeshData of the current
-   * \p Mesh has to be active.  Do not use this directly,
+   * \p MeshBase has to be active.  Do not use this directly,
    * but through the proper write method.
    */
   void node_out (std::ostream& out_file);
@@ -236,8 +238,9 @@ class UNVIO : public MeshIO<Mesh>
 // ------------------------------------------------------------
 // MeshIO inline members
 inline
-UNVIO::UNVIO (Mesh& mesh, MeshData& mesh_data) :
-  MeshIO<Mesh> (mesh),
+UNVIO::UNVIO (MeshBase& mesh, MeshData& mesh_data) :
+  MeshInput<MeshBase> (mesh),
+  MeshOutput<MeshBase>(mesh),
   _verbose (false),
   _mesh_data (mesh_data)
 {
@@ -246,8 +249,8 @@ UNVIO::UNVIO (Mesh& mesh, MeshData& mesh_data) :
 
 
 inline
-UNVIO::UNVIO (const Mesh& mesh, MeshData& mesh_data) :
-  MeshIO<Mesh> (mesh),
+UNVIO::UNVIO (const MeshBase& mesh, MeshData& mesh_data) :
+  MeshOutput<MeshBase> (mesh),
   _verbose (false),
   _mesh_data (mesh_data)
 {

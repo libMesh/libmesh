@@ -1,4 +1,4 @@
-// $Id: tetgen_io.C,v 1.9 2004-11-08 00:11:05 jwpeterson Exp $
+// $Id: tetgen_io.C,v 1.10 2004-11-17 07:52:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -23,6 +23,7 @@
 
 // Local includes
 #include "tetgen_io.h"
+#include "mesh_base.h"
 #include "cell_tet4.h"
 
 
@@ -34,7 +35,7 @@ void TetGenIO::read (const std::string& name)
   std::string name_node, name_ele, dummy;
 
   // get a reference to the mesh
-  Mesh& mesh = this->mesh();
+  MeshBase& mesh = MeshInput<MeshBase>::mesh();
   
   // tetgen only works in 3D
   assert (mesh.mesh_dimension() == 3);
@@ -117,7 +118,7 @@ void TetGenIO::node_in (std::istream& node_stream)
   assert (node_stream.good());
 
   // Get a reference to the mesh
-  Mesh& mesh = this->mesh();
+  MeshBase& mesh = MeshInput<MeshBase>::mesh();
   
   unsigned int dimension=0, nAttributes=0, BoundaryMarkers=0;
 
@@ -166,7 +167,7 @@ void TetGenIO::element_in (std::istream& ele_stream)
   assert (ele_stream.good());
 
   // Get a reference to the mesh
-  Mesh& mesh = this->mesh();
+  MeshBase& mesh = MeshInput<MeshBase>::mesh();
   
   // Read the elements from the ele_stream (*.ele file). 
   unsigned int element_lab, n_nodes, nAttri=0;
@@ -218,7 +219,7 @@ void TetGenIO::element_in (std::istream& ele_stream)
 void TetGenIO::write (const std::string& fname)
 {
   // assert three dimensions (should be extended later)
-  assert (this->mesh().mesh_dimension() == 3);
+  assert (MeshOutput<MeshBase>::mesh().mesh_dimension() == 3);
 
   if (!(fname.rfind(".poly") < fname.size())) 
     {
@@ -233,7 +234,7 @@ void TetGenIO::write (const std::string& fname)
   assert (out.good());
 
   // Get a reference to the mesh
-  const Mesh& mesh = this->cmesh();
+  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
   
   // Begin interfacing with the .poly file
   {

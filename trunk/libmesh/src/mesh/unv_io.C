@@ -1,4 +1,4 @@
-// $Id: unv_io.C,v 1.13 2004-11-08 00:11:05 jwpeterson Exp $
+// $Id: unv_io.C,v 1.14 2004-11-17 07:52:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -311,7 +311,7 @@ void UNVIO::write_implementation (std::ostream& out_file)
     }
 
 
-  Mesh& mesh = this->mesh();
+  MeshBase& mesh = MeshInput<MeshBase>::mesh();
   
   // already know these data, so initialize
   // them.  Does not hurt.
@@ -534,7 +534,7 @@ void UNVIO::node_in (std::istream& in_file)
       error();
     }
 
-  Mesh& mesh = this->mesh();
+  MeshBase& mesh = MeshInput<MeshBase>::mesh();
   
   unsigned int node_lab;           // label of the node
   unsigned int exp_coord_sys_num,  // export coordinate system number       (not supported yet)
@@ -628,7 +628,7 @@ void UNVIO::element_in (std::istream& in_file)
   if (this->verbose())
     std::cout << "  Reading elements" << std::endl;
 
-  Mesh& mesh = this->mesh();
+  MeshBase& mesh = MeshInput<MeshBase>::mesh();
 
   // adjust the \p istream to our
   // position
@@ -934,7 +934,7 @@ void UNVIO::node_out (std::ostream& out_file)
   unsigned int color_dummy          = 0; // color(not supported yet)
 
   // A reference to the parent class's mesh
-  const Mesh& mesh = this->cmesh();
+  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
 
 //   const_node_iterator       nd  (mesh.nodes_begin());
 //   const const_node_iterator end (mesh.nodes_end());
@@ -1019,7 +1019,7 @@ void UNVIO::element_out(std::ostream& out_file)
   unsigned int n_elem_written=0;
 
   // A reference to the parent class's mesh
-  const Mesh& mesh = this->cmesh();
+  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
 
 //   const_elem_iterator        it  (mesh.elements_begin());
 //   const const_elem_iterator  end (mesh.elements_end());

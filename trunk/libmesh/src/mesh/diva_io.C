@@ -1,4 +1,4 @@
-// $Id: diva_io.C,v 1.5 2004-11-14 18:51:58 jwpeterson Exp $
+// $Id: diva_io.C,v 1.6 2004-11-17 07:52:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -69,7 +69,10 @@ void DivaIO::write_stream (std::ostream& out)
   
   // Can't use a constant mesh reference since we have to
   // sync the boundary info.
-  Mesh& mesh = this->mesh();
+  here();
+  std::cerr << "WARNING...  Sure you want to do this?"
+	    << std::endl;
+  Mesh& mesh = const_cast<Mesh&>(MeshOutput<Mesh>::mesh());
 
   if (mesh.mesh_dimension() < 3)
     {

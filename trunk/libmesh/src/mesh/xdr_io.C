@@ -1,4 +1,4 @@
-// $Id: xdr_io.C,v 1.5 2004-11-15 22:09:14 benkirk Exp $
+// $Id: xdr_io.C,v 1.6 2004-11-17 07:52:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -28,7 +28,7 @@
 #include <string>
 
 // Local includes
-#include "mesh.h"
+#include "mesh_base.h"
 #include "mesh_data.h"
 #include "mesh_tools.h"
 #include "cell_hex27.h" // Needed for MGF-style Hex27 meshes
@@ -1896,7 +1896,7 @@ void XdrIO::write_mgf_soln (const std::string& name,
 void XdrIO::read_ascii (const std::string& name, const unsigned int originator)
 {
   // get a writeable reference to the underlying mesh
-  Mesh& mesh = this->mesh();
+  MeshBase& mesh = MeshInput<MeshBase>::mesh();
   
   // clear any existing mesh data
   mesh.clear();
@@ -1919,7 +1919,7 @@ void XdrIO::read_binary (const std::string& name, const unsigned int originator)
 #else
   
   // get a writeable reference to the underlying mesh
-  Mesh& mesh = this->mesh();
+  MeshBase& mesh = MeshInput<MeshBase>::mesh();
   
   // clear any existing mesh data
   mesh.clear();
@@ -1962,7 +1962,7 @@ void XdrIO::read_mesh (const std::string& name,
 		       MeshData* mesh_data)
 {
   // get a writeable reference to the mesh
-  Mesh& mesh = this->mesh();
+  MeshBase& mesh = MeshInput<MeshBase>::mesh();
 
   // clear any data in the mesh
   mesh.clear();
@@ -2196,7 +2196,7 @@ void XdrIO::write_mesh (const std::string& name,
 			const unsigned int mgf_originator)
 {
   // get a read-only reference to the mesh
-  const Mesh& mesh = this->cmesh();
+  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
   
   // Create an XdrMESH object.
   XdrMESH m;
@@ -2443,7 +2443,7 @@ void XdrIO::write_soln (const std::string& name,
 			std::vector<std::string>& var_names) const
 {
   // get a read-only reference to the mesh
-  const Mesh& mesh = this->cmesh();
+  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
   
   // Create an XdrSOLN object.
   XdrSOLN s;

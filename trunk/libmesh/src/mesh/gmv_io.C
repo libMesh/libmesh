@@ -1,4 +1,4 @@
-// $Id: gmv_io.C,v 1.16 2004-11-15 00:20:52 benkirk Exp $
+// $Id: gmv_io.C,v 1.17 2004-11-17 07:52:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -240,7 +240,7 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
   assert (out.good());
 
   // Get a reference to the mesh
-  const MeshBase& mesh = this->cmesh();
+  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
 
   // Begin interfacing with the GMV data file
   {
@@ -388,7 +388,7 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
   assert (out.good());
 
   // Get a reference to the mesh
-  const MeshBase& mesh = this->cmesh();
+  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
   
   // Begin interfacing with the GMV data file
   {
@@ -717,7 +717,7 @@ void GMVIO::write_binary (const std::string& fname,
   assert (out.good());
 
   // get a reference to the mesh
-  const MeshBase& mesh = this->cmesh();
+  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
   
   char buf[80];
 
@@ -987,7 +987,7 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
   std::vector<Number>      v;
 
   // Get a reference to the mesh
-  const MeshBase& mesh = this->cmesh();
+  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
   
   es.build_variable_names  (solution_names);
   es.build_discontinuous_solution_vector (v);

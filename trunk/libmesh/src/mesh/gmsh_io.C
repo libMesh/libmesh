@@ -1,4 +1,4 @@
-// $Id: gmsh_io.C,v 1.6 2004-11-14 18:51:58 jwpeterson Exp $
+// $Id: gmsh_io.C,v 1.7 2004-11-17 07:52:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -68,7 +68,7 @@ void GmshIO::write_stream (std::ostream& out)
   assert (out.good());
   
   // Get a const reference to the mesh
-  const MeshBase& mesh = this->cmesh();
+  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
   
   // Note: we are using version 2.0 of the gmsh output format.
   

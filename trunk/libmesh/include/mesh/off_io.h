@@ -1,4 +1,4 @@
-// $Id: off_io.h,v 1.2 2004-04-07 21:42:31 benkirk Exp $
+// $Id: off_io.h,v 1.3 2004-11-17 07:52:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -22,7 +22,7 @@
 
 // Local includes
 #include "libmesh_common.h"
-#include "mesh_io.h"
+#include "mesh_input.h"
 
 // Forward declarations
 class MeshBase;
@@ -37,7 +37,7 @@ class MeshBase;
 
 // ------------------------------------------------------------
 // OFFIO class definition
-class OFFIO : public MeshIO<MeshBase>
+class OFFIO : public MeshInput<MeshBase>
 {
 public:
   /**
@@ -66,7 +66,7 @@ private:
 // OFFIO inline members
 inline
 OFFIO::OFFIO (MeshBase& mesh) :
-  MeshIO<MeshBase>  (mesh)
+  MeshInput<MeshBase> (mesh)
 {}
 
 
