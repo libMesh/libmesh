@@ -1,4 +1,4 @@
-// $Id: petsc_vector.C,v 1.28 2004-02-15 15:35:31 benkirk Exp $
+// $Id: petsc_vector.C,v 1.29 2004-03-09 18:52:39 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -179,7 +179,6 @@ void PetscVector<T>::add_vector (const NumericVector<T>& V,
 
 
 template <typename T>
-inline
 void PetscVector<T>::add_vector (const NumericVector<T>& V_in,
 				 SparseMatrix<T>& A_in)
 {
