@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.30 2003-08-17 19:06:33 ddreyer Exp $
+// $Id: elem.h,v 1.31 2003-08-18 14:44:52 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -409,16 +409,22 @@ class Elem : public ReferenceCountedObject<Elem>,
    * \p n has to be greater or equal \p this->n_vertices().  For
    * linear elements this returns 0.
    */
-  virtual unsigned int second_order_adjacent_vertex (const unsigned int n,
-						     const unsigned int v) const;
+  virtual unsigned short int second_order_adjacent_vertex (const unsigned int n,
+							   const unsigned int v) const;
 
   /**
    * @returns the element type of the associated second-order element,
    * e.g. when \p this is a \p TET4, then \p TET10 is returned.  Returns
    * \p INVALID_ELEM for second order or other elements that should not
    * or cannot be converted into higher order equivalents.
+   *
+   * For some elements, there exist two second-order equivalents, e.g.
+   * for \p Quad4 there is \p Quad8 and \p Quad9.  When the optional
+   * \p full_ordered is \p true, then \p QUAD9 is returned.  When
+   * \p full_ordered is \p false, then \p QUAD8 is returned.
    */
-  virtual ElemType second_order_equivalent_type () const;
+  static ElemType second_order_equivalent_type (const ElemType et,
+						const bool full_ordered=true);
 
   /**
    * @returns the refinement level of the current element.  If the

@@ -1,4 +1,4 @@
-// $Id: edge_edge3.h,v 1.12 2003-08-07 19:25:31 ddreyer Exp $
+// $Id: edge_edge3.h,v 1.13 2003-08-18 14:44:52 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -88,9 +88,9 @@ class Edge3 : public Edge
    * @returns the element-local number of the  \f$ v^{th} \f$ vertex
    * that defines the \f$ n^{th} \f$ second-order node.
    */
-  unsigned int second_order_adjacent_vertex (const unsigned int,
-					     const unsigned int v) const
-      { return v; }
+  unsigned short int second_order_adjacent_vertex (const unsigned int,
+						   const unsigned int v) const
+      { return static_cast<unsigned short int>(v); }
 
 
 #ifdef ENABLE_INFINITE_ELEMENTS

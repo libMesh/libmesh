@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex.h,v 1.3 2003-08-07 19:25:30 ddreyer Exp $
+// $Id: cell_inf_hex.h,v 1.4 2003-08-18 14:44:51 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -141,7 +141,7 @@ protected:
    * this.  Matrix that tells which vertices define the location
    * of mid-side (or second-order) nodes.  
    */
-  static const unsigned int _second_order_adjacent_vertices[8][2];
+  static const unsigned short int _second_order_adjacent_vertices[8][2];
   
 
 private:

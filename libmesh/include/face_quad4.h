@@ -1,4 +1,4 @@
-// $Id: face_quad4.h,v 1.12 2003-08-07 19:25:31 ddreyer Exp $
+// $Id: face_quad4.h,v 1.13 2003-08-18 14:44:52 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -88,12 +88,6 @@ public:
 
   unsigned int vtk_element_type (const unsigned int) const
   { return 9; }
-
-  /**
-   * @returns \p QUAD9 (alternatively, \p QUAD8
-   * could be returned)
-   */
-  ElemType second_order_equivalent_type () const {return QUAD9; }
 
   
 protected:

@@ -1,4 +1,4 @@
-// $Id: mesh_gmv_support.C,v 1.23 2003-06-24 05:33:51 benkirk Exp $
+// $Id: mesh_gmv_support.C,v 1.24 2003-08-18 14:44:52 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -238,13 +238,18 @@ void MeshBase::write_gmv(std::ostream& out,
 			<< conn[4] << " ";
 		    }
 #ifndef  ENABLE_INFINITE_ELEMENTS
-		else if ((*it)->type() == PRISM6)
+		else if (((*it)->type() == PRISM6)  ||
+			 ((*it)->type() == PRISM15) ||
+			 ((*it)->type() == PRISM18))
 #else
 		else if (((*it)->type() == PRISM6)     ||
+			 ((*it)->type() == PRISM15)    ||
+			 ((*it)->type() == PRISM18)    ||
 			 ((*it)->type() == INFPRISM6)  ||
 			 ((*it)->type() == INFPRISM12))
 #endif
 		  {
+		      here();
 		    /**
 		     * Note that the prisms are treated as
 		     * degenerated phex8's.

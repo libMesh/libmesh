@@ -1,4 +1,4 @@
-// $Id: cell_hex8.h,v 1.14 2003-08-07 19:25:30 ddreyer Exp $
+// $Id: cell_hex8.h,v 1.15 2003-08-18 14:44:51 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -94,14 +94,6 @@ public:
   
   unsigned int vtk_element_type (const unsigned int) const
   { return 12; }
-
-  /**
-   * @returns \p HEX27 (alternatively return \p HEX20,
-   * but most of the \p FE class is currently based on
-   * \p HEX27 and not on \p HEX20.  Also \p InfHex8 should
-   * then be changed, too)
-   */
-  ElemType second_order_equivalent_type () const { return HEX27; }
   
 
 protected:

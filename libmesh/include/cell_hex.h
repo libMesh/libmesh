@@ -1,4 +1,4 @@
-// $Id: cell_hex.h,v 1.11 2003-05-23 23:17:47 benkirk Exp $
+// $Id: cell_hex.h,v 1.12 2003-08-18 14:44:51 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -115,6 +115,15 @@ protected:
 #endif  
 
 
+  /**
+   * Matrix that tells which vertices define the location
+   * of mid-side (or second-order) nodes.  This matrix
+   * is kept here, since the matrix (for the first 12
+   * higher-order nodes) is identical for \p Hex20 and
+   * \p Hex27.
+   */
+  static const unsigned short int _second_order_adjacent_vertices[12][2];
+
 
 private:
 
@@ -129,6 +138,8 @@ private:
   static const unsigned int _side_children_matrix[6][4];
   
 #endif  
+  
+
 };
 
 

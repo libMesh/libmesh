@@ -1,4 +1,4 @@
-// $Id: cell_prism18.C,v 1.5 2003-08-07 19:25:31 ddreyer Exp $
+// $Id: cell_prism18.C,v 1.6 2003-08-18 14:44:52 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -414,30 +414,46 @@ unsigned int Prism18::n_second_order_adjacent_vertices (const unsigned int n) co
 
 
 
-unsigned int Prism18::second_order_adjacent_vertex (const unsigned int n,
-						    const unsigned int v) const
+unsigned short int Prism18::second_order_adjacent_vertex (const unsigned int n,
+							  const unsigned int v) const
 { 
   assert (n >= this->n_vertices());
   assert (n <  this->n_nodes());
-  return _second_order_adjacent_vertices[n-this->n_vertices()][v]; 
+
+  switch (n)
+    {
+      /*
+       * These nodes are unique to \p Prism18,
+       * let our _remaining_... matrix handle
+       * this.
+       */
+      case 15:
+      case 16:
+      case 17:
+      {
+	assert (v < 4);
+	return _remaining_second_order_adjacent_vertices[n-15][v]; 
+      }
+
+      /*
+       * All other second-order nodes (6,...,14) are
+       * identical with Prism15 and are therefore
+       * delegated to the _second_order matrix of
+       * \p Prism
+       */
+      default:
+      {
+	assert (v < 2);
+	return _second_order_adjacent_vertices[n-this->n_vertices()][v]; 
+      }
+
+    }
 }
 
 
 
-const unsigned int Prism18::_second_order_adjacent_vertices[12][4] = 
+const unsigned short int Prism18::_remaining_second_order_adjacent_vertices[3][4] = 
 {
-  { 0,  1, 42, 42}, // vertices adjacent to node 6 
-  { 1,  2, 42, 42}, // vertices adjacent to node 7 
-  { 0,  2, 42, 42}, // vertices adjacent to node 8 
-
-  { 0,  3, 42, 42}, // vertices adjacent to node 9 
-  { 1,  4, 42, 42}, // vertices adjacent to node 10 
-  { 2,  5, 42, 42}, // vertices adjacent to node 11
-
-  { 3,  4, 42, 42}, // vertices adjacent to node 12
-  { 4,  5, 42, 42}, // vertices adjacent to node 13
-  { 3,  5, 42, 42}, // vertices adjacent to node 14
-
   { 0,  1,  3,  4}, // vertices adjacent to node 15
   { 1,  2,  4,  5}, // vertices adjacent to node 16
   { 0,  2,  3,  5}  // vertices adjacent to node 17

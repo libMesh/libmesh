@@ -1,4 +1,4 @@
-// $Id: face_quad9.h,v 1.13 2003-08-07 19:25:31 ddreyer Exp $
+// $Id: face_quad9.h,v 1.14 2003-08-18 14:44:52 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -114,8 +114,8 @@ public:
    * that defines the \f$ n^{th} \f$ second-order node.
    * Note that \p n is counted as depicted above, \f$ 4 \le n < 8 \f$.
    */
-  unsigned int second_order_adjacent_vertex (const unsigned int n,
-					     const unsigned int v) const;
+  unsigned short int second_order_adjacent_vertex (const unsigned int n,
+						   const unsigned int v) const;
 
   
 protected:
@@ -139,14 +139,6 @@ protected:
   
 #endif
 
-
-private:
-  
-  /**
-   * Matrix that tells which vertices define the location
-   * of mid-side (or second-order) nodes
-   */
-  static const unsigned int _second_order_adjacent_vertices[5][4];
     
 };
 

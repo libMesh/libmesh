@@ -1,4 +1,4 @@
-// $Id: cell_prism15.C,v 1.4 2003-08-07 19:25:31 ddreyer Exp $
+// $Id: cell_prism15.C,v 1.5 2003-08-18 14:44:52 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -167,27 +167,13 @@ void Prism15::vtk_connectivity(const unsigned int sc,
 
 
 
-unsigned int Prism15::second_order_adjacent_vertex (const unsigned int n,
-						    const unsigned int v) const
+unsigned short int Prism15::second_order_adjacent_vertex (const unsigned int n,
+							  const unsigned int v) const
 { 
   assert (n >= this->n_vertices());
   assert (n <  this->n_nodes());
+  assert (v < 2);
   return _second_order_adjacent_vertices[n-this->n_vertices()][v]; 
 }
 
 
-
-const unsigned int Prism15::_second_order_adjacent_vertices[9][2] = 
-{
-  { 0,  1}, // vertices adjacent to node 6 
-  { 1,  2}, // vertices adjacent to node 7 
-  { 0,  2}, // vertices adjacent to node 8 
-
-  { 0,  3}, // vertices adjacent to node 9 
-  { 1,  4}, // vertices adjacent to node 10 
-  { 2,  5}, // vertices adjacent to node 11
-
-  { 3,  4}, // vertices adjacent to node 12
-  { 4,  5}, // vertices adjacent to node 13
-  { 3,  5}  // vertices adjacent to node 14
-};

@@ -1,4 +1,4 @@
-// $Id: face_quad.C,v 1.11 2003-05-23 23:17:56 benkirk Exp $
+// $Id: face_quad.C,v 1.12 2003-08-18 14:44:52 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -197,6 +197,19 @@ std::pair<Real, Real> Quad::qual_bounds (const ElemQuality q) const
 
   return bounds;
 }
+
+
+
+
+const unsigned short int Quad::_second_order_adjacent_vertices[4][2] = 
+{
+  {0, 1}, // vertices adjacent to node 4 
+  {1, 2}, // vertices adjacent to node 5 
+  {2, 3}, // vertices adjacent to node 6 
+  {0, 3}  // vertices adjacent to node 7 
+};
+
+
 
 
 

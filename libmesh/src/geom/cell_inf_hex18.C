@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex18.C,v 1.18 2003-08-07 19:25:31 ddreyer Exp $
+// $Id: cell_inf_hex18.C,v 1.19 2003-08-18 14:44:52 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -279,11 +279,12 @@ unsigned int InfHex18::n_second_order_adjacent_vertices (const unsigned int n) c
 
 
 
-unsigned int InfHex18::second_order_adjacent_vertex (const unsigned int n,
-						     const unsigned int v) const
+unsigned short int InfHex18::second_order_adjacent_vertex (const unsigned int n,
+							   const unsigned int v) const
 { 
   assert (n >= this->n_vertices());
   assert (n <  this->n_nodes());
+  assert (v <  this->n_second_order_adjacent_vertices(n));
 
   if (n == 16)
       /*
@@ -293,14 +294,14 @@ unsigned int InfHex18::second_order_adjacent_vertex (const unsigned int n,
        * there are 4 adjacent vertices, and these happen to be
        * 0..3
        */
-      return v;
+      return static_cast<unsigned short int>(v);
   else if (n == 17)
       /*
        * for the bubble node further out similar reasoning works,
        * but v must be shifted to the further-out nodes: 
        * simply add 4
        */
-      return v+4;
+      return static_cast<unsigned short int>(v+4);
 
   else
       /*

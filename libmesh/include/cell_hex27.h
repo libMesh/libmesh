@@ -1,4 +1,4 @@
-// $Id: cell_hex27.h,v 1.15 2003-08-07 19:25:30 ddreyer Exp $
+// $Id: cell_hex27.h,v 1.16 2003-08-18 14:44:51 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -132,8 +132,8 @@ public:
    * that defines the \f$ n^{th} \f$ second-order node.
    * Note that \p n is counted as depicted above, \f$ 8 \le n < 27 \f$.
    */
-  unsigned int second_order_adjacent_vertex (const unsigned int n,
-					     const unsigned int v) const;
+  unsigned short int second_order_adjacent_vertex (const unsigned int n,
+						   const unsigned int v) const;
 
   
 protected:
@@ -162,12 +162,16 @@ private:
   
   /**
    * Matrix that tells which vertices define the location
-   * of mid-side (or second-order) nodes.  Note that this
-   * matrix does @e not cover the bubble node.  The interpolation
+   * of mid-side (or second-order) nodes.  This matrix only
+   * covers the nodes that are unique to \p Hex27, while the
+   * second-order-nodes that are identical with \p Hex20 are covered
+   * through the \p _second_order_adjacent_vertices matrix in
+   * \p cell_hex.C.  Note that this matrix also does @e not 
+   * cover the bubble node.  The interpolation
    * is trivial and would only blow up the size of this
    * matrix.
    */
-  static const unsigned int _second_order_adjacent_vertices[18][4];
+  static const unsigned short int _remaining_second_order_adjacent_vertices[6][4];
 
 };
 

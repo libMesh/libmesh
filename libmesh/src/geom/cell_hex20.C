@@ -1,4 +1,4 @@
-// $Id: cell_hex20.C,v 1.14 2003-08-07 19:25:31 ddreyer Exp $
+// $Id: cell_hex20.C,v 1.15 2003-08-18 14:44:52 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -194,35 +194,19 @@ void Hex20::vtk_connectivity(const unsigned int sc,
 
 
 
-unsigned int Hex20::second_order_adjacent_vertex (const unsigned int n,
-						  const unsigned int v) const
+unsigned short int Hex20::second_order_adjacent_vertex (const unsigned int n,
+							const unsigned int v) const
 { 
   assert (n >= this->n_vertices());
   assert (n <  this->n_nodes());
+  assert (v < 2);
+  /*
+   * the _second_order_adjacent_vertices matrix is
+   * stored in cell_hex.C, since this matrix is identical
+   * for Hex20 and Hex27 (for the first 12 higher-order nodes)
+   */
   return _second_order_adjacent_vertices[n-this->n_vertices()][v]; 
 }
-
-
-
-const unsigned int Hex20::_second_order_adjacent_vertices[12][2] = 
-{
-  { 0,  1}, // vertices adjacent to node 8 
-  { 1,  2}, // vertices adjacent to node 9 
-  { 2,  3}, // vertices adjacent to node 10 
-  { 0,  3}, // vertices adjacent to node 11
-
-  { 0,  4}, // vertices adjacent to node 12
-  { 1,  5}, // vertices adjacent to node 13
-  { 2,  6}, // vertices adjacent to node 14
-  { 3,  7}, // vertices adjacent to node 15
-
-  { 4,  5}, // vertices adjacent to node 16
-  { 5,  6}, // vertices adjacent to node 17
-  { 6,  7}, // vertices adjacent to node 18
-  { 4,  7}  // vertices adjacent to node 19
-};
-
-
 
 
 

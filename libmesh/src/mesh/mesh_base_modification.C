@@ -1,4 +1,4 @@
-// $Id: mesh_base_modification.C,v 1.5 2003-08-17 11:49:01 ddreyer Exp $
+// $Id: mesh_base_modification.C,v 1.6 2003-08-18 14:44:52 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -39,7 +39,7 @@
 
 // ------------------------------------------------------------
 // Mesh class member functions for mesh modification
-void MeshBase::all_second_order ()
+void MeshBase::all_second_order (const bool full_ordered)
 {
   /*
    * when the mesh is not prepared,
@@ -144,9 +144,14 @@ void MeshBase::all_second_order ()
 
       /*
        * build the second-order equivalent, add to
-       * the new_elements list
+       * the new_elements list.  Note that this here
+       * is the only point where \p full_ordered
+       * is necessary.  The remaining code works well
+       * for either type of seconrd-order equivalent, e.g.
+       * Hex20 or Hex27, as equivalents for Hex8
        */
-      Elem* so_elem = Elem::build (lo_elem->second_order_equivalent_type());
+      Elem* so_elem = Elem::build ( Elem::second_order_equivalent_type(lo_elem->type(), 
+								       full_ordered) );
       assert (lo_elem->n_vertices() == so_elem->n_vertices());
 
 
