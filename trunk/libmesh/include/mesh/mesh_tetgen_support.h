@@ -1,4 +1,4 @@
-// $Id: mesh_tetgen_support.h,v 1.10 2004-10-29 23:24:54 benkirk Exp $
+// $Id: mesh_tetgen_support.h,v 1.11 2004-11-02 19:21:21 spetersen Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -39,8 +39,6 @@
 
 
 // Forward Declarations
-class Mesh;
-class MeshData;
 
 
 /**
@@ -257,7 +255,7 @@ public:
   /**
    * Constructor. Takes a reference to the mesh.
    */
-  TetGenMeshInterface (Mesh& mesh, MeshData& data);
+  TetGenMeshInterface (Mesh& mesh);
 
 
   /**
@@ -326,12 +324,6 @@ protected:
    * total number of elements. Primarily used when reading.
    */
   unsigned int _num_elements;
-
-  /**
-   * writable reference to the class that
-   * handles foreign node/element ids
-   */
-  MeshData& _mesh_data;
 
 };
 
