@@ -1,4 +1,4 @@
-// $Id: implicit_system.h,v 1.1 2004-01-03 15:37:42 benkirk Exp $
+// $Id: implicit_system.h,v 1.2 2004-03-01 14:40:19 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,7 @@
 // C++ includes
 
 // Local Includes
-#include "system.h"
+#include "explicit_system.h"
 #include "numeric_vector.h"
 
 
@@ -37,13 +37,13 @@
  * at implicit systems, offering nothing more than just
  * the essentials needed to solve a system.  Note
  * that still additional vectors/matrices may be added,
- * as offered in the parent class \p System.
+ * as offered in the parent class \p ExplicitSystem.
  */
 
 // ------------------------------------------------------------
 // ImplicitSystem class definition
 
-class ImplicitSystem : public System
+class ImplicitSystem : public ExplicitSystem
 {
 public:
 
@@ -140,13 +140,6 @@ public:
   SparseMatrix<Number> * matrix;
 
   /**
-   * The system matrix.  Implicit systems are characterized by
-   * the need to solve the linear system Ax=b.  This is the
-   * right-hand-side vector b.
-   */
-  NumericVector<Number> * rhs;
-
-  /**
    * The \p LinearSolverInterface defines the interface used to
    * solve the implicit system.  This class handles all the
    * details of interfacing with various linear algebra packages
@@ -163,7 +156,7 @@ protected:
    * the system, so that, e.g., \p assemble() may be used.
    */
   virtual void init_data ();
-
+  
   /**
    * Initializes the matrices associated with this system.
    */
@@ -188,12 +181,6 @@ private:
    * Useful in initialization.
    */
   void add_system_matrix ();
-  
-  /**
-   * Add the system right-hand-side vector to the \p _vectors data structure.
-   * Useful in initialization.
-   */
-  void add_system_rhs ();
 };
 
 

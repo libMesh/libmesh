@@ -1,4 +1,4 @@
-// $Id: implicit_system.C,v 1.1 2004-01-03 15:37:44 benkirk Exp $
+// $Id: implicit_system.C,v 1.2 2004-03-01 14:40:24 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -41,9 +41,8 @@ ImplicitSystem::ImplicitSystem (EquationSystems& es,
 				const std::string& name,
 				const unsigned int number) :
   
-  System                  (es, name, number),
+  ExplicitSystem          (es, name, number),
   matrix                  (NULL),
-  rhs                     (NULL),
   linear_solver_interface (LinearSolverInterface<Number>::build()),
   _can_add_matrices       (true)
 {
@@ -62,7 +61,7 @@ ImplicitSystem::~ImplicitSystem ()
 void ImplicitSystem::clear ()
 {
   // clear the parent data
-  System::clear();
+  ExplicitSystem::clear();
 
   // clear any user-added matrices
   {
@@ -78,24 +77,20 @@ void ImplicitSystem::clear ()
     _can_add_matrices = true;
   }
 
-  // clear the matrix and rhs.
+  // NULL the matrix.
   matrix = NULL;
-  rhs    = NULL;
 }
 
 
 
 void ImplicitSystem::init_data ()
 {
-  // Add the system matrix and RHS.
-  // (We must do this before initializing the System data,
-  //  then we lose the opportunity to add vectors).
-  this->add_system_matrix ();
-  this->add_system_rhs ();
-  
   // initialize parent data
-  System::init_data();
+  ExplicitSystem::init_data();
 
+  // Add the system matrix.
+  this->add_system_matrix ();
+  
   // Initialize the matrices for the system
   this->init_matrices ();
 }
@@ -144,10 +139,7 @@ void ImplicitSystem::init_matrices ()
 void ImplicitSystem::reinit ()
 {
   // initialize parent data
-  System::reinit();  
-  
-  // Resize the RHS conformal to the current mesh
-  rhs->init (this->n_dofs(), this->n_local_dofs());
+  ExplicitSystem::reinit();  
 
   // Clear the matrices
   for (matrices_iterator pos = _matrices.begin();
@@ -175,7 +167,7 @@ void ImplicitSystem::assemble ()
   rhs->zero ();
 
   // Call the base class assemble function
-  System::assemble ();
+  ExplicitSystem::assemble ();
 }
 
 
@@ -285,21 +277,4 @@ void ImplicitSystem::add_system_matrix ()
     matrix = &(this->add_matrix ("System Matrix"));
 
   assert (matrix != NULL);
-}
-
-
-
-void ImplicitSystem::add_system_rhs ()
-{
-  // Possible that we cleared the _vectors but
-  // forgot to NULL-out the rhs?
-  if (_vectors.empty()) rhs = NULL;
-
-
-  // Only need to add the rhs if it isn't there
-  // already!
-  if (rhs == NULL)
-    rhs = &(this->add_vector ("RHS Vector"));
-
-  assert (rhs != NULL);
 }

@@ -1,4 +1,4 @@
-// $Id: explicit_system.h,v 1.2 2004-02-29 18:28:09 benkirk Exp $
+// $Id: explicit_system.h,v 1.3 2004-03-01 14:40:19 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -71,6 +71,18 @@ public:
   sys_type & system () { return *this; }
   
   /**
+   * Clear all the data structures associated with
+   * the system. 
+   */
+  virtual void clear ();
+
+  /**
+   * Reinitializes the member data fields associated with
+   * the system, so that, e.g., \p assemble() may be used.
+   */
+  virtual void reinit ();
+  
+  /**
    * Assembles & solves the linear system Ax=b. 
    */
   virtual void solve ();
@@ -90,6 +102,23 @@ public:
   
 
 protected:
+
+  
+  /**
+   * Initializes the member data fields associated with
+   * the system, so that, e.g., \p assemble() may be used.
+   */
+  virtual void init_data ();
+
+  
+private:
+
+  
+  /**
+   * Add the system right-hand-side vector to the \p _vectors data structure.
+   * Useful in initialization.
+   */
+  void add_system_rhs ();
 };
 
 

@@ -1,4 +1,4 @@
-// $Id: explicit_system.C,v 1.2 2004-02-29 18:28:10 benkirk Exp $
+// $Id: explicit_system.C,v 1.3 2004-03-01 14:40:24 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -30,16 +30,55 @@
 ExplicitSystem::ExplicitSystem (EquationSystems& es,
 				const std::string& name,
 				const unsigned int number) :
-  rhs(NULL),
-  System (es, name, number)
+  System (es, name, number),
+  rhs(NULL)
+
 {
-  rhs = &(this->add_vector ("RHS Vector"));
+  //rhs = &(this->add_vector ("RHS Vector"));
 }
 
 
 
 ExplicitSystem::~ExplicitSystem ()
 {
+  // clear data
+  this->clear();
+}
+
+
+
+void ExplicitSystem::clear ()
+{
+  // Clear the parent data
+  System::clear();
+
+  // NULL-out the matrix.  Note that
+  // System::clear() actually deleted it.
+  rhs = NULL;
+}
+
+
+
+void ExplicitSystem::init_data ()
+{
+  // Add the system RHS.
+  // (We must do this before initializing the System data,
+  //  then we lose the opportunity to add vectors).
+  this->add_system_rhs ();
+  
+  // initialize parent data
+  System::init_data();
+}
+
+
+
+void ExplicitSystem::reinit ()
+{
+  // initialize parent data
+  System::reinit();  
+  
+  // Resize the RHS conformal to the current mesh
+  rhs->init (this->n_dofs(), this->n_local_dofs());
 }
 
 
@@ -51,4 +90,21 @@ void ExplicitSystem::solve ()
 
   // Update the system after the solve
   this->update();  
+}
+
+
+
+void ExplicitSystem::add_system_rhs ()
+{
+  // Possible that we cleared the _vectors but
+  // forgot to NULL-out the rhs?
+  if (_vectors.empty()) rhs = NULL;
+
+
+  // Only need to add the rhs if it isn't there
+  // already!
+  if (rhs == NULL)
+    rhs = &(this->add_vector ("RHS Vector"));
+
+  assert (rhs != NULL);
 }
