@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.45 2003-07-26 00:17:04 ddreyer Exp $
+// $Id: mesh_base.C,v 1.46 2003-08-11 19:48:24 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -47,7 +47,7 @@
 #include "cell_inf_hex8.h"
 #include "cell_inf_hex16.h"
 #include "cell_inf_hex18.h"
-#include "petsc_matrix.h"
+//#include "petsc_matrix.h"
 #include "mesh_logging.h"
 
 #include "metis_partitioner.h"
@@ -1607,252 +1607,252 @@ Sphere MeshBase::subdomain_bounding_sphere (const unsigned int sid) const
 
 
 
-void MeshBase::build_L_graph (PetscMatrix<Number>& conn) const
-{
-#ifndef HAVE_PETSC
+// void MeshBase::build_L_graph (PetscMatrix<Number>& conn) const
+// {
+// #ifndef HAVE_PETSC
 
-  std::cerr << "ERROR: This fuctionality requires PETSC support!"
-	    << std::endl;
-  error();
+//   std::cerr << "ERROR: This fuctionality requires PETSC support!"
+// 	    << std::endl;
+//   error();
 
-#else
+// #else
 
-  // Initialize the connectivity matrix.
-  {
-    conn.init(this->n_nodes(),
-	      this->n_nodes(),
-	      this->n_nodes(),
-	      this->n_nodes());
+//   // Initialize the connectivity matrix.
+//   {
+//     conn.init(this->n_nodes(),
+// 	      this->n_nodes(),
+// 	      this->n_nodes(),
+// 	      this->n_nodes());
 
-    // be sure the diagonals are all 0 so that ++ works.
-    for (unsigned int n=0; n<this->n_nodes(); n++)
-      conn.set(n,n,0.);
+//     // be sure the diagonals are all 0 so that ++ works.
+//     for (unsigned int n=0; n<this->n_nodes(); n++)
+//       conn.set(n,n,0.);
 
-  }
+//   }
   
-  switch (this->mesh_dimension())
-    {
-    case 1:
-      {
-	std::cerr << "ERROR:  The connectivity graph doesn't make much sense"
-		  << std::endl
-		  << " in 1D!"
-		  << std::endl;
-	error();
-      }
+//   switch (this->mesh_dimension())
+//     {
+//     case 1:
+//       {
+// 	std::cerr << "ERROR:  The connectivity graph doesn't make much sense"
+// 		  << std::endl
+// 		  << " in 1D!"
+// 		  << std::endl;
+// 	error();
+//       }
 
       
-      // Create the graph for a 2D mesh.  Do this by looking
-      // at element edges.
-    case 2:
-      {
-	const_active_elem_iterator       el (this->elements_begin());
-	const const_active_elem_iterator end(this->elements_end());
+//       // Create the graph for a 2D mesh.  Do this by looking
+//       // at element edges.
+//     case 2:
+//       {
+// 	const_active_elem_iterator       el (this->elements_begin());
+// 	const const_active_elem_iterator end(this->elements_end());
 	
-	for (; el != end; ++el)
-	  for (unsigned int s=0; s<(*el)->n_neighbors(); s++)
-	    if (((*el)->neighbor(s) == NULL) ||
-		((*el)->id() > (*el)->neighbor(s)->id()))
-	      {
-		AutoPtr<Elem> side((*el)->build_side(s));
+// 	for (; el != end; ++el)
+// 	  for (unsigned int s=0; s<(*el)->n_neighbors(); s++)
+// 	    if (((*el)->neighbor(s) == NULL) ||
+// 		((*el)->id() > (*el)->neighbor(s)->id()))
+// 	      {
+// 		AutoPtr<Elem> side((*el)->build_side(s));
 		
-		const unsigned int n0 = side->node(0);
-		const unsigned int n1 = side->node(1);
+// 		const unsigned int n0 = side->node(0);
+// 		const unsigned int n1 = side->node(1);
 		
-		conn.set(n0,n0, conn(n0,n0) + 1.);		  
-		conn.set(n0,n1, -1.);
+// 		conn.set(n0,n0, conn(n0,n0) + 1.);		  
+// 		conn.set(n0,n1, -1.);
 		
-		conn.set(n1,n1, conn(n1,n1) + 1.);
-		conn.set(n1,n0, -1.);
-	      }
+// 		conn.set(n1,n1, conn(n1,n1) + 1.);
+// 		conn.set(n1,n0, -1.);
+// 	      }
 	
-	// All done.
-	break;
-      }
+// 	// All done.
+// 	break;
+//       }
 
 
 
-      // Create the graph for a 3D mesh.  Do this by looking
-      // at element faces, then at the edges of the face.
-    case 3:
-      {
-	const_active_elem_iterator       el (this->elements_begin());
-	const const_active_elem_iterator end(this->elements_end());
+//       // Create the graph for a 3D mesh.  Do this by looking
+//       // at element faces, then at the edges of the face.
+//     case 3:
+//       {
+// 	const_active_elem_iterator       el (this->elements_begin());
+// 	const const_active_elem_iterator end(this->elements_end());
 
-	for (; el != end; ++el)
-	  for (unsigned int f=0; f<(*el)->n_neighbors(); f++) // Loop over faces
-	    if (((*el)->neighbor(f) == NULL) ||
-		((*el)->id() > (*el)->neighbor(f)->id()))
-	      {
-		AutoPtr<Elem> face((*el)->build_side(f));
+// 	for (; el != end; ++el)
+// 	  for (unsigned int f=0; f<(*el)->n_neighbors(); f++) // Loop over faces
+// 	    if (((*el)->neighbor(f) == NULL) ||
+// 		((*el)->id() > (*el)->neighbor(f)->id()))
+// 	      {
+// 		AutoPtr<Elem> face((*el)->build_side(f));
 		
-		for (unsigned int s=0; s<face->n_neighbors(); s++) // Loop over face's edges
-		  {
-		    AutoPtr<Elem> side(face->build_side(s));
+// 		for (unsigned int s=0; s<face->n_neighbors(); s++) // Loop over face's edges
+// 		  {
+// 		    AutoPtr<Elem> side(face->build_side(s));
 		    
-		    const unsigned int n0 = side->node(0);
-		    const unsigned int n1 = side->node(1);
+// 		    const unsigned int n0 = side->node(0);
+// 		    const unsigned int n1 = side->node(1);
 		    
-		    // If this is the first time we've seen this edge
-		    if (conn(n0,n1) == 0.)
-		      {
-			assert (conn(n1,n0) == 0.);
+// 		    // If this is the first time we've seen this edge
+// 		    if (conn(n0,n1) == 0.)
+// 		      {
+// 			assert (conn(n1,n0) == 0.);
 			
-			conn.set(n0,n0, conn(n0,n0) + 1.);		  
-			conn.set(n0,n1, -1.);
+// 			conn.set(n0,n0, conn(n0,n0) + 1.);		  
+// 			conn.set(n0,n1, -1.);
 			
-			conn.set(n1,n1, conn(n1,n1) + 1.);
-			conn.set(n1,n0, -1.);
-		      }
-		  }
-	      }
+// 			conn.set(n1,n1, conn(n1,n1) + 1.);
+// 			conn.set(n1,n0, -1.);
+// 		      }
+// 		  }
+// 	      }
 
-	// All done
-	break;
-      }
+// 	// All done
+// 	break;
+//       }
       
 
-    default:
-      // what?
-      error();
-    }
+//     default:
+//       // what?
+//       error();
+//     }
 
 
-  // OK, now the matrix is built.  Close it
-  // and return.
-  conn.close();
+//   // OK, now the matrix is built.  Close it
+//   // and return.
+//   conn.close();
   
-  return;
+//   return;
 
-#endif
-}
+// #endif
+// }
 
 
 
-void MeshBase::build_script_L_graph (PetscMatrix<Number>& conn) const
-{
-#ifndef HAVE_PETSC
+// void MeshBase::build_script_L_graph (PetscMatrix<Number>& conn) const
+// {
+// #ifndef HAVE_PETSC
 
-  std::cerr << "ERROR: This fuctionality requires PETSC support!"
-	    << std::endl;
-  error();
+//   std::cerr << "ERROR: This fuctionality requires PETSC support!"
+// 	    << std::endl;
+//   error();
 
-#else
+// #else
 
-  // Inefficient at the moment.  We build an L
-  // matrix and use it to create the script L matrix
-  PetscMatrix<Number> l_conn;
+//   // Inefficient at the moment.  We build an L
+//   // matrix and use it to create the script L matrix
+//   PetscMatrix<Number> l_conn;
 
-  build_L_graph (l_conn);
+//   build_L_graph (l_conn);
 
-  conn.init(l_conn.m(),
-	    l_conn.n(),
-	    l_conn.m(),
-	    l_conn.n());
+//   conn.init(l_conn.m(),
+// 	    l_conn.n(),
+// 	    l_conn.m(),
+// 	    l_conn.n());
 
   
-  switch (mesh_dimension())
-    {
-    case 1:
-      {
-	std::cerr << "ERROR:  The connectivity graph doesn't make much sense"
-		  << std::endl
-		  << " in 1D!"
-		  << std::endl;
-	error();
-      }
+//   switch (mesh_dimension())
+//     {
+//     case 1:
+//       {
+// 	std::cerr << "ERROR:  The connectivity graph doesn't make much sense"
+// 		  << std::endl
+// 		  << " in 1D!"
+// 		  << std::endl;
+// 	error();
+//       }
 
       
-      // Create the graph for a 2D mesh.  Do this by looking
-      // at element edges.
-    case 2:
-      {
-	const_active_elem_iterator       el (this->elements_begin());
-	const const_active_elem_iterator end(this->elements_end());
+//       // Create the graph for a 2D mesh.  Do this by looking
+//       // at element edges.
+//     case 2:
+//       {
+// 	const_active_elem_iterator       el (this->elements_begin());
+// 	const const_active_elem_iterator end(this->elements_end());
 	
-	for (; el != end; ++el)
-	  for (unsigned int s=0; s<(*el)->n_neighbors(); s++)
-	    if (((*el)->neighbor(s) == NULL) ||
-	        ((*el) > (*el)->neighbor(s)))
-	      {
-		AutoPtr<Elem> side((*el)->build_side(s));
+// 	for (; el != end; ++el)
+// 	  for (unsigned int s=0; s<(*el)->n_neighbors(); s++)
+// 	    if (((*el)->neighbor(s) == NULL) ||
+// 	        ((*el) > (*el)->neighbor(s)))
+// 	      {
+// 		AutoPtr<Elem> side((*el)->build_side(s));
 		
-		const unsigned int n0 = side->node(0);
-		const unsigned int n1 = side->node(1);
+// 		const unsigned int n0 = side->node(0);
+// 		const unsigned int n1 = side->node(1);
 		
-		conn.set(n0,n0, 1.);
-		conn.set(n1,n1, 1.);
+// 		conn.set(n0,n0, 1.);
+// 		conn.set(n1,n1, 1.);
 		
-#ifdef USE_COMPLEX_NUMBERS
-		const Real prod_term = -1./sqrt(l_conn(n0,n0).real()*l_conn(n1,n1).real());
-#else
-		const Real prod_term = -1./sqrt(l_conn(n0,n0)*l_conn(n1,n1));
-#endif
+// #ifdef USE_COMPLEX_NUMBERS
+// 		const Real prod_term = -1./sqrt(l_conn(n0,n0).real()*l_conn(n1,n1).real());
+// #else
+// 		const Real prod_term = -1./sqrt(l_conn(n0,n0)*l_conn(n1,n1));
+// #endif
 		
-		conn.set(n0,n1, prod_term);
-		conn.set(n1,n0, prod_term);
-	      }
+// 		conn.set(n0,n1, prod_term);
+// 		conn.set(n1,n0, prod_term);
+// 	      }
 
-	// All done.
-	break;
-      }
+// 	// All done.
+// 	break;
+//       }
 
 
 
-      // Create the graph for a 3D mesh.  Do this by looking
-      // at element faces, then at the edges of the face.
-    case 3:
-      {
-	const_active_elem_iterator       el (this->elements_begin());
-	const const_active_elem_iterator end(this->elements_end());
+//       // Create the graph for a 3D mesh.  Do this by looking
+//       // at element faces, then at the edges of the face.
+//     case 3:
+//       {
+// 	const_active_elem_iterator       el (this->elements_begin());
+// 	const const_active_elem_iterator end(this->elements_end());
 	
-	for (; el != end; ++el)
-	  for (unsigned int f=0; f<(*el)->n_neighbors(); f++) // Loop over faces
-	    if (((*el)->neighbor(f) == NULL) ||
-		((*el) > (*el)->neighbor(f)))
-	      {
-		AutoPtr<Elem> face((*el)->build_side(f));
+// 	for (; el != end; ++el)
+// 	  for (unsigned int f=0; f<(*el)->n_neighbors(); f++) // Loop over faces
+// 	    if (((*el)->neighbor(f) == NULL) ||
+// 		((*el) > (*el)->neighbor(f)))
+// 	      {
+// 		AutoPtr<Elem> face((*el)->build_side(f));
 		
-		for (unsigned int s=0; s<face->n_neighbors(); s++) // Loop over face's edges
-		  {
-		    AutoPtr<Elem> side(face->build_side(s));
+// 		for (unsigned int s=0; s<face->n_neighbors(); s++) // Loop over face's edges
+// 		  {
+// 		    AutoPtr<Elem> side(face->build_side(s));
 		    
-		    const unsigned int n0 = side->node(0);
-		    const unsigned int n1 = side->node(1);
+// 		    const unsigned int n0 = side->node(0);
+// 		    const unsigned int n1 = side->node(1);
 		    
-		    conn.set(n0,n0, 1.);
-		    conn.set(n1,n1, 1.);
+// 		    conn.set(n0,n0, 1.);
+// 		    conn.set(n1,n1, 1.);
 		    
-#ifdef USE_COMPLEX_NUMBERS
-		    const Real prod_term = -1./sqrt(l_conn(n0,n0).real()*l_conn(n1,n1).real());
-#else
-		    const Real prod_term = -1./sqrt(l_conn(n0,n0)*l_conn(n1,n1));
-#endif
+// #ifdef USE_COMPLEX_NUMBERS
+// 		    const Real prod_term = -1./sqrt(l_conn(n0,n0).real()*l_conn(n1,n1).real());
+// #else
+// 		    const Real prod_term = -1./sqrt(l_conn(n0,n0)*l_conn(n1,n1));
+// #endif
 		    
-		    conn.set(n0,n1, prod_term);
-		    conn.set(n1,n0, prod_term);
-		  }
-	      }
+// 		    conn.set(n0,n1, prod_term);
+// 		    conn.set(n1,n0, prod_term);
+// 		  }
+// 	      }
 	
-	// All done
-	break;
-      }
+// 	// All done
+// 	break;
+//       }
       
 
-    default:
-      // what?
-      error();
-    }
+//     default:
+//       // what?
+//       error();
+//     }
 
 
-  // OK, now the matrix is built.  Close it
-  // and return.
-  conn.close();
+//   // OK, now the matrix is built.  Close it
+//   // and return.
+//   conn.close();
   
-  return;  
+//   return;  
 
-#endif
-}
+// #endif
+// }
 
 
 
