@@ -1,4 +1,4 @@
-// $Id: perf_log.h,v 1.6 2003-02-06 23:28:46 benkirk Exp $
+// $Id: perf_log.h,v 1.7 2003-02-07 15:21:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -107,7 +107,7 @@ class PerfLog
    * disable logging.  You can use this flag to turn off
    * logging without touching any other code.
    */
-  PerfLog(std::string class_name="",
+  PerfLog(const std::string class_name="",
 	  const bool log_events=true);
 
   /**
@@ -212,19 +212,22 @@ void PerfLog::start_event(const std::string &label)
 {
   if (log_events)
     {
+      // Get a reference to the event data to avoid
+      // repeated map lookups
+      PerfData& perf_data = log[label];
+      
       // make sure we aren't currently
-      // monitoring this event
-      if (log[label].open)
+      // monitoring this event      
+      if (perf_data.open)
 	{
 	  std::cerr << "ERROR logging event " << label << std::endl
 		    << "Did you forget to stop logging it?" << std::endl;
-
 	  error();
 	}
 
-      log[label].open = true;
+      perf_data.open = true;
       
-      gettimeofday (&log[label].tstart, NULL);
+      gettimeofday (&perf_data.tstart, NULL);
     }
 };
 
@@ -235,28 +238,31 @@ void PerfLog::stop_event(const std::string &label)
 {
   if (log_events)
     {
+      // Get a reference to the event data to avoid
+      // repeated map lookups
+      PerfData& perf_data = log[label];
+      
       // make sure we are currently
       // monitoring this event
-      if (!log[label].open)
+      if (!perf_data.open)
 	{
 	  std::cerr << "ERROR logging event " << label << std::endl
-		    << "Did you forget to start logging it?" << std::endl;
-
+		    << "Did you forget to start or restart it?" << std::endl;
 	  error();
 	}
       
-      log[label].open = false;
+      perf_data.open = false;
       
       struct timeval tstop;
 
       gettimeofday (&tstop, NULL);
 
-      const double elapsed_time = ((double) (tstop.tv_sec  - log[label].tstart.tv_sec)) +
-	                          ((double) (tstop.tv_usec - log[label].tstart.tv_usec))/1000000.;
+      const double elapsed_time = (static_cast<double>(tstop.tv_sec  - tstart.tv_sec) +
+				   static_cast<double>(tstop.tv_usec - tstart.tv_usec)*1.e-6);      
 
-      total_time += elapsed_time;
-      log[label].tot_time += elapsed_time;
-      log[label].count++;	 
+      total_time         += elapsed_time;
+      perf_data.tot_time += elapsed_time;
+      perf_data.count++;	 
     }
 };
 
@@ -267,13 +273,16 @@ void PerfLog::pause_event(const std::string &label)
 {
   if (log_events)
     {
+      // Get a reference to the event data to avoid
+      // repeated map lookups
+      PerfData& perf_data = log[label];
+      
       // make sure we are currently
       // monitoring this event
-      if (!log[label].open)
+      if (!perf_data.open)
 	{
 	  std::cerr << "ERROR pausing event " << label << std::endl
-		    << "Did you forget to start logging it?" << std::endl;
-	  
+		    << "Did you forget to start logging it?" << std::endl;	  
 	  error();
 	}
       
@@ -281,10 +290,11 @@ void PerfLog::pause_event(const std::string &label)
 
       gettimeofday (&tstop, NULL);
 
-      const double elapsed_time = ((double) (tstop.tv_sec  - log[label].tstart.tv_sec)) +
-	                          ((double) (tstop.tv_usec - log[label].tstart.tv_usec))/1000000.;
+      const double elapsed_time = (static_cast<double>(tstop.tv_sec  - tstart.tv_sec) +
+				   static_cast<double>(tstop.tv_usec - tstart.tv_usec)*1.e-6);      
 
-      log[label].tot_time += elapsed_time;
+      total_time         += elapsed_time;
+      perf_data.tot_time += elapsed_time;
     }
 };
 
@@ -295,17 +305,20 @@ void PerfLog::restart_event(const std::string &label)
 {
   if (log_events)
     {
+      // Get a reference to the event data to avoid
+      // repeated map lookups
+      PerfData& perf_data = log[label];
+      
       // make sure we are currently
       // monitoring this event
-      if (!log[label].open)
+      if (!perf_data.open)
 	{
 	  std::cerr << "ERROR restarting event " << label << std::endl
-		    << "Did you forget to start logging it?" << std::endl;
-	  
+		    << "Did you forget to start or pause it?" << std::endl;	  
 	  error();
 	}
       
-      gettimeofday (&log[label].tstart, NULL);
+      gettimeofday (&perf_data.tstart, NULL);
     }
 };
 
