@@ -1,4 +1,4 @@
-// $Id: fe_base.C,v 1.24 2004-04-18 00:51:50 jwpeterson Exp $
+// $Id: fe_base.C,v 1.25 2004-10-28 20:38:56 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -33,9 +33,6 @@
 AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 			       const FEType& fet)
 {
-  // The stupid AutoPtr<FEBase> ap(); return ap;
-  // construct is required to satisfy IBM's xlC
-
   switch (dim)
     {
       // 1D
@@ -44,37 +41,22 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	switch (fet.family)
 	  {
 	  case LAGRANGE:
-	    {
-	      AutoPtr<FEBase> ap(new FE<1,LAGRANGE>(fet));
-	      return ap;
-	    }
-		   
+	    return AutoPtr<FEBase> (new FE<1,LAGRANGE>(fet));
+	    		   
 	  case HIERARCHIC:
-	    {
-	      AutoPtr<FEBase> ap(new FE<1,HIERARCHIC>(fet));
-	      return ap;
-	    }
+	    return AutoPtr<FEBase> (new FE<1,HIERARCHIC>(fet));
 	    
 	  case MONOMIAL:
-	    {
-	      AutoPtr<FEBase> ap(new FE<1,MONOMIAL>(fet));
-	      return ap;
-	    }
+	    return AutoPtr<FEBase> (new FE<1,MONOMIAL>(fet));
 	    
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
 	  case SZABAB:
-	    {
-	      AutoPtr<FEBase> ap(new FE<1,SZABAB>(fet));
-	      return ap;
-	    }
+	    return AutoPtr<FEBase> (new FE<1,SZABAB>(fet));
 #endif
 
 	  case XYZ:
-	    {
-	      AutoPtr<FEBase> ap(new FEXYZ<1>(fet));
-	      return ap;
-	    }
-
+	    return AutoPtr<FEBase> (new FEXYZ<1>(fet));
+	    
 	  default:
 	    std::cout << "ERROR: Bad FEType.family= " << fet.family << std::endl;
 	    error();
@@ -88,37 +70,22 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	switch (fet.family)
 	  {
 	  case LAGRANGE:
-	    {
-	      AutoPtr<FEBase> ap(new FE<2,LAGRANGE>(fet));
-	      return ap;
-	    }
-	    
+	    return AutoPtr<FEBase> (new FE<2,LAGRANGE>(fet));
+	    	    
 	  case HIERARCHIC:
-	    {
-	      AutoPtr<FEBase> ap(new FE<2,HIERARCHIC>(fet));
-	      return ap;
-	    }
-	    
+	    return AutoPtr<FEBase> (new FE<2,HIERARCHIC>(fet));
+	    	    
 	  case MONOMIAL:
-	    {
-	      AutoPtr<FEBase> ap(new FE<2,MONOMIAL>(fet));
-	      return ap;
-	    }
-	    
+	    return AutoPtr<FEBase> (new FE<2,MONOMIAL>(fet));
+	    	    
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
 	  case SZABAB:
-	    {
-	      AutoPtr<FEBase> ap(new FE<2,SZABAB>(fet));
-	      return ap;
-	    }
+	    return AutoPtr<FEBase> (new FE<2,SZABAB>(fet));
 #endif
 
 	  case XYZ:
-	    {
-	      AutoPtr<FEBase> ap(new FEXYZ<2>(fet));
-	      return ap;
-	    }
-
+	    return AutoPtr<FEBase> (new FEXYZ<2>(fet));
+	    
 	  default:
 	    std::cout << "ERROR: Bad FEType.family= " << fet.family << std::endl;
 	    error();
@@ -132,37 +99,22 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	switch (fet.family)
 	  {
 	  case LAGRANGE:
-	    {
-	      AutoPtr<FEBase> ap(new FE<3,LAGRANGE>(fet));
-	      return ap;
-	    }
-	    
+	    return AutoPtr<FEBase> (new FE<3,LAGRANGE>(fet));
+	    	    
 	  case HIERARCHIC:
-	    {
-	      AutoPtr<FEBase> ap(new FE<3,HIERARCHIC>(fet));
-	      return ap;
-	    }
-	    
+	    return AutoPtr<FEBase> (new FE<3,HIERARCHIC>(fet));
+	    	    
 	  case MONOMIAL:
-	    {
-	      AutoPtr<FEBase> ap(new FE<3,MONOMIAL>(fet));
-	      return ap;
-	    }
-	    
+	    return AutoPtr<FEBase> (new FE<3,MONOMIAL>(fet));
+	    	    
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
 	  case SZABAB:
-	    {
-	      AutoPtr<FEBase> ap(new FE<3,SZABAB>(fet));
-	      return ap;
-	    }
+	    return AutoPtr<FEBase> (new FE<3,SZABAB>(fet));
 #endif
 
 	  case XYZ:
-	    {
-	      AutoPtr<FEBase> ap(new FEXYZ<3>(fet));
-	      return ap;
-	    }
-
+	    return AutoPtr<FEBase> (new FEXYZ<3>(fet));
+	    
 	  default:
 	    std::cout << "ERROR: Bad FEType.family= " << fet.family << std::endl;
 	    error();
@@ -174,8 +126,7 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
     }
 
   error();
-  AutoPtr<FEBase> ap(NULL);
-  return ap;
+  return AutoPtr<FEBase> (NULL);
 }
 
 
@@ -190,9 +141,6 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
 				     const FEType& fet)
 {
-  // The stupid AutoPtr<FEBase> ap(); return ap;
-  // construct is required to satisfy IBM's xlC
-
   switch (dim)
     {
 
@@ -213,10 +161,8 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
   	      switch (fet.inf_map)
 	        {
 		  case CARTESIAN:
-		    {
-		      AutoPtr<FEBase> ap(new InfFE<1,JACOBI_20_00,CARTESIAN>(fet));
-		      return ap;
-		    }
+		    return AutoPtr<FEBase> (new InfFE<1,JACOBI_20_00,CARTESIAN>(fet));
+		    
 		  default:
 		    std::cerr << "ERROR: Don't build an infinite element " << std::endl
 			      << " with InfMapType = " << fet.inf_map << std::endl;
@@ -229,10 +175,8 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
   	      switch (fet.inf_map)
 	        {
 		  case CARTESIAN:
-		    {
-		      AutoPtr<FEBase> ap(new InfFE<1,JACOBI_30_00,CARTESIAN>(fet));
-		      return ap;
-		    }
+		    return AutoPtr<FEBase> (new InfFE<1,JACOBI_30_00,CARTESIAN>(fet));
+		    
 		  default:
 		    std::cerr << "ERROR: Don't build an infinite element " << std::endl
 			      << " with InfMapType = " << fet.inf_map << std::endl;
@@ -245,10 +189,8 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
   	      switch (fet.inf_map)
 	        {
 		  case CARTESIAN:
-		    {
-		      AutoPtr<FEBase> ap(new InfFE<1,LEGENDRE,CARTESIAN>(fet));
-		      return ap;
-		    }
+		    return AutoPtr<FEBase> (new InfFE<1,LEGENDRE,CARTESIAN>(fet));
+		    
 		  default:
 		    std::cerr << "ERROR: Don't build an infinite element " << std::endl
 			      << " with InfMapType = " << fet.inf_map << std::endl;
@@ -261,10 +203,8 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
   	      switch (fet.inf_map)
 	        {
 		  case CARTESIAN:
-		    {
-		      AutoPtr<FEBase> ap(new InfFE<1,LAGRANGE,CARTESIAN>(fet));
-		      return ap;
-		    }
+		    return AutoPtr<FEBase> (new InfFE<1,LAGRANGE,CARTESIAN>(fet));
+		    
 		  default:
 		    std::cerr << "ERROR: Don't build an infinite element " << std::endl
 			      << " with InfMapType = " << fet.inf_map << std::endl;
@@ -301,10 +241,8 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
   	      switch (fet.inf_map)
 	        {
 		  case CARTESIAN:
-		    {
-		      AutoPtr<FEBase> ap(new InfFE<2,JACOBI_20_00,CARTESIAN>(fet));
-		      return ap;
-		    }
+		    return AutoPtr<FEBase> (new InfFE<2,JACOBI_20_00,CARTESIAN>(fet));
+		    
 		  default:
 		    std::cerr << "ERROR: Don't build an infinite element " << std::endl
 			      << " with InfMapType = " << fet.inf_map << std::endl;
@@ -317,10 +255,8 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
   	      switch (fet.inf_map)
 	        {
 		  case CARTESIAN:
-		    {
-		      AutoPtr<FEBase> ap(new InfFE<2,JACOBI_30_00,CARTESIAN>(fet));
-		      return ap;
-		    }
+		    return AutoPtr<FEBase> (new InfFE<2,JACOBI_30_00,CARTESIAN>(fet));
+		    
 		  default:
 		    std::cerr << "ERROR: Don't build an infinite element " << std::endl
 			      << " with InfMapType = " << fet.inf_map << std::endl;
@@ -333,10 +269,8 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
   	      switch (fet.inf_map)
 	        {
 		  case CARTESIAN:
-		    {
-		      AutoPtr<FEBase> ap(new InfFE<2,LEGENDRE,CARTESIAN>(fet));
-		      return ap;
-		    }
+		    return AutoPtr<FEBase> (new InfFE<2,LEGENDRE,CARTESIAN>(fet));
+		    
 		  default:
 		    std::cerr << "ERROR: Don't build an infinite element " << std::endl
 			      << " with InfMapType = " << fet.inf_map << std::endl;
@@ -349,10 +283,8 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
   	      switch (fet.inf_map)
 	        {
 		  case CARTESIAN:
-		    {
-		      AutoPtr<FEBase> ap(new InfFE<2,LAGRANGE,CARTESIAN>(fet));
-		      return ap;
-		    }
+		    return AutoPtr<FEBase> (new InfFE<2,LAGRANGE,CARTESIAN>(fet));
+		    
 		  default:
 		    std::cerr << "ERROR: Don't build an infinite element " << std::endl
 			      << " with InfMapType = " << fet.inf_map << std::endl;
@@ -389,10 +321,8 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
   	      switch (fet.inf_map)
 	        {
 		  case CARTESIAN:
-		    {
-		      AutoPtr<FEBase> ap(new InfFE<3,JACOBI_20_00,CARTESIAN>(fet));
-		      return ap;
-		    }
+		    return AutoPtr<FEBase> (new InfFE<3,JACOBI_20_00,CARTESIAN>(fet));
+		    
 		  default:
 		    std::cerr << "ERROR: Don't build an infinite element " << std::endl
 			      << " with InfMapType = " << fet.inf_map << std::endl;
@@ -405,10 +335,8 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
   	      switch (fet.inf_map)
 	        {
 		  case CARTESIAN:
-		    {
-		      AutoPtr<FEBase> ap(new InfFE<3,JACOBI_30_00,CARTESIAN>(fet));
-		      return ap;
-		    }
+		    return AutoPtr<FEBase> (new InfFE<3,JACOBI_30_00,CARTESIAN>(fet));
+		    
 		  default:
 		    std::cerr << "ERROR: Don't build an infinite element " << std::endl
 			      << " with InfMapType = " << fet.inf_map << std::endl;
@@ -421,10 +349,8 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
   	      switch (fet.inf_map)
 	        {
 		  case CARTESIAN:
-		    {
-		      AutoPtr<FEBase> ap(new InfFE<3,LEGENDRE,CARTESIAN>(fet));
-		      return ap;
-		    }
+		    return AutoPtr<FEBase> (new InfFE<3,LEGENDRE,CARTESIAN>(fet));
+		    
 		  default:
 		    std::cerr << "ERROR: Don't build an infinite element " << std::endl
 			      << " with InfMapType = " << fet.inf_map << std::endl;
@@ -437,10 +363,8 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
   	      switch (fet.inf_map)
 	        {
 		  case CARTESIAN:
-		    {
-		      AutoPtr<FEBase> ap(new InfFE<3,LAGRANGE,CARTESIAN>(fet));
-		      return ap;
-		    }
+		    return AutoPtr<FEBase> (new InfFE<3,LAGRANGE,CARTESIAN>(fet));
+		    
 		  default:
 		    std::cerr << "ERROR: Don't build an infinite element " << std::endl
 			      << " with InfMapType = " << fet.inf_map << std::endl;
@@ -461,8 +385,7 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
     }
 
   error();
-  AutoPtr<FEBase> ap(NULL);
-  return ap;
+  return AutoPtr<FEBase> (NULL);
 }
 
 
