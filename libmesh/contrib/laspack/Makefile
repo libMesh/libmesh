@@ -7,21 +7,21 @@ OBJS   	:= $(patsubst %.c, %.$(obj-suffix), $(SRC))
 
 
 
-target := ../lib/$(hosttype)_$(METHOD)/libsfcurves.a
+target := ../lib/$(hosttype)_$(METHOD)/liblaspack.a
 
 ifeq ($(enable-shared),yes)
-  target := ../lib/$(hosttype)_$(METHOD)/libsfcurves.so
+  target := ../lib/$(hosttype)_$(METHOD)/liblaspack.so
 endif
 
 
 all:: $(target)
 
-../lib/$(hosttype)_$(METHOD)/libsfcurves.a: $(OBJS)
+../lib/$(hosttype)_$(METHOD)/liblaspack.a: $(OBJS)
 	@echo "Linking "$@
 	@$(shell mkdir -p ../lib/$(hosttype)_$(METHOD))
 	@$(AR) rv $@ $(OBJS)
 
-../lib/$(hosttype)_$(METHOD)/libsfcurves.so: $(OBJS)
+../lib/$(hosttype)_$(METHOD)/liblaspack.so: $(OBJS)
 	@echo "Linking "$@
 	@$(shell mkdir -p ../lib/$(hosttype)_$(METHOD))
 	@$(CC) $(CSHAREDFLAG) -o $@ $(OBJS)
@@ -37,8 +37,8 @@ clean:
 clobber:
 	@$(MAKE) clean
 	@rm -f *.o *.g.o *.pg.o *.sy.o
-	@rm -f ../lib/$(hosttype)_$(METHOD)/libsfcurves.*
+	@rm -f ../lib/$(hosttype)_$(METHOD)/liblaspack.*
 
 distclean:
 	@$(MAKE) clobber
-	@rm -f ../lib/*/libsfcurves.*
+	@rm -f ../lib/*/liblaspack.*

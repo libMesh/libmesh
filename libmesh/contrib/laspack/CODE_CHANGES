@@ -1,0 +1,5 @@
+Changed #include "laspack/*" to #include "*"
+
+
+Benjamin S. Kirk
+Fri Feb  7 10:51:37 CST 2003
