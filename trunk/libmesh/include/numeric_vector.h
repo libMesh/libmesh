@@ -1,4 +1,4 @@
-// $Id: numeric_vector.h,v 1.12 2003-04-29 21:37:36 benkirk Exp $
+// $Id: numeric_vector.h,v 1.13 2003-05-04 23:58:52 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,6 +31,7 @@
 #include "auto_ptr.h"
 #include "enum_solver_package.h"
 #include "reference_counted_object.h"
+#include "libmesh.h"
 
 
 // forward declarations
@@ -80,7 +81,7 @@ public:
    * Builds a \p NumericVector using the linear solver package specified by
    * \p solver_package
    */
-  static AutoPtr<NumericVector<T> > build(const SolverPackage solver_package);
+  static AutoPtr<NumericVector<T> > build(const SolverPackage solver_package = libMesh::default_solver_package());
   
   /**
    * @returns true if the vector has been initialized,

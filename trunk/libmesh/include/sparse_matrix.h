@@ -1,4 +1,4 @@
-// $Id: sparse_matrix.h,v 1.9 2003-03-20 11:51:24 ddreyer Exp $
+// $Id: sparse_matrix.h,v 1.10 2003-05-04 23:58:52 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -34,6 +34,7 @@
 #include "enum_solver_package.h"
 #include "dof_map.h"
 #include "reference_counted_object.h"
+#include "libmesh.h"
 
 
 // forward declarations
@@ -83,7 +84,7 @@ public:
    * Builds a \p SparseMatrix<T> using the linear solver package specified by
    * \p solver_package
    */
-  static AutoPtr<SparseMatrix<T> > build(const SolverPackage solver_package);
+  static AutoPtr<SparseMatrix<T> > build(const SolverPackage solver_package = libMesh::default_solver_package());
   
   /**
    * @returns true if the matrix has been initialized,

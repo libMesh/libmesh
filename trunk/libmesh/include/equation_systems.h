@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.22 2003-04-30 21:09:23 benkirk Exp $
+// $Id: equation_systems.h,v 1.23 2003-05-04 23:58:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -50,31 +50,9 @@ public:
 
   /**
    * Constructor.  Optionally initializes required
-   * data structures.  By default Petsc data structures
-   * will be used, but this is optional via the \p sp
-   * flag.
+   * data structures. 
    */
-  EquationSystems (Mesh& mesh,
-
-#if defined(HAVE_PETSC)
-		   
-		   // Default to PETSC solvers if they are there
-		   const SolverPackage sp = PETSC_SOLVERS
-		   
-//#elif defined(HAVE_LASPACK) && !defined(USE_COMPLEX_NUMBERS)
-#elif defined(HAVE_LASPACK)
-		   
-		   // Try LASPACK if PETSC is not available
-		   const SolverPackage sp = LASPACK_SOLVERS
-		   
-#else
-		   
-		   // No linear solvers for you!
-		   const SolverPackage sp = INVALID_SOLVER_PACKAGE
-#endif
-		   
-		   );
-
+  EquationSystems (Mesh& mesh);
 
   /**
    * Destructor.

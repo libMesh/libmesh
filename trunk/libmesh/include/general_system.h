@@ -1,4 +1,4 @@
-// $Id: general_system.h,v 1.9 2003-04-30 21:09:23 benkirk Exp $
+// $Id: general_system.h,v 1.10 2003-05-04 23:58:52 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -52,8 +52,7 @@ public:
    */
   GeneralSystem (EquationSystems<GeneralSystem>& es,
 		 const std::string&              name,
-		 const unsigned int              number,
-		 const SolverPackage             solver_package);
+		 const unsigned int              number);
 
   /**
    * Destructor.

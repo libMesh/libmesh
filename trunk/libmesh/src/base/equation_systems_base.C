@@ -1,4 +1,4 @@
-// $Id: equation_systems_base.C,v 1.4 2003-04-30 21:09:28 benkirk Exp $
+// $Id: equation_systems_base.C,v 1.5 2003-05-04 23:59:00 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -33,10 +33,8 @@
 
 // ------------------------------------------------------------
 // EquationSystemsBase class implementation
-EquationSystemsBase::EquationSystemsBase (Mesh& m,
-					  const SolverPackage sp) :
-  _mesh(m),
-  _solver_package(sp)
+EquationSystemsBase::EquationSystemsBase (Mesh& m) :
+  _mesh(m)
 {
 }
 

@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.33 2003-04-30 21:09:28 benkirk Exp $
+// $Id: equation_systems.C,v 1.34 2003-05-04 23:59:00 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -40,9 +40,8 @@
 // ------------------------------------------------------------
 // EquationSystems<T_sys> class implementation
 template <typename T_sys>
-EquationSystems<T_sys>::EquationSystems (Mesh& m,
-					 const SolverPackage sp) :
-  EquationSystemsBase(m, sp)
+EquationSystems<T_sys>::EquationSystems (Mesh& m) :
+  EquationSystemsBase(m)
 {
   // Default parameters
   this->set_parameter("linear solver tolerance")          = 1.e-12;
@@ -170,8 +169,7 @@ void EquationSystems<T_sys>::add_system (const std::string& name)
       _systems.insert (std::pair<std::string, T_sys*>(name,
 						      new T_sys(*this,
 								name,
-								num,
-								_solver_package)
+								num)
 						      )
 		       );
       

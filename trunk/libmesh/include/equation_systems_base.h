@@ -1,4 +1,4 @@
-// $Id: equation_systems_base.h,v 1.4 2003-04-30 21:09:23 benkirk Exp $
+// $Id: equation_systems_base.h,v 1.5 2003-05-04 23:58:52 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,7 +30,6 @@
 
 // Local Includes
 #include "mesh_common.h"
-#include "enum_solver_package.h"
 
 
 // Forward Declarations
@@ -54,12 +53,9 @@ class EquationSystemsBase
 protected:
 
   /**
-   * Constructor.  Optionally initializes required
-   * data structures.  Derived classes decide whether
-   * to use PETSc or LASPACK.
+   * Constructor.
    */
-  EquationSystemsBase (Mesh& mesh,
-		       const SolverPackage sp);
+  EquationSystemsBase (Mesh& mesh);
 
   /**
    * Destructor.
@@ -164,12 +160,6 @@ public:
    */
   Mesh & get_mesh();
 
-  /**
-   * @returns the solver package type currently in use
-   */
-  SolverPackage get_solver_package() const 
-  { return _solver_package; }
-
 
 
 protected:
@@ -185,11 +175,6 @@ protected:
    */ 
   Mesh& _mesh;
   
-  /**
-   * Flag indicating what linear solver package to use
-   */
-  const SolverPackage _solver_package;
-
   /**
    * Data structure to hold user-specified flags.
    */

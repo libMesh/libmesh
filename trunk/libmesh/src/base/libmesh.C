@@ -1,4 +1,4 @@
-// $Id: libmesh.C,v 1.13 2003-04-18 19:02:23 benkirk Exp $
+// $Id: libmesh.C,v 1.14 2003-05-04 23:59:00 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -90,6 +90,14 @@ PerfLog      libMesh::log ("libMesh",
 AutoPtr<GetPot>  libMesh::_command_line (NULL);
 bool             libMesh::_is_initialized = false;
 
+
+#if   defined(HAVE_PETSC)
+SolverPackage    libMesh::_solver_package = PETSC_SOLVERS;
+#elif defined(HAVE_LASPACK)
+SolverPackage    libMesh::_solver_package = LASPACK_SOLVERS;
+#else
+SolverPackage    libMesh::_solver_package = INVALID_SOLVER_PACKAGE;
+#endif
 
 
 
@@ -216,4 +224,32 @@ bool libMesh::on_command_line (const std::string& arg)
   assert (_command_line.get() != NULL);
 
   return _command_line->search (arg);
+}
+
+
+
+SolverPackage libMesh::default_solver_package ()
+{
+  static bool called = false;
+
+  // Check the command line.  Since the command line is
+  // unchangingt it is sufficient to do this only once.
+  if (!called)
+    {
+      called = true;
+
+#ifdef HAVE_PETSC
+      if (libMesh::on_command_line ("--use-petsc"))
+	_solver_package = PETSC_SOLVERS;
+#endif
+
+#ifdef HAVE_LASPACK
+      if (libMesh::on_command_line ("--use-laspack"))
+	_solver_package = LASPACK_SOLVERS;
+#endif
+      
+    }
+
+
+  return _solver_package;  
 }

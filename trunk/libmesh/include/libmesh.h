@@ -1,4 +1,4 @@
-// $Id: libmesh.h,v 1.10 2003-04-08 22:54:10 benkirk Exp $
+// $Id: libmesh.h,v 1.11 2003-05-04 23:58:52 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,6 +31,7 @@
 #include "mesh_common.h"
 #include "libmesh_base.h"
 #include "perf_log.h"
+#include "enum_solver_package.h"
 #include "auto_ptr.h"
 
 
@@ -126,6 +127,16 @@ public:
 #endif
 
   /**
+   * @returns the default solver interface to use.  The value depends on
+   * which solver packages  were available when the library was configured.
+   * The command-line is also checked, allowing the user to override the
+   * compiled default.  For example, \p --use-petsc will force the use of
+   * PETSc solvers, and \p --use-laspack will force the use of LASPACK
+   * solvers.   
+   */
+  static SolverPackage default_solver_package ();
+
+  /**
    * \f$ \pi=3.14159... \f$.
    */
   static const Real pi;
@@ -153,6 +164,11 @@ private:
    * Flag that tells if \p init() has been called.
    */
   static bool _is_initialized;
+
+  /**
+   * The default solver package to use.
+   */
+  static SolverPackage _solver_package;
   
 };
 

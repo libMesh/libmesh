@@ -1,4 +1,4 @@
-// $Id: numeric_vector.C,v 1.8 2003-04-09 02:30:28 jwpeterson Exp $
+// $Id: numeric_vector.C,v 1.9 2003-05-04 23:59:00 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,7 +26,7 @@
 #include "numeric_vector.h"
 #include "laspack_vector.h"
 #include "petsc_vector.h"
-#include "libmesh.h"
+
 
 
 //------------------------------------------------------------------
@@ -35,25 +35,8 @@
 // Full specialization for Real datatypes
 template <typename T>
 AutoPtr<NumericVector<T> >
-NumericVector<T>::build(const SolverPackage solver_package_in)
+NumericVector<T>::build(const SolverPackage solver_package)
 {
-  // Possibly overload the solver package based on
-  // command-line arguments
-  SolverPackage solver_package = solver_package_in;
-  
-#ifdef HAVE_PETSC
-  if (libMesh::on_command_line ("--use-petsc"))
-    solver_package = PETSC_SOLVERS;
-#endif
-  
-#ifdef HAVE_LASPACK
-  if (libMesh::on_command_line("--use-laspack"))
-    solver_package = LASPACK_SOLVERS;
-#endif
-
-
-
-
   // Build the appropriate vector
   switch (solver_package)
     {
