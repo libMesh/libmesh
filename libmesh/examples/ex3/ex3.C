@@ -1,4 +1,4 @@
-// $Id: ex3.C,v 1.22 2003-05-22 21:17:58 benkirk Exp $
+// $Id: ex3.C,v 1.23 2003-06-03 05:33:34 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -266,9 +266,28 @@ void assemble_poisson(EquationSystems& es,
    * Tell the finite element object to use our quadrature rule.
    */
   fe->attach_quadrature_rule (&qrule);
+  
+  /**
+   * Declare a special finite element object for
+   * boundary integration.
+   */
+  AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
+  
+  /**
+   * Boundary integration requires one quadraure rule,
+   * with dimensionality one less than the dimensionality
+   * of the element.
+   */
+  QGauss qface(dim-1, FIFTH);
+  
+  /**
+   * Tell the finte element object to use our
+   * quadrature rule.
+   */
+  fe_face->attach_quadrature_rule (&qface);
+    
 
   
-
   /**
    *--------------------------------------------------------------------
    * Here we define some references to cell-specific data that
@@ -487,25 +506,6 @@ void assemble_poisson(EquationSystems& es,
 	for (unsigned int side=0; side<elem->n_sides(); side++)
 	  if (elem->neighbor(side) == NULL)
 	    {
-	      /**
-	       * Declare a special finite element object for
-	       * boundary integration.
-	       */
-	      AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
-	      
-	      /**
-	       * Boundary integration requires one quadraure rule,
-	       * with dimensionality one less than the dimensionality
-	       * of the element.
-	       */
-	      QGauss qface(dim-1, FIFTH);
-	      
-	      /**
-	       * Tell the finte element object to use our
-	       * quadrature rule.
-	       */
-	      fe_face->attach_quadrature_rule (&qface);
-	      
 	      /**
 	       * The value of the shape functions at the quadrature
 	       * points.

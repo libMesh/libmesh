@@ -1,4 +1,4 @@
-// $Id: ex5.C,v 1.20 2003-05-22 21:18:00 benkirk Exp $
+// $Id: ex5.C,v 1.21 2003-06-03 05:33:34 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -264,7 +264,44 @@ void assemble_poisson(EquationSystems& es,
    */
   fe->attach_quadrature_rule (qrule.get());
 
-  
+  /**
+   * Declare a special finite element object for
+   * boundary integration.
+   */
+  AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
+	      
+  /**
+   * As already seen in example 3, boundary integration 
+   * requires a quadraure rule.  Here, however,
+   * we use the more convenient way of building this
+   * rule.  Note that one could also have initialized
+   * the face quadrature rules with the type directly
+   * determined from \p qrule, namely through:
+   * \verbatim
+   AutoPtr<QBase>  qface1 (QBase::build(qrule->type(),
+   dim-1, 
+   THIRD));
+   \endverbatim
+   * And again: using the \p AutoPtr<QBase> relaxes
+   * the need to delete the object afterwards,
+   * they clean up themselves.
+   */
+  AutoPtr<QBase>  qface (QBase::build(quad_type,
+				      dim-1, 
+				      THIRD));
+	      
+  /**
+   * Tell the finte element object to use our
+   * quadrature rule.  Note that a \p AutoPtr<QBase> returns
+   * a \p QBase* pointer to the object it handles with \p get().  
+   * However, using \p get(), the \p AutoPtr<QBase> \p qface is 
+   * still in charge of this pointer. I.e., when \p qface goes 
+   * out of scope, it will safely delete the \p QBase object it 
+   * points to.  This behavior may be overridden using
+   * \p AutoPtr<Xyz>::release(), but is not recommended.
+   */
+  fe_face->attach_quadrature_rule (qface.get());
+	      
 
   /**
    *--------------------------------------------------------------------
@@ -367,41 +404,7 @@ void assemble_poisson(EquationSystems& es,
       {
 	for (unsigned int side=0; side<elem->n_sides(); side++)
 	  if (elem->neighbor(side) == NULL)
-	    {
-	      AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
-	      
-	      /**
-	       * As already seen in example 3, boundary integration 
-	       * requires a quadraure rule.  Here, however,
-	       * we use the more convenient way of building this
-	       * rule.  Note that one could also have initialized
-	       * the face quadrature rules with the type directly
-	       * determined from \p qrule, namely through:
-	       * \verbatim
-	         AutoPtr<QBase>  qface1 (QBase::build(qrule->type(),
-		                                      dim-1, 
-						      THIRD));
-		 \endverbatim
-	       * And again: using the \p AutoPtr<QBase> relaxes
-	       * the need to delete the object afterwards,
-	       * they clean up themselves.
-	       */
-	      AutoPtr<QBase>  qface (QBase::build(quad_type,
-						  dim-1, 
-						  THIRD));
-	      
-	      /**
-	       * Tell the finte element object to use our
-	       * quadrature rule.  Note that a \p AutoPtr<QBase> returns
-	       * a \p QBase* pointer to the object it handles with \p get().  
-	       * However, using \p get(), the \p AutoPtr<QBase> \p qface is 
-	       * still in charge of this pointer. I.e., when \p qface goes 
-	       * out of scope, it will safely delete the \p QBase object it 
-	       * points to.  This behavior may be overridden using
-	       * \p AutoPtr<Xyz>::release(), but is not recommended.
-	       */
-	      fe_face->attach_quadrature_rule (qface.get());
-	      
+	    {	      
 	      const std::vector<std::vector<Real> >&  phi_face = fe_face->get_phi();
 
 	      const std::vector<Real>& JxW_face = fe_face->get_JxW();

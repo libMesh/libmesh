@@ -1,4 +1,4 @@
-// $Id: inf_fe_boundary.C,v 1.4 2003-02-24 14:35:48 benkirk Exp $
+// $Id: inf_fe_boundary.C,v 1.5 2003-06-03 05:33:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -48,9 +48,8 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem*,
 
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
-void InfFE<Dim,T_radial,T_base>::init_shape_functions(const std::vector<Point>&,
-						      const Elem*,
-						      const unsigned int)
+void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Point>&,
+							   const Elem*)
 {
   // We don't do this for 1D elements!
   //assert (Dim != 1);

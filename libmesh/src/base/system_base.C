@@ -1,4 +1,4 @@
-// $Id: system_base.C,v 1.20 2003-05-29 21:31:36 benkirk Exp $
+// $Id: system_base.C,v 1.21 2003-06-03 05:33:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -262,9 +262,9 @@ void SystemBase::assemble ()
 	// Initialize additional matrices conformal
 	// to this sparsity pattern, though normally, _dof_map.compute_sparsity()
 	// already did this
-	for(other_matrices_iterator pos = _other_matrices.begin(); 
-	    pos != _other_matrices.end(); ++pos)
-	    pos->second->init ();
+	for (other_matrices_iterator pos = _other_matrices.begin(); 
+	     pos != _other_matrices.end(); ++pos)
+	  pos->second->init ();
 	    
       }
     else

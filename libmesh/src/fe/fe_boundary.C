@@ -1,4 +1,4 @@
-// $Id: fe_boundary.C,v 1.16 2003-05-21 15:27:34 benkirk Exp $
+// $Id: fe_boundary.C,v 1.17 2003-06-03 05:33:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -29,6 +29,8 @@
 #include "quadrature.h"
 #include "elem.h"
 #include "fe_macro.h"
+#include "mesh_logging.h"
+
 
 
 
@@ -81,38 +83,45 @@ void FE<Dim,T>::reinit(const Elem* elem,
   assert (qrule != NULL);
   // We don't do this for 1D elements!
   assert (Dim != 1);
-  
+
+  // Build the side of interest 
   const AutoPtr<Elem> side(elem->build_side(s));
-      
+
+  // initialize quadrature rule
   qrule->init(side->type());
-  
+
+  // The last side we computed the shape functions for
+  static unsigned int last_s = static_cast<unsigned int>(-1);
+
+  // We might not need to reinitialize the shape functions
+  if ((this->get_type() != elem->type()) ||
+      (s != last_s) ||
+      this->shapes_need_reinit())
+    {
+      // Set the element type
+      elem_type = elem->type();
+
+      // Set the last_s
+      last_s = s;
+      
+      // Initialize the face shape functions
+      this->init_face_shape_functions (qrule->get_points(),  side.get());
+    }
   
   // Compute the Jacobian*Weight on the face for integration
-  {
-    elem_type = side->type();
-    init_shape_functions (qrule->get_points(),  elem, s);
-    compute_map          (qrule->get_weights(), elem, s);
-  }
+  this->compute_face_map (qrule->get_weights(), side.get());
 
   // make a copy of the Jacobian for integration
-  const std::vector<Real>  JxW_int(JxW);
-
+  const std::vector<Real> JxW_int(JxW);
 
   // Find where the integration points are located on the
   // full element.
-  std::vector<Point> qp;
+  std::vector<Point> qp; this->inverse_map (elem, xyz, qp);
   
-  inverse_map (elem, xyz, qp);
-  
-
   // compute the shape function and derivative values
-  {
-    elem_type = elem->type();
-    init_shape_functions    (qp, elem);
-    compute_map             (qrule->get_weights(), elem);
-    compute_shape_functions ();
-  }  
-  
+  // at the points qp
+  this->reinit  (elem, &qp);
+      
   // copy back old data
   JxW = JxW_int;
 }
@@ -120,14 +129,16 @@ void FE<Dim,T>::reinit(const Elem* elem,
 
 
 template <unsigned int Dim, FEFamily T>
-void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
-				     const Elem* elem,
-				     const unsigned int s)
+void FE<Dim,T>::init_face_shape_functions(const std::vector<Point>& qp,
+					  const Elem* side)
 {
-  assert (elem  != NULL);
+  assert (side  != NULL);
   
-  const AutoPtr<Elem> side(elem->build_side(s));
-  
+  /**
+   * Start logging the shape function initialization
+   */
+  START_LOG("init_face_shape_functions()", "FE");
+
   // The element type and order to use in
   // the map
   const Order    mapping_order     (side->default_order()); 
@@ -137,96 +148,55 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
   const unsigned int n_qp = qp.size();
 	
   const unsigned int n_mapping_shape_functions =
-    n_shape_functions (mapping_elem_type,
-		       mapping_order);
+    this->n_shape_functions (mapping_elem_type,
+			     mapping_order);
   
   // resize the vectors to hold current data
   // Psi are the shape functions used for the FE mapping
-  {
-    psi_map.resize        (n_mapping_shape_functions);
-    dpsidxi_map.resize    (n_mapping_shape_functions);
-    if (Dim == 3)
-      dpsideta_map.resize (n_mapping_shape_functions);
-    
-    for (unsigned int i=0; i<n_mapping_shape_functions; i++)
-      {
-	psi_map[i].resize        (n_qp);
-	dpsidxi_map[i].resize    (n_qp);
-	if (Dim == 3)
-	  dpsideta_map[i].resize (n_qp);
-      }
-  }
+  psi_map.resize        (n_mapping_shape_functions);
+  dpsidxi_map.resize    (n_mapping_shape_functions);
+  if (Dim == 3)
+    dpsideta_map.resize (n_mapping_shape_functions);
   
-  
-  // Compute the value of shape function i at quadrature point p
-  // (Lagrange shape functions are used for the mapping)
   for (unsigned int i=0; i<n_mapping_shape_functions; i++)
-    for (unsigned int p=0; p<n_qp; p++)
-      {
-	psi_map[i][p]        = FE<Dim-1,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[p]);
-	dpsidxi_map[i][p]    = FE<Dim-1,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
-	if (Dim == 3)
-	  dpsideta_map[i][p] = FE<Dim-1,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 1, qp[p]);
-      }
-
-  // compute the normal vectors at each quadrature point p
-  tangents.resize(n_qp);
-  normals.resize(n_qp);
-  for (unsigned int p=0; p<n_qp; p++)
     {
-      tangents[p].resize(DIM-1); // 1 Tangent in 2D, 2 in 3D
+      psi_map[i].resize        (n_qp);
+      dpsidxi_map[i].resize    (n_qp);
+      if (Dim == 3)
+	dpsideta_map[i].resize (n_qp);
       
-      if (Dim == 2)
+  
+      // Compute the value of shape function i at quadrature point p
+      // (Lagrange shape functions are used for the mapping)
+      for (unsigned int p=0; p<n_qp; p++)
 	{
-	  // compute d(xyz)/dxi at the
-	  // quadrature point.
-	  Point dxyzdxi_map;
-
-	  for (unsigned int i=0; i<n_mapping_shape_functions; i++)
-	    dxyzdxi_map.add_scaled(side->point(i), dpsidxi_map[i][p]);
-	  
-	  const Point n(dxyzdxi_map(1), -dxyzdxi_map(0), 0.);
-	  
-	  normals[p]     = n.unit();
-	  tangents[p][0] = dxyzdxi_map.unit();
-#if DIM == 3  // Only good in 3D space
-	  tangents[p][1] = dxyzdxi_map.cross(n).unit();
-#endif
-	}
-	
-      else if (Dim == 3)
-	{
-	  // compute d(xyz)/dxi and d(xyz)/deta at the
-	  // quadrature point.
-	  Point dxyzdxi_map;
-	  Point dxyzdeta_map;
-
-	  for (unsigned int i=0; i<n_mapping_shape_functions; i++)
-	    {
-	      dxyzdxi_map.add_scaled (side->point(i), dpsidxi_map[i][p]);
-	      dxyzdeta_map.add_scaled(side->point(i), dpsideta_map[i][p]);
-	    }
-	  
-	  const Point n  = dxyzdxi_map.cross(dxyzdeta_map);
-	  normals[p]     = n.unit();
-	  tangents[p][0] = dxyzdxi_map.unit();
-	  tangents[p][1] = n.cross(dxyzdxi_map).unit();
+	  psi_map[i][p]        = FE<Dim-1,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[p]);
+	  dpsidxi_map[i][p]    = FE<Dim-1,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
+	  if (Dim == 3)
+	    dpsideta_map[i][p] = FE<Dim-1,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 1, qp[p]);
 	}
     }
+
+  
+  /**
+   * Stop logging the shape function initialization
+   */
+  STOP_LOG("init_face_shape_functions()", "FE");
 }
 
   
 
-void FEBase::compute_map(const std::vector<Real>& qw,
-			 const Elem* elem,
-			 const unsigned int s)
+void FEBase::compute_face_map(const std::vector<Real>& qw,
+			      const Elem* side)
 {
-  assert (elem  != NULL);
+  assert (side  != NULL);
 
-  // Get an AutoPtr to the side.  Don't worry about deleting it.
-  const AutoPtr<Elem> side(elem->build_side(s));       
+  START_LOG("compute_face_map()", "FE");
+
+  // The number of quadrature points.
   const unsigned int n_qp = qw.size();
-
+  
+  
   switch (dim)
     {
       
@@ -237,13 +207,17 @@ void FEBase::compute_map(const std::vector<Real>& qw,
 	{  
 	  xyz.resize(n_qp);
 	  dxyzdxi_map.resize(n_qp);
+	  tangents.resize(n_qp);
+	  normals.resize(n_qp);
 	  
 	  JxW.resize(n_qp);
 	}
 	
 	// Clear the entities that will be summed
+	// Compute the tangent & normal at the quadrature point
 	for (unsigned int p=0; p<n_qp; p++)
 	  {
+	    tangents[p].resize(DIM-1); // 1 Tangent in 2D, 2 in 3D
 	    xyz[p].zero();
 	    dxyzdxi_map[p].zero();
 	  }
@@ -259,7 +233,18 @@ void FEBase::compute_map(const std::vector<Real>& qw,
 		dxyzdxi_map[p].add_scaled(side_point, dpsidxi_map[i][p]);
 	      }
 	  }
-	  
+
+	// Compute the tangent & normal at the quadrature point
+	for (unsigned int p=0; p<n_qp; p++)
+	  {
+	    const Point n(dxyzdxi_map[p](1), -dxyzdxi_map[p](0), 0.);
+	    
+	    normals[p]     = n.unit();
+	    tangents[p][0] = dxyzdxi_map[p].unit();
+#if DIM == 3  // Only good in 3D space
+	    tangents[p][1] = dxyzdxi_map[p].cross(n).unit();
+#endif
+	  }
 	
 	// compute the jacobian at the quadrature points
 	for (unsigned int p=0; p<n_qp; p++)
@@ -272,11 +257,12 @@ void FEBase::compute_map(const std::vector<Real>& qw,
 	    JxW[p] = jac*qw[p];
 	  }
 	
-	// done computing the map	
-	return;
+	// done computing the map
+	break;
       }
 
 
+      
     case 3:
       {
 	//----------------------------------------------------------------
@@ -285,13 +271,16 @@ void FEBase::compute_map(const std::vector<Real>& qw,
 	  xyz.resize(n_qp);
 	  dxyzdxi_map.resize(n_qp);
 	  dxyzdeta_map.resize(n_qp);
-	  
+	  tangents.resize(n_qp);
+	  normals.resize(n_qp);
+
 	  JxW.resize(n_qp);
 	}
     
 	// Clear the entities that will be summed
 	for (unsigned int p=0; p<n_qp; p++)
 	  {
+	    tangents[p].resize(DIM-1); // 1 Tangent in 2D, 2 in 3D
 	    xyz[p].zero();
 	    dxyzdxi_map[p].zero();
 	    dxyzdeta_map[p].zero();
@@ -309,9 +298,16 @@ void FEBase::compute_map(const std::vector<Real>& qw,
 		dxyzdeta_map[p].add_scaled(side_point, dpsideta_map[i][p]);
 	      }
 	  }
-    
-    
-	
+
+	// Compute the tangents & normal at the quadrature point
+	for (unsigned int p=0; p<n_qp; p++)
+	  {	    
+	    const Point n  = dxyzdxi_map[p].cross(dxyzdeta_map[p]);
+	    normals[p]     = n.unit();
+	    tangents[p][0] = dxyzdxi_map[p].unit();
+	    tangents[p][1] = n.cross(dxyzdxi_map[p]).unit();
+	  }    
+    	
 	// compute the jacobian at the quadrature points, see
 	// http://sp81.msi.umn.edu:999/fluent/fidap/help/theory/thtoc.htm
 	for (unsigned int p=0; p<n_qp; p++)
@@ -339,7 +335,7 @@ void FEBase::compute_map(const std::vector<Real>& qw,
 	  }
 	
 	// done computing the map
-	return;  
+	break;
       }
 
 
@@ -347,6 +343,7 @@ void FEBase::compute_map(const std::vector<Real>& qw,
       error();
       
     }
+  STOP_LOG("compute_face_map()", "FE");
 }
 
 

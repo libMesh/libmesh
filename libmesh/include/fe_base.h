@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.14 2003-05-30 20:15:45 ddreyer Exp $
+// $Id: fe_base.h,v 1.15 2003-06-03 05:33:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -340,9 +340,8 @@ protected:
   /** 
    * Same as before, but for a side.  Useful for boundary integration.
    */  
-  void compute_map(const std::vector<Real>& qw,
-		   const Elem* e,
-		   const unsigned int s);
+  void compute_face_map(const std::vector<Real>& qw,
+			const Elem* side);
 
   /** 
    * After having updated the jacobian and the transformation

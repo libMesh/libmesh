@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.20 2003-05-27 17:18:14 benkirk Exp $
+// $Id: fe.h,v 1.21 2003-06-03 05:33:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -52,7 +52,7 @@ class InfFE;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.20 $
+ * \version $Revision: 1.21 $
  */
 
 //-------------------------------------------------------------
@@ -265,9 +265,8 @@ private:
    * Same as before, but for a side. This is used for boundary
    * integration.
    */  
-  void init_shape_functions(const std::vector<Point>& qp,
-			    const Elem* e,
-			    const unsigned int s);
+  void init_face_shape_functions(const std::vector<Point>& qp,
+				 const Elem* side);
 
   /**
    * @returns the location (in physical space) of the point
@@ -316,7 +315,7 @@ private:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.20 $
+ * \version $Revision: 1.21 $
  */
 
 //-------------------------------------------------------------
@@ -341,7 +340,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.20 $
+ * \version $Revision: 1.21 $
  */
 
 //-------------------------------------------------------------
@@ -366,7 +365,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.20 $
+ * \version $Revision: 1.21 $
  */
 
 //-------------------------------------------------------------

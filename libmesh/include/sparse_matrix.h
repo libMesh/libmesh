@@ -1,4 +1,4 @@
-// $Id: sparse_matrix.h,v 1.11 2003-06-02 22:50:08 benkirk Exp $
+// $Id: sparse_matrix.h,v 1.12 2003-06-03 05:33:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -98,24 +98,11 @@ public:
   { _dof_map = &dof_map; }
 
   /**
-   * Updates the matrix sparsity pattern, just like
-   * \p update_sparsity_pattern(), but leaves the sparsity
-   * pattern untouched.  Necessary for allocating multiple
-   * matrices in the @e same system.  When your \p SparseMatrix<T>
+   * Updates the matrix sparsity pattern. When your \p SparseMatrix<T>
    * implementation does not need this data simply do
    * not overload this method.
    */
-  virtual void const_update_sparsity_pattern (const std::vector<std::vector<unsigned int> >&) {}
-  
-  /**
-   * Updates the matrix sparsity pattern, and may freely trash
-   * the sparsity pattern passed to it.  This method is
-   * included because some sparse matrix storage schemes
-   * (e.g. LASPACK) need it.  If your \p SparseMatrix<T>
-   * implementation does not need this data simply do
-   * not overload this method.
-   */
-  virtual void update_sparsity_pattern (std::vector<std::vector<unsigned int> >&) {}
+  virtual void update_sparsity_pattern (const std::vector<std::vector<unsigned int> >&) {}
   
   /**
    * Initialize a Sparse matrix that is of global

@@ -1,4 +1,4 @@
-// $Id: laspack_matrix.C,v 1.12 2003-06-02 22:50:11 benkirk Exp $
+// $Id: laspack_matrix.C,v 1.13 2003-06-03 05:33:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -34,8 +34,8 @@
 //-----------------------------------------------------------------------
 // LaspackMatrix members
 template <typename T> 
-void LaspackMatrix<T>::const_update_sparsity_pattern (const std::vector<std::vector<unsigned int> >&
-						      sparsity_pattern)
+void LaspackMatrix<T>::update_sparsity_pattern (const std::vector<std::vector<unsigned int> >&
+						sparsity_pattern)
 {
   // clear data, start over
   this->clear ();    
@@ -91,11 +91,11 @@ void LaspackMatrix<T>::const_update_sparsity_pattern (const std::vector<std::vec
 
   // Initialize the matrix
   assert (!this->initialized());
-  init ();
+  this->init ();
   assert (this->initialized());
   //std::cout << "n_rows=" << n_rows << std::endl;
   //std::cout << "m()=" << m() << std::endl;
-  assert (n_rows == m());
+  assert (n_rows == this->m());
 
   // Tell the matrix about its structure.  Initialize it
   // to zero.
@@ -120,24 +120,13 @@ void LaspackMatrix<T>::const_update_sparsity_pattern (const std::vector<std::vec
 	  // 	    << ")" << std::endl;
 	  //std::cout << "pos(i,j)=" << pos(i,j)
 	  //          << std::endl;	  
-	  assert (pos(i,j) == l);
+	  assert (this->pos(i,j) == l);
 	  Q_SetEntry (&_QMat, i+1, l, j+1, 0.);
 	}
     }
   
   // That's it!
   //here();
-}
-
-
-
-template <typename T> 
-void LaspackMatrix<T>::update_sparsity_pattern (std::vector<std::vector<unsigned int> >&
-					       sparsity_pattern)
-{
-  // for now, there is no need that \p LaspackMatrix<T> destroys the
-  // sparsity pattern.  Use the const version.
-  const_update_sparsity_pattern(sparsity_pattern);
 }
 
 

@@ -1,4 +1,4 @@
-// $Id: ex6.C,v 1.25 2003-05-22 21:18:00 benkirk Exp $
+// $Id: ex6.C,v 1.26 2003-06-03 05:33:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -116,8 +116,8 @@ int main (int argc, char** argv)
    */
 #ifndef ENABLE_INFINITE_ELEMENTS
 
-  std::cerr << "ERROR: This example requires the library to be " << std::endl
-	    << " compiled with Infinite Element support!" << std::endl;
+  std::cerr << "ERROR: This example requires the library to be compiled with Infinite Element support!"
+	    << std::endl;
   here();
 
   return 0;
@@ -130,8 +130,8 @@ int main (int argc, char** argv)
    */
 #ifdef USE_COMPLEX_NUMBERS
 
-  std::cerr << "ERROR: This example is not intended for " << std::endl
-	    << " use with complex numbers." << std::endl;
+  std::cerr << "ERROR: Not intended for use with complex numbers."
+	    << std::endl;
   here();
 
   return 0;

@@ -1,4 +1,4 @@
-// $Id: ex4.C,v 1.26 2003-05-22 21:17:59 benkirk Exp $
+// $Id: ex4.C,v 1.27 2003-06-03 05:33:34 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -298,6 +298,25 @@ void assemble_poisson(EquationSystems& es,
    */
   fe->attach_quadrature_rule (&qrule);
 
+  /**
+   * Declare a special finite element object for
+   * boundary integration.
+   */
+  AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
+	      
+  /**
+   * Boundary integration requires one quadraure rule,
+   * with dimensionality one less than the dimensionality
+   * of the element.
+   */
+  QGauss qface(dim-1, FIFTH);
+  
+  /**
+   * Tell the finte element object to use our
+   * quadrature rule.
+   */
+  fe_face->attach_quadrature_rule (&qface);
+	      
   
 
   /**
@@ -528,25 +547,6 @@ void assemble_poisson(EquationSystems& es,
 	  if (elem->neighbor(side) == NULL)
 	    {
 	      /**
-	       * Declare a special finite element object for
-	       * boundary integration.
-	       */
-	      AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
-	      
-	      /**
-	       * Boundary integration requires one quadraure rule,
-	       * with dimensionality one less than the dimensionality
-	       * of the element.
-	       */
-	      QGauss qface(dim-1, FIFTH);
-	      
-	      /**
-	       * Tell the finte element object to use our
-	       * quadrature rule.
-	       */
-	      fe_face->attach_quadrature_rule (&qface);
-	      
-	      /**
 	       * The value of the shape functions at the quadrature
 	       * points.
 	       */
@@ -617,7 +617,7 @@ void assemble_poisson(EquationSystems& es,
 	    } // end if (elem->neighbor(side) == NULL)
 	
 	/**
-	 * Start logging the boundary condition computation
+	 * Stop logging the boundary condition computation
 	 */
 	perf_log.stop_event ("BCs");
 
