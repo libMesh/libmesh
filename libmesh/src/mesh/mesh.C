@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.20 2003-08-27 02:04:23 jwpeterson Exp $
+// $Id: mesh.C,v 1.21 2003-08-27 02:07:25 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -284,61 +284,46 @@ void Mesh::create_submesh (Mesh& new_mesh,
 	     static_cast<unsigned int>(-1));
 
   
-  {
-    // the number of nodes on the new mesh, will be incremented
-    unsigned int n_new_nodes = 0;
-    unsigned int n_new_elem  = 0;
+  
+  // the number of nodes on the new mesh, will be incremented
+  unsigned int n_new_nodes = 0;
+  unsigned int n_new_elem  = 0;
     
-    for (; it != it_end; ++it)
-      {
-	// increment the new element counter
-	n_new_elem++;
+  for (; it != it_end; ++it)
+    {
+      // increment the new element counter
+      n_new_elem++;
 	
-	const Elem* old_elem = *it;
+      const Elem* old_elem = *it;
 
-	// Add an equivalent element type to the new_mesh
-	Elem* new_elem = new_mesh.add_elem (Elem::build (old_elem->type()));
+      // Add an equivalent element type to the new_mesh
+      Elem* new_elem = new_mesh.add_elem (Elem::build (old_elem->type()));
 
-	assert (new_elem != NULL);
+      assert (new_elem != NULL);
 	
-	// Loop over the nodes on this element.  
-	for (unsigned int n=0; n<old_elem->n_nodes(); n++)
-	  {
-	    assert (old_elem->node(n) < new_node_numbers.size());
+      // Loop over the nodes on this element.  
+      for (unsigned int n=0; n<old_elem->n_nodes(); n++)
+	{
+	  assert (old_elem->node(n) < new_node_numbers.size());
 
-	    if (new_node_numbers[old_elem->node(n)] == static_cast<unsigned int>(-1))
-	      {
-		new_node_numbers[old_elem->node(n)] = n_new_nodes;
+	  if (new_node_numbers[old_elem->node(n)] == static_cast<unsigned int>(-1))
+	    {
+	      new_node_numbers[old_elem->node(n)] = n_new_nodes;
 
-		// Add this node to the new mesh
-		new_mesh.add_point (old_elem->point(n), n_new_nodes);
+	      // Add this node to the new mesh
+	      new_mesh.add_point (old_elem->point(n), n_new_nodes);
 
-		// Increment the new node counter
-		n_new_nodes++;
-	      }
+	      // Increment the new node counter
+	      n_new_nodes++;
+	    }
 
-	    // Define this element's connectivity on the new mesh
-	    assert (new_node_numbers[old_elem->node(n)] < new_mesh.n_nodes());
+	  // Define this element's connectivity on the new mesh
+	  assert (new_node_numbers[old_elem->node(n)] < new_mesh.n_nodes());
 	    
-	    new_elem->set_node(n) = new_mesh.node_ptr (new_node_numbers[old_elem->node(n)]);
-	  }
-      }
+	  new_elem->set_node(n) = new_mesh.node_ptr (new_node_numbers[old_elem->node(n)]);
+	}
+    }
   
-    // Test out what we have
-//     std::cout << "number of elements in the new_mesh will be = "
-// 	      << n_new_elem
-// 	      << std::endl;
-  
-//     std::cout << "number of nodes in the new_mesh will be = "
-// 	      << n_new_nodes
-// 	      << std::endl;
-  
-//     for (unsigned int i=0; i<new_node_numbers.size(); ++i)
-//       std::cout << new_node_numbers[i] << std::endl;
-
-  }
-
-  new_mesh.print_info();
 
   // Prepare the new_mesh for use
   new_mesh.prepare_for_use();
