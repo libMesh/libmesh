@@ -1,4 +1,4 @@
-// $Id: mesh_tetgen_support.C,v 1.9 2004-06-19 21:36:43 fprill Exp $
+// $Id: mesh_tetgen_support.C,v 1.10 2004-08-05 14:44:15 jwpeterson Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -20,8 +20,9 @@
 #include "libmesh_config.h"
 #ifdef HAVE_TETGEN
 
+
+
 // C++ includes
-#include <stdio.h>
 #include <sstream>
 
 
@@ -134,7 +135,7 @@ void TetGen13_wrapper::set_switches(std::string s)
 { 
   switches = strdup(s.c_str()); 
   if (!tetgen_be.parse_commandline(switches)) {
-    printf("TetGen replies: Wrong switches!\n");
+    std::cout << "TetGen replies: Wrong switches!" << std::endl;
   } // if
 }
 

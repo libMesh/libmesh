@@ -121,6 +121,9 @@
    interface */
 #undef HAVE_TECPLOT_API
 
+/* Flag indicating whether the library will be compiled with TetGen support */
+#undef HAVE_TETGEN
+
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 

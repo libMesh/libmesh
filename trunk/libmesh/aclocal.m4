@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.64 2004-05-11 21:18:31 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.65 2004-08-05 14:44:13 jwpeterson Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -811,6 +811,8 @@ dnl TetGen version 1.3:
 	AC_SUBST(TETGEN_INCLUDE)
 	AC_SUBST(TETGEN_LIBRARY)	
 	AC_SUBST(enabletetgen)
+	AC_DEFINE(HAVE_TETGEN, 1, [Flag indicating whether the library will be compiled with TetGen support])
+        AC_MSG_RESULT(<<< Configuring library with TetGen support >>>)
 ])
 dnl -------------------------------------------------------------
 
