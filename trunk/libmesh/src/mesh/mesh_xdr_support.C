@@ -1,4 +1,4 @@
-// $Id: mesh_xdr_support.C,v 1.21 2004-07-12 23:53:26 jwpeterson Exp $
+// $Id: mesh_xdr_support.C,v 1.22 2004-07-26 14:02:52 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -140,10 +140,10 @@ void XdrInterface::mesh_interface(const std::string& name,
 	    n_blocks = mh->get_n_blocks();
 
 	    etypes.resize(n_blocks);
-	    etypes   = mh->get_block_elt_types();
+	    mh->get_block_elt_types(etypes);
 
 	    neeb.resize(n_blocks);
-	    neeb     = mh->get_num_elem_each_block();
+	    mh->get_num_elem_each_block(neeb);
 	  }
 	  
 	

@@ -1,4 +1,4 @@
-// "$Id: xdrIO.C,v 1.18 2004-03-08 02:10:05 benkirk Exp $\n"
+// "$Id: xdrIO.C,v 1.19 2004-07-26 14:02:52 jwpeterson Exp $\n"
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -491,7 +491,8 @@ int XdrMESH::header(XdrMHEAD *hd)
 	}
 
       
-      std::vector<ElemType> et = hd->get_block_elt_types();
+      std::vector<ElemType> et;
+      hd->get_block_elt_types(et);
       
       // Note:  If DECODING or READING, allocate space in the vector
       if ((m_type == DECODE) || (m_type == R_ASCII)) et.resize(hd->n_blocks);  
@@ -552,7 +553,8 @@ int XdrMESH::header(XdrMHEAD *hd)
       if ((m_type == DECODE) || (m_type == R_ASCII)) hd->set_block_elt_types(et);
 
 
-      std::vector<unsigned int> neeb = hd->get_num_elem_each_block();
+      std::vector<unsigned int> neeb;
+      hd->get_num_elem_each_block(neeb);
 
       // If DECODING or READING, allocate space for the vector 
       if ((m_type == DECODE) || (m_type == R_ASCII)) neeb.resize(hd->n_blocks);
