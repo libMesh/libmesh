@@ -1,6 +1,6 @@
 
 
-// $Id: mesh_base.C,v 1.34 2003-05-22 12:48:09 benkirk Exp $
+// $Id: mesh_base.C,v 1.35 2003-05-23 03:21:47 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -1112,8 +1112,8 @@ void MeshBase::sfc_partition(const unsigned int n_sbdmns,
     if (n_sbdmns == 1)
       {
 	for (unsigned int e=0; e<n_elem(); e++)
-	  elem(e)->subdomain_id() = 
-	    elem(e)->processor_id() = 0;
+	  elem(e)->set_subdomain_id() = 
+	    elem(e)->set_processor_id() = 0;
 	
 	return;
       }
@@ -1122,8 +1122,8 @@ void MeshBase::sfc_partition(const unsigned int n_sbdmns,
     const unsigned int blksize = n_elem()/n_sbdmns; 
     
     for (unsigned int e=0; e<n_elem(); e++)
-      elem(e)->subdomain_id() = 
-	elem(e)->processor_id() = 
+      elem(e)->set_subdomain_id() = 
+	elem(e)->set_processor_id() = 
 	(int) (e/blksize);
     
     return;

@@ -1,4 +1,4 @@
-// $Id: dof_object.h,v 1.12 2003-05-21 13:50:19 benkirk Exp $
+// $Id: dof_object.h,v 1.13 2003-05-23 03:21:47 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -48,7 +48,7 @@
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.12 $
+ * \version $Revision: 1.13 $
  */
 
 class DofObject
@@ -297,6 +297,122 @@ private:
 //------------------------------------------------------
 // Inline functions
 inline
+DofObject::DofObject () :
+#ifdef ENABLE_AMR
+  old_dof_object(NULL),
+#endif
+  _id (invalid_id),
+  _processor_id (invalid_processor_id),
+  _n_systems  (0),
+  _n_vars (NULL),
+#ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
+  _n_comp (NULL),
+#endif
+  _dof_ids (NULL)
+{
+  this->invalidate();
+}
+
+
+
+inline
+DofObject::DofObject (const DofObject& dof_obj) :
+#ifdef ENABLE_AMR
+  old_dof_object(NULL),
+#endif
+  _id (dof_obj._id),
+  _processor_id (dof_obj._processor_id),
+  _n_systems  (dof_obj._n_systems),
+  _n_vars (NULL),
+#ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
+  _n_comp (NULL),
+#endif
+  _dof_ids (NULL)
+{
+
+#ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
+
+  // Allocate storage for the dof numbers and copy
+  // the values.
+  _n_vars  = new unsigned char  [this->n_systems()];
+  _n_comp  = new unsigned char* [this->n_systems()];
+  _dof_ids = new unsigned int** [this->n_systems()];
+
+  for (unsigned int s=0; s<this->n_systems(); s++)
+    {      
+      _n_vars[s]  = dof_obj.n_vars(s);
+      _n_comp[s]  = new unsigned char [this->n_vars(s)];
+      _dof_ids[s] = new unsigned int* [this->n_vars(s)];
+  
+      for (unsigned int v=0; v<this->n_vars(s); v++)
+	{
+	  _n_comp[s][v]  = dof_obj.n_comp(s,v);
+	  
+	  _dof_ids[s][v] = new unsigned int [dof_obj.n_comp(s,v)];
+	  
+	  for (unsigned int c=0; c<this->n_comp(s,v); c++)
+	    _dof_ids[s][v][c] = dof_obj.dof_number(s,v,c);
+	}
+    }
+
+#else
+
+  // Allocate storage for the dof numbers and copy
+  // the values.
+  _n_vars  = new unsigned char [this->n_systems()];
+  _dof_ids = new unsigned int* [this->n_systems()];
+
+  for (unsigned int s=0; s<this->n_systems(); s++)
+    {  
+      _n_vars[s]  = dof_obj.n_vars(s);
+      _dof_ids[s] = new unsigned int [this->n_vars(s)];
+  
+      for (unsigned int v=0; v<this->n_vars(s); v++)
+	for (unsigned int c=0; c<this->n_comp(s,v); c++)
+	  {
+	    assert (c == 0);
+	    _dof_ids[s][v] = dof_obj.dof_number(s,v,c);
+	  }
+    }
+  
+#endif
+
+  // Check that everything worked
+#ifdef DEBUG
+
+  assert (this->n_systems() == dof_obj.n_systems());
+
+  for (unsigned int s=0; s<this->n_systems(); s++)
+    {
+      assert (this->n_vars(s) == dof_obj.n_vars(s));
+
+      for (unsigned int v=0; v<this->n_vars(s); v++)
+	{
+	  assert (this->n_comp(s,v) == dof_obj.n_comp(s,v));
+
+	  for (unsigned int c=0; c<this->n_comp(s,v); c++)
+	    assert (this->dof_number(s,v,c) == dof_obj.dof_number(s,v,c));
+	}
+    }
+  
+#endif
+}
+
+
+
+inline
+DofObject::~DofObject ()
+{
+  // Free all memory.
+#ifdef ENABLE_AMR
+  this->clear_old_dof_object ();
+#endif
+  this->clear_dofs ();
+}
+
+
+
+inline
 void DofObject::invalidate_dofs (const unsigned int sys_num)
 {
   // If the user does not specify the system number...
@@ -337,6 +453,67 @@ void DofObject::invalidate ()
   this->invalidate_dofs ();
   this->invalidate_id ();
   this->invalidate_processor_id ();
+}
+
+
+
+inline
+void DofObject::clear_dofs ()
+{
+#ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
+
+  // Only clear if there is data
+  if (this->n_systems() != 0)
+    {
+      for (unsigned int s=0; s<this->n_systems(); s++)
+	if (this->n_vars(s) != 0) // This has only been allocated if 
+	  {                       // variables were declared
+	    for (unsigned int v=0; v<this->n_vars(s); v++)
+	      if (this->n_comp(s,v) != 0)
+		{
+		  assert (_dof_ids[s][v] != NULL); delete [] _dof_ids[s][v]; _dof_ids[s][v] = NULL;
+		}
+	  
+	    assert (_dof_ids[s] != NULL); delete [] _dof_ids[s]; _dof_ids[s] = NULL;
+	    assert (_n_comp[s]  != NULL); delete [] _n_comp[s];  _n_comp[s]  = NULL;
+	  }
+      
+      assert (_n_vars  != NULL); delete [] _n_vars;  _n_vars  = NULL; 
+      assert (_n_comp  != NULL); delete [] _n_comp;  _n_comp  = NULL;
+      assert (_dof_ids != NULL); delete [] _dof_ids; _dof_ids = NULL;
+    }
+  
+  // Make sure we cleaned up
+  // (or there was nothing there)
+  assert (_n_vars  == NULL);
+  assert (_n_comp  == NULL);
+  assert (_dof_ids == NULL);
+  
+#else
+
+  // Only clear if there is data
+  if (this->n_systems() != 0)
+    {
+      for (unsigned int s=0; s<this->n_systems(); s++)
+	if (this->n_vars(s) != 0) // This has only been allocated if
+	  {                       // variables were declared
+	    assert(_dof_ids[s] != NULL); delete [] _dof_ids[s] ; _dof_ids[s] = NULL;
+	  }
+      
+      assert (_n_vars  != NULL); delete [] _n_vars;  _n_vars  = NULL; 
+      assert (_dof_ids != NULL); delete [] _dof_ids; _dof_ids = NULL;
+    }
+  
+  // Make sure we cleaned up
+  // (or there was nothing there)
+  assert (_n_vars  == NULL);
+  assert (_dof_ids == NULL);
+  
+#endif
+  
+
+  // No systems now.
+  _n_systems = 0;
 }
   
 
@@ -394,7 +571,27 @@ unsigned short int & DofObject::set_processor_id ()
 {
   return _processor_id;
 }
- 
+
+
+
+inline
+void DofObject::set_processor_id (const unsigned int id)
+{
+#ifdef DEBUG
+  
+  if (id != static_cast<unsigned int>(static_cast<unsigned short int>(id)))
+    {
+      std::cerr << "ERROR: id too large for unsigned short int!" << std::endl
+		<< "Recompile with DofObject::_processor_id larger!" << std::endl;
+      
+      error();
+    }
+
+#endif
+  
+  this->set_processor_id() = id;
+}
+
 
 
 inline

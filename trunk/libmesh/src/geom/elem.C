@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.22 2003-05-22 21:40:06 benkirk Exp $
+// $Id: elem.C,v 1.23 2003-05-23 03:21:47 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -475,8 +475,8 @@ void Elem::refine (MeshBase& mesh)
 
   // Two big prime numbers less than
   // sqrt(max_unsigned_int) for key creation.
-  static const unsigned int bp1 = 65449;
-  static const unsigned int bp2 = 48661;
+  const unsigned int bp1 = 65449;
+  const unsigned int bp2 = 48661;
   
   
   // Create my children
@@ -497,13 +497,9 @@ void Elem::refine (MeshBase& mesh)
     // Make these static.  It is unlikely the
     // sizes will change from call to call, so having these
     // static should save on reallocations
-    static std::vector<std::vector<Point> >         p;
-    static std::vector<std::vector<unsigned int> >  keys;
-    static std::vector<std::vector<Node*> >         nodes;
-
-    p.resize    (this->n_children());
-    keys.resize (this->n_children());
-    nodes.resize(this->n_children());
+    std::vector<std::vector<Point> >         p(this->n_children());
+    std::vector<std::vector<unsigned int> >  keys(this->n_children());
+    std::vector<std::vector<Node*> >         nodes(this->n_children());
     
 
     // compute new nodal locations
