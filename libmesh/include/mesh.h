@@ -1,4 +1,4 @@
-// $Id: mesh.h,v 1.24 2003-09-30 18:22:18 benkirk Exp $
+// $Id: mesh.h,v 1.25 2003-10-01 04:02:52 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -31,10 +31,16 @@
 
 
 /**
- * The \p Mesh class is identical to the \p MeshBase class except
- * it contains information about the boundary of the domain and
- * can be refined since it contains a \p MeshRefinement object.
- */
+ * The \p Mesh class is derived from the \p MeshBase class.
+ * The user will typically want to instantiate and use the
+ * Mesh class in her applications.
+ * In order to use the adaptive mesh refinment capabilities
+ * of the library, first instantiate a MeshRefinement object
+ * with a reference to this class.  Then call the appropriate
+ * refinement functions from that object.  To interact with the 
+ * boundary, instantiate a BoundaryMesh with a reference to
+ * this class, and then use that object's functionality.
+*/
 
 // ------------------------------------------------------------
 // Mesh class definition
