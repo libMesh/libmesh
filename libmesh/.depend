@@ -148,6 +148,7 @@ src/fe/fe.$(obj-suffix):\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
     include/enum_order.h\
+    include/enum_quadrature_type.h\
     include/fe.h\
     include/fe_base.h\
     include/fe_type.h\
@@ -162,19 +163,17 @@ src/fe/fe.$(obj-suffix):\
 src/fe/fe_base.$(obj-suffix):\
     src/fe/fe_base.C\
     include/auto_ptr.h\
-    include/elem.h\
-    include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
     include/enum_order.h\
+    include/enum_quadrature_type.h\
     include/fe.h\
     include/fe_base.h\
     include/fe_type.h\
     include/inf_fe.h\
     include/mesh_common.h\
     include/mesh_config.h\
-    include/node.h\
     include/point.h\
     include/quadrature.h\
     include/reference_counted_object.h\
@@ -188,6 +187,7 @@ src/fe/fe_boundary.$(obj-suffix):\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
     include/enum_order.h\
+    include/enum_quadrature_type.h\
     include/fe.h\
     include/fe_base.h\
     include/fe_type.h\
@@ -272,6 +272,25 @@ src/fe/fe_hierarchic_shape_3D.$(obj-suffix):\
     include/reference_counter.h
 src/fe/fe_interface.$(obj-suffix):\
     src/fe/fe_interface.C\
+    include/auto_ptr.h\
+    include/elem.h\
+    include/enum_elem_quality.h\
+    include/enum_elem_type.h\
+    include/enum_fe_family.h\
+    include/enum_inf_map_type.h\
+    include/enum_order.h\
+    include/fe.h\
+    include/fe_base.h\
+    include/fe_interface.h\
+    include/fe_type.h\
+    include/mesh_common.h\
+    include/mesh_config.h\
+    include/node.h\
+    include/point.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h
+src/fe/fe_interface_inf_fe.$(obj-suffix):\
+    src/fe/fe_interface_inf_fe.C\
     include/auto_ptr.h\
     include/elem.h\
     include/enum_elem_quality.h\
@@ -371,6 +390,7 @@ src/fe/fe_map.$(obj-suffix):\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
     include/enum_order.h\
+    include/enum_quadrature_type.h\
     include/fe.h\
     include/fe_base.h\
     include/fe_type.h\
@@ -462,6 +482,7 @@ src/fe/inf_fe.$(obj-suffix):\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
     include/enum_order.h\
+    include/enum_quadrature_type.h\
     include/fe.h\
     include/fe_base.h\
     include/fe_type.h\
@@ -481,8 +502,6 @@ src/fe/inf_fe.$(obj-suffix):\
 src/fe/inf_fe_boundary.$(obj-suffix):\
     src/fe/inf_fe_boundary.C\
     include/auto_ptr.h\
-    include/elem.h\
-    include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
@@ -496,15 +515,12 @@ src/fe/inf_fe_boundary.$(obj-suffix):\
     include/inf_fe_macro.h\
     include/mesh_common.h\
     include/mesh_config.h\
-    include/node.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h
 src/fe/inf_fe_jacobi_20_00_eval.$(obj-suffix):\
     src/fe/inf_fe_jacobi_20_00_eval.C\
     include/auto_ptr.h\
-    include/elem.h\
-    include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
@@ -514,15 +530,12 @@ src/fe/inf_fe_jacobi_20_00_eval.$(obj-suffix):\
     include/inf_fe.h\
     include/mesh_common.h\
     include/mesh_config.h\
-    include/node.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h
 src/fe/inf_fe_jacobi_30_00_eval.$(obj-suffix):\
     src/fe/inf_fe_jacobi_30_00_eval.C\
     include/auto_ptr.h\
-    include/elem.h\
-    include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
@@ -532,15 +545,12 @@ src/fe/inf_fe_jacobi_30_00_eval.$(obj-suffix):\
     include/inf_fe.h\
     include/mesh_common.h\
     include/mesh_config.h\
-    include/node.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h
 src/fe/inf_fe_lagrange_eval.$(obj-suffix):\
     src/fe/inf_fe_lagrange_eval.C\
     include/auto_ptr.h\
-    include/elem.h\
-    include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
@@ -550,15 +560,12 @@ src/fe/inf_fe_lagrange_eval.$(obj-suffix):\
     include/inf_fe.h\
     include/mesh_common.h\
     include/mesh_config.h\
-    include/node.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h
 src/fe/inf_fe_legendre_eval.$(obj-suffix):\
     src/fe/inf_fe_legendre_eval.C\
     include/auto_ptr.h\
-    include/elem.h\
-    include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
@@ -568,15 +575,12 @@ src/fe/inf_fe_legendre_eval.$(obj-suffix):\
     include/inf_fe.h\
     include/mesh_common.h\
     include/mesh_config.h\
-    include/node.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h
 src/fe/inf_fe_map_eval.$(obj-suffix):\
     src/fe/inf_fe_map_eval.C\
     include/auto_ptr.h\
-    include/elem.h\
-    include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
@@ -586,7 +590,6 @@ src/fe/inf_fe_map_eval.$(obj-suffix):\
     include/inf_fe.h\
     include/mesh_common.h\
     include/mesh_config.h\
-    include/node.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h
@@ -1202,8 +1205,6 @@ src/geom/face_inf_quad6.$(obj-suffix):\
     include/reference_counter.h\
     include/sphere.h\
     include/surface.h
-src/geom/face_infinite.$(obj-suffix):\
-    src/geom/face_infinite.C
 src/geom/face_quad.$(obj-suffix):\
     src/geom/face_quad.C\
     include/auto_ptr.h\
@@ -1821,110 +1822,178 @@ src/numerics/petsc_vector.$(obj-suffix):\
     include/petsc_vector.h
 src/quadrature/quadrature.$(obj-suffix):\
     src/quadrature/quadrature.C\
+    include/auto_ptr.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_quadrature_type.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/point.h\
-    include/quadrature.h
+    include/quadrature.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h
+src/quadrature/quadrature_build.$(obj-suffix):\
+    src/quadrature/quadrature_build.C\
+    include/auto_ptr.h\
+    include/enum_elem_type.h\
+    include/enum_order.h\
+    include/enum_quadrature_type.h\
+    include/mesh_common.h\
+    include/mesh_config.h\
+    include/point.h\
+    include/quadrature.h\
+    include/quadrature_gauss.h\
+    include/quadrature_jacobi.h\
+    include/quadrature_simpson.h\
+    include/quadrature_trap.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h
 src/quadrature/quadrature_gauss.$(obj-suffix):\
     src/quadrature/quadrature_gauss.C
 src/quadrature/quadrature_gauss_1D.$(obj-suffix):\
     src/quadrature/quadrature_gauss_1D.C\
+    include/auto_ptr.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_quadrature_type.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/point.h\
     include/quadrature.h\
-    include/quadrature_gauss.h
+    include/quadrature_gauss.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h
 src/quadrature/quadrature_gauss_2D.$(obj-suffix):\
     src/quadrature/quadrature_gauss_2D.C\
+    include/auto_ptr.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_quadrature_type.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/point.h\
     include/quadrature.h\
-    include/quadrature_gauss.h
+    include/quadrature_gauss.h\
+    include/quadrature_jacobi.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h
 src/quadrature/quadrature_gauss_3D.$(obj-suffix):\
     src/quadrature/quadrature_gauss_3D.C\
+    include/auto_ptr.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_quadrature_type.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/point.h\
     include/quadrature.h\
-    include/quadrature_gauss.h
+    include/quadrature_gauss.h\
+    include/quadrature_jacobi.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h
 src/quadrature/quadrature_jacobi.$(obj-suffix):\
     src/quadrature/quadrature_jacobi.C
 src/quadrature/quadrature_jacobi_1D.$(obj-suffix):\
     src/quadrature/quadrature_jacobi_1D.C\
+    include/auto_ptr.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_quadrature_type.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/point.h\
     include/quadrature.h\
-    include/quadrature_jacobi.h
+    include/quadrature_jacobi.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h
+src/quadrature/quadrature_rules.$(obj-suffix):\
+    src/quadrature/quadrature_rules.C\
+    include/enum_quadrature_type.h\
+    include/mesh_common.h\
+    include/mesh_config.h\
+    include/quadrature_rules.h
 src/quadrature/quadrature_simpson.$(obj-suffix):\
     src/quadrature/quadrature_simpson.C
 src/quadrature/quadrature_simpson_1D.$(obj-suffix):\
     src/quadrature/quadrature_simpson_1D.C\
+    include/auto_ptr.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_quadrature_type.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/point.h\
     include/quadrature.h\
-    include/quadrature_simpson.h
+    include/quadrature_simpson.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h
 src/quadrature/quadrature_simpson_2D.$(obj-suffix):\
     src/quadrature/quadrature_simpson_2D.C\
+    include/auto_ptr.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_quadrature_type.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/point.h\
     include/quadrature.h\
-    include/quadrature_simpson.h
+    include/quadrature_simpson.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h
 src/quadrature/quadrature_simpson_3D.$(obj-suffix):\
     src/quadrature/quadrature_simpson_3D.C\
+    include/auto_ptr.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_quadrature_type.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/point.h\
     include/quadrature.h\
-    include/quadrature_simpson.h
+    include/quadrature_simpson.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h
 src/quadrature/quadrature_trap.$(obj-suffix):\
     src/quadrature/quadrature_trap.C
 src/quadrature/quadrature_trap_1D.$(obj-suffix):\
     src/quadrature/quadrature_trap_1D.C\
+    include/auto_ptr.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_quadrature_type.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/point.h\
     include/quadrature.h\
-    include/quadrature_trap.h
+    include/quadrature_trap.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h
 src/quadrature/quadrature_trap_2D.$(obj-suffix):\
     src/quadrature/quadrature_trap_2D.C\
+    include/auto_ptr.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_quadrature_type.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/point.h\
     include/quadrature.h\
-    include/quadrature_trap.h
+    include/quadrature_trap.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h
 src/quadrature/quadrature_trap_3D.$(obj-suffix):\
     src/quadrature/quadrature_trap_3D.C\
+    include/auto_ptr.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_quadrature_type.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/point.h\
     include/quadrature.h\
-    include/quadrature_trap.h
+    include/quadrature_trap.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h
 src/utils/perf_log.$(obj-suffix):\
     src/utils/perf_log.C\
     include/mesh_common.h\

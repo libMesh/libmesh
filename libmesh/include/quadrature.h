@@ -1,4 +1,4 @@
-// $Id: quadrature.h,v 1.7 2003-02-06 06:02:41 jwpeterson Exp $
+// $Id: quadrature.h,v 1.8 2003-02-06 17:58:34 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -28,9 +28,12 @@
 
 // Local includes
 #include "mesh_common.h"
+#include "reference_counted_object.h"
 #include "point.h"
 #include "enum_elem_type.h"
 #include "enum_order.h"
+#include "enum_quadrature_type.h"
+#include "auto_ptr.h"
 
 
 
@@ -46,7 +49,7 @@
 // ------------------------------------------------------------
 // QBase class definition
 
-class QBase
+class QBase : public ReferenceCountedObject<QBase>
 {
 protected:
 
@@ -63,6 +66,22 @@ public:
    * Destructor.
    */
   virtual ~QBase() {};
+
+  /**
+   * @returns the quadrature type in derived classes.
+   */
+  virtual QuadratureType type() const = 0;
+
+  /**
+   * Builds a specific quadrature rule, identified through the
+   * \p QuadratureType.  An \p AutoPtr<FEBase> is returned
+   * to prevent a memory leak. This way the user need not
+   * remember to delete the object.  Enables run-time decision of
+   * the quadrature rule.
+   */
+  static AutoPtr<QBase> build(const QuadratureType _qt,
+			      const unsigned int _dim,
+			      const Order _order=INVALID_ORDER);
 
   /**
    * @returns the number of points associated with the quadrature rule.
@@ -135,38 +154,74 @@ protected:
    * weights vectors with the appropriate values.  The order of
    * the rule will be defined by the implementing class.
    * Should not be pure virtual since a derived quadrature rule
-   * may only be defined in 1D.  If not redefined, simply does
-   * nothing.
+   * may only be defined in 1D.  If not redefined, gives an
+   * error (when \p DEBUG defined) when called.
    */
-  virtual void init_2D (const ElemType) {};
+  virtual void init_2D (const ElemType)
+#ifndef DEBUG
+  {};
+#else
+  {  
+    std::cerr << "ERROR: Seems as if this quadrature rule" << std::endl
+	      << " is not implemented for 2D." << std::endl;
+    error();
+  };
+#endif
 
   /**
    * Initializes the 3D quadrature rule by filling the points and
    * weights vectors with the appropriate values.  The order of
    * the rule will be defined by the implementing class.
    * Should not be pure virtual since a derived quadrature rule
-   * may only be defined in 1D.  If not redefined, simply does
-   * nothing.
+   * may only be defined in 1D.  If not redefined, gives an
+   * error (when \p DEBUG defined) when called.
    */
-  virtual void init_3D (const ElemType) {};
-
+  virtual void init_3D (const ElemType)
+#ifndef DEBUG
+  {};
+#else
+  {  
+    std::cerr << "ERROR: Seems as if this quadrature rule" << std::endl
+	      << " is not implemented for 3D." << std::endl;
+    error();
+  };
+#endif
 
   
   /**
    * Initialize the 1D quadrature rule for a side (edge).
    * Should not be pure virtual since a derived quadrature rule
-   * may only be defined in 1D. If not redefined, simply does
-   * nothing. 
+   * may only be defined in 1D. If not redefined, gives an
+   * error (when \p DEBUG defined) when called.
    */
-  virtual void init_2D (const ElemType, const unsigned int) {};
-  
+  virtual void init_2D (const ElemType, const unsigned int)
+#ifndef DEBUG
+  {};
+#else
+  {  
+    std::cerr << "ERROR: Seems as if this quadrature rule" << std::endl
+	      << " is not implemented for 2D side(line) integration." << std::endl;
+    error();
+  };
+#endif
+
+
   /**
    * Initialize the 2D quadrature rule for a side (face).
    * Should not be pure virtual since a derived quadrature rule
-   * may only be defined in 1D. If not redefined, simply does
-   * nothing. 
+   * may only be defined in 1D. If not redefined, gives an
+   * error (when \p DEBUG defined) when called.
    */
-  virtual void init_3D (const ElemType, const unsigned int) {};
+  virtual void init_3D (const ElemType, const unsigned int)
+#ifndef DEBUG
+  {};
+#else
+  {  
+    std::cerr << "ERROR: Seems as if this quadrature rule" << std::endl
+	      << " is not implemented for 3D side(face) integration." << std::endl;
+    error();
+  };
+#endif
 
   
   /**

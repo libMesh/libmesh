@@ -1,4 +1,4 @@
-// $Id: ex5.C,v 1.1 2003-02-06 05:41:14 ddreyer Exp $
+// $Id: ex5.C,v 1.2 2003-02-06 17:58:33 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -18,15 +18,13 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-//#define _p(arg)  std::cout << "Here: " << #arg << std::endl;
-#define _p(arg) 
-
 
 
 /**
  * C++ include files that we need
  */
 #include <iostream>
+#include <sstream> 
 #include <algorithm>
 #include <math.h>
 
@@ -38,25 +36,22 @@
 #include "equation_systems.h"
 
 /**
- * Define the Finite and Infinite Element object.
+ * Define the Finite Element object.
  */
 #include "fe.h"
-#include "inf_fe.h"
 
 /**
- * Inside the library, all access to the finite element
- * objects are handled through the FEInterface class,
- * to enable run-time access to non-virtual functions
- * of multiple FE classes.
- * In case of infinite elements enabled, this class also 
- * offers some helpful static member functions to the exterior.
- */
-#include "fe_interface.h"
-
-/**
- * Define Gauss quadrature rules.
+ * Define the base quadrature class, with which
+ * specialized quadrature rules will be built.
  */
 #include "quadrature_gauss.h"
+
+/**
+ * Include the namespace \p QuadratureRules for
+ * some handy descriptions.
+ */
+#include "quadrature_rules.h"
+
 
 /**
  * Define the DofMap, which handles degree of freedom
@@ -74,626 +69,416 @@
  *
  * \section Introduction
  *
- * WARNING! -- This example is under development.
- * Do not use it!
- *
  * This is the fifth example program.  It builds on
- * the previous examples, and introduces the Infinite
- * Element class.  Note that the library must be compiled
- * with Infinite Elements enabled.  Otherwise, this
- * example will abort.
+ * the previous two examples, and extends the use
+ * of the \p AutoPtr<> and a convenient build method to
+ * determine the quadrature rule at run time.
  */
+
+
+/**
+ * Function prototype, as before.
+ */
+void assemble_poisson(EquationSystems& es,
+                      const std::string& system_name);
 
 
 
 /**
- * Function prototype.  This is similar to the Poisson
- * assemble function of example 4. 
+ * Exact solution function prototype, as before.
  */
-void assemble_wave(EquationSystems& es,
-		   const std::string& system_name);
+Real exact_solution (const Real x,
+		     const Real y,
+		     const Real z = 0.);
+
+
+/**
+ * The quadrature type the user requests.
+ */
+QuadratureType quad_type=INVALID_Q_RULE;
 
 
 
 
 int main (int argc, char** argv)
 {
-
   /**
-   * This example requires Infinite Elements
+   * Initialize Petsc, like in example 2.
    */
-#ifndef ENABLE_INFINITE_ELEMENTS
-
-  std::cerr << "ERROR: This example requires the library to be " << std::endl
-	    << " compiled with Infinite Element support!" << std::endl;
-  error();  argc++;  argv++;
-
+#ifdef HAVE_PETSC
+  
+  const bool have_petsc = true;
+  PetscInitialize (&argc, &argv, NULL, NULL);
+  
 #else
-
+  
+  const bool have_petsc = false;
+  
+#endif
 
   /**
    * This example is designed for real numbers only.
    */
-# ifdef USE_COMPLEX_NUMBERS
+#ifdef USE_COMPLEX_NUMBERS
 
   std::cerr << "ERROR: This example is not intended for " << std::endl
 	    << " use with complex numbers." << std::endl;
   error();
 
-# endif
-
-
-  /**
-   * Initialize Petsc, like in example 2.
-   */
-# ifdef HAVE_PETSC
-  
-  const bool have_petsc = true;
-  PetscInitialize (&argc, &argv, NULL, NULL);
-  
-# else
-  
-  const bool have_petsc = false;
-  
-# endif
-
+#endif
 
 
   /**
    * Braces are used to force object scope, like in example 2
    */   
-  {    
+  {
     /**
-     * For the moment, only allow 3D
+     * Check for proper usage.  The quadrature rule
+     * must be given at run time.
      */
-    const unsigned int dim = 3; 
-
+    if (argc != 3)
+      {
+	std::cerr << "Usage: " << argv[0] << " -q n"
+		  << std::endl;
+	std::cerr << "  where n stands for:" << std::endl;
+	for (unsigned int n=0; n<QuadratureRules::num_rules; n++)
+	  std::cerr << "  " << n << "    " 
+		    << QuadratureRules::name(static_cast<QuadratureType>(n))
+		    << std::endl;
+	
+	std::cerr << std::endl;
+	
+	error();
+      }
+    
     /**
      * Tell the user what we are doing.
      */
-    std::cout << "Running ex5 with dim = " << dim << std::endl << std::endl;        
+    else 
+      {
+	std::cout << "Running " << argv[0];
+	
+	for (int i=1; i<argc; i++)
+	  std::cout << " " << argv[i];
+	
+	std::cout << std::endl << std::endl;
+      };
+    
+
+    /**
+     * Set the quadrature rule type that the user wants from argv[2]
+     */
+    quad_type = static_cast<QuadratureType>(atoi(argv[2]));
+
+
+    /**
+     * Independence of dimension has already been shown in
+     * example 4.  For the time being, restrict to 3 dimensions.
+     */
+    const unsigned int dim=3;
     
     /**
-     * Create a mesh with user-defined dimension 
+     * The following is identical to example 4, and therefore
+     * not commented.  Differences are mentioned when present.
      */
     Mesh mesh (dim);
-
-    /**
-     * Use the internal mesh generator to create 8 elements
-     * on the square [-1,1]^D, of type \p Quad9 or \p Hex27.
-     */
-    mesh.build_cube (2, 2, 2,
-//    mesh.build_cube (1, 1, 1,
+    
+    mesh.build_cube (5, 5, 5,
 		     -1., 1.,
 		     -1., 1.,
 		     -1., 1.,
-		     (dim == 2) ? QUAD9 : HEX27); //HEX20); //HEX27);
+		     HEX27);
 
     mesh.find_neighbors();
     
-    /**
-     * Print information about the mesh to the screen.
-     */
     mesh.print_info();
-
-    /**
-     * Build infinite elements on the outer boundary of the existing 
-     * volume mesh.  This method automatically determines the
-     * origin of the infinite elements.  The \p bool determines
-     * whether to be verbose.
-     */
-//TODO:[HVDH] Does not work with HEX27...?
-    mesh.build_inf_elem(true);
-
-    /**
-     * Print information about the mesh to the screen.
-     */
-    mesh.print_info();
-
-    /**
-     * Save only the mesh, with infinite elements added.
-     */
-    mesh.write_gmv ("ifems_added.gmv");
-
-    /**
-     * After building finite elements, we have to let 
-     * the elements find their neighbors.
-     */
-//TODO:[DD] Does this work with infinite elements?
-    mesh.find_neighbors();
     
-
-
-    /**
-     * Create an equation systems object.
-     */
     EquationSystems equation_systems (mesh, have_petsc);
-
-    /**
-     * Declare the system and its variables.
-     */
+    
     {
-      /**
-       * Create a system named "Wave"
-       */
-      equation_systems.add_system("Wave");
+      equation_systems.add_system("Poisson");
       
-      /**
-       * Create an FEType describing the approximation
-       * characteristics of the InfFE object.  Note that
-       * the constructor automatically defaults to some
-       * sensible values.  But use \p FIRST order 
-       * approximation.
-       */
-      FEType fe_type(FIRST);
+      equation_systems("Poisson").add_variable("u", SECOND);
 
-      /**
-       * Add the variable "p" to "Wave".  Note that there exist
-       * various approaches in adding variables.  In example 3, 
-       * \p add_variable took the order of approximation and used
-       * default values for the \p FEFamily, while here the \p FEType 
-       * is used.
-       */
-      equation_systems("Wave").add_variable("p", fe_type);
-
-      /**
-       * Give the system a pointer to the matrix assembly
-       * function.
-       */
-      equation_systems("Wave").attach_assemble_function (assemble_wave);
+      equation_systems("Poisson").attach_assemble_function (assemble_poisson);
       
-      /**
-       * Initialize the data structures for the equation system.
-       */
       equation_systems.init();
       
-      /**
-       * Prints information about the system to the screen.
-       */
       equation_systems.print_info();
     };
 
 
+    equation_systems("Poisson").solve();
 
     /**
-     * Solve the system "Wave".
+     * "Personalize" the output, with the
+     * number of the quadrature rule appended.
      */
-    equation_systems("Wave").solve();
+    std::ostringstream f_name;
+    f_name << "out_" << quad_type << ".gmv";
 
-
-    /**
-     * After solving the system write the solution
-     * to a GMV-formatted plot file.
-     */
-    mesh.write_gmv ("out.gmv", equation_systems);
+    mesh.write_gmv (f_name.str(), equation_systems);
   };
 
 
-# ifdef HAVE_PETSC
+#ifdef HAVE_PETSC
 
   PetscFinalize();
   
-# endif
+#endif
 
   
-  /**
-   * All done.  
-   */
   return 0;
-
-
-#endif // else part of ifndef ENABLE_INFINITE_ELEMENTS
 };
 
 
 
 
-void assemble_wave(EquationSystems& es,
-		   const std::string& system_name)
+void assemble_poisson(EquationSystems& es,
+                      const std::string& system_name)
 {
-  _p(started assemble_wave)
-  /**
-   * It is a good idea to make sure we are assembling
-   * the proper system.
-   */
-  assert (system_name == "Wave");
+  assert (system_name == "Poisson");
 
-
-#ifdef ENABLE_INFINITE_ELEMENTS
-
-
-  /**
-   * Get a constant reference to the mesh object.
-   */
   const Mesh& mesh = es.get_mesh();
 
-  /**
-   * The dimension that we are running
-   */
   const unsigned int dim = mesh.mesh_dimension();
 
-  /**
-   * Get a constant reference to the Finite Element type
-   * for the first (and only) variable in the system.
-   */
-  FEType fe_type = es("Wave").dof_map.component_type(0);
+  FEType fe_type = es("Poisson").dof_map.component_type(0);
 
   /**
    * Build a Finite Element object of the specified type.  Since the
    * \p FEBase::build() member dynamically creates memory we will
-   * store the object as an \p AutoPtr<FEBase>.  This can be thought
-   * of as a pointer that will clean up after itself.
+   * store the object as an \p AutoPtr<FEBase>.  Below, the
+   * functionality of \p AutoPtr's is described more detailed in 
+   * the context of building quadrature rules.
    */
   AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
+  
+  /**
+   * Now this deviates from example 4.  we create a 
+   * 5th order quadrature rule of user-specified type
+   * for numerical integration.  Note that not all
+   * quadrature rules support this order.
+   */
+  AutoPtr<QBase> qrule(QBase::build(quad_type, dim, FIFTH));
+
 
   /**
-   * Do the same for an infinite element.
+   * Tell the finte element object to use our
+   * quadrature rule.  Note that a \p AutoPtr<QBase> returns
+   * a \p QBase* pointer to the object it handles with \p get().  
+   * However, using \p get(), the \p AutoPtr<QBase> \p qface0 is 
+   * still in charge of this pointer. I.e., when \p qface0 goes 
+   * out of scope, it will safely delete the \p QBase object it 
+   * points to.  This behavior may be overridden using
+   * \p AutoPtr<Xyz>::release(), but is currently not
+   * recommended.
    */
-  AutoPtr<FEBase> inf_fe (FEBase::build_InfFE(dim, fe_type));
+  fe->attach_quadrature_rule (qrule.get());
+
   
 
-
-  _p(init + attach qrule)
-  /**
-   * A 2nd order Gauss quadrature rule for numerical integration.
-   */
-  QGauss qrule (dim, SECOND);
-
-  /**
-   * Tell the finite element object to use our quadrature rule.
-   */
-  fe->attach_quadrature_rule (&qrule);
-
-
-  _p(fe->attach just finished.)
-  /**
-   * Due to its internal structure, the infinite element handles 
-   * quadrature rules differently.  It takes the quadrature
-   * rule which has been initialized for the FE object, but
-   * creates suitable quadrature rules by itself.  The user
-   * need not worry about this.
-   */
-  inf_fe->attach_quadrature_rule (&qrule);
-
-
-
-
-
-  _p(initialization of variables:)
   /**
    *--------------------------------------------------------------------
-   * Here we define some references to cell-specific data that
-   * will be used to assemble the linear system.  We have two
-   * objects to handle.  References to the conventional finite 
-   * element object are prepended by a "c", while references
-   * to the infinite element use an "i".
+   * This is again identical to example 4, and not commented.
    */
 
-  /**
-   * The element Jacobian * quadrature weight at each integration point.   
-   */
-  const std::vector<Real>& cJxW = fe->get_JxW();
-  const std::vector<Real>& iJxW = inf_fe->get_JxW();
+  const std::vector<Real>& JxW = fe->get_JxW();
 
-  /**
-   * The element shape functions evaluated at the quadrature points.
-   */
-  const std::vector<std::vector<Real> >& cphi = fe->get_phi();
-  const std::vector<std::vector<Real> >& iphi = inf_fe->get_phi();
+  const std::vector<Point>& q_point = fe->get_xyz();
 
-  /**
-   * The element shape function gradients evaluated at the quadrature
-   * points.
-   */
-  const std::vector<std::vector<Point> >& cdphi = fe->get_dphi();
-  const std::vector<std::vector<Point> >& idphi = inf_fe->get_dphi();
+  const std::vector<std::vector<Real> >& phi = fe->get_phi();
 
-  /**
-   * The infinite element offers some more publicly available variables.
-   * These are the gradients of the phase term \p dphase, an additional 
-   * radial weight for the test functions \p Sobolev_weight, and its
-   * gradient.
-   */
-  const std::vector<Point>& idphase = inf_fe->get_dphase();
-  const std::vector<Real>&  iweight = inf_fe->get_Sobolev_weight();
-  const std::vector<Point>& idweight = inf_fe->get_Sobolev_dweight();
+  const std::vector<std::vector<Point> >& dphi = fe->get_dphi();
 
+  const DofMap& dof_map = es("Poisson").get_dof_map();
 
-  /**
-   * A reference to the \p DofMap object for this system.  The \p DofMap
-   * object handles the index translation from node and element numbers
-   * to degree of freedom numbers.  We will talk more about the \p DofMap
-   * in future examples.
-   */
-  const DofMap& dof_map = es("Wave").get_dof_map();
+  ComplexDenseMatrix   Ke;
+  std::vector<Complex> Fe;
 
-  /**
-   * Define data structures to contain the element matrix
-   * and right-hand-side vector contribution.  Following
-   * basic finite element terminology we will denote these
-   * "Ke",  "Ce", "Me", and "Fe" for the stiffness, damping
-   * and mass matrices, and the load vector.  Note that in Acoustics,
-   * these descriptors do not match the true physical meaning
-   * of the projectors.  The final overall system, however, 
-   * resembles the conventional notation, again.
-   */
-  RealDenseMatrix   Ke;
-  RealDenseMatrix   Ce;
-  RealDenseMatrix   Me;
-
-  std::vector<Real> Fe;
-
-  /**
-   * This vector will hold the degree of freedom indices for
-   * the element.  These define where in the global system
-   * the element degrees of freedom get mapped.
-   */
   std::vector<unsigned int> dof_indices;
 
 
 
 
-
-  _p(begin loop over elements:)
-
   /**
    *--------------------------------------------------------------------
    * Now we will loop over all the elements in the mesh.
-   * We will compute the element matrix and right-hand-side
-   * contribution.
+   * See example 4 for details.
    */
   for (unsigned int e=0; e<mesh.n_elem(); e++)
     {
-      /**
-       * Store a pointer to the element we are currently
-       * working on.  This allows for nicer syntax later.
-       */
       const Elem* elem = mesh.elem(e);
 
-      /**
-       * Get the degree of freedom indices for the
-       * current element.  These define where in the global
-       * matrix and right-hand-side this element will
-       * contribute to.
-       */
       dof_map.dof_indices (e, dof_indices);
 
+      fe->reinit (elem);
+
+      Ke.resize (dof_indices.size(),
+		 dof_indices.size());
+
+      Fe.resize (dof_indices.size());
+
+      std::fill (Fe.begin(), Fe.end(), 0.);
+
+
 
       /**
-       * Up to now, we do not know what kind of element we
-       * have.  Use the following method to determine who
-       * should handle this element.
+       *----------------------------------------------------------------
+       * Now loop over the quadrature points.  This handles
+       * the numeric integration.  Note the slightly different
+       * access to the QBase members!
        */
-      if (FEInterface::is_InfFE_elem(elem->type()))
-      {
-
-	/** 
-	 *----------------------------------------------------------------
-	 * We have an infinite element.
-	 */
-	_p(is infinite element)
-
- 
-	/**
-	 * Compute the element-specific data, as described
-	 * in previous examples.
-	 */
-	inf_fe->reinit (elem);
-
-	_p(finished inf_fe->reinit)
-
-
-	/**
-	 * Zero the element matrices only.  Boundary conditions
-	 * on infinite elements are not supported.
-	 */
-	Ke.resize (dof_indices.size(), dof_indices.size());
-	Ce.resize (dof_indices.size(), dof_indices.size());
-	Me.resize (dof_indices.size(), dof_indices.size());
-
-	/**
-	 * The total number of quadrature points for infinite elements
-	 * has to be determined in a different way, compared to
-	 * conventional finite elements.
-	 */
-	unsigned int max_qp = inf_fe->n_quadrature_points();
-
-	/**
-	 * Loop over the quadrature points. 
-	 */
-	for (unsigned int qp=0; qp<max_qp; qp++)
+      for (unsigned int qp=0; qp<qrule->n_points(); qp++)
 	{
-	  /**
-	   * Similar to the modified access to the number of quadrature 
-	   * points, the number of shape functions may also be obtained
-	   * in a different manner.  However, this is not required
-	   * for infinite elements.  Still, use it, for consistency.
-	   */
-	  unsigned int n_sf = inf_fe->n_shape_functions();
 
-	  /**
-	   * Now we will build the element matrices.  Since the infinite
-	   * elements are based on a Petrov-Galerkin scheme, the
-	   * resulting system matrices are non-symmetric. The additional
-	   * weight, described before, is part of the trial space.
-	   */
-	  for (unsigned int i=0; i<n_sf; i++)
-	    for (unsigned int j=0; j<n_sf; j++)
+	  for (unsigned int i=0; i<phi.size(); i++)
+	    for (unsigned int j=0; j<phi.size(); j++)
 	      {
-		Ke(i,j) += iJxW[qp]*(idphi[i][qp]*idphi[j][qp])
-		                   *(idphase[qp]*idweight[qp]);
-
-		Ce(i,j) += iJxW[qp]*(iweight[qp]*(idphi[i][qp]*idphi[j][qp]));
-
-		Me(i,j) += iJxW[qp]*iphi[i][qp]*iphi[j][qp];
-
-	      }; // end of the matrix summation loop
-
-	}; // end of quadrature point loop
-
-      }
-
-
-      else // if(FEInterface::is_InfFE_elem(elem->type()))
-
-
-      {
-	/** 
-	 *----------------------------------------------------------------
-	 * This is a conventional finite element.  All of
-	 * the following concepts were already introduced
-	 * in previous examples.
-	 */
-	_p(is conventional finite element)
-
- 
-	fe->reinit (elem);
-
-	Ke.resize (dof_indices.size(), dof_indices.size());
-	Ce.resize (dof_indices.size(), dof_indices.size());
-	Me.resize (dof_indices.size(), dof_indices.size());
-
-	Fe.resize (dof_indices.size());
-	std::fill (Fe.begin(), Fe.end(), 0.);
-
-	/**
-	 * The class for conventional finite elements offers
-	 * similar interface methods, but does not require to use
-	 * them.  However, for consistency, proceed as above.
-	 */
-	unsigned int max_qp = fe->n_quadrature_points();
-
-	for (unsigned int qp=0; qp<max_qp; qp++)
-	{
-	  unsigned int  n_sf = fe->n_shape_functions();
-
-	  /**
-	   * The element matrices for conventional elements are much 
-	   * less involved than for infinite elements.
-	   */
-	  for (unsigned int i=0; i<n_sf; i++)
-	    for (unsigned int j=0; j<n_sf; j++)
-	      {
-		Ke(i,j) += cJxW[qp]*(cdphi[i][qp]*cdphi[j][qp]);
-		/* No volume-based damping */
-		Me(i,j) += cJxW[qp]*(cphi[i][qp]*cphi[j][qp]);
+		Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
 	      };
 
+
+	  for (unsigned int i=0; i<phi.size(); i++)
+	    {
+	      const Real x = q_point[qp](0);
+	      const Real y = q_point[qp](1);
+	      const Real z = q_point[qp](2);
+	      const Real eps = 1.e-3;
+	       
+	      const Real uxx = (exact_solution(x-eps,y,z) +
+				exact_solution(x+eps,y,z) +
+				-2.*exact_solution(x,y,z))/eps/eps;
+	      
+	      const Real uyy = (exact_solution(x,y-eps,z) +
+				exact_solution(x,y+eps,z) +
+				-2.*exact_solution(x,y,z))/eps/eps;
+	      
+	      const Real uzz = (exact_solution(x,y,z-eps) +
+				exact_solution(x,y,z+eps) +
+				-2.*exact_solution(x,y,z))/eps/eps;
+
+	      const Real fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
+	      
+	      Fe[i] += JxW[qp]*fxy*phi[i][qp];
+	    }; // end of the RHS summation loop
+	  
 	}; // end of quadrature point loop
 
-
-      
-        /**
-	 *----------------------------------------------------------------
-	 * Boundary conditions.  Currently, only  natural boundary
-	 * conditions on faces of finite elements are supported.
-	 */
-        {
-
-	  /**
-	   * See previous example(s) for details
-	   */
-	  for (unsigned int side=0; side<elem->n_sides(); side++)
-	    if (elem->neighbor(side) == NULL)
-	      {
-		AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
-	      
-		QGauss qface0(dim,   FIFTH);
-		QGauss qface1(dim-1, FIFTH);
-	      
-		fe_face->attach_quadrature_rule (&qface0);
-	      
-		/**
-		 * The value of the shape functions at the quadrature
-		 * points.
-		 */
-		const std::vector<std::vector<Real> >&  fphi = fe_face->get_phi();
-	      
-		/**
-		 * The Jacobian * Quadrature Weight at the quadrature
-		 * points on the face.
-		 */
-		const std::vector<Real>& fJxW = fe_face->get_JxW();
-	      
-		/**
-		 * The XYZ locations (in physical space) of the
-		 * quadrature points on the face.  This is where
-		 * we will interpolate the boundary value function.
-		 */
-		//const std::vector<Point >& qface_point = fe_face->get_xyz();
-	      
-		/**
-		 * Compute the shape function values on the element
-		 * face.
-		 */
-		fe_face->reinit(&qface1, elem, side);
-	      
-		/**
-		 * Loop over the face quagrature points for integration.
-		 */
-		for (unsigned int qp=0; qp<qface0.n_points(); qp++)
-		  {
-		    /**
-		     * The location on the boundary of the current
-		     * face quadrature point.
-		     */
- 		    //const Real xf = qface_point[qp](0);
- 		    //const Real yf = qface_point[qp](1);
- 		    //const Real zf = qface_point[qp](2);
-		  
-		    /**
-		     * The boundary value.
-		     */
-		    const Real value = 1.;
-		  		  
-		    /**
-		     * Right-hand-side contribution.
-		     */
-		    for (unsigned int i=0; i<fphi.size(); i++)
-		      {
-		        Fe[i] += fJxW[qp]*value*fphi[i][qp];
-		      };
-		  
-		}; // end face quadrature point loop	  
-
-
-		es("Wave").rhs.add_vector    (Fe, dof_indices);
-
-	      }; // end if (elem->neighbor(side) == NULL)
-
-	}; // end boundary condition section	     
-
-      }; // end of if(FEInterface::is_InfFE_elem(elem->type()))
 
 
 
       
       /**
        *----------------------------------------------------------------
-       * The element matrix and right-hand-side are now built
-       * for this element.  Add them to the global matrix and
-       * right-hand-side vector.  The \p PetscMatrix::add_matrix()
-       * and \p PetscVector::add_vector() members do this for us.
+       * Most of this has already been seen before, except
+       * for the build routines of QBase, described below
        */
-      es("Wave").matrix.add_matrix (Ke, dof_indices);
+      {
+	for (unsigned int side=0; side<elem->n_sides(); side++)
+	  if (elem->neighbor(side) == NULL)
+	    {
+	      AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
+	      
+	      /**
+	       * As already seen in example 3, boundary integration 
+	       * requires TWO quadraure rules.  Here, however,
+	       * we use the more convenient way of building these
+	       * rules.  Note that one could also have initialized
+	       * the face quadrature rules with the type directly
+	       * determined from \p qrule, namely through:
+	       * \verbatim
+	         AutoPtr<QBase>  qface1 (QBase::build(qrule->type(),
+		                                      dim-1, 
+						      FIFTH));
+		 \endverbatim
+	       * And again: using the \p AutoPtr<QBase> relaxes
+	       * the need to delete the object afterwards,
+	       * they clean up themselves.
+	       */
+	      AutoPtr<QBase>  qface0 (QBase::build(quad_type, 
+						   dim,   
+						   FIFTH));
+	      AutoPtr<QBase>  qface1 (QBase::build(quad_type,
+						   dim-1, 
+						   FIFTH));
+	      
+	      /**
+	       * Tell the finte element object to use our
+	       * quadrature rule.  Note that a \p AutoPtr<QBase> returns
+	       * a \p QBase* pointer to the object it handles with \p get().  
+	       * However, using \p get(), the \p AutoPtr<QBase> \p qface0 is 
+	       * still in charge of this pointer. I.e., when \p qface0 goes 
+	       * out of scope, it will safely delete the \p QBase object it 
+	       * points to.  This behavior may be overridden using
+	       * \p AutoPtr<Xyz>::release(), but is currently not
+	       * recommended.
+	       */
+	      fe_face->attach_quadrature_rule (qface0.get());
+	      
+	      const std::vector<std::vector<Real> >&  phi_face = fe_face->get_phi();
+
+	      const std::vector<Real>& JxW_face = fe_face->get_JxW();
+	      
+	      const std::vector<Point >& qface_point = fe_face->get_xyz();
+	      
+	      /**
+	       * Compute the shape function values on the element
+	       * face.  Again, note the slightly different access
+	       * to the qface1 pointer.
+	       */
+	      fe_face->reinit(qface1.get(), elem, side);
+	      
+	      /**
+	       * Loop over the face quagrature points for integration.
+	       * Note that the \p AutoPtr<QBase> overloaded the operator->,
+	       * so that QBase methods may safely be accessed.  It may
+	       * be said: accessing an \p AutoPtr<Xyz> through the
+	       * "." operator returns \p AutoPtr methods, while access
+	       * through the "->" operator returns Xyz methods.
+	       * This allows almost no change in syntax when switching
+	       * to "safe pointers".
+	       */
+	      for (unsigned int qp=0; qp<qface0->n_points(); qp++)
+		{
+		  const Real xf = qface_point[qp](0);
+		  const Real yf = qface_point[qp](1);
+		  const Real zf = qface_point[qp](2);
+		  
+		  const Real penalty = 1.e10;
+		  
+		  const Real value = exact_solution(xf, yf, zf);
+		  
+		  for (unsigned int i=0; i<phi_face.size(); i++)
+		    for (unsigned int j=0; j<phi_face.size(); j++)
+		      {
+			Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
+		      };
+
+		  for (unsigned int i=0; i<phi_face.size(); i++)
+		    {
+		      Fe[i] += JxW_face[qp]*penalty*value*phi_face[i][qp];
+		    };
+		  
+		}; // end face quadrature point loop	  
+	    }; // end if (elem->neighbor(side) == NULL)
+      }; // end boundary condition section	  
+
+
+      
+      
+      /**
+       *----------------------------------------------------------------
+       */
+      es("Poisson").matrix.add_matrix (Ke, dof_indices);
+      es("Poisson").rhs.add_vector    (Fe, dof_indices);
       
     }; // end of element loop
 
+
   
-#else
-
-  /* dummy assert */
-  assert(es.get_mesh().mesh_dimension() != 1);
-
-#endif //ifdef ENABLE_INFINITE_ELEMENTS
-
-
   /**
    * All done!
    */
   return;
-
-  _p(assemble_wave finished)
-
 };
-

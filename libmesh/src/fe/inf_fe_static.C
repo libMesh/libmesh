@@ -1,4 +1,4 @@
-// $Id: inf_fe_static.C,v 1.6 2003-02-06 17:13:37 benkirk Exp $
+// $Id: inf_fe_static.C,v 1.7 2003-02-06 17:58:35 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -211,7 +211,7 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_at_node(const FEType& fet,
   const unsigned int n_base   ( Base::index  (fet, base_et, n) );
   const unsigned int n_radial ( Radial::index(fet, base_et, n) );
 
-  std::cout << "n_base=" << n_base << ", n_radial=" << n_radial << ", n=" << n << std::endl;
+//  std::cout << "n_base=" << n_base << ", n_radial=" << n_radial << ", n=" << n << std::endl;
 
   if (Dim > 1)
     return FEInterface::n_dofs_at_node(Dim-1, fet, base_et, n_base) 

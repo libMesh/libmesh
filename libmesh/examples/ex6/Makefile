@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.2 2003-02-06 17:58:33 ddreyer Exp $
+# $Id: Makefile,v 1.1 2003-02-06 17:58:34 ddreyer Exp $
 
 
 # The location of the mesh library
@@ -16,7 +16,7 @@ include $(meshdir)/Make.common
 
 #
 # source files
-srcfiles 	:= $(wildcard *.C) ../ex3/exact_solution.C
+srcfiles 	:= $(wildcard *.C)
 
 #
 # object files
@@ -30,7 +30,7 @@ objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
 ###############################################################################
 # Target:
 #
-target 	   := ex5
+target 	   := ex6
 
 
 all:: $(target)
@@ -47,7 +47,7 @@ clean:
 
 clobber:
 	@$(MAKE) clean
-	@rm -f $(target) out_*.gmv
+	@rm -f $(target) ifems_added.gmv out.gmv
 
 distclean:
 	@$(MAKE) clobber

@@ -1,4 +1,4 @@
-// $Id: quadrature_simpson.h,v 1.4 2003-01-24 17:24:39 jwpeterson Exp $
+// $Id: quadrature_simpson.h,v 1.5 2003-02-06 17:58:34 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -53,6 +53,12 @@ class QSimpson : public QBase
    */
   ~QSimpson() {};
 
+  /**
+   * @returns \p QSIMPSON
+   */
+  QuadratureType type() const { return QSIMPSON; };
+
+
  private:
 
   void init_1D (const ElemType _type=INVALID_ELEM);
@@ -81,7 +87,6 @@ QSimpson::QSimpson(const unsigned int d) : QBase(d,THIRD)
   if (_dim == 1)
     init(EDGE2);
 };
-
 
 
 

@@ -1,4 +1,4 @@
-// $Id: quadrature_gauss.h,v 1.4 2003-01-24 17:24:39 jwpeterson Exp $
+// $Id: quadrature_gauss.h,v 1.5 2003-02-06 17:58:34 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -52,7 +52,12 @@ class QGauss : public QBase
    */
   ~QGauss();
 
-  
+  /**
+   * @returns \p QGAUSS
+   */
+  QuadratureType type() const { return QGAUSS; };
+
+ 
  private:
 
   void init_1D (const ElemType _type=INVALID_ELEM);
@@ -90,8 +95,6 @@ inline
 QGauss::~QGauss()
 {
 };
-
-
 
 
 
