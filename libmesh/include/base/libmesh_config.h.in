@@ -19,10 +19,6 @@
 /* Flag indicating if the library should be built with infinite elements */
 #undef ENABLE_INFINITE_ELEMENTS
 
-/* Flag indicating if the library should be built to work around broken MGF
-   boundary conditions */
-#undef ENABLE_MGF_WORKAROUND
-
 /* Flag indicating if the library should be built with performance logging
    support */
 #undef ENABLE_PERFORMANCE_LOGGING

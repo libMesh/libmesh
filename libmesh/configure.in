@@ -1,5 +1,5 @@
 dnl --------------------------------------------------------------
-dnl $Id: configure.in,v 1.46 2004-08-17 01:46:05 benkirk Exp $
+dnl $Id: configure.in,v 1.47 2004-09-29 21:45:17 benkirk Exp $
 dnl --------------------------------------------------------------
 dnl Process this file with autoconf to produce a configure script.
 
@@ -9,7 +9,7 @@ dnl you call ./configure subsequently on different systems without
 dnl clearing the cache 
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
-AC_REVISION($Revision: 1.46 $)
+AC_REVISION($Revision: 1.47 $)
 
 
 AC_INIT
@@ -236,14 +236,18 @@ if test "$enablexdr" != no ; then
    dnl --------------------------------------------------------------
    AC_ARG_ENABLE(mgf-workaround,
                  AC_HELP_STRING([--enable-mgf-workaround],
-                                [work around MGF BC problem]),
+                                [deprecated, use runtime --enable-mgf-workaround instead]),
                  enablemgfworkaround=$enableval,
                  enablemgfworkaround=no)
 
    if test "$enablemgfworkaround" != no ; then
-     AC_DEFINE(ENABLE_MGF_WORKAROUND, 1,
-              [Flag indicating if the library should be built to work around broken MGF boundary conditions])
-     AC_MSG_RESULT(<<< Configuring library to work around broken MGF boundary conditions >>>)
+     AC_MSG_RESULT( )
+     AC_MSG_RESULT(*** WARNING: ./configure option --enable-mgf-workaround is deprecated. ***)
+     AC_MSG_RESULT(********    Use runtime option --enable-mgf-workaround instead    ********)
+     AC_MSG_RESULT( )
+     dnl AC_DEFINE(ENABLE_MGF_WORKAROUND, 1,
+     dnl          [Flag indicating if the library should be built to work around broken MGF boundary conditions])
+     dnl AC_MSG_RESULT(<<< Configuring library to work around broken MGF boundary conditions >>>)
    fi
    dnl -------------------------------------------------------------
 fi
