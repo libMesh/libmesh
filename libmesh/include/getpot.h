@@ -1,4 +1,4 @@
-// $Id: getpot.h,v 1.6 2003-04-09 03:25:00 benkirk Exp $
+// $Id: getpot.h,v 1.7 2003-04-18 19:02:18 benkirk Exp $
 //
 // (with patches from Michael Anderson for more general variable types)
 
@@ -64,14 +64,14 @@ class GetPot {
   // (*) constructors, destructor, assignment operator -----------------------
   inline GetPot();
   inline GetPot(const GetPot&);
-  inline GetPot(const int argc_, const char ** argv_);
+  inline GetPot(int argc_, char ** argv_);
   inline GetPot(const char* FileName);
   inline GetPot(const std::string &FileName);
   inline ~GetPot();
   inline GetPot& operator=(const GetPot&);
 
   // (*) parse methods for command line & input files ------------------------
-  inline void         parse_command_line (const int argc_, const char ** argv_);
+  inline void         parse_command_line (int argc_, char ** argv_);
   inline void         parse_input_file   (const std::string& FileName);
   inline void         parse_input_file   (const char* FileName);
   
@@ -311,7 +311,7 @@ GetPot::GetPot()
 
 
 inline 
-GetPot::GetPot(int argc_, const char ** argv_)
+GetPot::GetPot(int argc_, char ** argv_)
 {
   parse_command_line (argc_, argv_);
 }
@@ -350,7 +350,7 @@ GetPot::~GetPot()
 
 
 inline
-void GetPot::parse_command_line (int argc_, const char ** argv_)
+void GetPot::parse_command_line (int argc_, char ** argv_)
 {
   __basic_initialization();
 
