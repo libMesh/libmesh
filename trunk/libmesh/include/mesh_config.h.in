@@ -1,0 +1,120 @@
+/* include/mesh_config.h.in.  Generated from configure.in by autoheader.  */
+
+/* This compiler is known not to support some iostream functionality */
+#undef BROKEN_IOSTREAM
+
+/* Flag indicating if the library should be built with AMR support */
+#undef ENABLE_AMR
+
+/* Flag indicating if the library should be built with expensive data
+   structures */
+#undef ENABLE_EXPENSIVE_DATA_STRUCTURES
+
+/* Flag indicating if the library should be built with infinite elements */
+#undef ENABLE_INFINITE_ELEMENTS
+
+/* Flag indicating if the library should be built to work around broken MGF
+   boundary conditions */
+#undef ENABLE_MGF_WORKAROUND
+
+/* Flag indicating if the library should be built with performance logging
+   support */
+#undef ENABLE_PERFORMANCE_LOGGING
+
+/* Flag indicating if the library should be built with reference counting
+   support */
+#undef ENABLE_REFERENCE_COUNTING
+
+/* Flag indicating whether the library shall be compiled to use the Exodus
+   interface */
+#undef HAVE_EXODUS_API
+
+/* Define to 1 if you have the <getopt.h> header file. */
+#undef HAVE_GETOPT_H
+
+/* Flag indicating whether the library shall be compiled to support hdf4 files
+   */
+#undef HAVE_HDF4
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the `papi' library (-lpapi). */
+#undef HAVE_LIBPAPI
+
+/* Define to 1 if you have the `perfctr' library (-lperfctr). */
+#undef HAVE_LIBPERFCTR
+
+/* Define to 1 if you have the <locale> header file. */
+#undef HAVE_LOCALE
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Flag indicating whether or not Metis is available */
+#undef HAVE_METIS
+
+/* Flag indicating whether the library shall be compiled to support netcdf
+   files */
+#undef HAVE_NETCDF
+
+/* Define to 1 if you have the <papi.h> header file. */
+#undef HAVE_PAPI_H
+
+/* Flag indicating whether or not Petsc is available */
+#undef HAVE_PETSC
+
+/* Define to 1 if you have the <rpc/rpc.h> header file. */
+#undef HAVE_RPC_RPC_H
+
+/* Flag indicating whether or not Space filling curves are available */
+#undef HAVE_SFCURVES
+
+/* Define to 1 if you have the <sstream> header file. */
+#undef HAVE_SSTREAM
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Flag indicating whether the library shall be compiled to use the Tecplot
+   interface */
+#undef HAVE_TECPLOT_API
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* Flag indicating if the library should be built using complex numbers */
+#undef USE_COMPLEX_NUMBERS
