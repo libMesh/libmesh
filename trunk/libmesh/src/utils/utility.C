@@ -1,4 +1,4 @@
-// $Id: utility.C,v 1.14 2004-08-06 16:48:41 jwpeterson Exp $
+// $Id: utility.C,v 1.15 2004-10-19 12:44:11 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -72,16 +72,16 @@ std::string Utility::system_info()
   
   // Get user information
   struct passwd* p = getpwuid(getuid());
-  out << std::endl
-      << " ---------------------------------------------------------------------" << std::endl
-      << "| Time:           " << dateStr.str()    << std::endl
-      << "| OS:             " << sysInfo.sysname  << std::endl
-      << "| HostName:       " << sysInfo.nodename << std::endl
-      << "| OS Release      " << sysInfo.release  << std::endl
-      << "| OS Version:     " << sysInfo.version  << std::endl
-      << "| Machine:        " << sysInfo.machine  << std::endl
-      << "| Username:       " << p->pw_name       << std::endl 
-      << " ---------------------------------------------------------------------" << std::endl;
+  out << '\n'
+      << " ---------------------------------------------------------------------\n"
+      << "| Time:           " << dateStr.str()    << '\n'
+      << "| OS:             " << sysInfo.sysname  << '\n'
+      << "| HostName:       " << sysInfo.nodename << '\n'
+      << "| OS Release      " << sysInfo.release  << '\n'
+      << "| OS Version:     " << sysInfo.version  << '\n'
+      << "| Machine:        " << sysInfo.machine  << '\n'
+      << "| Username:       " << p->pw_name       << '\n' 
+      << " ---------------------------------------------------------------------\n";
 
 #endif
   

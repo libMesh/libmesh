@@ -1,4 +1,4 @@
-// $Id: libmesh_common.h,v 1.5 2004-09-30 20:10:29 benkirk Exp $
+// $Id: libmesh_common.h,v 1.6 2004-10-19 12:44:08 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -106,7 +106,7 @@ typedef std::complex<double> COMPLEX;
   
 
 
-// These are useful macros that behave lilke functions in the code.
+// These are useful macros that behave like functions in the code.
 // If you want to make sure you are accessing a section of code just
 // stick a here(); in it, for example
 #undef here

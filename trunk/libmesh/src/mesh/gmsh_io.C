@@ -1,4 +1,4 @@
-// $Id: gmsh_io.C,v 1.3 2004-08-05 15:58:44 jwpeterson Exp $
+// $Id: gmsh_io.C,v 1.4 2004-10-19 12:44:10 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -74,22 +74,22 @@ void GmshIO::write_stream (std::ostream& out)
   
   {
     // Write the file header.
-    out << "$MeshFormat" << std::endl;
-    out << "2.0 0 " << sizeof(Real) << std::endl;
-    out << "$EndMeshFormat" << std::endl;
+    out << "$MeshFormat\n";
+    out << "2.0 0 " << sizeof(Real) << '\n';
+    out << "$EndMeshFormat\n";
   }
 
   {
     // write the nodes in (n x y z) format
-    out << "$Nodes" << std::endl;
-    out << mesh.n_nodes() << std::endl;
+    out << "$Nodes\n";
+    out << mesh.n_nodes() << '\n';
     
     for (unsigned int v=0; v<mesh.n_nodes(); v++)
       out << mesh.node(v).id()+1 << " "
 	  << mesh.node(v)(0) << " "
 	  << mesh.node(v)(1) << " "
-	  << mesh.node(v)(2) << std::endl;
-    out << "$EndNodes" << std::endl;
+	  << mesh.node(v)(2) << '\n';
+    out << "$EndNodes\n";
   }
 
 
@@ -97,8 +97,8 @@ void GmshIO::write_stream (std::ostream& out)
   {
     // write the connectivity
     
-    out << "$Elements" << std::endl;
-    out << mesh.n_active_sub_elem() << std::endl;
+    out << "$Elements\n";
+    out << mesh.n_active_sub_elem() << '\n';
 
 
     const_active_elem_iterator       it (mesh.elements_begin());
@@ -113,12 +113,12 @@ void GmshIO::write_stream (std::ostream& out)
 // 	  for ( ; it != end; ++it)
 // 	    for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
 // 	      {
-// 		out << "line 2" << std::endl;
+// 		out << "line 2\n";
 // 		std::vector<unsigned int> conn = (*it)->tecplot_connectivity(se);
 // 		for (unsigned int i=0; i<conn.size(); i++)
 // 		  out << conn[i] << " ";
 		
-// 		out << std::endl;
+// 		out << '\n';
 // 	      }
 	  error();  // Not yet implemented
 	  break;
@@ -183,7 +183,7 @@ void GmshIO::write_stream (std::ostream& out)
 		  }
 
 		// Go to next line
-		out << std::endl;
+		out << '\n';
 	      }
 	  
 	  break;
@@ -200,7 +200,7 @@ void GmshIO::write_stream (std::ostream& out)
 // 		if (((*it)->type() == HEX8)   ||    
 // 		    ((*it)->type() == HEX27))
 // 		  {
-// 		    out << "phex8 8" << std::endl;
+// 		    out << "phex8 8\n";
 // 		    std::vector<unsigned int> conn = (*it)->tecplot_connectivity(se);
 // 		    for (unsigned int i=0; i<conn.size(); i++)
 // 		      out << conn[i] << " ";
@@ -208,7 +208,7 @@ void GmshIO::write_stream (std::ostream& out)
 		
 // 		else if ((*it)->type() == HEX20)
 // 		  {
-// 		    out << "phex20 20" << std::endl;
+// 		    out << "phex20 20\n";
 // 		    out << (*it)->node(0)+1  << " "
 // 			<< (*it)->node(1)+1  << " "
 // 			<< (*it)->node(2)+1  << " "
@@ -243,7 +243,7 @@ void GmshIO::write_stream (std::ostream& out)
 // 		    ((*it)->type() == INFHEX18) ||
 // 		    ((*it)->type() == HEX20))
 // 		  {
-// 		    out << "phex8 8" << std::endl;
+// 		    out << "phex8 8\n";
 // 		    std::vector<unsigned int> conn = (*it)->tecplot_connectivity(se);
 // 		    for (unsigned int i=0; i<conn.size(); i++)
 // 		      out << conn[i] << " ";
@@ -253,7 +253,7 @@ void GmshIO::write_stream (std::ostream& out)
 // 		else if (((*it)->type() == TET4)  ||
 // 			 ((*it)->type() == TET10))
 // 		  {
-// 		    out << "tet 4" << std::endl;
+// 		    out << "tet 4\n";
 // 		    std::vector<unsigned int> conn = (*it)->tecplot_connectivity(se);
 // 		    out << conn[0] << " "
 // 			<< conn[2] << " "
@@ -276,7 +276,7 @@ void GmshIO::write_stream (std::ostream& out)
 // 		     * Note that the prisms are treated as
 // 		     * degenerated phex8's.
 // 		     */
-// 		    out << "phex8 8" << std::endl;
+// 		    out << "phex8 8\n";
 // 		    std::vector<unsigned int> conn = (*it)->tecplot_connectivity(se);
 // 		    for (unsigned int i=0; i<conn.size(); i++)
 // 		      out << conn[i] << " ";
@@ -287,7 +287,7 @@ void GmshIO::write_stream (std::ostream& out)
 // 		    error();
 // 		  }
 		
-// 		out << std::endl;
+// 		out << '\n';
 // 	      }
 	  
 	  error(); // Not yet implemented
@@ -302,7 +302,7 @@ void GmshIO::write_stream (std::ostream& out)
 
   
   // end of the file
-  out << std::endl << "$EndElements" << std::endl;
+  out << '\n' << "$EndElements\n";
 }
 
 

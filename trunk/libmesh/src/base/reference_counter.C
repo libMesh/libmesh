@@ -1,4 +1,4 @@
-// $Id: reference_counter.C,v 1.11 2004-01-03 15:37:42 benkirk Exp $
+// $Id: reference_counter.C,v 1.12 2004-10-19 12:44:10 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -48,10 +48,10 @@ std::string ReferenceCounter::get_info ()
 
   std::ostringstream out;
   
-  out << std::endl
-      << " ---------------------------------------------------------------------------- "  << std::endl
-      << "| Reference count information                                                |" << std::endl
-      << " ---------------------------------------------------------------------------- "  << std::endl;
+  out << '\n'
+      << " ---------------------------------------------------------------------------- \n"
+      << "| Reference count information                                                |\n"
+      << " ---------------------------------------------------------------------------- \n";
   
   for (Counts::iterator it = _counts.begin();
        it != _counts.end(); ++it)
@@ -60,25 +60,15 @@ std::string ReferenceCounter::get_info ()
       const unsigned int creations    = it->second.first;
       const unsigned int destructions = it->second.second;
 
-      out << "| "
-	  << name
-	  << " reference count information:"
-	  << std::endl
-	  << "| Creations:    " << creations
-	  << std::endl
-	  << "| Destructions: " << destructions
-	  << std::endl;
+      out << "| " << name << " reference count information:\n"
+	  << "| Creations:    " << creations    << '\n'
+	  << "| Destructions: " << destructions << '\n';
 
       if (creations != destructions)
-	out << "| WARNING: "
-	    << name << " "
-	    << creations - destructions
-	    << " items leaked!"
-	    << std::endl;
-      
+	out << "| WARNING: " << name << " " << creations - destructions << " items leaked!\n";      
     }
   
-  out << " ---------------------------------------------------------------------------- "  << std::endl;
+  out << " ---------------------------------------------------------------------------- \n";
 
   return out.str();
 

@@ -1,4 +1,4 @@
-// $Id: type_vector.C,v 1.6 2004-08-06 16:48:41 jwpeterson Exp $
+// $Id: type_vector.C,v 1.7 2004-10-19 12:44:10 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -117,7 +117,7 @@ void TypeVector<T>::write_unformatted (std::ostream &out,
       << (*this)(2) << " ";
 
   if (newline)
-    out << std::endl;      
+    out << '\n';      
 }
 
 

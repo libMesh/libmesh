@@ -180,7 +180,7 @@ void MEDITIO::write_ascii (const std::string& fname,
     
   }  
   // end of the out file
-  out << std::endl << "# end of file" << std::endl;
+  out << '\n' << "# end of file\n";
 
   // optionally write the data
   if ((solution_names != NULL) &&

@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.35 2004-07-22 19:54:16 jwpeterson Exp $
+// $Id: elem.C,v 1.36 2004-10-19 12:44:10 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -404,7 +404,7 @@ void Elem::write_connectivity (std::ostream& out,
 		      conn.end(),
 		      std::ostream_iterator<unsigned int>(out, " "));
 	    
-	    out << std::endl;
+	    out << '\n';
 	  }
 	return;
       }
@@ -414,7 +414,7 @@ void Elem::write_connectivity (std::ostream& out,
 	for (unsigned int i=0; i<this->n_nodes(); i++)
 	  out << this->node(i)+1 << "\t";
 	
-	out << std::endl;
+	out << '\n';
 	return;
       }
 

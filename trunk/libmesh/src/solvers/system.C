@@ -1,4 +1,4 @@
-// $Id: system.C,v 1.8 2004-10-12 19:46:58 benkirk Exp $
+// $Id: system.C,v 1.9 2004-10-19 12:44:11 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -528,14 +528,14 @@ std::string System::get_info() const
   
   const std::string& sys_name = this->name();
       
-  out << "   System \"" << sys_name << "\"" << std::endl
-      << "    Type \""  << this->system_type() << "\"" << std::endl
+  out << "   System \"" << sys_name << "\"\n"
+      << "    Type \""  << this->system_type() << "\"\n"
       << "    Variables=";
   
   for (unsigned int vn=0; vn<this->n_vars(); vn++)
       out << "\"" << this->variable_name(vn) << "\" ";
      
-  out << std::endl;
+  out << '\n';
 
 #ifndef ENABLE_INFINITE_ELEMENTS
   out << "    Finite Element Types=";
@@ -551,14 +551,14 @@ std::string System::get_info() const
       out << "\"" << this->get_dof_map().variable_type(vn).radial_family << "\" ";
   }
 
-  out << std::endl << "    Infinite Element Mapping=";
+  out << '\n' << "    Infinite Element Mapping=";
   for (unsigned int vn=0; vn<this->n_vars(); vn++)
   {
       out << "\"" << this->get_dof_map().variable_type(vn).inf_map << "\" ";
   }
 #endif      
 
-  out << std::endl;
+  out << '\n';
       
   out << "    Approximation Orders=";
   for (unsigned int vn=0; vn<this->n_vars(); vn++)
@@ -571,16 +571,16 @@ std::string System::get_info() const
 #endif
   }
 
-  out << std::endl;
+  out << '\n';
       
-  out << "    n_dofs()="             << this->n_dofs()             << std::endl;
-  out << "    n_local_dofs()="       << this->n_local_dofs()       << std::endl;
+  out << "    n_dofs()="             << this->n_dofs()             << '\n';
+  out << "    n_local_dofs()="       << this->n_local_dofs()       << '\n';
 #ifdef ENABLE_AMR
-  out << "    n_constrained_dofs()=" << this->n_constrained_dofs() << std::endl;
+  out << "    n_constrained_dofs()=" << this->n_constrained_dofs() << '\n';
 #endif
 
-  out << "    " << "n_vectors()="  << this->n_vectors()  << std::endl;
-//   out << "    " << "n_additional_matrices()=" << this->n_additional_matrices() << std::endl;
+  out << "    " << "n_vectors()="  << this->n_vectors()  << '\n';
+//   out << "    " << "n_additional_matrices()=" << this->n_additional_matrices() << '\n';
   
   return out.str();
 }

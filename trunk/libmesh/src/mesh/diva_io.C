@@ -1,4 +1,4 @@
-// $Id: diva_io.C,v 1.3 2004-07-26 16:27:48 jwpeterson Exp $
+// $Id: diva_io.C,v 1.4 2004-10-19 12:44:10 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -107,7 +107,7 @@ void DivaIO::write_stream (std::ostream& out)
 	  mesh.n_active_elem_of_type(HEX20) +
 	  mesh.n_active_elem_of_type(HEX27)*8) << " "
     
-      << std::endl;
+      << '\n';
   
 
   boundary_mesh.clear();
@@ -138,25 +138,25 @@ void DivaIO::write_stream (std::ostream& out)
 		{
 		  out << side->node(0)+1 << " "
 		      << side->node(1)+1 << " "
-		      << side->node(2)+1 << std::endl;
+		      << side->node(2)+1 << '\n';
 		}
 	      else if (side->type() == TRI6)
 		{
 		  out << side->node(0)+1 << " "
 		      << side->node(3)+1 << " "
-		      << side->node(5)+1 << std::endl
+		      << side->node(5)+1 << '\n'
 
 		      << side->node(3)+1 << " "
 		      << side->node(1)+1 << " "
-		      << side->node(4)+1 << std::endl
+		      << side->node(4)+1 << '\n'
 
 		      << side->node(5)+1 << " "
 		      << side->node(4)+1 << " "
-		      << side->node(2)+1 << std::endl
+		      << side->node(2)+1 << '\n'
 
 		      << side->node(3)+1 << " "
 		      << side->node(4)+1 << " "
-		      << side->node(5)+1 << std::endl;
+		      << side->node(5)+1 << '\n';
 		}
 	    }
 
@@ -177,29 +177,29 @@ void DivaIO::write_stream (std::ostream& out)
 		  out << side->node(0)+1 << " "
 		      << side->node(1)+1 << " "
 		      << side->node(2)+1 << " "
-		      << side->node(3)+1 << std::endl;
+		      << side->node(3)+1 << '\n';
 		}
 	      else if (side->type() == QUAD9)
 		{
 		  out << side->node(0)+1 << " "
 		      << side->node(4)+1 << " "
 		      << side->node(8)+1 << " "
-		      << side->node(7)+1 << std::endl
+		      << side->node(7)+1 << '\n'
 
 		      << side->node(4)+1 << " "
 		      << side->node(1)+1 << " "
 		      << side->node(5)+1 << " "
-		      << side->node(8)+1 << std::endl
+		      << side->node(8)+1 << '\n'
 
 		      << side->node(7)+1 << " "
 		      << side->node(8)+1 << " "
 		      << side->node(6)+1 << " "
-		      << side->node(3)+1 << std::endl
+		      << side->node(3)+1 << '\n'
 
 		      << side->node(8)+1 << " "
 		      << side->node(5)+1 << " "
 		      << side->node(2)+1 << " "
-		      << side->node(6)+1 << std::endl;
+		      << side->node(6)+1 << '\n';
 		}
 	    }
   }
@@ -224,7 +224,7 @@ void DivaIO::write_stream (std::ostream& out)
 		  (side->type() == TRI6)  )
 
 		out << mesh.boundary_info.boundary_id(mesh.elem(e), s)
-		    << std::endl;
+		    << '\n';
 	    }
 
     
@@ -258,49 +258,49 @@ void DivaIO::write_stream (std::ostream& out)
 	  out << mesh.elem(e)->node(0)+1 << " "
 	      << mesh.elem(e)->node(1)+1 << " "
 	      << mesh.elem(e)->node(2)+1 << " "
-	      << mesh.elem(e)->node(3)+1 << std::endl;
+	      << mesh.elem(e)->node(3)+1 << '\n';
 	}
       else if (mesh.elem(e)->type() == TET10)
 	{
 	  out << mesh.elem(e)->node(0)+1 << " "
 	      << mesh.elem(e)->node(4)+1 << " "
 	      << mesh.elem(e)->node(6)+1 << " "
-	      << mesh.elem(e)->node(7)+1 << std::endl;
+	      << mesh.elem(e)->node(7)+1 << '\n';
 	    
 	  out << mesh.elem(e)->node(4)+1 << " "
 	      << mesh.elem(e)->node(1)+1 << " "
 	      << mesh.elem(e)->node(5)+1 << " "
-	      << mesh.elem(e)->node(8)+1 << std::endl;	
+	      << mesh.elem(e)->node(8)+1 << '\n';	
 	    
 	  out << mesh.elem(e)->node(6)+1 << " "
 	      << mesh.elem(e)->node(5)+1 << " "
 	      << mesh.elem(e)->node(2)+1 << " "
-	      << mesh.elem(e)->node(9)+1 << std::endl;	
+	      << mesh.elem(e)->node(9)+1 << '\n';	
 	    
 	  out << mesh.elem(e)->node(7)+1 << " "
 	      << mesh.elem(e)->node(8)+1 << " "
 	      << mesh.elem(e)->node(9)+1 << " "
-	      << mesh.elem(e)->node(3)+1 << std::endl;	
+	      << mesh.elem(e)->node(3)+1 << '\n';	
 	    
 	  out << mesh.elem(e)->node(4)+1 << " "
 	      << mesh.elem(e)->node(8)+1 << " "
 	      << mesh.elem(e)->node(6)+1 << " "
-	      << mesh.elem(e)->node(7)+1 << std::endl;	
+	      << mesh.elem(e)->node(7)+1 << '\n';	
 	    
 	  out << mesh.elem(e)->node(4)+1 << " "
 	      << mesh.elem(e)->node(5)+1 << " "
 	      << mesh.elem(e)->node(6)+1 << " "
-	      << mesh.elem(e)->node(8)+1 << std::endl;	
+	      << mesh.elem(e)->node(8)+1 << '\n';	
 	    
 	  out << mesh.elem(e)->node(6)+1 << " "
 	      << mesh.elem(e)->node(5)+1 << " "
 	      << mesh.elem(e)->node(9)+1 << " "
-	      << mesh.elem(e)->node(8)+1 << std::endl;	
+	      << mesh.elem(e)->node(8)+1 << '\n';	
 	  
 	  out << mesh.elem(e)->node(6)+1 << " "
 	      << mesh.elem(e)->node(8)+1 << " "
 	      << mesh.elem(e)->node(9)+1 << " "
-	      << mesh.elem(e)->node(7)+1 << std::endl;	
+	      << mesh.elem(e)->node(7)+1 << '\n';	
 	}
 
 
@@ -316,7 +316,7 @@ void DivaIO::write_stream (std::ostream& out)
 	      << mesh.elem(e)->node(1)+1 << " "
 	      << mesh.elem(e)->node(2)+1 << " "
 	      << mesh.elem(e)->node(3)+1 << " "
-	      << mesh.elem(e)->node(4)+1 << std::endl;
+	      << mesh.elem(e)->node(4)+1 << '\n';
 	}
 
 
@@ -333,7 +333,7 @@ void DivaIO::write_stream (std::ostream& out)
 	      << mesh.elem(e)->node(2)+1 << " "
 	      << mesh.elem(e)->node(3)+1 << " "
 	      << mesh.elem(e)->node(4)+1 << " "
-	      << mesh.elem(e)->node(5)+1 << std::endl;
+	      << mesh.elem(e)->node(5)+1 << '\n';
 	}
       else if (mesh.elem(e)->type() == PRISM18)
 	{
@@ -363,7 +363,7 @@ void DivaIO::write_stream (std::ostream& out)
 		  << conn[4] << " "
 		  << conn[5] << " "
 		  << conn[6] << " "
-		  << conn[7] << std::endl;
+		  << conn[7] << '\n';
 	    }
 	}
 }

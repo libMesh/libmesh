@@ -1,4 +1,4 @@
-// $Id: perf_log.C,v 1.20 2004-08-05 15:58:44 jwpeterson Exp $
+// $Id: perf_log.C,v 1.21 2004-10-19 12:44:11 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -112,25 +112,25 @@ std::string PerfLog::get_info_header() const
       
       // Get user information
       struct passwd* p = getpwuid(getuid());
-      out << std::endl
-	  << " ----------------------------------------------------------------------------" << std::endl;
+      out << '\n'
+	  << " ----------------------------------------------------------------------------\n";
       
       if (libMesh::n_processors() > 1)
 	{
-      out << "| Processor id:   " << libMesh::processor_id() << std::endl
-	  << "| Num Processors: " << libMesh::n_processors() << std::endl;
+      out << "| Processor id:   " << libMesh::processor_id() << '\n'
+	  << "| Num Processors: " << libMesh::n_processors() << '\n';
 	}
       
 #ifdef HAVE_LOCALE
-      out << "| Time:           " << dateStr.str()               << std::endl;
+      out << "| Time:           " << dateStr.str()               << '\n';
 #endif
-      out << "| OS:             " << sysInfo.sysname             << std::endl
-	  << "| HostName:       " << sysInfo.nodename            << std::endl
-	  << "| OS Release      " << sysInfo.release             << std::endl
-	  << "| OS Version:     " << sysInfo.version             << std::endl
-	  << "| Machine:        " << sysInfo.machine             << std::endl
-	  << "| Username:       " << p->pw_name                  << std::endl 
-	  << " ----------------------------------------------------------------------------" << std::endl;
+      out << "| OS:             " << sysInfo.sysname             << '\n'
+	  << "| HostName:       " << sysInfo.nodename            << '\n'
+	  << "| OS Release      " << sysInfo.release             << '\n'
+	  << "| OS Version:     " << sysInfo.version             << '\n'
+	  << "| Machine:        " << sysInfo.machine             << '\n'
+	  << "| Username:       " << p->pw_name                  << '\n' 
+	  << " ----------------------------------------------------------------------------\n";
     }
 
   return out.str();
@@ -152,17 +152,17 @@ std::string PerfLog::get_perf_info() const
       const double elapsed_time = (static_cast<double>(tstop.tv_sec  - tstart.tv_sec) +
 				   static_cast<double>(tstop.tv_usec - tstart.tv_usec)*1.e-6);
 
-      out << " ----------------------------------------------------------------------------"  << std::endl;
+      out << " ----------------------------------------------------------------------------\n";
       out << "| " << label_name << " Performance: Alive time=" << elapsed_time
-	  << ", Active time=" << total_time << std::endl;
-      out << " ----------------------------------------------------------------------------"  << std::endl;
+	  << ", Active time=" << total_time << '\n';
+      out << " ----------------------------------------------------------------------------\n";
       out << "| ";
       OSSStringleft(out,30,"Event");      
       OSSStringleft(out,8,"nCalls");      
       OSSStringleft(out,12,"Total");      
       OSSStringleft(out,12,"Avg");      
       OSSStringleft(out,13,"Percent of");      
-      out << "|" << std::endl;      
+      out << "|\n";      
       out << "| ";
       OSSStringleft(out,30,"");
       OSSStringleft(out,8,"");
@@ -170,9 +170,9 @@ std::string PerfLog::get_perf_info() const
       OSSStringleft(out,12,"Time");
       OSSStringleft(out,13,"Active Time");
       
-      out << "|" << std::endl;
-      out << "|----------------------------------------------------------------------------|" << std::endl
-	  << "|                                                                            |" << std::endl;
+      out << "|\n";
+      out << "|----------------------------------------------------------------------------|\n"
+	  << "|                                                                            |\n";
       
       
       unsigned int summed_function_calls = 0;
@@ -212,12 +212,12 @@ std::string PerfLog::get_perf_info() const
 
 		      out << "| ";
 		      OSSStringright(out,76,"|");
-		      out << std::endl;
+		      out << '\n';
 		      
 		      out << "| ";
 		      OSSStringleft(out,75,pos->first.first);
 		      out << "|";
-		      out << std::endl;
+		      out << '\n';
 		    }
 
 		  out << "|   ";
@@ -239,11 +239,11 @@ std::string PerfLog::get_perf_info() const
 	      OSSRealleft(out,13,2,perf_percent);
 	      
 	      out << "|";
-	      out << std::endl;
+	      out << '\n';
 	    }
 	}
       
-      out << " ----------------------------------------------------------------------------" << std::endl;
+      out << " ----------------------------------------------------------------------------\n";
       out << "| ";
       OSSStringleft(out,30,"Totals:");
 
@@ -262,9 +262,9 @@ std::string PerfLog::get_perf_info() const
       OSSRealleft(out,13,2,summed_percentage);
       
       out << "|";
-      out << std::endl;
+      out << '\n';
       
-      out << " ----------------------------------------------------------------------------" << std::endl;
+      out << " ----------------------------------------------------------------------------\n";
     }
 
   return out.str();

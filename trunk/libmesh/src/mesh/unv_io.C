@@ -1,4 +1,4 @@
-// $Id: unv_io.C,v 1.8 2004-10-16 03:48:36 benkirk Exp $
+// $Id: unv_io.C,v 1.9 2004-10-19 12:44:10 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -47,8 +47,8 @@
 
 //-----------------------------------------------------------------------------
 // UNVIO class static members
-const std::string  UNVIO::_label_dataset_nodes       = "2411";
-const std::string  UNVIO::_label_dataset_elements    = "2412";
+const std::string UNVIO::_label_dataset_nodes    = "2411";
+const std::string UNVIO::_label_dataset_elements = "2412";
 
 
 
@@ -929,7 +929,7 @@ void UNVIO::node_out (std::ostream& out_file)
   out_file << "    -1\n"
 	   << "  " 
 	   << _label_dataset_nodes
-	   << "\n";
+	   << '\n';
 
 
   unsigned int exp_coord_sys_dummy  = 0; // export coordinate sys. (not supported yet)
@@ -1175,7 +1175,7 @@ void UNVIO::element_out(std::ostream& out_file)
 	       << std::setw(10) << mat_prop_tab_dummy                 // not supported 
 	       << std::setw(10) << color_dummy                        // not supported 
 	       << std::setw(10) << elem->n_nodes()                    // No. of nodes per element
-	       << std::endl;
+	       << '\n';
 
       for (unsigned int j=0; j<elem->n_nodes(); j++)
 	{
@@ -1188,7 +1188,7 @@ void UNVIO::element_out(std::ostream& out_file)
 	  out_file << std::setw(10) << mesh.data.node_to_foreign_id(node_in_unv_order);
 	}
 
-      out_file << std::endl;
+      out_file << '\n';
 
       n_elem_written++;
     }
