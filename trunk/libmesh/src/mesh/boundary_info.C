@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.29 2004-01-03 15:37:43 benkirk Exp $
+// $Id: boundary_info.C,v 1.30 2004-03-18 15:43:37 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -63,7 +63,7 @@ void BoundaryInfo::clear()
 
 
 void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
-			const bool transfer_mesh_data)
+			const bool transfer_mesh_data) const
 {
   boundary_mesh.clear();
 
@@ -116,13 +116,14 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
 	    
 	    // Get the top-level parent for this element
 	    const Elem* top_parent = elem->top_parent();
-	    
+
+	    // A convenient typedef
+	    typedef
+	      std::multimap<const Elem*, std::pair<unsigned short int, short int> >::const_iterator
+	      Iter;
+	      
 	    // Find the right id number for that side
-	    std::pair<std::multimap<const Elem*,
-		                    std::pair<unsigned short int, short int> >::iterator,
-		      std::multimap<const Elem*,
-		                    std::pair<unsigned short int, short int> >::iterator > 
-	      pos = _boundary_side_id.equal_range(top_parent);
+	    std::pair<Iter, Iter> pos = _boundary_side_id.equal_range(top_parent);
 
 	    while (pos.first != pos.second)
 	      {
