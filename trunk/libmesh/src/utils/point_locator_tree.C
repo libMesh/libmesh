@@ -1,4 +1,4 @@
-// $Id: point_locator_tree.C,v 1.5 2004-03-22 22:41:46 benkirk Exp $
+// $Id: point_locator_tree.C,v 1.6 2004-04-16 17:08:17 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -95,14 +95,14 @@ void PointLocatorTree::init ()
 	      {
 //TODO: What to do with the level of the tree?
 		
-		_tree = new Trees::QuadTree (this->_mesh, 20,
+		_tree = new Trees::QuadTree (this->_mesh, 100,
 					     Trees::QuadTree::ELEMENTS);
 		break;
 	      }
 
 	    case 3:
 	      {
-		_tree = new Trees::OctTree (this->_mesh, 20,
+		_tree = new Trees::OctTree (this->_mesh, 100,
 					    Trees::OctTree::ELEMENTS);
 		break;
 	      }
@@ -165,6 +165,20 @@ const Elem* PointLocatorTree::operator() (const Point& p) const
     {
 	// ask the tree
 	this->_element = this->_tree->find_element (p);
+
+	// Note that in some cases the tree may not find a point
+	// e.g. when a point is located in an element that is not
+	// entirely bounded by the tree node's bounding box.
+	// In those cases we take a safe but slow way.
+	if(this->_element == NULL)
+	  {
+	    const_elem_iterator pos           (this->_mesh.const_elements_begin());
+	    const const_elem_iterator end_pos (this->_mesh.const_elements_end());
+
+	    for ( ; pos != end_pos; ++pos)
+	      if ((*pos)->contains_point(p))
+		return this->_element = (*pos);
+	  }
 
 	if (this->_element == NULL)
 	  {

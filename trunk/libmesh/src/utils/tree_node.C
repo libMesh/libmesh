@@ -1,4 +1,4 @@
-// $Id: tree_node.C,v 1.12 2004-03-24 04:32:59 jwpeterson Exp $
+// $Id: tree_node.C,v 1.13 2004-04-16 17:08:17 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -79,6 +79,9 @@ void TreeNode<N>::insert (const Elem* elem)
   if (this->active())
     {
       elements.push_back (elem);
+
+      if (elem->infinite() && !this->contains_ifems)
+	this->contains_ifems = true;
 
       // Refine ourself if we reach the target bin size for a TreeNode.
       if (elements.size() == tgt_bin_size)
@@ -411,7 +414,12 @@ void TreeNode<N>::transform_nodes_to_elements (std::vector<std::vector<const Ele
 
       for (std::set<const Elem*>::iterator pos=elements_set.begin();
 	   pos != elements_set.end(); ++pos)
-	elements.push_back(*pos);
+	{
+	  elements.push_back(*pos);
+
+	  if ((*pos)->infinite() && !this->contains_ifems)
+	    this->contains_ifems = true;
+	}
     }
   else
     {
@@ -447,8 +455,9 @@ const Elem* TreeNode<N>::find_element(const Point& p) const
 {
   if (this->active())
     {
-      // Only check our children if the point is in our bounding box.
-      if (this->bounds_point(p))      
+      // Only check our children if the point is in our bounding box
+      // or if the node contains infinite elements
+      if (this->bounds_point(p) || this->contains_ifems)
 	// Search the active elements in the active TreeNode.
 	for (std::vector<const Elem*>::const_iterator pos=elements.begin();
 	     pos != elements.end(); ++pos)
