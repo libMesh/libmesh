@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.5 2004-07-14 19:23:17 jwpeterson Exp $
+// $Id: elem.h,v 1.6 2004-07-22 19:54:16 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -208,49 +208,28 @@ class Elem : public ReferenceCountedObject<Elem>,
   virtual void connectivity(const unsigned int sc,
 			    const IOPackage iop,
 			    std::vector<unsigned int>& conn) const = 0;
-  
-//   /**
-//    * @returns the connectivity in the \p Tecplot format, which is
-//    * 1-based.  Also, maps all elements to quadrilaterals in 2D and
-//    * hexahedrals in 3D, which can be useful for writing hybrid meshes
-//    * for visualization. 
-//    */
-//   virtual void tecplot_connectivity (const unsigned int sc,
-// 				     std::vector<unsigned int>& conn) const = 0;
 
-//   /**
-//    * @returns the connectivity of the \f$ sc^{th} \f$
-//    * sub-element in the VTK format.
-//    */
-//   virtual void vtk_connectivity (const unsigned int sc,
-// 				 std::vector<unsigned int>* conn) const = 0;
+  /**
+   * Writes the element connectivity for various IO packages
+   * to the passed ostream "out".  Not virtual, since it is
+   * implemented in the base class.  This function supercedes the
+   * write_tecplot_connectivity(...) and write_ucd_connectivity(...)
+   * routines.
+   */
+  void write_connectivity (std::ostream& out,
+			   const IOPackage iop) const;
 
-  
   /**
    * @returns the VTK element type of the sc-th sub-element.
    */
   virtual unsigned int vtk_element_type (const unsigned int sc) const = 0;
-  
-  /**
-   * Writes the \p Tecplot connectivity to the \p out stream.
-   * This function is actually defined in the Elem base class
-   * because it works the same for all element types.
-   */
-  virtual void write_tecplot_connectivity (std::ostream &out) const;
-  
-  /**
-   * Writes the \p UCD connectivity to the \p out stream.
-   * This function is actually defined in the Elem base class
-   * because it works the same for all element types.
-   */
-  virtual void write_ucd_connectivity (std::ostream &out) const;
-  
+
   /**
    * @returns the type of element that has been derived from this
    * base class.
    */
   virtual ElemType type () const = 0;
-
+  
   /**
    * @returns the dimensionality of the object.
    */

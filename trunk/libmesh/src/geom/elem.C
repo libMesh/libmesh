@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.34 2004-07-14 19:23:18 jwpeterson Exp $
+// $Id: elem.C,v 1.35 2004-07-22 19:54:16 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -204,25 +204,6 @@ Elem* Elem::build(const ElemType type,
 
 
 
-void Elem::write_tecplot_connectivity(std::ostream& out) const
-{
-  assert (!out.bad());
-  assert (_nodes != NULL);
-
-  // This connectivity vector will be used repeatedly instead
-  // of being reconstructed inside the loop.
-  std::vector<unsigned int> conn;
-  for (unsigned int sc=0; sc <this->n_sub_elem(); sc++)
-    {
-      this->connectivity(sc, TECPLOT, conn);
-      
-      std::copy(conn.begin(),
- 		conn.end(),
- 		std::ostream_iterator<unsigned int>(out, " "));
-      
-      out << std::endl;
-    }
-}
 
 
 
@@ -399,16 +380,84 @@ bool Elem::operator == (const Elem& rhs) const
 
 
 
-void Elem::write_ucd_connectivity(std::ostream &out) const
+
+
+void Elem::write_connectivity (std::ostream& out,
+			       const IOPackage iop) const
 {
-  assert (out);
+  assert (out.good());
   assert (_nodes != NULL);
+  assert (iop != INVALID_IO_PACKAGE);
 
-  for (unsigned int i=0; i<this->n_nodes(); i++)
-    out << this->node(i)+1 << "\t";
+  switch (iop)
+    {
+    case TECPLOT:
+      {
+	// This connectivity vector will be used repeatedly instead
+	// of being reconstructed inside the loop.
+	std::vector<unsigned int> conn;
+	for (unsigned int sc=0; sc <this->n_sub_elem(); sc++)
+	  {
+	    this->connectivity(sc, TECPLOT, conn);
+	    
+	    std::copy(conn.begin(),
+		      conn.end(),
+		      std::ostream_iterator<unsigned int>(out, " "));
+	    
+	    out << std::endl;
+	  }
+	return;
+      }
 
-  out << std::endl;
+    case UCD:
+      {
+	for (unsigned int i=0; i<this->n_nodes(); i++)
+	  out << this->node(i)+1 << "\t";
+	
+	out << std::endl;
+	return;
+      }
+
+    default:
+      error();
+    }
+
+  error();
 }
+
+
+// void Elem::write_tecplot_connectivity(std::ostream& out) const
+// {
+//   assert (!out.bad());
+//   assert (_nodes != NULL);
+
+//   // This connectivity vector will be used repeatedly instead
+//   // of being reconstructed inside the loop.
+//   std::vector<unsigned int> conn;
+//   for (unsigned int sc=0; sc <this->n_sub_elem(); sc++)
+//     {
+//       this->connectivity(sc, TECPLOT, conn);
+      
+//       std::copy(conn.begin(),
+//  		conn.end(),
+//  		std::ostream_iterator<unsigned int>(out, " "));
+      
+//       out << std::endl;
+//     }
+// }
+
+
+
+// void Elem::write_ucd_connectivity(std::ostream &out) const
+// {
+//   assert (out);
+//   assert (_nodes != NULL);
+
+//   for (unsigned int i=0; i<this->n_nodes(); i++)
+//     out << this->node(i)+1 << "\t";
+
+//   out << std::endl;
+// }
 
 
 
