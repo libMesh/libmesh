@@ -44,6 +44,7 @@ void usage(char *progName)
     "    -o <string>                   Output file name\n"
     "    -s <string>                   Solution file name\n"
     "    -d <dim>                      <dim>-dimensional mesh\n"
+    "    -D <factor>                   Randomly move interior nodes by D*hmin\n"
 #ifdef ENABLE_AMR
     "    -r <count>                    Globally refine <count> times\n"
 #endif
@@ -132,6 +133,7 @@ void process_cmd_line(int argc, char **argv,
 		      unsigned int& n_subdomains,
 		      unsigned int& n_rsteps,
 		      unsigned int& dim,
+		      double& dist_fact,
 		      bool& verbose,
 		      bool& write_bndry,
 		      bool& addinfelems,
@@ -153,12 +155,12 @@ void process_cmd_line(int argc, char **argv,
   x_sym    = y_sym    = z_sym    = false;
 
   char optionStr[] =
-    "i:o:s:d:r:p:bvlLm?h";
+    "i:o:s:d:D:r:p:bvlLm?h";
 
 #else
 
   char optionStr[] =
-    "i:o:s:d:r:p:ba::x:y:z:XYZvlLm?h";
+    "i:o:s:d:D:r:p:ba::x:y:z:XYZvlLm?h";
 
 #endif
 
@@ -228,6 +230,15 @@ void process_cmd_line(int argc, char **argv,
 	case 'd':
 	  {
 	    dim = atoi(optarg);
+	    break;
+	  }
+
+	  /**
+	   * Get the mesh distortion factor
+	   */
+	case 'D':
+	  {
+	    dist_fact = atof(optarg);
 	    break;
 	  }
 
@@ -362,6 +373,7 @@ int main (int argc, char** argv)
     unsigned int n_subdomains = 1;
     unsigned int n_rsteps = 0;
     unsigned int dim = static_cast<unsigned int>(-1); // invalid dimension
+    double dist_fact = 0.;
     bool verbose = false;
     bool write_bndry = false;
     bool addinfelems = false;
@@ -381,7 +393,7 @@ int main (int argc, char** argv)
 
     process_cmd_line(argc, argv, names,
 		     n_subdomains, n_rsteps,
-		     dim, verbose, write_bndry, 
+		     dim, dist_fact, verbose, write_bndry, 
 		     addinfelems, origin_x, origin_y, origin_z, x_sym, y_sym, z_sym,
 		     build_l,
 		     build_script_l);
@@ -408,6 +420,7 @@ int main (int argc, char** argv)
 	if (verbose)
 	  mesh.print_info();
       }
+    
     else
       {
 	std::cout << "No input specified." << std::endl;
@@ -566,6 +579,20 @@ int main (int argc, char** argv)
 	if (verbose)
 	  mesh.print_info();
       };
+
+    
+    /**
+     * Possibly distort the mesh
+     */
+    if (dist_fact > 0.)
+      {
+	std::cout << "Distoring the mesh by a factor of "
+		  << dist_fact
+		  << std::endl;
+	
+	mesh.distort(dist_fact);
+      };
+
 
     /*
     char filechar[81];
