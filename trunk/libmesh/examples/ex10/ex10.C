@@ -1,4 +1,4 @@
-/* $Id: ex10.C,v 1.14 2004-05-20 22:56:50 jwpeterson Exp $ */
+/* $Id: ex10.C,v 1.15 2004-08-06 16:48:38 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -177,8 +177,8 @@ int main (int argc, char** argv)
 	  OSSInt(out,2,t_step);
 	  out << ", time=";
 	  OSSRealzeroleft(out,6,3,time);
-	  out <<  "..." << std::endl;
-	  std::cout << out.str();
+	  out <<  "...";
+	  std::cout << out.str() << std::endl;
 	}
 	
 	// At this point we need to update the old

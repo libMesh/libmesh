@@ -1,4 +1,4 @@
-// $Id: data_map.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: data_map.h,v 1.3 2004-08-06 16:48:40 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -24,6 +24,7 @@
 
 
 // C++ includes
+#include <iostream>
 #include <map>
 #include <string>
 #include <typeinfo>

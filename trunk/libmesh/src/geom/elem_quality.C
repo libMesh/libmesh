@@ -1,4 +1,4 @@
-// $Id: elem_quality.C,v 1.8 2004-01-03 15:37:43 benkirk Exp $
+// $Id: elem_quality.C,v 1.9 2004-08-06 16:48:40 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -18,6 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // C++ includes
+#include <iostream>
 #include <sstream> 
 
 // Local includes

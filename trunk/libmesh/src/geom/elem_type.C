@@ -1,4 +1,4 @@
-// $Id: elem_type.C,v 1.7 2004-01-03 15:37:43 benkirk Exp $
+// $Id: elem_type.C,v 1.8 2004-08-06 16:48:40 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -16,6 +16,9 @@
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+// C++ includes
+#include <iostream>
 
 // Local includes
 #include "enum_elem_type.h"

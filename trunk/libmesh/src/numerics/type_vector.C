@@ -1,4 +1,4 @@
-// $Id: type_vector.C,v 1.5 2004-04-18 00:51:50 jwpeterson Exp $
+// $Id: type_vector.C,v 1.6 2004-08-06 16:48:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -21,6 +21,7 @@
 
 
 // C++ includes
+#include <iostream>
 #include <iomanip> // for std::setw, std::setiosflags
 
 // Local includes

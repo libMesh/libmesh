@@ -1,4 +1,4 @@
-// $Id: quadrature_rules.C,v 1.5 2004-01-03 15:37:44 benkirk Exp $
+// $Id: quadrature_rules.C,v 1.6 2004-08-06 16:48:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -19,7 +19,7 @@
 
 
 // C++ includes
-
+#include <iostream>
 
 // Local includes
 #include "libmesh_common.h"

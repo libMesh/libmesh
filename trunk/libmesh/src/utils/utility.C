@@ -1,4 +1,4 @@
-// $Id: utility.C,v 1.13 2004-03-20 15:16:57 benkirk Exp $
+// $Id: utility.C,v 1.14 2004-08-06 16:48:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -22,7 +22,6 @@
 #include "libmesh_config.h"
 
 // System includes
-#include <iostream>
 #include <sys/time.h>
 #include <pwd.h>
 #include <unistd.h>
