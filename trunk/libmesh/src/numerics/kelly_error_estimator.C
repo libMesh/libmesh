@@ -1,4 +1,4 @@
-// $Id: kelly_error_estimator.C,v 1.8 2005-03-10 22:05:48 jwpeterson Exp $
+// $Id: kelly_error_estimator.C,v 1.9 2005-03-21 01:36:31 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -217,7 +217,7 @@ void KellyErrorEstimator::estimate_error (const System& system,
 		      fe_f->reinit (f, &qp_f);
 
 		      // The error contribution from this face
-		      Real error = 1.e-10;
+		      Real error = 1.e-30;
 
 		    
 		    
