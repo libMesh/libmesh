@@ -1,4 +1,4 @@
-// $Id: ex7.C,v 1.13 2003-02-24 22:03:50 benkirk Exp $
+// $Id: ex7.C,v 1.14 2003-02-25 04:49:09 jwpeterson Exp $
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
   
@@ -104,7 +104,7 @@ const Real libmesh_pi = acos(-1.);
 /**
  * Define the imaginary unit
  * I = 0. + i*1.
- */ 
+ */
 Complex I(0.0, 1.0);
 
 
@@ -128,7 +128,9 @@ int main (int argc, char** argv)
 
   std::cerr << "ERROR: This example is intended for " << std::endl
 	    << " use with complex numbers." << std::endl;
-  error();
+  here();
+
+  return 0;
 
 #endif
 
