@@ -1,4 +1,4 @@
-// $Id: partitioner_factory.C,v 1.8 2004-10-26 22:02:00 benkirk Exp $
+// $Id: partitioner_factory.C,v 1.9 2004-10-26 22:22:38 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -40,6 +40,15 @@
 // be called from user code, they just need to get instantiated.  Hide
 // them in an anonymous namespace to prevent name clashes
 namespace {
+
+  template<>
+  std::map<std::string, Factory<Partitioner>*>&
+  Factory<Partitioner>::factory_map()
+  {
+    static std::map<std::string, Factory<Partitioner>*> _map;
+    return _map;      
+  }
+  
   
 #ifdef HAVE_METIS
   FactoryImp<MetisPartitioner,      Partitioner> metis    ("Metis");
