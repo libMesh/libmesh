@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.1 2003-02-04 01:57:17 benkirk Exp $
+# $Id: Makefile,v 1.2 2003-02-04 02:02:23 benkirk Exp $
 
 
 # The location of the mesh library
@@ -16,7 +16,7 @@ include $(meshdir)/Make.common
 
 #
 # source files
-srcfiles 	:= $(wildcard *.C)
+srcfiles 	:= $(wildcard *.C) ../ex3/exact_solution.C
 
 #
 # object files
