@@ -1,4 +1,4 @@
-// $Id: cell_prism18.C,v 1.7 2003-09-02 18:02:42 benkirk Exp $
+// $Id: cell_prism18.C,v 1.8 2003-09-02 19:50:20 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -448,6 +448,9 @@ unsigned short int Prism18::second_order_adjacent_vertex (const unsigned int n,
       }
 
     }
+
+  error();
+  return libMesh::invalid_uint;
 }
 
 
