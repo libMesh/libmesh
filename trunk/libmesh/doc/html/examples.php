@@ -39,6 +39,14 @@ in your application.
 <br>
 <br>
 
+<h2><a href="ex3.php">Example 3</a> -- Solving a Poisson Problem</h2>
+This is the third example program.  It builds on
+the second example program by showing how to solve a simple
+Poisson system.  This example also introduces the notion
+of customized matrix assembly functions, working with an
+exact solution, and using element iterators.
+We will not comment on things that
+were already explained in the second example.
 </div>
 
 <!--
