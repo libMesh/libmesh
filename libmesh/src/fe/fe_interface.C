@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.11 2003-02-13 22:56:09 benkirk Exp $
+// $Id: fe_interface.C,v 1.12 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -399,8 +399,8 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 void FEInterface::nodal_soln(const unsigned int dim,
 			     const FEType& fe_t,
 			     const Elem* elem,
-			     const std::vector<Complex>& elem_soln,
-			     std::vector<Complex>&       nodal_soln)
+			     const std::vector<Number>& elem_soln,
+			     std::vector<Number>&       nodal_soln)
 {
 #ifdef ENABLE_INFINITE_ELEMENTS
 

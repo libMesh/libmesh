@@ -1,4 +1,4 @@
-// $Id: dense_matrix.C,v 1.7 2003-02-13 22:56:12 benkirk Exp $
+// $Id: dense_matrix.C,v 1.8 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -150,8 +150,5 @@ void DenseMatrix<Tp>::right_multiply (const DenseMatrix<Tp>& B,
 
 //--------------------------------------------------------------
 // Explicit instantiations
+template class DenseMatrix<Real>;
 template class DenseMatrix<Complex>;
-#ifdef USE_COMPLEX_NUMBERS
- /* Avoid double instantiation in case of real-only */
- template class DenseMatrix<Real>;
-#endif

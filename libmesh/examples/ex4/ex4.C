@@ -1,4 +1,4 @@
-// $Id: ex4.C,v 1.11 2003-02-17 01:23:01 benkirk Exp $
+// $Id: ex4.C,v 1.12 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -109,18 +109,6 @@ int main (int argc, char** argv)
    * Initialize Petsc, like in example 2.
    */
   libMesh::init (argc, argv);
-  
-  /**
-   * This example is designed for real numbers only.
-   */
-#ifdef USE_COMPLEX_NUMBERS
-
-  std::cerr << "ERROR: This example is not intended for " << std::endl
-	    << " use with complex numbers." << std::endl;
-  error();
-
-#endif
-
 
   /**
    * Braces are used to force object scope, like in example 2
@@ -348,8 +336,8 @@ void assemble_poisson(EquationSystems& es,
    * this example compiles successfully, and the error 
    * message in \p main() can catch this irregularity.
    */
-  RealDenseMatrix   Ke;
-  std::vector<Real> Fe;
+  DenseMatrix<Number> Ke;
+  std::vector<Number> Fe;
 
   /**
    * This vector will hold the degree of freedom indices for
@@ -637,13 +625,8 @@ void assemble_poisson(EquationSystems& es,
        * for this element.  Add them to the global matrix and
        * right-hand-side vector.  The \p PetscMatrix::add_matrix()
        * and \p PetscVector::add_vector() members do this for us.
-       * 
-       * The preprocessor test for complex numbers is explained
-       * in example 5.
        */
       
-#ifndef USE_COMPLEX_NUMBERS
-
       /**
        * Start logging the insertion of the local (element)
        * matrix and vector into the global matrix and vector
@@ -658,8 +641,6 @@ void assemble_poisson(EquationSystems& es,
        * matrix and vector into the global matrix and vector
        */
       perf_log.stop_event ("matrix insertion");
-      
-#endif
       
     }; // end of element loop
 

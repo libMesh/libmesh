@@ -1,4 +1,4 @@
-// $Id: laspack_interface.C,v 1.3 2003-02-13 22:56:12 benkirk Exp $
+// $Id: laspack_interface.C,v 1.4 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -21,7 +21,7 @@
 
 #include "mesh_common.h"
 
-#if defined(HAVE_LASPACK) && !defined(USE_COMPLEX_NUMBERS)
+#if defined(HAVE_LASPACK)
 
 
 // C++ includes
@@ -96,9 +96,9 @@ void LaspackInterface::init ()
 
 
 std::pair<unsigned int, Real> 
-LaspackInterface::solve (SparseMatrix &matrix_in,
-			 NumericVector &solution_in,
-			 NumericVector &rhs_in,
+LaspackInterface::solve (SparseMatrix<Real> &matrix_in,
+			 NumericVector<Real> &solution_in,
+			 NumericVector<Real> &rhs_in,
 			 const double tol,
 			 const unsigned int m_its)
 {

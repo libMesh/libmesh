@@ -1,4 +1,4 @@
-// $Id: system_base.C,v 1.6 2003-02-17 01:23:01 benkirk Exp $
+// $Id: system_base.C,v 1.7 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -38,10 +38,10 @@ SystemBase::SystemBase (Mesh& mesh,
 			const unsigned int  number,
 			const SolverPackage solver_package) :
   
-  solution                (NumericVector::build(solver_package)),
-  rhs                     (NumericVector::build(solver_package)),
-  matrix                  (SparseMatrix::build (solver_package)),
-  linear_solver_interface (LinearSolverInterface::build(solver_package)),
+  solution                (NumericVector<Number>::build(solver_package)),
+  rhs                     (NumericVector<Number>::build(solver_package)),
+  matrix                  (SparseMatrix<Number>::build (solver_package)),
+  linear_solver_interface (LinearSolverInterface<Number>::build(solver_package)),
   _sys_name               (name),
   _sys_number             (number),
   _dof_map                (number),
@@ -131,7 +131,7 @@ void SystemBase::assemble ()
 
 
 
-void SystemBase::update_global_solution (std::vector<Complex>& global_soln) const
+void SystemBase::update_global_solution (std::vector<Number>& global_soln) const
 {
   global_soln.resize (solution->size());
 
@@ -140,7 +140,7 @@ void SystemBase::update_global_solution (std::vector<Complex>& global_soln) cons
 
 
 
-void SystemBase::update_global_solution (std::vector<Complex>& global_soln,
+void SystemBase::update_global_solution (std::vector<Number>& global_soln,
 					 const unsigned int dest_proc) const
 {
   global_soln.resize       (solution->size());

@@ -1,4 +1,4 @@
-// $Id: petsc_vector.C,v 1.9 2003-02-13 22:56:13 benkirk Exp $
+// $Id: petsc_vector.C,v 1.10 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -19,33 +19,30 @@
 
 
 
-#include "mesh_common.h"
-
-#ifdef HAVE_PETSC
-
-
 // C++ includes
-
-
 
 // Local Includes
 #include "petsc_vector.h"
 
 
 
+#ifdef HAVE_PETSC
 
-// void PetscVector::init (const NumericVector& v, const bool fast)
+
+
+// void PetscVector<Tp>::init (const NumericVector<Tp>& v, const bool fast)
 // {
 //   error();
   
 //   init (v.local_size(), v.size(), fast);
 
-//   vec = reinterpret_cast<const PetscVector&>(v).vec;
+//   vec = reinterpret_cast<const PetscVector<Tp>&>(v).vec;
 // }
 
 
 
-Real PetscVector::l1_norm () const
+template <typename Tp>
+Real PetscVector<Tp>::l1_norm () const
 {
   assert(closed());
   
@@ -59,7 +56,8 @@ Real PetscVector::l1_norm () const
 
 
 
-Real PetscVector::l2_norm () const
+template <typename Tp>
+Real PetscVector<Tp>::l2_norm () const
 {
   assert(closed());
   
@@ -74,7 +72,8 @@ Real PetscVector::l2_norm () const
 
 
 
-Real PetscVector::linfty_norm () const
+template <typename Tp>
+Real PetscVector<Tp>::linfty_norm () const
 {
   assert(closed());
   
@@ -89,7 +88,9 @@ Real PetscVector::linfty_norm () const
 
 
 
-NumericVector& PetscVector::operator += (const NumericVector& v)
+template <typename Tp>
+NumericVector<Tp>&
+PetscVector<Tp>::operator += (const NumericVector<Tp>& v)
 {
   assert(closed());
   
@@ -100,8 +101,9 @@ NumericVector& PetscVector::operator += (const NumericVector& v)
 
 
 
-
-NumericVector& PetscVector::operator -= (const NumericVector& v)
+template <typename Tp>
+NumericVector<Tp>&
+PetscVector<Tp>::operator -= (const NumericVector<Tp>& v)
 {
   assert(closed());
   
@@ -112,8 +114,8 @@ NumericVector& PetscVector::operator -= (const NumericVector& v)
 
 
 
-
-void PetscVector::set (const unsigned int i, const Complex value)
+template <typename Tp>
+void PetscVector<Tp>::set (const unsigned int i, const Tp value)
 {
   assert(i<size());
   
@@ -128,8 +130,8 @@ void PetscVector::set (const unsigned int i, const Complex value)
 
 
 
-
-void PetscVector::add (const unsigned int i, const Complex value)
+template <typename Tp>
+void PetscVector<Tp>::add (const unsigned int i, const Tp value)
 {
   assert(i<size());
   
@@ -144,9 +146,9 @@ void PetscVector::add (const unsigned int i, const Complex value)
 
 
 
-
-void PetscVector::add_vector (const std::vector<Complex>& v,
-			      const std::vector<unsigned int>& dof_indices)
+template <typename Tp>
+void PetscVector<Tp>::add_vector (const std::vector<Tp>& v,
+				  const std::vector<unsigned int>& dof_indices)
 {
   assert (!v.empty());
   assert (v.size() == dof_indices.size());
@@ -157,8 +159,9 @@ void PetscVector::add_vector (const std::vector<Complex>& v,
 
 
 
-void PetscVector::add_vector (const NumericVector& V,
-			      const std::vector<unsigned int>& dof_indices)
+template <typename Tp>
+void PetscVector<Tp>::add_vector (const NumericVector<Tp>& V,
+				  const std::vector<unsigned int>& dof_indices)
 {
   assert (V.size() == dof_indices.size());
 
@@ -167,7 +170,9 @@ void PetscVector::add_vector (const NumericVector& V,
 }
 
 
-void PetscVector::add (const Complex v)
+
+template <typename Tp>
+void PetscVector<Tp>::add (const Tp v)
 {
   int ierr=0;
   PetscScalar* values;
@@ -184,20 +189,21 @@ void PetscVector::add (const Complex v)
 
 
 
-
-void PetscVector::add (const NumericVector& v)
+template <typename Tp>
+void PetscVector<Tp>::add (const NumericVector<Tp>& v)
 {
   add (1., v);
 }
 
 
 
-void PetscVector::add (const Complex a, const NumericVector& v_in)
+template <typename Tp>
+void PetscVector<Tp>::add (const Tp a, const NumericVector<Tp>& v_in)
 {
   int ierr=0;
   PetscScalar petsc_a=static_cast<PetscScalar>(a);
 
-  const PetscVector& v = reinterpret_cast<const PetscVector&>(v_in);
+  const PetscVector<Tp>& v = reinterpret_cast<const PetscVector<Tp>&>(v_in);
   
   assert(size() == v.size());
   
@@ -206,7 +212,8 @@ void PetscVector::add (const Complex a, const NumericVector& v_in)
 
 
 
-void PetscVector::scale (const Complex factor)
+template <typename Tp>
+void PetscVector<Tp>::scale (const Tp factor)
 {
   int ierr=0;
   PetscScalar petsc_factor = static_cast<PetscScalar>(factor);
@@ -216,8 +223,9 @@ void PetscVector::scale (const Complex factor)
 
 
 
-NumericVector& 
-PetscVector::operator = (const Complex s)
+template <typename Tp>
+NumericVector<Tp>& 
+PetscVector<Tp>::operator = (const Tp s)
 {
   int ierr=0;
   PetscScalar petsc_s=static_cast<PetscScalar>(s);
@@ -232,12 +240,13 @@ PetscVector::operator = (const Complex s)
 
 
 
-NumericVector&
-PetscVector::operator = (const NumericVector& v_in)
+template <typename Tp>
+NumericVector<Tp>&
+PetscVector<Tp>::operator = (const NumericVector<Tp>& v_in)
 {
   int ierr=0;
   
-  const PetscVector& v = reinterpret_cast<const PetscVector&>(v_in);
+  const PetscVector<Tp>& v = reinterpret_cast<const PetscVector<Tp>&>(v_in);
 
   assert (size() == v.size());
 
@@ -251,8 +260,9 @@ PetscVector::operator = (const NumericVector& v_in)
 
 
 
-PetscVector&
-PetscVector::operator = (const PetscVector& v)
+template <typename Tp>
+PetscVector<Tp>&
+PetscVector<Tp>::operator = (const PetscVector<Tp>& v)
 {
   int ierr=0;
 
@@ -268,8 +278,9 @@ PetscVector::operator = (const PetscVector& v)
 
 
 
-NumericVector&
-PetscVector::operator = (const std::vector<Complex>& v)
+template <typename Tp>
+NumericVector<Tp>&
+PetscVector<Tp>::operator = (const std::vector<Tp>& v)
 {
   const unsigned int nl   = local_size();
   const unsigned int ioff = first_local_index();
@@ -311,10 +322,10 @@ PetscVector::operator = (const std::vector<Complex>& v)
 
 
 
-void PetscVector::localize (NumericVector& v_local_in) const
-
+template <typename Tp>
+void PetscVector<Tp>::localize (NumericVector<Tp>& v_local_in) const
 {
-  const PetscVector& v_local = reinterpret_cast<const PetscVector&>(v_local_in);
+  const PetscVector<Tp>& v_local = reinterpret_cast<const PetscVector<Tp>&>(v_local_in);
 
   assert (v_local.local_size() == size());
 
@@ -347,10 +358,11 @@ void PetscVector::localize (NumericVector& v_local_in) const
 
 
 
-void PetscVector::localize (NumericVector& v_local_in,
-			    const std::vector<unsigned int>& send_list) const
+template <typename Tp>
+void PetscVector<Tp>::localize (NumericVector<Tp>& v_local_in,
+				const std::vector<unsigned int>& send_list) const
 {
-  const PetscVector& v_local = reinterpret_cast<const PetscVector&>(v_local_in);
+  const PetscVector<Tp>& v_local = reinterpret_cast<const PetscVector<Tp>&>(v_local_in);
 
   assert (v_local.local_size() == size());
   assert (send_list.size() <= v_local.size());
@@ -386,9 +398,75 @@ void PetscVector::localize (NumericVector& v_local_in,
 
 
 
-void PetscVector::localize (std::vector<Complex>& v_local) const
+// Full specialization for Real datatypes
+#ifdef USE_REAL_NUMBERS
 
+template <>
+void PetscVector<Real>::localize (std::vector<Real>& v_local) const
 {
+  int ierr=0;
+  const int n  = size();
+  const int nl = local_size();
+  PetscScalar *values;
+
+  
+  v_local.resize(n);
+
+  
+  for (int i=0; i<n; i++)
+    v_local[i] = 0.;
+  
+  // only one processor
+  if (n == nl)
+    {      
+      ierr = VecGetArray (vec, &values); CHKERRQ(ierr);
+
+      for (int i=0; i<n; i++)
+	v_local[i] = static_cast<Real>(values[i]);
+
+      ierr = VecRestoreArray (vec, &values); CHKERRQ(ierr);
+    }
+
+  // otherwise multiple processors
+  else
+    {
+      unsigned int ioff = first_local_index();
+      std::vector<Real> local_values(n, 0.);
+
+      {
+	ierr = VecGetArray (vec, &values); CHKERRQ(ierr);
+	
+	for (int i=0; i<nl; i++)
+	  local_values[i+ioff] = static_cast<Real>(values[i]);
+	
+	ierr = VecRestoreArray (vec, &values); CHKERRQ(ierr);
+      }
+      
+      if (sizeof(Real) == sizeof(double))     
+	MPI_Allreduce (&local_values[0], &v_local[0], n, MPI_DOUBLE, MPI_SUM,
+		       PETSC_COMM_WORLD);
+
+      else if (sizeof(Real) == sizeof(float))     
+	MPI_Allreduce (&local_values[0], &v_local[0], n, MPI_FLOAT, MPI_SUM,
+			   PETSC_COMM_WORLD);
+
+      else
+	error();
+    }  
+}
+
+#endif
+
+
+
+// Full specialization for Complex datatypes
+#ifdef USE_COMPLEX_NUMBERS
+
+template <>
+void PetscVector<Complex>::localize (std::vector<Complex>& v_local) const
+{
+  //TODO:[DD/BSK] Will this work in parallel?
+  
   int ierr=0;
   const int n  = size();
   const int nl = local_size();
@@ -427,61 +505,49 @@ void PetscVector::localize (std::vector<Complex>& v_local) const
 	ierr = VecRestoreArray (vec, &values); CHKERRQ(ierr);
       }
       
-      if (sizeof(Real) == sizeof(double))     
-      {
-	if (sizeof(Real) == sizeof(Complex))
-	  MPI_Allreduce (&local_values[0], &v_local[0], n, MPI_DOUBLE, MPI_SUM,
-		         PETSC_COMM_WORLD);
-	else
-	  MPI_Allreduce (&local_values[0], &v_local[0], n, MPIU_SCALAR, MPI_SUM,
-		         PETSC_COMM_WORLD);	
-      }
-
-      else if (sizeof(Real) == sizeof(float))     
-
-      {
-	if (sizeof(Real) == sizeof(Complex))
-  	  MPI_Allreduce (&local_values[0], &v_local[0], n, MPI_FLOAT, MPI_SUM,
-		         PETSC_COMM_WORLD);
-	else
-	  MPI_Allreduce (&local_values[0], &v_local[0], n, MPIU_SCALAR, MPI_SUM,
-		         PETSC_COMM_WORLD);
-      }
-
-      else
-	error();
+      MPI_Allreduce (&local_values[0], &v_local[0], n, MPIU_SCALAR, MPI_SUM,
+		     PETSC_COMM_WORLD);	
     }  
 }
+
+#endif
 
 
 
 /*
-ifdef USE_COMPLEX_NUMBERS
-        {
-          //TODO:[DD] localize may be done in a better way...
-          // There is no MPI_COMPLEX in C. For now, use PETSc 
+  ifdef USE_COMPLEX_NUMBERS
+  {
+  //TODO:[DD] localize may be done in a better way...
+  // There is no MPI_COMPLEX in C. For now, use PETSc 
 	    
-	  // have an appropriately sized PetscVector handy
-	  PetscVector pv(n);
+  // have an appropriately sized PetscVector<Tp> handy
+  PetscVector<Tp> pv(n);
 	  
-	  // localize ourselves to this vector
-	  localize(&pv);
+  // localize ourselves to this vector
+  localize(&pv);
 
-	  // copy data to v_local
-	  for (int i=0; i<n; i++)
-	      v_local[i] =  static_cast<Complex>(pv(i));
+  // copy data to v_local
+  for (int i=0; i<n; i++)
+  v_local[i] =  static_cast<Tp>(pv(i));
 
-	  // note that the destructor of pv calls clear()
-	}
-else
-endif
+  // note that the destructor of pv calls clear()
+  }
+  else
+  endif
 */
 
 
-void PetscVector::localize_to_one (std::vector<Complex>& v_local,
-				   const unsigned int pid) const
+
+
+
+// Full specialization for Real datatypes
+#ifdef USE_REAL_NUMBERS
+
+template <>
+void PetscVector<Real>::localize_to_one (std::vector<Real>& v_local,
+					 const unsigned int pid) const
 {
-  int ierr=0, proc_id=static_cast<int>(pid);
+  int ierr=0;
   const int n  = size();
   const int nl = local_size();
   PetscScalar *values;
@@ -492,8 +558,70 @@ void PetscVector::localize_to_one (std::vector<Complex>& v_local,
   
   for (int i=0; i<n; i++)
     v_local[i] = 0.;
+  
+  // only one processor
+  if (n == nl)
+    {      
+      ierr = VecGetArray (vec, &values); CHKERRQ(ierr);
+
+      for (int i=0; i<n; i++)
+	v_local[i] = static_cast<Real>(values[i]);
+
+      ierr = VecRestoreArray (vec, &values); CHKERRQ(ierr);
+    }
+
+  // otherwise multiple processors
+  else
+    {
+      unsigned int ioff = first_local_index();
+      std::vector<Real> local_values(n, 0.);
+
+      {
+	ierr = VecGetArray (vec, &values); CHKERRQ(ierr);
+	
+	for (int i=0; i<nl; i++)
+	  local_values[i+ioff] = static_cast<Real>(values[i]);
+	
+	ierr = VecRestoreArray (vec, &values); CHKERRQ(ierr);
+      }
+      
+      if (sizeof(Real) == sizeof(double))     
+	MPI_Reduce (&local_values[0], &v_local[0], n, MPI_DOUBLE, pid, MPI_SUM,
+		    PETSC_COMM_WORLD);
+
+      else if (sizeof(Real) == sizeof(float))     
+	MPI_Reduce (&local_values[0], &v_local[0], n, MPI_FLOAT, pid, MPI_SUM,
+		    PETSC_COMM_WORLD);
+
+      else
+	error();
+    }  
+}
+
+#endif
 
 
+// Full specialization for Complex datatypes
+#ifdef USE_COMPLEX_NUMBERS
+
+template <>
+void PetscVector<Complex>::localize_to_one (std::vector<Complex>& v_local,
+					    const unsigned int pid) const
+{
+  //TODO:[DD/BSK] Will this work in parallel?
+  
+  int ierr=0;
+  const int n  = size();
+  const int nl = local_size();
+  PetscScalar *values;
+
+  
+  v_local.resize(n);
+
+  
+  for (int i=0; i<n; i++)
+    v_local[i] = 0.;
+  
   // only one processor
   if (n == nl)
     {      
@@ -510,7 +638,7 @@ void PetscVector::localize_to_one (std::vector<Complex>& v_local,
     {
       unsigned int ioff = first_local_index();
       std::vector<Complex> local_values(n, 0.);
-      
+
       {
 	ierr = VecGetArray (vec, &values); CHKERRQ(ierr);
 	
@@ -519,65 +647,48 @@ void PetscVector::localize_to_one (std::vector<Complex>& v_local,
 	
 	ierr = VecRestoreArray (vec, &values); CHKERRQ(ierr);
       }
-
-
-      if (sizeof(Real) == sizeof(double))     
-      {
-	if (sizeof(Real) == sizeof(Complex))
-	  MPI_Reduce (&local_values[0], &v_local[0], n, MPI_DOUBLE, MPI_SUM,
-		      proc_id, PETSC_COMM_WORLD);
-	else
-	  MPI_Reduce (&local_values[0], &v_local[0], n, MPIU_SCALAR, MPI_SUM,
-		      proc_id, PETSC_COMM_WORLD);	
-      }
-
-      else if (sizeof(Real) == sizeof(float))     
-
-      {
-	if (sizeof(Real) == sizeof(Complex))
-  	  MPI_Reduce (&local_values[0], &v_local[0], n, MPI_FLOAT, MPI_SUM,
-		      proc_id, PETSC_COMM_WORLD);
-	else
-	{
-	  std::cout << "Error: complex<float> not supported by PETSc." << std::endl;
-	  error();
-	}
-      }
-
-      else
-	error();
-
-    }
-
+      
+      MPI_Reduce (&local_values[0], &v_local[0], n, MPIU_SCALAR, pid, MPI_SUM,
+		  PETSC_COMM_WORLD);	
+    }  
 }
+
+#endif
 
 
 /*
-ifdef USE_COMPLEX_NUMBERS
-        {
-          //TODO:[DD] localize_to_one may be done in a better way...
+  ifdef USE_COMPLEX_NUMBERS
+  {
+  //TODO:[DD] localize_to_one may be done in a better way...
 
-	  int my_proc_id = 0;
-	  MPI_Comm_rank (PETSC_COMM_WORLD, &my_proc_id);
+  int my_proc_id = 0;
+  MPI_Comm_rank (PETSC_COMM_WORLD, &my_proc_id);
 
-	  if (my_proc_id == proc_id)
-	    {
-	      // have an appropriately sized PetscVector handy
-	      PetscVector pv(n);
+  if (my_proc_id == proc_id)
+  {
+  // have an appropriately sized PetscVector<Tp> handy
+  PetscVector<Tp> pv(n);
 	  
-	      // localize ourselves to this vector
-	      localize(&pv);
+  // localize ourselves to this vector
+  localize(&pv);
 
-	      // copy data to v_local
-	      for (int i=0; i<n; i++)
-		  v_local[i] =  static_cast<Complex>(pv(i));
+  // copy data to v_local
+  for (int i=0; i<n; i++)
+  v_local[i] =  static_cast<Tp>(pv(i));
 
-	    }
-	}
-else
-        error();
-endif
+  }
+  }
+  else
+  error();
+  endif
 */
 
 
-#endif
+
+//------------------------------------------------------------------
+// Explicit instantiations
+template class PetscVector<Number>;
+
+
+
+#endif // #ifdef HAVE_PETSC

@@ -1,4 +1,4 @@
-// $Id: sparse_matrix.C,v 1.3 2003-02-13 22:56:13 benkirk Exp $
+// $Id: sparse_matrix.C,v 1.4 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,28 +30,31 @@
 
 
 //------------------------------------------------------------------
-//
-AutoPtr<SparseMatrix>
-SparseMatrix::build(const SolverPackage solver_package)
+// SparseMatrix Methods
+
+// Full specialization for Real datatypes
+template <>
+AutoPtr<SparseMatrix<Real> >
+SparseMatrix<Real>::build(const SolverPackage solver_package)
 {
 
   switch (solver_package)
     {
 
 
-#ifdef HAVE_LASPACK
+#if defined(HAVE_LASPACK)
     case LASPACK_SOLVERS:
       {
-	AutoPtr<SparseMatrix> ap(new LaspackMatrix);
+	AutoPtr<SparseMatrix<Real> > ap(new LaspackMatrix);
 	return ap;
       }
 #endif
 
 
-#ifdef HAVE_PETSC
+#if defined(HAVE_PETSC) && defined(USE_REAL_NUMBERS)
     case PETSC_SOLVERS:
       {
-	AutoPtr<SparseMatrix> ap(new PetscMatrix);
+	AutoPtr<SparseMatrix<Real> > ap(new PetscMatrix<Real>);
 	return ap;
       }
 #endif
@@ -63,6 +66,43 @@ SparseMatrix::build(const SolverPackage solver_package)
       error();
     }
 
-  AutoPtr<SparseMatrix> ap(NULL);
+  AutoPtr<SparseMatrix<Real> > ap(NULL);
   return ap;    
 }
+
+
+
+
+// Full specialization for Complex datatypes
+template <>
+AutoPtr<SparseMatrix<Complex> >
+SparseMatrix<Complex>::build(const SolverPackage solver_package)
+{
+
+  switch (solver_package)
+    {
+
+
+#if defined(HAVE_PETSC) && defined(USE_COMPLEX_NUMBERS)
+    case PETSC_SOLVERS:
+      {
+	AutoPtr<SparseMatrix<Complex> > ap(new PetscMatrix<Complex>);
+	return ap;
+      }
+#endif
+
+    default:
+      std::cerr << "ERROR:  Unrecognized solver package: "
+		<< solver_package
+		<< std::endl;
+      error();
+    }
+
+  AutoPtr<SparseMatrix<Complex> > ap(NULL);
+  return ap;    
+}
+
+
+//------------------------------------------------------------------
+// Explicit instantiations
+template class SparseMatrix<Number>;

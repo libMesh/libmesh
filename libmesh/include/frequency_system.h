@@ -1,4 +1,4 @@
-// $Id: frequency_system.h,v 1.3 2003-02-14 22:37:11 benkirk Exp $
+// $Id: frequency_system.h,v 1.4 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -150,17 +150,17 @@ public:
   /**
    * Data structure to hold the mass matrix
    */
-  AutoPtr<SparseMatrix> mass;
+  AutoPtr<SparseMatrix<Number> > mass;
   
   /**
    * Data structure to hold the damping matrix
    */
-  AutoPtr<SparseMatrix> damping;
+  AutoPtr<SparseMatrix<Number> > damping;
 
   /**
    * Data structure to hold the stiffness matrix.
    */
-  AutoPtr<SparseMatrix> stiffness;
+  AutoPtr<SparseMatrix<Number> > stiffness;
 
 
 protected:
@@ -176,7 +176,7 @@ protected:
    * vector containing the solutions for the given
    * frequencies
    */
-  std::vector< NumericVector* > _solutions;
+  std::vector< NumericVector<Number>* > _solutions;
 
   /**
    * In this linear, frequency-dependent setting,

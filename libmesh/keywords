@@ -18,7 +18,7 @@ compiled_elisp_file=keywords.elc
 # Write the elisp file header
 echo    "(provide 'keywords)" > $elisp_file
 echo    "(font-lock-add-keywords 'c++-mode " >> $elisp_file
-echo -n " '( (\"\\\\<\\\\(Real\\\\|Complex\\\\|" >> $elisp_file
+echo -n " '( (\"\\\\<\\\\(Real\\\\|Complex\\\\|Number\\\\|" >> $elisp_file
 
 # Get the class list and declare an array of class names
 class_list=`/usr/bin/ebrowse --very-verbose --output-file=/dev/null ../s3/include/*.h ../vtk_gui/include/*.h include/*.h`

@@ -1,4 +1,4 @@
-// $Id: laspack_vector.C,v 1.6 2003-02-13 22:56:12 benkirk Exp $
+// $Id: laspack_vector.C,v 1.7 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -19,11 +19,6 @@
 
 
 
-#include "mesh_config.h"
-
-#if defined(HAVE_LASPACK) && !defined(USE_COMPLEX_NUMBERS)
-
-
 // C++ includes
 #include <math.h>
 
@@ -32,8 +27,12 @@
 
 
 
+#ifdef HAVE_LASPACK
 
-// void LaspackVector::init (const NumericVector& v, const bool fast)
+
+
+
+// void LaspackVector::init (const NumericVector<Real>& v, const bool fast)
 // {
 //   error();
   
@@ -72,7 +71,7 @@ Real LaspackVector::linfty_norm () const
 
 
 
-NumericVector& LaspackVector::operator += (const NumericVector& v)
+NumericVector<Real>& LaspackVector::operator += (const NumericVector<Real>& v)
 {
   assert(closed());
   
@@ -84,7 +83,7 @@ NumericVector& LaspackVector::operator += (const NumericVector& v)
 
 
 
-NumericVector& LaspackVector::operator -= (const NumericVector& v)
+NumericVector<Real>& LaspackVector::operator -= (const NumericVector<Real>& v)
 {
   assert(closed());
   
@@ -95,7 +94,7 @@ NumericVector& LaspackVector::operator -= (const NumericVector& v)
 
 
 
-void LaspackVector::add (const Complex v)
+void LaspackVector::add (const Real v)
 {
   for (unsigned int i=0; i<size(); i++)
     add (i, v);
@@ -104,14 +103,14 @@ void LaspackVector::add (const Complex v)
 
 
 
-void LaspackVector::add (const NumericVector& v)
+void LaspackVector::add (const NumericVector<Real>& v)
 {
   add (1., v);
 }
 
 
 
-void LaspackVector::add (const Complex a, const NumericVector& v_in)
+void LaspackVector::add (const Real a, const NumericVector<Real>& v_in)
 {
   const LaspackVector& v = reinterpret_cast<const LaspackVector&>(v_in);
   
@@ -122,7 +121,7 @@ void LaspackVector::add (const Complex a, const NumericVector& v_in)
 }
 
 
-void LaspackVector::scale (const Complex factor)
+void LaspackVector::scale (const Real factor)
 {
   assert (initialized());
   
@@ -131,8 +130,8 @@ void LaspackVector::scale (const Complex factor)
 
 
 
-NumericVector& 
-LaspackVector::operator = (const Complex s)
+NumericVector<Real>& 
+LaspackVector::operator = (const Real s)
 {
   assert (initialized());
 
@@ -143,8 +142,8 @@ LaspackVector::operator = (const Complex s)
 
 
 
-NumericVector&
-LaspackVector::operator = (const NumericVector& v_in)
+NumericVector<Real>&
+LaspackVector::operator = (const NumericVector<Real>& v_in)
 {
   const LaspackVector& v = reinterpret_cast<const LaspackVector&>(v_in);
 
@@ -169,8 +168,8 @@ LaspackVector::operator = (const LaspackVector& v)
 
 
 
-NumericVector&
-LaspackVector::operator = (const std::vector<Complex>& v)
+NumericVector<Real>&
+LaspackVector::operator = (const std::vector<Real>& v)
 {
   /**
    * Case 1:  The vector is the same size of
@@ -188,7 +187,7 @@ LaspackVector::operator = (const std::vector<Complex>& v)
 
 
 
-void LaspackVector::localize (NumericVector& v_local_in) const
+void LaspackVector::localize (NumericVector<Real>& v_local_in) const
 {
   LaspackVector& v_local =
     reinterpret_cast<LaspackVector&>(v_local_in);
@@ -198,7 +197,7 @@ void LaspackVector::localize (NumericVector& v_local_in) const
 
 
 
-void LaspackVector::localize (NumericVector& v_local_in,
+void LaspackVector::localize (NumericVector<Real>& v_local_in,
 			      const std::vector<unsigned int>& send_list) const
 {
   LaspackVector& v_local =
@@ -211,7 +210,7 @@ void LaspackVector::localize (NumericVector& v_local_in,
 
 
 
-void LaspackVector::localize (std::vector<Complex>& v_local) const
+void LaspackVector::localize (std::vector<Real>& v_local) const
 
 {
   v_local.resize(size());
@@ -222,7 +221,7 @@ void LaspackVector::localize (std::vector<Complex>& v_local) const
 
 
 
-void LaspackVector::localize_to_one (std::vector<Complex>& v_local,
+void LaspackVector::localize_to_one (std::vector<Real>& v_local,
 				     const unsigned int pid) const
 {
   assert (pid == 0);

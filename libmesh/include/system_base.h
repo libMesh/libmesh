@@ -1,4 +1,4 @@
-// $Id: system_base.h,v 1.5 2003-02-17 01:23:01 benkirk Exp $
+// $Id: system_base.h,v 1.6 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -117,14 +117,14 @@ public:
    * the global solution on all processors.
    * Requires communication with all other processors.
    */
-  void update_global_solution (std::vector<Complex>& global_soln) const;
+  void update_global_solution (std::vector<Number>& global_soln) const;
 
   /**
    * Fill the input vector \p global_soln so that it contains
    * the global solution on processor \p dest_proc.
    * Requires communication with all other processors.
    */
-  void update_global_solution (std::vector<Complex>& global_soln,
+  void update_global_solution (std::vector<Number>& global_soln,
 			       const unsigned int dest_proc) const;
   
   /**
@@ -198,22 +198,22 @@ public:
   /**
    * Data structure to hold solution values.
    */
-  AutoPtr<NumericVector> solution;
+  AutoPtr<NumericVector<Number> > solution;
 
   /**
    * Data structure to hold the system right-hand-side.
    */
-  AutoPtr<NumericVector> rhs;
+  AutoPtr<NumericVector<Number> > rhs;
   
   /**
    * Data structure to hold the system matrix.
    */
-  AutoPtr<SparseMatrix> matrix;
+  AutoPtr<SparseMatrix<Number> > matrix;
 
   /**
    * Interface to the Petsc solvers.
    */
-  AutoPtr<LinearSolverInterface> linear_solver_interface;
+  AutoPtr<LinearSolverInterface<Number> > linear_solver_interface;
 
 
 protected:

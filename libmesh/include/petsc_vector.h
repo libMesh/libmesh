@@ -1,4 +1,4 @@
-// $Id: petsc_vector.h,v 1.11 2003-02-13 22:56:08 benkirk Exp $
+// $Id: petsc_vector.h,v 1.12 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -19,13 +19,16 @@
 
 
 
+
+#ifndef __petsc_vector_h__
+#define __petsc_vector_h__
+
+
 #include "mesh_common.h"
 
 
 #ifdef HAVE_PETSC
 
-#ifndef __petsc_vector_h__
-#define __petsc_vector_h__
 
 
 // TODO:[BSK} This seems necessary to use petsc on IBM Power3 at NERSC, but only there?  This will need to be wrapped in an ifdef with a variable set by configure
@@ -44,14 +47,11 @@
  */
 # ifndef USE_COMPLEX_NUMBERS
 
-namespace Petsc {
 extern "C" {
 #include <petscvec.h>
 }
 // for easy switching between Petsc 2.1.0/2.1.1
 // typedef Scalar PetscScalar;
-} 
-using namespace Petsc;
 
 #else
 
@@ -62,7 +62,7 @@ using namespace Petsc;
 
 
 // forward declarations
-class PetscInterface;
+template <typename Tp> class PetscInterface;
 
 
 /**
@@ -72,9 +72,10 @@ class PetscInterface;
  * @author Benjamin S. Kirk, 2002
  */
 
-class PetscVector : public NumericVector
+template <typename Tp>
+class PetscVector : public NumericVector<Tp>
 {
- public:
+public:
 
   /**
    *  Dummy-Constructor. Dimension=0
@@ -105,7 +106,7 @@ class PetscVector : public NumericVector
   void close (); 
 
   /**
-   * @returns the \p PetscVector to a pristine state.
+   * @returns the \p PetscVector<Tp> to a pristine state.
    */
   void clear ();
   
@@ -138,37 +139,37 @@ class PetscVector : public NumericVector
   void init (const unsigned int N,
 	     const bool         fast=false);
     
-//   /**
-//    * Change the dimension to that of the
-//    * vector \p V. The same applies as for
-//    * the other \p init function.
-//    *
-//    * The elements of \p V are not copied, i.e.
-//    * this function is the same as calling
-//    * \p init(V.size(),fast).
-//    */
-//   void init (const NumericVector& V,
-// 	     const bool fast=false);
+  //   /**
+  //    * Change the dimension to that of the
+  //    * vector \p V. The same applies as for
+  //    * the other \p init function.
+  //    *
+  //    * The elements of \p V are not copied, i.e.
+  //    * this function is the same as calling
+  //    * \p init(V.size(),fast).
+  //    */
+  //   void init (const NumericVector<Tp>& V,
+  // 	     const bool fast=false);
 
   /**
    * $U(0-N) = s$: fill all components.
    */
-  NumericVector & operator= (const Complex s);
+  NumericVector<Tp> & operator= (const Tp s);
     
   /**
    *  $U = V$: copy all components.
    */
-  NumericVector & operator= (const NumericVector &V);
+  NumericVector<Tp> & operator= (const NumericVector<Tp> &V);
 
   /**
    *  $U = V$: copy all components.
    */
-  PetscVector & operator= (const PetscVector &V);
+  PetscVector<Tp> & operator= (const PetscVector<Tp> &V);
 
   /**
    *  $U = V$: copy all components.
    */
-  NumericVector & operator= (const std::vector<Complex> &v);
+  NumericVector<Tp> & operator= (const std::vector<Tp> &v);
 
   /**
    * @returns the minimum element in the vector.
@@ -207,7 +208,7 @@ class PetscVector : public NumericVector
   /**
    * @returns dimension of the vector. This
    * function was formerly called \p n(), but
-   * was renamed to get the \p PetscVector class
+   * was renamed to get the \p PetscVector<Tp> class
    * closer to the C++ standard library's
    * \p std::vector container.
    */
@@ -234,92 +235,92 @@ class PetscVector : public NumericVector
   /**
    * Access components, returns \p U(i).
    */
-  Complex operator() (const unsigned int i) const;
+  Tp operator() (const unsigned int i) const;
     
   /**
    * Addition operator.
    * Fast equivalent to \p U.add(1, V).
    */
-  NumericVector & operator += (const NumericVector &V);
+  NumericVector<Tp> & operator += (const NumericVector<Tp> &V);
 
   /**
    * Subtraction operator.
    * Fast equivalent to \p U.add(-1, V).
    */
-  NumericVector & operator -= (const NumericVector &V);
+  NumericVector<Tp> & operator -= (const NumericVector<Tp> &V);
     
   /**
    * v(i) = value
    */
-  void set (const unsigned int i, const Complex value);
+  void set (const unsigned int i, const Tp value);
     
   /**
    * v(i) += value
    */
-  void add (const unsigned int i, const Complex value);
+  void add (const unsigned int i, const Tp value);
     
   /**
    * $U(0-DIM)+=s$.
    * Addition of \p s to all components. Note
    * that \p s is a scalar and not a vector.
    */
-  void add (const Complex s);
+  void add (const Tp s);
     
   /**
    * U+=V.
    * Simple vector addition, equal to the
    * \p operator +=.
    */
-  void add (const NumericVector& V);
+  void add (const NumericVector<Tp>& V);
 
   /**
    * U+=a*V.
    * Simple vector addition, equal to the
    * \p operator +=.
    */
-  void add (const Complex a, const NumericVector& v);
+  void add (const Tp a, const NumericVector<Tp>& v);
   
   /**
-   * U+=v where v is a std::vector<Complex> 
+   * U+=v where v is a std::vector<Tp> 
    * and you
    * want to specify WHERE to add it
    */
-  void add_vector (const std::vector<Complex>& v,
+  void add_vector (const std::vector<Tp>& v,
 		   const std::vector<unsigned int>& dof_indices);
 
   /**
    * U+=V where U and V are type 
-   * NumericVector and you
+   * NumericVector<Tp> and you
    * want to specify WHERE to add
-   * the NumericVector V 
+   * the NumericVector<Tp> V 
    */
-  void add_vector (const NumericVector& V,
+  void add_vector (const NumericVector<Tp>& V,
 		   const std::vector<unsigned int>& dof_indices);
   
   /**
    * Scale each element of the
    * vector by the given factor.
    */
-  void scale (const Complex factor);
+  void scale (const Tp factor);
     
   /**
    * Creates a copy of the global vector in the
    * local vector \p v_local.
    */
-  void localize (std::vector<Complex>& v_local) const;
+  void localize (std::vector<Tp>& v_local) const;
 
   /**
-   * Same, but fills a \p NumericVector instead of
+   * Same, but fills a \p NumericVector<Tp> instead of
    * a \p std::vector.
    */
-  void localize (NumericVector& v_local) const;
+  void localize (NumericVector<Tp>& v_local) const;
 
   /**
    * Creates a local vector \p v_local containing
    * only information relevant to this processor, as
    * defined by the \p send_list.
    */
-  void localize (NumericVector& v_local,
+  void localize (NumericVector<Tp>& v_local,
 		 const std::vector<unsigned int>& send_list) const;
 
   /**
@@ -328,10 +329,10 @@ class PetscVector : public NumericVector
    * default the data is sent to processor 0.  This method
    * is useful for outputting data from one processor.
    */
-  void localize_to_one (std::vector<Complex>& v_local,
+  void localize_to_one (std::vector<Tp>& v_local,
 			const unsigned int proc_id=0) const;
     
- private:
+private:
 
   /**
    * Actual Petsc vector datatype
@@ -339,7 +340,7 @@ class PetscVector : public NumericVector
    */
   Vec vec;
   
-  friend class PetscInterface;
+  friend class PetscInterface<Tp>;
 };
 
 
@@ -347,41 +348,46 @@ class PetscVector : public NumericVector
 
 
 
+template <typename Tp>
 inline
-PetscVector::PetscVector ()
+PetscVector<Tp>::PetscVector ()
 {}
 
 
 
+template <typename Tp>
 inline
-PetscVector::PetscVector (const unsigned int n)
+PetscVector<Tp>::PetscVector (const unsigned int n)
 {
   init(n, n, false);
 }
 
 
 
+template <typename Tp>
 inline
-PetscVector::PetscVector (const unsigned int n,
-			  const unsigned int n_local)
+PetscVector<Tp>::PetscVector (const unsigned int n,
+			      const unsigned int n_local)
 {
   init(n, n_local, false);
 }
 
 
 
+template <typename Tp>
 inline
-PetscVector::~PetscVector ()
+PetscVector<Tp>::~PetscVector ()
 {
   clear ();
 }
 
 
 
+template <typename Tp>
 inline
-void PetscVector::init (const unsigned int n,
-			const unsigned int n_local,
-			const bool fast)
+void PetscVector<Tp>::init (const unsigned int n,
+			    const unsigned int n_local,
+			    const bool fast)
 {
   int ierr=0;
   int petsc_n=static_cast<int>(n);
@@ -428,17 +434,19 @@ void PetscVector::init (const unsigned int n,
 
 
 
+template <typename Tp>
 inline
-void PetscVector::init (const unsigned int n,
-			const bool fast)
+void PetscVector<Tp>::init (const unsigned int n,
+			    const bool fast)
 {
   init(n,n,fast);
 }
 
 
 
+template <typename Tp>
 inline
-void PetscVector::close ()
+void PetscVector<Tp>::close ()
 {
   assert (initialized());
   
@@ -454,8 +462,9 @@ void PetscVector::close ()
 
 
 
+template <typename Tp>
 inline
-void PetscVector::clear ()
+void PetscVector<Tp>::clear ()
 {
   if (initialized())
     {
@@ -469,8 +478,9 @@ void PetscVector::clear ()
 
 
 
+template <typename Tp>
 inline
-void PetscVector::zero ()
+void PetscVector<Tp>::zero ()
 {
   assert (initialized());
   
@@ -483,8 +493,9 @@ void PetscVector::zero ()
 
 
 
+template <typename Tp>
 inline
-unsigned int PetscVector::size () const
+unsigned int PetscVector<Tp>::size () const
 {
   assert (initialized());
   
@@ -500,8 +511,9 @@ unsigned int PetscVector::size () const
 
 
 
+template <typename Tp>
 inline
-unsigned int PetscVector::local_size () const
+unsigned int PetscVector<Tp>::local_size () const
 {
   assert (initialized());
   
@@ -514,8 +526,9 @@ unsigned int PetscVector::local_size () const
 
 
 
+template <typename Tp>
 inline
-unsigned int PetscVector::first_local_index () const
+unsigned int PetscVector<Tp>::first_local_index () const
 {
   assert (initialized());
   
@@ -528,8 +541,9 @@ unsigned int PetscVector::first_local_index () const
 
 
 
+template <typename Tp>
 inline
-unsigned int PetscVector::last_local_index () const
+unsigned int PetscVector<Tp>::last_local_index () const
 {
   assert (initialized());
   
@@ -542,8 +556,9 @@ unsigned int PetscVector::last_local_index () const
 
 
 
+template <typename Tp>
 inline
-Complex PetscVector::operator() (const unsigned int i) const
+Tp PetscVector<Tp>::operator() (const unsigned int i) const
 {
   assert (initialized());
   assert ( ((i >= first_local_index()) &&
@@ -559,13 +574,14 @@ Complex PetscVector::operator() (const unsigned int i) const
   
   ierr = VecRestoreArray (vec, &values); CHKERRQ(ierr);
   
-  return static_cast<Complex>(value);
+  return static_cast<Tp>(value);
 }
 
 
 
+template <typename Tp>
 inline
-Real PetscVector::min () const
+Real PetscVector<Tp>::min () const
 {
   assert (initialized());
 
@@ -580,8 +596,9 @@ Real PetscVector::min () const
 
 
 
+template <typename Tp>
 inline
-Real PetscVector::max() const
+Real PetscVector<Tp>::max() const
 {
   assert (initialized());
 
@@ -595,5 +612,5 @@ Real PetscVector::max() const
 }
 
 
-#endif
-#endif
+#endif // #ifdef HAVE_PETSC
+#endif // #ifdef __petsc_vector_h__

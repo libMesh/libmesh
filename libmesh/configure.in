@@ -1,5 +1,5 @@
 dnl --------------------------------------------------------------
-dnl $Id: configure.in,v 1.12 2003-02-14 22:37:07 benkirk Exp $
+dnl $Id: configure.in,v 1.13 2003-02-20 04:59:57 benkirk Exp $
 dnl --------------------------------------------------------------
 dnl Process this file with autoconf to produce a configure script.
 
@@ -9,7 +9,7 @@ dnl you call ./configure subsequently on different systems without
 dnl clearing the cache 
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
-AC_REVISION($Revision: 1.12 $)
+AC_REVISION($Revision: 1.13 $)
 
 
 AC_INIT(Make.common.in)
@@ -166,6 +166,10 @@ if test "$enablecomplex" != no ; then
   AC_SUBST(enablecomplex)
 
 else
+  AC_DEFINE(USE_REAL_NUMBERS, 1,
+     [Flag indicating if the library should be built using real numbers])
+  AC_MSG_RESULT(<<< Configuring library with real number support >>>)
+  AC_SUBST(enablecomplex)
 
 dnl LASPACK currently does not work with complex, so put it in the
 dnl else section.

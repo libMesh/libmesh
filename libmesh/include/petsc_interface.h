@@ -1,4 +1,4 @@
-// $Id: petsc_interface.h,v 1.9 2003-02-13 22:56:07 benkirk Exp $
+// $Id: petsc_interface.h,v 1.10 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -22,13 +22,7 @@
 #ifndef __petsc_interface_h__
 #define __petsc_interface_h__
 
-#include "mesh_common.h"
-
-#ifdef HAVE_PETSC
-
-
 // C++ includes
-
 
 // Local includes
 #include "linear_solver_interface.h"
@@ -36,20 +30,18 @@
 #include "petsc_matrix.h"
 
 
+#ifdef HAVE_PETSC
+
+
 /**
  * Petsc include files.  PETSc with complex numbers 
  * is actually C++.
  */
-# ifndef USE_COMPLEX_NUMBERS
+#ifndef USE_COMPLEX_NUMBERS
 
-namespace Petsc {
 extern "C" {
 #include <petscsles.h>
 }
-// for easy switching between Petsc 2.1.0/2.1.1
-// typedef Scalar PetscScalar;
-} 
-using namespace Petsc;
 
 #else
 
@@ -67,7 +59,8 @@ using namespace Petsc;
  * @author Benjamin Kirk, 2002
  */
 
-class PetscInterface : public LinearSolverInterface
+template <typename Tp>
+class PetscInterface : public LinearSolverInterface<Tp>
 {
  public:
   /**
@@ -94,9 +87,9 @@ class PetscInterface : public LinearSolverInterface
    * Call the Petsc solver
    */    
   std::pair<unsigned int, Real> 
-    solve (SparseMatrix &matrix,
-	   NumericVector &solution,
-	   NumericVector &rhs,
+    solve (SparseMatrix<Tp> &matrix,
+	   NumericVector<Tp> &solution,
+	   NumericVector<Tp> &rhs,
 	   const double tol,
 	   const unsigned int m_its);
    
@@ -132,15 +125,17 @@ class PetscInterface : public LinearSolverInterface
 
 
 /*----------------------- functions ----------------------------------*/
+template <typename Tp>
 inline
-PetscInterface::PetscInterface ()
+PetscInterface<Tp>::PetscInterface ()
 {
 }
 
 
 
+template <typename Tp>
 inline
-PetscInterface::~PetscInterface ()
+PetscInterface<Tp>::~PetscInterface ()
 {
   clear ();
 }

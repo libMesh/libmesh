@@ -118,3 +118,6 @@
 
 /* Flag indicating if the library should be built using complex numbers */
 #undef USE_COMPLEX_NUMBERS
+
+/* Flag indicating if the library should be built using real numbers */
+#undef USE_REAL_NUMBERS

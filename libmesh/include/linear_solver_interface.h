@@ -1,4 +1,4 @@
-// $Id: linear_solver_interface.h,v 1.2 2003-02-13 22:56:07 benkirk Exp $
+// $Id: linear_solver_interface.h,v 1.3 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -37,7 +37,7 @@
 
 
 // forward declarations
-class LinearSolverInterface;
+//template <typename Tp> class LinearSolverInterface;
 
 
 
@@ -50,7 +50,8 @@ class LinearSolverInterface;
  * @author Benjamin Kirk, 2003
  */
 
-class LinearSolverInterface : public ReferenceCountedObject<LinearSolverInterface>
+template <typename Tp>
+class LinearSolverInterface : public ReferenceCountedObject<LinearSolverInterface<Tp> >
 {
  public:
   
@@ -68,7 +69,7 @@ class LinearSolverInterface : public ReferenceCountedObject<LinearSolverInterfac
    * Builds a \p LinearSolverInterface using the linear solver package specified by
    * \p solver_package
    */
-  static AutoPtr<LinearSolverInterface> build(const SolverPackage solver_package);
+  static AutoPtr<LinearSolverInterface<Tp> > build(const SolverPackage solver_package);
   
   /**
    * @returns true if the data structures are
@@ -114,9 +115,9 @@ class LinearSolverInterface : public ReferenceCountedObject<LinearSolverInterfac
    * Call the Solver solver
    */    
   virtual std::pair<unsigned int, Real> 
-    solve (SparseMatrix&,
-	   NumericVector&,
-	   NumericVector&,
+    solve (SparseMatrix<Tp>&,
+	   NumericVector<Tp>&,
+	   NumericVector<Tp>&,
 	   const double,
 	   const unsigned int) = 0;
    
@@ -140,8 +141,9 @@ protected:
 
 
 /*----------------------- inline functions ----------------------------------*/
+template <typename Tp>
 inline
-LinearSolverInterface::LinearSolverInterface () :
+LinearSolverInterface<Tp>::LinearSolverInterface () :
   _solver_type (GMRES),
   _preconditioner_type (ILU_PRECOND),
   _is_initialized (false)
@@ -149,8 +151,9 @@ LinearSolverInterface::LinearSolverInterface () :
 
 
 
+template <typename Tp>
 inline
-LinearSolverInterface::~LinearSolverInterface ()
+LinearSolverInterface<Tp>::~LinearSolverInterface ()
 {
   clear ();
 }

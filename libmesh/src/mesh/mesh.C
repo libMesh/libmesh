@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.8 2003-02-14 15:22:49 benkirk Exp $
+// $Id: mesh.C,v 1.9 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -193,7 +193,7 @@ void Mesh::write(const std::string& name)
 
 
 void Mesh::write(const std::string& name,
-		 std::vector<Complex>& v,
+		 std::vector<Number>& v,
 		 std::vector<std::string>& vn)
 {
   libMesh::log.start_event("write()");

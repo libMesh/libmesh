@@ -1,4 +1,4 @@
-// $Id: laspack_matrix.h,v 1.6 2003-02-13 22:56:07 benkirk Exp $
+// $Id: laspack_matrix.h,v 1.7 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,7 @@
 
 #include "mesh_config.h"
 
-#if defined(HAVE_LASPACK) && !defined(USE_COMPLEX_NUMBERS)
+#ifdef HAVE_LASPACK 
 
 // C++ includes
 #include <algorithm>
@@ -50,14 +50,18 @@ class LaspackInterface;
  * allows for uniform access to laspack matrices
  * from various different solver packages in
  * different formats.
+ * Currently Laspack only supports real datatypes, so
+ * this class is a full specialization of \p SparseMatrix<>
+ * with \p Tp = \p Real
+
  *
  * @author Benjamin S. Kirk, 2003
  */
 
-class LaspackMatrix : public SparseMatrix
+class LaspackMatrix : public SparseMatrix<Real>
 {
 
- public:
+public:
   /**
    * Constructor; initializes the matrix to
    * be empty, without any structure, i.e.
@@ -161,7 +165,7 @@ class LaspackMatrix : public SparseMatrix
    */
   void set (const unsigned int i,
 	    const unsigned int j,
-	    const Complex value);
+	    const Real value);
     
   /**
    * Add \p value to the element
@@ -173,7 +177,7 @@ class LaspackMatrix : public SparseMatrix
    */
   void add (const unsigned int i,
 	    const unsigned int j,
-	    const Complex value);
+	    const Real value);
 
   /**
    * Add the full matrix to the
@@ -182,7 +186,7 @@ class LaspackMatrix : public SparseMatrix
    * at assembly time
    */
     
-  void add_matrix (const ComplexDenseMatrix &dm,
+  void add_matrix (const DenseMatrix<Real> &dm,
 		   const std::vector<unsigned int> &rows,
 		   const std::vector<unsigned int> &cols);
   
@@ -190,7 +194,7 @@ class LaspackMatrix : public SparseMatrix
    * Same, but assumes the row and column maps are the same.
    * Thus the matrix \p dm must be square.
    */
-  void add_matrix (const ComplexDenseMatrix &dm,
+  void add_matrix (const DenseMatrix<Real> &dm,
 		   const std::vector<unsigned int> &dof_indices);
       
   /**
@@ -211,8 +215,8 @@ class LaspackMatrix : public SparseMatrix
    * matrix), use the \p el
    * function.
    */
-  Complex operator () (const unsigned int i,
-		       const unsigned int j) const;
+  Real operator () (const unsigned int i,
+		    const unsigned int j) const;
 
   /**
    * Return the l1-norm of the matrix, that is
@@ -330,11 +334,11 @@ void LaspackMatrix::zero ()
       const unsigned int r_start = _row_start[row];
       const unsigned int len     = Q_GetLen(&_QMat, row+1);
 
-//       std::cout << "row=" << row << ", \t"
-// 		<< "len=" << len << ", \t"
-// 		<< "_row_start[row+1]-_row_start[row]="
-// 		<<  _row_start[row+1]-_row_start[row]
-// 		<< std::endl;
+      //       std::cout << "row=" << row << ", \t"
+      // 		<< "len=" << len << ", \t"
+      // 		<< "_row_start[row+1]-_row_start[row]="
+      // 		<<  _row_start[row+1]-_row_start[row]
+      // 		<< std::endl;
 	
       // Make sure we agree on the row length
       assert (len == (_row_start[row+1]-_row_start[row]));
@@ -392,7 +396,7 @@ unsigned int LaspackMatrix::row_stop () const
 inline
 void LaspackMatrix::set (const unsigned int i,
 			 const unsigned int j,
-			 const Complex value)
+			 const Real value)
 {
   assert (initialized());
   assert (i < m());
@@ -412,7 +416,7 @@ void LaspackMatrix::set (const unsigned int i,
 inline
 void LaspackMatrix::add (const unsigned int i,
 			 const unsigned int j,
-			 const Complex value)
+			 const Real value)
 {
   assert (initialized());
   assert (i < m());
@@ -429,7 +433,7 @@ void LaspackMatrix::add (const unsigned int i,
 
 
 inline
-void LaspackMatrix::add_matrix(const ComplexDenseMatrix& dm,
+void LaspackMatrix::add_matrix(const DenseMatrix<Real>& dm,
 			       const std::vector<unsigned int>& dof_indices)
 {
   add_matrix (dm, dof_indices, dof_indices);
@@ -438,7 +442,7 @@ void LaspackMatrix::add_matrix(const ComplexDenseMatrix& dm,
 
 
 inline
-void LaspackMatrix::add_matrix(const ComplexDenseMatrix& dm,
+void LaspackMatrix::add_matrix(const DenseMatrix<Real>& dm,
 			       const std::vector<unsigned int>& rows,
 			       const std::vector<unsigned int>& cols)
 		    
@@ -456,8 +460,8 @@ void LaspackMatrix::add_matrix(const ComplexDenseMatrix& dm,
 
 
 inline
-Complex LaspackMatrix::operator () (const unsigned int i,
-				    const unsigned int j) const
+Real LaspackMatrix::operator () (const unsigned int i,
+				 const unsigned int j) const
 {
   assert (initialized());
   assert (i < m());
@@ -481,7 +485,7 @@ unsigned int LaspackMatrix::pos (const unsigned int i,
   assert (_row_start.back() == _csr.size());
 
   std::pair<const unsigned int*,
-            const unsigned int*> p =
+    const unsigned int*> p =
     std::equal_range (&_csr[_row_start[i]],
 		      &_csr[_row_start[i+1]],
 		      j);

@@ -1,4 +1,4 @@
-// $Id: mesh_xdr_support.h,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: mesh_xdr_support.h,v 1.7 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -74,7 +74,7 @@ class XdrInterface
    */
   void soln_interface(const std::string& name,
 		      const XdrIO::XdrIO_TYPE access,
-		      std::vector<Complex>& soln,
+		      std::vector<Number>& soln,
 		      std::vector<std::string>& var_names,
 		      Mesh& mesh);
   

@@ -1,4 +1,4 @@
-// $Id: fe_interface.h,v 1.10 2003-02-13 22:56:07 benkirk Exp $
+// $Id: fe_interface.h,v 1.11 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -110,8 +110,8 @@ public:
   static void nodal_soln(const unsigned int dim,
 			 const FEType& fe_t,
 			 const Elem* elem,
-			 const std::vector<Complex>& elem_soln,
-			 std::vector<Complex>& nodal_soln);
+			 const std::vector<Number>& elem_soln,
+			 std::vector<Number>& nodal_soln);
 
   /**
    * @returns the location (on the reference element) of the
@@ -216,8 +216,8 @@ private:
   static void ifem_nodal_soln(const unsigned int dim,
 			      const FEType& fe_t,
 			      const Elem* elem,
-			      const std::vector<Complex>& elem_soln,
-			      std::vector<Complex>& nodal_soln);
+			      const std::vector<Number>& elem_soln,
+			      std::vector<Number>& nodal_soln);
 
   static Point ifem_inverse_map (const unsigned int dim,
 				 const FEType& fe_t,

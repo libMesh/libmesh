@@ -1,4 +1,4 @@
-// $Id: petsc_matrix.C,v 1.11 2003-02-13 22:56:13 benkirk Exp $
+// $Id: petsc_matrix.C,v 1.12 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -18,13 +18,14 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
+// C++ includes
 
-#include "mesh_common.h"
+// Local includes
+#include "petsc_matrix.h"
+#include "petsc_vector.h"
 
 #ifdef HAVE_PETSC
 
-#include "petsc_matrix.h"
-#include "petsc_vector.h"
 #include "dof_map.h"
 
 
@@ -32,7 +33,8 @@
 
 //-----------------------------------------------------------------------
 // PetscMatrix members
-void PetscMatrix::init (const unsigned int m,
+template <typename Tp>
+void PetscMatrix<Tp>::init (const unsigned int m,
 			const unsigned int n,
 			const unsigned int m_l,
 			const unsigned int n_l,
@@ -87,8 +89,8 @@ void PetscMatrix::init (const unsigned int m,
 
 
 
-
-void PetscMatrix::init ()
+template <typename Tp>
+void PetscMatrix<Tp>::init ()
 {
   assert (_dof_map != NULL);
   
@@ -156,8 +158,8 @@ void PetscMatrix::init ()
 
 
 
-
-void PetscMatrix::zero ()
+template <typename Tp>
+void PetscMatrix<Tp>::zero ()
 {
   assert (initialized());
   
@@ -168,7 +170,8 @@ void PetscMatrix::zero ()
 
 
 
-void PetscMatrix::clear ()
+template <typename Tp>
+void PetscMatrix<Tp>::clear ()
 {
   int ierr=0;
   
@@ -182,7 +185,8 @@ void PetscMatrix::clear ()
 
 
 
-Real PetscMatrix::l1_norm () const
+template <typename Tp>
+Real PetscMatrix<Tp>::l1_norm () const
 {
   assert (initialized());
   
@@ -201,7 +205,8 @@ Real PetscMatrix::l1_norm () const
 
 
 
-Real PetscMatrix::linfty_norm () const
+template <typename Tp>
+Real PetscMatrix<Tp>::linfty_norm () const
 {
   assert (initialized());
   
@@ -220,7 +225,8 @@ Real PetscMatrix::linfty_norm () const
 
 
 
-void PetscMatrix::print_matlab (const std::string name) const
+template <typename Tp>
+void PetscMatrix<Tp>::print_matlab (const std::string name) const
 {
   assert (initialized());
   assert (closed());
@@ -267,4 +273,10 @@ void PetscMatrix::print_matlab (const std::string name) const
 }
 
 
-#endif
+
+//------------------------------------------------------------------
+// Explicit instantiations
+template class PetscMatrix<Number>;
+
+
+#endif // #ifdef HAVE_PETSC

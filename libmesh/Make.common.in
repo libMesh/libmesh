@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.13 2003-02-11 22:59:25 benkirk Exp $
+# $Id: Make.common.in,v 1.14 2003-02-20 04:59:57 benkirk Exp $
 
 
 ###############################################################################
@@ -93,6 +93,9 @@ CXXDEPFLAG           = @CXXDEPFLAG@
 CXXSHAREDFLAG        = @CXXSHAREDFLAG@
 CSHAREDFLAG          = @CXXSHAREDFLAG@
 
+# Complex variable support
+enable-complex       = @enablecomplex@
+
 # NetCDF platform-independent binary file support.
 # Needed for ExodusII support
 enable-netcdf 	     = @enablenetcdf@
@@ -171,8 +174,7 @@ ifeq ($(enable-shared),yes)
 endif
 
 LIBS += $(mesh_library)
-
-
+LDFLAGS += -Wl,-rpath,$(mesh_library_dir)
 
 ###############################################################################
 # Compiler flags, different for optimized, debug, and profiler modes.
@@ -199,8 +201,6 @@ ifeq ($(syn-mode),on)
   CFLAGS   += @CFLAGSS@ 
 endif
 
-LIBS += $(LDFLAGS)
-
 ifeq ($(prof-mode),on)
   LIBS += -pg
 endif
@@ -213,12 +213,15 @@ endif
 
 INCLUDE += -I$(pwd)/include
 
+#
+# Contributed source & libraries
 EXTERNAL_LIBDIR := $(pwd)/contrib/lib/$(hosttype)_$(METHOD)
 EXTERNAL_LIBEXT := .a
 ifeq ($(enable-shared),yes) 
   EXTERNAL_LIBEXT := .so
 endif
 
+LDFLAGS += -Wl,-rpath,$(EXTERNAL_LIBDIR)
 
 #
 # Optional packages
@@ -343,10 +346,14 @@ ifeq ($(enable-hdf4),yes)
 endif
 
 
+#
+# Finally, Append the linker flags to the libraries
+LIBS += $(LDFLAGS)
+
+
 
 ###############################################################################
 # Build rules
-
 
 ##################################
 # C++ rules                      #

@@ -1,4 +1,4 @@
-// $Id: fe_lagrange.C,v 1.9 2003-02-13 22:56:10 benkirk Exp $
+// $Id: fe_lagrange.C,v 1.10 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,8 +31,8 @@
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::nodal_soln(const Elem* elem,
 			   const Order order,
-			   const std::vector<Complex>& elem_soln,
-			   std::vector<Complex>&       nodal_soln)
+			   const std::vector<Number>& elem_soln,
+			   std::vector<Number>&       nodal_soln)
 {
 
   const unsigned int n_nodes = elem->n_nodes();
