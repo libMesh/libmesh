@@ -1,4 +1,4 @@
-// $Id: laspack_matrix.h,v 1.16 2003-06-03 05:33:35 benkirk Exp $
+// $Id: laspack_matrix.h,v 1.17 2003-08-28 20:55:26 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk, John W. Peterson
@@ -321,7 +321,7 @@ template <typename T>
 inline
 LaspackMatrix<T>::~LaspackMatrix ()
 {
-  clear ();
+  this->clear ();
 }
 
 
@@ -347,7 +347,7 @@ template <typename T>
 inline
 void LaspackMatrix<T>::zero ()
 {
-  const unsigned int n_rows = m();
+  const unsigned int n_rows = this->m();
 
   for (unsigned int row=0; row<n_rows; row++)
     {
@@ -412,7 +412,7 @@ template <typename T>
 inline
 unsigned int LaspackMatrix<T>::row_stop () const
 {
-  return m();
+  return this->m();
 }
 
 
@@ -424,10 +424,10 @@ void LaspackMatrix<T>::set (const unsigned int i,
 			    const T value)
 {
   assert (this->initialized());
-  assert (i < m());
-  assert (j < n());
+  assert (i < this->m());
+  assert (j < this->n());
   
-  const unsigned int position = pos(i,j);
+  const unsigned int position = this->pos(i,j);
 
   // Sanity check
   assert (_csr[_row_start[i]+position] == j);
@@ -445,10 +445,10 @@ void LaspackMatrix<T>::add (const unsigned int i,
 			    const T value)
 {
   assert (this->initialized());
-  assert (i < m());
-  assert (j < n());
+  assert (i < this->m());
+  assert (j < this->n());
   
-  const unsigned int position = pos(i,j);
+  const unsigned int position = this->pos(i,j);
 
   // Sanity check
   assert (_csr[_row_start[i]+position] == j);
@@ -461,9 +461,9 @@ void LaspackMatrix<T>::add (const unsigned int i,
 template <typename T> 
 inline
 void LaspackMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
-			       const std::vector<unsigned int>& dof_indices)
+				  const std::vector<unsigned int>& dof_indices)
 {
-  add_matrix (dm, dof_indices, dof_indices);
+  this->add_matrix (dm, dof_indices, dof_indices);
 }
 
 
@@ -471,8 +471,8 @@ void LaspackMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 template <typename T> 
 inline
 void LaspackMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
-			       const std::vector<unsigned int>& rows,
-			       const std::vector<unsigned int>& cols)
+				  const std::vector<unsigned int>& rows,
+				  const std::vector<unsigned int>& cols)
 		    
 {
   assert (this->initialized());
@@ -482,7 +482,7 @@ void LaspackMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
   
   for (unsigned int i=0; i<rows.size(); i++)
     for (unsigned int j=0; j<cols.size(); j++)
-      add(rows[i],cols[j],dm(i,j));
+      this->add(rows[i],cols[j],dm(i,j));
 }
 
 
@@ -499,7 +499,7 @@ void LaspackMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
 
   // loops taken from LaspackMatrix<T>::zero ()
 
-  const unsigned int n_rows = m();
+  const unsigned int n_rows = this->m();
 
   for (unsigned int row=0; row<n_rows; row++)
     {
@@ -534,8 +534,8 @@ T LaspackMatrix<T>::operator () (const unsigned int i,
 				 const unsigned int j) const
 {
   assert (this->initialized());
-  assert (i < m());
-  assert (j < n());
+  assert (i < this->m());
+  assert (j < this->n());
   
   return Q_GetEl (const_cast<QMatrix*>(&_QMat), i+1, j+1);
 }

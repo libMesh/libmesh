@@ -1,4 +1,4 @@
-// $Id: laspack_vector.C,v 1.16 2003-07-23 21:49:05 ddreyer Exp $
+// $Id: laspack_vector.C,v 1.17 2003-08-28 20:55:27 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,22 +31,10 @@
 
 
 
-// template <typename T>
-// void LaspackVector<T> ::init (const NumericVector<T>& v, const bool fast)
-// {
-//   error();
-  
-//   init (v.local_size(), v.size(), fast);
-
-//   vec = dynamic_cast<const LaspackVector<T>&>(v).vec;
-// }
-
-
-
 template <typename T>
 Real LaspackVector<T>::l1_norm () const
 {
-  assert(this->closed());
+  assert (this->closed());
   
   return static_cast<Real>(l1Norm_V(const_cast<QVector*>(&_vec)));
 }
@@ -56,7 +44,7 @@ Real LaspackVector<T>::l1_norm () const
 template <typename T>
 Real LaspackVector<T>::l2_norm () const
 {
-  assert(this->closed());
+  assert (this->closed());
   
   return static_cast<Real>(l2Norm_V(const_cast<QVector*>(&_vec)));
 }
@@ -66,7 +54,7 @@ Real LaspackVector<T>::l2_norm () const
 template <typename T>
 Real LaspackVector<T>::linfty_norm () const
 {
-  assert(this->closed());
+  assert (this->closed());
   
   return static_cast<Real>(MaxNorm_V(const_cast<QVector*>(&_vec)));
 }
@@ -77,7 +65,7 @@ Real LaspackVector<T>::linfty_norm () const
 template <typename T>
 NumericVector<T>& LaspackVector<T>::operator += (const NumericVector<T>& v)
 {
-  assert(this->closed());
+  assert (this->closed());
   
   this->add(1., v);
   
@@ -90,7 +78,7 @@ NumericVector<T>& LaspackVector<T>::operator += (const NumericVector<T>& v)
 template <typename T>
 NumericVector<T>& LaspackVector<T>::operator -= (const NumericVector<T>& v)
 {
-  assert(this->closed());
+  assert (this->closed());
   
   this->add(-1., v);
   
@@ -124,7 +112,7 @@ void LaspackVector<T>::add (const T a, const NumericVector<T>& v_in)
 {
   const LaspackVector& v = dynamic_cast<const LaspackVector&>(v_in);
   
-  assert(this->size() == v.size());
+  assert (this->size() == v.size());
 
   for (unsigned int i=0; i<v.size(); i++)
     this->add (i, a*v(i));
@@ -215,7 +203,7 @@ LaspackVector<T>::operator = (const std::vector<T>& v)
    */
   if (this->size() == v.size())      
     for (unsigned int i=0; i<v.size(); i++)
-      set (i, v[i]);
+      this->set (i, v[i]);
   
   else
     error();
@@ -255,7 +243,7 @@ void LaspackVector<T>::localize (const unsigned int first_local_idx,
 				 const std::vector<unsigned int>& send_list)
 {
   assert (first_local_idx  == 0);
-  assert (last_local_idx+1 == this->size());
+  assert (last_local_idx   == this->size());
   
   assert (send_list.size() == this->size());
 }
@@ -266,7 +254,7 @@ template <typename T>
 void LaspackVector<T>::localize (std::vector<T>& v_local) const
 
 {
-  v_local.resize(size());
+  v_local.resize(this->size());
 
   for (unsigned int i=0; i<v_local.size(); i++)
     v_local[i] = (*this)(i);  
