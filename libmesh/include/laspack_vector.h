@@ -1,4 +1,4 @@
-// $Id: laspack_vector.h,v 1.17 2003-05-28 22:03:00 benkirk Exp $
+// $Id: laspack_vector.h,v 1.18 2003-06-12 02:29:01 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -424,11 +424,11 @@ void LaspackVector<T>::init (const unsigned int n,
 
   V_Constr(&_vec, const_cast<char*>(foo), n, Normal, _LPTrue);
     
-  this->_is_initialized = true;
+  _is_initialized = true;
   
   // Optionally zero out all components
   if (fast == false)
-    zero ();
+    this->zero ();
   
   return;
 }
@@ -438,9 +438,9 @@ void LaspackVector<T>::init (const unsigned int n,
 template <typename T> 
 inline
 void LaspackVector<T>::init (const unsigned int n,
-			  const bool fast)
+			     const bool fast)
 {
-  init(n,n,fast);
+  this->init(n,n,fast);
 }
 
 
@@ -451,7 +451,7 @@ void LaspackVector<T>::close ()
 {
   assert (this->initialized());
   
-  this->_is_closed = true;
+  _is_closed = true;
   
   return;
 }
@@ -467,7 +467,7 @@ void LaspackVector<T>::clear ()
       V_Destr (&_vec);
     }
 
-  this->_is_closed = this->_is_initialized = false;
+  _is_closed = _is_initialized = false;
 }
 
 
@@ -512,7 +512,7 @@ unsigned int LaspackVector<T>::local_size () const
 {
   assert (this->initialized());
   
-  return size();
+  return this->size();
 }
 
 
@@ -534,7 +534,7 @@ unsigned int LaspackVector<T>::last_local_index () const
 {
   assert (this->initialized());
   
-  return size();
+  return this->size();
 }
 
 
@@ -544,7 +544,7 @@ inline
 void LaspackVector<T>::set (const unsigned int i, const T value)
 {
   assert(this->initialized());
-  assert(i<size());
+  assert(i<this->size());
   
   V_SetCmp (&_vec, i+1, value);
 }
@@ -556,7 +556,7 @@ inline
 void LaspackVector<T>::add (const unsigned int i, const T value)
 {
   assert(this->initialized());
-  assert(i<size());
+  assert(i<this->size());
   
   V_AddCmp (&_vec, i+1, value);
 }
@@ -586,7 +586,7 @@ void LaspackVector<T>::add_vector (const std::vector<T>& v,
   assert (v.size() == dof_indices.size());
   
   for (unsigned int i=0; i<v.size(); i++)
-    add (dof_indices[i], v[i]);
+    this->add (dof_indices[i], v[i]);
 }
 
 
@@ -599,7 +599,7 @@ void LaspackVector<T>::add_vector (const NumericVector<T>& V,
   assert (V.size() == dof_indices.size());
 
   for (unsigned int i=0; i<V.size(); i++)
-    add (dof_indices[i], V(i));
+   this->add (dof_indices[i], V(i));
 }
 
 
@@ -612,7 +612,7 @@ void LaspackVector<T>::add_vector (const DenseVector<T>& V,
   assert (V.size() == dof_indices.size());
 
   for (unsigned int i=0; i<V.size(); i++)
-    add (dof_indices[i], V(i));
+    this->add (dof_indices[i], V(i));
 }
 
 
