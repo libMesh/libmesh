@@ -168,7 +168,7 @@ void MEDITIO::write_ascii (const std::string& fname,
     {
       // Open the ".bb" file stream
       int idx = fname.find_last_of(".");
-      string bbname = fname.substr(0,idx) + ".bb";
+      std::string bbname = fname.substr(0,idx) + ".bb";
       
       std::ofstream bbout (bbname.c_str());
       assert (bbout.good());      
