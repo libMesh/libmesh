@@ -1,4 +1,4 @@
-// $Id: numeric_vector.h,v 1.1 2003-02-10 03:55:51 benkirk Exp $
+// $Id: numeric_vector.h,v 1.2 2003-02-10 04:04:31 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -325,8 +325,6 @@ class NumericVector : public ReferenceCountedObject<NumericVector>
    * has been called yet
    */
   bool _is_initialized;
-
-  friend class NumericInterface;
 };
 
 
