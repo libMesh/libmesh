@@ -1,4 +1,4 @@
-// $Id: petsc_vector.C,v 1.15 2003-03-11 23:36:46 ddreyer Exp $
+// $Id: petsc_vector.C,v 1.16 2003-03-12 20:21:03 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -477,8 +477,6 @@ void PetscVector<Real>::localize (std::vector<Real>& v_local) const
 template <>
 void PetscVector<Complex>::localize (std::vector<Complex>& v_local) const
 {
-  //TODO:[DD/BSK] Will this work in parallel?
-  
   int ierr=0;
   const int n  = size();
   const int nl = local_size();
@@ -504,50 +502,66 @@ void PetscVector<Complex>::localize (std::vector<Complex>& v_local) const
   // otherwise multiple processors
   else
     {
+// OLD CODE
+//       unsigned int ioff = first_local_index();
+//       std::vector<Complex> local_values(n, 0.);
+
+//       {
+// 	ierr = VecGetArray (vec, &values); CHKERRQ(ierr);
+	
+// 	for (int i=0; i<nl; i++)
+// 	  local_values[i+ioff] = static_cast<Complex>(values[i]);
+	
+// 	ierr = VecRestoreArray (vec, &values); CHKERRQ(ierr);
+//       }
+      
+//       MPI_Allreduce (&local_values[0], &v_local[0], n, MPIU_SCALAR, MPI_SUM,
+// 		     PETSC_COMM_WORLD);	
+
       unsigned int ioff = first_local_index();
-      std::vector<Complex> local_values(n, 0.);
+
+      /* in here the local values are stored, acting as send buffer for MPI
+       * initialize to zero, since we collect using MPI_SUM
+       */
+      std::vector<Real> real_local_values(n, 0.);
+      std::vector<Real> imag_local_values(n, 0.);
 
       {
 	ierr = VecGetArray (vec, &values); CHKERRQ(ierr);
 	
+	// provide my local share to the real and imag buffers
 	for (int i=0; i<nl; i++)
-	  local_values[i+ioff] = static_cast<Complex>(values[i]);
-	
+	  {
+	    real_local_values[i+ioff] = static_cast<Complex>(values[i]).real();
+	    imag_local_values[i+ioff] = static_cast<Complex>(values[i]).imag();
+	  }
+
 	ierr = VecRestoreArray (vec, &values); CHKERRQ(ierr);
       }
-      
-      MPI_Allreduce (&local_values[0], &v_local[0], n, MPIU_SCALAR, MPI_SUM,
-		     PETSC_COMM_WORLD);	
-    }  
+   
+      /* have buffers of the real and imaginary part of v_local.
+       * Once MPI_Reduce() collected all the real and imaginary
+       * parts in these std::vector<double>, the values can be 
+       * copied to v_local
+       */
+      std::vector<Real> real_v_local(n);
+      std::vector<Real> imag_v_local(n);
+
+      // collect entries from other proc's in real_v_local, imag_v_local
+      MPI_Allreduce (&real_local_values[0], &real_v_local[0], n, 
+		     MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);	
+
+      MPI_Allreduce (&imag_local_values[0], &imag_v_local[0], n, 
+		     MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);	
+
+      // copy real_v_local and imag_v_local to v_local
+	for (int i=0; i<n; i++)
+	    v_local[i] = Complex(real_v_local[i], imag_v_local[i]);
+
+    }
 }
 
 #endif
-
-
-
-/*
-  ifdef USE_COMPLEX_NUMBERS
-  {
-  //TODO:[DD] localize may be done in a better way...
-  // There is no MPI_COMPLEX in C. For now, use PETSc 
-	    
-  // have an appropriately sized PetscVector<T> handy
-  PetscVector<T> pv(n);
-	  
-  // localize ourselves to this vector
-  localize(&pv);
-
-  // copy data to v_local
-  for (int i=0; i<n; i++)
-  v_local[i] =  static_cast<T>(pv(i));
-
-  // note that the destructor of pv calls clear()
-  }
-  else
-  endif
-*/
-
-
 
 
 
@@ -617,8 +631,6 @@ template <>
 void PetscVector<Complex>::localize_to_one (std::vector<Complex>& v_local,
 					    const unsigned int pid) const
 {
-  //TODO:[DD/BSK] Will this work in parallel?
-  
   int ierr=0;
   const int n  = size();
   const int nl = local_size();
@@ -645,52 +657,70 @@ void PetscVector<Complex>::localize_to_one (std::vector<Complex>& v_local,
   // otherwise multiple processors
   else
     {
+
+// OLD CODE
+//       unsigned int ioff = first_local_index();
+//       std::vector<Complex> local_values(n, 0.);
+
+//       {
+// 	ierr = VecGetArray (vec, &values); CHKERRQ(ierr);
+	
+// 	for (int i=0; i<nl; i++)
+// 	  local_values[i+ioff] = static_cast<Complex>(values[i]);
+	
+// 	ierr = VecRestoreArray (vec, &values); CHKERRQ(ierr);
+//       }
+      
+//       MPI_Reduce (&local_values[0], &v_local[0], n, MPIU_SCALAR, MPI_SUM,
+// 		  pid, PETSC_COMM_WORLD);	
+
       unsigned int ioff = first_local_index();
-      std::vector<Complex> local_values(n, 0.);
+
+      /* in here the local values are stored, acting as send buffer for MPI
+       * initialize to zero, since we collect using MPI_SUM
+       */
+      std::vector<Real> real_local_values(n, 0.);
+      std::vector<Real> imag_local_values(n, 0.);
 
       {
 	ierr = VecGetArray (vec, &values); CHKERRQ(ierr);
 	
+	// provide my local share to the real and imag buffers
 	for (int i=0; i<nl; i++)
-	  local_values[i+ioff] = static_cast<Complex>(values[i]);
-	
+	  {
+	    real_local_values[i+ioff] = static_cast<Complex>(values[i]).real();
+	    imag_local_values[i+ioff] = static_cast<Complex>(values[i]).imag();
+	  }
+
 	ierr = VecRestoreArray (vec, &values); CHKERRQ(ierr);
       }
-      
-      MPI_Reduce (&local_values[0], &v_local[0], n, MPIU_SCALAR, MPI_SUM,
+   
+      /* have buffers of the real and imaginary part of v_local.
+       * Once MPI_Reduce() collected all the real and imaginary
+       * parts in these std::vector<double>, the values can be 
+       * copied to v_local
+       */
+      std::vector<Real> real_v_local(n);
+      std::vector<Real> imag_v_local(n);
+
+      // collect entries from other proc's in real_v_local, imag_v_local
+      MPI_Reduce (&real_local_values[0], &real_v_local[0], n, 
+		  MPI_DOUBLE, MPI_SUM,
 		  pid, PETSC_COMM_WORLD);	
+
+      MPI_Reduce (&imag_local_values[0], &imag_v_local[0], n, 
+		  MPI_DOUBLE, MPI_SUM,
+		  pid, PETSC_COMM_WORLD);	
+
+      // copy real_v_local and imag_v_local to v_local
+	for (int i=0; i<n; i++)
+	    v_local[i] = Complex(real_v_local[i], imag_v_local[i]);
+
     }  
 }
 
 #endif
 
-
-/*
-  ifdef USE_COMPLEX_NUMBERS
-  {
-  //TODO:[DD] localize_to_one may be done in a better way...
-
-  int my_proc_id = 0;
-  MPI_Comm_rank (PETSC_COMM_WORLD, &my_proc_id);
-
-  if (my_proc_id == proc_id)
-  {
-  // have an appropriately sized PetscVector<T> handy
-  PetscVector<T> pv(n);
-	  
-  // localize ourselves to this vector
-  localize(&pv);
-
-  // copy data to v_local
-  for (int i=0; i<n; i++)
-  v_local[i] =  static_cast<T>(pv(i));
-
-  }
-  }
-  else
-  error();
-  endif
-*/
 
 
 

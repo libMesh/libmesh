@@ -1,4 +1,4 @@
-// $Id: inf_fe_static.C,v 1.11 2003-02-27 00:15:14 ddreyer Exp $
+// $Id: inf_fe_static.C,v 1.12 2003-03-12 20:20:54 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -216,7 +216,6 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_at_node(const FEType& fet,
   const unsigned int n_base   ( Base::index  (fet, base_et, n) );
   const unsigned int n_radial ( Radial::index(fet, base_et, n) );
 
-  //TODO:[DD] Does icc7.0 here also complain???
   if (Dim > 1)
     return FEInterface::n_dofs_at_node(Dim-1, fet, base_et, n_base) 
         * Radial::n_dofs_at_node(fet.radial_order, n_radial);
@@ -313,7 +312,7 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
   const Real         v        ( p(Dim-1) );  // holds for all Dim, except for 0, but we don't inst Dim=0 ;-)
 
 
-  //TODO:[DD]  exp(ikr) is still missing here!
+  //TODO:[SP/DD]  exp(ikr) is still missing here!
   if (Dim > 1)
     return FEInterface::shape (Dim-1, fet, base_et, i_base, p)
         * InfFE<Dim,T_radial,T_map>::eval (v, o_radial, i_radial)

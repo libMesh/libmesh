@@ -1,4 +1,4 @@
-// $Id: inf_fe.C,v 1.16 2003-03-04 18:09:47 spetersen Exp $
+// $Id: inf_fe.C,v 1.17 2003-03-12 20:20:54 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -176,7 +176,9 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem)
       // update to the new radial order
       current_fe_type.radial_order = fe_type.radial_order;
 
-      //TODO:[DD] this call to QBase->init() only works for current_fe_type = const!   To allow variable Order, the init() of QBase has to be modified...  
+      // Watch out: this call to QBase->init() only works for 
+      // current_fe_type = const!   To allow variable Order, 
+      // the init() of QBase has to be modified...  
       radial_qrule->init(EDGE2);
 
       // initialize the radial shape functions
