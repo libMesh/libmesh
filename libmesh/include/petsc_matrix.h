@@ -1,4 +1,4 @@
-//    $Id: petsc_matrix.h,v 1.24 2003-03-23 01:39:11 ddreyer Exp $
+//    $Id: petsc_matrix.h,v 1.25 2003-03-26 13:55:24 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -27,7 +27,7 @@
 #ifdef HAVE_PETSC
 
 // TODO:[BSK} This seems necessary to use petsc on IBM Power3 at NERSC, but only there?  
-#include <cmath>
+//#include <cmath>
 
 
 // C++ includes

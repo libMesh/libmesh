@@ -1,4 +1,4 @@
-// $Id: exact_solution.C,v 1.2 2003-02-04 16:29:50 benkirk Exp $
+// $Id: exact_solution.C,v 1.3 2003-03-26 13:55:23 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -46,4 +46,4 @@ Real exact_solution (const Real x,
   static const Real pi = acos(-1.);
 
   return cos(.5*pi*x)*sin(.5*pi*y)*cos(.5*pi*z);
-};
+}

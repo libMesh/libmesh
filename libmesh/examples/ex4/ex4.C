@@ -1,4 +1,4 @@
-// $Id: ex4.C,v 1.19 2003-03-11 04:35:17 ddreyer Exp $
+// $Id: ex4.C,v 1.20 2003-03-26 13:55:23 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -442,7 +442,7 @@ void assemble_poisson(EquationSystems<GeneralSystem>& es,
 	  for (unsigned int j=0; j<phi.size(); j++)
 	    {
 	      Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-	    }; // end of the matrix summation loop
+	    } // end of the matrix summation loop
 
       /**
        * Stop logging the matrix computation

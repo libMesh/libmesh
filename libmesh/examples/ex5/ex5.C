@@ -1,4 +1,4 @@
-// $Id: ex5.C,v 1.17 2003-03-11 04:35:18 ddreyer Exp $
+// $Id: ex5.C,v 1.18 2003-03-26 13:55:24 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -155,7 +155,7 @@ int main (int argc, char** argv)
 	  std::cout << " " << argv[i];
 	
 	std::cout << std::endl << std::endl;
-      };
+      }
     
 
     /**
@@ -196,8 +196,7 @@ int main (int argc, char** argv)
       equation_systems.init();
       
       equation_systems.print_info();
-    };
-
+    }
 
     equation_systems("Poisson").solve();
 
@@ -209,14 +208,14 @@ int main (int argc, char** argv)
     f_name << "out_" << quad_type << ".gmv";
 
     mesh.write_gmv (f_name.str(), equation_systems);
-  };
+  }
 
 
   /**
    * All done.
    */
   return libMesh::close ();
-};
+}
 
 
 
@@ -325,7 +324,7 @@ void assemble_poisson(EquationSystems<GeneralSystem>& es,
 	    for (unsigned int j=0; j<phi.size(); j++)
 	      {
 		Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-	      };
+	      }
 
 
 	  for (unsigned int i=0; i<phi.size(); i++)
@@ -350,9 +349,9 @@ void assemble_poisson(EquationSystems<GeneralSystem>& es,
 	      const Real fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
 	      
 	      Fe(i) += JxW[qp]*fxy*phi[i][qp];
-	    }; // end of the RHS summation loop
+	    } // end of the RHS summation loop
 	  
-	}; // end of quadrature point loop
+	} // end of quadrature point loop
 
 
 
@@ -437,16 +436,16 @@ void assemble_poisson(EquationSystems<GeneralSystem>& es,
 		    for (unsigned int j=0; j<phi_face.size(); j++)
 		      {
 			Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
-		      };
+		      }
 
 		  for (unsigned int i=0; i<phi_face.size(); i++)
 		    {
 		      Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
-		    };
+		    }
 		  
-		}; // end face quadrature point loop	  
-	    }; // end if (elem->neighbor(side) == NULL)
-      }; // end boundary condition section	  
+		} // end face quadrature point loop	  
+	    } // end if (elem->neighbor(side) == NULL)
+      } // end boundary condition section	  
 
 
       
@@ -462,7 +461,7 @@ void assemble_poisson(EquationSystems<GeneralSystem>& es,
       es("Poisson").matrix->add_matrix (Ke, dof_indices);
       es("Poisson").rhs->add_vector    (Fe, dof_indices);
       
-    }; // end of element loop
+    } // end of element loop
 
 
   
@@ -470,4 +469,4 @@ void assemble_poisson(EquationSystems<GeneralSystem>& es,
    * All done!
    */
   return;
-};
+}
