@@ -1,0 +1,8 @@
+*~
+*.go
+*.o
+*.pgo
+*.syo
+ex1
+ii_files
+so_locations
