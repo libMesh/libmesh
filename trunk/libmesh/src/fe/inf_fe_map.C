@@ -1,4 +1,4 @@
-// $Id: inf_fe_map.C,v 1.2 2003-04-05 12:16:35 ddreyer Exp $
+// $Id: inf_fe_map.C,v 1.3 2003-04-18 15:46:23 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -87,7 +87,8 @@ Point InfFE<Dim,T_radial,T_map>::map (const Elem* inf_elem,
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 					      const Point& physical_point,
-					      const Real tolerance)
+					      const Real tolerance,
+					      const bool secure)
 {
   assert (inf_elem != NULL);
   assert (tolerance >= 0.);
@@ -202,7 +203,8 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 	     */	    
 	    const Real G = dxi*dxi;
 	    
-	    assert (G > 0.);
+	    if (secure)
+	      assert (G > 0.);
 	    
 	    const Real Ginv = 1./G;
 	    
@@ -251,9 +253,12 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 	    
 	    const Real det = (G11*G22 - G12*G21);
 	    
-	    assert (det > 0.);
-	    assert (fabs(det) > 1.e-10);
-	    
+	    if (secure)
+	      {
+		assert (det > 0.);
+		assert (fabs(det) > 1.e-10);
+	      }
+
 	    const Real inv_det = 1./det;
 	    
 	    const Real
@@ -305,32 +310,40 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
        */
       if (cnt > 10)
 	{
-	  here();
-	  {
-	    std::cerr << "WARNING: Newton scheme has not converged in "
-		      << cnt << " iterations:" << std::endl
-		      << "   physical_point=";
-	    
-	    physical_point.print();
-	    
-	    std::cerr << "   dp=";
-	    
-	    dp.print();
-	    
-	    std::cerr << "   p=";
-	    
-	    p.print();
-	    
-	    std::cerr << "   error=" << error
-		      << std::endl;
-	  }
-	  
-	  if (cnt > 20)
+	  if (secure)
+	    {
+	      here();
+	      {
+		std::cerr << "WARNING: Newton scheme has not converged in "
+			  << cnt << " iterations:" << std::endl
+			  << "   physical_point=";
+		
+		physical_point.print();
+		
+		std::cerr << "   dp=";
+		
+		dp.print();
+		
+		std::cerr << "   p=";
+		
+		p.print();
+		
+		std::cerr << "   error=" << error
+			  << std::endl;
+	      }
+	    }
+
+	  if (cnt > 2000)
 	    {
 	      std::cerr << "ERROR: Newton scheme FAILED to converge in "
 			<< cnt << " iterations!" << std::endl;
 	      error();
 	    }
+
+	  // else
+	  //  {
+	  //    break;
+	  //  }
 	}
     }
   while (error > tolerance);
@@ -447,18 +460,18 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
    * map to the point \p physical_point within a tolerance.
    */ 
 #ifdef DEBUG
-	
-  const Point check = InfFE<Dim,T_radial,T_map>::map (inf_elem, p);
-  const Point diff  = physical_point - check;
+  /*	
+	const Point check = InfFE<Dim,T_radial,T_map>::map (inf_elem, p);
+	const Point diff  = physical_point - check;
   
-  if (diff.size() > tolerance)
-    {
-      here();
-      std::cerr << "WARNING:  diff is "
-		<< diff.size()
-		<< std::endl;
-    }
-  
+	if (diff.size() > tolerance)
+	{
+	here();
+	std::cerr << "WARNING:  diff is "
+	<< diff.size()
+	<< std::endl;
+	}
+  */
 #endif
 
 

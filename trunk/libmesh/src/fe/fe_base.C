@@ -1,4 +1,4 @@
-// $Id: fe_base.C,v 1.12 2003-03-05 17:01:21 benkirk Exp $
+// $Id: fe_base.C,v 1.13 2003-04-18 15:46:22 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -656,7 +656,25 @@ bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real e
 
 	return false;
       }
-      
+
+    case INFHEX8:
+      {      
+	// The reference infhex8 is a [-1,1]^3.
+	if ((xi   >= -1.-eps) &&
+	    (xi   <=  1.+eps) &&
+	    (eta  >= -1.-eps) &&
+	    (eta  <=  1.+eps) &&
+	    (zeta >= -1.-eps) &&
+	    (zeta <=  1.+eps))
+	  {
+	    std::cout << "Found this point in infinite domain:\n";
+	    p.print();
+	    return true;
+	  }
+
+	return false;
+      }
+
     default:
       std::cerr << "ERROR: Unknown element type " << t << std::endl;
       error();

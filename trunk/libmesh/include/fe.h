@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.16 2003-04-02 14:55:03 benkirk Exp $
+// $Id: fe.h,v 1.17 2003-04-18 15:46:31 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -52,7 +52,7 @@ class InfFE;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.16 $
+ * \version $Revision: 1.17 $
  */
 
 //-------------------------------------------------------------
@@ -166,7 +166,8 @@ public:
    */
   static Point inverse_map (const Elem* elem,
 			    const Point& p,
-			    const Real tolerance = TOLERANCE);
+			    const Real tolerance = TOLERANCE,
+			    const bool secure = true);
   
   /**
    * This is at the core of this class. Use this for each
@@ -294,7 +295,7 @@ private:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.16 $
+ * \version $Revision: 1.17 $
  */
 
 //-------------------------------------------------------------
@@ -319,7 +320,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.16 $
+ * \version $Revision: 1.17 $
  */
 
 //-------------------------------------------------------------
@@ -344,7 +345,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.16 $
+ * \version $Revision: 1.17 $
  */
 
 //-------------------------------------------------------------

@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.16 2003-04-07 18:34:49 benkirk Exp $
+// $Id: fe_interface.C,v 1.17 2003-04-18 15:46:22 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -507,12 +507,13 @@ Point FEInterface::inverse_map (const unsigned int dim,
 				const FEType& fe_t,
 				const Elem* elem,
 				const Point& p,
-				const Real tolerance)
+				const Real tolerance,
+				const bool secure)
 {
 #ifdef ENABLE_INFINITE_ELEMENTS
 
   if ( is_InfFE_elem(elem->type()) )
-    return ifem_inverse_map(dim, fe_t, elem, p, tolerance);
+    return ifem_inverse_map(dim, fe_t, elem, p, tolerance, secure);
 
 #endif
 
@@ -524,13 +525,13 @@ Point FEInterface::inverse_map (const unsigned int dim,
 	switch (fe_t.family)
 	  {
 	  case HIERARCHIC:
-	    return FE<1,HIERARCHIC>::inverse_map(elem, p, tolerance);
+	    return FE<1,HIERARCHIC>::inverse_map(elem, p, tolerance, secure);
 	    
 	  case LAGRANGE:
-	    return FE<1,LAGRANGE>::inverse_map(elem, p, tolerance);
+	    return FE<1,LAGRANGE>::inverse_map(elem, p, tolerance, secure);
 	    
 	  case MONOMIAL:
-	    return FE<1,MONOMIAL>::inverse_map(elem, p, tolerance);
+	    return FE<1,MONOMIAL>::inverse_map(elem, p, tolerance, secure);
 
 	  default:
 	    error();
@@ -544,13 +545,13 @@ Point FEInterface::inverse_map (const unsigned int dim,
 	switch (fe_t.family)
 	  {
 	  case HIERARCHIC:
-	    return FE<2,HIERARCHIC>::inverse_map(elem, p, tolerance);
+	    return FE<2,HIERARCHIC>::inverse_map(elem, p, tolerance, secure);
 	    
 	  case LAGRANGE:
-	    return FE<2,LAGRANGE>::inverse_map(elem, p, tolerance);
+	    return FE<2,LAGRANGE>::inverse_map(elem, p, tolerance, secure);
 	    
 	  case MONOMIAL:
-	    return FE<2,MONOMIAL>::inverse_map(elem, p, tolerance);
+	    return FE<2,MONOMIAL>::inverse_map(elem, p, tolerance, secure);
 
 	  default:
 	    error();
@@ -564,13 +565,13 @@ Point FEInterface::inverse_map (const unsigned int dim,
 	switch (fe_t.family)
 	  {
 	  case HIERARCHIC:
-	    return FE<3,HIERARCHIC>::inverse_map(elem, p, tolerance);
+	    return FE<3,HIERARCHIC>::inverse_map(elem, p, tolerance, secure);
 	    
 	  case LAGRANGE:
-	    return FE<3,LAGRANGE>::inverse_map(elem, p, tolerance);
+	    return FE<3,LAGRANGE>::inverse_map(elem, p, tolerance, secure);
 	    
 	  case MONOMIAL:
-	    return FE<3,MONOMIAL>::inverse_map(elem, p, tolerance);
+	    return FE<3,MONOMIAL>::inverse_map(elem, p, tolerance, secure);
 
 	  default:
 	    error();
