@@ -1,4 +1,4 @@
-// $Id: fe_szabab_shape_2D.C,v 1.1 2004-01-09 19:33:22 spetersen Exp $
+// $Id: fe_szabab_shape_2D.C,v 1.2 2004-02-08 20:52:45 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -30,6 +30,19 @@
 
 #include "fe.h"
 #include "elem.h"
+
+
+// Anonymous namespace to hold static sqrt values
+namespace
+{
+  static const Real sqrt2  = sqrt(2.);
+  static const Real sqrt6  = sqrt(6.);
+  static const Real sqrt10 = sqrt(10.);
+  static const Real sqrt14 = sqrt(14.);
+  static const Real sqrt22 = sqrt(22.);
+  static const Real sqrt26 = sqrt(26.);
+}
+
 
 template <>
 Real FE<2,SZABAB>::shape(const ElemType,
@@ -81,9 +94,9 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 		case 1: return l2;		  
 		case 2: return l3;
 		  
-		case 3: return l1*l2*(-4.*sqrt(6.));			  
-		case 4: return l2*l3*(-4.*sqrt(6.));		  
-		case 5: return l3*l1*(-4.*sqrt(6.));	
+		case 3: return l1*l2*(-4.*sqrt6);			  
+		case 4: return l2*l3*(-4.*sqrt6);		  
+		case 5: return l3*l1*(-4.*sqrt6);	
 		  
 		default:
 		  error();
@@ -148,14 +161,14 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 		case 2: return l3;
 		  
 		  //side modes
-		case 3: return   l1*l2*(-4.*sqrt(6.));			  
-		case 4: return f*l1*l2*(-4.*sqrt(10.))*(l2-l1);
+		case 3: return   l1*l2*(-4.*sqrt6);			  
+		case 4: return f*l1*l2*(-4.*sqrt10)*(l2-l1);
 
-		case 5: return   l2*l3*(-4.*sqrt(6.));		  
-		case 6: return f*l2*l3*(-4.*sqrt(10.))*(l3-l2);
+		case 5: return   l2*l3*(-4.*sqrt6);		  
+		case 6: return f*l2*l3*(-4.*sqrt10)*(l3-l2);
 	  
-		case 7: return   l3*l1*(-4.*sqrt(6.));
-		case 8: return f*l3*l1*(-4.*sqrt(10.))*(l1-l3);	
+		case 7: return   l3*l1*(-4.*sqrt6);
+		case 8: return f*l3*l1*(-4.*sqrt10)*(l1-l3);	
 		
 		  //internal modes
 		case 9: return l1*l2*l3;
@@ -244,17 +257,17 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 		case  2: return l3;
 		  
 		  //side modes
-		case  3: return   l1*l2*(-4.*sqrt(6.));			  
-		case  4: return f*l1*l2*(-4.*sqrt(10.))*(l2-l1);
-		case  5: return   l1*l2*(-sqrt(14.))*(5.*pow(l2-l1,2)-1);		  
+		case  3: return   l1*l2*(-4.*sqrt6);			  
+		case  4: return f*l1*l2*(-4.*sqrt10)*(l2-l1);
+		case  5: return   l1*l2*(-sqrt14)*(5.*pow(l2-l1,2)-1);		  
 		  
-		case  6: return   l2*l3*(-4.*sqrt(6.));	
-		case  7: return f*l2*l3*(-4.*sqrt(10.))*(l3-l2);	  
-		case  8: return   l2*l3*(-sqrt(14.))*(5.*pow(l3-l2,2)-1);	  
+		case  6: return   l2*l3*(-4.*sqrt6);	
+		case  7: return f*l2*l3*(-4.*sqrt10)*(l3-l2);	  
+		case  8: return   l2*l3*(-sqrt14)*(5.*pow(l3-l2,2)-1);	  
 		  
-		case  9: return   l3*l1*(-4.*sqrt(6.));		  
-		case 10: return f*l3*l1*(-4.*sqrt(10.))*(l1-l3);		
-		case 11: return   l3*l1*(-sqrt(14.))*(5.*pow(l1-l3,2)-1);
+		case  9: return   l3*l1*(-4.*sqrt6);		  
+		case 10: return f*l3*l1*(-4.*sqrt10)*(l1-l3);		
+		case 11: return   l3*l1*(-sqrt14)*(5.*pow(l1-l3,2)-1);
 		  
 		  //internal modes
 		case 12: return l1*l2*l3;
@@ -345,20 +358,20 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 		case  2: return l3;
 		  
 		  //side modes
-		case  3: return   l1*l2*(-4.*sqrt(6.));			  
-		case  4: return f*l1*l2*(-4.*sqrt(10.))*(l2-l1);	
-		case  5: return   l1*l2*(-sqrt(14.))*(5.*pow(l2-l1,2)-1.);		  
-		case  6: return f*l1*l2*(-sqrt(2.))*(21.*pow(l2-l1,3)-9.*(l2-l1));		  
+		case  3: return   l1*l2*(-4.*sqrt6);			  
+		case  4: return f*l1*l2*(-4.*sqrt10)*(l2-l1);	
+		case  5: return   l1*l2*(-sqrt14)*(5.*pow(l2-l1,2)-1.);		  
+		case  6: return f*l1*l2*(-sqrt2)*(21.*pow(l2-l1,3)-9.*(l2-l1));		  
 	  
-		case  7: return   l2*l3*(-4.*sqrt(6.));
-		case  8: return f*l2*l3*(-4.*sqrt(10.))*(l3-l2);	  
-		case  9: return   l2*l3*(-sqrt(14.))*(5.*pow(l3-l2,2)-1.);	  
-		case 10: return f*l2*l3*(-sqrt(2.))*(21.*pow(l3-l2,3)-9.*(l3-l2));	  
+		case  7: return   l2*l3*(-4.*sqrt6);
+		case  8: return f*l2*l3*(-4.*sqrt10)*(l3-l2);	  
+		case  9: return   l2*l3*(-sqrt14)*(5.*pow(l3-l2,2)-1.);	  
+		case 10: return f*l2*l3*(-sqrt2)*(21.*pow(l3-l2,3)-9.*(l3-l2));	  
 		  
-		case 11: return   l3*l1*(-4.*sqrt(6.));		  
-		case 12: return f*l3*l1*(-4.*sqrt(10.))*(l1-l3);  
-		case 13: return   l3*l1*(-sqrt(14.))*(5.*pow(l1-l3,2)-1.);		  
-		case 14: return f*l3*l1*(-sqrt(2.))*(21.*pow(l1-l3,3)-9.*(l1-l3));
+		case 11: return   l3*l1*(-4.*sqrt6);		  
+		case 12: return f*l3*l1*(-4.*sqrt10)*(l1-l3);  
+		case 13: return   l3*l1*(-sqrt14)*(5.*pow(l1-l3,2)-1.);		  
+		case 14: return f*l3*l1*(-sqrt2)*(21.*pow(l1-l3,3)-9.*(l1-l3));
 		  
 		  //internal modes
 		case 15: return l1*l2*l3;
@@ -457,23 +470,23 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 		case  2: return l3;
 		  
 		  //side modes
-		case  3: return   l1*l2*(-4.*sqrt(6.));
-		case  4: return f*l1*l2*(-4.*sqrt(10.))*(l2-l1);		  
-		case  5: return   l1*l2*(-sqrt(14.))*(5.*pow(l2-l1,2)-1.);		  
-		case  6: return f*l1*l2*(-sqrt(2.))*(21.*pow(l2-l1,3)-9.*(l2-l1));		  
-		case  7: return   l1*l2*(-sqrt(22.))*(10.5*pow(l2-l1,4)-7.*pow(l2-l1,2)+0.5);
+		case  3: return   l1*l2*(-4.*sqrt6);
+		case  4: return f*l1*l2*(-4.*sqrt10)*(l2-l1);		  
+		case  5: return   l1*l2*(-sqrt14)*(5.*pow(l2-l1,2)-1.);		  
+		case  6: return f*l1*l2*(-sqrt2)*(21.*pow(l2-l1,3)-9.*(l2-l1));		  
+		case  7: return   l1*l2*(-sqrt22)*(10.5*pow(l2-l1,4)-7.*pow(l2-l1,2)+0.5);
 			  
-		case  8: return   l2*l3*(-4.*sqrt(6.));
-		case  9: return f*l2*l3*(-4.*sqrt(10.))*(l3-l2);	  
-		case 10: return   l2*l3*(-sqrt(14.))*(5.*pow(l3-l2,2)-1.);	  
-		case 11: return f*l2*l3*(-sqrt(2.))*(21.*pow(l3-l2,3)-9.*(l3-l2));	  
-		case 12: return   l2*l3*(-sqrt(22.))*(10.5*pow(l3-l2,4)-7.*pow(l3-l2,2)+0.5);
+		case  8: return   l2*l3*(-4.*sqrt6);
+		case  9: return f*l2*l3*(-4.*sqrt10)*(l3-l2);	  
+		case 10: return   l2*l3*(-sqrt14)*(5.*pow(l3-l2,2)-1.);	  
+		case 11: return f*l2*l3*(-sqrt2)*(21.*pow(l3-l2,3)-9.*(l3-l2));	  
+		case 12: return   l2*l3*(-sqrt22)*(10.5*pow(l3-l2,4)-7.*pow(l3-l2,2)+0.5);
 		  
-		case 13: return   l3*l1*(-4.*sqrt(6.));
-		case 14: return f*l3*l1*(-4.*sqrt(10.))*(l1-l3);
-		case 15: return   l3*l1*(-sqrt(14.))*(5.*pow(l1-l3,2)-1.);		  
-		case 16: return f*l3*l1*(-sqrt(2.))*(21.*pow(l1-l3,3)-9.*(l1-l3));		  
-		case 17: return   l3*l1*(-sqrt(22.))*(10.5*pow(l1-l3,4)-7.*pow(l1-l3,2)+0.5);
+		case 13: return   l3*l1*(-4.*sqrt6);
+		case 14: return f*l3*l1*(-4.*sqrt10)*(l1-l3);
+		case 15: return   l3*l1*(-sqrt14)*(5.*pow(l1-l3,2)-1.);		  
+		case 16: return f*l3*l1*(-sqrt2)*(21.*pow(l1-l3,3)-9.*(l1-l3));		  
+		case 17: return   l3*l1*(-sqrt22)*(10.5*pow(l1-l3,4)-7.*pow(l1-l3,2)+0.5);
 		  
 		  
 		  //internal modes
@@ -579,26 +592,26 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 		case  2: return l3;
 		  
 		  //side modes
-		case  3: return   l1*l2*(-4.*sqrt(6.));
-		case  4: return f*l1*l2*(-4.*sqrt(10.))*(l2-l1);		  
-		case  5: return   l1*l2*(-sqrt(14.))*(5.*pow(l2-l1,2)-1.);		  
-		case  6: return f*l1*l2*(-sqrt(2.))*(21.*pow(l2-l1,3)-9.*(l2-l1));		  
-		case  7: return   l1*l2*(-sqrt(22.))*(10.5*pow(l2-l1,4)-7.*pow(l2-l1,2)+0.5);
-		case  8: return f*l1*l2*(-sqrt(26.))*(16.5*pow(l2-l1,5)-15.*pow(l2-l1,3)+2.5*(l2-l1));
+		case  3: return   l1*l2*(-4.*sqrt6);
+		case  4: return f*l1*l2*(-4.*sqrt10)*(l2-l1);		  
+		case  5: return   l1*l2*(-sqrt14)*(5.*pow(l2-l1,2)-1.);		  
+		case  6: return f*l1*l2*(-sqrt2)*(21.*pow(l2-l1,3)-9.*(l2-l1));		  
+		case  7: return   l1*l2*(-sqrt22)*(10.5*pow(l2-l1,4)-7.*pow(l2-l1,2)+0.5);
+		case  8: return f*l1*l2*(-sqrt26)*(16.5*pow(l2-l1,5)-15.*pow(l2-l1,3)+2.5*(l2-l1));
 			  
-		case  9: return   l2*l3*(-4.*sqrt(6.));
-		case 10: return f*l2*l3*(-4.*sqrt(10.))*(l3-l2);	  
-		case 11: return   l2*l3*(-sqrt(14.))*(5.*pow(l3-l2,2)-1.);	  
-		case 12: return f*l2*l3*(-sqrt(2.))*(21.*pow(l3-l2,3)-9.*(l3-l2));	  
-		case 13: return   l2*l3*(-sqrt(22.))*(10.5*pow(l3-l2,4)-7.*pow(l3-l2,2)+0.5);
-		case 14: return f*l2*l3*(-sqrt(26.))*(16.5*pow(l3-l2,5)-15.*pow(l3-l2,3)+2.5*(l3-l2));
+		case  9: return   l2*l3*(-4.*sqrt6);
+		case 10: return f*l2*l3*(-4.*sqrt10)*(l3-l2);	  
+		case 11: return   l2*l3*(-sqrt14)*(5.*pow(l3-l2,2)-1.);	  
+		case 12: return f*l2*l3*(-sqrt2)*(21.*pow(l3-l2,3)-9.*(l3-l2));	  
+		case 13: return   l2*l3*(-sqrt22)*(10.5*pow(l3-l2,4)-7.*pow(l3-l2,2)+0.5);
+		case 14: return f*l2*l3*(-sqrt26)*(16.5*pow(l3-l2,5)-15.*pow(l3-l2,3)+2.5*(l3-l2));
 		  
-		case 15: return   l3*l1*(-4.*sqrt(6.));
-		case 16: return f*l3*l1*(-4.*sqrt(10.))*(l1-l3);
-		case 17: return   l3*l1*(-sqrt(14.))*(5.*pow(l1-l3,2)-1.);		  
-		case 18: return f*l3*l1*(-sqrt(2.))*(21.*pow(l1-l3,3)-9.*(l1-l3));		  
-		case 19: return   l3*l1*(-sqrt(22.))*(10.5*pow(l1-l3,4)-7.*pow(l1-l3,2)+0.5);
-		case 20: return f*l3*l1*(-sqrt(26.))*(16.5*pow(l1-l3,5)-15.*pow(l1-l3,3)+2.5*(l1-l3));
+		case 15: return   l3*l1*(-4.*sqrt6);
+		case 16: return f*l3*l1*(-4.*sqrt10)*(l1-l3);
+		case 17: return   l3*l1*(-sqrt14)*(5.*pow(l1-l3,2)-1.);		  
+		case 18: return f*l3*l1*(-sqrt2)*(21.*pow(l1-l3,3)-9.*(l1-l3));		  
+		case 19: return   l3*l1*(-sqrt22)*(10.5*pow(l1-l3,4)-7.*pow(l1-l3,2)+0.5);
+		case 20: return f*l3*l1*(-sqrt26)*(16.5*pow(l1-l3,5)-15.*pow(l1-l3,3)+2.5*(l1-l3));
 		  
 		  //internal modes
 		case 21: return l1*l2*l3;
