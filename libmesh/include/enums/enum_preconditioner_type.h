@@ -1,4 +1,4 @@
-// $Id: enum_preconditioner_type.h,v 1.3 2004-08-20 13:56:27 jwpeterson Exp $
+// $Id: enum_preconditioner_type.h,v 1.4 2004-10-14 22:02:47 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -54,6 +54,7 @@ namespace libMeshEnums {
 			   ILU_PRECOND,
 			   LU_PRECOND,
 			   USER_PRECOND,
+			   SHELL_PRECOND,
 			   
 			   INVALID_PRECONDITIONER};
 }
