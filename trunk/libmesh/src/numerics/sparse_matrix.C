@@ -1,4 +1,4 @@
-// $Id: sparse_matrix.C,v 1.7 2003-04-09 01:20:25 benkirk Exp $
+// $Id: sparse_matrix.C,v 1.8 2003-04-09 02:30:28 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,7 +26,7 @@
 #include "sparse_matrix.h"
 #include "laspack_matrix.h"
 #include "petsc_matrix.h"
-
+#include "libmesh.h"
 
 
 //------------------------------------------------------------------

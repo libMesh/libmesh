@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.22 2003-04-02 14:55:02 benkirk Exp $
+// $Id: dof_map.h,v 1.23 2003-04-09 02:30:14 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -79,7 +79,7 @@ public:
   /**
    * Additional matrices may be handled with this \p DofMap.
    * They are initialized to the same sparsity structure as
-   * the mayor matrix.
+   * the major matrix.
    */
   void attach_other_matrix (std::pair<std::string, SparseMatrix<Number>*> _new);
 
