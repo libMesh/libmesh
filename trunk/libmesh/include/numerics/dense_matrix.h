@@ -1,4 +1,4 @@
-// $Id: dense_matrix.h,v 1.4 2004-02-22 21:47:58 jwpeterson Exp $
+// $Id: dense_matrix.h,v 1.5 2004-02-27 13:30:18 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -24,6 +24,7 @@
 
 // C++ includes
 #include <vector>
+#include <algorithm>
 
 // Local Includes
 #include "libmesh_common.h"
@@ -328,6 +329,7 @@ void DenseMatrix<T>::resize(const unsigned int m,
   this->_m = m;
   this->_n = n;
 
+  _decomposition_type = NONE;
   this->zero();
 }
 
@@ -337,8 +339,9 @@ template<typename T>
 inline
 void DenseMatrix<T>::zero()
 {
-  for (unsigned int i=0; i<_val.size(); i++)
-    _val[i] = 0.;
+  _decomposition_type = NONE;
+
+  std::fill (_val.begin(), _val.end(), libMesh::zero);
 }
 
 
@@ -350,8 +353,9 @@ DenseMatrix<T>& DenseMatrix<T>::operator = (const DenseMatrix<T>& other_matrix)
   this->_m = other_matrix._m;
   this->_n = other_matrix._n;
 
-  _val   = other_matrix._val;
-  
+  _val                = other_matrix._val;
+  _decomposition_type = other_matrix._decomposition_type;
+
   return *this;
 }
 
