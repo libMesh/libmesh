@@ -1,4 +1,4 @@
-// $Id: unv_io.C,v 1.7 2004-08-09 17:34:58 jwpeterson Exp $
+// $Id: unv_io.C,v 1.8 2004-10-16 03:48:36 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -391,13 +391,14 @@ void UNVIO::count_nodes (std::istream& in_file)
   // line does not contain a "D", then the
   // other lines won't, too.
   {
-#ifdef __HP_aCC
-    // Use an "int" instead of unsigned int,
-    // otherwise HP aCC may crash!
-    const int position          = data.find("D",6);
-#else
-    const unsigned int position = data.find("D",6);
-#endif
+// #ifdef __HP_aCC
+//     // Use an "int" instead of unsigned int,
+//     // otherwise HP aCC may crash!
+//     const int position          = data.find("D",6);
+// #else
+//     const unsigned int position = data.find("D",6);
+// #endif
+    std::string::size_type position = data.find("D",6);
 
     if (position!=std::string::npos) // npos means no position
       {
