@@ -1,4 +1,4 @@
-// $Id: tree.C,v 1.8 2004-01-03 15:37:44 benkirk Exp $
+// $Id: tree.C,v 1.9 2004-03-22 22:41:46 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -29,7 +29,7 @@
 // ------------------------------------------------------------
 // Tree class method
 template <unsigned int N>
-Elem* Tree<N>::find_element(const Point& p) const
+const Elem* Tree<N>::find_element(const Point& p) const
 {
   return root.find_element(p);
 }

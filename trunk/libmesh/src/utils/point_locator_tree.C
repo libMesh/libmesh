@@ -1,4 +1,4 @@
-// $Id: point_locator_tree.C,v 1.4 2004-03-21 07:23:00 jwpeterson Exp $
+// $Id: point_locator_tree.C,v 1.5 2004-03-22 22:41:46 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -21,12 +21,12 @@
 
 // C++ includes
 
-
 // Local Includes
 #include "point_locator_tree.h"
 #include "mesh.h"
 #include "point.h"
 #include "tree_base.h"
+#include "tree.h"
 #include "elem.h"
 
 
@@ -36,11 +36,11 @@
 // PointLocator methods
 PointLocatorTree::PointLocatorTree (const Mesh& mesh,
 				    const PointLocatorBase* master) :
-  PointLocatorBase (mesh, 
-		    master),
+  PointLocatorBase (mesh,master),
   _tree            (NULL),
   _element         (NULL)
 {
+  this->init();
 }
 
 
@@ -88,51 +88,42 @@ void PointLocatorTree::init ()
 
       if (this->_master == NULL)
         {
-	  /*
-	   * We are the master, so we have to build the tree
-	   */
-
-	  switch (this->_mesh.mesh_dimension())
+	  // We are the master, so we have to build the tree
+	  switch (this->_mesh.spatial_dimension())
 	    { 
 	    case 2:
 	      {
 //TODO: What to do with the level of the tree?
-		AutoPtr<TreeBase> ap(TreeBase::build(4, 
-						     this->_mesh, 
-						     100));
-		_tree = ap.release();
+		
+		_tree = new Trees::QuadTree (this->_mesh, 20,
+					     Trees::QuadTree::ELEMENTS);
 		break;
 	      }
 
 	    case 3:
 	      {
-		AutoPtr<TreeBase> ap(TreeBase::build(8, 
-						     this->_mesh, 
-						     100));
-		_tree = ap.release();
+		_tree = new Trees::OctTree (this->_mesh, 20,
+					    Trees::OctTree::ELEMENTS);
 		break;
 	      }
 
 	    default:
 	      {
 		std::cerr << "ERROR: Bad dimension = " 
-			  << this->_mesh.mesh_dimension() 
+			  << this->_mesh.spatial_dimension() 
 			  << std::endl;
 		error();
 	      }
 	    }	
-
 	}
 
       else
 	  
         {
-	  /*
-	   * We are _not_ the master.  Let our Tree point to
-	   * the master's tree.  But for this we first transform
-	   * the master in a state for which we are friends.
-	   * And make sure the master @e has a tree!
-	   */
+	  // We are _not_ the master.  Let our Tree point to
+	  // the master's tree.  But for this we first transform
+	  // the master in a state for which we are friends.
+	  // And make sure the master @e has a tree!
 	  const PointLocatorTree* my_master =
 	    dynamic_cast<const PointLocatorTree*>(this->_master);
 
@@ -147,16 +138,13 @@ void PointLocatorTree::init ()
         }
 
 
-      /*
-       * Not all PointLocators may own a tree, but all of them
-       * use their own element pointer.  Let the element pointer
-       * be unique for every interpolator.
-       * Suppose the interpolators are used concurrently
-       * at different locations in the mesh, then it makes quite
-       * sense to have unique start elements.
-       */
+      // Not all PointLocators may own a tree, but all of them
+      // use their own element pointer.  Let the element pointer
+      // be unique for every interpolator.
+      // Suppose the interpolators are used concurrently
+      // at different locations in the mesh, then it makes quite
+      // sense to have unique start elements.
       this->_element = this->_mesh.elem(0);
-
     }
 
 
@@ -171,10 +159,8 @@ void PointLocatorTree::init ()
 const Elem* PointLocatorTree::operator() (const Point& p) const
 {
   assert (this->_initialized);
-
-  /*
-   * Check first the element from last time before asking the tree
-   */
+  
+  // First check the element from last time before asking the tree
   if (!(this->_element->contains_point(p)))
     {
 	// ask the tree
@@ -192,10 +178,7 @@ const Elem* PointLocatorTree::operator() (const Point& p) const
 	  }
     }
 
-  /*
-   * return the element
-   */
-
+  // return the element
   return this->_element;
 }
 

@@ -1,4 +1,4 @@
-// $Id: tree_node.h,v 1.3 2004-03-08 02:10:04 benkirk Exp $
+// $Id: tree_node.h,v 1.4 2004-03-22 22:41:46 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -41,12 +41,6 @@ template <unsigned int N>
 class TreeNode
 {  
 public:
-  
-
-  /**
-   * Dummy constructor.
-   */
-  //TreeNode () {}
 
 
   /**
@@ -55,7 +49,7 @@ public:
    * for the top-level (root) node.
    */
   TreeNode (const MeshBase& m, 
-	    const unsigned int l,	    
+	    const unsigned int tbs,	    
 	    const TreeNode<N> *p = NULL);
 
   /**
@@ -78,9 +72,14 @@ public:
   bool active() const { return children.empty(); }
 
   /**
-   * Inserts node number n into the TreeNode.
+   * Inserts \p Node \p nd into the TreeNode.
    */
-  void insert (const unsigned int n);
+  void insert (const Node* nd);
+
+  /**
+   * Inserts \p Elem \p el into the TreeNode.
+   */
+  void insert (const Elem* nd);
 
   /**
    * Refine the tree node into N children if it contains
@@ -97,8 +96,8 @@ public:
    * @returns true if this TreeNode (or its children) contain node n,
    * false otherwise.
    */
-  bool bounds_node (const unsigned int n) const { assert (n < mesh.n_nodes()); 
-  return bounds_point(mesh.point(n)); }
+  bool bounds_node (const Node* nd) const
+  { assert (nd != NULL); return bounds_point(*nd); }
 
   /**
    * @returns true if this TreeNode (or its children) contain point p,
@@ -126,29 +125,31 @@ public:
   /**
    * Transforms node numbers to element pointers.
    */
-  void transform_nodes_to_elements (std::vector<std::vector<unsigned int> >& 
+  void transform_nodes_to_elements (std::vector<std::vector<const Elem*> >& 
 				    nodes_to_elem);
 
   /**
-   * @returns 1 if the node is active, otherwise
-   * recursively calls this on the children.
+   * @returns the number of active bins below
+   * (including) this element.
    */
   unsigned int n_active_bins() const;
 
   /**
    * @returns an element containing point p.
    */
-  Elem* find_element(const Point& p) const;
+  const Elem* find_element (const Point& p) const;
+
   
 private:
+
   
   /**
-   *
+   * Look for point \p p in our children.
    */
-  Elem* find_element_in_children(const Point& p) const;
+  const Elem* find_element_in_children (const Point& p) const;
 
   /**
-   * Constructs the bounding box for child c.
+   * Constructs the bounding box for child \p c.
    */
   std::pair<Point, Point> create_bounding_box (const unsigned int c) const;
 
@@ -161,7 +162,7 @@ private:
    * The maximum number of things we should store before 
    * refining ourself.
    */
-  const unsigned int max_level;
+  const unsigned int tgt_bin_size;
 
   /**
    * Pointer to this node's parent.
@@ -184,12 +185,12 @@ private:
   /**
    * Pointers to the elements in this tree node.
    */
-  std::vector<Elem*> elements;
+  std::vector<const Elem*> elements;
 
   /**
    * The node numbers contained in this portion of the tree.
    */
-  std::vector<unsigned int> node_numbers;
+  std::vector<const Node*> nodes;
 
 };
 
@@ -199,24 +200,26 @@ private:
 
 // ------------------------------------------------------------
 // TreeNode class inline methods
-
-// constructor
 template <unsigned int N>
 inline
 TreeNode<N>::TreeNode (const MeshBase& m, 
-		       const unsigned int l,
+		       const unsigned int tbs,
 		       const TreeNode<N>* p) :
-  mesh(m),
-  max_level(l),
-  parent(p)
+  mesh         (m),
+  tgt_bin_size (tbs),
+  parent       (p)
 {
   // Assert our children are empty, thus we are active.
   assert (children.empty());
+  assert (this->active());
+  
+  // Reserve space for the nodes & elements
+  nodes.reserve    (tgt_bin_size);
+  elements.reserve (tgt_bin_size);
 }
 
 
 
-// destructor
 template <unsigned int N>
 inline
 TreeNode<N>::~TreeNode ()
@@ -226,32 +229,19 @@ TreeNode<N>::~TreeNode ()
   // All the way down the line...
   for (unsigned int c=0; c<children.size(); c++)
     delete children[c];
-
-  children.clear();
-  elements.clear();
 }
 
 
 
-// level
 template <unsigned int N>
 inline
 unsigned int TreeNode<N>::level () const 
 { 
-  if (parent == NULL)
-    return 0;
-  else
+  if (parent != NULL)
     return parent->level()+1;
 
-  // I have NO idea why error() doesn't work here for the Sun compiler!
-#ifndef __SUNPRO_CC
-  error();
-#else
-  here();
-  abort();
-#endif
-
-  return libMesh::invalid_uint;
+  // if we have no parent, we are a level-0 box
+  return 0;
 }
 
 

@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.24 2004-02-10 22:49:48 benkirk Exp $
+// $Id: fe_map.C,v 1.25 2004-03-22 22:41:46 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -847,7 +847,10 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
       here();
       std::cerr << "WARNING:  diff is "
 		<< diff.size()
-		<< std::endl;
+		<< std::endl
+		<< " point="; physical_point.print();
+      std::cerr << " local="; check.print();
+      std::cerr << " lref= "; p.print(); 
     }
   
 #endif

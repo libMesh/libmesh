@@ -1,4 +1,4 @@
-// $Id: tree_base.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: tree_base.h,v 1.3 2004-03-22 22:41:46 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -26,12 +26,13 @@
 
 // Local includes
 #include "reference_counted_object.h"
-#include "auto_ptr.h"
-#include "tree_node.h"
 
 
 // Forward Declarations
 class TreeBase;
+class MeshBase;
+class Point;
+class Elem;
 
 
 /**
@@ -59,14 +60,6 @@ public:
   virtual ~TreeBase() {}
 
   /**
-   * Builds a \p N -tree with \p level levels for the mesh \p m.
-   * Currently only \p QuadTree and \p OctTree supported.
-   */
-  static AutoPtr<TreeBase> build (const unsigned int N,
-				  const MeshBase& m,
-				  const unsigned int level);
-
-  /**
    * Prints the nodes.
    */
   virtual void print_nodes() const = 0;
@@ -76,7 +69,6 @@ public:
    */
   virtual void print_elements() const = 0;
   
-
   /**
    * @returns the number of active bins.
    */
@@ -85,7 +77,7 @@ public:
   /**
    * @returns a pointer to the element containing point p.
    */
-  virtual Elem* find_element(const Point& p) const = 0;
+  virtual const Elem* find_element(const Point& p) const = 0;
 
 protected:
 
@@ -106,7 +98,6 @@ inline
 TreeBase::TreeBase (const MeshBase& m) :
   mesh(m)
 {
-  assert (mesh.n_nodes());
 }
 
 
