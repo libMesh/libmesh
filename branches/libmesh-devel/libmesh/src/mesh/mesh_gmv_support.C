@@ -1,4 +1,4 @@
-// $Id: mesh_gmv_support.C,v 1.16.2.1 2003-05-06 00:10:11 benkirk Exp $
+// $Id: mesh_gmv_support.C,v 1.16.2.2 2003-05-06 14:00:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -32,7 +32,7 @@
 
 
 void MeshBase::write_gmv (const std::string& name,
-			  EquationSystemsBase& es,
+			  EquationSystems& es,
 			  const bool write_partitioning)
 {
   std::ofstream out(name.c_str());
@@ -43,7 +43,7 @@ void MeshBase::write_gmv (const std::string& name,
 
 
 void MeshBase::write_gmv (std::ostream& out,
-			  EquationSystemsBase& es,
+			  EquationSystems& es,
 			  const bool write_partitioning)
 {
   std::vector<Number> soln;
@@ -361,7 +361,7 @@ void MeshBase::write_gmv(std::ostream& out,
 
 
 void MeshBase::write_gmv_binary (const std::string& name,
-				 EquationSystemsBase& es,
+				 EquationSystems& es,
 				 const bool write_partitioning)
 {
   std::ofstream out(name.c_str());
@@ -372,7 +372,7 @@ void MeshBase::write_gmv_binary (const std::string& name,
 
 
 void MeshBase::write_gmv_binary (std::ostream& out,
-				 EquationSystemsBase& es,
+				 EquationSystems& es,
 				 const bool write_partitioning)
 {
   std::vector<Number> soln;

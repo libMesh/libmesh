@@ -1,6 +1,6 @@
 
 
-// $Id: mesh_base.C,v 1.28 2003-04-30 21:09:30 benkirk Exp $
+// $Id: mesh_base.C,v 1.28.2.1 2003-05-06 14:00:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -40,6 +40,7 @@
 #include "cell_inf_hex16.h"
 #include "cell_inf_hex18.h"
 #include "petsc_matrix.h"
+#include "mesh_logging.h"
 
 
 #ifdef HAVE_SFCURVES

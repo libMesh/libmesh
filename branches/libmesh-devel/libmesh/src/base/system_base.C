@@ -1,4 +1,4 @@
-// $Id: system_base.C,v 1.14.2.1 2003-05-05 23:55:28 benkirk Exp $
+// $Id: system_base.C,v 1.14.2.2 2003-05-06 14:00:47 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -27,14 +27,15 @@
 
 // Local includes
 #include "system_base.h"
-#include "mesh.h"
+#include "equation_systems.h"
 #include "libmesh.h"
+#include "mesh.h"
 #include "sparse_matrix.h"
 #include "numeric_vector.h"
 #include "linear_solver_interface.h"
 
 
-// typedef
+// typedefs
 typedef std::map<std::string, SparseMatrix<Number>* >::iterator        other_matrices_iterator;
 typedef std::map<std::string, SparseMatrix<Number>* >::const_iterator  other_matrices_const_iterator;
 typedef std::map<std::string, NumericVector<Number>* >::iterator       other_vectors_iterator;
@@ -43,14 +44,13 @@ typedef std::map<std::string, NumericVector<Number>* >::const_iterator other_vec
 
 // ------------------------------------------------------------
 // SystemBase implementation
-
-SystemBase::SystemBase (const Mesh& mesh,
-			const std::string&  name,
-			const unsigned int  number) :
+SystemBase::SystemBase (EquationSystems& es,
+			const std::string& name,
+			const unsigned int number) :
   
   solution                (NumericVector<Number>::build()),
   rhs                     (NumericVector<Number>::build()),
-  matrix                  (SparseMatrix<Number>::build ()),
+  matrix                  (SparseMatrix<Number>::build()),
   linear_solver_interface (LinearSolverInterface<Number>::build()),
   _sys_name               (name),
   _sys_number             (number),
@@ -58,7 +58,8 @@ SystemBase::SystemBase (const Mesh& mesh,
   _can_add_matrices       (true),
   _can_add_vectors        (true),
   _dof_map                (number),
-  _mesh                   (mesh)
+  _equation_systems       (es),
+  _mesh                   (es.get_mesh())
 {
 }
 
@@ -123,28 +124,28 @@ void SystemBase::clear ()
 
 void SystemBase::init ()
 {
-  assert (_mesh.is_prepared());
-  
+  // Distribute the degrees of freedom on the mesh
   _dof_map.distribute_dofs (_mesh);
 
 #ifdef ENABLE_AMR
 
+  // Recreate any hanging node constraints
   _dof_map.create_dof_constraints(_mesh);
 
 #endif
 
-  solution->init (n_dofs(), n_local_dofs());
-
-  rhs->init      (n_dofs(), n_local_dofs());
+  // Resize the solution & RHS conformal to the current mesh
+  solution->init (this->n_dofs(), this->n_local_dofs());
+  rhs->init      (this->n_dofs(), this->n_local_dofs());
 
   // from now on, no chance to add additional vectors
   _can_add_vectors=false;
 
   // initialize & zero other vectors, if necessary
-  for(other_vectors_iterator pos = _other_vectors.begin();
-      pos != _other_vectors.end(); ++pos)
+  for (other_vectors_iterator pos = _other_vectors.begin();
+       pos != _other_vectors.end(); ++pos)
     {
-      pos->second->init (n_dofs(), n_local_dofs());
+      pos->second->init (this->n_dofs(), this->n_local_dofs());
       pos->second->zero ();
     }
 }
@@ -153,17 +154,18 @@ void SystemBase::init ()
 
 void SystemBase::reinit ()
 {
-  assert (_mesh.is_prepared());
-  
+  // Distribute the degrees of freedom on the mesh
   _dof_map.distribute_dofs (_mesh);
   
 #ifdef ENABLE_AMR
 
+  // Recreate any hanging node constraints
   _dof_map.create_dof_constraints(_mesh);
   
 #endif
 
-  rhs->init      (n_dofs(), n_local_dofs());
+  // Resize the RHS conformal to the current mesh
+  rhs->init      (this->n_dofs(), this->n_local_dofs());
 
   // Clear the matrices
   matrix->clear();
@@ -195,7 +197,6 @@ void SystemBase::assemble ()
       // information with the matrix during the
       // sparsity computation phase
       _dof_map.attach_matrix (*matrix.get());
-//      matrix->attach_dof_map (_dof_map);
 
       // Also tell the additional matrices about
       // the dof map, and vice versa
@@ -204,7 +205,6 @@ void SystemBase::assemble ()
 	if (!pos->second->initialized())
 	  {
 	    _dof_map.attach_other_matrix (*pos);
-//	    pos->second->attach_dof_map (_dof_map);
 	  }
 	else
 	  {
@@ -239,8 +239,8 @@ void SystemBase::assemble ()
   else
     {
       // Better check whether the other matrices are also initialized
-      for(other_matrices_const_iterator pos = _other_matrices.begin(); 
-	  pos != _other_matrices.end(); ++pos)
+      for (other_matrices_const_iterator pos = _other_matrices.begin(); 
+	   pos != _other_matrices.end(); ++pos)
 	if (!pos->second->initialized())
 	  {
 	    // theoretically, with the proper access tests in get_matrix(),
@@ -259,9 +259,9 @@ void SystemBase::assemble ()
   rhs->zero    ();
 
   // Clear the additional matrices
-  for(other_matrices_iterator pos = _other_matrices.begin(); 
-      pos != _other_matrices.end(); ++pos)
-        pos->second->zero ();
+  for (other_matrices_iterator pos = _other_matrices.begin(); 
+       pos != _other_matrices.end(); ++pos)
+    pos->second->zero ();
 
   // Now everything is set up and ready for matrix assembly
 }
@@ -334,8 +334,8 @@ bool SystemBase::compare (const SystemBase& other_system,
   else
     {
       // compare other vectors
-      for(other_vectors_const_iterator pos = _other_vectors.begin();
-	  pos != _other_vectors.end(); ++pos)
+      for (other_vectors_const_iterator pos = _other_vectors.begin();
+	   pos != _other_vectors.end(); ++pos)
         {
 	  if (verbose)
 	      std::cout << "   comparing vector \""
@@ -655,7 +655,9 @@ std::string SystemBase::get_info() const
   const std::string& sys_name = this->name();
       
   out << "   System \"" << sys_name << "\"" << std::endl
+      << "    Type \""  << this->system_type() << "\"" << std::endl
       << "    Variables=";
+  
   for (unsigned int vn=0; vn<this->n_vars(); vn++)
       out << "\"" << this->variable_name(vn) << "\" ";
      

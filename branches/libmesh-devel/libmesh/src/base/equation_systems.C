@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.34.2.2 2003-05-06 00:10:12 benkirk Exp $
+// $Id: equation_systems.C,v 1.34.2.3 2003-05-06 14:00:44 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -27,6 +27,8 @@
 #include "libmesh.h"
 #include "mesh.h"
 #include "system_base.h"
+#include "steady_system.h"
+#include "transient_system.h"
 
 // Forward Declarations
 
@@ -34,22 +36,22 @@
 
 
 // ------------------------------------------------------------
-// EquationSystemsBase class implementation
-EquationSystemsBase::EquationSystemsBase (const Mesh& m) :
+// EquationSystems class implementation
+EquationSystems::EquationSystems (const Mesh& m) :
   _mesh(m)
 {
 }
 
 
 
-EquationSystemsBase::~EquationSystemsBase ()
+EquationSystems::~EquationSystems ()
 {
   this->clear ();
 }
 
 
 
-void EquationSystemsBase::clear ()
+void EquationSystems::clear ()
 {
   _flags.clear ();
 
@@ -68,39 +70,7 @@ void EquationSystemsBase::clear ()
 
 
 
-const SystemBase& EquationSystemsBase::get_system (const std::string& name) const
-{
-  std::map<std::string, SystemBase*>::const_iterator pos = _systems.find(name);
-  
-  if (pos == _systems.end())
-    {
-      std::cerr << "ERROR: no system named " << name << " found!"
-		<< std::endl;
-      error();
-    }
-
-  return *(pos->second);
-}
-
-
-
-SystemBase& EquationSystemsBase::get_system (const std::string& name)
-{
-  std::map<std::string, SystemBase*>::iterator pos = _systems.find(name);
-  
-  if (pos == _systems.end())
-    {
-      std::cerr << "ERROR: no system named " << name << " found!"
-		<< std::endl;
-      error();
-    }
-
-  return *(pos->second);
-}
-
-
-
-void EquationSystemsBase::init ()
+void EquationSystems::init ()
 {
    const unsigned int n_sys = this->n_systems();
 
@@ -112,15 +82,15 @@ void EquationSystemsBase::init ()
    */
   {
     // All the nodes
-    node_iterator       node_it  (_mesh.nodes_begin());
-    const node_iterator node_end (_mesh.nodes_end());
+    const_node_iterator       node_it  (_mesh.nodes_begin());
+    const const_node_iterator node_end (_mesh.nodes_end());
     
     for ( ; node_it != node_end; ++node_it)
       (*node_it)->set_n_systems(n_sys);
     
     // All the elements
-    elem_iterator       elem_it (_mesh.elements_begin());
-    const elem_iterator elem_end(_mesh.elements_end());
+    const_elem_iterator       elem_it (_mesh.elements_begin());
+    const const_elem_iterator elem_end(_mesh.elements_end());
     
     for ( ; elem_it != elem_end; ++elem_it)
       (*elem_it)->set_n_systems(n_sys);
@@ -140,7 +110,7 @@ void EquationSystemsBase::init ()
 
 
 
-void EquationSystemsBase::reinit ()
+void EquationSystems::reinit ()
 {
  const unsigned int n_sys = this->n_systems();
 
@@ -152,15 +122,15 @@ void EquationSystemsBase::reinit ()
    */
   {
     // All the nodes
-    node_iterator       node_it  (_mesh.nodes_begin());
-    const node_iterator node_end (_mesh.nodes_end());
+    const_node_iterator       node_it  (_mesh.nodes_begin());
+    const const_node_iterator node_end (_mesh.nodes_end());
     
     for ( ; node_it != node_end; ++node_it)
       (*node_it)->set_n_systems(n_sys);
     
     // All the elements
-    elem_iterator       elem_it (_mesh.elements_begin());
-    const elem_iterator elem_end(_mesh.elements_end());
+    const_elem_iterator       elem_it (_mesh.elements_begin());
+    const const_elem_iterator elem_end(_mesh.elements_end());
     
     for ( ; elem_it != elem_end; ++elem_it)
       (*elem_it)->set_n_systems(n_sys);
@@ -180,7 +150,73 @@ void EquationSystemsBase::reinit ()
 
 
 
-void EquationSystemsBase::delete_system (const std::string& name)
+void EquationSystems::add_system (const std::string& sys_type,
+				  const std::string& name)
+{
+  if      (sys_type == "Steady")
+    this->add_system<SteadySystem> (name);
+
+  else if (sys_type == "Transient")
+    this->add_system<TransientSystem> (name);
+
+  else
+    {
+      std::cerr << "ERROR: Unknown system type: "
+		<< sys_type
+		<< std::endl;
+    }
+}
+
+
+
+template <typename T_sys>
+void EquationSystems::add_system (const std::string& name)
+{
+  if (!_systems.count(name))
+    {
+      const unsigned int num = this->n_systems();
+
+      _systems.insert (std::pair<std::string, SystemBase*>(name,
+							   new T_sys(*this,
+								     name,
+								     num)
+							   )
+		       );
+      
+    }
+  else
+    {
+      std::cerr << "ERROR: There was already a system"
+		<< " named " << name
+		<< std::endl;
+
+      error();
+    }
+
+  
+  /**
+   * Tell all the \p DofObject entities to add a system.
+   */
+  {
+    // All the nodes
+    const_node_iterator       node_it  (_mesh.nodes_begin());
+    const const_node_iterator node_end (_mesh.nodes_end());
+    
+    for ( ; node_it != node_end; ++node_it)
+      (*node_it)->add_system();
+    
+    // All the elements
+    const_elem_iterator       elem_it (_mesh.elements_begin());
+    const const_elem_iterator elem_end(_mesh.elements_end());
+    
+    for ( ; elem_it != elem_end; ++elem_it)
+      (*elem_it)->add_system();
+  }
+}
+
+
+
+void EquationSystems::delete_system (const std::string& name)
 {
   if (!_systems.count(name))
     {
@@ -197,8 +233,100 @@ void EquationSystemsBase::delete_system (const std::string& name)
 
 
 
+const SystemBase& EquationSystems::get_system (const std::string& name) const
+{
+  return this->get_system<SystemBase> (name);
+}
 
-void EquationSystemsBase::build_variable_names (std::vector<std::string>& var_names) const
+
+
+SystemBase& EquationSystems::get_system (const std::string& name)
+{
+  return this->get_system<SystemBase> (name);
+}
+
+
+
+
+SystemBase & EquationSystems::operator () (const std::string& name)
+{
+  std::map<std::string, SystemBase*>::iterator
+    pos = _systems.find(name);
+   
+  if (pos == _systems.end())
+    {
+      std::cerr << "ERROR: system "
+                << name
+                << " not found!"
+                << std::endl;
+ 
+      error();
+    }
+ 
+  return *(pos->second);
+}
+  
+ 
+ 
+const SystemBase & EquationSystems::operator () (const std::string& name) const
+{
+  std::map<std::string, SystemBase*>::const_iterator
+    pos = _systems.find(name);
+   
+  if (pos == _systems.end())
+    {
+      std::cerr << "ERROR: system "
+                << name
+                << " not found!"
+                << std::endl;
+ 
+      error();
+    }
+ 
+  return *(pos->second);
+}
+  
+ 
+ 
+SystemBase & EquationSystems::operator () (const unsigned int num)
+{
+  assert (num < this->n_systems());
+ 
+  std::map<std::string, SystemBase*>::iterator
+    pos = _systems.begin();
+   
+  // New code
+#if (__GNUC__ == 2)
+  std::advance (pos, static_cast<int>(num));
+#else
+  std::advance (pos, num);
+#endif
+                                                                                
+  return *(pos->second);
+}
+                                                                                
+                                                                                
+                                                                                
+const SystemBase & EquationSystems::operator ()  (const unsigned int num) const
+{
+  assert (num < this->n_systems());
+                                                                                
+  std::map<std::string, SystemBase*>::const_iterator
+    pos = _systems.begin();
+
+  // New code
+#if (__GNUC__ == 2)
+  std::advance (pos, static_cast<int>(num));
+#else
+  std::advance (pos, num);
+#endif
+                                                                                
+  return *(pos->second);
+}
+
+ 
+ 
+void EquationSystems::build_variable_names (std::vector<std::string>& var_names) const
 {
   assert (n_systems());
   
@@ -218,7 +346,7 @@ void EquationSystemsBase::build_variable_names (std::vector<std::string>& var_na
 
 
 
-void EquationSystemsBase::build_solution_vector (std::vector<Number>& soln,
+void EquationSystems::build_solution_vector (std::vector<Number>& soln,
 						 std::string& system_name,
 						 std::string& variable_name) const
 {
@@ -258,8 +386,8 @@ void EquationSystemsBase::build_solution_vector (std::vector<Number>& soln,
   const FEType& fe_type    = system.variable_type(variable_num);
 
   // Define iterators to iterate over all the elements of the mesh
-  active_elem_iterator       it (_mesh.elements_begin());
-  const active_elem_iterator end(_mesh.elements_end());
+  const_active_elem_iterator       it (_mesh.elements_begin());
+  const const_active_elem_iterator end(_mesh.elements_end());
 
   // Loop over elements
   for ( ; it != end; ++it)
@@ -296,8 +424,7 @@ void EquationSystemsBase::build_solution_vector (std::vector<Number>& soln,
 
       // Copy the nodal solution over into the correct place in
       // the global soln vector which will be returned to the user.
-      for (unsigned int n=0; n<elem->n_nodes();   
-n++)
+      for (unsigned int n=0; n<elem->n_nodes(); n++)
 	soln[elem->node(n)] = nodal_soln[n];
     }
 }
@@ -305,7 +432,7 @@ n++)
 
 
 
-void EquationSystemsBase::build_solution_vector (std::vector<Number>& soln) const
+void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
 {
   assert (this->n_systems());
 
@@ -347,8 +474,8 @@ void EquationSystemsBase::build_solution_vector (std::vector<Number>& soln) cons
 	    {
 	      const FEType& fe_type    = system.variable_type(var);
 
-	      active_elem_iterator       it (_mesh.elements_begin());
-	      const active_elem_iterator end(_mesh.elements_end());
+	      const_active_elem_iterator       it (_mesh.elements_begin());
+	      const const_active_elem_iterator end(_mesh.elements_end());
 
 	      for ( ; it != end; ++it)
 		{
@@ -387,9 +514,9 @@ void EquationSystemsBase::build_solution_vector (std::vector<Number>& soln) cons
 
 
 
-bool EquationSystemsBase::compare (const EquationSystemsBase& other_es, 
-				   const Real threshold,
-				   const bool verbose) const
+bool EquationSystems::compare (const EquationSystems& other_es, 
+			       const Real threshold,
+			       const bool verbose) const
 {
   // safety check, whether we handle at least the same number
   // of systems
@@ -449,11 +576,11 @@ bool EquationSystemsBase::compare (const EquationSystemsBase& other_es,
 
 
 
-std::string EquationSystemsBase::get_info () const
+std::string EquationSystems::get_info () const
 {
   std::ostringstream out;
   
-  out << " EquationSystemsBase" << std::endl
+  out << " EquationSystems" << std::endl
       << "  n_systems()=" << this->n_systems() << std::endl;
 
   // Print the info for the individual systems
@@ -502,7 +629,15 @@ std::string EquationSystemsBase::get_info () const
 
 
 
-unsigned int EquationSystemsBase::n_vars () const
+void EquationSystems::print_info () const
+{
+  std::cout << this->get_info()
+	    << std::endl;
+}
+
+
+
+unsigned int EquationSystems::n_vars () const
 {
   if (_systems.empty())
     return 0;
@@ -519,7 +654,7 @@ unsigned int EquationSystemsBase::n_vars () const
 
 
 
-unsigned int EquationSystemsBase::n_dofs () const
+unsigned int EquationSystems::n_dofs () const
 {
   if (_systems.empty())
     return 0;
@@ -537,14 +672,14 @@ unsigned int EquationSystemsBase::n_dofs () const
 
 
 
-bool EquationSystemsBase::flag (const std::string& fl) const
+bool EquationSystems::flag (const std::string& fl) const
 {
   return (_flags.count(fl) != 0);
 }
 
 
 
-void EquationSystemsBase::set_flag (const std::string& fl)
+void EquationSystems::set_flag (const std::string& fl)
 {
 #ifdef DEBUG
   /*
@@ -564,7 +699,7 @@ void EquationSystemsBase::set_flag (const std::string& fl)
 
 
 
-void EquationSystemsBase::unset_flag (const std::string& fl)
+void EquationSystems::unset_flag (const std::string& fl)
 {
   // Look for the flag in the database
   if (!_flags.count(fl))
@@ -581,7 +716,7 @@ void EquationSystemsBase::unset_flag (const std::string& fl)
 
 
 
-Real EquationSystemsBase::parameter (const std::string& id) const
+Real EquationSystems::parameter (const std::string& id) const
 {
   // Look for the id in the database
   std::map<std::string, Real>::const_iterator
@@ -601,7 +736,7 @@ Real EquationSystemsBase::parameter (const std::string& id) const
 
 
 
-Real & EquationSystemsBase::set_parameter (const std::string& id)
+Real & EquationSystems::set_parameter (const std::string& id)
 {
 #ifdef DEBUG
   /*
@@ -622,7 +757,7 @@ Real & EquationSystemsBase::set_parameter (const std::string& id)
 
 
 
-void EquationSystemsBase::unset_parameter (const std::string& id)
+void EquationSystems::unset_parameter (const std::string& id)
 {
   // Look for the id in the database
   std::map<std::string, Real>::iterator
@@ -640,3 +775,11 @@ void EquationSystemsBase::unset_parameter (const std::string& id)
   // Erase the entry
   _parameters.erase(pos);
 }
+
+
+
+//--------------------------------------------------------------------------
+// Instantiations of templated functions
+
+template void EquationSystems::add_system<SteadySystem>    (const std::string&);
+template void EquationSystems::add_system<TransientSystem> (const std::string&);

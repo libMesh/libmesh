@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.23.2.1 2003-05-05 23:57:32 benkirk Exp $
+// $Id: equation_systems.h,v 1.23.2.2 2003-05-06 14:00:34 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -19,8 +19,8 @@
 
 
 
-#ifndef __equation_systems_base_h__
-#define __equation_systems_base_h__
+#ifndef __equation_systems_h__
+#define __equation_systems_h__
 
 // C++ includes
 #include <set>
@@ -47,20 +47,20 @@ class SystemBase;
  */
 
 // ------------------------------------------------------------
-// EquationSystemsBase class definition
-class EquationSystemsBase
+// EquationSystems class definition
+class EquationSystems
 {
-protected:
-
+public:
+  
   /**
    * Constructor.
    */
-  EquationSystemsBase (const Mesh& mesh);
+  EquationSystems (const Mesh& mesh);
 
   /**
    * Destructor.
    */
-  virtual ~EquationSystemsBase ();
+  ~EquationSystems ();
  
   /**
    * Returns tha data structure to a pristine state.
@@ -76,26 +76,59 @@ protected:
    * Reinitialize all the systems
    */
   void reinit ();
-  
-
-public:
 
   /**
    * @returns the number of equation systems.
    */
   unsigned int n_systems() const;
 
-
   /**
    * @returns a constant reference to the system named \p name.
    */
-  const SystemBase& get_system(const std::string& name) const;
+  const SystemBase & get_system(const std::string& name) const;
+
+  /**
+   * @returns a constant reference to the system named \p name.
+   * The template argument defines the return type.  For example,
+   * const SteadySystem& sys = eq.get_system<SteadySystem> ("sys");
+   * is an example of how the method might be used
+   */
+  template <typename T_sys>
+  const T_sys& get_system (const std::string& name) const;
+ 
+  /**
+   * @returns a reference to the system named \p name.
+   */
+  SystemBase& operator () (const std::string& name);
+ 
+  /**
+   * @returns a constant reference to the system name
+   */
+  const SystemBase& operator () (const std::string& name) const;
+ 
+  /**
+   * @returns a reference to system number \p num.
+   */
+  SystemBase& operator () (const unsigned int num);
+ 
+  /**
+   * @returns a constant reference to system number \p num.
+   */
+  const SystemBase& operator () (const unsigned int num) const;
+  
+  /**
+   * Add the system of type \p system_type named \p name to the
+   * systems array. Must be overloaded in the derived classes.
+   */
+  void add_system (const std::string& system_type,
+		   const std::string& name);
   
   /**
    * Add the system named \p name to the systems array.
    * Must be overloaded in the derived classes.
    */
-  virtual void add_system (const std::string& name) = 0;
+  template <typename T_sys>
+  void add_system (const std::string& name);
   
   /**
    * Remove the system named \p name from the systems array.
@@ -171,7 +204,7 @@ public:
    * most of the comparisons to perform to the responsible
    * systems
    */
-  bool compare (const EquationSystemsBase& other_es, 
+  bool compare (const EquationSystems& other_es, 
                 const Real threshold,
                 const bool verbose) const;
 
@@ -244,6 +277,15 @@ protected:
    * @returns a constant reference to the system named \p name.
    */
   SystemBase& get_system(const std::string& name);
+
+  /**
+   * @returns a writeable referene to the system named \p name.
+   * The template argument defines the return type.  For example,
+   * const SteadySystem& sys = eq.get_system<SteadySystem> ("sys");
+   * is an example of how the method might be used
+   */
+  template <typename T_sys>
+  T_sys& get_system (const std::string& name);
   
   /**
    * @returns a string containing information about the
@@ -277,7 +319,7 @@ protected:
 // ------------------------------------------------------------
 // EquationSystems inline methods
 inline
-const Mesh & EquationSystemsBase::get_mesh () const
+const Mesh & EquationSystems::get_mesh () const
 {
   return _mesh;
 }
@@ -285,7 +327,7 @@ const Mesh & EquationSystemsBase::get_mesh () const
 
 
 inline
-unsigned int EquationSystemsBase::n_systems () const
+unsigned int EquationSystems::n_systems () const
 {
   return _systems.size();
 }
@@ -293,7 +335,7 @@ unsigned int EquationSystemsBase::n_systems () const
 
 
 inline
-unsigned int EquationSystemsBase::n_flags () const
+unsigned int EquationSystems::n_flags () const
 {
   return _flags.size();
 }
@@ -301,9 +343,48 @@ unsigned int EquationSystemsBase::n_flags () const
 
 
 inline
-unsigned int EquationSystemsBase::n_parameters () const
+unsigned int EquationSystems::n_parameters () const
 {
   return _parameters.size();
 }
+
+
+
+template <typename T_sys>
+inline
+const T_sys& EquationSystems::get_system (const std::string& name) const
+{
+  std::map<std::string, SystemBase*>::const_iterator
+    pos = _systems.find(name);
+  
+  if (pos == _systems.end())
+    {
+      std::cerr << "ERROR: no system named " << name << " found!"
+		<< std::endl;
+      error();
+    }
+
+  return dynamic_cast<const T_sys&>(*(pos->second));
+}
+
+
+
+template <typename T_sys>
+inline
+T_sys& EquationSystems::get_system (const std::string& name)
+{
+  std::map<std::string, SystemBase*>::const_iterator pos = _systems.find(name);
+  
+  if (pos == _systems.end())
+    {
+      std::cerr << "ERROR: no system named " << name << " found!"
+		<< std::endl;
+      error();
+    }
+
+  return dynamic_cast<T_sys&>(*(pos->second));
+}
+
+
 
 #endif

@@ -1,4 +1,4 @@
-// $Id: system_base_projection.C,v 1.1.2.1 2003-05-06 00:10:12 benkirk Exp $
+// $Id: system_base_projection.C,v 1.1.2.2 2003-05-06 14:00:47 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -98,8 +98,8 @@ void SystemBase::project_vector (const NumericVector<Number>* old_vector,
       
       
       // Iterators for the active elements on local processor
-      active_local_elem_iterator       elem_it (_mesh.elements_begin());
-      const active_local_elem_iterator elem_end(_mesh.elements_end());
+      const_active_local_elem_iterator       elem_it (_mesh.elements_begin());
+      const const_active_local_elem_iterator elem_end(_mesh.elements_end());
       
       for ( ; elem_it != elem_end; ++elem_it)
 	{

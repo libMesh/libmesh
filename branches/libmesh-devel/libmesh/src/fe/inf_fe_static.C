@@ -1,4 +1,4 @@
-// $Id: inf_fe_static.C,v 1.17 2003-04-05 12:16:35 ddreyer Exp $
+// $Id: inf_fe_static.C,v 1.17.2.1 2003-05-06 14:00:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -308,7 +308,7 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType& fet,
   const short int sign (-1);
 
   // get the simulation-specific data
-  const EquationSystemsBase& es (data.equation_systems);
+  const EquationSystems& es (data.equation_systems);
   const Real wavenumber = 2. * libMesh::pi
       * es.parameter("current frequency")
       / es.parameter("wave speed");

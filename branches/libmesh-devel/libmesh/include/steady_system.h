@@ -1,4 +1,4 @@
-// $Id: thin_system.h,v 1.3 2003-05-04 23:58:53 benkirk Exp $
+// $Id: steady_system.h,v 1.1.2.1 2003-05-06 14:00:42 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -19,32 +19,31 @@
 
 
 
-#ifndef __thin_system_h__
-#define __thin_system_h__
+#ifndef __steady_system_h__
+#define __steady_system_h__
 
 // C++ includes
 
 // Local Includes
-#include "equation_systems.h"
 #include "system_base.h"
+#include "numeric_vector.h"
 
 
 // Forward Declarations
-class ThinSystem;
 
 
 /**
  * This class provides a specific system class.  It aims
- * at thin systems, offering nothing more than just
+ * at steady systems, offering nothing more than just
  * the essentials needed to solve a system.  Note
  * that still additional vectors/matrices may be added,
  * as offered in the parent class \p SystemBase.
  */
 
 // ------------------------------------------------------------
-// ThinSystem class definition
+// SteadySystem class definition
 
-class ThinSystem : public SystemBase
+class SteadySystem : public SystemBase
 {
 public:
 
@@ -52,14 +51,14 @@ public:
    * Constructor.  Optionally initializes required
    * data structures.
    */
-  ThinSystem (EquationSystems<ThinSystem>& es,
-	      const std::string&           name,
-	      const unsigned int           number);
+  SteadySystem (EquationSystems& es,
+		const std::string& name,
+		const unsigned int number);
 
   /**
    * Destructor.
    */
-  ~ThinSystem ();
+  ~SteadySystem ();
   
   /**
    * Clear all the data structures associated with
@@ -78,7 +77,13 @@ public:
    * the system, so that, e.g., \p assemble() may be used.
    */
   void reinit ();
- 
+   
+  /**
+   * Update the local values to reflect the solution
+   * on neighboring processors.
+   */
+  void update ();
+
   /**
    * Assemble the linear system.  Does not
    * actually call the solver.
@@ -91,60 +96,74 @@ public:
   std::pair<unsigned int, Real> solve ();
   
   /**
-   * @returns \p "Thin".  Helps in identifying
+   * @returns \p "Steady".  Helps in identifying
    * the system type in an equation system file.
    */
-  static const std::string system_type () { return "Thin"; }
-
-  /**
-   * @returns \p true when the other system contains
-   * identical data, up to the given threshold.
-   */
-  bool compare (const ThinSystem& other_system, 
-		const Real threshold,
-		const bool verbose) const;
+  const std::string system_type () const { return "Steady"; }
 
   /**
    * Register a user function to use in initializing the system.
    */
-  void attach_init_function(void fptr(EquationSystems<ThinSystem>& es,
-				      const std::string& name));
+  void attach_init_function (void fptr(EquationSystems& es,
+				       const std::string& name));
   
   /**
    * Register a user function to use in assembling the system
    * matrix and RHS.
    */
-  void attach_assemble_function(void fptr(EquationSystems<ThinSystem>& es,
-					  const std::string& name));
+  void attach_assemble_function (void fptr(EquationSystems& es,
+					   const std::string& name));
   
   /**
    * Function that initializes the system.
    */
-  void (* init_system_fptr) (EquationSystems<ThinSystem>& es,
-			     const std::string& name);
+  void (* init_system) (EquationSystems& es,
+			const std::string& name);
   
   /**
    * Function that assembles the system.
    */
-  void (* assemble_fptr) (EquationSystems<ThinSystem>& es,
-			  const std::string& name);
+  void (* assemble_system) (EquationSystems& es,
+			    const std::string& name);
+
+
+  
+  //-----------------------------------------------------------------
+  // access to the solution data fields
+  
+  /**
+   * @returns the current solution for the specified global
+   * DOF.
+   */
+  Number current_solution (const unsigned int global_dof_number) const;
+
+  /**
+   * All the values I need to compute my contribution
+   * to the simulation at hand.  Think of this as the
+   * current solution with any ghost values needed from
+   * other processors.
+   */
+  AutoPtr<NumericVector<Number> > current_local_solution;
 
 
 protected:
 
-  /**
-   * Reference to the \p EquationSystems<ThinSystem> data structure 
-   * that handles us.   
-   */
-  EquationSystems<ThinSystem>& _equation_systems;
 
 };
 
 
 
 // ------------------------------------------------------------
-// ThinSystem inline methods
-
+// SteadySystem inline methods
+inline
+Number SteadySystem::current_solution (const unsigned int global_dof_number) const
+{
+  // Check the sizes
+  assert (global_dof_number < _dof_map.n_dofs());
+  assert (global_dof_number < current_local_solution->size());
+   
+  return (*current_local_solution)(global_dof_number);
+}
 
 
 #endif

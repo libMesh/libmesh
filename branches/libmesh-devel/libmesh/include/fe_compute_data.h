@@ -1,4 +1,4 @@
-// $Id: fe_compute_data.h,v 1.1 2003-04-03 14:17:20 ddreyer Exp $
+// $Id: fe_compute_data.h,v 1.1.2.1 2003-05-06 14:00:38 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,7 +30,7 @@
 
 
 // Forward declarations
-class EquationSystemsBase;
+class EquationSystems;
 
 
 /**
@@ -55,7 +55,7 @@ public:
    * Constructor.  Takes the required input data and clears
    * the output data using \p clear().
    */
-  FEComputeData (const EquationSystemsBase& es,
+  FEComputeData (const EquationSystems& es,
 		 const Point& pin) :
     equation_systems(es),
     p(pin)
@@ -70,7 +70,7 @@ public:
    * Const reference to the \p EquationSystems object
    * that contains simulation-specific data.
    */
-  const EquationSystemsBase& equation_systems;
+  const EquationSystems& equation_systems;
   /**
    * Holds the point where the data are to be computed
    */

@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.18 2003-04-09 19:26:59 ddreyer Exp $
+// $Id: fe.C,v 1.18.2.1 2003-05-06 14:00:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,9 @@
 #include "libmesh.h"
 #include "quadrature.h"
 #include "elem.h"
+#include "mesh_logging.h"
 #include "fe_macro.h"
+
 
 
 // ------------------------------------------------------------
@@ -35,7 +37,6 @@ unsigned int FE<Dim,T>::n_quadrature_points () const
   assert (qrule != NULL);  
   return qrule->n_points(); 
 }
-
 
 
 
@@ -66,7 +67,6 @@ void FE<Dim,T>::reinit(const Elem* elem)
   // quadrature points.
   compute_shape_functions ();
 }
-
 
 
 

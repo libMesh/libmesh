@@ -1,4 +1,4 @@
-// $Id: enum_xdr_mode.h,v 1.1.2.1 2003-05-06 00:24:10 benkirk Exp $
+// $Id: enum_xdr_mode.h,v 1.1.2.2 2003-05-06 14:00:33 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -49,7 +49,7 @@ namespace libMeshEnums {
     };
 }
 
-
+using namespace libMeshEnums;
 
 #endif
 

@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.38.2.1 2003-05-05 23:55:28 benkirk Exp $
+// $Id: dof_map.C,v 1.38.2.2 2003-05-06 14:00:43 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -34,7 +34,7 @@
 #include "dense_matrix.h"
 #include "dense_vector.h"
 #include "libmesh.h"
-
+#include "mesh_logging.h"
 
 
 
@@ -84,8 +84,8 @@ void DofMap::reinit(const MeshBase& mesh)
   // Clear the old_dof_objects for all the nodes
   // and elements so that we can overwrite them
   {
-    node_iterator       node_it (mesh.nodes_begin());
-    const node_iterator node_end(mesh.nodes_end());
+    const_node_iterator       node_it (mesh.nodes_begin());
+    const const_node_iterator node_end(mesh.nodes_end());
     
     for ( ; node_it != node_end; ++node_it)
       {
@@ -93,8 +93,8 @@ void DofMap::reinit(const MeshBase& mesh)
 	assert ((*node_it)->old_dof_object == NULL);
       }
     
-    elem_iterator       elem_it (mesh.elements_begin());
-    const elem_iterator elem_end(mesh.elements_end());
+    const_elem_iterator       elem_it (mesh.elements_begin());
+    const const_elem_iterator elem_end(mesh.elements_end());
     
     for ( ; elem_it != elem_end; ++elem_it)
       {
@@ -108,8 +108,8 @@ void DofMap::reinit(const MeshBase& mesh)
   // Set the old_dof_objects for the elements that
   // weren't just created
   {
-    elem_iterator       elem_it (mesh.elements_begin());
-    const elem_iterator elem_end(mesh.elements_end());
+    const_elem_iterator       elem_it (mesh.elements_begin());
+    const const_elem_iterator elem_end(mesh.elements_end());
     
     for ( ; elem_it != elem_end; ++elem_it)
       {
@@ -140,15 +140,15 @@ void DofMap::reinit(const MeshBase& mesh)
   // handle new \p DofObjects that may have just been created
   {
     // All the nodes
-    node_iterator       node_it  (mesh.nodes_begin());
-    const node_iterator node_end (mesh.nodes_end());
+    const_node_iterator       node_it  (mesh.nodes_begin());
+    const const_node_iterator node_end (mesh.nodes_end());
 
     for ( ; node_it != node_end; ++node_it)
       (*node_it)->set_n_vars(this->sys_number(),n_var);
 
     // All the elements
-    elem_iterator       elem_it (mesh.elements_begin());
-    const elem_iterator elem_end(mesh.elements_end());
+    const_elem_iterator       elem_it (mesh.elements_begin());
+    const const_elem_iterator elem_end(mesh.elements_end());
 
     for ( ; elem_it != elem_end; ++elem_it)
       (*elem_it)->set_n_vars(this->sys_number(),n_var);
@@ -162,8 +162,8 @@ void DofMap::reinit(const MeshBase& mesh)
       const FEType& fe_type = variable_type(var);
 
       // For all the active elements
-      active_elem_iterator       elem_it (mesh.elements_begin());
-      const active_elem_iterator elem_end(mesh.elements_end());
+      const_active_elem_iterator       elem_it (mesh.elements_begin());
+      const const_active_elem_iterator elem_end(mesh.elements_end());
       
       for ( ; elem_it != elem_end; ++elem_it)
 	{
@@ -192,15 +192,15 @@ void DofMap::reinit(const MeshBase& mesh)
   // Finally, clear all the current DOF indices
   {
     // All the nodes
-    node_iterator       node_it  (mesh.nodes_begin());
-    const node_iterator node_end (mesh.nodes_end());
+    const_node_iterator       node_it  (mesh.nodes_begin());
+    const const_node_iterator node_end (mesh.nodes_end());
 
     for ( ; node_it != node_end; ++node_it)
       (*node_it)->invalidate_dofs();
     
     // All the elements
-    active_elem_iterator       elem_it (mesh.elements_begin());
-    const active_elem_iterator elem_end(mesh.elements_end());
+    const_active_elem_iterator       elem_it (mesh.elements_begin());
+    const const_active_elem_iterator elem_end(mesh.elements_end());
 
     for ( ; elem_it != elem_end; ++elem_it)
       (*elem_it)->invalidate_dofs();
@@ -274,8 +274,8 @@ void DofMap::distribute_dofs(const MeshBase& mesh)
       
       for (unsigned var=0; var<this->n_variables(); var++)
 	{
-	  active_pid_elem_iterator       elem_it (mesh.elements_begin(), processor);
-	  const active_pid_elem_iterator elem_end(mesh.elements_end(),   processor);
+	  const_active_pid_elem_iterator       elem_it (mesh.elements_begin(), processor);
+	  const const_active_pid_elem_iterator elem_end(mesh.elements_end(),   processor);
 
 	  for ( ; elem_it != elem_end; ++elem_it)
 	    {
@@ -397,8 +397,8 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
     {
       std::vector<unsigned int> element_dofs;
 
-      active_elem_iterator       elem_it (mesh.elements_begin());
-      const active_elem_iterator elem_end(mesh.elements_end());
+      const_active_elem_iterator       elem_it (mesh.elements_begin());
+      const const_active_elem_iterator elem_end(mesh.elements_end());
 
       for ( ; elem_it != elem_end; ++elem_it)
 	{
@@ -456,8 +456,8 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
       std::vector<unsigned int> element_dofs_j;
       
       
-      active_elem_iterator       elem_it (mesh.elements_begin());
-      const active_elem_iterator elem_end(mesh.elements_end());
+      const_active_elem_iterator       elem_it (mesh.elements_begin());
+      const const_active_elem_iterator elem_end(mesh.elements_end());
       
       for ( ; elem_it != elem_end; ++elem_it)
 	for (unsigned int vi=0; vi<n_var; vi++)
@@ -739,8 +739,8 @@ void DofMap::create_dof_constraints(const MeshBase& mesh)
     {
       const FEType& fe_type = this->variable_type(variable_number);
       
-      elem_iterator       elem_it (mesh.elements_begin());
-      const elem_iterator elem_end(mesh.elements_end());
+      const_elem_iterator       elem_it (mesh.elements_begin());
+      const const_elem_iterator elem_end(mesh.elements_end());
       
       for ( ; elem_it != elem_end; ++elem_it)
 	FEInterface::compute_constraints (_dof_constraints,

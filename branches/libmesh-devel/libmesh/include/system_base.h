@@ -1,4 +1,4 @@
-// $Id: system_base.h,v 1.14.2.1 2003-05-05 23:57:32 benkirk Exp $
+// $Id: system_base.h,v 1.14.2.2 2003-05-06 14:00:42 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -34,7 +34,7 @@
 
 // Forward Declarations
 class SystemBase;
-class EquationSystemsBase;
+class EquationSystems;
 class Mesh;
 class Xdr;
 template <typename T> class SparseMatrix;
@@ -64,19 +64,24 @@ protected:
    * data structures.  Protected so that this base class
    * cannot be explicitly instantiated.
    */
-  SystemBase (const Mesh&         mesh,
-	      const std::string&  name,
-	      const unsigned int  number);
+  SystemBase (EquationSystems& es,
+	      const std::string& name,
+	      const unsigned int number);
   
 public:
 
   
   /**
+   * Destructor.
+   */
+  virtual ~SystemBase ();
+
+  /**
    * Clear all the data structures associated with
    * the system.  Protected so that only children can
    * use it.
    */
-  void clear ();
+  virtual void clear ();
   
   /**
    * Initializes degrees of freedom and other 
@@ -85,7 +90,7 @@ public:
    * for all applications. @e Should be overloaded in derived classes.
    * Protected so that only children can use it.
    */
-  void init ();
+  virtual void init ();
   
   /**
    * Reinitializes degrees of freedom and other 
@@ -94,7 +99,13 @@ public:
    * for all applications. @e Should be overloaded in derived classes.
    * Protected so that only children can use it.
    */
-  void reinit ();
+  virtual void reinit ();
+  
+  /**
+   * Update the local values to reflect the solution
+   * on neighboring processors.
+   */
+  virtual void update () = 0;
   
   /**
    * Prepares \p matrix and \p _dof_map for matrix assembly.
@@ -103,24 +114,21 @@ public:
    * @e Should be overloaded in derived classes.
    * Protected so that only children can use it.
    */
-  void assemble ();
+  virtual void assemble ();
 
+  /**
+   * Assembles & solves the linear system Ax=b. 
+   */
+  virtual std::pair<unsigned int, Real> solve () = 0;
+  
   /**
    * @returns \p true when the other system contains
    * identical data, up to the given threshold.  Outputs
    * some diagnostic info when \p verbose is set.
    */
-  bool compare (const SystemBase& other_system, 
-		const Real threshold,
-		const bool verbose) const;
-
-
-
-  
-  /**
-   * Destructor.
-   */
-  virtual ~SystemBase ();
+  virtual bool compare (const SystemBase& other_system, 
+			const Real threshold,
+			const bool verbose) const;
 
   /**
    * @returns the system name.
@@ -132,7 +140,7 @@ public:
    * which system type to use when reading equation system
    * data from file.  Has be overloaded in derived classes.
    */
-  static const std::string system_type () { error(); return ""; }
+  virtual const std::string system_type () const = 0;
 
   /**
    * Projects the solution vector to the new mesh.  The input indices
@@ -160,7 +168,6 @@ public:
    */
   void update_global_solution (std::vector<Number>& global_soln,
 			       const unsigned int dest_proc) const;
-
 
   /**
    * @returns a constant reference to this systems's \p _mesh.
@@ -396,6 +403,11 @@ protected:
    * names.
    */
   std::map<std::string, unsigned short int> _var_num;
+
+  /**
+   * Flag stating if the system is active or not.
+   */
+  bool _active;
   
   /**
    * Some systems need multiple matrices.
@@ -417,10 +429,11 @@ protected:
    */
   bool _can_add_vectors;
 
-  /**
-   * Flag stating if the system is active or not.
-   */
-  bool _active;
+
+
+  // -------------------------------------------------
+  // Necessary classes
+  //
   
   /**
    * Data structure describing the relationship between
@@ -429,16 +442,16 @@ protected:
   DofMap _dof_map;
 
   /**
+   * Constant reference to the \p EquationSystems object
+   * used for the simulation.
+   */
+  EquationSystems& _equation_systems;
+  
+  /**
    * Constant reference to the \p mesh data structure used
    * for the simulation.   
    */
   const Mesh& _mesh;
-
-  /**
-   * Constant reference to the \p EquationSystemsBase object
-   * used for the simulation.
-   */
-  //const EquationSystemsBase& _equation_systems;
 };
 
 
@@ -579,7 +592,7 @@ unsigned int SystemBase::n_constrained_dofs() const
 inline
 unsigned int SystemBase::n_local_dofs() const
 {
-  return _dof_map.n_dofs_on_processor(libMesh::processor_id());
+  return _dof_map.n_dofs_on_processor(libMeshBase::processor_id());
 }
 
 
