@@ -79,7 +79,7 @@ The library is known to work with the following compilers:
     </ul>
   <li>Sun ONE Studio Compilers</li>
     <ul>
-      <li>Version 5.5 tested <code>(CXXFLAGS=-library=stlport4 CPPFLAGS=-library=stlport4 CXX=CC ./configure [...])</code></li>
+      <li>Version 5.5 tested <code>(CXXFLAGS=-library=stlport4 CPPFLAGS=-library=stlport4 CXX=CC CC=cc ./configure [...])</code></li>
       <li>Must use the STLPort C++ standard library provided with the compiler</li>
     </ul>
   <li>HP, use <code>CXX="aCC -AA" CC="cc -Aa"</code> to get full std support</li>
