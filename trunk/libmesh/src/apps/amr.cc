@@ -1,4 +1,4 @@
-#include "mesh_init.h"
+#include "libmesh.h"
 #include "fe.h"
 #include "quadrature_gauss.h"
 #include "mesh.h"
@@ -72,9 +72,7 @@ int main (int argc, char** argv)
     mesh.write_tecplot_binary("out.plt", es);
   };
   
-  libMesh::close();
-
-  return 0;
+  return libMesh::close();
 };
 
 
@@ -145,8 +143,8 @@ void assemble(EquationSystems& es,
       
       //fe->print_info();
 
-      dof_map.dof_indices(e, dof_indices_U, 0);
-      dof_map.dof_indices(e, dof_indices_V, 1);
+      dof_map.dof_indices(elem, dof_indices_U, 0);
+      dof_map.dof_indices(elem, dof_indices_V, 1);
       
       // zero the element matrix and vector
       Kuu.resize (phi.size(),

@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.15 2003-02-13 22:56:07 benkirk Exp $
+// $Id: mesh_base.h,v 1.16 2003-02-14 15:22:41 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -41,7 +41,6 @@ class PetscMatrix;
 #include "node.h"
 #include "enum_elem_type.h"
 #include "sphere.h"
-#include "perf_log.h"
 #include "enum_order.h"
 #include "elem_iterators.h"
 #include "node_iterators.h"
@@ -60,7 +59,7 @@ class PetscMatrix;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.15 $
+ * \version $Revision: 1.16 $
  */
 
 
@@ -547,18 +546,6 @@ public:
    */
   void print_info() const;
   
-  /**
-   * @returns the performance data (and possibly the information
-   * header) as a string.
-   */
-  std::string get_performance_info () const { return _perf_log.get_log(); }
-
-  /**
-   * @returns ONLY the performance information, never the header.
-   */
-  std::string get_performance_info_no_header () const { return _perf_log.get_perf_info(); }
-
-
 
 #ifdef USE_COMPLEX_NUMBERS
 
@@ -817,13 +804,7 @@ protected:
   /**
    * The processor id.
    */
-  const unsigned int _proc_id;
-  
-  /**
-   * A performance logger.
-   */
-  PerfLog _perf_log;
-  
+  const unsigned int _proc_id;  
 };
 
 

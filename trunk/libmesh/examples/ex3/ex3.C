@@ -1,4 +1,4 @@
-// $Id: ex3.C,v 1.11 2003-02-13 01:49:48 benkirk Exp $
+// $Id: ex3.C,v 1.12 2003-02-14 15:22:33 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -30,7 +30,7 @@
 /**
  * Basic include file needed for the mesh functionality.
  */
-#include "mesh_init.h"
+#include "libmesh.h"
 #include "mesh.h"
 #include "general_system.h"
 #include "equation_systems.h"
@@ -228,12 +228,10 @@ int main (int argc, char** argv)
   };
 
 
-  libMesh::close();
-  
   /**
    * All done.  
    */
-  return 0;
+  return libMesh::close();
 };
 
 

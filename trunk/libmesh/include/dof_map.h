@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.10 2003-02-13 22:56:06 benkirk Exp $
+// $Id: dof_map.h,v 1.11 2003-02-14 15:22:37 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,20 +23,20 @@
 #define __dof_map_h__
 
 // C++ Includes   -----------------------------------
+#include <map>
+
+// Local Includes -----------------------------------
+#include "mesh_common.h"
+#include "enum_order.h"
+#include "fe_type.h"
+#include "dense_matrix.h"
+#include "coupling_matrix.h"
 
 // Forward Declarations
 class Elem;
 class MeshBase;
 class SparseMatrix;
 
-
-// Local Includes -----------------------------------
-#include "mesh_common.h"
-#include "enum_order.h"
-#include "fe_type.h"
-#include "perf_log.h"
-#include "dense_matrix.h"
-#include "coupling_matrix.h"
 
 
 
@@ -47,7 +47,7 @@ class SparseMatrix;
  * correspond to distinct subdomains.  This is so that the resulting data
  * structures will work well with parallel linear algebra packages.
  *
- * @author Benjamin S. Kirk, 2002
+ * @author Benjamin S. Kirk, 2002-2003
  */
 
 // ------------------------------------------------------------
@@ -382,11 +382,6 @@ class DofMap
   DofConstraints _dof_constraints;
 
 #endif
-
-  /**
-   * Object to use for performance logging.
-   */
-  PerfLog perf_log;
 };
 
 

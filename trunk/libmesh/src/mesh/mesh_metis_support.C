@@ -1,4 +1,4 @@
-// $Id: mesh_metis_support.C,v 1.6 2003-02-13 22:56:12 benkirk Exp $
+// $Id: mesh_metis_support.C,v 1.7 2003-02-14 15:22:50 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,6 +24,7 @@
 
 // Local includes
 #include "mesh_base.h"
+#include "libmesh.h"
 #include "elem.h"
 
 
@@ -67,7 +68,7 @@ void MeshBase::metis_partition(const unsigned int n_sbdmns,
   
   assert (_dim != 1);
 
-  _perf_log.start_event("metis_partition()");
+  libMesh::log.start_event("metis_partition()");
 
   // new way, build the graph
   std::vector<int> xadj;
@@ -162,7 +163,7 @@ void MeshBase::metis_partition(const unsigned int n_sbdmns,
       elem(e)->processor_id() = 
       static_cast<short int>(part[e]);
 
-  _perf_log.stop_event("metis_partition()");
+  libMesh::log.stop_event("metis_partition()");
   
 #endif
 }

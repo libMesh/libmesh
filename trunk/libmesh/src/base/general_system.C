@@ -1,4 +1,4 @@
-// $Id: general_system.C,v 1.2 2003-02-13 22:56:08 benkirk Exp $
+// $Id: general_system.C,v 1.3 2003-02-14 15:22:46 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -25,6 +25,8 @@
 
 // Local includes
 #include "general_system.h"
+#include "libmesh.h"
+
 
 
 // ------------------------------------------------------------
@@ -122,11 +124,14 @@ void GeneralSystem::assemble ()
   // fill with sparsity pattern
   SystemBase::assemble();
 
+  // Log how long the user's matrix assembly code takes
+  libMesh::log.start_event("assemble()");
+  
   // Call the user-specified matrix assembly function
   assemble_fptr (equation_systems, name());
 
-  //matrix.print ();
-  //rhs.print    ();
+  // Stop logging the user code
+  libMesh::log.stop_event("assemble()");
 }
 
 
@@ -137,6 +142,9 @@ GeneralSystem::solve ()
   // Assemble the linear system
   assemble (); 
 
+  // Log how long the linear solve takes.
+  libMesh::log.start_event("solve()");
+  
   // Get the user-specifiied linear solver tolerance
   const Real tol            =
     equation_systems.parameter("linear solver tolerance");
@@ -151,7 +159,10 @@ GeneralSystem::solve ()
 
   // Update the local solution to reflect the new values
   update ();
-  
+
+  // Stop logging the linear solve
+  libMesh::log.stop_event("solve()");
+
   return rval; 
 }
 

@@ -1,4 +1,4 @@
-// $Id: reference_counter.C,v 1.6 2003-02-13 22:56:09 benkirk Exp $
+// $Id: reference_counter.C,v 1.7 2003-02-14 15:22:47 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -33,6 +33,7 @@
 
 ReferenceCounter::Counts ReferenceCounter::_counts;
 unsigned int             ReferenceCounter::_n_objects=0;
+bool                     ReferenceCounter::_have_printed_info=false;
 
 #endif
 
@@ -42,14 +43,14 @@ unsigned int             ReferenceCounter::_n_objects=0;
 // ReferenceCounter class members
 std::string ReferenceCounter::get_info ()
 {
-  std::ostringstream out;
-  
 #if defined(ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
 
+  std::ostringstream out;
+  
   out << std::endl
-      << " ---------------------------------------------------------------------- "  << std::endl
-      << "| Reference count information                                          |" << std::endl
-      << " ---------------------------------------------------------------------- "  << std::endl;
+      << " ---------------------------------------------------------------------------- "  << std::endl
+      << "| Reference count information                                                |" << std::endl
+      << " ---------------------------------------------------------------------------- "  << std::endl;
   
   for (Counts::iterator it = _counts.begin();
        it != _counts.end(); ++it)
@@ -76,9 +77,13 @@ std::string ReferenceCounter::get_info ()
       
     }
   
-  out << " ---------------------------------------------------------------------- "  << std::endl;
-
-#endif
+  out << " ---------------------------------------------------------------------------- "  << std::endl;
 
   return out.str();
+
+#else
+
+  return "";
+  
+#endif
 }

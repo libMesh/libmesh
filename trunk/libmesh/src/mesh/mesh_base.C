@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.13 2003-02-13 22:56:12 benkirk Exp $
+// $Id: mesh_base.C,v 1.14 2003-02-14 15:22:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -27,6 +27,7 @@
 
 // Local includes
 #include "mesh_base.h"
+#include "libmesh.h"
 #include "face_tri3.h"
 #include "face_tri6.h"
 #include "cell_inf_prism6.h"
@@ -57,37 +58,32 @@ MeshBase::MeshBase (unsigned int d,
   _n_sbd(1),
   _n_proc(1),
   _dim(d),
-  _proc_id(pid),
-#ifdef ENABLE_PERFORMANCE_LOGGING
-  _perf_log("MeshBase", true)
-#else
-  _perf_log("MeshBase", false)
-#endif
-  
+  _proc_id(pid)
 {
   assert (DIM <= 3);
   assert (DIM >= _dim);
+  assert (libMesh::initialized());
 }
 
 
 
 MeshBase::MeshBase (const MeshBase& other_mesh) :
-  _n_sbd(other_mesh._n_sbd),
-  _n_proc(other_mesh._n_proc),
-  _dim(other_mesh._dim),
-  _proc_id(other_mesh._proc_id)
+  _n_sbd   (other_mesh._n_sbd),
+  _n_proc  (other_mesh._n_proc),
+  _dim     (other_mesh._dim),
+  _proc_id (other_mesh._proc_id)
 
 {
-
   _nodes = other_mesh._nodes;
-  _elements = other_mesh._elements;
-  
+  _elements = other_mesh._elements; 
 }
 
 
 MeshBase::~MeshBase()
 {
   clear();
+
+  assert (!libMesh::closed());
 }
 
 
@@ -95,14 +91,14 @@ MeshBase::~MeshBase()
 Node* MeshBase::add_point(const Point& p,
 			  const unsigned int num)
 {  
-  _perf_log.start_event("add_point()");
+  libMesh::log.start_event("add_point()");
 
   if ((num == static_cast<unsigned int>(-1)) ||
       (num == n_nodes()))
     {
       _nodes.push_back(Node::build(p, n_nodes()));
 
-      _perf_log.stop_event("add_point()");
+      libMesh::log.stop_event("add_point()");
   
       return node_ptr(n_nodes()-1);
     }
@@ -115,7 +111,7 @@ Node* MeshBase::add_point(const Point& p,
       node(num)          = p;
       node(num).set_id() = num;
       
-      _perf_log.stop_event("add_point()");
+      libMesh::log.stop_event("add_point()");
   
       return node_ptr(num);
     }
@@ -130,7 +126,7 @@ Node* MeshBase::add_point(const Point& p,
 
 void MeshBase::add_elem(Elem* e, const unsigned int n)
 {
-  _perf_log.start_event("add_elem()");
+  libMesh::log.start_event("add_elem()");
 
   if ((n == static_cast<unsigned int>(-1)) ||
       (n == n_elem()))
@@ -142,7 +138,7 @@ void MeshBase::add_elem(Elem* e, const unsigned int n)
       _elements[n] = e;
     }
 
-  _perf_log.stop_event("add_elem()");
+  libMesh::log.stop_event("add_elem()");
 }
 
 
@@ -342,7 +338,7 @@ void MeshBase::find_neighbors()
     error();
 
 
-  _perf_log.start_event("find_neighbors()");
+  libMesh::log.start_event("find_neighbors()");
   
   // data structures
   typedef std::pair<unsigned int, Elem*> key_val_pair;
@@ -464,7 +460,7 @@ void MeshBase::find_neighbors()
   
 #endif
 
-  _perf_log.stop_event("find_neighbors()");
+  libMesh::log.stop_event("find_neighbors()");
 }
 
 
@@ -510,7 +506,7 @@ void MeshBase::build_inf_elem(const Point& origin,
   find_neighbors();	// update elem->neighbor() tables
 
 
-  _perf_log.start_event("build_inf_elem()");
+  libMesh::log.start_event("build_inf_elem()");
 
   std::set< std::pair<unsigned int,unsigned int> > faces,ofaces;
   std::set< std::pair<unsigned int,unsigned int> > :: iterator face_it;
@@ -751,7 +747,7 @@ void MeshBase::build_inf_elem(const Point& origin,
 	      << std::endl;
 
 
-  _perf_log.stop_event("build_inf_elem()");
+  libMesh::log.stop_event("build_inf_elem()");
 
 }
 
@@ -987,7 +983,7 @@ void MeshBase::sfc_partition(const unsigned int n_sbdmns,
       return;
     }
   
-  _perf_log.start_event("sfc_partition()");
+  libMesh::log.start_event("sfc_partition()");
     
   std::vector<double> x;
   std::vector<double> y;
@@ -1031,7 +1027,7 @@ void MeshBase::sfc_partition(const unsigned int n_sbdmns,
       wgt += elem(table[e]-1)->n_nodes();
     }
   
-  _perf_log.stop_event("sfc_partiton()");
+  libMesh::log.stop_event("sfc_partiton()");
 
   return;
   
@@ -1048,7 +1044,7 @@ void MeshBase::distort(const Real factor,
   assert (n_elem());
   assert ((factor >= 0.) && (factor <= 1.));
 
-  _perf_log.start_event("distort()");
+  libMesh::log.start_event("distort()");
 
   std::vector<Real>      hmin(n_nodes(), 1.e20);
   std::vector<short int> on_boundary(n_nodes(), 0);
@@ -1125,7 +1121,7 @@ void MeshBase::distort(const Real factor,
 
 
   // All done  
-  _perf_log.stop_event("distort()");
+  libMesh::log.stop_event("distort()");
 
   return;
 }
@@ -1578,7 +1574,7 @@ void MeshBase::read(const std::string&)
 
 void MeshBase::write(const std::string& name)
 {
-  _perf_log.start_event("write()");
+  libMesh::log.start_event("write()");
   
   // Write the file based on extension
   {
@@ -1600,7 +1596,7 @@ void MeshBase::write(const std::string& name)
       }
   }
 
-  _perf_log.stop_event("write()");
+  libMesh::log.stop_event("write()");
 }
 
 
@@ -1609,7 +1605,7 @@ void MeshBase::write(const std::string& name,
 		     std::vector<Complex>& v,
 		     std::vector<std::string>& vn)
 {
-  _perf_log.start_event("write()");
+  libMesh::log.start_event("write()");
   
   // Write the file based on extension
   {
@@ -1628,7 +1624,7 @@ void MeshBase::write(const std::string& name,
       }
   }
 
-  _perf_log.stop_event("write()");
+  libMesh::log.stop_event("write()");
 }
 
 

@@ -1,4 +1,4 @@
-// $Id: perf_log.h,v 1.8 2003-02-13 22:56:07 benkirk Exp $
+// $Id: perf_log.h,v 1.9 2003-02-14 15:22:41 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -257,8 +257,8 @@ void PerfLog::stop_event(const std::string &label)
 
       gettimeofday (&tstop, NULL);
 
-      const double elapsed_time = (static_cast<double>(tstop.tv_sec  - tstart.tv_sec) +
-				   static_cast<double>(tstop.tv_usec - tstart.tv_usec)*1.e-6);      
+      const double elapsed_time = (static_cast<double>(tstop.tv_sec  - perf_data.tstart.tv_sec) +
+				   static_cast<double>(tstop.tv_usec - perf_data.tstart.tv_usec)*1.e-6);      
 
       total_time         += elapsed_time;
       perf_data.tot_time += elapsed_time;
@@ -290,8 +290,8 @@ void PerfLog::pause_event(const std::string &label)
 
       gettimeofday (&tstop, NULL);
 
-      const double elapsed_time = (static_cast<double>(tstop.tv_sec  - tstart.tv_sec) +
-				   static_cast<double>(tstop.tv_usec - tstart.tv_usec)*1.e-6);      
+      const double elapsed_time = (static_cast<double>(tstop.tv_sec  - perf_data.tstart.tv_sec) +
+				   static_cast<double>(tstop.tv_usec - perf_data.tstart.tv_usec)*1.e-6);      
 
       total_time         += elapsed_time;
       perf_data.tot_time += elapsed_time;

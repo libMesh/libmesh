@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.11 2003-02-13 22:56:12 benkirk Exp $
+// $Id: mesh_generation.C,v 1.12 2003-02-14 15:22:50 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -25,6 +25,7 @@
 
 // Local includes
 #include "mesh.h"
+#include "libmesh.h"
 #include "edge_edge2.h"
 #include "edge_edge3.h"
 #include "face_tri3.h"
@@ -48,7 +49,7 @@ void Mesh::build_cube(const unsigned int nx,
 		      const Real zmin, const Real zmax,
 		      const ElemType type)
 {
-  _perf_log.start_event("build_cube()");
+  libMesh::log.start_event("build_cube()");
 
 
   
@@ -497,7 +498,7 @@ void Mesh::build_cube(const unsigned int nx,
       }
     }  
 
-  _perf_log.stop_event("build_cube()");
+  libMesh::log.stop_event("build_cube()");
 }
 
 
@@ -529,7 +530,7 @@ void Mesh::build_sphere (const Real rad,
 
   assert (rad > 0.);
 
-  _perf_log.start_event("build_sphere()");
+  libMesh::log.start_event("build_sphere()");
   
   const Point cent;
 
@@ -1058,5 +1059,5 @@ void Mesh::build_sphere (const Real rad,
     }
 
   
-  _perf_log.stop_event("build_sphere()");
+  libMesh::log.stop_event("build_sphere()");
 }

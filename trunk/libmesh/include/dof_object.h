@@ -1,4 +1,4 @@
-// $Id: dof_object.h,v 1.2 2003-02-13 22:56:07 benkirk Exp $
+// $Id: dof_object.h,v 1.3 2003-02-14 15:22:39 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -46,7 +46,7 @@
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.2 $
+ * \version $Revision: 1.3 $
  */
 
 class DofObject
@@ -308,10 +308,7 @@ unsigned int DofObject::n_dofs (const unsigned int var) const
   // Only count specified variable
   else
     {
-      assert (var < n_vars());
-
-      for (unsigned int c=0; c<n_comp(var); c++)
-	num++;	
+      num = n_comp(var);
     }
 
   return num;
