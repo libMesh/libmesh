@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.21 2003-05-22 21:18:03 benkirk Exp $
+// $Id: elem.C,v 1.22 2003-05-22 21:40:06 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -529,19 +529,20 @@ void Elem::refine (MeshBase& mesh)
 		{
 		  p[c][nc].add_scaled (this->point(n), em_val);
 		  
-		  // Build the key to look for the node
-		  keys[c][nc] +=
-		    ((static_cast<unsigned int>(em_val*100000.)%bp1 *
-		      (this->node(n)%bp1))%bp1)*bp2;
+		  // We may have found the node, in which case we
+		  // won't need to look it up later.
+		  if (em_val == 1.)
+		    nodes[c][nc] = this->get_node(n);
+		  
+		  // Otherwise build the key to look for the node
+		  else
+		    keys[c][nc] +=
+		      ((static_cast<unsigned int>(em_val*100000.)%bp1 *
+			(this->node(n)%bp1))%bp1)*bp2;
 		}
-
-	      // We may have found the node, in which case we
-	      // won't need to look it up later.
-	      if (em_val == 1.)
-		nodes[c][nc] = this->get_node(n);
 	    }
 	  // Mod one last time
-	  keys[c][nc] = keys[c][nc]%bp1;
+	  //keys[c][nc] = keys[c][nc]%bp1;
 	}
       }
     
