@@ -1,4 +1,4 @@
-// $Id: utility.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: utility.h,v 1.3 2004-02-09 17:12:28 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -75,7 +75,25 @@ namespace Utility
       
 #endif    
   }
-  
+
+  /**
+   * An efficient template instantiation for raising
+   * to an arbitrary integer power.
+   */
+  template <int N>
+  inline
+  Real pow(const Real x) { return x * pow<N-1>(x); }
+
+  /**
+   * You have to also provide a full specialization for
+   * raising to the zero power which returns 1.  Otherwise,
+   * the function above will simply expand to the maximum
+   * template depth on your machine and cause a compilation
+   * error.
+   */
+  template <>
+  inline
+  Real pow<0>(const Real) { return 1.; }
 }
 
 #endif
