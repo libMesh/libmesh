@@ -1,4 +1,4 @@
-// $Id: ex9.C,v 1.5 2003-06-04 14:59:24 ddreyer Exp $
+// $Id: ex9.C,v 1.6 2003-06-04 22:47:45 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -232,7 +232,7 @@ int main (int argc, char** argv)
 	 * functionality, libMesh offers a string stream
 	 * to work around this.  Note that for other compilers,
 	 * this is just a set of preprocessor macros and therefore
-	 * should cost nothing (compared a hand-coded string stream).
+	 * should cost nothing (compared to a hand-coded string stream).
 	 */
 	{
 	  OStringStream out;
@@ -243,17 +243,6 @@ int main (int argc, char** argv)
 	  out <<  "..." << std::endl;
 	  std::cout << out.str();
 	}
-
-// OLD CODE
-// 	std::cout.width(2);
-// 	std::cout.fill(' ');
-// 	std::cout << std::right << t_step;
-//	std::cout << ", time=";
-// 	std::cout.width(6);
-// 	std::cout.fill('0');
-// 	std::cout << std::left << time;
-//	std::cout << "..." << std::endl;
-
 	
 
 	/**
