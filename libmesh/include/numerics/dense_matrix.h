@@ -1,4 +1,4 @@
-// $Id: dense_matrix.h,v 1.1 2003-11-05 22:26:44 benkirk Exp $
+// $Id: dense_matrix.h,v 1.2 2003-12-09 20:24:08 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -162,9 +162,29 @@ public:
 		const unsigned int j,
 		const T val,
 		DenseVector<T>& rhs);
+
+  /**
+   * Form the LU decomposition of the matrix.
+   */
+  void lu_decompose (const bool partial_pivot = false);
   
+  /**
+   * Solve the system Ax=b given the input vector b.
+   */
+  void lu_solve (DenseVector<T>& b,
+		 DenseVector<T>& x,
+		 const bool partial_pivot = false);
+
+  /**
+   * Solves the system Ax=b through back substitution
+   */
+  void lu_back_substitute (DenseVector<T>& b,
+			   DenseVector<T>& x,
+			   const bool partial_pivot = false) const;
+
   
 private:
+
   /**
    * The actual data values, stored as a 1D array.
    */

@@ -1,4 +1,4 @@
-// $Id: dense_matrix_base.h,v 1.1 2003-11-05 22:26:44 benkirk Exp $
+// $Id: dense_matrix_base.h,v 1.2 2003-12-09 20:24:08 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -186,7 +186,7 @@ void DenseMatrixBase<T>::add (const T factor,
 
 /*
  * For complex numbers, also offer a method
- * to add a real-valued matrix to a complex-
+ * to add a real-valued matrix to a complex-de
  * valued matrix (but not the other way around)!
  */
 template<>
