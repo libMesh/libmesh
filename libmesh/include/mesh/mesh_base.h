@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.17 2004-03-23 05:16:21 jwpeterson Exp $
+// $Id: mesh_base.h,v 1.18 2004-04-18 00:51:50 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -61,7 +61,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.17 $
+ * \version $Revision: 1.18 $
  */
 
 
@@ -497,6 +497,13 @@ public:
    */
   void print_info () const;
 
+  /**
+   * Equivalent to calling print_info() above, but now you can write:
+   * Mesh mesh;
+   * std::cout << mesh << std::endl;
+   */
+  friend std::ostream& operator << (std::ostream& os, const MeshBase& m);
+  
   /**
    * Returns a pair of std::vector<Elem*>::iterators which point
    * to the beginning and end of the _elements vector.

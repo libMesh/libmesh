@@ -1,4 +1,4 @@
-// $Id: quadrature.h,v 1.3 2004-03-18 16:40:59 jwpeterson Exp $
+// $Id: quadrature.h,v 1.4 2004-04-18 00:51:50 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -139,7 +139,10 @@ public:
    */
   void print_info() const;
 
-
+  /**
+   * Same as above, but allows you to use ethe stream syntax.
+   */
+  friend std::ostream& operator << (std::ostream& os, const QBase& q);
 
 protected:
 

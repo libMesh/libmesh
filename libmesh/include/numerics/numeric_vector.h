@@ -1,4 +1,4 @@
-// $Id: numeric_vector.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: numeric_vector.h,v 1.3 2004-04-18 00:51:50 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -369,7 +369,16 @@ public:
    * Prints the contents of the vector to the screen.
    */
   virtual void print() const;
-    
+
+  /**
+   * Same as above but allows you to use stream syntax.
+   */
+  friend std::ostream& operator << (std::ostream& os, const NumericVector<T>& v)
+  {
+    v.print();
+    return os;
+  }
+  
 protected:
   
   /**

@@ -1,4 +1,4 @@
-// $Id: sparse_matrix.h,v 1.3 2004-03-13 20:21:59 jwpeterson Exp $
+// $Id: sparse_matrix.h,v 1.4 2004-04-18 00:51:50 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -272,6 +272,16 @@ public:
    * package being used.
    */
   void print() const;
+
+  /**
+   * Same as the print method above, but allows you
+   * to print to a stream in the standard syntax.
+   */
+  friend std::ostream& operator << (std::ostream& os, const SparseMatrix<T>& m)
+  {
+    m.print();
+    return os;
+  }
   
   /**
    * Print the contents of the matrix to the screen

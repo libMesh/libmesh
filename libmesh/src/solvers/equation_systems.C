@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.4 2004-03-24 03:48:52 jwpeterson Exp $
+// $Id: equation_systems.C,v 1.5 2004-04-18 00:51:51 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -817,6 +817,14 @@ void EquationSystems::print_info () const
 {
   std::cout << this->get_info()
 	    << std::endl;
+}
+
+
+
+std::ostream& operator << (std::ostream& os, const EquationSystems& es)
+{
+  es.print_info();
+  return os;
 }
 
 

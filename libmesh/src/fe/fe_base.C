@@ -1,4 +1,4 @@
-// $Id: fe_base.C,v 1.23 2004-02-18 23:04:08 benkirk Exp $
+// $Id: fe_base.C,v 1.24 2004-04-18 00:51:50 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -747,4 +747,11 @@ bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real e
   return false;
 }
 
+
+
+std::ostream& operator << (std::ostream& os, const FEBase& fe)
+{
+  fe.print_info();
+  return os;
+}
 

@@ -1,4 +1,4 @@
-// $Id: dense_matrix_base.h,v 1.5 2004-03-21 03:19:25 benkirk Exp $
+// $Id: dense_matrix_base.h,v 1.6 2004-04-18 00:51:50 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -106,6 +106,17 @@ public:
    */
   void print() const;
 
+  /**
+   * Formatted print as above but allows you to do
+   * DenseMatrix K;
+   * std::cout << K << std::endl;
+   */
+  friend std::ostream& operator << (std::ostream& os, const DenseMatrixBase<T>& m)
+  {
+    m.print();
+    return os;
+  }
+  
   /**
    * Prints the matrix entries with more decimal places in
    * scientific notation.

@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.74 2004-03-24 05:49:12 jwpeterson Exp $
+// $Id: mesh_base.C,v 1.75 2004-04-18 00:51:50 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -349,6 +349,12 @@ void MeshBase::print_info() const
 	    << std::endl;
 }
 
+
+std::ostream& operator << (std::ostream& os, const MeshBase& m)
+{
+  m.print_info();
+  return os;
+}
 
 
 void MeshBase::skip_comment_lines (std::istream &in,

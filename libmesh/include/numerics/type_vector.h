@@ -1,4 +1,4 @@
-// $Id: type_vector.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: type_vector.h,v 1.3 2004-04-18 00:51:50 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -203,6 +203,17 @@ public:
    */
   void print() const;
 
+  /**
+   * Formatted print as above but allows you to do
+   * Point p(1,2,3);
+   * std::cout << p << std::endl;
+   */
+  friend std::ostream& operator << (std::ostream& os, const TypeVector<T>& t)
+  {
+    t.print();
+    return os;
+  }
+  
   /**
    * Unformatted print to the stream \p out.  Simply prints the elements
    * of the vector separated by spaces.  Optionally prints a newline,
