@@ -1,4 +1,4 @@
-// $Id: error_estimator.h,v 1.3 2004-05-20 19:48:46 jwpeterson Exp $
+// $Id: error_estimator.h,v 1.4 2004-06-02 20:32:53 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -74,10 +74,6 @@ public:
 			       std::vector<float>& error_per_cell)
   { this->estimate_error (es.get_system<SteadySystem>(name), error_per_cell); }
 
-
-  
-
-
   /**
    * This vector can be used to "mask" certain
    * variables in a system.  If the mask is empty then the error
@@ -87,6 +83,15 @@ public:
    * true.
    */
   std::vector<bool> component_mask;
+
+protected:
+
+  /**
+   * This method takes the local error contributions in
+   * \p error_per_cell from each processor and combines
+   * them to get the global error vector.
+   */
+  void reduce_error (std::vector<float>& error_per_cell) const;
 };
 
 

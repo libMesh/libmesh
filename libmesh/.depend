@@ -3384,7 +3384,52 @@ src/numerics/distributed_vector.$(obj-suffix):\
     include/numerics/numeric_vector.h\
     include/utils/perf_log.h
 src/numerics/error_estimator.$(obj-suffix):\
-    src/numerics/error_estimator.C
+    src/numerics/error_estimator.C\
+    include/base/auto_ptr.h\
+    include/base/dof_map.h\
+    include/base/dof_object.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/node.h\
+    include/base/predicated_iterator.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
+    include/enums/enum_order.h\
+    include/enums/enum_solver_package.h\
+    include/enums/enum_xdr_mode.h\
+    include/fe/fe_type.h\
+    include/geom/elem.h\
+    include/geom/point.h\
+    include/geom/sphere.h\
+    include/geom/surface.h\
+    include/mesh/boundary_info.h\
+    include/mesh/elem_iterators.h\
+    include/mesh/mesh.h\
+    include/mesh/mesh_base.h\
+    include/mesh/mesh_data.h\
+    include/mesh/node_iterators.h\
+    include/numerics/coupling_matrix.h\
+    include/numerics/error_estimator.h\
+    include/numerics/numeric_vector.h\
+    include/numerics/type_vector.h\
+    include/partitioning/partitioner.h\
+    include/solvers/equation_systems.h\
+    include/solvers/explicit_system.h\
+    include/solvers/frequency_system.h\
+    include/solvers/implicit_system.h\
+    include/solvers/newmark_system.h\
+    include/solvers/steady_system.h\
+    include/solvers/system.h\
+    include/solvers/transient_system.h\
+    include/utils/data_map.h\
+    include/utils/data_object.h\
+    include/utils/perf_log.h
 src/numerics/function_base.$(obj-suffix):\
     src/numerics/function_base.C\
     include/base/libmesh_base.h\
@@ -3627,6 +3672,65 @@ src/numerics/numeric_vector.$(obj-suffix):\
     include/numerics/laspack_vector.h\
     include/numerics/numeric_vector.h\
     include/numerics/petsc_vector.h\
+    include/utils/perf_log.h
+src/numerics/patch_recovery_error_estimator.$(obj-suffix):\
+    src/numerics/patch_recovery_error_estimator.C\
+    include/base/auto_ptr.h\
+    include/base/dof_map.h\
+    include/base/dof_object.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_logging.h\
+    include/base/node.h\
+    include/base/predicated_iterator.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
+    include/enums/enum_order.h\
+    include/enums/enum_quadrature_type.h\
+    include/enums/enum_solver_package.h\
+    include/enums/enum_xdr_mode.h\
+    include/fe/fe.h\
+    include/fe/fe_base.h\
+    include/fe/fe_type.h\
+    include/geom/elem.h\
+    include/geom/point.h\
+    include/geom/sphere.h\
+    include/geom/surface.h\
+    include/mesh/boundary_info.h\
+    include/mesh/elem_iterators.h\
+    include/mesh/mesh.h\
+    include/mesh/mesh_base.h\
+    include/mesh/mesh_data.h\
+    include/mesh/node_iterators.h\
+    include/numerics/coupling_matrix.h\
+    include/numerics/dense_matrix.h\
+    include/numerics/dense_matrix_base.h\
+    include/numerics/dense_vector.h\
+    include/numerics/dense_vector_base.h\
+    include/numerics/error_estimator.h\
+    include/numerics/numeric_vector.h\
+    include/numerics/patch_recovery_error_estimator.h\
+    include/numerics/type_vector.h\
+    include/numerics/vector_value.h\
+    include/partitioning/partitioner.h\
+    include/quadrature/quadrature.h\
+    include/quadrature/quadrature_gauss.h\
+    include/solvers/equation_systems.h\
+    include/solvers/explicit_system.h\
+    include/solvers/frequency_system.h\
+    include/solvers/implicit_system.h\
+    include/solvers/newmark_system.h\
+    include/solvers/steady_system.h\
+    include/solvers/system.h\
+    include/solvers/transient_system.h\
+    include/utils/data_map.h\
+    include/utils/data_object.h\
     include/utils/perf_log.h
 src/numerics/petsc_interface.$(obj-suffix):\
     src/numerics/petsc_interface.C\
@@ -4238,8 +4342,12 @@ src/solvers/exact_solution.$(obj-suffix):\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_quadrature_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
+    include/fe/fe.h\
+    include/fe/fe_base.h\
+    include/fe/fe_interface.h\
     include/fe/fe_type.h\
     include/geom/elem.h\
     include/geom/point.h\
@@ -4254,7 +4362,10 @@ src/solvers/exact_solution.$(obj-suffix):\
     include/numerics/coupling_matrix.h\
     include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
+    include/numerics/vector_value.h\
     include/partitioning/partitioner.h\
+    include/quadrature/quadrature.h\
+    include/quadrature/quadrature_gauss.h\
     include/solvers/equation_systems.h\
     include/solvers/exact_solution.h\
     include/solvers/explicit_system.h\
