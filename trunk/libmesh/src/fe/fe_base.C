@@ -1,4 +1,4 @@
-// $Id: fe_base.C,v 1.16 2003-05-21 15:27:34 benkirk Exp $
+// $Id: fe_base.C,v 1.17 2003-06-08 17:28:42 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -672,8 +672,20 @@ bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real e
 	    (zeta >= -1.-eps) &&
 	    (zeta <=  1.+eps))
 	  {
-	    std::cout << "Found this point in infinite domain:\n";
-	    p.print();
+	    return true;
+	  }
+	return false;
+      }
+
+    case INFPRISM6:
+      {      
+	// inside the reference triange with zeta in [-1,1]
+	if ((xi   >=  0.-eps) &&
+	    (eta  >=  0.-eps) &&
+	    (zeta >= -1.-eps) &&
+	    (zeta <=  1.+eps) &&
+	    ((xi + eta) <= 1.+eps))
+	  {
 	    return true;
 	  }
 
