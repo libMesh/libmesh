@@ -1,4 +1,4 @@
-// $Id: petsc_nonlinear_solver.C,v 1.7 2005-02-02 20:51:17 benkirk Exp $
+// $Id: petsc_nonlinear_solver.C,v 1.8 2005-02-04 13:36:39 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -56,12 +56,12 @@ extern "C"
   __libmesh_petsc_snes_monitor (SNES, PetscInt its, PetscReal fnorm, void *)
   {
     //int ierr=0;
-    
-    std::cout << "  NL conv: step " << its
-	      << std::scientific
-	      //<< ", |u|_oo = "      << 0
-	      << ", |resid|_2 = "   << fnorm
-              << std::endl;
+
+    if (its > 0)
+      std::cout << "  NL step " << its
+		<< std::scientific
+		<< ", |residual|_2 = " << fnorm
+		<< std::endl;
 
     //return ierr;
     return 0;
@@ -92,10 +92,6 @@ extern "C"
     if (solver->matvec   != NULL) solver->matvec   (X_local, &R, NULL);
 
     R.close();
-        
-//     std::cout << "X.size()=" << X_global.size()
-// 	      << ", R.size()=" << R.size()
-// 	      << std::endl;
     
     return ierr;
   }
@@ -128,11 +124,6 @@ extern "C"
     Jac.close();
     
     *msflag = SAME_NONZERO_PATTERN;
-    
-//     here();
-        
-//     std::cout << "X.size()=" << X_global.size()
-// 	      << std::endl;
     
     return ierr;
   }
