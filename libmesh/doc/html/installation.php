@@ -16,8 +16,8 @@
 <br>
 <h2><a name="getsoftware">Getting the Software</a></h2>
 <br>
-The <code>libMesh</code> source can be downloaded from the project's
-<a href="http://sourceforge.net/projects/libmesh">SourceForge homepage</a>.
+The <code>libMesh</code> source can be 
+<a href="http://sourceforge.net/project/showfiles.php?group_id=71130">downloaded from the project's SourceForge homepage</a>.
 Stable releases are located there as compressed tar archives. You may also
 access the CVS source tree for the latest code. You can get read-only access
 to the CVS repository via:
