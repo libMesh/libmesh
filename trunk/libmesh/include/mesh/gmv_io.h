@@ -1,4 +1,4 @@
-// $Id: gmv_io.h,v 1.2 2004-04-07 21:42:31 benkirk Exp $
+// $Id: gmv_io.h,v 1.3 2004-06-15 20:17:20 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -82,6 +82,13 @@ class GMVIO : public MeshIO<MeshBase>
    * information for the mesh.
    */
   bool & partitioning();
+  
+  /**
+   * Writes a GMV file with discontinuous data
+   */ 
+  void write_discontinuous_gmv (const std::string& name, 
+				const EquationSystems& es,
+				const bool write_partitioning) const;
   
 
 private:
