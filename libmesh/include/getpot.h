@@ -1,4 +1,4 @@
-// $Id: getpot.h,v 1.9 2003-09-03 16:35:23 benkirk Exp $
+// $Id: getpot.h,v 1.10 2003-09-03 16:49:10 benkirk Exp $
 //
 // (with patches from Michael Anderson for more general variable types)
 
@@ -29,7 +29,7 @@
 
 #if defined(WIN32) || defined(SOLARIS_RAW) || (__GNUC__ == 2) || defined(__HP_aCC) || defined (__CYGWIN__)
 #  define strtok_r(a, b, c) strtok(a, b)
-#endif // WINDOWS or SOLARIS or gcc 2.* or HP aCC
+#endif // WINDOWS or SOLARIS or gcc 2.* or HP aCC or CYGWIN
 
 
 #define GETPOT_ALLOW_VARGS
