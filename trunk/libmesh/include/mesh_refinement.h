@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.h,v 1.8 2003-05-01 18:44:30 benkirk Exp $
+// $Id: mesh_refinement.h,v 1.9 2003-05-19 21:21:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -38,6 +38,7 @@
 class MeshBase;
 class Point;
 class Node;
+class ErrorVector;
 
 
 
@@ -68,8 +69,18 @@ public:
   /**
    * Deletes all the data that are currently stored.
    */
-  void clear();  
+  void clear ();  
 
+  /**
+   * Flags elements for coarsening and refinement based on
+   * the computed error passed in \p error_per_cell.  The two
+   * fractions \p refine_fraction and \p coarsen_fraction must be in
+   * \f$ [0,1] \f$.
+   */
+  void flag_elements_by_error_fraction (const ErrorVector& error_per_cell,
+					const Real refine_fraction  = 0.3,
+					const Real coarsen_fraction = 0.0);
+		      
   /**
    * Refines and coarsens user-requested elements. Will also
    * refine/coarsen additional elements to satisy level-one rule.
@@ -95,14 +106,14 @@ public:
    * Add point \p p to the mesh. The function returns a pointer to
    * the new node.
    */
-  Node* add_point(const Point& p);
+  Node* add_point (const Point& p);
   
   /**
    * @returns The index of the next unused element number
    * in the \p element vector.  If all the entries are
    * full it returns the size of the vector.
    */
-  unsigned int new_element_number();
+  unsigned int new_element_number ();
 
 
 
@@ -116,37 +127,37 @@ private:
    * in the \p nodes vector.  If all the entries are
    * full it returns the size of the vector.
    */
-  unsigned int new_node_number();
+  unsigned int new_node_number ();
 
   /**
    * Updates the \p unused_elements data structure to
    * be compatible with the current state of the mesh.
    */
-  void update_unused_elements();
+  void update_unused_elements ();
   
   /**
    * Updates the \p unused_nodes data structure to
    * be compatible with the current state of the mesh.
    */
-  void update_unused_nodes() {}
+  void update_unused_nodes () {}
+
+  /**
+   * Sets the refinement flag to \p Elem::DO_NOTHING
+   * for each element in the mesh.
+   */
+  void clean_refinement_flags ();
   
   /**
    * Take user-specified coarsening flags and augment them
    * so that level-one dependency is satisfied.
    */
-  bool make_coarsening_compatible(const bool);
+  bool make_coarsening_compatible (const bool);
 
   /**
    * Take user-specified refinement flags and augment them
    * so that level-one dependency is satisfied.
    */
-  bool make_refinement_compatible(const bool);
-
-  /**
-   * Rebuild data structure that is used to constrain
-   * hanging nodes for non-conforming finite elements.
-   */
-  void update_hanging_node_constraints();
+  bool make_refinement_compatible (const bool);
 
   /**
    * Data structure that holds the new nodes information.

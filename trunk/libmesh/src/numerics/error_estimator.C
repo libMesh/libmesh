@@ -1,4 +1,4 @@
-// $Id: error_estimator.C,v 1.3 2003-05-16 14:37:50 benkirk Exp $
+// $Id: error_estimator.C,v 1.4 2003-05-19 21:21:13 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -18,9 +18,22 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
+// libMesh Configuration
+#include "mesh_config.h"
 
 // C++ includes
 #include <algorithm>
+#include <math.h>
+
+#ifdef HAVE_MPI
+namespace Mpi
+{
+  extern "C"{
+#include <mpi.h>
+  }
+}
+#endif
+
 
 // Local Includes
 #include "error_estimator.h"
@@ -236,6 +249,30 @@ void ErrorEstimator::flux_jump (const EquationSystems& es,
 	} // End loop over active local elements
       
     } // End loop over variables
+
+
+  // Each processor has now computed the error contribuions
+  // for its local elements.  We need to sum the vector
+  // and then take the square-root of each component.  Note
+  // that we only need to sum if we are running on multiple
+  // processors, and we only need to take the square-root
+  // if the value is nonzero.  There will in general be many
+  // zeros for the inactive elements.
+#ifdef HAVE_MPI
+  if (libMesh::n_processors() > 1)
+    {
+      using namespace Mpi;
+      
+      MPI_Allreduce (&error_per_cell[0], &error_per_cell[0],
+		     error_per_cell.size(),
+		     MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
+    }  
+#endif
+
+  // Compute the square-root of each component.
+  for (unsigned int i=0; i<error_per_cell.size(); i++)
+    if (error_per_cell[i] != 0.)
+      error_per_cell[i] = sqrt(error_per_cell[i]);
   
   STOP_LOG("flux_jump()", "ErrorEstimator");
 }
