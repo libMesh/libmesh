@@ -1,4 +1,4 @@
-// $Id: mesh_exodus_support.C,v 1.9 2003-09-16 15:59:31 benkirk Exp $
+// $Id: mesh_exodus_support.C,v 1.10 2003-10-02 03:39:25 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -30,11 +30,11 @@
 
 
 #ifdef HAVE_EXODUS_API
-namespace exII {
-extern "C" {
-#include "exodusII.h"
-}
-}
+// namespace exII {
+// extern "C" {
+// #include "exodusII.h"
+// }
+// }
 
 #include "mesh_exodus_support.h"
 

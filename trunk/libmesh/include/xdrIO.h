@@ -1,4 +1,4 @@
-// $Id: xdrIO.h,v 1.13 2003-09-25 21:46:55 benkirk Exp $
+// $Id: xdrIO.h,v 1.14 2003-10-02 03:39:25 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -22,12 +22,18 @@
 #ifndef __xdrIO_h__
 #define __xdrIO_h__
 
+#include "libmesh_config.h"
+
 // C++ includes
 #include <stdio.h>
-//#include <fstream>
 #include <iomanip>
 #include <vector>
 #include <string>
+
+#ifdef HAVE_RPC_RPC_H
+# include <rpc/rpc.h>
+#endif
+
 
 // Local includes
 #include "libmesh_common.h"

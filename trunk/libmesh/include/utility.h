@@ -1,4 +1,4 @@
-// $Id: utility.h,v 1.10 2003-09-27 00:54:57 benkirk Exp $
+// $Id: utility.h,v 1.11 2003-10-02 03:39:25 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,7 @@
 // Local includes
 
 // System includes
-
+#include <string>
 
 
 // ------------------------------------------------------------
