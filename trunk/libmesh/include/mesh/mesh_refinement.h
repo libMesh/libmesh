@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: mesh_refinement.h,v 1.3 2004-02-25 14:27:24 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -329,7 +329,11 @@ private:
     typedef std::hash_multimap<unsigned int, Node*> map_type;    
 #elif defined(HAVE_EXT_HASH_MAP)
 # if  __GNUC__ >= 3
-    typedef __gnu_cxx::hash_multimap<unsigned int, Node*> map_type;
+#   if __GNUC_MINOR__ == 0    
+       typedef std::hash_multimap<unsigned int, Node*> map_type;
+#   else
+       typedef __gnu_cxx::hash_multimap<unsigned int, Node*> map_type;
+#   endif 
 # else
     DIE A HORRIBLE DEATH
 # endif
