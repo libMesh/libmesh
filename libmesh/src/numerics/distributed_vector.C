@@ -1,4 +1,4 @@
-// $Id: distributed_vector.C,v 1.1 2003-02-18 19:43:38 benkirk Exp $
+// $Id: distributed_vector.C,v 1.2 2003-02-19 13:28:41 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -359,8 +359,8 @@ void DistributedVector<Tp>::localize (NumericVector& v_local_in,
 
 
 
-template <typename Tp>
-void DistributedVector<Tp>::localize (std::vector<Tp>& v_local) const
+template <>
+void DistributedVector<float>::localize (std::vector<float>& v_local) const
 
 {
   assert (initialized());
@@ -380,19 +380,8 @@ void DistributedVector<Tp>::localize (std::vector<Tp>& v_local) const
 
   using namespace Mpi;
 
-  if (sizeof(Tp) == sizeof(double))
-    MPI_Allreduce (&v_local[0], &v_local[0], v_local.size(),
-		   MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-
-  else if (sizeof(Tp) == sizeof(float))
-    MPI_Allreduce (&v_local[0], &v_local[0], v_local.size(),
-		   MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
-
-  else
-    {
-      error();
-    }
-    
+  MPI_Allreduce (&v_local[0], &v_local[0], v_local.size(),
+		 MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
   
 #else
 
@@ -403,9 +392,9 @@ void DistributedVector<Tp>::localize (std::vector<Tp>& v_local) const
 
 
 
-template <typename Tp>
-void DistributedVector<Tp>::localize_to_one (std::vector<Tp>& v_local,
-					     const unsigned int pid) const
+template <>
+void DistributedVector<double>::localize (std::vector<double>& v_local) const
+
 {
   assert (initialized());
   assert (_values.size() == _local_size);
@@ -424,19 +413,74 @@ void DistributedVector<Tp>::localize_to_one (std::vector<Tp>& v_local,
 
   using namespace Mpi;
 
-  if (sizeof(Tp) == sizeof(double))
-    MPI_Reduce (&v_local[0], &v_local[0], v_local.size(),
-		MPI_DOUBLE, MPI_SUM, pid, MPI_COMM_WORLD);
+  MPI_Allreduce (&v_local[0], &v_local[0], v_local.size(),
+		 MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+  
+#else
 
-  else if (sizeof(Tp) == sizeof(float))
-    MPI_Reduce (&v_local[0], &v_local[0], v_local.size(),
-		   MPI_FLOAT, MPI_SUM, pid, MPI_COMM_WORLD);
+  assert (local_size() == size());
+  
+#endif  
+}
 
-  else
-    {
-      error();
-    }
-    
+
+
+template <>
+void DistributedVector<float>::localize_to_one (std::vector<float>& v_local,
+						const unsigned int pid) const
+{
+  assert (initialized());
+  assert (_values.size() == _local_size);
+  assert ((_last_local_index - _first_local_index) == _local_size);
+
+  v_local.resize(size());
+  
+  std::fill (v_local.begin(),
+	     v_local.end(),
+	     0.);
+
+  for (unsigned int i=0; i<local_size(); i++)
+    v_local[i+first_local_index()] = _values[i];
+
+#ifdef HAVE_MPI
+
+  using namespace Mpi;
+
+  MPI_Reduce (&v_local[0], &v_local[0], v_local.size(),
+	      MPI_FLOAT, MPI_SUM, pid, MPI_COMM_WORLD);
+  
+#else
+
+  assert (local_size() == size());
+  
+#endif  
+}
+
+
+
+template <>
+void DistributedVector<double>::localize_to_one (std::vector<double>& v_local,
+						 const unsigned int pid) const
+{
+  assert (initialized());
+  assert (_values.size() == _local_size);
+  assert ((_last_local_index - _first_local_index) == _local_size);
+
+  v_local.resize(size());
+  
+  std::fill (v_local.begin(),
+	     v_local.end(),
+	     0.);
+
+  for (unsigned int i=0; i<local_size(); i++)
+    v_local[i+first_local_index()] = _values[i];
+
+#ifdef HAVE_MPI
+
+  using namespace Mpi;
+
+  MPI_Reduce (&v_local[0], &v_local[0], v_local.size(),
+	      MPI_DOUBLE, MPI_SUM, pid, MPI_COMM_WORLD);
   
 #else
 
