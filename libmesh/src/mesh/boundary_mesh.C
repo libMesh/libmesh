@@ -1,4 +1,4 @@
-// $Id: boundary_mesh.C,v 1.14 2005-02-22 22:17:39 jwpeterson Exp $
+// $Id: boundary_mesh.C,v 1.15 2005-03-02 21:27:08 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -44,36 +44,16 @@ BoundaryMesh::~BoundaryMesh()
 
 void BoundaryMesh::clear()
 {
-  // Reset the number of subdomains and partitions
-  _n_sbd   = 1;
-  _n_parts = 1;
-  
-  //   // Clear the elements data structure
-  //   for (unsigned int e=0; e<_elements.size(); e++)
-  //     if (_elements[e] != NULL)
-  //       {
-  // 	delete _elements[e];
-  // 	_elements[e] = NULL;
-  //       }	    
-  
-  // Delete all the elements.
-  MeshBase::element_iterator it        = this->elements_begin();
-  const MeshBase::element_iterator end = this->elements_end();
-
-  for (; it != end; ++it)
-    this->delete_elem(*it);
-
-  // Note: in the future, we can't assume that there will be
-  // a vector of elements to clear!
-  // _elements.clear();
+  // No need to delete the elements here.
+  // MeshBase::clear() will handle that for us.
   
   // Don't delete the nodes here... They are simply pointers
-  // to the nodes in \p MeshBase that will be deleted by another
-  // class.
+  // to the nodes that were allocated by another mesh.
+  // However, we need to clear the vector, otherwise
+  // the MeshBase::clear() member will doubly-delete the nodes!
+  _nodes.clear();
 
-  // Note: in the future, we can't assume that there will be
-  // a vector of nodes to clear!
-  // _nodes.clear();
+  MeshBase::clear();
 }
 
 
