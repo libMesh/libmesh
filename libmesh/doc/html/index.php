@@ -18,18 +18,27 @@
 <!-- <br><br><br> -->
 <?php
 // This php script makes the words wrap nicely around the image which
-// we have split up into several sections.
-for ($i=0; $i<11; $i++)
+// we have split up into several sections.  Unfortunately, it doesnt
+// work for internet explorer!
+if (NW_IS_IE)
 {
-  if ($i < 10)
-  {
-    echo "<img class=\"slant\" src=\"images/libmesh_mesh_layer_0$i.png\">";
-  }
-  
-  else
-  {
-    echo "<img class=\"slant\" src=\"images/libmesh_mesh_layer_10.png\">";
-  }
+  echo "<img class=\"title_image\" src=\"images/libmesh_mesh_small.png\">";
+}
+
+else
+{
+  for ($i=0; $i<11; $i++)
+    {
+      if ($i < 10)
+	{
+	  echo "<img class=\"slant\" src=\"images/libmesh_mesh_layer_0$i.png\">";
+	}
+      
+      else
+	{
+	  echo "<img class=\"slant\" src=\"images/libmesh_mesh_layer_10.png\">";
+	}
+    }
 }
 ?>
 The <code>libMesh</code> library is a C++ framework for the numerical
