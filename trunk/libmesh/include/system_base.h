@@ -1,4 +1,4 @@
-// $Id: system_base.h,v 1.8 2003-03-18 18:20:15 benkirk Exp $
+// $Id: system_base.h,v 1.9 2003-03-19 22:43:30 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -352,7 +352,7 @@ unsigned int SystemBase::number() const
 inline
 unsigned int SystemBase::n_vars() const
 {
-  assert (!_var_names.empty());
+//  assert (!_var_names.empty());
 
   return _var_names.size();
 }
