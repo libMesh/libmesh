@@ -1,4 +1,4 @@
-// $Id: frequency_system.C,v 1.11.2.2 2003-05-06 21:53:35 benkirk Exp $
+// $Id: frequency_system.C,v 1.11.2.3 2003-05-07 20:47:15 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -98,7 +98,7 @@ void FrequencySystem::clear ()
 
 
 
-void FrequencySystem::init ()
+void FrequencySystem::init_data ()
 {
   // Log how long initializing the system takes
   START_LOG("init()", "FrequencySystem");
@@ -111,7 +111,7 @@ void FrequencySystem::init ()
     }
 
   // initialize parent data and additional solution vectors
-  SteadySystem::init();
+  SteadySystem::init_data();
 
   _finished_init = true;
 

@@ -1,4 +1,4 @@
-// $Id: newmark_system.C,v 1.4.2.1 2003-05-06 17:13:33 benkirk Exp $
+// $Id: newmark_system.C,v 1.4.2.2 2003-05-07 20:47:15 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,9 +24,7 @@
 // Local includes
 #include "newmark_system.h"
 #include "equation_systems.h"
-// #include "mesh.h"
 #include "sparse_matrix.h"
-#include "linear_solver_interface.h"
 #include "mesh_logging.h"
 
 
@@ -39,7 +37,6 @@ NewmarkSystem::NewmarkSystem (EquationSystems& es,
 			      const unsigned int number) :
   
   TransientSystem    (es, name, number),
-  solve_system       (NULL),
   _finished_assemble (false)
   
 {
@@ -79,8 +76,6 @@ NewmarkSystem::NewmarkSystem (EquationSystems& es,
 
 NewmarkSystem::~NewmarkSystem ()
 {
-  solve_system = NULL;
-  
   // clear the parameters and integration constants
   _equation_systems.unset_parameter("Newmark alpha");
   _equation_systems.unset_parameter("Newmark delta");
@@ -104,25 +99,12 @@ void NewmarkSystem::clear ()
 
 
 
-
-void NewmarkSystem::init ()
-{
-//  assert (_mesh.is_prepared());
-  
-  // initialize parent data
-  TransientSystem::init();
-}
-
-
-
 void NewmarkSystem::reinit ()
 {
-//  assert (_mesh.is_prepared());
+  error();
   
   // initialize parent data
   TransientSystem::reinit();
-
-  error();
 }
 
 
@@ -130,29 +112,30 @@ void NewmarkSystem::reinit ()
 void NewmarkSystem::assemble ()
 {
   assert (assemble_system != NULL);
-  assert (!_finished_assemble);
 
-  // prepare matrix with the help of the _dof_map, 
-  // fill with sparsity pattern
-  TransientSystem::assemble();
-
-  // Log how long the user's matrix assembly code takes
-  START_LOG("assemble()", "NewmarkSystem");
-  
-  // Call the user-specified matrix assembly function
-  this->assemble_system (_equation_systems, this->name());
-
-  // Stop logging the user code
-  STOP_LOG("assemble()", "NewmarkSystem");
-
-  // compute the effective system matrix
-  this->compute_matrix();
-
-  // apply initial conditions
-  this->initial_conditions();
-
-  _finished_assemble = true;
-
+  if (!_finished_assemble)
+    {
+      // prepare matrix with the help of the _dof_map, 
+      // fill with sparsity pattern
+      TransientSystem::assemble();
+      
+      // Log how long the user's matrix assembly code takes
+      START_LOG("assemble()", "NewmarkSystem");
+      
+      // Call the user-specified matrix assembly function
+      this->assemble_system (_equation_systems, this->name());
+      
+      // Stop logging the user code
+      STOP_LOG("assemble()", "NewmarkSystem");
+      
+      // compute the effective system matrix
+      this->compute_matrix();
+      
+      // apply initial conditions
+      this->initial_conditions();
+      
+      _finished_assemble = true;
+    }
 }
 
 
@@ -177,9 +160,8 @@ void NewmarkSystem::initial_conditions ()
 
   // Stop logging the user code
   STOP_LOG("initial_conditions ()", "NewmarkSystem");
-
-
 }
+
 
 
 void NewmarkSystem::compute_matrix ()
@@ -203,6 +185,8 @@ void NewmarkSystem::compute_matrix ()
 
 void NewmarkSystem::update_rhs ()
 {
+  START_LOG("update_rhs ()", "NewmarkSystem");
+  
   // zero the rhs-vector
   NumericVector<Number>& rhs = *this->rhs;
   rhs.zero();
@@ -229,12 +213,16 @@ void NewmarkSystem::update_rhs ()
   rhs.add(this->get_vector("force"));
   rhs.add_vector(rhs_m, this->get_matrix("mass"));
   rhs.add_vector(rhs_c, this->get_matrix("damping"));
+  
+  STOP_LOG("update_rhs ()", "NewmarkSystem");
 }
 
 
 
 void NewmarkSystem::update_u_v_a ()
 {
+  START_LOG("update_u_v_a ()", "NewmarkSystem");
+  
   // get some references for convenience
   const NumericVector<Number>&  solu = *this->solution;
 
@@ -258,49 +246,8 @@ void NewmarkSystem::update_u_v_a ()
   // compute the new velocity vector
   vel_vec.add(_a_6,old_acc);
   vel_vec.add(_a_7,acc_vec);
-}
-
-
-
-std::pair<unsigned int, Real>
-NewmarkSystem::solve ()
-{
-
-  // make sure that the system is assembled
-  if(!_finished_assemble)
-    {
-      std::cerr << "ERROR: Need to assemble the system before calling solve(). " << std::endl;
-      error();
-    }
-
-
-  // Assemble the linear system
-  // this->assemble ();
-
-  // Call the user specified pre-solve method
-  // if it is provided
-  // if(this->solve_fptr != NULL)
-  //    this->solve_fptr (_equation_systems, this->name());
-
-  // Log how long the linear solve takes.
-  START_LOG("solve()", "NewmarkSystem");
   
-  // Get the user-specifiied linear solver tolerance
-  const Real tol            =
-    _equation_systems.parameter("linear solver tolerance");
-
-  // Get the user-specified maximum # of linear solver iterations
-  const unsigned int maxits =
-    static_cast<unsigned int>(_equation_systems.parameter("linear solver maximum iterations"));
-
-  // Solve the linear system
-  const std::pair<unsigned int, Real> rval = 
-    linear_solver_interface->solve (*matrix, *solution, *rhs, tol, maxits);
-
-  // Stop logging the linear solve
-  STOP_LOG("solve()", "NewmarkSystem");
-
-  return rval; 
+  STOP_LOG("update_u_v_a ()", "NewmarkSystem");
 }
 
 
@@ -327,50 +274,4 @@ void NewmarkSystem::set_newmark_parameters (const Real delta_T,
   _a_5 = delta_T/2.*(delta/alpha-2.);
   _a_6 = delta_T*(1.-delta);
   _a_7 = delta*delta_T;
-}
-
-
-
-
-// bool NewmarkSystem::compare (const NewmarkSystem& other_system, 
-// 			     const Real threshold,
-// 			     const bool verbose) const
-// {
-//   /* provided the parameters alpha and delta are identical
-//    * (what EquationSystems will check, since it owns the parameters),
-//    * we have no additional data to compare, so let SystemBase do the job
-//    */
-//   const SystemBase& other_system_base = static_cast<const SystemBase&>(other_system);
-//   return SystemBase::compare (other_system_base, threshold, verbose);
-// }
-
-
-
-
-// void NewmarkSystem::attach_init_cond_function(void fptr(EquationSystems& es,
-// 							const std::string& name))
-// {
-//   assert (fptr != NULL);
-  
-//   init_cond_fptr = fptr;
-// }
-
-
-
-// void NewmarkSystem::attach_assemble_function(void fptr(EquationSystems& es,
-// 						    const std::string& name))
-// {
-//   assert (fptr != NULL);
-  
-//   assemble_fptr = fptr;  
-// }
-
-
-
-void NewmarkSystem::attach_solve_function(void fptr(EquationSystems& es,
-						    const std::string& name))
-{
-  assert (fptr != NULL);
-  
-  solve_system = fptr;
 }

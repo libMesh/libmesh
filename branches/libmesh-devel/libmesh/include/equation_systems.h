@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.23.2.3 2003-05-06 17:13:32 benkirk Exp $
+// $Id: equation_systems.h,v 1.23.2.4 2003-05-07 20:47:15 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -109,6 +109,24 @@ public:
    */
   template <typename T_sys>
   T_sys& get_system (const std::string& name);
+
+  /**
+   * @returns a constant reference to system number \p num.
+   * The template argument defines the return type.  For example,
+   * const SteadySystem& sys = eq.get_system<SteadySystem> (0);
+   * is an example of how the method might be used
+   */
+  template <typename T_sys>
+  const T_sys& get_system (const unsigned int num) const;
+
+  /**
+   * @returns a writeable referene to the system number \p num.
+   * The template argument defines the return type.  For example,
+   * const SteadySystem& sys = eq.get_system<SteadySystem> (0);
+   * is an example of how the method might be used
+   */
+  template <typename T_sys>
+  T_sys& get_system (const unsigned int num);
   
   /**
    * @returns a reference to the system named \p name.
@@ -223,15 +241,44 @@ public:
                 const bool verbose) const;
 
   /**
+   * @returns a string containing information about the
+   * systems, flags, and parameters.
+   */
+  std::string get_info() const;
+    
+  /**
    * Prints information about the equation systems.
    */
   void print_info () const;
 
+  
 
+  //-------------------------------------------------
+  // Methods for accessing additional data
+  //
+
+  /**
+   * @returns a pointet to an object of type \p T.  If the
+   * user has specified such an object then a vaild pointer
+   * is returned, otherwise \p NULL is returned.
+   */
+  template <class T>
+  T* additional_data (const std::string& name) const;
+
+  /**
+   * Set or get a pointer to an arbitrary type identified by \p name.
+   */
+  void* & additional_data (const std::string& name);
+
+  /**
+   * Removes any additional data associated with the name \p name.
+   */
+  void unset_additional_data (const std::string& name);
 
   
+  
   //-------------------------------------------------
-  // Flags & parameters
+  // Methods for accessing flags
   // 
   /**
    * @returns \p true if the flag \p fl is set, returns
@@ -254,11 +301,22 @@ public:
    * @returns the number of flags. 
    */
   unsigned int n_flags () const;
-  
+
+
+
+  //-------------------------------------------------
+  // Methods for accessing parameters
+  //
   /**
-   * @returns the parameter value assoicated with \p id.
+   * @returns the parameter value assoicated with \p id as a Real number.
    */
   Real parameter (const std::string& id) const;
+
+  /**
+   * @returns the parameter value assoicated with \p id as a specified type.
+   */
+  template <typename T>
+  T parameter (const std::string& id) const;
 
   /**
    * Defines the value of parameter \p id as \p value.
@@ -278,6 +336,9 @@ public:
    */
   unsigned int n_parameters () const;
 
+
+
+  
   /**
    * @returns a constant reference to the mesh
    */
@@ -288,12 +349,6 @@ protected:
 
   
   /**
-   * @returns a string containing information about the
-   * flags and parameters.
-   */
-  std::string get_info() const;
-    
-  /**
    * The mesh data structure
    */ 
   const Mesh& _mesh;
@@ -302,6 +357,11 @@ protected:
    * Data structure holding the systems.
    */
   std::map<std::string, SystemBase*> _systems;
+
+  /**
+   * Data structure holding user-supplied additional data.
+   */
+  std::map<std::string, void*> _additional_data;
   
   /**
    * Data structure to hold user-specified flags.
@@ -373,7 +433,8 @@ template <typename T_sys>
 inline
 T_sys& EquationSystems::get_system (const std::string& name)
 {
-  std::map<std::string, SystemBase*>::const_iterator pos = _systems.find(name);
+  std::map<std::string, SystemBase*>::const_iterator
+    pos = _systems.find(name);
   
   if (pos == _systems.end())
     {
@@ -383,6 +444,106 @@ T_sys& EquationSystems::get_system (const std::string& name)
     }
 
   return dynamic_cast<T_sys&>(*(pos->second));
+}
+
+
+
+template <typename T_sys>
+inline
+const T_sys& EquationSystems::get_system (const unsigned int num) const
+{
+  assert (num < this->n_systems());
+  
+  std::map<std::string, SystemBase*>::const_iterator
+    pos = _systems.begin();
+
+  for (; pos != _systems.end(); ++pos)
+    if (pos->second->number() == num)
+      break;
+  
+  if (pos == _systems.end())
+    {
+      std::cerr << "ERROR: no system number " << num << " found!"
+		<< std::endl;
+      error();
+    }
+
+  return dynamic_cast<const T_sys&>(*(pos->second));
+}
+
+
+
+template <typename T_sys>
+inline
+T_sys& EquationSystems::get_system (const unsigned int num)
+{
+  assert (num < this->n_systems());
+  
+  std::map<std::string, SystemBase*>::iterator
+    pos = _systems.begin();
+
+  for (; pos != _systems.end(); ++pos)
+    if (pos->second->number() == num)
+      break;
+  
+  if (pos == _systems.end())
+    {
+      std::cerr << "ERROR: no system number " << num << " found!"
+		<< std::endl;
+      error();
+    }
+
+  return dynamic_cast<T_sys&>(*(pos->second));
+}
+
+
+
+template <class T>
+inline
+T* EquationSystems::additional_data (const std::string& name) const
+{
+  // Look for name in the additional data map
+  std::map<std::string, void*>::const_iterator
+    pos = _additional_data.find(name);
+
+  if (pos == _additional_data.end())
+    {
+      here();
+
+      std::cerr << "WARNING: no object matching \"" << name
+		<< "\" found.  Returning NULL"
+		<< std::endl;
+
+      return NULL;
+    }
+
+  // Better not be NULL!
+  assert (pos->second != NULL);
+  
+  return static_cast<T*>(pos->second);
+}
+
+
+
+template <typename T>
+inline
+T EquationSystems::parameter (const std::string& id) const
+{
+  // Look for the id in the database
+  std::map<std::string, Real>::const_iterator
+    pos = _parameters.find(id);
+  
+  if (pos == _parameters.end())
+    {
+      std::cerr << "ERROR: parameter " << id
+		<< " was not set!"
+		<< std::endl;
+      error();
+    }
+
+  
+  // Return the parameter value if found
+  return static_cast<T>(pos->second);
 }
 
 

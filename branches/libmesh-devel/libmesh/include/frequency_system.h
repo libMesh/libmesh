@@ -1,4 +1,4 @@
-// $Id: frequency_system.h,v 1.8.2.2 2003-05-06 21:53:34 benkirk Exp $
+// $Id: frequency_system.h,v 1.8.2.3 2003-05-07 20:47:15 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -90,14 +90,6 @@ public:
    * the system. 
    */
   void clear ();
-
-  /**
-   * Initializes the member data fields associated with
-   * the system, so that, e.g., \p assemble() may be used.  
-   * The frequenices have to be set @e prior to calling 
-   * \p init().
-   */
-  void init ();
  
 //   /**
 //    * Reinitializes the member data fields associated with
@@ -200,6 +192,14 @@ public:
 
 protected:
 
+
+  /**
+   * Initializes the member data fields associated with
+   * the system, so that, e.g., \p assemble() may be used.  
+   * The frequenices have to be set @e prior to calling 
+   * \p init().
+   */
+  void init_data ();
   
   /**
    * Sets the current frequency to the \p n-th entry in the vector

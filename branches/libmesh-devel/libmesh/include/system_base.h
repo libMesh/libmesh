@@ -1,4 +1,4 @@
-// $Id: system_base.h,v 1.14.2.4 2003-05-06 21:53:34 benkirk Exp $
+// $Id: system_base.h,v 1.14.2.5 2003-05-07 20:47:15 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -90,7 +90,7 @@ public:
    * for all applications. @e Should be overloaded in derived classes.
    * Protected so that only children can use it.
    */
-  virtual void init ();
+  void init ();
   
   /**
    * Reinitializes degrees of freedom and other 
@@ -119,7 +119,7 @@ public:
   /**
    * Assembles & solves the linear system Ax=b. 
    */
-  virtual std::pair<unsigned int, Real> solve () = 0;
+  virtual std::pair<unsigned int, Real> solve ();
   
   /**
    * @returns \p true when the other system contains
@@ -146,8 +146,8 @@ public:
    * Projects the solution vector to the new mesh.  The input indices
    * give the old DOF numbers in terms of the new DOF numbers.
    */
-  void project_vector(const NumericVector<Number>*,
-                      NumericVector<Number>*) const;
+  void project_vector (const NumericVector<Number>*,
+		       NumericVector<Number>*) const;
   
   /**
    * @returns the system number.   
@@ -400,6 +400,13 @@ public:
 
 protected:
 
+  
+  /**
+   * Initializes the data for the system.  Note that this is called
+   * before any user-supplied intitialization function so that all
+   * required storage will be available.
+   */
+  virtual void init_data ();
   
   /**
    * A name associated with this system.

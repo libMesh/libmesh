@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.34.2.5 2003-05-06 21:53:35 benkirk Exp $
+// $Id: equation_systems.C,v 1.34.2.6 2003-05-07 20:47:15 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -58,19 +58,28 @@ EquationSystems::~EquationSystems ()
 
 void EquationSystems::clear ()
 {
+  // Clear any user-supplied additional data
+  _additional_data.clear ();
+
+  // Clear any flags
   _flags.clear ();
 
+  // Clear any parameters
   _parameters.clear ();
 
-  std::map<std::string, SystemBase*>::iterator
-    pos = _systems.begin();
-  
-  for (; pos != _systems.end(); ++pos)
-    {
-      delete pos->second; pos->second = NULL;
-    }
-      
- _systems.clear ();
+  // clear the systems.  We must delete them
+  // since we newed them!
+  {
+    std::map<std::string, SystemBase*>::iterator
+      pos = _systems.begin();
+    
+    for (; pos != _systems.end(); ++pos)
+      {
+	delete pos->second; pos->second = NULL;
+      }
+    
+    _systems.clear ();
+  }
 }
 
 
@@ -312,16 +321,16 @@ SystemBase & EquationSystems::operator () (const unsigned int num)
 #else
   std::advance (pos, num);
 #endif
-                                                                                
+  
   return *(pos->second);
 }
-                                                                                
-                                                                                
-                                                                                
+
+
+
 const SystemBase & EquationSystems::operator ()  (const unsigned int num) const
 {
   assert (num < this->n_systems());
-                                                                                
+
   std::map<std::string, SystemBase*>::const_iterator
     pos = _systems.begin();
 
@@ -331,7 +340,7 @@ const SystemBase & EquationSystems::operator ()  (const unsigned int num) const
 #else
   std::advance (pos, num);
 #endif
-                                                                                
+
   return *(pos->second);
 }
 
@@ -352,8 +361,6 @@ void EquationSystems::build_variable_names (std::vector<std::string>& var_names)
     for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
       var_names[var_num++] = pos->second->variable_name(vn);       
 }
-
-
 
 
 
@@ -585,8 +592,6 @@ bool EquationSystems::compare (const EquationSystems& other_es,
 
 
 
-
-
 std::string EquationSystems::get_info () const
 {
   std::ostringstream out;
@@ -683,6 +688,36 @@ unsigned int EquationSystems::n_dofs () const
 
 
 
+
+void* & EquationSystems::additional_data (const std::string& name)
+{
+  // Check for the entry already.  If it is there return the pointer,
+  // but make sure it isn't NULL
+  if (_additional_data.count(name) != 0)
+    {
+      assert (_additional_data[name] != NULL);
+
+      return _additional_data[name];
+    }
+
+  return _additional_data[name];
+}
+
+
+
+void EquationSystems::unset_additional_data (const std::string& name)
+{
+  // Look for an entry matching name
+  std::map<std::string, void*>::iterator
+    pos = _additional_data.find(name);
+
+  // Remove it if an entry was found
+  if (pos != _additional_data.end())
+    _additional_data.erase(pos);
+}
+
+
+
 bool EquationSystems::flag (const std::string& fl) const
 {
   return (_flags.count(fl) != 0);
@@ -692,19 +727,6 @@ bool EquationSystems::flag (const std::string& fl) const
 
 void EquationSystems::set_flag (const std::string& fl)
 {
-#ifdef DEBUG
-  /*
-  // Make sure the parameter isn't already set
-  if (flags.count(fl))
-    std::cerr << "WARNING: flag "
-      	      << "\""
-	      << fl
-      	      << "\""
-	      << " is already set!"
-	      << std::endl;
-  */
-#endif
-
   _flags.insert (fl);
 }
 
@@ -713,36 +735,19 @@ void EquationSystems::set_flag (const std::string& fl)
 void EquationSystems::unset_flag (const std::string& fl)
 {
   // Look for the flag in the database
-  if (!_flags.count(fl))
-    {
-      std::cerr << "ERROR: flag " << fl
-		<< " was not set!"
-		<< std::endl;
-      error(); 
-    }
+  std::set<std::string>::iterator
+    pos = _flags.find(fl);
 
-  // Remove the flag
-  _flags.erase (fl);  
+  // If the flag was found remove it
+  if (pos != _flags.end())
+    _flags.erase(pos);
 }
 
 
 
 Real EquationSystems::parameter (const std::string& id) const
 {
-  // Look for the id in the database
-  std::map<std::string, Real>::const_iterator
-    pos = _parameters.find(id);
-  
-  if (pos == _parameters.end())
-    {
-      std::cerr << "ERROR: parameter " << id
-		<< " was not set!"
-		<< std::endl;
-      error();
-    }
-  
-  // Return the parameter value if found
-  return pos->second;
+  return this->parameter<Real> (id);
 }
 
 
@@ -774,7 +779,7 @@ void EquationSystems::unset_parameter (const std::string& id)
   std::map<std::string, Real>::iterator
     pos = _parameters.find(id);
   
-  // If the parameter was found
+  // If the parameter was found remove it
   if (pos != _parameters.end())
     _parameters.erase(pos);
 }

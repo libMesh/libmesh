@@ -1,4 +1,4 @@
-// $Id: steady_system.C,v 1.1.2.3 2003-05-06 21:53:35 benkirk Exp $
+// $Id: steady_system.C,v 1.1.2.4 2003-05-07 20:47:15 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,10 +24,8 @@
 // Local includes
 #include "steady_system.h"
 #include "equation_systems.h"
-#include "mesh.h"
+#include "sparse_matrix.h"
 #include "linear_solver_interface.h"
-#include "mesh_logging.h"
-
 
 
 
@@ -53,8 +51,6 @@ SteadySystem::~SteadySystem ()
 void SteadySystem::clear ()
 {
   SystemBase::clear();
-
-  //init_system_fptr = assemble_fptr = NULL;
   
   // clear the current local solution  
   current_local_solution->clear();
@@ -63,25 +59,19 @@ void SteadySystem::clear ()
 
 
 
-void SteadySystem::init ()
+void SteadySystem::init_data ()
 {
-  assert (_mesh.is_prepared());
-  
   // initialize parent data
-  SystemBase::init();
+  SystemBase::init_data();
 
-  // Possibly call a user-supplied initialization
-  // method.
-  if (init_system != NULL)
-    this->init_system (_equation_systems, this->name());
+  // Initialize the local copy of the solution vector
+  current_local_solution->init (this->n_dofs());
 }
 
 
 
 void SteadySystem::reinit ()
 {
-  assert (_mesh.is_prepared());
-   
   // initialize parent data
   SystemBase::reinit();
    
@@ -135,54 +125,4 @@ void SteadySystem::update ()
   // Only the necessary values (specified by the send_list)
   // are copied to minimize communication
   solution->localize (*current_local_solution, send_list); 
-}
-
-
-
-void SteadySystem::assemble ()
-{
-  assert (assemble_system != NULL);
-
-  // prepare matrix with the help of the _dof_map, 
-  // fill with sparsity pattern
-  SystemBase::assemble();
-
-  // Log how long the user's matrix assembly code takes
-  START_LOG("assemble()", "SteadySystem");
-  
-  // Call the user-specified matrix assembly function
-  if (this->assemble_system != NULL)
-    this->assemble_system (_equation_systems, this->name());
-
-  // Stop logging the user code
-  STOP_LOG("assemble()", "SteadySystem");
-}
-
-
-
-std::pair<unsigned int, Real>
-SteadySystem::solve ()
-{
-  // Assemble the linear system
-  this->assemble (); 
-
-  // Log how long the linear solve takes.
-  START_LOG("solve()", "SteadySystem");
-  
-  // Get the user-specifiied linear solver tolerance
-  const Real tol            =
-    _equation_systems.parameter("linear solver tolerance");
-
-  // Get the user-specified maximum # of linear solver iterations
-  const unsigned int maxits =
-    static_cast<unsigned int>(_equation_systems.parameter("linear solver maximum iterations"));
-
-  // Solve the linear system
-  const std::pair<unsigned int, Real> rval = 
-    linear_solver_interface->solve (*matrix, *solution, *rhs, tol, maxits);
-
-  // Stop logging the linear solve
-  STOP_LOG("solve()", "SteadySystem");
-
-  return rval; 
 }

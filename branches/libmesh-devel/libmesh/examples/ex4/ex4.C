@@ -1,4 +1,4 @@
-// $Id: ex4.C,v 1.24.2.1 2003-05-06 17:53:28 benkirk Exp $
+// $Id: ex4.C,v 1.24.2.2 2003-05-07 20:47:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -144,9 +144,7 @@ int main (int argc, char** argv)
       }
     
     /**
-     * Tell the user what we are doing. Here we use the libMesh::msg()
-     * method instead of std::cout.  The reason for this is so messages
-     * are not duplicated (and jumbled) across processors.
+     * Tell the user what we are doing. 
      */
     else 
       {
