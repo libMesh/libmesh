@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.5 2003-01-24 17:24:37 jwpeterson Exp $
+// $Id: dof_map.h,v 1.6 2003-01-25 05:33:10 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -475,10 +475,6 @@ class DofMap
    */
   PerfLog perf_log;
 
-  // make the mesh base class (that will contain us) a friend
- friend class MeshBase;
- friend class Mesh;
- friend class BoundaryMesh;
 };
 
 

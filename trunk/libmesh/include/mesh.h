@@ -1,4 +1,4 @@
-// $Id: mesh.h,v 1.5 2003-01-24 17:24:38 jwpeterson Exp $
+// $Id: mesh.h,v 1.6 2003-01-25 05:33:10 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -236,6 +236,8 @@ class Mesh : public MeshBase
    */
   void trim_unused_elements(std::set<unsigned int>& unused_elements);
 
+  // The MeshRefinement functions need to be able to
+  // call trim_unused_elements()
   friend class MeshRefinement;
   
 #endif

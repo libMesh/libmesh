@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.5 2003-01-24 17:24:38 jwpeterson Exp $
+// $Id: mesh_base.h,v 1.6 2003-01-25 05:33:10 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -59,7 +59,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.5 $
+ * \version $Revision: 1.6 $
  */
 
 
@@ -717,11 +717,6 @@ protected:
    */
   PerfLog _perf_log;
   
-  // Make the boundary info class we will be contained in a friend
-  friend class BoundaryInfo;
-  friend class Mesh;
-  friend class DofMap;
-  friend class XdrInterface;
 };
 
 

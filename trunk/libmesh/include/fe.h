@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.5 2003-01-24 17:24:38 jwpeterson Exp $
+// $Id: fe.h,v 1.6 2003-01-25 05:33:10 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -47,7 +47,7 @@
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.5 $
+ * \version $Revision: 1.6 $
  */
 
 //-------------------------------------------------------------
@@ -289,12 +289,6 @@ private:
   static Point map_zeta (const Elem* elem,
 			 const Point& reference_point);
 
-  /**
-   * Make the \p FEBase class a friend so that its
-   * \p FEBase::build() member will work.
-   */
-  friend class FEBase;
-
 };
 
 
@@ -305,7 +299,7 @@ private:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.5 $
+ * \version $Revision: 1.6 $
  */
 
 //-------------------------------------------------------------
@@ -330,7 +324,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.5 $
+ * \version $Revision: 1.6 $
  */
 
 //-------------------------------------------------------------
@@ -355,7 +349,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.5 $
+ * \version $Revision: 1.6 $
  */
 
 //-------------------------------------------------------------
