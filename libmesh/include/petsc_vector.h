@@ -1,4 +1,4 @@
-// $Id: petsc_vector.h,v 1.16 2003-02-28 23:37:43 benkirk Exp $
+// $Id: petsc_vector.h,v 1.17 2003-03-21 17:15:05 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -63,7 +63,8 @@ extern "C" {
 
 // forward declarations
 template <typename T> class PetscInterface;
-
+template <typename T> class SparseMatrix;
+template <typename T> class PetscMatrix;
 
 /**
  * Petsc vector. Provides a nice interface to the
@@ -296,7 +297,16 @@ public:
    */
   void add_vector (const NumericVector<T>& V,
 		   const std::vector<unsigned int>& dof_indices);
-  
+
+
+  /**
+   * U+=U+A*V.
+   * Add the product of a Sparse matrix \p A
+   * and a Numeric vector \p V to this Numeric vector.
+   */
+  void add_vector (const NumericVector<T> &_V,
+		   SparseMatrix<T> &_A);
+     
   /**
    * U+=V where U and V are type 
    * DenseVector<T> and you
@@ -353,6 +363,7 @@ private:
    * Make other Petsc datatypes friends
    */
   friend class PetscInterface<T>;
+  friend class PetscMatrix<T>;
 };
 
 
@@ -626,3 +637,11 @@ Real PetscVector<T>::max() const
 
 #endif // #ifdef HAVE_PETSC
 #endif // #ifdef __petsc_vector_h__
+
+
+
+
+
+
+
+
