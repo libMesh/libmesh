@@ -1,4 +1,4 @@
-// $Id: inf_elem_builder.C,v 1.2 2004-11-15 22:09:13 benkirk Exp $
+// $Id: inf_elem_builder.C,v 1.3 2004-11-18 21:23:23 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -35,8 +35,6 @@
 
 const Point InfElemBuilder::build_inf_elem(bool be_verbose)
 {
-  START_LOG("build_inf_elem()", "MeshBase");
-
   // determine origin automatically,
   // works only if the mesh has no symmetry planes.
   const MeshTools::BoundingBox b_box = MeshTools::bounding_box(_mesh);
@@ -56,8 +54,6 @@ const Point InfElemBuilder::build_inf_elem(bool be_verbose)
   // Call the protected implementation function with the
   // automatically determined origin.
   this->build_inf_elem(origin, false, false, false, be_verbose);
-
-  STOP_LOG("build_inf_elem()", "InfElemBuilder");
 
   // when finished with building the Ifems,
   // it remains to prepare the mesh for use:
