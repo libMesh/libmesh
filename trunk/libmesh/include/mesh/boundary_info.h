@@ -1,4 +1,4 @@
-// $Id: boundary_info.h,v 1.9 2004-08-09 17:34:57 jwpeterson Exp $
+// $Id: boundary_info.h,v 1.10 2004-08-17 03:03:48 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -26,7 +26,6 @@
 #include <vector>
 #include <map>
 #include <set>
-#include <assert.h>
 
 // Local includes
 #include "libmesh_common.h"

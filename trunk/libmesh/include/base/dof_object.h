@@ -1,4 +1,4 @@
-// $Id: dof_object.h,v 1.5 2004-08-09 17:34:55 jwpeterson Exp $
+// $Id: dof_object.h,v 1.6 2004-08-17 03:03:46 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -23,7 +23,6 @@
 #define __dof_object_h__
 
 // C++ includes
-#include <assert.h>
 
 // Local includes
 #include "libmesh_config.h"
@@ -49,7 +48,7 @@
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.5 $
+ * \version $Revision: 1.6 $
  */
 
 class DofObject

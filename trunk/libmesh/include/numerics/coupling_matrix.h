@@ -1,4 +1,4 @@
-// $Id: coupling_matrix.h,v 1.3 2004-08-09 17:34:57 jwpeterson Exp $
+// $Id: coupling_matrix.h,v 1.4 2004-08-17 03:03:49 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,6 @@
 
 // C++ includes
 #include <vector>
-#include <assert.h>
 
 // Local Includes
 #include "libmesh_common.h"
