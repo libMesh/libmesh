@@ -1,4 +1,4 @@
-// $Id: face_tri6.C,v 1.12 2003-02-27 00:55:30 benkirk Exp $
+// $Id: face_tri6.C,v 1.13 2003-05-24 22:49:47 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -83,6 +83,36 @@ const float Tri6::_embedding_matrix[4][6][6] =
 
 // ------------------------------------------------------------
 // Tri6 class member functions
+unsigned int Tri6::key (const unsigned int s) const
+{
+  assert (s < this->n_sides());
+
+  switch (s)
+    {
+    case 0:
+
+      return
+	this->compute_key (this->node(3));
+	
+    case 1:
+
+      return
+	this->compute_key (this->node(4));
+	
+    case 2:
+
+      return
+	this->compute_key (this->node(5));
+    }
+
+  
+  // We will never get here...  Look at the code above.
+  error();
+  return 0;
+}
+
+
+
 AutoPtr<Elem> Tri6::build_side (const unsigned int i) const
 {
   assert (i < this->n_sides());
