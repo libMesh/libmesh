@@ -1,4 +1,4 @@
-// $Id: petsc_vector.C,v 1.20 2003-05-29 00:03:06 benkirk Exp $
+// $Id: petsc_vector.C,v 1.21 2003-05-29 18:14:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -485,16 +485,14 @@ void PetscVector<T>::localize (const unsigned int first_local_idx,
   
   const unsigned int size       = this->size();
   const unsigned int local_size = (last_local_idx - first_local_idx + 1);
-  int ierr=0;
-  PetscScalar *my_values, *their_values;
-
+  int ierr=0;  
   
   // Don't bother for serial cases
   if ((first_local_idx == 0) &&
       (local_size == size))
     return;
   
-	  
+  
   // Build a parallel vector, initialize it with the local
   // parts of (*this)
   PetscVector<T> parallel_vec;
@@ -504,24 +502,43 @@ void PetscVector<T>::localize (const unsigned int first_local_idx,
 
   // Copy part of *this into the parallel_vec
   {
-    ierr = VecGetArray (vec, &my_values);
+    IS is;
+    VecScatter scatter;
+
+    // Create idx, idx[i] = i+first_local_idx;
+    std::vector<int> idx(local_size);
+    Utility::iota (idx.begin(), idx.end(), first_local_idx);
+
+    // Create the index set & scatter object
+    ierr = ISCreateGeneral(PETSC_COMM_WORLD, local_size, &idx[0], &is); 
+           CHKERRQ(ierr);
+
+    ierr = VecScatterCreate(vec,              is,
+			    parallel_vec.vec, is,
+			    &scatter);
+           CHKERRQ(ierr);
+
+    // Perform the scatter
+    ierr = VecScatterBegin(vec, parallel_vec.vec, INSERT_VALUES,
+			   SCATTER_FORWARD, scatter);
            CHKERRQ(ierr);
   
-    ierr = VecGetArray (parallel_vec.vec, &their_values);
+    ierr = VecScatterEnd  (vec, parallel_vec.vec, INSERT_VALUES,
+			   SCATTER_FORWARD, scatter);
+           CHKERRQ(ierr);
+
+    // Clean up
+    ierr = ISDestroy (is);
            CHKERRQ(ierr);
   
-    for (unsigned int i=first_local_idx; i<=last_local_idx; i++)
-      their_values[i-first_local_idx] = my_values[i];
-
-    ierr = VecRestoreArray (vec, &my_values);
-           CHKERRQ(ierr);
-
-    ierr = VecRestoreArray (parallel_vec.vec, &their_values);
+    ierr = VecScatterDestroy(scatter);
            CHKERRQ(ierr);
   }
 
   // localize like normal
-  parallel_vec.localize (*this, send_list);  
+  parallel_vec.close();
+  parallel_vec.localize (*this, send_list);
+  this->close();
 }
 
 
