@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism6.C,v 1.24 2005-02-23 04:33:20 roystgnr Exp $
+// $Id: cell_inf_prism6.C,v 1.25 2005-02-23 04:40:36 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -34,14 +34,14 @@
 // ------------------------------------------------------------
 // InfPrism6 class member functions
 
-bool InfPrism6::is_vertex(const unsigned int) const
+bool InfPrism6::is_vertex(const unsigned int i) const
 {
   if (i < 3)
     return true;
   return false;
 }
 
-bool InfPrism6::is_edge(const unsigned int) const
+bool InfPrism6::is_edge(const unsigned int i) const
 {
   if (i < 3)
     return false;

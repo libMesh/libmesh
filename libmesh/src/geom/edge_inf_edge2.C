@@ -1,4 +1,4 @@
-// $Id: edge_inf_edge2.C,v 1.16 2005-02-23 04:33:20 roystgnr Exp $
+// $Id: edge_inf_edge2.C,v 1.17 2005-02-23 04:40:36 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -29,14 +29,14 @@
 // ------------------------------------------------------------
 // InfEdge2 class member functions
 
-bool InfEdge2::is_vertex(const unsigned int) const
+bool InfEdge2::is_vertex(const unsigned int i) const
 {
   if (i)
     return false;
   return true;
 }
 
-bool InfEdge2::is_edge(const unsigned int) const
+bool InfEdge2::is_edge(const unsigned int i) const
 {
   if (i)
     return true;
