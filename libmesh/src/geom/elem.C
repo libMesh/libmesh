@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.13 2003-02-28 23:37:46 benkirk Exp $
+// $Id: elem.C,v 1.14 2003-03-02 17:36:35 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -493,7 +493,7 @@ void Elem::refine (Mesh& mesh)
     for (unsigned int c=0; c<this->n_children(); c++)
       for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
 	for (unsigned int n=0; n<this->n_nodes(); n++)
-	  if (embedding_matrix(c,nc,n) != 0.)
+	  if (this->embedding_matrix(c,nc,n) != 0.)
 	    p[c][nc].add_scaled (this->point(n), this->embedding_matrix(c,nc,n));
     
     
