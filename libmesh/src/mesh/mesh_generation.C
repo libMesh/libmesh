@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.5 2003-01-25 01:42:46 jwpeterson Exp $
+// $Id: mesh_generation.C,v 1.6 2003-01-31 21:22:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -480,6 +480,25 @@ void Mesh::build_cube(const unsigned int nx,
 	error();
       }
     };  
+};
+
+
+
+void Mesh::build_square (const unsigned int nx,
+			 const unsigned int ny,
+			 const real xmin, const real xmax,
+			 const real ymin, const real ymax,
+			 const ElemType type)
+{
+  // This method only makes sense in 2D!
+  assert (mesh_dimension() == 2);
+
+  // Call the build_cube() member to actually do the work for us.
+  build_cube (nx, ny, 0,
+	      xmin, xmax,
+	      ymin, ymax,
+	      0., 0.,
+	      type);
 };
 
 

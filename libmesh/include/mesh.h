@@ -1,4 +1,4 @@
-// $Id: mesh.h,v 1.6 2003-01-25 05:33:10 jwpeterson Exp $
+// $Id: mesh.h,v 1.7 2003-01-31 21:22:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -88,6 +88,14 @@ class Mesh : public MeshBase
 		   const real zmin=0., const real zmax=1.,
 		   const ElemType type=INVALID_ELEM);
 
+  /**
+   * A specialized \p build_cube() for 2D meshes.
+   */
+  void build_square (const unsigned int nx,
+		     const unsigned int ny,
+		     const real xmin=0., const real xmax=1.,
+		     const real ymin=0., const real ymax=1.,
+		     const ElemType type=INVALID_ELEM);
 
   /**
    * Meshes a spherical or mapped-spherical domain.
