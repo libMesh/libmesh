@@ -1,4 +1,4 @@
-// $Id: mesh_data.h,v 1.1 2003-11-05 22:26:44 benkirk Exp $
+// $Id: mesh_data.h,v 1.2 2003-12-08 19:14:41 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -40,6 +40,7 @@
 // Forward Declarations
 class MeshBase;
 class UnvMeshInterface;
+class TetGenMeshInterface;
 class XdrInterface;
 class MeshDataUnvHeader;
 class MeshData;
@@ -443,6 +444,11 @@ protected:
   //----------------------------------------------------------
   // read/write Methods
   /**
+   * Read nodal/element oriented data in TetGen format.
+   */
+  void read_tetgen (const std::string& name);
+
+  /**
    * Read nodal/element oriented data in UNV format,
    * either from an ASCII file or from a gzip'ed ASCII 
    * file, using the C++ wrapper \p gzstream to \p zlib.h.
@@ -613,6 +619,12 @@ protected:
    * that it can communicate foreign node ids to this class.
    */
   friend class UnvMeshInterface;
+
+  /**
+   * Make the mesh importer class \p TetGenInterface friend, so
+   * that it can communicate foreign node ids to this class.
+   */
+  friend class TetGenMeshInterface;
 
   /**
    * Make the mesh importer class \p XdrInterface friend, so

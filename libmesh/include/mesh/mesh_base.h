@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.2 2003-11-14 14:47:25 benkirk Exp $
+// $Id: mesh_base.h,v 1.3 2003-12-08 19:14:41 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -62,7 +62,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.2 $
+ * \version $Revision: 1.3 $
  */
 
 
@@ -762,6 +762,13 @@ protected:
    * Read mesh from the file specified by \p name in Universal (unv) format.  
    */
   void read_unv (const std::string& name);
+
+   /** 
+   * Read mesh from the file specified by \p name in TetGen format.
+	 * Both files (*.node and *.ele) are required. But only one works as 
+	 * parameter for the function. The other is determined at runtime.
+   */
+  void read_tetgen (const std::string& name);
 
   /**
    * Read a 2D mesh in the shanee format from the file specified

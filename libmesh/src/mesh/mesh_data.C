@@ -1,4 +1,4 @@
-// $Id: mesh_data.C,v 1.15 2003-11-05 22:26:45 benkirk Exp $
+// $Id: mesh_data.C,v 1.16 2003-12-08 19:14:43 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -265,13 +265,17 @@ void MeshData::read (const std::string& name)
   // Read the file based on extension
   {
     if (name.rfind(".xta") < name.size())
-      read_xdr (name, READ);
+      this->read_xdr (name, READ);
 
     else if (name.rfind(".xtr")  < name.size())
-      read_xdr (name, DECODE);
+      this->read_xdr (name, DECODE);
 
     else if (name.rfind(".unv") < name.size())
-      read_unv (name);
+      this->read_unv (name);
+
+    else if ((name.rfind(".node") < name.size()) ||
+	     (name.rfind(".ele") < name.size()))
+      this->read_tetgen (name);
 
     else
       {
