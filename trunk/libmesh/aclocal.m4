@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.42 2003-11-30 05:58:14 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.43 2003-11-30 06:01:17 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -1279,7 +1279,7 @@ if (test -e $MPI_LIBS_PATH/libmpi.a || test -e $MPI_LIBS_PATH/libmpi.so) ; then
                      [lam_show_version],
                      [
                        LIBS="$LIBS -llam"
-                       MPI_LIBS="-llam"
+                       MPI_LIBS="-llam $MPI_LIBS"
                        MPI_IMPL="lam"
                      ],	
                      [])
