@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.34.2.4 2003-05-06 17:13:33 benkirk Exp $
+// $Id: equation_systems.C,v 1.34.2.5 2003-05-06 21:53:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -27,6 +27,7 @@
 #include "libmesh.h"
 #include "mesh.h"
 #include "system_base.h"
+#include "frequency_system.h"
 #include "newmark_system.h"
 #include "steady_system.h"
 #include "transient_system.h"
@@ -782,6 +783,11 @@ void EquationSystems::unset_parameter (const std::string& id)
 
 //--------------------------------------------------------------------------
 // Instantiations of templated functions
+
+// Some systems only work with complex numbers
+#ifdef USE_COMPLEX_NUMBERS
+template void EquationSystems::add_system<FrequencySystem> (const std::string&);
+#endif
 
 template void EquationSystems::add_system<NewmarkSystem>   (const std::string&);
 template void EquationSystems::add_system<SteadySystem>    (const std::string&);

@@ -3,16 +3,18 @@
 #include "quadrature_gauss.h"
 #include "mesh.h"
 #include "dof_map.h"
-#include "general_system.h"
+#include "steady_system.h"
 #include "equation_systems.h"
 #include "mesh_refinement.h"
+#include "sparse_matrix.h"
+#include "numeric_vector.h"
 #include "dense_matrix.h"
 #include "dense_vector.h"
 
 
 
 
-void assemble(EquationSystems<GeneralSystem>& es,
+void assemble(EquationSystems& es,
 	      const std::string& system_name);
 
 
@@ -46,9 +48,9 @@ int main (int argc, char** argv)
 
     
     // Set up the equation system(s)
-    EquationSystems<GeneralSystem> es(mesh);
+    EquationSystems es(mesh);
 
-    es.add_system("primary");
+    es.add_system<SteadySystem>("primary");
 
     es("primary").add_variable("U", FIRST);
     es("primary").add_variable("V", FIRST);
@@ -80,7 +82,7 @@ int main (int argc, char** argv)
 
 
 
-void assemble(EquationSystems<GeneralSystem>& es,
+void assemble(EquationSystems& es,
 	      const std::string& system_name)
 {
   assert (system_name == "primary");

@@ -1,4 +1,4 @@
-// $Id: steady_system.h,v 1.1.2.2 2003-05-06 17:53:29 benkirk Exp $
+// $Id: steady_system.h,v 1.1.2.3 2003-05-06 21:53:34 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -99,7 +99,7 @@ public:
    * @returns \p "Steady".  Helps in identifying
    * the system type in an equation system file.
    */
-  const std::string system_type () const { return "Steady"; }
+  std::string system_type () const { return "Steady"; }
 
 
   

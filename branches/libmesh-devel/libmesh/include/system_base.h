@@ -1,4 +1,4 @@
-// $Id: system_base.h,v 1.14.2.3 2003-05-06 17:53:29 benkirk Exp $
+// $Id: system_base.h,v 1.14.2.4 2003-05-06 21:53:34 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -140,7 +140,7 @@ public:
    * which system type to use when reading equation system
    * data from file.  Has be overloaded in derived classes.
    */
-  virtual const std::string system_type () const = 0;
+  virtual std::string system_type () const = 0;
 
   /**
    * Projects the solution vector to the new mesh.  The input indices

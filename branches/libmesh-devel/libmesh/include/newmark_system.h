@@ -1,4 +1,4 @@
-// $Id: newmark_system.h,v 1.4.2.1 2003-05-06 17:13:32 benkirk Exp $
+// $Id: newmark_system.h,v 1.4.2.2 2003-05-06 21:53:34 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -100,7 +100,7 @@ public:
    * @returns \p "Newmark".  Helps in identifying
    * the system type in an equation system file.
    */
-  const std::string system_type () const { return "Newmark"; }
+  std::string system_type () const { return "Newmark"; }
 
 
   //---------------------------------------------------------

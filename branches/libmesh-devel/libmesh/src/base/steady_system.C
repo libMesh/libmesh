@@ -1,4 +1,4 @@
-// $Id: steady_system.C,v 1.1.2.2 2003-05-06 17:53:29 benkirk Exp $
+// $Id: steady_system.C,v 1.1.2.3 2003-05-06 21:53:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -151,7 +151,8 @@ void SteadySystem::assemble ()
   START_LOG("assemble()", "SteadySystem");
   
   // Call the user-specified matrix assembly function
-  this->assemble_system (_equation_systems, this->name());
+  if (this->assemble_system != NULL)
+    this->assemble_system (_equation_systems, this->name());
 
   // Stop logging the user code
   STOP_LOG("assemble()", "SteadySystem");
