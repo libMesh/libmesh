@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.20 2003-04-05 02:25:42 ddreyer Exp $
+// $Id: equation_systems.h,v 1.21 2003-04-09 02:30:14 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -150,6 +150,16 @@ public:
   void build_variable_names (std::vector<std::string>& var_names);
 
   /**
+   * Fill the input vector \p soln with the solution values for the
+   * system named \p name.  Note that the input
+   * vector \p soln will only be assembled on processor 0, so this
+   * method is only applicable to outputting plot files from processor 0.
+   */
+  void build_solution_vector (std::vector<Number>& soln,
+			      std::string& system_name,
+			      std::string& variable_name);
+  
+  /**
    * Fill the input vector \p soln with solution values.  The
    * entries will be in variable-major format (corresponding to
    * the names from \p build_variable_names()).  Note that the input
@@ -157,7 +167,7 @@ public:
    * method is only applicable to outputting plot files from processor 0.
    */
   void build_solution_vector (std::vector<Number>& soln);
-
+  
   /**
    * Read & initialize the systems from disk using the XDR data format.
    * This format allows for machine-independent binary output.

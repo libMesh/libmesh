@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.28 2003-04-05 02:25:42 ddreyer Exp $
+// $Id: equation_systems.C,v 1.29 2003-04-09 02:30:27 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -334,6 +334,95 @@ void EquationSystems<T_sys>::build_variable_names (std::vector<std::string>& var
 
 
 
+
+
+template <typename T_sys>
+void EquationSystems<T_sys>::build_solution_vector (std::vector<Number>& soln,
+						    std::string& system_name,
+						    std::string& variable_name)
+{
+  error();
+
+  // Get a reference to the named system
+  const T_sys& system = (*this)(system_name);
+
+  // Get the number associated with the variable_name we are passed
+  const unsigned short int variable_num = system.variable_number(variable_name);
+
+  // Get the dimension of the current mesh
+  const unsigned int dim = _mesh.mesh_dimension();
+
+  // If we're on processor 0, allocate enough memory to hold the solution.
+  // Since we're only looking at one variable, there will be one solution value
+  // for each node in the mesh.
+  if (_mesh.processor_id() == 0)
+    soln.resize(_mesh.n_nodes());
+
+  // Vector to hold the global solution from all processors
+  std::vector<Number> sys_soln;
+  
+  // Update the global solution from all processors
+  system.update_global_solution (sys_soln, 0);
+  
+  // Temporary vector to store the solution on an individual element.
+  std::vector<Number>       elem_soln;   
+
+  // The FE solution interpolated to the nodes
+  std::vector<Number>       nodal_soln;  
+
+  // The DOF indices for the element
+  std::vector<unsigned int> dof_indices; 
+
+  // Determine the finite/infinite element type used in this system 
+  const FEType& fe_type    = system.variable_type(variable_num);
+
+  // Define iterators to iterate over all the elements of the mesh
+  active_elem_iterator       it (_mesh.elements_begin());
+  const active_elem_iterator end(_mesh.elements_end());
+
+  // Loop over elements
+  for ( ; it != end; ++it)
+    {
+      // Convenient shortcut to the element pointer
+      const Elem* elem = *it;
+
+      // Fill the dof_indices vector for this variable
+      system.get_dof_map().dof_indices(elem,
+				       dof_indices,
+				       variable_num);
+
+      // Resize the element solution vector to fit the
+      // dof_indices for this element.
+      elem_soln.resize(dof_indices.size());
+
+      // Transfer the system solution to the element
+      // solution by mapping it through the dof_indices vector.
+      for (unsigned int i=0; i<dof_indices.size(); i++)
+	elem_soln[i] = sys_soln[dof_indices[i]];
+
+      // Using the FE interface, compute the nodal_soln
+      // for the current elemnt type given the elem_soln
+      FEInterface::nodal_soln (dim,
+			       fe_type,
+			       elem,
+			       elem_soln,
+			       nodal_soln);
+
+      // Sanity check -- make sure that there are the same number
+      // of entries in the nodal_soln as there are nodes in the
+      // element!
+      assert (nodal_soln.size() == elem->n_nodes());
+
+      // Copy the nodal solution over into the correct place in
+      // the global soln vector which will be returned to the user.
+      for (unsigned int n=0; n<elem->n_nodes(); n++)
+	soln[elem->node(n)] = nodal_soln[n];
+    }
+}
+
+
+
+
 template <typename T_sys>
 void EquationSystems<T_sys>::build_solution_vector (std::vector<Number>& soln)
 {
@@ -343,6 +432,8 @@ void EquationSystems<T_sys>::build_solution_vector (std::vector<Number>& soln)
   const unsigned int nn  = _mesh.n_nodes();
   const unsigned int nv  = this->n_vars();
 
+  // Only if we are on processor zero, allocate the storage
+  // to hold (number_of_nodes)*(number_of_variables) entries.
   if (_mesh.processor_id() == 0)
     soln.resize(nn*nv);
 
@@ -350,6 +441,11 @@ void EquationSystems<T_sys>::build_solution_vector (std::vector<Number>& soln)
   
   unsigned int var_num=0;
 
+  // For each system in this EquationSystems object,
+  // update the global solution and if we are on processor 0,
+  // loop over the elements and build the nodal solution
+  // from the element solution.  Then insert this nodal solution
+  // into the vector passed to build_solution_vector.
   for (unsigned int sys=0; sys<this->n_systems(); sys++)
     {
       const T_sys& system       = (*this)(sys);	      
@@ -380,8 +476,11 @@ void EquationSystems<T_sys>::build_solution_vector (std::vector<Number>& soln)
 		  for (unsigned int i=0; i<dof_indices.size(); i++)
 		    elem_soln[i] = sys_soln[dof_indices[i]];
 		  
-		  FEInterface::nodal_soln (dim, fe_type, elem,
-					   elem_soln, nodal_soln);
+		  FEInterface::nodal_soln (dim,
+					   fe_type,
+					   elem,
+					   elem_soln,
+					   nodal_soln);
 
  		  if (nodal_soln.size() == elem->n_nodes())
 		    for (unsigned int n=0; n<elem->n_nodes(); n++)
@@ -389,10 +488,10 @@ void EquationSystems<T_sys>::build_solution_vector (std::vector<Number>& soln)
  		        nodal_soln[n];
 // OLD CODE		  
 // 		  assert (nodal_soln.size() == elem->n_nodes());
+		  assert (nodal_soln.size() == elem->n_nodes());
 		  
-// 		  for (unsigned int n=0; n<elem->n_nodes(); n++)
-// 		    soln[nv*(elem->node(n)) + (var + var_num)] =
-// 		      nodal_soln[n];
+		  for (unsigned int n=0; n<elem->n_nodes(); n++)
+		    soln[nv*(elem->node(n)) + (var + var_num)] = nodal_soln[n];
 		}
 	    }	 
 	}
