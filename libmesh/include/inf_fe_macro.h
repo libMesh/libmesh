@@ -1,4 +1,4 @@
-// $Id: inf_fe_macro.h,v 1.1 2003-01-24 17:24:38 jwpeterson Exp $
+// $Id: inf_fe_macro.h,v 1.2 2003-01-26 18:20:14 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,20 +30,17 @@
 
 
 /**
- * Include this file when you either 
- * (a) want to instantiate the template classes 
- *     \p InfFE<Dim,T_radial,T_map>, or
- * (b) declare these classes as friends.  
- *
- * The classes are instantiated in \p inf_fe_instantiate_1D.h, 
- * \p inf_fe_instantiate_2D.h, and \p inf_fe_instantiate_3D.h
- * for 1D, 2D and 3D, respectively.
+ * This macro helps in instantiating specific versions
+ * of the InfFE class.  Better do not use this macro
+ * directly, but instantiate through #include`ing the
+ * file(s) \p inf_fe_instantiate_1D.h, \p inf_fe_instantiate_2D.h, 
+ * and \p inf_fe_instantiate_3D.h for 1D, 2D and 3D, respectively.
  */
-#define SAY_THAT_INF_FE_IS(_say_what,_dim,_map_type) _say_what  class InfFE< _dim, INFINITE_MAP, _map_type >; \
-                                                     _say_what  class InfFE< _dim, JACOBI_20_00, _map_type >; \
-                                                     _say_what  class InfFE< _dim, JACOBI_30_00, _map_type >; \
-                                                     _say_what  class InfFE< _dim, LEGENDRE,     _map_type >; \
-                                                     _say_what  class InfFE< _dim, INF_LAGRANGE, _map_type >; 
+#define INSTANTIATE_INF_FE(_dim,_map_type) template  class InfFE< _dim, INFINITE_MAP, _map_type >; \
+                                           template  class InfFE< _dim, JACOBI_20_00, _map_type >; \
+                                           template  class InfFE< _dim, JACOBI_30_00, _map_type >; \
+                                           template  class InfFE< _dim, LEGENDRE,     _map_type >; \
+                                           template  class InfFE< _dim, INF_LAGRANGE, _map_type >; 
 
 
 
@@ -51,7 +48,7 @@
 
 
 
-#define SAY_THAT_INF_FE_IS(_say_what,_dim,_map_type) \
+#define INSTANTIATE_INF_FE(_dim,_map_type) \
 
 
 
