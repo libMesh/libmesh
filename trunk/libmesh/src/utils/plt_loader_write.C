@@ -1,4 +1,4 @@
-// $Id: plt_loader_write.C,v 1.2 2004-10-14 20:24:07 jwpeterson Exp $
+// $Id: plt_loader_write.C,v 1.3 2004-10-15 13:08:04 jwpeterson Exp $
 
 // Copyright (C) 2002-2004  Benjamin S. Kirk
   
@@ -497,7 +497,7 @@ void PltLoader::write_dat (const std::string& name,
 		for (unsigned int j=0; j<this->jmax(z); j++)
 		  for (unsigned int i=0; i<this->imax(z); i++)
 		    {
-		      out << std::ios::scientific
+		      out << std::scientific
 			  << _data[z][v][l++] << " ";
 
 		      // Throw in a newline every 5 entries to
@@ -539,7 +539,7 @@ void PltLoader::write_dat (const std::string& name,
 		for (unsigned int i=0; i<this->imax(z); i++)
 		  {
 		    for (unsigned int v=0; v<this->n_vars(); v++)
-		      out << std::ios::scientific
+		      out << std::scientific
 			  << _data[z][v][l] << " ";
 		    
 		    out << std::endl;
