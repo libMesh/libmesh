@@ -1,4 +1,4 @@
-// $Id: quadrature.h,v 1.11 2003-02-26 00:47:51 jwpeterson Exp $
+// $Id: quadrature.h,v 1.12 2003-05-05 15:30:36 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -93,12 +93,23 @@ public:
    * @returns a \p std::vector containing the quadrature point locations
    * on a reference object.
    */
-  const std::vector<Point>& get_points()  const { return _points;  }
+  const std::vector<Point>& get_points() const { return _points;  }
+
+  /**
+   * @returns a \p std::vector containing the quadrature point locations
+   * on a reference object as a writeable reference.
+   */
+  std::vector<Point>& get_points() { return _points;  }
 
   /**
    * @returns a \p std::vector containing the quadrature weights.
    */
   const std::vector<Real>& get_weights() const { return _weights; }
+
+  /**
+   * @returns a \p std::vector containing the quadrature weights.
+   */
+  std::vector<Real>& get_weights() { return _weights; }
 
   /**
    * @returns the \f$ i^{th} \f$ quadrature point on the reference object.
