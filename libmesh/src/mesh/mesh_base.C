@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.10 2003-02-06 05:41:15 ddreyer Exp $
+// $Id: mesh_base.C,v 1.11 2003-02-10 11:50:57 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -470,14 +470,24 @@ void MeshBase::find_neighbors()
 #ifdef ENABLE_INFINITE_ELEMENTS
 
 
-void MeshBase::build_inf_elem(bool be_verbose)
+const Point MeshBase::build_inf_elem(bool be_verbose)
 {
   // determine origin automatically,
   // works only if the mesh has no symmetry planes.
   std::pair<Point, Point> b_box = bounding_box();
+  Point origin = (b_box.first+b_box.second)/2.;
     
-  build_inf_elem( (b_box.first+b_box.second)/2., 
-		  false, false, false, be_verbose);
+  if (be_verbose)
+    {
+      std::cout << " Determined origin for Infinite Elements:" << std::endl
+		<< "  ";
+      origin.write_unformatted(std::cout);
+      std::cout << std::endl;
+    }
+
+  build_inf_elem(origin, false, false, false, be_verbose);
+
+  return origin;
 }
 
 
@@ -490,11 +500,10 @@ void MeshBase::build_inf_elem(const Point& origin,
 {
 		
   if (be_verbose)
-  {
-    std::cout << " Building Infinite Elements:" << std::endl;
-    std::cout << "  updating element neighbor tables..." << std::endl;
-
-  };
+    {
+      std::cout << " Building Infinite Elements:" << std::endl;
+      std::cout << "  updating element neighbor tables..." << std::endl;
+    };
 
   find_neighbors();	// update elem->neighbor() tables
 
@@ -1617,12 +1626,12 @@ void MeshBase::write(const std::string& name,
 
 #ifdef USE_COMPLEX_NUMBERS
 
-const char* MeshBase::complex_filename(const std::string& _n,
-				       unsigned int r_o_c)
+char* MeshBase::complex_filename(const std::string& _n,
+				 unsigned int r_o_c) const
 {
   std::string loc=_n;
   if (r_o_c == 0)
-    loc.append(".Real");
+    loc.append(".real");
   else
     loc.append(".imag");
   return loc.c_str();
@@ -1631,7 +1640,7 @@ const char* MeshBase::complex_filename(const std::string& _n,
 
 void MeshBase::prepare_complex_data(const std::vector<Complex>* source,
 				    std::vector<Real>* real_part,
-				    std::vector<Real>* imag_part)
+				    std::vector<Real>* imag_part) const
 {
   real_part->resize(source->size());
   imag_part->resize(source->size());
