@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.5 2004-04-18 00:51:47 jwpeterson Exp $
+// $Id: fe_base.h,v 1.6 2004-08-02 18:46:47 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -193,7 +193,39 @@ public:
   const std::vector<std::vector<Real> >& get_dphidz() const
   { return dphidz; }
 
+  /**
+   * @returns the element tangents in xi-direction at the quadrature
+   * points.
+   */
+  const std::vector<RealGradient>& get_dxyzdxi() const
+  { return dxyzdxi_map; }
+
+  /**
+   * @returns the element tangents in eta-direction at the quadrature
+   * points.
+   */
+  const std::vector<RealGradient>& get_dxyzdeta() const
+  { return dxyzdeta_map; }
   
+  /**
+   * @returns the second partial derivatives in xi.
+   */
+  const std::vector<RealGradient>& get_d2xyzdxi2() const
+  { return d2xyzdxi2_map; }
+
+  /**
+   * @returns the second partial derivatives in xi-eta.
+   */
+  const std::vector<RealGradient>& get_d2xyzdxideta() const
+  { return d2xyzdxideta_map; }
+
+  /**
+   * @returns the second partial derivatives in eta.
+   */
+  const std::vector<RealGradient>& get_d2xyzdeta2() const
+  { return d2xyzdeta2_map; }
+
+
 #ifdef ENABLE_INFINITE_ELEMENTS
 
   /**
@@ -649,6 +681,7 @@ protected:
    * curvature at the quadrature points.
    */
   std::vector<std::vector<Real> > d2psideta2_map;
+
   
 #ifdef ENABLE_INFINITE_ELEMENTS
 
