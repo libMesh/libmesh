@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.44 2003-11-30 06:07:41 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.45 2003-11-30 06:21:32 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -1278,11 +1278,23 @@ if (test -e $MPI_LIBS_PATH/libmpi.a || test -e $MPI_LIBS_PATH/libmpi.so) ; then
 	AC_CHECK_LIB([lam],
                      [lam_show_version],
                      [
-                       LIBS="$LIBS -llam"
+                       LIBS    ="-llam $LIBS"
                        MPI_LIBS="-llam $MPI_LIBS"
                        MPI_IMPL="lam"
                      ],	
                      [])
+
+	# Quadricss MPI requires the elan library to be included too
+	if (nm $MPI_LIBS_PATH/libmpi.a | grep elan > /dev/null); then
+	  echo "note: MPI found to use Quadrics switch, looking for elan library"
+		 AC_CHECK_LIB([elan],
+	                      [elan_init],
+	                      [
+                                LIBS    ="-lelan $LIBS"
+                                MPI_LIBS="-lelan $MPI_LIBS"
+                              ],
+	                      [AC_MSG_ERROR( [Could not find elan library... exiting] )] )
+	fi
 
 	AC_CHECK_LIB([mpi],
                      [MPI_Init],                     
@@ -1291,14 +1303,6 @@ if (test -e $MPI_LIBS_PATH/libmpi.a || test -e $MPI_LIBS_PATH/libmpi.so) ; then
 	               MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
                        AC_MSG_RESULT([Found valid MPI installlaion...])
 
-		       # AlphaServer SCs MPI requires the elan library to be included too
-	 	       if nm $MPI_LIBS_PATH/libmpi.a | grep elan > /dev/null; then
-		         echo "note: MPI found to use Quadrics switch, looking for elan library"
-			 AC_CHECK_LIB([elan],
-		                      [elan_init],
-		                      [MPI_LIBS="$MPI_LIBS -lelan"],
-		                      [AC_MSG_ERROR( [Could not find elan library... exiting] )] )
-	               fi
                      ],
                      [AC_MSG_RESULT([Could not link in the MPI library...]); enablempi=no] )
 
@@ -1316,6 +1320,18 @@ if (test -e $MPI_LIBS_PATH/libmpich.a || test -e $MPI_LIBS_PATH/libmpich.so) ; t
 	AC_LANG_SAVE
 	AC_LANG_CPLUSPLUS
 	LIBS="-L$MPI_LIBS_PATH $LIBS"
+
+	# Quadrics MPICH requires the gm library to be included too
+	if (nm $MPI_LIBS_PATH/libmpich.a | grep gm_open > /dev/null); then
+	  echo "note: MPICH found to use Myricomm's Myrinet, looking for gm library"
+		 AC_CHECK_LIB([gm],
+	                      [gm_open],
+	                      [
+                                LIBS    ="-lgm $LIBS"
+                                MPI_LIBS="-lgm $MPI_LIBS"
+                              ],
+	                      [AC_MSG_ERROR( [Could not find gm library... exiting] )] )
+	fi
 
 	# look for MPI_Init in libmpich.(a/so)
 	AC_CHECK_LIB([mpich],
