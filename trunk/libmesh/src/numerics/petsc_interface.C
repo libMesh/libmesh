@@ -1,4 +1,4 @@
-// $Id: petsc_interface.C,v 1.21 2004-02-15 15:35:30 benkirk Exp $
+// $Id: petsc_interface.C,v 1.22 2004-02-26 04:24:07 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -148,9 +148,7 @@ PetscInterface<T>::solve (SparseMatrix<T> &matrix_in,
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
   // return the # of its. and the final residual norm.
-  std::pair<unsigned int, Real> p (its, final_resid);
-
-  return p;
+  return std::make_pair(its, final_resid);
 }
 
 
