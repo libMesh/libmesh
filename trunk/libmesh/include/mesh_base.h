@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.20 2003-02-24 14:35:49 benkirk Exp $
+// $Id: mesh_base.h,v 1.21 2003-02-26 01:08:14 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -33,6 +33,7 @@
 // forward declarations
 class Elem;
 class EquationSystems;
+class BoundaryInfo;
 template <typename T> class PetscMatrix;
 
 
@@ -59,7 +60,7 @@ template <typename T> class PetscMatrix;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.20 $
+ * \version $Revision: 1.21 $
  */
 
 
@@ -797,7 +798,13 @@ protected:
   /**
    * The processor id.
    */
-  const unsigned int _proc_id;  
+  const unsigned int _proc_id;
+
+  /**
+   * Make the \p BoundaryInfo class a friend so that
+   * they can create a \p BoundaryMesh.
+   */
+  friend class BoundaryInfo;
 };
 
 

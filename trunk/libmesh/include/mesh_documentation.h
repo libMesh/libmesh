@@ -47,7 +47,7 @@
    - Generic 3D Finite Elements
       - 4 and 10 noded tetrahedrals (\p Tet4, \p Tet10)
       - 8, 20, and 27 noded hexahedrals (\p Hex8, \p Hex20, \p Hex27)
-      - 6 noded prisms (\p Prism6)
+      - 6, 15, and 18 noded prisms (\p Prism6, \p Prism15, \p Prism18)
       - 5 noded pyramids (\p Pyramid5)
       - 8, 16, and 18 noded infinite hexahedrals (\p InfHex8,
           \p InfHex16, \p InfHex18)
@@ -113,7 +113,15 @@
      cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/libmesh co libmesh \endverbatim
      
   If you would like to contribute to the project you will need a
-  SourceForge developer account.
+  SourceForge developer account, or you can contribute patches.  To create a
+  patch from a modified CVS tree simply do:
+
+  \verbatim
+    cvs diff -c > patch \endverbatim
+
+  in the top-level directory.  You can then submit the file \p patch.
+
+  
  
  
  
