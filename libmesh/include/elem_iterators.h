@@ -1,4 +1,4 @@
-// $Id: elem_iterators.h,v 1.2 2003-02-13 00:16:48 jwpeterson Exp $
+// $Id: elem_iterators.h,v 1.3 2003-02-14 20:50:39 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -103,9 +103,11 @@ typedef basic_elem_iterator<const Elem**> const_neighbor_iterator;
  * to instantiate non-const and const versions of the iterator,
  * respectively.  Note the "false" argument to the basic_elem_iterator
  * constructor.  This basically tells that constructor to NOT advance();
+ * This class uses virtual inheritance because it will eventually
+ * be used in a "diamond" inheritance hierarchy.
  */
 template <class T>
-class basic_active_elem_iterator : public basic_elem_iterator<T>
+class basic_active_elem_iterator : virtual public basic_elem_iterator<T>
 {
 public:
 
@@ -218,9 +220,10 @@ typedef basic_not_active_elem_iterator<std::vector<Elem*>::const_iterator> const
  * adds the additional internal state which describes the type
  * of element.  Note the "false" argument to the basic_elem_iterator
  * constructor.  This basically tells that constructor to NOT advance();
+ * This class uses virtual inheritance 
  */
 template <class T>
-class basic_type_elem_iterator : public basic_elem_iterator<T>
+class basic_type_elem_iterator : virtual public basic_elem_iterator<T>
 {
 public:
   /**
@@ -311,10 +314,15 @@ typedef basic_not_type_elem_iterator<std::vector<Elem*>::const_iterator> const_n
  * iterator which can be used to iterate only over active elements
  * of a specific type.  The typedefs active_type_elem_iterator
  * and const_active_type_elem_iterator should be used to instantiate
- * actual iterators.
+ * actual iterators.  This class uses multiple inheritance (in a diamond
+ * pattern no less) so that it can mimic the behavior of both the
+ * active_elem_iterator and type_elem_iterator classes without
+ * reimplementing those functions.  Because its base classes use virtual
+ * inheritance, we must explicitly call the constructor for their
+ * common parent, the basic_elem_iterator, here.
  */
 template <class T>
-class basic_active_type_elem_iterator : public basic_type_elem_iterator<T>
+class basic_active_type_elem_iterator : public basic_type_elem_iterator<T>, public basic_active_elem_iterator<T>
 {
 public:
   /**
@@ -322,7 +330,9 @@ public:
    */
   basic_active_type_elem_iterator(const std::pair<T,T>& p,
 				  const ElemType t)
-    : basic_type_elem_iterator<T>(p, t, false)
+    : basic_elem_iterator<T>(p,false),
+      basic_type_elem_iterator<T>(p, t, false),
+      basic_active_elem_iterator<T>(p, false) 
   {
     advance();
   }
@@ -332,7 +342,7 @@ public:
    */
   virtual bool predicate() const
   {
-    return ((*_current)->active() && basic_type_elem_iterator<T>::predicate());
+    return (basic_active_elem_iterator<T>::predicate() && basic_type_elem_iterator<T>::predicate());
   }
 };
 
