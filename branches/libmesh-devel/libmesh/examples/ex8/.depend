@@ -17,18 +17,15 @@ ex8.$(obj-suffix):\
     ../../include/enum_fe_family.h\
     ../../include/enum_inf_map_type.h\
     ../../include/enum_order.h\
-    ../../include/enum_preconditioner_type.h\
     ../../include/enum_quadrature_type.h\
     ../../include/enum_solver_package.h\
-    ../../include/enum_solver_type.h\
+    ../../include/enum_xdr_mode.h\
     ../../include/equation_systems.h\
-    ../../include/equation_systems_base.h\
     ../../include/fe.h\
     ../../include/fe_base.h\
     ../../include/fe_type.h\
     ../../include/libmesh.h\
     ../../include/libmesh_base.h\
-    ../../include/linear_solver_interface.h\
     ../../include/mesh.h\
     ../../include/mesh_base.h\
     ../../include/mesh_common.h\
@@ -39,7 +36,6 @@ ex8.$(obj-suffix):\
     ../../include/node.h\
     ../../include/node_iterators.h\
     ../../include/numeric_vector.h\
-    ../../include/o_f_stream.h\
     ../../include/perf_log.h\
     ../../include/point.h\
     ../../include/predicated_iterator.h\
@@ -49,6 +45,7 @@ ex8.$(obj-suffix):\
     ../../include/reference_counter.h\
     ../../include/sparse_matrix.h\
     ../../include/sphere.h\
+    ../../include/steady_system.h\
     ../../include/surface.h\
     ../../include/system_base.h\
-    ../../include/xdr_cxx.h
+    ../../include/transient_system.h

@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.34.2.3 2003-05-06 14:00:44 benkirk Exp $
+// $Id: equation_systems.C,v 1.34.2.4 2003-05-06 17:13:33 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -27,6 +27,7 @@
 #include "libmesh.h"
 #include "mesh.h"
 #include "system_base.h"
+#include "newmark_system.h"
 #include "steady_system.h"
 #include "transient_system.h"
 
@@ -40,6 +41,9 @@
 EquationSystems::EquationSystems (const Mesh& m) :
   _mesh(m)
 {
+  // Set default parameters
+  this->set_parameter("linear solver tolerance")          = 1.e-12;
+  this->set_parameter("linear solver maximum iterations") = 5000;
 }
 
 
@@ -153,9 +157,15 @@ void EquationSystems::reinit ()
 void EquationSystems::add_system (const std::string& sys_type,
 				  const std::string& name)
 {
-  if      (sys_type == "Steady")
+  // Build a Newmark system
+  if      (sys_type == "Newmark")
+    this->add_system<NewmarkSystem> (name);
+
+  // Build a steady system
+  else if (sys_type == "Steady")
     this->add_system<SteadySystem> (name);
 
+  // build a transient system
   else if (sys_type == "Transient")
     this->add_system<TransientSystem> (name);
 
@@ -763,17 +773,9 @@ void EquationSystems::unset_parameter (const std::string& id)
   std::map<std::string, Real>::iterator
     pos = _parameters.find(id);
   
-  // Make sure the parameter was found
-  if (pos == _parameters.end())
-    {
-      std::cerr << "ERROR: parameter " << id
-		<< " was not set!"
-		<< std::endl;
-      error();
-    }
-  
-  // Erase the entry
-  _parameters.erase(pos);
+  // If the parameter was found
+  if (pos != _parameters.end())
+    _parameters.erase(pos);
 }
 
 
@@ -781,5 +783,6 @@ void EquationSystems::unset_parameter (const std::string& id)
 //--------------------------------------------------------------------------
 // Instantiations of templated functions
 
+template void EquationSystems::add_system<NewmarkSystem>   (const std::string&);
 template void EquationSystems::add_system<SteadySystem>    (const std::string&);
 template void EquationSystems::add_system<TransientSystem> (const std::string&);

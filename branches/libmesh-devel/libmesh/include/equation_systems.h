@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.23.2.2 2003-05-06 14:00:34 benkirk Exp $
+// $Id: equation_systems.h,v 1.23.2.3 2003-05-06 17:13:32 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -86,6 +86,11 @@ public:
    * @returns a constant reference to the system named \p name.
    */
   const SystemBase & get_system(const std::string& name) const;
+ 
+  /**
+   * @returns a constant reference to the system named \p name.
+   */
+  SystemBase& get_system(const std::string& name);
 
   /**
    * @returns a constant reference to the system named \p name.
@@ -95,7 +100,16 @@ public:
    */
   template <typename T_sys>
   const T_sys& get_system (const std::string& name) const;
- 
+
+  /**
+   * @returns a writeable referene to the system named \p name.
+   * The template argument defines the return type.  For example,
+   * const SteadySystem& sys = eq.get_system<SteadySystem> ("sys");
+   * is an example of how the method might be used
+   */
+  template <typename T_sys>
+  T_sys& get_system (const std::string& name);
+  
   /**
    * @returns a reference to the system named \p name.
    */
@@ -272,20 +286,6 @@ public:
   
 protected:
 
-  
-  /**
-   * @returns a constant reference to the system named \p name.
-   */
-  SystemBase& get_system(const std::string& name);
-
-  /**
-   * @returns a writeable referene to the system named \p name.
-   * The template argument defines the return type.  For example,
-   * const SteadySystem& sys = eq.get_system<SteadySystem> ("sys");
-   * is an example of how the method might be used
-   */
-  template <typename T_sys>
-  T_sys& get_system (const std::string& name);
   
   /**
    * @returns a string containing information about the

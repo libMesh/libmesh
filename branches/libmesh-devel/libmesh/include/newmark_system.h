@@ -1,4 +1,4 @@
-// $Id: newmark_system.h,v 1.4 2003-05-04 23:58:52 benkirk Exp $
+// $Id: newmark_system.h,v 1.4.2.1 2003-05-06 17:13:32 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -25,12 +25,9 @@
 // C++ includes
 
 // Local Includes
-#include "system_base.h"
-
+#include "transient_system.h"
 
 // Forward Declarations
-class NewmarkSystem;
-template <class T_sys> class EquationSystems;
 
 
 /**
@@ -53,7 +50,7 @@ template <class T_sys> class EquationSystems;
 // ------------------------------------------------------------
 // NewmarkSystem class definition
 
-class NewmarkSystem : public SystemBase
+class NewmarkSystem : public TransientSystem
 {
 public:
 
@@ -61,9 +58,9 @@ public:
    * Constructor.  Optionally initializes required
    * data structures.
    */
-  NewmarkSystem (EquationSystems<NewmarkSystem>& es,
-		 const std::string&              name,
-		 const unsigned int              number);
+  NewmarkSystem (EquationSystems& es,
+		 const std::string& name,
+		 const unsigned int number);
 
   /**
    * Destructor.
@@ -93,6 +90,22 @@ public:
    * actually call the solver.
    */
   void assemble ();
+
+  /**
+   * Solve the linear system. Does not call assemble.
+   */
+  std::pair<unsigned int, Real> solve ();
+  
+  /**
+   * @returns \p "Newmark".  Helps in identifying
+   * the system type in an equation system file.
+   */
+  const std::string system_type () const { return "Newmark"; }
+
+
+  //---------------------------------------------------------
+  // These members are specific to the Newmark system
+  //
   
   /**
    * Apply initial conditions.
@@ -117,26 +130,14 @@ public:
    */
   void update_u_v_a ();
 
-
-  /**
-   * Solve the linear system. Does not call assemble.
-   */
-  std::pair<unsigned int, Real> solve ();
-
   
-  /**
-   * @returns \p "Newmark".  Helps in identifying
-   * the system type in an equation system file.
-   */
-  static const std::string system_type () { return "Newmark"; }
-
   /**
    * @returns \p true when the other system contains
    * identical data, up to the given threshold.
    */
-  bool compare (const NewmarkSystem& other_system, 
-		const Real threshold,
-		const bool verbose) const;
+//   bool compare (const NewmarkSystem& other_system, 
+// 		const Real threshold,
+// 		const bool verbose) const;
 
 
   /**
@@ -149,53 +150,53 @@ public:
 			       const Real delta=.5);
 
 
-  /**
-   * Register a user function to use in initializing the system.
-   */
-  void attach_init_cond_function(void fptr(EquationSystems<NewmarkSystem>& es,
-					   const std::string& name));
+//   /**
+//    * Register a user function to use in initializing the system.
+//    */
+//   void attach_init_cond_function(void fptr(EquationSystems<NewmarkSystem>& es,
+// 					   const std::string& name));
   
-  /**
-   * Register a user function to use in assembling the system
-   * matrix and RHS.
-   */
-  void attach_assemble_function(void fptr(EquationSystems<NewmarkSystem>& es,
-					  const std::string& name));
+//   /**
+//    * Register a user function to use in assembling the system
+//    * matrix and RHS.
+//    */
+//   void attach_assemble_function(void fptr(EquationSystems<NewmarkSystem>& es,
+// 					  const std::string& name));
 
   /**
    * Register a required user function to use in assembling/solving the system.  
    * Right before solving for a new frequency or time step, this function is called.
    */
-  void attach_solve_function(void fptr(EquationSystems<NewmarkSystem>& es,
+  void attach_solve_function(void fptr(EquationSystems& es,
 				       const std::string& name));
 
-  /**
-   * Function that applies initial conditions.
-   */
-  void (* init_cond_fptr) (EquationSystems<NewmarkSystem>& es,
-			     const std::string& name);
+//   /**
+//    * Function that applies initial conditions.
+//    */
+//   void (* init_cond_fptr) (EquationSystems<NewmarkSystem>& es,
+// 			     const std::string& name);
   
+//   /**
+//    * Function that assembles the system.
+//    */
+//   void (* assemble_fptr) (EquationSystems<NewmarkSystem>& es,
+// 			  const std::string& name);
+
+
   /**
-   * Function that assembles the system.
-   */
-  void (* assemble_fptr) (EquationSystems<NewmarkSystem>& es,
-			  const std::string& name);
-
-
- /**
    * Function that computes time or frequency dependent data of the system.
    */
-  void (* solve_fptr) (EquationSystems<NewmarkSystem>& es,
-			const std::string& name);
+  void (* solve_system) (EquationSystems& es,
+			 const std::string& name);
 
 
 protected:
 
-  /**
-   * Reference to the \p EquationSystems<NewmarkSystem> data structure 
-   * that handles us.   
-   */
-  EquationSystems<NewmarkSystem>& _equation_systems;
+//   /**
+//    * Reference to the \p EquationSystems<NewmarkSystem> data structure 
+//    * that handles us.   
+//    */
+//   EquationSystems<NewmarkSystem>& _equation_systems;
 
 
 private:
@@ -215,8 +216,7 @@ private:
     /**
      * Returns true if the matrix assambly is finished.
      */
-    bool _finished_assemble;
-  
+    bool _finished_assemble;  
 };
 
 
