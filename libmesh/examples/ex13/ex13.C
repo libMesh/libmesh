@@ -1,4 +1,4 @@
-/* $Id: ex13.C,v 1.4 2004-03-20 15:16:56 benkirk Exp $ */
+/* $Id: ex13.C,v 1.5 2004-05-12 18:05:24 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -176,7 +176,7 @@ int main (int argc, char** argv)
 	// Now we need to update the solution vector from the
 	// previous time step.  This is done directly through
 	// the reference to the Stokes system.
-	*stokes_system.old_local_solution = *stokes_system.solution;
+	*stokes_system.old_local_solution = *stokes_system.current_local_solution;
 
 	// Now we begin the nonlinear loop
 	for (unsigned int l=0; l<n_nonlinear_steps; ++l)
