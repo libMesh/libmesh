@@ -1,4 +1,4 @@
-// $Id: mesh_diva_support.C,v 1.11 2004-01-03 15:37:43 benkirk Exp $
+// $Id: mesh_diva_support.C,v 1.12 2004-03-18 15:43:37 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -30,7 +30,7 @@
 
 
 
-void Mesh::write_diva (const std::string& name)
+void Mesh::write_diva (const std::string& name) const
 {
   std::ofstream out(name.c_str());
 
@@ -39,7 +39,7 @@ void Mesh::write_diva (const std::string& name)
 
 
 
-void Mesh::write_diva (std::ostream& out)
+void Mesh::write_diva (std::ostream& out) const
 {
   /*
     From Kelly: (kelly@tacc.utexas.edu)
