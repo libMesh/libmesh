@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.53 2004-03-07 21:56:51 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.54 2004-03-07 22:39:04 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -200,6 +200,7 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
   dnl be changed at a later stage
   RPATHFLAG="-Wl,-rpath,"
 
+
   dnl First the flags for gcc compilers
   if test "$GXX" = yes ; then
     CXXFLAGSO="-O2 -felide-constructors -DNDEBUG"
@@ -269,6 +270,21 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           CXXFLAGSO="$CXXFLAGSO -fnonnull-objects"
           CXXFLAGSG="$CXXFLAGSG -Wmissing-declarations -Wbad-function-cast -Wtraditional -Wnested-externs"
           CXXFLAGSP="$CXXFLAGSP -fnonnull-objects"
+          ;;
+  
+      *)
+          ;;
+    esac
+
+
+    dnl Set OS-specific flags for linkers & other stuff
+    case "$target" in
+
+      dnl For Solaris we need to pass a different flag to the linker for specifying the
+      dnl dynamic library search path and add -lrpcsvc to use XDR
+      *solaris*)
+          RPATHFLAG="-Wl,-R,"
+          LIBS="$LIBS -lrpcsvc"
           ;;
   
       *)
@@ -442,6 +458,10 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           CXXFLAGSO="-DNDEBUG -w"
           CFLAGSG="-DDEBUG -w"
           CFLAGSO="-DNDEBUG -w"
+
+          dnl Linker flags & librpcsvc for XDR
+          RPATHFLAG="-Wl,-R,"
+          LIBS="$LIBS -lrpcsvc"
 
           dnl Position-independent code for shared libraries
           if test "$enableshared" = yes ; then
