@@ -12,9 +12,9 @@ all:
 	@echo "--- Building Metis ---------------------------"
 	@$(MAKE) -C metis/Lib    $(MAKECMDGOALS)
 	@echo ""
-	@echo "--- Building Parmetis ------------------------"
-	@$(MAKE) -C parmetis/Lib $(MAKECMDGOALS)
-	@echo ""
+#	@echo "--- Building Parmetis ------------------------"
+#	@$(MAKE) -C parmetis/Lib $(MAKECMDGOALS)
+#	@echo ""
 	@echo "--- Building sfcurves ------------------------"
 	@$(MAKE) -C sfcurves     $(MAKECMDGOALS)
 	@echo ""
