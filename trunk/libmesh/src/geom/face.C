@@ -1,7 +1,7 @@
-// $Id: face.C,v 1.5 2003-01-24 17:24:43 jwpeterson Exp $
+// $Id: face.C,v 1.6 2003-09-02 18:02:42 benkirk Exp $
 
 // The Next Great Finite Element Library.
-// Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

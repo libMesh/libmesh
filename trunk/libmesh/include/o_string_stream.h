@@ -1,7 +1,7 @@
-// $Id: o_string_stream.h,v 1.7 2003-06-04 22:47:45 benkirk Exp $
+// $Id: o_string_stream.h,v 1.8 2003-09-02 18:02:38 benkirk Exp $
 
 // The Next Great Finite Element Library.
-// Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

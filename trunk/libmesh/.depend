@@ -79,10 +79,14 @@ src/base/dof_map_constraints.$(obj-suffix):\
     include/type_vector.h
 src/base/dof_object.$(obj-suffix):\
     src/base/dof_object.C\
+    include/auto_ptr.h\
     include/dof_object.h\
+    include/enum_solver_package.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
-    include/mesh_config.h
+    include/mesh_config.h\
+    include/perf_log.h
 src/base/equation_systems.$(obj-suffix):\
     src/base/equation_systems.C\
     include/auto_ptr.h\
@@ -292,11 +296,15 @@ src/base/newmark_system.$(obj-suffix):\
     include/type_vector.h
 src/base/node.$(obj-suffix):\
     src/base/node.C\
+    include/auto_ptr.h\
     include/dof_object.h\
+    include/enum_solver_package.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -610,13 +618,16 @@ src/fe/fe_hierarchic.$(obj-suffix):\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/fe.h\
     include/fe_base.h\
     include/fe_type.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -632,13 +643,16 @@ src/fe/fe_hierarchic_shape_1D.$(obj-suffix):\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/fe.h\
     include/fe_base.h\
     include/fe_type.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -654,13 +668,16 @@ src/fe/fe_hierarchic_shape_2D.$(obj-suffix):\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/fe.h\
     include/fe_base.h\
     include/fe_type.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -676,13 +693,16 @@ src/fe/fe_hierarchic_shape_3D.$(obj-suffix):\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/fe.h\
     include/fe_base.h\
     include/fe_type.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -753,14 +773,17 @@ src/fe/fe_lagrange.$(obj-suffix):\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/fe.h\
     include/fe_base.h\
     include/fe_interface.h\
     include/fe_type.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -776,13 +799,16 @@ src/fe/fe_lagrange_shape_1D.$(obj-suffix):\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/fe.h\
     include/fe_base.h\
     include/fe_type.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -798,13 +824,16 @@ src/fe/fe_lagrange_shape_2D.$(obj-suffix):\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/fe.h\
     include/fe_base.h\
     include/fe_type.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -820,13 +849,16 @@ src/fe/fe_lagrange_shape_3D.$(obj-suffix):\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/fe.h\
     include/fe_base.h\
     include/fe_type.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -871,13 +903,16 @@ src/fe/fe_monomial.$(obj-suffix):\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/fe.h\
     include/fe_base.h\
     include/fe_type.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -893,13 +928,16 @@ src/fe/fe_monomial_shape_1D.$(obj-suffix):\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/fe.h\
     include/fe_base.h\
     include/fe_type.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -915,13 +953,16 @@ src/fe/fe_monomial_shape_2D.$(obj-suffix):\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/fe.h\
     include/fe_base.h\
     include/fe_type.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -937,13 +978,16 @@ src/fe/fe_monomial_shape_3D.$(obj-suffix):\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/fe.h\
     include/fe_base.h\
     include/fe_type.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -993,6 +1037,7 @@ src/fe/inf_fe_base_radial.$(obj-suffix):\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/fe.h\
     include/fe_base.h\
     include/fe_interface.h\
@@ -1002,10 +1047,12 @@ src/fe/inf_fe_base_radial.$(obj-suffix):\
     include/inf_fe_instantiate_2D.h\
     include/inf_fe_instantiate_3D.h\
     include/inf_fe_macro.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -1218,13 +1265,16 @@ src/geom/cell_hex.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/face.h\
     include/face_quad.h\
     include/face_quad4.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -1239,13 +1289,16 @@ src/geom/cell_hex20.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/face.h\
     include/face_quad.h\
     include/face_quad8.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -1260,13 +1313,16 @@ src/geom/cell_hex27.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/face.h\
     include/face_quad.h\
     include/face_quad9.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -1281,13 +1337,16 @@ src/geom/cell_hex8.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/face.h\
     include/face_quad.h\
     include/face_quad4.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -1303,15 +1362,18 @@ src/geom/cell_inf_hex.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/face.h\
     include/face_inf_quad.h\
     include/face_inf_quad4.h\
     include/face_quad.h\
     include/face_quad4.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -1326,15 +1388,18 @@ src/geom/cell_inf_hex16.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/face.h\
     include/face_inf_quad.h\
     include/face_inf_quad6.h\
     include/face_quad.h\
     include/face_quad8.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -1349,15 +1414,18 @@ src/geom/cell_inf_hex18.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/face.h\
     include/face_inf_quad.h\
     include/face_inf_quad6.h\
     include/face_quad.h\
     include/face_quad9.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -1374,12 +1442,15 @@ src/geom/cell_inf_hex8.$(obj-suffix):\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/fe_interface.h\
     include/fe_type.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -1394,15 +1465,18 @@ src/geom/cell_inf_prism.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/face.h\
     include/face_inf_quad.h\
     include/face_inf_quad4.h\
     include/face_tri.h\
     include/face_tri3.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -1418,15 +1492,18 @@ src/geom/cell_inf_prism12.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/face.h\
     include/face_inf_quad.h\
     include/face_inf_quad6.h\
     include/face_tri.h\
     include/face_tri6.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -1444,12 +1521,15 @@ src/geom/cell_inf_prism6.$(obj-suffix):\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/fe_interface.h\
     include/fe_type.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -1464,15 +1544,18 @@ src/geom/cell_prism.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/face.h\
     include/face_quad.h\
     include/face_quad4.h\
     include/face_tri.h\
     include/face_tri3.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -1488,15 +1571,18 @@ src/geom/cell_prism15.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/face.h\
     include/face_quad.h\
     include/face_quad8.h\
     include/face_tri.h\
     include/face_tri6.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -1512,15 +1598,18 @@ src/geom/cell_prism18.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/face.h\
     include/face_quad.h\
     include/face_quad9.h\
     include/face_tri.h\
     include/face_tri6.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -1536,15 +1625,18 @@ src/geom/cell_prism6.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/face.h\
     include/face_quad.h\
     include/face_quad4.h\
     include/face_tri.h\
     include/face_tri3.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -1559,15 +1651,18 @@ src/geom/cell_pyramid.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/face.h\
     include/face_quad.h\
     include/face_quad4.h\
     include/face_tri.h\
     include/face_tri3.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -1583,15 +1678,18 @@ src/geom/cell_pyramid5.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/face.h\
     include/face_quad.h\
     include/face_quad4.h\
     include/face_tri.h\
     include/face_tri3.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -1606,13 +1704,16 @@ src/geom/cell_tet.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/face.h\
     include/face_tri.h\
     include/face_tri3.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -1628,13 +1729,16 @@ src/geom/cell_tet10.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/face.h\
     include/face_tri.h\
     include/face_tri6.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -1650,13 +1754,16 @@ src/geom/cell_tet4.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/face.h\
     include/face_tri.h\
     include/face_tri3.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -1673,10 +1780,13 @@ src/geom/edge_edge2.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -1691,10 +1801,13 @@ src/geom/edge_edge3.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -1709,10 +1822,13 @@ src/geom/edge_inf_edge2.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -1844,11 +1960,14 @@ src/geom/face_inf_quad.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/face_inf_quad.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -1863,14 +1982,17 @@ src/geom/face_inf_quad4.$(obj-suffix):\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/face_inf_quad.h\
     include/face_inf_quad4.h\
     include/fe_interface.h\
     include/fe_type.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -1886,12 +2008,15 @@ src/geom/face_inf_quad6.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/face_inf_quad.h\
     include/face_inf_quad6.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -1906,12 +2031,15 @@ src/geom/face_quad.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/face.h\
     include/face_quad.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -1926,13 +2054,16 @@ src/geom/face_quad4.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/face.h\
     include/face_quad.h\
     include/face_quad4.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -1947,13 +2078,16 @@ src/geom/face_quad8.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/face.h\
     include/face_quad.h\
     include/face_quad8.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -1968,13 +2102,16 @@ src/geom/face_quad9.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/face.h\
     include/face_quad.h\
     include/face_quad9.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -1989,12 +2126,15 @@ src/geom/face_tri.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/face.h\
     include/face_tri.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -2009,13 +2149,16 @@ src/geom/face_tri3.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/face.h\
     include/face_tri.h\
     include/face_tri3.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -2030,13 +2173,16 @@ src/geom/face_tri6.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/face.h\
     include/face_tri.h\
     include/face_tri6.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/perf_log.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -2059,9 +2205,13 @@ src/geom/point.$(obj-suffix):\
     include/type_vector.h
 src/geom/sphere.$(obj-suffix):\
     src/geom/sphere.C\
+    include/auto_ptr.h\
+    include/enum_solver_package.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
+    include/perf_log.h\
     include/point.h\
     include/sphere.h\
     include/surface.h\

@@ -1,7 +1,7 @@
-// $Id: enum_quadrature_type.h,v 1.3 2003-05-15 23:34:33 benkirk Exp $
+// $Id: enum_quadrature_type.h,v 1.4 2003-09-02 18:02:37 benkirk Exp $
 
 // The Next Great Finite Element Library.
-// Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

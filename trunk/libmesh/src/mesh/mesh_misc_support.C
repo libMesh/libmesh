@@ -1,7 +1,7 @@
-// $Id: mesh_misc_support.C,v 1.10 2003-07-23 21:32:26 jwpeterson Exp $
+// $Id: mesh_misc_support.C,v 1.11 2003-09-02 18:02:43 benkirk Exp $
 
 // The Next Great Finite Element Library.
-// Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

@@ -1,7 +1,7 @@
-// $Id: equation_systems.C,v 1.40 2003-07-24 22:14:56 benkirk Exp $
+// $Id: equation_systems.C,v 1.41 2003-09-02 18:02:40 benkirk Exp $
 
 // The Next Great Finite Element Library.
-// Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

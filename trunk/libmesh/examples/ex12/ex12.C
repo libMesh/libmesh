@@ -1,4 +1,4 @@
-// $Id: ex12.C,v 1.1 2003-09-01 18:12:36 ddreyer Exp $
+// $Id: ex12.C,v 1.2 2003-09-02 18:02:36 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -197,12 +197,12 @@ int main (int argc, char** argv)
      *     arbitrary node-/element-associated data, stored in the 
      *     so-called datasets "2411", "2412", and "2414", respectively.
      *     Here, only the last dataset is covered.  The two first datasets are
-     *     implemented in the Universal support for I/O of meshes.  A single unv
-     *     file may hold @e multiple datasets of type "2414".  To distinguish
-     *     data, each dataset has a header.  The \p libMesh pendant to
-     *     this header is the \p MeshDataUnvHeader class.  When you read/write
-     *     unv files using the \p MeshData, you @always automatically also
-     *     read/write such headers.
+     *     implemented in the Universal support for I/O of meshes.  A single
+     *     unv file may hold @e multiple datasets of type "2414".  To
+     *     distinguish data, each dataset has a header.  The \p libMesh pendant
+     *     to this header is the \p MeshDataUnvHeader class.  When you
+     *     read/write unv files using the \p MeshData, you @always
+     *     automatically also read/write such headers.
      *
      * Enough babble for now.  Examples. 
      */

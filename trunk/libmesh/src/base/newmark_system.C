@@ -1,7 +1,7 @@
-// $Id: newmark_system.C,v 1.7 2003-08-16 17:33:49 ddreyer Exp $
+// $Id: newmark_system.C,v 1.8 2003-09-02 18:02:40 benkirk Exp $
 
 // The Next Great Finite Element Library.
-// Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

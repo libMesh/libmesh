@@ -1,7 +1,7 @@
-// $Id: surface.h,v 1.7 2003-08-29 20:09:37 ddreyer Exp $
+// $Id: surface.h,v 1.8 2003-09-02 18:02:39 benkirk Exp $
 
 // The Next Great Finite Element Library.
-// Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

@@ -1,7 +1,7 @@
-// $Id: laspack_matrix.C,v 1.14 2003-08-28 20:55:27 benkirk Exp $
+// $Id: laspack_matrix.C,v 1.15 2003-09-02 18:02:44 benkirk Exp $
 
 // The Next Great Finite Element Library.
-// Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
