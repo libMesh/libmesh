@@ -1,5 +1,5 @@
 dnl --------------------------------------------------------------
-dnl $Id: configure.in,v 1.27 2003-05-23 03:21:41 benkirk Exp $
+dnl $Id: configure.in,v 1.28 2003-05-29 15:54:05 benkirk Exp $
 dnl --------------------------------------------------------------
 dnl Process this file with autoconf to produce a configure script.
 
@@ -9,7 +9,7 @@ dnl you call ./configure subsequently on different systems without
 dnl clearing the cache 
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
-AC_REVISION($Revision: 1.27 $)
+AC_REVISION($Revision: 1.28 $)
 
 
 AC_INIT(Make.common.in)
@@ -20,10 +20,9 @@ AC_MSG_RESULT(----------- Configuring libMesh -------------)
 AC_MSG_RESULT(---------------------------------------------)
 
 AC_CANONICAL_TARGET
-AC_LANG_CPLUSPLUS
-
 AC_PROG_CXX
 AC_PROG_CC
+AC_LANG_CPLUSPLUS
 
 
 dnl --------------------------------------------------------------
@@ -53,6 +52,18 @@ AC_SUBST(LDFLAGS)
 AC_SUBST(CXXDEPFLAG)
 AC_SUBST(CXXSHAREDFLAG)
 AC_SUBST(RPATHFLAG)
+
+
+dnl --------------------------------------------------------------
+dnl Check for important type sizes
+dnl --------------------------------------------------------------
+AC_CHECK_SIZEOF(int)
+AC_CHECK_SIZEOF(long int)
+AC_CHECK_SIZEOF(long long int)
+AC_CHECK_SIZEOF(float)
+AC_CHECK_SIZEOF(double)
+AC_CHECK_SIZEOF(void *)
+
 
 
 dnl --------------------------------------------------------------

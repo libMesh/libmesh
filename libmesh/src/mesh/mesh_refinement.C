@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.20 2003-05-29 04:29:16 benkirk Exp $
+// $Id: mesh_refinement.C,v 1.21 2003-05-29 15:54:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -28,6 +28,7 @@
 #include "mesh_refinement.h"
 #include "mesh_base.h"
 #include "elem.h"
+#include "mesh_logging.h"
 
 
 
@@ -232,6 +233,8 @@ void MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
 
 bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 {
+  START_LOG ("make_coarsening_compatible()", "MeshRefinement");
+  
   /**
    * Unless we encounter a specific situation level-one
    * will be satisfied after executing this loop just once
@@ -392,6 +395,8 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 	  mesh.elem(e)->set_refinement_flag(Elem::COARSEN);
       }
 	
+  STOP_LOG ("make_coarsening_compatible()", "MeshRefinement");
+  
   return compatible_with_refinement;
 }
 
@@ -399,6 +404,8 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 
 bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 {
+  START_LOG ("make_refinement_compatible()", "MeshRefinement");
+  
   // Unless we encounter a specific situation level-one
   // will be satisfied after executing this loop just once
   bool level_one_satisfied = true;
@@ -501,6 +508,8 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
     } // end if (maintain_level_one)
 
   
+  STOP_LOG ("make_refinement_compatible()", "MeshRefinement");
+  
   return compatible_with_coarsening;
 }
 
@@ -508,20 +517,7 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 
 void MeshRefinement::coarsen_elements ()
 {
-
-  unsigned int max_level=0;
-
-//  const std::vector<Elem*>& elements = mesh.get_elem();
-//  const unsigned int n_elem = elements.size();
-  
-  for (unsigned int e=0; e<mesh.n_elem(); e++)
-    {
-      assert (mesh.elem(e) != NULL);
-      max_level = std::max(max_level, mesh.elem(e)->level());
-    }
-  
-  if (max_level == 0) return;
-
+  START_LOG ("coarsen_elements()", "MeshRefinement");  
   
   for (unsigned int e=0; e<mesh.n_elem(); e++)
     if (mesh.elem(e)->refinement_flag() == Elem::COARSEN)
@@ -544,12 +540,16 @@ void MeshRefinement::coarsen_elements ()
 	    assert (mesh.elem(e)->active());
 	  }
       }
+  
+  STOP_LOG ("coarsen_elements()", "MeshRefinement");  
 }
 
 
 
 void MeshRefinement::refine_elements ()
 {
+  START_LOG ("refine_elements()", "MeshRefinement");
+  
   const unsigned int orig_n_elem = mesh.n_elem();
 
 
@@ -561,6 +561,8 @@ void MeshRefinement::refine_elements ()
     if (elements[e] != NULL)
       if (elements[e]->refinement_flag() == Elem::REFINE)
 	elements[e]->refine (mesh);
+
+  STOP_LOG ("refine_elements()", "MeshRefinement");
 }
 
 

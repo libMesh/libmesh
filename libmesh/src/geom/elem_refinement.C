@@ -1,4 +1,4 @@
-// $Id: elem_refinement.C,v 1.1 2003-05-28 03:17:49 benkirk Exp $
+// $Id: elem_refinement.C,v 1.2 2003-05-29 15:54:06 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -105,12 +105,36 @@ void Elem::refine (MeshBase& mesh)
 		  // Otherwise build the key to look for the node
 		  else
 		    {
-		      const unsigned int node_num =
+		      // An unsigned int associated with the
+		      // address of the node n.  We can't use the
+		      // node number since they can change.
+		      const unsigned int n_id =
+			
+#if SIZEOF_INT == SIZEOF_VOID_P
+			
+			// 32-bit machines
 			reinterpret_cast<unsigned int>(this->get_node(n));
+		      
+#elif SIZEOF_LONG_LONG_INT == SIZEOF_VOID_P
 
+		        // 64-bit machines 
+ 		        // Another big prime number less than max_unsigned_int
+		        // for key creation on 64-bit machines
+		        const unsigned int bp3 = 4294967291;
+		        static_cast<long long unsigned int>(this->get_node(n))%
+			bp3;
+			
+#else
+			// Huh?
+		        0; error();
+			
+#endif
+		      // Compute the key for this new node nc.  This will
+		      // be used to locate the node if it already exists
+		      // in the mesh.
 		      keys[c][nc] +=
 			(((static_cast<unsigned int>(em_val*100000.)%bp1) *
-			  (node_num%bp1))%bp1)*bp2;
+			  (n_id%bp1))%bp1)*bp2;
 		    }
 		}
 	    }
