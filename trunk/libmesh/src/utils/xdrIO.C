@@ -1,4 +1,4 @@
-// "$Id: xdrIO.C,v 1.23 2004-08-17 03:03:57 benkirk Exp $\n"
+// "$Id: xdrIO.C,v 1.24 2004-09-30 17:18:38 benkirk Exp $\n"
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -68,8 +68,22 @@ void XdrIO::fini()
 
 Originator XdrIO::get_originator()
 {
-  const Originator orig("DEAL", 3, 3);
-  return orig;
+  if (orig_flag == 1) 
+    {
+      const Originator orig_mgf("MGF ", 2, 0);
+      return orig_mgf;
+    }
+  else if (orig_flag == 0)
+    {
+      const Originator orig_deal("DEAL", 3, 3);
+      return orig_deal;
+    }
+  else
+    {
+      std::cerr << "orig_flag set to unknown value: "
+                << orig_flag << std::endl;
+      error();
+    }
 }
 
 
@@ -605,8 +619,10 @@ int XdrMESH::header(XdrMHEAD *hd)
     }
 
 
-
-  else if (orig_flag != 1) // Not MGF originator, unknown Originator!
+  else if (orig_flag == 1) // MGF originator
+    {
+    }
+  else  // Unknown Originator!
     {
       error();
     }
@@ -623,14 +639,18 @@ int XdrMESH::header(XdrMHEAD *hd)
     case (XdrIO::ENCODE):
     case (XdrIO::DECODE):
       {
-	char* temp = const_cast<char *>(hd->getId());
-	xdr_string(mp_xdr_handle,&temp,    ((m_type == ENCODE) ? strlen(temp)    : hd->m_strSize));
+        char* temp = hd->cpyString(hd->getId());
+	xdr_string(mp_xdr_handle,&temp, ((m_type == XdrIO::ENCODE) ? strlen(temp) : hd->m_strSize));
 	hd->setId(temp);
+        delete [] temp;
 
-	temp = const_cast<char *>(hd->getTitle());
-	xdr_string(mp_xdr_handle,&temp, ((m_type == ENCODE) ? strlen(temp) : hd->m_strSize));
+	temp = hd->cpyString(hd->getTitle());
+
+	xdr_string(mp_xdr_handle,&temp, ((m_type == XdrIO::ENCODE) ? strlen(temp) : hd->m_strSize));
 	hd->setTitle(temp);
-	break;
+        if(temp) std::cout << strlen(hd->getTitle()) << std::endl;
+        delete [] temp;
+        break;
       }
 
 #endif
@@ -877,10 +897,16 @@ XdrHEAD::~XdrHEAD()
 
 char* XdrHEAD::cpyString(const char* src, int len)
 {
-  if (len == -1)
-    len = strlen(src)+1;
-  char* temp = new char[len];
-  return (char *) memcpy(temp, (char *) src, (len)*sizeof(char));
+  char* temp = NULL;
+  int myLen = len;
+  if(src)
+    {
+      if (myLen == -1)
+        myLen = strlen(src)+1;
+      temp = new char[myLen];
+      temp = (char *) memcpy(temp, (char *) src, (myLen)*sizeof(char));
+    }
+  return temp;
 }
 
 #undef xdr_REAL

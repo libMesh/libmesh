@@ -1,4 +1,4 @@
-// $Id: mesh_xdr_support.C,v 1.24 2004-08-05 15:58:44 jwpeterson Exp $
+// $Id: mesh_xdr_support.C,v 1.25 2004-09-30 17:17:49 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -40,7 +40,8 @@ void XdrInterface::mesh_interface(const std::string& name,
 				  std::vector<Node*>& nodes,
 				  std::vector<Elem*>& elements,
 				  BoundaryInfo& boundary_info,
-				  Mesh& mesh)
+				  Mesh& mesh,
+                                  const unsigned int mgf_originator)
 {
 #ifdef DEBUG
   /**
@@ -88,6 +89,8 @@ void XdrInterface::mesh_interface(const std::string& name,
    * Note 2: Has to do the right thing for
    * both binary and ASCII files.
    */
+
+  m.set_orig_flag(mgf_originator);
   m.init(access, name.c_str(), 0); // mesh files are always number 0 ...
 
   /**
@@ -120,7 +123,7 @@ void XdrInterface::mesh_interface(const std::string& name,
 	/**
 	 * Read information from the
 	 * file header.  This depends on
-	 * whether its a DEAL or MGF mesh.
+	 * whether its a libMesh or MGF mesh.
 	 */
 	numElem           = mh->getNumEl();
 	numNodes          = mh->getNumNodes();
@@ -128,7 +131,7 @@ void XdrInterface::mesh_interface(const std::string& name,
 	numBCs            = mh->getNumBCs();
 
 	/**
-	 * If a deal type mesh, read the augmented mesh information
+	 * If a libMesh-type mesh, read the augmented mesh information
 	 */
 	int orig_type = m.get_orig_flag();
 	if (orig_type == 0)
@@ -150,17 +153,6 @@ void XdrInterface::mesh_interface(const std::string& name,
     case (XdrIO::W_ASCII):
     case (XdrIO::ENCODE):
       {
-	/**
-	 * Set the header information.
-	 * We assume now that it is only
-	 * necessary to write DEAL-style
-	 * "augmented" headers.  An
-	 * augmented header contains 
-	 * information about mesh blocks,
-	 * allowing us to optimize storage
-	 * and minimize IO requirements
-	 * for these meshes.
-	 */
 	numBCs = boundary_info.n_boundary_conds();
 	etypes = mesh.elem_types();
 	neeb.resize(etypes.size());
@@ -168,9 +160,26 @@ void XdrInterface::mesh_interface(const std::string& name,
 	for (unsigned int i=0; i<etypes.size(); i++)
 	  neeb[i] = mesh.n_elem_of_type(etypes[i]);
 
-	mh->set_n_blocks(etypes.size());
-	mh->set_block_elt_types(etypes);
-	mh->set_num_elem_each_block(neeb);	
+        /* Now we check to see if we're doing
+         * MGF-style headers or libMesh-style
+         * "augmented" headers.  An
+	 * augmented header contains 
+	 * information about mesh blocks,
+	 * allowing us to optimize storage
+	 * and minimize IO requirements
+	 * for these meshes.
+         */
+        
+        int orig_type = m.get_orig_flag();
+	if (orig_type == 0)
+          {
+            mh->set_n_blocks(etypes.size());
+            mh->set_block_elt_types(etypes);
+            mh->set_num_elem_each_block(neeb);
+          }
+        else
+          assert(etypes.size() == 1);
+            
 	mh->setNumEl(mesh.n_elem());
 	mh->setNumNodes(mesh.n_nodes());
 	mh->setStrSize(65536);
@@ -241,12 +250,12 @@ void XdrInterface::mesh_interface(const std::string& name,
 
 	/**
 	 * Note: This section now depends on
-	 * whether we are reading a DEAL or
+	 * whether we are reading a libMesh or
 	 * MGF style mesh.
 	 */
 	int orig_flag = m.get_orig_flag();
 
-	if (orig_flag == 0) // DEAL 
+	if (orig_flag == 0) // libMesh 
 	  {
 	    conn.resize(totalWeight);
 	    m.Icon(&conn[0], 1, totalWeight);
@@ -417,7 +426,7 @@ void XdrInterface::mesh_interface(const std::string& name,
       {
 	int orig_type = m.get_orig_flag();
 
-	if (orig_type == 0) // DEAL-style (0) hybrid mesh possible
+	if (orig_type == 0) // libMesh-style (0) hybrid mesh possible
 	  {
 	    unsigned int lastConnIndex = 0;
 	    unsigned int lastFaceIndex = 0;
@@ -676,7 +685,7 @@ void XdrInterface::soln_interface_impl(const std::string& name,
 	/**
 	 * Read information from the
 	 * file header.  This depends on
-	 * whether its a DEAL or MGF mesh.
+	 * whether its a libMesh or MGF mesh.
 	 */
 	numVar   = sh->getWrtVar();
 	numNodes = sh->getNumNodes();
@@ -806,7 +815,8 @@ void Mesh::read_xdr(const std::string& name)
 
 
 
-void Mesh::read_xdr_binary(const std::string& name)
+void Mesh::read_xdr_binary(const std::string& name,
+                           const unsigned int mgf_originator)
 {
 #ifndef HAVE_XDR
 
@@ -836,7 +846,8 @@ void Mesh::read_xdr_binary(const std::string& name)
 			   _nodes,
 			   _elements,
 			   boundary_info,
-			   *this);
+			   *this,
+                           mgf_originator);
   
 #endif
 }
@@ -930,7 +941,8 @@ void Mesh::write_xdr(const std::string& name)
 
 
 
-void Mesh::write_xdr_binary(const std::string& name)
+void Mesh::write_xdr_binary(const std::string& name,
+                            const unsigned int mgf_originator)
 {
 #ifndef HAVE_XDR
 
@@ -946,7 +958,6 @@ void Mesh::write_xdr_binary(const std::string& name)
    * interface.
    */
   XdrInterface interface;
-  
   /**
    * Call the appropriate function in the interface
    */
@@ -955,7 +966,8 @@ void Mesh::write_xdr_binary(const std::string& name)
 			   _nodes,
 			   _elements,
 			   boundary_info,
-			   *this);
+			   *this,
+                           mgf_originator);
 
 #endif
 }
