@@ -1,4 +1,4 @@
-// $Id: partitioner_factory.C,v 1.9 2004-10-26 22:22:38 benkirk Exp $
+// $Id: partitioner_factory.C,v 1.10 2004-10-27 15:04:41 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -34,6 +34,17 @@
 #include "factory.h"
 
 
+//-------------------------------------------------
+// Full specialization for the Factory<Partitioner>
+template<>
+std::map<std::string, Factory<Partitioner>*>&
+Factory<Partitioner>::factory_map()
+{
+  static std::map<std::string, Factory<Partitioner>*> _map;
+  return _map;      
+}
+
+
 
 // ------------------------------------------------------------
 // Register Partitioning classes with the factory.  These will never
@@ -41,15 +52,6 @@
 // them in an anonymous namespace to prevent name clashes
 namespace {
 
-  template<>
-  std::map<std::string, Factory<Partitioner>*>&
-  Factory<Partitioner>::factory_map()
-  {
-    static std::map<std::string, Factory<Partitioner>*> _map;
-    return _map;      
-  }
-  
-  
 #ifdef HAVE_METIS
   FactoryImp<MetisPartitioner,      Partitioner> metis    ("Metis");
 #endif
