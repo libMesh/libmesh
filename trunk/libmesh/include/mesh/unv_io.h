@@ -1,4 +1,4 @@
-// $Id: unv_io.h,v 1.2 2004-03-22 22:41:45 benkirk Exp $
+// $Id: unv_io.h,v 1.3 2004-04-07 21:42:31 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -31,6 +31,8 @@
 // Local includes
 #include "mesh_io.h"
 
+// Forward declarations
+class Mesh;
 
 
 /**
@@ -41,7 +43,7 @@
 
 // ------------------------------------------------------------
 // UNVIO class definition
-class UNVIO : public MeshIO
+class UNVIO : public MeshIO<Mesh>
 {
 
  public:
@@ -228,7 +230,7 @@ class UNVIO : public MeshIO
 // MeshIO inline members
 inline
 UNVIO::UNVIO (Mesh& mesh) :
-  MeshIO (mesh)
+  MeshIO<Mesh> (mesh)
 {
   
 }
@@ -237,7 +239,7 @@ UNVIO::UNVIO (Mesh& mesh) :
 
 inline
 UNVIO::UNVIO (const Mesh& mesh) :
-  MeshIO (mesh)
+  MeshIO<Mesh> (mesh)
 {
 }
 

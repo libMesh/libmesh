@@ -1,4 +1,4 @@
-// $Id: diva_io.h,v 1.2 2004-03-23 04:17:26 jwpeterson Exp $
+// $Id: diva_io.h,v 1.3 2004-04-07 21:42:30 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -25,6 +25,10 @@
 #include "libmesh_common.h"
 #include "mesh_io.h"
 
+// Forward declarations
+class Mesh;
+
+
 
 /**
  * This class implements writing meshes in the Diva format.
@@ -37,7 +41,7 @@
 
 // ------------------------------------------------------------
 // DivaIO class definition
-class DivaIO : public MeshIO
+class DivaIO : public MeshIO<Mesh>
 {
 public:
   /**
@@ -68,7 +72,7 @@ private:
 // DivaIO inline members
 inline
 DivaIO::DivaIO (Mesh& mesh) :
-  MeshIO  (mesh)
+  MeshIO<Mesh>  (mesh)
 {}
 
 

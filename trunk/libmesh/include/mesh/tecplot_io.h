@@ -1,4 +1,4 @@
-// $Id: tecplot_io.h,v 1.1 2004-03-19 19:16:52 benkirk Exp $
+// $Id: tecplot_io.h,v 1.2 2004-04-07 21:42:31 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -26,6 +26,10 @@
 #include "libmesh_common.h"
 #include "mesh_io.h"
 
+// Forward declarations
+class MeshBase;
+
+
 
 /**
  * This class implements writing meshes in the Tecplot format.
@@ -35,7 +39,7 @@
 
 // ------------------------------------------------------------
 // TecplotIO class definition
-class TecplotIO : public MeshIO
+class TecplotIO : public MeshIO<MeshBase>
 {
  public:
 
@@ -43,7 +47,7 @@ class TecplotIO : public MeshIO
    * Constructor.  Takes a reference to a constant mesh object.
    * This constructor will only allow us to write the mesh.
    */
-  TecplotIO (const Mesh&);
+  TecplotIO (const MeshBase&);
   
   /**
    * This method implements writing a mesh to a specified file.
@@ -97,8 +101,8 @@ class TecplotIO : public MeshIO
 // ------------------------------------------------------------
 // TecplotIO inline members
 inline
-TecplotIO::TecplotIO (const Mesh& mesh) :
-  MeshIO  (mesh),
+TecplotIO::TecplotIO (const MeshBase& mesh) :
+  MeshIO<MeshBase> (mesh),
   _binary (true)
 {
 }

@@ -1,4 +1,4 @@
-// $Id: mesh_io.h,v 1.1 2004-03-19 19:16:52 benkirk Exp $
+// $Id: mesh_io.h,v 1.2 2004-04-07 21:42:31 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -31,8 +31,6 @@
 #include "libmesh_common.h"
 #include "equation_systems.h"
 
-// Forward declarations
-class Mesh;
 
 
 
@@ -46,6 +44,7 @@ class Mesh;
 
 // ------------------------------------------------------------
 // MeshIO class definition
+template <class MT>
 class MeshIO
 {
 
@@ -60,16 +59,16 @@ class MeshIO
  protected:
   
   /**
-   * Constructor.  Takes a writeable reference to a mesh object.
+   * Constructor.  Takes a writeable reference to a \p MeshBase object.
    * This is the constructor required to read a mesh.
    */
-  MeshIO (Mesh&);
+  MeshIO (MT&);
 
   /**
    * Constructor.  Takes a reference to a constant mesh object.
    * This constructor will only allow us to write the mesh.
    */
-  MeshIO (const Mesh&);
+  MeshIO (const MT&);
 
   
  public:
@@ -107,12 +106,12 @@ class MeshIO
   /**
    * Returns the \p Mesh objevy as a writeable reference.
    */
-  Mesh& mesh ();
+  MT& mesh ();
 
   /**
    * Returns the \p Mesh object as a read-only reference.
    */
-  const Mesh& cmesh () const;
+  const MT& cmesh () const;
 
   
  protected:
@@ -133,13 +132,13 @@ class MeshIO
    * A pointer to a non-const mesh object.  This allows us to read or write
    * the mesh.
    */ 
-  Mesh* _rmesh;
+  MT* _rmesh;
   
   /**
    *  A pointer to a constant mesh object.  This allows us to write
    * meshes that may be passed in as constant objects.
    */
-  const Mesh* const _wmesh;
+  const MT* const _wmesh;
   
 };
 
@@ -147,8 +146,9 @@ class MeshIO
 
 // ------------------------------------------------------------
 // MeshIO inline members
+template <class MT>
 inline
-MeshIO::MeshIO (Mesh& mesh) :
+MeshIO<MT>::MeshIO (MT& mesh) :
   _rmesh (&mesh),
   _wmesh (&mesh)
 {
@@ -156,8 +156,9 @@ MeshIO::MeshIO (Mesh& mesh) :
 
 
 
+template <class MT>
 inline
-MeshIO::MeshIO (const Mesh& mesh) :
+MeshIO<MT>::MeshIO (const MT& mesh) :
   _rmesh (NULL),
   _wmesh (&mesh)
 {
@@ -165,15 +166,17 @@ MeshIO::MeshIO (const Mesh& mesh) :
 
 
 
+template <class MT>
 inline
-MeshIO::~MeshIO ()
+MeshIO<MT>::~MeshIO ()
 {
 }
 
 
 
+template <class MT>
 inline
-const Mesh& MeshIO::cmesh () const
+const MT& MeshIO<MT>::cmesh () const
 {
   assert (_wmesh != NULL);
 
@@ -182,8 +185,9 @@ const Mesh& MeshIO::cmesh () const
 
 
 
+template <class MT>
 inline
-Mesh& MeshIO::mesh ()
+MT& MeshIO<MT>::mesh ()
 {
   assert (_rmesh != NULL);
 
@@ -192,8 +196,9 @@ Mesh& MeshIO::mesh ()
 
 
 
+template <class MT>
 inline
-void MeshIO::read (const std::string& )
+void MeshIO<MT>::read (const std::string& )
 {
   std::cerr << "ERROR:  Must implement the MeshIO::read() member in a derived class!"
 	    << std::endl;
@@ -202,8 +207,9 @@ void MeshIO::read (const std::string& )
 
 
 
+template <class MT>
 inline
-void MeshIO::write (const std::string& )
+void MeshIO<MT>::write (const std::string& )
 {
   std::cerr << "ERROR:  Must implement the MeshIO::write() member in a derived class!"
 	    << std::endl;
@@ -212,10 +218,11 @@ void MeshIO::write (const std::string& )
 
 
 
+template <class MT>
 inline
-void MeshIO::write_nodal_data (const std::string&,
-			       const std::vector<Number>&,
-			       const std::vector<std::string>&)
+void MeshIO<MT>::write_nodal_data (const std::string&,
+				   const std::vector<Number>&,
+				   const std::vector<std::string>&)
 {
   std::cerr << "ERROR:  Must implement the MeshIO::write() member in a derived class!"
 	    << std::endl;

@@ -1,4 +1,4 @@
-// $Id: gmv_io.h,v 1.1 2004-03-20 15:16:56 benkirk Exp $
+// $Id: gmv_io.h,v 1.2 2004-04-07 21:42:31 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -26,6 +26,10 @@
 #include "libmesh_common.h"
 #include "mesh_io.h"
 
+// Forward declarations
+class MeshBase;
+
+
 
 /**
  * This class implements writing meshes in the GMV format.
@@ -38,7 +42,7 @@
 
 // ------------------------------------------------------------
 // GMVIO class definition
-class GMVIO : public MeshIO
+class GMVIO : public MeshIO<MeshBase>
 {
  public:
 
@@ -46,7 +50,7 @@ class GMVIO : public MeshIO
    * Constructor.  Takes a reference to a constant mesh object.
    * This constructor will only allow us to write the mesh.
    */
-  GMVIO (const Mesh&);
+  GMVIO (const MeshBase&);
   
   /**
    * This method implements writing a mesh to a specified file.
@@ -132,8 +136,8 @@ private:
 // ------------------------------------------------------------
 // GMVIO inline members
 inline
-GMVIO::GMVIO (const Mesh& mesh) :
-  MeshIO  (mesh),
+GMVIO::GMVIO (const MeshBase& mesh) :
+  MeshIO<MeshBase> (mesh),
   _binary        (false),
   _discontinuous (false),  
   _partitioning  (true)

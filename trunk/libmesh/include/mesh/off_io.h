@@ -1,4 +1,4 @@
-// $Id: off_io.h,v 1.1 2004-03-23 04:47:28 jwpeterson Exp $
+// $Id: off_io.h,v 1.2 2004-04-07 21:42:31 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -24,6 +24,11 @@
 #include "libmesh_common.h"
 #include "mesh_io.h"
 
+// Forward declarations
+class MeshBase;
+
+
+
 /**
  * This class is repsonsible for reading an unstructured,
  * triangulated surface in the
@@ -32,14 +37,14 @@
 
 // ------------------------------------------------------------
 // OFFIO class definition
-class OFFIO : public MeshIO
+class OFFIO : public MeshIO<MeshBase>
 {
 public:
   /**
    *  Constructor.  Takes a non-const Mesh reference which it
    * will fill up with elements.
    */
-  OFFIO (Mesh&);
+  OFFIO (MeshBase&);
 
   /**
    * Reads in an OFF OOGL data file based on the string
@@ -60,8 +65,8 @@ private:
 // ------------------------------------------------------------
 // OFFIO inline members
 inline
-OFFIO::OFFIO (Mesh& mesh) :
-  MeshIO  (mesh)
+OFFIO::OFFIO (MeshBase& mesh) :
+  MeshIO<MeshBase>  (mesh)
 {}
 
 

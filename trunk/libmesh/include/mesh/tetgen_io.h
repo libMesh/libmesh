@@ -1,4 +1,4 @@
-// $Id: tetgen_io.h,v 1.1 2004-03-19 19:16:52 benkirk Exp $
+// $Id: tetgen_io.h,v 1.2 2004-04-07 21:42:31 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -26,6 +26,10 @@
 #include "libmesh_common.h"
 #include "mesh_io.h"
 
+// Forward declarations
+class Mesh;
+
+
 
 /**
  * This class implements reading and writing meshes in the TetGen format.
@@ -35,7 +39,7 @@
 
 // ------------------------------------------------------------
 // TetGenIO class definition
-class TetGenIO : public MeshIO
+class TetGenIO : public MeshIO<Mesh>
 {
  public:
   
@@ -111,7 +115,7 @@ class TetGenIO : public MeshIO
 // TetGenIO inline members
 inline
 TetGenIO::TetGenIO (Mesh& mesh) :
-  MeshIO (mesh)
+  MeshIO<Mesh> (mesh)
 {
 }
 

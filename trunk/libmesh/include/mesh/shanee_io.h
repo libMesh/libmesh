@@ -1,4 +1,4 @@
-// $Id: shanee_io.h,v 1.1 2004-03-23 05:16:21 jwpeterson Exp $
+// $Id: shanee_io.h,v 1.2 2004-04-07 21:42:31 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -24,6 +24,11 @@
 #include "libmesh_common.h"
 #include "mesh_io.h"
 
+// Forward declarations
+class MeshBase;
+
+
+
 /**
  * Read a 2D mesh in the shanee format from the file specified
  * by \p name.  This is for compatibility with
@@ -35,14 +40,14 @@
 
 // ------------------------------------------------------------
 // ShaneeIO class definition
-class ShaneeIO : public MeshIO
+class ShaneeIO : public MeshIO<MeshBase>
 {
 public:
   /**
    *  Constructor.  Takes a non-const Mesh reference which it
    * will fill up with elements.
    */
-  ShaneeIO (Mesh&);
+  ShaneeIO (MeshBase&);
 
   /**
    * Reads in an OFF OOGL data file based on the string
@@ -63,8 +68,8 @@ private:
 // ------------------------------------------------------------
 // ShaneeIO inline members
 inline
-ShaneeIO::ShaneeIO (Mesh& mesh) :
-  MeshIO  (mesh)
+ShaneeIO::ShaneeIO (MeshBase& mesh) :
+  MeshIO<MeshBase>  (mesh)
 {}
 
 
