@@ -1,4 +1,4 @@
-// $Id: mesh_iterators.C,v 1.2 2004-11-14 18:51:59 jwpeterson Exp $
+// $Id: mesh_iterators.C,v 1.3 2004-11-22 21:32:36 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -44,6 +44,15 @@ MeshBase::element_iterator
 MeshBase::active_elements_begin ()
 {
   Predicates::Active<elem_iterator_imp> p;
+  return element_iterator(_elements.begin(), _elements.end(), p);
+}
+
+
+// not active elements begin() accessor
+MeshBase::element_iterator
+MeshBase::not_active_elements_begin ()
+{
+  Predicates::NotActive<elem_iterator_imp> p;
   return element_iterator(_elements.begin(), _elements.end(), p);
 }
 
@@ -137,6 +146,15 @@ MeshBase::const_element_iterator
 MeshBase::active_elements_begin () const
 {
   Predicates::Active<const_elem_iterator_imp> p;
+  return const_element_iterator(_elements.begin(), _elements.end(), p);
+}
+
+
+// const not active begin() accessor
+MeshBase::const_element_iterator
+MeshBase::not_active_elements_begin () const
+{
+  Predicates::NotActive<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.begin(), _elements.end(), p);
 }
 
@@ -238,8 +256,17 @@ MeshBase::active_elements_end ()
 
 
 
-// local end() accessor
+// active end() accessor
+MeshBase::element_iterator
+MeshBase::not_active_elements_end ()
+{
+  Predicates::NotActive<elem_iterator_imp> p;
+  return element_iterator(_elements.end(), _elements.end(), p);
+}
 
+
+
+// local end() accessor
 MeshBase::element_iterator
 MeshBase::local_elements_end ()
 {
@@ -335,6 +362,18 @@ MeshBase::active_elements_end () const
   Predicates::Active<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.end(), _elements.end(), p);
 }
+
+
+
+// not active const end() accessor
+MeshBase::const_element_iterator
+MeshBase::not_active_elements_end () const
+{
+  Predicates::NotActive<const_elem_iterator_imp> p;
+  return const_element_iterator(_elements.end(), _elements.end(), p);
+}
+
+
 
 
 // local const end() accessor

@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.37 2004-11-15 22:09:12 benkirk Exp $
+// $Id: mesh_base.h,v 1.38 2004-11-22 21:32:35 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -62,8 +62,8 @@ class EquationSystems;
  * mesh to disk in various formats.
  *
  * \author  Benjamin S. Kirk
- * \date    $Date: 2004-11-15 22:09:12 $
- * \version $Revision: 1.37 $
+ * \date    $Date: 2004-11-22 21:32:35 $
+ * \version $Revision: 1.38 $
  */
 
 
@@ -266,12 +266,6 @@ public:
    */
   void find_neighbors ();
   
-  /**
-   * Calling this function on a 2D mesh will convert all the elements
-   * to triangles.  \p QUAD4s will be converted to \p TRI3s, \p QUAD8s
-   * and \p QUAD9s will be converted to \p TRI6s. 
-   */
-  void all_tri ();
     
   /**
    * Call the default partitioner (currently \p metis_partition()).
@@ -367,18 +361,30 @@ public:
   typedef variant_filter_iterator<Node* const, Predicate> const_node_iterator;
 
 private:
-  // Typedefs for the container implementation.  In this case,
-  // it's just a std::vector<Elem*>.
+  /**
+   * Typedefs for the container implementation.  In this case,
+   * it's just a std::vector<Elem*>.
+   */
   typedef std::vector<Elem*>::iterator             elem_iterator_imp;
   typedef std::vector<Elem*>::const_iterator const_elem_iterator_imp;
 
-  // Typedefs for the container implementation.  In this case,
-  // it's just a std::vector<Node*>.
+  /**
+   * Typedefs for the container implementation.  In this case,
+   * it's just a std::vector<Node*>.
+   */
   typedef std::vector<Node*>::iterator             node_iterator_imp;
   typedef std::vector<Node*>::const_iterator const_node_iterator_imp;
 
-  
+
 public:
+
+  
+
+
+
+
+
+  
   /**
    * Elem iterator accessor functions.
    */
@@ -387,6 +393,9 @@ public:
 
   element_iterator active_elements_begin ();
   element_iterator active_elements_end   ();
+
+  element_iterator not_active_elements_begin ();
+  element_iterator not_active_elements_end   ();
 
   element_iterator local_elements_begin ();
   element_iterator local_elements_end   ();
@@ -419,6 +428,9 @@ public:
 
   const_element_iterator active_elements_begin() const;
   const_element_iterator active_elements_end()   const;
+
+  const_element_iterator not_active_elements_begin() const;
+  const_element_iterator not_active_elements_end()   const;
 
   const_element_iterator local_elements_begin () const;
   const_element_iterator local_elements_end   () const;

@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.39 2004-11-15 22:14:24 benkirk Exp $
+// $Id: elem.C,v 1.40 2004-11-22 21:32:35 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -58,7 +58,7 @@
 #include "cell_inf_prism12.h"
 #include "cell_pyramid.h"
 #include "cell_pyramid5.h"
-
+#include "multi_predicates.h"
 
 
 // ------------------------------------------------------------
@@ -725,3 +725,17 @@ ElemType Elem::second_order_equivalent_type (const ElemType et,
 
 
 
+Elem::side_iterator Elem::boundary_sides_begin()
+{
+  Predicates::BoundarySide<SideIter> bsp;
+  return side_iterator(this->_first_side(), this->_last_side(), bsp);
+}
+
+
+
+
+Elem::side_iterator Elem::boundary_sides_end()
+{
+  Predicates::BoundarySide<SideIter> bsp;
+  return side_iterator(this->_last_side(), this->_last_side(), bsp);
+}

@@ -1,4 +1,4 @@
-// $Id: mesh_modification.C,v 1.7 2004-11-16 15:58:05 jwpeterson Exp $
+// $Id: mesh_modification.C,v 1.8 2004-11-22 21:32:36 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -29,6 +29,8 @@
 #include "mesh.h"
 #include "libmesh.h"
 #include "elem.h"
+#include "face_tri3.h"
+#include "face_tri6.h"
 #include "face_inf_quad4.h"
 #include "face_inf_quad6.h"
 #include "cell_inf_prism6.h"
@@ -443,4 +445,196 @@ void Mesh::all_second_order (const bool full_ordered)
 
   // renumber nodes, elements etc
   this->prepare_for_use();
+}
+
+
+
+
+
+
+void MeshTools::Modification::all_tri (MeshBase& mesh)
+{
+  // We store pointers to the newly created elements in a vector
+  // until they are ready to be added to the mesh.  This is because
+  // adding new elements on the fly can cause reallocation and invalidation
+  // of existing iterators.
+  std::vector<Elem*> new_elements;
+  new_elements.reserve (2*mesh.n_active_elem());
+
+  // Iterate over the elements, splitting QUADS into
+  // pairs of conforming triangles.
+  {
+    MeshBase::element_iterator       el  = mesh.elements_begin();
+    const MeshBase::element_iterator end = mesh.elements_end(); 
+
+    for (; el!=end; ++el)
+      {
+	const ElemType etype = (*el)->type();
+
+	switch (etype)
+	  {
+	  case QUAD4:
+	    {
+	      Elem* tri0 = new Tri3;
+	      Elem* tri1 = new Tri3;
+	    
+	      // Check for possible edge swap
+	      if (((*el)->point(0) - (*el)->point(2)).size() <
+		  ((*el)->point(1) - (*el)->point(3)).size())
+		{	      
+		  tri0->set_node(0) = (*el)->get_node(0);
+		  tri0->set_node(1) = (*el)->get_node(1);
+		  tri0->set_node(2) = (*el)->get_node(2);
+		
+		  tri1->set_node(0) = (*el)->get_node(0);
+		  tri1->set_node(1) = (*el)->get_node(2);
+		  tri1->set_node(2) = (*el)->get_node(3);
+		}
+	    
+	      else
+		{
+		  tri0->set_node(0) = (*el)->get_node(0);
+		  tri0->set_node(1) = (*el)->get_node(1);
+		  tri0->set_node(2) = (*el)->get_node(3);
+		
+		  tri1->set_node(0) = (*el)->get_node(1);
+		  tri1->set_node(1) = (*el)->get_node(2);
+		  tri1->set_node(2) = (*el)->get_node(3);
+		}
+
+	      new_elements.push_back(tri0);
+	      new_elements.push_back(tri1);
+
+	      mesh.delete_elem(*el);
+	      break;
+	    }
+      
+	  case QUAD8:
+	    {
+	      Elem* tri0 = new Tri6;
+	      Elem* tri1 = new Tri6;
+	  
+	      Node* new_node = mesh.add_point((mesh.node((*el)->node(0)) +
+					       mesh.node((*el)->node(1)) +
+					       mesh.node((*el)->node(2)) +
+					       mesh.node((*el)->node(3)))*.25
+					       );
+	  
+	      // Check for possible edge swap
+	      if (((*el)->point(0) - (*el)->point(2)).size() <
+		  ((*el)->point(1) - (*el)->point(3)).size())
+		{	      
+		  tri0->set_node(0) = (*el)->get_node(0);
+		  tri0->set_node(1) = (*el)->get_node(1);
+		  tri0->set_node(2) = (*el)->get_node(2);
+		  tri0->set_node(3) = (*el)->get_node(4);
+		  tri0->set_node(4) = (*el)->get_node(5);
+		  tri0->set_node(5) = new_node;
+	      
+		  tri1->set_node(0) = (*el)->get_node(0);
+		  tri1->set_node(1) = (*el)->get_node(2);
+		  tri1->set_node(2) = (*el)->get_node(3);
+		  tri1->set_node(3) = new_node;
+		  tri1->set_node(4) = (*el)->get_node(6);
+		  tri1->set_node(5) = (*el)->get_node(7);
+
+		}
+	  
+	      else
+		{
+		  tri0->set_node(0) = (*el)->get_node(3);
+		  tri0->set_node(1) = (*el)->get_node(0);
+		  tri0->set_node(2) = (*el)->get_node(1);
+		  tri0->set_node(3) = (*el)->get_node(7);
+		  tri0->set_node(4) = (*el)->get_node(4);
+		  tri0->set_node(5) = new_node;
+	      
+		  tri1->set_node(0) = (*el)->get_node(1);
+		  tri1->set_node(1) = (*el)->get_node(2);
+		  tri1->set_node(2) = (*el)->get_node(3);
+		  tri1->set_node(3) = (*el)->get_node(5);
+		  tri1->set_node(4) = (*el)->get_node(6);
+		  tri1->set_node(5) = new_node;
+		}
+	  
+	      new_elements.push_back(tri0);
+	      new_elements.push_back(tri1);
+
+	      mesh.delete_elem(*el);
+	      break;
+	    }
+      
+	  case QUAD9:
+	    {
+	      Elem* tri0 = new Tri6;
+	      Elem* tri1 = new Tri6;
+
+	      // Check for possible edge swap
+	      if (((*el)->point(0) - (*el)->point(2)).size() <
+		  ((*el)->point(1) - (*el)->point(3)).size())
+		{	      
+		  tri0->set_node(0) = (*el)->get_node(0);
+		  tri0->set_node(1) = (*el)->get_node(1);
+		  tri0->set_node(2) = (*el)->get_node(2);
+		  tri0->set_node(3) = (*el)->get_node(4);
+		  tri0->set_node(4) = (*el)->get_node(5);
+		  tri0->set_node(5) = (*el)->get_node(8);
+	      
+		  tri1->set_node(0) = (*el)->get_node(0);
+		  tri1->set_node(1) = (*el)->get_node(2);
+		  tri1->set_node(2) = (*el)->get_node(3);
+		  tri1->set_node(3) = (*el)->get_node(8);
+		  tri1->set_node(4) = (*el)->get_node(6);
+		  tri1->set_node(5) = (*el)->get_node(7);
+		}
+
+	      else
+		{
+		  tri0->set_node(0) = (*el)->get_node(0);
+		  tri0->set_node(1) = (*el)->get_node(1);
+		  tri0->set_node(2) = (*el)->get_node(3);
+		  tri0->set_node(3) = (*el)->get_node(4);
+		  tri0->set_node(4) = (*el)->get_node(8);
+		  tri0->set_node(5) = (*el)->get_node(7);
+	      
+		  tri1->set_node(0) = (*el)->get_node(1);
+		  tri1->set_node(1) = (*el)->get_node(2);
+		  tri1->set_node(2) = (*el)->get_node(3);
+		  tri1->set_node(3) = (*el)->get_node(5);
+		  tri1->set_node(4) = (*el)->get_node(6);
+		  tri1->set_node(5) = (*el)->get_node(8);
+		}
+	    
+	      new_elements.push_back(tri0);
+	      new_elements.push_back(tri1);
+	      
+	      mesh.delete_elem(*el);
+	      break;
+	    }
+	  
+	  default:
+	    {
+	      // If not one of the QUAD* types, the Elem must
+	      // be a TRI* type already, or a 3D element, so just leave it.
+	    }
+	  }
+      }
+  }
+
+  {
+    // Now, iterate over the new elements vector, and add them each to
+    // the Mesh.
+    std::vector<Elem*>::iterator el        = new_elements.begin();
+    const std::vector<Elem*>::iterator end = new_elements.end();
+    for (; el != end; ++el)
+      {
+	mesh.add_elem(*el);
+      }
+  }
+  
+
+  // Prepare the newly created mesh for use.
+  mesh.prepare_for_use();
+
+  // Let the new_elements vector go out of scope.
 }
