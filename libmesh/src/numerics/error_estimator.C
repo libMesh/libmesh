@@ -1,4 +1,4 @@
-// $Id: error_estimator.C,v 1.8 2003-05-28 03:17:50 benkirk Exp $
+// $Id: error_estimator.C,v 1.9 2003-06-03 22:10:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -46,12 +46,6 @@ namespace Mpi
 #include "quadrature_gauss.h"
 #include "mesh_logging.h"
 
-
-
-
-//-----------------------------------------------------------------
-// ErrorEstimator implementations
-std::vector<unsigned char> ErrorEstimator::component_mask(0);
 
 
 
@@ -139,7 +133,7 @@ void ErrorEstimator::flux_jump (const EquationSystems& es,
     {
       // Possibly skip this variable
       if (!component_mask.empty())
-	if (component_mask[var] == 0) continue;
+	if (component_mask[var] == false) continue;
       
       // The type of finite element to use for this variable
       const FEType& fe_type = dof_map.variable_type (var);

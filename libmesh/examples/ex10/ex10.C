@@ -1,4 +1,4 @@
-// $Id: ex9.C,v 1.3 2003-06-03 22:10:07 benkirk Exp $
+// $Id: ex10.C,v 1.1 2003-06-03 22:10:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -48,10 +48,16 @@
 #include "transient_system.h"
 #include "vector_value.h"
 
+/**
+ * To refine the mesh we need an \p ErrorEstimator
+ * object to figure out which elements to refine.
+ */
+#include "error_vector.h"
+#include "error_estimator.h"
 
 
 /**
- * \mainpage Example 9
+ * \mainpage Example 10
  *
  * \section Introduction
  *
@@ -105,6 +111,17 @@ Real exact_solution (const Real x,
 
 int main (int argc, char** argv)
 {
+#ifndef HAVE_PETSC
+
+  std::cerr << "ERROR: AMR only good with PETSc for some strange reason..."
+	    << "       Bug Ben about this."
+	    << std::endl;
+  here();
+
+  return 0;
+  
+#endif
+  
 #ifdef USE_COMPLEX_NUMBERS
   
   std::cerr << "ERROR: Not intended for use with complex numbers."
@@ -131,10 +148,12 @@ int main (int argc, char** argv)
      * grid on the square [0,2]^D.  We instruct the mesh generator
      * to build a mesh of 80x80 elements.
      */
-    mesh.build_square (80, 80,
+    mesh.build_square (5, 5,
 		       0., 2.,
 		       0., 2.);
 
+    mesh.mesh_refinement.uniformly_refine (4);
+    
     /**
      * Print information about the mesh to the screen.
      */
@@ -243,11 +262,84 @@ int main (int argc, char** argv)
 	  equation_systems.get_system<TransientSystem>("Convection-Diffusion");
 
 	*system.old_local_solution = *system.current_local_solution;
-	
+
+
 	/**
-	 * Assemble & solve the linear system
+	 * The number of refinement steps per time step.
 	 */
-	equation_systems("Convection-Diffusion").solve();
+	const unsigned int max_r_steps = 2;
+
+	/**
+	 * A refinement loop.
+	 */
+	for (unsigned int r_step=0; r_step<max_r_steps; r_step++)
+	  {
+	    /**
+	     * Assemble & solve the linear system
+	     */
+	    system.solve();
+
+	    /**
+	     * Possibly refine the mesh
+	     */
+	    if (r_step+1 != max_r_steps)
+	      {
+		std::cout << "  Refining the mesh..." << std::endl;
+
+		/**
+		 * The \p ErrorVector is a particular \p StatisticsVector
+		 * for computing error information on a finite element mesh.
+		 */
+		ErrorVector error;
+
+		/**
+		 * The \p ErrorEstimator class interrogates a finite element
+		 * solution and assigns to each element a positive error value.
+		 * This value is used for deciding which elements to refine
+		 * and which to coarsen.
+		 */
+		ErrorEstimator error_estimator;
+
+		/**
+		 * Compute the error for each active element using the provided
+		 * \p flux_jump indicator.  Note in general you will need to
+		 * provide an error estimator specifically designed for your
+		 * application.
+		 */
+		error_estimator.flux_jump (equation_systems,
+					   "Convection-Diffusion",
+					   error);
+
+		/**
+		 * This takes the error in \p error and decides which elements
+		 * will be coarsened or refined.  Any element within 20% of the
+		 * maximum error on any element will be refined, and any
+		 * element within 10% of the minimum error on any element might
+		 * be coarsened. Note that the elements flagged for refinement
+		 * will be refined, but those flagged for coarsening _might_ be
+		 * coarsened.
+		 */
+		mesh.mesh_refinement.flag_elements_by_error_fraction (error,
+								      0.80,
+								      0.07,
+								      4);
+		
+		/**
+		 * This call actually refines and coarsens the flagged
+		 * elements.
+		 */
+		mesh.mesh_refinement.refine_and_coarsen_elements();
+
+		/**
+		 * This call reinitializes the \p EquationSystems object for
+		 * the newly refined mesh.  One of the steps in the
+		 * reinitialization is projecting the \p solution,
+		 * \p old_solution, etc... vectors from the old mesh to
+		 * the current one.
+		 */
+		equation_systems.reinit ();
+	      }	    
+	  }
 
 	/**
 	 * Output evey 10 timesteps to file.
@@ -300,7 +392,8 @@ void init_cd (EquationSystems& es,
   /**
    * Get a reference to the Convection-Diffusion system object.
    */
-  TransientSystem& system = es.get_system<TransientSystem> ("Convection-Diffusion");
+  TransientSystem& system =
+    es.get_system<TransientSystem> ("Convection-Diffusion");
   
   /**
    * Get a reference to the \p DofMap for this system.
@@ -330,8 +423,8 @@ void init_cd (EquationSystems& es,
    * in the loop.
    */
 
-  const_local_elem_iterator       elem_it (mesh.elements_begin());
-  const const_local_elem_iterator elem_end(mesh.elements_end());
+  const_active_local_elem_iterator       elem_it (mesh.elements_begin());
+  const const_active_local_elem_iterator elem_end(mesh.elements_end());
 
   for ( ; elem_it != elem_end; ++elem_it)
     {
@@ -404,7 +497,8 @@ void assemble_cd (EquationSystems& es,
   /**
    * Get a reference to the Convection-Diffusion system object.
    */
-  TransientSystem& system = es.get_system<TransientSystem> ("Convection-Diffusion");
+  TransientSystem& system =
+    es.get_system<TransientSystem> ("Convection-Diffusion");
   
   /**
    * Get a constant reference to the Finite Element type
@@ -500,11 +594,13 @@ void assemble_cd (EquationSystems& es,
    *--------------------------------------------------------------------
    * Now we will loop over all the elements in the mesh that
    * live on the local processor. We will compute the element
-   * matrix and right-hand-side contribution.
+   * matrix and right-hand-side contribution.  Since the mesh
+   * will be refined we want to only consider the ACTIVE elements,
+   * hence we use a variant of the \p active_elem_iterator.
    */
 
-  const_local_elem_iterator           el (mesh.elements_begin());
-  const const_local_elem_iterator end_el (mesh.elements_end());
+  const_active_local_elem_iterator           el (mesh.elements_begin());
+  const const_active_local_elem_iterator end_el (mesh.elements_end());
   
   for ( ; el != end_el; ++el)
     {    
@@ -682,6 +778,17 @@ void assemble_cd (EquationSystems& es,
 
       
 
+      /**
+       * We have now built the element matrix and RHS vector in terms
+       * of the element degrees of freedom.  However, it is possible
+       * that some of the element DOFs are constrained to enforce
+       * solution continuity, i.e. they are not really "free".  We need
+       * to constrain those DOFs in terms of non-constrained DOFs to
+       * ensure a continuous solution.  The
+       * \p DofMap::constrain_element_matrix_and_vector() method does
+       * just that.
+       */
+      dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
       
       /**
        *----------------------------------------------------------------
@@ -689,8 +796,7 @@ void assemble_cd (EquationSystems& es,
        * for this element.  Add them to the global matrix and
        * right-hand-side vector.  The \p PetscMatrix::add_matrix()
        * and \p PetscVector::add_vector() members do this for us.
-       */
-      
+       */      
       es("Convection-Diffusion").matrix->add_matrix (Ke, dof_indices);
       es("Convection-Diffusion").rhs->add_vector    (Fe, dof_indices);
       

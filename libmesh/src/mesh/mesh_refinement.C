@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.23 2003-06-03 16:47:38 benkirk Exp $
+// $Id: mesh_refinement.C,v 1.24 2003-06-03 22:10:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -169,16 +169,13 @@ void MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
       const bool refinement_satisfied =
 	this->make_refinement_compatible(maintain_level_one);
 
-      const bool smoothing_satisfied =
- 	!this->eliminate_unrefined_patches() &&
- 	!this->limit_level_mismatch_at_node(1);
+      const bool smoothing_satisfied = 
+ 	!this->eliminate_unrefined_patches();// &&
+// 	!this->limit_level_mismatch_at_node(1);
       
-      if (coarsening_satisfied &&
-	  refinement_satisfied &&
-	  smoothing_satisfied)
-	{
-	  satisfied = true;
-	}
+      satisfied = (coarsening_satisfied &&
+		   refinement_satisfied &&
+		   smoothing_satisfied);
     }
   while (!satisfied);
 
@@ -288,10 +285,10 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
    */
   if (maintain_level_one)
     {
-      
+         
     repeat:
       level_one_satisfied = true;
-      
+  
       do
 	{
 	  level_one_satisfied = true;
@@ -335,47 +332,47 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 	}
       while (!level_one_satisfied);
       
-      /**
-       * Next we look at all of the inactive cells.
-       * If there is an inactive cell with all of its children
-       * wanting to be unrefined then the element is a candidate
-       * for unrefinement.  If all the children don't
-       * all want to be unrefined then ALL of them need to have their
-       * unrefinement flags cleared. 
-       */
-      for (int level=(max_level); level >= 0; level--)
-	for (unsigned int e=0; e<mesh.n_elem(); e++)
-	  if (!mesh.elem(e)->active() &&
-	      (mesh.elem(e)->level() == static_cast<unsigned int>(level)))
-	    {
-	      /**
-	       * right now the element hasn't been disqualified
-	       * as a candidate for unrefinement
-	       */
-	      bool is_a_candidate = true;
-	      
-	      for (unsigned int c=0; c<mesh.elem(e)->n_children(); c++)
-		if ((mesh.elem(e)->child(c)->refinement_flag() != Elem::COARSEN) ||
-		    !mesh.elem(e)->child(c)->active() )
-		  is_a_candidate = false;
-	      
-	      if (!is_a_candidate)
-		{
-		  mesh.elem(e)->set_refinement_flag(Elem::DO_NOTHING);
-		  
-		  for (unsigned int c=0; c<mesh.elem(e)->n_children(); c++)
-		    if (mesh.elem(e)->child(c)->refinement_flag() == Elem::COARSEN)
-		      {
-			level_one_satisfied = false;
-			mesh.elem(e)->child(c)->set_refinement_flag(Elem::DO_NOTHING);
-		      }
-		}
-	    }
-      
-      if (!level_one_satisfied) goto repeat;
-      
     } // end if (maintian_level_one)
-
+  
+  /**
+   * Next we look at all of the inactive cells.
+   * If there is an inactive cell with all of its children
+   * wanting to be unrefined then the element is a candidate
+   * for unrefinement.  If all the children don't
+   * all want to be unrefined then ALL of them need to have their
+   * unrefinement flags cleared. 
+   */
+  for (int level=(max_level); level >= 0; level--)
+    for (unsigned int e=0; e<mesh.n_elem(); e++)
+      if (!mesh.elem(e)->active() &&
+	  (mesh.elem(e)->level() == static_cast<unsigned int>(level)))
+	{
+	  /**
+	   * right now the element hasn't been disqualified
+	   * as a candidate for unrefinement
+	   */
+	  bool is_a_candidate = true;
+	      
+	  for (unsigned int c=0; c<mesh.elem(e)->n_children(); c++)
+	    if ((mesh.elem(e)->child(c)->refinement_flag() != Elem::COARSEN) ||
+		!mesh.elem(e)->child(c)->active() )
+	      is_a_candidate = false;
+	      
+	  if (!is_a_candidate)
+	    {
+	      mesh.elem(e)->set_refinement_flag(Elem::DO_NOTHING);
+		  
+	      for (unsigned int c=0; c<mesh.elem(e)->n_children(); c++)
+		if (mesh.elem(e)->child(c)->refinement_flag() == Elem::COARSEN)
+		  {
+		    level_one_satisfied = false;
+		    mesh.elem(e)->child(c)->set_refinement_flag(Elem::DO_NOTHING);
+		  }
+	    }
+	}
+      
+  if (!level_one_satisfied && maintain_level_one) goto repeat;
+  
   
   /**
    * If all the children of a parent are set to be coarsened
