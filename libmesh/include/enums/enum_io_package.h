@@ -1,4 +1,4 @@
-// $Id: enum_io_package.h,v 1.1 2004-07-14 19:26:06 jwpeterson Exp $
+// $Id: enum_io_package.h,v 1.2 2004-07-22 19:54:16 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -53,6 +53,8 @@ namespace libMeshEnums {
       VTK,
       DIVA,
       TETGEN,
+      UCD,
+      LIBMESH,
       INVALID_IO_PACKAGE
     };
 }
