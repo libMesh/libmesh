@@ -1,4 +1,4 @@
-// $Id: dense_matrix.h,v 1.11 2003-02-21 18:31:28 benkirk Exp $
+// $Id: dense_matrix.h,v 1.12 2003-02-21 21:03:52 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,7 +31,7 @@
 
 
 // Forward Declarations
-template <typename Tp> class PetscMatrix;
+template <typename T> class PetscMatrix;
 
 
 
@@ -193,7 +193,7 @@ private:
    * so that they can insert values directly
    * from our matrix.
    */
-  friend class PetscMatrix<Tp>;
+  friend class PetscMatrix<T>;
 };
 
 
@@ -519,4 +519,5 @@ void DenseMatrix<T>::print () const
 
 
 
-#endif
+#endif // #ifndef __dense_matrix_h__
+

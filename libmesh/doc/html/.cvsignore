@@ -1,4 +1,5 @@
 *.html
+*.png
 *.gif
 doxygen.css 
 formula.repository

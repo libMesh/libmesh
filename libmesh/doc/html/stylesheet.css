@@ -1,19 +1,13 @@
-body
-{
-  background: #ffffff url(images/bg.png);
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-}
-
 a
 {
-    text-decoration: none;
+ text-decoration: none;
+ color: navy;
 }
 a.qindex {}
 a.qindexRef {}
 a.el {
     text-decoration: none;
-    font-weight: bold
+    font-weight: bold;
 }
 a.elRef {
     font-weight: bold
@@ -21,7 +15,7 @@ a.elRef {
 a.code {
     text-decoration: none;
     font-weight: normal;
-    color: #4444ee
+    color: navy
 }
 a.codeRef {
     font-weight: normal;
@@ -29,7 +23,38 @@ a.codeRef {
 }
 a:hover {
     text-decoration: none;
-    background-color: #f2f2ff
+    background-color: #cccccc
+}
+
+
+
+body
+{
+  background            : white url(images/bg.png);
+  background-repeat     : no-repeat;
+  background-attachment : fixed;
+  background-position   : center;
+  color                 : black;
+}
+
+
+
+div.main_style {
+    background: #eeeeee;
+    background-image: url(images/bg_muted.png);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    padding-left         : 1em;
+    margin-left          : 3em;
+    margin-right         : 1em;
+    padding-top          : 1em;
+    padding-bottom       : 1em;
+    margin-top           : 5em;
+    margin-bottom        : 5em;
+    border-style: outset;
+    border-width: medium;
+    border-color: #000000;
 }
 
 
@@ -51,12 +76,25 @@ dl.el {
 
 
 div.fragment {
-    width: 100%;
-    border: none;
-    background-color: transparent;
+    background: #999999;
+    background-image: url(images/bg_more_muted.png);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    margin-left          : 0em;
+    margin-right         : 1em;
+    padding-left         : 1em;
+    padding-right        : 3em;
+    margin-top           : 0em;
+    margin-bottom        : 0em;
+    padding-top          : 0em;
+    padding-bottom       : 0em;
+    border-style: solid;
+    border-width: medium;
+    border-color: #000000;
+    max-width            : 800;
 }
 div.ah {
-    background-color: black;
     font-weight: bold;
     color: "grey";
     margin-bottom: 3px;
@@ -120,10 +158,17 @@ td.indexvalue {
 }
 
 
-font.keyword       { color: #008000 }
-font.keywordtype   { color: #604020 }
-font.keywordflow   { color: #e08000 }
+p,ul,ol {
+   padding-left   : 0;
+   margin-left    : 1.5em;
+   max-width      : 700px;   
+}
+
+
+font.keyword       { color: #06dbdb }
+font.keywordtype   { color: lightgreen }
+font.keywordflow   { color: cyan }
 font.comment       { color: #800000 }
-font.preprocessor  { color: #806020 }
-font.stringliteral { color: #002080 }
+font.preprocessor  { color: darkgreen }
+font.stringliteral { color: maroon }
 font.charliteral   { color: #008080 }
