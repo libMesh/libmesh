@@ -1,4 +1,4 @@
-// $Id: tree_node.C,v 1.6 2003-02-13 22:56:14 benkirk Exp $
+// $Id: tree_node.C,v 1.7 2003-07-15 09:20:20 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -206,7 +206,6 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
 	      return std::pair<Point, Point> (min, max);
 	      break;
 	    }
-
     
 	  default:
 	    std::cerr << "c >= N!" << std::endl;
@@ -216,10 +215,65 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
 
 
 	break;
-      }
+      } // case 8
+
+      // How to refine an QuadTree Node
+    case 4:
+      {
+	const Real xmin = bounding_box.first(0);
+	const Real ymin = bounding_box.first(1);
+
+	const Real xmax = bounding_box.second(0);
+	const Real ymax = bounding_box.second(1);
+
+	const Real xc = xmin + .5*(xmax - xmin);
+	const Real yc = ymin + .5*(ymax - ymin);
+
+	switch (c)
+	  {
+	  case 0:
+	    {
+	      const Point min(xmin, ymin);
+	      const Point max(xc,   yc);
+	      return std::pair<Point, Point> (min, max);
+	      break;
+	    }
+
+	  case 1:
+	    {
+	      const Point min(xc,   ymin);
+	      const Point max(xmax, yc);
+	      return std::pair<Point, Point> (min, max);
+	      break;
+	    }
+
+	  case 2:
+	    {
+	      const Point min(xmin, yc);
+	      const Point max(xc,   ymax);
+	      return std::pair<Point, Point> (min, max);
+	      break;
+	    }
+
+	  case 3:
+	    {
+	      const Point min(xc,   yc);
+	      const Point max(xmax, ymax);
+	      return std::pair<Point, Point> (min, max);
+	      break;
+	    }
+	    
+	  default:
+	    std::cerr << "c >= N!" << std::endl;
+	    error();
+	    
+	  }
+
+	break;
+      } // case 4
 
     default:
-      std::cerr << "Only implemented for Octrees!" << std::endl;
+      std::cerr << "Only implemented for Octrees and QuadTrees!" << std::endl;
       error();
 
     }
