@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.25 2003-11-05 22:26:31 benkirk Exp $
+# $Id: Makefile,v 1.26 2003-11-06 20:30:17 benkirk Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -16,8 +16,8 @@ include Make.common
 # defined
 
 #
-# header files
-headerfiles 	:= $(wildcard include/*.h)
+# header files & directories
+headerfiles 	:= $(wildcard include/*/*.h)
 
 #
 # source files
@@ -101,7 +101,7 @@ echo:
 	@echo -e "LDFLAGS:\n$(LDFLAGS)\n"
 	@echo -e "DLFLAGS:\n$(DLFLAGS)\n"
 
-#
+#	
 # Remove project object files for the current mode
 #
 clean:
@@ -185,7 +185,7 @@ TODO:
 # Dependencies
 #
 .depend:
-	@$(perl) ./contrib/bin/make_dependencies.pl $(LIBMESH_INCLUDES) "-S\$$(obj-suffix)" $(srcfiles) > .depend
+	@$(perl) ./contrib/bin/make_dependencies.pl $(foreach i, $(wildcard include/*), -I./$(i)) "-S\$$(obj-suffix)" $(srcfiles) > .depend
 	@echo "Updated .depend"
 
 

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.4 2003-11-05 22:26:32 benkirk Exp $
+# $Id: Makefile,v 1.5 2003-11-06 20:30:19 benkirk Exp $
 
 
 # The location of the mesh library
@@ -70,7 +70,7 @@ run: $(target)
 # Dependencies
 #
 .depend:
-	@$(perl) $(meshdir)/contrib/bin/make_dependencies.pl $(LIBMESH_INCLUDES) "-S\$$(obj-suffix)" $(srcfiles) > .depend
+	@$(perl) $(meshdir)/contrib/bin/make_dependencies.pl $(foreach i, $(wildcard ../../include/*), -I$(i)) "-S\$$(obj-suffix)" $(srcfiles) > .depend
 	@echo "Updated .depend"
 
 ###############################################################################
