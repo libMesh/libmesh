@@ -1,4 +1,4 @@
-// $Id: predicated_iterator.h,v 1.2 2004-01-03 15:37:41 benkirk Exp $
+// $Id: predicated_iterator.h,v 1.3 2004-03-18 23:22:40 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -82,11 +82,16 @@ public:
 
   
   /**
-   * We need a typedef which defines the type of values
-   * that we're iterating over.
+   * We need several typedefs from the iterator traits struct.
    */
-  typedef typename std::iterator_traits<T>::value_type value_type; 
+  typedef typename std::iterator_traits<T>::value_type value_type;
+  typedef typename std::iterator_traits<T>::reference reference;
+  typedef typename std::iterator_traits<T>::pointer pointer;
 
+//   typedef typename std::iterator_traits<const T*>::value_type const_value_type;
+//   typedef typename std::iterator_traits<const T*>::reference  const_reference;
+//   typedef typename std::iterator_traits<const T*>::pointer    const_pointer;
+  
   /**
    * Used to simulate the index of a for loop.
    * Call this if you need explicit access to
@@ -127,25 +132,26 @@ public:
    * A dereferencing operator.  Returns a reference
    * to what is currently being iterated to.
    */
-  //value_type& operator* () { return *_current; }
+  reference operator* () { return _current.operator*(); }
 
   /**
    * A const dereferencing operator.  Returns a const
    * reference to what is currently being iterated to.
    */
-  const value_type& operator* () const { return *_current; }
-  
+  const reference operator* () const { return _current.operator*(); }
+
+
   /**
    * A dereferencing operator.  Returns a pointer to
    * what is currently being iterated to.
    */
-  value_type* operator-> () { return _current.operator->(); }
+  pointer operator-> () { return _current.operator->(); }
   
   /**
    * A const dereferencing operator.  Returns a const pointer
    * to what is currently being iterated to.
    */
-  //const value_type* operator-> () const { return _current.operator->(); }
+  const pointer operator-> () const { return _current.operator->(); }
   
   
   
