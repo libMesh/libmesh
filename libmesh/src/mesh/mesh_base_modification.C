@@ -1,4 +1,4 @@
-// $Id: mesh_base_modification.C,v 1.4 2003-08-17 11:39:10 ddreyer Exp $
+// $Id: mesh_base_modification.C,v 1.5 2003-08-17 11:49:01 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -483,8 +483,6 @@ const Point MeshBase::build_inf_elem (const InfElemOriginValue& origin_x,
        */
       inner_boundary_nodes->reserve (unique_size);
       inner_boundary_nodes->clear();
-//Does this work ok?
-      std::cout << "inner_boundary_nodes->capacity()=" << inner_boundary_nodes->capacity() << std::endl;
 
 
       std::vector<unsigned int>::iterator pos_it = inner_boundary_node_numbers.begin();
