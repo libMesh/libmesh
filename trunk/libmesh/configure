@@ -2653,8 +2653,8 @@ echo "$as_me: error: Unrecognized compiler" >&2;}
 
     case "$GXX_VERSION" in
       ibm_xlc)
+          CXXFLAGSG="-DDEBUG -qmaxmem=-1 -qansialias -qrtti=all -Q -g"
           CXXFLAGSO="-DNDEBUG -O3 -qmaxmem=-1 -w -qansialias -qrtti=all -Q"
-          CXXFLAGSG="$CXXFLAGSO -check=bounds -info=all -g"
           CXXFLAGSP="$CXXFLAGSO -g -pg"
           CFLAGSG="-DDEBUG -qansialias -g"
           CFLAGSO="-DNDEBUG -O2 -w -qansialias"
