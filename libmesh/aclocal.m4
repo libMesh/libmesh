@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.58 2004-04-01 16:36:39 jwpeterson Exp $
+dnl $Id: aclocal.m4,v 1.59 2004-04-08 21:58:54 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -367,7 +367,7 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           CXXFLAGSO="-Kc++eh -Krtti -O2 -DNDEBUG -unroll -w0"
           CXXFLAGSP="$CXXFLAGSO -g -pg"
           CFLAGSG="-w1 -DDEBUG -inline_debug_info -wd266"
-          CFLAGSO="-O2 -DNDEBUG -axiMK -unroll -w0"
+          CFLAGSO="-O2 -DNDEBUG -unroll -w0"
           CFLAGSP="$CFLAGSO -g -pg"
 
           dnl Position-independent code for shared libraries
