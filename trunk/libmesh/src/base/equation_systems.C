@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.41 2003-09-02 18:02:40 benkirk Exp $
+// $Id: equation_systems.C,v 1.42 2003-11-28 16:23:39 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -429,7 +429,19 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
   if (_mesh.processor_id() == 0)
     soln.resize(nn*nv);
 
-  std::vector<Number> sys_soln; 
+  std::vector<Number>        sys_soln; 
+  std::vector<unsigned char> node_conn (nn);
+
+  // Get the number of elements that share each node
+  {
+    const_active_elem_iterator       it (_mesh.elements_begin());
+    const const_active_elem_iterator end(_mesh.elements_end());
+    
+    for ( ; it != end; ++it)
+      for (unsigned int n=0; n<(*it)->n_nodes(); n++)
+	  node_conn[(*it)->node(n)]++;
+  }
+
   
   unsigned int var_num=0;
 
@@ -485,9 +497,12 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
 		      assert (nodal_soln.size() == elem->n_nodes());
 		  
 		      for (unsigned int n=0; n<elem->n_nodes(); n++)
-			soln[nv*(elem->node(n)) + (var + var_num)] = nodal_soln[n];
+			{
+			  assert (node_conn[elem->node(n)] != 0);
+			  soln[nv*(elem->node(n)) + (var + var_num)] +=
+			    nodal_soln[n]/static_cast<Real>(node_conn[elem->node(n)]);
+			}
 		    }
-
 		}
 	    }	 
 	}
