@@ -1,4 +1,4 @@
-// $Id: fe_szabab_shape_2D.C,v 1.6 2004-02-10 16:20:15 spetersen Exp $
+// $Id: fe_szabab_shape_2D.C,v 1.7 2004-02-25 03:44:44 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -705,6 +705,9 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
       error();
 
     } // switch order
+
+  error();
+  return 0.;
 }
 
       
