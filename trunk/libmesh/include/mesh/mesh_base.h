@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.16 2004-03-23 04:47:28 jwpeterson Exp $
+// $Id: mesh_base.h,v 1.17 2004-03-23 05:16:21 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -61,7 +61,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.16 $
+ * \version $Revision: 1.17 $
  */
 
 
@@ -672,22 +672,6 @@ protected:
    * Return a reference to the \p cells vector holding the elements.
    */
   std::vector<Elem*> & get_elem () { return _elements; }
-
-  /**
-   * Read a 2D mesh in the shanee format from the file specified
-   * by \p name.  This is for compatibility with
-   * Ben Kirk's old code, and may be removed at any time in the future.
-   *
-   * @sect2{Write Methods}
-   *
-   */
-  void read_shanee (const std::string& name);
-
-  /**
-   * Read a 2D mesh in the shanee format from a stream.
-   * Implements the read process initiated by the associated public method.
-   */
-  void read_shanee (std::istream& in);
   
   /**
    * Returns a writeable reference to the number of subdomains.
