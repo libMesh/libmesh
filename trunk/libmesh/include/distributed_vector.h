@@ -1,4 +1,4 @@
-// $Id: distributed_vector.h,v 1.14 2003-09-25 21:46:55 benkirk Exp $
+// $Id: distributed_vector.h,v 1.15 2003-09-25 22:04:42 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -32,8 +32,10 @@
 // C++ includes
 #include <vector>
 #include <algorithm>
-#include <mpi.h>
 
+#ifdef HAVE_MPI
+# include <mpi.h>
+#endif
 
 // Local includes
 #include "numeric_vector.h"
