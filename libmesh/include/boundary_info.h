@@ -1,4 +1,4 @@
-// $Id: boundary_info.h,v 1.8 2003-02-03 03:51:48 ddreyer Exp $
+// $Id: boundary_info.h,v 1.9 2003-02-07 16:19:11 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -196,13 +196,6 @@ class BoundaryInfo
   void add_boundary_values(const unsigned int node,
 			   const std::vector<Real> values,
 			   const short int id);
-
-  /**
-   * @returns a reference to the user-specified boundary values.
-   */
-  const std::vector<std::pair<unsigned int,
-                 std::vector<Real> > >& get_boundary_values() const
-  { return  boundary_values; };
 
   /**
    * @returns the boundary values specified for node \p node.

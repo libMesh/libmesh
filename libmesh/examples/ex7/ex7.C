@@ -1,4 +1,4 @@
-// $Id: ex7.C,v 1.1 2003-02-06 19:02:58 spetersen Exp $
+// $Id: ex7.C,v 1.2 2003-02-07 16:19:11 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -60,9 +60,10 @@
  *
  * This is the sixth example program.  It builds on
  * the privious example programs. This example now sows how
- * to deal with complex numbers by solving a simple Helmholz
- * system. For this example the library has to be compiled with
- * complex numbers enabled. 
+ * to deal with complex numbers by solving the Helmholtz
+ * equation grad(p)*grad(p)+(omega/c)^2*p=0.
+ * For this example the library has to be compiled with
+ * complex numbers enabled.
  */
 
 
@@ -325,10 +326,11 @@ void assemble_helmholtz(EquationSystems& es,
   /**
    * Define data structures to contain the element matrix
    * [Ae] and right-hand-side vector [Fe] contribution.
-   * Here [Ae] is computed using the element stiffness [Ke]
-   * and mass [Me] matrices, where [Ae] = [Ke]-(omega/c)^2*[Me]
+   * Here [Ae] is computed using the element stiffness [Ke],
+   * mass [Me] and damping [Ce]  matrices, where
+   * [Ae] = [Ke]+i*omega*[Ce]-(omega/c)^2*[Me].
    */
-  ComplexDenseMatrix   Ae, Ke, Me;
+  ComplexDenseMatrix   Ae, Ke, Me, Ce;
   std::vector<Complex> Fe;
 
   /**
@@ -402,6 +404,9 @@ void assemble_helmholtz(EquationSystems& es,
       Ke.resize (dof_indices.size(),
 		 dof_indices.size());
 
+      Ce.resize (dof_indices.size(),
+		 dof_indices.size());
+
       Me.resize (dof_indices.size(),
 		 dof_indices.size());
 
@@ -433,21 +438,12 @@ void assemble_helmholtz(EquationSystems& es,
 	}; // end of quadrature point loop
 
 
-	  /**
-	   * Now we build the element right-hand-side contribution.
-	   * This involves a single loop in which we integrate the
-	   * a prescribed normal velocity on the boundary in the PDE
-	   * against the test functions.
-	   * For simplicity we apply a const normal velocity at all
-	   * parts of the boundary.
-	   */
 
       /**
        *----------------------------------------------------------------
-       * At this point the interior element integration has
-       * been completed.  However, we have not yet addressed
-       * boundary conditions.  For this example we will only
-       * consider Neumann boundary conditions.
+       * Now compute the contribution to the element matrix and the
+       * right-hand-side vector if the current element lies on the
+       * boundary. 
        */
       {
 	/**
@@ -455,7 +451,6 @@ void assemble_helmholtz(EquationSystems& es,
 	 * If the element has no neighbor on a side then that
 	 * side MUST live on a boundary of the domain.
 	 */
-
 	for (unsigned int side=0; side<elem->n_sides(); side++)
 	  if (elem->neighbor(side) == NULL)
 	    {
@@ -502,6 +497,12 @@ void assemble_helmholtz(EquationSystems& es,
 	       * the whole boundary of our mesh.
 	       */ 
 	      const Real vn_value = 1.0;
+
+	      /**
+	       * Consider a normal admittance an=1
+	       * at some parts of the bounfdary
+	       */
+	      const Real an_value = 1.0;
 	      
 	      /**
 	       * Loop over the face quagrature points for integration.
@@ -510,15 +511,26 @@ void assemble_helmholtz(EquationSystems& es,
 		{
 
 		  /**
-		   * Right-hand-side contribution of the L2
-		   * projection.
+		   * Right-hand-side contribution due to prescribed
+		   * normal velocity.
 		   */
 		  for (unsigned int i=0; i<phi_face.size(); i++)
 		    {
 		      Fe[i] += -I*vn_value*rho*omega
 			*phi_face[i][qp]*JxW_face[qp];
 		    };
-		  
+
+		  /**
+		   * Element matrix contributrion due to precribed
+		   * admittance boundary conditions.
+		   */
+		  for (unsigned int i=0; i<phi_face.size(); i++)
+		    for (unsigned int j=0; j<phi_face.size(); j++)
+		      {
+			Ce(i,j) += rho*an_value
+			  *JxW_face[qp]*phi_face[i][qp]*phi_face[j][qp];
+		      };
+
 		}; // end face quadrature point loop	  
 	    }; // end if (elem->neighbor(side) == NULL)
       }; // end boundary condition section	  
@@ -527,6 +539,7 @@ void assemble_helmholtz(EquationSystems& es,
        * Compute [Ae]
        */
       Ae.add( 1, Ke);
+      Ae.add(I*omega, Ce);
       Ae.add(-omega*omega/(c*c), Me);      
       
       /**
@@ -540,8 +553,6 @@ void assemble_helmholtz(EquationSystems& es,
       es("Helmholtz").rhs.add_vector    (Fe, dof_indices);
       
     }; // end of element loop
-
-
   
   /**
    * All done!
