@@ -1,4 +1,4 @@
-// $Id: system.h,v 1.5 2004-09-27 15:56:44 jwpeterson Exp $
+// $Id: system.h,v 1.6 2004-10-12 19:46:58 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -226,21 +226,28 @@ public:
   NumericVector<Number> & add_vector (const std::string& vec_name);
 
   /**
+   * @returns \p true if this \p System has a vector associated with the
+   * given name, \p false otherwise.
+   */
+  bool have_vector (const std::string& vec_name) const;
+  
+  /**
    * @returns a const reference to this system's @e additional vector
    * named \p vec_name.  Access is only granted when the vector is already
    * properly initialized.
    */
-  const NumericVector<Number> & get_vector(const std::string& vec_name) const;
+  const NumericVector<Number> & get_vector (const std::string& vec_name) const;
 
   /**
    * @returns a writeable reference to this system's @e additional vector
    * named \p vec_name.  Access is only granted when the vector is already
    * properly initialized.
    */
-  NumericVector<Number> & get_vector(const std::string& vec_name);
+  NumericVector<Number> & get_vector (const std::string& vec_name);
 
   /**
-   * @returns the number of vectors (in addition to the solution) handled by this system
+   * @returns the number of vectors (in addition to the solution)
+   * handled by this system
    * This is the size of the \p _vectors map
    */
   unsigned int n_vectors () const;
@@ -637,6 +644,14 @@ inline
 unsigned int System::n_local_dofs() const
 {
   return _dof_map.n_dofs_on_processor (libMesh::processor_id());
+}
+
+
+
+inline
+bool System::have_vector (const std::string& vec_name) const
+{
+  return (_vectors.count(vec_name));
 }
 
 

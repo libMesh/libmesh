@@ -1,4 +1,4 @@
-// $Id: petsc_interface.C,v 1.27 2004-09-29 13:27:13 benkirk Exp $
+// $Id: petsc_interface.C,v 1.28 2004-10-12 19:46:58 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -182,13 +182,13 @@ PetscInterface<T>::solve (SparseMatrix<T>&  matrix_in,
   solution->close ();
   rhs->close ();
 
-  // If matrix != precond, then this means we have specified a
-  // special preconditioner, so reset preconditioner type to PCMAT.
-  if (matrix != precond)
-    {
-      this->_preconditioner_type = USER_PRECOND;
-      this->set_petsc_preconditioner_type ();
-    }
+//   // If matrix != precond, then this means we have specified a
+//   // special preconditioner, so reset preconditioner type to PCMAT.
+//   if (matrix != precond)
+//     {
+//       this->_preconditioner_type = USER_PRECOND;
+//       this->set_petsc_preconditioner_type ();
+//     }
   
 // 2.1.x & earlier style      
 #if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 1)

@@ -1,4 +1,4 @@
-// $Id: implicit_system.C,v 1.3 2004-03-05 21:07:00 jwpeterson Exp $
+// $Id: implicit_system.C,v 1.4 2004-10-12 19:46:58 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -190,8 +190,12 @@ void ImplicitSystem::solve ()
   const unsigned int maxits =
     static_cast<unsigned int>(_equation_systems.parameter("linear solver maximum iterations"));
 
-  // Solve the linear system
-  const std::pair<unsigned int, Real> rval = 
+  // Solve the linear system.  Two cases:
+  const std::pair<unsigned int, Real> rval =
+    (this->have_matrix("Preconditioner")) ?
+    // 1.) User-supplied preconditioner
+    linear_solver_interface->solve (*matrix, this->get_matrix("Preconditioner"), *solution, *rhs, tol, maxits) :
+    // 2.) Use system matrix for the preconditioner
     linear_solver_interface->solve (*matrix, *solution, *rhs, tol, maxits);
 
   // Store the number of linear iterations required to
@@ -221,7 +225,7 @@ SparseMatrix<Number> & ImplicitSystem::add_matrix (const std::string& mat_name)
     }
 
   // Return the matrix if it is already there.
-  if (_matrices.count (mat_name))
+  if (this->have_matrix(mat_name))
     return *(_matrices[mat_name]);
 
   // Otherwise build the matrix and return it.
