@@ -1,4 +1,4 @@
-/* $Id: ex7.C,v 1.35 2004-12-07 22:47:44 benkirk Exp $ */
+/* $Id: ex7.C,v 1.36 2004-12-17 20:55:06 benkirk Exp $ */
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
 
@@ -468,7 +468,7 @@ void assemble_helmholtz(EquationSystems& es,
 	    // at some parts of the bounfdary
 	    const Real an_value = 1.;
 	      
-	    // Loop over the face quagrature points for integration.
+	    // Loop over the face quadrature points for integration.
 	    for (unsigned int qp=0; qp<qface.n_points(); qp++)
 	      {
 		// Right-hand-side contribution due to prescribed

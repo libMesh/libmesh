@@ -1,4 +1,4 @@
-/* $Id: ex8.C,v 1.13 2004-12-07 22:47:44 benkirk Exp $ */
+/* $Id: ex8.C,v 1.14 2004-12-17 20:55:06 benkirk Exp $ */
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
 
@@ -482,7 +482,7 @@ void assemble_wave(EquationSystems& es,
 	      // the whole boundary of our mesh.
 	      const Real acc_n_value = 1.0;
 	      
-	      // Loop over the face quagrature points for integration.
+	      // Loop over the face quadrature points for integration.
 	      for (unsigned int qp=0; qp<qface.n_points(); qp++)
 		{
 		  // Right-hand-side contribution due to prescribed

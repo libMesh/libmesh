@@ -1,4 +1,4 @@
-/* $Id: ex5.C,v 1.29 2004-11-15 22:09:07 benkirk Exp $ */
+/* $Id: ex5.C,v 1.30 2004-12-17 20:55:06 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -387,7 +387,7 @@ void assemble_poisson(EquationSystems& es,
 	      fe_face->reinit(elem, side);
 	      
 	      
-	      // Loop over the face quagrature points for integration.
+	      // Loop over the face quadrature points for integration.
 	      // Note that the \p AutoPtr<QBase> overloaded the operator->,
 	      // so that QBase methods may safely be accessed.  It may
 	      // be said: accessing an \p AutoPtr<Xyz> through the

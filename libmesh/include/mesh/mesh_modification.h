@@ -1,4 +1,4 @@
-// $Id: mesh_modification.h,v 1.3 2004-12-02 18:18:56 benkirk Exp $
+// $Id: mesh_modification.h,v 1.4 2004-12-17 20:55:07 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -43,7 +43,7 @@ namespace MeshTools
    *
    * \author Benjamin S. Kirk
    * \date 2004
-   * \version $Revision: 1.3 $
+   * \version $Revision: 1.4 $
    */  
   namespace Modification
   {
@@ -65,13 +65,22 @@ namespace MeshTools
     void translate (MeshBase& mesh,
 		    const Real xt=0., const Real yt=0., const Real zt=0.); 
 
+//     /**
+//      * Rotates the mesh in the xy plane. The rotation is
+//      * counter-clock-wise (mathematical definition).
+//      * The angle is in degrees (360 make a full circle)
+//      */
+//     void rotate2D (MeshBase& mesh,
+//                    const Real alpha=0.); 
+
     /**
-     * Rotates the mesh.  The grid points are rotated about the 
-     * \p x axis by \p xr , about the \p y axis by \p yr,
-     * etc...  
+     * Rotates the mesh in 3D space. 
+     * Here the standard Euler angles are adopted
+     * (http://mathworld.wolfram.com/EulerAngles.html)
+     * The angles are in degrees (360 make a full circle)
      */
     void rotate (MeshBase& mesh,
-		 const Real xr, const Real yr=0., const Real zr=0.); 
+		 const Real phi, const Real theta=0., const Real psi=0.); 
 
     /**
      * Scales the mesh.  The grid points are scaled in the
