@@ -1,4 +1,4 @@
-// $Id: factory.h,v 1.10 2003-10-01 16:28:51 benkirk Exp $
+// $Id: factory.h,v 1.11 2003-10-02 01:05:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -32,6 +32,24 @@
 #include "auto_ptr.h"
 
 
+/**
+ * A base class.
+ */
+class FactoryBase
+{
+public:
+
+protected:
+  /**
+   * Constructor.
+   */
+  FactoryBase () {}
+
+  /**
+   * Destructor.
+   */
+  virtual ~FactoryBase () {}  
+};
 
 
 
@@ -39,7 +57,7 @@
  * Factory class defintion.  
  */
 template <class Base>
-class Factory
+class Factory : public FactoryBase
 {  
 protected:
 
@@ -71,13 +89,13 @@ private:
   /**
    * Map from a name to a Factory<Base>* pointer.
    */
-  static std::map<std::string, Factory<Base>*> factory_map;
+  static std::map<std::string, FactoryBase*> factory_map;
 };
 
 
 
 /**
- * Factory class implementation.
+ * Factory implementation class.
  */
 template <class Derived, class Base>
 class FactoryImp: public Factory<Base>
@@ -131,7 +149,7 @@ AutoPtr<Base> Factory<Base>::build (const std::string& name)
 
       std::cerr << "valid options are:" << std::endl;
       
-      for (typename std::map<std::string,Factory<Base>*>::const_iterator
+      for (typename std::map<std::string,FactoryBase*>::const_iterator
 	     it = factory_map.begin(); it != factory_map.end(); ++it)
         std::cerr << "  " << it->first << std::endl;
 
@@ -142,7 +160,9 @@ AutoPtr<Base> Factory<Base>::build (const std::string& name)
     }
   
   // Do this the stoopid way for IBM xlC
-  AutoPtr<Base> ret_val (factory_map[name]->create());
+  Factory<Base> *f = dynamic_cast<Factory<Base>*> (factory_map[name]);
+  
+  AutoPtr<Base> ret_val (f->create());
   
   return ret_val;
 }
