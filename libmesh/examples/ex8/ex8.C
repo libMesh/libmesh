@@ -1,4 +1,4 @@
-// $Id: ex8.C,v 1.1 2003-04-09 14:08:39 spetersen Exp $
+// $Id: ex8.C,v 1.2 2003-04-09 19:26:57 ddreyer Exp $
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
   
@@ -110,48 +110,9 @@ void apply_initial(EquationSystems<NewmarkSystem>& es,
  * method after the system is assembled.
  */
 void fill_dirichlet_bc(EquationSystems<NewmarkSystem>& es,
-		       const std::string& system_name,
-		       bool do_for_matrix=false);
+		       const std::string& system_name);
 
 
-
-/**
- *--------------------------------------------------------------------
- * Initialize some (global) handy constants and variables
- *
- * The step size for the time.
- */
-Real delta_t = .0000625;
-
-/**
- * The time.
- */
-Real t_time;
-
-/**
- * The number of time steps.
- */
-unsigned int n_time_steps = 300;
-
-/**
- * The node that should be monitored.
- */
-unsigned int result_node = 274;
-
-
-
-/**
- * Define the fluid properties (the density rho 
- * and the speed of sound speed).
- */
-const Real speed = 1000.;
-const Real rho   = 1000.;
-
-
-/**
- * Define pi.
- */
-const Real libmesh_pi = acos(-1.);
 
 
 
@@ -209,9 +170,10 @@ int main (int argc, char** argv)
 	
 	std::cout << std::endl << std::endl;
 
-      };
+      }
 
     /**
+     *--------------------------------------------------------------------
      * Get the name of the mesh file
      * from the command line.
      */
@@ -232,7 +194,7 @@ int main (int argc, char** argv)
     /**
      * Read the meshfile specified in the command line or
      * use the internal mesh generator to create a uniform
-     * grid on square or cube.
+     * grid on an elongated cube.
      */
     mesh.read(mesh_file);
     // mesh.build_cube (10, 10, 40,
@@ -245,12 +207,36 @@ int main (int argc, char** argv)
      * Print information about the mesh to the screen.
      */
     mesh.print_info();
+
+    /**
+     * The node that should be monitored.
+     */
+    const unsigned int result_node = 274;
+
     
     /**
+     *--------------------------------------------------------------------
+     * time stepping issues
+     *
+     * Note that the total current time is stored as a parameter
+     * in the \pEquationSystems object.
+     *
+     * the time step size
+     */
+    const Real delta_t = .0000625;
+
+    /**
+     * The number of time steps.
+     */
+    unsigned int n_time_steps = 300;
+
+    
+    /**
+     *--------------------------------------------------------------------
      * Create an equation systems object.
      */
     EquationSystems<NewmarkSystem> equation_systems (mesh);
-    
+
     /**
      * Declare the system and its variables.
      */
@@ -279,14 +265,30 @@ int main (int argc, char** argv)
       t_system.attach_assemble_function (assemble_wave);
       t_system.attach_init_cond_function (apply_initial);
   
-
       /**
-       * Set the Newmark parameters and compute integration
-       * constants. Here we simply use the default values
-       * of alpha=.25  and delta=.5.
+       * Set the time step size, and optionally the
+       * Newmark parameters, so that \p NewmarkSystem can 
+       * compute integration constants. Here we simply use 
+       * pass only the time step and use default values 
+       * for \p alpha=.25  and \p delta=.5.
        */
       t_system.set_newmark_parameters(delta_t);
-     
+
+      /**
+       * Set the speed of sound and fluid density
+       * as \p EquationSystems parameter,
+       * so that \p assemble_wave() can access it.
+       */
+      equation_systems.set_parameter("speed")          = 1000.;
+      equation_systems.set_parameter("fluid density")  = 1000.;
+
+      /**
+       * Store the current time as an
+       * \p EquationSystems parameter, so that
+       * \p fill_dirichlet_bc() can access it.
+       */
+      equation_systems.set_parameter("time")           = 0.;
+
       /**
        * Initialize the data structures for the equation system.
        */
@@ -296,37 +298,46 @@ int main (int argc, char** argv)
        * Prints information about the system to the screen.
        */
       equation_systems.print_info();
-    };
+    }
+
 
     /**
      * A file to store the results at certain nodes.
      */
-    std::ofstream res_out("result_file.dat");
+    std::ofstream res_out("pressure_node.res");
 
     /**
      * get the dof_numbers for the nodes that
      * should be monitored.
      */
-    unsigned int res_node_no = result_node;
+    const unsigned int res_node_no = result_node;
     const Node& res_node = mesh.node(res_node_no-1);
     unsigned int dof_no = res_node.dof_number(0,0,0);
 
 
+    /**
+     * Use a handy reference to this system
+     */
+    NewmarkSystem& t_system = equation_systems("Wave");
+       
     /**
      * Assemble the time independent system matrices and rhs.
      * This function will also compute the effective system matrix
      * K~=K+a_0*M+a_1*C and apply user specified initial
      * conditions. 
      */
-    equation_systems("Wave").assemble();
+    t_system.assemble();
 
 
     /**
      * Now solve for each time step.
+     * For convenience, use a local buffer of the 
+     * current time.  But once this time is updated,
+     * also update the \p EquationSystems parameter
      */
     // start with t_time = 0 and write a short header to the
     // nodal result file
-    t_time = 0.;
+    Real t_time = 0.;
     res_out << "# pressure at node " << res_node_no << "\n"
 	    << "# time\tpressure\n"
 	    << t_time << "\t" << 0 << std::endl;
@@ -336,32 +347,50 @@ int main (int argc, char** argv)
       {
 
 	/**
-	 * Update the time.
+	 * Update the time.  Both here and in the
+	 * \p EquationSystems object
 	 */
 	t_time += delta_t;
+	equation_systems.set_parameter("time")  = t_time;
 
 	/**
 	 * Update the rhs.
 	 */
-	equation_systems("Wave").update_rhs();
+	t_system.update_rhs();
 
 	/**
 	 * Impose essential boundary conditions.
 	 * Not that since the matrix is only assembled once,
-	 * the panalty parameter should be added to the matrix
+	 * the penalty parameter should be added to the matrix
 	 * only in the first time step. The applied
 	 * boundary conditions may be time-dependent and hence
 	 * the rhs vector is considered in each time step. 
 	 */
 	if (time_step == 0)
-	  fill_dirichlet_bc(equation_systems, "Wave", true);
+	  {
+	    /**
+	     * The local function \p fill_dirichlet_bc()
+	     * may also set Dirichlet boundary conditions for the
+	     * matrix.  When you set the flag as shown below,
+	     * the flag will return true.  If you want it to return
+	     * false, simply do not set it.
+	     */
+	    equation_systems.set_flag("Newmark set BC for Matrix");
+
+	    fill_dirichlet_bc(equation_systems, "Wave");
+
+	    /**
+	     * unset the flag, so that it returns false
+	     */
+	    equation_systems.unset_flag("Newmark set BC for Matrix");
+	  }
 	else
 	  fill_dirichlet_bc(equation_systems, "Wave");
 
 	/**
 	 * Solve the system "Wave".
 	 */
-	equation_systems("Wave").solve();
+	t_system.solve();
 
 	/**
 	 * After solving the system, write the solution
@@ -379,7 +408,7 @@ int main (int argc, char** argv)
 	/**
 	 * Update the p, v and a.
 	 */
-	equation_systems("Wave").update_u_v_a();
+	t_system.update_u_v_a();
 
 	/**
 	 * Write nodal results to file. The results can then
@@ -387,18 +416,19 @@ int main (int argc, char** argv)
 	 * 'plot "result_file.dat" with lines' in the command line)
 	 */
 	res_out << t_time << "\t"
-		<< equation_systems("Wave").get_vector("displacement")(dof_no)
+		<< t_system.get_vector("displacement")(dof_no)
 		<< std::endl;
 
       }
-  };
+
+  }
 
   
   /**
    * All done.  
    */
   return libMesh::close ();
-};
+}
 
 
 
@@ -422,6 +452,13 @@ void assemble_wave(EquationSystems<NewmarkSystem>& es,
    * The dimension that we are running
    */
   const unsigned int dim = mesh.mesh_dimension();
+
+  /**
+   * Copy the speed of sound and fluid density
+   * to a local variable
+   */
+  const Real speed = es.parameter("speed");
+  const Real rho   = es.parameter("fluid density");
 
   /**
    * Get a reference to our system, as before
@@ -603,9 +640,9 @@ void assemble_wave(EquationSystems<NewmarkSystem>& es,
 		Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
 		Me(i,j) += JxW[qp]*phi[i][qp]*phi[j][qp]
 		           *1./(speed*speed);
-	      }; // end of the matrix summation loop
+	      } // end of the matrix summation loop
 	  
-	}; // end of quadrature point loop
+	} // end of quadrature point loop
 
 
       /**       
@@ -687,11 +724,11 @@ void assemble_wave(EquationSystems<NewmarkSystem>& es,
 		    {
 		      Fe(i) += acc_n_value*rho
 			*phi_face[i][qp]*JxW_face[qp];
-		    };
+		    }
 
 
-		}; // end face quadrature point loop	  
-	    }; // end if (elem->neighbor(side) == NULL)
+		} // end face quadrature point loop	  
+	    } // end if (elem->neighbor(side) == NULL)
 
 	/**
 	 * In this example the Dirichlet boundary conditions will be 
@@ -699,7 +736,7 @@ void assemble_wave(EquationSystems<NewmarkSystem>& es,
 	 * system is assembled.
 	 */
 
-      }; // end boundary condition section	  
+      } // end boundary condition section	  
 
 
 
@@ -720,14 +757,17 @@ void assemble_wave(EquationSystems<NewmarkSystem>& es,
        */
       matrix.add_matrix(zero_matrix, dof_indices);
     
-    }; // end of element loop
+    } // end of element loop
   
   /**
    * All done!
    */
   return;
 
-};
+}
+
+
+
 
 void apply_initial(EquationSystems<NewmarkSystem>& es,
 		   const std::string& system_name)
@@ -756,15 +796,13 @@ void apply_initial(EquationSystems<NewmarkSystem>& es,
   // the nodal acceleration values for t=t_0 could be computed
   // in the matrix assembly.
   // acc_vec.add (1., t_system.get_vector("force"));
-
 }
 
 
 
 
 void fill_dirichlet_bc(EquationSystems<NewmarkSystem>& es,
-		       const std::string& system_name,
-		       bool do_for_matrix)
+		       const std::string& system_name)
 {
   /**
    * It is a good idea to make sure we are assembling
@@ -789,6 +827,22 @@ void fill_dirichlet_bc(EquationSystems<NewmarkSystem>& es,
   const Mesh& mesh = es.get_mesh();
 
   /**
+   * Get \p libMesh's  \f$ \pi \f$
+   */
+  const Real pi = libMesh::pi;
+
+  /**
+   * Ask the \p EquationSystems flag whether
+   * we should do this also for the matrix
+   */
+  const bool do_for_matrix = es.flag("Newmark set BC for Matrix");
+
+  /**
+   * Ge the current time from \p EquationSystems
+   */
+  const Real current_time = es.parameter("time");
+
+  /**
    * Number of nodes in the mesh.
    */
   unsigned int n_nodes = mesh.n_nodes();
@@ -802,14 +856,13 @@ void fill_dirichlet_bc(EquationSystems<NewmarkSystem>& es,
 
       /**
        * Check if Dirichlet BCs should be applied to this node.
+       * Use the \p TOLERANCE from \p mesh_common.h as tolerance.
        * Here a pressure value is applied if the z-coord.
        * is equal to 4.
        */
-      const Real coo_tol = 1.e-6;
       const Real z_coo = 4.;
 
-      if (curr_node(2)<z_coo+coo_tol &&
-	  curr_node(2)>z_coo-coo_tol)
+      if (fabs(curr_node(2)-z_coo) < TOLERANCE)
 	{
 	  /**
 	   * The global number of the respective degree of freedom.
@@ -837,13 +890,13 @@ void fill_dirichlet_bc(EquationSystems<NewmarkSystem>& es,
 	   * at one end of the pipe-mesh.
 	   */
 	  Real p_value;
-	  if (t_time < .002 )
-	    p_value = sin(2*libmesh_pi*t_time/.002);
+	  if (current_time < .002 )
+	    p_value = sin(2*pi*current_time/.002);
 	  else
 	    p_value = .0;
 
-	  // if (r_dist < .2+coo_tol && t_time < .002 )
-	  //   p_value = sin(2*libmesh_pi*t_time/.002);
+	  // if (r_dist < .2+TOLERANCE && current_time < .002 )
+	  //   p_value = sin(2*pi*current_time/.002);
 	  // else
 	  //   p_value = .0;
 
@@ -851,6 +904,8 @@ void fill_dirichlet_bc(EquationSystems<NewmarkSystem>& es,
 	   * Now add the contributions to the matrix and the rhs.
 	   */
 	  rhs.add(dn, p_value*penalty);
+
+
 
 	  if (do_for_matrix)
 	    matrix.add(dn, dn, penalty);

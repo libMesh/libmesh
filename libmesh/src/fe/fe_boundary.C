@@ -1,4 +1,4 @@
-// $Id: fe_boundary.C,v 1.13 2003-02-24 14:35:48 benkirk Exp $
+// $Id: fe_boundary.C,v 1.14 2003-04-09 19:27:00 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -28,6 +28,7 @@
 #include "fe.h"
 #include "quadrature.h"
 #include "elem.h"
+#include "fe_macro.h"
 
 
 
@@ -351,12 +352,9 @@ void FEBase::compute_map(const std::vector<Real>& qw,
 
 
 //--------------------------------------------------------------
-// Explicit instantiations (doesn't make sense in 1D!)
-template class FE<2,HIERARCHIC>;
-template class FE<3,HIERARCHIC>;
+// Explicit instantiations (doesn't make sense in 1D!) using fe_macro.h's macro
 
-template class FE<2,LAGRANGE>;
-template class FE<3,LAGRANGE>;
+INSTANTIATE_FE(2);
 
-template class FE<2,MONOMIAL>;
-template class FE<3,MONOMIAL>;
+INSTANTIATE_FE(3);
+

@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.30 2003-04-09 14:04:26 spetersen Exp $
+// $Id: equation_systems.C,v 1.31 2003-04-09 19:26:57 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,6 +30,7 @@
 #include "frequency_system.h"
 #include "thin_system.h"
 #include "newmark_system.h"
+#include "equation_systems_macro.h"
 
 // Forward Declarations
 
@@ -588,11 +589,6 @@ std::string EquationSystems<T_sys>::get_info () const
 
 
 //--------------------------------------------------------------
-// Explicit instantiations
-template class EquationSystems<GeneralSystem>;
-template class EquationSystems<ThinSystem>;
-template class EquationSystems<NewmarkSystem>;
+// Explicit instantiations using the macro from equation_systems_macro.h
 
-#if defined(USE_COMPLEX_NUMBERS) 
-template class EquationSystems<FrequencySystem>;
-#endif
+INSTANTIATE_EQUATION_SYSTEMS;
