@@ -1,4 +1,4 @@
-// $Id: xdrIO.h,v 1.7 2004-09-30 17:17:49 benkirk Exp $
+// $Id: xdrIO.h,v 1.8 2004-09-30 20:10:31 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -25,6 +25,8 @@
 #include "libmesh_config.h"
 
 // C++ includes
+#include <stdio.h>  // for FILE
+#include <string.h> // for strncmp
 #include <iomanip>
 #include <vector>
 #include <string>
