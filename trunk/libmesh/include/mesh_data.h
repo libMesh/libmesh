@@ -1,4 +1,4 @@
-// $Id: mesh_data.h,v 1.18 2003-08-23 22:27:33 ddreyer Exp $
+// $Id: mesh_data.h,v 1.19 2003-09-01 18:12:36 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -342,7 +342,7 @@ public:
    * Set the \p MeshDataUnvHeader data structure that will be
    * used for output.
    */
-  void set_unv_header(MeshDataUnvHeader& unv_header);
+  void set_unv_header(MeshDataUnvHeader* unv_header);
 
 
 protected:
@@ -530,7 +530,7 @@ protected:
   bool _compatibility_mode;
 
   /**
-   * A pointer to the header information of universal files.
+   * The header information of universal files.
    */
   MeshDataUnvHeader* _unv_header;
 
@@ -763,7 +763,7 @@ inline
 Number MeshData::operator() (const Node* node, 
 			     const unsigned int i) const
 {
-  assert (_active);
+  assert (_active || _compatibility_mode);
   assert (_node_data_closed);
 
   std::map<const Node*, 
@@ -782,7 +782,7 @@ Number MeshData::operator() (const Node* node,
 inline
 bool MeshData::has_data (const Node* node) const
 {
-  assert (_active);
+  assert (_active || _compatibility_mode);
   assert (_node_data_closed);
 
   std::map<const Node*, 
@@ -796,7 +796,7 @@ bool MeshData::has_data (const Node* node) const
 inline
 const std::vector<Number>& MeshData::get_data (const Node* node) const
 {
-  assert (_active);
+  assert (_active || _compatibility_mode);
   assert (_node_data_closed);
 
   std::map<const Node*, 
@@ -819,7 +819,7 @@ inline
 Number MeshData::operator() (const Elem* elem, 
 			     const unsigned int i) const
 {
-  assert (_active);
+  assert (_active || _compatibility_mode);
   assert (_elem_data_closed);
 
   std::map<const Elem*, 
@@ -838,7 +838,7 @@ Number MeshData::operator() (const Elem* elem,
 inline
 bool MeshData::has_data (const Elem* elem) const
 {
-  assert (_active);
+  assert (_active || _compatibility_mode);
   assert (_elem_data_closed);
 
   std::map<const Elem*, 
@@ -852,7 +852,7 @@ bool MeshData::has_data (const Elem* elem) const
 inline
 const std::vector<Number>& MeshData::get_data (const Elem* elem) const
 {
-  assert (_active);
+  assert (_active || _compatibility_mode);
   assert (_elem_data_closed);
 
   std::map<const Elem*, 
@@ -949,14 +949,16 @@ void MeshData::add_foreign_elem_id (const Elem* elem,
 inline
 const MeshDataUnvHeader & MeshData::get_unv_header () const
 {
-  return *_unv_header;
+  assert (this->_unv_header != NULL);
+  return *this->_unv_header;
 }
 
 
 inline
-void MeshData::set_unv_header (MeshDataUnvHeader& unv_header)
+void MeshData::set_unv_header (MeshDataUnvHeader* unv_header)
 {
-  this->_unv_header = & unv_header;
+  assert (unv_header != NULL);
+  this->_unv_header = unv_header;
 }
 
 
