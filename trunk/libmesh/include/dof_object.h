@@ -1,4 +1,4 @@
-// $Id: dof_object.h,v 1.6 2003-02-28 23:37:42 benkirk Exp $
+// $Id: dof_object.h,v 1.7 2003-03-07 20:59:04 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -46,7 +46,7 @@
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.6 $
+ * \version $Revision: 1.7 $
  */
 
 class DofObject
@@ -368,6 +368,7 @@ void DofObject::clear_dofs ()
 	  for (unsigned int v=0; v<this->n_vars(s); v++)
 	    if (this->n_comp(s,v) != 0)
 	      {
+		here();
 		assert (_dof_ids[s][v] != NULL); delete [] _dof_ids[s][v]; _dof_ids[s][v] = NULL;
 	      }
 	  
