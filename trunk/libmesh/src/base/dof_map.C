@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.69 2005-02-28 16:35:24 roystgnr Exp $
+// $Id: dof_map.C,v 1.70 2005-03-01 01:32:00 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1014,20 +1014,35 @@ void DofMap::dof_indices (const Elem* const elem,
 	    if (extra_hanging_dofs && !elem->is_vertex(n))
 	      dof_offset = node->n_comp(sys_num,v) - nc;
 	    
-	    for (unsigned int i=dof_offset; i<nc+dof_offset; i++)
+	    // We should never have fewer dofs than necessary on a
+	    // node unless we're getting indices on a parent element,
+	    // and we should never need the indices on such a node
+	    if (dof_offset < 0)
 	      {
-		assert (node->dof_number(sys_num,v,i) !=
-			DofObject::invalid_id);
-		
-		di.push_back(node->dof_number(sys_num,v,i));
+		assert(!elem->active());
+		di.resize(di.size() + nc, DofObject::invalid_id);
 	      }
+	    else
+	      for (unsigned int i=dof_offset; i<nc+dof_offset; i++)
+	        {
+		  assert (node->dof_number(sys_num,v,i) !=
+			  DofObject::invalid_id);
+	
+		  di.push_back(node->dof_number(sys_num,v,i));
+	        }
 	  }
 	
 	// If there are any element-based DOF numbers, get them
-	if (elem->n_systems() > sys_num)
+	const unsigned int nc = FEInterface::n_dofs_per_elem(dim,
+							     fe_type,
+							     type);
+
+	// We should never have fewer dofs than necessary on an
+	// element unless we're getting indices on a parent element,
+	// and we should never need those indices
+	if (elem->n_systems() > sys_num &&
+	    nc == elem->n_comp(sys_num,v))
 	  {
-	    const unsigned int nc = elem->n_comp(sys_num,v);
-	  
 	    for (unsigned int i=0; i<nc; i++)
 	      {
 	        assert (elem->dof_number(sys_num,v,i) !=
@@ -1035,6 +1050,11 @@ void DofMap::dof_indices (const Elem* const elem,
 
 	        di.push_back(elem->dof_number(sys_num,v,i));
 	      }
+	  }
+	else
+	  {
+	    assert(!elem->active());
+	    di.resize(di.size() + nc, DofObject::invalid_id);
 	  }
       }
 
@@ -1112,28 +1132,50 @@ void DofMap::old_dof_indices (const Elem* const elem,
 	    if (extra_hanging_dofs && !elem->is_vertex(n))
 	      dof_offset = node->old_dof_object->n_comp(sys_num,v) - nc;
 	    
-	    for (unsigned int i=dof_offset; i<nc+dof_offset; i++)
+	    // We should never have fewer dofs than necessary on a
+	    // node unless we're getting indices on a parent element,
+	    // and we should never need the indices on such a node
+	    if (dof_offset < 0)
 	      {
-		assert (node->old_dof_object->dof_number(sys_num,v,i) !=
-			DofObject::invalid_id);
-		
-		di.push_back(node->old_dof_object->dof_number(sys_num,v,i));
+		assert(!elem->active());
+		di.resize(di.size() + nc, DofObject::invalid_id);
 	      }
+	    else
+	      for (unsigned int i=dof_offset; i<nc+dof_offset; i++)
+	        {
+		  assert (node->old_dof_object->dof_number(sys_num,v,i) !=
+			  DofObject::invalid_id);
+	
+		  di.push_back(node->old_dof_object->dof_number(sys_num,v,i));
+	        }
 	  }
 	
-	// Get the element-based DOF numbers
-	{
-	  assert (elem->old_dof_object != NULL);
-	  const unsigned int nc = elem->old_dof_object->n_comp(sys_num,v);
+	// If there are any element-based DOF numbers, get them
+	const unsigned int nc = FEInterface::n_dofs_per_elem(dim,
+							     fe_type,
+							     type);
+
+	// We should never have fewer dofs than necessary on an
+	// element unless we're getting indices on a parent element,
+	// and we should never need those indices
+	if (elem->old_dof_object->n_systems() > sys_num &&
+	    nc == elem->old_dof_object->n_comp(sys_num,v))
+	  {
+	    assert (elem->old_dof_object != NULL);
 	  
-	  for (unsigned int i=0; i<nc; i++)
-	    {
-	      assert (elem->old_dof_object->dof_number(sys_num,v,i) !=
-		      DofObject::invalid_id);
+	    for (unsigned int i=0; i<nc; i++)
+	      {
+	        assert (elem->old_dof_object->dof_number(sys_num,v,i) !=
+		        DofObject::invalid_id);
 	      
-	      di.push_back(elem->old_dof_object->dof_number(sys_num,v,i));
-	    }
-	}
+	        di.push_back(elem->old_dof_object->dof_number(sys_num,v,i));
+	      }
+	  }
+	else
+	  {
+	    assert(!elem->active());
+	    di.resize(di.size() + nc, DofObject::invalid_id);
+	  }
       }
 
 #ifdef DEBUG
