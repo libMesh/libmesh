@@ -1,4 +1,4 @@
-// $Id: frequency_system.h,v 1.13 2003-07-10 12:10:04 ddreyer Exp $
+// $Id: frequency_system.h,v 1.14 2003-08-07 08:55:29 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -139,26 +139,38 @@ public:
    * respectively.  Calls to this of the form
    * \p set_frequencies_by_steps(30.) lets this object
    * solve the system for only this single frequency.
+   * By default, the solution for each frequency is copied
+   * to a separate \p DistributedVector.  This feature
+   * can be disabled with \p allocate_solution_duplicates=false.
    */
   void set_frequencies_by_steps (const Real base_freq,
 				 const Real freq_step=0.,
-				 const unsigned int n_freq=1);
+				 const unsigned int n_freq=1,
+				 const bool allocate_solution_duplicates=true);
 
   /**
    * Set the frequency range for which the system should 
    * be solved.  \p n_freq frequencies are equally 
    * distributed in the interval 
    * \f$ [ \texttt{min\_freq, max\_freq} ] \f$ .
+   * By default, the solution for each frequency is copied
+   * to a separate \p DistributedVector.  This feature
+   * can be disabled with \p allocate_solution_duplicates=false.
    */
   void set_frequencies_by_range (const Real min_freq,
 				 const Real max_freq,
-				 const unsigned int n_freq);
+				 const unsigned int n_freq,
+				 const bool allocate_solution_duplicates=true);
 
   /**
    * Set the frequency range by simply copying the values
    * from \p frequencies.
+   * By default, the solution for each frequency is copied
+   * to a separate \p DistributedVector.  This feature
+   * can be disabled with \p allocate_solution_duplicates=false.
    */
-  void set_frequencies (const std::vector<Real>& frequencies);
+  void set_frequencies (const std::vector<Real>& frequencies,
+			const bool allocate_solution_duplicates=true);
 
   /**
    * @returns the number of frequencies to solve
@@ -218,6 +230,15 @@ protected:
    * creating/adding a \p FrequencySystem.
    */
   bool _finished_set_frequencies;
+
+  /**
+   * when the solution for each frequency should be 
+   * stored in an additional vector, then this \p bool
+   * is \p true, otherwise \p false.  
+   * \p _keep_solution_duplicates is implicitly set
+   * through the \p set_frequencies methods.
+   */
+  bool _keep_solution_duplicates;
 
   /**
    * true when we have finished the \p init() phase.
