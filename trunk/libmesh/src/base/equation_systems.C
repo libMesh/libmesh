@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.44 2003-12-22 13:40:56 benkirk Exp $
+// $Id: equation_systems.C,v 1.45 2003-12-24 00:30:43 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -33,10 +33,6 @@
 // Include the systems before this one to avoid
 // overlapping forward declarations.
 #include "equation_systems.h"
-
-#ifdef HAVE_MPI
-# include <mpi.h>
-#endif
 
 // Forward Declarations
 
@@ -432,10 +428,11 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
   // (number_of_nodes)*(number_of_variables) entries.
   soln.resize(nn*nv);
 
-  std::vector<Number>        soln_local (soln.size());
-  std::vector<Number>        sys_soln;
-  std::vector<unsigned char> node_conn(nn);
+  std::vector<Number>             soln_local (soln.size());
+  std::vector<Number>             sys_soln;
+  std::vector<unsigned short int> node_conn(nn);
 
+  
   // Zero out the soln and soln_local vectors
   std::fill (soln.begin(),       soln.end(),       libMesh::zero);
   std::fill (soln_local.begin(), soln_local.end(), libMesh::zero);
@@ -445,7 +442,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
   // compute the average value at each node.  This is particularly
   // useful for plotting discontinuous data.
   {
-    std::vector<unsigned char> node_conn_local (node_conn.size());
+    std::vector<unsigned short int> node_conn_local (node_conn.size());
     
     const_active_local_elem_iterator       it (_mesh.elements_begin());
     const const_active_local_elem_iterator end(_mesh.elements_end());
@@ -457,8 +454,13 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
 #ifdef HAVE_MPI
     // Gather the distributed node_conn arrays in the case of
     // multiple processors
+    //
+    // (Note that we use an unsigned short int here even though an
+    // unsigned char would be more that sufficient.  The MPI 1.1
+    // standard does not require that MPI_SUM, MPI_PROD etc... be
+    // implemented for char data types. 12/23/2003 - BSK)  
     MPI_Allreduce (&node_conn_local[0], &node_conn[0], node_conn.size(),
-		   MPI_UNSIGNED_CHAR, MPI_SUM, MPI_COMM_WORLD);
+		   MPI_UNSIGNED_SHORT, MPI_SUM, MPI_COMM_WORLD);
     
 #else
     // Without MPI the node_conn_local and the node_conn arrays
@@ -604,7 +606,7 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number>& 
   if (_mesh.processor_id() == 0)
     soln.resize(tw*nv);
 
-  std::vector<Number>        sys_soln; 
+  std::vector<Number> sys_soln; 
 
   
   unsigned int var_num=0;
