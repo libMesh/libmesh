@@ -1,4 +1,4 @@
-// $Id: ex6.C,v 1.21 2003-04-03 14:17:18 ddreyer Exp $
+// $Id: ex6.C,v 1.22 2003-05-12 15:51:08 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -18,10 +18,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-//#define _p(arg)  std::cout << "Here: " << #arg << std::endl
-#define _p(arg) 
-
-
 
 /**
  * C++ include files that we need
@@ -35,7 +31,7 @@
  */
 #include "libmesh.h"
 #include "mesh.h"
-#include "general_system.h"
+#include "thin_system.h"
 #include "equation_systems.h"
 
 /**
@@ -72,14 +68,17 @@
  *
  * \section Introduction
  *
- * WARNING! This example is under development.
- * Better do NOT use it!
- *
  * This is the sixth example program.  It builds on
  * the previous examples, and introduces the Infinite
  * Element class.  Note that the library must be compiled
  * with Infinite Elements enabled.  Otherwise, this
  * example will abort.
+ * This example intends to demonstrate the general use
+ * of the infinite elements implemented in libMesh.
+ * The matrices are assembled according to the wave equation.
+ * However, for practical applications a time integration
+ * scheme (as introduced in a subsequent example) should be
+ * included.
  */
 
 
@@ -88,7 +87,7 @@
  * Function prototype.  This is similar to the Poisson
  * assemble function of example 4. 
  */
-void assemble_wave(EquationSystems<GeneralSystem>& es,
+void assemble_wave(EquationSystems<ThinSystem>& es,
 		   const std::string& system_name);
 
 
@@ -158,16 +157,14 @@ int main (int argc, char** argv)
     Mesh mesh (dim);
 
     /**
-     * Use the internal mesh generator to create 8 elements
-     * on the square [-1,1]^D, of type \p Quad9 or \p Hex27.
+     * Use the internal mesh generator to create elements
+     * on the square [-1,1]^3, of type Hex8.
      */
-    mesh.build_cube (2, 2, 2,
-//    mesh.build_cube (1, 1, 1,
+    mesh.build_cube (4, 4, 4,
 		     -1., 1.,
 		     -1., 1.,
 		     -1., 1.,
-// 		     (dim == 2) ? QUAD8 : HEX27);
-		     (dim == 2) ? QUAD4 : HEX8); //HEX20); //HEX27);
+		     HEX8); //HEX20); //HEX27);
 
     /**
      * Print information about the mesh to the screen.
@@ -196,15 +193,14 @@ int main (int argc, char** argv)
      * After building finite elements, we have to let 
      * the elements find their neighbors.
      */
-//TODO:[DD] Does this work with infinite elements?
     mesh.find_neighbors();
+
     
-
-
     /**
-     * Create an equation systems object.
+     * Create an equation systems object, where ThinSystem
+     * offers the essential functions for solving a system.
      */
-    EquationSystems<GeneralSystem> equation_systems (mesh);
+    EquationSystems<ThinSystem> equation_systems (mesh);
 
     /**
      * Declare the system and its variables.
@@ -223,6 +219,7 @@ int main (int argc, char** argv)
        * approximation.
        */
       FEType fe_type(FIRST);
+      // FEType fe_type(FIRST, LAGRANGE, THIRD, LAGRANGE);
 
       /**
        * Add the variable "p" to "Wave".  Note that there exist
@@ -238,9 +235,15 @@ int main (int argc, char** argv)
        * function.
        */
       equation_systems("Wave").attach_assemble_function (assemble_wave);
-      
 
-      _p(kurz_vor_eqnsys_init);
+      /**
+       * Set the speed of sound and fluid density
+       * as \p EquationSystems parameter,
+       * so that \p assemble_wave() can access it.
+       */
+      equation_systems.set_parameter("speed")          = 1.;
+      equation_systems.set_parameter("fluid density")  = 1.;
+      
       /**
        * Initialize the data structures for the equation system.
        */
@@ -253,14 +256,12 @@ int main (int argc, char** argv)
     }
 
 
-
     /**
      * Solve the system "Wave".
      */
     equation_systems("Wave").solve();
 
 
-    _p(Write results);
     /**
      * After solving the system write the solution
      * to a GMV-formatted plot file.
@@ -281,10 +282,9 @@ int main (int argc, char** argv)
 
 
 
-void assemble_wave(EquationSystems<GeneralSystem>& es,
+void assemble_wave(EquationSystems<ThinSystem>& es,
 		   const std::string& system_name)
 {
-  _p(starting assemble_wave);
 
   /**
    * It is a good idea to make sure we are assembling
@@ -302,9 +302,15 @@ void assemble_wave(EquationSystems<GeneralSystem>& es,
   const Mesh& mesh = es.get_mesh();
 
   /**
-   * The dimension that we are running
+   * The dimension that we are running.
    */
   const unsigned int dim = mesh.mesh_dimension();
+
+  /**
+   * Copy the speed of sound
+   * to a local variable.
+   */
+  const Real speed = es.parameter("speed");
 
   /**
    * Get a constant reference to the Finite Element type
@@ -336,7 +342,6 @@ void assemble_wave(EquationSystems<GeneralSystem>& es,
    * Tell the finite element object to use our quadrature rule.
    */
   fe->attach_quadrature_rule (&qrule);
-  _p(fe->attach just finished.);
 
 
   /**
@@ -347,10 +352,6 @@ void assemble_wave(EquationSystems<GeneralSystem>& es,
    * need not worry about this.
    */
   inf_fe->attach_quadrature_rule (&qrule);
-  _p(inf_fe->attach just finished.);
-
-
-
 
 
   /**
@@ -385,9 +386,6 @@ void assemble_wave(EquationSystems<GeneralSystem>& es,
   std::vector<unsigned int> dof_indices;
 
 
-
-  _p(Start element loop);
-  
   /**
    *--------------------------------------------------------------------
    * Now we will loop over all the elements in the mesh.
@@ -447,7 +445,6 @@ void assemble_wave(EquationSystems<GeneralSystem>& es,
 	   * still in charge of memory management.
 	   */
 	  cfe = inf_fe.get(); 
-	  _p(InfFE);
 	}
       else
         {
@@ -455,15 +452,13 @@ void assemble_wave(EquationSystems<GeneralSystem>& es,
 	   * This is a conventional finite element.  Let \p fe handle it.
 	   */
   	  cfe = fe.get();
-	  _p(FE);
 
 
 	  /**
 	   *----------------------------------------------------------------
-	   * Boundary conditions.  Currently, only  natural boundary
-	   * conditions on faces of finite elements are supported (this
-	   * is likely to change in the future!).  Therefore, we do this 
-	   * only for finite elements. 
+	   * Boundary conditions.
+	   * Here we just zero the rhs-vector. For consideration of
+	   * natural boundary conditions we refer to the prvious examples.
 	   */
 	    {
 	      /**
@@ -471,77 +466,7 @@ void assemble_wave(EquationSystems<GeneralSystem>& es,
 	       */
 	      Fe.resize (dof_indices.size());
 
-
-	      /**
-	       * See previous example(s) for details
-	       */
-	      for (unsigned int side=0; side<elem->n_sides(); side++)
-		  if (elem->neighbor(side) == NULL)
-		    {
-		      AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
-	      
-		      QGauss qface (dim, SECOND);
-	      
-		      fe_face->attach_quadrature_rule (&qface);
-	      
-		      /**
-		       * The value of the shape functions at the quadrature
-		       * points.
-		       */
-		      const std::vector<std::vector<Real> >&  phi_face = fe_face->get_phi();
-	      
-		      /**
-		       * The Jacobian * Quadrature Weight at the quadrature
-		       * points on the face.
-		       */
-		      const std::vector<Real>& JxW_face = fe_face->get_JxW();
-	      
-		      /**
-		       * The XYZ locations (in physical space) of the
-		       * quadrature points on the face.  This is where
-		       * we will interpolate the boundary value function.
-		       */
-		      //const std::vector<Point >& qface_point = fe_face->get_xyz();
-	      
-		      /**
-		       * Compute the shape function values on the element
-		       * face.
-		       */
-		      fe_face->reinit(elem, side);
-
-	      
-		      /**
-		       * Loop over the face quagrature points for integration.
-		       */
-		      for (unsigned int qp=0; qp<fe_face->n_quadrature_points(); qp++)
-		        {
-			  /**
-			   * The location on the boundary of the current
-			   * face quadrature point.
-			   */
-			  //const Real xf = qface_point[qp](0);
-			  //const Real yf = qface_point[qp](1);
-			  //const Real zf = qface_point[qp](2);
-		  
-			  /**
-			   * The boundary value.
-			   */
-			  const Real value = 1.;
-		  		  
-			  /**
-			   * Right-hand-side contribution.
-			   */
-			  for (unsigned int i=0; i<fe_face->n_shape_functions(); i++)
-			    {
-			      Fe(i) += JxW_face[qp]*value*phi_face[i][qp];
-			    }
-		  
-			} // end face quadrature point loop	  
-
-
-		      es("Wave").rhs->add_vector    (Fe, dof_indices);
-
-		    } // end if (elem->neighbor(side) == NULL)
+	      es("Wave").rhs->add_vector    (Fe, dof_indices);
 
 	    } // end boundary condition section	     
 
@@ -679,6 +604,7 @@ void assemble_wave(EquationSystems<GeneralSystem>& es,
 			* phi[i][qp] * phi[j][qp] * weight[qp] /*      * Real *  Real  * Real    = Real */
 		    ) * JxW[qp];                               /*    ) * Real                    = Real */
 
+
 	      } // end of the matrix summation loop
 
 	} // end of quadrature point loop
@@ -690,19 +616,51 @@ void assemble_wave(EquationSystems<GeneralSystem>& es,
        * Collect them in Ke, and then add them to the global matrix.  
        * The \p PetscMatrix::add_matrix() member does this for us.
        */
-      //Ke.print();
+      Ke.add(1./speed        , Ce);
+      Ke.add(1./(speed*speed), Me);
 
-// Doesn't make sense!
-      Ke.add(1., Ce);
-      Ke.add(1., Me);
       es("Wave").matrix->add_matrix (Ke, dof_indices);
 
       
     } // end of element loop
 
-  _p(Finished element loop);
+  /**
+   *----------------------------------------------------------------
+   * Note that we have not applied any boundary conditions so far.
+   * Here we apply a unit load at the node located at (0,0,0).
+   */
+  {
+    /**
+     * Number of nodes in the mesh.
+     */
+    unsigned int n_nodes = mesh.n_nodes();
+    
+    for (unsigned int n_cnt=0; n_cnt<n_nodes; n_cnt++)
+      {
+	/**
+	 * Get a reference to the current node.
+	 */
+	const Node& curr_node = mesh.node(n_cnt);
 
-  
+	/**
+	 * Check the location of the current node.
+	 */
+	if (fabs(curr_node(0)) < TOLERANCE &&
+	    fabs(curr_node(1)) < TOLERANCE &&
+	    fabs(curr_node(2)) < TOLERANCE)
+	  {
+	    /**
+	     * The global number of the respective degree of freedom.
+	     */ 
+	    unsigned int dn = curr_node.dof_number(0,0,0);
+
+	    es("Wave").rhs->add (dn, 1.);
+	  }
+
+      }
+
+  }
+
 #else
 
   /* dummy assert */
