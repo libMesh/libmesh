@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.63 2004-08-17 03:03:50 benkirk Exp $
+// $Id: dof_map.C,v 1.64 2004-09-30 19:40:08 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -479,32 +479,32 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
 			row.insert (pos.first, jg);
 		    }
 
-		  // Now add dofs from neighboring elements
-		  for (unsigned int s=0; s<elem->n_sides(); s++)
-		    if (elem->neighbor(s) != NULL)
-		      {
-			const Elem* const neighbor = elem->neighbor(s);
+// 		  // Now add dofs from neighboring elements
+// 		  for (unsigned int s=0; s<elem->n_sides(); s++)
+// 		    if (elem->neighbor(s) != NULL)
+// 		      {
+// 			const Elem* const neighbor = elem->neighbor(s);
 
-			this->dof_indices (neighbor, neighbor_dofs);
-			this->find_connected_dofs (neighbor_dofs);
+// 			this->dof_indices (neighbor, neighbor_dofs);
+// 			this->find_connected_dofs (neighbor_dofs);
 
-			const unsigned int n_dofs_on_neighbor = neighbor_dofs.size();
+// 			const unsigned int n_dofs_on_neighbor = neighbor_dofs.size();
 
-			for (unsigned int j=0; j<n_dofs_on_neighbor; j++)
-			  {
-			    const unsigned int jg = neighbor_dofs[j];
+// 			for (unsigned int j=0; j<n_dofs_on_neighbor; j++)
+// 			  {
+// 			    const unsigned int jg = neighbor_dofs[j];
 			    
-			    // See if jg is in the sorted range
-			    std::pair<std::vector<unsigned int>::iterator,
-			              std::vector<unsigned int>::iterator>
-			      pos = std::equal_range (row.begin(), row.end(), jg);
+// 			    // See if jg is in the sorted range
+// 			    std::pair<std::vector<unsigned int>::iterator,
+// 			              std::vector<unsigned int>::iterator>
+// 			      pos = std::equal_range (row.begin(), row.end(), jg);
 			    
-			    // Insert jg if it wasn't found
-			    if (pos.first == pos.second)
-			      row.insert (pos.first, jg);
-			  }
+// 			    // Insert jg if it wasn't found
+// 			    if (pos.first == pos.second)
+// 			      row.insert (pos.first, jg);
+// 			  }
 			
-		      }
+// 		      }
 		}
 	    }
 	}      
