@@ -1,4 +1,4 @@
-// $Id: mesh_base_modification.C,v 1.2 2003-08-08 09:13:24 ddreyer Exp $
+// $Id: mesh_base_modification.C,v 1.3 2003-08-15 19:14:13 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -20,6 +20,7 @@
 
 
 // C++ includes
+#include <algorithm>
 #include <map>
 
 
