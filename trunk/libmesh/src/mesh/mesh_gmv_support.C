@@ -1,4 +1,4 @@
-// $Id: mesh_gmv_support.C,v 1.21 2003-06-03 16:47:38 benkirk Exp $
+// $Id: mesh_gmv_support.C,v 1.22 2003-06-07 14:36:17 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -240,13 +240,14 @@ void MeshBase::write_gmv(std::ostream& out,
 #ifndef  ENABLE_INFINITE_ELEMENTS
 		else if ((*it)->type() == PRISM6)
 #else
-		else if (((*it)->type() == PRISM6) ||
-			 ((*it)->type() == INFPRISM6))
+		else if (((*it)->type() == PRISM6)     ||
+			 ((*it)->type() == INFPRISM6)  ||
+			 ((*it)->type() == INFPRISM12))
 #endif
 		  {
 		    /**
-		     * Note that here PRISM6 is treted as
-		     * a degenerated phex8.
+		     * Note that the prisms are treated as
+		     * degenerated phex8's.
 		     */
 		    out << "phex8 8" << std::endl;
 		    std::vector<unsigned int> conn = (*it)->tecplot_connectivity(se);
