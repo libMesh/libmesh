@@ -1,4 +1,4 @@
-// $Id: fe_base.C,v 1.13 2003-04-18 15:46:22 spetersen Exp $
+// $Id: fe_base.C,v 1.14 2003-04-18 17:10:38 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -657,6 +657,7 @@ bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real e
 	return false;
       }
 
+#ifdef ENABLE_INFINITE_ELEMENTS
     case INFHEX8:
       {      
 	// The reference infhex8 is a [-1,1]^3.
@@ -674,6 +675,7 @@ bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real e
 
 	return false;
       }
+#endif
 
     default:
       std::cerr << "ERROR: Unknown element type " << t << std::endl;
