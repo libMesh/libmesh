@@ -1,4 +1,4 @@
-// $Id: boundary_info.h,v 1.1 2003-11-05 22:26:44 benkirk Exp $
+// $Id: boundary_info.h,v 1.2 2003-12-23 22:57:51 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -50,12 +50,18 @@ class BoundaryMesh;
 // BoundaryInfo class definition
 class BoundaryInfo
 {
- public:
-
+protected:
+  friend class MeshBase;
+  
   /**
    * Constructor.  Takes a reference to the mesh.
+   * The BoundaryInfo class is only used internally
+   * by the MeshBase class.  A user should never instantiate
+   * this class.  Therefore the constructor is protected.
    */ 
   BoundaryInfo (const MeshBase& m);
+
+public:
 
   /**
    * Destructor.  Not much to do.
