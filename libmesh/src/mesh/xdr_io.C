@@ -1,4 +1,4 @@
-// $Id: xdr_io.C,v 1.2 2004-11-12 22:36:09 jwpeterson Exp $
+// $Id: xdr_io.C,v 1.3 2004-11-14 03:54:20 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -1257,7 +1257,6 @@ int XdrMGF::dataBlk(REAL* array, int numvar, int size)
 
 // ------------------------------------------------------------
 // XdrMGF::Originator members
-inline
 bool XdrMGF::Originator::operator == (const XdrMGF::Originator &rhs) const
 {
   bool b=false;
