@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic.C,v 1.10 2003-02-20 04:59:58 benkirk Exp $
+// $Id: fe_hierarchic.C,v 1.11 2003-04-02 14:55:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -358,6 +358,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 
 	    // The 3D tensor-product hierarchics defined on a
 	    // twenty-seven noded hexahedral.
+	  case HEX8:
+	  case HEX20:
 	  case HEX27:
 	    {
 	      switch (n)
@@ -983,6 +985,8 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 	    
 	    // The 3D tensor-product hierarchics defined on a
 	    // twenty-seven noded hexahedral.
+	  case HEX8:
+	  case HEX20:
 	  case HEX27:
 	    return 0;
 	    
@@ -1203,6 +1207,22 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
     default:
       return 0;
     }
+}
+
+
+
+template <unsigned int Dim, FEFamily T>
+void FE<Dim,T>::compute_constraints (std::map<unsigned int,
+				            std::map<unsigned int,
+				                     float> > &,
+				     const unsigned int,
+				     const unsigned int,
+				     const FEType&,
+				     const Elem*)
+{
+  std::cerr << "ERROR:  Not yet implemented for Hierarchics!"
+	    << std::endl;
+  error();
 }
 
 

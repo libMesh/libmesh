@@ -1,4 +1,4 @@
-// $Id: fe_lagrange.C,v 1.11 2003-02-25 18:34:46 benkirk Exp $
+// $Id: fe_lagrange.C,v 1.12 2003-04-02 14:55:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -21,6 +21,7 @@
 
 // Local includes
 #include "fe.h"
+#include "fe_interface.h"
 #include "elem.h"
 
 
@@ -539,6 +540,98 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType,
   // (just at the nodes)
   
   return 0;
+}
+
+
+
+template <unsigned int Dim, FEFamily T>
+void FE<Dim,T>::compute_constraints (std::map<unsigned int,
+				            std::map<unsigned int,
+				                     float> > & constraints,
+				     const unsigned int system_number,
+				     const unsigned int variable_number,
+				     const FEType& fe_type,
+				     const Elem* elem)
+{
+  // Only constrain elements in 2,3D.
+  if (Dim == 1)
+    return;
+
+  	      
+  // Get pointers to the elements of interest and its parent.
+  assert (elem != NULL);
+  const Elem* parent = elem->parent();
+
+  // This can't happen...  Only level-0 elements have NULL
+  // parents, and no level-0 elements can be at a higher
+  // level than their neighbors!
+  assert (parent != NULL);
+	      
+  // Look at the element faces.  Check to see if we need to 
+  // build constraints.
+  for (unsigned int s=0; s<elem->n_sides(); s++)
+    if (elem->neighbor(s) != NULL)
+      if (elem->neighbor(s)->level() < elem->level()) // constrain dofs shared between
+	{                                                     // this element and ones coarser
+	                                                      // than this element.
+	  const AutoPtr<Elem> my_side     (elem->build_side(s));
+	  const AutoPtr<Elem> parent_side (parent->build_side(s));
+  
+	  for (unsigned int my_dof=0;
+	       my_dof<FEInterface::n_dofs(Dim-1, fe_type, my_side->type());
+	       my_dof++)
+	    {
+	      assert (my_dof < my_side->n_nodes());
+	      
+	      // My global node and dof indices.
+	      const Node* my_node          = my_side->get_node(my_dof);
+	      const unsigned int my_dof_g  = my_node->dof_number(system_number,
+								 variable_number,
+								 0);
+	      
+	      // The support point of the DOF
+	      const Point& support_point = my_side->point(my_dof);
+	      
+	      // Figure out where my node lies on their reference element.
+	      const Point mapped_point = FEInterface::inverse_map(Dim-1, fe_type,
+								  parent_side.get(),
+								  support_point);
+	      
+	      // Compute the parent's side shape function values.
+	      for (unsigned int their_dof=0;
+		   their_dof<FEInterface::n_dofs(Dim-1, fe_type, parent_side->type());
+		   their_dof++)
+		{
+		  assert (their_dof < parent_side->n_nodes());
+		  
+		  // Their global node and dof indices.
+		  const Node* their_node          = parent_side->get_node(their_dof);
+		  const unsigned int their_dof_g  = their_node->dof_number(system_number,
+									   variable_number,
+									   0);
+		  
+		  const Real their_dof_value = FEInterface::shape(Dim-1,
+								  fe_type,
+								  parent_side->type(),
+								  their_dof,
+								  mapped_point);
+		  
+		  // Only add non-zero and non-identity values
+		  // for Lagrange basis functions.
+		  if ((fabs(their_dof_value) > 1.e-5) &&
+		      (fabs(their_dof_value) < .999)) 
+		    {
+		      // A reference to the constraint row.
+		      std::map<unsigned int, float>& constraint_row = constraints[my_dof_g];
+		      
+		      const std::pair<unsigned int, float> p (their_dof_g,
+							      static_cast<float>(their_dof_value));
+		      
+		      constraint_row.insert(p);
+		    }
+		}		      
+	    }
+	}
 }
 
 

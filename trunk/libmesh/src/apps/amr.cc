@@ -49,6 +49,7 @@ int main (int argc, char** argv)
     EquationSystems<GeneralSystem> es(mesh);
 
     es.add_system("primary");
+
     es("primary").add_variable("U", FIRST);
     es("primary").add_variable("V", FIRST);
 

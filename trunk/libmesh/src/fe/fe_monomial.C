@@ -1,4 +1,4 @@
-// $Id: fe_monomial.C,v 1.11 2003-02-25 18:34:49 benkirk Exp $
+// $Id: fe_monomial.C,v 1.12 2003-04-02 14:55:13 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -493,6 +493,21 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
     default:
       return 0;
     }
+}
+
+
+
+template <unsigned int Dim, FEFamily T>
+void FE<Dim,T>::compute_constraints (std::map<unsigned int,
+				            std::map<unsigned int,
+				                     float> > &,
+				     const unsigned int,
+				     const unsigned int,
+				     const FEType&,
+				     const Elem*)
+{
+  // Monomials are discontinuous...  No constraints.
+  return;
 }
 
 

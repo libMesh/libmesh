@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.16 2003-04-01 14:19:48 ddreyer Exp $
+// $Id: fe.C,v 1.17 2003-04-02 14:55:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -296,6 +296,7 @@ void FE<Dim,T>::init_base_shape_functions(const std::vector<Point>& qp,
 }
 
 #endif
+    
 
 
 //--------------------------------------------------------------

@@ -1,4 +1,4 @@
-// $Id: fe_interface.h,v 1.14 2003-04-01 14:19:47 ddreyer Exp $
+// $Id: fe_interface.h,v 1.15 2003-04-02 14:55:05 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -163,6 +163,18 @@ public:
 		    const Point& p);
 
 
+  /**
+   * Computes the constraint matrix contributions (for
+   * non-conforming adapted meshes) corresponding to 
+   * variable number \p var_number.
+   */
+  static void compute_constraints (std::map<unsigned int,
+				            std::map<unsigned int,
+				                     float> > & constraints,
+				   const unsigned int system_number,
+				   const unsigned int variable_number,
+				   const FEType& fe_t,
+				   const Elem* elem);
 private:
 
 

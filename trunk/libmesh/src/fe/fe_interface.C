@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.12 2003-02-20 04:59:58 benkirk Exp $
+// $Id: fe_interface.C,v 1.13 2003-04-02 14:55:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -773,5 +773,63 @@ Real FEInterface::shape(const unsigned int dim,
   error();
   return 0.;
 }
+
+
+
+void FEInterface::compute_constraints (std::map<unsigned int,
+				            std::map<unsigned int,
+				                     float> > & constraints,
+				       const unsigned int system_number,
+				       const unsigned int variable_number,
+				       const FEType& fe_t,
+				       const Elem* elem)
+{
+  assert (elem != NULL);
+  
+  switch (elem->dim())
+    {
+    case 1:
+      // No constraints in 1D.
+      return;
+
+      
+    case 2:
+      {
+	switch (fe_t.family)
+	  {
+	  case LAGRANGE:
+	    return FE<2,LAGRANGE>::compute_constraints (constraints,
+							system_number,
+							variable_number,
+							fe_t,
+							elem);      
+	  default:
+	    error();
+	  }
+      }
+
+
+    case 3:
+      {
+	switch (fe_t.family)
+	  {
+	  case LAGRANGE:
+	    return FE<3,LAGRANGE>::compute_constraints (constraints,
+							system_number,
+							variable_number,
+							fe_t,
+							elem);      
+	  default:
+	    error();
+	  }
+      }
+
+      
+    default:
+      error();
+    }
+}
+  
+
 
 
