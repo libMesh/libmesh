@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.5 2003-01-24 17:24:40 jwpeterson Exp $
+// $Id: dof_map.C,v 1.6 2003-02-03 02:21:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -640,9 +640,9 @@ void DofMap::create_dof_constraints()
     if (_mesh.elem(e)->active())
       for (unsigned int s=0; s<_mesh.elem(e)->n_sides(); s++)
 	if (_mesh.elem(e)->neighbor(s) != NULL)
-	  if (_mesh.elem(e)->neighbor(s)->level() < _mesh.elem(e)->level())  // constrain dofs shared between
-	    {                                                              // this element and ones coarser
-	                                                                   // than this element.
+	  if (_mesh.elem(e)->neighbor(s)->level() < _mesh.elem(e)->level()) // constrain dofs shared between
+	    {                                                               // this element and ones coarser
+	                                                                    // than this element.
 	      // Get pointers to the two elements of interest.  
 	      const AutoPtr<Elem> my_side(_mesh.elem(e)->build_side(s));
 	      
@@ -652,7 +652,7 @@ void DofMap::create_dof_constraints()
 	      for (unsigned int component=0; component<n_components();
 		   ++component)
 		{
-		  const FEType fe_type = component_type(component);
+		  const FEType& fe_type = component_type(component);
 	      
 		  for (unsigned int my_dof=0;
 		       my_dof<FEInterface::n_dofs(_dim-1, fe_type, my_side->type());
