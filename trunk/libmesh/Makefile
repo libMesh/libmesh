@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.38 2004-05-11 21:18:31 benkirk Exp $
+# $Id: Makefile,v 1.39 2004-09-27 14:54:24 jwpeterson Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -80,6 +80,14 @@ $(mesh_library_dir)/libmesh.so: $(objects)
 #
 examples: $(mesh_library) $(examplesrcfiles)
 	@$(MAKE) -C examples
+
+#
+# Only link the examples.  Useful on machines where you
+# do not have permission to run programs outside of a queue.
+#
+link_examples: $(mesh_library)
+	@$(MAKE) -C examples link
+
 
 #
 # Run the examples
