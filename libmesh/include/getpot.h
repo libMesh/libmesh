@@ -1,4 +1,4 @@
-// $Id: getpot.h,v 1.1 2003-03-23 02:47:51 benkirk Exp $
+// $Id: getpot.h,v 1.2 2003-03-25 21:06:59 benkirk Exp $
 //
 // (with patches from Michael Anderson for more general variable types)
 
@@ -37,13 +37,14 @@
 extern "C" {
 #include <ctype.h> 
 #include <stdio.h>
-#include <math.h>
 
 #ifdef GETPOT_ALLOW_VARGS
 #include <stdarg.h>
 #endif
 
 }
+
+#include <math.h>
 
 #include <iostream>
 #include <string>
@@ -670,7 +671,7 @@ GetPot::__convert_to_type(const std::string& String, bool Default) const
   //std::transform(newstring.begin(), newstring.end(), newstring.begin(), std::toupper);
   for (unsigned int i=0; i<newstring.length(); ++i)
   {
-    newstring[i]=std::toupper(newstring[i]);
+    newstring[i]=toupper(newstring[i]);
   }
   
   if (newstring.find("TRUE")!=std::string::npos)  return true;
