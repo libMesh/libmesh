@@ -1,4 +1,4 @@
-// $Id: error_estimator.C,v 1.13 2004-01-03 15:37:43 benkirk Exp $
+// $Id: error_estimator.C,v 1.14 2004-03-24 03:48:52 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -35,7 +35,6 @@
 #include "equation_systems.h"
 #include "steady_system.h"
 #include "dof_map.h"
-#include "mesh.h"
 #include "fe.h"
 #include "fe_interface.h"
 #include "quadrature_gauss.h"

@@ -1,4 +1,4 @@
-// $Id: system.C,v 1.4 2004-03-21 03:19:26 benkirk Exp $
+// $Id: system.C,v 1.5 2004-03-24 03:48:52 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -29,7 +29,6 @@
 #include "system.h"
 #include "equation_systems.h"
 #include "libmesh.h"
-#include "mesh.h"
 #include "sparse_matrix.h"
 #include "libmesh_logging.h"
 #include "utility.h"

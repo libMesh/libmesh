@@ -2148,6 +2148,56 @@ src/mesh/gmv_io.$(obj-suffix):\
     include/utils/data_map.h\
     include/utils/data_object.h\
     include/utils/perf_log.h
+src/mesh/matlab_io.$(obj-suffix):\
+    src/mesh/matlab_io.C\
+    include/base/auto_ptr.h\
+    include/base/dof_map.h\
+    include/base/dof_object.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/node.h\
+    include/base/predicated_iterator.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
+    include/enums/enum_order.h\
+    include/enums/enum_solver_package.h\
+    include/enums/enum_xdr_mode.h\
+    include/fe/fe_type.h\
+    include/geom/elem.h\
+    include/geom/face.h\
+    include/geom/face_tri.h\
+    include/geom/face_tri3.h\
+    include/geom/point.h\
+    include/geom/sphere.h\
+    include/geom/surface.h\
+    include/mesh/boundary_info.h\
+    include/mesh/elem_iterators.h\
+    include/mesh/matlab_io.h\
+    include/mesh/mesh.h\
+    include/mesh/mesh_base.h\
+    include/mesh/mesh_data.h\
+    include/mesh/mesh_io.h\
+    include/mesh/node_iterators.h\
+    include/numerics/coupling_matrix.h\
+    include/numerics/numeric_vector.h\
+    include/numerics/type_vector.h\
+    include/solvers/equation_systems.h\
+    include/solvers/explicit_system.h\
+    include/solvers/frequency_system.h\
+    include/solvers/implicit_system.h\
+    include/solvers/newmark_system.h\
+    include/solvers/steady_system.h\
+    include/solvers/system.h\
+    include/solvers/transient_system.h\
+    include/utils/data_map.h\
+    include/utils/data_object.h\
+    include/utils/perf_log.h
 src/mesh/mesh_base.$(obj-suffix):\
     src/mesh/mesh_base.C\
     include/base/auto_ptr.h\
@@ -2275,12 +2325,15 @@ src/mesh/mesh.$(obj-suffix):\
     include/mesh/diva_io.h\
     include/mesh/elem_iterators.h\
     include/mesh/gmv_io.h\
+    include/mesh/matlab_io.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_communication.h\
     include/mesh/mesh_data.h\
     include/mesh/mesh_io.h\
     include/mesh/node_iterators.h\
+    include/mesh/off_io.h\
+    include/mesh/shanee_io.h\
     include/mesh/tecplot_io.h\
     include/mesh/tetgen_io.h\
     include/mesh/ucd_io.h\
@@ -2616,39 +2669,6 @@ src/mesh/mesh_io.$(obj-suffix):\
     include/utils/data_map.h\
     include/utils/data_object.h\
     include/utils/perf_log.h
-src/mesh/mesh_misc_support.$(obj-suffix):\
-    src/mesh/mesh_misc_support.C\
-    include/base/auto_ptr.h\
-    include/base/dof_object.h\
-    include/base/libmesh.h\
-    include/base/libmesh_base.h\
-    include/base/libmesh_common.h\
-    include/base/libmesh_config.h\
-    include/base/node.h\
-    include/base/predicated_iterator.h\
-    include/base/reference_counted_object.h\
-    include/base/reference_counter.h\
-    include/enums/enum_elem_quality.h\
-    include/enums/enum_elem_type.h\
-    include/enums/enum_order.h\
-    include/enums/enum_solver_package.h\
-    include/enums/enum_xdr_mode.h\
-    include/geom/elem.h\
-    include/geom/face.h\
-    include/geom/face_quad.h\
-    include/geom/face_quad4.h\
-    include/geom/face_tri.h\
-    include/geom/face_tri3.h\
-    include/geom/point.h\
-    include/geom/sphere.h\
-    include/geom/surface.h\
-    include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
-    include/mesh/mesh_base.h\
-    include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
-    include/numerics/type_vector.h\
-    include/utils/perf_log.h
 src/mesh/mesh_modification.$(obj-suffix):\
     src/mesh/mesh_modification.C\
     include/base/auto_ptr.h\
@@ -2847,6 +2867,106 @@ src/mesh/mesh_xdr_support.$(obj-suffix):\
     include/utils/perf_log.h\
     include/utils/utility.h\
     include/utils/xdrIO.h
+src/mesh/off_io.$(obj-suffix):\
+    src/mesh/off_io.C\
+    include/base/auto_ptr.h\
+    include/base/dof_map.h\
+    include/base/dof_object.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/node.h\
+    include/base/predicated_iterator.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
+    include/enums/enum_order.h\
+    include/enums/enum_solver_package.h\
+    include/enums/enum_xdr_mode.h\
+    include/fe/fe_type.h\
+    include/geom/elem.h\
+    include/geom/face.h\
+    include/geom/face_tri.h\
+    include/geom/face_tri3.h\
+    include/geom/point.h\
+    include/geom/sphere.h\
+    include/geom/surface.h\
+    include/mesh/boundary_info.h\
+    include/mesh/elem_iterators.h\
+    include/mesh/mesh.h\
+    include/mesh/mesh_base.h\
+    include/mesh/mesh_data.h\
+    include/mesh/mesh_io.h\
+    include/mesh/node_iterators.h\
+    include/mesh/off_io.h\
+    include/numerics/coupling_matrix.h\
+    include/numerics/numeric_vector.h\
+    include/numerics/type_vector.h\
+    include/solvers/equation_systems.h\
+    include/solvers/explicit_system.h\
+    include/solvers/frequency_system.h\
+    include/solvers/implicit_system.h\
+    include/solvers/newmark_system.h\
+    include/solvers/steady_system.h\
+    include/solvers/system.h\
+    include/solvers/transient_system.h\
+    include/utils/data_map.h\
+    include/utils/data_object.h\
+    include/utils/perf_log.h
+src/mesh/shanee_io.$(obj-suffix):\
+    src/mesh/shanee_io.C\
+    include/base/auto_ptr.h\
+    include/base/dof_map.h\
+    include/base/dof_object.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/node.h\
+    include/base/predicated_iterator.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
+    include/enums/enum_order.h\
+    include/enums/enum_solver_package.h\
+    include/enums/enum_xdr_mode.h\
+    include/fe/fe_type.h\
+    include/geom/elem.h\
+    include/geom/face.h\
+    include/geom/face_quad.h\
+    include/geom/face_quad4.h\
+    include/geom/point.h\
+    include/geom/sphere.h\
+    include/geom/surface.h\
+    include/mesh/boundary_info.h\
+    include/mesh/elem_iterators.h\
+    include/mesh/mesh.h\
+    include/mesh/mesh_base.h\
+    include/mesh/mesh_data.h\
+    include/mesh/mesh_io.h\
+    include/mesh/node_iterators.h\
+    include/mesh/shanee_io.h\
+    include/numerics/coupling_matrix.h\
+    include/numerics/numeric_vector.h\
+    include/numerics/type_vector.h\
+    include/solvers/equation_systems.h\
+    include/solvers/explicit_system.h\
+    include/solvers/frequency_system.h\
+    include/solvers/implicit_system.h\
+    include/solvers/newmark_system.h\
+    include/solvers/steady_system.h\
+    include/solvers/system.h\
+    include/solvers/transient_system.h\
+    include/utils/data_map.h\
+    include/utils/data_object.h\
+    include/utils/perf_log.h
 src/mesh/tecplot_io.$(obj-suffix):\
     src/mesh/tecplot_io.C\
     include/base/auto_ptr.h\
@@ -4340,33 +4460,14 @@ src/utils/perf_log.$(obj-suffix):\
 src/utils/point_locator_base.$(obj-suffix):\
     src/utils/point_locator_base.C\
     include/base/auto_ptr.h\
-    include/base/dof_object.h\
-    include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
-    include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
-    include/enums/enum_elem_quality.h\
-    include/enums/enum_elem_type.h\
-    include/enums/enum_order.h\
     include/enums/enum_point_locator_type.h\
-    include/enums/enum_solver_package.h\
-    include/enums/enum_xdr_mode.h\
-    include/geom/elem.h\
     include/geom/point.h\
-    include/geom/sphere.h\
-    include/geom/surface.h\
-    include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
-    include/mesh/mesh.h\
-    include/mesh/mesh_base.h\
-    include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
     include/numerics/type_vector.h\
-    include/utils/perf_log.h\
     include/utils/point_locator_base.h\
     include/utils/point_locator_list.h\
     include/utils/point_locator_tree.h
@@ -4434,6 +4535,7 @@ src/utils/point_locator_tree.$(obj-suffix):\
     include/utils/perf_log.h\
     include/utils/point_locator_base.h\
     include/utils/point_locator_tree.h\
+    include/utils/tree.h\
     include/utils/tree_base.h\
     include/utils/tree_node.h
 src/utils/statistics.$(obj-suffix):\
@@ -4446,37 +4548,6 @@ src/utils/statistics.$(obj-suffix):\
     include/enums/enum_solver_package.h\
     include/utils/perf_log.h\
     include/utils/statistics.h
-src/utils/tree_base.$(obj-suffix):\
-    src/utils/tree_base.C\
-    include/base/auto_ptr.h\
-    include/base/dof_object.h\
-    include/base/libmesh.h\
-    include/base/libmesh_base.h\
-    include/base/libmesh_common.h\
-    include/base/libmesh_config.h\
-    include/base/node.h\
-    include/base/predicated_iterator.h\
-    include/base/reference_counted_object.h\
-    include/base/reference_counter.h\
-    include/enums/enum_elem_quality.h\
-    include/enums/enum_elem_type.h\
-    include/enums/enum_order.h\
-    include/enums/enum_solver_package.h\
-    include/enums/enum_xdr_mode.h\
-    include/geom/elem.h\
-    include/geom/point.h\
-    include/geom/sphere.h\
-    include/geom/surface.h\
-    include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
-    include/mesh/mesh_base.h\
-    include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
-    include/numerics/type_vector.h\
-    include/utils/perf_log.h\
-    include/utils/tree.h\
-    include/utils/tree_base.h\
-    include/utils/tree_node.h
 src/utils/tree.$(obj-suffix):\
     src/utils/tree.C\
     include/base/auto_ptr.h\

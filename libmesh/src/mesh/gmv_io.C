@@ -1,4 +1,4 @@
-// $Id: gmv_io.C,v 1.2 2004-03-21 16:14:10 benkirk Exp $
+// $Id: gmv_io.C,v 1.3 2004-03-24 03:48:51 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -26,7 +26,6 @@
 #include <string.h>
 
 // Local includes
-#include "mesh.h"
 #include "libmesh_config.h"
 #include "gmv_io.h"
 
