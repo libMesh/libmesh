@@ -1,4 +1,4 @@
-// $Id: boundary_info.h,v 1.19 2003-09-02 18:02:36 benkirk Exp $
+// $Id: boundary_info.h,v 1.20 2003-09-11 19:10:52 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -112,9 +112,21 @@ class BoundaryInfo
 		 const short int id);
 
   /**
+   * Removes the boundary conditions associated with node \p node,
+   * if any exist.
+   */
+  void remove (const Node* node);
+
+  /**
+   * Removes the boundary conditions associated with element \p elem,
+   * if any exist.
+   */
+  void remove (const Elem* elem);
+
+  /**
    * Returns the number of user-specified boundary ids.
    */
-  unsigned int n_boundary_ids () const { return boundary_ids.size(); }
+  unsigned int n_boundary_ids () const { return _boundary_ids.size(); }
 
   /**
    * Returns the boundary id associated with \p Node \p node.
@@ -137,7 +149,7 @@ class BoundaryInfo
    * @returns the number of element-based boundary conditions.
    */
   unsigned int n_boundary_conds () const
-  { return boundary_side_id.size(); }
+  { return _boundary_side_id.size(); }
   
   /**
    * Creates a list of nodes and ids for those nodes.
@@ -156,7 +168,7 @@ class BoundaryInfo
    * @returns the user-specified boundary ids.
    */
   const std::set<short int>& get_boundary_ids () const
-  { return boundary_ids; }
+  { return _boundary_ids; }
 
   /**
    * Print the boundary information data structure.
@@ -176,14 +188,14 @@ class BoundaryInfo
   /**
    * The Mesh this boundary info pertains to.
    */
-  const MeshBase& mesh;
+  const MeshBase& _mesh;
 
   /**
    * Data structure that maps nodes in the mesh
    * to boundary ids.
    */  
   std::map<const Node*,
-	   short int> boundary_node_id;
+	   short int> _boundary_node_id;
 
   /**
    * Data structure that maps sides of elements
@@ -191,12 +203,12 @@ class BoundaryInfo
    */
   std::multimap<const Elem*,
                 std::pair<unsigned short int, short int> >
-                                             boundary_side_id;
+                                             _boundary_side_id;
 
   /**
    * A collection of user-specified boundary ids.
    */
-  std::set<short int> boundary_ids;
+  std::set<short int> _boundary_ids;
 
 
 

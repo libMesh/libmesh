@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.25 2003-09-02 18:02:42 benkirk Exp $
+// $Id: boundary_info.C,v 1.26 2003-09-11 19:10:53 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -40,7 +40,7 @@ const short int BoundaryInfo::invalid_id = -1234;
 //------------------------------------------------------
 // BoundaryInfo functions
 BoundaryInfo::BoundaryInfo(const MeshBase& m) :
-  mesh           (m)
+  _mesh (m)
 {
 }
 
@@ -48,16 +48,16 @@ BoundaryInfo::BoundaryInfo(const MeshBase& m) :
 
 BoundaryInfo::~BoundaryInfo()
 {
-  clear();
+  this->clear();
 }
 
 
 
 void BoundaryInfo::clear()
 {
-  boundary_node_id.clear();
-  boundary_side_id.clear();
-  boundary_ids.clear();
+  _boundary_node_id.clear();
+  _boundary_side_id.clear();
+  _boundary_ids.clear();
 }
 
 
@@ -73,7 +73,7 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
   
   std::map<unsigned int, unsigned int> new_node_numbers;
   
-  boundary_mesh.set_n_subdomains() = n_boundary_ids();
+  boundary_mesh.set_n_subdomains() = this->n_boundary_ids();
 
 
   // Add sides to the structure.
@@ -91,8 +91,8 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
   // New code
   // Here we need to use iota() once it is in the
   // Utility namespace.
-  std::for_each(boundary_ids.begin(),
-		boundary_ids.end(),
+  std::for_each(_boundary_ids.begin(),
+		_boundary_ids.end(),
 		Fill(id_map));
     
     
@@ -100,8 +100,8 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
   boundary_mesh.set_n_subdomains() = id_map.size();
 
   // Add additional sides that aren't flagged with boundary conditions
-  const_active_elem_iterator       el     (mesh.elements_begin());
-  const const_active_elem_iterator end_el (mesh.elements_end());
+  const_active_elem_iterator       el     (_mesh.elements_begin());
+  const const_active_elem_iterator end_el (_mesh.elements_end());
   
   for ( ; el != end_el; ++el)
     {
@@ -118,10 +118,10 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
 	    
 	    // Find the right id number for that side
 	    std::pair<std::multimap<const Elem*,
-		      std::pair<unsigned short int, short int> >::iterator,
+		                    std::pair<unsigned short int, short int> >::iterator,
 		      std::multimap<const Elem*,
-		      std::pair<unsigned short int, short int> >::iterator > 
-	      pos = boundary_side_id.equal_range(elem);
+		                    std::pair<unsigned short int, short int> >::iterator > 
+	      pos = _boundary_side_id.equal_range(elem);
 
 	    while (pos.first != pos.second)
 	      {
@@ -151,13 +151,12 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
     }
 
   // Copy over the nodes
-  boundary_mesh._nodes = mesh._nodes;
+  boundary_mesh._nodes = _mesh._nodes;
 
   // When desired, copy the MeshData
   // to the boundary_mesh
   if (transfer_mesh_data)
-      boundary_mesh.data.assign(mesh.data);
-
+    boundary_mesh.data.assign(_mesh.data);
 }
 
 
@@ -165,7 +164,7 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
 void BoundaryInfo::add_node(const unsigned int node,
 			    const short int id)
 {
-  add_node (mesh.node_ptr(node), id);
+  this->add_node (_mesh.node_ptr(node), id);
 }
 
 
@@ -183,8 +182,8 @@ void BoundaryInfo::add_node(const Node* node,
       error();
     }
   
-  boundary_node_id[node] = id;
-  boundary_ids.insert(id);
+  _boundary_node_id[node] = id;
+  _boundary_ids.insert(id);
 }
 
 
@@ -193,7 +192,7 @@ void BoundaryInfo::add_side(const unsigned int e,
 			    const unsigned short int side,
 			    const short int id)
 {
-  add_side (mesh.elem(e), side, id);
+  this->add_side (_mesh.elem(e), side, id);
 }
 
 
@@ -216,8 +215,8 @@ void BoundaryInfo::add_side(const Elem* elem,
   std::pair<const Elem*, std::pair<unsigned short int, short int> >
     kv (elem, p);
   
-  boundary_side_id.insert(kv);
-  boundary_ids.insert(id);
+  _boundary_side_id.insert(kv);
+  _boundary_ids.insert(id);
 
   // Possilby add the nodes of the side,
   // if they aren't already there. MGF meshes
@@ -231,8 +230,8 @@ void BoundaryInfo::add_side(const Elem* elem,
     AutoPtr<Elem> side_elem(elem->build_side(side));
 
     for (unsigned int n=0; n<side_elem->n_nodes(); n++)
-      if (boundary_id(side_elem->get_node(n)) == invalid_id)
- 	add_node(side_elem->get_node(n), id);
+      if (this->boundary_id(side_elem->get_node(n)) == invalid_id)
+ 	this->add_node(side_elem->get_node(n), id);
   }
 #endif
   
@@ -240,13 +239,33 @@ void BoundaryInfo::add_side(const Elem* elem,
 
 
 
+void BoundaryInfo::remove (const Node* node)
+{
+  assert (node != NULL);
+  
+  // Erase everything associated with node
+  _boundary_node_id.erase (node);
+}
+
+
+
+void BoundaryInfo::remove (const Elem* elem)
+{
+  assert (elem != NULL);
+  
+  // Erase everything associated with elem
+  _boundary_side_id.erase (elem);
+}
+
+
+
 short int BoundaryInfo::boundary_id(const Node* node) const
 { 
-  std::map<const Node*, short int>::const_iterator n
-    = boundary_node_id.find(node);
+  std::map<const Node*, short int>::const_iterator
+    n = _boundary_node_id.find(node);
 
   // node not in the data structure
-  if (n == boundary_node_id.end())
+  if (n == _boundary_node_id.end())
     return invalid_id;
 
   return n->second;
@@ -261,7 +280,7 @@ short int BoundaryInfo::boundary_id(const Elem* elem,
                           std::pair<unsigned short int, short int> >::const_iterator,
             std::multimap<const Elem*,
                           std::pair<unsigned short int, short int> >::const_iterator > 
-    e = boundary_side_id.equal_range(elem);
+    e = _boundary_side_id.equal_range(elem);
 
   // elem not in the data structure
   if (e.first == e.second)
@@ -289,12 +308,12 @@ void BoundaryInfo::build_node_list (std::vector<unsigned int>& nl,
 				    std::vector<short int>&    il) const
 {
   // Reserve the size, then use push_back
-  nl.reserve (boundary_node_id.size());
-  il.reserve (boundary_node_id.size());
+  nl.reserve (_boundary_node_id.size());
+  il.reserve (_boundary_node_id.size());
   
   std::map<const Node*, short int>::const_iterator pos;
 
-  for (pos=boundary_node_id.begin(); pos != boundary_node_id.end();
+  for (pos=_boundary_node_id.begin(); pos != _boundary_node_id.end();
        ++pos)
     {
       nl.push_back (pos->first->id());
@@ -309,15 +328,15 @@ void BoundaryInfo::build_side_list (std::vector<unsigned int>&       el,
 				    std::vector<short int>&          il) const
 {
   // Reserve the size, then use push_back
-  el.reserve (boundary_side_id.size());
-  sl.reserve (boundary_side_id.size());
-  il.reserve (boundary_side_id.size());
+  el.reserve (_boundary_side_id.size());
+  sl.reserve (_boundary_side_id.size());
+  il.reserve (_boundary_side_id.size());
 
   std::multimap<const Elem*,
                 std::pair<unsigned short int,
                           short int> >::const_iterator pos;
 
-  for (pos=boundary_side_id.begin(); pos != boundary_side_id.end();
+  for (pos=_boundary_side_id.begin(); pos != _boundary_side_id.end();
        ++pos)
     {
       el.push_back (pos->first->id());
@@ -331,26 +350,26 @@ void BoundaryInfo::build_side_list (std::vector<unsigned int>&       el,
 void BoundaryInfo::print_info() const
 {
   // Print out the nodal BCs
-  if (!boundary_node_id.empty())
+  if (!_boundary_node_id.empty())
     {
       std::cout << "Nodal Boundary conditions:" << std::endl
 		<< "--------------------------" << std::endl
 		<< "  (Node No., ID)               " << std::endl;
 
-      std::for_each(boundary_node_id.begin(),
-		    boundary_node_id.end(),
+      std::for_each(_boundary_node_id.begin(),
+		    _boundary_node_id.end(),
 		    PrintNodeInfo());
     }
 
   // Print out the element BCs
-  if (!boundary_side_id.empty())
+  if (!_boundary_side_id.empty())
     {
       std::cout << "Side Boundary conditions:" << std::endl
 		<< "-------------------------" << std::endl
 		<< "  (Elem No., Side No., ID)      " << std::endl;
 
-      std::for_each(boundary_side_id.begin(),
-		    boundary_side_id.end(),
+      std::for_each(_boundary_side_id.begin(),
+		    _boundary_side_id.end(),
   		    PrintSideInfo()); 
     }
 }
