@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.34 2005-03-07 12:41:36 spetersen Exp $
+// $Id: fe.C,v 1.35 2005-03-17 22:45:36 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -477,9 +477,9 @@ void FE<Dim,T>::compute_C0_constraints (DofConstraints &constraints,
   std::vector<unsigned int> child_dof_indices, parent_dof_indices;
   std::vector<unsigned int> my_side_dofs, parent_side_dofs;
 
-  DenseMatrix<Number> Ke;
-  DenseVector<Number> Fe;
-  std::vector<DenseVector<Number> > Ue;
+  DenseMatrix<Real> Ke;
+  DenseVector<Real> Fe;
+  std::vector<DenseVector<Real> > Ue;
 
   // Look at the element faces.  Check to see if we need to
   // build constraints.
@@ -559,7 +559,7 @@ void FE<Dim,T>::compute_C0_constraints (DofConstraints &constraints,
 	        {
 	          const unsigned int j = my_side_dofs[js];
 	          const unsigned int my_dof_g = child_dof_indices[j];
-		  const Number their_dof_value = Ue[is](js);
+		  const Real their_dof_value = Ue[is](js);
 		  if (their_dof_g == my_dof_g)
 		    {
 		      assert(std::abs(their_dof_value-1.) < 1.e-5);
@@ -618,9 +618,9 @@ void FE<Dim,T>::compute_C1_constraints (DofConstraints &constraints,
   std::vector<unsigned int> child_dof_indices, parent_dof_indices;
   std::vector<unsigned int> my_side_dofs, parent_side_dofs;
 
-  DenseMatrix<Number> Ke;
-  DenseVector<Number> Fe;
-  std::vector<DenseVector<Number> > Ue;
+  DenseMatrix<Real> Ke;
+  DenseVector<Real> Fe;
+  std::vector<DenseVector<Real> > Ue;
 
   // Look at the element faces.  Check to see if we need to
   // build constraints.
@@ -708,7 +708,7 @@ void FE<Dim,T>::compute_C1_constraints (DofConstraints &constraints,
 	        {
 	          const unsigned int j = my_side_dofs[js];
 	          const unsigned int my_dof_g = child_dof_indices[j];
-		  const Number their_dof_value = Ue[is](js);
+		  const Real their_dof_value = Ue[is](js);
 		  if (their_dof_g == my_dof_g)
 		    {
 		      assert(std::abs(their_dof_value-1.) < 1.e-5);
