@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.72 2004-11-14 01:20:21 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.73 2004-11-14 03:50:29 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -22,9 +22,9 @@ AC_DEFUN(DETERMINE_CXX_BRAND, dnl
     dnl find out the right version
     GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
     case "$GXX_VERSION_STRING" in
-      *3.5*)
-  	AC_MSG_RESULT(<<< C++ compiler is gcc-3.5 >>>)
-  	GXX_VERSION=gcc3.5
+      *4.0*)
+  	AC_MSG_RESULT(<<< C++ compiler is gcc-4.0 >>>)
+  	GXX_VERSION=gcc4.0
   	;;
       *3.4*)
   	AC_MSG_RESULT(<<< C++ compiler is gcc-3.4 >>>)
@@ -226,7 +226,7 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
   dnl First the flags for gcc compilers
   if (test "$GXX" = yes -a "x$REAL_GXX" != "x" ) ; then
     CXXFLAGSO="-O2 -felide-constructors -DNDEBUG"
-    CXXFLAGSG=" -O2 -felide-constructors -g -ansi -pedantic -W -Wall -Wunused -Wpointer-arith -Wimplicit -Wformat -Wparentheses -Wuninitialized -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -DDEBUG"
+    CXXFLAGSG="-O2 -felide-constructors -g -ansi -pedantic -W -Wall -Wunused -Wpointer-arith -Wimplicit -Wformat -Wparentheses -Wuninitialized -DDEBUG"
     CXXFLAGSP="$CXXFLAGSO -g -pg"
     CXXFLAGSS="-fsyntax-only"
 
@@ -244,8 +244,6 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
       CFLAGSO="$CFLAGSO -fPIC"
       CFLAGSG="$CFLAGSG -fPIC"
       CFLAGSP="$CFLAGSP -fPIC"
-
-      dnl LDFLAGS="$LDFLAGS -fPIC"
     fi
 
     dnl set some flags that are specific to some versions of the
@@ -282,19 +280,26 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           ;;
     esac
   
-    dnl - after gcc2.95, some flags were deemed obsolete for C++
-    dnl   (and are only supported for C any more), so only define them for
-    dnl   previous compilers
   
     case "$GXX_VERSION" in
+      dnl - after gcc2.95, some flags were deemed obsolete for C++
+      dnl   (and are only supported for C any more), so only define them for
+      dnl   previous compilers
       egcs1.1 | gcc2.95)
-          CXXFLAGSO="$CXXFLAGSO -fnonnull-objects"
-          CXXFLAGSG="$CXXFLAGSG -Wmissing-declarations -Wbad-function-cast -Wtraditional -Wnested-externs"
-          CXXFLAGSP="$CXXFLAGSP -fnonnull-objects"
-          ;;
-  
+         CXXFLAGSO="$CXXFLAGSO -fnonnull-objects"
+         CXXFLAGSG="$CXXFLAGSG -Wmissing-declarations -Wbad-function-cast -Wtraditional -Wnested-externs"
+         CXXFLAGSP="$CXXFLAGSP -fnonnull-objects"
+         ;;
+
+      dnl - define additional debug flags for newer versions of gcc which support them.
+      dnl 
+      dnl Note:  do not use -Wold-style-cast...  creates a lot of unavoidable warnings
+      dnl        when dealing with C APIs that take void* pointers.
+      gcc3.* | gcc4.*)
+         CXXFLAGSG="$CXXFLAGSG -Woverloaded-virtual -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
+  	 ;;
       *)
-          ;;
+         ;;
     esac
 
 
