@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.h,v 1.13 2003-05-26 23:29:50 benkirk Exp $
+// $Id: mesh_refinement.h,v 1.14 2003-06-03 16:45:50 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,8 +30,15 @@
 
 // C++ Includes   -----------------------------------
 #include <vector>
-#include <map>
 #include <set>
+
+#if   defined(HAVE_HASH_MAP)
+# include <hash_map>
+#elif defined(HAVE_EXT_HASH_MAP)
+# include <ext/hash_map>
+#else
+# include <map>
+#endif
 
 // Local Includes -----------------------------------
 #include "mesh_common.h"
@@ -314,19 +321,33 @@ private:
    * so that level-one dependency is satisfied.
    */
   bool make_refinement_compatible (const bool);
-
+  
   /**
    * Data structure that holds the new nodes information.
    * The key is a pointer to the element that created the node.
+   * For efficiency we will use a hashed multimap if it is
+   * available, otherwise a regular multimap.
    */
-  std::multimap<unsigned int, unsigned int> new_nodes;
+#if   defined(HAVE_HASH_MAP)    
+    typedef std::hash_multimap<unsigned int, Node*> map_type;    
+#elif defined(HAVE_EXT_HASH_MAP)
+# if  __GNUC__ >= 3
+    typedef __gnu_cxx::hash_multimap<unsigned int, Node*> map_type;
+# else
+    DIE A HORRIBLE DEATH
+# endif
+#else
+    typedef std::multimap<unsigned int, Node*> map_type;
+#endif
+  
+  map_type _new_nodes_map;
 
   /**
    * Data structure that holds the indices of elements
    * that have been removed from the mesh but not
    * yet removed from the \p _elements vector.
    */
-  std::set<unsigned int> unused_elements;
+  std::set<unsigned int> _unused_elements;
 
   /**
    * Reference to the mesh.

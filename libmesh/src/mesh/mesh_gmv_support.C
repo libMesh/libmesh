@@ -1,4 +1,4 @@
-// $Id: mesh_gmv_support.C,v 1.20 2003-05-23 14:44:37 spetersen Exp $
+// $Id: mesh_gmv_support.C,v 1.21 2003-06-03 16:47:38 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -278,10 +278,10 @@ void MeshBase::write_gmv(std::ostream& out,
   if (write_partitioning)
     {
       out << "material "
-	  << n_processors()
+	  << this->n_subdomains()
 	  << " 0"<< std::endl;
 
-      for (unsigned int sbd=0; sbd<n_processors(); sbd++)
+      for (unsigned int sbd=0; sbd<this->n_subdomains(); sbd++)
 	out << "sbd_" << sbd << std::endl;
       
       const_active_elem_iterator       it (elements_begin());
@@ -289,7 +289,7 @@ void MeshBase::write_gmv(std::ostream& out,
 
       for ( ; it != end; ++it)
 	for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
-	    out << (*it)->processor_id()+1 << std::endl;
+	    out << (*it)->subdomain_id()+1 << std::endl;
       
       out << std::endl;
     }
@@ -544,7 +544,7 @@ void MeshBase::write_gmv_binary(std::ostream& out,
       strcpy(buf, "material");
       out.write(buf, strlen(buf));
       
-      unsigned int tmpint = n_processors();
+      unsigned int tmpint = this->n_subdomains();
       memcpy(buf, &tmpint, sizeof(unsigned int));
       out.write(buf, sizeof(unsigned int));
 
@@ -553,7 +553,7 @@ void MeshBase::write_gmv_binary(std::ostream& out,
       out.write(buf, sizeof(unsigned int));
 
 
-      for (unsigned int sbd=0; sbd<n_processors(); sbd++)
+      for (unsigned int sbd=0; sbd<this->n_subdomains(); sbd++)
 	{
 	  sprintf(buf, "sbd_%d", sbd);
 	  out.write(buf, 8);
@@ -568,7 +568,7 @@ void MeshBase::write_gmv_binary(std::ostream& out,
 
       for ( ; it != end; ++it)
 	for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
-	  sbd_id[n++] = (*it)->processor_id()+1;
+	  sbd_id[n++] = (*it)->subdomain_id()+1;
       
       
       out.write(reinterpret_cast<char *>(sbd_id), sizeof(unsigned int)*n_active_sub_elem());

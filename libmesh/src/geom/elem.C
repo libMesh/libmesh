@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.25 2003-06-03 05:33:35 benkirk Exp $
+// $Id: elem.C,v 1.26 2003-06-03 16:45:53 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -22,6 +22,7 @@
 // C++ includes
 #include <algorithm>
 #include <iterator>
+//#include <set>
 
 // Local includes
 #include "elem.h"
@@ -246,7 +247,7 @@ void Elem::write_tecplot_connectivity(std::ostream& out) const
 
 unsigned int Elem::key() const
 {
-  const unsigned int nv = n_vertices();
+  const unsigned int nv = this->n_vertices();
   
   assert (nv != 0);
 
@@ -277,7 +278,7 @@ Point Elem::centroid() const
   for (unsigned int n=0; n<this->n_vertices(); n++)
     cp.add (this->point(n));
 
-  return (cp /= static_cast<Real>(n_vertices()));    
+  return (cp /= static_cast<Real>(this->n_vertices()));    
 }
 
 
@@ -287,13 +288,12 @@ Real Elem::hmin() const
   Real h_min=1.e30;
 
   for (unsigned int n_outer=0; n_outer<this->n_vertices(); n_outer++)
-    for (unsigned int n_inner=0; n_inner<this->n_vertices(); n_inner++)
-      if (n_outer != n_inner) // would create false 0
-	{
-	  const Point diff = (point(n_outer) - point(n_inner));
-	  
-	  h_min = std::min(h_min,diff.size());
-	}
+    for (unsigned int n_inner=n_outer+1; n_inner<this->n_vertices(); n_inner++)
+      {
+	const Point diff = (this->point(n_outer) - this->point(n_inner));
+	
+	h_min = std::min(h_min,diff.size());
+      }
 
   return h_min;
 }
@@ -305,13 +305,12 @@ Real Elem::hmax() const
   Real h_max=0;
 
   for (unsigned int n_outer=0; n_outer<this->n_vertices(); n_outer++)
-    for (unsigned int n_inner=0; n_inner<this->n_vertices(); n_inner++)
-      if (n_outer != n_inner) // will be 0, definately _not_ max
-	{
-	  const Point diff = (point(n_outer) - point(n_inner));
-	  
-	  h_max = std::max(h_max,diff.size());
-	}
+    for (unsigned int n_inner=n_outer+1; n_inner<this->n_vertices(); n_inner++)
+      {
+	const Point diff = (this->point(n_outer) - this->point(n_inner));
+	
+	h_max = std::max(h_max,diff.size());
+      }
 
   return h_max;
 }
@@ -324,16 +323,47 @@ Real Elem::length(const unsigned int n1,
   assert ( n1 < this->n_vertices() );
   assert ( n2 < this->n_vertices() );
 
-  return (point(n1) - point(n2)).size();
+  return (this->point(n1) - this->point(n2)).size();
 }
 
 
 
 bool Elem::operator == (const Elem& rhs) const
 {
+//   assert (n_nodes());
+//   assert (rhs.n_nodes());
+
+//   // Elements can only be equal if they
+//   // contain the same number of nodes.
+//   if (this->n_nodes() == rhs.n_nodes())
+//     {
+//       // Create a set that contains our global
+//       // node numbers and those of our neighbor.
+//       // If the set is the same size as the number
+//       // of nodes in both elements then they must
+//       // be connected to the same nodes.     
+//       std::set<unsigned int> nodes_set;
+
+//       for (unsigned int n=0; n<this->n_nodes(); n++)
+//         {
+//           nodes_set.insert(this->node(n));
+//           nodes_set.insert(rhs.node(n));
+//         }
+
+//       // If this passes the elements are connected
+//       // to the same global nodes
+//       if (nodes_set.size() == this->n_nodes())
+//         return true;
+//     }
+
+//   // If we get here it is because the elements either
+//   // do not have the same number of nodes or they are
+//   // connected to different nodes.  Either way they
+//   // are not the same element
+//   return false;
+  
   // Useful typedefs
   typedef std::vector<unsigned int>::iterator iterator;
-  typedef iterator::difference_type diff_type;
 
   
   // Elements can only be equal if they
@@ -342,19 +372,22 @@ bool Elem::operator == (const Elem& rhs) const
   // which is sufficient & cheaper
   if (this->n_nodes() == rhs.n_nodes())
     {
+      // The number of nodes in the element
+      const unsigned int nn = this->n_nodes();
+      
       // Create a vector that contains our global
       // node numbers and those of our neighbor.
       // If the sorted, unique vector is the same size
       // as the number of nodes in both elements then
       // they must be connected to the same nodes.
       //
-      // The vector will be no larger than 2*n_vertices(),
+      // The vector will be no larger than 2*n_nodes(),
       // so we might as well reserve the space.
       std::vector<unsigned int> common_nodes;
-      common_nodes.reserve (2*this->n_vertices());
+      common_nodes.reserve (2*nn);
 
-      // Add the global indices of the vertex nodes
-      for (unsigned int n=0; n<this->n_vertices(); n++)
+      // Add the global indices of the nodes
+      for (unsigned int n=0; n<nn; n++)
 	{
 	  common_nodes.push_back (this->node(n));
 	  common_nodes.push_back (rhs.node(n));
@@ -367,12 +400,12 @@ bool Elem::operator == (const Elem& rhs) const
       iterator new_end = std::unique (common_nodes.begin(),
 				      common_nodes.end());
       
-      const diff_type new_size = std::distance (common_nodes.begin(),
-						new_end);
+      const int new_size = std::distance (common_nodes.begin(),
+					  new_end);
       
       // If this passes the elements are connected
       // to the same global vertex nodes
-      if (new_size == static_cast<diff_type>(this->n_vertices()))
+      if (new_size == static_cast<int>(nn))
 	return true;
     }
 
@@ -390,9 +423,8 @@ void Elem::write_ucd_connectivity(std::ostream &out) const
   assert (out);
   assert (_nodes != NULL);
 
-  // Original Code
-  for (unsigned int i=0; i<n_nodes(); i++)
-    out << node(i)+1 << "\t";
+  for (unsigned int i=0; i<this->n_nodes(); i++)
+    out << this->node(i)+1 << "\t";
 
   out << std::endl;
 }
@@ -432,9 +464,9 @@ bool Elem::contains_point (const Point& p) const
 {
   // Declare a basic FEType.  Will ue a Lagrange
   // element by default.
-  FEType fe_type(default_order());
+  FEType fe_type(this->default_order());
   
-  const Point mapped_point = FEInterface::inverse_map(dim(),
+  const Point mapped_point = FEInterface::inverse_map(this->dim(),
 						      fe_type,
 						      this,
 						      p,
@@ -456,7 +488,7 @@ void Elem::nullify_neighbors ()
 	Elem* neighbor = this->neighbor(n);
 
 	// Note:  it is possible that I see the neighbor
-	// (which is at a lower refinement level than me)
+	// (which is coarser than me)
 	// but they don't see me, so avoid that case.
 	if (neighbor->level() == this->level())
 	  {	
