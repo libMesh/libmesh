@@ -20,8 +20,6 @@
 // C++ includes
 #include <iomanip>
 #include <fstream>
-#include <stdio.h>
-#include <string.h>
 
 // Local includes
 #include "mesh.h"

@@ -1,4 +1,4 @@
-// $Id: mesh_xdr_support.C,v 1.23 2004-07-26 16:27:48 jwpeterson Exp $
+// $Id: mesh_xdr_support.C,v 1.24 2004-08-05 15:58:44 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -22,8 +22,6 @@
 #include "libmesh_common.h"
 
 // C++ includes
-#include <string.h>
-#include <stdio.h>
 #ifdef HAVE_XDR
 #include <rpc/rpc.h>
 #endif
