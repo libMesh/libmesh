@@ -1,4 +1,4 @@
-// $Id: edge_edge3.C,v 1.9 2004-01-03 15:37:43 benkirk Exp $
+// $Id: edge_edge3.C,v 1.10 2004-07-14 19:23:18 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -24,71 +24,131 @@
 
 
 
-
-const std::vector<unsigned int> Edge3::tecplot_connectivity(const unsigned int se) const
+void Edge3::connectivity(const unsigned int sc,
+			 const IOPackage iop,
+			 std::vector<unsigned int>& conn) const
 {
-  assert (se <= 1);
-
-  std::vector<unsigned int> conn(2);
-
-  switch (se)
-    {
-    case 0: 
-      conn[0] = this->node(0)+1;
-      conn[1] = this->node(2)+1;
-      
-      return conn;
-      
-    case 1: 
-      conn[0] = this->node(2)+1;
-      conn[1] = this->node(1)+1;
-      
-      return conn;
-
-    default:
-      error();
-    }
-
-  error();
-
-  return conn;
-}
-
-
-
-void Edge3::vtk_connectivity(const unsigned int se,
-			     std::vector<unsigned int> *conn) const
-{
+  assert (sc <= 1);
   assert (_nodes != NULL);
-  assert (se < this->n_sub_elem());
-  
-  if (conn == NULL)
-    conn = new std::vector<unsigned int>;
+  assert (sc < this->n_sub_elem());
+  assert (iop != INVALID_IO_PACKAGE);
 
-  conn->resize(2);
+  // Create storage
+  conn.resize(2);
 
-  switch (se)
+  switch (iop)
     {
-    case 0: 
-      (*conn)[0] = this->node(0);
-      (*conn)[1] = this->node(2);
+    case TECPLOT:
+      {
+	switch (sc)
+	  {
+	  case 0: 
+	    conn[0] = this->node(0)+1;
+	    conn[1] = this->node(2)+1;
+	    return;
       
-      return;
+	  case 1: 
+	    conn[0] = this->node(2)+1;
+	    conn[1] = this->node(1)+1;
+	    return;
+
+	  default:
+	    error();
+	  }
+      }
+
       
-    case 1: 
-      (*conn)[0] = this->node(2);
-      (*conn)[1] = this->node(1);
+    case VTK:
+      {
+	switch (sc)
+	  {
+	  case 0: 
+	    conn[0] = this->node(0);
+	    conn[1] = this->node(2);
       
-      return;
+	    return;
+      
+	  case 1: 
+	    conn[0] = this->node(2);
+	    conn[1] = this->node(1);
+      
+	    return;
+
+	  default:
+	    error();
+	  }
+      }
 
     default:
-      error();
+      {
+	error();
+      }
     }
-
-  error();
-
-  return;
 }
+
+
+// void Edge3::tecplot_connectivity(const unsigned int se,
+// 				 std::vector<unsigned int>& conn) const
+// {
+//   assert (se <= 1);
+
+//   //std::vector<unsigned int> conn(2);
+//   conn.resize(2);
+
+//   switch (se)
+//     {
+//     case 0: 
+//       conn[0] = this->node(0)+1;
+//       conn[1] = this->node(2)+1;
+//       return;
+      
+//     case 1: 
+//       conn[0] = this->node(2)+1;
+//       conn[1] = this->node(1)+1;
+//       return;
+
+//     default:
+//       error();
+//     }
+
+//   error();
+// }
+
+
+
+// void Edge3::vtk_connectivity(const unsigned int se,
+// 			     std::vector<unsigned int> *conn) const
+// {
+//   assert (_nodes != NULL);
+//   assert (se < this->n_sub_elem());
+  
+//   if (conn == NULL)
+//     conn = new std::vector<unsigned int>;
+
+//   conn->resize(2);
+
+//   switch (se)
+//     {
+//     case 0: 
+//       (*conn)[0] = this->node(0);
+//       (*conn)[1] = this->node(2);
+      
+//       return;
+      
+//     case 1: 
+//       (*conn)[0] = this->node(2);
+//       (*conn)[1] = this->node(1);
+      
+//       return;
+
+//     default:
+//       error();
+//     }
+
+//   error();
+
+//   return;
+// }
   
 
 

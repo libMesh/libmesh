@@ -1,4 +1,4 @@
-// $Id: face_inf_quad4.C,v 1.20 2004-01-03 15:37:43 benkirk Exp $
+// $Id: face_inf_quad4.C,v 1.21 2004-07-14 19:23:18 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -118,41 +118,75 @@ const float InfQuad4::_embedding_matrix[2][4][4] =
 #endif
 
 
-
-const std::vector<unsigned int> InfQuad4::tecplot_connectivity(const unsigned int sf) const
+void InfQuad4::connectivity(const unsigned int sf,
+			    const IOPackage iop,
+			    std::vector<unsigned int>& conn) const
 {
   assert (sf < this->n_sub_elem());
-  
-  std::vector<unsigned int> conn(4);
-
-  conn[0] = this->node(0)+1;
-  conn[1] = this->node(1)+1;
-  conn[2] = this->node(3)+1;
-  conn[3] = this->node(2)+1;
-
-  return conn;
-}
-
-
-
-void InfQuad4::vtk_connectivity(const unsigned int sf,
-				std::vector<unsigned int> *conn) const
-{
   assert (_nodes != NULL);
-  assert (sf < this->n_sub_elem());
+  assert (iop != INVALID_IO_PACKAGE);
+
+  conn.resize(4);
   
-  if (conn == NULL)
-    conn = new std::vector<unsigned int>;
-
-  conn->resize(4);
-
-  (*conn)[0] = this->node(0);
-  (*conn)[1] = this->node(1);
-  (*conn)[2] = this->node(3);
-  (*conn)[3] = this->node(2);
-
-  return;
+  switch (iop)
+    {
+    case TECPLOT:
+      {
+	conn[0] = this->node(0)+1;
+	conn[1] = this->node(1)+1;
+	conn[2] = this->node(3)+1;
+	conn[3] = this->node(2)+1;
+	return;
+      }
+    case VTK:
+      {
+	conn[0] = this->node(0);
+	conn[1] = this->node(1);
+	conn[2] = this->node(3);
+	conn[3] = this->node(2);
+      }
+    default:
+      error();
+    }
+  
+  error();
 }
+
+
+// void InfQuad4::tecplot_connectivity(const unsigned int sf,
+// 				    std::vector<unsigned int>& conn) const
+// {
+//   assert (sf < this->n_sub_elem());
+  
+//   // std::vector<unsigned int> conn(4);
+//   conn.resize(4);
+
+//   conn[0] = this->node(0)+1;
+//   conn[1] = this->node(1)+1;
+//   conn[2] = this->node(3)+1;
+//   conn[3] = this->node(2)+1;
+// }
+
+
+
+// void InfQuad4::vtk_connectivity(const unsigned int sf,
+// 				std::vector<unsigned int> *conn) const
+// {
+//   assert (_nodes != NULL);
+//   assert (sf < this->n_sub_elem());
+  
+//   if (conn == NULL)
+//     conn = new std::vector<unsigned int>;
+
+//   conn->resize(4);
+
+//   (*conn)[0] = this->node(0);
+//   (*conn)[1] = this->node(1);
+//   (*conn)[2] = this->node(3);
+//   (*conn)[3] = this->node(2);
+
+//   return;
+// }
 
 
 #endif // ifdef ENABLE_INFINITE_ELEMENTS

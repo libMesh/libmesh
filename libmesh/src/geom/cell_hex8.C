@@ -1,4 +1,4 @@
-// $Id: cell_hex8.C,v 1.15 2004-01-03 15:37:43 benkirk Exp $
+// $Id: cell_hex8.C,v 1.16 2004-07-14 19:23:18 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -108,52 +108,97 @@ AutoPtr<Elem> Hex8::build_side (const unsigned int i) const
 
 
 
-const std::vector<unsigned int> Hex8::tecplot_connectivity(const unsigned int sc) const
+
+void Hex8::connectivity(const unsigned int sc,
+			const IOPackage iop,
+			std::vector<unsigned int>& conn) const
 {
   assert (_nodes != NULL);
   assert (sc < this->n_sub_elem());
+  assert (iop != INVALID_IO_PACKAGE);
 
-  std::vector<unsigned int> conn(8);
-  
-  conn[0] = this->node(0)+1;
-  conn[1] = this->node(1)+1;
-  conn[2] = this->node(2)+1;
-  conn[3] = this->node(3)+1;
-  conn[4] = this->node(4)+1;
-  conn[5] = this->node(5)+1;
-  conn[6] = this->node(6)+1;
-  conn[7] = this->node(7)+1;
+  conn.resize(8);
 
-  return conn;
+  switch (iop)
+    {
+    case TECPLOT:
+      {
+	conn[0] = this->node(0)+1;
+	conn[1] = this->node(1)+1;
+	conn[2] = this->node(2)+1;
+	conn[3] = this->node(3)+1;
+	conn[4] = this->node(4)+1;
+	conn[5] = this->node(5)+1;
+	conn[6] = this->node(6)+1;
+	conn[7] = this->node(7)+1;
+	return;
+      }
+
+    case VTK:
+      {
+	conn[0] = this->node(0);
+	conn[1] = this->node(1);
+	conn[2] = this->node(2);
+	conn[3] = this->node(3);
+	conn[4] = this->node(4);
+	conn[5] = this->node(5);
+	conn[6] = this->node(6);
+	conn[7] = this->node(7);
+      }
+
+    default:
+      error();
+    }
+
+  error();
 }
 
+// void Hex8::tecplot_connectivity(const unsigned int sc,
+// 				std::vector<unsigned int>& conn) const
+// {
+//   assert (_nodes != NULL);
+//   assert (sc < this->n_sub_elem());
 
-
-
-
-
-void Hex8::vtk_connectivity(const unsigned int sc,
-			    std::vector<unsigned int> *conn) const
-{
-  assert (_nodes != NULL);
-  assert (sc < this->n_sub_elem());
+//   // std::vector<unsigned int> conn(8);
+//   conn.resize(8);
   
-  if (conn == NULL)
-    conn = new std::vector<unsigned int>;
+//   conn[0] = this->node(0)+1;
+//   conn[1] = this->node(1)+1;
+//   conn[2] = this->node(2)+1;
+//   conn[3] = this->node(3)+1;
+//   conn[4] = this->node(4)+1;
+//   conn[5] = this->node(5)+1;
+//   conn[6] = this->node(6)+1;
+//   conn[7] = this->node(7)+1;
+// }
 
-  conn->resize(8);
 
-  (*conn)[0] = this->node(0);
-  (*conn)[1] = this->node(1);
-  (*conn)[2] = this->node(2);
-  (*conn)[3] = this->node(3);
-  (*conn)[4] = this->node(4);
-  (*conn)[5] = this->node(5);
-  (*conn)[6] = this->node(6);
-  (*conn)[7] = this->node(7);
 
-  return;
-}
+
+
+
+// void Hex8::vtk_connectivity(const unsigned int sc,
+// 			    std::vector<unsigned int> *conn) const
+// {
+//   assert (_nodes != NULL);
+//   assert (sc < this->n_sub_elem());
+  
+//   if (conn == NULL)
+//     conn = new std::vector<unsigned int>;
+
+//   conn->resize(8);
+
+//   (*conn)[0] = this->node(0);
+//   (*conn)[1] = this->node(1);
+//   (*conn)[2] = this->node(2);
+//   (*conn)[3] = this->node(3);
+//   (*conn)[4] = this->node(4);
+//   (*conn)[5] = this->node(5);
+//   (*conn)[6] = this->node(6);
+//   (*conn)[7] = this->node(7);
+
+//   return;
+// }
 
 
 

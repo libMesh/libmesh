@@ -1,4 +1,4 @@
-// $Id: gmv_io.C,v 1.8 2004-06-15 20:17:23 benkirk Exp $
+// $Id: gmv_io.C,v 1.9 2004-07-14 19:23:18 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -104,25 +104,31 @@ void GMVIO::write_ascii (const std::string& fname,
       {
       case 1:
 	{
+	  // The same temporary storage will be used for each element
+	  std::vector<unsigned int> conn;
+
 	  for ( ; it != end; ++it)
 	    for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
 	      {
 		out << "line 2" << std::endl;
-		std::vector<unsigned int> conn = (*it)->tecplot_connectivity(se);
+		(*it)->connectivity(se, TECPLOT, conn);
 		for (unsigned int i=0; i<conn.size(); i++)
 		  out << conn[i] << " ";
 		
 		out << std::endl;
 	      }
-	  
 	  break;
 	}
 	
       case 2:
 	{
+	  // The same temporary storage will be used for each element
+	  std::vector<unsigned int> conn;
+	  
 	  for ( ; it != end; ++it)
 	    for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
 	      {
+		// Quad elements
 		if (((*it)->type() == QUAD4) ||
 		    ((*it)->type() == QUAD8) ||
 		    ((*it)->type() == QUAD9)
@@ -133,18 +139,21 @@ void GMVIO::write_ascii (const std::string& fname,
 		    )
 		  {
 		    out << "quad 4" << std::endl;
-		    std::vector<unsigned int> conn = (*it)->tecplot_connectivity(se);
+		    (*it)->connectivity(se, TECPLOT, conn);
 		    for (unsigned int i=0; i<conn.size(); i++)
 		      out << conn[i] << " ";
 		  }
-		  else if (((*it)->type() == TRI3) ||
-			   ((*it)->type() == TRI6))
-		    {
-		      out << "tri 3" << std::endl;
-		      std::vector<unsigned int> conn = (*it)->tecplot_connectivity(se);
-		      for (unsigned int i=0; i<3; i++)
-			out << conn[i] << " ";
-		    }
+
+		// Triangle elements
+		else if (((*it)->type() == TRI3) ||
+			 ((*it)->type() == TRI6))
+		  {
+		    out << "tri 3" << std::endl;
+		    (*it)->connectivity(se, TECPLOT, conn);
+		    for (unsigned int i=0; i<3; i++)
+		      out << conn[i] << " ";
+		  }
+		
 		else
 		  {
 		    error();
@@ -159,6 +168,9 @@ void GMVIO::write_ascii (const std::string& fname,
 	
       case 3:
 	{
+	  // The same temporary storage will be used for each element
+	  std::vector<unsigned int> conn;
+	  
 	  for ( ; it != end; ++it)
 	    for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
 	      {
@@ -168,7 +180,7 @@ void GMVIO::write_ascii (const std::string& fname,
 		    ((*it)->type() == HEX27))
 		  {
 		    out << "phex8 8" << std::endl;
-		    std::vector<unsigned int> conn = (*it)->tecplot_connectivity(se);
+		    (*it)->connectivity(se, TECPLOT, conn);
 		    for (unsigned int i=0; i<conn.size(); i++)
 		      out << conn[i] << " ";
 		  }
@@ -211,7 +223,7 @@ void GMVIO::write_ascii (const std::string& fname,
 		    ((*it)->type() == HEX20))
 		  {
 		    out << "phex8 8" << std::endl;
-		    std::vector<unsigned int> conn = (*it)->tecplot_connectivity(se);
+		    (*it)->connectivity(se, TECPLOT, conn);
 		    for (unsigned int i=0; i<conn.size(); i++)
 		      out << conn[i] << " ";
 		  }
@@ -221,7 +233,7 @@ void GMVIO::write_ascii (const std::string& fname,
 			 ((*it)->type() == TET10))
 		  {
 		    out << "tet 4" << std::endl;
-		    std::vector<unsigned int> conn = (*it)->tecplot_connectivity(se);
+		    (*it)->connectivity(se, TECPLOT, conn);
 		    out << conn[0] << " "
 			<< conn[2] << " "
 			<< conn[1] << " "
@@ -244,7 +256,7 @@ void GMVIO::write_ascii (const std::string& fname,
 		     * degenerated phex8's.
 		     */
 		    out << "phex8 8" << std::endl;
-		    std::vector<unsigned int> conn = (*it)->tecplot_connectivity(se);
+		    (*it)->connectivity(se, TECPLOT, conn);
 		    for (unsigned int i=0; i<conn.size(); i++)
 		      out << conn[i] << " ";
 		  }
@@ -438,61 +450,73 @@ void GMVIO::write_binary (const std::string& fname,
       {
 
       case 1:
-       
-	for ( ; it != end; ++it)
-	  for(unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
-	    {
-	      strcpy(buf, "line    ");
-	      out.write(buf, strlen(buf));
+	{
+	  // The same temporary storage will be used for each element
+	  std::vector<unsigned int> conn;
+	  
+	  for ( ; it != end; ++it)
+	    for(unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
+	      {
+		strcpy(buf, "line    ");
+		out.write(buf, strlen(buf));
 	      
-	      tempint = 2;
-	      memcpy(buf, &tempint, sizeof(unsigned int));
-	      out.write(buf, sizeof(unsigned int));
+		tempint = 2;
+		memcpy(buf, &tempint, sizeof(unsigned int));
+		out.write(buf, sizeof(unsigned int));
 	      
-	      std::vector<unsigned int> conn = (*it)->tecplot_connectivity(se);
+		(*it)->connectivity(se, TECPLOT, conn);
 	      
-	      out.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
-	    }
+		out.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
+	      }
 	
-	break;
+	  break;
+	}
 	
       case 2:
-       
-      for ( ; it != end; ++it)
-	for(unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
-	  {
-	    strcpy(buf, "quad    ");
-	    out.write(buf, strlen(buf));
+	{
+	  // The same temporary storage will be used for each element
+	  std::vector<unsigned int> conn;
+	  
+	  for ( ; it != end; ++it)
+	    for(unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
+	      {
+		strcpy(buf, "quad    ");
+		out.write(buf, strlen(buf));
 	    
-	    tempint = 4;
-	    memcpy(buf, &tempint, sizeof(unsigned int));
-	    out.write(buf, sizeof(unsigned int));
+		tempint = 4;
+		memcpy(buf, &tempint, sizeof(unsigned int));
+		out.write(buf, sizeof(unsigned int));
 		
-	    std::vector<unsigned int> conn = (*it)->tecplot_connectivity(se);
+		(*it)->connectivity(se, TECPLOT, conn);
 	    
-	    out.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
-	  }
+		out.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
+	      }
 	
-	break;
+	  break;
+	}
 	
       case 3:
-       
-      for ( ; it != end; ++it)
-	for(unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
-	  {
-	    strcpy(buf, "phex8   ");
-	    out.write(buf, strlen(buf));
+	{
+	  // The same temporary storage will be used for each element
+	  std::vector<unsigned int> conn;
+	  
+	  for ( ; it != end; ++it)
+	    for(unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
+	      {
+		strcpy(buf, "phex8   ");
+		out.write(buf, strlen(buf));
 	    
-	    tempint = 8;
-	    memcpy(buf, &tempint, sizeof(unsigned int));
-	    out.write(buf, sizeof(unsigned int));
+		tempint = 8;
+		memcpy(buf, &tempint, sizeof(unsigned int));
+		out.write(buf, sizeof(unsigned int));
 	    
-	    std::vector<unsigned int> conn = (*it)->tecplot_connectivity(se);
+		(*it)->connectivity(se, TECPLOT, conn);
 	    
-	    out.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
-	  }
+		out.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
+	      }
       
-	break;
+	  break;
+	}
 	
       default:
 	error();

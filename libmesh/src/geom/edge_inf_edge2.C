@@ -1,4 +1,4 @@
-// $Id: edge_inf_edge2.C,v 1.12 2004-01-03 15:37:43 benkirk Exp $
+// $Id: edge_inf_edge2.C,v 1.13 2004-07-14 19:23:18 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -28,35 +28,71 @@
 
 // ------------------------------------------------------------
 // InfEdge2 class member functions
-const std::vector<unsigned int> InfEdge2::tecplot_connectivity(const unsigned int se) const
+void InfEdge2::connectivity(const unsigned int se,
+			    const IOPackage iop,
+			    std::vector<unsigned int>& conn) const
 {
   assert (se == 0);
-
-  std::vector<unsigned int> conn(2);
-
-  conn[0] = this->node(0)+1;
-  conn[1] = this->node(1)+1;
-
-  return conn;
-}
-
-
-void InfEdge2::vtk_connectivity(const unsigned int se,
-				std::vector<unsigned int> *conn) const
-{
   assert (_nodes != NULL);
   assert (se < this->n_sub_elem());
+  assert (iop != INVALID_IO_PACKAGE);
+
+  conn.resize(2);
   
-  if (conn == NULL)
-    conn = new std::vector<unsigned int>;
+  switch (iop)
+    {
+    case TECPLOT:
+      {
+	conn[0] = this->node(0)+1;
+	conn[1] = this->node(1)+1;
+	return;
+      }
 
-  conn->resize(2);
+    case VTK:
+      {
+	conn[0] = this->node(0);
+	conn[1] = this->node(1);
+	return;
+      }
 
-  (*conn)[0] = this->node(0);
-  (*conn)[1] = this->node(1);
+    default:
+      error();
+    }
 
-  return;
+  error();
 }
+
+
+
+// const std::vector<unsigned int> InfEdge2::tecplot_connectivity(const unsigned int se) const
+// {
+//   assert (se == 0);
+
+//   std::vector<unsigned int> conn(2);
+
+//   conn[0] = this->node(0)+1;
+//   conn[1] = this->node(1)+1;
+
+//   return conn;
+// }
+
+
+// void InfEdge2::vtk_connectivity(const unsigned int se,
+// 				std::vector<unsigned int> *conn) const
+// {
+//   assert (_nodes != NULL);
+//   assert (se < this->n_sub_elem());
+  
+//   if (conn == NULL)
+//     conn = new std::vector<unsigned int>;
+
+//   conn->resize(2);
+
+//   (*conn)[0] = this->node(0);
+//   (*conn)[1] = this->node(1);
+
+//   return;
+// }
 
 
 #endif

@@ -1,4 +1,4 @@
-// $Id: gmsh_io.C,v 1.1 2004-07-13 21:48:41 jwpeterson Exp $
+// $Id: gmsh_io.C,v 1.2 2004-07-14 19:23:18 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -132,6 +132,9 @@ void GmshIO::write_stream (std::ostream& out)
 	// 2D Meshes
       case 2:
 	{
+	  // The same temporary storage will be used for each element
+	  std::vector<unsigned int> conn;
+
 	  unsigned int ctr=1;
 	  for ( ; it != end; ++it)
 	    for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
@@ -139,7 +142,7 @@ void GmshIO::write_stream (std::ostream& out)
 		// Write element number
 		out << ctr++ << " ";
 
-		// Write element type number
+		// Quadrilateral elements
 		if (((*it)->type() == QUAD4) ||
 		    ((*it)->type() == QUAD8) ||
 		    ((*it)->type() == QUAD9)
@@ -155,25 +158,26 @@ void GmshIO::write_stream (std::ostream& out)
 		    out << "0 ";
 
 		    // Write connectivity
-		    std::vector<unsigned int> conn = (*it)->tecplot_connectivity(se);
+		    (*it)->connectivity(se, TECPLOT, conn);
 		    for (unsigned int i=0; i<conn.size(); i++)
 		      out << conn[i] << " ";
 
 		  }
-		
-		  else if (((*it)->type() == TRI3) ||
-			   ((*it)->type() == TRI6))
-		    {
-		      out << "2 ";
 
-		      // Write the number of tags 
-		      out << "0 ";
-		      
-		      // Write connectivity (last entry of conn is skipped!)
-		      std::vector<unsigned int> conn = (*it)->tecplot_connectivity(se);
-		      for (unsigned int i=0; i<3; i++)
-			out << conn[i] << " ";
-		    }
+		// Triangular elements
+		else if (((*it)->type() == TRI3) ||
+			 ((*it)->type() == TRI6))
+		  {
+		    out << "2 ";
+		    
+		    // Write the number of tags 
+		    out << "0 ";
+		    
+		    // Write connectivity (last entry of conn is skipped!)
+		    (*it)->connectivity(se, TECPLOT, conn);
+		    for (unsigned int i=0; i<3; i++)
+		      out << conn[i] << " ";
+		  }
 		
 		else
 		  {

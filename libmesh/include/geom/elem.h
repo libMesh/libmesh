@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.4 2004-03-13 20:21:51 jwpeterson Exp $
+// $Id: elem.h,v 1.5 2004-07-14 19:23:17 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -34,6 +34,7 @@
 #include "enum_elem_type.h"
 #include "enum_elem_quality.h"
 #include "enum_order.h"
+#include "enum_io_package.h"
 #include "auto_ptr.h"
 
 
@@ -199,20 +200,31 @@ class Elem : public ReferenceCountedObject<Elem>,
   unsigned int which_neighbor_am_i(const Elem *e) const; 
 
   /**
-   * @returns the connectivity in the \p Tecplot format, which is
-   * 1-based.  Also, maps all elements to quadrilaterals in 2D and
-   * hexahedrals in 3D, which can be useful for writing hybrid meshes
-   * for visualization. 
+   * Returns the connectivity for this element in a specific
+   * format, which is specified by the IOPackage tag.  This
+   * method supercedes the tecplot_connectivity(...) and vtk_connectivity(...)
+   * routines.
    */
-  virtual const std::vector<unsigned int>
-  tecplot_connectivity (const unsigned int sc=0) const = 0;
+  virtual void connectivity(const unsigned int sc,
+			    const IOPackage iop,
+			    std::vector<unsigned int>& conn) const = 0;
+  
+//   /**
+//    * @returns the connectivity in the \p Tecplot format, which is
+//    * 1-based.  Also, maps all elements to quadrilaterals in 2D and
+//    * hexahedrals in 3D, which can be useful for writing hybrid meshes
+//    * for visualization. 
+//    */
+//   virtual void tecplot_connectivity (const unsigned int sc,
+// 				     std::vector<unsigned int>& conn) const = 0;
 
-  /**
-   * @returns the connectivity of the \f$ sc^{th} \f$
-   * sub-element in the VTK format.
-   */
-  virtual void vtk_connectivity (const unsigned int sc,
-				 std::vector<unsigned int>* conn) const = 0;
+//   /**
+//    * @returns the connectivity of the \f$ sc^{th} \f$
+//    * sub-element in the VTK format.
+//    */
+//   virtual void vtk_connectivity (const unsigned int sc,
+// 				 std::vector<unsigned int>* conn) const = 0;
+
   
   /**
    * @returns the VTK element type of the sc-th sub-element.

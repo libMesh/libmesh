@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.33 2004-03-24 05:49:12 jwpeterson Exp $
+// $Id: elem.C,v 1.34 2004-07-14 19:23:18 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -208,11 +208,13 @@ void Elem::write_tecplot_connectivity(std::ostream& out) const
 {
   assert (!out.bad());
   assert (_nodes != NULL);
-  
+
+  // This connectivity vector will be used repeatedly instead
+  // of being reconstructed inside the loop.
+  std::vector<unsigned int> conn;
   for (unsigned int sc=0; sc <this->n_sub_elem(); sc++)
     {
-      std::vector<unsigned int> conn =
-	this->tecplot_connectivity(sc);
+      this->connectivity(sc, TECPLOT, conn);
       
       std::copy(conn.begin(),
  		conn.end(),

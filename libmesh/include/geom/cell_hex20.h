@@ -1,4 +1,4 @@
-// $Id: cell_hex20.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: cell_hex20.h,v 1.3 2004-07-14 19:23:17 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -101,11 +101,16 @@ public:
    */
   AutoPtr<Elem> build_side (const unsigned int i) const;
 
-  const std::vector<unsigned int> tecplot_connectivity(const unsigned int sc=0) const;
+  virtual void connectivity(const unsigned int sc,
+			    const IOPackage iop,
+			    std::vector<unsigned int>& conn) const;
+
+//   void tecplot_connectivity(const unsigned int sc,
+// 			    std::vector<unsigned int>& conn) const;
   
   
-  void vtk_connectivity(const unsigned int sc,
-			std::vector<unsigned int> *conn = NULL) const;
+//   void vtk_connectivity(const unsigned int sc,
+// 			std::vector<unsigned int> *conn = NULL) const;
   
   unsigned int vtk_element_type (const unsigned int) const
   { return 12; }

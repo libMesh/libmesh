@@ -1,4 +1,4 @@
-// $Id: face_quad4.C,v 1.14 2004-01-03 15:37:43 benkirk Exp $
+// $Id: face_quad4.C,v 1.15 2004-07-14 19:23:18 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -132,37 +132,79 @@ AutoPtr<Elem> Quad4::build_side (const unsigned int i) const
 
 
 
-const std::vector<unsigned int> Quad4::tecplot_connectivity(const unsigned int sf) const
+
+
+void Quad4::connectivity(const unsigned int sf,
+			 const IOPackage iop,
+			 std::vector<unsigned int>& conn) const
 {
   assert (sf < this->n_sub_elem());
-  
-  std::vector<unsigned int> conn(4);
-
-  conn[0] = this->node(0)+1;
-  conn[1] = this->node(1)+1;
-  conn[2] = this->node(2)+1;
-  conn[3] = this->node(3)+1;
-
-  return conn;
-}
-
-
-
-void Quad4::vtk_connectivity(const unsigned int sf,
-			     std::vector<unsigned int> *conn) const
-{
   assert (_nodes != NULL);
-  assert (sf < this->n_sub_elem());
-  
-  if (conn == NULL)
-    conn = new std::vector<unsigned int>;
+  assert (iop != INVALID_IO_PACKAGE);
 
-  conn->resize(4);
+  // Create storage.
+  conn.resize(4);
 
-  (*conn)[0] = this->node(0);
-  (*conn)[1] = this->node(1);
-  (*conn)[2] = this->node(2);
-  (*conn)[3] = this->node(3);
+  switch (iop)
+    {
+    case TECPLOT:
+      {
+	conn[0] = this->node(0)+1;
+	conn[1] = this->node(1)+1;
+	conn[2] = this->node(2)+1;
+	conn[3] = this->node(3)+1;
+	return;
+      }
 
-  return;
+    case VTK:
+      {
+	conn[0] = this->node(0);
+	conn[1] = this->node(1);
+	conn[2] = this->node(2);
+	conn[3] = this->node(3);
+	return;
+      }
+
+    default:
+      error();
+    }
+
+  error();
 }
+
+// void Quad4::tecplot_connectivity(const unsigned int sf,
+// 				 std::vector<unsigned int>& conn) const
+// {
+//   assert (sf < this->n_sub_elem());
+
+//   //std::vector<unsigned int> conn(4);
+//   conn.resize(4);
+
+  
+//   conn[0] = this->node(0)+1;
+//   conn[1] = this->node(1)+1;
+//   conn[2] = this->node(2)+1;
+//   conn[3] = this->node(3)+1;
+
+// }
+
+
+
+// void Quad4::vtk_connectivity(const unsigned int sf,
+// 			     std::vector<unsigned int> *conn) const
+// {
+//   assert (_nodes != NULL);
+//   assert (sf < this->n_sub_elem());
+  
+//   if (conn == NULL)
+//     conn = new std::vector<unsigned int>;
+
+//   conn->resize(4);
+
+//   (*conn)[0] = this->node(0);
+//   (*conn)[1] = this->node(1);
+//   (*conn)[2] = this->node(2);
+//   (*conn)[3] = this->node(3);
+
+//   return;
+// }
