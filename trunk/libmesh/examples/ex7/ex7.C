@@ -1,4 +1,4 @@
-// $Id: ex7.C,v 1.19 2003-03-20 11:51:13 ddreyer Exp $
+// $Id: ex7.C,v 1.20 2003-03-20 14:40:39 benkirk Exp $
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
   
@@ -138,8 +138,7 @@ int main (int argc, char** argv)
 
   return 0;
 
-#endif
-
+#else
 
   /**
    * Braces are used to force object scope, like in example 2
@@ -341,6 +340,8 @@ int main (int argc, char** argv)
    * All done.  
    */
   return libMesh::close ();
+
+#endif // #ifdef USE_COMPLEX_NUMBERS
 }
 
 

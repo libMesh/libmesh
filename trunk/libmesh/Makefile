@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.20 2003-03-08 07:30:56 benkirk Exp $
+# $Id: Makefile,v 1.21 2003-03-20 14:40:36 benkirk Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -152,7 +152,7 @@ log: $(loggedfiles)
 # CVS documentation
 #
 cvsweb:
-	./contrib/bin/cvs2html -f -p -o doc/cvshtml/index.html -v -a -b -n 3 -C crono.html
+	./contrib/bin/cvs2html -f -p -o doc/cvshtml/index.html -v -a -b -n 2 -C crono.html
 
 #
 # Standalone applications.  Anything in the ./src/apps directory that ends in .cc
