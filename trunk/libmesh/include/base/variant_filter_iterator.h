@@ -1,4 +1,4 @@
-// $Id: variant_filter_iterator.h,v 1.2 2004-11-08 18:05:30 jwpeterson Exp $
+// $Id: variant_filter_iterator.h,v 1.3 2004-11-09 21:46:16 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -45,7 +45,7 @@ class variant_filter_iterator : public std::forward_iterator<std::forward_iterat
 class variant_filter_iterator : public std::iterator<std::forward_iterator_tag,  Type>
 #endif
 {
-private:
+public:
 
   // Abstract base class for the iterator type.
   struct IterBase
@@ -85,7 +85,8 @@ private:
     // the base (non-templated) class.
     virtual IterBase* clone() const
     {
-      Iter<IterType> *copy = new Iter<IterType>(iter_data);
+      variant_filter_iterator::Iter<IterType> *copy = 
+	new variant_filter_iterator::Iter<IterType>(iter_data);
       return copy;
     }
 
@@ -109,7 +110,8 @@ private:
     // classes.
     virtual bool equal(const IterBase *other) const
     {
-      const Iter<IterType>* p = dynamic_cast<const Iter<IterType>*>(other) ;
+      const variant_filter_iterator::Iter<IterType>* p = 
+	dynamic_cast<const variant_filter_iterator::Iter<IterType>*>(other);
 
       // Check for failed cast
       if ( p == NULL )
@@ -144,7 +146,8 @@ private:
     // Returns a copy of this object as a pointer to the base class.
     virtual PredBase* clone() const
     {
-      Pred<IterType,PredType> *copy = new Pred<IterType,PredType>(pred_data);
+      variant_filter_iterator::Pred<IterType,PredType> *copy = 
+	new variant_filter_iterator::Pred<IterType,PredType>(pred_data);
       return copy;
     }
     
@@ -154,14 +157,9 @@ private:
       //std::cout << "called Pred::op()" << std::endl;
       assert (in != NULL);
       
-      // Attempt downcast (full qualification of the type is only necessary for GCC 2.95.3)
-#if defined(__GNUC__) && (__GNUC__ < 3)  && !defined(__INTEL_COMPILER)
+      // Attempt downcast
       const variant_filter_iterator::Iter<IterType>* p =
 	dynamic_cast<const variant_filter_iterator::Iter<IterType>* >(in);
-#else
-      const Iter<IterType>* p =
-	dynamic_cast<const Iter<IterType>* >(in);
-#endif
       
       // Check for failure
       if ( p == NULL )
@@ -180,8 +178,7 @@ private:
   };
 
 
-
-  
+ private:  
   // Polymorphic pointer to the object.  Don't confuse
   // with the data pointer located in the Iter!
   IterBase* data;
