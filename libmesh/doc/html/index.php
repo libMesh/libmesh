@@ -14,8 +14,24 @@
 
 <div class="content">
 
-<img class="title_image" src="images/libmesh_mesh_small.png">
-<br><br><br>
+<!-- <img class="title_image" src="images/libmesh_mesh_small.png"> -->
+<!-- <br><br><br> -->
+<?php
+// This php script makes the words wrap nicely around the image which
+// we have split up into several sections.
+for ($i=0; $i<11; $i++)
+{
+  if ($i < 10)
+  {
+    echo "<img class=\"slant\" src=\"images/libmesh_mesh_layer_0$i.png\">";
+  }
+  
+  else
+  {
+    echo "<img class=\"slant\" src=\"images/libmesh_mesh_layer_10.png\">";
+  }
+}
+?>
 The <code>libMesh</code> library is a C++ framework for the numerical
 simulation of partial differential equations on serial and parallel
 platforms. Development began in March 2002 with the intent of
@@ -66,8 +82,3 @@ PHP Does not Work
 </HTML>
 
 
-<?php if (0) { ?>
-# Local Variables:
-# mode: html
-# End:
-<?php } ?>
