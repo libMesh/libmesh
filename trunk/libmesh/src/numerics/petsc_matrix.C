@@ -1,4 +1,4 @@
-// $Id: petsc_matrix.C,v 1.12 2003-02-20 04:59:58 benkirk Exp $
+// $Id: petsc_matrix.C,v 1.13 2003-02-20 23:18:16 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -33,13 +33,13 @@
 
 //-----------------------------------------------------------------------
 // PetscMatrix members
-template <typename Tp>
-void PetscMatrix<Tp>::init (const unsigned int m,
-			const unsigned int n,
-			const unsigned int m_l,
-			const unsigned int n_l,
-			const unsigned int nnz,
-			const unsigned int noz)
+template <typename T>
+void PetscMatrix<T>::init (const unsigned int m,
+			   const unsigned int n,
+			   const unsigned int m_l,
+			   const unsigned int n_l,
+			   const unsigned int nnz,
+			   const unsigned int noz)
 {
   if ((m==0) || (n==0))
     return;
@@ -89,8 +89,8 @@ void PetscMatrix<Tp>::init (const unsigned int m,
 
 
 
-template <typename Tp>
-void PetscMatrix<Tp>::init ()
+template <typename T>
+void PetscMatrix<T>::init ()
 {
   assert (_dof_map != NULL);
   
@@ -158,8 +158,8 @@ void PetscMatrix<Tp>::init ()
 
 
 
-template <typename Tp>
-void PetscMatrix<Tp>::zero ()
+template <typename T>
+void PetscMatrix<T>::zero ()
 {
   assert (initialized());
   
@@ -170,8 +170,8 @@ void PetscMatrix<Tp>::zero ()
 
 
 
-template <typename Tp>
-void PetscMatrix<Tp>::clear ()
+template <typename T>
+void PetscMatrix<T>::clear ()
 {
   int ierr=0;
   
@@ -185,8 +185,8 @@ void PetscMatrix<Tp>::clear ()
 
 
 
-template <typename Tp>
-Real PetscMatrix<Tp>::l1_norm () const
+template <typename T>
+Real PetscMatrix<T>::l1_norm () const
 {
   assert (initialized());
   
@@ -205,8 +205,8 @@ Real PetscMatrix<Tp>::l1_norm () const
 
 
 
-template <typename Tp>
-Real PetscMatrix<Tp>::linfty_norm () const
+template <typename T>
+Real PetscMatrix<T>::linfty_norm () const
 {
   assert (initialized());
   
@@ -225,8 +225,8 @@ Real PetscMatrix<Tp>::linfty_norm () const
 
 
 
-template <typename Tp>
-void PetscMatrix<Tp>::print_matlab (const std::string name) const
+template <typename T>
+void PetscMatrix<T>::print_matlab (const std::string name) const
 {
   assert (initialized());
   assert (closed());

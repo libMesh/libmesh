@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.14 2003-02-20 04:59:58 benkirk Exp $
+// $Id: dof_map.h,v 1.15 2003-02-20 23:18:03 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -35,7 +35,7 @@
 // Forward Declarations
 class Elem;
 class MeshBase;
-template <typename Tp> class SparseMatrix;
+template <typename T> class SparseMatrix;
 
 
 
@@ -55,7 +55,7 @@ template <typename Tp> class SparseMatrix;
 
 class DofMap
 {
- public:
+public:
 
   /**
    * Constructor.  Requires the number of the system for which we
@@ -296,7 +296,7 @@ class DofMap
   CouplingMatrix dof_coupling;
 
   
- private:
+private:
 
 
   /**

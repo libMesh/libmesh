@@ -1,4 +1,4 @@
-// $Id: petsc_vector.C,v 1.10 2003-02-20 04:59:58 benkirk Exp $
+// $Id: petsc_vector.C,v 1.11 2003-02-20 23:18:16 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,19 +30,19 @@
 
 
 
-// void PetscVector<Tp>::init (const NumericVector<Tp>& v, const bool fast)
+// void PetscVector<T>::init (const NumericVector<T>& v, const bool fast)
 // {
 //   error();
   
 //   init (v.local_size(), v.size(), fast);
 
-//   vec = reinterpret_cast<const PetscVector<Tp>&>(v).vec;
+//   vec = reinterpret_cast<const PetscVector<T>&>(v).vec;
 // }
 
 
 
-template <typename Tp>
-Real PetscVector<Tp>::l1_norm () const
+template <typename T>
+Real PetscVector<T>::l1_norm () const
 {
   assert(closed());
   
@@ -56,8 +56,8 @@ Real PetscVector<Tp>::l1_norm () const
 
 
 
-template <typename Tp>
-Real PetscVector<Tp>::l2_norm () const
+template <typename T>
+Real PetscVector<T>::l2_norm () const
 {
   assert(closed());
   
@@ -72,8 +72,8 @@ Real PetscVector<Tp>::l2_norm () const
 
 
 
-template <typename Tp>
-Real PetscVector<Tp>::linfty_norm () const
+template <typename T>
+Real PetscVector<T>::linfty_norm () const
 {
   assert(closed());
   
@@ -88,9 +88,9 @@ Real PetscVector<Tp>::linfty_norm () const
 
 
 
-template <typename Tp>
-NumericVector<Tp>&
-PetscVector<Tp>::operator += (const NumericVector<Tp>& v)
+template <typename T>
+NumericVector<T>&
+PetscVector<T>::operator += (const NumericVector<T>& v)
 {
   assert(closed());
   
@@ -101,9 +101,9 @@ PetscVector<Tp>::operator += (const NumericVector<Tp>& v)
 
 
 
-template <typename Tp>
-NumericVector<Tp>&
-PetscVector<Tp>::operator -= (const NumericVector<Tp>& v)
+template <typename T>
+NumericVector<T>&
+PetscVector<T>::operator -= (const NumericVector<T>& v)
 {
   assert(closed());
   
@@ -114,8 +114,8 @@ PetscVector<Tp>::operator -= (const NumericVector<Tp>& v)
 
 
 
-template <typename Tp>
-void PetscVector<Tp>::set (const unsigned int i, const Tp value)
+template <typename T>
+void PetscVector<T>::set (const unsigned int i, const T value)
 {
   assert(i<size());
   
@@ -130,8 +130,8 @@ void PetscVector<Tp>::set (const unsigned int i, const Tp value)
 
 
 
-template <typename Tp>
-void PetscVector<Tp>::add (const unsigned int i, const Tp value)
+template <typename T>
+void PetscVector<T>::add (const unsigned int i, const T value)
 {
   assert(i<size());
   
@@ -146,9 +146,9 @@ void PetscVector<Tp>::add (const unsigned int i, const Tp value)
 
 
 
-template <typename Tp>
-void PetscVector<Tp>::add_vector (const std::vector<Tp>& v,
-				  const std::vector<unsigned int>& dof_indices)
+template <typename T>
+void PetscVector<T>::add_vector (const std::vector<T>& v,
+				 const std::vector<unsigned int>& dof_indices)
 {
   assert (!v.empty());
   assert (v.size() == dof_indices.size());
@@ -159,9 +159,9 @@ void PetscVector<Tp>::add_vector (const std::vector<Tp>& v,
 
 
 
-template <typename Tp>
-void PetscVector<Tp>::add_vector (const NumericVector<Tp>& V,
-				  const std::vector<unsigned int>& dof_indices)
+template <typename T>
+void PetscVector<T>::add_vector (const NumericVector<T>& V,
+				 const std::vector<unsigned int>& dof_indices)
 {
   assert (V.size() == dof_indices.size());
 
@@ -171,8 +171,8 @@ void PetscVector<Tp>::add_vector (const NumericVector<Tp>& V,
 
 
 
-template <typename Tp>
-void PetscVector<Tp>::add (const Tp v)
+template <typename T>
+void PetscVector<T>::add (const T v)
 {
   int ierr=0;
   PetscScalar* values;
@@ -189,21 +189,21 @@ void PetscVector<Tp>::add (const Tp v)
 
 
 
-template <typename Tp>
-void PetscVector<Tp>::add (const NumericVector<Tp>& v)
+template <typename T>
+void PetscVector<T>::add (const NumericVector<T>& v)
 {
   add (1., v);
 }
 
 
 
-template <typename Tp>
-void PetscVector<Tp>::add (const Tp a, const NumericVector<Tp>& v_in)
+template <typename T>
+void PetscVector<T>::add (const T a, const NumericVector<T>& v_in)
 {
   int ierr=0;
   PetscScalar petsc_a=static_cast<PetscScalar>(a);
 
-  const PetscVector<Tp>& v = reinterpret_cast<const PetscVector<Tp>&>(v_in);
+  const PetscVector<T>& v = reinterpret_cast<const PetscVector<T>&>(v_in);
   
   assert(size() == v.size());
   
@@ -212,8 +212,8 @@ void PetscVector<Tp>::add (const Tp a, const NumericVector<Tp>& v_in)
 
 
 
-template <typename Tp>
-void PetscVector<Tp>::scale (const Tp factor)
+template <typename T>
+void PetscVector<T>::scale (const T factor)
 {
   int ierr=0;
   PetscScalar petsc_factor = static_cast<PetscScalar>(factor);
@@ -223,9 +223,9 @@ void PetscVector<Tp>::scale (const Tp factor)
 
 
 
-template <typename Tp>
-NumericVector<Tp>& 
-PetscVector<Tp>::operator = (const Tp s)
+template <typename T>
+NumericVector<T>& 
+PetscVector<T>::operator = (const T s)
 {
   int ierr=0;
   PetscScalar petsc_s=static_cast<PetscScalar>(s);
@@ -240,13 +240,13 @@ PetscVector<Tp>::operator = (const Tp s)
 
 
 
-template <typename Tp>
-NumericVector<Tp>&
-PetscVector<Tp>::operator = (const NumericVector<Tp>& v_in)
+template <typename T>
+NumericVector<T>&
+PetscVector<T>::operator = (const NumericVector<T>& v_in)
 {
   int ierr=0;
   
-  const PetscVector<Tp>& v = reinterpret_cast<const PetscVector<Tp>&>(v_in);
+  const PetscVector<T>& v = reinterpret_cast<const PetscVector<T>&>(v_in);
 
   assert (size() == v.size());
 
@@ -260,9 +260,9 @@ PetscVector<Tp>::operator = (const NumericVector<Tp>& v_in)
 
 
 
-template <typename Tp>
-PetscVector<Tp>&
-PetscVector<Tp>::operator = (const PetscVector<Tp>& v)
+template <typename T>
+PetscVector<T>&
+PetscVector<T>::operator = (const PetscVector<T>& v)
 {
   int ierr=0;
 
@@ -278,9 +278,9 @@ PetscVector<Tp>::operator = (const PetscVector<Tp>& v)
 
 
 
-template <typename Tp>
-NumericVector<Tp>&
-PetscVector<Tp>::operator = (const std::vector<Tp>& v)
+template <typename T>
+NumericVector<T>&
+PetscVector<T>::operator = (const std::vector<T>& v)
 {
   const unsigned int nl   = local_size();
   const unsigned int ioff = first_local_index();
@@ -322,10 +322,10 @@ PetscVector<Tp>::operator = (const std::vector<Tp>& v)
 
 
 
-template <typename Tp>
-void PetscVector<Tp>::localize (NumericVector<Tp>& v_local_in) const
+template <typename T>
+void PetscVector<T>::localize (NumericVector<T>& v_local_in) const
 {
-  const PetscVector<Tp>& v_local = reinterpret_cast<const PetscVector<Tp>&>(v_local_in);
+  const PetscVector<T>& v_local = reinterpret_cast<const PetscVector<T>&>(v_local_in);
 
   assert (v_local.local_size() == size());
 
@@ -358,11 +358,11 @@ void PetscVector<Tp>::localize (NumericVector<Tp>& v_local_in) const
 
 
 
-template <typename Tp>
-void PetscVector<Tp>::localize (NumericVector<Tp>& v_local_in,
-				const std::vector<unsigned int>& send_list) const
+template <typename T>
+void PetscVector<T>::localize (NumericVector<T>& v_local_in,
+			       const std::vector<unsigned int>& send_list) const
 {
-  const PetscVector<Tp>& v_local = reinterpret_cast<const PetscVector<Tp>&>(v_local_in);
+  const PetscVector<T>& v_local = reinterpret_cast<const PetscVector<T>&>(v_local_in);
 
   assert (v_local.local_size() == size());
   assert (send_list.size() <= v_local.size());
@@ -448,7 +448,7 @@ void PetscVector<Real>::localize (std::vector<Real>& v_local) const
 
       else if (sizeof(Real) == sizeof(float))     
 	MPI_Allreduce (&local_values[0], &v_local[0], n, MPI_FLOAT, MPI_SUM,
-			   PETSC_COMM_WORLD);
+		       PETSC_COMM_WORLD);
 
       else
 	error();
@@ -520,15 +520,15 @@ void PetscVector<Complex>::localize (std::vector<Complex>& v_local) const
   //TODO:[DD] localize may be done in a better way...
   // There is no MPI_COMPLEX in C. For now, use PETSc 
 	    
-  // have an appropriately sized PetscVector<Tp> handy
-  PetscVector<Tp> pv(n);
+  // have an appropriately sized PetscVector<T> handy
+  PetscVector<T> pv(n);
 	  
   // localize ourselves to this vector
   localize(&pv);
 
   // copy data to v_local
   for (int i=0; i<n; i++)
-  v_local[i] =  static_cast<Tp>(pv(i));
+  v_local[i] =  static_cast<T>(pv(i));
 
   // note that the destructor of pv calls clear()
   }
@@ -666,15 +666,15 @@ void PetscVector<Complex>::localize_to_one (std::vector<Complex>& v_local,
 
   if (my_proc_id == proc_id)
   {
-  // have an appropriately sized PetscVector<Tp> handy
-  PetscVector<Tp> pv(n);
+  // have an appropriately sized PetscVector<T> handy
+  PetscVector<T> pv(n);
 	  
   // localize ourselves to this vector
   localize(&pv);
 
   // copy data to v_local
   for (int i=0; i<n; i++)
-  v_local[i] =  static_cast<Tp>(pv(i));
+  v_local[i] =  static_cast<T>(pv(i));
 
   }
   }

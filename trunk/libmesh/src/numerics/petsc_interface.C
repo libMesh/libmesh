@@ -1,4 +1,4 @@
-// $Id: petsc_interface.C,v 1.9 2003-02-20 04:59:58 benkirk Exp $
+// $Id: petsc_interface.C,v 1.10 2003-02-20 23:18:16 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -32,8 +32,8 @@
 
 
 /*----------------------- functions ----------------------------------*/
-template <typename Tp>
-void PetscInterface<Tp>::clear ()
+template <typename T>
+void PetscInterface<T>::clear ()
 {
   if (initialized())
     {
@@ -50,8 +50,8 @@ void PetscInterface<Tp>::clear ()
 
 
 
-template <typename Tp>
-void PetscInterface<Tp>::init ()
+template <typename T>
+void PetscInterface<T>::init ()
 {
   int ierr=0;
   
@@ -90,19 +90,19 @@ void PetscInterface<Tp>::init ()
 
 
 
-template <typename Tp>
+template <typename T>
 std::pair<unsigned int, Real> 
-PetscInterface<Tp>::solve (SparseMatrix<Tp> &matrix_in,
-			   NumericVector<Tp> &solution_in,
-			   NumericVector<Tp> &rhs_in,
-			   const double tol,
-			   const unsigned int m_its)
+PetscInterface<T>::solve (SparseMatrix<T> &matrix_in,
+			  NumericVector<T> &solution_in,
+			  NumericVector<T> &rhs_in,
+			  const double tol,
+			  const unsigned int m_its)
 {
   init ();
   
-  PetscMatrix<Tp>& matrix   = reinterpret_cast<PetscMatrix<Tp>&>(matrix_in);
-  PetscVector<Tp>& solution = reinterpret_cast<PetscVector<Tp>&>(solution_in);
-  PetscVector<Tp>& rhs      = reinterpret_cast<PetscVector<Tp>&>(rhs_in);
+  PetscMatrix<T>& matrix   = reinterpret_cast<PetscMatrix<T>&>(matrix_in);
+  PetscVector<T>& solution = reinterpret_cast<PetscVector<T>&>(solution_in);
+  PetscVector<T>& rhs      = reinterpret_cast<PetscVector<T>&>(rhs_in);
   
   int ierr=0;
   int its=0, max_its = static_cast<int>(m_its);
@@ -137,8 +137,8 @@ PetscInterface<Tp>::solve (SparseMatrix<Tp> &matrix_in,
 
 
 
-template <typename Tp>
-void PetscInterface<Tp>::set_petsc_solver_type()
+template <typename T>
+void PetscInterface<T>::set_petsc_solver_type()
 {
   int ierr = 0;
   
@@ -190,8 +190,8 @@ void PetscInterface<Tp>::set_petsc_solver_type()
 
 
 
-template <typename Tp>
-void PetscInterface<Tp>::set_petsc_preconditioner_type()
+template <typename T>
+void PetscInterface<T>::set_petsc_preconditioner_type()
 {
   int ierr = 0;
  

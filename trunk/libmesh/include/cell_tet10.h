@@ -1,4 +1,4 @@
-// $Id: cell_tet10.h,v 1.6 2003-02-13 22:56:06 benkirk Exp $
+// $Id: cell_tet10.h,v 1.7 2003-02-20 23:18:02 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -108,19 +108,30 @@ public:
   /**
    * Refine the element.
    */
-  void refine(Mesh&)
-  { error(); return; }
-  
-  /**
-   * Coarsen the element.
-   */
-  void coarsen()
-  { error(); return; }
+  void refine(Mesh& mesh);
 
 #endif
+
   
-private:
+private:  
+
   
+#ifdef ENABLE_AMR
+  
+  /**
+   * Matrix that computes new nodal locations/solution values
+   * from current nodes/solution.
+   */
+  static const float embedding_matrix[8][10][10];
+  
+  /**
+   * Matrix that tells which children share which of
+   * my sides.
+   */
+  static const unsigned int side_children_matrix[4][4];
+  
+#endif
+
 };
 
 

@@ -1,4 +1,4 @@
-// $Id: distributed_vector.C,v 1.4 2003-02-20 05:13:42 benkirk Exp $
+// $Id: distributed_vector.C,v 1.5 2003-02-20 23:18:16 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -32,8 +32,8 @@
 
 //--------------------------------------------------------------------------
 // DistributedVector methods
-template <typename Tp>
-Real DistributedVector<Tp>::l1_norm () const
+template <typename T>
+Real DistributedVector<T>::l1_norm () const
 {
   assert (initialized());
   assert (_values.size() == _local_size);
@@ -61,8 +61,8 @@ Real DistributedVector<Tp>::l1_norm () const
 
 
 
-template <typename Tp>
-Real DistributedVector<Tp>::l2_norm () const
+template <typename T>
+Real DistributedVector<T>::l2_norm () const
 {
   assert (initialized());
   assert (_values.size() == _local_size);
@@ -90,8 +90,8 @@ Real DistributedVector<Tp>::l2_norm () const
 
 
 
-template <typename Tp>
-Real DistributedVector<Tp>::linfty_norm () const
+template <typename T>
+Real DistributedVector<T>::linfty_norm () const
 {
   assert (initialized());
   assert (_values.size() == _local_size);
@@ -123,8 +123,8 @@ Real DistributedVector<Tp>::linfty_norm () const
 
 
 
-template <typename Tp>
-NumericVector<Tp>& DistributedVector<Tp>::operator += (const NumericVector<Tp>& v)
+template <typename T>
+NumericVector<T>& DistributedVector<T>::operator += (const NumericVector<T>& v)
 {
   assert(closed());
   assert (initialized());
@@ -138,8 +138,8 @@ NumericVector<Tp>& DistributedVector<Tp>::operator += (const NumericVector<Tp>& 
 
 
 
-template <typename Tp>
-NumericVector<Tp>& DistributedVector<Tp>::operator -= (const NumericVector<Tp>& v)
+template <typename T>
+NumericVector<T>& DistributedVector<T>::operator -= (const NumericVector<T>& v)
 {
   assert(closed());
   assert (initialized());
@@ -153,9 +153,9 @@ NumericVector<Tp>& DistributedVector<Tp>::operator -= (const NumericVector<Tp>& 
 
 
 
-template <typename Tp>
-void DistributedVector<Tp>::add_vector (const std::vector<Tp>& v,
-					const std::vector<unsigned int>& dof_indices)
+template <typename T>
+void DistributedVector<T>::add_vector (const std::vector<T>& v,
+				       const std::vector<unsigned int>& dof_indices)
 {
   assert (!v.empty());
   assert (v.size() == dof_indices.size());
@@ -169,9 +169,9 @@ void DistributedVector<Tp>::add_vector (const std::vector<Tp>& v,
 
 
 
-template <typename Tp>
-void DistributedVector<Tp>::add_vector (const NumericVector<Tp>& V,
-					const std::vector<unsigned int>& dof_indices)
+template <typename T>
+void DistributedVector<T>::add_vector (const NumericVector<T>& V,
+				       const std::vector<unsigned int>& dof_indices)
 {
   assert (V.size() == dof_indices.size());
   assert (initialized());
@@ -184,8 +184,8 @@ void DistributedVector<Tp>::add_vector (const NumericVector<Tp>& V,
 
 
 
-template <typename Tp>
-void DistributedVector<Tp>::add (const Tp v)
+template <typename T>
+void DistributedVector<T>::add (const T v)
 {
   assert (initialized());
   assert (_values.size() == _local_size);
@@ -197,8 +197,8 @@ void DistributedVector<Tp>::add (const Tp v)
 
 
 
-template <typename Tp>
-void DistributedVector<Tp>::add (const NumericVector<Tp>& v)
+template <typename T>
+void DistributedVector<T>::add (const NumericVector<T>& v)
 {
   assert (initialized());
   assert (_values.size() == _local_size);
@@ -209,8 +209,8 @@ void DistributedVector<Tp>::add (const NumericVector<Tp>& v)
 
 
 
-template <typename Tp>
-void DistributedVector<Tp>::add (const Tp a, const NumericVector<Tp>& v)
+template <typename T>
+void DistributedVector<T>::add (const T a, const NumericVector<T>& v)
 {
   assert (initialized());
   assert (_values.size() == _local_size);
@@ -221,8 +221,8 @@ void DistributedVector<Tp>::add (const Tp a, const NumericVector<Tp>& v)
 
 
 
-template <typename Tp>
-void DistributedVector<Tp>::scale (const Tp factor)
+template <typename T>
+void DistributedVector<T>::scale (const T factor)
 {
   assert (initialized());
   assert (_values.size() == _local_size);
@@ -234,9 +234,9 @@ void DistributedVector<Tp>::scale (const Tp factor)
 
 
 
-template <typename Tp>
-NumericVector<Tp>& 
-DistributedVector<Tp>::operator = (const Tp s)
+template <typename T>
+NumericVector<T>& 
+DistributedVector<T>::operator = (const T s)
 {
   assert (initialized());
   assert (_values.size() == _local_size);
@@ -250,15 +250,15 @@ DistributedVector<Tp>::operator = (const Tp s)
 
 
 
-template <typename Tp>
-NumericVector<Tp>&
-DistributedVector<Tp>::operator = (const NumericVector<Tp>& v_in)
+template <typename T>
+NumericVector<T>&
+DistributedVector<T>::operator = (const NumericVector<T>& v_in)
 {
   assert (initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 
-  const DistributedVector<Tp>& v = reinterpret_cast<const DistributedVector<Tp>&>(v_in);
+  const DistributedVector<T>& v = reinterpret_cast<const DistributedVector<T>&>(v_in);
   
   *this = v;
   
@@ -267,9 +267,9 @@ DistributedVector<Tp>::operator = (const NumericVector<Tp>& v_in)
 
 
 
-template <typename Tp>
-DistributedVector<Tp>&
-DistributedVector<Tp>::operator = (const DistributedVector<Tp>& v)
+template <typename T>
+DistributedVector<T>&
+DistributedVector<T>::operator = (const DistributedVector<T>& v)
 {
   assert (initialized());
   assert (v.local_size() == local_size());
@@ -291,9 +291,9 @@ DistributedVector<Tp>::operator = (const DistributedVector<Tp>& v)
 
 
 
-template <typename Tp>
-NumericVector<Tp>&
-DistributedVector<Tp>::operator = (const std::vector<Tp>& v)
+template <typename T>
+NumericVector<T>&
+DistributedVector<T>::operator = (const std::vector<T>& v)
 {
   assert (initialized());
   assert (_values.size() == _local_size);
@@ -317,15 +317,15 @@ DistributedVector<Tp>::operator = (const std::vector<Tp>& v)
 
 
 
-template <typename Tp>
-void DistributedVector<Tp>::localize (NumericVector<Tp>& v_local_in) const
+template <typename T>
+void DistributedVector<T>::localize (NumericVector<T>& v_local_in) const
 
 {
   assert (initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 
-  DistributedVector<Tp>& v_local = reinterpret_cast<DistributedVector<Tp>&>(v_local_in);
+  DistributedVector<T>& v_local = reinterpret_cast<DistributedVector<T>&>(v_local_in);
 
   v_local._first_local_index = 0;
   
@@ -349,9 +349,9 @@ void DistributedVector<Tp>::localize (NumericVector<Tp>& v_local_in) const
 
 
 
-template <typename Tp>
-void DistributedVector<Tp>::localize (NumericVector<Tp>& v_local_in,
-				      const std::vector<unsigned int>&) const
+template <typename T>
+void DistributedVector<T>::localize (NumericVector<T>& v_local_in,
+				     const std::vector<unsigned int>&) const
 {
   assert (initialized());
   assert (_values.size() == _local_size);

@@ -1,4 +1,12 @@
-a {
+body
+{
+  background: #ffffff url(images/bg.png);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+a
+{
     text-decoration: none;
 }
 a.qindex {}
@@ -45,7 +53,7 @@ dl.el {
 div.fragment {
     width: 100%;
     border: none;
-    background-color: #eeeeee
+    background-color: transparent;
 }
 div.ah {
     background-color: black;
@@ -72,22 +80,22 @@ div.groupText {
 
 
 td.md {
-    background-color: #f2f2ff;
+    background-color: transparent;
     font-weight: bold;
 }
 td.mdname1 {
-    background-color: #f2f2ff;
+    background-color: transparent;
     font-weight: bold;
     color: #602020;
 }
 td.mdname {
-    background-color: #f2f2ff;
+    background-color: transparent;
     font-weight: bold;
     color: #602020;
     width: 600px;
 }
 td.indexkey { 
-   background-color: #eeeeff; 
+   background-color: transparent;
    font-weight: bold; 
    padding-right  : 10px; 
    padding-top    : 2px; 
@@ -99,7 +107,7 @@ td.indexkey {
    margin-bottom  : 2px  
 }
 td.indexvalue { 
-   background-color: #eeeeff; 
+   background-color: transparent;
    font-style: italic; 
    padding-right  : 10px; 
    padding-top    : 2px; 

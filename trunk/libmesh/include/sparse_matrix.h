@@ -1,4 +1,4 @@
-// $Id: sparse_matrix.h,v 1.5 2003-02-20 04:59:58 benkirk Exp $
+// $Id: sparse_matrix.h,v 1.6 2003-02-20 23:18:09 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -36,7 +36,7 @@
 
 
 // forward declarations
-//template <typename Tp> class SparseMatrix;
+//template <typename T> class SparseMatrix;
 
 
 /**
@@ -50,8 +50,8 @@
  * @author Benjamin S. Kirk, 2003
  */
 
-template <typename Tp>
-class SparseMatrix : public ReferenceCountedObject<SparseMatrix<Tp> >
+template <typename T>
+class SparseMatrix : public ReferenceCountedObject<SparseMatrix<T> >
 {
 public:
   /**
@@ -79,10 +79,10 @@ public:
   virtual ~SparseMatrix ();
 
   /**
-   * Builds a \p SparseMatrix<Tp> using the linear solver package specified by
+   * Builds a \p SparseMatrix<T> using the linear solver package specified by
    * \p solver_package
    */
-  static AutoPtr<SparseMatrix<Tp> > build(const SolverPackage solver_package);
+  static AutoPtr<SparseMatrix<T> > build(const SolverPackage solver_package);
   
   /**
    * @returns true if the matrix has been initialized,
@@ -100,7 +100,7 @@ public:
   /**
    * Updates the matrix sparsity pattern.  This method is
    * included because some sparse matrix storage schemes
-   * (e.g. LASPACK) need it.  If your \p SparseMatrix<Tp>
+   * (e.g. LASPACK) need it.  If your \p SparseMatrix<T>
    * implementation does not need this data simply do
    * not overload this method.
    */
@@ -179,7 +179,7 @@ public:
    */
   virtual void set (const unsigned int i,
 		    const unsigned int j,
-		    const Tp value) = 0;
+		    const T value) = 0;
     
   /**
    * Add \p value to the element
@@ -191,7 +191,7 @@ public:
    */
   virtual void add (const unsigned int i,
 		    const unsigned int j,
-		    const Tp value) = 0;
+		    const T value) = 0;
 
   /**
    * Add the full matrix to the
@@ -200,7 +200,7 @@ public:
    * at assembly time
    */
     
-  virtual void add_matrix (const DenseMatrix<Tp> &dm,
+  virtual void add_matrix (const DenseMatrix<T> &dm,
 			   const std::vector<unsigned int> &rows,
 			   const std::vector<unsigned int> &cols) = 0;
   
@@ -208,7 +208,7 @@ public:
    * Same, but assumes the row and column maps are the same.
    * Thus the matrix \p dm must be square.
    */
-  virtual void add_matrix (const DenseMatrix<Tp> &dm,
+  virtual void add_matrix (const DenseMatrix<T> &dm,
 			   const std::vector<unsigned int> &dof_indices) = 0;
       
   /**
@@ -229,8 +229,8 @@ public:
    * matrix), use the \p el
    * function.
    */
-  virtual Tp operator () (const unsigned int i,
-			  const unsigned int j) const = 0;
+  virtual T operator () (const unsigned int i,
+			 const unsigned int j) const = 0;
 
   /**
    * Return the l1-norm of the matrix, that is
@@ -299,25 +299,25 @@ protected:
 
 //-----------------------------------------------------------------------
 // SparseMatrix inline members
-template <typename Tp>
+template <typename T>
 inline
-SparseMatrix<Tp>::SparseMatrix () :
+SparseMatrix<T>::SparseMatrix () :
   _dof_map(NULL),
   _is_initialized(false)
 {}
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-SparseMatrix<Tp>::~SparseMatrix ()
+SparseMatrix<T>::~SparseMatrix ()
 {}
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-void SparseMatrix<Tp>::print() const
+void SparseMatrix<T>::print() const
 {
   assert (initialized());
 

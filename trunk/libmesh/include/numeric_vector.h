@@ -1,4 +1,4 @@
-// $Id: numeric_vector.h,v 1.6 2003-02-20 04:59:58 benkirk Exp $
+// $Id: numeric_vector.h,v 1.7 2003-02-20 23:18:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -34,7 +34,7 @@
 
 
 // forward declarations
-template <typename Tp> class NumericVector;
+template <typename T> class NumericVector;
 
 
 /**
@@ -44,8 +44,8 @@ template <typename Tp> class NumericVector;
  *
  * @author Benjamin S. Kirk, 2003
  */
-template <typename Tp>
-class NumericVector : public ReferenceCountedObject<NumericVector<Tp> >
+template <typename T>
+class NumericVector : public ReferenceCountedObject<NumericVector<T> >
 {
 public:
 
@@ -78,7 +78,7 @@ public:
    * Builds a \p NumericVector using the linear solver package specified by
    * \p solver_package
    */
-  static AutoPtr<NumericVector<Tp> > build(const SolverPackage solver_package);
+  static AutoPtr<NumericVector<T> > build(const SolverPackage solver_package);
   
   /**
    * @returns true if the vector has been initialized,
@@ -98,7 +98,7 @@ public:
   virtual void close () = 0; 
 
   /**
-   * @returns the \p NumericVector<Tp> to a pristine state.
+   * @returns the \p NumericVector<T> to a pristine state.
    */
   virtual void clear ();
   
@@ -140,23 +140,23 @@ public:
   //    * this function is the same as calling
   //    * \p init(V.size(),fast).
   //    */
-  //   virtual void init (const NumericVector<Tp>&,
+  //   virtual void init (const NumericVector<T>&,
   // 		     const bool = false) {}
 
   /**
    * $U(0-N) = s$: fill all components.
    */
-  virtual NumericVector<Tp> & operator= (const Tp s);
+  virtual NumericVector<T> & operator= (const T s);
   
   /**
    *  $U = V$: copy all components.
    */
-  virtual NumericVector<Tp> & operator= (const NumericVector<Tp> &V);
+  virtual NumericVector<T> & operator= (const NumericVector<T> &V);
 
   /**
    *  $U = V$: copy all components.
    */
-  virtual NumericVector<Tp> & operator= (const std::vector<Tp> &v);
+  virtual NumericVector<T> & operator= (const std::vector<T> &v);
 
   /**
    * @returns the minimum element in the vector.
@@ -195,7 +195,7 @@ public:
   /**
    * @returns dimension of the vector. This
    * function was formerly called \p n(), but
-   * was renamed to get the \p NumericVector<Tp> class
+   * was renamed to get the \p NumericVector<T> class
    * closer to the C++ standard library's
    * \p std::vector container.
    */
@@ -222,92 +222,92 @@ public:
   /**
    * Access components, returns \p U(i).
    */
-  virtual Tp operator() (const unsigned int i) const = 0;
+  virtual T operator() (const unsigned int i) const = 0;
     
   /**
    * Addition operator.
    * Fast equivalent to \p U.add(1, V).
    */
-  virtual NumericVector<Tp> & operator += (const NumericVector<Tp> &V) = 0;
+  virtual NumericVector<T> & operator += (const NumericVector<T> &V) = 0;
 
   /**
    * Subtraction operator.
    * Fast equivalent to \p U.add(-1, V).
    */
-  virtual NumericVector<Tp> & operator -= (const NumericVector<Tp> &V) = 0;
+  virtual NumericVector<T> & operator -= (const NumericVector<T> &V) = 0;
     
   /**
    * v(i) = value
    */
-  virtual void set (const unsigned int i, const Tp value) = 0;
+  virtual void set (const unsigned int i, const T value) = 0;
     
   /**
    * v(i) += value
    */
-  virtual void add (const unsigned int i, const Tp value) = 0;
+  virtual void add (const unsigned int i, const T value) = 0;
     
   /**
    * $U(0-DIM)+=s$.
    * Addition of \p s to all components. Note
    * that \p s is a scalar and not a vector.
    */
-  virtual void add (const Tp s) = 0;
+  virtual void add (const T s) = 0;
     
   /**
    * U+=V.
    * Simple vector addition, equal to the
    * \p operator +=.
    */
-  virtual void add (const NumericVector<Tp>& V) = 0;
+  virtual void add (const NumericVector<T>& V) = 0;
 
   /**
    * U+=a*V.
    * Simple vector addition, equal to the
    * \p operator +=.
    */
-  virtual void add (const Tp a, const NumericVector<Tp>& v) = 0;
+  virtual void add (const T a, const NumericVector<T>& v) = 0;
   
   /**
-   * U+=v where v is a std::vector<Tp> 
+   * U+=v where v is a std::vector<T> 
    * and you
    * want to specify WHERE to add it
    */
-  virtual void add_vector (const std::vector<Tp>& v,
+  virtual void add_vector (const std::vector<T>& v,
 			   const std::vector<unsigned int>& dof_indices) = 0;
 
   /**
    * U+=V where U and V are type 
-   * NumericVector<Tp> and you
+   * NumericVector<T> and you
    * want to specify WHERE to add
-   * the NumericVector<Tp> V 
+   * the NumericVector<T> V 
    */
-  virtual void add_vector (const NumericVector<Tp>& V,
+  virtual void add_vector (const NumericVector<T>& V,
 			   const std::vector<unsigned int>& dof_indices) = 0;
     
   /**
    * Scale each element of the
    * vector by the given factor.
    */
-  virtual void scale (const Tp factor) = 0;
+  virtual void scale (const T factor) = 0;
 
   /**
    * Creates a copy of the global vector in the
    * local vector \p v_local.
    */
-  virtual void localize (std::vector<Tp>& v_local) const = 0;
+  virtual void localize (std::vector<T>& v_local) const = 0;
 
   /**
-   * Same, but fills a \p NumericVector<Tp> instead of
+   * Same, but fills a \p NumericVector<T> instead of
    * a \p std::vector.
    */
-  virtual void localize (NumericVector<Tp>& v_local) const = 0;
+  virtual void localize (NumericVector<T>& v_local) const = 0;
 
   /**
    * Creates a local vector \p v_local containing
    * only information relevant to this processor, as
    * defined by the \p send_list.
    */
-  virtual void localize (NumericVector<Tp>& v_local,
+  virtual void localize (NumericVector<T>& v_local,
 			 const std::vector<unsigned int>& send_list) const = 0;
 
   /**
@@ -316,7 +316,7 @@ public:
    * default the data is sent to processor 0.  This method
    * is useful for outputting data from one processor.
    */
-  virtual void localize_to_one (std::vector<Tp>& v_local,
+  virtual void localize_to_one (std::vector<T>& v_local,
 				const unsigned int proc_id=0) const = 0;
     
   /**
@@ -344,18 +344,18 @@ protected:
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-NumericVector<Tp>::NumericVector () :
+NumericVector<T>::NumericVector () :
   _is_closed(false),
   _is_initialized(false)
 {}
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-NumericVector<Tp>::NumericVector (const unsigned int n) :
+NumericVector<T>::NumericVector (const unsigned int n) :
   _is_closed(false),
   _is_initialized(false)
 {
@@ -364,10 +364,10 @@ NumericVector<Tp>::NumericVector (const unsigned int n) :
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-NumericVector<Tp>::NumericVector (const unsigned int n,
-				  const unsigned int n_local) :
+NumericVector<T>::NumericVector (const unsigned int n,
+				 const unsigned int n_local) :
   _is_closed(false),
   _is_initialized(false)
 {
@@ -376,18 +376,18 @@ NumericVector<Tp>::NumericVector (const unsigned int n,
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-NumericVector<Tp>::~NumericVector ()
+NumericVector<T>::~NumericVector ()
 {
   clear ();
 }
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-NumericVector<Tp> & NumericVector<Tp>::operator= (const Tp) 
+NumericVector<T> & NumericVector<T>::operator= (const T) 
 {
   //  error();
 
@@ -396,9 +396,9 @@ NumericVector<Tp> & NumericVector<Tp>::operator= (const Tp)
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-NumericVector<Tp> & NumericVector<Tp>::operator= (const NumericVector<Tp>&) 
+NumericVector<T> & NumericVector<T>::operator= (const NumericVector<T>&) 
 {
   //  error();
 
@@ -407,9 +407,9 @@ NumericVector<Tp> & NumericVector<Tp>::operator= (const NumericVector<Tp>&)
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-NumericVector<Tp> & NumericVector<Tp>::operator= (const std::vector<Tp>&) 
+NumericVector<T> & NumericVector<T>::operator= (const std::vector<T>&) 
 {
   //  error();
 
@@ -418,9 +418,9 @@ NumericVector<Tp> & NumericVector<Tp>::operator= (const std::vector<Tp>&)
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-void NumericVector<Tp>::clear ()
+void NumericVector<T>::clear ()
 {
   _is_closed      = false;
   _is_initialized = false;
@@ -428,9 +428,9 @@ void NumericVector<Tp>::clear ()
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-void NumericVector<Tp>::print() const
+void NumericVector<T>::print() const
 {
   assert (initialized());
 

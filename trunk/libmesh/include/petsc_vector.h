@@ -1,4 +1,4 @@
-// $Id: petsc_vector.h,v 1.12 2003-02-20 04:59:58 benkirk Exp $
+// $Id: petsc_vector.h,v 1.13 2003-02-20 23:18:08 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -62,7 +62,7 @@ extern "C" {
 
 
 // forward declarations
-template <typename Tp> class PetscInterface;
+template <typename T> class PetscInterface;
 
 
 /**
@@ -72,8 +72,8 @@ template <typename Tp> class PetscInterface;
  * @author Benjamin S. Kirk, 2002
  */
 
-template <typename Tp>
-class PetscVector : public NumericVector<Tp>
+template <typename T>
+class PetscVector : public NumericVector<T>
 {
 public:
 
@@ -106,7 +106,7 @@ public:
   void close (); 
 
   /**
-   * @returns the \p PetscVector<Tp> to a pristine state.
+   * @returns the \p PetscVector<T> to a pristine state.
    */
   void clear ();
   
@@ -148,28 +148,28 @@ public:
   //    * this function is the same as calling
   //    * \p init(V.size(),fast).
   //    */
-  //   void init (const NumericVector<Tp>& V,
+  //   void init (const NumericVector<T>& V,
   // 	     const bool fast=false);
 
   /**
    * $U(0-N) = s$: fill all components.
    */
-  NumericVector<Tp> & operator= (const Tp s);
+  NumericVector<T> & operator= (const T s);
     
   /**
    *  $U = V$: copy all components.
    */
-  NumericVector<Tp> & operator= (const NumericVector<Tp> &V);
+  NumericVector<T> & operator= (const NumericVector<T> &V);
 
   /**
    *  $U = V$: copy all components.
    */
-  PetscVector<Tp> & operator= (const PetscVector<Tp> &V);
+  PetscVector<T> & operator= (const PetscVector<T> &V);
 
   /**
    *  $U = V$: copy all components.
    */
-  NumericVector<Tp> & operator= (const std::vector<Tp> &v);
+  NumericVector<T> & operator= (const std::vector<T> &v);
 
   /**
    * @returns the minimum element in the vector.
@@ -208,7 +208,7 @@ public:
   /**
    * @returns dimension of the vector. This
    * function was formerly called \p n(), but
-   * was renamed to get the \p PetscVector<Tp> class
+   * was renamed to get the \p PetscVector<T> class
    * closer to the C++ standard library's
    * \p std::vector container.
    */
@@ -235,92 +235,92 @@ public:
   /**
    * Access components, returns \p U(i).
    */
-  Tp operator() (const unsigned int i) const;
+  T operator() (const unsigned int i) const;
     
   /**
    * Addition operator.
    * Fast equivalent to \p U.add(1, V).
    */
-  NumericVector<Tp> & operator += (const NumericVector<Tp> &V);
+  NumericVector<T> & operator += (const NumericVector<T> &V);
 
   /**
    * Subtraction operator.
    * Fast equivalent to \p U.add(-1, V).
    */
-  NumericVector<Tp> & operator -= (const NumericVector<Tp> &V);
+  NumericVector<T> & operator -= (const NumericVector<T> &V);
     
   /**
    * v(i) = value
    */
-  void set (const unsigned int i, const Tp value);
+  void set (const unsigned int i, const T value);
     
   /**
    * v(i) += value
    */
-  void add (const unsigned int i, const Tp value);
+  void add (const unsigned int i, const T value);
     
   /**
    * $U(0-DIM)+=s$.
    * Addition of \p s to all components. Note
    * that \p s is a scalar and not a vector.
    */
-  void add (const Tp s);
+  void add (const T s);
     
   /**
    * U+=V.
    * Simple vector addition, equal to the
    * \p operator +=.
    */
-  void add (const NumericVector<Tp>& V);
+  void add (const NumericVector<T>& V);
 
   /**
    * U+=a*V.
    * Simple vector addition, equal to the
    * \p operator +=.
    */
-  void add (const Tp a, const NumericVector<Tp>& v);
+  void add (const T a, const NumericVector<T>& v);
   
   /**
-   * U+=v where v is a std::vector<Tp> 
+   * U+=v where v is a std::vector<T> 
    * and you
    * want to specify WHERE to add it
    */
-  void add_vector (const std::vector<Tp>& v,
+  void add_vector (const std::vector<T>& v,
 		   const std::vector<unsigned int>& dof_indices);
 
   /**
    * U+=V where U and V are type 
-   * NumericVector<Tp> and you
+   * NumericVector<T> and you
    * want to specify WHERE to add
-   * the NumericVector<Tp> V 
+   * the NumericVector<T> V 
    */
-  void add_vector (const NumericVector<Tp>& V,
+  void add_vector (const NumericVector<T>& V,
 		   const std::vector<unsigned int>& dof_indices);
   
   /**
    * Scale each element of the
    * vector by the given factor.
    */
-  void scale (const Tp factor);
+  void scale (const T factor);
     
   /**
    * Creates a copy of the global vector in the
    * local vector \p v_local.
    */
-  void localize (std::vector<Tp>& v_local) const;
+  void localize (std::vector<T>& v_local) const;
 
   /**
-   * Same, but fills a \p NumericVector<Tp> instead of
+   * Same, but fills a \p NumericVector<T> instead of
    * a \p std::vector.
    */
-  void localize (NumericVector<Tp>& v_local) const;
+  void localize (NumericVector<T>& v_local) const;
 
   /**
    * Creates a local vector \p v_local containing
    * only information relevant to this processor, as
    * defined by the \p send_list.
    */
-  void localize (NumericVector<Tp>& v_local,
+  void localize (NumericVector<T>& v_local,
 		 const std::vector<unsigned int>& send_list) const;
 
   /**
@@ -329,7 +329,7 @@ public:
    * default the data is sent to processor 0.  This method
    * is useful for outputting data from one processor.
    */
-  void localize_to_one (std::vector<Tp>& v_local,
+  void localize_to_one (std::vector<T>& v_local,
 			const unsigned int proc_id=0) const;
     
 private:
@@ -340,7 +340,7 @@ private:
    */
   Vec vec;
   
-  friend class PetscInterface<Tp>;
+  friend class PetscInterface<T>;
 };
 
 
@@ -348,46 +348,46 @@ private:
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-PetscVector<Tp>::PetscVector ()
+PetscVector<T>::PetscVector ()
 {}
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-PetscVector<Tp>::PetscVector (const unsigned int n)
+PetscVector<T>::PetscVector (const unsigned int n)
 {
   init(n, n, false);
 }
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-PetscVector<Tp>::PetscVector (const unsigned int n,
-			      const unsigned int n_local)
+PetscVector<T>::PetscVector (const unsigned int n,
+			     const unsigned int n_local)
 {
   init(n, n_local, false);
 }
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-PetscVector<Tp>::~PetscVector ()
+PetscVector<T>::~PetscVector ()
 {
   clear ();
 }
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-void PetscVector<Tp>::init (const unsigned int n,
-			    const unsigned int n_local,
-			    const bool fast)
+void PetscVector<T>::init (const unsigned int n,
+			   const unsigned int n_local,
+			   const bool fast)
 {
   int ierr=0;
   int petsc_n=static_cast<int>(n);
@@ -434,19 +434,19 @@ void PetscVector<Tp>::init (const unsigned int n,
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-void PetscVector<Tp>::init (const unsigned int n,
-			    const bool fast)
+void PetscVector<T>::init (const unsigned int n,
+			   const bool fast)
 {
   init(n,n,fast);
 }
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-void PetscVector<Tp>::close ()
+void PetscVector<T>::close ()
 {
   assert (initialized());
   
@@ -462,9 +462,9 @@ void PetscVector<Tp>::close ()
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-void PetscVector<Tp>::clear ()
+void PetscVector<T>::clear ()
 {
   if (initialized())
     {
@@ -478,9 +478,9 @@ void PetscVector<Tp>::clear ()
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-void PetscVector<Tp>::zero ()
+void PetscVector<T>::zero ()
 {
   assert (initialized());
   
@@ -493,9 +493,9 @@ void PetscVector<Tp>::zero ()
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-unsigned int PetscVector<Tp>::size () const
+unsigned int PetscVector<T>::size () const
 {
   assert (initialized());
   
@@ -511,9 +511,9 @@ unsigned int PetscVector<Tp>::size () const
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-unsigned int PetscVector<Tp>::local_size () const
+unsigned int PetscVector<T>::local_size () const
 {
   assert (initialized());
   
@@ -526,9 +526,9 @@ unsigned int PetscVector<Tp>::local_size () const
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-unsigned int PetscVector<Tp>::first_local_index () const
+unsigned int PetscVector<T>::first_local_index () const
 {
   assert (initialized());
   
@@ -541,9 +541,9 @@ unsigned int PetscVector<Tp>::first_local_index () const
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-unsigned int PetscVector<Tp>::last_local_index () const
+unsigned int PetscVector<T>::last_local_index () const
 {
   assert (initialized());
   
@@ -556,9 +556,9 @@ unsigned int PetscVector<Tp>::last_local_index () const
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-Tp PetscVector<Tp>::operator() (const unsigned int i) const
+T PetscVector<T>::operator() (const unsigned int i) const
 {
   assert (initialized());
   assert ( ((i >= first_local_index()) &&
@@ -574,14 +574,14 @@ Tp PetscVector<Tp>::operator() (const unsigned int i) const
   
   ierr = VecRestoreArray (vec, &values); CHKERRQ(ierr);
   
-  return static_cast<Tp>(value);
+  return static_cast<T>(value);
 }
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-Real PetscVector<Tp>::min () const
+Real PetscVector<T>::min () const
 {
   assert (initialized());
 
@@ -596,9 +596,9 @@ Real PetscVector<Tp>::min () const
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-Real PetscVector<Tp>::max() const
+Real PetscVector<T>::max() const
 {
   assert (initialized());
 

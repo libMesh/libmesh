@@ -1,4 +1,4 @@
-// $Id: laspack_vector.h,v 1.7 2003-02-20 04:59:58 benkirk Exp $
+// $Id: laspack_vector.h,v 1.8 2003-02-20 23:18:06 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -57,7 +57,7 @@ class LaspackInterface;
  * Laspack C-based data structures for parallel vectors.
  * Currently Laspack only supports real datatypes, so
  * this class is a full specialization of \p NumericVector<>
- * with \p Tp = \p Real
+ * with \p T = \p Real
  *
  * @author Benjamin S. Kirk, 2002
  */

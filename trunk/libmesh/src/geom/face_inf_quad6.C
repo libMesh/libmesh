@@ -1,4 +1,4 @@
-// $Id: face_inf_quad6.C,v 1.9 2003-02-13 22:56:11 benkirk Exp $
+// $Id: face_inf_quad6.C,v 1.10 2003-02-20 23:18:13 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -38,7 +38,7 @@
 // InfQuad6 class static member initialization
 #ifdef ENABLE_AMR
 
-const Real InfQuad6::embedding_matrix[2][6][6] =
+const float  InfQuad6::embedding_matrix[2][6][6] =
 {
   // embedding matrix for child 0
   {
@@ -210,7 +210,7 @@ void InfQuad6::refine(Mesh& mesh)
       for (unsigned int nc=0; nc<child(c)->n_nodes(); nc++)
 	for (unsigned int n=0; n<n_nodes(); n++)
 	  if (embedding_matrix[c][nc][n] != 0.)
-	    p[c][nc].add_scaled (point(n), embedding_matrix[c][nc][n]);
+	    p[c][nc].add_scaled (point(n), static_cast<Real>(embedding_matrix[c][nc][n]));
     
     
     // assign nodes to children & add them to the mesh

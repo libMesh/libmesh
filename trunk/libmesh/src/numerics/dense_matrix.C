@@ -1,4 +1,4 @@
-// $Id: dense_matrix.C,v 1.8 2003-02-20 04:59:58 benkirk Exp $
+// $Id: dense_matrix.C,v 1.9 2003-02-20 23:18:15 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,15 +26,15 @@
 
 // ------------------------------------------------------------
 // Dense Matrix member functions
-template<typename Tp>
-void DenseMatrix<Tp>::left_multiply (const DenseMatrix<Tp>& A,
-				     const bool transpose)
+template<typename T>
+void DenseMatrix<T>::left_multiply (const DenseMatrix<T>& A,
+				    const bool transpose)
 {
   // C = A*B  C (mxn), A (mxp), B (pxn)
   
-  DenseMatrix<Tp> B(*this);
+  DenseMatrix<T> B(*this);
 
-  DenseMatrix<Tp>& C = *this;
+  DenseMatrix<T>& C = *this;
 
   C.zero();
   
@@ -58,10 +58,10 @@ void DenseMatrix<Tp>::left_multiply (const DenseMatrix<Tp>& A,
   else
     {
       /*
-      std::cout << "A=" << std::endl;
-      A.print();
-      std::cout << "B=" << std::endl;
-      B.print();
+	std::cout << "A=" << std::endl;
+	A.print();
+	std::cout << "B=" << std::endl;
+	B.print();
       */
       
       resize (A.n(), B.n());
@@ -80,33 +80,33 @@ void DenseMatrix<Tp>::left_multiply (const DenseMatrix<Tp>& A,
 	    C(i,j) += A.transpose(i,k)*B(k,j);
 
       /*
-      std::cout << "C=" << std::endl;
-      C.print();
+	std::cout << "C=" << std::endl;
+	C.print();
       */
     }    	     
 }
 
 
 
-template<typename Tp>
-void DenseMatrix<Tp>::right_multiply (const DenseMatrix<Tp>& B,
-				      const bool transpose)
+template<typename T>
+void DenseMatrix<T>::right_multiply (const DenseMatrix<T>& B,
+				     const bool transpose)
 {
   // C = A*B  C (mxn), A (mxp), B (pxn)
   
-  DenseMatrix<Tp> A(*this);
+  DenseMatrix<T> A(*this);
   
-  DenseMatrix<Tp>& C = *this;
+  DenseMatrix<T>& C = *this;
   
   C.zero();
   
   if (!transpose)
     {
       /*
-      std::cout << "A=" << std::endl;
-      A.print();
-      std::cout << "B=" << std::endl;
-      B.print();
+	std::cout << "A=" << std::endl;
+	A.print();
+	std::cout << "B=" << std::endl;
+	B.print();
       */
       resize (A.m(), B.n());
       
@@ -124,8 +124,8 @@ void DenseMatrix<Tp>::right_multiply (const DenseMatrix<Tp>& B,
 	    C(i,j) += A(i,k)*B(k,j);
 
       /*
-      std::cout << "C=" << std::endl;
-      C.print();
+	std::cout << "C=" << std::endl;
+	C.print();
       */
     }
   else
