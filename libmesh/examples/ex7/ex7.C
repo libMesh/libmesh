@@ -1,4 +1,4 @@
-// $Id: ex7.C,v 1.14 2003-02-25 04:49:09 jwpeterson Exp $
+// $Id: ex7.C,v 1.15 2003-02-26 11:34:36 ddreyer Exp $
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
   
@@ -142,7 +142,7 @@ int main (int argc, char** argv)
     /**
      * Check for proper usage.
      */
-    if (argc != 3)
+    if (argc < 3)
       {
 	std::cerr << "Usage: " << argv[0] << " -f [frequency]"
 		  << std::endl;
