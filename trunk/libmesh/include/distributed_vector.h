@@ -1,4 +1,4 @@
-// $Id: distributed_vector.h,v 1.5 2003-02-20 23:18:03 benkirk Exp $
+// $Id: distributed_vector.h,v 1.6 2003-02-25 16:26:46 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -387,7 +387,7 @@ void DistributedVector<T>::init (const unsigned int n,
   assert (n_local <= n);
 
   // Clear the data structures if already initialized
-  if (initialized())
+  if (this->initialized())
     clear();
     
   // Initialize data structures
@@ -447,7 +447,7 @@ void DistributedVector<T>::init (const unsigned int n,
   _last_local_index = _first_local_index + n_local;
   
   // Set the initialized flag
-  _is_initialized = true;
+  this->_is_initialized = true;
 
   // Zero the components unless directed otherwise
   if (!fast)
@@ -470,9 +470,9 @@ template <typename T>
 inline
 void DistributedVector<T>::close ()
 {
-  assert (initialized());
+  assert (this->initialized());
   
-  _is_closed = true;
+  this->_is_closed = true;
 }
 
 
@@ -489,7 +489,7 @@ void DistributedVector<T>::clear ()
     _last_local_index = 0;
   
   
-  _is_closed = _is_initialized = false;
+  this->_is_closed = this->_is_initialized = false;
 }
 
 
@@ -498,7 +498,7 @@ template <typename T>
 inline
 void DistributedVector<T>::zero ()
 {
-  assert (initialized());
+  assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
   
@@ -513,7 +513,7 @@ template <typename T>
 inline
 unsigned int DistributedVector<T>::size () const
 {
-  assert (initialized());
+  assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 
@@ -526,7 +526,7 @@ template <typename T>
 inline
 unsigned int DistributedVector<T>::local_size () const
 {
-  assert (initialized());
+  assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 
@@ -539,7 +539,7 @@ template <typename T>
 inline
 unsigned int DistributedVector<T>::first_local_index () const
 {
-  assert (initialized());
+  assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 
@@ -552,7 +552,7 @@ template <typename T>
 inline
 unsigned int DistributedVector<T>::last_local_index () const
 {
-  assert (initialized());
+  assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 
@@ -565,7 +565,7 @@ template <typename T>
 inline
 T DistributedVector<T>::operator() (const unsigned int i) const
 {
-  assert (initialized());
+  assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
   assert ( ((i >= first_local_index()) &&
@@ -580,7 +580,7 @@ template <typename T>
 inline
 void DistributedVector<T>::set (const unsigned int i, const T value)
 {
-  assert (initialized());
+  assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
   assert (i<size());
@@ -595,7 +595,7 @@ template <typename T>
 inline
 void DistributedVector<T>::add (const unsigned int i, const T value)
 {
-  assert (initialized());
+  assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
   assert (i<size());
@@ -610,7 +610,7 @@ template <typename T>
 inline
 Real DistributedVector<T>::min () const
 {
-  assert (initialized());
+  assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 
@@ -638,7 +638,7 @@ template <typename T>
 inline
 Real DistributedVector<T>::max() const
 {
-  assert (initialized());
+  assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 

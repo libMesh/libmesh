@@ -1,4 +1,4 @@
-// $Id: mesh_gmv_support.C,v 1.11 2003-02-24 14:35:48 benkirk Exp $
+// $Id: mesh_gmv_support.C,v 1.12 2003-02-25 16:26:47 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,17 +23,6 @@
 #include <iomanip>
 #include <fstream>
 #include <stdio.h>
-
-#ifdef __HP_aCC
-
-// additional includes for hpux aCC
-#include "mesh.h"
-#include "petsc_vector.h"
-#include "petsc_matrix.h"
-#include "petsc_interface.h"
-#include "system_data.h"
-
-#endif
 
 // Local includes
 #include "equation_systems.h"

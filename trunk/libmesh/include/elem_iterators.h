@@ -1,4 +1,4 @@
-// $Id: elem_iterators.h,v 1.6 2003-02-24 14:35:50 benkirk Exp $
+// $Id: elem_iterators.h,v 1.7 2003-02-25 16:26:46 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -48,7 +48,7 @@ public:
 		      const bool b=true)
     : PredicatedIterator<T>(p.first, p.second)
   {
-    if (b) advance();
+    if (b) this->advance();
   }
 
 protected:
@@ -56,7 +56,7 @@ protected:
   /**
    * Redefinition of the predicate
    */
-  virtual bool predicate() const { return (*_current != NULL); }
+  virtual bool predicate() const { return (*this->_current != NULL); }
 };
 
 
@@ -127,7 +127,7 @@ public:
 			     const bool b=true)
     : basic_elem_iterator<T>(p, false)
   {
-    if (b) advance();
+    if (b) this->advance();
   }
 
   
@@ -138,7 +138,7 @@ protected:
    * first, this will avoid calling the \p active member on \p NULL
    * elements.
    */
-  virtual bool predicate() const { return (basic_elem_iterator<T>::predicate() && (*_current)->active()); }
+  virtual bool predicate() const { return (basic_elem_iterator<T>::predicate() && (*this->_current)->active()); }
 };
 
 
@@ -193,7 +193,7 @@ public:
   basic_not_active_elem_iterator(const std::pair<T,T>& p)
     : basic_active_elem_iterator<T>(p, false)
   {
-    advance();
+    this->advance();
   }
   
 protected:
@@ -253,7 +253,7 @@ public:
     : basic_elem_iterator<T>(p, false),
       _type(t)
   {
-    if (b) advance();
+    if (b) this->advance();
   }
   
 protected:
@@ -264,7 +264,7 @@ protected:
    * elements.
    */
   virtual bool predicate() const { return (basic_elem_iterator<T>::predicate() &&
-					   ((*_current)->type() == _type)); }
+					   ((*this->_current)->type() == _type)); }
 
   const ElemType _type;
 };
@@ -315,7 +315,7 @@ public:
 			       const bool b=true)
     : basic_type_elem_iterator<T>(p, t, false)
   {
-    if (b) advance();
+    if (b) this->advance();
   }
   
 protected:
@@ -364,7 +364,7 @@ public:
 				  const ElemType t)
     : basic_type_elem_iterator<T>(p, t, false)
   {
-    advance();
+    this->advance();
   }
   
 protected:
@@ -374,7 +374,7 @@ protected:
    */
   virtual bool predicate() const
   {
-    return (basic_type_elem_iterator<T>::predicate() && (*_current)->active() );
+    return (basic_type_elem_iterator<T>::predicate() && (*this->_current)->active() );
   }
 };
 
@@ -430,7 +430,7 @@ public:
     : basic_elem_iterator<T>(p, false),
       _level(l)
   {
-    if (b) advance();
+    if (b) this->advance();
   }
 
 protected:
@@ -440,7 +440,7 @@ protected:
    * first, this will avoid calling the \p active member on \p NULL
    * elements.
    */
-  virtual bool predicate() const { return (basic_elem_iterator<T>::predicate() && (*_current)->level() == _level); }
+  virtual bool predicate() const { return (basic_elem_iterator<T>::predicate() && (*this->_current)->level() == _level); }
   
   const unsigned int _level;
 };
@@ -489,7 +489,7 @@ public:
 				const unsigned int l)
     : basic_level_elem_iterator<T>(p, l, false)
   {
-    advance();
+    this->advance();
   }
   
 protected:
@@ -550,7 +550,7 @@ public:
     : basic_elem_iterator<T>(p, false),
       _pid(pid)
   {
-    if (b) advance();
+    if (b) this->advance();
   }
 
 protected:
@@ -560,7 +560,7 @@ protected:
    * first, this will avoid calling the \p active member on \p NULL
    * elements.
    */
-  virtual bool predicate() const { return (basic_elem_iterator<T>::predicate() && (*_current)->processor_id() == _pid); }
+  virtual bool predicate() const { return (basic_elem_iterator<T>::predicate() && (*this->_current)->processor_id() == _pid); }
 
   const unsigned int _pid;
 };
@@ -608,7 +608,7 @@ public:
 			      const unsigned int pid)
     : basic_pid_elem_iterator<T>(p, pid, false)
   {
-    advance();
+    this->advance();
   }
 
 protected:
@@ -658,7 +658,7 @@ public:
 				 const bool b=true)
     : basic_pid_elem_iterator<T>(p, pid, false)
   {
-    if (b) advance();
+    if (b) this->advance();
   }
 
 protected:
@@ -668,7 +668,7 @@ protected:
    */
   virtual bool predicate() const
   {
-    return (basic_pid_elem_iterator<T>::predicate() && (*_current)->active());
+    return (basic_pid_elem_iterator<T>::predicate() && (*this->_current)->active());
   }
 };
 
@@ -709,7 +709,7 @@ public:
   basic_active_local_elem_iterator(const std::pair<T,T>& p)
     : basic_active_pid_elem_iterator<T>(p, libMeshBase::processor_id(), false)
   {
-    advance();
+    this->advance();
   }
 
 protected:
