@@ -1,4 +1,4 @@
-// $Id: tree_node.C,v 1.7 2003-07-15 09:20:20 spetersen Exp $
+// $Id: tree_node.C,v 1.8 2003-08-27 02:51:33 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -436,7 +436,7 @@ Elem* TreeNode<N>::find_element_in_children(const Point& p) const
 {
   assert (!active());
 
-  unsigned int excluded_child = static_cast<unsigned int>(-1);
+  unsigned int excluded_child = libMesh::invalid_uint;
   
   // First only look in the children whose bounding box
   // contain the point p.  Note that only one child will

@@ -1,4 +1,4 @@
-// $Id: parmetis_partitioner.C,v 1.6 2003-08-26 22:58:45 jwpeterson Exp $
+// $Id: parmetis_partitioner.C,v 1.7 2003-08-27 02:51:33 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -241,7 +241,7 @@ void ParmetisPartitioner::initialize (const unsigned int n_sbdmns)
   // contiguous range.
   _forward_map.resize (n_elem); std::fill (_forward_map.begin(),
 					   _forward_map.end(),
-					   static_cast<unsigned int>(-1));
+					   libMesh::invalid_uint);
   _first_local_elem = 0;
   unsigned int el_num = 0;
   unsigned int local_el_num = 0;
@@ -256,7 +256,7 @@ void ParmetisPartitioner::initialize (const unsigned int n_sbdmns)
       for (; elem_it != elem_end; ++elem_it)
 	{
 	  assert ((*elem_it)->id() < _forward_map.size());
-	  assert ( _forward_map[(*elem_it)->id()] == static_cast<unsigned int>(-1));
+	  assert ( _forward_map[(*elem_it)->id()] == libMesh::invalid_uint);
 	  
 	  _forward_map[(*elem_it)->id()] = el_num;
 	  el_num++;
@@ -299,7 +299,7 @@ void ParmetisPartitioner::build_graph ()
       
       assert (elem->id() < _forward_map.size());
       assert (_forward_map[elem->id()] !=
-	      static_cast<unsigned int>(-1));
+	      libMesh::invalid_uint);
 	
       // The beginning of the adjacency array for this elem
       _xadj.push_back (_adjncy.size());
@@ -318,7 +318,7 @@ void ParmetisPartitioner::build_graph ()
 		{
 		  assert (neighbor->id() < _forward_map.size());
 		  assert (_forward_map[neighbor->id()] !=
-			  static_cast<unsigned int>(-1));
+			  libMesh::invalid_uint);
 
 		  _adjncy.push_back (_forward_map[neighbor->id()]);
 		}
@@ -355,7 +355,7 @@ void ParmetisPartitioner::build_graph ()
 			  assert (child->active());
 			  assert (child->id() < _forward_map.size());
 			  assert (_forward_map[child->id()] !=
-				  static_cast<unsigned int>(-1));
+				  libMesh::invalid_uint);
 			
 			  _adjncy.push_back (_forward_map[child->id()]);
 			}
@@ -387,7 +387,7 @@ void ParmetisPartitioner::assign_partitioning ()
 
       assert (elem->id() < _forward_map.size());
       assert (_forward_map[elem->id()] !=
-	      static_cast<unsigned int>(-1));
+	      libMesh::invalid_uint);
       assert (_forward_map[elem->id()] < _part.size());
       
       elem->set_processor_id() = static_cast<short int>(_part[_forward_map[elem->id()]]);

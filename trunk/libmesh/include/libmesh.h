@@ -1,4 +1,4 @@
-// $Id: libmesh.h,v 1.11 2003-05-04 23:58:52 benkirk Exp $
+// $Id: libmesh.h,v 1.12 2003-08-27 02:51:32 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -147,6 +147,12 @@ public:
    */
   static const Number zero;
 
+
+  /**
+   * A number which is used quite often to represent
+   * an invalid or uninitialized value.
+   */
+  static const unsigned int invalid_uint;
   
 private:
 

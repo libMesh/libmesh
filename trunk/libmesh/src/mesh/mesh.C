@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.21 2003-08-27 02:07:25 jwpeterson Exp $
+// $Id: mesh.C,v 1.22 2003-08-27 02:51:33 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -281,7 +281,7 @@ void Mesh::create_submesh (Mesh& new_mesh,
 
   std::fill (new_node_numbers.begin(),
 	     new_node_numbers.end(),
-	     static_cast<unsigned int>(-1));
+	     libMesh::invalid_uint);
 
   
   
@@ -306,7 +306,7 @@ void Mesh::create_submesh (Mesh& new_mesh,
 	{
 	  assert (old_elem->node(n) < new_node_numbers.size());
 
-	  if (new_node_numbers[old_elem->node(n)] == static_cast<unsigned int>(-1))
+	  if (new_node_numbers[old_elem->node(n)] == libMesh::invalid_uint)
 	    {
 	      new_node_numbers[old_elem->node(n)] = n_new_nodes;
 

@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.48 2003-08-26 22:58:45 jwpeterson Exp $
+// $Id: mesh_base.C,v 1.49 2003-08-27 02:51:33 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -1123,7 +1123,7 @@ MeshBase::processor_bounding_box (const unsigned int pid) const
 
   // By default no processor is specified and we compute
   // the bounding box for the whole domain.
-  if (pid == static_cast<unsigned int>(-1))
+  if (pid == libMesh::invalid_uint)
     {
       for (unsigned int n=0; n<this->n_nodes(); n++)
 	for (unsigned int i=0; i<this->spatial_dimension(); i++)
@@ -1178,7 +1178,7 @@ MeshBase::subdomain_bounding_box (const unsigned int sid) const
 
   // By default no subdomain is specified and we compute
   // the bounding box for the whole domain.
-  if (sid == static_cast<unsigned int>(-1))
+  if (sid == libMesh::invalid_uint)
     {
       for (unsigned int n=0; n<this->n_nodes(); n++)
 	for (unsigned int i=0; i<this->spatial_dimension(); i++)

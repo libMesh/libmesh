@@ -1,4 +1,4 @@
-// $Id: dof_object.h,v 1.15 2003-07-27 17:16:42 ddreyer Exp $
+// $Id: dof_object.h,v 1.16 2003-08-27 02:51:32 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -27,7 +27,7 @@
 // Local includes
 #include "mesh_config.h"
 #include "mesh_common.h"
-
+#include "libmesh.h" // libMesh::invalid_uint
 
 // Forward declarations
 
@@ -48,7 +48,7 @@
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.15 $
+ * \version $Revision: 1.16 $
  */
 
 class DofObject
@@ -102,7 +102,7 @@ public:
   /**
    * Sets all degree of freedom numbers to \p invalid_id
    */
-  void invalidate_dofs (const unsigned int sys_num = static_cast<unsigned int>(-1));
+  void invalidate_dofs (const unsigned int sys_num = libMesh::invalid_uint);
 
   /**
    * Sets the id to \p invalid_id
@@ -126,7 +126,7 @@ public:
    */
   unsigned int n_dofs (const unsigned int s, 
 		       const unsigned int var =
-		       static_cast<unsigned int>(-1)) const;
+		       libMesh::invalid_uint) const;
   
   /**
    * \returns the \p id for this \p DofObject
@@ -532,7 +532,7 @@ unsigned int DofObject::n_dofs (const unsigned int s,
   unsigned int num = 0;
 
   // Count all variables
-  if (var == static_cast<unsigned int>(-1))
+  if (var == libMesh::invalid_uint)
     for (unsigned int v=0; v<this->n_vars(s); v++)
       num += this->n_comp(s,v);
   
