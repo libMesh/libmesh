@@ -159,8 +159,17 @@ Since <code>libMesh</code> can be configured with many additional packages we re
 including the <code>Make.common</code> file created in the top-level directory in the
 <code>Makefile</code> of any application you want to use with the library. This will
 properly set the <code>INCLUDE</code> and <code>LIBS</code> variables, which you can
-append to with your own stuff. You could of course figure out what these need to be
-yourself, but don't complain that it is hard.
+append to with your own stuff.
+
+For testing simple programs you may want to use the <code>libmesh-config</code> script
+included in the <code>contrib/bin</code> directory instead of creating a <code>Makefile</code>.
+This script may be used to determine the relevant compilation and linking flags
+used by <code>libMesh</code>. For example, you could build the application <code>foo</code> from
+<code>foo.C</code> like this:
+<div class="fragment">
+<pre>c++ -o foo foo.C `libmesh-config --cxxflags --include --ldflags`</pre>
+</div>
+
 
 <br> 
 

@@ -1,4 +1,4 @@
-// $Id: petsc_interface.C,v 1.20 2004-01-11 15:56:46 benkirk Exp $
+// $Id: petsc_interface.C,v 1.21 2004-02-15 15:35:30 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -41,7 +41,8 @@ void PetscInterface<T>::clear ()
 
       int ierr=0;
 
-      ierr = SLESDestroy(_sles); CHKERRQ(ierr);
+      ierr = SLESDestroy(_sles);
+             CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
       // Mimic PETSc default solver and preconditioner
       this->_solver_type           = GMRES;
@@ -66,17 +67,21 @@ void PetscInterface<T>::init ()
       this->_is_initialized = true;
 
       // Create the linear solver context
-      ierr = SLESCreate (PETSC_COMM_WORLD, &_sles); CHKERRQ(ierr);
+      ierr = SLESCreate (PETSC_COMM_WORLD, &_sles);
+             CHKERRABORT(PETSC_COMM_WORLD,ierr);
       
       // Create the Krylov subspace & preconditioner contexts
-      ierr = SLESGetKSP       (_sles, &_ksp); CHKERRQ(ierr);
-      ierr = SLESGetPC        (_sles, &_pc);  CHKERRQ(ierr);
+      ierr = SLESGetKSP       (_sles, &_ksp);
+             CHKERRABORT(PETSC_COMM_WORLD,ierr);
+      ierr = SLESGetPC        (_sles, &_pc);
+             CHKERRABORT(PETSC_COMM_WORLD,ierr);
       
       // Have the Krylov subspace method use our good initial guess rather than 0
       // 2.1.0 - style
-      //ierr = KSPSetInitialGuessNonzero (ksp); CHKERRQ(ierr);
+      //ierr = KSPSetInitialGuessNonzero (ksp); CHKERRABORT(PETSC_COMM_WORLD,ierr);
       // 2.1.1 - style
-      ierr = KSPSetInitialGuessNonzero (_ksp, PETSC_TRUE); CHKERRQ(ierr);
+      ierr = KSPSetInitialGuessNonzero (_ksp, PETSC_TRUE);
+             CHKERRABORT(PETSC_COMM_WORLD,ierr);
       
       // Set user-specified  solver and preconditioner types
       set_petsc_solver_type();
@@ -89,7 +94,8 @@ void PetscInterface<T>::init ()
       //  SLESSetFromOptions() is called _after_ any other customization
       //  routines.
       
-      ierr = SLESSetFromOptions (_sles);                   CHKERRQ(ierr);
+      ierr = SLESSetFromOptions (_sles);
+             CHKERRABORT(PETSC_COMM_WORLD,ierr);
     }
 }
 
@@ -121,21 +127,25 @@ PetscInterface<T>::solve (SparseMatrix<T> &matrix_in,
   
   // Set operators. The input matrix works as the preconditioning matrix
   ierr = SLESSetOperators(_sles, matrix.mat, matrix.mat,
-			  SAME_NONZERO_PATTERN);             CHKERRQ(ierr);
+			  SAME_NONZERO_PATTERN);
+         CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
 
   // Set the tolerances for the iterative solver.  Use the user-supplied
   // tolerance for the relative residual & leave the others at default values.
   ierr = KSPSetTolerances (_ksp, tol, PETSC_DEFAULT,
- 			   PETSC_DEFAULT, max_its);          CHKERRQ(ierr);
+ 			   PETSC_DEFAULT, max_its);
+         CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
 
   // Solve the linear system
-  ierr = SLESSolve (_sles, rhs.vec, solution.vec, &its);     CHKERRQ(ierr);
+  ierr = SLESSolve (_sles, rhs.vec, solution.vec, &its);
+         CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
 
   // Get the norm of the final residual to return to the user.
-  ierr = KSPGetResidualNorm (_ksp, &final_resid);            CHKERRQ(ierr);
+  ierr = KSPGetResidualNorm (_ksp, &final_resid);
+         CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
   // return the # of its. and the final residual norm.
   std::pair<unsigned int, Real> p (its, final_resid);
@@ -154,40 +164,40 @@ void PetscInterface<T>::set_petsc_solver_type()
     {
 
     case CG:
-      ierr = KSPSetType (_ksp, (char*) KSPCG); CHKERRQ(ierr); return;
+      ierr = KSPSetType (_ksp, (char*) KSPCG); CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
 
     case CR:
-      ierr = KSPSetType (_ksp, (char*) KSPCR); CHKERRQ(ierr); return;
+      ierr = KSPSetType (_ksp, (char*) KSPCR); CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
 
     case CGS:
-      ierr = KSPSetType (_ksp, (char*) KSPCGS); CHKERRQ(ierr); return;
+      ierr = KSPSetType (_ksp, (char*) KSPCGS); CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
 
     case BICG:
-      ierr = KSPSetType (_ksp, (char*) KSPBICG); CHKERRQ(ierr); return;
+      ierr = KSPSetType (_ksp, (char*) KSPBICG); CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
 
     case TCQMR:
-      ierr = KSPSetType (_ksp, (char*) KSPTCQMR); CHKERRQ(ierr); return;
+      ierr = KSPSetType (_ksp, (char*) KSPTCQMR); CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
 
     case TFQMR:
-      ierr = KSPSetType (_ksp, (char*) KSPTFQMR); CHKERRQ(ierr); return;
+      ierr = KSPSetType (_ksp, (char*) KSPTFQMR); CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
 
     case LSQR:
-      ierr = KSPSetType (_ksp, (char*) KSPLSQR); CHKERRQ(ierr); return;
+      ierr = KSPSetType (_ksp, (char*) KSPLSQR); CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
 
     case BICGSTAB:
-      ierr = KSPSetType (_ksp, (char*) KSPBCGS); CHKERRQ(ierr); return;
+      ierr = KSPSetType (_ksp, (char*) KSPBCGS); CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
 
     case MINRES:
-      ierr = KSPSetType (_ksp, (char*) KSPMINRES); CHKERRQ(ierr); return;
+      ierr = KSPSetType (_ksp, (char*) KSPMINRES); CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
 
     case GMRES:
-      ierr = KSPSetType (_ksp, (char*) KSPGMRES); CHKERRQ(ierr); return;
+      ierr = KSPSetType (_ksp, (char*) KSPGMRES); CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
 
     case RICHARDSON:
-      ierr = KSPSetType (_ksp, (char*) KSPRICHARDSON); CHKERRQ(ierr); return;
+      ierr = KSPSetType (_ksp, (char*) KSPRICHARDSON); CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
 
     case CHEBYSHEV:
-      ierr = KSPSetType (_ksp, (char*) KSPCHEBYCHEV); CHKERRQ(ierr); return;
+      ierr = KSPSetType (_ksp, (char*) KSPCHEBYCHEV); CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
 
     default:
       std::cerr << "ERROR:  Unsupported PETSC Solver: "
@@ -206,34 +216,34 @@ void PetscInterface<T>::set_petsc_preconditioner_type()
   switch (this->_preconditioner_type)
     {
     case IDENTITY_PRECOND:
-      ierr = PCSetType (_pc, (char*) PCNONE); CHKERRQ(ierr); return;
+      ierr = PCSetType (_pc, (char*) PCNONE); CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
 	
     case CHOLESKY_PRECOND:
-      ierr = PCSetType (_pc, (char*) PCCHOLESKY); CHKERRQ(ierr); return;
+      ierr = PCSetType (_pc, (char*) PCCHOLESKY); CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
 
     case ICC_PRECOND:
-      ierr = PCSetType (_pc, (char*) PCICC); CHKERRQ(ierr); return;
+      ierr = PCSetType (_pc, (char*) PCICC); CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
 
     case ILU_PRECOND:
-      ierr = PCSetType (_pc, (char*) PCILU); CHKERRQ(ierr); return;
+      ierr = PCSetType (_pc, (char*) PCILU); CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
 
     case LU_PRECOND:
-      ierr = PCSetType (_pc, (char*) PCLU); CHKERRQ(ierr); return;
+      ierr = PCSetType (_pc, (char*) PCLU); CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
       
     case ASM_PRECOND:
-      ierr = PCSetType (_pc, (char*) PCASM); CHKERRQ(ierr); return;
+      ierr = PCSetType (_pc, (char*) PCASM); CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
 
     case JACOBI_PRECOND:
-      ierr = PCSetType (_pc, (char*) PCJACOBI); CHKERRQ(ierr); return;
+      ierr = PCSetType (_pc, (char*) PCJACOBI); CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
 
     case BLOCK_JACOBI_PRECOND:
-      ierr = PCSetType (_pc, (char*) PCBJACOBI); CHKERRQ(ierr); return;
+      ierr = PCSetType (_pc, (char*) PCBJACOBI); CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
 
     case SOR_PRECOND:
-      ierr = PCSetType (_pc, (char*) PCSOR); CHKERRQ(ierr); return;
+      ierr = PCSetType (_pc, (char*) PCSOR); CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
 
     case EISENSTAT_PRECOND:
-      ierr = PCSetType (_pc, (char*) PCEISENSTAT); CHKERRQ(ierr); return;
+      ierr = PCSetType (_pc, (char*) PCEISENSTAT); CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
 
     default:
       std::cerr << "ERROR:  Unsupported PETSC Preconditioner: "
