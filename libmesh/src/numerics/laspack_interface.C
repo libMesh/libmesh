@@ -1,4 +1,4 @@
-// $Id: laspack_interface.C,v 1.12 2004-01-03 15:37:43 benkirk Exp $
+// $Id: laspack_interface.C,v 1.13 2004-03-10 07:11:26 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -115,6 +115,11 @@ LaspackInterface<T>::solve (SparseMatrix<T> &matrix_in,
   LaspackMatrix<T>& matrix   = dynamic_cast<LaspackMatrix<T>&>(matrix_in);
   LaspackVector<T>& solution = dynamic_cast<LaspackVector<T>&>(solution_in);
   LaspackVector<T>& rhs      = dynamic_cast<LaspackVector<T>&>(rhs_in);
+
+  // Zero-out the solution to prevent the solver from exiting in 0
+  // iterations (?)
+  //TODO:[BSK] Why does Laspack do this?  Comment out this and try ex13...
+  solution.zero();
   
   // Close the matrix and vectors in case this wasn't already done.
   matrix.close ();
@@ -124,6 +129,8 @@ LaspackInterface<T>::solve (SparseMatrix<T> &matrix_in,
   // Set the preconditioner type
   this->set_laspack_preconditioner_type ();
 
+  // Set the solver tolerance
+  SetRTCAccuracy (tol);
 
   // Solve the linear system
   switch (this->_solver_type)
