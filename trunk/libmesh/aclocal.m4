@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.25 2003-04-02 22:34:36 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.26 2003-04-03 00:52:58 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -274,10 +274,10 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
     case "$GXX_VERSION" in
       ibm_xlc)
           CXXFLAGSG="-DDEBUG -qmaxmem=-1 -qansialias -qrtti=all -g -qstaticinline"
-          CXXFLAGSO="-DNDEBUG -04 -qmaxmem=-1 -w -qansialias -qrtti=all -Q -qstaticinline"
+          CXXFLAGSO="-DNDEBUG -O3 -qmaxmem=-1 -w -qansialias -Q=10 -qrtti=all -qstaticinline"
           CXXFLAGSP="$CXXFLAGSO -g -pg"
           CFLAGSG="-DDEBUG -qansialias -g"
-          CFLAGSO="-DNDEBUG -O2 -w -qansialias"
+          CFLAGSO="-DNDEBUG -O3 -qmaxmem=-1 -w -qansialias -Q=10"
           CFLAGSP="$CFLAGSO -g -pg"
 	  CXXSHAREDFLAG="-G -qmkshrobj -bnoerrmsg"
 	  CSHAREDFLAG="-G -qmkshrobj"
