@@ -1,4 +1,4 @@
-// $Id: hilbert_sfc_partitioner.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: hilbert_sfc_partitioner.h,v 1.3 2004-05-11 20:29:06 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -48,11 +48,13 @@ class HilbertSFCPartitioner : public SFCPartitioner
     this->set_sfc_type ("Hilbert");
   }
 
+protected:
   /**
    * Partition the \p MeshBase into \p n subdomains.
    */
-  virtual void partition (MeshBase& mesh,
-			  const unsigned int n = libMesh::n_processors()) { SFCPartitioner::partition (mesh, n); }
+  virtual void _do_partition (MeshBase& mesh,
+			      const unsigned int n)
+  { SFCPartitioner::_do_partition (mesh, n); }
 
 
   

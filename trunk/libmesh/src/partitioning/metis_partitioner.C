@@ -1,4 +1,4 @@
-// $Id: metis_partitioner.C,v 1.14 2004-03-22 01:11:59 jwpeterson Exp $
+// $Id: metis_partitioner.C,v 1.15 2004-05-11 20:29:07 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -41,8 +41,8 @@
 
 // ------------------------------------------------------------
 // MetisPartitioner implementation
-void MetisPartitioner::partition (MeshBase& mesh,
-				  const unsigned int n_pieces)
+void MetisPartitioner::_do_partition (MeshBase& mesh,
+				      const unsigned int n_pieces)
 {
   assert (n_pieces > 0);
 

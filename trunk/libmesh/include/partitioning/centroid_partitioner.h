@@ -1,4 +1,4 @@
-// $Id: centroid_partitioner.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: centroid_partitioner.h,v 1.3 2004-05-11 20:29:06 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -70,12 +70,6 @@ public:
    */
   CentroidPartitioner (const CentroidSortMethod sm=X) : _sort_method(sm) {}
 
-  /**
-   * Partitions the mesh into n subdomains.  This is
-   * a required interface for the class.
-   */
-  virtual void partition (MeshBase& mesh,
-			  const unsigned int n = libMesh::n_processors());
 
   /**
    * Specifies how the elements will be sorted.
@@ -86,7 +80,16 @@ public:
    * Change how the elements will be sorted.
    */
   void set_sort_method (const CentroidSortMethod sm) {_sort_method = sm; }
+
   
+protected:
+  /**
+   * Partitions the mesh into n subdomains.  This is
+   * a required interface for the class.
+   */
+  virtual void _do_partition (MeshBase& mesh,
+			      const unsigned int n);
+
 private:
 
   /**

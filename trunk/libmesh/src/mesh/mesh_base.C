@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.75 2004-04-18 00:51:50 jwpeterson Exp $
+// $Id: mesh_base.C,v 1.76 2004-05-11 20:29:07 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -51,6 +51,7 @@ MeshBase::MeshBase (unsigned int d) :
   boundary_info (*this),
   data          (*this),
   _n_sbd        (1),
+  _n_parts      (1),
   _dim          (d),
   _is_prepared  (false)
 {
