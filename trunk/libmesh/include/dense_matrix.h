@@ -1,4 +1,4 @@
-// $Id: dense_matrix.h,v 1.14 2003-03-07 04:44:38 jwpeterson Exp $
+// $Id: dense_matrix.h,v 1.15 2003-03-08 07:30:56 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -85,12 +85,12 @@ public:
 			  const unsigned int j);
 
   /**
-   * Left multipliess by the matrix \p A.
+   * Left multipliess by the matrix \p M2.
    */
   virtual void left_multiply (const DenseMatrixBase<T>& M2);
   
   /**
-   * Right multiplies by the matrix \p A.
+   * Right multiplies by the matrix \p M3.
    */
   virtual void right_multiply (const DenseMatrixBase<T>& M3);
   

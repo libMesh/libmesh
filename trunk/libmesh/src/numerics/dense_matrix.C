@@ -1,4 +1,4 @@
-// $Id: dense_matrix.C,v 1.11 2003-03-07 04:44:38 jwpeterson Exp $
+// $Id: dense_matrix.C,v 1.12 2003-03-08 07:30:56 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -36,7 +36,7 @@ void DenseMatrix<T>::left_multiply (const DenseMatrixBase<T>& M2)
   // M3      = (p x n)
 
   // M3 is a copy of *this before it gets resize()d
-  DenseMatrix<T>& M3(*this);
+  DenseMatrix<T> M3(*this);
 
   // Resize *this so that the result can fit
   this->resize (M2.m(), M3.n());
@@ -54,15 +54,15 @@ void DenseMatrix<T>::left_multiply_transpose(const DenseMatrix<T>& A)
 
   DenseMatrix<T> B(*this);
   
-  this->resize (A._n, B._n);
+  this->resize (A.n(), B.n());
       
-  assert (A._m == B._m);
-  assert (_m == A._n);
-  assert (_n == B._n);
+  assert (A.m() == B.m());
+  assert (this->m() == A.n());
+  assert (this->n() == B.n());
       
-  const unsigned int m_s = A._n;
-  const unsigned int p_s = A._m; 
-  const unsigned int n_s = _n;
+  const unsigned int m_s = A.n();
+  const unsigned int p_s = A.m(); 
+  const unsigned int n_s = this->n();
   
   // Do it this way because there is a
   // decent chance (at least for constraint matrices)
@@ -90,7 +90,7 @@ void DenseMatrix<T>::right_multiply (const DenseMatrixBase<T>& M3)
   // M3      = (p x n)
 
   // M2 is a copy of *this before it gets resize()d
-  DenseMatrix<T>& M2(*this);
+  DenseMatrix<T> M2(*this);
 
   // Resize *this so that the result can fit
   this->resize (M2.m(), M3.n());
@@ -106,15 +106,15 @@ void DenseMatrix<T>::right_multiply_transpose (const DenseMatrix<T>& B)
 {
   DenseMatrix<T> A(*this);
   
-  this->resize (A._m, B._m);
+  this->resize (A.m(), B.m());
       
-  assert (A._n == B._n);
-  assert (_m == A._m);
-  assert (_n == B._m);
+  assert (A.n() == B.n());
+  assert (this->m() == A.m());
+  assert (this->n() == B.m());
       
-  const unsigned int m_s = A._m;
-  const unsigned int p_s = A._n; 
-  const unsigned int n_s = _n;
+  const unsigned int m_s = A.m();
+  const unsigned int p_s = A.n(); 
+  const unsigned int n_s = this->n();
 
   // Do it this way because there is a
   // decent chance (at least for constraint matrices)

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.19 2003-02-24 14:35:52 benkirk Exp $
+# $Id: Makefile,v 1.20 2003-03-08 07:30:56 benkirk Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -59,21 +59,19 @@ endif
 # static library
 #
 $(mesh_library_dir)/libmesh.a: $(objects)
-	@$(MAKE) -C contrib
 	@$(shell mkdir -p $(mesh_library_dir))
-	@echo ""
 	@echo "Linking "$@
 	@$(AR) rv $(mesh_library) $(objects)
+	@$(MAKE) -C contrib
 
 #
 # shared library
 #
 $(mesh_library_dir)/libmesh.so: $(objects)
-	@$(MAKE) -C contrib
 	@$(shell mkdir -p $(mesh_library_dir))
-	@echo ""
 	@echo "Linking "$@
 	@$(CXX) $(CXXSHAREDFLAG) -o $(mesh_library) $(objects) $(LDFLAGS)
+	@$(MAKE) -C contrib
 
 #
 # Build the examples
