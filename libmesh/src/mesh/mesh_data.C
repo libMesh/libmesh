@@ -1,4 +1,4 @@
-// $Id: mesh_data.C,v 1.6 2003-07-10 07:38:06 ddreyer Exp $
+// $Id: mesh_data.C,v 1.7 2003-07-12 14:02:59 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -21,6 +21,7 @@
 
 // C++ includes
 #include <map>
+#include <sstream>
 
 // Local includes
 #include "mesh_data.h"
@@ -204,6 +205,39 @@ void MeshData::write (const std::string& name)
 
 
 
+
+std::string MeshData::get_info() const
+{
+  std::ostringstream out;
+
+  if (this->active())
+    {
+      out << " MeshData Information:" << std::endl;
+      if (this->_data_descriptor != "")
+	  out << "  descriptor=" << this->_data_descriptor << std::endl;
+      if (this->elem_initialized())
+	  out << "  Element associated data initialized." << std::endl
+	      << "   n_val_per_elem()=" << this->n_val_per_elem() << std::endl
+	      << "   n_elem_data()=" << this->n_elem_data() << std::endl;
+      if (this->node_initialized())
+	  out << "  Node associated data initialized." << std::endl
+	      << "   n_val_per_node()=" << this->n_val_per_node() << std::endl
+	      << "   n_node_data()=" << this->n_node_data() << std::endl;
+    }
+  else
+      out << " MeshData inactive." << std::endl;
+
+  return out.str();
+}
+
+
+
+
+void MeshData::print_info() const
+{
+  std::cout << this->get_info()
+	    << std::endl;
+}
 
 
 
@@ -440,3 +474,64 @@ void MeshData::insert_elem_data (std::map<const Elem*,
 }
 
 
+
+
+
+unsigned int MeshData::n_val_per_node () const
+{
+  assert (_active);
+  assert (_node_id_map_closed);
+  assert (_node_data_closed);
+
+  if (!_node_data.empty())
+    {
+      std::map<const Node*, 
+	       std::vector<Number> >::const_iterator pos = _node_data.begin();
+      assert (pos != _node_data.end());
+      return ((*pos).second.size());
+    }
+  else
+      return 0;
+}
+
+
+
+
+unsigned int MeshData::n_node_data () const
+{
+  assert (_active);
+  assert (_node_data_closed);
+
+  return _node_data.size();
+}
+
+
+
+
+unsigned int MeshData::n_val_per_elem () const
+{
+  assert (_active);
+  assert (_elem_id_map_closed);
+  assert (_elem_data_closed);
+
+  if (!_elem_data.empty())
+    {
+      std::map<const Elem*, 
+	       std::vector<Number> >::const_iterator pos = _elem_data.begin();
+      assert (pos != _elem_data.end());
+      return ((*pos).second.size());
+    }
+  else
+      return 0;
+}
+
+
+
+
+unsigned int MeshData::n_elem_data () const
+{
+  assert (_active);
+  assert (_elem_data_closed);
+
+  return _elem_data.size();
+}

@@ -1,4 +1,4 @@
-// $Id: mesh_data.h,v 1.9 2003-07-10 07:38:01 ddreyer Exp $
+// $Id: mesh_data.h,v 1.10 2003-07-12 14:02:56 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -112,6 +112,17 @@ public:
    */
   void write (const std::string& name);
 
+  /**
+   * @returns a string containing relevant information
+   * about the mesh.
+   */
+  std::string get_info () const;
+
+  /**
+   * Prints relevant information about the mesh.
+   */
+  void print_info () const;
+
   //----------------------------------------------------------
   // Node-associated data
   /**
@@ -144,6 +155,12 @@ public:
    * nodal data exists.
    */
   unsigned int n_val_per_node () const;
+
+  /**
+   * @returns the number of nodes for which this
+   * \p MeshData has data stored.
+   */
+  unsigned int n_node_data () const;
 
   /**
    * For the desperate user, nodal boundary conditions 
@@ -197,6 +214,12 @@ public:
    * there is no element-associated data.
    */
   unsigned int n_val_per_elem () const;
+
+  /**
+   * @returns the number of elements for which this
+   * \p MeshData has data stored.
+   */
+  unsigned int n_elem_data () const;
 
   /**
    * For the desperate user, element-associated boundary 
@@ -462,10 +485,6 @@ protected:
    */
   friend class MeshDataUnvHeader;
 
-
-private:
-
-
 };
 
 
@@ -569,10 +588,16 @@ public:
    */
   friend class MeshData;
 
-protected:
 
 private:
 
+  /**
+   * @returns \p true when the string \p number
+   * has a 'D' that needs to be replaced by 'e',
+   * \p false otherwise.  Also actually replaces
+   * the 'D' by an 'e'.
+   */
+  static bool need_D_to_e (std::string& number);
 
 };
 
@@ -640,26 +665,6 @@ void MeshData::operator() (const Node* node,
 
 
 inline
-unsigned int MeshData::n_val_per_node () const
-{
-  assert (_active);
-  assert (_node_id_map_closed);
-  assert (_node_data_closed);
-
-  if (!_node_data.empty())
-    {
-      std::map<const Node*, 
-	       std::vector<Number> >::const_iterator pos = _node_data.begin();
-      assert (pos != _node_data.end());
-      return ((*pos).second.size());
-    }
-  else
-      return 0;
-}
-
-
-
-inline
 Number MeshData::operator() (const Elem* elem, 
 			     const unsigned int i) const
 {
@@ -714,26 +719,6 @@ void MeshData::operator() (const Elem* elem,
     {
       data = (*pos).second;
     }
-}
-
-
-
-inline
-unsigned int MeshData::n_val_per_elem () const
-{
-  assert (_active);
-  assert (_elem_id_map_closed);
-  assert (_elem_data_closed);
-
-  if (!_elem_data.empty())
-    {
-      std::map<const Elem*, 
-	       std::vector<Number> >::const_iterator pos = _elem_data.begin();
-      assert (pos != _elem_data.end());
-      return ((*pos).second.size());
-    }
-  else
-      return 0;
 }
 
 
