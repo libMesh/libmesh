@@ -1,4 +1,4 @@
-// $Id: fe_type.h,v 1.5 2003-01-24 17:24:38 jwpeterson Exp $
+// $Id: fe_type.h,v 1.6 2003-01-27 13:13:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -66,14 +66,32 @@ public:
   
   /**
    * Constructor.  Optionally takes the approximation \p Order
+   * and the finite element family \p FEFamily.  Note that for
+   * non-infinite elements the \p order and \p base order are the
+   * same, as with the \p family and \p base_family.  It must be
+   * so, otherwise what we switch on would change when infinite
+   * elements are not compiled in.
+   */
+  FEType(const Order    o = FIRST,
+	 const FEFamily f = LAGRANGE) :
+    order(o),
+    base_order(o),
+    family(f),
+    base_family(f),
+    inf_map(INVALID_INF_MAP)
+  {};
+
+  
+  /**
+   * Constructor.  Takes the approximation \p Order
    * and the finite element family \p FEFamily, and provides
    * a uniform interface for non-infinite elements.
    */
-  FEType(const Order      bo = FIRST,
-	 const FEFamily   bf = LAGRANGE,
-	 const Order      o  = THIRD,
-	 const FEFamily   f  = JACOBI_20_00,
-	 const InfMapType im = CARTESIAN) :
+  FEType(const Order      bo,
+	 const FEFamily   bf,
+	 const Order      o,
+	 const FEFamily   f,
+	 const InfMapType im ) :
     order(o),
     base_order(bo),
     family(f),
