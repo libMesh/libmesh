@@ -858,13 +858,13 @@ Optional Features:
   --enable-netcdf Set compiler flags to enable netCDF binary I/O
   --enable-exodus build with ExodusII binary support
   --enable-optional Set compiler flags to disable optional external libraries
-  --enable-metis Set compiler flags to build with Metis suppport
-  --enable-parmetis Set compiler flags to build with Parmetis suppport
   --enable-sfc Set compiler flags to build with Sfc suppport
   --enable-tecplot build with Tecplot binary support
   --enable-laspack Set compiler flags to build with LASPACK suppport
   --enable-petsc Set compiler flags to build with Petsc suppport
   --enable-mpi build with MPI message passing support
+  --enable-metis Set compiler flags to build with Metis suppport
+  --enable-parmetis Set compiler flags to build with Parmetis suppport
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -6917,103 +6917,6 @@ echo "${ECHO_T}---------------------------------------------" >&6
 
 
 
-# Check whether --enable-metis or --disable-metis was given.
-if test "${enable_metis+set}" = set; then
-  enableval="$enable_metis"
-  enablemetis=$enableval
-else
-  enablemetis=yes
-fi;
-
-if test "$enablemetis" != no ; then
-
-  echo "$as_me:$LINENO: checking for ./contrib/metis/Lib/metis.h" >&5
-echo $ECHO_N "checking for ./contrib/metis/Lib/metis.h... $ECHO_C" >&6
-if test "${ac_cv_file___contrib_metis_Lib_metis_h+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "./contrib/metis/Lib/metis.h"; then
-  ac_cv_file___contrib_metis_Lib_metis_h=yes
-else
-  ac_cv_file___contrib_metis_Lib_metis_h=no
-fi
-fi
-echo "$as_me:$LINENO: result: $ac_cv_file___contrib_metis_Lib_metis_h" >&5
-echo "${ECHO_T}$ac_cv_file___contrib_metis_Lib_metis_h" >&6
-if test $ac_cv_file___contrib_metis_Lib_metis_h = yes; then
-  METIS_INCLUDE_PATH=$PWD/contrib/metis/Lib
-fi
-
-
-  if (test -r $METIS_INCLUDE_PATH/metis.h) ; then
-
-
-cat >>confdefs.h <<\_ACEOF
-#define HAVE_METIS 1
-_ACEOF
-
-    echo "$as_me:$LINENO: result: <<< Configuring library with Metis support >>>" >&5
-echo "${ECHO_T}<<< Configuring library with Metis support >>>" >&6
-  else
-    enablemetis=no
-  fi
-
-
-
-
-        # Check whether --enable-parmetis or --disable-parmetis was given.
-if test "${enable_parmetis+set}" = set; then
-  enableval="$enable_parmetis"
-  enableparmetis=$enableval
-else
-  enableparmetis=yes
-fi;
-
-  if test "$enableparmetis" != no ; then
-
-  echo "$as_me:$LINENO: checking for ./contrib/parmetis/Lib/parmetis.h" >&5
-echo $ECHO_N "checking for ./contrib/parmetis/Lib/parmetis.h... $ECHO_C" >&6
-if test "${ac_cv_file___contrib_parmetis_Lib_parmetis_h+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "./contrib/parmetis/Lib/parmetis.h"; then
-  ac_cv_file___contrib_parmetis_Lib_parmetis_h=yes
-else
-  ac_cv_file___contrib_parmetis_Lib_parmetis_h=no
-fi
-fi
-echo "$as_me:$LINENO: result: $ac_cv_file___contrib_parmetis_Lib_parmetis_h" >&5
-echo "${ECHO_T}$ac_cv_file___contrib_parmetis_Lib_parmetis_h" >&6
-if test $ac_cv_file___contrib_parmetis_Lib_parmetis_h = yes; then
-  PARMETIS_INCLUDE_PATH=$PWD/contrib/parmetis/Lib
-fi
-
-
-  if (test -r $PARMETIS_INCLUDE_PATH/parmetis.h) ; then
-
-
-cat >>confdefs.h <<\_ACEOF
-#define HAVE_PARMETIS 1
-_ACEOF
-
-    echo "$as_me:$LINENO: result: <<< Configuring library with Parmetis support >>>" >&5
-echo "${ECHO_T}<<< Configuring library with Parmetis support >>>" >&6
-  else
-    enableparmetis=no
-  fi
-
-
-
-  fi
-fi
 
 
 
@@ -7378,7 +7281,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:7381:" \
+echo "$as_me:7284:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -7544,7 +7447,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_verb"
-(eval echo $as_me:7547: \"$ac_link\") >&5
+(eval echo $as_me:7450: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -7623,7 +7526,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_cv_prog_f77_v"
-(eval echo $as_me:7626: \"$ac_link\") >&5
+(eval echo $as_me:7529: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -7896,6 +7799,115 @@ echo "${ECHO_T}<<< Configuring library with MPI support >>>" >&6
 
       fi
   fi
+
+
+
+
+
+
+# Check whether --enable-metis or --disable-metis was given.
+if test "${enable_metis+set}" = set; then
+  enableval="$enable_metis"
+  enablemetis=$enableval
+else
+  enablemetis=yes
+fi;
+
+if test "$enablemetis" != no ; then
+
+  echo "$as_me:$LINENO: checking for ./contrib/metis/Lib/metis.h" >&5
+echo $ECHO_N "checking for ./contrib/metis/Lib/metis.h... $ECHO_C" >&6
+if test "${ac_cv_file___contrib_metis_Lib_metis_h+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "./contrib/metis/Lib/metis.h"; then
+  ac_cv_file___contrib_metis_Lib_metis_h=yes
+else
+  ac_cv_file___contrib_metis_Lib_metis_h=no
+fi
+fi
+echo "$as_me:$LINENO: result: $ac_cv_file___contrib_metis_Lib_metis_h" >&5
+echo "${ECHO_T}$ac_cv_file___contrib_metis_Lib_metis_h" >&6
+if test $ac_cv_file___contrib_metis_Lib_metis_h = yes; then
+  METIS_INCLUDE_PATH=$PWD/contrib/metis/Lib
+fi
+
+
+  if (test -r $METIS_INCLUDE_PATH/metis.h) ; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_METIS 1
+_ACEOF
+
+    echo "$as_me:$LINENO: result: <<< Configuring library with Metis support >>>" >&5
+echo "${ECHO_T}<<< Configuring library with Metis support >>>" >&6
+  else
+    enablemetis=no
+  fi
+
+
+
+
+            if (test "$enablepetsc" != yes -a "$enablempi" != yes) ; then
+    enableparmetis=no
+  else
+    # Check whether --enable-parmetis or --disable-parmetis was given.
+if test "${enable_parmetis+set}" = set; then
+  enableval="$enable_parmetis"
+  enableparmetis=$enableval
+else
+  enableparmetis=yes
+fi;
+
+    if test "$enableparmetis" != no ; then
+
+  echo "$as_me:$LINENO: checking for ./contrib/parmetis/Lib/parmetis.h" >&5
+echo $ECHO_N "checking for ./contrib/parmetis/Lib/parmetis.h... $ECHO_C" >&6
+if test "${ac_cv_file___contrib_parmetis_Lib_parmetis_h+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "./contrib/parmetis/Lib/parmetis.h"; then
+  ac_cv_file___contrib_parmetis_Lib_parmetis_h=yes
+else
+  ac_cv_file___contrib_parmetis_Lib_parmetis_h=no
+fi
+fi
+echo "$as_me:$LINENO: result: $ac_cv_file___contrib_parmetis_Lib_parmetis_h" >&5
+echo "${ECHO_T}$ac_cv_file___contrib_parmetis_Lib_parmetis_h" >&6
+if test $ac_cv_file___contrib_parmetis_Lib_parmetis_h = yes; then
+  PARMETIS_INCLUDE_PATH=$PWD/contrib/parmetis/Lib
+fi
+
+
+  if (test -r $PARMETIS_INCLUDE_PATH/parmetis.h) ; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_PARMETIS 1
+_ACEOF
+
+    echo "$as_me:$LINENO: result: <<< Configuring library with Parmetis support >>>" >&5
+echo "${ECHO_T}<<< Configuring library with Parmetis support >>>" >&6
+  else
+    enableparmetis=no
+  fi
+
+
+
+    fi
+  fi
+fi
+
+
 
 
 
@@ -8593,10 +8605,6 @@ s,@LIBEXOII@,$LIBEXOII,;t t
 s,@EXODUS_INCLUDE_PATH@,$EXODUS_INCLUDE_PATH,;t t
 s,@enableexodus@,$enableexodus,;t t
 s,@enableoptional@,$enableoptional,;t t
-s,@METIS_INCLUDE_PATH@,$METIS_INCLUDE_PATH,;t t
-s,@enablemetis@,$enablemetis,;t t
-s,@PARMETIS_INCLUDE_PATH@,$PARMETIS_INCLUDE_PATH,;t t
-s,@enableparmetis@,$enableparmetis,;t t
 s,@SFC_INCLUDE_PATH@,$SFC_INCLUDE_PATH,;t t
 s,@enablesfc@,$enablesfc,;t t
 s,@TECPLOT_LIBRARY@,$TECPLOT_LIBRARY,;t t
@@ -8615,6 +8623,10 @@ s,@enablepetsc@,$enablepetsc,;t t
 s,@MPI_INCLUDE_PATH@,$MPI_INCLUDE_PATH,;t t
 s,@MPI_LIBRARY_PATH@,$MPI_LIBRARY_PATH,;t t
 s,@enablempi@,$enablempi,;t t
+s,@METIS_INCLUDE_PATH@,$METIS_INCLUDE_PATH,;t t
+s,@enablemetis@,$enablemetis,;t t
+s,@PARMETIS_INCLUDE_PATH@,$PARMETIS_INCLUDE_PATH,;t t
+s,@enableparmetis@,$enableparmetis,;t t
 s,@DOXYGEN@,$DOXYGEN,;t t
 s,@DOT@,$DOT,;t t
 s,@DOTPATH@,$DOTPATH,;t t
@@ -9612,10 +9624,6 @@ s,@LIBEXOII@,$LIBEXOII,;t t
 s,@EXODUS_INCLUDE_PATH@,$EXODUS_INCLUDE_PATH,;t t
 s,@enableexodus@,$enableexodus,;t t
 s,@enableoptional@,$enableoptional,;t t
-s,@METIS_INCLUDE_PATH@,$METIS_INCLUDE_PATH,;t t
-s,@enablemetis@,$enablemetis,;t t
-s,@PARMETIS_INCLUDE_PATH@,$PARMETIS_INCLUDE_PATH,;t t
-s,@enableparmetis@,$enableparmetis,;t t
 s,@SFC_INCLUDE_PATH@,$SFC_INCLUDE_PATH,;t t
 s,@enablesfc@,$enablesfc,;t t
 s,@TECPLOT_LIBRARY@,$TECPLOT_LIBRARY,;t t
@@ -9634,6 +9642,10 @@ s,@enablepetsc@,$enablepetsc,;t t
 s,@MPI_INCLUDE_PATH@,$MPI_INCLUDE_PATH,;t t
 s,@MPI_LIBRARY_PATH@,$MPI_LIBRARY_PATH,;t t
 s,@enablempi@,$enablempi,;t t
+s,@METIS_INCLUDE_PATH@,$METIS_INCLUDE_PATH,;t t
+s,@enablemetis@,$enablemetis,;t t
+s,@PARMETIS_INCLUDE_PATH@,$PARMETIS_INCLUDE_PATH,;t t
+s,@enableparmetis@,$enableparmetis,;t t
 s,@DOXYGEN@,$DOXYGEN,;t t
 s,@DOT@,$DOT,;t t
 s,@DOTPATH@,$DOTPATH,;t t

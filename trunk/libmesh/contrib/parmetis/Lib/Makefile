@@ -31,6 +31,13 @@ ifeq ($(enable-shared),yes)
 endif
 
 
+ifeq ($(enable-mpi)_$(enable-petsc) , no_no)
+  # Do nothing
+  all::
+	@echo "<<< Cannot build Parmetis without either petsc or mpi >>>"
+
+else
+
 all:: $(target)
 
 ../../lib/$(hosttype)_$(METHOD)/libparmetis.a: $(OBJS)
@@ -42,6 +49,7 @@ all:: $(target)
 	@echo "Linking "$@
 	@$(shell mkdir -p ../../lib/$(hosttype)_$(METHOD))
 	@$(CC) $(CSHAREDFLAG) -o $@ $(OBJS) $(LDFLAGS)
+endif
 
 clean:
 	@rm -f $(OBJS) *~
