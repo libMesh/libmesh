@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.2 2003-02-04 02:02:23 benkirk Exp $
+# $Id: Makefile,v 1.3 2003-02-04 16:29:50 benkirk Exp $
 
 
 # The location of the mesh library
@@ -51,5 +51,5 @@ clobber:
 
 distclean:
 	@$(MAKE) clobber
-	@rm -f *.o *.go *.pgo
+	@rm -f *.o *.g.o *.pg.o
 ###############################################################################

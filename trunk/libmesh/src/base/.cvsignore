@@ -1,5 +1,5 @@
 *~
-*.go
+*.g.o
 *.o
-*.pgo
-*.syo
+*.pg.o
+*.sy.o

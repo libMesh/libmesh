@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.9 2003-02-04 14:07:27 spetersen Exp $
+// $Id: boundary_info.C,v 1.10 2003-02-04 16:29:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -253,6 +253,8 @@ void BoundaryInfo::add_side(const Elem* elem,
   // --enable-mgf-workaround
 #ifndef ENABLE_MGF_WORKAROUND 
   {
+    assert (side < elem->n_sides());
+    
     AutoPtr<Elem> side_elem(elem->build_side(side));
 
     for (unsigned int n=0; n<side_elem->n_nodes(); n++)
