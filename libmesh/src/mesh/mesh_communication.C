@@ -1,4 +1,4 @@
-// $Id: mesh_communication.C,v 1.13 2005-02-22 22:17:41 jwpeterson Exp $
+// $Id: mesh_communication.C,v 1.14 2005-02-23 03:31:06 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -53,7 +53,11 @@ void MeshCommunication::distribute (Mesh& mesh) const
 
 
 
+#ifdef HAVE_MPI
 void MeshCommunication::distribute_mesh (MeshBase& mesh) const
+#else // avoid spurious gcc warnings
+void MeshCommunication::distribute_mesh (MeshBase&) const
+#endif
 {
   // Don't need to do anything if there is
   // only one processor.
@@ -211,8 +215,13 @@ void MeshCommunication::distribute_mesh (MeshBase& mesh) const
 
 
 
+#ifdef HAVE_MPI
 void MeshCommunication::distribute_bcs (MeshBase& mesh,
 					BoundaryInfo& boundary_info) const
+#else // avoid spurious gcc warnings
+void MeshCommunication::distribute_bcs (MeshBase&,
+					BoundaryInfo&) const
+#endif
 {
   // Don't need to do anything if there is
   // only one processor.
