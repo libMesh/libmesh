@@ -60,11 +60,11 @@ void MEDITIO::write (const std::string& fname)
 
 
 void MEDITIO::write_ascii (const std::string& fname,
-			 const std::vector<Number>* v,
-			 const std::vector<std::string>* solution_names)
+			   const std::vector<Number>* ,
+			   const std::vector<std::string>* )
 {
   // assert three dimensions (should be extended later)
-  assert (this->mesh_dimension() == 3);
+  assert (this->mesh().mesh_dimension() == 3);
 
   // Open the output file stream
   std::ofstream out (fname.c_str());
