@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.13 2003-05-15 23:34:35 benkirk Exp $
+// $Id: mesh_refinement.C,v 1.14 2003-05-19 21:21:13 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -25,6 +25,7 @@
 // only compile these functions if the user requests AMR support
 #ifdef ENABLE_AMR
 
+#include "error_vector.h"
 #include "mesh_refinement.h"
 #include "mesh_base.h"
 #include "elem.h"
@@ -42,7 +43,7 @@ MeshRefinement::MeshRefinement (MeshBase& m) :
 
 MeshRefinement::~MeshRefinement ()
 {
-  clear();  
+  this->clear();  
 }
 
 
@@ -124,11 +125,93 @@ void MeshRefinement::update_unused_elements()
   // clear and start from scratch
   unused_elements.clear();
   
-  // find NULL elements and add the index to the database
+  // find NULL elements and add the index to the database.
+  // Note that we can't use the mesh.elem(e) approach here
+  // since it asserts the element is not NULL.
+  const std::vector<Elem*>& elements = mesh.get_elem();
+
+  assert (mesh.n_elem() == elements.size());
+  
   for (unsigned int e=0; e<mesh.n_elem(); e++)
-    if (mesh.elem(e) == NULL)
+    if (elements[e] == NULL)
       unused_elements.insert(e);
 }
+
+
+
+void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_per_cell,
+						      const Real refine_fraction,
+						      const Real coarsen_fraction)
+{
+  // Check for valid fractions..
+  // The fraction values must be in [0,1]
+  assert (refine_fraction  >= 0.);  assert (refine_fraction  <= 1.);
+  assert (coarsen_fraction >= 0.);  assert (coarsen_fraction <= 1.);
+
+  // Clean up the refinement flags.  These could be left
+  // over from previous refinement steps.
+  this->clean_refinement_flags();
+  
+
+  // Get the minimum, maximum, and delta error values
+  // for the elements
+  const Real error_max   = error_per_cell.maximum();
+  const Real error_min   = error_per_cell.minimum();
+  const Real error_delta = (error_max - error_min);
+
+
+  std::cout << " Error Information:"       << std::endl
+	    << " ------------------"       << std::endl
+	    << "   min:   " << error_min   << std::endl
+	    << "   max:   " << error_max   << std::endl
+	    << "   delta: " << error_delta << std::endl;
+  
+  
+  // Compute the cutoff values for coarsening and refinement
+  const Real refine_cutoff  = (1.- refine_fraction)*error_max;
+  const Real coarsen_cutoff = coarsen_fraction*error_delta + error_min;
+
+
+  // Loop over the elements and flag them for coarsening or
+  // refinement based on the element error
+  active_elem_iterator       elem_it (mesh.elements_begin());
+  const active_elem_iterator elem_end(mesh.elements_end());
+
+  for (; elem_it != elem_end; ++elem_it)
+    {
+      Elem* elem             = *elem_it;
+      const unsigned int id  = elem->id();
+
+      assert (id < error_per_cell.size());
+      
+      const float elem_error = error_per_cell[id];
+
+      // Flag the element for refinement if its error
+      // is >= refinement_cutoff.
+      if (elem_error >= refine_cutoff)
+	elem->set_refinement_flag(Elem::REFINE);
+
+      // Flag the element for coarsening if its error
+      // is <= coarsen_fraction*delta + error_min
+      else if (elem_error <=  coarsen_cutoff)
+	elem->set_refinement_flag(Elem::COARSEN);
+    }
+}
+
+
+
+
+void MeshRefinement::clean_refinement_flags ()
+{
+  // Possibly clean up the refinement flags from
+  // a previous step
+  elem_iterator       elem_it (mesh.elements_begin());
+  const elem_iterator elem_end(mesh.elements_end());
+
+  for ( ; elem_it != elem_end; ++elem_it)
+    (*elem_it)->set_refinement_flag(Elem::DO_NOTHING);
+}
+
 
 
 
@@ -162,8 +245,11 @@ void MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
    */
   do
     {
-      const bool coarsening_satisfied = make_coarsening_compatible(maintain_level_one);
-      const bool refinement_satisfied = make_refinement_compatible(maintain_level_one);
+      const bool coarsening_satisfied =
+	this->make_coarsening_compatible(maintain_level_one);
+      
+      const bool refinement_satisfied =
+	this->make_refinement_compatible(maintain_level_one);
       
       if (coarsening_satisfied && refinement_satisfied)
 	satisfied = true;
@@ -174,25 +260,25 @@ void MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
    * First coarsen the flagged elements.  This
    * will free space.
    */
-  coarsen_elements ();
+  this->coarsen_elements ();
 
   /**
    * Find any NULL elements from the coarsening step.
    * We will fill these before allocating new space.
    */
-  update_unused_elements ();
+  this->update_unused_elements ();
   
   /**
    * Now refine the flagged elements.  This will
    * take up some space, maybe more than what was freed.
    */
-  refine_elements();
+  this->refine_elements();
 
   /**
    * Find any nodes that were orphaned by the coarsening
    * step and not reconnected during the refinement step.
    */
-  update_unused_nodes();
+  this->update_unused_nodes();
   
   /**
    * We need contiguous elements, so
@@ -499,6 +585,9 @@ void MeshRefinement::coarsen_elements ()
 
   unsigned int max_level=0;
 
+//  const std::vector<Elem*>& elements = mesh.get_elem();
+//  const unsigned int n_elem = elements.size();
+  
   for (unsigned int e=0; e<mesh.n_elem(); e++)
     {
       assert (mesh.elem(e) != NULL);
@@ -536,34 +625,24 @@ void MeshRefinement::coarsen_elements ()
 void MeshRefinement::refine_elements ()
 {
   const unsigned int orig_n_elem = mesh.n_elem();
-  
+
+
+  // Loop over the elements in the mesh, refine
+  // those whose flags are set to Elem::REFINE
+  const std::vector<Elem*>& elements = mesh.get_elem();
+
   for (unsigned int e=0; e<orig_n_elem; e++)
-    if (mesh.elem(e) != NULL) // could be if deleted
-      if (mesh.elem(e)->refinement_flag() == Elem::REFINE)
-	mesh.elem(e)->refine(mesh);
+    if (elements[e] != NULL)
+      if (elements[e]->refinement_flag() == Elem::REFINE)
+	elements[e]->refine (mesh);
 }
 
 
 
 void MeshRefinement::uniformly_refine (unsigned int n)
 {
-  // Possibly clean up the refinement flags from
-  // a previous step
-  elem_iterator       elem_it (mesh.elements_begin());
-  const elem_iterator elem_end(mesh.elements_end());
-
-  for ( ; elem_it != elem_end; ++elem_it)
-    {
-      // Set refinement flag to DO_NOTHING if the
-      // element isn't active
-      if ( !(*elem_it)->active())
-	(*elem_it)->set_refinement_flag(Elem::DO_NOTHING);
-
-      // This might be left over from the last step
-      if ((*elem_it)->refinement_flag() == Elem::JUST_REFINED)
-	(*elem_it)->set_refinement_flag(Elem::DO_NOTHING);
-    }
-
+  // Clean up the refinement flags
+  this->clean_refinement_flags();  
 
   // Refine n times
   for (unsigned int rstep=0; rstep<n; rstep++)
@@ -575,7 +654,7 @@ void MeshRefinement::uniformly_refine (unsigned int n)
       /**
        * Refine all the elements we just flagged.
        */
-      refine_elements();
+      this->refine_elements();
       
   
       /**

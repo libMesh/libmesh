@@ -1,4 +1,4 @@
-// $Id: statistics.h,v 1.8 2003-05-19 13:08:00 benkirk Exp $
+// $Id: statistics.h,v 1.9 2003-05-19 21:21:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -79,23 +79,34 @@ class StatisticsVector : public std::vector<T>
    * Call the std::vector constructor.
    */
   StatisticsVector(unsigned int i=0) { this->resize(i); }
+  
+  /**
+   * Call the std::vector constructor, fill each entry with \p val
+   */
+  StatisticsVector(unsigned int i, T val);
+
+  /**
+   * Destructor.  Virtual so we can derive from the \p StatisticsVector
+   */
+  virtual ~StatisticsVector () {}
+
 
   /**
    * Returns the minimum value in the data set.
    */
-  T minimum() const;
+  virtual T minimum() const;
   
   /**
    * Returns the maximum value in the data set.
    */
-  T maximum() const;
+  virtual T maximum() const;
   
   /**
    * Returns the mean value of the
    * data set using a recurrence relation.
    * Source: GNU Scientific Library
    */
-  Real mean() const;
+  virtual Real mean() const;
 
   /**
    * Returns the median (e.g. the middle)
@@ -105,14 +116,14 @@ class StatisticsVector : public std::vector<T>
    * can't be called on const objects.
    * Source: GNU Scientific Library
    */
-  Real median();
+  virtual Real median();
 
   /**
    * A const version of the median funtion.
    * Requires twice the memory of original
    * data set but does not change the original.
    */
-  Real median() const;
+  virtual Real median() const;
 
   /**
    * Computes the variance of the data set.
@@ -123,7 +134,7 @@ class StatisticsVector : public std::vector<T>
    * is normalized by N in this case.
    * Source: GNU Scientific Library
    */
-  Real variance() const;
+  virtual Real variance() const;
 
   /**
    * Computes and returns a histogram with
@@ -134,21 +145,21 @@ class StatisticsVector : public std::vector<T>
    * of members in each bin.
    * Source: GNU Scientific Library
    */
-  std::vector<unsigned int> histogram(unsigned int n_bins=10);
+  virtual std::vector<unsigned int> histogram(unsigned int n_bins=10);
 
   /**
    * A const version of the median function.
    * Requires twice the memory of the data set
    * but does not change the original.
    */
-  std::vector<unsigned int> histogram(unsigned int n_bins=10) const;
+  virtual std::vector<unsigned int> histogram(unsigned int n_bins=10) const;
 
   /**
    * Returns a vector of unsigned ints which correspond
    * to the indices of every member of the data set
    * below the cutoff value cut.
    */
-  std::vector<unsigned int> cut_below(Real cut) const;
+  virtual std::vector<unsigned int> cut_below(Real cut) const;
 
   /**
    * Returns a vector of unsigned ints which correspond
@@ -157,7 +168,7 @@ class StatisticsVector : public std::vector<T>
    * these two functions since the interface is cleaner
    * with one passed parameter instead of two.
    */
-  std::vector<unsigned int> cut_above(Real cut) const;
+  virtual std::vector<unsigned int> cut_above(Real cut) const;
   
   
  private:

@@ -1,6 +1,6 @@
 
 
-// $Id: mesh_base.C,v 1.32 2003-05-15 23:34:35 benkirk Exp $
+// $Id: mesh_base.C,v 1.33 2003-05-19 21:21:13 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -2024,8 +2024,8 @@ void MeshBase::trim_unused_elements (std::set<unsigned int>& unused_elements)
     unsigned int ne=0;
     
     for (unsigned int e=0; e<n_elem(); e++)
-      if (elem(e) != NULL)
-	new_elements[ne++] = elem(e); 
+      if (_elements[e] != NULL)
+	new_elements[ne++] = _elements[e]; 
 
     new_elements.resize(ne);
     

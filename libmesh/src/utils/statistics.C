@@ -1,4 +1,4 @@
-// $Id: statistics.C,v 1.8 2003-05-19 13:08:02 benkirk Exp $
+// $Id: statistics.C,v 1.9 2003-05-19 21:21:14 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,6 +30,17 @@
 
 // ------------------------------------------------------------
 // StatisticsVector class member functions
+template <typename T>
+StatisticsVector<T>::StatisticsVector (unsigned int i, T val)
+{
+  this->resize (i);
+
+  std::fill (this->begin(), this->end(), val);
+}
+
+
+
+
 template <typename T>
 T StatisticsVector<T>::minimum() const
 {
