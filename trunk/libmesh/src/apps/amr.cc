@@ -83,10 +83,10 @@ int main (int argc, char** argv)
     // Solve again. Output the refined solution
     es("primary").solve ();
     mesh.write_gmv_binary ("out_3.gmv", es);
-  };
+  }
   
   return libMesh::close();
-};
+}
 
 
 
@@ -117,11 +117,11 @@ void assemble(EquationSystems& es,
   
   
   // These are references to cell-specific data
-  const std::vector<Real>& JxW_face            = fe_face->get_JxW();
-  const std::vector<Real>& JxW                 = fe->get_JxW();
-  const std::vector<Point>& q_point            = fe->get_xyz();
-  const std::vector<std::vector<Real> >& phi   = fe->get_phi();
-  const std::vector<std::vector<Point> >& dphi = fe->get_dphi();
+  const std::vector<Real>& JxW_face                   = fe_face->get_JxW();
+  const std::vector<Real>& JxW                        = fe->get_JxW();
+  const std::vector<Point>& q_point                   = fe->get_xyz();
+  const std::vector<std::vector<Real> >& phi          = fe->get_phi();
+  const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
   
   std::vector<unsigned int> dof_indices_U;
   std::vector<unsigned int> dof_indices_V;
@@ -223,10 +223,10 @@ void assemble(EquationSystems& es,
 				       dof_indices_U);
       es("primary").matrix->add_matrix(Kvv,
 				       dof_indices_V);
-    };
+    }
   
   std::cout << "Vol="  << vol << std::endl;
 
   if (dim == 3)
     std::cout << "Area=" << area << std::endl;
-};
+}
