@@ -1,4 +1,4 @@
-// $Id: utility.h,v 1.7 2004-09-30 21:21:49 benkirk Exp $
+// $Id: utility.h,v 1.8 2004-11-13 04:12:06 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -96,7 +96,7 @@ namespace Utility
    * of complex data, and for  \p r_o_c = 1 the filename for the imaginary 
    * part.
    */
-  const char* complex_filename (std::string name,
+  std::string complex_filename (const std::string& basename,
 				unsigned int r_o_c=0);
 
   /**
