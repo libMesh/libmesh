@@ -1,4 +1,4 @@
-// $Id: laspack_matrix.h,v 1.4 2003-02-10 23:42:57 benkirk Exp $
+// $Id: laspack_matrix.h,v 1.5 2003-02-11 00:08:41 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk, John W. Peterson
@@ -358,7 +358,7 @@ unsigned int LaspackMatrix::m () const
 {
   assert (initialized());
 
-  return static_cast<unsigned int>(Q_GetDim(const_cast<Laspack::QMatrix*>(&_QMat)));
+  return static_cast<unsigned int>(Laspack::Q_GetDim(const_cast<Laspack::QMatrix*>(&_QMat)));
 };
 
 
@@ -368,7 +368,7 @@ unsigned int LaspackMatrix::n () const
 {
   assert (initialized());
   
-  return static_cast<unsigned int>(Q_GetDim(const_cast<Laspack::QMatrix*>(&_QMat)));
+  return static_cast<unsigned int>(Laspack::Q_GetDim(const_cast<Laspack::QMatrix*>(&_QMat)));
 };
 
 
