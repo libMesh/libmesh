@@ -1,4 +1,4 @@
-/* $Id: ex13.C,v 1.5 2004-05-12 18:05:24 jwpeterson Exp $ */
+/* $Id: ex13.C,v 1.6 2004-05-12 18:10:29 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -473,12 +473,12 @@ void assemble_stokes (EquationSystems& es,
 
 	  // Definitions for convenience.  It is sometimes simpler to do a
 	  // dot product if you have the full vector at your disposal.
-	  const Point U_old (u_old, v_old);
-	  const Point U     (u,     v);
-	  const Real  u_x = grad_u(0);
-	  const Real  u_y = grad_u(1);
-	  const Real  v_x = grad_v(0);
-	  const Real  v_y = grad_v(1);
+	  const NumberVectorValue U_old (u_old, v_old);
+	  const NumberVectorValue U     (u,     v);
+	  const Number  u_x = grad_u(0);
+	  const Number  u_y = grad_u(1);
+	  const Number  v_x = grad_v(0);
+	  const Number  v_y = grad_v(1);
 	  
 	  // First, an i-loop over the velocity degrees of freedom.
 	  // We know that n_u_dofs == n_v_dofs so we can compute contributions
