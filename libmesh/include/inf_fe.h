@@ -1,4 +1,4 @@
-// $Id: inf_fe.h,v 1.31 2003-09-25 21:46:55 benkirk Exp $
+// $Id: inf_fe.h,v 1.32 2003-10-01 10:37:35 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -66,7 +66,7 @@ class FEComputeData;
  *
  * \author Daniel Dreyer
  * \date 2003
- * \version $Revision: 1.31 $
+ * \version $Revision: 1.32 $
  */
 
 //-------------------------------------------------------------
@@ -89,7 +89,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.31 $
+   * \version $Revision: 1.32 $
    */
   //-------------------------------------------------------------
   // InfFE::Radial class definition
@@ -181,7 +181,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.31 $
+   * \version $Revision: 1.32 $
    */
   //-------------------------------------------------------------
   // InfFE::Base class definition
@@ -293,7 +293,10 @@ public:
    * Generalized version of \p shape(), takes an \p Elem*.  The \p data
    * contains both input and output parameters.  For frequency domain
    * simulations, the complex-valued shape is returned.  In time domain
-   * it may be possible to return both the computed shape and phase lag.
+   * both the computed shape, @e and the phase is returned.  Note that
+   * the phase (proportional to the distance of the \p Point \p data.p
+   * from the envelope) is actually a measure how @e far into the @e future
+   * the results are.  Pretty weird, hm!?
    */
   static void compute_data(const FEType& fe_t,
 			   const Elem* inf_elem,
