@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism12.C,v 1.26 2005-02-23 04:40:36 roystgnr Exp $
+// $Id: cell_inf_prism12.C,v 1.27 2005-02-25 19:16:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -31,6 +31,17 @@
 
 
 // ------------------------------------------------------------
+// InfPrism12 class static member initializations
+const unsigned int InfPrism12::side_nodes_map[4][6] =
+{
+  { 0, 1, 2, 6, 7, 8},  // Side 0
+  { 0, 1, 3, 4, 6, 9},  // Side 1
+  { 1, 2, 4, 5, 7, 10}, // Side 2
+  { 2, 0, 5, 3, 8, 11}  // Side 3
+};
+
+
+// ------------------------------------------------------------
 // InfPrism12 class member functions
 
 bool InfPrism12::is_vertex(const unsigned int i) const
@@ -53,6 +64,16 @@ bool InfPrism12::is_face(const unsigned int i) const
 {
   if (i > 8)
     return true;
+  return false;
+}
+
+bool InfPrism12::is_node_on_side(const unsigned int n,
+				 const unsigned int s) const
+{
+  assert(s < n_sides());
+  for (unsigned int i = 0; i != 6; ++i)
+    if (side_nodes_map[s][i] == n)
+      return true;
   return false;
 }
 

@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex18.C,v 1.27 2005-02-23 04:33:20 roystgnr Exp $
+// $Id: cell_inf_hex18.C,v 1.28 2005-02-25 19:16:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -31,6 +31,17 @@
 
 
 // ------------------------------------------------------------
+// InfHex18 class static member initializations
+const unsigned int InfHex18::side_nodes_map[5][9] =
+{
+  { 0, 1, 2, 3, 8, 9, 10, 11, 16},   // Side 0
+  { 0, 1, 4, 5, 8, 12, 99, 99, 99},  // Side 1
+  { 1, 2, 5, 6, 9, 13, 99, 99, 99},  // Side 2
+  { 2, 3, 6, 7, 10, 14, 99, 99, 99}, // Side 3
+  { 3, 0, 7, 4, 11, 15, 99, 99, 99}  // Side 4
+};
+
+// ------------------------------------------------------------
 // InfHex18 class member functions
 
 bool InfHex18::is_vertex(const unsigned int i) const
@@ -53,6 +64,16 @@ bool InfHex18::is_face(const unsigned int i) const
 {
   if (i > 11)
     return true;
+  return false;
+}
+
+bool InfHex18::is_node_on_side(const unsigned int n,
+			       const unsigned int s) const
+{
+  assert(s < n_sides());
+  for (unsigned int i = 0; i != 9; ++i)
+    if (side_nodes_map[s][i] == n)
+      return true;
   return false;
 }
 

@@ -1,4 +1,4 @@
-// $Id: cell_pyramid5.C,v 1.15 2005-02-22 22:17:39 jwpeterson Exp $
+// $Id: cell_pyramid5.C,v 1.16 2005-02-25 19:16:24 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -57,6 +57,16 @@ bool Pyramid5::is_edge(const unsigned int) const
 
 bool Pyramid5::is_face(const unsigned int) const
 {
+  return false;
+}
+
+bool Pyramid5::is_node_on_side(const unsigned int n,
+			       const unsigned int s) const
+{
+  assert(s < n_sides());
+  for (unsigned int i = 0; i != 4; ++i)
+    if (side_nodes_map[s][i] == n)
+      return true;
   return false;
 }
 

@@ -1,4 +1,4 @@
-// $Id: face_inf_quad4.C,v 1.25 2005-02-23 04:40:36 roystgnr Exp $
+// $Id: face_inf_quad4.C,v 1.26 2005-02-25 19:16:38 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -32,6 +32,16 @@
 
 
 // ------------------------------------------------------------
+// InfQuad4 class static member initializations
+const unsigned int InfQuad4::side_nodes_map[3][2] =
+{
+  {0, 1}, // Side 0
+  {1, 3}, // Side 1
+  {0, 2}  // Side 2
+};
+
+
+// ------------------------------------------------------------
 // InfQuad4 class member functions
 
 bool InfQuad4::is_vertex(const unsigned int i) const
@@ -50,6 +60,16 @@ bool InfQuad4::is_edge(const unsigned int i) const
 
 bool InfQuad4::is_face(const unsigned int) const
 {
+  return false;
+}
+
+bool InfQuad4::is_node_on_side(const unsigned int n,
+			       const unsigned int s) const
+{
+  assert(s < n_sides());
+  for (unsigned int i = 0; i != 2; ++i)
+    if (side_nodes_map[s][i] == n)
+      return true;
   return false;
 }
 

@@ -1,4 +1,4 @@
-// $Id: face_inf_quad6.h,v 1.7 2005-02-22 22:17:32 jwpeterson Exp $
+// $Id: face_inf_quad6.h,v 1.8 2005-02-25 19:15:41 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -102,6 +102,13 @@ public:
    */
   virtual bool is_face(const unsigned int i) const;
   
+  /*
+   * @returns true iff the specified (local) node number is on the
+   * specified side
+   */
+  virtual bool is_node_on_side(const unsigned int n,
+			       const unsigned int s) const;
+  
   /**
    * @returns \p SECOND
    */
@@ -131,6 +138,12 @@ public:
   unsigned short int second_order_adjacent_vertex (const unsigned int n,
 						   const unsigned int v) const;
   
+  /**
+   * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
+   * element node numbers.
+   */
+  static const unsigned int side_nodes_map[3][3];
+
   
   
 protected:
