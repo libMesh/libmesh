@@ -1,4 +1,4 @@
-// $Id: steady_system.C,v 1.5 2003-05-28 22:03:15 benkirk Exp $
+// $Id: steady_system.C,v 1.6 2003-05-29 00:03:05 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -119,5 +119,7 @@ void SteadySystem::update ()
 
 void SteadySystem::re_update ()
 {
-  error();
+  // For this system there is no difference
+  // between re_update & update.
+  SteadySystem::update ();
 }

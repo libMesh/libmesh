@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.18 2003-05-28 03:17:50 benkirk Exp $
+// $Id: mesh_refinement.C,v 1.19 2003-05-29 00:03:06 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -567,27 +567,26 @@ void MeshRefinement::refine_elements ()
 
 void MeshRefinement::uniformly_refine (unsigned int n)
 {
-  // Clean up the refinement flags
-  this->clean_refinement_flags();  
-
   // Refine n times
   for (unsigned int rstep=0; rstep<n; rstep++)
     {
-      for (unsigned int e=0; e<mesh.n_elem(); e++)
-	if (mesh.elem(e)->active())
-	  mesh.elem(e)->set_refinement_flag(Elem::REFINE);
-
-      /**
-       * Refine all the elements we just flagged.
-       */
-      this->refine_elements();
+      // Flag all the active elements for refinement.       
+      active_elem_iterator       elem_it (mesh.elements_begin());
+      const active_elem_iterator elem_end(mesh.elements_end());
       
-  
-      /**
-       * Finally, the new mesh needs to be prepared for use
-       */
-      mesh.prepare_for_use ();
+      for ( ; elem_it != elem_end; ++elem_it)
+	(*elem_it)->set_refinement_flag(Elem::REFINE);
+
+      // Refine all the elements we just flagged.
+       this->refine_elements();
     }
+          
+  // Clean up the refinement flags
+  this->clean_refinement_flags();  
+
+  
+  // Finally, the new mesh needs to be prepared for use
+  mesh.prepare_for_use ();
 }
 
 

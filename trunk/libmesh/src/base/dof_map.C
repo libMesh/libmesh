@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.43 2003-05-28 22:03:14 benkirk Exp $
+// $Id: dof_map.C,v 1.44 2003-05-29 00:03:05 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -807,9 +807,56 @@ void DofMap::old_dof_indices (const Elem* elem,
 
 
 
-void DofMap::augment_send_list_for_projection(const MeshBase &)
+void DofMap::augment_send_list_for_projection(const MeshBase& mesh)
 {
-  error();
+  // Loop over the active local elements in the mesh.
+  // If the element was just refined and its parent lives
+  // on a different processor then we need to augment the
+  // _send_list with the parent's DOF indices so that we
+  // can access the parent's data for computing solution
+  // projections, etc...
+
+  // The DOF indices for the parent
+  std::vector<unsigned int> di;
+
+  // Flag telling us if we need to re-sort the send_list.
+  // Note we won't need to re-sort unless a child with a
+  // parent belonging to a different processor is found
+  bool needs_sorting = false;
+  
+  
+  const_active_local_elem_iterator       elem_it (mesh.elements_begin());
+  const const_active_local_elem_iterator elem_end(mesh.elements_end());
+
+  for ( ; elem_it != elem_end; ++elem_it)
+    {
+      const Elem* elem   = *elem_it;
+
+      // We only need to consider the children that
+      // were just refined
+      if (elem->refinement_flag() != Elem::JUST_REFINED) continue;
+      
+      const Elem* parent = elem->parent();
+
+      // If the parent lives on another processor
+      // than the child
+      if (parent != NULL)
+	if (parent->processor_id() != elem->processor_id())
+	  {
+	    // Get the DOF indices for the parent
+	    this->dof_indices (parent, di);
+
+	    // Insert the DOF indices into the send list
+	    _send_list.insert (_send_list.end(),
+			       di.begin(), di.end());
+
+	    // We will need to re-sort the send list
+	    needs_sorting = true;	    
+	  }
+    }
+
+  // The send-list might need to be sorted again.
+  if (needs_sorting) this->sort_send_list ();
 }
 
 #endif // #ifdef ENABLE_AMR
