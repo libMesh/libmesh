@@ -1,4 +1,4 @@
-// $Id: petsc_interface.C,v 1.22 2004-02-26 04:24:07 jwpeterson Exp $
+// $Id: petsc_interface.C,v 1.23 2004-03-14 01:31:48 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -111,22 +111,28 @@ PetscInterface<T>::solve (SparseMatrix<T> &matrix_in,
 {
   this->init ();
   
-  PetscMatrix<T>& matrix   = dynamic_cast<PetscMatrix<T>&>(matrix_in);
-  PetscVector<T>& solution = dynamic_cast<PetscVector<T>&>(solution_in);
-  PetscVector<T>& rhs      = dynamic_cast<PetscVector<T>&>(rhs_in);
+  PetscMatrix<T>* matrix   = dynamic_cast<PetscMatrix<T>*>(&matrix_in);
+  PetscVector<T>* solution = dynamic_cast<PetscVector<T>*>(&solution_in);
+  PetscVector<T>* rhs      = dynamic_cast<PetscVector<T>*>(&rhs_in);
+
+  // We cast to pointers so we can be sure that they succeeded
+  // by comparing the result against NULL.
+  assert(matrix   != NULL);
+  assert(solution != NULL);
+  assert(rhs      != NULL);
   
   int ierr=0;
   int its=0, max_its = static_cast<int>(m_its);
   PetscReal final_resid=0.;
 
   // Close the matrix and vectors in case this wasn't already done.
-  matrix.close ();
-  solution.close ();
-  rhs.close ();
+  matrix->close ();
+  solution->close ();
+  rhs->close ();
 
   
   // Set operators. The input matrix works as the preconditioning matrix
-  ierr = SLESSetOperators(_sles, matrix.mat, matrix.mat,
+  ierr = SLESSetOperators(_sles, matrix->mat, matrix->mat,
 			  SAME_NONZERO_PATTERN);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
@@ -139,7 +145,7 @@ PetscInterface<T>::solve (SparseMatrix<T> &matrix_in,
 
 
   // Solve the linear system
-  ierr = SLESSolve (_sles, rhs.vec, solution.vec, &its);
+  ierr = SLESSolve (_sles, rhs->vec, solution->vec, &its);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
 

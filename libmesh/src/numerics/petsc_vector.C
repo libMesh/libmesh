@@ -1,4 +1,4 @@
-// $Id: petsc_vector.C,v 1.29 2004-03-09 18:52:39 benkirk Exp $
+// $Id: petsc_vector.C,v 1.30 2004-03-14 01:31:48 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -182,13 +182,17 @@ template <typename T>
 void PetscVector<T>::add_vector (const NumericVector<T>& V_in,
 				 SparseMatrix<T>& A_in)
 {
-  const PetscVector<T>& V = dynamic_cast<const PetscVector<T>&>(V_in);
-  PetscMatrix<T>&       A = dynamic_cast<PetscMatrix<T>&>(A_in);
+  const PetscVector<T>* V = dynamic_cast<const PetscVector<T>*>(&V_in);
+  PetscMatrix<T>*       A = dynamic_cast<PetscMatrix<T>*>(&A_in);
+
+  assert (V != NULL);
+  assert (A != NULL);
+  
   int ierr=0;
 
-  A.close();
+  A->close();
 
-  ierr = MatMultAdd(A.mat, V.vec, vec, vec);
+  ierr = MatMultAdd(A->mat, V->vec, vec, vec);
          CHKERRABORT(PETSC_COMM_WORLD,ierr); 
 }
 
@@ -248,11 +252,12 @@ void PetscVector<T>::add (const T a_in, const NumericVector<T>& v_in)
   int ierr = 0;
   PetscScalar a = static_cast<PetscScalar>(a_in);
 
-  const PetscVector<T>& v = dynamic_cast<const PetscVector<T>&>(v_in);
+  const PetscVector<T>* v = dynamic_cast<const PetscVector<T>*>(&v_in);
+
+  assert (v != NULL);
+  assert(this->size() == v->size());
   
-  assert(this->size() == v.size());
-  
-  ierr = VecAXPY(&a, v.vec, vec);
+  ierr = VecAXPY(&a, v->vec, vec);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 }
 
@@ -292,9 +297,11 @@ template <typename T>
 NumericVector<T>&
 PetscVector<T>::operator = (const NumericVector<T>& v_in)
 {
-  const PetscVector<T>& v = dynamic_cast<const PetscVector<T>&>(v_in);
+  const PetscVector<T>* v = dynamic_cast<const PetscVector<T>*>(&v_in);
 
-  *this = v;
+  assert (v != NULL);
+  
+  *this = *v;
   
   return *this;
 }
@@ -376,9 +383,10 @@ PetscVector<T>::operator = (const std::vector<T>& v)
 template <typename T>
 void PetscVector<T>::localize (NumericVector<T>& v_local_in) const
 {
-  PetscVector<T>& v_local = dynamic_cast<PetscVector<T>&>(v_local_in);
+  PetscVector<T>* v_local = dynamic_cast<PetscVector<T>*>(&v_local_in);
 
-  assert (v_local.local_size() == this->size());
+  assert (v_local != NULL);
+  assert (v_local->local_size() == this->size());
 
   int ierr = 0;
   const int n = this->size();
@@ -393,17 +401,17 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in) const
   ierr = ISCreateGeneral(PETSC_COMM_WORLD, n, &idx[0], &is);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
-  ierr = VecScatterCreate(vec,         is,
-			  v_local.vec, is,
+  ierr = VecScatterCreate(vec,          is,
+			  v_local->vec, is,
 			  &scatter);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
   // Perform the scatter
-  ierr = VecScatterBegin(vec, v_local.vec, INSERT_VALUES,
+  ierr = VecScatterBegin(vec, v_local->vec, INSERT_VALUES,
 			 SCATTER_FORWARD, scatter);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
   
-  ierr = VecScatterEnd  (vec, v_local.vec, INSERT_VALUES,
+  ierr = VecScatterEnd  (vec, v_local->vec, INSERT_VALUES,
 			 SCATTER_FORWARD, scatter);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
@@ -421,10 +429,11 @@ template <typename T>
 void PetscVector<T>::localize (NumericVector<T>& v_local_in,
 			       const std::vector<unsigned int>& send_list) const
 {
-  PetscVector<T>& v_local = dynamic_cast<PetscVector<T>&>(v_local_in);
+  PetscVector<T>* v_local = dynamic_cast<PetscVector<T>*>(&v_local_in);
 
-  assert (v_local.local_size() == this->size());
-  assert (send_list.size()     <= v_local.size());
+  assert (v_local != NULL);
+  assert (v_local->local_size() == this->size());
+  assert (send_list.size()     <= v_local->size());
   
   int ierr=0;
   const int n_sl = send_list.size();
@@ -441,18 +450,18 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in,
   ierr = ISCreateGeneral(PETSC_COMM_WORLD, n_sl, &idx[0], &is);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
-  ierr = VecScatterCreate(vec,         is,
-			  v_local.vec, is,
+  ierr = VecScatterCreate(vec,          is,
+			  v_local->vec, is,
 			  &scatter);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
   
   // Perform the scatter
-  ierr = VecScatterBegin(vec, v_local.vec, INSERT_VALUES,
+  ierr = VecScatterBegin(vec, v_local->vec, INSERT_VALUES,
 			 SCATTER_FORWARD, scatter);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
   
-  ierr = VecScatterEnd  (vec, v_local.vec, INSERT_VALUES,
+  ierr = VecScatterEnd  (vec, v_local->vec, INSERT_VALUES,
 			 SCATTER_FORWARD, scatter);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 

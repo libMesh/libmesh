@@ -1,4 +1,4 @@
-// $Id: laspack_matrix.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: laspack_matrix.h,v 1.3 2004-03-14 01:31:48 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2003-2003  Benjamin S. Kirk, John W. Peterson
@@ -494,9 +494,11 @@ void LaspackMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
   assert (this->m() == X_in.m());
   assert (this->n() == X_in.n());
 
-  LaspackMatrix<T>& X = dynamic_cast<LaspackMatrix<T>&> (X_in);
+  LaspackMatrix<T>* X = dynamic_cast<LaspackMatrix<T>*> (&X_in);
   _LPNumber         a = static_cast<_LPNumber>          (a_in);
-
+  
+  assert(X != NULL);
+  
   // loops taken from LaspackMatrix<T>::zero ()
 
   const unsigned int n_rows = this->m();
@@ -507,7 +509,7 @@ void LaspackMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
       const unsigned int len     = Q_GetLen(&_QMat, row+1);
 
       // compare matrix sparsity structures
-      assert (len == Q_GetLen(&(X._QMat), row+1));
+      assert (len == Q_GetLen(&(X->_QMat), row+1));
 	
       // Make sure we agree on the row length
       assert (len == (_row_start[row+1]-_row_start[row]));
@@ -519,7 +521,7 @@ void LaspackMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
 	  // Make sure the data structures are working
 	  assert ((j+1) == Q_GetPos (&_QMat, row+1, l));
 
-	  const _LPNumber value = a * Q_GetEl(const_cast<QMatrix*>(&(X._QMat)), row+1, j+1);
+	  const _LPNumber value = a * Q_GetEl(const_cast<QMatrix*>(&(X->_QMat)), row+1, j+1);
 	  Q_AddVal   (&_QMat, row+1, l, value);
 	}
     }    

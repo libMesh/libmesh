@@ -1,4 +1,4 @@
-// $Id: laspack_vector.C,v 1.23 2004-03-10 17:33:55 benkirk Exp $
+// $Id: laspack_vector.C,v 1.24 2004-03-14 01:31:48 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -110,12 +110,13 @@ void LaspackVector<T>::add (const NumericVector<T>& v)
 template <typename T>
 void LaspackVector<T>::add (const T a, const NumericVector<T>& v_in)
 {
-  const LaspackVector& v = dynamic_cast<const LaspackVector&>(v_in);
-  
-  assert (this->size() == v.size());
+  const LaspackVector* v = dynamic_cast<const LaspackVector*>(&v_in);
 
-  for (unsigned int i=0; i<v.size(); i++)
-    this->add (i, a*v(i));
+  assert (v != NULL);
+  assert (this->size() == v->size());
+
+  for (unsigned int i=0; i<v->size(); i++)
+    this->add (i, a*(*v)(i));
 }
 
 
@@ -125,11 +126,14 @@ void LaspackVector<T>::add_vector (const NumericVector<T> &vec_in,
 				   SparseMatrix<T> &mat_in)
 {
   // Convert from input types
-  const LaspackVector<T> &vec = dynamic_cast<const LaspackVector<T>&>(vec_in);
-  LaspackMatrix<T>       &mat = dynamic_cast<LaspackMatrix<T>&>      (mat_in);
+  const LaspackVector<T>* vec = dynamic_cast<const LaspackVector<T>*>(&vec_in);
+  LaspackMatrix<T>*       mat = dynamic_cast<LaspackMatrix<T>*>      (&mat_in);
 
+  assert (vec != NULL);
+  assert (mat != NULL);
+  
   // += mat*vec
-  AddAsgn_VV (&_vec, Mul_QV(&mat._QMat, const_cast<QVector*>(&vec._vec)));
+  AddAsgn_VV (&_vec, Mul_QV(&mat->_QMat, const_cast<QVector*>(&vec->_vec)));
 }
 
 
@@ -161,10 +165,12 @@ template <typename T>
 NumericVector<T>&
 LaspackVector<T>::operator = (const NumericVector<T>& v_in)
 {
-  const LaspackVector<T>& v =
-    dynamic_cast<const LaspackVector<T>&>(v_in);
+  const LaspackVector<T>* v =
+    dynamic_cast<const LaspackVector<T>*>(&v_in);
+
+  assert (v != NULL);
   
-  *this = v;
+  *this = *v;
 
   return *this;
 }
@@ -216,10 +222,12 @@ LaspackVector<T>::operator = (const std::vector<T>& v)
 template <typename T>
 void LaspackVector<T>::localize (NumericVector<T>& v_local_in) const
 {
-  LaspackVector& v_local =
-    dynamic_cast<LaspackVector&>(v_local_in);
+  LaspackVector<T>* v_local =
+    dynamic_cast<LaspackVector<T>*>(&v_local_in);
 
-  v_local = *this;
+  assert (v_local != NULL);
+
+  *v_local = *this;
 }
 
 
@@ -228,12 +236,13 @@ template <typename T>
 void LaspackVector<T>::localize (NumericVector<T>& v_local_in,
 				 const std::vector<unsigned int>& send_list) const
 {
-  LaspackVector<T>& v_local =
-    dynamic_cast<LaspackVector<T>&>(v_local_in);
+  LaspackVector<T>* v_local =
+    dynamic_cast<LaspackVector<T>*>(&v_local_in);
 
-  assert (send_list.size() == v_local.size());
+  assert (v_local != NULL);
+  assert (send_list.size() == v_local->size());
 
-  v_local = *this;
+  *v_local = *this;
 }
 
 
