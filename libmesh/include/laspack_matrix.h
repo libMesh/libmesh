@@ -1,4 +1,4 @@
-// $Id: laspack_matrix.h,v 1.13 2003-03-23 01:39:10 ddreyer Exp $
+// $Id: laspack_matrix.h,v 1.14 2003-04-21 15:22:18 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk, John W. Peterson
@@ -39,6 +39,7 @@
 
 
 // Forward declarations
+template <typename T> class LaspackVector;
 template <typename T> class LaspackInterface;
 
 
@@ -307,6 +308,7 @@ private:
   /**
    * Make other Laspack datatypes friends
    */
+  friend class LaspackVector<T>;
   friend class LaspackInterface<T>;
 };
 

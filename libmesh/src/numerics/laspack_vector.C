@@ -1,4 +1,4 @@
-// $Id: laspack_vector.C,v 1.10 2003-03-23 01:39:14 ddreyer Exp $
+// $Id: laspack_vector.C,v 1.11 2003-04-21 15:22:20 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,7 @@
 
 // Local Includes
 #include "laspack_vector.h"
-
+#include "laspack_matrix.h"
 
 
 #ifdef HAVE_LASPACK
@@ -127,6 +127,21 @@ void LaspackVector<T>::add (const T a, const NumericVector<T>& v_in)
   for (unsigned int i=0; i<v.size(); i++)
     add (i, a*v(i));
 }
+
+
+
+template <typename T> 
+void LaspackVector<T>::add_vector (const NumericVector<T> &vec_in,
+				   SparseMatrix<T> &mat_in)
+{
+  // Convert from input types
+  const LaspackVector<T> &vec = dynamic_cast<const LaspackVector<T>&>(vec_in);
+  LaspackMatrix<T>       &mat = dynamic_cast<LaspackMatrix<T>&>      (mat_in);
+
+  // += mat*vec
+  AddAsgn_VV (&_vec, Mul_QV(&mat._QMat, const_cast<QVector*>(&vec._vec)));
+}
+
 
 
 template <typename T>
