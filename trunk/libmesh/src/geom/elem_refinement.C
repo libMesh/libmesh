@@ -1,4 +1,4 @@
-// $Id: elem_refinement.C,v 1.10 2004-03-24 05:49:12 jwpeterson Exp $
+// $Id: elem_refinement.C,v 1.11 2004-10-25 21:49:25 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -156,24 +156,6 @@ void Elem::refine (MeshRefinement& mesh_refinement)
       }
   }
 
-
-
-  // Note (9/30/2003) No longer necessary.  BCs are stored for the level-0
-  // elements and inferred for the children
-//   // Possibly add boundary information
-//   for (unsigned int s=0; s<this->n_neighbors(); s++)
-//     if (this->neighbor(s) == NULL)
-//       {
-// 	const short int id = mesh.boundary_info.boundary_id(this, s);
-	
-// 	if (id != mesh.boundary_info.invalid_id)
-// 	  for (unsigned int sc=0; sc<this->n_children_per_side(s); sc++)
-// 	    mesh.boundary_info.add_side(this->child(this->side_children_matrix(s,sc)),
-// 					s,
-// 					id);
-//       }
-
-  
   // Un-set my refinement flag now
   this->set_refinement_flag(Elem::DO_NOTHING);
 

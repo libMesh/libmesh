@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: cell_inf_prism.h,v 1.3 2004-10-25 21:49:24 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -102,37 +102,6 @@ public:
    */
   AutoPtr<Elem> side (const unsigned int i) const;
 
-  
-protected:
-
-
-  
-#ifdef ENABLE_AMR
-  
-  /**
-   * Matrix that allows children to inherit boundary conditions.
-   */
-  unsigned int side_children_matrix (const unsigned int i,
-				     const unsigned int j) const
-  { return _side_children_matrix[i][j]; }
-
-#endif  
-
-
-
-private:
-
-  
-  
-#ifdef ENABLE_AMR
-  
-  /**
-   * Matrix that tells which children share which of
-   * my sides.
-   */
-  static const unsigned int _side_children_matrix[4][4];
-  
-#endif  
 };
 
 

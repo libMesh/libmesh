@@ -1,4 +1,4 @@
-// $Id: face_inf_quad.C,v 1.6 2004-01-03 15:37:43 benkirk Exp $
+// $Id: face_inf_quad.C,v 1.7 2004-10-25 21:49:25 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -201,20 +201,6 @@ std::pair<Real, Real> InfQuad::qual_bounds (const ElemQuality q) const
 
   return bounds;
 }
-
-
-
-#ifdef ENABLE_AMR
-
-const unsigned int InfQuad::_side_children_matrix[3][2] =
-{
-  // note different storage scheme
-  {0,  1}, // 2 side-0 children
-  {1, 42}, // 1 side-1 children
-  {0, 42}  // 1 side-2 children
-};
-
-#endif
 
 
 

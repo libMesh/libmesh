@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.6 2004-07-22 19:54:16 jwpeterson Exp $
+// $Id: elem.h,v 1.7 2004-10-25 21:49:24 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -593,12 +593,6 @@ class Elem : public ReferenceCountedObject<Elem>,
   virtual float embedding_matrix (const unsigned int i,
 				  const unsigned int j,
 				  const unsigned int k) const = 0;
-  
-  /**
-   * Matrix that allows children to inherit boundary conditions.
-   */
-  virtual unsigned int side_children_matrix (const unsigned int i,
-					     const unsigned int j) const = 0;
 
 #endif
   

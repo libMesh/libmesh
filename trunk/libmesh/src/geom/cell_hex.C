@@ -1,4 +1,4 @@
-// $Id: cell_hex.C,v 1.15 2004-03-24 05:49:12 jwpeterson Exp $
+// $Id: cell_hex.C,v 1.16 2004-10-25 21:49:24 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -406,20 +406,3 @@ const unsigned short int Hex::_second_order_adjacent_vertices[12][2] =
   { 6,  7}, // vertices adjacent to node 18
   { 4,  7}  // vertices adjacent to node 19
 };
-
-
-
-
-#ifdef ENABLE_AMR
-
-const unsigned int Hex::_side_children_matrix[6][4] =
-{
-  {0, 1, 2, 3}, // side-0 children
-  {0, 1, 4, 5}, // side-1 children
-  {1, 3, 5, 7}, // side-2 children
-  {2, 3, 6, 7}, // side-3 children
-  {0, 2, 4, 6}, // side-4 children
-  {4, 5, 6, 7}  // side-5 children
-};
-
-#endif

@@ -1,4 +1,4 @@
-// $Id: face_quad.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: face_quad.h,v 1.3 2004-10-25 21:49:24 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -113,21 +113,6 @@ public:
    * the values suggested by the CUBIT User's Manual.
    */
   std::pair<Real, Real> qual_bounds (const ElemQuality q) const;
-
-protected:
-
-
-  
-#ifdef ENABLE_AMR
-  
-  /**
-   * Matrix that allows children to inherit boundary conditions.
-   */
-  unsigned int side_children_matrix (const unsigned int i,
-				     const unsigned int j) const
-  { return _side_children_matrix[i][j]; }
-
-#endif  
   
   /**
    * Matrix that tells which vertices define the location
@@ -136,21 +121,6 @@ protected:
    * we keep this matrix here in \p Quad
    */
   static const unsigned short int _second_order_adjacent_vertices[4][2];
-
-  
-private:
-
-
-  
-#ifdef ENABLE_AMR
-  
-  /**
-   * Matrix that tells which children share which of
-   * my sides.
-   */
-  static const unsigned int _side_children_matrix[4][2];
-  
-#endif    
 
 };
 

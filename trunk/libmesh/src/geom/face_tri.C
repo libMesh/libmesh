@@ -1,4 +1,4 @@
-// $Id: face_tri.C,v 1.14 2004-03-24 05:49:12 jwpeterson Exp $
+// $Id: face_tri.C,v 1.15 2004-10-25 21:49:25 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -160,16 +160,3 @@ std::pair<Real, Real> Tri::qual_bounds (const ElemQuality q) const
 
   return bounds;
 }
-
-
-
-#ifdef ENABLE_AMR
-
-const unsigned int Tri::_side_children_matrix[3][2] =
-{
-  {0, 1}, // side-0 children
-  {1, 2}, // side-1 children
-  {0, 2}  // side-2 children
-};
-
-#endif

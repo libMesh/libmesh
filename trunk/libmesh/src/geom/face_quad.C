@@ -1,4 +1,4 @@
-// $Id: face_quad.C,v 1.15 2004-03-24 05:49:12 jwpeterson Exp $
+// $Id: face_quad.C,v 1.16 2004-10-25 21:49:25 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -206,19 +206,3 @@ const unsigned short int Quad::_second_order_adjacent_vertices[4][2] =
   {2, 3}, // vertices adjacent to node 6 
   {0, 3}  // vertices adjacent to node 7 
 };
-
-
-
-
-
-#ifdef ENABLE_AMR
-
-const unsigned int Quad::_side_children_matrix[4][2] =
-{
-  {0, 1}, // side-0 children
-  {1, 3}, // side-1 children
-  {2, 3}, // side-2 children
-  {0, 2}  // side-3 children
-};
-
-#endif
