@@ -1,4 +1,4 @@
-// $Id: mesh.h,v 1.25 2003-10-01 04:02:52 jwpeterson Exp $
+// $Id: mesh.h,v 1.26 2003-10-09 21:03:01 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -93,13 +93,10 @@ class Mesh : public MeshBase
   /**
    * Reads the file specified by \p name.  Attempts to figure out the
    * proper method by the file extension.  This is now the only
-   * way to read a mesh.  It allows the library to so some initialization
-   * after the mesh is read (particularly for for parallel data layout).
-   * This simplifies life by centralizing this code.
+   * way to read a mesh.  The \p Mesh then initializes its data
+   * structures and is ready for use.
    */
-  void read (const std::string& name,
-	     const bool do_prepare_for_use = true);
-
+  void read (const std::string& name);
   
   /**
    * Read solutions in mgflo's XDR format.

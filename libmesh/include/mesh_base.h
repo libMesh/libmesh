@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.50 2003-09-30 18:22:18 benkirk Exp $
+// $Id: mesh_base.h,v 1.51 2003-10-09 21:03:01 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -62,7 +62,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.50 $
+ * \version $Revision: 1.51 $
  */
 
 
@@ -121,7 +121,8 @@ public:
   { return static_cast<unsigned int>(_dim); }
   
   /**
-   * Returns the spatial dimension of the mesh.
+   * Returns the spatial dimension of the mesh.  Note that this is
+   * defined at compile time in the header \p libmesh_common.h.
    */
   unsigned int spatial_dimension () const
   { return static_cast<unsigned int>(DIM); }
@@ -228,7 +229,8 @@ public:
   const std::vector<Node*> & get_nodes () const { return _nodes; }
 
   /**
-   * Add \p Node \p n to the vertex array, optionally at the specified position \p nn.
+   * Add \p Node \p n to the vertex array.  The node will be appended to the
+   * end of the vertex array. 
    */
   Node* add_point (const Point& n);
 
