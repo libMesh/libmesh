@@ -1,0 +1,179 @@
+<!DOCTYPE HTML PUBLIC "-//W3O//DTD W3 HTML 2.0//EN">
+<!Converted with LaTeX2HTML 95 (Thu Jan 19 1995) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds >
+<HEAD>
+<TITLE> RTC(3LAS)</TITLE>
+</HEAD>
+<BODY>
+<meta name="description" value=" RTC(3LAS)">
+<meta name="keywords" value="html">
+<meta name="resource-type" value="document">
+<meta name="distribution" value="global">
+<P>
+ <BR> <HR><A NAME=tex2html454 HREF="node27.html"><IMG ALIGN=BOTTOM ALT="next" SRC="next_motif.gif"></A> <A NAME=tex2html452 HREF="node15.html"><IMG ALIGN=BOTTOM ALT="up" SRC="up_motif.gif"></A> <A NAME=tex2html446 HREF="node25.html"><IMG ALIGN=BOTTOM ALT="previous" SRC="previous_motif.gif"></A> <A NAME=tex2html456 HREF="node1.html"><IMG ALIGN=BOTTOM ALT="contents" SRC="contents_motif.gif"></A>   <A HREF="node28.html#SectionIndex"><IMG ALIGN=BOTTOM ALT="index" SRC="index_motif.gif"></A> <BR>
+<B> Next:</B> <A NAME=tex2html455 HREF="node27.html"> VECTOR(3LAS)</A>
+<B>Up:</B> <A NAME=tex2html453 HREF="node15.html"> Manual Pages</A>
+<B> Previous:</B> <A NAME=tex2html447 HREF="node25.html"> QMATRIX(3LAS)</A>
+<BR> <HR> <P>
+<H2><A NAME=SECTION000811000000000000000>&#160;</A><A NAME=RTC> RTC(3LAS)</A></H2>
+<P>
+<P>
+
+<H3><A NAME=SECTION000811100000000000000> NAME</A></H3>
+<P>
+
+<P>
+<tt> SetRTCAccuracy</tt>, <tt> SetRTCAuxProc</tt>, <tt> RTCResult</tt>,
+<tt> GetLastNoIter</tt>, <tt> GetLastAccuracy</tt>
+-- residual termination control of iterative solvers
+<P>
+<H3><A NAME=SECTION000811200000000000000> SYNOPSIS</A></H3>
+<P>
+
+<PRE>#include &lt;laspack/rtc.h&gt;
+
+typedef enum { 
+    JacobiIterId, 
+    SORForwIterId, 
+    SORBackwIterId, 
+    SSORIterId, 
+
+    ChebyshevIterId, 
+
+    CGIterId, 
+    CGNIterId, 
+    GMRESIterId, 
+    BiCGIterId, 
+    QMRIterId, 
+    CGSIterId, 
+    BiCGSTABIterId, 
+
+    MGIterId, 
+    NestedMGIterId, 
+    MGPCGIterId, 
+    BPXPCGIterId 
+} IterIdType;
+
+void SetRTCAccuracy(double Eps); 
+void SetRTCAuxProc(RTCAuxProcType AuxProc); 
+Boolean RTCResult(int Iter, double rNorm, double bNorm, IterIdType IterId); 
+int GetLastNoIter(void); 
+double GetLastAccuracy(void);
+</PRE>
+<H3><A NAME=SECTION000811300000000000000> DESCRIPTION</A></H3>
+<P>
+<H6><A NAME=SetRTCAccuracy>&#160;</A></H6>
+The procedure <tt> SetRTCAccuracy</tt> sets accuracy for iterative methods
+implemented in the modules <A HREF="node20.html#ITERSOLV"><b> ITERSOLV</b></A> and
+<A HREF="node22.html#MLSOLV"><b> MLSOLV</b></A>.
+The default is <tt> 1e-8</tt>.
+<P>
+<H6><A NAME=SetRTCAuxProc>&#160;</A></H6>
+The procedure <tt> SetRTCAuxProc</tt> specifies a user defined routine
+which should be performed after each iteration step
+(exactly after each call of <tt> RTCResult</tt>).
+The prototype of such a procedure is
+
+<PRE>  void (*RTCAuxProcType)(int, double, double, IterIdType).
+</PRE>
+
+The parameters are identical with those of the function <tt> RTCResult</tt>
+(see below).
+<P>
+<H6><A NAME=RTCResult>&#160;</A></H6>
+The procedure <tt> RTCResult</tt> is used internally by iterative solvers
+to check the termination condition
+
+<PRE>    || r ||_2 = &lt;= eps || b ||_2,
+</PRE>
+<P>
+where <tt> || r ||_2 = rNorm</tt>
+ is 
+the norm of the residual,
+<tt> || b ||_2 = rNorm</tt>
+ is 
+the norm of the right hand side vector,
+and <tt> eps</tt>
+ is the given accuracy.
+If this condition is fulfilled, the procedure returns <tt> True</tt>
+otherwise <tt> False</tt>.
+Furthermore, the number of performed iterations <tt> Iter</tt> and the identifier
+of the iteration method <tt> IterId</tt> (see synopsis above) 
+are registered and passed to the auxiliary procedure defined
+by <tt> SetRTCAuxProc</tt>.
+<P>
+<H6><A NAME=GetLastNoIter>&#160;</A></H6>
+The procedure <tt> GetLastNoIter</tt> returns the number of performed iterations
+transmitted in the last call to the procedure <tt> RTCResult</tt>.
+<P>
+<H6><A NAME=GetLastAccuracy>&#160;</A></H6>
+The procedure <tt> GetLastAccuracy</tt> returns the &quot;accuracy&quot;
+<tt> || r ||_2 / || b ||_2</tt>
+ transmitted 
+in the last call to the procedure <tt> RTCResult</tt>.
+<P>
+<H3><A NAME=SECTION000811400000000000000> REFERENCES</A></H3>
+<P>
+The stopping criterion applied is comprehensively discussed in:
+
+<blockquote> R. Barrett, M. Berry, T. F. Chan, J. Demmel, J. Donato, J. Dongarra, 
+  V. Eijkhout, R. Pozo, Ch. Romine, H. van der Vorst:
+  <A NAME=tex2html15 HREF="http://www.netlib.org/templates/templates.ps">
+  Templates for the Solution of Linear Systems: Building Blocks
+  for Iterative Solvers</A>,
+  SIAM, Philadelphia, 1994.
+  (A <A NAME=tex2html16 HREF="http://www.netlib.org/templates/Templates.html">HTML version</A> is also available).
+</blockquote><H3><A NAME=SECTION000811500000000000000> FILES</A></H3>
+<P>
+  <tt> rtc.h ... </tt> header file <BR> 
+
+  <tt> rtc.c ... </tt> source file
+<P>
+<H3><A NAME=SECTION000811600000000000000> EXAMPLES</A></H3>
+<P>
+A procedure which prints the norm of scaled residuals
+after each multigrid iteration 
+could be defined in an application code as follows:
+
+<PRE>void PrintMGAccuracy(int Iter, double rNorm, double bNorm, IterIdType IterId);
+    
+int main(void)
+{
+    ...
+
+    SetRTCAuxProc(PrintMGAccuracy);
+
+    ...
+
+    MGIter(...);
+
+    ...
+}
+
+void PrintMGAccuracy(int Iter, double rNorm, double bNorm, IterIdType IterId)
+/* put out accuracy reached after each multigrid iteration */
+{
+    if (IterId == MGIterId) {
+        printf(&quot;%3d. iteration ... accuracy = &quot;, Iter);
+        if (!IsZero(bNorm))
+            printf(&quot;%12.5e\n&quot;, rNorm / bNorm);
+        else
+            printf(&quot;    ---\n&quot;);
+    }
+}
+</PRE>
+<P>
+<H3><A NAME=SECTION000811700000000000000> SEE ALSO</A></H3>
+<P>
+<A HREF="node20.html#ITERSOLV">itersolv(3LAS)</A>, <A HREF="node22.html#MLSOLV">mlsolv(3LAS)</A>
+<P>
+<BR> <HR><A NAME=tex2html454 HREF="node27.html"><IMG ALIGN=BOTTOM ALT="next" SRC="next_motif.gif"></A> <A NAME=tex2html452 HREF="node15.html"><IMG ALIGN=BOTTOM ALT="up" SRC="up_motif.gif"></A> <A NAME=tex2html446 HREF="node25.html"><IMG ALIGN=BOTTOM ALT="previous" SRC="previous_motif.gif"></A> <A NAME=tex2html456 HREF="node1.html"><IMG ALIGN=BOTTOM ALT="contents" SRC="contents_motif.gif"></A>   <A HREF="node28.html#SectionIndex"><IMG ALIGN=BOTTOM ALT="index" SRC="index_motif.gif"></A> <BR>
+<B> Next:</B> <A NAME=tex2html455 HREF="node27.html"> VECTOR(3LAS)</A>
+<B>Up:</B> <A NAME=tex2html453 HREF="node15.html"> Manual Pages</A>
+<B> Previous:</B> <A NAME=tex2html447 HREF="node25.html"> QMATRIX(3LAS)</A>
+<BR> <HR> <P>
+<BR> <HR>
+<P><ADDRESS>
+Tomas Skalicky (skalicky@msmfs1.mw.tu-dresden.de)
+</ADDRESS>
+</BODY>
+</BODY>

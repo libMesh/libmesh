@@ -1,0 +1,603 @@
+// $Id: inf_fe_map.C,v 1.7 2003-09-02 18:02:41 benkirk Exp $
+
+// The Next Great Finite Element Library.
+// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
+  
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+  
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+  
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+
+// Local includes
+#include "mesh_config.h"
+#ifdef ENABLE_INFINITE_ELEMENTS
+#include "inf_fe.h"
+#include "fe.h"
+#include "elem.h"
+#include "inf_fe_macro.h"
+#include "mesh_logging.h"
+
+
+
+// ------------------------------------------------------------
+// InfFE static class members concerned with coordinate
+// mapping
+
+
+template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
+Point InfFE<Dim,T_radial,T_map>::map (const Elem* inf_elem,
+				      const Point& reference_point)
+{
+  assert (inf_elem != NULL);
+  assert (Dim != 0);
+
+  AutoPtr<Elem>      base_elem (Base::build_elem (inf_elem));
+
+  const Order        radial_mapping_order (Radial::mapping_order());    
+  const Real         v                    (reference_point(Dim-1)); 
+
+  // map in the base face
+  Point base_point;
+  switch (Dim)
+    {  
+    case 1:
+      base_point = inf_elem->point(0);
+      break;
+    case 2:
+      base_point = FE<1,LAGRANGE>::map (base_elem.get(), reference_point);
+      break;
+    case 3:
+      base_point = FE<2,LAGRANGE>::map (base_elem.get(), reference_point);
+      break;
+#ifdef DEBUG
+    default:
+	error();
+#endif
+    }
+      
+
+  // map in the outer node face not necessary. Simply
+  // compute the outer_point = base_point + (base_point-origin)
+  const Point outer_point (base_point * 2. - inf_elem->origin());
+  
+  Point p;
+
+  // there are only two mapping shapes in radial direction
+  p.add_scaled (base_point,  InfFE<Dim,INFINITE_MAP,T_map>::eval (v, radial_mapping_order, 0));
+  p.add_scaled (outer_point, InfFE<Dim,INFINITE_MAP,T_map>::eval (v, radial_mapping_order, 1));
+
+  return p;
+}
+
+
+
+
+
+template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
+Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
+					      const Point& physical_point,
+					      const Real tolerance,
+					      const bool secure)
+{
+  assert (inf_elem != NULL);
+  assert (tolerance >= 0.);
+
+  /**
+   * Start logging the map inversion.
+   */
+  START_LOG("inverse_map()", "InfFE");
+
+  /*
+   * 1.
+   *
+   * build a base element to do the map inversion in the base face
+   */
+  AutoPtr<Elem> base_elem (Base::build_elem (inf_elem));
+
+  const Order    base_mapping_order     (base_elem->default_order());
+  const ElemType base_mapping_elem_type (base_elem->type());
+  const unsigned int n_base_mapping_sf = Base::n_base_mapping_sf (base_mapping_elem_type,
+								  base_mapping_order);
+
+  const ElemType inf_elem_type = inf_elem->type();
+  if (inf_elem_type != INFHEX8 &&
+      inf_elem_type != INFPRISM6)
+    {
+      here();
+      std::cerr << "ERROR: InfFE::inverse_map is currently implemented only for\n"
+		<< " infinite elments of type InfHex8 and InfPrism6." << std::endl;
+      error();
+    }
+
+  /*
+   * 2.
+   *
+   * just like in FE<Dim-1,LAGRANGE>::inverse_map(): compute
+   * the local coordinates, but only in the base element.
+   * The radial part can then be computed directly later on.
+   */
+
+  /**
+   * How much did the point on the reference
+   * element change by in this Newton step?
+   */
+  Real error = 0.;
+  
+  /**
+   * The point on the reference element.  This is
+   * the "initial guess" for Newton's method.  The
+   * centroid seems like a good idea, but computing
+   * it is a little more intensive than, say taking
+   * the zero point.  
+   *
+   * Convergence should be insensitive of this choice
+   * for "good" elements.
+   */
+  Point p; // the zero point.  No computation required
+
+
+  /**
+   * Now find the intersection of a plane represented by the base
+   * element nodes and the line given by the origin of the infinite
+   * element and the physical point.
+   */
+
+  Point intersection;
+
+  // the origin of the infinite lement
+  const Point o = inf_elem->origin(); 
+
+  switch (Dim)
+    {
+
+      // unnecessary for 1D
+    case 1:
+      {
+	break;
+      }
+
+    case 2:
+      {
+	here();
+	std::cerr << "ERROR: InfFE::inverse_map is not yet implemented"
+		  << " in 2d" << std::endl;
+	error();
+	break;
+      }
+
+
+    case 3:
+      {
+	// references to the nodal points of the base element
+	const Point& p0 = base_elem->point(0);
+	const Point& p1 = base_elem->point(1);
+	const Point& p2 = base_elem->point(2);
+	
+	// a reference to the physical point
+	const Point& fp = physical_point;
+	
+	// The intersection of the plane and the line is given by
+	// can be computed solving a linear 3x3 system
+	// a*({p1}-{p0})+b*({p2}-{p0})-c*({fp}-{o})={fp}-{p0}.  	
+	const Real c_factor = -(p1(0)*fp(1)*p0(2)-p1(0)*fp(2)*p0(1)
+				+fp(0)*p1(2)*p0(1)-p0(0)*fp(1)*p1(2)
+				+p0(0)*fp(2)*p1(1)+p2(0)*fp(2)*p0(1)
+				-p2(0)*fp(1)*p0(2)-fp(0)*p2(2)*p0(1)
+				+fp(0)*p0(2)*p2(1)+p0(0)*fp(1)*p2(2)
+				-p0(0)*fp(2)*p2(1)-fp(0)*p0(2)*p1(1)
+				+p0(2)*p2(0)*p1(1)-p0(1)*p2(0)*p1(2)
+				-fp(0)*p1(2)*p2(1)+p2(1)*p0(0)*p1(2)
+				-p2(0)*fp(2)*p1(1)-p1(0)*fp(1)*p2(2)
+				+p2(2)*p1(0)*p0(1)+p1(0)*fp(2)*p2(1)
+				-p0(2)*p1(0)*p2(1)-p2(2)*p0(0)*p1(1)
+				+fp(0)*p2(2)*p1(1)+p2(0)*fp(1)*p1(2))/
+	                        (fp(0)*p1(2)*p0(1)-p1(0)*fp(2)*p0(1)
+				 +p1(0)*fp(1)*p0(2)-p1(0)*o(1)*p0(2)
+				 +o(0)*p2(2)*p0(1)-p0(0)*fp(2)*p2(1)
+				 +p1(0)*o(1)*p2(2)+fp(0)*p0(2)*p2(1)
+				 -fp(0)*p1(2)*p2(1)-p0(0)*o(1)*p2(2)
+				 +p0(0)*fp(1)*p2(2)-o(0)*p0(2)*p2(1)
+				 +o(0)*p1(2)*p2(1)-p2(0)*fp(2)*p1(1)
+				 +fp(0)*p2(2)*p1(1)-p2(0)*fp(1)*p0(2)
+				 -o(2)*p0(0)*p1(1)-fp(0)*p0(2)*p1(1)
+				 +p0(0)*o(1)*p1(2)+p0(0)*fp(2)*p1(1)
+				 -p0(0)*fp(1)*p1(2)-o(0)*p1(2)*p0(1)
+				 -p2(0)*o(1)*p1(2)-o(2)*p2(0)*p0(1)
+				 -o(2)*p1(0)*p2(1)+o(2)*p0(0)*p2(1)
+				 -fp(0)*p2(2)*p0(1)+o(2)*p2(0)*p1(1)
+				 +p2(0)*o(1)*p0(2)+p2(0)*fp(1)*p1(2)
+				 +p2(0)*fp(2)*p0(1)-p1(0)*fp(1)*p2(2)
+				 +p1(0)*fp(2)*p2(1)-o(0)*p2(2)*p1(1)
+				 +o(2)*p1(0)*p0(1)+o(0)*p0(2)*p1(1));
+	
+
+	// Compute the intersection with
+	// {intersection} = {fp} + c*({fp}-{o}).
+	intersection.add_scaled(fp,1.+c_factor);
+	intersection.add_scaled(o,-c_factor);
+
+	break;
+      }
+    }
+
+   /**
+   * The number of iterations in the map inversion process.
+   */
+  unsigned int cnt = 0;
+
+
+  /**
+   * Newton iteration loop.
+   */
+  do
+    {
+      /**
+       * Increment in current iterate \p p, will be computed.
+       * Automatically initialized to all zero.  Note that
+       * in 3D, actually only the first two entries are
+       * filled by the inverse map, and in 2D only the first. 
+       */
+      Point dp;
+
+
+      /**
+       * The form of the map and how we invert it depends
+       * on the dimension that we are in.
+       */      
+      switch (Dim)
+	{
+
+	  /**	 
+	   *------------------------------------------------------------------
+	   * 1D infinite element - no map inversion necessary
+	   */
+	case 1:
+	  {
+	    break;
+	  }
+
+
+	  /**	 
+	   *------------------------------------------------------------------
+	   * 2D infinite element - 1D map inversion
+	   *
+	   * In this iteration scheme only search for the local coordinate
+	   * in xi direction.  Once xi is determined, the radial coordinate eta is
+	   * uniquely determined, and there is no need to iterate in that direction.
+	   */
+	case 2:
+	  {
+	    /**
+	     * Where our current iterate \p p maps to.
+	     */
+	    const Point physical_guess = FE<1,LAGRANGE>::map (base_elem.get(), p);
+
+	    /**
+	     * How far our current iterate is from the actual point.
+	     */
+	    const Point delta = physical_point - physical_guess;
+
+
+	    const Point dxi = FE<1,LAGRANGE>::map_xi (base_elem.get(), p);
+	    
+	    /**
+	     * For details on Newton's method see fe_map.C
+	     */	    
+	    const Real G = dxi*dxi;
+	    
+	    if (secure)
+	      assert (G > 0.);
+	    
+	    const Real Ginv = 1./G;
+	    
+	    const Real  dxidelta = dxi*delta;
+	    
+	    // compute only the first coordinate
+	    dp(0) = Ginv*dxidelta;
+
+	    break;
+	  }
+
+
+	  
+	  /**	 
+	   *------------------------------------------------------------------
+	   * 3D infinite element - 2D map inversion
+	   *
+	   * In this iteration scheme only search for the local coordinates
+	   * in xi and eta direction.  Once xi, eta are determined, the radial
+	   * coordinate zeta may directly computed.
+	   * 
+	   */
+	case 3:
+	  {
+
+	    /**
+	     * Where our current iterate \p p maps to.
+	     */
+	    const Point physical_guess = FE<2,LAGRANGE>::map (base_elem.get(), p);
+
+
+	    /**
+	     * How far our current iterate is from the actual point.
+	     */
+	    // const Point delta = physical_point - physical_guess;
+	    const Point delta = intersection - physical_guess;
+
+
+	    const Point dxi  = FE<2,LAGRANGE>::map_xi  (base_elem.get(), p);
+	    const Point deta = FE<2,LAGRANGE>::map_eta (base_elem.get(), p);
+	    
+	    /**
+	     * For details on Newton's method see fe_map.C
+	     */	    
+	    const Real
+	      G11 = dxi*dxi,  G12 = dxi*deta,
+	      G21 = dxi*deta, G22 = deta*deta;
+	    
+	    
+	    const Real det = (G11*G22 - G12*G21);
+	    
+	    if (secure)
+	      {
+		assert (det > 0.);
+		assert (fabs(det) > 1.e-10);
+	      }
+
+	    const Real inv_det = 1./det;
+	    
+	    const Real
+	      Ginv11 =  G22*inv_det,
+	      Ginv12 = -G12*inv_det,
+	      
+	      Ginv21 = -G21*inv_det,
+	      Ginv22 =  G11*inv_det;
+	    
+	    
+	    const Real  dxidelta  = dxi*delta;
+	    const Real  detadelta = deta*delta;
+	    
+	    // compute only the first two coordinates.
+	    dp(0) = (Ginv11*dxidelta + Ginv12*detadelta);
+	    dp(1) = (Ginv21*dxidelta + Ginv22*detadelta);
+
+	    break;
+	  }
+
+
+	  /**
+	   * Some other dimension?
+	   */
+	default:
+	  error();
+	} // end switch(Dim), dp now computed
+
+
+      /*
+       * determine the error in computing the local coordinates
+       * in the base: ||P_n+1 - P_n||
+       */
+      error = dp.size();
+
+      /**
+       * P_n+1 = P_n + dp
+       */
+      p.add (dp);
+
+      /**
+       * Increment the iteration count.
+       */
+      cnt++;
+
+      /**
+       * Watch for divergence of Newton's
+       * method.
+       */
+      if (cnt > 10)
+	{
+	  if (secure || !secure)
+	    {
+	      here();
+	      {
+		std::cerr << "WARNING: Newton scheme has not converged in "
+			  << cnt << " iterations:" << std::endl
+			  << "   physical_point=";
+		
+		physical_point.print();
+		
+		std::cerr << "   dp=";
+		
+		dp.print();
+		
+		std::cerr << "   p=";
+		
+		p.print();
+		
+		std::cerr << "   error=" << error
+			  << std::endl;
+	      }
+	    }
+
+	  if (cnt > 20)
+	    {
+	      std::cerr << "ERROR: Newton scheme FAILED to converge in "
+			<< cnt << " iterations!" << std::endl;
+	      error();
+	    }
+
+	  // else
+	  //  {
+	  //    break;
+	  //  }
+	}
+    }
+  while (error > tolerance);
+
+
+  /*
+   * 4.
+   *
+   * Now that we have the local coordinates in the base,
+   * compute the interpolated radial distance a(s,t) \p a_interpolated
+   */
+
+  switch (Dim)
+    {
+    case 1:
+      {
+  	Real a_interpolated = Point( inf_elem->point(0) 
+				 - inf_elem->point(n_base_mapping_sf) ).size();
+
+	p(0) = 1. - 2*a_interpolated/physical_point(0);
+
+#ifdef DEBUG
+	// the radial distance should always be >= -1.
+
+	if (p(0)+1 < tolerance)
+	  {
+	    here();
+	    std::cerr << "WARNING: radial distance p(0) is "
+		      << p(0)
+		      << std::endl;
+	  }
+#endif
+	
+	break;
+      }
+
+
+    case 2:
+      {
+        Real a_interpolated = 0.;
+
+	// the distance between the origin and the physical point
+	const Real fp_o_dist = Point(o-physical_point).size(); 
+
+	for (unsigned int i=0; i<n_base_mapping_sf; i++)
+	  {
+	    // the radial distance of the i-th base mapping point
+	    const Real dist_i = Point( inf_elem->point(i) 
+				       - inf_elem->point(i+n_base_mapping_sf) ).size();
+	    // weight with the corresponding shape function
+	    a_interpolated += dist_i * FE<1,LAGRANGE>::shape(base_mapping_elem_type,
+							     base_mapping_order,
+							     i,
+							     p);
+	  }
+
+	p(1) = 1. - 2*a_interpolated/fp_o_dist;
+
+#ifdef DEBUG
+	// the radial distance should always be >= -1.
+
+	// if (p(1)+1 < tolerance)
+	//  {
+	//    here();
+	//    std::cerr << "WARNING: radial distance p(1) is "
+	//	      << p(1)
+	//	      << std::endl;
+	//  }
+#endif
+	
+	break;
+      }
+
+
+    case 3:
+      {
+        Real a_interpolated = 0.;
+
+	// the distance between the origin and the physical point
+	const Real fp_o_dist = Point(o-physical_point).size(); 
+
+	for (unsigned int i=0; i<n_base_mapping_sf; i++)
+	  {
+	    // the radial distance of the i-th base mapping point
+	    const Real dist_i = Point( inf_elem->point(i) 
+				       - inf_elem->point(i+n_base_mapping_sf) ).size();
+
+	    // weight with the corresponding shape function
+	    a_interpolated += dist_i * FE<2,LAGRANGE>::shape(base_mapping_elem_type,
+							     base_mapping_order,
+							     i,
+							     p);
+
+	  }
+
+	p(2) = 1. - 2*a_interpolated/fp_o_dist;
+
+#ifdef DEBUG
+	// the radial distance should always be >= -1.
+
+	// if (p(2)+1 < tolerance)
+	//  {
+	    // here();
+	    // std::cerr << "WARNING: radial distance p(2) is "
+	    //	      << p(2)
+	    //	      << std::endl;
+	//  }
+#endif
+	
+	break;
+      }
+
+    default:
+      error();
+    } // end switch(Dim), p fully computed, including radial part
+
+
+  /*
+   * If we are in debug mode do a sanity check.  Make sure
+   * the point \p p on the reference element actually does
+   * map to the point \p physical_point within a tolerance.
+   */ 
+#ifdef DEBUG
+  /*	
+	const Point check = InfFE<Dim,T_radial,T_map>::map (inf_elem, p);
+	const Point diff  = physical_point - check;
+  
+	if (diff.size() > tolerance)
+	{
+	here();
+	std::cerr << "WARNING:  diff is "
+	<< diff.size()
+	<< std::endl;
+	}
+  */
+#endif
+
+
+  /**
+   * Stop logging the map inversion.
+   */
+  STOP_LOG("inverse_map()", "InfFE");
+  
+  return p;
+}
+
+
+
+
+
+//--------------------------------------------------------------
+// Explicit instantiations using the macro from inf_fe_macro.h
+INSTANTIATE_INF_FE(1,CARTESIAN);
+
+INSTANTIATE_INF_FE(2,CARTESIAN);
+
+INSTANTIATE_INF_FE(3,CARTESIAN);
+
+
+#endif //ifdef ENABLE_INFINITE_ELEMENTS
+
