@@ -1,4 +1,4 @@
-// $Id: distributed_vector.h,v 1.3 2003-02-20 04:59:58 benkirk Exp $
+// $Id: distributed_vector.h,v 1.4 2003-02-20 12:55:07 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -35,11 +35,11 @@
 #ifdef HAVE_MPI
 namespace Mpi
 {
-  extern "C"
-  {
-#    include <mpi.h>
-  }
+extern "C"{
+#include <mpi.h>
 }
+}
+using namespace Mpi;
 #endif
 
 

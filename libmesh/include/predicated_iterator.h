@@ -1,4 +1,4 @@
-// $Id: predicated_iterator.h,v 1.3 2003-02-13 22:56:08 benkirk Exp $
+// $Id: predicated_iterator.h,v 1.4 2003-02-20 12:55:08 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -38,7 +38,11 @@
  * \author John W. Peterson, 2002-2003
  */
 template <class T>
+#ifdef BROKEN_IOSTREAM     // for gcc-2.95.3 using old stl version
+class PredicatedIterator : public std::forward_iterator<std::forward_iterator_tag, T>
+#else
 class PredicatedIterator : public std::iterator<std::forward_iterator_tag, T>
+#endif
 {
   /**
    * The default constructor is declared private as a clue that

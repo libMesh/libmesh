@@ -1,4 +1,4 @@
-// $Id: inf_fe.h,v 1.16 2003-02-20 04:59:58 benkirk Exp $
+// $Id: inf_fe.h,v 1.17 2003-02-20 12:55:07 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -95,7 +95,7 @@ class Elem;
  *
  * \author Daniel Dreyer
  * \date 2003
- * \version $Revision: 1.16 $
+ * \version $Revision: 1.17 $
  */
 
 //-------------------------------------------------------------
@@ -118,7 +118,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.16 $
+   * \version $Revision: 1.17 $
    */
   //-------------------------------------------------------------
   // InfFE::Radial class definition
@@ -135,7 +135,7 @@ protected:
      * @returns the decay in radial direction of
      * the \p Dim dimensional infinite element.
      */
-    static Real decay(const Real v);
+    static Real decay(const Real v) { return (1.-v)/2.; }
 
     /**
      * @returns the first (local) derivative of the
@@ -247,7 +247,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.16 $
+   * \version $Revision: 1.17 $
    */
   //-------------------------------------------------------------
   // InfFE::Base class definition
@@ -743,25 +743,27 @@ private:
 
 // ------------------------------------------------------------
 // InfFE::Radial class inline members
-template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-inline
-Real InfFE<Dim,T_radial,T_map>::Radial::decay(const Real v)
-{
+
+/*
+  template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
+  inline
+  Real InfFE<Dim,T_radial,T_map>::Radial::decay(const Real v)
+  {
   switch (Dim)
   //TODO:[DD] What decay do i have in 2D and 1D?
   {
-    case 3:
-      return (1.-v)/2.;
-    case 2:
-      return 0.;
-    case 1:
-      return 0.;
-    default:
-      error();
-      return 0.;
+  case 3:
+   return (1.-v)/2.;
+  case 2:
+   return 0.;
+  case 1:
+   return 0.;
+  default:
+   error();
+  return 0.;
+   }
   }
-}
-
+*/
 
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
