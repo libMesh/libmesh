@@ -161,7 +161,7 @@
     - Version 7.30
     - Not tested (but will likely work) with others
  
-  - HP (GNU \p make recommended, use \p CXX="aCC \p -AA" and \p CC="cc \p -Aa" to get full std support) 
+  - HP, use \p CXX="aCC \p -AA" and \p CC="cc \p -Aa" to get full std support
     - \p aCC A.03.37
 
   - IBM \p xlC version 5.0, 6.0
@@ -202,10 +202,10 @@
  
   \subsection build Building the Library
  
-  To build the library you need GNU Make and a supported compiler, as
+  To build the library you need \p GNU \p Make and a supported compiler, as
   listed in section \ref conf.  After the library is configured
   simply type \p make to build the library.  Typing \p make \p
-  meshtool will build a mesh translation tool using the library.
+  bin/meshtool will build a mesh translation tool using the library.
  
   The Makefiles distributed with the library look at the shell
   environment variable \p METHOD to determine what mode the library
