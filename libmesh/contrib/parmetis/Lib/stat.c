@@ -8,87 +8,94 @@
  * Started 7/25/97
  * George
  *
- * $Id: stat.c,v 1.1 2003-06-24 05:33:51 benkirk Exp $
+ * $Id: stat.c,v 1.2 2004-03-08 04:58:31 benkirk Exp $
  *
  */
 
-#include <parmetis.h>
+#include <parmetislib.h>
 
 
 
 /*************************************************************************
 * This function computes the balance of the partitioning
 **************************************************************************/
-void Moc_ComputeSerialBalance(CtrlType *ctrl, GraphType *graph, idxtype *where,
-float *ubvec)
+void Moc_ComputeSerialBalance(CtrlType *ctrl, GraphType *graph, idxtype *where, float *ubvec)
 {
   int i, j, nvtxs, ncon, nparts;
   idxtype *pwgts, *tvwgts, *vwgt;
   float *tpwgts, maximb;
 
-  nvtxs = graph->nvtxs;
-  ncon = graph->ncon;
-  vwgt = graph->vwgt;
+  nvtxs  = graph->nvtxs;
+  ncon   = graph->ncon;
+  vwgt   = graph->vwgt;
   nparts = ctrl->nparts;
   tpwgts = ctrl->tpwgts;
 
   pwgts = idxsmalloc(nparts*ncon, 0, "pwgts");
   tvwgts = idxsmalloc(ncon, 0, "tvwgts");
 
-  for (i=0; i<graph->nvtxs; i++)
+  for (i=0; i<graph->nvtxs; i++) {
     for (j=0; j<ncon; j++) {
       pwgts[where[i]*ncon+j] += vwgt[i*ncon+j];
       tvwgts[j] += vwgt[i*ncon+j];
     }
+  }
 
+  /* The +1 in the following code is to deal with bad cases of tpwgts[i*ncon+j] == 0 */
   for (j=0; j<ncon; j++) {
     maximb = 0.0;
     for (i=0; i<nparts; i++)
-      maximb = amax(maximb, (float)pwgts[i*ncon+j]/(tpwgts[i*ncon+j]*(float)tvwgts[j]));
+      maximb = amax(maximb, (1.0+(float)pwgts[i*ncon+j])/(1.0+(tpwgts[i*ncon+j]*(float)tvwgts[j])));
     ubvec[j] = maximb;
   }
 
   GKfree((void **)&pwgts, (void **)&tvwgts, LTERM);
-
 }
+
 
 /*************************************************************************
 * This function computes the balance of the partitioning
 **************************************************************************/
-void Moc_ComputeParallelBalance(CtrlType *ctrl, GraphType *graph, idxtype *where,
-float *ubvec)
+void Moc_ComputeParallelBalance(CtrlType *ctrl, GraphType *graph, idxtype *where, float *ubvec)
 {
   int i, j, nvtxs, ncon, nparts;
   float *nvwgt, *lnpwgts, *gnpwgts;
   float *tpwgts, maximb;
-  MPI_Comm comm;
+  float lminvwgts[MAXNCON], gminvwgts[MAXNCON];
 
-  ncon = graph->ncon;
-  nvtxs = graph->nvtxs;
-  nvwgt = graph->nvwgt;
+  ncon   = graph->ncon;
+  nvtxs  = graph->nvtxs;
+  nvwgt  = graph->nvwgt;
   nparts = ctrl->nparts;
   tpwgts = ctrl->tpwgts;
-  comm = ctrl->comm;
 
   lnpwgts = fmalloc(nparts*ncon, "CPB: lnpwgts");
   gnpwgts = fmalloc(nparts*ncon, "CPB: gnpwgts");
   sset(nparts*ncon, 0.0, lnpwgts);
+  sset(ncon, 1.0, lminvwgts);
 
-  for (i=0; i<nvtxs; i++)
-    for (j=0; j<ncon; j++)
+  for (i=0; i<nvtxs; i++) {
+    for (j=0; j<ncon; j++) {
       lnpwgts[where[i]*ncon+j] += nvwgt[i*ncon+j];
 
-  MPI_Allreduce((void *)(lnpwgts), (void *)(gnpwgts), nparts*ncon,
-      MPI_FLOAT, MPI_SUM, comm);
+      /* The following is to deal with tpwgts[] that are 0.0 for certain partitions/constraints */
+      lminvwgts[j] = (nvwgt[i*ncon+j] > 0.0 && lminvwgts[j] > nvwgt[i*ncon+j] ? nvwgt[i*ncon+j] : lminvwgts[j]);
+    }
+  }
 
+  MPI_Allreduce((void *)(lnpwgts), (void *)(gnpwgts), nparts*ncon, MPI_FLOAT, MPI_SUM, ctrl->comm);
+  MPI_Allreduce((void *)(lminvwgts), (void *)(gminvwgts), ncon, MPI_FLOAT, MPI_MIN, ctrl->comm);
+
+  /* The +gminvwgts[j] in the following code is to deal with bad cases of tpwgts[i*ncon+j] == 0 */
   for (j=0; j<ncon; j++) {
     maximb = 0.0;
     for (i=0; i<nparts; i++)
-      maximb = amax(maximb, gnpwgts[i*ncon+j]/tpwgts[i*ncon+j]);
+      maximb = amax(maximb, (gminvwgts[j]+gnpwgts[i*ncon+j])/(gminvwgts[j]+tpwgts[i*ncon+j]));
     ubvec[j] = maximb;
   }
 
   GKfree((void **)&lnpwgts, (void **)&gnpwgts, LTERM);
+
   return;
 }
 

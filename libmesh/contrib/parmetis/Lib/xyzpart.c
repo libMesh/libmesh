@@ -8,17 +8,18 @@
  * Started 7/11/97
  * George
  *
- * $Id: xyzpart.c,v 1.1 2003-06-24 05:33:51 benkirk Exp $
+ * $Id: xyzpart.c,v 1.2 2004-03-08 04:58:31 benkirk Exp $
  *
  */
 
-#include <parmetis.h>
+#include <parmetislib.h>
 
 
 /*************************************************************************
 * This function implements a simple coordinate based partitioning
 **************************************************************************/
-void Coordinate_Partition(CtrlType *ctrl, GraphType *graph, int ndims, float *xyz, int setup, WorkSpaceType *wspace)
+void Coordinate_Partition(CtrlType *ctrl, GraphType *graph, int ndims, float *xyz, 
+                          int setup, WorkSpaceType *wspace)
 {
   int i, j, k, nvtxs, firstvtx, icoord, coords[3];
   idxtype *vtxdist;
@@ -110,14 +111,14 @@ void PartSort(CtrlType *ctrl, GraphType *graph, KeyValueType *elmnts, WorkSpaceT
   idxtype *scounts, *rcounts, *vtxdist, *perm;
   KeyValueType *relmnts, *mypicks, *allpicks;
 
-  nvtxs = graph->nvtxs;
+  nvtxs   = graph->nvtxs;
   vtxdist = graph->vtxdist;
 
   scounts = wspace->pv1;
   rcounts = wspace->pv2;
 
   /* Allocate memory for the splitters */
-  mypicks = (KeyValueType *)GKmalloc(sizeof(KeyValueType)*(npes+1), "ParSort: mypicks");
+  mypicks  = (KeyValueType *)GKmalloc(sizeof(KeyValueType)*(npes+1), "ParSort: mypicks");
   allpicks = (KeyValueType *)GKmalloc(sizeof(KeyValueType)*npes*npes, "ParSort: allpicks");
 
   /* Sort the local elements */
@@ -144,7 +145,7 @@ void PartSort(CtrlType *ctrl, GraphType *graph, KeyValueType *elmnts, WorkSpaceT
   /* Select the final splitters. Set the boundaries to simplify coding */
   for (i=1; i<npes; i++)
     mypicks[i] = allpicks[i*(npes-1)];
-  mypicks[0].key = MIN_INT;
+  mypicks[0].key    = MIN_INT;
   mypicks[npes].key = MAX_INT;
 
   /* PrintPairs(ctrl, npes+1, mypicks, "Mypicks"); */
@@ -168,7 +169,7 @@ void PartSort(CtrlType *ctrl, GraphType *graph, KeyValueType *elmnts, WorkSpaceT
   MAKECSR(i, npes, scounts);
   MAKECSR(i, npes, rcounts);
   nrecv = rcounts[npes];
-  if (wspace->nlarge <= nrecv)
+  if (wspace->nlarge >= nrecv)
     relmnts = (KeyValueType *)wspace->pairs;
   else
     relmnts = (KeyValueType *)GKmalloc(sizeof(KeyValueType)*nrecv, "ParSort: relmnts");
@@ -249,9 +250,8 @@ void PartSort(CtrlType *ctrl, GraphType *graph, KeyValueType *elmnts, WorkSpaceT
 
 
   GKfree((void **)&mypicks, (void **)&allpicks, (void **)&perm, LTERM);
-  if (wspace->nlarge >= nrecv)
+  if (wspace->nlarge < nrecv)
     free(relmnts);
-
 
 }
 

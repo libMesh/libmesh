@@ -8,7 +8,7 @@
  * Started 9/28/95
  * George
  *
- * $Id: util.c,v 1.4 2003-06-24 05:33:50 benkirk Exp $
+ * $Id: util.c,v 1.5 2004-03-08 04:58:28 benkirk Exp $
  */
 
 #include <metis.h>
@@ -466,8 +466,8 @@ void RandomPermute(int n, idxtype *p, int flag)
     return;
 
   for (i=0; i<n; i+=16) {
-    u = RandomInRangeFast(n-4);
-    v = RandomInRangeFast(n-4);
+    u = RandomInRange(n-4);
+    v = RandomInRange(n-4);
     SWAP(p[v], p[u], tmp);
     SWAP(p[v+1], p[u+1], tmp);
     SWAP(p[v+2], p[u+2], tmp);
@@ -492,18 +492,10 @@ int ispow2(int a)
 **************************************************************************/
 void InitRandom(int seed)
 {
-  if (seed == -1) {
-#ifndef __VC__
-    srand48(7654321L);  
-#endif
+  if (seed == -1) 
     srand(4321);  
-  }
-  else {
-#ifndef __VC__
-    srand48(seed);  
-#endif
+  else 
     srand(seed);  
-  }
 }
 
 /*************************************************************************

@@ -8,7 +8,7 @@
  * Started 8/27/94
  * George
  *
- * $Id: stdheaders.h,v 1.1 2003-06-24 05:33:50 benkirk Exp $
+ * $Id: stdheaders.h,v 1.2 2004-03-08 04:58:28 benkirk Exp $
  */
 
 
@@ -18,7 +18,6 @@
 #else
 #include <malloc.h>
 #endif
-#include <strings.h>
 #include <string.h>
 #include <ctype.h>
 #include <math.h>

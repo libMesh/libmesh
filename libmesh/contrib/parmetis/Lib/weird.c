@@ -8,11 +8,11 @@
  * Started 10/19/96
  * George
  *
- * $Id: weird.c,v 1.1 2003-06-24 05:33:51 benkirk Exp $
+ * $Id: weird.c,v 1.2 2004-03-08 04:58:31 benkirk Exp $
  *
  */
 
-#include <parmetis.h>
+#include <parmetislib.h>
 
 
 
@@ -38,29 +38,27 @@ void PartitionSmallGraph(CtrlType *ctrl, GraphType *graph, WorkSpaceType *wspace
 
   SetUp(ctrl, graph, wspace);
   graph->where = idxmalloc(graph->nvtxs+graph->nrecv, "PartitionSmallGraph: where");
-  agraph = Moc_AssembleAdaptiveGraph(ctrl, graph, wspace);
-  mypart = idxmalloc(agraph->nvtxs, "mypart");
+  agraph       = Moc_AssembleAdaptiveGraph(ctrl, graph, wspace);
+  mypart       = idxmalloc(agraph->nvtxs, "mypart");
 
   moptions[0] = 0;
+  moptions[7] = ctrl->sync + mype;
   mynumflag = 0;
   mywgtflag = 3;
   if (ncon == 1) {
-    METIS_PartGraphKway(&agraph->nvtxs, agraph->xadj, agraph->adjncy, agraph->vwgt, agraph->adjwgt,
-    &mywgtflag, &mynumflag, &nparts, moptions, &graph->mincut, mypart);
+    METIS_WPartGraphKway2(&agraph->nvtxs, agraph->xadj, agraph->adjncy, agraph->vwgt, 
+          agraph->adjwgt, &mywgtflag, &mynumflag, &nparts, ctrl->tpwgts, moptions, 
+	  &graph->mincut, mypart);
   }
   else {
     mytpwgts = fmalloc(nparts, "mytpwgts");
     for (i=0; i<nparts; i++)
       mytpwgts[i] = ctrl->tpwgts[i*ncon];
 
-    METIS_mCPartGraphRecursive2(&agraph->nvtxs, &ncon, agraph->xadj,
-    agraph->adjncy, agraph->vwgt, agraph->adjwgt, &mywgtflag, &mynumflag,
-    &nparts, mytpwgts, moptions, &graph->mincut, mypart);
-/*
-    METIS_mCPartGraphKway(&agraph->nvtxs, &ncon, agraph->xadj, agraph->adjncy,
-    agraph->vwgt, agraph->adjwgt, &mywgtflag, &mynumflag, &nparts, ctrl->ubvec,
-    moptions, &graph->mincut, mypart);
-*/
+    METIS_mCPartGraphRecursive2(&agraph->nvtxs, &ncon, agraph->xadj, agraph->adjncy, 
+          agraph->vwgt, agraph->adjwgt, &mywgtflag, &mynumflag, &nparts, mytpwgts, 
+	  moptions, &graph->mincut, mypart);
+
     free(mytpwgts);
   }
 
@@ -75,7 +73,7 @@ void PartitionSmallGraph(CtrlType *ctrl, GraphType *graph, WorkSpaceType *wspace
     MPI_Recv((void *)mypart, agraph->nvtxs, IDX_DATATYPE, gpecut[1], 1, ctrl->comm, &ctrl->status);
 
   sendcounts = imalloc(npes, "sendcounts");
-  displs = imalloc(npes, "displs");
+  displs     = imalloc(npes, "displs");
 
   for (i=0; i<npes; i++) {
     sendcounts[i] = graph->vtxdist[i+1]-graph->vtxdist[i];
@@ -106,10 +104,10 @@ void PartitionSmallGraph(CtrlType *ctrl, GraphType *graph, WorkSpaceType *wspace
 * This function checks the inputs for the partitioning routines
 **************************************************************************/
 void CheckInputs(int partType, int npes, int dbglvl, int *wgtflag, int *iwgtflag,
-  int *numflag, int *inumflag, int *ncon, int *incon, int *nparts, int *inparts,
-  float *tpwgts, float **itpwgts, float *ubvec, float *iubvec, int *etype, int *ietype,
-  int *mgcnum, int *imgcnum, float *ipc2redist, float *iipc2redist, int *options,
-  int *ioptions, idxtype *part, MPI_Comm *comm)
+                 int *numflag, int *inumflag, int *ncon, int *incon, int *nparts, 
+		 int *inparts, float *tpwgts, float **itpwgts, float *ubvec, 
+		 float *iubvec, float *ipc2redist, float *iipc2redist, int *options, 
+		 int *ioptions, idxtype *part, MPI_Comm *comm)
 {
   int i, j;
   int doweabort, doiabort = 0;
@@ -216,49 +214,11 @@ void CheckInputs(int partType, int npes, int dbglvl, int *wgtflag, int *iwgtflag
     for (i=0; i<*incon; i++) {
       if (ubvec[i] < 1.0 || ubvec[i] > (float)(*inparts)) {
         iubvec[i] = 1.05;
-        IFSET(dbglvl, DBG_INFO, printf("WARNING: bad value for ubvec[%d]: %.3f.  Setting value to 1.05.\n", i, ubvec[i]));
+        IFSET(dbglvl, DBG_INFO, printf("WARNING: bad value for ubvec[%d]: %.3f.  Setting value to 1.05.[%d]\n", i, ubvec[i], *inparts));
       }
       else {
         iubvec[i] = ubvec[i];
       }
-    }
-  }
-  /**************************************/
-
-
-  /**************************************/
-  if (partType == MESH_PARTITION) {
-    if (etype != NULL) {
-      if (*etype < 1 || *etype > 4) {
-        IFSET(dbglvl, DBG_INFO, printf("WARNING: bad value for etype %d.  Using a value of 1.\n", *etype));
-        *ietype = 1;
-      }
-      else {
-        *ietype = *etype;
-      }
-    }
-    else {
-      IFSET(dbglvl, DBG_INFO, printf("WARNING: etype is NULL.  Using a value of 1.\n"));
-      *ietype = 1;
-    }
-  }
-  /**************************************/
-
-
-  /**************************************/
-  if (partType == MESH_PARTITION) {
-    if (mgcnum != NULL) {
-      if (*mgcnum < 1 || *mgcnum > 4) {
-        IFSET(dbglvl, DBG_INFO, printf("WARNING: bad value for mgcnum %d.  Using the default value.\n", *mgcnum));
-        *imgcnum = mgcnums[*ietype];
-      }
-      else {
-        *imgcnum = *mgcnum;
-      }
-    }
-    else {
-      IFSET(dbglvl, DBG_INFO, printf("WARNING: mgcnum is NULL.  Using the default value.\n"));
-      *imgcnum = mgcnums[*ietype];
     }
   }
   /**************************************/

@@ -8,11 +8,11 @@
  * Started 2/24/96
  * George
  *
- * $Id: memory.c,v 1.1 2003-06-24 05:33:51 benkirk Exp $
+ * $Id: memory.c,v 1.2 2004-03-08 04:58:31 benkirk Exp $
  *
  */
 
-#include <parmetis.h>
+#include <parmetislib.h>
 
 
 /*************************************************************************
@@ -20,12 +20,12 @@
 **************************************************************************/
 void PreAllocateMemory(CtrlType *ctrl, GraphType *graph, WorkSpaceType *wspace)
 {
-  wspace->nlarge = 2*graph->nedges;
+  wspace->nlarge  = 2*graph->nedges;
 
   wspace->maxcore = 8*graph->nedges+1;
-  wspace->core = idxmalloc(wspace->maxcore, "PreAllocateMemory: wspace->core");
+  wspace->core    = idxmalloc(wspace->maxcore, "PreAllocateMemory: wspace->core");
 
-  wspace->pairs = (KeyValueType *)wspace->core;
+  wspace->pairs   = (KeyValueType *)wspace->core;
   wspace->indices = (idxtype *)(wspace->pairs + wspace->nlarge);
   wspace->degrees = (EdgeType *)(wspace->indices + wspace->nlarge);
 

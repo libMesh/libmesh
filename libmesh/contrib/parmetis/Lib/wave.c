@@ -7,11 +7,11 @@
  *
  * Started 5/19/97, Kirk, George
  *
- * $Id: wave.c,v 1.1 2003-06-24 05:33:51 benkirk Exp $
+ * $Id: wave.c,v 1.2 2004-03-08 04:58:31 benkirk Exp $
  *
  */
 
-#include <parmetis.h>
+#include <parmetislib.h>
 
 /*************************************************************************
 * This function performs a k-way directed diffusion
@@ -30,15 +30,15 @@ float WavefrontDiffusion(CtrlType *ctrl, GraphType *graph, idxtype *home)
   KeyValueType *cand;
   int ndirty, nclean, dptr, clean;
 
-  nvtxs = graph->nvtxs;
-  nedges = graph->nedges;
-  xadj = graph->xadj;
-  nvwgt = graph->nvwgt;
-  adjncy = graph->adjncy;
-  adjwgt = graph->adjwgt;
-  where = graph->where;
-  nparts = ctrl->nparts;
-  ubfactor = ctrl->ubvec[0];
+  nvtxs        = graph->nvtxs;
+  nedges       = graph->nedges;
+  xadj         = graph->xadj;
+  nvwgt        = graph->nvwgt;
+  adjncy       = graph->adjncy;
+  adjwgt       = graph->adjwgt;
+  where        = graph->where;
+  nparts       = ctrl->nparts;
+  ubfactor     = ctrl->ubvec[0];
   matrix.nrows = nparts;
 
   flowFactor = 0.35;
@@ -47,30 +47,31 @@ float WavefrontDiffusion(CtrlType *ctrl, GraphType *graph, idxtype *home)
   flowFactor = (ctrl->mype == 4) ? 1.00 : flowFactor;
 
   /* allocate memory */
-  solution = fmalloc(4*nparts+2*nedges, "WavefrontDiffusion: solution");
-  tmpvec = solution + nparts;
-  npwgts = solution + 2*nparts;
-  load   = solution + 3*nparts;
-  matrix.values = solution + 4*nparts;
+  solution                   = fmalloc(4*nparts+2*nedges, "WavefrontDiffusion: solution");
+  tmpvec                     = solution + nparts;
+  npwgts                     = solution + 2*nparts;
+  load                       = solution + 3*nparts;
+  matrix.values              = solution + 4*nparts;
   transfer = matrix.transfer = solution + 4*nparts + nedges;
 
-  perm = idxmalloc(2*nvtxs+2*nparts+nedges+1, "WavefrontDiffusion: perm");
-  ed = perm + nvtxs;
-  psize = perm + 2*nvtxs;
+  perm                   = idxmalloc(2*nvtxs+2*nparts+nedges+1, "WavefrontDiffusion: perm");
+  ed                     = perm + nvtxs;
+  psize                  = perm + 2*nvtxs;
   rowptr = matrix.rowptr = perm + 2*nvtxs + nparts;
   colind = matrix.colind = perm + 2*nvtxs + 2*nparts + 1;
 
-  wsize = amax(sizeof(float)*nparts*6, sizeof(idxtype)*(nvtxs+nparts*2+1));
+  wsize     = amax(sizeof(float)*nparts*6, sizeof(idxtype)*(nvtxs+nparts*2+1));
   workspace = (float *)GKmalloc(wsize, "WavefrontDiffusion: workspace");
-  cand = (KeyValueType *)GKmalloc(nvtxs*sizeof(KeyValueType), "WavefrontDiffusion: cand");
+  cand      = (KeyValueType *)GKmalloc(nvtxs*sizeof(KeyValueType), "WavefrontDiffusion: cand");
+
 
   /*****************************/
   /* Populate empty subdomains */
   /*****************************/
   idxset(nparts, 0, psize);
-  for (i=0; i<nvtxs; i++) {
+  for (i=0; i<nvtxs; i++) 
     psize[where[i]]++;
-  }
+
   mind = idxamin(nparts, psize);
   maxd = idxamax(nparts, psize);
   if (psize[mind] == 0) {
@@ -106,16 +107,19 @@ float WavefrontDiffusion(CtrlType *ctrl, GraphType *graph, idxtype *home)
     SetUpConnectGraph(graph, &matrix, (idxtype *)workspace);
 
     /* check for disconnected subdomains */
-    for(i=0; i<matrix.nrows; i++)
-      if (matrix.rowptr[i]+1  == matrix.rowptr[i+1])
-        return (float)(ctrl->mype); 
+    for(i=0; i<matrix.nrows; i++) {
+      if (matrix.rowptr[i]+1 == matrix.rowptr[i+1]) {
+        cost = (float)(ctrl->mype); 
+	goto CleanUpAndExit;
+      }
+    }
 
     ConjGrad2(&matrix, load, solution, 0.001, workspace);
     ComputeTransferVector(1, &matrix, solution, transfer, 0);
 
     GetThreeMax(nparts, load, &first, &second, &third);
 
-    if (l % 3 == 0) {
+    if (l%3 == 0) {
       FastRandomPermute(nvtxs, perm, 1);
     }
     else {
@@ -225,9 +229,11 @@ float WavefrontDiffusion(CtrlType *ctrl, GraphType *graph, idxtype *home)
   }
 
   graph->mincut = ComputeSerialEdgeCut(graph);
-  totalv = Mc_ComputeSerialTotalV(graph, home);
-  cost = ctrl->ipc_factor * (float)graph->mincut + ctrl->redist_factor * (float)totalv;
+  totalv        = Mc_ComputeSerialTotalV(graph, home);
+  cost          = ctrl->ipc_factor * (float)graph->mincut + ctrl->redist_factor * (float)totalv;
 
+
+CleanUpAndExit:
   GKfree((void **)&solution, (void **)&perm, (void **)&workspace, (void **)&cand, LTERM);
 
   return cost;

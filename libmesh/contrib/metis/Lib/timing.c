@@ -8,7 +8,7 @@
  * Started 7/24/97
  * George
  *
- * $Id: timing.c,v 1.4 2003-06-24 05:33:50 benkirk Exp $
+ * $Id: timing.c,v 1.5 2004-03-08 04:58:28 benkirk Exp $
  *
  */
 

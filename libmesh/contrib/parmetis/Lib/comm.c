@@ -5,10 +5,10 @@
  *
  * This function provides various high level communication functions 
  *
- * $Id: comm.c,v 1.1 2003-06-24 05:33:51 benkirk Exp $
+ * $Id: comm.c,v 1.2 2004-03-08 04:58:30 benkirk Exp $
  */
 
-#include <parmetis.h>
+#include <parmetislib.h>
 
 
 

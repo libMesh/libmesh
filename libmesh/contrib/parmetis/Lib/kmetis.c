@@ -8,11 +8,11 @@
  * Started 10/19/96
  * George
  *
- * $Id: kmetis.c,v 1.1 2003-06-24 05:33:51 benkirk Exp $
+ * $Id: kmetis.c,v 1.2 2004-03-08 04:58:31 benkirk Exp $
  *
  */
 
-#include <parmetis.h>
+#include <parmetislib.h>
 
 
 /***********************************************************************************
@@ -21,8 +21,9 @@
 * It is the general case.
 ************************************************************************************/
 void ParMETIS_V3_PartKway(idxtype *vtxdist, idxtype *xadj, idxtype *adjncy, idxtype *vwgt,
-  idxtype *adjwgt, int *wgtflag, int *numflag, int *ncon, int *nparts, float *tpwgts,
-  float *ubvec, int *options, int *edgecut, idxtype *part, MPI_Comm *comm)
+              idxtype *adjwgt, int *wgtflag, int *numflag, int *ncon, int *nparts, 
+	      float *tpwgts, float *ubvec, int *options, int *edgecut, idxtype *part, 
+	      MPI_Comm *comm)
 {
   int h, i;
   int nvtxs = -1, npes, mype;
@@ -38,23 +39,18 @@ void ParMETIS_V3_PartKway(idxtype *vtxdist, idxtype *xadj, idxtype *adjncy, idxt
   MPI_Comm_size(*comm, &npes);
   MPI_Comm_rank(*comm, &mype);
 
-/*
-dbglvl = 7;
-printf("[%d]    wgtflag: %d, numflag: %d, ncon: %d, nparts: %d, tpwgts: %.3f %.3f %.3f, ubvec: %.3f, options: %d %d %d\n", mype, *wgtflag, *numflag, *ncon, *nparts, tpwgts[0], tpwgts[1], tpwgts[2], ubvec[0], options[0], options[1], options[2]);
-*/
 
   /********************************/
   /* Try and take care bad inputs */
   /********************************/
   if (options != NULL && options[0] == 1)
     dbglvl = options[PMV3_OPTION_DBGLVL];
-  CheckInputs(STATIC_PARTITION, npes, dbglvl, wgtflag, &iwgtflag, numflag, &inumflag, ncon, &incon,
-  nparts, &inparts, tpwgts, &itpwgts, ubvec, iubvec, NULL, NULL, NULL, NULL, NULL, NULL,
-  options, ioptions, part, comm);
 
-/*
-printf("[%d]    wgtflag: %d, numflag: %d, ncon: %d, nparts: %d, tpwgts: %.3f %.3f %.3f, ubvec: %.3f, options: %d %d %d\n", mype, iwgtflag, inumflag, incon, inparts, itpwgts[0], itpwgts[1], itpwgts[2], iubvec[0], ioptions[0], ioptions[1], ioptions[2]);
-*/
+  CheckInputs(STATIC_PARTITION, npes, dbglvl, wgtflag, &iwgtflag, numflag, &inumflag, ncon, 
+              &incon, nparts, &inparts, tpwgts, &itpwgts, ubvec, iubvec, NULL, NULL, 
+	      options, ioptions, part, comm);
+
+
   /*********************************/
   /* Take care the nparts = 1 case */
   /*********************************/
@@ -72,8 +68,8 @@ printf("[%d]    wgtflag: %d, numflag: %d, ncon: %d, nparts: %d, tpwgts: %.3f %.3
     nvtxs = vtxdist[1];
 
     if (incon == 1) {
-      METIS_PartGraphKway(&nvtxs, xadj, adjncy, vwgt, adjwgt,
-      &iwgtflag, &inumflag, &inparts, moptions, edgecut, part);
+      METIS_WPartGraphKway(&nvtxs, xadj, adjncy, vwgt, adjwgt, &iwgtflag, &inumflag, 
+            &inparts, itpwgts, moptions, edgecut, part);
     }
     else {
       /* ADD: this is because METIS does not support tpwgts for all constraints */
@@ -81,15 +77,11 @@ printf("[%d]    wgtflag: %d, numflag: %d, ncon: %d, nparts: %d, tpwgts: %.3f %.3
       for (i=0; i<inparts; i++)
         mytpwgts[i] = itpwgts[i*incon];
 
-      METIS_mCPartGraphRecursive2(&nvtxs, &incon, xadj, adjncy, vwgt, adjwgt,
-      &iwgtflag, &inumflag, &inparts, mytpwgts, moptions, edgecut, part);
+      moptions[7] = -1;
+      METIS_mCPartGraphRecursive2(&nvtxs, &incon, xadj, adjncy, vwgt, adjwgt, &iwgtflag, 
+            &inumflag, &inparts, mytpwgts, moptions, edgecut, part);
 
       free(mytpwgts);
-
-/*
-      METIS_mCPartGraphKway(&nvtxs, &incon, xadj, adjncy, vwgt, adjwgt,
-      &iwgtflag, &inumflag, &inparts, iubvec, moptions, edgecut, part);
-*/
     }
  
     return;
@@ -110,7 +102,7 @@ printf("[%d]    wgtflag: %d, numflag: %d, ncon: %d, nparts: %d, tpwgts: %.3f %.3
     dbglvl = GLOBAL_DBGLVL;
     seed = GLOBAL_SEED;
   }
-  SetUpCtrl(&ctrl, inparts, &dbglvl, *comm);
+  SetUpCtrl(&ctrl, inparts, dbglvl, *comm);
   ctrl.CoarsenTo = amin(vtxdist[npes]+1, 25*incon*amax(npes, inparts));
   ctrl.seed = (seed == 0) ? mype : seed*mype;
   ctrl.sync = GlobalSEMax(&ctrl, seed);
@@ -134,9 +126,8 @@ printf("[%d]    wgtflag: %d, numflag: %d, ncon: %d, nparts: %d, tpwgts: %.3f %.3
   /* 	-graph with poor vertex distribution */
   /* 	-graph with less than 2*npe nodes    */
   /*******************************************/
-  if (vtxdist[npes] < SMALLGRAPH || vtxdist[npes] < npes*20) {
-    IFSET(ctrl.dbglvl, DBG_INFO,
-    rprintf(&ctrl, "Partitioning a graph of size %d serially\n", vtxdist[npes]));
+  if (vtxdist[npes] < SMALLGRAPH || vtxdist[npes] < npes*20 || GlobalSESum(&ctrl, graph->nedges) == 0) {
+    IFSET(ctrl.dbglvl, DBG_INFO, rprintf(&ctrl, "Partitioning a graph of size %d serially\n", vtxdist[npes]));
     PartitionSmallGraph(&ctrl, graph, &wspace);
   }
   else {
@@ -158,9 +149,9 @@ printf("[%d]    wgtflag: %d, numflag: %d, ncon: %d, nparts: %d, tpwgts: %.3f %.3
   /*******************/
   IFSET(ctrl.dbglvl, DBG_TIME, PrintTimingInfo(&ctrl));
   IFSET(ctrl.dbglvl, DBG_TIME, MPI_Barrier(ctrl.gcomm));
-  IFSET(ctrl.dbglvl, DBG_INFO,
-     rprintf(&ctrl, "Final %d-way CUT: %6d \tBalance: ", inparts, graph->mincut));
+
   if (ctrl.dbglvl&DBG_INFO) {
+    rprintf(&ctrl, "Final %d-way CUT: %6d \tBalance: ", inparts, graph->mincut);
     avg = 0.0;
     for (h=0; h<incon; h++) {
       maximb = 0.0;
@@ -169,8 +160,8 @@ printf("[%d]    wgtflag: %d, numflag: %d, ncon: %d, nparts: %d, tpwgts: %.3f %.3
       avg += maximb;
       rprintf(&ctrl, "%.3f ", maximb);
     }
+    rprintf(&ctrl, "  avg: %.3f\n", avg/(float)incon);
   }
-  IFSET(ctrl.dbglvl, DBG_INFO, rprintf(&ctrl, "  avg: %.3f\n", avg/(float)incon));
 
   GKfree((void **)&itpwgts, (void **)&graph->lnpwgts, (void **)&graph->gnpwgts, (void **)&graph->nvwgt, LTERM);
   FreeInitialGraphAndRemap(graph, iwgtflag);
@@ -181,4 +172,103 @@ printf("[%d]    wgtflag: %d, numflag: %d, ncon: %d, nparts: %d, tpwgts: %.3f %.3
     ChangeNumbering(vtxdist, xadj, adjncy, part, npes, mype, 0);
 
 }
+
+
+
+/*************************************************************************
+* This function is the driver to the multi-constraint partitioning algorithm.
+**************************************************************************/
+void Moc_Global_Partition(CtrlType *ctrl, GraphType *graph, WorkSpaceType *wspace)
+{
+  int i, ncon, nparts;
+  float ftmp, ubavg, lbavg, lbvec[MAXNCON];
+ 
+  ncon = graph->ncon;
+  nparts = ctrl->nparts;
+  ubavg = savg(graph->ncon, ctrl->ubvec);
+
+  SetUp(ctrl, graph, wspace);
+
+  if (ctrl->dbglvl&DBG_PROGRESS) {
+    rprintf(ctrl, "[%6d %8d %5d %5d] [%d] [", graph->gnvtxs, GlobalSESum(ctrl, graph->nedges),
+	    GlobalSEMin(ctrl, graph->nvtxs), GlobalSEMax(ctrl, graph->nvtxs), ctrl->CoarsenTo);
+    for (i=0; i<ncon; i++)
+      rprintf(ctrl, " %.3f", GlobalSEMinFloat(ctrl,graph->nvwgt[samin_strd(graph->nvtxs, graph->nvwgt+i, ncon)*ncon+i]));  
+    rprintf(ctrl, "] [");
+    for (i=0; i<ncon; i++)
+      rprintf(ctrl, " %.3f", GlobalSEMaxFloat(ctrl, graph->nvwgt[samax_strd(graph->nvtxs, graph->nvwgt+i, ncon)*ncon+i]));  
+    rprintf(ctrl, "]\n");
+  }
+
+  if (graph->gnvtxs < 1.3*ctrl->CoarsenTo ||
+	(graph->finer != NULL &&
+	graph->gnvtxs > graph->finer->gnvtxs*COARSEN_FRACTION)) {
+
+    /* Done with coarsening. Find a partition */
+    graph->where = idxmalloc(graph->nvtxs+graph->nrecv, "graph->where");
+    Moc_InitPartition_RB(ctrl, graph, wspace);
+
+    if (ctrl->dbglvl&DBG_PROGRESS) {
+      Moc_ComputeParallelBalance(ctrl, graph, graph->where, lbvec);
+      rprintf(ctrl, "nvtxs: %10d, balance: ", graph->gnvtxs);
+      for (i=0; i<graph->ncon; i++) 
+        rprintf(ctrl, "%.3f ", lbvec[i]);
+      rprintf(ctrl, "\n");
+    }
+
+    /* In case no coarsening took place */
+    if (graph->finer == NULL) {
+      Moc_ComputePartitionParams(ctrl, graph, wspace);
+      Moc_KWayFM(ctrl, graph, wspace, NGR_PASSES);
+    }
+  }
+  else {
+    Moc_GlobalMatch_Balance(ctrl, graph, wspace);
+
+    Moc_Global_Partition(ctrl, graph->coarser, wspace);
+
+    Moc_ProjectPartition(ctrl, graph, wspace);
+    Moc_ComputePartitionParams(ctrl, graph, wspace);
+
+    if (graph->ncon > 1 && graph->level < 3) {
+      for (i=0; i<ncon; i++) {
+        ftmp = ssum_strd(nparts, graph->gnpwgts+i, ncon);
+        if (ftmp != 0.0)
+          lbvec[i] = (float)(nparts) *
+          graph->gnpwgts[samax_strd(nparts, graph->gnpwgts+i, ncon)*ncon+i]/ftmp;
+        else
+          lbvec[i] = 1.0;
+      }
+      lbavg = savg(graph->ncon, lbvec);
+
+      if (lbavg > ubavg + 0.035) {
+        if (ctrl->dbglvl&DBG_PROGRESS) {
+          Moc_ComputeParallelBalance(ctrl, graph, graph->where, lbvec);
+          rprintf(ctrl, "nvtxs: %10d, cut: %8d, balance: ", graph->gnvtxs, graph->mincut);
+          for (i=0; i<graph->ncon; i++) 
+            rprintf(ctrl, "%.3f ", lbvec[i]);
+          rprintf(ctrl, "\n");
+	}
+
+        Moc_KWayBalance(ctrl, graph, wspace, graph->ncon);
+      }
+    }
+
+    Moc_KWayFM(ctrl, graph, wspace, NGR_PASSES);
+
+    if (ctrl->dbglvl&DBG_PROGRESS) {
+      Moc_ComputeParallelBalance(ctrl, graph, graph->where, lbvec);
+      rprintf(ctrl, "nvtxs: %10d, cut: %8d, balance: ", graph->gnvtxs, graph->mincut);
+      for (i=0; i<graph->ncon; i++) 
+        rprintf(ctrl, "%.3f ", lbvec[i]);
+      rprintf(ctrl, "\n");
+    }
+
+    if (graph->level != 0)
+      GKfree((void **)&graph->lnpwgts, (void **)&graph->gnpwgts, LTERM);
+  }
+
+  return;
+}
+
 

@@ -8,7 +8,7 @@
  * Started 8/1/97
  * George
  *
- * $Id: sfm.c,v 1.4 2003-06-24 05:33:50 benkirk Exp $
+ * $Id: sfm.c,v 1.5 2004-03-08 04:58:28 benkirk Exp $
  *
  */
 
@@ -48,9 +48,9 @@ void FM_2WayNodeRefine(CtrlType *ctrl, GraphType *graph, float ubfactor, int npa
 
   moved = idxwspacemalloc(ctrl, nvtxs);
   swaps = idxwspacemalloc(ctrl, nvtxs);
-  mptr = idxwspacemalloc(ctrl, nvtxs+1);
-  mind = idxwspacemalloc(ctrl, nvtxs);
-  perm = idxwspacemalloc(ctrl, nvtxs);
+  mptr  = idxwspacemalloc(ctrl, nvtxs+1);
+  mind  = idxwspacemalloc(ctrl, nvtxs);
+  perm  = idxwspacemalloc(ctrl, nvtxs);
 
   IFSET(ctrl->dbglvl, DBG_REFINE,
     printf("Partitions: [%6d %6d] Nv-Nb[%6d %6d]. ISep: %6d\n", pwgts[0], pwgts[1], graph->nvtxs, graph->nbnd, graph->mincut));
@@ -283,9 +283,9 @@ void FM_2WayNodeRefine2(CtrlType *ctrl, GraphType *graph, float ubfactor, int np
 
   moved = idxwspacemalloc(ctrl, nvtxs);
   swaps = idxwspacemalloc(ctrl, nvtxs);
-  mptr = idxwspacemalloc(ctrl, nvtxs+1);
-  mind = idxwspacemalloc(ctrl, nvtxs);
-  perm = idxwspacemalloc(ctrl, nvtxs);
+  mptr  = idxwspacemalloc(ctrl, nvtxs+1);
+  mind  = idxwspacemalloc(ctrl, nvtxs);
+  perm  = idxwspacemalloc(ctrl, nvtxs);
 
   IFSET(ctrl->dbglvl, DBG_REFINE,
     printf("Partitions: [%6d %6d] Nv-Nb[%6d %6d]. ISep: %6d\n", pwgts[0], pwgts[1], graph->nvtxs, graph->nbnd, graph->mincut));
@@ -520,9 +520,9 @@ void FM_2WayNodeRefineEqWgt(CtrlType *ctrl, GraphType *graph, int npasses)
 
   moved = idxwspacemalloc(ctrl, nvtxs);
   swaps = idxwspacemalloc(ctrl, nvtxs);
-  mptr = idxwspacemalloc(ctrl, nvtxs+1);
-  mind = idxwspacemalloc(ctrl, nvtxs);
-  perm = idxwspacemalloc(ctrl, nvtxs);
+  mptr  = idxwspacemalloc(ctrl, nvtxs+1);
+  mind  = idxwspacemalloc(ctrl, nvtxs);
+  perm  = idxwspacemalloc(ctrl, nvtxs);
 
   IFSET(ctrl->dbglvl, DBG_REFINE,
     printf("Partitions: [%6d %6d] Nv-Nb[%6d %6d]. ISep: %6d\n", pwgts[0], pwgts[1], graph->nvtxs, graph->nbnd, graph->mincut));
@@ -738,10 +738,10 @@ void FM_2WayNodeRefine_OneSided(CtrlType *ctrl, GraphType *graph, float ubfactor
 
   PQueueInit(ctrl, &parts, nvtxs, ComputeMaxNodeGain(nvtxs, xadj, adjncy, vwgt));
 
-  perm = idxwspacemalloc(ctrl, nvtxs);
+  perm  = idxwspacemalloc(ctrl, nvtxs);
   swaps = idxwspacemalloc(ctrl, nvtxs);
-  mptr = idxwspacemalloc(ctrl, nvtxs);
-  mind = idxwspacemalloc(ctrl, nvtxs+1);
+  mptr  = idxwspacemalloc(ctrl, nvtxs+1);
+  mind  = idxwspacemalloc(ctrl, nvtxs);
 
   IFSET(ctrl->dbglvl, DBG_REFINE,
     printf("Partitions-N1: [%6d %6d] Nv-Nb[%6d %6d]. ISep: %6d\n", pwgts[0], pwgts[1], graph->nvtxs, graph->nbnd, graph->mincut));
@@ -904,8 +904,8 @@ void FM_2WayNodeRefine_OneSided(CtrlType *ctrl, GraphType *graph, float ubfactor
 
   PQueueFree(ctrl, &parts);
 
-  idxwspacefree(ctrl, nvtxs+1);
   idxwspacefree(ctrl, nvtxs);
+  idxwspacefree(ctrl, nvtxs+1);
   idxwspacefree(ctrl, nvtxs);
   idxwspacefree(ctrl, nvtxs);
 }

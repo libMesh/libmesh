@@ -8,11 +8,11 @@
  * Started 10/19/96
  * George
  *
- * $Id: ometis.c,v 1.1 2003-06-24 05:33:51 benkirk Exp $
+ * $Id: ometis.c,v 1.2 2004-03-08 04:58:31 benkirk Exp $
  *
  */
 
-#include <parmetis.h>
+#include <parmetislib.h>
 
 
 
@@ -23,7 +23,7 @@
 * processors and then proceeds to perform recursive bisection.
 ************************************************************************************/
 void ParMETIS_V3_NodeND(idxtype *vtxdist, idxtype *xadj, idxtype *adjncy, int *numflag,
-  int *options, idxtype *order, idxtype *sizes, MPI_Comm *comm)
+              int *options, idxtype *order, idxtype *sizes, MPI_Comm *comm)
 {
   int i, j;
   int ltvwgts[MAXNCON];
@@ -64,7 +64,7 @@ void ParMETIS_V3_NodeND(idxtype *vtxdist, idxtype *xadj, idxtype *adjncy, int *n
   if (*numflag == 1) 
     ChangeNumbering(vtxdist, xadj, adjncy, order, npes, mype, 1);
 
-  SetUpCtrl(&ctrl, nparts, &options[PMV3_OPTION_DBGLVL], *comm);
+  SetUpCtrl(&ctrl, nparts, options[PMV3_OPTION_DBGLVL], *comm);
   ctrl.CoarsenTo = amin(vtxdist[npes]+1, 25*npes);
 
   ctrl.CoarsenTo = amin(vtxdist[npes]+1, 25*amax(npes, nparts));

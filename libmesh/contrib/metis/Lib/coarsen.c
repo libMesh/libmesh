@@ -6,7 +6,7 @@
  * Started 7/23/97
  * George
  *
- * $Id: coarsen.c,v 1.4 2003-06-24 05:33:50 benkirk Exp $
+ * $Id: coarsen.c,v 1.5 2004-03-08 04:58:28 benkirk Exp $
  *
  */
 
@@ -45,19 +45,22 @@ GraphType *Coarsen2Way(CtrlType *ctrl, GraphType *graph)
           Match_RM(ctrl, cgraph);
           break;
         case MATCH_HEM:
-          if (clevel < 1)
+          if (clevel < 1 || cgraph->nedges == 0)
             Match_RM(ctrl, cgraph);
           else
             Match_HEM(ctrl, cgraph);
           break;
         case MATCH_SHEM:
-          if (clevel < 1)
+          if (clevel < 1 || cgraph->nedges == 0)
             Match_RM(ctrl, cgraph);
           else
             Match_SHEM(ctrl, cgraph);
           break;
         case MATCH_SHEMKWAY:
-          Match_SHEM(ctrl, cgraph);
+          if (cgraph->nedges == 0)
+            Match_RM(ctrl, cgraph);
+          else
+            Match_SHEM(ctrl, cgraph);
           break;
         default:
           errexit("Unknown CType: %d\n", ctrl->CType);
