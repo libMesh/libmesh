@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.27 2003-07-22 19:14:44 jwpeterson Exp $
+// $Id: equation_systems.h,v 1.28 2003-07-27 17:16:43 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -48,10 +48,14 @@ class SystemBase;
 
 
 /**
- * This is the base class for the \p EquationSystems<T_sys>,
- * providing rudimentary functionality concerning flags,
- * parameters etc.  The interesting things are handled in
- * the derived class.
+ * This is the \p EquationSystems class.  It is in charge
+ * of handling all the various equation systems defined
+ * for a \p Mesh.  It may have multiple systems, which may
+ * be active or inactive, so that at different solution
+ * stages only a sub-set may be solved for.  Also, through
+ * the templated access, @e different types of systems
+ * may be handled.  Also other features, like flags, 
+ * parameters, I/O etc are provided.
  *
  * @author Benjamin S. Kirk, 2002-2003
  */
