@@ -1,4 +1,4 @@
-// $Id: mesh_data.C,v 1.10 2003-08-08 14:11:27 ddreyer Exp $
+// $Id: mesh_data.C,v 1.11 2003-08-12 17:49:18 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -563,8 +563,14 @@ void MeshData::insert_node_data (std::map<const Node*,
   /*
    * Compare entity-by-entity that the
    * sizes of the std::vector's are identical.
+   * For this, simply take the length of the 0th
+   * entry as reference length, and compare this
+   * with the length of the 1st, 2nd...
    */
+  assert (nd_pos != nd_end);
   const unsigned int reference_length = (*nd_pos).second.size();
+
+  // advance, so that we compare with the 1st
   ++nd_pos;
 
   for (; nd_pos != nd_end; ++nd_pos)
@@ -716,4 +722,63 @@ unsigned int MeshData::n_elem_data () const
   assert (_elem_data_closed);
 
   return _elem_data.size();
+}
+
+
+
+
+void MeshData::assign (const MeshData& omd)
+{
+  this->_data_descriptor    = omd._data_descriptor;
+  this->_node_id_map_closed = omd._node_id_map_closed;
+  this->_node_data_closed   = omd._node_data_closed;
+
+  // we have to be able to modify our elem id maps
+  assert (!this->_elem_id_map_closed);
+
+  this->_elem_data_closed   = omd._elem_data_closed;
+  this->_active             = omd._active;
+  this->_compatibility_mode = omd._compatibility_mode;
+
+  /*
+   * this is ok because we do not manage the UnvHeader
+   * in terms of memory, but only hold a pointer to it...
+   */
+  this->_unv_header         = omd._unv_header;
+
+  /*
+   * Now copy the foreign id maps -- but only for the 
+   * nodes.  The nodes of the boundary mesh are actually
+   * nodes of the volume mesh.
+   */
+  this->_node_id = omd._node_id;
+  this->_id_node = omd._id_node;
+
+  /*
+   * The element vector of the boundary mesh contains elements
+   * that are new, and there _cannot_ be any associated
+   * foreign id in the maps.  Therefore, fill the maps with
+   * the libMesh id's.  But only when the other MeshData
+   * has element ids.
+   */
+  if ((this->_active) && (omd._elem_id.size() != 0))
+    {
+      std::vector<Elem*>::const_iterator elem_it        = this->_mesh.elements_begin().first;
+      const std::vector<Elem*>::const_iterator elem_end = this->_mesh.elements_end().first;
+      for (; elem_it != elem_end; ++elem_it)
+        {
+	  const Elem* elem = *elem_it;  
+	  this->add_foreign_elem_id(elem, elem->id());
+	}
+    }
+
+  // now we can safely assign omd's value
+  this->_elem_id_map_closed   = omd._elem_id_map_closed;
+  
+
+  /*
+   * and finally the node- and element-associated data
+   */
+  this->_node_data = omd._node_data;
+  this->_elem_data = omd._elem_data;
 }

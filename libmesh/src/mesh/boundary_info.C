@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.23 2003-06-25 19:53:05 jwpeterson Exp $
+// $Id: boundary_info.C,v 1.24 2003-08-12 17:49:18 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -62,7 +62,8 @@ void BoundaryInfo::clear()
 
 
 
-void BoundaryInfo::sync(BoundaryMesh& boundary_mesh)
+void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
+			const bool transfer_mesh_data)
 {
   boundary_mesh.clear();
 
@@ -151,6 +152,12 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh)
 
   // Copy over the nodes
   boundary_mesh._nodes = mesh._nodes;
+
+  // When desired, copy the MeshData
+  // to the boundary_mesh
+  if (transfer_mesh_data)
+      boundary_mesh.data.assign(mesh.data);
+
 }
 
 

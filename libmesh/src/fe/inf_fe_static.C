@@ -1,4 +1,4 @@
-// $Id: inf_fe_static.C,v 1.19 2003-05-15 23:34:35 benkirk Exp $
+// $Id: inf_fe_static.C,v 1.20 2003-08-12 17:49:18 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -311,7 +311,7 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType& fet,
   const EquationSystems& es (data.equation_systems);
   const Real wavenumber = 2. * libMesh::pi
       * es.parameter("current frequency")
-      / es.parameter("wave speed");
+      / es.parameter("speed");
 
   // the exponent for time-harmonic behavior
   const Real exponent = sign                                                            /* +1. or -1.                */

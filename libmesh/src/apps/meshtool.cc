@@ -27,16 +27,22 @@
 #include "statistics.h"
 
 // Conditionally include Petsc stuff
-#ifdef HAVE_PETSC
-#include "petsc_interface.h"
-#include "petsc_matrix.h"
-#endif
+// #ifdef HAVE_PETSC
+// #include "petsc_interface.h"
+// #include "petsc_matrix.h"
+// #endif
 
 /* 
  * convenient typedef for origin coordinates; so that meshtool
  * knows whether the value was given or not
  */
 typedef std::pair<bool, double> IfemOriginValue;
+
+/*
+ * convenient enum for the mode in which the boundary mesh
+ * should be written
+ */
+enum BoundaryMeshWriteMode {BM_DISABLED=0, BM_MESH_ONLY, BM_WITH_MESHDATA};
 
 
 void usage(char *progName)
@@ -57,6 +63,9 @@ void usage(char *progName)
 #endif
     "    -p <count>                    Partition into <count> subdomains\n"
     "    -b                            Write the boundary conditions\n"
+    "    -B                            Like -b, but with activated MeshData\n"
+    "                                  (allows to write .unv file of the\n"
+    "                                  boundary with the correct node ids)\n"
 #ifdef ENABLE_INFINITE_ELEMENTS
   "\n    -a                            Add infinite elements\n"
     "    -x <coord>                    Specify infinite element origin\n"
@@ -67,8 +76,8 @@ void usage(char *progName)
     "    -Z                            When -X is given, -x <coord> also\n"
     "                                  has to be given.  Similar for y,z.\n"
 #endif
-  "\n    -l                            Build the L connectivity matrix \n"
-    "    -L                            Build the script L connectivity matrix \n"
+/*  "\n    -l                            Build the L connectivity matrix \n"         */
+/*    "    -L                            Build the script L connectivity matrix \n"  */
     "    -v                            Verbose\n"
     "    -h                            Print help menu\n"
     "\n"
@@ -146,7 +155,7 @@ void process_cmd_line(int argc, char **argv,
 		      unsigned int& dim,
 		      double& dist_fact,
 		      bool& verbose,
-		      bool& write_bndry,
+		      BoundaryMeshWriteMode& write_bndry,
 		      bool& addinfelems,
 		      IfemOriginValue& origin_x,
 		      IfemOriginValue& origin_y,
@@ -170,13 +179,16 @@ void process_cmd_line(int argc, char **argv,
   origin_x.second = origin_y.second = origin_z.second = 0.;
   x_sym           = y_sym           = z_sym           = false;
 
+  bool b_mesh_b_given = false;
+  bool b_mesh_B_given = false;
+
   char optionStr[] =
-    "i:o:s:d:D:r:p:bvlLm?h";
+    "i:o:s:d:D:r:p:bBvlLm?h";
 
 #else
 
   char optionStr[] =
-    "i:o:s:d:D:r:p:ba::x:y:z:XYZvlLm?h";
+    "i:o:s:d:D:r:p:bBa::x:y:z:XYZvlLm?h";
 
 #endif
 
@@ -290,7 +302,33 @@ void process_cmd_line(int argc, char **argv,
 	   */
 	case 'b':
 	  {
-	    write_bndry = true;
+	    if (b_mesh_B_given)
+	      {
+		std::cout << "ERROR: Do not use -b and -B concurrently!"
+			  << std::endl;
+		exit(1);
+	      }
+		  
+	    b_mesh_b_given = true;
+	    write_bndry = BM_MESH_ONLY;
+	    break;
+	  }
+	  
+	  /**
+	   * Try to write the boundary,
+	   * but copy also the MeshData
+	   */
+	case 'B':
+	  {
+	    if (b_mesh_b_given)
+	      {
+		std::cout << "ERROR: Do not use -b and -B concurrently!"
+			  << std::endl;
+		exit(1);
+	      }
+		  
+	    b_mesh_B_given = true;
+	    write_bndry = BM_WITH_MESHDATA;
 	    break;
 	  }
 	  
@@ -388,7 +426,7 @@ int main (int argc, char** argv)
     unsigned int dim = static_cast<unsigned int>(-1); // invalid dimension
     double dist_fact = 0.;
     bool verbose = false;
-    bool write_bndry = false;
+    BoundaryMeshWriteMode write_bndry = BM_DISABLED;
     bool addinfelems = false;
     IfemOriginValue origin_x(false, 0.);
     IfemOriginValue origin_y(false, 0.);
@@ -431,10 +469,24 @@ int main (int argc, char** argv)
      */      
     if (!names.empty())
       {
+	/*
+	 * activate the MeshData of the dim mesh,
+	 * so that it can be copied to the boundary
+	 */
+	if (write_bndry == BM_WITH_MESHDATA)
+	  {
+	    mesh.data.activate();
+
+	    if (verbose)
+		mesh.data.print_info();
+	  }
+
+
 	mesh.read(names[0]);
 
 	if (verbose)
 	  mesh.print_info();
+
       }
     
     else
@@ -456,7 +508,7 @@ int main (int argc, char** argv)
 	    exit(1);
 	  }
 	
-	if (write_bndry)
+	if (write_bndry != BM_DISABLED)
 	  {
 	    std::cout << "ERROR: Invalid combination: Building infinite elements " << std::endl
 		      << "not compatible with writing boundary conditions." << std::endl;
@@ -733,29 +785,35 @@ int main (int argc, char** argv)
     {
       if (build_l)
 	{
-#ifdef HAVE_PETSC	  
-	  PetscMatrix<Number> conn;
-	  mesh.build_L_graph (conn);
-	  conn.print_matlab();
-#else
-	  std::cerr << "This functionality requires PETSC support!"
+	  std::cerr << "Deactivated!"
 		    << std::endl;
-	  error();
-#endif
+	  error();	    
+// #ifdef HAVE_PETSC	  
+// 	  PetscMatrix<Number> conn;
+// 	  mesh.build_L_graph (conn);
+// 	  conn.print_matlab();
+// #else
+// 	  std::cerr << "This functionality requires PETSC support!"
+// 		    << std::endl;
+// 	  error();
+// #endif
 	};
       
       
       if (build_script_l)
 	{
-#ifdef HAVE_PETSC	  
-	  PetscMatrix<Number> conn;
-	  mesh.build_script_L_graph (conn);
-	  conn.print_matlab();
-#else
-	  std::cerr << "This functionality requires PETSC support!"
+	  std::cerr << "Deactivated!"
 		    << std::endl;
-	  error();
-#endif
+	  error();	    
+// #ifdef HAVE_PETSC	  
+// 	  PetscMatrix<Number> conn;
+// 	  mesh.build_script_L_graph (conn);
+// 	  conn.print_matlab();
+// #else
+// 	  std::cerr << "This functionality requires PETSC support!"
+// 		    << std::endl;
+// 	  error();
+// #endif
 	};
     };
 
@@ -785,12 +843,17 @@ int main (int argc, char** argv)
 	  /**
 	   * Possibly write the BCs
 	   */
-	  if (write_bndry)
+	  if (write_bndry != BM_DISABLED)
 	    {
 	      std::string boundary_name = "bndry_";
 	      boundary_name += names[1];
 	      
-	      mesh.boundary_info.sync(mesh.boundary_mesh);
+	      if (write_bndry == BM_MESH_ONLY)
+		  mesh.boundary_info.sync(mesh.boundary_mesh, false);
+	      else if  (write_bndry == BM_WITH_MESHDATA)
+		  mesh.boundary_info.sync(mesh.boundary_mesh, true);
+	      else
+		  error();
 	      
 	      if (names.size() == 2)
 		mesh.boundary_mesh.write(boundary_name);

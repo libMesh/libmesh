@@ -1,4 +1,4 @@
-// $Id: boundary_info.h,v 1.16 2003-05-15 23:34:33 benkirk Exp $
+// $Id: boundary_info.h,v 1.17 2003-08-12 17:49:15 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -75,9 +75,11 @@ class BoundaryInfo
    * data structures with the \p mesh data structures.
    * Allows the \p buondary_mesh to be used like any other mesh.
    * Before this is called the \p boundary_mesh data structure is
-   * empty.
+   * empty.  Optionally synchronizes also the \p boundary_mesh's 
+   * \p MeshData (disabled by default).
    */
-  void sync (BoundaryMesh& boundary_mesh);
+  void sync (BoundaryMesh& boundary_mesh,
+	     const bool transfer_mesh_data = false);
   
   /**
    * Add \p Node \p node with boundary id \p id to the boundary
