@@ -1,4 +1,4 @@
-// $Id: utility.h,v 1.6 2003-05-28 22:03:01 benkirk Exp $
+// $Id: utility.h,v 1.7 2003-05-29 15:54:06 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -60,7 +60,10 @@ namespace Utility
   void iota (ForwardIter first, ForwardIter last, T value)
   {
     while (first != last)
-      *first++ = value++;
+      {
+	*first = value++;
+	++first;
+      }
   } 
 }
 

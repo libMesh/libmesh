@@ -548,13 +548,6 @@ int main (int argc, char** argv)
 
 
     /**
-     * Possibly partition the mesh
-     */
-    if (n_subdomains > 1)
-      mesh.metis_partition(n_subdomains);
-    
-    
-    /**
      * Possibly read the solution
      */
     if (names.size() == 3)
@@ -767,6 +760,13 @@ int main (int argc, char** argv)
     };
 
 
+    
+    /**
+     * Possibly partition the mesh
+     */
+    if (n_subdomains > 1)
+      mesh.partition(n_subdomains);
+    
     
     /**
      * Possibly write the mesh
