@@ -1,4 +1,4 @@
-//    $Id: petsc_matrix.h,v 1.12 2003-02-13 22:56:07 benkirk Exp $
+//    $Id: petsc_matrix.h,v 1.13 2003-02-18 13:38:19 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -357,7 +357,7 @@ unsigned int PetscMatrix::row_start () const
 
   ierr = MatGetOwnershipRange(mat, &start, &stop); CHKERRQ(ierr);
 
-  return start;
+  return static_cast<unsigned int>(start);
 }
 
 
@@ -372,7 +372,7 @@ unsigned int PetscMatrix::row_stop () const
 
   ierr = MatGetOwnershipRange(mat, &start, &stop); CHKERRQ(ierr);
 
-  return stop;
+  return static_cast<unsigned int>(stop);
 }
 
 
@@ -481,6 +481,7 @@ Complex PetscMatrix::operator () (const unsigned int i,
   ierr = MatGetRow(mat, i_val, &ncols, &petsc_cols, &petsc_row); CHKERRQ(ierr);
 
 
+  //TODO:[BSK] A binary search on petsc_cols would be faster!
   for (int entry=0; entry<ncols; entry++)
     if (petsc_cols[entry] == j_val)
       {
@@ -513,10 +514,7 @@ bool PetscMatrix::closed() const
 
   ierr = MatAssembled(mat, &assembled); CHKERRQ(ierr);
 
-  if (assembled == PETSC_TRUE)
-    return true;
-
-  return false;
+  return (assembled == PETSC_TRUE);
 }
 
 
