@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic_shape_1D.C,v 1.10 2004-01-03 15:37:42 benkirk Exp $
+// $Id: fe_hierarchic_shape_1D.C,v 1.11 2004-02-09 17:12:28 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -36,8 +36,11 @@ Real FE<1,HIERARCHIC>::shape(const ElemType,
 			     const Point& p)
 {
   const Real xi = p(0);
+  
+  // Declare that we are using our own special power function
+  // from the Utility namespace.  This saves typing later.
+  using Utility::pow;
 
-	
   switch (order)
     {
       // Hierarchics. since they are heirarchic we only need one case block.
@@ -64,10 +67,10 @@ Real FE<1,HIERARCHIC>::shape(const ElemType,
 	    return (xi*xi - 1.)/2.;
 	    
 	  case 4:
-	    return (pow(xi,4.) - 1.)/24.;
+	    return (pow<4>(xi) - 1.)/24.;
 	    
 	  case 6:
-	    return (pow(xi,6.) - 1.)/720.;
+	    return (pow<6>(xi) - 1.)/720.;
 
 	    // All odd-terms have the same form.
 	    // (xi^p - xi)/p!
@@ -75,10 +78,10 @@ Real FE<1,HIERARCHIC>::shape(const ElemType,
 	    return (xi*xi*xi - xi)/6.;
 
 	  case 5:
-	    return (pow(xi,5.) - xi)/120.;
+	    return (pow<5>(xi) - xi)/120.;
 
 	  case 7:
-	    return (pow(xi,7.) - xi)/5040.;	    
+	    return (pow<7>(xi) - xi)/5040.;	    
 	    
 	  default:
 	    std::cerr << "Invalid shape function index!" << std::endl;
@@ -122,7 +125,11 @@ Real FE<1,HIERARCHIC>::shape_deriv(const ElemType,
   // only d()/dxi in 1D!
   
   assert (j == 0);
-	
+
+  // Declare that we are using our own special power function
+  // from the Utility namespace.  This saves typing later.
+  using Utility::pow;
+
   const Real xi = p(0);
 
 	
@@ -151,10 +158,10 @@ Real FE<1,HIERARCHIC>::shape_deriv(const ElemType,
 	    return xi;
 	    
 	  case 4:
-	    return pow(xi,3.)/6.;
+	    return pow<3>(xi)/6.;
 	    
 	  case 6:
-	    return pow(xi,5.)/120.;
+	    return pow<5>(xi)/120.;
 
 	    // All odd-terms have the same form.
 	    // (p*xi^(p-1) - 1.)/p!
@@ -162,10 +169,10 @@ Real FE<1,HIERARCHIC>::shape_deriv(const ElemType,
 	    return (3*xi*xi - 1.)/6.;
 
 	  case 5:
-	    return (5.*pow(xi,4.) - 1.)/120.;
+	    return (5.*pow<4>(xi) - 1.)/120.;
 
 	  case 7:
-	    return (7.*pow(xi,6.) - 1.)/5040.;	    
+	    return (7.*pow<6>(xi) - 1.)/5040.;	    
 	    
 	  default:
 	    std::cerr << "Invalid shape function index!" << std::endl;
