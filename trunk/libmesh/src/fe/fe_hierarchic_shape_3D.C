@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic_shape_3D.C,v 1.5 2003-01-24 17:24:41 jwpeterson Exp $
+// $Id: fe_hierarchic_shape_3D.C,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,7 +30,7 @@
 
 
 template <>
-real FE<3,HIERARCHIC>::shape(const ElemType,
+Real FE<3,HIERARCHIC>::shape(const ElemType,
 			     const Order,
 			     const unsigned int,
 			     const Point&)
@@ -46,7 +46,7 @@ real FE<3,HIERARCHIC>::shape(const ElemType,
 
 
 template <>
-real FE<3,HIERARCHIC>::shape(const Elem* elem,
+Real FE<3,HIERARCHIC>::shape(const Elem* elem,
 			     const Order order,
 			     const unsigned int i,
 			     const Point& p)
@@ -73,9 +73,9 @@ real FE<3,HIERARCHIC>::shape(const Elem* elem,
 	      assert (i<27);
 	
 	      // Compute hex shape functions as a tensor-product
-	      const real xi   = p(0);
-	      const real eta  = p(1);
-	      const real zeta = p(2);
+	      const Real xi   = p(0);
+	      const Real eta  = p(1);
+	      const Real zeta = p(2);
 	
 	      // The only way to make any sense of this
 	      // is to look at the mgflo/mg2/mgf documentation
@@ -110,12 +110,12 @@ real FE<3,HIERARCHIC>::shape(const Elem* elem,
 	      assert (i<64);
 	
 	      // Compute hex shape functions as a tensor-product
-	      const real xi    = p(0);
-	      const real eta   = p(1);
-	      const real zeta  = p(2);
-	      real xi_mapped   = p(0);
-	      real eta_mapped  = p(1);
-	      real zeta_mapped = p(2);
+	      const Real xi    = p(0);
+	      const Real eta   = p(1);
+	      const Real zeta  = p(2);
+	      Real xi_mapped   = p(0);
+	      Real eta_mapped  = p(1);
+	      Real zeta_mapped = p(2);
 	
 	      // The only way to make any sense of this
 	      // is to look at the mgflo/mg2/mgf documentation
@@ -625,7 +625,7 @@ real FE<3,HIERARCHIC>::shape(const Elem* elem,
 
 
 template <>
-real FE<3,HIERARCHIC>::shape_deriv(const ElemType,
+Real FE<3,HIERARCHIC>::shape_deriv(const ElemType,
 				   const Order,
 				   const unsigned int,
 				   const unsigned int,
@@ -642,7 +642,7 @@ real FE<3,HIERARCHIC>::shape_deriv(const ElemType,
 
 
 template <>
-real FE<3,HIERARCHIC>::shape_deriv(const Elem* elem,
+Real FE<3,HIERARCHIC>::shape_deriv(const Elem* elem,
 				   const Order order,
 				   const unsigned int i,
 				   const unsigned int j,
@@ -671,9 +671,9 @@ real FE<3,HIERARCHIC>::shape_deriv(const Elem* elem,
 	      assert (i<27);
 	
 	      // Compute hex shape functions as a tensor-product
-	      const real xi   = p(0);
-	      const real eta  = p(1);
-	      const real zeta = p(2);
+	      const Real xi   = p(0);
+	      const Real eta  = p(1);
+	      const Real zeta = p(2);
 	
 	      // The only way to make any sense of this
 	      // is to look at the mgflo/mg2/mgf documentation
@@ -727,12 +727,12 @@ real FE<3,HIERARCHIC>::shape_deriv(const Elem* elem,
 	      assert (i<64);
 	
 	      // Compute hex shape functions as a tensor-product
-	      const real xi    = p(0);
-	      const real eta   = p(1);
-	      const real zeta  = p(2);
-	      real xi_mapped   = p(0);
-	      real eta_mapped  = p(1);
-	      real zeta_mapped = p(2);
+	      const Real xi    = p(0);
+	      const Real eta   = p(1);
+	      const Real zeta  = p(2);
+	      Real xi_mapped   = p(0);
+	      Real eta_mapped  = p(1);
+	      Real zeta_mapped = p(2);
 	
 	      // The only way to make any sense of this
 	      // is to look at the mgflo/mg2/mgf documentation

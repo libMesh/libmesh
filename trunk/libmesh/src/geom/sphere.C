@@ -1,4 +1,4 @@
-// $Id: sphere.C,v 1.5 2003-01-24 17:24:43 jwpeterson Exp $
+// $Id: sphere.C,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -38,7 +38,7 @@ Sphere::Sphere () :
 
 
 Sphere::Sphere (const Point& c, 
-		const real   r)
+		const Real   r)
 {
   assert (r > 0.);
 
@@ -62,7 +62,7 @@ Sphere::~Sphere ()
 
 
 
-void Sphere::create_from_center_radius (const Point& c, const real r)
+void Sphere::create_from_center_radius (const Point& c, const Real r)
 {
   cent = c;
   rad = r;
@@ -77,7 +77,7 @@ bool Sphere::intersects (const Sphere& other_sphere) const
   assert ( rad > 0. );
   assert ( other_sphere.rad > 0. );
 
-  const real distance = (cent - other_sphere.cent).size();
+  const Real distance = (cent - other_sphere.cent).size();
 
   if (distance < (rad + other_sphere.rad) )
     return true;

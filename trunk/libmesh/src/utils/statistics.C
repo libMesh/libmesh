@@ -1,4 +1,4 @@
-// $Id: statistics.C,v 1.5 2003-01-24 17:24:45 jwpeterson Exp $
+// $Id: statistics.C,v 1.6 2003-02-03 03:51:50 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -29,15 +29,15 @@
 // ------------------------------------------------------------
 // StatisticsVector class member functions
 template <typename T>
-real StatisticsVector<T>::mean() const
+Real StatisticsVector<T>::mean() const
 {
   const unsigned int n = this->size();
 
-  real mean = 0;
+  Real mean = 0;
 
   for (unsigned int i=0; i<n; i++)
     {
-      mean += ( static_cast<real>((*this)[i]) - mean ) / (i + 1);
+      mean += ( static_cast<Real>((*this)[i]) - mean ) / (i + 1);
     }
   
   return mean;
@@ -47,7 +47,7 @@ real StatisticsVector<T>::mean() const
 
 
 template <typename T>
-real StatisticsVector<T>::median() 
+Real StatisticsVector<T>::median() 
 {
   std::sort(this->begin(), this->end());
   
@@ -55,20 +55,20 @@ real StatisticsVector<T>::median()
   const unsigned int lhs = (n-1) / 2;
   const unsigned int rhs = n / 2;
   
-  real median = 0;
+  Real median = 0;
   
   if (n == 0)
     return median;
   
   if (lhs == rhs)
     {
-      median = static_cast<real>((*this)[lhs]);
+      median = static_cast<Real>((*this)[lhs]);
     }
   
   else
     {
-      median = ( static_cast<real>((*this)[lhs]) + 
-		 static_cast<real>((*this)[rhs]) ) / 2.0;
+      median = ( static_cast<Real>((*this)[lhs]) + 
+		 static_cast<Real>((*this)[rhs]) ) / 2.0;
     }
   
   return median;
@@ -78,7 +78,7 @@ real StatisticsVector<T>::median()
 
 
 template <typename T>
-real StatisticsVector<T>::median() const
+Real StatisticsVector<T>::median() const
 {
   StatisticsVector<T> sv = (*this);
 
@@ -89,17 +89,17 @@ real StatisticsVector<T>::median() const
 
 
 template <typename T>
-real StatisticsVector<T>::variance() const
+Real StatisticsVector<T>::variance() const
 {
   const unsigned int n   = this->size();
   
-  const real mean = this->mean();
+  const Real mean = this->mean();
   
-  real variance = 0;
+  Real variance = 0;
 
   for (unsigned int i=0; i<n; i++)
     {
-      const real delta = ( static_cast<real>((*this)[i]) - mean );
+      const Real delta = ( static_cast<Real>((*this)[i]) - mean );
       variance += (delta * delta - variance) / (i + 1);
     }
   
@@ -159,7 +159,7 @@ std::vector<unsigned int> StatisticsVector<T>::histogram(unsigned int n_bins) co
 
 
 template <typename T>
-std::vector<unsigned int> StatisticsVector<T>::cut_below(real cut) const
+std::vector<unsigned int> StatisticsVector<T>::cut_below(Real cut) const
 {
   const unsigned int n   = this->size();
   
@@ -181,7 +181,7 @@ std::vector<unsigned int> StatisticsVector<T>::cut_below(real cut) const
 
 
 template <typename T>
-std::vector<unsigned int> StatisticsVector<T>::cut_above(real cut) const
+std::vector<unsigned int> StatisticsVector<T>::cut_above(Real cut) const
 {
   const unsigned int n   = this->size();
   
@@ -203,6 +203,6 @@ std::vector<unsigned int> StatisticsVector<T>::cut_above(real cut) const
 
 
 // Explicit Instantions
-template class StatisticsVector<real>;
+template class StatisticsVector<Real>;
 template class StatisticsVector<int>;
 template class StatisticsVector<unsigned int>;

@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.6 2003-01-24 21:19:55 jwpeterson Exp $
+// $Id: elem.C,v 1.7 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -273,14 +273,14 @@ Point Elem::centroid() const
   for (unsigned int n=0; n<n_vertices(); n++)
     cp += point(n);
 
-  return cp/((real) n_vertices());    
+  return cp/((Real) n_vertices());    
 };
 
 
 
-real Elem::hmin() const
+Real Elem::hmin() const
 {
-  real h_min=1.e30;
+  Real h_min=1.e30;
 
   for (unsigned int n_outer=0; n_outer<n_vertices(); n_outer++)
     for (unsigned int n_inner=0; n_inner<n_vertices(); n_inner++)
@@ -296,9 +296,9 @@ real Elem::hmin() const
 
 
 
-real Elem::hmax() const
+Real Elem::hmax() const
 {
-  real h_max=0;
+  Real h_max=0;
 
   for (unsigned int n_outer=0; n_outer<n_vertices(); n_outer++)
     for (unsigned int n_inner=0; n_inner<n_vertices(); n_inner++)
@@ -314,7 +314,7 @@ real Elem::hmax() const
 
 
 
-real Elem::length(const unsigned int n1, 
+Real Elem::length(const unsigned int n1, 
 		  const unsigned int n2) const
 {
   assert ( n1 < n_vertices() );
@@ -414,7 +414,7 @@ void Elem::write_ucd_connectivity(std::ostream &out) const
 
 
 
-real Elem::quality (const ElemQuality q) const
+Real Elem::quality (const ElemQuality q) const
 {
   switch (q)
     {    

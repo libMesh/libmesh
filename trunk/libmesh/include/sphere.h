@@ -1,4 +1,4 @@
-// $Id: sphere.h,v 1.5 2003-01-24 17:24:39 jwpeterson Exp $
+// $Id: sphere.h,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -48,7 +48,7 @@ public:
   /**
    * Constructs a sphere of radius r centered at c.
    */
-  Sphere (const Point& c, const real r);
+  Sphere (const Point& c, const Real r);
 
   /**
    * Copy-constructor.
@@ -63,7 +63,7 @@ public:
   /**
    * Defines a sphere of radius r centered at c.
    */
-  void create_from_center_radius (const Point& c, const real r);
+  void create_from_center_radius (const Point& c, const Real r);
 
   /**
    * @returns true if other_sphere intersects this sphere,
@@ -105,7 +105,7 @@ public:
   /**
    * Returns the radius of the sphere.
    */
-  real radius() const { return rad; };
+  Real radius() const { return rad; };
 
   /**
    * @returns the center of the sphere.
@@ -124,7 +124,7 @@ private:
   /**
    * The radius of the sphere.
    */
-  real  rad;
+  Real  rad;
 };
 
 #endif

@@ -1,4 +1,4 @@
-// $Id: fe_boundary.C,v 1.5 2003-01-24 17:24:41 jwpeterson Exp $
+// $Id: fe_boundary.C,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -105,7 +105,7 @@ void FE<Dim,T>::reinit(QBase* qside,
   };
   
   // make a copy of the Jacobian for integration
-  const std::vector<real>  JxW_int(JxW);
+  const std::vector<Real>  JxW_int(JxW);
   const std::vector<Point> xyz_int(xyz);
 
   // compute the shape function and derivative values
@@ -241,7 +241,7 @@ void FEBase::compute_map(const QBase* qrule,
 	const AutoPtr<Elem> side(elem->build_side(s));
 	
 	const unsigned int      n_qp = qrule->n_points();
-	const std::vector<real> & qw = qrule->get_weights();
+	const std::vector<Real> & qw = qrule->get_weights();
 	
 	
 	{
@@ -297,7 +297,7 @@ void FEBase::compute_map(const QBase* qrule,
 	const AutoPtr<Elem> side(elem->build_side(s));
   
 	const unsigned int      n_qp = qrule->n_points();
-	const std::vector<real> & qw = qrule->get_weights();
+	const std::vector<Real> & qw = qrule->get_weights();
 
 
 	{
@@ -336,17 +336,17 @@ void FEBase::compute_map(const QBase* qrule,
 	  for (unsigned int p=0; p<n_qp; p++)
 	    {
 
-	      const real g11 = (dxdxi_map(p)*dxdxi_map(p) +
+	      const Real g11 = (dxdxi_map(p)*dxdxi_map(p) +
 				dydxi_map(p)*dydxi_map(p) +
 				dzdxi_map(p)*dzdxi_map(p));
 	
-	      const real g12 = (dxdxi_map(p)*dxdeta_map(p) +
+	      const Real g12 = (dxdxi_map(p)*dxdeta_map(p) +
 				dydxi_map(p)*dydeta_map(p) +
 				dzdxi_map(p)*dzdeta_map(p));
 	
-	      const real g21 = g12;
+	      const Real g21 = g12;
 	
-	      const real g22 = (dxdeta_map(p)*dxdeta_map(p) +
+	      const Real g22 = (dxdeta_map(p)*dxdeta_map(p) +
 				dydeta_map(p)*dydeta_map(p) +
 				dzdeta_map(p)*dzdeta_map(p));
 	

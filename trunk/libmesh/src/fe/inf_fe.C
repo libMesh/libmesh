@@ -1,4 +1,4 @@
-// $Id: inf_fe.C,v 1.5 2003-01-24 17:24:42 jwpeterson Exp $
+// $Id: inf_fe.C,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -551,12 +551,12 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial()
     case 3:
       {
 	// fast access to the approximation and mapping shapes of base_fe
-	const std::vector<std::vector<real> >& S  = base_fe->phi;
-	const std::vector<std::vector<real> >& Ss = base_fe->dphidxi;
-	const std::vector<std::vector<real> >& St = base_fe->dphideta;
-	const std::vector<std::vector<real> >& S_map  = base_fe->phi_map;
-	const std::vector<std::vector<real> >& Ss_map = base_fe->dphidxi_map;
-	const std::vector<std::vector<real> >& St_map = base_fe->dphideta_map;
+	const std::vector<std::vector<Real> >& S  = base_fe->phi;
+	const std::vector<std::vector<Real> >& Ss = base_fe->dphidxi;
+	const std::vector<std::vector<Real> >& St = base_fe->dphideta;
+	const std::vector<std::vector<Real> >& S_map  = base_fe->phi_map;
+	const std::vector<std::vector<Real> >& Ss_map = base_fe->dphidxi_map;
+	const std::vector<std::vector<Real> >& St_map = base_fe->dphideta_map;
 
 	const unsigned int n_radial_qp = radial_qrule->n_points();
 	const unsigned int n_base_qp   = base_qrule->  n_points();

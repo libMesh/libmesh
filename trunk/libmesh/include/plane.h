@@ -1,4 +1,4 @@
-// $Id: plane.h,v 1.5 2003-01-24 17:24:39 jwpeterson Exp $
+// $Id: plane.h,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -84,17 +84,17 @@ public:
   /**
    * Creates an XY plane located at z=zpos,
    */ 
-  void xy_plane (const real zpos=0.);
+  void xy_plane (const Real zpos=0.);
 
   /**
    * Creates an XZ plane located at y=ypos,
    */ 
-  void xz_plane (const real ypos=0.);
+  void xz_plane (const Real ypos=0.);
 
   /**
    * Creates an YZ plane located at x=xpos,
    */ 
-  void yz_plane (const real xpos=0.);
+  void yz_plane (const Real xpos=0.);
 
   /**
    * @returns true if the point p is above the surface,

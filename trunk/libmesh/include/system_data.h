@@ -1,4 +1,4 @@
-// $Id: system_data.h,v 1.7 2003-01-31 16:47:41 benkirk Exp $
+// $Id: system_data.h,v 1.8 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -88,14 +88,14 @@ public:
    * the global solution on all processors.
    * Requires communication with all other processors.
    */
-  void update_global_solution (std::vector<number>& global_soln) const;
+  void update_global_solution (std::vector<Complex>& global_soln) const;
 
   /**
    * Fill the input vector \p global_soln so that it contains
    * the global solution on processor \p dest_proc.
    * Requires communication with all other processors.
    */
-  void update_global_solution (std::vector<number>& global_soln,
+  void update_global_solution (std::vector<Complex>& global_soln,
 			       const unsigned int dest_proc) const;
 
   /**
@@ -188,19 +188,19 @@ public:
    * @returns the current solution for the specified global
    * DOF.
    */
-  number current_solution (const unsigned int global_dof_number) const;
+  Complex current_solution (const unsigned int global_dof_number) const;
   
   /**
    * @returns the old solution for the specified global
    * DOF.
    */
-  number old_solution (const unsigned int global_dof_number) const;
+  Complex old_solution (const unsigned int global_dof_number) const;
   
   /**
    * @returns the older solution for the specified global
    * DOF.
    */
-  number older_solution (const unsigned int global_dof_number) const;
+  Complex older_solution (const unsigned int global_dof_number) const;
   
   /**
    * @returns the value of variable \p var at node point
@@ -208,18 +208,18 @@ public:
    * Slower than using the integer id for the variable
    * since this requires a lookup.
    */
-  number current_nodal_solution (const unsigned int node,
-				 const std::string& var,
-				 const unsigned int index=0) const;
+  Complex current_nodal_solution (const unsigned int node,
+				  const std::string& var,
+				  const unsigned int index=0) const;
   
   /**
    * @returns the value of variable number \p var at
    * node point \p node in the mesh for the current
    * solution.
    */
-  number current_nodal_solution (const unsigned int node,
-				 const unsigned short int var=0,
-				 const unsigned int index=0) const;
+  Complex current_nodal_solution (const unsigned int node,
+				  const unsigned short int var=0,
+				  const unsigned int index=0) const;
   
   /**
    * @returns the value of variable \p var at node point
@@ -227,18 +227,18 @@ public:
    * Slower than using the integer id for the variable
    * since this requires a lookup.
    */
-  number old_nodal_solution (const unsigned int node,
-			     const std::string& var,
-			     const unsigned int index=0) const;
+  Complex old_nodal_solution (const unsigned int node,
+			      const std::string& var,
+			      const unsigned int index=0) const;
   
   /**
    * @returns the value of variable number \p var at
    * node point \p node in the mesh for the old
    * solution.
    */
-  number old_nodal_solution (const unsigned int node,
-			     const unsigned short int var=0,
-			     const unsigned int index=0) const;
+  Complex old_nodal_solution (const unsigned int node,
+			      const unsigned short int var=0,
+			      const unsigned int index=0) const;
 
   /**
    * @returns the value of variable \p var at node point
@@ -246,18 +246,18 @@ public:
    * Slower than using the integer id for the variable
    * since this requires a lookup.
    */
-  number older_nodal_solution (const unsigned int node,
-			       const std::string& var,
-			       const unsigned int index=0) const;
+  Complex older_nodal_solution (const unsigned int node,
+				const std::string& var,
+				const unsigned int index=0) const;
   
   /**
    * @returns the value of variable number \p var at
    * node point \p node in the mesh for the older
    * solution.
    */
-  number older_nodal_solution (const unsigned int node,
-			       const unsigned short int var=0,
-			       const unsigned int index=0) const;
+  Complex older_nodal_solution (const unsigned int node,
+				const unsigned short int var=0,
+				const unsigned int index=0) const;
 
   /**
    * @returns the value of variable \p var at elem point
@@ -265,18 +265,18 @@ public:
    * Slower than using the integer id for the variable
    * since this requires a lookup.
    */
-  number current_elem_solution (const unsigned int elem,
-				const std::string& var,
-				const unsigned int index=0) const;
+  Complex current_elem_solution (const unsigned int elem,
+				 const std::string& var,
+				 const unsigned int index=0) const;
   
   /**
    * @returns the value of variable number \p var at
    * elem point \p elem in the mesh for the current
    * solution.
    */
-  number current_elem_solution (const unsigned int elem,
-				const unsigned short int var=0,
-				const unsigned int index=0) const;
+  Complex current_elem_solution (const unsigned int elem,
+				 const unsigned short int var=0,
+				 const unsigned int index=0) const;
   
   /**
    * @returns the value of variable \p var at elem point
@@ -284,18 +284,18 @@ public:
    * Slower than using the integer id for the variable
    * since this requires a lookup.
    */
-  number old_elem_solution (const unsigned int elem,
-			    const std::string& var,
-			    const unsigned int index=0) const;
+  Complex old_elem_solution (const unsigned int elem,
+			     const std::string& var,
+			     const unsigned int index=0) const;
   
   /**
    * @returns the value of variable number \p var at
    * elem point \p elem in the mesh for the old
    * solution.
    */
-  number old_elem_solution (const unsigned int elem,
-			    const unsigned short int var=0,
-			    const unsigned int index=0) const;
+  Complex old_elem_solution (const unsigned int elem,
+			     const unsigned short int var=0,
+			     const unsigned int index=0) const;
 
   /**
    * @returns the value of variable \p var at elem point
@@ -303,18 +303,18 @@ public:
    * Slower than using the integer id for the variable
    * since this requires a lookup.
    */
-  number older_elem_solution (const unsigned int elem,
-			      const std::string& var,
-			      const unsigned int index=0) const;
+  Complex older_elem_solution (const unsigned int elem,
+			       const std::string& var,
+			       const unsigned int index=0) const;
   
   /**
    * @returns the value of variable number \p var at
    * elem point \p elem in the mesh for the older
    * solution.
    */
-  number older_elem_solution (const unsigned int elem,
-			      const unsigned short int var=0,
-			      const unsigned int index=0) const;
+  Complex older_elem_solution (const unsigned int elem,
+			       const unsigned short int var=0,
+			       const unsigned int index=0) const;
   
   /**
    * Data structure describing the relationship between
@@ -358,7 +358,7 @@ public:
   /**
    * Assemble & solve the linear system.
    */
-  std::pair<unsigned int, real> solve ();
+  std::pair<unsigned int, Real> solve ();
   
   /**
    * Data structure to hold solution values.
@@ -553,7 +553,7 @@ unsigned int SystemData::n_local_dofs() const
 
 
 inline
-number SystemData::current_solution (const unsigned int global_dof_number) const
+Complex SystemData::current_solution (const unsigned int global_dof_number) const
 {
 #ifndef HAVE_PETSC
 
@@ -576,7 +576,7 @@ number SystemData::current_solution (const unsigned int global_dof_number) const
 
 
 inline
-number SystemData::old_solution (const unsigned int global_dof_number) const
+Complex SystemData::old_solution (const unsigned int global_dof_number) const
 {
 #ifndef HAVE_PETSC
 
@@ -599,7 +599,7 @@ number SystemData::old_solution (const unsigned int global_dof_number) const
 
 
 inline
-number SystemData::older_solution (const unsigned int global_dof_number) const
+Complex SystemData::older_solution (const unsigned int global_dof_number) const
 {
 #ifndef HAVE_PETSC
 
@@ -622,7 +622,7 @@ number SystemData::older_solution (const unsigned int global_dof_number) const
 
 
 inline
-number SystemData::current_nodal_solution (const unsigned int node,
+Complex SystemData::current_nodal_solution (const unsigned int node,
 					   const std::string& var,
 					   const unsigned int index) const
 {
@@ -632,7 +632,7 @@ number SystemData::current_nodal_solution (const unsigned int node,
 
 
 inline
-number SystemData::current_nodal_solution (const unsigned int node,
+Complex SystemData::current_nodal_solution (const unsigned int node,
 					   const unsigned short int var,
 					   const unsigned int index) const
 {
@@ -655,7 +655,7 @@ number SystemData::current_nodal_solution (const unsigned int node,
 
 
 inline
-number SystemData::old_nodal_solution (const unsigned int node,
+Complex SystemData::old_nodal_solution (const unsigned int node,
 				       const std::string& var,
 				       const unsigned int index) const
 {
@@ -665,7 +665,7 @@ number SystemData::old_nodal_solution (const unsigned int node,
 
 
 inline
-number SystemData::old_nodal_solution (const unsigned int node,
+Complex SystemData::old_nodal_solution (const unsigned int node,
 				       const unsigned short int var,
 				       const unsigned int index) const
 {
@@ -688,7 +688,7 @@ number SystemData::old_nodal_solution (const unsigned int node,
 
 
 inline
-number SystemData::older_nodal_solution (const unsigned int node,
+Complex SystemData::older_nodal_solution (const unsigned int node,
 					 const std::string& var,
 					 const unsigned int index) const
 {
@@ -698,7 +698,7 @@ number SystemData::older_nodal_solution (const unsigned int node,
 
 
 inline
-number SystemData::older_nodal_solution (const unsigned int node,
+Complex SystemData::older_nodal_solution (const unsigned int node,
 					 const unsigned short int var,
 					 const unsigned int index) const
 {
@@ -721,7 +721,7 @@ number SystemData::older_nodal_solution (const unsigned int node,
 
 
 inline
-number SystemData::current_elem_solution (const unsigned int elem,
+Complex SystemData::current_elem_solution (const unsigned int elem,
 					  const std::string& var,
 					  const unsigned int index) const
 {
@@ -731,7 +731,7 @@ number SystemData::current_elem_solution (const unsigned int elem,
 
 
 inline
-number SystemData::current_elem_solution (const unsigned int elem,
+Complex SystemData::current_elem_solution (const unsigned int elem,
 					  const unsigned short int var,
 					  const unsigned int index) const
 {
@@ -754,7 +754,7 @@ number SystemData::current_elem_solution (const unsigned int elem,
 
 
 inline
-number SystemData::old_elem_solution (const unsigned int elem,
+Complex SystemData::old_elem_solution (const unsigned int elem,
 				      const std::string& var,
 				      const unsigned int index) const
 {
@@ -764,7 +764,7 @@ number SystemData::old_elem_solution (const unsigned int elem,
 
 
 inline
-number SystemData::old_elem_solution (const unsigned int elem,
+Complex SystemData::old_elem_solution (const unsigned int elem,
 				      const unsigned short int var,
 				      const unsigned int index) const
 {
@@ -787,7 +787,7 @@ number SystemData::old_elem_solution (const unsigned int elem,
 
 
 inline
-number SystemData::older_elem_solution (const unsigned int elem,
+Complex SystemData::older_elem_solution (const unsigned int elem,
 					const std::string& var,
 					const unsigned int index) const
 {
@@ -797,7 +797,7 @@ number SystemData::older_elem_solution (const unsigned int elem,
 
 
 inline
-number SystemData::older_elem_solution (const unsigned int elem,
+Complex SystemData::older_elem_solution (const unsigned int elem,
 					const unsigned short int var,
 					const unsigned int index) const
 {

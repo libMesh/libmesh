@@ -1,4 +1,4 @@
-//    $Id: petsc_interface.h,v 1.5 2003-01-24 17:24:39 jwpeterson Exp $
+//    $Id: petsc_interface.h,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -35,22 +35,27 @@
 #include "petsc_matrix.h"
 
 
-// Petsc include files
-#ifdef USE_COMPLEX_NUMBERS
-#  define PETSC_USE_COMPLEX 1
-#endif
+/**
+ * Petsc include files.  PETSc with complex numbers 
+ * is actually C++.
+ */
+# ifndef USE_COMPLEX_NUMBERS
 
 namespace Petsc {
 extern "C" {
-#include <petsc.h>
-#include <petscsles.h>  
+#include "petscsles.h"
 }
 // for easy switching between Petsc 2.1.0/2.1.1
-//typedef Scalar PetscScalar;
+// typedef Scalar PetscScalar;
 } 
-
-
 using namespace Petsc;
+
+#else
+
+#include "petscsles.h"
+
+#endif
+
 
 
 
@@ -201,7 +206,7 @@ class PetscInterface
    * Call the Petsc solver
    **/
     
-  std::pair<unsigned int, real> 
+  std::pair<unsigned int, Real> 
     solve (PetscMatrix &matrix,
 	   PetscVector &solution,
 	   PetscVector &rhs,

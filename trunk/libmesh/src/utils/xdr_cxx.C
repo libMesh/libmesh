@@ -1,4 +1,4 @@
-// "$Id: xdr_cxx.C,v 1.5 2003-01-24 17:24:46 jwpeterson Exp $\n"
+// "$Id: xdr_cxx.C,v 1.6 2003-02-03 03:51:50 ddreyer Exp $\n"
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -641,8 +641,7 @@ void Xdr::data (std::complex<double>& a, const char* comment)
 };
 
 
-// endif for USE_COMPLEX_NUMBERS
-#endif
+#endif // USE_COMPLEX_NUMBERS
 
 
 
@@ -1339,14 +1338,14 @@ void Xdr::data (std::vector<double>& v, const char* comment)
 
 #ifdef USE_COMPLEX_NUMBERS
 
-void Xdr::data (std::vector< std::complex<float> >& v, const char* comment)
+void Xdr::data (std::vector< std::complex<float> >&, const char*)
 {
   error();
 };
 
 
 
-void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
+void Xdr::data (std::vector< std::complex<double> >&, const char*)
 {
   error();
 };

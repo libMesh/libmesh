@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.5 2003-01-24 17:24:38 jwpeterson Exp $
+// $Id: equation_systems.h,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -147,7 +147,7 @@ public:
   /**
    * @returns the parameter value assoicated with \p id.
    */
-  real parameter (const std::string& id) const;
+  Real parameter (const std::string& id) const;
 
   /**
    * Defines the value of parameter \p id as \p value.
@@ -155,7 +155,7 @@ public:
    * this method makes sure the parameter isn't already
    * set to avoid accidental overwriting.
    */
-  real & set_parameter (const std::string& id);
+  Real & set_parameter (const std::string& id);
   
   /**
    * Undefines the value of parameter \p id. 
@@ -173,7 +173,7 @@ public:
    * entries will be in variable-major format (corresponding to
    * the names from \p build_variable_names())
    */
-  void build_solution_vector (std::vector<number>& soln);
+  void build_solution_vector (std::vector<Complex>& soln);
 
   /**
    * @returns a constant reference to the mesh
@@ -243,7 +243,7 @@ public:
   /**
    * Data structore to hold user-specified parameters 
    */
-  std::map<std::string, real> parameters;
+  std::map<std::string, Real> parameters;
 };
 
 

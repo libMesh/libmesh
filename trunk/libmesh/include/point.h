@@ -1,4 +1,4 @@
-// $Id: point.h,v 1.5 2003-01-24 17:24:39 jwpeterson Exp $
+// $Id: point.h,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -47,9 +47,9 @@ class Point
    * Constructor.  By default sets all entries to 0.  Gives the point 0 in
    * \p DIM dimensions.
    */
-  Point  (const real x=0,
-	  const real y=0,
-	  const real z=0);
+  Point  (const Real x=0,
+	  const Real y=0,
+	  const Real z=0);
 
   /**
    * Copy-constructor.
@@ -64,12 +64,12 @@ class Point
   /**
    * Return the \f$ i^{th} \f$ element of the point.
    */
-  real operator () (const unsigned int i) const;
+  Real operator () (const unsigned int i) const;
 
   /**
    * Return a writeable reference to the \f$ i^{th} \f$ element of the point.
    */
-  real & operator () (const unsigned int i);
+  Real & operator () (const unsigned int i);
   
   /**
    * Add two points.
@@ -99,17 +99,17 @@ class Point
   /**
    * Multiply a point by a number, i.e. scale.
    */
-  Point operator * (const real) const;
+  Point operator * (const Real) const;
   
   /**
    * Divide a point by a number, i.e. scale.
    */
-  Point operator / (const real) const;
+  Point operator / (const Real) const;
 
   /**
    * Multiply 2 points together, i.e. dot-product.
    */
-  real operator * (const Point &) const;
+  Real operator * (const Point &) const;
 
   /**
    * Multiply 2 points together, i.e. dot-product.
@@ -126,7 +126,7 @@ class Point
    * Reutrns the magnitude of the point, i.e. the square-root of the
    * sum of the elements squared.
    */
-  real size() const;
+  Real size() const;
 
   /**
    * Zero the point in any dimension.
@@ -167,12 +167,12 @@ class Point
    * Reutrns the magnitude of the point squared, i.e. the square-root
    * of the sum of the elements squared.
    */
-  real size_sq() const;
+  Real size_sq() const;
 
   /**
    * The coordinates of the \p Point
    */
-  real coords[DIM];
+  Real coords[DIM];
 
   /**
    * Make the derived class a friend
@@ -185,9 +185,9 @@ class Point
 //------------------------------------------------------
 // Inline functions
 inline
-Point::Point (const real x,
-	      const real y,
-	      const real z)
+Point::Point (const Real x,
+	      const Real y,
+	      const Real z)
 {
   coords[0] = x;
 
@@ -221,7 +221,7 @@ Point::~Point ()
 
 
 inline
-real Point::operator () (const unsigned int i) const
+Real Point::operator () (const unsigned int i) const
 {
   assert (i<3);
 
@@ -235,7 +235,7 @@ real Point::operator () (const unsigned int i) const
 
 
 inline
-real & Point::operator () (const unsigned int i)
+Real & Point::operator () (const unsigned int i)
 {
   assert (i<DIM);
   
@@ -345,7 +345,7 @@ Point Point::operator - () const
 
 
 inline
-Point Point::operator * (const real factor) const
+Point Point::operator * (const Real factor) const
 {
 
 #if DIM == 1
@@ -368,9 +368,9 @@ Point Point::operator * (const real factor) const
 
 
 inline
-Point Point::operator / (const real factor) const
+Point Point::operator / (const Real factor) const
 {
-  assert (factor != static_cast<real>(0.));
+  assert (factor != static_cast<Real>(0.));
 
 #if DIM == 1
   return Point(coords[0]/factor);
@@ -392,7 +392,7 @@ Point Point::operator / (const real factor) const
 
 
 inline
-real Point::operator * (const Point &p) const
+Real Point::operator * (const Point &p) const
 {
 #if DIM == 1
   return coords[0]*p.coords[0];
@@ -413,7 +413,7 @@ real Point::operator * (const Point &p) const
 
 
 inline
-real Point::size() const
+Real Point::size() const
 {
   return sqrt(size_sq());  
 };
@@ -421,9 +421,9 @@ real Point::size() const
 
 
 inline
-real Point::size_sq() const
+Real Point::size_sq() const
 {
-  real val = 0.;
+  Real val = 0.;
 
   for (unsigned int i=0; i<DIM; i++)
     val += coords[i]*coords[i];

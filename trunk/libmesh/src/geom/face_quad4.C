@@ -1,4 +1,4 @@
-// $Id: face_quad4.C,v 1.6 2003-01-24 21:19:55 jwpeterson Exp $
+// $Id: face_quad4.C,v 1.7 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -32,7 +32,7 @@
 // Quad class static member initialization
 #ifdef ENABLE_AMR
 
-const real Quad4::embedding_matrix[4][4][4] =
+const Real Quad4::embedding_matrix[4][4][4] =
 {
   // embedding matrix for child 0
   {

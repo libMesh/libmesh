@@ -1,4 +1,4 @@
-// $Id: mesh_xdr_support.C,v 1.6 2003-01-25 01:42:46 jwpeterson Exp $
+// $Id: mesh_xdr_support.C,v 1.7 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -315,7 +315,7 @@ void XdrInterface::mesh_interface(const std::string& name,
    * it to the XDR file.
    */
   {
-    std::vector<real> coords;
+    std::vector<Real> coords;
     
     switch (access)
       {
@@ -494,21 +494,21 @@ void XdrInterface::mesh_interface(const std::string& name,
 
 void XdrInterface::soln_interface(const std::string& name,
 				  const XdrIO::XdrIO_TYPE access,
-				  std::vector<number>& soln,
+				  std::vector<Complex>& soln,
 				  std::vector<std::string>& var_names,
 				  Mesh& mesh)
 {
 
 #ifdef USE_COMPLEX_NUMBERS
   // buffer for writing separately
-  std::vector<real> real_soln;
-  std::vector<real> imag_soln;
+  std::vector<Real> Real_soln;
+  std::vector<Real> imag_soln;
 
-  mesh.prepare_complex_data(&soln, &real_soln, &imag_soln);
+  mesh.prepare_complex_data(&soln, &Real_soln, &imag_soln);
 
   soln_interface_impl(mesh.complex_filename(name, 0), 
 		      access, 
-		      real_soln, 
+		      Real_soln, 
 		      var_names, 
 		      mesh);
 
@@ -532,7 +532,7 @@ void XdrInterface::soln_interface(const std::string& name,
 
 void XdrInterface::soln_interface_impl(const std::string& name,
 				       const XdrIO::XdrIO_TYPE access,
-				       std::vector<real>& soln,
+				       std::vector<Real>& soln,
 				       std::vector<std::string>& var_names,
 				       Mesh& mesh)
 {
@@ -781,7 +781,7 @@ void Mesh::read_xdr_binary(const std::string& name)
 
 
 void Mesh::read_xdr_soln(const std::string& name,
-			 std::vector<number>& soln,
+			 std::vector<Complex>& soln,
 			 std::vector<std::string>& var_names)
 {
   /**
@@ -804,7 +804,7 @@ void Mesh::read_xdr_soln(const std::string& name,
 
 
 void Mesh::read_xdr_soln_binary(const std::string& name,
-				std::vector<number>& soln,
+				std::vector<Complex>& soln,
 				std::vector<std::string>& var_names)
 {
 #ifndef HAVE_RPC_RPC_H
@@ -897,7 +897,7 @@ void Mesh::write_xdr_binary(const std::string& name)
 
 
 void Mesh::write_xdr_soln(const std::string& name,
-			  std::vector<number>& soln,
+			  std::vector<Complex>& soln,
 			  std::vector<std::string>& var_names)
 {
   /**
@@ -920,7 +920,7 @@ void Mesh::write_xdr_soln(const std::string& name,
 
 
 void Mesh::write_xdr_soln_binary(const std::string& name,
-				 std::vector<number>& soln,
+				 std::vector<Complex>& soln,
 				 std::vector<std::string>& var_names)
 
 {

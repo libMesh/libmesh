@@ -1,4 +1,4 @@
-// $Id: quadrature.C,v 1.5 2003-01-24 17:24:44 jwpeterson Exp $
+// $Id: quadrature.C,v 1.6 2003-02-03 03:51:50 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -666,8 +666,8 @@ void QBase::side_rule_pyramid(QBase* q2D, unsigned int side)
 	_points.resize(q2D->n_points());
 	_weights.resize(q2D->n_points());
 
-	const real a = -1.;
-	const real b =  1.;
+	const Real a = -1.;
+	const Real b =  1.;
 
 	for (unsigned int qp=0; qp<q2D->n_points(); qp++)
 	  {
@@ -690,8 +690,8 @@ void QBase::side_rule_pyramid(QBase* q2D, unsigned int side)
 	_points.resize(q2D->n_points());
 	_weights.resize(q2D->n_points());
 
-	const real a = 1.;
-	const real b = 1.;
+	const Real a = 1.;
+	const Real b = 1.;
 
 	for (unsigned int qp=0; qp<q2D->n_points(); qp++)
 	  {
@@ -714,8 +714,8 @@ void QBase::side_rule_pyramid(QBase* q2D, unsigned int side)
 	_points.resize(q2D->n_points());
 	_weights.resize(q2D->n_points());
 
-	const real a = 1.;
-	const real b = -1.;
+	const Real a = 1.;
+	const Real b = -1.;
 
 	for (unsigned int qp=0; qp<q2D->n_points(); qp++)
 	  {
@@ -738,8 +738,8 @@ void QBase::side_rule_pyramid(QBase* q2D, unsigned int side)
 	_points.resize(q2D->n_points());
 	_weights.resize(q2D->n_points());
 
-	const real a = -1.;
-	const real b = -1.;
+	const Real a = -1.;
+	const Real b = -1.;
 
 	for (unsigned int qp=0; qp<q2D->n_points(); qp++)
 	  {

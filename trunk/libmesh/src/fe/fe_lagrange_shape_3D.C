@@ -1,4 +1,4 @@
-// $Id: fe_lagrange_shape_3D.C,v 1.5 2003-01-24 17:24:41 jwpeterson Exp $
+// $Id: fe_lagrange_shape_3D.C,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,7 +30,7 @@
 
 
 template <>
-real FE<3,LAGRANGE>::shape(const ElemType type,
+Real FE<3,LAGRANGE>::shape(const ElemType type,
 			   const Order order,
 			   const unsigned int i,
 			   const Point& p)
@@ -53,9 +53,9 @@ real FE<3,LAGRANGE>::shape(const ElemType type,
 	      assert (i<8);
 	
 	      // Compute hex shape functions as a tensor-product
-	      const real xi   = p(0);
-	      const real eta  = p(1);
-	      const real zeta = p(2);
+	      const Real xi   = p(0);
+	      const Real eta  = p(1);
+	      const Real zeta = p(2);
 	
 	      //                                0  1  2  3  4  5  6  7
 	      static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0};
@@ -74,10 +74,10 @@ real FE<3,LAGRANGE>::shape(const ElemType type,
 	      assert(i<4);
 	
 	      // Area coordinates, pg. 205, Vol. I, Carey, Oden, Becker FEM
-	      const real zeta1 = p(0);
-	      const real zeta2 = p(1);
-	      const real zeta3 = p(2);
-	      const real zeta0 = 1. - zeta1 - zeta2 - zeta3;
+	      const Real zeta1 = p(0);
+	      const Real zeta2 = p(1);
+	      const Real zeta3 = p(2);
+	      const Real zeta0 = 1. - zeta1 - zeta2 - zeta3;
 
 	      switch(i)
 		{
@@ -146,10 +146,10 @@ real FE<3,LAGRANGE>::shape(const ElemType type,
 	    {
 	      assert (i<5);
 	
-	      const real xi   = p(0);
-	      const real eta  = p(1);
-	      const real zeta = p(2);
-	      const real eps  = 1.e-35;
+	      const Real xi   = p(0);
+	      const Real eta  = p(1);
+	      const Real zeta = p(2);
+	      const Real eps  = 1.e-35;
    
 	      switch(i)
 		{
@@ -195,15 +195,15 @@ real FE<3,LAGRANGE>::shape(const ElemType type,
 	    {
 	      assert (i<20);
 	
-	      const real xi   = p(0);
-	      const real eta  = p(1);
-	      const real zeta = p(2);
+	      const Real xi   = p(0);
+	      const Real eta  = p(1);
+	      const Real zeta = p(2);
 
 	      // these functions are defined for (x,y,z) in [0,1]^3
 	      // so transform the locations
-	      const real x = .5*(xi   + 1.);
-	      const real y = .5*(eta  + 1.);
-	      const real z = .5*(zeta + 1.);
+	      const Real x = .5*(xi   + 1.);
+	      const Real y = .5*(eta  + 1.);
+	      const Real z = .5*(zeta + 1.);
 
 	      switch (i)
 		{
@@ -278,9 +278,9 @@ real FE<3,LAGRANGE>::shape(const ElemType type,
  	      assert (i<27);
 	
 	      // Compute hex shape functions as a tensor-product
-	      const real xi   = p(0);
-	      const real eta  = p(1);
-	      const real zeta = p(2);
+	      const Real xi   = p(0);
+	      const Real eta  = p(1);
+	      const Real zeta = p(2);
 	
 	      // The only way to make any sense of this
 	      // is to look at the mgflo/mg2/mgf documentation
@@ -301,10 +301,10 @@ real FE<3,LAGRANGE>::shape(const ElemType type,
 	      assert (i<10);
 	
 	      // Area coordinates, pg. 205, Vol. I, Carey, Oden, Becker FEM
-	      const real zeta1 = p(0);
-	      const real zeta2 = p(1);
-	      const real zeta3 = p(2);
-	      const real zeta0 = 1. - zeta1 - zeta2 - zeta3;
+	      const Real zeta1 = p(0);
+	      const Real zeta2 = p(1);
+	      const Real zeta3 = p(2);
+	      const Real zeta0 = 1. - zeta1 - zeta2 - zeta3;
 	
 	      switch(i)
 		{
@@ -386,7 +386,7 @@ real FE<3,LAGRANGE>::shape(const ElemType type,
 
 
 template <>
-real FE<3,LAGRANGE>::shape(const Elem* elem,
+Real FE<3,LAGRANGE>::shape(const Elem* elem,
 			   const Order order,
 			   const unsigned int i,
 			   const Point& p)
@@ -401,7 +401,7 @@ real FE<3,LAGRANGE>::shape(const Elem* elem,
 
 
 template <>
-real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
+Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 				 const Order order,
 				 const unsigned int i,
 				 const unsigned int j,
@@ -426,9 +426,9 @@ real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 	      assert (i<8);
 	
 	      // Compute hex shape functions as a tensor-product
-	      const real xi   = p(0);
-	      const real eta  = p(1);
-	      const real zeta = p(2);
+	      const Real xi   = p(0);
+	      const Real eta  = p(1);
+	      const Real zeta = p(2);
 	
 	      static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0};
 	      static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1};
@@ -465,20 +465,20 @@ real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 	      assert (i<4);
 	
 	      // Area coordinates, pg. 205, Vol. I, Carey, Oden, Becker FEM
-	      const real dzeta0dxi = -1.;
-	      const real dzeta1dxi =  1.;
-	      const real dzeta2dxi =  0.;
-	      const real dzeta3dxi =  0.;
+	      const Real dzeta0dxi = -1.;
+	      const Real dzeta1dxi =  1.;
+	      const Real dzeta2dxi =  0.;
+	      const Real dzeta3dxi =  0.;
 	
-	      const real dzeta0deta = -1.;
-	      const real dzeta1deta =  0.;
-	      const real dzeta2deta =  1.;
-	      const real dzeta3deta =  0.;
+	      const Real dzeta0deta = -1.;
+	      const Real dzeta1deta =  0.;
+	      const Real dzeta2deta =  1.;
+	      const Real dzeta3deta =  0.;
 	
-	      const real dzeta0dzeta = -1.;
-	      const real dzeta1dzeta =  0.;
-	      const real dzeta2dzeta =  0.;
-	      const real dzeta3dzeta =  1.;
+	      const Real dzeta0dzeta = -1.;
+	      const Real dzeta1dzeta =  0.;
+	      const Real dzeta2dzeta =  0.;
+	      const Real dzeta3dzeta =  1.;
 
 	      switch (j)
 		{
@@ -670,10 +670,10 @@ real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 	    {
 	      assert (i<5);
 	      	
-	      const real xi   = p(0);
-	      const real eta  = p(1);
-	      const real zeta = p(2);
-	      const real eps  = 1.e-35;
+	      const Real xi   = p(0);
+	      const Real eta  = p(1);
+	      const Real zeta = p(2);
+	      const Real eps  = 1.e-35;
 
 	      switch (j)
 		{
@@ -734,8 +734,8 @@ real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 		    {
 		    case 0:
 		      {
-			const real a=1.;
-			const real b=1.;
+			const Real a=1.;
+			const Real b=1.;
 		  
 			return .25*(((zeta + a*xi - 1.)*(zeta + b*eta - 1.) +
 				     (1. - xi)*((zeta + a*xi -1.) + (zeta + b*eta - 1.)))/
@@ -744,8 +744,8 @@ real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 		
 		    case 1:
 		      {
-			const real a=-1.;
-			const real b=1.;
+			const Real a=-1.;
+			const Real b=1.;
 		  
 			return .25*(((zeta + a*xi - 1.)*(zeta + b*eta - 1.) +
 				     (1. - xi)*((zeta + a*xi -1.) + (zeta + b*eta - 1.)))/
@@ -754,8 +754,8 @@ real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 		
 		    case 2:
 		      {
-			const real a=-1.;
-			const real b=-1.;
+			const Real a=-1.;
+			const Real b=-1.;
 		  
 			return .25*(((zeta + a*xi - 1.)*(zeta + b*eta - 1.) +
 				     (1. - xi)*((zeta + a*xi -1.) + (zeta + b*eta - 1.)))/
@@ -764,8 +764,8 @@ real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 		
 		    case 3:
 		      {
-			const real a=1.;
-			const real b=-1.;
+			const Real a=1.;
+			const Real b=-1.;
 		  
 			return .25*(((zeta + a*xi - 1.)*(zeta + b*eta - 1.) +
 				     (1. - xi)*((zeta + a*xi -1.) + (zeta + b*eta - 1.)))/
@@ -807,15 +807,15 @@ real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 	    {
 	      assert (i<20);
 	
-	      const real xi   = p(0);
-	      const real eta  = p(1);
-	      const real zeta = p(2);
+	      const Real xi   = p(0);
+	      const Real eta  = p(1);
+	      const Real zeta = p(2);
 
 	      // these functions are defined for (x,y,z) in [0,1]^3
 	      // so transform the locations
-	      const real x = .5*(xi   + 1.);
-	      const real y = .5*(eta  + 1.);
-	      const real z = .5*(zeta + 1.);
+	      const Real x = .5*(xi   + 1.);
+	      const Real y = .5*(eta  + 1.);
+	      const Real z = .5*(zeta + 1.);
 
 	      // and don't forget the chain rule!
 	
@@ -1061,9 +1061,9 @@ real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 	      assert (i<27);
 	
 	      // Compute hex shape functions as a tensor-product
-	      const real xi   = p(0);
-	      const real eta  = p(1);
-	      const real zeta = p(2);
+	      const Real xi   = p(0);
+	      const Real eta  = p(1);
+	      const Real zeta = p(2);
 	
 	      // The only way to make any sense of this
 	      // is to look at the mgflo/mg2/mgf documentation
@@ -1103,25 +1103,25 @@ real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 	      assert (i<10);
 	
 	      // Area coordinates, pg. 205, Vol. I, Carey, Oden, Becker FEM
-	      const real zeta1 = p(0);
-	      const real zeta2 = p(1);
-	      const real zeta3 = p(2);
-	      const real zeta0 = 1. - zeta1 - zeta2 - zeta3;
+	      const Real zeta1 = p(0);
+	      const Real zeta2 = p(1);
+	      const Real zeta3 = p(2);
+	      const Real zeta0 = 1. - zeta1 - zeta2 - zeta3;
 	
-	      const real dzeta0dxi = -1.;
-	      const real dzeta1dxi =  1.;
-	      const real dzeta2dxi =  0.;
-	      const real dzeta3dxi =  0.;
+	      const Real dzeta0dxi = -1.;
+	      const Real dzeta1dxi =  1.;
+	      const Real dzeta2dxi =  0.;
+	      const Real dzeta3dxi =  0.;
 	
-	      const real dzeta0deta = -1.;
-	      const real dzeta1deta =  0.;
-	      const real dzeta2deta =  1.;
-	      const real dzeta3deta =  0.;
+	      const Real dzeta0deta = -1.;
+	      const Real dzeta1deta =  0.;
+	      const Real dzeta2deta =  1.;
+	      const Real dzeta3deta =  0.;
 	
-	      const real dzeta0dzeta = -1.;
-	      const real dzeta1dzeta =  0.;
-	      const real dzeta2dzeta =  0.;
-	      const real dzeta3dzeta =  1.;
+	      const Real dzeta0dzeta = -1.;
+	      const Real dzeta1dzeta =  0.;
+	      const Real dzeta2dzeta =  0.;
+	      const Real dzeta3dzeta =  1.;
 
 	      switch (j)
 		{
@@ -1294,7 +1294,7 @@ real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 
 
 template <>
-real FE<3,LAGRANGE>::shape_deriv(const Elem* elem,
+Real FE<3,LAGRANGE>::shape_deriv(const Elem* elem,
 				 const Order order,
 				 const unsigned int i,
 				 const unsigned int j,

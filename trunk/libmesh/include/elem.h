@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.9 2003-01-31 16:47:38 benkirk Exp $
+// $Id: elem.h,v 1.10 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -346,20 +346,20 @@ class Elem : public ReferenceCountedObject<Elem>
    * This method is overloadable since some derived elements 
    * might want to use shortcuts to compute their centroid.
    */
-  virtual real hmin() const;
+  virtual Real hmin() const;
   
   /**
    * @returns the maximum vertex separation for the element.
    * This method is overloadable since some derived elements 
    * might want to use shortcuts to compute their centroid.
    */
-  virtual real hmax() const;
+  virtual Real hmax() const;
   
   /**
    * Based on the quality metric q specified by the user,
    * returns a quantitative assessment of element quality.
    */
-  virtual real quality(const ElemQuality q) const;  
+  virtual Real quality(const ElemQuality q) const;  
 
   /**
    * Returns the suggested quality bounds for
@@ -368,8 +368,8 @@ class Elem : public ReferenceCountedObject<Elem>
    * Since this function can have no possible meaning
    * for an abstract Elem, it is an error.
    */
-  virtual std::pair<real,real> qual_bounds (const ElemQuality) const
-  { error(); std::pair<real,real> p(0,0); return p; };
+  virtual std::pair<Real,Real> qual_bounds (const ElemQuality) const
+  { error(); std::pair<Real,Real> p(0,0); return p; };
   
   /**
    * @returns true if the point p is contained in this element, 
@@ -395,7 +395,7 @@ class Elem : public ReferenceCountedObject<Elem>
    * @returns the magnitude of the distance between nodes n1 and n2.
    * Useful for computing the lengths of the sides of elements.
    */
-  real length (const unsigned int n1, 
+  Real length (const unsigned int n1, 
 	       const unsigned int n2) const;
   
 #ifdef ENABLE_AMR

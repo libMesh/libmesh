@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.6 2003-02-03 02:21:48 benkirk Exp $
+// $Id: dof_map.C,v 1.7 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -680,7 +680,7 @@ void DofMap::create_dof_constraints()
 			  const unsigned int their_node_g = neighbor->node(their_dof);
 			  const unsigned int their_dof_g  = node_dof_number(their_node_g, component);
 
-			  const real their_dof_value = FEInterface::shape(_dim,
+			  const Real their_dof_value = FEInterface::shape(_dim,
 									  fe_type,
 									  neighbor->type(),
 									  their_dof,
@@ -749,14 +749,14 @@ void DofMap::print_dof_constraints() const
 
 
 
-void DofMap::constrain_element_matrix (DenseMatrix& matrix,
+void DofMap::constrain_element_matrix (RealDenseMatrix& matrix,
 				       std::vector<unsigned int>& elem_dofs) const
 {
   assert (elem_dofs.size() == matrix.m());
   assert (elem_dofs.size() == matrix.n());
   
   // The constrained matrix is built up as C^T K C.    
-  DenseMatrix C;
+  RealDenseMatrix C;
 
   
   build_constraint_matrix (C, elem_dofs);
@@ -806,8 +806,8 @@ void DofMap::constrain_element_matrix (DenseMatrix& matrix,
 
 
 
-void DofMap::constrain_element_matrix_and_vector (DenseMatrix& matrix,
-						  std::vector<real>& rhs,
+void DofMap::constrain_element_matrix_and_vector (RealDenseMatrix& matrix,
+						  std::vector<Real>& rhs,
 						  std::vector<unsigned int>& elem_dofs) const
 {
   assert (elem_dofs.size() == matrix.m());
@@ -816,7 +816,7 @@ void DofMap::constrain_element_matrix_and_vector (DenseMatrix& matrix,
   
   // The constrained matrix is built up as C^T K C.
   // The constrained RHS is built up as C^T F
-  DenseMatrix C;
+  RealDenseMatrix C;
   
   build_constraint_matrix (C, elem_dofs);
 
@@ -863,7 +863,7 @@ void DofMap::constrain_element_matrix_and_vector (DenseMatrix& matrix,
 
       
       // Compute the matrix-vector product C^T F
-      std::vector<real> old_rhs(rhs);
+      std::vector<Real> old_rhs(rhs);
       
       rhs.resize(elem_dofs.size());
       
@@ -891,7 +891,7 @@ void DofMap::constrain_element_matrix_and_vector (DenseMatrix& matrix,
 
 
 
-void DofMap::constrain_element_matrix (DenseMatrix& matrix,
+void DofMap::constrain_element_matrix (RealDenseMatrix& matrix,
 				       std::vector<unsigned int>& row_dofs,
 				       std::vector<unsigned int>& col_dofs) const
 {
@@ -903,8 +903,8 @@ void DofMap::constrain_element_matrix (DenseMatrix& matrix,
 
   
   
-  DenseMatrix R;
-  DenseMatrix C;
+  RealDenseMatrix R;
+  RealDenseMatrix C;
 
   // Safeguard against the user passing us the same
   // object for row_dofs and col_dofs.  If that is done
@@ -965,14 +965,14 @@ void DofMap::constrain_element_matrix (DenseMatrix& matrix,
 
 
 
-void DofMap::constrain_element_vector (std::vector<real>&         rhs,
+void DofMap::constrain_element_vector (std::vector<Real>&         rhs,
 				       std::vector<unsigned int>& row_dofs) const
 {
   assert (rhs.size() == row_dofs.size());
 
   
   // The constrained RHS is built up as R^T F.  
-  DenseMatrix R;
+  RealDenseMatrix R;
 
   build_constraint_matrix (R, row_dofs);
 
@@ -982,7 +982,7 @@ void DofMap::constrain_element_vector (std::vector<real>&         rhs,
       (R.n() == row_dofs.size())) // if the RHS is constrained
     {
       // Compute the matrix-vector product
-      std::vector<real> old_rhs(rhs);
+      std::vector<Real> old_rhs(rhs);
       
       rhs.resize(row_dofs.size());
       
@@ -1010,7 +1010,7 @@ void DofMap::constrain_element_vector (std::vector<real>&         rhs,
 
 
 
-void DofMap::build_constraint_matrix (DenseMatrix& C,
+void DofMap::build_constraint_matrix (RealDenseMatrix& C,
 				      std::vector<unsigned int>& elem_dofs) const
 {
   typedef std::set<unsigned int> RCSet;
@@ -1077,7 +1077,7 @@ void DofMap::build_constraint_matrix (DenseMatrix& C,
       };
       
       // Now we can build the constraint matrix.
-      // Note that resize also zeros for a DenseMatrix.
+      // Note that resize also zeros for a RealDenseMatrix.
       C.resize (elem_dofs.size(), new_elem_dofs.size());
       
       // Create the C constraint matrix.
@@ -1116,7 +1116,7 @@ void DofMap::build_constraint_matrix (DenseMatrix& C,
       // constrained DOF.
       elem_dofs = new_elem_dofs;
       
-      DenseMatrix Cnew;
+      RealDenseMatrix Cnew;
       
       build_constraint_matrix (Cnew, elem_dofs);
 

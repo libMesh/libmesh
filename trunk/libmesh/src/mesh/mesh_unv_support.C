@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.C,v 1.6 2003-01-25 01:42:46 jwpeterson Exp $
+// $Id: mesh_unv_support.C,v 1.7 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -110,7 +110,7 @@ UnvInterface::UnvInterface(std::istream& _in,
   // added for testing bcs import only
 
   // const vector<std::pair<unsigned int,
-  //    std::vector<real> > >&  testvalues = boundary_info.get_boundary_values();
+  //    std::vector<Real> > >&  testvalues = boundary_info.get_boundary_values();
 
   // std::cout << "List of Boundary Values:" << std::endl;
 
@@ -197,7 +197,7 @@ void UnvInterface::scan_dataset(std::string ds_num){
 	}
 
       // Read from file and store readings in data
-      // Then write the data to the virtual file, check, if reals have
+      // Then write the data to the virtual file, check, if Reals have
       // to be converted
       std::string data;                  // Sets of data to be read from file
       int i;                             // used for counting
@@ -459,7 +459,7 @@ void UnvInterface::node_in()
   unsigned long int exp_coord_sys_num,  // export coordinate system number(not supported yet)
                     disp_coord_sys_num, // displacement coordinate system number(not supp. yet)
                     color;              // color(not supported yet)
-  real x,y,z;           // coordinates of the node
+  Real x,y,z;           // coordinates of the node
 
   // allocate the correct amount of memory for the vector
   // that holds the nodes
@@ -708,7 +708,7 @@ void UnvInterface::bcs_in(BoundaryInfo& boundary_info)
                NVALDC,
                dummy_u_int;
 
-  real dummy_real;
+  Real dummy_Real;
 
   temporary_file >> Model_type           // not supported yet
 		 >> Analysis_type        // not supported yet
@@ -725,18 +725,18 @@ void UnvInterface::bcs_in(BoundaryInfo& boundary_info)
   // Record 12 and 13: Real analysis type specific data
   // (not supported yet)
   for(char i=0;i<12;i++){
-    temporary_file >> dummy_real;}
+    temporary_file >> dummy_Real;}
 
   // boundary_values.resize(num_bcs);
 
   unsigned int       bc_node;
-  std::vector<real>  boundary_data;
+  std::vector<Real>  boundary_data;
   // complex data in 3 directions, should be generalized to
   // other formats later (using record 9) 
   boundary_data.resize(6);
 
 
-  // Reading real data
+  // Reading Real data
   for(unsigned int i=0;i<num_bcs;i++){
     temporary_file >> dummy_u_int;
 

@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.6 2003-01-25 05:33:10 jwpeterson Exp $
+// $Id: fe.h,v 1.7 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -47,7 +47,7 @@
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.6 $
+ * \version $Revision: 1.7 $
  */
 
 //-------------------------------------------------------------
@@ -68,7 +68,7 @@ public:
    * element type, and order directly.  This allows the method to
    * be static.
    */
-  static real shape(const ElemType t,
+  static Real shape(const ElemType t,
 		    const Order o,
 		    const unsigned int i,
 		    const Point& p);
@@ -79,7 +79,7 @@ public:
    * element type, and order directly.  This allows the method to
    * be static.
    */
-  static real shape(const Elem* elem,
+  static Real shape(const Elem* elem,
 		    const Order o,
 		    const unsigned int i,
 		    const Point& p);
@@ -89,7 +89,7 @@ public:
    * shape function at point \p p.  This method allows you to
    * specify the dimension, element type, and order directly.
    */
-  static real shape_deriv(const ElemType t,
+  static Real shape_deriv(const ElemType t,
 			  const Order o,
 			  const unsigned int i,
 			  const unsigned int j,
@@ -99,7 +99,7 @@ public:
    * @returns the \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
    * shape functionelement type, and order directly.
    */
-  static real shape_deriv(const Elem* elem,
+  static Real shape_deriv(const Elem* elem,
 			  const Order o,
 			  const unsigned int i,
 			  const unsigned int j,
@@ -110,8 +110,8 @@ public:
    * This is the solution that will be plotted.
    */
   static void nodal_soln(const Elem* elem, const Order o,
-			 const std::vector<number>& elem_soln,
-			 std::vector<number>& nodal_soln);
+			 const std::vector<Complex>& elem_soln,
+			 std::vector<Complex>& nodal_soln);
 
   /**
    * @returns the number of shape functions associated with
@@ -208,7 +208,7 @@ public:
    * Do not use this method for conventional finite elements!
    * Check the infinite element class for details.
    */
-  const std::vector<real>& get_Sobolev_weight() const
+  const std::vector<Real>& get_Sobolev_weight() const
   { std::cout << "ERROR: Do not use this with FE<Dim,T>!" 
 	      << std::endl;
     error();
@@ -299,7 +299,7 @@ private:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.6 $
+ * \version $Revision: 1.7 $
  */
 
 //-------------------------------------------------------------
@@ -324,7 +324,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.6 $
+ * \version $Revision: 1.7 $
  */
 
 //-------------------------------------------------------------
@@ -349,7 +349,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.6 $
+ * \version $Revision: 1.7 $
  */
 
 //-------------------------------------------------------------

@@ -1,4 +1,4 @@
-// $Id: point.C,v 1.5 2003-01-24 17:24:43 jwpeterson Exp $
+// $Id: point.C,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -54,9 +54,9 @@ Point Point::cross(const Point& p) const
 Point Point::unit() const
 {
 
-  const real length = size();
+  const Real length = size();
   
-  assert (length != static_cast<real>(0.));
+  assert (length != static_cast<Real>(0.));
   
 #if DIM == 1
   return Point(coords[0]/length);
@@ -185,7 +185,7 @@ unsigned int Point::key() const
 
   int i,j=2,cnt=0;
   unsigned int index[3];
-  const real deg = 1.e12;
+  const Real deg = 1.e12;
   
   tempx = static_cast<unsigned int>(((*this)(0)*deg));
   tempy = static_cast<unsigned int>(((*this)(1)*deg));

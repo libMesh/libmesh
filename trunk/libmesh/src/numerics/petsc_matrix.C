@@ -1,4 +1,4 @@
-//    $Id: petsc_matrix.C,v 1.6 2003-01-29 20:58:30 benkirk Exp $
+//    $Id: petsc_matrix.C,v 1.7 2003-02-03 03:51:50 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -80,7 +80,7 @@ void PetscMatrix::init (const unsigned int m,
   // create a sequential matrix on one processor
   if ((m_l == m) && (n_l == n))
     {
-      // Create matrix.  Revisit later to do preallocation and make more efficient
+      // Create matrix.  Revisit later to do pReallocation and make more efficient
       ierr = MatCreateSeqAIJ (PETSC_COMM_WORLD, n_global, n_global,
 			      n_nz, PETSC_NULL, &mat);                 CHKERRQ(ierr);
   
@@ -275,38 +275,38 @@ void PetscMatrix::clear ()
 
 
 
-real PetscMatrix::l1_norm () const
+Real PetscMatrix::l1_norm () const
 {
   assert (initialized());
   
   int ierr=0;
   double petsc_value;
-  real value;
+  Real value;
   
   assert (closed());
 
   ierr = MatNorm(mat, NORM_1, &petsc_value); CHKERRQ(ierr);
 
-  value = static_cast<real>(petsc_value);
+  value = static_cast<Real>(petsc_value);
 
   return value;
 };
 
 
 
-real PetscMatrix::linfty_norm () const
+Real PetscMatrix::linfty_norm () const
 {
   assert (initialized());
   
   int ierr=0;
   double petsc_value;
-  real value;
+  Real value;
   
   assert (closed());
 
   ierr = MatNorm(mat, NORM_INFINITY, &petsc_value); CHKERRQ(ierr);
 
-  value = static_cast<real>(petsc_value);
+  value = static_cast<Real>(petsc_value);
 
   return value;
 };

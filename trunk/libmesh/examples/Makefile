@@ -5,6 +5,7 @@ all:: examples
 examples:
 	@$(MAKE) -C ex1 $(MAKECMDGOALS)
 	@$(MAKE) -C ex2 $(MAKECMDGOALS)
+	@$(MAKE) -C ex3 $(MAKECMDGOALS)
 
 
 .PHONY: clean clobber distclean
@@ -14,6 +15,7 @@ examples:
 clean:
 	@$(MAKE) -C ex1 $(MAKECMDGOALS)
 	@$(MAKE) -C ex2 $(MAKECMDGOALS)
+	@$(MAKE) -C ex3 $(MAKECMDGOALS)
 
 
 #
@@ -21,6 +23,7 @@ clean:
 clobber:
 	@$(MAKE) -C ex1 $(MAKECMDGOALS)
 	@$(MAKE) -C ex2 $(MAKECMDGOALS)
+	@$(MAKE) -C ex3 $(MAKECMDGOALS)
 
 #
 # Make the example program directories look
@@ -28,5 +31,6 @@ clobber:
 distclean:
 	@$(MAKE) -C ex1 $(MAKECMDGOALS)
 	@$(MAKE) -C ex2 $(MAKECMDGOALS)
+	@$(MAKE) -C ex3 $(MAKECMDGOALS)
 
 

@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex8.h,v 1.5 2003-01-24 17:24:37 jwpeterson Exp $
+// $Id: cell_inf_hex8.h,v 1.6 2003-02-03 03:51:48 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -122,7 +122,7 @@ private:
    * Matrix that computes new nodal locations/solution values
    * from current nodes/solution.
    */
-  static const real embedding_matrix[4][8][8];
+  static const Real embedding_matrix[4][8][8];
   
   /**
    * Matrix that tells which children share which of

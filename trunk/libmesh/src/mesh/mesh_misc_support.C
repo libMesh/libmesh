@@ -1,4 +1,4 @@
-// $Id: mesh_misc_support.C,v 1.6 2003-01-25 01:42:46 jwpeterson Exp $
+// $Id: mesh_misc_support.C,v 1.7 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -70,7 +70,7 @@ void MeshBase::read_shanee (std::istream &in)
   // however.  So, we read in x,y,z for each node and make a point
   // in the proper way based on what dimension we're in
   {
-    real x=0., y=0., z=0.;
+    Real x=0., y=0., z=0.;
 
     // Reserve space in the nNodes vector to avoid unnecessary
     // allocations
@@ -190,7 +190,7 @@ void MeshBase::read_matlab(std::istream& in)
 
   // Read the nodal coordinates
   {
-    real x=0., y=0., z=0.;
+    Real x=0., y=0., z=0.;
 
     // Resize the nodes vector
     _nodes.resize(nNodes);
@@ -273,7 +273,7 @@ void MeshBase::read_off(std::istream& in)
   _elements.resize(nf);
 
   
-  real x=0., y=0., z=0.;
+  Real x=0., y=0., z=0.;
   
   // Read the nodes
   for (unsigned int n=0; n<nn; n++)

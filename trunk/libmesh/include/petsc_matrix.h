@@ -1,4 +1,4 @@
-//    $Id: petsc_matrix.h,v 1.7 2003-01-29 20:58:29 benkirk Exp $
+//    $Id: petsc_matrix.h,v 1.8 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -35,29 +35,33 @@
 // Local includes
 #include "dof_map.h"
 
-// Forward declarations
-class PetscVector;
 
 
-// Petsc include files
-#ifdef USE_COMPLEX_NUMBERS
-#  define PETSC_USE_COMPLEX 1
-#endif
+/**
+ * Petsc include files.  PETSc with complex numbers 
+ * is actually C++.
+ */
+# ifndef USE_COMPLEX_NUMBERS
 
 namespace Petsc {
 extern "C" {
-#include <petsc.h>
-#include <petscmat.h>
+#include "petscmat.h"
 }
 // for easy switching between Petsc 2.1.0/2.1.1
-//typedef Scalar PetscScalar;
-}
-
+// typedef Scalar PetscScalar;
+} 
 using namespace Petsc;
 
+#else
+
+#include "petscmat.h"
+
+#endif
 
 
 
+// Forward declarations
+class PetscVector;
 class PetscInterface;
 
 
@@ -178,7 +182,7 @@ class PetscMatrix
    * zero values in non-existent fields.
    */
   void set (const unsigned int i, const unsigned int j,
-	    const number value);
+	    const Complex value);
     
   /**
    * Add \p value to the element
@@ -189,7 +193,7 @@ class PetscMatrix
    * non-existent fields.
    */
   void add (const unsigned int i, const unsigned int j,
-	    const number value);
+	    const Complex value);
 
   /**
    * Add the full matrix to the
@@ -198,7 +202,7 @@ class PetscMatrix
    * at assembly time
    */
     
-  void add_matrix (const DenseMatrix &dm,
+  void add_matrix (const ComplexDenseMatrix &dm,
 		   const std::vector<unsigned int> &rows,
 		   const std::vector<unsigned int> &cols);	     
 
@@ -206,7 +210,7 @@ class PetscMatrix
    * Same, but assumes the row and column maps are the same.
    * Thus the matrix \p dm must be square.
    */
-  void add_matrix (const DenseMatrix &dm,
+  void add_matrix (const ComplexDenseMatrix &dm,
 		   const std::vector<unsigned int> &dof_indices);	     
     
   /**
@@ -227,8 +231,8 @@ class PetscMatrix
    * matrix), use the \p el
    * function.
    */
-  number operator () (const unsigned int i,
-		      const unsigned int j) const;
+  Complex operator () (const unsigned int i,
+		       const unsigned int j) const;
 
   /**
    * Return the l1-norm of the matrix, that is
@@ -241,7 +245,7 @@ class PetscMatrix
    * $|Mv|_1\leq |M|_1 |v|_1$.
    * (cf. Haemmerlin-Hoffmann : Numerische Mathematik)
    */
-  real l1_norm () const;
+  Real l1_norm () const;
 
   /**
    * Return the linfty-norm of the
@@ -255,7 +259,7 @@ class PetscMatrix
    * $|Mv|_infty \leq |M|_infty |v|_infty$.
    * (cf. Haemmerlin-Hoffmann : Numerische Mathematik)
    */
-  real linfty_norm () const;
+  Real linfty_norm () const;
 
   /**
    * see if Petsc matrix has been closed
@@ -390,7 +394,7 @@ unsigned int PetscMatrix::row_stop () const
 inline
 void PetscMatrix::set (const unsigned int i,
 		       const unsigned int j,
-		       const number value)
+		       const Complex value)
 {  
   assert (initialized());
   
@@ -409,7 +413,7 @@ void PetscMatrix::set (const unsigned int i,
 inline
 void PetscMatrix::add (const unsigned int i,
 		       const unsigned int j,
-		       const number value)
+		       const Complex value)
 {
   assert (initialized());
   
@@ -425,7 +429,7 @@ void PetscMatrix::add (const unsigned int i,
 
 
 inline
-void PetscMatrix::add_matrix(const DenseMatrix& dm,
+void PetscMatrix::add_matrix(const ComplexDenseMatrix& dm,
 			     const std::vector<unsigned int>& dof_indices)
 {
   add_matrix (dm, dof_indices, dof_indices);
@@ -433,7 +437,7 @@ void PetscMatrix::add_matrix(const DenseMatrix& dm,
 
 
 inline
-void PetscMatrix::add_matrix(const DenseMatrix& dm,
+void PetscMatrix::add_matrix(const ComplexDenseMatrix& dm,
 			     const std::vector<unsigned int>& rows,
 			     const std::vector<unsigned int>& cols)
 		    
@@ -470,13 +474,13 @@ void PetscMatrix::add_matrix(const DenseMatrix& dm,
 
 
 inline
-number PetscMatrix::operator () (const unsigned int i,
-				 const unsigned int j) const
+Complex PetscMatrix::operator () (const unsigned int i,
+				  const unsigned int j) const
 {
   assert (initialized());
   
   PetscScalar *petsc_row;
-  number value=0.;
+  Complex value=0.;
   bool found=false;
   int ierr=0, ncols=0, *petsc_cols,
     i_val=static_cast<int>(i),
@@ -495,7 +499,7 @@ number PetscMatrix::operator () (const unsigned int i,
       {
 	found = true;
 	  
-	value = static_cast<number>(petsc_row[entry]);
+	value = static_cast<Complex>(petsc_row[entry]);
 	  
 	ierr = MatRestoreRow(mat, i_val,
 			     &ncols, &petsc_cols, &petsc_row); CHKERRQ(ierr);

@@ -1,4 +1,4 @@
-// $Id: node.h,v 1.4 2003-01-24 17:24:39 jwpeterson Exp $
+// $Id: node.h,v 1.5 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -43,7 +43,7 @@ class Node;
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.4 $
+ * \version $Revision: 1.5 $
  */
 
 class Node : public Point, public ReferenceCountedObject<Node>
@@ -55,9 +55,9 @@ public:
    * Constructor.  By default sets all entries to 0.  Gives the point 0 in
    * \p DIM dimensions with an \p id of \p Node::invalid_id
    */
-  Node  (const real x,
-	 const real y,
-	 const real z,
+  Node  (const Real x,
+	 const Real y,
+	 const Real z,
 	 const unsigned int id);
 
   /**
@@ -88,9 +88,9 @@ public:
    * Builds a \p Node from specified points and returns a \p Node* to the
    * newly-created object.  Optionally assigned the \p id.
    */
-  static Node* build (const real x,
-		      const real y,
-		      const real z,
+  static Node* build (const Real x,
+		      const Real y,
+		      const Real z,
 		      const unsigned int id);
 
   /**
@@ -129,9 +129,9 @@ private:
 //------------------------------------------------------
 // Inline functions
 inline
-Node::Node (const real x,
-	    const real y,
-	    const real z,
+Node::Node (const Real x,
+	    const Real y,
+	    const Real z,
 	    const unsigned int id) :
   Point(x,y,z),
   _id(id)
@@ -190,9 +190,9 @@ Node* Node::build(const Point& p,
 
 
 inline
-Node* Node::build(const real x,
-		  const real y,
-		  const real z,
+Node* Node::build(const Real x,
+		  const Real y,
+		  const Real z,
 		  const unsigned int id)
 {
   return new Node(x,y,z,id);  

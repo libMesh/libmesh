@@ -1,4 +1,4 @@
-// $Id: equation_systems_io.C,v 1.5 2003-01-24 17:24:40 jwpeterson Exp $
+// $Id: equation_systems_io.C,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -218,8 +218,8 @@ void EquationSystems::read(const std::string& name,
       {
 	SystemData& system  = (*this)(sys);
 	DofMap&     dof_map = system.dof_map; 
-	std::vector<number> global_soln;
-	std::vector<number> reordered_soln;
+	std::vector<Complex> global_soln;
+	std::vector<Complex> reordered_soln;
 	
 	io.data (global_soln);	  
 	
@@ -509,7 +509,7 @@ void EquationSystems::write(const std::string& name,
 	SystemData& system     = pos->second;
 	DofMap&     dof_map    = system.dof_map;
 
-	std::vector<number> global_soln;
+	std::vector<Complex> global_soln;
 	
 	/**
 	 * Collect the global solution on one processor
@@ -534,7 +534,7 @@ void EquationSystems::write(const std::string& name,
 	     * Obviously, a value is only written out if it corresponds
 	     * to a global DOF.  The code should make this clear.
 	     */
-	    std::vector<number> reordered_soln(global_soln.size());
+	    std::vector<Complex> reordered_soln(global_soln.size());
 	  
 	    unsigned int cnt=0;
 

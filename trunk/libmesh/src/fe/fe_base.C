@@ -1,4 +1,4 @@
-// $Id: fe_base.C,v 1.2 2003-01-27 13:13:50 benkirk Exp $
+// $Id: fe_base.C,v 1.3 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -302,13 +302,13 @@ void FEBase::compute_shape_functions(const QBase* qrule)
 
 
 
-bool FEBase::on_reference_element(const Point& p, const ElemType t, const real eps)
+bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real eps)
 {
   assert (eps >= 0.);
   
-  const real xi   = p(0);
-  const real eta  = p(1);
-  const real zeta = p(2);
+  const Real xi   = p(0);
+  const Real eta  = p(1);
+  const Real zeta = p(2);
   
   switch (t)
     {

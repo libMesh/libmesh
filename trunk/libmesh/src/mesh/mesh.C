@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.5 2003-01-24 17:24:44 jwpeterson Exp $
+// $Id: mesh.C,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -188,7 +188,7 @@ void Mesh::write(const std::string& name)
 
 
 void Mesh::write(const std::string& name,
-		 std::vector<number>& v,
+		 std::vector<Complex>& v,
 		 std::vector<std::string>& vn)
 {
   _perf_log.start_event("write()");
@@ -241,7 +241,7 @@ void Mesh::trim_unused_elements(std::set<unsigned int>& unused_elements)
    * Trim the unused elements
    */
   {
-    // We don't really need this in the
+    // We don't Really need this in the
     // current implementation
     unused_elements.clear();
 
