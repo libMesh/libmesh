@@ -1,4 +1,4 @@
-// $Id: mesh_common.h,v 1.10 2003-03-04 15:31:08 benkirk Exp $
+// $Id: mesh_common.h,v 1.11 2003-03-16 20:11:38 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -32,6 +32,8 @@
 // The library configuration options
 #include "mesh_config.h"
 #include "libmesh_base.h"
+
+
 
 
 
@@ -87,6 +89,7 @@ typedef std::complex<double> COMPLEX;
   DIE A HORRIBLE DEATH HERE...
 #endif
 
+  
 
 
 // These are useful macros that behave lilke functions in the code.
@@ -102,10 +105,14 @@ typedef std::complex<double> COMPLEX;
 #define untested() { std::cout << "*** Using untested code: " << __FILE__ << ", line " << __LINE__ << ", compiled on " << __DATE__ << " at " << __TIME__ << " ***" << std::endl; }
 
 
+
+
 // 3D spatial dimension unless otherwise specified
 #ifndef DIM
 #  define DIM 3
 #endif
+
+
 
 // Define a tolerance.  This is what should be considered "good enough"
 // when doing floating point comparisons.  For example, v == 0 is
@@ -121,13 +128,19 @@ typedef std::complex<double> COMPLEX;
 // is disabled.
 #ifdef ENABLE_PERFORMANCE_LOGGING
 
-#define START_LOG(a,b)  { libMesh::log.start_event(a,b); }
-#define STOP_LOG(a,b)   { libMesh::log.stop_event(a,b); }
+// Note the log is in libMesh, so we need to include it.
+#  include "libmesh.h"
+#  define START_LOG(a,b)   { libMesh::log.start_event(a,b); }
+#  define STOP_LOG(a,b)    { libMesh::log.stop_event(a,b); }
+#  define PAUSE_LOG(a,b)   { libMesh::log.pause_event(a,b); }
+#  define RESTART_LOG(a,b) { libMesh::log.restart_event(a,b); }
 
 #else
 
-#define START_LOG(a,b) {}
-#define STOP_LOG(a,b)  {}
+#  define START_LOG(a,b)   {}
+#  define STOP_LOG(a,b)    {}
+#  define PAUSE_LOG(a,b)   {}
+#  define RESTART_LOG(a,b) {}
 
 #endif
 
