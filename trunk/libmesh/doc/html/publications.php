@@ -19,6 +19,8 @@
 
   <li>Web Links</li>
   
+  <a href="howto/howto.pdf">HOWTO</a><br>
+  XDA file <a href="xda_format/xda_format.pdf">description</a><br>
   <a href="http://www.tacc.utexas.edu/general/press/announcements/20040112_01.php">TACC</a> press release.<br>
 </ul>
 </div>
