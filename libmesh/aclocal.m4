@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.66 2004-09-21 22:38:58 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.67 2004-09-22 18:42:58 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -235,8 +235,7 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
     dnl - egcs1.1 yielded incorrect code with some loop unrolling
     dnl - after egcs1.1, the optimization flag -fstrict-aliasing was
     dnl   introduced, which enables better optimizations for
-    dnl   well-written C++ code. we believe that deal.II falls into that
-    dnl   category and thus enable the flag 
+    dnl   well-written C++ code. (Your code *is* well-written, right?) 
     dnl - egcs1.1 yielded incorrect code with vtable-thunks. thus disable
     dnl   them for egcs1.1. however, if on Linux, disabling them
     dnl   prevents programs from being linked, so take the risk of broken

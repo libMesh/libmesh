@@ -1,4 +1,4 @@
-// $Id: petsc_interface.h,v 1.4 2004-08-20 14:01:39 jwpeterson Exp $
+// $Id: petsc_interface.h,v 1.5 2004-09-22 18:43:01 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -56,10 +56,11 @@ extern "C" {
 
 
 /**
- * This class provides a deal.II interface to the Petsc
- * iterative solver library.
+ * This class provides an interface to PETSc
+ * iterative solvers that is compatible with the \p libMesh
+ * \p LinearSolverInterface<>
  *
- * @author Benjamin Kirk, 2002
+ * @author Benjamin Kirk, 2002-2004
  */
 
 template <typename T>
