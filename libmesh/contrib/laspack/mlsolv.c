@@ -23,7 +23,7 @@
 #include "rtc.h"
 #include "copyrght.h"
 
-Vector *MGStep(int NoLevels, QMatrix *A, Vector *x, Vector *b,
+QVector *MGStep(int NoLevels, QMatrix *A, QVector *x, QVector *b,
             Matrix *R, Matrix *P, int Level, int Gamma,
             IterProcType SmoothProc, int Nu1, int Nu2, 
 	    PrecondProcType PrecondProc, double Omega,
@@ -61,7 +61,7 @@ Vector *MGStep(int NoLevels, QMatrix *A, Vector *x, Vector *b,
     return(&x[Level]);
 }
 
-Vector *MGIter(int NoLevels, QMatrix *A, Vector *x, Vector *b,
+QVector *MGIter(int NoLevels, QMatrix *A, QVector *x, QVector *b,
 	    Matrix *R, Matrix *P, int MaxIter, int Gamma,
             IterProcType SmoothProc, int Nu1, int Nu2, 
 	    PrecondProcType PrecondProc, double Omega,
@@ -72,7 +72,7 @@ Vector *MGIter(int NoLevels, QMatrix *A, Vector *x, Vector *b,
     int Iter;
     double bNorm;
     size_t Dim;
-    Vector r;
+    QVector r;
 
     Dim = Q_GetDim(&A[NoLevels - 1]);
     V_Constr(&r, "r", Dim, Normal, True);
@@ -100,7 +100,7 @@ Vector *MGIter(int NoLevels, QMatrix *A, Vector *x, Vector *b,
     return(&x[NoLevels - 1]);
 }
 
-Vector *NestedMGIter(int NoLevels, QMatrix *A, Vector *x, Vector *b,
+QVector *NestedMGIter(int NoLevels, QMatrix *A, QVector *x, QVector *b,
 	    Matrix *R, Matrix *P, int Gamma,
             IterProcType SmoothProc, int Nu1, int Nu2, 
 	    PrecondProcType PrecondProc, double Omega,
@@ -137,7 +137,7 @@ Vector *NestedMGIter(int NoLevels, QMatrix *A, Vector *x, Vector *b,
     return(&x[NoLevels - 1]);
 }
 
-Vector *MGPCGIter(int NoLevels, QMatrix *A, Vector *z, Vector *r,
+QVector *MGPCGIter(int NoLevels, QMatrix *A, QVector *z, QVector *r,
 		   Matrix *R, Matrix *P, int MaxIter, int NoMGIter, int Gamma,
                    IterProcType SmoothProc, int Nu1, int Nu2, 
 		   PrecondProcType PrecondProc, double Omega,
@@ -148,7 +148,7 @@ Vector *MGPCGIter(int NoLevels, QMatrix *A, Vector *z, Vector *r,
     double Alpha, Beta, Rho, RhoOld = 0.0;
     double bNorm;
     size_t Dim;
-    Vector x, p, q, b;
+    QVector x, p, q, b;
 
     Dim = Q_GetDim(&A[NoLevels - 1]);
     V_Constr(&x, "x", Dim, Normal, True);
@@ -201,7 +201,7 @@ Vector *MGPCGIter(int NoLevels, QMatrix *A, Vector *z, Vector *r,
     return(&z[NoLevels - 1]);
 }
 
-Vector *BPXPrecond(int NoLevels, QMatrix *A, Vector *y, Vector *c,
+QVector *BPXPrecond(int NoLevels, QMatrix *A, QVector *y, QVector *c,
             Matrix *R, Matrix *P, int Level, 
             IterProcType SmoothProc, int Nu, 
             PrecondProcType PrecondProc, double Omega,
@@ -232,7 +232,7 @@ Vector *BPXPrecond(int NoLevels, QMatrix *A, Vector *y, Vector *c,
     return(&y[Level]);
 }
 
-Vector *BPXPCGIter(int NoLevels, QMatrix *A, Vector *z, Vector *r,
+QVector *BPXPCGIter(int NoLevels, QMatrix *A, QVector *z, QVector *r,
 		   Matrix *R, Matrix *P, int MaxIter,
                    IterProcType SmoothProc, int Nu, 
 		   PrecondProcType PrecondProc, double Omega,
@@ -244,7 +244,7 @@ Vector *BPXPCGIter(int NoLevels, QMatrix *A, Vector *z, Vector *r,
     double Alpha, Beta, Rho, RhoOld = 0.0;
     double bNorm;
     size_t Dim;
-    Vector x, p, q, b;
+    QVector x, p, q, b;
 
     Dim = Q_GetDim(&A[NoLevels - 1]);
     V_Constr(&x, "x", Dim, Normal, True);

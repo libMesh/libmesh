@@ -51,7 +51,7 @@ HDRS		= copyrght.h \
 		precond.h \
 		qmatrix.h \
 		rtc.h \
-		vector.h \
+		qvector.h \
 		version.h
 
 EXTHDRS		=

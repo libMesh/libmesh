@@ -60,7 +60,6 @@ Example%:
 	@echo "----------------------------------------------"
 	@echo ""
 
-
 #
 # Run the example programs to see if shared lib's get properly loaded
 run: $(wildcard examples/ex?/ex?.C)
@@ -75,9 +74,5 @@ run: $(wildcard examples/ex?/ex?.C)
 	@$(MAKE) -C ex5 $(MAKECMDGOALS)
 	@$(MAKE) Example5
 	@$(MAKE) -C ex7 $(MAKECMDGOALS)
-	@echo ""
-	@echo "----------------------------------------------"
-	@echo "--------- Finished running Example7. ---------
-	@echo "----------------------------------------------"
-	@echo ""
+	@$(MAKE) Example7
 

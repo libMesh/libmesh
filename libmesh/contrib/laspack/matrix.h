@@ -16,6 +16,11 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+  
 #include <stdlib.h>
 
 #include "lastypes.h"
@@ -69,5 +74,9 @@ void M_SortEl(Matrix *M);
 
 void M_Lock(Matrix *M);
 void M_Unlock(Matrix *M);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* MATRIX_H */

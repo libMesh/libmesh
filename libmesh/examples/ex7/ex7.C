@@ -1,4 +1,4 @@
-// $Id: ex7.C,v 1.3 2003-02-07 18:07:44 ddreyer Exp $
+// $Id: ex7.C,v 1.4 2003-02-10 03:55:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -30,6 +30,7 @@
 /**
  * Basic include file needed for the mesh functionality.
  */
+#include "mesh_init.h"
 #include "mesh.h"
 #include "system_data.h"
 #include "equation_systems.h"
@@ -96,13 +97,9 @@ const Real rho = 1.;
 
 
 /**
- * When we have PETSc, use their pi.  If not, define our own.
+ * Define pi.
  */
-#ifdef HAVE_PETSC
-const Real libmesh_pi = PETSC_PI;
-#else
-const Real libmesh_pi = 3.141592653589793;
-#endif
+const Real libmesh_pi = acos(-1.);
 
 
 /**
@@ -131,16 +128,7 @@ int main (int argc, char** argv)
   /**
    * Initialize Petsc, like in example 2.
    */
-#ifdef HAVE_PETSC
-  
-  const bool have_petsc = true;
-  PetscInitialize (&argc, &argv, NULL, NULL);
-  
-#else
-  
-  const bool have_petsc = false;
-  
-#endif
+  libMesh::init (argc, argv);
 
   /**
    * This example is designed for complex numbers.
@@ -229,7 +217,7 @@ int main (int argc, char** argv)
     /**
      * Create an equation systems object.
      */
-    EquationSystems equation_systems (mesh, have_petsc);
+    EquationSystems equation_systems (mesh);
     
     /**
      * Declare the system and its variables.
@@ -283,12 +271,7 @@ int main (int argc, char** argv)
   };
 
 
-#ifdef HAVE_PETSC
-
-  PetscFinalize();
-  
-#endif
-
+  libMesh::close ();
   
   /**
    * All done.  

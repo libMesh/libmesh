@@ -1,4 +1,4 @@
-// $Id: petsc_interface.h,v 1.7 2003-02-10 03:55:51 benkirk Exp $
+// $Id: laspack_interface.h,v 1.1 2003-02-10 03:55:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -19,66 +19,50 @@
 
 
 
-#ifndef __petsc_interface_h__
-#define __petsc_interface_h__
+#ifndef __laspack_interface_h__
+#define __laspack_interface_h__
 
 #include "mesh_common.h"
 
-#ifdef HAVE_PETSC
+#if defined(HAVE_LASPACK) && !defined(USE_COMPLEX_NUMBERS)
 
 
 // C++ includes
 
-
 // Local includes
 #include "solver_interface.h"
-#include "petsc_vector.h"
-#include "petsc_matrix.h"
+#include "laspack_vector.h"
+#include "laspack_matrix.h"
 
 
-/**
- * Petsc include files.  PETSc with complex numbers 
- * is actually C++.
- */
-# ifndef USE_COMPLEX_NUMBERS
-
-namespace Petsc {
-extern "C" {
-#include <petscsles.h>
+namespace Laspack {
+#include <itersolv.h>
+#include <rtc.h>
+#include <errhandl.h>
 }
-// for easy switching between Petsc 2.1.0/2.1.1
-// typedef Scalar PetscScalar;
-} 
-using namespace Petsc;
-
-#else
-
-#include <petscsles.h>
-
-#endif
 
 
 
 
 /**
- * This class provides a deal.II interface to the Petsc
+ * This class provides a deal.II interface to the Laspack
  * iterative solver library.
  *
  * @author Benjamin Kirk, 2002
  */
 
-class PetscInterface : public SolverInterface
+class LaspackInterface : public SolverInterface
 {
  public:
   /**
-   *  Constructor. Initializes Petsc data structures
+   *  Constructor. Initializes Laspack data structures
    */
-  PetscInterface ();
+  LaspackInterface ();
     
   /**
    * Destructor.
    */
-  ~PetscInterface ();
+  ~LaspackInterface ();
   
   /**
    * Release all memory and clear data structures.
@@ -90,9 +74,11 @@ class PetscInterface : public SolverInterface
    */
   void init ();
   
+
   /**
-   * Call the Petsc solver
-   */    
+   * Call the Laspack solver
+   */
+    
   std::pair<unsigned int, Real> 
     solve (SparseMatrix &matrix,
 	   NumericVector &solution,
@@ -101,51 +87,35 @@ class PetscInterface : public SolverInterface
 	   const unsigned int m_its);
    
  private:
-
+  
   /**
-   * Tells PETSC to use the user-specified solver stored in
-   * \p _solver_type
-   */
-  void set_petsc_solver_type ();
-
-  /**
-   * Tells PETSC to use the user-specified preconditioner stored in
+   * Tells LASPACK to use the user-specified preconditioner stored in
    * \p _preconditioner_type
    */
-  void set_petsc_preconditioner_type ();
+  void set_laspack_preconditioner_type ();
 
   /**
-   * Linear solver context
+   * Preconditioner type
    */
-  SLES _sles;
-    
-  /**
-   * Preconditioner context
-   */
-  PC _pc; 
-
-  /**
-   * Krylov subspace context
-   */
-  KSP _ksp;
+  Laspack::PrecondProcType _precond_type;
 };
 
 
 /*----------------------- functions ----------------------------------*/
 inline
-PetscInterface::PetscInterface ()
+LaspackInterface::LaspackInterface () :
+  _precond_type (Laspack::ILUPrecond)
 {
 };
 
 
 
 inline
-PetscInterface::~PetscInterface ()
+LaspackInterface::~LaspackInterface ()
 {
   clear ();
 };
 
 
-
-#endif
-#endif
+#endif // #ifdef HAVE_LASPACK
+#endif // #ifndef __laspack_interface_h__

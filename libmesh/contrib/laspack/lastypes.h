@@ -16,6 +16,11 @@
 #ifndef LASTYPES_H
 #define LASTYPES_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+  
 #include "copyrght.h"
 
 #ifndef BOOLEAN
@@ -37,5 +42,9 @@ typedef enum {
     Normal,
     Tempor
 } InstanceType;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* LASTYPES_H */

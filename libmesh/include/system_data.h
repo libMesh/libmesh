@@ -1,4 +1,4 @@
-// $Id: system_data.h,v 1.9 2003-02-10 01:23:12 ddreyer Exp $
+// $Id: system_data.h,v 1.10 2003-02-10 03:55:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -32,15 +32,13 @@
 #include "fe_type.h"
 #include "petsc_interface.h"
 #include "equation_systems.h"
-#include "enum_system_type.h"
+#include "reference_counted_object.h"
+
 
 // Forward Declarations
+class SystemBase;
 
-// For backward compatibility, provide this; didn't work with typedef
 #define SystemData GeneralSystem
-//typedef GeneralSystem SystemData;
-
-
 
 /**
  * This is the purely virtual base class for classes which contain 
@@ -55,8 +53,7 @@
 
 // ------------------------------------------------------------
 // SystemBase class definition
-
-class SystemBase
+class SystemBase : public ReferenceCountedObject<SystemBase>
 {
 protected:
 
@@ -730,6 +727,7 @@ GeneralSystem::GeneralSystem (EquationSystems& es,
 inline
 GeneralSystem::~GeneralSystem ()
 {
+  clear ();
 };
 
 

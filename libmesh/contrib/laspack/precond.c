@@ -23,7 +23,7 @@
 #include "itersolv.h"
 #include "copyrght.h"
 
-Vector *JacobiPrecond(QMatrix *A, Vector *y, Vector *c, double Omega)
+QVector *JacobiPrecond(QMatrix *A, QVector *y, QVector *c, double Omega)
 /* Jacobi preconditioner */
 {
     Q_Lock(A);
@@ -45,7 +45,7 @@ Vector *JacobiPrecond(QMatrix *A, Vector *y, Vector *c, double Omega)
     return(y);
 }
 
-Vector *SSORPrecond(QMatrix *A, Vector *y, Vector *c, double Omega)
+QVector *SSORPrecond(QMatrix *A, QVector *y, QVector *c, double Omega)
 /* SSOR preconditioner */
 {
     Q_Lock(A);
@@ -72,7 +72,7 @@ Vector *SSORPrecond(QMatrix *A, Vector *y, Vector *c, double Omega)
     return(y);
 }
 
-Vector *ILUPrecond(QMatrix *A, Vector *y, Vector *c, double Omega)
+QVector *ILUPrecond(QMatrix *A, QVector *y, QVector *c, double Omega)
 /* incomplete factorization preconditioner */
 {
     Q_Lock(A);

@@ -1,4 +1,4 @@
-//    $Id: petsc_matrix.h,v 1.10 2003-02-09 22:47:17 ddreyer Exp $
+//    $Id: petsc_matrix.h,v 1.11 2003-02-10 03:55:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -117,7 +117,7 @@ class PetscMatrix : public SparseMatrix
   /**
    * Initialize using sparsity structure computed by \p dof_map.
    */   
-  void init (const DofMap& dof_map);
+  void init ();
   
   /**
    * Release all memory and return
@@ -256,11 +256,6 @@ class PetscMatrix : public SparseMatrix
    * and fully assembled yet
    */
   bool closed() const;
-
-  /**
-   * Print the contents of the matrix to the screen.
-   */
-  void print() const;
   
   /**
    * Print the contents of the matrix in Matlab's
@@ -522,46 +517,6 @@ bool PetscMatrix::closed() const
     return true;
 
   return false;
-};
-
-
-
-
-inline
-void PetscMatrix::print() const
-{
-  assert (initialized());
-
-#ifndef USE_COMPLEX_NUMBERS
-
-  for (unsigned int i=0; i<m(); i++)
-    {
-      for (unsigned int j=0; j<n(); j++)
-	std::cout << std::setw(8) << (*this)(i,j) << " ";
-      std::cout << std::endl;
-    }
-
-#else
-  // std::complex<>::operator<<() is defined, but use this form
-
-  std::cout << "Real part:" << std::endl;
-  for (unsigned int i=0; i<m(); i++)
-    {
-      for (unsigned int j=0; j<n(); j++)
-	std::cout << std::setw(8) << (*this)(i,j).real() << " ";
-      std::cout << std::endl;
-    }
-
-  std::cout << std::endl << "Imaginary part:" << std::endl;
-  for (unsigned int i=0; i<m(); i++)
-    {
-      for (unsigned int j=0; j<n(); j++)
-	std::cout << std::setw(8) << (*this)(i,j).imag() << " ";
-      std::cout << std::endl;
-    }
-
-#endif
-
 };
 
 

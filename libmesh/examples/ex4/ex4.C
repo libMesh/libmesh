@@ -1,4 +1,4 @@
-// $Id: ex4.C,v 1.5 2003-02-07 18:07:43 ddreyer Exp $
+// $Id: ex4.C,v 1.6 2003-02-10 03:55:50 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -30,6 +30,7 @@
 /**
  * Basic include file needed for the mesh functionality.
  */
+#include "mesh_init.h"
 #include "mesh.h"
 #include "system_data.h"
 #include "equation_systems.h"
@@ -97,17 +98,8 @@ int main (int argc, char** argv)
   /**
    * Initialize Petsc, like in example 2.
    */
-#ifdef HAVE_PETSC
+  libMesh::init (argc, argv);
   
-  const bool have_petsc = true;
-  PetscInitialize (&argc, &argv, NULL, NULL);
-  
-#else
-  
-  const bool have_petsc = false;
-  
-#endif
-
   /**
    * This example is designed for real numbers only.
    */
@@ -190,7 +182,7 @@ int main (int argc, char** argv)
     /**
      * Create an equation systems object.
      */
-    EquationSystems equation_systems (mesh, have_petsc);
+    EquationSystems equation_systems (mesh);
     
     /**
      * Declare the system and its variables.
@@ -235,15 +227,12 @@ int main (int argc, char** argv)
      * After solving the system write the solution
      * to a GMV-formatted plot file.
      */
-    mesh.write_gmv ("out.gmv", equation_systems);
+    mesh.write_gmv ((dim == 3) ? "out_3.gmv" : "out_2.gmv",
+		    equation_systems);
   };
 
 
-#ifdef HAVE_PETSC
-
-  PetscFinalize();
-  
-#endif
+  libMesh::close ();
 
   
   /**

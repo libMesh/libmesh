@@ -16,17 +16,26 @@
 #ifndef PRECOND_H
 #define PRECOND_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+  
 #include "lastypes.h"
-#include "vector.h"
+#include "qvector.h"
 #include "qmatrix.h"
 #include "copyrght.h"
 
-typedef Vector *(*PrecondProcType)(QMatrix *, Vector *, Vector *, double);
+typedef QVector *(*PrecondProcType)(QMatrix *, QVector *, QVector *, double);
 
 /* declaration of preconditioners */
 
-Vector *JacobiPrecond(QMatrix *A, Vector *y, Vector *c, double Omega);
-Vector *SSORPrecond(QMatrix *A, Vector *y, Vector *c, double Omega);
-Vector *ILUPrecond(QMatrix *A, Vector *y, Vector *c, double Omega);
+QVector *JacobiPrecond(QMatrix *A, QVector *y, QVector *c, double Omega);
+QVector *SSORPrecond(QMatrix *A, QVector *y, QVector *c, double Omega);
+QVector *ILUPrecond(QMatrix *A, QVector *y, QVector *c, double Omega);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* PRECOND_H */

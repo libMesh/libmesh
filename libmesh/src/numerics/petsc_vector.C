@@ -1,4 +1,4 @@
-//    $Id: petsc_vector.C,v 1.6 2003-02-03 03:51:50 ddreyer Exp $
+// $Id: petsc_vector.C,v 1.7 2003-02-10 03:55:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -34,34 +34,20 @@
 
 
 
-/*
-PetscVector::PetscVector (const PetscVector& v) :
-  is_closed(false),
-  initialized(false)
-{
-  error();
-  int ierr=0;
+// void PetscVector::init (const NumericVector& v, const bool fast)
+// {
+//   error();
   
-  ierr = VecDuplicate(v.vec, &vec); CHKERRQ(ierr);
+//   init (v.local_size(), v.size(), fast);
 
-  ierr = VecCopy(v.vec, vec); CHKERRQ(ierr);
-};
-*/
-
-
-
-void PetscVector::init (const PetscVector& v, const bool fast)
-{
-  init (v.local_size(), v.size(), fast);
-
-  vec = v.vec;
-};
+//   vec = reinterpret_cast<const PetscVector&>(v).vec;
+// };
 
 
 
 Real PetscVector::l1_norm () const
 {
-  assert(is_closed);
+  assert(closed());
   
   int ierr=0;
   double value=0.;
@@ -75,7 +61,7 @@ Real PetscVector::l1_norm () const
 
 Real PetscVector::l2_norm () const
 {
-  assert(is_closed);
+  assert(closed());
   
   int ierr=0;
   double value=0.;
@@ -90,7 +76,7 @@ Real PetscVector::l2_norm () const
 
 Real PetscVector::linfty_norm () const
 {
-  assert(is_closed);
+  assert(closed());
   
   int ierr=0;
   double value=0.;
@@ -103,9 +89,9 @@ Real PetscVector::linfty_norm () const
 
 
 
-PetscVector& PetscVector::operator += (const PetscVector& v)
+NumericVector& PetscVector::operator += (const NumericVector& v)
 {
-  assert(is_closed);
+  assert(closed());
   
   add(1., v);
   
@@ -115,9 +101,9 @@ PetscVector& PetscVector::operator += (const PetscVector& v)
 
 
 
-PetscVector& PetscVector::operator -= (const PetscVector& v)
+NumericVector& PetscVector::operator -= (const NumericVector& v)
 {
-  assert(is_closed);
+  assert(closed());
   
   add(-1., v);
   
@@ -171,8 +157,8 @@ void PetscVector::add_vector (const std::vector<Complex>& v,
 
 
 
-void PetscVector::add_petsc_vector (const PetscVector& V,
-				    const std::vector<unsigned int>& dof_indices)
+void PetscVector::add_vector (const NumericVector& V,
+			      const std::vector<unsigned int>& dof_indices)
 {
   assert (V.size() == dof_indices.size());
 
@@ -199,18 +185,19 @@ void PetscVector::add (const Complex v)
 
 
 
-void PetscVector::add (const PetscVector& v)
+void PetscVector::add (const NumericVector& v)
 {
   add (1., v);
 };
 
 
 
-
-void PetscVector::add (const Complex a, const PetscVector& v)
+void PetscVector::add (const Complex a, const NumericVector& v_in)
 {
   int ierr=0;
   PetscScalar petsc_a=static_cast<PetscScalar>(a);
+
+  const PetscVector& v = reinterpret_cast<const PetscVector&>(v_in);
   
   assert(size() == v.size());
   
@@ -229,7 +216,7 @@ void PetscVector::scale (const Complex factor)
 
 
 
-PetscVector& 
+NumericVector& 
 PetscVector::operator = (const Complex s)
 {
   int ierr=0;
@@ -245,10 +232,12 @@ PetscVector::operator = (const Complex s)
 
 
 
-PetscVector&
-PetscVector::operator = (const PetscVector& v)
+NumericVector&
+PetscVector::operator = (const NumericVector& v_in)
 {
   int ierr=0;
+  
+  const PetscVector& v = reinterpret_cast<const PetscVector&>(v_in);
 
   assert (size() == v.size());
 
@@ -262,7 +251,7 @@ PetscVector::operator = (const PetscVector& v)
 
 
 
-PetscVector&
+NumericVector&
 PetscVector::operator = (const std::vector<Complex>& v)
 {
   const unsigned int nl   = local_size();
@@ -305,12 +294,13 @@ PetscVector::operator = (const std::vector<Complex>& v)
 
 
 
-void PetscVector::localize (PetscVector& v_local) const
+void PetscVector::localize (NumericVector& v_local_in) const
 
 {
+  const PetscVector& v_local = reinterpret_cast<const PetscVector&>(v_local_in);
+
   assert (v_local.local_size() == size());
 
-  
   int ierr=0;
   const int n  = size();
 
@@ -340,9 +330,11 @@ void PetscVector::localize (PetscVector& v_local) const
 
 
 
-void PetscVector::localize (PetscVector& v_local,
+void PetscVector::localize (NumericVector& v_local_in,
 			    const std::vector<unsigned int>& send_list) const
 {
+  const PetscVector& v_local = reinterpret_cast<const PetscVector&>(v_local_in);
+
   assert (v_local.local_size() == size());
   assert (send_list.size() <= v_local.size());
   
@@ -471,7 +463,6 @@ endif
 
 void PetscVector::localize_to_one (std::vector<Complex>& v_local,
 				   const unsigned int pid) const
-
 {
   int ierr=0, proc_id=static_cast<int>(pid);
   const int n  = size();

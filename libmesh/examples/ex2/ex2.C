@@ -1,4 +1,4 @@
-// $Id: ex2.C,v 1.2 2003-01-31 21:22:10 benkirk Exp $
+// $Id: ex2.C,v 1.3 2003-02-10 03:55:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -28,6 +28,7 @@
 /**
  * Basic include file needed for the mesh functionality.
  */
+#include "mesh_init.h"
 #include "mesh.h"
 
 /**
@@ -77,16 +78,7 @@ int main (int argc, char** argv)
    * communications library on your system if you haven't already
    * done so.
    */
-#ifdef HAVE_PETSC
-  
-  const bool have_petsc = true;
-  PetscInitialize (&argc, &argv, NULL, NULL);
-  
-#else
-  
-  const bool have_petsc = false;
-  
-#endif
+  libMesh::init (argc, argv);
 
 
   /**
@@ -136,7 +128,7 @@ int main (int argc, char** argv)
      * The EquationSystems object needs a reference to the mesh
      * object, so the order of construction here is important.
      */
-    EquationSystems equation_systems (mesh, have_petsc);
+    EquationSystems equation_systems (mesh);
     
     /**
      * Declare the system and its variables.
@@ -222,12 +214,7 @@ int main (int argc, char** argv)
    * Call PetscFinalize() to allow Petsc to clean up after
    * itself.
    */  
-#ifdef HAVE_PETSC
-
-  PetscFinalize();
-  
-#endif
-
+  libMesh::close();
   
   /**
    * All done.  

@@ -1,5 +1,7 @@
-Changed #include "laspack/*" to #include "*"
-
+1.) Changed #include "laspack/*" to #include "*"
+2.) Moved vector.{c,h} to qvector.{c,h} to work with C++.
+3.) Renamed Vector QVector.
+4.) Added extern "C" to all header files
 
 Benjamin S. Kirk
 Fri Feb  7 10:51:37 CST 2003

@@ -4,4 +4,4 @@
 *.pgo
 *.syo
 ex4
-out.gmv
+out_*.gmv

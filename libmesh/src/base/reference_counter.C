@@ -1,4 +1,4 @@
-// $Id: reference_counter.C,v 1.4 2003-01-24 17:24:40 jwpeterson Exp $
+// $Id: reference_counter.C,v 1.5 2003-02-10 03:55:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -47,9 +47,9 @@ std::string ReferenceCounter::get_info ()
 #if defined(ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
 
   out << std::endl
-      << " -------------------------------------------------"  << std::endl
-      << "| Reference count information                     |" << std::endl
-      << " -------------------------------------------------"  << std::endl;
+      << " ---------------------------------------------------------------------- "  << std::endl
+      << "| Reference count information                                          |" << std::endl
+      << " ---------------------------------------------------------------------- "  << std::endl;
   
   for (Counts::iterator it = _counts.begin();
        it != _counts.end(); ++it)
@@ -58,16 +58,17 @@ std::string ReferenceCounter::get_info ()
       const unsigned int creations    = it->second.first;
       const unsigned int destructions = it->second.second;
 
-      out << name
+      out << "| "
+	  << name
 	  << " class reference count information:"
 	  << std::endl
-	  << " Creations:    " << creations
+	  << "| Creations:    " << creations
 	  << std::endl
-	  << " Destructions: " << destructions
+	  << "| Destructions: " << destructions
 	  << std::endl;
 
       if (creations != destructions)
-	out << " WARNING: class "
+	out << "| WARNING: class "
 	    << name << " "
 	    << creations - destructions
 	    << " items leaked!"
@@ -75,7 +76,7 @@ std::string ReferenceCounter::get_info ()
       
     };
   
-  out << " -------------------------------------------------"  << std::endl;
+  out << " ---------------------------------------------------------------------- "  << std::endl;
 
 #endif
 
