@@ -1,4 +1,4 @@
-// $Id: cell_pyramid5.C,v 1.12 2004-07-14 19:23:18 jwpeterson Exp $
+// $Id: cell_pyramid5.C,v 1.13 2005-01-28 19:14:18 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -21,10 +21,24 @@
 // C++ includes
 
 // Local includes
+#include "side.h"
 #include "cell_pyramid5.h"
 #include "face_tri3.h"
 #include "face_quad4.h"
 
+
+
+
+// ------------------------------------------------------------
+// Pyramid5 class static member initializations
+const unsigned int Pyramid5::side_nodes_map[5][4] =
+{
+  {0, 1, 4, 99}, // Side 0
+  {1, 2, 4, 99}, // Side 1
+  {2, 3, 4, 99}, // Side 2
+  {3, 0, 4, 99}, // Side 3
+  {0, 3, 2,  1}  // Side 4
+};
 
 
 
@@ -40,54 +54,54 @@ AutoPtr<Elem> Pyramid5::build_side (const unsigned int i) const
     {
     case 0:  // triangular face 1
       {
-	Tri3* face = new Tri3;
+	AutoPtr<Elem> face(new Side<Tri3,Pyramid5>(this,i));
 
-	face->set_node(0) = this->get_node(0);
-	face->set_node(1) = this->get_node(1);
-	face->set_node(2) = this->get_node(4);
-	
-	AutoPtr<Elem> ap(face);  return ap;
+// 	face->set_node(0) = this->get_node(0);
+// 	face->set_node(1) = this->get_node(1);
+// 	face->set_node(2) = this->get_node(4);
+
+	return face;
       }
     case 1:  // triangular face 2
       {
-	Tri3* face = new Tri3;
+	AutoPtr<Elem> face(new Side<Tri3,Pyramid5>(this,i));
 
-	face->set_node(0) = this->get_node(1);
-	face->set_node(1) = this->get_node(2);
-	face->set_node(2) = this->get_node(4);
-	
-	AutoPtr<Elem> ap(face);  return ap;
+// 	face->set_node(0) = this->get_node(1);
+// 	face->set_node(1) = this->get_node(2);
+// 	face->set_node(2) = this->get_node(4);
+
+	return face;
       }
     case 2:  // triangular face 3
       {
-	Tri3* face = new Tri3;
+	AutoPtr<Elem> face(new Side<Tri3,Pyramid5>(this,i));
 
-	face->set_node(0) = this->get_node(2);
-	face->set_node(1) = this->get_node(3);
-	face->set_node(2) = this->get_node(4);
-	
-	AutoPtr<Elem> ap(face);  return ap;
+// 	face->set_node(0) = this->get_node(2);
+// 	face->set_node(1) = this->get_node(3);
+// 	face->set_node(2) = this->get_node(4);
+
+	return face;
       }
     case 3:  // triangular face 4
       {
-	Tri3* face = new Tri3;
+	AutoPtr<Elem> face(new Side<Tri3,Pyramid5>(this,i));
 
-	face->set_node(0) = this->get_node(3);
-	face->set_node(1) = this->get_node(0);
-	face->set_node(2) = this->get_node(4);
-	
-	AutoPtr<Elem> ap(face);  return ap;
+// 	face->set_node(0) = this->get_node(3);
+// 	face->set_node(1) = this->get_node(0);
+// 	face->set_node(2) = this->get_node(4);
+
+	return face;
       }
     case 4:  // the quad face at z=0
       {
-	Quad4* face = new Quad4;
-	
-	face->set_node(0) = this->get_node(0);
-	face->set_node(1) = this->get_node(3);
-	face->set_node(2) = this->get_node(2);
-	face->set_node(3) = this->get_node(1);
+	AutoPtr<Elem> face(new Side<Quad4,Pyramid5>(this,i));
 
-	AutoPtr<Elem> ap(face);  return ap;
+// 	face->set_node(0) = this->get_node(0);
+// 	face->set_node(1) = this->get_node(3);
+// 	face->set_node(2) = this->get_node(2);
+// 	face->set_node(3) = this->get_node(1);
+
+	return face;
       }
     default:
       {

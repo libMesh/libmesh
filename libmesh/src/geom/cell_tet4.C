@@ -1,4 +1,4 @@
-// $Id: cell_tet4.C,v 1.16 2004-07-14 19:23:18 jwpeterson Exp $
+// $Id: cell_tet4.C,v 1.17 2005-01-28 19:14:18 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -21,9 +21,21 @@
 // C++ includes
 
 // Local includes
+#include "side.h"
 #include "cell_tet4.h"
 #include "face_tri3.h"
 
+
+
+// ------------------------------------------------------------
+// Tet4 class static member initializations
+const unsigned int Tet4::side_nodes_map[4][3] =
+{
+  {0, 2, 1}, // Side 0
+  {0, 1, 3}, // Side 1
+  {1, 2, 3}, // Side 2
+  {2, 0, 3}  // Side 3
+};
 
 
 // ------------------------------------------------------------
@@ -32,53 +44,54 @@ AutoPtr<Elem> Tet4::build_side (const unsigned int i) const
 {
   assert (i < this->n_sides());
 
+  AutoPtr<Elem> ap(new Side<Tri3,Tet4>(this,i));
+  return ap;
   
-  
-  AutoPtr<Elem> face(new Tri3);
+//   AutoPtr<Elem> face(new Tri3);
 
-  switch (i)
-    {
-    case 0:
-      {
-	face->set_node(0) = this->get_node(0);
-	face->set_node(1) = this->get_node(2);
-	face->set_node(2) = this->get_node(1);
+//   switch (i)
+//     {
+//     case 0:
+//       {
+// 	face->set_node(0) = this->get_node(0);
+// 	face->set_node(1) = this->get_node(2);
+// 	face->set_node(2) = this->get_node(1);
 
-	return face;
-      }
-    case 1:
-      {
-	face->set_node(0) = this->get_node(0);
-	face->set_node(1) = this->get_node(1);
-	face->set_node(2) = this->get_node(3);
+// 	return face;
+//       }
+//     case 1:
+//       {
+// 	face->set_node(0) = this->get_node(0);
+// 	face->set_node(1) = this->get_node(1);
+// 	face->set_node(2) = this->get_node(3);
 
-	return face;
-      }
-    case 2:
-      {
-	face->set_node(0) = this->get_node(1);
-	face->set_node(1) = this->get_node(2);
-	face->set_node(2) = this->get_node(3);
+// 	return face;
+//       }
+//     case 2:
+//       {
+// 	face->set_node(0) = this->get_node(1);
+// 	face->set_node(1) = this->get_node(2);
+// 	face->set_node(2) = this->get_node(3);
 
-	return face;
-      }
-    case 3:
-      {
-	face->set_node(0) = this->get_node(2);
-	face->set_node(1) = this->get_node(0);
-	face->set_node(2) = this->get_node(3);
+// 	return face;
+//       }
+//     case 3:
+//       {
+// 	face->set_node(0) = this->get_node(2);
+// 	face->set_node(1) = this->get_node(0);
+// 	face->set_node(2) = this->get_node(3);
 	
-	return face;
-      }
-    default:
-      {
-	error();
-      }
-    }
+// 	return face;
+//       }
+//     default:
+//       {
+// 	error();
+//       }
+//     }
 
-  // We'll never get here.
-  error();  
-  return face;
+//   // We'll never get here.
+//   error();  
+//   return face;
 }
 
 

@@ -1,4 +1,4 @@
-// $Id: side.h,v 1.1 2004-11-15 22:09:12 benkirk Exp $
+// $Id: side.h,v 1.2 2005-01-28 19:14:16 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -26,6 +26,7 @@
 
 // Local includes
 #include "libmesh_common.h"
+#include "elem.h"
 
 // Forward declarations
 class Point;
@@ -42,8 +43,8 @@ class Node;
  * does not store any.
  *
  * \author  Benjamin S. Kirk
- * \date    $Date: 2004-11-15 22:09:12 $
- * \version $Revision: 1.1 $
+ * \date    $Date: 2005-01-28 19:14:16 $
+ * \version $Revision: 1.2 $
  */
 
 // ------------------------------------------------------------
@@ -51,22 +52,20 @@ class Node;
 template <class SideType, class ParentType>
 class Side : public SideType
 {
- protected:
-  
+ public:
+
   /**
    * Constructor.  Creates a side from an element.
    */ 
-  Side (const ParentType* parent,
+  Side (const Elem* parent,
 	const unsigned int side) :
-    ST(0,0,p), // Allocate no storage for nodes or neighbors!
-    _side_number(s)
+    SideType(0,0,parent), // Allocate no storage for nodes or neighbors!
+    _side_number(side)
   {
-    assert (p != NULL);
-    assert (this->side() < this->parent()->n_sides());
+    assert (parent != NULL);
+    assert (_side_number < this->parent()->n_sides());
     assert ((this->dim()+1) == this->parent()->dim());
   }
-
- public:
 
   /**
    * @returns the \p Point associated with local \p Node \p i.
@@ -74,7 +73,7 @@ class Side : public SideType
   virtual const Point & point (const unsigned int i) const
   {
     assert (i < this->n_nodes());    
-    return this->parent()->point (PT::side_nodes_map[_side_number][i]);
+    return this->parent()->point (ParentType::side_nodes_map[_side_number][i]);
   }
  
   /**
@@ -84,7 +83,8 @@ class Side : public SideType
   virtual Point & point (const unsigned int i)
   {
     assert (i < this->n_nodes());
-    return this->parent()->point (PT::side_nodes_map[_side_number][i]);
+    //TODO:[BSK] figure out how to get rid of this hideous const_cast
+    return const_cast<Elem*>(this->parent())->point (ParentType::side_nodes_map[_side_number][i]);
   }
   
   /**
@@ -93,7 +93,7 @@ class Side : public SideType
   virtual unsigned int node (const unsigned int i) const
   {
     assert (i < this->n_nodes());
-    return this->parent()->node (PT::side_nodes_map[_side_number][i]);  
+    return this->parent()->node (ParentType::side_nodes_map[_side_number][i]);  
   }
 
   /**
@@ -102,37 +102,33 @@ class Side : public SideType
   virtual Node* get_node (const unsigned int i) const
   {
     assert (i < this->n_nodes());    
-    return this->parent()->get_node (PT::side_nodes_map[_side_number][i]);
+    return this->parent()->get_node (ParentType::side_nodes_map[_side_number][i]);
   }
 
   /**
    * @returns the pointer to local \p Node \p i as a writeable reference.
    */
-  virtual Node* & set_node (const unsigned int i);
+  virtual Node* & set_node (const unsigned int i)
   {
     assert (i < this->n_nodes());    
-    return this->parent()->set_node (PT::side_nodes_map[_side_number][i]);
+    //TODO:[BSK] figure out how to get rid of this hideous const_cast
+    return const_cast<Elem*>(this->parent())->set_node (ParentType::side_nodes_map[_side_number][i]);
   }
 
   /**
    * @returns 0. Sides effectively do not have sides, so
    * don't even ask!
    */
-  virtual unsigned int n_sides () { return 0; }
+  virtual unsigned int n_sides () const { return 0; }
 
+  
  private:
 
+  
   /**
    * The side on the parent element
    */
   const unsigned int _side_number;
-
-  /**
-   * Make the parent class our friend.  That
-   * way we can protect our constructor from
-   * everyone else.
-   */
-  friend ParentType;
 };
 
 

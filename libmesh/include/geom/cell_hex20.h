@@ -1,4 +1,4 @@
-// $Id: cell_hex20.h,v 1.4 2004-11-15 22:09:10 benkirk Exp $
+// $Id: cell_hex20.h,v 1.5 2005-01-28 19:14:16 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -105,16 +105,6 @@ public:
 			    const IOPackage iop,
 			    std::vector<unsigned int>& conn) const;
 
-//   void tecplot_connectivity(const unsigned int sc,
-// 			    std::vector<unsigned int>& conn) const;
-  
-  
-//   void vtk_connectivity(const unsigned int sc,
-// 			std::vector<unsigned int> *conn = NULL) const;
-  
-//   unsigned int vtk_element_type (const unsigned int) const
-//   { return 12; }
-
   /**
    * @returns 2 for all \p n
    */
@@ -128,6 +118,12 @@ public:
    */
   unsigned short int second_order_adjacent_vertex (const unsigned int n,
 						   const unsigned int v) const;
+
+  /**
+   * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
+   * element node numbers.
+   */
+  static const unsigned int side_nodes_map[6][8];
   
 
 protected:
