@@ -1,4 +1,4 @@
-// $Id: fe_boundary.C,v 1.22 2003-11-05 22:26:45 benkirk Exp $
+// $Id: fe_boundary.C,v 1.23 2003-12-12 22:42:53 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -155,25 +155,48 @@ void FE<Dim,T>::init_face_shape_functions(const std::vector<Point>& qp,
   // Psi are the shape functions used for the FE mapping
   psi_map.resize        (n_mapping_shape_functions);
   dpsidxi_map.resize    (n_mapping_shape_functions);
+  d2psidxi2_map.resize  (n_mapping_shape_functions);
+  
   if (Dim == 3)
-    dpsideta_map.resize (n_mapping_shape_functions);
+    {
+      dpsideta_map.resize     (n_mapping_shape_functions);
+      d2psidxideta_map.resize (n_mapping_shape_functions);
+      d2psideta2_map.resize   (n_mapping_shape_functions);
+    }
   
   for (unsigned int i=0; i<n_mapping_shape_functions; i++)
     {
+      // Allocate space to store the values of the shape functions
+      // and their first and second derivatives at the quadrature points.
       psi_map[i].resize        (n_qp);
       dpsidxi_map[i].resize    (n_qp);
+      d2psidxi2_map[i].resize  (n_qp);
       if (Dim == 3)
-	dpsideta_map[i].resize (n_qp);
-      
+	{
+	  dpsideta_map[i].resize     (n_qp);
+	  d2psidxideta_map[i].resize (n_qp);
+	  d2psideta2_map[i].resize   (n_qp);
+	}
   
-      // Compute the value of shape function i at quadrature point p
+      // Compute the value of shape function i, and its first and
+      // second derivatives at quadrature point p
       // (Lagrange shape functions are used for the mapping)
       for (unsigned int p=0; p<n_qp; p++)
 	{
-	  psi_map[i][p]        = FE<Dim-1,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[p]);
-	  dpsidxi_map[i][p]    = FE<Dim-1,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
+	  psi_map[i][p]        = FE<Dim-1,LAGRANGE>::shape             (mapping_elem_type, mapping_order, i,    qp[p]);
+	  dpsidxi_map[i][p]    = FE<Dim-1,LAGRANGE>::shape_deriv       (mapping_elem_type, mapping_order, i, 0, qp[p]);
+	  d2psidxi2_map[i][p]  = FE<Dim-1,LAGRANGE>::shape_second_deriv(mapping_elem_type, mapping_order, i, 0, qp[p]);
+	  // std::cout << "d2psidxi2_map["<<i<<"][p]=" << d2psidxi2_map[i][p] << std::endl;
+
+	  // If we are in 3D, then our sides are 2D faces.
+	  // For the second derivatives, we must also compute the cross
+	  // derivative d^2() / dxi deta
 	  if (Dim == 3)
-	    dpsideta_map[i][p] = FE<Dim-1,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 1, qp[p]);
+	    {
+	      dpsideta_map[i][p]     = FE<Dim-1,LAGRANGE>::shape_deriv       (mapping_elem_type, mapping_order, i, 1, qp[p]);
+	      d2psidxideta_map[i][p] = FE<Dim-1,LAGRANGE>::shape_second_deriv(mapping_elem_type, mapping_order, i, 1, qp[p]); 
+	      d2psideta2_map[i][p]   = FE<Dim-1,LAGRANGE>::shape_second_deriv(mapping_elem_type, mapping_order, i, 2, qp[p]);
+	    }
 	}
     }
 
@@ -202,13 +225,17 @@ void FEBase::compute_face_map(const std::vector<Real>& qw,
       
     case 2:
       {
-	//-------------------------------------------------------------
+	// A 2D finite element living in either 2D or 3D space.
+	// This means the boundary is a 1D finite element, i.e.
+	// and EDGE2 or EDGE3.
 	// Resize the vectors to hold data at the quadrature points
 	{  
 	  xyz.resize(n_qp);
 	  dxyzdxi_map.resize(n_qp);
+	  d2xyzdxi2_map.resize(n_qp);
 	  tangents.resize(n_qp);
 	  normals.resize(n_qp);
+	  curvatures.resize(n_qp);
 	  
 	  JxW.resize(n_qp);
 	}
@@ -220,6 +247,7 @@ void FEBase::compute_face_map(const std::vector<Real>& qw,
 	    tangents[p].resize(DIM-1); // 1 Tangent in 2D, 2 in 3D
 	    xyz[p].zero();
 	    dxyzdxi_map[p].zero();
+	    d2xyzdxi2_map[p].zero();
 	  }
 	
 	// compute x, dxdxi at the quadrature points    
@@ -229,8 +257,9 @@ void FEBase::compute_face_map(const std::vector<Real>& qw,
 	    
 	    for (unsigned int p=0; p<n_qp; p++) // for each quadrature point...
 	      {	  
-		xyz[p].add_scaled        (side_point, psi_map[i][p]);
-		dxyzdxi_map[p].add_scaled(side_point, dpsidxi_map[i][p]);
+		xyz[p].add_scaled          (side_point, psi_map[i][p]);
+		dxyzdxi_map[p].add_scaled  (side_point, dpsidxi_map[i][p]);
+		d2xyzdxi2_map[p].add_scaled(side_point, d2psidxi2_map[i][p]);
 	      }
 	  }
 
@@ -244,6 +273,19 @@ void FEBase::compute_face_map(const std::vector<Real>& qw,
 #if DIM == 3  // Only good in 3D space
 	    tangents[p][1] = dxyzdxi_map[p].cross(n).unit();
 #endif
+	    // The curvature is computed via the familiar Frenet formula:
+	    // curvature = [d^2(x) / d (xi)^2] dot [normal]
+	    // For a reference, see:
+	    // F.S. Merritt, Mathematics Manual, 1962, McGraw-Hill, p. 310
+	    //
+	    // Note: The sign convention here is different from the
+	    // 3D case.  Concave-upward curves (smiles) have a positive
+	    // curvature.  Concave-downward curves (frowns) have a
+	    // negative curvature.  Be sure to take that into account!
+	    const Real numerator   = d2xyzdxi2_map[p] * normals[p];
+	    const Real denominator = dxyzdxi_map[p].size_sq();
+	    assert (denominator != 0);
+	    curvatures[p] = numerator / denominator;
 	  }
 	
 	// compute the jacobian at the quadrature points
@@ -265,14 +307,18 @@ void FEBase::compute_face_map(const std::vector<Real>& qw,
       
     case 3:
       {
-	//----------------------------------------------------------------
+	// A 3D finite element living in 3D space.
 	// Resize the vectors to hold data at the quadrature points
 	{  
 	  xyz.resize(n_qp);
 	  dxyzdxi_map.resize(n_qp);
 	  dxyzdeta_map.resize(n_qp);
+	  d2xyzdxi2_map.resize(n_qp);
+	  d2xyzdxideta_map.resize(n_qp);
+	  d2xyzdeta2_map.resize(n_qp);
 	  tangents.resize(n_qp);
 	  normals.resize(n_qp);
+	  curvatures.resize(n_qp);
 
 	  JxW.resize(n_qp);
 	}
@@ -284,6 +330,9 @@ void FEBase::compute_face_map(const std::vector<Real>& qw,
 	    xyz[p].zero();
 	    dxyzdxi_map[p].zero();
 	    dxyzdeta_map[p].zero();
+	    d2xyzdxi2_map[p].zero();
+	    d2xyzdxideta_map[p].zero();
+	    d2xyzdeta2_map[p].zero();
 	  }
 	
 	// compute x, dxdxi at the quadrature points    
@@ -296,16 +345,37 @@ void FEBase::compute_face_map(const std::vector<Real>& qw,
 		xyz[p].add_scaled         (side_point, psi_map[i][p]);
 		dxyzdxi_map[p].add_scaled (side_point, dpsidxi_map[i][p]);
 		dxyzdeta_map[p].add_scaled(side_point, dpsideta_map[i][p]);
+		d2xyzdxi2_map[p].add_scaled   (side_point, d2psidxi2_map[i][p]);
+		d2xyzdxideta_map[p].add_scaled(side_point, d2psidxideta_map[i][p]);
+		d2xyzdeta2_map[p].add_scaled  (side_point, d2psideta2_map[i][p]);
 	      }
 	  }
 
-	// Compute the tangents & normal at the quadrature point
+	// Compute the tangents, normal, and curvature at the quadrature point
 	for (unsigned int p=0; p<n_qp; p++)
 	  {	    
 	    const Point n  = dxyzdxi_map[p].cross(dxyzdeta_map[p]);
 	    normals[p]     = n.unit();
 	    tangents[p][0] = dxyzdxi_map[p].unit();
 	    tangents[p][1] = n.cross(dxyzdxi_map[p]).unit();
+	    
+	    // Compute curvature using the typical nomenclature
+	    // of the first and second fundamental forms.
+	    // For reference, see:
+	    // 1) http://mathworld.wolfram.com/MeanCurvature.html
+	    //    (note -- they are using inward normal)
+	    // 2) F.S. Merritt, Mathematics Manual, 1962, McGraw-Hill
+	    const Real L  = -d2xyzdxi2_map[p]    * normals[p];
+	    const Real M  = -d2xyzdxideta_map[p] * normals[p];
+	    const Real N  = -d2xyzdeta2_map[p]   * normals[p];
+	    const Real E  =  dxyzdxi_map[p].size_sq();
+	    const Real F  =  dxyzdxi_map[p]      * dxyzdeta_map[p];
+	    const Real G  =  dxyzdeta_map[p].size_sq();
+	    
+	    const Real numerator   = E*N -2.*F*M + G*L;
+	    const Real denominator = E*G - F*F;
+	    assert (denominator != 0.);
+	    curvatures[p] = 0.5*numerator/denominator;
 	  }    
     	
 	// compute the jacobian at the quadrature points, see

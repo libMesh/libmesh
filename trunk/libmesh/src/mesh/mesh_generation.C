@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.24 2003-11-05 22:26:45 benkirk Exp $
+// $Id: mesh_generation.C,v 1.25 2003-12-12 22:42:53 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -688,7 +688,8 @@ void Mesh::build_sphere (const Real rad,
   assert (rad > 0.);
 
   START_LOG("build_sphere()", "Mesh");
-  
+
+  // Sphere is centered at origin by default
   const Point cent;
 
   const Sphere sphere (cent, rad);

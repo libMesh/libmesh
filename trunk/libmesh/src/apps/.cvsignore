@@ -12,3 +12,4 @@ libmesh_mesh.cc
 read_gz.cc
 smooth_test.cc
 tri_mesh.cc
+curv_test.cc

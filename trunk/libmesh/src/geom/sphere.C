@@ -1,4 +1,4 @@
-// $Id: sphere.C,v 1.8 2003-09-02 18:02:42 benkirk Exp $
+// $Id: sphere.C,v 1.9 2003-12-12 22:42:53 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -149,6 +149,8 @@ Point Sphere::unit_normal (const Point& p) const
 {
   assert (rad > 0.);
 
+  assert ( !(p == cent) );
+  
   // Create a vector from the center to the point
   Point n = p - cent;
 
