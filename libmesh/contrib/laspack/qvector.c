@@ -27,7 +27,6 @@ void V_Constr(QVector *V, char *Name, size_t Dim, InstanceType Instance,
 /* constructor of the type QVector */
 {
   V->Name = (char *)malloc((strlen(Name) + 1) * sizeof(char));
-  /* printf("ctor: %s name:%p\n",Name, V->Name);fflush(stdout); */
   if (V->Name != NULL)
     strcpy(V->Name, Name);
   else
@@ -40,7 +39,6 @@ void V_Constr(QVector *V, char *Name, size_t Dim, InstanceType Instance,
   if (OwnData) {
     if (LASResult() == LASOK) {
       V->Cmp = (Real *)malloc((Dim + 1) * sizeof(Real));
-      /* printf("ctor: %s cmp: %p\n",Name,V->Cmp);fflush(stdout); */
       if (V->Cmp == NULL) 
 	LASError(LASMemAllocErr, "V_Constr", Name, NULL, NULL);
     } else {
@@ -52,17 +50,15 @@ void V_Constr(QVector *V, char *Name, size_t Dim, InstanceType Instance,
 void V_Destr(QVector *V)
 /* destructor of the type QVector */
 {
+   if (V->Name != NULL) {
+    free(V->Name);
+    V->Name = NULL;
+  }
   if (V->OwnData) {
-    /* printf("dtor: %s cmp: %p\n",V->Name,V->Cmp);fflush(stdout); */
     if (V->Cmp != NULL) {
       free(V->Cmp);
       V->Cmp = NULL;
     }
-  }
-  /* printf("dtor: %s name:%p\n",V->Name,V->Name);fflush(stdout); */
-  if (V->Name != NULL) {
-    free(V->Name);
-    V->Name = NULL;
   }
 }
 

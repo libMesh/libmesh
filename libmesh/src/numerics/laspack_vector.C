@@ -1,4 +1,4 @@
-// $Id: laspack_vector.C,v 1.2 2003-02-10 22:03:27 benkirk Exp $
+// $Id: laspack_vector.C,v 1.3 2003-02-10 23:42:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -149,13 +149,24 @@ LaspackVector::operator = (const NumericVector& v_in)
 
   assert (size() == v.size());
 
-  here();
-  
   if (size() != 0)    
     Laspack::Asgn_VV (const_cast<Laspack::QVector*>(&_vec),
 		      const_cast<Laspack::QVector*>(&v._vec)
 		      );
+  return *this;
+};
 
+
+
+LaspackVector&
+LaspackVector::operator = (const LaspackVector& v)
+{
+  assert (size() == v.size());
+
+  if (size() != 0)    
+    Laspack::Asgn_VV (const_cast<Laspack::QVector*>(&_vec),
+		      const_cast<Laspack::QVector*>(&v._vec)
+		      );
   return *this;
 };
 

@@ -1,4 +1,4 @@
-// $Id: petsc_vector.h,v 1.9 2003-02-10 03:55:51 benkirk Exp $
+// $Id: petsc_vector.h,v 1.10 2003-02-10 23:42:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -159,6 +159,11 @@ class PetscVector : public NumericVector
    *  $U = V$: copy all components.
    */
   NumericVector & operator= (const NumericVector &V);
+
+  /**
+   *  $U = V$: copy all components.
+   */
+  PetscVector & operator= (const PetscVector &V);
 
   /**
    *  $U = V$: copy all components.
