@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.22 2003-05-29 16:01:02 benkirk Exp $
+// $Id: mesh_refinement.C,v 1.23 2003-06-03 16:47:38 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -50,45 +50,43 @@ MeshRefinement::~MeshRefinement ()
 
 void MeshRefinement::clear ()
 {
-  new_nodes.clear();
-  unused_elements.clear();
+  _new_nodes_map.clear();
+  _unused_elements.clear();
 }
 
 
 
 Node* MeshRefinement::add_point(const Point& p, const unsigned int key)
 {
-  unsigned int n;
-  
-  std::pair<std::multimap<unsigned int, unsigned int>::iterator,
-            std::multimap<unsigned int, unsigned int>::iterator>
-    pos = new_nodes.equal_range(key);
+  // Look for the key in the multimap  
+  std::pair<map_type::iterator, map_type::iterator>
+    pos = _new_nodes_map.equal_range(key);
   
       
   while (pos.first != pos.second) 
-    {                              
-      if (mesh.point(pos.first->second) == p)
-	{
-	  n = pos.first->second;
-
-	  return mesh.node_ptr(n);
-	}
-      
+    if (p == *pos.first->second)
+      return pos.first->second;      
+    else      
       ++pos.first;
-    }
-  
-  if (pos.first == pos.second) // still not found
-    {                          // so we better add it
-      n = mesh.n_nodes();
-      
-      new_nodes.insert(pos.first,
-		       std::pair<unsigned int,
-		                 unsigned int>(key,n));
-    }
     
+
+  // If we get here pos.first == pos.second.
+  assert (pos.first == pos.second); // still not found
+                                    // so we better add it
+  Node* node = mesh.add_point (p);
+
+  assert (node != NULL);
+
+  // Add the node to the map.  In the case of the
+  // std::multimap use pos.first as a hint for where to put it
+#if defined(HAVE_HASH_MAP) || defined(HAVE_EXT_HASH_MAP)
+  _new_nodes_map.insert(std::make_pair(key, node));
+#else
+  _new_nodes_map.insert(pos.first, std::make_pair(key, node));
+#endif			    
   
   // Return the address of the new node
-  return mesh.add_point(p,n);
+  return node;
 }
 
 
@@ -97,12 +95,12 @@ unsigned int MeshRefinement::new_element_number()
 {
   unsigned int n=0;
   
-  if (unused_elements.empty())      
+  if (_unused_elements.empty())      
     n = mesh.n_elem();
   else
     {
-      n = *unused_elements.begin();
-      unused_elements.erase(unused_elements.begin());
+      n = *_unused_elements.begin();
+      _unused_elements.erase(_unused_elements.begin());
     }
 
   return n;
@@ -117,18 +115,19 @@ void MeshRefinement::update_unused_elements()
    */
   
   // clear and start from scratch
-  unused_elements.clear();
+  _unused_elements.clear();
   
   // find NULL elements and add the index to the database.
   // Note that we can't use the mesh.elem(e) approach here
   // since it asserts the element is not NULL.
   const std::vector<Elem*>& elements = mesh.get_elem();
 
-  assert (mesh.n_elem() == elements.size());
-  
-  for (unsigned int e=0; e<mesh.n_elem(); e++)
+  // Loop over the entries in the elements vector &
+  // add any NULL elements to the set.
+  for (unsigned int e=0; e<elements.size(); e++)
     if (elements[e] == NULL)
-      unused_elements.insert(e);
+      // Insert at the end.
+      _unused_elements.insert(_unused_elements.end(),e);
 }
 
 
@@ -213,9 +212,9 @@ void MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
    * we didn't fill up the coarsened
    * space.
    */
-  mesh.trim_unused_elements (unused_elements);
+  mesh.trim_unused_elements (_unused_elements);
   
-  assert (unused_elements.empty());
+  assert (_unused_elements.empty());
   
   for (unsigned int e=0; e<mesh.n_elem(); e++)
     {

@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.39 2003-05-29 04:29:15 benkirk Exp $
+// $Id: mesh_base.C,v 1.40 2003-06-03 16:47:38 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -19,11 +19,21 @@
 
 
 
+// library configuration
+#include "mesh_config.h"
+
 // C++ includes
 #include <algorithm>
 #include <sstream>
 #include <math.h>
 #include <set>
+#include <map>
+
+#if   defined(HAVE_HASH_MAP)
+# include <hash_map>
+#elif defined(HAVE_EXT_HASH_MAP)
+# include <ext/hash_map>
+#endif
 
 // Local includes
 #include "mesh_base.h"
@@ -410,9 +420,25 @@ void MeshBase::find_neighbors()
   // with identical side keys and then check to see if they
   // are neighbors
   {
-    // data structures
-    typedef std::pair<unsigned int, std::pair<Elem*, unsigned char> > key_val_pair;
-    std::multimap<unsigned int, std::pair<Elem*, unsigned char> >     side_to_elem;
+    // data structures -- Use the hash_multimap if available
+    typedef unsigned int                    key_type;
+    typedef std::pair<Elem*, unsigned char> val_type;
+    typedef std::pair<key_type, val_type>   key_val_pair;
+    
+#if   defined(HAVE_HASH_MAP)    
+    typedef std::hash_multimap<key_type, val_type>       map_type;    
+#elif defined(HAVE_EXT_HASH_MAP)
+# if  __GNUC__ >= 3
+    typedef __gnu_cxx::hash_multimap<key_type, val_type> map_type;
+# else
+    DIE A HORRIBLE DEATH
+# endif
+#else
+    typedef std::multimap<key_type, val_type>            map_type;
+#endif
+    
+    // A map from side keys to corresponding elements & side numbers  
+    map_type side_to_elem_map;
   
     elem_iterator       el (this->elements_begin());
     const elem_iterator end(this->elements_end());
@@ -431,9 +457,8 @@ void MeshBase::find_neighbors()
 		const unsigned int key = element->key(ms);
 		
 		// Look for elements that have an identical side key
-		std::pair <std::multimap<unsigned int, std::pair<Elem*, unsigned char> >::iterator,
-		           std::multimap<unsigned int, std::pair<Elem*, unsigned char> >::iterator >
-		  bounds = side_to_elem.equal_range(key);
+		std::pair <map_type::iterator, map_type::iterator>
+		  bounds = side_to_elem_map.equal_range(key);
 		
 		// May be multiple keys, check all the possible
 		// elements which _might_ be neighbors.
@@ -442,29 +467,30 @@ void MeshBase::find_neighbors()
 		    // Get the side for this element
 		    const AutoPtr<Elem> my_side(element->side(ms));
 
-		    
-		    for (std::multimap<unsigned int, std::pair<Elem*, unsigned char> >::iterator
-			   it = bounds.first; it != bounds.second; ++it)
+		    // Look at all the entries with an equivalent key
+		    while (bounds.first != bounds.second)
 		      {
 			// Get the potential element
-			Elem* neighbor = it->second.first;
+			Elem* neighbor = bounds.first->second.first;
 			
 			// Get the side for the neighboring element
-			const unsigned int ns = it->second.second;
+			const unsigned int ns = bounds.first->second.second;
 			const AutoPtr<Elem> their_side(neighbor->side(ns));
 			
-			// If found a match with my side
+			// If found a match wbounds.firsth my side
 			if (*my_side == *their_side) 
 			  {
 			    // So we are neighbors. Tell the other element 
 			    element->set_neighbor (ms,neighbor);
 			    neighbor->set_neighbor(ns,element);
 			    
-			    side_to_elem.erase (it);
+			    side_to_elem_map.erase (bounds.first);
 			    
 			    // get out of this nested crap
 			    goto next_side; 
 			  }
+
+			++bounds.first;
 		      }
 		  }
 		    
@@ -478,7 +504,11 @@ void MeshBase::find_neighbors()
 		
 		// use the lower bound as a hint for
 		// where to put it.
-		side_to_elem.insert (bounds.first, kvp);
+#if defined(HAVE_HASH_MAP) || defined(HAVE_EXT_HASH_MAP)
+		side_to_elem_map.insert (kvp);
+#else
+		side_to_elem_map.insert (bounds.first,kvp);
+#endif
 	      }
 	  }
       }

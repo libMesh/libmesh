@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.16 2003-05-28 03:17:50 benkirk Exp $
+// $Id: mesh.C,v 1.17 2003-06-03 16:47:37 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -146,7 +146,7 @@ void Mesh::write (const std::string& name)
 
     else if (name.rfind(".gmv") < name.size())
       {
-	if (n_subdomains() > 1)
+	if (this->n_subdomains() > 1)
 	  this->write_gmv_binary(name, NULL, NULL, true);
 	else
 	  this->write_gmv_binary(name);
