@@ -1,4 +1,4 @@
-// $Id: mesh_tetgen_support.C,v 1.14 2004-11-08 00:11:05 jwpeterson Exp $
+// $Id: mesh_tetgen_support.C,v 1.15 2004-11-12 00:42:42 jwpeterson Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -41,23 +41,20 @@
 //----------------------------------------------------------------------
 // TetGenMeshInterface class members
 TetGenMeshInterface::TetGenMeshInterface (Mesh& mesh) :
-  _nodes        (mesh._nodes),
-  _elements     (mesh._elements),
-  _num_nodes    (0),
-  _num_elements (0)
-{
-}
+  _mesh         (mesh)
+{}
 
 
 
-TetGenMeshInterface::~TetGenMeshInterface()
-{
-}
+TetGenMeshInterface::~TetGenMeshInterface() {}
+
+
+
+
+
 
 
 // =============================================================================
-
-
 TetGen1_wrapper::TetGen1_wrapper()
 {
   tetgen_output = new tetgenio;
@@ -130,13 +127,13 @@ int TetGen1_wrapper::get_numberofpoints()
 
 
 
-int TetGen1_wrapper::get_element_node(int i, int j)
+int TetGen1_wrapper::get_element_node(const int i, const int j)
 { return tetgen_output->tetrahedronlist[i*4+j]; }
 
 
 
 
-int TetGen1_wrapper::get_triface_node(int i, int j)
+int TetGen1_wrapper::get_triface_node(const int i, const int j)
 { return tetgen_output->trifacelist[i*3+j]; }
 
 
@@ -148,35 +145,34 @@ int TetGen1_wrapper::get_triface_node(int i, int j)
 
 TetGen13_wrapper::TetGen13_wrapper()
 {
-  tetgen_data.mesh_dim                = 3;
-  tetgen_data.numberofpointattributes = 0;
-  tetgen_data.firstnumber             = 0;
+  this->tetgen_data.mesh_dim                = 3;
+  this->tetgen_data.numberofpointattributes = 0;
+  this->tetgen_data.firstnumber             = 0;
 }
 
 
 
 
-TetGen13_wrapper::~TetGen13_wrapper()
-{ }
+TetGen13_wrapper::~TetGen13_wrapper() {}
 
 
 
 
-void TetGen13_wrapper::set_pointlist(int numofpoints)
+void TetGen13_wrapper::set_pointlist(const int numofpoints)
 {
-  set_numberofpoints(numofpoints);
-  tetgen_data.pointlist = new REAL[tetgen_data.numberofpoints * 3];
+  this->set_numberofpoints(numofpoints);
+  this->tetgen_data.pointlist = new REAL[tetgen_data.numberofpoints * 3];
 }
 
 
 
 
 void TetGen13_wrapper::set_switches(std::string s)
-{ 
+{
+  // this allocates memory!!!!!  You must free it at some point!!!!
   switches = strdup(s.c_str()); 
-  if (!tetgen_be.parse_commandline(switches)) {
+  if (!tetgen_be.parse_commandline(switches)) 
     std::cout << "TetGen replies: Wrong switches!" << std::endl;
-  } // if
 }
 
 
@@ -184,20 +180,21 @@ void TetGen13_wrapper::set_switches(std::string s)
 
 void TetGen13_wrapper::run_tetgen()
 {
+  // Call tetrahedralize from the TetGen library.
   tetrahedralize(&tetgen_be, &tetgen_data, tetgen_output);
 }
 
 
 
 
-void TetGen13_wrapper::set_numberoffacets(int i)
-{ tetgen_data.numberoffacets = i; }
+void TetGen13_wrapper::set_numberoffacets(const int i)
+{ this->tetgen_data.numberoffacets = i; }
 
 
 
 
-void TetGen13_wrapper::set_numberofholes(int i)
-{ tetgen_data.numberofholes = i; }
+void TetGen13_wrapper::set_numberofholes(const int i)
+{ this->tetgen_data.numberofholes = i; }
 
 
 
@@ -206,23 +203,23 @@ void TetGen13_wrapper::set_facetlist(int numoffacets, int numofholes)
 {
   set_numberoffacets(numoffacets);
   set_numberofholes(numofholes);
-  tetgen_data.facetlist = new tetgenio::facet[tetgen_data.numberoffacets];
+  this->tetgen_data.facetlist = new tetgenio::facet[this->tetgen_data.numberoffacets];
   for (int i=0; i<numoffacets; i++)
-    tetgen_data.init(&(tetgen_data.facetlist[i]));
-  tetgen_data.holelist = new REAL[tetgen_data.numberofholes * 3];
+    this->tetgen_data.init(&(this->tetgen_data.facetlist[i]));
+  this->tetgen_data.holelist = new REAL[this->tetgen_data.numberofholes * 3];
 }
 
 
 
 
 void TetGen13_wrapper::set_facet_numberofpolygons(int i, int num)
-{ tetgen_data.facetlist[i].numberofpolygons = num; }
+{ this->tetgen_data.facetlist[i].numberofpolygons = num; }
 
 
 
 
 void TetGen13_wrapper::set_facet_numberofholes(int i, int num)
-{ tetgen_data.facetlist[i].numberofholes = num; }
+{ this->tetgen_data.facetlist[i].numberofholes = num; }
 
 
 
@@ -231,16 +228,16 @@ void TetGen13_wrapper::set_facet_polygonlist(int i, int numofpolygons)
 {
   set_facet_numberofpolygons(i, numofpolygons);
   set_facet_numberofholes(i, 0);
-  tetgen_data.facetlist[i].polygonlist = new tetgenio::polygon[numofpolygons];
-  for (int j=0; j<tetgen_data.facetlist[i].numberofpolygons; j++)
-    tetgen_data.init(&(tetgen_data.facetlist[i].polygonlist[j]));
+  this->tetgen_data.facetlist[i].polygonlist = new tetgenio::polygon[numofpolygons];
+  for (int j=0; j<this->tetgen_data.facetlist[i].numberofpolygons; j++)
+    this->tetgen_data.init(&(this->tetgen_data.facetlist[i].polygonlist[j]));
 }
 
 
 
 
 void TetGen13_wrapper::set_polygon_numberofvertices(int i, int j, int num)
-{ tetgen_data.facetlist[i].polygonlist[j].numberofvertices = num; }
+{ this->tetgen_data.facetlist[i].polygonlist[j].numberofvertices = num; }
 
 
 
@@ -248,7 +245,7 @@ void TetGen13_wrapper::set_polygon_numberofvertices(int i, int j, int num)
 void TetGen13_wrapper::set_polygon_vertexlist(int i, int j, int numofvertices)
 {
   set_polygon_numberofvertices(i, j, numofvertices);
-  tetgen_data.facetlist[i].polygonlist[j].vertexlist = new int[numofvertices];
+  this->tetgen_data.facetlist[i].polygonlist[j].vertexlist = new int[numofvertices];
 }
 
 
@@ -256,7 +253,7 @@ void TetGen13_wrapper::set_polygon_vertexlist(int i, int j, int numofvertices)
 
 void TetGen13_wrapper::set_vertex(int i, int j, int k, int nodeindex)
 {
-  tetgen_data.facetlist[i].polygonlist[j].vertexlist[k] = nodeindex;
+  this->tetgen_data.facetlist[i].polygonlist[j].vertexlist[k] = nodeindex;
 }
 
 
@@ -266,48 +263,66 @@ void TetGen13_wrapper::set_vertex(int i, int j, int k, int nodeindex)
 typedef TetGen13_wrapper TetGen_access;
 
 
+
+
+
+
+
+
+
+
+
 // =============================================================================
-
-
 void TetGenMeshInterface::triangulate_pointset ()   
 {
   // class tetgen_wrapper allows library access on a basic level:
   TetGen_access tetgen_wrapper; 
 
-  _num_elements = 0; // counts additional elements 
-
   // fill input structure with point set data:
-  tetgen_wrapper.set_pointlist(_nodes.size());
-  int index = 0;
-  std::vector< Node *>::iterator i;
-  for (i=_nodes.begin(); i!=_nodes.end(); ++i) {
-    tetgen_wrapper.set_node(index++, (**i)(0), (**i)(1), (**i)(2));
-  } 
+  tetgen_wrapper.set_pointlist( this->_mesh.n_nodes() );
 
+  {
+    int index = 0;
+    MeshBase::node_iterator it  = this->_mesh.nodes_begin();
+    const MeshBase::node_iterator end = this->_mesh.nodes_end();
+    for ( ; it != end; ++it) 
+      tetgen_wrapper.set_node(index++, (**it)(0), (**it)(1), (**it)(2));
+  }
+  
   // run TetGen triangulation method:
   tetgen_wrapper.set_switches("-Q"); // TetGen switches: triangulation, Quiet mode
   tetgen_wrapper.run_tetgen();
 
   // save elements to mesh structure, nodes will not be changed:
-  int n_nodes     = 4;                                  // (Tet4 elements)
-  _num_elements   = tetgen_wrapper.get_numberoftetrahedra();
-  int firstnumber = _elements.size()+1;                 // append position
-  // Reserve space in the appropriate vector to avoid unnecessary allocations.
-  _elements.resize (_num_elements+firstnumber);
+  const unsigned int num_elements   = tetgen_wrapper.get_numberoftetrahedra();
 
-  // Vector that assigns element nodes to their correct position:
-  static const unsigned int assign_elm_nodes[] = { 0, 1, 2, 3};
-  unsigned long int node_labels[4];      // Vector that temporarily holds the node labels defining element.
-  for (unsigned int i=0; i<_num_elements; i++)
+  // Vector that temporarily holds the node labels defining element.
+  unsigned long int node_labels[4];      
+
+  for (unsigned int i=0; i<num_elements; ++i)
     {
-      _elements[firstnumber+i] = new Tet4;     // TetGen only supports Tet4 elements.
-      for (int j=0; j<n_nodes; j++)
+      Elem* elem = new Tet4;
+
+      // Get the nodes associated with this element
+      for (unsigned int j=0; j<elem->n_nodes(); ++j)
 	node_labels[j] = tetgen_wrapper.get_element_node(i,j);
-      // nodes are being stored in element
-      for (int j=0; j<n_nodes; j++)
-	_elements[firstnumber+i]->set_node(assign_elm_nodes[j]) = _nodes[node_labels[j]];
-    } // for
-} // triangulate_pointset
+
+      // Associate the nodes with this element
+      for (unsigned int j=0; j<elem->n_nodes(); ++j)
+	elem->set_node(j) = this->_mesh.node_ptr( node_labels[j] );
+
+      // Finally, add this element to the mesh.
+      this->_mesh.add_elem(elem);
+    }
+} 
+
+
+
+
+
+
+
+
 
 
 void TetGenMeshInterface::pointset_convexhull ()   
@@ -315,66 +330,89 @@ void TetGenMeshInterface::pointset_convexhull ()
   // class tetgen_wrapper allows library access on a basic level:
   TetGen_access tetgen_wrapper; 
 
-  _num_elements = 0; // counts additional elements 
-
   // fill input structure with point set data:
-  tetgen_wrapper.set_pointlist(_nodes.size());
+  tetgen_wrapper.set_pointlist(this->_mesh.n_nodes());
   int index = 0;
-  std::vector< Node *>::iterator i;
-  for (i=_nodes.begin(); i!=_nodes.end(); ++i) {
-    tetgen_wrapper.set_node(index++, (**i)(0), (**i)(1), (**i)(2));
-  } 
 
+  MeshBase::node_iterator it        = this->_mesh.nodes_begin();
+  const MeshBase::node_iterator end = this->_mesh.nodes_end();
+  for ( ; it != end; ++it) 
+    tetgen_wrapper.set_node(index++, (**it)(0), (**it)(1), (**it)(2));
+
+  
   // run TetGen triangulation method:
   tetgen_wrapper.set_switches("-Q"); // TetGen switches: triangulation, Convex hull, Quiet mode
   tetgen_wrapper.run_tetgen();
+  unsigned int num_elements   = tetgen_wrapper.get_numberoftrifaces();
 
-  // save SURFACE elements to mesh structure, nodes will not be changed:
-  int n_nodes     = 3;                                  // (Tri3 elements)
-  _num_elements   = tetgen_wrapper.get_numberoftrifaces();
-  //  int firstnumber = _elements.size()+1;                 // append position
-  int firstnumber = 0;                                      // trivial append position
+  // Delete *all* old elements
+  {
+    MeshBase::element_iterator       it  = this->_mesh.elements_begin();
+    const MeshBase::element_iterator end = this->_mesh.elements_end();
+    for ( ; it != end; ++it) 
+      this->_mesh.delete_elem (*it);
+  }
+  
 
-  // Delete old elements:
-  std::vector< Elem *>::iterator j;
-  for (j=_elements.begin(); j!=_elements.end(); ++j) {
-    delete (*j);
-  } 
-
-  // Reserve space in the appropriate vector to avoid unnecessary allocations.
-  _elements.resize (_num_elements+firstnumber);
-
-  // Vector that assigns element nodes to their correct position:
-  static const unsigned int assign_elm_nodes[] = { 0, 1, 2};
-  unsigned long int node_labels[3];      // Vector that temporarily holds the node labels defining element.
-  for (unsigned int i=0; i<_num_elements; i++)
+  // Add the 2D elements which comprise the convex hull back to the mesh.
+  // Vector that temporarily holds the node labels defining element.
+  unsigned long int node_labels[3];
+  
+  for (unsigned int i=0; i<num_elements; ++i)
     {
-      _elements[firstnumber+i] = new Tri3;
-      for (int j=0; j<n_nodes; j++)
+      Elem* elem = new Tri3;
+
+      // Get node labels associated with this element
+      for (unsigned int j=0; j<elem->n_nodes(); ++j)
 	node_labels[j] = tetgen_wrapper.get_triface_node(i,j);
-      // nodes are being stored in element
-      for (int j=0; j<n_nodes; j++)
-	_elements[firstnumber+i]->set_node(assign_elm_nodes[j]) = _nodes[node_labels[j]];
-    } // for
-} // pointset_convexhull
+
+      // Associate nodes with this element
+      for (unsigned int j=0; j<elem->n_nodes(); j++)
+	elem->set_node(j) = this->_mesh.node_ptr( node_labels[j] );
+
+      // Finally, add this element to the mesh.
+      this->_mesh.add_elem(elem);
+    }
+} 
+
+
+
+
+
+
+
 
 
 
 
 int TetGenMeshInterface::get_node_index (Node* inode)
 {
-  // This is NO elegant solution!
+  // This is NO elegant solution! (A linear search of the nodes.)
   unsigned int node_id;
-  int result = 0;
   node_id = inode->id();
 
-  for (unsigned int i=0; i<_nodes.size(); i++)
-    if (_nodes[i]->id()==node_id) result=i;
-  return result;
+  for (unsigned int i=0; i<this->_mesh.n_nodes(); ++i)
+    if (this->_mesh.node(i).id() == node_id)
+      return i;
+
+  std::cerr << "Error! Node not found in the mesh!" << std::endl;
+  error();
+  
+  return 0;
 }
 
 
-void TetGenMeshInterface::triangulate_conformingDelaunayMesh (double quality_constraint, double volume_constraint)   
+
+
+
+
+
+
+
+
+
+void TetGenMeshInterface::triangulate_conformingDelaunayMesh (const double quality_constraint,
+							      const double volume_constraint)   
 {
   // >>> assert usage of TRI3 hull elements (no other elements! => mesh.all_tri() )
 
@@ -382,144 +420,189 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh (double quality_con
   // loop over hull with breadth-first search:
   std::set< Elem *>    visited;
   std::vector< Elem *> current;
-  current.push_back(_elements[0]);
-  while (!current.empty()) {
-    Elem* actual = current.back();
-    visited.insert(actual);
-    current.pop_back();
-    for (unsigned int i=0; i<actual->n_neighbors(); ++i) {
-      int new_n = 0; // number of non-visited neighbours
-      if (visited.find(actual->neighbor(i))==visited.end()) {
-	new_n++;
-	current.push_back(actual->neighbor(i));
-      } // if
-    } // for
-  } // while
-  if (visited.size() != _elements.size()) {
-    std::cout << "triangulate: hull not connected: element(s) not reached by others.\n";
-    error();
-  } // if
+
+  // Initialize the current vector with element 0
+  current.push_back(this->_mesh.elem(0));
+  
+  while (!current.empty())
+    {
+      Elem* elem = current.back();
+
+      // Attempt to insert this element into the visited set.
+      visited.insert(elem);
+
+      // Remove the last element from the vector.
+      current.pop_back();
+
+      // Loop over the element's neighbors
+      for (unsigned int i=0; i<elem->n_neighbors(); ++i)
+	{
+	  // Attempt to find this element's neighbor in the visited set.
+	  // If not found, insert this neighbor into the current vector.
+	  if (visited.find(elem->neighbor(i)) == visited.end())
+	    current.push_back(elem->neighbor(i));
+	} 
+    }
+  
+  if (visited.size() != this->_mesh.n_elem())
+    {
+      std::cerr << "triangulate: hull not connected: element(s) not reached by others.\n";
+      error();
+    } 
 
   // start triangulation method with empty holes list:
   std::vector< Node *> noholes;
   triangulate_conformingDelaunayMesh_carvehole(noholes, quality_constraint, volume_constraint);
-} // triangulate_conformingDelaunayMesh
+}
 
 
-void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole
-      (std::vector< Node *>& holes, double quality_constraint, double volume_constraint)
+
+
+
+
+
+
+
+
+
+
+
+void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const std::vector< Node *>& holes,
+									 const double quality_constraint,
+									 const double volume_constraint)
 {
-  // >>> assert usage of TRI3 hull elements (no other elements! => mesh.all_tri() )
-  // >>> intersection of inner and outer hull structures, connectedness etc. is not verified!
+  // Check mesh for validity: Must be composed of all TRI3 elements,
+  // also it must be convex so each element must have non-NULL neighbors.
+  {
+    MeshBase::element_iterator it        = this->_mesh.elements_begin();
+    const MeshBase::element_iterator end = this->_mesh.elements_end();
 
-  // count number of facet elements:
-  // (by the way check number of element neighbours - should be 3!)
-  unsigned int tri3_num  = 0;
-  unsigned int min_nb    = 4;
-  unsigned int total_num = _elements.size();  
-  for (unsigned int i=0; i<total_num; i++) {
-    if (_elements[i]->type() == TRI3) { 
-      tri3_num++;
-      if (_elements[i]->n_neighbors() < min_nb) 
-	min_nb = _elements[i]->n_neighbors();
-    } // if
-  } // for
-  if (total_num > tri3_num) error();
-  if (min_nb < 3) { 
-    // hull cannot be closed
-    std::cout << "triangulate_carvehole: hull not connected: element has " << min_nb << " neighbours.";
-    error();
+    for (; it != end ; ++it)
+      {
+	Elem* elem = *it;
+
+	// Check for proper element type
+	if (elem->type() != TRI3)
+	  {
+	    std::cerr << "ERROR: Some of the elements in the original mesh were not TRI3!" << std::endl;
+	    error();
+	  }
+
+	for (unsigned int i=0; i<elem->n_neighbors(); ++i)
+	  {
+	    if (elem->neighbor(i) == NULL)
+	      {
+		std::cerr << "ERROR: Non-convex hull, cannot be tetrahedralized." << std::endl;
+		error();
+	      }
+	  }
+      }
   }
   
   // >>> fill input structure with point set data:
-
   // class tetgen_wrapper allows library access on a basic level:
   TetGen_access tetgen_wrapper; 
-  _num_elements = 0; // counts additional elements 
 
-  tetgen_wrapper.set_pointlist(_nodes.size());
-  int index = 0;
-  std::vector< Node *>::iterator i;
-  for (i=_nodes.begin(); i!=_nodes.end(); ++i) {
-    tetgen_wrapper.set_node(index++, (**i)(0), (**i)(1), (**i)(2));
-  } 
+  tetgen_wrapper.set_pointlist(this->_mesh.n_nodes());
+  {
+    int index = 0;
+    MeshBase::node_iterator it        = this->_mesh.nodes_begin();
+    const MeshBase::node_iterator end = this->_mesh.nodes_end();
+    for ( ; it != end; ++it) 
+      tetgen_wrapper.set_node(index++, (**it)(0), (**it)(1), (**it)(2));
+  }
 
   // >>> fill input structure "tetgenio" with facet data:
-  int facet_num = tri3_num; 
+  int facet_num = this->_mesh.n_elem();
 
   // allocate memory in "tetgenio" structure:
   tetgen_wrapper.set_facetlist(facet_num, holes.size());
 
-  // fill facetlist: each facet consists of only one polygon:
-  int insertnum = 0;
-  for (unsigned int i=0; i<total_num; i++) {
-    tetgen_wrapper.set_facet_polygonlist(insertnum, 1);
-    tetgen_wrapper.set_polygon_vertexlist(insertnum, 0, 3);
-    for (int j=0; j<3; j++)
-      tetgen_wrapper.set_vertex(insertnum,0,j, get_node_index(_elements[i]->get_node(j)));
-    insertnum++;
-  } // for
+
+  {
+    int insertnum = 0;
+    MeshBase::element_iterator it        = this->_mesh.elements_begin();
+    const MeshBase::element_iterator end = this->_mesh.elements_end();
+    for (; it != end ; ++it)
+      {
+	tetgen_wrapper.set_facet_polygonlist(insertnum, 1);
+	tetgen_wrapper.set_polygon_vertexlist(insertnum, 0, 3);
+
+	Elem* elem = *it;
+
+	for (unsigned int j=0; j<elem->n_nodes(); ++j)
+	  tetgen_wrapper.set_vertex(insertnum, // facet number
+				    0,         // polygon (always 0)
+				    j,         // vertex in tetgen input
+				    this->get_node_index(elem->get_node(j)));
+	insertnum++;
+      }
+  }
+
+
 
   // fill hole list (if there are holes):
-  if (holes.size()>0) {
-    std::vector< Node *>::iterator ihole;
-    int hole_index = 0;
-    for (ihole=holes.begin(); ihole!=holes.end(); ++ihole) {
-      tetgen_wrapper.set_hole(hole_index++, (**ihole)(0), (**ihole)(1), (**ihole)(2));
-    } // for
-  } // if
+  if (holes.size() > 0)
+    {
+      std::vector< Node *>::const_iterator ihole;
+      int hole_index = 0;
+      for (ihole=holes.begin(); ihole!=holes.end(); ++ihole)
+	tetgen_wrapper.set_hole(hole_index++, (**ihole)(0), (**ihole)(1), (**ihole)(2));
+    }
 
+  
   // >>> run TetGen triangulation method:
-
   // assemble switches:
   std::ostringstream oss; // string holding switches
   oss << "-pQ";
+
   if (quality_constraint != 0)
     oss << "q" << quality_constraint;
+  
   if (volume_constraint != 0)
     oss << "a" << volume_constraint;
+  
   std::string params = oss.str();
 
   tetgen_wrapper.set_switches(params); // TetGen switches: Piecewise linear complex, Quiet mode
   tetgen_wrapper.run_tetgen();
 
-  // >>> save elements to mesh structure, 
-  // old nodes should not be changed, new nodes will be appended:
-
   // => nodes:
-  // Reserve space in the _nodes vector to avoid unnecessary allocations.
-  unsigned int old_nodesnum = _nodes.size();
-  REAL x,y,z;
-  _num_nodes       = tetgen_wrapper.get_numberofpoints();
-  _nodes.resize (_num_nodes+1);
+  unsigned int old_nodesnum = this->_mesh.n_nodes();
+  REAL x=0., y=0., z=0.;
+  const unsigned int num_nodes = tetgen_wrapper.get_numberofpoints();
+
   // Add additional nodes to the nodes vector.
-  for (unsigned int i=old_nodesnum; i<=_num_nodes; i++) {
-    tetgen_wrapper.get_output_node(i, x,y,z);
-    _nodes[i] = Node::build(x,y,z,i).release();
-  }
-  // => tetrahedra:
-  int n_nodes     = 4;                                  // (Tet4 elements)
-  _num_elements   = tetgen_wrapper.get_numberoftetrahedra();
-
-  int firstnumber = _elements.size();                 // append position
-  // Reserve space in the _elements vector to avoid unnecessary allocations.
-  _elements.resize (_num_elements+firstnumber);
-
-  // Vector that assigns element nodes to their correct position:
-  static const unsigned int assign_elm_nodes[] = { 0, 1, 2, 3};
-  unsigned long int node_labels[4];      // Vector that temporarily holds the node labels defining element.
-  for (unsigned int i=0; i<_num_elements; i++)
+  for (unsigned int i=old_nodesnum; i<=num_nodes; i++)
     {
-      _elements[firstnumber+i] = new Tet4;     // TetGen only supports Tet4 elements.
-      for (int j=0; j<n_nodes; j++) 
+      tetgen_wrapper.get_output_node(i, x,y,z);
+      this->_mesh.add_point ( Point(x,y,z) );
+    }
+  
+  // => tetrahedra:
+  const unsigned int num_elements   = tetgen_wrapper.get_numberoftetrahedra();
+
+  // Vector that temporarily holds the node labels defining element.
+  unsigned long int node_labels[4];      
+
+  for (unsigned int i=0; i<num_elements; i++)
+    {
+      //_elements[firstnumber+i] = new Tet4;     // TetGen only supports Tet4 elements.
+      Elem* elem = new Tet4;
+
+      // Fill up the the node_labels vector
+      for (unsigned int j=0; j<elem->n_nodes(); j++) 
 	node_labels[j] = tetgen_wrapper.get_element_node(i,j);
       
-      // nodes are being stored in element
-      for (int j=0; j<n_nodes; j++) 
-	_elements[firstnumber+i]->set_node(assign_elm_nodes[j]) = _nodes[node_labels[j]];
-    } // for
-} // triangulate_conformingDelaunayMesh_carvehole
+      // Associate nodes with this element
+      for (unsigned int j=0; j<elem->n_nodes(); j++) 
+	elem->set_node(j) = this->_mesh.node_ptr( node_labels[j] );
+
+      // Finally, add this element to the mesh
+      this->_mesh.add_elem(elem);
+    }
+}
 
 #endif
 
-#endif
+#endif // #ifdef HAVE_TETGEN

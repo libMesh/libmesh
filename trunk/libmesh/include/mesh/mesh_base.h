@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.32 2004-11-10 20:34:48 jwpeterson Exp $
+// $Id: mesh_base.h,v 1.33 2004-11-12 00:42:40 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -64,7 +64,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.32 $
+ * \version $Revision: 1.33 $
  */
 
 
@@ -714,20 +714,9 @@ protected:
 
   /**
    * The partitioner class is a friend so that it can set
-   * the number of subdomains.
+   * the number of partitions.
    */
   friend class Partitioner;
-  
-
-#ifdef HAVE_TETGEN
-
-  /**
-   * Some methods need read/write access to
-   * protected \p _nodes and \p elements arrays.
-   */ 
-  friend class TetGenMeshInterface;
-
-#endif
 
 };
 

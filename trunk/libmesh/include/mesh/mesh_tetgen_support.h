@@ -1,4 +1,4 @@
-// $Id: mesh_tetgen_support.h,v 1.12 2004-11-08 00:11:03 jwpeterson Exp $
+// $Id: mesh_tetgen_support.h,v 1.13 2004-11-12 00:42:40 jwpeterson Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -74,7 +74,7 @@ class TetGenWrapper
   /**
    * Method sets number of nodes in TetGen input.
    */
-  virtual void set_numberofpoints(int i) = 0;
+  virtual void set_numberofpoints(const int i) = 0;
 
   /**
    * Method returns number of nodes in TetGen output.
@@ -84,17 +84,17 @@ class TetGenWrapper
   /**
    * Method sets number of facets in TetGen input.
    */
-  virtual void set_numberoffacets(int i) = 0;
+  virtual void set_numberoffacets(const int i) = 0;
 
   /**
    * Method sets number of holes in TetGen input.
    */
-  virtual void set_numberofholes(int i) = 0;
+  virtual void set_numberofholes(const int i) = 0;
 
   /**
    * Method allocates memory, sets number of nodes in TetGen input.
    */
-  virtual void set_pointlist(int numofpoints) = 0;
+  virtual void set_pointlist(const int numofpoints) = 0;
 
   /**
    * Method allocates memory, sets number of facets, holes in TetGen input.
@@ -114,15 +114,16 @@ class TetGenWrapper
   /**
    * Method returns index of jth node from element i in TetGen output.
    */
-  virtual int  get_element_node(int i, int j) = 0;
+  virtual int  get_element_node(const int i, const int j) = 0;
 
   /**
    * Method returns index of jth node from surface triangle i in TetGen output.
    */
-  virtual int  get_triface_node(int i, int j) = 0;
+  virtual int  get_triface_node(const int i, const int j) = 0;
 
   /**
-   * Method sets coordinates of hole i in TetGen input. */
+   * Method sets coordinates of hole i in TetGen input.
+   */
   virtual void set_hole(int i, REAL x, REAL y, REAL z) = 0;
 
   /**
@@ -160,6 +161,16 @@ class TetGenWrapper
 };
 
 
+
+
+
+
+
+
+
+
+
+
 /**
  * Semi-abstract implementation of TetGenWrapper class 
  * for TetGen 1.x data structures and methods.
@@ -190,15 +201,22 @@ class TetGen1_wrapper : public TetGenWrapper
 
   void set_node(int i, REAL x, REAL y, REAL z);
   void set_hole(int i, REAL x, REAL y, REAL z);
-  void set_numberofpoints(int i);
+  void set_numberofpoints(const int i);
   int  get_numberofpoints();
 
   void get_output_node(int i, REAL& x, REAL& y, REAL& z);
   int  get_numberoftetrahedra();
   int  get_numberoftrifaces();
-  int  get_element_node(int i, int j);
-  int  get_triface_node(int i, int j);
+  int  get_element_node(const int i, const int j);
+  int  get_triface_node(const int i, const int j);
 };
+
+
+
+
+
+
+
 
 
 #ifdef TETGEN_13
@@ -211,12 +229,12 @@ class TetGen13_wrapper : public TetGen1_wrapper
 {
  public:
   /**
-   * TetGen mesh structure.
+   * TetGen mesh structure (from the TetGen library).
    */
   tetgenmesh      tetgen_mesh;
   
   /**
-   * TetGen control class.
+   * TetGen control class (from the TetGen library).
    */
   tetgenbehavior  tetgen_be; 
 
@@ -226,21 +244,21 @@ class TetGen13_wrapper : public TetGen1_wrapper
   char*           switches;
 
   /**
-   * Constructor class
+   * Constructor.
    */
   TetGen13_wrapper();
 
   /**
-   * Destructor class
+   * Destructor.
    */
   ~TetGen13_wrapper();
 
   void set_switches(std::string s);
   void run_tetgen();
-  void set_pointlist(int numofpoints);
+  void set_pointlist(const int numofpoints);
 
-  void set_numberoffacets(int i);
-  void set_numberofholes(int i);
+  void set_numberoffacets(const int i);
+  void set_numberofholes(const int i);
   void set_facetlist(int numoffacets, int numofholes);
 
   void set_facet_numberofpolygons(int i, int num);
@@ -252,6 +270,16 @@ class TetGen13_wrapper : public TetGen1_wrapper
 };
 
 #endif // TETGEN_13
+
+
+
+
+
+
+
+
+
+
 
 
 /**
@@ -287,15 +315,17 @@ public:
    * from the nodes point set. Boundary constraints are taken from 
    * elements array.
    */
-  void triangulate_conformingDelaunayMesh (double quality_constraint, double volume_constraint);
+  void triangulate_conformingDelaunayMesh (const double quality_constraint,
+					   const double volume_constraint);
 
   /**
    * Method invokes TetGen library to compute a Delaunay tetrahedrization
    * from the nodes point set. Boundary constraints are taken from 
    * elements array. Include carve-out functionality.
    */
-  void triangulate_conformingDelaunayMesh_carvehole
-         (std::vector< Node *>& holes, double quality_constraint, double volume_constraint);
+  void triangulate_conformingDelaunayMesh_carvehole (const std::vector< Node *>& holes,
+						     const double quality_constraint,
+						     const double volume_constraint);
 
   /**
    * Help function. Returns _nodes index for *Node. 
@@ -311,31 +341,11 @@ protected:
 
   //-------------------------------------------------------------
   // local data
-  
-  /**
-   * vector holding the nodes.
-   */
-  std::vector<Node*>& _nodes;    
 
   /**
-   * vector holding the elements.
+   * Local reference to the mesh we are working with.
    */
-  std::vector<Elem*>& _elements; 
-
-  /**
-   * stores new positions of nodes. Used when reading.
-   */
-  std::map<unsigned int,unsigned int> _assign_nodes; 
-
-  /**
-   * total number of nodes. Primarily used when reading.
-   */
-  unsigned int _num_nodes;
-
-  /**
-   * total number of elements. Primarily used when reading.
-   */
-  unsigned int _num_elements;
+  Mesh& _mesh;
 
 };
 
