@@ -1,4 +1,4 @@
-// $Id: mesh_function.C,v 1.2.2.1 2003-05-13 21:32:41 benkirk Exp $
+// $Id: mesh_function.C,v 1.2.2.2 2003-05-13 22:08:21 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,7 @@
 
 // Local Includes
 #include "mesh_function.h"
-#include "equation_systems_base.h"
+#include "equation_systems.h"
 #include "numeric_vector.h"
 #include "dof_map.h"
 #include "point_locator_base.h"
@@ -37,7 +37,7 @@
 
 //------------------------------------------------------------------
 // MeshFunction methods
-MeshFunction::MeshFunction (const EquationSystemsBase& eqn_systems,
+MeshFunction::MeshFunction (const EquationSystems& eqn_systems,
 			    const NumericVector<Number>& vec,
 			    const DofMap& dof_map,
 			    const std::vector<unsigned int>& vars,
@@ -53,7 +53,7 @@ MeshFunction::MeshFunction (const EquationSystemsBase& eqn_systems,
 
 
 
-MeshFunction::MeshFunction (const EquationSystemsBase& eqn_systems,
+MeshFunction::MeshFunction (const EquationSystems& eqn_systems,
 			    const NumericVector<Number>& vec,
 			    const DofMap& dof_map,
 			    const unsigned int var,
@@ -107,7 +107,8 @@ void MeshFunction::init ()
   if (this->_master != NULL)
     {
       // we aren't the master
-      const MeshFunction* master = static_cast<const MeshFunction*>(this->_master);
+      const MeshFunction* master =
+	dynamic_cast<const MeshFunction*>(this->_master);
       
       if (master->_point_locator == NULL)
         {

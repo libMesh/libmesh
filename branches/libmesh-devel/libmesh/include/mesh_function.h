@@ -1,4 +1,4 @@
-// $Id: mesh_function.h,v 1.1.2.1 2003-05-13 21:32:41 benkirk Exp $
+// $Id: mesh_function.h,v 1.1.2.2 2003-05-13 22:08:21 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -33,7 +33,7 @@
 
 
 // Forward Declarations
-class EquationSystemsBase;
+class EquationSystems;
 template <typename T> class NumericVector;
 class DofMap;
 class PointLocatorBase;
@@ -57,7 +57,7 @@ public:
    * Constructor for mesh based functions with vectors
    * as return value.  Optionally takes a master function.
    */
-  MeshFunction (const EquationSystemsBase& eqn_systems,
+  MeshFunction (const EquationSystems& eqn_systems,
 		const NumericVector<Number>& vec,
 		const DofMap& dof_map,
 		const std::vector<unsigned int>& vars,
@@ -67,7 +67,7 @@ public:
    * Constructor for mesh based functions with a number
    * as return value.  Optionally takes a master function.
    */
-  MeshFunction (const EquationSystemsBase& eqn_systems,
+  MeshFunction (const EquationSystems& eqn_systems,
 		const NumericVector<Number>& vec,
 		const DofMap& dof_map,
 		const unsigned int var,
@@ -111,7 +111,7 @@ protected:
    * The equation systems handler, from which
    * the data are gathered.
    */
-  const EquationSystemsBase& _eqn_systems;
+  const EquationSystems& _eqn_systems;
 
   /**
    * A reference to the vector that holds the data

@@ -1,4 +1,4 @@
-// $Id: fe_compute_data.h,v 1.1.2.1 2003-05-06 14:00:38 benkirk Exp $
+// $Id: fe_compute_data.h,v 1.1.2.2 2003-05-13 22:08:21 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -81,9 +81,10 @@ public:
   //----------------------------------------------------
   // Output data
   /**
-   * Storage for the computed shape function values
+   * Storage for the computed shape function values.
+   * The shape functions are real-valued.
    */
-  std::vector<Number> shape;
+  std::vector<Real> shape;
 
 
 #if defined(ENABLE_INFINITE_ELEMENTS) && !defined(USE_COMPLEX_NUMBERS)
@@ -114,7 +115,7 @@ public:
   void init () 
     { 
       if (!(this->shape.empty()))
-        std::fill (this->shape.begin(),   this->shape.end(),   libMesh::zero);
+        std::fill (this->shape.begin(),   this->shape.end(),   0.);
 #if defined(ENABLE_INFINITE_ELEMENTS) && !defined(USE_COMPLEX_NUMBERS)
       this->phase = 0.;
 #endif

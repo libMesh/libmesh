@@ -1,4 +1,4 @@
-// $Id: point_locator.h,v 1.1.2.1 2003-05-13 21:32:41 benkirk Exp $
+// $Id: point_locator.h,v 1.1.2.2 2003-05-13 22:08:21 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -117,8 +117,7 @@ private:
    * Make all \p PointLocator<TREE> friend so that
    * the servants can access the master's tree.
    */
-  friend class PointLocator<TREE>;
-
+//  friend class PointLocator<TREE>;
 };
 
 
