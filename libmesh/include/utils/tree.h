@@ -1,4 +1,4 @@
-// $Id: tree.h,v 1.6 2004-07-26 15:01:30 jwpeterson Exp $
+// $Id: tree.h,v 1.7 2004-11-08 00:11:03 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -156,9 +156,12 @@ Tree<N>::Tree (const MeshBase& m,
     {
       // Add all the nodes to the root node.  It will 
       // automagically build the tree for us.
-      const_node_iterator       it (mesh.const_nodes_begin());
-      const const_node_iterator end(mesh.const_nodes_end());
-      
+//       const_node_iterator       it (mesh.const_nodes_begin());
+//       const const_node_iterator end(mesh.const_nodes_end());
+
+      MeshBase::const_node_iterator       it  = mesh.nodes_begin();
+      const MeshBase::const_node_iterator end = mesh.nodes_end();
+
       for (; it != end; ++it)
 	root.insert (*it);
       
@@ -175,9 +178,13 @@ Tree<N>::Tree (const MeshBase& m,
     {
       // Add all the elements to the root node.  It will
       // automagically build the tree for us.
-      const_active_elem_iterator       it (mesh.const_elements_begin());
-      const const_active_elem_iterator end(mesh.const_elements_end());
+//       const_active_elem_iterator       it (mesh.const_elements_begin());
+//       const const_active_elem_iterator end(mesh.const_elements_end());
 
+      MeshBase::const_element_iterator       it  = mesh.elements_begin();
+      const MeshBase::const_element_iterator end = mesh.elements_end();
+
+      
       for (; it != end; ++it)
 	root.insert (*it);
     }

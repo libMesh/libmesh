@@ -1,4 +1,4 @@
-/* $Id: ex8.C,v 1.11 2004-10-26 22:00:32 jwpeterson Exp $ */
+/* $Id: ex8.C,v 1.12 2004-11-08 00:11:02 jwpeterson Exp $ */
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
 
@@ -384,8 +384,11 @@ void assemble_wave(EquationSystems& es,
   // Now we will loop over all the elements in the mesh.
   // We will compute the element matrix and right-hand-side
   // contribution.
-  const_elem_iterator           el (mesh.elements_begin());
-  const const_elem_iterator end_el (mesh.elements_end());
+//   const_elem_iterator           el (mesh.elements_begin());
+//   const const_elem_iterator end_el (mesh.elements_end());
+
+  MeshBase::const_element_iterator       el     = mesh.elements_begin();
+  const MeshBase::const_element_iterator end_el = mesh.elements_end();
   
   for ( ; el != end_el; ++el)
     {

@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.44 2004-10-28 20:06:14 benkirk Exp $
+// $Id: mesh.C,v 1.45 2004-11-08 00:11:05 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -331,8 +331,11 @@ void Mesh::create_pid_mesh(Mesh& pid_mesh,
 #endif
   
   // Create iterators to loop over the list of elements
-  const_active_pid_elem_iterator       it(this->elements_begin(),   pid);
-  const const_active_pid_elem_iterator it_end(this->elements_end(), pid);
+//   const_active_pid_elem_iterator       it(this->elements_begin(),   pid);
+//   const const_active_pid_elem_iterator it_end(this->elements_end(), pid);
+
+  const_element_iterator       it     = this->active_pid_elements_begin(pid);
+  const const_element_iterator it_end = this->active_pid_elements_end(pid);
     
   this->create_submesh (pid_mesh, it, it_end);
 }
@@ -344,8 +347,8 @@ void Mesh::create_pid_mesh(Mesh& pid_mesh,
 
 
 void Mesh::create_submesh (Mesh& new_mesh,
-			   const_elem_iterator& it,
-			   const const_elem_iterator& it_end) const
+			   const_element_iterator& it,
+			   const const_element_iterator& it_end) const
 {
  
   // Just in case the subdomain_mesh already has some information

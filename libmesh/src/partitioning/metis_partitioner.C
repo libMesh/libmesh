@@ -1,4 +1,4 @@
-// $Id: metis_partitioner.C,v 1.15 2004-05-11 20:29:07 jwpeterson Exp $
+// $Id: metis_partitioner.C,v 1.16 2004-11-08 00:11:06 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -104,8 +104,11 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
   // We need to map the active element ids into a
   // contiguous range.
   {
-    active_elem_iterator       elem_it (mesh.elements_begin());
-    const active_elem_iterator elem_end(mesh.elements_end());
+//     active_elem_iterator       elem_it (mesh.elements_begin());
+//     const active_elem_iterator elem_end(mesh.elements_end());
+
+    MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
+    const MeshBase::element_iterator elem_end = mesh.active_elements_end(); 
 
     unsigned int el_num = 0;
 
@@ -126,8 +129,11 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
   {
     std::vector<const Elem*> neighbors_offspring;
     
-    const_active_elem_iterator       elem_it (mesh.const_elements_begin());
-    const const_active_elem_iterator elem_end(mesh.const_elements_end());
+//     const_active_elem_iterator       elem_it (mesh.const_elements_begin());
+//     const const_active_elem_iterator elem_end(mesh.const_elements_end());
+
+    MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
+    const MeshBase::element_iterator elem_end = mesh.active_elements_end(); 
 
     // This will be exact when there is no refinement and all the
     // elements are of the same type.
@@ -234,8 +240,11 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
   // the processor id for each active element, but in terms of
   // the contiguous indexing we defined above
   {
-    active_elem_iterator       elem_it (mesh.elements_begin());
-    const active_elem_iterator elem_end(mesh.elements_end());
+ //    active_elem_iterator       elem_it (mesh.elements_begin());
+//     const active_elem_iterator elem_end(mesh.elements_end());
+
+    MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
+    const MeshBase::element_iterator elem_end = mesh.active_elements_end(); 
 
     for (; elem_it != elem_end; ++elem_it)
       {

@@ -1,4 +1,4 @@
-// $Id: partitioner.C,v 1.6 2004-05-11 20:29:07 jwpeterson Exp $
+// $Id: partitioner.C,v 1.7 2004-11-08 00:11:06 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -62,9 +62,12 @@ void Partitioner::repartition (MeshBase& mesh,
 void Partitioner::single_partition (MeshBase& mesh)
 {
   // Loop over all the elements and assign them to processor 0.
-  elem_iterator       elem_it (mesh.elements_begin());
-  const elem_iterator elem_end(mesh.elements_end());
-      
+//   elem_iterator       elem_it (mesh.elements_begin());
+//   const elem_iterator elem_end(mesh.elements_end());
+
+  MeshBase::element_iterator       elem_it  = mesh.elements_begin();
+  const MeshBase::element_iterator elem_end = mesh.elements_end(); 
+
   for ( ; elem_it != elem_end; ++elem_it)
     (*elem_it)->set_processor_id() = 0;
 }

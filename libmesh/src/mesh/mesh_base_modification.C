@@ -1,4 +1,4 @@
-// $Id: mesh_base_modification.C,v 1.16 2004-05-13 15:58:35 spetersen Exp $
+// $Id: mesh_base_modification.C,v 1.17 2004-11-08 00:11:05 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -48,8 +48,11 @@ void MeshBase::all_tri ()
   std::vector<Elem*> new_elements;
   new_elements.reserve (2*this->n_active_elem());
 
-  active_elem_iterator el (this->elements_begin());
-  active_elem_iterator end(this->elements_end());
+//   active_elem_iterator el (this->elements_begin());
+//   active_elem_iterator end(this->elements_end());
+
+  element_iterator       el  = this->active_elements_begin();
+  const element_iterator end = this->active_elements_end(); 
 
   for (; el!=end; ++el)
     {

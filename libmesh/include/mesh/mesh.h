@@ -1,4 +1,4 @@
-// $Id: mesh.h,v 1.8 2004-10-26 22:00:43 jwpeterson Exp $
+// $Id: mesh.h,v 1.9 2004-11-08 00:11:03 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -26,7 +26,7 @@
 
 // Local Includes -----------------------------------
 #include "mesh_base.h"
-
+//#include "elem_iterators.h"
 
 
 
@@ -203,11 +203,16 @@ class Mesh : public MeshBase
 			const unsigned int pid) const;
   
   /**
-   * document me!
+   * Constructs a mesh called "new_mesh" from the current mesh by
+   * iterating over the elements between it and it_end and adding
+   * them to the new mesh.
    */
   void create_submesh (Mesh& new_mesh,
-		       const_elem_iterator& it,
-		       const const_elem_iterator& it_end) const;
+		       const_element_iterator& it,
+		       const const_element_iterator& it_end) const;
+
+
+  
  protected:
 
   /**

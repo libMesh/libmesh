@@ -1,4 +1,4 @@
-// $Id: mesh_data.C,v 1.23 2004-10-26 15:31:18 jwpeterson Exp $
+// $Id: mesh_data.C,v 1.24 2004-11-08 00:11:05 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -170,8 +170,11 @@ void MeshData::translate (const MeshBase& out_mesh,
     values.reserve(n_comp*out_mesh.n_nodes());
     
     // iterate over the mesh's nodes
-    const_node_iterator       nodes_it  (out_mesh.nodes_begin());
-    const const_node_iterator nodes_end (out_mesh.nodes_end());
+//     const_node_iterator       nodes_it  (out_mesh.nodes_begin());
+//     const const_node_iterator nodes_end (out_mesh.nodes_end());
+
+    MeshBase::const_node_iterator       nodes_it  = out_mesh.nodes_begin();
+    const MeshBase::const_node_iterator nodes_end = out_mesh.nodes_end();
 
     // Do not use the \p get_data() method, but the operator()
     // method, since this returns by default a zero value,
@@ -739,9 +742,12 @@ void MeshData::assign (const MeshData& omd)
   // has element ids.
   if ((this->_active) && (omd._elem_id.size() != 0))
     {
-      const_elem_iterator       elem_it (_mesh.elements_begin());
-      const const_elem_iterator elem_end(_mesh.elements_end());
-      
+//       const_elem_iterator       elem_it (_mesh.elements_begin());
+//       const const_elem_iterator elem_end(_mesh.elements_end());
+
+      MeshBase::const_element_iterator       elem_it  = _mesh.elements_begin();
+      const MeshBase::const_element_iterator elem_end = _mesh.elements_end();
+
       for (; elem_it != elem_end; ++elem_it)
         {
 	  const Elem* elem = *elem_it;  

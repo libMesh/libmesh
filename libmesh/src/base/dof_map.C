@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.66 2004-11-03 14:30:12 benkirk Exp $
+// $Id: dof_map.C,v 1.67 2004-11-08 00:11:04 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -64,8 +64,11 @@ void DofMap::reinit(MeshBase& mesh)
   // Clear the old_dof_objects for all the nodes
   // and elements so that we can overwrite them
   {
-    node_iterator       node_it (mesh.nodes_begin());
-    const node_iterator node_end(mesh.nodes_end());
+    //node_iterator       node_it (mesh.nodes_begin());
+    //const node_iterator node_end(mesh.nodes_end());
+
+    MeshBase::node_iterator       node_it  = mesh.nodes_begin();
+    const MeshBase::node_iterator node_end = mesh.nodes_end();
     
     for ( ; node_it != node_end; ++node_it)
       {
@@ -73,8 +76,11 @@ void DofMap::reinit(MeshBase& mesh)
 	assert ((*node_it)->old_dof_object == NULL);
       }
     
-    elem_iterator       elem_it (mesh.elements_begin());
-    const elem_iterator elem_end(mesh.elements_end());
+//     elem_iterator       elem_it (mesh.elements_begin());
+//     const elem_iterator elem_end(mesh.elements_end());
+
+    MeshBase::element_iterator       elem_it  = mesh.elements_begin();
+    const MeshBase::element_iterator elem_end = mesh.elements_end();
     
     for ( ; elem_it != elem_end; ++elem_it)
       {
@@ -88,8 +94,11 @@ void DofMap::reinit(MeshBase& mesh)
   // Set the old_dof_objects for the elements that
   // weren't just created
   {
-    elem_iterator       elem_it (mesh.elements_begin());
-    const elem_iterator elem_end(mesh.elements_end());
+//     elem_iterator       elem_it (mesh.elements_begin());
+//     const elem_iterator elem_end(mesh.elements_end());
+
+    MeshBase::element_iterator       elem_it  = mesh.elements_begin();
+    const MeshBase::element_iterator elem_end = mesh.elements_end();
     
     for ( ; elem_it != elem_end; ++elem_it)
       {
@@ -120,15 +129,21 @@ void DofMap::reinit(MeshBase& mesh)
   // handle new \p DofObjects that may have just been created
   {
     // All the nodes
-    node_iterator       node_it  (mesh.nodes_begin());
-    const node_iterator node_end (mesh.nodes_end());
+//     node_iterator       node_it  (mesh.nodes_begin());
+//     const node_iterator node_end (mesh.nodes_end());
+
+    MeshBase::node_iterator       node_it  = mesh.nodes_begin();
+    const MeshBase::node_iterator node_end = mesh.nodes_end();
 
     for ( ; node_it != node_end; ++node_it)
       (*node_it)->set_n_vars(this->sys_number(),n_var);
 
     // All the elements
-    elem_iterator       elem_it (mesh.elements_begin());
-    const elem_iterator elem_end(mesh.elements_end());
+//     elem_iterator       elem_it (mesh.elements_begin());
+//     const elem_iterator elem_end(mesh.elements_end());
+
+    MeshBase::element_iterator       elem_it  = mesh.elements_begin();
+    const MeshBase::element_iterator elem_end = mesh.elements_end();
 
     for ( ; elem_it != elem_end; ++elem_it)
       (*elem_it)->set_n_vars(this->sys_number(),n_var);
@@ -142,9 +157,12 @@ void DofMap::reinit(MeshBase& mesh)
       const FEType& fe_type = this->variable_type(var);
 
       // For all the active elements
-      active_elem_iterator       elem_it (mesh.elements_begin());
-      const active_elem_iterator elem_end(mesh.elements_end());
-      
+//       active_elem_iterator       elem_it (mesh.elements_begin());
+//       const active_elem_iterator elem_end(mesh.elements_end());
+
+      MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
+      const MeshBase::element_iterator elem_end = mesh.active_elements_end(); 
+ 
       for ( ; elem_it != elem_end; ++elem_it)
 	{
 	  Elem*    elem       = *elem_it;
@@ -180,15 +198,21 @@ void DofMap::reinit(MeshBase& mesh)
   // Finally, clear all the current DOF indices
   {
     // All the nodes
-    node_iterator       node_it  (mesh.nodes_begin());
-    const node_iterator node_end (mesh.nodes_end());
+//     node_iterator       node_it  (mesh.nodes_begin());
+//     const node_iterator node_end (mesh.nodes_end());
+
+    MeshBase::node_iterator       node_it  = mesh.nodes_begin();
+    const MeshBase::node_iterator node_end = mesh.nodes_end();
 
     for ( ; node_it != node_end; ++node_it)
       (*node_it)->invalidate_dofs(this->sys_number());
     
     // All the elements
-    active_elem_iterator       elem_it (mesh.elements_begin());
-    const active_elem_iterator elem_end(mesh.elements_end());
+//     active_elem_iterator       elem_it (mesh.elements_begin());
+//     const active_elem_iterator elem_end(mesh.elements_end());
+
+    MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
+    const MeshBase::element_iterator elem_end = mesh.active_elements_end(); 
 
     for ( ; elem_it != elem_end; ++elem_it)
       (*elem_it)->invalidate_dofs(this->sys_number());
@@ -277,10 +301,13 @@ void DofMap::distribute_dofs_var_major (MeshBase& mesh)
       
       for (unsigned var=0; var<n_vars; var++)
 	{
-	  active_pid_elem_iterator       elem_it (mesh.elements_begin(),
-							processor);
-	  const active_pid_elem_iterator elem_end(mesh.elements_end(),
-							processor);
+// 	  active_pid_elem_iterator       elem_it (mesh.elements_begin(),
+// 							processor);
+// 	  const active_pid_elem_iterator elem_end(mesh.elements_end(),
+// 							processor);
+	  
+	  MeshBase::element_iterator       elem_it  = mesh.active_pid_elements_begin(processor);
+	  const MeshBase::element_iterator elem_end = mesh.active_pid_elements_end(processor);
 
 	  for ( ; elem_it != elem_end; ++elem_it)
 	    {
@@ -355,8 +382,12 @@ void DofMap::distribute_dofs_var_major (MeshBase& mesh)
   // that are neighbors of the elements on the local processor
   // (for discontinuous elements)
   {
-    const_active_local_elem_iterator       elem_it (mesh.const_elements_begin());
-    const const_active_local_elem_iterator elem_end(mesh.const_elements_end());
+//     const_active_local_elem_iterator       elem_it (mesh.const_elements_begin());
+//     const const_active_local_elem_iterator elem_end(mesh.const_elements_end());
+
+    // "mesh" is a non-const reference, therefore we have to use regular iterators
+    MeshBase::element_iterator       elem_it  = mesh.active_local_elements_begin();
+    const MeshBase::element_iterator elem_end = mesh.active_local_elements_end(); 
 
     std::vector<unsigned int> di;
 
@@ -433,10 +464,13 @@ void DofMap::distribute_dofs_node_major (MeshBase& mesh)
       
       // Only number dofs connected to active
       // elements for the current processor.	      
-      active_pid_elem_iterator       elem_it (mesh.elements_begin(),
-					      processor);
-      const active_pid_elem_iterator elem_end(mesh.elements_end(),
-					      processor);
+//       active_pid_elem_iterator       elem_it (mesh.elements_begin(),
+// 					      processor);
+//       const active_pid_elem_iterator elem_end(mesh.elements_end(),
+// 					      processor);
+
+      MeshBase::element_iterator       elem_it  = mesh.active_pid_elements_begin(processor);
+      const MeshBase::element_iterator elem_end = mesh.active_pid_elements_end(processor);
 	
       for ( ; elem_it != elem_end; ++elem_it)
 	{
@@ -510,8 +544,12 @@ void DofMap::distribute_dofs_node_major (MeshBase& mesh)
   // that are neighbors of the elements on the local processor
   // (for discontinuous elements)
   {
-    const_active_local_elem_iterator       elem_it (mesh.const_elements_begin());
-    const const_active_local_elem_iterator elem_end(mesh.const_elements_end());
+//     const_active_local_elem_iterator       elem_it (mesh.const_elements_begin());
+//     const const_active_local_elem_iterator elem_end(mesh.const_elements_end());
+
+    // "mesh" is a non-const reference, therefore we have to use regular iterators
+    MeshBase::element_iterator       elem_it  = mesh.active_local_elements_begin();
+    const MeshBase::element_iterator elem_end = mesh.active_local_elements_end(); 
 
     std::vector<unsigned int> di;
 
@@ -602,8 +640,11 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
       std::vector<unsigned int> element_dofs;
       std::vector<unsigned int> neighbor_dofs;
 
-      const_active_elem_iterator       elem_it (mesh.elements_begin());
-      const const_active_elem_iterator elem_end(mesh.elements_end());
+//       const_active_elem_iterator       elem_it (mesh.elements_begin());
+//       const const_active_elem_iterator elem_end(mesh.elements_end());
+
+      MeshBase::const_element_iterator       elem_it  = mesh.active_elements_begin();
+      const MeshBase::const_element_iterator elem_end = mesh.active_elements_end(); 
 
       for ( ; elem_it != elem_end; ++elem_it)
 	{
@@ -695,9 +736,12 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
       std::vector<unsigned int> element_dofs_j;
       
       
-      const_active_elem_iterator       elem_it (mesh.elements_begin());
-      const const_active_elem_iterator elem_end(mesh.elements_end());
-      
+//       const_active_elem_iterator       elem_it (mesh.elements_begin());
+//       const const_active_elem_iterator elem_end(mesh.elements_end());
+
+      MeshBase::const_element_iterator       elem_it  = mesh.active_elements_begin();
+      const MeshBase::const_element_iterator elem_end = mesh.active_elements_end(); 
+
       for ( ; elem_it != elem_end; ++elem_it)
 	for (unsigned int vi=0; vi<n_var; vi++)
 	  {
@@ -1002,8 +1046,11 @@ void DofMap::augment_send_list_for_projection(const MeshBase& mesh)
   bool needs_sorting = false;
   
   
-  const_active_local_elem_iterator       elem_it (mesh.elements_begin());
-  const const_active_local_elem_iterator elem_end(mesh.elements_end());
+//   const_active_local_elem_iterator       elem_it (mesh.elements_begin());
+//   const const_active_local_elem_iterator elem_end(mesh.elements_end());
+
+  MeshBase::const_element_iterator       elem_it  = mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end(); 
 
   for ( ; elem_it != elem_end; ++elem_it)
     {

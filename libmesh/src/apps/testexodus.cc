@@ -1,11 +1,9 @@
  // C++ includes
-#include <iostream>
-#include <map>
 
 
 
 // Local Includes
-#include "mesh_config.h"
+#include "libmesh_config.h"
 #include "libmesh.h"
 #include "mesh.h"
 #include "quadrature_gauss.h"
@@ -16,21 +14,14 @@
 #include "boundary_info.h"
 #include "elem.h"
 #include "point.h"
-#include "general_system.h"
 #include "equation_systems.h"
 #include "perfmon.h"
-
-#if defined(HAVE_PETSC)
-extern "C" {
-#include <petsc.h>
-}
-#elif defined(HAVE_MPI)
-extern "C" {
-#include <mpi.h>
-}
-#endif
-
-
+#include "steady_system.h"
+#include "enum_xdr_mode.h"
+#include "sparse_matrix.h"
+#include "gmv_io.h"
+#include "dense_matrix.h"
+#include "dense_vector.h"
 
 void assemble_primary(EquationSystems& es,
 		      const std::string& system_name);
@@ -113,71 +104,42 @@ int main (int argc, char** argv)
     }
     */
 
-    {
-      PerfMon pm("EquationSystem Initialization");
 
-      // Set up the primary system
-      {  
-	es.add_system("primary");
-	es("primary").add_variable("U", SECOND);
-	es("primary").add_variable("V", SECOND);
-      
-	es("primary").get_dof_map().dof_coupling.resize(2);      
-	es("primary").get_dof_map().dof_coupling(0,0) = 1;
-	es("primary").get_dof_map().dof_coupling(1,1) = 1;
-	
-	es("primary").attach_assemble_function(assemble_primary);
-      };
-      
-      // Set up the secondary system
-      {  
-	es.add_system("secondary");
-	FEType fe_type(SECOND, MONOMIAL);
-	es("secondary").add_variable("w", fe_type);
-	
-	es("secondary").attach_assemble_function(assemble_secondary);
-      };
-      
-      es.set_parameter("linear solver tolerance") = 1.e-6;
-      
-      es.init();
 
-      es.print_info();
-    };
+    // Set up the primary system
+    SteadySystem& system1 = es.add_system<SteadySystem>("primary");
+    system1.add_variable("U", SECOND);
+    system1.add_variable("V", SECOND);
+    system1.attach_assemble_function(assemble_primary);
+      
+    // Set up the secondary system
+    SteadySystem& system2 = es.add_system<SteadySystem>("secondary");
+    FEType fe_type(SECOND, MONOMIAL);
+    system2.add_variable("w", fe_type);
+    system2.attach_assemble_function(assemble_secondary);
+      
+    es.set_parameter("linear solver tolerance") = 1.e-6;
+      
+    es.init();
+
+    es.print_info();
     
     // assemble & solve the primary
-    {
-      PerfMon pm ("Solver Performance");
+    system1.solve ();
       
-      // call the solver.
-      es("primary").solve ();
-      
-      // clear the unneded matrix and
-      // Petsc interface
-      es("primary").matrix->clear ();
-      es("primary").linear_solver_interface->clear ();
-    };
-    
-    // assemble & solve the secondary
-    {
-      PerfMon pm ("Solver Performance");
-      
-      // call the solver.
-      es("secondary").solve ();
-    };
-    
+    // assemble & solve the primary
+    system2.solve ();
 
-    
-    mesh.write_gmv_binary(gmv_name, es);	
-    
+    // Write solution and mesh to file.
+    GMVIO(mesh).write_equation_systems(gmv_name, es);	
 
-    es.write("out.xdr", Xdr::ENCODE);
-    es.write("out.xda", Xdr::WRITE);
-  };
+    es.write("out.xdr", libMeshEnums::ENCODE);
+    es.write("out.xda", libMeshEnums::WRITE);
+  }
 
   
   return libMesh::close();
-};
+}
   
 
 
@@ -185,6 +147,8 @@ void assemble_primary(EquationSystems& es,
 		      const std::string& system_name)
 {
   assert (system_name == "primary");
+
+  SteadySystem& system1 = es.get_system<SteadySystem>(system_name);
   
   const Mesh& mesh       = es.get_mesh();
   const unsigned int dim = mesh.mesh_dimension();
@@ -196,13 +160,13 @@ void assemble_primary(EquationSystems& es,
   // Also use a 3x3x3 quadrature rule (3D).  Then tell the FE
   // about the geometry of the problem and the quadrature rule
   
-  AutoPtr<FEBase> fe(FEBase::build(dim, es("primary").get_dof_map().variable_type(0)));
+  AutoPtr<FEBase> fe(FEBase::build(dim, system1.get_dof_map().variable_type(0)));
   QGauss qrule(dim, SEVENTH);
   //QTrap qrule(dim);
   
   fe->attach_quadrature_rule (&qrule);
   
-  AutoPtr<FEBase> fe_face(FEBase::build(dim, es("primary").get_dof_map().variable_type(0)));
+  AutoPtr<FEBase> fe_face(FEBase::build(dim, system1.get_dof_map().variable_type(0)));
   
   QGauss   qface(dim-1, FIFTH);
   //QTrap   qface(dim-1);
@@ -216,16 +180,16 @@ void assemble_primary(EquationSystems& es,
   const std::vector<Real>& JxW                 = fe->get_JxW();
   const std::vector<Point>& q_point            = fe->get_xyz();
   const std::vector<std::vector<Real> >& phi   = fe->get_phi();
-  const std::vector<std::vector<Point> >& dphi = fe->get_dphi();
+  const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
   
   std::vector<unsigned int> dof_indices_U;
   std::vector<unsigned int> dof_indices_V;
-  const DofMap& dof_map = es(system_name).get_dof_map();
+  const DofMap& dof_map = system1.get_dof_map();
   
-  RealDenseMatrix   Kuu;
-  RealDenseMatrix   Kvv;
-  std::vector<Real> Fu;
-  std::vector<Real> Fv;
+  DenseMatrix<Number>   Kuu;
+  DenseMatrix<Number>   Kvv;
+  DenseVector<Number> Fu;
+  DenseVector<Number> Fv;
   
   Real vol=0., area=0.;
 
@@ -256,9 +220,9 @@ void assemble_primary(EquationSystems& es,
       Fu.resize (phi.size());
       Fv.resize (phi.size());
 	    
-      for (unsigned int i=0; i<phi.size(); i++)
-	Fu[i] = Fv[i] = 0.;
-	    
+      Fu.zero();
+      Fv.zero();
+      
       // standard stuff...  like in code 1.
       for (unsigned int gp=0; gp<qrule.n_points(); gp++)
 	{
@@ -277,8 +241,8 @@ void assemble_primary(EquationSystems& es,
 		    
 	      // add jac*weight*f*phi to the RHS in position ig
 		    
-	      Fu[i] += JxW[gp]*f*phi[i][gp];
-	      Fv[i] += JxW[gp]*f*phi[i][gp];
+	      Fu(i) += JxW[gp]*f*phi[i][gp];
+	      Fv(i) += JxW[gp]*f*phi[i][gp];
 		    
 	      for (unsigned int j=0; j<phi.size(); ++j)
 		{
@@ -287,10 +251,10 @@ void assemble_primary(EquationSystems& es,
 			
 		  Kvv(i,j) += JxW[gp]*((phi[i][gp])*(phi[j][gp]) +
 				       1.*((dphi[i][gp])*(dphi[j][gp])));
-		};
-	    };
+		}
+	    }
 	  vol += JxW[gp];
-	};
+	}
 
 
       // Compute surface area (perimiter in 2D)
@@ -307,16 +271,16 @@ void assemble_primary(EquationSystems& es,
 	    }
       }
 
-      es("primary").rhs->add_vector(Fu,
+      system1.rhs->add_vector(Fu,
 				    dof_indices_U);
-      es("primary").rhs->add_vector(Fv,
+      system1.rhs->add_vector(Fv,
 				    dof_indices_V);
 
-      es("primary").matrix->add_matrix(Kuu,
+      system1.matrix->add_matrix(Kuu,
 				       dof_indices_U);
-      es("primary").matrix->add_matrix(Kvv,
+      system1.matrix->add_matrix(Kvv,
 				       dof_indices_V);
-    };
+    }
 
     if (dim == 3)
       {
@@ -328,7 +292,7 @@ void assemble_primary(EquationSystems& es,
       	std::cout << "Area="  << vol << std::endl;	
 	std::cout << "Perimeter=" << area << std::endl;
       }
-};
+}
   
 
 
@@ -336,7 +300,9 @@ void assemble_secondary(EquationSystems& es,
 			const std::string& system_name)
 {
   assert (system_name == "secondary");
-  
+
+  SteadySystem& system2 = es.get_system<SteadySystem>(system_name);
+
   const Mesh& mesh       = es.get_mesh();
   const unsigned int dim = mesh.mesh_dimension();
   const int proc_id      = mesh.processor_id();
@@ -344,7 +310,7 @@ void assemble_secondary(EquationSystems& es,
   // In this section we assemble the matrix and rhs
   PerfMon pm("Matrix Assembly (secondary)");
 
-  AutoPtr<FEBase> fe(FEBase::build(dim, es("secondary").get_dof_map().variable_type(0)));
+  AutoPtr<FEBase> fe(FEBase::build(dim, system2.get_dof_map().variable_type(0)));
   QGauss qrule(dim, FIFTH);
   
   fe->attach_quadrature_rule (&qrule);
@@ -358,8 +324,8 @@ void assemble_secondary(EquationSystems& es,
   std::vector<unsigned int> dof_indices;
   const DofMap& dof_map = es(system_name).get_dof_map();
   
-  RealDenseMatrix   Kww;
-  std::vector<Real> Fw;
+  DenseMatrix<Number> Kww;
+  DenseVector<Number> Fw;
   
 	
   for (unsigned int e=0; e<mesh.n_elem(); e++)
@@ -381,9 +347,8 @@ void assemble_secondary(EquationSystems& es,
 	    
       Fw.resize (phi.size());
 	    
-      for (unsigned int i=0; i<phi.size(); i++)
-	Fw[i] = 0.;
-	    
+      Fw.zero();
+      
       // standard stuff...  like in code 1.
       for (unsigned int gp=0; gp<qrule.n_points(); gp++)
 	for (unsigned int i=0; i<phi.size(); ++i)
@@ -396,17 +361,17 @@ void assemble_secondary(EquationSystems& es,
 	    
 	    const Real f = q_point[gp]*q_point[gp];
 	    
-	    Fw[i] += JxW[gp]*f*phi[i][gp];
+	    Fw(i) += JxW[gp]*f*phi[i][gp];
 	    
 	    for (unsigned int j=0; j<phi.size(); ++j)
 	      Kww(i,j) += JxW[gp]*(phi[i][gp])*(phi[j][gp]);
-	  };
+	  }
 
-      es("secondary").matrix->add_matrix(Kww,
+      system2.matrix->add_matrix(Kww,
 					 dof_indices);
       
-      es("secondary").rhs->add_vector(Fw,
+      system2.rhs->add_vector(Fw,
 				      dof_indices);
       
-    };
-};
+    }
+}

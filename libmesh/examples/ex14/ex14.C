@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.7 2004-06-02 15:05:06 jwpeterson Exp $ */
+/* $Id: ex14.C,v 1.8 2004-11-08 00:11:00 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -72,16 +72,16 @@ void assemble_laplace(EquationSystems& es,
 
 // Prototype for calculation of the exact solution.  Useful
 // for setting boundary conditions.
-Real exact_solution(const Point& p,
-		    const Real,          // time, not needed
-		    const std::string&,  // sys_name, not needed
-		    const std::string&); // unk_name, not needed);
+Number exact_solution(const Point& p,
+		      const Real,          // time, not needed
+		      const std::string&,  // sys_name, not needed
+		      const std::string&); // unk_name, not needed);
 
 // Prototype for calculation of the gradient of the exact solution.  
-RealGradient exact_derivative(const Point& p,
-			      const Real,          // time, not needed
-			      const std::string&,  // sys_name, not needed
-			      const std::string&); // unk_name, not needed);
+Gradient exact_derivative(const Point& p,
+			  const Real,          // time, not needed
+			  const std::string&,  // sys_name, not needed
+			  const std::string&); // unk_name, not needed);
 
 
 
@@ -238,8 +238,7 @@ int main(int argc, char** argv)
 		// \p flux_jump indicator.  Note in general you will need to
 		// provide an error estimator specifically designed for your
 		// application.
-		error_estimator.estimate_error (equation_systems,
-						"Laplace",
+		error_estimator.estimate_error (system,
 						error);
 		
 		// This takes the error in \p error and decides which elements
@@ -310,7 +309,7 @@ int main(int argc, char** argv)
 // We now define the exact solution, being careful
 // to obtain an angle from atan2 in the correct
 // quadrant.
-Real exact_solution(const Point& p,
+Number exact_solution(const Point& p,
 		    const Real,         // time, not needed
 		    const std::string&, // sys_name, not needed
 		    const std::string&) // unk_name, not needed
@@ -336,13 +335,13 @@ Real exact_solution(const Point& p,
 // We now define the gradient of the exact solution, again being careful
 // to obtain an angle from atan2 in the correct
 // quadrant.
-RealGradient exact_derivative(const Point& p,
-			      const Real,         // time, not needed
-			      const std::string&, // sys_name, not needed
-			      const std::string&) // unk_name, not needed
+Gradient exact_derivative(const Point& p,
+			  const Real,         // time, not needed
+			  const std::string&, // sys_name, not needed
+			  const std::string&) // unk_name, not needed
 {
   // Gradient value to be returned.
-  RealGradient gradu;
+  Gradient gradu;
   
   // x and y coordinates in space
   const Real x = p(0);
@@ -482,8 +481,11 @@ void assemble_laplace(EquationSystems& es,
   // processor to compute its components of the global matrix for
   // active elements while ignoring parent elements which have been
   // refined.
-  const_active_local_elem_iterator           el (mesh.elements_begin());
-  const const_active_local_elem_iterator end_el (mesh.elements_end());
+//   const_active_local_elem_iterator           el (mesh.elements_begin());
+//   const const_active_local_elem_iterator end_el (mesh.elements_end());
+
+  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end(); 
   
   for ( ; el != end_el; ++el)
     {
@@ -568,10 +570,10 @@ void assemble_laplace(EquationSystems& es,
 		{
 		  //const Real x = side->point(ns)(0);
 		  //const Real y = side->point(ns)(1);
-		  const Real value = exact_solution(side->point(ns),
-						    0.,
-						    "null",
-						    "void");
+		  const Number value = exact_solution(side->point(ns),
+						      0.,
+						      "null",
+						      "void");
 		  
 // 		  std::cout << "(x,y,bc)=("
 // 			    << x << ","

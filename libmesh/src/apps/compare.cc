@@ -73,7 +73,7 @@ void usage(char *progName)
   fflush(stderr);
 
   abort();
-};
+}
 
 
 

@@ -1,4 +1,4 @@
-// $Id: system_projection.C,v 1.5 2004-06-01 15:50:54 jwpeterson Exp $
+// $Id: system_projection.C,v 1.6 2004-11-08 00:11:06 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -115,9 +115,12 @@ void System::project_vector (const NumericVector<Number>& old_vector,
       
       
       // Iterators for the active elements on local processor
-      const_active_local_elem_iterator       elem_it (_mesh.const_elements_begin());
-      const const_active_local_elem_iterator elem_end(_mesh.const_elements_end());
-      
+//       const_active_local_elem_iterator       elem_it (_mesh.const_elements_begin());
+//       const const_active_local_elem_iterator elem_end(_mesh.const_elements_end());
+
+      MeshBase::element_iterator       elem_it  = _mesh.active_local_elements_begin();
+      const MeshBase::element_iterator elem_end = _mesh.active_local_elements_end(); 
+
       for ( ; elem_it != elem_end; ++elem_it)
 	{
 	  const Elem* elem = *elem_it;

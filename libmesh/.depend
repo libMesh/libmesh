@@ -8,10 +8,12 @@ src/base/dof_map.$(obj-suffix):\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
     include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_fe_family.h\
@@ -27,10 +29,8 @@ src/base/dof_map.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
     include/numerics/coupling_matrix.h\
     include/numerics/sparse_matrix.h\
     include/numerics/type_vector.h\
@@ -46,10 +46,12 @@ src/base/dof_map_constraints.$(obj-suffix):\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
     include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_fe_family.h\
@@ -65,10 +67,8 @@ src/base/dof_map_constraints.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
     include/numerics/coupling_matrix.h\
     include/numerics/dense_matrix.h\
     include/numerics/dense_matrix_base.h\
@@ -99,6 +99,7 @@ src/base/libmesh.$(obj-suffix):\
     include/utils/perf_log.h
 src/base/node.$(obj-suffix):\
     src/base/node.C\
+    include/base/auto_ptr.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
@@ -1064,10 +1065,12 @@ src/fe/inf_fe_static.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_fe_family.h\
@@ -1091,11 +1094,9 @@ src/fe/inf_fe_static.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
     include/numerics/coupling_matrix.h\
     include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
@@ -2092,10 +2093,12 @@ src/mesh/boundary_info.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_io_package.h\
@@ -2108,11 +2111,9 @@ src/mesh/boundary_info.$(obj-suffix):\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
     include/mesh/boundary_mesh.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/utils/perf_log.h
@@ -2124,10 +2125,12 @@ src/mesh/boundary_mesh.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_io_package.h\
@@ -2140,11 +2143,9 @@ src/mesh/boundary_mesh.$(obj-suffix):\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
     include/mesh/boundary_mesh.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/utils/perf_log.h
@@ -2157,10 +2158,12 @@ src/mesh/diva_io.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_fe_family.h\
@@ -2177,12 +2180,10 @@ src/mesh/diva_io.$(obj-suffix):\
     include/mesh/boundary_info.h\
     include/mesh/boundary_mesh.h\
     include/mesh/diva_io.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
     include/mesh/mesh_io.h\
-    include/mesh/node_iterators.h\
     include/numerics/coupling_matrix.h\
     include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
@@ -2207,10 +2208,12 @@ src/mesh/gmsh_io.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_fe_family.h\
@@ -2225,13 +2228,11 @@ src/mesh/gmsh_io.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/gmsh_io.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
     include/mesh/mesh_io.h\
-    include/mesh/node_iterators.h\
     include/numerics/coupling_matrix.h\
     include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
@@ -2256,10 +2257,12 @@ src/mesh/gmv_io.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_fe_family.h\
@@ -2274,13 +2277,11 @@ src/mesh/gmv_io.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/gmv_io.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
     include/mesh/mesh_io.h\
-    include/mesh/node_iterators.h\
     include/numerics/coupling_matrix.h\
     include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
@@ -2305,10 +2306,12 @@ src/mesh/matlab_io.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_fe_family.h\
@@ -2326,13 +2329,11 @@ src/mesh/matlab_io.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/matlab_io.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
     include/mesh/mesh_io.h\
-    include/mesh/node_iterators.h\
     include/numerics/coupling_matrix.h\
     include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
@@ -2357,10 +2358,12 @@ src/mesh/medit_io.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_fe_family.h\
@@ -2375,13 +2378,11 @@ src/mesh/medit_io.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/medit_io.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
     include/mesh/mesh_io.h\
-    include/mesh/node_iterators.h\
     include/numerics/coupling_matrix.h\
     include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
@@ -2407,10 +2408,12 @@ src/mesh/mesh_base.$(obj-suffix):\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
     include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_fe_family.h\
@@ -2429,13 +2432,11 @@ src/mesh/mesh_base.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/gmv_io.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
     include/mesh/mesh_io.h\
-    include/mesh/node_iterators.h\
     include/numerics/coupling_matrix.h\
     include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
@@ -2461,10 +2462,12 @@ src/mesh/mesh_base_modification.$(obj-suffix):\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
     include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_io_package.h\
@@ -2490,10 +2493,8 @@ src/mesh/mesh_base_modification.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/utils/perf_log.h
@@ -2507,10 +2508,12 @@ src/mesh/mesh.$(obj-suffix):\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
     include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_fe_family.h\
@@ -2526,7 +2529,6 @@ src/mesh/mesh.$(obj-suffix):\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
     include/mesh/diva_io.h\
-    include/mesh/elem_iterators.h\
     include/mesh/gmsh_io.h\
     include/mesh/gmv_io.h\
     include/mesh/matlab_io.h\
@@ -2536,7 +2538,6 @@ src/mesh/mesh.$(obj-suffix):\
     include/mesh/mesh_communication.h\
     include/mesh/mesh_data.h\
     include/mesh/mesh_io.h\
-    include/mesh/node_iterators.h\
     include/mesh/off_io.h\
     include/mesh/shanee_io.h\
     include/mesh/tecplot_io.h\
@@ -2566,10 +2567,12 @@ src/mesh/mesh_communication.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_io_package.h\
@@ -2581,12 +2584,10 @@ src/mesh/mesh_communication.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_communication.h\
     include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/utils/perf_log.h
@@ -2599,10 +2600,12 @@ src/mesh/mesh_data.$(obj-suffix):\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
     include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_io_package.h\
@@ -2614,10 +2617,8 @@ src/mesh/mesh_data.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/utils/perf_log.h
@@ -2650,10 +2651,12 @@ src/mesh/mesh_data_xdr_support.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_io_package.h\
@@ -2665,10 +2668,8 @@ src/mesh/mesh_data_xdr_support.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/utils/o_f_stream.h\
@@ -2682,10 +2683,12 @@ src/mesh/mesh_exodus_support.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_io_package.h\
@@ -2697,12 +2700,10 @@ src/mesh/mesh_exodus_support.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
     include/mesh/mesh_exodus_support.h\
-    include/mesh/node_iterators.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/utils/perf_log.h
@@ -2715,10 +2716,12 @@ src/mesh/mesh_generation.$(obj-suffix):\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
     include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_io_package.h\
@@ -2749,12 +2752,10 @@ src/mesh/mesh_generation.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
     include/mesh/mesh_refinement.h\
-    include/mesh/node_iterators.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/utils/perf_log.h
@@ -2767,10 +2768,12 @@ src/mesh/mesh_io.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_fe_family.h\
@@ -2785,12 +2788,10 @@ src/mesh/mesh_io.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
     include/mesh/mesh_io.h\
-    include/mesh/node_iterators.h\
     include/numerics/coupling_matrix.h\
     include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
@@ -2806,6 +2807,36 @@ src/mesh/mesh_io.$(obj-suffix):\
     include/utils/data_map.h\
     include/utils/data_object.h\
     include/utils/perf_log.h
+src/mesh/mesh_iterators.$(obj-suffix):\
+    src/mesh/mesh_iterators.C\
+    include/base/auto_ptr.h\
+    include/base/dof_object.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
+    include/base/node.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_io_package.h\
+    include/enums/enum_order.h\
+    include/enums/enum_solver_package.h\
+    include/enums/enum_xdr_mode.h\
+    include/geom/elem.h\
+    include/geom/point.h\
+    include/geom/sphere.h\
+    include/geom/surface.h\
+    include/mesh/boundary_info.h\
+    include/mesh/mesh_base.h\
+    include/mesh/mesh_data.h\
+    include/numerics/type_vector.h\
+    include/partitioning/partitioner.h\
+    include/utils/perf_log.h
 src/mesh/mesh_modification.$(obj-suffix):\
     src/mesh/mesh_modification.C\
     include/base/auto_ptr.h\
@@ -2815,10 +2846,12 @@ src/mesh/mesh_modification.$(obj-suffix):\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
     include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_io_package.h\
@@ -2840,11 +2873,9 @@ src/mesh/mesh_modification.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/utils/perf_log.h
@@ -2857,10 +2888,12 @@ src/mesh/mesh_refinement.$(obj-suffix):\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
     include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_io_package.h\
@@ -2872,11 +2905,9 @@ src/mesh/mesh_refinement.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
     include/mesh/mesh_refinement.h\
-    include/mesh/node_iterators.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/utils/perf_log.h
@@ -2888,10 +2919,12 @@ src/mesh/mesh_refinement_flagging.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_io_package.h\
@@ -2903,11 +2936,9 @@ src/mesh/mesh_refinement_flagging.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
     include/mesh/mesh_refinement.h\
-    include/mesh/node_iterators.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/utils/error_vector.h\
@@ -2921,10 +2952,12 @@ src/mesh/mesh_refinement_smoothing.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_io_package.h\
@@ -2936,11 +2969,9 @@ src/mesh/mesh_refinement_smoothing.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
     include/mesh/mesh_refinement.h\
-    include/mesh/node_iterators.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/utils/perf_log.h
@@ -2954,10 +2985,12 @@ src/mesh/mesh_smoother_laplace.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_io_package.h\
@@ -2969,13 +3002,11 @@ src/mesh/mesh_smoother_laplace.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
     include/mesh/mesh_smoother.h\
     include/mesh/mesh_smoother_laplace.h\
-    include/mesh/node_iterators.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/utils/perf_log.h
@@ -2987,10 +3018,12 @@ src/mesh/mesh_tetgen_support.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_io_package.h\
@@ -3008,12 +3041,10 @@ src/mesh/mesh_tetgen_support.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
     include/mesh/mesh_tetgen_support.h\
-    include/mesh/node_iterators.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/utils/perf_log.h
@@ -3025,10 +3056,12 @@ src/mesh/mesh_xdr_support.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_io_package.h\
@@ -3042,12 +3075,10 @@ src/mesh/mesh_xdr_support.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
     include/mesh/mesh_xdr_support.h\
-    include/mesh/node_iterators.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/utils/o_f_stream.h\
@@ -3063,10 +3094,12 @@ src/mesh/off_io.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_fe_family.h\
@@ -3084,12 +3117,10 @@ src/mesh/off_io.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
     include/mesh/mesh_io.h\
-    include/mesh/node_iterators.h\
     include/mesh/off_io.h\
     include/numerics/coupling_matrix.h\
     include/numerics/numeric_vector.h\
@@ -3115,10 +3146,12 @@ src/mesh/shanee_io.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_fe_family.h\
@@ -3136,12 +3169,10 @@ src/mesh/shanee_io.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
     include/mesh/mesh_io.h\
-    include/mesh/node_iterators.h\
     include/mesh/shanee_io.h\
     include/numerics/coupling_matrix.h\
     include/numerics/numeric_vector.h\
@@ -3167,10 +3198,12 @@ src/mesh/tecplot_io.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_fe_family.h\
@@ -3185,12 +3218,10 @@ src/mesh/tecplot_io.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
     include/mesh/mesh_io.h\
-    include/mesh/node_iterators.h\
     include/mesh/tecplot_io.h\
     include/numerics/coupling_matrix.h\
     include/numerics/numeric_vector.h\
@@ -3216,10 +3247,12 @@ src/mesh/tetgen_io.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_fe_family.h\
@@ -3237,12 +3270,10 @@ src/mesh/tetgen_io.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
     include/mesh/mesh_io.h\
-    include/mesh/node_iterators.h\
     include/mesh/tetgen_io.h\
     include/numerics/coupling_matrix.h\
     include/numerics/numeric_vector.h\
@@ -3268,10 +3299,12 @@ src/mesh/ucd_io.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_fe_family.h\
@@ -3297,12 +3330,10 @@ src/mesh/ucd_io.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
     include/mesh/mesh_io.h\
-    include/mesh/node_iterators.h\
     include/mesh/ucd_io.h\
     include/numerics/coupling_matrix.h\
     include/numerics/numeric_vector.h\
@@ -3328,10 +3359,12 @@ src/mesh/unv_io.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_fe_family.h\
@@ -3361,12 +3394,10 @@ src/mesh/unv_io.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
     include/mesh/mesh_io.h\
-    include/mesh/node_iterators.h\
     include/mesh/unv_io.h\
     include/numerics/coupling_matrix.h\
     include/numerics/numeric_vector.h\
@@ -3471,10 +3502,12 @@ src/numerics/error_estimator.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_fe_family.h\
@@ -3489,11 +3522,9 @@ src/numerics/error_estimator.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
     include/numerics/coupling_matrix.h\
     include/numerics/error_estimator.h\
     include/numerics/numeric_vector.h\
@@ -3528,10 +3559,12 @@ src/numerics/kelly_error_estimator.$(obj-suffix):\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
     include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_fe_family.h\
@@ -3550,11 +3583,9 @@ src/numerics/kelly_error_estimator.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
     include/numerics/coupling_matrix.h\
     include/numerics/error_estimator.h\
     include/numerics/kelly_error_estimator.h\
@@ -3693,10 +3724,12 @@ src/numerics/mesh_function.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_fe_family.h\
@@ -3714,12 +3747,10 @@ src/numerics/mesh_function.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
     include/mesh/mesh_function.h\
-    include/mesh/node_iterators.h\
     include/numerics/coupling_matrix.h\
     include/numerics/dense_vector.h\
     include/numerics/dense_vector_base.h\
@@ -3765,10 +3796,12 @@ src/numerics/patch_recovery_error_estimator.$(obj-suffix):\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
     include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_fe_family.h\
@@ -3786,11 +3819,9 @@ src/numerics/patch_recovery_error_estimator.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
     include/numerics/coupling_matrix.h\
     include/numerics/dense_matrix.h\
     include/numerics/dense_matrix_base.h\
@@ -3933,10 +3964,12 @@ src/partitioning/centroid_partitioner.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_io_package.h\
@@ -3948,10 +3981,8 @@ src/partitioning/centroid_partitioner.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
     include/numerics/type_vector.h\
     include/partitioning/centroid_partitioner.h\
     include/partitioning/partitioner.h\
@@ -3965,10 +3996,12 @@ src/partitioning/linear_partitioner.$(obj-suffix):\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
     include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_io_package.h\
@@ -3980,10 +4013,8 @@ src/partitioning/linear_partitioner.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
     include/numerics/type_vector.h\
     include/partitioning/linear_partitioner.h\
     include/partitioning/partitioner.h\
@@ -3997,10 +4028,12 @@ src/partitioning/metis_partitioner.$(obj-suffix):\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
     include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_io_package.h\
@@ -4012,10 +4045,8 @@ src/partitioning/metis_partitioner.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
     include/numerics/type_vector.h\
     include/partitioning/metis_partitioner.h\
     include/partitioning/partitioner.h\
@@ -4030,10 +4061,12 @@ src/partitioning/parmetis_partitioner.$(obj-suffix):\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
     include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_io_package.h\
@@ -4045,10 +4078,8 @@ src/partitioning/parmetis_partitioner.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
     include/numerics/type_vector.h\
     include/partitioning/metis_partitioner.h\
     include/partitioning/parmetis_partitioner.h\
@@ -4062,10 +4093,12 @@ src/partitioning/partitioner.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_io_package.h\
@@ -4077,15 +4110,31 @@ src/partitioning/partitioner.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/utils/perf_log.h
 src/partitioning/partitioner_factory.$(obj-suffix):\
-    src/partitioning/partitioner_factory.C
+    src/partitioning/partitioner_factory.C\
+    include/base/auto_ptr.h\
+    include/base/factory.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/enums/enum_solver_package.h\
+    include/geom/point.h\
+    include/numerics/type_vector.h\
+    include/partitioning/centroid_partitioner.h\
+    include/partitioning/hilbert_sfc_partitioner.h\
+    include/partitioning/linear_partitioner.h\
+    include/partitioning/metis_partitioner.h\
+    include/partitioning/morton_sfc_partitioner.h\
+    include/partitioning/parmetis_partitioner.h\
+    include/partitioning/partitioner.h\
+    include/partitioning/sfc_partitioner.h\
+    include/utils/perf_log.h
 src/partitioning/sfc_partitioner.$(obj-suffix):\
     src/partitioning/sfc_partitioner.C\
     include/base/auto_ptr.h\
@@ -4095,10 +4144,12 @@ src/partitioning/sfc_partitioner.$(obj-suffix):\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
     include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_io_package.h\
@@ -4110,10 +4161,8 @@ src/partitioning/sfc_partitioner.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
     include/numerics/type_vector.h\
     include/partitioning/linear_partitioner.h\
     include/partitioning/partitioner.h\
@@ -4327,10 +4376,12 @@ src/solvers/equation_systems.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_fe_family.h\
@@ -4346,11 +4397,9 @@ src/solvers/equation_systems.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
     include/numerics/coupling_matrix.h\
     include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
@@ -4375,10 +4424,12 @@ src/solvers/equation_systems_io.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_fe_family.h\
@@ -4393,11 +4444,9 @@ src/solvers/equation_systems_io.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
     include/numerics/coupling_matrix.h\
     include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
@@ -4424,10 +4473,12 @@ src/solvers/exact_solution.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_fe_family.h\
@@ -4446,11 +4497,9 @@ src/solvers/exact_solution.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
     include/numerics/coupling_matrix.h\
     include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
@@ -4500,10 +4549,12 @@ src/solvers/frequency_system.$(obj-suffix):\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
     include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_fe_family.h\
@@ -4520,11 +4571,9 @@ src/solvers/frequency_system.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
     include/numerics/coupling_matrix.h\
     include/numerics/linear_solver_interface.h\
     include/numerics/numeric_vector.h\
@@ -4551,10 +4600,12 @@ src/solvers/implicit_system.$(obj-suffix):\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
     include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_fe_family.h\
@@ -4571,11 +4622,9 @@ src/solvers/implicit_system.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
     include/numerics/coupling_matrix.h\
     include/numerics/linear_solver_interface.h\
     include/numerics/numeric_vector.h\
@@ -4604,10 +4653,12 @@ src/solvers/newmark_system.$(obj-suffix):\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
     include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_fe_family.h\
@@ -4622,11 +4673,9 @@ src/solvers/newmark_system.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
     include/numerics/coupling_matrix.h\
     include/numerics/numeric_vector.h\
     include/numerics/sparse_matrix.h\
@@ -4655,10 +4704,12 @@ src/solvers/system.$(obj-suffix):\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
     include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_fe_family.h\
@@ -4673,11 +4724,9 @@ src/solvers/system.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
     include/numerics/coupling_matrix.h\
     include/numerics/numeric_vector.h\
     include/numerics/sparse_matrix.h\
@@ -4704,10 +4753,12 @@ src/solvers/system_io.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_fe_family.h\
@@ -4722,11 +4773,9 @@ src/solvers/system_io.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
     include/numerics/coupling_matrix.h\
     include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
@@ -4745,10 +4794,12 @@ src/solvers/system_projection.$(obj-suffix):\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
     include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_fe_family.h\
@@ -4764,11 +4815,9 @@ src/solvers/system_projection.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
     include/numerics/coupling_matrix.h\
     include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
@@ -4872,10 +4921,12 @@ src/utils/point_locator_list.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_io_package.h\
@@ -4888,11 +4939,9 @@ src/utils/point_locator_list.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/utils/perf_log.h\
@@ -4906,10 +4955,12 @@ src/utils/point_locator_tree.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_io_package.h\
@@ -4922,11 +4973,9 @@ src/utils/point_locator_tree.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/utils/perf_log.h\
@@ -4953,10 +5002,12 @@ src/utils/tree.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_io_package.h\
@@ -4968,10 +5019,8 @@ src/utils/tree.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/utils/perf_log.h\
@@ -4986,10 +5035,12 @@ src/utils/tree_node.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
     include/base/node.h\
-    include/base/predicated_iterator.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_io_package.h\
@@ -5001,10 +5052,8 @@ src/utils/tree_node.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/utils/perf_log.h\

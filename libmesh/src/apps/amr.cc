@@ -10,7 +10,7 @@
 #include "numeric_vector.h"
 #include "dense_matrix.h"
 #include "dense_vector.h"
-
+#include "gmv_io.h"
 
 
 
@@ -53,7 +53,7 @@ int main (int argc, char** argv)
     // Set up the equation system(s)
     EquationSystems es (mesh);
 
-    es.add_system<SteadySystem>("primary");
+    SteadySystem& primary = es.add_system<SteadySystem>("primary");
 
     es("primary").add_variable ("U", FIRST);
     es("primary").add_variable ("V", FIRST);
@@ -67,12 +67,13 @@ int main (int argc, char** argv)
     es.init ();
     
     es.print_info ();
-    es("primary").get_dof_map().print_dof_constraints ();
+    primary.get_dof_map().print_dof_constraints ();
 
     // call the solver.
-    es("primary").solve ();
+    primary.solve ();
     
-    mesh.write_gmv_binary ("out_1.gmv", es);
+    GMVIO(mesh).write_equation_systems ("out_1.gmv",
+					es);
 
 
 
@@ -81,11 +82,14 @@ int main (int argc, char** argv)
     es.reinit ();
 
     // Write out the projected solution
-    mesh.write_gmv_binary ("out_2.gmv", es);
+    GMVIO(mesh).write_equation_systems ("out_2.gmv",
+					es);
 
     // Solve again. Output the refined solution
-    es("primary").solve ();
-    mesh.write_gmv_binary ("out_3.gmv", es);
+    primary.solve ();
+    GMVIO(mesh).write_equation_systems ("out_3.gmv",
+					es);
+
   }
   
   return libMesh::close();
@@ -118,6 +122,8 @@ void assemble(EquationSystems& es,
   
   fe_face->attach_quadrature_rule(&qface);
   
+  SteadySystem& system = es.get_system<SteadySystem>("primary");
+  
   
   // These are references to cell-specific data
   const std::vector<Real>& JxW_face                   = fe_face->get_JxW();
@@ -128,7 +134,7 @@ void assemble(EquationSystems& es,
   
   std::vector<unsigned int> dof_indices_U;
   std::vector<unsigned int> dof_indices_V;
-  const DofMap& dof_map = es(system_name).get_dof_map();
+  const DofMap& dof_map = system.get_dof_map();
   
   DenseMatrix<Number> Kuu;
   DenseMatrix<Number> Kvv;
@@ -137,9 +143,9 @@ void assemble(EquationSystems& es,
   
   Real vol=0., area=0.;
 
-  const_active_local_elem_iterator       el     (mesh.elements_begin());
-  const const_active_local_elem_iterator end_el (mesh.elements_end());
-
+  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+  
   for (; el != end_el; ++el)
     {
       const Elem* elem = *el;
@@ -217,15 +223,11 @@ void assemble(EquationSystems& es,
       dof_map.constrain_element_matrix_and_vector(Kvv, Fv, dof_indices_V);
 
       
-      es("primary").rhs->add_vector(Fu,
-				    dof_indices_U);
-      es("primary").rhs->add_vector(Fv,
-				    dof_indices_V);
+      system.rhs->add_vector(Fu, dof_indices_U);
+      system.rhs->add_vector(Fv, dof_indices_V);
 
-      es("primary").matrix->add_matrix(Kuu,
-				       dof_indices_U);
-      es("primary").matrix->add_matrix(Kvv,
-				       dof_indices_V);
+      system.matrix->add_matrix(Kuu, dof_indices_U);
+      system.matrix->add_matrix(Kvv, dof_indices_V);
     }
   
   std::cout << "Vol="  << vol << std::endl;

@@ -1,4 +1,4 @@
-// $Id: plt_loader.C,v 1.1 2004-09-30 21:21:49 benkirk Exp $
+// $Id: plt_loader.C,v 1.2 2004-11-08 00:11:06 jwpeterson Exp $
 
 // Copyright (C) 2002-2004  Benjamin S. Kirk
   
@@ -32,9 +32,11 @@ const unsigned int PltLoader::NNodes[4] = {3, 4, 4, 8};
 // PltLoader members
 void PltLoader::clear ()
 {
-  // clear vectors & strings
-  _version.clear();
-  _title.clear();
+  // clear vectors & strings.  Using .erase() for strings instead of .clear()
+  // since GCC 2.95.3 does not support .clear().
+  _version.erase();
+  _title.erase();
+
   _var_names.clear();
   _var_types.clear();
   _zone_types.clear();

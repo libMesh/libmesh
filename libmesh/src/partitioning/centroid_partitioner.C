@@ -1,4 +1,4 @@
-// $Id: centroid_partitioner.C,v 1.9 2004-05-11 20:29:07 jwpeterson Exp $
+// $Id: centroid_partitioner.C,v 1.10 2004-11-08 00:11:06 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -124,8 +124,12 @@ void CentroidPartitioner::compute_centroids (MeshBase& mesh)
   _elem_centroids.clear();
   _elem_centroids.reserve(mesh.n_elem());
   
-  elem_iterator it(mesh.elements_begin());
-  const elem_iterator it_end(mesh.elements_end());
+//   elem_iterator it(mesh.elements_begin());
+//   const elem_iterator it_end(mesh.elements_end());
+
+  MeshBase::element_iterator       it     = mesh.elements_begin();
+  const MeshBase::element_iterator it_end = mesh.elements_end(); 
+
   for (; it != it_end; ++it)
     {
       Elem* elem = *it;

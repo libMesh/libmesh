@@ -1,4 +1,4 @@
-// $Id: mesh_smoother_laplace.C,v 1.10 2004-03-22 01:11:59 jwpeterson Exp $
+// $Id: mesh_smoother_laplace.C,v 1.11 2004-11-08 00:11:05 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -100,8 +100,11 @@ void LaplaceMeshSmoother::init()
 	for (unsigned int i=0; i<_mesh.n_nodes(); ++i)
 	  _graph[i].reserve(4);
 	
-	const_active_elem_iterator       el (_mesh.const_elements_begin());
-	const const_active_elem_iterator end(_mesh.const_elements_end());
+// 	const_active_elem_iterator       el (_mesh.const_elements_begin());
+// 	const const_active_elem_iterator end(_mesh.const_elements_end());
+
+	MeshBase::element_iterator       el  = _mesh.active_elements_begin();
+	const MeshBase::element_iterator end = _mesh.active_elements_end(); 
 	
 	for (; el != end; ++el)
 	  {
@@ -135,8 +138,11 @@ void LaplaceMeshSmoother::init()
 	for (unsigned int i=0; i<_mesh.n_nodes(); ++i)
 	  _graph[i].reserve(8);
 	
-	const_active_elem_iterator       el (_mesh.const_elements_begin());
-	const const_active_elem_iterator end(_mesh.const_elements_end());
+// 	const_active_elem_iterator       el (_mesh.const_elements_begin());
+// 	const const_active_elem_iterator end(_mesh.const_elements_end());
+
+	MeshBase::element_iterator       el  = _mesh.active_elements_begin();
+	const MeshBase::element_iterator end = _mesh.active_elements_end(); 
 
 	for (; el != end; ++el)
 	  {

@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.11 2004-11-05 17:19:30 spetersen Exp $
+// $Id: equation_systems.C,v 1.12 2004-11-08 00:11:06 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -98,15 +98,22 @@ void EquationSystems::init ()
    */
   {
     // All the nodes
-    node_iterator       node_it  (_mesh.nodes_begin());
-    const node_iterator node_end (_mesh.nodes_end());
-    
+//     node_iterator       node_it  (_mesh.nodes_begin());
+//     const node_iterator node_end (_mesh.nodes_end());
+
+    MeshBase::node_iterator       node_it  = _mesh.nodes_begin();
+    const MeshBase::node_iterator node_end = _mesh.nodes_end();
+
     for ( ; node_it != node_end; ++node_it)
       (*node_it)->set_n_systems(n_sys);
     
     // All the elements
-    elem_iterator       elem_it (_mesh.elements_begin());
-    const elem_iterator elem_end(_mesh.elements_end());
+//     elem_iterator       elem_it (_mesh.elements_begin());
+//     const elem_iterator elem_end(_mesh.elements_end());
+
+    MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
+    const MeshBase::element_iterator elem_end = _mesh.elements_end();
+
     
     for ( ; elem_it != elem_end; ++elem_it)
       (*elem_it)->set_n_systems(n_sys);
@@ -138,15 +145,21 @@ void EquationSystems::reinit ()
    */
   {
     // All the nodes
-    node_iterator       node_it  (_mesh.nodes_begin());
-    const node_iterator node_end (_mesh.nodes_end());
-    
+//     node_iterator       node_it  (_mesh.nodes_begin());
+//     const node_iterator node_end (_mesh.nodes_end());
+
+    MeshBase::node_iterator       node_it  = _mesh.nodes_begin();
+    const MeshBase::node_iterator node_end = _mesh.nodes_end();
+
     for ( ; node_it != node_end; ++node_it)
       (*node_it)->set_n_systems(n_sys);
     
     // All the elements
-    elem_iterator       elem_it (_mesh.elements_begin());
-    const elem_iterator elem_end(_mesh.elements_end());
+//     elem_iterator       elem_it (_mesh.elements_begin());
+//     const elem_iterator elem_end(_mesh.elements_end());
+
+    MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
+    const MeshBase::element_iterator elem_end = _mesh.elements_end();
     
     for ( ; elem_it != elem_end; ++elem_it)
       (*elem_it)->set_n_systems(n_sys);
@@ -465,9 +478,12 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
   {
     std::vector<unsigned short int> node_conn_local (node_conn.size());
     
-    active_local_elem_iterator       it (_mesh.elements_begin());
-    const active_local_elem_iterator end(_mesh.elements_end());
-    
+//     active_local_elem_iterator       it (_mesh.elements_begin());
+//     const active_local_elem_iterator end(_mesh.elements_end());
+
+    MeshBase::element_iterator       it  = _mesh.active_local_elements_begin();
+    const MeshBase::element_iterator end = _mesh.active_local_elements_end(); 
+
     for ( ; it != end; ++it)
       for (unsigned int n=0; n<(*it)->n_nodes(); n++)
 	node_conn_local[(*it)->node(n)]++;
@@ -517,9 +533,12 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
 	{
 	  const FEType& fe_type    = system.variable_type(var);
 	  
-	  active_local_elem_iterator       it (_mesh.elements_begin());
-	  const active_local_elem_iterator end(_mesh.elements_end());
-	  
+//  	  active_local_elem_iterator       it (_mesh.elements_begin());
+// 	  const active_local_elem_iterator end(_mesh.elements_end());
+
+	  MeshBase::element_iterator       it  = _mesh.active_local_elements_begin();
+	  const MeshBase::element_iterator end = _mesh.active_local_elements_end(); 
+
 	  for ( ; it != end; ++it)
 	    {
 	      const Elem* elem = *it;
@@ -614,9 +633,12 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number>& 
 
   // get the total weight
   {
-    active_elem_iterator       it (_mesh.elements_begin());
-    const active_elem_iterator end(_mesh.elements_end());
-    
+//     active_elem_iterator       it (_mesh.elements_begin());
+//     const active_elem_iterator end(_mesh.elements_end());
+
+    MeshBase::element_iterator       it  = _mesh.active_elements_begin();
+    const MeshBase::element_iterator end = _mesh.active_elements_end(); 
+
     for ( ; it != end; ++it)
       tw += (*it)->n_nodes();
   }
@@ -657,8 +679,11 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number>& 
 	    {
 	      const FEType& fe_type    = system.variable_type(var);
 
-	      active_elem_iterator       it (_mesh.elements_begin());
-	      const active_elem_iterator end(_mesh.elements_end());
+// 	      active_elem_iterator       it (_mesh.elements_begin());
+// 	      const active_elem_iterator end(_mesh.elements_end());
+
+	      MeshBase::element_iterator       it  = _mesh.active_elements_begin();
+	      const MeshBase::element_iterator end = _mesh.active_elements_end(); 
 
 	      unsigned int nn=0;
 	      

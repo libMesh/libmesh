@@ -1,4 +1,4 @@
-// $Id: kelly_error_estimator.h,v 1.1 2004-05-20 22:56:52 jwpeterson Exp $
+// $Id: kelly_error_estimator.h,v 1.2 2004-11-08 00:11:03 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -56,6 +56,13 @@ public:
   ~KellyErrorEstimator() {}
 
 
+  // Bring the base class functionality into the name lookup
+  // procedure.  This allows for alternative calling formats
+  // defined in the base class.  Thanks Wolfgang.
+  // GCC 2.95.3 cannot compile such code.  Since it was not really
+  // essential to the functioning of this class, it's been removed.
+  // using ErrorEstimator::estimate_error;
+
   /**
    * This function uses the Kelly Flux Jump error
    * estimate to estimate the error on each cell.
@@ -66,10 +73,6 @@ public:
 			       std::vector<float>& error_per_cell);
 
 
-  // Bring the base class functionality into the name lookup
-  // procedure.  This allows for alternative calling formats
-  // defined in the base class.  Thanks Wolfgang.
-  using ErrorEstimator::estimate_error;
 };
 
 

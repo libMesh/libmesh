@@ -97,8 +97,11 @@ void MEDITIO::write_ascii (const std::string& fname,
     int n_tet4  = 0;
 
     {
-      const_active_elem_iterator       it (mesh.elements_begin());
-      const const_active_elem_iterator end(mesh.elements_end());
+//       const_active_elem_iterator       it (mesh.elements_begin());
+//       const const_active_elem_iterator end(mesh.elements_end());
+
+      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+      const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
       
       for ( ; it != end; ++it)
 	{
@@ -114,8 +117,11 @@ void MEDITIO::write_ascii (const std::string& fname,
     out << n_tri3 << "\n";
 
     {
-      const_active_elem_iterator       it (mesh.elements_begin());
-      const const_active_elem_iterator end(mesh.elements_end());
+//       const_active_elem_iterator       it (mesh.elements_begin());
+//       const const_active_elem_iterator end(mesh.elements_end());
+
+      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+      const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
     
       for ( ; it != end; ++it) 
 	if ((*it)->type() == TRI3)
@@ -127,8 +133,11 @@ void MEDITIO::write_ascii (const std::string& fname,
     out << n_quad4 << "\n";
 
     {
-      const_active_elem_iterator       it (mesh.elements_begin());
-      const const_active_elem_iterator end(mesh.elements_end());
+//       const_active_elem_iterator       it (mesh.elements_begin());
+//       const const_active_elem_iterator end(mesh.elements_end());
+
+      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+      const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
 
       for ( ; it != end; ++it) 
 	if ((*it)->type() == QUAD4)
@@ -165,8 +174,11 @@ void MEDITIO::write_ascii (const std::string& fname,
     out << n_tet4 << "\n";
 
     {
-      const_active_elem_iterator       it (mesh.elements_begin());
-      const const_active_elem_iterator end(mesh.elements_end());
+//       const_active_elem_iterator       it (mesh.elements_begin());
+//       const const_active_elem_iterator end(mesh.elements_end());
+
+      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+      const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
       
       for ( ; it != end; ++it) 
 	if ((*it)->type() == TET4)
