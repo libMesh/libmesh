@@ -3,20 +3,14 @@ ex4.$(obj-suffix):\
     ../../include/base/auto_ptr.h\
     ../../include/base/dof_map.h\
     ../../include/base/dof_object.h\
-    ../../include/base/equation_systems.h\
-    ../../include/base/frequency_system.h\
     ../../include/base/libmesh.h\
     ../../include/base/libmesh_base.h\
     ../../include/base/libmesh_common.h\
     ../../include/base/libmesh_config.h\
-    ../../include/base/newmark_system.h\
     ../../include/base/node.h\
     ../../include/base/predicated_iterator.h\
     ../../include/base/reference_counted_object.h\
     ../../include/base/reference_counter.h\
-    ../../include/base/steady_system.h\
-    ../../include/base/system_base.h\
-    ../../include/base/transient_system.h\
     ../../include/enums/enum_elem_quality.h\
     ../../include/enums/enum_elem_type.h\
     ../../include/enums/enum_fe_family.h\
@@ -49,6 +43,13 @@ ex4.$(obj-suffix):\
     ../../include/numerics/vector_value.h\
     ../../include/quadrature/quadrature.h\
     ../../include/quadrature/quadrature_gauss.h\
+    ../../include/solvers/equation_systems.h\
+    ../../include/solvers/frequency_system.h\
+    ../../include/solvers/implicit_system.h\
+    ../../include/solvers/newmark_system.h\
+    ../../include/solvers/steady_system.h\
+    ../../include/solvers/system.h\
+    ../../include/solvers/transient_system.h\
     ../../include/utils/data_map.h\
     ../../include/utils/data_object.h\
     ../../include/utils/perf_log.h\

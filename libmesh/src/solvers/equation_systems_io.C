@@ -1,7 +1,7 @@
-// $Id: equation_systems_io.C,v 1.28 2003-09-25 21:46:55 benkirk Exp $
+// $Id: equation_systems_io.C,v 1.1 2004-01-03 15:37:44 benkirk Exp $
 
-// The Next Great Finite Element Library.
-// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -27,7 +27,7 @@
 
 // Local Includes
 #include "equation_systems.h"
-#include "system_base.h"
+#include "system.h"
 #include "fe_type.h"
 #include "xdr_cxx.h"
 
@@ -74,7 +74,7 @@ void EquationSystems::read (const std::string& name,
    *    7.)  The name of the system (string)
    *    8.)  The type of the system (string)
    *
-   *    handled through SystemBase::read():
+   *    handled through System::read():
    *
    * +-------------------------------------------------------------+
    * |  9.) The number of variables in the system (unsigned int)   |
@@ -101,7 +101,7 @@ void EquationSystems::read (const std::string& name,
    * end system loop
    *
    *
-   *   for each system, handled through SystemBase::read_data():
+   *   for each system, handled through System::read_data():
    *   
    * +-------------------------------------------------------------+
    * | 14.) The global solution vector, re-ordered to be node-major|
@@ -133,23 +133,7 @@ void EquationSystems::read (const std::string& name,
    * Possibly clear data structures and start from scratch.
    */
   if (read_header)
-    clear ();
-      
-  
-//   if (sys_type != T_sys::system_type())
-//     {
-//       // wrong T_sys for this file
-// //       std::cerr << "ERROR: System mismatch: This EquationSystems object handles" 
-// // 		<< std::endl
-// // 		<< " systems of type " << T_sys::system_type() 
-// // 		<< ", while the file" << std::endl
-// // 		<< " contains systems of type " << sys_type << std::endl;
-// //       error();
-//       std::cout << "Warning: This EquationSystems object handles" << std::endl
-// 		<< " systems of type \"" << T_sys::system_type() 
-// 		<< "\", while the file" << std::endl
-// 		<< " contains systems of type \"" << sys_type << "\"" << std::endl;
-//     }
+    this->clear ();
 
 
   /**
@@ -252,9 +236,9 @@ void EquationSystems::read (const std::string& name,
 	/**
 	 * 9.) - 11.)
 	 *
-	 * Let SystemBase::read() do the job
+	 * Let System::read() do the job
 	 */
-	SystemBase& new_system = this->get_system(sys_name);
+	System& new_system = this->get_system(sys_name);
 	  
 	new_system.read (io,
 			 read_header,
@@ -281,7 +265,7 @@ void EquationSystems::read (const std::string& name,
    */
   if (read_data)
     {
-      std::map<std::string, SystemBase*>::iterator
+      std::map<std::string, System*>::iterator
 	pos = _systems.begin();
       
       for (; pos != _systems.end(); ++pos)
@@ -339,7 +323,7 @@ void EquationSystems::write(const std::string& name,
    *    7.)  The name of the system (string)            
    *    8.)  The type of the system (string)            
    *
-   *    handled through SystemBase::read():
+   *    handled through System::read():
    *
    * +-------------------------------------------------------------+
    * |  9.) The number of variables in the system (unsigned int)   |
@@ -366,7 +350,7 @@ void EquationSystems::write(const std::string& name,
    * end system loop
    *
    *
-   *   for each system, handled through SystemBase::read_data():
+   *   for each system, handled through System::read_data():
    *   
    * +-------------------------------------------------------------+
    * | 14.) The global solution vector, re-ordered to be node-major|
@@ -395,7 +379,7 @@ void EquationSystems::write(const std::string& name,
   const unsigned int proc_id = libMesh::processor_id();
   unsigned int n_sys         = this->n_systems();
 
-  std::map<std::string, SystemBase*>::const_iterator
+  std::map<std::string, System*>::const_iterator
     pos = _systems.begin();
   
   std::string comment;
@@ -530,7 +514,7 @@ void EquationSystems::write(const std::string& name,
 	  /**
 	   * 9.) - 13.)
 	   *
-	   * Let SystemBase::write() do the job
+	   * Let System::write() do the job
 	   */
 	  pos->second->write (io);
 
@@ -553,7 +537,7 @@ void EquationSystems::write(const std::string& name,
 	/**
 	 * 14.) + 15.)
 	 *
-	 * Let SystemBase::write_data() do the job
+	 * Let System::write_data() do the job
 	 */
 	pos->second->write_data (io,
 				 write_additional_data);

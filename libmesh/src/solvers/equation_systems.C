@@ -1,7 +1,7 @@
-// $Id: equation_systems.C,v 1.45 2003-12-24 00:30:43 benkirk Exp $
+// $Id: equation_systems.C,v 1.1 2004-01-03 15:37:44 benkirk Exp $
 
-// The Next Great Finite Element Library.
-// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -25,7 +25,7 @@
 #include "fe_interface.h"
 #include "libmesh.h"
 #include "mesh.h"
-#include "system_base.h"
+#include "system.h"
 #include "frequency_system.h"
 #include "newmark_system.h"
 #include "steady_system.h"
@@ -41,7 +41,7 @@
 
 // ------------------------------------------------------------
 // EquationSystems class implementation
-EquationSystems::EquationSystems (const Mesh& m) :
+EquationSystems::EquationSystems (Mesh& m) :
   _mesh(m)
 {
   // Set default parameters
@@ -72,7 +72,7 @@ void EquationSystems::clear ()
   // clear the systems.  We must delete them
   // since we newed them!
   {
-    std::map<std::string, SystemBase*>::iterator
+    std::map<std::string, System*>::iterator
       pos = _systems.begin();
     
     for (; pos != _systems.end(); ++pos)
@@ -112,7 +112,7 @@ void EquationSystems::init ()
       (*elem_it)->set_n_systems(n_sys);
   }
 
-  std::map<std::string, SystemBase*>::iterator
+  std::map<std::string, System*>::iterator
     pos = _systems.begin();
   
   for (; pos != _systems.end();  ++pos)
@@ -152,10 +152,10 @@ void EquationSystems::reinit ()
       (*elem_it)->set_n_systems(n_sys);
   }
 
-  std::map<std::string, SystemBase*>::iterator
+  std::map<std::string, System*>::iterator
     pos = _systems.begin();
   
-  for (; pos != _systems.end();  ++pos)
+  for (; pos != _systems.end(); ++pos)
     {
       /**
        * Initialize the system.
@@ -166,20 +166,26 @@ void EquationSystems::reinit ()
 
 
 
-void EquationSystems::add_system (const std::string& sys_type,
-				  const std::string& name)
+System & EquationSystems::add_system (const std::string& sys_type,
+				      const std::string& name)
 {
   // Build a Newmark system
   if      (sys_type == "Newmark")
     this->add_system<NewmarkSystem> (name);
 
-  // Build a steady system
-  else if (sys_type == "Steady")
-    this->add_system<SteadySystem> (name);
+  // Build an Implicit system
+  else if ((sys_type == "Implicit") ||
+	   (sys_type == "Steady"  ))
+    this->add_system<ImplicitSystem> (name);
 
-  // build a transient system
-  else if (sys_type == "Transient")
-    this->add_system<TransientSystem> (name);
+  // build a transient implicit system
+  else if ((sys_type == "Transient") ||
+	   (sys_type == "TransientImplicit"))
+    this->add_system<TransientImplicitSystem> (name);
+
+  // build a transient explicit system
+  else if (sys_type == "TransientExplicit")
+    this->add_system<TransientExplicitSystem> (name);
 
 #if defined(USE_COMPLEX_NUMBERS)
   // build a frequency system
@@ -194,6 +200,9 @@ void EquationSystems::add_system (const std::string& sys_type,
 		<< std::endl;
       error();
     }
+
+  // Return a reference to the new system
+  return (*this)(name);
 }
 
 
@@ -218,24 +227,24 @@ void EquationSystems::delete_system (const std::string& name)
 
 
 
-const SystemBase& EquationSystems::get_system (const std::string& name) const
+const System& EquationSystems::get_system (const std::string& name) const
 {
-  return this->get_system<SystemBase> (name);
+  return this->get_system<System> (name);
 }
 
 
 
-SystemBase& EquationSystems::get_system (const std::string& name)
+System& EquationSystems::get_system (const std::string& name)
 {
-  return this->get_system<SystemBase> (name);
+  return this->get_system<System> (name);
 }
 
 
 
 
-SystemBase & EquationSystems::operator () (const std::string& name)
+System & EquationSystems::operator () (const std::string& name)
 {
-  std::map<std::string, SystemBase*>::iterator
+  std::map<std::string, System*>::iterator
     pos = _systems.find(name);
    
   if (pos == _systems.end())
@@ -253,9 +262,9 @@ SystemBase & EquationSystems::operator () (const std::string& name)
   
  
  
-const SystemBase & EquationSystems::operator () (const std::string& name) const
+const System & EquationSystems::operator () (const std::string& name) const
 {
-  std::map<std::string, SystemBase*>::const_iterator
+  std::map<std::string, System*>::const_iterator
     pos = _systems.find(name);
    
   if (pos == _systems.end())
@@ -273,11 +282,11 @@ const SystemBase & EquationSystems::operator () (const std::string& name) const
   
  
  
-SystemBase & EquationSystems::operator () (const unsigned int num)
+System & EquationSystems::operator () (const unsigned int num)
 {
   assert (num < this->n_systems());
  
-  std::map<std::string, SystemBase*>::iterator
+  std::map<std::string, System*>::iterator
     pos = _systems.begin();
    
   // New code
@@ -292,11 +301,11 @@ SystemBase & EquationSystems::operator () (const unsigned int num)
 
 
 
-const SystemBase & EquationSystems::operator ()  (const unsigned int num) const
+const System & EquationSystems::operator ()  (const unsigned int num) const
 {
   assert (num < this->n_systems());
 
-  std::map<std::string, SystemBase*>::const_iterator
+  std::map<std::string, System*>::const_iterator
     pos = _systems.begin();
 
   // New code
@@ -309,17 +318,29 @@ const SystemBase & EquationSystems::operator ()  (const unsigned int num) const
   return *(pos->second);
 }
 
+
+
+void EquationSystems::solve ()
+{
+  assert (this->n_systems());
+  
+  std::map<std::string, System*>::iterator
+    pos = _systems.begin();
+
+  for (; pos != _systems.end(); ++pos)
+    pos->second->solve ();
+}
  
  
 void EquationSystems::build_variable_names (std::vector<std::string>& var_names) const
 {
-  assert (n_systems());
+  assert (this->n_systems());
   
-  var_names.resize (n_vars());
+  var_names.resize (this->n_vars());
 
   unsigned int var_num=0;
 
-  std::map<std::string, SystemBase*>::const_iterator
+  std::map<std::string, System*>::const_iterator
     pos = _systems.begin();
 
   for (; pos != _systems.end(); ++pos)
@@ -337,7 +358,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>&,
   error();
 
 //   // Get a reference to the named system
-//   const SystemBase& system = this->get_system(system_name);
+//   const System& system = this->get_system(system_name);
 
 //   // Get the number associated with the variable_name we are passed
 //   const unsigned short int variable_num = system.variable_number(variable_name);
@@ -478,12 +499,12 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
   // loop over the elements and build the nodal solution
   // from the element solution.  Then insert this nodal solution
   // into the vector passed to build_solution_vector.
-  std::map<std::string, SystemBase*>::const_iterator
+  std::map<std::string, System*>::const_iterator
     pos = _systems.begin();
 
   for (; pos != _systems.end(); ++pos)
     {  
-      const SystemBase& system  = *(pos->second);
+      const System& system  = *(pos->second);
       const unsigned int nv_sys = system.n_vars();
       
       system.update_global_solution (sys_soln);
@@ -616,12 +637,12 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number>& 
   // loop over the elements and build the nodal solution
   // from the element solution.  Then insert this nodal solution
   // into the vector passed to build_solution_vector.
-  std::map<std::string, SystemBase*>::const_iterator
+  std::map<std::string, System*>::const_iterator
     pos = _systems.begin();
 
   for (; pos != _systems.end(); ++pos)
     {  
-      const SystemBase& system  = *(pos->second);
+      const System& system  = *(pos->second);
       const unsigned int nv_sys = system.n_vars();
       
       system.update_global_solution (sys_soln, 0);
@@ -704,15 +725,15 @@ bool EquationSystems::compare (const EquationSystems& other_es,
   else
     {
       // start comparing each system
-      std::map<std::string, SystemBase*>::const_iterator pos=_systems.begin();
+      std::map<std::string, System*>::const_iterator pos=_systems.begin();
       
       for (; pos != _systems.end(); ++pos)
         {
 	  const std::string& sys_name = pos->first;
-	  const SystemBase&  system        = *(pos->second);
+	  const System&  system        = *(pos->second);
       
 	  // get the other system
-	  const SystemBase& other_system   = other_es.get_system (sys_name);
+	  const System& other_system   = other_es.get_system (sys_name);
 
 	  os_result.push_back (system.compare (other_system, threshold, verbose));
 
@@ -748,7 +769,7 @@ std::string EquationSystems::get_info () const
       << "  n_systems()=" << this->n_systems() << std::endl;
 
   // Print the info for the individual systems
-  std::map<std::string, SystemBase*>::const_iterator it=_systems.begin();
+  std::map<std::string, System*>::const_iterator it=_systems.begin();
 
   for (; it != _systems.end(); ++it)
     out << it->second->get_info();
@@ -808,7 +829,7 @@ unsigned int EquationSystems::n_vars () const
 
   unsigned int tot=0;
 
-  std::map<std::string, SystemBase*>::const_iterator pos = _systems.begin();
+  std::map<std::string, System*>::const_iterator pos = _systems.begin();
   
   for (; pos != _systems.end(); ++pos)
     tot += pos->second->n_vars();
@@ -825,7 +846,7 @@ unsigned int EquationSystems::n_dofs () const
 
   unsigned int tot=0;
 
-  std::map<std::string, SystemBase*>::const_iterator pos = _systems.begin();
+  std::map<std::string, System*>::const_iterator pos = _systems.begin();
   
   for (; pos != _systems.end(); ++pos)
     tot += pos->second->n_dofs();

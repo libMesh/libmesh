@@ -1,7 +1,7 @@
-// $Id: equation_systems.h,v 1.3 2003-12-22 13:40:56 benkirk Exp $
+// $Id: equation_systems.h,v 1.1 2004-01-03 15:37:42 benkirk Exp $
 
-// The Next Great Finite Element Library.
-// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -35,11 +35,11 @@
 #include "enum_xdr_mode.h"
 
 // Forward Declarations
-class SystemBase;
+class System;
 
 // HP aCC needs these for some reason
 #ifdef __HP_aCC
-# include "system_base.h"
+# include "system.h"
 # include "frequency_system.h"
 # include "transient_system.h"
 # include "newmark_system.h"
@@ -69,7 +69,7 @@ public:
   /**
    * Constructor.
    */
-  EquationSystems (const Mesh& mesh);
+  EquationSystems (Mesh& mesh);
 
   /**
    * Destructor.
@@ -99,12 +99,12 @@ public:
   /**
    * @returns a constant reference to the system named \p name.
    */
-  const SystemBase & get_system(const std::string& name) const;
+  const System & get_system(const std::string& name) const;
  
   /**
    * @returns a constant reference to the system named \p name.
    */
-  SystemBase& get_system(const std::string& name);
+  System & get_system(const std::string& name);
 
   /**
    * @returns a constant reference to the system named \p name.
@@ -113,7 +113,7 @@ public:
    * is an example of how the method might be used
    */
   template <typename T_sys>
-  const T_sys& get_system (const std::string& name) const;
+  const T_sys & get_system (const std::string& name) const;
 
   /**
    * @returns a writeable referene to the system named \p name.
@@ -122,7 +122,7 @@ public:
    * is an example of how the method might be used
    */
   template <typename T_sys>
-  T_sys& get_system (const std::string& name);
+  T_sys & get_system (const std::string& name);
 
   /**
    * @returns a constant reference to system number \p num.
@@ -131,7 +131,7 @@ public:
    * is an example of how the method might be used
    */
   template <typename T_sys>
-  const T_sys& get_system (const unsigned int num) const;
+  const T_sys & get_system (const unsigned int num) const;
 
   /**
    * @returns a writeable referene to the system number \p num.
@@ -140,40 +140,40 @@ public:
    * is an example of how the method might be used
    */
   template <typename T_sys>
-  T_sys& get_system (const unsigned int num);
+  T_sys & get_system (const unsigned int num);
   
   /**
    * @returns a reference to the system named \p name.
    */
-  SystemBase& operator () (const std::string& name);
+  System & operator () (const std::string& name);
  
   /**
    * @returns a constant reference to the system name
    */
-  const SystemBase& operator () (const std::string& name) const;
+  const System & operator () (const std::string& name) const;
  
   /**
    * @returns a reference to system number \p num.
    */
-  SystemBase& operator () (const unsigned int num);
+  System & operator () (const unsigned int num);
  
   /**
    * @returns a constant reference to system number \p num.
    */
-  const SystemBase& operator () (const unsigned int num) const;
+  const System & operator () (const unsigned int num) const;
   
   /**
    * Add the system of type \p system_type named \p name to the
    * systems array.
    */
-  void add_system (const std::string& system_type,
-		   const std::string& name);
+  System & add_system (const std::string& system_type,
+		      const std::string& name);
   
   /**
    * Add the system named \p name to the systems array.
    */
   template <typename T_sys>
-  T_sys& add_system (const std::string& name);
+  T_sys & add_system (const std::string& name);
   
   /**
    * Remove the system named \p name from the systems array.
@@ -191,6 +191,11 @@ public:
    * in all systems.
    */
   unsigned int n_dofs () const;
+
+  /**
+   * Call \p solve on all the individual equation systems.
+   */
+  void solve ();
   
   /**
    * Fill the input vector \p var_names with the names
@@ -230,11 +235,11 @@ public:
    * the data vectors to any solution values.  This can be done
    * by calling the routine with the read_data flag set to false.
    */
-  void read(const std::string& name,
-            const libMeshEnums::XdrMODE,
-            const bool read_header=true,
-            const bool read_data=true,
-            const bool read_additional_data=true);
+  void read (const std::string& name,
+	     const libMeshEnums::XdrMODE,
+	     const bool read_header=true,
+	     const bool read_data=true,
+	     const bool read_additional_data=false);
 
   /**
    * Write the systems to disk using the XDR data format.
@@ -243,10 +248,10 @@ public:
    * Note that the solution data can be omitted by calling
    * this routine with the write_data flag set to false.
    */
-  void write(const std::string& name,
-             const libMeshEnums::XdrMODE,
-             const bool write_data=true,
-             const bool write_additional_data=true) const;
+  void write (const std::string& name,
+	      const libMeshEnums::XdrMODE,
+	      const bool write_data=true,
+	      const bool write_additional_data=false) const;
 
   /**
    * @returns \p true when this equation system contains
@@ -366,6 +371,11 @@ public:
   const Mesh & get_mesh() const;
 
   /**
+   * @returns a reference to the mesh
+   */
+  Mesh & get_mesh();
+
+  /**
    * Data structure holding user-supplied additional data.
    */
   DataMap data_map;
@@ -377,12 +387,12 @@ protected:
   /**
    * The mesh data structure
    */ 
-  const Mesh& _mesh;
+  Mesh& _mesh;
 
   /**
    * Data structure holding the systems.
    */
-  std::map<std::string, SystemBase*> _systems;
+  std::map<std::string, System*> _systems;
   
   /**
    * Data structure to hold user-specified flags.
@@ -401,6 +411,14 @@ protected:
 // EquationSystems inline methods
 inline
 const Mesh & EquationSystems::get_mesh () const
+{
+  return _mesh;
+}
+
+
+
+inline
+Mesh & EquationSystems::get_mesh ()
 {
   return _mesh;
 }
@@ -434,7 +452,7 @@ unsigned int EquationSystems::n_parameters () const
 
 template <typename T_sys>
 inline
-T_sys& EquationSystems::add_system (const std::string& name)
+T_sys & EquationSystems::add_system (const std::string& name)
 {
   if (!_systems.count(name))
     {
@@ -482,9 +500,9 @@ T_sys& EquationSystems::add_system (const std::string& name)
 
 template <typename T_sys>
 inline
-const T_sys& EquationSystems::get_system (const std::string& name) const
+const T_sys & EquationSystems::get_system (const std::string& name) const
 {
-  std::map<std::string, SystemBase*>::const_iterator
+  std::map<std::string, System*>::const_iterator
     pos = _systems.find(name);
   
   if (pos == _systems.end())
@@ -503,9 +521,9 @@ const T_sys& EquationSystems::get_system (const std::string& name) const
 
 template <typename T_sys>
 inline
-T_sys& EquationSystems::get_system (const std::string& name)
+T_sys & EquationSystems::get_system (const std::string& name)
 {
-  std::map<std::string, SystemBase*>::iterator
+  std::map<std::string, System*>::iterator
     pos = _systems.find(name);
   
   if (pos == _systems.end())
@@ -524,11 +542,11 @@ T_sys& EquationSystems::get_system (const std::string& name)
 
 template <typename T_sys>
 inline
-const T_sys& EquationSystems::get_system (const unsigned int num) const
+const T_sys & EquationSystems::get_system (const unsigned int num) const
 {
   assert (num < this->n_systems());
   
-  std::map<std::string, SystemBase*>::const_iterator
+  std::map<std::string, System*>::const_iterator
     pos = _systems.begin();
 
   for (; pos != _systems.end(); ++pos)
@@ -549,11 +567,11 @@ const T_sys& EquationSystems::get_system (const unsigned int num) const
 
 template <typename T_sys>
 inline
-T_sys& EquationSystems::get_system (const unsigned int num)
+T_sys & EquationSystems::get_system (const unsigned int num)
 {
   assert (num < this->n_systems());
   
-  std::map<std::string, SystemBase*>::iterator
+  std::map<std::string, System*>::iterator
     pos = _systems.begin();
 
   for (; pos != _systems.end(); ++pos)

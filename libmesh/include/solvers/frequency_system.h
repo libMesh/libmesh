@@ -1,7 +1,7 @@
-// $Id: frequency_system.h,v 1.1 2003-11-05 22:26:42 benkirk Exp $
+// $Id: frequency_system.h,v 1.1 2004-01-03 15:37:42 benkirk Exp $
 
-// The Next Great Finite Element Library.
-// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -35,7 +35,7 @@
  */
 #if defined(USE_COMPLEX_NUMBERS)
 
-#include "steady_system.h"
+#include "implicit_system.h"
 
 // Forward Declarations
 
@@ -70,7 +70,7 @@
 // ------------------------------------------------------------
 // FrequencySystem class definition
 
-class FrequencySystem : public SteadySystem
+class FrequencySystem : public ImplicitSystem
 {
 public:
 
@@ -92,7 +92,7 @@ public:
    * The frequencies belong to the \p EquationSystems
    * object.
    */
-  void clear ();
+  virtual void clear ();
   
   /**
    * The full clear method also clears the frequencies
@@ -105,26 +105,29 @@ public:
    * Assemble the linear system.  Does not
    * actually call the solver.
    */
-  void assemble ();
+  virtual void assemble ();
 
+  /**
+   * Solves the system for all frequencies.
+   */ 
+  virtual void solve ();
   
   /**
    * Solves the linear system for the
-   * \f$ [ \texttt{n\_start\_in, n\_stop\_in} ]^{th} \f$ 
-   * frequencies.  When neither \p n_start nor \p n_stop are given, solves for
-   * all frequencies.  The solution vectors are stored in automatically
+   * \f$ [ \texttt{n\_start, n\_stop} ]^{th} \f$ 
+   * frequencies. The solution vectors are stored in automatically
    * allocated vectors named \p solution_nnnn.  For access to these vectors,
-   * see \p SystemBase. When calling this, the frequency range should better
+   * see \p System. When calling this, the frequency range should better
    * be already set.
    */
-  std::vector< std::pair<unsigned int, Real> > solve (const unsigned int n_start_in = libMesh::invalid_uint,
-						      const unsigned int n_stop_in  = libMesh::invalid_uint);
+  void solve (const unsigned int n_start,
+	      const unsigned int n_stop);
   
   /**
    * @returns \p "Frequency".  Helps in identifying
    * the system type in an equation system file.
    */
-  std::string system_type () const { return "Frequency"; }
+  virtual std::string system_type () const { return "Frequency"; }
 
 
   //--------------------------------------------------------
@@ -202,7 +205,7 @@ public:
   /**
    * @returns a string of the form \p "solution_x", where \p x is
    * the integer \p n.  Useful for identifying frequencies and 
-   * solution vectors in the vectors map of \p SystemBase.
+   * solution vectors in the vectors map of \p System.
    */
   std::string form_solu_vec_name(const unsigned int n) const;
 
@@ -216,7 +219,7 @@ protected:
    * The frequenices have to be set @e prior to calling 
    * \p init().
    */
-  void init_data ();
+  virtual void init_data ();
   
   /**
    * Sets the current frequency to the \p n-th entry in the vector

@@ -1,7 +1,7 @@
-// $Id: quadrature_gauss_2D.C,v 1.13 2003-11-30 07:10:17 benkirk Exp $
+// $Id: quadrature_gauss_2D.C,v 1.14 2004-01-03 15:37:44 benkirk Exp $
 
-// The Next Great Finite Element Library.
-// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

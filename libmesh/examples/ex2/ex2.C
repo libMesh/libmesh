@@ -1,4 +1,4 @@
-/* $Id: ex2.C,v 1.13 2003-11-11 04:58:33 benkirk Exp $ */
+/* $Id: ex2.C,v 1.14 2004-01-03 15:37:41 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -51,7 +51,7 @@
 // Include file that defines (possibly multiple) systems of equations.
 #include "equation_systems.h"
 // Include file that defines a simple steady system
-#include "steady_system.h"
+#include "transient_system.h"
 
 int main (int argc, char** argv)
 {
@@ -105,7 +105,7 @@ int main (int argc, char** argv)
     // We begin by adding a "SteadyStytem" to the
     // EquationSystems object, and we give it the name
     // "Simple System".
-    equation_systems.add_system<SteadySystem> ("Simple System");
+    equation_systems.add_system<TransientImplicitSystem> ("Simple System");
       
     // Adds the variable "u" to "Simple System".  "u"
     // will be approximated using first-order approximation.

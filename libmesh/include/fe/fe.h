@@ -1,7 +1,7 @@
-// $Id: fe.h,v 1.2 2003-12-12 22:42:52 jwpeterson Exp $
+// $Id: fe.h,v 1.3 2004-01-03 15:37:42 benkirk Exp $
 
-// The Next Great Finite Element Library.
-// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -52,7 +52,7 @@ class InfFE;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.2 $
+ * \version $Revision: 1.3 $
  */
 
 //-------------------------------------------------------------
@@ -345,7 +345,7 @@ private:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.2 $
+ * \version $Revision: 1.3 $
  */
 
 //-------------------------------------------------------------
@@ -370,7 +370,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.2 $
+ * \version $Revision: 1.3 $
  */
 
 //-------------------------------------------------------------
@@ -395,7 +395,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.2 $
+ * \version $Revision: 1.3 $
  */
 
 //-------------------------------------------------------------

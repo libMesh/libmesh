@@ -1,7 +1,7 @@
-// $Id: error_estimator.h,v 1.1 2003-11-05 22:26:44 benkirk Exp $
+// $Id: error_estimator.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
 
-// The Next Great Finite Element Library.
-// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -28,10 +28,8 @@
 
 // Local Includes
 #include "libmesh_common.h"
-
-
-// Forward Declarations
-class EquationSystems;
+#include "equation_systems.h"
+#include "steady_system.h"
 
 /**
  * This class holds functions that will estimate the error
@@ -53,16 +51,25 @@ public:
    */
   virtual ~ErrorEstimator() {}
 
-  
+
+  /**
+   * 
+   */
+  void flux_jump (const EquationSystems& es,
+		  const std::string& name,
+		  std::vector<float>& error_per_cell)
+  { this->flux_jump (es.get_system<SteadySystem>(name), error_per_cell); }
+
   /**
    * This function uses the Kelley Flux Jump error
    * estimate to estimate the error on each cell.
    * The estimated error is output in the vector
    * \p error_per_cell
    */
-  virtual void flux_jump (const EquationSystems& es,
-			  const std::string& name,
+  virtual void flux_jump (const SteadySystem& system,
 			  std::vector<float>& error_per_cell);
+
+  
 
 
   /**

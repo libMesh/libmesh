@@ -1,7 +1,7 @@
-// $Id: system_base_projection.C,v 1.6 2003-11-05 22:26:44 benkirk Exp $
+// $Id: system_projection.C,v 1.1 2004-01-03 15:37:44 benkirk Exp $
 
-// The Next Great Finite Element Library.
-// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,7 +23,7 @@
 #include <vector>
 
 // Local includes
-#include "system_base.h"
+#include "system.h"
 #include "mesh.h"
 #include "libmesh.h"
 #include "dof_map.h"
@@ -35,8 +35,8 @@
 
 
 // ------------------------------------------------------------
-// SystemBase implementation
-void SystemBase::project_vector (NumericVector<Number>& vector) const
+// System implementation
+void System::project_vector (NumericVector<Number>& vector) const
 {
   // Create a copy of the vector, which currently
   // contains the old data.
@@ -49,38 +49,27 @@ void SystemBase::project_vector (NumericVector<Number>& vector) const
 
 
 
-void SystemBase::project_vector (const NumericVector<Number>& old_vector,
-				 NumericVector<Number>& new_vector) const
+void System::project_vector (const NumericVector<Number>& old_vector,
+			     NumericVector<Number>& new_vector) const
 {
 #ifdef ENABLE_AMR
   
-  START_LOG ("project_vector()", "SystemBase");
+  START_LOG ("project_vector()", "System");
   
-  /**
-   * This method projects a solution from an old mesh to a current, refined
-   * mesh.  The input vector \p old_vector gives the solution on the
-   * old mesh, while the \p new_vector gives the solution (to be computed)
-   * on the new mesh.
-   */
+  // This method projects a solution from an old mesh to a current, refined
+  // mesh.  The input vector \p old_vector gives the solution on the
+  // old mesh, while the \p new_vector gives the solution (to be computed)
+  // on the new mesh.
   new_vector.clear();
 
-  // If the old vector was uniprocessor, make the new
-  // vector uniprocessor
-  if (old_vector.size() == old_vector.local_size())
-    new_vector.init (this->n_dofs(),
-		     this->n_dofs());
-
-  // Otherwise it is a parallel, distributed vector.
-  else
-    new_vector.init (this->n_dofs(),
-		     this->n_local_dofs());
-    
-  // Note that the init above will have zeroed the new_vector
+  // Resize the new vector.
+  // Note that this will zero-out the new_vector
+  new_vector.init (this->n_dofs(),
+		   this->n_local_dofs());  
 
   // A vector indicating if we have visited a DOF yet
   std::vector<bool> already_done (this->n_dofs(), false);
   
-
   // The number of variables in this system
   const unsigned int n_variables = this->n_vars();
 
@@ -91,7 +80,7 @@ void SystemBase::project_vector (const NumericVector<Number>& old_vector,
   const DofMap& dof_map = this->get_dof_map();
 
 
-  
+
   // Loop over all the variables in the system
   for (unsigned int var=0; var<n_variables; var++)
     {
@@ -236,7 +225,7 @@ void SystemBase::project_vector (const NumericVector<Number>& old_vector,
   // Close the new vector so that it is ready for use.
   new_vector.close();
   
-  STOP_LOG ("project_vector()", "SystemBase");
+  STOP_LOG ("project_vector()", "System");
 
 
 #else
@@ -255,7 +244,7 @@ void SystemBase::project_vector (const NumericVector<Number>& old_vector,
  * the L2 projection system is constructed.
  * It must be solved subsequently.
  */
-// void SystemBase::project_vector (const NumericVector<Number>& old_vector,
+// void System::project_vector (const NumericVector<Number>& old_vector,
 // 				 NumericVector<Number>& new_vector) const
 // {
 // #ifdef ENABLE_AMR

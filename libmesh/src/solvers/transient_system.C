@@ -1,7 +1,7 @@
-// $Id: transient_system.C,v 1.7 2003-11-05 22:26:44 benkirk Exp $
+// $Id: transient_system.C,v 1.1 2004-01-03 15:37:44 benkirk Exp $
 
-// The Next Great Finite Element Library.
-// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,8 @@
 
 // Local includes
 #include "transient_system.h"
+#include "implicit_system.h"
+#include "explicit_system.h"
 #include "libmesh_logging.h"
 #include "utility.h"
 
@@ -30,11 +32,12 @@
 
 // ------------------------------------------------------------
 // TransientSystem implementation
-TransientSystem::TransientSystem (EquationSystems& es,
-				  const std::string& name,
-				  const unsigned int number) :
+template <class Base>
+TransientSystem<Base>::TransientSystem (EquationSystems& es,
+					const std::string& name,
+					const unsigned int number) :
   
-  SteadySystem         (es, name, number),
+  Base                 (es, name, number),
   old_local_solution   (NumericVector<Number>::build()),
   older_local_solution (NumericVector<Number>::build())
 {
@@ -42,22 +45,19 @@ TransientSystem::TransientSystem (EquationSystems& es,
 
 
 
-TransientSystem::~TransientSystem ()
+template <class Base>
+TransientSystem<Base>::~TransientSystem ()
 {
-  // Null-out the function pointers.  Since this
-  // class is getting destructed it is pointless,
-  // but a good habit.
-  init_system = assemble_system = NULL;
-
   this->clear();
 }
 
 
 
-void TransientSystem::clear ()
+template <class Base>
+void TransientSystem<Base>::clear ()
 {
   // clear the parent data
-  SteadySystem::clear();
+  Base::clear();
 
   // clear the old & older local solutions
   old_local_solution->clear();
@@ -67,10 +67,11 @@ void TransientSystem::clear ()
 
 
 
-void TransientSystem::init_data ()
+template <class Base>
+void TransientSystem<Base>::init_data ()
 {
   // initialize parent data
-  SteadySystem::init_data();
+  Base::init_data();
 
   // Initialize the old & older solutions
   old_local_solution->init   (this->n_dofs());
@@ -79,10 +80,11 @@ void TransientSystem::init_data ()
 
 
 
-void TransientSystem::reinit ()
+template <class Base>
+void TransientSystem<Base>::reinit ()
 {
   // initialize parent data
-  SteadySystem::reinit();
+  Base::reinit();
     
   // Project the old & older vectors to the new mesh
   this->project_vector (*old_local_solution);
@@ -91,17 +93,11 @@ void TransientSystem::reinit ()
 
 
 
-void TransientSystem::update ()
-{
-  // Update the parent system
-  SteadySystem::update ();
-}
-
-
-void TransientSystem::re_update ()
+template <class Base>
+void TransientSystem<Base>::re_update ()
 {
   // re_update the parent system
-  SteadySystem::re_update ();
+  Base::re_update ();
   
   //const std::vector<unsigned int>& send_list = _dof_map.get_send_list ();
 
@@ -128,3 +124,10 @@ void TransientSystem::re_update ()
 				last_local_dof,
 				send_list);  
 }
+
+
+
+// ------------------------------------------------------------
+// TransientSystem instantiations
+template class TransientSystem<ImplicitSystem>;
+template class TransientSystem<ExplicitSystem>;

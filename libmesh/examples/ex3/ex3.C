@@ -1,4 +1,4 @@
-/* $Id: ex3.C,v 1.26 2003-11-11 04:58:33 benkirk Exp $ */
+/* $Id: ex3.C,v 1.27 2004-01-03 15:37:41 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -36,7 +36,7 @@
 // Basic include files needed for the mesh functionality.
 #include "libmesh.h"
 #include "mesh.h"
-#include "steady_system.h"
+#include "implicit_system.h"
 #include "equation_systems.h"
 
 // Define the Finite Element object.
@@ -113,7 +113,7 @@ int main (int argc, char** argv)
     
     // Declare the Poisson system and its variables.
     // The Poisson system is another example of a steady system.
-    equation_systems.add_system<SteadySystem> ("Poisson");
+    equation_systems.add_system<ImplicitSystem> ("Poisson");
 
     // Adds the variable "u" to "Poisson".  "u"
     // will be approximated using second-order approximation.
@@ -177,10 +177,19 @@ void assemble_poisson(EquationSystems& es,
 
   // The dimension that we are running
   const unsigned int dim = mesh.mesh_dimension();
+
+  // Get a reference to the ImplicitSystem we are solving
+  ImplicitSystem& system = es.get_system<ImplicitSystem> ("Poisson");
+
+  // A reference to the  DofMap object for this system.  The  DofMap
+  // object handles the index translation from node and element numbers
+  // to degree of freedom numbers.  We will talk more about the  DofMap
+  // in future examples.
+  const DofMap& dof_map = system.get_dof_map();
   
   // Get a constant reference to the Finite Element type
   // for the first (and only) variable in the system.
-  FEType fe_type = es("Poisson").get_dof_map().variable_type(0);
+  FEType fe_type = dof_map.variable_type(0);
   
   // Build a Finite Element object of the specified type.  Since the
   // FEBase::build() member dynamically creates memory we will
@@ -226,12 +235,6 @@ void assemble_poisson(EquationSystems& es,
   // The element shape function gradients evaluated at the quadrature
   // points.
   const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
-
-  // A reference to the  DofMap object for this system.  The  DofMap
-  // object handles the index translation from node and element numbers
-  // to degree of freedom numbers.  We will talk more about the  DofMap
-  // in future examples.
-  const DofMap& dof_map = es("Poisson").get_dof_map();
 
   // Define data structures to contain the element matrix
   // and right-hand-side vector contribution.  Following
@@ -439,8 +442,8 @@ void assemble_poisson(EquationSystems& es,
       // for this element.  Add them to the global matrix and
       // right-hand-side vector.  The  SparseMatrix::add_matrix()
       // and  NumericVector::add_vector() members do this for us.
-      es("Poisson").matrix->add_matrix (Ke, dof_indices);
-      es("Poisson").rhs->add_vector    (Fe, dof_indices);
+      system.matrix->add_matrix (Ke, dof_indices);
+      system.rhs->add_vector    (Fe, dof_indices);
     }
   
   // All done!

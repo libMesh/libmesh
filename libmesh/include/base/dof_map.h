@@ -1,7 +1,7 @@
-// $Id: dof_map.h,v 1.1 2003-11-05 22:26:42 benkirk Exp $
+// $Id: dof_map.h,v 1.2 2004-01-03 15:37:41 benkirk Exp $
 
-// The Next Great Finite Element Library.
-// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -74,17 +74,17 @@ public:
    */
   ~DofMap();
 
-  /**
-   * Attach the matrix that is used with this \p DofMap.
-   */
-  void attach_matrix (SparseMatrix<Number>& matrix);
+//   /**
+//    * Attach the matrix that is used with this \p DofMap.
+//    */
+//   void attach_matrix (SparseMatrix<Number>& matrix);
 
   /**
    * Additional matrices may be handled with this \p DofMap.
    * They are initialized to the same sparsity structure as
    * the major matrix.
    */
-  void attach_other_matrix (std::pair<std::string, SparseMatrix<Number>*> _new);
+  void attach_matrix (SparseMatrix<Number>& matrix);
 
 
 #ifdef ENABLE_AMR
@@ -387,17 +387,17 @@ private:
    */
   const unsigned int _sys_number;
   
-  /**
-   * Pointer to the matrix used with this object.
-   */
-  SparseMatrix<Number>* _matrix;
+//   /**
+//    * Pointer to the matrix used with this object.
+//    */
+//   SparseMatrix<Number>* _matrix;
   
   /**
    * Additional matrices handled by this object.  These pointers do @e 
-   * not handle the memory, instead, \p SystemBase, who
+   * not handle the memory, instead, \p System, who
    * told \p DofMap about them, owns them.
    */
-  std::map<std::string, SparseMatrix<Number>* > _other_matrices;
+  std::vector<SparseMatrix<Number>* > _matrices;
   
   /**
    * Total number of degrees of freedom.
@@ -451,10 +451,10 @@ private:
 inline
 DofMap::DofMap(const unsigned int number) :
   _sys_number(number),
-  _matrix(NULL),
+//  _matrix(NULL),
   _n_dfs(0)  
 {
-  _other_matrices.clear();
+  _matrices.clear();
 }
 
 
