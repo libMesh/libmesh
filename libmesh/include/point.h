@@ -1,4 +1,4 @@
-// $Id: point.h,v 1.15 2003-05-21 13:50:19 benkirk Exp $
+// $Id: point.h,v 1.16 2003-05-22 12:48:08 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -610,24 +610,22 @@ Real Point::size_sq() const
 inline
 bool Point::operator == (const Point& rhs) const
 {
-  static const Real tol_sq = TOLERANCE*TOLERANCE;
-  
 #if DIM == 1
-  return ((_coords[0] - rhs._coords[0])*(_coords[0] - rhs._coords[0])
-	  < tol_sq);
+  return (fabs(_coords[0] - rhs._coords[0])
+	  < TOLERANCE);
 #endif
   
 #if DIM == 2
-  return (((_coords[0] - rhs._coords[0])*(_coords[0] - rhs._coords[0]) +
-	   (_coords[1] - rhs._coords[1])*(_coords[1] - rhs._coords[1]))
-	  < tol_sq);
+  return ((fabs(_coords[0] - rhs._coords[0]) +
+	   fabs(_coords[1] - rhs._coords[1]))
+	  < 2.*TOLERANCE);
 #endif
   
 #if DIM == 3
-  return (((_coords[0] - rhs._coords[0])*(_coords[0] - rhs._coords[0]) +
-	   (_coords[1] - rhs._coords[1])*(_coords[1] - rhs._coords[1]) +
-	   (_coords[2] - rhs._coords[2])*(_coords[2] - rhs._coords[2]))
-	  < tol_sq);
+  return ((fabs(_coords[0] - rhs._coords[0]) +
+	   fabs(_coords[1] - rhs._coords[1]) +
+	   fabs(_coords[2] - rhs._coords[2]))
+	  < 3.*TOLERANCE);
 #endif
   
 }

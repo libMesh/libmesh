@@ -1,6 +1,6 @@
 
 
-// $Id: mesh_base.C,v 1.33 2003-05-19 21:21:13 benkirk Exp $
+// $Id: mesh_base.C,v 1.34 2003-05-22 12:48:09 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -503,7 +503,12 @@ void MeshBase::find_neighbors()
 	    
 #ifdef DEBUG	    
 	    if ((*el)->neighbor(s) != NULL)
-	      assert ((*el)->neighbor(s)->active());
+	      if (!(*el)->neighbor(s)->active())
+		{
+		  std::cerr << "I'm confused..." << std::endl;
+		  this->write_gmv("bad_mesh.gmv");
+		  error();
+		}
 #endif
 	  }
     }
