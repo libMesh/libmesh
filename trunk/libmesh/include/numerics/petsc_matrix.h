@@ -1,4 +1,4 @@
-//    $Id: petsc_matrix.h,v 1.3 2004-02-15 15:35:30 benkirk Exp $
+//    $Id: petsc_matrix.h,v 1.4 2004-03-14 01:31:48 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -482,13 +482,16 @@ void PetscMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
   assert (this->n() == X_in.n());
 
   PetscScalar     a = static_cast<PetscScalar>      (a_in);
-  PetscMatrix<T>& X = dynamic_cast<PetscMatrix<T>&> (X_in);
+  PetscMatrix<T>* X = dynamic_cast<PetscMatrix<T>*> (&X_in);
+
+  assert (X != NULL);
+  
   int ierr=0;
 
   // the matrix from which we copy the values has to be assembled/closed
-  X.close ();
+  X->close ();
 
-  ierr = MatAXPY(&a,  X.mat, mat, SAME_NONZERO_PATTERN);
+  ierr = MatAXPY(&a,  X->mat, mat, SAME_NONZERO_PATTERN);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 }
 

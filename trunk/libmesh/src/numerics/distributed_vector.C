@@ -1,4 +1,4 @@
-// $Id: distributed_vector.C,v 1.19 2004-01-03 15:37:43 benkirk Exp $
+// $Id: distributed_vector.C,v 1.20 2004-03-14 01:31:48 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -264,9 +264,11 @@ template <typename T>
 NumericVector<T>&
 DistributedVector<T>::operator = (const NumericVector<T>& v_in)
 {
-  const DistributedVector<T>& v = dynamic_cast<const DistributedVector<T>&>(v_in);
+  const DistributedVector<T>* v = dynamic_cast<const DistributedVector<T>*>(&v_in);
+
+  assert (v != NULL);
   
-  *this = v;
+  *this = *v;
   
   return *this;
 }
@@ -333,20 +335,22 @@ void DistributedVector<T>::localize (NumericVector<T>& v_local_in) const
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 
-  DistributedVector<T>& v_local = dynamic_cast<DistributedVector<T>&>(v_local_in);
+  DistributedVector<T>* v_local = dynamic_cast<DistributedVector<T>*>(&v_local_in);
 
-  v_local._first_local_index = 0;
+  assert (v_local != NULL);
+
+  v_local->_first_local_index = 0;
   
-  v_local._global_size =
-    v_local._local_size =
-    v_local._last_local_index = size();
+  v_local->_global_size =
+    v_local->_local_size =
+    v_local->_last_local_index = size();
 
-  v_local._is_initialized =
-    v_local._is_closed = true;
+  v_local->_is_initialized =
+    v_local->_is_closed = true;
   
   // Call localize on the vector's values.  This will help
   // prevent code duplication
-  localize (v_local._values);    
+  localize (v_local->_values);    
   
 #ifndef HAVE_MPI
 

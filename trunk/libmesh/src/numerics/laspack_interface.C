@@ -1,4 +1,4 @@
-// $Id: laspack_interface.C,v 1.14 2004-03-13 16:39:02 jwpeterson Exp $
+// $Id: laspack_interface.C,v 1.15 2004-03-14 01:31:48 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -112,19 +112,25 @@ LaspackInterface<T>::solve (SparseMatrix<T> &matrix_in,
 {
   this->init ();
 
-  LaspackMatrix<T>& matrix   = dynamic_cast<LaspackMatrix<T>&>(matrix_in);
-  LaspackVector<T>& solution = dynamic_cast<LaspackVector<T>&>(solution_in);
-  LaspackVector<T>& rhs      = dynamic_cast<LaspackVector<T>&>(rhs_in);
+  LaspackMatrix<T>* matrix   = dynamic_cast<LaspackMatrix<T>*>(&matrix_in);
+  LaspackVector<T>* solution = dynamic_cast<LaspackVector<T>*>(&solution_in);
+  LaspackVector<T>* rhs      = dynamic_cast<LaspackVector<T>*>(&rhs_in);
 
+  // We cast to pointers so we can be sure that they succeeded
+  // by comparing the result against NULL.
+  assert(matrix   != NULL);
+  assert(solution != NULL);
+  assert(rhs      != NULL);
+  
   // Zero-out the solution to prevent the solver from exiting in 0
   // iterations (?)
   //TODO:[BSK] Why does Laspack do this?  Comment out this and try ex13...
-  solution.zero();
+  solution->zero();
   
   // Close the matrix and vectors in case this wasn't already done.
-  matrix.close ();
-  solution.close ();
-  rhs.close ();
+  matrix->close ();
+  solution->close ();
+  rhs->close ();
 
   // Set the preconditioner type
   this->set_laspack_preconditioner_type ();
@@ -138,9 +144,9 @@ LaspackInterface<T>::solve (SparseMatrix<T> &matrix_in,
       // Conjugate-Gradient
     case CG:
       {
-	CGIter (&matrix._QMat,
-		&solution._vec,
-		&rhs._vec,
+	CGIter (&matrix->_QMat,
+		&solution->_vec,
+		&rhs->_vec,
 		m_its,
 		_precond_type,
 		1.);
@@ -150,9 +156,9 @@ LaspackInterface<T>::solve (SparseMatrix<T> &matrix_in,
       // Conjugate-Gradient Normalized
     case CGN:
       {
-	CGNIter (&matrix._QMat,
-		 &solution._vec,
-		 &rhs._vec,
+	CGNIter (&matrix->_QMat,
+		 &solution->_vec,
+		 &rhs->_vec,
 		 m_its,
 		 _precond_type,
 		 1.);
@@ -162,9 +168,9 @@ LaspackInterface<T>::solve (SparseMatrix<T> &matrix_in,
       // Conjugate-Gradient Squared
     case CGS:
       {
-	CGSIter (&matrix._QMat,
-		 &solution._vec,
-		 &rhs._vec,
+	CGSIter (&matrix->_QMat,
+		 &solution->_vec,
+		 &rhs->_vec,
 		 m_its,
 		 _precond_type,
 		 1.);
@@ -174,9 +180,9 @@ LaspackInterface<T>::solve (SparseMatrix<T> &matrix_in,
       // Bi-Conjugate Gradient
     case BICG:
       {
-	BiCGIter (&matrix._QMat,
-		  &solution._vec,
-		  &rhs._vec,
+	BiCGIter (&matrix->_QMat,
+		  &solution->_vec,
+		  &rhs->_vec,
 		  m_its,
 		  _precond_type,
 		  1.);
@@ -186,9 +192,9 @@ LaspackInterface<T>::solve (SparseMatrix<T> &matrix_in,
       // Bi-Conjugate Gradient Stabilized
     case BICGSTAB:
       {
-	BiCGSTABIter (&matrix._QMat,
-		      &solution._vec,
-		      &rhs._vec,
+	BiCGSTABIter (&matrix->_QMat,
+		      &solution->_vec,
+		      &rhs->_vec,
 		      m_its,
 		      _precond_type,
 		      1.);
@@ -198,9 +204,9 @@ LaspackInterface<T>::solve (SparseMatrix<T> &matrix_in,
       // Quasi-Minimum Residual
     case QMR:
       {
-	QMRIter (&matrix._QMat,
-		 &solution._vec,
-		 &rhs._vec,
+	QMRIter (&matrix->_QMat,
+		 &solution->_vec,
+		 &rhs->_vec,
 		 m_its,
 		 _precond_type,
 		 1.);
@@ -210,9 +216,9 @@ LaspackInterface<T>::solve (SparseMatrix<T> &matrix_in,
       // Symmetric over-relaxation
     case SSOR:
       {
-	SSORIter (&matrix._QMat,
-		  &solution._vec,
-		  &rhs._vec,
+	SSORIter (&matrix->_QMat,
+		  &solution->_vec,
+		  &rhs->_vec,
 		  m_its,
 		  _precond_type,
 		  1.);
@@ -222,9 +228,9 @@ LaspackInterface<T>::solve (SparseMatrix<T> &matrix_in,
       // Jacobi Relaxation
     case JACOBI:
       {
-	JacobiIter (&matrix._QMat,
-		    &solution._vec,
-		    &rhs._vec,
+	JacobiIter (&matrix->_QMat,
+		    &solution->_vec,
+		    &rhs->_vec,
 		    m_its,
 		    _precond_type,
 		    1.);
@@ -235,9 +241,9 @@ LaspackInterface<T>::solve (SparseMatrix<T> &matrix_in,
     case GMRES:
       {
 	SetGMRESRestart (30);
-	GMRESIter (&matrix._QMat,
-		   &solution._vec,
-		   &rhs._vec,
+	GMRESIter (&matrix->_QMat,
+		   &solution->_vec,
+		   &rhs->_vec,
 		   m_its,
 		   _precond_type,
 		   1.);
@@ -253,9 +259,9 @@ LaspackInterface<T>::solve (SparseMatrix<T> &matrix_in,
 	
 	this->_solver_type = GMRES;
 	
-	return this->solve (matrix,
-			    solution,
-			    rhs,
+	return this->solve (*matrix,
+			    *solution,
+			    *rhs,
 			    tol,
 			    m_its);
       }
