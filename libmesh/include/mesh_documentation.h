@@ -155,7 +155,7 @@
     - Version 7.30
     - Not tested (but will likely work) with others
  
-  - HP (use \p CXX="aCC \p -AA" and \p CC="cc \p -Aa" to get full std support) 
+  - HP (GNU \p make recommended, use \p CXX="aCC \p -AA" and \p CC="cc \p -Aa" to get full std support) 
     - \p aCC A.03.37
 
   - IBM \p xlC version 5.0, 6.0
