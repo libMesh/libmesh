@@ -1,4 +1,4 @@
-// $Id: mesh_common.h,v 1.14 2003-05-19 21:21:11 benkirk Exp $
+// $Id: mesh_common.h,v 1.15 2003-05-22 12:48:08 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -119,7 +119,7 @@ typedef std::complex<double> COMPLEX;
 // Define a tolerance.  This is what should be considered "good enough"
 // when doing floating point comparisons.  For example, v == 0 is
 // changed to fabs(v) < TOLERANCE.
-#define TOLERANCE 1.e-8
+#define TOLERANCE 1.e-6
 
 
 
