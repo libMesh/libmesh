@@ -1,4 +1,4 @@
-//    $Id: petsc_matrix.h,v 1.32 2003-10-08 13:25:27 benkirk Exp $
+//    $Id: petsc_matrix.h,v 1.33 2003-10-08 13:49:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -530,7 +530,7 @@ T PetscMatrix<T>::operator () (const unsigned int i,
     {
       // The entry in the contiguous row corresponding
       // to the j_val column of interest
-      const unsigned int j = std::distance (&petsc_cols[0], p.first);
+      const int j = std::distance (&petsc_cols[0], p.first);
       
       assert (j < ncols);
       assert (petsc_cols[j] == j_val);
