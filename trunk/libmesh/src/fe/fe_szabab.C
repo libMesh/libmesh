@@ -1,4 +1,4 @@
-// $Id: fe_szabab.C,v 1.1 2004-01-09 19:33:22 spetersen Exp $
+// $Id: fe_szabab.C,v 1.2 2004-01-16 11:01:52 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -31,6 +31,7 @@
 
 // ------------------------------------------------------------
 // Szabo-Babuska-specific implementations
+// Steffen Petersen 2004
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::nodal_soln(const Elem* elem,
 			   const Order order,
