@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.19 2003-05-15 23:34:35 benkirk Exp $
+// $Id: fe.C,v 1.20 2003-05-16 19:29:13 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -44,11 +44,17 @@ template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::reinit(const Elem* elem,
 		       const std::vector<Point>* const pts)
 {
-  assert (qrule   != NULL);
   assert (elem    != NULL);
 
-  qrule->init(elem->type());
+  // Only need the quadrature rule if the user did not supply
+  // points
+  if (pts == NULL)
+    {
+      assert (qrule   != NULL);
+      qrule->init(elem->type());
+    }
 
+  
   // Initialize the shape functions at the user-specified
   // points
   if (pts != NULL)
@@ -67,6 +73,8 @@ void FE<Dim,T>::reinit(const Elem* elem,
       elem_type = elem->type();
       init_shape_functions (qrule->get_points(), elem);
     }
+
+
   
   // Compute the map for this element.  In the future we can specify
   // different types of maps

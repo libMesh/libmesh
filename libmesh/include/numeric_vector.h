@@ -1,4 +1,4 @@
-// $Id: numeric_vector.h,v 1.15 2003-05-15 23:34:34 benkirk Exp $
+// $Id: numeric_vector.h,v 1.16 2003-05-16 19:29:09 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -279,7 +279,7 @@ public:
   virtual void add (const T a, const NumericVector<T>& v) = 0;
 
   /**
-   * U+=v where v is a std::vector<T> 
+   * U+=v where v is a DenseVector<T> 
    * and you
    * want to specify WHERE to add it
    */

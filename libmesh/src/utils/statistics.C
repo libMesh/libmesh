@@ -1,4 +1,4 @@
-// $Id: statistics.C,v 1.6 2003-02-03 03:51:50 ddreyer Exp $
+// $Id: statistics.C,v 1.7 2003-05-16 19:29:13 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -203,6 +203,7 @@ std::vector<unsigned int> StatisticsVector<T>::cut_above(Real cut) const
 
 
 // Explicit Instantions
-template class StatisticsVector<Real>;
+template class StatisticsVector<float>;
+template class StatisticsVector<double>;
 template class StatisticsVector<int>;
 template class StatisticsVector<unsigned int>;
