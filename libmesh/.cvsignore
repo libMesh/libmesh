@@ -34,7 +34,6 @@ Makefile
 include/config.h
 *.exd
 autom4te.cache
-.depend
 testexodus
 metis-4.0*
 cubit
