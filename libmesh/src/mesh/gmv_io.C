@@ -1,4 +1,4 @@
-// $Id: gmv_io.C,v 1.10 2004-08-05 20:20:11 jwpeterson Exp $
+// $Id: gmv_io.C,v 1.11 2004-10-18 22:10:06 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -71,22 +71,22 @@ void GMVIO::write_ascii (const std::string& fname,
   {
     // write the nodes
     
-    out << "gmvinput ascii" << std::endl << std::endl;
-    out << "nodes " << mesh.n_nodes() << std::endl;
+    out << "gmvinput ascii" << '\n' << '\n';
+    out << "nodes " << mesh.n_nodes() << '\n';
     for (unsigned int v=0; v<mesh.n_nodes(); v++)
       out << mesh.point(v)(0) << " ";
          
-    out << std::endl;
+    out << '\n';
     
     for (unsigned int v=0; v<mesh.n_nodes(); v++)
       out << mesh.point(v)(1) << " ";
     
-    out << std::endl;
+    out << '\n';
     
     for (unsigned int v=0; v<mesh.n_nodes(); v++)
       out << mesh.point(v)(2) << " ";
      
-    out << std::endl << std::endl;
+    out << '\n' << '\n';
   }
 
 
@@ -94,7 +94,7 @@ void GMVIO::write_ascii (const std::string& fname,
   {
     // write the connectivity
     
-    out << "cells " << mesh.n_active_sub_elem() << std::endl;
+    out << "cells " << mesh.n_active_sub_elem() << '\n';
 
     const_active_elem_iterator       it (mesh.elements_begin());
     const const_active_elem_iterator end(mesh.elements_end());
@@ -109,12 +109,12 @@ void GMVIO::write_ascii (const std::string& fname,
 	  for ( ; it != end; ++it)
 	    for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
 	      {
-		out << "line 2" << std::endl;
+		out << "line 2" << '\n';
 		(*it)->connectivity(se, TECPLOT, conn);
 		for (unsigned int i=0; i<conn.size(); i++)
 		  out << conn[i] << " ";
 		
-		out << std::endl;
+		out << '\n';
 	      }
 	  break;
 	}
@@ -137,7 +137,7 @@ void GMVIO::write_ascii (const std::string& fname,
 #endif
 		    )
 		  {
-		    out << "quad 4" << std::endl;
+		    out << "quad 4" << '\n';
 		    (*it)->connectivity(se, TECPLOT, conn);
 		    for (unsigned int i=0; i<conn.size(); i++)
 		      out << conn[i] << " ";
@@ -147,7 +147,7 @@ void GMVIO::write_ascii (const std::string& fname,
 		else if (((*it)->type() == TRI3) ||
 			 ((*it)->type() == TRI6))
 		  {
-		    out << "tri 3" << std::endl;
+		    out << "tri 3" << '\n';
 		    (*it)->connectivity(se, TECPLOT, conn);
 		    for (unsigned int i=0; i<3; i++)
 		      out << conn[i] << " ";
@@ -158,7 +158,7 @@ void GMVIO::write_ascii (const std::string& fname,
 		    error();
 		  }
 		
-		out << std::endl;
+		out << '\n';
 	      }
 	  
 	  break;
@@ -178,7 +178,7 @@ void GMVIO::write_ascii (const std::string& fname,
 		if (((*it)->type() == HEX8)   ||    
 		    ((*it)->type() == HEX27))
 		  {
-		    out << "phex8 8" << std::endl;
+		    out << "phex8 8" << '\n';
 		    (*it)->connectivity(se, TECPLOT, conn);
 		    for (unsigned int i=0; i<conn.size(); i++)
 		      out << conn[i] << " ";
@@ -186,7 +186,7 @@ void GMVIO::write_ascii (const std::string& fname,
 		
 		else if ((*it)->type() == HEX20)
 		  {
-		    out << "phex20 20" << std::endl;
+		    out << "phex20 20" << '\n';
 		    out << (*it)->node(0)+1  << " "
 			<< (*it)->node(1)+1  << " "
 			<< (*it)->node(2)+1  << " "
@@ -221,7 +221,7 @@ void GMVIO::write_ascii (const std::string& fname,
 		    ((*it)->type() == INFHEX18) ||
 		    ((*it)->type() == HEX20))
 		  {
-		    out << "phex8 8" << std::endl;
+		    out << "phex8 8" << '\n';
 		    (*it)->connectivity(se, TECPLOT, conn);
 		    for (unsigned int i=0; i<conn.size(); i++)
 		      out << conn[i] << " ";
@@ -231,7 +231,7 @@ void GMVIO::write_ascii (const std::string& fname,
 		else if (((*it)->type() == TET4)  ||
 			 ((*it)->type() == TET10))
 		  {
-		    out << "tet 4" << std::endl;
+		    out << "tet 4" << '\n';
 		    (*it)->connectivity(se, TECPLOT, conn);
 		    out << conn[0] << " "
 			<< conn[2] << " "
@@ -254,7 +254,7 @@ void GMVIO::write_ascii (const std::string& fname,
 		     * Note that the prisms are treated as
 		     * degenerated phex8's.
 		     */
-		    out << "phex8 8" << std::endl;
+		    out << "phex8 8" << '\n';
 		    (*it)->connectivity(se, TECPLOT, conn);
 		    for (unsigned int i=0; i<conn.size(); i++)
 		      out << conn[i] << " ";
@@ -265,7 +265,7 @@ void GMVIO::write_ascii (const std::string& fname,
 		    error();
 		  }
 		
-		out << std::endl;
+		out << '\n';
 	      }
 	  
 	  break;
@@ -275,7 +275,7 @@ void GMVIO::write_ascii (const std::string& fname,
 	error();
       }
     
-    out << std::endl;
+    out << '\n';
   }
   
 
@@ -285,19 +285,19 @@ void GMVIO::write_ascii (const std::string& fname,
     {
       out << "material "
 	  << mesh.n_partitions()
-	  << " 0"<< std::endl;
+	  << " 0"<< '\n';
 
       for (unsigned int proc=0; proc<mesh.n_partitions(); proc++)
-	out << "proc_" << proc << std::endl;
+	out << "proc_" << proc << '\n';
       
       const_active_elem_iterator       it (mesh.elements_begin());
       const const_active_elem_iterator end(mesh.elements_end());
 
       for ( ; it != end; ++it)
 	for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
-	    out << (*it)->processor_id()+1 << std::endl;
+	    out << (*it)->processor_id()+1 << '\n';
       
-      out << std::endl;
+      out << '\n';
     }
 
 
@@ -317,7 +317,7 @@ void GMVIO::write_ascii (const std::string& fname,
       
       assert (v->size() == mesh.n_nodes()*n_vars);
 
-      out << "variable" << std::endl;
+      out << "variable" << '\n';
 
 
       for (unsigned int c=0; c<n_vars; c++)
@@ -329,48 +329,48 @@ void GMVIO::write_ascii (const std::string& fname,
 	  // for each component
 
 	  // this is the real part
-	  out << "r_" << (*solution_names)[c] << " 1" << std::endl;
+	  out << "r_" << (*solution_names)[c] << " 1" << '\n';
 	  
 	  for (unsigned int n=0; n<mesh.n_nodes(); n++)
 	    out << std::setprecision(10) << (*v)[n*n_vars + c].real() << " ";
 	  
-	  out << std::endl << std::endl;
+	  out << '\n' << '\n';
 
 
 	  // this is the imaginary part
-	  out << "i_" << (*solution_names)[c] << " 1" << std::endl;
+	  out << "i_" << (*solution_names)[c] << " 1" << '\n';
 	  
 	  for (unsigned int n=0; n<mesh.n_nodes(); n++)
 	    out << std::setprecision(10) << (*v)[n*n_vars + c].imag() << " ";
 	  
-	  out << std::endl << std::endl;
+	  out << '\n' << '\n';
 
 	  // this is the magnitude
-	  out << "a_" << (*solution_names)[c] << " 1" << std::endl;
+	  out << "a_" << (*solution_names)[c] << " 1" << '\n';
 	  for (unsigned int n=0; n<mesh.n_nodes(); n++)
 	    out << std::setprecision(10)
 		<< std::abs((*v)[n*n_vars + c]) << " ";
 
-	  out << std::endl << std::endl;
+	  out << '\n' << '\n';
 
 #else
 
-	  out << (*solution_names)[c] << " 1" << std::endl;
+	  out << (*solution_names)[c] << " 1" << '\n';
 	  
 	  for (unsigned int n=0; n<mesh.n_nodes(); n++)
 	    out << std::setprecision(10) << (*v)[n*n_vars + c] << " ";
 	  
-	  out << std::endl << std::endl;
+	  out << '\n' << '\n';
 
 #endif
 	}
       
-      out << "endvars" << std::endl;
+      out << "endvars" << '\n';
     }
 
   
   // end of the file
-  out << std::endl << "endgmv" << std::endl;
+  out << '\n' << "endgmv" << '\n';
 }
 
 
@@ -680,7 +680,7 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
   {
 
     // write the nodes    
-    out << "gmvinput ascii" << std::endl << std::endl;
+    out << "gmvinput ascii" << '\n' << '\n';
     
     // Compute the total weight
     {
@@ -692,7 +692,7 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
       for ( ; it != end; ++it)
 	tw += (*it)->n_nodes();
       
-      out << "nodes " << tw << std::endl;
+      out << "nodes " << tw << '\n';
     }
     
 
@@ -706,7 +706,7 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
 	for (unsigned int n=0; n<(*it)->n_nodes(); n++)
 	  out << (*it)->point(n)(0) << " ";
 
-      out << std::endl;
+      out << '\n';
     }
     
     
@@ -719,7 +719,7 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
 	for (unsigned int n=0; n<(*it)->n_nodes(); n++)
 	  out << (*it)->point(n)(1) << " ";
 
-      out << std::endl;
+      out << '\n';
     }
     
     
@@ -732,7 +732,7 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
 	for (unsigned int n=0; n<(*it)->n_nodes(); n++)
 	  out << (*it)->point(n)(2) << " ";
 
-      out << std::endl << std::endl;
+      out << '\n' << '\n';
     }
   }
 
@@ -741,7 +741,7 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
   {
     // write the connectivity
     
-    out << "cells " << mesh.n_active_elem() << std::endl;
+    out << "cells " << mesh.n_active_elem() << '\n';
 
     const_active_elem_iterator       it (mesh.elements_begin());
     const const_active_elem_iterator end(mesh.elements_end());
@@ -770,7 +770,7 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
 #endif
 		    )
 		  {
-		    out << "quad 4" << std::endl;
+		    out << "quad 4" << '\n';
 		    for (unsigned int i=0; i<(*it)->n_nodes(); i++)
 		      out << nn++ << " ";
 		    
@@ -778,7 +778,7 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
 		  else if (((*it)->type() == TRI3) ||
 			   ((*it)->type() == TRI6))
 		    {
-		      out << "tri 3" << std::endl;
+		      out << "tri 3" << '\n';
 		    for (unsigned int i=0; i<(*it)->n_nodes(); i++)
 		      out << nn++ << " ";
 		    
@@ -788,7 +788,7 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
 		    error();
 		  }
 		
-		out << std::endl;
+		out << '\n';
 	      }
 	  
 	  break;
@@ -805,7 +805,7 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
 	error();
       }
     
-    out << std::endl;
+    out << '\n';
   }
   
 
@@ -815,18 +815,18 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
     {
       out << "material "
 	  << mesh.n_processors()
-	  << " 0"<< std::endl;
+	  << " 0"<< '\n';
 
       for (unsigned int proc=0; proc<mesh.n_processors(); proc++)
-	out << "proc_" << proc << std::endl;
+	out << "proc_" << proc << '\n';
       
       const_active_elem_iterator       it (mesh.elements_begin());
       const const_active_elem_iterator end(mesh.elements_end());
 
       for ( ; it != end; ++it)
-	out << (*it)->processor_id()+1 << std::endl;
+	out << (*it)->processor_id()+1 << '\n';
       
-      out << std::endl;
+      out << '\n';
     }
 
 
@@ -837,7 +837,7 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
       
     //    assert (v.size() == tw*n_vars);
 
-    out << "variable" << std::endl;
+    out << "variable" << '\n';
 
 
       for (unsigned int c=0; c<n_vars; c++)
@@ -849,7 +849,7 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
 	  // for each component
 
 	  // this is the real part
-	  out << "r_" << solution_names[c] << " 1" << std::endl;
+	  out << "r_" << solution_names[c] << " 1" << '\n';
 	  {
 	    const_active_elem_iterator       it (mesh.elements_begin());
 	    const const_active_elem_iterator end(mesh.elements_end());
@@ -858,11 +858,11 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
 	      for (unsigned int n=0; n<(*it)->n_nodes(); n++)
 		out << std::setprecision(10) << v[(n++)*n_vars + c].real() << " ";	    
 	  }	  	  
-	  out << std::endl << std::endl;
+	  out << '\n' << '\n';
 
 
 	  // this is the imaginary part
-	  out << "i_" << solution_names[c] << " 1" << std::endl;	  
+	  out << "i_" << solution_names[c] << " 1" << '\n';	  
 	  {
 	    const_active_elem_iterator       it (mesh.elements_begin());
 	    const const_active_elem_iterator end(mesh.elements_end());
@@ -871,10 +871,10 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
 	      for (unsigned int n=0; n<(*it)->n_nodes(); n++)
 		out << std::setprecision(10) << v[(n++)*n_vars + c].imag() << " ";	    
 	  }	  
-	  out << std::endl << std::endl;
+	  out << '\n' << '\n';
 
 	  // this is the magnitude
-	  out << "a_" << solution_names[c] << " 1" << std::endl;
+	  out << "a_" << solution_names[c] << " 1" << '\n';
 	  {
 	    const_active_elem_iterator       it (mesh.elements_begin());
 	    const const_active_elem_iterator end(mesh.elements_end());
@@ -884,11 +884,11 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
 		out << std::setprecision(10)
 		    << std::abs(v[(n++)*n_vars + c]) << " ";	    
 	  }
-	  out << std::endl << std::endl;
+	  out << '\n' << '\n';
 
 #else
 
-	  out << solution_names[c] << " 1" << std::endl;
+	  out << solution_names[c] << " 1" << '\n';
 	  {
 	    const_active_elem_iterator       it (mesh.elements_begin());
 	    const const_active_elem_iterator end(mesh.elements_end());
@@ -899,17 +899,17 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
 	      for (unsigned int n=0; n<(*it)->n_nodes(); n++)
 		out << std::setprecision(10) << v[(nn++)*n_vars + c] << " ";	    
 	  }	  
-	  out << std::endl << std::endl;
+	  out << '\n' << '\n';
 
 #endif
 
 	}
       
-      out << "endvars" << std::endl;
+      out << "endvars" << '\n';
     }
 
   
   // end of the file
-  out << std::endl << "endgmv" << std::endl;
+  out << '\n' << "endgmv" << '\n';
 }
 

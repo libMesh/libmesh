@@ -1,4 +1,4 @@
-//    $Id: petsc_matrix.h,v 1.7 2004-10-18 18:25:00 jwpeterson Exp $
+//    $Id: petsc_matrix.h,v 1.8 2004-10-18 22:10:05 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -548,17 +548,17 @@ T PetscMatrix<T>::operator () (const unsigned int i,
 			       const unsigned int j) const
 {
   assert (this->initialized());
-
-#if   ((PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <2))
-
+  
+#if ((PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR >= 2) && (PETSC_VERSION_SUBMINOR >= 1))
+  // PETSc 2.2.1 & newer
+  const PetscScalar *petsc_row;
+  const int* petsc_cols;
+  
+#else
+  // PETSc 2.2.0 & older
   PetscScalar *petsc_row;
   int* petsc_cols;
   
-#elif ((PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR >=2))
-    
-  const PetscScalar *petsc_row;
-  const int* petsc_cols;
-
 #endif
   
   T value=0.;
