@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.C,v 1.27 2003-09-13 21:32:35 ddreyer Exp $
+// $Id: mesh_unv_support.C,v 1.28 2003-09-16 00:41:29 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -27,7 +27,6 @@
 // Local includes
 #include "mesh_unv_support.h"
 #include "mesh_data.h"
-// #include "elem.h"
 #include "face_quad4.h"
 #include "face_tri3.h"
 #include "face_tri6.h"
@@ -37,6 +36,7 @@
 #include "cell_hex20.h"
 #include "cell_tet10.h"
 #include "cell_prism6.h"
+#include "gzstream.h" // For reading/writing compressed streams
 
 //-----------------------------------------------------------------------------
 // MeshBase methods
@@ -126,6 +126,34 @@ void UnvMeshInterface::clear ()
 
 void UnvMeshInterface::read (const std::string& file_name)
 {
+  
+  if (file_name.rfind(".gz") < file_name.size())
+    {
+#ifdef HAVE_ZLIB_H
+      igzstream in_stream(file_name.c_str());
+      this->read_implementation (in_stream);
+#else
+      std::cerr << "ERROR:  You must have the zlib.h header "
+		<< "files and libraries to read and write "
+		<< "compressed streams."
+		<< std::endl;
+      error();
+#endif
+      return;
+      
+    }
+  
+  else
+    {
+      std::ifstream in_stream(file_name.c_str());
+      this->read_implementation (in_stream);
+      return;
+    }
+}
+
+
+void UnvMeshInterface::read_implementation (std::istream& in_stream)
+{
   /*
    * clear everything, so that
    * we can start from scratch
@@ -145,7 +173,6 @@ void UnvMeshInterface::read (const std::string& file_name)
    * and second to do the actual
    * read.
    */
-  std::fstream in_stream;
 
   std::vector<std::string> order_of_datasets;
   order_of_datasets.reserve(2);
@@ -155,7 +182,7 @@ void UnvMeshInterface::read (const std::string& file_name)
      * the first time we read the file,
      * merely to obtain overall info
      */
-    in_stream.open (file_name.c_str(), std::fstream::in);
+    //in_stream.open (file_name.c_str(), std::fstream::in);
 
     if ( !in_stream.good() )
       {
@@ -256,7 +283,9 @@ void UnvMeshInterface::read (const std::string& file_name)
       }
 
 
-    in_stream.close();    
+    // Don't close, just seek to the beginning
+    //in_stream.close();
+    in_stream.seekg(0, std::ios::beg);
   }
 
 
@@ -272,7 +301,7 @@ void UnvMeshInterface::read (const std::string& file_name)
    * should be properly initialized.
    */
   {
-    in_stream.open (file_name.c_str(), std::fstream::in);
+    //in_stream.open (file_name.c_str(), std::fstream::in);
 
 
     if ( !in_stream.good() )
@@ -308,7 +337,7 @@ void UnvMeshInterface::read (const std::string& file_name)
      */
     this->_mesh_data.close_foreign_id_maps ();
 
-    in_stream.close();    
+    //in_stream.close();    
 
     if (_verbose)
       std::cout << "  Finished." << std::endl << std::endl;

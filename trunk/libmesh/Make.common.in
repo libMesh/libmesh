@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.26 2003-08-28 19:35:38 benkirk Exp $
+# $Id: Make.common.in,v 1.27 2003-09-16 00:41:29 jwpeterson Exp $
 
 
 ###############################################################################
@@ -86,6 +86,10 @@ MPI_LIBRARY          = @MPI_LIBRARY_PATH@
 # Hilbert and Morton space filling curves for domain decomposition
 enable-sfc	     = @enablesfc@
 SFC_INCLUDE	     = @SFC_INCLUDE_PATH@
+
+# gzstreams for reading/writing compressed files using streams
+enable-gzstreams     = @enablegz@
+GZ_INCLUDE	     = @GZ_INCLUDE_PATH@
 
 # Tecplot binary API support
 enable-tecplot       = @enabletecplot@
@@ -273,6 +277,14 @@ ifeq ($(enable-optional),yes)
     LIBS    += $(EXTERNAL_LIBDIR)/libsfcurves$(EXTERNAL_LIBEXT)
     INCLUDE += -I$(SFC_INCLUDE)
   endif
+
+  # if gzstreams are used, we need the 
+  # header path and the lib
+  ifeq ($(enable-gzstreams),yes)
+    LIBS    += $(EXTERNAL_LIBDIR)/libgzstream$(EXTERNAL_LIBEXT) -lz
+    INCLUDE += -I$(GZ_INCLUDE)
+  endif
+
 
   #if Tecplot is used, link against tecio.a
   ifeq ($(enable-tecplot),yes)
