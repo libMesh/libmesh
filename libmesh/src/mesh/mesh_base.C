@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.65 2004-02-12 17:31:38 benkirk Exp $
+// $Id: mesh_base.C,v 1.66 2004-02-25 14:27:25 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -398,15 +398,19 @@ void MeshBase::find_neighbors()
     typedef std::pair<key_type, val_type>   key_val_pair;
     
 #if   defined(HAVE_HASH_MAP)    
-    typedef std::hash_multimap<key_type, val_type>       map_type;    
+    typedef std::hash_multimap<key_type, val_type> map_type;    
 #elif defined(HAVE_EXT_HASH_MAP)
 # if  __GNUC__ >= 3
-    typedef __gnu_cxx::hash_multimap<key_type, val_type> map_type;
+#   if __GNUC_MINOR__ == 0    
+       typedef std::hash_multimap<key_type, val_type> map_type;
+#   else
+       typedef __gnu_cxx::hash_multimap<key_type, val_type> map_type;
+#   endif
 # else
     DIE A HORRIBLE DEATH
 # endif
 #else
-    typedef std::multimap<key_type, val_type>            map_type;
+    typedef std::multimap<key_type, val_type>  map_type;
 #endif
     
     // A map from side keys to corresponding elements & side numbers  
