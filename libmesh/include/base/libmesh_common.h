@@ -1,4 +1,4 @@
-// $Id: libmesh_common.h,v 1.3 2004-08-06 16:48:39 jwpeterson Exp $
+// $Id: libmesh_common.h,v 1.4 2004-08-17 01:46:07 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -28,6 +28,7 @@
 
 // C++ includes everyone should know about
 #include <complex>
+#include <assert.h>
 
 // Include the MPI definition
 #ifdef HAVE_MPI
