@@ -1,4 +1,4 @@
-// $Id: inf_fe.C,v 1.7 2003-02-05 20:51:43 ddreyer Exp $
+// $Id: inf_fe.C,v 1.8 2003-02-06 05:41:15 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,9 +26,12 @@
 #include "quadrature_gauss.h"
 #include "elem.h"
 #include "fe.h"
-#include "fe_interface.h"
 
-
+#ifdef INF_FE_HEAVILY_VERBOSE
+# define _p(arg)  std::cout << "Value: " << #arg << "=" << arg << std::endl;
+#else
+# define _p(arg)  
+#endif
 
 
 // ------------------------------------------------------------
@@ -71,7 +74,7 @@ InfFE<Dim,T_radial,T_map>::InfFE (const FEType& fet) :
   assert (T_map    == fe_type.inf_map);
 
   // build the base_fe object, handle the AutoPtr
-  AutoPtr<FEBase> ap_fb = FEBase::build(Dim-1, fet);
+  AutoPtr<FEBase> ap_fb(FEBase::build(Dim-1, fet));
   base_fe = ap_fb.release();
 };
 
@@ -106,9 +109,12 @@ void InfFE<Dim,T_radial,T_map>:: attach_quadrature_rule (QBase* q)
   assert (q != NULL);
 
   Order base_int_order   = q->get_order();
+//  Order radial_int_order = static_cast<Order>(
+//      static_cast<unsigned int>(fe_type.radial_order) + 2 );
   Order radial_int_order = static_cast<Order>(
-      static_cast<unsigned int>(fe_type.radial_order) + 2 );
-  // radial order rather conservative, may also work with m+1...?
+      2*(static_cast<unsigned int>(fe_type.radial_order) + 1) );
+  // radial order rather conservative, may also work with other values...?
+  // check this radial order again!!!!
 
   if (Dim != 1)
   {
@@ -122,10 +128,23 @@ void InfFE<Dim,T_radial,T_map>:: attach_quadrature_rule (QBase* q)
    * with which we initialized our own quadrature rules */
   qrule = q;
 
-  _n_total_qp  = base_qrule->n_points() * radial_qrule->n_points();
+  /* This does not work, since the quadrature rules are not
+   * initialized yet.  Let init_shape_functions() set _n_total_qp
+   * to an appropriate value */
+  //_n_total_qp  = base_qrule->n_points() * radial_qrule->n_points();
 };
 
 
+
+
+
+template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
+void InfFE<Dim,T_radial,T_base>::update_base_elem (const Elem* inf_elem)
+{
+  if (base_elem != NULL)
+    delete base_elem;
+  base_elem = Base::build_elem(inf_elem);
+};
 
 
 
@@ -142,8 +161,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem)
   assert (radial_qrule   != NULL);
   assert (inf_elem       != NULL);
 
-  
-    
+
   // -----------------------------------------------------------------
   // update the type in accordance to the current cell
   // and reinit if the cell type has changed or (as in
@@ -163,8 +181,16 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem)
       // store the new element type
       elem_type = inf_elem->type();
 
+#ifdef INF_FE_HEAVILY_VERBOSE
+      std::cout << "new elem_type=" << elem_type << std::endl;
+#endif
+
       // initialize the AutoPtr<Elem> for the base_fe
       update_base_elem(inf_elem);
+
+#ifdef INF_FE_HEAVILY_VERBOSE
+      std::cout << "base_elem->type() is now: " << base_elem->type() << std::endl;
+#endif
 
       // initialize the base quadrature rule for the new element
       base_qrule->init( base_elem->type() );
@@ -174,6 +200,9 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem)
 
     };
 
+#ifdef INF_FE_HEAVILY_VERBOSE
+  std::cout << "Done with base init." << std::endl;
+#endif
 
   // -----------------------------------------------------------------
   // the radial part only needs to be re-initialized with
@@ -187,12 +216,17 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem)
       // proceed with quadrature rule
 
       // initialize the radial quadrature rule
+      // note that it does not matter with which ElemType this
+      // is initialized
       radial_qrule->init(inf_elem->type());  
 
       // initialize the radial shape functions
       init_shape_functions (inf_elem);
     };
 
+#ifdef INF_FE_HEAVILY_VERBOSE
+  std::cout << "Done with radial init." << std::endl;
+#endif
 
   // -----------------------------------------------------------------
   // Now that both the base and radial parts are properly initialized,
@@ -200,13 +234,25 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem)
   // may directly be applied
   combine_base_radial();
 
+#ifdef INF_FE_HEAVILY_VERBOSE
+  std::cout << "Done with combine_base_radial." << std::endl;
+#endif
+
   // Compute the map for this element.  In the future we can specify
   // different types of maps
   compute_map (qrule, inf_elem);
 
+#ifdef INF_FE_HEAVILY_VERBOSE
+  std::cout << "Done with compute_map." << std::endl;
+#endif
+
   // Compute the shape functions and the derivatives at all of the
   // quadrature points.  This part is dimension-independent
   compute_shape_functions ();
+
+#ifdef INF_FE_HEAVILY_VERBOSE
+  std::cout << "Done with compute_shape_fn's." << std::endl;
+#endif
 
 };
 
@@ -275,14 +321,19 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
   else
     n_base_approx_shape_functions = 1;
 
+  _p(n_base_approx_shape_functions)
+
   const unsigned int n_radial_approx_shape_functions =
       Radial::n_dofs(elem_type, radial_approx_order);
+  _p(n_radial_approx_shape_functions)
 
   const unsigned int n_total_approx_shape_functions = 
       n_radial_approx_shape_functions * n_base_approx_shape_functions;
 
   // update class member field
   _n_total_approx_sf = n_total_approx_shape_functions;
+
+  _p(_n_total_approx_sf)
 
 
   // The number and location of the radial quadrature points.
@@ -293,6 +344,11 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 
   // The total number of quadrature points.
   const unsigned int        n_total_qp =  n_radial_qp * n_base_qp;
+
+  _p(n_radial_qp)
+  _p(n_base_qp)
+  _p(n_total_qp)
+
   
   // update class member field
   _n_total_qp = n_total_qp;
@@ -559,8 +615,10 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial()
 
 	const unsigned int n_radial_qp = radial_qrule->n_points();
 	const unsigned int n_base_qp   = base_qrule->  n_points();
+
 	const unsigned int n_base_mapping_sf   = dist.size();
-/* NOT USED	const unsigned int n_radial_mapping_sf = Radial::n_mapping_shape_functions(INVALID_ELEM);  */
+	const unsigned int n_radial_mapping_sf = radial_map.size();
+
 	const unsigned int n_base_approx_sf   = base_fe->n_shape_functions();
 	const unsigned int n_radial_approx_sf = Radial::n_dofs(elem_type, fe_type.radial_order);
 
@@ -577,18 +635,30 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial()
 	            dphasedxi[tp]   += Ss_map[i][bp] * dist[i] * radial_map   [1][rp];
 		    dphasedeta[tp]  += St_map[i][bp] * dist[i] * radial_map   [1][rp];
 		    dphasedzeta[tp] += S_map [i][bp] * dist[i] * dradialdv_map[1][rp];
+
+#ifdef INF_FE_HEAVILY_VERBOSE
+		    if (tp != (bp+rp*n_base_qp) )
+		    {
+		      std::cout << "ERROR: cannot count..." << std::endl
+				<< " tp = " << tp 
+				<< " bp = " << bp
+				<< " rp = " << rp
+				<< std::endl;	      
+		      error();
+		    };
+#endif		    
+
 		  };
 
 		tp++;
+
 	      };
-	
-	  if (tp != (_n_total_qp) )
-	    {
-	      std::cout << "ERROR: cannot count..." << std::endl;
-	      error();
-	    };
+
 	}
 
+#ifdef INF_FE_HEAVILY_VERBOSE
+	std::cout << "finished phase term deriv's" << std::endl;
+#endif
 
 	// compute the overall approximation shape functions
 	for (unsigned int rp=0; rp<n_radial_qp; rp++)  // over radial qp's
@@ -604,12 +674,15 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial()
 		      * (dmodedv[ri][rp] * som[ri] + mode[ri][rp] * dsomdv[ri]);
 		};
 
+#ifdef INF_FE_HEAVILY_VERBOSE
+	std::cout << "finished phi and phi deriv's" << std::endl;
+#endif
 	
 	// compute the overall mapping functions
 	for (unsigned int rp=0; rp<n_radial_qp; rp++)  // over radial qp's
 	  for (unsigned int bp=0; bp<n_base_qp; bp++)  // over base qp's
-	    for (unsigned int ri=0; ri<n_radial_approx_sf; ri++)  // over radial mapping shapes
-	      for (unsigned int bi=0; bi<n_base_approx_sf; bi++)  // over base   mapping shapes
+	    for (unsigned int ri=0; ri<n_radial_mapping_sf; ri++)  // over radial mapping shapes
+	      for (unsigned int bi=0; bi<n_base_mapping_sf; bi++)  // over base   mapping shapes
 	        {
 		  // form the total shape function data fields
 		  phi_map      [ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = S_map [bi][bp] * radial_map   [ri][rp];
@@ -618,6 +691,10 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial()
 		  dphidzeta_map[ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = S_map [bi][bp] * dradialdv_map[ri][rp];
 		};
 			
+#ifdef INF_FE_HEAVILY_VERBOSE
+	std::cout << "finished phi_map and phi_map deriv's" << std::endl;
+#endif
+
 	return;
       };
 

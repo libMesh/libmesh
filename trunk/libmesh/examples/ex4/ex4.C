@@ -1,4 +1,4 @@
-// $Id: ex4.C,v 1.2 2003-02-04 02:02:23 benkirk Exp $
+// $Id: ex4.C,v 1.3 2003-02-06 05:41:14 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -160,7 +160,7 @@ int main (int argc, char** argv)
     const unsigned int dim = atoi(argv[2]);     
     
     /**
-     * Create a 2D mesh.
+     * Create a mesh with user-defined dimension.
      */
     Mesh mesh (dim);
     

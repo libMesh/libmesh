@@ -1,4 +1,4 @@
-// $Id: inf_fe_static.C,v 1.4 2003-02-05 20:51:44 ddreyer Exp $
+// $Id: inf_fe_static.C,v 1.5 2003-02-06 05:41:15 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,7 @@
 #ifdef ENABLE_INFINITE_ELEMENTS
 #include "inf_fe.h"
 #include "fe_interface.h"
-
+#include "elem.h"
 
 
 
@@ -80,6 +80,17 @@ InfFE<Dim,T_radial,T_base>::Base::Base ()
 	    << std::endl;  
   error(); 
 };
+
+
+
+
+template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
+Elem* InfFE<Dim,T_radial,T_base>::Base::build_elem (const Elem* inf_elem)
+{ 
+  AutoPtr<Elem> ape(inf_elem->build_side(0)); 
+  return ape.release(); 
+};
+
 
 
 
@@ -173,7 +184,9 @@ template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 unsigned int InfFE<Dim,T_radial,T_map>::n_dofs(const FEType& fet,
 					       const ElemType inf_elem_type)
 {
-  const ElemType     base_et  ( Base::get_elem_type(inf_elem_type) );
+  assert ( FEInterface::is_InfFE_elem(inf_elem_type) );
+
+  const ElemType base_et(Base::get_elem_type(inf_elem_type));
     
   if (Dim > 1)
     return FEInterface::n_dofs(Dim-1, fet, base_et) * Radial::n_dofs(inf_elem_type, fet.radial_order);
@@ -190,10 +203,14 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_at_node(const FEType& fet,
 						       const ElemType inf_elem_type,
 						       const unsigned int n)
 {
+  assert ( FEInterface::is_InfFE_elem(inf_elem_type) );
+
   const ElemType     base_et  ( Base::get_elem_type(inf_elem_type) );
 
   const unsigned int n_base   ( Base::index  (fet, base_et, n) );
   const unsigned int n_radial ( Radial::index(fet, base_et, n) );
+
+  std::cout << "n_base=" << n_base << ", n_radial=" << n_radial << ", n=" << n << std::endl;
 
   if (Dim > 1)
     return FEInterface::n_dofs_at_node(Dim-1, fet, base_et, n_base) 
@@ -209,6 +226,8 @@ template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_per_elem(const FEType& fet,
 							const ElemType inf_elem_type)
 {
+  assert ( FEInterface::is_InfFE_elem(inf_elem_type) );
+
   const ElemType     base_et  ( Base::get_elem_type(inf_elem_type) );
 
   if (Dim > 1)
@@ -311,14 +330,14 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
   assert (elem != NULL);
   assert (Dim != 0);
 
-  const ElemType     base_et  ( Base::get_elem_type(elem->type()) );
-  const unsigned int i_base   ( Base::index  (fet, base_et, i) );
+  const ElemType     base_et (Base::get_elem_type(elem->type()));
+  const unsigned int i_base  (Base::index  (fet, base_et, i));
 
-  const Order        o_radial ( fet.radial_order );
-  const unsigned int i_radial ( Radial::index(fet, base_et, i) );
-  const Real         v        ( p(Dim-1) );  // holds for all Dim, except for 0, but we don't inst Dim=0 ;-)
+  const Order        o_radial(fet.radial_order);
+  const unsigned int i_radial(Radial::index(fet, base_et, i));
+  const Real         v       (p(Dim-1));  // holds for all Dim, except for 0, but we don't inst Dim=0 ;-)
 
-  AutoPtr<Elem>      base_el  = elem->build_side(0);
+  AutoPtr<Elem>      base_el(elem->build_side(0));
 
   if (Dim > 1)
     return FEInterface::shape (Dim-1, fet, base_el.get(), i_base, p)

@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.9 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: mesh_base.C,v 1.10 2003-02-06 05:41:15 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -470,13 +470,14 @@ void MeshBase::find_neighbors()
 #ifdef ENABLE_INFINITE_ELEMENTS
 
 
-void MeshBase::build_inf_elem()
+void MeshBase::build_inf_elem(bool be_verbose)
 {
   // determine origin automatically,
   // works only if the mesh has no symmetry planes.
   std::pair<Point, Point> b_box = bounding_box();
     
-  build_inf_elem( (b_box.first+b_box.second)/2. );	 /* untested */
+  build_inf_elem( (b_box.first+b_box.second)/2., 
+		  false, false, false, be_verbose);
 }
 
 
@@ -489,8 +490,12 @@ void MeshBase::build_inf_elem(const Point& origin,
 {
 		
   if (be_verbose)
-    std::cout << "Updating element neighbor tables..." << std::endl;
-	
+  {
+    std::cout << " Building Infinite Elements:" << std::endl;
+    std::cout << "  updating element neighbor tables..." << std::endl;
+
+  };
+
   find_neighbors();	// update elem->neighbor() tables
 
 
@@ -507,7 +512,7 @@ void MeshBase::build_inf_elem(const Point& origin,
 
   if (be_verbose)
     {
-      std::cout << "Collecting boundary sides";
+      std::cout << "  collecting boundary sides";
       if (x_sym || y_sym || z_sym)
 	std::cout << ", skipping sides in symmetry planes..." << std::endl;
       else
@@ -640,8 +645,8 @@ void MeshBase::build_inf_elem(const Point& origin,
 	
 	
   if (be_verbose)
-    std::cout << "Found " << faces.size() << " inner and " 
-	      << ofaces.size() << " outer boundary faces." << std::endl;
+    std::cout << "  found " << faces.size() << " inner and " 
+	      << ofaces.size() << " outer boundary faces" << std::endl;
 	
 	
   faces.clear();		//free memory
@@ -727,9 +732,10 @@ void MeshBase::build_inf_elem(const Point& origin,
 
 
   if (be_verbose)
-    std::cout << "Added "
+    std::cout << "  added "
 	      << n_elem()-n_conventional_elem
-	      << " infinite elements to mesh."
+	      << " infinite elements to mesh"
+	      << std::endl
 	      << std::endl;
 
 

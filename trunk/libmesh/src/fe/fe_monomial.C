@@ -1,4 +1,4 @@
-// $Id: fe_monomial.C,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: fe_monomial.C,v 1.7 2003-02-06 05:41:15 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -146,7 +146,14 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 	    return 4;
 	    
 	  default:
-	    error();
+	    {
+#ifdef DEBUG
+	      std::cerr << "ERROR: Bad ElemType = " << t
+			<< " for " << o << "th order approximation!" 
+			<< std::endl;
+#endif
+	      error();	    
+	    };
 	  };
       };
 
@@ -180,7 +187,14 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 	    return 10;
 	    
 	  default:
-	    error();
+	    {
+#ifdef DEBUG
+	      std::cerr << "ERROR: Bad ElemType = " << t
+			<< " for " << o << "th order approximation!" 
+			<< std::endl;
+#endif
+	      error();	    
+	    };
 	  };
       };
 
@@ -214,7 +228,14 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 	    return 20;
 	    
 	  default:
-	    error();
+	    {
+#ifdef DEBUG
+	      std::cerr << "ERROR: Bad ElemType = " << t
+			<< " for " << o << "th order approximation!" 
+			<< std::endl;
+#endif
+	      error();	    
+	    };
 	  };
       };
 
@@ -247,7 +268,14 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 	    return 35;
 	    
 	  default:
-	    error();
+	    {
+#ifdef DEBUG
+	      std::cerr << "ERROR: Bad ElemType = " << t
+			<< " for " << o << "th order approximation!" 
+			<< std::endl;
+#endif
+	      error();	    
+	    };
 	  };
       };
 
@@ -320,7 +348,14 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 	    return 4;
 	    
 	  default:
-	    error();
+	    {
+#ifdef DEBUG
+	      std::cerr << "ERROR: Bad ElemType = " << t
+			<< " for " << o << "th order approximation!" 
+			<< std::endl;
+#endif
+	      error();	    
+	    };
 	  };
       };
 
@@ -357,7 +392,14 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 	    return 10;
 	    
 	  default:
-	    error();
+	    {
+#ifdef DEBUG
+	      std::cerr << "ERROR: Bad ElemType = " << t
+			<< " for " << o << "th order approximation!" 
+			<< std::endl;
+#endif
+	      error();	    
+	    };
 	  };
       };
 
@@ -391,7 +433,14 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 	    return 20;
 	    
 	  default:
-	    error();
+	    {
+#ifdef DEBUG
+	      std::cerr << "ERROR: Bad ElemType = " << t
+			<< " for " << o << "th order approximation!" 
+			<< std::endl;
+#endif
+	      error();	    
+	    };
 	  };
       };
 
@@ -425,7 +474,14 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 	    return 35;
 	    
 	  default:
-	    error();
+	    {
+#ifdef DEBUG
+	      std::cerr << "ERROR: Bad ElemType = " << t
+			<< " for " << o << "th order approximation!" 
+			<< std::endl;
+#endif
+	      error();	    
+	    };
 	  };
       };
 

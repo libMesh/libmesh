@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.7 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: fe.h,v 1.8 2003-02-06 05:41:14 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -47,7 +47,7 @@
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.7 $
+ * \version $Revision: 1.8 $
  */
 
 //-------------------------------------------------------------
@@ -235,8 +235,7 @@ protected:
    * an infinite element.
    */
   void init_base_shape_functions(const QBase* q,
-				 const Elem* e)
-      { init_shape_functions(q, e); };
+				 const Elem* e);
 
 
 #endif
@@ -299,7 +298,7 @@ private:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.7 $
+ * \version $Revision: 1.8 $
  */
 
 //-------------------------------------------------------------
@@ -324,7 +323,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.7 $
+ * \version $Revision: 1.8 $
  */
 
 //-------------------------------------------------------------
@@ -349,7 +348,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.7 $
+ * \version $Revision: 1.8 $
  */
 
 //-------------------------------------------------------------
