@@ -1,4 +1,4 @@
-// $Id: fe_xyz_boundary.C,v 1.1 2004-05-11 21:18:34 benkirk Exp $
+// $Id: fe_xyz_boundary.C,v 1.2 2004-07-12 22:56:18 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -53,7 +53,7 @@ void FEXYZ<Dim>::reinit(const Elem* elem,
 			const unsigned int s)
 {
   assert (elem  != NULL);
-  assert (qrule != NULL);
+  assert (this->qrule != NULL);
   // We don't do this for 1D elements!
   assert (Dim != 1);
 
@@ -61,7 +61,7 @@ void FEXYZ<Dim>::reinit(const Elem* elem,
   const AutoPtr<Elem> side(elem->build_side(s));
 
   // initialize quadrature rule
-  qrule->init(side->type());
+  this->qrule->init(side->type());
 
   // We might not need to reinitialize the shape functions.
   // Note that the face shape functions are LAGRANGE and only
@@ -69,10 +69,10 @@ void FEXYZ<Dim>::reinit(const Elem* elem,
   if (this->get_type() != elem->type())
     {
       // Set the element type
-      elem_type = elem->type();
+      this->elem_type = elem->type();
       
       // Initialize the face shape functions
-      this->init_face_shape_functions (qrule->get_points(),  side.get());
+      this->init_face_shape_functions (this->qrule->get_points(),  side.get());
     }
   
   // Compute data on the face for integration
@@ -91,7 +91,7 @@ void FEXYZ<Dim>::compute_face_values(const Elem* elem,
   START_LOG("compute_face_values()", "FEXYZ");
 
   // The quadrature weights.
-  const std::vector<Real>& qw = qrule->get_weights();
+  const std::vector<Real>& qw = this->qrule->get_weights();
   
   // The number of quadrature points.
   const unsigned int n_qp = qw.size();
@@ -118,7 +118,7 @@ void FEXYZ<Dim>::compute_face_values(const Elem* elem,
       this->dphidz[i].resize (n_qp);
     }
  
-  switch (dim)
+  switch (this->dim)
     {
       
     case 2:
@@ -135,41 +135,41 @@ void FEXYZ<Dim>::compute_face_values(const Elem* elem,
 	  this->normals.resize(n_qp);
 	  this->curvatures.resize(n_qp);
 	  
-	  JxW.resize(n_qp);
+	  this->JxW.resize(n_qp);
 	}
 	
 	// Clear the entities that will be summed
 	// Compute the tangent & normal at the quadrature point
 	for (unsigned int p=0; p<n_qp; p++)
 	  {
-	    tangents[p].resize(DIM-1); // 1 Tangent in 2D, 2 in 3D
-	    xyz[p].zero();
-	    dxyzdxi_map[p].zero();
-	    d2xyzdxi2_map[p].zero();
+	    this->tangents[p].resize(DIM-1); // 1 Tangent in 2D, 2 in 3D
+	    this->xyz[p].zero();
+	    this->dxyzdxi_map[p].zero();
+	    this->d2xyzdxi2_map[p].zero();
 	  }
 	
 	// compute x, dxdxi at the quadrature points    
-	for (unsigned int i=0; i<psi_map.size(); i++) // sum over the nodes
+	for (unsigned int i=0; i<this->psi_map.size(); i++) // sum over the nodes
 	  {
 	    const Point& side_point = side->point(i);
 	    
 	    for (unsigned int p=0; p<n_qp; p++) // for each quadrature point...
 	      {	  
-		xyz[p].add_scaled          (side_point, psi_map[i][p]);
-		dxyzdxi_map[p].add_scaled  (side_point, dpsidxi_map[i][p]);
-		d2xyzdxi2_map[p].add_scaled(side_point, d2psidxi2_map[i][p]);
+		this->xyz[p].add_scaled          (side_point, this->psi_map[i][p]);
+		this->dxyzdxi_map[p].add_scaled  (side_point, this->dpsidxi_map[i][p]);
+		this->d2xyzdxi2_map[p].add_scaled(side_point, this->d2psidxi2_map[i][p]);
 	      }
 	  }
 
 	// Compute the tangent & normal at the quadrature point
 	for (unsigned int p=0; p<n_qp; p++)
 	  {
-	    const Point n(dxyzdxi_map[p](1), -dxyzdxi_map[p](0), 0.);
+	    const Point n(this->dxyzdxi_map[p](1), -this->dxyzdxi_map[p](0), 0.);
 	    
-	    normals[p]     = n.unit();
-	    tangents[p][0] = dxyzdxi_map[p].unit();
+	    this->normals[p]     = n.unit();
+	    this->tangents[p][0] = this->dxyzdxi_map[p].unit();
 #if DIM == 3  // Only good in 3D space
-	    tangents[p][1] = dxyzdxi_map[p].cross(n).unit();
+	    this->tangents[p][1] = this->dxyzdxi_map[p].cross(n).unit();
 #endif
 	    // The curvature is computed via the familiar Frenet formula:
 	    // curvature = [d^2(x) / d (xi)^2] dot [normal]
@@ -180,34 +180,34 @@ void FEXYZ<Dim>::compute_face_values(const Elem* elem,
 	    // 3D case.  Concave-upward curves (smiles) have a positive
 	    // curvature.  Concave-downward curves (frowns) have a
 	    // negative curvature.  Be sure to take that into account!
-	    const Real numerator   = d2xyzdxi2_map[p] * normals[p];
-	    const Real denominator = dxyzdxi_map[p].size_sq();
+	    const Real numerator   = this->d2xyzdxi2_map[p] * this->normals[p];
+	    const Real denominator = this->dxyzdxi_map[p].size_sq();
 	    assert (denominator != 0);
-	    curvatures[p] = numerator / denominator;
+	    this->curvatures[p] = numerator / denominator;
 	  }
 	
 	// compute the jacobian at the quadrature points
 	for (unsigned int p=0; p<n_qp; p++)
 	  {
-	    const Real jac = sqrt(dxdxi_map(p)*dxdxi_map(p) +
-				  dydxi_map(p)*dydxi_map(p));
+	    const Real jac = sqrt(this->dxdxi_map(p)*this->dxdxi_map(p) +
+				  this->dydxi_map(p)*this->dydxi_map(p));
 	    
 	    assert (jac > 0.);
 	    
-	    JxW[p] = jac*qw[p];
+	    this->JxW[p] = jac*qw[p];
 	  }
 
 	// compute the shape function values & gradients
 	for (unsigned int i=0; i<n_approx_shape_functions; i++)
 	  for (unsigned int p=0; p<n_qp; p++)
 	    {
-	      this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->get_order(), i, xyz[p]);
+	      this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->get_order(), i, this->xyz[p]);
 
 	      this->dphi[i][p](0) =
-		this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 0, xyz[p]);
+		this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 0, this->xyz[p]);
 	      
 	      this->dphi[i][p](1) =
-		this->dphidy[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 1, xyz[p]);
+		this->dphidy[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 1, this->xyz[p]);
 	      
 #if DIM == 3  
 	      this->dphi[i][p](2) = // can only assign to the Z component if DIM==3
@@ -226,54 +226,54 @@ void FEXYZ<Dim>::compute_face_values(const Elem* elem,
 	// A 3D finite element living in 3D space.
 	// Resize the vectors to hold data at the quadrature points
 	{  
-	  xyz.resize(n_qp);
-	  dxyzdxi_map.resize(n_qp);
-	  dxyzdeta_map.resize(n_qp);
-	  d2xyzdxi2_map.resize(n_qp);
-	  d2xyzdxideta_map.resize(n_qp);
-	  d2xyzdeta2_map.resize(n_qp);
-	  tangents.resize(n_qp);
-	  normals.resize(n_qp);
-	  curvatures.resize(n_qp);
+	  this->xyz.resize(n_qp);
+	  this->dxyzdxi_map.resize(n_qp);
+	  this->dxyzdeta_map.resize(n_qp);
+	  this->d2xyzdxi2_map.resize(n_qp);
+	  this->d2xyzdxideta_map.resize(n_qp);
+	  this->d2xyzdeta2_map.resize(n_qp);
+	  this->tangents.resize(n_qp);
+	  this->normals.resize(n_qp);
+	  this->curvatures.resize(n_qp);
 
-	  JxW.resize(n_qp);
+	  this->JxW.resize(n_qp);
 	}
     
 	// Clear the entities that will be summed
 	for (unsigned int p=0; p<n_qp; p++)
 	  {
-	    tangents[p].resize(DIM-1); // 1 Tangent in 2D, 2 in 3D
-	    xyz[p].zero();
-	    dxyzdxi_map[p].zero();
-	    dxyzdeta_map[p].zero();
-	    d2xyzdxi2_map[p].zero();
-	    d2xyzdxideta_map[p].zero();
-	    d2xyzdeta2_map[p].zero();
+	    this->tangents[p].resize(DIM-1); // 1 Tangent in 2D, 2 in 3D
+	    this->xyz[p].zero();
+	    this->dxyzdxi_map[p].zero();
+	    this->dxyzdeta_map[p].zero();
+	    this->d2xyzdxi2_map[p].zero();
+	    this->d2xyzdxideta_map[p].zero();
+	    this->d2xyzdeta2_map[p].zero();
 	  }
 	
 	// compute x, dxdxi at the quadrature points    
-	for (unsigned int i=0; i<psi_map.size(); i++) // sum over the nodes
+	for (unsigned int i=0; i<this->psi_map.size(); i++) // sum over the nodes
 	  {
 	    const Point& side_point = side->point(i);
 	    
 	    for (unsigned int p=0; p<n_qp; p++) // for each quadrature point...
 	      {
-		xyz[p].add_scaled         (side_point, psi_map[i][p]);
-		dxyzdxi_map[p].add_scaled (side_point, dpsidxi_map[i][p]);
-		dxyzdeta_map[p].add_scaled(side_point, dpsideta_map[i][p]);
-		d2xyzdxi2_map[p].add_scaled   (side_point, d2psidxi2_map[i][p]);
-		d2xyzdxideta_map[p].add_scaled(side_point, d2psidxideta_map[i][p]);
-		d2xyzdeta2_map[p].add_scaled  (side_point, d2psideta2_map[i][p]);
+		this->xyz[p].add_scaled             (side_point, this->psi_map[i][p]);
+		this->dxyzdxi_map[p].add_scaled     (side_point, this->dpsidxi_map[i][p]);
+		this->dxyzdeta_map[p].add_scaled    (side_point, this->dpsideta_map[i][p]);
+		this->d2xyzdxi2_map[p].add_scaled   (side_point, this->d2psidxi2_map[i][p]);
+		this->d2xyzdxideta_map[p].add_scaled(side_point, this->d2psidxideta_map[i][p]);
+		this->d2xyzdeta2_map[p].add_scaled  (side_point, this->d2psideta2_map[i][p]);
 	      }
 	  }
 
 	// Compute the tangents, normal, and curvature at the quadrature point
 	for (unsigned int p=0; p<n_qp; p++)
 	  {	    
-	    const Point n  = dxyzdxi_map[p].cross(dxyzdeta_map[p]);
-	    normals[p]     = n.unit();
-	    tangents[p][0] = dxyzdxi_map[p].unit();
-	    tangents[p][1] = n.cross(dxyzdxi_map[p]).unit();
+	    const Point n  = this->dxyzdxi_map[p].cross(this->dxyzdeta_map[p]);
+	    this->normals[p]     = n.unit();
+	    this->tangents[p][0] = this->dxyzdxi_map[p].unit();
+	    this->tangents[p][1] = n.cross(this->dxyzdxi_map[p]).unit();
 	    
 	    // Compute curvature using the typical nomenclature
 	    // of the first and second fundamental forms.
@@ -281,59 +281,59 @@ void FEXYZ<Dim>::compute_face_values(const Elem* elem,
 	    // 1) http://mathworld.wolfram.com/MeanCurvature.html
 	    //    (note -- they are using inward normal)
 	    // 2) F.S. Merritt, Mathematics Manual, 1962, McGraw-Hill
-	    const Real L  = -d2xyzdxi2_map[p]    * normals[p];
-	    const Real M  = -d2xyzdxideta_map[p] * normals[p];
-	    const Real N  = -d2xyzdeta2_map[p]   * normals[p];
-	    const Real E  =  dxyzdxi_map[p].size_sq();
-	    const Real F  =  dxyzdxi_map[p]      * dxyzdeta_map[p];
-	    const Real G  =  dxyzdeta_map[p].size_sq();
+	    const Real L  = -this->d2xyzdxi2_map[p]    * this->normals[p];
+	    const Real M  = -this->d2xyzdxideta_map[p] * this->normals[p];
+	    const Real N  = -this->d2xyzdeta2_map[p]   * this->normals[p];
+	    const Real E  =  this->dxyzdxi_map[p].size_sq();
+	    const Real F  =  this->dxyzdxi_map[p]      * this->dxyzdeta_map[p];
+	    const Real G  =  this->dxyzdeta_map[p].size_sq();
 	    
 	    const Real numerator   = E*N -2.*F*M + G*L;
 	    const Real denominator = E*G - F*F;
 	    assert (denominator != 0.);
-	    curvatures[p] = 0.5*numerator/denominator;
+	    this->curvatures[p] = 0.5*numerator/denominator;
 	  }    
     	
 	// compute the jacobian at the quadrature points, see
 	// http://sp81.msi.umn.edu:999/fluent/fidap/help/theory/thtoc.htm
 	for (unsigned int p=0; p<n_qp; p++)
 	  {
-	    const Real g11 = (dxdxi_map(p)*dxdxi_map(p) +
-			      dydxi_map(p)*dydxi_map(p) +
-			      dzdxi_map(p)*dzdxi_map(p));
+	    const Real g11 = (this->dxdxi_map(p)*this->dxdxi_map(p) +
+			      this->dydxi_map(p)*this->dydxi_map(p) +
+			      this->dzdxi_map(p)*this->dzdxi_map(p));
 	    
-	    const Real g12 = (dxdxi_map(p)*dxdeta_map(p) +
-			      dydxi_map(p)*dydeta_map(p) +
-			      dzdxi_map(p)*dzdeta_map(p));
+	    const Real g12 = (this->dxdxi_map(p)*this->dxdeta_map(p) +
+			      this->dydxi_map(p)*this->dydeta_map(p) +
+			      this->dzdxi_map(p)*this->dzdeta_map(p));
 	    
 	    const Real g21 = g12;
 	    
-	    const Real g22 = (dxdeta_map(p)*dxdeta_map(p) +
-			      dydeta_map(p)*dydeta_map(p) +
-			      dzdeta_map(p)*dzdeta_map(p));
+	    const Real g22 = (this->dxdeta_map(p)*this->dxdeta_map(p) +
+			      this->dydeta_map(p)*this->dydeta_map(p) +
+			      this->dzdeta_map(p)*this->dzdeta_map(p));
 	    
 	    
 	    const Real jac = sqrt(g11*g22 - g12*g21);
 	    
 	    assert (jac > 0.);
 
-	    JxW[p] = jac*qw[p];
+	    this->JxW[p] = jac*qw[p];
 	  }
 	
 	// compute the shape function values & gradients
 	for (unsigned int i=0; i<n_approx_shape_functions; i++)
 	  for (unsigned int p=0; p<n_qp; p++)
 	    {
-	      this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->get_order(), i, xyz[p]);
+	      this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->get_order(), i, this->xyz[p]);
 	       
 	      this->dphi[i][p](0) =
-		this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 0, xyz[p]);
+		this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 0, this->xyz[p]);
 		
 	      this->dphi[i][p](1) =
-		this->dphidy[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 1, xyz[p]);
+		this->dphidy[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 1, this->xyz[p]);
 		
 	      this->dphi[i][p](2) =
-		this->dphidz[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 2, xyz[p]);	      
+		this->dphidz[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 2, this->xyz[p]);	      
 	    }
 
 	// done computing face values
