@@ -1,4 +1,4 @@
-// $Id: mesh_data_unv_support.C,v 1.5 2003-07-09 10:10:16 spetersen Exp $
+// $Id: mesh_data_unv_support.C,v 1.6 2003-07-12 14:02:59 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -97,8 +97,7 @@ void MeshData::read_unv(const std::string& name)
 	    Result_type,
 	    Data_type,
 	    NVALDC;
-	      
-	  Real dummy_Real;
+
 
 	  /**
 	   * If there is no MeshDataUnvHeader object
@@ -146,10 +145,16 @@ void MeshData::read_unv(const std::string& name)
 		in_file.ignore(256,'\n');
 	      
 	      /**
-	       * Ignore record 12 and record 13.
+	       * Ignore record 12 and record 13.  Since there
+	       * exist UNV files with 'D' instead of 'e' as 
+	       * 10th-power char, it is safer to use a string
+	       * to read the dummy reals.
 	       */
-	      for (unsigned int i=0; i<12; i++)
-		in_file >> dummy_Real;
+	      {
+	        std::string dummy_Real;
+		for (unsigned int i=0; i<12; i++)
+		    in_file >> dummy_Real;
+	      }
 
 	    }
 	  else
@@ -204,18 +209,36 @@ void MeshData::read_unv(const std::string& name)
 		   * 2,4: Real
 		   * 5,6: Complex
 		   * other data types are not supported yet.
+		   * As again, these floats may also be written
+		   * using a 'D' instead of an 'e'.
 		   */
 		  if (Data_type == 2 || Data_type == 4)
-		    in_file >> values[data_cnt];
-
+		    {
+		      std::string buf;
+		      in_file >> buf;
+		      MeshDataUnvHeader::need_D_to_e(buf);
+		      values[data_cnt] = atof(buf.c_str());
+		    }
 		  else if(Data_type == 5 || Data_type == 6)
 		    {
 #ifdef USE_COMPLEX_NUMBERS
-		      
 		      Real re_val, im_val;
 
-		      in_file >> re_val
-			      >> im_val;
+		      std::string buf;
+		      in_file >> buf;
+
+		      if (MeshDataUnvHeader::need_D_to_e(buf))
+		        {
+			  re_val = atof(buf.c_str());
+			  in_file >> buf;
+			  MeshDataUnvHeader::need_D_to_e(buf);
+			  im_val = atof(buf.c_str()); 
+			}
+		      else
+		        {
+			  re_val = atof(buf.c_str());
+			  in_file >> im_val;
+			}
 
 		      values[data_cnt] = Complex(re_val,im_val);
 #else
@@ -237,7 +260,7 @@ void MeshData::read_unv(const std::string& name)
 		} // end loop data_cnt
 
 	      /**
-	       * Add the values vector to the MechData data structure.
+	       * Add the values vector to the MeshData data structure.
 	       */
 	      const Node* node = foreign_id_to_node(f_n_id);
 	      _node_data.insert (std::make_pair(node, values));
@@ -398,10 +421,11 @@ void MeshData::write_unv (const std::string& name)
 }
 
 
+
+
+
 //------------------------------------------------------
 // MeshDataUnvHeader functions
-
-
 MeshDataUnvHeader::MeshDataUnvHeader() :
   dataset_label        (0),
   dataset_name         ("libMesh mesh data"),
@@ -425,8 +449,10 @@ MeshDataUnvHeader::MeshDataUnvHeader() :
   record_11.resize(2);
   record_12.resize(6);
   record_13.resize(8);
-
 }
+
+
+
 
 
 MeshDataUnvHeader::~MeshDataUnvHeader()
@@ -434,9 +460,10 @@ MeshDataUnvHeader::~MeshDataUnvHeader()
 }
 
 
+
+
 void MeshDataUnvHeader::read (std::ifstream& in_file)
 {
-
   in_file >> this->dataset_label;
 
   in_file.ignore(256,'\n');
@@ -461,13 +488,50 @@ void MeshDataUnvHeader::read (std::ifstream& in_file)
   for (unsigned int i=0; i<2; i++)
     in_file >> this->record_11[i];
 
-  for (unsigned int i=0; i<6; i++)
-    in_file >> this->record_12[i];
 
-  for (unsigned int i=0; i<6; i++)
-    in_file >> this->record_13[i];
+  /*
+   * There are UNV-files where floats are 
+   * written with 'D' as the 10th-power 
+   * character. Replace this 'D' by 'e',
+   * so that atof() can work fine.
+   */
+  std::string buf;
+  in_file >> buf;
 
+  if (need_D_to_e(buf))
+    {
+      // have to convert _all_ 'D' to 'e'
+      this->record_12[0] = atof(buf.c_str());
+
+      for (unsigned int i=1; i<6; i++)
+        {
+	  in_file >> buf;
+	  need_D_to_e(buf);
+	  this->record_12[i] = atof(buf.c_str());
+        }
+
+      for (unsigned int i=0; i<6; i++)
+        {
+	  in_file >> buf;
+	  need_D_to_e(buf);
+	  this->record_13[i] = atof(buf.c_str());
+        }
+    }
+  else
+    {
+      // no 'D', the stream will recognize the floats
+      this->record_12[0] = atof(buf.c_str());
+
+      for (unsigned int i=1; i<6; i++)
+	  in_file >> this->record_12[i];
+
+      for (unsigned int i=0; i<6; i++)
+	  in_file >> this->record_13[i];
+    }
 }
+
+
+
 
 void MeshDataUnvHeader::write (std::ofstream& out_file)
 {
@@ -516,6 +580,25 @@ void MeshDataUnvHeader::write (std::ofstream& out_file)
 
 
 
+bool MeshDataUnvHeader::need_D_to_e (std::string& number)
+{
+  // position of the "D" in the string
+  unsigned int position;
+
+  // find "D" in string, start looking at 6th element, to improve speed.
+  // We dont expect a "D" earlier
+  position = number.find("D",6);
+
+  if(position!=std::string::npos)     // npos means no position
+    {
+      // replace "D" in string
+      number.replace(position,1,"e"); 
+      return true;
+    }
+  else
+      // we assume that if this one number is written correctly, all numbers are
+      return false;
+}
 
 
 
