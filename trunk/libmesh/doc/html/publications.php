@@ -11,12 +11,21 @@
 <?php make_navigation("publications",$root)?>
 
 <div class="content">
-<h1>Publications -- Stay Tuned ...</h1>
+<h1>Publications</h1>
 <ul>
-  <li> <a href="http://www.cfdlab.ae.utexas.edu/~peterson/masters.pdf">John's Masters</a> </li>
+  <li>Theses and dissertations</li>
+  John's <a href="http://www.cfdlab.ae.utexas.edu/~peterson/masters.pdf">Masters Report</a>.
+
+
+  <li>Web Links</li>
+  
+  <a href="http://www.tacc.utexas.edu/general/press/announcements/20040112_01.php">TACC</a> press release.<br>
 </ul>
 </div>
 
+<br>
+<br>
+<br>
 <br>
 <br>
 <br>
