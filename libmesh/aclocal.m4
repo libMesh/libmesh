@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.50 2003-11-30 07:04:18 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.51 2003-11-30 21:42:56 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -710,9 +710,9 @@ dnl -------------------------------------------------------------
 AC_DEFUN(CONFIGURE_TECPLOT,
 [
   AC_ARG_WITH(tecplot,
-      [  --with-tecplot=[PATH] Specify the path where the Tecplot is installed],
-      withtecplot=$withval,
-      withtecplot=no)
+              AC_HELP_STRING([--with-tecplot=PATH],[Specify the path where the Tecplot is installed]),
+              withtecplot=$withval,
+              withtecplot=no)
 
   if test "$withtecplot" = no ; then
     AC_CHECK_FILE(./contrib/tecplot/lib/$host/tecio.a,
@@ -940,7 +940,7 @@ acx_blas_ok=no
 acx_blas_save_LIBS="$LIBS"
 
 AC_ARG_WITH(blas,
-	[AC_HELP_STRING([--with-blas=<lib>], [use BLAS library <lib>])])
+            AC_HELP_STRING([--with-blas=<lib>], [use BLAS library <lib>]))
 case $with_blas in
 	yes | "") ;;
 	no) acx_blas_ok=disable ;;
@@ -1099,7 +1099,7 @@ AC_REQUIRE([ACX_BLAS])
 acx_lapack_ok=no
 
 AC_ARG_WITH(lapack,
-        [AC_HELP_STRING([--with-lapack=<lib>], [use LAPACK library <lib>])])
+            AC_HELP_STRING([--with-lapack=<lib>], [use LAPACK library <lib>]))
 case $with_lapack in
         yes | "") ;;
         no) acx_lapack_ok=disable ;;
@@ -1170,12 +1170,14 @@ if (test "x$MPIHOME" = x) ; then
   MPIHOME="/usr"
 fi
 
-AC_ARG_WITH(
-	[mpi],
-	[  --with-mpi=PATH	Prefix where MPI is installed (MPIHOME)],
-	[MPI="$withval"],
-	[echo "note: MPI library path not given... trying prefix=$MPIHOME"
-	MPI=$MPIHOME])
+AC_ARG_WITH([mpi],
+	    AC_HELP_STRING([--with-mpi=PATH],
+                           [Prefix where MPI is installed (MPIHOME)]),
+	    [MPI="$withval"],
+	    [
+              echo "note: MPI library path not given... trying prefix=$MPIHOME"
+	      MPI=$MPIHOME
+            ])
 
 if test -z "$MPI"; then
 	MPI="/usr"
@@ -1254,7 +1256,8 @@ if (test -e $MPI_LIBS_PATH/libmpich.a || test -e $MPI_LIBS_PATH/libmpich.so) ; t
             GMHOME="/usr"
           fi 
           AC_ARG_WITH([gm],
-	              [  --with-gm=PATH			Prefix where GM is installed (GMHOME)],
+	              AC_HELP_STRING([--with-gm=PATH],
+                                     [Prefix where GM is installed (GMHOME)]),
 		      [GM="$withval"],
 		      [
                         echo "note: GM library path not given... trying prefix=$MPIHOME"
@@ -1347,34 +1350,41 @@ AC_PATH_XTRA
 X_LIBS="$X_PRE_LIBS $X_LIBS -lX11 $X_EXTRA_LIBS"
 
 # Set variables...
-AC_ARG_WITH(
-	[PETSc],
-	[  --with-PETSc=PFX        Prefix where PETSc is installed (PETSC_DIR)],
-	[PETSc="$withval"],
-	[if test $PETSC_DIR; then
+AC_ARG_WITH([PETSc],
+	    AC_ARG_HELP([--with-PETSc=PATH],
+                        [Prefix where PETSc is installed (PETSC_DIR)]),
+	    [PETSc="$withval"],
+	    [
+              if test $PETSC_DIR; then
 		PETSc="$PETSC_DIR"
 		echo "note: assuming PETSc library is in $PETSc (/lib,/include) as specified by environment variable PETSC_DIR"
-	else
+	      else
 		PETSc="/usr/local"
 		echo "note: assuming PETSc library is in /usr/local (/lib,/include)"
-	fi])
-AC_ARG_WITH(
-	[BOPT],
-	[  --with-BOPT=VAL         BOPT setting for PETSc (BOPT)],
-	[BOPT="$withval"],
-	[echo "note: assuming BOPT to O"
-	BOPT="O"])
-AC_ARG_WITH(
-	[PETSc_ARCH],
-	[  --with-PETSc_ARCH=VAL   PETSc hardware architecture (PETSC_ARCH)],
-	[PETSc_ARCH="$withval"],
-	[if test $PETSC_ARCH; then
+	      fi
+            ])
+
+AC_ARG_WITH([BOPT],
+	    AC_ARG_HELP([--with-BOPT=VAL],[BOPT setting for PETSc (BOPT)]),
+ 	    [BOPT="$withval"],
+	    [
+              echo "note: assuming BOPT to O"
+	      BOPT="O"
+            ])
+
+AC_ARG_WITH([PETSc_ARCH],
+	    AC_ARG_HELP([--with-PETSc_ARCH=VAL],[PETSc hardware architecture (PETSC_ARCH)]),
+	    [PETSc_ARCH="$withval"],
+	    [
+              if test $PETSC_ARCH; then
 		PETSc_ARCH="$PETSC_ARCH"
 		echo "note: assuming PETSc hardware architecture to be $PETSc_ARCH as specified by environment variable PETSC_ARCH"
-	else
+	      else
 		PETSc_ARCH=`uname -p`
 		echo "note: assuming PETSc hardware architecture to be $PETSc_ARCH"
-	fi])
+	      fi
+            ])
+
 PETSc_LIBS_PATH="$PETSc/lib/lib$BOPT/$PETSc_ARCH"
 PETSc_INCLUDES_PATH="$PETSc/include"
 
