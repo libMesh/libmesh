@@ -1,4 +1,4 @@
-// $Id: perf_log.C,v 1.14 2003-03-23 02:47:51 benkirk Exp $
+// $Id: perf_log.C,v 1.15 2003-03-23 15:09:19 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -88,13 +88,13 @@ void PerfLog::clear()
 
 std::string PerfLog::get_info_header() const
 {
-  OStringStream out;
+  OSSOStringStream out;
   
   if (log_events)
     {
 
 #ifdef HAVE_LOCALE
-      OStringStream     dateStr;
+      OSSOStringStream  dateStr;
       time_t tm         = time(NULL);
       struct tm* tmb    = localtime(&tm);
       std::locale loc;
@@ -142,7 +142,7 @@ std::string PerfLog::get_info_header() const
 
 std::string PerfLog::get_perf_info() const
 {
-  OStringStream out;
+  OSSOStringStream out;
   
   if (log_events && !log.empty())
     {
@@ -158,18 +158,18 @@ std::string PerfLog::get_perf_info() const
 	  << ", Active time=" << total_time << std::endl;
       out << " ----------------------------------------------------------------------------"  << std::endl;
       out << "| ";
-      out.left(30, "Event");      
-      out.left(8, "nCalls");      
-      out.left(12, "Total");      
-      out.left(12, "Avg");      
-      out.left(13, "Percent of");      
+      OSSStringleft(out,30,"Event");      
+      OSSStringleft(out,8,"nCalls");      
+      OSSStringleft(out,12,"Total");      
+      OSSStringleft(out,12,"Avg");      
+      OSSStringleft(out,13,"Percent of");      
       out << "|" << std::endl;      
       out << "| ";
-      out.left(30, "");
-      out.left(8, "");
-      out.left(12, "Time");
-      out.left(12, "Time");
-      out.left(13, "Active Time");
+      OSSStringleft(out,30,"");
+      OSSStringleft(out,8,"");
+      OSSStringleft(out,12,"Time");
+      OSSStringleft(out,12,"Time");
+      OSSStringleft(out,13,"Active Time");
       
       out << "|" << std::endl;
       out << "|----------------------------------------------------------------------------|" << std::endl
@@ -203,7 +203,7 @@ std::string PerfLog::get_perf_info() const
 	      if (pos->first.first == "")
 		{
 		  out << "| ";
-		  out.left(30, pos->first.second);
+		  OSSStringleft(out,30,pos->first.second);
 		}
 	      else
 		{
@@ -212,32 +212,32 @@ std::string PerfLog::get_perf_info() const
 		      last_header = pos->first.first;
 
 		      out << "| ";
-		      out.right(76, "|");
+		      OSSStringright(out,76,"|");
 		      out << std::endl;
 		      
 		      out << "| ";
-		      out.left(75, pos->first.first);
+		      OSSStringleft(out,75,pos->first.first);
 		      out << "|";
 		      out << std::endl;
 		    }
 
 		  out << "|   ";
-		  out.left(28, pos->first.second);
+		  OSSStringleft(out,28,pos->first.second);
 		}
 	      
 
 	      // Print the number of calls to the event
-	      out.left(8, perf_count);
+	      OSSInt(out,8,perf_count);
 
 	      // Print the total time spent in the event
 	      out.setf(std::ios::fixed);
-	      out.left(12, 4, perf_time);
+	      OSSRealleft(out,12,4,perf_time);
 
 	      // Print the average time per function call
-	      out.left(12, 6, perf_avg_time);
+	      OSSRealleft(out,12,6,perf_avg_time);
 
 	      // Print the percentage of the time spent in the event
-	      out.left(13, 2, perf_percent);
+	      OSSRealleft(out,13,2,perf_percent);
 	      
 	      out << "|";
 	      out << std::endl;
@@ -246,21 +246,21 @@ std::string PerfLog::get_perf_info() const
       
       out << " ----------------------------------------------------------------------------" << std::endl;
       out << "| ";
-      out.left(30, "Totals:");
+      OSSStringleft(out,30,"Totals:");
 
       // Print the total number of logged function calls
-      out.left(8, summed_function_calls);
+      OSSInt(out,8,summed_function_calls);
 
       // Print the total time spent in logged function calls
       out.setf(std::ios::fixed);
-      out.left(12, 4, summed_total_time);
+      OSSRealleft(out,12,4,summed_total_time);
 
       // Null, the average time doesn't make sense as a total
       out.width(12);
       out << "";
 
       // Print the total percentage
-      out.left(13, 2, summed_percentage);
+      OSSRealleft(out,13,2,summed_percentage);
       
       out << "|";
       out << std::endl;
@@ -275,7 +275,7 @@ std::string PerfLog::get_perf_info() const
 
 std::string PerfLog::get_log() const
 {
-  OStringStream out;
+  OSSOStringStream out;
   
   if (log_events)
     {

@@ -1,4 +1,4 @@
-// "$Id: xdr_cxx.C,v 1.9 2003-03-22 21:04:31 ddreyer Exp $\n"
+// "$Id: xdr_cxx.C,v 1.10 2003-03-23 15:09:19 ddreyer Exp $\n"
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -1129,20 +1129,18 @@ void Xdr::data (std::vector<float>& v, const char* comment)
 
 	data(length, "# vector length");
 
-	out.scientific (12, v, " ");
-
-// OLD CODE
-// 	for (unsigned int i=0; i<v.size(); i++)
-// 	  {
-// 	    assert(out.good());
+	for (unsigned int i=0; i<v.size(); i++)
+	  {
+	    assert(out.good());
 // #ifndef BROKEN_IOSTREAM
+	    OFSRealscientific(out,12,v[i]) << " ";
 // 	    out << std::setw(12) 
 // 		<< std::scientific 
 // 		<<v[i] << " ";
 // #else
 // 	    out << v[i] << " ";
 // #endif
-// 	  }
+ 	  }
 
 	out << "\t " << comment << std::endl;
 
@@ -1251,20 +1249,20 @@ void Xdr::data (std::vector<double>& v, const char* comment)
 
 	data(length, "# vector length");
 
-	out.scientific (12, v, " ");
-
-// OLD CODE
-// 	for (unsigned int i=0; i<v.size(); i++)
-// 	  {
-// 	    assert(out.good());
+	for (unsigned int i=0; i<v.size(); i++)
+	  {
+	    assert(out.good());
 // #ifndef BROKEN_IOSTREAM
+	    OFSRealscientific(out,12,v[i]) << " ";
 // 	    out << std::setw(12) 
 // 		<< std::scientific 
 // 		<<v[i] << " ";
 // #else
 // 	    out << v[i] << " ";
 // #endif
-// 	  }
+ 	  }
+
+
 
 	out << "\t " << comment << std::endl;
 
@@ -1458,12 +1456,10 @@ void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
 
 	data(length, "# vector length x 2 (complex)");
 
-	out.scientific (12, v, " ");
-
-// OLD CODE
-// 	for (unsigned int i=0; i<v.size(); i++)
-// 	  {
-// 	    assert (out.good());
+ 	for (unsigned int i=0; i<v.size(); i++)
+ 	  {
+ 	    assert (out.good());
+	    OFSNumberscientific(out,12,v[i]) << " ";
 // #ifndef BROKEN_IOSTREAM
 // 	    out << std::setw(12) << std::scientific << v[i].real() << " "
 // 		<< std::setw(12) << std::scientific << v[i].imag() << " ";
@@ -1471,7 +1467,7 @@ void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
 // 	    out << v[i].real() << " " 
 // 		<< v[i].imag() << " ";
 // #endif
-// 	  }
+ 	  }
 
 	out << "\t " << comment << std::endl;
 
