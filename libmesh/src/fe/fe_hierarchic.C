@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic.C,v 1.16 2005-02-22 22:17:36 jwpeterson Exp $
+// $Id: fe_hierarchic.C,v 1.17 2005-02-28 16:35:25 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1213,11 +1213,9 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::compute_constraints (std::map<unsigned int,
-				            std::map<unsigned int,
-				                     float> > &,
+				     std::map<unsigned int, float> > &,
+				     DofMap &,
 				     const unsigned int,
-				     const unsigned int,
-				     const FEType&,
 				     const Elem*)
 {
   std::cerr << "ERROR:  Not yet implemented for Hierarchics!"

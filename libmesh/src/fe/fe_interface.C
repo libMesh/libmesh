@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.28 2005-02-22 23:12:32 roystgnr Exp $
+// $Id: fe_interface.C,v 1.29 2005-02-28 16:35:25 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1248,12 +1248,13 @@ void FEInterface::compute_data(const unsigned int dim,
 void FEInterface::compute_constraints (std::map<unsigned int,
 				            std::map<unsigned int,
 				                     float> > & constraints,
-				       const unsigned int system_number,
+				       DofMap &dof_map,
 				       const unsigned int variable_number,
-				       const FEType& fe_t,
 				       const Elem* elem)
 {
   assert (elem != NULL);
+
+  const FEType& fe_t = dof_map.variable_type(variable_number);
   
   switch (elem->dim())
     {
@@ -1270,16 +1271,14 @@ void FEInterface::compute_constraints (std::map<unsigned int,
 	  {
 	  case LAGRANGE:
 	    FE<2,LAGRANGE>::compute_constraints (constraints,
-						 system_number,
+						 dof_map,
 						 variable_number,
-						 fe_t,
 						 elem); return;
 
 	  case CLOUGH:
 	    FE<2,CLOUGH>::compute_constraints (constraints,
-					       system_number,
+					       dof_map,
 					       variable_number,
-					       fe_t,
 					       elem); return;
 
 	  default:
@@ -1294,9 +1293,8 @@ void FEInterface::compute_constraints (std::map<unsigned int,
 	  {
 	  case LAGRANGE:
 	    FE<3,LAGRANGE>::compute_constraints (constraints,
-						 system_number,
+					         dof_map,
 						 variable_number,
-						 fe_t,
 						 elem); return;      
 	  default:
 	    return;

@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.68 2005-02-22 22:17:35 jwpeterson Exp $
+// $Id: dof_map.C,v 1.69 2005-02-28 16:35:24 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -21,7 +21,7 @@
 
 // C++ Includes -------------------------------------
 #include <set>
-#include <algorithm> // for std::fill
+#include <algorithm> // for std::fill and std::max
 
 // Local Includes -----------------------------------
 #include "dof_map.h"
@@ -163,33 +163,129 @@ void DofMap::reinit(MeshBase& mesh)
       MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
       const MeshBase::element_iterator elem_end = mesh.active_elements_end(); 
  
+      unsigned int vertex_dofs = 0;
+      bool extra_hanging_dofs =
+        FEInterface::extra_hanging_dofs(fe_type);
+
+      // Count vertex degrees of freedom first
       for ( ; elem_it != elem_end; ++elem_it)
 	{
 	  Elem*    elem       = *elem_it;
 	  const ElemType type = elem->type();
 	     
-	  // Allocate the nodal DOFs
+	  // Allocate the vertex DOFs
 	  for (unsigned int n=0; n<elem->n_nodes(); n++)
 	    {
 	      Node* node = elem->get_node(n);
 
-	      const unsigned int dofs_at_node =
+	      const unsigned int old_node_dofs =
+	        node->n_comp(this->sys_number(), var);
+
+	      if (elem->is_vertex(n))
+	        {
+                  if (!vertex_dofs)
+		    vertex_dofs = FEInterface::n_dofs_at_node(dim,
+							      fe_type,
+							      type,
+							      n);
+		  else
+		    assert(vertex_dofs ==
+			   FEInterface::n_dofs_at_node(dim, fe_type,
+						       type, n));
+		  assert(vertex_dofs);
+		  if (!old_node_dofs)
+		    {
+	              node->set_n_comp(this->sys_number(),
+			               var,
+			               vertex_dofs);
+		      // Abusing dof_number to set a "this is a
+		      // vertex" flag
+		      node->set_dof_number(this->sys_number(),
+					   var, 0, 1);
+		    }
+		  else
+		    assert(vertex_dofs == old_node_dofs);
+	        }
+	    }
+	}
+
+      elem_it = mesh.active_elements_begin();
+
+      for ( ; elem_it != elem_end; ++elem_it)
+	{
+	  Elem*    elem       = *elem_it;
+	  const ElemType type = elem->type();
+	     
+	  // Allocate the edge and face DOFs
+	  for (unsigned int n=0; n<elem->n_nodes(); n++)
+	    {
+	      Node* node = elem->get_node(n);
+
+	      const unsigned int old_node_dofs =
+	        node->n_comp(this->sys_number(), var);
+
+	      const unsigned int new_node_dofs =
 		FEInterface::n_dofs_at_node(dim, fe_type, type, n);
 
-	      // Consider the possibility that a neighboring element
-	      // has assigned more components than we will use.  In that
-	      // case do not step on their toes...
-	      if (dofs_at_node > node->n_comp(this->sys_number(), var))
-		node->set_n_comp(this->sys_number(),
-				 var,
-				 dofs_at_node);
+	      // We've already allocated vertex DOFs
+	      if (elem->is_vertex(n))
+	        {
+		  assert(old_node_dofs >= new_node_dofs &&
+			 vertex_dofs == new_node_dofs);
+		}
+	      // We need to allocate the rest
+	      else
+	        {
+		  // If this has no dofs yet, it isn't another
+		  // element's vertex, so we just give it edge or face
+		  // dofs
+		  if (!old_node_dofs)
+		    node->set_n_comp(this->sys_number(), var,
+				     new_node_dofs);
+
+		  // If this has dofs, but isn't another element's
+		  // unrevisited vertex, it should already have the
+		  // right number of edge or face dofs
+		  else if (node->dof_number(this->sys_number(), var, 0)
+			!= 1)
+		    {
+		      if (extra_hanging_dofs)
+		        assert(old_node_dofs == new_node_dofs ||
+			       old_node_dofs == 
+			       vertex_dofs + new_node_dofs);
+		      else
+		        assert(old_node_dofs == new_node_dofs ||
+			       old_node_dofs == 
+			       std::max(vertex_dofs, new_node_dofs));
+		    }
+		  // If this is another element's unrevisited vertex,
+		  // add any (non-overlapping) edge/face dofs if
+		  // necessary
+		  else if (extra_hanging_dofs)
+		    {
+		      assert(old_node_dofs == vertex_dofs);
+		      node->set_n_comp(this->sys_number(), var,
+				       vertex_dofs + new_node_dofs);
+		      assert(node->dof_number(this->sys_number(), var,
+					      0) != 1);
+		    }
+		  // If this is another element's vertex, add any
+		  // (overlapping) edge/face dofs if necessary
+		  else
+		    {
+		      assert(old_node_dofs == vertex_dofs);
+		      node->set_n_comp(this->sys_number(), var,
+				       std::max(vertex_dofs, new_node_dofs));
+		    }
+		}
 	    }
-	     
-	  // Allocate the element DOFs
+          // Allocate the element DOFs
 	  const unsigned int dofs_per_elem =
-	    FEInterface::n_dofs_per_elem(dim, fe_type, type);
-	  
+			  FEInterface::n_dofs_per_elem(dim, fe_type,
+						       type);
+
 	  elem->set_n_comp(this->sys_number(), var, dofs_per_elem);
+
 	}
     }
 
@@ -888,6 +984,9 @@ void DofMap::dof_indices (const Elem* const elem,
 
 	const FEType& fe_type = this->variable_type(v);
 
+	const bool extra_hanging_dofs =
+	  FEInterface::extra_hanging_dofs(fe_type);
+
 #ifdef DEBUG
 	tot_size += FEInterface::n_dofs(dim,
 					fe_type,
@@ -907,8 +1006,15 @@ void DofMap::dof_indices (const Elem* const elem,
 								 fe_type,
 								 type,
 								 n);
+
+	    // If this is a non-vertex on a hanging node with extra
+	    // degrees of freedom, we use the non-vertex dofs (which
+	    // are numbered last)
+	    int dof_offset = 0;
+	    if (extra_hanging_dofs && !elem->is_vertex(n))
+	      dof_offset = node->n_comp(sys_num,v) - nc;
 	    
-	    for (unsigned int i=0; i<nc; i++)
+	    for (unsigned int i=dof_offset; i<nc+dof_offset; i++)
 	      {
 		assert (node->dof_number(sys_num,v,i) !=
 			DofObject::invalid_id);
@@ -917,18 +1023,19 @@ void DofMap::dof_indices (const Elem* const elem,
 	      }
 	  }
 	
-	// Get the element-based DOF numbers
-	{
-	  const unsigned int nc = elem->n_comp(sys_num,v);
+	// If there are any element-based DOF numbers, get them
+	if (elem->n_systems() > sys_num)
+	  {
+	    const unsigned int nc = elem->n_comp(sys_num,v);
 	  
-	  for (unsigned int i=0; i<nc; i++)
-	    {
-	      assert (elem->dof_number(sys_num,v,i) !=
-		      DofObject::invalid_id);
+	    for (unsigned int i=0; i<nc; i++)
+	      {
+	        assert (elem->dof_number(sys_num,v,i) !=
+		        DofObject::invalid_id);
 
-	      di.push_back(elem->dof_number(sys_num,v,i));
-	    }
-	}
+	        di.push_back(elem->dof_number(sys_num,v,i));
+	      }
+	  }
       }
 
 #ifdef DEBUG
@@ -974,6 +1081,9 @@ void DofMap::old_dof_indices (const Elem* const elem,
 	
 	const FEType& fe_type = this->variable_type(v);
 	
+	const bool extra_hanging_dofs =
+	  FEInterface::extra_hanging_dofs(fe_type);
+
 #ifdef DEBUG
 	tot_size += FEInterface::n_dofs(dim,
 					fe_type,
@@ -995,7 +1105,14 @@ void DofMap::old_dof_indices (const Elem* const elem,
 								 n);
 	    assert (node->old_dof_object != NULL);
 	    
-	    for (unsigned int i=0; i<nc; i++)
+	    // If this is a non-vertex on a hanging node with extra
+	    // degrees of freedom, we use the non-vertex dofs (which
+	    // are numbered last)
+	    int dof_offset = 0;
+	    if (extra_hanging_dofs && !elem->is_vertex(n))
+	      dof_offset = node->old_dof_object->n_comp(sys_num,v) - nc;
+	    
+	    for (unsigned int i=dof_offset; i<nc+dof_offset; i++)
 	      {
 		assert (node->old_dof_object->dof_number(sys_num,v,i) !=
 			DofObject::invalid_id);

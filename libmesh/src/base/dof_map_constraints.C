@@ -1,4 +1,4 @@
-// $Id: dof_map_constraints.C,v 1.13 2005-02-22 22:17:36 jwpeterson Exp $
+// $Id: dof_map_constraints.C,v 1.14 2005-02-28 16:35:25 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -65,8 +65,6 @@ void DofMap::create_dof_constraints(const MeshBase& mesh)
   for (unsigned int variable_number=0; variable_number<this->n_variables();
        ++variable_number)
     {
-      const FEType& fe_type = this->variable_type(variable_number);
-      
       //const_elem_iterator       elem_it (mesh.elements_begin());
       //const const_elem_iterator elem_end(mesh.elements_end());
 
@@ -75,9 +73,8 @@ void DofMap::create_dof_constraints(const MeshBase& mesh)
       
       for ( ; elem_it != elem_end; ++elem_it)
 	FEInterface::compute_constraints (_dof_constraints,
-					  this->sys_number(),
+					  *this,
 					  variable_number,
-					  fe_type,
 					  *elem_it);
     }
   

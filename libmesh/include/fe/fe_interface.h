@@ -1,4 +1,4 @@
-// $Id: fe_interface.h,v 1.4 2005-02-22 23:11:58 roystgnr Exp $
+// $Id: fe_interface.h,v 1.5 2005-02-28 16:35:19 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -32,6 +32,7 @@
 
 
 // forward declarations
+class DofMap;
 class Elem;
 class FEType;
 class FEComputeData;
@@ -203,9 +204,8 @@ public:
   static void compute_constraints (std::map<unsigned int,
 				            std::map<unsigned int,
 				                     float> > & constraints,
-				   const unsigned int system_number,
+				   DofMap &dof_map,
 				   const unsigned int variable_number,
-				   const FEType& fe_t,
 				   const Elem* elem);
 
   /**

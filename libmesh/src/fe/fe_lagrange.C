@@ -1,4 +1,4 @@
-// $Id: fe_lagrange.C,v 1.20 2005-02-22 22:17:36 jwpeterson Exp $
+// $Id: fe_lagrange.C,v 1.21 2005-02-28 16:35:26 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -20,6 +20,7 @@
 
 
 // Local includes
+#include "dof_map.h"
 #include "fe.h"
 #include "fe_interface.h"
 #include "elem.h"
@@ -548,16 +549,19 @@ template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::compute_constraints (std::map<unsigned int,
 				            std::map<unsigned int,
 				                     float> > & constraints,
-				     const unsigned int system_number,
+				     DofMap &dof_map,
 				     const unsigned int variable_number,
-				     const FEType& fe_type,
 				     const Elem* elem)
 {
   // Only constrain elements in 2,3D.
   if (Dim == 1)
     return;
-  	      
+
   assert (elem != NULL);
+
+  const FEType& fe_type = dof_map.variable_type(variable_number);
+
+  std::vector<unsigned int> my_dof_indices, parent_dof_indices;
 
   // Look at the element faces.  Check to see if we need to 
   // build constraints.
@@ -576,6 +580,9 @@ void FE<Dim,T>::compute_constraints (std::map<unsigned int,
 	  
 	  const AutoPtr<Elem> my_side     (elem->build_side(s));
 	  const AutoPtr<Elem> parent_side (parent->build_side(s));
+
+	  dof_map.dof_indices (my_side.get(), my_dof_indices);
+	  dof_map.dof_indices (parent_side.get(), parent_dof_indices);
   
 	  for (unsigned int my_dof=0;
 	       my_dof<FEInterface::n_dofs(Dim-1, fe_type, my_side->type());
@@ -583,11 +590,8 @@ void FE<Dim,T>::compute_constraints (std::map<unsigned int,
 	    {
 	      assert (my_dof < my_side->n_nodes());
 	      
-	      // My global node and dof indices.
-	      const Node* my_node          = my_side->get_node(my_dof);
-	      const unsigned int my_dof_g  = my_node->dof_number(system_number,
-								 variable_number,
-								 0);
+	      // My global dof index.
+	      const unsigned int my_dof_g = my_dof_indices[my_dof];
 	      
 	      // The support point of the DOF
 	      const Point& support_point = my_side->point(my_dof);
@@ -604,11 +608,9 @@ void FE<Dim,T>::compute_constraints (std::map<unsigned int,
 		{
 		  assert (their_dof < parent_side->n_nodes());
 		  
-		  // Their global node and dof indices.
-		  const Node* their_node          = parent_side->get_node(their_dof);
-		  const unsigned int their_dof_g  = their_node->dof_number(system_number,
-									   variable_number,
-									   0);
+	          // Their global dof index.
+	          const unsigned int their_dof_g =
+				  parent_dof_indices[their_dof];
 		  
 		  const Real their_dof_value = FEInterface::shape(Dim-1,
 								  fe_type,
