@@ -12,7 +12,7 @@
   providing a friendly interface to a number of high-quality software
   packages that are currently available.  Currently the library
   supports 2D and 3D steady and transient finite element simulations.
-  <a href="http://www-fp.mcs.anl.gov/petsc"> PETSc </a> is
+  <a href="http://www-unix.mcs.anl.gov/petsc/petsc-2"> PETSc </a> is
   currently used for the solution of linear systems on both serial and
   parallel platforms, and
   <a href="http://www.tu-dresden.de/mwism/skalicky/laspack/laspack.html">
