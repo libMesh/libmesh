@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.16 2003-02-22 16:38:20 benkirk Exp $
+// $Id: dof_map.h,v 1.17 2003-02-26 00:47:51 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -293,7 +293,7 @@ public:
    * should be 1 and \p dof_coupling(0,j) = 0 for j not equal
    * to 0.
    */
-  CouplingMatrix dof_coupling;
+  CouplingMatrix _dof_coupling;
 
   
 private:

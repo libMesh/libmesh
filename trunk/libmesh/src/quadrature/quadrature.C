@@ -1,4 +1,4 @@
-// $Id: quadrature.C,v 1.10 2003-02-24 14:35:45 benkirk Exp $
+// $Id: quadrature.C,v 1.11 2003-02-26 00:47:52 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -37,17 +37,17 @@ void QBase::init(const ElemType t)
   switch(_dim)
     {
     case 1:
-      init_1D(_type);
+      this->init_1D(_type);
 
       return;
       
     case 2:
-      init_2D(_type);
+      this->init_2D(_type);
 
       return;
 
     case 3:
-      init_3D(_type);
+      this->init_3D(_type);
 
       return;
 
@@ -75,15 +75,17 @@ void QBase::scale(std::pair<Real, Real> old_range,
   // We're mapping from old_range -> new_range 
   for (unsigned int i=0; i<_points.size(); i++)
     {
-      _points[i](0) = (_points[i](0) - old_range.first) *
-	              (new_range.second - new_range.first) /
-	              (old_range.second - old_range.first) +
-	              new_range.first;
+      _points[i](0) =
+	(_points[i](0) - old_range.first) *
+	(new_range.second - new_range.first) /
+	(old_range.second - old_range.first) +
+	new_range.first;
     }
 
   // Compute the scale factor and scale the weights
   const Real scfact = (new_range.second - new_range.first) /
                       (old_range.second - old_range.first);
+
   for (unsigned int i=0; i<_points.size(); i++)
     _weights[i] *= scfact;
 }
