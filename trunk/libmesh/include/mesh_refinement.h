@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.h,v 1.10 2003-05-20 20:55:01 benkirk Exp $
+// $Id: mesh_refinement.h,v 1.11 2003-05-21 22:17:59 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,16 +24,17 @@
 
 
 
+#include "mesh_config.h"
+
+#ifdef ENABLE_AMR
+
 // C++ Includes   -----------------------------------
 #include <vector>
 #include <map>
 #include <set>
 
-
 // Local Includes -----------------------------------
-#include "mesh_config.h"
-
-#ifdef ENABLE_AMR
+#include "mesh_common.h"
 
 class MeshBase;
 class Point;
@@ -81,6 +82,19 @@ public:
 					const Real refine_fraction  = 0.3,
 					const Real coarsen_fraction = 0.0,
 					const unsigned int max_level = static_cast<unsigned int>(-1));
+
+  /**
+   * Flags elements for coarsening and refinement based on
+   * the computed error passed in \p error_per_cell.  This method picks
+   * the top \p refine_fraction * \p n_elem elements for refinement and
+   * the bottom \p coarsen_fraction * \p n_elem elements for coarsening.
+   * The two fractions \p refine_fraction and \p coarsen_fraction must be
+   * in \f$ [0,1] \f$.
+   */
+  void flag_elements_by_elem_fraction (const ErrorVector& error_per_cell,
+				       const Real refine_fraction  = 0.3,
+				       const Real coarsen_fraction = 0.0,
+				       const unsigned int max_level = static_cast<unsigned int>(-1));
 		      
   /**
    * Refines and coarsens user-requested elements. Will also
@@ -122,7 +136,130 @@ public:
 private:
 
 
+
+  //------------------------------------------------------
+  // "Smoothing" algorthms for refined meshes
   
+  /**
+   * This algorithm restricts the maximim level mismatch
+   * at any node in the mesh.  Calling this with \p max_mismatch
+   * equal to 1 would transform this mesh:
+   \verbatim
+   o---o---o---o---o-------o-------o
+   |   |   |   |   |       |       |
+   |   |   |   |   |       |       |
+   o---o---o---o---o       |       |
+   |   |   |   |   |       |       |
+   |   |   |   |   |       |       |
+   o---o---o---o---o-------o-------o
+   |   |   |   |   |       |       |
+   |   |   |   |   |       |       |
+   o---o---o---o---o       |       |
+   |   |   |   |   |       |       |
+   |   |   |   |   |       |       |
+   o---o---o---o---o-------o-------o
+   |       |       |               |
+   |       |       |               |
+   |       |       |               |
+   |       |       |               |
+   |       |       |               |
+   o-------o-------o               |
+   |       |       |               |
+   |       |       |               |
+   |       |       |               |
+   |       |       |               |
+   |       |       |               |
+   o-------o-------o---------------o     
+   \endverbatim
+
+   * into this:
+   
+   \verbatim
+   o---o---o---o---o-------o-------o
+   |   |   |   |   |       |       |
+   |   |   |   |   |       |       |
+   o---o---o---o---o       |       |
+   |   |   |   |   |       |       |
+   |   |   |   |   |       |       |
+   o---o---o---o---o-------o-------o
+   |   |   |   |   |       |       |
+   |   |   |   |   |       |       |
+   o---o---o---o---o       |       |
+   |   |   |   |   |       |       |
+   |   |   |   |   |       |       |
+   o---o---o---o---o-------o-------o
+   |       |       |       :       |
+   |       |       |       :       |
+   |       |       |       :       |
+   |       |       |       :       |
+   |       |       |       :       |
+   o-------o-------o.......o.......o
+   |       |       |       :       |
+   |       |       |       :       |
+   |       |       |       :       |
+   |       |       |       :       |
+   |       |       |       :       |
+   o-------o-------o-------o-------o     
+   \endverbatim
+   by refining the indicated element
+   
+   */
+  bool limit_level_mismatch_at_node (const unsigned int max_mismatch);
+
+  /**
+   * This algorithm selects an element for refinement
+   * if all of its neighbors are (or will be) refined.
+   * This algorithm will transform this mesh:
+   \verbatim
+   o---o---o---o---o---o---o
+   |   |   |   |   |   |   |
+   |   |   |   |   |   |   |
+   o---o---o---o---o---o---o
+   |   |   |   |   |   |   |
+   |   |   |   |   |   |   |
+   o---o---o---o---o---o---o
+   |   |   |       |   |   |
+   |   |   |       |   |   |
+   o---o---o       o---o---o
+   |   |   |       |   |   |
+   |   |   |       |   |   |
+   o---o---o---o---o---o---o
+   |   |   |   |   |   |   |
+   |   |   |   |   |   |   |
+   o---o---o---o---o---o---o
+   |   |   |   |   |   |   |
+   |   |   |   |   |   |   |
+   o---o---o---o---o---o---o
+   \endverbatim
+
+   into this:
+   \verbatim
+   o---o---o---o---o---o---o
+   |   |   |   |   |   |   |
+   |   |   |   |   |   |   |
+   o---o---o---o---o---o---o
+   |   |   |   |   |   |   |
+   |   |   |   |   |   |   |
+   o---o---o---o---o---o---o
+   |   |   |   :   |   |   |
+   |   |   |   :   |   |   |
+   o---o---o...o...o---o---o
+   |   |   |   :   |   |   |
+   |   |   |   :   |   |   |
+   o---o---o---o---o---o---o
+   |   |   |   |   |   |   |
+   |   |   |   |   |   |   |
+   o---o---o---o---o---o---o
+   |   |   |   |   |   |   |
+   |   |   |   |   |   |   |
+   o---o---o---o---o---o---o
+   \endverbatim
+
+   by refining the indicated element
+   
+   */
+  bool eliminate_unrefined_patches ();
+				     
   /**
    * @returns The index of the next unused node number
    * in the \p nodes vector.  If all the entries are
@@ -130,6 +267,11 @@ private:
    */
   unsigned int new_node_number ();
 
+
+
+  //---------------------------------------------
+  // Utility algorithms
+  
   /**
    * Updates the \p unused_elements data structure to
    * be compatible with the current state of the mesh.
