@@ -1,4 +1,4 @@
-// $Id: ex3.C,v 1.3 2003-02-03 03:51:48 ddreyer Exp $
+// $Id: ex3.C,v 1.4 2003-02-03 20:34:46 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -78,6 +78,8 @@
 void assemble_poisson(EquationSystems& es,
                       const std::string& system_name);
 
+
+
 /**
  * This is the exact solution that
  * we are trying to obtain.  We will solve
@@ -94,7 +96,7 @@ Real exact_solution (const Real x,
 {
   static const Real pi = acos(-1.);
 
-  return cos(pi*x)*sin(pi*y)*cos(pi*z);
+  return cos(.5*pi*x)*sin(.5*pi*y)*cos(.5*pi*z);
 };
 
 
@@ -163,6 +165,18 @@ int main (int argc, char** argv)
 		     -1., 1.,
 		      0., 0.,
 		     QUAD9);
+
+    /**
+     * This is the first use of the \p Mesh::find_neighbors() method.
+     * When this method is called all the elements are interrogated
+     * and neighbors are found.  After this method is called then
+     * calling mesh.elem(3)->neighbor(2) will return a pointer to
+     * the element in the mesh that borders side 2 of element number
+     * 3.  The \p Elem::neighbor(unsigned int s)  member returns
+     * \p NULL if the \p s side of the element is on a boundary of
+     * the domain.
+     */
+    mesh.find_neighbors();
     
     /**
      * Print information about the mesh to the screen.
@@ -422,7 +436,7 @@ void assemble_poisson(EquationSystems& es,
 	    for (unsigned int j=0; j<phi.size(); j++)
 	      {
 		Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-	      };
+	      }; // end of the matrix summation loop
 
 
 	  /**
@@ -455,8 +469,144 @@ void assemble_poisson(EquationSystems& es,
 				 4.*exact_solution(x,y))/eps/eps;
 	      
 	      Fe[i] += JxW[qp]*fxy*phi[i][qp];
-	    };
-	};
+	    }; // end of the RHS summation loop
+	  
+	}; // end of quadrature point loop
+
+
+
+      
+      /**
+       *----------------------------------------------------------------
+       * At this point the interior element integration has
+       * been completed.  However, we have not yet addressed
+       * boundary conditions.  For this example we will only
+       * consider simple Dirichlet boundary conditions.
+       *
+       * There are several ways Dirichlet boundary conditions
+       * can be imposed.  A simple approach, which works for
+       * interpolary bases like you have with standard Lagrange
+       * finite elements, is to assing function values to the
+       * degrees of freedom living on the domain boundary. This
+       * works well for interpolary bases, but is more difficult
+       * when non-interpolary (e.g Legendre or Hierarchic) bases
+       * are used.
+       *
+       * Dirichlet boundary conditions can also be imposed with a
+       * "penalty" method.  In this case essentially the L2 projection
+       * of the boundary values are added to the matrix. The
+       * projection is multiplied by some large factor so that, in
+       * floating point arithmetic, the existing (smaller) entries
+       * in the matrix and right-hand-side are effectively ignored.
+       *
+       * This amounts to adding a term of the form
+       *
+       * \f$ \frac{1}{\epsilon} \int_{\delta \Omega} \phi_i \phi_j = \frac{1}{\epsilon} \int_{\delta \Omega} u \phi_i \f$
+       *
+       * where \f$ \frac{1}{\epsilon} \f$ is the penalty parameter when \f$ \epsilon \lle 1 \f$
+       */
+      {
+	/**
+	 * The following loops over the sides of the element.
+	 * If the element has no neighbor on a side then that
+	 * side MUST live on a boundary of the domain.
+	 */
+	for (unsigned int side=0; side<elem->n_sides(); side++)
+	  if (elem->neighbor(side) == NULL)
+	    {
+	      /**
+	       * Declare a special finite element object for
+	       * boundary integration.
+	       */
+	      AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
+	      
+	      /**
+	       * Boundary integration requires TWO quadraure rules:
+	       * one the dimensionality of the element and another
+	       * one less than the dimensionality of the element.
+	       */
+	      QGauss qface0(dim,   FIFTH);
+	      QGauss qface1(dim-1, FIFTH);
+	      
+	      /**
+	       * Tell the finte element object to use our
+	       * quadrature rule.
+	       */
+	      fe_face->attach_quadrature_rule (&qface0);
+	      
+	      /**
+	       * The value of the shape functions at the quadrature
+	       * points.
+	       */
+	      const std::vector<std::vector<Real> >&  phi_face = fe_face->get_phi();
+	      
+	      /**
+	       * The Jacobian * Quadrature Weight at the quadrature
+	       * points on the face.
+	       */
+	      const std::vector<Real>& JxW_face = fe_face->get_JxW();
+	      
+	      /**
+	       * The XYZ locations (in physical space) of the
+	       * quadrature points on the face.  This is where
+	       * we will interpolate the boundary value function.
+	       */
+	      const std::vector<Point >& qface_point = fe_face->get_xyz();
+	      
+	      /**
+	       * Compute the shape function values on the element
+	       * face.
+	       */
+	      fe_face->reinit(&qface1, elem, side);
+	      
+	      /**
+	       * Loop over the face quagrature points for integration.
+	       */
+	      for (unsigned int qp=0; qp<qface0.n_points(); qp++)
+		{
+		  /**
+		   * The location on the boundary of the current
+		   * face quadrature point.
+		   */
+		  const Real xf = qface_point[qp](0);
+		  const Real yf = qface_point[qp](1);
+		  
+		  /**
+		   * The penalty value.  \f$ \frac{1}{\epsilon \f$
+		   * in the discussion above.
+		   */
+		  const Real penalty = 1.e10;
+		  
+		  /**
+		   * The boundary value.
+		   */
+		  const Real value = exact_solution(xf, yf);
+		  
+		  /**
+		   * Matrix contribution of the L2 projection. 
+		   */
+		  for (unsigned int i=0; i<phi_face.size(); i++)
+		    for (unsigned int j=0; j<phi_face.size(); j++)
+		      {
+			Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
+		      };
+		  
+		  /**
+		   * Right-hand-side contribution of the L2
+		   * projection.
+		   */
+		  for (unsigned int i=0; i<phi_face.size(); i++)
+		    {
+		      Fe[i] += JxW_face[qp]*penalty*value*phi_face[i][qp];
+		    };
+		  
+		}; // end face quadrature point loop	  
+	    }; // end if (elem->neighbor(side) == NULL)
+      }; // end boundary condition section	  
+
+
+      
+
       
       /**
        *----------------------------------------------------------------
@@ -467,7 +617,8 @@ void assemble_poisson(EquationSystems& es,
        */
       es("Poisson").matrix.add_matrix (Ke, dof_indices);
       es("Poisson").rhs.add_vector (Fe, dof_indices);
-    };
+      
+    }; // end of element loop
 
 
   
