@@ -1,4 +1,4 @@
-// $Id: fe_xyz.C,v 1.1 2004-02-18 23:04:08 benkirk Exp $
+// $Id: fe_xyz.C,v 1.2 2004-04-25 05:43:33 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -63,40 +63,41 @@ void FEXYZ<Dim>::init_shape_functions(const std::vector<Point>& qp,
   // Phi are the shape functions used for the FE approximation
   // Phi_map are the shape functions used for the FE mapping
   {
-    phi.resize     (n_approx_shape_functions);
-    dphi.resize    (n_approx_shape_functions);
-    dphidx.resize  (n_approx_shape_functions);
-    dphidy.resize  (n_approx_shape_functions);
-    dphidz.resize  (n_approx_shape_functions);
+    // (note: GCC 3.4.0 requires the use of this-> here)
+    this->phi.resize     (n_approx_shape_functions);
+    this->dphi.resize    (n_approx_shape_functions);
+    this->dphidx.resize  (n_approx_shape_functions);
+    this->dphidy.resize  (n_approx_shape_functions);
+    this->dphidz.resize  (n_approx_shape_functions);
           
-    phi_map.resize         (n_mapping_shape_functions);
-    dphidxi_map.resize     (n_mapping_shape_functions);
+    this->phi_map.resize         (n_mapping_shape_functions);
+    this->dphidxi_map.resize     (n_mapping_shape_functions);
     
     if (Dim > 1)
-      dphideta_map.resize  (n_mapping_shape_functions);
+      this->dphideta_map.resize  (n_mapping_shape_functions);
     
     if (Dim == 3)
-      dphidzeta_map.resize (n_mapping_shape_functions);
+      this->dphidzeta_map.resize (n_mapping_shape_functions);
     
     for (unsigned int i=0; i<n_approx_shape_functions; i++)
       {
-	phi[i].resize         (n_qp);
-	dphi[i].resize        (n_qp);
-	dphidx[i].resize      (n_qp);
-	dphidy[i].resize      (n_qp);
-	dphidz[i].resize      (n_qp);
+	this->phi[i].resize         (n_qp);
+	this->dphi[i].resize        (n_qp);
+	this->dphidx[i].resize      (n_qp);
+	this->dphidy[i].resize      (n_qp);
+	this->dphidz[i].resize      (n_qp);
       }
        
     for (unsigned int i=0; i<n_mapping_shape_functions; i++)
       {
-	phi_map[i].resize         (n_qp);
-	dphidxi_map[i].resize     (n_qp);
+	this->phi_map[i].resize         (n_qp);
+	this->dphidxi_map[i].resize     (n_qp);
 	   
 	if (Dim > 1)
-	  dphideta_map[i].resize  (n_qp);
+	  this->dphideta_map[i].resize  (n_qp);
 	   
 	if (Dim == 3)
-	  dphidzeta_map[i].resize (n_qp);
+	  this->dphidzeta_map[i].resize (n_qp);
       }
   }
 
@@ -110,15 +111,15 @@ void FEXYZ<Dim>::init_shape_functions(const std::vector<Point>& qp,
   // returned
 
  {
-    weight.resize  (n_qp);
-    dweight.resize (n_qp);
-    dphase.resize  (n_qp);
+    this->weight.resize  (n_qp);
+    this->dweight.resize (n_qp);
+    this->dphase.resize  (n_qp);
     
     for (unsigned int p=0; p<n_qp; p++)
       {
-        weight[p] = 1.;
-	dweight[p].zero();
-	dphase[p].zero();
+        this->weight[p] = 1.;
+	this->dweight[p].zero();
+	this->dphase[p].zero();
       }
 
  }
@@ -138,8 +139,8 @@ void FEXYZ<Dim>::init_shape_functions(const std::vector<Point>& qp,
 	for (unsigned int i=0; i<n_mapping_shape_functions; i++)
 	  for (unsigned int p=0; p<n_qp; p++)
 	    {
-	      phi_map[i][p]      = FE<Dim,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[p]);
-	      dphidxi_map[i][p]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
+	      this->phi_map[i][p]     = FE<Dim,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[p]);
+	      this->dphidxi_map[i][p] = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
 	    }
 		
 	break;
@@ -156,9 +157,9 @@ void FEXYZ<Dim>::init_shape_functions(const std::vector<Point>& qp,
 	for (unsigned int i=0; i<n_mapping_shape_functions; i++)
 	  for (unsigned int p=0; p<n_qp; p++)
 	    {
-	      phi_map[i][p]      = FE<Dim,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[p]);
-	      dphidxi_map[i][p]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
-	      dphideta_map[i][p] = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 1, qp[p]);
+	      this->phi_map[i][p]      = FE<Dim,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[p]);
+	      this->dphidxi_map[i][p]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
+	      this->dphideta_map[i][p] = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 1, qp[p]);
 	    }
 			
        	break;
@@ -175,10 +176,10 @@ void FEXYZ<Dim>::init_shape_functions(const std::vector<Point>& qp,
 	for (unsigned int i=0; i<n_mapping_shape_functions; i++)
 	  for (unsigned int p=0; p<n_qp; p++)
 	    {
-	      phi_map[i][p]       = FE<Dim,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[p]);
-	      dphidxi_map[i][p]   = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
-	      dphideta_map[i][p]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 1, qp[p]);
-	      dphidzeta_map[i][p] = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 2, qp[p]);
+	      this->phi_map[i][p]       = FE<Dim,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[p]);
+	      this->dphidxi_map[i][p]   = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
+	      this->dphideta_map[i][p]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 1, qp[p]);
+	      this->dphidzeta_map[i][p] = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 2, qp[p]);
 	    }
 			
 	break;
@@ -212,21 +213,21 @@ void FEXYZ<Dim>::compute_shape_functions (const Elem* elem)
   const std::vector<Point>& xyz = this->get_xyz();
   
   // Compute the value of the derivative shape function i at quadrature point p
-  switch (dim)
+  switch (this->dim)
     {
       
     case 1:
       {
-	for (unsigned int i=0; i<phi.size(); i++)
-	  for (unsigned int p=0; p<phi[i].size(); p++)
+	for (unsigned int i=0; i<this->phi.size(); i++)
+	  for (unsigned int p=0; p<this->phi[i].size(); p++)
 	    {
-	      phi[i][p] = FE<Dim,XYZ>::shape (elem, this->get_order(), i, xyz[p]);
+	      this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->get_order(), i, xyz[p]);
 	      
-	      dphi[i][p](0) =
-		dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 0, xyz[p]);
+	      this->dphi[i][p](0) =
+		this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 0, xyz[p]);
 	      
-	      dphi[i][p](1) = dphidy[i][p] = 0.;
-	      dphi[i][p](2) = dphidz[i][p] = 0.;
+	      this->dphi[i][p](1) = this->dphidy[i][p] = 0.;
+	      this->dphi[i][p](2) = this->dphidz[i][p] = 0.;
 	    }
 
 	// All done
@@ -235,21 +236,21 @@ void FEXYZ<Dim>::compute_shape_functions (const Elem* elem)
 
     case 2:
       {
-	for (unsigned int i=0; i<phi.size(); i++)
-	  for (unsigned int p=0; p<phi[i].size(); p++)
+	for (unsigned int i=0; i<this->phi.size(); i++)
+	  for (unsigned int p=0; p<this->phi[i].size(); p++)
 	    {
-	      phi[i][p] = FE<Dim,XYZ>::shape (elem, this->get_order(), i, xyz[p]);
+	      this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->get_order(), i, xyz[p]);
 
-	      dphi[i][p](0) =
-		dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 0, xyz[p]);
+	      this->dphi[i][p](0) =
+		this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 0, xyz[p]);
 	      
-	      dphi[i][p](1) =
-		dphidy[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 1, xyz[p]);
+	      this->dphi[i][p](1) =
+		this->dphidy[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 1, xyz[p]);
 	      
 #if DIM == 3  
-	      dphi[i][p](2) = // can only assign to the Z component if DIM==3
+	      this->dphi[i][p](2) = // can only assign to the Z component if DIM==3
 #endif
-		dphidz[i][p] = 0.;
+		this->dphidz[i][p] = 0.;
 	    }
 
 	// All done
@@ -258,19 +259,19 @@ void FEXYZ<Dim>::compute_shape_functions (const Elem* elem)
     
     case 3:
       {
-	for (unsigned int i=0; i<phi.size(); i++)
-	  for (unsigned int p=0; p<phi[i].size(); p++)
+	for (unsigned int i=0; i<this->phi.size(); i++)
+	  for (unsigned int p=0; p<this->phi[i].size(); p++)
 	    {
-	      phi[i][p] = FE<Dim,XYZ>::shape (elem, this->get_order(), i, xyz[p]);
+	      this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->get_order(), i, xyz[p]);
 	       
-	      dphi[i][p](0) =
-		dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 0, xyz[p]);
+	      this->dphi[i][p](0) =
+		this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 0, xyz[p]);
 		
-	      dphi[i][p](1) =
-		dphidy[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 1, xyz[p]);
+	      this->dphi[i][p](1) =
+		this->dphidy[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 1, xyz[p]);
 		
-	      dphi[i][p](2) =
-		dphidz[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 2, xyz[p]);	      
+	      this->dphi[i][p](2) =
+		this->dphidz[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 2, xyz[p]);	      
 	    }
 
 	// All done

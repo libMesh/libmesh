@@ -1,4 +1,4 @@
-// $Id: transient_system.h,v 1.1 2004-01-03 15:37:42 benkirk Exp $
+// $Id: transient_system.h,v 1.2 2004-04-25 05:43:33 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -165,7 +165,7 @@ inline
 Number TransientSystem<Base>::old_solution (const unsigned int global_dof_number) const
 {
   // Check the sizes
-  assert (global_dof_number < _dof_map.n_dofs());
+  assert (global_dof_number < this->_dof_map.n_dofs());
   assert (global_dof_number < old_local_solution->size());
    
   return (*old_local_solution)(global_dof_number);
@@ -178,7 +178,7 @@ inline
 Number TransientSystem<Base>::older_solution (const unsigned int global_dof_number) const
 {
   // Check the sizes
-  assert (global_dof_number < _dof_map.n_dofs());
+  assert (global_dof_number < this->_dof_map.n_dofs());
   assert (global_dof_number < older_local_solution->size());
    
   return (*older_local_solution)(global_dof_number);
