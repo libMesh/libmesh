@@ -1,4 +1,4 @@
-// $Id: numeric_vector.h,v 1.6 2004-08-20 14:00:22 jwpeterson Exp $
+// $Id: numeric_vector.h,v 1.7 2004-10-15 00:39:41 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -301,7 +301,7 @@ public:
    * and a \p NumericVector \p V to \p this, where \p this=U.
    */
   virtual void add_vector (const NumericVector<T> &,
-			   SparseMatrix<T> &) = 0;
+			   const SparseMatrix<T> &) = 0;
       
   /**
    * \f$ U+=V \f$ where U and V are type 

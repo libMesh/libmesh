@@ -1,4 +1,4 @@
-// $Id: laspack_vector.C,v 1.25 2004-03-24 05:49:12 jwpeterson Exp $
+// $Id: laspack_vector.C,v 1.26 2004-10-15 00:39:42 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -123,17 +123,18 @@ void LaspackVector<T>::add (const T a, const NumericVector<T>& v_in)
 
 template <typename T> 
 void LaspackVector<T>::add_vector (const NumericVector<T> &vec_in,
-				   SparseMatrix<T> &mat_in)
+				   const SparseMatrix<T>  &mat_in)
 {
   // Convert from input types
   const LaspackVector<T>* vec = dynamic_cast<const LaspackVector<T>*>(&vec_in);
-  LaspackMatrix<T>*       mat = dynamic_cast<LaspackMatrix<T>*>      (&mat_in);
+  const LaspackMatrix<T>* mat = dynamic_cast<const LaspackMatrix<T>*>(&mat_in);
 
   assert (vec != NULL);
   assert (mat != NULL);
   
   // += mat*vec
-  AddAsgn_VV (&_vec, Mul_QV(&mat->_QMat, const_cast<QVector*>(&vec->_vec)));
+  AddAsgn_VV (&_vec, Mul_QV(const_cast<QMatrix*>(&mat->_QMat),
+			    const_cast<QVector*>(&vec->_vec)));
 }
 
 

@@ -1,4 +1,4 @@
-// $Id: laspack_vector.h,v 1.3 2004-08-05 15:58:42 jwpeterson Exp $
+// $Id: laspack_vector.h,v 1.4 2004-10-15 00:39:41 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -281,7 +281,7 @@ class LaspackVector : public NumericVector<T>
    * and a \p NumericVector \p V to \p this, where \p this=U.
    */
   void add_vector (const NumericVector<T> &,
-		   SparseMatrix<T> &);
+		   const SparseMatrix<T> &);
       
   /**
    * \f$U+=V \f$ where U and V are type 
