@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex16.C,v 1.6 2003-01-24 21:19:53 jwpeterson Exp $
+// $Id: cell_inf_hex16.C,v 1.7 2003-01-25 01:42:46 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -27,8 +27,8 @@
 // Local includes cont'd
 #include "mesh.h"
 #include "cell_inf_hex16.h"
-
-
+#include "face_quad8.h"
+#include "face_inf_quad6.h"
 
 
 // ------------------------------------------------------------
@@ -44,7 +44,7 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i) const
     {
     case 0:  // the face at z=0
       {
-	AutoPtr<Elem> face(Elem::build(QUAD8));
+	AutoPtr<Elem> face(new Quad8);
 
 	face->set_node(0) = get_node(0);
 	face->set_node(1) = get_node(1);
@@ -70,7 +70,7 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i) const
 
     case 1:  // the face at y = 0
       {
-	AutoPtr<Elem> face(Elem::build(INFQUAD6));
+	AutoPtr<Elem> face(new InfQuad6);
 
 	face->set_node(0) = get_node(0);
 	face->set_node(1) = get_node(1);
@@ -84,7 +84,7 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i) const
 
     case 2:  // the face at x=1
       {
-	AutoPtr<Elem> face(Elem::build(INFQUAD6));
+	AutoPtr<Elem> face(new InfQuad6);
 
 	face->set_node(0) = get_node(1);
 	face->set_node(1) = get_node(2);
@@ -97,7 +97,7 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i) const
       };
     case 3: // the face at y=1
       {
-	AutoPtr<Elem> face(Elem::build(INFQUAD6));
+	AutoPtr<Elem> face(new InfQuad6);
 	
 	face->set_node(0) = get_node(2);
 	face->set_node(1) = get_node(3);
@@ -110,7 +110,7 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i) const
       };
     case 4: // the face at x=0
       {
-	AutoPtr<Elem> face(Elem::build(INFQUAD6));
+	AutoPtr<Elem> face(new InfQuad6);
 
 	face->set_node(0) = get_node(3);
 	face->set_node(1) = get_node(0);

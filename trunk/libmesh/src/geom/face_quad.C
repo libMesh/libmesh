@@ -1,4 +1,4 @@
-// $Id: face_quad.C,v 1.5 2003-01-24 17:24:43 jwpeterson Exp $
+// $Id: face_quad.C,v 1.6 2003-01-25 01:42:46 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,7 +23,7 @@
 
 // Local includes
 #include "face_quad.h"
-
+#include "edge_edge2.h"
 
 
 // ------------------------------------------------------------
@@ -32,7 +32,7 @@ AutoPtr<Elem> Quad::side (const unsigned int i) const
 {
   assert (i < n_sides());
 
-  AutoPtr<Elem> edge(Elem::build(EDGE2));
+  AutoPtr<Elem> edge(new Edge2);
 
   switch (i)
     {

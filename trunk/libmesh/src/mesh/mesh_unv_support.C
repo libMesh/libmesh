@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.C,v 1.5 2003-01-24 17:24:44 jwpeterson Exp $
+// $Id: mesh_unv_support.C,v 1.6 2003-01-25 01:42:46 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,8 +24,14 @@
 
 // Local includes
 #include "mesh_unv_support.h"
-
-
+#include "face_quad4.h"
+#include "face_tri3.h"
+#include "face_tri6.h"
+#include "face_quad8.h"
+#include "cell_tet4.h"
+#include "cell_hex8.h"
+#include "cell_hex20.h"
+#include "cell_tet10.h"
 
 //-----------------------------------------------------------------------------
 // Mesh methods
@@ -543,7 +549,7 @@ void UnvInterface::element_in()
 	
 	case 41: // Plane Stress Linear Triangle
 	case 91: // Thin Shell   Linear Triangle
-	  elements[i]=Elem::build(TRI3);  // add new element
+	  elements[i]=new Tri3;  // add new element
 	  assign_elm_nodes[1]=0;
 	  assign_elm_nodes[2]=2;
 	  assign_elm_nodes[3]=1;
@@ -551,7 +557,7 @@ void UnvInterface::element_in()
 	
 	case 42: // Plane Stress Quadratic Triangle
 	case 92: // Thin Shell   Quadratic Triangle
-	  elements[i]=Elem::build(TRI6);  // add new element
+	  elements[i]=new Tri6;  // add new element
 	  assign_elm_nodes[1]=0;
 	  assign_elm_nodes[2]=5;
 	  assign_elm_nodes[3]=2;
@@ -570,7 +576,7 @@ void UnvInterface::element_in()
 	
 	case 44: // Plane Stress Linear Quadrilateral
 	case 94: // Thin Shell   Linear Quadrilateral
-	  elements[i]=Elem::build(QUAD4); // add new element
+	  elements[i]=new Quad4; // add new element
 	  assign_elm_nodes[1]=0;
 	  assign_elm_nodes[2]=3;
 	  assign_elm_nodes[3]=2;
@@ -579,7 +585,7 @@ void UnvInterface::element_in()
 	
 	case 45: // Plane Stress Quadratic Quadrilateral
 	case 95: // Thin Shell   Quadratic Quadrilateral
-	  elements[i]=Elem::build(QUAD8); // add new element
+	  elements[i]=new Quad8; // add new element
 	  assign_elm_nodes[1]=0;
 	  assign_elm_nodes[2]=7;
 	  assign_elm_nodes[3]=3;
@@ -599,7 +605,7 @@ void UnvInterface::element_in()
 	
 	
 	case 111: // Solid Linear Tetrahedron
-	  elements[i]=Elem::build(TET4);  // add new element
+	  elements[i]=new Tet4;  // add new element
 	  assign_elm_nodes[1]=0;
 	  assign_elm_nodes[2]=1;
 	  assign_elm_nodes[3]=2;
@@ -608,7 +614,7 @@ void UnvInterface::element_in()
 
 	
 	case 115: // Solid Linear Brick
-	  elements[i]=Elem::build(HEX8);  // add new element
+	  elements[i]=new Hex8;  // add new element
 	  assign_elm_nodes[1]=0;
 	  assign_elm_nodes[2]=4;
 	  assign_elm_nodes[3]=5;
@@ -621,7 +627,7 @@ void UnvInterface::element_in()
 	
 	
 	case 116: // Solid Quadratic Brick
-	  elements[i]=Elem::build(HEX20); // add new element
+	  elements[i]=new Hex20; // add new element
 	  assign_elm_nodes[1]=0;
 	  assign_elm_nodes[2]=12;
 	  assign_elm_nodes[3]=4;
@@ -655,7 +661,7 @@ void UnvInterface::element_in()
 
 	
 	case 118: // Solid Parabolic Tetrahedron
-	  elements[i]=Elem::build(TET10); // add new element
+	  elements[i]=new Tet10; // add new element
 	  assign_elm_nodes[1]=0;
 	  assign_elm_nodes[2]=4;
 	  assign_elm_nodes[3]=1;

@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.6 2003-01-24 21:19:51 jwpeterson Exp $
+// $Id: elem.h,v 1.7 2003-01-25 01:42:45 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -509,11 +509,12 @@ class Elem : public ReferenceCountedObject<Elem>
 
   /**
    * Make the classes that need to access our build
-   * member friends
+   * member friends.  These classes do not really fit
+   * the profile of what a "friend" should be, but
+   * if we are going to protect the constructor and
+   * the build method, there's no way around it.
    */
-  friend class UnvInterface;
   friend class XdrInterface;
-  friend class MeshBase;
   friend class Mesh;
 };
 
