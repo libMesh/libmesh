@@ -1,4 +1,4 @@
-// $Id: variant_filter_iterator.h,v 1.4 2004-11-09 22:24:32 benkirk Exp $
+// $Id: variant_filter_iterator.h,v 1.5 2004-11-09 22:40:03 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -98,8 +98,14 @@ private:
      */
     virtual IterBase* clone() const
     {
+#ifdef __SUNPRO_CC      
       variant_filter_iterator::Iter<IterType> *copy = 
 	new variant_filter_iterator::Iter<IterType>(iter_data);
+#else
+      Iter<IterType> *copy = 
+	new Iter<IterType>(iter_data);      
+#endif
+      
       return copy;
     }
 
@@ -127,9 +133,13 @@ private:
      */
     virtual bool equal(const IterBase *other) const
     {
+#if defined(__SUNPRO_CC) || (defined(__GNUC__) && (__GNUC__ < 3)  && !defined(__INTEL_COMPILER))
       const variant_filter_iterator::Iter<IterType>* p = 
 	dynamic_cast<const variant_filter_iterator::Iter<IterType>*>(other);
-      
+#else      
+      const Iter<IterType>* p = 
+	dynamic_cast<const Iter<IterType>*>(other);      
+#endif
       // Check for failed cast
       if (p == NULL)
 	{
@@ -172,8 +182,14 @@ private:
      */
     virtual PredBase* clone() const
     {
+#ifdef __SUNPRO_CC
       variant_filter_iterator::Pred<IterType,PredType> *copy = 
 	new variant_filter_iterator::Pred<IterType,PredType>(pred_data);
+#else
+      Pred<IterType,PredType> *copy = 
+	new Pred<IterType,PredType>(pred_data);
+#endif
+      
       return copy;
     }
     
@@ -185,8 +201,13 @@ private:
       assert (in != NULL);
       
       // Attempt downcast
+#if defined(__SUNPRO_CC) || (defined(__GNUC__) && (__GNUC__ < 3)  && !defined(__INTEL_COMPILER))
       const variant_filter_iterator::Iter<IterType>* p =
 	dynamic_cast<const variant_filter_iterator::Iter<IterType>* >(in);
+#else
+      const Iter<IterType>* p =
+	dynamic_cast<const Iter<IterType>* >(in);
+#endif
       
       // Check for failure
       if ( p == NULL )
