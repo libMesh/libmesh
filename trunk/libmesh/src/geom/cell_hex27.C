@@ -1,7 +1,7 @@
-// $Id: cell_hex27.C,v 1.25 2005-02-19 19:06:59 roystgnr Exp $
+// $Id: cell_hex27.C,v 1.26 2005-02-22 22:17:38 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

@@ -1,7 +1,7 @@
-// $Id: side.h,v 1.2 2005-01-28 19:14:16 benkirk Exp $
+// $Id: side.h,v 1.3 2005-02-22 22:17:33 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -43,8 +43,8 @@ class Node;
  * does not store any.
  *
  * \author  Benjamin S. Kirk
- * \date    $Date: 2005-01-28 19:14:16 $
- * \version $Revision: 1.2 $
+ * \date    $Date: 2005-02-22 22:17:33 $
+ * \version $Revision: 1.3 $
  */
 
 // ------------------------------------------------------------

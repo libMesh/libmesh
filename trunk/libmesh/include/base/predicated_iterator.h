@@ -1,7 +1,7 @@
-// $Id: predicated_iterator.h,v 1.6 2004-10-14 22:56:09 benkirk Exp $
+// $Id: predicated_iterator.h,v 1.7 2005-02-22 22:17:30 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -35,7 +35,7 @@
  * predicate.  Thanks to Michael, Bill, and Ben
  * for fine tuning.
  *
- * \author John W. Peterson, 2002-2004
+ * \author John W. Peterson, 2002-2005
  */
 template <class T>
 

@@ -1,7 +1,7 @@
-// $Id: mesh_base.h,v 1.38 2004-11-22 21:32:35 jwpeterson Exp $
+// $Id: mesh_base.h,v 1.39 2005-02-22 22:17:33 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -62,8 +62,8 @@ class EquationSystems;
  * mesh to disk in various formats.
  *
  * \author  Benjamin S. Kirk
- * \date    $Date: 2004-11-22 21:32:35 $
- * \version $Revision: 1.38 $
+ * \date    $Date: 2005-02-22 22:17:33 $
+ * \version $Revision: 1.39 $
  */
 
 
