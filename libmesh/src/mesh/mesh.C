@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.22 2003-08-27 02:51:33 jwpeterson Exp $
+// $Id: mesh.C,v 1.23 2003-08-27 21:22:22 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -256,7 +256,7 @@ void Mesh::create_pid_mesh(Mesh& pid_mesh,
   // Create iterators to loop over the list of elements
   const_active_pid_elem_iterator       it(this->elements_begin(),   pid);
   const const_active_pid_elem_iterator it_end(this->elements_end(), pid);
-
+    
   this->create_submesh (pid_mesh, it, it_end);
 }
 
@@ -322,7 +322,16 @@ void Mesh::create_submesh (Mesh& new_mesh,
 	    
 	  new_elem->set_node(n) = new_mesh.node_ptr (new_node_numbers[old_elem->node(n)]);
 	}
-    }
+
+      // Maybe add boundary conditions for this element
+      for (unsigned int s=0; s<old_elem->n_sides(); s++)
+	if (old_elem->neighbor(s) == NULL)
+	  if (this->boundary_info.boundary_id (old_elem, s) !=
+	      this->boundary_info.invalid_id)
+	    new_mesh.boundary_info.add_side (new_elem,
+					     s,
+					     this->boundary_info.boundary_id (old_elem, s));
+    } // end loop over elements
   
 
   // Prepare the new_mesh for use
