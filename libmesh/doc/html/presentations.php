@@ -20,9 +20,9 @@
     <li> <a href="http://cfdlab.ae.utexas.edu/~benkirk/libmesh_uwa03.pdf">libMesh Presentation</a> (from the June 2003 UWA Shortcourse)</li>
     <li> <a href="http://cfdlab.ae.utexas.edu/~benkirk/applications_uwa03.pdf">AMR Applications</a> (from the June 2003 UWA Shortcourse)</li>
   </ul>
-  <li> USNCCM VII </li>
+  <li> <a href="http://usnccm.sandia.gov/mslist/upload/IncomprssblCFD/2230_Final_abstract.pdf">USNCCM VII</a> conference abstract. </li>
   <li> ICIAM </li>
-  <li> SAVIAC </li>
+  <li>  <a href="http://www.saviac.org/74th_Symposium/abstracts/U040.htm">SAVIAC</a> conference abstract.</li>
 </ul>
 </div>
 
