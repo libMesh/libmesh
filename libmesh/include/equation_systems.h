@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.25 2003-05-22 18:31:18 ddreyer Exp $
+// $Id: equation_systems.h,v 1.26 2003-06-04 01:30:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,11 +30,11 @@
 
 // Local Includes
 #include "mesh_common.h"
+#include "mesh.h"
 #include "data_map.h"
 #include "enum_xdr_mode.h"
 
 // Forward Declarations
-class Mesh;
 class SystemBase;
 
 // HP aCC needs these for some reason
@@ -160,17 +160,16 @@ public:
   
   /**
    * Add the system of type \p system_type named \p name to the
-   * systems array. Must be overloaded in the derived classes.
+   * systems array.
    */
   void add_system (const std::string& system_type,
 		   const std::string& name);
   
   /**
    * Add the system named \p name to the systems array.
-   * Must be overloaded in the derived classes.
    */
   template <typename T_sys>
-  void add_system (const std::string& name);
+  T_sys& add_system (const std::string& name);
   
   /**
    * Remove the system named \p name from the systems array.
