@@ -1,4 +1,4 @@
-// $Id: tree_node.C,v 1.10 2004-01-03 15:37:44 benkirk Exp $
+// $Id: tree_node.C,v 1.11 2004-03-22 22:41:46 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -30,32 +30,69 @@
 // ------------------------------------------------------------
 // TreeNode class methods
 template <unsigned int N>
-void TreeNode<N>::insert (const unsigned int n)
+void TreeNode<N>::insert (const Node* nd)
 {
-  assert (n < mesh.n_nodes());
+  assert (nd != NULL);
+  assert (nd->id() < mesh.n_nodes());
+
+  // Return if we don't bound the node
+  if (!this->bounds_node(nd))
+    return;
   
-  // Only consider the node for addition
-  // if we are active
-  if (active())
+  // Only add the node if we are active
+  if (this->active())
     {
-      // Only add the node if we bound it
-      if (bounds_node(n))
-	node_numbers.push_back (n);
+      nodes.push_back (nd);
+
+      // Refine ourself if we reach the target bin size for a TreeNode.
+      if (nodes.size() == tgt_bin_size)
+	this->refine();
     }
-    
+  
   // If we are not active simply pass the node along to
   // our children
   else
     {
-      for (unsigned int c=0; c<children.size(); c++)
-	children[c]->insert (n);
+      assert (children.size() == N);
+      
+      for (unsigned int c=0; c<N; c++)
+	children[c]->insert (nd);
     }
+}
 
-  // Refine ourself if we exceed the maximim 
-  // number of nodes in a TreeNode.
-  if (node_numbers.size() > max_level)
+
+
+template <unsigned int N>
+void TreeNode<N>::insert (const Elem* elem)
+{
+  assert (elem != NULL);
+
+  // Get the element centroid.  This will be used to test
+  // if the element is in our bounding box.
+  const Point p = elem->centroid();
+  
+  // Return if we don't bound any of the element's nodes
+  if (!this->bounds_point(p))
+    return;
+  
+  // Only add the element if we are active
+  if (this->active())
     {
-      refine();
+      elements.push_back (elem);
+
+      // Refine ourself if we reach the target bin size for a TreeNode.
+      if (elements.size() == tgt_bin_size)
+	this->refine();
+    }
+  
+  // If we are not active simply pass the element along to
+  // our children
+  else
+    {
+      assert (children.size() == N);
+      
+      for (unsigned int c=0; c<N; c++)
+	children[c]->insert (elem);
     }
 }
 
@@ -64,23 +101,31 @@ void TreeNode<N>::insert (const unsigned int n)
 template <unsigned int N>
 void TreeNode<N>::refine ()
 {
+  // Huh?  better be active...
+  assert (this->active());
+  assert (children.empty());
+  
   // A TreeNode<N> has by definition N children
   children.resize(N);
 
-  for (unsigned int c=0; c<children.size(); c++)
+  for (unsigned int c=0; c<N; c++)
     {
       // Create the child and set its bounding box.
-      children[c] = new TreeNode<N> (mesh, max_level, this);
-      children[c]->set_bounding_box(create_bounding_box(c));
+      children[c] = new TreeNode<N> (mesh, tgt_bin_size, this);
+      children[c]->set_bounding_box(this->create_bounding_box(c));
 
       // Pass off our nodes to our children
-      for (unsigned int node=0; node<node_numbers.size(); node++)
-	if (children[c]->bounds_node(node_numbers[node]))
-	  children[c]->insert(node_numbers[node]);
+      for (unsigned int n=0; n<nodes.size(); n++)
+	children[c]->insert(nodes[n]);
+
+      // Pass off our elements to our children
+      for (unsigned int e=0; e<elements.size(); e++)
+	children[c]->insert(elements[e]);
     }
 
-  // We don't need to store any nodes any more
-  node_numbers.clear(); 
+  // We don't need to store nodes or elements any more,
+  // they have been added to the children.
+  nodes.clear();
   elements.clear();
 }
 
@@ -107,10 +152,8 @@ bool TreeNode<N>::bounds_point (const Point& p) const
       
       (p(0) <= max(0)) &&
       (p(1) <= max(1)) &&
-      (p(2) <= max(2))
-      )
-    return true;
-   
+      (p(2) <= max(2)))
+    return true;   
 
   return false;
 }
@@ -147,7 +190,7 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
 	    {
 	      const Point min(xmin, ymin, zmin);
 	      const Point max(xc,   yc,   zc);
-	      return std::pair<Point, Point> (min, max);
+	      return std::make_pair (min, max);
 	      break;
 	    }
 
@@ -155,7 +198,7 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
 	    {
 	      const Point min(xc,   ymin, zmin);
 	      const Point max(xmax, yc,   zc);
-	      return std::pair<Point, Point> (min, max);
+	      return std::make_pair (min, max);
 	      break;
 	    }
 
@@ -163,7 +206,7 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
 	    {
 	      const Point min(xmin, yc,   zmin);
 	      const Point max(xc,   ymax, zc);
-	      return std::pair<Point, Point> (min, max);
+	      return std::make_pair (min, max);
 	      break;
 	    }
 
@@ -171,7 +214,7 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
 	    {
 	      const Point min(xc,   yc,   zmin);
 	      const Point max(xmax, ymax, zc);
-	      return std::pair<Point, Point> (min, max);
+	      return std::make_pair (min, max);
 	      break;
 	    }
 
@@ -179,7 +222,7 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
 	    {
 	      const Point min(xmin, ymin, zc);
 	      const Point max(xc,   yc,   zmax);
-	      return std::pair<Point, Point> (min, max);
+	      return std::make_pair (min, max);
 	      break;
 	    }
 
@@ -187,7 +230,7 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
 	    {
 	      const Point min(xc,   ymin, zc);
 	      const Point max(xmax, yc,   zmax);
-	      return std::pair<Point, Point> (min, max);
+	      return std::make_pair (min, max);
 	      break;
 	    }
 
@@ -195,7 +238,7 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
 	    {
 	      const Point min(xmin, yc,   zc);
 	      const Point max(xc,   ymax, zmax);
-	      return std::pair<Point, Point> (min, max);
+	      return std::make_pair (min, max);
 	      break;
 	    }
 
@@ -203,12 +246,13 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
 	    {
 	      const Point min(xc,   yc,   zc);
 	      const Point max(xmax, ymax, zmax);
-	      return std::pair<Point, Point> (min, max);
+	      return std::make_pair (min, max);
 	      break;
 	    }
     
 	  default:
-	    std::cerr << "c >= N!" << std::endl;
+	    std::cerr << "c >= N! : " << c
+		      << std::endl;
 	    error();
 	  }
 
@@ -235,7 +279,7 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
 	    {
 	      const Point min(xmin, ymin);
 	      const Point max(xc,   yc);
-	      return std::pair<Point, Point> (min, max);
+	      return std::make_pair (min, max);
 	      break;
 	    }
 
@@ -243,7 +287,7 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
 	    {
 	      const Point min(xc,   ymin);
 	      const Point max(xmax, yc);
-	      return std::pair<Point, Point> (min, max);
+	      return std::make_pair (min, max);
 	      break;
 	    }
 
@@ -251,7 +295,7 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
 	    {
 	      const Point min(xmin, yc);
 	      const Point max(xc,   ymax);
-	      return std::pair<Point, Point> (min, max);
+	      return std::make_pair (min, max);
 	      break;
 	    }
 
@@ -259,7 +303,7 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
 	    {
 	      const Point min(xc,   yc);
 	      const Point max(xmax, ymax);
-	      return std::pair<Point, Point> (min, max);
+	      return std::make_pair (min, max);
 	      break;
 	    }
 	    
@@ -281,9 +325,8 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
   // How did we get here?
   error();
 
-  Point min, max;
-  
-  return std::pair<Point, Point> (min, max);
+  Point min, max;  
+  return std::make_pair (min, max);
 }
 
 
@@ -291,12 +334,12 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
 template <unsigned int N>
 void TreeNode<N>::print_nodes() const
 {
-  if (active())
+  if (this->active())
     {
-      std::cout << "TreeNode Level: " << level() << std::endl;
+      std::cout << "TreeNode Level: " << this->level() << std::endl;
       
-      for (unsigned int node=0; node<node_numbers.size(); node++)
-	std::cout << " " << node_numbers[node];
+      for (unsigned int n=0; n<nodes.size(); n++)
+	std::cout << " " << nodes[n]->id();
       
       std::cout << std::endl << std::endl;
 	
@@ -313,11 +356,11 @@ void TreeNode<N>::print_nodes() const
 template <unsigned int N>
 void TreeNode<N>::print_elements() const
 {
-  if (active())
+  if (this->active())
     {
-      std::cout << "TreeNode Level: " << level() << std::endl;
+      std::cout << "TreeNode Level: " << this->level() << std::endl;
      
-      for (std::vector<Elem*>::const_iterator pos=elements.begin();
+      for (std::vector<const Elem*>::const_iterator pos=elements.begin();
 	   pos != elements.end(); ++pos)
 	std::cout << " " << *pos;
 
@@ -333,44 +376,42 @@ void TreeNode<N>::print_elements() const
 
 
 template <unsigned int N>
-void TreeNode<N>::transform_nodes_to_elements (std::vector<std::vector<unsigned int> >& nodes_to_elem)
+void TreeNode<N>::transform_nodes_to_elements (std::vector<std::vector<const Elem*> >& nodes_to_elem)
 {
-   if (active())
+   if (this->active())
     {
       elements.clear();
 
       // Temporarily use a set. Since multiple nodes
       // will likely map to the same element we use a
       // set to eliminate the duplication.
-      std::set<Elem*> elements_set;
+      std::set<const Elem*> elements_set;
       
-      for (unsigned int node=0; node<node_numbers.size(); node++)
+      for (unsigned int n=0; n<nodes.size(); n++)
 	{
 	  // the actual global node number we are replacing
 	  // with the connected elements
-	  const unsigned int node_number = node_numbers[node];
+	  const unsigned int node_number = nodes[n]->id();
 
 	  assert (node_number < mesh.n_nodes());
 	  assert (node_number < nodes_to_elem.size());
 	  
 	  for (unsigned int e=0; e<nodes_to_elem[node_number].size(); e++)
-	    elements_set.insert(mesh.elem(nodes_to_elem[node_number][e]));
+	    elements_set.insert(nodes_to_elem[node_number][e]);
 	}
 
-      // Done with the node numbers.
-      node_numbers.clear();
+      // Done with the nodes.
+      nodes.clear();
 
       // Now the set is built.  We can copy this to the
       // vector.  Note that the resulting vector will 
       // already be sorted, and will require less memory
       // than the set.
-      elements.resize(elements_set.size());
+      elements.reserve(elements_set.size());
 
-      unsigned int cnt=0;		      
-
-      for (std::set<Elem*>::iterator pos=elements_set.begin();
+      for (std::set<const Elem*>::iterator pos=elements_set.begin();
 	   pos != elements_set.end(); ++pos)
-	elements[cnt++] = *pos;
+	elements.push_back(*pos);
     }
   else
     {
@@ -385,8 +426,9 @@ void TreeNode<N>::transform_nodes_to_elements (std::vector<std::vector<unsigned 
 template <unsigned int N>
 unsigned int TreeNode<N>::n_active_bins() const
 {
-  if (active())
+  if (this->active())
     return 1;
+  
   else
     {
       unsigned int sum=0;
@@ -401,23 +443,25 @@ unsigned int TreeNode<N>::n_active_bins() const
 
 
 template <unsigned int N>
-Elem* TreeNode<N>::find_element(const Point& p) const
+const Elem* TreeNode<N>::find_element(const Point& p) const
 {
-  if (active())
+  if (this->active())
     {
-      // Search the active elements in the active TreeNode.
-      for (std::vector<Elem*>::const_iterator pos=elements.begin();
-	   pos != elements.end(); ++pos)
-	if ((*pos)->active())
-	  if ((*pos)->contains_point(p))
-	    return *pos;
-
+      // Only check our children if the point is in our bounding box.
+      if (this->bounds_point(p))      
+	// Search the active elements in the active TreeNode.
+	for (std::vector<const Elem*>::const_iterator pos=elements.begin();
+	     pos != elements.end(); ++pos)
+	  if ((*pos)->active())
+	    if ((*pos)->contains_point(p))
+	      return *pos;
+      
       // The point was not found in any element
       return NULL;	    
     }
   else
     {
-      return find_element_in_children(p);
+      return this->find_element_in_children(p);
     }
     
 
@@ -432,9 +476,9 @@ Elem* TreeNode<N>::find_element(const Point& p) const
 
 
 template <unsigned int N>
-Elem* TreeNode<N>::find_element_in_children(const Point& p) const
+const Elem* TreeNode<N>::find_element_in_children(const Point& p) const
 {
-  assert (!active());
+  assert (!this->active());
 
   unsigned int excluded_child = libMesh::invalid_uint;
   
@@ -447,14 +491,14 @@ Elem* TreeNode<N>::find_element_in_children(const Point& p) const
       {
 	if (children[c]->active())
 	  {
-	    Elem* e = children[c]->find_element(p);
+	    const Elem* e = children[c]->find_element(p);
 	    
 	    if (e != NULL)
 	      return e;	  
 	  }
 	else
 	  {
-	    Elem* e = children[c]->find_element_in_children(p);
+	    const Elem* e = children[c]->find_element_in_children(p);
 
 	    if (e != NULL)
 	      return e;
@@ -477,14 +521,14 @@ Elem* TreeNode<N>::find_element_in_children(const Point& p) const
     if (c != excluded_child)    
       if (children[c]->active())
 	{
-	  Elem* e = children[c]->find_element(p);
+	  const Elem* e = children[c]->find_element(p);
 	  
 	  if (e != NULL)
 	    return e;	  
 	}
       else
 	{
-	  Elem* e = children[c]->find_element_in_children(p);
+	  const Elem* e = children[c]->find_element_in_children(p);
 	  
 	  if (e != NULL)
 	    return e;

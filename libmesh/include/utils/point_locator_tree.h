@@ -1,4 +1,4 @@
-// $Id: point_locator_tree.h,v 1.3 2004-03-21 07:23:00 jwpeterson Exp $
+// $Id: point_locator_tree.h,v 1.4 2004-03-22 22:41:46 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -106,7 +106,7 @@ protected:
    * Chances are that this may be close to the next call to
    * \p operator()...
    */
-  mutable Elem* _element;
+  mutable const Elem* _element;
 
 };
 

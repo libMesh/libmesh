@@ -1,4 +1,4 @@
-// $Id: tree.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: tree.h,v 1.3 2004-03-22 22:41:46 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -25,11 +25,13 @@
 // C++ includes
 
 // Local includes
+#include "tree_node.h"
 #include "tree_base.h"
 
 
 /**
- * This class defines a tree.
+ * This class defines a tree that may be used for fast point
+ * location in space.
  *
  * @author Benjamin S. Kirk, 2002
  */
@@ -42,9 +44,19 @@ class Tree : public TreeBase
 public:
   
   /**
+   * \p enum defining how to build the tree.  \p NODES will populate
+   * the tree with nodes and then replace the nodes with element
+   * connectivity, \p ELEMENTS will populate the tree with the elements
+   * directly.
+   */
+  enum BuildType {NODES=0,
+		  ELEMENTS,
+		  INVALID_BUILD_TYPE };
+  
+  /**
    * Constructor.  Does nothing at the moment.
    */
-  Tree (const MeshBase& m, const unsigned int level);
+  Tree (const MeshBase& m, const unsigned int level, BuildType bt=NODES);
 
   /**
    * Copy-constructor.
@@ -55,18 +67,19 @@ public:
    * Destructor.
    */
   ~Tree() {}
-
-  /**
-   * Prints the nodes.
-   */
-  void print_nodes() const { std::cout << "Printing nodes...\n"; root.print_nodes(); }
-
-  /**
-   * Prints the nodes.
-   */
-  void print_elements() const { std::cout << "Printing elements...\n"; root.print_elements(); }
   
+  /**
+   * Prints the nodes.
+   */
+  void print_nodes() const
+  { std::cout << "Printing nodes...\n"; root.print_nodes(); }
 
+  /**
+   * Prints the nodes.
+   */
+  void print_elements() const
+  { std::cout << "Printing elements...\n"; root.print_elements(); }
+  
   /**
    * @returns the number of active bins.
    */
@@ -75,14 +88,19 @@ public:
   /**
    * @returns a pointer to the element containing point p.
    */
-  Elem* find_element(const Point& p) const;
-
+  const Elem* find_element(const Point& p) const;
+  
 private:
 
   /**
    * The tree root.
    */
   TreeNode<N> root;
+
+  /**
+   * How the tree is built.
+   */
+  const BuildType build_type;
   
 };
 
@@ -115,27 +133,47 @@ namespace Trees
 // constructor
 template <unsigned int N>
 inline
-Tree<N>::Tree (const MeshBase& m, const unsigned int level) :
+Tree<N>::Tree (const MeshBase& m,
+	       const unsigned int level,
+	       const BuildType bt) :
   TreeBase(m),
-  root(m,level)
+  root(m,level),
+  build_type(bt)
 {
   // Set the root node bounding box equal to the bounding
   // box for the entire domain.
   root.set_bounding_box (mesh.bounding_box());
 
-  // Add all the nodal indices to the root node.  It will 
-  // automagically build the tree for us.
-  for (unsigned int n=0; n<mesh.n_nodes(); ++n)
-    root.insert (n);
 
-  // Now the tree contains the global node numbers.
-  // However, we want element pointers, so here we
-  // convert between the two.
-  std::vector<std::vector<unsigned int> > nodes_to_elem;
+  if (build_type == NODES)
+    {
+      // Add all the nodes to the root node.  It will 
+      // automagically build the tree for us.
+      const_node_iterator       it (mesh.const_nodes_begin());
+      const const_node_iterator end(mesh.const_nodes_end());
+      
+      for (; it != end; ++it)
+	root.insert (*it);
+      
+      // Now the tree contains the nodes.
+      // However, we want element pointers, so here we
+      // convert between the two.
+      std::vector<std::vector<const Elem*> > nodes_to_elem;
+      
+      mesh.build_nodes_to_elem_map (nodes_to_elem);      
+      root.transform_nodes_to_elements (nodes_to_elem);
+    }
 
-  mesh.build_nodes_to_elem_map (nodes_to_elem);
+  else if (build_type == ELEMENTS)
+    {
+      // Add all the elements to the root node.  It will
+      // automagically build the tree for us.
+      const_active_elem_iterator       it (mesh.const_elements_begin());
+      const const_active_elem_iterator end(mesh.const_elements_end());
 
-  root.transform_nodes_to_elements (nodes_to_elem);
+      for (; it != end; ++it)
+	root.insert (*it);
+    }
 }
 
 
@@ -144,8 +182,9 @@ Tree<N>::Tree (const MeshBase& m, const unsigned int level) :
 template <unsigned int N>
 inline
 Tree<N>::Tree (const Tree<N>& other_tree) :
-  TreeBase(other_tree),
-  root(other_tree.root)
+  TreeBase   (other_tree),
+  root       (other_tree.root),
+  build_type (other_tree.build_type)
 {
   error();
 }

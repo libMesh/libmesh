@@ -1,4 +1,4 @@
-// $Id: unv_io.h,v 1.1 2004-03-19 19:16:52 benkirk Exp $
+// $Id: unv_io.h,v 1.2 2004-03-22 22:41:45 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -33,9 +33,14 @@
 
 
 
+/**
+ * The \p UNVIO class implements the Ideas \p UNV universal
+ * file format.  This class enables both reading and writing
+ * \p UNV files.
+ */
 
 // ------------------------------------------------------------
-// MeshIO class definition
+// UNVIO class definition
 class UNVIO : public MeshIO
 {
 

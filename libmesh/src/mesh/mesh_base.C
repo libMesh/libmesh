@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.71 2004-03-21 03:19:25 benkirk Exp $
+// $Id: mesh_base.C,v 1.72 2004-03-22 22:41:46 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -50,11 +50,11 @@
 // ------------------------------------------------------------
 // MeshBase class member functions
 MeshBase::MeshBase (unsigned int d) :
-  boundary_info      (*this),
-  data               (*this),
-  _n_sbd             (1),
-  _dim               (d),
-  _is_prepared       (false)
+  boundary_info (*this),
+  data          (*this),
+  _n_sbd        (1),
+  _dim          (d),
+  _is_prepared  (false)
 {
   assert (DIM <= 3);
   assert (DIM >= _dim);
