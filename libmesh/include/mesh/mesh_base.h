@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.25 2004-06-15 20:17:20 benkirk Exp $
+// $Id: mesh_base.h,v 1.26 2004-08-02 22:08:14 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -25,6 +25,7 @@
 
 
 // C++ Includes   -----------------------------------
+#include <algorithm>
 #include <vector>
 #include <set>
 #include <string>
@@ -61,7 +62,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.25 $
+ * \version $Revision: 1.26 $
  */
 
 
@@ -870,11 +871,16 @@ void MeshBase::delete_elem(Elem* e)
 {
   assert (e != NULL);
 
-  std::vector<Elem*>::iterator pos = find (_elements.begin(),
-					   _elements.end(),
-					   e);
+  std::vector<Elem*>::iterator pos = std::find (_elements.begin(),
+						_elements.end(),
+						e);
 
-  delete e;
+  // Huh? Element not in the vector?
+  assert (pos != _elements.end());
+
+  // delete the element, explicitly invalidate the pointer
+  delete e; e = NULL;
+  
   _elements.erase(pos);
 
   return;
