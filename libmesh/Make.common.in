@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.28 2003-11-05 22:26:31 benkirk Exp $
+# $Id: Make.common.in,v 1.29 2003-11-06 20:30:17 benkirk Exp $
 
 
 ###############################################################################
@@ -109,7 +109,7 @@ enable-optional      = @enableoptional@
 
 #
 # Set the current directory.
-pwd := @PWD@
+libmesh_dir := @PWD@
 ###############################################################################
 
 
@@ -212,7 +212,7 @@ endif
 ###############################################################################
 # The mesh library
 #
-mesh_library_dir := $(pwd)/lib/$(hosttype)_$(METHOD)
+mesh_library_dir := $(libmesh_dir)/lib/$(hosttype)_$(METHOD)
 
 mesh_library     := $(mesh_library_dir)/libmesh.a
 ifeq ($(enable-shared),yes) 
@@ -230,15 +230,15 @@ LIBS += $(mesh_library)
 
 #
 # The include directories for libMesh
-LIBMESH_INCLUDES = -I$(pwd)/include/base \
-                   -I$(pwd)/include/enums \
-                   -I$(pwd)/include/fe \
-                   -I$(pwd)/include/geom \
-                   -I$(pwd)/include/mesh \
-                   -I$(pwd)/include/numerics \
-                   -I$(pwd)/include/partitioning \
-                   -I$(pwd)/include/quadrature \
-                   -I$(pwd)/include/utils
+LIBMESH_INCLUDES = -I$(libmesh_dir)/include/base \
+                   -I$(libmesh_dir)/include/enums \
+                   -I$(libmesh_dir)/include/fe \
+                   -I$(libmesh_dir)/include/geom \
+                   -I$(libmesh_dir)/include/mesh \
+                   -I$(libmesh_dir)/include/numerics \
+                   -I$(libmesh_dir)/include/partitioning \
+                   -I$(libmesh_dir)/include/quadrature \
+                   -I$(libmesh_dir)/include/utils
 
 INCLUDE += $(LIBMESH_INCLUDES)
 
@@ -249,7 +249,7 @@ INCLUDE += $(LIBMESH_INCLUDES)
 
 #
 # Contributed source & libraries
-EXTERNAL_LIBDIR := $(pwd)/contrib/lib/$(hosttype)_$(METHOD)
+EXTERNAL_LIBDIR := $(libmesh_dir)/contrib/lib/$(hosttype)_$(METHOD)
 EXTERNAL_LIBEXT := .a
 ifeq ($(enable-shared),yes) 
   EXTERNAL_LIBEXT := .so
