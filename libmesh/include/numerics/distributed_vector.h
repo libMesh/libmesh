@@ -1,4 +1,4 @@
-// $Id: distributed_vector.h,v 1.1 2003-11-05 22:26:44 benkirk Exp $
+// $Id: distributed_vector.h,v 1.2 2003-12-12 18:57:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -380,7 +380,7 @@ template <typename T>
 inline
 DistributedVector<T>::DistributedVector (const unsigned int n)
 {
-  init(n, n, false);
+  this->init(n, n, false);
 }
 
 
@@ -390,7 +390,7 @@ inline
 DistributedVector<T>::DistributedVector (const unsigned int n,
 					 const unsigned int n_local)
 {
-  init(n, n_local, false);
+  this->init(n, n_local, false);
 }
 
 
@@ -399,7 +399,7 @@ template <typename T>
 inline
 DistributedVector<T>::~DistributedVector ()
 {
-  clear ();
+  this->clear ();
 }
 
 
@@ -414,7 +414,7 @@ void DistributedVector<T>::init (const unsigned int n,
 
   // Clear the data structures if already initialized
   if (this->initialized())
-    clear();
+    this->clear();
     
   // Initialize data structures
   _values.resize(n_local);
@@ -430,11 +430,12 @@ void DistributedVector<T>::init (const unsigned int n,
   MPI_Comm_rank (MPI_COMM_WORLD, &proc_id);
   MPI_Comm_size (MPI_COMM_WORLD, &n_proc);
   
-  std::vector<int> local_sizes(n_proc, 0);
+  std::vector<int> local_sizes     (n_proc, 0);
+  std::vector<int> local_sizes_send(n_proc, 0);
+  
+  local_sizes_send[proc_id] = n_local;
 
-  local_sizes[proc_id] = n_local;
-
-  MPI_Allreduce (&local_sizes[0], &local_sizes[0], local_sizes.size(),
+  MPI_Allreduce (&local_sizes_send[0], &local_sizes[0], local_sizes.size(),
 		 MPI_INT, MPI_SUM, MPI_COMM_WORLD);
   
   // _first_local_index is the sum of _local_size
@@ -452,7 +453,6 @@ void DistributedVector<T>::init (const unsigned int n,
     sum += local_sizes[p];
 
   assert (sum == static_cast<int>(n));
-  assert (sum == static_cast<int>(size()));
   
 #  endif
   
@@ -475,7 +475,7 @@ void DistributedVector<T>::init (const unsigned int n,
 
   // Zero the components unless directed otherwise
   if (!fast)
-    zero();
+    this->zero();
 }
 
 
@@ -485,7 +485,7 @@ inline
 void DistributedVector<T>::init (const unsigned int n,
 				 const bool fast)
 {
-  init(n,n,fast);
+  this->init(n,n,fast);
 }
 
 
