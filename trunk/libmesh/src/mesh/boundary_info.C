@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.31 2004-03-18 16:40:59 jwpeterson Exp $
+// $Id: boundary_info.C,v 1.32 2004-03-24 04:32:59 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -20,13 +20,11 @@
 
 
 // C++ includes
-#include <algorithm>
-#include <fstream>
+
 
 // Local includes
 #include "libmesh_config.h"
 #include "boundary_info.h"
-#include "mesh_base.h"
 #include "boundary_mesh.h"
 
 

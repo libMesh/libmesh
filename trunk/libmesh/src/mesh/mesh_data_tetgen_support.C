@@ -1,4 +1,4 @@
-// $Id: mesh_data_tetgen_support.C,v 1.2 2004-01-03 15:37:43 benkirk Exp $
+// $Id: mesh_data_tetgen_support.C,v 1.3 2004-03-24 04:32:59 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,6 @@
 
 // Local includes
 #include "mesh_data.h"
-#include "mesh_base.h"
 
 
 

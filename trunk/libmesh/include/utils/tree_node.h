@@ -1,4 +1,4 @@
-// $Id: tree_node.h,v 1.4 2004-03-22 22:41:46 benkirk Exp $
+// $Id: tree_node.h,v 1.5 2004-03-24 04:32:59 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -24,12 +24,16 @@
 
 // C++ includes
 #include <set>
+#include <vector>
 
 // Local includes
 #include "libmesh_common.h"
-#include "mesh_base.h"
+#include "point.h"
 
-
+// Forward Declarations
+class MeshBase;
+class Node;
+class Elem;
 
 /**
  * This class defines a node on a tree.  A tree node

@@ -1,4 +1,4 @@
-// $Id: centroid_partitioner.C,v 1.6 2004-01-03 15:37:44 benkirk Exp $
+// $Id: centroid_partitioner.C,v 1.7 2004-03-24 04:32:59 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -22,7 +22,6 @@
 
 // Local includes
 #include "centroid_partitioner.h"
-#include "elem_iterators.h"
 #include "mesh_base.h"
 
 

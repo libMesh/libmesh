@@ -1,4 +1,4 @@
-// $Id: tree.h,v 1.3 2004-03-22 22:41:46 benkirk Exp $
+// $Id: tree.h,v 1.4 2004-03-24 04:32:59 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -27,7 +27,7 @@
 // Local includes
 #include "tree_node.h"
 #include "tree_base.h"
-
+#include "mesh_base.h"
 
 /**
  * This class defines a tree that may be used for fast point
