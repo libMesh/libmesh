@@ -1,4 +1,4 @@
-// $Id: laspack_vector.h,v 1.12 2003-03-23 01:39:11 ddreyer Exp $
+// $Id: laspack_vector.h,v 1.13 2003-04-21 15:22:19 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -577,17 +577,6 @@ void LaspackVector<T>::add_vector (const NumericVector<T>& V,
 
   for (unsigned int i=0; i<V.size(); i++)
     add (dof_indices[i], V(i));
-}
-
-
-
-template <typename T> 
-inline
-void LaspackVector<T>::add_vector (const NumericVector<T> &,
-				   SparseMatrix<T> &)
-{
-  std::cerr << "Not implemented yet!" << std::endl;
-  error();
 }
 
 
