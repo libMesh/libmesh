@@ -1,4 +1,4 @@
-//    $Id: petsc_matrix.h,v 1.21 2003-03-20 11:51:24 ddreyer Exp $
+//    $Id: petsc_matrix.h,v 1.22 2003-03-20 17:19:56 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -484,6 +484,7 @@ void PetscMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 
 
 template <typename T>
+inline
 void PetscMatrix<T>::add (const T _a, SparseMatrix<T> &_X)
 {
   assert (this->initialized());
