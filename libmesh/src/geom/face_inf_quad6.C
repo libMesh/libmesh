@@ -1,4 +1,4 @@
-// $Id: face_inf_quad6.C,v 1.23 2005-02-22 22:17:39 jwpeterson Exp $
+// $Id: face_inf_quad6.C,v 1.24 2005-02-23 04:33:20 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -37,14 +37,14 @@
 
 bool InfQuad6::is_vertex(const unsigned int i) const
 {
-  if (i < 4)
+  if (i < 2)
     return true;
   return false;
 }
 
 bool InfQuad6::is_edge(const unsigned int i) const
 {
-  if (i < 4)
+  if (i < 2)
     return false;
   return true;
 }
