@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.35 2004-04-17 03:02:48 benkirk Exp $
+# $Id: Make.common.in,v 1.36 2004-04-20 11:22:19 benkirk Exp $
 
 
 ###############################################################################
@@ -46,6 +46,7 @@ endif
 # applications
 enable-petsc         = @enablepetsc@
 petsc-version        = @petscversion@
+petsc-major-minor    = @petscmajorminor@
 PETSC_ARCH           = @PETSC_ARCH@
 PETSC_DIR            = @PETSC_DIR@
 
@@ -277,7 +278,7 @@ ifeq ($(enable-optional),yes)
     endif
 
     # Depending on petsc version, we include different files
-    ifeq ($(petsc-version),2.1.*)
+    ifeq ($(petsc-version),2.1.0)
       include $(PETSC_DIR)/bmake/$(PETSC_ARCH)/base.site # 2.1.0 style
     else
       C_CLINKER_SLFLAG = $(RPATHFLAG)# necessary for PETSc 2.1.6
@@ -297,16 +298,16 @@ ifeq ($(enable-optional),yes)
     endif
 
     # Depending on petsc version, we link with different libs :-(
-    ifeq ($(petsc-version),2.1.*)  # 2.1.x style
+    ifeq ($(petsc-major-minor),2.2.x)  # 2.2.x & newer style
       libs-PETSC = -L$(PETSC_LIB) \
-	           -lpetscsles \
+	           -lpetscksp \
 		   -lpetscdm \
 		   -lpetscmat \
 		   -lpetscvec \
 		   -lpetsc
-    else                           # 2.2.0 & newer style
+    else                           # 2.1.6 & older style
       libs-PETSC = -L$(PETSC_LIB) \
-	           -lpetscksp \
+	           -lpetscsles \
 		   -lpetscdm \
 		   -lpetscmat \
 		   -lpetscvec \
