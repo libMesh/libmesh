@@ -1,4 +1,4 @@
-// $Id: centroid_partitioner.h,v 1.1 2003-08-22 19:59:50 jwpeterson Exp $
+// $Id: centroid_partitioner.h,v 1.2 2003-08-23 00:36:08 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -41,7 +41,7 @@ class Elem;
  * define "less than" differently than if you cared about radial
  * distance.
  *
- * @author John W. Peterson, 2003
+ * @author John W. Peterson and Benjamin S. Kirk, 2003
  */
 
 
@@ -94,7 +94,7 @@ private:
 
   /**
    * Partition the list of centroids based on the
-   * x-coordinate of the centroid.  This function provides
+   * x-coordinate of the centroid.  This provides
    * a function which may be passed to the std::sort
    * routine for sorting the elements by centroid.
    */
@@ -103,7 +103,7 @@ private:
 
   /**
    * Partition the list of centroids based on the
-   * y-coordinate of the centroid.  This function provides
+   * y-coordinate of the centroid.  This  provides
    * a function which may be passed to the std::sort
    * routine for sorting the elements by centroid.
    */
@@ -112,7 +112,7 @@ private:
 
   /**
    * Partition the list of centroids based on the
-   * z-coordinate of the centroid.  This function provides
+   * z-coordinate of the centroid.  This provides
    * a function which may be passed to the std::sort
    * routine for sorting the elements by centroid.
    */
@@ -120,6 +120,15 @@ private:
 		     const std::pair<Point, Elem*>& rhs);
 
   
+  /**
+   * Partition the list of centroids based on the
+   * radial position of the centroid.  This provides
+   * a function which may be passed to the std::sort
+   * routine for sorting the elements by centroid.
+   */
+  static bool sort_radial(const std::pair<Point, Elem*>& lhs,
+			  const std::pair<Point, Elem*>& rhs);
+
   /**
    * Store a flag which tells which type of
    * sort method we are using.
