@@ -3023,8 +3023,8 @@ echo "$as_me: error: Unrecognized compiler" >&2;}
           ;;
 
       MIPSpro)
-          CXXFLAGSG="-DDEBUG -LANG:std -no_auto_include -ansi -g -woff 1460"
-          CXXFLAGSO="-DNDEBUG -LANG:std -no_auto_include -ansi -O2 -w"
+          CXXFLAGSG="-DDEBUG -LANG:std -LANG:libc_in_namespace_std=OFF -no_auto_include -ansi -g -woff 1460"
+          CXXFLAGSO="-DNDEBUG -LANG:std -LANG:libc_in_namespace_std=OFF -no_auto_include -ansi -O2 -w"
           CFLAGSG="-DDEBUG"
           CFLAGSO="-DNDEBUG -O2 -w"
 
@@ -3042,7 +3042,7 @@ echo "$as_me: error: Unrecognized compiler" >&2;}
             LDFLAGS="$LDFLAGS -KPIC"
           fi
 
-	            if test "x`echo $CXXFLAGS | grep "LANG:std"`" = "x" ; then
+	                      if test "x`echo $CXXFLAGS | grep 'LANG:std'`" = "x" ; then
 	    CXXFLAGS="$CXXFLAGS -LANG:std"
           fi
           ;;
