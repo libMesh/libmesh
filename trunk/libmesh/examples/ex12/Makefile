@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.1 2003-09-01 18:12:36 ddreyer Exp $
+# $Id: Makefile,v 1.2 2003-09-16 16:44:04 ddreyer Exp $
 
 
 # The location of the mesh library
@@ -50,7 +50,7 @@ clean:
 
 clobber:
 	@$(MAKE) clean
-	@rm -f $(target) *.unv data_and_mesh_out.gmv
+	@rm -f $(target) *.unv *.unv.gz data_and_mesh_out.gmv
 
 distclean:
 	@$(MAKE) clobber
