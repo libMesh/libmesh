@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.78 2004-10-26 15:31:18 jwpeterson Exp $
+// $Id: mesh_base.C,v 1.79 2004-10-26 22:00:45 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -49,7 +49,6 @@
 // MeshBase class member functions
 MeshBase::MeshBase (unsigned int d) :
   boundary_info (*this),
-  data          (*this),
   _n_sbd        (1),
   _n_parts      (1),
   _dim          (d),
@@ -64,7 +63,6 @@ MeshBase::MeshBase (unsigned int d) :
 
 MeshBase::MeshBase (const MeshBase& other_mesh) :
   boundary_info      (*this),
-  data               (*this),
   _nodes             (other_mesh._nodes),
   _elements          (other_mesh._elements),
   _n_sbd             (other_mesh._n_sbd),
@@ -358,21 +356,6 @@ std::ostream& operator << (std::ostream& os, const MeshBase& m)
 }
 
 
-void MeshBase::skip_comment_lines (std::istream &in,
-				   const char comment_start) const
-{    
-  char c;
-  while (in.get(c), c==comment_start) 
-    {
-      char line[256];
-      in.get (line, 255, '\n'); // ignore rest of line, at most 256 chars
-      in.get (c);               // ignore '\n' at end of line.
-    }
-  
-  // put back first character of
-  // first non-comment line
-  in.putback (c);
-}
 
 
 

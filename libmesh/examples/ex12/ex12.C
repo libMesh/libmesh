@@ -1,4 +1,4 @@
-/* $Id: ex12.C,v 1.7 2004-03-20 15:16:56 benkirk Exp $ */
+/* $Id: ex12.C,v 1.8 2004-10-26 22:00:26 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -74,6 +74,8 @@
 // Basic include files needed for the mesh and 
 // <code> MeshData </code> functionality.
 #include "mesh.h"
+#include "mesh_data.h"
+#include "unv_io.h"
 #include "gmv_io.h"
 
 
@@ -192,19 +194,20 @@ int main (int argc, char** argv)
       // it.
       assert (dim == 3);
       Mesh mesh(dim);
-
+      MeshData mesh_data(mesh);
+      
       // Activate the <code>MeshData</code> of the mesh, so that
       // we can remember the node and element ids used
       // in the file.  When we do not activate the <code>MeshData</code>,
       // then there is no chance to import node- or element-
       // associated data.
-      mesh.data.activate();
+      mesh_data.activate();
 
       // Now we can safely read the input mesh.  Note that
-      // this should be a .unv or .xdr/xda file, otherwise
+      // this should be an .xda/.xdr or .unv file only, otherwise
       // we cannot load/save associated data.
-      mesh.read (mesh_file);
-    
+      mesh.read (mesh_file, &mesh_data);
+      
       // Print information about the mesh and the data
       // to the screen.  Obviously, there is no data
       // (apart from node & element ids) in it, yet.
@@ -213,7 +216,7 @@ int main (int argc, char** argv)
 		<< "---------------------------------------------------------" << std::endl;
       
       mesh.print_info();
-      mesh.data.print_info();
+      mesh_data.print_info();
     
       // Create some artificial node-associated data and store
       // it in the mesh's <code>MeshData</code>.  Use a <code>std::map</code> for this. 
@@ -227,7 +230,7 @@ int main (int argc, char** argv)
 	// the <code>MeshData</code>.  Note that by default the element-associated
 	// data containers are closed, so that the <code>MeshData</code> is
 	// ready for use.
-	mesh.data.insert_node_data(artificial_data);
+	mesh_data.insert_node_data(artificial_data);
 
 	// Let <code>artificial_data()</code> go out of scope
       }
@@ -237,13 +240,13 @@ int main (int argc, char** argv)
 		<< "After inserting artificial data into the MeshData:" << std::endl
 		<< "--------------------------------------------------" << std::endl;
       
-      mesh.data.print_info();
+      mesh_data.print_info();
 
       // Write the artificial data into a universal
       // file.  Use a default header for this.
       std::string first_out_data="data_first_out_with_default_header.unv";
       std::cout << "Writing MeshData to: " << first_out_data << std::endl;
-      mesh.data.write(first_out_data);
+      mesh_data.write(first_out_data);
 
       // Alternatively, create your own header.
       std::cout << std::endl 
@@ -275,43 +278,54 @@ int main (int argc, char** argv)
       
       // Now attach this header to the <code>MeshData</code>, and write
       // the same file again, but with the personalized header.
-      mesh.data.set_unv_header(&my_header);
+      mesh_data.set_unv_header(&my_header);
 
       // Write again to file.
       std::string second_out_data="data_second_with_header_out.unv";
       std::cout << "Writing MeshData to: " << second_out_data << std::endl;
-      mesh.data.write(second_out_data);
+      mesh_data.write(second_out_data);
       
       // Print information about the data to the screen.
       std::cout << std::endl 
 		<< "Before clearing the MeshData:" << std::endl
 		<< "-----------------------------" << std::endl;
-      mesh.data.print_info();
+      mesh_data.print_info();
 
       // Now clear only the data associated with nodes/elements,
       // but keep the node/element ids used in the mesh.  To
       // clear also these ids, use MeshData::slim() (not used here).
-      mesh.data.clear();
+      mesh_data.clear();
 
       // Print information about the data to the screen.
       std::cout << std::endl 
 		<< "After clearing the MeshData:" << std::endl
 		<< "----------------------------" << std::endl;
-      mesh.data.print_info();
+      mesh_data.print_info();
 
       // Now the <code>MeshData</code> is open again to read data from
       // file.  Read the file that we created first.
-      mesh.data.read(first_out_data);
+      mesh_data.read(first_out_data);
       
       std::cout << std::endl 
 		<< "After re-reading the first file:" << std::endl
 		<< "--------------------------------" << std::endl;
-      mesh.data.print_info();
+      mesh_data.print_info();
 
       // Let the mesh, the unv_header etc go out of scope, and
       // do another example.
     }
 
+
+
+
+
+
+
+
+
+
+
+    
     std::cout << std::endl 
 	      << "----------------------------------------------" << std::endl
 	      << "---------- next example with MeshData --------" << std::endl
@@ -325,17 +339,20 @@ int main (int argc, char** argv)
     // The libMesh-internal node and element ids are used.
     {
       Mesh mesh(dim);
-
+      MeshData mesh_data(mesh);
+      
       // Read the input mesh, but with deactivated <code>MeshData</code>.
-      mesh.read (mesh_file);
-    
+//       UNVIO unvio (mesh, mesh_data);
+//       unvio.read (mesh_file);
+      mesh.read(mesh_file, &mesh_data);
+      
       // Print information about the mesh and the data
       // to the screen.
       std::cout << std::endl 
 		<< "De-activated MeshData:" << std::endl
 		<< "----------------------" << std::endl;
       mesh.print_info();
-      mesh.data.print_info();
+      mesh_data.print_info();
  
       // Write the <i>mesh</i> (not the MeshData!) as .unv file.
       // In general, the <code>MeshBase</code> interface for .unv I/O
@@ -348,14 +365,14 @@ int main (int argc, char** argv)
 		<< "to see the differences in node numbers." << std::endl
 		<< "---------------------------------------" << std::endl
 		<< std::endl;
-      mesh.write(out_mesh);
+      mesh.write(out_mesh, &mesh_data);
 
       // Again create some artificial node-associated data,
       // as before.
       {
 	std::map<const Node*, std::vector<Number> > artificial_data;
 	create_artificial_data (mesh, artificial_data);
-	mesh.data.insert_node_data(artificial_data);
+	mesh_data.insert_node_data(artificial_data);
       }
 
       // Note that even with (only) compatibility mode MeshData
@@ -363,7 +380,7 @@ int main (int argc, char** argv)
       // are used.  Consult the warning messages issued in
       // DEBUG mode.  And the user <i>has</i> to specify that the
       // <code>MeshData</code> should change to compatibility mode.
-      mesh.data.enable_compatibility_mode();
+      mesh_data.enable_compatibility_mode();
 
       // Now that compatibility mode is used, data can be written.
       // _Without_ explicitly enabling compatibility mode, we
@@ -374,11 +391,11 @@ int main (int argc, char** argv)
 		<< "Writing MeshData to: " << mesh_data_file << std::endl
 		<< "----------------------------------------------------------" 
 		<< std::endl << std::endl;
-      mesh.data.write (mesh_data_file);
+      mesh_data.write (mesh_data_file);
 
 #ifdef HAVE_ZLIB_H
 
-      // As may already seen, UNV files are text-based, so the may
+      // As may already seen, UNV files are text-based, so they may
       // become really big.  When <code>./configure</code> found <code>zlib.h</code>,
       // then we may also <i>read</i> or <i>write</i> <code>.unv</code> files in gzip'ed 
       // format! -- Pretty cool, and also pretty fast, due to zlib.h.
@@ -399,10 +416,16 @@ int main (int argc, char** argv)
 		<< "   diff packed_" << mesh_data_file << " " 
 		<< mesh_data_file << std::endl << std::endl;
       
-      mesh.data.write (packed_mesh_data_file);
+      mesh_data.write (packed_mesh_data_file);
       
 #endif
 
+
+
+
+
+
+      
       // And now a last gimmick: The <code>MeshData::translate()</code>
       // conveniently converts the nodal- or element-associated
       // data (currently only nodal) to vectors that may be used 
@@ -427,7 +450,7 @@ int main (int argc, char** argv)
 	
 	// Use the <code> mesh</code> itself.  Alternatively, use the 
 	// <code> BoundaryMesh</code> of <code> mesh</code>.
-	mesh.data.translate (mesh,
+	mesh_data.translate (mesh,
 			     translated_data,
 			     data_names);
 
@@ -455,6 +478,13 @@ int main (int argc, char** argv)
    // All done.
   return libMesh::close();
 }
+
+
+
+
+
+
+
 
 // This function creates the data to populate the <code> MeshData</code> object
 void create_artificial_data (const Mesh& mesh,

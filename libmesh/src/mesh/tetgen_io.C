@@ -1,4 +1,4 @@
-// $Id: tetgen_io.C,v 1.6 2004-10-19 12:44:10 benkirk Exp $
+// $Id: tetgen_io.C,v 1.7 2004-10-26 22:00:46 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -100,7 +100,8 @@ void TetGenIO::read_nodes_and_elem (std::istream& node_stream,
 
   // Tell the MeshData object that we are finished 
   // reading data.
-  this->mesh().data.close_foreign_id_maps ();
+  if (this->_mesh_data != NULL)
+    this->_mesh_data->close_foreign_id_maps ();
 
   // some more clean-up
   _assign_nodes.clear();
@@ -150,7 +151,8 @@ void TetGenIO::node_in (std::istream& node_stream)
 
       // Add node to the nodes vector &
       // tell the MeshData object the foreign node id.
-      mesh.data.add_foreign_node_id (mesh.add_point(xyz), node_lab);
+      if (this->_mesh_data != NULL)
+	this->_mesh_data->add_foreign_node_id (mesh.add_point(xyz), node_lab);
     }
 }
 
@@ -203,7 +205,8 @@ void TetGenIO::element_in (std::istream& ele_stream)
 
       // Add the element to the mesh &
       // tell the MeshData object the foreign element id
-      mesh.data.add_foreign_elem_id (mesh.add_elem(elem), element_lab);
+      if (this->_mesh_data != NULL)
+	this->_mesh_data->add_foreign_elem_id (mesh.add_elem(elem), element_lab);
     }
 }
 

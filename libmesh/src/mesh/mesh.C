@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.42 2004-09-30 17:17:49 benkirk Exp $
+// $Id: mesh.C,v 1.43 2004-10-26 22:00:44 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -67,7 +67,8 @@ void Mesh::clear ()
 
 
 
-void Mesh::read (const std::string& name)
+void Mesh::read (const std::string& name,
+		 MeshData* mesh_data)
 {
   START_LOG("read()", "Mesh");
 
@@ -105,7 +106,17 @@ void Mesh::read (const std::string& name)
 	ShaneeIO (*this).read (name);
       
       else if (name.rfind(".unv") < name.size())
-	UNVIO(*this).read (name);
+	{
+	  if (mesh_data == NULL)
+	    {
+	      std::cerr << "Error! You must pass a "
+			<< "valid MeshData pointer to "
+			<< "read UNV files!" << std::endl;
+	      error();
+	    }
+	  UNVIO unvio(*this, *mesh_data);
+	  unvio.read (name);
+	}
       
       else if ((name.rfind(".node")  < name.size()) ||
 	       (name.rfind(".ele")   < name.size()))
@@ -149,7 +160,8 @@ void Mesh::read (const std::string& name)
 
 
 
-void Mesh::write (const std::string& name)
+void Mesh::write (const std::string& name,
+		  MeshData* mesh_data)
 {
   START_LOG("write()", "Mesh");
   
@@ -197,7 +209,17 @@ void Mesh::write (const std::string& name)
       this->write_xdr_binary (name,1);
 
     else if (name.rfind(".unv") < name.size())
-      UNVIO (*this).write (name);
+      {
+	if (mesh_data == NULL)
+	  {
+	    std::cerr << "Error! You must pass a "
+		      << "valid MeshData pointer to "
+		      << "write UNV files!" << std::endl;
+	    error();
+	  }
+	UNVIO unvio(*this, *mesh_data);
+	unvio.write (name);
+      }
 
     else if (name.rfind(".mesh") < name.size())
       MEDITIO (*this).write (name);
