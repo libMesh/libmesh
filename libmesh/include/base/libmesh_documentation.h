@@ -156,8 +156,12 @@
     - \p icc/ifc 7.x
     - \p icc/ifc 6.0
     - Earlier versions (<= 5.0) not supported.
+    
+  - SGI Altix
+    - \p ecc/efc 7.1 tested
+    - \p MPT \p MPI 1.9.1
  
-  - SGI MIPSPro Compilers
+  - SGI IRIX 6.5 with  MIPSPro Compilers
     - Version 7.30 <code>(CXXFLAGS=-LANG:std CXX=CC ./configure [...])</code>
     - Not tested (but will likely work) with others
 
