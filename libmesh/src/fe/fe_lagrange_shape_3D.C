@@ -1,4 +1,4 @@
-// $Id: fe_lagrange_shape_3D.C,v 1.13 2004-03-24 05:49:11 jwpeterson Exp $
+// $Id: fe_lagrange_shape_3D.C,v 1.14 2005-01-13 22:10:15 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -1228,4 +1228,210 @@ Real FE<3,LAGRANGE>::shape_deriv(const Elem* elem,
       
   // call the orientation-independent shape function derivatives
   return FE<3,LAGRANGE>::shape_deriv(elem->type(), order, i, j, p);
+}
+
+
+
+template <>
+Real FE<3,LAGRANGE>::shape_second_deriv(const ElemType type,
+				        const Order order,
+				        const unsigned int i,
+				        const unsigned int j,
+				        const Point& p)
+{
+#if DIM == 3
+  
+  assert (j<6);
+  
+  switch (order)
+    {
+      // linear Lagrange shape functions
+    case FIRST:
+      {
+	return 0.;
+      }
+      
+      // quadratic Lagrange shape functions
+    case SECOND:
+      {
+	switch (type)
+	  {
+
+	    // serendipity hexahedral quadratic shape functions
+	  case HEX20:
+	    {
+              static bool warning_given_HEX20 = false;
+
+              if (!warning_given_HEX20)
+              std::cerr << "Second derivatives for 2D Lagrangian HEX20"
+                        << " elements are not yet implemented!"
+                        << std::endl;
+              warning_given_HEX20 = true;
+	    }
+
+	    // triquadraic hexahedral shape funcions	    
+	  case HEX27:
+	    {
+	      assert (i<27);
+	
+	      // Compute hex shape functions as a tensor-product
+	      const Real xi   = p(0);
+	      const Real eta  = p(1);
+	      const Real zeta = p(2);
+	
+	      // The only way to make any sense of this
+	      // is to look at the mgflo/mg2/mgf documentation
+	      // and make the cut-out cube!
+	      //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
+	      static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 0, 2, 2, 1, 2, 0, 2, 2};
+	      static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 2, 0, 2, 1, 2, 2, 2};
+	      static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 2, 2, 2, 2, 1, 1, 1, 1, 0, 2, 2, 2, 2, 1, 2};
+	
+	      switch(j)
+		{
+                // d^2()/dxi^2
+		case 0:
+		  return (FE<1,LAGRANGE>::shape_second_deriv(EDGE3, SECOND, i0[i], 0, xi)*
+			  FE<1,LAGRANGE>::shape      (EDGE3, SECOND, i1[i], eta)*
+			  FE<1,LAGRANGE>::shape      (EDGE3, SECOND, i2[i], zeta));
+
+                // d^2()/dxideta
+		case 1:     
+		  return (FE<1,LAGRANGE>::shape_deriv(EDGE3, SECOND, i0[i], 0, xi)*
+			  FE<1,LAGRANGE>::shape_deriv(EDGE3, SECOND, i1[i], 0, eta)*
+			  FE<1,LAGRANGE>::shape      (EDGE3, SECOND, i2[i], zeta));
+
+                // d^2()/deta^2
+		case 2:     
+		  return (FE<1,LAGRANGE>::shape      (EDGE3, SECOND, i0[i], xi)*
+			  FE<1,LAGRANGE>::shape_second_deriv(EDGE3, SECOND, i1[i], 0, eta)*
+			  FE<1,LAGRANGE>::shape      (EDGE3, SECOND, i2[i], zeta));
+
+                // d^2()/dxidzeta
+		case 3:     
+		  return (FE<1,LAGRANGE>::shape_deriv(EDGE3, SECOND, i0[i], 0, xi)*
+			  FE<1,LAGRANGE>::shape      (EDGE3, SECOND, i1[i], eta)*
+			  FE<1,LAGRANGE>::shape_deriv(EDGE3, SECOND, i2[i], 0, zeta));
+
+                // d^2()/detadzeta
+		case 4:     
+		  return (FE<1,LAGRANGE>::shape      (EDGE3, SECOND, i0[i], xi)*
+			  FE<1,LAGRANGE>::shape_deriv(EDGE3, SECOND, i1[i], 0, eta)*
+			  FE<1,LAGRANGE>::shape_deriv(EDGE3, SECOND, i2[i], 0, zeta));
+
+                // d^2()/dzeta^2
+		case 5:     
+		  return (FE<1,LAGRANGE>::shape      (EDGE3, SECOND, i0[i], xi)*
+			  FE<1,LAGRANGE>::shape      (EDGE3, SECOND, i1[i], eta)*
+			  FE<1,LAGRANGE>::shape_second_deriv(EDGE3, SECOND, i2[i], 0, zeta));
+		  
+		default:
+		  {
+		    error();
+		  }
+		}
+	    }
+	    
+	    // quadratic tetrahedral shape functions	    
+	  case TET10:
+	    {
+              static bool warning_given_TET10 = false;
+
+              if (!warning_given_TET10)
+              std::cerr << "Second derivatives for 2D Lagrangian TET10"
+                        << " elements are not yet implemented!"
+                        << std::endl;
+              warning_given_TET10 = true;
+	    }
+
+	    
+	    // quadradic prism shape functions	    
+	  case PRISM18:
+	    {
+	      assert (i<18);
+	
+	      // Compute prism shape functions as a tensor-product
+	      // of a triangle and an edge
+	
+	      Point p2d(p(0),p(1));
+	      Point p1d(p(2));
+	
+	      //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 
+	      static const unsigned int i0[] = {0, 0, 0, 1, 1, 1, 0, 0, 0, 2, 2, 2, 1, 1, 1, 2, 2, 2};
+	      static const unsigned int i1[] = {0, 1, 2, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 3, 4, 5};
+
+	      switch (j)
+		{
+		  // d^2()/dxi^2
+		case 0:
+		  return (FE<2,LAGRANGE>::shape_second_deriv(TRI6, SECOND, i1[i], 0, p2d)*
+			  FE<1,LAGRANGE>::shape(EDGE3, SECOND, i0[i], p1d));
+
+		  // d^2()/dxideta
+		case 1:
+		  return (FE<2,LAGRANGE>::shape_second_deriv(TRI6, SECOND, i1[i], 1, p2d)*
+			  FE<1,LAGRANGE>::shape(EDGE3, SECOND, i0[i], p1d));
+		  
+		  // d^2()/deta^2
+		case 2:
+		  return (FE<2,LAGRANGE>::shape_second_deriv(TRI6, SECOND, i1[i], 2, p2d)*
+			  FE<1,LAGRANGE>::shape(EDGE3, SECOND, i0[i], p1d));
+
+		  // d^2()/dxidzeta
+		case 3:
+		  return (FE<2,LAGRANGE>::shape_deriv(TRI6,  SECOND, i1[i], 0, p2d)*
+			  FE<1,LAGRANGE>::shape_deriv(EDGE3, SECOND, i0[i], 0, p1d));
+
+		  // d^2()/detadzeta
+		case 4:
+		  return (FE<2,LAGRANGE>::shape_deriv(TRI6,  SECOND, i1[i], 1, p2d)*
+			  FE<1,LAGRANGE>::shape_deriv(EDGE3, SECOND, i0[i], 0, p1d));
+
+		  // d^2()/dzeta^2
+		case 5:
+		  return (FE<2,LAGRANGE>::shape(TRI6,  SECOND, i1[i], p2d)*
+			  FE<1,LAGRANGE>::shape_second_deriv(EDGE3, SECOND, i0[i], 0, p1d));
+		}
+	    }
+
+	    
+	    
+	  default:
+	    {
+	      std::cerr << "ERROR: Unsupported 3D element type!: " << type
+			<< std::endl;
+	      error();
+	    }
+	  }
+      }
+      
+      
+      // unsupported order
+    default:
+      {
+	std::cerr << "ERROR: Unsupported 3D FE order!: " << order
+		  << std::endl;
+	error();
+      }
+    }
+
+#endif
+  
+  error();
+  return 0.;  
+}
+
+
+
+template <>
+Real FE<3,LAGRANGE>::shape_second_deriv(const Elem* elem,
+				 const Order order,
+				 const unsigned int i,
+				 const unsigned int j,
+				 const Point& p)
+{
+  assert (elem != NULL);
+      
+  // call the orientation-independent shape function derivatives
+  return FE<3,LAGRANGE>::shape_second_deriv(elem->type(), order, i, j, p);
 }

@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic_shape_3D.C,v 1.10 2004-03-24 05:49:11 jwpeterson Exp $
+// $Id: fe_hierarchic_shape_3D.C,v 1.11 2005-01-13 22:10:14 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -1256,5 +1256,42 @@ Real FE<3,HIERARCHIC>::shape_deriv(const Elem* elem,
 #endif
   
   error();
+  return 0.;
+}
+
+
+
+template <>
+Real FE<3,HIERARCHIC>::shape_second_deriv(const ElemType,
+				          const Order,
+				          const unsigned int,
+				          const unsigned int,
+				          const Point& )
+{
+  std::cerr << "Hierarchic polynomials require the element type\n"
+	    << "because edge and face orientation is needed."
+	    << std::endl;
+  error();
+  
+  return 0.;
+}
+
+
+
+template <>
+Real FE<3,HIERARCHIC>::shape_second_deriv(const Elem*,
+				          const Order,
+				          const unsigned int,
+				          const unsigned int,
+				          const Point&)
+{
+  static bool warning_given = false;
+
+  if (!warning_given)
+  std::cerr << "Second derivatives for 3D hierarchics "
+	    << " are not yet implemented!"
+	    << std::endl;
+
+  warning_given = true;
   return 0.;
 }

@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic_shape_2D.C,v 1.14 2004-03-24 05:49:11 jwpeterson Exp $
+// $Id: fe_hierarchic_shape_2D.C,v 1.15 2005-01-13 22:10:14 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -1119,3 +1119,72 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
   return 0.;
 }
 
+
+
+template <>
+Real FE<2,HIERARCHIC>::shape_second_deriv(const ElemType,
+				          const Order,			    
+				          const unsigned int,
+				          const unsigned int,
+				          const Point&)
+{
+  std::cerr << "Hierarchic polynomials require the element type\n"
+	    << "because edge orientation is needed."
+	    << std::endl;
+
+  error();
+  return 0.;
+}
+
+
+
+template <>
+Real FE<2,HIERARCHIC>::shape_second_deriv(const Elem* elem,
+				          const Order order,
+				          const unsigned int i,
+				          const unsigned int j,
+				          const Point& p)
+{
+  assert (elem != NULL);
+
+  // I have been lazy here and am using finite differences
+  // to compute the derivatives!
+  const Real eps = 1.e-6;
+  Point pp, pm;
+  unsigned int prevj;
+	      
+  switch (j)
+  {
+    //  d^2()/dxi^2
+    case 0:
+      {
+        pp = Point(p(0)+eps, p(1));
+        pm = Point(p(0)-eps, p(1));
+        prevj = 0;
+	break;
+      }
+  
+    // d^2()/dxideta
+    case 1:
+      {
+        pp = Point(p(0), p(1)+eps);
+        pm = Point(p(0), p(1)-eps);
+        prevj = 0;
+	break;
+      }
+
+    // d^2()/deta^2
+    case 2:
+      {
+        pp = Point(p(0), p(1)+eps);
+        pm = Point(p(0), p(1)-eps);
+        prevj = 1;
+	break;
+      }
+    default:
+      error();
+  }
+  return (FE<2,HIERARCHIC>::shape_deriv(elem, order, i, prevj, pp) -
+	  FE<2,HIERARCHIC>::shape_deriv(elem, order, i, prevj,
+					pm))/2./eps;
+}

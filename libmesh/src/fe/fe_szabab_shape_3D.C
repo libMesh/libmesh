@@ -1,4 +1,4 @@
-// $Id: fe_szabab_shape_3D.C,v 1.1 2004-01-09 19:33:22 spetersen Exp $
+// $Id: fe_szabab_shape_3D.C,v 1.2 2005-01-13 22:10:16 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -73,6 +73,34 @@ Real FE<3,SZABAB>::shape_deriv(const Elem*,
 			       const unsigned int,
 			       const unsigned int,
 			       const Point&)
+{
+  std::cerr << "Szabo-Babuska polynomials are not defined in 3D\n" << std::endl;
+  error();
+  return 0.;
+}
+
+
+
+template <>
+Real FE<3,SZABAB>::shape_second_deriv(const ElemType,
+			              const Order,
+			              const unsigned int,
+			              const unsigned int,
+			              const Point&)
+{
+  std::cerr << "Szabo-Babuska polynomials are not defined in 3D\n" << std::endl;
+  error();
+  return 0.;
+}
+
+
+
+template <>
+Real FE<3,SZABAB>::shape_second_deriv(const Elem*,
+			              const Order,
+			              const unsigned int,
+			              const unsigned int,
+			              const Point&)
 {
   std::cerr << "Szabo-Babuska polynomials are not defined in 3D\n" << std::endl;
   error();

@@ -1,4 +1,4 @@
-// $Id: fe_szabab_shape_1D.C,v 1.5 2004-03-24 05:49:11 jwpeterson Exp $
+// $Id: fe_szabab_shape_1D.C,v 1.6 2005-01-13 22:10:15 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -166,6 +166,46 @@ Real FE<1,SZABAB>::shape_deriv(const Elem* elem,
   
   return FE<1,SZABAB>::shape_deriv(elem->type(),
 				       order, i, j, p);
+}
+
+
+
+template <>
+Real FE<1,SZABAB>::shape_second_deriv(const ElemType,
+			              const Order,
+			              const unsigned int,
+			              const unsigned int,
+			              const Point&)
+{
+  static bool warning_given = false;
+
+  if (!warning_given)
+  std::cerr << "Second derivatives for Szabab elements "
+            << " are not yet implemented!"
+            << std::endl;
+
+  warning_given = true;
+  return 0.;
+}
+
+
+
+template <>
+Real FE<1,SZABAB>::shape_second_deriv(const Elem*,
+			       const Order,
+			       const unsigned int,
+			       const unsigned int,
+			       const Point&)
+{
+  static bool warning_given = false;
+
+  if (!warning_given)
+  std::cerr << "Second derivatives for Szabab elements "
+            << " are not yet implemented!"
+            << std::endl;
+
+  warning_given = true;
+  return 0.;
 }
 
 

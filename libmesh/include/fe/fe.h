@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.7 2004-10-14 22:56:04 benkirk Exp $
+// $Id: fe.h,v 1.8 2005-01-13 22:09:49 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -52,7 +52,7 @@ class InfFE;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.7 $
+ * \version $Revision: 1.8 $
  */
 
 //-------------------------------------------------------------
@@ -117,21 +117,25 @@ public:
    * j = 0 ==> d^2 phi / dxi^2
    * j = 1 ==> d^2 phi / dxi deta
    * j = 2 ==> d^2 phi / deta^2
+   * j = 3 ==> d^2 phi / dxi dzeta
+   * j = 4 ==> d^2 phi / deta dzeta
+   * j = 5 ==> d^2 phi / dzeta^2
    *
    * Note 1) Computing second derivatives is currently only supported
-   * for 2D element types, since the second derivaties are needed
-   * for the computation of curvature in e.g. surface tension boundary
-   * conditions for deformed surfaces.  The 1D element type EDGE3
-   * does have its second derivatives calculated since it is used in
-   * the tensor product for QUAD9.  All 3D element types should
-   * throw an error for the method.
+   * for a few element types.  2D elements have support, since the second
+   * derivatives are needed for the computation of curvature in e.g. surface
+   * tension boundary conditions for deformed surfaces.  The 1D element type
+   * EDGE3 does have its second derivatives calculated since it is used in the
+   * tensor product for QUAD9.  Currently all 3D element types throw an error
+   * for the method.
    *
-   * Note 2) We only need second derivatives (typically) for computing
-   * the curvature of element faces.  Since only quadratic (and biquadratic)
-   * Lagrange shape functions are used to compute the map between the
-   * physical element and the reference element, only Lagrange second
-   * derivatives have been provided.  All other element types return
-   * an error when asked for second derivatives.
+   * Note 2) We primarily need second derivatives for computing the curvature
+   * of element faces and for shape functions and mappings for C1 continuous
+   * elements.  Since only quadratic (and biquadratic) Lagrange shape functions
+   * are used to compute the map between the physical element and the reference
+   * element, only Lagrange second derivatives and C1 element second
+   * derivatives have been provided.  All other element types return an error
+   * when asked for second derivatives.
    */
   static Real shape_second_deriv(const ElemType t,
 				 const Order o,
@@ -139,6 +143,38 @@ public:
 				 const unsigned int j,
 				 const Point& p);
 
+  /**
+   * @returns the second \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
+   * shape function at the point \p p.  Note that cross-derivatives are
+   * also possible, i.e.
+   * j = 0 ==> d^2 phi / dxi^2
+   * j = 1 ==> d^2 phi / dxi deta
+   * j = 2 ==> d^2 phi / deta^2
+   * j = 3 ==> d^2 phi / dxi dzeta
+   * j = 4 ==> d^2 phi / deta dzeta
+   * j = 5 ==> d^2 phi / dzeta^2
+   *
+   * Note 1) Computing second derivatives is currently only supported
+   * for a few element types.  2D elements have support, since the second
+   * derivatives are needed for the computation of curvature in e.g. surface
+   * tension boundary conditions for deformed surfaces.  The 1D element type
+   * EDGE3 does have its second derivatives calculated since it is used in the
+   * tensor product for QUAD9.  Currently all 3D element types throw an error
+   * for the method.
+   *
+   * Note 2) We primarily need second derivatives for computing the curvature
+   * of element faces and for shape functions and mappings for C1 continuous
+   * elements.  Since only quadratic (and biquadratic) Lagrange shape functions
+   * are used to compute the map between the physical element and the reference
+   * element, only Lagrange second derivatives and C1 element second
+   * derivatives have been provided.  All other element types return an error
+   * when asked for second derivatives.
+   */
+  static Real shape_second_deriv(const Elem* elem,
+				 const Order o,
+				 const unsigned int i,
+				 const unsigned int j,
+				 const Point& p);
   
   /**
    * Build the nodal soln from the element soln.
@@ -337,12 +373,37 @@ protected:
 
 
 /**
+ * Clough-Tocher finite elements.  Still templated on the dimension,
+ * \p Dim.  
+ *
+ * \author Roy Stogner
+ * \date 2004
+ * \version $Revision: 1.8 $
+ */
+
+//-------------------------------------------------------------
+// FEHierarchic class definition
+template <unsigned int Dim>
+class FEClough : public FE<Dim,CLOUGH>
+{
+public:
+
+  /**
+   * Constructor. Creates a hierarchic finite element
+   * to be used in dimension \p Dim.
+   */
+  FEClough(const FEType& fet);
+};
+
+
+
+/**
  * Hierarchic finite elements.  Still templated on the dimension,
  * \p Dim.  
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.7 $
+ * \version $Revision: 1.8 $
  */
 
 //-------------------------------------------------------------
@@ -367,7 +428,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.7 $
+ * \version $Revision: 1.8 $
  */
 
 //-------------------------------------------------------------
@@ -392,7 +453,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.7 $
+ * \version $Revision: 1.8 $
  */
 
 //-------------------------------------------------------------
@@ -418,7 +479,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.7 $
+ * \version $Revision: 1.8 $
  */
 
 //-------------------------------------------------------------
@@ -488,6 +549,12 @@ protected:
  */
 namespace FiniteElements
 {
+  /**
+   * Convenient definition for a 2D
+   * Clough-Tocher finite element.
+   */
+  typedef FEClough<2> FEClough2D;
+  
   /**
    * Convenient definition for a 1D
    * Hierarchic finite element.
@@ -561,6 +628,17 @@ FE<Dim,T>::FE (const FEType& fet) :
   // Family specified in the template instantiation
   // matches the one in the FEType object
   assert (T == fe_type.family);
+}
+
+
+
+// ------------------------------------------------------------
+// FEClough class inline members
+template <unsigned int Dim>
+inline
+FEClough<Dim>::FEClough (const FEType& fet) :
+  FE<Dim,CLOUGH> (fet)
+{
 }
 
 

@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.8 2004-12-24 15:02:29 benkirk Exp $
+// $Id: fe_base.h,v 1.9 2005-01-13 22:09:50 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -32,6 +32,10 @@
 #include "enum_elem_type.h"
 #include "fe_type.h"
 #include "auto_ptr.h"
+
+#ifdef ENABLE_SECOND_DERIVATIVES
+#include "tensor_value.h"
+#endif
 
 
 // forward declarations
@@ -193,6 +197,59 @@ public:
   const std::vector<std::vector<Real> >& get_dphidz() const
   { return dphidz; }
 
+#ifdef ENABLE_SECOND_DERIVATIVES
+
+  /**
+   * @returns the shape function second derivatives at the quadrature
+   * points.
+   */
+  const std::vector<std::vector<RealTensor> >& get_d2phi() const
+  { return d2phi; }
+  
+  /**
+   * @returns the shape function second derivatives at the quadrature
+   * points.
+   */
+  const std::vector<std::vector<Real> >& get_d2phidx2() const
+  { return d2phidx2; }
+  
+  /**
+   * @returns the shape function second derivatives at the quadrature
+   * points.
+   */
+  const std::vector<std::vector<Real> >& get_d2phidxdy() const
+  { return d2phidxdy; }
+  
+  /**
+   * @returns the shape function second derivatives at the quadrature
+   * points.
+   */
+  const std::vector<std::vector<Real> >& get_d2phidxdz() const
+  { return d2phidxdz; }
+  
+  /**
+   * @returns the shape function second derivatives at the quadrature
+   * points.
+   */
+  const std::vector<std::vector<Real> >& get_d2phidy2() const
+  { return d2phidy2; }
+  
+  /**
+   * @returns the shape function second derivatives at the quadrature
+   * points.
+   */
+  const std::vector<std::vector<Real> >& get_d2phidydz() const
+  { return d2phidydz; }
+  
+  /**
+   * @returns the shape function second derivatives at the quadrature
+   * points.
+   */
+  const std::vector<std::vector<Real> >& get_d2phidz2() const
+  { return d2phidz2; }
+
+#endif
+  
   /**
    * @returns the element tangents in xi-direction at the quadrature
    * points.
@@ -399,6 +456,16 @@ public:
    * at each quadrature point.
    */ 
   void print_dphi(std::ostream& os=std::cout) const;
+
+#ifdef ENABLE_SECOND_DERIVATIVES
+
+  /**
+   * Prints the value of each shape function's second derivatives
+   * at each quadrature point.
+   */ 
+  void print_d2phi(std::ostream& os=std::cout) const;
+
+#endif
   
   /**
    * Prints the spatial location of each quadrature point
@@ -438,7 +505,7 @@ protected:
    * data fields. Takes the integration weights
    * as input, along with a pointer to the element.
    */
-  void compute_map(const std::vector<Real>& qw,
+  virtual void compute_map(const std::vector<Real>& qw,
 		   const Elem* e);
   
   /** 
@@ -574,6 +641,28 @@ protected:
    * d^2(x)/d(eta)^2 
    */
   std::vector<RealGradient> d2xyzdeta2_map;
+
+#ifdef ENABLE_SECOND_DERIVATIVES
+
+  /**
+   * Vector of second partial derivatives in xi-zeta:
+   * d^2(x)/d(xi)d(zeta), d^2(y)/d(xi)d(zeta), d^2(z)/d(xi)d(zeta)
+   */
+  std::vector<RealGradient> d2xyzdxidzeta_map;
+
+  /**
+   * Vector of mixed second partial derivatives in eta-zeta:
+   * d^2(x)/d(eta)d(zeta) d^2(y)/d(eta)d(zeta) d^2(z)/d(eta)d(zeta)
+   */
+  std::vector<RealGradient> d2xyzdetadzeta_map;
+
+  /**
+   * Vector of second partial derivatives in zeta:
+   * d^2(x)/d(zeta)^2 
+   */
+  std::vector<RealGradient> d2xyzdzeta2_map;
+
+#endif
   
   /**
    * Map for partial derivatives:
@@ -636,8 +725,6 @@ protected:
    */
   std::vector<Real>  dzetadz_map;
 
-
-  
   /**
    * Shape function values.
    */
@@ -679,6 +766,75 @@ protected:
   std::vector<std::vector<Real> >   dphidz;
 
 
+#ifdef ENABLE_SECOND_DERIVATIVES
+  
+  /**
+   * Shape function second derivative values.
+   */
+  std::vector<std::vector<RealTensor> >  d2phi;
+
+  /**
+   * Shape function second derivatives in the xi direction.
+   */
+  std::vector<std::vector<Real> >   d2phidxi2;
+
+  /**
+   * Shape function second derivatives in the xi-eta direction.
+   */
+  std::vector<std::vector<Real> >   d2phidxideta;
+  
+  /**
+   * Shape function second derivatives in the xi-zeta direction.
+   */
+  std::vector<std::vector<Real> >   d2phidxidzeta;
+
+  /**
+   * Shape function second derivatives in the eta direction.
+   */
+  std::vector<std::vector<Real> >   d2phideta2;
+
+  /**
+   * Shape function second derivatives in the eta-zeta direction.
+   */
+  std::vector<std::vector<Real> >   d2phidetadzeta;
+  
+  /**
+   * Shape function second derivatives in the zeta direction.
+   */
+  std::vector<std::vector<Real> >   d2phidzeta2;
+
+  /**
+   * Shape function second derivatives in the x direction.
+   */
+  std::vector<std::vector<Real> >   d2phidx2;
+
+  /**
+   * Shape function second derivatives in the x-y direction.
+   */
+  std::vector<std::vector<Real> >   d2phidxdy;
+
+  /**
+   * Shape function second derivatives in the x-z direction.
+   */
+  std::vector<std::vector<Real> >   d2phidxdz;
+
+  /**
+   * Shape function second derivatives in the y direction.
+   */
+  std::vector<std::vector<Real> >   d2phidy2;
+
+  /**
+   * Shape function second derivatives in the y-z direction.
+   */
+  std::vector<std::vector<Real> >   d2phidydz;
+
+  /**
+   * Shape function second derivatives in the z direction.
+   */
+  std::vector<std::vector<Real> >   d2phidz2;
+  
+#endif
+
 
 
   
@@ -702,6 +858,40 @@ protected:
    */
   std::vector<std::vector<Real> >   dphidzeta_map;
 
+#ifdef ENABLE_SECOND_DERIVATIVES
+
+  /**
+   * Map for the second derivative, d^2(phi)/d(xi)^2.
+   */
+  std::vector<std::vector<Real> >   d2phidxi2_map;
+
+  /**
+   * Map for the second derivative, d^2(phi)/d(xi)d(eta).
+   */
+  std::vector<std::vector<Real> >   d2phidxideta_map;
+
+  /**
+   * Map for the second derivative, d^2(phi)/d(xi)d(zeta).
+   */
+  std::vector<std::vector<Real> >   d2phidxidzeta_map;
+
+  /**
+   * Map for the second derivative, d^2(phi)/d(eta)^2.
+   */
+  std::vector<std::vector<Real> >   d2phideta2_map;
+
+  /**
+   * Map for the second derivative, d^2(phi)/d(eta)d(zeta).
+   */
+  std::vector<std::vector<Real> >   d2phidetadzeta_map;
+
+  /**
+   * Map for the second derivative, d^2(phi)/d(zeta)^2.
+   */
+  std::vector<std::vector<Real> >   d2phidzeta2_map;
+
+#endif
+  
 
 
 
@@ -896,6 +1086,20 @@ void FEBase::print_dphi(std::ostream& os) const
     for (unsigned int j=0; j<dphi[i].size(); ++j)
       os << " dphi[" << i << "][" << j << "]=" << dphi[i][j];
 }
+
+
+
+#ifdef ENABLE_SECOND_DERIVATIVES
+
+inline
+void FEBase::print_d2phi(std::ostream& os) const
+{
+  for (unsigned int i=0; i<dphi.size(); ++i)
+    for (unsigned int j=0; j<dphi[i].size(); ++j)
+      os << " d2phi[" << i << "][" << j << "]=" << d2phi[i][j];
+}
+
+#endif
 
 
 

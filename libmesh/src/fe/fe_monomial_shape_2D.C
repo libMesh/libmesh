@@ -1,4 +1,4 @@
-// $Id: fe_monomial_shape_2D.C,v 1.11 2004-03-24 05:49:11 jwpeterson Exp $
+// $Id: fe_monomial_shape_2D.C,v 1.12 2005-01-13 22:10:15 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -326,5 +326,238 @@ Real FE<2,MONOMIAL>::shape_deriv(const Elem* elem,
 
   // by default call the orientation-independent shape functions
   return FE<2,MONOMIAL>::shape_deriv(elem->type(), order, i, j, p); 
+}
+
+
+
+template <>
+Real FE<2,MONOMIAL>::shape_second_deriv(const ElemType,
+				        const Order order,
+				        const unsigned int i,
+				        const unsigned int j,
+				        const Point& p)
+{
+#if DIM > 1
+
+  
+  assert (j<2);
+
+  switch (order)
+    {
+      // monomials. since they are heirarchic we only need one case block.
+    case CONSTANT:
+    case FIRST:
+    case SECOND:
+    case THIRD:
+    case FOURTH:
+      {
+	assert (i < 15);
+
+	const Real xi  = p(0);
+	const Real eta = p(1);
+
+	switch (j)
+	  {
+	    // d^2()/dxi^2
+	  case 0:
+	    {
+	      switch (i)
+		{
+		  // constants
+		case 0:
+		  // linears
+		case 1:
+		case 2:
+		  return 0.;
+
+		  // quadratics
+		case 3:
+		  return 2.;
+		    
+		case 4:
+		case 5:
+		  return 0.;
+
+		  // cubics
+		case 6:
+		  return 6.*xi;
+		    
+		case 7:
+		  return 0.;
+		    
+		case 8:
+		  return 2.*eta;
+		    
+		case 9:
+		  return 0.;
+		    
+		  // quartics
+		case 10:
+		  return 12.*xi*xi;
+		    
+		case 11:
+		  return 0.;
+		    
+		case 12:
+		  return 2.*eta*eta;
+		    
+		case 13:
+		  return 6.*xi*eta;
+		    
+		case 14:
+		  return 0.;
+		    
+		default:
+		  std::cerr << "Invalid shape function index!" << std::endl;
+		  error();
+		}
+	    }
+
+	    // d^2()/dxideta
+	  case 1:
+	    {
+	      switch (i)
+		{
+		  // constants
+		case 0:
+		    
+		  // linears
+		case 1:
+		case 2:
+		  return 0.;
+
+		  // quadratics
+		case 3:
+		  return 0.;
+		    
+		case 4:
+		  return 1.;
+		    
+		case 5:
+		  return 0.;
+
+		  // cubics
+		case 6:
+		case 7:
+		  return 0.;
+		    
+		case 8:
+		  return 2.*xi;
+		    
+		case 9:
+		  return 2.*eta;
+		    
+		  // quartics
+		case 10:
+		case 11:
+		  return 0.;
+		    
+		case 12:
+		  return 4.*xi*eta;
+		    
+		case 13:
+		  return 3.*xi*xi;
+		    
+		case 14:
+		  return 3.*eta*eta;
+		    
+		default:
+		  std::cerr << "Invalid shape function index!" << std::endl;
+		  error();
+		}
+	    }
+	      
+	    // d^2()/deta^2
+	  case 2:
+	    {
+	      switch (i)
+		{
+		  // constants
+		case 0:
+		    
+		  // linears
+		case 1:
+		case 2:
+		  return 0.;
+
+		  // quadratics
+		case 3:
+		case 4:
+		  return 0.;
+		    
+		case 5:
+		  return 2.;
+
+		  // cubics
+		case 6:
+		  return 0.;
+		    
+		case 7:
+		  return 6.*eta;
+		    
+		case 8:
+		  return 0.;
+		    
+		case 9:
+		  return 2.*xi;
+		    
+		  // quartics
+		case 10:
+		  return 0.;
+		    
+		case 11:
+		  return 12.*eta*eta;
+		    
+		case 12:
+		  return 2.*xi*xi;
+		    
+		case 13:
+		  return 0.;
+		    
+		case 14:
+		  return 6.*xi*eta;
+		    
+		default:
+		  std::cerr << "Invalid shape function index!" << std::endl;
+		  error();
+		}
+	    }
+	      
+	      
+	  default:
+	    error();
+	  }
+      }
+
+      
+      
+      // unsupported order
+    default:
+      {
+	std::cerr << "ERROR: Unsupported 2D FE order!: " << order
+		  << std::endl;
+	error();
+      }
+    }
+
+  error();
+  return 0.;
+
+#endif
+}
+
+
+
+template <>
+Real FE<2,MONOMIAL>::shape_second_deriv(const Elem* elem,
+				        const Order order,
+				        const unsigned int i,
+				        const unsigned int j,
+				        const Point& p)
+{
+  assert (elem != NULL);
+
+  // by default call the orientation-independent shape functions
+  return FE<2,MONOMIAL>::shape_second_deriv(elem->type(), order, i, j, p); 
 }
 
