@@ -1,4 +1,4 @@
-// $Id: libmesh.h,v 1.3 2004-02-27 22:43:47 spetersen Exp $
+// $Id: libmesh.h,v 1.4 2004-08-06 16:48:39 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,6 @@
 
 
 // C++ includes
-#include <iostream>
 #include <string>
 
 // Local includes

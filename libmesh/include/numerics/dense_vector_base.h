@@ -1,4 +1,4 @@
-// $Id: dense_vector_base.h,v 1.5 2004-04-18 00:51:50 jwpeterson Exp $
+// $Id: dense_vector_base.h,v 1.6 2004-08-06 16:48:40 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -23,6 +23,7 @@
 #define __dense_vector_base_h__
 
 // C++ includes
+#include <iostream>
 #include <iomanip> // for std::setw
 
 // Local Includes

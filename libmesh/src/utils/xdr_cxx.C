@@ -1,4 +1,4 @@
-// "$Id: xdr_cxx.C,v 1.17 2004-08-05 20:21:10 jwpeterson Exp $\n"
+// "$Id: xdr_cxx.C,v 1.18 2004-08-06 16:48:41 jwpeterson Exp $\n"
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -19,6 +19,7 @@
 
 
 // C/C++ includes
+#include <iostream>
 #include <string.h>
 
 // Local includes
