@@ -129,8 +129,8 @@ void assemble(EquationSystems& es,
   
   DenseMatrix<Number> Kuu;
   DenseMatrix<Number> Kvv;
-  std::vector<Number> Fu;
-  std::vector<Number> Fv;
+  DenseVector<Number> Fu;
+  DenseVector<Number> Fv;
   
   Real vol=0., area=0.;
 
@@ -160,9 +160,6 @@ void assemble(EquationSystems& es,
       Fu.resize (phi.size());
       Fv.resize (phi.size());
 	    
-      for (unsigned int i=0; i<phi.size(); i++)
-	Fu[i] = Fv[i] = 0.;
-	    
       // standard stuff...  like in code 1.
       for (unsigned int gp=0; gp<qrule.n_points(); gp++)
 	{
@@ -181,8 +178,8 @@ void assemble(EquationSystems& es,
 		    
 	      // add jac*weight*f*phi to the RHS in position ig
 		    
-	      Fu[i] += JxW[gp]*f*phi[i][gp];
-	      Fv[i] += JxW[gp]*f*phi[i][gp];
+	      Fu(i) += JxW[gp]*f*phi[i][gp];
+	      Fv(i) += JxW[gp]*f*phi[i][gp];
 		    
 	      for (unsigned int j=0; j<phi.size(); ++j)
 		{

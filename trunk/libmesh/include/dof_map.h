@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.26 2003-05-15 23:34:33 benkirk Exp $
+// $Id: dof_map.h,v 1.27 2003-05-16 19:29:09 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -268,7 +268,7 @@ public:
   /**
    * Constrains the element vector.
    */
-  void constrain_element_vector (std::vector<Number>&       rhs,
+  void constrain_element_vector (DenseVector<Number>&       rhs,
 				 std::vector<unsigned int>& dofs) const;
   
   /**
@@ -280,7 +280,7 @@ public:
    * of the same approximation order.
    */
   void constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
-					    std::vector<Number>& rhs,
+					    DenseVector<Number>& rhs,
 					    std::vector<unsigned int>& elem_dofs) const;
   
 #endif

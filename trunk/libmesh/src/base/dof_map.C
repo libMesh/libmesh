@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.39 2003-05-15 23:34:34 benkirk Exp $
+// $Id: dof_map.C,v 1.40 2003-05-16 19:29:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -118,8 +118,6 @@ void DofMap::reinit(const MeshBase& mesh)
         // Skip the elements that were just refined
 	if (elem->refinement_flag() == Elem::JUST_REFINED) continue;
 
-	//here();
-        
 	for (unsigned int n=0; n<elem->n_nodes(); n++)
 	  {
 	    Node* node = elem->get_node(n);
@@ -196,14 +194,14 @@ void DofMap::reinit(const MeshBase& mesh)
     const const_node_iterator node_end (mesh.nodes_end());
 
     for ( ; node_it != node_end; ++node_it)
-      (*node_it)->invalidate_dofs();
+      (*node_it)->invalidate_dofs(this->sys_number());
     
     // All the elements
     const_active_elem_iterator       elem_it (mesh.elements_begin());
     const const_active_elem_iterator elem_end(mesh.elements_end());
 
     for ( ; elem_it != elem_end; ++elem_it)
-      (*elem_it)->invalidate_dofs();
+      (*elem_it)->invalidate_dofs(this->sys_number());
   }
 
   
@@ -860,7 +858,7 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
 
 
 void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
-						  std::vector<Number>& rhs,
+						  DenseVector<Number>& rhs,
 						  std::vector<unsigned int>& elem_dofs) const
 {
   assert (elem_dofs.size() == matrix.m());
@@ -920,7 +918,7 @@ void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
 
       
       // Compute the matrix-vector product C^T F
-      std::vector<Number> old_rhs(rhs);
+      DenseVector<Number> old_rhs(rhs);
       
       rhs.resize(elem_dofs.size());
       
@@ -928,10 +926,10 @@ void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
       for (unsigned int i=0; i<elem_dofs.size(); i++)
 	{
 	  // zero before summation
-	  rhs[i] = 0.;
+	  rhs(i) = 0.;
 	  
 	  for (unsigned int j=0; j<old_rhs.size(); j++)
-	    rhs[i] += C.transpose(i,j)*old_rhs[j];
+	    rhs(i) += C.transpose(i,j)*old_rhs(j);
 	}
 
 
@@ -941,7 +939,7 @@ void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
 	if (this->is_constrained_dof(elem_dofs[i]))
 	  {	
 	    // If the DOF is constrained
-	    rhs[i] = 0.;
+	    rhs(i) = 0.;
 	  }
     } // end if is constrained...
   
@@ -1027,7 +1025,7 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
 
 
 
-void DofMap::constrain_element_vector (std::vector<Number>&       rhs,
+void DofMap::constrain_element_vector (DenseVector<Number>&       rhs,
 				       std::vector<unsigned int>& row_dofs) const
 {
   assert (rhs.size() == row_dofs.size());
@@ -1044,7 +1042,7 @@ void DofMap::constrain_element_vector (std::vector<Number>&       rhs,
       (R.n() == row_dofs.size())) // if the RHS is constrained
     {
       // Compute the matrix-vector product
-      std::vector<Number> old_rhs(rhs);
+      DenseVector<Number> old_rhs(rhs);
       
       rhs.resize(row_dofs.size());
       
@@ -1052,10 +1050,10 @@ void DofMap::constrain_element_vector (std::vector<Number>&       rhs,
       for (unsigned int i=0; i<row_dofs.size(); i++)
 	{
 	  // zero before summation
-	  rhs[i] = 0.;
+	  rhs(i) = 0.;
 	  
 	  for (unsigned int j=0; j<old_rhs.size(); j++)
-	    rhs[i] += R.transpose(i,j)*old_rhs[j];
+	    rhs(i) += R.transpose(i,j)*old_rhs(j);
 	}
 
 
@@ -1065,7 +1063,7 @@ void DofMap::constrain_element_vector (std::vector<Number>&       rhs,
 	if (this->is_constrained_dof(row_dofs[i]))
 	  {	
 	    // If the DOF is constrained
-	    rhs[i] = 0.;
+	    rhs(i) = 0.;
 	  }
     } // end if the RHS is constrained.
   

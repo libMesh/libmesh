@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.35 2003-05-15 23:34:34 benkirk Exp $
+// $Id: equation_systems.C,v 1.36 2003-05-16 19:29:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -607,7 +607,7 @@ std::string EquationSystems::get_info () const
 
   for (; it != _systems.end(); ++it)
     out << it->second->get_info();
-
+    
   
   // Possibly print the flags
   if (!_flags.empty())
