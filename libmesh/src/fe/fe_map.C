@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.27 2004-04-19 17:41:07 benkirk Exp $
+// $Id: fe_map.C,v 1.28 2004-10-15 19:46:58 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -800,17 +800,12 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 		
 		physical_point.print();
 		
-		std::cerr << "   physical_guess=";
-		
-		physical_guess.print();
-		
-		std::cerr << "   dp=";
-		
-		dp.print();
-		
-		std::cerr << "   p=";
-		
-		p.print();
+		std::cerr << "   physical_guess="
+			  << physical_guess
+			  << "   dp="
+			  << dp
+			  << "   p="
+			  << p;
 		
 		std::cerr << "   error=" << error
 			  << std::endl;
