@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.7 2004-10-26 15:31:12 jwpeterson Exp $
+// $Id: fe_base.h,v 1.8 2004-12-24 15:02:29 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -225,7 +225,69 @@ public:
   const std::vector<RealGradient>& get_d2xyzdeta2() const
   { return d2xyzdeta2_map; }
 
+  /**
+   * @returns the dxi/dx entry in the transformation
+   * matrix from physical to local coordinates. 
+   */
+  const std::vector<Real>& get_dxidx() const
+  { return dxidx_map; }
 
+  /**
+   * @returns the dxi/dy entry in the transformation
+   * matrix from physical to local coordinates. 
+   */
+  const std::vector<Real>& get_dxidy() const
+  { return dxidy_map; }
+
+  /**
+   * @returns the dxi/dz entry in the transformation
+   * matrix from physical to local coordinates. 
+   */
+  const std::vector<Real>& get_dxidz() const
+  { return dxidz_map; }
+
+  /**
+   * @returns the deta/dx entry in the transformation
+   * matrix from physical to local coordinates. 
+   */
+  const std::vector<Real>& get_detadx() const
+  { return detadx_map; }
+
+  /**
+   * @returns the deta/dy entry in the transformation
+   * matrix from physical to local coordinates. 
+   */
+  const std::vector<Real>& get_detady() const
+  { return detady_map; }
+
+  /**
+   * @returns the deta/dz entry in the transformation
+   * matrix from physical to local coordinates. 
+   */
+  const std::vector<Real>& get_detadz() const
+  { return detadz_map; }
+
+  /**
+   * @returns the dzeta/dx entry in the transformation
+   * matrix from physical to local coordinates. 
+   */
+  const std::vector<Real>& get_dzetadx() const
+  { return dzetadx_map; }
+
+  /**
+   * @returns the dzeta/dy entry in the transformation
+   * matrix from physical to local coordinates. 
+   */
+  const std::vector<Real>& get_dzetady() const
+  { return dzetady_map; }
+
+  /**
+   * @returns the dzeta/dz entry in the transformation
+   * matrix from physical to local coordinates. 
+   */
+  const std::vector<Real>& get_dzetadz() const
+  { return dzetadz_map; }
+  
 #ifdef ENABLE_INFINITE_ELEMENTS
 
   /**

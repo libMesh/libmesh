@@ -1,4 +1,4 @@
-// $Id: type_vector.h,v 1.7 2004-10-19 16:35:55 jwpeterson Exp $
+// $Id: type_vector.h,v 1.8 2004-12-24 15:02:32 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -171,13 +171,13 @@ public:
   TypeVector<T> unit() const;
 
   /**
-   * Reutrns the magnitude of the vector, i.e. the square-root of the
+   * Returns the magnitude of the vector, i.e. the square-root of the
    * sum of the elements squared.
    */
   Real size() const;
 
   /**
-   * Reutrns the magnitude of the vector squared, i.e. the square-root
+   * Returns the magnitude of the vector squared, i.e. the square-root
    * of the sum of the elements squared.
    */
   Real size_sq() const;
