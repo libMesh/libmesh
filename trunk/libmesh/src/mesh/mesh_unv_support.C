@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.C,v 1.23 2003-09-09 14:11:56 ddreyer Exp $
+// $Id: mesh_unv_support.C,v 1.24 2003-09-09 17:13:35 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -857,10 +857,12 @@ void UnvMeshInterface::element_in (std::istream& in_file)
 	  assign_elem_nodes[6]=13;
 	  assign_elem_nodes[7]=1;
 	  assign_elem_nodes[8]=8;
+
 	  assign_elem_nodes[9]=11;
 	  assign_elem_nodes[10]=19;
 	  assign_elem_nodes[11]=17;
 	  assign_elem_nodes[12]=9;
+
 	  assign_elem_nodes[13]=3;
 	  assign_elem_nodes[14]=15;
 	  assign_elem_nodes[15]=7;
@@ -881,7 +883,7 @@ void UnvMeshInterface::element_in (std::istream& in_file)
 	  break;
 
 	
-	case 118: // Solid Parabolic Tetrahedron
+	case 118: // Solid Quadratic Tetrahedron
 	  // _elements[i]= Elem::build(TET10);
 	  _elements[i]=new Tet10; // add new element
 	  assign_elem_nodes[1]=0;
@@ -1114,29 +1116,31 @@ void UnvMeshInterface::element_out(std::ostream& out_file)
 	case HEX20:
 	  fe_descriptor_id = 116; // Solid Quadratic Brick
 	  assign_elem_nodes[ 0] = 1;
-	  assign_elem_nodes[12] = 2;
-	  assign_elem_nodes[ 4] = 3;
-	  assign_elem_nodes[16] = 4;
-	  assign_elem_nodes[ 5] = 5;
-	  assign_elem_nodes[13] = 6;
-	  assign_elem_nodes[ 1] = 7;
-	  assign_elem_nodes[ 8] = 8;
-	  assign_elem_nodes[11] = 9;
-	  assign_elem_nodes[19] = 10;
-	  assign_elem_nodes[17] = 11;
-	  assign_elem_nodes[ 9] = 12;
-	  assign_elem_nodes[ 3] = 13;
-	  assign_elem_nodes[15] = 14;
-	  assign_elem_nodes[ 7] = 15;
-	  assign_elem_nodes[18] = 16;
-	  assign_elem_nodes[ 6] = 17;
-	  assign_elem_nodes[14] = 18;
-	  assign_elem_nodes[ 2] = 19;
-	  assign_elem_nodes[10] = 20;
+	  assign_elem_nodes[ 1] = 13;
+	  assign_elem_nodes[ 2] = 5;
+	  assign_elem_nodes[ 3] = 17;
+	  assign_elem_nodes[ 4] = 6;
+	  assign_elem_nodes[ 5] = 14;
+	  assign_elem_nodes[ 6] = 2;
+	  assign_elem_nodes[ 7] = 9;
+
+	  assign_elem_nodes[ 8] = 12;
+	  assign_elem_nodes[ 9] = 20;
+	  assign_elem_nodes[10] = 18;
+	  assign_elem_nodes[11] = 10;
+
+	  assign_elem_nodes[12] = 4;
+	  assign_elem_nodes[13] = 16;
+	  assign_elem_nodes[14] = 8;
+	  assign_elem_nodes[15] = 19;
+	  assign_elem_nodes[16] = 7;
+	  assign_elem_nodes[17] = 15;
+	  assign_elem_nodes[18] = 3;
+	  assign_elem_nodes[19] = 11;
 	  break;
 		
 	case TET10:
-	  fe_descriptor_id = 118; // Solid Parabolic Tetrahedron
+	  fe_descriptor_id = 118; // Solid Quadratic Tetrahedron
 
 	  assign_elem_nodes[0] = 1; //0
 	  assign_elem_nodes[1] = 5; //4
@@ -1154,7 +1158,7 @@ void UnvMeshInterface::element_out(std::ostream& out_file)
 	default:
 	  std::cerr << "ERROR: Element type = " 
 		    << elem->type() 
-		    << "not supported in "
+		    << " not supported in "
 		    << "UnvMeshInterface!"
 		    << std::endl;
 	  error();	
