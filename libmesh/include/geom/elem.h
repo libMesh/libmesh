@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: elem.h,v 1.3 2004-02-10 13:28:06 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -23,6 +23,7 @@
 #define __elem_h__
 
 // C++ includes
+#include <algorithm>
 #include <vector>
 
 // Local includes
@@ -34,7 +35,6 @@
 #include "enum_elem_quality.h"
 #include "enum_order.h"
 #include "auto_ptr.h"
-#include "utility.h"
 
 
 // Forward declarations
@@ -1048,7 +1048,7 @@ unsigned int Elem::compute_key (unsigned int n0,
   const unsigned int bp = 65449;
   
   // Order the two so that n0 < n1
-  if (n0 > n1) Utility::swap (n0, n1);
+  if (n0 > n1) std::swap (n0, n1);
 
   return (n0%bp + (n1<<5)%bp);  
 }
@@ -1078,13 +1078,13 @@ unsigned int Elem::compute_key (unsigned int n0,
 
 
   // Step 1
-  if (n0 > n1) Utility::swap (n0, n1);
+  if (n0 > n1) std::swap (n0, n1);
 
   // Step 2
-  if (n1 > n2) Utility::swap (n1, n2);
+  if (n1 > n2) std::swap (n1, n2);
 
   // Step 3
-  if (n0 > n1) Utility::swap (n0, n1);
+  if (n0 > n1) std::swap (n0, n1);
 
   assert ((n0 < n1) && (n1 < n2));
 
@@ -1104,19 +1104,19 @@ unsigned int Elem::compute_key (unsigned int n0,
   const unsigned int bp = 65449;
 
   // Step 1
-  if (n0 > n1) Utility::swap (n0, n1);
+  if (n0 > n1) std::swap (n0, n1);
 
   // Step 2
-  if (n2 > n3) Utility::swap (n2, n3);
+  if (n2 > n3) std::swap (n2, n3);
 
   // Step 3
-  if (n0 > n2) Utility::swap (n0, n2);
+  if (n0 > n2) std::swap (n0, n2);
 
   // Step 4
-  if (n1 > n3) Utility::swap (n1, n3);
+  if (n1 > n3) std::swap (n1, n3);
 
   // Finally step 5
-  if (n1 > n2) Utility::swap (n1, n2);
+  if (n1 > n2) std::swap (n1, n2);
 
   assert ((n0 < n1) && (n1 < n2) && (n2 < n3));
   

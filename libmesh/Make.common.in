@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.32 2004-01-03 15:37:40 benkirk Exp $
+# $Id: Make.common.in,v 1.33 2004-02-10 13:28:06 benkirk Exp $
 
 
 ###############################################################################
@@ -226,15 +226,16 @@ ifeq ($(enable-optional),yes)
   LIBS    += @LASPACK_LIB@
   INCLUDE += @LASPACK_INCLUDE@
 
+  # if Paretis is used we need the header path
+  # and the lib
+  # (Parmetis must precede Metis for static linking)
+  LIBS    += @PARMETIS_LIB@
+  INCLUDE += @PARMETIS_INCLUDE@
+
   # if Metis is used we need the header path
   # and the lib
   LIBS    += @METIS_LIB@
   INCLUDE += @METIS_INCLUDE@
-
-  # if Paretis is used we need the header path
-  # and the lib
-  LIBS    += @PARMETIS_LIB@
-  INCLUDE += @PARMETIS_INCLUDE@
 
   # if Space filling curves are used we need the
   # header path and the lib

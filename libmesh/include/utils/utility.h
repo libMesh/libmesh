@@ -1,4 +1,4 @@
-// $Id: utility.h,v 1.4 2004-02-09 18:51:31 jwpeterson Exp $
+// $Id: utility.h,v 1.5 2004-02-10 13:28:06 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -55,26 +55,6 @@ namespace Utility
 	*first = value++;
 	++first;
       }
-  }
-
-  /**
-   * An efficient, temporary-free swapping algorithm
-   * on machines where this is possible.
-   */
-  template <typename T>
-  void swap (T& a, T& b)
-  {
-#ifdef __HP_aCC
-    
-    const T buf = a;
-    a = b;
-    b = buf;
-    
-#else
-
-    a^=b^=a^=b;
-      
-#endif    
   }
 
   /**

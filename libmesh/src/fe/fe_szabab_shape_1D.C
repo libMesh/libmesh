@@ -1,4 +1,4 @@
-// $Id: fe_szabab_shape_1D.C,v 1.3 2004-02-08 22:07:46 benkirk Exp $
+// $Id: fe_szabab_shape_1D.C,v 1.4 2004-02-10 13:28:07 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -43,7 +43,7 @@ Real FE<1,SZABAB>::shape(const ElemType,
 
 
   // Use this assert rather than a switch with a single entry...
-  // It will go away in debug mode, essentially has the same effect.
+  // It will go away in optimized mode, essentially has the same effect.
   assert (order <= SEVENTH);
   
 //   switch (order)
@@ -114,7 +114,7 @@ Real FE<1,SZABAB>::shape_deriv(const ElemType,
   const Real xi2 = xi*xi;
   
   // Use this assert rather than a switch with a single entry...
-  // It will go away in debug mode, essentially has the same effect.
+  // It will go away in optimized mode, essentially has the same effect.
   assert (order <= SEVENTH);
   
 //   switch (order)

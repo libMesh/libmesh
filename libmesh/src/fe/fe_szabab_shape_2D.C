@@ -1,4 +1,4 @@
-// $Id: fe_szabab_shape_2D.C,v 1.4 2004-02-09 17:12:28 jwpeterson Exp $
+// $Id: fe_szabab_shape_2D.C,v 1.5 2004-02-10 13:28:07 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -30,6 +30,7 @@
 
 #include "fe.h"
 #include "elem.h"
+#include "utility.h"
 
 
 // Anonymous namespace to hold static sqrt values

@@ -8,7 +8,7 @@
  * Started 8/27/94
  * George
  *
- * $Id: parmetis.h,v 1.2 2003-07-15 12:40:11 benkirk Exp $
+ * $Id: parmetis.h,v 1.3 2004-02-10 13:28:06 benkirk Exp $
  */
 
 #define PARMETIS_MAJOR_VERSION        3
@@ -25,19 +25,8 @@
 #include <dmalloc.h>
 #endif
 
-#include <rename.h>
-#include <defs.h>
-#include <struct.h>
-#include <macros.h>
-#include <proto.h>
-
-/**
- * Hmm...  These are copied from proto.h, but for some reason they
- * don't get included?
- */
-
-/* kmetis.c */
-void ParMETIS_V3_PartKway(idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, int *, int *, int *, int *, float *, float *, int *, int *, idxtype *, MPI_Comm *);
-
-/* ametis.c */
-void ParMETIS_V3_AdaptiveRepart(idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, int *, int *, int *, int *, float *, float *, float *, int *, int *, idxtype *, MPI_Comm *);
+#include "rename.h"
+#include "defs.h"
+#include "struct.h"
+#include "macros.h"
+#include "proto.h"
