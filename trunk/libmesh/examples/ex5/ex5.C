@@ -1,4 +1,4 @@
-// $Id: ex5.C,v 1.2 2003-02-06 17:58:33 ddreyer Exp $
+// $Id: ex5.C,v 1.3 2003-02-07 15:21:30 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -141,11 +141,18 @@ int main (int argc, char** argv)
 	std::cerr << "Usage: " << argv[0] << " -q n"
 		  << std::endl;
 	std::cerr << "  where n stands for:" << std::endl;
-	for (unsigned int n=0; n<QuadratureRules::num_rules; n++)
-	  std::cerr << "  " << n << "    " 
-		    << QuadratureRules::name(static_cast<QuadratureType>(n))
+
+	/**
+	 * Note that only some of all quadrature rules are
+	 * valid choices.  For example, the Jacobi quadrature
+	 * is actually a "helper" for higher-order rules,
+	 * included in QGauss.
+	 */
+	for (unsigned int n=0; n<QuadratureRules::num_valid_elem_rules; n++)
+	  std::cerr << "  " << QuadratureRules::valid_elem_rules[n] << "    " 
+		    << QuadratureRules::name(QuadratureRules::valid_elem_rules[n])
 		    << std::endl;
-	
+
 	std::cerr << std::endl;
 	
 	error();
@@ -183,11 +190,11 @@ int main (int argc, char** argv)
      */
     Mesh mesh (dim);
     
-    mesh.build_cube (5, 5, 5,
+    mesh.build_cube (8, 8, 8,
 		     -1., 1.,
 		     -1., 1.,
 		     -1., 1.,
-		     HEX27);
+		     HEX8);
 
     mesh.find_neighbors();
     
@@ -198,7 +205,7 @@ int main (int argc, char** argv)
     {
       equation_systems.add_system("Poisson");
       
-      equation_systems("Poisson").add_variable("u", SECOND);
+      equation_systems("Poisson").add_variable("u", FIRST);
 
       equation_systems("Poisson").attach_assemble_function (assemble_poisson);
       
@@ -260,7 +267,7 @@ void assemble_poisson(EquationSystems& es,
    * for numerical integration.  Note that not all
    * quadrature rules support this order.
    */
-  AutoPtr<QBase> qrule(QBase::build(quad_type, dim, FIFTH));
+  AutoPtr<QBase> qrule(QBase::build(quad_type, dim, THIRD));
 
 
   /**
@@ -390,7 +397,7 @@ void assemble_poisson(EquationSystems& es,
 	       * \verbatim
 	         AutoPtr<QBase>  qface1 (QBase::build(qrule->type(),
 		                                      dim-1, 
-						      FIFTH));
+						      THIRD));
 		 \endverbatim
 	       * And again: using the \p AutoPtr<QBase> relaxes
 	       * the need to delete the object afterwards,
@@ -398,10 +405,10 @@ void assemble_poisson(EquationSystems& es,
 	       */
 	      AutoPtr<QBase>  qface0 (QBase::build(quad_type, 
 						   dim,   
-						   FIFTH));
+						   THIRD));
 	      AutoPtr<QBase>  qface1 (QBase::build(quad_type,
 						   dim-1, 
-						   FIFTH));
+						   THIRD));
 	      
 	      /**
 	       * Tell the finte element object to use our

@@ -1,4 +1,4 @@
-// $Id: quadrature_rules.h,v 1.1 2003-02-06 17:58:34 ddreyer Exp $
+// $Id: quadrature_rules.h,v 1.2 2003-02-07 15:21:32 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -43,6 +43,22 @@ namespace QuadratureRules
    * add a new one!
    */
   const unsigned int num_rules = 5;
+
+  /**
+   * The types of quadrature rules that may 
+   * be used for numerical integration
+   * over geometric entities.
+   */
+  const QuadratureType valid_elem_rules[] = {QGAUSS,
+					     QSIMPSON,
+					     QTRAP};
+
+  /**
+   * The number of valid quadrature rules for
+   * numerical integration over geometric entities.
+   */
+  const unsigned int num_valid_elem_rules = 3;
+
 
   /**
    * Returns a standard string representation

@@ -1,4 +1,4 @@
-// $Id: quadrature_build.C,v 1.1 2003-02-06 17:58:35 ddreyer Exp $
+// $Id: quadrature_build.C,v 1.2 2003-02-07 15:21:32 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -45,7 +45,7 @@ AutoPtr<QBase> QBase::build(const QuadratureType _qt,
 	if (_order > TWENTYTHIRD)
 	  {
 	    std::cout << "WARNING: Gauss quadrature implemented" << std::endl
-		      << " 'only' up to TWENTYTHIRD order!" << std::endl;
+		      << " up to TWENTYTHIRD order." << std::endl;
 	  };
 #endif
 
@@ -60,7 +60,13 @@ AutoPtr<QBase> QBase::build(const QuadratureType _qt,
 	if (_order > TWENTYTHIRD)
 	  {
 	    std::cout << "WARNING: Jacobi(1,0) quadrature implemented" << std::endl
-		      << " 'only' up to TWENTYTHIRD order!" << std::endl;
+		      << " up to TWENTYTHIRD order." << std::endl;
+	  };
+
+	if (_dim > 1)
+	  {
+	    std::cout << "WARNING: Jacobi(1,0) quadrature implemented" << std::endl
+		      << " in 1D only." << std::endl;
 	  };
 #endif
 
@@ -75,7 +81,13 @@ AutoPtr<QBase> QBase::build(const QuadratureType _qt,
 	if (_order > TWENTYTHIRD)
 	  {
 	    std::cout << "WARNING: Jacobi(2,0) quadrature implemented" << std::endl
-		      << " 'only' up to TWENTYTHIRD order!" << std::endl;
+		      << " up to TWENTYTHIRD order." << std::endl;
+	  };
+
+	if (_dim > 1)
+	  {
+	    std::cout << "WARNING: Jacobi(2,0) quadrature implemented" << std::endl
+		      << " in 1D only." << std::endl;
 	  };
 #endif
 
