@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.47 2003-11-30 06:33:38 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.48 2003-11-30 06:35:11 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -1337,6 +1337,7 @@ if (test -e $MPI_LIBS_PATH/libmpich.a || test -e $MPI_LIBS_PATH/libmpich.so) ; t
                       ])
 
           LIBS="-L$GM/lib $LIBS"
+          MPI_LIBS="-L$GM/lib $MPI_LIBS"
 
           AC_CHECK_LIB([gm],
 	               [gm_open],

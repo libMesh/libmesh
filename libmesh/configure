@@ -8181,8 +8181,8 @@ echo "$as_me:$LINENO: result: $ac_cv_lib_gm_gm_open" >&5
 echo "${ECHO_T}$ac_cv_lib_gm_gm_open" >&6
 if test $ac_cv_lib_gm_gm_open = yes; then
 
-                         LIBS="-lgm $LIBS"
-                         MPI_LIBS="-lgm $MPI_LIBS"
+                         LIBS="$LIBS -lgm"
+                         MPI_LIBS="$MPI_LIBS -lgm"
 
 else
   { { echo "$as_me:$LINENO: error: Could not find gm library... exiting " >&5
@@ -8249,7 +8249,7 @@ echo "$as_me:$LINENO: result: $ac_cv_lib_mpich_MPI_Init" >&5
 echo "${ECHO_T}$ac_cv_lib_mpich_MPI_Init" >&6
 if test $ac_cv_lib_mpich_MPI_Init = yes; then
 
-		       MPI_LIBS="-lmpich"
+		       MPI_LIBS="-lmpich $MPI_LIBS"
 		       MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
                        echo "$as_me:$LINENO: result: Found valid MPICH installlaion..." >&5
 echo "${ECHO_T}Found valid MPICH installlaion..." >&6
@@ -8864,8 +8864,8 @@ echo "$as_me:$LINENO: result: $ac_cv_lib_gm_gm_open" >&5
 echo "${ECHO_T}$ac_cv_lib_gm_gm_open" >&6
 if test $ac_cv_lib_gm_gm_open = yes; then
 
-                         LIBS="-lgm $LIBS"
-                         MPI_LIBS="-lgm $MPI_LIBS"
+                         LIBS="$LIBS -lgm"
+                         MPI_LIBS="$MPI_LIBS -lgm"
 
 else
   { { echo "$as_me:$LINENO: error: Could not find gm library... exiting " >&5
@@ -8932,7 +8932,7 @@ echo "$as_me:$LINENO: result: $ac_cv_lib_mpich_MPI_Init" >&5
 echo "${ECHO_T}$ac_cv_lib_mpich_MPI_Init" >&6
 if test $ac_cv_lib_mpich_MPI_Init = yes; then
 
-		       MPI_LIBS="-lmpich"
+		       MPI_LIBS="-lmpich $MPI_LIBS"
 		       MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
                        echo "$as_me:$LINENO: result: Found valid MPICH installlaion..." >&5
 echo "${ECHO_T}Found valid MPICH installlaion..." >&6
