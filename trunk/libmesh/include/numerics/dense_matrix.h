@@ -1,4 +1,4 @@
-// $Id: dense_matrix.h,v 1.3 2004-01-03 15:37:42 benkirk Exp $
+// $Id: dense_matrix.h,v 1.4 2004-02-22 21:47:58 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -163,10 +163,6 @@ public:
 		const T val,
 		DenseVector<T>& rhs);
 
-  /**
-   * Form the LU decomposition of the matrix.
-   */
-  void lu_decompose (const bool partial_pivot = false);
   
   /**
    * Solve the system Ax=b given the input vector b.
@@ -175,13 +171,35 @@ public:
 		 DenseVector<T>& x,
 		 const bool partial_pivot = false);
 
-  /**
-   * Solves the system Ax=b through back substitution
-   */
-  void lu_back_substitute (DenseVector<T>& b,
-			   DenseVector<T>& x,
-			   const bool partial_pivot = false) const;
 
+
+  /**
+   * For symmetric positive definite (SPD) matrices. A Cholesky factorization
+   * of A such that A = L L^T is about twice as fast as a standard LU
+   * factorization.  Therefore you can use this method if you know a-priori
+   * that the matrix is SPD.  If the matrix is not SPD, an error is generated.
+   * One nice property of cholesky decompositions is that they do not require
+   * pivoting for stability.
+   */
+  void cholesky_solve(DenseVector<T>& b,
+		      DenseVector<T>& x);
+  
+  /**
+   * @returns the determinant of the matrix.  Note that this means
+   * doing an LU decomposition and then computing the product of the
+   * diagonal terms.  Therefore this is a non-const method.
+   */
+  T det();
+
+  /**
+   * Computes the inverse of the dense matrix (assuming it is invertible)
+   * by first computing the LU decomposition and then performing multiple
+   * back substitution steps.  Follows the algorithm from Numerical Recipes
+   * in C available on the web.  This is not the most memory efficient routine since
+   * the inverse is not computed "in place" but is instead placed into a the
+   * matrix inv passed in by the user.
+   */
+  // void inverse();
   
 private:
 
@@ -189,6 +207,52 @@ private:
    * The actual data values, stored as a 1D array.
    */
   std::vector<T> _val;
+
+  /**
+   * Form the LU decomposition of the matrix.  This function
+   * is private since it is only called as part of the implementation
+   * of the lu_solve(...) function.
+   */
+  void _lu_decompose (const bool partial_pivot = false);
+  
+  /**
+   * Solves the system Ax=b through back substitution.  This function
+   * is private since it is only called as part of the implementation
+   * of the lu_solve(...) function.
+   */
+  void _lu_back_substitute (DenseVector<T>& b,
+			    DenseVector<T>& x,
+			    const bool partial_pivot = false) const;
+  
+  /**
+   * Decomposes a symmetric positive definite matrix into a
+   * product of two lower triangular matrices according to
+   * A = LL^T.  Note that this program generates an error
+   * if the matrix is not SPD.
+   */
+  void _cholesky_decompose();
+
+  /**
+   * Solves the equation Ax=b for the unknown value x and rhs
+   * b based on the Cholesky factorization of A.
+   */
+  void _cholesky_back_substitute(DenseVector<T>& b,
+				 DenseVector<T>& x) const;
+
+  /**
+   * The decomposition schemes above change the entries of the matrix
+   * A.  It is therefore an error to call A.lu_solve() and subsequently
+   * call A.cholesky_solve() since the result will probably not match
+   * any desired outcome.  This typedef keeps track of which decomposition
+   * has been called for this matrix.  
+   */
+  enum DecompositionType {LU=0, CHOLESKY=1, NONE};
+
+  /**
+   * This flag keeps track of which type of decomposition has been
+   * performed on the matrix.
+   */
+  DecompositionType _decomposition_type;
 };
 
 
@@ -235,7 +299,8 @@ template<typename T>
 inline
 DenseMatrix<T>::DenseMatrix(const unsigned int m,
 			    const unsigned int n)
-  : DenseMatrixBase<T>(m,n)
+  : DenseMatrixBase<T>(m,n),
+    _decomposition_type(NONE)
 {
   this->resize(m,n);
 }
