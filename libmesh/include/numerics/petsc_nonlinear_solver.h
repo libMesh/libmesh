@@ -1,4 +1,4 @@
-// $Id: petsc_nonlinear_solver.h,v 1.1 2005-01-03 20:14:36 benkirk Exp $
+// $Id: petsc_nonlinear_solver.h,v 1.2 2005-01-03 22:10:10 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -77,7 +77,11 @@ public:
    * Call the Petsc solver.  It calls the method below, using the
    * same matrix for the system and preconditioner matrices.
    */
-  virtual std::pair<unsigned int, Real> solve ();
+  virtual std::pair<unsigned int, Real> solve (SparseMatrix<T>&,    // System Jacobian Matrix
+					       NumericVector<T>&,   // Solution vector
+					       NumericVector<T>&,   // Residual vector
+					       const double,        // Stopping tolerance
+					       const unsigned int); // N. Iterations
 
 
   

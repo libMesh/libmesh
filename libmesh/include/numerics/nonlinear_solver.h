@@ -1,4 +1,4 @@
-// $Id: nonlinear_solver.h,v 1.1 2005-01-03 20:14:36 benkirk Exp $
+// $Id: nonlinear_solver.h,v 1.2 2005-01-03 22:10:10 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -87,14 +87,27 @@ public:
   virtual void init () = 0;
 
   /**
-   * This function calls the solver
-   * "_solver_type" preconditioned with the
-   * "_preconditioner_type" preconditioner.  Note that this method
-   * will compute the preconditioner from the system matrix.
+   *
    */
-  virtual std::pair<unsigned int, Real> solve ( ) = 0;
+  virtual std::pair<unsigned int, Real> solve (SparseMatrix<T>&,  // System Jacobian Matrix
+					       NumericVector<T>&, // Solution vector
+					       NumericVector<T>&, // Residual vector
+					       const double,      // Stopping tolerance
+					       const unsigned int) = 0; // N. Iterations
 
+  /**
+   * Function that computes the residual \p R(X) of the nonlinear system
+   * at the input iterate \p X.
+   */
+  void (* residual) (const NumericVector<Number>& X,
+		     NumericVector<Number>& R);
 
+  /**
+   * Function that computes the Jacobian \p J(X) of the nonlinear system
+   * at the input iterate \p X.
+   */
+  void (* jacobian) (const NumericVector<Number>& X,
+		     SparseMatrix<Number>& J);
   
 protected:
 
@@ -112,8 +125,9 @@ protected:
 template <typename T>
 inline
 NonlinearSolver<T>::NonlinearSolver () :
-  
-  _is_initialized      (false)
+  residual        (NULL),
+  jacobian        (NULL),
+  _is_initialized (false)
 {
 }
 
