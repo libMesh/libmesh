@@ -1,4 +1,4 @@
-// $Id: system_projection.C,v 1.4 2004-03-22 01:11:59 jwpeterson Exp $
+// $Id: system_projection.C,v 1.5 2004-06-01 15:50:54 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -101,6 +101,13 @@ void System::project_vector (const NumericVector<Number>& old_vector,
       // This method is only good for Lagrange elements
       assert (fe_type.family == LAGRANGE);
 
+      // Optionally, you can comment out the above assert,
+      // and uncomment the lines below to skip variables not
+      // approximated by Lagrange elements.  Just don't
+      // comment out both!
+      //if (fe_type.family != LAGRANGE)
+      //continue;
+      
       // The global DOF indices on the
       // old and new meshes
       std::vector<unsigned int> new_dof_indices, old_dof_indices;
