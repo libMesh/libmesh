@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.6 2003-01-31 17:13:41 spetersen Exp $
+// $Id: boundary_info.C,v 1.7 2003-01-31 21:22:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -373,7 +373,7 @@ void BoundaryInfo::add_boundary_values(const unsigned int node,
 };
 
 
-std::vector<real> BoundaryInfo::get_boundary_values(unsigned int node) const
+std::vector<real> BoundaryInfo::get_boundary_values(const unsigned int node) const
 {
   std::vector<std::pair<unsigned int,
               std::vector<real> > >::const_iterator pos;
