@@ -1,4 +1,4 @@
-//    $Id: petsc_matrix.h,v 1.26 2003-08-04 12:43:06 ddreyer Exp $
+//    $Id: petsc_matrix.h,v 1.27 2003-08-28 19:35:42 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -316,7 +316,7 @@ template <typename T>
 inline
 PetscMatrix<T>::~PetscMatrix()
 {
-  clear();
+  this->clear();
 }
 
 
@@ -325,15 +325,13 @@ template <typename T>
 inline
 void PetscMatrix<T>::close () const
 {
-  if (closed())
+  if (this->closed())
     return;
   
   int ierr=0;
  
   ierr = MatAssemblyBegin (mat, MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
   ierr = MatAssemblyEnd   (mat, MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
-  
-  return;
 }
 
 
@@ -411,8 +409,6 @@ void PetscMatrix<T>::set (const unsigned int i,
   PetscScalar petsc_value = static_cast<PetscScalar>(value);
   ierr = MatSetValues(mat, 1, &i_val, 1, &j_val,
 		      &petsc_value, INSERT_VALUES); CHKERRQ(ierr);
-
-  return;
 }
 
 

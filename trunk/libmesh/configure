@@ -8136,13 +8136,91 @@ _ACEOF
     echo "$as_me:$LINENO: result: <<< Configuring library with PETSc version $petscversion support >>>" >&5
 echo "${ECHO_T}<<< Configuring library with PETSc version $petscversion support >>>" >&6
 
-
   else
     enablepetsc=no
   fi
 
 
 
+
+      if test "$enablepetsc" = no ; then
+                                # Check whether --enable-mpi or --disable-mpi was given.
+if test "${enable_mpi+set}" = set; then
+  enableval="$enable_mpi"
+  enablempi=$enableval
+else
+  enablempi=yes
+fi;
+
+    if test "$enablempi" != no ; then
+
+  as_ac_File=`echo "ac_cv_file_$MPIHOME/include/mpi.h" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $MPIHOME/include/mpi.h" >&5
+echo $ECHO_N "checking for $MPIHOME/include/mpi.h... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$MPIHOME/include/mpi.h"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  MPI_INCLUDE_PATH=-I$MPIHOME/include
+fi
+
+
+    as_ac_File=`echo "ac_cv_file_$MPIHOME/lib/libmpich.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $MPIHOME/lib/libmpich.a" >&5
+echo $ECHO_N "checking for $MPIHOME/lib/libmpich.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$MPIHOME/lib/libmpich.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  MPI_LIBRARY_PATH=$MPIHOME/lib/libmpich.a
+else
+  MPI_LIBRARY_PATH=/mpich_bar_not_there
+fi
+
+
+  if (test -r $MPIHOME/include/mpi.h -a -r $MPI_LIBRARY_PATH) ; then
+
+                                MPI_LIBRARY_PATH="-L $MPIHOME/lib -lmpich -lpmpich"
+
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_MPI 1
+_ACEOF
+
+    echo "$as_me:$LINENO: result: <<< Configuring library with MPI support >>>" >&5
+echo "${ECHO_T}<<< Configuring library with MPI support >>>" >&6
+  else
+    enablempi=no
+  fi
+
+
+
+          fi
+    fi
 else
                 # Check whether --enable-mpi or --disable-mpi was given.
 if test "${enable_mpi+set}" = set; then

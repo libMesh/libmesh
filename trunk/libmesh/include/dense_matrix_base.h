@@ -1,4 +1,4 @@
-// $Id: dense_matrix_base.h,v 1.2 2003-03-12 00:33:17 jwpeterson Exp $
+// $Id: dense_matrix_base.h,v 1.3 2003-08-28 19:35:42 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -70,16 +70,16 @@ public:
    * Since internal data representations may differ, you
    * must redefine this function.
    */
-  virtual T operator() (const unsigned int i,
-			const unsigned int j) const = 0;
+  virtual T el(const unsigned int i,
+	       const unsigned int j) const = 0;
   
   /**
    * @returns the \p (i,j) element of the matrix as a writeable reference.
    * Since internal data representations may differ, you
    * must redefine this function.
    */
-  virtual T & operator() (const unsigned int i,
-			  const unsigned int j) = 0;
+  virtual T & el(const unsigned int i,
+		 const unsigned int j) = 0;
 
   /**
    * Performs the operation: (*this) <- M2 * (*this) 
@@ -157,7 +157,7 @@ void DenseMatrixBase<T>::print () const
   for (unsigned int i=0; i<_m; i++)
     {
       for (unsigned int j=0; j<_n; j++)
-	std::cout << std::setw(8) << (*this)(i,j) << " ";
+	std::cout << std::setw(8) << this->el(i,j) << " ";
 
       std::cout << std::endl;
     }
@@ -177,7 +177,7 @@ void DenseMatrixBase<T>::add (const T factor,
 
   for (unsigned int j=0; j<_n; j++)
     for (unsigned int i=0; i<_m; i++)
-      (*this)(i,j) += factor*mat(i,j);
+      this->el(i,j) += factor*mat.el(i,j);
 }
 
 
@@ -199,7 +199,7 @@ void DenseMatrixBase<Complex>::add (const Complex factor,
 
   for (unsigned int j=0; j<_n; j++)
     for (unsigned int i=0; i<_m; i++)
-      (*this)(i,j) += factor*mat(i,j);
+      this->el(i,j) += factor*mat.el(i,j);
 }
 
 

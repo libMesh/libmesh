@@ -1,4 +1,4 @@
-// $Id: dense_submatrix.h,v 1.3 2003-03-11 23:36:42 ddreyer Exp $
+// $Id: dense_submatrix.h,v 1.4 2003-08-28 19:35:42 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -78,15 +78,27 @@ public:
   /**
    * @returns the \p (i,j) element of the submatrix.
    */
-  virtual T operator() (const unsigned int i,
-			const unsigned int j) const;
+  T operator() (const unsigned int i,
+		const unsigned int j) const;
 
   /**
    * @returns the \p (i,j) element of the submatrix as a writeable reference.
    */
-  virtual T & operator() (const unsigned int i,
-			  const unsigned int j);
+  T & operator() (const unsigned int i,
+		  const unsigned int j);
   
+  /**
+   * @returns the \p (i,j) element of the matrix as a writeable reference.
+   */
+  virtual T el(const unsigned int i,
+	       const unsigned int j) const { return (*this)(i,j); }
+
+  /**
+   * @returns the \p (i,j) element of the matrix as a writeable reference.
+   */
+  virtual T & el(const unsigned int i,
+		 const unsigned int j)     { return (*this)(i,j); } 
+
   /**
    * Performs the operation: (*this) <- M2 * (*this) 
    */

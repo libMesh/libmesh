@@ -1,4 +1,4 @@
-// $Id: dense_subvector.h,v 1.3 2003-03-07 05:07:54 jwpeterson Exp $
+// $Id: dense_subvector.h,v 1.4 2003-08-28 19:35:42 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -69,13 +69,23 @@ public:
   /**
    * @returns the \p (i,j) element of the subvector.
    */
-  virtual T operator() (const unsigned int i) const;
+  T operator() (const unsigned int i) const;
 
   /**
    * @returns the \p (i,j) element of the subvector as a writeable reference.
    */
-  virtual T & operator() (const unsigned int i);
+  T & operator() (const unsigned int i);
 
+  /**
+   * @returns the \p (i) element of the vector.
+   */
+  virtual T el(const unsigned int i) const { return (*this)(i); }
+
+  /**
+   * @returns the \p (i) element of the vector as a writeable reference.
+   */
+  virtual T & el(const unsigned int i)     { return (*this)(i); }
+  
   /**
    * @returns the size of the subvector.
    */

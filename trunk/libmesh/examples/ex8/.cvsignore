@@ -9,3 +9,4 @@ ex8
 *.res
 ii_files
 so_locations
+gmon.out

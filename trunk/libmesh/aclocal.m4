@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.35 2003-08-28 02:47:19 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.36 2003-08-28 19:35:38 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -523,7 +523,6 @@ AC_DEFUN(CONFIGURE_PETSC,
     petscversion=$petscmajor.$petscminor.$petscsubminor
     AC_MSG_RESULT(<<< Configuring library with PETSc version $petscversion support >>>)
     AC_SUBST(petscversion)
-
   else
     enablepetsc=no  
   fi

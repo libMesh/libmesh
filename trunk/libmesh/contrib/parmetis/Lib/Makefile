@@ -18,10 +18,10 @@ ifeq ($(enable-shared),yes)
 endif
 
 
-ifeq ($(enable-mpi)_$(enable-petsc) , no_no)
+ifeq ($(enable-mpi),no)
   # Do nothing
   all::
-	@echo "<<< Cannot build Parmetis without either petsc or mpi >>>"
+	@echo "<<< Cannot build Parmetis without mpi >>>"
 
 else
 
@@ -51,4 +51,4 @@ distclean:
 	@rm -f ../../lib/*/libparmetis.*
 
 echo:
-	@echo $(MPI_INCLUDE)
+	@echo $(INCLUDE)

@@ -9,3 +9,4 @@ ii_files
 so_locations
 *.log
 *.mcr
+gmon.out
