@@ -1,4 +1,4 @@
-// "$Id: xdrIO.C,v 1.26 2004-10-26 15:31:19 jwpeterson Exp $\n"
+// "$Id: xdrIO.C,v 1.27 2004-10-27 21:46:46 benkirk Exp $\n"
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -69,25 +69,27 @@ void XdrIO::fini()
 
 Originator XdrIO::get_originator()
 {
-  if (orig_flag == 1) 
+  switch (orig_flag)
     {
-      const Originator orig_mgf("MGF ", 2, 0);
-      return orig_mgf;
-    }
-  else if (orig_flag == 0)
-    {
-      const Originator orig_deal("DEAL", 3, 3);
-      return orig_deal;
-    }
-  else
-    {
-      std::cerr << "orig_flag set to unknown value: "
-                << orig_flag << std::endl;
-      error();
+    case 0:
+      {
+	const Originator orig_deal("DEAL", 3, 3);
+	return orig_deal;
+      }
+
+    case 1:
+      {
+	const Originator orig_mgf("MGF ", 2, 0);
+	return orig_mgf;
+      }
     }
 
+  
+  // Huh?  
+  std::cerr << "orig_flag set to unknown value: "
+	    << orig_flag << std::endl;
   error();
-  Originator never ("EROR", 0, 0);
+  Originator never ("ERROR", 0, 0);
   return never;
 }
 
