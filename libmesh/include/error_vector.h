@@ -1,4 +1,4 @@
-// $Id: error_vector.h,v 1.1 2003-05-19 21:21:10 benkirk Exp $
+// $Id: error_vector.h,v 1.2 2003-07-18 18:53:00 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -86,7 +86,21 @@ public:
    * is normalized by N in this case.
    * Source: GNU Scientific Library
    */
-  virtual Real variance() const;
+  virtual Real variance() const
+  { return this->variance(this->mean()); }
+
+  /**   
+   * Computes the variance of the data set
+   * (and ignoring zero values)
+   * where the \p mean is provided. This is useful
+   * for efficiency when you have already calculated
+   * the mean. Uses a recurrence relation to prevent
+   * data overflow for large sums.
+   * Note: The variance is equal to the
+   * standard deviation squared.
+   * Source: GNU Scientific Library
+   */
+  virtual Real variance(const Real mean) const;
 
   /**
    * Returns a vector of unsigned ints which correspond

@@ -1,4 +1,4 @@
-// $Id: statistics.h,v 1.10 2003-06-05 19:33:50 benkirk Exp $
+// $Id: statistics.h,v 1.11 2003-07-18 18:53:00 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -134,7 +134,7 @@ class StatisticsVector : public std::vector<T>
    * Source: GNU Scientific Library
    */
   virtual Real variance() const
-  {return this->variance(this->mean()); }
+  { return this->variance(this->mean()); }
 
   /**   
    * Computes the variance of the data set
