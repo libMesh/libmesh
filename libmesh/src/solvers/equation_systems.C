@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.10 2004-10-26 15:31:19 jwpeterson Exp $
+// $Id: equation_systems.C,v 1.11 2004-11-05 17:19:30 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -40,8 +40,9 @@
 
 // ------------------------------------------------------------
 // EquationSystems class implementation
-EquationSystems::EquationSystems (Mesh& m) :
-  _mesh(m)
+EquationSystems::EquationSystems (Mesh& m, MeshData* mesh_data) :
+  _mesh_data (mesh_data),
+  _mesh      (m)
 {
   // Set default parameters
   this->set_parameter("linear solver tolerance")          = 1.e-12;

@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.7 2004-10-26 15:31:17 jwpeterson Exp $
+// $Id: equation_systems.h,v 1.8 2004-11-05 17:19:42 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -66,7 +66,7 @@ public:
   /**
    * Constructor.
    */
-  EquationSystems (Mesh& mesh);
+  EquationSystems (Mesh& mesh, MeshData* mesh_data=NULL);
 
   /**
    * Destructor.
@@ -387,6 +387,12 @@ public:
    * Data structure holding user-supplied additional data.
    */
   DataMap data_map;
+
+  /**
+   * A pointer to the MeshData object you would like to use.
+   * Can be NULL.
+   */
+  MeshData* _mesh_data;
 
   
 protected:
