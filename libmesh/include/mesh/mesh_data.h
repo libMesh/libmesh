@@ -1,4 +1,4 @@
-// $Id: mesh_data.h,v 1.5 2004-04-18 00:51:50 jwpeterson Exp $
+// $Id: mesh_data.h,v 1.6 2004-07-26 16:27:47 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -25,19 +25,17 @@
 // C++ includes
 #include <map>
 #include <vector>
-#include <string>
-#include <fstream>
 
 
 // Local Includes
 #include "libmesh.h"
-#include "node.h"
-#include "elem.h"
 #include "enum_xdr_mode.h"
 
 
 
 // Forward Declarations
+class Node;
+class Elem;
 class MeshBase;
 class UNVIO;
 class TetGenIO;

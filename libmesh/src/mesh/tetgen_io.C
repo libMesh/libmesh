@@ -1,4 +1,4 @@
-// $Id: tetgen_io.C,v 1.4 2004-05-09 15:39:38 fprill Exp $
+// $Id: tetgen_io.C,v 1.5 2004-07-26 16:27:48 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -19,7 +19,7 @@
 
 
 // C++ includes
-
+#include <fstream>
 
 // Local includes
 #include "tetgen_io.h"

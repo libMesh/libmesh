@@ -1,4 +1,4 @@
-// $Id: mesh_data_unv_support.C,v 1.19 2004-03-24 04:32:59 jwpeterson Exp $
+// $Id: mesh_data_unv_support.C,v 1.20 2004-07-26 16:27:48 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -25,6 +25,7 @@
 // Local includes
 #include "libmesh_config.h"
 #include "mesh_data.h"
+#include "auto_ptr.h"
 
 #ifdef  HAVE_GZSTREAM
 # include "gzstream.h" // For reading/writing compressed streams

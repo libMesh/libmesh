@@ -1,4 +1,4 @@
-// $Id: diva_io.C,v 1.2 2004-07-14 19:23:18 jwpeterson Exp $
+// $Id: diva_io.C,v 1.3 2004-07-26 16:27:48 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -19,7 +19,7 @@
 
 
 // C++ includes
-
+#include <fstream>
 
 // Local includes
 #include "diva_io.h"
