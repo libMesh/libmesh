@@ -1,4 +1,4 @@
-// $Id: mesh_data_xdr_support.C,v 1.2 2003-05-15 23:34:35 benkirk Exp $
+// $Id: mesh_data_xdr_support.C,v 1.3 2003-05-22 09:39:58 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -13,7 +13,7 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
   
-// You should have received a copy of the GNU Lesser General Public
+// You should have receied a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
@@ -160,8 +160,6 @@ void MeshData::read_xdr (const std::string& name,
    */
   unsigned int n_elem = 0;
   io.data (n_elem);
-
-  std::cout << "n_elem = " << n_elem << std::endl;
 
   for (unsigned int n_cnt=0; n_cnt < n_node; n_cnt++)
     {
