@@ -1,4 +1,4 @@
-// $Id: linear_solver_interface.C,v 1.5 2003-03-14 09:56:41 ddreyer Exp $
+// $Id: linear_solver_interface.C,v 1.6 2003-03-17 01:27:08 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,31 +30,29 @@
 
 
 //------------------------------------------------------------------
-//
-
-// Full specialization for Real data types
-template <>
-AutoPtr<LinearSolverInterface<Real> >
-LinearSolverInterface<Real>::build(const SolverPackage solver_package)
+// LinearSolverInterface members
+template <typename T>
+AutoPtr<LinearSolverInterface<T> >
+LinearSolverInterface<T>::build(const SolverPackage solver_package)
 {
 
   switch (solver_package)
     {
 
 
-#if defined(HAVE_LASPACK) && defined(USE_REAL_NUMBERS)
+#if defined(HAVE_LASPACK)
     case LASPACK_SOLVERS:
       {
-	AutoPtr<LinearSolverInterface<Real> > ap(new LaspackInterface<Real>);
+	AutoPtr<LinearSolverInterface<T> > ap(new LaspackInterface<T>);
 	return ap;
       }
 #endif
 
 
-#if defined(HAVE_PETSC) && defined(USE_REAL_NUMBERS)
+#if defined(HAVE_PETSC)
     case PETSC_SOLVERS:
       {
-	AutoPtr<LinearSolverInterface<Real> > ap(new PetscInterface<Real>);
+	AutoPtr<LinearSolverInterface<T> > ap(new PetscInterface<T>);
 	return ap;
       }
 #endif
@@ -66,49 +64,9 @@ LinearSolverInterface<Real>::build(const SolverPackage solver_package)
       error();
     }
     
-  AutoPtr<LinearSolverInterface<Real> > ap(NULL);
+  AutoPtr<LinearSolverInterface<T> > ap(NULL);
   return ap;    
 }
-
-
-// Full specialization for Complex data types
-template <>
-AutoPtr<LinearSolverInterface<Complex> >
-LinearSolverInterface<Complex>::build(const SolverPackage solver_package)
-{
-
-  switch (solver_package)
-    {
-
-#if defined(HAVE_LASPACK) && defined(USE_COMPLEX_NUMBERS)
-    case LASPACK_SOLVERS:
-      {
-	AutoPtr<LinearSolverInterface<Complex> > ap(new LaspackInterface<Complex>);
-	return ap;
-      }
-#endif
-
-      
-#if defined(HAVE_PETSC) && defined(USE_COMPLEX_NUMBERS)
-    case PETSC_SOLVERS:
-      {
-	AutoPtr<LinearSolverInterface<Complex> > ap(new PetscInterface<Complex>);
-	return ap;
-      }
-#endif
-
-    default:
-      std::cerr << "ERROR:  Unrecognized solver package: "
-		<< solver_package
-		<< std::endl;
-      error();
-    }
-    
-  AutoPtr<LinearSolverInterface<Complex> > ap(NULL);
-  return ap;    
-}
-
-
 
 
 
