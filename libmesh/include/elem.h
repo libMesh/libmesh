@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.5 2003-01-24 17:24:38 jwpeterson Exp $
+// $Id: elem.h,v 1.6 2003-01-24 21:19:51 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -447,9 +447,11 @@ class Elem : public ReferenceCountedObject<Elem>
   virtual void refine(Mesh&) = 0;
   
   /**
-   * Refine the element.
+   * Coarsen the element.  This is not
+   * virtual since it is the same for all
+   * element types.
    */
-  virtual void coarsen() = 0;
+  void coarsen();
   
 #endif
 
