@@ -1,4 +1,4 @@
-// $Id: kelly_error_estimator.h,v 1.5 2005-03-10 22:05:14 jwpeterson Exp $
+// $Id: kelly_error_estimator.h,v 1.6 2005-03-11 15:23:45 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -58,9 +58,10 @@ class KellyErrorEstimator : public ErrorEstimator
 public:
 
   /**
-   * Constructor.
+   * Constructor.  Responsible for initializing the _bc_function function
+   * pointer to NULL.
    */
-  KellyErrorEstimator() {}
+  KellyErrorEstimator() : _bc_function(NULL) {}
   
   /**
    * Destructor.  
