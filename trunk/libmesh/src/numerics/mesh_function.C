@@ -1,4 +1,4 @@
-// $Id: mesh_function.C,v 1.1 2003-05-10 22:10:38 ddreyer Exp $
+// $Id: mesh_function.C,v 1.2 2003-05-10 22:19:41 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -91,6 +91,12 @@ void MeshFunction::init ()
   // are indices of the desired variable(s) provided?
   assert (this->_system_vars.size() > 0);
 
+  // Don't do twice...
+  if (this->_initialized)
+    {
+      assert(this->_point_locator != NULL);
+      return;
+    }
 
   /*
    * set up the PointLocator: either someone else
