@@ -1,4 +1,4 @@
-// $Id: dense_matrix_base.h,v 1.10 2004-10-10 19:07:17 benkirk Exp $
+// $Id: dense_matrix_base.h,v 1.11 2004-10-19 16:57:58 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -106,7 +106,7 @@ public:
   /**
    * Pretty-print the matrix to \p stdout.
    */
-  void print() const;
+  void print(std::ostream& os=std::cout) const;
 
   /**
    * Formatted print as above but allows you to do
@@ -115,7 +115,7 @@ public:
    */
   friend std::ostream& operator << (std::ostream& os, const DenseMatrixBase<T>& m)
   {
-    m.print();
+    m.print(os);
     return os;
   }
   
@@ -123,7 +123,7 @@ public:
    * Prints the matrix entries with more decimal places in
    * scientific notation.
    */
-  void print_scientific() const;
+  void print_scientific(std::ostream& os=std::cout) const;
   
   /**
    * Adds \p factor to every element in the matrix.
@@ -183,27 +183,27 @@ protected:
 
 template<typename T>
 inline
-void DenseMatrixBase<T>::print_scientific () const
+void DenseMatrixBase<T>::print_scientific (std::ostream& os) const
 {
 #ifndef BROKEN_IOSTREAM
   
   // save the initial format flags
-  std::ios_base::fmtflags cout_flags = std::cout.flags();
+  std::ios_base::fmtflags os_flags = os.flags();
   
   // Print the matrix entries.
   for (unsigned int i=0; i<this->m(); i++)
     {
       for (unsigned int j=0; j<this->n(); j++)
-	std::cout << std::setw(15)
-		  << std::scientific
-		  << std::setprecision(8)
-		  << this->el(i,j) << " ";
+	os << std::setw(15)
+	   << std::scientific
+	   << std::setprecision(8)
+	   << this->el(i,j) << " ";
 
-      std::cout << std::endl;
+      os << std::endl;
     }
   
   // reset the original format flags
-  std::cout.flags(cout_flags);
+  os.flags(os_flags);
 
 #else
   
@@ -211,11 +211,11 @@ void DenseMatrixBase<T>::print_scientific () const
   for (unsigned int i=0; i<this->m(); i++)
     {
       for (unsigned int j=0; j<this->n(); j++)	
-	std::cout << std::setprecision(8)
-		  << this->el(i,j)
-		  << " ";
+	os << std::setprecision(8)
+	   << this->el(i,j)
+	   << " ";
       
-      std::cout << std::endl;
+      os << std::endl;
     }
   
   
@@ -226,15 +226,15 @@ void DenseMatrixBase<T>::print_scientific () const
 
 template<typename T>
 inline
-void DenseMatrixBase<T>::print () const
+void DenseMatrixBase<T>::print (std::ostream& os) const
 {  
   for (unsigned int i=0; i<this->m(); i++)
     {
       for (unsigned int j=0; j<this->n(); j++)
-	std::cout << std::setw(8)
-		  << this->el(i,j) << " ";
+	os << std::setw(8)
+	   << this->el(i,j) << " ";
 
-      std::cout << std::endl;
+      os << std::endl;
     }
 
   return;

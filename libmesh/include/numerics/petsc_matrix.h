@@ -1,4 +1,4 @@
-//    $Id: petsc_matrix.h,v 1.8 2004-10-18 22:10:05 benkirk Exp $
+//    $Id: petsc_matrix.h,v 1.9 2004-10-19 16:58:04 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -277,9 +277,12 @@ public:
   
   /**
    * Print the contents of the matrix to the screen
-   * with the PETSc viewer.
+   * with the PETSc viewer.  This function only allows
+   * printing to standard out, this is because we have
+   * limited ourselves to one PETSc implementation for
+   * writing.
    */
-  void print_personal() const;
+  void print_personal(std::ostream& os=std::cout) const;
 
   /**
    * Print the contents of the matrix in Matlab's
@@ -628,9 +631,14 @@ bool PetscMatrix<T>::closed() const
 
 template <typename T>
 inline
-void PetscMatrix<T>::print_personal() const
+void PetscMatrix<T>::print_personal(std::ostream& os) const
 {
   assert (this->initialized());
+
+#ifdef DEBUG
+  if (os != std::cout)
+    std::cerr << "Warning! PETSc can only print to std::cout!" << std::endl;
+#endif
   
   int ierr=0;
 
