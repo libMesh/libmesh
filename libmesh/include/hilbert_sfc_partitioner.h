@@ -1,4 +1,4 @@
-// $Id: hilbert_sfc_partitioner.h,v 1.4 2003-10-01 16:28:51 benkirk Exp $
+// $Id: hilbert_sfc_partitioner.h,v 1.5 2003-10-01 19:27:42 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -43,7 +43,7 @@ class HilbertSFCPartitioner : public SFCPartitioner
   /**
    * Constructor.
    */
-  HilbertSFCPartitioner () {}
+  HilbertSFCPartitioner ()
   {
     this->set_sfc_type ("Hilbert");
   }
