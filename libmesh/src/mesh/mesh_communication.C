@@ -1,4 +1,4 @@
-// $Id: mesh_communication.C,v 1.8 2004-05-14 23:06:33 spetersen Exp $
+// $Id: mesh_communication.C,v 1.9 2004-10-28 20:06:14 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -177,7 +177,7 @@ void MeshCommunication::distribute_mesh (MeshBase& mesh) const
 	while (cnt < conn.size())
 	  {
 	    Elem* elem = 
-	      mesh.add_elem (Elem::build (static_cast<ElemType>(conn[cnt++])));
+	      mesh.add_elem (Elem::build(static_cast<ElemType>(conn[cnt++])).release());
 
 	    for (unsigned int n=0; n<elem->n_nodes(); n++)
 	      {

@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.28 2004-03-24 05:49:12 jwpeterson Exp $
+// $Id: mesh_generation.C,v 1.29 2004-10-28 20:06:14 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -72,7 +72,10 @@ void Mesh::build_cube(const unsigned int nx,
 
 	for (unsigned int i=0; i<=nx; i++)
 	  {
-	    node_ptr(i) = Node::build(static_cast<Real>(i)/static_cast<Real>(nx), 0, 0, i);
+	    node_ptr(i) = Node::build(static_cast<Real>(i)/static_cast<Real>(nx), 
+				      0, 
+				      0, 
+				      i).release();
 	  }
 	
 	for (unsigned int i=0; i<nx; i++)
@@ -124,7 +127,7 @@ void Mesh::build_cube(const unsigned int nx,
 		  node_ptr(p) = Node::build(static_cast<Real>(i)/static_cast<Real>(nx),
 					    static_cast<Real>(j)/static_cast<Real>(ny),
 					    0,
-					    p);
+					    p).release();
 		  p++;
 		}
 	    
@@ -177,7 +180,7 @@ void Mesh::build_cube(const unsigned int nx,
 		  node_ptr(p) = Node::build(static_cast<Real>(i)/static_cast<Real>(nx),
 					    static_cast<Real>(j)/static_cast<Real>(ny),
 					    0,
-					    p);
+					    p).release();
 		  p++;
 		}
 	    
@@ -226,7 +229,7 @@ void Mesh::build_cube(const unsigned int nx,
 		  node_ptr(p) = Node::build(static_cast<Real>(i)/static_cast<Real>(2*nx),
 					    static_cast<Real>(j)/static_cast<Real>(2*ny),
 					    0,
-					    p);
+					    p).release();
 		  p++;
 		}
 	    
@@ -288,7 +291,7 @@ void Mesh::build_cube(const unsigned int nx,
 		  node_ptr(p) = Node::build(static_cast<Real>(i)/static_cast<Real>(2*nx),
 					    static_cast<Real>(j)/static_cast<Real>(2*ny),
 					    0,
-					    p);
+					    p).release();
 		  p++;
 		}
 	    
@@ -383,7 +386,7 @@ void Mesh::build_cube(const unsigned int nx,
 		    node_ptr(p) = Node::build(static_cast<Real>(i)/static_cast<Real>(nx),
 					      static_cast<Real>(j)/static_cast<Real>(ny),
 					      static_cast<Real>(k)/static_cast<Real>(nz),
-					      p);
+					      p).release();
 		    p++;
 		  }
 	    
@@ -485,7 +488,7 @@ void Mesh::build_cube(const unsigned int nx,
 		    node_ptr(p) = Node::build(static_cast<Real>(i)/static_cast<Real>(2*nx),
 					      static_cast<Real>(j)/static_cast<Real>(2*ny),
 					      static_cast<Real>(k)/static_cast<Real>(2*nz),
-					      p);
+					      p).release();
 		    p++;
 		  }
 	    
@@ -720,28 +723,28 @@ void Mesh::build_sphere (const Real rad,
 	    _nodes.resize(8);
 	    
 	    // Point 0
-	    node_ptr(0) = Node::build(-rad_2,-rad_2, 0, 0);
+	    node_ptr(0) = Node::build(-rad_2,-rad_2, 0, 0).release();
 	    
 	    // Point 1
-	    node_ptr(1) = Node::build( rad_2,-rad_2, 0, 1);
+	    node_ptr(1) = Node::build( rad_2,-rad_2, 0, 1).release();
 	    
 	    // Point 2
-	    node_ptr(2) = Node::build( rad_2, rad_2, 0, 2);
+	    node_ptr(2) = Node::build( rad_2, rad_2, 0, 2).release();
 
 	    // Point 3
-	    node_ptr(3) = Node::build(-rad_2, rad_2, 0, 3);
+	    node_ptr(3) = Node::build(-rad_2, rad_2, 0, 3).release();
 	    
 	    // Point 4
-	    node_ptr(4) = Node::build(-rad_sqrt_2,-rad_sqrt_2, 0, 4);
+	    node_ptr(4) = Node::build(-rad_sqrt_2,-rad_sqrt_2, 0, 4).release();
 	    
 	    // Point 5
-	    node_ptr(5) = Node::build( rad_sqrt_2,-rad_sqrt_2, 0, 5);
+	    node_ptr(5) = Node::build( rad_sqrt_2,-rad_sqrt_2, 0, 5).release();
 	    
 	    // Point 6
-	    node_ptr(6) = Node::build( rad_sqrt_2, rad_sqrt_2, 0, 6);
+	    node_ptr(6) = Node::build( rad_sqrt_2, rad_sqrt_2, 0, 6).release();
 	    
 	    // Point 7
-	    node_ptr(7) = Node::build(-rad_sqrt_2, rad_sqrt_2, 0, 7);
+	    node_ptr(7) = Node::build(-rad_sqrt_2, rad_sqrt_2, 0, 7).release();
 
 	    // Build the elements
 	    _elements.resize(5);
@@ -790,79 +793,79 @@ void Mesh::build_sphere (const Real rad,
 	    _nodes.resize(25);
 
 	    // Point 0
-	    node_ptr(0)  = Node::build(-rad_2,-rad_2, 0, 0);
+	    node_ptr(0)  = Node::build(-rad_2,-rad_2, 0, 0).release();
 	    
 	    // Point 1
-	    node_ptr(1)  = Node::build( rad_2,-rad_2, 0, 1);
+	    node_ptr(1)  = Node::build( rad_2,-rad_2, 0, 1).release();
 	    
 	    // Point 2
-	    node_ptr(2)  = Node::build( rad_2, rad_2, 0, 2);
+	    node_ptr(2)  = Node::build( rad_2, rad_2, 0, 2).release();
 
 	    // Point 3
-	    node_ptr(3)  = Node::build(-rad_2, rad_2, 0, 3);
+	    node_ptr(3)  = Node::build(-rad_2, rad_2, 0, 3).release();
 	    
 	    // Point 4
-	    node_ptr(4)  = Node::build(-rad_sqrt_2,-rad_sqrt_2, 0, 4);
+	    node_ptr(4)  = Node::build(-rad_sqrt_2,-rad_sqrt_2, 0, 4).release();
 	     
 	    // Point 5
-	    node_ptr(5)  = Node::build( rad_sqrt_2,-rad_sqrt_2, 0, 5);
+	    node_ptr(5)  = Node::build( rad_sqrt_2,-rad_sqrt_2, 0, 5).release();
 	    
 	    // Point 6
-	    node_ptr(6)  = Node::build( rad_sqrt_2, rad_sqrt_2, 0, 6);
+	    node_ptr(6)  = Node::build( rad_sqrt_2, rad_sqrt_2, 0, 6).release();
 	    
 	    // Point 7
-	    node_ptr(7)  = Node::build(-rad_sqrt_2, rad_sqrt_2, 0, 7);
+	    node_ptr(7)  = Node::build(-rad_sqrt_2, rad_sqrt_2, 0, 7).release();
 
 	    // Point 8
-	    node_ptr(8)  = Node::build((point(0) + point(1))/2., 8);
+	    node_ptr(8)  = Node::build((point(0) + point(1))/2., 8).release();
 
 	    // Point 9
-	    node_ptr(9)  = Node::build((point(1) + point(2))/2., 9);
+	    node_ptr(9)  = Node::build((point(1) + point(2))/2., 9).release();
 	    
 	    // Point 10
-	    node_ptr(10) = Node::build((point(2) + point(3))/2., 10);
+	    node_ptr(10) = Node::build((point(2) + point(3))/2., 10).release();
 	    
 	    // Point 11
-	    node_ptr(11) = Node::build((point(0) + point(3))/2., 11);
+	    node_ptr(11) = Node::build((point(0) + point(3))/2., 11).release();
 	    
 	    // Point 12
-	    node_ptr(12) = Node::build((point(0) + point(2))/2., 12);
+	    node_ptr(12) = Node::build((point(0) + point(2))/2., 12).release();
 
 	    // Point 13
-	    node_ptr(13) = Node::build( 0,-rad, 0, 13);
+	    node_ptr(13) = Node::build( 0,-rad, 0, 13).release();
 
 	    // Point 14
-	    node_ptr(14) = Node::build( rad, 0, 0, 14);
+	    node_ptr(14) = Node::build( rad, 0, 0, 14).release();
 
 	    // Point 15
-	    node_ptr(15) = Node::build( 0, rad, 0, 15);
+	    node_ptr(15) = Node::build( 0, rad, 0, 15).release();
 
 	    // Point 16
-	    node_ptr(16) = Node::build(-rad, 0, 0, 16);
+	    node_ptr(16) = Node::build(-rad, 0, 0, 16).release();
 
 	    // Point 17
-	    node_ptr(17) = Node::build((point(8) + point(13))/2., 17);
+	    node_ptr(17) = Node::build((point(8) + point(13))/2., 17).release();
 
 	    // Point 18
-	    node_ptr(18) = Node::build((point(9) + point(14))/2., 18);
+	    node_ptr(18) = Node::build((point(9) + point(14))/2., 18).release();
 
 	    // Point 19
-	    node_ptr(19) = Node::build((point(10) + point(15))/2., 19);
+	    node_ptr(19) = Node::build((point(10) + point(15))/2., 19).release();
 	    
 	    // Point 20
-	    node_ptr(20) = Node::build((point(11) + point(16))/2., 20);
+	    node_ptr(20) = Node::build((point(11) + point(16))/2., 20).release();
 	      
 	    // Point 21
-	    node_ptr(21) = Node::build((point(0) + point(4))/2., 21);
+	    node_ptr(21) = Node::build((point(0) + point(4))/2., 21).release();
 
 	    // Point 22
-	    node_ptr(22) = Node::build((point(1) + point(5))/2., 22);
+	    node_ptr(22) = Node::build((point(1) + point(5))/2., 22).release();
 
 	    // Point 23
-	    node_ptr(23) = Node::build((point(2) + point(6))/2., 23);
+	    node_ptr(23) = Node::build((point(2) + point(6))/2., 23).release();
 
 	    // Point 24
-	    node_ptr(24) = Node::build((point(3) + point(7))/2., 24);
+	    node_ptr(24) = Node::build((point(3) + point(7))/2., 24).release();
 
 	    
 	    // Build the elements
@@ -973,7 +976,7 @@ void Mesh::build_sphere (const Real rad,
 	      // We'll allocate new elements instead.
 	      if (elem(e)->active())
 		{
-		  new_elements.push_back(Elem::build(elem(e)->type()));
+		  new_elements.push_back(Elem::build(elem(e)->type()).release());
 
 		  for (unsigned int n=0; n<elem(e)->n_nodes(); n++)
 		    new_elements.back()->set_node(n) =

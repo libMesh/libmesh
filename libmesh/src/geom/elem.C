@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.36 2004-10-19 12:44:10 benkirk Exp $
+// $Id: elem.C,v 1.37 2004-10-28 20:06:14 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -63,19 +63,23 @@
 
 // ------------------------------------------------------------
 // Elem class member funcions
-Elem* Elem::build(const ElemType type,
-		  const Elem* p)
+AutoPtr<Elem> Elem::build(const ElemType type,
+			  const Elem* p)
 {
+  Elem* elem = NULL;
+ 
   switch (type)
     {
       // 1D elements 
     case EDGE2:
       {
-	return new Edge2(p);
+	elem = new Edge2(p);
+	break;
       }
     case EDGE3:
       {
-	return new Edge3(p);
+	elem = new Edge3(p);
+	break;
       }
 
 
@@ -83,62 +87,76 @@ Elem* Elem::build(const ElemType type,
       // 2D elements
     case TRI3:
       {
-	return new Tri3(p);
+	elem = new Tri3(p);
+	break;
       }
     case TRI6:
       {
-	return new Tri6(p);
+	elem = new Tri6(p);
+	break;
       }
     case QUAD4:
       {
-	return new Quad4(p);
+	elem = new Quad4(p);
+	break;
       }
     case QUAD8:
       {
-	return new Quad8(p);
+	elem = new Quad8(p);
+	break;
       }
     case QUAD9:
       {
-	return new Quad9(p);
+	elem = new Quad9(p);
+	break;
       }
    
 
       // 3D elements
     case TET4:
       {
-	return new Tet4(p);
+	elem = new Tet4(p);
+	break;
       }
     case TET10:
       {
-	return new Tet10(p);
+	elem = new Tet10(p);
+	break;
       }
     case HEX8:
       {
-	return new Hex8(p);
+	elem = new Hex8(p);
+	break;
       }
     case HEX20:
       {
-	return new Hex20(p);
+	elem = new Hex20(p);
+	break;
       }
     case HEX27:
       {
-	return new Hex27(p);
+	elem = new Hex27(p);
+	break;
       }
     case PRISM6:
       {
-	return new Prism6(p);
+	elem = new Prism6(p);
+	break;
       }
     case PRISM15:
       {
-	return new Prism15(p);
+	elem = new Prism15(p);
+	break;
       }
     case PRISM18:
       {
-	return new Prism18(p);
+	elem = new Prism18(p);
+	break;
       }
     case PYRAMID5:
       {
-	return new Pyramid5(p);
+	elem = new Pyramid5(p);
+	break;
       }
 
 
@@ -148,41 +166,49 @@ Elem* Elem::build(const ElemType type,
       // 1D infinite elements
     case INFEDGE2:
       {
-	return new InfEdge2(p);
+	elem = new InfEdge2(p);
+	break;
       }
 
 
       // 2D infinite elements
     case INFQUAD4:
       {
-	return new InfQuad4(p);
+	elem = new InfQuad4(p);
+	break;
       }
     case INFQUAD6:
       {
-	return new InfQuad6(p);
+	elem = new InfQuad6(p);
+	break;
       }
 
    
     // 3D infinite elements
     case INFHEX8:
       {
-	return new InfHex8(p);
+	elem = new InfHex8(p);
+	break;
       }
     case INFHEX16:
       {
-	return new InfHex16(p);
+	elem = new InfHex16(p);
+	break;
       }
     case INFHEX18:
       {
-	return new InfHex18(p);
+	elem = new InfHex18(p);
+	break;
       }
     case INFPRISM6:
       {
-	return new InfPrism6(p);
+	elem = new InfPrism6(p);
+	break;
       }
     case INFPRISM12:
       {
-	return new InfPrism12(p);
+	elem = new InfPrism12(p);
+	break;
       }
 
 #endif
@@ -193,13 +219,10 @@ Elem* Elem::build(const ElemType type,
 	error();
       }
     }
-    
-
-  // This will never happen...  Look at the case-structure above.
-  // error() will abort, so we won't get here...
-  error();
   
-  return NULL;
+
+  AutoPtr<Elem> ap(elem);
+  return ap;
 }
 
 

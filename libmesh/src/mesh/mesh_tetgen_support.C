@@ -1,4 +1,4 @@
-// $Id: mesh_tetgen_support.C,v 1.11 2004-10-28 19:09:27 benkirk Exp $
+// $Id: mesh_tetgen_support.C,v 1.12 2004-10-28 20:06:14 benkirk Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -422,7 +422,7 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole
   // Add additional nodes to the nodes vector.
   for (unsigned int i=old_nodesnum; i<=_num_nodes; i++) {
     tetgen_wrapper.get_output_node(i, x,y,z);
-    _nodes[i] = Node::build(x,y,z,i);
+    _nodes[i] = Node::build(x,y,z,i).release();
   }
   // => tetrahedra:
   int n_nodes     = 4;                                  // (Tet4 elements)

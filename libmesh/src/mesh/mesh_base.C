@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.80 2004-10-28 19:09:25 benkirk Exp $
+// $Id: mesh_base.C,v 1.81 2004-10-28 20:06:14 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -103,7 +103,7 @@ void MeshBase::prepare_for_use ()
 
 Node* MeshBase::add_point (const Point& p)
 {  
-  _nodes.push_back (Node::build(p, this->n_nodes()));
+  _nodes.push_back (Node::build(p, this->n_nodes()).release());
   
   return _nodes.back();
 }
