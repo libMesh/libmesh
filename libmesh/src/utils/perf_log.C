@@ -1,4 +1,4 @@
-// $Id: perf_log.C,v 1.6 2003-02-06 23:28:48 benkirk Exp $
+// $Id: perf_log.C,v 1.7 2003-02-07 04:34:16 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -148,10 +148,10 @@ std::string PerfLog::get_perf_info() const
       const double elapsed_time = ((double) (tstop.tv_sec  - tstart.tv_sec)) +
 	((double) (tstop.tv_usec - tstart.tv_usec))/1000000.;      
       
-      out << " ---------------------------------------------------------------------"  << std::endl;
+      out << " ----------------------------------------------------------------------"  << std::endl;
       out << "| " << class_name << " Performance: Alive time=" << elapsed_time
 	  << ", Active time=" << total_time << std::endl;
-      out << " ---------------------------------------------------------------------"  << std::endl;
+      out << " ----------------------------------------------------------------------"  << std::endl;
       out << "| ";
       out.width(24);
       out << std::left << "Event";
@@ -187,8 +187,8 @@ std::string PerfLog::get_perf_info() const
       out << std::left << "Active Time";
       
       out << "|" << std::endl;
-      out << "|---------------------------------------------------------------------|" << std::endl
-	  << "|                                                                     |" << std::endl;
+      out << "|----------------------------------------------------------------------|" << std::endl
+	  << "|                                                                      |" << std::endl;
       
       
       for (std::map<std::string, PerfData>::const_iterator
@@ -227,7 +227,7 @@ std::string PerfLog::get_perf_info() const
 	    }
 	}
       
-      out << " ---------------------------------------------------------------------" << std::endl;
+      out << " ----------------------------------------------------------------------" << std::endl;
     }
 
 #endif
