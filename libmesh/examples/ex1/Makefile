@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.2 2003-02-03 03:51:48 ddreyer Exp $
+# $Id: Makefile,v 1.3 2003-02-04 00:49:09 benkirk Exp $
 
 
 # The location of the mesh library
@@ -21,18 +21,6 @@ srcfiles 	:= $(wildcard *.C)
 #
 # object files
 objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
-###############################################################################
-
-
-
-###############################################################################
-# Configuration: Augment libraries
-#
-ifeq ($(enable-shared), yes)
-  LIBS := $(meshdir)/lib/$(hosttype)_$(METHOD)/libmesh.so $(LIBS)
-else
-  LIBS := $(meshdir)/lib/$(hosttype)_$(METHOD)/libmesh.a $(LIBS)
-endif
 ###############################################################################
 
 

@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.8 2003-02-03 03:51:48 ddreyer Exp $
+# $Id: Make.common.in,v 1.9 2003-02-04 00:49:08 benkirk Exp $
 
 
 ###############################################################################
@@ -132,6 +132,21 @@ enable-optional      = @enableoptional@
 # Set the current directory.
 pwd := @PWD@
 
+
+
+
+###############################################################################
+# The mesh library
+#
+mesh_library_dir := $(pwd)/lib/$(hosttype)_$(METHOD)
+
+mesh_library     := $(mesh_library_dir)/libmesh.a
+
+ifeq ($(enable-shared),yes) 
+  mesh_library   := $(mesh_library_dir)/libmesh.so
+endif
+
+LIBS += $(mesh_library)
 
 
 
