@@ -1,4 +1,4 @@
-// $Id: boundary_mesh.h,v 1.5 2005-02-22 22:17:33 jwpeterson Exp $
+// $Id: boundary_mesh.h,v 1.6 2005-03-02 21:26:56 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -45,10 +45,10 @@ class BoundaryMesh : public Mesh
   /**
    * Constructor. Initializes dimenstion and processor id.
    */
-  BoundaryMesh(unsigned int d);
+  BoundaryMesh (unsigned int d);
   
   /**
-   * Destructor. Empty.
+   * Destructor.
    */
   ~BoundaryMesh();
 
