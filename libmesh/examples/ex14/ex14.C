@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.2 2004-05-20 22:56:51 jwpeterson Exp $ */
+/* $Id: ex14.C,v 1.3 2004-05-24 19:58:36 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -69,7 +69,11 @@ void assemble_laplace(EquationSystems& es,
                       const std::string& system_name);
 
 
-
+// Prototype for calculation of the exact solution.  Useful
+// for setting boundary conditions.
+Real exact_solution(const Real x,
+		    const Real y);
+  
 
 
 
@@ -219,6 +223,23 @@ int main(int argc, char** argv)
 
 
 
+
+// We now define the exact solution, being careful
+// to obtain an angle from atan2 in the correct
+// quadrant.
+Real exact_solution(const Real x,
+		    const Real y)
+{
+  // The boundary value, given by the exact solution,
+  // u_exact = r^(2/3)*sin(2*theta/3).
+  Real theta = atan2(y,x);
+
+  // Make sure 0 <= theta <= 2*pi
+  if (theta < 0)
+    theta += 2. * libMesh::pi;
+		  
+  return pow(x*x + y*y, 1./3.)*sin(2./3.*theta);
+}
 
 
 
@@ -413,16 +434,7 @@ void assemble_laplace(EquationSystems& es,
 		{
 		  const Real x = side->point(ns)(0);
 		  const Real y = side->point(ns)(1);
-		  
-		  // The boundary value, given by the exact solution,
-		  // u_exact = r^(2/3)*sin(2*theta/3).
-		  Real theta = atan2(y,x);
-
-		  // Make sure 0 <= theta <= 2*pi
-		  if (theta < 0)
-		    theta += 2. * libMesh::pi;
-		  
-		  const Real value = pow(x*x + y*y, 1./3.)*sin(2./3.*theta);
+		  const Real value = exact_solution(x,y);
 		  
 // 		  std::cout << "(x,y,bc)=("
 // 			    << x << ","
