@@ -1,4 +1,4 @@
-// $Id: inf_fe_static.C,v 1.16 2003-04-03 14:17:24 ddreyer Exp $
+// $Id: inf_fe_static.C,v 1.17 2003-04-05 12:16:35 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -256,23 +256,48 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType& fet,
    * is added to.
    */
   Real interpolated_dist = 0.;
-  if (Dim > 1)
-    {
-      const unsigned int n_base_nodes = base_el->n_nodes();
+  switch (Dim)
+    {  
+    case 1:
+      {	
+        assert (inf_elem->type() == INFEDGE2);
+	interpolated_dist =  Point(inf_elem->point(0) - inf_elem->point(1)).size();
+	break;
+      }
 
-      const Point    origin                 = inf_elem->origin();
-      const Order    base_mapping_order     (base_el->default_order());
-      const ElemType base_mapping_elem_type (base_el->type());
+    case 2:
+      {
+	const unsigned int n_base_nodes = base_el->n_nodes();
 
-      // interpolate the base nodes' distances
-      for (unsigned int n=0; n<n_base_nodes; n++)
-	  interpolated_dist += Point(base_el->point(n) - origin).size()
-	      * FE<Dim-1,LAGRANGE>::shape (base_mapping_elem_type, base_mapping_order, n, p);
-    }
-  else
-    {	
-      assert (inf_elem->type() == INFEDGE2);
-      interpolated_dist =  Point(inf_elem->point(0) - inf_elem->point(1)).size();
+	const Point    origin                 = inf_elem->origin();
+	const Order    base_mapping_order     (base_el->default_order());
+	const ElemType base_mapping_elem_type (base_el->type());
+
+	// interpolate the base nodes' distances
+	for (unsigned int n=0; n<n_base_nodes; n++)
+	    interpolated_dist += Point(base_el->point(n) - origin).size()
+		* FE<1,LAGRANGE>::shape (base_mapping_elem_type, base_mapping_order, n, p);
+	break;
+      }
+
+    case 3:
+      {
+	const unsigned int n_base_nodes = base_el->n_nodes();
+
+	const Point    origin                 = inf_elem->origin();
+	const Order    base_mapping_order     (base_el->default_order());
+	const ElemType base_mapping_elem_type (base_el->type());
+
+	// interpolate the base nodes' distances
+	for (unsigned int n=0; n<n_base_nodes; n++)
+	    interpolated_dist += Point(base_el->point(n) - origin).size()
+		* FE<2,LAGRANGE>::shape (base_mapping_elem_type, base_mapping_order, n, p);
+	break;
+      }
+#ifdef DEBUG
+    default:
+	error();
+#endif
     }
 
 
