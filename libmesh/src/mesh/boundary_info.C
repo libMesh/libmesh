@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.14 2003-02-27 17:20:03 ddreyer Exp $
+// $Id: boundary_info.C,v 1.15 2003-02-28 23:37:47 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -121,7 +121,7 @@ void BoundaryInfo::sync()
 	    AutoPtr<Elem> side (elem->build_side(s));
 	    
 	    // The side lives on the same processor as the parent
-	    //side->processor_id() = elem->processor_id();
+	    //side->set_processor_id() = elem->processor_id();
 	    
 	    // Find the right id number for that side
 	    std::pair<std::multimap<const Elem*,
@@ -134,10 +134,10 @@ void BoundaryInfo::sync()
 	      {
 		if (pos.first->second.first == s) // already flagged with a boundary condition
 		  {
-		    side->subdomain_id() =
+		    side->set_subdomain_id() =
 		      id_map[pos.first->second.second];
 		    
-		    side->processor_id() =
+		    side->set_processor_id() =
 		      side->subdomain_id();
 		    break;
 		  }
@@ -149,7 +149,7 @@ void BoundaryInfo::sync()
 	    // doesn't have a booundary condition
 	    if (pos.first == pos.second)
 	      {
-		side->subdomain_id() = id_map[invalid_id];
+		side->set_subdomain_id() = id_map[invalid_id];
 	      }
 	    
 	    // Add the side

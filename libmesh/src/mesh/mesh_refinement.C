@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.7 2003-02-13 22:56:12 benkirk Exp $
+// $Id: mesh_refinement.C,v 1.8 2003-02-28 23:37:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -191,9 +191,9 @@ void MeshRefinement::refine_and_coarsen_elements ()
     }
   
   /**
-   * Finally, the new elements need to find their neighbors
+   * Finally, the new mesh needs to be prepared for use
    */
-  mesh.find_neighbors();  
+  mesh.prepare_for_use ();
 }
 
 
@@ -462,6 +462,10 @@ void MeshRefinement::coarsen_elements ()
 	if (mesh.elem(e)->active())
 	  {
 	    assert (mesh.elem(e)->level() != 0);
+
+	    // Remove this element from any neighbor
+	    // lists that point to it.
+	    mesh.elem(e)->nullify_neighbors();
 	    
 	    delete mesh.elem(e);
 	    
@@ -497,9 +501,16 @@ void MeshRefinement::uniformly_refine (unsigned int n)
 	if (mesh.elem(e)->active())
 	  mesh.elem(e)->set_refinement_flag() = Elem::REFINE;
 
+      /**
+       * Refine all the elements we just flagged.
+       */
       refine_elements();
       
-      mesh.find_neighbors();
+  
+      /**
+       * Finally, the new mesh needs to be prepared for use
+       */
+      mesh.prepare_for_use ();
     }
 }
 

@@ -1,0 +1,252 @@
+// $Id: dense_submatrix.h,v 1.1 2003-02-28 23:37:40 benkirk Exp $
+
+// The Next Great Finite Element Library.
+// Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
+  
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+  
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+  
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+
+#ifndef __dense_submatrix_h__
+#define __dense_submatrix_h__
+
+// C++ includes
+
+// Local Includes
+#include "mesh_common.h"
+#include "dense_matrix.h"
+
+
+
+
+/**
+ * Defines a dense submatrix for use in Finite Element-type computations.
+ * Useful for storing element stiffness matrices before summation
+ * into a global matrix, particularly when you have systems of equations.
+ *
+ * @author Benjamin S. Kirk, 2003
+ */ 
+
+// ------------------------------------------------------------
+// DenseSubMatrix class definition
+template<typename T>
+class DenseSubMatrix
+{
+public:
+
+  /**
+   * Constructor.  Creates a dense submatrix of the matrix
+   * \p parent.  The submatrix has dimensions \f$(m \times n)\f$,
+   * and the \f$(0,0) entry of the submatrix is located
+   * at the \f$(ioff,joff)\f$ location in the parent matrix.
+   */
+  DenseSubMatrix(DenseMatrix<T>& parent,
+		 const unsigned int ioff=0,
+		 const unsigned int joff=0,
+		 const unsigned int m=0,
+		 const unsigned int n=0);
+
+  /**
+   * Destructor.  Frees all associated memory.
+   */     
+  ~DenseSubMatrix();
+
+  /**
+   * Changes the location of the submatrix in the parent matrix. 
+   */
+  void reposition(const unsigned int ioff,
+		  const unsigned int joff,
+		  const unsigned int m,
+		  const unsigned int n);
+
+  /**
+   * Set every element in the submatrix to 0.
+   */
+  void zero();
+
+  /**
+   * @returns the \p (i,j) element of the submatrix.
+   */
+  T operator() (const unsigned int i,
+		const unsigned int j) const;
+
+  /**
+   * @returns the \p (i,j) element of the submatrix as a writeable reference.
+   */
+  T & operator() (const unsigned int i,
+		  const unsigned int j);
+
+  /**
+   * @returns the row-dimension of the submatrix.
+   */
+  unsigned int m() const { return _m_dim; }
+  
+  /**
+   * @returns the column-dimension of the submatrix.
+   */
+  unsigned int n() const { return _n_dim; }
+
+  /**
+   * @returns the row offset into the parent matrix.
+   */
+  unsigned int i_off() const { return _i_off; }
+
+  /**
+   * @returns the column offset into the parent matrix.
+   */
+  unsigned int j_off() const { return _j_off; }
+
+  /**
+   * Pretty-print the submatrix to \p stdout.
+   */
+  void print() const;
+
+  
+private:
+
+
+  /**
+   * The parent matrix that contains this submatrix.
+   */
+  DenseMatrix<T>& _parent_matrix;
+  
+  /**
+   * The row dimension.
+   */
+  unsigned int _m_dim;
+
+  /**
+   * The column dimension.
+   */
+  unsigned int _n_dim;
+
+  /**
+   * The row offset into the parent matrix.
+   */
+  unsigned int _i_off;
+
+  /**
+   * The column offset into the parent matrix.
+   */
+  unsigned int _j_off;
+};
+
+
+
+// ------------------------------------------------------------
+// Dense Matrix member functions
+template<typename T>
+inline
+DenseSubMatrix<T>::DenseSubMatrix(DenseMatrix<T>& parent,
+				  const unsigned int ioff,
+				  const unsigned int joff,
+				  const unsigned int m,
+				  const unsigned int n) :
+  _parent_matrix(parent)
+{
+  reposition (ioff, joff, m, n);
+}
+
+
+
+template<typename T>
+inline
+DenseSubMatrix<T>::~DenseSubMatrix()
+{
+}
+
+
+
+template<typename T>
+inline
+void DenseSubMatrix<T>::reposition(const unsigned int ioff,
+				   const unsigned int joff,
+				   const unsigned int m,
+				   const unsigned int n)
+{				   
+  _i_off = ioff;
+  _j_off = joff;
+  _m_dim = m;
+  _n_dim = n;
+
+  // Make sure we still fit in the parent matrix.
+  assert ((this->i_off() + this->m()) <= _parent_matrix.m());
+  assert ((this->j_off() + this->n()) <= _parent_matrix.n());
+}
+
+
+
+template<typename T>
+inline
+void DenseSubMatrix<T>::zero()
+{
+  for (unsigned int i=0; i<this->m(); i++)
+    for (unsigned int j=0; j<this->n(); j++)
+      _parent_matrix(i + this->i_off(),
+		     j + this->j_off()) = 0.;
+}
+
+
+
+template<typename T>
+inline
+T DenseSubMatrix<T>::operator () (const unsigned int i,
+				  const unsigned int j) const
+{
+  assert (i < this->m());
+  assert (j < this->n());
+  assert (i + this->i_off() < _parent_matrix.m());
+  assert (j + this->j_off() < _parent_matrix.n());
+  
+  return _parent_matrix (i + this->i_off(),
+			 j + this->j_off());
+}
+
+
+template<typename T>
+inline
+T & DenseSubMatrix<T>::operator () (const unsigned int i,
+				    const unsigned int j)
+{
+  assert (i < this->m());
+  assert (j < this->n());
+  assert (i + this->i_off() < _parent_matrix.m());
+  assert (j + this->j_off() < _parent_matrix.n());
+  
+  return _parent_matrix (i + this->i_off(),
+			 j + this->j_off());
+}
+
+
+
+template<typename T>
+inline
+void DenseSubMatrix<T>::print () const
+{  
+  for (unsigned int i=0; i<this->m(); i++)
+    {
+      for (unsigned int j=0; j<this->n(); j++)
+	std::cout << std::setw(8) << (*this)(i,j) << " ";
+
+      std::cout << std::endl;
+    }
+
+  return;
+}
+
+
+
+#endif // #ifndef __dense_matrix_h__
+

@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.14 2003-02-27 22:26:51 benkirk Exp $
+// $Id: mesh_generation.C,v 1.15 2003-02-28 23:37:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -650,6 +650,12 @@ void Mesh::build_cube(const unsigned int nx,
     }  
 
   libMesh::log.stop_event("build_cube()");
+
+
+  
+  // Done building the mesh.  Now prepare it for use.
+  this->prepare_for_use ();
+  
 }
 
 
@@ -1211,4 +1217,9 @@ void Mesh::build_sphere (const Real rad,
 
   
   libMesh::log.stop_event("build_sphere()");
+
+
+  
+  // Done building the mesh.  Now prepare it for use.
+  this->prepare_for_use();
 }

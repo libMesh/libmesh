@@ -1,4 +1,4 @@
-// $Id: edge.h,v 1.7 2003-02-27 00:55:28 benkirk Exp $
+// $Id: edge.h,v 1.8 2003-02-28 23:37:42 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -48,8 +48,8 @@ class Edge : public Elem
    * Default line element, takes number of nodes and 
    * parent. Derived classes implement 'true' elements.
    */
-  Edge (const unsigned int nn, Edge* p);
-
+  Edge (const unsigned int nn, const Elem* p);
+  
   /**
    * @returns 1, the dimensionality of the object.
    */
@@ -126,12 +126,9 @@ class Edge : public Elem
 // ------------------------------------------------------------
 // Edge class member functions
 inline
-Edge::Edge(const unsigned int nn, Edge* p) :
+Edge::Edge(const unsigned int nn, const Elem* p) :
   Elem(nn, Edge::n_sides(), p) 
 {
 }
-
-
-
 
 #endif

@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.17 2003-02-26 00:47:51 jwpeterson Exp $
+// $Id: dof_map.h,v 1.18 2003-02-28 23:37:41 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,6 +30,7 @@
 #include "enum_order.h"
 #include "fe_type.h"
 #include "dense_matrix.h"
+#include "dense_vector.h"
 #include "coupling_matrix.h"
 
 // Forward Declarations

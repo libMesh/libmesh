@@ -1,4 +1,4 @@
-// $Id: face_quad8.h,v 1.9 2003-02-27 00:55:28 benkirk Exp $
+// $Id: face_quad8.h,v 1.10 2003-02-28 23:37:43 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -62,7 +62,7 @@ public:
   /**
    * Constructor. By default this element has no parent.
    */
-  Quad8  (Face* p=NULL);
+  Quad8  (const Elem* p=NULL);
   
   /**
    * @returns \p QUAD8
@@ -131,7 +131,7 @@ protected:
 // ------------------------------------------------------------
 // Quad8 class member functions
 inline
-Quad8::Quad8(Face* p) :
+Quad8::Quad8(const Elem* p) :
   Quad(Quad8::n_nodes(), p) 
 {
 }

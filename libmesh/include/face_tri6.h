@@ -1,4 +1,4 @@
-// $Id: face_tri6.h,v 1.9 2003-02-27 00:55:28 benkirk Exp $
+// $Id: face_tri6.h,v 1.10 2003-02-28 23:37:43 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -61,7 +61,7 @@ public:
   /**
    * Constructor.  By default this element has no parent.
    */
-  Tri6  (Face* p=NULL);
+  Tri6  (const Elem* p=NULL);
 
   /**
    * @returns \p TRI6
@@ -124,7 +124,7 @@ private:
 // ------------------------------------------------------------
 // Tri6 class member functions
 inline
-Tri6::Tri6(Face* p) :
+Tri6::Tri6(const Elem* p) :
   Tri(Tri6::n_nodes(), p) 
 {
 }

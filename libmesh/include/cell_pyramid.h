@@ -1,4 +1,4 @@
-// $Id: cell_pyramid.h,v 1.7 2003-02-27 00:55:28 benkirk Exp $
+// $Id: cell_pyramid.h,v 1.8 2003-02-28 23:37:38 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -45,8 +45,8 @@ public:
    * takes number of nodes and parent. 
    * Derived classes implement 'true' elements.
    */
-  Pyramid(const unsigned int nn, Cell* p);
-
+  Pyramid(const unsigned int nn, const Elem* p);
+  
   /**
    * @returns 5.  All pyramid-derivatives are guaranteed to have at
    * least 5 nodes.
@@ -106,11 +106,9 @@ public:
 // ------------------------------------------------------------
 // Pyramid class member functions
 inline
-Pyramid::Pyramid(const unsigned int nn, Cell* p) :
+Pyramid::Pyramid(const unsigned int nn, const Elem* p) :
   Cell(nn, Pyramid::n_sides(), p) 
 {
 }
-
-
 
 #endif

@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex8.h,v 1.9 2003-02-27 00:55:28 benkirk Exp $
+// $Id: cell_inf_hex8.h,v 1.10 2003-02-28 23:37:37 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -62,7 +62,7 @@ public:
   /**
    * Constructor.  By default this element has no parent.
    */
-  InfHex8  (Cell* p=NULL);
+  InfHex8  (const Elem* p=NULL);
   
   /**
    * @returns \p INFHEX8
@@ -143,7 +143,7 @@ private:
 // ------------------------------------------------------------
 // InfHex8 class member functions
 inline
-InfHex8::InfHex8(Cell* p) :
+InfHex8::InfHex8(const Elem* p) :
   Hex(InfHex8::n_nodes(), p) 
 {
 }

@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.12 2003-02-27 00:55:30 benkirk Exp $
+// $Id: elem.C,v 1.13 2003-02-28 23:37:46 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -62,18 +62,19 @@
 
 // ------------------------------------------------------------
 // Elem class member funcions
-Elem* Elem::build(const ElemType type)
+Elem* Elem::build(const ElemType type,
+		  const Elem* p)
 {
   switch (type)
     {
-      // 1D elements
+      // 1D elements 
     case EDGE2:
       {
-	return new Edge2;
+	return new Edge2(p);
       }
     case EDGE3:
       {
-	return new Edge3;
+	return new Edge3(p);
       }
 
 
@@ -81,62 +82,62 @@ Elem* Elem::build(const ElemType type)
       // 2D elements
     case TRI3:
       {
-	return new Tri3;
+	return new Tri3(p);
       }
     case TRI6:
       {
-	return new Tri6;
+	return new Tri6(p);
       }
     case QUAD4:
       {
-	return new Quad4;
+	return new Quad4(p);
       }
     case QUAD8:
       {
-	return new Quad8;
+	return new Quad8(p);
       }
     case QUAD9:
       {
-	return new Quad9;
+	return new Quad9(p);
       }
    
 
       // 3D elements
     case TET4:
       {
-	return new Tet4;
+	return new Tet4(p);
       }
     case TET10:
       {
-	return new Tet10;
+	return new Tet10(p);
       }
     case HEX8:
       {
-	return new Hex8;
+	return new Hex8(p);
       }
     case HEX20:
       {
-	return new Hex20;
+	return new Hex20(p);
       }
     case HEX27:
       {
-	return new Hex27;
+	return new Hex27(p);
       }
     case PRISM6:
       {
-	return new Prism6;
+	return new Prism6(p);
       }
     case PRISM15:
       {
-	return new Prism15;
+	return new Prism15(p);
       }
     case PRISM18:
       {
-	return new Prism18;
+	return new Prism18(p);
       }
     case PYRAMID5:
       {
-	return new Pyramid5;
+	return new Pyramid5(p);
       }
 
 
@@ -146,41 +147,41 @@ Elem* Elem::build(const ElemType type)
       // 1D infinite elements
     case INFEDGE2:
       {
-	return new InfEdge2;
+	return new InfEdge2(p);
       }
 
 
       // 2D infinite elements
     case INFQUAD4:
       {
-	return new InfQuad4;
+	return new InfQuad4(p);
       }
     case INFQUAD6:
       {
-	return new InfQuad6;
+	return new InfQuad6(p);
       }
 
    
     // 3D infinite elements
     case INFHEX8:
       {
-	return new InfHex8;
+	return new InfHex8(p);
       }
     case INFHEX16:
       {
-	return new InfHex16;
+	return new InfHex16(p);
       }
     case INFHEX18:
       {
-	return new InfHex18;
+	return new InfHex18(p);
       }
     case INFPRISM6:
       {
-	return new InfPrism6;
+	return new InfPrism6(p);
       }
     case INFPRISM12:
       {
-	return new InfPrism12;
+	return new InfPrism12(p);
       }
 
 #endif
@@ -205,10 +206,11 @@ Elem* Elem::build(const ElemType type)
 unsigned int Elem::which_neighbor_am_i (const Elem* e) const
 {
   assert (e != NULL);
-
-  for (unsigned int s=0; s<this->n_sides(); s++)
+  
+  for (unsigned int s=0; s<this->n_neighbors(); s++)
     if (this->neighbor(s) == e)
       return s;
+    
 
   std::cerr << "ERROR:  Elements are not neighbors!" 
 	    << std::endl;
@@ -425,6 +427,34 @@ bool Elem::contains_point (const Point& p) const
 
 
 
+void Elem::nullify_neighbors ()
+{
+  // Tell any of my neighbors about my death...
+  // Looks strange, huh?
+  for (unsigned int n=0; n<this->n_neighbors(); n++)
+    if (this->neighbor(n) != NULL)
+      {
+	Elem* neighbor = this->neighbor(n);
+
+	// Note:  it is possible that I see the neighbor
+	// (which is at a lower refinement level than me)
+	// but they don't see me, so avoid that case.
+	if (neighbor->level() == this->level())
+	  {	
+// 	    std::cout << "this=" << this
+// 		      << ", neighbor=" << neighbor
+// 		      << ", this->id()=" << this->id()
+// 		      << std::endl;
+	
+	    const unsigned int w_n_a_i = neighbor->which_neighbor_am_i(this);
+	    neighbor->set_neighbor(w_n_a_i, NULL);
+	    this->set_neighbor(n, NULL);
+	  }
+      }
+}
+
+
+
 /**
  * The following functions only apply when
  * AMR is enabled and thus are not present
@@ -444,7 +474,7 @@ void Elem::refine (Mesh& mesh)
 
     for (unsigned int c=0; c<this->n_children(); c++)
       {
-	_children[c] = Elem::build(this->type());
+	_children[c] = Elem::build(this->type(), this);
 	_children[c]->set_refinement_flag() = Elem::JUST_REFINED;
       }
   }
@@ -480,7 +510,7 @@ void Elem::refine (Mesh& mesh)
 
   
   // Possibly add boundary information
-  for (unsigned int s=0; s<this->n_sides(); s++)
+  for (unsigned int s=0; s<this->n_neighbors(); s++)
     if (this->neighbor(s) == NULL)
       {
 	const short int id = mesh.boundary_info.boundary_id(this, s);
@@ -502,6 +532,7 @@ void Elem::coarsen()
   assert (this->refinement_flag() == Elem::COARSEN);
   assert (!this->active());
 
+  // Delete the storage for my children
   delete [] _children;
 
   _children = NULL;

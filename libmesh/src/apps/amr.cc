@@ -33,7 +33,6 @@ int main (int argc, char** argv)
   
     // Read a mesh
     mesh.read(meshname);
-    mesh.find_neighbors();
 
     mesh.elem(0)->set_refinement_flag() = Elem::REFINE;
     mesh.mesh_refinement.refine_and_coarsen_elements();    

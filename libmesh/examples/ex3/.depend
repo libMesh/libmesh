@@ -5,6 +5,7 @@ ex3.$(obj-suffix):\
     ../../include/boundary_mesh.h\
     ../../include/coupling_matrix.h\
     ../../include/dense_matrix.h\
+    ../../include/dense_vector.h\
     ../../include/dof_map.h\
     ../../include/dof_object.h\
     ../../include/elem.h\
@@ -24,10 +25,12 @@ ex3.$(obj-suffix):\
     ../../include/fe_type.h\
     ../../include/general_system.h\
     ../../include/libmesh.h\
+    ../../include/libmesh_base.h\
     ../../include/linear_solver_interface.h\
     ../../include/mesh.h\
     ../../include/mesh_base.h\
     ../../include/mesh_common.h\
+    ../../include/mesh_communication.h\
     ../../include/mesh_config.h\
     ../../include/mesh_refinement.h\
     ../../include/node.h\
@@ -47,5 +50,6 @@ ex3.$(obj-suffix):\
     ../../include/xdr_cxx.h
 exact_solution.$(obj-suffix):\
     exact_solution.C\
+    ../../include/libmesh_base.h\
     ../../include/mesh_common.h\
     ../../include/mesh_config.h

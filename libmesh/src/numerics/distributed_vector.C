@@ -1,4 +1,4 @@
-// $Id: distributed_vector.C,v 1.6 2003-02-25 16:26:47 ddreyer Exp $
+// $Id: distributed_vector.C,v 1.7 2003-02-28 23:37:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,6 +26,7 @@
 
 // Local Includes
 #include "distributed_vector.h"
+#include "dense_vector.h"
 
 
 
@@ -171,6 +172,21 @@ void DistributedVector<T>::add_vector (const std::vector<T>& v,
 
 template <typename T>
 void DistributedVector<T>::add_vector (const NumericVector<T>& V,
+				       const std::vector<unsigned int>& dof_indices)
+{
+  assert (V.size() == dof_indices.size());
+  assert (this->initialized());
+  assert (_values.size() == _local_size);
+  assert ((_last_local_index - _first_local_index) == _local_size);
+
+  for (unsigned int i=0; i<V.size(); i++)
+    add (dof_indices[i], V(i));
+}
+
+
+
+template <typename T>
+void DistributedVector<T>::add_vector (const DenseVector<T>& V,
 				       const std::vector<unsigned int>& dof_indices)
 {
   assert (V.size() == dof_indices.size());

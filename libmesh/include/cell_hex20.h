@@ -1,4 +1,4 @@
-// $Id: cell_hex20.h,v 1.9 2003-02-27 00:55:28 benkirk Exp $
+// $Id: cell_hex20.h,v 1.10 2003-02-28 23:37:36 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -73,7 +73,7 @@ public:
   /**
    * Constructor.  By default this element has no parent.
    */
-  Hex20  (Cell* p=NULL);
+  Hex20  (const Elem* p=NULL);
   
   /**
    * @returns \p HEX20
@@ -140,7 +140,7 @@ protected:
 // ------------------------------------------------------------
 // Hex20 class member functions
 inline
-Hex20::Hex20(Cell* p) :
+Hex20::Hex20(const Elem* p) :
   Hex(Hex20::n_nodes(), p) 
 {
 }

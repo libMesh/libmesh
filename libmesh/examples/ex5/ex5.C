@@ -1,4 +1,4 @@
-// $Id: ex5.C,v 1.14 2003-02-26 11:34:34 ddreyer Exp $
+// $Id: ex5.C,v 1.15 2003-02-28 23:37:33 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -175,8 +175,6 @@ int main (int argc, char** argv)
 		     -1., 1.,
 		     -1., 1.,
 		     HEX8);
-
-    mesh.find_neighbors();
     
     mesh.print_info();
     
@@ -277,7 +275,7 @@ void assemble_poisson(EquationSystems& es,
   const DofMap& dof_map = es("Poisson").get_dof_map();
 
   DenseMatrix<Number> Ke;
-  std::vector<Number> Fe;
+  DenseVector<Number> Fe;
 
   std::vector<unsigned int> dof_indices;
 
@@ -305,8 +303,6 @@ void assemble_poisson(EquationSystems& es,
 		 dof_indices.size());
 
       Fe.resize (dof_indices.size());
-
-      std::fill (Fe.begin(), Fe.end(), 0.);
 
 
 
@@ -347,7 +343,7 @@ void assemble_poisson(EquationSystems& es,
 
 	      const Real fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
 	      
-	      Fe[i] += JxW[qp]*fxy*phi[i][qp];
+	      Fe(i) += JxW[qp]*fxy*phi[i][qp];
 	    }; // end of the RHS summation loop
 	  
 	}; // end of quadrature point loop
@@ -439,7 +435,7 @@ void assemble_poisson(EquationSystems& es,
 
 		  for (unsigned int i=0; i<phi_face.size(); i++)
 		    {
-		      Fe[i] += JxW_face[qp]*penalty*value*phi_face[i][qp];
+		      Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
 		    };
 		  
 		}; // end face quadrature point loop	  

@@ -411,9 +411,7 @@ int main (int argc, char** argv)
     if (!names.empty())
       {
 	mesh.read(names[0]);
-	
-	mesh.find_neighbors();
-	
+
 	if (verbose)
 	  mesh.print_info();
       }

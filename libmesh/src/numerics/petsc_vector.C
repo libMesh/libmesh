@@ -1,4 +1,4 @@
-// $Id: petsc_vector.C,v 1.12 2003-02-24 14:35:48 benkirk Exp $
+// $Id: petsc_vector.C,v 1.13 2003-02-28 23:37:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,9 +24,9 @@
 // Local Includes
 #include "petsc_vector.h"
 
-
-
 #ifdef HAVE_PETSC
+
+#include "dense_vector.h"
 
 
 
@@ -161,6 +161,18 @@ void PetscVector<T>::add_vector (const std::vector<T>& v,
 
 template <typename T>
 void PetscVector<T>::add_vector (const NumericVector<T>& V,
+				 const std::vector<unsigned int>& dof_indices)
+{
+  assert (V.size() == dof_indices.size());
+
+  for (unsigned int i=0; i<V.size(); i++)
+    add (dof_indices[i], V(i));
+}
+
+
+
+template <typename T>
+void PetscVector<T>::add_vector (const DenseVector<T>& V,
 				 const std::vector<unsigned int>& dof_indices)
 {
   assert (V.size() == dof_indices.size());

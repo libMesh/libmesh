@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.16 2003-02-27 02:02:15 benkirk Exp $
+// $Id: elem.h,v 1.17 2003-02-28 23:37:42 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -38,6 +38,7 @@
 
 // Forward declarations
 class Mesh;
+class MeshRefinement;
 class Elem;
 
 
@@ -88,7 +89,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    */ 
   Elem (const unsigned int n_nodes=0,
 	const unsigned int n_sides=0,
-	Elem* _parent=NULL);
+	const Elem* parent=NULL);
 
  public:
 
@@ -134,22 +135,8 @@ class Elem : public ReferenceCountedObject<Elem>,
    * @returns the subdomain that this element belongs to as a
    * writeable reference.
    */
-  unsigned char & subdomain_id ()
+  unsigned char & set_subdomain_id ()
   { return _sbd_id; }
-
-  /**
-   * @returns the processor that this element belongs to.
-   * To conserve space this is stored as a short integer.
-   */
-  unsigned short int processor_id () const
-  { return _proc_id; }
-  
-  /**
-   * @returns the processor that this element belongs to as a
-   * writeable reference.
-   */
-  unsigned short int & processor_id ()
-  { return _proc_id; }
 
   /**
    * @returns an id assocated with this element.  The id is not
@@ -175,14 +162,21 @@ class Elem : public ReferenceCountedObject<Elem>,
    * a boundary of the domain. 
    */
   Elem* neighbor(const unsigned int i) const
-  { assert (i < n_sides()); return _neighbors[i]; }
+  { assert (i < n_neighbors()); return _neighbors[i]; }
 
   /**
    * Assigns \p n as the \f$ i^{th} \f$ neighbor.
    */
   void set_neighbor(const unsigned int i, Elem* n)
-  { assert (i < n_sides()); _neighbors[i]=n; return; }
+  { assert (i < n_neighbors()); _neighbors[i]=n; return; }
 
+  /**
+   * @returns \p true if this element has a side coincident
+   * with a boundary (indicated by a \p NULL neighbor), \p false
+   * otherwise.
+   */
+  bool on_boundary () const;
+  
   /**
    * This function tells you which neighbor you \p (e) are.
    * What is returned is the index of the side _in_the_neighbor_
@@ -452,16 +446,16 @@ class Elem : public ReferenceCountedObject<Elem>,
   /**
    * The non-const begin and end accessor functions.
    */
-  ElemPair neighbors_begin() { return ElemPair (&_neighbors[0],         &_neighbors[n_sides()]); }
-  ElemPair neighbors_end()   { return ElemPair (&_neighbors[n_sides()], &_neighbors[n_sides()]); }
+  ElemPair neighbors_begin() { return ElemPair (&_neighbors[0],         &_neighbors[n_neighbors()]); }
+  ElemPair neighbors_end()   { return ElemPair (&_neighbors[n_sides()], &_neighbors[n_neighbors()]); }
 
   /**
    * The const begin and end accessor functions. 
    */
   ConstElemPair neighbors_begin() const { return ConstElemPair (const_cast<const Elem**>(&_neighbors[0]),
-								const_cast<const Elem**>(&_neighbors[n_sides()])); }
-  ConstElemPair neighbors_end()   const { return ConstElemPair (const_cast<const Elem**>(&_neighbors[n_sides()]),
-								const_cast<const Elem**>(&_neighbors[n_sides()])); }
+								const_cast<const Elem**>(&_neighbors[n_neighbors()])); }
+  ConstElemPair neighbors_end()   const { return ConstElemPair (const_cast<const Elem**>(&_neighbors[n_neighbors()]),
+								const_cast<const Elem**>(&_neighbors[n_neighbors()])); }
 #endif
 
   
@@ -474,8 +468,16 @@ class Elem : public ReferenceCountedObject<Elem>,
    * the pointer when you are done with it.  The user should not call this,
    * so it is protected.
    */
-  static Elem* build (const ElemType type);
+  static Elem* build (const ElemType type,
+		      const Elem* p=NULL);
 
+  /**
+   * Replaces this element with \p NULL for all of
+   * its neighbors.  This is useful when deleting an
+   * element.
+   */
+  void nullify_neighbors ();
+  
 #ifdef ENABLE_AMR
   
   /**
@@ -503,11 +505,6 @@ class Elem : public ReferenceCountedObject<Elem>,
    * The subdomain to which this element belongs.
    */
   unsigned char _sbd_id;
-
-  /**
-   * The processor to which this element belongs.
-   */
-  unsigned short int _proc_id;
 
   /**
    * Pointers to this element's neighbors.
@@ -542,6 +539,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    * the build method, there's no way around it.
    */
   friend class XdrInterface;
+  friend class MeshRefinement;
   friend class Mesh;
 };
 
@@ -553,13 +551,13 @@ class Elem : public ReferenceCountedObject<Elem>,
 inline
 Elem::Elem(const unsigned int nn,
 	   const unsigned int ns,
-	   Elem* p) :
+	   const Elem* p) :
   _parent(p)
 {
   assert (nn);
 
-  subdomain_id() = 0;
-  processor_id() = 0;
+  this->set_subdomain_id() = 0;
+  this->set_processor_id() = 0;
 
   // Initialize the nodes data structure
   {
@@ -588,17 +586,17 @@ Elem::Elem(const unsigned int nn,
   }
 
   // Optionally initialize data from the parent
-  if (parent() != NULL)
+  if (this->parent() != NULL)
     {
-      subdomain_id() = parent()->subdomain_id();
-      processor_id() = parent()->processor_id();
+      this->set_subdomain_id() = this->parent()->subdomain_id();
+      this->set_processor_id() = this->parent()->processor_id();
     }  
 
 #ifdef ENABLE_AMR
   
   _children = NULL;
 
-  set_refinement_flag() = Elem::DO_NOTHING;
+  this->set_refinement_flag() = Elem::DO_NOTHING;
 
 #endif  
 }
@@ -608,16 +606,19 @@ Elem::Elem(const unsigned int nn,
 inline
 Elem::~Elem() 
 {
+  // Delete my node storage
   if (_nodes != NULL)
     delete [] _nodes;
   _nodes = NULL;
-  
+
+  // Delete my neighbor storage
   if (_neighbors != NULL)
     delete [] _neighbors;
   _neighbors = NULL;
 
 #ifdef ENABLE_AMR
-  
+
+  // Delete my children's storage
   if (_children != NULL)
     delete [] _children;
   _children = NULL;
@@ -630,7 +631,7 @@ Elem::~Elem()
 inline
 const Point & Elem::point (const unsigned int i) const
 {
-  assert (i < n_nodes());
+  assert (i < this->n_nodes());
   assert (_nodes[i] != NULL);
   assert (_nodes[i]->id() != Node::invalid_id);
 
@@ -642,7 +643,7 @@ const Point & Elem::point (const unsigned int i) const
 inline
 Point & Elem::point (const unsigned int i)
 {
-  assert (i < n_nodes());
+  assert (i < this->n_nodes());
 
   return *_nodes[i];
 }
@@ -652,7 +653,7 @@ Point & Elem::point (const unsigned int i)
 inline
 unsigned int Elem::node (const unsigned int i) const
 {
-  assert (i < n_nodes());
+  assert (i < this->n_nodes());
   assert (_nodes[i] != NULL);
   assert (_nodes[i]->id() != Node::invalid_id);
 
@@ -664,9 +665,8 @@ unsigned int Elem::node (const unsigned int i) const
 inline
 Node* Elem::get_node (const unsigned int i) const
 {
-  assert (i < n_nodes());
+  assert (i < this->n_nodes());
   assert (_nodes[i] != NULL);
-  assert (_nodes[i]->id() != Node::invalid_id);
 
   return _nodes[i];
 }
@@ -676,9 +676,20 @@ Node* Elem::get_node (const unsigned int i) const
 inline
 Node* & Elem::set_node (const unsigned int i)
 {
-  assert (i < n_nodes());
+  assert (i < this->n_nodes());
 
   return _nodes[i];
+}
+
+
+inline
+bool Elem::on_boundary () const
+{
+  for (unsigned int n=0; n<this->n_neighbors(); n++)
+    if (this->neighbor(n) == NULL)
+      return true;
+
+  return false;
 }
 
 
@@ -711,12 +722,12 @@ unsigned int Elem::level() const
   // created directly from file
   // or by the user, so I am a
   // level-0 element
-  if (parent() == NULL)
+  if (this->parent() == NULL)
     return 0;
 
   // otherwise we are at a level one
   // higher than our parent
-  return (parent()->level() + 1);
+  return (this->parent()->level() + 1);
 }
 
 #endif // endf #ifdef ENABLE_AMR

@@ -1,4 +1,4 @@
-// $Id: face_inf_quad6.h,v 1.9 2003-02-27 00:55:28 benkirk Exp $
+// $Id: face_inf_quad6.h,v 1.10 2003-02-28 23:37:42 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -67,7 +67,7 @@ public:
   /**
    * Constructor.  By default this element has no parent.
    */
-  InfQuad6  (Face* p=NULL);
+  InfQuad6  (const Elem* p=NULL);
   
   /**
    * @returns \p INFQUAD6
@@ -162,7 +162,7 @@ private:
 // ------------------------------------------------------------
 // InfQuad6 class member functions
 inline
-InfQuad6::InfQuad6(Face* p) :
+InfQuad6::InfQuad6(const Elem* p) :
   Quad(InfQuad6::n_nodes(), p) 
 {
 }

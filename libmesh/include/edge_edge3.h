@@ -1,4 +1,4 @@
-// $Id: edge_edge3.h,v 1.8 2003-02-27 00:55:28 benkirk Exp $
+// $Id: edge_edge3.h,v 1.9 2003-02-28 23:37:42 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -48,7 +48,7 @@ class Edge3 : public Edge
   /**
    * Constructor.  By default this element has no parent.
    */
-  Edge3 (Edge* p=NULL);
+  Edge3 (const Elem* p=NULL);
   
   /**
    * @returns 3
@@ -101,7 +101,7 @@ protected:
 // ------------------------------------------------------------
 // Edge3 class member functions
 inline
-Edge3::Edge3(Edge* p) :
+Edge3::Edge3(const Elem* p) :
   Edge(Edge3::n_nodes(), p) 
 {
 }
