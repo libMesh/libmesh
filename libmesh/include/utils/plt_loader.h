@@ -1,4 +1,4 @@
-// $Id: plt_loader.h,v 1.2 2004-10-04 13:53:22 benkirk Exp $
+// $Id: plt_loader.h,v 1.3 2005-02-15 05:23:33 benkirk Exp $
 
 // Copyright (C) 2002-2004  Benjamin S. Kirk
   
@@ -416,7 +416,7 @@ private:
   std::vector<unsigned int> _zone_pack;
 
   /**
-   * The \p(imax,jmax,kmax) value for each zone.
+   * The (imax,jmax,kmax) value for each zone.
    */
   std::vector<unsigned int> _imax;
   std::vector<unsigned int> _jmax;

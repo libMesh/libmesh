@@ -1,4 +1,4 @@
-// $Id: explicit_system.C,v 1.4 2005-01-06 21:55:04 benkirk Exp $
+// $Id: explicit_system.C,v 1.5 2005-02-15 05:23:34 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -52,7 +52,7 @@ void ExplicitSystem::clear ()
   // Clear the parent data
   Parent::clear();
 
-  // NULL-out the matrix.  Note that
+  // NULL-out the vector.  Note that
   // System::clear() actually deleted it.
   rhs = NULL;
 }
@@ -77,8 +77,9 @@ void ExplicitSystem::reinit ()
   // initialize parent data
   Parent::reinit();  
   
+  // not necessary, handled by the parent!
   // Resize the RHS conformal to the current mesh
-  rhs->init (this->n_dofs(), this->n_local_dofs());
+  //rhs->init (this->n_dofs(), this->n_local_dofs());
 }
 
 

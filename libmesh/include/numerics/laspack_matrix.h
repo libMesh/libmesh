@@ -1,4 +1,4 @@
-// $Id: laspack_matrix.h,v 1.6 2005-01-03 00:06:48 benkirk Exp $
+// $Id: laspack_matrix.h,v 1.7 2005-02-15 05:23:33 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2003-2003  Benjamin S. Kirk, John W. Peterson
@@ -231,26 +231,26 @@ public:
 
   /**
    * Return the l1-norm of the matrix, that is
-   * $|M|_1=max_{all columns j}\sum_{all 
-   * rows i} |M_ij|$,
+   * \f$|M|_1=max_{all columns j}\sum_{all 
+   * rows i} |M_ij|\f$,
    * (max. sum of columns).
    * This is the
    * natural matrix norm that is compatible
    * to the l1-norm for vectors, i.e.
-   * $|Mv|_1\leq |M|_1 |v|_1$.
+   * \f$|Mv|_1\leq |M|_1 |v|_1\f$.
    */
   Real l1_norm () const { error(); return 0.; }
 
   /**
    * Return the linfty-norm of the
    * matrix, that is
-   * $|M|_infty=max_{all rows i}\sum_{all 
-   * columns j} |M_ij|$,
+   * \f$|M|_\infty=max_{all rows i}\sum_{all 
+   * columns j} |M_ij|\f$,
    * (max. sum of rows).
    * This is the
    * natural matrix norm that is compatible
    * to the linfty-norm of vectors, i.e.
-   * $|Mv|_infty \leq |M|_infty |v|_infty$.
+   * \f$|Mv|_\infty \leq |M|_\infty |v|_\infty\f$.
    */
   Real linfty_norm () const { error(); return 0.; }
 

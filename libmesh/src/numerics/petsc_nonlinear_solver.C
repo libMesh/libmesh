@@ -1,4 +1,4 @@
-// $Id: petsc_nonlinear_solver.C,v 1.8 2005-02-04 13:36:39 benkirk Exp $
+// $Id: petsc_nonlinear_solver.C,v 1.9 2005-02-15 05:23:33 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -57,7 +57,7 @@ extern "C"
   {
     //int ierr=0;
 
-    if (its > 0)
+    //if (its > 0)
       std::cout << "  NL step " << its
 		<< std::scientific
 		<< ", |residual|_2 = " << fnorm
@@ -183,7 +183,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
 				const double,              // Stopping tolerance
 				const unsigned int) 
 {
-  //this->init ();
+  this->init ();
 
 //   std::cout << "x.size()=" << x_in.size()
 // 	    << ", r.size()=" << r_in.size()
@@ -204,12 +204,12 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
 
   //Mat A = jac->mat();
 
-  ierr = SNESCreate(PETSC_COMM_WORLD,&_snes);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+//   ierr = SNESCreate(PETSC_COMM_WORLD,&_snes);
+//          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 	 
-  ierr = SNESSetMonitor (_snes, __libmesh_petsc_snes_monitor,
-			 this, PETSC_NULL);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+//   ierr = SNESSetMonitor (_snes, __libmesh_petsc_snes_monitor,
+// 			 this, PETSC_NULL);
+//          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
   ierr = SNESSetFunction (_snes, r->vec(), __libmesh_petsc_snes_residual, this);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
@@ -217,8 +217,8 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
   ierr = SNESSetJacobian (_snes, jac->mat(), jac->mat(), __libmesh_petsc_snes_jacobian, this);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 	     
-  ierr = SNESSetFromOptions(_snes);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+//   ierr = SNESSetFromOptions(_snes);
+//          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
   // Older versions (at least up to 2.1.5) of SNESSolve took 3 arguments,
   // the last one being a pointer to an int to hold the number of iterations required.
@@ -236,8 +236,8 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
 //              CHKERRABORT(PETSC_COMM_WORLD,ierr);
 //     }
  	 
- ierr = SNESDestroy(_snes);
-        CHKERRABORT(PETSC_COMM_WORLD,ierr);
+//  ierr = SNESDestroy(_snes);
+//         CHKERRABORT(PETSC_COMM_WORLD,ierr);
 	 
   // return the # of its. and the final residual norm.  Note that
   // n_iterations may be zero for PETSc versions 2.2.x and greater.

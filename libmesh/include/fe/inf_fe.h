@@ -1,4 +1,4 @@
-// $Id: inf_fe.h,v 1.3 2004-03-21 03:19:25 benkirk Exp $
+// $Id: inf_fe.h,v 1.4 2005-02-15 05:23:32 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -66,7 +66,7 @@ class FEComputeData;
  *
  * \author Daniel Dreyer
  * \date 2003
- * \version $Revision: 1.3 $
+ * \version $Revision: 1.4 $
  */
 
 //-------------------------------------------------------------
@@ -89,7 +89,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.3 $
+   * \version $Revision: 1.4 $
    */
   //-------------------------------------------------------------
   // InfFE::Radial class definition
@@ -181,7 +181,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.3 $
+   * \version $Revision: 1.4 $
    */
   //-------------------------------------------------------------
   // InfFE::Base class definition
@@ -762,7 +762,7 @@ private:
 #endif
 
   /**
-   * Make all \p \InfFE<Dim,T_radial,T_map> classes
+   * Make all \p InfFE<Dim,T_radial,T_map> classes
    * friends of each other, so that the protected
    * \p eval() may be accessed.
    */
