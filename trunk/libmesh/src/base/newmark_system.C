@@ -1,4 +1,4 @@
-// $Id: newmark_system.C,v 1.6 2003-05-29 21:31:36 benkirk Exp $
+// $Id: newmark_system.C,v 1.7 2003-08-16 17:33:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,18 +31,36 @@
 
 
 // ------------------------------------------------------------
+// NewmarkSystem static members
+const Real NewmarkSystem::_default_alpha    = .25;
+const Real NewmarkSystem::_default_delta    = .5;
+const Real NewmarkSystem::_default_timestep = 1.;
+
+
+
+// ------------------------------------------------------------
 // NewmarkSystem implementation
 NewmarkSystem::NewmarkSystem (EquationSystems& es,
 			      const std::string& name,
-			      const unsigned int number) :
-  
+			      const unsigned int number) :  
   TransientSystem    (es, name, number),
+  _a_0               (1./(_default_alpha*_default_timestep*_default_timestep)),
+  _a_1               (_default_delta/(_default_alpha*_default_timestep)),
+  _a_2               (1./(_default_alpha*_default_timestep)),
+  _a_3               (1./(2.*_default_alpha)-1.),
+  _a_4               (_default_delta/_default_alpha -1.),
+  _a_5               (_default_timestep/2.*(_default_delta/_default_alpha-2.)),
+  _a_6               (_default_timestep*(1.-_default_delta)),
+  _a_7               (_default_delta*_default_timestep),
   _finished_assemble (false)
   
 {
   // default values of the newmark parameters
-  _equation_systems.set_parameter("Newmark alpha") = .25;
-  _equation_systems.set_parameter("Newmark delta") = .5;
+  _equation_systems.set_parameter("Newmark alpha") = _default_alpha;
+  _equation_systems.set_parameter("Newmark delta") = _default_delta;
+
+  // time step size.  should be handled at a later stage through EquationSystems?
+  _equation_systems.set_parameter("Newmark time step") = _default_timestep;
 
   // add additional matrices and vectors that will be used in the
   // newmark algorithm to the data structure
@@ -87,9 +105,12 @@ void NewmarkSystem::clear ()
   // matrices and vectors added in the constructor
   TransientSystem::clear();
 
-  // clear the parameters and integration constants
-  _equation_systems.unset_parameter("Newmark alpha");
-  _equation_systems.unset_parameter("Newmark delta");
+  // default values of the newmark parameters
+  _equation_systems.set_parameter("Newmark alpha") = _default_alpha;
+  _equation_systems.set_parameter("Newmark delta") = _default_delta;
+
+  // time step size.  should be handled at a later stage through EquationSystems?
+  _equation_systems.set_parameter("Newmark time step") = _default_timestep;
 
   // set bool to false
   _finished_assemble = false;
@@ -116,15 +137,6 @@ void NewmarkSystem::assemble ()
       // prepare matrix with the help of the _dof_map, 
       // fill with sparsity pattern
       TransientSystem::assemble();
-      
-      // Log how long the user's matrix assembly code takes
-      START_LOG("assemble()", "NewmarkSystem");
-      
-      // Call the user-specified matrix assembly function
-      this->assemble_system (_equation_systems, this->name());
-      
-      // Stop logging the user code
-      STOP_LOG("assemble()", "NewmarkSystem");
       
       // compute the effective system matrix
       this->compute_matrix();

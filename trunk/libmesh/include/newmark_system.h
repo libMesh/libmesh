@@ -1,4 +1,4 @@
-// $Id: newmark_system.h,v 1.5 2003-05-15 23:34:34 benkirk Exp $
+// $Id: newmark_system.h,v 1.6 2003-08-16 17:33:45 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -122,30 +122,46 @@ public:
    * delta and calculate the constant parameters used for
    * time integration.
    */
-  void set_newmark_parameters (const Real delta_T,
-			       const Real alpha=.25,
-			       const Real delta=.5);
+  void set_newmark_parameters (const Real delta_T = _default_timestep,
+			       const Real alpha   = _default_alpha,
+			       const Real delta   = _default_delta);
 
 
 
 private:
 
-    /**
-     * Constants used for the time integration.
-     */
-    Real _a_0;
-    Real _a_1;
-    Real _a_2;
-    Real _a_3;
-    Real _a_4;
-    Real _a_5;
-    Real _a_6;
-    Real _a_7;
+  /**
+   * Constants used for the time integration.
+   */
+  Real _a_0;
+  Real _a_1;
+  Real _a_2;
+  Real _a_3;
+  Real _a_4;
+  Real _a_5;
+  Real _a_6;
+  Real _a_7;
 
-    /**
-     * Returns true if the matrix assambly is finished.
-     */
-    bool _finished_assemble;  
+  /**
+   * Returns true if the matrix assembly is finished.
+   */
+  bool _finished_assemble;  
+  
+  /**
+   * Default Newmark \p alpha
+   */
+  static const Real _default_alpha;
+
+  /**
+   * Default Newmark \p delta
+   */
+  static const Real _default_delta;
+
+  /**
+   * Default Newmark time step
+   */
+  static const Real _default_timestep;
+
 };
 
 
