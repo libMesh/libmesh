@@ -1,4 +1,4 @@
-// $Id: system_base.C,v 1.21 2003-06-03 05:33:35 benkirk Exp $
+// $Id: system_base.C,v 1.22 2003-08-07 08:55:30 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -211,8 +211,6 @@ void SystemBase::reinit ()
 
 void SystemBase::assemble ()
 {
-  assert (assemble_system != NULL);
-
   // Initiaize the matrices if not already done
   { 
     // no chance to add other matrices

@@ -1,4 +1,4 @@
-// $Id: frequency_system.C,v 1.17 2003-07-10 12:10:10 ddreyer Exp $
+// $Id: frequency_system.C,v 1.18 2003-08-07 08:55:30 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -47,6 +47,7 @@ FrequencySystem::FrequencySystem (EquationSystems& es,
   SteadySystem              (es, name, number),
   solve_system              (NULL),
   _finished_set_frequencies (false),
+  _keep_solution_duplicates (true),
   _finished_init            (false),
   _finished_assemble        (false)
 {
@@ -72,6 +73,7 @@ void FrequencySystem::clear ()
   SteadySystem::clear();
 
   _finished_set_frequencies = false;
+  _keep_solution_duplicates = true;
   _finished_init            = false;
   _finished_assemble        = false;
 
@@ -95,6 +97,7 @@ void FrequencySystem::clear_all ()
   SteadySystem::clear();
 
   _finished_set_frequencies = false;
+  _keep_solution_duplicates = true;
   _finished_init            = false;
   _finished_assemble        = false;
 
@@ -190,8 +193,11 @@ void FrequencySystem::assemble ()
 
 void FrequencySystem::set_frequencies_by_steps (const Real base_freq,
 						const Real freq_step,
-						const unsigned int n_freq)
+						const unsigned int n_freq,
+						const bool allocate_solution_duplicates)
 {
+  this->_keep_solution_duplicates = allocate_solution_duplicates;
+
   // sanity check
   if (_finished_set_frequencies)
     {
@@ -209,8 +215,9 @@ void FrequencySystem::set_frequencies_by_steps (const Real base_freq,
       _equation_systems.set_parameter(this->form_freq_param_name(n)) = 
 	  base_freq + n * freq_step;
 
-      // build storage for solution vector
-      SystemBase::add_vector(this->form_solu_vec_name(n));
+      // build storage for solution vector, if wanted
+      if (this->_keep_solution_duplicates)
+	  SystemBase::add_vector(this->form_solu_vec_name(n));
     }  
 
   _finished_set_frequencies = true;
@@ -223,8 +230,11 @@ void FrequencySystem::set_frequencies_by_steps (const Real base_freq,
 
 void FrequencySystem::set_frequencies_by_range (const Real min_freq,
 						const Real max_freq,
-						const unsigned int n_freq)
+						const unsigned int n_freq,
+						const bool allocate_solution_duplicates)
 {
+  this->_keep_solution_duplicates = allocate_solution_duplicates;
+
   // sanity checks
   assert(max_freq > min_freq);
   assert(n_freq > 0);
@@ -245,8 +255,9 @@ void FrequencySystem::set_frequencies_by_range (const Real min_freq,
       _equation_systems.set_parameter(this->form_freq_param_name(n)) = 
 	  min_freq + n*(max_freq-min_freq)/(n_freq-1);
       
-      // build storage for solution vector
-      SystemBase::add_vector(this->form_solu_vec_name(n));
+      // build storage for solution vector, if wanted
+      if (this->_keep_solution_duplicates)
+	  SystemBase::add_vector(this->form_solu_vec_name(n));
     }  
 
   _finished_set_frequencies = true;
@@ -257,8 +268,11 @@ void FrequencySystem::set_frequencies_by_range (const Real min_freq,
 
 
 
-void FrequencySystem::set_frequencies (const std::vector<Real>& frequencies)
+void FrequencySystem::set_frequencies (const std::vector<Real>& frequencies,
+				       const bool allocate_solution_duplicates)
 {
+  this->_keep_solution_duplicates = allocate_solution_duplicates;
+
   // sanity checks
   assert(!frequencies.empty());
 
@@ -277,8 +291,9 @@ void FrequencySystem::set_frequencies (const std::vector<Real>& frequencies)
       // remember frequencies as parameters
       _equation_systems.set_parameter(this->form_freq_param_name(n)) = frequencies[n];
       
-      // build storage for solution vector
-      SystemBase::add_vector(this->form_solu_vec_name(n));
+      // build storage for solution vector, if wanted
+      if (this->_keep_solution_duplicates)
+	  SystemBase::add_vector(this->form_solu_vec_name(n));
     }  
 
   _finished_set_frequencies = true;
@@ -377,7 +392,8 @@ FrequencySystem::solve (const unsigned int n_start_in,
       /**
        * store the current solution in the additional vector
        */
-      this->get_vector(this->form_solu_vec_name(n)) = *solution;
+      if (this->_keep_solution_duplicates)
+	  this->get_vector(this->form_solu_vec_name(n)) = *solution;
 
     }  
 
