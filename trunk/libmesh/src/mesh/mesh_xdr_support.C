@@ -1,4 +1,4 @@
-// $Id: mesh_xdr_support.C,v 1.20 2004-03-20 15:16:57 benkirk Exp $
+// $Id: mesh_xdr_support.C,v 1.21 2004-07-12 23:53:26 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -502,7 +502,16 @@ void XdrInterface::mesh_interface(const std::string& name,
    * object exists.
    */
   std::vector<int> bcs;
-  bcs.resize(numBCs*3);   
+
+  // The following if-test was for GCC-3.4.1
+  // Its aggressive debug mode will not let you
+  // access the zero-element of a vector which
+  // it knows to be empty.
+  if (numBCs == 0)
+    bcs.resize(1);
+  else
+    bcs.resize(numBCs*3);
+  
   switch (access)
     {
     case (XdrIO::R_ASCII):
