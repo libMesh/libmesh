@@ -1,4 +1,4 @@
-// $Id: utility.h,v 1.9 2003-09-25 21:46:55 benkirk Exp $
+// $Id: utility.h,v 1.10 2003-09-27 00:54:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -22,13 +22,8 @@
 #define __utility_h__
 
 // Local includes
-#include "libmesh_config.h"
 
 // System includes
-#ifdef HAVE_LOCALE
-#include <locale>
-#endif
-
 
 
 
@@ -43,11 +38,6 @@ namespace Utility
    * you are running on.
    */
   std::string system_info();
-
-#ifdef HAVE_LOCALE
-  typedef std::ostreambuf_iterator<char, std::char_traits<char> > TimeIter;
-  typedef std::time_put<char, TimeIter>                           TimePut;
-#endif
 
   /**
    * \p Utility::iota is a duplication of the SGI STL extension
@@ -64,7 +54,28 @@ namespace Utility
 	*first = value++;
 	++first;
       }
-  } 
+  }
+
+  /**
+   * An efficient, temporary-free swapping algorithm
+   * on machines where this is possible.
+   */
+  template <typename T>
+  void swap (T& a, T& b)
+  {
+#ifdef __HP_aCC
+    
+    const T buf = a;
+    a = b;
+    b = buf;
+    
+#else
+
+    a^=b^=a^=b;
+      
+#endif    
+  }
+  
 }
 
 #endif

@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.37 2003-09-25 21:46:55 benkirk Exp $
+// $Id: elem.h,v 1.38 2003-09-27 00:54:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -34,6 +34,7 @@
 #include "enum_elem_quality.h"
 #include "enum_order.h"
 #include "auto_ptr.h"
+#include "utility.h"
 
 
 // Forward declarations
@@ -1021,32 +1022,9 @@ unsigned int Elem::compute_key (unsigned int n0,
   const unsigned int bp = 65449;
   
   // Order the two so that n0 < n1
+  if (n0 > n1) Utility::swap (n0, n1);
 
-#ifdef __HP_aCC
-
-  // HP aCC cannot swap as shown below
-  if (n0 > n1)
-    {
-      // Swap n0 & n1
-      const unsigned int buf = n0;
-      n0                     = n1;
-      n1                     = buf;
-    }
-
-#else
-
-  if (n1 < n0)
-    {
-      // Swap n0 & n1 without a temporary
-      n0^=n1^=n0^=n1;
-
-      assert ( n0 < n1 );
-    }
-
-#endif
-
-  return (n0%bp + (n1<<5)%bp);
-  
+  return (n0%bp + (n1<<5)%bp);  
 }
 
 
@@ -1073,65 +1051,14 @@ unsigned int Elem::compute_key (unsigned int n0,
 
 
 
-#ifdef __HP_aCC
-
-  // HP aCC cannot swap as shown below;
-  // the lower int gets zero'ed.
-  // In case anybody has a better suggestion,
-  // _please_ change!
-  unsigned int buf;
-
   // Step 1
-  if (n0 > n1)
-    {
-      // Swap n0 & n1
-      buf = n0;
-      n0  = n1;
-      n1  = buf;
-    }
+  if (n0 > n1) Utility::swap (n0, n1);
 
   // Step 2
-  if (n1 > n2)
-    {
-      // Swap n1 & n2
-      buf = n1;
-      n1  = n2;
-      n2  = buf;
-    }
+  if (n1 > n2) Utility::swap (n1, n2);
 
   // Step 3
-  if (n0 > n1)
-    {
-      // Swap n0 & n1 
-      buf = n0;
-      n0  = n1;
-      n1  = buf;
-    }
-
-#else
-  
-  // Step 1
-  if (n0 > n1)
-    {
-      // Swap n0 & n1 without a temporary
-      n0^=n1^=n0^=n1;
-    }
-
-  // Step 2
-  if (n1 > n2)
-    {
-      // Swap n1 & n2 without a temporary
-      n1^=n2^=n1^=n2;
-    }
-
-  // Finally step 3
-  if (n0 > n1)
-    {
-      // Swap n0 & n1 without a temporary
-      n0^=n1^=n0^=n1;
-    }
-
-#endif
+  if (n0 > n1) Utility::swap (n0, n1);
 
   assert ((n0 < n1) && (n1 < n2));
 
@@ -1150,103 +1077,20 @@ unsigned int Elem::compute_key (unsigned int n0,
   // big prime number
   const unsigned int bp = 65449;
 
-#ifdef __HP_aCC
-
-  // You love to work with bullshit?
-  // Use HP-UX!
-  //
-  // HP aCC cannot swap as shown below;
-  // the lower int gets zero'ed.
-  // In case anybody knows a better way to swap,
-  // feel free to change (but test on HP... ;-)
-  unsigned int buf;
-
   // Step 1
-  if (n0 > n1)
-    {
-      // Swap n0 & n1
-      buf = n0;
-      n0  = n1;
-      n1  = buf;
-    }
+  if (n0 > n1) Utility::swap (n0, n1);
 
   // Step 2
-  if (n2 > n3)
-    {
-      // Swap n2 & n3
-      buf = n2;
-      n2  = n3;
-      n3  = buf;
-    }
+  if (n2 > n3) Utility::swap (n2, n3);
 
   // Step 3
-  if (n0 > n2)
-    {
-      // Swap n0 & n2 
-      buf = n0;
-      n0 = n2;
-      n2 = buf;
-    }
+  if (n0 > n2) Utility::swap (n0, n2);
 
   // Step 4
-  if (n1 > n3)
-    {
-      // Swap n1 & n3
-      buf = n1;
-      n1  = n3;
-      n3  = buf;
-    }
+  if (n1 > n3) Utility::swap (n1, n3);
 
   // Finally step 5
-  if (n1 > n2)
-    {
-      // Swap n1 & n2
-      buf = n1;
-      n1  = n2;
-      n2  = buf;
-    }
-
-#else
-
-  // Order the numbers such that n0 < n1 < n2 < n3
-  // We'll do it in 5 steps.
-
-  // Step 1
-  if (n0 > n1)
-    {
-      // Swap n0 & n1 without a temporary
-      n0^=n1^=n0^=n1;
-    }
-
-  // Step 2
-  if (n2 > n3)
-    {
-      // Swap n2 & n3 without a temporary
-      n2^=n3^=n2^=n3;
-    }
-
-  // Step 3
-  if (n0 > n2)
-    {
-      // Swap n0 & n2 without a temporary
-      n0^=n2^=n0^=n2;
-    }
-
-  // Step 4
-  if (n1 > n3)
-    {
-      // Swap n1 & n3 without a temporary
-      n1^=n3^=n1^=n3;
-    }
-
-  // Finally step 5
-  if (n1 > n2)
-    {
-      // Swap n1 & n2 without a temporary
-      n1^=n2^=n1^=n2;
-    }
-
-#endif
+  if (n1 > n2) Utility::swap (n1, n2);
 
   assert ((n0 < n1) && (n1 < n2) && (n2 < n3));
   

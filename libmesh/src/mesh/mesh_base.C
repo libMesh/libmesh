@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.55 2003-09-25 21:46:56 benkirk Exp $
+// $Id: mesh_base.C,v 1.56 2003-09-27 00:54:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -116,66 +116,21 @@ void MeshBase::prepare_for_use ()
 
 
 
-Node* MeshBase::add_point (const Point& p,
-			   const unsigned int num)
+Node* MeshBase::add_point (const Point& p)
 {  
-  START_LOG("add_point()", "MeshBase");
-
-  if (num >= this->n_nodes())
-    {
-      _nodes.push_back (Node::build(p, this->n_nodes()));
-
-      STOP_LOG("add_point()", "MeshBase");
+  _nodes.push_back (Node::build(p, this->n_nodes()));
   
-      return _nodes.back();
-    }
-  
-  else
-    {
-      assert (num < this->n_nodes());
-      assert (this->node_ptr(num)       != NULL);
-      assert (this->node_ptr(num)->id() != Node::invalid_id);
-      
-      this->node(num) = p;
-      
-      assert (this->node(num).id() == num);
-      
-      STOP_LOG("add_point()", "MeshBase");
-  
-      return this->node_ptr(num);
-    }
-
-  
-  // We'll never get here...
-  error();
-  return NULL;
+  return _nodes.back();
 }
 
 
 
-Elem* MeshBase::add_elem (Elem* e, const unsigned int n)
+Elem* MeshBase::add_elem (Elem* e)
 {
-  START_LOG("add_elem()", "MeshBase");
-
-  if (n >= _elements.size())
-    {
-      if (e != NULL)
-	e->set_id (_elements.size());
-      
-      _elements.push_back(e);
-    }
+  if (e != NULL)
+    e->set_id (_elements.size());
   
-  else
-    {
-      assert (n < _elements.size());
-
-      if (e != NULL)
-	e->set_id (n);
-      
-      _elements[n] = e;
-    }
-
-  STOP_LOG("add_elem()", "MeshBase");
+  _elements.push_back(e);
 
   return e;
 }
@@ -646,77 +601,108 @@ void MeshBase::partition (const unsigned int n_parts)
 void MeshBase::renumber_nodes_and_elements ()
 {
   START_LOG("renumber_nodes_and_elem()", "MeshBase");
+  
+  // node and element id counters
+  unsigned int next_free_elem = 0;
+  unsigned int next_free_node = 0;
 
+  // Loop over the elements.  Note that there may
+  // be NULLs in the _elements vector from the coarsening
+  // process.  Pack the elements in to a contiguous array
+  // and then trim any excess.
+  {      
+    std::vector<Elem*>::iterator in        = _elements.begin();
+    std::vector<Elem*>::iterator out       = _elements.begin();
+    const std::vector<Elem*>::iterator end = _elements.end();
 
-  // Begin by setting all node and element ids
-  // to an invalid value.
-  {
-    for (unsigned int e=0; e<_elements.size(); e++)
-      if (_elements[e] != NULL)
-	_elements[e]->invalidate_id();
-
-    for (unsigned int n=0; n<_nodes.size(); n++)
-      if (_nodes[n] != NULL)	
+    for (; in != end; ++in)
+      if (*in != NULL)
 	{
-	  _nodes[n]->invalidate_id();
-	  _nodes[n]->invalidate_processor_id();
+	  Elem* elem = *in;
+	  
+	  *out = *in;
+	  ++out;
+	  
+	  // Increment the element counter
+	  elem->set_id (next_free_elem++);
+	  
+	  // Loop over this element's nodes.  Number them,
+	  // if they have not been numbered already.  Also,
+	  // position them in the _nodes vector so that they
+	  // are packed contiguously from the beginning.
+	  for (unsigned int n=0; n<elem->n_nodes(); n++)
+	    if (elem->node(n) == next_free_node)     // don't need to process
+	      next_free_node++;                      // [(src == dst) below]
+
+	    else if (elem->node(n) > next_free_node) // need to process
+	      {
+		// The source and destination indices
+		// for this node
+		const unsigned int src_idx = elem->node(n);
+		const unsigned int dst_idx = next_free_node++;
+
+		// ensure we want to swap valid nodes
+		assert (_nodes[src_idx] != NULL);
+		assert (_nodes[dst_idx] != NULL);
+		
+		// Swap the source and destination nodes
+		std::swap (_nodes[src_idx],
+			   _nodes[dst_idx] );
+
+		// Set proper indices
+		_nodes[src_idx]->set_id (src_idx);
+		_nodes[dst_idx]->set_id (dst_idx);
+	      }
 	}
+
+    // Erase any additional storage. These elements have been
+    // copied into NULL voids by the procedure above, and are
+    // thus repeated and unnecessary.
+    _elements.erase (out, end);
   }
 
+  // Any nodes in the vector >= _nodes[next_free_node]
+  // are not connected to any elements and may be deleted
+  // if desired.
 
-  // Renumber the elements
-  { 
-    std::vector<Elem*> new_elem;
-    new_elem.reserve (_elements.size());
+  
+  // (This code block will erase the unused nodes)
+  // Now, delete the unused nodes
+  {
+    std::vector<Node*>::iterator nd        = _nodes.begin();
+    const std::vector<Node*>::iterator end = _nodes.end();
+
+    std::advance (nd, next_free_node);
     
-    unsigned int next_free_elem = 0;
-      
-    // Loop over the elements
-    elem_iterator       el    (this->elements_begin());
-    const elem_iterator end_el(this->elements_end());
-    
-    for (; el != end_el; ++el)
+    for (std::vector<Node*>::iterator it=nd;
+	 it != end; ++it)
       {
-	(*el)->set_id(next_free_elem++);
+	assert (*it != NULL);
 	
-	// Add the element to the new list
-	new_elem.push_back(*el);
+	delete *it;
+	*it = NULL;
       }
-
-    // Assign the _elements vector
-    _elements = new_elem;
     
-    // This could only fail if we did something seriously WRONG!
-    assert (_elements.size()  == next_free_elem);
+    _nodes.erase (nd, end);
   }
   
-  // Renumber the nodes
-  {
-    std::vector<Node*> new_nodes;
-    new_nodes.reserve (_nodes.size());
-    
-    unsigned int next_free_node = 0;
-    
-    node_iterator       nd    (this->nodes_begin());
-    const node_iterator end_nd(this->nodes_end());
-    
-    //TODO:[BSK] This will not produce any inactive nodes to be deleted
-    // in the last step.  Might want to change this later.
-    for (; nd != end_nd; ++nd)
-      {
-	(*nd)->set_id(next_free_node++);
-	
-	(*nd)->set_processor_id(0);
-	
-	// Add the node to the new list
-	new_nodes.push_back(*nd);
-      }	       
 
-    _nodes = new_nodes;
+//   // (This code block will keep the unused nodes)
+//   // Now, number the unused nodes so that they are
+//   // contiguous
+//   {
+//     std::vector<Node*>::iterator nd        = _nodes.begin();
+//     const std::vector<Node*>::iterator end = _nodes.end();
+
+//     std::advance (nd, next_free_node);
     
-    // This could only fail if we did something seriously WRONG!
-    assert (_nodes.size() == next_free_node);
-  }
+//     for (; nd != end; ++nd)
+//       (*nd)->set_id(next_free_node++);
+//   }
+  
+
+  assert (next_free_elem == _elements.size());
+  assert (next_free_node == _nodes.size());
   
   STOP_LOG("renumber_nodes_and_elem()", "MeshBase");
 }
@@ -724,16 +710,16 @@ void MeshBase::renumber_nodes_and_elements ()
 
 
 
-void MeshBase::find_boundary_nodes(std::vector<bool>& on_boundary)
+void MeshBase::find_boundary_nodes (std::vector<bool>& on_boundary)
 {
-  // Resize the vector which holds boundary nodes and fill with zeros.
+  // Resize the vector which holds boundary nodes and fill with false.
   on_boundary.resize(this->n_nodes());
   std::fill(on_boundary.begin(),
 	    on_boundary.end(),
 	    false);
 
   // Loop over elements, find those on boundary, and
-  // mark them as 1 in on_boundary.
+  // mark them as true in on_boundary.
   active_elem_iterator       el (this->elements_begin());
   const active_elem_iterator end(this->elements_end());
   
@@ -754,9 +740,9 @@ void MeshBase::find_boundary_nodes(std::vector<bool>& on_boundary)
 void MeshBase::distort (const Real factor,
 			const bool perturb_boundary)
 {
-  assert (mesh_dimension() != 1);
-  assert (n_nodes());
-  assert (n_elem());
+  assert (this->mesh_dimension() != 1);
+  assert (this->n_nodes());
+  assert (this->n_elem());
   assert ((factor >= 0.) && (factor <= 1.));
 
   START_LOG("distort()", "MeshBase");
@@ -765,16 +751,16 @@ void MeshBase::distort (const Real factor,
 
   // First find nodes on the boundary and flag them
   // so that we don't move them
-  // on_boundary holds 0's (not on boundary) and 1's (on boundary)
-  std::vector<bool> on_boundary(this->n_nodes());
+  // on_boundary holds false (not on boundary) and true (on boundary)
+  std::vector<bool> on_boundary (this->n_nodes(), false);
   
   if (!perturb_boundary)
-    this->find_boundary_nodes(on_boundary);
+    this->find_boundary_nodes (on_boundary);
 
   // Now calculate the minimum distance to
   // neighboring nodes for each node.
   // hmin holds these distances.
-  std::vector<float> hmin(this->n_nodes(), 1.e20);
+  std::vector<float> hmin (this->n_nodes(), 1.e20);
   
   active_elem_iterator       el (this->elements_begin());
   const active_elem_iterator end(this->elements_end());
@@ -1127,66 +1113,3 @@ void MeshBase::prepare_complex_data(const std::vector<Number>* source,
 }
 
 #endif // #ifdef USE_COMPLEX_NUMBERS
-
-
-
-#ifdef ENABLE_AMR
-
-void MeshBase::trim_unused_elements (std::set<unsigned int>& unused_elements)
-{
-  /**
-   * Anything we clear in this routiune
-   * will invalidate the unknowing boundary
-   * mesh, so we need to clear it.  It must
-   * be recreated before reuse.  
-   */
-  //boundary_info.boundary_mesh.clear();
-  
-  
-  /**
-   * Trim the unused elements
-   */
-  {
-    // We don't Really need this in the
-    // current implementation
-    unused_elements.clear();
-
-    // for the time being we make a copy
-    // of the elements vector since the pointers
-    // are relatively small.  Note that this is
-    // not _necessary_, but it should be
-    // less expensive than repeated calls
-    // to std::vector<>::erase()    
-    std::vector<Elem*> new_elements;
-    
-    new_elements.resize(this->n_elem());
-
-    unsigned int ne=0;
-    
-    for (unsigned int e=0; e<this->n_elem(); e++)
-      if (_elements[e] != NULL)
-	new_elements[ne++] = _elements[e]; 
-
-    new_elements.resize(ne);
-    
-    _elements = new_elements;
-
-    /**
-     * Explicitly check that it worked
-     * in DEBUG mode.
-     */
-#ifdef DEBUG
-
-    for (unsigned int e=0; e<this->n_elem(); e++)
-      assert (_elements[e] != NULL);
-    
-#endif
-    
-  }
-}
-
-#endif // #ifdef ENABLE_AMR
-
-
-
-

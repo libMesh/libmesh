@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.25 2003-09-16 15:59:31 benkirk Exp $
+// $Id: mesh.C,v 1.26 2003-09-27 00:54:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -323,7 +323,7 @@ void Mesh::create_submesh (Mesh& new_mesh,
 	      new_node_numbers[old_elem->node(n)] = n_new_nodes;
 
 	      // Add this node to the new mesh
-	      new_mesh.add_point (old_elem->point(n), n_new_nodes);
+	      new_mesh.add_point (old_elem->point(n));
 
 	      // Increment the new node counter
 	      n_new_nodes++;
