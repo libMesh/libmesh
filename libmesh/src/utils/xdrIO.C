@@ -1,4 +1,4 @@
-// "$Id: xdrIO.C,v 1.22 2004-08-09 17:34:58 jwpeterson Exp $\n"
+// "$Id: xdrIO.C,v 1.23 2004-08-17 03:03:57 benkirk Exp $\n"
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -22,7 +22,6 @@
 // C++ includes
 #include <iostream>
 #include <stdio.h>    // for sprintf
-#include <assert.h>
 
 // Local includes
 #include "xdrIO.h"

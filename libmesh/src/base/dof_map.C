@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.62 2004-08-09 17:34:57 jwpeterson Exp $
+// $Id: dof_map.C,v 1.63 2004-08-17 03:03:50 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -22,7 +22,6 @@
 // C++ Includes -------------------------------------
 #include <set>
 #include <algorithm> // for std::fill
-#include <assert.h>
 
 // Local Includes -----------------------------------
 #include "dof_map.h"

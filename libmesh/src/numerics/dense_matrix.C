@@ -1,4 +1,4 @@
-// $Id: dense_matrix.C,v 1.20 2004-08-09 17:34:58 jwpeterson Exp $
+// $Id: dense_matrix.C,v 1.21 2004-08-17 03:03:56 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -20,7 +20,6 @@
 
 // C++ Includes
 #include <math.h> // for sqrt
-#include <assert.h>
 
 // Local Includes
 #include "dense_matrix.h"

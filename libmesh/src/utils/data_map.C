@@ -1,4 +1,4 @@
-// $Id: data_map.C,v 1.5 2004-08-09 17:34:58 jwpeterson Exp $
+// $Id: data_map.C,v 1.6 2004-08-17 03:03:57 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -20,7 +20,6 @@
 
 
 // System includes
-#include <assert.h>
 
 // Local includes
 #include "data_map.h"

@@ -1,4 +1,4 @@
-// $Id: dense_matrix_base.h,v 1.8 2004-08-09 17:34:57 jwpeterson Exp $
+// $Id: dense_matrix_base.h,v 1.9 2004-08-17 03:03:49 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,6 @@
 // C++ includes
 #include <iostream>
 #include <iomanip> // for std::setw()
-#include <assert.h>
 
 // Local Includes
 #include "libmesh_common.h"
