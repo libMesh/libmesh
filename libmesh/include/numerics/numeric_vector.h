@@ -1,4 +1,4 @@
-// $Id: numeric_vector.h,v 1.5 2004-08-17 03:03:49 benkirk Exp $
+// $Id: numeric_vector.h,v 1.6 2004-08-20 14:00:22 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -81,7 +81,8 @@ public:
    * Builds a \p NumericVector using the linear solver package specified by
    * \p solver_package
    */
-  static AutoPtr<NumericVector<T> > build(const SolverPackage solver_package = libMesh::default_solver_package());
+  static AutoPtr<NumericVector<T> >
+  build(const SolverPackage solver_package = libMesh::default_solver_package());
   
   /**
    * @returns true if the vector has been initialized,
@@ -379,6 +380,32 @@ public:
     return os;
   }
   
+  /**
+   * Print the contents of the matrix in Matlab's
+   * sparse matrix format. Optionally prints the
+   * matrix to the file named \p name.  If \p name
+   * is not specified it is dumped to the screen.
+   */
+  virtual void print_matlab(const std::string name="NULL") const
+  {
+    std::cerr << "ERROR: Not Implemented in base class yet!" << std::endl;
+    std::cerr << "ERROR writing MATLAB file " << name << std::endl;
+    error();
+  }
+
+  /**
+   * Creates the subvector "subvector" from the indices in the
+   * "rows" array.  Similar to the create_submatrix routine for
+   * the SparseMatrix class, it is currently only implemented for
+   * PetscVectors.
+   */
+  virtual void create_subvector(NumericVector<T>& ,
+				const std::vector<unsigned int>& ) const
+  {
+    std::cerr << "ERROR: Not Implemented in base class yet!" << std::endl;
+    error();
+  }
+    
 protected:
   
   /**
