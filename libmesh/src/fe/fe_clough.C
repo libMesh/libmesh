@@ -1,7 +1,8 @@
-// $Id: fe_clough.C,v 1.2 2005-02-22 22:17:36 jwpeterson Exp $
+// $Id: fe_clough.C,v 1.3 2005-02-23 03:42:16 roystgnr Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson, 
+// Roy H. Stogner
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -20,8 +21,13 @@
 
 
 // Local includes
-#include "fe.h"
+#include "dense_matrix.h"
+#include "dense_vector.h"
+#include "dof_map.h"
 #include "elem.h"
+#include "fe.h"
+#include "fe_interface.h"
+#include "quadrature_clough.h"
 
 
 
@@ -213,16 +219,109 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::compute_constraints (std::map<unsigned int,
-				            std::map<unsigned int,
-				                     float> > &,
-				     const unsigned int,
-				     const unsigned int,
-				     const FEType&,
-				     const Elem*)
+				     std::map<unsigned int, float> > &
+				     constraints,
+				     DofMap &dof_map,
+				     const unsigned int variable_number,
+				     const Elem* elem)
 {
-  std::cerr << "ERROR:  Not yet implemented for Clough-Tocher!"
-	    << std::endl;
-  error();
+  // Only constrain elements in 2,3D.
+  if (Dim == 1)
+    return;
+
+  assert (elem != NULL);
+
+  const FEType& fe_type = dof_map.variable_type(variable_number);
+
+  AutoPtr<FEBase> my_fe (FEBase::build(Dim, fe_type));
+  AutoPtr<FEBase> parent_fe (FEBase::build(Dim, fe_type));
+
+  QClough my_qface(Dim-1, fe_type.default_quadrature_order());
+  my_fe->attach_quadrature_rule (&my_qface);
+  std::vector<Point> parent_qface;
+
+  const std::vector<Real>& JxW = my_fe->get_JxW();
+  const std::vector<Point>& q_point = my_fe->get_xyz();
+  const std::vector<std::vector<Real> >& phi = my_fe->get_phi();
+  const std::vector<std::vector<Real> >& parent_phi =
+		  parent_fe->get_phi();
+  const std::vector<Point>& face_normals = my_fe->get_normals();
+  const std::vector<std::vector<RealGradient> >& dphi =
+		  my_fe->get_dphi();
+  const std::vector<std::vector<RealGradient> >& parent_dphi =
+		  parent_fe->get_dphi();
+  const std::vector<unsigned int> child_dof_indices;
+  const std::vector<unsigned int> parent_dof_indices;
+
+  DenseMatrix<Number> Ke;
+  DenseVector<Number> Fe;
+  std::vector<DenseVector<Number> > Ue;
+
+  // Look at the element faces.  Check to see if we need to
+  // build constraints.
+  for (unsigned int s=0; s<elem->n_sides(); s++)
+    if (elem->neighbor(s) != NULL)
+      // constrain dofs shared between
+      // this element and ones coarser
+      // than this element.
+      if (elem->neighbor(s)->level() < elem->level()) 
+        {
+          // FIXME: hanging nodes aren't working yet!
+	  std::cerr << "Error: hanging nodes not yet implemented for "
+			  << "Clough-Tocher elements!" << std::endl;
+	  error();
+
+          // Get pointers to the elements of interest and its parent.
+          const Elem* parent = elem->parent();
+
+          // This can't happen...  Only level-0 elements have NULL
+          // parents, and no level-0 elements can be at a higher
+          // level than their neighbors!
+          assert (parent != NULL);
+
+	  my_fe->reinit(elem, s);
+
+          const AutoPtr<Elem> my_side     (elem->build_side(s));
+          const AutoPtr<Elem> parent_side (parent->build_side(s));
+
+	  const unsigned int n_dofs = FEInterface::n_dofs(Dim-1,
+							  fe_type,
+							  my_side->type());
+	  assert(n_dofs == FEInterface::n_dofs(Dim-1, fe_type,
+					       parent_side->type()));
+	  const unsigned int n_qp = my_qface.n_points();
+
+	  FEInterface::inverse_map (Dim, fe_type, parent, q_point,
+				    parent_qface);
+
+	  parent_fe->reinit(parent, &parent_qface);
+
+	  Ke.resize (n_dofs, n_dofs);
+	  Ue.resize(n_dofs);
+
+	  for (unsigned int i = 0; i != n_dofs; ++i)
+	    for (unsigned int j = 0; j != n_dofs; ++j)
+	      for (unsigned int qp = 0; qp != n_qp; ++qp)
+		Ke(i,j) += JxW[qp] * (phi[i][qp] * phi[j][qp] +
+				      (dphi[i][qp] *
+				       face_normals[qp]) *
+				      (dphi[j][qp] *
+				       face_normals[qp]));
+
+	  for (unsigned int i = 0; i != n_dofs; ++i)
+	    {
+	      Fe.resize (n_dofs);
+	      for (unsigned int j = 0; j != n_dofs; ++j)
+	        for (unsigned int qp = 0; qp != n_qp; ++qp)
+		  Fe(j) += JxW[qp] * (parent_phi[i][qp] * phi[j][qp] +
+				      (parent_dphi[i][qp] *
+				       face_normals[qp]) *
+				      (dphi[j][qp] *
+				       face_normals[qp]));
+	      Ke.cholesky_solve(Fe, Ue[i]);
+
+	    }
+	}
 }
 
 
