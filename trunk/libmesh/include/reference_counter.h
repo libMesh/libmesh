@@ -1,4 +1,4 @@
- // $Id: reference_counter.h,v 1.9 2003-02-22 16:01:10 benkirk Exp $
+ // $Id: reference_counter.h,v 1.10 2003-03-05 13:11:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -27,11 +27,9 @@
 
 
 // C++ includes
-#ifdef ENABLE_REFERENCE_COUNTING
 #include <iostream>
 #include <string>
 #include <map>
-#endif
 
 
 
