@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.11 2003-02-06 23:02:32 benkirk Exp $
+// $Id: elem.h,v 1.12 2003-02-13 00:16:47 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -432,7 +432,28 @@ class Elem : public ReferenceCountedObject<Elem>
    * element types.
    */
   void coarsen();
-  
+
+  /**
+   * Convenience typedefs for providing iterator access
+   * to the _neighbors array.  These make the accessor
+   * functions easier to read.
+   */
+  typedef std::pair<Elem**, Elem**> ElemPair;
+  typedef std::pair<const Elem**, const Elem**> ConstElemPair;
+
+  /**
+   * The non-const begin and end accessor functions.
+   */
+  ElemPair neighbors_begin() { return ElemPair (&_neighbors[0],         &_neighbors[n_sides()]); }
+  ElemPair neighbors_end()   { return ElemPair (&_neighbors[n_sides()], &_neighbors[n_sides()]); }
+
+  /**
+   * The const begin and end accessor functions. 
+   */
+  ConstElemPair neighbors_begin() const { return ConstElemPair (const_cast<const Elem**>(&_neighbors[0]),
+								const_cast<const Elem**>(&_neighbors[n_sides()])); }
+  ConstElemPair neighbors_end()   const { return ConstElemPair (const_cast<const Elem**>(&_neighbors[n_sides()]),
+								const_cast<const Elem**>(&_neighbors[n_sides()])); }
 #endif
 
   

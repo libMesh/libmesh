@@ -1,4 +1,4 @@
-// $Id: elem_iterators.h,v 1.1 2003-02-12 05:41:29 jwpeterson Exp $
+// $Id: elem_iterators.h,v 1.2 2003-02-13 00:16:48 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -29,8 +29,8 @@
 
 /**
  * The basic_elem_iterator class simply redefines
- * the predicate to return true so that the class is not pure virtual.
- * The typedefs elem_iterator and const_elem_iterator
+ * the predicate to return whether or not what is currently
+ * iterated to is NULL. The typedefs elem_iterator and const_elem_iterator
  * should be used to instantiate actual iterators.  Since other
  * classes will be derived from this one, we must be able to
  * specify whether or not to advance() in the constructor.
@@ -53,9 +53,8 @@ public:
   /**
    * Redefinition of the predicate
    */
-  virtual bool predicate() const { return true; }
+  virtual bool predicate() const { return *_current != NULL; }
 };
-
 
 
 
@@ -64,11 +63,12 @@ public:
  * Specialization of the basic_elem_iterator class
  * for \p std::vector<Elem*>::iterator.  This is what
  * users will create if they want to iterate over
- * all the elements in the mesh.
+ * all the elements in the mesh.  The neighbor iterator
+ * may be used to access the _neighbors array in the
+ * Elem class.
  */
 typedef basic_elem_iterator<std::vector<Elem*>::iterator> elem_iterator;
-
-
+typedef basic_elem_iterator<Elem**> neighbor_iterator;
 
 
 
@@ -78,8 +78,15 @@ typedef basic_elem_iterator<std::vector<Elem*>::iterator> elem_iterator;
  * for \p std::vector<Elem*>::const_iterator.  This is what
  * users will create if they want to iterate over
  * all the elements in the mesh in const functions.
+ * The const_neighbor_iterator may be used to access the
+ * _neighbors array in the Elem class in const functions.
  */
 typedef basic_elem_iterator<std::vector<Elem*>::const_iterator> const_elem_iterator; 
+typedef basic_elem_iterator<const Elem**> const_neighbor_iterator;
+
+
+
+
 
 
 
@@ -262,6 +269,42 @@ typedef basic_type_elem_iterator<std::vector<Elem*>::const_iterator> const_type_
 
 
 
+/**
+ * The const_type_elem_iterator class is an unspecialized template
+ * which only iterates over a certain type of element.
+ * The typedefs type_elem_iterator and const_type_elem_iterator
+ * should be used to instantiate actual iterators.  This class
+ * adds the additional internal state which describes the type
+ * of element.  Note the "false" argument to the basic_elem_iterator
+ * constructor.  This basically tells that constructor to NOT advance();
+ */
+template <class T>
+class basic_not_type_elem_iterator : public basic_type_elem_iterator<T>
+{
+public:
+  /**
+   * Constructor.
+   */
+  basic_not_type_elem_iterator(const std::pair<T,T>& p,
+			       const ElemType t,
+			       const bool b=true)
+    : basic_type_elem_iterator<T>(p, t, false)
+  {
+    if (b) advance();
+  }
+  
+  /**
+   * Definition of the predicate.
+   */
+  virtual bool predicate() const { return !basic_type_elem_iterator<T>::predicate(); }
+};
+
+
+typedef basic_not_type_elem_iterator<std::vector<Elem*>::iterator> not_type_elem_iterator;
+typedef basic_not_type_elem_iterator<std::vector<Elem*>::const_iterator> const_not_type_elem_iterator;
+
+
+
 
 /**
  * The basic_active_type_elem_iterator is a templated unspecialized
@@ -428,6 +471,11 @@ typedef basic_not_level_elem_iterator<std::vector<Elem*>::const_iterator> const_
 
 
 
+
+
+
+
+
 /**
  * The basic_pid_elem_iterator is a templated unspecialized
  * iterator which can be used to iterate only over elements 
@@ -461,7 +509,6 @@ public:
 protected:
   const unsigned int _pid;
 };
-
 
 /**
  * Specialization of the basic_pid_elem_iterator for
