@@ -1,4 +1,4 @@
-// $Id: mesh_data.h,v 1.17 2003-08-23 17:12:43 ddreyer Exp $
+// $Id: mesh_data.h,v 1.18 2003-08-23 22:27:33 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -571,10 +571,10 @@ protected:
  * This header is structured in records 1 to 13.  A typical
  * header is described here.  The text after the # are comments
  * and are @e not part of such a dataset.  The text in brackets
- * after the # are the corresponding class members names.  If
- * brackets left empty, then this feature is not (yet) supported.
+ * after the # are the corresponding class members names.
  *
  \verbatim                
+
       -1                                                                              # beginning of dataset
     2414                                                                              # type of dataset: data at mesh entities
            1                                                                          # R.  1: unique number of dataset (dataset_label)
@@ -604,7 +604,6 @@ protected:
  * some empty default.  Also files that contain multiple
  * datasets of type \p 2414 may be handled through the
  * \p which_dataset() method.
- *
  * Note that an instance of this class has to be attached 
  * to the \p MeshData @e prior to using the \p read() or
  * \p write() methods of the \p MeshData.
