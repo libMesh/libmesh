@@ -1,4 +1,4 @@
-// $Id: petsc_interface.C,v 1.24 2004-04-17 03:02:50 benkirk Exp $
+// $Id: petsc_interface.C,v 1.25 2004-08-20 14:01:55 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -144,23 +144,31 @@ void PetscInterface<T>::init ()
 
 
 
+
+
+
+
+
 template <typename T>
 std::pair<unsigned int, Real> 
-PetscInterface<T>::solve (SparseMatrix<T> &matrix_in,
-			  NumericVector<T> &solution_in,
-			  NumericVector<T> &rhs_in,
+PetscInterface<T>::solve (SparseMatrix<T>&  matrix_in,
+			  SparseMatrix<T>&  precond_in,
+			  NumericVector<T>& solution_in,
+			  NumericVector<T>& rhs_in,
 			  const double tol,
 			  const unsigned int m_its)
 {
   this->init ();
   
   PetscMatrix<T>* matrix   = dynamic_cast<PetscMatrix<T>*>(&matrix_in);
+  PetscMatrix<T>* precond  = dynamic_cast<PetscMatrix<T>*>(&precond_in);
   PetscVector<T>* solution = dynamic_cast<PetscVector<T>*>(&solution_in);
   PetscVector<T>* rhs      = dynamic_cast<PetscVector<T>*>(&rhs_in);
 
   // We cast to pointers so we can be sure that they succeeded
   // by comparing the result against NULL.
   assert(matrix   != NULL);
+  assert(precond  != NULL);
   assert(solution != NULL);
   assert(rhs      != NULL);
   
@@ -168,17 +176,25 @@ PetscInterface<T>::solve (SparseMatrix<T> &matrix_in,
   int its=0, max_its = static_cast<int>(m_its);
   PetscReal final_resid=0.;
 
-  // Close the matrix and vectors in case this wasn't already done.
+  // Close the matrices and vectors in case this wasn't already done.
   matrix->close ();
+  precond->close ();
   solution->close ();
   rhs->close ();
 
+  // If matrix != precond, then this means we have specified a
+  // special preconditioner, so reset preconditioner type to PCMAT.
+  if (matrix != precond)
+    {
+      this->_preconditioner_type = USER_PRECOND;
+      this->set_petsc_preconditioner_type ();
+    }
   
 // 2.1.x & earlier style      
 #if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 1)
       
   // Set operators. The input matrix works as the preconditioning matrix
-  ierr = SLESSetOperators(_sles, matrix->mat, matrix->mat,
+  ierr = SLESSetOperators(_sles, matrix->mat, precond->mat,
 			  SAME_NONZERO_PATTERN);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
@@ -203,7 +219,7 @@ PetscInterface<T>::solve (SparseMatrix<T> &matrix_in,
 #else
       
   // Set operators. The input matrix works as the preconditioning matrix
-  ierr = KSPSetOperators(_ksp, matrix->mat, matrix->mat,
+  ierr = KSPSetOperators(_ksp, matrix->mat, precond->mat,
 			 SAME_NONZERO_PATTERN);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
@@ -332,6 +348,9 @@ void PetscInterface<T>::set_petsc_preconditioner_type()
 
     case EISENSTAT_PRECOND:
       ierr = PCSetType (_pc, (char*) PCEISENSTAT); CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
+
+    case USER_PRECOND:
+      ierr = PCSetType (_pc, (char*) PCMAT);       CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
 
     default:
       std::cerr << "ERROR:  Unsupported PETSC Preconditioner: "
