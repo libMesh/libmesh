@@ -6,7 +6,7 @@
  * Started 7/23/97
  * George
  *
- * $Id: mcoarsen.c,v 1.4 2003-06-24 05:33:50 benkirk Exp $
+ * $Id: mcoarsen.c,v 1.5 2004-03-08 04:58:28 benkirk Exp $
  *
  */
 
@@ -40,31 +40,46 @@ GraphType *MCCoarsen2Way(CtrlType *ctrl, GraphType *graph)
         MCMatch_RM(ctrl, cgraph);
         break;
       case MATCH_HEM:
-        if (clevel < 1)
+        if (clevel < 1 || cgraph->nedges == 0)
           MCMatch_RM(ctrl, cgraph);
         else
           MCMatch_HEM(ctrl, cgraph);
         break;
       case MATCH_SHEM:
-        if (clevel < 1)
+        if (clevel < 1 || cgraph->nedges == 0)
           MCMatch_RM(ctrl, cgraph);
         else
           MCMatch_SHEM(ctrl, cgraph);
         break;
       case MATCH_SHEMKWAY:
-        MCMatch_SHEM(ctrl, cgraph);
+        if (clevel < 1 || cgraph->nedges == 0)
+          MCMatch_RM(ctrl, cgraph);
+        else
+          MCMatch_SHEM(ctrl, cgraph);
         break;
       case MATCH_SHEBM_ONENORM:
-        MCMatch_SHEBM(ctrl, cgraph, 1);
+        if (clevel < 1 || cgraph->nedges == 0)
+          MCMatch_RM(ctrl, cgraph);
+        else
+          MCMatch_SHEBM(ctrl, cgraph, 1);
         break;
       case MATCH_SHEBM_INFNORM:
-        MCMatch_SHEBM(ctrl, cgraph, -1);
+        if (clevel < 1 || cgraph->nedges == 0)
+          MCMatch_RM(ctrl, cgraph);
+        else
+          MCMatch_SHEBM(ctrl, cgraph, -1);
         break;
       case MATCH_SBHEM_ONENORM:
-        MCMatch_SBHEM(ctrl, cgraph, 1);
+        if (clevel < 1 || cgraph->nedges == 0)
+          MCMatch_RM(ctrl, cgraph);
+        else
+          MCMatch_SBHEM(ctrl, cgraph, 1);
         break;
       case MATCH_SBHEM_INFNORM:
-        MCMatch_SBHEM(ctrl, cgraph, -1);
+        if (clevel < 1 || cgraph->nedges == 0)
+          MCMatch_RM(ctrl, cgraph);
+        else
+          MCMatch_SBHEM(ctrl, cgraph, -1);
         break;
       default:
         errexit("Unknown CType: %d\n", ctrl->CType);

@@ -8,22 +8,16 @@
  * Started 10/19/95
  * George
  *
- * $Id: proto.h,v 1.1 2003-06-24 05:33:51 benkirk Exp $
+ * $Id: proto.h,v 1.2 2004-03-08 04:58:31 benkirk Exp $
  *
  */
 
 /* kmetis.c */
-void ParMETIS_V3_PartKway(idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, int *, int *, int *, int *, float *, float *, int *, int *, idxtype *, MPI_Comm *);
+void Moc_Global_Partition(CtrlType *, GraphType *, WorkSpaceType *);
 
 /* mmetis.c */
-void ParMETIS_V3_PartMeshKway(idxtype *, idxtype *, idxtype *, int *, int *, int *, int *, int *, int *, float *, float *, int *, int *, idxtype *, MPI_Comm *);
 
 /* gkmetis.c */
-void ParMETIS_V3_PartGeomKway(idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, int *, int *, int *, float *, int *, int *, float *, float *, int *, int *, idxtype *, MPI_Comm *);
-void ParMETIS_V3_PartGeom(idxtype *, int *, float *, idxtype *, MPI_Comm *);
-
-/* mdrivers.c */
-void Moc_Global_Partition(CtrlType *, GraphType *, WorkSpaceType *);
 
 /* match.c */
 void Moc_GlobalMatch_Balance(CtrlType *, GraphType *, WorkSpaceType *);
@@ -67,18 +61,11 @@ void FreeGraph(GraphType *);
 void FreeInitialGraphAndRemap(GraphType *, int);
 
 
-/************************/
-/* Adaptive subroutines */
-/************************/
-
 /* ametis.c */
-void ParMETIS_V3_AdaptiveRepart(idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, int *, int *, int *, int *, float *, float *, float *, int *, int *, idxtype *, MPI_Comm *);
+void Adaptive_Partition(CtrlType *, GraphType *, WorkSpaceType *);
 
 /* rmetis.c */
-void ParMETIS_V3_RefineKway(idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, int *, int *, int *, int *, float *, float *, int *, int *, idxtype *, MPI_Comm *);
 
-/* adrivers.c */
-void Adaptive_Partition(CtrlType *, GraphType *, WorkSpaceType *);
 
 /* lmatch.c */
 void Mc_LocalMatch_HEM(CtrlType *, GraphType *, WorkSpaceType *);
@@ -143,30 +130,18 @@ int Serial_AreAnyVwgtsBelow(int, float, float *, float, float *, float *);
 
 /* weird.c */
 void PartitionSmallGraph(CtrlType *, GraphType *, WorkSpaceType *);
-void CheckInputs(int, int, int, int *, int *, int *, int *, int *, int *, int *, int *, float *, float **, float *, float *, int *, int *, int *, int *, float *, float *, int *, int *, idxtype *, MPI_Comm *);
+void CheckInputs(int partType, int npes, int dbglvl, int *wgtflag, int *iwgtflag,
+                 int *numflag, int *inumflag, int *ncon, int *incon, int *nparts, 
+		 int *inparts, float *tpwgts, float **itpwgts, float *ubvec, 
+		 float *iubvec, float *ipc2redist, float *iipc2redist, int *options, 
+		 int *ioptions, idxtype *part, MPI_Comm *comm);
 
-/****************************/
-/* Mesh to Dual subroutines */
-/****************************/
 /* mesh.c */
-void ParMETIS_V3_Mesh2Dual(idxtype *, idxtype *, int *, int *, int *, idxtype **, idxtype **, MPI_Comm *);
 
-/* msetup.c */
-MeshType *SetUpMesh(int *, int *, idxtype *, idxtype *, idxtype *, int *, MPI_Comm *);
-MeshType *CreateMesh(void);
-void InitMesh(MeshType *);
-
-
-/************************/
-/* Ordering subroutines */
-/************************/
 /* ometis.c */
-void ParMETIS_V3_NodeND(idxtype *, idxtype *, idxtype *, int *, int *, idxtype *, idxtype *, MPI_Comm *);
 
 /* pspases.c */
-void ParMETIS_SerialNodeND(idxtype *, idxtype *, idxtype *, int *, int *, idxtype *, idxtype *, MPI_Comm *);
 GraphType *AssembleEntireGraph(CtrlType *, idxtype *, idxtype *, idxtype *);
-
 
 /* node_refine.c */
 void ComputeNodePartitionParams0(CtrlType *, GraphType *, WorkSpaceType *);
@@ -192,10 +167,6 @@ void Order_Partition(CtrlType *, GraphType *, WorkSpaceType *);
 void Coordinate_Partition(CtrlType *, GraphType *, int, float *, int, WorkSpaceType *);
 void PartSort(CtrlType *, GraphType *, KeyValueType *, WorkSpaceType *);
 
-
-/***********************/
-/* Utility subroutines */
-/***********************/
 
 /* fpqueue.c */
 void FPQueueInit(FPQueueType *, int);
@@ -268,8 +239,6 @@ int DecKeyValueCmp(const void *, const void *);
 int BSearch(int, idxtype *, int);
 void RandomPermute(int, idxtype *, int);
 void FastRandomPermute(int, idxtype *, int);
-double drand48();
-void srand48(long);
 int ispow2(int);
 int log2Int(int);
 void BucketSortKeysDec(int, int, idxtype *, idxtype *);
@@ -310,9 +279,12 @@ void ikeyvalsort(int, KeyValueType *);
 
 /* grsetup.c */
 GraphType *Moc_SetUpGraph(CtrlType *, int, idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, int *);
-void SetUpCtrl(CtrlType *ctrl, int, int *, MPI_Comm);
+void SetUpCtrl(CtrlType *ctrl, int, int, MPI_Comm);
 void ChangeNumbering(idxtype *, idxtype *, idxtype *, idxtype *, int, int, int);
 void ChangeNumberingMesh(idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, int, int, int, int);
+void ChangeNumberingMesh2(idxtype *elmdist, idxtype *eptr, idxtype *eind,
+                          idxtype *xadj, idxtype *adjncy, idxtype *part,
+			  int npes, int mype, int from);
 void GraphRandomPermute(GraphType *);
 void ComputeMoveStatistics(CtrlType *, GraphType *, int *, int *, int *);
 
@@ -324,35 +296,6 @@ void PrintTimer(CtrlType *, timer, char *);
 /* setup.c */
 void SetUp(CtrlType *, GraphType *, WorkSpaceType *);
 int Home_PE(int, int, idxtype *, int);
-
-
-/***************************************/
-/* backwards compatibility subroutines */
-/***************************************/
-/* kmetis.c */
-void ParMETIS_PartKway(idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, int *, int *, int *, int *, int *, idxtype *, MPI_Comm *);
-void PARKMETIS(idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, int *, MPI_Comm);
-/* rmetis.c */
-void ParMETIS_RefineKway(idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, int *, int *, int *, int *, idxtype *, MPI_Comm *);
-void PARRMETIS(idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, int *, MPI_Comm);
-/* diffuse.c */
-void ParMETIS_RepartLDiffusion(idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, int *, int *, int *, int *, idxtype *, MPI_Comm *);
-void ParMETIS_RepartGDiffusion(idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, int *, int *, int *, int *, idxtype *, MPI_Comm *);
-void PARUAMETIS(idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, int *, MPI_Comm);
-void PARDAMETIS(idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, int *, MPI_Comm);
-/* scremap.c */
-void ParMETIS_RepartRemap(idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, int *, int *, int *, int *, idxtype *, MPI_Comm *);
-void ParMETIS_RepartMLRemap(idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, int *, int *, int *, int *, idxtype *, MPI_Comm *);
-/* gmetis.c */
-void ParMETIS_PartGeomKway(idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, int *, int *, int *, float *, int *, int *, int *, idxtype *, MPI_Comm *);
-void ParMETIS_PartGeom(idxtype *, int *, float *, idxtype *, MPI_Comm *);
-void ParMETIS_PartGeomRefine(idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, int *, int *, int *, float *, int *, int *, idxtype *, MPI_Comm *);
-void PARGKMETIS(idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, int, float *, idxtype *, int *, MPI_Comm);
-void PARGRMETIS(idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, int, float *, idxtype *, int *, MPI_Comm);
-void PARGMETIS(idxtype *, idxtype *, idxtype *, int, float *, idxtype *, int *, MPI_Comm);
-/* ometis.c */
-void ParMETIS_NodeND(idxtype *, idxtype *, idxtype *, int *, int *, idxtype *, idxtype *, MPI_Comm *);
-void PAROMETIS(idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, int *, MPI_Comm);
 
 
 /*********************/

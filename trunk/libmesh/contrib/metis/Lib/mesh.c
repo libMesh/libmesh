@@ -9,7 +9,7 @@
  * Started 8/18/97
  * George
  *
- * $Id: mesh.c,v 1.4 2003-06-24 05:33:50 benkirk Exp $
+ * $Id: mesh.c,v 1.5 2004-03-08 04:58:28 benkirk Exp $
  *
  */
 
@@ -71,7 +71,8 @@ void METIS_MeshToNodal(int *ne, int *nn, idxtype *elmnts, int *etype, int *numfl
 /*****************************************************************************
 * This function creates the dual of a finite element mesh
 ******************************************************************************/
-void GENDUALMETIS(int nelmnts, int nvtxs, int etype, idxtype *elmnts, idxtype *dxadj, idxtype *dadjncy)
+void GENDUALMETIS(int nelmnts, int nvtxs, int etype, idxtype *elmnts, idxtype *dxadj, 
+                  idxtype *dadjncy)
 {
    int i, j, jj, k, kk, kkk, l, m, n, nedges, mask;
    idxtype *nptr, *nind;

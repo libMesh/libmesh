@@ -8,9 +8,10 @@
  * Started 9/26/95
  * George
  *
- * $Id: struct.h,v 1.4 2003-06-24 05:33:50 benkirk Exp $
+ * $Id: struct.h,v 1.5 2004-03-08 04:58:28 benkirk Exp $
  */
 
+#ifndef __parmetis_h__
 /* Undefine the following #define in order to use short int as the idxtype */
 #define IDXTYPE_INT
 
@@ -19,6 +20,7 @@
 typedef int idxtype;
 #else
 typedef short idxtype;
+#endif
 #endif
 
 #define MAXIDX	(1<<8*sizeof(idxtype)-2)

@@ -9,7 +9,7 @@
  * Started 7/25/97
  * George
  *
- * $Id: graph.c,v 1.4 2003-06-24 05:33:50 benkirk Exp $
+ * $Id: graph.c,v 1.5 2004-03-08 04:58:28 benkirk Exp $
  *
  */
 
@@ -385,8 +385,8 @@ int IsConnectedSubdomain(CtrlType *ctrl, GraphType *graph, int pid, int report)
   where = graph->where;
 
   touched = idxsmalloc(nvtxs, 0, "IsConnected: touched");
-  queue = idxmalloc(nvtxs, "IsConnected: queue");
-  cptr = idxmalloc(nvtxs, "IsConnected: cptr");
+  queue   = idxmalloc(nvtxs, "IsConnected: queue");
+  cptr    = idxmalloc(nvtxs+1, "IsConnected: cptr");
 
   nleft = 0;
   for (i=0; i<nvtxs; i++) {
@@ -500,8 +500,8 @@ int IsConnected2(GraphType *graph, int report)
   where = graph->where;
 
   touched = idxsmalloc(nvtxs, 0, "IsConnected: touched");
-  queue = idxmalloc(nvtxs, "IsConnected: queue");
-  cptr = idxmalloc(nvtxs, "IsConnected: cptr");
+  queue   = idxmalloc(nvtxs, "IsConnected: queue");
+  cptr    = idxmalloc(nvtxs+1, "IsConnected: cptr");
 
   nleft = nvtxs;
   touched[0] = 1;

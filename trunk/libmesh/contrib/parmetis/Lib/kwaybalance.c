@@ -8,10 +8,10 @@
  * Started 3/1/96
  * George
  *
- * $Id: kwaybalance.c,v 1.1 2003-06-24 05:33:51 benkirk Exp $
+ * $Id: kwaybalance.c,v 1.2 2004-03-08 04:58:31 benkirk Exp $
  */
 
-#include <parmetis.h>
+#include <parmetislib.h>
 
 #define ProperSide(c, from, other) \
               (((c) == 0 && (from)-(other) < 0) || ((c) == 1 && (from)-(other) > 0))

@@ -1,8 +1,9 @@
 /* kmetis.c */
-/* mmetis.c */
-/* gkmetis.c */
-/* mdrivers.c */
 #define	Moc_Global_Partition Moc_Global_Partition__
+
+/* mmetis.c */
+
+/* gkmetis.c */
 
 /* match.c */
 #define	Moc_GlobalMatch_Balance Moc_GlobalMatch_Balance__
@@ -49,9 +50,9 @@
 /* Adaptive subroutines */
 /************************/
 /* ametis.c */
-/* rmetis.c */
-/* adrivers.c */
 #define	Adaptive_Partition Adaptive_Partition__
+
+/* rmetis.c */
 
 /* lmatch.c */
 #define	Mc_LocalMatch_HEM Mc_LocalMatch_HEM__

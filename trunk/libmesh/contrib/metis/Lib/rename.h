@@ -8,7 +8,7 @@
  * Started 10/2/97
  * George
  *
- * $Id: rename.h,v 1.4 2003-06-24 05:33:50 benkirk Exp $
+ * $Id: rename.h,v 1.5 2004-03-08 04:58:28 benkirk Exp $
  *
  */
 
@@ -28,6 +28,10 @@
 #define CreateCoarseGraph_NVW 		__CreateCoarseGraph_NVW
 #define SetUpCoarseGraph		__SetUpCoarseGraph
 #define ReAdjustMemory			__ReAdjustMemory
+
+
+/* checkgraph.c */
+#define CheckGraph      		__CheckGraph
 
 
 /* coarsen.c */
@@ -302,6 +306,7 @@
 
 /* parmetis.c */
 #define MlevelNestedDissectionP		__MlevelNestedDissectionP
+#define MCMlevelRecursiveBisection2     __MCMlevelRecursiveBisection2
 
 
 /* pmetis.c */
@@ -356,6 +361,7 @@
 #define ComputePartitionInfo		__ComputePartitionInfo
 #define ComputePartitionBalance		__ComputePartitionBalance
 #define ComputeElementBalance		__ComputeElementBalance
+#define Moc_ComputePartitionBalance     __Moc_ComputePartitionBalance
 
 
 /* subdomains.c */

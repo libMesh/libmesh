@@ -9,62 +9,64 @@
  * Started 10/19/94
  * George
  *
- * $Id: mesh.c,v 1.1 2003-06-24 05:33:51 benkirk Exp $
+ * $Id: mesh.c,v 1.2 2004-03-08 04:58:31 benkirk Exp $
  *
  */
 
-#include <parmetis.h>
-#define	MAXLINE	8192
+#include <parmetislib.h>
+
 
 /*************************************************************************
 * This function converts a mesh into a dual graph
 **************************************************************************/
-void ParMETIS_V3_Mesh2Dual(idxtype *elmdist, idxtype *elements, int *etype, int *mgcnum,
-  int *numflag, idxtype **xadj, idxtype **adjncy, MPI_Comm *comm)
+void ParMETIS_V3_Mesh2Dual(idxtype *elmdist, idxtype *eptr, idxtype *eind, 
+                 int *numflag, int *ncommonnodes, idxtype **xadj, 
+		 idxtype **adjncy, MPI_Comm *comm)
 {
-  int i, j, jj, k, kk, kkk, m;
+  int i, j, jj, k, kk, m;
   int npes, mype, pe, count, mask, pass;
   int nelms, lnns, my_nns, node;
-  int firstelm, lastelm, firstnode, lnode, element, nrecv, nsend;
+  int firstelm, firstnode, lnode, nrecv, nsend;
   int *scounts, *rcounts, *sdispl, *rdispl;
-  idxtype *nodedist, *nmap;
+  idxtype *nodedist, *nmap, *auxarray;
   idxtype *gnptr, *gnind, *nptr, *nind, *myxadj, *myadjncy = NULL;
   idxtype *sbuffer, *rbuffer, *htable;
   KeyValueType *nodelist, *recvbuffer;
   idxtype ind[200], wgt[200];
-  int esize, esizes[5] = {-1, 3, 4, 8, 4};
-  int maxnode, gmaxnode, minnode, gminnode;
+  int gmaxnode, gminnode;
+  CtrlType ctrl;
 
-  MPI_Comm_size(*comm, &npes);
-  MPI_Comm_rank(*comm, &mype);
-  esize = esizes[*etype];
 
-  if (*numflag == 1) 
-    ChangeNumberingMesh(elmdist, elements, NULL, NULL, NULL, npes, mype, esize, 1);
+  SetUpCtrl(&ctrl, -1, 0, *comm);
+
+  npes = ctrl.npes;
+  mype = ctrl.mype;
 
   nelms = elmdist[mype+1]-elmdist[mype];
+
+  if (*numflag == 1) 
+    ChangeNumberingMesh2(elmdist, eptr, eind, NULL, NULL, NULL, npes, mype, 1);
+
   mask = (1<<11)-1;
 
   /*****************************/
   /* Determine number of nodes */
   /*****************************/
-  minnode = elements[idxamin(nelms*esize, elements)];
-  MPI_Allreduce((void *)&minnode, (void *)&gminnode, 1, MPI_INT, MPI_MIN, *comm);
-  for (i=0; i<nelms*esize; i++)
-    elements[i] -= gminnode;
+  gminnode = GlobalSEMin(&ctrl, eind[idxamin(eptr[nelms], eind)]);
+  for (i=0; i<eptr[nelms]; i++)
+    eind[i] -= gminnode;
 
-  maxnode = elements[idxamax(nelms*esize, elements)];
-  MPI_Allreduce((void *)&maxnode, (void *)&gmaxnode, 1, MPI_INT, MPI_MAX, *comm);
+  gmaxnode = GlobalSEMax(&ctrl, eind[idxamax(eptr[nelms], eind)]);
+
 
   /**************************/
   /* Check for input errors */
   /**************************/
   ASSERTS(nelms > 0);
 
-  nodedist = idxsmalloc(npes+1, 0, "nodedist");
   /* construct node distribution array */
-  nodedist[0] = 0;
-  for (i=0,j=gmaxnode+1; i<npes; i++) {
+  nodedist = idxsmalloc(npes+1, 0, "nodedist");
+  for (nodedist[0]=0, i=0,j=gmaxnode+1; i<npes; i++) {
     k = j/(npes-i);
     nodedist[i+1] = nodedist[i]+k;
     j -= k;
@@ -72,28 +74,31 @@ void ParMETIS_V3_Mesh2Dual(idxtype *elmdist, idxtype *elements, int *etype, int 
   my_nns = nodedist[mype+1]-nodedist[mype];
   firstnode = nodedist[mype];
 
-  nodelist = (KeyValueType *)GKmalloc(nelms*esize*sizeof(KeyValueType), "nodelist");
-  htable = idxsmalloc(amax(my_nns, mask+1), -1, "htable");
-  scounts = imalloc(4*npes+2, "scounts");
-  rcounts = scounts+npes;
-  sdispl  = scounts+2*npes;
-  rdispl  = scounts+3*npes+1;
+  nodelist = (KeyValueType *)GKmalloc(eptr[nelms]*sizeof(KeyValueType), "nodelist");
+  auxarray = idxmalloc(eptr[nelms], "auxarray");
+  htable   = idxsmalloc(amax(my_nns, mask+1), -1, "htable");
+  scounts  = imalloc(4*npes+2, "scounts");
+  rcounts  = scounts+npes;
+  sdispl   = scounts+2*npes;
+  rdispl   = scounts+3*npes+1;
+
 
   /*********************************************/
   /* first find a local numbering of the nodes */
   /*********************************************/
-  for (i=0; i<nelms; i++)
-    for (j=0; j<esize; j++) {
-      nodelist[i*esize+j].key = elements[i*esize+j];
-      nodelist[i*esize+j].val = i*esize+j;
+  for (i=0; i<nelms; i++) {
+    for (j=eptr[i]; j<eptr[i+1]; j++) {
+      nodelist[j].key = eind[j];
+      nodelist[j].val = j;
+      auxarray[j]     = i; /* remember the local element ID that uses this node */
     }
+  }
+  ikeysort(eptr[nelms], nodelist);
 
-  ikeysort(nelms*esize, nodelist);
-
-  count = 1;
-  for (i=1; i<nelms*esize; i++)
+  for (count=1, i=1; i<eptr[nelms]; i++) {
     if (nodelist[i].key > nodelist[i-1].key)
       count++;
+  }
 
   lnns = count;
   nmap = idxmalloc(lnns, "nmap");
@@ -101,45 +106,44 @@ void ParMETIS_V3_Mesh2Dual(idxtype *elmdist, idxtype *elements, int *etype, int 
   /* renumber the nodes of the elements array */
   count = 1;
   nmap[0] = nodelist[0].key;
-  elements[nodelist[0].val] = 0;
-  for (i=1; i<nelms*esize; i++) {
+  eind[nodelist[0].val] = 0;
+  nodelist[0].val = auxarray[nodelist[0].val];  /* Store the local element ID */
+  for (i=1; i<eptr[nelms]; i++) {
     if (nodelist[i].key > nodelist[i-1].key) {
       nmap[count] = nodelist[i].key;
       count++;
     }
-    elements[nodelist[i].val] = count-1;
+    eind[nodelist[i].val] = count-1;
+    nodelist[i].val = auxarray[nodelist[i].val];  /* Store the local element ID */
   }
   MPI_Barrier(*comm);
 
   /**********************************************************/
   /* perform comms necessary to construct node-element list */
   /**********************************************************/
-  pe = 0;
   iset(npes, 0, scounts);
-  for (i=0; i<nelms*esize; i++) {
+  for (pe=i=0; i<eptr[nelms]; i++) {
     while (nodelist[i].key >= nodedist[pe+1])
       pe++;
-
     scounts[pe] += 2;
   }
   ASSERTS(pe < npes);
 
   MPI_Alltoall((void *)scounts, 1, MPI_INT, (void *)rcounts, 1, MPI_INT, *comm);
 
-  for (i=0; i<npes; i++) {
-    sdispl[i] = scounts[i];
-    rdispl[i] = rcounts[i];
-  }
-
+  icopy(npes, scounts, sdispl);
   MAKECSR(i, npes, sdispl);
+
+  icopy(npes, rcounts, rdispl);
   MAKECSR(i, npes, rdispl);
-  ASSERTS(sdispl[npes] == nelms*esize*2);
+
+  ASSERTS(sdispl[npes] == eptr[nelms]*2);
 
   nrecv = rdispl[npes]/2;
   recvbuffer = (KeyValueType *)GKmalloc(amax(1, nrecv)*sizeof(KeyValueType), "recvbuffer");
 
-  MPI_Alltoallv((void *)nodelist, scounts, sdispl, IDX_DATATYPE,
-  (void *)recvbuffer, rcounts, rdispl, IDX_DATATYPE, *comm);
+  MPI_Alltoallv((void *)nodelist, scounts, sdispl, IDX_DATATYPE, (void *)recvbuffer, 
+                rcounts, rdispl, IDX_DATATYPE, *comm);
 
   /**************************************/
   /* construct global node-element list */
@@ -161,14 +165,11 @@ void ParMETIS_V3_Mesh2Dual(idxtype *elmdist, idxtype *elements, int *etype, int 
     firstelm = elmdist[pe];
     for (j=rdispl[pe]/2; j<rdispl[pe+1]/2; j++) {
       lnode = recvbuffer[j].key-firstnode;
-      element = recvbuffer[j].val/esize+firstelm;
-      gnind[gnptr[lnode]++] = element;
+      gnind[gnptr[lnode]++] = recvbuffer[j].val+firstelm;
     }
   }
+  SHIFTCSR(i, my_nns, gnptr);
 
-  for (i=my_nns; i>0; i--)
-    gnptr[i] = gnptr[i-1];
-  gnptr[0] = 0;
 
   /*********************************************************/
   /* send the node-element info to the relevant processors */
@@ -195,9 +196,7 @@ void ParMETIS_V3_Mesh2Dual(idxtype *elmdist, idxtype *elements, int *etype, int 
 
   MPI_Alltoall((void *)scounts, 1, MPI_INT, (void *)rcounts, 1, MPI_INT, *comm);
 
-  for (i=0; i<npes; i++) {
-    sdispl[i] = scounts[i];
-  }
+  icopy(npes, scounts, sdispl);
   MAKECSR(i, npes, sdispl);
 
   /* create the send buffer */
@@ -227,16 +226,14 @@ void ParMETIS_V3_Mesh2Dual(idxtype *elmdist, idxtype *elements, int *etype, int 
     }
   }
 
-  for (i=0; i<npes; i++) {
-    rdispl[i] = rcounts[i];
-  }
+  icopy(npes, rcounts, rdispl);
   MAKECSR(i, npes, rdispl);
 
   nrecv = rdispl[npes];
   rbuffer = (idxtype *)realloc(recvbuffer, sizeof(idxtype)*amax(1, nrecv));
 
-  MPI_Alltoallv((void *)sbuffer, scounts, sdispl, IDX_DATATYPE,
-  (void *)rbuffer, rcounts, rdispl, IDX_DATATYPE, *comm);
+  MPI_Alltoallv((void *)sbuffer, scounts, sdispl, IDX_DATATYPE, (void *)rbuffer, 
+                rcounts, rdispl, IDX_DATATYPE, *comm);
 
   k = -1;
   nptr = idxsmalloc(lnns+1, 0, "nptr");
@@ -259,29 +256,26 @@ void ParMETIS_V3_Mesh2Dual(idxtype *elmdist, idxtype *elements, int *etype, int 
   idxset(mask+1, -1, htable);
 
   firstelm = elmdist[mype];
-  lastelm = elmdist[mype+1]-1;
 
   /* Two passes -- in first pass, simply find out the memory requirements */
   for (pass=0; pass<2; pass++) {
     for (i=0; i<nelms; i++) {
-      count = 0;
-      for (j=0; j<esize; j++) {
-        node = elements[esize*i+j];
-        for (kkk=nptr[node+1]-1; kkk>=nptr[node]; kkk--) {
-          kk = nind[kkk];
+      for (count=0, j=eptr[i]; j<eptr[i+1]; j++) {
+        node = eind[j];
 
-          if (kk == i+firstelm)
-            continue;
-          k = kk&mask;
-          m = htable[k];
+        for (k=nptr[node]; k<nptr[node+1]; k++) {
+          if ((kk=nind[k]) == firstelm+i) 
+	    continue;
+	    
+          m = htable[(kk&mask)];
 
           if (m == -1) {
             ind[count] = kk;
             wgt[count] = 1;
-            htable[k] = count++;
+            htable[(kk&mask)] = count++;
           }
           else {
-            if (ind[m] == kk) {
+            if (ind[m] == kk) { 
               wgt[m]++;
             }
             else {
@@ -289,26 +283,25 @@ void ParMETIS_V3_Mesh2Dual(idxtype *elmdist, idxtype *elements, int *etype, int 
                 if (ind[jj] == kk) {
                   wgt[jj]++;
                   break;
-                }
+	        }
               }
               if (jj == count) {
-                ind[count] = kk;
+                ind[count]   = kk;
                 wgt[count++] = 1;
               }
-            }
+	    }
           }
         }
       }
+
       for (j=0; j<count; j++) {
-        if (wgt[j] >= *mgcnum) {
-          if (pass == 0) {
+        htable[(ind[j]&mask)] = -1;
+        if (wgt[j] >= *ncommonnodes) {
+          if (pass == 0) 
             myxadj[i]++;
-          }
-          else {
+          else 
             myadjncy[myxadj[i]++] = ind[j];
-          }
-        }
-        htable[ind[j]&mask] = -1;
+	}
       }
     }
 
@@ -317,25 +310,26 @@ void ParMETIS_V3_Mesh2Dual(idxtype *elmdist, idxtype *elements, int *etype, int 
       myadjncy = *adjncy = idxmalloc(myxadj[nelms], "adjncy");
     }
     else {
-      for (i=nelms; i>0; i--)
-        myxadj[i] = myxadj[i-1];
-      myxadj[0] = 0;
+      SHIFTCSR(i, nelms, myxadj);
     }
   }
 
   /*****************************************/
   /* correctly renumber the elements array */
   /*****************************************/
-  for (i=0; i<nelms*esize; i++)
-    elements[i] = nmap[elements[i]];
+  for (i=0; i<eptr[nelms]; i++)
+    eind[i] = nmap[eind[i]] + gminnode;
 
   if (*numflag == 1) 
-    ChangeNumberingMesh(elmdist, elements, myxadj, myadjncy, NULL, npes, mype, esize, 0);
+    ChangeNumberingMesh2(elmdist, eptr, eind, myxadj, myadjncy, NULL, npes, mype, 0);
 
   /* do not free nodelist, recvbuffer, rbuffer */
-  GKfree((void **)&scounts, (void **)&nodedist, (void **)&nmap, (void **)&sbuffer, (void **)&htable, (void **)&nptr, (void **)&nind, (void **)&gnptr, (void **)&gnind, LTERM);
+  GKfree((void **)&scounts, (void **)&nodedist, (void **)&nmap, (void **)&sbuffer, 
+         (void **)&htable, (void **)&nptr, (void **)&nind, (void **)&gnptr, 
+	 (void **)&gnind, (void **)&auxarray, LTERM);
+
+  FreeCtrl(&ctrl);
 
   return;
 }
-
 

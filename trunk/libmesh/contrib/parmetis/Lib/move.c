@@ -8,11 +8,11 @@
  * Started 11/22/96
  * George
  *
- * $Id: move.c,v 1.1 2003-06-24 05:33:51 benkirk Exp $
+ * $Id: move.c,v 1.2 2004-03-08 04:58:31 benkirk Exp $
  *
  */
 
-#include <parmetis.h>
+#include <parmetislib.h>
 
 /*************************************************************************
 * This function moves the graph, and returns a new graph.
@@ -194,7 +194,8 @@ GraphType *Moc_MoveGraph(CtrlType *ctrl, GraphType *graph, WorkSpaceType *wspace
 * and it is used to get the inverse mapping information.
 * The routine assumes that graph->where corresponds to a npes-way partition.
 **************************************************************************/
-void ProjectInfoBack(CtrlType *ctrl, GraphType *graph, idxtype *info, idxtype *minfo, WorkSpaceType *wspace)
+void ProjectInfoBack(CtrlType *ctrl, GraphType *graph, idxtype *info, idxtype *minfo, 
+                     WorkSpaceType *wspace)
 {
   int i, nvtxs, nparts;
   idxtype *where, *auxinfo, *sinfo, *rinfo;
@@ -204,9 +205,8 @@ void ProjectInfoBack(CtrlType *ctrl, GraphType *graph, idxtype *info, idxtype *m
   nvtxs = graph->nvtxs;
   where = graph->where;
 
-  sinfo = wspace->pv1;
-  rinfo = wspace->pv2;
-  auxinfo = wspace->core;
+  sinfo   = wspace->pv1;
+  rinfo   = wspace->pv2;
 
   /* Find out in rinfo how many entries are received per partition */
   idxset(nparts, 0, rinfo);
@@ -218,6 +218,9 @@ void ProjectInfoBack(CtrlType *ctrl, GraphType *graph, idxtype *info, idxtype *m
 
   MAKECSR(i, nparts, sinfo);
   MAKECSR(i, nparts, rinfo);
+
+  /* allocate memory for auxinfo */
+  auxinfo = idxmalloc(rinfo[nparts], "ProjectInfoBack: auxinfo");
 
   /*-----------------------------------------------------------------
    * Now, go and send back the minfo
@@ -246,6 +249,7 @@ void ProjectInfoBack(CtrlType *ctrl, GraphType *graph, idxtype *info, idxtype *m
   for (i=0; i<nvtxs; i++)
     info[i] = auxinfo[rinfo[where[i]]++];
 
+  free(auxinfo);
 }
 
 

@@ -8,11 +8,11 @@
  * Started 10/19/96
  * George
  *
- * $Id: rmetis.c,v 1.1 2003-06-24 05:33:51 benkirk Exp $
+ * $Id: rmetis.c,v 1.2 2004-03-08 04:58:31 benkirk Exp $
  *
  */
 
-#include <parmetis.h>
+#include <parmetislib.h>
 
 
 
@@ -22,8 +22,9 @@
 * refinement. This function utilizes local coarsening.
 ************************************************************************************/
 void ParMETIS_V3_RefineKway(idxtype *vtxdist, idxtype *xadj, idxtype *adjncy,
-  idxtype *vwgt, idxtype *adjwgt, int *wgtflag, int *numflag, int *ncon, int *nparts,
-  float *tpwgts, float *ubvec, int *options, int *edgecut, idxtype *part, MPI_Comm *comm)
+              idxtype *vwgt, idxtype *adjwgt, int *wgtflag, int *numflag, int *ncon, 
+	      int *nparts, float *tpwgts, float *ubvec, int *options, int *edgecut, 
+	      idxtype *part, MPI_Comm *comm)
 {
   int h, i;
   int npes, mype;
@@ -45,8 +46,8 @@ void ParMETIS_V3_RefineKway(idxtype *vtxdist, idxtype *xadj, idxtype *adjncy,
   if (options != NULL && options[0] == 1)
     dbglvl = options[PMV3_OPTION_DBGLVL];
   CheckInputs(REFINE_PARTITION, npes, dbglvl, wgtflag, &iwgtflag, numflag, &inumflag,
-  ncon, &incon, nparts, &inparts, tpwgts, &itpwgts, ubvec, iubvec, NULL, NULL, NULL, NULL,
-  NULL, NULL, options, ioptions, part, comm);
+              ncon, &incon, nparts, &inparts, tpwgts, &itpwgts, ubvec, iubvec, 
+              NULL, NULL, options, ioptions, part, comm);
 
   /* ADD: take care of disconnected graph */
   /* ADD: take care of highly unbalanced vtxdist */
@@ -79,7 +80,7 @@ void ParMETIS_V3_RefineKway(idxtype *vtxdist, idxtype *xadj, idxtype *adjncy,
     ps_relation = (npes == inparts) ? COUPLED : DISCOUPLED;
   }
 
-  SetUpCtrl(&ctrl, inparts, &dbglvl, *comm);
+  SetUpCtrl(&ctrl, inparts, dbglvl, *comm);
   ctrl.CoarsenTo = amin(vtxdist[npes]+1, 50*incon*amax(npes, inparts));
   ctrl.ipc_factor = 1000.0;
   ctrl.redist_factor = 1.0;
@@ -99,10 +100,10 @@ void ParMETIS_V3_RefineKway(idxtype *vtxdist, idxtype *xadj, idxtype *adjncy,
   else
     idxcopy(graph->nvtxs, part, graph->home);
 
-  tewgt = idxsum(graph->nedges, graph->adjwgt);
-  tvsize = idxsum(graph->nvtxs, graph->vsize);
-  gtewgt = (float) GlobalSESum(&ctrl, tewgt);
-  gtvsize = (float) GlobalSESum(&ctrl, tvsize);
+  tewgt   = idxsum(graph->nedges, graph->adjwgt);
+  tvsize  = idxsum(graph->nvtxs, graph->vsize);
+  gtewgt  = (float) GlobalSESum(&ctrl, tewgt) + 1.0/graph->gnvtxs;
+  gtvsize = (float) GlobalSESum(&ctrl, tvsize) + 1.0/graph->gnvtxs;
   ctrl.edge_size_ratio = gtewgt/gtvsize;
   scopy(incon, iubvec, ctrl.ubvec);
 
@@ -130,11 +131,10 @@ void ParMETIS_V3_RefineKway(idxtype *vtxdist, idxtype *xadj, idxtype *adjncy,
   /***********************/
   IFSET(ctrl.dbglvl, DBG_TIME, PrintTimingInfo(&ctrl));
   IFSET(ctrl.dbglvl, DBG_TIME, MPI_Barrier(ctrl.gcomm));
-  IFSET(ctrl.dbglvl, DBG_INFO,
-    Mc_ComputeMoveStatistics(&ctrl, graph, &nmoved, &maxin, &maxout));
-  IFSET(ctrl.dbglvl, DBG_INFO,
-  rprintf(&ctrl, "Final %3d-way Cut: %6d \tBalance: ", inparts, graph->mincut));
+
   if (ctrl.dbglvl&DBG_INFO) {
+    Mc_ComputeMoveStatistics(&ctrl, graph, &nmoved, &maxin, &maxout);
+    rprintf(&ctrl, "Final %3d-way Cut: %6d \tBalance: ", inparts, graph->mincut);
     avg = 0.0;
     for (h=0; h<incon; h++) {
       maximb = 0.0;
@@ -143,9 +143,8 @@ void ParMETIS_V3_RefineKway(idxtype *vtxdist, idxtype *xadj, idxtype *adjncy,
       avg += maximb;
       rprintf(&ctrl, "%.3f ", maximb);
     }
+    rprintf(&ctrl, "\nNMoved: %d %d %d %d\n", nmoved, maxin, maxout, maxin+maxout);
   }
-  IFSET(ctrl.dbglvl, DBG_INFO,
-  rprintf(&ctrl, "\nNMoved: %d %d %d %d\n", nmoved, maxin, maxout, maxin+maxout));
 
   /*************************************/
   /* Free memory, renumber, and return */

@@ -8,10 +8,10 @@
  * Started 7/28/97
  * George
  *
- * $Id: selectq.c,v 1.1 2003-06-24 05:33:51 benkirk Exp $
+ * $Id: selectq.c,v 1.2 2004-03-08 04:58:31 benkirk Exp $
  */
 
-#include <parmetis.h>
+#include <parmetislib.h>
 
 /*************************************************************************
 *  This stuff is hardcoded for up to four constraints

@@ -8,20 +8,15 @@
  * Started 9/26/95
  * George
  *
- * $Id: struct.h,v 1.1 2003-06-24 05:33:51 benkirk Exp $
+ * $Id: struct.h,v 1.2 2004-03-08 04:58:31 benkirk Exp $
  */
-
-/* Undefine the following #define in order to use short int as the idxtype */
-#define IDXTYPE_INT
 
 /* Indexes are as long as integers for now */
 #ifdef IDXTYPE_INT
-typedef int idxtype;
 #define IDX_DATATYPE	MPI_INT
 #define MAX_INT		INT_MAX
 #define MIN_INT		INT_MIN
 #else
-typedef short idxtype;
 #define IDX_DATATYPE	MPI_SHORT
 #define MAX_INT		SHRT_MAX
 #define MIN_INT		SHRT_MIN

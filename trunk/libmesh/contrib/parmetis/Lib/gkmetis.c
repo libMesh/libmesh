@@ -9,11 +9,11 @@
  * Started 10/19/96
  * George
  *
- * $Id: gkmetis.c,v 1.1 2003-06-24 05:33:51 benkirk Exp $
+ * $Id: gkmetis.c,v 1.2 2004-03-08 04:58:31 benkirk Exp $
  *
  */
 
-#include <parmetis.h>
+#include <parmetislib.h>
 
 
 
@@ -23,9 +23,9 @@
 * coordinates to compute an initial graph distribution.
 ************************************************************************************/
 void ParMETIS_V3_PartGeomKway(idxtype *vtxdist, idxtype *xadj, idxtype *adjncy,
-  idxtype *vwgt, idxtype *adjwgt, int *wgtflag, int *numflag, int *ndims, float *xyz,
-  int *ncon, int *nparts, float *tpwgts, float *ubvec, int *options, int *edgecut,
-  idxtype *part, MPI_Comm *comm)
+              idxtype *vwgt, idxtype *adjwgt, int *wgtflag, int *numflag, int *ndims, 
+	      float *xyz, int *ncon, int *nparts, float *tpwgts, float *ubvec, 
+	      int *options, int *edgecut, idxtype *part, MPI_Comm *comm)
 {
   int h, i, j;
   int nvtxs = -1, npes, mype;
@@ -49,9 +49,10 @@ void ParMETIS_V3_PartGeomKway(idxtype *vtxdist, idxtype *xadj, idxtype *adjncy,
   /********************************/
   if (options != NULL && options[0] == 1)
     dbglvl = options[PMV3_OPTION_DBGLVL];
+
   CheckInputs(STATIC_PARTITION, npes, dbglvl, wgtflag, &iwgtflag, numflag, &inumflag,
-  ncon, &incon, nparts, &inparts, tpwgts, &itpwgts, ubvec, iubvec, NULL, NULL, NULL, NULL,
-  NULL, NULL, options, ioptions, part, comm);
+              ncon, &incon, nparts, &inparts, tpwgts, &itpwgts, ubvec, iubvec, 
+	      NULL, NULL, options, ioptions, part, comm);
 
 
   /*********************************/
@@ -67,30 +68,24 @@ void ParMETIS_V3_PartGeomKway(idxtype *vtxdist, idxtype *xadj, idxtype *adjncy,
   /* Take care of npes = 1 case */
   /******************************/
   if (npes == 1 && inparts > 1) {
-
     moptions[0] = 0;
     nvtxs = vtxdist[1];
 
     if (incon == 1) {
-      METIS_PartGraphKway(&nvtxs, xadj, adjncy, vwgt, adjwgt,
-      &iwgtflag, &inumflag, &inparts, moptions, edgecut, part);
+      METIS_WPartGraphKway(&nvtxs, xadj, adjncy, vwgt, adjwgt, &iwgtflag, &inumflag, 
+            &inparts, itpwgts, moptions, edgecut, part);
     }
     else {
-
       /* ADD: this is because METIS does not support tpwgts for all constraints */
       mytpwgts = fmalloc(inparts, "mytpwgts");
       for (i=0; i<inparts; i++)
         mytpwgts[i] = itpwgts[i*incon];
 
-      METIS_mCPartGraphRecursive2(&nvtxs, &incon, xadj, adjncy, vwgt, adjwgt,
-      &iwgtflag, &inumflag, &inparts, mytpwgts, moptions, edgecut, part);
+      moptions[7] = -1;
+      METIS_mCPartGraphRecursive2(&nvtxs, &incon, xadj, adjncy, vwgt, adjwgt, &iwgtflag, 
+            &inumflag, &inparts, mytpwgts, moptions, edgecut, part);
 
       free(mytpwgts);
-
-/*
-      METIS_mCPartGraphKway(&nvtxs, &incon, xadj, adjncy, vwgt, adjwgt,
-      &iwgtflag, &inumflag, &inparts, iubvec, moptions, edgecut, part);
-*/
     }
 
     return;
@@ -111,7 +106,7 @@ void ParMETIS_V3_PartGeomKway(idxtype *vtxdist, idxtype *xadj, idxtype *adjncy,
     dbglvl = GLOBAL_DBGLVL;
     seed = GLOBAL_SEED;
   }
-  SetUpCtrl(&ctrl, npes, &dbglvl, *comm);
+  SetUpCtrl(&ctrl, npes, dbglvl, *comm);
   ctrl.CoarsenTo = amin(vtxdist[npes]+1, 25*incon*amax(npes, inparts));
   ctrl.seed = (seed == 0) ? mype : seed*mype;
   ctrl.sync = GlobalSEMax(&ctrl, seed);
@@ -215,9 +210,8 @@ void ParMETIS_V3_PartGeomKway(idxtype *vtxdist, idxtype *xadj, idxtype *adjncy,
   /*=======================================================
    * Now compute the partition of the moved graph
    =======================================================*/
-  if (vtxdist[npes] < SMALLGRAPH || vtxdist[npes] < npes*20) {
-    IFSET(ctrl.dbglvl, DBG_INFO,
-    rprintf(&ctrl, "Partitioning a graph of size %d serially\n", vtxdist[npes]));
+  if (vtxdist[npes] < SMALLGRAPH || vtxdist[npes] < npes*20 || GlobalSESum(&ctrl, mgraph->nedges) == 0) {
+    IFSET(ctrl.dbglvl, DBG_INFO, rprintf(&ctrl, "Partitioning a graph of size %d serially\n", vtxdist[npes]));
     PartitionSmallGraph(&ctrl, mgraph, &wspace);
   }
   else {
@@ -239,9 +233,9 @@ void ParMETIS_V3_PartGeomKway(idxtype *vtxdist, idxtype *xadj, idxtype *adjncy,
   /*******************/
   IFSET(ctrl.dbglvl, DBG_TIME, PrintTimingInfo(&ctrl));
   IFSET(ctrl.dbglvl, DBG_TIME, MPI_Barrier(ctrl.gcomm));
-  IFSET(ctrl.dbglvl, DBG_INFO,
-     rprintf(&ctrl, "Final %d-way CUT: %6d \tBalance: ", inparts, mgraph->mincut));
+
   if (ctrl.dbglvl&DBG_INFO) {
+    rprintf(&ctrl, "Final %d-way CUT: %6d \tBalance: ", inparts, mgraph->mincut);
     avg = 0.0;
     for (h=0; h<incon; h++) {
       maximb = 0.0;
@@ -250,8 +244,8 @@ void ParMETIS_V3_PartGeomKway(idxtype *vtxdist, idxtype *xadj, idxtype *adjncy,
       avg += maximb;
       rprintf(&ctrl, "%.3f ", maximb);
     }
+    rprintf(&ctrl, "  avg: %.3f\n", avg/(float)incon);
   }
-  IFSET(ctrl.dbglvl, DBG_INFO, rprintf(&ctrl, "  avg: %.3f\n", avg/(float)incon));
 
   GKfree((void **)&itpwgts, LTERM);
   FreeGraph(mgraph);
@@ -302,7 +296,8 @@ void ParMETIS_V3_PartGeom(idxtype *vtxdist, int *ndims, float *xyz, idxtype *par
   xadj[nvtxs] = nvtxs;
 
   /* Proceed with the rest of the code */
-  SetUpCtrl(&ctrl, npes, &dbglvl, *comm);
+  SetUpCtrl(&ctrl, npes, dbglvl, *comm);
+  ctrl.seed      = mype;
   ctrl.CoarsenTo = amin(vtxdist[npes]+1, 25*npes);
 
   graph = Moc_SetUpGraph(&ctrl, 1, vtxdist, xadj, NULL, adjncy, NULL, &zeroflg);

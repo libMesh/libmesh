@@ -8,7 +8,7 @@
  * Started 9/25/94
  * George
  *
- * $Id: macros.h,v 1.1 2003-06-24 05:33:51 benkirk Exp $
+ * $Id: macros.h,v 1.2 2004-03-08 04:58:31 benkirk Exp $
  *
  */
 
@@ -16,8 +16,7 @@
 /*************************************************************************
 * The following macro returns a random number in the specified range
 **************************************************************************/
-#define RandomInRange(u) ((int)(drand48()*((double)(u))))
-#define RandomInRangeFast(u) ((rand()>>2)%(u))
+#define RandomInRange(u) ((int)(1.0*(u)*rand()/(RAND_MAX+1.0)))
 
 #define amax(a, b) ((a) >= (b) ? (a) : (b))
 #define amin(a, b) ((a) >= (b) ? (b) : (a))
@@ -91,6 +90,12 @@
    } while(0) 
 
 
+#define SHIFTCSR(i, n, a) \
+   do { \
+     for (i=n; i>0; i--) a[i] = a[i-1]; \
+     a[0] = 0; \
+   } while(0)
+
 
 
 #ifdef DEBUG
@@ -105,7 +110,7 @@
 #endif 
 
 #ifdef DEBUG
-#   define ASSERTP(ctrl, expr,msg)                                          \
+#   define ASSERTP(ctrl, expr, msg)                                          \
     if (!(expr)) {                                               \
         myprintf(ctrl, "***ASSERTION failed on line %d of file %s:" #expr "\n", \
               __LINE__, __FILE__);                               \

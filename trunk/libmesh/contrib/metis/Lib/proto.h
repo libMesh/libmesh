@@ -8,7 +8,7 @@
  * Started 10/19/95
  * George
  *
- * $Id: proto.h,v 1.4 2003-06-24 05:33:50 benkirk Exp $
+ * $Id: proto.h,v 1.5 2004-03-08 04:58:28 benkirk Exp $
  *
  */
 
@@ -26,6 +26,9 @@ void CreateCoarseGraphNoMask(CtrlType *, GraphType *, int, idxtype *, idxtype *)
 void CreateCoarseGraph_NVW(CtrlType *, GraphType *, int, idxtype *, idxtype *);
 GraphType *SetUpCoarseGraph(GraphType *, int, int);
 void ReAdjustMemory(GraphType *, GraphType *, int);
+
+/* checkgraph.c */
+int CheckGraph(GraphType *);
 
 /* coarsen.c */
 GraphType *Coarsen2Way(CtrlType *, GraphType *);
@@ -354,6 +357,10 @@ void METIS_NodeNDP(int, idxtype *, idxtype *, int, int *, idxtype *, idxtype *, 
 void MlevelNestedDissectionP(CtrlType *, GraphType *, idxtype *, int, int, int, idxtype *);
 void METIS_NodeComputeSeparator(int *, idxtype *, idxtype *, idxtype *, idxtype *, int *, int *, idxtype *); 
 void METIS_EdgeComputeSeparator(int *, idxtype *, idxtype *, idxtype *, idxtype *, int *, int *, idxtype *); 
+void METIS_mCPartGraphRecursive2(int *nvtxs, int *ncon, idxtype *xadj, idxtype *adjncy, idxtype *vwgt, idxtype *adjwgt, int *wgtflag, int *numflag, int *nparts, float *tpwgts, int *options, int *edgecut, idxtype *part);
+int MCMlevelRecursiveBisection2(CtrlType *ctrl, GraphType *graph, int nparts, float *tpwgts, idxtype *part, float ubfactor, int fpart);
+
+
 
 /* pmetis.c */
 void METIS_PartGraphRecursive(int *, idxtype *, idxtype *, idxtype *, idxtype *, int *, int *, int *, int *, int *, idxtype *); 
@@ -406,6 +413,7 @@ void ComputePartitionInfo(GraphType *, int, idxtype *);
 void ComputePartitionInfoBipartite(GraphType *, int, idxtype *);
 void ComputePartitionBalance(GraphType *, int, idxtype *, float *);
 float ComputeElementBalance(int, int, idxtype *);
+void Moc_ComputePartitionBalance(GraphType *graph, int nparts, idxtype *where, float *ubvec);
 
 /* subdomains.c */
 void Random_KWayEdgeRefineMConn(CtrlType *, GraphType *, int, float *, float, int, int);
@@ -455,8 +463,6 @@ float snorm2(int, float *);
 float sdot(int n, float *, float *);
 void saxpy(int, float, float *, int, float *, int);
 void RandomPermute(int, idxtype *, int);
-double drand48();
-void srand48(long);
 int ispow2(int);
 void InitRandom(int);
 int log2Int(int);

@@ -8,13 +8,14 @@
  * Started 3/1/96
  * George
  *
- * $Id: akwayfm.c,v 1.1 2003-06-24 05:33:51 benkirk Exp $
+ * $Id: akwayfm.c,v 1.2 2004-03-08 04:58:30 benkirk Exp $
  */
 
-#include <parmetis.h>
+#include <parmetislib.h>
 
 #define ProperSide(c, from, other) \
               (((c) == 0 && (from)-(other) < 0) || ((c) == 1 && (from)-(other) > 0))
+
 
 /*************************************************************************
 * This function performs k-way refinement
@@ -23,8 +24,7 @@ void Moc_KWayAdaptiveRefine(CtrlType *ctrl, GraphType *graph, WorkSpaceType *wsp
 {
   int h, i, ii, iii, j, k, c;
   int pass, nvtxs, nedges, ncon;
-  int nmoves, nmoved, nswaps, nzgswaps;
-/*  int gnswaps, gnzgswaps; */
+  int nmoves, nmoved;
   int me, firstvtx, lastvtx, yourlastvtx;
   int from, to = -1, oldto, oldcut, mydomain, yourdomain, imbalanced, overweight;
   int npes = ctrl->npes, mype = ctrl->mype, nparts = ctrl->nparts;
@@ -120,7 +120,6 @@ void Moc_KWayAdaptiveRefine(CtrlType *ctrl, GraphType *graph, WorkSpaceType *wsp
     }
   }
 
-  nswaps = nzgswaps = 0;
   /*********************************************************/
   /* perform a small number of passes through the vertices */
   /*********************************************************/
@@ -167,177 +166,174 @@ void Moc_KWayAdaptiveRefine(CtrlType *ctrl, GraphType *graph, WorkSpaceType *wsp
       /* PASS ONE -- record stats for desired moves */
       /**********************************************/
       for (iii=0; iii<nvtxs; iii++) {
-        i = perm[iii];
-        from = tmp_where[i];
+        i     = perm[iii];
+        from  = tmp_where[i];
         nvwgt = graph->nvwgt+i*ncon;
         vsize = (float)(graph->vsize[i]);
 
-        for (h=0; h<ncon; h++)
+        for (h=0; h<ncon; h++) {
           if (fabs(nvwgt[h]-gnpwgts[from*ncon+h]) < SMALLFLOAT)
             break;
-
-        if (h < ncon) {
-          continue;
         }
+        if (h < ncon) 
+          continue;
 
         /* only check border vertices */
-        if (tmp_rinfo[i].ed > 0) {
-          my_edegrees = tmp_rinfo[i].degrees;
+        if (tmp_rinfo[i].ed <= 0)
+	  continue;
 
-          for (k=0; k<tmp_rinfo[i].ndegrees; k++) {
-            to = my_edegrees[k].edge;
+        my_edegrees = tmp_rinfo[i].degrees;
+
+        for (k=0; k<tmp_rinfo[i].ndegrees; k++) {
+          to = my_edegrees[k].edge;
+          if (ProperSide(c, pperm[from], pperm[to])) {
+            for (h=0; h<ncon; h++) {
+              if (gnpwgts[to*ncon+h]+nvwgt[h] > badmaxpwgt[to*ncon+h] && nvwgt[h] > 0.0)
+                break;
+            }
+            if (h == ncon)
+              break;
+          }
+        }
+        oldto = to;
+
+        /* check if a subdomain was found that fits */
+        if (k < tmp_rinfo[i].ndegrees) {
+          /**************************/
+          /**************************/
+          switch (ctrl->ps_relation) {
+            case COUPLED:
+              better = (oldto == mype) ? 1 : 0;
+              worse = (from == mype) ? 1 : 0;
+              break;
+            case DISCOUPLED:
+            default:
+              better = (oldto == graph->home[i]) ? 1 : 0;
+              worse = (from == graph->home[i]) ? 1 : 0;
+              break;
+          }
+          /**************************/
+          /**************************/
+
+          oldgain = ipc_factor * (float)(my_edegrees[k].ewgt-tmp_rinfo[i].id);
+          if (better) oldgain += redist_factor * vsize;
+          if (worse) oldgain -= redist_factor * vsize;
+
+          for (j=k+1; j<tmp_rinfo[i].ndegrees; j++) {
+            to = my_edegrees[j].edge;
             if (ProperSide(c, pperm[from], pperm[to])) {
+              /**************************/
+              /**************************/
+              switch (ctrl->ps_relation) {
+                case COUPLED:
+                  better = (to == mype) ? 1 : 0;
+                  break;
+                case DISCOUPLED:
+                default:
+                  better = (to == graph->home[i]) ? 1 : 0;
+                  break;
+              }
+              /**************************/
+              /**************************/
+
+              gain = ipc_factor * (float)(my_edegrees[j].ewgt-tmp_rinfo[i].id);
+              if (better) gain += redist_factor * vsize;
+              if (worse) gain -= redist_factor * vsize;
+
               for (h=0; h<ncon; h++)
                 if (gnpwgts[to*ncon+h]+nvwgt[h] > badmaxpwgt[to*ncon+h] && nvwgt[h] > 0.0)
                   break;
 
-              if (h == ncon)
-                break;
+              if (h == ncon) {
+                if (gain > oldgain ||
+                 (fabs(gain-oldgain) < SMALLFLOAT &&
+                 IsHBalanceBetterTT(ncon,gnpwgts+oldto*ncon,gnpwgts+to*ncon,nvwgt,ubvec))){
+                  oldgain = gain;
+                  oldto = to;
+                  k = j;
+                }
+              }
             }
           }
-          oldto = to;
+          to = oldto;
+          gain = oldgain;
 
-          /* check if a subdomain was found that fits */
-          if (k < tmp_rinfo[i].ndegrees) {
-            /**************************/
-            /**************************/
-            switch (ctrl->ps_relation) {
-              case COUPLED:
-                better = (oldto == mype) ? 1 : 0;
-                worse = (from == mype) ? 1 : 0;
-                break;
-              case DISCOUPLED:
-              default:
-                better = (oldto == graph->home[i]) ? 1 : 0;
-                worse = (from == graph->home[i]) ? 1 : 0;
-                break;
+          if (gain > 0.0 ||  
+          (gain > -1.0*SMALLFLOAT &&
+          (imbalanced ||  graph->level > 3  || iii % 8 == 0) &&
+          IsHBalanceBetterFT(ncon,gnpwgts+from*ncon,gnpwgts+to*ncon,nvwgt,ubvec))){
+
+            /****************************************/
+            /* Update tmp arrays of the moved vertex */
+            /****************************************/
+            tmp_where[i] = to;
+            moved[nmoved++] = i;
+            for (h=0; h<ncon; h++) {
+	      INC_DEC(lnpwgts[to*ncon+h], lnpwgts[from*ncon+h], nvwgt[h]);
+	      INC_DEC(gnpwgts[to*ncon+h], gnpwgts[from*ncon+h], nvwgt[h]);
+	      INC_DEC(movewgts[to*ncon+h], movewgts[from*ncon+h], nvwgt[h]);
             }
-            /**************************/
-            /**************************/
 
-            oldgain = ipc_factor * (float)(my_edegrees[k].ewgt-tmp_rinfo[i].id);
-            if (better) oldgain += redist_factor * vsize;
-            if (worse) oldgain -= redist_factor * vsize;
-
-            for (j=k+1; j<tmp_rinfo[i].ndegrees; j++) {
-              to = my_edegrees[j].edge;
-              if (ProperSide(c, pperm[from], pperm[to])) {
-                /**************************/
-                /**************************/
-                switch (ctrl->ps_relation) {
-                  case COUPLED:
-                    better = (to == mype) ? 1 : 0;
-                    break;
-                  case DISCOUPLED:
-                  default:
-                    better = (to == graph->home[i]) ? 1 : 0;
-                    break;
-                }
-                /**************************/
-                /**************************/
-
-                gain = ipc_factor * (float)(my_edegrees[j].ewgt-tmp_rinfo[i].id);
-                if (better) gain += redist_factor * vsize;
-                if (worse) gain -= redist_factor * vsize;
-
-                for (h=0; h<ncon; h++)
-                  if (gnpwgts[to*ncon+h]+nvwgt[h] > badmaxpwgt[to*ncon+h] && nvwgt[h] > 0.0)
-                    break;
-
-                if (h == ncon) {
-                  if (gain > oldgain ||
-                   (fabs(gain-oldgain) < SMALLFLOAT &&
-                   IsHBalanceBetterTT(ncon,gnpwgts+oldto*ncon,gnpwgts+to*ncon,nvwgt,ubvec))){
-                    oldgain = gain;
-                    oldto = to;
-                    k = j;
-                  }
-                }
-              }
+            tmp_rinfo[i].ed += tmp_rinfo[i].id-my_edegrees[k].ewgt;
+            SWAP(tmp_rinfo[i].id, my_edegrees[k].ewgt, j);
+            if (my_edegrees[k].ewgt == 0) {
+              tmp_rinfo[i].ndegrees--;
+              my_edegrees[k].edge = my_edegrees[tmp_rinfo[i].ndegrees].edge;
+              my_edegrees[k].ewgt = my_edegrees[tmp_rinfo[i].ndegrees].ewgt;
             }
-            to = oldto;
-            gain = oldgain;
+            else {
+              my_edegrees[k].edge = from;
+            }
 
-            if (gain > 0.0 ||  
-            (gain > -1.0*SMALLFLOAT &&
-            (imbalanced ||  graph->level > 3  || iii % 8 == 0) &&
-            IsHBalanceBetterFT(ncon,gnpwgts+from*ncon,gnpwgts+to*ncon,nvwgt,ubvec))){
+            /* Update the degrees of adjacent vertices */
+            for (j=xadj[i]; j<xadj[i+1]; j++) {
+              /* no need to bother about vertices on different pe's */
+              if (ladjncy[j] >= nvtxs)
+                continue;
 
-              /****************************************/
-              /* Update tmp arrays of the moved vertex */
-              /****************************************/
-              tmp_where[i] = to;
-              moved[nmoved++] = i;
-              for (h=0; h<ncon; h++) {
-                lnpwgts[to*ncon+h] += nvwgt[h];
-                lnpwgts[from*ncon+h] -= nvwgt[h];
-                gnpwgts[to*ncon+h] += nvwgt[h];
-                gnpwgts[from*ncon+h] -= nvwgt[h];
-                movewgts[to*ncon+h] += nvwgt[h];
-                movewgts[from*ncon+h] -= nvwgt[h];
-              }
+              me = ladjncy[j];
+              mydomain = tmp_where[me];
 
-              tmp_rinfo[i].ed += tmp_rinfo[i].id-my_edegrees[k].ewgt;
-              SWAP(tmp_rinfo[i].id, my_edegrees[k].ewgt, j);
-              if (my_edegrees[k].ewgt == 0) {
-                tmp_rinfo[i].ndegrees--;
-                my_edegrees[k].edge = my_edegrees[tmp_rinfo[i].ndegrees].edge;
-                my_edegrees[k].ewgt = my_edegrees[tmp_rinfo[i].ndegrees].ewgt;
+              myrinfo = tmp_rinfo+me;
+              your_edegrees = myrinfo->degrees;
+
+              if (mydomain == from) {
+                INC_DEC(myrinfo->ed, myrinfo->id, adjwgt[j]);
               }
               else {
-                my_edegrees[k].edge = from;
+                if (mydomain == to) {
+                  INC_DEC(myrinfo->id, myrinfo->ed, adjwgt[j]);
+                }
               }
 
-              /* Update the degrees of adjacent vertices */
-              for (j=xadj[i]; j<xadj[i+1]; j++) {
-                /* no need to bother about vertices on different pe's */
-                if (ladjncy[j] >= nvtxs)
-                  continue;
-
-                me = ladjncy[j];
-                mydomain = tmp_where[me];
-
-                myrinfo = tmp_rinfo+me;
-                your_edegrees = myrinfo->degrees;
-
-                if (mydomain == from) {
-                  INC_DEC(myrinfo->ed, myrinfo->id, adjwgt[j]);
-                }
-                else {
-                  if (mydomain == to) {
-                    INC_DEC(myrinfo->id, myrinfo->ed, adjwgt[j]);
-                  }
-                }
-
-                /* Remove contribution from the .ed of 'from' */
-                if (mydomain != from) {
-                  for (k=0; k<myrinfo->ndegrees; k++) {
-                    if (your_edegrees[k].edge == from) {
-                      if (your_edegrees[k].ewgt == adjwgt[j]) {
-                        myrinfo->ndegrees--;
-                        your_edegrees[k].edge = your_edegrees[myrinfo->ndegrees].edge;
-                        your_edegrees[k].ewgt = your_edegrees[myrinfo->ndegrees].ewgt;
-                      }
-                      else {
-                        your_edegrees[k].ewgt -= adjwgt[j];
-                      }
-                      break;
+              /* Remove contribution from the .ed of 'from' */
+              if (mydomain != from) {
+                for (k=0; k<myrinfo->ndegrees; k++) {
+                  if (your_edegrees[k].edge == from) {
+                    if (your_edegrees[k].ewgt == adjwgt[j]) {
+                      myrinfo->ndegrees--;
+                      your_edegrees[k].edge = your_edegrees[myrinfo->ndegrees].edge;
+                      your_edegrees[k].ewgt = your_edegrees[myrinfo->ndegrees].ewgt;
                     }
+                    else {
+                      your_edegrees[k].ewgt -= adjwgt[j];
+                    }
+                    break;
                   }
                 }
+              }
 
-                /* Add contribution to the .ed of 'to' */
-                if (mydomain != to) {
-                  for (k=0; k<myrinfo->ndegrees; k++) {
-                    if (your_edegrees[k].edge == to) {
-                      your_edegrees[k].ewgt += adjwgt[j];
-                      break;
-                    }
+              /* Add contribution to the .ed of 'to' */
+              if (mydomain != to) {
+                for (k=0; k<myrinfo->ndegrees; k++) {
+                  if (your_edegrees[k].edge == to) {
+                    your_edegrees[k].ewgt += adjwgt[j];
+                    break;
                   }
-                  if (k == myrinfo->ndegrees) {
-                    your_edegrees[myrinfo->ndegrees].edge = to;
-                    your_edegrees[myrinfo->ndegrees++].ewgt = adjwgt[j];
-                  }
+                }
+                if (k == myrinfo->ndegrees) {
+                  your_edegrees[myrinfo->ndegrees].edge = to;
+                  your_edegrees[myrinfo->ndegrees++].ewgt = adjwgt[j];
                 }
               }
             }
@@ -349,8 +345,7 @@ void Moc_KWayAdaptiveRefine(CtrlType *ctrl, GraphType *graph, WorkSpaceType *wsp
       /* Let processors know the subdomain wgts */
       /* if all proposed moves commit.          */
       /******************************************/
-      MPI_Allreduce((void *)lnpwgts, (void *)pgnpwgts, nparts*ncon,
-      MPI_FLOAT, MPI_SUM, ctrl->comm);
+      MPI_Allreduce((void *)lnpwgts, (void *)pgnpwgts, nparts*ncon, MPI_FLOAT, MPI_SUM, ctrl->comm);
 
       /**************************/
       /* compute overfill array */
@@ -358,14 +353,10 @@ void Moc_KWayAdaptiveRefine(CtrlType *ctrl, GraphType *graph, WorkSpaceType *wsp
       overweight = 0;
       for (j=0; j<nparts; j++) {
         for (h=0; h<ncon; h++) {
-          if (pgnpwgts[j*ncon+h] > ognpwgts[j*ncon+h]) {
-            overfill[j*ncon+h] =
-            (pgnpwgts[j*ncon+h]-badmaxpwgt[j*ncon+h]) /
-            (pgnpwgts[j*ncon+h]-ognpwgts[j*ncon+h]);
-          }
-          else {
+          if (pgnpwgts[j*ncon+h] > ognpwgts[j*ncon+h]) 
+            overfill[j*ncon+h] = (pgnpwgts[j*ncon+h]-badmaxpwgt[j*ncon+h]) / (pgnpwgts[j*ncon+h]-ognpwgts[j*ncon+h]);
+          else 
             overfill[j*ncon+h] = 0.0;
-          }
 
           overfill[j*ncon+h] = amax(overfill[j*ncon+h], 0.0);
           overfill[j*ncon+h] *= movewgts[j*ncon+h];
@@ -373,10 +364,8 @@ void Moc_KWayAdaptiveRefine(CtrlType *ctrl, GraphType *graph, WorkSpaceType *wsp
           if (overfill[j*ncon+h] > 0.0)
             overweight = 1;
 
-          ASSERTP(ctrl, ognpwgts[j*ncon+h] <= badmaxpwgt[j*ncon+h] ||
-          pgnpwgts[j*ncon+h] <= ognpwgts[j*ncon+h],
-          (ctrl, "%.4f %.4f %.4f\n", ognpwgts[j*ncon+h],
-          badmaxpwgt[j*ncon+h], pgnpwgts[j*ncon+h]));
+          ASSERTP(ctrl, ognpwgts[j*ncon+h] <= badmaxpwgt[j*ncon+h] || pgnpwgts[j*ncon+h] <= ognpwgts[j*ncon+h],
+                  (ctrl, "%.4f %.4f %.4f\n", ognpwgts[j*ncon+h], badmaxpwgt[j*ncon+h], pgnpwgts[j*ncon+h]));
         }
       }
 
@@ -406,9 +395,8 @@ void Moc_KWayAdaptiveRefine(CtrlType *ctrl, GraphType *graph, WorkSpaceType *wsp
             from = oldto;
             to = where[i];
 
-            for (h=0; h<ncon; h++) {
+            for (h=0; h<ncon; h++) 
               overfill[oldto*ncon+h] = amax(overfill[oldto*ncon+h]-nvwgt[h], 0.0);
-            }
 
             tmp_where[i] = to;
             tmp_rinfo[i].ed += tmp_rinfo[i].id-my_edegrees[k].ewgt;
@@ -422,10 +410,8 @@ void Moc_KWayAdaptiveRefine(CtrlType *ctrl, GraphType *graph, WorkSpaceType *wsp
               my_edegrees[k].edge = from;
             }
 
-            for (h=0; h<ncon; h++) {
-              lnpwgts[to*ncon+h] += nvwgt[h];
-              lnpwgts[from*ncon+h] -= nvwgt[h];
-            }
+            for (h=0; h<ncon; h++) 
+	      INC_DEC(lnpwgts[to*ncon+h], lnpwgts[from*ncon+h], nvwgt[h]);
 
             /* Update the degrees of adjacent vertices */
             for (j=xadj[i]; j<xadj[i+1]; j++) {
@@ -492,7 +478,7 @@ void Moc_KWayAdaptiveRefine(CtrlType *ctrl, GraphType *graph, WorkSpaceType *wsp
         if (i == -1)
           continue;
 
-        where[i] = tmp_where[i];
+        where[i] = tmp_where[i]; 
 
         /* Make sure to update the vertex information */
         if (htable[i] == 0) {
@@ -513,40 +499,25 @@ void Moc_KWayAdaptiveRefine(CtrlType *ctrl, GraphType *graph, WorkSpaceType *wsp
           }
         }
         nmoves++;
-        nswaps++;
-
-        /* check number of zero-gain moves */
-        for (k=0; k<rinfo[i].ndegrees; k++)
-          if (rinfo[i].degrees[k].edge == to)
-            break;
-        if (rinfo[i].id == rinfo[i].degrees[k].ewgt)
-          nzgswaps++;
 
         if (graph->pexadj[i+1]-graph->pexadj[i] > 0)
           changed[nchanged++] = i;
       }
 
       /* Tell interested pe's the new where[] info for the interface vertices */
-      CommChangedInterfaceData(ctrl, graph, nchanged, changed, where,
-      swchanges, rwchanges, wspace->pv4); 
+      CommChangedInterfaceData(ctrl, graph, nchanged, changed, where, swchanges, rwchanges, wspace->pv4); 
 
 
-      IFSET(ctrl->dbglvl, DBG_RMOVEINFO,
-      rprintf(ctrl, "\t[%d %d], [%.4f],  [%d %d %d]\n",
-      pass, c, badmaxpwgt[0],
-      GlobalSESum(ctrl, nmoves),
-      GlobalSESum(ctrl, nsupd),
-      GlobalSESum(ctrl, nlupd)));
+      IFSET(ctrl->dbglvl, DBG_RMOVEINFO, rprintf(ctrl, "\t[%d %d], [%.4f],  [%d %d %d]\n",
+            pass, c, badmaxpwgt[0], GlobalSESum(ctrl, nmoves), GlobalSESum(ctrl, nsupd), GlobalSESum(ctrl, nlupd)));
 
       /*-------------------------------------------------------------
       / Time to communicate with processors to send the vertices
       / whose degrees need to be update.
       /-------------------------------------------------------------*/
       /* Issue the receives first */
-      for (i=0; i<nnbrs; i++) {
-        MPI_Irecv((void *)(rupdate+sendptr[i]), sendptr[i+1]-sendptr[i], IDX_DATATYPE,
-                  peind[i], 1, ctrl->comm, ctrl->rreq+i);
-      }
+      for (i=0; i<nnbrs; i++) 
+        MPI_Irecv((void *)(rupdate+sendptr[i]), sendptr[i+1]-sendptr[i], IDX_DATATYPE, peind[i], 1, ctrl->comm, ctrl->rreq+i);
 
       /* Issue the sends next. This needs some preporcessing */
       for (i=0; i<nsupd; i++) {
@@ -639,21 +610,13 @@ void Moc_KWayAdaptiveRefine(CtrlType *ctrl, GraphType *graph, WorkSpaceType *wsp
       }
 
       /* finally, sum-up the partition weights */
-      MPI_Allreduce((void *)lnpwgts, (void *)gnpwgts, nparts*ncon,
-      MPI_FLOAT, MPI_SUM, ctrl->comm);
+      MPI_Allreduce((void *)lnpwgts, (void *)gnpwgts, nparts*ncon, MPI_FLOAT, MPI_SUM, ctrl->comm);
     }
     graph->mincut = GlobalSESum(ctrl, graph->lmincut)/2;
 
     if (graph->mincut == oldcut)
       break;
   }
-
-/*
-  gnswaps = GlobalSESum(ctrl, nswaps);
-  gnzgswaps = GlobalSESum(ctrl, nzgswaps);
-  if (mype == 0)
-    printf("niters: %d, nswaps: %d, nzgswaps: %d\n", pass+1, gnswaps, gnzgswaps);
-*/
 
   GKfree((void **)&badmaxpwgt, (void **)&update, (void **)&nupds_pe, (void **)&htable, LTERM);
   GKfree((void **)&changed, (void **)&pperm, (void **)&perm, (void **)&moved, LTERM);

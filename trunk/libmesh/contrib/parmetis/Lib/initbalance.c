@@ -8,10 +8,10 @@
  * Started 3/4/96
  * George
  *
- * $Id: initbalance.c,v 1.1 2003-06-24 05:33:51 benkirk Exp $
+ * $Id: initbalance.c,v 1.2 2004-03-08 04:58:31 benkirk Exp $
  */
 
-#include <parmetis.h>
+#include <parmetislib.h>
 
 
 /*************************************************************************
@@ -169,14 +169,14 @@ void Balance_Partition(CtrlType *ctrl, GraphType *graph, WorkSpaceType *wspace)
 
 
       if (agraph->ncon == 1) {
-        METIS_WPartGraphKway2(&agraph->nvtxs, agraph->xadj, agraph->adjncy,
-        agraph->vwgt, agraph->adjwgt, &wgtflag, &numflag, &twoparts, mytpwgts2,
-        moptions, &edgecut, part);
+        METIS_WPartGraphKway2(&agraph->nvtxs, agraph->xadj, agraph->adjncy, agraph->vwgt, 
+	      agraph->adjwgt, &wgtflag, &numflag, &twoparts, mytpwgts2, moptions, &edgecut, 
+	      part);
       }
       else {
-        METIS_mCPartGraphRecursive2(&agraph->nvtxs, &ncon, agraph->xadj,
-        agraph->adjncy, agraph->vwgt, agraph->adjwgt, &wgtflag, &numflag,
-        &twoparts, mytpwgts2, moptions, &edgecut, part);
+        METIS_mCPartGraphRecursive2(&agraph->nvtxs, &ncon, agraph->xadj, agraph->adjncy, 
+	      agraph->vwgt, agraph->adjwgt, &wgtflag, &numflag, &twoparts, mytpwgts2, 
+	      moptions, &edgecut, part);
       }
 
       wsum = ssum(lnparts/2, mytpwgts+fpart);
@@ -209,13 +209,13 @@ void Balance_Partition(CtrlType *ctrl, GraphType *graph, WorkSpaceType *wspace)
     /* In case srnpes is smaller than nparts */
     else {
       if (ncon == 1)
-        METIS_WPartGraphKway2(&agraph->nvtxs, agraph->xadj, agraph->adjncy,
-          agraph->vwgt, agraph->adjwgt, &wgtflag, &numflag, &lnparts, mytpwgts+fpart,
-          moptions, &edgecut, part);
+        METIS_WPartGraphKway2(&agraph->nvtxs, agraph->xadj, agraph->adjncy, agraph->vwgt, 
+	      agraph->adjwgt, &wgtflag, &numflag, &lnparts, mytpwgts+fpart, moptions, 
+	      &edgecut, part);
       else
-        METIS_mCPartGraphRecursive2(&agraph->nvtxs, &ncon, agraph->xadj,
-           agraph->adjncy, agraph->vwgt, agraph->adjwgt, &wgtflag, &numflag,
-           &lnparts, mytpwgts+fpart, moptions, &edgecut, part);
+        METIS_mCPartGraphRecursive2(&agraph->nvtxs, &ncon, agraph->xadj, agraph->adjncy, 
+	      agraph->vwgt, agraph->adjwgt, &wgtflag, &numflag, &lnparts, mytpwgts+fpart, 
+	      moptions, &edgecut, part);
 
       for (i=0; i<agraph->nvtxs; i++) 
         lwhere[agraph->label[i]] = fpart + part[i];
@@ -373,17 +373,17 @@ GraphType *Moc_AssembleAdaptiveGraph(CtrlType *ctrl, GraphType *graph, WorkSpace
   float *anvwgt;
   GraphType *agraph;
 
-  gnvtxs = graph->gnvtxs;
-  nvtxs = graph->nvtxs;
-  ncon = graph->ncon;
-  nedges = graph->xadj[nvtxs];
-  xadj = graph->xadj;
-  vwgt = graph->vwgt;
-  vsize = graph->vsize;
-  adjncy = graph->adjncy;
-  adjwgt = graph->adjwgt;
+  gnvtxs  = graph->gnvtxs;
+  nvtxs   = graph->nvtxs;
+  ncon    = graph->ncon;
+  nedges  = graph->xadj[nvtxs];
+  xadj    = graph->xadj;
+  vwgt    = graph->vwgt;
+  vsize   = graph->vsize;
+  adjncy  = graph->adjncy;
+  adjwgt  = graph->adjwgt;
   vtxdist = graph->vtxdist;
-  imap = graph->imap;
+  imap    = graph->imap;
 
   /*************************************************************/
   /* Determine the # of idxtype to receive from each processor */
