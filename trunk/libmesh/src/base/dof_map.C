@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.64 2004-09-30 19:40:08 benkirk Exp $
+// $Id: dof_map.C,v 1.65 2004-11-02 00:38:09 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -227,8 +227,14 @@ void DofMap::clear()
 
 
 
+void DofMap::distribute_dofs (MeshBase& mesh)
+{
+  this->distribute_dofs_var_major (mesh);
+}
 
-void DofMap::distribute_dofs(MeshBase& mesh)
+
+
+void DofMap::distribute_dofs_var_major (MeshBase& mesh)
 {
   assert (mesh.is_prepared());
   
@@ -330,6 +336,161 @@ void DofMap::distribute_dofs(MeshBase& mesh)
       _last_df[processor] = (next_free_dof-1);
     }
 
+  // Set the total number of degrees of freedom
+  _n_dfs = next_free_dof;
+  //-------------------------------------------------------------------------
+
+  
+
+  //-------------------------------------------------------------------------
+  // The _send_list now only contains entries from the local processor.
+  // We need to add the DOFs from elements that live on neighboring processors
+  // that are neighbors of the elements on the local processor
+  // (for discontinuous elements)
+  {
+    const_active_local_elem_iterator       elem_it (mesh.const_elements_begin());
+    const const_active_local_elem_iterator elem_end(mesh.const_elements_end());
+
+    std::vector<unsigned int> di;
+
+    // Loop over the active local elements
+    for ( ; elem_it != elem_end; ++elem_it)
+      {
+	const Elem* elem = *elem_it;
+
+	// Loop over the neighbors of those elements
+	for (unsigned int s=0; s<elem->n_neighbors(); s++)
+	  if (elem->neighbor(s) != NULL)
+	    
+	    // If the neighbor lives on a different processor
+	    if (elem->neighbor(s)->processor_id() != libMesh::processor_id())
+	      {
+		// Get the DOF indices for this neighboring element
+		this->dof_indices (elem->neighbor(s), di);
+
+		// Insert the DOF indices into the send list
+		_send_list.insert (_send_list.end(),
+				   di.begin(), di.end());
+	      }
+      }
+  }
+  //-------------------------------------------------------------------------
+
+
+  
+  // Note that in the code above nodes on processor boundaries
+  // that are shared by multiple elements are added for each element.
+  // Here we need to clean up that data structure
+  this->sort_send_list ();
+
+  // All done. Stop logging.
+  STOP_LOG("distribute_dofs()", "DofMap");    
+}
+
+
+
+
+void DofMap::distribute_dofs_node_major (MeshBase& mesh)
+{
+  assert (mesh.is_prepared());
+  
+  const unsigned int proc_id = libMesh::processor_id();
+  const unsigned int n_proc  = libMesh::n_processors();
+  const unsigned int sys_num = this->sys_number();
+  const unsigned int n_vars  = this->n_variables();
+  
+  assert (n_vars > 0);
+  assert (proc_id < n_proc);
+  
+  // re-init in case the mesh has changed
+  this->reinit(mesh);
+
+  // Log how long it takes to distribute the degrees of freedom
+  START_LOG("distribute_dofs()", "DofMap");
+
+  // The DOF counter, will be incremented as we encounter
+  // new degrees of freedom
+  unsigned int next_free_dof = 0;
+
+  // Resize the _first_df and _last_df arrays, fill with 0.
+  _first_df.resize(n_proc); std::fill(_first_df.begin(), _first_df.end(), 0);
+  _last_df.resize (n_proc); std::fill(_last_df.begin(),  _last_df.end(),  0);
+
+  _send_list.clear();
+  
+  //-------------------------------------------------------------------------
+  // DOF numbering
+  for (unsigned int processor=0; processor<n_proc; processor++)
+    {
+      _first_df[processor] = next_free_dof;
+      
+      // Only number dofs connected to active
+      // elements for the current processor.	      
+      active_pid_elem_iterator       elem_it (mesh.elements_begin(),
+					      processor);
+      const active_pid_elem_iterator elem_end(mesh.elements_end(),
+					      processor);
+	
+      for ( ; elem_it != elem_end; ++elem_it)
+	{
+	  Elem* elem                 = *elem_it;
+	  const unsigned int n_nodes = elem->n_nodes();
+	  
+	  // First number the nodal DOFS
+	  for (unsigned int n=0; n<n_nodes; n++)
+	    {
+	      Node* node = elem->get_node(n);
+	      
+	      for (unsigned var=0; var<n_vars; var++)
+		for (unsigned int index=0; index<node->n_comp(sys_num,var);
+		     index++)
+		  {  
+		    // only assign a dof number if there isn't one
+		    // already there
+		    if (node->dof_number(sys_num,var,index) ==
+			DofObject::invalid_id)
+		      {
+			node->set_dof_number(sys_num,
+					     var,
+					     index,
+					     next_free_dof++);
+			
+			// If this DOF is used by the local processor add it
+			// to the _send_list
+			if (processor == proc_id)
+			  _send_list.push_back(node->dof_number(sys_num,
+								var,
+								index));
+		      }
+		  }
+	    }
+	    
+	  // Now number the element DOFS
+	  for (unsigned var=0; var<n_vars; var++)
+	    for (unsigned int index=0; index<elem->n_comp(sys_num,var);
+		 index++)
+	      {		  
+		// No way we could have already numbered this DOF!
+		assert (elem->dof_number(sys_num,var,index) ==
+			DofObject::invalid_id);
+		
+		elem->set_dof_number(sys_num,
+				     var,
+				     index,
+				     next_free_dof++);
+		
+		// If this DOF is on the local processor add it
+		// to the _send_list
+		if (processor == proc_id)
+		  _send_list.push_back(elem->dof_number(sys_num,
+							var,
+							index));
+	      }
+	}
+      
+      _last_df[processor] = (next_free_dof-1);
+    }
+  
   // Set the total number of degrees of freedom
   _n_dfs = next_free_dof;
   //-------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.3 2004-03-21 03:19:25 benkirk Exp $
+// $Id: dof_map.h,v 1.4 2004-11-02 00:37:59 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -91,7 +91,7 @@ public:
    * processor \p proc_id, which defaults to 0 for ease of use in serial
    * applications. 
    */
-  void distribute_dofs(MeshBase&);
+  void distribute_dofs (MeshBase&);
 
   /**
    * Computes the sparsity pattern for the matrix corresponding
@@ -332,12 +332,30 @@ public:
   
 private:
 
-
+  
   /**
    * @returns the number of the system we are responsible for.
    */
   unsigned int sys_number() const;
-    
+  
+  /**
+   * Distributes the global degrees of freedom in a 
+   * variable-major ordering.  In this format the local
+   * degrees of freedom are in a contiguous block for each
+   * variable in the system.
+   */  
+  void distribute_dofs_var_major (MeshBase&);
+  
+  /**
+   * Distributes the global degrees of freedom in a 
+   * node/element-major ordering.  In this format all the 
+   * degrees of freedom at a node/element are in contiguous 
+   * blocks.  Note in particular that the degrees of freedom
+   * for a given variable are not in contiguous blocks, as 
+   * in the case of \p distribute_dofs_var_major.
+   */  
+  void distribute_dofs_node_major (MeshBase&);
+
   /**
    * Takes the \p _send_list vector (which may have duplicate entries)
    * and sorts it.  The duplicate entries are then removed, resulting in
