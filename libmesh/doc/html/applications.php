@@ -11,7 +11,7 @@
 <?php make_navigation("applications",$root)?>
 
 <div class="content">
-<h1>This is the starting point for applications</h1>
+<h2>Here you will find presentations, organized by application area, that use libMesh</h2>
 <ul>
   <li>    Foo </li>
   <li>    Bar </li>
@@ -20,7 +20,6 @@
 <h2>Natural Convection</h2>
 <ul>
   <li> <a href="http://cfdlab.ae.utexas.edu/~benkirk/adv_flows_project.pdf">Ben's Adavnced Flows Class Project</a> </li>
-  <li> Bar </li>
 </ul>
 
 <h2>Sub-Heading 2 </h2>
@@ -40,3 +39,10 @@
 
 </body>
 </html>
+
+
+<?php if (0) { ?>
+# Local Variables:
+# mode: html
+# End:
+<?php } ?>
