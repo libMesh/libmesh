@@ -1,4 +1,4 @@
-// $Id: mesh_generation.h,v 1.1 2004-11-15 22:09:12 benkirk Exp $
+// $Id: mesh_generation.h,v 1.2 2004-12-02 18:18:56 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -35,19 +35,17 @@ class Mesh;
 
 
 
-/**
- * Tools for \p Mesh generation.
- *
- * \author Benjamin S. Kirk
- * \date 2004
- * \version $Revision: 1.1 $
- */
-
-
 // ------------------------------------------------------------
 // MeshTools::Generation namespace
 namespace MeshTools
 {
+  /**
+   * Tools for \p Mesh generation.
+   *
+   * \author Benjamin S. Kirk
+   * \date 2004
+   * \version $Revision: 1.2 $
+   */
   namespace Generation
   {
     /**

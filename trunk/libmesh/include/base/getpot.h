@@ -1,4 +1,4 @@
-// $Id: getpot.h,v 1.5 2004-11-23 02:11:12 benkirk Exp $
+// $Id: getpot.h,v 1.6 2004-12-02 18:18:54 benkirk Exp $
 //
 // (with patches from Michael Anderson for more general variable types)
 
@@ -1569,7 +1569,7 @@ GetPot::__DBE_expand(const std::string& expr)
     std::vector<std::string>::const_iterator it = A.begin();
     double result = __convert_to_type(*it++, 0.0);
     if( result == 0 ) return "0.0";
-    for(it++; it != A.end(); it++) {
+    for(; it != A.end(); it++) {
       const double Q = __convert_to_type(*it, 0.0);
       if( Q == 0.0 ) return "0.0";	    
       result /= Q;
