@@ -1,4 +1,4 @@
-// $Id: mesh_data.h,v 1.20 2003-09-02 18:02:38 benkirk Exp $
+// $Id: mesh_data.h,v 1.21 2003-09-09 14:11:56 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -47,6 +47,8 @@ class BoundaryInfo;
 
 
 
+
+
 /**
  * Yet another Mesh-something class...  What's this good for: 
  * \p MeshData handles actual data and the corresponding I/O
@@ -67,6 +69,31 @@ class MeshData
 {
 public:
 
+
+  //----------------------------------------------------------
+  // convenient typedefs
+  /**
+   * A const iterator over the nodal data entries of
+   * \p MeshData.  Use this when a loop over all \p Node*
+   * in the \p MeshData is wanted.  Note that only const versions 
+   * are provided.  Also these iterators should @e not be 
+   * confused with the \p node_iterators provided
+   * for the \p Mesh classes!
+   */
+  typedef std::map<const Node*, std::vector<Number> >::const_iterator const_node_data_iterator;
+
+  /**
+   * A const iterator over the element-associated data entries of
+   * \p MeshData.  Use this when a loop over all \p Node*
+   * in the \p MeshData is wanted.  Note that only const versions 
+   * are provided.  Also these iterators should @e not be 
+   * confused with the \p node_iterators provided
+   * for the \p Mesh classes!
+   */
+  typedef std::map<const Elem*, std::vector<Number> >::const_iterator const_elem_data_iterator;
+
+
+  //----------------------------------------------------------
   /**
    * Default Constructor.  Takes const reference
    * to the mesh it belongs to.
@@ -201,6 +228,19 @@ public:
   unsigned int n_node_data () const;
 
   /**
+   * Returns the \p MeshData::const_node_data_iterator which points
+   * to the beginning of the \p Node* data containers
+   * used here.
+   */
+  const_node_data_iterator node_data_begin () const;
+
+  /**
+   * Returns the \p MeshData::const_node_data_iterator which points
+   * to the end of the \p Node* data containers used here.
+   */
+  const_node_data_iterator node_data_end () const;
+
+  /**
    * For the desperate user, nodal boundary conditions 
    * may be inserted directly through the map \p nd.
    * It is mandatory that there does not yet exist any
@@ -258,6 +298,19 @@ public:
    * \p MeshData has data stored.
    */
   unsigned int n_elem_data () const;
+
+  /**
+   * Returns a \p MeshData::const_elem_data_iterators which points
+   * to the beginning of the \p Elem* data containers
+   * used here.
+   */
+  const_elem_data_iterator elem_data_begin () const;
+
+  /**
+   * Returns a \p MeshData::const_elem_data_iterators which points
+   * to the end of the \p Elem* data containers used here.
+   */
+  const_elem_data_iterator elem_data_end () const;
 
   /**
    * For the desperate user, element-associated boundary 
@@ -759,6 +812,9 @@ private:
 
 // ------------------------------------------------------------
 // MeshData inline methods
+
+//-------------------------------------------------------------
+// element data inline methods
 inline
 Number MeshData::operator() (const Node* node, 
 			     const unsigned int i) const
@@ -816,6 +872,24 @@ const std::vector<Number>& MeshData::get_data (const Node* node) const
 
 
 inline
+MeshData::const_node_data_iterator MeshData::node_data_begin () const
+{
+  return _node_data.begin();
+}
+
+
+
+inline
+MeshData::const_node_data_iterator MeshData::node_data_end () const
+{
+  return _node_data.end();
+}
+
+
+
+//-------------------------------------------------------------
+// element data inline methods
+inline
 Number MeshData::operator() (const Elem* elem, 
 			     const unsigned int i) const
 {
@@ -871,6 +945,24 @@ const std::vector<Number>& MeshData::get_data (const Elem* elem) const
 
 
 
+inline
+MeshData::const_elem_data_iterator MeshData::elem_data_begin () const
+{
+  return _elem_data.begin();
+}
+
+
+
+inline
+MeshData::const_elem_data_iterator MeshData::elem_data_end () const
+{
+  return _elem_data.end();
+}
+
+
+
+//-------------------------------------------------------------
+// other inline methods
 inline
 bool MeshData::active() const
 {

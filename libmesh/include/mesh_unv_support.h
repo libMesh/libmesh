@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.h,v 1.13 2003-09-02 18:02:38 benkirk Exp $
+// $Id: mesh_unv_support.h,v 1.14 2003-09-09 14:11:56 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,7 @@
 // C++ includes
 #include <fstream>
 #include <vector>
-#include <set>
+#include <map>
 
 
 
@@ -42,7 +42,7 @@ class MeshData;
  * for reading a mesh (datasets 2411 and 2412)
  * from a file in I-deas Universal file format.
  *
- * @author: Tammo Kaschner
+ * @author: Tammo Kaschner, Daniel Dreyer
  */
 class UnvMeshInterface
 {
@@ -53,25 +53,25 @@ public:
    * for reading/writing mesh or reading data.
    * Note that for simplicity, the node and element
    * vectors have to be readable even when only
-   * read access is needed.
+   * read access is needed.  Optionally produces
+   * some babble on \p std::cout with \p be_verbose.
    */
   UnvMeshInterface(std::vector<Node*>& nodes,
 		   std::vector<Elem*>& elements,
-		   MeshData& md);
+		   MeshData& md,
+		   const bool be_verbose=false);
 
   /**
    * Reads a mesh (nodes & elements) from the file
-   * provided through \p in_stream, gives progress 
-   * reports if desired using \p verbose.
+   * named \p file_name.
    */
-  void read (std::istream& in_stream,
-	     const bool verbose = false);
+  void read (const std::string& file_name);
 
   /**
    * Writes a mesh (nodes & elements) to the file
-   * provided through \p out_stream.
+   * named \p file_name.
    */
-  void write (std::ostream& out_stream);
+  void write (const std::string& file_name);
   
   /**
    * Destructor.
@@ -80,46 +80,63 @@ public:
 
 protected:
 
+  /**
+   * Clears the data structures to a pristine
+   * state.
+   */
+  void clear();
+
 
   //-------------------------------------------------------------
   // read support methods
   /**
-   * When reading, the node related data is
-   * buffered in a temporary file prior to the actual
-   * read process.  This helps e.g. in counting nodes
-   * beforehand for pre-allocation.
+   * When reading, counting the nodes first
+   * helps pre-allocation.  Also determine
+   * whether we need to convert from "D" to "e".
    */
-  void buffer_nodes (std::istream& physical_file,
-		     std::fstream& temp_file);
+  void count_nodes (std::istream& in_file);
   
   /**
-   * Method reads nodes from \p tempfile and stores them in
+   * Method reads nodes from \p in_file and stores them in
    * vector<Node*> \p nodes in the order they come in.
-   * The original node labels are being stored in the
-   * map \p _assign_nodes in order to assign the elements to
-   * the right nodes later.  In addition, provided it is 
+   * The original node labels are being stored in
+   * \p _assign_nodes in order to assign the elements to
+   * the correct nodes later.  In addition, provided it is 
    * active, the \p MeshData gets to know the node id from
    * the Universal file, too.
    */
-  void node_in(std::fstream& temp_file);
+  void node_in(std::istream& in_file);
 
   /**
-   * When reading, the element related data is
-   * buffered in a temporary file prior to the actual
-   * read process.  This helps e.g. in counting elements
-   * beforehand for pre-allocation.
+   * When reading, counting the elements first
+   * helps pre-allocation.
    */
-  void buffer_elements (std::istream& physical_file,
-			std::fstream& temp_file);
+  void count_elements (std::istream& in_file);
 
   /**
    * Method reads elements and stores them in
-   * vector<Elem*> \p elements in the same order as they
+   * \p std::vector<Elem*> \p _elements in the same order as they
    * come in. Within \p UnvMeshInterface, element labels are
    * ignored, but \p MeshData takes care of such things
    * (if active).
    */
-  void element_in(std::fstream& temp_file);
+  void element_in(std::istream& in_file);
+
+  /**
+   * @returns \p false when error occured, \p true otherwise.
+   * Adjusts the \p in_stream to the beginning of the
+   * dataset \p ds_name.
+   */
+  bool beginning_of_dataset(std::istream& in_file, 
+			    const std::string& ds_name) const;
+
+  /**
+   * Method for converting exponential notation
+   * from "D" to "e", for example
+   * \p 3.141592654D+00 \p --> \p 3.141592654e+00
+   * in order to make it readable for C++.
+   */
+  Real D_to_e(std::string& number) const;
 
 
   //-------------------------------------------------------------
@@ -142,57 +159,45 @@ protected:
 
 
   //-------------------------------------------------------------
-  // misc helpers
-  /**
-   * Method for setting the stream pointer
-   * to the position of the dataset with label
-   * \p ds_num in the temporary_file \p temp_file.
-   */
-  void set_stream_pointer(std::fstream& temp_file,
-			  const std::string& ds_num);
-
-  /**
-   * Method for converting exponential notation
-   * from "D" to "e", for example
-   * \p 3.141592654D+00 \p --> \p 3.141592654e+00
-   * in order to make it readable for C++.
-   */
-  std::string& D_to_e(std::string& number);
-
-
-  //-------------------------------------------------------------
   // local data
+
   /**
-   * vector holding the nodes.  Either used during writing
-   * or reading.
+   * should be be verbose?
+   */
+  const bool _verbose;
+
+  /**
+   * Reference to the mesh's vector holding the nodes
    */
   std::vector<Node*>& _nodes;    
 
   /**
-   * vector holding the elements.  Either used during writing
-   * or reading.
+   * Reference to the mesh's vector holding the elements
    */
   std::vector<Elem*>& _elements; 
 
   /**
-   * stores new positions of nodes.  Used when reading.
+   * maps node id's from UNV to internal.  Used when reading.
    */
-  std::map<unsigned int,unsigned int> _assign_nodes; 
+  std::map<unsigned int,unsigned int> _assign_nodes;
 
   /**
-   * stores positions of datasets in the stream.  Used when reading.
+   * stores positions of relevant datasets in the file, should
+   * help to re-read the data faster.  Used when reading.
    */
   std::map<std::string,std::streampos> _ds_position;
 
   /**
-   * total number of nodes.  Primarily used when reading.
+   * total number of nodes, determined through \p count_nodes().
+   * Primarily used when reading.
    */
-  unsigned int _num_nodes;
+  unsigned int _n_nodes;
 
   /**
-   * total number of elements.  Primarily used when reading.
+   * total number of elements, determined through 
+   * \p count_elements().  Primarily used when reading.
    */
-  unsigned int _num_elements;
+  unsigned int _n_elements;
 
   /**
    * writable reference to the class that
@@ -201,12 +206,12 @@ protected:
   MeshData& _mesh_data;
 
   /**
-   * labels for the node dataset
+   * label for the node dataset
    */
   static const std::string _label_dataset_nodes;
 
   /**
-   * labels for the element dataset
+   * label for the element dataset
    */
   static const std::string _label_dataset_elements;
 
@@ -217,6 +222,72 @@ protected:
   bool _need_D_to_e;
 
 };
+
+
+// ------------------------------------------------------------
+// UnvMeshInterface inline functions
+inline
+bool UnvMeshInterface::beginning_of_dataset(std::istream& in_file, 
+					    const std::string& ds_name) const
+{
+  assert (in_file.good());
+  assert (!ds_name.empty());
+
+  std::string olds, news;
+
+  while (true)
+    {
+      in_file >> olds >> news;
+
+      /*
+       * a "-1" followed by a number means the beginning of a dataset
+       * stop combing at the end of the file
+       */
+      while( ((olds != "-1") || (news == "-1") ) && !in_file.eof() )
+	{	  
+	  olds = news;
+	  in_file >> news;
+	}
+
+      if(in_file.eof())
+	  return false;
+
+      if (news == ds_name)
+	  return true;
+    }
+
+  // should never end up here
+  error();
+  return false;
+}
+
+
+
+
+inline
+Real UnvMeshInterface::D_to_e (std::string& number) const
+{
+  /* find "D" in string, start looking at 
+   * 6th element, to improve speed.
+   * We dont expect a "D" earlier
+   */
+
+#ifdef __HP_aCC
+  // Use an int instead of an unsigned int,
+  // otherwise HP aCC may crash!
+  const int position = number.find("D",6);
+#else
+  const unsigned int position = number.find("D",6);
+#endif
+
+  assert (position!=std::string::npos);
+  number.replace(position, 1, "e"); 
+
+  return atof (number.c_str());
+}
+
+
+
 
 #endif
 

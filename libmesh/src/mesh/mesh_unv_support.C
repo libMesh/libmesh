@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.C,v 1.22 2003-09-06 22:57:11 ddreyer Exp $
+// $Id: mesh_unv_support.C,v 1.23 2003-09-09 14:11:56 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -26,6 +26,7 @@
 // Local includes
 #include "mesh_unv_support.h"
 #include "mesh_data.h"
+// #include "elem.h"
 #include "face_quad4.h"
 #include "face_tri3.h"
 #include "face_tri6.h"
@@ -40,30 +41,24 @@
 // MeshBase methods
 void MeshBase::read_unv(const std::string& name)
 {
-  std::ifstream file (name.c_str());
-
   UnvMeshInterface unv_interface (_nodes,
 				  _elements,
-				  data);
+				  data,
+				  true);
 
-  unv_interface.read (file);
-
-  file.close();
+  unv_interface.read (name);
 }
 
 
 
 void MeshBase::write_unv(const std::string& name)
 {
-  std::ofstream file (name.c_str());
-
   UnvMeshInterface unv_interface (_nodes,
 				  _elements,
-				  data);
+				  data,
+				  true);
 
-  unv_interface.write (file);
-
-  file.close();
+  unv_interface.write (name);
 }
 
 
@@ -84,20 +79,21 @@ const std::string  UnvMeshInterface::_label_dataset_elements    = "2412";
 // UnvMeshInterface class members
 UnvMeshInterface::UnvMeshInterface (std::vector<Node*>& nodes,
 				    std::vector<Elem*>& elements,
-				    MeshData& md) :
+				    MeshData& md,
+				    const bool be_verbose) :
+  _verbose       (be_verbose),
   _nodes         (nodes),
   _elements      (elements),
+  _n_nodes       (0),
+  _n_elements    (0),
   _mesh_data     (md)
 {
-  /*
-   * Initialize these to dummy values
-   */
-  _num_nodes    = 0;
-  _num_elements = 0;
-  _need_D_to_e  = true;
+  // read/write only works in 2D/3D
+  assert (DIM > 1);
+  this->clear();
 
-  _assign_nodes.clear();
-  _ds_position.clear();
+  if (_verbose)
+      std::cout << std::endl << " Universal file Interface:" << std::endl;
 }
 
 
@@ -114,56 +110,79 @@ UnvMeshInterface::~UnvMeshInterface()
 
 
 
-
-
-
-
-void UnvMeshInterface::read (std::istream& in_stream,
-			     const bool verbose)
+void UnvMeshInterface::clear ()
 {
-  if ( !in_stream.good() )
-    {
-      std::cerr << "ERROR: Input file not good." 
-		<< std::endl;
-      error();
-    }
+  /*
+   * Initialize these to dummy values
+   */
+  this->_n_nodes     = 0;
+  this->_n_elements  = 0;
+  this->_need_D_to_e = true;
 
-  _num_nodes    = 0;
-  _num_elements = 0;
-  _need_D_to_e  = true;
+  this->_assign_nodes.clear();
+  this->_ds_position.clear();
+}
+
+
+
+
+
+void UnvMeshInterface::read (const std::string& file_name)
+{
+  /*
+   * clear everything, so that
+   * we can start from scratch
+   */
+  this->clear ();
+
+
+  /*
+   * Note that we read this file
+   * @e twice.  First time to
+   * detect the number of nodes
+   * and elements (and possible
+   * conversion tasks like D_to_e)
+   * and the order of datasets
+   * (nodes first, then elements,
+   * or the other way around),
+   * and second to do the actual
+   * read.
+   */
+  std::fstream in_stream;
+
+  std::vector<std::string> order_of_datasets;
+  order_of_datasets.reserve(2);
+
+  {
+    /*
+     * the first time we read the file,
+     * merely to obtain overall info
+     */
+    in_stream.open (file_name.c_str(), std::fstream::in);
+
+    if ( !in_stream.good() )
+      {
+        std::cerr << "ERROR: Input file not good." 
+		  << std::endl;
+	error();
+      }
 
     
-  /*
-   * When reading, the data is stored in a temporary
-   * file.  This is the tempfile.
-   */
-  std::string temp_buffer_name = tmpnam (NULL);
-  if (verbose)
-    {  
-      std::cout << "Using temporary file: " 
-		<< temp_buffer_name 
-		<< std::endl;
-    }
+    /*
+     * Count nodes and elements, then let 
+     * other methods read the element and 
+     * node data.  Also remember which
+     * dataset comes first: nodes or elements
+     */
+    if (_verbose)
+	std::cout << "  Counting nodes and elements" << std::endl;
 
-  std::fstream temp_buffer;
-  temp_buffer.open (temp_buffer_name.c_str(), 
-		    std::fstream::out);
-  if  (!temp_buffer.good())
-    {
-      std::cerr << "ERROR: Could not open temporary file in write mode." 
-		<< std::endl;
-      error();
-    }
-   
 
-  /*
-   * locate the beginning of data sets,
-   * store interesting datasets (through
-   * \p buffer_interesting_datasets) in 
-   * the tempfile, extract data useful for
-   * faster re-reading of the tempfile
-   */
-  {
+    bool reached_eof = false;
+    bool found_node  = false;
+    bool found_elem  = false;
+
+
     std::string olds, news;
 
     while (true)
@@ -175,13 +194,16 @@ void UnvMeshInterface::read (std::istream& in_stream,
        * stop combing at the end of the file
        */
       while( ((olds != "-1") || (news == "-1") ) && !in_stream.eof() )
-	{
+	{	  
 	  olds = news;
 	  in_stream >> news;
 	}
 
       if(in_stream.eof())
-	break;
+        {
+	  break;
+	  reached_eof = true;
+	}
 
       /*
        * if beginning of dataset, buffer it in
@@ -189,82 +211,119 @@ void UnvMeshInterface::read (std::istream& in_stream,
        */
       if (news == _label_dataset_nodes)
         {
-	  buffer_nodes (in_stream,
-			temp_buffer);
+	  found_node = true;
+	  order_of_datasets.push_back (_label_dataset_nodes);
+	  count_nodes (in_stream);
+
+	  /*
+	   * we can safe some time scanning the file
+	   * when we know we already have everything
+	   * we want
+	   */
+	  if (found_elem)
+	      break;
         }
 
       else if (news == _label_dataset_elements)
         {
-	  buffer_elements (in_stream,
-			   temp_buffer);
-        }
+	  found_elem = true;
+	  order_of_datasets.push_back (_label_dataset_elements);
+	  count_elements (in_stream);
 
-      else
-        {
 	  /*
-	   * other datasets are ignored
+	   * we can safe some time scanning the file
+	   * when we know we already have everything
+	   * we want
 	   */
+	  if (found_node)
+	      break;
         }
-
     }
+
+
+    /*
+     * Here we should better have found
+     * the datasets for nodes and elements,
+     * otherwise the unv files is bad!
+     */
+    if (!found_elem)
+      {
+	std::cerr << "ERROR: Could not find elements!" << std::endl;
+	error();
+      }
+
+    if (!found_node)
+      {
+	std::cerr << "ERROR: Could not find nodes!" << std::endl;
+	error();
+      }
+
+
+    in_stream.close();    
   }
 
 
+
+
+
   /*
-   * writing to temp_buffer is finished, 
-   * close the file and open it for reading
+   * We finished scanning the file,
+   * and our member data 
+   * \p this->_n_nodes,
+   * \p this->_n_elements,
+   * \p this->_need_D_to_e
+   * should be properly initialized.
    */
   {
-    temp_buffer.close ();
-    temp_buffer.open  (temp_buffer_name.c_str(), 
-			    std::fstream::in);
+    in_stream.open (file_name.c_str(), std::fstream::in);
 
-    if  (!temp_buffer.good())
+
+    if ( !in_stream.good() )
       {
-        std::cout << "ERROR:  Could not open temporary file in read mode." 
+        std::cerr << "ERROR: Cannot re-read input file." 
 		  << std::endl;
 	error();
       }
-  }
 
 
-  /*
-   * read all the datasets in the order
-   * as given by the user, but only once!
-   * Datasets that are already read are
-   * added to the set \p already_read.
-   */
-  node_in    (temp_buffer);
-  element_in (temp_buffer);
+    /*
+     * Read the datasets in the order that
+     * we already know
+     */
+    assert (order_of_datasets.size()==2);
 
-
-  /*
-   * close the tempfile and try to delete it
-   */
-  {
-    temp_buffer.close();
-
-    if ( remove(temp_buffer_name.c_str()) == -1 )
+    for (unsigned int ds=0; ds < order_of_datasets.size(); ds++)
       {
-        std::cerr << "ERROR: Cannot delete temporary file." 
-		  << std::endl;
-	error();
+	if (order_of_datasets[ds] == _label_dataset_nodes)
+	    node_in    (in_stream);
+
+	else if (order_of_datasets[ds] == _label_dataset_elements)
+	    element_in (in_stream);
+
+	else
+	    error();
       }
+
+
+    /*
+     * tell the MeshData object that we are finished 
+     * reading data
+     */
+    this->_mesh_data.close_foreign_id_maps ();
+
+    in_stream.close();    
+
+    if (_verbose)
+	std::cout << "  Finished." << std::endl << std::endl;
   }
 
-
-  /*
-   * tell the MeshData object that we are finished 
-   * reading data
-   */
-  _mesh_data.close_foreign_id_maps ();
 
 
   /* 
-   * some more clean-up
+   * save memory
    */
-  _assign_nodes.clear();
-  _ds_position.clear();
+  this->_assign_nodes.clear();
+  this->_ds_position.clear();
 }
 
 
@@ -272,9 +331,11 @@ void UnvMeshInterface::read (std::istream& in_stream,
 
 
 
-void UnvMeshInterface::write (std::ostream& out_stream)
+void UnvMeshInterface::write (const std::string& file_name)
 {
-  if ( !out_stream.good() )
+  std::ofstream out_file (file_name.c_str());
+
+  if ( !out_file.good() )
     {
       std::cerr << "ERROR: Output file not good." 
 		<< std::endl;
@@ -286,9 +347,9 @@ void UnvMeshInterface::write (std::ostream& out_stream)
    * already know these data, so initialize
    * them.  Does not hurt.
    */
-  _num_nodes    = _nodes.size();
-  _num_elements = _elements.size();
-  _need_D_to_e  = false;
+  this->_n_nodes      = this->_nodes.size();
+  this->_n_elements   = this->_elements.size();
+  this->_need_D_to_e  = false;
 
 
   /*
@@ -299,9 +360,13 @@ void UnvMeshInterface::write (std::ostream& out_stream)
     {
       if (!_mesh_data.compatibility_mode())
         {
-	  std::cerr << "WARNING: MeshData neither active nor in compatibility mode." << std::endl
-		    << "         Enable compatibility mode for MeshData.  Use this Universal" << std::endl
-		    << "         file with caution: libMesh node and element ids are used." << std::endl;
+	  std::cerr << std::endl
+		    << "*************************************************************************" << std::endl
+		    << "* WARNING: MeshData neither active nor in compatibility mode.           *" << std::endl
+		    << "*          Enable compatibility mode for MeshData.  Use this Universal  *" << std::endl
+		    << "*          file with caution: libMesh node and element ids are used.    *" << std::endl
+		    << "*************************************************************************" << std::endl
+		    << std::endl;
 	  _mesh_data.enable_compatibility_mode();
 	}
     }
@@ -310,82 +375,128 @@ void UnvMeshInterface::write (std::ostream& out_stream)
   /*
    * write the nodes,  then the elements
    */
-  node_out         (out_stream);
-  element_out      (out_stream);
+  node_out    (out_file);
+  element_out (out_file);
 }
 
 
 
 
 
-void UnvMeshInterface::buffer_nodes (std::istream& physical_file,
-				     std::fstream& temp_file)
+void UnvMeshInterface::count_nodes (std::istream& in_file)
 {
-  std::string data;
-
-  //Write beginning of dataset to virtual file
-  temp_file << "    -1\n"
-	    << "  " 
-	    << _label_dataset_nodes 
-	    << "\n";
-
-  // store the position of the dataset in the virtual file
-  _ds_position[_label_dataset_nodes]=temp_file.tellp();
-
-  // if _num_nodes is not 0 the dataset has already been scanned
-  if (_num_nodes != 0)
+  /*
+   * if this->_n_nodes is not 0 the dataset 
+   * has already been scanned
+   */
+  if (this->_n_nodes != 0)
     {
       std::cerr << "Error: Trying to scan nodes twice!" 
 		<< std::endl;
       error();
     }
 
+
   /* 
-   * Read from file and buffer in temp_file,
-   * check if Reals have to be converted
+   * Read from file, count nodes,
+   * check if floats have to be converted
    */
-  while (true)                       // read data until break
+  std::string data;
+
+  in_file >> data; // read the first node label
+
+
+  if (data == "-1")
     {
-      physical_file >> data;             // read the node label
+      std::cerr << "ERROR: Bad, already reached end of dataset before even starting to read nodes!"
+		<< std::endl;
+      error();
+    }
+
+ 
+  // ignore the misc data for this node
+  in_file.ignore(256,'\n');	      
+
+
+  /*
+   * Now we are there to verify whether we need
+   * to convert from D to e or not
+   */
+  in_file >> data;
+
+  /*
+   * When this "data" contains a "D", then
+   * we have to convert each and every float...
+   * But also assume when _this_ specific
+   * line does not contain a "D", then the
+   * other lines won't, too.
+   *
+   */
+  {
+#ifdef __HP_aCC
+    // Use an "int" instead of unsigned int,
+    // otherwise HP aCC may crash!
+    const int position          = data.find("D",6);
+#else
+    const unsigned int position = data.find("D",6);
+#endif
+
+    if(position!=std::string::npos)     // npos means no position
+      {
+	this->_need_D_to_e = true;
+
+	if (_verbose)
+	    std::cout << "  Convert from \"D\" to \"e\"" << std::endl;
+      }
+    else
+	this->_need_D_to_e = false;
+  }
+
+  /*
+   * read the remaining two coordinates
+   */
+  in_file >> data;
+  in_file >> data;
+
+
+  /*
+   * this was our first node
+   */
+  this->_n_nodes++;
+
+
+
+  /*
+   * proceed _counting_ the remaining
+   * nodes.
+   */
+  while (!in_file.eof())
+    {
+      // read the node label
+      in_file >> data; 
 	   	
       if (data == "-1")
-        {     
 	  // end of dataset is reached
-	  temp_file << "    -1\n";
 	  break;
-	}
+      
+      // ignore the remaining data (coord_sys_label, color etc)
+      in_file.ignore (256, '\n');
+      // ignore the coordinates
+      in_file.ignore (256, '\n');
 
-      temp_file << "\t" << data;
-
-      for(unsigned int i=0;i<3;i++)
-        {
-	  physical_file >> data;
-	  temp_file << "\t" << data;
-	}
-	
-      temp_file << "\n  ";
-
-      if(_need_D_to_e)
-        {
-	  for(unsigned int i=0;i<3;i++)
-	    {  
-	      physical_file >> data;
-	      temp_file << D_to_e(data) << "\t";
-	    }
-	}
-      else
-        {
-	  for(unsigned int i=0;i<3;i++)
-	    {
-	      physical_file >> data;
-	      temp_file << data << "\t";
-	    }
-	}
-
-      temp_file << "\n";
-
-      _num_nodes++;                   // count nodes
+      this->_n_nodes++;
     }
+
+
+  if (in_file.eof())
+    {
+      std::cerr << "ERROR: File ended before end of node dataset!"
+		<< std::endl;
+      error();
+    }
+
+  if (_verbose)
+      std::cout << "  Nodes   : " << this->_n_nodes << std::endl;
 }
 
 
@@ -393,143 +504,201 @@ void UnvMeshInterface::buffer_nodes (std::istream& physical_file,
 
 
 
-void UnvMeshInterface::buffer_elements (std::istream& physical_file,
-					std::fstream& temp_file)
+void UnvMeshInterface::count_elements (std::istream& in_file)
 {
-  std::string data;
-
-  /*
-   * buffer the element dataset in tempfile
-   */
-  temp_file << "    -1\n  " 
-	    << _label_dataset_elements
-	    << "\n";
-
-  /*
-   * remember the position of the dataset 
-   * in the virtual file
-   */
-  _ds_position[_label_dataset_elements]=temp_file.tellp();
-
-  if (_num_elements != 0)
+  if (this->_n_elements != 0)
     {
       std::cerr << "Error: Trying to scan elements twice!" 
 		<< std::endl;
       error();
     }
 
-  while (true)
-    {
-      physical_file >> data;             // read element label
-      if (data == "-1") 
-        { 
-	  // end of dataset is reached
-	  temp_file << "    -1\n";
-	  break;
-	}
 
-      temp_file << "\t" << data;
+  /*
+   * Simply read the element
+   * dataset for the @e only
+   * purpose to count nodes!
+   */
+
+  std::string data;
+
+  while (!in_file.eof())
+    {
+      // read element label
+      in_file >> data;
+
+
+      // end of dataset?
+      if (data == "-1") 
+	  break;
 	
       /*
-       * Nodes & related data, including the 
-       * number of nodes, just copy them
+       * Skip related data,
+       * and node number list
        */
-      for(unsigned int cnt=0; cnt<4; cnt++)
-        {
-	  physical_file >> data;
-	  temp_file << "\t" << data;
-	}
-
-      unsigned int n_nodes = 0;
-      physical_file >> n_nodes;
-      assert (n_nodes != 0);
-      temp_file << "\t" << n_nodes << "\n";
-      for (unsigned int cnt=0; cnt<n_nodes; cnt++)
-        {
-	  physical_file >> data;
-	  temp_file << "\t" << data;
-	}
+      in_file.ignore (256,'\n');
+      in_file.ignore (256,'\n');
       
-      temp_file << "\n";
-      _num_elements++;                 // count elements
+      this->_n_elements++;
     }
-}
 
 
-
-
-
-
-
-
-void UnvMeshInterface::set_stream_pointer(std::fstream& temp_file,
-					  const std::string& ds_num)
-{
-  // An error message is displayed if the specified
-  // dataset does not exist
-  if (static_cast<int>(_ds_position[ds_num]) == 0)
+  if (in_file.eof())
     {
-      std::cerr << "Error: Dataset #" 
-		<< ds_num 
-		<< " not found in file." 
+      std::cerr << "ERROR: File ended before end of element dataset!"
 		<< std::endl;
       error();
-      return;
     }
 
-  // Move file pointer
-  temp_file.seekg(_ds_position[ds_num],std::ios::beg);
+  if (_verbose)
+      std::cout << "  Elements: " << this->_n_elements << std::endl;
 }
 
 
 
 
 
-void UnvMeshInterface::node_in (std::fstream& temp_file)
+
+
+
+
+void UnvMeshInterface::node_in (std::istream& in_file)
 {
-  unsigned int node_lab;                // label of the node
-  unsigned long int exp_coord_sys_num,  // export coordinate system number(not supported yet)
-                    disp_coord_sys_num, // displacement coordinate system number(not supp. yet)
-                    color;              // color(not supported yet)
-  Real x,y,z;                           // coordinates of the node
+  if (_verbose)
+      std::cout << "  Reading nodes" << std::endl;
 
-  // allocate the correct amount of memory for the vector
-  // that holds the nodes
-  _nodes.resize(_num_nodes);
+  /*
+   * adjust the \p istream to our
+   * position
+   */
+  const bool ok = beginning_of_dataset(in_file, _label_dataset_nodes);
 
-  // put the file-pointer at the beginning of the dataset
-  set_stream_pointer(temp_file,
-		     _label_dataset_nodes);
-
-  // read from virtual file
-  for(unsigned int i=0;i<_num_nodes;i++)
+  if (!ok)
     {
-      temp_file >> node_lab                // read the node label
-		>> exp_coord_sys_num       // (not supported yet)
-		>> disp_coord_sys_num      // (not supported yet)
-		>> color                   // (not supported yet)
-		>> x                       // read x-coordinate
-		>> y                       // read y-coordinate
-		>> z;                      // read z-coordinate
-
-      // store the new position of the node under its label
-      _assign_nodes[node_lab]=i;
-
-      // add node to the nodes vector.
-      _nodes[i] = Node::build(x,y,z,i);
-
-      // tell the MeshData object the foreign node id
-      _mesh_data.add_foreign_node_id (_nodes[i],
-				      node_lab);
+      std::cerr << "ERROR: Could not find node dataset!" << std::endl;
+      error();
     }
 
+  unsigned int node_lab;           // label of the node
+  unsigned int exp_coord_sys_num,  // export coordinate system number       (not supported yet)
+               disp_coord_sys_num, // displacement coordinate system number (not supported yet)
+               color;              // color                                 (not supported yet)
+
+  /*
+   * allocate the correct amount 
+   * of memory for the node vector
+   */
+  this->_nodes.resize(this->_n_nodes);
+
+
+  /*
+   * depending on whether we have to convert each
+   * coordinate (float), we offer two versions.
+   * Note that \p count_nodes() already verified
+   * whether this file uses "D" of "e"
+   */
+  if (this->_need_D_to_e)
+    {
+      /*
+       * ok, convert...
+       *
+       * always 3 coordinates in the UNV file, no matter
+       * which dimensionality libMesh is in
+       */
+      std::vector<Real> xyz;
+      xyz.resize(3);
+
+      std::string num_buf;
+
+      for(unsigned int i=0;i<this->_n_nodes;i++)
+        {
+	  assert (!in_file.eof());
+
+	  in_file >> node_lab                // read the node label
+		  >> exp_coord_sys_num       // (not supported yet)
+		  >> disp_coord_sys_num      // (not supported yet)
+		  >> color;                  // (not supported yet)
+
+	  /*
+	   * take care of the
+	   * floating-point data
+	   */
+	  for (unsigned int d=0; d<3; d++)
+	    {
+	      in_file >> num_buf;
+	      xyz[d] = D_to_e (num_buf);
+	    }
+
+	  // store the new position of the node under its label
+	  this->_assign_nodes[node_lab]=i;
+
+	  // add node to the nodes vector.
+	  this->_nodes[i] = Node::build (xyz[0],
+					 xyz[1],
+					 xyz[2],
+					 i);
+
+	  // tell the MeshData object the foreign node id
+	  this->_mesh_data.add_foreign_node_id (this->_nodes[i], node_lab);
+	}
+    }
+
+  else
+
+    {
+      /*
+       * very well, no need to convert anything,
+       * just plain import.
+       */
+      Real x, y, z;
+
+      for(unsigned int i=0;i<this->_n_nodes;i++)
+        {
+	  assert (!in_file.eof());
+
+	  in_file >> node_lab                // read the node label
+		  >> exp_coord_sys_num       // (not supported yet)
+		  >> disp_coord_sys_num      // (not supported yet)
+		  >> color                   // (not supported yet)
+		  >> x                       // read x-coordinate
+		  >> y                       // read y-coordinate
+		  >> z;                      // read z-coordinate
+
+	  // store the new position of the node under its label
+	  this->_assign_nodes[node_lab]=i;
+
+	  // add node to the nodes vector.
+	  this->_nodes[i] = Node::build (x, y, z, i);
+
+	  // tell the MeshData object the foreign node id
+	  this->_mesh_data.add_foreign_node_id (this->_nodes[i], node_lab);
+	}
+    }
 }
 
 
 
-void UnvMeshInterface::element_in (std::fstream& temp_file)
+
+
+void UnvMeshInterface::element_in (std::istream& in_file)
 {
-  // Variables needed for reading from the file
+  if (_verbose)
+      std::cout << "  Reading elements" << std::endl;
+
+
+  /*
+   * adjust the \p istream to our
+   * position
+   */
+  const bool ok = beginning_of_dataset(in_file, _label_dataset_elements);
+
+  if (!ok)
+    {
+      std::cerr << "ERROR: Could not find element dataset!" << std::endl;
+      error();
+    }
+
+
   unsigned int element_lab,            // element label (not supported yet)
                n_nodes;                // number of nodes on element
   unsigned long int fe_descriptor_id,  // FE descriptor id
@@ -539,8 +708,8 @@ void UnvMeshInterface::element_in (std::fstream& temp_file)
 
 
   // vector that temporarily holds the node labels defining element
-  // (this was named "nodes" but that clashes with UnvMeshInterface::nodes
-  unsigned long int node_labels[21];
+  std::vector<unsigned int> node_labels;
+  node_labels.reserve(21);
 
 
   // vector that assigns element nodes to their correct position
@@ -548,57 +717,58 @@ void UnvMeshInterface::element_in (std::fstream& temp_file)
   // 44:plane stress      | QUAD4
   // linear quadrilateral |
   // position in UNV-file | position in libmesh
-  // assign_elm_node[1]   = 0
-  // assign_elm_node[2]   = 3
-  // assign_elm_node[3]   = 2
-  // assign_elm_node[4]   = 1
+  // assign_elem_node[1]   = 0
+  // assign_elem_node[2]   = 3
+  // assign_elem_node[3]   = 2
+  // assign_elem_node[4]   = 1
   //
   // UNV is 1-based, we leave the 0th element of the vectors unused in order
   // to prevent confusion, this way we can store elements with up to 20 nodes
-  unsigned int assign_elm_nodes[21];
+  std::vector<unsigned int> assign_elem_nodes;
+  assign_elem_nodes.resize (21);
+
 
   // allocate the correct amount of memory for the vector
   // that holds the elements
-  _elements.resize(_num_elements);
+  this->_elements.resize (this->_n_elements);
 
-  // put the file-pointer at the beginning of the dataset
-  set_stream_pointer(temp_file,
-		     _label_dataset_elements);
 
   // read from the virtual file
-  for (unsigned int i=0;i<_num_elements;i++)
+  for (unsigned int i=0;i<this->_n_elements;i++)
     {
-      temp_file >> element_lab             // read element label
-		>> fe_descriptor_id        // read FE descriptor id
-		>> phys_prop_tab_num       // (not supported yet)
-		>> mat_prop_tab_num        // (not supported yet)
-		>> color                   // (not supported yet)
-		>> n_nodes;                // read number of nodes on element
+      in_file >> element_lab             // read element label
+	      >> fe_descriptor_id        // read FE descriptor id
+	      >> phys_prop_tab_num       // (not supported yet)
+	      >> mat_prop_tab_num        // (not supported yet)
+	      >> color                   // (not supported yet)
+	      >> n_nodes;                // read number of nodes on element
 
       for (unsigned int j=1;j<=n_nodes;j++)
-	temp_file >> node_labels[j];             // read node labels
+	in_file >> node_labels[j];             // read node labels
 
-      // UNV-FE descriptor id has to be recognized and translated to mesh
+
       switch (fe_descriptor_id)
 	{
 	
 	case 41: // Plane Stress Linear Triangle
 	case 91: // Thin Shell   Linear Triangle
 	  _elements[i]=new Tri3;  // add new element
-	  assign_elm_nodes[1]=0;
-	  assign_elm_nodes[2]=2;
-	  assign_elm_nodes[3]=1;
+	  // _elements[i]= Elem::build(TRI3);
+	  assign_elem_nodes[1]=0;
+	  assign_elem_nodes[2]=2;
+	  assign_elem_nodes[3]=1;
 	  break;
 	
 	case 42: // Plane Stress Quadratic Triangle
 	case 92: // Thin Shell   Quadratic Triangle
+	  // _elements[i]= Elem::build(TRI6);
 	  _elements[i]=new Tri6;  // add new element
-	  assign_elm_nodes[1]=0;
-	  assign_elm_nodes[2]=5;
-	  assign_elm_nodes[3]=2;
-	  assign_elm_nodes[4]=4;
-	  assign_elm_nodes[5]=1;
-	  assign_elm_nodes[6]=3;
+	  assign_elem_nodes[1]=0;
+	  assign_elem_nodes[2]=5;
+	  assign_elem_nodes[3]=2;
+	  assign_elem_nodes[4]=4;
+	  assign_elem_nodes[5]=1;
+	  assign_elem_nodes[6]=3;
 	  break;
 	
 	case 43: // Plane Stress Cubic Triangle
@@ -611,24 +781,26 @@ void UnvMeshInterface::element_in (std::fstream& temp_file)
 	
 	case 44: // Plane Stress Linear Quadrilateral
 	case 94: // Thin Shell   Linear Quadrilateral
+	  // _elements[i]= Elem::build(QUAD4);
 	  _elements[i]=new Quad4; // add new element
-	  assign_elm_nodes[1]=0;
-	  assign_elm_nodes[2]=3;
-	  assign_elm_nodes[3]=2;
-	  assign_elm_nodes[4]=1;
+	  assign_elem_nodes[1]=0;
+	  assign_elem_nodes[2]=3;
+	  assign_elem_nodes[3]=2;
+	  assign_elem_nodes[4]=1;
 	  break;
 	
 	case 45: // Plane Stress Quadratic Quadrilateral
 	case 95: // Thin Shell   Quadratic Quadrilateral
+	  // _elements[i]= Elem::build(QUAD8);
 	  _elements[i]=new Quad8; // add new element
-	  assign_elm_nodes[1]=0;
-	  assign_elm_nodes[2]=7;
-	  assign_elm_nodes[3]=3;
-	  assign_elm_nodes[4]=6;
-	  assign_elm_nodes[5]=2;
-	  assign_elm_nodes[6]=5;
-	  assign_elm_nodes[7]=1;
-	  assign_elm_nodes[8]=4;
+	  assign_elem_nodes[1]=0;
+	  assign_elem_nodes[2]=7;
+	  assign_elem_nodes[3]=3;
+	  assign_elem_nodes[4]=6;
+	  assign_elem_nodes[5]=2;
+	  assign_elem_nodes[6]=5;
+	  assign_elem_nodes[7]=1;
+	  assign_elem_nodes[8]=4;
 	  break;
 	
 	case 46: // Plane Stress Cubic Quadrilateral
@@ -640,59 +812,63 @@ void UnvMeshInterface::element_in (std::fstream& temp_file)
 	
 	
 	case 111: // Solid Linear Tetrahedron
+	  // _elements[i]= Elem::build(TET4);
 	  _elements[i]=new Tet4;  // add new element
-	  assign_elm_nodes[1]=0;
-	  assign_elm_nodes[2]=1;
-	  assign_elm_nodes[3]=2;
-	  assign_elm_nodes[4]=3;
+	  assign_elem_nodes[1]=0;
+	  assign_elem_nodes[2]=1;
+	  assign_elem_nodes[3]=2;
+	  assign_elem_nodes[4]=3;
 	  break;
 
 
 	case 112: // Solid Linear Prism
+	  // _elements[i]= Elem::build(PRISM6);
 	  _elements[i]=new Prism6;  // add new element
-	  assign_elm_nodes[1]=0;
-	  assign_elm_nodes[2]=1;
-	  assign_elm_nodes[3]=2;
-	  assign_elm_nodes[4]=3;
-	  assign_elm_nodes[5]=4;
-	  assign_elm_nodes[6]=5;
+	  assign_elem_nodes[1]=0;
+	  assign_elem_nodes[2]=1;
+	  assign_elem_nodes[3]=2;
+	  assign_elem_nodes[4]=3;
+	  assign_elem_nodes[5]=4;
+	  assign_elem_nodes[6]=5;
 	  break;
 	
 	case 115: // Solid Linear Brick
+	  // _elements[i]= Elem::build(HEX8);
 	  _elements[i]=new Hex8;  // add new element
-	  assign_elm_nodes[1]=0;
-	  assign_elm_nodes[2]=4;
-	  assign_elm_nodes[3]=5;
-	  assign_elm_nodes[4]=1;
-	  assign_elm_nodes[5]=3;
-	  assign_elm_nodes[6]=7;
-	  assign_elm_nodes[7]=6;
-	  assign_elm_nodes[8]=2;
+	  assign_elem_nodes[1]=0;
+	  assign_elem_nodes[2]=4;
+	  assign_elem_nodes[3]=5;
+	  assign_elem_nodes[4]=1;
+	  assign_elem_nodes[5]=3;
+	  assign_elem_nodes[6]=7;
+	  assign_elem_nodes[7]=6;
+	  assign_elem_nodes[8]=2;
 	  break;
 	
 	
 	case 116: // Solid Quadratic Brick
+	  // _elements[i]= Elem::build(HEX20);
 	  _elements[i]=new Hex20; // add new element
-	  assign_elm_nodes[1]=0;
-	  assign_elm_nodes[2]=12;
-	  assign_elm_nodes[3]=4;
-	  assign_elm_nodes[4]=16;
-	  assign_elm_nodes[5]=5;
-	  assign_elm_nodes[6]=13;
-	  assign_elm_nodes[7]=1;
-	  assign_elm_nodes[8]=8;
-	  assign_elm_nodes[9]=11;
-	  assign_elm_nodes[10]=19;
-	  assign_elm_nodes[11]=17;
-	  assign_elm_nodes[12]=9;
-	  assign_elm_nodes[13]=3;
-	  assign_elm_nodes[14]=15;
-	  assign_elm_nodes[15]=7;
-	  assign_elm_nodes[16]=18;
-	  assign_elm_nodes[17]=6;
-	  assign_elm_nodes[18]=14;
-	  assign_elm_nodes[19]=2;
-	  assign_elm_nodes[20]=10;
+	  assign_elem_nodes[1]=0;
+	  assign_elem_nodes[2]=12;
+	  assign_elem_nodes[3]=4;
+	  assign_elem_nodes[4]=16;
+	  assign_elem_nodes[5]=5;
+	  assign_elem_nodes[6]=13;
+	  assign_elem_nodes[7]=1;
+	  assign_elem_nodes[8]=8;
+	  assign_elem_nodes[9]=11;
+	  assign_elem_nodes[10]=19;
+	  assign_elem_nodes[11]=17;
+	  assign_elem_nodes[12]=9;
+	  assign_elem_nodes[13]=3;
+	  assign_elem_nodes[14]=15;
+	  assign_elem_nodes[15]=7;
+	  assign_elem_nodes[16]=18;
+	  assign_elem_nodes[17]=6;
+	  assign_elem_nodes[18]=14;
+	  assign_elem_nodes[19]=2;
+	  assign_elem_nodes[20]=10;
 	  break;
 	
 	
@@ -706,17 +882,18 @@ void UnvMeshInterface::element_in (std::fstream& temp_file)
 
 	
 	case 118: // Solid Parabolic Tetrahedron
+	  // _elements[i]= Elem::build(TET10);
 	  _elements[i]=new Tet10; // add new element
-	  assign_elm_nodes[1]=0;
-	  assign_elm_nodes[2]=4;
-	  assign_elm_nodes[3]=1;
-	  assign_elm_nodes[4]=5;
-	  assign_elm_nodes[5]=2;
-	  assign_elm_nodes[6]=6;
-	  assign_elm_nodes[7]=7;
-	  assign_elm_nodes[8]=8;
-	  assign_elm_nodes[9]=9;
-	  assign_elm_nodes[10]=3;
+	  assign_elem_nodes[1]=0;
+	  assign_elem_nodes[2]=4;
+	  assign_elem_nodes[3]=1;
+	  assign_elem_nodes[4]=5;
+	  assign_elem_nodes[5]=2;
+	  assign_elem_nodes[6]=6;
+	  assign_elem_nodes[7]=7;
+	  assign_elem_nodes[8]=8;
+	  assign_elem_nodes[9]=9;
+	  assign_elem_nodes[10]=3;
 	  break;
 	
 	
@@ -732,12 +909,11 @@ void UnvMeshInterface::element_in (std::fstream& temp_file)
 
       // nodes are being stored in element
       for (unsigned int j=1;j<=n_nodes;j++)
-	_elements[i]->set_node(assign_elm_nodes[j]) = _nodes[_assign_nodes[node_labels[j]]];
+	this->_elements[i]->set_node(assign_elem_nodes[j]) = this->_nodes[this->_assign_nodes[node_labels[j]]];
 
 
       // tell the MeshData object the foreign element id
-      _mesh_data.add_foreign_elem_id (_elements[i],
-				      element_lab);
+      this->_mesh_data.add_foreign_elem_id (this->_elements[i], element_lab);
 
     }
 }
@@ -750,6 +926,10 @@ void UnvMeshInterface::element_in (std::fstream& temp_file)
 void UnvMeshInterface::node_out (std::ostream& out_file)
 {
   assert (_mesh_data.active() || _mesh_data.compatibility_mode());
+
+
+  if (_verbose)
+      std::cout << "  Writing " << this->_nodes.size() << " nodes" << std::endl;
 
   /*
    * Write beginning of dataset
@@ -765,7 +945,7 @@ void UnvMeshInterface::node_out (std::ostream& out_file)
   unsigned int color_dummy          = 0; // color(not supported yet)
 
 
-  for(unsigned int i=0;i<_nodes.size();i++)
+  for(unsigned int i=0;i<this->_nodes.size();i++)
     {
       const Node* current_node = _nodes[i];
       char buf[78];
@@ -792,7 +972,7 @@ void UnvMeshInterface::node_out (std::ostream& out_file)
 
       out_file << buf;
     }
-
+ 
 
   /*
    * Write end of dataset
@@ -808,6 +988,9 @@ void UnvMeshInterface::node_out (std::ostream& out_file)
 void UnvMeshInterface::element_out(std::ostream& out_file)
 {
   assert (_mesh_data.active() || _mesh_data.compatibility_mode());
+
+  if (_verbose)
+      std::cout << "  Writing elements" << std::endl;
 
   /*
    * Write beginning of dataset
@@ -834,12 +1017,12 @@ void UnvMeshInterface::element_out(std::ostream& out_file)
    * position in libMesh | UNV numbering
    * (note: 0-based)     | (note: 1-based)
    *     
-   * assign_elm_node[0]  = 1
-   * assign_elm_node[3]  = 2
-   * assign_elm_node[2]  = 3
-   * assign_elm_node[1]  = 4
+   * assign_elem_node[0]  = 1
+   * assign_elem_node[3]  = 2
+   * assign_elem_node[2]  = 3
+   * assign_elem_node[1]  = 4
    */
-  unsigned int assign_elm_nodes[20];
+  unsigned int assign_elem_nodes[20];
 
   unsigned int n_elem_written=0;
 
@@ -863,108 +1046,108 @@ void UnvMeshInterface::element_out(std::ostream& out_file)
 	
 	case TRI3:
 	  fe_descriptor_id = 41; // Plane Stress Linear Triangle
-	  assign_elm_nodes[0] = 1;
-	  assign_elm_nodes[2] = 2;
-	  assign_elm_nodes[1] = 3;
+	  assign_elem_nodes[0] = 1;
+	  assign_elem_nodes[2] = 2;
+	  assign_elem_nodes[1] = 3;
 	  break;
 
 	case TRI6:
 	  fe_descriptor_id = 42; // Plane Stress Quadratic Triangle
-	  assign_elm_nodes[0] = 1;
-	  assign_elm_nodes[5] = 2;
-	  assign_elm_nodes[2] = 3;
-	  assign_elm_nodes[4] = 4;
-	  assign_elm_nodes[1] = 5;
-	  assign_elm_nodes[3] = 6;
+	  assign_elem_nodes[0] = 1;
+	  assign_elem_nodes[5] = 2;
+	  assign_elem_nodes[2] = 3;
+	  assign_elem_nodes[4] = 4;
+	  assign_elem_nodes[1] = 5;
+	  assign_elem_nodes[3] = 6;
 	  break;
 
 	case QUAD4:
 	  fe_descriptor_id = 44; // Plane Stress Linear Quadrilateral
-	  assign_elm_nodes[0] = 1;
-	  assign_elm_nodes[3] = 2;
-	  assign_elm_nodes[2] = 3;
-	  assign_elm_nodes[1] = 4;
+	  assign_elem_nodes[0] = 1;
+	  assign_elem_nodes[3] = 2;
+	  assign_elem_nodes[2] = 3;
+	  assign_elem_nodes[1] = 4;
 	  break;
 	
 	case QUAD8:
 	  fe_descriptor_id = 45; // Plane Stress Quadratic Quadrilateral
-	  assign_elm_nodes[0] = 1;
-	  assign_elm_nodes[7] = 2;
-	  assign_elm_nodes[3] = 3;
-	  assign_elm_nodes[6] = 4;
-	  assign_elm_nodes[2] = 5;
-	  assign_elm_nodes[5] = 6;
-	  assign_elm_nodes[1] = 7;
-	  assign_elm_nodes[4] = 8;
+	  assign_elem_nodes[0] = 1;
+	  assign_elem_nodes[7] = 2;
+	  assign_elem_nodes[3] = 3;
+	  assign_elem_nodes[6] = 4;
+	  assign_elem_nodes[2] = 5;
+	  assign_elem_nodes[5] = 6;
+	  assign_elem_nodes[1] = 7;
+	  assign_elem_nodes[4] = 8;
 	  break;
 	
 	case TET4:
 	  fe_descriptor_id = 111; // Solid Linear Tetrahedron
-	  assign_elm_nodes[0] = 1;
-	  assign_elm_nodes[1] = 2;
-	  assign_elm_nodes[2] = 3;
-	  assign_elm_nodes[3] = 4;
+	  assign_elem_nodes[0] = 1;
+	  assign_elem_nodes[1] = 2;
+	  assign_elem_nodes[2] = 3;
+	  assign_elem_nodes[3] = 4;
 	  break;
 
 	case PRISM6:
 	  fe_descriptor_id = 112; // Solid Linear Prism
-	  assign_elm_nodes[0] = 1;
-	  assign_elm_nodes[1] = 2;
-	  assign_elm_nodes[2] = 3;
-	  assign_elm_nodes[3] = 4;
-	  assign_elm_nodes[4] = 5;
-	  assign_elm_nodes[5] = 6;
+	  assign_elem_nodes[0] = 1;
+	  assign_elem_nodes[1] = 2;
+	  assign_elem_nodes[2] = 3;
+	  assign_elem_nodes[3] = 4;
+	  assign_elem_nodes[4] = 5;
+	  assign_elem_nodes[5] = 6;
 	  break;
 
 	case HEX8:
 	  fe_descriptor_id = 115; // Solid Linear Brick
-	  assign_elm_nodes[0] = 1;
-	  assign_elm_nodes[4] = 2;
-	  assign_elm_nodes[5] = 3;
-	  assign_elm_nodes[1] = 4;
-	  assign_elm_nodes[3] = 5;
-	  assign_elm_nodes[7] = 6;
-	  assign_elm_nodes[6] = 7;
-	  assign_elm_nodes[2] = 8;
+	  assign_elem_nodes[0] = 1;
+	  assign_elem_nodes[4] = 2;
+	  assign_elem_nodes[5] = 3;
+	  assign_elem_nodes[1] = 4;
+	  assign_elem_nodes[3] = 5;
+	  assign_elem_nodes[7] = 6;
+	  assign_elem_nodes[6] = 7;
+	  assign_elem_nodes[2] = 8;
 	  break;
 	
 	case HEX20:
 	  fe_descriptor_id = 116; // Solid Quadratic Brick
-	  assign_elm_nodes[ 0] = 1;
-	  assign_elm_nodes[12] = 2;
-	  assign_elm_nodes[ 4] = 3;
-	  assign_elm_nodes[16] = 4;
-	  assign_elm_nodes[ 5] = 5;
-	  assign_elm_nodes[13] = 6;
-	  assign_elm_nodes[ 1] = 7;
-	  assign_elm_nodes[ 8] = 8;
-	  assign_elm_nodes[11] = 9;
-	  assign_elm_nodes[19] = 10;
-	  assign_elm_nodes[17] = 11;
-	  assign_elm_nodes[ 9] = 12;
-	  assign_elm_nodes[ 3] = 13;
-	  assign_elm_nodes[15] = 14;
-	  assign_elm_nodes[ 7] = 15;
-	  assign_elm_nodes[18] = 16;
-	  assign_elm_nodes[ 6] = 17;
-	  assign_elm_nodes[14] = 18;
-	  assign_elm_nodes[ 2] = 19;
-	  assign_elm_nodes[10] = 20;
+	  assign_elem_nodes[ 0] = 1;
+	  assign_elem_nodes[12] = 2;
+	  assign_elem_nodes[ 4] = 3;
+	  assign_elem_nodes[16] = 4;
+	  assign_elem_nodes[ 5] = 5;
+	  assign_elem_nodes[13] = 6;
+	  assign_elem_nodes[ 1] = 7;
+	  assign_elem_nodes[ 8] = 8;
+	  assign_elem_nodes[11] = 9;
+	  assign_elem_nodes[19] = 10;
+	  assign_elem_nodes[17] = 11;
+	  assign_elem_nodes[ 9] = 12;
+	  assign_elem_nodes[ 3] = 13;
+	  assign_elem_nodes[15] = 14;
+	  assign_elem_nodes[ 7] = 15;
+	  assign_elem_nodes[18] = 16;
+	  assign_elem_nodes[ 6] = 17;
+	  assign_elem_nodes[14] = 18;
+	  assign_elem_nodes[ 2] = 19;
+	  assign_elem_nodes[10] = 20;
 	  break;
 		
 	case TET10:
 	  fe_descriptor_id = 118; // Solid Parabolic Tetrahedron
 
-	  assign_elm_nodes[0] = 1; //0
-	  assign_elm_nodes[1] = 5; //4
-	  assign_elm_nodes[2] = 2; //1
-	  assign_elm_nodes[3] = 6; //5
-	  assign_elm_nodes[4] = 3; //2
-	  assign_elm_nodes[5] = 7; //6
-	  assign_elm_nodes[6] = 8; //7
-	  assign_elm_nodes[7] = 9; //8
-	  assign_elm_nodes[8] = 10; //9
-	  assign_elm_nodes[9] = 4; //3
+	  assign_elem_nodes[0] = 1; //0
+	  assign_elem_nodes[1] = 5; //4
+	  assign_elem_nodes[2] = 2; //1
+	  assign_elem_nodes[3] = 6; //5
+	  assign_elem_nodes[4] = 3; //2
+	  assign_elem_nodes[5] = 7; //6
+	  assign_elem_nodes[6] = 8; //7
+	  assign_elem_nodes[7] = 9; //8
+	  assign_elem_nodes[8] = 10; //9
+	  assign_elem_nodes[9] = 4; //3
 	  break;
 	
 	
@@ -990,11 +1173,11 @@ void UnvMeshInterface::element_out(std::ostream& out_file)
       for (unsigned int j=0;j<elem_n_nodes;j++)
 	{
 	  /*
-	   * assign_elm_nodes[j]-th node: i.e., j loops over the
-	   * libMesh numbering, and assign_elm_nodes[j] over the
+	   * assign_elem_nodes[j]-th node: i.e., j loops over the
+	   * libMesh numbering, and assign_elem_nodes[j] over the
 	   * UNV numbering.
 	   */
-	  const Node* node_in_unv_order = elem->get_node(assign_elm_nodes[j]-1);
+	  const Node* node_in_unv_order = elem->get_node(assign_elem_nodes[j]-1);
 
 	  // write foreign label for this node
 	  out_file << std::setw(10) << _mesh_data.node_to_foreign_id(node_in_unv_order);
@@ -1005,8 +1188,8 @@ void UnvMeshInterface::element_out(std::ostream& out_file)
       n_elem_written++;
     }
 
-
-  std::cout << "Written " << n_elem_written << " elements." << std::endl;
+  if (_verbose)
+      std::cout << "  Finished writing " << n_elem_written << " elements" << std::endl;
 
   /*
    * Write end of dataset
@@ -1014,37 +1197,3 @@ void UnvMeshInterface::element_out(std::ostream& out_file)
   out_file << "    -1\n";
 }
 
-
-
-
-
-
-
-
-
-
-
-std::string& UnvMeshInterface::D_to_e(std::string& number)
-{
-  // find "D" in string, start looking at 6th element, to improve speed.
-  // We dont expect a "D" earlier
-
-#ifdef __HP_aCC
-  // Use an int instead of an unsigned int,
-  // otherwise HP aCC may crash!
-  const int position = number.find("D",6);
-#else
-  const unsigned int position = number.find("D",6);
-#endif
-
-
-  if(position!=std::string::npos)     // npos means no position
-      // replace "D" in string
-      number.replace(position,1,"e"); 
-  else
-      // we assume that if this one number is written correctly, all numbers are
-      _need_D_to_e = false;
-
-  return number;
-
-}
