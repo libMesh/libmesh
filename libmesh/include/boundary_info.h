@@ -1,4 +1,4 @@
-// $Id: boundary_info.h,v 1.11 2003-03-03 02:15:57 benkirk Exp $
+// $Id: boundary_info.h,v 1.12 2003-03-03 22:23:32 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -77,6 +77,13 @@ class BoundaryInfo
   void sync (BoundaryMesh& boundary_mesh);
   
   /**
+   * Add \p Node \p node with boundary id \p id to the boundary
+   * information data structures.
+   */ 
+  void add_node (const Node* node,
+		 const short int id);
+
+  /**
    * Add node number \p node with boundary id \p id to the boundary
    * information data structures.
    */ 
@@ -105,18 +112,11 @@ class BoundaryInfo
   unsigned int n_boundary_ids () const { return boundary_ids.size(); }
 
   /**
-   * Read boundary data in the shanee format,
-   * taking a string for the name of the file.
-   * Probably deprecated.
+   * Returns the boundary id associated with \p Node \p node.
+   * Returns \p invalid_id if the node is not found, so \p invalid_id
+   * can be thought of as a "default" boundary id.
    */
-  void read_shanee_boundary (const std::string& name);
-  
-  /**
-   * Read boundary data in the shanee format,
-   * taking an istream which represents the file.
-   * Probably deprecated.
-   */
-  void read_shanee_boundary (std::istream& in);
+  short int boundary_id (const Node* node) const;
 
   /**
    * Returns the boundary id associated with node number \p node.
@@ -127,7 +127,7 @@ class BoundaryInfo
 
   /**
    * Returns the boundary id associated with the \p side side of
-   * element number \p elem.  Note that only one id per side is allowed,
+   * element \p elem.  Note that only one id per side is allowed,
    * however multiple sides per element are allowed.  Returns \p invalid_id
    * if the \p side does not have an associated boundary id, hence
    * \p invalid_id can be used as the default boundary id.
@@ -150,19 +150,19 @@ class BoundaryInfo
    */
   unsigned int n_boundary_conds () const
   { return elem_list.size(); }
-
+  
   /**
    * @returns a list of nodes that have boundary conditions.
    */
   const std::vector<unsigned int>& get_node_list () const
   { assert(node_list.size() == node_id_list.size()); return node_list; }
-
+  
   /**
    * @returns a list of elements that have boundary conditions.
    */
-   const std::vector<unsigned int>& get_elem_list () const
+  const std::vector<unsigned int>& get_elem_list () const
   { assert(elem_list.size() == elem_id_list.size()); return elem_list; }
-
+  
   /**
    * @returns the side of each element that has a boundary condition.
    */
@@ -190,7 +190,15 @@ class BoundaryInfo
   { return boundary_ids; }
 
   /**
-   * Add boundary values for node \p node with id \p id to the boundary
+   * Add boundary values for \p Node \p node with id \p id to the boundary
+   * information data structures.
+   */
+  void add_boundary_values (const Node* node,
+			    const std::vector<Real> values,
+			    const short int id);
+
+  /**
+   * Add boundary values for node number \p node with id \p id to the boundary
    * information data structures.
    */
   void add_boundary_values (const unsigned int node,
@@ -198,7 +206,12 @@ class BoundaryInfo
 			    const short int id);
 
   /**
-   * @returns the boundary values specified for node \p node.
+   * @returns the boundary values specified for \p Node \p node.
+   */
+  std::vector<Real> get_boundary_values (const Node* node) const;
+
+  /**
+   * @returns the boundary values specified for node number \p node.
    */
   std::vector<Real> get_boundary_values (const unsigned int node) const;
 
@@ -222,7 +235,8 @@ class BoundaryInfo
   const MeshBase& mesh;
   
   
-  std::map<unsigned int, short int> boundary_node_id;
+  std::map<const Node*,
+	   short int> boundary_node_id;
   
   std::multimap<const Elem*,
                 std::pair<unsigned short int, short int> >
@@ -239,7 +253,7 @@ class BoundaryInfo
   std::vector<short int>          elem_id_list;
 
   // a vector for boundary values
-  std::vector<std::pair<unsigned int,
+  std::vector<std::pair<const Node*,
               std::vector<Real> > >   boundary_values;
   
 
@@ -252,9 +266,9 @@ class BoundaryInfo
   public:
     
     inline
-    void operator() (const std::pair<const unsigned int, short int>& np) const
+    void operator() (const std::pair<const Node*, short int>& np) const
     {
-      std::cout << "  (" << np.first
+      std::cout << "  (" << np.first->id()
 		<< ", "  << np.second
 		<< ")"  << std::endl;
     }

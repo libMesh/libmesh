@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.16 2003-03-03 02:15:58 benkirk Exp $
+// $Id: boundary_info.C,v 1.17 2003-03-03 22:23:43 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -157,15 +157,20 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh)
     }
 
   // Copy over the nodes
-  boundary_mesh._nodes.resize(mesh.n_nodes());
-  
-  for (unsigned int n=0; n<mesh.n_nodes(); n++)
-    boundary_mesh.node_ptr(n) = mesh.node_ptr(n);
+  boundary_mesh._nodes = mesh._nodes;
 }
 
 
 
 void BoundaryInfo::add_node(const unsigned int node,
+			    const short int id)
+{
+  add_node (mesh.node_ptr(node), id);
+}
+
+
+
+void BoundaryInfo::add_node(const Node* node,
 			    const short int id)
 {
   if (id == invalid_id)
@@ -181,10 +186,9 @@ void BoundaryInfo::add_node(const unsigned int node,
   boundary_node_id[node] = id;
   boundary_ids.insert(id);
 
-  node_list.push_back(node);
+  node_list.push_back(node->id());
   node_id_list.push_back(id);
 }
-
 
 
 
@@ -244,21 +248,16 @@ void BoundaryInfo::add_side(const Elem* elem,
 
 
 
-void BoundaryInfo::read_shanee_boundary (const std::string& name)
+short int BoundaryInfo::boundary_id(const unsigned int node) const
 {
-  std::ifstream in(name.c_str());
-
-  read_shanee_boundary(in);
-
-  return;
+  return boundary_id(mesh.node_ptr(node));
 }
 
 
 
-
-short int BoundaryInfo::boundary_id(const unsigned int node) const
+short int BoundaryInfo::boundary_id(const Node* node) const
 { 
-  std::map<unsigned int, short int>::const_iterator n
+  std::map<const Node*, short int>::const_iterator n
     = boundary_node_id.find(node);
 
   // node not in the data structure
@@ -309,40 +308,16 @@ short int BoundaryInfo::boundary_id(const Elem* elem,
 
 
 
-
-void BoundaryInfo::read_shanee_boundary(std::istream& in)
+void BoundaryInfo::add_boundary_values(const unsigned int node,
+				       const std::vector<Real> values,
+				       const short int id)
 {
-  assert (in);
-  assert (dim == 2);
-
-  unsigned int n_elem, n_nds, n0, n1, id;
-  
-  in >> n_elem
-     >> n_nds;
-
-  for (unsigned int elem=0; elem<n_elem; elem++)
-    {
-      in >> n0 >> n1 >> id;
-      
-      //      Edge2 edge(n0,n1);
-
-      //      add_edge(edge, static_cast<short int>(id));
-      add_node(n0, static_cast<short int>(id));
-      add_node(n1, static_cast<short int>(id));
-      
-    }
-  
-  for (unsigned int node=0; node<n_nds; node++)
-    {
-      in >> n0 >> id;
-      
-      add_node(n0, static_cast<short int>(id));      
-    }    
+  add_boundary_values (mesh.node_ptr(node), values, id);
 }
 
 
 
-void BoundaryInfo::add_boundary_values(const unsigned int node,
+void BoundaryInfo::add_boundary_values(const Node* node,
 				       const std::vector<Real> values,
 				       const short int id)
 {
@@ -351,9 +326,17 @@ void BoundaryInfo::add_boundary_values(const unsigned int node,
 }
 
 
+
 std::vector<Real> BoundaryInfo::get_boundary_values(const unsigned int node) const
 {
-  std::vector<std::pair<unsigned int,
+  return get_boundary_values (mesh.node_ptr(node));
+}
+
+
+
+std::vector<Real> BoundaryInfo::get_boundary_values(const Node* node) const
+{
+  std::vector<std::pair<const Node*,
               std::vector<Real> > >::const_iterator pos;
   
   for (pos=boundary_values.begin(); pos!=boundary_values.end(); ++pos)
@@ -365,7 +348,7 @@ std::vector<Real> BoundaryInfo::get_boundary_values(const unsigned int node) con
     }
 
   std::cerr << "ERROR: No boundary values are specified for Node: "
-	    << node << std::endl;
+	    << node->id() << std::endl;
 
   error();
   std::vector<Real> v;
@@ -423,11 +406,8 @@ void BoundaryInfo::print_info() const
       // New code
       std::for_each(boundary_side_id.begin(),
 		    boundary_side_id.end(),
-  		    PrintSideInfo(elem_star_to_num));
-
-      
+  		    PrintSideInfo(elem_star_to_num)); 
     }
-  
 }
 
 
