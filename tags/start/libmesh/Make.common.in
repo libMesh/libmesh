@@ -1,0 +1,293 @@
+# $Id: Make.common.in,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+
+
+###############################################################################
+## Please note:
+##   The ./configure script generates Make.common from 
+##   Make.common.in, so if you want to change something,
+##   then do it in the latter file (here!)and re-run ./configure in the
+##   top level directory
+###############################################################################
+
+###############################################################################
+#
+# The Make.common file defines the build environment for libMesh
+# and all its helper applications.  If you want to build an application
+# that makes use of libMesh it is highly recommended that you include
+# this file in your project's Makefile.
+#
+###############################################################################
+
+
+#
+# Figure out the compilation mode based on the
+# environment variable METHOD.
+opt-mode   := off
+debug-mode := off
+prof-mode  := off
+
+#
+# If the user has no environment variable
+# called METHOD, he gets optimized mode.
+ifeq (x$(METHOD),x)
+  opt-mode := on
+endif
+
+#
+# If METHOD=opt, compile in optimized mode.
+ifeq ($(METHOD),opt)
+  opt-mode := on
+endif
+
+#
+# If METHOD=dbg, compile in debug mode.
+ifeq ($(METHOD),dbg)
+  debug-mode := on
+endif
+
+#
+# If METHOD=pro, compile in profiler mode
+ifeq ($(METHOD),pro)
+  prof-mode := on
+endif
+
+#
+# Set the option to determine what type of
+# library (.so or .a) will be built.
+enable-shared        := @enableshared@
+
+#
+# If we are profiling, we CANNOT use shared
+# libs.  At least I don't think we can ;)
+ifeq ($(prof-mode),on)
+  enable-shared := no
+endif
+
+
+
+
+#
+# Set the current directory.
+pwd := @PWD@
+
+###############################################################################
+# the following lines will be replaced by the output 
+# of ./configure
+HOSTTYPE             = @host@
+
+CXX                  = @CXX@
+CC		     = @CC@
+LDFLAGS              = @LDFLAGS@
+LIBS                 = @LIBS@
+FLIBS		     = @FLIBS@
+GXX-VERSION          = @GXX_VERSION@
+CXXDEPFLAG           = @CXXDEPFLAG@
+
+enable-netcdf 	     = @enablenetcdf@
+NETCDF_INCLUDE	     = @NETCDF_INCLUDE_PATH@
+NETCDF_LIBRARY	     = @LIBNETCDF@ 
+
+enable-hdf4          = @enablehdf4@
+HDF4_INCLUDE	     = @HDF4_INCLUDE_PATH@
+HDF4_LIB_DIR	     = @HDF4_LIB_PATH@ 
+HDF4_LIBS            = @HDF4_LIB_NAMES@
+
+enable-exodus        = @enableexodus@
+EXODUS_INCLUDE       = @EXODUS_INCLUDE_PATH@
+EXODUS_LIBRARY       = @EXODUS_EXOII@
+
+enable-metis         = @enablemetis@
+METIS_INCLUDE	     = @METIS_INCLUDE_PATH@
+
+enable-petsc         = @enablepetsc@
+petsc-version        = @petscversion@
+PETSC_DIR            = @PETSC_DIR@
+
+enable-complex       = @enablecomplex@
+
+enable-sfc	     = @enablesfc@
+SFC_INCLUDE	     = @SFC_INCLUDE_PATH@
+
+enable-tecplot       = @enabletecplot@
+TECIO_INCLUDE        = @TECPLOT_INCLUDE_PATH@
+TECIO_LIBRARY        = @TECPLOT_LIBRARY_PATH@
+
+doxygen		     = @DOXYGEN@
+
+enable-optional      = @enableoptional@
+
+
+
+###############################################################################
+# Compiler flags, different for optimized, debug, and profiler modes.
+ifeq ($(debug-mode),on)
+  CXXFLAGS += @CXXFLAGSG@
+  CFLAGS   += @CFLAGSG@
+endif
+
+
+ifeq ($(opt-mode),on)
+  CXXFLAGS += @CXXFLAGSO@
+  CFLAGS   += @CFLAGSO@
+endif
+
+
+ifeq ($(prof-mode),on)
+  CXXFLAGS += @CXXFLAGSP@ 
+  CFLAGS   += @CFLAGSP@ 
+endif
+
+LIBS += $(LDFLAGS)
+
+ifeq ($(prof-mode),on)
+  LIBS += -pg
+endif
+
+
+###############################################################################
+# now configuration for package includes, libraries, etc...
+#
+# Package-specific stuff
+
+INCLUDE += -I$(pwd)/include
+
+
+#
+# Optional packages
+ifeq ($(enable-optional),yes)
+
+  # if Metis is used we need the header path
+  # and the lib
+  ifeq ($(enable-metis),yes)
+    ifeq ($(enable-shared),yes)
+      LIBS += $(pwd)/contrib/lib/$(HOSTTYPE)/libmetis.so
+    else
+      LIBS += $(pwd)/contrib/lib/$(HOSTTYPE)/libmetis.a
+    endif
+    INCLUDE += -I$(METIS_INCLUDE)
+  endif
+
+  # if Space filling curves are used we need the
+  # header path and the lib
+  ifeq ($(enable-sfc),yes)
+    ifeq ($(enable-shared),yes)
+      LIBS += $(pwd)/contrib/lib/$(HOSTTYPE)/libsfcurves.so
+    else
+      LIBS += $(pwd)/contrib/lib/$(HOSTTYPE)/libsfcurves.a
+    endif
+    INCLUDE += -I$(SFC_INCLUDE)
+  endif
+
+  #if Tecplot is used, link against tecio.a
+  ifeq ($(enable-tecplot),yes)
+    LIBS += $(TECIO_LIBRARY)
+    INCLUDE += -I$(TECIO_INCLUDE)
+  endif	
+
+  #if Exodus is used, link against libexoIIv2c.a
+  ifeq ($(enable-exodus),yes)
+    LIBS += $(EXODUS_LIBRARY)
+    INCLUDE += -I$(EXODUS_INCLUDE)
+  endif
+
+  #############################################################################
+  # Petsc
+  ifeq ($(enable-petsc),yes)
+
+    # Depending on petsc version, we include different files
+    ifeq ($(petsc-version),2.1.0)
+      include $(PETSC_DIR)/bmake/$(PETSC_ARCH)/base.site # 2.1.0 style
+    else
+      include $(PETSC_DIR)/bmake/$(PETSC_ARCH)/packages  # 2.1.1 or later style
+    endif
+
+
+    INCLUDE += -I$(PETSC_DIR)/include -I$(PETSC_DIR)/bmake/$(PETSC_ARCH) \
+                $(MPI_INCLUDE)
+
+    ifeq ($(enable-complex),yes)
+      PETSC_LIB.g  = $(PETSC_DIR)/lib/libg_complex/$(PETSC_ARCH)
+      PETSC_LIB.o  = $(PETSC_DIR)/lib/libO_complex/$(PETSC_ARCH)
+    else
+      PETSC_LIB.g  = $(PETSC_DIR)/lib/libg/$(PETSC_ARCH)
+      PETSC_LIB.o  = $(PETSC_DIR)/lib/libO/$(PETSC_ARCH)
+    endif
+
+    ifeq ($(debug-mode),on)
+      PETSC_LIB = $(PETSC_LIB.g)
+    else	
+      PETSC_LIB = $(PETSC_LIB.o)
+    endif	
+
+# Always link with PETSC's shared libs
+#    libs-PETSC = $(PETSC_LIB)/libpetscsles.a \
+# 		 $(PETSC_LIB)/libpetscvec.a \
+# 		 $(PETSC_LIB)/libpetscmat.a \
+# 		 $(PETSC_LIB)/libpetscdm.a \
+# 		 $(PETSC_LIB)/libpetsc.a
+
+#    ifeq ($(enable-shared),yes)
+
+      libs-PETSC = -L$(PETSC_LIB) \
+	  	   -lpetscsles \
+		   -lpetscvec \
+		   -lpetscmat \
+		   -lpetscdm \
+		   -lpetsc
+#    endif
+
+    LIBS += $(libs-PETSC) $(BLOCKSOLVE_LIB) $(SPOOLES_LIB) \
+	    $(HYPRE_LIB) $(BLASLAPACK_LIB) $(MPI_LIB) \
+	    $(X11_LIB) $(MATLAB_LIB) $(FLIBS)
+  endif
+
+endif # End of disable-all test
+
+
+
+#if netCDF is used, link against libnetcdf.a
+# (note that netCDF is required by exodus if available,
+# so we need to link to this _after_ exodus.
+ifeq ($(enable-netcdf),yes)
+  LIBS += $(NETCDF_LIBRARY)
+  INCLUDE += -I$(NETCDF_INCLUDE)
+endif
+
+#if HDF4 is used, link against its libraries
+ifeq ($(enable-hdf4),yes)
+  LIBS += -L$(HDF4_LIB_DIR) $(HDF4_LIBS)
+  INCLUDE += -I$(HDF4_INCLUDE)
+endif
+
+
+
+###############################################################################
+# Build rules
+
+#
+# How to compile optimized C++
+#
+%.$(HOSTTYPE).o : %.C
+	@echo "Compiling (in optimized mode) "$<"..."
+	@$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
+
+#
+# How to compile C++ with debugging flags
+#
+%.$(HOSTTYPE).go : %.C
+	@echo "Compiling (in debug mode) "$<"..."
+	@$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
+
+#
+# How to compile C++ with profiling flags
+#
+%.$(HOSTTYPE).pgo : %.C
+	@echo "Compiling (in profiler mode) "$<"..."
+	@$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
+###############################################################################
+
+
+
+# Local Variables:
+# mode: makefile
+# End:
