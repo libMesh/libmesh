@@ -1,4 +1,4 @@
-// $Id: laspack_matrix.C,v 1.3 2003-02-10 22:03:27 benkirk Exp $
+// $Id: laspack_matrix.C,v 1.4 2003-02-11 00:08:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -22,6 +22,9 @@
 #include "mesh_config.h"
 
 #if defined(HAVE_LASPACK) && !defined(USE_COMPLEX_NUMBERS)
+
+// C++ includes
+#include <math.h>
 
 // Local includes
 #include "laspack_matrix.h"
