@@ -22,3 +22,11 @@ clobber:
 	@$(MAKE) clean
 	@$(MAKE) -C metis/Lib $(MAKECMDGOALS)
 	@$(MAKE) -C sfcurves $(MAKECMDGOALS)
+
+#
+# How to distclean the packages
+#
+distclean:
+	@$(MAKE) clobber
+	@$(MAKE) -C metis/Lib $(MAKECMDGOALS)
+	@$(MAKE) -C sfcurves $(MAKECMDGOALS)

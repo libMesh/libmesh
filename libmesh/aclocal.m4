@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.4 2003-01-20 19:47:48 jwpeterson Exp $
+dnl $Id: aclocal.m4,v 1.5 2003-01-21 18:06:55 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -273,7 +273,7 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           ;;
   
       MIPSpro)
-          CXXFLAGSG="-DDEBUG -LANG:std -no_auto_include -ansi -g"
+          CXXFLAGSG="-DDEBUG -LANG:std -no_auto_include -ansi -g -woff 1355,1460"
           CXXFLAGSO="-DNDEBUG -LANG:std -no_auto_include -ansi -O2 -w"
           CFLAGSG="-DDEBUG"
           CFLAGSO="-DNDEBUG -w"

@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.4 2003-01-20 19:47:48 jwpeterson Exp $
+# $Id: Make.common.in,v 1.5 2003-01-21 18:06:55 benkirk Exp $
 
 
 ###############################################################################
@@ -31,6 +31,7 @@ obj-suffix := @host@.o
 # If the user has no environment variable
 # called METHOD, he gets optimized mode.
 ifeq (x$(METHOD),x)
+  METHOD     := opt
   opt-mode   := on
   obj-suffix := @host@.o
 endif
@@ -131,9 +132,6 @@ enable-optional      = @enableoptional@
 # Set the current directory.
 pwd := @PWD@
 
-#
-# Set the object output directory
-object-dir-prefix  	:= $(hosttype)-$(obj-suffix)
 
 
 
@@ -185,9 +183,9 @@ ifeq ($(enable-optional),yes)
   # and the lib
   ifeq ($(enable-metis),yes)
     ifeq ($(enable-shared),yes)
-      LIBS += $(pwd)/contrib/lib/$(hosttype)/libmetis.so
+      LIBS += $(pwd)/contrib/lib/$(hosttype)_$(METHOD)/libmetis.so
     else
-      LIBS += $(pwd)/contrib/lib/$(hosttype)/libmetis.a
+      LIBS += $(pwd)/contrib/lib/$(hosttype)_$(METHOD)/libmetis.a
     endif
     INCLUDE += -I$(METIS_INCLUDE)
   endif
@@ -196,9 +194,9 @@ ifeq ($(enable-optional),yes)
   # header path and the lib
   ifeq ($(enable-sfc),yes)
     ifeq ($(enable-shared),yes)
-      LIBS += $(pwd)/contrib/lib/$(hosttype)/libsfcurves.so
+      LIBS += $(pwd)/contrib/lib/$(hosttype)_$(METHOD)/libsfcurves.so
     else
-      LIBS += $(pwd)/contrib/lib/$(hosttype)/libsfcurves.a
+      LIBS += $(pwd)/contrib/lib/$(hosttype)_$(METHOD)/libsfcurves.a
     endif
     INCLUDE += -I$(SFC_INCLUDE)
   endif
@@ -289,6 +287,11 @@ endif
 ###############################################################################
 # Build rules
 
+
+##################################
+# C++ rules                      #
+##################################
+
 #
 # How to compile optimized C++
 #
@@ -317,6 +320,41 @@ endif
 	@echo "Compiling (in syntax-checker mode) "$<"..."
 	@$(CXX) $(CXXFLAGS) $(INCLUDE) -c $<
 	$(shell touch $@)
+
+
+
+##################################
+# C rules                        #
+##################################
+#
+# How to compile optimized C
+#
+%.@host@.o : %.c
+	@echo "Compiling (in optimized mode) "$<"..."
+	@$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
+
+#
+# How to compile C with debugging flags
+#
+%.@host@.go : %.c
+	@echo "Compiling (in debug mode) "$<"..."
+	@$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
+
+#
+# How to compile C with profiling flags
+#
+%.@host@.pgo : %.c
+	@echo "Compiling (in profiler mode) "$<"..."
+	@$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
+
+#
+# How to compile C with profiling flags
+#
+%.@host@.syo : %.c
+	@echo "Compiling (in syntax-checker mode) "$<"..."
+	@$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
+	$(shell touch $@)
+
 
 ###############################################################################
 

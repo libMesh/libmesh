@@ -2,35 +2,37 @@ include ../../Make.common
 
 INCLUDES = -I.
 
-OBJS = hilbert.o morton.o cmp.o
-
-%.o : %.c
-	@echo "Compiling "$<"..."
-	@$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
+SRC     := $(wildcard *.c)
+OBJS   	:= $(patsubst %.c, %.$(obj-suffix), $(SRC))
 
 
-target := ../lib/$(hosttype)/libsfcurves.a
+
+target := ../lib/$(hosttype)_$(METHOD)/libsfcurves.a
 
 ifeq ($(enable-shared),yes)
-  target := ../lib/$(hosttype)/libsfcurves.so
+  target := ../lib/$(hosttype)_$(METHOD)/libsfcurves.so
 endif
 
 
 all:: $(target)
 
-../lib/$(hosttype)/libsfcurves.a: $(OBJS)
+../lib/$(hosttype)_$(METHOD)/libsfcurves.a: $(OBJS)
 	@echo "Linking "$@
-	$(shell mkdir -p ../lib/$(hosttype))
+	$(shell mkdir -p ../lib/$(hosttype)_$(METHOD))
 	@$(AR) rv $@ $(OBJS)
 
-../lib/$(hosttype)/libsfcurves.so: $(OBJS)
+../lib/$(hosttype)_$(METHOD)/libsfcurves.so: $(OBJS)
 	@echo "Linking "$@
-	$(shell mkdir -p ../lib/$(hosttype))
+	$(shell mkdir -p ../lib/$(hosttype)_$(METHOD))
 	@$(CC) -shared -o $@ $(OBJS)
 
 clean:
-	@rm -f *.o *~
+	@rm -f $(OBJS) *~
 
 clobber:
-	@$(MAKE) clean
-	@rm -f ../lib/$(hosttype)/libsfcurves.*
+	@rm -f *.o *.go *.pgo *.syo
+	@rm -f ../lib/$(hosttype)_$(METHOD)/libsfcurves.*
+
+distclean:
+	@$(MAKE) clobber
+	@rm -f ../lib/*/libsfcurves.*
