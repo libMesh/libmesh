@@ -1,4 +1,4 @@
-// $Id: mesh_base_modification.C,v 1.11 2003-09-11 19:10:53 benkirk Exp $
+// $Id: mesh_base_modification.C,v 1.12 2003-09-12 21:31:22 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -541,16 +541,27 @@ void MeshBase::build_inf_elem(const Point& origin,
 	      Point dist_from_origin=this->point(side->node(n))-origin;
 
 	      if(x_sym)
-		if( fabs(dist_from_origin(0)) > 1.e-6 )
+		if( fabs(dist_from_origin(0)) > 1.e-3 )
 		  on_x_sym=false;
 
 	      if(y_sym)
-		if( fabs(dist_from_origin(1)) > 1.e-6 )
+		if( fabs(dist_from_origin(1)) > 1.e-3 )
 		  on_y_sym=false;
 
 	      if(z_sym)
-		if( fabs(dist_from_origin(2)) > 1.e-6 )
+		if( fabs(dist_from_origin(2)) > 1.e-3 )
 		  on_z_sym=false;
+// 	      if(x_sym)
+// 		if( fabs(dist_from_origin(0)) > 1.e-6 )
+// 		  on_x_sym=false;
+
+// 	      if(y_sym)
+// 		if( fabs(dist_from_origin(1)) > 1.e-6 )
+// 		  on_y_sym=false;
+
+// 	      if(z_sym)
+// 		if( fabs(dist_from_origin(2)) > 1.e-6 )
+// 		  on_z_sym=false;
 
 	      //find the node most distant from origin
 
