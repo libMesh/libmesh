@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.h,v 1.6 2003-02-10 14:31:15 ddreyer Exp $
+// $Id: mesh_unv_support.h,v 1.7 2003-05-14 11:54:36 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -81,19 +81,25 @@ protected:
   void set_stream_pointer(std::string ds_num);
   
   /**
-   * Method for reading nodes (dataset "2411").
+   * Method reads nodes from the virtual file and stores them in
+   * vector<Node> nodes in the order they come in.
+   * The original node labels are being stored in the
+   * map _assign_nodes in order to assign the elements to
+   * the right nodes later.  In addition, if there is
+   * a \p BoundaryData, this \p BoundaryData gets to know 
+   * the node id in the Universal file, too.
    */
   void node_in();
 
   /**
-   * Method for reading elements (dataset "2412").
+   * Method reads elements and stores them in
+   * vector<Elem*> elements in the same order as they
+   * come in. Within UnvInterface, element labels are
+   * ignored, but \p BoundaryData takes care of such things.
+   *
+   * Obviously, nodes are re-numbered.
    */
   void element_in();
-
-  /**
-   * Method for reading boundary conditions (dataset "2414").
-   */
-  void bcs_in(BoundaryInfo& boundary_info);
 
   /**
    * Method for converting exponential notation
@@ -105,65 +111,70 @@ protected:
   /**
    * input stream, physical file
    */
-  std::istream& phys_file;     
+  std::istream& _phys_file;     
 
   /**
    * vector holding the nodes
    */
-  std::vector<Node*>& nodes;    
+  std::vector<Node*>& _nodes;    
 
   /**
    * vector holding the elements
    */
-  std::vector<Elem*>& elements; 
+  std::vector<Elem*>& _elements; 
 
   /**
    * stores new positions of nodes
    */
-  std::map<unsigned int,unsigned int> assign_nodes; 
+  std::map<unsigned int,unsigned int> _assign_nodes; 
 
   /**
    * stores positions of datasets in the stream
    */
-  std::map<std::string,std::streampos> ds_position;
+  std::map<std::string,std::streampos> _ds_position;
 
   /**
-   * store the total number of nodes, elements and boundary conditions
+   * total number of nodes
    */
-  unsigned int num_nodes,
-               num_elements,
-               num_bcs;
+  unsigned int _num_nodes;
 
   /**
-   * location of boundary conditions
+   * total number of elements
    */
-  unsigned short int bcs_dataset_location;
+  unsigned int _num_elements;
 
 
 private:
 
   /**
-   * labels for the node and element datasets
+   * writable reference to the BoundaryInfo
    */
-  std::string label_dataset_nodes,                  
-              label_dataset_elms,  
-              label_dataset_bcs;        
+  BoundaryInfo& _boundary_info;
+
+  /**
+   * labels for the node dataset
+   */
+  std::string _label_dataset_nodes;
+
+  /**
+   * labels for the element dataset
+   */
+  std::string _label_dataset_elms;
     
   /**
    * temporary file, simplifies node & element conversion
    */
-  std::fstream temporary_file;
+  std::fstream _temporary_file;
 
   /**
    * Name of temporary file
    */
-  char* temporary_file_name;
-
+  char* _temporary_file_name;
 
   /**
    * whether we need to convert notation of exponentials
    */
-  bool need_D_to_e;
+  bool _need_D_to_e;
 
 };
 
