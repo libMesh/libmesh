@@ -1,4 +1,4 @@
-// $Id: elem_iterators.h,v 1.3 2003-02-14 20:50:39 jwpeterson Exp $
+// $Id: elem_iterators.h,v 1.4 2003-02-18 00:49:55 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -87,14 +87,6 @@ typedef basic_elem_iterator<const Elem**> const_neighbor_iterator;
 
 
 
-
-
-
-
-
-
-
-
 /**
  * The basic_active_elem_iterator class is an un-specialized templated
  * class which iterates over active elements.  Active elements are
@@ -164,6 +156,8 @@ typedef basic_active_elem_iterator<std::vector<Elem*>::const_iterator> const_act
  * to instantiate non-const and const versions of the iterator,
  * respectively.  Note the "false" argument to the basic_active_elem_iterator
  * constructor.  This basically tells that constructor to NOT advance();
+ * Note that this class needs to explicilty instantiate the basic_elem_iterator
+ * in its initialization list since its parent is a virtual public basic_elem_iterator.
  */
 template <class T>
 class basic_not_active_elem_iterator : public basic_active_elem_iterator<T>
@@ -175,7 +169,8 @@ public:
    * does not call the advance() function.
    */
   basic_not_active_elem_iterator(const std::pair<T,T>& p)
-    : basic_active_elem_iterator<T>(p, false)
+    : basic_elem_iterator<T>(p, false),
+      basic_active_elem_iterator<T>(p, false)
   {
     advance();
   }
@@ -280,6 +275,9 @@ typedef basic_type_elem_iterator<std::vector<Elem*>::const_iterator> const_type_
  * adds the additional internal state which describes the type
  * of element.  Note the "false" argument to the basic_elem_iterator
  * constructor.  This basically tells that constructor to NOT advance();
+ * Note that this class needs to explicitly instantiate the basic_elem_iterator
+ * in its initialization list since its parent is a virtual public
+ * basic_elem_iterator.
  */
 template <class T>
 class basic_not_type_elem_iterator : public basic_type_elem_iterator<T>
@@ -291,7 +289,8 @@ public:
   basic_not_type_elem_iterator(const std::pair<T,T>& p,
 			       const ElemType t,
 			       const bool b=true)
-    : basic_type_elem_iterator<T>(p, t, false)
+    : basic_elem_iterator<T>(p, false),
+      basic_type_elem_iterator<T>(p, t, false)
   {
     if (b) advance();
   }
@@ -345,6 +344,11 @@ public:
     return (basic_active_elem_iterator<T>::predicate() && basic_type_elem_iterator<T>::predicate());
   }
 };
+
+
+
+
+
 
 
 /**
@@ -499,7 +503,7 @@ typedef basic_not_level_elem_iterator<std::vector<Elem*>::const_iterator> const_
  * under the wrong predicate!
  */
 template <class T>
-class basic_pid_elem_iterator : public basic_elem_iterator<T>
+class basic_pid_elem_iterator : virtual public basic_elem_iterator<T>
 {
 public:
   basic_pid_elem_iterator(const std::pair<T,T>& p,
@@ -551,7 +555,9 @@ typedef basic_pid_elem_iterator<std::vector<Elem*>::const_iterator> const_pid_el
  * which has a default true value, tells whether or not to
  * actually call advance() in the constructor.  Derived classes
  * will want to set this to false so that advance() is not called
- * under the wrong predicate!
+ * under the wrong predicate!  Note that we need to explicitly
+ * instantiate the base class since the basic_pid_iterator is
+ * a virtual public basic_elem_iterator.
  */
 template <class T>
 class basic_not_pid_elem_iterator : public basic_pid_elem_iterator<T>
@@ -559,7 +565,8 @@ class basic_not_pid_elem_iterator : public basic_pid_elem_iterator<T>
 public:
   basic_not_pid_elem_iterator(const std::pair<T,T>& p,
 			      const unsigned int pid)
-    : basic_pid_elem_iterator<T>(p, pid, false)
+    : basic_elem_iterator<T>(p, false),
+      basic_pid_elem_iterator<T>(p, pid, false)
   {
     advance();
   }
@@ -589,6 +596,55 @@ typedef basic_not_pid_elem_iterator<std::vector<Elem*>::iterator> not_pid_elem_i
 typedef basic_not_pid_elem_iterator<std::vector<Elem*>::const_iterator> const_not_pid_elem_iterator;
 
 
+
+/**
+ * The basic_active_pid_elem_iterator is a templated unspecialized
+ * iterator which can be used to iterate only over active elements
+ * on a specific processor.  The typedefs active_pid_elem_iterator
+ * and const_active_pid_elem_iterator should be used to instantiate
+ * actual iterators.  This class uses multiple inheritance (in a diamond
+ * pattern no less) so that it can mimic the behavior of both the
+ * active_elem_iterator and pid_elem_iterator classes without
+ * reimplementing those functions.  Because its base classes use virtual
+ * inheritance, we must explicitly call the constructor for their
+ * common parent, the basic_elem_iterator, here.
+ */
+template <class T>
+class basic_active_pid_elem_iterator : public basic_pid_elem_iterator<T>, public basic_active_elem_iterator<T>
+{
+public:
+  /**
+   * Constructor.
+   */
+  basic_active_pid_elem_iterator(const std::pair<T,T>& p,
+				  const unsigned int pid)
+    : basic_elem_iterator<T>(p,false),
+      basic_pid_elem_iterator<T>(p, pid, false),
+      basic_active_elem_iterator<T>(p, false)
+  {
+    advance();
+  }
+
+  /**
+   * Definition of the predicate
+   */
+  virtual bool predicate() const
+  {
+    return (basic_active_elem_iterator<T>::predicate() && basic_pid_elem_iterator<T>::predicate());
+  }
+};
+
+
+/**
+ * typedef for user instantiation.
+ */
+typedef basic_active_pid_elem_iterator<std::vector<Elem*>::iterator> active_pid_elem_iterator;
+
+
+/**
+ * typedef for user instantiation.
+ */
+typedef basic_active_pid_elem_iterator<std::vector<Elem*>::const_iterator> const_active_pid_elem_iterator;
 
 #endif
 
