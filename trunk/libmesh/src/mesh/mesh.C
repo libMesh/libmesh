@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.18 2003-07-26 00:17:04 ddreyer Exp $
+// $Id: mesh.C,v 1.19 2003-08-26 22:58:45 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -223,4 +223,118 @@ void Mesh::write (const std::string& name,
   }
 
   STOP_LOG("write()", "Mesh");
+}
+
+
+
+
+
+void Mesh::create_pid_mesh(Mesh& pid_mesh,
+			   const unsigned int pid) const
+{
+
+  // Issue a warning if the number the number of processors
+  // currently available is less that that requested for
+  // partitioning.  This is not necessarily an error since
+  // you may run on one processor and still partition the
+  // mesh into several partitions.
+  if (this->n_processors() < pid)
+    {
+      std::cout << "WARNING:  You are creating a "
+		<< "mesh for a processor id (="
+		<< pid
+		<< ") greater than "
+		<< "the number of processors available for "
+		<< "the calculation. (="
+		<< libMesh::n_processors()
+		<< ")."
+		<< std::endl;
+    }
+  
+  // Create iterators to loop over the list of elements
+  const_active_pid_elem_iterator       it(this->elements_begin(),   pid);
+  const const_active_pid_elem_iterator it_end(this->elements_end(), pid);
+
+  this->create_submesh (pid_mesh, it, it_end);
+}
+
+
+
+void Mesh::create_submesh (Mesh& new_mesh,
+			   const_elem_iterator& it,
+			   const const_elem_iterator& it_end) const
+{
+ 
+  // Just in case the subdomain_mesh already has some information
+  // in it, get rid of it.
+  new_mesh.clear();
+
+  // How the nodes on this mesh will be renumbered to nodes
+  // on the new_mesh.  
+  std::vector<unsigned int> new_node_numbers (this->n_nodes());
+
+  std::fill (new_node_numbers.begin(),
+	     new_node_numbers.end(),
+	     static_cast<unsigned int>(-1));
+
+  
+  {
+    // the number of nodes on the new mesh, will be incremented
+    unsigned int n_new_nodes = 0;
+    unsigned int n_new_elem  = 0;
+    
+    for (; it != it_end; ++it)
+      {
+	// increment the new element counter
+	n_new_elem++;
+	
+	const Elem* old_elem = *it;
+
+	// Add an equivalent element type to the new_mesh
+	Elem* new_elem = new_mesh.add_elem (Elem::build (old_elem->type()));
+
+	assert (new_elem != NULL);
+	
+	// Loop over the nodes on this element.  Map 
+	for (unsigned int n=0; n<old_elem->n_nodes(); n++)
+	  {
+	    assert (old_elem->node(n) < new_node_numbers.size());
+
+	    if (new_node_numbers[old_elem->node(n)] == static_cast<unsigned int>(-1))
+	      {
+		new_node_numbers[old_elem->node(n)] = n_new_nodes;
+
+		// Add this node to the new mesh
+		new_mesh.add_point (old_elem->point(n), n_new_nodes);
+
+		// Increment the new node counter
+		n_new_nodes++;
+	      }
+
+	    // Define this element's connectivity on the new mesh
+	    assert (new_node_numbers[old_elem->node(n)] < new_mesh.n_nodes());
+	    
+	    new_elem->set_node(n) = new_mesh.node_ptr (new_node_numbers[old_elem->node(n)]);
+	  }
+      }
+  
+    // Test out what we have
+    std::cout << "number of elements in the new_mesh will be = "
+	      << n_new_elem
+	      << std::endl;
+  
+    std::cout << "number of nodes in the new_mesh will be = "
+	      << n_new_nodes
+	      << std::endl;
+  
+    for (unsigned int i=0; i<new_node_numbers.size(); ++i)
+      std::cout << new_node_numbers[i] << std::endl;
+
+  }
+
+  new_mesh.print_info();
+
+  // Prepare the new_mesh for use
+  new_mesh.prepare_for_use();
+  
 }

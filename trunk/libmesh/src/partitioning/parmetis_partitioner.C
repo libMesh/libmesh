@@ -1,4 +1,4 @@
-// $Id: parmetis_partitioner.C,v 1.5 2003-08-17 19:06:35 ddreyer Exp $
+// $Id: parmetis_partitioner.C,v 1.6 2003-08-26 22:58:45 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -123,9 +123,7 @@ void ParmetisPartitioner::repartition (const unsigned int n_sbdmns)
       const elem_iterator elem_end(_mesh.elements_end());
       
       for ( ; elem_it != elem_end; ++elem_it)
-	(*elem_it)->set_subdomain_id() = 
-	  (*elem_it)->set_processor_id() =
-	  0;
+	(*elem_it)->set_processor_id() = 0;
       
       return;
     }
@@ -392,9 +390,7 @@ void ParmetisPartitioner::assign_partitioning ()
 	      static_cast<unsigned int>(-1));
       assert (_forward_map[elem->id()] < _part.size());
       
-      elem->set_subdomain_id() =
-	elem->set_processor_id() =
-	static_cast<short int>(_part[_forward_map[elem->id()]]);
+      elem->set_processor_id() = static_cast<short int>(_part[_forward_map[elem->id()]]);
       
     }
 }

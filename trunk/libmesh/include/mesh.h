@@ -1,4 +1,4 @@
-// $Id: mesh.h,v 1.19 2003-08-07 19:25:31 ddreyer Exp $
+// $Id: mesh.h,v 1.20 2003-08-26 22:58:45 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -180,6 +180,21 @@ class Mesh : public MeshBase
   void clear();
 
 
+  /**
+   * Generates a new mesh containing all the elements which
+   * are assigned to processor \p pid.  This mesh is written
+   * to the pid_mesh reference which you must create and pass
+   * to the function.
+   */
+  void create_pid_mesh (Mesh& pid_mesh,
+			const unsigned int pid) const;
+  
+  /**
+   * document me!
+   */
+  void create_submesh (Mesh& new_mesh,
+		       const_elem_iterator& it,
+		       const const_elem_iterator& it_end) const;
  protected:
 
   /**

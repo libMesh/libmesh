@@ -1,4 +1,4 @@
-// $Id: centroid_partitioner.C,v 1.2 2003-08-23 00:36:08 jwpeterson Exp $
+// $Id: centroid_partitioner.C,v 1.3 2003-08-26 22:58:45 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -115,10 +115,7 @@ void CentroidPartitioner::partition (const unsigned int n)
     {
       Elem* elem = _elem_centroids[i].second;
 
-      elem->set_subdomain_id() =
-	elem->set_processor_id() =
-
-	std::min (i / target_size, n-1);
+      elem->set_processor_id() = std::min (i / target_size, n-1);
       
     }	
 }
@@ -126,10 +123,10 @@ void CentroidPartitioner::partition (const unsigned int n)
 
 
 
-void CentroidPartitioner::repartition (const unsigned int n)
-{
-  this->partition (n);
-}
+// void CentroidPartitioner::repartition (const unsigned int n)
+// {
+//   this->partition (n);
+// }
 
 
 

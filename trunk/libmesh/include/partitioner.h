@@ -1,4 +1,4 @@
-// $Id: partitioner.h,v 1.2 2003-07-25 20:58:24 benkirk Exp $
+// $Id: partitioner.h,v 1.3 2003-08-26 22:58:45 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,7 @@
 // C++ Includes   -----------------------------------
 
 // Local Includes -----------------------------------
-
+#include "libmesh.h"
 
 // Forward Declarations
 class MeshBase;
@@ -56,18 +56,24 @@ class Partitioner
   virtual ~Partitioner() {}
 
   /**
-   * Partition the \p MeshBase into \p n subdomains.
+   * Partition the \p MeshBase into \p n parts.  If the
+   * user does not specify a number of pieces into which the
+   * mesh should be partitioned, then the default behavior
+   * of the partitioner is to partition according to the number
+   * of processors defined in libMesh::n_processors().
+   * The partitioner currently does not modify the subdomain_id
+   * of each element.  This number is reserved for things like
+   * material properties, etc.
    */
-  virtual void partition (const unsigned int n) = 0;
+  virtual void partition (const unsigned int n=libMesh::n_processors()) = 0;
 
   /**
-   * Repartitions the \p MeshBase into \p n subdomains.  This
+   * Repartitions the \p MeshBase into \p n parts.  This
    * is required since some partitoning algorithms can repartition
    * more efficiently than computing a new partitioning from scratch.
-   * IF this is not the case then your derived class should implement
-   * \p repartition() to simply call \p this->partition().
-   */
-  virtual void repartition (const unsigned int n) = 0;
+   * The default behavior is to simply call this->partition(n)
+  */
+  virtual void repartition (const unsigned int n=libMesh::n_processors()) { this->partition(n); }
 
   
 protected:

@@ -20,7 +20,7 @@
   linear solver support on serial machines.
  
   The \p libMesh library is actively developed at The University of Texas at
-  Austin in the <a href="http://cfdlab.ae.utexas.edu">CFDLab</a>
+  Austin in the <a href="http://cfdlab.ae.utexas.edu" target="_top">CFDLab</a>
   and at Technische Universit&auml;t Hamburg-Harburg,
   <a href="http://www.mum.tu-harburg.de/english"> Mechanics and Ocean Engineering</a> 
   in Germany.  Many thanks to

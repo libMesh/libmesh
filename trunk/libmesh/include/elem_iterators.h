@@ -1,4 +1,4 @@
-// $Id: elem_iterators.h,v 1.10 2003-05-28 03:17:47 benkirk Exp $
+// $Id: elem_iterators.h,v 1.11 2003-08-26 22:58:45 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -523,6 +523,71 @@ typedef basic_not_level_elem_iterator<std::vector<Elem*>::iterator>
  */
 typedef basic_not_level_elem_iterator<std::vector<Elem*>::const_iterator>
   const_not_level_elem_iterator;
+
+
+
+
+
+/**
+ * The basic_sbd_elem_iterator is a templated unspecialized
+ * iterator which can be used to iterate only over elements 
+ * with a certain subdomain id.
+ * The typedefs sbd_elem_iterator
+ * and const_sbd_elem_iterator should be used to instantiate
+ * actual iterators.  The third and final constructor argument,
+ * which has a default true value, tells whether or not to
+ * actually call advance() in the constructor.  Derived classes
+ * will want to set this to false so that advance() is not called
+ * under the wrong predicate!
+ */
+template <class T>
+class basic_sbd_elem_iterator : public basic_elem_iterator<T>
+{
+public:
+  basic_sbd_elem_iterator(const std::pair<T,T>& p,
+			  const unsigned char sbd,
+			  const bool b=true)
+    : basic_elem_iterator<T>(p, false),
+      _sbd(sbd)
+  {
+    if (b) this->advance();
+  }
+
+protected:
+  
+  /**
+   * Definition of the predicate.  Test the base class predicate
+   * first, this will avoid calling the \p active member on \p NULL
+   * elements.
+   */
+  virtual bool predicate() const { return (basic_elem_iterator<T>::predicate() &&
+					   (*this->_current)->subdomain_id() == _sbd); }
+
+  const unsigned char _sbd;
+};
+
+
+
+
+/**
+ * Specialization of the basic_sbd_elem_iterator for
+ * \p std::vector<Elem*>::iterator.  This is what users
+ * create when they want to iterate over all elements
+ * with a specific subdomain id.
+ */
+typedef basic_sbd_elem_iterator<std::vector<Elem*>::iterator>
+  sbd_elem_iterator;
+
+
+/**
+ * Specialization of the basic_sbd_elem_iterator for
+ * \p std::vector<Elem*>::const_iterator.  This is what users
+ * create when they want to iterate over all elements
+ * with a specific processor id.
+ */
+typedef basic_sbd_elem_iterator<std::vector<Elem*>::const_iterator>
+  const_sbd_elem_iterator;
+
 
 
 

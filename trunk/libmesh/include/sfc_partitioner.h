@@ -1,4 +1,4 @@
-// $Id: sfc_partitioner.h,v 1.1 2003-06-24 05:33:51 benkirk Exp $
+// $Id: sfc_partitioner.h,v 1.2 2003-08-26 22:58:45 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -53,16 +53,7 @@ class SFCPartitioner : public Partitioner
   /**
    * Partition the \p MeshBase into \p n subdomains.
    */
-  void partition (const unsigned int n);
-
-  /**
-   * Repartitions the \p MeshBase into \p n subdomains.  This
-   * is required since some partitoning algorithms can repartition
-   * more efficiently than computing a new partitioning from scratch.
-   * IF this is not the case then your derived class should implement
-   * \p repartition() to simply call \p this->partition().
-   */
-  void repartition (const unsigned int n) { this->partition (n); }
+  virtual void partition (const unsigned int n = libMesh::n_processors());
 
   /**
    * Sets the type of space-filling curve to use.  Valid types are
