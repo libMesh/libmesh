@@ -1,4 +1,4 @@
-// $Id: mesh_tetgen_support.C,v 1.4 2004-05-05 15:23:50 spetersen Exp $
+// $Id: mesh_tetgen_support.C,v 1.5 2004-05-09 15:39:38 fprill Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -280,6 +280,7 @@ void TetGen13_wrapper::set_vertex(int i, int j, int k, int nodeindex)
   tetgen_data.facetlist[i].polygonlist[j].vertexlist[k] = nodeindex;
 }
 
+// class type TetGen_access is cast to TetGen_Wrapper class for current TetGen version:
 typedef TetGen13_wrapper TetGen_access;
 
 #endif // TETGEN_13
@@ -290,11 +291,12 @@ typedef TetGen13_wrapper TetGen_access;
 
 void TetGenMeshInterface::triangulate_pointset ()   
 {
+  // class tetgen_wrapper allows library access on a basic level:
   TetGen_access tetgen_wrapper; 
 
   _num_elements = 0; // counts additional elements 
 
-  // fill input structure "tetgenio" with point set data:
+  // fill input structure with point set data:
   tetgen_wrapper.set_pointlist(_nodes.size());
   int index = 0;
   std::vector< Node *>::iterator i;
@@ -313,7 +315,7 @@ void TetGenMeshInterface::triangulate_pointset ()
   // Reserve space in the appropriate vector to avoid unnecessary allocations.
   _elements.resize (_num_elements+firstnumber);
 
-  // Vector that assigns element nodes to their correct position (see above):
+  // Vector that assigns element nodes to their correct position:
   static const unsigned int assign_elm_nodes[] = { 0, 1, 2, 3};
   unsigned long int node_labels[4];      // Vector that temporarily holds the node labels defining element.
   for (unsigned int i=0; i<_num_elements; i++)
@@ -330,11 +332,12 @@ void TetGenMeshInterface::triangulate_pointset ()
 
 void TetGenMeshInterface::pointset_convexhull ()   
 {
+  // class tetgen_wrapper allows library access on a basic level:
   TetGen_access tetgen_wrapper; 
 
   _num_elements = 0; // counts additional elements 
 
-  // fill input structure "tetgenio" with point set data:
+  // fill input structure with point set data:
   tetgen_wrapper.set_pointlist(_nodes.size());
   int index = 0;
   std::vector< Node *>::iterator i;
@@ -346,14 +349,14 @@ void TetGenMeshInterface::pointset_convexhull ()
   tetgen_wrapper.set_switches("-Q"); // TetGen switches: triangulation, Convex hull, Quiet mode
   tetgen_wrapper.run_tetgen();
 
-  // save elements to mesh structure, nodes will not be changed:
+  // save SURFACE elements to mesh structure, nodes will not be changed:
   int n_nodes     = 3;                                  // (Tri3 elements)
   _num_elements   = tetgen_wrapper.get_numberoftrifaces();
   int firstnumber = _elements.size()+1;                 // append position
   // Reserve space in the appropriate vector to avoid unnecessary allocations.
   _elements.resize (_num_elements+firstnumber);
 
-  // Vector that assigns element nodes to their correct position (see above):
+  // Vector that assigns element nodes to their correct position:
   static const unsigned int assign_elm_nodes[] = { 0, 1, 2};
   unsigned long int node_labels[3];      // Vector that temporarily holds the node labels defining element.
   for (unsigned int i=0; i<_num_elements; i++)
@@ -370,6 +373,7 @@ void TetGenMeshInterface::pointset_convexhull ()
 
 int TetGenMeshInterface::get_node_index (Node* inode)
 {
+  // This is NO elegant solution!
   unsigned int node_id;
   int result = 0;
   node_id = inode->id();
@@ -384,7 +388,8 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh (double quality_con
 {
   // >>> assert usage of TRI3 hull elements (no other elements! => mesh.all_tri() )
 
-  // >>> thorough check of hull integrity:
+  // thorough check of hull integrity:
+  // loop over hull with breadth-first search:
   std::set< Elem *>    visited;
   std::vector< Elem *> current;
   current.push_back(_elements[0]);
@@ -436,7 +441,9 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole
     error();
   }
   
-  // >>> fill input structure "tetgenio" with point set data:
+  // >>> fill input structure with point set data:
+
+  // class tetgen_wrapper allows library access on a basic level:
   TetGen_access tetgen_wrapper; 
   _num_elements = 0; // counts additional elements 
 
@@ -453,7 +460,7 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole
   // allocate memory in "tetgenio" structure:
   tetgen_wrapper.set_facetlist(facet_num, holes.size());
 
-  // fill facetlist: each facet consists of only one polygon
+  // fill facetlist: each facet consists of only one polygon:
   int insertnum = 0;
   for (int i=0; i<total_num; i++) {
     tetgen_wrapper.set_facet_polygonlist(insertnum, 1);
@@ -473,6 +480,8 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole
   } // if
 
   // >>> run TetGen triangulation method:
+
+  // assemble switches:
   std::ostringstream oss; // string holding switches
   oss << "-pQ";
   if (quality_constraint != 0)
@@ -485,7 +494,7 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole
   tetgen_wrapper.run_tetgen();
 
   // >>> save elements to mesh structure, 
-  // old nodes will not be changed, new nodes will be appended:
+  // old nodes should not be changed, new nodes will be appended:
 
   // => nodes:
   // Reserve space in the _nodes vector to avoid unnecessary allocations.
@@ -497,8 +506,6 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole
   for (unsigned int i=old_nodesnum; i<=_num_nodes; i++) {
     tetgen_wrapper.get_output_node(i, x,y,z);
     _nodes[i] = Node::build(x,y,z,i);
-    // Tell the MeshData object the foreign node id.
-    //_mesh_data.add_foreign_node_id (_nodes[i], i);
   }
   // => tetrahedra:
   int n_nodes     = 4;                                  // (Tet4 elements)
@@ -508,7 +515,7 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole
   // Reserve space in the _elements vector to avoid unnecessary allocations.
   _elements.resize (_num_elements+firstnumber);
 
-  // Vector that assigns element nodes to their correct position (see above):
+  // Vector that assigns element nodes to their correct position:
   static const unsigned int assign_elm_nodes[] = { 0, 1, 2, 3};
   unsigned long int node_labels[4];      // Vector that temporarily holds the node labels defining element.
   for (unsigned int i=0; i<_num_elements; i++)

@@ -1,4 +1,4 @@
-// $Id: tetgen_io.C,v 1.3 2004-05-06 02:07:33 jwpeterson Exp $
+// $Id: tetgen_io.C,v 1.4 2004-05-09 15:39:38 fprill Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -208,10 +208,10 @@ void TetGenIO::element_in (std::istream& ele_stream)
 }
 
 
-// output method - poly file writes Piecewise Linear Complex (PLC)
-// format description: cf. TetGen manual.
-
-
+/**
+ * This method implements writing a mesh to a specified ".poly" file.
+ * ".poly" files defines so called Piecewise Linear Complex (PLC).
+ */
 void TetGenIO::write (const std::string& fname)
 {
   // assert three dimensions (should be extended later)
