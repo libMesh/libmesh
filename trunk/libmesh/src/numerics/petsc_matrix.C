@@ -1,4 +1,4 @@
-// $Id: petsc_matrix.C,v 1.22 2004-08-20 14:05:21 jwpeterson Exp $
+// $Id: petsc_matrix.C,v 1.23 2004-10-18 18:24:58 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -234,7 +234,9 @@ template <typename T>
 void PetscMatrix<T>::print_matlab (const std::string name) const
 {
   assert (this->initialized());
-  assert (this->closed());
+
+  // assert (this->closed());
+  this->close();
   
   int ierr=0; 
   PetscViewer petsc_viewer;
