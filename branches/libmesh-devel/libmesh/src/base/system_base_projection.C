@@ -1,4 +1,4 @@
-// $Id: system_base_projection.C,v 1.1 2003-04-30 21:09:29 benkirk Exp $
+// $Id: system_base_projection.C,v 1.1.2.1 2003-05-06 00:10:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -22,12 +22,15 @@
 // C++ includes
 // Local includes
 #include "system_base.h"
+#include "mesh.h"
 #include "libmesh.h"
 #include "dof_map.h"
 #include "dense_matrix.h"
 #include "fe.h"
 #include "fe_interface.h"
 #include "quadrature_gauss.h"
+#include "numeric_vector.h"
+#include "sparse_matrix.h"
 
 
 

@@ -1,4 +1,4 @@
-// $Id: mesh_gmv_support.C,v 1.16 2003-03-27 18:30:05 spetersen Exp $
+// $Id: mesh_gmv_support.C,v 1.16.2.1 2003-05-06 00:10:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,7 @@
 #include <stdio.h>
 
 // Local includes
-#include "equation_systems_base.h"
+#include "equation_systems.h"
 #include "mesh_base.h"
 #include "elem.h"
 
