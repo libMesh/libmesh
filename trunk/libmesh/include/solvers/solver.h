@@ -1,4 +1,4 @@
-// $Id: solver.h,v 1.1 2004-01-03 15:37:42 benkirk Exp $
+// $Id: solver.h,v 1.2 2004-01-17 22:56:54 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -139,6 +139,7 @@ protected:
 
 // ------------------------------------------------------------
 // Solver inline members
+inline
 Solver::Solver (EquationSystems& es) :
   _system (es),
   _mesh   (es.get_mesh())
@@ -147,15 +148,17 @@ Solver::Solver (EquationSystems& es) :
 
 
 
+inline
 Solver::~Solver ()
 {
 }
 
 
 
+inline
 void Solver::init ()
 {
-  std::cout << "Initializing $Id: solver.h,v 1.1 2004-01-03 15:37:42 benkirk Exp $"
+  std::cout << "Initializing $Id: solver.h,v 1.2 2004-01-17 22:56:54 benkirk Exp $"
 	    << std::endl;
   
   // Initialize the system.
@@ -164,21 +167,23 @@ void Solver::init ()
 
 
 
+inline
 void Solver::pre_process ()
 {
-  std::cout << "Pre-processing"
-	    << std::endl;
+//  std::cout << "Pre-processing"
+//	    << std::endl;
 }
 
 
 
+inline
 void Solver::solve ()
 {
   // Perform any necessary pre-processing
   Solver::pre_process ();
   
-  std::cout << "Solving $Id: solver.h,v 1.1 2004-01-03 15:37:42 benkirk Exp $"
-	    << std::endl;
+//  std::cout << "Solving $Id: solver.h,v 1.2 2004-01-17 22:56:54 benkirk Exp $"
+//	    << std::endl;
 
   // Solve the system
   this->system().solve ();
@@ -189,10 +194,11 @@ void Solver::solve ()
 
 
 
+inline
 void Solver::post_process ()
 {
-  std::cout << "Post-processing"
-	    << std::endl;
+//  std::cout << "Post-processing"
+//	    << std::endl;
 }
 
 

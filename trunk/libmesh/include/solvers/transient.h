@@ -1,4 +1,4 @@
-// $Id: transient.h,v 1.1 2004-01-03 15:37:42 benkirk Exp $
+// $Id: transient.h,v 1.2 2004-01-17 22:56:54 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -156,6 +156,7 @@ private:
 // ------------------------------------------------------------
 // Transient inline members
 template <class T>
+inline
 Transient<T>::Transient(EquationSystems& es) :
   T               (es),   // Call the base class constructor
   _time           (0.),   // Default solver attributes
@@ -169,6 +170,7 @@ Transient<T>::Transient(EquationSystems& es) :
 
 
 template <class T>
+inline
 Transient<T>::Transient (EquationSystems& es,
 			 const std::string& name,
 			 const unsigned int number) :
@@ -180,6 +182,7 @@ Transient<T>::Transient (EquationSystems& es,
 
 
 template <class T>
+inline
 Transient<T>::~Transient ()
 {
 }
@@ -187,6 +190,7 @@ Transient<T>::~Transient ()
 
 
 template <class T>
+inline
 void Transient<T>::solve ()
 {
   do

@@ -1,4 +1,4 @@
-// $Id: nonlinear.h,v 1.1 2004-01-03 15:37:42 benkirk Exp $
+// $Id: nonlinear.h,v 1.2 2004-01-17 22:56:54 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -108,6 +108,7 @@ private:
 // ------------------------------------------------------------
 // Nonlinear inline members
 template <class T>
+inline
 Nonlinear<T>::Nonlinear (EquationSystems& es) :
   T             (es),  // Call the base class constructor
   _max_nl_steps (5),   // Default solver attributes
@@ -118,6 +119,7 @@ Nonlinear<T>::Nonlinear (EquationSystems& es) :
 
 
 template <class T>
+inline
 Nonlinear<T>::Nonlinear (EquationSystems& es,
 			 const std::string& name,
 			 const unsigned int number) :
@@ -129,6 +131,7 @@ Nonlinear<T>::Nonlinear (EquationSystems& es,
 
 
 template <class T>
+inline
 Nonlinear<T>::~Nonlinear ()
 {
 }
@@ -136,6 +139,7 @@ Nonlinear<T>::~Nonlinear ()
 
 
 template <class T>
+inline
 void Nonlinear<T>::solve ()
 {
   for (unsigned int l=0; l<this->max_nonlinear_steps(); l++)

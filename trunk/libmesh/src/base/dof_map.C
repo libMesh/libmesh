@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.51 2004-01-03 15:37:42 benkirk Exp $
+// $Id: dof_map.C,v 1.52 2004-01-17 22:56:54 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -626,12 +626,13 @@ void DofMap::dof_indices (const Elem* elem,
   const ElemType type        = elem->type();
   const unsigned int sys_num = this->sys_number();
   const unsigned int n_vars  = this->n_variables();
+  const unsigned int dim     = elem->dim();
   
   // Clear the DOF indices vector
   di.clear();
 
-  // Check that sizes match in DEBUG mode
 #ifdef DEBUG
+  // Check that sizes match in DEBUG mode
   unsigned int tot_size = 0;
 #endif
   
@@ -641,19 +642,27 @@ void DofMap::dof_indices (const Elem* elem,
       { // Do this for all the variables if one was not specified
 	// or just for the specified variable
 
-#ifdef DEBUG
 	const FEType& fe_type = this->variable_type(v);
-	
-	tot_size += FEInterface::n_dofs(elem->dim(),
+
+#ifdef DEBUG
+	tot_size += FEInterface::n_dofs(dim,
 					fe_type,
 					type);
 #endif
 	
 	// Get the node-based DOF numbers
 	for (unsigned int n=0; n<n_nodes; n++)
-	  {
+	  {	    
 	    const Node* node      = elem->get_node(n);
-	    const unsigned int nc = node->n_comp(sys_num,v);
+	    
+	    // There is a potential problem with AMR.  Imagine a
+	    // quad9 that has a linear FE on it.  Then, on the hanging side,
+	    // it can falsely identify a DOF at the mid-edge node. This is why
+	    // we call FEInterface instead of node->n_comp() directly.
+	    const unsigned int nc = FEInterface::n_dofs_at_node (dim,
+								 fe_type,
+								 type,
+								 n);
 	    
 	    for (unsigned int i=0; i<nc; i++)
 	      {
@@ -672,7 +681,8 @@ void DofMap::dof_indices (const Elem* elem,
 	    {
 	      assert (elem->dof_number(sys_num,v,i) !=
 		      DofObject::invalid_id);
-	      
+
+	      here();
 	      di.push_back(elem->dof_number(sys_num,v,i));
 	    }
 	}
@@ -703,25 +713,26 @@ void DofMap::old_dof_indices (const Elem* elem,
   const ElemType type        = elem->type();
   const unsigned int sys_num = this->sys_number();
   const unsigned int n_vars  = this->n_variables();
+  const unsigned int dim     = elem->dim();
   
   // Clear the DOF indices vector.
   di.clear();
 
-  // Check that sizes match in DEBUG mode
 #ifdef DEBUG
+  // Check that sizes match
   unsigned int tot_size = 0;
 #endif
   
   // Get the dof numbers
   for (unsigned int v=0; v<n_vars; v++)
     if ((v == vn) || (vn == libMesh::invalid_uint))
-      {
-	// Do this for all the variables if one was not specified
+      { // Do this for all the variables if one was not specified
 	// or just for the specified variable
 	
-#ifdef DEBUG
 	const FEType& fe_type = this->variable_type(v);
-	tot_size += FEInterface::n_dofs(elem->dim(),
+	
+#ifdef DEBUG
+	tot_size += FEInterface::n_dofs(dim,
 					fe_type,
 					type);
 #endif
@@ -730,8 +741,16 @@ void DofMap::old_dof_indices (const Elem* elem,
 	for (unsigned int n=0; n<n_nodes; n++)
 	  {
 	    const Node* node      = elem->get_node(n);
+	    
+	    // There is a potential problem with AMR.  Imagine a
+	    // quad9 that has a linear FE on it.  Then, on the hanging side,
+	    // it can falsely identify a DOF at the mid-edge node. This is why
+	    // we call FEInterface instead of node->n_comp() directly.
+	    const unsigned int nc = FEInterface::n_dofs_at_node (dim,
+								 fe_type,
+								 type,
+								 n);
 	    assert (node->old_dof_object != NULL);
-	    const unsigned int nc = node->old_dof_object->n_comp(sys_num,v);
 	    
 	    for (unsigned int i=0; i<nc; i++)
 	      {
