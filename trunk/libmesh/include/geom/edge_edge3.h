@@ -1,4 +1,4 @@
-// $Id: edge_edge3.h,v 1.5 2005-01-28 19:14:16 benkirk Exp $
+// $Id: edge_edge3.h,v 1.6 2005-02-19 19:07:31 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -72,6 +72,21 @@ class Edge3 : public Edge
   unsigned int n_sub_elem() const { return 2; }
 
   /**
+   * @returns true iff the specified (local) node number is a vertex.
+   */
+  virtual bool is_vertex(const unsigned int i) const;
+
+  /**
+   * @returns true iff the specified (local) node number is an edge.
+   */
+  virtual bool is_edge(const unsigned int i) const;
+
+  /**
+   * @returns true iff the specified (local) node number is a face.
+   */
+  virtual bool is_face(const unsigned int i) const;
+  
+  /**
    * @returns \p EDGE3
    */
   ElemType type()  const { return EDGE3; }
@@ -125,7 +140,6 @@ protected:
   
 #endif
 };
-
 
 
 #endif

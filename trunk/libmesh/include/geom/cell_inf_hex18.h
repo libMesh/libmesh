@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex18.h,v 1.3 2004-07-14 19:23:17 jwpeterson Exp $
+// $Id: cell_inf_hex18.h,v 1.4 2005-02-19 19:07:31 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -99,6 +99,21 @@ public:
   Order default_order() const { return SECOND; }
 
   /**
+   * @returns true iff the specified (local) node number is a vertex.
+   */
+  virtual bool is_vertex(const unsigned int i) const;
+
+  /**
+   * @returns true iff the specified (local) node number is an edge.
+   */
+  virtual bool is_edge(const unsigned int i) const;
+
+  /**
+   * @returns true iff the specified (local) node number is a face.
+   */
+  virtual bool is_face(const unsigned int i) const;
+  
+  /**
    * Returns a \p QUAD9 built coincident with face 0, an \p INFQUAD6 
    * built coincident with faces 1 to 4. Note that the \p AutoPtr<Elem>
    * takes care of freeing memory.
@@ -177,7 +192,6 @@ InfHex18::InfHex18(const Elem* p) :
   InfHex(InfHex18::n_nodes(), p) 
 {
 }
-
 
 
 #endif  // ifdef ENABLE_INFINITE_ELEMENTS

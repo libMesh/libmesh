@@ -1,4 +1,4 @@
-// $Id: cell.h,v 1.3 2004-11-15 22:09:10 benkirk Exp $
+// $Id: cell.h,v 1.4 2005-02-19 19:07:30 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -34,7 +34,7 @@
 
 /**
  * The \p Cell is an abstract element type that lives in
- * three dimensions.  A face could be a tetrahedron, a hexahedron,
+ * three dimensions.  A cell could be a tetrahedron, a hexahedron,
  * a pyramid, a prism, etc...
  */
 

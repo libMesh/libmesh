@@ -1,4 +1,4 @@
-// $Id: face_inf_quad6.h,v 1.5 2005-02-15 05:23:32 benkirk Exp $
+// $Id: face_inf_quad6.h,v 1.6 2005-02-19 19:07:31 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -88,6 +88,21 @@ public:
   unsigned int n_sub_elem() const { return 2; }
   
   /**
+   * @returns true iff the specified (local) node number is a vertex.
+   */
+  virtual bool is_vertex(const unsigned int i) const;
+
+  /**
+   * @returns true iff the specified (local) node number is an edge.
+   */
+  virtual bool is_edge(const unsigned int i) const;
+
+  /**
+   * @returns true iff the specified (local) node number is a face.
+   */
+  virtual bool is_face(const unsigned int i) const;
+  
+  /**
    * @returns \p SECOND
    */
   Order default_order() const { return SECOND; }
@@ -149,13 +164,6 @@ private:
   static const unsigned short int _second_order_adjacent_vertices[2][2];
     
 };
-
-
-
-
-
-// ------------------------------------------------------------
-// InfQuad6 class member functions
 
 
 #endif // ifdef ENABLE_INFINITE_ELEMENTS
