@@ -1,4 +1,4 @@
-// $Id: transient_system.C,v 1.3 2003-05-28 22:03:15 benkirk Exp $
+// $Id: transient_system.C,v 1.4 2003-05-29 00:03:06 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -91,5 +91,26 @@ void TransientSystem::reinit ()
 
 void TransientSystem::re_update ()
 {
-  error();
+  const std::vector<unsigned int>& send_list = _dof_map.get_send_list();
+  const unsigned int first_local_dof         = _dof_map.first_dof();
+  const unsigned int last_local_dof          = _dof_map.last_dof();
+
+  // Check sizes
+  assert (last_local_dof > first_local_dof);
+  assert (send_list.size() >= (last_local_dof - first_local_dof + 1));
+  assert (older_local_solution->size() >= send_list.size());
+  assert (old_local_solution->size()   >= send_list.size());
+
+  // re-update the parent data
+  SteadySystem::re_update ();
+  
+  // Update the old & older solutions with the send_list,
+  // which may have changed since their last update.
+  older_local_solution->localize (first_local_dof,
+				  last_local_dof,
+				  send_list);
+  
+  old_local_solution->localize (first_local_dof,
+				last_local_dof,
+				send_list);
 }

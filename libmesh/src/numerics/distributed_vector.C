@@ -1,4 +1,4 @@
-// $Id: distributed_vector.C,v 1.12 2003-05-28 22:03:15 benkirk Exp $
+// $Id: distributed_vector.C,v 1.13 2003-05-29 00:03:06 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -382,10 +382,33 @@ void DistributedVector<T>::localize (const unsigned int first_local_idx,
 				     const unsigned int last_local_idx,
 				     const std::vector<unsigned int>& send_list)
 {
-  assert (first_local_idx  == 0);
-  assert (last_local_idx+1 == this->size());
+  // Only good for serial vectors
+  assert (this->size() == this->local_size());
+  assert (last_local_idx > first_local_idx);
+  assert (send_list.size() <= this->size());
+  assert (last_local_idx < this->size());
   
-  assert (send_list.size() == this->size());
+  const unsigned int size       = this->size();
+  const unsigned int local_size = (last_local_idx - first_local_idx + 1);
+
+    // Don't bother for serial cases
+  if ((first_local_idx == 0) &&
+      (local_size == size))
+    return;
+  
+	  
+  // Build a parallel vector, initialize it with the local
+  // parts of (*this)
+  DistributedVector<T> parallel_vec;
+
+  parallel_vec.init (size, local_size);
+
+  // Copy part of *this into the parallel_vec
+  for (unsigned int i=first_local_idx; i<=last_local_idx; i++)
+    parallel_vec._values[i-first_local_idx] = _values[i];
+
+  // localize like normal
+  parallel_vec.localize (*this, send_list);    
 }
 
 

@@ -1,4 +1,4 @@
-// $Id: petsc_vector.C,v 1.19 2003-05-28 22:03:15 benkirk Exp $
+// $Id: petsc_vector.C,v 1.20 2003-05-29 00:03:06 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -517,7 +517,7 @@ void PetscVector<T>::localize (const unsigned int first_local_idx,
            CHKERRQ(ierr);
 
     ierr = VecRestoreArray (parallel_vec.vec, &their_values);
-          CHKERRQ(ierr);
+           CHKERRQ(ierr);
   }
 
   // localize like normal

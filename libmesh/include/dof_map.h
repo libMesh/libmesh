@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.29 2003-05-28 22:03:00 benkirk Exp $
+// $Id: dof_map.h,v 1.30 2003-05-29 00:03:03 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -188,7 +188,13 @@ public:
    * @returns the total number of degrees of freedom in the problem.
    */
   unsigned int n_dofs() const { return _n_dfs; }
-  
+
+  /**
+   * @returns the number of degrees of freedom on this processor.
+   */
+  unsigned int n_local_dofs () const
+  { return this->n_dofs_on_processor (libMeshBase::processor_id()); }
+    
   /**
    * Returns the number of degrees of freedom on subdomain \p proc.
    */
