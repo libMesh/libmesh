@@ -8,7 +8,7 @@
  * Started 7/25/97
  * George
  *
- * $Id: stat.c,v 1.2 2003-01-21 19:24:33 benkirk Exp $
+ * $Id: stat.c,v 1.3 2003-01-24 17:24:37 jwpeterson Exp $
  *
  */
 

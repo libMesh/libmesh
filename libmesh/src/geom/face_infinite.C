@@ -1,4 +1,4 @@
-// $Id: face_infinite.C,v 1.4 2003-01-21 19:24:37 benkirk Exp $
+// $Id: face_infinite.C,v 1.5 2003-01-24 17:24:43 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson

@@ -8,7 +8,7 @@
  * Started 10/2/97
  * George
  *
- * $Id: rename.h,v 1.2 2003-01-21 19:24:33 benkirk Exp $
+ * $Id: rename.h,v 1.3 2003-01-24 17:24:37 jwpeterson Exp $
  *
  */
 

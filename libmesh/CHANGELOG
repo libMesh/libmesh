@@ -282,14 +282,18 @@ major directory restructuring
 
 RCS file: /home/benkirk/SOURCE/mesh/src/fe/fe.C,v
 Working file: src/fe/fe.C
-head: 1.10
+head: 1.11
 branch:
 locks: strict
 access list:
 symbolic names:
 keyword substitution: kv
-total revisions: 10;	selected revisions: 10
+total revisions: 11;	selected revisions: 11
 description:
+----------------------------
+revision 1.11
+date: 2003/01/24 02:17:03;  author: d.dreyer;  state: Exp;  lines: +90 -1
+Adding infinite element class :-) (finally...). Builds & Links successfully with both gcc's.  Managed to avoid templating InfFE also wrt the T of FE<Dim,T> (at the cost of a few new virtual functions in FEBase). Still, with old gcc, library size increases almost by 1/3rd, compared with disabled ifem. Definitely need to test them!
 ----------------------------
 revision 1.10
 date: 2003/01/16 22:06:45;  author: benkirk;  state: Exp;  lines: +4 -3
@@ -624,14 +628,18 @@ major directory restructuring
 
 RCS file: /home/benkirk/SOURCE/mesh/src/fe/fe_interface.C,v
 Working file: src/fe/fe_interface.C
-head: 1.6
+head: 1.7
 branch:
 locks: strict
 access list:
 symbolic names:
 keyword substitution: kv
-total revisions: 6;	selected revisions: 6
+total revisions: 7;	selected revisions: 7
 description:
+----------------------------
+revision 1.7
+date: 2003/01/24 02:17:03;  author: d.dreyer;  state: Exp;  lines: +342 -147
+Adding infinite element class :-) (finally...). Builds & Links successfully with both gcc's.  Managed to avoid templating InfFE also wrt the T of FE<Dim,T> (at the cost of a few new virtual functions in FEBase). Still, with old gcc, library size increases almost by 1/3rd, compared with disabled ifem. Definitely need to test them!
 ----------------------------
 revision 1.6
 date: 2003/01/16 16:25:07;  author: peterson;  state: Exp;  lines: +1 -3
@@ -1077,14 +1085,18 @@ major directory restructuring
 
 RCS file: /home/benkirk/SOURCE/mesh/src/fe/inf_fe.C,v
 Working file: src/fe/inf_fe.C
-head: 1.3
+head: 1.4
 branch:
 locks: strict
 access list:
 symbolic names:
 keyword substitution: kv
-total revisions: 3;	selected revisions: 3
+total revisions: 4;	selected revisions: 4
 description:
+----------------------------
+revision 1.4
+date: 2003/01/24 02:17:03;  author: d.dreyer;  state: Exp;  lines: +626 -136
+Adding infinite element class :-) (finally...). Builds & Links successfully with both gcc's.  Managed to avoid templating InfFE also wrt the T of FE<Dim,T> (at the cost of a few new virtual functions in FEBase). Still, with old gcc, library size increases almost by 1/3rd, compared with disabled ifem. Definitely need to test them!
 ----------------------------
 revision 1.3
 date: 2003/01/14 21:20:04;  author: benkirk;  state: Exp;  lines: +53 -52
@@ -1116,6 +1128,118 @@ removed kdoc. added order to FEType
 revision 1.1
 date: 2003/01/06 21:40:59;  author: benkirk;  state: Exp;
 major directory restructuring
+=============================================================================
+
+RCS file: /home/benkirk/SOURCE/mesh/src/fe/inf_fe_boundary.C,v
+Working file: src/fe/inf_fe_boundary.C
+head: 1.1
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 1;	selected revisions: 1
+description:
+----------------------------
+revision 1.1
+date: 2003/01/24 02:17:03;  author: d.dreyer;  state: Exp;
+Adding infinite element class :-) (finally...). Builds & Links successfully with both gcc's.  Managed to avoid templating InfFE also wrt the T of FE<Dim,T> (at the cost of a few new virtual functions in FEBase). Still, with old gcc, library size increases almost by 1/3rd, compared with disabled ifem. Definitely need to test them!
+=============================================================================
+
+RCS file: /home/benkirk/SOURCE/mesh/src/fe/inf_fe_jacobi_20_00_eval.C,v
+Working file: src/fe/inf_fe_jacobi_20_00_eval.C
+head: 1.1
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 1;	selected revisions: 1
+description:
+----------------------------
+revision 1.1
+date: 2003/01/24 02:17:03;  author: d.dreyer;  state: Exp;
+Adding infinite element class :-) (finally...). Builds & Links successfully with both gcc's.  Managed to avoid templating InfFE also wrt the T of FE<Dim,T> (at the cost of a few new virtual functions in FEBase). Still, with old gcc, library size increases almost by 1/3rd, compared with disabled ifem. Definitely need to test them!
+=============================================================================
+
+RCS file: /home/benkirk/SOURCE/mesh/src/fe/inf_fe_jacobi_30_00_eval.C,v
+Working file: src/fe/inf_fe_jacobi_30_00_eval.C
+head: 1.1
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 1;	selected revisions: 1
+description:
+----------------------------
+revision 1.1
+date: 2003/01/24 02:17:03;  author: d.dreyer;  state: Exp;
+Adding infinite element class :-) (finally...). Builds & Links successfully with both gcc's.  Managed to avoid templating InfFE also wrt the T of FE<Dim,T> (at the cost of a few new virtual functions in FEBase). Still, with old gcc, library size increases almost by 1/3rd, compared with disabled ifem. Definitely need to test them!
+=============================================================================
+
+RCS file: /home/benkirk/SOURCE/mesh/src/fe/inf_fe_lagrange_eval.C,v
+Working file: src/fe/inf_fe_lagrange_eval.C
+head: 1.1
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 1;	selected revisions: 1
+description:
+----------------------------
+revision 1.1
+date: 2003/01/24 02:17:03;  author: d.dreyer;  state: Exp;
+Adding infinite element class :-) (finally...). Builds & Links successfully with both gcc's.  Managed to avoid templating InfFE also wrt the T of FE<Dim,T> (at the cost of a few new virtual functions in FEBase). Still, with old gcc, library size increases almost by 1/3rd, compared with disabled ifem. Definitely need to test them!
+=============================================================================
+
+RCS file: /home/benkirk/SOURCE/mesh/src/fe/inf_fe_legendre_eval.C,v
+Working file: src/fe/inf_fe_legendre_eval.C
+head: 1.1
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 1;	selected revisions: 1
+description:
+----------------------------
+revision 1.1
+date: 2003/01/24 02:17:03;  author: d.dreyer;  state: Exp;
+Adding infinite element class :-) (finally...). Builds & Links successfully with both gcc's.  Managed to avoid templating InfFE also wrt the T of FE<Dim,T> (at the cost of a few new virtual functions in FEBase). Still, with old gcc, library size increases almost by 1/3rd, compared with disabled ifem. Definitely need to test them!
+=============================================================================
+
+RCS file: /home/benkirk/SOURCE/mesh/src/fe/inf_fe_map_eval.C,v
+Working file: src/fe/inf_fe_map_eval.C
+head: 1.1
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 1;	selected revisions: 1
+description:
+----------------------------
+revision 1.1
+date: 2003/01/24 02:17:03;  author: d.dreyer;  state: Exp;
+Adding infinite element class :-) (finally...). Builds & Links successfully with both gcc's.  Managed to avoid templating InfFE also wrt the T of FE<Dim,T> (at the cost of a few new virtual functions in FEBase). Still, with old gcc, library size increases almost by 1/3rd, compared with disabled ifem. Definitely need to test them!
+=============================================================================
+
+RCS file: /home/benkirk/SOURCE/mesh/src/fe/inf_fe_static.C,v
+Working file: src/fe/inf_fe_static.C
+head: 1.1
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 1;	selected revisions: 1
+description:
+----------------------------
+revision 1.1
+date: 2003/01/24 02:17:03;  author: d.dreyer;  state: Exp;
+Adding infinite element class :-) (finally...). Builds & Links successfully with both gcc's.  Managed to avoid templating InfFE also wrt the T of FE<Dim,T> (at the cost of a few new virtual functions in FEBase). Still, with old gcc, library size increases almost by 1/3rd, compared with disabled ifem. Definitely need to test them!
 =============================================================================
 
 RCS file: /home/benkirk/SOURCE/mesh/src/geom/cell.C,v
@@ -1400,14 +1524,18 @@ major directory restructuring
 
 RCS file: /home/benkirk/SOURCE/mesh/src/geom/cell_inf_hex16.C,v
 Working file: src/geom/cell_inf_hex16.C
-head: 1.12
+head: 1.13
 branch:
 locks: strict
 access list:
 symbolic names:
 keyword substitution: kv
-total revisions: 12;	selected revisions: 12
+total revisions: 13;	selected revisions: 13
 description:
+----------------------------
+revision 1.13
+date: 2003/01/22 22:07:31;  author: d.dreyer;  state: Exp;  lines: +11 -1
+Changes for inifinite elements: added some virtual members in FEBase; split fe_base.h from fe.h, but did not touch fe/src/fe*.C -- shall i change these, too?; changed normal vector of InfAbcXY::build_side(0) so that they point inwards; minor documentation issue in meshtool. -- All of this seems quite imperative to me for infinite elements. If anybody doesn't like - please feedback
 ----------------------------
 revision 1.12
 date: 2003/01/17 13:25:14;  author: benkirk;  state: Exp;  lines: +3 -4
@@ -1479,14 +1607,18 @@ major directory restructuring
 
 RCS file: /home/benkirk/SOURCE/mesh/src/geom/cell_inf_hex18.C,v
 Working file: src/geom/cell_inf_hex18.C
-head: 1.12
+head: 1.13
 branch:
 locks: strict
 access list:
 symbolic names:
 keyword substitution: kv
-total revisions: 12;	selected revisions: 12
+total revisions: 13;	selected revisions: 13
 description:
+----------------------------
+revision 1.13
+date: 2003/01/22 22:07:31;  author: d.dreyer;  state: Exp;  lines: +12 -1
+Changes for inifinite elements: added some virtual members in FEBase; split fe_base.h from fe.h, but did not touch fe/src/fe*.C -- shall i change these, too?; changed normal vector of InfAbcXY::build_side(0) so that they point inwards; minor documentation issue in meshtool. -- All of this seems quite imperative to me for infinite elements. If anybody doesn't like - please feedback
 ----------------------------
 revision 1.12
 date: 2003/01/17 13:25:14;  author: benkirk;  state: Exp;  lines: +3 -4
@@ -1558,14 +1690,18 @@ major directory restructuring
 
 RCS file: /home/benkirk/SOURCE/mesh/src/geom/cell_inf_hex8.C,v
 Working file: src/geom/cell_inf_hex8.C
-head: 1.11
+head: 1.12
 branch:
 locks: strict
 access list:
 symbolic names:
 keyword substitution: kv
-total revisions: 11;	selected revisions: 11
+total revisions: 12;	selected revisions: 12
 description:
+----------------------------
+revision 1.12
+date: 2003/01/22 22:07:31;  author: d.dreyer;  state: Exp;  lines: +7 -1
+Changes for inifinite elements: added some virtual members in FEBase; split fe_base.h from fe.h, but did not touch fe/src/fe*.C -- shall i change these, too?; changed normal vector of InfAbcXY::build_side(0) so that they point inwards; minor documentation issue in meshtool. -- All of this seems quite imperative to me for infinite elements. If anybody doesn't like - please feedback
 ----------------------------
 revision 1.11
 date: 2003/01/17 13:25:14;  author: benkirk;  state: Exp;  lines: +3 -4
@@ -1633,14 +1769,18 @@ major directory restructuring
 
 RCS file: /home/benkirk/SOURCE/mesh/src/geom/cell_inf_prism12.C,v
 Working file: src/geom/cell_inf_prism12.C
-head: 1.12
+head: 1.13
 branch:
 locks: strict
 access list:
 symbolic names:
 keyword substitution: kv
-total revisions: 12;	selected revisions: 12
+total revisions: 13;	selected revisions: 13
 description:
+----------------------------
+revision 1.13
+date: 2003/01/22 22:07:31;  author: d.dreyer;  state: Exp;  lines: +9 -1
+Changes for inifinite elements: added some virtual members in FEBase; split fe_base.h from fe.h, but did not touch fe/src/fe*.C -- shall i change these, too?; changed normal vector of InfAbcXY::build_side(0) so that they point inwards; minor documentation issue in meshtool. -- All of this seems quite imperative to me for infinite elements. If anybody doesn't like - please feedback
 ----------------------------
 revision 1.12
 date: 2003/01/17 13:25:14;  author: benkirk;  state: Exp;  lines: +4 -4
@@ -1712,14 +1852,18 @@ major directory restructuring
 
 RCS file: /home/benkirk/SOURCE/mesh/src/geom/cell_inf_prism6.C,v
 Working file: src/geom/cell_inf_prism6.C
-head: 1.11
+head: 1.12
 branch:
 locks: strict
 access list:
 symbolic names:
 keyword substitution: kv
-total revisions: 11;	selected revisions: 11
+total revisions: 12;	selected revisions: 12
 description:
+----------------------------
+revision 1.12
+date: 2003/01/22 22:07:31;  author: d.dreyer;  state: Exp;  lines: +6 -1
+Changes for inifinite elements: added some virtual members in FEBase; split fe_base.h from fe.h, but did not touch fe/src/fe*.C -- shall i change these, too?; changed normal vector of InfAbcXY::build_side(0) so that they point inwards; minor documentation issue in meshtool. -- All of this seems quite imperative to me for infinite elements. If anybody doesn't like - please feedback
 ----------------------------
 revision 1.11
 date: 2003/01/17 13:25:14;  author: benkirk;  state: Exp;  lines: +3 -4
@@ -3133,14 +3277,18 @@ major directory restructuring
 
 RCS file: /home/benkirk/SOURCE/mesh/src/mesh/boundary_info.C,v
 Working file: src/mesh/boundary_info.C
-head: 1.11
+head: 1.12
 branch:
 locks: strict
 access list:
 symbolic names:
 keyword substitution: kv
-total revisions: 11;	selected revisions: 11
+total revisions: 12;	selected revisions: 12
 description:
+----------------------------
+revision 1.12
+date: 2003/01/21 15:41:58;  author: steffen;  state: Exp;  lines: +11 -1
+extended UNV support to import analysis datasets (used for boundary conditions)
 ----------------------------
 revision 1.11
 date: 2003/01/16 20:13:50;  author: peterson;  state: Exp;  lines: +1 -2
@@ -3504,14 +3652,24 @@ major directory restructuring
 
 RCS file: /home/benkirk/SOURCE/mesh/src/mesh/mesh_exodus_support.C,v
 Working file: src/mesh/mesh_exodus_support.C
-head: 1.6
+head: 1.8
 branch:
 locks: strict
 access list:
 symbolic names:
 keyword substitution: kv
-total revisions: 6;	selected revisions: 6
+total revisions: 8;	selected revisions: 8
 description:
+----------------------------
+revision 1.8
+date: 2003/01/24 00:53:36;  author: d.dreyer;  state: Exp;  lines: +2 -2
+eliminated some warnings for --disable-exodus and --disable-ifem
+----------------------------
+revision 1.7
+date: 2003/01/22 01:09:28;  author: peterson;  state: Exp;  lines: +2 -3
+Added simpson quadrature rule for triangles.
+Checked to make sure it worked, but dont know what order of
+accuracy to expect.
 ----------------------------
 revision 1.6
 date: 2003/01/16 20:43:47;  author: peterson;  state: Exp;  lines: +1 -2
@@ -3908,14 +4066,18 @@ major directory restructuring
 
 RCS file: /home/benkirk/SOURCE/mesh/src/mesh/mesh_unv_support.C,v
 Working file: src/mesh/mesh_unv_support.C
-head: 1.3
+head: 1.4
 branch:
 locks: strict
 access list:
 symbolic names:
 keyword substitution: kv
-total revisions: 3;	selected revisions: 3
+total revisions: 4;	selected revisions: 4
 description:
+----------------------------
+revision 1.4
+date: 2003/01/21 15:41:59;  author: steffen;  state: Exp;  lines: +208 -8
+extended UNV support to import analysis datasets (used for boundary conditions)
 ----------------------------
 revision 1.3
 date: 2003/01/15 19:05:15;  author: benkirk;  state: Exp;  lines: +2 -2
@@ -4287,14 +4449,20 @@ when you want to create additional quadrature rules.
 
 RCS file: /home/benkirk/SOURCE/mesh/src/quadrature/quadrature_simpson_2D.C,v
 Working file: src/quadrature/quadrature_simpson_2D.C
-head: 1.1
+head: 1.2
 branch:
 locks: strict
 access list:
 symbolic names:
 keyword substitution: kv
-total revisions: 1;	selected revisions: 1
+total revisions: 2;	selected revisions: 2
 description:
+----------------------------
+revision 1.2
+date: 2003/01/22 01:09:28;  author: peterson;  state: Exp;  lines: +37 -21
+Added simpson quadrature rule for triangles.
+Checked to make sure it worked, but dont know what order of
+accuracy to expect.
 ----------------------------
 revision 1.1
 date: 2003/01/18 19:48:30;  author: peterson;  state: Exp;
@@ -4306,14 +4474,18 @@ when you want to create additional quadrature rules.
 
 RCS file: /home/benkirk/SOURCE/mesh/src/quadrature/quadrature_simpson_3D.C,v
 Working file: src/quadrature/quadrature_simpson_3D.C
-head: 1.2
+head: 1.3
 branch:
 locks: strict
 access list:
 symbolic names:
 keyword substitution: kv
-total revisions: 2;	selected revisions: 2
+total revisions: 3;	selected revisions: 3
 description:
+----------------------------
+revision 1.3
+date: 2003/01/23 03:07:30;  author: peterson;  state: Exp;  lines: +56 -40
+Added a simpson quadrature rule for tetrahedra.
 ----------------------------
 revision 1.2
 date: 2003/01/19 04:15:50;  author: peterson;  state: Exp;  lines: +25 -140
@@ -4653,14 +4825,18 @@ switched from std::auto_ptr to AutoPtr
 
 RCS file: /home/benkirk/SOURCE/mesh/include/boundary_info.h,v
 Working file: include/boundary_info.h
-head: 1.33
+head: 1.34
 branch:
 locks: strict
 access list:
 symbolic names:
 keyword substitution: kv
-total revisions: 33;	selected revisions: 33
+total revisions: 34;	selected revisions: 34
 description:
+----------------------------
+revision 1.34
+date: 2003/01/21 15:41:58;  author: steffen;  state: Exp;  lines: +20 -5
+extended UNV support to import analysis datasets (used for boundary conditions)
 ----------------------------
 revision 1.33
 date: 2003/01/20 01:11:31;  author: peterson;  state: Exp;  lines: +12 -2
@@ -6891,6 +7067,27 @@ Created separate file for the element type enumeration.
 
 RCS file: /home/benkirk/SOURCE/mesh/include/enum_fe_family.h,v
 Working file: include/enum_fe_family.h
+head: 1.2
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 2;	selected revisions: 2
+description:
+----------------------------
+revision 1.2
+date: 2003/01/24 02:17:03;  author: d.dreyer;  state: Exp;  lines: +4 -5
+Adding infinite element class :-) (finally...). Builds & Links successfully with both gcc's.  Managed to avoid templating InfFE also wrt the T of FE<Dim,T> (at the cost of a few new virtual functions in FEBase). Still, with old gcc, library size increases almost by 1/3rd, compared with disabled ifem. Definitely need to test them!
+----------------------------
+revision 1.1
+date: 2003/01/16 16:42:28;  author: peterson;  state: Exp;
+Removing unnecessary includes.  Changing headers which
+simply contain enumerations to be named enum_ e.g. order.h -> enum_order.h
+=============================================================================
+
+RCS file: /home/benkirk/SOURCE/mesh/include/enum_inf_map_type.h,v
+Working file: include/enum_inf_map_type.h
 head: 1.1
 branch:
 locks: strict
@@ -6901,21 +7098,24 @@ total revisions: 1;	selected revisions: 1
 description:
 ----------------------------
 revision 1.1
-date: 2003/01/16 16:42:28;  author: peterson;  state: Exp;
-Removing unnecessary includes.  Changing headers which
-simply contain enumerations to be named enum_ e.g. order.h -> enum_order.h
+date: 2003/01/24 02:17:03;  author: d.dreyer;  state: Exp;
+Adding infinite element class :-) (finally...). Builds & Links successfully with both gcc's.  Managed to avoid templating InfFE also wrt the T of FE<Dim,T> (at the cost of a few new virtual functions in FEBase). Still, with old gcc, library size increases almost by 1/3rd, compared with disabled ifem. Definitely need to test them!
 =============================================================================
 
 RCS file: /home/benkirk/SOURCE/mesh/include/enum_order.h,v
 Working file: include/enum_order.h
-head: 1.3
+head: 1.4
 branch:
 locks: strict
 access list:
 symbolic names:
 keyword substitution: kv
-total revisions: 3;	selected revisions: 3
+total revisions: 4;	selected revisions: 4
 description:
+----------------------------
+revision 1.4
+date: 2003/01/24 02:17:03;  author: d.dreyer;  state: Exp;  lines: +27 -38
+Adding infinite element class :-) (finally...). Builds & Links successfully with both gcc's.  Managed to avoid templating InfFE also wrt the T of FE<Dim,T> (at the cost of a few new virtual functions in FEBase). Still, with old gcc, library size increases almost by 1/3rd, compared with disabled ifem. Definitely need to test them!
 ----------------------------
 revision 1.3
 date: 2003/01/20 01:11:31;  author: peterson;  state: Exp;  lines: +4 -2
@@ -7843,14 +8043,22 @@ added factory to the lib.  it is generally useful and might be used in place of 
 
 RCS file: /home/benkirk/SOURCE/mesh/include/fe.h,v
 Working file: include/fe.h
-head: 1.78
+head: 1.80
 branch:
 locks: strict
 access list:
 symbolic names:
 keyword substitution: kv
-total revisions: 78;	selected revisions: 78
+total revisions: 80;	selected revisions: 80
 description:
+----------------------------
+revision 1.80
+date: 2003/01/24 02:17:03;  author: d.dreyer;  state: Exp;  lines: +20 -9
+Adding infinite element class :-) (finally...). Builds & Links successfully with both gcc's.  Managed to avoid templating InfFE also wrt the T of FE<Dim,T> (at the cost of a few new virtual functions in FEBase). Still, with old gcc, library size increases almost by 1/3rd, compared with disabled ifem. Definitely need to test them!
+----------------------------
+revision 1.79
+date: 2003/01/22 22:07:31;  author: d.dreyer;  state: Exp;  lines: +60 -625
+Changes for inifinite elements: added some virtual members in FEBase; split fe_base.h from fe.h, but did not touch fe/src/fe*.C -- shall i change these, too?; changed normal vector of InfAbcXY::build_side(0) so that they point inwards; minor documentation issue in meshtool. -- All of this seems quite imperative to me for infinite elements. If anybody doesn't like - please feedback
 ----------------------------
 revision 1.78
 date: 2003/01/20 01:11:31;  author: peterson;  state: Exp;  lines: +202 -18
@@ -8189,16 +8397,44 @@ date: 2002/02/28 00:19:42;  author: benkirk;  state: Exp;
 errata
 =============================================================================
 
-RCS file: /home/benkirk/SOURCE/mesh/include/fe_interface.h,v
-Working file: include/fe_interface.h
-head: 1.9
+RCS file: /home/benkirk/SOURCE/mesh/include/fe_base.h,v
+Working file: include/fe_base.h
+head: 1.3
 branch:
 locks: strict
 access list:
 symbolic names:
 keyword substitution: kv
-total revisions: 9;	selected revisions: 9
+total revisions: 3;	selected revisions: 3
 description:
+----------------------------
+revision 1.3
+date: 2003/01/24 09:40:35;  author: d.dreyer;  state: Exp;  lines: +2 -2
+first typos fixed
+----------------------------
+revision 1.2
+date: 2003/01/24 02:17:03;  author: d.dreyer;  state: Exp;  lines: +44 -2
+Adding infinite element class :-) (finally...). Builds & Links successfully with both gcc's.  Managed to avoid templating InfFE also wrt the T of FE<Dim,T> (at the cost of a few new virtual functions in FEBase). Still, with old gcc, library size increases almost by 1/3rd, compared with disabled ifem. Definitely need to test them!
+----------------------------
+revision 1.1
+date: 2003/01/22 22:07:31;  author: d.dreyer;  state: Exp;
+Changes for inifinite elements: added some virtual members in FEBase; split fe_base.h from fe.h, but did not touch fe/src/fe*.C -- shall i change these, too?; changed normal vector of InfAbcXY::build_side(0) so that they point inwards; minor documentation issue in meshtool. -- All of this seems quite imperative to me for infinite elements. If anybody doesn't like - please feedback
+=============================================================================
+
+RCS file: /home/benkirk/SOURCE/mesh/include/fe_interface.h,v
+Working file: include/fe_interface.h
+head: 1.10
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 10;	selected revisions: 10
+description:
+----------------------------
+revision 1.10
+date: 2003/01/24 02:17:03;  author: d.dreyer;  state: Exp;  lines: +1 -50
+Adding infinite element class :-) (finally...). Builds & Links successfully with both gcc's.  Managed to avoid templating InfFE also wrt the T of FE<Dim,T> (at the cost of a few new virtual functions in FEBase). Still, with old gcc, library size increases almost by 1/3rd, compared with disabled ifem. Definitely need to test them!
 ----------------------------
 revision 1.9
 date: 2003/01/16 16:54:23;  author: peterson;  state: Exp;  lines: +2 -2
@@ -8258,14 +8494,18 @@ Preparations for truly various finite element concepts. Had to decide: either ma
 
 RCS file: /home/benkirk/SOURCE/mesh/include/fe_type.h,v
 Working file: include/fe_type.h
-head: 1.9
+head: 1.10
 branch:
 locks: strict
 access list:
 symbolic names:
 keyword substitution: kv
-total revisions: 9;	selected revisions: 9
+total revisions: 10;	selected revisions: 10
 description:
+----------------------------
+revision 1.10
+date: 2003/01/24 02:17:03;  author: d.dreyer;  state: Exp;  lines: +21 -22
+Adding infinite element class :-) (finally...). Builds & Links successfully with both gcc's.  Managed to avoid templating InfFE also wrt the T of FE<Dim,T> (at the cost of a few new virtual functions in FEBase). Still, with old gcc, library size increases almost by 1/3rd, compared with disabled ifem. Definitely need to test them!
 ----------------------------
 revision 1.9
 date: 2003/01/16 16:42:28;  author: peterson;  state: Exp;  lines: +3 -29
@@ -8326,14 +8566,22 @@ templated the FE class.  Read the doxygen documentation and fixed all the docume
 
 RCS file: /home/benkirk/SOURCE/mesh/include/inf_fe.h,v
 Working file: include/inf_fe.h
-head: 1.6
+head: 1.8
 branch:
 locks: strict
 access list:
 symbolic names:
 keyword substitution: kv
-total revisions: 6;	selected revisions: 6
+total revisions: 8;	selected revisions: 8
 description:
+----------------------------
+revision 1.8
+date: 2003/01/24 09:40:35;  author: d.dreyer;  state: Exp;  lines: +5 -5
+first typos fixed
+----------------------------
+revision 1.7
+date: 2003/01/24 02:17:03;  author: d.dreyer;  state: Exp;  lines: +765 -139
+Adding infinite element class :-) (finally...). Builds & Links successfully with both gcc's.  Managed to avoid templating InfFE also wrt the T of FE<Dim,T> (at the cost of a few new virtual functions in FEBase). Still, with old gcc, library size increases almost by 1/3rd, compared with disabled ifem. Definitely need to test them!
 ----------------------------
 revision 1.6
 date: 2003/01/14 21:20:04;  author: benkirk;  state: Exp;  lines: +5 -8
@@ -8377,6 +8625,70 @@ complex! - This got much bigger than i thought... 'number' and 'real' coexist, '
 revision 1.1
 date: 2002/12/12 21:00:31;  author: d.dreyer;  state: Exp;
 Preparations for truly various finite element concepts. Had to decide: either make a _lot_ of FEBase virtual and mess up several switch statements, or introduce the FEInterface class to encapsulate the static member functions of finite element classes (guess what i chose). For good code re-use, i had to move some members in FEBase from private to protected, but did not touch the class in any other way - except for abandoning the virtual shape and shape_deriv. These do not make sense, were never used, and as stand-alone would not allow code re-use.
+=============================================================================
+
+RCS file: /home/benkirk/SOURCE/mesh/include/inf_fe_instantiate_1D.h,v
+Working file: include/inf_fe_instantiate_1D.h
+head: 1.1
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 1;	selected revisions: 1
+description:
+----------------------------
+revision 1.1
+date: 2003/01/24 02:17:03;  author: d.dreyer;  state: Exp;
+Adding infinite element class :-) (finally...). Builds & Links successfully with both gcc's.  Managed to avoid templating InfFE also wrt the T of FE<Dim,T> (at the cost of a few new virtual functions in FEBase). Still, with old gcc, library size increases almost by 1/3rd, compared with disabled ifem. Definitely need to test them!
+=============================================================================
+
+RCS file: /home/benkirk/SOURCE/mesh/include/inf_fe_instantiate_2D.h,v
+Working file: include/inf_fe_instantiate_2D.h
+head: 1.1
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 1;	selected revisions: 1
+description:
+----------------------------
+revision 1.1
+date: 2003/01/24 02:17:03;  author: d.dreyer;  state: Exp;
+Adding infinite element class :-) (finally...). Builds & Links successfully with both gcc's.  Managed to avoid templating InfFE also wrt the T of FE<Dim,T> (at the cost of a few new virtual functions in FEBase). Still, with old gcc, library size increases almost by 1/3rd, compared with disabled ifem. Definitely need to test them!
+=============================================================================
+
+RCS file: /home/benkirk/SOURCE/mesh/include/inf_fe_instantiate_3D.h,v
+Working file: include/inf_fe_instantiate_3D.h
+head: 1.1
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 1;	selected revisions: 1
+description:
+----------------------------
+revision 1.1
+date: 2003/01/24 02:17:03;  author: d.dreyer;  state: Exp;
+Adding infinite element class :-) (finally...). Builds & Links successfully with both gcc's.  Managed to avoid templating InfFE also wrt the T of FE<Dim,T> (at the cost of a few new virtual functions in FEBase). Still, with old gcc, library size increases almost by 1/3rd, compared with disabled ifem. Definitely need to test them!
+=============================================================================
+
+RCS file: /home/benkirk/SOURCE/mesh/include/inf_fe_macro.h,v
+Working file: include/inf_fe_macro.h
+head: 1.1
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 1;	selected revisions: 1
+description:
+----------------------------
+revision 1.1
+date: 2003/01/24 02:17:03;  author: d.dreyer;  state: Exp;
+Adding infinite element class :-) (finally...). Builds & Links successfully with both gcc's.  Managed to avoid templating InfFE also wrt the T of FE<Dim,T> (at the cost of a few new virtual functions in FEBase). Still, with old gcc, library size increases almost by 1/3rd, compared with disabled ifem. Definitely need to test them!
 =============================================================================
 
 RCS file: /home/benkirk/SOURCE/mesh/include/mesh.h,v
@@ -9134,14 +9446,34 @@ errata
 
 RCS file: /home/benkirk/SOURCE/mesh/include/mesh_documentation.h,v
 Working file: include/mesh_documentation.h
-head: 1.2
+head: 1.7
 branch:
 locks: strict
 access list:
 symbolic names:
 keyword substitution: kv
-total revisions: 2;	selected revisions: 2
+total revisions: 7;	selected revisions: 7
 description:
+----------------------------
+revision 1.7
+date: 2003/01/24 02:17:03;  author: d.dreyer;  state: Exp;  lines: +1 -1
+Adding infinite element class :-) (finally...). Builds & Links successfully with both gcc's.  Managed to avoid templating InfFE also wrt the T of FE<Dim,T> (at the cost of a few new virtual functions in FEBase). Still, with old gcc, library size increases almost by 1/3rd, compared with disabled ifem. Definitely need to test them!
+----------------------------
+revision 1.6
+date: 2003/01/24 00:04:50;  author: d.dreyer;  state: Exp;  lines: +3 -3
+just a german umlaut
+----------------------------
+revision 1.5
+date: 2003/01/22 14:07:52;  author: benkirk;  state: Exp;  lines: +28 -23
+documentation
+----------------------------
+revision 1.4
+date: 2003/01/22 02:04:18;  author: benkirk;  state: Exp;  lines: +2 -2
+documentation
+----------------------------
+revision 1.3
+date: 2003/01/22 00:40:49;  author: benkirk;  state: Exp;  lines: +55 -15
+documentation
 ----------------------------
 revision 1.2
 date: 2003/01/14 21:20:04;  author: benkirk;  state: Exp;  lines: +2 -4
@@ -9340,14 +9672,18 @@ put refinement support in its own class, split the element refinement implementa
 
 RCS file: /home/benkirk/SOURCE/mesh/include/mesh_unv_support.h,v
 Working file: include/mesh_unv_support.h
-head: 1.8
+head: 1.9
 branch:
 locks: strict
 access list:
 symbolic names:
 keyword substitution: kv
-total revisions: 8;	selected revisions: 8
+total revisions: 9;	selected revisions: 9
 description:
+----------------------------
+revision 1.9
+date: 2003/01/21 15:41:58;  author: steffen;  state: Exp;  lines: +16 -6
+extended UNV support to import analysis datasets (used for boundary conditions)
 ----------------------------
 revision 1.8
 date: 2003/01/20 01:11:31;  author: peterson;  state: Exp;  lines: +39 -13

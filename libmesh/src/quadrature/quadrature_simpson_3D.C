@@ -1,4 +1,4 @@
-// $Id: quadrature_simpson_3D.C,v 1.3 2003-01-21 19:24:38 benkirk Exp $
+// $Id: quadrature_simpson_3D.C,v 1.4 2003-01-24 17:24:45 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -57,35 +57,55 @@ void QSimpson::init_3D(const ElemType _type)
     case TET4:
     case TET10:
       {
-	// TODO:[JWP] Fix Simpson quadrature rule for tetrahedra
+	// This rule is created by combining 8 subtets
+	// which use the trapezoidal rule.  The weights
+	// may seem a bit odd, but they are correct,
+	// and should add up to 1/6, the volume of the
+	// reference tet.  The points of this rule are
+	// at the nodal points of the TET10, allowing
+	// you to generate diagonal element stiffness
+	// matrices when using quadratic elements.
+	// It should be able to integrate something
+	// better than linears, but I'm not sure how
+	// high.
 	
-	// 	_points.resize(4);
-	// 	_weights.resize(4);
+	_points.resize(10);
+	_weights.resize(10);
 	
-	// 	_points[0](0) = 0.;
-	// 	_points[0](1) = 0.;
-	// 	_points[0](2) = 0.;
+	_points[0](0) = 0.;   _points[5](0) = .5;  
+	_points[0](1) = 0.;   _points[5](1) = .5;
+	_points[0](2) = 0.;   _points[5](2) = 0.;
+			      		   
+	_points[1](0) = 1.;   _points[6](0) = 0.;
+	_points[1](1) = 0.;   _points[6](1) = .5;
+	_points[1](2) = 0.;   _points[6](2) = 0.;
+			      		   
+	_points[2](0) = 0.;   _points[7](0) = 0.;
+	_points[2](1) = 1.;   _points[7](1) = 0.;
+	_points[2](2) = 0.;   _points[7](2) = .5;
+			      		   
+	_points[3](0) = 0.;   _points[8](0) = .5;
+	_points[3](1) = 0.;   _points[8](1) = 0.;
+	_points[3](2) = 1.;   _points[8](2) = .5;
+			      		   
+	_points[4](0) = .5;   _points[9](0) = 0.;
+	_points[4](1) = 0.;   _points[9](1) = .5;
+	_points[4](2) = 0.;   _points[9](2) = .5;
 	
-	// 	_points[1](0) = 1.;
-	// 	_points[1](1) = 0.;
-	// 	_points[1](2) = 0.;
 	
-	// 	_points[2](0) = 0.;
-	// 	_points[2](1) = 1.;
-	// 	_points[2](2) = 0.;
+	_weights[0] = .0052083333333333333333333333333333333333333333; // 1./192.
+	_weights[1] = _weights[0];
+	_weights[2] = _weights[0];
+	_weights[3] = _weights[0];
+
+	_weights[4] = .0243055555555555555555555555555555555555555555; // 14./576.
+	_weights[5] = _weights[4];
+	_weights[6] = _weights[4];
+	_weights[7] = _weights[4];
+	_weights[8] = _weights[4];
+	_weights[9] = _weights[4];
 	
-	// 	_points[3](0) = 0.;
-	// 	_points[3](1) = 0.;
-	// 	_points[3](2) = 1.;
-	
-	
-	
-	// 	_weights[0] = .0416666666666666666666666666666666666666666667;
-	// 	_weights[1] = _weights[0];
-	// 	_weights[2] = _weights[0];
-	// 	_weights[3] = _weights[0];
-	
-	// 	return;
+	return;
       };
       
       
@@ -162,12 +182,10 @@ void QSimpson::init_3D(const ElemType _type,
     case TET4:
     case TET10:
       {
-	// TODO:[JWP] Fix Simpson quadrature rule for tet sides
-	
-	// QSimpson q2D(2);
-	// q2D.init(TRI3);
-	// side_rule_tet(&q2D, side);
-	// return;
+	QSimpson q2D(2);
+	q2D.init(TRI3);
+	side_rule_tet(&q2D, side);
+	return;
       }
 
       
@@ -177,11 +195,9 @@ void QSimpson::init_3D(const ElemType _type,
     case PRISM6:
     case PRISM18:
       {
-	// TODO:[JWP] Fix Simpson quadrature rule for prism sides
-	
-	// QSimpson q2D(2);
-	// side_rule_prism(&q2D, side);
-	// return;
+	QSimpson q2D(2);
+	side_rule_prism(&q2D, side);
+	return;
       }
 
 

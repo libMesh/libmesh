@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.4 2003-01-21 19:24:36 benkirk Exp $
+// $Id: fe_interface.C,v 1.5 2003-01-24 17:24:41 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,7 +23,9 @@
 #include "fe_interface.h"
 #include "elem.h"
 #include "fe.h"
-
+#ifdef ENABLE_INFINITE_ELEMENTS
+# include "inf_fe.h"
+#endif
 
 
 
@@ -31,46 +33,10 @@
 //FEInterface class members
 FEInterface::FEInterface()
 {
-  std::cerr << "Currently, this class is intended only" << std::endl
-            << "to provide static member functions." << std::endl
-            << "Do not define an object of this type." << std::endl;
+  std::cerr << "ERROR: Do not define an object of this type." 
+	    << std::endl;
   error();
 };
-
-
-
-
-#ifdef ENABLE_INFINITE_ELEMENTS
-
-// this one decides whether we have an infinite element or not
-inline
-bool FEInterface::is_InfFE_elem(const ElemType t)
-{
-
-  switch (t)
-    {
-    case INFEDGE2:
-    case INFQUAD4:
-    case INFQUAD6:
-    case INFHEX8:
-    case INFHEX16:
-    case INFHEX18:
-    case INFPRISM6:
-    case INFPRISM12:
-      {
-        return true;
-      }
-
-    default:
-      { 
-	return false;
-      }
-
-    }
-
-};
-
-#endif
 
 
 
@@ -81,14 +47,6 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 {
   const Order o = fe_t.order;
   
-  // #ifdef ENABLE_INFINITE_ELEMENTS
-  //   if (FEInterface::is_InfFE_elem(t))
-  //     {
-  //       return InfFE::n_shape_functions(t, o);
-  //     };
-  // #endif
-
-  // by default, use this
   switch (dim)
     {
       // 1D
@@ -104,6 +62,20 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 	    
 	  case MONOMIAL:
 	    return FE<1,MONOMIAL>::n_shape_functions(t, o);
+
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+	  case INFINITE_MAP:
+	  case JACOBI_20_00:
+	  case JACOBI_30_00:
+	  case LEGENDRE:   
+	  case INF_LAGRANGE:
+	    /* Since InfFE<Dim,T_radial,T_map>::n_shape_functions(...)
+	     * is actually independent of T_radial, we can use
+	     * just any T_radial */
+	    return InfFE<1,JACOBI_20_00,CARTESIAN>::n_shape_functions(fe_t, t);
+
+#endif
 
 	  default:
 	    error();
@@ -125,6 +97,17 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<2,MONOMIAL>::n_shape_functions(t, o);
 
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+	  case INFINITE_MAP:
+	  case JACOBI_20_00:
+	  case JACOBI_30_00:
+	  case LEGENDRE:   
+	  case INF_LAGRANGE:
+	    return InfFE<2,JACOBI_20_00,CARTESIAN>::n_shape_functions(fe_t, t);
+
+#endif
+
 	  default:
 	    error();
 	  };
@@ -144,6 +127,17 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 	    
 	  case MONOMIAL:
 	    return FE<3,MONOMIAL>::n_shape_functions(t, o);
+
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+	  case INFINITE_MAP:
+	  case JACOBI_20_00:
+	  case JACOBI_30_00:
+	  case LEGENDRE:   
+	  case INF_LAGRANGE:
+	    return InfFE<3,JACOBI_20_00,CARTESIAN>::n_shape_functions(fe_t, t);
+
+#endif
 
 	  default:
 	    error();
@@ -169,15 +163,7 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 				 const ElemType t)
 {
   const Order o = fe_t.order;
-  
-  // #ifdef ENABLE_INFINITE_ELEMENTS
-  //   if (FEInterface::is_InfFE_elem(t))
-  //     {
-  //       return InfFE::n_dofs(t, o);
-  //     };
-  // #endif
 
-  // by default, use this
   switch (dim)
     {
       // 1D
@@ -193,6 +179,20 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 	    
 	  case MONOMIAL:
 	    return FE<1,MONOMIAL>::n_dofs(t, o);
+
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+	  case INFINITE_MAP:
+	  case JACOBI_20_00:
+	  case JACOBI_30_00:
+	  case LEGENDRE:   
+	  case INF_LAGRANGE:
+	    /* Since InfFE<Dim,T_radial,T_map>::n_dofs(...)
+	     * is actually independent of T_radial, we can use
+	     * just any T_radial */
+	    return InfFE<1,JACOBI_20_00,CARTESIAN>::n_dofs(fe_t, t);
+
+#endif
 
 	  default:
 	    error();
@@ -214,6 +214,17 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<2,MONOMIAL>::n_dofs(t, o);
 
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+	  case INFINITE_MAP:
+	  case JACOBI_20_00:
+	  case JACOBI_30_00:
+	  case LEGENDRE:   
+	  case INF_LAGRANGE:
+	    return InfFE<2,JACOBI_20_00,CARTESIAN>::n_dofs(fe_t, t);
+
+#endif
+
 	  default:
 	    error();
 	  };
@@ -233,6 +244,17 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 	    
 	  case MONOMIAL:
 	    return FE<3,MONOMIAL>::n_dofs(t, o);
+
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+	  case INFINITE_MAP:
+	  case JACOBI_20_00:
+	  case JACOBI_30_00:
+	  case LEGENDRE:   
+	  case INF_LAGRANGE:
+	    return InfFE<3,JACOBI_20_00,CARTESIAN>::n_dofs(fe_t, t);
+
+#endif
 
 	  default:
 	    error();
@@ -259,14 +281,6 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 {
   const Order o = fe_t.order;
   
-  // #ifdef ENABLE_INFINITE_ELEMENTS
-  //   if (FEInterface::is_InfFE_elem(t))
-  //     {
-  //       return InfFE::n_dofs_at_node(t, o, n);
-  //     };
-  // #endif
-
-  // by default, use this
   switch (dim)
     {
       // 1D
@@ -282,6 +296,20 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 	    
 	  case MONOMIAL:
 	    return FE<1,MONOMIAL>::n_dofs_at_node(t, o, n);
+
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+	  case INFINITE_MAP:
+	  case JACOBI_20_00:
+	  case JACOBI_30_00:
+	  case LEGENDRE:   
+	  case INF_LAGRANGE:
+	    /* Since InfFE<Dim,T_radial,T_map>::n_dofs_at_node(...)
+	     * is actually independent of T_radial, we can use
+	     * just any T_radial */
+	    return InfFE<1,JACOBI_20_00,CARTESIAN>::n_dofs_at_node(fe_t, t, n);
+
+#endif
 
 	  default:
 	    error();
@@ -303,6 +331,17 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<2,MONOMIAL>::n_dofs_at_node(t, o, n);
 
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+	  case INFINITE_MAP:
+	  case JACOBI_20_00:
+	  case JACOBI_30_00:
+	  case LEGENDRE:   
+	  case INF_LAGRANGE:
+	    return InfFE<2,JACOBI_20_00,CARTESIAN>::n_dofs_at_node(fe_t, t, n);
+
+#endif
+
 	  default:
 	    error();
 	  };
@@ -322,6 +361,17 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 	    
 	  case MONOMIAL:
 	    return FE<3,MONOMIAL>::n_dofs_at_node(t, o, n);
+
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+	  case INFINITE_MAP:
+	  case JACOBI_20_00:
+	  case JACOBI_30_00:
+	  case LEGENDRE:   
+	  case INF_LAGRANGE:
+	    return InfFE<3,JACOBI_20_00,CARTESIAN>::n_dofs_at_node(fe_t, t, n);
+
+#endif
 
 	  default:
 	    error();
@@ -347,15 +397,7 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 					  const ElemType t)
 {
   const Order o = fe_t.order;
-  
-  // #ifdef ENABLE_INFINITE_ELEMENTS
-  //   if (FEInterface::is_InfFE_elem(t))
-  //     {
-  //       return InfFE::n_dofs_per_elem(t, o);
-  //     };
-  // #endif
 
-  // by default, use this
   switch (dim)
     {
       // 1D
@@ -371,6 +413,20 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 	    
 	  case MONOMIAL:
 	    return FE<1,MONOMIAL>::n_dofs_per_elem(t, o);
+
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+	  case INFINITE_MAP:
+	  case JACOBI_20_00:
+	  case JACOBI_30_00:
+	  case LEGENDRE:   
+	  case INF_LAGRANGE:
+	    /* Since InfFE<Dim,T_radial,T_map>::n_dofs_per_elem(...)
+	     * is actually independent of T_radial, we can use
+	     * just any T_radial */
+	    return InfFE<1,JACOBI_20_00,CARTESIAN>::n_dofs_per_elem(fe_t, t);
+
+#endif
 
 	  default:
 	    error();
@@ -392,6 +448,17 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<2,MONOMIAL>::n_dofs_per_elem(t, o);
 
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+	  case INFINITE_MAP:
+	  case JACOBI_20_00:
+	  case JACOBI_30_00:
+	  case LEGENDRE:   
+	  case INF_LAGRANGE:
+	    return InfFE<2,JACOBI_20_00,CARTESIAN>::n_dofs_per_elem(fe_t, t);
+
+#endif
+
 	  default:
 	    error();
 	  };
@@ -411,6 +478,17 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 	    
 	  case MONOMIAL:
 	    return FE<3,MONOMIAL>::n_dofs_per_elem(t, o);
+
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+	  case INFINITE_MAP:
+	  case JACOBI_20_00:
+	  case JACOBI_30_00:
+	  case LEGENDRE:   
+	  case INF_LAGRANGE:
+	    return InfFE<3,JACOBI_20_00,CARTESIAN>::n_dofs_per_elem(fe_t, t);
+
+#endif
 
 	  default:
 	    error();
@@ -440,15 +518,6 @@ void FEInterface::nodal_soln(const unsigned int dim,
 {
   const Order order = fe_t.order;
   
-  // #ifdef ENABLE_INFINITE_ELEMENTS
-  //   if (FEInterface::is_InfFE_elem(elem->type()))
-  //     {
-  //       InfFE::nodal_soln(mesh, elem, order, elem_soln, nodal_soln);
-  //     }
-  //   else
-  // #endif
-
-  // by default, use this
   switch (dim)
     {
       // 1D
@@ -470,6 +539,22 @@ void FEInterface::nodal_soln(const unsigned int dim,
 	    FE<1,MONOMIAL>::nodal_soln(elem, order,
 				       elem_soln, nodal_soln);
 	    return;
+
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+	  case INFINITE_MAP:
+	  case JACOBI_20_00:
+	  case JACOBI_30_00:
+	  case LEGENDRE:   
+	  case INF_LAGRANGE:
+	    /* Since InfFE<Dim,T_radial,T_map>::nodal_soln(...)
+	     * is actually independent of T_radial, we can use
+	     * just any T_radial */
+	    InfFE<1,JACOBI_20_00,CARTESIAN>::nodal_soln(fe_t, elem, 
+							elem_soln, nodal_soln);
+	    return;
+
+#endif
 
 	  default:
 	    error();
@@ -497,6 +582,19 @@ void FEInterface::nodal_soln(const unsigned int dim,
 				       elem_soln, nodal_soln);
 	    return;
 
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+	  case INFINITE_MAP:
+	  case JACOBI_20_00:
+	  case JACOBI_30_00:
+	  case LEGENDRE:   
+	  case INF_LAGRANGE:
+	    InfFE<2,JACOBI_20_00,CARTESIAN>::nodal_soln(fe_t, elem, 
+							elem_soln, nodal_soln);
+	    return;
+
+#endif
+
 	  default:
 	    error();
 	  };
@@ -523,6 +621,19 @@ void FEInterface::nodal_soln(const unsigned int dim,
 				       elem_soln, nodal_soln);
 	    return;
 
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+	  case INFINITE_MAP:
+	  case JACOBI_20_00:
+	  case JACOBI_30_00:
+	  case LEGENDRE:   
+	  case INF_LAGRANGE:
+	    InfFE<3,JACOBI_20_00,CARTESIAN>::nodal_soln(fe_t, elem, 
+							elem_soln, nodal_soln);
+	    return;
+
+#endif
+
 	  default:
 	    error();
 	  };
@@ -546,14 +657,6 @@ Point FEInterface::inverse_map (const unsigned int dim,
 				const Elem* elem,
 				const Point& p)
 {
-  // #ifdef ENABLE_INFINITE_ELEMENTS
-  //   if (FEInterface::is_InfFE_elem(elem->type()))
-  //     {
-  //       return 0.;//InfFE::inverse_map(elem, p);
-  //     };
-  // #endif
-
-  // by default, use this
   switch (dim)
     {
       // 1D
@@ -569,6 +672,20 @@ Point FEInterface::inverse_map (const unsigned int dim,
 	    
 	  case MONOMIAL:
 	    return FE<1,MONOMIAL>::inverse_map(elem, p);
+
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+	  case INFINITE_MAP:
+	  case JACOBI_20_00:
+	  case JACOBI_30_00:
+	  case LEGENDRE:   
+	  case INF_LAGRANGE:
+	    /* Since InfFE<Dim,T_radial,T_map>::nodal_soln(...)
+	     * is actually independent of T_radial, we can use
+	     * just any T_radial */
+	    return InfFE<1,JACOBI_20_00,CARTESIAN>::inverse_map(elem, p);
+
+#endif
 
 	  default:
 	    error();
@@ -590,6 +707,17 @@ Point FEInterface::inverse_map (const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<2,MONOMIAL>::inverse_map(elem, p);
 
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+	  case INFINITE_MAP:
+	  case JACOBI_20_00:
+	  case JACOBI_30_00:
+	  case LEGENDRE:   
+	  case INF_LAGRANGE:
+	    return InfFE<2,JACOBI_20_00,CARTESIAN>::inverse_map(elem, p);
+
+#endif
+
 	  default:
 	    error();
 	  };
@@ -609,6 +737,17 @@ Point FEInterface::inverse_map (const unsigned int dim,
 	    
 	  case MONOMIAL:
 	    return FE<3,MONOMIAL>::inverse_map(elem, p);
+
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+	  case INFINITE_MAP:
+	  case JACOBI_20_00:
+	  case JACOBI_30_00:
+	  case LEGENDRE:   
+	  case INF_LAGRANGE:
+	    return InfFE<3,JACOBI_20_00,CARTESIAN>::inverse_map(elem, p);
+
+#endif
 
 	  default:
 	    error();
@@ -646,14 +785,6 @@ real FEInterface::shape(const unsigned int dim,
 {
   const Order o = fe_t.order;
   
-  // #ifdef ENABLE_INFINITE_ELEMENTS
-  //   if (FEInterface::is_InfFE_elem(t))
-  //     {
-  //       return 0.;//InfFE::shape(d, t, o, i, p);
-  //     };
-  // #endif
-
-  // by default, use this
   switch (dim)
     {
       // 1D
@@ -669,6 +800,25 @@ real FEInterface::shape(const unsigned int dim,
 	    
 	  case MONOMIAL:
 	    return FE<1,MONOMIAL>::shape(t,o,i,p);
+
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+	  case INFINITE_MAP:
+	    return InfFE<1,INFINITE_MAP,CARTESIAN>::shape(fe_t, t, i, p);
+
+	  case JACOBI_20_00:
+	    return InfFE<1,JACOBI_20_00,CARTESIAN>::shape(fe_t, t, i, p);
+
+	  case JACOBI_30_00:
+	    return InfFE<1,JACOBI_30_00,CARTESIAN>::shape(fe_t, t, i, p);
+
+	  case LEGENDRE:   
+	    return InfFE<1,LEGENDRE,CARTESIAN>::shape(fe_t, t, i, p);
+
+	  case INF_LAGRANGE:
+	    return InfFE<1,INF_LAGRANGE,CARTESIAN>::shape(fe_t, t, i, p);
+
+#endif
 
 	  default:
 	    error();
@@ -690,6 +840,25 @@ real FEInterface::shape(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<2,MONOMIAL>::shape(t,o,i,p);
 
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+	  case INFINITE_MAP:
+	    return InfFE<2,INFINITE_MAP,CARTESIAN>::shape(fe_t, t, i, p);
+
+	  case JACOBI_20_00:
+	    return InfFE<2,JACOBI_20_00,CARTESIAN>::shape(fe_t, t, i, p);
+
+	  case JACOBI_30_00:
+	    return InfFE<2,JACOBI_30_00,CARTESIAN>::shape(fe_t, t, i, p);
+
+	  case LEGENDRE:   
+	    return InfFE<2,LEGENDRE,CARTESIAN>::shape(fe_t, t, i, p);
+
+	  case INF_LAGRANGE:
+	    return InfFE<2,INF_LAGRANGE,CARTESIAN>::shape(fe_t, t, i, p);
+
+#endif
+
 	  default:
 	    error();
 	  };
@@ -709,6 +878,25 @@ real FEInterface::shape(const unsigned int dim,
 	    
 	  case MONOMIAL:
 	    return FE<3,MONOMIAL>::shape(t,o,i,p);
+
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+	  case INFINITE_MAP:
+	    return InfFE<3,INFINITE_MAP,CARTESIAN>::shape(fe_t, t, i, p);
+
+	  case JACOBI_20_00:
+	    return InfFE<3,JACOBI_20_00,CARTESIAN>::shape(fe_t, t, i, p);
+
+	  case JACOBI_30_00:
+	    return InfFE<3,JACOBI_30_00,CARTESIAN>::shape(fe_t, t, i, p);
+
+	  case LEGENDRE:   
+	    return InfFE<3,LEGENDRE,CARTESIAN>::shape(fe_t, t, i, p);
+
+	  case INF_LAGRANGE:
+	    return InfFE<3,INF_LAGRANGE,CARTESIAN>::shape(fe_t, t, i, p);
+
+#endif
 
 	  default:
 	    error();
@@ -736,14 +924,6 @@ real FEInterface::shape(const unsigned int dim,
 {
   const Order o = fe_t.order;
 
-  // #ifdef ENABLE_INFINITE_ELEMENTS
-  //   if (FEInterface::is_InfFE_elem(elem->type()))
-  //     {
-  //       return 0.;//InfFE::shape(d, elem, o, i, p);
-  //     };
-  // #endif
-
-  // by default, use this
   switch (dim)
     {
       // 1D
@@ -759,6 +939,25 @@ real FEInterface::shape(const unsigned int dim,
 	    
 	  case MONOMIAL:
 	    return FE<1,MONOMIAL>::shape(elem,o,i,p);
+
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+	  case INFINITE_MAP:
+	    return InfFE<1,INFINITE_MAP,CARTESIAN>::shape(fe_t, elem, i, p);
+
+	  case JACOBI_20_00:
+	    return InfFE<1,JACOBI_20_00,CARTESIAN>::shape(fe_t, elem, i, p);
+
+	  case JACOBI_30_00:
+	    return InfFE<1,JACOBI_30_00,CARTESIAN>::shape(fe_t, elem, i, p);
+
+	  case LEGENDRE:   
+	    return InfFE<1,LEGENDRE,CARTESIAN>::shape(fe_t, elem, i, p);
+
+	  case INF_LAGRANGE:
+	    return InfFE<1,INF_LAGRANGE,CARTESIAN>::shape(fe_t, elem, i, p);
+
+#endif
 
 	  default:
 	    error();
@@ -780,6 +979,25 @@ real FEInterface::shape(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<2,MONOMIAL>::shape(elem,o,i,p);
 
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+	  case INFINITE_MAP:
+	    return InfFE<2,INFINITE_MAP,CARTESIAN>::shape(fe_t, elem, i, p);
+
+	  case JACOBI_20_00:
+	    return InfFE<2,JACOBI_20_00,CARTESIAN>::shape(fe_t, elem, i, p);
+
+	  case JACOBI_30_00:
+	    return InfFE<2,JACOBI_30_00,CARTESIAN>::shape(fe_t, elem, i, p);
+
+	  case LEGENDRE:   
+	    return InfFE<2,LEGENDRE,CARTESIAN>::shape(fe_t, elem, i, p);
+
+	  case INF_LAGRANGE:
+	    return InfFE<2,INF_LAGRANGE,CARTESIAN>::shape(fe_t, elem, i, p);
+
+#endif
+
 	  default:
 	    error();
 	  };
@@ -800,6 +1018,25 @@ real FEInterface::shape(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<3,MONOMIAL>::shape(elem,o,i,p);
 
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+	  case INFINITE_MAP:
+	    return InfFE<3,INFINITE_MAP,CARTESIAN>::shape(fe_t, elem, i, p);
+
+	  case JACOBI_20_00:
+	    return InfFE<3,JACOBI_20_00,CARTESIAN>::shape(fe_t, elem, i, p);
+
+	  case JACOBI_30_00:
+	    return InfFE<3,JACOBI_30_00,CARTESIAN>::shape(fe_t, elem, i, p);
+
+	  case LEGENDRE:   
+	    return InfFE<3,LEGENDRE,CARTESIAN>::shape(fe_t, elem, i, p);
+
+	  case INF_LAGRANGE:
+	    return InfFE<3,INF_LAGRANGE,CARTESIAN>::shape(fe_t, elem, i, p);
+
+#endif
+
 	  default:
 	    error();
 	  };
@@ -818,46 +1055,4 @@ real FEInterface::shape(const unsigned int dim,
 
 
 
-  
-// real FEInterface::shape_deriv(const unsigned int d,
-// 			      const ElemType t,
-// 			      const Order o,
-// 			      const unsigned int i,
-// 			      const unsigned int j,
-// 			      const Point& p)
-// {
-
-// #ifdef ENABLE_INFINITE_ELEMENTS
-//   if (FEInterface::is_InfFE_elem(t))
-//     {
-//       return InfFE::shape_deriv(d, t, o, i, j, p);
-//     };
-// #endif
-
-//   // by default, use this
-//   return FEBase::shape_deriv(d, t, o, i, j, p);
-// };
-
-
-
-
-
-// real FEInterface::shape_deriv(const unsigned int d,
-// 			      const Elem* elem,
-// 			      const Order o,
-// 			      const unsigned int i,
-// 			      const unsigned int j,
-// 			      const Point& p)
-// {
-
-// #ifdef ENABLE_INFINITE_ELEMENTS
-//   if (FEInterface::is_InfFE_elem(elem->type()))
-//     {
-//       return InfFE::shape_deriv(d, elem, o, i, j, p);
-//     };
-// #endif
-
-//   // by default, use this
-//   return FEBase::shape_deriv(d, elem, o, i, j, p);
-// };
 

@@ -1,4 +1,4 @@
-// $Id: fe_interface.h,v 1.4 2003-01-21 19:24:34 benkirk Exp $
+// $Id: fe_interface.h,v 1.5 2003-01-24 17:24:38 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -166,55 +166,6 @@ public:
 		    const unsigned int i,
 		    const Point& p);
   
-//   /**
-//    * @returns the \p{j}th derivative of the \p{i}th shape function at
-//    * point \p{p}.  This method allows you to specify the dimension,
-//    * element type, and order directly.
-//    * Automatically passes the request to the appropriate
-//    * finite element class member.
-//    */
-//   static real shape_deriv(const unsigned int dim,
-// 			  const FEType& fe_t,
-// 			  const ElemType t,
-// 			  const Order o,
-// 			  const unsigned int i,
-// 			  const unsigned int j,
-// 			  const Point& p);
-
-//   /**
-//    * @returns the \p{j}th derivative of the \p{i}th shape function at
-//    * point \p{p}.  This method allows you to specify the dimension,
-//    * element type, and order directly.
-//    * Automatically passes the request to the appropriate
-//    * finite element class member.
-//    */
-//   static real shape_deriv(const unsigned int dim,
-// 			  const FEType& fe_t,
-// 			  const Elem* elem,
-// 			  const Order o,
-// 			  const unsigned int i,
-// 			  const unsigned int j,
-// 			  const Point& p);
-
-
-
-#ifdef ENABLE_INFINITE_ELEMENTS
-  
-  /**
-   * @returns true if this element type \p t belongs to
-   * the \p InfFE class.  Note that for each finite element class -- 
-   * except for \p FE and \p FEBase, since these are the default ones --
-   * there  exists one such function, which tells whether these elements 
-   * belong to this class, or not.
-   *
-   * This method is particularly helpful during the actual
-   * matrix assembly process.
-   */
-  static bool is_InfFE_elem(const ElemType t);
-
-#endif
-
-
 };
 
 

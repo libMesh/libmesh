@@ -82,7 +82,7 @@ void usage(char *progName)
     "\n"
     " will read a 3D Universal file, build infinite elements with the\n"
     " origin (30.5, -10.5, 0.0) on top of volume elements, while preserving\n"
-    " a symmetry plane through (0., 0., 0.) perpendicular to z.\n"
+    " a symmetry plane through (30.5, -10.5, 0.0) perpendicular to z.\n"
 #endif
     "\n"
     " Currently this program supports the following formats:\n"
@@ -136,8 +136,23 @@ void process_cmd_line(int argc, char **argv,
 		      bool& z_sym
 		      )
 {
+
+#ifndef ENABLE_INFINITE_ELEMENTS
+
+  addinfelems = false;
+  origin_x = origin_y = origin_z = 0.;
+  x_sym    = y_sym    = z_sym    = false;
+
+  char optionStr[] =
+    "i:o:s:d:r:p:bv?h";
+
+#else
+
   char optionStr[] =
     "i:o:s:d:r:p:ba::x:y:z:XYZv?h";
+
+#endif
+
   int opt;  
   
   if (argc < 3)
@@ -304,6 +319,7 @@ void process_cmd_line(int argc, char **argv,
 	  usage(argv[0]);
 	};
     };
+
 };
 
 
@@ -319,9 +335,9 @@ int main (int argc, char** argv)
     bool verbose = false;
     bool write_bndry = false;
     bool addinfelems = false;
-    double origin_x=0;
-    double origin_y=0;
-    double origin_z=0;
+    double origin_x=0.;
+    double origin_y=0.;
+    double origin_z=0.;
     bool x_sym=false;
     bool y_sym=false;
     bool z_sym=false;
@@ -333,7 +349,8 @@ int main (int argc, char** argv)
 
     process_cmd_line(argc, argv, names,
 		     n_subdomains, n_rsteps,
-		     dim, verbose, write_bndry, addinfelems, origin_x, origin_y, origin_z, x_sym, y_sym, z_sym);
+		     dim, verbose, write_bndry, 
+		     addinfelems, origin_x, origin_y, origin_z, x_sym, y_sym, z_sym);
 
     if (dim == static_cast<unsigned int>(-1))
       {
@@ -366,29 +383,29 @@ int main (int argc, char** argv)
 
 #ifdef ENABLE_INFINITE_ELEMENTS
 
-	if(addinfelems)
-	{
-	    if (names.size() == 3)
-    	{
-			std::cout << "ERROR: Invalid combination: Building infinite elements " << std::endl
-			  << "not compatible with solution import." << std::endl;
-			exit(1);
-    	}
+    if(addinfelems)
+    {
+      if (names.size() == 3)
+      {
+	std::cout << "ERROR: Invalid combination: Building infinite elements " << std::endl
+		  << "not compatible with solution import." << std::endl;
+	exit(1);
+      }
 
-    	if (write_bndry)
-      	{
-			std::cout << "ERROR: Invalid combination: Building infinite elements " << std::endl
-		      << "not compatible with writing boundary conditions." << std::endl;
-			exit(1);
-      	}
+      if (write_bndry)
+      {
+	std::cout << "ERROR: Invalid combination: Building infinite elements " << std::endl
+		  << "not compatible with writing boundary conditions." << std::endl;
+	exit(1);
+      }
 
-      	mesh.build_inf_elem(Point(origin_x, origin_y, origin_z),
+      mesh.build_inf_elem(Point(origin_x, origin_y, origin_z),
 			  x_sym, y_sym, z_sym, 
 			  verbose);
 
-	    if (verbose)
-      		mesh.print_info();
-	}
+      if (verbose)
+	  mesh.print_info();
+    }
 
 #endif
 

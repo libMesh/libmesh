@@ -1,4 +1,4 @@
-// $Id: fe_type.h,v 1.4 2003-01-21 19:24:34 benkirk Exp $
+// $Id: fe_type.h,v 1.5 2003-01-24 17:24:38 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -28,7 +28,7 @@
 #include "mesh_config.h"
 #include "enum_order.h"
 #include "enum_fe_family.h"
-
+#include "enum_inf_map_type.h"
 
 
 /**
@@ -65,29 +65,20 @@ public:
 #else
   
   /**
-   * Constructor.  Provides a uniform interface for non-infinite
-   * elements.
-   */
-  FEType(const Order    o = FIRST,
-	 const FEFamily f = LAGRANGE) :
-    order(o),
-    base_order(o),
-    family(f),
-    base_family(f)
-  {};
-
-  /**
    * Constructor.  Optionally takes the approximation \p Order
-   * and the finite element family \p FEFamily
+   * and the finite element family \p FEFamily, and provides
+   * a uniform interface for non-infinite elements.
    */
-  FEType(const Order    o,
-	 const Order    bo,
-	 const FEFamily f,
-	 const FEFamily bf) :
+  FEType(const Order      bo = FIRST,
+	 const FEFamily   bf = LAGRANGE,
+	 const Order      o  = THIRD,
+	 const FEFamily   f  = JACOBI_20_00,
+	 const InfMapType im = CARTESIAN) :
     order(o),
     base_order(bo),
     family(f),
-    base_family(bf)
+    base_family(bf),
+    inf_map(im)
   {};
 
   /**
@@ -101,8 +92,8 @@ public:
   Order base_order;
 
   /**
-   * The type of radial approximation in radial direction.  Valid types are 
-   * \p JACOBI_20_00, \p JACOBI_30_00, \p LEGENDRE, and \p LAGRANGE.
+   * The type of approximation in radial direction.  Valid types are 
+   * \p JACOBI_20_00, \p JACOBI_30_00, etc...
    */
   FEFamily family;
 
@@ -112,6 +103,14 @@ public:
    * direction.  Valid types are \p LAGRANGE, \p HIERARCHIC, etc...
    */
   FEFamily base_family;
+
+  /**
+   * The coordinate mapping type of the infinite element.
+   * When the infinite elements are defined over a surface with
+   * a separable coordinate system (sphere, spheroid, ellipsoid),
+   * the infinite elements may take advantage of this fact.
+   */
+  InfMapType inf_map;
   
 #endif
 

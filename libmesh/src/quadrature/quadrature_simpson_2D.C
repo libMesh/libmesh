@@ -1,4 +1,4 @@
-// $Id: quadrature_simpson_2D.C,v 1.3 2003-01-21 19:24:38 benkirk Exp $
+// $Id: quadrature_simpson_2D.C,v 1.4 2003-01-24 17:24:45 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -44,9 +44,7 @@ void QSimpson::init_2D(const ElemType _type)
 	// product of the 1D quadrature rule.
 	QSimpson q1D(1);
 	q1D.init(EDGE2);
-
 	tensor_product_quad( &q1D );
-	
 	return;
       };
 
@@ -56,24 +54,42 @@ void QSimpson::init_2D(const ElemType _type)
     case TRI3:
     case TRI6:
       {
-	// TODO:[JWP] Fix Triangle rule for Simpson quadrature
+	// I'm not sure if you would call this Simpson's
+	// rule for triangles.  What it *really* is is
+	// four trapezoidal rules combined to give a six
+	// point rule.  The points lie at the nodal locations
+	// of the TRI6, so you can get diagonal element
+	// stiffness matrix entries for quadratic elements.
+	// This rule should be able to integrate a little
+	// better than linears exactly.
 	
-// 	_points.resize(3);
-// 	_weights.resize(3);
+ 	_points.resize(6);
+ 	_weights.resize(6);
 	
-// 	_points[0](0) = 0.;
-// 	_points[0](1) = 0.;
+ 	_points[0](0) = 0.;
+ 	_points[0](1) = 0.;
 	
-// 	_points[1](0) = 1.;
-// 	_points[1](1) = 0.;
+ 	_points[1](0) = 1.;
+ 	_points[1](1) = 0.;
 	
-// 	_points[2](0) = 0.;
-// 	_points[2](1) = 1.;
+ 	_points[2](0) = 0.;
+ 	_points[2](1) = 1.;
 	
+ 	_points[3](0) = 0.5;
+ 	_points[3](1) = 0.;
 	
-// 	_weights[0] = 1./6.;
-// 	_weights[1] = 1./6.;
-// 	_weights[2] = 1./6.;
+ 	_points[4](0) = 0.;
+ 	_points[4](1) = 0.5;
+	
+ 	_points[5](0) = 0.5;
+ 	_points[5](1) = 0.5;
+	
+ 	_weights[0] = 0.041666666666666666666666666667; // 1./24.
+ 	_weights[1] = 0.041666666666666666666666666667; // 1./24.
+ 	_weights[2] = 0.041666666666666666666666666667; // 1./24.
+ 	_weights[3] = 0.125;                            // 1./8.
+ 	_weights[4] = 0.125;                            // 1./8.
+ 	_weights[5] = 0.125;                            // 1./8.
 	
 	return;
       };

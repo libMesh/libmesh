@@ -1,4 +1,4 @@
-// $Id: mesh_exodus_support.C,v 1.4 2003-01-21 19:24:37 benkirk Exp $
+// $Id: mesh_exodus_support.C,v 1.5 2003-01-24 17:24:44 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -21,7 +21,6 @@
 
 // C++ includes
 #include <iomanip>
-
 
 // Local includes
 #include "mesh_base.h"
@@ -133,7 +132,7 @@ void ExodusII::open(const char* filename)
 			&comp_ws,
 			&io_ws,
 			&ex_version);
-
+  
   check_err(ex_id, "Error opening ExodusII mesh file.");
   if (verbose) std::cout << "File opened successfully." << std::endl;
 }
@@ -450,7 +449,7 @@ void Mesh::read_exd(const std::string& name)
 #ifndef HAVE_EXODUS_API
   {
     std::cerr << "ERROR, ExodusII API is not defined." << std::endl
-	      << "No input can be read" << std::endl;
+	      << "Input " << name << " cannot be read" << std::endl;
     error();
   }
 

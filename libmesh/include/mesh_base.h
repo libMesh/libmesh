@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.4 2003-01-21 19:24:34 benkirk Exp $
+// $Id: mesh_base.h,v 1.5 2003-01-24 17:24:38 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -59,7 +59,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.4 $
+ * \version $Revision: 1.5 $
  */
 
 

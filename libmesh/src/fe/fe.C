@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.4 2003-01-21 19:24:36 benkirk Exp $
+// $Id: fe.C,v 1.5 2003-01-24 17:24:41 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -21,6 +21,7 @@
 
 // Local includes
 #include "fe.h"
+#include "inf_fe.h"
 #include "quadrature.h"
 #include "elem.h"
 
@@ -61,6 +62,7 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	    };
 	    
 	  default:
+	    std::cout << "ERROR: Bad FEType.family= " << fet.family << std::endl;
 	    error();
 	  };
       };
@@ -90,6 +92,7 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	    };
 	    
 	  default:
+	    std::cout << "ERROR: Bad FEType.family= " << fet.family << std::endl;
 	    error();
 	  };
       };
@@ -117,8 +120,85 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	      AutoPtr<FEBase> ap(new FE<3,MONOMIAL>(fet));
 	      return ap;
 	    };
+
+
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+	  case INFINITE_MAP:
+	    {
+	      std::cout << "ERROR: Don't build an infinite element " << std::endl
+			<< " with FEFamily = " << fet.family << std::endl;
+	      error();
+	    };
+
+	  case JACOBI_20_00:
+	    {
+  	      switch (fet.inf_map)
+	        {
+		  case CARTESIAN:
+		    {
+		      AutoPtr<FEBase> ap(new InfFE<3,JACOBI_20_00,CARTESIAN>(fet));
+		      return ap;
+		    };
+		  default:
+		    std::cout << "ERROR: Don't build an infinite element " << std::endl
+			      << " with FEFamily = " << fet.family << std::endl;
+		    error();
+		};
+	    };
+
+	  case JACOBI_30_00:
+	    {
+  	      switch (fet.inf_map)
+	        {
+		  case CARTESIAN:
+		    {
+		      AutoPtr<FEBase> ap(new InfFE<3,JACOBI_30_00,CARTESIAN>(fet));
+		      return ap;
+		    };
+		  default:
+		    std::cout << "ERROR: Don't build an infinite element " << std::endl
+			      << " with FEFamily = " << fet.family << std::endl;
+		    error();
+		};
+	    };
+
+	  case LEGENDRE:
+	    {
+  	      switch (fet.inf_map)
+	        {
+		  case CARTESIAN:
+		    {
+		      AutoPtr<FEBase> ap(new InfFE<3,LEGENDRE,CARTESIAN>(fet));
+		      return ap;
+		    };
+		  default:
+		    std::cout << "ERROR: Don't build an infinite element " << std::endl
+			      << " with FEFamily = " << fet.family << std::endl;
+		    error();
+		};
+	    };
+
+	  case INF_LAGRANGE:
+	    {
+  	      switch (fet.inf_map)
+	        {
+		  case CARTESIAN:
+		    {
+		      AutoPtr<FEBase> ap(new InfFE<3,INF_LAGRANGE,CARTESIAN>(fet));
+		      return ap;
+		    };
+		  default:
+		    std::cout << "ERROR: Don't build an infinite element " << std::endl
+			      << " with FEFamily = " << fet.family << std::endl;
+		    error();
+		};
+	    };
+
+#endif
 	    
 	  default:
+	    std::cout << "ERROR: Bad FEType.family= " << fet.family << std::endl;
 	    error();
 	  };
       };
@@ -130,6 +210,15 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
   error();
   AutoPtr<FEBase> ap(NULL);
   return ap;
+};
+
+
+
+template <unsigned int Dim, FEFamily T>
+unsigned int FE<Dim,T>::n_quadrature_points () const
+{ 
+  assert (qrule != NULL);  
+  return qrule->n_points(); 
 };
 
 

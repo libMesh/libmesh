@@ -1,4 +1,4 @@
-// $Id: enum_order.h,v 1.3 2003-01-21 19:24:34 benkirk Exp $
+// $Id: enum_order.h,v 1.4 2003-01-24 17:24:38 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,8 +23,6 @@
 #define __enum_order_h__
 
 // Local includes
-#include "mesh_config.h"
-
 
 
 // ------------------------------------------------------------
@@ -33,43 +31,34 @@ namespace MeshEnums {
 
   /**
    * \enum MeshEnums::Order defines an \p enum for polynomial orders.
+   * Fixing each label to a specific int, since \p InfFE uses 
+   * \p static_cast<unsigned int>.
    */
-  enum Order {CONST=0,
-	      FIRST,
-	      SECOND,
-	      THIRD,
-	      FOURTH,
-	      FIFTH,
-	      SIXTH,
-	      SEVENTH,
-	      EIGHTH,
-	      NINTH,
-	      TENTH,
-	      ELEVENTH,
-	      TWELFTH,
-	      THIRTEENTH,
-	      FOURTEENTH,
-	      FIFTEENTH,
-	      SIXTEENTH,
-	      SEVENTEENTH,
-	      EIGHTTEENTH,
-	      NINTEENTH,
-	      TWENTIETH,
-	      TWENTYFIRST,
-	      TWENTYSECOND,
-	      TWENTYTHIRD,
-	      
+  enum Order {CONST        =  0,
+	      FIRST        =  1,
+	      SECOND       =  2,
+	      THIRD        =  3,
+	      FOURTH       =  4,
+	      FIFTH        =  5,
+	      SIXTH        =  6,
+	      SEVENTH      =  7,
+	      EIGHTH       =  8,
+	      NINTH        =  9,
+	      TENTH        = 10,
+	      ELEVENTH     = 11,
+	      TWELFTH      = 12,
+	      THIRTEENTH   = 13,
+	      FOURTEENTH   = 14,
+	      FIFTEENTH    = 15,
+	      SIXTEENTH    = 16,
+	      SEVENTEENTH  = 17,
+	      EIGHTTEENTH  = 18,
+	      NINTEENTH    = 19,
+	      TWENTIETH    = 20,
+	      TWENTYFIRST  = 21,
+	      TWENTYSECOND = 22,
+	      TWENTYTHIRD  = 23,	      
 	      INVALID_ORDER};
-
-
-#ifdef ENABLE_INFINITE_ELEMENTS
-
-  /**
-   * \enum MeshEnums::ShiftPattern for infinite elements
-   */
-  enum IfemShiftPattern {DD_SHIFT, ERROR};
-
-#endif
 
 };
 
