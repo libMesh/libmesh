@@ -1,4 +1,4 @@
-// $Id: system_data.h,v 1.10 2003-02-10 03:55:51 benkirk Exp $
+// $Id: system_data.h,v 1.11 2003-02-10 22:03:25 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,7 +30,11 @@
 #include "mesh.h"
 #include "dof_map.h"
 #include "fe_type.h"
-#include "petsc_interface.h"
+#include "auto_ptr.h"
+#include "enum_solver_package.h"
+#include "sparse_matrix.h"
+#include "numeric_vector.h"
+#include "linear_solver_interface.h"
 #include "equation_systems.h"
 #include "reference_counted_object.h"
 
@@ -62,8 +66,9 @@ protected:
    * data structures.  Protected so that this base class
    * cannot be explicitly instantiated.
    */
-  SystemBase (EquationSystems& es,
-	      const std::string& name);
+  SystemBase (EquationSystems&    es,
+	      const std::string&  name,
+	      const SolverPackage solver_package);
 
 public:
 
@@ -265,8 +270,6 @@ public:
   void (* assemble_fptr) (EquationSystems& es,
 			  const std::string& name);
   
-#ifdef HAVE_PETSC
-
   /**
    * Assemble the linear system.  Does not
    * actually call the solver.
@@ -281,22 +284,22 @@ public:
   /**
    * Data structure to hold solution values.
    */
-  PetscVector solution;
+  AutoPtr<NumericVector> solution;
 
   /**
    * Data structure to hold the system right-hand-side.
    */
-  PetscVector rhs;
+  AutoPtr<NumericVector> rhs;
   
   /**
    * Data structure to hold the system matrix.
    */
-  PetscMatrix matrix;
+  AutoPtr<SparseMatrix> matrix;
 
   /**
    * Interface to the Petsc solvers.
    */
-  PetscInterface petsc_interface;
+  AutoPtr<LinearSolverInterface> linear_solver_interface;
   
   /**
    * All the values I need to compute my contribution
@@ -304,9 +307,9 @@ public:
    * current solution with any ghost values needed from
    * other processors.
    */
-  PetscVector current_local_solution;
+  AutoPtr<NumericVector> current_local_solution;
     
-#endif
+
 
 protected:
 
@@ -440,22 +443,10 @@ unsigned int SystemBase::n_local_dofs() const
 inline
 Complex SystemBase::current_solution (const unsigned int global_dof_number) const
 {
-#ifndef HAVE_PETSC
-
-  std::cerr << "ERROR: this feature requires Petsc support!"
-	    << std::endl;
-
-  error();
-
-  return 0.;
   
-#else
-
   assert (global_dof_number < dof_map.n_dofs());
   
-  return current_local_solution(global_dof_number);
-
-#endif
+  return (*current_local_solution)(global_dof_number);
 };
 
 
@@ -475,20 +466,7 @@ Complex SystemBase::current_nodal_solution (const unsigned int node,
 					    const unsigned short int var,
 					    const unsigned int index) const
 {
-#ifndef HAVE_PETSC
-
-  std::cerr << "ERROR: this feature requires Petsc support!"
-	    << std::endl;
-
-  error();
-
-  return 0.;
-  
-#else
-
-  return current_local_solution(dof_map.node_dof_number(node, var, index));
-
-#endif
+  return (*current_local_solution)(dof_map.node_dof_number(node, var, index));
 };
 
 
@@ -498,7 +476,7 @@ Complex SystemBase::current_elem_solution (const unsigned int elem,
 					   const std::string& var,
 					   const unsigned int index) const
 {
-  return current_elem_solution (elem, variable_number(var), index);
+  return current_elem_solution(elem, variable_number(var), index);
 };
 
 
@@ -508,20 +486,7 @@ Complex SystemBase::current_elem_solution (const unsigned int elem,
 					   const unsigned short int var,
 					   const unsigned int index) const
 {
-#ifndef HAVE_PETSC
-
-  std::cerr << "ERROR: this feature requires Petsc support!"
-	    << std::endl;
-
-  error();
-
-  return 0.;
-  
-#else
-
-  return current_elem_solution(dof_map.elem_dof_number(elem, var, index));
-
-#endif
+  return (*current_local_solution)(dof_map.elem_dof_number(elem, var, index));
 };
 
 
@@ -554,7 +519,8 @@ public:
    * data structures.
    */
   GeneralSystem (EquationSystems& es,
-		 const std::string& name);
+		 const std::string& name,
+		 const SolverPackage solver_package);
 
   /**
    * Destructor.
@@ -678,10 +644,7 @@ public:
   Complex older_elem_solution (const unsigned int elem,
 			       const unsigned short int var=0,
 			       const unsigned int index=0) const;
-
  
-#ifdef HAVE_PETSC
-
   /**
    * Assemble the linear system.  Does not
    * actually call the solver.
@@ -697,15 +660,14 @@ public:
    * All the values I need to compute my contribution
    * to the simulation at hand for the previous time step.
    */
-  PetscVector old_local_solution;
+  AutoPtr<NumericVector> old_local_solution;
   
   /**
    * All the values I need to compute my contribution
    * to the simulation at hand two time steps ago.
    */
-  PetscVector older_local_solution;
+  AutoPtr<NumericVector> older_local_solution;
   
-#endif
 
 private:
 
@@ -717,8 +679,12 @@ private:
 // GeneralSystem inline methods
 inline
 GeneralSystem::GeneralSystem (EquationSystems& es,
-			      const std::string& name) :
-    SystemBase(es, name)
+			      const std::string& name,
+			      const SolverPackage solver_package) :
+  SystemBase(es, name, solver_package),
+  old_local_solution   (NumericVector::build(solver_package)),
+  older_local_solution (NumericVector::build(solver_package))
+
 {
 };
 
@@ -756,22 +722,9 @@ Order GeneralSystem::variable_order (const std::string& var) const
 inline
 Complex GeneralSystem::old_solution (const unsigned int global_dof_number) const
 {
-#ifndef HAVE_PETSC
-
-  std::cerr << "ERROR: this feature requires Petsc support!"
-	    << std::endl;
-
-  error();
-
-  return 0.;
-  
-#else
-
   assert (global_dof_number < dof_map.n_dofs());
   
-  return old_local_solution(global_dof_number);
-
-#endif
+  return (*old_local_solution)(global_dof_number);
 };
 
 
@@ -779,22 +732,9 @@ Complex GeneralSystem::old_solution (const unsigned int global_dof_number) const
 inline
 Complex GeneralSystem::older_solution (const unsigned int global_dof_number) const
 {
-#ifndef HAVE_PETSC
-
-  std::cerr << "ERROR: this feature requires Petsc support!"
-	    << std::endl;
-
-  error();
-
-  return 0.;
-  
-#else
-
   assert (global_dof_number < dof_map.n_dofs());
   
-  return older_local_solution(global_dof_number);
-
-#endif
+  return (*older_local_solution)(global_dof_number);
 };
 
 
@@ -814,20 +754,7 @@ Complex GeneralSystem::old_nodal_solution (const unsigned int node,
 					   const unsigned short int var,
 					   const unsigned int index) const
 {
-#ifndef HAVE_PETSC
-
-  std::cerr << "ERROR: this feature requires Petsc support!"
-	    << std::endl;
-
-  error();
-
-  return 0.;
-  
-#else
-
-  return old_local_solution(dof_map.node_dof_number(node, var, index));
-
-#endif
+  return (*old_local_solution)(dof_map.node_dof_number(node, var, index));
 };
 
 
@@ -837,7 +764,7 @@ Complex GeneralSystem::older_nodal_solution (const unsigned int node,
 					     const std::string& var,
 					     const unsigned int index) const
 {
-  return older_nodal_solution (node, variable_number(var), index);
+  return older_nodal_solution(node, variable_number(var), index);
 };
 
 
@@ -847,20 +774,7 @@ Complex GeneralSystem::older_nodal_solution (const unsigned int node,
 					     const unsigned short int var,
 					     const unsigned int index) const
 {
-#ifndef HAVE_PETSC
-
-  std::cerr << "ERROR: this feature requires Petsc support!"
-	    << std::endl;
-
-  error();
-
-  return 0.;
-  
-#else
-
-  return older_local_solution(dof_map.node_dof_number(node, var, index));
-
-#endif
+  return (*older_local_solution)(dof_map.node_dof_number(node, var, index));
 };
 
 
@@ -880,20 +794,7 @@ Complex GeneralSystem::old_elem_solution (const unsigned int elem,
 					  const unsigned short int var,
 					  const unsigned int index) const
 {
-#ifndef HAVE_PETSC
-
-  std::cerr << "ERROR: this feature requires Petsc support!"
-	    << std::endl;
-
-  error();
-
-  return 0.;
-  
-#else
-
-  return old_local_solution(dof_map.elem_dof_number(elem, var, index));
-
-#endif
+  return (*old_local_solution)(dof_map.elem_dof_number(elem, var, index));
 };
 
 
@@ -913,20 +814,7 @@ Complex GeneralSystem::older_elem_solution (const unsigned int elem,
 					    const unsigned short int var,
 					    const unsigned int index) const
 {
-#ifndef HAVE_PETSC
-
-  std::cerr << "ERROR: this feature requires Petsc support!"
-	    << std::endl;
-
-  error();
-
-  return 0.;
-  
-#else
-
-  return older_local_solution(dof_map.elem_dof_number(elem, var, index));
-
-#endif
+  return (*older_local_solution)(dof_map.elem_dof_number(elem, var, index));
 };
 
 

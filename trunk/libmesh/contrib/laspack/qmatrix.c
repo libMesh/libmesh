@@ -30,8 +30,8 @@ void Q_Constr(QMatrix *Q, char *Name, size_t Dim, Boolean Symmetry,
               ElOrderType ElOrder, InstanceType Instance, Boolean OwnData)
 /* constructor of the type QMatrix */
 {
-    size_t RoC;
-
+    size_t RoC;    
+    
     Q->Name = (char *)malloc((strlen(Name) + 1) * sizeof(char));
     if (Q->Name != NULL)
         strcpy(Q->Name, Name);

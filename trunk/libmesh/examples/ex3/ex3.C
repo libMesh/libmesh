@@ -1,4 +1,4 @@
-// $Id: ex3.C,v 1.8 2003-02-10 03:55:49 benkirk Exp $
+// $Id: ex3.C,v 1.9 2003-02-10 22:03:16 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -591,8 +591,8 @@ void assemble_poisson(EquationSystems& es,
        * right-hand-side vector.  The \p PetscMatrix::add_matrix()
        * and \p PetscVector::add_vector() members do this for us.
        */
-      es("Poisson").matrix.add_matrix (Ke, dof_indices);
-      es("Poisson").rhs.add_vector (Fe, dof_indices);
+      es("Poisson").matrix->add_matrix (Ke, dof_indices);
+      es("Poisson").rhs->add_vector (Fe, dof_indices);
       
     }; // end of element loop
 

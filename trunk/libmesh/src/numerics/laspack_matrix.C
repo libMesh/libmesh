@@ -1,4 +1,4 @@
-//    $Id: laspack_matrix.C,v 1.2 2003-02-10 03:55:51 benkirk Exp $
+// $Id: laspack_matrix.C,v 1.3 2003-02-10 22:03:27 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -106,7 +106,7 @@ void LaspackMatrix::update_sparsity_pattern (std::vector<std::set<unsigned int> 
       const unsigned int length = _row_start[i+1] - rs;
       
       //std::cout << "m()=" << m() << std::endl;
-      Laspack::Q_SetLen (_QMat, i+1, length);
+      Laspack::Q_SetLen (&_QMat, i+1, length);
       //std::cout << "m()=" << m() << std::endl;
 
       for (unsigned int l=0; l<length; l++)
@@ -122,7 +122,7 @@ void LaspackMatrix::update_sparsity_pattern (std::vector<std::set<unsigned int> 
 	  //std::cout << "pos(i,j)=" << pos(i,j)
 	  //          << std::endl;	  
 	  assert (pos(i,j) == l);
-	  Laspack::Q_SetEntry (_QMat, i+1, l, j+1, 0.);
+	  Laspack::Q_SetEntry (&_QMat, i+1, l, j+1, 0.);
 	};
     };
   
@@ -188,14 +188,11 @@ void LaspackMatrix::init ()
 
   using namespace Laspack;
 
-  _QMat = new QMatrix;
-  
-  Q_Constr(_QMat, const_cast<char*>("Mat"), m, False, Rowws, Normal, True);
+  Q_Constr(&_QMat, const_cast<char*>("Mat"), m, False, Rowws, Normal, True);
 
-  //here();
-  assert (m == this->m());
-  
   _is_initialized = true;
+  
+  assert (m == this->m());
 };
 
 

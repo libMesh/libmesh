@@ -1,4 +1,4 @@
-// $Id: ex4.C,v 1.6 2003-02-10 03:55:50 benkirk Exp $
+// $Id: ex4.C,v 1.7 2003-02-10 22:03:19 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -586,8 +586,8 @@ void assemble_poisson(EquationSystems& es,
        */
 #ifndef USE_COMPLEX_NUMBERS
 
-      es("Poisson").matrix.add_matrix (Ke, dof_indices);
-      es("Poisson").rhs.add_vector    (Fe, dof_indices);
+      es("Poisson").matrix->add_matrix (Ke, dof_indices);
+      es("Poisson").rhs->add_vector    (Fe, dof_indices);
 #endif
       
     }; // end of element loop

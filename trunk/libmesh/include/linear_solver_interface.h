@@ -1,4 +1,4 @@
-// $Id: solver_interface.h,v 1.1 2003-02-10 03:55:51 benkirk Exp $
+// $Id: linear_solver_interface.h,v 1.1 2003-02-10 22:03:24 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -19,23 +19,25 @@
 
 
 
-#ifndef __solver_interface_h__
-#define __solver_interface_h__
+#ifndef __linear_solver_interface_h__
+#define __linear_solver_interface_h__
 
 
 // C++ includes
 
 // Local includes
 #include "mesh_common.h"
+#include "auto_ptr.h"
 #include "sparse_matrix.h"
 #include "numeric_vector.h"
+#include "enum_solver_package.h"
 #include "enum_solver_type.h"
 #include "enum_preconditioner_type.h"
 #include "reference_counted_object.h"
 
 
 // forward declarations
-class SolverInterface;
+class LinearSolverInterface;
 
 
 
@@ -48,19 +50,25 @@ class SolverInterface;
  * @author Benjamin Kirk, 2003
  */
 
-class SolverInterface : public ReferenceCountedObject<SolverInterface>
+class LinearSolverInterface : public ReferenceCountedObject<LinearSolverInterface>
 {
  public:
   
   /**
    *  Constructor. Initializes Solver data structures
    */
-  SolverInterface ();
+  LinearSolverInterface ();
     
   /**
    * Destructor.
    */
-  virtual ~SolverInterface ();
+  virtual ~LinearSolverInterface ();
+  
+  /**
+   * Builds a \p LinearSolverInterface using the linear solver package specified by
+   * \p solver_package
+   */
+  static AutoPtr<LinearSolverInterface> build(const SolverPackage solver_package);
   
   /**
    * @returns true if the data structures are
@@ -133,7 +141,7 @@ protected:
 
 /*----------------------- inline functions ----------------------------------*/
 inline
-SolverInterface::SolverInterface () :
+LinearSolverInterface::LinearSolverInterface () :
   _solver_type (GMRES),
   _preconditioner_type (ILU_PRECOND),
   _is_initialized (false)
@@ -142,7 +150,7 @@ SolverInterface::SolverInterface () :
 
 
 inline
-SolverInterface::~SolverInterface ()
+LinearSolverInterface::~LinearSolverInterface ()
 {
   clear ();
 };

@@ -3,5 +3,6 @@
 3.) Renamed Vector QVector.
 4.) Added extern "C" to all header files
 
+
 Benjamin S. Kirk
 Fri Feb  7 10:51:37 CST 2003

@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.8 2003-02-10 03:55:50 benkirk Exp $
+// $Id: equation_systems.h,v 1.9 2003-02-10 22:03:22 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -29,6 +29,8 @@
 // Local Includes
 #include "mesh_common.h"
 #include "xdr_cxx.h"
+#include "enum_solver_package.h"
+
 
 // Forward Declarations
 #define SystemData GeneralSystem
@@ -43,7 +45,7 @@ class Mesh;
  * are identified by a user-specified name and are solved
  * in the order that they are declared.
  *
- * @author Benjamin S. Kirk, 2002
+ * @author Benjamin S. Kirk, 2002-2003
  */
 
 // ------------------------------------------------------------
@@ -55,12 +57,28 @@ public:
   /**
    * Constructor.  Optionally initializes required
    * data structures.  By default Petsc data structures
-   * will be used, but this is optional via the use_petsc
+   * will be used, but this is optional via the \p sp
    * flag.
    */
   EquationSystems (const Mesh& mesh,
-		   const bool use_petsc=true);
 
+#if defined(HAVE_PETSC)
+		   
+		   // Default to PETSC solvers if they are there
+		   const SolverPackage sp = PETSC_SOLVERS
+		   
+#elif defined(HAVE_LASPACK) && !defined(USE_COMPLEX_NUMBERS)
+		   
+		   // Try LASPACK if PETSC is not available
+		   const SolverPackage sp = LASPACK_SOLVERS
+		   
+#else
+		   
+		   // No linear solvers for you!
+		   const SolverPackage sp = INVALID_SOLVER_PACKAGE
+#endif
+		   
+		   );
   /**
    * Destructor.
    */
@@ -223,28 +241,27 @@ public:
   /**
    * The mesh data structure
    */ 
-  const Mesh& mesh;
+  const Mesh& _mesh;
   
   /**
-   * Flag indicating if we should use
-   * Petsc data structures
+   * Flag indicating what linear solver package to use
    */
-  const bool use_petsc;
+  const SolverPackage _solver_package;
 
   /**     
    * Data structure that holds the systems.
    */
-  std::map<std::string, SystemData*> systems;
+  std::map<std::string, SystemData*> _systems;
   
   /**
    * Data structure to hold user-specified flags.
    */
-  std::set<std::string> flags;
+  std::set<std::string> _flags;
 
   /**
    * Data structore to hold user-specified parameters 
    */
-  std::map<std::string, Real> parameters;
+  std::map<std::string, Real> _parameters;
 };
 
 
@@ -254,7 +271,7 @@ public:
 inline
 unsigned int EquationSystems::n_systems () const
 {
-  return systems.size();
+  return _systems.size();
 };
 
 
@@ -262,7 +279,7 @@ unsigned int EquationSystems::n_systems () const
 inline
 const Mesh & EquationSystems::get_mesh () const
 {
-  return mesh;
+  return _mesh;
 };
 
 

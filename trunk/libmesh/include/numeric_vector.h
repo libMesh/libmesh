@@ -1,4 +1,4 @@
-// $Id: numeric_vector.h,v 1.2 2003-02-10 04:04:31 benkirk Exp $
+// $Id: numeric_vector.h,v 1.3 2003-02-10 22:03:24 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,8 +24,12 @@
 
 
 // C++ includes
-#include "mesh_common.h"
 #include <vector>
+
+// Local includes
+#include "mesh_common.h"
+#include "auto_ptr.h"
+#include "enum_solver_package.h"
 #include "reference_counted_object.h"
 
 
@@ -67,6 +71,12 @@ class NumericVector : public ReferenceCountedObject<NumericVector>
    * for derived classes to behave properly.
    */
   virtual ~NumericVector ();
+
+  /**
+   * Builds a \p NumericVector using the linear solver package specified by
+   * \p solver_package
+   */
+  static AutoPtr<NumericVector> build(const SolverPackage solver_package);
   
   /**
    * @returns true if the vector has been initialized,

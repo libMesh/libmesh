@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.9 2003-02-07 18:05:40 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.10 2003-02-10 22:02:59 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -438,7 +438,7 @@ AC_DEFUN(CONFIGURE_PETSC,
     petscminor=`grep "define PETSC_VERSION_MINOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_MINOR[ ]*//g"`
     petscsubminor=`grep "define PETSC_VERSION_SUBMINOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_SUBMINOR[ ]*//g"`
     petscversion=$petscmajor.$petscminor.$petscsubminor
-    echo "<<< Configuring library with petsc version " $petscversion " support >>>"
+    AC_MSG_RESULT(<<< Configuring library with petsc version $petscversion support >>>)
     AC_SUBST(petscversion)
   else
     enablepetsc=no  
@@ -485,7 +485,6 @@ AC_DEFUN(CONFIGURE_LASPACK,
     AC_SUBST(LASPACK_INCLUDE_PATH)
     AC_DEFINE(HAVE_LASPACK, 1,
               [Flag indicating whether or not LASPACK iterative solvers are available])
-    dnl [[ == [, m4 eats brackets.
     laspack_version=`grep "define LASPACK_VERSION " $LASPACK_INCLUDE_PATH/version.h | sed -e "s/[[^0-9.]]*//g"`
     AC_MSG_RESULT(<<< Configuring library with LASPACK version $laspack_version support >>>)
   else

@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.9 2003-02-10 03:55:51 benkirk Exp $
+// $Id: equation_systems.C,v 1.10 2003-02-10 22:03:25 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -22,6 +22,7 @@
 #include <sstream>
 
 // Local Includes
+#include "enum_solver_package.h"
 #include "fe_interface.h"
 #include "petsc_vector.h"
 #include "petsc_matrix.h"
@@ -36,9 +37,10 @@
 
 // ------------------------------------------------------------
 // EquationSystem class implementation
-EquationSystems::EquationSystems (const Mesh& m, const bool up) :
-  mesh(m),
-  use_petsc(up)
+EquationSystems::EquationSystems (const Mesh& m,
+				  const SolverPackage sp) :
+  _mesh(m),
+  _solver_package(sp)
 {
   // Default parameters
   set_parameter("linear solver tolerance")          = 1.e-12;
@@ -57,26 +59,26 @@ EquationSystems::~EquationSystems ()
 void EquationSystems::clear ()
 {
   for (std::map<std::string, SystemData*>::iterator
-	 pos = systems.begin(); pos != systems.end();
+	 pos = _systems.begin(); pos != _systems.end();
        ++pos)
     delete pos->second;
   
-  systems.clear ();
+  _systems.clear ();
 
-  flags.clear ();
+  _flags.clear ();
 
-  parameters.clear ();
+  _parameters.clear ();
 };
 
 
 
 void EquationSystems::init ()
 {
-  assert (!systems.empty());
+  assert (!_systems.empty());
 
 
   for (std::map<std::string, SystemData*>::iterator
-	 sys = systems.begin(); sys != systems.end();
+	 sys = _systems.begin(); sys != _systems.end();
        ++sys)
     {
       /**
@@ -90,7 +92,7 @@ void EquationSystems::init ()
 
 void EquationSystems::add_system (const std::string& name)
 {
-  if (!systems.count(name))
+  if (!_systems.count(name))
     {
       // Requires a number of temporaries
       
@@ -102,8 +104,13 @@ void EquationSystems::add_system (const std::string& name)
 //       systems.insert (kv);
       
       // Requires no unnecessary temporaries
-      systems.insert (std::pair<std::string, SystemData*>(name,
-							  new SystemData(*this, name)));
+      _systems.insert (std::pair<std::string,
+	 	                 SystemData*>(name,
+					      new SystemData(*this,
+							     name,
+							     _solver_package)
+					      )
+		       );
     }
   else
     {
@@ -117,7 +124,7 @@ void EquationSystems::add_system (const std::string& name)
 
 void EquationSystems::delete_system (const std::string& name)
 {
-  if (!systems.count(name))
+  if (!_systems.count(name))
     {
       std::cerr << "ERROR: no system named "
 		<< name  << std::endl;
@@ -125,22 +132,22 @@ void EquationSystems::delete_system (const std::string& name)
       error();
     }
   
-  delete systems[name];
+  delete _systems[name];
   
-  systems.erase (name);
+  _systems.erase (name);
 };
 
 
 
 unsigned int EquationSystems::n_vars () const
 {
-  if (systems.empty())
+  if (_systems.empty())
     return 0;
 
   unsigned int tot=0;
   
   for (std::map<std::string, SystemData*>::const_iterator
-	 pos = systems.begin(); pos != systems.end(); ++pos)
+	 pos = _systems.begin(); pos != _systems.end(); ++pos)
     tot += pos->second->n_vars();
 
   return tot;      
@@ -150,13 +157,13 @@ unsigned int EquationSystems::n_vars () const
 
 unsigned int EquationSystems::n_dofs () const
 {
-  if (systems.empty())
+  if (_systems.empty())
     return 0;
 
   unsigned int tot=0;
   
   for (std::map<std::string, SystemData*>::const_iterator
-	 pos = systems.begin(); pos != systems.end(); ++pos)
+	 pos = _systems.begin(); pos != _systems.end(); ++pos)
     tot += pos->second->n_dofs();
 
   return tot;      
@@ -167,9 +174,9 @@ unsigned int EquationSystems::n_dofs () const
 SystemData & EquationSystems::operator () (const std::string& name)
 {
   std::map<std::string, SystemData*>::iterator
-    pos = systems.find(name);
+    pos = _systems.find(name);
   
-  if (pos == systems.end())
+  if (pos == _systems.end())
     {
       std::cerr << "ERROR: system "
 		<< name
@@ -187,9 +194,9 @@ SystemData & EquationSystems::operator () (const std::string& name)
 const SystemData & EquationSystems::operator () (const std::string& name) const
 {
   std::map<std::string, SystemData*>::const_iterator
-    pos = systems.find(name);
+    pos = _systems.find(name);
   
-  if (pos == systems.end())
+  if (pos == _systems.end())
     {
       std::cerr << "ERROR: system "
 		<< name
@@ -210,10 +217,14 @@ const std::string & EquationSystems::name (const unsigned int num) const
   assert (num < n_systems());
 
   std::map<std::string, SystemData*>::const_iterator
-    pos = systems.begin();
-  
-  for (unsigned int i=0; i<num; i++)
-    ++pos;
+    pos = _systems.begin();
+
+  // New code
+  std::advance (pos, num);
+
+  // Old code
+//  for (unsigned int i=0; i<num; i++)
+//    ++pos;
 
   return pos->first;
 };
@@ -226,10 +237,14 @@ SystemData & EquationSystems::operator () (const unsigned int num)
   assert (num < n_systems());
 
   std::map<std::string, SystemData*>::iterator
-    pos = systems.begin();
+    pos = _systems.begin();
   
-  for (unsigned int i=0; i<num; i++)
-    ++pos;
+  // New code
+  std::advance (pos, num);
+
+  // Old code
+//  for (unsigned int i=0; i<num; i++)
+//    ++pos;
 
   return *pos->second;
 };
@@ -241,11 +256,15 @@ const SystemData & EquationSystems::operator ()  (const unsigned int num) const
   assert (num < n_systems());
 
   std::map<std::string, SystemData*>::const_iterator
-    pos = systems.begin();
+    pos = _systems.begin();
   
-  for (unsigned int i=0; i<num; i++)
-    ++pos;
-
+    // New code
+  std::advance (pos, num);
+  
+  // Old code
+  //  for (unsigned int i=0; i<num; i++)
+//    ++pos;
+  
   return *pos->second;
 };
 
@@ -254,7 +273,7 @@ const SystemData & EquationSystems::operator ()  (const unsigned int num) const
 
 bool EquationSystems::flag (const std::string& fl) const
 {
-  return (flags.count(fl) != 0);
+  return (_flags.count(fl) != 0);
 };
 
 
@@ -274,7 +293,7 @@ void EquationSystems::set_flag (const std::string& fl)
   */
 #endif
 
-  flags.insert (fl);
+  _flags.insert (fl);
 };
 
 
@@ -282,7 +301,7 @@ void EquationSystems::set_flag (const std::string& fl)
 void EquationSystems::unset_flag (const std::string& fl)
 {
   // Look for the flag in the database
-  if (!flags.count(fl))
+  if (!_flags.count(fl))
     {
       std::cerr << "ERROR: flag " << fl
 		<< " was not set!"
@@ -291,7 +310,7 @@ void EquationSystems::unset_flag (const std::string& fl)
     }
 
   // Remove the flag
-  flags.erase (fl);  
+  _flags.erase (fl);  
 };
 
 
@@ -300,9 +319,9 @@ Real EquationSystems::parameter (const std::string& id) const
 {
   // Look for the id in the database
   std::map<std::string, Real>::const_iterator
-    pos = parameters.find(id);
+    pos = _parameters.find(id);
   
-  if (pos == parameters.end())
+  if (pos == _parameters.end())
     {
       std::cerr << "ERROR: parameter " << id
 		<< " was not set!"
@@ -332,7 +351,7 @@ Real & EquationSystems::set_parameter (const std::string& id)
 #endif
   
   // Insert the parameter/value pair into the database
-  return parameters[id];
+  return _parameters[id];
 };
 
 
@@ -341,10 +360,10 @@ void EquationSystems::unset_parameter (const std::string& id)
 {
   // Look for the id in the database
   std::map<std::string, Real>::iterator
-    pos = parameters.find(id);
+    pos = _parameters.find(id);
   
   // Make sure the parameter was found
-  if (pos == parameters.end())
+  if (pos == _parameters.end())
     {
       std::cerr << "ERROR: parameter " << id
 		<< " was not set!"
@@ -353,7 +372,7 @@ void EquationSystems::unset_parameter (const std::string& id)
     }
   
   // Erase the entry
-  parameters.erase(pos);
+  _parameters.erase(pos);
 };
 
 
@@ -377,11 +396,11 @@ void EquationSystems::build_solution_vector (std::vector<Complex>& soln)
 {
   assert (n_systems());
 
-  const unsigned int dim = mesh.mesh_dimension();
-  const unsigned int nn  = mesh.n_nodes();
+  const unsigned int dim = _mesh.mesh_dimension();
+  const unsigned int nn  = _mesh.n_nodes();
   const unsigned int nv  = n_vars();
 
-  if (mesh.processor_id() == 0)
+  if (_mesh.processor_id() == 0)
     soln.resize(nn*nv);
 
   std::vector<Complex> sys_soln; 
@@ -395,7 +414,7 @@ void EquationSystems::build_solution_vector (std::vector<Complex>& soln)
       
       system.update_global_solution (sys_soln);
 
-      if (mesh.processor_id() == 0)
+      if (_mesh.processor_id() == 0)
 	{
 	  std::vector<Complex>      elem_soln;   // The finite element solution
 	  std::vector<Complex>      nodal_soln;  // The finite elemnt solution interpolated to the nodes
@@ -405,10 +424,10 @@ void EquationSystems::build_solution_vector (std::vector<Complex>& soln)
 	    {
 	      const FEType& fe_type    = system.variable_type(var);
 	      
-	      for (unsigned int e=0; e<mesh.n_elem(); e++)
-		if (mesh.elem(e)->active())
+	      for (unsigned int e=0; e<_mesh.n_elem(); e++)
+		if (_mesh.elem(e)->active())
 		  {
-		    const Elem* elem = mesh.elem(e);
+		    const Elem* elem = _mesh.elem(e);
 		    system.dof_map.dof_indices (e, dof_indices, var);
 		    
 		    elem_soln.resize(dof_indices.size());
@@ -441,8 +460,8 @@ std::string EquationSystems::get_info () const
   out << " EquationSystems:" << std::endl
       << "  n_systems()=" << n_systems() << std::endl;
   
-  for (std::map<std::string, SystemData*>::const_iterator it=systems.begin();
-       it != systems.end(); ++it)
+  for (std::map<std::string, SystemData*>::const_iterator it=_systems.begin();
+       it != _systems.end(); ++it)
     {
       const std::string& sys_name = it->first;
       const SystemData&  system   = *it->second;
@@ -498,12 +517,12 @@ std::string EquationSystems::get_info () const
     };
   
   
-  if (!flags.empty())
+  if (!_flags.empty())
     {  
       out << "  Flags:" << std::endl;
       
-      for (std::set<std::string>::const_iterator flag = flags.begin();
-	   flag != flags.end(); ++flag)
+      for (std::set<std::string>::const_iterator flag = _flags.begin();
+	   flag != _flags.end(); ++flag)
 	out << "   "
 	    << "\""
 	    << *flag
@@ -512,12 +531,12 @@ std::string EquationSystems::get_info () const
     };
   
   
-  if (!parameters.empty())
+  if (!_parameters.empty())
     {  
       out << "  Parameters:" << std::endl;
       
       for (std::map<std::string, Real>::const_iterator
-	     param = parameters.begin(); param != parameters.end();
+	     param = _parameters.begin(); param != _parameters.end();
 	   ++param)
 	out << "   "
 	    << "\""

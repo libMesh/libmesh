@@ -1,4 +1,4 @@
-// $Id: ex6.C,v 1.5 2003-02-10 12:21:08 ddreyer Exp $
+// $Id: ex6.C,v 1.6 2003-02-10 22:03:21 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -537,7 +537,7 @@ void assemble_wave(EquationSystems& es,
 			}; // end face quadrature point loop	  
 
 
-		      es("Wave").rhs.add_vector    (Fe, dof_indices);
+		      es("Wave").rhs->add_vector    (Fe, dof_indices);
 
 		    }; // end if (elem->neighbor(side) == NULL)
 
@@ -693,7 +693,7 @@ void assemble_wave(EquationSystems& es,
 // Doesn't make sense!
       Ke.add(1., Ce);
       Ke.add(1., Me);
-      es("Wave").matrix.add_matrix (Ke, dof_indices);
+      es("Wave").matrix->add_matrix (Ke, dof_indices);
 
       
     }; // end of element loop

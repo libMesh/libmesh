@@ -1,4 +1,4 @@
-// $Id: system_data.C,v 1.9 2003-02-10 03:55:51 benkirk Exp $
+// $Id: system_data.C,v 1.10 2003-02-10 22:03:26 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,6 @@
 
 // Local includes
 #include "mesh_config.h"
-#include "petsc_interface.h"
 #include "system_data.h"
 #include "equation_systems.h"
 
@@ -34,13 +33,19 @@
 // SystemBase implementation
 
 SystemBase::SystemBase (EquationSystems& es,
-			const std::string& name) :
-  dof_map(es.get_mesh()),
-  init_system_fptr(NULL),
-  assemble_fptr(NULL),
-  sys_name(name),
-  equation_systems(es),
-  mesh(es.get_mesh())
+			const std::string& name,
+			const SolverPackage solver_package) :
+  dof_map (es.get_mesh()),
+  init_system_fptr (NULL),
+  assemble_fptr (NULL),
+  solution (NumericVector::build(solver_package)),
+  rhs (NumericVector::build(solver_package)),
+  matrix (SparseMatrix::build (solver_package)),
+  linear_solver_interface (LinearSolverInterface::build(solver_package)),
+  current_local_solution (NumericVector::build(solver_package)),
+  sys_name (name),
+  equation_systems (es),
+  mesh (es.get_mesh())
 {
 };
 
@@ -64,65 +69,41 @@ void GeneralSystem::clear ()
 
   //init_system_fptr = assemble_fptr = NULL;
   
-#ifdef HAVE_PETSC
+  solution->clear ();
 
-  solution.clear ();
+  rhs->clear ();
 
-  rhs.clear ();
-
-  matrix.clear ();
+  matrix->clear ();
   
-  current_local_solution.clear ();
+  current_local_solution->clear ();
 
-  old_local_solution.clear ();
+  old_local_solution->clear ();
   
-  older_local_solution.clear ();
-  
-#endif
+  older_local_solution->clear ();
 };
 
 
 
 void GeneralSystem::update ()
 {
-#ifndef HAVE_PETSC
-
-  std::cerr << "ERROR: this feature requires Petsc support!"
-	    << std::endl;
-  error();
-
-#else
-  
-  assert (current_local_solution.local_size() == solution.size());
+  assert (current_local_solution->local_size() == solution->size());
 
   const std::vector<unsigned int>& send_list = dof_map.get_send_list ();
 
   assert (!send_list.empty());
 
-  assert (send_list.size() <= solution.size());
+  assert (send_list.size() <= solution->size());
   
-  solution.localize (current_local_solution, send_list);
-  
-#endif
+  solution->localize (*current_local_solution, send_list);
 };
 
 
 
 void SystemBase::update_global_solution (std::vector<Complex>& global_soln) const
 {
-#ifndef HAVE_PETSC
+  global_soln.resize (solution->size());
 
-  std::cerr << "ERROR: this feature requires Petsc support!"
-	    << std::endl;
-  error();
-
-#else
-  
-  global_soln.resize (solution.size());
-
-  solution.localize  (global_soln);
-
-#endif
+  solution->localize  (global_soln);
 };
 
 
@@ -130,19 +111,9 @@ void SystemBase::update_global_solution (std::vector<Complex>& global_soln) cons
 void SystemBase::update_global_solution (std::vector<Complex>& global_soln,
 					 const unsigned int dest_proc) const
 {
-#ifndef HAVE_PETSC
+  global_soln.resize       (solution->size());
 
-  std::cerr << "ERROR: this feature requires Petsc support!"
-	    << std::endl;
-  error();
-
-#else
-  
-  global_soln.resize       (solution.size());
-
-  solution.localize_to_one (global_soln, dest_proc);
-
-#endif
+  solution->localize_to_one (global_soln, dest_proc);
 };
 
 
@@ -157,19 +128,15 @@ void GeneralSystem::init ()
 
 #endif
 
-#ifdef HAVE_PETSC
-  
-  solution.init (n_dofs(), n_local_dofs());
+  solution->init (n_dofs(), n_local_dofs());
 
-  rhs.init      (n_dofs(), n_local_dofs());
+  rhs->init      (n_dofs(), n_local_dofs());
 
-  current_local_solution.init (n_dofs ());
+  current_local_solution->init (n_dofs ());
 
-  old_local_solution.init     (n_dofs ());
+  old_local_solution->init     (n_dofs ());
   
-  older_local_solution.init   (n_dofs ());
-  
-#endif
+  older_local_solution->init   (n_dofs ());
 
   // Possibly call a user-supplied initialization
   // method.
@@ -179,10 +146,8 @@ void GeneralSystem::init ()
 
       update();
 
-#ifdef HAVE_PETSC
-      old_local_solution   = current_local_solution;
-      older_local_solution = current_local_solution; 
-#endif
+      *old_local_solution   = *current_local_solution;
+      *older_local_solution = *current_local_solution; 
     };
 };
 
@@ -242,23 +207,21 @@ unsigned short int SystemBase::variable_number (const std::string& var) const
 
 
 
-#ifdef HAVE_PETSC
-
 void GeneralSystem::assemble ()
 {
   assert (assemble_fptr != NULL);
 
   // initialize the matrix if not 
   // already initialized
-  if (!matrix.initialized())
+  if (!matrix->initialized())
     {
       // Tell the matrix and the dof map
       // about each other.  This is necessary
       // because the dof_map needs to share
       // information with the matrix during the
       // sparsity computation phase
-      dof_map.attach_matrix (matrix);
-      matrix.attach_dof_map (dof_map);
+      dof_map.attach_matrix (*matrix.get());
+      matrix->attach_dof_map (dof_map);
 
       // Compute the sparisty pattern for the current
       // mesh and DOF distribution
@@ -266,12 +229,12 @@ void GeneralSystem::assemble ()
 
       // Initialize the matrix conformal to this
       // sparsity pattern
-      matrix.init ();
+      matrix->init ();
     };
 
   // Clear the matrix and right-hand side.
-  matrix.zero ();
-  rhs.zero    ();
+  matrix->zero ();
+  rhs->zero    ();
 
   // Call the user-specified matrix assembly function
   assemble_fptr (equation_systems, name());
@@ -298,15 +261,13 @@ GeneralSystem::solve ()
 
   // Solve the linear system
   const std::pair<unsigned int, Real> rval = 
-    petsc_interface.solve (matrix, solution, rhs, tol, maxits);
+    linear_solver_interface->solve (*matrix, *solution, *rhs, tol, maxits);
 
   // Update the local solution to reflect the new values
   update ();
   
   return rval; 
 };
-
-#endif
 
 
 
