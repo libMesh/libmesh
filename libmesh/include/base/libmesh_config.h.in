@@ -13,6 +13,9 @@
    structures */
 #undef ENABLE_EXPENSIVE_DATA_STRUCTURES
 
+/* Flag indicating if the library should offer higher order p-FEM shapes */
+#undef ENABLE_HIGHER_ORDER_SHAPES
+
 /* Flag indicating if the library should be built with infinite elements */
 #undef ENABLE_INFINITE_ELEMENTS
 

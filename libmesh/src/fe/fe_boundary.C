@@ -1,4 +1,4 @@
-// $Id: fe_boundary.C,v 1.24 2004-01-03 15:37:42 benkirk Exp $
+// $Id: fe_boundary.C,v 1.25 2004-01-09 19:25:35 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -71,6 +71,17 @@ void FE<1,MONOMIAL>::reinit(const Elem*,
   error();
 }
 
+
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+template <>
+void FE<1,SZABAB>::reinit(const Elem*,
+			    const unsigned int)
+{
+  std::cerr << "ERROR: This method only makes sense for 2D elements!"
+	    << std::endl;
+  error();
+}
+#endif
 
 
 //-------------------------------------------------------
