@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.32 2005-03-01 01:32:00 roystgnr Exp $
+// $Id: fe.C,v 1.33 2005-03-01 15:50:25 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -448,9 +448,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
 
 
 template <unsigned int Dim, FEFamily T>
-void FE<Dim,T>::compute_C0_constraints (std::map<unsigned int,
-					std::map<unsigned int, float> >
-				       	& constraints,
+void FE<Dim,T>::compute_C0_constraints (DofConstraints &constraints,
 				        DofMap &dof_map,
 				        const unsigned int variable_number,
 				        const Elem* elem)
@@ -572,11 +570,11 @@ void FE<Dim,T>::compute_C0_constraints (std::map<unsigned int,
 		  if (std::abs(their_dof_value) < 1.e-5)
 		    continue;
 
-		  DofMap::DofConstraintRow& constraint_row =
+		  DofConstraintRow& constraint_row =
 				  constraints[my_dof_g];
 
 		  constraint_row.insert(std::make_pair(their_dof_g,
-						       static_cast<float>(their_dof_value)));
+						       their_dof_value));
 	        }
 	    }
 	}
@@ -586,9 +584,7 @@ void FE<Dim,T>::compute_C0_constraints (std::map<unsigned int,
 
 
 template <unsigned int Dim, FEFamily T>
-void FE<Dim,T>::compute_C1_constraints (std::map<unsigned int,
-					std::map<unsigned int, float> >
-					& constraints,
+void FE<Dim,T>::compute_C1_constraints (DofConstraints &constraints,
 					DofMap &dof_map,
 					const unsigned int variable_number,
 					const Elem* elem)
@@ -723,11 +719,11 @@ void FE<Dim,T>::compute_C1_constraints (std::map<unsigned int,
 		  if (std::abs(their_dof_value) < 1.e-5)
 		    continue;
 
-		  DofMap::DofConstraintRow& constraint_row =
+		  DofConstraintRow& constraint_row =
 				  constraints[my_dof_g];
 
 		  constraint_row.insert(std::make_pair(their_dof_g,
-						       static_cast<float>(their_dof_value)));
+						       their_dof_value));
 	        }
 	    }
 	}

@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.11 2005-03-01 01:31:58 roystgnr Exp $
+// $Id: fe.h,v 1.12 2005-03-01 15:50:25 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -28,6 +28,7 @@
 #include "fe_base.h"
 
 // forward declarations
+class DofConstraints;
 class DofMap;
 #ifdef ENABLE_INFINITE_ELEMENTS
 
@@ -53,7 +54,7 @@ class InfFE;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.11 $
+ * \version $Revision: 1.12 $
  */
 
 //-------------------------------------------------------------
@@ -296,9 +297,7 @@ public:
    * variable number \p var_number, using element-specific
    * optimizations if possible.
    */
-  static void compute_constraints (std::map<unsigned int,
-				   std::map<unsigned int, float> > &
-				   constraints,
+  static void compute_constraints (DofConstraints &constraints,
 				   DofMap &dof_map,
 				   const unsigned int variable_number,
 				   const Elem* elem);
@@ -309,9 +308,7 @@ public:
    * variable number \p var_number, for any C^0 continuous finite
    * element space.
    */
-  static void compute_C0_constraints (std::map<unsigned int,
-				      std::map<unsigned int, float> >
-				      & constraints,
+  static void compute_C0_constraints (DofConstraints &constraints,
 				      DofMap &dof_map,
 				      const unsigned int variable_number,
 				      const Elem* elem);
@@ -322,9 +319,7 @@ public:
    * variable number \p var_number, for any C^1 continuous finite
    * element space.
    */
-  static void compute_C1_constraints (std::map<unsigned int,
-				      std::map<unsigned int, float> >
-				      & constraints,
+  static void compute_C1_constraints (DofConstraints &constraints,
 				      DofMap &dof_map,
 				      const unsigned int variable_number,
 				      const Elem* elem);
@@ -414,7 +409,7 @@ protected:
  *
  * \author Roy Stogner
  * \date 2004
- * \version $Revision: 1.11 $
+ * \version $Revision: 1.12 $
  */
 
 //-------------------------------------------------------------
@@ -439,7 +434,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.11 $
+ * \version $Revision: 1.12 $
  */
 
 //-------------------------------------------------------------
@@ -464,7 +459,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.11 $
+ * \version $Revision: 1.12 $
  */
 
 //-------------------------------------------------------------
@@ -489,7 +484,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.11 $
+ * \version $Revision: 1.12 $
  */
 
 //-------------------------------------------------------------
@@ -515,7 +510,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.11 $
+ * \version $Revision: 1.12 $
  */
 
 //-------------------------------------------------------------

@@ -1,4 +1,4 @@
-// $Id: fe_xyz.C,v 1.7 2005-02-28 16:35:26 roystgnr Exp $
+// $Id: fe_xyz.C,v 1.8 2005-03-01 15:50:26 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -757,9 +757,7 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 
 
 template <unsigned int Dim, FEFamily T>
-void FE<Dim,T>::compute_constraints (std::map<unsigned int,
-				            std::map<unsigned int,
-				                     float> > &,
+void FE<Dim,T>::compute_constraints (DofConstraints &,
 				     DofMap &,
 				     const unsigned int,
 				     const Elem*)
