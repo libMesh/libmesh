@@ -1,4 +1,4 @@
-// $Id: laspack_interface.C,v 1.16 2004-03-24 05:49:12 jwpeterson Exp $
+// $Id: laspack_linear_solver.C,v 1.1 2005-01-03 00:06:49 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -27,7 +27,7 @@
 // C++ includes
 
 // Local Includes
-#include "laspack_interface.h"
+#include "laspack_linear_solver.h"
 
 // #ifndef USE_COMPLEX_NUMBERS
 // extern "C"
@@ -74,7 +74,7 @@
 
 /*----------------------- functions ----------------------------------*/
 template <typename T>
-void LaspackInterface<T>::clear ()
+void LaspackLinearSolver<T>::clear ()
 {
   if (this->initialized())
     {
@@ -88,7 +88,7 @@ void LaspackInterface<T>::clear ()
 
 
 template <typename T>
-void LaspackInterface<T>::init ()
+void LaspackLinearSolver<T>::init ()
 {
   // Initialize the data structures if not done so already.
   if (!this->initialized())
@@ -103,11 +103,11 @@ void LaspackInterface<T>::init ()
 
 template <typename T>
 std::pair<unsigned int, Real> 
-LaspackInterface<T>::solve (SparseMatrix<T> &matrix_in,
-			    NumericVector<T> &solution_in,
-			    NumericVector<T> &rhs_in,
-			    const double tol,
-			    const unsigned int m_its)
+LaspackLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
+			       NumericVector<T> &solution_in,
+			       NumericVector<T> &rhs_in,
+			       const double tol,
+			       const unsigned int m_its)
 {
   this->init ();
 
@@ -281,7 +281,7 @@ LaspackInterface<T>::solve (SparseMatrix<T> &matrix_in,
 
 
 template <typename T>
-void LaspackInterface<T>::set_laspack_preconditioner_type ()
+void LaspackLinearSolver<T>::set_laspack_preconditioner_type ()
 {
   switch (this->_preconditioner_type)
     {
@@ -311,7 +311,7 @@ void LaspackInterface<T>::set_laspack_preconditioner_type ()
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class LaspackInterface<Number>;
+template class LaspackLinearSolver<Number>;
  
 
 #endif // #ifdef HAVE_LASPACK

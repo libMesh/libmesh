@@ -71,7 +71,7 @@
       - Complex values are supported with \p PETSc
       - \p LASPACK provides iterative solvers and preconditioners for serial
         applications
-      - The \p SparseMatrix, \p NumericVector, and \p LinearSolverInterface
+      - The \p SparseMatrix, \p NumericVector, and \p LinearSolver
         allow for transparent switching between solver packages.  Adding
         a new solver interface is as simple as deriving from these classes
  

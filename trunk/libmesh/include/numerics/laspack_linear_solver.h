@@ -1,4 +1,4 @@
-// $Id: laspack_interface.h,v 1.5 2004-10-15 04:38:19 benkirk Exp $
+// $Id: laspack_linear_solver.h,v 1.1 2005-01-03 00:06:48 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -19,8 +19,8 @@
 
 
 
-#ifndef __laspack_interface_h__
-#define __laspack_interface_h__
+#ifndef __laspack_linear_solver_h__
+#define __laspack_linear_solver_h__
 
 #include "libmesh_common.h"
 
@@ -31,7 +31,7 @@
 // C++ includes
 
 // Local includes
-#include "linear_solver_interface.h"
+#include "linear_solver.h"
 #include "laspack_vector.h"
 #include "laspack_matrix.h"
 
@@ -45,23 +45,23 @@
 /**
  * This class provides an interface to Laspack
  * iterative solvers that is compatible with the \p libMesh
- * \p LinearSolverInterface<>
+ * \p LinearSolver<>
  * 
  * @author Benjamin Kirk, 2002-2004
  */
 template <typename T>
-class LaspackInterface : public LinearSolverInterface<T>
+class LaspackLinearSolver : public LinearSolver<T>
 {
  public:
   /**
    *  Constructor. Initializes Laspack data structures
    */
-  LaspackInterface ();
+  LaspackLinearSolver ();
     
   /**
    * Destructor.
    */
-  ~LaspackInterface ();
+  ~LaspackLinearSolver ();
   
   /**
    * Release all memory and clear data structures.
@@ -112,7 +112,7 @@ class LaspackInterface : public LinearSolverInterface<T>
 /*----------------------- functions ----------------------------------*/
 template <typename T>
 inline
-LaspackInterface<T>::LaspackInterface () :
+LaspackLinearSolver<T>::LaspackLinearSolver () :
   _precond_type (ILUPrecond)
 {
 }
@@ -121,7 +121,7 @@ LaspackInterface<T>::LaspackInterface () :
 
 template <typename T>
 inline
-LaspackInterface<T>::~LaspackInterface ()
+LaspackLinearSolver<T>::~LaspackLinearSolver ()
 {
   this->clear ();
 }
@@ -131,12 +131,12 @@ LaspackInterface<T>::~LaspackInterface ()
 template <typename T>
 inline
 std::pair<unsigned int, Real>
-LaspackInterface<T>::solve (SparseMatrix<T>&,
-			    SparseMatrix<T>&,
-			    NumericVector<T>&,
-			    NumericVector<T>&,
-			    const double,
-			    const unsigned int)
+LaspackLinearSolver<T>::solve (SparseMatrix<T>&,
+			       SparseMatrix<T>&,
+			       NumericVector<T>&,
+			       NumericVector<T>&,
+			       const double,
+			       const unsigned int)
 {
   std::cerr << "ERROR: LASPACK does not support a user-supplied preconditioner!"
 	    << std::endl;
@@ -147,4 +147,4 @@ LaspackInterface<T>::solve (SparseMatrix<T>&,
 }
 
 #endif // #ifdef HAVE_LASPACK
-#endif // #ifndef __laspack_interface_h__
+#endif // #ifndef __laspack_linear_solver_h__

@@ -1,4 +1,4 @@
-// $Id: petsc_vector.h,v 1.7 2004-11-29 18:37:01 benkirk Exp $
+// $Id: petsc_vector.h,v 1.8 2005-01-03 00:06:48 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -55,9 +55,7 @@ extern "C" {
 
 
 // forward declarations
-template <typename T> class PetscInterface;
 template <typename T> class SparseMatrix;
-template <typename T> class PetscMatrix;
 
 /**
  * Petsc vector. Provides a nice interface to the
@@ -405,6 +403,15 @@ public:
    */
   virtual void create_subvector(NumericVector<T>& subvector,
 				const std::vector<unsigned int>& rows) const;
+
+  /**
+   * Returns the raw PETSc vector context pointer.  Note this is generally
+   * not required in user-level code. Just don't do anything crazy like
+   * calling VecDestroy()!
+   */
+  Vec vec () { return _vec; }
+
+
   
 private:
 
@@ -412,19 +419,13 @@ private:
    * Actual Petsc vector datatype
    * to hold vector entries
    */
-  Vec vec;
+  Vec _vec;
 
   /**
    * This boolean value should only be set to false
    * for the constructor which takes a PETSc Vec object. 
    */
   const bool _destroy_vec_on_exit;
-  
-  /**
-   * Make other Petsc datatypes friends
-   */
-  friend class PetscInterface<T>;
-  friend class PetscMatrix<T>;
 };
 
 
@@ -468,7 +469,7 @@ inline
 PetscVector<T>::PetscVector (Vec v)
   : _destroy_vec_on_exit(false)
 {
-  this->vec = v;
+  this->_vec = v;
   this->_is_initialized = true;
 }
 
@@ -503,10 +504,10 @@ void PetscVector<T>::init (const unsigned int n,
   // create a sequential vector if on only 1 processor 
   if (n_local == n)
     {
-      ierr = VecCreateSeq (PETSC_COMM_SELF, petsc_n, &vec);
+      ierr = VecCreateSeq (PETSC_COMM_SELF, petsc_n, &_vec);
              CHKERRABORT(PETSC_COMM_WORLD,ierr);
       
-      ierr = VecSetFromOptions (vec);
+      ierr = VecSetFromOptions (_vec);
              CHKERRABORT(PETSC_COMM_WORLD,ierr);
     }
   // otherwise create an MPI-enabled vector
@@ -515,10 +516,10 @@ void PetscVector<T>::init (const unsigned int n,
       assert (n_local < n);
       
       ierr = VecCreateMPI (PETSC_COMM_WORLD, petsc_n_local, petsc_n,
-			   &vec);
+			   &_vec);
              CHKERRABORT(PETSC_COMM_WORLD,ierr);
       
-      ierr = VecSetFromOptions (vec);
+      ierr = VecSetFromOptions (_vec);
              CHKERRABORT(PETSC_COMM_WORLD,ierr);
     }  
   
@@ -549,9 +550,9 @@ void PetscVector<T>::close ()
   
   int ierr=0;
   
-  ierr = VecAssemblyBegin(vec);
+  ierr = VecAssemblyBegin(_vec);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
-  ierr = VecAssemblyEnd(vec);
+  ierr = VecAssemblyEnd(_vec);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
   this->_is_closed = true;
@@ -567,7 +568,7 @@ void PetscVector<T>::clear ()
     {
       int ierr=0;
 
-      ierr = VecDestroy(vec);
+      ierr = VecDestroy(_vec);
              CHKERRABORT(PETSC_COMM_WORLD,ierr);
     }
 
@@ -586,7 +587,7 @@ void PetscVector<T>::zero ()
 
   PetscScalar z=0.;
   
-  ierr = VecSet (&z, vec);
+  ierr = VecSet (&z, _vec);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 }
 
@@ -616,7 +617,7 @@ unsigned int PetscVector<T>::size () const
   if (!this->initialized())
     return 0;
   
-  ierr = VecGetSize(vec, &petsc_size);
+  ierr = VecGetSize(_vec, &petsc_size);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
   return static_cast<unsigned int>(petsc_size);
@@ -632,7 +633,7 @@ unsigned int PetscVector<T>::local_size () const
   
   int ierr=0, petsc_size=0;
   
-  ierr = VecGetLocalSize(vec, &petsc_size);
+  ierr = VecGetLocalSize(_vec, &petsc_size);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
   
   return static_cast<unsigned int>(petsc_size);
@@ -648,7 +649,7 @@ unsigned int PetscVector<T>::first_local_index () const
   
   int ierr=0, petsc_first=0, petsc_last=0;
   
-  ierr = VecGetOwnershipRange (vec, &petsc_first, &petsc_last);
+  ierr = VecGetOwnershipRange (_vec, &petsc_first, &petsc_last);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
   
   return static_cast<unsigned int>(petsc_first);
@@ -664,7 +665,7 @@ unsigned int PetscVector<T>::last_local_index () const
   
   int ierr=0, petsc_first=0, petsc_last=0;
   
-  ierr = VecGetOwnershipRange (vec, &petsc_first, &petsc_last);
+  ierr = VecGetOwnershipRange (_vec, &petsc_first, &petsc_last);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
   
   return static_cast<unsigned int>(petsc_last);
@@ -684,12 +685,12 @@ T PetscVector<T>::operator() (const unsigned int i) const
   PetscScalar *values, value=0.;
   
 
-  ierr = VecGetArray(vec, &values);
+  ierr = VecGetArray(_vec, &values);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
   
-  value = values[i-this->first_local_index()];
+  value = values[i - this->first_local_index()];
   
-  ierr = VecRestoreArray (vec, &values);
+  ierr = VecRestoreArray (_vec, &values);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
   
   return static_cast<T>(value);
@@ -706,7 +707,7 @@ Real PetscVector<T>::min () const
   int index=0, ierr=0;
   PetscReal min=0.;
 
-  ierr = VecMin (vec, &index, &min);
+  ierr = VecMin (_vec, &index, &min);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
   // this return value is correct: VecMin returns a PetscReal
@@ -724,7 +725,7 @@ Real PetscVector<T>::max() const
   int index=0, ierr=0;
   PetscReal max=0.;
 
-  ierr = VecMax (vec, &index, &max);
+  ierr = VecMax (_vec, &index, &max);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
   // this return value is correct: VecMax returns a PetscReal

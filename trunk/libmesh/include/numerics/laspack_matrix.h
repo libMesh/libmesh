@@ -1,4 +1,4 @@
-// $Id: laspack_matrix.h,v 1.5 2004-10-20 21:42:32 benkirk Exp $
+// $Id: laspack_matrix.h,v 1.6 2005-01-03 00:06:48 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2003-2003  Benjamin S. Kirk, John W. Peterson
@@ -40,7 +40,7 @@
 
 // Forward declarations
 template <typename T> class LaspackVector;
-template <typename T> class LaspackInterface;
+template <typename T> class LaspackLinearSolver;
 
 
 
@@ -301,7 +301,7 @@ private:
    * Make other Laspack datatypes friends
    */
   friend class LaspackVector<T>;
-  friend class LaspackInterface<T>;
+  friend class LaspackLinearSolver<T>;
 };
 
 

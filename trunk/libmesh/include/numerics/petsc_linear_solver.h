@@ -1,4 +1,4 @@
-// $Id: petsc_interface.h,v 1.8 2004-10-28 19:09:22 benkirk Exp $
+// $Id: petsc_linear_solver.h,v 1.1 2005-01-03 00:06:48 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -19,13 +19,13 @@
 
 
 
-#ifndef __petsc_interface_h__
-#define __petsc_interface_h__
+#ifndef __petsc_linear_solver_h__
+#define __petsc_linear_solver_h__
 
 // C++ includes
 
 // Local includes
-#include "linear_solver_interface.h"
+#include "linear_solver.h"
 #include "petsc_vector.h"
 #include "petsc_matrix.h"
 
@@ -58,24 +58,24 @@ extern "C" {
 /**
  * This class provides an interface to PETSc
  * iterative solvers that is compatible with the \p libMesh
- * \p LinearSolverInterface<>
+ * \p LinearSolver<>
  *
  * @author Benjamin Kirk, 2002-2004
  */
 
 template <typename T>
-class PetscInterface : public LinearSolverInterface<T>
+class PetscLinearSolver : public LinearSolver<T>
 {
 public:
   /**
    *  Constructor. Initializes Petsc data structures
    */
-  PetscInterface ();
+  PetscLinearSolver ();
     
   /**
    * Destructor.
    */
-  ~PetscInterface ();
+  ~PetscLinearSolver ();
   
   /**
    * Release all memory and clear data structures.
@@ -112,7 +112,7 @@ public:
    * PCSetType(_pc, PCMAT);
    *
    * before invoking KSPSolve().  Note: this functionality is not implemented
-   * in the LinearSolverInterface class since there is not a built-in analog
+   * in the LinearSolver class since there is not a built-in analog
    * to this method for LasPack -- You could probably implement it by hand
    * if you wanted.
    */
@@ -184,7 +184,7 @@ private:
 /*----------------------- functions ----------------------------------*/
 template <typename T>
 inline
-PetscInterface<T>::PetscInterface ()
+PetscLinearSolver<T>::PetscLinearSolver ()
 {
   if (libMesh::n_processors() == 1)
     this->_preconditioner_type = ILU_PRECOND;
@@ -196,7 +196,7 @@ PetscInterface<T>::PetscInterface ()
 
 template <typename T>
 inline
-PetscInterface<T>::~PetscInterface ()
+PetscLinearSolver<T>::~PetscLinearSolver ()
 {
   this->clear ();
 }
@@ -204,4 +204,4 @@ PetscInterface<T>::~PetscInterface ()
 
 
 #endif // #ifdef HAVE_PETSC
-#endif // #ifdef __petsc_interface_h__
+#endif // #ifdef __petsc_linear_solver_h__

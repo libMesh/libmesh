@@ -1,4 +1,4 @@
-// $Id: laspack_vector.h,v 1.5 2004-11-29 18:37:01 benkirk Exp $
+// $Id: laspack_vector.h,v 1.6 2005-01-03 00:06:48 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -47,7 +47,7 @@
 
 
 // Forward declarations
-template <typename T> class LaspackInterface;
+template <typename T> class LaspackLinearSolver;
 template <typename T> class SparseMatrix;
 
 
@@ -297,7 +297,7 @@ class LaspackVector : public NumericVector<T>
    * and you want to specify WHERE to insert it
    */
   virtual void insert (const std::vector<T>& v,
-			      const std::vector<unsigned int>& dof_indices);
+		       const std::vector<unsigned int>& dof_indices);
 
   /**
    * \f$U=V\f$, where U and V are type 
@@ -306,7 +306,7 @@ class LaspackVector : public NumericVector<T>
    * the NumericVector<T> V 
    */
   virtual void insert (const NumericVector<T>& V,
-			      const std::vector<unsigned int>& dof_indices);
+		       const std::vector<unsigned int>& dof_indices);
       
   /**
    * \f$ U+=V \f$ where U and V are type 
@@ -315,7 +315,7 @@ class LaspackVector : public NumericVector<T>
    * the DenseVector<T> V 
    */
   virtual void insert (const DenseVector<T>& V,
-			      const std::vector<unsigned int>& dof_indices);
+		       const std::vector<unsigned int>& dof_indices);
   
   /**
    * Scale each element of the
@@ -372,7 +372,7 @@ class LaspackVector : public NumericVector<T>
   /**
    * Make other Laspack datatypes friends
    */
-  friend class LaspackInterface<T>;
+  friend class LaspackLinearSolver<T>;
 };
 
 

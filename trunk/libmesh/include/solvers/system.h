@@ -1,4 +1,4 @@
-// $Id: system.h,v 1.6 2004-10-12 19:46:58 benkirk Exp $
+// $Id: system.h,v 1.7 2005-01-03 00:06:48 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -40,7 +40,7 @@ class EquationSystems;
 class Mesh;
 class Xdr;
 template <typename T> class SparseMatrix;
-template <typename T> class LinearSolverInterface;
+template <typename T> class LinearSolver;
 
 /**
  * This is the base class for classes which contain 

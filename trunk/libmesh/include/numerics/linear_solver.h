@@ -1,4 +1,4 @@
-// $Id: linear_solver_interface.h,v 1.4 2004-10-12 19:46:57 benkirk Exp $
+// $Id: linear_solver.h,v 1.1 2005-01-03 00:06:48 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -19,8 +19,8 @@
 
 
 
-#ifndef __linear_solver_interface_h__
-#define __linear_solver_interface_h__
+#ifndef __linear_solver_h__
+#define __linear_solver_h__
 
 
 // C++ includes
@@ -51,25 +51,25 @@ template <typename T> class NumericVector;
  */
 
 template <typename T>
-class LinearSolverInterface : public ReferenceCountedObject<LinearSolverInterface<T> >
+class LinearSolver : public ReferenceCountedObject<LinearSolver<T> >
 {
 public:
   
   /**
    *  Constructor. Initializes Solver data structures
    */
-  LinearSolverInterface ();
+  LinearSolver ();
     
   /**
    * Destructor.
    */
-  virtual ~LinearSolverInterface ();
+  virtual ~LinearSolver ();
   
   /**
-   * Builds a \p LinearSolverInterface using the linear solver package specified by
+   * Builds a \p LinearSolver using the linear solver package specified by
    * \p solver_package
    */
-  static AutoPtr<LinearSolverInterface<T> > build(const SolverPackage solver_package =
+  static AutoPtr<LinearSolver<T> > build(const SolverPackage solver_package =
 						  libMesh::default_solver_package());
   
   /**
@@ -165,7 +165,7 @@ protected:
 /*----------------------- inline functions ----------------------------------*/
 template <typename T>
 inline
-LinearSolverInterface<T>::LinearSolverInterface () :
+LinearSolver<T>::LinearSolver () :
   
   _solver_type         (GMRES),
   _preconditioner_type (ILU_PRECOND),
@@ -177,11 +177,11 @@ LinearSolverInterface<T>::LinearSolverInterface () :
 
 template <typename T>
 inline
-LinearSolverInterface<T>::~LinearSolverInterface ()
+LinearSolver<T>::~LinearSolver ()
 {
   this->clear ();
 }
 
 
 
-#endif // #ifdef __solver_interface_h__
+#endif // #ifdef __solver_h__

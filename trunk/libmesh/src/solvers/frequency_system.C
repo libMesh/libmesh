@@ -1,4 +1,4 @@
-// $Id: frequency_system.C,v 1.4 2004-12-07 22:47:46 benkirk Exp $
+// $Id: frequency_system.C,v 1.5 2005-01-03 00:06:49 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -35,7 +35,7 @@
 #include "frequency_system.h"
 #include "equation_systems.h"
 #include "libmesh_logging.h"
-#include "linear_solver_interface.h"
+#include "linear_solver.h"
 
 
 
@@ -357,7 +357,7 @@ void FrequencySystem::solve (const unsigned int n_start,
 
       // Solve the linear system for this specific frequency
       const std::pair<unsigned int, Real> rval = 
-	linear_solver_interface->solve (*matrix, *solution, *rhs, tol, maxits);
+	linear_solver->solve (*matrix, *solution, *rhs, tol, maxits);
 
       STOP_LOG("linear_equation_solve()", "FrequencySystem");
 
