@@ -1,4 +1,4 @@
-// $Id: ex4.C,v 1.14 2003-02-24 22:03:47 benkirk Exp $
+// $Id: ex4.C,v 1.15 2003-02-26 13:59:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -76,6 +76,10 @@
  * as a way to monitor your code's performance.  We will
  * use it to instrument the matrix assembly code and look
  * for bottlenecks where we should focus optimization efforts.
+ *
+ * This example also shows how to extend example 3 to run in
+ * parallel.  Notice how litte has changed!  The significant
+ * differences are marked with ----- PARALELL CHANGE -----
  */
 
 
@@ -171,6 +175,14 @@ int main (int argc, char** argv)
      * Let the elements find their neighbors.
      */
     mesh.find_neighbors();
+
+    /**
+     * Partiton the mesh.  By default the number of partitons
+     * created equals the number of processors you are running on.
+     *
+     * ----- PARALLEL CHANGE -----
+     */
+    mesh.metis_partition();
     
     /**
      * Print information about the mesh to the screen.
@@ -354,11 +366,16 @@ void assemble_poisson(EquationSystems& es,
    * Now we will loop over all the elements in the mesh.
    * We will compute the element matrix and right-hand-side
    * contribution.  See example 3 for a discussion of the
-   * element iterators.
+   * element iterators.  Here we use the \p const_local_elem_iterator
+   * to indicate we only want to loop over elements that are assigned
+   * to the local processor.  This allows each processor to compute
+   * its components of the global matrix.
+   *
+   * ----- PARALLEL CHANGE -----
    */
 
-  const_elem_iterator           el (mesh.elements_begin());
-  const const_elem_iterator end_el (mesh.elements_end());
+  const_local_elem_iterator           el (mesh.elements_begin());
+  const const_local_elem_iterator end_el (mesh.elements_end());
   
   for ( ; el != end_el; ++el)
     {
