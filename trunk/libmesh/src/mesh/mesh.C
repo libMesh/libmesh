@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.29 2003-11-05 22:26:45 benkirk Exp $
+// $Id: mesh.C,v 1.30 2003-12-08 19:14:43 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -102,6 +102,10 @@ void Mesh::read (const std::string& name)
       
       else if (name.rfind(".unv") < name.size())
 	this->read_unv (name);
+      
+      else if ((name.rfind(".node")  < name.size()) ||
+	       (name.rfind(".ele")   < name.size()))
+	this->read_tetgen (name);
       
       else
 	{
