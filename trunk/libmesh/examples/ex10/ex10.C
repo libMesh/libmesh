@@ -1,4 +1,4 @@
-/* $Id: ex10.C,v 1.13 2004-05-20 19:48:46 jwpeterson Exp $ */
+/* $Id: ex10.C,v 1.14 2004-05-20 22:56:50 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -58,7 +58,7 @@
 // To refine the mesh we need an \p ErrorEstimator
 // object to figure out which elements to refine.
 #include "error_vector.h"
-#include "kelley_error_estimator.h"
+#include "kelly_error_estimator.h"
 
 // Function prototype.  This function will assemble the system
 // matrix and right-hand-side at each time step.  Note that
@@ -216,8 +216,8 @@ int main (int argc, char** argv)
 		// solution and assigns to each element a positive error value.
 		// This value is used for deciding which elements to refine
 		// and which to coarsen.
-		//ErrorEstimator* error_estimator = new KelleyErrorEstimator;
-		KelleyErrorEstimator error_estimator;
+		//ErrorEstimator* error_estimator = new KellyErrorEstimator;
+		KellyErrorEstimator error_estimator;
 		
 		// Compute the error for each active element using the provided
 		// \p flux_jump indicator.  Note in general you will need to

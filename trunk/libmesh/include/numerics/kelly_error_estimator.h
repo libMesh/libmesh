@@ -1,4 +1,4 @@
-// $Id: kelley_error_estimator.h,v 1.2 2004-05-20 22:14:12 jwpeterson Exp $
+// $Id: kelly_error_estimator.h,v 1.1 2004-05-20 22:56:52 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -19,8 +19,8 @@
 
 
 
-#ifndef __kelley_error_estimator_h__
-#define __kelley_error_estimator_h__
+#ifndef __kelly_error_estimator_h__
+#define __kelly_error_estimator_h__
 
 // C++ includes
 #include <vector>
@@ -36,28 +36,28 @@
 
 
 /**
- * This class implements the Kelley error indicator
+ * This class implements the Kelly error indicator
  * which is based on the flux jumps between elements.
  *
  * @author Benjamin S. Kirk, 2003.
  */
-class KelleyErrorEstimator : public ErrorEstimator
+class KellyErrorEstimator : public ErrorEstimator
 {
 public:
 
   /**
    * Constructor.
    */
-  KelleyErrorEstimator() {}
+  KellyErrorEstimator() {}
   
   /**
    * Destructor.  
    */
-  ~KelleyErrorEstimator() {}
+  ~KellyErrorEstimator() {}
 
 
   /**
-   * This function uses the Kelley Flux Jump error
+   * This function uses the Kelly Flux Jump error
    * estimate to estimate the error on each cell.
    * The estimated error is output in the vector
    * \p error_per_cell

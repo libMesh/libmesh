@@ -40,8 +40,6 @@ ex10.$(obj-suffix):\
     ../../include/numerics/dense_matrix_base.h\
     ../../include/numerics/dense_vector.h\
     ../../include/numerics/dense_vector_base.h\
-    ../../include/numerics/error_estimator.h\
-    ../../include/numerics/kelley_error_estimator.h\
     ../../include/numerics/numeric_vector.h\
     ../../include/numerics/sparse_matrix.h\
     ../../include/numerics/type_vector.h\
