@@ -1,4 +1,4 @@
-// $Id: mesh_metis_support.C,v 1.8 2003-02-28 23:37:49 benkirk Exp $
+// $Id: mesh_metis_support.C,v 1.9 2003-03-03 18:03:38 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -41,6 +41,7 @@ void MeshBase::metis_partition(const unsigned int n_sbdmns,
 			       const std::string& type)
 {
 #ifndef HAVE_METIS
+  
   std::cerr << "ERROR:  Metis not detected during configuration!" << std::endl
 	    << "        Using space-filling curves instead." << std::endl;
 
@@ -68,7 +69,7 @@ void MeshBase::metis_partition(const unsigned int n_sbdmns,
   
   assert (_dim != 1);
 
-  libMesh::log.start_event("metis_partition()");
+  libMesh::log.start_event("metis_partition()", "MeshBase");
 
   // new way, build the graph
   std::vector<int> xadj;
@@ -92,26 +93,18 @@ void MeshBase::metis_partition(const unsigned int n_sbdmns,
   // the edges in the graph will correspond to
   // face neighbors
   {
-    std::map<const Elem*, int> elem_numbers;
-    
-    for (unsigned int e=0; e<n_elem(); e++)
-      {
-	vwgt[e] = elem(e)->n_nodes(); // maybe there is a better weight? 
-	elem_numbers[elem(e)] = static_cast<int>(e);
-      }
-
     bool found_a_neighbor = false;
     
     for (unsigned int e=0; e<n_elem(); e++)
       {
 	xadj.push_back(adjncy.size());
-	for (unsigned int s=0; s<elem(e)->n_sides(); s++)
+	for (unsigned int n=0; n<elem(e)->n_neighbors(); n++)
 	  {
-	    const Elem* neighbor = elem(e)->neighbor(s);
+	    const Elem* neighbor = elem(e)->neighbor(n);
 	    if (neighbor != NULL)
 	      {
 		found_a_neighbor = true;
-		adjncy.push_back(elem_numbers[neighbor]);
+		adjncy.push_back(neighbor->id());
 	      }
 	  }
       }
@@ -128,6 +121,7 @@ void MeshBase::metis_partition(const unsigned int n_sbdmns,
 		  << " BEFORE calling the graph partitioner?" << std::endl << std::endl
 		  << " I'll use a space-filling curves instead." << std::endl;
 	
+	libMesh::log.stop_event("metis_partition()", "MeshBase");
 	sfc_partition(n_sbdmns);
 	return;
       }
@@ -153,6 +147,7 @@ void MeshBase::metis_partition(const unsigned int n_sbdmns,
 		<< "   \"kway\"  "     << std::endl
 		<< " Using space-filling curves instead." << std::endl;
 
+      libMesh::log.stop_event("metis_partition()", "MeshBase");
       sfc_partition(n_sbdmns);
       return;
     }
@@ -163,7 +158,7 @@ void MeshBase::metis_partition(const unsigned int n_sbdmns,
       elem(e)->set_processor_id() = 
       static_cast<short int>(part[e]);
 
-  libMesh::log.stop_event("metis_partition()");
+  libMesh::log.stop_event("metis_partition()", "MeshBase");
 
 #endif
 }

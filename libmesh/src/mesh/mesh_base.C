@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.19 2003-03-03 02:15:58 benkirk Exp $
+// $Id: mesh_base.C,v 1.20 2003-03-03 18:03:37 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -103,14 +103,14 @@ MeshBase::~MeshBase()
 Node* MeshBase::add_point (const Point& p,
 			   const unsigned int num)
 {  
-  libMesh::log.start_event("add_point()");
+  libMesh::log.start_event("add_point()", "MeshBase");
 
   if ((num == static_cast<unsigned int>(-1)) ||
       (num == n_nodes()))
     {
       _nodes.push_back(Node::build(p, n_nodes()));
 
-      libMesh::log.stop_event("add_point()");
+      libMesh::log.stop_event("add_point()", "MeshBase");
   
       return node_ptr(n_nodes()-1);
     }
@@ -123,7 +123,7 @@ Node* MeshBase::add_point (const Point& p,
       node(num)          = p;
       node(num).set_id() = num;
       
-      libMesh::log.stop_event("add_point()");
+      libMesh::log.stop_event("add_point()", "MeshBase");
   
       return node_ptr(num);
     }
@@ -138,7 +138,7 @@ Node* MeshBase::add_point (const Point& p,
 
 void MeshBase::add_elem (Elem* e, const unsigned int n)
 {
-  libMesh::log.start_event("add_elem()");
+  libMesh::log.start_event("add_elem()", "MeshBase");
 
   if ((n == static_cast<unsigned int>(-1)) ||
       (n == n_elem()))
@@ -150,7 +150,7 @@ void MeshBase::add_elem (Elem* e, const unsigned int n)
       _elements[n] = e;
     }
 
-  libMesh::log.stop_event("add_elem()");
+  libMesh::log.stop_event("add_elem()", "MeshBase");
 }
 
 
@@ -382,7 +382,7 @@ void MeshBase::find_neighbors()
     error();
 
 
-  libMesh::log.start_event("find_neighbors()");
+  libMesh::log.start_event("find_neighbors()", "MeshBase");
   
   // data structures
   typedef std::pair<unsigned int, Elem*> key_val_pair;
@@ -504,7 +504,7 @@ void MeshBase::find_neighbors()
   
 #endif
 
-  libMesh::log.stop_event("find_neighbors()");
+  libMesh::log.stop_event("find_neighbors()", "MeshBase");
 }
 
 
@@ -550,7 +550,7 @@ void MeshBase::build_inf_elem(const Point& origin,
   find_neighbors();	// update elem->neighbor() tables
 
 
-  libMesh::log.start_event("build_inf_elem()");
+  libMesh::log.start_event("build_inf_elem()", "MeshBase");
 
   std::set< std::pair<unsigned int,unsigned int> > faces,ofaces;
   std::set< std::pair<unsigned int,unsigned int> > :: iterator face_it;
@@ -791,7 +791,7 @@ void MeshBase::build_inf_elem(const Point& origin,
 	      << std::endl;
 
 
-  libMesh::log.stop_event("build_inf_elem()");
+  libMesh::log.stop_event("build_inf_elem()", "MeshBase");
 
 }
 
@@ -1032,7 +1032,7 @@ void MeshBase::sfc_partition(const unsigned int n_sbdmns,
       return;
     }
   
-  libMesh::log.start_event("sfc_partition()");
+  libMesh::log.start_event("sfc_partition()", "MeshBase");
     
   std::vector<double> x;
   std::vector<double> y;
@@ -1076,7 +1076,7 @@ void MeshBase::sfc_partition(const unsigned int n_sbdmns,
       wgt += elem(table[e]-1)->n_nodes();
     }
   
-  libMesh::log.stop_event("sfc_partition()");
+  libMesh::log.stop_event("sfc_partition()", "MeshBase");
   
   return;
   
@@ -1087,7 +1087,7 @@ void MeshBase::sfc_partition(const unsigned int n_sbdmns,
 
 void MeshBase::renumber_nodes_and_elements ()
 {
-  libMesh::log.start_event("renumber_nodes_and_elements()");
+  libMesh::log.start_event("renumber_nodes_and_elem()", "MeshBase");
 
   std::vector<Elem*> new_elem;
   std::vector<Node*> new_nodes;
@@ -1171,7 +1171,7 @@ void MeshBase::renumber_nodes_and_elements ()
   _elements = new_elem;
   _nodes    = new_nodes;
   
-  libMesh::log.stop_event("renumber_nodes_and_elements()");
+  libMesh::log.stop_event("renumber_nodes_and_elem()", "MeshBase");
 }
 
 
@@ -1184,7 +1184,7 @@ void MeshBase::distort (const Real factor,
   assert (n_elem());
   assert ((factor >= 0.) && (factor <= 1.));
 
-  libMesh::log.start_event("distort()");
+  libMesh::log.start_event("distort()", "MeshBase");
 
   std::vector<Real>      hmin(n_nodes(), 1.e20);
   std::vector<short int> on_boundary(n_nodes(), 0);
@@ -1261,7 +1261,7 @@ void MeshBase::distort (const Real factor,
 
 
   // All done  
-  libMesh::log.stop_event("distort()");
+  libMesh::log.stop_event("distort()", "MeshBase");
 
   return;
 }
@@ -1724,7 +1724,7 @@ void MeshBase::read(const std::string&)
 
 void MeshBase::write(const std::string& name)
 {
-  libMesh::log.start_event("write()");
+  libMesh::log.start_event("write()", "MeshBase");
   
   // Write the file based on extension
   {
@@ -1746,7 +1746,7 @@ void MeshBase::write(const std::string& name)
       }
   }
 
-  libMesh::log.stop_event("write()");
+  libMesh::log.stop_event("write()", "MeshBase");
 }
 
 
@@ -1755,7 +1755,7 @@ void MeshBase::write(const std::string& name,
 		     std::vector<Number>& v,
 		     std::vector<std::string>& vn)
 {
-  libMesh::log.start_event("write()");
+  libMesh::log.start_event("write()", "MeshBase");
   
   // Write the file based on extension
   {
@@ -1774,7 +1774,7 @@ void MeshBase::write(const std::string& name,
       }
   }
 
-  libMesh::log.stop_event("write()");
+  libMesh::log.stop_event("write()", "MeshBase");
 }
 
 

@@ -1,4 +1,4 @@
-// $Id: perf_log.h,v 1.9 2003-02-14 15:22:41 benkirk Exp $
+// $Id: perf_log.h,v 1.10 2003-03-03 18:03:31 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -102,12 +102,13 @@ class PerfLog
  public:
 
   /**
-   * Constructor.  \p class_name is the name of the class
-   * we are monitoring.  \p log_events is a flag to optionally
+   * Constructor.  \p label_name is the name of the object, which
+   * will bw print in the log to distinguish it from other objects.
+   * \p log_events is a flag to optionally
    * disable logging.  You can use this flag to turn off
    * logging without touching any other code.
    */
-  PerfLog(const std::string class_name="",
+  PerfLog(const std::string& label_name="",
 	  const bool log_events=true);
 
   /**
@@ -127,22 +128,26 @@ class PerfLog
   /**
    * Start monitoring the event named \p label.
    */
-  void start_event(const std::string &label);
+  void start_event(const std::string &label,
+		   const std::string &header="");
 
   /**
    * Stop monitoring the event named \p label.
    */
-  void stop_event(const std::string &label);
+  void stop_event(const std::string &label,
+		  const std::string &header="");
 
   /**
    * Suspend monitoring of the event. 
    */
-  void pause_event(const std::string &label);
+  void pause_event(const std::string &label,
+		   const std::string &header="");
 
   /**
    * Restart monitoring the event.
    */
-  void restart_event(const std::string &label);
+  void restart_event(const std::string &label,
+		     const std::string &header="");
   
   /**
    * @returns a string containing:
@@ -171,9 +176,9 @@ class PerfLog
 
   
   /**
-   * The name of the class we are monitoring.
+   * The label for this object.
    */
-  const std::string class_name;
+  const std::string label_name;
 
   /**
    * Flag to optionally disable all logging.
@@ -193,7 +198,9 @@ class PerfLog
   /**
    * The actual log.
    */
-  std::map<std::string, PerfData> log;
+  std::map<std::pair<std::string,
+		     std::string>,
+	   PerfData> log;
 
   /**
    * Flag indicating if print_log() has been called.
@@ -208,13 +215,14 @@ class PerfLog
 // ------------------------------------------------------------
 // PerfLog class inline member funcions
 inline
-void PerfLog::start_event(const std::string &label)
+void PerfLog::start_event(const std::string &label,
+			  const std::string &header)
 {
   if (log_events)
     {
       // Get a reference to the event data to avoid
       // repeated map lookups
-      PerfData& perf_data = log[label];
+      PerfData& perf_data = log[std::make_pair(header,label)];
       
       // make sure we aren't currently
       // monitoring this event      
@@ -234,13 +242,14 @@ void PerfLog::start_event(const std::string &label)
 
 
 inline
-void PerfLog::stop_event(const std::string &label)
+void PerfLog::stop_event(const std::string &label,
+			 const std::string &header)
 {
   if (log_events)
     {
       // Get a reference to the event data to avoid
       // repeated map lookups
-      PerfData& perf_data = log[label];
+      PerfData& perf_data = log[std::make_pair(header,label)];
       
       // make sure we are currently
       // monitoring this event
@@ -269,13 +278,14 @@ void PerfLog::stop_event(const std::string &label)
 
 
 inline
-void PerfLog::pause_event(const std::string &label)
+void PerfLog::pause_event(const std::string &label,
+			  const std::string &header)
 {
   if (log_events)
     {
       // Get a reference to the event data to avoid
       // repeated map lookups
-      PerfData& perf_data = log[label];
+      PerfData& perf_data = log[std::make_pair(header,label)];
       
       // make sure we are currently
       // monitoring this event
@@ -301,13 +311,14 @@ void PerfLog::pause_event(const std::string &label)
 
 
 inline
-void PerfLog::restart_event(const std::string &label)
+void PerfLog::restart_event(const std::string &label,
+			    const std::string &header)
 {
   if (log_events)
     {
       // Get a reference to the event data to avoid
       // repeated map lookups
-      PerfData& perf_data = log[label];
+      PerfData& perf_data = log[std::make_pair(header,label)];
       
       // make sure we are currently
       // monitoring this event

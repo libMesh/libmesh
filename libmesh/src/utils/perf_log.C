@@ -1,4 +1,4 @@
-// $Id: perf_log.C,v 1.11 2003-02-26 13:59:52 benkirk Exp $
+// $Id: perf_log.C,v 1.12 2003-03-03 18:03:39 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -40,9 +40,9 @@
 bool PerfLog::called = false;
 
 
-PerfLog::PerfLog(const std::string cn,
+PerfLog::PerfLog(const std::string& ln,
 		 const bool le) :
-  class_name(cn),
+  label_name(ln),
   log_events(le),
   total_time(0.)
 {
@@ -65,14 +65,14 @@ void PerfLog::clear()
   if (log_events)
     {
       //  check that all events are closed
-      for (std::map<std::string, PerfData>::iterator
+      for (std::map<std::pair<std::string,std::string>, PerfData>::iterator
 	     pos = log.begin(); pos != log.end(); ++pos)
 	if (pos->second.open)
 	  {
 	    std::cout
 	      << "ERROR clearning performance log for class "
-	      << class_name << std::endl
-	      << "event " << pos->first << " is still being monitored!"
+	      << label_name << std::endl
+	      << "event " << pos->first.second << " is still being monitored!"
 	      << std::endl;
 
 	    error();
@@ -156,7 +156,7 @@ std::string PerfLog::get_perf_info() const
 				   static_cast<double>(tstop.tv_usec - tstart.tv_usec)*1.e-6);
 
       out << " ----------------------------------------------------------------------------"  << std::endl;
-      out << "| " << class_name << " Performance: Alive time=" << elapsed_time
+      out << "| " << label_name << " Performance: Alive time=" << elapsed_time
 	  << ", Active time=" << total_time << std::endl;
       out << " ----------------------------------------------------------------------------"  << std::endl;
       out << "| ";
@@ -202,10 +202,12 @@ std::string PerfLog::get_perf_info() const
       double       summed_total_time     = 0;
       double       summed_percentage     = 0;
       
-      for (std::map<std::string, PerfData>::const_iterator
+      std::string last_header("");
+	  
+      for (std::map<std::pair<std::string,std::string>, PerfData>::const_iterator
 	     pos = log.begin(); pos != log.end(); ++pos)
 	{
-	  const PerfData perf_data = pos->second;
+	  const PerfData& perf_data = pos->second;
 
 	  // Only print the event if the count is non-zero.
 	  if (perf_data.count != 0)
@@ -220,9 +222,33 @@ std::string PerfLog::get_perf_info() const
 	      summed_percentage     += perf_percent;
 
 	      // Print the event name
-	      out << "| ";
-	      out.width(30);
-	      out << std::left << pos->first;
+	      if (pos->first.first == "")
+		{
+		  out << "| ";
+		  out.width(30);
+		  out << std::left << pos->first.second;
+		}
+	      else
+		{
+		  if (last_header != pos->first.first)
+		    {
+		      last_header = pos->first.first;
+
+		      out << "| ";
+		      out.width(76);
+		      out << std::right << "|" << std::endl;
+		      
+		      out << "| ";
+		      out.width(75);
+		      out << std::left << pos->first.first;
+		      out << std::right << "|" << std::endl;
+		    }
+
+		  out << "|   ";
+		  out.width(28);
+		  out << std::left << pos->first.second;
+		}
+	      
 
 	      // Print the number of calls to the event
 	      out.width(8);
