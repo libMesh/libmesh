@@ -1,4 +1,4 @@
-// $Id: auto_ptr.h,v 1.5 2003-02-10 14:31:13 ddreyer Exp $
+// $Id: auto_ptr.h,v 1.6 2003-02-13 17:42:59 benkirk Exp $
 
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -68,7 +68,7 @@ struct AutoPtrRef
    */
   explicit
   AutoPtrRef(Tp1* p)
-    : _ptr(p) {};
+    : _ptr(p) {}
 };
   
   
@@ -123,7 +123,7 @@ public:
    */
   explicit
   AutoPtr(element_type* p = 0) 
-    : _ptr(p) {};
+    : _ptr(p) {}
 
   /**
    *  @brief  An %AutoPtr can be constructed from another %AutoPtr.
@@ -133,7 +133,7 @@ public:
    *  given up ownsership.
    */
   AutoPtr(AutoPtr& a) 
-    : _ptr(a.release()) {};
+    : _ptr(a.release()) {}
 
   /**
    *  @brief  An %AutoPtr can be constructed from another %AutoPtr.
@@ -146,7 +146,7 @@ public:
    */
   template<typename Tp1>
   AutoPtr(AutoPtr<Tp1>& a) 
-    : _ptr(a.release()) {};
+    : _ptr(a.release()) {}
 
   /**
    *  @brief  %AutoPtr assignment operator.
@@ -179,7 +179,7 @@ public:
   {
     reset(a.release());
     return *this;
-  };
+  }
 
   /**
    *  When the %AutoPtr goes out of scope, the object it owns is deleted.
@@ -193,7 +193,7 @@ public:
    *  prohibited.  [17.4.3.6]/2
    *  @endif maint
    */
-  ~AutoPtr() { delete _ptr; };
+  ~AutoPtr() { delete _ptr; }
     
   /**
    *  @brief  Smart pointer dereferencing.
@@ -204,7 +204,7 @@ public:
    *  one of those...)
    */
   element_type&
-  operator*() const  { return *_ptr; };
+  operator*() const  { return *_ptr; }
     
   /**
    *  @brief  Smart pointer dereferencing.
@@ -213,7 +213,7 @@ public:
    *  automatically cause to be dereferenced.
    */
   element_type*
-  operator->() const  { return _ptr; };
+  operator->() const  { return _ptr; }
     
   /**
    *  @brief  Bypassing the smart pointer.
@@ -226,7 +226,7 @@ public:
    *  @note  This %AutoPtr still owns the memory.
    */
   element_type*
-  get() const  { return _ptr; };
+  get() const  { return _ptr; }
     
   /**
    *  @brief  Bypassing the smart pointer.
@@ -245,7 +245,7 @@ public:
     element_type* tmp = _ptr;
     _ptr = 0;
     return tmp;
-  };
+  }
     
   /**
    *  @brief  Forcibly deletes the managed object.
@@ -261,8 +261,8 @@ public:
       {
 	delete _ptr;
 	_ptr = p;
-      };
-  };
+      }
+  }
     
   /** @{
    *  @brief  Automatic conversions
@@ -276,7 +276,7 @@ public:
    *  @endcode
    */
   AutoPtr(AutoPtrRef<element_type> ref) 
-    : _ptr(ref._ptr) {};
+    : _ptr(ref._ptr) {}
 
   /**
    * op= for AutoPtr.  Allows you to write:
@@ -291,23 +291,23 @@ public:
       {
 	delete _ptr;
 	_ptr = ref._ptr;
-      };
+      }
     return *this;
-  };
+  }
 
   /**
    * op() for AutoPtrRef<Tp1>.  Calls the release member.
    */
   template<typename Tp1>
   operator AutoPtrRef<Tp1>() 
-  { return AutoPtrRef<Tp1>(this->release()); };
+  { return AutoPtrRef<Tp1>(this->release()); }
     
   /**
    * op() for AutoPtr<Tp1>.  Calls the release member.
    */
   template<typename Tp1>
   operator AutoPtr<Tp1>() 
-  { return AutoPtr<Tp1>(this->release()); };
+  { return AutoPtr<Tp1>(this->release()); }
 };
 
 
