@@ -1,4 +1,4 @@
-// $Id: libmesh.C,v 1.18 2003-09-25 21:59:11 benkirk Exp $
+// $Id: libmesh.C,v 1.19 2003-09-29 19:54:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -89,11 +89,11 @@ int           libMesh::libMeshPrivateData::_n_processors = 1;
 int           libMesh::libMeshPrivateData::_processor_id = 0;
 bool          libMesh::libMeshPrivateData::_is_initialized = false;
 SolverPackage libMesh::libMeshPrivateData::_solver_package =
-#if   defined(HAVE_PETSC)
+#if   defined(HAVE_PETSC)   // PETSc is the default
                                                        PETSC_SOLVERS;
-#elif defined(HAVE_LASPACK)
+#elif defined(HAVE_LASPACK) // Use LASPACK if PETSc isn't there
                                                        LASPACK_SOLVERS;
-#else
+#else                       // No valid linear solver package at compile time
                                                        INVALID_SOLVER_PACKAGE;
 #endif
 
@@ -106,22 +106,38 @@ void libMesh::init (int &argc, char** & argv)
   // should _not_ be initialized already.
   assert (!libMesh::initialized());
   
+  // Build a command-line parser.
+  command_line.reset(new GetPot (argc, argv));
+  
 #if defined(HAVE_PETSC)
 
-  PetscInitialize (&argc, &argv, NULL, NULL);
- 
-  // Get the number of processors and our local processor id  
-  MPI_Comm_rank (PETSC_COMM_WORLD, &libMeshPrivateData::_processor_id);
-  MPI_Comm_size (PETSC_COMM_WORLD, &libMeshPrivateData::_n_processors);
-
+  // Allow the user to bypass PETSc initialization
+  if (!libMesh::on_command_line ("--disable-petsc"))      
+    PetscInitialize (&argc, &argv, NULL, NULL);
+  // Allow the user to bypass MPI initialization
+  else if (!libMesh::on_command_line ("--disable-mpi"))
+    MPI_Init (&argc, &argv);
+   
+  // Get the number of processors and our local processor id
+  if (!libMesh::on_command_line ("--disable-petsc") &&
+      !libMesh::on_command_line ("--disable-mpi"))
+    {
+      MPI_Comm_rank (PETSC_COMM_WORLD, &libMeshPrivateData::_processor_id);
+      MPI_Comm_size (PETSC_COMM_WORLD, &libMeshPrivateData::_n_processors);
+    }
+  
 #elif defined(HAVE_MPI)
 
-  MPI_Init (&argc, &argv);
+  // Allow the user to bypass MPI initialization
+  if (!libMesh::on_command_line ("--disable-mpi"))
+    {
+      MPI_Init (&argc, &argv);
 
-  // Get the number of processors and our local processor id  
-  MPI_Comm_rank (MPI_COMM_WORLD, &libMeshPrivateData::_processor_id);
-  MPI_Comm_size (MPI_COMM_WORLD, &libMeshPrivateData::_n_processors);
-
+      // Get the number of processors and our local processor id  
+      MPI_Comm_rank (MPI_COMM_WORLD, &libMeshPrivateData::_processor_id);
+      MPI_Comm_size (MPI_COMM_WORLD, &libMeshPrivateData::_n_processors);
+    }
+  
 #else
 
   // No PETSC or MPI, can only be uniprocessor
@@ -129,26 +145,26 @@ void libMesh::init (int &argc, char** & argv)
   assert (libMeshPrivateData::_processor_id == 0);
 
 #endif
-
+  
   // Could we have gotten bad values from the above calls?
   assert (libMeshPrivateData::_n_processors >  0);
   assert (libMeshPrivateData::_processor_id >= 0);
+
+  // Re-parse the command-line arguments.  Note that PETSc and MPI
+  // initialization above may have removed command line arguments
+  // that are not relevant to this application in the above calls.
+  // We don't want a false-positive by detecting those arguments.
+  command_line->parse_command_line (argc, argv);
     
-  // Parse the command-line arguments
-  command_line.reset(new GetPot (argc, argv));
-  
   // redirect std::cout to nothing on all
   // other processors unless explicitly told
   // not to via the --keep-cout command-line argument.
   if (libMesh::processor_id() != 0)
-    if (!libMesh::on_command_line("--keep-cout"))
+    if (!libMesh::on_command_line ("--keep-cout"))
       std::cout.rdbuf (NULL);
-  
-
-  
+    
   // The library is now ready for use
   libMeshPrivateData::_is_initialized = true;
-
 
   
   // Make sure these work.  Library methods
@@ -165,11 +181,18 @@ int libMesh::close ()
 
 #if defined(HAVE_PETSC)
 
-  PetscFinalize ();
+  // Allow the user to bypass PETSc finalization
+  if (!libMesh::on_command_line ("--disable-petsc"))      
+    PetscFinalize ();
+  // Allow the user to bypass MPI finalization
+  else if (!libMesh::on_command_line ("--disable-mpi"))
+    MPI_Finalize ();
 
 #elif defined(HAVE_MPI)
 
-  MPI_Finalize();
+  // Allow the user to bypass MPI finalization
+  if (!libMesh::on_command_line ("--disable-mpi"))
+    MPI_Finalize();
   
 #endif
 
@@ -200,6 +223,8 @@ int libMesh::close ()
 
 
   // Reconnect the output streams
+  // (don't do this, or we will get messages from objects
+  //  that go out of scope after the following return)
   //std::cout.rdbuf(std::cerr.rdbuf());
 
   
@@ -218,7 +243,8 @@ int libMesh::close ()
 
 bool libMesh::on_command_line (const std::string& arg)
 {
-  assert (libMesh::initialized());
+  // Make sure the command line parser is ready for use
+  assert (command_line.get() != NULL);
   
   return command_line->search (arg);
 }
@@ -232,7 +258,7 @@ SolverPackage libMesh::default_solver_package ()
   static bool called = false;
 
   // Check the command line.  Since the command line is
-  // unchangingt it is sufficient to do this only once.
+  // unchanging it is sufficient to do this only once.
   if (!called)
     {
       called = true;
@@ -241,14 +267,14 @@ SolverPackage libMesh::default_solver_package ()
       if (libMesh::on_command_line ("--use-petsc"))
 	libMeshPrivateData::_solver_package = PETSC_SOLVERS;
 #endif
-
+      
 #ifdef HAVE_LASPACK
       if (libMesh::on_command_line ("--use-laspack"))
 	libMeshPrivateData::_solver_package = LASPACK_SOLVERS;
 #endif
       
     }
-
-
+  
+  
   return libMeshPrivateData::_solver_package;  
 }
