@@ -1,4 +1,4 @@
-// $Id: distributed_vector.C,v 1.21 2004-03-24 05:49:12 jwpeterson Exp $
+// $Id: distributed_vector.C,v 1.22 2004-11-29 18:37:09 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -227,6 +227,52 @@ void DistributedVector<T>::add (const T a, const NumericVector<T>& v)
   assert ((_last_local_index - _first_local_index) == _local_size);
 
   add(a, v);
+}
+
+
+
+template <typename T>
+void DistributedVector<T>::insert (const std::vector<T>& v,
+				   const std::vector<unsigned int>& dof_indices)
+{
+  assert (!v.empty());
+  assert (v.size() == dof_indices.size());
+  assert (this->initialized());
+  assert (_values.size() == _local_size);
+  assert ((_last_local_index - _first_local_index) == _local_size);
+  
+  for (unsigned int i=0; i<v.size(); i++)
+    this->set (dof_indices[i], v[i]);
+}
+
+
+
+template <typename T>
+void DistributedVector<T>::insert (const NumericVector<T>& V,
+				   const std::vector<unsigned int>& dof_indices)
+{
+  assert (V.size() == dof_indices.size());
+  assert (this->initialized());
+  assert (_values.size() == _local_size);
+  assert ((_last_local_index - _first_local_index) == _local_size);
+
+  for (unsigned int i=0; i<V.size(); i++)
+    this->set (dof_indices[i], V(i));
+}
+
+
+
+template <typename T>
+void DistributedVector<T>::insert (const DenseVector<T>& V,
+				   const std::vector<unsigned int>& dof_indices)
+{
+  assert (V.size() == dof_indices.size());
+  assert (this->initialized());
+  assert (_values.size() == _local_size);
+  assert ((_last_local_index - _first_local_index) == _local_size);
+
+  for (unsigned int i=0; i<V.size(); i++)
+    this->set (dof_indices[i], V(i));
 }
 
 

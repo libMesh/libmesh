@@ -1,4 +1,4 @@
-// $Id: petsc_vector.C,v 1.32 2004-10-15 00:39:42 benkirk Exp $
+// $Id: petsc_vector.C,v 1.33 2004-11-29 18:37:10 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -157,9 +157,8 @@ template <typename T>
 void PetscVector<T>::add_vector (const std::vector<T>& v,
 				 const std::vector<unsigned int>& dof_indices)
 {
-  assert (!v.empty());
   assert (v.size() == dof_indices.size());
-  
+
   for (unsigned int i=0; i<v.size(); i++)
     this->add (dof_indices[i], v[i]);
 }
@@ -205,7 +204,7 @@ void PetscVector<T>::add_vector (const DenseVector<T>& V,
   assert (V.size() == dof_indices.size());
 
   for (unsigned int i=0; i<V.size(); i++)
-    add (dof_indices[i], V(i));
+    this->add (dof_indices[i], V(i));
 }
 
 
@@ -259,6 +258,42 @@ void PetscVector<T>::add (const T a_in, const NumericVector<T>& v_in)
   
   ierr = VecAXPY(&a, v->vec, vec);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
+}
+
+
+
+template <typename T>
+void PetscVector<T>::insert (const std::vector<T>& v,
+			     const std::vector<unsigned int>& dof_indices)
+{
+  assert (v.size() == dof_indices.size());
+
+  for (unsigned int i=0; i<v.size(); i++)
+    this->set (dof_indices[i], v[i]);
+}
+
+
+
+template <typename T>
+void PetscVector<T>::insert (const NumericVector<T>& V,
+			     const std::vector<unsigned int>& dof_indices)
+{
+  assert (V.size() == dof_indices.size());
+
+  for (unsigned int i=0; i<V.size(); i++)
+    this->set (dof_indices[i], V(i));
+}
+
+
+
+template <typename T>
+void PetscVector<T>::insert (const DenseVector<T>& V,
+			     const std::vector<unsigned int>& dof_indices)
+{
+  assert (V.size() == dof_indices.size());
+
+  for (unsigned int i=0; i<V.size(); i++)
+    this->set (dof_indices[i], V(i));
 }
 
 
