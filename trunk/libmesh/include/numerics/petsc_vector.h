@@ -1,4 +1,4 @@
-// $Id: petsc_vector.h,v 1.6 2004-10-15 00:39:41 benkirk Exp $
+// $Id: petsc_vector.h,v 1.7 2004-11-29 18:37:01 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -321,6 +321,32 @@ public:
    */
   void add_vector (const DenseVector<T>& V,
 		   const std::vector<unsigned int>& dof_indices);
+  
+  /**
+   * \f$ U=v \f$ where v is a DenseVector<T> 
+   * and you want to specify WHERE to insert it
+   */
+  virtual void insert (const std::vector<T>& v,
+		       const std::vector<unsigned int>& dof_indices);
+
+  /**
+   * \f$U=V\f$, where U and V are type 
+   * NumericVector<T> and you
+   * want to specify WHERE to insert
+   * the NumericVector<T> V 
+   */
+  virtual void insert (const NumericVector<T>& V,
+		       const std::vector<unsigned int>& dof_indices);
+      
+  /**
+   * \f$ U+=V \f$ where U and V are type 
+   * DenseVector<T> and you
+   * want to specify WHERE to insert
+   * the DenseVector<T> V 
+   */
+  virtual void insert (const DenseVector<T>& V,
+		       const std::vector<unsigned int>& dof_indices);
+    
   
   /**
    * Scale each element of the

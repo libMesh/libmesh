@@ -1,4 +1,4 @@
-// $Id: laspack_vector.C,v 1.27 2004-10-15 13:09:46 jwpeterson Exp $
+// $Id: laspack_vector.C,v 1.28 2004-11-29 18:37:09 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -61,6 +61,16 @@ Real LaspackVector<T>::linfty_norm () const
 
 
 
+template <typename T> 
+Real LaspackVector<T>::max() const
+{
+  assert (this->initialized());
+
+  return static_cast<Real>(MaxNorm_V(const_cast<QVector*>(&_vec)));
+}
+
+
+
 
 template <typename T>
 NumericVector<T>& LaspackVector<T>::operator += (const NumericVector<T>& v)
@@ -117,6 +127,81 @@ void LaspackVector<T>::add (const T a, const NumericVector<T>& v_in)
 
   for (unsigned int i=0; i<v->size(); i++)
     this->add (i, a*(*v)(i));
+}
+
+
+
+template <typename T> 
+void LaspackVector<T>::add_vector (const std::vector<T>& v,
+				   const std::vector<unsigned int>& dof_indices)
+{
+  assert (!v.empty());
+  assert (v.size() == dof_indices.size());
+  
+  for (unsigned int i=0; i<v.size(); i++)
+    this->add (dof_indices[i], v[i]);
+}
+
+
+
+template <typename T> 
+void LaspackVector<T>::add_vector (const NumericVector<T>& V,
+				   const std::vector<unsigned int>& dof_indices)
+{
+  assert (V.size() == dof_indices.size());
+
+  for (unsigned int i=0; i<V.size(); i++)
+    this->add (dof_indices[i], V(i));
+}
+
+
+
+template <typename T> 
+void LaspackVector<T>::add_vector (const DenseVector<T>& V,
+				   const std::vector<unsigned int>& dof_indices)
+{
+  assert (V.size() == dof_indices.size());
+
+  for (unsigned int i=0; i<V.size(); i++)
+    this->add (dof_indices[i], V(i));
+}
+
+
+
+template <typename T> 
+inline
+void LaspackVector<T>::insert (const std::vector<T>& v,
+			       const std::vector<unsigned int>& dof_indices)
+{
+  assert (!v.empty());
+  assert (v.size() == dof_indices.size());
+  
+  for (unsigned int i=0; i<v.size(); i++)
+    this->set (dof_indices[i], v[i]);
+}
+
+
+
+template <typename T> 
+void LaspackVector<T>::insert (const NumericVector<T>& V,
+			       const std::vector<unsigned int>& dof_indices)
+{
+  assert (V.size() == dof_indices.size());
+
+  for (unsigned int i=0; i<V.size(); i++)
+   this->set (dof_indices[i], V(i));
+}
+
+
+
+template <typename T> 
+void LaspackVector<T>::insert (const DenseVector<T>& V,
+			       const std::vector<unsigned int>& dof_indices)
+{
+  assert (V.size() == dof_indices.size());
+
+  for (unsigned int i=0; i<V.size(); i++)
+    this->set (dof_indices[i], V(i));
 }
 
 

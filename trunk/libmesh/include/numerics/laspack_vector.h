@@ -1,4 +1,4 @@
-// $Id: laspack_vector.h,v 1.4 2004-10-15 00:39:41 benkirk Exp $
+// $Id: laspack_vector.h,v 1.5 2004-11-29 18:37:01 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -293,6 +293,31 @@ class LaspackVector : public NumericVector<T>
 		   const std::vector<unsigned int>& dof_indices);
   
   /**
+   * \f$ U=v \f$ where v is a DenseVector<T> 
+   * and you want to specify WHERE to insert it
+   */
+  virtual void insert (const std::vector<T>& v,
+			      const std::vector<unsigned int>& dof_indices);
+
+  /**
+   * \f$U=V\f$, where U and V are type 
+   * NumericVector<T> and you
+   * want to specify WHERE to insert
+   * the NumericVector<T> V 
+   */
+  virtual void insert (const NumericVector<T>& V,
+			      const std::vector<unsigned int>& dof_indices);
+      
+  /**
+   * \f$ U+=V \f$ where U and V are type 
+   * DenseVector<T> and you
+   * want to specify WHERE to insert
+   * the DenseVector<T> V 
+   */
+  virtual void insert (const DenseVector<T>& V,
+			      const std::vector<unsigned int>& dof_indices);
+  
+  /**
    * Scale each element of the
    * vector by the given factor.
    */
@@ -559,58 +584,6 @@ T LaspackVector<T>::operator() (const unsigned int i) const
   
   return static_cast<T>(V_GetCmp(const_cast<QVector*>(&_vec), i+1));
 }
-
-
-
-template <typename T> 
-inline
-void LaspackVector<T>::add_vector (const std::vector<T>& v,
-				   const std::vector<unsigned int>& dof_indices)
-{
-  assert (!v.empty());
-  assert (v.size() == dof_indices.size());
-  
-  for (unsigned int i=0; i<v.size(); i++)
-    this->add (dof_indices[i], v[i]);
-}
-
-
-
-template <typename T> 
-inline
-void LaspackVector<T>::add_vector (const NumericVector<T>& V,
-				   const std::vector<unsigned int>& dof_indices)
-{
-  assert (V.size() == dof_indices.size());
-
-  for (unsigned int i=0; i<V.size(); i++)
-   this->add (dof_indices[i], V(i));
-}
-
-
-
-template <typename T> 
-inline
-void LaspackVector<T>::add_vector (const DenseVector<T>& V,
-				   const std::vector<unsigned int>& dof_indices)
-{
-  assert (V.size() == dof_indices.size());
-
-  for (unsigned int i=0; i<V.size(); i++)
-    this->add (dof_indices[i], V(i));
-}
-
-
-
-template <typename T> 
-inline
-Real LaspackVector<T>::max() const
-{
-  assert (this->initialized());
-
-  return static_cast<Real>(MaxNorm_V(const_cast<QVector*>(&_vec)));
-}
-
 
 
 #endif // #ifdef HAVE_LASPACK
