@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.19 2005-02-22 22:17:43 jwpeterson Exp $
+// $Id: equation_systems.C,v 1.20 2005-03-07 15:28:50 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -172,6 +172,10 @@ System & EquationSystems::add_system (const std::string& sys_type,
   // build a transient explicit system
   else if (sys_type == "TransientExplicit")
     this->add_system<TransientExplicitSystem> (name);
+
+  // build a linear implicit sytsem
+  else if (sys_type == "LinearImplicit")
+    this->add_system<LinearImplicitSystem> (name);
 
 #if defined(USE_COMPLEX_NUMBERS)
   // build a frequency system
