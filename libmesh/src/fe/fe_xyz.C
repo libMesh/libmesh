@@ -1,4 +1,4 @@
-// $Id: fe_xyz.C,v 1.3 2004-05-11 21:18:33 benkirk Exp $
+// $Id: fe_xyz.C,v 1.4 2004-05-17 02:18:02 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -774,7 +774,7 @@ void FE<Dim,T>::compute_constraints (std::map<unsigned int,
 template <unsigned int Dim, FEFamily T>
 bool FE<Dim,T>::shapes_need_reinit() const
 {
-  return true;
+  return false;
 }
 
 
