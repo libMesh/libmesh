@@ -1,0 +1,131 @@
+// $Id: nonlinear_solver.h,v 1.1 2005-01-03 20:14:36 benkirk Exp $
+
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
+  
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+  
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+  
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+
+#ifndef __nonlinear_solver_h__
+#define __nonlinear_solver_h__
+
+
+// C++ includes
+
+// Local includes
+#include "libmesh_common.h"
+#include "enum_solver_package.h"
+#include "reference_counted_object.h"
+#include "libmesh.h"
+
+// forward declarations
+template <typename T> class AutoPtr;
+template <typename T> class SparseMatrix;
+template <typename T> class NumericVector;
+
+
+
+
+
+/**
+ * This class provides a uniform interface for nonlinear solvers.  This base
+ * class is overloaded to provide nonlinear solvers from different packages
+ * like PETSC or LASPACK.
+ *
+ * @author Benjamin Kirk, 2003
+ */
+
+template <typename T>
+class NonlinearSolver : public ReferenceCountedObject<NonlinearSolver<T> >
+{
+public:
+  
+  /**
+   *  Constructor. Initializes Solver data structures
+   */
+  NonlinearSolver ();
+    
+  /**
+   * Destructor.
+   */
+  virtual ~NonlinearSolver ();
+  
+  /**
+   * Builds a \p NonlinearSolver using the nonlinear solver package specified by
+   * \p solver_package
+   */
+  static AutoPtr<NonlinearSolver<T> > build(const SolverPackage solver_package =
+					    libMesh::default_solver_package());
+  
+  /**
+   * @returns true if the data structures are
+   * initialized, false otherwise.
+   */
+  bool initialized () const { return _is_initialized; }
+  
+  /**
+   * Release all memory and clear data structures.
+   */
+  virtual void clear () {}
+
+  /**
+   * Initialize data structures if not done so already.
+   */
+  virtual void init () = 0;
+
+  /**
+   * This function calls the solver
+   * "_solver_type" preconditioned with the
+   * "_preconditioner_type" preconditioner.  Note that this method
+   * will compute the preconditioner from the system matrix.
+   */
+  virtual std::pair<unsigned int, Real> solve ( ) = 0;
+
+
+  
+protected:
+
+  
+  /**
+   * Flag indicating if the data structures have been initialized.
+   */
+  bool _is_initialized;
+};
+
+
+
+
+/*----------------------- inline functions ----------------------------------*/
+template <typename T>
+inline
+NonlinearSolver<T>::NonlinearSolver () :
+  
+  _is_initialized      (false)
+{
+}
+
+
+
+template <typename T>
+inline
+NonlinearSolver<T>::~NonlinearSolver ()
+{
+  this->clear ();
+}
+
+
+
+#endif // #ifdef __solver_h__
