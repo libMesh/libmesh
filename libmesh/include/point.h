@@ -1,4 +1,4 @@
-// $Id: point.h,v 1.12 2003-03-28 20:38:05 benkirk Exp $
+// $Id: point.h,v 1.13 2003-05-02 20:32:34 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -166,6 +166,12 @@ class Point
   Real size() const;
 
   /**
+   * Reutrns the magnitude of the point squared, i.e. the square-root
+   * of the sum of the elements squared.
+   */
+  Real size_sq() const;
+
+  /**
    * Zero the point in any dimension.
    */
   void zero();
@@ -200,12 +206,6 @@ class Point
   void write_unformatted (std::ostream &out, const bool newline = true) const;
     
  protected:
-
-  /**
-   * Reutrns the magnitude of the point squared, i.e. the square-root
-   * of the sum of the elements squared.
-   */
-  Real size_sq() const;
 
   /**
    * The coordinates of the \p Point
