@@ -3,7 +3,7 @@
 
 <HTML>
 <head>
-  <title>libMesh -- A C++ Finite Element Library</title>
+  <title>libMesh - A C++ Finite Element Library</title>
   <?php load_style($root); ?>
 </head>
 
