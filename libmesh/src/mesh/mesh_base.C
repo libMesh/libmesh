@@ -1,4 +1,6 @@
-// $Id: mesh_base.C,v 1.24 2003-03-12 20:21:02 ddreyer Exp $
+
+
+// $Id: mesh_base.C,v 1.25 2003-03-19 23:43:56 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -880,16 +882,19 @@ void MeshBase::build_inf_elem(const Point& origin,
 void MeshBase::build_nodes_to_elem_map (std::vector<std::vector<unsigned int> >&
 					nodes_to_elem_map) const
 {
-  nodes_to_elem_map.resize (n_nodes());
+  nodes_to_elem_map.resize (this->n_nodes());
 
   const_elem_iterator       el (this->elements_begin());
   const const_elem_iterator end(this->elements_end());
 
-  unsigned int e=0;
-  
   for (; el != end; ++el)
     for (unsigned int n=0; n<(*el)->n_nodes(); n++)
-      nodes_to_elem_map[(*el)->node(n)].push_back(e++);
+      {
+	assert ((*el)->node(n) < nodes_to_elem_map.size());
+	assert ((*el)->id()    < this->n_elem());
+	
+	nodes_to_elem_map[(*el)->node(n)].push_back((*el)->id());
+      }
 }
 
 
@@ -1188,17 +1193,18 @@ void MeshBase::renumber_nodes_and_elements ()
   }
 
 
-  // Now loop over all the processors
-  {
+  // Renumber the elements and the nodes.
+  { 
     unsigned int next_free_elem = 0;
     unsigned int next_free_node = 0;
+
     
-    for (unsigned int proc_id=0;
-	 proc_id<this->n_processors(); proc_id++)
+    // If there is only one processor, loop over the nodes and elements
+    // and set their ids based on where they lie in their vectors.
+    if (this->n_processors() == 1)
       {
-	// Loop over the elements on the processor proc_id
-	pid_elem_iterator       el    (this->elements_begin(), proc_id);
-	const pid_elem_iterator end_el(this->elements_end(),   proc_id);
+	elem_iterator       el    (this->elements_begin());
+	const elem_iterator end_el(this->elements_end());
 	
 	for (; el != end_el; ++el)
 	  {
@@ -1209,26 +1215,74 @@ void MeshBase::renumber_nodes_and_elements ()
 
 	    // Add the element to the new list
 	    new_elem.push_back(*el);
+	  }
 
-	    // Number the nodes on the element that
-	    // have not been numbered already.
-	    for (unsigned int n=0; n<(*el)->n_nodes(); n++)
-	      if ((*el)->get_node(n)->id() == Node::invalid_id)
-		{
-		  (*el)->get_node(n)->set_id(next_free_node++);
 
-		  // Add the node to the new list
-		  new_nodes.push_back((*el)->get_node(n));
-		  
-		  // How could this fail?  Only if something is WRONG!
-		  assert ((*el)->get_node(n)->processor_id() ==
-			  Node::invalid_processor_id);
-		  
-		  (*el)->get_node(n)->set_processor_id((*el)->processor_id());
-		}
+	node_iterator       nd    (this->nodes_begin());
+	const node_iterator end_nd(this->nodes_end());
+
+	//TODO:[BSK] This will not produce any inactive nodes to be deleted in the last step.  Might want to change this later.
+	for (; nd != end_nd; ++nd)
+	  {
+	    // this node should _not_ have been numbered already
+	    assert ((*nd)->id() == Node::invalid_id);
+	    
+	    (*nd)->set_id(next_free_node++);
+
+	    assert (this->processor_id() == 0);
+	    
+	    (*nd)->set_processor_id(0);
+	     
+	    // Add the node to the new list
+	    new_nodes.push_back(*nd);
+	  }	       
+      }
+	  
+
+  
+    // Otherwise renumber the elements to be in contiguous blocks
+    // on the processors.  The nodes are numbered in the order they
+    // are encountered on the element.
+    else
+      {    
+	for (unsigned int proc_id=0;
+	     proc_id<this->n_processors(); proc_id++)
+	  {
+	    // Loop over the elements on the processor proc_id
+	    pid_elem_iterator       el    (this->elements_begin(), proc_id);
+	    const pid_elem_iterator end_el(this->elements_end(),   proc_id);
+	    
+	    for (; el != end_el; ++el)
+	      {
+		// this element should _not_ have been numbered already
+		assert ((*el)->id() == Elem::invalid_id);
+		
+		(*el)->set_id(next_free_elem++);
+		
+		// Add the element to the new list
+		new_elem.push_back(*el);
+		
+		// Number the nodes on the element that
+		// have not been numbered already.
+		for (unsigned int n=0; n<(*el)->n_nodes(); n++)
+		  if ((*el)->get_node(n)->id() == Node::invalid_id)
+		    {
+		      (*el)->get_node(n)->set_id(next_free_node++);
+		      
+		      // Add the node to the new list
+		      new_nodes.push_back((*el)->get_node(n));
+		      
+		      // How could this fail?  Only if something is WRONG!
+		      assert ((*el)->get_node(n)->processor_id() ==
+			      Node::invalid_processor_id);
+		      
+		      (*el)->get_node(n)->set_processor_id((*el)->processor_id());
+		    }
+	      }
 	  }
       }
 
+    // This could only fail if we did something seriously WRONG!
     assert (new_elem.size()  == next_free_elem);
     assert (new_nodes.size() == next_free_node);
   }
