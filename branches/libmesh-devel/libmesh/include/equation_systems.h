@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.23.2.5 2003-05-09 03:45:50 benkirk Exp $
+// $Id: equation_systems.h,v 1.23.2.6 2003-05-10 15:46:43 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,6 +30,7 @@
 
 // Local Includes
 #include "mesh_common.h"
+#include "data_map.h"
 #include "enum_xdr_mode.h"
 
 // Forward Declarations
@@ -257,23 +258,23 @@ public:
   // Methods for accessing additional data
   //
 
-  /**
-   * @returns a pointet to an object of type \p T.  If the
-   * user has specified such an object then a vaild pointer
-   * is returned, otherwise \p NULL is returned.
-   */
-  template <class T>
-  T* additional_data (const std::string& name) const;
+//   /**
+//    * @returns a pointet to an object of type \p T.  If the
+//    * user has specified such an object then a vaild pointer
+//    * is returned, otherwise \p NULL is returned.
+//    */
+//   template <class T>
+//   T* additional_data (const std::string& name) const;
 
-  /**
-   * Set or get a pointer to an arbitrary type identified by \p name.
-   */
-  void* & additional_data (const std::string& name);
+//   /**
+//    * Set or get a pointer to an arbitrary type identified by \p name.
+//    */
+//   void* & additional_data (const std::string& name);
 
-  /**
-   * Removes any additional data associated with the name \p name.
-   */
-  void unset_additional_data (const std::string& name);
+//   /**
+//    * Removes any additional data associated with the name \p name.
+//    */
+//   void unset_additional_data (const std::string& name);
 
   
   
@@ -336,13 +337,15 @@ public:
    */
   unsigned int n_parameters () const;
 
-
-
-  
   /**
    * @returns a constant reference to the mesh
    */
   const Mesh & get_mesh() const;
+
+  /**
+   * Data structure holding user-supplied additional data.
+   */
+  DataMap data_map;
 
   
 protected:
@@ -357,11 +360,6 @@ protected:
    * Data structure holding the systems.
    */
   std::map<std::string, SystemBase*> _systems;
-
-  /**
-   * Data structure holding user-supplied additional data.
-   */
-  std::map<std::string, void*> _additional_data;
   
   /**
    * Data structure to hold user-specified flags.
@@ -502,30 +500,30 @@ T_sys& EquationSystems::get_system (const unsigned int num)
 
 
 
-template <class T>
-inline
-T* EquationSystems::additional_data (const std::string& name) const
-{
-  // Look for name in the additional data map
-  std::map<std::string, void*>::const_iterator
-    pos = _additional_data.find(name);
+// template <class T>
+// inline
+// T* EquationSystems::additional_data (const std::string& name) const
+// {
+//   // Look for name in the additional data map
+//   std::map<std::string, void*>::const_iterator
+//     pos = _additional_data.find(name);
 
-  if (pos == _additional_data.end())
-    {
-      here();
+//   if (pos == _additional_data.end())
+//     {
+//       here();
 
-      std::cerr << "WARNING: no object matching \"" << name
-		<< "\" found.  Returning NULL"
-		<< std::endl;
+//       std::cerr << "WARNING: no object matching \"" << name
+// 		<< "\" found.  Returning NULL"
+// 		<< std::endl;
 
-      return NULL;
-    }
+//       return NULL;
+//     }
 
-  // Better not be NULL!
-  assert (pos->second != NULL);
+//   // Better not be NULL!
+//   assert (pos->second != NULL);
   
-  return static_cast<T*>(pos->second);
-}
+//   return static_cast<T*>(pos->second);
+// }
 
 
 

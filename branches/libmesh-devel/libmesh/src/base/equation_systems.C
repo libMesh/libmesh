@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.34.2.6 2003-05-07 20:47:15 benkirk Exp $
+// $Id: equation_systems.C,v 1.34.2.7 2003-05-10 15:46:43 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -59,7 +59,7 @@ EquationSystems::~EquationSystems ()
 void EquationSystems::clear ()
 {
   // Clear any user-supplied additional data
-  _additional_data.clear ();
+  data_map.clear ();
 
   // Clear any flags
   _flags.clear ();
@@ -689,32 +689,32 @@ unsigned int EquationSystems::n_dofs () const
 
 
 
-void* & EquationSystems::additional_data (const std::string& name)
-{
-  // Check for the entry already.  If it is there return the pointer,
-  // but make sure it isn't NULL
-  if (_additional_data.count(name) != 0)
-    {
-      assert (_additional_data[name] != NULL);
+// void* & EquationSystems::additional_data (const std::string& name)
+// {
+//   // Check for the entry already.  If it is there return the pointer,
+//   // but make sure it isn't NULL
+//   if (_additional_data.count(name) != 0)
+//     {
+//       assert (_additional_data[name] != NULL);
 
-      return _additional_data[name];
-    }
+//       return _additional_data[name];
+//     }
 
-  return _additional_data[name];
-}
+//   return _additional_data[name];
+// }
 
 
 
-void EquationSystems::unset_additional_data (const std::string& name)
-{
-  // Look for an entry matching name
-  std::map<std::string, void*>::iterator
-    pos = _additional_data.find(name);
+// void EquationSystems::unset_additional_data (const std::string& name)
+// {
+//   // Look for an entry matching name
+//   std::map<std::string, void*>::iterator
+//     pos = _additional_data.find(name);
 
-  // Remove it if an entry was found
-  if (pos != _additional_data.end())
-    _additional_data.erase(pos);
-}
+//   // Remove it if an entry was found
+//   if (pos != _additional_data.end())
+//     _additional_data.erase(pos);
+// }
 
 
 

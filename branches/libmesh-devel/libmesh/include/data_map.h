@@ -1,4 +1,4 @@
-// $Id: data_map.h,v 1.1.2.3 2003-05-09 21:27:47 benkirk Exp $
+// $Id: data_map.h,v 1.1.2.4 2003-05-10 15:46:43 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,80 +30,13 @@
 
 // Local includes
 #include "mesh_common.h"
-
-
-
-
-//----------------------------------------
-// DataObjectBase
-  
-/**
- * The base class for a generic data object
- */
-class DataObjectBase
-{
-public:
-
-  /**
-   * Destructor. 
-   */
-  virtual ~DataObjectBase () {}
-  
-  /**
-   * Returns the name of the class used in the construction
-   * of derived objects.
-   */
-  const std::string & class_name () const { return _class_name; }
-
-  
-protected:
-
-  
-  /**
-   * Constructor.  Takes the name of the class pointed to.
-   */
-  DataObjectBase (const std::string& class_name) : _class_name(class_name) {}
-  
-  /**
-   * Build an object of the requested type.
-   * Note that this COPIES the object \p data,
-   * so you should pass POINTERS to large objects,
-   * not the objects themselves!
-   */
-  template <typename T>
-  static DataObjectBase* build (const T& data);
-  
-  /**
-   * Build an object of the requested type, taking a pointer
-   * to the type. For this to work properly we must be able
-   * to derive from \p T, and furthermore \p T needs an accessible
-   * default constructor.
-   */
-  template <typename T>
-  static DataObjectBase* build (const T* data_ptr);
-
-
-private:
-
-  
-  /**
-   * The class name.
-   */
-  const std::string _class_name;
-    
-  /**
-   * Friends.  The \p DataMap needs to call the
-   * \p DataObjectBase::build () members.
-   */
-  friend class DataMap;
-};
-
+#include "data_object.h"
 
 
 
 
 //-----------------------------------------------------------
-// DataObject
+// DataObjectCpy
 
 /**
  * Derived class.  Implements storage of arbtrary data types.
@@ -112,19 +45,26 @@ private:
  * heavy objects.
  */
 template <typename T>
-class DataObject : public DataObjectBase
+class DataObjectCpy : public DataObject
 {
 private:
   
   /**
    * Construct from an object.  NOTE THAT THIS COPIES THE OBJECT!
-   * Tells the \p DataObjectBase class what type \p T is for
+   * Tells the \p DataObject class what type \p T is for
    * possible debugging.
    */
-  DataObject (const T& data) :
-    DataObjectBase(typeid(T).name()),
+  DataObjectCpy (const T& data) :
     _data (data)
   {}
+    
+  /**
+   * Build an object of the requested type.
+   * Note that this COPIES the object \p data,
+   * so you should pass POINTERS to large objects,
+   * not the objects themselves!
+   */
+  static DataObject* build (const T& data);
   
   /**
    * @returns a constant reference to the data.
@@ -141,45 +81,51 @@ private:
    * ever be able to use one of these objects since the
    * class is completely private.
    */
-  friend class DataObjectBase;
   friend class DataMap;
 };
 
 
 
-/**
- * Derived class.  This class is multiply inherited based on input type,
- * so it is only safe to use with objects.  Furthermore, this class
- * must be able to inherit from \p T, and T needs an accessible default
- * constructor.  By inheriting from \p T a \p DataObjectPtr<T> can
- * be successfully cast to a \p T or any related class via
- * \p dynamic_cast<>
- */
-template <class T>
-class DataObjectPtr : public T, public DataObjectBase
-{ 
-private:
+// /**
+//  * Derived class.  This class is multiply inherited based on input type,
+//  * so it is only safe to use with objects.  Furthermore, this class
+//  * must be able to inherit from \p T, and T needs an accessible default
+//  * constructor.  By inheriting from \p T a \p DataObjectPtr<T> can
+//  * be successfully cast to a \p T or any related class via
+//  * \p dynamic_cast<>
+//  */
+// template <class T>
+// class DataObjectPtr : public T, public DataObject
+// { 
+// private:
 
-  /**
-   * Constructor.
-   */
-  DataObjectPtr (const T* data_ptr) :
-    DataObjectBase (typeid(T).name()),
-    _data_ptr (data_ptr)
-  {}
+//   /**
+//    * Constructor.
+//    */
+//   DataObjectPtr (const T* data_ptr) :
+//     _data_ptr (data_ptr)
+//   {}
+  
+//   /**
+//    * Build an object of the requested type, taking a pointer
+//    * to the type. For this to work properly we must be able
+//    * to derive from \p T, and furthermore \p T needs an accessible
+//    * default constructor.
+//    */
+//   static DataObject* build (const T* data_ptr);
 
-  /**
-   * Pointer to the object.
-   */
-  const T* _data_ptr;
+//   /**
+//    * Pointer to the object.
+//    */
+//   const T* _data_ptr;
 
-  /**
-   * Friend. This is the only class that should
-   * ever be able to use one of these objects since
-   * the class is completely private. 
-   */
-  friend class DataObjectBase;
-};
+//   /**
+//    * Friend. This is the only class that should
+//    * ever be able to use one of these objects since
+//    * the class is completely private. 
+//    */
+//   friend class DataMap;
+// };
 
 
 
@@ -216,19 +162,25 @@ public:
   void clear ();
 
   /**
+   * Add the data \p data with the associated \p name
+   * when \p data has been derived from a \p DataObject
+   */
+  void add_data_object (const std::string& name, DataObject& data);
+  
+  /**
    * Add the data \p data with the associated \p name.
    * This method will create a copy of the data.
    */
   template <typename T>
   void add_data (const std::string& name, const T& data);
   
-  /**
-   * Add the data \p data with the associated \p name.
-   * We must be able to derive from a \p T, and \p T
-   * must have an accessible default constructor.
-   */
-  template <typename T>
-  void add_data_ptr (const std::string& name, const T* data_ptr);
+//   /**
+//    * Add the data \p data with the associated \p name.
+//    * We must be able to derive from a \p T, and \p T
+//    * must have an accessible default constructor.
+//    */
+//   template <typename T>
+//   void add_data_ptr (const std::string& name, const T* data_ptr);
   
   /**
    * Get the data specified by \p name.  The return type is
@@ -242,11 +194,20 @@ public:
   /**
    * Get the data specified by \p name.  The return type is
    * specified by the template parameter.  Note that \p T
-   * may be any type that is related to the type used
-   * in the \p add_data() member.  
+   * must be the same type that was used in the \p add_data()
+   * member.
    */
-  template <typename T>
-  const T * get_data_ptr (const std::string& name) const;
+  template <class T>
+  const T & get_data_object (const std::string& name) const;
+  
+//   /**
+//    * Get the data specified by \p name.  The return type is
+//    * specified by the template parameter.  Note that \p T
+//    * may be any type that is related to the type used
+//    * in the \p add_data() member.  
+//    */
+//   template <typename T>
+//   const T * get_data_ptr (const std::string& name) const;
 
   
 private:
@@ -255,7 +216,7 @@ private:
   /**
    * Data container.
    */
-  std::map<std::string, DataObjectBase*> _data_map;
+  std::map<std::string, DataObject*> _data_map;
 };
 
 
@@ -265,19 +226,50 @@ private:
 // DataMap inline members
 template <typename T>
 inline
-DataObjectBase* DataObjectBase::build (const T& data)
+DataObject* DataObjectCpy<T>::build (const T& data)
 {
-  return new DataObject<T> (data);
+  return new DataObjectCpy<T> (data);
 }
 
 
 
-template <typename T>
+// template <typename T>
+// inline
+// DataObject* DataObjectPtr<T>::build (const T* data_ptr)
+// {
+//   assert (data_ptr != NULL);
+//   return new DataObjectPtr<T> (data_ptr);
+// }
+
+
+
 inline
-DataObjectBase* DataObjectBase::build (const T* data_ptr)
+void DataMap::add_data_object (const std::string& name, DataObject& data)
 {
-  assert (data_ptr != NULL);
-  return new DataObjectPtr<T> (data_ptr);
+  here();
+  
+  // Check to see if we have somethint with this name already
+  std::map<std::string, DataObject*>::iterator
+    pos = _data_map.find (name);
+
+
+  // Make sure it wasn't already there
+  if (pos != _data_map.end())
+    {
+      std::cerr << "ERROR:  Data already exists for \""
+		<< name
+		<< "\", aborting!"
+		<< std::endl;
+
+      error();
+    }
+
+  
+  // Didn't find it
+  else
+    {
+      _data_map[name] = &data;
+    }
 }
 
 
@@ -287,7 +279,7 @@ inline
 void DataMap::add_data (const std::string& name, const T& data)
 {
   // Check to see if we have somethint with this name already
-  std::map<std::string, DataObjectBase*>::iterator
+  std::map<std::string, DataObject*>::iterator
     pos = _data_map.find (name);
 
 
@@ -306,38 +298,38 @@ void DataMap::add_data (const std::string& name, const T& data)
   // Didn't find it
   else
     {
-      _data_map[name] = DataObjectBase::build (data);
+      _data_map[name] = DataObjectCpy<T>::build (data);
     }
 }
 
 
 
-template <typename T>
-inline
-void DataMap::add_data_ptr (const std::string& name, const T* data_ptr)
-{
-  // Check to see if we have somethint with this name already
-  std::map<std::string, DataObjectBase*>::iterator
-    pos = _data_map.find (name);
+// template <typename T>
+// inline
+// void DataMap::add_data_ptr (const std::string& name, const T* data_ptr)
+// {
+//   // Check to see if we have somethint with this name already
+//   std::map<std::string, DataObject*>::iterator
+//     pos = _data_map.find (name);
 
 
-  // Make sure it wasn't already there
-  if (pos != _data_map.end())
-    {
-      std::cerr << "ERROR:  Data already exists for \""
-		<< name
-		<< "\", aborting!"
-		<< std::endl;
+//   // Make sure it wasn't already there
+//   if (pos != _data_map.end())
+//     {
+//       std::cerr << "ERROR:  Data already exists for \""
+// 		<< name
+// 		<< "\", aborting!"
+// 		<< std::endl;
 
-      error();
-    }
+//       error();
+//     }
   
-  // Didn't find it
-  else
-    {
-      _data_map[name] = DataObjectBase::build (data_ptr);
-    }
-}
+//   // Didn't find it
+//   else
+//     {
+//       _data_map[name] = DataObjectPtr<T>::build (data_ptr);
+//     }
+// }
 
 
 
@@ -345,7 +337,7 @@ template <typename T>
 inline
 const T& DataMap::get_data (const std::string& name) const
 {
-  std::map<std::string, DataObjectBase*>::const_iterator
+  std::map<std::string, DataObject*>::const_iterator
     pos = _data_map.find(name);
   
   if (pos == _data_map.end())
@@ -359,18 +351,15 @@ const T& DataMap::get_data (const std::string& name) const
   
   assert (pos->second != NULL);
 
-  
-  // the object must be there.  Look above
-  DataObject<T>* obj = dynamic_cast<DataObject<T>* >(pos->second);
+
+  // Maybe it was a copy
+  DataObjectCpy<T>* obj = dynamic_cast<DataObjectCpy<T>* >(pos->second);
 
   // Check for failed cast
   if (obj == NULL)
     {      
       std::cerr << "ERROR: Cast failed, invalid type requested!"
-		<< std::endl
-		<< "The known type is:     \""         << pos->second->class_name() << "\""
-		<< std::endl
-		<< "The requested type is: \""         << typeid(T).name() << "\""
+		<< "The requested type is: \"" << typeid(T).name() << "\""
 		<< std::endl;
       error();
     }
@@ -381,11 +370,11 @@ const T& DataMap::get_data (const std::string& name) const
 
 
 
-template <typename T>
+template <class T>
 inline
-const T* DataMap::get_data_ptr (const std::string& name) const
+const T& DataMap::get_data_object (const std::string& name) const
 {
-  std::map<std::string, DataObjectBase*>::const_iterator
+  std::map<std::string, DataObject*>::const_iterator
     pos = _data_map.find(name);
   
   if (pos == _data_map.end())
@@ -396,31 +385,61 @@ const T* DataMap::get_data_ptr (const std::string& name) const
 
       error();
     }
-
-
-  // Can't happen...
-  assert (pos->second != NULL);
   
-  // the object must be there.  Look above
+  assert (pos->second != NULL);
+
+
+  // Try this first
   T* obj = dynamic_cast<T*>(pos->second);
 
   // Check for failed cast
   if (obj == NULL)
     {      
       std::cerr << "ERROR: Cast failed, invalid type requested!"
-		<< std::endl
-		<< "The known type is:     \""  << pos->second->class_name() << "\""
-		<< std::endl
-		<< "The requested type is: \""  << typeid(T).name() << "\""
-		<< std::endl
-		<< "Cannot cast from a \""      << pos->second->class_name()
-		<< "\" to a \"" << typeid(T).name() << "\", aborting!"
+		<< "The requested type is: \"" << typeid(T).name() << "\""
 		<< std::endl;
       error();
     }
 
-  return obj;
+  return *obj;
 }
+
+
+
+// template <typename T>
+// inline
+// const T* DataMap::get_data_ptr (const std::string& name) const
+// {
+//   std::map<std::string, DataObject*>::const_iterator
+//     pos = _data_map.find(name);
+  
+//   if (pos == _data_map.end())
+//     {
+//       std::cerr << "ERROR:  No data associated with the name \""
+// 		<< name << "\"!"
+// 		<< std::endl;
+
+//       error();
+//     }
+
+
+//   // Can't happen...
+//   assert (pos->second != NULL);
+  
+//   // the object must be there.  Look above
+//   T* obj = dynamic_cast<T*>(pos->second);
+
+//   // Check for failed cast
+//   if (obj == NULL)
+//     {      
+//       std::cerr << "ERROR: Cast failed, invalid type requested!"
+// 		<< "The requested type is: \"" << typeid(T).name() << "\""
+// 		<< std::endl;
+//       error();
+//     }
+
+//   return obj;
+// }
 
 
 #endif // #define __data_map_h__

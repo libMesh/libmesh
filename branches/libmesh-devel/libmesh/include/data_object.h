@@ -1,4 +1,4 @@
-// $Id: data_map.C,v 1.1.2.2 2003-05-10 15:46:43 benkirk Exp $
+// $Id: data_object.h,v 1.1.2.1 2003-05-10 15:46:43 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -19,25 +19,30 @@
 
 
 
-// System includes
-
-// Local includes
-#include "data_map.h"
+#ifndef __data_object_h__
+#define __data_object_h__
 
 
 
-//----------------------------------------------------------------
-// DataMap implementation
-void DataMap::clear ()
+//----------------------------------------
+// DataObject
+  
+/**
+ * The base class for a generic data object.
+ */
+class DataObject
 {
-  std::map<std::string, DataObject*>::iterator
-    pos = _data_map.begin();
+public:
 
-  for (; pos != _data_map.end(); ++pos)
-    {
-      assert (pos->second != NULL);
-      delete pos->second;
-    }
+  /**
+   * Destructor. This class is pure-virtual.
+   */
+  virtual ~DataObject () = 0;
+};
 
-  _data_map.clear();
-}
+
+inline
+DataObject::~DataObject () {}
+
+
+#endif // #define __data_map_h__
