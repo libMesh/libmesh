@@ -1,4 +1,4 @@
-// $Id: mesh_gmv_support.C,v 1.30 2004-03-20 15:16:57 benkirk Exp $
+// $Id: mesh_gmv_support.C,v 1.31 2004-03-24 04:32:59 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -22,14 +22,9 @@
 // C/C++ includes
 #include <iomanip>
 #include <fstream>
-#include <stdio.h>
-#include <string.h>
 
 // Local includes
 #include "equation_systems.h"
-#include "mesh_base.h"
-#include "elem.h"
-
 
 
 void MeshBase::write_discontinuous_gmv (const std::string& name,

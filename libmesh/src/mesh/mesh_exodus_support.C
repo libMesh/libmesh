@@ -1,4 +1,4 @@
-// $Id: mesh_exodus_support.C,v 1.11 2004-01-03 15:37:43 benkirk Exp $
+// $Id: mesh_exodus_support.C,v 1.12 2004-03-24 04:32:59 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -23,11 +23,7 @@
 #include <iomanip>
 
 // Local includes
-#include "mesh_base.h"
-#include "boundary_mesh.h"
-#include "boundary_info.h"
 #include "mesh.h"
-
 
 #ifdef HAVE_EXODUS_API
 // namespace exII {
