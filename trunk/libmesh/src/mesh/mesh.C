@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.27 2003-09-30 18:22:18 benkirk Exp $
+// $Id: mesh.C,v 1.28 2003-10-09 21:03:02 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -66,8 +66,7 @@ void Mesh::clear ()
 
 
 
-void Mesh::read (const std::string& name,
-		 const bool do_prepare_for_use)
+void Mesh::read (const std::string& name)
 {
   START_LOG("read()", "Mesh");
 
@@ -133,9 +132,8 @@ void Mesh::read (const std::string& name,
   STOP_LOG("read()", "Mesh");
 
 
-  // Done reading the mesh.  Now prepare it for use, if desired
-  if (do_prepare_for_use)
-    this->prepare_for_use();
+  // Done reading the mesh.  Now prepare it for use.
+  this->prepare_for_use();
 }
 
 
