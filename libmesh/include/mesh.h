@@ -1,4 +1,4 @@
-// $Id: mesh.h,v 1.16 2003-07-12 16:56:39 ddreyer Exp $
+// $Id: mesh.h,v 1.17 2003-07-24 18:31:17 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -102,9 +102,13 @@ class Mesh : public MeshBase
   
   /**
    * Read solutions in mgflo's XDR format.
-   * Should be compatible with the mgf
+   * Should be compatible with the MGF
    * solution file format. This method expects
-   * an ASCII file.
+   * an ASCII file.  What is MGF?  It was a microgravity
+   * fluid physics code developed under a NASA ESS Grand
+   * Challenge Grant.  This method exists solely for
+   * backwards compatiblity with MGF and could be
+   * deprecated at any time.
    */
   void read_xdr_soln (const std::string& name,
 		      std::vector<Number>& soln,
