@@ -1,4 +1,4 @@
-// $Id: mesh_data_xdr_support.C,v 1.5 2003-08-04 17:23:51 ddreyer Exp $
+// $Id: mesh_data_xdr_support.C,v 1.6 2003-08-08 14:11:27 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -71,6 +71,11 @@ void MeshData::read_xdr (const std::string& name,
    * ASCII output.  Thus this one section of code will write XDR or ASCII
    * files with no changes.
    */ 
+
+
+  // we should better be active or in compatibility mode
+  assert (_active || _compatibility_mode);
+
 
   // make sure the id maps are ready
   assert (_node_id_map_closed);

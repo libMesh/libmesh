@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.37 2003-08-07 19:25:31 ddreyer Exp $
+// $Id: mesh_base.h,v 1.38 2003-08-08 14:11:26 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -64,7 +64,7 @@ template <typename T> class PetscMatrix;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.37 $
+ * \version $Revision: 1.38 $
  */
 
 
@@ -233,6 +233,11 @@ public:
    * \f$ i^{th} \f$ node.
    */  
   const Node& node (const unsigned int i) const;
+  
+  /**
+   * Return a pointer to the \f$ i^{th} \f$ node.
+   */  
+  const Node* node_ptr (const unsigned int i) const;
 
   /**
    * Return a constant reference to the \p nodes vector holding the nodes.
@@ -712,11 +717,6 @@ protected:
    *  3.) call \p renumber_nodes_and_elements() 
    */
   virtual void prepare_for_use ();
-  
-  /**
-   * Return a pointer to the \f$ i^{th} \f$ node.
-   */  
-  const Node* node_ptr (const unsigned int i) const;
 
   /**
    * Return a pointer to the \f$ i^{th} \f$ node.

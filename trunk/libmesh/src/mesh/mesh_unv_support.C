@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.C,v 1.17 2003-07-12 16:56:39 ddreyer Exp $
+// $Id: mesh_unv_support.C,v 1.18 2003-08-08 14:11:27 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -289,6 +289,22 @@ void UnvMeshInterface::write (std::ostream& out_stream)
   _num_nodes    = _nodes.size();
   _num_elements = _elements.size();
   _need_D_to_e  = false;
+
+
+  /*
+   * we need the MeshData, otherwise we do not
+   * know the foreign node id
+   */
+  if (!_mesh_data.active())
+    {
+      if (!_mesh_data.compatibility_mode())
+        {
+	  std::cerr << "WARNING: MeshData neither active nor in compatibility mode." << std::endl
+		    << "         Enable compatibility mode for MeshData.  Use this Universal" << std::endl
+		    << "         file with caution: libMesh node and element ids are used." << std::endl;
+	  _mesh_data.enable_compatibility_mode();
+	}
+    }
 
 
   /*
@@ -733,16 +749,7 @@ void UnvMeshInterface::element_in (std::fstream& temp_file)
 
 void UnvMeshInterface::node_out (std::ostream& out_file)
 {
-  /*
-   * we need the MeshData, otherwise we do not
-   * know the foreign node id
-   */
-  if (!_mesh_data.active())
-    {
-      std::cerr << "ERROR: Need to have an active MeshData for writing UNV files."
-		<< std::endl;
-      error();
-    }
+  assert (_mesh_data.active() || _mesh_data.compatibility_mode());
 
   /*
    * Write beginning of dataset
@@ -800,17 +807,7 @@ void UnvMeshInterface::node_out (std::ostream& out_file)
 
 void UnvMeshInterface::element_out(std::ostream& out_file)
 {
-  /*
-   * we need the MeshData, otherwise we do not
-   * know the foreign node id
-   */
-  if (!_mesh_data.active())
-    {
-      std::cerr << "ERROR: Need to have an active MeshData for writing UNV files."
-		<< std::endl;
-      error();
-    }
-
+  assert (_mesh_data.active() || _mesh_data.compatibility_mode());
 
   /*
    * Write beginning of dataset
@@ -948,16 +945,27 @@ void UnvMeshInterface::element_out(std::ostream& out_file)
 		
 	case TET10:
 	  fe_descriptor_id = 118; // Solid Parabolic Tetrahedron
-	  assign_elm_nodes[0] = 1;
-	  assign_elm_nodes[4] = 2;
-	  assign_elm_nodes[1] = 3;
-	  assign_elm_nodes[5] = 4;
-	  assign_elm_nodes[2] = 5;
-	  assign_elm_nodes[6] = 6;
-	  assign_elm_nodes[7] = 7;
-	  assign_elm_nodes[8] = 8;
-	  assign_elm_nodes[9] = 9;
-	  assign_elm_nodes[3] = 10;
+// 	  assign_elm_nodes[0] = 1;
+// 	  assign_elm_nodes[4] = 2;
+// 	  assign_elm_nodes[1] = 3;
+// 	  assign_elm_nodes[5] = 4;
+// 	  assign_elm_nodes[2] = 5;
+// 	  assign_elm_nodes[6] = 6;
+// 	  assign_elm_nodes[7] = 7;
+// 	  assign_elm_nodes[8] = 8;
+// 	  assign_elm_nodes[9] = 9;
+// 	  assign_elm_nodes[3] = 10;
+
+	  assign_elm_nodes[0] = 1; //0
+	  assign_elm_nodes[1] = 5; //4
+	  assign_elm_nodes[2] = 2; //1
+	  assign_elm_nodes[3] = 6; //5
+	  assign_elm_nodes[4] = 3; //2
+	  assign_elm_nodes[5] = 7; //6
+	  assign_elm_nodes[6] = 8; //7
+	  assign_elm_nodes[7] = 9; //8
+	  assign_elm_nodes[8] = 10; //9
+	  assign_elm_nodes[9] = 4; //3
 	  break;
 	
 	
