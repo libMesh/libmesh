@@ -1,4 +1,4 @@
-// $Id: face_quad9.C,v 1.16 2003-09-02 18:02:42 benkirk Exp $
+// $Id: face_quad9.C,v 1.17 2003-09-02 19:50:20 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -321,6 +321,9 @@ unsigned int Quad9::n_second_order_adjacent_vertices (const unsigned int n) cons
       default:
 	error();
     }
+
+  error();
+  return libMesh::invalid_uint;
 }
 
 
