@@ -1,5 +1,5 @@
 dnl --------------------------------------------------------------
-dnl $Id: configure.in,v 1.51 2005-01-13 21:13:28 roystgnr Exp $
+dnl $Id: configure.in,v 1.52 2005-01-25 21:45:00 benkirk Exp $
 dnl --------------------------------------------------------------
 dnl Process this file with autoconf to produce a configure script.
 
@@ -9,7 +9,7 @@ dnl you call ./configure subsequently on different systems without
 dnl clearing the cache 
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
-AC_REVISION($Revision: 1.51 $)
+AC_REVISION($Revision: 1.52 $)
 
 
 AC_INIT
@@ -235,7 +235,7 @@ AC_ARG_ENABLE(second,
               AC_HELP_STRING([--enable-second],
                              [build with second derivatives]),
               enablesecond=$enableval,
-              enablesecond=no)
+              enablesecond=$enableeverything)
 
 if test "$enablesecond" != no ; then
   AC_DEFINE(ENABLE_SECOND_DERIVATIVES, 1,
