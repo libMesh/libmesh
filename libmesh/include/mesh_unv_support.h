@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.h,v 1.7 2003-05-14 11:54:36 ddreyer Exp $
+// $Id: mesh_unv_support.h,v 1.8 2003-05-15 19:43:33 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -25,13 +25,19 @@
 #include <fstream>
 #include <vector>
 
+
+
 // Local includes
 #include "mesh.h"
 
 
 
+// Forward Declarations
+class MeshData;
+
+
 /**
- * Class UnvInterface provides an Interface to
+ * Class \p UnvInterface provides an Interface to
  * a stream object that contains a mesh in
  * I-deas UNV format.
  *
@@ -47,10 +53,10 @@ public:
    * read and the nodes and elements will be stored
    * in the vectors specified in the arguments
    */
-  UnvInterface(std::istream& _in,
-	       std::vector<Node*>&  _nodes,
-	       std::vector<Elem*>& _elements,
-	       BoundaryInfo& boundary_info);
+  UnvInterface(std::istream& in,
+	       std::vector<Node*>& nodes,
+	       std::vector<Elem*>& elements,
+	       MeshData& md);
   
   /**
    * Destructor.
@@ -147,9 +153,10 @@ protected:
 private:
 
   /**
-   * writable reference to the BoundaryInfo
+   * writable reference to the class that
+   * handles foreign node/element ids
    */
-  BoundaryInfo& _boundary_info;
+  MeshData& _mesh_data;
 
   /**
    * labels for the node dataset

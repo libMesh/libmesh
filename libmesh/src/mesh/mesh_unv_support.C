@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.C,v 1.10 2003-05-14 11:54:37 ddreyer Exp $
+// $Id: mesh_unv_support.C,v 1.11 2003-05-15 19:43:34 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,7 @@
 
 // Local includes
 #include "mesh_unv_support.h"
-#include "boundary_data.h"
+#include "mesh_data.h"
 #include "face_quad4.h"
 #include "face_tri3.h"
 #include "face_tri6.h"
@@ -37,19 +37,25 @@
 
 //-----------------------------------------------------------------------------
 // Mesh methods
-
-void Mesh::read_unv(const std::string& name){
+void Mesh::read_unv(const std::string& name)
+{
   std::ifstream file (name.c_str());
+
   read_unv(file);
+
   file.close();
-  return;
 }
 
 
 
-void Mesh::read_unv(std::istream& in){
-  UnvInterface i(in,_nodes,_elements,boundary_info);
+void Mesh::read_unv(std::istream& in)
+{
+  UnvInterface i (in,
+		  _nodes,
+		  _elements,
+		  data);
 }
+
 
 
 //-----------------------------------------------------------------------------
@@ -58,11 +64,11 @@ void Mesh::read_unv(std::istream& in){
 UnvInterface::UnvInterface(std::istream& in,
 			   std::vector<Node*>& nodes,
 			   std::vector<Elem*>& elements,
-			   BoundaryInfo& boundary_info):
+			   MeshData& md):
   _phys_file     (in),
   _nodes         (nodes),
   _elements      (elements),
-  _boundary_info (boundary_info)
+  _mesh_data     (md)
 {
   if ( !_phys_file.good() )
   {
@@ -110,14 +116,15 @@ UnvInterface::UnvInterface(std::istream& in,
 
 UnvInterface::~UnvInterface()
 {
+  _assign_nodes.clear();
+
+  // tell the MeshData object that we are finished
+  _mesh_data.close_foreign_id_maps ();
 
   _temporary_file.close();
 
   if ( remove(_temporary_file_name) == -1 )
-  {
-    std::cout << "Error deleting temporary file." << std::endl;
-    error();
-  }
+      std::cout << "Cannot delete temporary file." << std::endl;
 
 }
 
@@ -316,14 +323,13 @@ void UnvInterface::set_stream_pointer(std::string ds_num)
 
 
 
-void UnvInterface::node_in()
+void UnvInterface::node_in ()
 {
-  // Variables needed for reading
-  unsigned int node_lab;// label of the node
+  unsigned int node_lab;                // label of the node
   unsigned long int exp_coord_sys_num,  // export coordinate system number(not supported yet)
                     disp_coord_sys_num, // displacement coordinate system number(not supp. yet)
                     color;              // color(not supported yet)
-  Real x,y,z;           // coordinates of the node
+  Real x,y,z;                           // coordinates of the node
 
   // allocate the correct amount of memory for the vector
   // that holds the nodes
@@ -336,12 +342,12 @@ void UnvInterface::node_in()
   for(unsigned int i=0;i<_num_nodes;i++)
     {
       _temporary_file >> node_lab                // read the node label
-		     >> exp_coord_sys_num       // (not supported yet)
-		     >> disp_coord_sys_num      // (not supported yet)
-		     >> color                   // (not supported yet)
-		     >> x                       // read x-coordinate
-		     >> y                       // read y-coordinate
-		     >> z;                      // read z-coordinate
+		      >> exp_coord_sys_num       // (not supported yet)
+		      >> disp_coord_sys_num      // (not supported yet)
+		      >> color                   // (not supported yet)
+		      >> x                       // read x-coordinate
+		      >> y                       // read y-coordinate
+		      >> z;                      // read z-coordinate
 
       // store the new position of the node under its label
       _assign_nodes[node_lab]=i;
@@ -349,17 +355,11 @@ void UnvInterface::node_in()
       // add node to the nodes vector.
       _nodes[i] = Node::build(x,y,z,i);
 
-      // when there is a BoundaryData object, add the foreign id
-      if (_boundary_info.has_boundary_data())
-	  _boundary_info.get_boundary_data().add_foreign_node_id(_nodes[i],
-								 node_lab);
-
+      // tell the MeshData object the foreign node id
+      _mesh_data.add_foreign_node_id (_nodes[i],
+				      node_lab);
     }
 
-
-  // when there is a BoundaryData object, tell it we are finished with nodes
-  if (_boundary_info.has_boundary_data())
-      _boundary_info.get_boundary_data().close_node_map();
 }
 
 
@@ -570,17 +570,11 @@ void UnvInterface::element_in()
 	_elements[i]->set_node(assign_elm_nodes[j]) = _nodes[_assign_nodes[node_labels[j]]];
 
 
-      // when there is a BoundaryData object, add the foreign elem id
-      if (_boundary_info.has_boundary_data())
-	  _boundary_info.get_boundary_data().add_foreign_elem_id(_elements[i],
-								 element_lab);
-
+      // tell the MeshData object the foreign element id
+      _mesh_data.add_foreign_elem_id (_elements[i],
+				      element_lab);
 
     }
-
-  // when there is a BoundaryData object, tell it we are finished with nodes
-  if (_boundary_info.has_boundary_data())
-      _boundary_info.get_boundary_data().close_elem_map();
 }
 
 
