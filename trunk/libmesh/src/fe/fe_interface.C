@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.23 2004-02-18 23:04:08 benkirk Exp $
+// $Id: fe_interface.C,v 1.24 2004-03-08 01:12:51 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -845,7 +845,8 @@ void FEInterface::inverse_map (const unsigned int dim,
 #endif
 	    
 	  case XYZ:
-	    return FEXYZ<1>::inverse_map(elem, physical_points, reference_points);
+	    FEXYZ<1>::inverse_map(elem, physical_points, reference_points);
+	    return;
 
 	  default:
 	    error();
@@ -879,7 +880,8 @@ void FEInterface::inverse_map (const unsigned int dim,
 #endif
 	    
 	  case XYZ:
-	    return FEXYZ<2>::inverse_map(elem, physical_points, reference_points);
+	    FEXYZ<2>::inverse_map(elem, physical_points, reference_points);
+	    return;
 
 	  default:
 	    error();
@@ -913,7 +915,8 @@ void FEInterface::inverse_map (const unsigned int dim,
 #endif
 	    
 	  case XYZ:
-	    return FEXYZ<3>::inverse_map(elem, physical_points, reference_points);
+	    FEXYZ<3>::inverse_map(elem, physical_points, reference_points);
+	    return;
 	    
 	  default:
 	    error();
