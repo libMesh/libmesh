@@ -1,4 +1,4 @@
-// $Id: mesh_smoother.h,v 1.3 2003-06-25 19:53:04 jwpeterson Exp $
+// $Id: mesh_smoother.h,v 1.4 2003-06-25 19:58:26 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -40,7 +40,7 @@
  *
  * \author John W. Peterson
  * \date 2002-2003
- * \version $Revision: 1.3 $
+ * \version $Revision: 1.4 $
  */
 
 
@@ -64,7 +64,7 @@ public:
    * Function which actually performs the smoothing operations.
    * In this abstract base class, this function does nothing.
    */
-  virtual void smooth() {}
+  virtual void smooth() = 0;
   
 protected:
 
