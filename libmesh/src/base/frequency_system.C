@@ -1,4 +1,4 @@
-// $Id: frequency_system.C,v 1.16 2003-07-07 23:19:28 ddreyer Exp $
+// $Id: frequency_system.C,v 1.17 2003-07-10 12:10:10 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -75,10 +75,31 @@ void FrequencySystem::clear ()
   _finished_init            = false;
   _finished_assemble        = false;
 
-  // clear frequencies: 
-  // 1. in the parameters section of the 
-  //    EquationSystems<FrequencySystem> object
-  // 2. in the local vector
+  /*
+   * We have to distinguish between the
+   * simple straightforward "clear()"
+   * and the clear that also touches the
+   * EquationSystems parameters "current frequency" etc.
+   * Namely, when reading from file (through equation_systems_io.C
+   * methods), the param's are read in, then the systems.
+   * Prior to reading a system, this system gets cleared...
+   * And there, all the previously loaded frequency parameters
+   * would get lost...
+   */
+}
+
+
+
+void FrequencySystem::clear_all ()
+{
+  SteadySystem::clear();
+
+  _finished_set_frequencies = false;
+  _finished_init            = false;
+  _finished_assemble        = false;
+
+  // clear frequencies in the parameters section of the 
+  // EquationSystems object
   if (_equation_systems.parameter_exists ("n_frequencies"))
     {
       for (unsigned int n=0; n < _equation_systems.parameter("n_frequencies"); n++)
@@ -108,7 +129,6 @@ void FrequencySystem::init_data ()
 	  const unsigned int n_freq = 
 	      static_cast<unsigned int>(_equation_systems.parameter("n_frequencies"));
 
-	  assert(this->n_frequencies() == 0);
 	  assert(n_freq > 0);
 
 	  _finished_set_frequencies = true;
