@@ -1,4 +1,4 @@
-// $Id: perf_log.C,v 1.21 2004-10-19 12:44:11 benkirk Exp $
+// $Id: perf_log.C,v 1.22 2005-01-28 21:29:52 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -20,7 +20,7 @@
 
 
 // C++ includes
-#include <time.h>
+#include <ctime>
 #include <unistd.h>
 #include <sys/utsname.h>
 #include <sys/types.h>

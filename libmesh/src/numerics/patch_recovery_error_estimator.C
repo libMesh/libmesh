@@ -1,4 +1,4 @@
-// $Id: patch_recovery_error_estimator.C,v 1.6 2005-01-06 21:55:04 benkirk Exp $
+// $Id: patch_recovery_error_estimator.C,v 1.7 2005-01-28 21:29:51 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -20,7 +20,7 @@
 
 // C++ includes
 #include <algorithm> // for std::fill
-#include <math.h>    // for sqrt
+#include <cmath>     // for sqrt
 
 
 // Local Includes

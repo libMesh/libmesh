@@ -1,4 +1,4 @@
-// $Id: fe_szabab_shape_2D.C,v 1.9 2005-01-13 22:10:15 roystgnr Exp $
+// $Id: fe_szabab_shape_2D.C,v 1.10 2005-01-28 21:29:49 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -20,7 +20,7 @@
 
 
 // C++ includes
-#include <math.h> // for sqrt
+#include <cmath> // for std::sqrt
 
 
 // Local includes
@@ -33,15 +33,15 @@
 #include "utility.h"
 
 
-// Anonymous namespace to hold static sqrt values
+// Anonymous namespace to hold static std::sqrt values
 namespace
 {
-  static const Real sqrt2  = sqrt(2.);
-  static const Real sqrt6  = sqrt(6.);
-  static const Real sqrt10 = sqrt(10.);
-  static const Real sqrt14 = sqrt(14.);
-  static const Real sqrt22 = sqrt(22.);
-  static const Real sqrt26 = sqrt(26.);
+  static const Real sqrt2  = std::sqrt(2.);
+  static const Real sqrt6  = std::sqrt(6.);
+  static const Real sqrt10 = std::sqrt(10.);
+  static const Real sqrt14 = std::sqrt(14.);
+  static const Real sqrt22 = std::sqrt(22.);
+  static const Real sqrt26 = std::sqrt(26.);
 }
 
 

@@ -1,4 +1,4 @@
-// $Id: inf_elem_builder.C,v 1.4 2004-11-19 03:19:08 benkirk Exp $
+// $Id: inf_elem_builder.C,v 1.5 2005-01-28 21:29:50 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -352,27 +352,27 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
 		    const Point dist_from_origin = this->_mesh.point(side->node(n)) - origin;
 
 		    if(x_sym)
-		      if( fabs(dist_from_origin(0)) > 1.e-3 )
+		      if( std::abs(dist_from_origin(0)) > 1.e-3 )
 			on_x_sym=false;
 
 		    if(y_sym)
-		      if( fabs(dist_from_origin(1)) > 1.e-3 )
+		      if( std::abs(dist_from_origin(1)) > 1.e-3 )
 			on_y_sym=false;
 
 		    if(z_sym)
-		      if( fabs(dist_from_origin(2)) > 1.e-3 )
+		      if( std::abs(dist_from_origin(2)) > 1.e-3 )
 			on_z_sym=false;
 	      
 		    // 	      if(x_sym)
-		    // 		if( fabs(dist_from_origin(0)) > 1.e-6 )
+		    // 		if( std::abs(dist_from_origin(0)) > 1.e-6 )
 		    // 		  on_x_sym=false;
 
 		    // 	      if(y_sym)
-		    // 		if( fabs(dist_from_origin(1)) > 1.e-6 )
+		    // 		if( std::abs(dist_from_origin(1)) > 1.e-6 )
 		    // 		  on_y_sym=false;
 
 		    // 	      if(z_sym)
-		    // 		if( fabs(dist_from_origin(2)) > 1.e-6 )
+		    // 		if( std::abs(dist_from_origin(2)) > 1.e-6 )
 		    // 		  on_z_sym=false;
 
 		    //find the node most distant from origin

@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.31 2004-11-16 15:58:05 jwpeterson Exp $
+// $Id: mesh_generation.C,v 1.32 2005-01-28 21:29:50 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -20,7 +20,7 @@
 
 
 // C++ includes
-#include <math.h> // for sqrt
+#include <cmath> // for std::sqrt
 
 
 // Local includes

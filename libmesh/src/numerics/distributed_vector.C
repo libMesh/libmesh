@@ -1,4 +1,4 @@
-// $Id: distributed_vector.C,v 1.22 2004-11-29 18:37:09 benkirk Exp $
+// $Id: distributed_vector.C,v 1.23 2005-01-28 21:29:51 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -22,7 +22,7 @@
 #include "libmesh_common.h"
 
 // C++ includes
-#include <math.h> // for fabs
+#include <cmath> // for std::abs
 
 // Local Includes
 #include "distributed_vector.h"
@@ -43,7 +43,7 @@ Real DistributedVector<T>::l1_norm () const
   double local_l1 = 0.;
 
   for (unsigned int i=0; i<local_size(); i++)
-    local_l1 += fabs(_values[i]);
+    local_l1 += std::abs(_values[i]);
   
   double global_l1 = local_l1;
 
@@ -98,7 +98,7 @@ Real DistributedVector<T>::linfty_norm () const
   
   for (unsigned int i=0; i<local_size(); i++)
     local_linfty  = std::max(local_linfty,
-			     static_cast<double>(fabs(_values[i]))
+			     static_cast<double>(std::abs(_values[i]))
 			     ); // Note we static_cast so that both
                                 // types are the same, as required
                                 // by std::max

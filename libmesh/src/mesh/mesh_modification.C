@@ -1,4 +1,4 @@
-// $Id: mesh_modification.C,v 1.10 2005-01-03 16:17:59 benkirk Exp $
+// $Id: mesh_modification.C,v 1.11 2005-01-28 21:29:50 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -20,7 +20,7 @@
 
 
 // C++ includes
-#include <math.h> // for acos()
+#include <cmath> // for acos()
 #include <algorithm>
 #include <map>
 

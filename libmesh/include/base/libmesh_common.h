@@ -1,4 +1,4 @@
-// $Id: libmesh_common.h,v 1.8 2004-10-25 21:49:22 benkirk Exp $
+// $Id: libmesh_common.h,v 1.9 2005-01-28 21:29:44 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -29,9 +29,9 @@
 // C/C++ includes everyone should know about
 #include <iostream> // needed for std::cout, std::cerr
 #include <complex>
-#include <assert.h>
+#include <cassert>
 #ifdef HAVE_STDLIB_H
-# include <stdlib.h>
+# include <cstdlib>
 #endif
 
 // Include the MPI definition
@@ -117,7 +117,7 @@ typedef std::complex<double> COMPLEX;
 #ifdef HAVE_MPI
 #  define error()    { std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; MPI_Abort(MPI_COMM_WORLD,1);}
 #else
-#  define error()    { std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; abort(); }
+#  define error()    { std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; std::abort(); }
 #endif
 
 #undef untested
@@ -135,7 +135,7 @@ typedef std::complex<double> COMPLEX;
 
 // Define a tolerance.  This is what should be considered "good enough"
 // when doing floating point comparisons.  For example, v == 0 is
-// changed to fabs(v) < TOLERANCE.
+// changed to std::abs(v) < TOLERANCE.
 #define TOLERANCE 1.e-6
 
 

@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.30 2005-01-13 22:10:15 roystgnr Exp $
+// $Id: fe_map.C,v 1.31 2005-01-28 21:29:49 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -20,7 +20,7 @@
 
 
 // C++ includes
-#include <math.h> // for sqrt, fabs
+#include <cmath> // for std::sqrt, std::abs
 
 
 // Local includes
@@ -271,7 +271,7 @@ void FEBase::compute_map(const std::vector<Real>& qw,
 	    //     T = | dy/dxi  dy/deta |
 	    //         | dz/dxi  dz/deta |
 	    // note det(T' T) = det(T')det(T) = det(T)det(T)
-	    // so det(T) = sqrt(det(T' T))
+	    // so det(T) = std::sqrt(det(T' T))
 	    //
 	    //----------------------------------------------
 	    // Notes:
@@ -307,7 +307,7 @@ void FEBase::compute_map(const std::vector<Real>& qw,
 	      }
 	      
 	    const Real inv_det = 1./det;
-	    const Real jac = sqrt(det);
+	    const Real jac = std::sqrt(det);
 	    
 	    JxW[p] = jac*qw[p];
 
@@ -793,7 +793,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 			      J13*(J21*J32 - J22*J31));
 	    
 	    if (secure)
-	      assert (fabs(det) > 1.e-20);
+	      assert (std::abs(det) > 1.e-20);
 
 	    const Real inv_det = 1./det;
 	    

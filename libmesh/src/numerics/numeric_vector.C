@@ -1,4 +1,4 @@
-// $Id: numeric_vector.C,v 1.14 2004-10-19 22:31:06 benkirk Exp $
+// $Id: numeric_vector.C,v 1.15 2005-01-28 21:29:51 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -20,7 +20,7 @@
 
 
 // C++ includes
-#include <math.h> // for fabs
+#include <cmath> // for std::abs
 
 // Local Includes
 #include "numeric_vector.h"
@@ -91,7 +91,7 @@ int NumericVector<float>::compare (const NumericVector<float> &other_vector,
 
   do
     {
-      if ( fabs( (*this)(i) - other_vector(i) ) > threshold )
+      if ( std::abs( (*this)(i) - other_vector(i) ) > threshold )
 	rvalue = i;
       else
 	i++;
@@ -119,7 +119,7 @@ int NumericVector<Real>::compare (const NumericVector<Real> &other_vector,
 
   do
     {
-      if ( fabs( (*this)(i) - other_vector(i) ) > threshold )
+      if ( std::abs( (*this)(i) - other_vector(i) ) > threshold )
 	rvalue = i;
       else
 	i++;
@@ -146,8 +146,8 @@ int NumericVector<Complex>::compare (const NumericVector<Complex> &other_vector,
 
   do
     {
-      if (( fabs( (*this)(i).real() - other_vector(i).real() ) > threshold ) ||
-	  ( fabs( (*this)(i).imag() - other_vector(i).imag() ) > threshold ))
+      if (( std::abs( (*this)(i).real() - other_vector(i).real() ) > threshold ) ||
+	  ( std::abs( (*this)(i).imag() - other_vector(i).imag() ) > threshold ))
 	rvalue = i;
       else
 	i++;

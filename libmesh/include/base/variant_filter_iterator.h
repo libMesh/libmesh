@@ -1,4 +1,4 @@
-// $Id: variant_filter_iterator.h,v 1.6 2004-11-09 22:51:35 benkirk Exp $
+// $Id: variant_filter_iterator.h,v 1.7 2005-01-28 21:29:44 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,7 @@
 #include <iterator>
 #include <iostream>
 #include <algorithm> // for std::swap
-#include <stdlib.h>  // for abort()
+#include <cstdlib>   // for std::abort()
 
 /**
  * Original Authors: Corwin Joy          * Michael Gradman
@@ -148,7 +148,7 @@ class variant_filter_iterator : public std::iterator<std::forward_iterator_tag, 
       if (p == NULL)
 	{
 	  std::cerr << "Dynamic cast failed in Iter::equal(...)" << std::endl;
-	  abort();
+	  std::abort();
 	}
       
       return (iter_data == p->iter_data);
@@ -218,7 +218,7 @@ class variant_filter_iterator : public std::iterator<std::forward_iterator_tag, 
 	{
 	  std::cerr << "Dynamic cast failed in Pred::op()" << std::endl;
 	  std::cerr << "typeid(IterType).name()=" << typeid(IterType).name() << std::endl;
-	  abort();
+	  std::abort();
 	}
       
       // Return result of op() for the user's predicate.

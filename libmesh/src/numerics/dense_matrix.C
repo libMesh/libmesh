@@ -1,4 +1,4 @@
-// $Id: dense_matrix.C,v 1.21 2004-08-17 03:03:56 benkirk Exp $
+// $Id: dense_matrix.C,v 1.22 2005-01-28 21:29:51 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -19,7 +19,7 @@
 
 
 // C++ Includes
-#include <math.h> // for sqrt
+#include <cmath> // for sqrt
 
 // Local Includes
 #include "dense_matrix.h"
@@ -396,7 +396,7 @@ void DenseMatrix<T>::_cholesky_decompose ()
 		}
 #endif
 
-	      A(i,i) = sqrt(A(i,j));
+	      A(i,i) = std::sqrt(A(i,j));
 	    }
 	  else
 	    A(j,i) = A(i,j) / A(i,i);

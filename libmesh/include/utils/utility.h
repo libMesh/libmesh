@@ -1,4 +1,4 @@
-// $Id: utility.h,v 1.8 2004-11-13 04:12:06 benkirk Exp $
+// $Id: utility.h,v 1.9 2005-01-28 21:29:49 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -24,6 +24,7 @@
 // System includes
 #include <string>
 #include <vector>
+#include <cmath>
 
 // Local includes
 #include "libmesh_common.h" // for Real

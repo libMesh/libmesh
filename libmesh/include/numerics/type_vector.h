@@ -1,4 +1,4 @@
-// $Id: type_vector.h,v 1.9 2005-01-19 15:18:34 roystgnr Exp $
+// $Id: type_vector.h,v 1.10 2005-01-28 21:29:48 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -23,7 +23,7 @@
 #define __type_vector_h__
 
 // C++ includes
-#include <math.h>
+#include <cmath>
 #include <iostream>
 
 // Local includes
@@ -616,7 +616,7 @@ template <typename T>
 inline
 Real TypeVector<T>::size() const
 {
-  return sqrt(this->size_sq());  
+  return std::sqrt(this->size_sq());  
 }
 
 
@@ -671,20 +671,20 @@ inline
 bool TypeVector<Real>::operator == (const TypeVector<Real>& rhs) const
 {
 #if DIM == 1
-  return (fabs(_coords[0] - rhs._coords[0])
+  return (std::abs(_coords[0] - rhs._coords[0])
 	  < TOLERANCE);
 #endif
   
 #if DIM == 2
-  return ((fabs(_coords[0] - rhs._coords[0]) +
-	   fabs(_coords[1] - rhs._coords[1]))
+  return ((std::abs(_coords[0] - rhs._coords[0]) +
+	   std::abs(_coords[1] - rhs._coords[1]))
 	  < 2.*TOLERANCE);
 #endif
   
 #if DIM == 3
-  return ((fabs(_coords[0] - rhs._coords[0]) +
-	   fabs(_coords[1] - rhs._coords[1]) +
-	   fabs(_coords[2] - rhs._coords[2]))
+  return ((std::abs(_coords[0] - rhs._coords[0]) +
+	   std::abs(_coords[1] - rhs._coords[1]) +
+	   std::abs(_coords[2] - rhs._coords[2]))
 	  < 3.*TOLERANCE);
 #endif
   

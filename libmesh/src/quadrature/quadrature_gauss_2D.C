@@ -1,4 +1,4 @@
-// $Id: quadrature_gauss_2D.C,v 1.17 2004-12-01 02:37:02 roystgnr Exp $
+// $Id: quadrature_gauss_2D.C,v 1.18 2005-01-28 21:29:51 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -127,9 +127,9 @@ void QGauss::init_2D(const ElemType _type)
 	      _points.resize(7);
 	      _weights.resize(7);
 		  
-	      const Real b1 = 2./7. + sqrt(15.)/21.;
+	      const Real b1 = 2./7. + std::sqrt(15.)/21.;
 	      const Real a1 = 1. - 2.*b1;
-	      const Real b2 = 2./7. - sqrt(15.)/21.;
+	      const Real b2 = 2./7. - std::sqrt(15.)/21.;
 	      const Real a2 = 1. - 2.*b2;
 		  
 	      _points[0](0) = 1./3.;
@@ -155,10 +155,10 @@ void QGauss::init_2D(const ElemType _type)
 
 
 	      _weights[0] = 9./80.;
-	      _weights[1] = 31./480. + sqrt(15.)/2400.;
+	      _weights[1] = 31./480. + std::sqrt(15.)/2400.;
 	      _weights[2] = _weights[1];
 	      _weights[3] = _weights[1];
-	      _weights[4] = 31./480. - sqrt(15.)/2400.;
+	      _weights[4] = 31./480. - std::sqrt(15.)/2400.;
 	      _weights[5] = _weights[4];
 	      _weights[6] = _weights[4];
 

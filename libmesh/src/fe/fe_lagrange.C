@@ -1,4 +1,4 @@
-// $Id: fe_lagrange.C,v 1.18 2005-01-19 16:49:49 benkirk Exp $
+// $Id: fe_lagrange.C,v 1.19 2005-01-28 21:29:49 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -618,8 +618,8 @@ void FE<Dim,T>::compute_constraints (std::map<unsigned int,
 		  
 		  // Only add non-zero and non-identity values
 		  // for Lagrange basis functions.
-		  if ((fabs(their_dof_value) > 1.e-5) &&
-		      (fabs(their_dof_value) < .999)) 
+		  if ((std::abs(their_dof_value) > 1.e-5) &&
+		      (std::abs(their_dof_value) < .999)) 
 		    {
 		      // A reference to the constraint row.
 		      std::map<unsigned int, float>& constraint_row = constraints[my_dof_g];

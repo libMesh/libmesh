@@ -1,4 +1,4 @@
-// $Id: point.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: point.h,v 1.3 2005-01-28 21:29:48 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -23,7 +23,7 @@
 #define __point_h__
 
 // C++ includes
-#include <math.h>
+#include <cmath>
 
 // Local includes
 #include "type_vector.h"

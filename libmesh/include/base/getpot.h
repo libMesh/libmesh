@@ -1,4 +1,4 @@
-// $Id: getpot.h,v 1.7 2004-12-03 22:34:10 benkirk Exp $
+// $Id: getpot.h,v 1.8 2005-01-28 21:29:44 benkirk Exp $
 //
 // (with patches from Michael Anderson for more general variable types)
 
@@ -34,16 +34,14 @@
 
 #define GETPOT_ALLOW_VARGS
 
-extern "C" {
-#include <ctype.h> 
-#include <stdio.h>
-#include <string.h>
+#include <cctype> 
+#include <cstdio>
+#include <cstring>
 
 #ifdef GETPOT_ALLOW_VARGS
-#  include <stdarg.h>
+#  include <cstdarg>
 #endif
 
-}
 
 #include <math.h>
 #include <iostream>
