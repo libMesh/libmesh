@@ -1,4 +1,4 @@
-// $Id: ex5.C,v 1.13 2003-02-24 22:03:48 benkirk Exp $
+// $Id: ex5.C,v 1.14 2003-02-26 11:34:34 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -116,7 +116,7 @@ int main (int argc, char** argv)
      * Check for proper usage.  The quadrature rule
      * must be given at run time.
      */
-    if (argc != 3)
+    if (argc < 3)
       {
 	std::cerr << "Usage: " << argv[0] << " -q n"
 		  << std::endl;
