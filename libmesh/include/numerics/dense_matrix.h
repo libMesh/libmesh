@@ -1,4 +1,4 @@
-// $Id: dense_matrix.h,v 1.6 2004-03-01 09:26:25 spetersen Exp $
+// $Id: dense_matrix.h,v 1.7 2004-03-05 21:07:00 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -30,7 +30,6 @@
 #include "libmesh_common.h"
 #include "dense_vector.h"
 #include "dense_matrix_base.h"
-
 
 // Forward Declarations (for friends)
 
