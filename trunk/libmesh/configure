@@ -2930,7 +2930,7 @@ echo "$as_me: error: Unrecognized compiler" >&2;}
           CXXFLAGSO="-Kc++eh -Krtti -O2 -DNDEBUG -unroll -w0"
           CXXFLAGSP="$CXXFLAGSO -g -pg"
           CFLAGSG="-w1 -DDEBUG -inline_debug_info -wd266"
-          CFLAGSO="-O2 -DNDEBUG -axiMK -unroll -w0"
+          CFLAGSO="-O2 -DNDEBUG -unroll -w0"
           CFLAGSP="$CFLAGSO -g -pg"
 
                     if test "$enableshared" = yes ; then
