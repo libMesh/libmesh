@@ -1,4 +1,4 @@
-// $Id: cell_tet4.h,v 1.13 2003-05-22 21:18:02 benkirk Exp $
+// $Id: cell_tet4.h,v 1.14 2003-08-07 19:25:31 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -94,6 +94,11 @@ public:
   
   unsigned int vtk_element_type (const unsigned int) const
   { return 10; }
+
+  /**
+   * @returns \p TET10
+   */
+  ElemType second_order_equivalent_type () const { return TET10; }
   
  
 protected:

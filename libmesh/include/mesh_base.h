@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.36 2003-07-26 00:17:00 ddreyer Exp $
+// $Id: mesh_base.h,v 1.37 2003-08-07 19:25:31 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -64,7 +64,7 @@ template <typename T> class PetscMatrix;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.36 $
+ * \version $Revision: 1.37 $
  */
 
 
@@ -331,6 +331,14 @@ public:
    * and \p QUAD9s will be converted to \p TRI6s. 
    */
   void all_tri ();
+  
+  /**
+   * Converts a (conforming, non-refined) mesh with linear 
+   * elements into a mesh with second-order elements.  For 
+   * example, a mesh consisting of \p Tet4 will be converted
+   * to a mesh with \p Tet10 etc.
+   */
+  void all_second_order ();
   
 //   /**
 //    * Partition the mesh into \p n_sbdmns subdomians. Currently this routine

@@ -1,4 +1,4 @@
-// $Id: face_inf_quad4.h,v 1.15 2003-05-22 21:18:02 benkirk Exp $
+// $Id: face_inf_quad4.h,v 1.16 2003-08-07 19:25:31 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -101,6 +101,11 @@ public:
    * expensive computations.
    */
   bool contains_point (const Point& p) const;
+
+  /**
+   * @returns \p INFQUAD6
+   */
+  ElemType second_order_equivalent_type () const {return INFQUAD6; }
 
   
 protected:

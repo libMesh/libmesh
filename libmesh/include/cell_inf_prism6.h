@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism6.h,v 1.15 2003-05-22 21:18:02 benkirk Exp $
+// $Id: cell_inf_prism6.h,v 1.16 2003-08-07 19:25:30 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -109,6 +109,11 @@ public:
    * about the envelope can be helpful.
    */
   bool contains_point (const Point& p) const;
+
+  /**
+   * @returns \p INFPRISM12
+   */
+  ElemType second_order_equivalent_type () const { return INFPRISM12; }
   
   
 protected:

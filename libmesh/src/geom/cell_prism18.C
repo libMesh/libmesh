@@ -1,4 +1,4 @@
-// $Id: cell_prism18.C,v 1.4 2003-02-27 00:55:29 benkirk Exp $
+// $Id: cell_prism18.C,v 1.5 2003-08-07 19:25:31 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -381,6 +381,71 @@ void Prism18::vtk_connectivity(const unsigned int sc,
       error();
     }
 }
+
+
+
+
+unsigned int Prism18::n_second_order_adjacent_vertices (const unsigned int n) const
+{
+  switch (n)
+    {
+      case 6:
+      case 7:
+      case 8:
+      case 9:
+      case 10:
+      case 11:
+      case 12:
+      case 13:
+      case 14:
+	return 2;
+
+      case 15:
+      case 16:
+      case 17:
+	return 4;
+
+      default:
+	error();
+    }
+}
+
+
+
+
+
+unsigned int Prism18::second_order_adjacent_vertex (const unsigned int n,
+						    const unsigned int v) const
+{ 
+  assert (n >= this->n_vertices());
+  assert (n <  this->n_nodes());
+  return _second_order_adjacent_vertices[n-this->n_vertices()][v]; 
+}
+
+
+
+const unsigned int Prism18::_second_order_adjacent_vertices[12][4] = 
+{
+  { 0,  1, 42, 42}, // vertices adjacent to node 6 
+  { 1,  2, 42, 42}, // vertices adjacent to node 7 
+  { 0,  2, 42, 42}, // vertices adjacent to node 8 
+
+  { 0,  3, 42, 42}, // vertices adjacent to node 9 
+  { 1,  4, 42, 42}, // vertices adjacent to node 10 
+  { 2,  5, 42, 42}, // vertices adjacent to node 11
+
+  { 3,  4, 42, 42}, // vertices adjacent to node 12
+  { 4,  5, 42, 42}, // vertices adjacent to node 13
+  { 3,  5, 42, 42}, // vertices adjacent to node 14
+
+  { 0,  1,  3,  4}, // vertices adjacent to node 15
+  { 1,  2,  4,  5}, // vertices adjacent to node 16
+  { 0,  2,  3,  5}  // vertices adjacent to node 17
+};
+
+
+
+
 
 
 

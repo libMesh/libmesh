@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism12.C,v 1.16 2003-07-12 16:33:18 ddreyer Exp $
+// $Id: cell_inf_prism12.C,v 1.17 2003-08-07 19:25:31 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -181,6 +181,32 @@ const std::vector<unsigned int> InfPrism12::tecplot_connectivity(const unsigned 
   error();
   return conn;
 }
+
+
+
+
+
+unsigned int InfPrism12::second_order_adjacent_vertex (const unsigned int n,
+						       const unsigned int v) const
+{ 
+  assert (n >= this->n_vertices());
+  assert (n <  this->n_nodes());
+  return _second_order_adjacent_vertices[n-this->n_vertices()][v]; 
+}
+
+
+
+const unsigned int InfPrism12::_second_order_adjacent_vertices[6][2] = 
+{
+  { 0,  1}, // vertices adjacent to node 6 
+  { 1,  2}, // vertices adjacent to node 7 
+  { 0,  2}, // vertices adjacent to node 8 
+
+  { 3,  4}, // vertices adjacent to node 9 
+  { 4,  5}, // vertices adjacent to node 10 
+  { 3,  5}  // vertices adjacent to node 11
+};
+
 
 
 
