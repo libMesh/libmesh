@@ -1,4 +1,4 @@
-// $Id: face_inf_quad6.C,v 1.11 2003-02-26 04:43:14 jwpeterson Exp $
+// $Id: face_inf_quad6.C,v 1.12 2003-02-27 00:55:30 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -38,7 +38,7 @@
 // InfQuad6 class static member initialization
 #ifdef ENABLE_AMR
 
-const float  InfQuad6::embedding_matrix[2][6][6] =
+const float InfQuad6::_embedding_matrix[2][6][6] =
 {
   // embedding matrix for child 0
   {
@@ -65,7 +65,7 @@ const float  InfQuad6::embedding_matrix[2][6][6] =
 
 
 
-const unsigned int InfQuad6::side_children_matrix[4][3] =
+const unsigned int InfQuad6::_side_children_matrix[4][3] =
 {
   // note different storage scheme
   {2,   0, 1}, // 2 side-0 children
@@ -209,8 +209,8 @@ void InfQuad6::refine(Mesh& mesh)
     for (unsigned int c=0; c<this->n_children(); c++)
       for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
 	for (unsigned int n=0; n<this->n_nodes(); n++)
-	  if (embedding_matrix[c][nc][n] != 0.)
-	    p[c][nc].add_scaled (this->point(n), static_cast<Real>(embedding_matrix[c][nc][n]));
+	  if (_embedding_matrix[c][nc][n] != 0.)
+	    p[c][nc].add_scaled (this->point(n), static_cast<Real>(_embedding_matrix[c][nc][n]));
     
     
     // assign nodes to children & add them to the mesh
@@ -233,8 +233,8 @@ void InfQuad6::refine(Mesh& mesh)
 	  const short int id = mesh.boundary_info.boundary_id(this, s);
 	
 	  if (id != mesh.boundary_info.invalid_id)
-	    for (unsigned int sc=0; sc <2; sc++)
-	      mesh.boundary_info.add_side(this->child(side_children_matrix[s][sc]), s, id);
+	    for (unsigned int sc=0; sc < 2; sc++)
+	      mesh.boundary_info.add_side(this->child(_side_children_matrix[s][sc]), s, id);
 	}
   }
 
@@ -245,7 +245,7 @@ void InfQuad6::refine(Mesh& mesh)
 
 
 
-#endif
-
-
 #endif // #ifdef ENABLE_AMR
+
+
+#endif // #ifdef ENABLE_INFINITE_ELEMENTS

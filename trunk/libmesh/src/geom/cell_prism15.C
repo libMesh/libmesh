@@ -1,4 +1,4 @@
-// $Id: cell_prism15.C,v 1.2 2003-02-26 04:43:14 jwpeterson Exp $
+// $Id: cell_prism15.C,v 1.3 2003-02-27 00:55:29 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -21,7 +21,6 @@
 // C++ includes
 
 // Local includes
-#include "mesh.h"
 #include "cell_prism15.h"
 #include "face_quad8.h"
 #include "face_tri6.h"
@@ -144,11 +143,8 @@ const std::vector<unsigned int> Prism15::tecplot_connectivity(const unsigned int
 
 
 
-
-
-
 void Prism15::vtk_connectivity(const unsigned int sc,
-			      std::vector<unsigned int> *conn) const
+			       std::vector<unsigned int> *conn) const
 {
   assert (_nodes != NULL);
   assert (sc < this->n_sub_elem());
@@ -167,184 +163,3 @@ void Prism15::vtk_connectivity(const unsigned int sc,
 
   return;
 }
-
-
-
-#ifdef ENABLE_AMR
-
-/*
-
-const float  Prism15::embedding_matrix[8][6][6] =
-{
-  // embedding matrix for child 0
-  {
-    //  0     1     2     3     4     5
-    { 1.0,  0.0,  0.0,  0.0,  0.0,  0.0}, // 0
-    { 0.5,  0.5,  0.0,  0.0,  0.0,  0.0}, // 1
-    { 0.5,  0.0,  0.5,  0.0,  0.0,  0.0}, // 2
-    { 0.5,  0.0,  0.0,  0.5,  0.0,  0.0}, // 3
-    { .25,  .25,  0.0,  .25,  .25,  0.0}, // 4
-    { .25,  0.0,  .25,  .25,  0.0,  .25}  // 5
-  },
-
-  // embedding matrix for child 1
-  {
-    //  0     1     2     3     4     5
-    { 0.5,  0.5,  0.0,  0.0,  0.0,  0.0}, // 0
-    { 0.0,  1.0,  0.0,  0.0,  0.0,  0.0}, // 1
-    { 0.0,  0.5,  0.5,  0.0,  0.0,  0.0}, // 2
-    { .25,  .25,  0.0,  .25,  .25,  0.0}, // 3
-    { 0.0,  0.5,  0.0,  0.0,  0.5,  0.0}, // 4
-    { 0.0,  .25,  .25,  0.0,  .25,  .25}  // 5
-  },
-
-  // embedding matrix for child 2
-  {
-    //  0     1     2     3     4     5
-    { 0.5,  0.0,  0.5,  0.0,  0.0,  0.0}, // 0
-    { 0.0,  0.5,  0.5,  0.0,  0.0,  0.0}, // 1
-    { 0.0,  0.0,  1.0,  0.0,  0.0,  0.0}, // 2
-    { .25,  0.0,  .25,  .25,  0.0,  .25}, // 3
-    { 0.0,  .25,  .25,  0.0,  .25,  .25}, // 4
-    { 0.0,  0.0,  0.5,  0.0,  0.0,  0.5}  // 5
-  },
-
-  // embedding matrix for child 3
-  {
-    //  0     1     2     3     4     5
-    { 0.5,  0.5,  0.0,  0.0,  0.0,  0.0}, // 0
-    { 0.0,  0.5,  0.5,  0.0,  0.0,  0.0}, // 1
-    { 0.5,  0.0,  0.5,  0.0,  0.0,  0.0}, // 2
-    { .25,  .25,  0.0,  .25,  .25,  0.0}, // 3
-    { 0.0,  .25,  .25,  0.0,  .25,  .25}, // 4
-    { .25,  0.0,  .25,  .25,  0.0,  .25}  // 5
-  },
-
-  // embedding matrix for child 4
-  {
-    //  0     1     2     3     4     5
-    { 0.5,  0.0,  0.0,  0.5,  0.0,  0.0}, // 0
-    { .25,  .25,  0.0,  .25,  .25,  0.0}, // 1
-    { .25,  0.0,  .25,  .25,  0.0,  .25}, // 2
-    { 0.0,  0.0,  0.0,  1.0,  0.0,  0.0}, // 3
-    { 0.0,  0.0,  0.0,  0.5,  0.5,  0.0}, // 4
-    { 0.0,  0.0,  0.0,  0.5,  0.0,  0.5}  // 5
-  },
-
-  // embedding matrix for child 5
-  {
-    //  0     1     2     3     4     5
-    { .25,  .25,  0.0,  .25,  .25,  0.0}, // 0
-    { 0.0,  0.5,  0.0,  0.0,  0.5,  0.0}, // 1
-    { 0.0,  .25,  .25,  0.0,  .25,  .25}, // 2
-    { 0.0,  0.0,  0.0,  0.5,  0.5,  0.0}, // 3
-    { 0.0,  0.0,  0.0,  0.0,  1.0,  0.0}, // 4
-    { 0.0,  0.0,  0.0,  0.0,  0.5,  0.5}  // 5
-  },
-
-  // embedding matrix for child 6
-  {
-    //  0     1     2     3     4     5
-    { .25,  0.0,  .25,  .25,  0.0,  .25}, // 0
-    { 0.0,  .25,  .25,  0.0,  .25,  .25}, // 1
-    { 0.0,  0.0,  0.5,  0.0,  0.0,  0.5}, // 2
-    { 0.0,  0.0,  0.0,  0.5,  0.0,  0.5}, // 3
-    { 0.0,  0.0,  0.0,  0.0,  0.5,  0.5}, // 4
-    { 0.0,  0.0,  0.0,  0.0,  0.0,  1.0}  // 5
-  },
-
-  // embedding matrix for child 7
-  {
-    //  0     1     2     3     4     5
-    { .25,  .25,  0.0,  .25,  .25,  0.0}, // 0
-    { 0.0,  .25,  .25,  0.0,  .25,  .25}, // 1
-    { .25,  0.0,  .25,  .25,  0.0,  .25}, // 2
-    { 0.0,  0.0,  0.0,  0.5,  0.5,  0.0}, // 3
-    { 0.0,  0.0,  0.0,  0.0,  0.5,  0.5}, // 4
-    { 0.0,  0.0,  0.0,  0.5,  0.0,  0.5}  // 5
-  }
-};
-
-*/
-
-
-const unsigned int Prism15::side_children_matrix[5][4] =
-{
-  {0, 1, 2, 3}, // side-0 children
-  {0, 1, 4, 5}, // side-1 children
-  {1, 2, 5, 6}, // side-2 children
-  {0, 2, 4, 6}, // side-3 children
-  {4, 5, 6, 7}  // side-4 children
-};
-
-
-
-void Prism15::refine(Mesh&)
-{
-  /*
-  assert (this->refinement_flag() == Elem::REFINE);
-  assert (this->active());
-  assert (_children == NULL);
-
-  // Create my children
-  {
-    _children = new Elem*[this->n_children()];
-
-    for (unsigned int c=0; c<this->n_children(); c++)
-      {
-	_children[c] = new Prism1(this);
-	_children[c]->set_refinement_flag() = Elem::JUST_REFINED;
-      }
-  }
-
-
-  // Compute new nodal locations
-  // and asssign nodes to children
-  {
-    std::vector<std::vector<Point> >  p(this->n_children());
-    
-    for (unsigned int c=0; c<this->n_children(); c++)
-      p[c].resize(this->child(c)->n_nodes());
-    
-
-    // compute new nodal locations
-    for (unsigned int c=0; c<this->n_children(); c++)
-      for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
-	for (unsigned int n=0; n<this->n_nodes(); n++)
-	  if (embedding_matrix[c][nc][n] != 0.)
-	    p[c][nc].add_scaled (this->point(n), static_cast<Real>(embedding_matrix[c][nc][n]));
-    
-    
-    // assign nodes to children & add them to the mesh
-    for (unsigned int c=0; c<this->n_children(); c++)
-      {
-	for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
-	  _children[c]->set_node(nc) = mesh.mesh_refinement.add_point(p[c][nc]);
-
-	mesh.add_elem(this->child(c), mesh.mesh_refinement.new_element_number());
-      }
-  }
-
-
-  
-  // Possibly add boundary information
-  {
-    for (unsigned int s=0; s<this->n_sides(); s++)
-      if (this->neighbor(s) == NULL)
-	{
-	  const short int id = mesh.boundary_info.boundary_id(this, s);
-	
-	  if (id != mesh.boundary_info.invalid_id)
-	    for (unsigned int sc=0; sc <4; sc++)
-	      mesh.boundary_info.add_side(this->child(side_children_matrix[s][sc]), s, id);
-	}
-  }
-
-
-  // Un-set my refinement flag now
-  this->set_refinement_flag() = Elem::DO_NOTHING;
-  */
-}
-
-
-#endif

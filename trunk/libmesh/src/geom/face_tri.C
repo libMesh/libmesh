@@ -1,4 +1,4 @@
-// $Id: face_tri.C,v 1.9 2003-02-26 04:43:14 jwpeterson Exp $
+// $Id: face_tri.C,v 1.10 2003-02-27 00:55:30 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -135,3 +135,14 @@ std::pair<Real, Real> Tri::qual_bounds (const ElemQuality q) const
 }
 
 
+
+#ifdef ENABLE_AMR
+
+const unsigned int Tri::_side_children_matrix[3][2] =
+{
+  {0, 1}, // side-0 children
+  {1, 2}, // side-1 children
+  {0, 2}  // side-2 children
+};
+
+#endif

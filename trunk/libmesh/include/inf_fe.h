@@ -1,4 +1,4 @@
-// $Id: inf_fe.h,v 1.20 2003-02-27 00:15:12 ddreyer Exp $
+// $Id: inf_fe.h,v 1.21 2003-02-27 00:55:28 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -95,7 +95,7 @@ class Elem;
  *
  * \author Daniel Dreyer
  * \date 2003
- * \version $Revision: 1.20 $
+ * \version $Revision: 1.21 $
  */
 
 //-------------------------------------------------------------
@@ -118,7 +118,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.20 $
+   * \version $Revision: 1.21 $
    */
   //-------------------------------------------------------------
   // InfFE::Radial class definition
@@ -135,7 +135,7 @@ protected:
      * @returns the decay in radial direction of
      * the \p Dim dimensional infinite element.
      */
-    static Real decay(const Real v);
+    static Real decay(const Real v) { return (1.-v)/2.; }
 
     /**
      * @returns the first (local) derivative of the
@@ -188,13 +188,15 @@ protected:
      * Either way, if the modes are stored as nodal dofs (\p n_dofs_at_node) 
      * or as element dofs (\p n_dofs_per_elem), in each case we have the
      * same number of modes in radial direction. Note that for the case of 1D
-     * infinite elements, in the base the dof-per-node scheme is used.
+     * infinite elements, in the base the dof-per-node scheme is used, 
+     * as defined in \p FE<0,T>.
      * 
      * From the formulation of the infinite elements, we have
      * 1 mode, when \p o_radial=CONST.
      * Therefore, we have a total of \p o_radial+1 modes in radial direction.
      */
-    static unsigned int n_dofs(const Order o_radial)
+    static unsigned int n_dofs(const ElemType /* t */,
+			       const Order o_radial)
 	{ return static_cast<unsigned int>(o_radial)+1; }
 
     /**
@@ -206,7 +208,8 @@ protected:
      * the base.  All higher radial modes are associated with
      * the physically existing nodes further out.
      */
-    static unsigned int n_dofs_at_node(const Order o_radial,
+    static unsigned int n_dofs_at_node(const ElemType /* inf_elem_type */,
+				       const Order o_radial,
 				       const unsigned int n_onion);
 
     /**
@@ -216,7 +219,8 @@ protected:
      * we have no special formulation for coupling in the base, like in the 
      * case of associating (possibly) multiple dofs per (outer) node.
      */
-    static unsigned int n_dofs_per_elem(const Order o_radial)
+    static unsigned int n_dofs_per_elem(const ElemType /* inf_elem */,
+					const Order    o_radial)
 	{ return static_cast<unsigned int>(o_radial)+1; }
 				       
     /**
@@ -243,7 +247,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.20 $
+   * \version $Revision: 1.21 $
    */
   //-------------------------------------------------------------
   // InfFE::Base class definition
@@ -492,6 +496,8 @@ protected:
 
 
 
+//protected:
+
   //-------------------------------------------------------------
   // Non-static members used by the "work-horses"
   /**
@@ -507,12 +513,6 @@ protected:
 				 const Elem*)
   { error(); }
 
-  /**
-   * Some of the member data only depend on the radial part of the
-   * infinite element.  The parts that only change when the radial
-   * order changes, are initialized here.  
-   */
-  void init_radial_shape_functions(const Elem* inf_elem);
 
 
   //-------------------------------------------------------------
@@ -520,8 +520,10 @@ protected:
   /** 
    * Initialize all the data fields like \p weight, \p mode, 
    * \p phi, \p dphidxi, \p dphideta, \p dphidzeta, etc.
-   * for the current element.  This method prepares the data
-   * related to the base part, and some of the combined fields.
+   * for the current element.  Of these data fields, only
+   * the ones that are independent of base approximation
+   * are evaluated.  For constant radial \p order in the mesh, 
+   * this method only has to be called once.
    */
   void init_shape_functions(const Elem* inf_elem);
 
@@ -533,15 +535,18 @@ protected:
 			    const Elem* e,
 			    const unsigned int s);
 
-  /** 
-   * Combines the shape functions, which were formed in
-   * \p init_shape_functions(Elem*), with geometric data.
-   * Has to be called every time the geometric configuration
-   * changes.  Afterwards, the fields are ready to be used
-   * to compute global derivatives, the jacobian etc, see
-   * \p FEBase::compute_map().
+  /**
+   * Calculates the radial distances from the origin
+   * to the base nodes.
    */
-  void combine_base_radial(const Elem* inf_elem);
+  void compute_dist(const Elem* inf_elem);
+
+  /** 
+   * Combines the base approximation, mapping etc. with
+   * the radial counterparts.  Has to be used every time
+   * the base approximation changes (so rather often).
+   */
+  void combine_base_radial();
 
   /** 
    * After having updated the jacobian and the transformation
@@ -671,6 +676,11 @@ protected:
   // some protected members
 
   /**
+   * The Number of base shape functions used to construct the map.
+   */
+  unsigned int n_base_mapping_shape_functions;
+
+  /**
    * The number of total approximation shape functions for 
    * the current configuration
    */
@@ -681,12 +691,6 @@ protected:
    * for the current configuration
    */
   unsigned int _n_total_qp;
-
-  /**
-   * this vector contains the combined integration weights, so
-   * that \p FEBase::compute_map() can still be used
-   */
-  std::vector<Real>  _total_qrule_weights;
 
   /**
    * The quadrature rule for the base element associated 
@@ -705,6 +709,7 @@ protected:
    * current infinite element
    */
   Elem* base_elem;
+//  AutoPtr<Elem> base_elem;
 
   /**
    * Have a \p FE<Dim-1,T_base> handy for base approximation.
@@ -748,32 +753,32 @@ private:
 // ------------------------------------------------------------
 // InfFE::Radial class inline members
 
-template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-inline
-Real InfFE<Dim,T_radial,T_map>::Radial::decay(const Real v)
-{
+/*
+  template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
+  inline
+  Real InfFE<Dim,T_radial,T_map>::Radial::decay(const Real v)
+  {
   switch (Dim)
   //TODO:[DD] What decay do i have in 2D and 1D?
   {
-    case 3:
-      return (1.-v)/2.;
-
-    case 2:
-      return 0.;
-
-    case 1:
-      return 0.;
-
-    default:
-      error();
-      return 0.;
+  case 3:
+   return (1.-v)/2.;
+  case 2:
+   return 0.;
+  case 1:
+   return 0.;
+  default:
+   error();
+  return 0.;
+   }
   }
-}
+*/
 
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 inline
-unsigned int InfFE<Dim,T_radial,T_map>::Radial::n_dofs_at_node(const Order o_radial,
+unsigned int InfFE<Dim,T_radial,T_map>::Radial::n_dofs_at_node(const ElemType,
+							       const Order o_radial,
 							       const unsigned int n_onion)
 {
   assert (n_onion < 2);

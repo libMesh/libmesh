@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.14 2003-02-13 22:56:07 benkirk Exp $
+// $Id: elem.h,v 1.15 2003-02-27 00:55:28 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -281,6 +281,12 @@ class Elem : public ReferenceCountedObject<Elem>,
   virtual unsigned int n_children() const = 0;
 
   /**
+   * @returns the number of children this element has that
+   * share side \p s
+   */
+  virtual unsigned int n_children_per_side(const unsigned int) const = 0;
+  
+  /**
    * @returns the number of sub-elements this element may be broken
    * down into for visualization purposes.  For example, this returns
    * 1 for a linear triangle, 4 for a quadratic (6-noded) triangle, etc...
@@ -426,7 +432,7 @@ class Elem : public ReferenceCountedObject<Elem>,
   /**
    * Refine the element.
    */
-  virtual void refine (Mesh&) = 0;
+  virtual void refine (Mesh& mesh);
   
   /**
    * Coarsen the element.  This is not
@@ -469,6 +475,24 @@ class Elem : public ReferenceCountedObject<Elem>,
    * so it is protected.
    */
   static Elem* build (const ElemType type);
+
+#ifdef ENABLE_AMR
+  
+  /**
+   * Matrix that transforms the parents nodes into the children's
+   * nodes
+   */
+  virtual Real embedding_matrix (const unsigned int i,
+				 const unsigned int j,
+				 const unsigned int k) const = 0;
+
+  /**
+   * Matrix that allows children to inherit boundary conditions.
+   */
+  virtual unsigned int side_children_matrix (const unsigned int i,
+					     const unsigned int j) const = 0;
+
+#endif
   
   /**
    * Pointers to the nodes we are conneted to.
@@ -674,6 +698,23 @@ bool Elem::active() const
   return true;
   
 #endif
+}
+
+
+
+inline
+unsigned int Elem::level() const
+{
+  // if I don't have a parent I was
+  // created directly from file
+  // or by the user, so I am a
+  // level-0 element
+  if (parent() == NULL)
+    return 0;
+
+  // otherwise we are at a level one
+  // higher than our parent
+  return (parent()->level() + 1);
 }
 
 

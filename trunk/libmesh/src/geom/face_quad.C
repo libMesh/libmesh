@@ -1,4 +1,4 @@
-// $Id: face_quad.C,v 1.9 2003-02-26 04:43:14 jwpeterson Exp $
+// $Id: face_quad.C,v 1.10 2003-02-27 00:55:30 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -163,3 +163,16 @@ std::pair<Real, Real> Quad::qual_bounds (const ElemQuality q) const
   return bounds;
 }
 
+
+
+#ifdef ENABLE_AMR
+
+const unsigned int Quad::_side_children_matrix[4][2] =
+{
+  {0, 1}, // side-0 children
+  {1, 3}, // side-1 children
+  {2, 3}, // side-2 children
+  {0, 2}  // side-3 children
+};
+
+#endif

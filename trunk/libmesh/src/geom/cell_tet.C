@@ -1,4 +1,4 @@
-// $Id: cell_tet.C,v 1.9 2003-02-26 04:43:14 jwpeterson Exp $
+// $Id: cell_tet.C,v 1.10 2003-02-27 00:55:30 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -21,7 +21,6 @@
 // C++ includes
 
 // Local includes
-#include "mesh.h"
 #include "cell_tet.h"
 #include "face_tri3.h"
 
@@ -134,3 +133,17 @@ std::pair<Real, Real> Tet::qual_bounds (const ElemQuality q) const
 
   return bounds;
 }
+
+
+
+#ifdef ENABLE_AMR
+
+const unsigned int Tet::_side_children_matrix[4][4] =
+{
+  {0, 1, 2, 5}, // side-0 children
+  {0, 1, 3, 4}, // side-1 children
+  {1, 2, 3, 6}, // side-2 children
+  {0, 2, 3, 7}  // side-3 children
+};
+
+#endif

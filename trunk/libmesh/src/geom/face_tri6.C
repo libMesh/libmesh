@@ -1,4 +1,4 @@
-// $Id: face_tri6.C,v 1.11 2003-02-26 04:43:14 jwpeterson Exp $
+// $Id: face_tri6.C,v 1.12 2003-02-27 00:55:30 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -20,10 +20,8 @@
 // C++ includes
 
 // Local includes
-#include "mesh_config.h"
 #include "edge_edge3.h"
 #include "face_tri6.h"
-#include "mesh.h"
 
 
 
@@ -32,7 +30,7 @@
 // Tri6 class static member initializations
 #ifdef ENABLE_AMR
 
-const float  Tri6::embedding_matrix[4][6][6] =
+const float Tri6::_embedding_matrix[4][6][6] =
 {
   // embedding matrix for child 0
   {
@@ -77,15 +75,6 @@ const float  Tri6::embedding_matrix[4][6][6] =
     {-.125, -.125,   0.0, .25, 0.5, 0.5}, // 4
     {  0.0, -.125, -.125, 0.5, .25, 0.5}  // 5
   }
-};
-
-
-
-const unsigned int Tri6::side_children_matrix[3][2] =
-{
-  {0, 1}, // side-0 children
-  {1, 2}, // side-1 children
-  {0, 2}  // side-2 children
 };
 
 #endif
@@ -250,78 +239,6 @@ void Tri6::vtk_connectivity(const unsigned int sf,
   
   return;
 }
-
-
-
-#ifdef ENABLE_AMR
-
-void Tri6::refine(Mesh& mesh)
-{
-  assert (this->refinement_flag() == Elem::REFINE);
-  assert (this->active());
-  assert (_children == NULL);
-
-  // Create my children
-  {
-    _children = new Elem*[this->n_children()];
-
-    for (unsigned int c=0; c<this->n_children(); c++)
-      {
-	_children[c] = Elem::build (this->type());
-	_children[c]->set_refinement_flag() = Elem::JUST_REFINED;
-      }
-  }
-
-  // Compute new nodal locations
-  // and asssign nodes to children
-  {
-    std::vector<std::vector<Point> >  p(this->n_children());
-    
-    for (unsigned int c=0; c<this->n_children(); c++)
-      p[c].resize(this->child(c)->n_nodes());
-    
-
-    // compute new nodal locations
-    for (unsigned int c=0; c<this->n_children(); c++)
-      for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
-	for (unsigned int n=0; n<this->n_nodes(); n++)
-	  if (embedding_matrix[c][nc][n] != 0.)
-	    p[c][nc].add_scaled (this->point(n), static_cast<Real>(embedding_matrix[c][nc][n]));
-    
-    
-    // Assign nodes to children & add them to the mesh
-    for (unsigned int c=0; c<this->n_children(); c++)
-      {
-	for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
-	  _children[c]->set_node(nc) = mesh.mesh_refinement.add_point(p[c][nc]);
-
-	mesh.add_elem(this->child(c), mesh.mesh_refinement.new_element_number());
-      }
-  }
-
-
-  
-  // Possibly add boundary information
-  {
-    for (unsigned int s=0; s<this->n_sides(); s++)
-      if (this->neighbor(s) == NULL)
-	{
-	  const short int id = mesh.boundary_info.boundary_id(this, s);
-	
-	  if (id != mesh.boundary_info.invalid_id)
-	    for (unsigned int sc=0; sc <2; sc++)
-	      mesh.boundary_info.add_side(this->child(side_children_matrix[s][sc]), s, id);
-	}
-  }
-
-  
-  // Un-set my refinement flag now
-  this->set_refinement_flag() = Elem::DO_NOTHING;
-}
-
-
-
-#endif
 
 
 

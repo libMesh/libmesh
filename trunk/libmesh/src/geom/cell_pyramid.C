@@ -1,4 +1,4 @@
-// $Id: cell_pyramid.C,v 1.8 2003-02-26 04:43:14 jwpeterson Exp $
+// $Id: cell_pyramid.C,v 1.9 2003-02-27 00:55:30 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -21,7 +21,6 @@
 // C++ includes
 
 // Local includes
-#include "mesh.h"
 #include "cell_pyramid.h"
 #include "face_tri3.h"
 #include "face_quad4.h"
