@@ -47,6 +47,7 @@ Basic include files needed for overall functionality.
 <div class ="fragment">
 <pre>
         #include "libmesh.h"
+        #include "libmesh_logging.h"
         #include "mesh.h"
         #include "equation_systems.h"
         
@@ -85,7 +86,7 @@ Define Gauss quadrature rules.
 </pre>
 </div>
 <div class = "comment">
-Define useful datatypes for finite @e element
+Define useful datatypes for finite element
 matrix and vector components.
 </div>
 
@@ -123,7 +124,7 @@ indexing.
 </div>
 <div class = "comment">
 Function prototype.  This is the function that will assemble
-the mass, damping and stiffness matrices.  It will @e not
+the mass, damping and stiffness matrices.  It will <i>not</i>
 form an overall system matrix ready for solution.
 </div>
 
@@ -174,10 +175,8 @@ Initialize Petsc, like in example 2.
 </pre>
 </div>
 <div class = "comment">
-This example is designed for complex numbers.
-   
-
-<br><br></div>
+This example is designed for complex numbers.   
+</div>
 
 <div class ="fragment">
 <pre>
@@ -213,17 +212,7 @@ Check for proper usage.
         	std::cerr << "Usage: " << argv[0] << " -f [frequency]"
         		  << std::endl;
         	
-</pre>
-</div>
-<div class = "comment">
-This handy function will print the file name, line number,
-and then abort.  Currrently the library does not use C++
-exception handling.
-</div>
-
-<div class ="fragment">
-<pre>
-                error();
+        	error();
               }
             
 </pre>
@@ -258,7 +247,7 @@ may easily be changed, see example 4
 </pre>
 </div>
 <div class = "comment">
-Get the frequency from argv[2] as a @e float,
+Get the frequency from argv[2] as a <i>float</i>,
 currently, solve for 1/3rd, 2/3rd and 1/1th of the given frequency
 </div>
 
@@ -275,7 +264,8 @@ mesh discretization depends on frequency (badly guessed estimate...?)
 
 <div class ="fragment">
 <pre>
-            const unsigned int n_el_per_dim = static_cast&lt;unsigned int&gt;(frequency_in*30.);
+            const unsigned int n_el_per_dim =
+              static_cast<unsigned int>(frequency_in*40.);
             
 </pre>
 </div>
@@ -362,12 +352,12 @@ Use a handy reference to this system
 </div>
 <div class = "comment">
 Add the variable "p" to "Helmholtz".  "p"
-will be approximated using first-order approximation.
+will be approximated using second-order approximation.
 </div>
 
 <div class ="fragment">
 <pre>
-            f_system.add_variable("p", FIRST);
+            f_system.add_variable("p", SECOND);
             
 </pre>
 </div>
@@ -386,7 +376,7 @@ solve function has to be attached.
 </div>
 <div class = "comment">
 To enable the fast solution scheme, additional
-@e global matrices and one global vector, all appropriately sized,
+<i>global</i> matrices and one global vector, all appropriately sized,
 have to be added.  The system object takes care of the
 appropriate size, but the user should better fill explicitly
 the sparsity structure of the overall matrix, so that the
@@ -433,7 +423,7 @@ these may be overridden, as shown here.
 </pre>
 </div>
 <div class = "comment">
-Initialize the data structures for the equation system.  @e Always
+Initialize the data structures for the equation system.  <i>Always</i>
 prior to this, the frequencies have to be communicated to the system.
 </div>
 
@@ -473,7 +463,7 @@ the system only for specific frequencies.
 <div class = "comment">
 After solving the system, write the solution
 to a GMV-formatted plot file, for every frequency.  
-Now this is nice ;-) : we have the @e identical 
+Now this is nice ;-) : we have the <i>identical</i> 
 interface to the mesh write method as in the real-only 
 case, but we output the real and imaginary 
 part, and the magnitude, where the variable 
@@ -610,7 +600,7 @@ get the fluid density
 </div>
 <div class = "comment">
 In here, we will add the element matrices to the
-@e additional matrices "stiffness_mass", "damping",
+<i>additional</i> matrices "stiffness_mass", "damping",
 and the additional vector "rhs", not to the members 
 "matrix" and "rhs".  Therefore, get writable
 references to them
@@ -658,7 +648,7 @@ of as a pointer that will clean up after itself.
 </pre>
 </div>
 <div class = "comment">
-A 2nd order Gauss quadrature rule for numerical integration.
+A 5th order Gauss quadrature rule for numerical integration.
 </div>
 
 <div class ="fragment">
@@ -850,7 +840,7 @@ Now we will build the element matrix.  This involves
 a double loop to integrate the test funcions (i) against
 the trial functions (j).  Note the braces on the rhs
 of Ke(i,j): these are quite necessary to finally compute
-Real// (Point// Point) = Real, and not something else...
+Real*(Point*Point) = Real, and not something else...
 </div>
 
 <div class ="fragment">
@@ -858,10 +848,9 @@ Real// (Point// Point) = Real, and not something else...
                   for (unsigned int i=0; i&lt;phi.size(); i++)
         	    for (unsigned int j=0; j<phi.size(); j++)
         	      {
-        		Ke(i,j) += JxW[qp]//  (dphi[i][qp]// dphi[j][qp]);
-        		Me(i,j) += JxW[qp]//   phi[i][qp] // phi[j][qp];
+        		Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+        		Me(i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp]);
         	      }	  
-        
         	}
         
               STOP_LOG("stiffness & mass","assemble_helmholtz");
@@ -1215,10 +1204,8 @@ be fine, but the imaginary part cluttered with unwanted products.
 </pre>
 </div>
 <div class = "comment">
-The "matrix" and "rhs" are now ready for solution
-   
-
-<br><br></div>
+The "matrix" and "rhs" are now ready for solution   
+</div>
 
 <div class ="fragment">
 <pre>
@@ -1237,6 +1224,7 @@ The "matrix" and "rhs" are now ready for solution
   #include &lt;stdio.h&gt;
   
   #include <FONT COLOR="#BC8F8F"><B>&quot;libmesh.h&quot;</FONT></B>
+  #include <FONT COLOR="#BC8F8F"><B>&quot;libmesh_logging.h&quot;</FONT></B>
   #include <FONT COLOR="#BC8F8F"><B>&quot;mesh.h&quot;</FONT></B>
   #include <FONT COLOR="#BC8F8F"><B>&quot;equation_systems.h&quot;</FONT></B>
   
@@ -1264,7 +1252,6 @@ The "matrix" and "rhs" are now ready for solution
   {
     libMesh::init (argc, argv);
     
-     
   #ifndef USE_COMPLEX_NUMBERS
   
     std::cerr &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;ERROR: This example is intended for &quot;</FONT></B> &lt;&lt; std::endl
@@ -1299,7 +1286,8 @@ The "matrix" and "rhs" are now ready for solution
       <FONT COLOR="#228B22"><B>const</FONT></B> Real frequency_in = atof(argv[2]);
       <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n_frequencies = 3;
       
-      <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n_el_per_dim = static_cast&lt;<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B>&gt;(frequency_in*30.);
+      <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n_el_per_dim =
+        static_cast&lt;<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B>&gt;(frequency_in*40.);
       
       std::cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; Using &quot;</FONT></B> &lt;&lt; n_el_per_dim &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; x &quot;</FONT></B> 
   	      &lt;&lt; n_el_per_dim &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; = &quot;</FONT></B> 
@@ -1323,7 +1311,7 @@ The "matrix" and "rhs" are now ready for solution
       FrequencySystem &amp; f_system =
         equation_systems.get_system&lt;FrequencySystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Helmholtz&quot;</FONT></B>);
       
-      f_system.add_variable(<FONT COLOR="#BC8F8F"><B>&quot;p&quot;</FONT></B>, FIRST);
+      f_system.add_variable(<FONT COLOR="#BC8F8F"><B>&quot;p&quot;</FONT></B>, SECOND);
       
       f_system.attach_assemble_function (assemble_helmholtz);
       f_system.attach_solve_function    (add_M_C_K_helmholtz);
@@ -1438,10 +1426,9 @@ The "matrix" and "rhs" are now ready for solution
   	  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i&lt;phi.size(); i++)
   	    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> j=0; j&lt;phi.size(); j++)
   	      {
-  		Ke(i,j) += JxW[qp]<I><FONT COLOR="#B22222">//  (dphi[i][qp]// dphi[j][qp]);
-</FONT></I>  		Me(i,j) += JxW[qp]<I><FONT COLOR="#B22222">//   phi[i][qp] // phi[j][qp];
-</FONT></I>  	      }	  
-  
+  		Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+  		Me(i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp]);
+  	      }	  
   	}
   
         STOP_LOG(<FONT COLOR="#BC8F8F"><B>&quot;stiffness &amp; mass&quot;</FONT></B>,<FONT COLOR="#BC8F8F"><B>&quot;assemble_helmholtz&quot;</FONT></B>);
@@ -1544,7 +1531,6 @@ The "matrix" and "rhs" are now ready for solution
   
     STOP_LOG(<FONT COLOR="#BC8F8F"><B>&quot;global matrix &amp; vector additions&quot;</FONT></B>,<FONT COLOR="#BC8F8F"><B>&quot;add_M_C_K_helmholtz&quot;</FONT></B>);
     
-     
   #endif
   }
   
@@ -1553,7 +1539,144 @@ The "matrix" and "rhs" are now ready for solution
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
 ***************************************************************
-*** Skipping Example  ./ex7 , only good with --enable-complex
+* Running Example  ./ex7
+***************************************************************
+ 
+Running ./ex7 -f .7
+
+ Using 27 x 27 = 729 QUAD9 elements
+
+ Mesh Information:
+  mesh_dimension()=2
+  spatial_dimension()=3
+  n_nodes()=3025
+  n_elem()=729
+   n_local_elem()=729
+   n_active_elem()=729
+  n_subdomains()=1
+  n_processors()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System "Helmholtz"
+    Type "Frequency"
+    Variables="p" 
+    Finite Element Types="0" 
+    Approximation Orders="2" 
+    n_dofs()=3025
+    n_local_dofs()=3025
+    n_constrained_dofs()=0
+    n_additional_vectors()=4
+    n_additional_matrices()=3
+  n_parameters()=9
+   Parameters:
+    "current frequency"=0.233333
+    "frequency 0000"=0.233333
+    "frequency 0001"=0.933333
+    "frequency 0002"=1.63333
+    "linear solver maximum iterations"=5000
+    "linear solver tolerance"=1e-12
+    "n_frequencies"=3
+    "rho"=1
+    "wave speed"=1
+
+
+ ---------------------------------------------------------------------------- 
+| Reference count information                                                |
+ ---------------------------------------------------------------------------- 
+| 10SystemBase reference count information:
+| Creations:    1
+| Destructions: 1
+| 12SparseMatrixISt7complexIdEE reference count information:
+| Creations:    4
+| Destructions: 4
+| 13NumericVectorISt7complexIdEE reference count information:
+| Creations:    7
+| Destructions: 7
+| 21LinearSolverInterfaceISt7complexIdEE reference count information:
+| Creations:    1
+| Destructions: 1
+| 4Elem reference count information:
+| Creations:    3753
+| Destructions: 3753
+| 4Node reference count information:
+| Creations:    3025
+| Destructions: 3025
+| 5QBase reference count information:
+| Creations:    110
+| Destructions: 110
+| 6DofMap reference count information:
+| Creations:    1
+| Destructions: 1
+| 6FEBase reference count information:
+| Creations:    109
+| Destructions: 109
+ ---------------------------------------------------------------------------- 
+
+ ----------------------------------------------------------------------------
+| Time:           Tue Nov 11 07:50:37 2003
+| OS:             Linux
+| HostName:       hactar
+| OS Release      2.4.20-19.9smp
+| OS Version:     #1 SMP Tue Jul 15 17:04:18 EDT 2003
+| Machine:        i686
+| Username:       benkirk
+ ----------------------------------------------------------------------------
+ ----------------------------------------------------------------------------
+| libMesh Performance: Alive time=5.35949, Active time=5.19776
+ ----------------------------------------------------------------------------
+| Event                         nCalls  Total       Avg         Percent of   |
+|                                       Time        Time        Active Time  |
+|----------------------------------------------------------------------------|
+|                                                                            |
+|                                                                            |
+| DofMap                                                                     |
+|   compute_sparsity()          1       0.0326      0.032593    0.63         |
+|   create_dof_constraints()    1       0.0003      0.000283    0.01         |
+|   distribute_dofs()           1       0.0019      0.001889    0.04         |
+|   dof_indices()               3645    0.0270      0.000007    0.52         |
+|   reinit()                    1       0.0096      0.009618    0.19         |
+|                                                                            |
+| FE                                                                         |
+|   compute_face_map()          108     0.0013      0.000012    0.03         |
+|   compute_map()               837     0.0085      0.000010    0.16         |
+|   compute_shape_functions()   837     0.0075      0.000009    0.14         |
+|   init_face_shape_functions() 108     0.0013      0.000012    0.03         |
+|   init_shape_functions()      109     0.0085      0.000078    0.16         |
+|   inverse_map()               216     0.0036      0.000017    0.07         |
+|                                                                            |
+| FrequencySystem                                                            |
+|   assemble()                  1       0.1916      0.191594    3.69         |
+|   init()                      1       0.0138      0.013830    0.27         |
+|   linear_equation_solve()     3       4.5010      1.500333    86.60        |
+|   user_pre_solve()            3       0.0642      0.021411    1.24         |
+|                                                                            |
+| Mesh                                                                       |
+|   build_cube()                1       0.0078      0.007829    0.15         |
+|                                                                            |
+| MeshBase                                                                   |
+|   find_neighbors()            1       0.0112      0.011202    0.22         |
+|   renumber_nodes_and_elem()   1       0.0006      0.000586    0.01         |
+|                                                                            |
+| SystemBase                                                                 |
+|   assemble()                  1       0.1444      0.144351    2.78         |
+|                                                                            |
+| add_M_C_K_helmholtz                                                        |
+|   global matrix & vector additions3       0.0606      0.020200    1.17         |
+|   init phase                  3       0.0035      0.001180    0.07         |
+|                                                                            |
+| assemble_helmholtz                                                         |
+|   damping & rhs               108     0.0244      0.000226    0.47         |
+|   elem init                   729     0.0391      0.000054    0.75         |
+|   stiffness & mass            729     0.0333      0.000046    0.64         |
+ ----------------------------------------------------------------------------
+| Totals:                       7448    5.1978                  100.00       |
+ ----------------------------------------------------------------------------
+
+ 
+***************************************************************
+* Done Running Example  ./ex7
 ***************************************************************
 </pre>
 </div>
