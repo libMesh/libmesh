@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.32 2003-06-24 05:33:51 benkirk Exp $
+// $Id: mesh_base.h,v 1.33 2003-06-25 19:53:04 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -64,7 +64,7 @@ template <typename T> class PetscMatrix;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.32 $
+ * \version $Revision: 1.33 $
  */
 
 
@@ -653,6 +653,11 @@ public:
 	    std::vector<Node*>::const_iterator>
   nodes_end () const;
   
+  /**
+   * Fills the vector "on_boundary" with flags that tell whether each node
+   * is on the domain boundary (true)) or not (false).
+   */
+  void find_boundary_nodes(std::vector<bool>& on_boundary);
   
   
 protected:
@@ -788,11 +793,6 @@ protected:
 			 const std::vector<std::string>* solution_names=NULL,
 			 const bool write_partitioning=false);
 
-  /**
-   * Fills the vector "on_boundary" with flags that tell whether each node
-   * is on the domain boundary (true)) or not (false).
-   */
-  void find_boundary_nodes(std::vector<bool>& on_boundary);
   
   
 #ifdef ENABLE_AMR

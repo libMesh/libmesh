@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.22 2003-05-28 03:17:49 benkirk Exp $
+// $Id: boundary_info.C,v 1.23 2003-06-25 19:53:05 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -87,7 +87,9 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh)
   //     id_map[invalid_id] = cnt;
 
     
-  // New code 
+  // New code
+  // Here we need to use iota() once it is in the
+  // Utility namespace.
   std::for_each(boundary_ids.begin(),
 		boundary_ids.end(),
 		Fill(id_map));

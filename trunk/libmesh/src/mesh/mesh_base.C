@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.41 2003-06-24 05:33:51 benkirk Exp $
+// $Id: mesh_base.C,v 1.42 2003-06-25 19:53:05 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -1356,7 +1356,7 @@ void MeshBase::distort (const Real factor,
     // seed the random number generator
     srand(seed);
     
-    for (unsigned int n=0; this->n_nodes(); n++)
+    for (unsigned int n=0; n<this->n_nodes(); n++)
       if (!on_boundary[n])
 	{
 	  // the direction, random but unit normalized
