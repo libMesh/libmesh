@@ -1,4 +1,4 @@
-//    $Id: sparse_matrix.h,v 1.2 2003-02-10 03:55:51 benkirk Exp $
+//    $Id: sparse_matrix.h,v 1.3 2003-02-10 22:03:24 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -29,6 +29,8 @@
 
 // Local includes
 #include "mesh_common.h"
+#include "auto_ptr.h"
+#include "enum_solver_package.h"
 #include "dof_map.h"
 #include "reference_counted_object.h"
 
@@ -77,6 +79,12 @@ class SparseMatrix : public ReferenceCountedObject<SparseMatrix>
    */
   virtual ~SparseMatrix ();
 
+  /**
+   * Builds a \p SparseMatrix using the linear solver package specified by
+   * \p solver_package
+   */
+  static AutoPtr<SparseMatrix> build(const SolverPackage solver_package);
+  
   /**
    * @returns true if the matrix has been initialized,
    * false otherwise.

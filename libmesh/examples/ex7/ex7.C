@@ -1,4 +1,4 @@
-// $Id: ex7.C,v 1.5 2003-02-10 14:31:12 ddreyer Exp $
+// $Id: ex7.C,v 1.6 2003-02-10 22:03:21 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -592,8 +592,8 @@ void assemble_helmholtz(EquationSystems& es,
        * right-hand-side vector.  The \p PetscMatrix::add_matrix()
        * and \p PetscVector::add_vector() members do this for us.
        */
-      es("Helmholtz").matrix.add_matrix (Ae, dof_indices);
-      es("Helmholtz").rhs.add_vector    (Fe, dof_indices);
+      es("Helmholtz").matrix->add_matrix (Ae, dof_indices);
+      es("Helmholtz").rhs->add_vector    (Fe, dof_indices);
       
     }; // end of element loop
   

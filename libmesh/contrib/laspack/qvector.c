@@ -15,6 +15,7 @@
 
 #include <stddef.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "qvector.h"
@@ -25,41 +26,44 @@ void V_Constr(QVector *V, char *Name, size_t Dim, InstanceType Instance,
               Boolean OwnData)
 /* constructor of the type QVector */
 {
-    V->Name = (char *)malloc((strlen(Name) + 1) * sizeof(char));
-    if (V->Name != NULL)
-        strcpy(V->Name, Name);
-    else
-        LASError(LASMemAllocErr, "V_Constr", Name, NULL, NULL);
-    V->Dim = Dim;
-    V->Instance = Instance;
-    V->LockLevel = 0;
-    V->Multipl = 1.0;
-    V->OwnData = OwnData;
-    if (OwnData) {
-        if (LASResult() == LASOK) {
-            V->Cmp = (Real *)malloc((Dim + 1) * sizeof(Real));
-            if (V->Cmp == NULL) 
-                LASError(LASMemAllocErr, "V_Constr", Name, NULL, NULL);
-        } else {
-            V->Cmp = NULL;
-        }
+  V->Name = (char *)malloc((strlen(Name) + 1) * sizeof(char));
+  /* printf("ctor: %s name:%p\n",Name, V->Name);fflush(stdout); */
+  if (V->Name != NULL)
+    strcpy(V->Name, Name);
+  else
+    LASError(LASMemAllocErr, "V_Constr", Name, NULL, NULL);
+  V->Dim = Dim;
+  V->Instance = Instance;
+  V->LockLevel = 0;
+  V->Multipl = 1.0;
+  V->OwnData = OwnData;
+  if (OwnData) {
+    if (LASResult() == LASOK) {
+      V->Cmp = (Real *)malloc((Dim + 1) * sizeof(Real));
+      /* printf("ctor: %s cmp: %p\n",Name,V->Cmp);fflush(stdout); */
+      if (V->Cmp == NULL) 
+	LASError(LASMemAllocErr, "V_Constr", Name, NULL, NULL);
+    } else {
+      V->Cmp = NULL;
     }
+  }
 }
 
 void V_Destr(QVector *V)
 /* destructor of the type QVector */
 {
-    if (V->Name != NULL) {
-      /* WHY DOES THIS CAUSE A SEGFAULT?!? */
-      /*free(V->Name); */
-      V->Name = NULL;
+  if (V->OwnData) {
+    /* printf("dtor: %s cmp: %p\n",V->Name,V->Cmp);fflush(stdout); */
+    if (V->Cmp != NULL) {
+      free(V->Cmp);
+      V->Cmp = NULL;
     }
-    if (V->OwnData) {
-        if (V->Cmp != NULL) {
-            free(V->Cmp);
-            V->Cmp = NULL;
-        }
-    }
+  }
+  /* printf("dtor: %s name:%p\n",V->Name,V->Name);fflush(stdout); */
+  if (V->Name != NULL) {
+    free(V->Name);
+    V->Name = NULL;
+  }
 }
 
 void V_SetName(QVector *V, char *Name)

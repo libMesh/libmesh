@@ -1,4 +1,4 @@
-// $Id: laspack_vector.C,v 1.1 2003-02-10 03:55:51 benkirk Exp $
+// $Id: laspack_vector.C,v 1.2 2003-02-10 22:03:27 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -47,7 +47,7 @@ Real LaspackVector::l1_norm () const
 {
   assert(closed());
   
-  return static_cast<Real>(Laspack::l1Norm_V(_vec));
+  return static_cast<Real>(Laspack::l1Norm_V(const_cast<Laspack::QVector*>(&_vec)));
 };
 
 
@@ -56,7 +56,7 @@ Real LaspackVector::l2_norm () const
 {
   assert(closed());
   
-  return static_cast<Real>(Laspack::l2Norm_V(_vec));
+  return static_cast<Real>(Laspack::l2Norm_V(const_cast<Laspack::QVector*>(&_vec)));
 };
 
 
@@ -65,7 +65,7 @@ Real LaspackVector::linfty_norm () const
 {
   assert(closed());
   
-  return static_cast<Real>(Laspack::MaxNorm_V(_vec));
+  return static_cast<Real>(Laspack::MaxNorm_V(const_cast<Laspack::QVector*>(&_vec)));
 };
 
 
@@ -125,7 +125,7 @@ void LaspackVector::scale (const Complex factor)
 {
   assert (initialized());
   
-  Laspack::Mul_SV (factor, _vec);
+  Laspack::Mul_SV (factor, &_vec);
 };
 
 
@@ -135,7 +135,7 @@ LaspackVector::operator = (const Complex s)
 {
   assert (initialized());
 
-  Laspack::V_SetAllCmp (_vec, s);
+  Laspack::V_SetAllCmp (&_vec, s);
   
   return *this;
 };
@@ -149,9 +149,13 @@ LaspackVector::operator = (const NumericVector& v_in)
 
   assert (size() == v.size());
 
-  if (size() != 0)
-    Laspack::Asgn_VV (_vec, v._vec);
+  here();
   
+  if (size() != 0)    
+    Laspack::Asgn_VV (const_cast<Laspack::QVector*>(&_vec),
+		      const_cast<Laspack::QVector*>(&v._vec)
+		      );
+
   return *this;
 };
 

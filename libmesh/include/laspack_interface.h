@@ -1,4 +1,4 @@
-// $Id: laspack_interface.h,v 1.1 2003-02-10 03:55:51 benkirk Exp $
+// $Id: laspack_interface.h,v 1.2 2003-02-10 22:03:23 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,7 +30,7 @@
 // C++ includes
 
 // Local includes
-#include "solver_interface.h"
+#include "linear_solver_interface.h"
 #include "laspack_vector.h"
 #include "laspack_matrix.h"
 
@@ -51,7 +51,7 @@ namespace Laspack {
  * @author Benjamin Kirk, 2002
  */
 
-class LaspackInterface : public SolverInterface
+class LaspackInterface : public LinearSolverInterface
 {
  public:
   /**

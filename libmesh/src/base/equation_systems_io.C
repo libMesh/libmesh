@@ -1,4 +1,4 @@
-// $Id: equation_systems_io.C,v 1.8 2003-02-10 03:55:51 benkirk Exp $
+// $Id: equation_systems_io.C,v 1.9 2003-02-10 22:03:25 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -247,8 +247,8 @@ void EquationSystems::read(const std::string& name,
 	unsigned int cnt=0;
 
 	const unsigned int n_vars  = system.n_vars();
-	const unsigned int n_nodes = mesh.n_nodes();
-	const unsigned int n_elem  = mesh.n_elem();
+	const unsigned int n_nodes = _mesh.n_nodes();
+	const unsigned int n_elem  = _mesh.n_elem();
 	
 	for (unsigned int var=0; var<n_vars; var++)
 	  {
@@ -283,7 +283,7 @@ void EquationSystems::read(const std::string& name,
 		};
 	  };
 	    
-	system.solution = reordered_soln;
+	*(system.solution) = reordered_soln;
       };
 
 #endif
@@ -346,11 +346,11 @@ void EquationSystems::write(const std::string& name,
 
   assert (io.writing());
 
-  const unsigned int proc_id = mesh.processor_id();
+  const unsigned int proc_id = _mesh.processor_id();
   unsigned int n_sys         = n_systems();
 
   std::map<std::string, SystemData*>::iterator
-    pos = systems.begin();
+    pos = _systems.begin();
   
   unsigned int sys_num=0;
   std::string comment;
@@ -371,7 +371,7 @@ void EquationSystems::write(const std::string& name,
        */
       io.data (n_sys, "# The number of equation systems");
         
-      while (pos != systems.end())
+      while (pos != _systems.end())
 	{
 	  std::string sys_name = pos->first;
 	  SystemData& system   = *pos->second;
@@ -518,14 +518,14 @@ void EquationSystems::write(const std::string& name,
 	};      
     };
 
-  pos     = systems.begin();
+  pos     = _systems.begin();
   sys_num = 0;
 
   /**
    * All processors contribute numeric vector values
    */
   if (write_data)
-    while (pos != systems.end())
+    while (pos != _systems.end())
       {
 	// Convenient references
 	std::string sys_name   = pos->first;
@@ -537,7 +537,7 @@ void EquationSystems::write(const std::string& name,
 	/**
 	 * Collect the global solution on one processor
 	 */
-	system.solution.localize_to_one (global_soln, 0);       
+	system.solution->localize_to_one (global_soln, 0);       
       
 
 	/**
@@ -562,8 +562,8 @@ void EquationSystems::write(const std::string& name,
 	    unsigned int cnt=0;
 
 	    const unsigned int n_vars  = system.n_vars();
-	    const unsigned int n_nodes = mesh.n_nodes();
-	    const unsigned int n_elem  = mesh.n_elem();
+	    const unsigned int n_nodes = _mesh.n_nodes();
+	    const unsigned int n_elem  = _mesh.n_elem();
 
 	    for (unsigned int var=0; var<n_vars; var++)
 	      {		
@@ -583,7 +583,7 @@ void EquationSystems::write(const std::string& name,
 
 		// Then write the element DOF values
 		for (unsigned int elem=0; elem<n_elem; elem++)
-		  if (mesh.elem(elem)->active())
+		  if (_mesh.elem(elem)->active())
 		    for (unsigned int index=0;
 			 index<dof_map.n_dofs_on_elem(elem, var); index++)
 		      {

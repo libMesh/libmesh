@@ -1,4 +1,4 @@
-// $Id: laspack_matrix.h,v 1.2 2003-02-10 03:55:51 benkirk Exp $
+// $Id: laspack_matrix.h,v 1.3 2003-02-10 22:03:23 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk, John W. Peterson
@@ -82,11 +82,11 @@ class LaspackMatrix : public SparseMatrix
    */
   ~LaspackMatrix ();
 
-  /**
-   * @returns true if the matrix has been initialized,
-   * false otherwise.
-   */
-  bool initialized() const { return (_QMat != NULL); };
+//   /**
+//    * @returns true if the matrix has been initialized,
+//    * false otherwise.
+//    */
+//   bool initialized() const { return (_QMat != NULL); };
 
   /**
    * Updates the matrix sparsity pattern. This will
@@ -264,7 +264,7 @@ private:
   /**
    *  The Laspack sparse matrix pointer.
    */
-  Laspack::QMatrix *_QMat;
+  Laspack::QMatrix _QMat;
 
   /**
    * The compressed row indices.
@@ -294,7 +294,6 @@ private:
 // LaspackMatrix class inline members
 inline
 LaspackMatrix::LaspackMatrix () :
-  _QMat (NULL),
   _closed (false)
 {
 };
@@ -314,10 +313,7 @@ void LaspackMatrix::clear ()
 {
   if (initialized())
     {
-      Laspack::Q_Destr(_QMat);
-      
-      delete _QMat;
-      _QMat = NULL;
+      Laspack::Q_Destr(&_QMat);
     };
   
   _csr.clear();
@@ -338,7 +334,7 @@ void LaspackMatrix::zero ()
   for (unsigned int row=0; row<n_rows; row++)
     {
       const unsigned int r_start = _row_start[row];
-      const unsigned int len     = Q_GetLen(_QMat, row+1);
+      const unsigned int len     = Q_GetLen(&_QMat, row+1);
 
 //       std::cout << "row=" << row << ", \t"
 // 		<< "len=" << len << ", \t"
@@ -354,9 +350,9 @@ void LaspackMatrix::zero ()
 	  const unsigned int j = _csr[r_start + l];
 
 	  // Make sure the data structures are working
-	  assert ((j+1) == Q_GetPos (_QMat, row+1, l));
+	  assert ((j+1) == Q_GetPos (&_QMat, row+1, l));
 	  
-	  Q_SetEntry (_QMat, row+1, l, j+1, 0.);
+	  Q_SetEntry (&_QMat, row+1, l, j+1, 0.);
 	};
     };    
 };
@@ -368,7 +364,7 @@ unsigned int LaspackMatrix::m () const
 {
   assert (initialized());
 
-  return static_cast<unsigned int>(Q_GetDim(const_cast<Laspack::QMatrix*>(_QMat)));
+  return static_cast<unsigned int>(Q_GetDim(const_cast<Laspack::QMatrix*>(&_QMat)));
 };
 
 
@@ -378,7 +374,7 @@ unsigned int LaspackMatrix::n () const
 {
   assert (initialized());
   
-  return static_cast<unsigned int>(Q_GetDim(const_cast<Laspack::QMatrix*>(_QMat)));
+  return static_cast<unsigned int>(Q_GetDim(const_cast<Laspack::QMatrix*>(&_QMat)));
 };
 
 
@@ -412,9 +408,9 @@ void LaspackMatrix::set (const unsigned int i,
 
   // Sanity check
   assert (_csr[_row_start[i]+position] == j);
-  assert ((j+1) == Laspack::Q_GetPos (_QMat, i+1, position));
+  assert ((j+1) == Laspack::Q_GetPos (&_QMat, i+1, position));
 
-  Laspack::Q_SetEntry (_QMat, i+1, position, j+1, value);
+  Laspack::Q_SetEntry (&_QMat, i+1, position, j+1, value);
 };
 
 
@@ -433,7 +429,7 @@ void LaspackMatrix::add (const unsigned int i,
   // Sanity check
   assert (_csr[_row_start[i]+position] == j);
 
-  Laspack::Q_AddVal (_QMat, i+1, position, value);
+  Laspack::Q_AddVal (&_QMat, i+1, position, value);
 };
 
 
@@ -475,7 +471,7 @@ Complex LaspackMatrix::operator () (const unsigned int i,
   
   using namespace Laspack;
 
-  return Q_GetEl (const_cast<Laspack::QMatrix*>(_QMat), i+1, j+1);
+  return Q_GetEl (const_cast<Laspack::QMatrix*>(&_QMat), i+1, j+1);
 };
 
 

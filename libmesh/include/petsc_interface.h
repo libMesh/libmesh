@@ -1,4 +1,4 @@
-// $Id: petsc_interface.h,v 1.7 2003-02-10 03:55:51 benkirk Exp $
+// $Id: petsc_interface.h,v 1.8 2003-02-10 22:03:24 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,7 +31,7 @@
 
 
 // Local includes
-#include "solver_interface.h"
+#include "linear_solver_interface.h"
 #include "petsc_vector.h"
 #include "petsc_matrix.h"
 
@@ -67,7 +67,7 @@ using namespace Petsc;
  * @author Benjamin Kirk, 2002
  */
 
-class PetscInterface : public SolverInterface
+class PetscInterface : public LinearSolverInterface
 {
  public:
   /**

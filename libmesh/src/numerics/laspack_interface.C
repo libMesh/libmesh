@@ -1,4 +1,4 @@
-// $Id: laspack_interface.C,v 1.1 2003-02-10 03:55:51 benkirk Exp $
+// $Id: laspack_interface.C,v 1.2 2003-02-10 22:03:26 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -123,51 +123,91 @@ LaspackInterface::solve (SparseMatrix &matrix_in,
   switch (_solver_type)
     {
     case CG:
-      Laspack::CGIter (matrix._QMat, solution._vec, rhs._vec,
-		       m_its, _precond_type, 1.); break;
+      Laspack::CGIter (&matrix._QMat,
+		       &solution._vec,
+		       &rhs._vec,
+		       m_its,
+		       _precond_type,
+		       1.); break;
 
     case CGN:
-      Laspack::CGNIter (matrix._QMat, solution._vec, rhs._vec,
-			m_its, _precond_type, 1.); break;
+      Laspack::CGNIter (&matrix._QMat,
+			&solution._vec,
+			&rhs._vec,
+			m_its,
+			_precond_type,
+			1.); break;
       
     case CGS:
-      Laspack::CGSIter (matrix._QMat, solution._vec, rhs._vec,
-			m_its, _precond_type, 1.); break;
+      Laspack::CGSIter (&matrix._QMat,
+			&solution._vec,
+			&rhs._vec,
+			m_its,
+			_precond_type,
+			1.); break;
 
     case BICG:
-      Laspack::BiCGIter (matrix._QMat, solution._vec, rhs._vec,
-			 m_its, _precond_type, 1.); break;
+      Laspack::BiCGIter (&matrix._QMat,
+			 &solution._vec,
+			 &rhs._vec,
+			 m_its,
+			 _precond_type,
+			 1.); break;
 
     case BICGSTAB:
-      Laspack::BiCGSTABIter (matrix._QMat, solution._vec, rhs._vec,
-			     m_its, _precond_type, 1.); break;
+      Laspack::BiCGSTABIter (&matrix._QMat,
+			     &solution._vec,
+			     &rhs._vec,
+			     m_its,
+			     _precond_type,
+			     1.); break;
 
     case QMR:
-      Laspack::QMRIter (matrix._QMat, solution._vec, rhs._vec,
-			m_its, _precond_type, 1.); break;
+      Laspack::QMRIter (&matrix._QMat,
+			&solution._vec,
+			&rhs._vec,
+			m_its,
+			_precond_type,
+			1.); break;
 
     case SSOR:
-      Laspack::SSORIter (matrix._QMat, solution._vec, rhs._vec,
-			 m_its, _precond_type, 1.); break;
+      Laspack::SSORIter (&matrix._QMat,
+			 &solution._vec,
+			 &rhs._vec,
+			 m_its,
+			 _precond_type,
+			 1.); break;
 
     case JACOBI:
-      Laspack::JacobiIter (matrix._QMat, solution._vec, rhs._vec,
-			   m_its, _precond_type, 1.); break;
+      Laspack::JacobiIter (&matrix._QMat,
+			   &solution._vec,
+			   &rhs._vec,
+			   m_its,
+			   _precond_type,
+			   1.); break;
 
      case GMRES:
        Laspack::SetGMRESRestart (30);
-       Laspack::GMRESIter (matrix._QMat, solution._vec, rhs._vec,
-			   m_its, _precond_type, 1.); break;
+       Laspack::GMRESIter (&matrix._QMat,
+			   &solution._vec,
+			   &rhs._vec,
+			   m_its,
+			   _precond_type,
+			   1.); break;
       
     default:
       std::cerr << "ERROR:  Unsupported LASPACK Solver: "
 		<< _solver_type            << std::endl
 		<< "Continuing with GMRES" << std::endl;
+      
       _solver_type = GMRES;
-      return solve (matrix, solution, rhs, tol, m_its);
+      
+      return solve (matrix,
+		    solution,
+		    rhs,
+		    tol,
+		    m_its);
     };
-
-  here();
 
   if (Laspack::LASResult() != Laspack::LASOK)
     {
@@ -178,7 +218,7 @@ LaspackInterface::solve (SparseMatrix &matrix_in,
         
   std::pair<unsigned int, Real> p (Laspack::GetLastNoIter(),
 				   Laspack::GetLastAccuracy());
-  here();
+  
   return p;
 };
 
