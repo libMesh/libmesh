@@ -14,7 +14,13 @@
 /****************************************************************************/
 
 #include <stddef.h>
-#include <math.h>
+
+#ifdef __cplusplus
+/* # include <cmath> */
+# include <math.h>
+#else
+# include <math.h>
+#endif
 
 #include "itersolv.h"
 #include "elcmp.h"
@@ -576,7 +582,7 @@ QVector *CGNIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
 }
 
 QVector *GMRESIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
-            PrecondProcType PrecondProc, _LPDouble OmegaPrecond)
+		   PrecondProcType PrecondProc, _LPDouble OmegaPrecond)
 {
     /*
      *  for details to the algorithm see
@@ -689,6 +695,8 @@ QVector *GMRESIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
                     h[i][k] = h1;
                     h[i][k+1] = h2;
                 }
+		/* r could be complex-valued!! */
+		   
                 r = sqrt(h[i][i] * h[i][i] + h[i][i+1] * h[i][i+1]);
                 c1[i] = h[i][i] / r;
                 c2[i] = h[i][i+1] / r;
