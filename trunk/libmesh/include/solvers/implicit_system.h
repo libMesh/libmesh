@@ -1,4 +1,4 @@
-// $Id: implicit_system.h,v 1.3 2004-03-05 21:07:00 jwpeterson Exp $
+// $Id: implicit_system.h,v 1.4 2004-08-20 14:09:30 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -58,7 +58,7 @@ public:
   /**
    * Destructor.
    */
-  ~ImplicitSystem ();
+  virtual ~ImplicitSystem ();
 
   /**
    * The type of system.
