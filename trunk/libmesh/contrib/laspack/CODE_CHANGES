@@ -20,3 +20,13 @@ Fri Feb  7 10:51:37 CST 2003
 
 Daniel Dreyer
 Fri Mar 14 09:41:11 CET 2003
+
+
+7.) Fixed GMRES for complex numbers:
+    - added a function InnerProd_VV(QVector *V1, QVector *V2)
+      that computes the inner product of two vectors. For
+      real valued vectors this is simply Mul_VV,
+      for complex vectors the adjoint of V1 has to be taken.
+
+Steffen Petersen
+Di Apr  5 20:14:57 CEST 2005

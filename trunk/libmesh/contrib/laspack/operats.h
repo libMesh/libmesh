@@ -42,6 +42,7 @@ QVector *Mul_SV(_LPDouble S, QVector *V);
 Matrix *Mul_SM(_LPDouble S, Matrix *M);
 QMatrix *Mul_SQ(_LPDouble S, QMatrix *Q);
 _LPDouble Mul_VV(QVector *V1, QVector *V2);
+_LPDouble InnerProd_VV(QVector *V1, QVector *V2);
 QVector *Mul_MV(Matrix *M, QVector *V);
 QVector *Mul_QV(QMatrix *Q, QVector *V);
 QVector *MulInv_QV(QMatrix *Q, QVector *V);

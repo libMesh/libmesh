@@ -681,7 +681,7 @@ QVector *GMRESIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
 
                 /* modified Gram-Schmidt orthogonalization */
                 for (k = 1; k <= i; k++) {
-                    h[i][k] = Mul_VV(&v[i+1], &v[k]);
+                    h[i][k] = InnerProd_VV(&v[i+1], &v[k]);
                     SubAsgn_VV(&v[i+1], Mul_SV(h[i][k], &v[k]));
                 }
 
