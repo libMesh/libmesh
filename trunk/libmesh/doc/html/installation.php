@@ -3,7 +3,7 @@
 
 <html>
 <head>
-  <title>libMesh Examples</title>
+  <title>Download and Installation</title>
   <?php load_style($root); ?>
 </head>
 
@@ -67,7 +67,12 @@ The library is known to work with the following compilers:
       <li><code>icc/ifc</code> 6.0</li>
       <li>Earlier versions (&lt;= 5.0) not supported</li>
     </ul>
-  <li>SGI MIPSPro Compilers</li>
+  <li>SGI Altix</li>
+    <ul>
+      <li><code>ecc/efc</code> 7.1 tested</li>
+      <li><code>MPT MPI</code> 1.9.1</li>
+    </ul>
+  <li>SGI IRIX 6.5 with MIPSPro Compilers</li>
     <ul>
       <li>Version 7.30 <code>(CXXFLAGS=-LANG:std CXX=CC ./configure [...])</code></li>
       <li>Not tested (but will likely work) with others</li>
