@@ -18,8 +18,8 @@
 // ============================================================================
 //
 // File          : gzstream.h
-// Revision      : $Revision: 1.2 $
-// Revision_date : $Date: 2003-09-25 21:46:54 $
+// Revision      : $Revision: 1.3 $
+// Revision_date : $Date: 2004-10-14 22:56:09 $
 // Author(s)     : Deepak Bandyopadhyay, Lutz Kettner
 // 
 // Standard streambuf implementation following Nicolai Josuttis, "The 
@@ -77,7 +77,7 @@ public:
 
 
   // Backwards compatibility for GCC 2.95.3
-#if defined(__GNUC__) && (__GNUC__ < 3)
+#if defined(__GNUC__) && (__GNUC__ < 3) && !defined(__INTEL_COMPILER)
   typedef streampos pos_type;
   typedef streamoff off_type;
 #endif
