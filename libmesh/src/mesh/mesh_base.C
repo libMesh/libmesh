@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.11 2003-02-10 11:50:57 ddreyer Exp $
+// $Id: mesh_base.C,v 1.12 2003-02-12 05:41:29 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -151,9 +151,11 @@ unsigned int MeshBase::n_active_elem() const
 {
   unsigned int num=0;
 
-  for (unsigned int e=0; e<n_elem(); e++)
-    if (elem(e)->active())
-      num++;
+  const_active_elem_iterator it(elements_begin());
+  const_active_elem_iterator end(elements_end()); 
+
+  for (; it!=end; ++it)
+    num++;
 
   return num;
 };
@@ -169,9 +171,9 @@ void MeshBase::clear()
 
   // Clear the elements data structure
   {
-    for (unsigned int i=0; i<n_elem(); i++)
-      if (elem(i) != NULL)
-	delete elem(i);
+    for (unsigned int e=0; e<n_elem(); e++)
+      if (elem(e) != NULL)
+	delete elem(e);
     
     _elements.clear();
   };
@@ -204,9 +206,10 @@ unsigned int MeshBase::n_active_sub_elem() const
 {
   unsigned int ne=0;
 
-  for (unsigned int i=0; i<n_elem(); i++)
-    if (elem(i)->active())
-      ne += elem(i)->n_sub_elem();
+  const_active_elem_iterator it(elements_begin());
+  const_active_elem_iterator end(elements_end());
+  for (; it!=end; ++it)
+    ne += (*it)->n_sub_elem(); 
 
   return ne;
 };
@@ -246,9 +249,11 @@ unsigned int MeshBase::n_elem_of_type(const ElemType type) const
 {
   unsigned int cnt=0;
 
-  for (unsigned int e=0; e<n_elem(); e++)
-    if (elem(e)->type() == type)
-      cnt++;
+  const_type_elem_iterator it(elements_begin(), type);
+  const_type_elem_iterator end(elements_end(),   type);
+
+  for (; it!=end; ++it)
+    cnt++;
   
   return cnt;
 };
@@ -259,11 +264,11 @@ unsigned int MeshBase::n_active_elem_of_type(const ElemType type) const
 {
   unsigned int cnt=0;
 
-  for (unsigned int e=0; e<n_elem(); e++)
-    if (elem(e)->active())
-      if (elem(e)->type() == type)
-	cnt++;
-  
+  const_active_type_elem_iterator it(elements_begin(), type);
+  const_active_type_elem_iterator end(elements_end(), type);
+  for (; it!=end; ++it)
+    cnt++;
+    
   return cnt;
 };
 
@@ -440,27 +445,24 @@ void MeshBase::find_neighbors()
    * Furthermore, that neighbor better be active,
    * otherwise we missed a child somewhere.
    */
-  
-  for (unsigned int e=0; e<n_elem(); e++)
-    if (elem(e)->level() != 0)
-      for (unsigned int s=0; s<elem(e)->n_sides(); s++)
-	if (elem(e)->neighbor(s) == NULL)
-	  {
-	    elem(e)->set_neighbor(s,elem(e)->parent()->neighbor(s));
+  not_level_elem_iterator it(elements_begin(), 0);
+  not_level_elem_iterator end(elements_end(),   0);
 
+  for (; it!=end; ++it)
+    {
+      for (unsigned int s=0; s < (*it)->n_sides(); s++)
+	if ((*it)->neighbor(s) == NULL)
+	  {
+	    (*it)->set_neighbor(s, (*it)->parent()->neighbor(s));
+	    
 #ifdef DEBUG	    
-	    if (elem(e)->neighbor(s) != NULL)
-	      assert (elem(e)->neighbor(s)->active());
+	    if ((*it)->neighbor(s) != NULL)
+	      assert ((*it)->neighbor(s)->active());
 #endif
 	  }
+    }
   
 #endif
-
-//   std::cout << "Counter 0=" << c0
-// 	    << ", Counter 1=" << c1
-// 	    << std::endl;
-    
-    
 
   _perf_log.stop_event("find_neighbors()");
 };
@@ -532,18 +534,19 @@ void MeshBase::build_inf_elem(const Point& origin,
    * Iterate through all elements and sides, collect indices of all active
    * boundary sides in the faces set. Skip sides which lie in symmetry planes.
    * Later, sides of the inner boundary will be sorted out.
+   * Can't use iterators here since the element
+   * index (e) is explicitly used later...
    */
-
   for(unsigned int e=0;e<n_elem();e++)
     {
       if (!(elem(e)->active()))
-	continue;
-
+   	continue;
+      
       for (unsigned int s=0; s<elem(e)->n_sides(); s++)
 	{
 	  if (elem(e)->neighbor(s) != NULL)
 	    continue;	 // check if elem(e) is on the boundary
-		
+	  
 	  /* note that it is safe to use the Elem::side() method, 
 	     which gives a non-full-ordered element */
 	  AutoPtr<Elem> side(elem(e)->side(s));			
@@ -587,7 +590,7 @@ void MeshBase::build_inf_elem(const Point& origin,
 	  sym_side=(x_sym&&on_x_sym)||(y_sym&&on_y_sym)||(z_sym&&on_z_sym);
 				
 	  std::pair<unsigned int,unsigned int> p(e,s);
-												
+	  
 	  if (!sym_side)
 	    faces.insert(p);					
 					    
@@ -777,146 +780,150 @@ void MeshBase::all_tri ()
   std::vector<Elem*> new_elements;
   new_elements.reserve (2*n_elem());
 
-  for (unsigned int e=0; e<n_elem(); e++)
-    if (elem(e)->active())
-      if (elem(e)->type() == QUAD4)
+  active_elem_iterator it(elements_begin());
+  active_elem_iterator end(elements_end());
+
+  for (; it!=end; ++it)
+    {
+      if ((*it)->type() == QUAD4)
 	{
 	  Elem* tri0 = new Tri3;
 	  Elem* tri1 = new Tri3;
 	  
 	  // Check for possible edge swap
-	  if ((elem(e)->point(0) - elem(e)->point(2)).size() <
-	      (elem(e)->point(1) - elem(e)->point(3)).size())
+	  if (((*it)->point(0) - (*it)->point(2)).size() <
+	      ((*it)->point(1) - (*it)->point(3)).size())
 	    {	      
-	      tri0->set_node(0) = elem(e)->get_node(0);
-	      tri0->set_node(1) = elem(e)->get_node(1);
-	      tri0->set_node(2) = elem(e)->get_node(2);
+	      tri0->set_node(0) = (*it)->get_node(0);
+	      tri0->set_node(1) = (*it)->get_node(1);
+	      tri0->set_node(2) = (*it)->get_node(2);
 	      
-	      tri1->set_node(0) = elem(e)->get_node(0);
-	      tri1->set_node(1) = elem(e)->get_node(2);
-	      tri1->set_node(2) = elem(e)->get_node(3);
+	      tri1->set_node(0) = (*it)->get_node(0);
+	      tri1->set_node(1) = (*it)->get_node(2);
+	      tri1->set_node(2) = (*it)->get_node(3);
 	    }
 
 	  else
 	    {
-	      tri0->set_node(0) = elem(e)->get_node(0);
-	      tri0->set_node(1) = elem(e)->get_node(1);
-	      tri0->set_node(2) = elem(e)->get_node(3);
+	      tri0->set_node(0) = (*it)->get_node(0);
+	      tri0->set_node(1) = (*it)->get_node(1);
+	      tri0->set_node(2) = (*it)->get_node(3);
 	      
-	      tri1->set_node(0) = elem(e)->get_node(1);
-	      tri1->set_node(1) = elem(e)->get_node(2);
-	      tri1->set_node(2) = elem(e)->get_node(3);
+	      tri1->set_node(0) = (*it)->get_node(1);
+	      tri1->set_node(1) = (*it)->get_node(2);
+	      tri1->set_node(2) = (*it)->get_node(3);
 	    }
 	  
 	  new_elements.push_back(tri0);
 	  new_elements.push_back(tri1);
 	  
-	  delete _elements[e];
+	  delete *it; //_elements[e];
 	}
       
-      else if (elem(e)->type() == QUAD8)
+      else if ((*it)->type() == QUAD8)
 	{
 	  Elem* tri0 = new Tri6;
 	  Elem* tri1 = new Tri6;
 	  
-	  Node* new_node = add_point((node(elem(e)->node(0)) +
-				      node(elem(e)->node(1)) +
-				      node(elem(e)->node(2)) +
-				      node(elem(e)->node(3)))*.25
+	  Node* new_node = add_point((node((*it)->node(0)) +
+				      node((*it)->node(1)) +
+				      node((*it)->node(2)) +
+				      node((*it)->node(3)))*.25
 				     );
 	  
 	  // Check for possible edge swap
-	  if ((elem(e)->point(0) - elem(e)->point(2)).size() <
-	      (elem(e)->point(1) - elem(e)->point(3)).size())
+	  if (((*it)->point(0) - (*it)->point(2)).size() <
+	      ((*it)->point(1) - (*it)->point(3)).size())
 	    {	      
-	      tri0->set_node(0) = elem(e)->get_node(0);
-	      tri0->set_node(1) = elem(e)->get_node(1);
-	      tri0->set_node(2) = elem(e)->get_node(2);
-	      tri0->set_node(3) = elem(e)->get_node(4);
-	      tri0->set_node(4) = elem(e)->get_node(5);
+	      tri0->set_node(0) = (*it)->get_node(0);
+	      tri0->set_node(1) = (*it)->get_node(1);
+	      tri0->set_node(2) = (*it)->get_node(2);
+	      tri0->set_node(3) = (*it)->get_node(4);
+	      tri0->set_node(4) = (*it)->get_node(5);
 	      tri0->set_node(5) = new_node;
 	      
-	      tri1->set_node(0) = elem(e)->get_node(0);
-	      tri1->set_node(1) = elem(e)->get_node(2);
-	      tri1->set_node(2) = elem(e)->get_node(3);
+	      tri1->set_node(0) = (*it)->get_node(0);
+	      tri1->set_node(1) = (*it)->get_node(2);
+	      tri1->set_node(2) = (*it)->get_node(3);
 	      tri1->set_node(3) = new_node;
-	      tri1->set_node(4) = elem(e)->get_node(6);
-	      tri1->set_node(5) = elem(e)->get_node(7);
+	      tri1->set_node(4) = (*it)->get_node(6);
+	      tri1->set_node(5) = (*it)->get_node(7);
 
 	    }
 	  
 	  else
 	    {
-	      tri0->set_node(0) = elem(e)->get_node(3);
-	      tri0->set_node(1) = elem(e)->get_node(0);
-	      tri0->set_node(2) = elem(e)->get_node(1);
-	      tri0->set_node(3) = elem(e)->get_node(7);
-	      tri0->set_node(4) = elem(e)->get_node(4);
+	      tri0->set_node(0) = (*it)->get_node(3);
+	      tri0->set_node(1) = (*it)->get_node(0);
+	      tri0->set_node(2) = (*it)->get_node(1);
+	      tri0->set_node(3) = (*it)->get_node(7);
+	      tri0->set_node(4) = (*it)->get_node(4);
 	      tri0->set_node(5) = new_node;
 	      
-	      tri1->set_node(0) = elem(e)->get_node(1);
-	      tri1->set_node(1) = elem(e)->get_node(2);
-	      tri1->set_node(2) = elem(e)->get_node(3);
-	      tri1->set_node(3) = elem(e)->get_node(5);
-	      tri1->set_node(4) = elem(e)->get_node(6);
+	      tri1->set_node(0) = (*it)->get_node(1);
+	      tri1->set_node(1) = (*it)->get_node(2);
+	      tri1->set_node(2) = (*it)->get_node(3);
+	      tri1->set_node(3) = (*it)->get_node(5);
+	      tri1->set_node(4) = (*it)->get_node(6);
 	      tri1->set_node(5) = new_node;
 	    }
 	  
 	  new_elements.push_back(tri0);
 	  new_elements.push_back(tri1);
 	  
-	  delete _elements[e];
+	  delete *it; //_elements[e];
 	}
       
-      else if (elem(e)->type() == QUAD9)
+      else if ((*it)->type() == QUAD9)
 	{
 	  Elem* tri0 = new Tri6;
 	  Elem* tri1 = new Tri6;
 
 	  // Check for possible edge swap
-	  if ((elem(e)->point(0) - elem(e)->point(2)).size() <
-	      (elem(e)->point(1) - elem(e)->point(3)).size())
+	  if (((*it)->point(0) - (*it)->point(2)).size() <
+	      ((*it)->point(1) - (*it)->point(3)).size())
 	    {	      
-	      tri0->set_node(0) = elem(e)->get_node(0);
-	      tri0->set_node(1) = elem(e)->get_node(1);
-	      tri0->set_node(2) = elem(e)->get_node(2);
-	      tri0->set_node(3) = elem(e)->get_node(4);
-	      tri0->set_node(4) = elem(e)->get_node(5);
-	      tri0->set_node(5) = elem(e)->get_node(8);
+	      tri0->set_node(0) = (*it)->get_node(0);
+	      tri0->set_node(1) = (*it)->get_node(1);
+	      tri0->set_node(2) = (*it)->get_node(2);
+	      tri0->set_node(3) = (*it)->get_node(4);
+	      tri0->set_node(4) = (*it)->get_node(5);
+	      tri0->set_node(5) = (*it)->get_node(8);
 	      
-	      tri1->set_node(0) = elem(e)->get_node(0);
-	      tri1->set_node(1) = elem(e)->get_node(2);
-	      tri1->set_node(2) = elem(e)->get_node(3);
-	      tri1->set_node(3) = elem(e)->get_node(8);
-	      tri1->set_node(4) = elem(e)->get_node(6);
-	      tri1->set_node(5) = elem(e)->get_node(7);
+	      tri1->set_node(0) = (*it)->get_node(0);
+	      tri1->set_node(1) = (*it)->get_node(2);
+	      tri1->set_node(2) = (*it)->get_node(3);
+	      tri1->set_node(3) = (*it)->get_node(8);
+	      tri1->set_node(4) = (*it)->get_node(6);
+	      tri1->set_node(5) = (*it)->get_node(7);
 	    }
 
 	  else
 	    {
-	      tri0->set_node(0) = elem(e)->get_node(0);
-	      tri0->set_node(1) = elem(e)->get_node(1);
-	      tri0->set_node(2) = elem(e)->get_node(3);
-	      tri0->set_node(3) = elem(e)->get_node(4);
-	      tri0->set_node(4) = elem(e)->get_node(8);
-	      tri0->set_node(5) = elem(e)->get_node(7);
+	      tri0->set_node(0) = (*it)->get_node(0);
+	      tri0->set_node(1) = (*it)->get_node(1);
+	      tri0->set_node(2) = (*it)->get_node(3);
+	      tri0->set_node(3) = (*it)->get_node(4);
+	      tri0->set_node(4) = (*it)->get_node(8);
+	      tri0->set_node(5) = (*it)->get_node(7);
 	      
-	      tri1->set_node(0) = elem(e)->get_node(1);
-	      tri1->set_node(1) = elem(e)->get_node(2);
-	      tri1->set_node(2) = elem(e)->get_node(3);
-	      tri1->set_node(3) = elem(e)->get_node(5);
-	      tri1->set_node(4) = elem(e)->get_node(6);
-	      tri1->set_node(5) = elem(e)->get_node(8);
+	      tri1->set_node(0) = (*it)->get_node(1);
+	      tri1->set_node(1) = (*it)->get_node(2);
+	      tri1->set_node(2) = (*it)->get_node(3);
+	      tri1->set_node(3) = (*it)->get_node(5);
+	      tri1->set_node(4) = (*it)->get_node(6);
+	      tri1->set_node(5) = (*it)->get_node(8);
 	    }
 	  
 	  new_elements.push_back(tri0);
 	  new_elements.push_back(tri1);
-	  
-	  delete _elements[e];
+
+	  delete *it; //_elements[e];
 	}
       else
-	new_elements.push_back(elem(e));
-
+	new_elements.push_back(*it);
+    }
+  
   _elements = new_elements;
 
   find_neighbors();
@@ -1051,26 +1058,28 @@ void MeshBase::distort(const Real factor,
   // so that we don't move them
   if (!perturb_boundary)
     {
-      for (unsigned int e=0; e<n_elem(); e++)
-	if (elem(e)->active())
-	  for (unsigned int s=0; s<elem(e)->n_sides(); s++)
-	    if (elem(e)->neighbor(s) == NULL) // on the boundary
-	      {
-		const AutoPtr<Elem> side(elem(e)->build_side(s));
-		
-		for (unsigned int n=0; n<side->n_nodes(); n++)
-		  on_boundary[side->node(n)] = 1;
-	      };
+      active_elem_iterator it(elements_begin());
+      active_elem_iterator end(elements_end());
+      for (; it!=end; ++it)
+	for (unsigned int s=0; s<(*it)->n_sides(); s++)
+	  if ((*it)->neighbor(s) == NULL) // on the boundary
+	    {
+	      const AutoPtr<Elem> side((*it)->build_side(s));
+	      
+	      for (unsigned int n=0; n<side->n_nodes(); n++)
+		on_boundary[side->node(n)] = 1;
+	    };
     };
 
 
   // Now calculate the minimum distance to
   // neighboring nodes for each node
-  for (unsigned int e=0; e<n_elem(); e++)
-    if (elem(e)->active())
-      for (unsigned int n=0; n<elem(e)->n_nodes(); n++)
-	hmin[elem(e)->node(n)] = std::min(hmin[elem(e)->node(n)],
-					  elem(e)->hmin());		
+  active_elem_iterator it(elements_begin());
+  active_elem_iterator end(elements_end());
+  for (; it!=end; ++it)
+    for (unsigned int n=0; n<(*it)->n_nodes(); n++)
+      hmin[(*it)->node(n)] = std::min(hmin[(*it)->node(n)],
+				      (*it)->hmin());		
 
   
   // Now actually move the nodes

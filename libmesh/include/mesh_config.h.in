@@ -58,6 +58,9 @@
    files */
 #undef HAVE_NETCDF
 
+/* Define to 1 if you have the <ostream> header file. */
+#undef HAVE_OSTREAM
+
 /* Flag indicating whether or not Petsc is available */
 #undef HAVE_PETSC
 

@@ -1,5 +1,5 @@
 dnl --------------------------------------------------------------
-dnl $Id: configure.in,v 1.10 2003-02-11 22:59:25 benkirk Exp $
+dnl $Id: configure.in,v 1.11 2003-02-12 05:41:24 jwpeterson Exp $
 dnl --------------------------------------------------------------
 dnl Process this file with autoconf to produce a configure script.
 
@@ -9,7 +9,7 @@ dnl you call ./configure subsequently on different systems without
 dnl clearing the cache 
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
-AC_REVISION($Revision: 1.10 $)
+AC_REVISION($Revision: 1.11 $)
 
 
 AC_INIT(Make.common.in)
@@ -44,7 +44,7 @@ dnl --------------------------------------------------------------
 AC_CHECK_HEADERS(getopt.h)
 AC_CHECK_HEADERS(locale)
 AC_CHECK_HEADERS(sstream)
-
+AC_CHECK_HEADERS(ostream)
 
 dnl --------------------------------------------------------------
 dnl Get the source tree directory
