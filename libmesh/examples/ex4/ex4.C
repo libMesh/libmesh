@@ -1,4 +1,4 @@
-// $Id: ex4.C,v 1.1 2003-02-04 01:57:17 benkirk Exp $
+// $Id: ex4.C,v 1.2 2003-02-04 02:02:23 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -82,23 +82,11 @@ void assemble_poisson(EquationSystems& es,
 
 
 /**
- * This is the exact solution that
- * we are trying to obtain.  We will solve
- *
- * - (u_xx + u_yy) = f
- *
- * and take a finite difference approximation using this
- * function to get f.  This is the well-known "method of
- * manufactured solutions".
+ * Exact solution function prototype.
  */
 Real exact_solution (const Real x,
 		     const Real y,
-		     const Real z = 0.)
-{
-  static const Real pi = acos(-1.);
-
-  return cos(.5*pi*x)*sin(.5*pi*y)*cos(.5*pi*z);
-};
+		     const Real z = 0.);
 
 
 
