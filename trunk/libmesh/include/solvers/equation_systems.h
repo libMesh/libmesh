@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.5 2004-04-25 05:43:33 benkirk Exp $
+// $Id: equation_systems.h,v 1.6 2004-06-02 15:08:27 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -189,6 +189,12 @@ public:
    */
   unsigned int n_dofs () const;
 
+  /**
+   * Returns the number of active degrees of freedom
+   * for the EquationSystems object.
+   */
+  unsigned int n_active_dofs() const;
+  
   /**
    * Call \p solve on all the individual equation systems.
    */

@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.7 2004-05-14 23:06:35 spetersen Exp $
+// $Id: equation_systems.C,v 1.8 2004-06-02 15:08:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -861,6 +861,23 @@ unsigned int EquationSystems::n_dofs () const
   return tot;      
 }
 
+
+
+
+unsigned int EquationSystems::n_active_dofs () const
+{
+  if (_systems.empty())
+    return 0;
+
+  unsigned int tot=0;
+
+  std::map<std::string, System*>::const_iterator pos = _systems.begin();
+  
+  for (; pos != _systems.end(); ++pos)
+    tot += pos->second->n_active_dofs();
+
+  return tot;      
+}
 
 
 

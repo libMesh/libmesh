@@ -1,4 +1,4 @@
-// $Id: system.h,v 1.2 2004-03-21 03:19:25 benkirk Exp $
+// $Id: system.h,v 1.3 2004-06-02 15:08:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -254,6 +254,12 @@ public:
    * @returns the number of degrees of freedom in the system
    */
   unsigned int n_dofs() const;
+
+  /**
+   * Returns the number of active degrees of freedom
+   * for this System.
+   */
+  unsigned int n_active_dofs() const;
 
   /**
    * @returns the number of constrained degrees of freedom
@@ -597,6 +603,12 @@ unsigned int System::n_dofs() const
   return _dof_map.n_dofs();
 }
 
+
+inline
+unsigned int System::n_active_dofs() const
+{
+  return this->n_dofs() - this->n_constrained_dofs();
+}
 
 
 inline
