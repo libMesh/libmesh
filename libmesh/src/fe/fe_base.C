@@ -1,0 +1,439 @@
+// $Id: fe_base.C,v 1.1 2003-01-24 19:38:45 jwpeterson Exp $
+
+// The Next Great Finite Element Library.
+// Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
+  
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+  
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+  
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+
+// Local includes
+#include "fe.h"
+#include "quadrature.h"
+#include "inf_fe.h"
+
+// ------------------------------------------------------------
+// FEBase class members
+AutoPtr<FEBase> FEBase::build (const unsigned int dim,
+			       const FEType& fet)
+{
+  // The stupid AutoPtr<FEBase> ap(); return ap;
+  // construct is required to satisfy IBM's xlC
+  
+  switch (dim)
+    {
+      // 1D
+    case 1:
+      {
+	switch (fet.family)
+	  {
+	  case LAGRANGE:
+	    {
+	      AutoPtr<FEBase> ap(new FE<1,LAGRANGE>(fet));
+	      return ap;
+	    };
+		   
+	  case HIERARCHIC:
+	    {
+	      AutoPtr<FEBase> ap(new FE<1,HIERARCHIC>(fet));
+	      return ap;
+	    };
+	    
+	  case MONOMIAL:
+	    {
+	      AutoPtr<FEBase> ap(new FE<1,MONOMIAL>(fet));
+	      return ap;
+	    };
+	    
+	  default:
+	    std::cout << "ERROR: Bad FEType.family= " << fet.family << std::endl;
+	    error();
+	  };
+      };
+
+      
+      // 2D
+    case 2:
+      {
+	switch (fet.family)
+	  {
+	  case LAGRANGE:
+	    {
+	      AutoPtr<FEBase> ap(new FE<2,LAGRANGE>(fet));
+	      return ap;
+	    };
+	    
+	  case HIERARCHIC:
+	    {
+	      AutoPtr<FEBase> ap(new FE<2,HIERARCHIC>(fet));
+	      return ap;
+	    };
+	    
+	  case MONOMIAL:
+	    {
+	      AutoPtr<FEBase> ap(new FE<2,MONOMIAL>(fet));
+	      return ap;
+	    };
+	    
+	  default:
+	    std::cout << "ERROR: Bad FEType.family= " << fet.family << std::endl;
+	    error();
+	  };
+      };
+
+      
+      // 3D
+    case 3:
+      {
+	switch (fet.family)
+	  {
+	  case LAGRANGE:
+	    {
+	      AutoPtr<FEBase> ap(new FE<3,LAGRANGE>(fet));
+	      return ap;
+	    };
+	    
+	  case HIERARCHIC:
+	    {
+	      AutoPtr<FEBase> ap(new FE<3,HIERARCHIC>(fet));
+	      return ap;
+	    };
+	    
+	  case MONOMIAL:
+	    {
+	      AutoPtr<FEBase> ap(new FE<3,MONOMIAL>(fet));
+	      return ap;
+	    };
+
+
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+	  case INFINITE_MAP:
+	    {
+	      std::cout << "ERROR: Don't build an infinite element " << std::endl
+			<< " with FEFamily = " << fet.family << std::endl;
+	      error();
+	    };
+
+	  case JACOBI_20_00:
+	    {
+  	      switch (fet.inf_map)
+	        {
+		  case CARTESIAN:
+		    {
+		      AutoPtr<FEBase> ap(new InfFE<3,JACOBI_20_00,CARTESIAN>(fet));
+		      return ap;
+		    };
+		  default:
+		    std::cout << "ERROR: Don't build an infinite element " << std::endl
+			      << " with FEFamily = " << fet.family << std::endl;
+		    error();
+		};
+	    };
+
+	  case JACOBI_30_00:
+	    {
+  	      switch (fet.inf_map)
+	        {
+		  case CARTESIAN:
+		    {
+		      AutoPtr<FEBase> ap(new InfFE<3,JACOBI_30_00,CARTESIAN>(fet));
+		      return ap;
+		    };
+		  default:
+		    std::cout << "ERROR: Don't build an infinite element " << std::endl
+			      << " with FEFamily = " << fet.family << std::endl;
+		    error();
+		};
+	    };
+
+	  case LEGENDRE:
+	    {
+  	      switch (fet.inf_map)
+	        {
+		  case CARTESIAN:
+		    {
+		      AutoPtr<FEBase> ap(new InfFE<3,LEGENDRE,CARTESIAN>(fet));
+		      return ap;
+		    };
+		  default:
+		    std::cout << "ERROR: Don't build an infinite element " << std::endl
+			      << " with FEFamily = " << fet.family << std::endl;
+		    error();
+		};
+	    };
+
+	  case INF_LAGRANGE:
+	    {
+  	      switch (fet.inf_map)
+	        {
+		  case CARTESIAN:
+		    {
+		      AutoPtr<FEBase> ap(new InfFE<3,INF_LAGRANGE,CARTESIAN>(fet));
+		      return ap;
+		    };
+		  default:
+		    std::cout << "ERROR: Don't build an infinite element " << std::endl
+			      << " with FEFamily = " << fet.family << std::endl;
+		    error();
+		};
+	    };
+
+#endif
+	    
+	  default:
+	    std::cout << "ERROR: Bad FEType.family= " << fet.family << std::endl;
+	    error();
+	  };
+      };
+
+    default:
+      error();
+    };
+
+  error();
+  AutoPtr<FEBase> ap(NULL);
+  return ap;
+};
+
+
+
+
+
+
+void FEBase::compute_shape_functions(const QBase* qrule)
+{
+  assert (qrule != NULL);
+  
+  const unsigned int n_qp = qrule->n_points();
+
+
+  //-------------------------------------------------------------------------
+  // Compute the shape function values (and derivatives)
+  // at the Quadrature points.  Note that the actual values
+  // have already been computed via init_shape_functions
+
+  // Compute the value of the derivative shape function i at quadrature point p
+  switch (dim)
+    {
+      
+    case 1:
+      {
+	for (unsigned int i=0; i<phi.size(); i++)
+	  for (unsigned int p=0; p<n_qp; p++)
+	    {
+	      // dphi/dx    = (dphi/dxi)*(dxi/dx)
+	      dphi[i][p](0) =
+		dphidx[i][p] = dphidxi[i][p]*dxidx_map[p];
+	      
+	      dphi[i][p](1) = dphidy[i][p] = 0.;
+	      dphi[i][p](2) = dphidz[i][p] = 0.;
+	    };
+	  
+	break;
+      };
+
+    case 2:
+      {
+	for (unsigned int i=0; i<phi.size(); i++)
+	  for (unsigned int p=0; p<n_qp; p++)
+	    {
+	      // dphi/dx    = (dphi/dxi)*(dxi/dx) + (dphi/deta)*(deta/dx)
+	      dphi[i][p](0) =
+		dphidx[i][p] = (dphidxi[i][p]*dxidx_map[p] +
+				dphideta[i][p]*detadx_map[p]);
+	      
+	      // dphi/dy    = (dphi/dxi)*(dxi/dy) + (dphi/deta)*(deta/dy)
+	      dphi[i][p](1) =
+		dphidy[i][p] = (dphidxi[i][p]*dxidy_map[p] +
+				dphideta[i][p]*detady_map[p]);
+
+	      dphi[i][p](2) = dphidz[i][p] = 0.;
+	    };
+
+	break;
+      };
+    
+    case 3:
+      {
+	for (unsigned int i=0; i<phi.size(); i++)
+	  for (unsigned int p=0; p<n_qp; p++)
+	    {
+	      // dphi/dx    = (dphi/dxi)*(dxi/dx) + (dphi/deta)*(deta/dx) + (dphi/dzeta)*(dzeta/dx);
+	      dphi[i][p](0) =
+		dphidx[i][p] = (dphidxi[i][p]*dxidx_map[p] +
+				dphideta[i][p]*detadx_map[p] +
+				dphidzeta[i][p]*dzetadx_map[p]);
+		
+	      // dphi/dy    = (dphi/dxi)*(dxi/dy) + (dphi/deta)*(deta/dy) + (dphi/dzeta)*(dzeta/dy);
+	      dphi[i][p](1) =
+		dphidy[i][p] = (dphidxi[i][p]*dxidy_map[p] +
+				dphideta[i][p]*detady_map[p] +
+				dphidzeta[i][p]*dzetady_map[p]);
+		
+	      // dphi/dz    = (dphi/dxi)*(dxi/dz) + (dphi/deta)*(deta/dz) + (dphi/dzeta)*(dzeta/dz);
+	      dphi[i][p](2) =
+		dphidz[i][p] = (dphidxi[i][p]*dxidz_map[p] +
+				dphideta[i][p]*detadz_map[p] +
+				dphidzeta[i][p]*dzetadz_map[p]);	      
+	    };
+
+	break;
+      };
+
+    default:
+      {
+	error();
+      };
+    };
+};
+
+
+
+bool FEBase::on_reference_element(const Point& p, const ElemType t, const real eps)
+{
+  assert (eps >= 0.);
+  
+  const real xi   = p(0);
+  const real eta  = p(1);
+  const real zeta = p(2);
+  
+  switch (t)
+    {
+
+    case EDGE2:
+    case EDGE3:
+    case EDGE4:
+      {
+	// The reference 1D element is [-1,1].
+	if ((xi >= -1.-eps) &&
+	    (xi <=  1.+eps))
+	  return true;
+
+	break;
+      };
+
+      
+    case TRI3:
+    case TRI6:
+      {
+	// The reference triangle is isocoles
+	// and is bound by xi=0, eta=0, and xi+eta=1.
+	if ((xi  >= 0.-eps) &&
+	    (eta >= 0.-eps) &&
+	    ((xi + eta) <= 1.+eps))
+	  return true;
+
+	break;
+      };
+
+      
+    case QUAD4:
+    case QUAD8:
+    case QUAD9:
+      {
+	// The reference quadrilateral element is [-1,1]^2.
+	if ((xi  >= -1.-eps) &&
+	    (xi  <=  1.+eps) &&
+	    (eta >= -1.-eps) &&
+	    (eta <=  1.+eps))
+	  return true;
+		
+	break;
+      };
+
+
+    case TET4:
+    case TET10:
+      {
+	// The reference tetrahedral is isocoles
+	// and is bound by xi=0, eta=0, zeta=0,
+	// and xi+eta+zeta=1.
+	if ((xi   >= 0.-eps) &&
+	    (eta  >= 0.-eps) &&
+	    (zeta >= 0.-eps) &&
+	    ((xi + eta + zeta) <= 1.+eps))
+	  return true;
+		
+	break;
+      };
+
+      
+    case HEX8:
+    case HEX20:
+    case HEX27:
+      {
+	/*
+	  if ((xi   >= -1.) &&
+	  (xi   <=  1.) &&
+	  (eta  >= -1.) &&
+	  (eta  <=  1.) &&
+	  (zeta >= -1.) &&
+	  (zeta <=  1.))
+	  return true;
+	*/
+	
+	// The reference hexahedral element is [-1,1]^3.
+	if ((xi   >= -1.-eps) &&
+	    (xi   <=  1.+eps) &&
+	    (eta  >= -1.-eps) &&
+	    (eta  <=  1.+eps) &&
+	    (zeta >= -1.-eps) &&
+	    (zeta <=  1.+eps))
+	  {
+	    //	    std::cout << "Strange Point:\n";
+	    //	    p.print();
+	    return true;
+	  }
+
+	break;
+      };
+
+    case PRISM6:
+    case PRISM18:
+      {
+	// Figure this one out...
+	if ((xi   >= 0.-eps) &&
+	    (eta  >= 0.-eps) &&
+	    (zeta >= 0.-eps) &&
+	    (zeta <= 1.+eps) &&
+	    ((xi + eta) <= 1.+eps))
+	  return true;
+
+	break;
+      };
+
+
+    case PYRAMID5:
+      {
+	std::cerr << "BEN: Implement this you lazy bastard!"
+		  << std::endl;
+	error();
+
+	break;
+      };
+      
+    default:
+      std::cerr << "ERROR: Unknown element type " << t << std::endl;
+      error();
+    };
+
+  // If we get here then the point is _not_ in the
+  // reference element.   Better return false.
+  
+  return false;
+};
+
+
