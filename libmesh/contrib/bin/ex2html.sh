@@ -68,8 +68,6 @@ echo "<?php } ?>" >> $output_file;
 # Finally, move the output_file to the html directory
 mv $output_file ../../doc/html
 
-
-
 # Local Variables:
 # mode: shell-script
 # End:
