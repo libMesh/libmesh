@@ -1,4 +1,4 @@
-// $Id: fe_lagrange_shape_3D.C,v 1.7 2003-02-13 22:56:10 benkirk Exp $
+// $Id: fe_lagrange_shape_3D.C,v 1.8 2003-02-25 18:34:47 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -100,45 +100,23 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
 	    
 	    // linear prism shape functions	    
 	  case PRISM6:
+	  case PRISM15:
 	  case PRISM18:
 	    {
 	      assert (i<6);
 	
 	      // Compute prism shape functions as a tensor-product
-	      // of a triangle and a linear
+	      // of a triangle and an edge
 	
 	      Point p2d(p(0),p(1));
 	      Point p1d(p(2));
 	
-	      switch(i)
-		{
-		case 0:
-		  return (FE<2,LAGRANGE>::shape(TRI3,  FIRST, 0, p2d)*
-			  FE<1,LAGRANGE>::shape(EDGE2, FIRST, 0, p1d));
-	   		   	  	           
-		case 1:	   	  	           
-		  return (FE<2,LAGRANGE>::shape(TRI3,  FIRST, 1, p2d)*
-			  FE<1,LAGRANGE>::shape(EDGE2, FIRST, 0, p1d));
-	   		   	  	           
-		case 2:	   	  	           
-		  return (FE<2,LAGRANGE>::shape(TRI3,  FIRST, 2, p2d)*
-			  FE<1,LAGRANGE>::shape(EDGE2, FIRST, 0, p1d));
-	   	   	   	  	           
-		case 3:  	  		   
-		  return (FE<2,LAGRANGE>::shape(TRI3,  FIRST, 0, p2d)*
-			  FE<1,LAGRANGE>::shape(EDGE2, FIRST, 1, p1d));
-	   	   	   	  	           
-		case 4:  	  		   
-		  return (FE<2,LAGRANGE>::shape(TRI3,  FIRST, 1, p2d)*
-			  FE<1,LAGRANGE>::shape(EDGE2, FIRST, 1, p1d));
-	   	   	   	  	           
-		case 5:  	  		   
-		  return (FE<2,LAGRANGE>::shape(TRI3,  FIRST, 2, p2d)*
-			  FE<1,LAGRANGE>::shape(EDGE2, FIRST, 1, p1d));
-
-		default:
-		  error();
-		}
+	      //                                0  1  2  3  4  5
+	      static const unsigned int i0[] = {0, 0, 0, 1, 1, 1};
+	      static const unsigned int i1[] = {0, 1, 2, 0, 1, 2};
+	      
+	      return (FE<2,LAGRANGE>::shape(TRI3,  FIRST, i1[i], p2d)*
+		      FE<1,LAGRANGE>::shape(EDGE2, FIRST, i0[i], p1d));
 	    }
 
 	    // linear pyramid shape functions
@@ -349,12 +327,17 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
 	      assert (i<18);
 	
 	      // Compute prism shape functions as a tensor-product
-	      // of a triangle and a linear
+	      // of a triangle and an edge
 	
 	      Point p2d(p(0),p(1));
 	      Point p1d(p(2));
 	
-	      error();
+	      //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 
+	      static const unsigned int i0[] = {0, 0, 0, 1, 1, 1, 0, 0, 0, 2, 2, 2, 1, 1, 1, 2, 2, 2};
+	      static const unsigned int i1[] = {0, 1, 2, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 3, 4, 5};
+	      
+	      return (FE<2,LAGRANGE>::shape(TRI6,  SECOND, i1[i], p2d)*
+		      FE<1,LAGRANGE>::shape(EDGE3, SECOND, i0[i], p1d));
 	    }
 	    
 	    
@@ -552,116 +535,37 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 	    
 	    // linear prism shape functions	    
 	  case PRISM6:
+	  case PRISM15:
 	  case PRISM18:
 	    {
 	      assert (i<6);
 	
 	      // Compute prism shape functions as a tensor-product
-	      // of a triangle and a linear
+	      // of a triangle and an edge
 	
 	      Point p2d(p(0),p(1));
 	      Point p1d(p(2));
 	
+	      //                                0  1  2  3  4  5  
+	      static const unsigned int i0[] = {0, 0, 0, 1, 1, 1};
+	      static const unsigned int i1[] = {0, 1, 2, 0, 1, 2};
+
 	      switch (j)
 		{
-	    
 		  // d()/dxi
 		case 0:
-		  {
-		    switch(i)
-		      {
-		      case 0:
-			return (FE<2,LAGRANGE>::shape_deriv(TRI3,  FIRST, 0, 0, p2d)*
-				FE<1,LAGRANGE>::shape      (EDGE2, FIRST, 0, p1d));
-		 		              	            	  
-		      case 1:		         		      
-			return (FE<2,LAGRANGE>::shape_deriv(TRI3,  FIRST, 1, 0, p2d)*
-				FE<1,LAGRANGE>::shape      (EDGE2, FIRST, 0, p1d));
-		 	 	              	            	  
-		      case 2:	 	         		      
-			return (FE<2,LAGRANGE>::shape_deriv(TRI3,  FIRST, 2, 0, p2d)*
-				FE<1,LAGRANGE>::shape      (EDGE2, FIRST, 0, p1d));
-		 	 	              	            	  
-		      case 3:	 	         		      
-			return (FE<2,LAGRANGE>::shape_deriv(TRI3,  FIRST, 0, 0, p2d)*
-				FE<1,LAGRANGE>::shape      (EDGE2, FIRST, 1, p1d));
-		  	 	              	            	  
-		      case 4:	 	         		      
-			return (FE<2,LAGRANGE>::shape_deriv(TRI3,  FIRST, 1, 0, p2d)*
-				FE<1,LAGRANGE>::shape      (EDGE2, FIRST, 1, p1d));
-		 	 	              	            	  
-		      case 5:	 	         		      
-			return (FE<2,LAGRANGE>::shape_deriv(TRI3,  FIRST, 2, 0, p2d)*
-				FE<1,LAGRANGE>::shape      (EDGE2, FIRST, 1, p1d));
-		 	 		      			  
-		      }	 	         		  
-		  }		 	         		  
-		      	 		      			  
-		  // d()/deta	 	         		  
-		case 1:	 		      			  
-		  {		 	         		  
-		    switch(i)	 	         		  
-		      {	 		      			  
-		      case 0:	 	         		  
-			return (FE<2,LAGRANGE>::shape_deriv(TRI3,  FIRST, 0, 1, p2d)*
-				FE<1,LAGRANGE>::shape      (EDGE2, FIRST, 0, p1d));
-		 	 	                 	          
-		      case 1:	 	        	      	      
-			return (FE<2,LAGRANGE>::shape_deriv(TRI3,  FIRST, 1, 1, p2d)*
-				FE<1,LAGRANGE>::shape      (EDGE2, FIRST, 0, p1d));
-		 	 	                 	          
-		      case 2:	 	        	      	      
-			return (FE<2,LAGRANGE>::shape_deriv(TRI3,  FIRST, 2, 1, p2d)*
-				FE<1,LAGRANGE>::shape      (EDGE2, FIRST, 0, p1d));
-		 	 	                 	          
-		      case 3:	 	        	      	      
-			return (FE<2,LAGRANGE>::shape_deriv(TRI3,  FIRST, 0, 1, p2d)*
-				FE<1,LAGRANGE>::shape      (EDGE2, FIRST, 1, p1d));
-		 	 	                 	          
-		      case 4:	 	        	      	      
-			return (FE<2,LAGRANGE>::shape_deriv(TRI3,  FIRST, 1, 1, p2d)*
-				FE<1,LAGRANGE>::shape      (EDGE2, FIRST, 1, p1d));
-		 	 	                 	          
-		      case 5:	 	        	      	      
-			return (FE<2,LAGRANGE>::shape_deriv(TRI3,  FIRST, 2, 1, p2d)*
-				FE<1,LAGRANGE>::shape      (EDGE2, FIRST, 1, p1d));
-		 	 
-		      }	 
-		  }		 
-	    		 
-		  // d()/dzeta 
-		case 2:	 
-		  {		 
-		    switch(i)	 
-		      {	 
-		      case 0:	 
-			return (FE<2,LAGRANGE>::shape      (TRI3,  FIRST, 0, p2d)*
-				FE<1,LAGRANGE>::shape_deriv(EDGE2, FIRST, 0, 0, p1d));
-		 	               			            
-		      case 1:	          			        
-			return (FE<2,LAGRANGE>::shape      (TRI3,  FIRST, 1, p2d)*
-				FE<1,LAGRANGE>::shape_deriv(EDGE2, FIRST, 0, 0, p1d));
-		 	               			            
-		      case 2:	          			        
-			return (FE<2,LAGRANGE>::shape      (TRI3,  FIRST, 2, p2d)*
-				FE<1,LAGRANGE>::shape_deriv(EDGE2, FIRST, 0, 0, p1d));
-		 	               			            
-		      case 3:	          			        
-			return (FE<2,LAGRANGE>::shape      (TRI3,  FIRST, 0, p2d)*
-				FE<1,LAGRANGE>::shape_deriv(EDGE2, FIRST, 1, 0, p1d));
-		 	               			            
-		      case 4:	          			        
-			return (FE<2,LAGRANGE>::shape      (TRI3,  FIRST, 1, p2d)*
-				FE<1,LAGRANGE>::shape_deriv(EDGE2, FIRST, 1, 0, p1d));
-		 	               			            
-		      case 5:	          			        
-			return (FE<2,LAGRANGE>::shape      (TRI3,  FIRST, 2, p2d)*
-				FE<1,LAGRANGE>::shape_deriv(EDGE2, FIRST, 1, 0, p1d));
-		      }
-		  }
-	    
-		default:
-		  error();
+		  return (FE<2,LAGRANGE>::shape_deriv(TRI3,  FIRST, i1[i], 0, p2d)*
+			  FE<1,LAGRANGE>::shape(EDGE2, FIRST, i0[i], p1d));
+		  
+		  // d()/deta
+		case 1:
+		  return (FE<2,LAGRANGE>::shape_deriv(TRI3,  FIRST, i1[i], 1, p2d)*
+			  FE<1,LAGRANGE>::shape(EDGE2, FIRST, i0[i], p1d));
+
+		  // d()/dzeta
+		case 2:
+		  return (FE<2,LAGRANGE>::shape(TRI3,  FIRST, i1[i], p2d)*
+			  FE<1,LAGRANGE>::shape_deriv(EDGE2, FIRST, i0[i], 0, p1d));
 		}
 	    }
 
@@ -1249,6 +1153,8 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 		  error();
 		}
 	    }
+
+
 	    
 	    // quadradic prism shape functions	    
 	  case PRISM18:
@@ -1256,14 +1162,34 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 	      assert (i<18);
 	
 	      // Compute prism shape functions as a tensor-product
-	      // of a triangle and a linear
+	      // of a triangle and an edge
 	
 	      Point p2d(p(0),p(1));
 	      Point p1d(p(2));
 	
-	
-	      error();
+	      //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 
+	      static const unsigned int i0[] = {0, 0, 0, 1, 1, 1, 0, 0, 0, 2, 2, 2, 1, 1, 1, 2, 2, 2};
+	      static const unsigned int i1[] = {0, 1, 2, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 3, 4, 5};
+
+	      switch (j)
+		{
+		  // d()/dxi
+		case 0:
+		  return (FE<2,LAGRANGE>::shape_deriv(TRI6,  SECOND, i1[i], 0, p2d)*
+			  FE<1,LAGRANGE>::shape(EDGE3, SECOND, i0[i], p1d));
+		  
+		  // d()/deta
+		case 1:
+		  return (FE<2,LAGRANGE>::shape_deriv(TRI6,  SECOND, i1[i], 1, p2d)*
+			  FE<1,LAGRANGE>::shape(EDGE3, SECOND, i0[i], p1d));
+
+		  // d()/dzeta
+		case 2:
+		  return (FE<2,LAGRANGE>::shape(TRI6,  SECOND, i1[i], p2d)*
+			  FE<1,LAGRANGE>::shape_deriv(EDGE3, SECOND, i0[i], 0, p1d));
+		}
 	    }
+
 	    
 	    
 	  default:

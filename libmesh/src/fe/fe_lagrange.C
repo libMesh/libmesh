@@ -1,4 +1,4 @@
-// $Id: fe_lagrange.C,v 1.10 2003-02-20 04:59:58 benkirk Exp $
+// $Id: fe_lagrange.C,v 1.11 2003-02-25 18:34:46 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -173,10 +173,39 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 	    }
 	    
 	    
+	  case PRISM15:
 	  case PRISM18:
 	    {
-	      error();
+	      assert (elem_soln.size()  == 6);
+
+	      if (type == PRISM15)
+		assert (nodal_soln.size() == 15);
+	      else
+		assert (nodal_soln.size() == 18);
 	      
+	      nodal_soln[0]  = elem_soln[0];
+	      nodal_soln[1]  = elem_soln[1];
+	      nodal_soln[2]  = elem_soln[2];
+	      nodal_soln[3]  = elem_soln[3];
+	      nodal_soln[4]  = elem_soln[4];
+	      nodal_soln[5]  = elem_soln[5];
+	      nodal_soln[6]  = .5*(elem_soln[0] + elem_soln[1]);
+	      nodal_soln[7]  = .5*(elem_soln[1] + elem_soln[2]);
+	      nodal_soln[8]  = .5*(elem_soln[0] + elem_soln[2]);
+	      nodal_soln[9]  = .5*(elem_soln[0] + elem_soln[3]);
+	      nodal_soln[10] = .5*(elem_soln[1] + elem_soln[4]);
+	      nodal_soln[11] = .5*(elem_soln[2] + elem_soln[5]);
+	      nodal_soln[12] = .5*(elem_soln[3] + elem_soln[4]);
+	      nodal_soln[13] = .5*(elem_soln[4] + elem_soln[5]);
+	      nodal_soln[14] = .5*(elem_soln[3] + elem_soln[5]);
+
+	      if (type == PRISM18)
+		{
+		  nodal_soln[15] = .25*(elem_soln[0] + elem_soln[1] + elem_soln[4] + elem_soln[3]);
+		  nodal_soln[16] = .25*(elem_soln[1] + elem_soln[2] + elem_soln[5] + elem_soln[4]);
+		  nodal_soln[17] = .25*(elem_soln[2] + elem_soln[0] + elem_soln[3] + elem_soln[5]);
+		}
+	      	      
 	      return;
 	    }
 
@@ -243,6 +272,7 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 	    return 8;
 
 	  case PRISM6:
+	  case PRISM15:
 	  case PRISM18:
 	    return 6;
 
@@ -287,6 +317,9 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 	    
 	  case HEX27:
 	    return 27;
+
+	  case PRISM15:
+	    return 15;
 
 	  case PRISM18:
 	    return 18;
@@ -412,6 +445,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	    }
 
 	  case PRISM6:
+	  case PRISM15:
 	  case PRISM18:
 	    {
 	      switch (n)
@@ -470,6 +504,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	  case TET10:
 	  case HEX20:
 	  case HEX27:
+	  case PRISM15:
 	  case PRISM18:
 	    return 1;
 

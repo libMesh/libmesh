@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.12 2003-02-14 15:22:50 benkirk Exp $
+// $Id: mesh_generation.C,v 1.13 2003-02-25 18:34:52 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -36,7 +36,9 @@
 #include "cell_hex8.h"
 #include "cell_hex20.h"
 #include "cell_hex27.h"
-
+#include "cell_prism6.h"
+#include "cell_prism15.h"
+#include "cell_prism18.h"
 
 
 // ------------------------------------------------------------
@@ -359,11 +361,16 @@ void Mesh::build_cube(const unsigned int nx,
 
 
 	if ((type == INVALID_ELEM) ||
-	    (type == HEX8))
+	    (type == HEX8) ||
+	    (type == PRISM6))
 	  {
 	    // Build a HEX8
 	    _nodes.resize( (nx+1)*(ny+1)*(nz+1) );
-	    _elements.resize(nx*ny*nz);
+	    
+	    if (type == PRISM6)
+	      _elements.resize(2*nx*ny*nz);
+	    else
+	      _elements.resize(nx*ny*nz);
 	    
 	    unsigned int p=0;
 	    
@@ -386,18 +393,51 @@ void Mesh::build_cube(const unsigned int nx,
 	      for (unsigned int j=0; j<ny; j++)
 		for (unsigned int i=0; i<nx; i++)
 		  {
-		    _elements[e] = new Hex8;
-		    
-		    elem(e)->set_node(0) = _nodes[G(i,j,k)      ];
-		    elem(e)->set_node(1) = _nodes[G(i+1,j,k)    ];
-		    elem(e)->set_node(2) = _nodes[G(i+1,j+1,k)  ];
-		    elem(e)->set_node(3) = _nodes[G(i,j+1,k)    ];
-		    elem(e)->set_node(4) = _nodes[G(i,j,k+1)    ];
-		    elem(e)->set_node(5) = _nodes[G(i+1,j,k+1)  ];
-		    elem(e)->set_node(6) = _nodes[G(i+1,j+1,k+1)];
-		    elem(e)->set_node(7) = _nodes[G(i,j+1,k+1)  ];
-		    
-		    e++;
+		    if ((type == INVALID_ELEM) ||
+			(type == HEX8) ||
+			(type == PRISM6))
+		      {
+			_elements[e] = new Hex8;
+			
+			elem(e)->set_node(0) = _nodes[G(i,j,k)      ];
+			elem(e)->set_node(1) = _nodes[G(i+1,j,k)    ];
+			elem(e)->set_node(2) = _nodes[G(i+1,j+1,k)  ];
+			elem(e)->set_node(3) = _nodes[G(i,j+1,k)    ];
+			elem(e)->set_node(4) = _nodes[G(i,j,k+1)    ];
+			elem(e)->set_node(5) = _nodes[G(i+1,j,k+1)  ];
+			elem(e)->set_node(6) = _nodes[G(i+1,j+1,k+1)];
+			elem(e)->set_node(7) = _nodes[G(i,j+1,k+1)  ];
+			
+			e++;
+		      }
+
+		    else if (type == PRISM6)
+		      {
+			_elements[e] = new Prism6;
+
+			elem(e)->set_node(0) = _nodes[G(i,j,k)      ];
+			elem(e)->set_node(1) = _nodes[G(i+1,j,k)    ];
+			elem(e)->set_node(2) = _nodes[G(i,j+1,k)    ];
+			elem(e)->set_node(3) = _nodes[G(i,j,k+1)    ];
+			elem(e)->set_node(4) = _nodes[G(i+1,j,k+1)  ];
+			elem(e)->set_node(5) = _nodes[G(i,j+1,k+1)  ];
+
+			e++;
+			
+			_elements[e] = new Prism6;
+
+			elem(e)->set_node(0) = _nodes[G(i+1,j,k)    ];
+			elem(e)->set_node(1) = _nodes[G(i+1,j+1,k)  ];
+			elem(e)->set_node(2) = _nodes[G(i,j+1,k)    ];
+			elem(e)->set_node(3) = _nodes[G(i+1,j,k+1)  ];
+			elem(e)->set_node(4) = _nodes[G(i+1,j+1,k+1)];
+			elem(e)->set_node(5) = _nodes[G(i,j+1,k+1)  ];
+
+			e++;
+		      }
+
+		    else
+		      error();
 		  }
 #undef G
 
@@ -406,11 +446,17 @@ void Mesh::build_cube(const unsigned int nx,
 
 //TODO: Hex20 and Hex27 cubes seem to give bad number of nodes....
 	else if ((type == HEX20) ||
-		 (type == HEX27))
+		 (type == HEX27) ||
+		 (type == PRISM15) ||
+		 (type == PRISM18))
 	  {
-	    // Build a HEX20 or HEX27
+	    // Build a HEX20 or HEX27 or PRISM15 or PRISM18
 	    _nodes.resize( (2*nx+1)*(2*ny+1)*(2*nz+1) );
-	    _elements.resize(nx*ny*nz);
+	    
+	    if ((type == HEX20) || (type == HEX27))
+	      _elements.resize(nx*ny*nz);
+	    else
+	      _elements.resize(2*nx*ny*nz);
 	    
 	    unsigned int p=0;
 	    
@@ -433,43 +479,112 @@ void Mesh::build_cube(const unsigned int nx,
 	      for (unsigned int j=0; j<(2*ny); j += 2)
 		for (unsigned int i=0; i<(2*nx); i += 2)
 		  {
-		    if (type == HEX20)
-		      _elements[e] = new Hex20;
-		    else
-		      _elements[e] = new Hex27;
-		    
-		    elem(e)->set_node(0)  = _nodes[G(i,  j,  k)  ];
-		    elem(e)->set_node(1)  = _nodes[G(i+2,j,  k)  ];
-		    elem(e)->set_node(2)  = _nodes[G(i+2,j+2,k)  ];
-		    elem(e)->set_node(3)  = _nodes[G(i,  j+2,k)  ];
-		    elem(e)->set_node(4)  = _nodes[G(i,  j,  k+2)];
-		    elem(e)->set_node(5)  = _nodes[G(i+2,j,  k+2)];
-		    elem(e)->set_node(6)  = _nodes[G(i+2,j+2,k+2)];
-		    elem(e)->set_node(7)  = _nodes[G(i,  j+2,k+2)];
-		    elem(e)->set_node(8)  = _nodes[G(i+1,j,  k)  ];
-		    elem(e)->set_node(9)  = _nodes[G(i+2,j+1,k)  ];
-		    elem(e)->set_node(10) = _nodes[G(i+1,j+2,k)  ];
-		    elem(e)->set_node(11) = _nodes[G(i,  j+1,k)  ];
-		    elem(e)->set_node(12) = _nodes[G(i,  j,  k+1)];
-		    elem(e)->set_node(13) = _nodes[G(i+2,j,  k+1)];
-		    elem(e)->set_node(14) = _nodes[G(i+2,j+2,k+1)];
-		    elem(e)->set_node(15) = _nodes[G(i,  j+2,k+1)];
-		    elem(e)->set_node(16) = _nodes[G(i+1,j,  k+2)];
-		    elem(e)->set_node(17) = _nodes[G(i+2,j+1,k+2)];
-		    elem(e)->set_node(18) = _nodes[G(i+1,j+2,k+2)];
-		    elem(e)->set_node(19) = _nodes[G(i,  j+1,k+2)];
-		    if (type == HEX27)
+		    if ((type == HEX20) ||
+			(type == HEX27))
 		      {
-			elem(e)->set_node(20) = _nodes[G(i+1,j+1,k)  ];
-			elem(e)->set_node(21) = _nodes[G(i+1,j,  k+1)];
-			elem(e)->set_node(22) = _nodes[G(i+2,j+1,k+1)];
-			elem(e)->set_node(23) = _nodes[G(i+1,j+2,k+1)];
-			elem(e)->set_node(24) = _nodes[G(i,  j+1,k+1)];
-			elem(e)->set_node(25) = _nodes[G(i+1,j+1,k+2)];
-			elem(e)->set_node(26) = _nodes[G(i+1,j+1,k+1)];
-		      }
+			if (type == HEX20)
+			  _elements[e] = new Hex20;
+			else
+			  _elements[e] = new Hex27;
 		    
-		    e++;
+			elem(e)->set_node(0)  = _nodes[G(i,  j,  k)  ];
+			elem(e)->set_node(1)  = _nodes[G(i+2,j,  k)  ];
+			elem(e)->set_node(2)  = _nodes[G(i+2,j+2,k)  ];
+			elem(e)->set_node(3)  = _nodes[G(i,  j+2,k)  ];
+			elem(e)->set_node(4)  = _nodes[G(i,  j,  k+2)];
+			elem(e)->set_node(5)  = _nodes[G(i+2,j,  k+2)];
+			elem(e)->set_node(6)  = _nodes[G(i+2,j+2,k+2)];
+			elem(e)->set_node(7)  = _nodes[G(i,  j+2,k+2)];
+			elem(e)->set_node(8)  = _nodes[G(i+1,j,  k)  ];
+			elem(e)->set_node(9)  = _nodes[G(i+2,j+1,k)  ];
+			elem(e)->set_node(10) = _nodes[G(i+1,j+2,k)  ];
+			elem(e)->set_node(11) = _nodes[G(i,  j+1,k)  ];
+			elem(e)->set_node(12) = _nodes[G(i,  j,  k+1)];
+			elem(e)->set_node(13) = _nodes[G(i+2,j,  k+1)];
+			elem(e)->set_node(14) = _nodes[G(i+2,j+2,k+1)];
+			elem(e)->set_node(15) = _nodes[G(i,  j+2,k+1)];
+			elem(e)->set_node(16) = _nodes[G(i+1,j,  k+2)];
+			elem(e)->set_node(17) = _nodes[G(i+2,j+1,k+2)];
+			elem(e)->set_node(18) = _nodes[G(i+1,j+2,k+2)];
+			elem(e)->set_node(19) = _nodes[G(i,  j+1,k+2)];
+			if (type == HEX27)
+			  {
+			    elem(e)->set_node(20) = _nodes[G(i+1,j+1,k)  ];
+			    elem(e)->set_node(21) = _nodes[G(i+1,j,  k+1)];
+			    elem(e)->set_node(22) = _nodes[G(i+2,j+1,k+1)];
+			    elem(e)->set_node(23) = _nodes[G(i+1,j+2,k+1)];
+			    elem(e)->set_node(24) = _nodes[G(i,  j+1,k+1)];
+			    elem(e)->set_node(25) = _nodes[G(i+1,j+1,k+2)];
+			    elem(e)->set_node(26) = _nodes[G(i+1,j+1,k+1)];
+			  }
+			
+			e++;
+		      }
+
+		    else if ((type == PRISM15) ||
+			     (type == PRISM18))
+		      {
+			if (type == PRISM15)
+			  _elements[e] = new Prism15;
+			else
+			  _elements[e] = new Prism18;
+
+			elem(e)->set_node(0)  = _nodes[G(i,  j,  k)  ];
+			elem(e)->set_node(1)  = _nodes[G(i+2,j,  k)  ];
+			elem(e)->set_node(2)  = _nodes[G(i,  j+2,k)  ];
+			elem(e)->set_node(3)  = _nodes[G(i,  j,  k+2)];
+			elem(e)->set_node(4)  = _nodes[G(i+2,j,  k+2)];
+			elem(e)->set_node(5)  = _nodes[G(i,  j+2,k+2)];
+			elem(e)->set_node(6)  = _nodes[G(i+1,j,  k)  ];
+			elem(e)->set_node(7)  = _nodes[G(i+1,j+1,k)  ];
+			elem(e)->set_node(8)  = _nodes[G(i,  j+1,k)  ];
+			elem(e)->set_node(9)  = _nodes[G(i,  j,  k+1)];
+			elem(e)->set_node(10) = _nodes[G(i+2,j,  k+1)];
+			elem(e)->set_node(11) = _nodes[G(i,  j+2,k+1)];
+			elem(e)->set_node(12) = _nodes[G(i+1,j,  k+2)];
+			elem(e)->set_node(13) = _nodes[G(i+1,j+1,k+2)];
+			elem(e)->set_node(14) = _nodes[G(i,  j+1,k+2)];
+			if (type == PRISM18)
+			  {
+			    elem(e)->set_node(15) = _nodes[G(i+1,j,  k+1)];
+			    elem(e)->set_node(16) = _nodes[G(i+1,j+1,k+1)];
+			    elem(e)->set_node(17) = _nodes[G(i,  j+1,k+1)];
+			  }
+			
+			e++;
+			
+			if (type == PRISM15)
+			  _elements[e] = new Prism15;
+			else
+			  _elements[e] = new Prism18;
+
+			elem(e)->set_node(0) = _nodes[G(i+2,j,k)     ];
+			elem(e)->set_node(1) = _nodes[G(i+2,j+2,k)   ];
+			elem(e)->set_node(2) = _nodes[G(i,j+2,k)     ];
+			elem(e)->set_node(3) = _nodes[G(i+2,j,k+2)   ];
+			elem(e)->set_node(4) = _nodes[G(i+2,j+2,k+2) ];
+			elem(e)->set_node(5) = _nodes[G(i,j+2,k+2)   ];
+			elem(e)->set_node(6)  = _nodes[G(i+2,j+1,k)  ];
+			elem(e)->set_node(7)  = _nodes[G(i+1,j+2,k)  ];
+			elem(e)->set_node(8)  = _nodes[G(i+1,j+1,k)  ];
+			elem(e)->set_node(9)  = _nodes[G(i+2,j,k+1)  ];
+			elem(e)->set_node(10) = _nodes[G(i+2,j+2,k+1)];
+			elem(e)->set_node(11) = _nodes[G(i,j+2,k+1)  ];
+			elem(e)->set_node(12) = _nodes[G(i+2,j+1,k+2)];
+			elem(e)->set_node(13) = _nodes[G(i+1,j+2,k+2)];
+			elem(e)->set_node(14) = _nodes[G(i+1,j+1,k+2)];
+			if (type == PRISM18)
+			  {
+			    elem(e)->set_node(15)  = _nodes[G(i+2,j+1,k+1)];
+			    elem(e)->set_node(16)  = _nodes[G(i+1,j+2,k+1)];
+			    elem(e)->set_node(17)  = _nodes[G(i+1,j+1,k+1)];
+			  }
+	
+			e++;
+		      }
+
+		    else
+		      error();
 		  }
 #undef G
 

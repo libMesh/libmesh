@@ -1,4 +1,4 @@
-// $Id: fe_monomial.C,v 1.10 2003-02-20 04:59:58 benkirk Exp $
+// $Id: fe_monomial.C,v 1.11 2003-02-25 18:34:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -135,6 +135,7 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 	  case HEX20:
 	  case HEX27:
 	  case PRISM6:
+	  case PRISM15:
 	  case PRISM18:
 	  case PYRAMID5:
 	    return 4;
@@ -176,6 +177,7 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 	  case HEX20:
 	  case HEX27:
 	  case PRISM6:
+	  case PRISM15:
 	  case PRISM18:
 	  case PYRAMID5:
 	    return 10;
@@ -217,6 +219,7 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 	  case HEX20:
 	  case HEX27:
 	  case PRISM6:
+	  case PRISM15:
 	  case PRISM18:
 	  case PYRAMID5:
 	    return 20;
@@ -257,6 +260,7 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 	  case HEX20:
 	  case HEX27:
 	  case PRISM6:
+	  case PRISM15:
 	  case PRISM18:
 	  case PYRAMID5:
 	    return 35;
@@ -337,6 +341,7 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 	  case HEX20:
 	  case HEX27:
 	  case PRISM6:
+	  case PRISM15:
 	  case PRISM18:
 	  case PYRAMID5:
 	    return 4;
@@ -381,6 +386,7 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 	  case HEX20:
 	  case HEX27:
 	  case PRISM6:
+	  case PRISM15:
 	  case PRISM18:
 	  case PYRAMID5:
 	    return 10;
@@ -422,6 +428,7 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 	  case HEX20:
 	  case HEX27:
 	  case PRISM6:
+	  case PRISM15:
 	  case PRISM18:
 	  case PYRAMID5:
 	    return 20;
@@ -463,6 +470,7 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 	  case HEX20:
 	  case HEX27:
 	  case PRISM6:
+	  case PRISM15:
 	  case PRISM18:
 	  case PYRAMID5:
 	    return 35;

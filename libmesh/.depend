@@ -1076,6 +1076,72 @@ src/geom/cell_inf_prism6.$(obj-suffix):\
     include/reference_counter.h\
     include/sphere.h\
     include/surface.h
+src/geom/cell_prism15.$(obj-suffix):\
+    src/geom/cell_prism15.C\
+    include/auto_ptr.h\
+    include/boundary_info.h\
+    include/boundary_mesh.h\
+    include/cell.h\
+    include/cell_prism.h\
+    include/cell_prism15.h\
+    include/dof_object.h\
+    include/elem.h\
+    include/elem_iterators.h\
+    include/enum_elem_quality.h\
+    include/enum_elem_type.h\
+    include/enum_order.h\
+    include/face.h\
+    include/face_quad.h\
+    include/face_quad8.h\
+    include/face_tri.h\
+    include/face_tri6.h\
+    include/libmesh_base.h\
+    include/mesh.h\
+    include/mesh_base.h\
+    include/mesh_common.h\
+    include/mesh_config.h\
+    include/mesh_refinement.h\
+    include/node.h\
+    include/node_iterators.h\
+    include/point.h\
+    include/predicated_iterator.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h\
+    include/sphere.h\
+    include/surface.h
+src/geom/cell_prism18.$(obj-suffix):\
+    src/geom/cell_prism18.C\
+    include/auto_ptr.h\
+    include/boundary_info.h\
+    include/boundary_mesh.h\
+    include/cell.h\
+    include/cell_prism.h\
+    include/cell_prism18.h\
+    include/dof_object.h\
+    include/elem.h\
+    include/elem_iterators.h\
+    include/enum_elem_quality.h\
+    include/enum_elem_type.h\
+    include/enum_order.h\
+    include/face.h\
+    include/face_quad.h\
+    include/face_quad9.h\
+    include/face_tri.h\
+    include/face_tri6.h\
+    include/libmesh_base.h\
+    include/mesh.h\
+    include/mesh_base.h\
+    include/mesh_common.h\
+    include/mesh_config.h\
+    include/mesh_refinement.h\
+    include/node.h\
+    include/node_iterators.h\
+    include/point.h\
+    include/predicated_iterator.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h\
+    include/sphere.h\
+    include/surface.h
 src/geom/cell_prism6.$(obj-suffix):\
     src/geom/cell_prism6.C\
     include/auto_ptr.h\
@@ -1358,6 +1424,8 @@ src/geom/elem.$(obj-suffix):\
     include/cell_inf_prism12.h\
     include/cell_inf_prism6.h\
     include/cell_prism.h\
+    include/cell_prism15.h\
+    include/cell_prism18.h\
     include/cell_prism6.h\
     include/cell_pyramid.h\
     include/cell_pyramid5.h\
