@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.29 2005-02-28 16:35:25 roystgnr Exp $
+// $Id: fe_interface.C,v 1.30 2005-03-01 01:32:01 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1269,17 +1269,23 @@ void FEInterface::compute_constraints (std::map<unsigned int,
       {
 	switch (fe_t.family)
 	  {
+	  case CLOUGH:
+	    FE<2,CLOUGH>::compute_constraints (constraints,
+					       dof_map,
+					       variable_number,
+					       elem); return;
+
 	  case LAGRANGE:
 	    FE<2,LAGRANGE>::compute_constraints (constraints,
 						 dof_map,
 						 variable_number,
 						 elem); return;
 
-	  case CLOUGH:
-	    FE<2,CLOUGH>::compute_constraints (constraints,
-					       dof_map,
-					       variable_number,
-					       elem); return;
+	  case HIERARCHIC:
+	    FE<2,HIERARCHIC>::compute_constraints (constraints,
+						   dof_map,
+						   variable_number,
+						   elem); return;
 
 	  default:
 	    return;
@@ -1296,6 +1302,12 @@ void FEInterface::compute_constraints (std::map<unsigned int,
 					         dof_map,
 						 variable_number,
 						 elem); return;      
+
+	  case HIERARCHIC:
+	    FE<3,HIERARCHIC>::compute_constraints (constraints,
+						   dof_map,
+						   variable_number,
+						   elem); return;
 	  default:
 	    return;
 	  }
@@ -1312,7 +1324,6 @@ bool FEInterface::extra_hanging_dofs(const FEType& fe_t)
 {
   switch (fe_t.family)
     {
-      case HIERARCHIC:
       case LAGRANGE:
       case MONOMIAL:
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
@@ -1321,6 +1332,7 @@ bool FEInterface::extra_hanging_dofs(const FEType& fe_t)
       case XYZ:
 	return false;
       case CLOUGH:
+      case HIERARCHIC:
       default:
 	return true;
     }
