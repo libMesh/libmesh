@@ -1,4 +1,4 @@
-// $Id: libmesh_common.h,v 1.7 2004-10-22 21:03:22 jwpeterson Exp $
+// $Id: libmesh_common.h,v 1.8 2004-10-25 21:49:22 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -27,6 +27,7 @@
 #include "libmesh_config.h"
 
 // C/C++ includes everyone should know about
+#include <iostream> // needed for std::cout, std::cerr
 #include <complex>
 #include <assert.h>
 #ifdef HAVE_STDLIB_H

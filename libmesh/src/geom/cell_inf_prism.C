@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism.C,v 1.6 2004-01-03 15:37:43 benkirk Exp $
+// $Id: cell_inf_prism.C,v 1.7 2004-10-25 21:49:25 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -145,21 +145,6 @@ AutoPtr<Elem> InfPrism::side (const unsigned int i) const
   error();
   AutoPtr<Elem> ap(NULL);  return ap;
 }
-
-
-
-
-#ifdef ENABLE_AMR
-
-const unsigned int InfPrism::_side_children_matrix[4][4] =
-{
-  {0, 1,  2,  3}, // 4 side-0 children
-  {0, 1, 42, 42}, // 2 side-1 children
-  {1, 2, 42, 42}, // 2 side-2 children
-  {0, 2, 42, 42}, // 2 side-3 children
-};
-
-#endif
 
 
 

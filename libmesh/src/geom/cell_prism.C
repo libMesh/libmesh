@@ -1,4 +1,4 @@
-// $Id: cell_prism.C,v 1.13 2004-01-03 15:37:43 benkirk Exp $
+// $Id: cell_prism.C,v 1.14 2004-10-25 21:49:25 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -162,18 +162,3 @@ const unsigned short int Prism::_second_order_adjacent_vertices[9][2] =
   { 4,  5}, // vertices adjacent to node 13
   { 3,  5}  // vertices adjacent to node 14
 };
-
-
-
-#ifdef ENABLE_AMR
-
-const unsigned int Prism::_side_children_matrix[5][4] =
-{
-  {0, 1, 2, 3}, // side-0 children
-  {0, 1, 4, 5}, // side-1 children
-  {1, 2, 5, 6}, // side-2 children
-  {0, 2, 4, 6}, // side-3 children
-  {4, 5, 6, 7}  // side-4 children
-};
-
-#endif
