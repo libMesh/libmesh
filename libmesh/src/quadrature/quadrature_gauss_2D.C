@@ -1,4 +1,4 @@
-// $Id: quadrature_gauss_2D.C,v 1.6 2003-02-03 03:51:50 ddreyer Exp $
+// $Id: quadrature_gauss_2D.C,v 1.7 2003-02-04 17:02:29 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -180,16 +180,18 @@ void QGauss::init_2D(const ElemType _type)
 	      std::vector<Real> B(4);
 
 	      // Interval Quadrature points
-	      r[0] = 0.0694318422; s[0] = 0.0571041961;
-	      r[1] = 0.3300094782; s[1] = 0.2768430136;
-	      r[2] = 0.6699905218; s[2] = 0.5835904324;
-	      r[3] = 0.9305681558; s[3] = 0.8602401357;
+	      // Gauss Points        // Jacobi-Gauss Points
+	      r[0] = 0.0694318422;   s[0] = 0.0571041961;
+	      r[1] = 0.3300094782;   s[1] = 0.2768430136;
+	      r[2] = 0.6699905218;   s[2] = 0.5835904324;
+	      r[3] = 0.9305681558;   s[3] = 0.8602401357;
 
 	      // Interval Quadrature Weights
-	      A[0] = 0.1739274226; B[0] = 0.1355069134;
-	      A[1] = 0.3260725774; B[1] = 0.2034645680;
-	      A[2] = 0.3260725774; B[2] = 0.1298475476;
-	      A[3] = 0.1739274226; B[3] = 0.0311809709;
+	      // Gauss Weights       // Jacobi-Gauss Weights
+	      A[0] = 0.1739274226;   B[0] = 0.1355069134;
+	      A[1] = 0.3260725774;   B[1] = 0.2034645680;
+	      A[2] = 0.3260725774;   B[2] = 0.1298475476;
+	      A[3] = 0.1739274226;   B[3] = 0.0311809709;
 
 	      // Compute the conical products
 	      _points.resize(16);
