@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.h,v 1.3 2004-03-18 15:10:32 jwpeterson Exp $
+// $Id: unv_io.h,v 1.1 2004-03-19 19:16:52 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -18,70 +18,59 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef __mesh_unv_support_h__
-#define __mesh_unv_support_h__
 
-// C++ includes
-#include <fstream>
+#ifndef __unv_io_h__
+#define __unv_io_h__
+
+
+// C++ inludes
 #include <vector>
-
-
+#include <map>
+#include <string>
 
 // Local includes
-#include "mesh_base.h"
+#include "mesh_io.h"
 
 
 
-// Forward Declarations
-class MeshData;
 
-
-/**
- * Class \p UnvMeshInterface provides an interface
- * for reading a mesh (datasets 2411 and 2412)
- * from a file in I-deas Universal file format,
- * \p .unv.   Thanks to ,John: when \p zlib.h was 
- * found (see \p configure), then this interface 
- * may also read and write packed files of format 
- * \p .unv.gz @e directly.  Cool, hm?
- *
- * @author: Tammo Kaschner, Daniel Dreyer
- */
-class UnvMeshInterface
+// ------------------------------------------------------------
+// MeshIO class definition
+class UNVIO : public MeshIO
 {
-public:
+
+ public:
+  
+  /**
+   * Constructor.  Takes a writeable reference to a mesh object.
+   * This is the constructor required to read a mesh.
+   */
+  UNVIO (Mesh&);
 
   /**
-   * Constructor.  Takes the data relevant 
-   * for reading/writing mesh or reading data.
-   * Note that for simplicity, the node and element
-   * vectors have to be writable even when only
-   * read access is needed.  Optionally produces
-   * some babble on \p std::cout with \p be_verbose.
+   * Constructor.  Takes a reference to a constant mesh object.
+   * This constructor will only allow us to write the mesh.
    */
-  UnvMeshInterface (std::vector<Node*>& nodes,
-		    std::vector<Elem*>& elements,
-		    MeshData& md,
-		    const bool be_verbose=false);
-
-  /**
-   * Reads a mesh (nodes & elements) from the file
-   * named \p file_name.
-   */
-  void read (const std::string& file_name);
-
-  /**
-   * Writes a mesh (nodes & elements) to the file
-   * named \p file_name.
-   */
-  void write (const std::string& file_name);
+  UNVIO (const Mesh&);
   
   /**
    * Destructor.
    */
-  ~UnvMeshInterface();
+  virtual ~UNVIO ();
+  
+  /**
+   * This method implements reading a mesh from a specified file.
+   */
+  virtual void read (const std::string& );
+  
+  /**
+   * This method implements writing a mesh to a specified file.
+   */
+  virtual void write (const std::string& );
 
-protected:
+  
+ private:
+  
 
   /**
    * The actual implementation of the read function.
@@ -103,6 +92,10 @@ protected:
    */
   void clear();
 
+  /**
+   * Flag indicationg if we should be verbose.
+   */
+  bool & verbose ();
 
   //-------------------------------------------------------------
   // read support methods
@@ -122,7 +115,7 @@ protected:
    * active, the \p MeshData gets to know the node id from
    * the Universal file, too.
    */
-  void node_in(std::istream& in_file);
+  void node_in (std::istream& in_file);
 
   /**
    * When reading, counting the elements first
@@ -133,19 +126,19 @@ protected:
   /**
    * Method reads elements and stores them in
    * \p std::vector<Elem*> \p _elements in the same order as they
-   * come in. Within \p UnvMeshInterface, element labels are
+   * come in. Within \p UNVIO, element labels are
    * ignored, but \p MeshData takes care of such things
    * (if active).
    */
-  void element_in(std::istream& in_file);
+  void element_in (std::istream& in_file);
 
   /**
    * @returns \p false when error occured, \p true otherwise.
    * Adjusts the \p in_stream to the beginning of the
    * dataset \p ds_name.
    */
-  bool beginning_of_dataset(std::istream& in_file, 
-			    const std::string& ds_name) const;
+  bool beginning_of_dataset (std::istream& in_file, 
+			     const std::string& ds_name) const;
 
   /**
    * Method for converting exponential notation
@@ -153,7 +146,7 @@ protected:
    * \p 3.141592654D+00 \p --> \p 3.141592654e+00
    * in order to make it readable for C++.
    */
-  Real D_to_e(std::string& number) const;
+  Real D_to_e (std::string& number) const;
 
 
   //-------------------------------------------------------------
@@ -164,7 +157,7 @@ protected:
    * \p Mesh has to be active.  Do not use this directly,
    * but through the proper write method.
    */
-  void node_out(std::ostream& out_file);
+  void node_out (std::ostream& out_file);
 
   /**
    * Outputs the element data to the file \p out_file.
@@ -172,7 +165,7 @@ protected:
    * \p Mesh has to be active. Do not use this directly,
    * but through the proper write method.
    */
-  void element_out(std::ostream& out_file);
+  void element_out (std::ostream& out_file);
 
 
   //-------------------------------------------------------------
@@ -181,17 +174,7 @@ protected:
   /**
    * should be be verbose?
    */
-  const bool _verbose;
-
-  /**
-   * Reference to the mesh's vector holding the nodes
-   */
-  std::vector<Node*>& _nodes;    
-
-  /**
-   * Reference to the mesh's vector holding the elements
-   */
-  std::vector<Elem*>& _elements; 
+  bool _verbose;
 
   /**
    * maps node id's from UNV to internal.  Used when reading.
@@ -217,12 +200,6 @@ protected:
   unsigned int _n_elements;
 
   /**
-   * writable reference to the class that
-   * handles foreign node/element ids
-   */
-  MeshData& _mesh_data;
-
-  /**
    * label for the node dataset
    */
   static const std::string _label_dataset_nodes;
@@ -241,11 +218,45 @@ protected:
 };
 
 
+
 // ------------------------------------------------------------
-// UnvMeshInterface inline functions
+// MeshIO inline members
 inline
-bool UnvMeshInterface::beginning_of_dataset(std::istream& in_file, 
-					    const std::string& ds_name) const
+UNVIO::UNVIO (Mesh& mesh) :
+  MeshIO (mesh)
+{
+  
+}
+
+
+
+inline
+UNVIO::UNVIO (const Mesh& mesh) :
+  MeshIO (mesh)
+{
+}
+
+
+
+inline
+UNVIO::~UNVIO ()
+{
+  this->clear ();
+}
+
+
+
+inline
+bool & UNVIO::verbose ()
+{
+  return _verbose;
+}
+
+
+
+inline
+bool UNVIO::beginning_of_dataset (std::istream& in_file, 
+				  const std::string& ds_name) const
 {
   assert (in_file.good());
   assert (!ds_name.empty());
@@ -266,7 +277,7 @@ bool UnvMeshInterface::beginning_of_dataset(std::istream& in_file,
 	  in_file >> news;
 	}
 
-      if(in_file.eof())
+      if (in_file.eof())
 	return false;
       
       if (news == ds_name)
@@ -280,9 +291,8 @@ bool UnvMeshInterface::beginning_of_dataset(std::istream& in_file,
 
 
 
-
 inline
-Real UnvMeshInterface::D_to_e (std::string& number) const
+Real UNVIO::D_to_e (std::string& number) const
 {
   /* find "D" in string, start looking at 
    * 6th element, to improve speed.
@@ -297,7 +307,7 @@ Real UnvMeshInterface::D_to_e (std::string& number) const
   const unsigned int position = number.find("D",6);
 #endif
 
-  assert (position!=std::string::npos);
+  assert (position != std::string::npos);
   number.replace(position, 1, "e"); 
 
   return atof (number.c_str());
@@ -305,10 +315,4 @@ Real UnvMeshInterface::D_to_e (std::string& number) const
 
 
 
-
-#endif
-
-
-
-
-
+#endif // #define __unv_io_h__

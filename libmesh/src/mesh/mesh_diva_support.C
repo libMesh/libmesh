@@ -1,4 +1,4 @@
-// $Id: mesh_diva_support.C,v 1.13 2004-03-18 16:41:00 jwpeterson Exp $
+// $Id: mesh_diva_support.C,v 1.14 2004-03-19 19:16:53 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -65,7 +65,7 @@ void Mesh::write_diva (std::ostream& out)
     
   */
   
-  assert (out);
+  assert (out.good());
 
 
   if (_dim < 3)
@@ -84,30 +84,28 @@ void Mesh::write_diva (std::ostream& out)
   /**
    * Write the header
    */ 
-  {
-    out << this->n_nodes() << " "
-      
-	<< (boundary_mesh.n_active_elem_of_type(TRI3) +
-	    boundary_mesh.n_active_elem_of_type(TRI6)*4) << " "
-      
-	<< (boundary_mesh.n_active_elem_of_type(QUAD4)  +
-	    boundary_mesh.n_active_elem_of_type(QUAD8) +
-	    boundary_mesh.n_active_elem_of_type(QUAD9)*4) << " "
-      
-	<< (n_active_elem_of_type(TET4) +
-	    n_active_elem_of_type(TET10)*8) << " "
-      
-	<< n_active_elem_of_type(PYRAMID5) << " "
-      
-	<< (n_active_elem_of_type(PRISM6) +
-	    n_active_elem_of_type(PRISM18)*8) << " "
-      
-	<< (n_active_elem_of_type(HEX8)   +
-	    n_active_elem_of_type(HEX20) +
-	    n_active_elem_of_type(HEX27)*8) << " "
-      
-	<< std::endl;
-  }
+  out << this->n_nodes() << " "
+    
+      << (boundary_mesh.n_active_elem_of_type(TRI3) +
+	  boundary_mesh.n_active_elem_of_type(TRI6)*4) << " "
+    
+      << (boundary_mesh.n_active_elem_of_type(QUAD4) +
+	  boundary_mesh.n_active_elem_of_type(QUAD8) +
+	  boundary_mesh.n_active_elem_of_type(QUAD9)*4) << " "
+    
+      << (n_active_elem_of_type(TET4) +
+	  n_active_elem_of_type(TET10)*8) << " "
+    
+      << n_active_elem_of_type(PYRAMID5) << " "
+    
+      << (n_active_elem_of_type(PRISM6) +
+	  n_active_elem_of_type(PRISM18)*8) << " "
+    
+      << (n_active_elem_of_type(HEX8)   +
+	  n_active_elem_of_type(HEX20) +
+	  n_active_elem_of_type(HEX27)*8) << " "
+    
+      << std::endl;
   
 
   boundary_mesh.clear();

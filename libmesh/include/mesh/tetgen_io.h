@@ -1,7 +1,7 @@
-// $Id: mesh_tetgen_support.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: tetgen_io.h,v 1.1 2004-03-19 19:16:52 benkirk Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -18,57 +18,52 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef __mesh_tetgen_support_h__
-#define __mesh_tetgen_support_h__
 
-// C++ includes
-#include <vector>
-#include <map>
-
-
+#ifndef __tetgen_io_h__
+#define __tetgen_io_h__
 
 // Local includes
-#include "mesh_base.h"
-
-
-
-// Forward Declarations
-class MeshData;
+#include "libmesh_common.h"
+#include "mesh_io.h"
 
 
 /**
- * Class \p TetGenMeshInterface provides an interface
- * for reading a mesh from a file in TetGen file format.
+ * This class implements reading and writing meshes in the TetGen format.
+ *
+ * @author Benjamin S. Kirk, 2004
  */
 
-class TetGenMeshInterface
+// ------------------------------------------------------------
+// TetGenIO class definition
+class TetGenIO : public MeshIO
 {
-public:
-
+ public:
+  
   /**
-   * Constructor.  Takes the data relevant 
-   * for reading mesh or reading data.
+   * Constructor.  Takes a writeable reference to a mesh object.
+   * This is the constructor required to read a mesh.
    */
-  TetGenMeshInterface(std::vector<Node*>& nodes,
-		      std::vector<Elem*>& elements,
-		      MeshData& md);
+  TetGenIO (Mesh&);
+  
+  /**
+   * This method implements reading a mesh from a specified file
+   * in TetGen format.
+   */
+  virtual void read (const std::string& );
+
+  
+ private:
+ 
+
+  //-------------------------------------------------------------
+  // read support methods
 
   /**
    * Reads a mesh (nodes & elements) from the file
    * provided through \p node_stream and ele_stream.
    */
-  void read (std::istream& node_stream, std::istream& ele_stream);
-
-  /**
-   * Destructor.
-   */
-  ~TetGenMeshInterface();
-
-protected:
-
-
-  //-------------------------------------------------------------
-  // read support methods
+  void read_nodes_and_elem (std::istream& node_stream,
+			    std::istream& ele_stream);
 
   /**
    * Method reads nodes from \p node_stream and stores them in
@@ -79,7 +74,7 @@ protected:
    * active, the \p MeshData gets to know the node id from
    * the file, too.
    */
-  void node_in(std::istream& node_stream);
+  void node_in (std::istream& node_stream);
 
   /**
    * Method reads elements and stores them in
@@ -88,20 +83,10 @@ protected:
    * ignored, but \p MeshData takes care of such things
    * (if active).
    */
-  void element_in(std::istream& ele_stream);
+  void element_in (std::istream& ele_stream);
 
   //-------------------------------------------------------------
   // local data
-  
-  /**
-   * vector holding the nodes.
-   */
-  std::vector<Node*>& _nodes;    
-
-  /**
-   * vector holding the elements.
-   */
-  std::vector<Elem*>& _elements; 
 
   /**
    * stores new positions of nodes. Used when reading.
@@ -117,18 +102,19 @@ protected:
    * total number of elements. Primarily used when reading.
    */
   unsigned int _num_elements;
-
-  /**
-   * writable reference to the class that
-   * handles foreign node/element ids
-   */
-  MeshData& _mesh_data;
-
+ 
 };
 
-#endif
+
+
+// ------------------------------------------------------------
+// TetGenIO inline members
+inline
+TetGenIO::TetGenIO (Mesh& mesh) :
+  MeshIO (mesh)
+{
+}
 
 
 
-
-
+#endif // #define __tetgen_io_h__
