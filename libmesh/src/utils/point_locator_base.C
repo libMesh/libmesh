@@ -1,4 +1,4 @@
-// $Id: point_locator_base.C,v 1.2 2003-05-15 23:34:36 benkirk Exp $
+// $Id: point_locator_base.C,v 1.3 2003-07-05 14:58:59 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,7 +26,8 @@
 #include "point_locator_base.h"
 #include "mesh.h"
 #include "point.h"
-#include "point_locator.h"
+#include "point_locator_tree.h"
+#include "point_locator_list.h"
 
 
 
@@ -61,8 +62,15 @@ AutoPtr<PointLocatorBase> PointLocatorBase::build (const PointLocatorType t,
     {
     case TREE:
       {
-	AutoPtr<PointLocatorBase> ap(new PointLocator<TREE>(mesh,
-							    master));
+	AutoPtr<PointLocatorBase> ap(new PointLocatorTree(mesh,
+							  master));
+	return ap;
+      }
+
+    case LIST:
+      {
+	AutoPtr<PointLocatorBase> ap(new PointLocatorList(mesh,
+							  master));
 	return ap;
       }
 
