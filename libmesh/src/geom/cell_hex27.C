@@ -1,4 +1,4 @@
-// $Id: cell_hex27.C,v 1.16 2003-08-17 19:06:35 ddreyer Exp $
+// $Id: cell_hex27.C,v 1.17 2003-08-17 19:07:42 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -38,32 +38,32 @@ unsigned int Hex27::key (const unsigned int s) const
     case 0:  // the face at z=0
 
       return
-	Elem::compute_key (this->node(20));
+	this->compute_key (this->node(20));
 
     case 1:  // the face at y = 0
 
       return
-	Elem::compute_key (this->node(21));
+	this->compute_key (this->node(21));
 
     case 2:  // the face at x=1
 
       return
-	Elem::compute_key (this->node(22));
+	this->compute_key (this->node(22));
 
     case 3: // the face at y=1
 
       return
-	Elem::compute_key (this->node(23));
+	this->compute_key (this->node(23));
 
     case 4: // the face at x=0
 
       return
-	Elem::compute_key (this->node(24));
+	this->compute_key (this->node(24));
 
     case 5: // the face at z=1
 
       return
-	Elem::compute_key (this->node(25));
+	this->compute_key (this->node(25));
     }
 
   // We'll never get here.
