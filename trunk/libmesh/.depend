@@ -120,8 +120,33 @@ src/base/reference_counter.$(obj-suffix):\
     src/base/reference_counter.C\
     include/base/libmesh_config.h\
     include/base/reference_counter.h
-src/fe/fe.$(obj-suffix):\
-    src/fe/fe.C\
+src/fe/fe_base.$(obj-suffix):\
+    src/fe/fe_base.C\
+    include/base/auto_ptr.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_logging.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
+    include/enums/enum_order.h\
+    include/enums/enum_quadrature_type.h\
+    include/enums/enum_solver_package.h\
+    include/fe/fe.h\
+    include/fe/fe_base.h\
+    include/fe/fe_type.h\
+    include/fe/inf_fe.h\
+    include/geom/point.h\
+    include/numerics/type_vector.h\
+    include/numerics/vector_value.h\
+    include/quadrature/quadrature.h\
+    include/utils/perf_log.h
+src/fe/fe_boundary.$(obj-suffix):\
+    src/fe/fe_boundary.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
@@ -150,33 +175,8 @@ src/fe/fe.$(obj-suffix):\
     include/numerics/vector_value.h\
     include/quadrature/quadrature.h\
     include/utils/perf_log.h
-src/fe/fe_base.$(obj-suffix):\
-    src/fe/fe_base.C\
-    include/base/auto_ptr.h\
-    include/base/libmesh.h\
-    include/base/libmesh_base.h\
-    include/base/libmesh_common.h\
-    include/base/libmesh_config.h\
-    include/base/libmesh_logging.h\
-    include/base/reference_counted_object.h\
-    include/base/reference_counter.h\
-    include/enums/enum_elem_type.h\
-    include/enums/enum_fe_family.h\
-    include/enums/enum_inf_map_type.h\
-    include/enums/enum_order.h\
-    include/enums/enum_quadrature_type.h\
-    include/enums/enum_solver_package.h\
-    include/fe/fe.h\
-    include/fe/fe_base.h\
-    include/fe/fe_type.h\
-    include/fe/inf_fe.h\
-    include/geom/point.h\
-    include/numerics/type_vector.h\
-    include/numerics/vector_value.h\
-    include/quadrature/quadrature.h\
-    include/utils/perf_log.h
-src/fe/fe_boundary.$(obj-suffix):\
-    src/fe/fe_boundary.C\
+src/fe/fe.$(obj-suffix):\
+    src/fe/fe.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
@@ -712,33 +712,6 @@ src/fe/fe_szabab_shape_3D.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
     include/utils/perf_log.h
-src/fe/fe_xyz.$(obj-suffix):\
-    src/fe/fe_xyz.C\
-    include/base/auto_ptr.h\
-    include/base/dof_object.h\
-    include/base/libmesh.h\
-    include/base/libmesh_base.h\
-    include/base/libmesh_common.h\
-    include/base/libmesh_config.h\
-    include/base/libmesh_logging.h\
-    include/base/node.h\
-    include/base/reference_counted_object.h\
-    include/base/reference_counter.h\
-    include/enums/enum_elem_quality.h\
-    include/enums/enum_elem_type.h\
-    include/enums/enum_fe_family.h\
-    include/enums/enum_inf_map_type.h\
-    include/enums/enum_io_package.h\
-    include/enums/enum_order.h\
-    include/enums/enum_solver_package.h\
-    include/fe/fe.h\
-    include/fe/fe_base.h\
-    include/fe/fe_type.h\
-    include/geom/elem.h\
-    include/geom/point.h\
-    include/numerics/type_vector.h\
-    include/numerics/vector_value.h\
-    include/utils/perf_log.h
 src/fe/fe_xyz_boundary.$(obj-suffix):\
     src/fe/fe_xyz_boundary.C\
     include/base/auto_ptr.h\
@@ -768,6 +741,33 @@ src/fe/fe_xyz_boundary.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
     include/quadrature/quadrature.h\
+    include/utils/perf_log.h
+src/fe/fe_xyz.$(obj-suffix):\
+    src/fe/fe_xyz.C\
+    include/base/auto_ptr.h\
+    include/base/dof_object.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_logging.h\
+    include/base/node.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
+    include/enums/enum_io_package.h\
+    include/enums/enum_order.h\
+    include/enums/enum_solver_package.h\
+    include/fe/fe.h\
+    include/fe/fe_base.h\
+    include/fe/fe_type.h\
+    include/geom/elem.h\
+    include/geom/point.h\
+    include/numerics/type_vector.h\
+    include/numerics/vector_value.h\
     include/utils/perf_log.h
 src/fe/fe_xyz_shape_1D.$(obj-suffix):\
     src/fe/fe_xyz_shape_1D.C\
@@ -847,41 +847,6 @@ src/fe/fe_xyz_shape_3D.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
     include/utils/perf_log.h
-src/fe/inf_fe.$(obj-suffix):\
-    src/fe/inf_fe.C\
-    include/base/auto_ptr.h\
-    include/base/dof_object.h\
-    include/base/libmesh.h\
-    include/base/libmesh_base.h\
-    include/base/libmesh_common.h\
-    include/base/libmesh_config.h\
-    include/base/libmesh_logging.h\
-    include/base/node.h\
-    include/base/reference_counted_object.h\
-    include/base/reference_counter.h\
-    include/enums/enum_elem_quality.h\
-    include/enums/enum_elem_type.h\
-    include/enums/enum_fe_family.h\
-    include/enums/enum_inf_map_type.h\
-    include/enums/enum_io_package.h\
-    include/enums/enum_order.h\
-    include/enums/enum_quadrature_type.h\
-    include/enums/enum_solver_package.h\
-    include/fe/fe.h\
-    include/fe/fe_base.h\
-    include/fe/fe_type.h\
-    include/fe/inf_fe.h\
-    include/fe/inf_fe_instantiate_1D.h\
-    include/fe/inf_fe_instantiate_2D.h\
-    include/fe/inf_fe_instantiate_3D.h\
-    include/fe/inf_fe_macro.h\
-    include/geom/elem.h\
-    include/geom/point.h\
-    include/numerics/type_vector.h\
-    include/numerics/vector_value.h\
-    include/quadrature/quadrature.h\
-    include/quadrature/quadrature_gauss.h\
-    include/utils/perf_log.h
 src/fe/inf_fe_base_radial.$(obj-suffix):\
     src/fe/inf_fe_base_radial.C\
     include/base/auto_ptr.h\
@@ -936,6 +901,41 @@ src/fe/inf_fe_boundary.$(obj-suffix):\
     include/geom/point.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h
+src/fe/inf_fe.$(obj-suffix):\
+    src/fe/inf_fe.C\
+    include/base/auto_ptr.h\
+    include/base/dof_object.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_logging.h\
+    include/base/node.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
+    include/enums/enum_io_package.h\
+    include/enums/enum_order.h\
+    include/enums/enum_quadrature_type.h\
+    include/enums/enum_solver_package.h\
+    include/fe/fe.h\
+    include/fe/fe_base.h\
+    include/fe/fe_type.h\
+    include/fe/inf_fe.h\
+    include/fe/inf_fe_instantiate_1D.h\
+    include/fe/inf_fe_instantiate_2D.h\
+    include/fe/inf_fe_instantiate_3D.h\
+    include/fe/inf_fe_macro.h\
+    include/geom/elem.h\
+    include/geom/point.h\
+    include/numerics/type_vector.h\
+    include/numerics/vector_value.h\
+    include/quadrature/quadrature.h\
+    include/quadrature/quadrature_gauss.h\
+    include/utils/perf_log.h
 src/fe/inf_fe_jacobi_20_00_eval.$(obj-suffix):\
     src/fe/inf_fe_jacobi_20_00_eval.C\
     include/base/auto_ptr.h\
@@ -1114,30 +1114,6 @@ src/fe/inf_fe_static.$(obj-suffix):\
     include/utils/perf_log.h
 src/geom/cell.$(obj-suffix):\
     src/geom/cell.C
-src/geom/cell_hex.$(obj-suffix):\
-    src/geom/cell_hex.C\
-    include/base/auto_ptr.h\
-    include/base/dof_object.h\
-    include/base/libmesh.h\
-    include/base/libmesh_base.h\
-    include/base/libmesh_common.h\
-    include/base/libmesh_config.h\
-    include/base/node.h\
-    include/base/reference_counted_object.h\
-    include/base/reference_counter.h\
-    include/enums/enum_elem_quality.h\
-    include/enums/enum_elem_type.h\
-    include/enums/enum_io_package.h\
-    include/enums/enum_order.h\
-    include/enums/enum_solver_package.h\
-    include/geom/cell_hex.h\
-    include/geom/elem.h\
-    include/geom/face.h\
-    include/geom/face_quad.h\
-    include/geom/face_quad4.h\
-    include/geom/point.h\
-    include/numerics/type_vector.h\
-    include/utils/perf_log.h
 src/geom/cell_hex20.$(obj-suffix):\
     src/geom/cell_hex20.C\
     include/base/auto_ptr.h\
@@ -1213,10 +1189,8 @@ src/geom/cell_hex8.$(obj-suffix):\
     include/geom/point.h\
     include/numerics/type_vector.h\
     include/utils/perf_log.h
-src/geom/cell_inf.$(obj-suffix):\
-    src/geom/cell_inf.C
-src/geom/cell_inf_hex.$(obj-suffix):\
-    src/geom/cell_inf_hex.C\
+src/geom/cell_hex.$(obj-suffix):\
+    src/geom/cell_hex.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
@@ -1231,16 +1205,16 @@ src/geom/cell_inf_hex.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
-    include/geom/cell_inf_hex.h\
+    include/geom/cell_hex.h\
     include/geom/elem.h\
     include/geom/face.h\
-    include/geom/face_inf_quad.h\
-    include/geom/face_inf_quad4.h\
     include/geom/face_quad.h\
     include/geom/face_quad4.h\
     include/geom/point.h\
     include/numerics/type_vector.h\
     include/utils/perf_log.h
+src/geom/cell_inf.$(obj-suffix):\
+    src/geom/cell_inf.C
 src/geom/cell_inf_hex16.$(obj-suffix):\
     src/geom/cell_inf_hex16.C\
     include/base/auto_ptr.h\
@@ -1310,8 +1284,8 @@ src/geom/cell_inf_hex8.$(obj-suffix):\
     include/geom/cell_inf_hex8.h\
     include/geom/point.h\
     include/numerics/type_vector.h
-src/geom/cell_inf_prism.$(obj-suffix):\
-    src/geom/cell_inf_prism.C\
+src/geom/cell_inf_hex.$(obj-suffix):\
+    src/geom/cell_inf_hex.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
@@ -1326,14 +1300,13 @@ src/geom/cell_inf_prism.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
-    include/geom/cell_inf.h\
-    include/geom/cell_inf_prism.h\
+    include/geom/cell_inf_hex.h\
     include/geom/elem.h\
     include/geom/face.h\
     include/geom/face_inf_quad.h\
     include/geom/face_inf_quad4.h\
-    include/geom/face_tri.h\
-    include/geom/face_tri3.h\
+    include/geom/face_quad.h\
+    include/geom/face_quad4.h\
     include/geom/point.h\
     include/numerics/type_vector.h\
     include/utils/perf_log.h
@@ -1392,8 +1365,8 @@ src/geom/cell_inf_prism6.$(obj-suffix):\
     include/geom/point.h\
     include/numerics/type_vector.h\
     include/utils/perf_log.h
-src/geom/cell_prism.$(obj-suffix):\
-    src/geom/cell_prism.C\
+src/geom/cell_inf_prism.$(obj-suffix):\
+    src/geom/cell_inf_prism.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
@@ -1408,12 +1381,12 @@ src/geom/cell_prism.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
-    include/geom/cell.h\
-    include/geom/cell_prism.h\
+    include/geom/cell_inf.h\
+    include/geom/cell_inf_prism.h\
     include/geom/elem.h\
     include/geom/face.h\
-    include/geom/face_quad.h\
-    include/geom/face_quad4.h\
+    include/geom/face_inf_quad.h\
+    include/geom/face_inf_quad4.h\
     include/geom/face_tri.h\
     include/geom/face_tri3.h\
     include/geom/point.h\
@@ -1503,8 +1476,8 @@ src/geom/cell_prism6.$(obj-suffix):\
     include/geom/point.h\
     include/numerics/type_vector.h\
     include/utils/perf_log.h
-src/geom/cell_pyramid.$(obj-suffix):\
-    src/geom/cell_pyramid.C\
+src/geom/cell_prism.$(obj-suffix):\
+    src/geom/cell_prism.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
@@ -1520,7 +1493,7 @@ src/geom/cell_pyramid.$(obj-suffix):\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
     include/geom/cell.h\
-    include/geom/cell_pyramid.h\
+    include/geom/cell_prism.h\
     include/geom/elem.h\
     include/geom/face.h\
     include/geom/face_quad.h\
@@ -1558,8 +1531,8 @@ src/geom/cell_pyramid5.$(obj-suffix):\
     include/geom/point.h\
     include/numerics/type_vector.h\
     include/utils/perf_log.h
-src/geom/cell_tet.$(obj-suffix):\
-    src/geom/cell_tet.C\
+src/geom/cell_pyramid.$(obj-suffix):\
+    src/geom/cell_pyramid.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
@@ -1575,9 +1548,11 @@ src/geom/cell_tet.$(obj-suffix):\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
     include/geom/cell.h\
-    include/geom/cell_tet.h\
+    include/geom/cell_pyramid.h\
     include/geom/elem.h\
     include/geom/face.h\
+    include/geom/face_quad.h\
+    include/geom/face_quad4.h\
     include/geom/face_tri.h\
     include/geom/face_tri3.h\
     include/geom/point.h\
@@ -1628,6 +1603,31 @@ src/geom/cell_tet4.$(obj-suffix):\
     include/geom/cell.h\
     include/geom/cell_tet.h\
     include/geom/cell_tet4.h\
+    include/geom/elem.h\
+    include/geom/face.h\
+    include/geom/face_tri.h\
+    include/geom/face_tri3.h\
+    include/geom/point.h\
+    include/numerics/type_vector.h\
+    include/utils/perf_log.h
+src/geom/cell_tet.$(obj-suffix):\
+    src/geom/cell_tet.C\
+    include/base/auto_ptr.h\
+    include/base/dof_object.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/node.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_io_package.h\
+    include/enums/enum_order.h\
+    include/enums/enum_solver_package.h\
+    include/geom/cell.h\
+    include/geom/cell_tet.h\
     include/geom/elem.h\
     include/geom/face.h\
     include/geom/face_tri.h\
@@ -1800,30 +1800,6 @@ src/geom/elem_type.$(obj-suffix):\
     include/geom/elem_type.h
 src/geom/face.$(obj-suffix):\
     src/geom/face.C
-src/geom/face_inf_quad.$(obj-suffix):\
-    src/geom/face_inf_quad.C\
-    include/base/auto_ptr.h\
-    include/base/dof_object.h\
-    include/base/libmesh.h\
-    include/base/libmesh_base.h\
-    include/base/libmesh_common.h\
-    include/base/libmesh_config.h\
-    include/base/node.h\
-    include/base/reference_counted_object.h\
-    include/base/reference_counter.h\
-    include/enums/enum_elem_quality.h\
-    include/enums/enum_elem_type.h\
-    include/enums/enum_io_package.h\
-    include/enums/enum_order.h\
-    include/enums/enum_solver_package.h\
-    include/geom/edge.h\
-    include/geom/edge_edge2.h\
-    include/geom/edge_inf_edge2.h\
-    include/geom/elem.h\
-    include/geom/face_inf_quad.h\
-    include/geom/point.h\
-    include/numerics/type_vector.h\
-    include/utils/perf_log.h
 src/geom/face_inf_quad4.$(obj-suffix):\
     src/geom/face_inf_quad4.C\
     include/base/auto_ptr.h\
@@ -1875,8 +1851,8 @@ src/geom/face_inf_quad6.$(obj-suffix):\
     include/geom/point.h\
     include/numerics/type_vector.h\
     include/utils/perf_log.h
-src/geom/face_quad.$(obj-suffix):\
-    src/geom/face_quad.C\
+src/geom/face_inf_quad.$(obj-suffix):\
+    src/geom/face_inf_quad.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
@@ -1893,9 +1869,9 @@ src/geom/face_quad.$(obj-suffix):\
     include/enums/enum_solver_package.h\
     include/geom/edge.h\
     include/geom/edge_edge2.h\
+    include/geom/edge_inf_edge2.h\
     include/geom/elem.h\
-    include/geom/face.h\
-    include/geom/face_quad.h\
+    include/geom/face_inf_quad.h\
     include/geom/point.h\
     include/numerics/type_vector.h\
     include/utils/perf_log.h
@@ -1974,8 +1950,8 @@ src/geom/face_quad9.$(obj-suffix):\
     include/geom/point.h\
     include/numerics/type_vector.h\
     include/utils/perf_log.h
-src/geom/face_tri.$(obj-suffix):\
-    src/geom/face_tri.C\
+src/geom/face_quad.$(obj-suffix):\
+    src/geom/face_quad.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
@@ -1994,7 +1970,7 @@ src/geom/face_tri.$(obj-suffix):\
     include/geom/edge_edge2.h\
     include/geom/elem.h\
     include/geom/face.h\
-    include/geom/face_tri.h\
+    include/geom/face_quad.h\
     include/geom/point.h\
     include/numerics/type_vector.h\
     include/utils/perf_log.h
@@ -2045,6 +2021,30 @@ src/geom/face_tri6.$(obj-suffix):\
     include/geom/face.h\
     include/geom/face_tri.h\
     include/geom/face_tri6.h\
+    include/geom/point.h\
+    include/numerics/type_vector.h\
+    include/utils/perf_log.h
+src/geom/face_tri.$(obj-suffix):\
+    src/geom/face_tri.C\
+    include/base/auto_ptr.h\
+    include/base/dof_object.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/node.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_io_package.h\
+    include/enums/enum_order.h\
+    include/enums/enum_solver_package.h\
+    include/geom/edge.h\
+    include/geom/edge_edge2.h\
+    include/geom/elem.h\
+    include/geom/face.h\
+    include/geom/face_tri.h\
     include/geom/point.h\
     include/numerics/type_vector.h\
     include/utils/perf_log.h
@@ -2397,67 +2397,6 @@ src/mesh/medit_io.$(obj-suffix):\
     include/utils/data_map.h\
     include/utils/data_object.h\
     include/utils/perf_log.h
-src/mesh/mesh.$(obj-suffix):\
-    src/mesh/mesh.C\
-    include/base/auto_ptr.h\
-    include/base/dof_map.h\
-    include/base/dof_object.h\
-    include/base/libmesh.h\
-    include/base/libmesh_base.h\
-    include/base/libmesh_common.h\
-    include/base/libmesh_config.h\
-    include/base/libmesh_logging.h\
-    include/base/node.h\
-    include/base/predicated_iterator.h\
-    include/base/reference_counted_object.h\
-    include/base/reference_counter.h\
-    include/enums/enum_elem_quality.h\
-    include/enums/enum_elem_type.h\
-    include/enums/enum_fe_family.h\
-    include/enums/enum_inf_map_type.h\
-    include/enums/enum_io_package.h\
-    include/enums/enum_order.h\
-    include/enums/enum_solver_package.h\
-    include/enums/enum_xdr_mode.h\
-    include/fe/fe_type.h\
-    include/geom/elem.h\
-    include/geom/point.h\
-    include/geom/sphere.h\
-    include/geom/surface.h\
-    include/mesh/boundary_info.h\
-    include/mesh/diva_io.h\
-    include/mesh/elem_iterators.h\
-    include/mesh/gmsh_io.h\
-    include/mesh/gmv_io.h\
-    include/mesh/matlab_io.h\
-    include/mesh/medit_io.h\
-    include/mesh/mesh.h\
-    include/mesh/mesh_base.h\
-    include/mesh/mesh_communication.h\
-    include/mesh/mesh_data.h\
-    include/mesh/mesh_io.h\
-    include/mesh/node_iterators.h\
-    include/mesh/off_io.h\
-    include/mesh/shanee_io.h\
-    include/mesh/tecplot_io.h\
-    include/mesh/tetgen_io.h\
-    include/mesh/ucd_io.h\
-    include/mesh/unv_io.h\
-    include/numerics/coupling_matrix.h\
-    include/numerics/numeric_vector.h\
-    include/numerics/type_vector.h\
-    include/partitioning/partitioner.h\
-    include/solvers/equation_systems.h\
-    include/solvers/explicit_system.h\
-    include/solvers/frequency_system.h\
-    include/solvers/implicit_system.h\
-    include/solvers/newmark_system.h\
-    include/solvers/steady_system.h\
-    include/solvers/system.h\
-    include/solvers/transient_system.h\
-    include/utils/data_map.h\
-    include/utils/data_object.h\
-    include/utils/perf_log.h
 src/mesh/mesh_base.$(obj-suffix):\
     src/mesh/mesh_base.C\
     include/base/auto_ptr.h\
@@ -2557,6 +2496,67 @@ src/mesh/mesh_base_modification.$(obj-suffix):\
     include/mesh/node_iterators.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
+    include/utils/perf_log.h
+src/mesh/mesh.$(obj-suffix):\
+    src/mesh/mesh.C\
+    include/base/auto_ptr.h\
+    include/base/dof_map.h\
+    include/base/dof_object.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_logging.h\
+    include/base/node.h\
+    include/base/predicated_iterator.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
+    include/enums/enum_io_package.h\
+    include/enums/enum_order.h\
+    include/enums/enum_solver_package.h\
+    include/enums/enum_xdr_mode.h\
+    include/fe/fe_type.h\
+    include/geom/elem.h\
+    include/geom/point.h\
+    include/geom/sphere.h\
+    include/geom/surface.h\
+    include/mesh/boundary_info.h\
+    include/mesh/diva_io.h\
+    include/mesh/elem_iterators.h\
+    include/mesh/gmsh_io.h\
+    include/mesh/gmv_io.h\
+    include/mesh/matlab_io.h\
+    include/mesh/medit_io.h\
+    include/mesh/mesh.h\
+    include/mesh/mesh_base.h\
+    include/mesh/mesh_communication.h\
+    include/mesh/mesh_data.h\
+    include/mesh/mesh_io.h\
+    include/mesh/node_iterators.h\
+    include/mesh/off_io.h\
+    include/mesh/shanee_io.h\
+    include/mesh/tecplot_io.h\
+    include/mesh/tetgen_io.h\
+    include/mesh/ucd_io.h\
+    include/mesh/unv_io.h\
+    include/numerics/coupling_matrix.h\
+    include/numerics/numeric_vector.h\
+    include/numerics/type_vector.h\
+    include/partitioning/partitioner.h\
+    include/solvers/equation_systems.h\
+    include/solvers/explicit_system.h\
+    include/solvers/frequency_system.h\
+    include/solvers/implicit_system.h\
+    include/solvers/newmark_system.h\
+    include/solvers/steady_system.h\
+    include/solvers/system.h\
+    include/solvers/transient_system.h\
+    include/utils/data_map.h\
+    include/utils/data_object.h\
     include/utils/perf_log.h
 src/mesh/mesh_communication.$(obj-suffix):\
     src/mesh/mesh_communication.C\
@@ -3396,6 +3396,12 @@ src/numerics/analytic_function.$(obj-suffix):\
     include/numerics/type_vector.h
 src/numerics/coupling_matrix.$(obj-suffix):\
     src/numerics/coupling_matrix.C
+src/numerics/dense_matrix_base.$(obj-suffix):\
+    src/numerics/dense_matrix_base.C\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/numerics/dense_matrix_base.h
 src/numerics/dense_matrix.$(obj-suffix):\
     src/numerics/dense_matrix.C\
     include/base/libmesh.h\
@@ -3408,12 +3414,6 @@ src/numerics/dense_matrix.$(obj-suffix):\
     include/numerics/dense_vector.h\
     include/numerics/dense_vector_base.h\
     include/utils/perf_log.h
-src/numerics/dense_matrix_base.$(obj-suffix):\
-    src/numerics/dense_matrix_base.C\
-    include/base/libmesh_base.h\
-    include/base/libmesh_common.h\
-    include/base/libmesh_config.h\
-    include/numerics/dense_matrix_base.h
 src/numerics/dense_submatrix.$(obj-suffix):\
     src/numerics/dense_submatrix.C\
     include/base/libmesh_base.h\
@@ -3432,18 +3432,18 @@ src/numerics/dense_subvector.$(obj-suffix):\
     include/numerics/dense_subvector.h\
     include/numerics/dense_vector.h\
     include/numerics/dense_vector_base.h
+src/numerics/dense_vector_base.$(obj-suffix):\
+    src/numerics/dense_vector_base.C\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/numerics/dense_vector_base.h
 src/numerics/dense_vector.$(obj-suffix):\
     src/numerics/dense_vector.C\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
     include/numerics/dense_vector.h\
-    include/numerics/dense_vector_base.h
-src/numerics/dense_vector_base.$(obj-suffix):\
-    src/numerics/dense_vector_base.C\
-    include/base/libmesh_base.h\
-    include/base/libmesh_common.h\
-    include/base/libmesh_config.h\
     include/numerics/dense_vector_base.h
 src/numerics/distributed_vector.$(obj-suffix):\
     src/numerics/distributed_vector.C\
@@ -4117,20 +4117,6 @@ src/partitioning/sfc_partitioner.$(obj-suffix):\
     include/partitioning/partitioner.h\
     include/partitioning/sfc_partitioner.h\
     include/utils/perf_log.h
-src/quadrature/quadrature.$(obj-suffix):\
-    src/quadrature/quadrature.C\
-    include/base/auto_ptr.h\
-    include/base/libmesh_base.h\
-    include/base/libmesh_common.h\
-    include/base/libmesh_config.h\
-    include/base/reference_counted_object.h\
-    include/base/reference_counter.h\
-    include/enums/enum_elem_type.h\
-    include/enums/enum_order.h\
-    include/enums/enum_quadrature_type.h\
-    include/geom/point.h\
-    include/numerics/type_vector.h\
-    include/quadrature/quadrature.h
 src/quadrature/quadrature_build.$(obj-suffix):\
     src/quadrature/quadrature_build.C\
     include/base/auto_ptr.h\
@@ -4149,8 +4135,20 @@ src/quadrature/quadrature_build.$(obj-suffix):\
     include/quadrature/quadrature_jacobi.h\
     include/quadrature/quadrature_simpson.h\
     include/quadrature/quadrature_trap.h
-src/quadrature/quadrature_gauss.$(obj-suffix):\
-    src/quadrature/quadrature_gauss.C
+src/quadrature/quadrature.$(obj-suffix):\
+    src/quadrature/quadrature.C\
+    include/base/auto_ptr.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_order.h\
+    include/enums/enum_quadrature_type.h\
+    include/geom/point.h\
+    include/numerics/type_vector.h\
+    include/quadrature/quadrature.h
 src/quadrature/quadrature_gauss_1D.$(obj-suffix):\
     src/quadrature/quadrature_gauss_1D.C\
     include/base/auto_ptr.h\
@@ -4198,8 +4196,8 @@ src/quadrature/quadrature_gauss_3D.$(obj-suffix):\
     include/quadrature/quadrature.h\
     include/quadrature/quadrature_gauss.h\
     include/quadrature/quadrature_jacobi.h
-src/quadrature/quadrature_jacobi.$(obj-suffix):\
-    src/quadrature/quadrature_jacobi.C
+src/quadrature/quadrature_gauss.$(obj-suffix):\
+    src/quadrature/quadrature_gauss.C
 src/quadrature/quadrature_jacobi_1D.$(obj-suffix):\
     src/quadrature/quadrature_jacobi_1D.C\
     include/base/auto_ptr.h\
@@ -4215,6 +4213,8 @@ src/quadrature/quadrature_jacobi_1D.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/quadrature/quadrature.h\
     include/quadrature/quadrature_jacobi.h
+src/quadrature/quadrature_jacobi.$(obj-suffix):\
+    src/quadrature/quadrature_jacobi.C
 src/quadrature/quadrature_rules.$(obj-suffix):\
     src/quadrature/quadrature_rules.C\
     include/base/libmesh_base.h\
@@ -4222,8 +4222,6 @@ src/quadrature/quadrature_rules.$(obj-suffix):\
     include/base/libmesh_config.h\
     include/enums/enum_quadrature_type.h\
     include/quadrature/quadrature_rules.h
-src/quadrature/quadrature_simpson.$(obj-suffix):\
-    src/quadrature/quadrature_simpson.C
 src/quadrature/quadrature_simpson_1D.$(obj-suffix):\
     src/quadrature/quadrature_simpson_1D.C\
     include/base/auto_ptr.h\
@@ -4269,8 +4267,8 @@ src/quadrature/quadrature_simpson_3D.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/quadrature/quadrature.h\
     include/quadrature/quadrature_simpson.h
-src/quadrature/quadrature_trap.$(obj-suffix):\
-    src/quadrature/quadrature_trap.C
+src/quadrature/quadrature_simpson.$(obj-suffix):\
+    src/quadrature/quadrature_simpson.C
 src/quadrature/quadrature_trap_1D.$(obj-suffix):\
     src/quadrature/quadrature_trap_1D.C\
     include/base/auto_ptr.h\
@@ -4316,6 +4314,8 @@ src/quadrature/quadrature_trap_3D.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/quadrature/quadrature.h\
     include/quadrature/quadrature_trap.h
+src/quadrature/quadrature_trap.$(obj-suffix):\
+    src/quadrature/quadrature_trap.C
 src/solvers/equation_systems.$(obj-suffix):\
     src/solvers/equation_systems.C\
     include/base/auto_ptr.h\
@@ -4994,14 +4994,6 @@ src/utils/utility.$(obj-suffix):\
     include/base/libmesh_config.h\
     include/utils/o_string_stream.h\
     include/utils/utility.h
-src/utils/xdrIO.$(obj-suffix):\
-    src/utils/xdrIO.C\
-    include/base/libmesh_base.h\
-    include/base/libmesh_common.h\
-    include/base/libmesh_config.h\
-    include/enums/enum_elem_type.h\
-    include/utils/o_f_stream.h\
-    include/utils/xdrIO.h
 src/utils/xdr_cxx.$(obj-suffix):\
     src/utils/xdr_cxx.C\
     include/base/libmesh_base.h\
@@ -5010,3 +5002,11 @@ src/utils/xdr_cxx.$(obj-suffix):\
     include/enums/enum_xdr_mode.h\
     include/utils/o_f_stream.h\
     include/utils/xdr_cxx.h
+src/utils/xdrIO.$(obj-suffix):\
+    src/utils/xdrIO.C\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/enums/enum_elem_type.h\
+    include/utils/o_f_stream.h\
+    include/utils/xdrIO.h
