@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.34 2004-02-08 20:25:23 benkirk Exp $
+# $Id: Makefile,v 1.35 2004-02-08 20:36:57 benkirk Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -134,7 +134,7 @@ clobber:
 	@$(MAKE) clean
 	@$(MAKE) -C contrib $(MAKECMDGOALS)
 	@$(MAKE) -C examples $(MAKECMDGOALS)
-	@rm -rf $(targ_dir) bin/grid2grid bin/meshtool bin/testexodus bin/amr bin/compare
+	@rm -rf config.status $(targ_dir) bin/grid2grid bin/meshtool bin/testexodus bin/amr bin/compare
 
 #
 # Make clobber, remove documentation, removes all libraries
