@@ -1,4 +1,4 @@
-// $Id: numeric_vector.h,v 1.11 2003-03-21 17:15:04 spetersen Exp $
+// $Id: numeric_vector.h,v 1.12 2003-04-29 21:37:36 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -460,23 +460,9 @@ void NumericVector<T>::clear ()
 
 
 
-template <typename T>
-inline
-void NumericVector<T>::print() const
-{
-  assert (initialized());
-  std::cout << "Size\tglobal =  " << size()
-	    << "\t\tlocal =  " << local_size() << std::endl;
-
-  std::cout << "#\tValue" << std::endl;
-  for (unsigned int i=first_local_index(); i<last_local_index(); i++)
-    std::cout << i << "\t" << (*this)(i) << std::endl;
-}
-
-
-
 // Full specialization of the print() member for complex
-// variables
+// variables.  This must precede the non-specialized
+// version, at least according to icc v7.1
 template <>
 inline
 void NumericVector<Complex>::print() const
@@ -491,6 +477,21 @@ void NumericVector<Complex>::print() const
     std::cout << i << "\t" 
 	      << (*this)(i).real() << "\t\t" 
 	      << (*this)(i).imag() << std::endl;
+}
+
+
+
+template <typename T>
+inline
+void NumericVector<T>::print() const
+{
+  assert (initialized());
+  std::cout << "Size\tglobal =  " << size()
+	    << "\t\tlocal =  " << local_size() << std::endl;
+
+  std::cout << "#\tValue" << std::endl;
+  for (unsigned int i=first_local_index(); i<last_local_index(); i++)
+    std::cout << i << "\t" << (*this)(i) << std::endl;
 }
 
 

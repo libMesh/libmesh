@@ -1,4 +1,4 @@
-// $Id: petsc_vector.C,v 1.17 2003-03-21 17:15:22 spetersen Exp $
+// $Id: petsc_vector.C,v 1.18 2003-04-29 21:39:36 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -273,16 +273,9 @@ template <typename T>
 NumericVector<T>&
 PetscVector<T>::operator = (const NumericVector<T>& v_in)
 {
-  int ierr=0;
-  
   const PetscVector<T>& v = dynamic_cast<const PetscVector<T>&>(v_in);
 
-  assert (size() == v.size());
-
-  if (size() != 0)
-    {
-      ierr = VecCopy (v.vec, vec); CHKERRQ(ierr);
-    }
+  *this = v;
   
   return *this;
 }
@@ -293,11 +286,16 @@ template <typename T>
 PetscVector<T>&
 PetscVector<T>::operator = (const PetscVector<T>& v)
 {
+  if (v.initialized())
+    {
+      this->init (v.size(), v.local_size());
+      _is_closed      = v._is_closed;
+      _is_initialized = v._is_initialized;
+    }
+  
   int ierr=0;
 
-  assert (size() == v.size());
-
-  if (size() != 0)
+  if (v.size() != 0)
     {
       ierr = VecCopy (v.vec, vec); CHKERRQ(ierr);
     }

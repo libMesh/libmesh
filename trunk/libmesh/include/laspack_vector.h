@@ -1,4 +1,4 @@
-// $Id: laspack_vector.h,v 1.13 2003-04-21 15:22:19 benkirk Exp $
+// $Id: laspack_vector.h,v 1.14 2003-04-29 21:37:34 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -398,13 +398,9 @@ void LaspackVector<T>::init (const unsigned int n,
   // Laspack vectors only for serial cases.
   assert (n == n_local);
 
-  // Only for uninitialized vectors
+  // Clear initialized vectors
   if (this->initialized())
-    {
-      std::cerr << "ERROR: Vector already initialized!"
-		<< std::endl;      
-      error();
-    }
+    this->clear();
 
   // create a sequential vector
 

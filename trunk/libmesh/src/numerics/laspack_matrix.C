@@ -1,4 +1,4 @@
-// $Id: laspack_matrix.C,v 1.10 2003-03-23 01:39:14 ddreyer Exp $
+// $Id: laspack_matrix.C,v 1.11 2003-04-29 21:39:36 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -179,7 +179,10 @@ void LaspackMatrix<T>::init ()
   
   // We need the DofMap for this!
   assert (this->_dof_map != NULL);
-  assert (!this->initialized());  
+
+  // Clear intialized matrices
+  if (this->initialized())
+    this->clear();
 
   const unsigned int m   = this->_dof_map->n_dofs();
   const unsigned int n   = m;

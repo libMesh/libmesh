@@ -1,4 +1,4 @@
-// $Id: petsc_matrix.C,v 1.14 2003-03-11 23:36:46 ddreyer Exp $
+// $Id: petsc_matrix.C,v 1.15 2003-04-29 21:39:36 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -45,13 +45,9 @@ void PetscMatrix<T>::init (const unsigned int m,
     return;
 
   {
+    // Clear initialized matrices
     if (this->initialized())
-      {
-	std::cerr << "ERROR: Matrix already initialized!"
-		  << std::endl;
-	
-	error();
-      }
+      this->clear();
 
     this->_is_initialized = true;
   }
@@ -95,12 +91,9 @@ void PetscMatrix<T>::init ()
   assert (this->_dof_map != NULL);
   
   {
+    // Clear initialized matrices
     if (this->initialized())
-      {
-	std::cerr << "ERROR: Matrix already initialized!"
-		  << std::endl;	
-	error();
-      }
+      this->clear();
 
     this->_is_initialized = true;
   }
