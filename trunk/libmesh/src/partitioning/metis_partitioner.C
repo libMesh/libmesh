@@ -1,4 +1,4 @@
-// $Id: metis_partitioner.C,v 1.12 2004-01-03 15:37:44 benkirk Exp $
+// $Id: metis_partitioner.C,v 1.13 2004-03-10 07:11:27 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -74,25 +74,27 @@ void MetisPartitioner::partition (MeshBase& mesh,
   const unsigned int n_elem        = mesh.n_elem();
   
   // build the graph
-  // the forward_map maps the active element id
+  // the forward_map maps each active element id
   // into a contiguous block of indices for Metis
-  std::vector<unsigned int>
-    forward_map (n_elem, libMesh::invalid_uint);
+  std::vector<unsigned int> forward_map (n_elem, libMesh::invalid_uint);
   
-  std::vector<int>          xadj;
-  std::vector<int>          adjncy;
-  std::vector<int>          options(5);
-  std::vector<int>          vwgt(n_active_elem);
-  std::vector<int>          part(n_active_elem);
+  std::vector<int> xadj;
+  std::vector<int> adjncy;
+  std::vector<int> options(5);
+  std::vector<int> vwgt(n_active_elem);
+  std::vector<int> part(n_active_elem);
+
+  xadj.reserve(n_active_elem+1);
   
   int
     n = static_cast<int>(n_active_elem),  // number of "nodes" (elements)
                                           //   in the graph
-    wgtflag = 2,                          // weights on vertices only
+    wgtflag = 2,                          // weights on vertices only,
+                                          //   none on edges
     numflag = 0,                          // C-style 0-based numbering
     nparts  = static_cast<int>(n_pieces), // number of subdomains to create
     edgecut = 0;                          // the numbers of edges cut by the
-                                          //   partition
+                                          //   resulting partition
 
   // Set the options
   options[0] = 0; // use default options
@@ -111,8 +113,7 @@ void MetisPartitioner::partition (MeshBase& mesh,
       {
 	assert ((*elem_it)->id() < forward_map.size());
 	
-	forward_map[(*elem_it)->id()] = el_num;
-	el_num++;
+	forward_map[(*elem_it)->id()] = el_num++;
       }
 
     assert (el_num == n_active_elem);
@@ -127,19 +128,21 @@ void MetisPartitioner::partition (MeshBase& mesh,
     
     active_elem_iterator       elem_it (mesh.elements_begin());
     const active_elem_iterator elem_end(mesh.elements_end());
-    
+
+    // This will be exact when there is no refinement and all the
+    // elements are of the same type.
+    adjncy.reserve (n_active_elem*(*elem_it)->n_neighbors());
     
     for (; elem_it != elem_end; ++elem_it)
       {
 	const Elem* elem = *elem_it;
 
 	assert (elem->id() < forward_map.size());
-	assert (forward_map[elem->id()] !=
-		libMesh::invalid_uint);
+	assert (forward_map[elem->id()] != libMesh::invalid_uint);
 	
 	// maybe there is a better weight?
-	vwgt[forward_map[elem->id()]]
-	     = elem->n_nodes(); 
+	// The weight is used to define what a balanced graph is
+	vwgt[forward_map[elem->id()]] = elem->n_nodes(); 
 
 	// The beginning of the adjacency array for this elem
 	xadj.push_back(adjncy.size());
@@ -157,8 +160,7 @@ void MetisPartitioner::partition (MeshBase& mesh,
 		if (neighbor->active())
 		  {
 		    assert (neighbor->id() < forward_map.size());
-		    assert (forward_map[neighbor->id()] !=
-			    libMesh::invalid_uint);
+		    assert (forward_map[neighbor->id()] != libMesh::invalid_uint);
 
 		    adjncy.push_back (forward_map[neighbor->id()]);
 		  }
@@ -194,8 +196,7 @@ void MetisPartitioner::partition (MeshBase& mesh,
 			  {
 			    assert (child->active());
 			    assert (child->id() < forward_map.size());
-			    assert (forward_map[child->id()] !=
-				    libMesh::invalid_uint);
+			    assert (forward_map[child->id()] != libMesh::invalid_uint);
 			
 			    adjncy.push_back (forward_map[child->id()]);
 			  }
@@ -208,7 +209,7 @@ void MetisPartitioner::partition (MeshBase& mesh,
 	  }
       }
     
-    // The end of the adjacency array for this elem
+    // The end of the adjacency array for the last elem
     xadj.push_back(adjncy.size());
     
   } // done building the graph
@@ -229,7 +230,9 @@ void MetisPartitioner::partition (MeshBase& mesh,
 			       &edgecut, &part[0]);
   
   
-  // Assign the returned processor ids
+  // Assign the returned processor ids.  The part array contains
+  // the processor id for each active element, but in terms of
+  // the contiguous indexing we defined above
   {
     active_elem_iterator       elem_it (mesh.elements_begin());
     const active_elem_iterator elem_end(mesh.elements_end());
@@ -239,12 +242,10 @@ void MetisPartitioner::partition (MeshBase& mesh,
 	Elem* elem = *elem_it;
 
 	assert (elem->id() < forward_map.size());
-	assert (forward_map[elem->id()] !=
-		libMesh::invalid_uint);
+	assert (forward_map[elem->id()] != libMesh::invalid_uint);
 	
 	elem->set_processor_id() =
-	  static_cast<short int>(part[forward_map[elem->id()]]);
-	
+	  static_cast<short int>(part[forward_map[elem->id()]]);	
       }
   }
 
