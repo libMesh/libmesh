@@ -1,4 +1,4 @@
-// $Id: inf_fe_static.C,v 1.7 2003-02-06 17:58:35 ddreyer Exp $
+// $Id: inf_fe_static.C,v 1.8 2003-02-13 17:43:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -63,6 +63,9 @@ Point InfFE<Dim,T_radial,T_map>::Radial::inverse_map(const Elem*,
 {
   std::cerr << "ERROR: Radial::inverse_map() not yet implemented." << std::endl;
   error();
+
+  Point p;
+  return p;
 };
 
 
@@ -113,7 +116,7 @@ template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
 ElemType InfFE<Dim,T_radial,T_base>::Base::get_elem_type(const ElemType type)
 {
   switch (type)
-  {
+    {
       // 3D infinite elements:
       // with Dim=3 -> infinite elements on their own
       case INFHEX8:
@@ -148,14 +151,16 @@ ElemType InfFE<Dim,T_radial,T_base>::Base::get_elem_type(const ElemType type)
 	  return INVALID_ELEM;
 
       default:
-      {
+	{
 	  std::cerr << "ERROR: Unsupported element type!: " << type
 		    << std::endl;
 	  error();
-      }
+	}
+    }
 
-  }
 
+  error();
+  return INVALID_ELEM;
 };
 
 
