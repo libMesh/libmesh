@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.37 2004-03-23 04:47:29 jwpeterson Exp $
+// $Id: mesh.C,v 1.38 2004-03-23 05:16:22 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -36,6 +36,7 @@
 #include "unv_io.h"
 #include "matlab_io.h"
 #include "off_io.h"
+#include "shanee_io.h"
 
 // ------------------------------------------------------------
 // Mesh class member functions
@@ -96,7 +97,7 @@ void Mesh::read (const std::string& name)
 	this->read_xdr_binary (name);
       
       else if (name.rfind(".mesh") < name.size())
-	this->read_shanee (name);
+	ShaneeIO (*this).read (name);
       
       else if (name.rfind(".unv") < name.size())
 	UNVIO(*this).read (name);

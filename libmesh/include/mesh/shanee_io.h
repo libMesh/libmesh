@@ -1,0 +1,72 @@
+// $Id: shanee_io.h,v 1.1 2004-03-23 05:16:21 jwpeterson Exp $
+
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
+  
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+  
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+  
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+#ifndef __shanee_io_h__
+#define __shanee_io_h__
+
+// Local includes
+#include "libmesh_common.h"
+#include "mesh_io.h"
+
+/**
+ * Read a 2D mesh in the shanee format from the file specified
+ * by \p name.  This is for compatibility with
+ * Ben Kirk's old code, and may be removed at any time in the future.
+ *
+ * @sect2{Write Methods}
+ *
+ */
+
+// ------------------------------------------------------------
+// ShaneeIO class definition
+class ShaneeIO : public MeshIO
+{
+public:
+  /**
+   *  Constructor.  Takes a non-const Mesh reference which it
+   * will fill up with elements.
+   */
+  ShaneeIO (Mesh&);
+
+  /**
+   * Reads in an OFF OOGL data file based on the string
+   * you pass it.
+   */
+  virtual void read (const std::string& name);
+
+private:
+  /**
+   * Implementation of the read() function.  This function
+   * is called by the public interface function and implements
+   * reading the file.
+   */
+  virtual void read_stream (std::istream& in);
+};
+
+
+// ------------------------------------------------------------
+// ShaneeIO inline members
+inline
+ShaneeIO::ShaneeIO (Mesh& mesh) :
+  MeshIO  (mesh)
+{}
+
+
+
+#endif
