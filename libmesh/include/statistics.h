@@ -1,4 +1,4 @@
-// $Id: statistics.h,v 1.9 2003-05-19 21:21:11 benkirk Exp $
+// $Id: statistics.h,v 1.10 2003-06-05 19:33:50 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,7 @@
 
 // C++ includes
 #include <vector>
-
+#include <math.h>
 
 // Local includes
 #include "mesh_common.h"
@@ -78,12 +78,12 @@ class StatisticsVector : public std::vector<T>
   /**
    * Call the std::vector constructor.
    */
-  StatisticsVector(unsigned int i=0) { this->resize(i); }
+  StatisticsVector(unsigned int i=0) : std::vector<T> (i) {}
   
   /**
    * Call the std::vector constructor, fill each entry with \p val
    */
-  StatisticsVector(unsigned int i, T val);
+  StatisticsVector(unsigned int i, T val) : std::vector<T> (i,val) {}
 
   /**
    * Destructor.  Virtual so we can derive from the \p StatisticsVector
@@ -130,11 +130,40 @@ class StatisticsVector : public std::vector<T>
    * Uses a recurrence relation to prevent
    * data overflow for large sums.
    * Note: The variance is equal to the
-   * standard deviation squared.  The variance
-   * is normalized by N in this case.
+   * standard deviation squared.
    * Source: GNU Scientific Library
    */
-  virtual Real variance() const;
+  virtual Real variance() const
+  {return this->variance(this->mean()); }
+
+  /**   
+   * Computes the variance of the data set
+   * where the \p mean is provided. This is useful
+   * for efficiency when you have already calculated
+   * the mean. Uses a recurrence relation to prevent
+   * data overflow for large sums.
+   * Note: The variance is equal to the
+   * standard deviation squared.
+   * Source: GNU Scientific Library
+   */
+  virtual Real variance(const Real mean) const;
+
+  /**
+   * Computes the standard deviation of
+   * the data set, which is simply the square-root
+   * of the variance.
+   */  
+  virtual Real stddev() const
+  { return sqrt(this->variance()); }
+  
+  /**
+   * Computes the standard deviation of
+   * the data set, which is simply the square-root
+   * of the variance.  This method can be used for
+   * efficiency when the \p mean has already been computed.
+   */  
+  virtual Real stddev(const Real mean) const
+  { return sqrt(this->variance(mean)); }
 
   /**
    * Computes and returns a histogram with
