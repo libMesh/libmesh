@@ -52,6 +52,18 @@
  *     - Los Alamos National Labs GMV format (.gmv)
  *     - AVS Unstructured UCD format (.ucd)
  *
+ *  - Mesh Creation & Modification Utilities
+ *     - refine or coarsen a mesh: prescribed, level-one-compatible, or uniform
+ *     - build equispaced n-cubes out of \p Edge2, \p Tri3, \p Tri6, 
+ *          \p Quad4, \p Quad8, \p Quad9, \p Hex8, \p Hex20, \p Hex27
+ *     - build circles/spheres out of \p Tri3, \p Tri6, \p Quad4,
+ *          \p Quad8, \p Quad9, \p Hex8
+ *     - add infinite elements to a volume-based mesh, handle symmetry planes
+ *     - convert \p Quad4, \p Quad8, \p Quad9 to \p Tri3, \p Tri6
+ *     - distort/translate/rotate/scale a mesh
+ *     - determine bounding boxes/spheres
+ *     - extract the mesh boundary for BC handling or as a separate mesh
+ *
  * \p libMesh is actively developed at The University ot Texas at
  * Austin in the CFDLab and at Technische Universit&auml;t Hamburg-Harburg,
  * Mechanics and Ocean Engineering in Germany.  Many thanks to SourceForge 
