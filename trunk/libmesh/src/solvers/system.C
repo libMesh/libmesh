@@ -1,4 +1,4 @@
-// $Id: system.C,v 1.2 2004-01-11 15:56:46 benkirk Exp $
+// $Id: system.C,v 1.3 2004-02-10 13:28:07 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -32,6 +32,7 @@
 #include "mesh.h"
 #include "sparse_matrix.h"
 #include "libmesh_logging.h"
+#include "utility.h"
 
 // typedefs
 typedef std::map<std::string, NumericVector<Number>* >::iterator       vectors_iterator;

@@ -1,4 +1,4 @@
-// $Id: laspack_vector.C,v 1.20 2004-01-03 15:37:43 benkirk Exp $
+// $Id: laspack_vector.C,v 1.21 2004-02-10 13:28:07 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -161,7 +161,8 @@ template <typename T>
 NumericVector<T>&
 LaspackVector<T>::operator = (const NumericVector<T>& v_in)
 {
-  const LaspackVector& v = dynamic_cast<const LaspackVector&>(v_in);
+  const LaspackVector<T>& v =
+    dynamic_cast<const LaspackVector<T>&>(v_in);
   
   *this = v;
 
@@ -227,8 +228,8 @@ template <typename T>
 void LaspackVector<T>::localize (NumericVector<T>& v_local_in,
 				 const std::vector<unsigned int>& send_list) const
 {
-  LaspackVector& v_local =
-    dynamic_cast<LaspackVector&>(v_local_in);
+  LaspackVector<T>& v_local =
+    dynamic_cast<LaspackVector<T>&>(v_local_in);
 
   assert (send_list.size() == v_local.size());
 
