@@ -1,4 +1,4 @@
-// $Id: mesh_data_unv_support.C,v 1.6 2003-07-12 14:02:59 ddreyer Exp $
+// $Id: mesh_data_unv_support.C,v 1.7 2003-07-12 20:39:30 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -25,6 +25,7 @@
 // Local includes
 #include "mesh_data.h"
 #include "mesh_base.h"
+#include "auto_ptr.h"
 
 
 
@@ -311,6 +312,13 @@ void MeshData::write_unv (const std::string& name)
    */
   assert (!_node_data.empty());
 
+  if (!_elem_data.empty())
+      std::cerr << "WARNING: MeshData currently only supports nodal data for Universal files."
+		<< std::endl
+		<< "         Will proceed writing only nodal data, ignoring element data."
+		<< std::endl;
+
+
   /**
    * Write the beginning of the dataset.
    */
@@ -324,59 +332,32 @@ void MeshData::write_unv (const std::string& name)
    */
   if (_unv_header==NULL)
     {
-      /**
-       * Write a dummy header.
-       *
-       * Record 1 (analysis dataset label, currently just a dummy).
+      /*
+       * create a header that holds at
+       * least sufficient data to specify
+       * what this data set currently holds.
+       * 
+       * The empty constructor automatically
+       * takes care of \p dataset_location
+       * and \p data_type.
        */
-      char buf[81];
-      sprintf(buf, "%10i\n",0);
-      out_file << buf;
-      
-      /**
-       * Record 2 (analysis dataset name, currently just a dummy).
-       */
-      std::string _dummy_string = "libMesh\n";
-      out_file << _dummy_string;
-      
-      /**
-       * Record 3 (dataset location).
-       */
-      sprintf(buf, "%10i\n",1);
-      out_file << buf;
-      
-      /**
-       * Record 4 trough 8 (ID lines).
-       */
-      for (unsigned int i=0; i<5;i++)
-	out_file << _dummy_string;
-      
-      /**
-       * Record 9 trough 11.
-       */
-      sprintf(buf, "%10i%10i%10i%10i%10i%10i\n", 0, 0, 0, 0, 0, 0);
-      out_file << buf;
-      
-      sprintf(buf, "%10i%10i%10i%10i%10i%10i%10i%10i\n", 0, 0, 0, 0, 0, 0, 0, 0);
-      out_file << buf;
-      
-      sprintf(buf, "%10i%10i\n", 0, 0);
-      out_file << buf;
-      
-      /**
-       * Record 12 and 13.
-       */
-      sprintf(buf, "%13.5E%13.5E%13.5E%13.5E%13.5E%13.5E\n", 0., 0., 0., 0., 0., 0.);
-      out_file << buf;
-      
-      sprintf(buf, "%13.5E%13.5E%13.5E%13.5E%13.5E%13.5E\n", 0., 0., 0., 0., 0., 0.);
-      out_file << buf;
-    }
+      AutoPtr<MeshDataUnvHeader> my_header(new MeshDataUnvHeader);
 
-  else
-    {
-      _unv_header->write (out_file);
+      /*
+       * It remains to set the correct nvaldc
+       */
+      my_header->nvaldc = this->n_val_per_node();
+
+      /*
+       * write this default header, then let
+       * the AutoPtr go out of scope.  This 
+       * will take care of memory management.
+       */
+      my_header->write (out_file);
     }
+  else
+      _unv_header->write (out_file);
+
 
   /**
    * Write the foreign node number and the respective data.
@@ -430,16 +411,20 @@ MeshDataUnvHeader::MeshDataUnvHeader() :
   dataset_label        (0),
   dataset_name         ("libMesh mesh data"),
   dataset_location     (1),  // default to nodal data
-  id_line_1            ("libMesh"),
-  id_line_2            ("libMesh"),
-  id_line_3            ("libMesh"),
-  id_line_4            ("libMesh"),
-  id_line_5            ("libMesh"),
+  id_line_1            ("libMesh default"),
+  id_line_2            ("libMesh default"),
+  id_line_3            ("libMesh default"),
+  id_line_4            ("libMesh default"),
+  id_line_5            ("libMesh default"),
   model_type           (0),          
   analysis_type        (0),
   data_characteristic  (0),
   result_type          (0),
+#ifdef USE_COMPLEX_NUMBERS
   data_type            (5),  // default to single precision complex
+#else
+  data_type            (2),  // default to single precision real
+#endif
   nvaldc               (3)   // default to 3 (principal directions)
 {
   /**
