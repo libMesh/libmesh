@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.6 2003-01-30 19:53:58 benkirk Exp $
+# $Id: Makefile,v 1.7 2003-01-31 16:47:26 benkirk Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -61,7 +61,7 @@ endif
 #
 # static library
 #
-(targ)/libmesh.a: $(objects)
+$(targ)/libmesh.a: $(objects)
 	@$(MAKE) -C contrib
 	@$(shell mkdir -p $(targ_dir))
 	@echo ""

@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.8 2003-01-29 20:58:29 benkirk Exp $
+// $Id: elem.h,v 1.9 2003-01-31 16:47:38 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -98,23 +98,23 @@ class Elem : public ReferenceCountedObject<Elem>
   /**
    * @returns the \p Point associated with local \p Node \p i.
    */
-  const Point & point (unsigned int i) const;
+  const Point & point (const unsigned int i) const;
 
   /**
    * @returns the \p Point associated with local \p Node \p i
    * as a writeable reference.
    */
-  Point & point (unsigned int i);
+  Point & point (const unsigned int i);
 
   /**
    * @returns the global id number of local \p Node \p i.
    */
-  unsigned int node (unsigned int i) const;
+  unsigned int node (const unsigned int i) const;
 
   /**
    * @returns the pointer to local \p Node \p i.
    */
-  Node* get_node (unsigned int i) const;
+  Node* get_node (const unsigned int i) const;
 
   /**
    * @returns the pointer to local \p Node \p i as a writeable reference.

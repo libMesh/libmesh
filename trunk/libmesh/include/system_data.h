@@ -1,4 +1,4 @@
-// $Id: system_data.h,v 1.6 2003-01-30 19:13:05 benkirk Exp $
+// $Id: system_data.h,v 1.7 2003-01-31 16:47:41 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -464,7 +464,7 @@ unsigned int SystemData::n_vars() const
 
 
 inline
-std::string SystemData::variable_name (unsigned int i) const
+std::string SystemData::variable_name (const unsigned int i) const
 {
   assert (i < n_vars());
 
