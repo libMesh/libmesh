@@ -1,0 +1,11 @@
+# Maximum number of refinement steps
+max_r_steps = 11
+
+# Maximum refinement level for an element.
+max_r_level = 10
+
+# Percentage of elements to refine at each step
+refine_percentage = 0.7
+
+# Percentage of elements to (attempt to) coarsen at each step
+coarsen_percentage = 0.3
