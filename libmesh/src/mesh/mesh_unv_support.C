@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.C,v 1.13 2003-05-20 09:28:45 ddreyer Exp $
+// $Id: mesh_unv_support.C,v 1.14 2003-05-20 22:43:10 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -842,7 +842,7 @@ void UnvMeshInterface::element_out(std::ostream& out_file)
    * assign_elm_node[2]  = 3
    * assign_elm_node[1]  = 4
    */
-  unsigned int assign_elm_nodes[19];
+  unsigned int assign_elm_nodes[20];
 
 
   for (unsigned int el_cnt=0;el_cnt<_elements.size();el_cnt++)
