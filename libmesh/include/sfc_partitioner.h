@@ -1,4 +1,4 @@
-// $Id: sfc_partitioner.h,v 1.3 2003-09-02 18:02:39 benkirk Exp $
+// $Id: sfc_partitioner.h,v 1.4 2003-10-01 16:28:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -42,18 +42,18 @@ class SFCPartitioner : public Partitioner
  public:
 
   /**
-   * Constructor.  Requires a \p MeshBase. Sets the default space filling
+   * Constructor.  Sets the default space filling
    * curve type to "Hilbert".
    */
-  SFCPartitioner (MeshBase& mesh) :
-    Partitioner(mesh),
+  SFCPartitioner () :
     _sfc_type ("Hilbert")
   {}
 
   /**
    * Partition the \p MeshBase into \p n subdomains.
    */
-  virtual void partition (const unsigned int n = libMesh::n_processors());
+  virtual void partition (MeshBase& mesh,
+			  const unsigned int n = libMesh::n_processors());
 
   /**
    * Sets the type of space-filling curve to use.  Valid types are

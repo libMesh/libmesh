@@ -1,4 +1,4 @@
-// $Id: centroid_partitioner.C,v 1.4 2003-09-02 18:02:44 benkirk Exp $
+// $Id: centroid_partitioner.C,v 1.5 2003-10-01 16:28:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -27,32 +27,26 @@
 
 
 
-
-
-
-
-
-CentroidPartitioner::CentroidPartitioner(MeshBase& mesh,
-					 CentroidSortMethod sm) : Partitioner(mesh),
-								  _sort_method(sm)
+//---------------------------------------------------------
+// CentroidPartitioner methods
+void CentroidPartitioner::partition (MeshBase& mesh,
+				     const unsigned int n)
 {
-  // construct list of centroids here?
-}
+  // Check for an easy return
+  if (n == 1)
+    {
+      this->single_partition (mesh);
+      return;
+    }
 
-
-
-
-
-void CentroidPartitioner::partition (const unsigned int n)
-{
 
   // Possibly reconstruct centroids
-  if (_mesh.n_elem() != _elem_centroids.size())
-    this->compute_centroids();
+  if (mesh.n_elem() != _elem_centroids.size())
+    this->compute_centroids (mesh);
 
 
   
-  switch (_sort_method)
+  switch (this->sort_method())
     {
     case X:
       {
@@ -103,20 +97,19 @@ void CentroidPartitioner::partition (const unsigned int n)
   assert (n > 0);
 
   // the number of elements, e.g. 1000
-  const unsigned int n_elem      = _mesh.n_elem();
+  const unsigned int n_elem      = mesh.n_elem();
   // the number of elements per processor, e.g 400
   const unsigned int target_size = n_elem / n;
 
   // Make sure the mesh hasn't changed since the
   // last time we computed the centroids.
-  assert (_mesh.n_elem() == _elem_centroids.size());
+  assert (mesh.n_elem() == _elem_centroids.size());
 
   for (unsigned int i=0; i<n_elem; i++)
     {
       Elem* elem = _elem_centroids[i].second;
 
       elem->set_processor_id() = std::min (i / target_size, n-1);
-      
     }	
 }
 
@@ -131,13 +124,13 @@ void CentroidPartitioner::partition (const unsigned int n)
 
 
 
-void CentroidPartitioner::compute_centroids()
+void CentroidPartitioner::compute_centroids (MeshBase& mesh)
 {
   _elem_centroids.clear();
-  _elem_centroids.reserve(_mesh.n_elem());
+  _elem_centroids.reserve(mesh.n_elem());
   
-  elem_iterator it(_mesh.elements_begin());
-  const elem_iterator it_end(_mesh.elements_end());
+  elem_iterator it(mesh.elements_begin());
+  const elem_iterator it_end(mesh.elements_end());
   for (; it != it_end; ++it)
     {
       Elem* elem = *it;

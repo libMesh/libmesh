@@ -1,4 +1,4 @@
-// $Id: partitioner.h,v 1.4 2003-09-02 18:02:38 benkirk Exp $
+// $Id: partitioner.h,v 1.5 2003-10-01 16:28:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -46,9 +46,9 @@ class Partitioner
  public:
 
   /**
-   * Constructor.  Requires a \p MeshBase.
+   * Constructor.
    */
-  Partitioner (MeshBase& mesh) : _mesh(mesh) {}
+  Partitioner () {}
   
   /**
    * Destructor. Virtual so that we can derive from this class.
@@ -65,7 +65,8 @@ class Partitioner
    * of each element.  This number is reserved for things like
    * material properties, etc.
    */
-  virtual void partition (const unsigned int n=libMesh::n_processors()) = 0;
+  virtual void partition (MeshBase& mesh,
+			  const unsigned int n=libMesh::n_processors()) = 0;
 
   /**
    * Repartitions the \p MeshBase into \p n parts.  This
@@ -73,7 +74,8 @@ class Partitioner
    * more efficiently than computing a new partitioning from scratch.
    * The default behavior is to simply call this->partition(n)
   */
-  virtual void repartition (const unsigned int n=libMesh::n_processors()) { this->partition(n); }
+  virtual void repartition (MeshBase& mesh,
+			    const unsigned int n=libMesh::n_processors()) { this->partition (mesh, n); }
 
   
 protected:
@@ -84,12 +86,7 @@ protected:
    * to processor 0.  Is is provided as a separate function
    * so that derived classes may use it without reimplementing it.
    */
-  void single_partition ();
-  
-  /**
-   * A reference to the \p MeshBase we will partition.
-   */
-  MeshBase& _mesh;
+  void single_partition (MeshBase& mesh);
 };
 
 

@@ -1,4 +1,4 @@
-// $Id: parmetis_partitioner.h,v 1.4 2003-09-02 18:02:38 benkirk Exp $
+// $Id: parmetis_partitioner.h,v 1.5 2003-10-01 16:28:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -42,14 +42,15 @@ class ParmetisPartitioner : public Partitioner
  public:
 
   /**
-   * Constructor.  Requires a \p MeshBase.
+   * Constructor.
    */
-  ParmetisPartitioner (MeshBase& mesh) : Partitioner(mesh) {}
+  ParmetisPartitioner () {}
 
   /**
    * Partition the \p MeshBase into \p n subdomains.
    */
-  virtual void partition (const unsigned int n = libMesh::n_processors());
+  virtual void partition (MeshBase& mesh,
+			  const unsigned int n = libMesh::n_processors());
 
   /**
    * Parmetis can handle dynamically repartitioning a mesh such
@@ -57,7 +58,8 @@ class ParmetisPartitioner : public Partitioner
    * takes a previously partitioned domain (which may have
    * then been adaptively refined) and repartitions it.
    */
-  virtual void repartition (const unsigned int n = libMesh::n_processors());
+  virtual void repartition (MeshBase& mesh,
+			    const unsigned int n = libMesh::n_processors());
 
 private:
 
@@ -68,17 +70,17 @@ private:
   /**
    * Initialize data structures.
    */
-  void initialize (const unsigned int n_sbdmns);
+  void initialize (const MeshBase& mesh, const unsigned int n_sbdmns);
   
   /**
    * Build the graph.
    */
-  void build_graph ();
+  void build_graph (const MeshBase& mesh);
 
   /**
    * Assign the computed partitioning to the mesh.
    */
-  void assign_partitioning ();
+  void assign_partitioning (MeshBase& mesh);
 
   /**
    * Maps active element ids into a contiguous range, as needed by ParMETIS.

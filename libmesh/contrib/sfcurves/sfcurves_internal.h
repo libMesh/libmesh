@@ -2,6 +2,10 @@
 #define __sfcurves_internal_h__
 
 #include "sfcurves.h"
+ 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 #define MIN(a,b) ((a)<(b)?(a):(b))
@@ -23,7 +27,9 @@ void hsfc3d(unsigned coord[], unsigned * nkey, unsigned   key[]);
 void interleave(double x, double y, double z, double deg, INT index[3]);
 
 int cmp_indx(const void *a, const void *b);
-
-
-
+ 
+#ifdef __cplusplus
+}
 #endif
+
+#endif /* #define __sfcurves_internal_h__ */
