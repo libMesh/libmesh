@@ -1,4 +1,4 @@
-// $Id: statistics.C,v 1.7 2003-05-16 19:29:13 benkirk Exp $
+// $Id: statistics.C,v 1.8 2003-05-19 13:08:02 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,13 +24,47 @@
 
 // Local includes
 #include "statistics.h"
+#include "mesh_logging.h"
+
 
 
 // ------------------------------------------------------------
 // StatisticsVector class member functions
 template <typename T>
+T StatisticsVector<T>::minimum() const
+{
+  START_LOG ("minimum()", "StatisticsVector");
+
+  const T min = *(std::min_element(this->begin(), this->end()));
+
+  STOP_LOG ("minimum()", "StatisticsVector");
+
+  return min;
+}
+
+
+
+
+template <typename T>
+T StatisticsVector<T>::maximum() const
+{
+  START_LOG ("maximum()", "StatisticsVector");
+
+  const T max = *(std::max_element(this->begin(), this->end()));
+  
+  STOP_LOG ("maximum()", "StatisticsVector");
+  
+  return max;
+}
+
+
+
+
+template <typename T>
 Real StatisticsVector<T>::mean() const
 {
+  START_LOG ("mean()", "StatisticsVector");
+  
   const unsigned int n = this->size();
 
   Real mean = 0;
@@ -39,6 +73,8 @@ Real StatisticsVector<T>::mean() const
     {
       mean += ( static_cast<Real>((*this)[i]) - mean ) / (i + 1);
     }
+  
+  STOP_LOG ("mean()", "StatisticsVector");
   
   return mean;
 }
@@ -49,16 +85,20 @@ Real StatisticsVector<T>::mean() const
 template <typename T>
 Real StatisticsVector<T>::median() 
 {
+  const unsigned int n   = this->size();
+  
+  if (n == 0)
+    return 0.;
+  
+  START_LOG ("median()", "StatisticsVector");
+  
   std::sort(this->begin(), this->end());
   
-  const unsigned int n   = this->size();
   const unsigned int lhs = (n-1) / 2;
   const unsigned int rhs = n / 2;
   
   Real median = 0;
   
-  if (n == 0)
-    return median;
   
   if (lhs == rhs)
     {
@@ -70,6 +110,8 @@ Real StatisticsVector<T>::median()
       median = ( static_cast<Real>((*this)[lhs]) + 
 		 static_cast<Real>((*this)[rhs]) ) / 2.0;
     }
+ 
+  STOP_LOG ("median()", "StatisticsVector");
   
   return median;
 }
@@ -95,6 +137,8 @@ Real StatisticsVector<T>::variance() const
   
   const Real mean = this->mean();
   
+  START_LOG ("variance()", "StatisticsVector");
+  
   Real variance = 0;
 
   for (unsigned int i=0; i<n; i++)
@@ -102,6 +146,8 @@ Real StatisticsVector<T>::variance() const
       const Real delta = ( static_cast<Real>((*this)[i]) - mean );
       variance += (delta * delta - variance) / (i + 1);
     }
+  
+  STOP_LOG ("variance()", "StatisticsVector");
   
   return variance;
 }
@@ -116,10 +162,12 @@ std::vector<unsigned int> StatisticsVector<T>::histogram(unsigned int n_bins)
   
   std::sort(this->begin(), this->end());
   
-  T max      = *(std::max_element(this->begin(), this->end())); 
-  T min      = *(std::min_element(this->begin(), this->end()));
+  T min      = this->minimum();
+  T max      = this->maximum();
   T bin_size = (max - min) / static_cast<T>(n_bins); 
 
+  START_LOG ("histogram()", "StatisticsVector");
+  
   std::vector<T> bin_bounds(n_bins+1);
   for (unsigned int i=0; i<n_bins+1; i++)
       bin_bounds[i] = min + i * bin_size;
@@ -142,7 +190,9 @@ std::vector<unsigned int> StatisticsVector<T>::histogram(unsigned int n_bins)
 	}
     }
   
-  return bin_members; 
+  STOP_LOG ("histogram()", "StatisticsVector");
+  
+ return bin_members; 
 }
 
 
@@ -161,6 +211,8 @@ std::vector<unsigned int> StatisticsVector<T>::histogram(unsigned int n_bins) co
 template <typename T>
 std::vector<unsigned int> StatisticsVector<T>::cut_below(Real cut) const
 {
+  START_LOG ("cut_below()", "StatisticsVector");
+  
   const unsigned int n   = this->size();
   
   std::vector<unsigned int> cut_indices;
@@ -174,6 +226,8 @@ std::vector<unsigned int> StatisticsVector<T>::cut_below(Real cut) const
 	}
     }
   
+  STOP_LOG ("cut_below()", "StatisticsVector");
+  
   return cut_indices;
 }
 
@@ -183,6 +237,8 @@ std::vector<unsigned int> StatisticsVector<T>::cut_below(Real cut) const
 template <typename T>
 std::vector<unsigned int> StatisticsVector<T>::cut_above(Real cut) const
 {
+  START_LOG ("cut_above()", "StatisticsVector");
+  
   const unsigned int n   = this->size();
   
   std::vector<unsigned int> cut_indices;
@@ -196,12 +252,15 @@ std::vector<unsigned int> StatisticsVector<T>::cut_above(Real cut) const
 	}
     }
   
+  STOP_LOG ("cut_above()", "StatisticsVector");
+  
   return cut_indices;
 }
 
 
 
 
+//------------------------------------------------------------
 // Explicit Instantions
 template class StatisticsVector<float>;
 template class StatisticsVector<double>;
