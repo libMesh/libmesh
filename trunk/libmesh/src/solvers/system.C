@@ -1,4 +1,4 @@
-// $Id: system.C,v 1.12 2005-03-18 16:56:12 benkirk Exp $
+// $Id: system.C,v 1.13 2005-03-21 02:10:22 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -158,11 +158,10 @@ void System::reinit ()
   // Recreate any hanging node constraints
   _dof_map.create_dof_constraints(this->get_mesh());
 
-  // Clear the _vectors and reinitialize them
+  // Project the _vectors
   for (vectors_iterator pos = _vectors.begin(); pos != _vectors.end(); ++pos)
     {
-      pos->second->clear ();
-      pos->second->init (this->n_dofs(), this->n_local_dofs());
+      this->project_vector (*(pos->second));
     }
   
   // Project the solution to the new mesh
