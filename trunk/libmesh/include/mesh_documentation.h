@@ -187,7 +187,7 @@
   will build with the \p MIPS compilers on an SGI:
   
   \verbatim
-     CXX=CC CC=cc F77=f77 ./configure \endverbatim
+     CXX=CC CC=cc F77=f77 CXXFLAGS=-LANG:std ./configure \endverbatim
      
   Note that the FORTRAN compiler is not actually used to compile any
   part of the library, but \p configure uses it to find out how to

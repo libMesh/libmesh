@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.13 2003-04-02 14:55:12 benkirk Exp $
+// $Id: fe_interface.C,v 1.14 2003-04-02 22:37:17 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -789,8 +789,10 @@ void FEInterface::compute_constraints (std::map<unsigned int,
   switch (elem->dim())
     {
     case 1:
-      // No constraints in 1D.
-      return;
+      {
+	// No constraints in 1D.
+	return;
+      }
 
       
     case 2:
@@ -798,11 +800,12 @@ void FEInterface::compute_constraints (std::map<unsigned int,
 	switch (fe_t.family)
 	  {
 	  case LAGRANGE:
-	    return FE<2,LAGRANGE>::compute_constraints (constraints,
-							system_number,
-							variable_number,
-							fe_t,
-							elem);      
+	    FE<2,LAGRANGE>::compute_constraints (constraints,
+						 system_number,
+						 variable_number,
+						 fe_t,
+						 elem); return;
+
 	  default:
 	    error();
 	  }
@@ -814,11 +817,11 @@ void FEInterface::compute_constraints (std::map<unsigned int,
 	switch (fe_t.family)
 	  {
 	  case LAGRANGE:
-	    return FE<3,LAGRANGE>::compute_constraints (constraints,
-							system_number,
-							variable_number,
-							fe_t,
-							elem);      
+	    FE<3,LAGRANGE>::compute_constraints (constraints,
+						 system_number,
+						 variable_number,
+						 fe_t,
+						 elem); return;      
 	  default:
 	    error();
 	  }
