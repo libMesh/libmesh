@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.h,v 1.7 2003-03-03 02:15:57 benkirk Exp $
+// $Id: mesh_refinement.h,v 1.8 2003-05-01 18:44:30 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -74,17 +74,15 @@ public:
    * Refines and coarsens user-requested elements. Will also
    * refine/coarsen additional elements to satisy level-one rule.
    */
-  void refine_and_coarsen_elements ();
+  void refine_and_coarsen_elements (const bool maintain_level_one=true);
   
   /**
-   * Coarsens user-requested elements. Will also
-   * coarsen additional elements to satisy level-one rule.
+   * Coarsens user-requested elements.
    */
   void coarsen_elements ();
   
   /**
-   * Refines user-requested elements. Will also
-   * refine additional elements to satisy level-one rule.
+   * Refines user-requested elements.
    */
   void refine_elements ();
   
@@ -136,13 +134,13 @@ private:
    * Take user-specified coarsening flags and augment them
    * so that level-one dependency is satisfied.
    */
-  bool make_coarsening_compatible();
+  bool make_coarsening_compatible(const bool);
 
   /**
    * Take user-specified refinement flags and augment them
    * so that level-one dependency is satisfied.
    */
-  bool make_refinement_compatible();
+  bool make_refinement_compatible(const bool);
 
   /**
    * Rebuild data structure that is used to constrain

@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.11 2003-04-30 21:09:30 benkirk Exp $
+// $Id: mesh_refinement.C,v 1.12 2003-05-01 18:44:31 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -132,24 +132,36 @@ void MeshRefinement::update_unused_elements()
 
 
 
-void MeshRefinement::refine_and_coarsen_elements ()
+void MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
 {
   assert (mesh.mesh_dimension() != 1);
 
   bool satisfied = false;
 
 
-  for (unsigned int e=0; e<mesh.n_elem(); e++)
-    if (!mesh.elem(e)->active())
-      mesh.elem(e)->set_refinement_flag(Elem::DO_NOTHING);
+  elem_iterator       elem_it (mesh.elements_begin());
+  const elem_iterator elem_end(mesh.elements_end());
+
+  for ( ; elem_it != elem_end; ++elem_it)
+    {
+      // Set refinement flag to DO_NOTHING if the
+      // element isn't active
+      if ( !(*elem_it)->active())
+	(*elem_it)->set_refinement_flag(Elem::DO_NOTHING);
+
+      // This might be left over from the last step
+      if ((*elem_it)->refinement_flag() == Elem::JUST_REFINED)
+	(*elem_it)->set_refinement_flag(Elem::DO_NOTHING);
+    }
+
   
   /**
    * Repeat until coarsening & refinement flags jive
    */
   do
     {
-      const bool coarsening_satisfied = make_coarsening_compatible();
-      const bool refinement_satisfied = make_refinement_compatible();
+      const bool coarsening_satisfied = make_coarsening_compatible(maintain_level_one);
+      const bool refinement_satisfied = make_refinement_compatible(maintain_level_one);
       
       if (coarsening_satisfied && refinement_satisfied)
 	satisfied = true;
@@ -160,13 +172,13 @@ void MeshRefinement::refine_and_coarsen_elements ()
    * First coarsen the flagged elements.  This
    * will free space.
    */
-  coarsen_elements();
+  coarsen_elements ();
 
   /**
    * Find any NULL elements from the coarsening step.
    * We will fill these before allocating new space.
    */
-  update_unused_elements();
+  update_unused_elements ();
   
   /**
    * Now refine the flagged elements.  This will
@@ -204,7 +216,7 @@ void MeshRefinement::refine_and_coarsen_elements ()
 
 
 
-bool MeshRefinement::make_coarsening_compatible()
+bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 {
   /**
    * Unless we encounter a specific situation level-one
@@ -254,90 +266,96 @@ bool MeshRefinement::make_coarsening_compatible()
    * coarsening.  Level-one would be violated in this case so we need to re-run
    * the loop.
    */
- repeat:
-  level_one_satisfied = true;
-  
-  do
+  if (maintain_level_one)
     {
+      
+    repeat:
       level_one_satisfied = true;
       
-      active_elem_iterator       el    (mesh.elements_begin());
-      const active_elem_iterator end_el(mesh.elements_end());
-      
-      for (; el != end_el; ++el)
+      do
 	{
-	  Elem* elem = *el;
+	  level_one_satisfied = true;
 	  
-	  if (elem->refinement_flag() == Elem::COARSEN) // If the element is active and 
-	                                                // the coarsen flag is set
+	  active_elem_iterator       el    (mesh.elements_begin());
+	  const active_elem_iterator end_el(mesh.elements_end());
+	  
+	  for (; el != end_el; ++el)
 	    {
-	      const unsigned int my_level = elem->level();
+	      Elem* elem = *el;
 	      
-	      for (unsigned int n=0; n<elem->n_neighbors(); n++)
-		if (elem->neighbor(n) != NULL)     // I have a neighbor
-		  if (elem->neighbor(n)->active()) // and it is active
-		    {
-		      const Elem* neighbor = elem->neighbor(n);
-		      
-		      if ((neighbor->level() == my_level) &&
-			  (neighbor->refinement_flag() == Elem::REFINE)) // the neighbor is at my level
-	        	                                                 // and wants to be refined
+	      if (elem->refinement_flag() == Elem::COARSEN) // If the element is active and 
+		// the coarsen flag is set
+		{
+		  const unsigned int my_level = elem->level();
+		  
+		  for (unsigned int n=0; n<elem->n_neighbors(); n++)
+		    if (elem->neighbor(n) != NULL)     // I have a neighbor
+		      if (elem->neighbor(n)->active()) // and it is active
 			{
+			  const Elem* neighbor = elem->neighbor(n);
+			  
+			  if ((neighbor->level() == my_level) &&
+			      (neighbor->refinement_flag() == Elem::REFINE)) // the neighbor is at my level
+	        	                                                     // and wants to be refined
+			    {
+			      elem->set_refinement_flag(Elem::DO_NOTHING);
+			      level_one_satisfied = false;
+			    }
+			}
+		      else  // I have a neighbor and it is not active. That means it has children.
+			{   // While it _may_ be possible to coarsen us if all the children of
+			  // that element want to be refined, it is impossible to know at this
+			  // stage.  Forget about it for the moment...  This can be handled in
+			  // two steps.
 			  elem->set_refinement_flag(Elem::DO_NOTHING);
 			  level_one_satisfied = false;
 			}
-		    }
-		  else  // I have a neighbor and it is not active. That means it has children.
-		    {   // While it _may_ be possible to coarsen us if all the children of
-		        // that element want to be refined, it is impossible to know at this
-		        // stage.  Forget about it for the moment...  This can be handled in
-		        // two steps.
-		      elem->set_refinement_flag(Elem::DO_NOTHING);
-		      level_one_satisfied = false;
-		    }
-	    }
-	}      
-    }
-  while (!level_one_satisfied);
-  
-  /**
-   * Next we look at all of the inactive cells.
-   * If there is an inactive cell with all of its children
-   * wanting to be unrefined then the element is a candidate
-   * for unrefinement.  If all the children don't
-   * all want to be unrefined then ALL of them need to have their
-   * unrefinement flags cleared. 
-   */
-  for (int level=(max_level); level >= 0; level--)
-    for (unsigned int e=0; e<mesh.n_elem(); e++)
-      if (!mesh.elem(e)->active() &&
-	  (mesh.elem(e)->level() == static_cast<unsigned int>(level)))
-	{
-	  /**
-	   * right now the element hasn't been disqualified
-	   * as a candidate for unrefinement
-	   */
-	  bool is_a_candidate = true;
-
-	  for (unsigned int c=0; c<mesh.elem(e)->n_children(); c++)
-	    if ((mesh.elem(e)->child(c)->refinement_flag() != Elem::COARSEN) ||
-		!mesh.elem(e)->child(c)->active() )
-	      is_a_candidate = false;
-	  
-	  if (!is_a_candidate)
+		}
+	    }      
+	}
+      while (!level_one_satisfied);
+      
+      /**
+       * Next we look at all of the inactive cells.
+       * If there is an inactive cell with all of its children
+       * wanting to be unrefined then the element is a candidate
+       * for unrefinement.  If all the children don't
+       * all want to be unrefined then ALL of them need to have their
+       * unrefinement flags cleared. 
+       */
+      for (int level=(max_level); level >= 0; level--)
+	for (unsigned int e=0; e<mesh.n_elem(); e++)
+	  if (!mesh.elem(e)->active() &&
+	      (mesh.elem(e)->level() == static_cast<unsigned int>(level)))
 	    {
-	      mesh.elem(e)->set_refinement_flag(Elem::DO_NOTHING);
+	      /**
+	       * right now the element hasn't been disqualified
+	       * as a candidate for unrefinement
+	       */
+	      bool is_a_candidate = true;
 	      
 	      for (unsigned int c=0; c<mesh.elem(e)->n_children(); c++)
-		if (mesh.elem(e)->child(c)->refinement_flag() == Elem::COARSEN)
-		  {
-		    level_one_satisfied = false;
-		    mesh.elem(e)->child(c)->set_refinement_flag(Elem::DO_NOTHING);
-		  }
+		if ((mesh.elem(e)->child(c)->refinement_flag() != Elem::COARSEN) ||
+		    !mesh.elem(e)->child(c)->active() )
+		  is_a_candidate = false;
+	      
+	      if (!is_a_candidate)
+		{
+		  mesh.elem(e)->set_refinement_flag(Elem::DO_NOTHING);
+		  
+		  for (unsigned int c=0; c<mesh.elem(e)->n_children(); c++)
+		    if (mesh.elem(e)->child(c)->refinement_flag() == Elem::COARSEN)
+		      {
+			level_one_satisfied = false;
+			mesh.elem(e)->child(c)->set_refinement_flag(Elem::DO_NOTHING);
+		      }
+		}
 	    }
-	}
-  
-  if (!level_one_satisfied) goto repeat;
+      
+      if (!level_one_satisfied) goto repeat;
+      
+    } // end if (maintian_level_one)
+
   
   /**
    * If all the children of a parent are set to be coarsened
@@ -365,7 +383,7 @@ bool MeshRefinement::make_coarsening_compatible()
 
 
 
-bool MeshRefinement::make_refinement_compatible()
+bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 {
   // Unless we encounter a specific situation level-one
   // will be satisfied after executing this loop just once
@@ -384,82 +402,89 @@ bool MeshRefinement::make_refinement_compatible()
   
 #endif
   
-  
-  do
-    {
-      level_one_satisfied = true;
-      
-      for (unsigned int e=0; e<mesh.n_elem(); e++)
-	if (mesh.elem(e)->active() &&                
-	    (mesh.elem(e)->refinement_flag() == Elem::REFINE))  // If the element is active and the
-	                                                        // refinement flag is set    
-	  {
-	    const unsigned int my_level = mesh.elem(e)->level();
-	    
-	    for (unsigned int side=0; side<mesh.elem(e)->n_sides(); side++)
-	      if (mesh.elem(e)->neighbor(side) != NULL)     // I have a neighbor
-		if (mesh.elem(e)->neighbor(side)->active()) // and it is active
-		  {
-		    Elem* neighbor = mesh.elem(e)->neighbor(side);
-		    
-		    /**
-		     * Case 1:  The neighbor is at the same level I am.
-		     *        1a: The neighbor will be refined       -> NO PROBLEM
-		     *        1b: The neighbor won't be refined      -> NO PROBLEM
-		     *        1c: The neighbor wants to be coarsened -> PROBLEM
-		     */
-		    if (neighbor->level() == my_level)
-		      {
-			if (neighbor->refinement_flag() == Elem::COARSEN)
-			  {
-			    neighbor->set_refinement_flag(Elem::DO_NOTHING);
-			    compatible_with_coarsening = false;
-			    level_one_satisfied = false;
-			  }
-		      }
-		    
-		    /**
-		     * Case 2: The neighbor is one level lower than I am.
-		     *         The neighbor thus MUST be refined to satisfy
-		     *         the level-one rule, regardless of whether it
-		     *         was originally flagged for refinement. If it
-		     *         wasn't flagged already we need to repeat
-		     *         this process.
-		     */
-		    else if ((neighbor->level()+1) == my_level)
-		      {
-			if (neighbor->refinement_flag() != Elem::REFINE)
-			  {
-			    neighbor->set_refinement_flag(Elem::REFINE);
-			    level_one_satisfied = false; 
-			  }
-		      }
-#ifdef DEBUG		
-		    /**
-		     * Sanity check. We should never get into a
-		     * case when our neighbot is more than one
-		     * level away.
-		     */
-		    else if ((neighbor->level()+1) < my_level)
-		      {
-			error();
-		      }
-		    
-		    /**
-		     * Note that the only other possibility is that the
-		     * neighbor is already refined, in which case it isn't
-		     * active and we should never get here.
-		     */
-		    else
-		      {
-			error();
-		      }
-#endif		
-		  } 
-	  }
-    }
-  while (!level_one_satisfied);
 
+  /**
+   * This loop enforces the level-1 rule.  We should only
+   * execute it if the user indeed wants level-1 satisfied!
+   */
+  if (maintain_level_one)
+    {  
+      do
+	{
+	  level_one_satisfied = true;
+	  
+	  for (unsigned int e=0; e<mesh.n_elem(); e++)
+	    if (mesh.elem(e)->active() &&                
+		(mesh.elem(e)->refinement_flag() == Elem::REFINE))  // If the element is active and the
+	                                                            // refinement flag is set    
+	      {
+		const unsigned int my_level = mesh.elem(e)->level();
+	    
+		for (unsigned int side=0; side<mesh.elem(e)->n_sides(); side++)
+		  if (mesh.elem(e)->neighbor(side) != NULL)     // I have a neighbor
+		    if (mesh.elem(e)->neighbor(side)->active()) // and it is active
+		      {
+			Elem* neighbor = mesh.elem(e)->neighbor(side);
+			
+			/**
+			 * Case 1:  The neighbor is at the same level I am.
+			 *        1a: The neighbor will be refined       -> NO PROBLEM
+			 *        1b: The neighbor won't be refined      -> NO PROBLEM
+			 *        1c: The neighbor wants to be coarsened -> PROBLEM
+			 */
+			if (neighbor->level() == my_level)
+			  {
+			    if (neighbor->refinement_flag() == Elem::COARSEN)
+			      {
+				neighbor->set_refinement_flag(Elem::DO_NOTHING);
+				compatible_with_coarsening = false;
+				level_one_satisfied = false;
+			      }
+			  }
+			
+			/**
+			 * Case 2: The neighbor is one level lower than I am.
+			 *         The neighbor thus MUST be refined to satisfy
+			 *         the level-one rule, regardless of whether it
+			 *         was originally flagged for refinement. If it
+			 *         wasn't flagged already we need to repeat
+			 *         this process.
+			 */
+			else if ((neighbor->level()+1) == my_level)
+			  {
+			    if (neighbor->refinement_flag() != Elem::REFINE)
+			      {
+				neighbor->set_refinement_flag(Elem::REFINE);
+				level_one_satisfied = false; 
+			      }
+			  }
+#ifdef DEBUG		
+			/**
+			 * Sanity check. We should never get into a
+			 * case when our neighbot is more than one
+			 * level away.
+			 */
+			else if ((neighbor->level()+1) < my_level)
+			  {
+			    error();
+			  }
+			
+			/**
+			 * Note that the only other possibility is that the
+			 * neighbor is already refined, in which case it isn't
+			 * active and we should never get here.
+			 */
+			else
+			  {
+			    error();
+			  }
+#endif		
+		      } 
+	      }
+	}
+      
+      while (!level_one_satisfied);
+    } // end if (maintain_level_one)
 
   
   return compatible_with_coarsening;

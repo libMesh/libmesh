@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.37 2003-04-30 21:09:27 benkirk Exp $
+// $Id: dof_map.C,v 1.38 2003-05-01 18:44:31 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -739,8 +739,8 @@ void DofMap::create_dof_constraints(MeshBase& mesh)
     {
       const FEType& fe_type = this->variable_type(variable_number);
       
-      active_elem_iterator       elem_it (mesh.elements_begin());
-      const active_elem_iterator elem_end(mesh.elements_end());
+      elem_iterator       elem_it (mesh.elements_begin());
+      const elem_iterator elem_end(mesh.elements_end());
       
       for ( ; elem_it != elem_end; ++elem_it)
 	FEInterface::compute_constraints (_dof_constraints,
