@@ -1,4 +1,4 @@
-// $Id: petsc_vector.C,v 1.14 2003-03-04 22:31:17 benkirk Exp $
+// $Id: petsc_vector.C,v 1.15 2003-03-11 23:36:46 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -44,7 +44,7 @@
 template <typename T>
 Real PetscVector<T>::l1_norm () const
 {
-  assert(closed());
+  assert(this->closed());
   
   int ierr=0;
   double value=0.;
@@ -59,7 +59,7 @@ Real PetscVector<T>::l1_norm () const
 template <typename T>
 Real PetscVector<T>::l2_norm () const
 {
-  assert(closed());
+  assert(this->closed());
   
   int ierr=0;
   double value=0.;
@@ -75,7 +75,7 @@ Real PetscVector<T>::l2_norm () const
 template <typename T>
 Real PetscVector<T>::linfty_norm () const
 {
-  assert(closed());
+  assert(this->closed());
   
   int ierr=0;
   double value=0.;
@@ -92,7 +92,7 @@ template <typename T>
 NumericVector<T>&
 PetscVector<T>::operator += (const NumericVector<T>& v)
 {
-  assert(closed());
+  assert(this->closed());
   
   add(1., v);
   
@@ -105,7 +105,7 @@ template <typename T>
 NumericVector<T>&
 PetscVector<T>::operator -= (const NumericVector<T>& v)
 {
-  assert(closed());
+  assert(this->closed());
   
   add(-1., v);
   

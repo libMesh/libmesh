@@ -1,4 +1,4 @@
-// $Id: petsc_interface.C,v 1.12 2003-03-04 22:31:16 benkirk Exp $
+// $Id: petsc_interface.C,v 1.13 2003-03-11 23:36:46 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -35,21 +35,21 @@
 template <typename T>
 void PetscInterface<T>::clear ()
 {
-  if (initialized())
+  if (this->initialized())
     {
-      _is_initialized = false;
+      this->_is_initialized = false;
 
       int ierr=0;
 
       ierr = SLESDestroy(_sles); CHKERRQ(ierr);
 
       // Mimic PETSc default solver and preconditioner
-      _solver_type         = GMRES;
+      this->_solver_type           = GMRES;
 
       if (libMeshBase::n_processors() == 1)
-	_preconditioner_type = ILU_PRECOND;
+	this->_preconditioner_type = ILU_PRECOND;
       else
-	_preconditioner_type = BLOCK_JACOBI_PRECOND;
+	this->_preconditioner_type = BLOCK_JACOBI_PRECOND;
     }
 }
 
@@ -61,9 +61,9 @@ void PetscInterface<T>::init ()
   int ierr=0;
   
   // Initialize the data structures if not done so already.
-  if (!initialized())
+  if (!this->initialized())
     {
-      _is_initialized = true;
+      this->_is_initialized = true;
 
       // Create the linear solver context
       ierr = SLESCreate (PETSC_COMM_WORLD, &_sles); CHKERRQ(ierr);
@@ -147,7 +147,7 @@ void PetscInterface<T>::set_petsc_solver_type()
 {
   int ierr = 0;
   
-  switch (_solver_type)
+  switch (this->_solver_type)
     {
 
     case CG:
@@ -188,7 +188,7 @@ void PetscInterface<T>::set_petsc_solver_type()
 
     default:
       std::cerr << "ERROR:  Unsupported PETSC Solver: "
-		<< _solver_type                     << std::endl
+		<< this->_solver_type               << std::endl
 		<< "Continuing with PETSC defaults" << std::endl;
     }
 }
@@ -200,7 +200,7 @@ void PetscInterface<T>::set_petsc_preconditioner_type()
 {
   int ierr = 0;
  
-  switch (_preconditioner_type)
+  switch (this->_preconditioner_type)
     {
     case IDENTITY_PRECOND:
       ierr = PCSetType (_pc, (char*) PCNONE); CHKERRQ(ierr); return;
@@ -234,7 +234,7 @@ void PetscInterface<T>::set_petsc_preconditioner_type()
 
     default:
       std::cerr << "ERROR:  Unsupported PETSC Preconditioner: "
-		<< _preconditioner_type             << std::endl
+		<< this->_preconditioner_type       << std::endl
 		<< "Continuing with PETSC defaults" << std::endl;
     }
 }

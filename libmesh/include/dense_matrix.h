@@ -1,4 +1,4 @@
-// $Id: dense_matrix.h,v 1.15 2003-03-08 07:30:56 benkirk Exp $
+// $Id: dense_matrix.h,v 1.16 2003-03-11 23:36:41 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -228,8 +228,8 @@ void DenseMatrix<T>::resize(const unsigned int m,
   if (m*n > _val.size())
     _val.resize(m*n);
 
-  _m = m;
-  _n = n;
+  this->_m = m;
+  this->_n = n;
 
   this->zero();
 }
@@ -250,8 +250,8 @@ template<typename T>
 inline
 DenseMatrix<T>& DenseMatrix<T>::operator = (const DenseMatrix<T>& other_matrix)
 {
-  _m = other_matrix._m;
-  _n = other_matrix._n;
+  this->_m = other_matrix._m;
+  this->_n = other_matrix._n;
 
   _val   = other_matrix._val;
   
@@ -267,8 +267,8 @@ T DenseMatrix<T>::operator () (const unsigned int i,
 {
   assert (i*j<_val.size());
   
-  //  return _val[(i) + (_m)*(j)]; // col-major
-  return _val[(i)*(_n) + (j)]; // row-major
+  //  return _val[(i) + (this->_m)*(j)]; // col-major
+  return _val[(i)*(this->_n) + (j)]; // row-major
 }
 
 
@@ -280,8 +280,8 @@ T & DenseMatrix<T>::operator () (const unsigned int i,
 {
   assert (i*j<_val.size());
   
-  //return _val[(i) + (_m)*(j)]; // col-major
-  return _val[(i)*(_n) + (j)]; // row-major
+  //return _val[(i) + (this->_m)*(j)]; // col-major
+  return _val[(i)*(this->_n) + (j)]; // row-major
 }
 
 
@@ -307,7 +307,7 @@ T DenseMatrix<T>::transpose (const unsigned int i,
 {
   // Be sure that we haven't exceeded
   // the bounds of the matrix.
-  assert (i*j <= _m * _n);
+  assert (i*j <= this->_m * this->_n);
   
   // Implement in terms of operator()
   return (*this)(j,i);
@@ -324,20 +324,20 @@ void DenseMatrix<T>::condense(const unsigned int iv,
 			      const T val,
 			      std::vector<T>& rhs)
 {
-  assert (_m == rhs.size());
+  assert (this->_m == rhs.size());
   assert (iv == jv);
 
 
   // move the known value into the RHS
   // and zero the column
-  for (unsigned int i=0; i<m(); i++)
+  for (unsigned int i=0; i<this->m(); i++)
     {
       rhs[i] -= ((*this)(i,jv))*val;
       (*this)(i,jv) = 0.;
     }
 
   // zero the row
-  for (unsigned int j=0; j<n(); j++)
+  for (unsigned int j=0; j<this->n(); j++)
     (*this)(iv,j) = 0.;
 
   (*this)(iv,jv) = 1.;
