@@ -1,0 +1,191 @@
+// $Id: inf_fe_legendre_eval.C,v 1.1 2003-01-24 17:24:42 jwpeterson Exp $
+
+// The Next Great Finite Element Library.
+// Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
+
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+// Local Includes
+#include "mesh_config.h"
+#ifdef ENABLE_INFINITE_ELEMENTS
+#include "inf_fe.h"
+
+
+
+template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
+real InfFE<Dim,T_radial,T_map>::eval(const real v,
+				     const Order, /* not used */
+				     const unsigned int i)
+{
+  assert (-1. <= v && v <= 1.);
+
+  switch (i)
+    {
+    case 0:
+      return 1.;
+
+    case 1:
+      return v;
+
+    case 2:
+      return 1.5*v*v-.50;
+
+    case 3:
+      return (-1.5+2.5*v*v)*v;
+
+    case 4:
+      return .375+(-3.75+4.375*v*v)*v*v;
+
+    case 5:
+      return (1.875+(-8.75+7.875*v*v)*v*v)*v;
+
+    case 6:
+      return -.3125+(6.5625+(-19.6875+14.4375*v*v)*v*v)*v*v;
+
+    case 7:
+      return (-2.1875+(19.6875+(-43.3125+26.8125*v*v)*v*v)*v*v)*v;
+
+    case 8:
+      return .2734375+(-9.84375+(54.140625+(-93.84375+50.2734375*v*v)*v*v)*v*v)*v*v;
+
+    case 9:
+      return (2.4609375+(-36.09375+(140.765625+(-201.09375+94.9609375*v*v)*v*v)*v*v)*v*v)*v;
+
+    case 10:
+      return -.24609375+(13.53515625+(-117.3046875+(351.9140625+(-427.32421875+180.42578125*v*v)*v*v)*v*v)*v*v)*v*v;
+
+    case 11:
+      return (-2.70703125+(58.65234375+(-351.9140625+(854.6484375+(-902.12890625+344.44921875*v*v)*v*v)*v*v)*v*v)*v*v)*v;
+
+    case 12:
+      return .2255859375+(-17.595703125+(219.9462890625+(-997.08984375+(2029.7900390625+(-1894.470703125+660.1943359375*v*v)*v*v)*v*v)*v*v)*v*v)*v*v;
+
+    case 13:
+      return (2.9326171875+(-87.978515625+(747.8173828125+(-2706.38671875+(4736.1767578125+(-3961.166015625+1269.6044921875*v*v)*v*v)*v*v)*v*v)*v*v)*v*v)*v;
+
+    case 14:
+      return -.20947265625+(21.99462890625+(-373.90869140625+(2368.08837890625+(-7104.26513671875+(10893.20654296875+(-8252.42919921875+2448.52294921875*v*v)*v*v)*v*v)*v*v)*v*v)*v*v)*v*v;
+
+    case 15:
+      return (-3.14208984375+(124.63623046875+(-1420.85302734375+(7104.26513671875+(-18155.34423828125+(24757.28759765625+(-17139.66064453125+4733.81103515625*v*v)*v*v)*v*v)*v*v)*v*v)*v*v)*v*v)*v;
+
+    case 16:
+      return .196380615234375+(-26.707763671875+(592.0220947265625+(-4972.985595703125+(20424.76226806641+(-45388.36059570313+(55703.89709472656+(-35503.58276367188+9171.758880615234*v*v)*v*v)*v*v)*v*v)*v*v)*v*v)*v*v)*v*v;
+
+
+    default:
+      std::cerr << "bad index i = " << i << std::endl;
+      error();
+
+    };
+
+  // we never end up here.
+  return 0.;
+};
+
+
+
+template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
+real InfFE<Dim,T_radial,T_map>::eval_deriv(const real v,
+					   const Order, /* not used */
+					   const unsigned int i)
+{
+  assert (-1. <= v && v <= 1.);
+
+  switch (i)
+    {
+    case 0:
+      return 0.;
+
+    case 1:
+      return 1.;
+
+    case 2:
+      return 3.*v;
+
+    case 3:
+      return 7.5*v*v-1.5;
+
+    case 4:
+      return (-7.5+17.5*v*v)*v;
+
+    case 5:
+      return 1.875+(-26.25+39.375*v*v)*v*v;
+
+    case 6:
+      return (13.125+(-78.75+86.625*v*v)*v*v)*v;
+
+    case 7:
+      return -2.1875+(59.0625+(-216.5625+187.6875*v*v)*v*v)*v*v;
+
+    case 8:
+      return (-19.6875+(216.5625+(-563.0625+402.1875*v*v)*v*v)*v*v)*v;
+
+    case 9:
+      return 2.4609375+(-108.28125+(703.828125+(-1407.65625+854.6484375*v*v)*v*v)*v*v)*v*v;
+
+    case 10:
+      return (27.0703125+(-469.21875+(2111.484375+(-3418.59375+1804.2578125*v*v)*v*v)*v*v)*v*v)*v;
+
+    case 11:
+      return -2.70703125+(175.95703125+(-1759.5703125+(5982.5390625+(-8119.16015625+3788.94140625*v*v)*v*v)*v*v)*v*v)*v*v;
+
+    case 12:
+      return (-35.19140625+(879.78515625+(-5982.5390625+(16238.3203125+(-18944.70703125+7922.33203125*v*v)*v*v)*v*v)*v*v)*v*v)*v;
+
+    case 13:
+      return 2.9326171875+(-263.935546875+(3739.0869140625+(-18944.70703125+(42625.5908203125+(-43572.826171875+16504.8583984375*v*v)*v*v)*v*v)*v*v)*v*v)*v*v;
+
+    case 14:
+      return (43.9892578125+(-1495.634765625+(14208.5302734375+(-56834.12109375+(108932.0654296875+(-99029.150390625+34279.3212890625*v*v)*v*v)*v*v)*v*v)*v*v)*v*v)*v;
+
+    case 15:
+      return -3.14208984375+(373.90869140625+(-7104.26513671875+(49729.85595703125+(-163398.0981445313+(272330.1635742188+(-222815.5883789063+71007.16552734375*v*v)*v*v)*v*v)*v*v)*v*v)*v*v)*v*v;
+
+    case 16:
+      return (-53.41552734375+(2368.08837890625+(-29837.91357421875+(163398.0981445313+(-453883.6059570313+(668446.7651367188+(-497050.1586914063+146748.1420898438*v*v)*v*v)*v*v)*v*v)*v*v)*v*v)*v*v)*v;
+
+
+    default:
+      std::cerr << "bad index i = " << i << std::endl;
+      error();
+
+    };
+
+  // we never end up here.
+  return 0.;
+};
+
+
+
+//-----------------------------------------------------------------
+// Explicit instantiations
+template class InfFE<1,LEGENDRE,CARTESIAN>;
+template class InfFE<2,LEGENDRE,CARTESIAN>;
+template class InfFE<3,LEGENDRE,CARTESIAN>;
+
+// template class InfFE<1,LEGENDRE,SPHERICAL>;
+// template class InfFE<2,LEGENDRE,SPHERICAL>;
+// template class InfFE<3,LEGENDRE,SPHERICAL>;
+
+// template class InfFE<1,LEGENDRE,ELLIPSOIDAL>;
+// template class InfFE<2,LEGENDRE,ELLIPSOIDAL>;
+// template class InfFE<3,LEGENDRE,ELLIPSOIDAL>;
+
+
+
+#endif //ifdef ENABLE_INFINITE_ELEMENTS
+

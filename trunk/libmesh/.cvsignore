@@ -46,3 +46,7 @@ BROWSE
 *.hdf
 autom4te*.cache
 *.oogl
+gprof*
+CHANGELOG
+*.png
+*.rgb

@@ -9,6 +9,7 @@
 #include "mesh.h"
 #include "quadrature_gauss.h"
 #include "quadrature_trap.h"
+#include "quadrature_simpson.h"
 #include "fe.h"
 #include "dof_map.h"
 #include "boundary_info.h"
@@ -157,8 +158,11 @@ int main (int argc, char** argv)
     {
       PerfMon pm ("Solver Performance");
       
-      // call the solver.
-      es("secondary").solve ();
+      // call the solver.  Don't solve
+      // the secondary system if not in 3D
+      if (dim == 3)
+	es("secondary").solve ();
+
     };
     
 
@@ -195,7 +199,7 @@ void assemble_primary(EquationSystems& es,
   // about the geometry of the problem and the quadrature rule
   FEType fe_type (SECOND);
   
-  AutoPtr<FEBase> fe(FEBase::build(3, fe_type));
+  AutoPtr<FEBase> fe(FEBase::build(dim, fe_type));
   QGauss qrule(dim, FIFTH);
   //QTrap qrule(dim);
   
@@ -204,9 +208,11 @@ void assemble_primary(EquationSystems& es,
   AutoPtr<FEBase> fe_face(FEBase::build(3, fe_type));
   QGauss   qface0(dim, FIFTH);
   //QTrap   qface0(dim);
+  //QSimpson   qface0(dim);
   
   QGauss   qface1(dim-1, FIFTH);
   //QTrap   qface1(dim-1);
+  //QSimpson   qface1(dim-1);
   
   fe_face->attach_quadrature_rule(&qface0);
   
@@ -228,7 +234,7 @@ void assemble_primary(EquationSystems& es,
   std::vector<real> Fv;
   
   real vol=0., area=0.;
-	
+
   for (unsigned int e=0; e<mesh.n_elem(); e++)
     {
       const Elem* elem = mesh.elem(e);
@@ -236,15 +242,17 @@ void assemble_primary(EquationSystems& es,
       // Find the next active element on my processor
       if (elem->processor_id() != proc_id) continue;
       if (!elem->active())                 continue;
-	    
+
       // recompute the element-specific data for the current element
       fe->reinit (elem);
+
+      
       //fe->print_info();
 
       dof_map.dof_indices(e, dof_indices_U, 0);
       dof_map.dof_indices(e, dof_indices_V, 1);
       
-	    // zero the element matrix and vector
+      // zero the element matrix and vector
       Kuu.resize (phi.size(),
 		  phi.size());
 	    
@@ -257,7 +265,7 @@ void assemble_primary(EquationSystems& es,
       for (unsigned int i=0; i<phi.size(); i++)
 	Fu[i] = Fv[i] = 0.;
 	    
-	    // standard stuff...  like in code 1.
+      // standard stuff...  like in code 1.
       for (unsigned int gp=0; gp<qrule.n_points(); gp++)
 	{
 	  for (unsigned int i=0; i<phi.size(); ++i)
@@ -290,17 +298,21 @@ void assemble_primary(EquationSystems& es,
 	  vol += JxW[gp];
 	};
 
-	  
-      for (unsigned int side=0; side<elem->n_sides(); side++)
-	if (elem->neighbor(side) == NULL)
-	  {
-	    fe_face->reinit (&qface1, elem, side);
-		  
-	    //fe_face->print_info();
 
-	    for (unsigned int gp=0; gp<JxW_face.size(); gp++)
-	      area += JxW_face[gp];
-	  }
+      // You can't compute "area" (perimeter) if you are in 2D
+      if (dim == 3)
+	{
+	  for (unsigned int side=0; side<elem->n_sides(); side++)
+	    if (elem->neighbor(side) == NULL)
+	      {
+		fe_face->reinit (&qface1, elem, side);
+	    
+		//fe_face->print_info();
+	    
+		for (unsigned int gp=0; gp<JxW_face.size(); gp++)
+		  area += JxW_face[gp];
+	      }
+	}
 
       es("primary").rhs.add_vector(Fu,
 				   dof_indices_U);
@@ -314,7 +326,9 @@ void assemble_primary(EquationSystems& es,
     };
   
   std::cout << "Vol="  << vol << std::endl;
-  std::cout << "Area=" << area << std::endl;
+
+  if (dim == 3)
+    std::cout << "Area=" << area << std::endl;
 };
   
 
@@ -375,7 +389,7 @@ void assemble_secondary(EquationSystems& es,
       for (unsigned int i=0; i<phi.size(); i++)
 	Fw[i] = 0.;
 	    
-	    // standard stuff...  like in code 1.
+      // standard stuff...  like in code 1.
       for (unsigned int gp=0; gp<qrule.n_points(); gp++)
 	for (unsigned int i=0; i<phi.size(); ++i)
 	  {

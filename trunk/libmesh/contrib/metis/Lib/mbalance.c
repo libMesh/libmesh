@@ -9,7 +9,7 @@
  * Started 7/29/97
  * George
  *
- * $Id: mbalance.c,v 1.2 2003-01-21 19:24:26 benkirk Exp $
+ * $Id: mbalance.c,v 1.3 2003-01-24 17:24:36 jwpeterson Exp $
  *
  */
 

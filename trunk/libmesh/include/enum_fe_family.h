@@ -1,4 +1,4 @@
-// $Id: enum_fe_family.h,v 1.3 2003-01-21 19:24:34 benkirk Exp $
+// $Id: enum_fe_family.h,v 1.4 2003-01-24 17:24:38 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -41,12 +41,11 @@ namespace MeshEnums {
 		 MONOMIAL,
 		 
 #ifdef ENABLE_INFINITE_ELEMENTS
-		 
-		 RADIAL_MAP,       //   for 1/r-map
-                 JACOBI_20_00,     //   i_max = 19
+		 INFINITE_MAP,     //   for 1/r-map
+		 JACOBI_20_00,     //   i_max = 19
                  JACOBI_30_00,     //   i_max = 19
 		 LEGENDRE,         //   i_max = 19
-		 
+		 INF_LAGRANGE,     //   i_max = 14
 #endif
 		 
 		 INVALID_FE};

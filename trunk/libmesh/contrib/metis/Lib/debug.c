@@ -8,7 +8,7 @@
  * Started 7/24/97
  * George
  *
- * $Id: debug.c,v 1.2 2003-01-21 19:24:25 benkirk Exp $
+ * $Id: debug.c,v 1.3 2003-01-24 17:24:36 jwpeterson Exp $
  *
  */
 

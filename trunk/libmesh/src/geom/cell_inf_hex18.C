@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex18.C,v 1.4 2003-01-21 19:24:36 benkirk Exp $
+// $Id: cell_inf_hex18.C,v 1.5 2003-01-24 17:24:43 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -47,6 +47,16 @@ AutoPtr<Elem> InfHex18::build_side (const unsigned int i) const
         AutoPtr<Elem> face(Elem::build(QUAD9));
 
 	face->set_node(0) = get_node(0);
+	face->set_node(1) = get_node(1);
+	face->set_node(2) = get_node(2);
+	face->set_node(3) = get_node(3);
+	face->set_node(4) = get_node(8);
+	face->set_node(5) = get_node(9);
+	face->set_node(6) = get_node(10);
+	face->set_node(7) = get_node(11);
+	face->set_node(8) = get_node(16);
+/* old code
+	face->set_node(0) = get_node(0);
 	face->set_node(1) = get_node(3);
 	face->set_node(2) = get_node(2);
 	face->set_node(3) = get_node(1);
@@ -55,6 +65,7 @@ AutoPtr<Elem> InfHex18::build_side (const unsigned int i) const
 	face->set_node(6) = get_node(9);
 	face->set_node(7) = get_node(8);
 	face->set_node(8) = get_node(16);
+*/
 
 	return face;
       };

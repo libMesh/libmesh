@@ -1,4 +1,4 @@
-// $Id: node.C,v 1.3 2003-01-21 19:24:36 benkirk Exp $
+// $Id: node.C,v 1.4 2003-01-24 17:24:40 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
