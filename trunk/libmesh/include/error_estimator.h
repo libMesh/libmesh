@@ -1,4 +1,4 @@
-// $Id: error_estimator.h,v 1.4 2003-05-20 20:55:01 benkirk Exp $
+// $Id: error_estimator.h,v 1.5 2003-06-03 22:10:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -46,6 +46,13 @@ class EquationSystems;
 class ErrorEstimator
 {
 public:
+
+  /**
+   * Destructor.  Virtual, so feel free to derive your
+   * own error estimator from this if you want.
+   */
+  virtual ~ErrorEstimator() {}
+
   
   /**
    * This function uses the Kelley Flux Jump error
@@ -53,9 +60,9 @@ public:
    * The estimated error is output in the vector
    * \p error_per_cell
    */
-  static void flux_jump (const EquationSystems& es,
-			 const std::string& name,
-			 std::vector<float>& error_per_cell);
+  virtual void flux_jump (const EquationSystems& es,
+			  const std::string& name,
+			  std::vector<float>& error_per_cell);
 
 
   /**
@@ -64,9 +71,9 @@ public:
    * will be calculated for all variables in the system.  If
    * the mask is not empty the error will be calculated only
    * for those components for which \p component_mask[c] is
-   * nonzero.
+   * true.
    */
-  static std::vector<unsigned char> component_mask;
+  std::vector<bool> component_mask;
 };
 
 
