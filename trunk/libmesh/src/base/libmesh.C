@@ -1,4 +1,4 @@
-// $Id: libmesh.C,v 1.11 2003-04-08 03:21:35 benkirk Exp $
+// $Id: libmesh.C,v 1.12 2003-04-09 01:20:22 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -20,7 +20,6 @@
  
 
 // C++ includes
-#include <fstream>
 #include <math.h>
 
 
@@ -89,8 +88,6 @@ PerfLog      libMesh::log ("libMesh",
 
 
 AutoPtr<GetPot>  libMesh::_command_line (NULL);
-std::ostream    *libMesh::_out            = NULL;
-std::ostream    *libMesh::_err            = NULL;
 bool             libMesh::_is_initialized = false;
 
 
@@ -129,24 +126,26 @@ void libMesh::init (int & argc, char** & argv)
   assert (_processor_id >= 0);
 
 
-  // Open the output streams.
-  if (processor_id() == 0)
-    {
-      _out = &std::cout;
-      _err = &std::cerr;
-    }
-  else
-    {
-      _out = new std::ostream(NULL);
-      _err = new std::ostream(NULL);
-    }
-
+  
   // Parse the command-line arguments
   _command_line.reset(new GetPot (argc, (const char**) argv));
+
+
+  
+  // redirect std::cout to nothing on all
+  // other processors unless explicitly told
+  // not to via the --keep-cout command-line argument.
+  if (libMesh::processor_id() != 0)
+    if (!libMesh::on_command_line("--keep-cout"))
+      std::cout.rdbuf (NULL);
+  
+
   
   // The library is now ready for use
   _is_initialized = true;
 
+
+  
   // Make sure these work.  Library methods
   // depend on these being implemented properly,
   // so this is a good time to test them!
@@ -195,17 +194,8 @@ int libMesh::close ()
     }
 
 
-  // Close the output streams.
-  {
-    if (processor_id() != 0)
-      {
-	delete _out;
-	delete _err;
-      }
-    
-    _out = NULL;
-    _err = NULL;
-  }
+  // Reconnect the output streams
+  //std::cout.rdbuf(std::cerr.rdbuf());
 
   
   // Set the initialized() flag to false

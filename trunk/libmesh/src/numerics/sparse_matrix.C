@@ -1,4 +1,4 @@
-// $Id: sparse_matrix.C,v 1.6 2003-04-08 03:21:26 benkirk Exp $
+// $Id: sparse_matrix.C,v 1.7 2003-04-09 01:20:25 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -62,7 +62,7 @@ SparseMatrix<T>::build(const SolverPackage solver_package_in)
 #ifdef HAVE_LASPACK
     case LASPACK_SOLVERS:
       {
-	AutoPtr<SparseMatrix<T> > ap(new LaspackMatrix<Real>);
+	AutoPtr<SparseMatrix<T> > ap(new LaspackMatrix<T>);
 	return ap;
       }
 #endif
@@ -71,7 +71,7 @@ SparseMatrix<T>::build(const SolverPackage solver_package_in)
 #ifdef HAVE_PETSC
     case PETSC_SOLVERS:
       {
-	AutoPtr<SparseMatrix<T> > ap(new PetscMatrix<Real>);
+	AutoPtr<SparseMatrix<T> > ap(new PetscMatrix<T>);
 	return ap;
       }
 #endif
