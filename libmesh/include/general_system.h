@@ -1,4 +1,4 @@
-// $Id: general_system.h,v 1.7 2003-03-20 11:51:23 ddreyer Exp $
+// $Id: general_system.h,v 1.8 2003-03-21 15:29:08 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -88,19 +88,9 @@ public:
    * Assemble & solve the linear system.
    */
   std::pair<unsigned int, Real> solve ();
-
-  /*   /\** */
-  /*    * @returns the approximation order of variable number \p i. */
-  /*    *\/ */
-  /*   Order variable_order (const unsigned int i) const; */
-
-  /*   /\** */
-  /*    * @returns the approximation order of variable \p var. */
-  /*    *\/ */
-  /*   Order variable_order (const std::string& var) const; */
   
   /**
-   * @returns "General System".  Helps in identifying
+   * @returns \p "General".  Helps in identifying
    * the system type in an equation system file.
    */
   static const std::string system_type () { return "General"; }
@@ -258,6 +248,14 @@ public:
    * to the simulation at hand two time steps ago.
    */
   AutoPtr<NumericVector<Number> > older_local_solution;
+  
+  /**
+   * @returns \p true when the other system contains
+   * identical data, up to the given threshold.
+   */
+  bool compare (const GeneralSystem& other_system, 
+		const Real threshold,
+		const bool verbose) const;
 
   /**
    * Register a user function to use in initializing the system.
@@ -299,27 +297,6 @@ protected:
 
 // ------------------------------------------------------------
 // GeneralSystem inline methods
-/* inline */
-/* Order GeneralSystem::variable_order (const unsigned int i) const */
-/* { */
-/*   return variable_type(var_names[i]).order; */
-/* } */
-
-
-
-/* inline */
-/* Order GeneralSystem::variable_order (const std::string& var) const */
-/* { */
-/*   std::map<std::string, FEType>::const_iterator */
-/*     pos = var_type.find(var); */
-
-/*   assert (pos != var_type.end()); */
-  
-/*   return pos->second.order; */
-/* } */
-
-
-
 inline
 Number GeneralSystem::current_solution (const unsigned int global_dof_number) const
 {

@@ -1,4 +1,4 @@
-// $Id: general_system.C,v 1.10 2003-03-11 04:35:19 ddreyer Exp $
+// $Id: general_system.C,v 1.11 2003-03-21 15:29:27 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -166,6 +166,21 @@ GeneralSystem::solve ()
   STOP_LOG("solve()", "GeneralSystem");
 
   return rval; 
+}
+
+
+
+
+bool GeneralSystem::compare (const GeneralSystem& other_system, 
+			     const Real threshold,
+			     const bool verbose) const
+{
+  // should implement the additional vectors in here as SystemBase vectors
+//  error();
+
+  // let SystemBase do the job
+  const SystemBase& other_system_base = static_cast<const SystemBase&>(other_system);
+  return SystemBase::compare (other_system_base, threshold, verbose);
 }
 
 

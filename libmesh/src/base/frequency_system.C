@@ -1,4 +1,4 @@
-// $Id: frequency_system.C,v 1.7 2003-03-20 11:51:25 ddreyer Exp $
+// $Id: frequency_system.C,v 1.8 2003-03-21 15:29:25 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -323,6 +323,20 @@ FrequencySystem::solve (const unsigned int n_start_in,
 
   return vec_rval; 
 }
+
+
+
+
+bool FrequencySystem::compare (const FrequencySystem& other_system, 
+			       const Real threshold,
+			       const bool verbose) const
+{
+  // we have no additional data to compare,
+  // let SystemBase do the job
+  const SystemBase& other_system_base = static_cast<const SystemBase&>(other_system);
+  return SystemBase::compare (other_system_base, threshold, verbose);
+}
+
 
 
 

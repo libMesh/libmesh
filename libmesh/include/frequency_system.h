@@ -1,4 +1,4 @@
-// $Id: frequency_system.h,v 1.6 2003-03-20 11:51:23 ddreyer Exp $
+// $Id: frequency_system.h,v 1.7 2003-03-21 15:29:06 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -154,11 +154,19 @@ public:
 						      const unsigned int n_stop_in  = static_cast<unsigned int>(-1));
   
   /**
-   * @returns "Frequency".  Helps in identifying
+   * @returns \p "Frequency".  Helps in identifying
    * the system type in an equation system file.
    */
   static const std::string system_type () { return "Frequency"; }
   
+  /**
+   * @returns \p true when the other system contains
+   * identical data, up to the given threshold.
+   */
+  bool compare (const FrequencySystem& other_system, 
+		const Real threshold,
+		const bool verbose) const;
+
   /**
    * Register an optional user function to use in pre-assembling the system
    * matrix and RHS.  Since this function is called only once

@@ -1,4 +1,4 @@
-// $Id: numeric_vector.h,v 1.9 2003-03-12 20:15:10 ddreyer Exp $
+// $Id: numeric_vector.h,v 1.10 2003-03-21 15:29:09 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -332,6 +332,17 @@ public:
   virtual void localize_to_one (std::vector<T>& v_local,
 				const unsigned int proc_id=0) const = 0;
     
+  /**
+   * @returns \p -1 when \p this is equivalent to \p other_vector,
+   * up to the given \p threshold.  When differences occur,
+   * the return value contains the first index where
+   * the difference exceeded the threshold.  When
+   * no threshold is given, the \p libMesh \p TOLERANCE
+   * is used.
+   */
+  virtual int compare (const NumericVector<T> &other_vector,
+		       const Real threshold = TOLERANCE) const;
+
   /**
    * Prints the contents of the vector to the screen.
    */
