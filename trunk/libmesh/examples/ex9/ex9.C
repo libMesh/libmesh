@@ -1,4 +1,4 @@
-// $Id: ex9.C,v 1.3 2003-06-03 22:10:07 benkirk Exp $
+// $Id: ex9.C,v 1.4 2003-06-04 01:30:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -152,25 +152,26 @@ int main (int argc, char** argv)
       /**
        * Creates a transient system named "ConvectionDiffusion"
        */
-      equation_systems.add_system<TransientSystem> ("Convection-Diffusion");
+      TransientSystem& system = 
+	equation_systems.add_system<TransientSystem> ("Convection-Diffusion");
       
       /**
        * Adds the variable "u" to "Convection-Diffusion".  "u"
        * will be approximated using first-order approximation.
        */
-      equation_systems("Convection-Diffusion").add_variable("u", FIRST);
+      system.add_variable ("u", FIRST);
 
       /**
        * Give the system a pointer to the matrix assembly
        * and initialization functions.
        */
-      equation_systems("Convection-Diffusion").attach_assemble_function(assemble_cd);
-      equation_systems("Convection-Diffusion").attach_init_function(init_cd);
+      system.attach_assemble_function (assemble_cd);
+      system.attach_init_function (init_cd);
       
       /**
        * Initialize the data structures for the equation system.
        */
-      equation_systems.init();
+      equation_systems.init ();
       
       /**
        * Prints information about the system to the screen.
@@ -182,7 +183,6 @@ int main (int argc, char** argv)
        */
       mesh.write_gmv ("out_000.gmv",
 		      equation_systems);
-      
     }
 
 

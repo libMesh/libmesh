@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.37 2003-05-22 18:31:19 ddreyer Exp $
+// $Id: equation_systems.C,v 1.38 2003-06-04 01:30:08 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -193,24 +193,23 @@ void EquationSystems::add_system (const std::string& sys_type,
       std::cerr << "ERROR: Unknown system type: "
 		<< sys_type
 		<< std::endl;
+      error();
     }
 }
 
 
 
 template <typename T_sys>
-void EquationSystems::add_system (const std::string& name)
+inline
+T_sys& EquationSystems::add_system (const std::string& name)
 {
   if (!_systems.count(name))
     {
       const unsigned int num = this->n_systems();
 
-      _systems.insert (std::pair<std::string, SystemBase*>(name,
-							   new T_sys(*this,
-								     name,
-								     num)
-							   )
-		       );
+      _systems.insert (std::make_pair(name, new T_sys(*this,
+						      name,
+						      num)));
       
     }
   else
@@ -241,6 +240,8 @@ void EquationSystems::add_system (const std::string& name)
     for ( ; elem_it != elem_end; ++elem_it)
       (*elem_it)->add_system();
   }
+
+  return *(dynamic_cast<T_sys*>(_systems[name]));
 }
 
 
@@ -810,9 +811,9 @@ bool EquationSystems::parameter_exists (const std::string& id) const
 
 // Some systems only work with complex numbers
 #ifdef USE_COMPLEX_NUMBERS
-template void EquationSystems::add_system<FrequencySystem> (const std::string&);
+template FrequencySystem &  EquationSystems::add_system<FrequencySystem> (const std::string&);
 #endif
 
-template void EquationSystems::add_system<NewmarkSystem>   (const std::string&);
-template void EquationSystems::add_system<SteadySystem>    (const std::string&);
-template void EquationSystems::add_system<TransientSystem> (const std::string&);
+template NewmarkSystem &    EquationSystems::add_system<NewmarkSystem>   (const std::string&);
+template SteadySystem  &    EquationSystems::add_system<SteadySystem>    (const std::string&);
+template TransientSystem &  EquationSystems::add_system<TransientSystem> (const std::string&);
