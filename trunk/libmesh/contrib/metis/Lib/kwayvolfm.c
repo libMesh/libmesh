@@ -6,7 +6,7 @@
  * Started 7/8/98
  * George
  *
- * $Id: kwayvolfm.c,v 1.3 2003-01-24 17:24:36 jwpeterson Exp $
+ * $Id: kwayvolfm.c,v 1.4 2003-06-24 05:33:50 benkirk Exp $
  *
  */
 
@@ -350,14 +350,14 @@ void Random_KWayVolRefineMConn(CtrlType *ctrl, GraphType *graph, int nparts, flo
             if (pmat[me*nparts+to] == 0) {
               ndoms[me]++;
               if (ndoms[me] > maxndoms) {
-                printf("You just increased the maxndoms: %d %d\n", ndoms[me], maxndoms);
+                IFSET(ctrl->dbglvl, DBG_REFINE, printf("You just increased the maxndoms: %d %d\n", ndoms[me], maxndoms));
                 maxndoms = ndoms[me];
               }
             }
             if (pmat[to*nparts+me] == 0) {
               ndoms[to]++;
               if (ndoms[to] > maxndoms) {
-                printf("You just increased the maxndoms: %d %d\n", ndoms[to], maxndoms);
+                IFSET(ctrl->dbglvl, DBG_REFINE, printf("You just increased the maxndoms: %d %d\n", ndoms[to], maxndoms));
                 maxndoms = ndoms[to];
               }
             }
@@ -750,14 +750,14 @@ void Greedy_KWayVolBalanceMConn(CtrlType *ctrl, GraphType *graph, int nparts, fl
           if (pmat[me*nparts+to] == 0) {
             ndoms[me]++;
             if (ndoms[me] > maxndoms) {
-              printf("You just increased the maxndoms: %d %d\n", ndoms[me], maxndoms);
+              IFSET(ctrl->dbglvl, DBG_REFINE, printf("You just increased the maxndoms: %d %d\n", ndoms[me], maxndoms));
               maxndoms = ndoms[me];
             }
           }
           if (pmat[to*nparts+me] == 0) {
             ndoms[to]++;
             if (ndoms[to] > maxndoms) {
-              printf("You just increased the maxndoms: %d %d\n", ndoms[to], maxndoms);
+              IFSET(ctrl->dbglvl, DBG_REFINE, printf("You just increased the maxndoms: %d %d\n", ndoms[to], maxndoms));
               maxndoms = ndoms[to];
             }
           }

@@ -9,7 +9,7 @@
  * Started 7/24/97
  * George
  *
- * $Id: mpmetis.c,v 1.3 2003-01-24 17:24:37 jwpeterson Exp $
+ * $Id: mpmetis.c,v 1.4 2003-06-24 05:33:50 benkirk Exp $
  *
  */
 
@@ -265,7 +265,7 @@ int MCMlevelRecursiveBisection(CtrlType *ctrl, GraphType *graph, int nparts, idx
     SplitGraphPart(ctrl, graph, &lgraph, &rgraph);
 
   /* Free the memory of the top level graph */
-  GKfree(&graph->gdata, &graph->nvwgt, &graph->rdata, &graph->npwgts, &graph->label, LTERM);
+  GKfree(&graph->gdata, &graph->nvwgt, &graph->rdata, &graph->label, LTERM);
 
 
   /* Do the recursive call */
@@ -338,7 +338,7 @@ int MCHMlevelRecursiveBisection(CtrlType *ctrl, GraphType *graph, int nparts, id
   }
 
   /* Free the memory of the top level graph */
-  GKfree(&graph->gdata, &graph->nvwgt, &graph->rdata, &graph->npwgts, &graph->label, LTERM);
+  GKfree(&graph->gdata, &graph->nvwgt, &graph->rdata, &graph->label, LTERM);
 
 
   /* Do the recursive call */

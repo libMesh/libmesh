@@ -1,4 +1,4 @@
-// $Id: dense_matrix.h,v 1.17 2003-03-18 18:20:14 benkirk Exp $
+// $Id: dense_matrix.h,v 1.18 2003-06-24 05:33:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -266,6 +266,9 @@ T DenseMatrix<T>::operator () (const unsigned int i,
 			       const unsigned int j) const
 {
   assert (i*j<_val.size());
+  assert (i < this->_m);
+  assert (j < this->_n);
+  
   
   //  return _val[(i) + (this->_m)*(j)]; // col-major
   return _val[(i)*(this->_n) + (j)]; // row-major
@@ -279,6 +282,8 @@ T & DenseMatrix<T>::operator () (const unsigned int i,
 				 const unsigned int j)
 {
   assert (i*j<_val.size());
+  assert (i < this->_m);
+  assert (j < this->_n);
   
   //return _val[(i) + (this->_m)*(j)]; // col-major
   return _val[(i)*(this->_n) + (j)]; // row-major
@@ -305,10 +310,6 @@ inline
 T DenseMatrix<T>::transpose (const unsigned int i,
 			     const unsigned int j) const
 {
-  // Be sure that we haven't exceeded
-  // the bounds of the matrix.
-  assert (i*j <= this->_m * this->_n);
-  
   // Implement in terms of operator()
   return (*this)(j,i);
 }

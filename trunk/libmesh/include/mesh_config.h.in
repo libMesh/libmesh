@@ -76,6 +76,9 @@
    files */
 #undef HAVE_NETCDF
 
+/* Flag indicating whether or not Parmetis is available */
+#undef HAVE_PARMETIS
+
 /* Flag indicating whether or not Petsc is available */
 #undef HAVE_PETSC
 

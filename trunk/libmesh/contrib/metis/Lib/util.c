@@ -8,7 +8,7 @@
  * Started 9/28/95
  * George
  *
- * $Id: util.c,v 1.3 2003-01-24 17:24:37 jwpeterson Exp $
+ * $Id: util.c,v 1.4 2003-06-24 05:33:50 benkirk Exp $
  */
 
 #include <metis.h>
@@ -507,9 +507,9 @@ void InitRandom(int seed)
 }
 
 /*************************************************************************
-* This function returns the log2int(x)
+* This function returns the log2(x)
 **************************************************************************/
-int log2int(int a)
+int log2Int(int a)
 {
   int i;
 

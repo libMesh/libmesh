@@ -8,7 +8,7 @@
  * Started 10/14/97
  * George
  *
- * $Id: parmetis.c,v 1.3 2003-01-24 17:24:37 jwpeterson Exp $
+ * $Id: parmetis.c,v 1.4 2003-06-24 05:33:50 benkirk Exp $
  *
  */
 
@@ -48,6 +48,7 @@ void METIS_WPartGraphKway2(int *nvtxs, idxtype *xadj, idxtype *adjncy, idxtype *
   int i, j;
   GraphType graph;
   CtrlType ctrl;
+idxtype wgt[2048];
 
   if (*numflag == 1)
     Change2CNumbering(*nvtxs, xadj, adjncy);
@@ -77,7 +78,8 @@ void METIS_WPartGraphKway2(int *nvtxs, idxtype *xadj, idxtype *adjncy, idxtype *
   IFSET(ctrl.dbglvl, DBG_TIME, InitTimers(&ctrl));
   IFSET(ctrl.dbglvl, DBG_TIME, starttimer(ctrl.TotalTmr));
 
-  *edgecut = MlevelKWayPartitioning(&ctrl, &graph, *nparts, part, tpwgts, 1.03);
+/*  *edgecut = MlevelKWayPartitioning(&ctrl, &graph, *nparts, part, tpwgts, 1.03); */
+  *edgecut = MlevelKWayPartitioning(&ctrl, &graph, *nparts, part, tpwgts, 1.00);
 
   IFSET(ctrl.dbglvl, DBG_TIME, stoptimer(ctrl.TotalTmr));
   IFSET(ctrl.dbglvl, DBG_TIME, PrintTimers(&ctrl));

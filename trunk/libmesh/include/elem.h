@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.26 2003-05-28 03:17:47 benkirk Exp $
+// $Id: elem.h,v 1.27 2003-06-24 05:33:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -39,6 +39,7 @@
 // Forward declarations
 class MeshBase;
 class MeshRefinement;
+class MetisPartitioner;
 class Elem;
 
 
@@ -586,6 +587,7 @@ class Elem : public ReferenceCountedObject<Elem>,
   friend class MeshRefinement;
   friend class MeshBase;
   friend class Mesh;
+  friend class MetisPartitioner;
 };
 
 

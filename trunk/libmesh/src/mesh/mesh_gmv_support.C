@@ -1,4 +1,4 @@
-// $Id: mesh_gmv_support.C,v 1.22 2003-06-07 14:36:17 ddreyer Exp $
+// $Id: mesh_gmv_support.C,v 1.23 2003-06-24 05:33:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -279,18 +279,18 @@ void MeshBase::write_gmv(std::ostream& out,
   if (write_partitioning)
     {
       out << "material "
-	  << this->n_subdomains()
+	  << this->n_processors()
 	  << " 0"<< std::endl;
 
-      for (unsigned int sbd=0; sbd<this->n_subdomains(); sbd++)
-	out << "sbd_" << sbd << std::endl;
+      for (unsigned int proc=0; proc<this->n_processors(); proc++)
+	out << "proc_" << proc << std::endl;
       
-      const_active_elem_iterator       it (elements_begin());
-      const const_active_elem_iterator end(elements_end());
+      const_active_elem_iterator       it (this->elements_begin());
+      const const_active_elem_iterator end(this->elements_end());
 
       for ( ; it != end; ++it)
 	for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
-	    out << (*it)->subdomain_id()+1 << std::endl;
+	    out << (*it)->processor_id()+1 << std::endl;
       
       out << std::endl;
     }
@@ -545,7 +545,7 @@ void MeshBase::write_gmv_binary(std::ostream& out,
       strcpy(buf, "material");
       out.write(buf, strlen(buf));
       
-      unsigned int tmpint = this->n_subdomains();
+      unsigned int tmpint = this->n_processors();
       memcpy(buf, &tmpint, sizeof(unsigned int));
       out.write(buf, sizeof(unsigned int));
 
@@ -554,27 +554,26 @@ void MeshBase::write_gmv_binary(std::ostream& out,
       out.write(buf, sizeof(unsigned int));
 
 
-      for (unsigned int sbd=0; sbd<this->n_subdomains(); sbd++)
+      for (unsigned int proc=0; proc<this->n_processors(); proc++)
 	{
-	  sprintf(buf, "sbd_%d", sbd);
+	  sprintf(buf, "proc_%d", proc);
 	  out.write(buf, 8);
 	}
 
-      unsigned int* sbd_id = new unsigned int[n_active_sub_elem()];
+      std::vector<unsigned int> proc_id (this->n_active_sub_elem());
       
       unsigned int n=0;
       
-      const_active_elem_iterator       it (elements_begin());
-      const const_active_elem_iterator end(elements_end());
+      const_active_elem_iterator       it (this->elements_begin());
+      const const_active_elem_iterator end(this->elements_end());
 
       for ( ; it != end; ++it)
 	for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
-	  sbd_id[n++] = (*it)->subdomain_id()+1;
+	  proc_id[n++] = (*it)->processor_id()+1;
       
       
-      out.write(reinterpret_cast<char *>(sbd_id), sizeof(unsigned int)*n_active_sub_elem());
-
-      delete [] sbd_id;
+      out.write(reinterpret_cast<char *>(&proc_id[0]),
+		sizeof(unsigned int)*proc_id.size());
     }
 
 

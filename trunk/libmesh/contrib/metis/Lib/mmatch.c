@@ -9,7 +9,7 @@
  * Started 7/23/97
  * George
  *
- * $Id: mmatch.c,v 1.3 2003-01-24 17:24:37 jwpeterson Exp $
+ * $Id: mmatch.c,v 1.4 2003-06-24 05:33:50 benkirk Exp $
  *
  */
 
@@ -458,12 +458,7 @@ float BetterVBalance(int ncon, int norm, float *vwgt, float *u1wgt, float *u2wgt
       sum2 += vwgt[i]+u2wgt[i];
     }
 
-    if (sum1 == 0.0)
-      return 1;
-    else if (sum2 == 0.0)
-      return -1;
-    else
-      return ((max1-min1)/sum1) - ((max2-min2)/sum2);
+    return ((max1-min1)/sum1) - ((max2-min2)/sum2);
   }
   else if (norm == 1) {
     sum1 = sum2 = 0.0;

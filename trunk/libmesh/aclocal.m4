@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.30 2003-05-28 03:30:41 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.31 2003-06-24 05:33:50 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -619,6 +619,29 @@ AC_DEFUN(CONFIGURE_METIS,
   fi
 
   AC_SUBST(enablemetis)	
+])
+dnl -------------------------------------------------------------
+
+
+
+dnl -------------------------------------------------------------
+dnl Parmetis
+dnl -------------------------------------------------------------
+AC_DEFUN(CONFIGURE_PARMETIS, 
+[
+  AC_CHECK_FILE(./contrib/parmetis/Lib/parmetis.h,
+                PARMETIS_INCLUDE_PATH=$PWD/contrib/parmetis/Lib)
+
+  if (test -r $PARMETIS_INCLUDE_PATH/parmetis.h) ; then
+    AC_SUBST(PARMETIS_INCLUDE_PATH)
+    AC_DEFINE(HAVE_PARMETIS, 1,
+	      [Flag indicating whether or not Parmetis is available])
+    AC_MSG_RESULT(<<< Configuring library with Parmetis support >>>)
+  else
+    enableparmetis=no
+  fi
+
+  AC_SUBST(enableparmetis)	
 ])
 dnl -------------------------------------------------------------
 

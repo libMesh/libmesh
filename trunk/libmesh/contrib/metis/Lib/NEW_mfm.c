@@ -8,7 +8,7 @@
  * Started 7/23/97
  * George
  *
- * $Id: mfm.c,v 1.3 2003-01-24 17:24:37 jwpeterson Exp $
+ * $Id: NEW_mfm.c,v 1.1 2003-06-24 05:33:50 benkirk Exp $
  */
 
 #include <metis.h>
@@ -59,7 +59,6 @@ void MocFM_2WayEdgeRefine(CtrlType *ctrl, GraphType *graph, float *tpwgts, int n
 
   rtpwgts[0] = origbal*tpwgts[0];
   rtpwgts[1] = origbal*tpwgts[1];
-
 
   if (ctrl->dbglvl&DBG_REFINE) {
     printf("Parts: [");
@@ -254,7 +253,7 @@ void SelectQueue(int ncon, float *npwgts, float *tpwgts, int *from, int *cnum, P
     }
   }
 
-  /* printf("Selected1 %d(%d) -> %d [%5f]\n", *from, *cnum, PQueueGetSize(&queues[*cnum][*from]), maxdiff); */
+  /* printf("Selected %d(%d) -> %d\n", *from, *cnum, PQueueGetSize(&queues[*cnum][*from])); */
 
   if (*from != -1 && PQueueGetSize(&queues[*cnum][*from]) == 0) {
     /* The desired queue is empty, select a node from that side anyway */
@@ -288,8 +287,6 @@ void SelectQueue(int ncon, float *npwgts, float *tpwgts, int *from, int *cnum, P
       }
     }
   }
-
-  /* printf("Selected2 %d(%d) -> %d\n", *from, *cnum, PQueueGetSize(&queues[*cnum][*from])); */
 }
 
 

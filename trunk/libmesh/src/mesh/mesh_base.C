@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.40 2003-06-03 16:47:38 benkirk Exp $
+// $Id: mesh_base.C,v 1.41 2003-06-24 05:33:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -49,7 +49,7 @@
 #include "cell_inf_hex18.h"
 #include "petsc_matrix.h"
 #include "mesh_logging.h"
-
+#include "metis_partitioner.h"
 
 
 
@@ -1131,6 +1131,17 @@ void MeshBase::all_tri ()
   _elements = new_elements;
 
   this->prepare_for_use();
+}
+
+
+
+void MeshBase::partition (const unsigned int n_sbdmns)
+{
+  assert (n_sbdmns > 0);
+
+  MetisPartitioner mp (*this);
+
+  mp.partition(n_sbdmns);
 }
 
 

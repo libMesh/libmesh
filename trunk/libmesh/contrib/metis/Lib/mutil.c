@@ -7,7 +7,7 @@
  * Started 2/15/98
  * George
  *
- * $Id: mutil.c,v 1.3 2003-01-24 17:24:37 jwpeterson Exp $
+ * $Id: mutil.c,v 1.4 2003-06-24 05:33:50 benkirk Exp $
  *
  */
 

@@ -9,7 +9,7 @@
  * Started 7/23/97
  * George
  *
- * $Id: minitpart.c,v 1.3 2003-01-24 17:24:37 jwpeterson Exp $
+ * $Id: minitpart.c,v 1.4 2003-06-24 05:33:50 benkirk Exp $
  *
  */
 
@@ -39,7 +39,7 @@ void MocInit2WayPartition(CtrlType *ctrl, GraphType *graph, float *tpwgts, float
       errexit("Unknown initial partition type: %d\n", ctrl->IType);
   }
 
-  IFSET(ctrl->dbglvl, DBG_IPART, printf("Initial Cut: %d [%d]\n", graph->mincut, graph->where[0]));
+  IFSET(ctrl->dbglvl, DBG_IPART, printf("Initial Cut: %d\n", graph->mincut));
   IFSET(ctrl->dbglvl, DBG_TIME, stoptimer(ctrl->InitPartTmr));
   ctrl->dbglvl = dbglvl;
 
@@ -81,7 +81,7 @@ void MocGrowBisection(CtrlType *ctrl, GraphType *graph, float *tpwgts, float ubf
     MocBalance2Way(ctrl, graph, tpwgts, 1.02);
     MocFM_2WayEdgeRefine(ctrl, graph, tpwgts, 4); 
 
-    if (bestcut >= graph->mincut) {
+    if (bestcut > graph->mincut) {
       bestcut = graph->mincut;
       idxcopy(nvtxs, where, bestwhere);
       if (bestcut == 0)
@@ -150,7 +150,7 @@ void MocRandomBisection(CtrlType *ctrl, GraphType *graph, float *tpwgts, float u
     printf("]\n");
     */
 
-    if (bestcut >= graph->mincut) {
+    if (bestcut > graph->mincut) {
       bestcut = graph->mincut;
       idxcopy(nvtxs, where, bestwhere);
       if (bestcut == 0)
@@ -220,7 +220,7 @@ void MocInit2WayBalance(CtrlType *ctrl, GraphType *graph, float *tpwgts)
 
   ASSERT(ComputeCut(graph, where) == graph->mincut);
   ASSERT(CheckBnd(graph));
-  /* ASSERT(CheckGraph(graph)); */
+  ASSERT(CheckGraph(graph));
 
   /* Compute the queues in which each vertex will be assigned to */
   for (i=0; i<nvtxs; i++)

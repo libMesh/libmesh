@@ -8,22 +8,15 @@
  * Started 8/27/94
  * George
  *
- * $Id: metis.h,v 1.3 2003-01-24 17:24:37 jwpeterson Exp $
+ * $Id: metis.h,v 1.4 2003-06-24 05:33:50 benkirk Exp $
  */
 
+/*
+#define	DEBUG		1
+#define	DMALLOC		1
+*/
 
-#include <stdio.h>
-#ifdef __STDC__
-#include <stdlib.h>
-#else
-#include <malloc.h>
-#endif
-#include <strings.h>
-#include <string.h>
-#include <ctype.h>
-#include <math.h>
-#include <stdarg.h>
-#include <time.h>
+#include <stdheaders.h>
 
 #ifdef DMALLOC
 #include <dmalloc.h>
@@ -33,5 +26,7 @@
 #include <struct.h>
 #include <macros.h>
 #include <rename.h>
+#include <NEW_rename.h>
 #include <proto.h>
+#include <NEW_proto.h>
 
