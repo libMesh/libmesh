@@ -1,4 +1,4 @@
-// $Id: inf_fe.C,v 1.19 2003-04-03 14:17:24 ddreyer Exp $
+// $Id: inf_fe.C,v 1.20 2003-04-11 19:09:32 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -528,11 +528,6 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
   }
 
 
-  // zero  the phase, since it is to be summed up
-  std::fill (dphasedxi.begin(),   dphasedxi.end(),   0.);
-  std::fill (dphasedeta.begin(),  dphasedeta.end(),  0.);
-  std::fill (dphasedzeta.begin(), dphasedzeta.end(), 0.);
-
 
   {
     // -----------------------------------------------------------------
@@ -572,6 +567,12 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
   // at least check whether the base element type is correct.
   // otherwise this version of computing dist would give problems
   assert (base_elem->type() == Base::get_elem_type(inf_elem->type()));
+
+  // zero  the phase, since it is to be summed up
+  std::fill (dphasedxi.begin(),   dphasedxi.end(),   0.);
+  std::fill (dphasedeta.begin(),  dphasedeta.end(),  0.);
+  std::fill (dphasedzeta.begin(), dphasedzeta.end(), 0.);
+
 
   const unsigned int n_base_mapping_sf   = dist.size();
   const Point origin                     = inf_elem->origin();
