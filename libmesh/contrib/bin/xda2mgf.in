@@ -1,6 +1,6 @@
 #!@PERL@
 #
-# $Id: xda2mgf.in,v 1.2 2004-09-30 14:26:22 benkirk Exp $
+# $Id: xda2mgf.in,v 1.3 2004-11-05 02:19:33 bbarth Exp $
 # Perl script to convert libMesh XDA meshes to MGF-format
 # Author: Bill Barth, 2004
 
@@ -33,7 +33,7 @@ while(<>)
       }
     elsif ($cnt < $nelem + 11)
       {
-        print "0 0 ".$_;
+        print "27 0 ".$_;
       }
     else
       {

@@ -1,4 +1,4 @@
-// $Id: mesh_xdr_support.C,v 1.28 2004-10-28 20:06:14 benkirk Exp $
+// $Id: mesh_xdr_support.C,v 1.29 2004-11-05 02:19:46 bbarth Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -156,7 +156,7 @@ void XdrInterface::mesh_interface(const std::string& name,
     case (XdrIO::ENCODE):
       {
 	numBCs = boundary_info.n_boundary_conds();
-	etypes = mesh.elem_types();
+        etypes = mesh.elem_types();
 	neeb.resize(etypes.size());
 	
 	for (unsigned int i=0; i<etypes.size(); i++)
@@ -185,7 +185,14 @@ void XdrInterface::mesh_interface(const std::string& name,
 	mh->setNumEl(mesh.n_elem());
 	mh->setNumNodes(mesh.n_nodes());
 	mh->setStrSize(65536);
-	mh->setSumWghts(mesh.total_weight());
+        
+        if (orig_type == 0)
+          mh->setSumWghts(mesh.total_weight());
+        else if (orig_type == 1)
+          mh->setSumWghts(mesh.total_weight()+2*numElem);
+        else
+          error();
+        
 	mh->setNumBCs(numBCs);
 	mh->setId("Id String");	   // Ignored
 	mh->setTitle("Title String"); // Ignored
@@ -265,7 +272,7 @@ void XdrInterface::mesh_interface(const std::string& name,
 	
 	else if (orig_flag == 1) // MGF
 	  {
-	    conn.resize(totalWeight+2*numElem);
+	    conn.resize(totalWeight+(2*numElem));
 	    m.Icon(&conn[0], 1, totalWeight+(2*numElem));
 	  }
 	
@@ -280,12 +287,26 @@ void XdrInterface::mesh_interface(const std::string& name,
 
     case (XdrIO::ENCODE):
     case (XdrIO::W_ASCII):
-      { 
-	conn.resize(mesh.total_weight());
+      {
+        int orig_type = m.get_orig_flag();
+        int totalWeight =0;
+	if(orig_type == 0)
+          totalWeight = mesh.total_weight();
+        else if(orig_type == 1)
+          totalWeight = mesh.total_weight()+2*mh->getNumEl();
+        else
+          error();
+
+        conn.resize(totalWeight);
+
+        std::cout << orig_type << std::endl;
+
+          
 	
 	unsigned int lastConnIndex = 0;
 	unsigned int nn = 0;
 	
+
 	for (unsigned int idx=0; idx<etypes.size(); idx++)
 	  {
 	    nn = lastConnIndex = 0;
@@ -293,16 +314,31 @@ void XdrInterface::mesh_interface(const std::string& name,
 	    for (unsigned int e=0; e<mesh.n_elem(); e++)
 	      if (mesh.elem(e)->type() == etypes[idx])
 		{
-		  nn = mesh.elem(e)->n_nodes();
-		  
-		  for (unsigned int n=0; n<nn; n++)
-		    conn[lastConnIndex + n] = mesh.elem(e)->node(n);
+                  int nstart=0;
+                  if (orig_type == 0)
+                    nn = mesh.elem(e)->n_nodes();
+                  else if (orig_type == 1)
+                    {
+                      nstart=2;
+                      nn = mesh.elem(e)->n_nodes()+2;
+                      conn[lastConnIndex + 0] = 27;
+                      conn[lastConnIndex + 1] = 0;
+                    }
+                  else
+                    error();
+                  
+                  //std::cout << " HERE " << std::endl;
+                  //std::cout << e << std::endl;
+        
+		  for (unsigned int n=nstart; n<nn; n++)
+		    conn[lastConnIndex + n] = mesh.elem(e)->node(n-nstart);
 		  
 		  lastConnIndex += nn;
 		}
 	    
 	    // Send conn to the XDR file
-	    m.Icon(&conn[0], nn, lastConnIndex/nn);
+            std::cout << nn << " " << lastConnIndex/nn << std::endl;
+	    m.Icon(&conn[0], nn, totalWeight/nn);
 	  }
 	
 	break;
@@ -526,8 +562,7 @@ void XdrInterface::mesh_interface(const std::string& name,
 	
 	// Create the boundary_info !!
 	for (int ibc=0; ibc < numBCs; ibc++)
-	  boundary_info.add_side(bcs[0+ibc*3], bcs[1+ibc*3], bcs[2+ibc*3]);
-	  
+          boundary_info.add_side(bcs[0+ibc*3], bcs[1+ibc*3], bcs[2+ibc*3]);
 	break;
       }
 
