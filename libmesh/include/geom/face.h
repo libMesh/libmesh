@@ -1,4 +1,4 @@
-// $Id: face.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: face.h,v 1.3 2004-11-15 22:09:11 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -46,13 +46,13 @@ class Face : public Elem
 public:
 
   /**
-   * Constructor.
+   * Constructor.  Explicitly specifies the number of
+   * nodes and neighbors for which storage will be allocated.
    */
   Face (const unsigned int nn,
 	const unsigned int ns,
 	const Elem* p) :
-    Elem (nn, ns, p)
-  {}
+    Elem(nn, ns, p) {}
 
   /**
    * @returns 2, the dimensionality of the object.
@@ -65,10 +65,10 @@ public:
    */
   unsigned int n_faces() const { return 0; }
 
-  /**
-   * @returns 2
-   */
-  unsigned int n_children_per_side(const unsigned int) const { return 2; }
+//   /**
+//    * @returns 2
+//    */
+//   unsigned int n_children_per_side(const unsigned int) const { return 2; }
 
 #ifdef ENABLE_INFINITE_ELEMENTS
 

@@ -1,4 +1,4 @@
-// $Id: cell.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: cell.h,v 1.3 2004-11-15 22:09:10 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -58,10 +58,10 @@ public:
    */
   unsigned int dim () const { return 3; }
   
-  /**
-   * @returns 4
-   */
-  unsigned int n_children_per_side(const unsigned int) const { return 4; }
+//   /**
+//    * @returns 4
+//    */
+//   unsigned int n_children_per_side(const unsigned int) const { return 4; }
 
 
 #ifdef ENABLE_INFINITE_ELEMENTS

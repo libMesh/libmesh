@@ -1,4 +1,4 @@
-/* $Id: ex5.C,v 1.28 2004-11-08 00:11:01 jwpeterson Exp $ */
+/* $Id: ex5.C,v 1.29 2004-11-15 22:09:07 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -37,6 +37,7 @@
 // Basic include file needed for the mesh functionality.
 #include "libmesh.h"
 #include "mesh.h"
+#include "mesh_generation.h"
 #include "gmv_io.h"
 #include "implicit_system.h"
 #include "equation_systems.h"
@@ -150,11 +151,12 @@ int main (int argc, char** argv)
     // is different than example 4 where we used 27-noded
     // hexahedral elements to support a second-order approximation
     // space.
-    mesh.build_cube (16, 16, 16,
-		     -1., 1.,
-		     -1., 1.,
-		     -1., 1.,
-		     HEX8);
+    MeshTools::Generation::build_cube (mesh,
+				       16, 16, 16,
+				       -1., 1.,
+				       -1., 1.,
+				       -1., 1.,
+				       HEX8);
     
     mesh.print_info();
     

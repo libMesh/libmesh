@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.9 2004-10-28 20:06:14 benkirk Exp $
+// $Id: elem.h,v 1.10 2004-11-15 22:09:11 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -104,28 +104,28 @@ class Elem : public ReferenceCountedObject<Elem>,
   /**
    * @returns the \p Point associated with local \p Node \p i.
    */
-  const Point & point (const unsigned int i) const;
+  virtual const Point & point (const unsigned int i) const;
 
   /**
    * @returns the \p Point associated with local \p Node \p i
    * as a writeable reference.
    */
-  Point & point (const unsigned int i);
+  virtual Point & point (const unsigned int i);
 
   /**
    * @returns the global id number of local \p Node \p i.
    */
-  unsigned int node (const unsigned int i) const;
+  virtual unsigned int node (const unsigned int i) const;
 
   /**
    * @returns the pointer to local \p Node \p i.
    */
-  Node* get_node (const unsigned int i) const;
+  virtual Node* get_node (const unsigned int i) const;
 
   /**
    * @returns the pointer to local \p Node \p i as a writeable reference.
    */
-  Node* & set_node (const unsigned int i);
+  virtual Node* & set_node (const unsigned int i);
   
   /**
    * @returns the subdomain that this element belongs to.
@@ -137,7 +137,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    * @returns the subdomain that this element belongs to as a
    * writeable reference.
    */
-  unsigned char & set_subdomain_id ();
+  unsigned char & subdomain_id ();
 
   /**
    * @returns an id assocated with this element.  The id is not
@@ -216,10 +216,10 @@ class Elem : public ReferenceCountedObject<Elem>,
   void write_connectivity (std::ostream& out,
 			   const IOPackage iop) const;
 
-  /**
-   * @returns the VTK element type of the sc-th sub-element.
-   */
-  virtual unsigned int vtk_element_type (const unsigned int sc) const = 0;
+//   /**
+//    * @returns the VTK element type of the sc-th sub-element.
+//    */
+//   virtual unsigned int vtk_element_type (const unsigned int sc) const = 0;
 
   /**
    * @returns the type of element that has been derived from this
@@ -277,11 +277,11 @@ class Elem : public ReferenceCountedObject<Elem>,
    */
   virtual unsigned int n_children () const = 0;
 
-  /**
-   * @returns the number of children this element has that
-   * share side \p s
-   */
-  virtual unsigned int n_children_per_side (const unsigned int) const = 0;
+//   /**
+//    * @returns the number of children this element has that
+//    * share side \p s
+//    */
+//   virtual unsigned int n_children_per_side (const unsigned int) const = 0;
   
   /**
    * @returns the number of sub-elements this element may be broken
@@ -491,17 +491,17 @@ class Elem : public ReferenceCountedObject<Elem>,
    */
   void coarsen ();
 
-  /**
-   * The non-const begin and end accessor functions.
-   */
-  std::pair<Elem**, Elem**> neighbors_begin ();
-  std::pair<Elem**, Elem**> neighbors_end ();
+//   /**
+//    * The non-const begin and end accessor functions.
+//    */
+//   std::pair<Elem**, Elem**> neighbors_begin ();
+//   std::pair<Elem**, Elem**> neighbors_end ();
 
-  /**
-   * The const begin and end accessor functions. 
-   */
-  std::pair<const Elem**, const Elem**> neighbors_begin () const;
-  std::pair<const Elem**, const Elem**> neighbors_end () const;
+//   /**
+//    * The const begin and end accessor functions. 
+//    */
+//   std::pair<const Elem**, const Elem**> neighbors_begin () const;
+//   std::pair<const Elem**, const Elem**> neighbors_end () const;
   
 #endif
 
@@ -654,42 +654,36 @@ Elem::Elem(const unsigned int nn,
 	   const Elem* p) :
   _parent(p)
 {
-  assert (nn);
-
-  this->set_subdomain_id() = 0;
-  this->set_processor_id() = 0;
+  this->subdomain_id() = 0;
+  this->processor_id() = 0;
 
   // Initialize the nodes data structure
-  {
-    _nodes = NULL;
-
-    if (nn != 0)
-      {
-	_nodes = new Node*[nn]; 
-	
-	for (unsigned int n=0; n<nn; n++)
-	  _nodes[n] = NULL;
-      }
-  }
+  _nodes = NULL;
+  
+  if (nn != 0)
+    {
+      _nodes = new Node*[nn]; 
+      
+      for (unsigned int n=0; n<nn; n++)
+	_nodes[n] = NULL;
+    }
   
   // Initialize the neighbors data structure
-  {
-    _neighbors = NULL;
-
-    if (ns != 0)
-      {
-	_neighbors = new Elem*[ns]; 
-	
-	for (unsigned int n=0; n<ns; n++)
-	  _neighbors[n] = NULL;
-      }
-  }
+  _neighbors = NULL;
+  
+  if (ns != 0)
+    {
+      _neighbors = new Elem*[ns]; 
+      
+      for (unsigned int n=0; n<ns; n++)
+	_neighbors[n] = NULL;
+    }
 
   // Optionally initialize data from the parent
   if (this->parent() != NULL)
     {
-      this->set_subdomain_id() = this->parent()->subdomain_id();
-      this->set_processor_id() = this->parent()->processor_id();
+      this->subdomain_id() = this->parent()->subdomain_id();
+      this->processor_id() = this->parent()->processor_id();
     }  
 
 #ifdef ENABLE_AMR
@@ -729,61 +723,6 @@ Elem::~Elem()
 
 
 inline
-const Point & Elem::point (const unsigned int i) const
-{
-  assert (i < this->n_nodes());
-  assert (_nodes[i] != NULL);
-  assert (_nodes[i]->id() != Node::invalid_id);
-
-  return *_nodes[i];
-}
-
-
-
-inline
-Point & Elem::point (const unsigned int i)
-{
-  assert (i < this->n_nodes());
-
-  return *_nodes[i];
-}
-
-
-
-inline
-unsigned int Elem::node (const unsigned int i) const
-{
-  assert (i < this->n_nodes());
-  assert (_nodes[i] != NULL);
-  assert (_nodes[i]->id() != Node::invalid_id);
-
-  return _nodes[i]->id();
-}
-
-
-
-inline
-Node* Elem::get_node (const unsigned int i) const
-{
-  assert (i < this->n_nodes());
-  assert (_nodes[i] != NULL);
-
-  return _nodes[i];
-}
-
-
-
-inline
-Node* & Elem::set_node (const unsigned int i)
-{
-  assert (i < this->n_nodes());
-
-  return _nodes[i];
-}
-
-
-
-inline
 unsigned char Elem::subdomain_id () const
 {
   return _sbd_id;
@@ -792,7 +731,7 @@ unsigned char Elem::subdomain_id () const
 
 
 inline
-unsigned char & Elem::set_subdomain_id ()
+unsigned char & Elem::subdomain_id ()
 {
   return _sbd_id;
 }
@@ -971,39 +910,39 @@ void Elem::set_refinement_flag(RefinementState rflag)
 
 
 
-inline
-std::pair<Elem**, Elem**> Elem::neighbors_begin ()
-{
-  return std::make_pair (&_neighbors[0],
-			 &_neighbors[this->n_neighbors()]);
-}
+// inline
+// std::pair<Elem**, Elem**> Elem::neighbors_begin ()
+// {
+//   return std::make_pair (&_neighbors[0],
+// 			 &_neighbors[this->n_neighbors()]);
+// }
 
 
 
-inline
-std::pair<Elem**, Elem**> Elem::neighbors_end ()
-{
-  return std::make_pair (&_neighbors[this->n_neighbors()],
-			 &_neighbors[this->n_neighbors()]);
-}
+// inline
+// std::pair<Elem**, Elem**> Elem::neighbors_end ()
+// {
+//   return std::make_pair (&_neighbors[this->n_neighbors()],
+// 			 &_neighbors[this->n_neighbors()]);
+// }
 
 
 
-inline
-std::pair<const Elem**, const Elem**> Elem::neighbors_begin () const
-{
-  return std::make_pair (const_cast<const Elem**>(&_neighbors[0]),
-			 const_cast<const Elem**>(&_neighbors[this->n_neighbors()]));
-}
+// inline
+// std::pair<const Elem**, const Elem**> Elem::neighbors_begin () const
+// {
+//   return std::make_pair (const_cast<const Elem**>(&_neighbors[0]),
+// 			 const_cast<const Elem**>(&_neighbors[this->n_neighbors()]));
+// }
 
 
 
-inline
-std::pair<const Elem**, const Elem**> Elem::neighbors_end () const
-{
-  return std::make_pair (const_cast<const Elem**>(&_neighbors[this->n_neighbors()]),
-			 const_cast<const Elem**>(&_neighbors[this->n_neighbors()]));
-}
+// inline
+// std::pair<const Elem**, const Elem**> Elem::neighbors_end () const
+// {
+//   return std::make_pair (const_cast<const Elem**>(&_neighbors[this->n_neighbors()]),
+// 			 const_cast<const Elem**>(&_neighbors[this->n_neighbors()]));
+// }
 
 
 #endif /* ifdef ENABLE_AMR */

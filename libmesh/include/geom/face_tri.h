@@ -1,4 +1,4 @@
-// $Id: face_tri.h,v 1.3 2004-10-25 21:49:24 benkirk Exp $
+// $Id: face_tri.h,v 1.4 2004-11-15 22:09:12 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -62,8 +62,19 @@ public:
    * Default triangular element, takes number of nodes and 
    * parent. Derived classes implement 'true' elements.
    */
-  Tri  (const unsigned int nn, const Elem* p);
-
+  Tri (const unsigned int nn,
+       const Elem* p) :
+    Face(nn, Tri::n_sides(), p) {}
+ 
+  /**
+   * Constructor.  Explicitly specifies the number of
+   * nodes and neighbors for which storage will be allocated.
+   */
+  Tri (const unsigned int nn,
+       const unsigned int ns,
+       const Elem* p) :
+    Face(nn, ns, p) {}
+    
   /**
    * @returns 3.  All tri-derivatives are guaranteed to have at
    * least 3 nodes.
@@ -120,11 +131,6 @@ public:
 
 // ------------------------------------------------------------
 // Tri class member functions
-inline
-Tri::Tri(const unsigned int nn, const Elem* p) :
-  Face(nn, Tri::n_sides(), p)
-{
-}
 
 #endif
 

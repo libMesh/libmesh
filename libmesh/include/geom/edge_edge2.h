@@ -1,4 +1,4 @@
-// $Id: edge_edge2.h,v 1.3 2004-07-14 19:23:17 jwpeterson Exp $
+// $Id: edge_edge2.h,v 1.4 2004-11-15 22:09:11 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -76,8 +76,8 @@ class Edge2 : public Edge
 			    const IOPackage iop,
 			    std::vector<unsigned int>& conn) const;
 
-  unsigned int vtk_element_type (const unsigned int) const
-  { return 3; }
+//   unsigned int vtk_element_type (const unsigned int) const
+//   { return 3; }
 
 
 #ifdef ENABLE_INFINITE_ELEMENTS

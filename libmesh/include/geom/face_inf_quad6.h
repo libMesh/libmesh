@@ -1,4 +1,4 @@
-// $Id: face_inf_quad6.h,v 1.3 2004-07-14 19:23:17 jwpeterson Exp $
+// $Id: face_inf_quad6.h,v 1.4 2004-11-15 22:09:11 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -60,7 +60,17 @@ public:
   /**
    * Constructor.  By default this element has no parent.
    */
-  InfQuad6  (const Elem* p=NULL);
+  InfQuad6 (const Elem* p=NULL):
+    InfQuad(InfQuad6::n_nodes(), p) {}
+
+  /**
+   * Constructor.  Explicitly specifies the number of
+   * nodes and neighbors for which storage will be allocated.
+   */
+  InfQuad6 (const unsigned int nn,
+	    const unsigned int ns,
+	    const Elem* p) :
+    InfQuad(nn, ns, p) {}
   
   /**
    * @returns 6
@@ -98,8 +108,8 @@ public:
 //   void vtk_connectivity(const unsigned int,
 // 			std::vector<unsigned int>*) const;
   
-  unsigned int vtk_element_type (const unsigned int) const
-  { return 9; }
+//   unsigned int vtk_element_type (const unsigned int) const
+//   { return 9; }
 
   /**
    * @returns 2 for all \p n
@@ -155,11 +165,6 @@ private:
 
 // ------------------------------------------------------------
 // InfQuad6 class member functions
-inline
-InfQuad6::InfQuad6(const Elem* p) :
-  InfQuad(InfQuad6::n_nodes(), p) 
-{
-}
 
 
 #endif // ifdef ENABLE_INFINITE_ELEMENTS

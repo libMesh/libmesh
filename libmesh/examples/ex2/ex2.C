@@ -1,4 +1,4 @@
-/* $Id: ex2.C,v 1.14 2004-01-03 15:37:41 benkirk Exp $ */
+/* $Id: ex2.C,v 1.15 2004-11-15 22:09:06 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -48,6 +48,8 @@
 //Basic include file needed for the mesh functionality.
 #include "libmesh.h"
 #include "mesh.h"
+// Include file that defines various mesh generation utilities
+#include "mesh_generation.h"
 // Include file that defines (possibly multiple) systems of equations.
 #include "equation_systems.h"
 // Include file that defines a simple steady system
@@ -70,11 +72,11 @@ int main (int argc, char** argv)
     // Create a 2D mesh.
     Mesh mesh (2);
     
-    // Use the internal mesh generator to create a uniform
+    // Use the MeshTools::Generation mesh generator to create a uniform
     // grid on the unit square.  By default a mesh of QUAD4
     // elements will be created.  We instruct the mesh generator
     // to build a mesh of 5x5 elements.
-    mesh.build_cube (5, 5);
+    MeshTools::Generation::build_cube (mesh, 5, 5);
     
     // Print information about the mesh to the screen.
     mesh.print_info();

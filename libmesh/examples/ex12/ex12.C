@@ -1,4 +1,4 @@
-/* $Id: ex12.C,v 1.9 2004-11-08 00:11:00 jwpeterson Exp $ */
+/* $Id: ex12.C,v 1.10 2004-11-15 22:09:05 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -74,6 +74,7 @@
 // Basic include files needed for the mesh and 
 // <code> MeshData </code> functionality.
 #include "mesh.h"
+#include "mesh_tools.h"
 #include "mesh_data.h"
 #include "unv_io.h"
 #include "gmv_io.h"
@@ -491,7 +492,7 @@ void create_artificial_data (const Mesh& mesh,
 			     std::map<const Node*, std::vector<Number> >& art_data)
 {
   // get the bounding box to have some sensible data
-  std::pair<Point, Point> b_box = mesh.bounding_box();
+  MeshTools::BoundingBox b_box = MeshTools::bounding_box(mesh);
 
   const Real z_min = b_box.first (2);
   const Real z_max = b_box.second(2);

@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism.h,v 1.3 2004-10-25 21:49:24 benkirk Exp $
+// $Id: cell_inf_prism.h,v 1.4 2004-11-15 22:09:11 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -55,10 +55,10 @@ public:
    */
   InfPrism(const unsigned int nn, const Elem* p);
 
-  /**
-   * @returns 4 for the base \p s=0 and 2 for side faces. 
-   */
-  unsigned int n_children_per_side(const unsigned int s) const;
+//   /**
+//    * @returns 4 for the base \p s=0 and 2 for side faces. 
+//    */
+//   unsigned int n_children_per_side(const unsigned int s) const;
 
   /**
    * @returns 4.  Infinite elements have one side less
@@ -115,24 +115,24 @@ InfPrism::InfPrism(const unsigned int nn, const Elem* p) :
 }
 
 
-inline
-unsigned int InfPrism::n_children_per_side(const unsigned int s) const
-{
-  assert (s < this->n_sides());
+// inline
+// unsigned int InfPrism::n_children_per_side(const unsigned int s) const
+// {
+//   assert (s < this->n_sides());
 
-  switch (s)
-  {
-    case 0:
-      // every infinite prism has 4 children in the base side
-      return 4;
+//   switch (s)
+//   {
+//     case 0:
+//       // every infinite prism has 4 children in the base side
+//       return 4;
 
-    default:
-      // on infinite faces (sides), only 2 children exist
-      //
-      // note that the face at infinity is already caught by the assertion
-      return 2;
-  }
-}
+//     default:
+//       // on infinite faces (sides), only 2 children exist
+//       //
+//       // note that the face at infinity is already caught by the assertion
+//       return 2;
+//   }
+// }
 
 
 #endif // ifdef ENABLE_INFINITE_ELEMENTS

@@ -27,8 +27,6 @@ ex10.$(obj-suffix):\
     ../../include/fe/fe_type.h\
     ../../include/geom/elem.h\
     ../../include/geom/point.h\
-    ../../include/geom/sphere.h\
-    ../../include/geom/surface.h\
     ../../include/mesh/boundary_info.h\
     ../../include/mesh/gmv_io.h\
     ../../include/mesh/mesh.h\

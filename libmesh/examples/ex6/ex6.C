@@ -1,4 +1,4 @@
-/* $Id: ex6.C,v 1.35 2004-11-12 22:36:09 jwpeterson Exp $ */
+/* $Id: ex6.C,v 1.36 2004-11-15 22:09:08 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -42,6 +42,7 @@
 // Basic include file needed for the mesh functionality.
 #include "libmesh.h"
 #include "mesh.h"
+#include "mesh_generation.h"
 #include "gmv_io.h"
 #include "implicit_system.h"
 #include "equation_systems.h"
@@ -100,11 +101,12 @@ int main (int argc, char** argv)
 
     // Use the internal mesh generator to create elements
     // on the square [-1,1]^3, of type Hex8.
-    mesh.build_cube (4, 4, 4,
-		     -1., 1.,
-		     -1., 1.,
-		     -1., 1.,
-		     HEX8);
+    MeshTools::Generation::build_cube (mesh,
+				       4, 4, 4,
+				       -1., 1.,
+				       -1., 1.,
+				       -1., 1.,
+				       HEX8);
     
     // Print information about the mesh to the screen.
     mesh.print_info();

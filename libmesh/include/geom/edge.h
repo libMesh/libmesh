@@ -1,4 +1,4 @@
-// $Id: edge.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: edge.h,v 1.3 2004-11-15 22:09:11 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -48,8 +48,19 @@ class Edge : public Elem
    * Default line element, takes number of nodes and 
    * parent. Derived classes implement 'true' elements.
    */
-  Edge (const unsigned int nn, const Elem* p);
-  
+  Edge (const unsigned int nn,
+	const Elem* p) :
+    Elem(nn, Edge::n_sides(), p) {}
+   
+  /**
+   * Constructor.  Explicitly specifies the number of
+   * nodes and neighbors for which storage will be allocated.
+   */
+  Edge (const unsigned int nn,
+	const unsigned int ns,
+	const Elem* p) :
+    Elem(nn, ns, p) {}
+
   /**
    * @returns 1, the dimensionality of the object.
    */
@@ -85,10 +96,10 @@ class Edge : public Elem
    */
   unsigned int n_children() const { return 2; }
 
-  /**
-   * @returns 1
-   */
-  unsigned int n_children_per_side(const unsigned int) const { return 1; }
+//   /**
+//    * @returns 1
+//    */
+//   unsigned int n_children_per_side(const unsigned int) const { return 1; }
   
   /**
    * @returns an id associated with the \p s side of this element.
@@ -133,10 +144,5 @@ class Edge : public Elem
 
 // ------------------------------------------------------------
 // Edge class member functions
-inline
-Edge::Edge(const unsigned int nn, const Elem* p) :
-  Elem(nn, Edge::n_sides(), p) 
-{
-}
 
 #endif
