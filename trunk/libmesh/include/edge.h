@@ -1,4 +1,4 @@
-// $Id: edge.h,v 1.8 2003-02-28 23:37:42 benkirk Exp $
+// $Id: edge.h,v 1.9 2003-05-23 23:17:47 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -89,6 +89,14 @@ class Edge : public Elem
    * @returns 1
    */
   unsigned int n_children_per_side(const unsigned int) const { return 1; }
+  
+  /**
+   * @returns an id associated with the \p s side of this element.
+   * The id is not necessariy unique, but should be close.  This is
+   * particularly useful in the \p MeshBase::find_neighbors() routine.
+   */
+  unsigned int key (const unsigned int s) const
+  { return this->compute_key(this->node(s)); }
   
   /**
    * The \p Elem::side() member makes no sense for edges.

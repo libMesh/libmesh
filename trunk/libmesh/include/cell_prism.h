@@ -1,4 +1,4 @@
-// $Id: cell_prism.h,v 1.8 2003-02-28 23:37:38 benkirk Exp $
+// $Id: cell_prism.h,v 1.9 2003-05-23 23:17:47 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -76,6 +76,13 @@ public:
    * @returns 8
    */
   unsigned int n_children() const { return 8; }
+  
+  /**
+   * @returns an id associated with the \p s side of this element.
+   * The id is not necessariy unique, but should be close.  This is
+   * particularly useful in the \p MeshBase::find_neighbors() routine.
+   */
+  unsigned int key (const unsigned int s) const;
 
   /**
    * @returns a primitive triangle or quad for 

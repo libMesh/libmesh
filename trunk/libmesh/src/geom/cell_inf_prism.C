@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism.C,v 1.1 2003-03-11 00:47:42 ddreyer Exp $
+// $Id: cell_inf_prism.C,v 1.2 2003-05-23 23:17:56 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -35,6 +35,51 @@
 
 // ------------------------------------------------------------
 // InfPrism class member functions
+unsigned int InfPrism::key (const unsigned int s) const
+{
+  assert (s < this->n_sides());
+  
+  switch (s)
+    {
+    case 0:  // the triangular face at z=-1, base face
+
+      return
+	this->compute_key (this->node(0),
+			   this->node(2),
+			   this->node(1));
+
+    case 1:  // the quad face at y=0
+
+      return
+	this->compute_key (this->node(0),
+			   this->node(1),
+			   this->node(4),
+			   this->node(3));	
+
+    case 2:  // the other quad face
+
+      return
+	this->compute_key (this->node(1),
+			   this->node(2),
+			   this->node(5),
+			   this->node(4));
+
+    case 3: // the quad face at x=0
+
+      return
+	this->compute_key (this->node(2),
+			   this->node(0),
+			   this->node(3),
+			   this->node(5));
+    }
+
+  // We'll never get here.
+  error();
+  return 0;
+}
+
+
+
 AutoPtr<Elem> InfPrism::side (const unsigned int i) const
 {
   assert (i < this->n_sides());

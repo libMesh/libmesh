@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.23 2003-05-22 21:18:02 benkirk Exp $
+// $Id: elem.h,v 1.24 2003-05-23 23:17:47 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -142,7 +142,14 @@ class Elem : public ReferenceCountedObject<Elem>,
    * is thus useful, for example, as a key in a hash table
    * data structure.
    */
-  unsigned int key() const;
+  unsigned int key () const;
+
+  /**
+   * @returns an id associated with the \p s side of this element.
+   * The id is not necessariy unique, but should be close.  This is
+   * particularly useful in the \p MeshBase::find_neighbors() routine.
+   */
+  virtual unsigned int key (const unsigned int s) const = 0;
   
   /**
    * @returns true if two elements are identical, false otherwise.
@@ -471,6 +478,40 @@ class Elem : public ReferenceCountedObject<Elem>,
   static Elem* build (const ElemType type,
 		      const Elem* p=NULL);
 
+
+  //-------------------------------------------------------
+  // These methods compute has keys from the specified
+  // global node numbers
+  //
+  /**
+   * Compute a key from the specified nodes.
+   */
+  static unsigned int compute_key (unsigned int n0);
+
+  /**
+   * Compute a key from the specified nodes.
+   */
+  static unsigned int compute_key (unsigned int n0,
+				   unsigned int n1);
+
+  /**
+   * Compute a key from the specified nodes.
+   */
+  static unsigned int compute_key (unsigned int n0,
+				   unsigned int n1,
+				   unsigned int n2);
+
+  /**
+   * Compute a key from the specified nodes.
+   */
+  static unsigned int compute_key (unsigned int n0,
+				   unsigned int n1,
+				   unsigned int n2,
+				   unsigned int n3);
+  //-------------------------------------------------------
+
+
+  
   /**
    * Replaces this element with \p NULL for all of
    * its neighbors.  This is useful when deleting an
@@ -858,6 +899,141 @@ std::pair<const Elem**, const Elem**> Elem::neighbors_end () const
   return std::make_pair (const_cast<const Elem**>(&_neighbors[n_neighbors()]),
 			 const_cast<const Elem**>(&_neighbors[n_neighbors()]));
 }
+
+
+
+inline
+unsigned int Elem::compute_key (unsigned int n0)
+{
+  return n0;
+}
+
+
+
+inline
+unsigned int Elem::compute_key (unsigned int n0,
+				unsigned int n1)
+{
+  // big prime number
+  const unsigned int bp = 65449;
+  
+  // Order the two so that n0 < n1
+  if (n1 < n0)
+    {
+      // Swap n0 & n1 without a temporary
+      n0^=n1^=n0^=n1;
+
+      assert ( n0 < n1 );
+    }
+
+  return (n0%bp + (n1<<5)%bp);
+  
+}
+
+
+
+inline
+unsigned int Elem::compute_key (unsigned int n0,
+				unsigned int n1,
+				unsigned int n2)
+{
+  // big prime number
+  const unsigned int bp = 65449;
+
+  // Order the numbers such that n0 < n1 < n2.
+  // We'll do it in 3 steps like this:
+  //
+  //     n0         n1                n2
+  //     min(n0,n1) max(n0,n1)        n2
+  //     min(n0,n1) min(n2,max(n0,n1) max(n2,max(n0,n1)
+  //           |\   /|                  |
+  //           | \ / |                  |
+  //           |  /  |                  |
+  //           | /  \|                  |
+  //  gb min= min   max              gb max
+  
+  // Step 1
+  if (n0 > n1)
+    {
+      // Swap n0 & n1 without a temporary
+      n0^=n1^=n0^=n1;
+    }
+
+  // Step 2
+  if (n1 > n2)
+    {
+      // Swap n1 & n2 without a temporary
+      n1^=n2^=n1^=n2;
+    }
+
+  // Finally step 3
+  if (n0 > n1)
+    {
+      // Swap n0 & n1 without a temporary
+      n0^=n1^=n0^=n1;
+    }
+
+  assert ((n0 < n1) && (n1 < n2));
+
+  
+  return (n0%bp + (n1<<5)%bp + (n2<<10)%bp);
+}
+
+
+
+inline
+unsigned int Elem::compute_key (unsigned int n0,
+				unsigned int n1,
+				unsigned int n2,
+				unsigned int n3)
+{
+  // big prime number
+  const unsigned int bp = 65449;
+
+  // Order the numbers such that n0 < n1 < n2 < n3
+  // We'll do it in 5 steps.
+
+  // Step 1
+  if (n0 > n1)
+    {
+      // Swap n0 & n1 without a temporary
+      n0^=n1^=n0^=n1;
+    }
+
+  // Step 2
+  if (n2 > n3)
+    {
+      // Swap n2 & n3 without a temporary
+      n2^=n3^=n2^=n3;
+    }
+
+  // Step 3
+  if (n0 > n2)
+    {
+      // Swap n0 & n2 without a temporary
+      n0^=n2^=n0^=n2;
+    }
+
+  // Step 4
+  if (n1 > n3)
+    {
+      // Swap n1 & n3 without a temporary
+      n1^=n3^=n1^=n3;
+    }
+
+  // Finally step 5
+  if (n1 > n2)
+    {
+      // Swap n1 & n2 without a temporary
+      n1^=n2^=n1^=n2;
+    }
+
+  assert ((n0 < n1) && (n1 < n2) && (n2 < n3));
+
+  
+  return (n0%bp + (n1<<5)%bp + (n2<<10)%bp + (n3<<15)%bp);
+}
+				
 
 
 #endif // endf #ifdef ENABLE_AMR

@@ -1,6 +1,6 @@
 
 
-// $Id: mesh_base.C,v 1.36 2003-05-23 14:28:40 benkirk Exp $
+// $Id: mesh_base.C,v 1.37 2003-05-23 23:17:56 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -416,8 +416,8 @@ void MeshBase::find_neighbors()
 	    
 	    if (element->neighbor(ms) == NULL)
 	      {
-		const AutoPtr<Elem> my_side(element->side(ms));
-		const unsigned int key = my_side->key();
+		// Get the key for the side of this element
+		const unsigned int key = element->key(ms);
 		
 		// Look for elements that have an identical side key
 		std::pair <std::multimap<unsigned int, std::pair<Elem*, unsigned char> >::iterator,
@@ -428,13 +428,17 @@ void MeshBase::find_neighbors()
 		// elements which _might_ be neighbors.
 		if (bounds.first != bounds.second)
 		  {
+		    // Get the side for this element
+		    const AutoPtr<Elem> my_side(element->side(ms));
+
+		    
 		    for (std::multimap<unsigned int, std::pair<Elem*, unsigned char> >::iterator
 			   it = bounds.first; it != bounds.second; ++it)
 		      {
 			// Get the potential element
 			Elem* neighbor = it->second.first;
 			
-			// Get the side
+			// Get the side for the neighboring element
 			const unsigned int ns = it->second.second;
 			const AutoPtr<Elem> their_side(neighbor->side(ns));
 			
