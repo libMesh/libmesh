@@ -2717,7 +2717,7 @@ echo "${ECHO_T}<<< C++ compiler is Intel ICC >>>" >&6
           GXX_VERSION=intel_icc
         else
 
-                    is_intel_ecc="`($CXX -V 2>&1) | grep 'Intel(R) C++ Itanium(TM) Compiler'`"
+                    is_intel_ecc="`($CXX -V 2>&1) | grep 'Intel(R) C++ Itanium(R) Compiler'`"
           if test "x$is_intel_ecc" != "x" ; then
             echo "$as_me:$LINENO: result: <<< C++ compiler is Intel Itanium ECC >>>" >&5
 echo "${ECHO_T}<<< C++ compiler is Intel Itanium ECC >>>" >&6
