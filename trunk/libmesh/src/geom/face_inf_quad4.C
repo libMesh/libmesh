@@ -1,4 +1,4 @@
-// $Id: face_inf_quad4.C,v 1.7 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: face_inf_quad4.C,v 1.8 2003-02-06 23:02:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -185,7 +185,7 @@ void InfQuad4::refine(Mesh& mesh)
       for (unsigned int nc=0; nc<child(c)->n_nodes(); nc++)
 	for (unsigned int n=0; n<n_nodes(); n++)
 	  if (embedding_matrix[c][nc][n] != 0.)
-	    p[c][nc] += point(n)*embedding_matrix[c][nc][n];
+	    p[c][nc].add_scaled (point(n), embedding_matrix[c][nc][n]);
     
     
     // assign nodes to children & add them to the mesh

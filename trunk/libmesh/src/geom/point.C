@@ -1,4 +1,4 @@
-// $Id: point.C,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: point.C,v 1.7 2003-02-06 23:02:56 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -20,9 +20,11 @@
 
 
 
+// C++ includes
+#include <iomanip>
+
 // Local includes
 #include "point.h"
-#include <iomanip>
 
 
 
@@ -37,16 +39,9 @@ Point Point::cross(const Point& p) const
   // |(*this)(0) (*this)(1) (*this)(2)|
   // |   p(0)       p(1)       p(2)   |
 
-  
-  // Point val;
-  // val.coords[0] =  (coords[1]*p.coords[2] - coords[2]*p.coords[1]);
-  // val.coords[1] = -(coords[0]*p.coords[2] - coords[2]*p.coords[0]);
-  // val.coords[2] =  (coords[0]*p.coords[1] - coords[1]*p.coords[0]);
-  // return val;
-
-  return Point(  coords[1]*p.coords[2] - coords[2]*p.coords[1],
-	        -coords[0]*p.coords[2] + coords[2]*p.coords[0],
-	         coords[0]*p.coords[1] - coords[1]*p.coords[0]);
+  return Point(  _coords[1]*p._coords[2] - _coords[2]*p._coords[1],
+	        -_coords[0]*p._coords[2] + _coords[2]*p._coords[0],
+	         _coords[0]*p._coords[1] - _coords[1]*p._coords[0]);
 };
 
 
@@ -59,18 +54,18 @@ Point Point::unit() const
   assert (length != static_cast<Real>(0.));
   
 #if DIM == 1
-  return Point(coords[0]/length);
+  return Point(_coords[0]/length);
 #endif
   
 #if DIM == 2 
-  return Point(coords[0]/length,
-	       coords[1]/length);
+  return Point(_coords[0]/length,
+	       _coords[1]/length);
 #endif
   
 #if DIM == 3
-  return Point(coords[0]/length,
-	       coords[1]/length, 
-	       coords[2]/length);
+  return Point(_coords[0]/length,
+	       _coords[1]/length, 
+	       _coords[2]/length);
 #endif
   
 };
@@ -80,7 +75,7 @@ Point Point::unit() const
 void Point::clear()
 {
   for (unsigned int i=0; i<DIM; i++)
-    coords[i] = 0;
+    _coords[i] = 0;
 };
 
 

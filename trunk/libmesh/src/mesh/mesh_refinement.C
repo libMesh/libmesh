@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.5 2003-01-24 17:24:44 jwpeterson Exp $
+// $Id: mesh_refinement.C,v 1.6 2003-02-06 23:02:56 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -146,14 +146,15 @@ void MeshRefinement::refine_and_coarsen_elements ()
   /**
    * Repeat until coarsening & refinement flags jive
    */
-  while (!satisfied)
+  do
     {
       const bool coarsening_satisfied = make_coarsening_compatible();
       const bool refinement_satisfied = make_refinement_compatible();
-
+      
       if (coarsening_satisfied && refinement_satisfied)
 	satisfied = true;
-    };
+    }
+  while (!satisfied);
 
   /**
    * First coarsen the flagged elements.  This
