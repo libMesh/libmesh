@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.18 2004-04-18 00:51:50 jwpeterson Exp $
+// $Id: mesh_base.h,v 1.19 2004-04-19 17:34:36 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -61,7 +61,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.18 $
+ * \version $Revision: 1.19 $
  */
 
 
@@ -656,11 +656,6 @@ public:
    */
   void find_boundary_nodes(std::vector<bool>& on_boundary) const;
   
-  
-protected:
-
-
-  
   /**
    * Prepare a newly created (or read) mesh for use.
    * This involves 3 steps:
@@ -669,7 +664,13 @@ protected:
    *  3.) call \p renumber_nodes_and_elements() 
    */
   virtual void prepare_for_use ();
-    
+  
+  
+protected:
+
+
+
+  
   /**
    * Return a reference to the \p nodes vector holding the nodes.
    */
