@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.31 2003-11-11 17:54:09 jwpeterson Exp $
+# $Id: Makefile,v 1.32 2003-11-11 20:51:47 benkirk Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -141,7 +141,9 @@ doc:
 # Upload the web page to sourceforge
 #
 upload:
+	chmod -R g+w ./doc/html/*
 	rsync -rltzve ssh ./doc/html/ $(shell cat CVS/Root | cut -d"@" -f1 | cut -d":" -f3)@libmesh.sourceforge.net:/home/groups/l/li/libmesh/htdocs
+	chmod -R g-w ./doc/html/*
 
 #
 # Build and upload the documentation to sourceforge
