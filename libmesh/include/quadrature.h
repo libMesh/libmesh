@@ -1,4 +1,4 @@
-// $Id: quadrature.h,v 1.10 2003-02-24 14:35:49 benkirk Exp $
+// $Id: quadrature.h,v 1.11 2003-02-26 00:47:51 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -290,8 +290,8 @@ void QBase::print_info() const
   assert(!_points.empty());
   assert(!_weights.empty());
 
-  std::cout << "N_Q_Points=" << n_points() << std::endl << std::endl;
-  for (unsigned int qp=0; qp<n_points(); qp++)
+  std::cout << "N_Q_Points=" << this->n_points() << std::endl << std::endl;
+  for (unsigned int qp=0; qp<this->n_points(); qp++)
     {
       std::cout << " Point " << qp << ":" << std::endl << "  ";
       _points[qp].print();
