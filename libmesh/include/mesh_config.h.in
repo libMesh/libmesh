@@ -41,6 +41,9 @@
 /* Define to 1 if you have the <getopt.h> header file. */
 #undef HAVE_GETOPT_H
 
+/* Flag indicating whether or not gzstreams are available */
+#undef HAVE_GZSTREAM
+
 /* Define to 1 if you have the <hash_map> header file. */
 #undef HAVE_HASH_MAP
 
@@ -121,6 +124,9 @@
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
+
+/* Define to 1 if you have the <zlib.h> header file. */
+#undef HAVE_ZLIB_H
 
 /* Define to the address where bug reports for this package should be sent. */
 #undef PACKAGE_BUGREPORT

@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.h,v 1.16 2003-09-12 03:28:54 benkirk Exp $
+// $Id: mesh_unv_support.h,v 1.17 2003-09-16 00:41:29 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -79,6 +79,13 @@ public:
 
 protected:
 
+  /**
+   * The actual implementation of the read function.
+   * The public read interface simply decides which
+   * type of stream to pass the implementation.
+   */
+  void read_implementation (std::istream& in_stream);
+  
   /**
    * Clears the data structures to a pristine
    * state.

@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.36 2003-08-28 19:35:38 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.37 2003-09-16 00:41:29 jwpeterson Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -590,6 +590,31 @@ AC_DEFUN(CONFIGURE_SFC,
   AC_SUBST(enablesfc)
 ])
 dnl -------------------------------------------------------------
+
+
+
+
+dnl -------------------------------------------------------------
+dnl Read/Write Compressed Streams with gzstream
+dnl -------------------------------------------------------------
+AC_DEFUN(CONFIGURE_GZ, 
+[
+  AC_CHECK_FILE(./contrib/gzstream/gzstream.h,
+                GZ_INCLUDE_PATH=$PWD/contrib/gzstream)
+
+  if (test -r $GZ_INCLUDE_PATH/gzstream.h) ; then
+    AC_SUBST(GZ_INCLUDE_PATH)
+    AC_DEFINE(HAVE_GZSTREAM, 1,
+              [Flag indicating whether or not gzstreams are available])
+    AC_MSG_RESULT(<<< Configuring library with gzstreams support >>>)
+  else
+    enablegz=no
+  fi
+
+  AC_SUBST(enablegz)
+])
+dnl -------------------------------------------------------------
+
 
 
 

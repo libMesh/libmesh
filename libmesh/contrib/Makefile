@@ -17,6 +17,10 @@ all:
 	@echo ""
 	@echo "--- Building sfcurves ------------------------"
 	@$(MAKE) -C sfcurves     $(MAKECMDGOALS)
+	@echo ""
+	@echo "--- Building sfcurves ------------------------"
+	@$(MAKE) -C gzstream     $(MAKECMDGOALS)
+	@echo ""
 	@echo "----------------------------------------------"
 	@echo "----- Done Building Contributed Packages -----"
 	@echo "----------------------------------------------"
@@ -32,7 +36,7 @@ clean:
 	@$(MAKE) -C metis/Lib    $(MAKECMDGOALS)
 	@$(MAKE) -C parmetis/Lib $(MAKECMDGOALS)
 	@$(MAKE) -C sfcurves     $(MAKECMDGOALS)
-
+	@$(MAKE) -C gzstream     $(MAKECMDGOALS)
 #
 # How to clobber the packages
 #
@@ -42,6 +46,7 @@ clobber:
 	@$(MAKE) -C metis/Lib    $(MAKECMDGOALS)
 	@$(MAKE) -C parmetis/Lib $(MAKECMDGOALS)
 	@$(MAKE) -C sfcurves     $(MAKECMDGOALS)
+	@$(MAKE) -C gzstream     $(MAKECMDGOALS)
 
 #
 # How to distclean the packages
@@ -52,4 +57,5 @@ distclean:
 	@$(MAKE) -C metis/Lib    $(MAKECMDGOALS)
 	@$(MAKE) -C parmetis/Lib $(MAKECMDGOALS)
 	@$(MAKE) -C sfcurves     $(MAKECMDGOALS)
+	@$(MAKE) -C gzstream     $(MAKECMDGOALS)
 	@rm -rf lib/*_dbg lib/*_opt lib/*_pro
