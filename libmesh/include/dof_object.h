@@ -1,4 +1,4 @@
-// $Id: dof_object.h,v 1.7 2003-03-07 20:59:04 jwpeterson Exp $
+// $Id: dof_object.h,v 1.8 2003-03-08 05:44:02 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -46,7 +46,7 @@
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.7 $
+ * \version $Revision: 1.8 $
  */
 
 class DofObject
@@ -368,7 +368,7 @@ void DofObject::clear_dofs ()
 	  for (unsigned int v=0; v<this->n_vars(s); v++)
 	    if (this->n_comp(s,v) != 0)
 	      {
-		here();
+//		here();
 		assert (_dof_ids[s][v] != NULL); delete [] _dof_ids[s][v]; _dof_ids[s][v] = NULL;
 	      }
 	  
@@ -545,16 +545,17 @@ void DofObject::set_n_systems (const unsigned int ns)
   if (this->n_systems())
     {
       for (unsigned int s=0; s<this->n_systems(); s++)
-	{
-	  for (unsigned int v=0; v<this->n_vars(s); v++)
-	    if (this->n_comp(s,v) != 0)
-	      {
-		assert (_dof_ids[s][v] != NULL); delete [] _dof_ids[s][v]; _dof_ids[s][v] = NULL;
-	      }
+	if (this->n_vars(s))
+	  {
+	    for (unsigned int v=0; v<this->n_vars(s); v++)
+	      if (this->n_comp(s,v) != 0)
+		{
+		  assert (_dof_ids[s][v] != NULL); delete [] _dof_ids[s][v]; _dof_ids[s][v] = NULL;
+		}
 
-	  assert (_dof_ids[s] != NULL); delete [] _dof_ids[s]; _dof_ids[s] = NULL;
-	  assert (_n_comp[s]  != NULL); delete [] _n_comp[s];  _n_comp[s]  = NULL;	  
-	}
+	    assert (_dof_ids[s] != NULL); delete [] _dof_ids[s]; _dof_ids[s] = NULL;
+	    assert (_n_comp[s]  != NULL); delete [] _n_comp[s];  _n_comp[s]  = NULL;	  
+	  }
 
       assert (_dof_ids != NULL); delete [] _dof_ids; _dof_ids = NULL;
       assert (_n_comp  != NULL); delete [] _n_comp;  _n_comp  = NULL;
@@ -750,6 +751,11 @@ void DofObject::set_n_vars(const unsigned int s,
   // If we already have memory allocated clear it.
   if (this->n_vars(s))
     {
+      assert (_dof_ids    != NULL);
+      assert (_dof_ids[s] != NULL);
+      assert (_n_comp     != NULL);
+      assert (_n_comp[s]  != NULL);
+
       for (unsigned int v=0; v<this->n_vars(s); v++)
 	if (n_comp(s,v) != 0)
 	  {
@@ -761,7 +767,8 @@ void DofObject::set_n_vars(const unsigned int s,
       assert (_n_comp  != NULL); delete [] _n_comp[s];  _n_comp[s]  = NULL;
       assert (_dof_ids != NULL); delete [] _dof_ids[s]; _dof_ids[s] = NULL;
     }
-  
+
+  // Reset the number of variables in the system  
   _n_vars[s] = static_cast<unsigned char>(nvars);
 
   if (this->n_vars(s) > 0)
@@ -776,6 +783,7 @@ void DofObject::set_n_vars(const unsigned int s,
 	}
     }
 
+
 #else
 
   // If we already have memory allocated clear it.
@@ -783,7 +791,8 @@ void DofObject::set_n_vars(const unsigned int s,
     {
       assert (_dof_ids[s] != NULL); delete [] _dof_ids[s]; _dof_ids[s] = NULL;
     }
-  
+
+  // Reset the number of variables in the system    
   _n_vars[s] = static_cast<unsigned char>(nvars);
 
   if (this->n_vars(s) > 0)
@@ -795,6 +804,7 @@ void DofObject::set_n_vars(const unsigned int s,
 	_dof_ids[s][v] = invalid_id - 1;
     }
   
+
 #endif
 }
 
