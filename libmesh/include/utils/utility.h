@@ -1,4 +1,4 @@
-// $Id: utility.h,v 1.6 2004-03-20 15:16:56 benkirk Exp $
+// $Id: utility.h,v 1.7 2004-09-30 21:21:49 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -35,12 +35,16 @@
 
 namespace Utility
 {
+  //-------------------------------------------------------------------
   /**
    * The \p system_info function returns information about the system
    * you are running on.
    */
   std::string system_info();
 
+  
+
+  //-------------------------------------------------------------------
   /**
    * \p Utility::iota is a duplication of the SGI STL extension
    * \p std::iota.  It simply assigns sequentially increasing values
@@ -58,6 +62,9 @@ namespace Utility
       }
   }
 
+
+  
+  //-------------------------------------------------------------------
   /**
    * An efficient template instantiation for raising
    * to an arbitrary integer power.
@@ -77,10 +84,11 @@ namespace Utility
   inline
   Real pow<0>(const Real) { return 1.; }
 
-
+  
+  
   //-------------------------------------------------------------------
   // Utility functions useful when dealing with complex numbers.
-  
+ 
 #ifdef USE_COMPLEX_NUMBERS
 
   /**
@@ -100,6 +108,80 @@ namespace Utility
 
 #endif // #ifdef USE_COMPLEX_NUMBERS
 
+
+  
+  //-------------------------------------------------------------------
+  /**
+   * This Functor simply takes an object and reverses its byte
+   * representation.  This is useful for changing endian-ness
+   * for file IO.  This class has been tested on x86 architectures
+   * with 4-byte words.
+   *
+   * 
+   */
+  class ReverseBytes
+  {
+  public:
+    
+    /**
+     * Constructor.  Takes a bool, determines if we will actually
+     * do byte reversing.
+     */
+    ReverseBytes (const bool dr);
+
+    /**
+     * Functor.  Takes the data to reverse and performs the
+     * byte-ordering reversal.
+     */
+    template <typename T>
+    T operator () (T& data) const;
+  
+  private:
+  
+    /**
+     * Returns the value of the reverse flag.
+     */
+    bool reverse () const { return _do_reverse; };
+
+    /**
+     * flag
+     */
+    const bool _do_reverse;  
+  };
+
+
+
+  //---------------------------------------------------------
+  // ReverseBytes inline members
+  inline
+  ReverseBytes::ReverseBytes (const bool rb) :
+    _do_reverse (rb)
+  {}
+
+
+  template <typename T>
+  inline
+  T ReverseBytes::operator() (T& data) const
+  {
+    // Possibly reverse the byte ordering
+    if (this->reverse())
+      {
+	unsigned char* b = (unsigned char*) &data;
+	
+	register int i=0;
+	register int j=(sizeof(T) - 1);
+	
+	while (i < j)
+	  {
+	    std::swap (b[i], b[j]);
+	    i++; j--;
+	  }
+      }
+
+    return data;
+  }
+
+  
 }
 
 #endif // #define __utility_h__

@@ -4828,6 +4828,26 @@ src/utils/perf_log.$(obj-suffix):\
     include/base/libmesh_config.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
+src/utils/plt_loader.$(obj-suffix):\
+    src/utils/plt_loader.C\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/utils/plt_loader.h
+src/utils/plt_loader_read.$(obj-suffix):\
+    src/utils/plt_loader_read.C\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/utils/plt_loader.h\
+    include/utils/utility.h
+src/utils/plt_loader_write.$(obj-suffix):\
+    src/utils/plt_loader_write.C\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/utils/plt_loader.h\
+    include/utils/utility.h
 src/utils/point_locator_base.$(obj-suffix):\
     src/utils/point_locator_base.C\
     include/base/auto_ptr.h\
