@@ -12,7 +12,7 @@
 <div class="content">
 <a name="comments"></a> 
 <div class = "comment">
-Example 3 -- Solving a Poisson Problem
+<h1>Example 3 - Solving a Poisson Problem</h1>
 
 <br><br>This is the third example program.  It builds on
 the second example program by showing how to solve a simple
@@ -29,8 +29,8 @@ were already explained in the second example.
 <div class ="fragment">
 <pre>
         #include &lt;iostream&gt;
-        #include &lt;algorithm&gt;
-        #include &lt;math.h&gt;
+        #include <algorithm>
+        #include <math.h>
         
 </pre>
 </div>
@@ -104,7 +104,7 @@ other objects we might need.
 <div class ="fragment">
 <pre>
         void assemble_poisson(EquationSystems&amp; es,
-                              const std::string&amp; system_name);
+                              const std::string& system_name);
         
 </pre>
 </div>
@@ -115,8 +115,8 @@ Function prototype for the exact solution.
 <div class ="fragment">
 <pre>
         Real exact_solution (const Real x,
-                             const Real y,
-                             const Real z = 0.);
+        		     const Real y,
+        		     const Real z = 0.);
         
         int main (int argc, char** argv)
         {
@@ -153,10 +153,10 @@ and command line arguments.
 <pre>
             std::cout &lt;&lt; "Running " &lt;&lt; argv[0];
             
-            for (int i=1; i&lt;argc; i++)
-              std::cout &lt;&lt; " " &lt;&lt; argv[i];
+            for (int i=1; i<argc; i++)
+              std::cout << " " << argv[i];
             
-            std::cout &lt;&lt; std::endl &lt;&lt; std::endl;
+            std::cout << std::endl << std::endl;
             
 </pre>
 </div>
@@ -182,9 +182,9 @@ allow us to use higher-order approximation.
 <div class ="fragment">
 <pre>
             mesh.build_square (15, 15,
-                               -1., 1.,
-                               -1., 1.,
-                               QUAD9);
+        		       -1., 1.,
+        		       -1., 1.,
+        		       QUAD9);
         
 </pre>
 </div>
@@ -324,7 +324,7 @@ via a penalty method.
 <div class ="fragment">
 <pre>
         void assemble_poisson(EquationSystems&amp; es,
-                              const std::string&amp; system_name)
+                              const std::string& system_name)
         {
           
 </pre>
@@ -375,7 +375,7 @@ for the first (and only) variable in the system.
 <div class = "comment">
 Build a Finite Element object of the specified type.  Since the
 FEBase::build() member dynamically creates memory we will
-store the object as an AutoPtr&lt;FEBase&gt;.  This can be thought
+store the object as an AutoPtr<FEBase>.  This can be thought
 of as a pointer that will clean up after itself.  Example 4
 describes some advantages of  AutoPtr's in the context of
 quadrature rules.
@@ -512,7 +512,7 @@ or complex numbers.
 <div class ="fragment">
 <pre>
           DenseMatrix&lt;Number&gt; Ke;
-          DenseVector&lt;Number&gt; Fe;
+          DenseVector<Number> Fe;
         
         
 </pre>
@@ -617,7 +617,7 @@ members will automatically zero out the matrix  and vector.
 <div class ="fragment">
 <pre>
               Ke.resize (dof_indices.size(),
-                         dof_indices.size());
+        		 dof_indices.size());
         
               Fe.resize (dof_indices.size());
         
@@ -631,7 +631,7 @@ the numeric integration.
 <div class ="fragment">
 <pre>
               for (unsigned int qp=0; qp&lt;qrule.n_points(); qp++)
-                {
+        	{
         
 </pre>
 </div>
@@ -644,11 +644,11 @@ the trial functions (j).
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;phi.size(); i++)
-                    for (unsigned int j=0; j&lt;phi.size(); j++)
-                      {
-                        Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-                      }
-                  
+        	    for (unsigned int j=0; j<phi.size(); j++)
+        	      {
+        		Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+        	      }
+        	  
 </pre>
 </div>
 <div class = "comment">
@@ -661,10 +661,10 @@ This involves a single loop in which we integrate the
 <div class ="fragment">
 <pre>
                   {
-                    const Real x = q_point[qp](0);
-                    const Real y = q_point[qp](1);
-                    const Real eps = 1.e-3;
-                    
+        	    const Real x = q_point[qp](0);
+        	    const Real y = q_point[qp](1);
+        	    const Real eps = 1.e-3;
+        	    
         
 </pre>
 </div>
@@ -688,15 +688,15 @@ we will compute it here, outside of the i-loop
 <div class ="fragment">
 <pre>
                     const Real fxy = -(exact_solution(x,y-eps) +
-                                       exact_solution(x,y+eps) +
-                                       exact_solution(x-eps,y) +
-                                       exact_solution(x+eps,y) -
-                                       4.*exact_solution(x,y))/eps/eps;
-                    
-                    for (unsigned int i=0; i&lt;phi.size(); i++)
-                      Fe(i) += JxW[qp]*fxy*phi[i][qp];
-                  } 
-                } 
+        			       exact_solution(x,y+eps) +
+        			       exact_solution(x-eps,y) +
+        			       exact_solution(x+eps,y) -
+        			       4.*exact_solution(x,y))/eps/eps;
+        	    
+        	    for (unsigned int i=0; i<phi.size(); i++)
+        	      Fe(i) += JxW[qp]*fxy*phi[i][qp];
+        	  } 
+        	} 
               
 </pre>
 </div>
@@ -730,7 +730,7 @@ in the matrix and right-hand-side are effectively ignored.
 
 <br><br>where
 
-<br><br>\frac{1}{\epsilon} is the penalty parameter, defined such that \epsilon &lt;&lt; 1
+<br><br>\frac{1}{\epsilon} is the penalty parameter, defined such that \epsilon << 1
 </div>
 
 <div class ="fragment">
@@ -748,8 +748,8 @@ side MUST live on a boundary of the domain.
 <div class ="fragment">
 <pre>
                 for (unsigned int side=0; side&lt;elem-&gt;n_sides(); side++)
-                  if (elem-&gt;neighbor(side) == NULL)
-                    {
+        	  if (elem->neighbor(side) == NULL)
+        	    {
 </pre>
 </div>
 <div class = "comment">
@@ -760,7 +760,7 @@ points.
 <div class ="fragment">
 <pre>
                       const std::vector&lt;std::vector&lt;Real&gt; &gt;&amp;  phi_face = fe_face-&gt;get_phi();
-                      
+        	      
 </pre>
 </div>
 <div class = "comment">
@@ -771,7 +771,7 @@ points on the face.
 <div class ="fragment">
 <pre>
                       const std::vector&lt;Real&gt;&amp; JxW_face = fe_face-&gt;get_JxW();
-                      
+        	      
 </pre>
 </div>
 <div class = "comment">
@@ -783,7 +783,7 @@ we will interpolate the boundary value function.
 <div class ="fragment">
 <pre>
                       const std::vector&lt;Point &gt;&amp; qface_point = fe_face-&gt;get_xyz();
-                      
+        	      
 </pre>
 </div>
 <div class = "comment">
@@ -794,7 +794,7 @@ face.
 <div class ="fragment">
 <pre>
                       fe_face-&gt;reinit(elem, side);
-                      
+        	      
 </pre>
 </div>
 <div class = "comment">
@@ -804,7 +804,7 @@ Loop over the face quadrature points for integration.
 <div class ="fragment">
 <pre>
                       for (unsigned int qp=0; qp&lt;qface.n_points(); qp++)
-                        {
+        		{
         
 </pre>
 </div>
@@ -816,7 +816,7 @@ face quadrature point.
 <div class ="fragment">
 <pre>
                           const Real xf = qface_point[qp](0);
-                          const Real yf = qface_point[qp](1);
+        		  const Real yf = qface_point[qp](1);
         
 </pre>
 </div>
@@ -838,7 +838,7 @@ The boundary value.
 <div class ="fragment">
 <pre>
                           const Real value = exact_solution(xf, yf);
-                          
+        		  
 </pre>
 </div>
 <div class = "comment">
@@ -848,8 +848,8 @@ Matrix contribution of the L2 projection.
 <div class ="fragment">
 <pre>
                           for (unsigned int i=0; i&lt;phi_face.size(); i++)
-                            for (unsigned int j=0; j&lt;phi_face.size(); j++)
-                              Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
+        		    for (unsigned int j=0; j<phi_face.size(); j++)
+        		      Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
         
 </pre>
 </div>
@@ -861,9 +861,9 @@ projection.
 <div class ="fragment">
 <pre>
                           for (unsigned int i=0; i&lt;phi_face.size(); i++)
-                            Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
-                        } 
-                    }
+        		    Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
+        		} 
+        	    }
               }
               
 </pre>
@@ -881,7 +881,7 @@ and  NumericVector::add_vector() members do this for us.
 <div class ="fragment">
 <pre>
               es("Poisson").matrix-&gt;add_matrix (Ke, dof_indices);
-              es("Poisson").rhs-&gt;add_vector    (Fe, dof_indices);
+              es("Poisson").rhs->add_vector    (Fe, dof_indices);
             }
           
 </pre>
@@ -1124,8 +1124,9 @@ Running ./ex3
    System "Poisson"
     Type "Steady"
     Variables="u" 
-    Finite Element Types="0" 
-    Approximation Orders="2" 
+    Finite Element Types="0", "12" 
+    Infinite Element Mapping="0" 
+    Approximation Orders="2", "3" 
     n_dofs()=961
     n_local_dofs()=961
     n_constrained_dofs()=0
@@ -1168,6 +1169,53 @@ Running ./ex3
 | Creations:    2
 | Destructions: 2
  ---------------------------------------------------------------------------- 
+
+ ----------------------------------------------------------------------------
+| Time:           Mon Nov 10 22:54:15 2003
+| OS:             Linux
+| HostName:       ariel
+| OS Release      2.4.20-19.9smp
+| OS Version:     #1 SMP Tue Jul 15 17:04:18 EDT 2003
+| Machine:        i686
+| Username:       benkirk
+ ----------------------------------------------------------------------------
+ ----------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.423336, Active time=0.310941
+ ----------------------------------------------------------------------------
+| Event                         nCalls  Total       Avg         Percent of   |
+|                                       Time        Time        Active Time  |
+|----------------------------------------------------------------------------|
+|                                                                            |
+|                                                                            |
+| DofMap                                                                     |
+|   compute_sparsity()          1       0.0111      0.011113    3.57         |
+|   create_dof_constraints()    1       0.0001      0.000104    0.03         |
+|   distribute_dofs()           1       0.0012      0.001152    0.37         |
+|   dof_indices()               675     0.0065      0.000010    2.10         |
+|   reinit()                    1       0.0043      0.004251    1.37         |
+|                                                                            |
+| FE                                                                         |
+|   compute_face_map()          60      0.0006      0.000010    0.19         |
+|   compute_map()               285     0.0039      0.000014    1.24         |
+|   compute_shape_functions()   285     0.0030      0.000010    0.95         |
+|   init_face_shape_functions() 35      0.0003      0.000008    0.09         |
+|   init_shape_functions()      61      0.0027      0.000045    0.87         |
+|   inverse_map()               180     0.0034      0.000019    1.08         |
+|                                                                            |
+| Mesh                                                                       |
+|   build_cube()                1       0.0028      0.002790    0.90         |
+|                                                                            |
+| MeshBase                                                                   |
+|   find_neighbors()            1       0.0045      0.004544    1.46         |
+|   renumber_nodes_and_elem()   1       0.0002      0.000239    0.08         |
+|                                                                            |
+| SystemBase                                                                 |
+|   assemble()                  1       0.0441      0.044065    14.17        |
+|   solve()                     1       0.2224      0.222375    71.52        |
+ ----------------------------------------------------------------------------
+| Totals:                       1590    0.3109                  100.00       |
+ ----------------------------------------------------------------------------
+
  
 ***************************************************************
 * Done Running Example  ./ex3

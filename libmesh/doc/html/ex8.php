@@ -12,7 +12,7 @@
 <div class="content">
 <a name="comments"></a> 
 <div class = "comment">
-Example 8
+<h1>Example 8 - The Wave Equation</h1>
 
 <br><br>This is the eighth example program. It builds on
 the previous example programs.  It introduces the
@@ -31,10 +31,10 @@ The mesh contains HEX8 and PRISM6 elements.
 <div class ="fragment">
 <pre>
         #include &lt;iostream&gt;
-        #include &lt;fstream&gt;
-        #include &lt;algorithm&gt;
-        #include &lt;stdio.h&gt;
-        #include &lt;math.h&gt;
+        #include <fstream>
+        #include <algorithm>
+        #include <stdio.h>
+        #include <math.h>
         
 </pre>
 </div>
@@ -116,7 +116,7 @@ wave equation.
 <div class ="fragment">
 <pre>
         void assemble_wave(EquationSystems&amp; es,
-                           const std::string&amp; system_name);
+        		   const std::string& system_name);
         
         
 </pre>
@@ -129,7 +129,7 @@ initial conditions.
 <div class ="fragment">
 <pre>
         void apply_initial(EquationSystems&amp; es,
-                           const std::string&amp; system_name);
+        		   const std::string& system_name);
         
 </pre>
 </div>
@@ -142,7 +142,7 @@ method after the system is assembled.
 <div class ="fragment">
 <pre>
         void fill_dirichlet_bc(EquationSystems&amp; es,
-                               const std::string&amp; system_name);
+        		       const std::string& system_name);
         
 </pre>
 </div>
@@ -174,8 +174,8 @@ This example is not designed for complex numbers.
 <pre>
         #ifdef USE_COMPLEX_NUMBERS
         
-          std::cerr &lt;&lt; "ERROR: Not intended for use with complex numbers."
-                    &lt;&lt; std::endl;
+          std::cerr << "ERROR: Not intended for use with complex numbers."
+        	    << std::endl;
           here();
         
           return 0;
@@ -201,9 +201,9 @@ Check for proper usage.
 <pre>
             if (argc &lt; 2)
               {
-                std::cerr &lt;&lt; "Usage: " &lt;&lt; argv[0] &lt;&lt; " [meshfile]"
-                          &lt;&lt; std::endl;
-                
+        	std::cerr << "Usage: " << argv[0] << " [meshfile]"
+        		  << std::endl;
+        	
 </pre>
 </div>
 <div class = "comment">
@@ -227,12 +227,12 @@ Tell the user what we are doing.
 <pre>
             else 
               {
-                std::cout &lt;&lt; "Running " &lt;&lt; argv[0];
-                
-                for (int i=1; i&lt;argc; i++)
-                  std::cout &lt;&lt; " " &lt;&lt; argv[i];
-                
-                std::cout &lt;&lt; std::endl &lt;&lt; std::endl;
+        	std::cout << "Running " << argv[0];
+        	
+        	for (int i=1; i<argc; i++)
+        	  std::cout << " " << argv[i];
+        	
+        	std::cout << std::endl << std::endl;
         
               }
         
@@ -246,7 +246,7 @@ from the command line.
 <div class ="fragment">
 <pre>
             std::string mesh_file = argv[1];
-            std::cout &lt;&lt; "Mesh file is: " &lt;&lt; mesh_file &lt;&lt; std::endl;
+            std::cout << "Mesh file is: " << mesh_file << std::endl;
         
 </pre>
 </div>
@@ -477,7 +477,7 @@ should be monitored.
 <div class ="fragment">
 <pre>
             const unsigned int res_node_no = result_node;
-            const Node&amp; res_node = mesh.node(res_node_no-1);
+            const Node& res_node = mesh.node(res_node_no-1);
             unsigned int dof_no = res_node.dof_number(0,0,0);
         
 </pre>
@@ -517,12 +517,12 @@ to the nodal result file
 <div class ="fragment">
 <pre>
             Real t_time = 0.;
-            res_out &lt;&lt; "# pressure at node " &lt;&lt; res_node_no &lt;&lt; "\n"
-                    &lt;&lt; "# time\tpressure\n"
-                    &lt;&lt; t_time &lt;&lt; "\t" &lt;&lt; 0 &lt;&lt; std::endl;
+            res_out << "# pressure at node " << res_node_no << "\n"
+        	    << "# time\tpressure\n"
+        	    << t_time << "\t" << 0 << std::endl;
         
         
-            for (unsigned int time_step=0; time_step&lt;n_time_steps; time_step++)
+            for (unsigned int time_step=0; time_step<n_time_steps; time_step++)
               {
 </pre>
 </div>
@@ -534,7 +534,7 @@ Update the time.  Both here and in the
 <div class ="fragment">
 <pre>
                 t_time += delta_t;
-                equation_systems.set_parameter("time")  = t_time;
+        	equation_systems.set_parameter("time")  = t_time;
         
 </pre>
 </div>
@@ -560,7 +560,7 @@ the rhs vector is considered in each time step.
 <div class ="fragment">
 <pre>
                 if (time_step == 0)
-                  {
+        	  {
 </pre>
 </div>
 <div class = "comment">
@@ -575,7 +575,7 @@ false, simply do not set it.
 <pre>
                     equation_systems.set_flag("Newmark set BC for Matrix");
         
-                    fill_dirichlet_bc(equation_systems, "Wave");
+        	    fill_dirichlet_bc(equation_systems, "Wave");
         
 </pre>
 </div>
@@ -586,9 +586,9 @@ unset the flag, so that it returns false
 <div class ="fragment">
 <pre>
                     equation_systems.unset_flag("Newmark set BC for Matrix");
-                  }
-                else
-                  fill_dirichlet_bc(equation_systems, "Wave");
+        	  }
+        	else
+        	  fill_dirichlet_bc(equation_systems, "Wave");
         
 </pre>
 </div>
@@ -611,12 +611,12 @@ Do only for a few time steps.
 <div class ="fragment">
 <pre>
                 if (time_step == 30 || time_step == 60 ||
-                    time_step == 90 || time_step == 120 )
-                  {
-                    char buf[14];
-                    sprintf (buf, "out.%03d.gmv", time_step);
-                    mesh.write_gmv (buf, equation_systems);
-                  }
+        	    time_step == 90 || time_step == 120 )
+        	  {
+        	    char buf[14];
+        	    sprintf (buf, "out.%03d.gmv", time_step);
+        	    mesh.write_gmv (buf, equation_systems);
+        	  }
         
 </pre>
 </div>
@@ -639,8 +639,8 @@ be viewed with e.g. gnuplot (run gnuplot and type
 <div class ="fragment">
 <pre>
                 res_out &lt;&lt; t_time &lt;&lt; "\t"
-                        &lt;&lt; t_system.get_vector("displacement")(dof_no)
-                        &lt;&lt; std::endl;
+        		<< t_system.get_vector("displacement")(dof_no)
+        		<< std::endl;
               }
           }
           
@@ -665,7 +665,7 @@ for our wave equation.
 <div class ="fragment">
 <pre>
         void assemble_wave(EquationSystems&amp; es,
-                           const std::string&amp; system_name)
+        		   const std::string& system_name)
         {  
 </pre>
 </div>
@@ -744,10 +744,10 @@ references to them.
 <div class ="fragment">
 <pre>
           SparseMatrix&lt;Number&gt;&amp;   stiffness = t_system.get_matrix("stiffness");
-          SparseMatrix&lt;Number&gt;&amp;   damping   = t_system.get_matrix("damping");
-          SparseMatrix&lt;Number&gt;&amp;   mass      = t_system.get_matrix("mass");
+          SparseMatrix<Number>&   damping   = t_system.get_matrix("damping");
+          SparseMatrix<Number>&   mass      = t_system.get_matrix("mass");
         
-          NumericVector&lt;Number&gt;&amp;  force     = t_system.get_vector("force");
+          NumericVector<Number>&  force     = t_system.get_vector("force");
         
 </pre>
 </div>
@@ -764,14 +764,14 @@ encounter identical sparsity structures.
 <div class ="fragment">
 <pre>
           SparseMatrix&lt;Number&gt;&amp;  matrix     = *t_system.matrix;
-          DenseMatrix&lt;Number&gt;    zero_matrix;
+          DenseMatrix<Number>    zero_matrix;
         
 </pre>
 </div>
 <div class = "comment">
 Build a Finite Element object of the specified type.  Since the
 \p FEBase::build() member dynamically creates memory we will
-store the object as an \p AutoPtr&lt;FEBase&gt;.  This can be thought
+store the object as an \p AutoPtr<FEBase>.  This can be thought
 of as a pointer that will clean up after itself.
 </div>
 
@@ -852,7 +852,7 @@ and the element contribution to the rhs.
 <div class ="fragment">
 <pre>
           DenseMatrix&lt;Number&gt;   Ke, Ce, Me;
-          DenseVector&lt;Number&gt;   Fe;
+          DenseVector<Number>   Fe;
         
 </pre>
 </div>
@@ -934,11 +934,11 @@ and now have a PRISM6).
               {
                 const unsigned int n_dof_indices = dof_indices.size();
         
-                Ke.resize          (n_dof_indices, n_dof_indices);
-                Ce.resize          (n_dof_indices, n_dof_indices);
-                Me.resize          (n_dof_indices, n_dof_indices);
-                zero_matrix.resize (n_dof_indices, n_dof_indices);
-                Fe.resize          (n_dof_indices);
+        	Ke.resize          (n_dof_indices, n_dof_indices);
+        	Ce.resize          (n_dof_indices, n_dof_indices);
+        	Me.resize          (n_dof_indices, n_dof_indices);
+        	zero_matrix.resize (n_dof_indices, n_dof_indices);
+        	Fe.resize          (n_dof_indices);
               }
         
 </pre>
@@ -951,7 +951,7 @@ the numeric integration.
 <div class ="fragment">
 <pre>
               for (unsigned int qp=0; qp&lt;qrule.n_points(); qp++)
-                {
+        	{
 </pre>
 </div>
 <div class = "comment">
@@ -963,13 +963,13 @@ the trial functions (j).
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;phi.size(); i++)
-                    for (unsigned int j=0; j&lt;phi.size(); j++)
-                      {
-                        Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-                        Me(i,j) += JxW[qp]*phi[i][qp]*phi[j][qp]
-                                   *1./(speed*speed);
-                      } // end of the matrix summation loop          
-                } // end of quadrature point loop
+        	    for (unsigned int j=0; j<phi.size(); j++)
+        	      {
+        		Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+        		Me(i,j) += JxW[qp]*phi[i][qp]*phi[j][qp]
+        		           *1./(speed*speed);
+        	      } // end of the matrix summation loop	  
+        	} // end of quadrature point loop
         
 </pre>
 </div>
@@ -995,11 +995,11 @@ be extended.
 <div class ="fragment">
 <pre>
                 for (unsigned int side=0; side&lt;elem-&gt;n_sides(); side++)
-                  if (!true)
+        	  if (!true)
 </pre>
 </div>
 <div class = "comment">
-if (elem-&gt;neighbor(side) == NULL)
+if (elem->neighbor(side) == NULL)
 </div>
 
 <div class ="fragment">
@@ -1015,7 +1015,7 @@ boundary integration.
 <div class ="fragment">
 <pre>
                       AutoPtr&lt;FEBase&gt; fe_face (FEBase::build(dim, fe_type));
-                      
+        	      
 </pre>
 </div>
 <div class = "comment">
@@ -1027,7 +1027,7 @@ of the element.
 <div class ="fragment">
 <pre>
                       QGauss qface(dim-1, SECOND);
-                      
+        	      
 </pre>
 </div>
 <div class = "comment">
@@ -1038,7 +1038,7 @@ quadrature rule.
 <div class ="fragment">
 <pre>
                       fe_face-&gt;attach_quadrature_rule (&amp;qface);
-                      
+        	      
 </pre>
 </div>
 <div class = "comment">
@@ -1049,7 +1049,7 @@ points.
 <div class ="fragment">
 <pre>
                       const std::vector&lt;std::vector&lt;Real&gt; &gt;&amp;  phi_face = fe_face-&gt;get_phi();
-                      
+        	      
 </pre>
 </div>
 <div class = "comment">
@@ -1060,7 +1060,7 @@ points on the face.
 <div class ="fragment">
 <pre>
                       const std::vector&lt;Real&gt;&amp; JxW_face = fe_face-&gt;get_JxW();
-                      
+        	      
 </pre>
 </div>
 <div class = "comment">
@@ -1082,7 +1082,7 @@ the whole boundary of our mesh.
 <div class ="fragment">
 <pre>
                       const Real acc_n_value = 1.0;
-                      
+        	      
 </pre>
 </div>
 <div class = "comment">
@@ -1092,7 +1092,7 @@ Loop over the face quagrature points for integration.
 <div class ="fragment">
 <pre>
                       for (unsigned int qp=0; qp&lt;qface.n_points(); qp++)
-                        {
+        		{
 </pre>
 </div>
 <div class = "comment">
@@ -1103,20 +1103,20 @@ normal acceleration.
 <div class ="fragment">
 <pre>
                           for (unsigned int i=0; i&lt;phi_face.size(); i++)
-                            {
-                              Fe(i) += acc_n_value*rho
-                                *phi_face[i][qp]*JxW_face[qp];
-                            }
-                        } // end face quadrature point loop          
-                    } // end if (elem-&gt;neighbor(side) == NULL)
-                
+        		    {
+        		      Fe(i) += acc_n_value*rho
+        			*phi_face[i][qp]*JxW_face[qp];
+        		    }
+        		} // end face quadrature point loop	  
+        	    } // end if (elem->neighbor(side) == NULL)
+        	
 </pre>
 </div>
 <div class = "comment">
 In this example the Dirichlet boundary conditions will be 
 imposed via panalty method after the
 system is assembled.
-        
+	
 
 <br><br></div>
 
@@ -1173,7 +1173,7 @@ This function applies the initial conditions
 <div class ="fragment">
 <pre>
         void apply_initial(EquationSystems&amp; es,
-                           const std::string&amp; system_name)
+        		   const std::string& system_name)
         {
 </pre>
 </div>
@@ -1195,8 +1195,8 @@ values.
 <div class ="fragment">
 <pre>
           NumericVector&lt;Number&gt;&amp;  pres_vec       = t_system.get_vector("displacement");
-          NumericVector&lt;Number&gt;&amp;  vel_vec        = t_system.get_vector("velocity");
-          NumericVector&lt;Number&gt;&amp;  acc_vec        = t_system.get_vector("acceleration");
+          NumericVector<Number>&  vel_vec        = t_system.get_vector("velocity");
+          NumericVector<Number>&  acc_vec        = t_system.get_vector("acceleration");
         
 </pre>
 </div>
@@ -1222,7 +1222,7 @@ This function applies the Dirichlet boundary conditions
 <div class ="fragment">
 <pre>
         void fill_dirichlet_bc(EquationSystems&amp; es,
-                               const std::string&amp; system_name)
+        		       const std::string& system_name)
         {
 </pre>
 </div>
@@ -1254,7 +1254,7 @@ Get writable references to the overall matrix and vector.
 <div class ="fragment">
 <pre>
           SparseMatrix&lt;Number&gt;&amp;  matrix = *t_system.matrix;
-          NumericVector&lt;Number&gt;&amp; rhs    = *t_system.rhs;
+          NumericVector<Number>& rhs    = *t_system.rhs;
         
 </pre>
 </div>
@@ -1307,7 +1307,7 @@ Number of nodes in the mesh.
 <pre>
           unsigned int n_nodes = mesh.n_nodes();
         
-          for (unsigned int n_cnt=0; n_cnt&lt;n_nodes; n_cnt++)
+          for (unsigned int n_cnt=0; n_cnt<n_nodes; n_cnt++)
             {
 </pre>
 </div>
@@ -1333,8 +1333,8 @@ pipe-mesh in this directory.
 <pre>
               const Real z_coo = 4.;
         
-              if (fabs(curr_node(2)-z_coo) &lt; TOLERANCE)
-                {
+              if (fabs(curr_node(2)-z_coo) < TOLERANCE)
+        	{
 </pre>
 </div>
 <div class = "comment">
@@ -1358,17 +1358,17 @@ The penalty parameter.
 </pre>
 </div>
 <div class = "comment">
-Here we apply sinusoidal pressure values for 0&lt;t&lt;0.002
+Here we apply sinusoidal pressure values for 0<t<0.002
 at one end of the pipe-mesh.
 </div>
 
 <div class ="fragment">
 <pre>
                   Real p_value;
-                  if (current_time &lt; .002 )
-                    p_value = sin(2*pi*current_time/.002);
-                  else
-                    p_value = .0;
+        	  if (current_time < .002 )
+        	    p_value = sin(2*pi*current_time/.002);
+        	  else
+        	    p_value = .0;
         
 </pre>
 </div>
@@ -1390,8 +1390,8 @@ if desired.
 <div class ="fragment">
 <pre>
                   if (do_for_matrix)
-                    matrix.add(dn, dn, penalty);
-                }
+        	    matrix.add(dn, dn, penalty);
+        	}
             } // loop n_cnt
         }
 </pre>
@@ -1835,16 +1835,16 @@ Mesh file is: pipe-mesh.unv
  ---------------------------------------------------------------------------- 
 
  ----------------------------------------------------------------------------
-| Time:           Mon Nov 10 16:09:56 2003
+| Time:           Mon Nov 10 22:55:38 2003
 | OS:             Linux
-| HostName:       hactar
+| HostName:       ariel
 | OS Release      2.4.20-19.9smp
 | OS Version:     #1 SMP Tue Jul 15 17:04:18 EDT 2003
 | Machine:        i686
 | Username:       benkirk
  ----------------------------------------------------------------------------
  ----------------------------------------------------------------------------
-| libMesh Performance: Alive time=23.5383, Active time=22.5206
+| libMesh Performance: Alive time=50.8255, Active time=49.2282
  ----------------------------------------------------------------------------
 | Event                         nCalls  Total       Avg         Percent of   |
 |                                       Time        Time        Active Time  |
@@ -1852,34 +1852,34 @@ Mesh file is: pipe-mesh.unv
 |                                                                            |
 |                                                                            |
 | DofMap                                                                     |
-|   compute_sparsity()          1       0.1189      0.118851    0.53         |
-|   create_dof_constraints()    1       0.0021      0.002072    0.01         |
-|   distribute_dofs()           1       0.0068      0.006816    0.03         |
-|   dof_indices()               21120   0.1450      0.000007    0.64         |
-|   reinit()                    1       0.0228      0.022814    0.10         |
+|   compute_sparsity()          1       0.1266      0.126586    0.26         |
+|   create_dof_constraints()    1       0.0032      0.003225    0.01         |
+|   distribute_dofs()           1       0.0158      0.015805    0.03         |
+|   dof_indices()               21120   0.1711      0.000008    0.35         |
+|   reinit()                    1       0.0413      0.041273    0.08         |
 |                                                                            |
 | FE                                                                         |
-|   compute_map()               3520    0.0484      0.000014    0.21         |
-|   compute_shape_functions()   3520    0.0455      0.000013    0.20         |
-|   init_shape_functions()      8       0.0013      0.000159    0.01         |
+|   compute_map()               3520    0.0580      0.000016    0.12         |
+|   compute_shape_functions()   3520    0.0542      0.000015    0.11         |
+|   init_shape_functions()      8       0.0013      0.000165    0.00         |
 |                                                                            |
 | Mesh                                                                       |
-|   read()                      1       0.4470      0.447004    1.98         |
+|   read()                      1       0.5000      0.499951    1.02         |
 |                                                                            |
 | MeshBase                                                                   |
-|   find_neighbors()            1       0.0905      0.090512    0.40         |
-|   renumber_nodes_and_elem()   1       0.0018      0.001753    0.01         |
+|   find_neighbors()            1       0.1382      0.138173    0.28         |
+|   renumber_nodes_and_elem()   1       0.0046      0.004616    0.01         |
 |                                                                            |
 | NewmarkSystem                                                              |
-|   initial_conditions ()       1       0.0001      0.000111    0.00         |
-|   update_rhs ()               300     1.1360      0.003787    5.04         |
-|   update_u_v_a ()             300     0.2626      0.000875    1.17         |
+|   initial_conditions ()       1       0.0002      0.000233    0.00         |
+|   update_rhs ()               300     3.1685      0.010562    6.44         |
+|   update_u_v_a ()             300     0.4552      0.001517    0.92         |
 |                                                                            |
 | SystemBase                                                                 |
-|   assemble()                  1       0.5322      0.532158    2.36         |
-|   solve()                     300     19.6598     0.065533    87.30        |
+|   assemble()                  1       0.6913      0.691321    1.40         |
+|   solve()                     300     43.7988     0.145996    88.97        |
  ----------------------------------------------------------------------------
-| Totals:                       29077   22.5206                 100.00       |
+| Totals:                       29077   49.2282                 100.00       |
  ----------------------------------------------------------------------------
 
  

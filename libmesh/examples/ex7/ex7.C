@@ -1,4 +1,4 @@
-/* $Id: ex7.C,v 1.27 2003-11-10 22:22:22 jwpeterson Exp $ */
+/* $Id: ex7.C,v 1.28 2003-11-11 04:58:33 benkirk Exp $ */
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
 
@@ -16,7 +16,7 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
- // Example 7 -- Introduction to Complex Numbers and the "FrequencySystem"
+ // <h1>Example 7 - Introduction to Complex Numbers and the "FrequencySystem"</h1>
  //
  // This is the seventh example program.  It builds on
  // the previous example programs, introduces complex

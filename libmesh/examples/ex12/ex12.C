@@ -1,4 +1,4 @@
-/* $Id: ex12.C,v 1.5 2003-11-10 23:06:04 jwpeterson Exp $ */
+/* $Id: ex12.C,v 1.6 2003-11-11 04:58:33 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -17,7 +17,7 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
- // <h1>Example 12 -- The <code>MeshData</code> class</h1>
+ // <h1>Example 12 - The <code>MeshData</code> class</h1>
  //
  // The previous examples covered the certainly involved
  // aspects of simulating multiple equation systems, and prior 

@@ -1,4 +1,4 @@
-/* $Id: ex3.C,v 1.25 2003-11-06 22:29:59 jwpeterson Exp $ */
+/* $Id: ex3.C,v 1.26 2003-11-11 04:58:33 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -18,7 +18,7 @@
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
 
- // Example 3 -- Solving a Poisson Problem
+ // <h1>Example 3 - Solving a Poisson Problem</h1>
  //
  // This is the third example program.  It builds on
  // the second example program by showing how to solve a simple

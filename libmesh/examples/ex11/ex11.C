@@ -1,4 +1,4 @@
-/* $Id: ex11.C,v 1.3 2003-11-10 22:14:35 benkirk Exp $ */
+/* $Id: ex11.C,v 1.4 2003-11-11 04:58:33 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -17,7 +17,7 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
- // Example 11 -- Stokes Equations - Systems of Equations
+ // <h1>Example 11 - Stokes Equations - Systems of Equations</h1>
  //
  // This example shows how a simple, linear system of equations
  // can be solved in parallel.  The system of equations are the familiar

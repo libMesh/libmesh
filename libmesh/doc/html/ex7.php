@@ -12,7 +12,7 @@
 <div class="content">
 <a name="comments"></a> 
 <div class = "comment">
-Example 7 -- Introduction to Complex Numbers and the "FrequencySystem"
+<h1>Example 7 - Introduction to Complex Numbers and the "FrequencySystem"</h1>
 
 <br><br>This is the seventh example program.  It builds on
 the previous example programs, introduces complex
@@ -35,8 +35,8 @@ complex numbers enabled.
 <div class ="fragment">
 <pre>
         #include &lt;iostream&gt;
-        #include &lt;algorithm&gt;
-        #include &lt;stdio.h&gt;
+        #include <algorithm>
+        #include <stdio.h>
         
 </pre>
 </div>
@@ -130,7 +130,7 @@ form an overall system matrix ready for solution.
 <div class ="fragment">
 <pre>
         void assemble_helmholtz(EquationSystems&amp; es,
-                                const std::string&amp; system_name);
+        			const std::string& system_name);
         
 </pre>
 </div>
@@ -143,7 +143,7 @@ to the overall matrix, which then renders ready for solution.
 <div class ="fragment">
 <pre>
         void add_M_C_K_helmholtz(EquationSystems&amp; es,
-                                 const std::string&amp; system_name);
+        			 const std::string& system_name);
         
 </pre>
 </div>
@@ -183,8 +183,8 @@ This example is designed for complex numbers.
 <pre>
         #ifndef USE_COMPLEX_NUMBERS
         
-          std::cerr &lt;&lt; "ERROR: This example is intended for " &lt;&lt; std::endl
-                    &lt;&lt; " use with complex numbers." &lt;&lt; std::endl;
+          std::cerr << "ERROR: This example is intended for " << std::endl
+        	    << " use with complex numbers." << std::endl;
           here();
         
           return 0;
@@ -210,9 +210,9 @@ Check for proper usage.
 <pre>
             if (argc &lt; 3)
               {
-                std::cerr &lt;&lt; "Usage: " &lt;&lt; argv[0] &lt;&lt; " -f [frequency]"
-                          &lt;&lt; std::endl;
-                
+        	std::cerr << "Usage: " << argv[0] << " -f [frequency]"
+        		  << std::endl;
+        	
 </pre>
 </div>
 <div class = "comment">
@@ -236,12 +236,12 @@ Tell the user what we are doing.
 <pre>
             else 
               {
-                std::cout &lt;&lt; "Running " &lt;&lt; argv[0];
-                
-                for (int i=1; i&lt;argc; i++)
-                  std::cout &lt;&lt; " " &lt;&lt; argv[i];
-                
-                std::cout &lt;&lt; std::endl &lt;&lt; std::endl;
+        	std::cout << "Running " << argv[0];
+        	
+        	for (int i=1; i<argc; i++)
+        	  std::cout << " " << argv[i];
+        	
+        	std::cout << std::endl << std::endl;
               }
             
 </pre>
@@ -286,10 +286,10 @@ Tell the user the number of elements
 <div class ="fragment">
 <pre>
             std::cout &lt;&lt; " Using " &lt;&lt; n_el_per_dim &lt;&lt; " x " 
-                      &lt;&lt; n_el_per_dim &lt;&lt; " = " 
-                      &lt;&lt; n_el_per_dim*n_el_per_dim
-                      &lt;&lt; " QUAD9 elements"
-                      &lt;&lt; std::endl &lt;&lt; std::endl;
+        	      << n_el_per_dim << " = " 
+        	      << n_el_per_dim*n_el_per_dim
+        	      << " QUAD9 elements"
+        	      << std::endl << std::endl;
             
 </pre>
 </div>
@@ -312,9 +312,9 @@ to build a mesh of n x n Quad9 elements.
 <div class ="fragment">
 <pre>
             mesh.build_square (n_el_per_dim, n_el_per_dim,
-                               -1., 1.,
-                               -1., 1.,
-                               QUAD9);
+        		       -1., 1.,
+        		       -1., 1.,
+        		       QUAD9);
             
 </pre>
 </div>
@@ -356,7 +356,7 @@ Use a handy reference to this system
 <div class ="fragment">
 <pre>
             FrequencySystem &amp; f_system =
-              equation_systems.get_system&lt;FrequencySystem&gt; ("Helmholtz");
+              equation_systems.get_system<FrequencySystem> ("Helmholtz");
             
 </pre>
 </div>
@@ -413,8 +413,8 @@ Will solve for 1/3rd, 2/3rd and 1/1th of the given frequency
 <div class ="fragment">
 <pre>
             f_system.set_frequencies_by_steps (frequency_in/n_frequencies,
-                                               frequency_in,
-                                               n_frequencies);
+        				       frequency_in,
+        				       n_frequencies);
             
 </pre>
 </div>
@@ -451,7 +451,7 @@ Prints information about the system to the screen.
 <pre>
             equation_systems.print_info ();
         
-            for (unsigned int n=0; n &lt; n_frequencies; n++)
+            for (unsigned int n=0; n < n_frequencies; n++)
               {
 </pre>
 </div>
@@ -467,7 +467,7 @@ the system only for specific frequencies.
 <div class ="fragment">
 <pre>
                 f_system.solve (n,n);
-                
+        	
 </pre>
 </div>
 <div class = "comment">
@@ -484,8 +484,8 @@ respectively.
 <div class ="fragment">
 <pre>
                 char buf[14];
-                sprintf (buf, "out%04d.gmv", n);
-                mesh.write_gmv (buf, equation_systems);
+        	sprintf (buf, "out%04d.gmv", n);
+        	mesh.write_gmv (buf, equation_systems);
               }
             
 </pre>
@@ -526,7 +526,7 @@ called to form the stiffness matrix and right-hand side.
 <div class ="fragment">
 <pre>
         void assemble_helmholtz(EquationSystems&amp; es,
-                                const std::string&amp; system_name)
+        			const std::string& system_name)
         {
         #ifdef USE_COMPLEX_NUMBERS
             
@@ -570,7 +570,7 @@ Get a reference to our system, as before
 <div class ="fragment">
 <pre>
           FrequencySystem &amp; f_system =
-            es.get_system&lt;FrequencySystem&gt; (system_name);
+            es.get_system<FrequencySystem> (system_name);
           
 </pre>
 </div>
@@ -619,9 +619,9 @@ references to them
 <div class ="fragment">
 <pre>
           SparseMatrix&lt;Number&gt;&amp;   stiffness      = f_system.get_matrix("stiffness");
-          SparseMatrix&lt;Number&gt;&amp;   damping        = f_system.get_matrix("damping");
-          SparseMatrix&lt;Number&gt;&amp;   mass           = f_system.get_matrix("mass");
-          NumericVector&lt;Number&gt;&amp;  freq_indep_rhs = f_system.get_vector("rhs");
+          SparseMatrix<Number>&   damping        = f_system.get_matrix("damping");
+          SparseMatrix<Number>&   mass           = f_system.get_matrix("mass");
+          NumericVector<Number>&  freq_indep_rhs = f_system.get_vector("rhs");
           
 </pre>
 </div>
@@ -647,7 +647,7 @@ Finite Element related stuff
 
 <br><br>Build a Finite Element object of the specified type.  Since the
 FEBase::build() member dynamically creates memory we will
-store the object as an AutoPtr&lt;FEBase&gt;.  This can be thought
+store the object as an AutoPtr<FEBase>.  This can be thought
 of as a pointer that will clean up after itself.
 </div>
 
@@ -724,7 +724,7 @@ matrix.  This will definitely save memory.
 <div class ="fragment">
 <pre>
           DenseMatrix&lt;Number&gt; Ke, Ce, Me, zero_matrix;
-          DenseVector&lt;Number&gt; Fe;
+          DenseVector<Number> Fe;
           
 </pre>
 </div>
@@ -803,7 +803,7 @@ quadrature points (q_point) and the shape functions
 </pre>
 </div>
 <div class = "comment">
-Zero &amp; resize the element matrix and right-hand side before
+Zero & resize the element matrix and right-hand side before
 summing them, with different element types in the mesh this
 is quite necessary.
 </div>
@@ -813,11 +813,11 @@ is quite necessary.
               {
                 const unsigned int n_dof_indices = dof_indices.size();
         
-                Ke.resize          (n_dof_indices, n_dof_indices);
-                Ce.resize          (n_dof_indices, n_dof_indices);
-                Me.resize          (n_dof_indices, n_dof_indices);
-                zero_matrix.resize (n_dof_indices, n_dof_indices);
-                Fe.resize          (n_dof_indices);
+        	Ke.resize          (n_dof_indices, n_dof_indices);
+        	Ce.resize          (n_dof_indices, n_dof_indices);
+        	Me.resize          (n_dof_indices, n_dof_indices);
+        	zero_matrix.resize (n_dof_indices, n_dof_indices);
+        	Fe.resize          (n_dof_indices);
               }
               
 </pre>
@@ -841,8 +841,8 @@ the numeric integration.
 <pre>
               START_LOG("stiffness &amp; mass","assemble_helmholtz");
         
-              for (unsigned int qp=0; qp&lt;qrule.n_points(); qp++)
-                {
+              for (unsigned int qp=0; qp<qrule.n_points(); qp++)
+        	{
 </pre>
 </div>
 <div class = "comment">
@@ -856,15 +856,15 @@ Real// (Point// Point) = Real, and not something else...
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;phi.size(); i++)
-                    for (unsigned int j=0; j&lt;phi.size(); j++)
-                      {
-                        Ke(i,j) += JxW[qp]//  (dphi[i][qp]// dphi[j][qp]);
-                        Me(i,j) += JxW[qp]//   phi[i][qp] // phi[j][qp];
-                      }          
+        	    for (unsigned int j=0; j<phi.size(); j++)
+        	      {
+        		Ke(i,j) += JxW[qp]//  (dphi[i][qp]// dphi[j][qp]);
+        		Me(i,j) += JxW[qp]//   phi[i][qp] // phi[j][qp];
+        	      }	  
         
-                }
+        	}
         
-              STOP_LOG("stiffness &amp; mass","assemble_helmholtz");
+              STOP_LOG("stiffness & mass","assemble_helmholtz");
         
 </pre>
 </div>
@@ -876,17 +876,17 @@ boundary.
 <br><br>The following loops over the sides of the element.
 If the element has no neighbor on a side then that
 side MUST live on a boundary of the domain.
-         
+	 
 
 <br><br></div>
 
 <div class ="fragment">
 <pre>
               for (unsigned int side=0; side&lt;elem-&gt;n_sides(); side++)
-                if (elem-&gt;neighbor(side) == NULL)
-                  {
-                    START_LOG("damping &amp; rhs","assemble_helmholtz");
-                      
+        	if (elem->neighbor(side) == NULL)
+        	  {
+        	    START_LOG("damping & rhs","assemble_helmholtz");
+        	      
 </pre>
 </div>
 <div class = "comment">
@@ -897,7 +897,7 @@ boundary integration.
 <div class ="fragment">
 <pre>
                     AutoPtr&lt;FEBase&gt; fe_face (FEBase::build(dim, fe_type));
-                      
+        	      
 </pre>
 </div>
 <div class = "comment">
@@ -909,7 +909,7 @@ of the element.
 <div class ="fragment">
 <pre>
                     QGauss qface(dim-1, SECOND);
-                      
+        	      
 </pre>
 </div>
 <div class = "comment">
@@ -920,7 +920,7 @@ quadrature rule.
 <div class ="fragment">
 <pre>
                     fe_face-&gt;attach_quadrature_rule (&amp;qface);
-                      
+        	      
 </pre>
 </div>
 <div class = "comment">
@@ -931,8 +931,8 @@ points.
 <div class ="fragment">
 <pre>
                     const std::vector&lt;std::vector&lt;Real&gt; &gt;&amp;  phi_face =
-                      fe_face-&gt;get_phi();
-                      
+        	      fe_face->get_phi();
+        	      
 </pre>
 </div>
 <div class = "comment">
@@ -943,7 +943,7 @@ points on the face.
 <div class ="fragment">
 <pre>
                     const std::vector&lt;Real&gt;&amp; JxW_face = fe_face-&gt;get_JxW();
-                      
+        	      
 </pre>
 </div>
 <div class = "comment">
@@ -965,7 +965,7 @@ the whole boundary of our mesh.
 <div class ="fragment">
 <pre>
                     const Real vn_value = 1.;
-                      
+        	      
 </pre>
 </div>
 <div class = "comment">
@@ -976,7 +976,7 @@ at some parts of the bounfdary
 <div class ="fragment">
 <pre>
                     const Real an_value = 1.;
-                      
+        	      
 </pre>
 </div>
 <div class = "comment">
@@ -986,7 +986,7 @@ Loop over the face quagrature points for integration.
 <div class ="fragment">
 <pre>
                     for (unsigned int qp=0; qp&lt;qface.n_points(); qp++)
-                      {
+        	      {
 </pre>
 </div>
 <div class = "comment">
@@ -997,8 +997,8 @@ normal velocity.
 <div class ="fragment">
 <pre>
                         for (unsigned int i=0; i&lt;phi_face.size(); i++)
-                          Fe(i) += vn_value*phi_face[i][qp]*JxW_face[qp];
-                        
+        		  Fe(i) += vn_value*phi_face[i][qp]*JxW_face[qp];
+        		
 </pre>
 </div>
 <div class = "comment">
@@ -1009,12 +1009,12 @@ admittance boundary conditions.
 <div class ="fragment">
 <pre>
                         for (unsigned int i=0; i&lt;phi_face.size(); i++)
-                          for (unsigned int j=0; j&lt;phi_face.size(); j++)
-                            Ce(i,j) += rho*an_value*JxW_face[qp]*phi_face[i][qp]*phi_face[j][qp];
-                      }
+        		  for (unsigned int j=0; j<phi_face.size(); j++)
+        		    Ce(i,j) += rho*an_value*JxW_face[qp]*phi_face[i][qp]*phi_face[j][qp];
+        	      }
         
-                    STOP_LOG("damping &amp; rhs","assemble_helmholtz");
-                  }
+        	    STOP_LOG("damping & rhs","assemble_helmholtz");
+        	  }
               
 </pre>
 </div>
@@ -1066,7 +1066,7 @@ damping matrices into a single system matrix.
 <div class ="fragment">
 <pre>
         void add_M_C_K_helmholtz(EquationSystems&amp; es,
-                                 const std::string&amp; system_name)
+        			 const std::string& system_name)
         {
         #ifdef USE_COMPLEX_NUMBERS
         
@@ -1092,7 +1092,7 @@ Get a reference to our system, as before
 <div class ="fragment">
 <pre>
           FrequencySystem &amp; f_system =
-            es.get_system&lt;FrequencySystem&gt; (system_name);
+            es.get_system<FrequencySystem> (system_name);
           
 </pre>
 </div>
@@ -1128,7 +1128,7 @@ frequency-dependent system is to be collected
 <div class ="fragment">
 <pre>
           SparseMatrix&lt;Number&gt;&amp;  matrix          = *f_system.matrix;
-          NumericVector&lt;Number&gt;&amp; rhs             = *f_system.rhs;
+          NumericVector<Number>& rhs             = *f_system.rhs;
           
 </pre>
 </div>
@@ -1142,9 +1142,9 @@ before they can extract values for computation.
 <div class ="fragment">
 <pre>
           SparseMatrix&lt;Number&gt;&amp;   stiffness      = f_system.get_matrix("stiffness");
-          SparseMatrix&lt;Number&gt;&amp;   damping        = f_system.get_matrix("damping");
-          SparseMatrix&lt;Number&gt;&amp;   mass           = f_system.get_matrix("mass");
-          NumericVector&lt;Number&gt;&amp;  freq_indep_rhs = f_system.get_vector("rhs");
+          SparseMatrix<Number>&   damping        = f_system.get_matrix("damping");
+          SparseMatrix<Number>&   mass           = f_system.get_matrix("mass");
+          NumericVector<Number>&  freq_indep_rhs = f_system.get_vector("rhs");
           
 </pre>
 </div>
@@ -1187,7 +1187,7 @@ that, but let us do it explicitly.
         
           STOP_LOG("init phase","add_M_C_K_helmholtz");
         
-          START_LOG("global matrix &amp; vector additions","add_M_C_K_helmholtz");
+          START_LOG("global matrix & vector additions","add_M_C_K_helmholtz");
           
 </pre>
 </div>
@@ -1210,7 +1210,7 @@ be fine, but the imaginary part cluttered with unwanted products.
           matrix.add (scale_damping,   damping);
           rhs.add    (scale_rhs,       freq_indep_rhs);
         
-          STOP_LOG("global matrix &amp; vector additions","add_M_C_K_helmholtz");
+          STOP_LOG("global matrix & vector additions","add_M_C_K_helmholtz");
           
 </pre>
 </div>

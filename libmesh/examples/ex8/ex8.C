@@ -1,4 +1,4 @@
-/* $Id: ex8.C,v 1.7 2003-11-10 22:14:35 benkirk Exp $ */
+/* $Id: ex8.C,v 1.8 2003-11-11 04:58:33 benkirk Exp $ */
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
 
@@ -20,7 +20,7 @@
 
 
 
- // Example 8
+ // <h1>Example 8 - The Wave Equation</h1>
  //
  // This is the eighth example program. It builds on
  // the previous example programs.  It introduces the

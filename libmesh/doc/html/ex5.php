@@ -12,11 +12,11 @@
 <div class="content">
 <a name="comments"></a> 
 <div class = "comment">
-Example 5 -- Run-Time Quadrature Rule Selection
+<h1>Example 5 - Run-Time Quadrature Rule Selection</h1>
 
 <br><br>This is the fifth example program.  It builds on
 the previous two examples, and extends the use
-of the \p AutoPtr&lt;&gt; as a convenient build method to
+of the \p AutoPtr as a convenient build method to
 determine the quadrature rule at run time.
 
 
@@ -28,9 +28,9 @@ determine the quadrature rule at run time.
 <div class ="fragment">
 <pre>
         #include &lt;iostream&gt;
-        #include &lt;sstream&gt; 
-        #include &lt;algorithm&gt;
-        #include &lt;math.h&gt;
+        #include <sstream> 
+        #include <algorithm>
+        #include <math.h>
         
 </pre>
 </div>
@@ -118,7 +118,7 @@ Function prototype, as before.
 <div class ="fragment">
 <pre>
         void assemble_poisson(EquationSystems&amp; es,
-                              const std::string&amp; system_name);
+                              const std::string& system_name);
         
         
         
@@ -131,8 +131,8 @@ Exact solution function prototype, as before.
 <div class ="fragment">
 <pre>
         Real exact_solution (const Real x,
-                             const Real y,
-                             const Real z = 0.);
+        		     const Real y,
+        		     const Real z = 0.);
         
         
 </pre>
@@ -189,11 +189,11 @@ must be given at run time.
 <pre>
             if (argc &lt; 3)
               {
-                std::cerr &lt;&lt; "Usage: " &lt;&lt; argv[0] &lt;&lt; " -q n"
-                          &lt;&lt; std::endl;
-                std::cerr &lt;&lt; "  where n stands for:" &lt;&lt; std::endl;
+        	std::cerr << "Usage: " << argv[0] << " -q n"
+        		  << std::endl;
+        	std::cerr << "  where n stands for:" << std::endl;
         
-                
+        	
 </pre>
 </div>
 <div class = "comment">
@@ -206,13 +206,13 @@ included in QGauss.
 <div class ="fragment">
 <pre>
                 for (unsigned int n=0; n&lt;QuadratureRules::num_valid_elem_rules; n++)
-                  std::cerr &lt;&lt; "  " &lt;&lt; QuadratureRules::valid_elem_rules[n] &lt;&lt; "    " 
-                            &lt;&lt; QuadratureRules::name(QuadratureRules::valid_elem_rules[n])
-                            &lt;&lt; std::endl;
-                
-                std::cerr &lt;&lt; std::endl;
-                
-                error();
+        	  std::cerr << "  " << QuadratureRules::valid_elem_rules[n] << "    " 
+        		    << QuadratureRules::name(QuadratureRules::valid_elem_rules[n])
+        		    << std::endl;
+        	
+        	std::cerr << std::endl;
+        	
+        	error();
               }
             
             
@@ -226,12 +226,12 @@ Tell the user what we are doing.
 <pre>
             else 
               {
-                std::cout &lt;&lt; "Running " &lt;&lt; argv[0];
-                
-                for (int i=1; i&lt;argc; i++)
-                  std::cout &lt;&lt; " " &lt;&lt; argv[i];
-                
-                std::cout &lt;&lt; std::endl &lt;&lt; std::endl;
+        	std::cout << "Running " << argv[0];
+        	
+        	for (int i=1; i<argc; i++)
+        	  std::cout << " " << argv[i];
+        	
+        	std::cout << std::endl << std::endl;
               }
             
         
@@ -281,17 +281,17 @@ space.
 <div class ="fragment">
 <pre>
             mesh.build_cube (16, 16, 16,
-                             -1., 1.,
-                             -1., 1.,
-                             -1., 1.,
-                             HEX8);
+        		     -1., 1.,
+        		     -1., 1.,
+        		     -1., 1.,
+        		     HEX8);
             
             mesh.print_info();
             
             EquationSystems equation_systems (mesh);
             
             {
-              equation_systems.add_system&lt;SteadySystem&gt; ("Poisson");
+              equation_systems.add_system<SteadySystem> ("Poisson");
               
               equation_systems("Poisson").add_variable("u", FIRST);
         
@@ -314,7 +314,7 @@ number of the quadrature rule appended.
 <div class ="fragment">
 <pre>
             std::ostringstream f_name;
-            f_name &lt;&lt; "out_" &lt;&lt; quad_type &lt;&lt; ".gmv";
+            f_name << "out_" << quad_type << ".gmv";
         
             mesh.write_gmv (f_name.str(), equation_systems);
           }
@@ -334,12 +334,12 @@ All done.
         
         
         
-        void assemble_poisson(EquationSystems&amp; es,
-                              const std::string&amp; system_name)
+        void assemble_poisson(EquationSystems& es,
+                              const std::string& system_name)
         {
           assert (system_name == "Poisson");
         
-          const Mesh&amp; mesh = es.get_mesh();
+          const Mesh& mesh = es.get_mesh();
         
           const unsigned int dim = mesh.mesh_dimension();
         
@@ -351,7 +351,7 @@ All done.
 <div class = "comment">
 Build a Finite Element object of the specified type.  Since the
 \p FEBase::build() member dynamically creates memory we will
-store the object as an \p AutoPtr&lt;FEBase&gt;.  Below, the
+store the object as an \p AutoPtr<FEBase>.  Below, the
 functionality of \p AutoPtr's is described more detailed in 
 the context of building quadrature rules.
 </div>
@@ -380,13 +380,13 @@ quadrature rules support this order.
 </div>
 <div class = "comment">
 Tell the finte element object to use our
-quadrature rule.  Note that a \p AutoPtr&lt;QBase&gt; returns
+quadrature rule.  Note that a \p AutoPtr<QBase> returns
 a QBase* pointer to the object it handles with \p get().  
-However, using \p get(), the \p AutoPtr&lt;QBase&gt; \p qrule is 
+However, using \p get(), the \p AutoPtr<QBase> \p qrule is 
 still in charge of this pointer. I.e., when \p qrule goes 
 out of scope, it will safely delete the \p QBase object it 
 points to.  This behavior may be overridden using
-\p AutoPtr&lt;Xyz&gt;::release(), but is currently not
+\p AutoPtr<Xyz>::release(), but is currently not
 recommended.
 </div>
 
@@ -418,11 +418,11 @@ could also have initialized the face quadrature rules
 with the type directly determined from \p qrule, namely 
 through:
 \verbatim
-AutoPtr&lt;QBase&gt;  qface (QBase::build(qrule-&gt;type(),
+AutoPtr<QBase>  qface (QBase::build(qrule->type(),
 dim-1, 
 THIRD));
 \endverbatim
-And again: using the \p AutoPtr&lt;QBase&gt; relaxes
+And again: using the \p AutoPtr<QBase> relaxes
 the need to delete the object afterwards,
 they clean up themselves.
 </div>
@@ -430,27 +430,27 @@ they clean up themselves.
 <div class ="fragment">
 <pre>
           AutoPtr&lt;QBase&gt;  qface (QBase::build(quad_type,
-                                              dim-1, 
-                                              THIRD));
-                      
+        				      dim-1, 
+        				      THIRD));
+        	      
           
 </pre>
 </div>
 <div class = "comment">
 Tell the finte element object to use our
-quadrature rule.  Note that a \p AutoPtr&lt;QBase&gt; returns
+quadrature rule.  Note that a \p AutoPtr<QBase> returns
 a \p QBase* pointer to the object it handles with \p get().  
-However, using \p get(), the \p AutoPtr&lt;QBase&gt; \p qface is 
+However, using \p get(), the \p AutoPtr<QBase> \p qface is 
 still in charge of this pointer. I.e., when \p qface goes 
 out of scope, it will safely delete the \p QBase object it 
 points to.  This behavior may be overridden using
-\p AutoPtr&lt;Xyz&gt;::release(), but is not recommended.
+\p AutoPtr<Xyz>::release(), but is not recommended.
 </div>
 
 <div class ="fragment">
 <pre>
           fe_face-&gt;attach_quadrature_rule (qface.get());
-                      
+        	      
         
           
 </pre>
@@ -463,18 +463,18 @@ This is again identical to example 4, and not commented.
 <pre>
           const std::vector&lt;Real&gt;&amp; JxW = fe-&gt;get_JxW();
           
-          const std::vector&lt;Point&gt;&amp; q_point = fe-&gt;get_xyz();
+          const std::vector<Point>& q_point = fe->get_xyz();
           
-          const std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi = fe-&gt;get_phi();
+          const std::vector<std::vector<Real> >& phi = fe->get_phi();
           
-          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = fe-&gt;get_dphi();
+          const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
           
-          const DofMap&amp; dof_map = es("Poisson").get_dof_map();
+          const DofMap& dof_map = es("Poisson").get_dof_map();
           
-          DenseMatrix&lt;Number&gt; Ke;
-          DenseVector&lt;Number&gt; Fe;
+          DenseMatrix<Number> Ke;
+          DenseVector<Number> Fe;
           
-          std::vector&lt;unsigned int&gt; dof_indices;
+          std::vector<unsigned int> dof_indices;
           
           
           
@@ -498,10 +498,10 @@ See example 3 for details.
               
               dof_map.dof_indices (elem, dof_indices);
               
-              fe-&gt;reinit (elem);
+              fe->reinit (elem);
               
               Ke.resize (dof_indices.size(),
-                         dof_indices.size());
+        		 dof_indices.size());
               
               Fe.resize (dof_indices.size());
               
@@ -519,7 +519,7 @@ access to the QBase members!
 <div class ="fragment">
 <pre>
               for (unsigned int qp=0; qp&lt;qrule-&gt;n_points(); qp++)
-                {
+        	{
 </pre>
 </div>
 <div class = "comment">
@@ -529,10 +529,10 @@ Add the matrix contribution
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;phi.size(); i++)
-                    for (unsigned int j=0; j&lt;phi.size(); j++)
-                      Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-                  
-                  
+        	    for (unsigned int j=0; j<phi.size(); j++)
+        	      Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+        	  
+        	  
 </pre>
 </div>
 <div class = "comment">
@@ -549,30 +549,30 @@ u(i,j-1) + u(i,j+1) +
 
 <br><br>Since the value of the forcing function depends only
 on the location of the quadrature point (q_point[qp])
-we will compute it here, outside of the i-loop          
+we will compute it here, outside of the i-loop	  
 </div>
 
 <div class ="fragment">
 <pre>
                   const Real x = q_point[qp](0);
-                  const Real y = q_point[qp](1);
-                  const Real z = q_point[qp](2);
-                  const Real eps = 1.e-3;
+        	  const Real y = q_point[qp](1);
+        	  const Real z = q_point[qp](2);
+        	  const Real eps = 1.e-3;
         
-                  const Real uxx = (exact_solution(x-eps,y,z) +
-                                    exact_solution(x+eps,y,z) +
-                                    -2.*exact_solution(x,y,z))/eps/eps;
-                      
-                  const Real uyy = (exact_solution(x,y-eps,z) +
-                                    exact_solution(x,y+eps,z) +
-                                    -2.*exact_solution(x,y,z))/eps/eps;
-                  
-                  const Real uzz = (exact_solution(x,y,z-eps) +
-                                    exact_solution(x,y,z+eps) +
-                                    -2.*exact_solution(x,y,z))/eps/eps;
+        	  const Real uxx = (exact_solution(x-eps,y,z) +
+        			    exact_solution(x+eps,y,z) +
+        			    -2.*exact_solution(x,y,z))/eps/eps;
+        	      
+        	  const Real uyy = (exact_solution(x,y-eps,z) +
+        			    exact_solution(x,y+eps,z) +
+        			    -2.*exact_solution(x,y,z))/eps/eps;
+        	  
+        	  const Real uzz = (exact_solution(x,y,z-eps) +
+        			    exact_solution(x,y,z+eps) +
+        			    -2.*exact_solution(x,y,z))/eps/eps;
         
-                  const Real fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
-                  
+        	  const Real fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
+        	  
         
 </pre>
 </div>
@@ -583,8 +583,8 @@ Add the RHS contribution
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;phi.size(); i++)
-                    Fe(i) += JxW[qp]*fxy*phi[i][qp];          
-                }
+        	    Fe(i) += JxW[qp]*fxy*phi[i][qp];	  
+        	}
         
         
         
@@ -601,14 +601,14 @@ for the build routines of QBase, described below
 <div class ="fragment">
 <pre>
               {
-                for (unsigned int side=0; side&lt;elem-&gt;n_sides(); side++)
-                  if (elem-&gt;neighbor(side) == NULL)
-                    {              
-                      const std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi_face    = fe_face-&gt;get_phi();
-                      const std::vector&lt;Real&gt;&amp;               JxW_face    = fe_face-&gt;get_JxW();              
-                      const std::vector&lt;Point &gt;&amp;             qface_point = fe_face-&gt;get_xyz();
-                      
-                      
+        	for (unsigned int side=0; side<elem->n_sides(); side++)
+        	  if (elem->neighbor(side) == NULL)
+        	    {	      
+        	      const std::vector<std::vector<Real> >& phi_face    = fe_face->get_phi();
+        	      const std::vector<Real>&               JxW_face    = fe_face->get_JxW();	      
+        	      const std::vector<Point >&             qface_point = fe_face->get_xyz();
+        	      
+        	      
 </pre>
 </div>
 <div class = "comment">
@@ -619,17 +619,17 @@ face.
 <div class ="fragment">
 <pre>
                       fe_face-&gt;reinit(elem, side);
-                      
-                      
+        	      
+        	      
 </pre>
 </div>
 <div class = "comment">
 Loop over the face quagrature points for integration.
-Note that the \p AutoPtr&lt;QBase&gt; overloaded the operator-&gt;,
+Note that the \p AutoPtr<QBase> overloaded the operator->,
 so that QBase methods may safely be accessed.  It may
-be said: accessing an \p AutoPtr&lt;Xyz&gt; through the
+be said: accessing an \p AutoPtr<Xyz> through the
 "." operator returns \p AutoPtr methods, while access
-through the "-&gt;" operator returns Xyz methods.
+through the "->" operator returns Xyz methods.
 This allows almost no change in syntax when switching
 to "safe pointers".
 </div>
@@ -637,26 +637,26 @@ to "safe pointers".
 <div class ="fragment">
 <pre>
                       for (unsigned int qp=0; qp&lt;qface-&gt;n_points(); qp++)
-                        {
-                          const Real xf = qface_point[qp](0);
-                          const Real yf = qface_point[qp](1);
-                          const Real zf = qface_point[qp](2);
-                          
-                          const Real penalty = 1.e10;
-                          
-                          const Real value = exact_solution(xf, yf, zf);
-                          
-                          for (unsigned int i=0; i&lt;phi_face.size(); i++)
-                            for (unsigned int j=0; j&lt;phi_face.size(); j++)
-                              Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
-                          
-                          
-                          for (unsigned int i=0; i&lt;phi_face.size(); i++)
-                            Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
-                          
-                        } // end face quadrature point loop          
-                    } // end if (elem-&gt;neighbor(side) == NULL)
-              } // end boundary condition section          
+        		{
+        		  const Real xf = qface_point[qp](0);
+        		  const Real yf = qface_point[qp](1);
+        		  const Real zf = qface_point[qp](2);
+        		  
+        		  const Real penalty = 1.e10;
+        		  
+        		  const Real value = exact_solution(xf, yf, zf);
+        		  
+        		  for (unsigned int i=0; i<phi_face.size(); i++)
+        		    for (unsigned int j=0; j<phi_face.size(); j++)
+        		      Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
+        		  
+        		  
+        		  for (unsigned int i=0; i<phi_face.size(); i++)
+        		    Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
+        		  
+        		} // end face quadrature point loop	  
+        	    } // end if (elem->neighbor(side) == NULL)
+              } // end boundary condition section	  
               
               
               
@@ -674,7 +674,7 @@ and \p PetscVector::add_vector() members do this for us.
 <div class ="fragment">
 <pre>
               es("Poisson").matrix-&gt;add_matrix (Ke, dof_indices);
-              es("Poisson").rhs-&gt;add_vector    (Fe, dof_indices);
+              es("Poisson").rhs->add_vector    (Fe, dof_indices);
               
             } // end of element loop
           
@@ -1005,8 +1005,9 @@ Running ./ex5 -q 0
    System "Poisson"
     Type "Steady"
     Variables="u" 
-    Finite Element Types="0" 
-    Approximation Orders="1" 
+    Finite Element Types="0", "12" 
+    Infinite Element Mapping="0" 
+    Approximation Orders="1", "3" 
     n_dofs()=4913
     n_local_dofs()=4913
     n_constrained_dofs()=0
@@ -1052,6 +1053,53 @@ Running ./ex5 -q 0
 WARNING! There are options you set that were not used!
 WARNING! could be spelling mistake, etc!
 Option left: name:-q value: 0
+
+ ----------------------------------------------------------------------------
+| Time:           Mon Nov 10 22:54:45 2003
+| OS:             Linux
+| HostName:       ariel
+| OS Release      2.4.20-19.9smp
+| OS Version:     #1 SMP Tue Jul 15 17:04:18 EDT 2003
+| Machine:        i686
+| Username:       benkirk
+ ----------------------------------------------------------------------------
+ ----------------------------------------------------------------------------
+| libMesh Performance: Alive time=2.30228, Active time=2.40219
+ ----------------------------------------------------------------------------
+| Event                         nCalls  Total       Avg         Percent of   |
+|                                       Time        Time        Active Time  |
+|----------------------------------------------------------------------------|
+|                                                                            |
+|                                                                            |
+| DofMap                                                                     |
+|   compute_sparsity()          1       0.1512      0.151166    6.29         |
+|   create_dof_constraints()    1       0.0039      0.003864    0.16         |
+|   distribute_dofs()           1       0.0179      0.017871    0.74         |
+|   dof_indices()               12288   0.1032      0.000008    4.30         |
+|   reinit()                    1       0.0482      0.048209    2.01         |
+|                                                                            |
+| FE                                                                         |
+|   compute_face_map()          1536    0.0167      0.000011    0.69         |
+|   compute_map()               5632    0.0771      0.000014    3.21         |
+|   compute_shape_functions()   5632    0.0781      0.000014    3.25         |
+|   init_face_shape_functions() 766     0.0104      0.000014    0.43         |
+|   init_shape_functions()      1537    0.0977      0.000064    4.07         |
+|   inverse_map()               6144    0.1421      0.000023    5.92         |
+|                                                                            |
+| Mesh                                                                       |
+|   build_cube()                1       0.0337      0.033722    1.40         |
+|                                                                            |
+| MeshBase                                                                   |
+|   find_neighbors()            1       0.1549      0.154921    6.45         |
+|   renumber_nodes_and_elem()   1       0.0052      0.005195    0.22         |
+|                                                                            |
+| SystemBase                                                                 |
+|   assemble()                  1       0.9819      0.981875    40.87        |
+|   solve()                     1       0.4801      0.480086    19.99        |
+ ----------------------------------------------------------------------------
+| Totals:                       33544   2.4022                  100.00       |
+ ----------------------------------------------------------------------------
+
  
 ***************************************************************
 * Done Running Example  ./ex5
