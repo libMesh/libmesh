@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.76 2004-05-11 20:29:07 jwpeterson Exp $
+// $Id: mesh_base.C,v 1.77 2004-10-19 12:44:10 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -327,18 +327,18 @@ std::string MeshBase::get_info() const
 {
   std::ostringstream out;
 
-  out << " Mesh Information:"     << std::endl
-      << "  mesh_dimension()="    << this->mesh_dimension()    << std::endl
-      << "  spatial_dimension()=" << this->spatial_dimension() << std::endl
-      << "  n_nodes()="           << this->n_nodes()           << std::endl
-      << "  n_elem()="            << this->n_elem()            << std::endl
-      << "   n_local_elem()="     << this->n_local_elem()      << std::endl
+  out << " Mesh Information:"                                  << '\n'
+      << "  mesh_dimension()="    << this->mesh_dimension()    << '\n'
+      << "  spatial_dimension()=" << this->spatial_dimension() << '\n'
+      << "  n_nodes()="           << this->n_nodes()           << '\n'
+      << "  n_elem()="            << this->n_elem()            << '\n'
+      << "   n_local_elem()="     << this->n_local_elem()      << '\n'
 #ifdef ENABLE_AMR
-      << "   n_active_elem()="    << this->n_active_elem()     << std::endl
+      << "   n_active_elem()="    << this->n_active_elem()     << '\n'
 #endif
-      << "  n_subdomains()="      << this->n_subdomains()      << std::endl
-      << "  n_processors()="      << this->n_processors()      << std::endl
-      << "  processor_id()="      << this->processor_id()      << std::endl;
+      << "  n_subdomains()="      << this->n_subdomains()      << '\n'
+      << "  n_processors()="      << this->n_processors()      << '\n'
+      << "  processor_id()="      << this->processor_id()      << '\n';
 
   return out.str();
 }

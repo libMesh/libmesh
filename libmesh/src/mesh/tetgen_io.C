@@ -1,4 +1,4 @@
-// $Id: tetgen_io.C,v 1.5 2004-07-26 16:27:48 jwpeterson Exp $
+// $Id: tetgen_io.C,v 1.6 2004-10-19 12:44:10 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -259,5 +259,5 @@ void TetGenIO::write (const std::string& fname)
 
   // end of the file
   out << "0\n"; // no holes output!
-  out << std::endl << "\n# end of file" << std::endl;
+  out << "\n\n# end of file\n";
 }

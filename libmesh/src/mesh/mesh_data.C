@@ -1,4 +1,4 @@
-// $Id: mesh_data.C,v 1.21 2004-07-26 16:27:48 jwpeterson Exp $
+// $Id: mesh_data.C,v 1.22 2004-10-19 12:44:10 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -332,24 +332,24 @@ std::string MeshData::get_info() const
 
   if (this->active() || this->compatibility_mode())
     {
-      out << " MeshData Information:" << std::endl;
+      out << " MeshData Information:\n";
       if (this->active())
-	  out << "  object activated." << std::endl;
+	  out << "  object activated.\n";
       if (this->compatibility_mode())
-	  out << "  object in compatibility mode." << std::endl;
+	  out << "  object in compatibility mode.\n";
       if (this->_data_descriptor != "")
-	  out << "  descriptor=" << this->_data_descriptor << std::endl;
+	  out << "  descriptor=" << this->_data_descriptor << '\n';
       if (this->elem_initialized())
-	  out << "  Element associated data initialized." << std::endl
-	      << "   n_val_per_elem()=" << this->n_val_per_elem() << std::endl
-	      << "   n_elem_data()=" << this->n_elem_data() << std::endl;
+	  out << "  Element associated data initialized.\n"
+	      << "   n_val_per_elem()=" << this->n_val_per_elem() << '\n'
+	      << "   n_elem_data()=" << this->n_elem_data() << '\n';
       if (this->node_initialized())
-	  out << "  Node associated data initialized." << std::endl
-	      << "   n_val_per_node()=" << this->n_val_per_node() << std::endl
-	      << "   n_node_data()=" << this->n_node_data() << std::endl;
+	  out << "  Node associated data initialized.\n"
+	      << "   n_val_per_node()=" << this->n_val_per_node() << '\n'
+	      << "   n_node_data()=" << this->n_node_data() << '\n';
     }
   else
-      out << " MeshData neither active nor in compatibility mode." << std::endl;
+      out << " MeshData neither active nor in compatibility mode.\n";
 
   return out.str();
 }

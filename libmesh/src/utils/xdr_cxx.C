@@ -1,4 +1,4 @@
-// "$Id: xdr_cxx.C,v 1.19 2004-09-27 15:56:49 jwpeterson Exp $\n"
+// "$Id: xdr_cxx.C,v 1.20 2004-10-19 12:44:11 benkirk Exp $\n"
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -248,7 +248,7 @@ void Xdr::data (int& a, const char* comment)
       {
 	assert (out.good());
 	
-	out << a << "\t " << comment << std::endl;
+	out << a << "\t " << comment << '\n';
 
 	return;
       }
@@ -300,7 +300,7 @@ void Xdr::data (unsigned int& a, const char* comment)
       {
 	assert (out.good());
 
-	out << a << "\t " << comment << std::endl;
+	out << a << "\t " << comment << '\n';
 	
 	return;
       }
@@ -352,7 +352,7 @@ void Xdr::data (short int& a, const char* comment)
       {
 	assert (out.good());
 
-	out << a << "\t " << comment << std::endl;
+	out << a << "\t " << comment << '\n';
 	
 	return;
       }
@@ -404,7 +404,7 @@ void Xdr::data (unsigned short int& a, const char* comment)
       {
 	assert (out.good());
 
-	out << a << "\t " << comment << std::endl;
+	out << a << "\t " << comment << '\n';
 	
 	return;
       }
@@ -456,7 +456,7 @@ void Xdr::data (float& a, const char* comment)
       {
 	assert (out.good());
 
-	out << a << "\t " << comment << std::endl;
+	out << a << "\t " << comment << '\n';
 	
 	return;
       }
@@ -508,7 +508,7 @@ void Xdr::data (double& a, const char* comment)
       {
 	assert (out.good());
 
-	out << a << "\t " << comment << std::endl;
+	out << a << "\t " << comment << '\n';
 	
 	return;
       }
@@ -571,7 +571,7 @@ void Xdr::data (std::complex<double>& a, const char* comment)
 
 	out << a.real() << "\t " 
 	    << a.imag() << "\t "
-	    << comment << std::endl;
+	    << comment << '\n';
 	
 	return;
       }
@@ -686,7 +686,7 @@ void Xdr::data (std::vector<int>& v, const char* comment)
 	    out << v[i] << " ";
 	  }
 
-	out << "\t " << comment << std::endl;
+	out << "\t " << comment << '\n';
 
 	return;	
       }
@@ -799,7 +799,7 @@ void Xdr::data (std::vector<unsigned int>& v, const char* comment)
 	    out << v[i] << " ";
 	  }
 
-	out << "\t " << comment << std::endl;
+	out << "\t " << comment << '\n';
 
 	return;	
       }
@@ -912,7 +912,7 @@ void Xdr::data (std::vector<short int>& v, const char* comment)
 	    out << v[i] << " ";
 	  }
 
-	out << "\t " << comment << std::endl;
+	out << "\t " << comment << '\n';
 
 	return;	
       }
@@ -1025,7 +1025,7 @@ void Xdr::data (std::vector<unsigned short int>& v, const char* comment)
 	    out << v[i] << " ";
 	  }
 
-	out << "\t " << comment << std::endl;
+	out << "\t " << comment << '\n';
 
 	return;	
       }
@@ -1138,7 +1138,7 @@ void Xdr::data (std::vector<float>& v, const char* comment)
 	    OFSRealscientific(out,12,v[i]) << " ";
  	  }
 
-	out << "\t " << comment << std::endl;
+	out << "\t " << comment << '\n';
 
 	return;	
       }
@@ -1260,7 +1260,7 @@ void Xdr::data (std::vector<double>& v, const char* comment)
 
 
 
-	out << "\t " << comment << std::endl;
+	out << "\t " << comment << '\n';
 
 	return;	
       }
@@ -1458,7 +1458,7 @@ void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
 	    OFSNumberscientific(out,12,v[i]) << " ";
  	  }
 
-	out << "\t " << comment << std::endl;
+	out << "\t " << comment << '\n';
 
 	return;	
       }
@@ -1574,7 +1574,7 @@ void Xdr::data (std::string& s, const char* comment)
       {
 	assert (out.good());
 
-	out << s << "\t " << comment << std::endl;
+	out << s << "\t " << comment << '\n';
 
 	return;	
       }

@@ -1,4 +1,4 @@
-// $Id: plt_loader_write.C,v 1.3 2004-10-15 13:08:04 jwpeterson Exp $
+// $Id: plt_loader_write.C,v 1.4 2004-10-19 12:44:11 benkirk Exp $
 
 // Copyright (C) 2002-2004  Benjamin S. Kirk
   
@@ -455,16 +455,16 @@ void PltLoader::write_dat (const std::string& name,
   out << "TITLE=\""
       << this->title()
       << "\""
-      << std::endl;
+      << '\n';
 
   out << "VARIABLES = ";
 
   for (unsigned int v=0; v<this->n_vars(); v++)
-    out << "\"" << this->var_name(v) << "\"" << std::endl;
+    out << "\"" << this->var_name(v) << "\"\n";
 
   for (unsigned int z=0; z<this->n_zones(); z++)
     {
-      out << "ZONE T=\"" << this->zone_name(z) << "\"" << std::endl;
+      out << "ZONE T=\"" << this->zone_name(z) << "\"\n";
       out << " I="  << this->imax(z)
 	  << ", J=" << this->jmax(z)
 	  << ", K=" << this->kmax(z);
@@ -474,18 +474,18 @@ void PltLoader::write_dat (const std::string& name,
 	{
 	  if (version < 10)
 	    {
-	      out << ", F=BLOCK" << std::endl;
+	      out << ", F=BLOCK\n";
 	    }
 	  else
 	    {
-	      out << ", ZONETYPE=Ordered" << std::endl
-		  << "DATAPACKING=BLOCK"  << std::endl;
+	      out << ", ZONETYPE=Ordered\n"
+		  << "DATAPACKING=BLOCK\n";
 	    }
       
 	  out << "DT=(";
 	  for (unsigned int v=0; v<this->n_vars(); v++)
 	    out << "SINGLE ";
-	  out << ")" << std::endl;
+	  out << ")\n";
 
 	  out.precision(9);
 	  
@@ -503,11 +503,11 @@ void PltLoader::write_dat (const std::string& name,
 		      // Throw in a newline every 5 entries to
 		      // avoid really long lines.
  		      if (l%5 == 0)
- 			out << std::endl;
+ 			out << '\n';
 		    }
 
 	      if (l%5 != 0)
-		out << std::endl;
+		out << '\n';
 	    }
 	}
 
@@ -516,18 +516,18 @@ void PltLoader::write_dat (const std::string& name,
 	{
 	  if (version < 10)
 	    {
-	      out << ", F=POINT" << std::endl;
+	      out << ", F=POINT\n";
 	    }
 	  else
 	    {
-	      out << ", ZONETYPE=Ordered" << std::endl
-		  << "DATAPACKING=POINT"  << std::endl;
+	      out << ", ZONETYPE=Ordered\n"
+		  << "DATAPACKING=POINT\n";
 	    }
 	  
 	  out << "DT=(";
 	  for (unsigned int v=0; v<this->n_vars(); v++)
 	    out << "SINGLE ";
-	  out << ")" << std::endl;
+	  out << ")\n";
 	  
 	  out.precision(9);
 	  
@@ -542,7 +542,7 @@ void PltLoader::write_dat (const std::string& name,
 		      out << std::scientific
 			  << _data[z][v][l] << " ";
 		    
-		    out << std::endl;
+		    out << '\n';
 		    
 		    l++;
 		  }

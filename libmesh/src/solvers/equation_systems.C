@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.8 2004-06-02 15:08:41 jwpeterson Exp $
+// $Id: equation_systems.C,v 1.9 2004-10-19 12:44:11 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -764,8 +764,8 @@ std::string EquationSystems::get_info () const
 {
   std::ostringstream out;
   
-  out << " EquationSystems" << std::endl
-      << "  n_systems()=" << this->n_systems() << std::endl;
+  out << " EquationSystems\n"
+      << "  n_systems()=" << this->n_systems() << '\n';
 
   // Print the info for the individual systems
   std::map<std::string, System*>::const_iterator it=_systems.begin();
@@ -777,8 +777,8 @@ std::string EquationSystems::get_info () const
   // Possibly print the flags
   if (!_flags.empty())
     {  
-      out << "  n_flags()=" << this->n_flags() << std::endl;
-      out << "   Flags:" << std::endl;
+      out << "  n_flags()=" << this->n_flags() << '\n';
+      out << "   Flags:\n";
       
       for (std::set<std::string>::const_iterator flag = _flags.begin();
 	   flag != _flags.end(); ++flag)
@@ -786,15 +786,15 @@ std::string EquationSystems::get_info () const
 	    << "\""
 	    << *flag
 	    << "\""
-	    << std::endl;
+	    << '\n';
     }
 
   
   // Possibly print the parameters  
   if (!_parameters.empty())
     {  
-      out << "  n_parameters()=" << this->n_parameters() << std::endl;
-      out << "   Parameters:" << std::endl;
+      out << "  n_parameters()=" << this->n_parameters() << '\n';
+      out << "   Parameters:\n";
       
       for (std::map<std::string, Real>::const_iterator
 	     param = _parameters.begin(); param != _parameters.end();
@@ -805,7 +805,7 @@ std::string EquationSystems::get_info () const
 	    << "\""
 	    << "="
 	    << param->second
-	    << std::endl;
+	    << '\n';
     }
   
   return out.str();
