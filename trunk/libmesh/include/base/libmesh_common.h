@@ -1,4 +1,4 @@
-// $Id: libmesh_common.h,v 1.6 2004-10-19 12:44:08 benkirk Exp $
+// $Id: libmesh_common.h,v 1.7 2004-10-22 21:03:22 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -114,7 +114,7 @@ typedef std::complex<double> COMPLEX;
 
 #undef error
 #ifdef HAVE_MPI
-#  define error()    { std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; abort(); }
+#  define error()    { std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; MPI_Abort(MPI_COMM_WORLD,1);}
 #else
 #  define error()    { std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; abort(); }
 #endif
