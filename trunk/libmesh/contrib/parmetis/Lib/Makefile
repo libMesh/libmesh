@@ -1,19 +1,6 @@
 include ../../../Make.common
 
-# If enable-mpi is set, that means
-# petsc has been disabled, and we need
-# to include the mpi headers with an
-# additional -I.
-# Otherwise there will be one too many
-# -I's.  (This is a hack)
-#
-# If both petsc and mpi are explicitly
-# disabled, better not try to build anything!
-ifeq ($(enable-mpi),yes)
-  INCLUDE = -I$(MPI_INCLUDE) -I.
-else
-  INCLUDE = $(MPI_INCLUDE) -I.
-endif
+INCLUDE = $(MPI_INCLUDE) -I.
 
 
 SRC     := $(wildcard *.c)
