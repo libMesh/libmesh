@@ -20,6 +20,7 @@
 // Local Includes
 #include "libmesh.h"
 #include "mesh.h"
+#include "mesh_modification.h"
 #include "boundary_mesh.h"
 #include "mesh_refinement.h"
 #include "dof_map.h"
@@ -745,7 +746,7 @@ int main (int argc, char** argv)
 		  << dist_fact
 		  << std::endl;
 	
-	mesh.distort(dist_fact);
+	MeshTools::Modification::distort(mesh,dist_fact);
       };
 
 
