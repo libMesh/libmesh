@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.21 2003-05-29 15:54:07 benkirk Exp $
+// $Id: mesh_refinement.C,v 1.22 2003-05-29 16:01:02 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -272,7 +272,11 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
    * if there are no refined elements then
    * there is no work for us to do
    */
-  if (max_level == 0) return compatible_with_refinement; 
+  if (max_level == 0)
+    {
+      STOP_LOG ("make_coarsening_compatible()", "MeshRefinement");
+      return compatible_with_refinement;
+    }
 
   
   /**
