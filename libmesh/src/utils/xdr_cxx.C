@@ -1,4 +1,4 @@
-// "$Id: xdr_cxx.C,v 1.7 2003-02-13 22:56:14 benkirk Exp $\n"
+// "$Id: xdr_cxx.C,v 1.8 2003-03-12 20:21:03 ddreyer Exp $\n"
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -519,68 +519,6 @@ void Xdr::data (double& a, const char* comment)
 
 #ifdef USE_COMPLEX_NUMBERS
 
-
-void Xdr::data (std::complex<float>& a, const char* comment)
-{
-  switch (mode)
-    {
-    case ENCODE:
-    case DECODE:
-      {
-#ifdef HAVE_RPC_RPC_H
-
-	assert (is_open());
-	float buf;
-	buf = a.real();
-	xdr_float(xdrs, &buf);
-	buf = a.imag();
-	xdr_float(xdrs, &buf);
-
-#else
-	
-	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_RPC_RPC_H is defined at build time" 
-		  << std::endl
-		  << "The XDR interface is not available in this installation"
-		  << std::endl;
-
-	error();
-
-#endif
-	return;
-      }
-
-    case READ:
-      {
-	assert (in.good());
-
-	float _r, _i;
-	in >> _r;
-	in  >> _i;
-	a = std::complex<float>(_r,_i);
-        in.getline(comm, comm_len);
-
-	return;
-      }
-
-    case WRITE:
-      {
-	assert (out.good());
-
-	out << a.real() << "\t " 
-	    << a.imag() << "\t "
-	    << comment << std::endl;
-	
-	return;
-      }
-
-    default:
-      error();
-    }
-}
-
-
-
 void Xdr::data (std::complex<double>& a, const char* comment)
 {
   switch (mode)
@@ -639,7 +577,6 @@ void Xdr::data (std::complex<double>& a, const char* comment)
       error();
     }
 }
-
 
 #endif // USE_COMPLEX_NUMBERS
 
@@ -1338,20 +1275,206 @@ void Xdr::data (std::vector<double>& v, const char* comment)
 
 #ifdef USE_COMPLEX_NUMBERS
 
-void Xdr::data (std::vector< std::complex<float> >&, const char*)
+void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
 {
-  error();
-}
+  switch (mode)
+    {
+    case ENCODE:
+      {
+#ifdef HAVE_RPC_RPC_H
+
+	assert (is_open());
+
+	unsigned int length = v.size();
+
+	data(length, "# vector length x 2 (complex)");
+
+	std::vector< std::complex<double> >::iterator iter = v.begin();
+	
+	for (; iter != v.end(); ++iter)
+	    data(*iter, "");
+
+// Alternative code
+// 	/*
+// 	 * save complex values as two std::vectors<double>.
+// 	 * Using just one buffer increases time for copying,
+// 	 * but reduces memory consumption
+// 	 */
+// 	std::vector<double> buf;
+// 	buf.resize(length);
+
+// 	// real part
+// 	std::vector< std::complex<double> >::iterator c_iter   = v.begin();
+// 	std::vector<double>::iterator                 buf_iter = buf.begin();
+// 	for (; c_iter != v.end(); ++c_iter)
+// 	{
+// 	  *buf_iter = c_iter->real();
+// 	  ++buf_iter;
+// 	}
+// 	data(buf, "");
+
+// 	// imaginary part
+// 	c_iter   = v.begin();
+// 	buf_iter = buf.begin();
+// 	for (; c_iter != v.end(); ++c_iter)
+// 	{
+// 	  *buf_iter = c_iter->real();
+// 	  ++buf_iter;
+// 	}
+// 	data(buf, "");
+
+// 	buf.clear();
 
 
+// did not work...
+// 	// with null pointer, let XDR dynamically allocate?
+// 	xdr_vector(xdrs, 
+// 		   (char*) &v[0],
+// 		   length,
+// 		   sizeof(std::complex<double>),
+// 		   (xdrproc_t) 0);
 
-void Xdr::data (std::vector< std::complex<double> >&, const char*)
-{
-  error();
-}
+#else
+	
+	std::cerr << "ERROR: Functionality is not available." << std::endl
+		  << "Make sure HAVE_RPC_RPC_H is defined at build time" 
+		  << std::endl
+		  << "The XDR interface is not available in this installation"
+		  << std::endl;
 
-// endif for USE_COMPLEX_NUMBERS
+	error();
+
+#endif	
+	return;
+      }
+
+    case DECODE:
+      {
+#ifdef HAVE_RPC_RPC_H
+
+	assert (is_open());
+
+	unsigned int length=0;
+
+	data(length, "# vector length x 2 (complex)");
+
+	v.resize(length);
+
+	std::vector< std::complex<double> >::iterator iter = v.begin();
+	
+	for (; iter != v.end(); ++iter)
+	    data(*iter, "");
+
+// alternative code
+// 	/*
+// 	 * load complex values as two std::vector<double>
+// 	 * one after the other, store them in two buffers,
+// 	 * since we have @e no chance to get the real and complex
+// 	 * part one after the other into the std::complex
+// 	 * (apart from messing with += or so, which i don't want to)
+// 	 */
+// 	std::vector<double> real_buf, imag_buf;
+// 	real_buf.resize(length);
+// 	imag_buf.resize(length);
+
+// 	// get real & imaginary part
+// 	data(real_buf, "");
+// 	data(imag_buf, "");
+
+// 	// copy into vector
+// 	std::vector< std::complex<double> >::iterator c_iter   = v.begin();
+// 	std::vector<double>::iterator                 real_buf_iter = real_buf.begin();
+// 	std::vector<double>::iterator                 imag_buf_iter = imag_buf.begin();
+
+// 	for (; c_iter != v.end(); ++c_iter)
+// 	{
+// 	  *c_iter = std::complex<double>(*real_buf_iter, *imag_buf_iter);
+// 	  ++real_buf_iter;
+// 	  ++imag_buf_iter;
+// 	}
+
+// 	// clear up
+// 	real_buf.clear();
+// 	imag_buf.clear();
+
+
+// did not work...
+// 	xdr_vector(xdrs, 
+// 		   (char*) &v[0],
+// 		   length,
+// 		   sizeof(std::complex<double>),
+// 		   (xdrproc_t) 0);
+	
+#else
+	
+	std::cerr << "ERROR: Functionality is not available." << std::endl
+		  << "Make sure HAVE_RPC_RPC_H is defined at build time" 
+		  << std::endl
+		  << "The XDR interface is not available in this installation"
+		  << std::endl;
+
+	error();
+
 #endif
+	return;
+      }
+
+    case READ:
+      {
+	assert (in.good());
+
+	unsigned int length=0;
+
+	data(length, "# vector length x 2 (complex)");
+
+	v.resize(length);
+
+	for (unsigned int i=0; i<v.size(); i++)
+	  {
+	    assert (in.good());
+	
+	    double _r, _i;
+	    in >> _r;
+	    in  >> _i;
+	    v[i] = std::complex<double>(_r,_i);
+	  }
+
+	in.getline(comm, comm_len);
+
+	return;	
+      }
+
+    case WRITE:
+      {
+	assert (out.good());
+
+	unsigned int length=v.size();
+
+	data(length, "# vector length x 2 (complex)");
+
+	for (unsigned int i=0; i<v.size(); i++)
+	  {
+	    assert (out.good());
+#ifndef BROKEN_IOSTREAM
+	    out << std::setw(12) << std::scientific << v[i].real() << " "
+		<< std::setw(12) << std::scientific << v[i].imag() << " ";
+#else
+	    out << v[i].real() << " " 
+		<< v[i].imag() << " ";
+#endif
+	  }
+
+	out << "\t " << comment << std::endl;
+
+	return;	
+      }
+
+    default:
+      error();
+    }
+}
+
+#endif // ifdef USE_COMPLEX_NUMBERS
 
 
 
