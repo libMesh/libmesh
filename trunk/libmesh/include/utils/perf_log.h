@@ -1,4 +1,4 @@
-// $Id: perf_log.h,v 1.3 2004-08-06 16:48:40 jwpeterson Exp $
+// $Id: perf_log.h,v 1.4 2004-11-09 12:20:57 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -172,7 +172,13 @@ class PerfLog
    */
   void print_log() const;
 
-    
+  /**
+   * @returns the total time spent on this event.
+   */
+  double get_total_time() const
+    {return total_time;}
+ 
+   
  private:
 
   
