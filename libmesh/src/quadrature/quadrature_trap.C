@@ -1,4 +1,4 @@
-// $Id: quadrature_trap.C,v 1.1 2003-01-20 16:31:45 jwpeterson Exp $
+// $Id: quadrature_trap.C,v 1.2 2003-01-20 17:06:53 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
