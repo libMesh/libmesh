@@ -18,7 +18,7 @@ ifeq ($(enable-shared),yes)
 endif
 
 
-ifeq (x$(MPI_INCLUDE),x)
+ifeq (x$(MPI_IMPL),x)
   # Do nothing
   all::
 	@echo "<<< Cannot build Parmetis without MPI >>>"

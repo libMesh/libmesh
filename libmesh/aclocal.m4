@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.49 2003-11-30 06:38:40 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.50 2003-11-30 07:04:18 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -514,6 +514,7 @@ AC_DEFUN(CONFIGURE_PETSC,
 	      [Flag indicating whether or not Petsc is available])
     AC_DEFINE(HAVE_MPI, 1,
 	      [Flag indicating whether or not MPI is available])
+    MPI_IMPL="petsc_snooped"
 
     dnl Some tricks to discover the version of petsc.
     dnl You have to have grep and sed for this to work.
@@ -523,7 +524,11 @@ AC_DEFUN(CONFIGURE_PETSC,
     petscversion=$petscmajor.$petscminor.$petscsubminor
     AC_MSG_RESULT(<<< Configuring library with PETSc version $petscversion support >>>)
     AC_SUBST(petscversion)
+    AC_SUBST(MPI_IMPL)
+
   else
+
+    dnl PETSc config failed.  Try MPI.
     enablepetsc=no
 
     dnl -------------------------------------------------------------
@@ -893,79 +898,6 @@ dnl -------------------------------------------------------------
 
 
 
-# dnl -------------------------------------------------------------
-# dnl MPI
-# dnl -------------------------------------------------------------
-# AC_DEFUN([ACX_MPI], [
-# AC_PREREQ(2.50) dnl for AC_LANG_CASE
-
-# AC_LANG_CASE([C], [
-#         AC_REQUIRE([AC_PROG_CC])
-#         AC_CHECK_PROGS(MPICC, mpicc hcc mpcc mpcc_r mpxlc, $CC)
-#         acx_mpi_save_CC="$CC"
-#         CC="$MPICC"
-#         AC_SUBST(MPICC)
-# ],
-# [C++], [
-#         AC_REQUIRE([AC_PROG_CXX])
-#         AC_CHECK_PROGS(MPICXX, mpiCC mpCC, $CXX)
-#         acx_mpi_save_CXX="$CXX"
-#         CXX="$MPICXX"
-#         AC_SUBST(MPICXX)
-# ],
-# [Fortran 77], [
-#         AC_REQUIRE([AC_PROG_F77])
-#         AC_CHECK_PROGS(MPIF77, mpif77 hf77 mpxlf mpf77 mpif90 mpf90 mpxlf90 mpxlf95 mpxlf_r, $F77)
-#         acx_mpi_save_F77="$F77"
-#         F77="$MPIF77"
-#         AC_SUBST(MPIF77)
-# ])
-
-# if test x = x"$MPILIBS"; then
-#         AC_LANG_CASE([C], [AC_CHECK_FUNC(MPI_Init, [MPILIBS=" "])],
-#                 [C++], [AC_CHECK_FUNC(MPI_Init, [MPILIBS=" "])],
-#                 [Fortran 77], [AC_MSG_CHECKING([for MPI_Init])
-#                         AC_TRY_LINK([],[      call MPI_Init], [MPILIBS=" "
-#                                 AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no)])])
-# fi
-# if test x = x"$MPILIBS"; then
-#         AC_CHECK_LIB(mpi, MPI_Init, [MPILIBS="-lmpi"])
-# fi
-# if test x = x"$MPILIBS"; then
-#         AC_CHECK_LIB(mpich, MPI_Init, [MPILIBS="-lmpich"])
-# fi
-
-# dnl We have to use AC_TRY_COMPILE and not AC_CHECK_HEADER because the
-# dnl latter uses $CPP, not $CC (which may be mpicc).
-# AC_LANG_CASE([C], [if test x != x"$MPILIBS"; then
-#         AC_MSG_CHECKING([for mpi.h])
-#         AC_TRY_COMPILE([#include <mpi.h>],[],[AC_MSG_RESULT(yes)], [MPILIBS=""
-#                 AC_MSG_RESULT(no)])
-# fi],
-# [C++], [if test x != x"$MPILIBS"; then
-#         AC_MSG_CHECKING([for mpi.h])
-#         AC_TRY_COMPILE([#include <mpi.h>],[],[AC_MSG_RESULT(yes)], [MPILIBS=""
-#                 AC_MSG_RESULT(no)])
-# fi])
-
-# AC_LANG_CASE([C], [CC="$acx_mpi_save_CC"],
-#         [C++], [CXX="$acx_mpi_save_CXX"],
-#         [Fortran 77], [F77="$acx_mpi_save_F77"])
-
-# AC_SUBST(MPILIBS)
-
-# # Finally, execute ACTION-IF-FOUND/ACTION-IF-NOT-FOUND:
-# if test x = x"$MPILIBS"; then
-#         $2
-#         :
-# else
-#         ifelse([$1],,[AC_DEFINE(HAVE_MPI,1,[Define if you have the MPI library.])],[$1])
-#         :
-# fi
-# ])dnl ACX_MPI
-# dnl -------------------------------------------------------------
-
-
 dnl ----------------------------------------------------------------------------
 dnl @synopsis ACX_BLAS([ACTION-IF-FOUND[, ACTION-IF-NOT-FOUND]])
 dnl
@@ -1254,16 +1186,12 @@ fi
 MPI_LIBS_PATH="$MPI/lib"
 MPI_INCLUDES_PATH="$MPI/include"
 
-# no recognized MPI implementation
-MPI_IMPL="none"
-
 # Check that the compiler uses the library we specified...
 
 # look for LAM or other MPI implementation
 if (test -e $MPI_LIBS_PATH/libmpi.a || test -e $MPI_LIBS_PATH/libmpi.so) ; then
 	echo "note: using $MPI_LIBS_PATH/libmpi (.a/.so)"
 
-	MPI_IMPL="mpi"
 
 	# Ensure the comiler finds the library...
 	tmpLIBS=$LIBS
@@ -1280,7 +1208,6 @@ if (test -e $MPI_LIBS_PATH/libmpi.a || test -e $MPI_LIBS_PATH/libmpi.so) ; then
                      [
                        LIBS="-llam $LIBS"
                        MPI_LIBS="-llam $MPI_LIBS"
-                       MPI_IMPL="lam"
                      ],	
                      [])
 
@@ -1301,8 +1228,8 @@ if (test -e $MPI_LIBS_PATH/libmpi.a || test -e $MPI_LIBS_PATH/libmpi.so) ; then
                      [
 		       MPI_LIBS="-lmpi $MPI_LIBS"
 	               MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
+	               MPI_IMPL="mpi"
                        AC_MSG_RESULT([Found valid MPI installlaion...])
-
                      ],
                      [AC_MSG_RESULT([Could not link in the MPI library...]); enablempi=no] )
 
@@ -1312,8 +1239,6 @@ fi
 
 if (test -e $MPI_LIBS_PATH/libmpich.a || test -e $MPI_LIBS_PATH/libmpich.so) ; then
 	echo "note: using $MPI_LIBS_PATH/libmpich (.a/.so)"
-
-	MPI_IMPL="mpich"
 
 	# Ensure the comiler finds the library...
 	tmpLIBS=$LIBS
@@ -1354,6 +1279,7 @@ if (test -e $MPI_LIBS_PATH/libmpich.a || test -e $MPI_LIBS_PATH/libmpich.so) ; t
 		     [
 		       MPI_LIBS="-lmpich $MPI_LIBS"
 		       MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
+	               MPI_IMPL="mpich"
                        AC_MSG_RESULT([Found valid MPICH installlaion...])
                      ],
 		     [AC_MSG_RESULT([Could not link in the MPI library...]); enablempi=no] )
@@ -1362,7 +1288,7 @@ if (test -e $MPI_LIBS_PATH/libmpich.a || test -e $MPI_LIBS_PATH/libmpich.so) ; t
 	LIBS=$tmpLIBS
 fi
 
-if (test "$MPI_IMPL" != none) ; then
+if (test "x$MPI_IMPL" != x) ; then
 
 	# Ensure the comiler finds the header file...
 	if test -e $MPI_INCLUDES_PATH/mpi.h; then
@@ -1384,11 +1310,11 @@ if (test "$MPI_IMPL" != none) ; then
 else
    
 	# no MPI install found, see if the compiler supports it
-	MPI_IMPL="built-in"
 
       	AC_TRY_COMPILE([#include <mpi.h>],
 	  	       [int np; MPI_Comm_size (MPI_COMM_WORLD, &np);],
                        [
+	                 MPI_IMPL="built-in"
                          AC_MSG_RESULT( [$CXX Compiler Supports MPI] )
                          AC_DEFINE(HAVE_MPI, 1, [Flag indicating whether or not MPI is available])
                        ],

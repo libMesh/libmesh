@@ -309,7 +309,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT CC CFLAGS ac_ct_CC enableshared GXX_VERSION CXXFLAGSG CXXFLAGSO CXXFLAGSP CXXFLAGSS CFLAGSG CFLAGSO CFLAGSP CFLAGSS CXXDEPFLAG CXXSHAREDFLAG RPATHFLAG CXXCPP EGREP MPCXX PWD enablexdr enablecomplex NETCDF_LIB NETCDF_INCLUDE EXODUS_LIB EXODUS_INCLUDE enableoptional F77 FFLAGS ac_ct_F77 FLIBS PETSC_ARCH PETSC_DIR petscversion MPI MPI_IMPL MPI_LIBS MPI_LIBS_PATH MPI_LIBS_PATHS MPI_INCLUDES_PATH MPI_INCLUDES_PATHS enablepetsc LASPACK_INCLUDE LASPACK_LIB SFC_INCLUDE SFC_LIB GZSTREAM_INCLUDE GZSTREAM_LIB TECPLOT_LIBRARY TECPLOT_INCLUDE METIS_INCLUDE METIS_LIB PARMETIS_INCLUDE PARMETIS_LIB DOXYGEN DOT DOTPATH HAVE_DOT PERL LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT CC CFLAGS ac_ct_CC enableshared GXX_VERSION CXXFLAGSG CXXFLAGSO CXXFLAGSP CXXFLAGSS CFLAGSG CFLAGSO CFLAGSP CFLAGSS CXXDEPFLAG CXXSHAREDFLAG RPATHFLAG CXXCPP EGREP MPCXX PWD enablexdr enablecomplex NETCDF_LIB NETCDF_INCLUDE EXODUS_LIB EXODUS_INCLUDE enableoptional F77 FFLAGS ac_ct_F77 FLIBS PETSC_ARCH PETSC_DIR petscversion MPI_IMPL MPI MPI_LIBS MPI_LIBS_PATH MPI_LIBS_PATHS MPI_INCLUDES_PATH MPI_INCLUDES_PATHS enablepetsc LASPACK_INCLUDE LASPACK_LIB SFC_INCLUDE SFC_LIB GZSTREAM_INCLUDE GZSTREAM_LIB TECPLOT_LIBRARY TECPLOT_INCLUDE METIS_INCLUDE METIS_LIB PARMETIS_INCLUDE PARMETIS_LIB DOXYGEN DOT DOTPATH HAVE_DOT PERL LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -7811,6 +7811,7 @@ cat >>confdefs.h <<\_ACEOF
 #define HAVE_MPI 1
 _ACEOF
 
+    MPI_IMPL="petsc_snooped"
 
             petscmajor=`grep "define PETSC_VERSION_MAJOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_MAJOR[ ]*//g"`
     petscminor=`grep "define PETSC_VERSION_MINOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_MINOR[ ]*//g"`
@@ -7819,8 +7820,11 @@ _ACEOF
     echo "$as_me:$LINENO: result: <<< Configuring library with PETSc version $petscversion support >>>" >&5
 echo "${ECHO_T}<<< Configuring library with PETSc version $petscversion support >>>" >&6
 
+
+
   else
-    enablepetsc=no
+
+        enablepetsc=no
 
         if (test "$enablempi" != no) ; then
 
@@ -7849,16 +7853,12 @@ fi
 MPI_LIBS_PATH="$MPI/lib"
 MPI_INCLUDES_PATH="$MPI/include"
 
-# no recognized MPI implementation
-MPI_IMPL="none"
-
 # Check that the compiler uses the library we specified...
 
 # look for LAM or other MPI implementation
 if (test -e $MPI_LIBS_PATH/libmpi.a || test -e $MPI_LIBS_PATH/libmpi.so) ; then
 	echo "note: using $MPI_LIBS_PATH/libmpi (.a/.so)"
 
-	MPI_IMPL="mpi"
 
 	# Ensure the comiler finds the library...
 	tmpLIBS=$LIBS
@@ -7934,7 +7934,6 @@ if test $ac_cv_lib_lam_lam_show_version = yes; then
 
                        LIBS="-llam $LIBS"
                        MPI_LIBS="-llam $MPI_LIBS"
-                       MPI_IMPL="lam"
 
 fi
 
@@ -8067,9 +8066,9 @@ if test $ac_cv_lib_mpi_MPI_Init = yes; then
 
 		       MPI_LIBS="-lmpi $MPI_LIBS"
 	               MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
+	               MPI_IMPL="mpi"
                        echo "$as_me:$LINENO: result: Found valid MPI installlaion..." >&5
 echo "${ECHO_T}Found valid MPI installlaion..." >&6
-
 
 else
   echo "$as_me:$LINENO: result: Could not link in the MPI library..." >&5
@@ -8088,8 +8087,6 @@ fi
 
 if (test -e $MPI_LIBS_PATH/libmpich.a || test -e $MPI_LIBS_PATH/libmpich.so) ; then
 	echo "note: using $MPI_LIBS_PATH/libmpich (.a/.so)"
-
-	MPI_IMPL="mpich"
 
 	# Ensure the comiler finds the library...
 	tmpLIBS=$LIBS
@@ -8251,6 +8248,7 @@ if test $ac_cv_lib_mpich_MPI_Init = yes; then
 
 		       MPI_LIBS="-lmpich $MPI_LIBS"
 		       MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
+	               MPI_IMPL="mpich"
                        echo "$as_me:$LINENO: result: Found valid MPICH installlaion..." >&5
 echo "${ECHO_T}Found valid MPICH installlaion..." >&6
 
@@ -8269,7 +8267,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 	LIBS=$tmpLIBS
 fi
 
-if (test "$MPI_IMPL" != none) ; then
+if (test "x$MPI_IMPL" != x) ; then
 
 	# Ensure the comiler finds the header file...
 	if test -e $MPI_INCLUDES_PATH/mpi.h; then
@@ -8441,7 +8439,6 @@ echo "${ECHO_T}Could not find MPI header <mpi.h>..." >&6
 else
 
 	# no MPI install found, see if the compiler supports it
-	MPI_IMPL="built-in"
 
       	cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
@@ -8472,6 +8469,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
 
+	                 MPI_IMPL="built-in"
                          echo "$as_me:$LINENO: result: $CXX Compiler Supports MPI " >&5
 echo "${ECHO_T}$CXX Compiler Supports MPI " >&6
 
@@ -8532,16 +8530,12 @@ fi
 MPI_LIBS_PATH="$MPI/lib"
 MPI_INCLUDES_PATH="$MPI/include"
 
-# no recognized MPI implementation
-MPI_IMPL="none"
-
 # Check that the compiler uses the library we specified...
 
 # look for LAM or other MPI implementation
 if (test -e $MPI_LIBS_PATH/libmpi.a || test -e $MPI_LIBS_PATH/libmpi.so) ; then
 	echo "note: using $MPI_LIBS_PATH/libmpi (.a/.so)"
 
-	MPI_IMPL="mpi"
 
 	# Ensure the comiler finds the library...
 	tmpLIBS=$LIBS
@@ -8617,7 +8611,6 @@ if test $ac_cv_lib_lam_lam_show_version = yes; then
 
                        LIBS="-llam $LIBS"
                        MPI_LIBS="-llam $MPI_LIBS"
-                       MPI_IMPL="lam"
 
 fi
 
@@ -8750,9 +8743,9 @@ if test $ac_cv_lib_mpi_MPI_Init = yes; then
 
 		       MPI_LIBS="-lmpi $MPI_LIBS"
 	               MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
+	               MPI_IMPL="mpi"
                        echo "$as_me:$LINENO: result: Found valid MPI installlaion..." >&5
 echo "${ECHO_T}Found valid MPI installlaion..." >&6
-
 
 else
   echo "$as_me:$LINENO: result: Could not link in the MPI library..." >&5
@@ -8771,8 +8764,6 @@ fi
 
 if (test -e $MPI_LIBS_PATH/libmpich.a || test -e $MPI_LIBS_PATH/libmpich.so) ; then
 	echo "note: using $MPI_LIBS_PATH/libmpich (.a/.so)"
-
-	MPI_IMPL="mpich"
 
 	# Ensure the comiler finds the library...
 	tmpLIBS=$LIBS
@@ -8934,6 +8925,7 @@ if test $ac_cv_lib_mpich_MPI_Init = yes; then
 
 		       MPI_LIBS="-lmpich $MPI_LIBS"
 		       MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
+	               MPI_IMPL="mpich"
                        echo "$as_me:$LINENO: result: Found valid MPICH installlaion..." >&5
 echo "${ECHO_T}Found valid MPICH installlaion..." >&6
 
@@ -8952,7 +8944,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 	LIBS=$tmpLIBS
 fi
 
-if (test "$MPI_IMPL" != none) ; then
+if (test "x$MPI_IMPL" != x) ; then
 
 	# Ensure the comiler finds the header file...
 	if test -e $MPI_INCLUDES_PATH/mpi.h; then
@@ -9124,7 +9116,6 @@ echo "${ECHO_T}Could not find MPI header <mpi.h>..." >&6
 else
 
 	# no MPI install found, see if the compiler supports it
-	MPI_IMPL="built-in"
 
       	cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
@@ -9155,6 +9146,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
 
+	                 MPI_IMPL="built-in"
                          echo "$as_me:$LINENO: result: $CXX Compiler Supports MPI " >&5
 echo "${ECHO_T}$CXX Compiler Supports MPI " >&6
 
@@ -10528,8 +10520,8 @@ s,@FLIBS@,$FLIBS,;t t
 s,@PETSC_ARCH@,$PETSC_ARCH,;t t
 s,@PETSC_DIR@,$PETSC_DIR,;t t
 s,@petscversion@,$petscversion,;t t
-s,@MPI@,$MPI,;t t
 s,@MPI_IMPL@,$MPI_IMPL,;t t
+s,@MPI@,$MPI,;t t
 s,@MPI_LIBS@,$MPI_LIBS,;t t
 s,@MPI_LIBS_PATH@,$MPI_LIBS_PATH,;t t
 s,@MPI_LIBS_PATHS@,$MPI_LIBS_PATHS,;t t
@@ -11618,8 +11610,8 @@ s,@FLIBS@,$FLIBS,;t t
 s,@PETSC_ARCH@,$PETSC_ARCH,;t t
 s,@PETSC_DIR@,$PETSC_DIR,;t t
 s,@petscversion@,$petscversion,;t t
-s,@MPI@,$MPI,;t t
 s,@MPI_IMPL@,$MPI_IMPL,;t t
+s,@MPI@,$MPI,;t t
 s,@MPI_LIBS@,$MPI_LIBS,;t t
 s,@MPI_LIBS_PATH@,$MPI_LIBS_PATH,;t t
 s,@MPI_LIBS_PATHS@,$MPI_LIBS_PATHS,;t t

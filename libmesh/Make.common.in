@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.30 2003-11-30 05:00:36 benkirk Exp $
+# $Id: Make.common.in,v 1.31 2003-11-30 07:04:17 benkirk Exp $
 
 
 ###############################################################################
@@ -51,6 +51,7 @@ PETSC_DIR            = @PETSC_DIR@
 
 # MPI configuration
 # (only explicitly defined when PETSc is absent, otherwise snooped from PETSc)
+MPI_IMPL    = @MPI_IMPL@
 MPI_INCLUDE = @MPI_INCLUDES_PATHS@
 MPI_LIB     = @MPI_LIBS_PATHS@ @MPI_LIBS@
 
