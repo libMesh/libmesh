@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.16 2003-02-24 14:35:53 benkirk Exp $
+# $Id: Make.common.in,v 1.17 2003-03-05 17:01:08 benkirk Exp $
 
 
 ###############################################################################
@@ -128,6 +128,7 @@ LASPACK_INCLUDE	     = @LASPACK_INCLUDE_PATH@
 # applications
 enable-petsc         = @enablepetsc@
 petsc-version        = @petscversion@
+PETSC_ARCH           = @PETSC_ARCH@
 PETSC_DIR            = @PETSC_DIR@
 
 # MPI message passing interface for parallel communication.

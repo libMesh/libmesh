@@ -1,4 +1,4 @@
-// $Id: fe_base.C,v 1.11 2003-03-04 15:31:21 benkirk Exp $
+// $Id: fe_base.C,v 1.12 2003-03-05 17:01:21 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -636,11 +636,11 @@ bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real e
     case PRISM18:
       {
 	// Figure this one out...
-	// inside the reference triange with zeta in [0,1]
-	if ((xi   >= 0.-eps) &&
-	    (eta  >= 0.-eps) &&
-	    (zeta >= 0.-eps) &&
-	    (zeta <= 1.+eps) &&
+	// inside the reference triange with zeta in [-1,1]
+	if ((xi   >=  0.-eps) &&
+	    (eta  >=  0.-eps) &&
+	    (zeta >= -1.-eps) &&
+	    (zeta <=  1.+eps) &&
 	    ((xi + eta) <= 1.+eps))
 	  return true;
 

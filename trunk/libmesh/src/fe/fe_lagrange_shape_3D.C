@@ -1,4 +1,4 @@
-// $Id: fe_lagrange_shape_3D.C,v 1.9 2003-02-26 01:08:14 benkirk Exp $
+// $Id: fe_lagrange_shape_3D.C,v 1.10 2003-03-05 17:01:21 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -109,7 +109,7 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
 	      // of a triangle and an edge
 	
 	      Point p2d(p(0),p(1));
-	      Point p1d(2.*p(2)-1.);
+	      Point p1d(p(2));
 	
 	      //                                0  1  2  3  4  5
 	      static const unsigned int i0[] = {0, 0, 0, 1, 1, 1};
@@ -330,7 +330,7 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
 	      // of a triangle and an edge
 	
 	      Point p2d(p(0),p(1));
-	      Point p1d(2.*p(2)-1.);
+	      Point p1d(p(2));
 	
 	      //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 
 	      static const unsigned int i0[] = {0, 0, 0, 1, 1, 1, 0, 0, 0, 2, 2, 2, 1, 1, 1, 2, 2, 2};
@@ -544,7 +544,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 	      // of a triangle and an edge
 	
 	      Point p2d(p(0),p(1));
-	      Point p1d(2.*p(2)-1.);
+	      Point p1d(p(2));
 	
 	      //                                0  1  2  3  4  5  
 	      static const unsigned int i0[] = {0, 0, 0, 1, 1, 1};
@@ -1165,7 +1165,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 	      // of a triangle and an edge
 	
 	      Point p2d(p(0),p(1));
-	      Point p1d(2.*p(2)-1.);
+	      Point p1d(p(2));
 	
 	      //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 
 	      static const unsigned int i0[] = {0, 0, 0, 1, 1, 1, 0, 0, 0, 2, 2, 2, 1, 1, 1, 2, 2, 2};

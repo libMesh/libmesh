@@ -5034,6 +5034,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
 
+
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_PETSC 1
 _ACEOF
@@ -5846,6 +5847,7 @@ s,@F77@,$F77,;t t
 s,@FFLAGS@,$FFLAGS,;t t
 s,@ac_ct_F77@,$ac_ct_F77,;t t
 s,@FLIBS@,$FLIBS,;t t
+s,@PETSC_ARCH@,$PETSC_ARCH,;t t
 s,@PETSC_DIR@,$PETSC_DIR,;t t
 s,@petscversion@,$petscversion,;t t
 s,@enablepetsc@,$enablepetsc,;t t
@@ -6860,6 +6862,7 @@ s,@F77@,$F77,;t t
 s,@FFLAGS@,$FFLAGS,;t t
 s,@ac_ct_F77@,$ac_ct_F77,;t t
 s,@FLIBS@,$FLIBS,;t t
+s,@PETSC_ARCH@,$PETSC_ARCH,;t t
 s,@PETSC_DIR@,$PETSC_DIR,;t t
 s,@petscversion@,$petscversion,;t t
 s,@enablepetsc@,$enablepetsc,;t t

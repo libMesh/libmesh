@@ -1,4 +1,4 @@
-// $Id: quadrature.C,v 1.12 2003-02-26 01:08:11 benkirk Exp $
+// $Id: quadrature.C,v 1.13 2003-03-05 17:01:21 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -187,14 +187,13 @@ void QBase::tensor_product_prism(QBase* q1D, QBase* q2D)
   _weights.resize (n_points1D * n_points2D);
 
   unsigned int qp=0;
-
+  
   for (unsigned int j=0; j<n_points1D; j++)
     for (unsigned int i=0; i<n_points2D; i++)
       {
 	_points[qp](0) = q2D->qp(i)(0);
 	_points[qp](1) = q2D->qp(i)(1);
-	// Note that zeta lies in [0,1]
-	_points[qp](2) = .5*(q1D->qp(j)(0) + 1.);
+	_points[qp](2) = q1D->qp(j)(0);
 
 	_weights[qp] = q2D->w(i) * q1D->w(j);
 
