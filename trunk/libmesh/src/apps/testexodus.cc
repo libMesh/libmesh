@@ -6,6 +6,7 @@
 
 // Local Includes
 #include "mesh_config.h"
+#include "mesh_init.h"
 #include "mesh.h"
 #include "quadrature_gauss.h"
 #include "quadrature_trap.h"
@@ -15,19 +16,17 @@
 #include "boundary_info.h"
 #include "elem.h"
 #include "point.h"
-
-#include "petsc_interface.h"
-#include "petsc_matrix.h"
-#include "petsc_vector.h"
-#include "dense_matrix.h"
-
 #include "system_data.h"
 #include "equation_systems.h"
-
 #include "perfmon.h"
 
-
-
+extern "C" {
+#ifdef HAVE_PETSC
+#include <petsc.h>
+#else
+//#include <mpi.h>
+#endif
+}
 
 void assemble_primary(EquationSystems& es,
 		      const std::string& system_name);
@@ -41,7 +40,7 @@ void assemble_secondary(EquationSystems& es,
 int main (int argc, char** argv)
 {
 
-  PetscInitialize (&argc, &argv, (char *)0, NULL);
+  libMesh::init (argc, argv);
 
   {
     if (argc < 4)
@@ -62,18 +61,16 @@ int main (int argc, char** argv)
     gmv_name   += ".gmv";
       
     int proc_id = 0;
-    int n_procs = 0;
+    int n_procs = 1;
     
-    MPI_Comm_rank (PETSC_COMM_WORLD, &proc_id);
-    MPI_Comm_size (PETSC_COMM_WORLD, &n_procs);
+    //MPI_Comm_rank (PETSC_COMM_WORLD, &proc_id);
+    //MPI_Comm_size (PETSC_COMM_WORLD, &n_procs);
 
     PerfMon perfmon("Code performance");
 
     // declare a mesh...
     Mesh mesh(dim, proc_id);
   
-    PetscInterface petsc_interface;
-
     // Read an Exodus mesh
     //
     // Then partition the domain and find all the neighbor
@@ -150,8 +147,8 @@ int main (int argc, char** argv)
 
       // clear the unneded matrix and
       // Petsc interface
-      es("primary").matrix.clear ();
-      es("primary").petsc_interface.clear ();
+      es("primary").matrix->clear ();
+      es("primary").linear_solver_interface->clear ();
     };
     
     // assemble & solve the secondary
@@ -176,7 +173,7 @@ int main (int argc, char** argv)
     es.write("out.xda", Xdr::WRITE);
   };
   
-  PetscFinalize();
+  libMesh::close();
 
   return 0;
 };
@@ -314,15 +311,15 @@ void assemble_primary(EquationSystems& es,
 	      }
 	}
 
-      es("primary").rhs.add_vector(Fu,
+      es("primary").rhs->add_vector(Fu,
 				   dof_indices_U);
-      es("primary").rhs.add_vector(Fv,
+      es("primary").rhs->add_vector(Fv,
 				   dof_indices_V);
 
-      es("primary").matrix.add_matrix(Kuu,
-				      dof_indices_U);
-      es("primary").matrix.add_matrix(Kvv,
-				      dof_indices_V);
+      es("primary").matrix->add_matrix(Kuu,
+				       dof_indices_U);
+      es("primary").matrix->add_matrix(Kvv,
+				       dof_indices_V);
     };
   
   std::cout << "Vol="  << vol << std::endl;
@@ -407,11 +404,11 @@ void assemble_secondary(EquationSystems& es,
 	      Kww(i,j) += JxW[gp]*(phi[i][gp])*(phi[j][gp]);
 	  };
 
-      es("secondary").matrix.add_matrix(Kww,
-				   dof_indices);
+      es("secondary").matrix->add_matrix(Kww,
+					 dof_indices);
       
-      es("secondary").rhs.add_vector(Fw,
-				     dof_indices);
+      es("secondary").rhs->add_vector(Fw,
+				      dof_indices);
       
     };
 };

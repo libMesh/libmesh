@@ -1,4 +1,4 @@
-// $Id: equation_systems_io.C,v 1.9 2003-02-10 22:03:25 benkirk Exp $
+// $Id: equation_systems_io.C,v 1.10 2003-02-11 14:20:25 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -46,15 +46,6 @@ void EquationSystems::read(const std::string& name,
 			   const bool read_header,
 			   const bool read_data)
 {
-#ifndef HAVE_PETSC
-
-  std::cerr << "ERROR:  this requires PETSc support!"
-	    << std::endl;
-
-  error();
-
-#else
-
   /**
    * This program implements the output of an 
    * EquationSystems object.  This warrants some 
@@ -285,8 +276,6 @@ void EquationSystems::read(const std::string& name,
 	    
 	*(system.solution) = reordered_soln;
       };
-
-#endif
 };
 
 
@@ -295,15 +284,6 @@ void EquationSystems::write(const std::string& name,
 			    const Xdr::XdrMODE mode,
 			    const bool write_data)
 {
-#ifndef HAVE_PETSC
-
-  std::cerr << "ERROR:  this requires PETSc support!"
-	    << std::endl;
-
-  error();
-
-#else
-
   /**
    * This program implements the output of an 
    * EquationSystems object.  This warrants some 
@@ -618,6 +598,4 @@ void EquationSystems::write(const std::string& name,
 	++pos;
 	++sys_num;
       };
-
-#endif
 };
