@@ -7,3 +7,8 @@ foo.cc
 ii_files
 so_locations
 TestHeader_*cc
+extract_data.cc
+libmesh_mesh.cc
+read_gz.cc
+smooth_test.cc
+tri_mesh.cc
