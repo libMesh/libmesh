@@ -1,4 +1,4 @@
-// $Id: fe_base.C,v 1.20 2004-01-03 15:37:42 benkirk Exp $
+// $Id: fe_base.C,v 1.21 2004-01-09 19:25:35 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -61,6 +61,14 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	      return ap;
 	    }
 	    
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+	  case SZABAB:
+	    {
+	      AutoPtr<FEBase> ap(new FE<1,SZABAB>(fet));
+	      return ap;
+	    }
+#endif
+
 	  default:
 	    std::cout << "ERROR: Bad FEType.family= " << fet.family << std::endl;
 	    error();
@@ -91,6 +99,14 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	      return ap;
 	    }
 	    
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+	  case SZABAB:
+	    {
+	      AutoPtr<FEBase> ap(new FE<2,SZABAB>(fet));
+	      return ap;
+	    }
+#endif
+
 	  default:
 	    std::cout << "ERROR: Bad FEType.family= " << fet.family << std::endl;
 	    error();
@@ -121,6 +137,14 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	      return ap;
 	    }
 	    
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+	  case SZABAB:
+	    {
+	      AutoPtr<FEBase> ap(new FE<3,SZABAB>(fet));
+	      return ap;
+	    }
+#endif
+
 	  default:
 	    std::cout << "ERROR: Bad FEType.family= " << fet.family << std::endl;
 	    error();

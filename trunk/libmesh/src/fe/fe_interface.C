@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.21 2004-01-03 15:37:42 benkirk Exp $
+// $Id: fe_interface.C,v 1.22 2004-01-09 19:25:35 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -73,6 +73,13 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<1,MONOMIAL>::n_shape_functions(t, o);
 
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case SZABAB:
+	    return FE<1,SZABAB>::n_shape_functions(t, o);
+
+#endif
+
 	  default:
 	    error();
 	  }
@@ -93,6 +100,13 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<2,MONOMIAL>::n_shape_functions(t, o);
 
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case SZABAB:
+	    return FE<2,SZABAB>::n_shape_functions(t, o);
+
+#endif
+
 	  default:
 	    error();
 	  }
@@ -112,6 +126,13 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 	    
 	  case MONOMIAL:
 	    return FE<3,MONOMIAL>::n_shape_functions(t, o);
+
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case SZABAB:
+	    return FE<3,SZABAB>::n_shape_functions(t, o);
+
+#endif
 
 	  default:
 	    error();
@@ -161,6 +182,13 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<1,MONOMIAL>::n_dofs(t, o);
 
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case SZABAB:
+	    return FE<1,SZABAB>::n_dofs(t, o);
+
+#endif
+
 	  default:
 	    error();
 	  }
@@ -181,6 +209,13 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<2,MONOMIAL>::n_dofs(t, o);
 
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case SZABAB:
+	    return FE<2,SZABAB>::n_dofs(t, o);
+
+#endif
+
 	  default:
 	    error();
 	  }
@@ -200,6 +235,13 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 	    
 	  case MONOMIAL:
 	    return FE<3,MONOMIAL>::n_dofs(t, o);
+
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case SZABAB:
+	    return FE<3,SZABAB>::n_dofs(t, o);
+
+#endif
 
 	  default:
 	    error();
@@ -249,6 +291,13 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<1,MONOMIAL>::n_dofs_at_node(t, o, n);
 
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case SZABAB:
+	    return FE<1,SZABAB>::n_dofs_at_node(t, o, n);
+
+#endif
+
 	  default:
 	    error();
 	  }
@@ -269,6 +318,13 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<2,MONOMIAL>::n_dofs_at_node(t, o, n);
 
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case SZABAB:
+	    return FE<2,SZABAB>::n_dofs_at_node(t, o, n);
+
+#endif
+
 	  default:
 	    error();
 	  }
@@ -288,6 +344,13 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 	    
 	  case MONOMIAL:
 	    return FE<3,MONOMIAL>::n_dofs_at_node(t, o, n);
+
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case SZABAB:
+	    return FE<3,SZABAB>::n_dofs_at_node(t, o, n);
+
+#endif
 
 	  default:
 	    error();
@@ -337,6 +400,13 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<1,MONOMIAL>::n_dofs_per_elem(t, o);
 
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case SZABAB:
+	    return FE<1,SZABAB>::n_dofs_per_elem(t, o);
+
+#endif
+
 	  default:
 	    error();
 	  }
@@ -357,6 +427,13 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<2,MONOMIAL>::n_dofs_per_elem(t, o);
 
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case SZABAB:
+	    return FE<2,SZABAB>::n_dofs_per_elem(t, o);
+
+#endif
+
 	  default:
 	    error();
 	  }
@@ -376,6 +453,13 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 	    
 	  case MONOMIAL:
 	    return FE<3,MONOMIAL>::n_dofs_per_elem(t, o);
+
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case SZABAB:
+	    return FE<3,SZABAB>::n_dofs_per_elem(t, o);
+
+#endif
 
 	  default:
 	    error();
@@ -437,6 +521,15 @@ void FEInterface::nodal_soln(const unsigned int dim,
 				       elem_soln, nodal_soln);
 	    return;
 
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case SZABAB:
+	    FE<1,SZABAB>::nodal_soln(elem, order,
+				     elem_soln, nodal_soln);
+	    return;
+
+#endif
+
 	  default:
 	    error();
 	  }
@@ -463,6 +556,15 @@ void FEInterface::nodal_soln(const unsigned int dim,
 				       elem_soln, nodal_soln);
 	    return;
 
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case SZABAB:
+	    FE<2,SZABAB>::nodal_soln(elem, order,
+				     elem_soln, nodal_soln);
+	    return;
+
+#endif
+
 	  default:
 	    error();
 	  }
@@ -488,6 +590,15 @@ void FEInterface::nodal_soln(const unsigned int dim,
 	    FE<3,MONOMIAL>::nodal_soln(elem, order,
 				       elem_soln, nodal_soln);
 	    return;
+
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case SZABAB:
+	    FE<3,SZABAB>::nodal_soln(elem, order,
+				     elem_soln, nodal_soln);
+	    return;
+
+#endif
 
 	  default:
 	    error();
@@ -533,6 +644,13 @@ Point FEInterface::inverse_map (const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<1,MONOMIAL>::inverse_map(elem, p, tolerance, secure);
 
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case SZABAB:
+	    return FE<1,SZABAB>::inverse_map(elem, p, tolerance, secure);
+
+#endif
+
 	  default:
 	    error();
 	  }
@@ -553,6 +671,13 @@ Point FEInterface::inverse_map (const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<2,MONOMIAL>::inverse_map(elem, p, tolerance, secure);
 
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case SZABAB:
+	    return FE<2,SZABAB>::inverse_map(elem, p, tolerance, secure);
+
+#endif
+
 	  default:
 	    error();
 	  }
@@ -572,6 +697,13 @@ Point FEInterface::inverse_map (const unsigned int dim,
 	    
 	  case MONOMIAL:
 	    return FE<3,MONOMIAL>::inverse_map(elem, p, tolerance, secure);
+
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case SZABAB:
+	    return FE<3,SZABAB>::inverse_map(elem, p, tolerance, secure);
+
+#endif
 
 	  default:
 	    error();
@@ -645,6 +777,14 @@ void FEInterface::inverse_map (const unsigned int dim,
 	    FE<1,MONOMIAL>::inverse_map(elem, physical_points, reference_points);
 	    return;
 	    
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case SZABAB:
+	    FE<1,SZABAB>::inverse_map(elem, physical_points, reference_points);
+	    return;
+
+#endif
+
 	  default:
 	    error();
 	  }
@@ -668,6 +808,14 @@ void FEInterface::inverse_map (const unsigned int dim,
 	    FE<2,MONOMIAL>::inverse_map(elem, physical_points, reference_points);
 	    return;
 	    
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case SZABAB:
+	    FE<2,SZABAB>::inverse_map(elem, physical_points, reference_points);
+	    return;
+
+#endif
+
 	  default:
 	    error();
 	  }
@@ -691,6 +839,13 @@ void FEInterface::inverse_map (const unsigned int dim,
 	    FE<3,MONOMIAL>::inverse_map(elem, physical_points, reference_points);
 	    return;
 	    
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case SZABAB:
+	    FE<3,SZABAB>::inverse_map(elem, physical_points, reference_points);
+	    return;
+
+#endif
 	  default:
 	    error();
 	  }
@@ -749,6 +904,13 @@ Real FEInterface::shape(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<1,MONOMIAL>::shape(t,o,i,p);
 
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case SZABAB:
+	    return FE<1,SZABAB>::shape(t,o,i,p);
+
+#endif
+
 	  default:
 	    error();
 	  }
@@ -769,6 +931,13 @@ Real FEInterface::shape(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<2,MONOMIAL>::shape(t,o,i,p);
 
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case SZABAB:
+	    return FE<2,SZABAB>::shape(t,o,i,p);
+
+#endif
+
 	  default:
 	    error();
 	  }
@@ -788,6 +957,13 @@ Real FEInterface::shape(const unsigned int dim,
 	    
 	  case MONOMIAL:
 	    return FE<3,MONOMIAL>::shape(t,o,i,p);
+
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case SZABAB:
+	    return FE<3,SZABAB>::shape(t,o,i,p);
+
+#endif
 
 	  default:
 	    error();
@@ -838,6 +1014,13 @@ Real FEInterface::shape(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<1,MONOMIAL>::shape(elem,o,i,p);
 
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case SZABAB:
+	    return FE<1,SZABAB>::shape(elem,o,i,p);
+
+#endif
+
 	  default:
 	    error();
 	  }
@@ -858,6 +1041,13 @@ Real FEInterface::shape(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<2,MONOMIAL>::shape(elem,o,i,p);
 
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case SZABAB:
+	    return FE<2,SZABAB>::shape(elem,o,i,p);
+
+#endif
+
 	  default:
 	    error();
 	  }
@@ -877,6 +1067,13 @@ Real FEInterface::shape(const unsigned int dim,
 	    
 	  case MONOMIAL:
 	    return FE<3,MONOMIAL>::shape(elem,o,i,p);
+
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case SZABAB:
+	    return FE<3,SZABAB>::shape(elem,o,i,p);
+
+#endif
 
 	  default:
 	    error();
