@@ -1,4 +1,4 @@
-// $Id: dense_vector_base.h,v 1.1 2003-03-07 04:44:38 jwpeterson Exp $
+// $Id: dense_vector_base.h,v 1.2 2003-03-07 05:07:55 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,6 @@
 
 // C++ includes
 #include <iomanip> // for std::setw
-#include <vector>
 
 // Local Includes
 #include "mesh_common.h"
