@@ -1,4 +1,4 @@
-// $Id: mesh_data.h,v 1.4 2003-05-20 09:28:44 ddreyer Exp $
+// $Id: mesh_data.h,v 1.5 2003-05-22 19:10:38 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -33,6 +33,7 @@
 #include "libmesh.h"
 #include "node.h"
 #include "elem.h"
+#include "enum_xdr_mode.h"
 
 
 
@@ -228,20 +229,20 @@ protected:
    * Read nodal/element oriented data using the
    * \p Xdr class that enables both ASCII and
    * binary format through the same interface.  
-   * If \p ascii is true, an ASCII formatted file,
-   * otherwise a binary XDR file is written.
+   * By default uses ASCII format, but may easily
+   * be changed setting \p mode to \p DECODE.
    */
   void read_xdr (const std::string& name,
-		 const bool ascii);
+		 const XdrMODE mode = READ);
 
   /**
    * Write nodal data in format comparable to
    * the XDR format already known from \p Mesh.
-   * If \p ascii is true, an ASCII formatted file,
-   * otherwise a binary XDR file is written.
+   * By default uses ASCII format, but may easily
+   * be changed setting \p mode to \p ENCODE.
    */
   void write_xdr (const std::string& name,
-		  const bool ascii);
+		  const XdrMODE mode = WRITE);
 
 
   /**
