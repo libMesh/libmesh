@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.18 2003-02-28 23:37:41 benkirk Exp $
+// $Id: dof_map.h,v 1.19 2003-03-03 02:15:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,19 +23,20 @@
 #define __dof_map_h__
 
 // C++ Includes   -----------------------------------
+#include <vector>
 #include <map>
 
 // Local Includes -----------------------------------
 #include "mesh_common.h"
 #include "enum_order.h"
 #include "fe_type.h"
-#include "dense_matrix.h"
-#include "dense_vector.h"
 #include "coupling_matrix.h"
 
 // Forward Declarations
 class Elem;
 class MeshBase;
+template <typename T> class DenseVector;
+template <typename T> class DenseMatrix;
 template <typename T> class SparseMatrix;
 
 

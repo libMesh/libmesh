@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.14 2003-03-02 17:36:35 jwpeterson Exp $
+// $Id: elem.C,v 1.15 2003-03-03 02:15:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,7 +26,7 @@
 
 // Local includes
 #include "elem.h"
-#include "mesh.h"
+#include "mesh_base.h"
 #include "fe_type.h"
 #include "fe_interface.h"
 #include "edge_edge2.h"
@@ -462,7 +462,7 @@ void Elem::nullify_neighbors ()
  */ 
 #ifdef ENABLE_AMR
 
-void Elem::refine (Mesh& mesh)
+void Elem::refine (MeshBase& mesh)
 {
   assert (this->refinement_flag() == Elem::REFINE);
   assert (this->active());
@@ -475,7 +475,7 @@ void Elem::refine (Mesh& mesh)
     for (unsigned int c=0; c<this->n_children(); c++)
       {
 	_children[c] = Elem::build(this->type(), this);
-	_children[c]->set_refinement_flag() = Elem::JUST_REFINED;
+	_children[c]->set_refinement_flag(Elem::JUST_REFINED);
       }
   }
 
@@ -522,7 +522,7 @@ void Elem::refine (Mesh& mesh)
 
   
   // Un-set my refinement flag now
-  this->set_refinement_flag() = Elem::DO_NOTHING;
+  this->set_refinement_flag(Elem::DO_NOTHING);
 }
 
 
@@ -537,7 +537,7 @@ void Elem::coarsen()
 
   _children = NULL;
 
-  this->set_refinement_flag() = Elem::DO_NOTHING;
+  this->set_refinement_flag(Elem::DO_NOTHING);
 }
 
 #endif // #ifdef ENABLE_AMR

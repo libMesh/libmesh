@@ -1,4 +1,4 @@
-// $Id: predicated_iterator.h,v 1.6 2003-02-24 14:35:49 benkirk Exp $
+// $Id: predicated_iterator.h,v 1.7 2003-03-03 02:15:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -140,14 +140,12 @@ public:
    * what is currently being iterated to.
    */
   value_type* operator-> () { return _current.operator->(); }
-  //value_type* operator-> () { return &(this->operator*()); } // Deal II
   
   /**
    * A const dereferencing operator.  Returns a const pointer
    * to what is currently being iterated to.
    */
   //const value_type* operator-> () const { return _current.operator->(); }
-  //const value_type* operator-> () const { return &(this->operator*()); } // Deal II
   
   
   

@@ -1,4 +1,4 @@
-// $Id: mesh_communication.h,v 1.1 2003-02-28 23:37:43 benkirk Exp $
+// $Id: mesh_communication.h,v 1.2 2003-03-03 02:15:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,7 +31,9 @@
 
 
 // Forward declarations
-class Mesh;
+class MeshBase;
+
+
 
 
 /**
@@ -52,7 +54,7 @@ public:
   /**
    * Constructor.
    */
-  MeshCommunication (Mesh& mesh);
+  MeshCommunication (MeshBase& mesh);
 
   /**
    * Destructor.
@@ -68,8 +70,9 @@ public:
    * Finds all the processors that may contain
    * elements that neighbor my elements.  This list
    * is guaranteed to include all processors that border
-   * any my elements, but may include additional ones as
-   * well.
+   * any of my elements, but may include additional ones as
+   * well.  This method computes bounding boxes for the
+   * elements on each processor and checks for overlaps.
    */
   void find_neighboring_processors() {}
 
@@ -80,7 +83,7 @@ private:
   /**
    * Reference to the mesh.
    */
-  Mesh& _mesh;
+  MeshBase& _mesh;
 };
 
 
@@ -88,7 +91,7 @@ private:
 //--------------------------------------------------------------
 // MeshCommunication inline members
 inline
-MeshCommunication::MeshCommunication (Mesh& mesh) :
+MeshCommunication::MeshCommunication (MeshBase& mesh) :
   _mesh (mesh)
 {
 }

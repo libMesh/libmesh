@@ -1,4 +1,4 @@
-// $Id: mesh.h,v 1.11 2003-02-28 23:37:43 benkirk Exp $
+// $Id: mesh.h,v 1.12 2003-03-03 02:15:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -29,9 +29,7 @@
 
 // Local Includes -----------------------------------
 #include "mesh_base.h"
-#include "mesh_communication.h"
-#include "mesh_refinement.h"
-#include "boundary_info.h"
+#include "boundary_mesh.h"
 
 
 /**
@@ -58,28 +56,11 @@ class Mesh : public MeshBase
    * Destructor.
    */
   ~Mesh();
-  
-#ifdef ENABLE_AMR
-
+    
   /**
-   * Class that handles adaptive mesh refinement implementation.
-   */  
-  MeshRefinement mesh_refinement;
-  
-#endif
-  
-  /**
-   * This class enables parallelization of the mesh.  All
-   * required inter-processor communication is done via this class.
+   * A mesh describing just the boundary.
    */
-  MeshCommunication mesh_communication;
-  
-  /**
-   * This class holds the boundary information.  It can store nodes, edges,
-   * and faces with a corresponding id that facilitates setting boundary
-   * conditions.
-   */
-  BoundaryInfo boundary_info;
+  BoundaryMesh boundary_mesh;
 
   /**
    * Builds a \f$ nx \times ny \times nz \f$ (elements) cube.
@@ -240,33 +221,6 @@ class Mesh : public MeshBase
 
   
  private:
-
-  
-#ifdef ENABLE_AMR
-
-  /**
-   * After coarsening a mesh it is possible that
-   * there are some voids in the \p nodes and
-   * \p elements vectors that need to be cleaned
-   * up.  This functions does that.  The indices
-   * of the entities to be removed are contained
-   * in the two input sets.
-   */
-  void trim_unused_elements(std::set<unsigned int>& unused_elements);
-
-  /**
-   * The \p MeshRefinement functions need to be able to
-   * call trim_unused_elements()
-   */
-  friend class MeshRefinement;
-
-  /**
-   * The \p MeshCommunication class needs to be a friend.
-   */
-  friend class MeshCommunication;
-  
-#endif
-  
 };
 
 

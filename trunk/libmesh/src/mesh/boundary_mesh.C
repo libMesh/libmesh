@@ -1,4 +1,4 @@
-// $Id: boundary_mesh.C,v 1.6 2003-02-26 01:08:13 benkirk Exp $
+// $Id: boundary_mesh.C,v 1.7 2003-03-03 02:15:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -62,14 +62,6 @@ void BoundaryMesh::clear()
   // Don't delete the nodes here... They are simply pointers
   // to the nodes in \p MeshBase that will be deleted by another
   // class.
-//   // clear the nodes data structure
-//   {
-//     for (unsigned int n=0; n<n_nodes(); n++)
-//       if (node_ptr(n) != NULL)
-// 	delete node_ptr(n);
-    
-//     _nodes.clear();
-//   }  
   _nodes.clear();
 }
 

@@ -1,4 +1,4 @@
-// $Id: ex3.C,v 1.17 2003-02-28 23:37:30 benkirk Exp $
+// $Id: ex3.C,v 1.18 2003-03-03 02:15:54 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -44,6 +44,13 @@
  * Define Gauss quadrature rules.
  */
 #include "quadrature_gauss.h"
+
+/**
+ * Define useful datatypes for finite element
+ * matrix and vector components.
+ */
+#include "dense_matrix.h"
+#include "dense_vector.h"
 
 /**
  * Define the DofMap, which handles degree of freedom
@@ -124,11 +131,11 @@ int main (int argc, char** argv)
     /**
      * Use the internal mesh generator to create a uniform
      * grid on the square [-1,1]^2.  We instruct the mesh generator
-     * to build a mesh of 8x8 \p Quad9 elements.  Building \p Quad9
+     * to build a mesh of 15x15 \p Quad9 elements.  Building \p Quad9
      * elements instead of the default \p Quad4's we used in example 2
      * allow us to use higher-order approximation.
      */
-    mesh.build_square (8, 8,
+    mesh.build_square (15, 15,
 		       -1., 1.,
 		       -1., 1.,
 		       QUAD9);

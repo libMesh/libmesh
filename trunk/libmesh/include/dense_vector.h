@@ -1,4 +1,4 @@
-// $Id: dense_vector.h,v 1.1 2003-02-28 23:37:41 benkirk Exp $
+// $Id: dense_vector.h,v 1.2 2003-03-03 02:15:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -60,6 +60,11 @@ public:
    * Copy-constructor.
    */
   DenseVector (const DenseVector<T>& other_vector);
+
+  /**
+   * Copy-constructor, from a \p std::vector.
+   */
+  DenseVector (const std::vector<T>& other_vector);
   
   /**
    * Destructor.  Frees all associated memory.
@@ -122,7 +127,7 @@ public:
   unsigned int size() const { return _val.size(); }
 
   /**
-   * Access to the values array.  This should be used with
+   * Access to the values array. This should be used with
    * caution but can  be used to speed up code compilation
    * significantly.
    */
@@ -163,8 +168,17 @@ DenseVector<T>::DenseVector(const unsigned int n) :
 
 template<typename T>
 inline
-DenseVector<T>::DenseVector (const DenseVector& other_vector) :
+DenseVector<T>::DenseVector (const DenseVector<T>& other_vector) :
   _val(other_vector._val)
+{  
+}
+
+
+
+template<typename T>
+inline
+DenseVector<T>::DenseVector (const std::vector<T>& other_vector) :
+  _val(other_vector)
 {  
 }
 

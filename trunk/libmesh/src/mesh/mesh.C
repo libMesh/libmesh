@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.10 2003-02-28 23:37:48 benkirk Exp $
+// $Id: mesh.C,v 1.11 2003-03-03 02:15:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -42,11 +42,7 @@ namespace sfc {
 Mesh::Mesh (unsigned int d,
 	    unsigned int pid) :
   MeshBase           (d, pid),
-#ifdef ENABLE_AMR
-  mesh_refinement    (*this),
-#endif
-  mesh_communication (*this),
-  boundary_info      (d,*this)
+  boundary_mesh      (d-1, pid)
 {
   assert (libMesh::initialized());
 }
@@ -64,15 +60,8 @@ Mesh::~Mesh ()
 
 void Mesh::clear ()
 {
-#ifdef ENABLE_AMR
-  
-  mesh_refinement.clear();
-  
-#endif
-
-  mesh_communication.clear();
-  
-  boundary_info.clear();
+  // Clear other data structures
+  boundary_mesh.clear();
 
   MeshBase::clear();
 }
@@ -229,59 +218,3 @@ void Mesh::write (const std::string& name,
 
   libMesh::log.stop_event("write()");
 }
-
-
-
-#ifdef ENABLE_AMR
-
-void Mesh::trim_unused_elements (std::set<unsigned int>& unused_elements)
-{
-  /**
-   * Anything we clear in this routiune
-   * will invalidate the unknowing boundary
-   * mesh, so we need to clear it.  It must
-   * be recreated before reuse.  
-   */
-  boundary_info.boundary_mesh.clear();
-  
-  
-  /**
-   * Trim the unused elements
-   */
-  {
-    // We don't Really need this in the
-    // current implementation
-    unused_elements.clear();
-
-    // for the time being we make a copy
-    // of the elements vector since the pointers
-    // are relatively small.  Note that this is
-    // not _necessary_, but it should be
-    // less expensive than repeated calls
-    // to std::vector<>::erase()    
-    std::vector<Elem*> new_elements;
-    
-    new_elements.resize(n_elem());
-
-    unsigned int ne=0;
-    
-    for (unsigned int e=0; e<n_elem(); e++)
-      if (elem(e) != NULL)
-	new_elements[ne++] = elem(e); 
-
-    new_elements.resize(ne);
-    
-    _elements = new_elements;
-
-#ifdef DEBUG
-
-    for (unsigned int e=0; e<n_elem(); e++)
-      assert (elem(e) != NULL);
-    
-#endif
-    
-  }
-}
-
-
-#endif

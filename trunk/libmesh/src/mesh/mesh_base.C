@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.18 2003-02-28 23:37:48 benkirk Exp $
+// $Id: mesh_base.C,v 1.19 2003-03-03 02:15:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -55,11 +55,16 @@ namespace sfc {
 // MeshBase class member functions
 MeshBase::MeshBase (unsigned int d,
 		    unsigned int pid) :
-  _n_sbd(1),
-  _n_proc(1),
-  _dim(d),
-  _proc_id(pid),
-  _is_prepared(false)
+#ifdef ENABLE_AMR
+  mesh_refinement    (*this),
+#endif
+  boundary_info      (d,   *this),
+  mesh_communication (*this),
+  _n_sbd             (1),
+  _n_proc            (1),
+  _dim               (d),
+  _proc_id           (pid),
+  _is_prepared       (false)
 {
   assert (DIM <= 3);
   assert (DIM >= _dim);
@@ -69,15 +74,20 @@ MeshBase::MeshBase (unsigned int d,
 
 
 MeshBase::MeshBase (const MeshBase& other_mesh) :
-  _n_sbd       (other_mesh._n_sbd),
-  _n_proc      (other_mesh._n_proc),
-  _dim         (other_mesh._dim),
-  _proc_id     (other_mesh._proc_id),
-  _is_prepared (other_mesh._is_prepared)
+#ifdef ENABLE_AMR
+  mesh_refinement    (*this),
+#endif
+  boundary_info      (other_mesh._dim, *this),
+  mesh_communication (*this),
+  _nodes             (other_mesh._nodes),
+  _elements          (other_mesh._elements),
+  _n_sbd             (other_mesh._n_sbd),
+  _n_proc            (other_mesh._n_proc),
+  _dim               (other_mesh._dim),
+  _proc_id           (other_mesh._proc_id),
+  _is_prepared       (other_mesh._is_prepared)
 
 {
-  _nodes = other_mesh._nodes;
-  _elements = other_mesh._elements; 
 }
 
 
@@ -162,6 +172,18 @@ unsigned int MeshBase::n_active_elem () const
 
 void MeshBase::clear ()
 {
+  // Clear other data structures
+#ifdef ENABLE_AMR
+  
+  mesh_refinement.clear();
+  
+#endif
+
+  boundary_info.clear();
+
+  mesh_communication.clear();
+
+  
   // Reset the number of subdomains and the
   // number of processors
   _n_sbd  = 1;
@@ -801,7 +823,7 @@ void MeshBase::all_tri ()
   assert (mesh_dimension() == 2);
 	  
   std::vector<Elem*> new_elements;
-  new_elements.reserve (2*n_elem());
+  new_elements.reserve (2*n_active_elem());
 
   active_elem_iterator el (this->elements_begin());
   active_elem_iterator end(this->elements_end());
@@ -949,7 +971,7 @@ void MeshBase::all_tri ()
   
   _elements = new_elements;
 
-  find_neighbors();
+  this->prepare_for_use();
 }
 
 
@@ -1067,23 +1089,26 @@ void MeshBase::renumber_nodes_and_elements ()
 {
   libMesh::log.start_event("renumber_nodes_and_elements()");
 
+  std::vector<Elem*> new_elem;
+  std::vector<Node*> new_nodes;
+
+  // Reserve space in the new containers.
+  new_elem.reserve  (_elements.size());
+  new_nodes.reserve (_nodes.size());
+  
   // Begin by setting all node and element ids
   // to an invalid value.
   {
-    elem_iterator       el    (this->elements_begin());
-    const elem_iterator end_el(this->elements_end());
+    for (unsigned int e=0; e<_elements.size(); e++)
+      if (_elements[e] != NULL)
+	_elements[e]->invalidate_id();
 
-    for (; el != end_el; ++el)
-      (*el)->invalidate_id();
-    
-    node_iterator       nd    (this->nodes_begin());
-    const node_iterator end_nd(this->nodes_end());
-
-    for (; nd != end_nd; ++nd)
-      {
-	(*nd)->invalidate_id();
-	(*nd)->invalidate_processor_id();
-      }
+    for (unsigned int n=0; n<_nodes.size(); n++)
+      if (_nodes[n] != NULL)	
+	{
+	  _nodes[n]->invalidate_id();
+	  _nodes[n]->invalidate_processor_id();
+	}
   }
 
 
@@ -1095,20 +1120,19 @@ void MeshBase::renumber_nodes_and_elements ()
     for (unsigned int proc_id=0;
 	 proc_id<this->n_processors(); proc_id++)
       {
-
 	// Loop over the elements on the processor proc_id
 	pid_elem_iterator       el    (this->elements_begin(), proc_id);
 	const pid_elem_iterator end_el(this->elements_end(),   proc_id);
-
+	
 	for (; el != end_el; ++el)
 	  {
-	    // restate the obvious...
-	    assert ((*el)->processor_id() == proc_id);
-	    
 	    // this element should _not_ have been numbered already
 	    assert ((*el)->id() == Elem::invalid_id);
 	    
 	    (*el)->set_id(next_free_elem++);
+
+	    // Add the element to the new list
+	    new_elem.push_back(*el);
 
 	    // Number the nodes on the element that
 	    // have not been numbered already.
@@ -1117,6 +1141,9 @@ void MeshBase::renumber_nodes_and_elements ()
 		{
 		  (*el)->get_node(n)->set_id(next_free_node++);
 
+		  // Add the node to the new list
+		  new_nodes.push_back((*el)->get_node(n));
+		  
 		  // How could this fail?  Only if something is WRONG!
 		  assert ((*el)->get_node(n)->processor_id() ==
 			  Node::invalid_processor_id);
@@ -1125,42 +1152,24 @@ void MeshBase::renumber_nodes_and_elements ()
 		}
 	  }
       }
+
+    assert (new_elem.size()  == next_free_elem);
+    assert (new_nodes.size() == next_free_node);
   }
 
 
+  // Delete the inactive nodes
+  for (unsigned int n=0; n<_nodes.size(); n++)
+    if (_nodes[n] != NULL)
+      if (!_nodes[n]->active())
+	{
+	  delete _nodes[n];
+	  _nodes[n] = NULL;
+	}
+    
   // Finally, reassign the _nodes and _elem vectors
-  {
-    std::vector<Elem*> new_elem  (_elements.size(), NULL);
-    std::vector<Node*> new_nodes (_nodes.size(),    NULL);
-
-    elem_iterator       el    (this->elements_begin());
-    const elem_iterator end_el(this->elements_end());
-
-    for (; el != end_el; ++el)
-      {
-	assert ((*el)->id() < new_elem.size());
-	assert (new_elem[(*el)->id()] == NULL);
-
-	new_elem[(*el)->id()] = *el;
-      }
-
-    node_iterator       nd    (this->nodes_begin());
-    const node_iterator end_nd(this->nodes_end());
-
-    for (; nd != end_nd; ++nd)
-      {
-	assert ((*nd)->id() < new_nodes.size());
-	assert (new_nodes[(*nd)->id()] == NULL);
-
-	new_nodes[(*nd)->id()] = *nd;
-      }
-
-    // Overwrite the nodes and elements containers with the
-    // new, renumbered and sorted values.
-    _elements = new_elem;
-    _nodes    = new_nodes;
-  }
-
+  _elements = new_elem;
+  _nodes    = new_nodes;
   
   libMesh::log.stop_event("renumber_nodes_and_elements()");
 }
@@ -1784,6 +1793,7 @@ const char* MeshBase::complex_filename(const std::string& _n,
 }
 
 
+
 void MeshBase::prepare_complex_data(const std::vector<Number>* source,
 				    std::vector<Real>* real_part,
 				    std::vector<Real>* imag_part) const
@@ -1799,8 +1809,66 @@ void MeshBase::prepare_complex_data(const std::vector<Number>* source,
     }
 }
 
+#endif // #ifdef USE_COMPLEX_NUMBERS
 
+
+
+#ifdef ENABLE_AMR
+
+void MeshBase::trim_unused_elements (std::set<unsigned int>& unused_elements)
+{
+  /**
+   * Anything we clear in this routiune
+   * will invalidate the unknowing boundary
+   * mesh, so we need to clear it.  It must
+   * be recreated before reuse.  
+   */
+  //boundary_info.boundary_mesh.clear();
+  
+  
+  /**
+   * Trim the unused elements
+   */
+  {
+    // We don't Really need this in the
+    // current implementation
+    unused_elements.clear();
+
+    // for the time being we make a copy
+    // of the elements vector since the pointers
+    // are relatively small.  Note that this is
+    // not _necessary_, but it should be
+    // less expensive than repeated calls
+    // to std::vector<>::erase()    
+    std::vector<Elem*> new_elements;
+    
+    new_elements.resize(n_elem());
+
+    unsigned int ne=0;
+    
+    for (unsigned int e=0; e<n_elem(); e++)
+      if (elem(e) != NULL)
+	new_elements[ne++] = elem(e); 
+
+    new_elements.resize(ne);
+    
+    _elements = new_elements;
+
+    /**
+     * Explicitly check that it worked
+     * in DEBUG mode.
+     */
+#ifdef DEBUG
+
+    for (unsigned int e=0; e<n_elem(); e++)
+      assert (_elements[e] != NULL);
+    
 #endif
+    
+  }
+}
+
+#endif // #ifdef ENABLE_AMR
 
 
 

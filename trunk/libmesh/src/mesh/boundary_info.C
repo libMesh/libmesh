@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.15 2003-02-28 23:37:47 benkirk Exp $
+// $Id: boundary_info.C,v 1.16 2003-03-03 02:15:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,7 +26,9 @@
 // Local includes
 #include "mesh_config.h"
 #include "boundary_info.h"
-#include "mesh.h"
+#include "mesh_base.h"
+#include "boundary_mesh.h"
+
 
 
 //------------------------------------------------------
@@ -37,8 +39,7 @@ const short int BoundaryInfo::invalid_id = -1234;
 //------------------------------------------------------
 // BoundaryInfo functions
 BoundaryInfo::BoundaryInfo(unsigned int d,
-			   const Mesh& m) :
-  boundary_mesh(d-1, m.processor_id()),
+			   const MeshBase& m) :
   dim(d),
   mesh(m)
 {
@@ -65,13 +66,11 @@ void BoundaryInfo::clear()
   side_list.clear();
   node_id_list.clear();
   elem_id_list.clear();
-
-  boundary_mesh.clear();
 }
 
 
 
-void BoundaryInfo::sync()
+void BoundaryInfo::sync(BoundaryMesh& boundary_mesh)
 {
   boundary_mesh.clear();
 
