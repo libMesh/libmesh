@@ -1,4 +1,4 @@
-// $Id: perf_log.C,v 1.10 2003-02-14 15:22:51 benkirk Exp $
+// $Id: perf_log.C,v 1.11 2003-02-26 13:59:52 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -114,16 +114,23 @@ std::string PerfLog::get_info_header() const
       // Get user information
       struct passwd* p = getpwuid(getuid());
       out << std::endl
-	  << " ----------------------------------------------------------------------------" << std::endl
+	  << " ----------------------------------------------------------------------------" << std::endl;
+      
+      if (libMeshBase::n_processors() > 1)
+	{
+      out << "| Processor id:   " << libMeshBase::processor_id() << std::endl
+	  << "| Num Processors: " << libMeshBase::n_processors() << std::endl;
+	}
+      
 #ifdef HAVE_LOCALE
-	  << "| Time:           " << dateStr.str()    << std::endl
+      out << "| Time:           " << dateStr.str()               << std::endl;
 #endif
-	  << "| OS:             " << sysInfo.sysname  << std::endl
-	  << "| HostName:       " << sysInfo.nodename << std::endl
-	  << "| OS Release      " << sysInfo.release  << std::endl
-	  << "| OS Version:     " << sysInfo.version  << std::endl
-	  << "| Machine:        " << sysInfo.machine  << std::endl
-	  << "| Username:       " << p->pw_name       << std::endl 
+      out << "| OS:             " << sysInfo.sysname             << std::endl
+	  << "| HostName:       " << sysInfo.nodename            << std::endl
+	  << "| OS Release      " << sysInfo.release             << std::endl
+	  << "| OS Version:     " << sysInfo.version             << std::endl
+	  << "| Machine:        " << sysInfo.machine             << std::endl
+	  << "| Username:       " << p->pw_name                  << std::endl 
 	  << " ----------------------------------------------------------------------------" << std::endl;
     }
 

@@ -1,4 +1,4 @@
-// $Id: petsc_interface.C,v 1.10 2003-02-20 23:18:16 benkirk Exp $
+// $Id: petsc_interface.C,v 1.11 2003-02-26 13:59:52 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -43,8 +43,13 @@ void PetscInterface<T>::clear ()
 
       ierr = SLESDestroy(_sles); CHKERRQ(ierr);
 
+      // Mimic PETSc default solver and preconditioner
       _solver_type         = GMRES;
-      _preconditioner_type = ILU_PRECOND;
+
+      if (libMeshBase::n_processors() == 1)
+	_preconditioner_type = ILU_PRECOND;
+      else
+	_preconditioner_type = BLOCK_JACOBI_PRECOND;
     }
 }
 

@@ -1,4 +1,4 @@
-// $Id: elem_iterators.h,v 1.7 2003-02-25 16:26:46 ddreyer Exp $
+// $Id: elem_iterators.h,v 1.8 2003-02-26 13:59:52 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -689,6 +689,57 @@ typedef basic_active_pid_elem_iterator<std::vector<Elem*>::iterator> active_pid_
  * that have a specific processor id in const functions.
  */
 typedef basic_active_pid_elem_iterator<std::vector<Elem*>::const_iterator> const_active_pid_elem_iterator;
+
+
+
+/**
+ * The basic_local_elem_iterator is a templated unspecialized
+ * iterator which can be used to iterate only over elements
+ * on the local processor.  The typedefs local_elem_iterator
+ * and const_local_elem_iterator should be used to instantiate
+ * actual iterators.
+ */
+template <class T>
+class basic_local_elem_iterator : public basic_pid_elem_iterator<T>
+{
+public:
+  /**
+   * Constructor.
+   */
+  basic_local_elem_iterator(const std::pair<T,T>& p)
+    : basic_pid_elem_iterator<T>(p, libMeshBase::processor_id(), false)
+  {
+    this->advance();
+  }
+
+protected:
+  
+  /**
+   * Definition of the predicate
+   */
+  virtual bool predicate() const
+  {
+    return basic_pid_elem_iterator<T>::predicate();
+  }
+};
+
+
+/**
+ * Specialization of the basic_local_elem_iterator for
+ * \p std::vector<Elem*>::iterator.  This is what users
+ * create when they want to iterate over all elements
+ * on the local processor in non-const functions.
+ */
+typedef basic_local_elem_iterator<std::vector<Elem*>::iterator> local_elem_iterator;
+
+
+/**
+ * Specialization of the basic_local_elem_iterator for
+ * \p std::vector<Elem*>::const_iterator.  This is what users
+ * create when they want to iterate over all elements
+ * on the local processor in const functions.
+ */
+typedef basic_local_elem_iterator<std::vector<Elem*>::const_iterator> const_local_elem_iterator;
 
 
 

@@ -1,4 +1,4 @@
-// $Id: petsc_interface.h,v 1.11 2003-02-20 23:18:07 benkirk Exp $
+// $Id: petsc_interface.h,v 1.12 2003-02-26 13:59:52 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -129,6 +129,10 @@ template <typename T>
 inline
 PetscInterface<T>::PetscInterface ()
 {
+  if (libMeshBase::n_processors() == 1)
+    _preconditioner_type = ILU_PRECOND;
+  else
+    _preconditioner_type = BLOCK_JACOBI_PRECOND;
 }
 
 
