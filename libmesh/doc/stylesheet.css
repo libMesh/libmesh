@@ -1,0 +1,121 @@
+a {
+    text-decoration: none;
+}
+a.qindex {}
+a.qindexRef {}
+a.el {
+    text-decoration: none;
+    font-weight: bold
+}
+a.elRef {
+    font-weight: bold
+}
+a.code {
+    text-decoration: none;
+    font-weight: normal;
+    color: #4444ee
+}
+a.codeRef {
+    font-weight: normal;
+    color: #4444ee
+}
+a:hover {
+    text-decoration: none;
+    background-color: #f2f2ff
+}
+
+
+
+
+hq {
+    text-align: center;
+}
+
+caption {
+    font-weight: bold
+}
+
+dl.el {
+    margin-left: -1cm
+}
+
+
+
+
+div.fragment {
+    width: 100%;
+    border: none;
+    background-color: #eeeeee
+}
+div.ah {
+    background-color: black;
+    font-weight: bold;
+    color: "grey";
+    margin-bottom: 3px;
+    margin-top: 3px
+}
+div.groupHeader {
+    margin-left: 16px;
+    margin-top: 12px;
+    margin-bottom: 6px;
+    font-weight: bold
+}
+div.groupText {
+    margin-left: 16px;
+    font-style: italic;
+    font-size: smaller
+}
+
+
+
+
+
+
+td.md {
+    background-color: #f2f2ff;
+    font-weight: bold;
+}
+td.mdname1 {
+    background-color: #f2f2ff;
+    font-weight: bold;
+    color: #602020;
+}
+td.mdname {
+    background-color: #f2f2ff;
+    font-weight: bold;
+    color: #602020;
+    width: 600px;
+}
+td.indexkey { 
+   background-color: #eeeeff; 
+   font-weight: bold; 
+   padding-right  : 10px; 
+   padding-top    : 2px; 
+   padding-left   : 10px; 
+   padding-bottom : 2px; 
+   margin-left    : 0px; 
+   margin-right   : 0px; 
+   margin-top     : 2px; 
+   margin-bottom  : 2px  
+}
+td.indexvalue { 
+   background-color: #eeeeff; 
+   font-style: italic; 
+   padding-right  : 10px; 
+   padding-top    : 2px; 
+   padding-left   : 10px; 
+   padding-bottom : 2px; 
+   margin-left    : 0px; 
+   margin-right   : 0px; 
+   margin-top     : 2px; 
+   margin-bottom  : 2px  
+}
+
+
+font.keyword       { color: #008000 }
+font.keywordtype   { color: #604020 }
+font.keywordflow   { color: #e08000 }
+font.comment       { color: #800000 }
+font.preprocessor  { color: #806020 }
+font.stringliteral { color: #002080 }
+font.charliteral   { color: #008080 }
