@@ -1,7 +1,7 @@
 //---------------------------------------------------
 // Main page documentation
 /**
-  \mainpage libMesh Documentation
+  \mainpage libMesh - A C++ Finite Element Library
  
   \section intro Introduction
 
