@@ -1,4 +1,9 @@
 #!@PERL@
+#
+# $Id: xda2mgf.in,v 1.2 2004-09-30 14:26:22 benkirk Exp $
+# Perl script to convert libMesh XDA meshes to MGF-format
+# Author: Bill Barth, 2004
+
 
 use strict;
 my $cnt=0;
@@ -36,4 +41,7 @@ while(<>)
       }
     $cnt++;
   }
-
+  
+# Local Variables:
+# mode: perl
+# End:
