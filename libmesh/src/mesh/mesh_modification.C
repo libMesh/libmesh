@@ -1,4 +1,4 @@
-// $Id: mesh_modification.C,v 1.9 2004-12-17 20:55:07 benkirk Exp $
+// $Id: mesh_modification.C,v 1.10 2005-01-03 16:17:59 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -76,7 +76,7 @@ void MeshTools::Modification::distort (MeshBase& mesh,
   for (; el!=end; ++el)
     for (unsigned int n=0; n<(*el)->n_nodes(); n++)
       hmin[(*el)->node(n)] = std::min(hmin[(*el)->node(n)],
-				      static_cast<float>((*el)->hmin()));
+                                      static_cast<float>((*el)->hmin()));
   
   
   // Now actually move the nodes
@@ -86,8 +86,13 @@ void MeshTools::Modification::distort (MeshBase& mesh,
     // seed the random number generator
     srand(seed);
     
+    // If the node is on the boundary or
+    // the node is not used by any element (hmin[n]<1.e20)
+    // then we should not move it.
+    // [Note: Testing for (in)equality might be wrong
+    // (different types, namely float and double)]
     for (unsigned int n=0; n<mesh.n_nodes(); n++)
-      if (!on_boundary[n])
+      if (!on_boundary[n] && (hmin[n] < 1.e20) )
 	{
 	  // the direction, random but unit normalized
 	  
@@ -100,23 +105,15 @@ void MeshTools::Modification::distort (MeshBase& mesh,
 	  
 	  dir(0) = (dir(0)-.5)*2.;
 	  dir(1) = (dir(1)-.5)*2.;
-
 	  if (mesh.mesh_dimension() == 3)
 	    dir(2) = (dir(2)-.5)*2.;
 	  
 	  dir = dir.unit();
 
-	  // if hmin[n]=1.e20 then the node is not
-	  // used by any element.  We should not
-	  // move it.
-	  if (hmin[n] != 1.e20)
-	    {
-	      mesh.node(n)(0) += dir(0)*factor*hmin[n];
-	      mesh.node(n)(1) += dir(1)*factor*hmin[n];
-	      
-	      if (mesh.mesh_dimension() == 3)
-		mesh.node(n)(2) += dir(2)*factor*hmin[n];
-	    }
+          mesh.node(n)(0) += dir(0)*factor*hmin[n];
+          mesh.node(n)(1) += dir(1)*factor*hmin[n];
+          if (mesh.mesh_dimension() == 3)
+            mesh.node(n)(2) += dir(2)*factor*hmin[n];
 	}
   }
 
