@@ -1,4 +1,4 @@
-// $Id: type_vector.h,v 1.6 2004-10-19 16:26:17 jwpeterson Exp $
+// $Id: type_vector.h,v 1.7 2004-10-19 16:35:55 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -24,6 +24,7 @@
 
 // C++ includes
 #include <math.h>
+#include <iostream>
 
 // Local includes
 #include "libmesh_common.h"
