@@ -1,4 +1,4 @@
-// $Id: mesh_gmv_support.C,v 1.24 2003-08-18 14:44:52 ddreyer Exp $
+// $Id: mesh_gmv_support.C,v 1.25 2003-08-20 21:38:45 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -249,7 +249,6 @@ void MeshBase::write_gmv(std::ostream& out,
 			 ((*it)->type() == INFPRISM12))
 #endif
 		  {
-		      here();
 		    /**
 		     * Note that the prisms are treated as
 		     * degenerated phex8's.
