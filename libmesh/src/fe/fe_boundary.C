@@ -1,4 +1,4 @@
-// $Id: fe_boundary.C,v 1.11 2003-02-17 01:23:02 benkirk Exp $
+// $Id: fe_boundary.C,v 1.12 2003-02-22 16:01:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -113,7 +113,7 @@ void FE<Dim,T>::reinit(QBase* qside,
     elem_type = elem->type();
     init_shape_functions    (qrule, elem);
     compute_map             (qrule, elem);
-    compute_shape_functions (qrule);
+    compute_shape_functions ();
   }  
   
   // copy back old data

@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.11 2003-02-13 22:56:09 benkirk Exp $
+// $Id: fe.C,v 1.12 2003-02-22 16:01:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -62,8 +62,8 @@ void FE<Dim,T>::reinit(const Elem* elem)
   compute_map (qrule, elem);
 
   // Compute the shape functions and the derivatives at all of the
-  // quadrature points.  This part is dimension-independet
-  compute_shape_functions (qrule);
+  // quadrature points.
+  compute_shape_functions ();
 }
 
 

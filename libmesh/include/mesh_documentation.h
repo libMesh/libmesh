@@ -105,8 +105,10 @@
   located there as compressed tar archives. You may also access the CVS
   source tree for the latest code.  You can get read-only access to the
   CVS repository via:
+  
   \verbatim
      cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/libmesh co libmesh \endverbatim
+     
   If you would like to contribute to the project you will need a
   SourceForge developer account.
  
@@ -153,20 +155,26 @@
   Configuring the library is straightforward. The GNU
   autoconf package is used to determine site-specific configuration
   parameters. A standard build will occur after typing
+  
   \verbatim
      ./configure
      make \endverbatim
+     
   in the top-level project directory.  To see all the configuration
-  options type  
+  options type
+  
   \verbatim
-     ./configure --help \endverbatim     
+     ./configure --help \endverbatim
+     
   The configure script will find your compilers and create the \p
   Make.common file with the configuration for your site. If you want
   to use different compilers than those found by configure you can
   specify them in environment variables.  For example, the following
   will build with the \p MIPS compilers on an SGI:
+  
   \verbatim
      CXX=CC CC=cc F77=f77 ./configure \endverbatim
+     
   Note that the FORTRAN compiler is not actually used to compile any
   part of the library, but \p configure uses it to find out how to
   link FORTRAN libraries with C++ code.

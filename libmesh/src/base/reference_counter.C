@@ -1,4 +1,4 @@
-// $Id: reference_counter.C,v 1.7 2003-02-14 15:22:47 benkirk Exp $
+// $Id: reference_counter.C,v 1.8 2003-02-22 16:01:10 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -32,10 +32,11 @@
 #if defined(ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
 
 ReferenceCounter::Counts ReferenceCounter::_counts;
-unsigned int             ReferenceCounter::_n_objects=0;
 bool                     ReferenceCounter::_have_printed_info=false;
 
 #endif
+
+unsigned int             ReferenceCounter::_n_objects=0;
 
 
 
