@@ -1,4 +1,4 @@
-// $Id: ex4.C,v 1.4 2003-02-06 17:13:32 benkirk Exp $
+// $Id: ex4.C,v 1.5 2003-02-07 18:07:43 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -344,8 +344,8 @@ void assemble_poisson(EquationSystems& es,
    * this example compiles successfully, and the error 
    * message in \p main() can catch this irregularity.
    */
-  ComplexDenseMatrix   Ke;
-  std::vector<Complex> Fe;
+  RealDenseMatrix   Ke;
+  std::vector<Real> Fe;
 
   /**
    * This vector will hold the degree of freedom indices for
@@ -591,9 +591,15 @@ void assemble_poisson(EquationSystems& es,
        * for this element.  Add them to the global matrix and
        * right-hand-side vector.  The \p PetscMatrix::add_matrix()
        * and \p PetscVector::add_vector() members do this for us.
+       * 
+       * The preprocessor test for complex numbers is explained
+       * in example 5.
        */
+#ifndef USE_COMPLEX_NUMBERS
+
       es("Poisson").matrix.add_matrix (Ke, dof_indices);
       es("Poisson").rhs.add_vector    (Fe, dof_indices);
+#endif
       
     }; // end of element loop
 

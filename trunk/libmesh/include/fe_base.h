@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.6 2003-02-06 17:13:34 benkirk Exp $
+// $Id: fe_base.h,v 1.7 2003-02-07 18:07:45 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -49,21 +49,24 @@ class InfFE;
 
 /**
  * This class forms the foundation from which generic finite
- * elements may be derived. The current implementation offers
- * a wide variety of commonly used finite element concepts.
- * For actual use in simulations, take the templated FE
- * class.  Through static member functions this templated class implements 
- * Lagrange shape functions, monomials, and hierarchic shape functions.
- * These may be used, through the public methods FEBase::shape() and
- * FEBase::shape_deriv(), as building blocks for shape functions in
- * derived classes.
+ * elements may be derived.  In the current implementation the
+ * templated derived class \p FE offers a wide variety of commonly 
+ * used finite element concepts.  Check there for details.
+ * Use the \p FEBase::build() method to create an object of any of 
+ * the derived classes.
+ * Note that the amount of virtual members is kept to a minimum,
+ * and the sophisticated template scheme of \p FE is quite
+ * likely to offer acceptably fast code.
  *
- * All interaction of this and derived classes with other classes, 
- * like DofMap, are handled through the interface class FEInterface. 
- * When the static member functions like FEBase::n_dofs() etc are 
- * not sufficient to represent your derived class, add calls to your 
- * version in FEInterface, better do not modify the methods from FEBase.
- * Within the FEBase class, things should remain unchanged. 
+ * All calls to static members of the \p FE classes should be
+ * requested through the \p FEInterface.  This interface class
+ * offers sort-of runtime polymorphism for the templated finite
+ * element classes.  Even internal library classes, like \p DofMap,
+ * request the number of dof's through this interface class.
+ * Note that this also enables the co-existence of various
+ * element-based schemes.  
+ * This class is well 'at the heart' of the library, so 
+ * things in here should better remain unchanged. 
  *
  * @author Benjamin S. Kirk, 2002
  */

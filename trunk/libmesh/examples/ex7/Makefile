@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.1 2003-02-06 19:02:58 spetersen Exp $
+# $Id: Makefile,v 1.2 2003-02-07 18:07:44 ddreyer Exp $
 
 
 # The location of the mesh library
@@ -35,10 +35,14 @@ target 	   := ex7
 
 all:: $(target)
 
-# Production rules:  how to make the target
-$(target): $(objects)
+# Production rules:  how to make the target - depends on library configuration
+$(target): $(objects) $(meshdir)/include/mesh_config.h
 	@echo "Linking "$@"..."
 	@$(CXX) $(CXXFLAGS) $(objects) -o $@ $(LIBS) $(LDFLAGS)
+
+
+echo:
+	@echo "obj= $(objects)"
 
 
 # Useful rules.
@@ -52,4 +56,7 @@ clobber:
 distclean:
 	@$(MAKE) clobber
 	@rm -f *.o *.g.o *.pg.o
+
+run:
+	@$(target) -d 2 -f 1
 ###############################################################################

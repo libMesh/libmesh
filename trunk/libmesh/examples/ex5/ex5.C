@@ -1,4 +1,4 @@
-// $Id: ex5.C,v 1.3 2003-02-07 15:21:30 ddreyer Exp $
+// $Id: ex5.C,v 1.4 2003-02-07 18:07:43 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -300,8 +300,8 @@ void assemble_poisson(EquationSystems& es,
 
   const DofMap& dof_map = es("Poisson").get_dof_map();
 
-  ComplexDenseMatrix   Ke;
-  std::vector<Complex> Fe;
+  RealDenseMatrix   Ke;
+  std::vector<Real> Fe;
 
   std::vector<unsigned int> dof_indices;
 
@@ -476,9 +476,16 @@ void assemble_poisson(EquationSystems& es,
       
       /**
        *----------------------------------------------------------------
+       * This preprocessor test helps in letting
+       * main() catch the error of using this
+       * example with complex numbers.
        */
+#ifndef USE_COMPLEX_NUMBERS
+
       es("Poisson").matrix.add_matrix (Ke, dof_indices);
       es("Poisson").rhs.add_vector    (Fe, dof_indices);
+
+#endif
       
     }; // end of element loop
 
