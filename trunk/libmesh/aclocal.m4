@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.69 2004-10-19 20:12:45 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.70 2004-10-25 16:03:10 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -374,10 +374,10 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           dnl       Metis function "GKfree" caused this error
           dnl       in almost every file.
           CXXFLAGSG="-Kc++eh -Krtti -w1 -DDEBUG -inline_debug_info -g"
-          CXXFLAGSO="-Kc++eh -Krtti -O2 -DNDEBUG -unroll -w0"
+          CXXFLAGSO="-Kc++eh -Krtti -O2 -DNDEBUG -unroll -w0 -ftz"
           CXXFLAGSP="$CXXFLAGSO -g -pg"
           CFLAGSG="-w1 -DDEBUG -inline_debug_info -wd266"
-          CFLAGSO="-O2 -DNDEBUG -unroll -w0"
+          CFLAGSO="-O2 -DNDEBUG -unroll -w0 -ftz"
           CFLAGSP="$CFLAGSO -g -pg"
 
           dnl Position-independent code for shared libraries
@@ -491,8 +491,8 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           ;;
   
       portland_group)
-	  CXXFLAGSG="-g --no_using_std --instantiate=used -DDEBUG"
-          CXXFLAGSO="-O2 --no_using_std --instantiate=used -DNDEBUG"
+	  CXXFLAGSG="-g --no_using_std --instantiate=none --one_instantiation_per_object --prelink_objects -DDEBUG"
+          CXXFLAGSO="-O2 --no_using_std --instantiate=none --one_instantiation_per_object --prelink_objects -DNDEBUG"
 	  CFLAGSG="-g -DDEBUG"
           CFLAGSO="-O2 -DNDEBUG"
 

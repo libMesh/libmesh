@@ -3070,10 +3070,10 @@ echo "$as_me: error: Unrecognized compiler" >&2;}
 
       intel_ecc)
                                                   CXXFLAGSG="-Kc++eh -Krtti -w1 -DDEBUG -inline_debug_info -g"
-          CXXFLAGSO="-Kc++eh -Krtti -O2 -DNDEBUG -unroll -w0"
+          CXXFLAGSO="-Kc++eh -Krtti -O2 -DNDEBUG -unroll -w0 -ftz"
           CXXFLAGSP="$CXXFLAGSO -g -pg"
           CFLAGSG="-w1 -DDEBUG -inline_debug_info -wd266"
-          CFLAGSO="-O2 -DNDEBUG -unroll -w0"
+          CFLAGSO="-O2 -DNDEBUG -unroll -w0 -ftz"
           CFLAGSP="$CFLAGSO -g -pg"
 
                     if test "$enableshared" = yes ; then
@@ -3144,8 +3144,8 @@ echo "$as_me: error: Unrecognized compiler" >&2;}
           ;;
 
       portland_group)
-	  CXXFLAGSG="-g --no_using_std --instantiate=used -DDEBUG"
-          CXXFLAGSO="-O2 --no_using_std --instantiate=used -DNDEBUG"
+	  CXXFLAGSG="-g --no_using_std --instantiate=none --one_instantiation_per_object --prelink_objects -DDEBUG"
+          CXXFLAGSO="-O2 --no_using_std --instantiate=none --one_instantiation_per_object --prelink_objects -DNDEBUG"
 	  CFLAGSG="-g -DDEBUG"
           CFLAGSO="-O2 -DNDEBUG"
 
