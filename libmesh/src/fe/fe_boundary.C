@@ -1,4 +1,4 @@
-// $Id: fe_boundary.C,v 1.26 2004-02-18 23:04:08 benkirk Exp $
+// $Id: fe_boundary.C,v 1.27 2004-03-24 05:49:11 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -20,7 +20,7 @@
 
 
 // C++ includes
-#include <math.h>
+#include <math.h> // for sqrt
 
 
 // Local includes

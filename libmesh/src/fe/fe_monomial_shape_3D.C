@@ -1,4 +1,4 @@
-// $Id: fe_monomial_shape_3D.C,v 1.10 2004-01-03 15:37:42 benkirk Exp $
+// $Id: fe_monomial_shape_3D.C,v 1.11 2004-03-24 05:49:11 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -19,8 +19,6 @@
 
 
 // C++ inlcludes
-#include <math.h>
-
 
 // Local includes
 #include "fe.h"

@@ -1,4 +1,4 @@
-// $Id: face_quad.C,v 1.14 2004-01-03 15:37:43 benkirk Exp $
+// $Id: face_quad.C,v 1.15 2004-03-24 05:49:12 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -18,8 +18,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // C++ includes
-#include <iterator>
-#include <algorithm>
 
 // Local includes
 #include "face_quad.h"

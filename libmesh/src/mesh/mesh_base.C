@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.73 2004-03-23 04:17:26 jwpeterson Exp $
+// $Id: mesh_base.C,v 1.74 2004-03-24 05:49:12 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -23,11 +23,9 @@
 #include "libmesh_config.h"
 
 // C++ includes
-#include <algorithm>
-#include <sstream>
-#include <math.h>
-#include <set>
-#include <map>
+#include <algorithm> // for std::min
+#include <sstream>   // for std::ostringstream
+#include <map>       // for std::multimap
 
 #if   defined(HAVE_HASH_MAP)
 # include <hash_map>

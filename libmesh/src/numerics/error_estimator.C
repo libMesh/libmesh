@@ -1,4 +1,4 @@
-// $Id: error_estimator.C,v 1.14 2004-03-24 03:48:52 jwpeterson Exp $
+// $Id: error_estimator.C,v 1.15 2004-03-24 05:49:12 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -22,8 +22,8 @@
 #include "libmesh_config.h"
 
 // C++ includes
-#include <algorithm>
-#include <math.h>
+#include <algorithm> // for std::fill
+#include <math.h>    // for sqrt
 
 #ifdef HAVE_MPI
 # include <mpi.h>

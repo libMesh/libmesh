@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.32 2004-03-24 04:32:59 jwpeterson Exp $
+// $Id: elem.C,v 1.33 2004-03-24 05:49:12 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -20,9 +20,8 @@
 
 
 // C++ includes
-#include <algorithm>
-#include <iterator>
-//#include <set>
+#include <algorithm> // for std::sort
+#include <iterator>  // for std::ostream_iterator
 
 // Local includes
 #include "elem.h"

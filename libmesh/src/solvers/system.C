@@ -1,4 +1,4 @@
-// $Id: system.C,v 1.5 2004-03-24 03:48:52 jwpeterson Exp $
+// $Id: system.C,v 1.6 2004-03-24 05:49:12 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -20,9 +20,7 @@
 
 
 // C++ includes
-#include <math.h>
-#include <algorithm>
-#include <sstream>
+#include <sstream>   // for std::ostringstream
 
 
 // Local includes
@@ -468,7 +466,7 @@ NumericVector<Number> & System::get_vector(const std::string& vec_name)
 
 
 void System::add_variable (const std::string& var,
-			       const FEType& type)
+			   const FEType& type)
 {  
   // Make sure the variable isn't there already
   if (_var_num.count(var))
@@ -589,7 +587,7 @@ std::string System::get_info() const
 
 
 void System::attach_init_function (void fptr(EquationSystems& es,
-						 const std::string& name))
+					     const std::string& name))
 {
   assert (fptr != NULL);
   
@@ -599,7 +597,7 @@ void System::attach_init_function (void fptr(EquationSystems& es,
 
 
 void System::attach_assemble_function (void fptr(EquationSystems& es,
-						     const std::string& name))
+						 const std::string& name))
 {
   assert (fptr != NULL);
   

@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic_shape_1D.C,v 1.12 2004-02-10 13:28:07 benkirk Exp $
+// $Id: fe_hierarchic_shape_1D.C,v 1.13 2004-03-24 05:49:11 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -19,8 +19,6 @@
 
 
 // C++ inlcludes
-#include <math.h>
-
 
 // Local includes
 #include "fe.h"

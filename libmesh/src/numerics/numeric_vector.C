@@ -1,4 +1,4 @@
-// $Id: numeric_vector.C,v 1.12 2004-01-03 15:37:43 benkirk Exp $
+// $Id: numeric_vector.C,v 1.13 2004-03-24 05:49:12 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -20,7 +20,7 @@
 
 
 // C++ includes
-#include <math.h>
+#include <math.h> // for fabs
 
 // Local Includes
 #include "numeric_vector.h"
