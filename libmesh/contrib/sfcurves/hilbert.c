@@ -146,10 +146,7 @@ void fhsfc3d(
 
 void hilbert(double *x, double *y, double *z, int *N, int *table)
 {
-#undef INT
-#define INT unsigned
-
-  INT index[3];
+  unsigned int index[3];
 
   double extrx[2];
   double extry[2];

@@ -4,25 +4,25 @@
 
 
 
-void interleave(double x, double y, double z, double deg, INT index[3])
+void interleave(double x, double y, double z, double deg, unsigned int index[3])
 {
-  INT tempx,tempy,tempz;
+  unsigned int tempx,tempy,tempz;
   
   int i,j=2,cnt=0;
 
-  tempx=(INT )(x*deg);
-  tempy=(INT )(y*deg);
-  tempz=(INT )(z*deg);
+  tempx=(unsigned int )(x*deg);
+  tempy=(unsigned int )(y*deg);
+  tempz=(unsigned int )(z*deg);
 
   index[0]=0;
   index[1]=0;
   index[2]=0;
 
-  for(i=sizeof(INT)*8-1;i>=0;i--) {
+  for(i=sizeof(unsigned int)*8-1;i>=0;i--) {
     index[j] += (tempx >> i) & 01;
     index[j]  = index[j] << 01;
 
-    if (( cnt % (sizeof(INT )*8) == 0) && (cnt !=0 ) ) {
+    if (( cnt % (sizeof(unsigned int )*8) == 0) && (cnt !=0 ) ) {
       cnt = 0;
       j--;
     }
@@ -31,7 +31,7 @@ void interleave(double x, double y, double z, double deg, INT index[3])
     index[j] += (tempy >> i) & 01;
     index[j]  = index[j] << 01;
 
-    if (( cnt % (sizeof(INT )*8) == 0) && (cnt !=0 ) ) {
+    if (( cnt % (sizeof(unsigned int )*8) == 0) && (cnt !=0 ) ) {
       cnt = 0;
       j--;
     }
@@ -40,7 +40,7 @@ void interleave(double x, double y, double z, double deg, INT index[3])
     index[j] += (tempz >> i) & 01;
     index[j]  = index[j] << 01;
 
-    if (( cnt % (sizeof(INT )*8) == 0) && (cnt !=0 ) ) {
+    if (( cnt % (sizeof(unsigned int )*8) == 0) && (cnt !=0 ) ) {
       cnt = 0;
       j--;
     }
@@ -53,7 +53,7 @@ void interleave(double x, double y, double z, double deg, INT index[3])
 
 void morton(double *x, double *y, double *z, int *N, int *table)
 {  
-  INT index[3];
+  unsigned int index[3];
 
   double extrx[2];
   double extry[2];
