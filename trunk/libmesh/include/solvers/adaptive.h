@@ -1,4 +1,4 @@
-// $Id: adaptive.h,v 1.2 2004-01-17 22:56:53 benkirk Exp $
+// $Id: adaptive.h,v 1.3 2004-11-03 14:30:09 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -28,7 +28,7 @@
 #include "libmesh_common.h"
 #include "linear.h"
 #include "error_vector.h"
-#include "error_estimator.h"
+#include "kelly_error_estimator.h"
 #include "mesh_refinement.h"
 #include "mesh.h"
 
@@ -173,9 +173,9 @@ void Adaptive<T>::solve ()
       {
 	ErrorVector error;
 	
-	ErrorEstimator error_estimator;
+	KellyErrorEstimator error_estimator;
 	
-	error_estimator.flux_jump (this->system(), "incomp_ns", error);
+	error_estimator.estimate_error (this->system(), "incomp_ns", error);
 	
 	MeshRefinement mesh_refinement (this->mesh());
 	

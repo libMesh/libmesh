@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.65 2004-11-02 00:38:09 benkirk Exp $
+// $Id: dof_map.C,v 1.66 2004-11-03 14:30:12 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -229,7 +229,14 @@ void DofMap::clear()
 
 void DofMap::distribute_dofs (MeshBase& mesh)
 {
-  this->distribute_dofs_var_major (mesh);
+  // By default distribute variables in a
+  // var-major fashion, but allow run-time
+  // specification
+  if (libMesh::on_command_line ("--node_major_dofs"))
+    this->distribute_dofs_node_major (mesh);
+  
+  else
+    this->distribute_dofs_var_major (mesh);
 }
 
 
