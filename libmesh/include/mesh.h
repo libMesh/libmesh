@@ -1,4 +1,4 @@
-// $Id: mesh.h,v 1.7 2003-01-31 21:22:11 benkirk Exp $
+// $Id: mesh.h,v 1.8 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -83,9 +83,9 @@ class Mesh : public MeshBase
   void build_cube (const unsigned int nx=0,
 		   const unsigned int ny=0,
 		   const unsigned int nz=0,
-		   const real xmin=0., const real xmax=1.,
-		   const real ymin=0., const real ymax=1.,
-		   const real zmin=0., const real zmax=1.,
+		   const Real xmin=0., const Real xmax=1.,
+		   const Real ymin=0., const Real ymax=1.,
+		   const Real zmin=0., const Real zmax=1.,
 		   const ElemType type=INVALID_ELEM);
 
   /**
@@ -93,14 +93,14 @@ class Mesh : public MeshBase
    */
   void build_square (const unsigned int nx,
 		     const unsigned int ny,
-		     const real xmin=0., const real xmax=1.,
-		     const real ymin=0., const real ymax=1.,
+		     const Real xmin=0., const Real xmax=1.,
+		     const Real ymin=0., const Real ymax=1.,
 		     const ElemType type=INVALID_ELEM);
 
   /**
    * Meshes a spherical or mapped-spherical domain.
    */
-  void build_sphere (const real rad=1,
+  void build_sphere (const Real rad=1,
 		     const unsigned int nr=2,
 		     const ElemType type=INVALID_ELEM);
   
@@ -141,14 +141,14 @@ class Mesh : public MeshBase
    * an ASCII file.
    */
   void read_xdr_soln(const std::string& name,
-		     std::vector<number>& soln,
+		     std::vector<Complex>& soln,
 		     std::vector<std::string>& var_names);
 
   /**
    * Same, but expects a true XDR-Encoded binary file.
    */
   void read_xdr_soln_binary(const std::string& name,
-			    std::vector<number>& soln,
+			    std::vector<Complex>& soln,
 			    std::vector<std::string>& var_names);
   
   /** 
@@ -167,7 +167,7 @@ class Mesh : public MeshBase
    * proper method by the file extension. Also writes data.
    */
   void write(const std::string& name,
-	     std::vector<number>& values,
+	     std::vector<Complex>& values,
 	     std::vector<std::string>& variable_names);
   
   /**
@@ -198,14 +198,14 @@ class Mesh : public MeshBase
    * solution file format.  Writes an ASCII file.
    */
   void write_xdr_soln(const std::string& name,
-		      std::vector<number>& soln,
+		      std::vector<Complex>& soln,
 		      std::vector<std::string>& var_names);
 
   /**
    * Same, but writes an XDR-Encoded binary file.
    */
   void write_xdr_soln_binary(const std::string& name,
-			     std::vector<number>& soln,
+			     std::vector<Complex>& soln,
 			     std::vector<std::string>& var_names);
 
   /**

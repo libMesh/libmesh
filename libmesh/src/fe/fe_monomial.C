@@ -1,4 +1,4 @@
-// $Id: fe_monomial.C,v 1.5 2003-01-24 17:24:41 jwpeterson Exp $
+// $Id: fe_monomial.C,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,8 +31,8 @@
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::nodal_soln(const Elem* elem,
 			   const Order order,
-			   const std::vector<number>& elem_soln,
-			   std::vector<number>&       nodal_soln)
+			   const std::vector<Complex>& elem_soln,
+			   std::vector<Complex>&       nodal_soln)
 {
   const unsigned int n_nodes = elem->n_nodes();
   
@@ -49,7 +49,7 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
       {
 	assert (elem_soln.size() == 1);
 	
-	const number val = elem_soln[0];
+	const Complex val = elem_soln[0];
 	
 	for (unsigned int n=0; n<n_nodes; n++)
 	  nodal_soln[n] = val;

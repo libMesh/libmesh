@@ -1,4 +1,4 @@
-// $Id: xdrIO.h,v 1.5 2003-01-24 17:24:39 jwpeterson Exp $
+// $Id: xdrIO.h,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -137,11 +137,11 @@ class XdrIO
   int dataBlk(int*  array, int numvar, int size);
 
   /**
-   * Read/Writes a block of \p reals
+   * Read/Writes a block of \p Reals
    * to/from the current \p xdr
    * file/file handle.
    */
-  int dataBlk(real* array, int numvar, int size);
+  int dataBlk(Real* array, int numvar, int size);
 
   /**
    * Return an Originator data structure
@@ -366,16 +366,16 @@ class XdrMESH: public XdrIO
   /**
    * Read/Write a coord of appropriate size.
    *
-   * \param array Pointer to an array of \p reals
+   * \param array Pointer to an array of \p Reals
    * \param size Size of \p array (number of elements)
    * @return dim*size
    */
-  int coord(real* array, int dim, int size)  { return dataBlk(array, dim, size);}
+  int coord(Real* array, int dim, int size)  { return dataBlk(array, dim, size);}
 
   /**
    * Read/Write a BC of appropriate size
    *
-   * \param array Pointer to an array of \p reals
+   * \param array Pointer to an array of \p Reals
    * \param size Size of \p array (number of elements)
    * @return 3*size
    */
@@ -441,11 +441,11 @@ class XdrSOLN: public XdrIO
   /**
    * Read/Write solution values.
    *
-   * \param array Pointer to array of \p reals to be read/written
+   * \param array Pointer to array of \p Reals to be read/written
    * \param size Size of individual variables to be written
    * @return m_wrtVar*size
    */
-  int values(real* array, int size) { return dataBlk(array, m_wrtVar, size);}
+  int values(Real* array, int size) { return dataBlk(array, m_wrtVar, size);}
 
  private:
   int m_wrtVar;
@@ -614,7 +614,7 @@ class XdrHEAD
   /**
    * Current solution time.
    */
-  real m_time;
+  Real m_time;
 
   /**
    * Uses memcpy to create an exact
@@ -826,12 +826,12 @@ class XdrSHEAD : public XdrHEAD
   /**
    * Set the solution time.
    */
-  void setTime(real time)                       { m_time = time; }
+  void setTime(Real time)                       { m_time = time; }
 
   /**
    * Get the solution time.
    */
-  real getTime() const                          { return m_time; }
+  Real getTime() const                          { return m_time; }
 
   /**
    * Set the user solution title.

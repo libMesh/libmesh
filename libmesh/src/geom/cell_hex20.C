@@ -1,4 +1,4 @@
-// $Id: cell_hex20.C,v 1.7 2003-01-25 01:42:46 jwpeterson Exp $
+// $Id: cell_hex20.C,v 1.8 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -196,7 +196,7 @@ void Hex20::vtk_connectivity(const unsigned int sc,
 
 #ifdef ENABLE_AMR
 
-const real Hex20::embedding_matrix[8][20][20] =
+const Real Hex20::embedding_matrix[8][20][20] =
 {
   // embedding matrix for child 0
   {

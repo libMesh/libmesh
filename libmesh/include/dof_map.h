@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.6 2003-01-25 05:33:10 jwpeterson Exp $
+// $Id: dof_map.h,v 1.7 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -258,7 +258,7 @@ class DofMap
    * and columns of the matrix necessarily correspond to variables
    * of the same approximation order.
    */
-  void constrain_element_matrix (DenseMatrix& matrix,
+  void constrain_element_matrix (RealDenseMatrix& matrix,
 				 std::vector<unsigned int>& elem_dofs) const;
   
   /**
@@ -267,14 +267,14 @@ class DofMap
    * and col_dofs may be of different size and correspond to
    * variables approximated in different spaces.
    */
-  void constrain_element_matrix (DenseMatrix& matrix,
+  void constrain_element_matrix (RealDenseMatrix& matrix,
 				 std::vector<unsigned int>& row_dofs,
 				 std::vector<unsigned int>& col_dofs) const;
   
   /**
    * Constrains the element vector.
    */
-  void constrain_element_vector (std::vector<real>&         rhs,
+  void constrain_element_vector (std::vector<Real>&         rhs,
 				 std::vector<unsigned int>& dofs) const;
   
   /**
@@ -285,8 +285,8 @@ class DofMap
    * and columns of the matrix necessarily correspond to variables
    * of the same approximation order.
    */
-  void constrain_element_matrix_and_vector (DenseMatrix& matrix,
-					    std::vector<real>& rhs,
+  void constrain_element_matrix_and_vector (RealDenseMatrix& matrix,
+					    std::vector<Real>& rhs,
 					    std::vector<unsigned int>& elem_dofs) const;
   
 #endif
@@ -357,7 +357,7 @@ class DofMap
    * Build the constraint matrix C associated with the element
    * degree of freedom indices elem_dofs.
    */
-  void build_constraint_matrix (DenseMatrix& C,
+  void build_constraint_matrix (RealDenseMatrix& C,
 				std::vector<unsigned int>& elem_dofs) const;
 
 #endif

@@ -1,4 +1,4 @@
-// $Id: ex3.C,v 1.2 2003-01-31 23:27:41 benkirk Exp $
+// $Id: ex3.C,v 1.3 2003-02-03 03:51:48 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -88,11 +88,11 @@ void assemble_poisson(EquationSystems& es,
  * function to get f.  This is the well-known "method of
  * manufactured solutions".
  */
-real exact_solution (const real x,
-		     const real y,
-		     const real z = 0.)
+Real exact_solution (const Real x,
+		     const Real y,
+		     const Real z = 0.)
 {
-  static const real pi = acos(-1.);
+  static const Real pi = acos(-1.);
 
   return cos(pi*x)*sin(pi*y)*cos(pi*z);
 };
@@ -115,6 +115,17 @@ int main (int argc, char** argv)
   
   const bool have_petsc = false;
   
+#endif
+
+  /**
+   * This example is designed for real numbers only.
+   */
+#ifdef USE_COMPLEX_NUMBERS
+
+  std::cerr << "ERROR: This example is not intended for " << std::endl
+	    << " use with complex numbers." << std::endl;
+  error();
+
 #endif
 
 
@@ -293,7 +304,7 @@ void assemble_poisson(EquationSystems& es,
   /**
    * The element Jacobian * quadrature weight at each integration point.   
    */
-  const std::vector<real>& JxW = fe->get_JxW();
+  const std::vector<Real>& JxW = fe->get_JxW();
 
   /**
    * The physical XY locations of the quadrature points on the element.
@@ -305,7 +316,7 @@ void assemble_poisson(EquationSystems& es,
   /**
    * The element shape functions evaluated at the quadrature points.
    */
-  const std::vector<std::vector<real> >& phi = fe->get_phi();
+  const std::vector<std::vector<Real> >& phi = fe->get_phi();
 
   /**
    * The element shape function gradients evaluated at the quadrature
@@ -325,10 +336,12 @@ void assemble_poisson(EquationSystems& es,
    * Define data structures to contain the element matrix
    * and right-hand-side vector contribution.  Following
    * basic finite element terminology we will denote these
-   * "Ke" and "Fe".
+   * "Ke" and "Fe".  Use the complex versions, so that
+   * this example compiles successfully, and the error 
+   * message in \p main() can catch this irregularity.
    */
-  DenseMatrix       Ke;
-  std::vector<real> Fe;
+  ComplexDenseMatrix   Ke;
+  std::vector<Complex> Fe;
 
   /**
    * This vector will hold the degree of freedom indices for
@@ -419,9 +432,9 @@ void assemble_poisson(EquationSystems& es,
 	   */
 	  for (unsigned int i=0; i<phi.size(); i++)
 	    {
-	      const real x = q_point[qp](0);
-	      const real y = q_point[qp](1);
-	      const real eps = 1.e-3;
+	      const Real x = q_point[qp](0);
+	      const Real y = q_point[qp](1);
+	      const Real eps = 1.e-3;
 
 	      /**
 	       * fxy is the forcing function for the Poisson equation.
@@ -435,7 +448,7 @@ void assemble_poisson(EquationSystems& es,
 	       *                u(i-1,j) + u(i+1,j) +
 	       *                -4*u(i,j))/h^2
 	       */
-	      const real fxy = -(exact_solution(x,y-eps) +
+	      const Real fxy = -(exact_solution(x,y-eps) +
 				 exact_solution(x,y+eps) +
 				 exact_solution(x-eps,y) +
 				 exact_solution(x+eps,y) -

@@ -1,4 +1,4 @@
-// $Id: plane.C,v 1.5 2003-01-24 17:24:43 jwpeterson Exp $
+// $Id: plane.C,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -90,7 +90,7 @@ void Plane::create_from_three_points (const Point& p0,
 
 
 
-void Plane::xy_plane (const real zpos)
+void Plane::xy_plane (const Real zpos)
 {
   const Point p (0., 0., zpos);
   const Point n (0., 0., 1.);
@@ -101,7 +101,7 @@ void Plane::xy_plane (const real zpos)
 
 
 
-void Plane::xz_plane (const real ypos)
+void Plane::xz_plane (const Real ypos)
 {
   const Point p (0., ypos, 0.);
   const Point n (0., 1., 0.);
@@ -112,7 +112,7 @@ void Plane::xz_plane (const real ypos)
 
 
 
-void Plane::yz_plane (const real xpos)
+void Plane::yz_plane (const Real xpos)
 {
   const Point p (xpos, 0., 0.);
   const Point n (1., 0., 0.);
@@ -130,7 +130,7 @@ bool Plane::above_surface (const Point& p) const
 
   // The point is above the surface if the projection
   // of that vector onto the normal is positive 
-  const real proj = w*normal;
+  const Real proj = w*normal;
   
   if (proj > 0.) 
     return true;

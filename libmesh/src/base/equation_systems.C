@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.5 2003-01-24 17:24:40 jwpeterson Exp $
+// $Id: equation_systems.C,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -76,7 +76,7 @@ void EquationSystems::init ()
 //        /**
 //         * Pass our parameters on to the system
 //         */
-//        for (std::map<std::string, real>::const_iterator
+//        for (std::map<std::string, Real>::const_iterator
 //  	     param = parameters.begin();
 //  	   param != parameters.end(); ++param)
 //  	sys->second.set_parameter(param->first) =
@@ -299,10 +299,10 @@ void EquationSystems::unset_flag (const std::string& fl)
 
 
 
-real EquationSystems::parameter (const std::string& id) const
+Real EquationSystems::parameter (const std::string& id) const
 {
   // Look for the id in the database
-  std::map<std::string, real>::const_iterator
+  std::map<std::string, Real>::const_iterator
     pos = parameters.find(id);
   
   if (pos == parameters.end())
@@ -319,7 +319,7 @@ real EquationSystems::parameter (const std::string& id) const
 
 
 
-real & EquationSystems::set_parameter (const std::string& id)
+Real & EquationSystems::set_parameter (const std::string& id)
 {
 #ifdef DEBUG
   /*
@@ -343,7 +343,7 @@ real & EquationSystems::set_parameter (const std::string& id)
 void EquationSystems::unset_parameter (const std::string& id)
 {
   // Look for the id in the database
-  std::map<std::string, real>::iterator
+  std::map<std::string, Real>::iterator
     pos = parameters.find(id);
   
   // Make sure the parameter was found
@@ -376,7 +376,7 @@ void EquationSystems::build_variable_names (std::vector<std::string>& var_names)
 
 
 
-void EquationSystems::build_solution_vector (std::vector<number>& soln)
+void EquationSystems::build_solution_vector (std::vector<Complex>& soln)
 {
   assert (n_systems());
 
@@ -387,7 +387,7 @@ void EquationSystems::build_solution_vector (std::vector<number>& soln)
   if (mesh.processor_id() == 0)
     soln.resize(nn*nv);
 
-  std::vector<number> sys_soln; 
+  std::vector<Complex> sys_soln; 
   
   unsigned int var_num=0;
 
@@ -399,8 +399,8 @@ void EquationSystems::build_solution_vector (std::vector<number>& soln)
 
       if (mesh.processor_id() == 0)
 	{
-	  std::vector<number>         elem_soln; // The finite element solution
-	  std::vector<number>         nodal_soln;  // The finite elemnt solution interpolated to the nodes
+	  std::vector<Complex>      elem_soln; // The finite element solution
+	  std::vector<Complex>      nodal_soln;  // The finite elemnt solution interpolated to the nodes
 	  std::vector<unsigned int> dof_indices; // The DOF indices for the finite element 
 	      
 	  for (unsigned int var=0; var<nv_sys; var++)
@@ -501,7 +501,7 @@ std::string EquationSystems::get_info () const
     {  
       out << "  Parameters:" << std::endl;
       
-      for (std::map<std::string, real>::const_iterator
+      for (std::map<std::string, Real>::const_iterator
 	     param = parameters.begin(); param != parameters.end();
 	   ++param)
 	out << "   "

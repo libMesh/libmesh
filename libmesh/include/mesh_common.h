@@ -1,4 +1,4 @@
-// $Id: mesh_common.h,v 1.5 2003-01-24 17:24:38 jwpeterson Exp $
+// $Id: mesh_common.h,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -33,44 +33,44 @@
 
 /**
  * An anonymous namespace to hold \p typedefs and the like
- * for the library
+ * for the library.  Really couldn't get this to work together 
+ * with std::complex and PETSc.
  */
+#ifndef USE_COMPLEX_NUMBERS
 namespace
 {
+#endif
+
   
 #ifdef REAL
 #  undef REAL
 #endif
 
-#ifdef NUMBER
-#  undef NUMBER
+#ifdef COMPLEX
+#  undef COMPLEX
 #endif
 
 
 #ifndef SINGLE_PRECISION
-  typedef double real;
+  typedef double Real;
   typedef double REAL;
 #  ifdef USE_COMPLEX_NUMBERS
-  // note that PETSc also uses <complex>, check petscmath.h
 #    include <complex>
-     typedef std::complex<double> number;
-     typedef std::complex<double> NUMBER;
+     typedef std::complex<double> Complex;
+     typedef std::complex<double> COMPLEX;
 #  else
-     typedef double number;
-     typedef double NUMBER;
+     typedef double Complex;
+     typedef double COMPLEX;
 #  endif
 #else
-  typedef float real;
+  typedef float Real;
   typedef float REAL;
 #  ifdef USE_COMPLEX_NUMBERS
      // this is _not_ supported by PETSc!
      CHOKE_THIS!
-#    include <complex>
-     typedef std::complex<float> number;
-     typedef std::complex<float> NUMBER;
 #  else
-     typedef float number;
-     typedef float NUMBER;
+     typedef float Complex;
+     typedef float COMPLEX;
 #  endif
 #endif
 
@@ -87,6 +87,8 @@ namespace
 #  define DIM 3
 #endif
 
+#ifndef USE_COMPLEX_NUMBERS
 }; // end anonymous namespace
+#endif
 
 #endif // #define __mesh_common_h__

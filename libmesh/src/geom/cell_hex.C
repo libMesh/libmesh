@@ -1,4 +1,4 @@
-// $Id: cell_hex.C,v 1.6 2003-01-25 01:42:46 jwpeterson Exp $
+// $Id: cell_hex.C,v 1.7 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -109,7 +109,7 @@ AutoPtr<Elem> Hex::side (const unsigned int i) const
 
 
 
-real Hex::quality (const ElemQuality q) const
+Real Hex::quality (const ElemQuality q) const
 {
   switch (q)
     {
@@ -121,20 +121,20 @@ real Hex::quality (const ElemQuality q) const
     case DIAGONAL:
       {
 	// Diagonal between node 0 and node 6
-	const real d06 = this->length(0,6);
+	const Real d06 = this->length(0,6);
 
 	// Diagonal between node 3 and node 5
-	const real d35 = this->length(3,5);
+	const Real d35 = this->length(3,5);
 
 	// Diagonal between node 1 and node 7
-	const real d17 = this->length(1,7);
+	const Real d17 = this->length(1,7);
 
 	// Diagonal between node 2 and node 4 
-	const real d24 = this->length(2,4);
+	const Real d24 = this->length(2,4);
 
 	// Find the biggest and smallest diagonals
-	const real min = std::min(d06, std::min(d35, std::min(d17, d24)));
-	const real max = std::max(d06, std::max(d35, std::max(d17, d24)));
+	const Real min = std::min(d06, std::min(d35, std::min(d17, d24)));
+	const Real max = std::max(d06, std::max(d35, std::max(d17, d24)));
 
 	assert (max != 0.0);
 	
@@ -153,20 +153,20 @@ real Hex::quality (const ElemQuality q) const
 	/**
 	 * Compute the side lengths.
 	 */
-	const real d01 = this->length(0,1);
-	const real d12 = this->length(1,2);
-	const real d23 = this->length(2,3);
-	const real d03 = this->length(0,3);
-	const real d45 = this->length(4,5);
-	const real d56 = this->length(5,6);
-	const real d67 = this->length(6,7);
-	const real d47 = this->length(4,7);
-	const real d04 = this->length(0,4);
-	const real d15 = this->length(1,5);
-	const real d37 = this->length(3,7);
-	const real d26 = this->length(2,6);
+	const Real d01 = this->length(0,1);
+	const Real d12 = this->length(1,2);
+	const Real d23 = this->length(2,3);
+	const Real d03 = this->length(0,3);
+	const Real d45 = this->length(4,5);
+	const Real d56 = this->length(5,6);
+	const Real d67 = this->length(6,7);
+	const Real d47 = this->length(4,7);
+	const Real d04 = this->length(0,4);
+	const Real d15 = this->length(1,5);
+	const Real d37 = this->length(3,7);
+	const Real d26 = this->length(2,6);
 
-	std::vector<real> edge_ratios(12);
+	std::vector<Real> edge_ratios(12);
 	// Front
 	edge_ratios[0] = std::min(d01, d45) / std::max(d01, d45);
 	edge_ratios[1] = std::min(d04, d15) / std::max(d04, d15);
@@ -203,23 +203,23 @@ real Hex::quality (const ElemQuality q) const
        */
     case STRETCH:
       {
-	const real sqrt3 = 1.73205080756888;
+	const Real sqrt3 = 1.73205080756888;
 
 	/**
 	 * Compute the maximum diagonal.
 	 */
-	const real d06 = this->length(0,6);
-	const real d17 = this->length(1,7);
-	const real d35 = this->length(3,5);
-	const real d24 = this->length(2,4);
-	const real max_diag = std::max(d06, std::max(d17, std::max(d35, d24)));
+	const Real d06 = this->length(0,6);
+	const Real d17 = this->length(1,7);
+	const Real d35 = this->length(3,5);
+	const Real d24 = this->length(2,4);
+	const Real max_diag = std::max(d06, std::max(d17, std::max(d35, d24)));
 
 	assert ( max_diag != 0.0 );
 
 	/**
 	 * Compute the minimum edge length.
 	 */
-	std::vector<real> edges(12);
+	std::vector<Real> edges(12);
 	edges[0]  = this->length(0,1);
 	edges[1]  = this->length(1,2);
 	edges[2]  = this->length(2,3);
@@ -233,7 +233,7 @@ real Hex::quality (const ElemQuality q) const
 	edges[10] = this->length(2,6);
 	edges[11] = this->length(3,7);
 
-	const real min_edge = *(std::min_element(edges.begin(), edges.end()));
+	const Real min_edge = *(std::min_element(edges.begin(), edges.end()));
 	return sqrt3 * min_edge / max_diag ;
 	break;
       }
@@ -257,9 +257,9 @@ real Hex::quality (const ElemQuality q) const
 
 
 
-std::pair<real, real> Hex::qual_bounds (const ElemQuality q) const
+std::pair<Real, Real> Hex::qual_bounds (const ElemQuality q) const
 {
-  std::pair<real, real> bounds;
+  std::pair<Real, Real> bounds;
   
   switch (q)
     {

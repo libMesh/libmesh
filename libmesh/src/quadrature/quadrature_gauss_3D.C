@@ -1,4 +1,4 @@
-// $Id: quadrature_gauss_3D.C,v 1.5 2003-01-29 20:21:41 jwpeterson Exp $
+// $Id: quadrature_gauss_3D.C,v 1.6 2003-02-03 03:51:50 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -83,8 +83,8 @@ void QGauss::init_3D(const ElemType _type)
 	      _weights.resize(4);
 		    
 		    
-	      const real a = .585410196624969;
-	      const real b = .138196601125011;
+	      const Real a = .585410196624969;
+	      const Real b = .138196601125011;
 		    
 	      _points[0](0) = a;
 	      _points[0](1) = b;
@@ -157,8 +157,8 @@ void QGauss::init_3D(const ElemType _type)
 	      _points[0](2) = 0.25;
 
 	      {
-		const real a = 0.785714285714286;
-		const real b = 0.071428571428571;
+		const Real a = 0.785714285714286;
+		const Real b = 0.071428571428571;
 		
 		_points[1](0) = a;
 		_points[1](1) = b;
@@ -177,8 +177,8 @@ void QGauss::init_3D(const ElemType _type)
 		_points[4](2) = b;
 	      }
 	      {
-		const real a = 0.399403576166799;
-		const real b = 0.100596423833201;
+		const Real a = 0.399403576166799;
+		const Real b = 0.100596423833201;
 		
 		_points[5](0) = a;
 		_points[5](1) = a;
@@ -229,8 +229,8 @@ void QGauss::init_3D(const ElemType _type)
 	      _points[0](2) = 0.25;
 
 	      {
-		const real a = 0.;
-		const real b = 0.333333333333333333333333333333333333333;
+		const Real a = 0.;
+		const Real b = 0.333333333333333333333333333333333333333;
 		
 		_points[1](0) = a;
 		_points[1](1) = b;
@@ -249,8 +249,8 @@ void QGauss::init_3D(const ElemType _type)
 		_points[4](2) = b;
 	      }
 	      {
-		const real a = 0.7272727272727272727272727272727272727272727272727272727;
-		const real b = 0.0909090909090909090909090909090909090909090909090909091;
+		const Real a = 0.7272727272727272727272727272727272727272727272727272727;
+		const Real b = 0.0909090909090909090909090909090909090909090909090909091;
 		
 		_points[5](0) = a;
 		_points[5](1) = b;
@@ -269,8 +269,8 @@ void QGauss::init_3D(const ElemType _type)
 		_points[8](2) = b;
 	      }
 	      {
-		const real a = 0.066550153573664;
-		const real b = 0.433449846426336;
+		const Real a = 0.066550153573664;
+		const Real b = 0.433449846426336;
 		
 		_points[9](0) = a;
 		_points[9](1) = a;
@@ -326,9 +326,9 @@ void QGauss::init_3D(const ElemType _type)
 	      // There are 64 points in this rule.
 
 	      // Points (1D)            // Weights
-	      std::vector<real> r(4);   std::vector<real> A(4);
-	      std::vector<real> s(4);   std::vector<real> B(4);
-	      std::vector<real> t(4);   std::vector<real> C(4);
+	      std::vector<Real> r(4);   std::vector<Real> A(4);
+	      std::vector<Real> s(4);   std::vector<Real> B(4);
+	      std::vector<Real> t(4);   std::vector<Real> C(4);
 
 	      // Fill in the interval points
 	      r[0] = 0.0694318422; s[0] = 0.0571041961; t[0] = 0.0485005494;
@@ -416,8 +416,8 @@ void QGauss::init_3D(const ElemType _type)
 	q1D.init(EDGE2);
 
 	// Storage for our temporary rule
-	std::vector<real> pts(q1D.n_points());
-	std::vector<real> wts(q1D.n_points());
+	std::vector<Real> pts(q1D.n_points());
+	std::vector<Real> wts(q1D.n_points());
 
 	// Modify the 1D rule to fit in [0,1] instead
 	for (unsigned int i=0; i<q1D.n_points(); i++)

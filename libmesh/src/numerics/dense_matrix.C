@@ -1,4 +1,4 @@
-// $Id: dense_matrix.C,v 1.5 2003-01-24 17:24:44 jwpeterson Exp $
+// $Id: dense_matrix.C,v 1.6 2003-02-03 03:51:50 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,14 +26,15 @@
 
 // ------------------------------------------------------------
 // Dense Matrix member functions
-void DenseMatrix::left_multiply (const DenseMatrix& A,
-				 const bool transpose)
+template<typename Tp>
+void DenseMatrix<Tp>::left_multiply (const DenseMatrix<Tp>& A,
+				     const bool transpose)
 {
   // C = A*B  C (mxn), A (mxp), B (pxn)
   
-  DenseMatrix B(*this);
+  DenseMatrix<Tp> B(*this);
 
-  DenseMatrix& C = *this;
+  DenseMatrix<Tp>& C = *this;
 
   C.zero();
   
@@ -87,14 +88,15 @@ void DenseMatrix::left_multiply (const DenseMatrix& A,
 
 
 
-void DenseMatrix::right_multiply (const DenseMatrix& B,
-				  const bool transpose)
+template<typename Tp>
+void DenseMatrix<Tp>::right_multiply (const DenseMatrix<Tp>& B,
+				      const bool transpose)
 {
   // C = A*B  C (mxn), A (mxp), B (pxn)
   
-  DenseMatrix A(*this);
+  DenseMatrix<Tp> A(*this);
   
-  DenseMatrix& C = *this;
+  DenseMatrix<Tp>& C = *this;
   
   C.zero();
   
@@ -145,3 +147,11 @@ void DenseMatrix::right_multiply (const DenseMatrix& B,
     };    	     
 };
 
+
+//--------------------------------------------------------------
+// Explicit instantiations
+template class DenseMatrix<Complex>;
+#ifdef USE_COMPLEX_NUMBERS
+ /* Avoid double instantiation in case of real-only */
+ template class DenseMatrix<Real>;
+#endif

@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic_shape_2D.C,v 1.5 2003-01-24 17:24:41 jwpeterson Exp $
+// $Id: fe_hierarchic_shape_2D.C,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,7 +30,7 @@
 
 
 template <>
-real FE<2,HIERARCHIC>::shape(const ElemType,
+Real FE<2,HIERARCHIC>::shape(const ElemType,
 			     const Order,
 			     const unsigned int,
 			     const Point&)
@@ -46,7 +46,7 @@ real FE<2,HIERARCHIC>::shape(const ElemType,
 
 
 template <>
-real FE<2,HIERARCHIC>::shape(const Elem* elem,
+Real FE<2,HIERARCHIC>::shape(const Elem* elem,
 			     const Order order,
 			     const unsigned int i,
 			     const Point& p)
@@ -66,9 +66,9 @@ real FE<2,HIERARCHIC>::shape(const Elem* elem,
 	    // Hierarchic shape functions on the triangle.
 	  case TRI6:
 	    {
-	      const real zeta1 = p(0);
-	      const real zeta2 = p(1);
-	      const real zeta0 = 1. - zeta1 - zeta2;
+	      const Real zeta1 = p(0);
+	      const Real zeta2 = p(1);
+	      const Real zeta0 = 1. - zeta1 - zeta2;
 	      
 	      assert (i<6);
 
@@ -104,8 +104,8 @@ real FE<2,HIERARCHIC>::shape(const Elem* elem,
 	  case QUAD9:
 	    {
 	      // Compute quad shape functions as a tensor-product
-	      const real xi  = p(0);
-	      const real eta = p(1);
+	      const Real xi  = p(0);
+	      const Real eta = p(1);
 	      
 	      assert (i < 9);
 	      
@@ -135,16 +135,16 @@ real FE<2,HIERARCHIC>::shape(const Elem* elem,
 	    // Hierarchic shape functions on the triangle.
 	  case TRI6:
 	    {
-	      const real zeta1 = p(0);
-	      const real zeta2 = p(1);
-	      const real zeta0 = 1. - zeta1 - zeta2;
+	      const Real zeta1 = p(0);
+	      const Real zeta2 = p(1);
+	      const Real zeta0 = 1. - zeta1 - zeta2;
 	      
 	      assert (i<10);
 
 	      // Get  factors to account for edge-flipping
-	      real f0 = 1;
-	      real f1 = 1;
-	      real f2 = 1;
+	      Real f0 = 1;
+	      Real f1 = 1;
+	      Real f2 = 1;
 
 	      if (elem->node(0) != std::min(elem->node(0), elem->node(1)))
 		f0 = -1.;
@@ -210,8 +210,8 @@ real FE<2,HIERARCHIC>::shape(const Elem* elem,
 	  case QUAD9:
 	    {
 	      // Compute quad shape functions as a tensor-product
-	      const real xi  = p(0);
-	      const real eta = p(1);
+	      const Real xi  = p(0);
+	      const Real eta = p(1);
 	      
 	      assert (i < 16);
 
@@ -221,10 +221,10 @@ real FE<2,HIERARCHIC>::shape(const Elem* elem,
 	      
 	      
 	      // Get the factors
-	      real f0 = 1.;
-	      real f1 = 1.;
-	      real f2 = 1.;
-	      real f3 = 1.;
+	      Real f0 = 1.;
+	      Real f1 = 1.;
+	      Real f2 = 1.;
+	      Real f3 = 1.;
 
 	      if (elem->node(0) != std::min(elem->node(0), elem->node(1)))
 		f0 = -1.;
@@ -239,7 +239,7 @@ real FE<2,HIERARCHIC>::shape(const Elem* elem,
 		f3 = -1.;
 	      
 
-	      real f = 1.;
+	      Real f = 1.;
 
 	      
 	      if ((i0[i] == 3) &&
@@ -277,16 +277,16 @@ real FE<2,HIERARCHIC>::shape(const Elem* elem,
 	    // Hierarchic shape functions on the triangle.
 	  case TRI6:
 	    {
-	      const real zeta1 = p(0);
-	      const real zeta2 = p(1);
-	      const real zeta0 = 1. - zeta1 - zeta2;
+	      const Real zeta1 = p(0);
+	      const Real zeta2 = p(1);
+	      const Real zeta0 = 1. - zeta1 - zeta2;
 	      
 	      assert (i<15);
 
 	      // Get  factors to account for edge-flipping
-	      real f0 = 1;
-	      real f1 = 1;
-	      real f2 = 1;
+	      Real f0 = 1;
+	      Real f1 = 1;
+	      Real f2 = 1;
 
 	      if (elem->node(0) != std::min(elem->node(0), elem->node(1)))
 		f0 = -1.;
@@ -370,8 +370,8 @@ real FE<2,HIERARCHIC>::shape(const Elem* elem,
 	  case QUAD9:
 	    {
 	      // Compute quad shape functions as a tensor-product
-	      const real xi  = p(0);
-	      const real eta = p(1);
+	      const Real xi  = p(0);
+	      const Real eta = p(1);
 	      
 	      assert (i < 25);
 
@@ -381,10 +381,10 @@ real FE<2,HIERARCHIC>::shape(const Elem* elem,
 	      
 	      
 	      // Get the factors
-	      real f0 = 1.;
-	      real f1 = 1.;
-	      real f2 = 1.;
-	      real f3 = 1.;
+	      Real f0 = 1.;
+	      Real f1 = 1.;
+	      Real f2 = 1.;
+	      Real f3 = 1.;
 
 	      if (elem->node(0) != std::min(elem->node(0), elem->node(1)))
 		f0 = -1.;
@@ -399,7 +399,7 @@ real FE<2,HIERARCHIC>::shape(const Elem* elem,
 		f3 = -1.;
 	      
 
-	      real f = 1.;
+	      Real f = 1.;
 
 	      
 	      if ((i0[i] == 3) &&
@@ -437,16 +437,16 @@ real FE<2,HIERARCHIC>::shape(const Elem* elem,
 	    // Hierarchic shape functions on the triangle.
 	  case TRI6:
 	    {
-	      const real zeta1 = p(0);
-	      const real zeta2 = p(1);
-	      const real zeta0 = 1. - zeta1 - zeta2;
+	      const Real zeta1 = p(0);
+	      const Real zeta2 = p(1);
+	      const Real zeta0 = 1. - zeta1 - zeta2;
 	      
 	      assert (i<21);
 
 	      // Get  factors to account for edge-flipping
-	      real f0 = 1;
-	      real f1 = 1;
-	      real f2 = 1;
+	      Real f0 = 1;
+	      Real f1 = 1;
+	      Real f2 = 1;
 
 	      if (elem->node(0) != std::min(elem->node(0), elem->node(1)))
 		f0 = -1.;
@@ -551,8 +551,8 @@ real FE<2,HIERARCHIC>::shape(const Elem* elem,
 	  case QUAD9:
 	    {
 	      // Compute quad shape functions as a tensor-product
-	      const real xi  = p(0);
-	      const real eta = p(1);
+	      const Real xi  = p(0);
+	      const Real eta = p(1);
 	      
 	      assert (i < 36);
 
@@ -562,10 +562,10 @@ real FE<2,HIERARCHIC>::shape(const Elem* elem,
 	      
 	      
 	      // Get the factors
-	      real f0 = 1.;
-	      real f1 = 1.;
-	      real f2 = 1.;
-	      real f3 = 1.;
+	      Real f0 = 1.;
+	      Real f1 = 1.;
+	      Real f2 = 1.;
+	      Real f3 = 1.;
 
 	      if (elem->node(0) != std::min(elem->node(0), elem->node(1)))
 		f0 = -1.;
@@ -580,7 +580,7 @@ real FE<2,HIERARCHIC>::shape(const Elem* elem,
 		f3 = -1.;
 	      
 
-	      real f = 1.;
+	      Real f = 1.;
 
 	      
 	      if ( ((i0[i] == 3) || (i0[i] == 5)) &&
@@ -624,7 +624,7 @@ real FE<2,HIERARCHIC>::shape(const Elem* elem,
 
 
 template <>
-real FE<2,HIERARCHIC>::shape_deriv(const ElemType,
+Real FE<2,HIERARCHIC>::shape_deriv(const ElemType,
 				   const Order,			    
 				   const unsigned int,
 				   const unsigned int,
@@ -641,7 +641,7 @@ real FE<2,HIERARCHIC>::shape_deriv(const ElemType,
 
 
 template <>
-real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
+Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 				   const Order order,
 				   const unsigned int i,
 				   const unsigned int j,
@@ -666,7 +666,7 @@ real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 	    {
 	      // I have been lazy here and am using finite differences
 	      // to compute the derivatives!
-	      const real eps = 1.e-6;
+	      const Real eps = 1.e-6;
 	      
 	      assert (i < 6);
 	      assert (j < 2);
@@ -706,8 +706,8 @@ real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 	  case QUAD9:
 	    {
 	      // Compute quad shape functions as a tensor-product
-	      const real xi  = p(0);
-	      const real eta = p(1);
+	      const Real xi  = p(0);
+	      const Real eta = p(1);
 	      
 	      assert (i < 9);
 	      
@@ -749,7 +749,7 @@ real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 	    {
 	      // I have been lazy here and am using finite differences
 	      // to compute the derivatives!
-	      const real eps = 1.e-6;
+	      const Real eps = 1.e-6;
 	      
 	      assert (i < 10);
 	      assert (j < 2);
@@ -789,8 +789,8 @@ real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 	  case QUAD9:
 	    {
 	      // Compute quad shape functions as a tensor-product
-	      const real xi  = p(0);
-	      const real eta = p(1);
+	      const Real xi  = p(0);
+	      const Real eta = p(1);
 	      
 	      assert (i < 16);
 
@@ -800,10 +800,10 @@ real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 	      
 	      
 	      // Get the factors
-	      real f0 = 1.;
-	      real f1 = 1.;
-	      real f2 = 1.;
-	      real f3 = 1.;
+	      Real f0 = 1.;
+	      Real f1 = 1.;
+	      Real f2 = 1.;
+	      Real f3 = 1.;
 
 	      if (elem->node(0) != std::min(elem->node(0), elem->node(1)))
 		f0 = -1.;
@@ -818,7 +818,7 @@ real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 		f3 = -1.;
 	      
 
-	      real f = 1.;
+	      Real f = 1.;
 
 	      
 	      if ((i0[i] == 3) &&
@@ -871,7 +871,7 @@ real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 	    {
 	      // I have been lazy here and am using finite differences
 	      // to compute the derivatives!
-	      const real eps = 1.e-6;
+	      const Real eps = 1.e-6;
 	      
 	      assert (i < 15);
 	      assert (j < 2);
@@ -911,8 +911,8 @@ real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 	  case QUAD9:
 	    {
 	      // Compute quad shape functions as a tensor-product
-	      const real xi  = p(0);
-	      const real eta = p(1);
+	      const Real xi  = p(0);
+	      const Real eta = p(1);
 	      
 	      assert (i < 25);
 
@@ -922,10 +922,10 @@ real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 	      
 	      
 	      // Get the factors
-	      real f0 = 1.;
-	      real f1 = 1.;
-	      real f2 = 1.;
-	      real f3 = 1.;
+	      Real f0 = 1.;
+	      Real f1 = 1.;
+	      Real f2 = 1.;
+	      Real f3 = 1.;
 
 	      if (elem->node(0) != std::min(elem->node(0), elem->node(1)))
 		f0 = -1.;
@@ -940,7 +940,7 @@ real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 		f3 = -1.;
 	      
 
-	      real f = 1.;
+	      Real f = 1.;
 
 	      
 	      if ((i0[i] == 3) &&
@@ -994,7 +994,7 @@ real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 	    {
 	      // I have been lazy here and am using finite differences
 	      // to compute the derivatives!
-	      const real eps = 1.e-6;
+	      const Real eps = 1.e-6;
 	      
 	      assert (i < 21);
 	      assert (j < 2);
@@ -1033,8 +1033,8 @@ real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 	  case QUAD9:
 	    {
 	      // Compute quad shape functions as a tensor-product
-	      const real xi  = p(0);
-	      const real eta = p(1);
+	      const Real xi  = p(0);
+	      const Real eta = p(1);
 	      
 	      assert (i < 36);
 
@@ -1044,10 +1044,10 @@ real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 	      
 	      
 	      // Get the factors
-	      real f0 = 1.;
-	      real f1 = 1.;
-	      real f2 = 1.;
-	      real f3 = 1.;
+	      Real f0 = 1.;
+	      Real f1 = 1.;
+	      Real f2 = 1.;
+	      Real f3 = 1.;
 
 	      if (elem->node(0) != std::min(elem->node(0), elem->node(1)))
 		f0 = -1.;
@@ -1062,7 +1062,7 @@ real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 		f3 = -1.;
 	      
 
-	      real f = 1.;
+	      Real f = 1.;
 
 	      
 	      if ( ((i0[i] == 3) || (i0[i] == 5)) &&

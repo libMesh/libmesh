@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.7 2003-01-29 20:58:29 benkirk Exp $
+// $Id: mesh_base.h,v 1.8 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -60,7 +60,7 @@ class PetscMatrix;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.7 $
+ * \version $Revision: 1.8 $
  */
 
 
@@ -277,21 +277,21 @@ public:
    * by default, however they may be by setting the flag
    * \p perturb_boundary true.
    */
-  void distort(const real factor, const bool perturb_boundary=false);
+  void distort(const Real factor, const bool perturb_boundary=false);
   
   /**
    * Translates the mesh.  The grid points are translated in the
    * \p x direction by \p xt, in the \p y direction by \p yt,
    * etc...
    */
-  void translate(const real xt=0., const real yt=0., const real zt=0.); 
+  void translate(const Real xt=0., const Real yt=0., const Real zt=0.); 
 
   /**
    * Rotates the mesh.  The grid points are rotated about the 
    * \p x axis by \p xr , about the \p y axis by \p yr,
    * etc...  
    */
-  void rotate(const real xr, const real yr=0., const real zr=0.); 
+  void rotate(const Real xr, const Real yr=0., const Real zr=0.); 
 
   /**
    * Scales the mesh.  The grid points are scaled in the
@@ -299,7 +299,7 @@ public:
    * etc...  If only \p xs is specified then the scaling is
    * assumed uniform in all directions.
    */
-  void scale(const real xs, const real ys=0., const real zs=0.);
+  void scale(const Real xs, const Real ys=0., const Real zs=0.);
     
   /**
    * @returns two points defining a cartesian box that bounds the
@@ -435,7 +435,7 @@ public:
    * proper method by the file extension. Also writes data.
    */
   virtual void write(const std::string& name,
-		     std::vector<number>& values,
+		     std::vector<Complex>& values,
 		     std::vector<std::string>& variable_names);
   
   /**
@@ -451,7 +451,7 @@ public:
    * in addition to the mesh.
    */
   void write_tecplot(const std::string& name,
-		     const std::vector<number>* v=NULL,
+		     const std::vector<Complex>* v=NULL,
 		     const std::vector<std::string>* solution_names=NULL);
   
   /**
@@ -471,7 +471,7 @@ public:
    * is not present this function will simply call the ASCII output version.
    */
   void write_tecplot_binary(const std::string& name,
-			    const std::vector<number>* v=NULL,
+			    const std::vector<Complex>* v=NULL,
 			    const std::vector<std::string>* solution_names=NULL);
 
   /**
@@ -499,7 +499,7 @@ public:
    * write the partitioning information.
    */
   void write_gmv(const std::string& name,
-		 const std::vector<number>* v=NULL,
+		 const std::vector<Complex>* v=NULL,
 		 const std::vector<std::string>* solution_names=NULL,
 		 const bool write_partitioning=false);
   
@@ -522,7 +522,7 @@ public:
    * write the partitioning information.
    */
   void write_gmv_binary(const std::string& name,
-			const std::vector<number>* v=NULL,
+			const std::vector<Complex>* v=NULL,
 			const std::vector<std::string>* solution_names=NULL,
 			const bool write_partitioning=false);
 
@@ -564,9 +564,9 @@ public:
   /**
    * Prepare complex data for writing.
    */
-  void prepare_complex_data(const std::vector<number>* source,
-			    std::vector<real>* real_part,
-			    std::vector<real>* imag_part);
+  void prepare_complex_data(const std::vector<Complex>* source,
+			    std::vector<Real>* real_part,
+			    std::vector<Real>* imag_part);
 
 #endif
 
@@ -631,14 +631,14 @@ protected:
    * ASCII text file to a stream.
    */
   void write_tecplot(std::ostream& out,
-		     const std::vector<real>* v=NULL,
+		     const std::vector<Real>* v=NULL,
 		     const std::vector<std::string>* solution_names=NULL);
 
   /**
    * Actual implementation of writing a Tecplot-formatted binary file.
    */
   void do_write_tecplot_binary(const std::string& name,
-			       const std::vector<real>* v=NULL,
+			       const std::vector<Real>* v=NULL,
 			       const std::vector<std::string>* solution_names=NULL);
 
   /**
@@ -658,7 +658,7 @@ protected:
    * Actual implementation of writing a mesh in the GMV ASCII format.
    */
   void write_gmv(std::ostream& out,
-		 const std::vector<number>* v=NULL,
+		 const std::vector<Complex>* v=NULL,
 		 const std::vector<std::string>* solution_names=NULL,
 		 const bool write_partitioning=false);
 
@@ -675,7 +675,7 @@ protected:
    * Actual implementation of writing a mesh in the GMV binary format.
    */
   void write_gmv_binary(std::ostream& out,
-			const std::vector<number>* v=NULL,
+			const std::vector<Complex>* v=NULL,
 			const std::vector<std::string>* solution_names=NULL,
 			const bool write_partitioning=false);
 

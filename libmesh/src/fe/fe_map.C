@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.5 2003-01-24 17:24:41 jwpeterson Exp $
+// $Id: fe_map.C,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -38,7 +38,7 @@ void FEBase::compute_map(const QBase* qrule,
   assert (elem != NULL);
   
   const unsigned int        n_qp = qrule->n_points();
-  const std::vector<real> &   qw = qrule->get_weights();
+  const std::vector<Real> &   qw = qrule->get_weights();
 
 
   switch (dim)
@@ -449,11 +449,11 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
       // 1D map inversion
     case 1:
       {
-	real error = 0.;
+	Real error = 0.;
 
 	Point p;
 	
-	const real
+	const Real
 	  X = physical_point(0);
 
 	unsigned int cnt = 0;
@@ -466,12 +466,12 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 	      
 	      const Point dxi            = FE<Dim,T>::map_xi (elem, p);
 	      
-	      const real
+	      const Real
 		J = dxi(0);
 	      
 	      assert (J != 0.);
 	      
-	      const real
+	      const Real
 		Jinv =  1./J;
 
 	      
@@ -535,11 +535,11 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
       // 2D map inversion
     case 2:
       {
-	real error = 0.;
+	Real error = 0.;
 
 	Point p;
 	
-	const real
+	const Real
 	  X = physical_point(0), 
 	  Y = physical_point(1);
 
@@ -554,18 +554,18 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 	      const Point dxi   = FE<Dim,T>::map_xi   (elem, p);
 	      const Point deta  = FE<Dim,T>::map_eta  (elem, p);
 	      
-	      const real
+	      const Real
 		J11 = dxi(0), J12 = deta(0),
 		J21 = dxi(1), J22 = deta(1);
 	      
-	      const real det = (J11*J22 - J12*J21);
+	      const Real det = (J11*J22 - J12*J21);
 	      
 	      assert (det > 0.);
 	      assert (fabs(det) > 1.e-10);
 	      
-	      const real inv_det = 1./det;
+	      const Real inv_det = 1./det;
 	      
-	      const real
+	      const Real
 		Jinv11 =  J22*inv_det,
 		Jinv12 = -J12*inv_det,
 		
@@ -637,11 +637,11 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
       // 3D map inversion
     case 3:
       {
-	real error = 0.;
+	Real error = 0.;
 
 	Point p;
 	
-	const real
+	const Real
 	  X = physical_point(0), 
 	  Y = physical_point(1), 
 	  Z = physical_point(2);
@@ -658,21 +658,21 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 	      const Point deta  = FE<Dim,T>::map_eta  (elem, p);
 	      const Point dzeta = FE<Dim,T>::map_zeta (elem, p);
 	      
-	      const real
+	      const Real
 		J11 = dxi(0), J12 = deta(0), J13 = dzeta(0),
 		J21 = dxi(1), J22 = deta(1), J23 = dzeta(1),
 		J31 = dxi(2), J32 = deta(2), J33 = dzeta(2);
 	      
-	      const real det = (J11*(J22*J33 - J23*J32) +
+	      const Real det = (J11*(J22*J33 - J23*J32) +
 				J12*(J23*J31 - J21*J33) +
 				J13*(J21*J32 - J22*J31));
 	      
 	      assert (det > 0.);
 	      assert (fabs(det) > 1.e-10);
 	      
-	      const real inv_det = 1./det;
+	      const Real inv_det = 1./det;
 	      
-	      const real
+	      const Real
 		Jinv11 =  (J22*J33 - J23*J32)*inv_det,
 		Jinv12 = -(J12*J33 - J13*J32)*inv_det,
 		Jinv13 =  (J12*J23 - J13*J22)*inv_det,

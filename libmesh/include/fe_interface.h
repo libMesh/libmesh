@@ -1,4 +1,4 @@
-// $Id: fe_interface.h,v 1.5 2003-01-24 17:24:38 jwpeterson Exp $
+// $Id: fe_interface.h,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -118,8 +118,8 @@ public:
   static void nodal_soln(const unsigned int dim,
 			 const FEType& fe_t,
 			 const Elem* elem,
-			 const std::vector<number>& elem_soln,
-			 std::vector<number>& nodal_soln);
+			 const std::vector<Complex>& elem_soln,
+			 std::vector<Complex>& nodal_soln);
 
   /**
    * @returns the location (on the reference element) of the
@@ -141,14 +141,14 @@ public:
    */
   static bool on_reference_element(const Point& p,
 				   const ElemType t,
-				   const real eps=1.e-6);
+				   const Real eps=1.e-6);
   /**
    * @returns the value of the \f$ i^{th} \f$ shape function at
    * point \p p. This method allows you to specify the dimension,
    * element type, and order directly. Automatically passes the
    * request to the appropriate finite element class member.
    */
-  static real shape(const unsigned int dim,
+  static Real shape(const unsigned int dim,
 		    const FEType& fe_t,
 		    const ElemType t,
 		    const unsigned int i,
@@ -160,7 +160,7 @@ public:
    * element type, and order directly. Automatically passes the
    * request to the appropriate finite element class member.
    */
-  static real shape(const unsigned int dim,
+  static Real shape(const unsigned int dim,
 		    const FEType& fe_t,
 		    const Elem* elem,
 		    const unsigned int i,

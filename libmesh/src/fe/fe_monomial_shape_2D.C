@@ -1,4 +1,4 @@
-// $Id: fe_monomial_shape_2D.C,v 1.5 2003-01-24 17:24:42 jwpeterson Exp $
+// $Id: fe_monomial_shape_2D.C,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,7 +30,7 @@
 
 
 template <>
-real FE<2,MONOMIAL>::shape(const ElemType,
+Real FE<2,MONOMIAL>::shape(const ElemType,
 			   const Order order,
 			   const unsigned int i,
 			   const Point& p)
@@ -48,8 +48,8 @@ real FE<2,MONOMIAL>::shape(const ElemType,
       {
 	assert (i < 15);
 
-	const real xi  = p(0);
-	const real eta = p(1);
+	const Real xi  = p(0);
+	const Real eta = p(1);
 
 	switch (i)
 	  {
@@ -128,7 +128,7 @@ real FE<2,MONOMIAL>::shape(const ElemType,
 
 
 template <>
-real FE<2,MONOMIAL>::shape(const Elem* elem,
+Real FE<2,MONOMIAL>::shape(const Elem* elem,
 			   const Order order,
 			   const unsigned int i,
 			   const Point& p)
@@ -142,7 +142,7 @@ real FE<2,MONOMIAL>::shape(const Elem* elem,
 
 
 template <>
-real FE<2,MONOMIAL>::shape_deriv(const ElemType,
+Real FE<2,MONOMIAL>::shape_deriv(const ElemType,
 				 const Order order,
 				 const unsigned int i,
 				 const unsigned int j,
@@ -164,8 +164,8 @@ real FE<2,MONOMIAL>::shape_deriv(const ElemType,
       {
 	assert (i < 15);
 
-	const real xi  = p(0);
-	const real eta = p(1);
+	const Real xi  = p(0);
+	const Real eta = p(1);
 
 	switch (j)
 	  {
@@ -318,7 +318,7 @@ real FE<2,MONOMIAL>::shape_deriv(const ElemType,
 
 
 template <>
-real FE<2,MONOMIAL>::shape_deriv(const Elem* elem,
+Real FE<2,MONOMIAL>::shape_deriv(const Elem* elem,
 				 const Order order,
 				 const unsigned int i,
 				 const unsigned int j,

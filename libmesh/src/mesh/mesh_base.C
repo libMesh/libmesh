@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.8 2003-01-29 21:05:53 benkirk Exp $
+// $Id: mesh_base.C,v 1.9 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -502,7 +502,7 @@ void MeshBase::build_inf_elem(const Point& origin,
   std::set<unsigned int> onodes;
   std::set<unsigned int> :: iterator on_it;
 	
-  real max_r=0.;
+  Real max_r=0.;
   unsigned int max_r_node;
 
   if (be_verbose)
@@ -562,7 +562,7 @@ void MeshBase::build_inf_elem(const Point& origin,
 
 	      //find the node most distant from origin
 
-	      real r=dist_from_origin.size();
+	      Real r=dist_from_origin.size();
 	      if (r>max_r)
 		{
 		  max_r=r;max_r_node=side->node(n);
@@ -1018,7 +1018,7 @@ void MeshBase::sfc_partition(const unsigned int n_sbdmns,
 
 
 
-void MeshBase::distort(const real factor,
+void MeshBase::distort(const Real factor,
 		       const bool perturb_boundary)
 {
   assert (mesh_dimension() != 1);
@@ -1028,7 +1028,7 @@ void MeshBase::distort(const real factor,
 
   _perf_log.start_event("distort()");
 
-  std::vector<real>      hmin(n_nodes(), 1.e20);
+  std::vector<Real>      hmin(n_nodes(), 1.e20);
   std::vector<short int> on_boundary(n_nodes(), 0);
 
 
@@ -1070,10 +1070,10 @@ void MeshBase::distort(const real factor,
 	{
 	  // the direction, random but unit normalized
 	  
-	  Point dir( ((real) rand())/((real) RAND_MAX),
-		     ((real) rand())/((real) RAND_MAX),
+	  Point dir( ((Real) rand())/((Real) RAND_MAX),
+		     ((Real) rand())/((Real) RAND_MAX),
 		     ((mesh_dimension() == 3) ?
-		      ((real) rand())/((real) RAND_MAX) :
+		      ((Real) rand())/((Real) RAND_MAX) :
 		      0.)
 		     );
 	  
@@ -1108,9 +1108,9 @@ void MeshBase::distort(const real factor,
 
 
 
-void MeshBase::translate (const real xt,
-			  const real yt,
-			  const real zt)
+void MeshBase::translate (const Real xt,
+			  const Real yt,
+			  const Real zt)
 {
   const Point p(xt, yt, zt);
 
@@ -1120,22 +1120,22 @@ void MeshBase::translate (const real xt,
 
 
 
-void MeshBase::rotate (const real,
-		       const real,
-		       const real)
+void MeshBase::rotate (const Real,
+		       const Real,
+		       const Real)
 {
   error();
 };
 
 
 
-void MeshBase::scale (const real xs,
-		      const real ys,
-		      const real zs)
+void MeshBase::scale (const Real xs,
+		      const Real ys,
+		      const Real zs)
 {
-  const real x_scale = xs;
-  real y_scale       = ys;
-  real z_scale       = zs;
+  const Real x_scale = xs;
+  Real y_scale       = ys;
+  Real z_scale       = zs;
   
   if (ys == 0.)
     {
@@ -1182,7 +1182,7 @@ MeshBase::bounding_sphere() const
 {
   std::pair<Point, Point> bbox = bounding_box();
 
-  const real  diag = (bbox.second - bbox.first).size();
+  const Real  diag = (bbox.second - bbox.first).size();
   const Point cent = (bbox.second + bbox.first)/2.;
 
   Sphere sphere (cent, .5*diag);
@@ -1237,7 +1237,7 @@ MeshBase::processor_bounding_sphere (const unsigned int pid) const
 {
   std::pair<Point, Point> bbox = processor_bounding_box(pid);
 
-  const real  diag = (bbox.second - bbox.first).size();
+  const Real  diag = (bbox.second - bbox.first).size();
   const Point cent = (bbox.second + bbox.first)/2.;
 
   Sphere sphere (cent, .5*diag);
@@ -1292,7 +1292,7 @@ Sphere MeshBase::subdomain_bounding_sphere (const unsigned int sid) const
 {
   std::pair<Point, Point> bbox = subdomain_bounding_box(sid);
 
-  const real  diag = (bbox.second - bbox.first).size();
+  const Real  diag = (bbox.second - bbox.first).size();
   const Point cent = (bbox.second + bbox.first)/2.;
 
   Sphere sphere (cent, .5*diag);
@@ -1472,7 +1472,11 @@ void MeshBase::build_script_L_graph (PetscMatrix& conn) const
 		  conn.set(n0,n0, 1.);
 		  conn.set(n1,n1, 1.);
 
-		  const real prod_term = -1./sqrt(l_conn(n0,n0)*l_conn(n1,n1));
+#ifdef USE_COMPLEX_NUMBERS
+		  const Real prod_term = -1./sqrt(l_conn(n0,n0).real()*l_conn(n1,n1).real());
+#else
+		  const Real prod_term = -1./sqrt(l_conn(n0,n0)*l_conn(n1,n1));
+#endif
 		  
 		  conn.set(n0,n1, prod_term);
 		  conn.set(n1,n0, prod_term);
@@ -1506,7 +1510,11 @@ void MeshBase::build_script_L_graph (PetscMatrix& conn) const
 		      conn.set(n0,n0, 1.);
 		      conn.set(n1,n1, 1.);
 		      
-		      const real prod_term = -1./sqrt(l_conn(n0,n0)*l_conn(n1,n1));
+#ifdef USE_COMPLEX_NUMBERS
+		      const Real prod_term = -1./sqrt(l_conn(n0,n0).real()*l_conn(n1,n1).real());
+#else
+		      const Real prod_term = -1./sqrt(l_conn(n0,n0)*l_conn(n1,n1));
+#endif
 		      
 		      conn.set(n0,n1, prod_term);
 		      conn.set(n1,n0, prod_term);
@@ -1574,7 +1582,7 @@ void MeshBase::write(const std::string& name)
 
 
 void MeshBase::write(const std::string& name,
-		     std::vector<number>& v,
+		     std::vector<Complex>& v,
 		     std::vector<std::string>& vn)
 {
   _perf_log.start_event("write()");
@@ -1608,16 +1616,16 @@ const char* MeshBase::complex_filename(const std::string& _n,
 {
   std::string loc=_n;
   if (r_o_c == 0)
-    loc.append(".real");
+    loc.append(".Real");
   else
     loc.append(".imag");
   return loc.c_str();
 };
 
 
-void MeshBase::prepare_complex_data(const std::vector<number>* source,
-				    std::vector<real>* real_part,
-				    std::vector<real>* imag_part)
+void MeshBase::prepare_complex_data(const std::vector<Complex>* source,
+				    std::vector<Real>* real_part,
+				    std::vector<Real>* imag_part)
 {
   real_part->resize(source->size());
   imag_part->resize(source->size());
@@ -1626,7 +1634,7 @@ void MeshBase::prepare_complex_data(const std::vector<number>* source,
   for (unsigned int i=0; i< source->size(); i++)
     {
       (*real_part)[i] = (*source)[i].real();
-      (*imag_part)[i] = (*source)[i].real();
+      (*imag_part)[i] = (*source)[i].imag();
     };
 };
 

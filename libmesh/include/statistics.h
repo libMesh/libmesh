@@ -1,4 +1,4 @@
-// $Id: statistics.h,v 1.5 2003-01-24 17:24:39 jwpeterson Exp $
+// $Id: statistics.h,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -85,7 +85,7 @@ class StatisticsVector : public std::vector<T>
    * data set using a recurrence relation.
    * Source: GNU Scientific Library
    */
-  real mean() const;
+  Real mean() const;
 
   /**
    * Returns the median (e.g. the middle)
@@ -95,14 +95,14 @@ class StatisticsVector : public std::vector<T>
    * can't be called on const objects.
    * Source: GNU Scientific Library
    */
-  real median();
+  Real median();
 
   /**
    * A const version of the median funtion.
    * Requires twice the memory of original
    * data set but does not change the original.
    */
-  real median() const;
+  Real median() const;
 
   /**
    * Computes the variance of the data set.
@@ -113,7 +113,7 @@ class StatisticsVector : public std::vector<T>
    * is normalized by N in this case.
    * Source: GNU Scientific Library
    */
-  real variance() const;
+  Real variance() const;
 
   /**
    * Computes and returns a histogram with
@@ -138,7 +138,7 @@ class StatisticsVector : public std::vector<T>
    * to the indices of every member of the data set
    * below the cutoff value cut.
    */
-  std::vector<unsigned int> cut_below(real cut) const;
+  std::vector<unsigned int> cut_below(Real cut) const;
 
   /**
    * Returns a vector of unsigned ints which correspond
@@ -147,7 +147,7 @@ class StatisticsVector : public std::vector<T>
    * these two functions since the interface is cleaner
    * with one passed parameter instead of two.
    */
-  std::vector<unsigned int> cut_above(real cut) const;
+  std::vector<unsigned int> cut_above(Real cut) const;
   
   
  private:

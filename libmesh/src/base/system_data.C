@@ -1,4 +1,4 @@
-// $Id: system_data.C,v 1.6 2003-01-30 19:13:10 benkirk Exp $
+// $Id: system_data.C,v 1.7 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -106,7 +106,7 @@ void SystemData::update ()
 
 
 
-void SystemData::update_global_solution (std::vector<number>& global_soln) const
+void SystemData::update_global_solution (std::vector<Complex>& global_soln) const
 {
 #ifndef HAVE_PETSC
 
@@ -125,7 +125,7 @@ void SystemData::update_global_solution (std::vector<number>& global_soln) const
 
 
 
-void SystemData::update_global_solution (std::vector<number>& global_soln,
+void SystemData::update_global_solution (std::vector<Complex>& global_soln,
 					 const unsigned int dest_proc) const
 {
 #ifndef HAVE_PETSC
@@ -264,19 +264,19 @@ void SystemData::assemble ()
 
 
 
-std::pair<unsigned int, real>
+std::pair<unsigned int, Real>
 SystemData::solve ()
 {
   
   assemble (); 
   
-  const real tol            =
+  const Real tol            =
     equation_systems.parameter("linear solver tolerance");
   
   const unsigned int maxits =
     static_cast<unsigned int>(equation_systems.parameter("linear solver maximum iterations"));
 
-  const std::pair<unsigned int, real> rval = 
+  const std::pair<unsigned int, Real> rval = 
     petsc_interface.solve (matrix, solution, rhs, tol, maxits);
 
   // Update the local solution to reflect the new values

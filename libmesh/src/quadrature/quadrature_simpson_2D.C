@@ -1,4 +1,4 @@
-// $Id: quadrature_simpson_2D.C,v 1.4 2003-01-24 17:24:45 jwpeterson Exp $
+// $Id: quadrature_simpson_2D.C,v 1.5 2003-02-03 03:51:50 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -55,7 +55,7 @@ void QSimpson::init_2D(const ElemType _type)
     case TRI6:
       {
 	// I'm not sure if you would call this Simpson's
-	// rule for triangles.  What it *really* is is
+	// rule for triangles.  What it *Really* is is
 	// four trapezoidal rules combined to give a six
 	// point rule.  The points lie at the nodal locations
 	// of the TRI6, so you can get diagonal element

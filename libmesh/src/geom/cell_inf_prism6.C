@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism6.C,v 1.6 2003-01-24 21:19:54 jwpeterson Exp $
+// $Id: cell_inf_prism6.C,v 1.7 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -154,7 +154,7 @@ void InfPrism6::write_tecplot_connectivity(std::ostream &out) const
 
 #ifdef ENABLE_AMR
 
-const real InfPrism6::embedding_matrix[4][6][6] =
+const Real InfPrism6::embedding_matrix[4][6][6] =
 {
   // embedding matrix for child 0
   {

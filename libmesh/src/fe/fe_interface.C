@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.5 2003-01-24 17:24:41 jwpeterson Exp $
+// $Id: fe_interface.C,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -513,8 +513,8 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 void FEInterface::nodal_soln(const unsigned int dim,
 			     const FEType& fe_t,
 			     const Elem* elem,
-			     const std::vector<number>& elem_soln,
-			     std::vector<number>&       nodal_soln)
+			     const std::vector<Complex>& elem_soln,
+			     std::vector<Complex>&       nodal_soln)
 {
   const Order order = fe_t.order;
   
@@ -769,7 +769,7 @@ Point FEInterface::inverse_map (const unsigned int dim,
 
 bool FEInterface::on_reference_element(const Point& p,
 				       const ElemType t,
-				       const real eps)
+				       const Real eps)
 {
   return FEBase::on_reference_element(p,t,eps);
 };
@@ -777,7 +777,7 @@ bool FEInterface::on_reference_element(const Point& p,
 
 
 
-real FEInterface::shape(const unsigned int dim,
+Real FEInterface::shape(const unsigned int dim,
 			const FEType& fe_t,
 			const ElemType t,
 			const unsigned int i,
@@ -916,7 +916,7 @@ real FEInterface::shape(const unsigned int dim,
 
 
 
-real FEInterface::shape(const unsigned int dim,
+Real FEInterface::shape(const unsigned int dim,
 			const FEType& fe_t,
 			const Elem* elem,
 			const unsigned int i,

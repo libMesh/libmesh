@@ -1,4 +1,4 @@
-//    $Id: petsc_interface.C,v 1.5 2003-01-24 17:24:44 jwpeterson Exp $
+//    $Id: petsc_interface.C,v 1.6 2003-02-03 03:51:50 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -82,7 +82,7 @@ void PetscInterface::init ()
 
 
 
-std::pair<unsigned int, real> 
+std::pair<unsigned int, Real> 
 PetscInterface::solve (PetscMatrix &matrix,
 		       PetscVector &solution,
 		       PetscVector &rhs,
@@ -119,10 +119,10 @@ PetscInterface::solve (PetscMatrix &matrix,
   
   //ierr = KSPTrueMonitor (ksp, its, final_resid, PETSC_NULL); CHKERRQ(ierr);
   
-  std::pair<unsigned int, real> p;
+  std::pair<unsigned int, Real> p;
 
   p.first  = static_cast<unsigned int>(its);
-  p.second = static_cast<real>(final_resid);
+  p.second = static_cast<Real>(final_resid);
 
   return p;
 };

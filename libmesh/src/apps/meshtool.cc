@@ -377,7 +377,7 @@ int main (int argc, char** argv)
       
     std::vector<std::string> names;
     std::vector<std::string> var_names;
-    std::vector<number>      soln;
+    std::vector<Complex>     soln;
 
     process_cmd_line(argc, argv, names,
 		     n_subdomains, n_rsteps,
@@ -470,7 +470,7 @@ int main (int argc, char** argv)
 
     if (do_quality)
       {
-	StatisticsVector<real> sv;
+	StatisticsVector<Real> sv;
 	sv.resize(mesh.n_elem());
 	
 	const ElemQuality q = DIAGONAL;
@@ -478,7 +478,7 @@ int main (int argc, char** argv)
 	std::cout << "Quality type is: " << Quality::name(q) << std::endl;
 	
 	// What are the quality bounds for this element?
-	std::pair<real, real> bounds = mesh.elem(0)->qual_bounds(q);
+	std::pair<Real, Real> bounds = mesh.elem(0)->qual_bounds(q);
 	std::cout << "Quality bounds for this element type are: (" << bounds.first
 		  << ", " << bounds.second << ") "
 		  << std::endl;
@@ -521,14 +521,14 @@ int main (int argc, char** argv)
 	    out << "% This is a sample histogram plot for Matlab." << std::endl;
 	    out << "bin_members = [" << std::endl;
 	    for (unsigned int i=0; i<n_bins; i++)
-	      out << static_cast<real>(histogram[i]) / static_cast<real>(mesh.n_elem())
+	      out << static_cast<Real>(histogram[i]) / static_cast<Real>(mesh.n_elem())
 		  << std::endl;
 	    out << "];" << std::endl;
 	    
-	    std::vector<real> bin_coords(n_bins);
-	    const real max   = *(std::max_element(sv.begin(), sv.end()));
-	    const real min   = *(std::min_element(sv.begin(), sv.end()));
-	    const real delta = (max - min) / static_cast<real>(n_bins);
+	    std::vector<Real> bin_coords(n_bins);
+	    const Real max   = *(std::max_element(sv.begin(), sv.end()));
+	    const Real min   = *(std::min_element(sv.begin(), sv.end()));
+	    const Real delta = (max - min) / static_cast<Real>(n_bins);
 	    for (unsigned int i=0; i<n_bins; i++)
 	      bin_coords[i] = min + (i * delta) + delta / 2.0 ;
 	    
@@ -576,10 +576,10 @@ int main (int argc, char** argv)
     
     for (unsigned int step=0; step<100; step++)
       {
-//	const real x = .5 + .25*cos((((real) step)/100.)*3.1415927); 
-//	const real y = .5 + .25*sin((((real) step)/100.)*3.1415927);
-	const real x = 2.5*cos((((real) step)/100.)*3.1415927); 
-	const real y = 2.5*sin((((real) step)/100.)*3.1415927);
+//	const Real x = .5 + .25*cos((((Real) step)/100.)*3.1415927); 
+//	const Real y = .5 + .25*sin((((Real) step)/100.)*3.1415927);
+	const Real x = 2.5*cos((((Real) step)/100.)*3.1415927); 
+	const Real y = 2.5*sin((((Real) step)/100.)*3.1415927);
 
 	const Point p(x,y);
 	

@@ -1,4 +1,4 @@
-// $Id: inf_fe_lagrange_eval.C,v 1.1 2003-01-24 17:24:42 jwpeterson Exp $
+// $Id: inf_fe_lagrange_eval.C,v 1.2 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,7 +26,7 @@
 
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-real InfFE<Dim,T_radial,T_map>::eval(const real v,
+Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
 				     const Order o_radial,
 				     const unsigned int i)
 {
@@ -543,7 +543,7 @@ real InfFE<Dim,T_radial,T_map>::eval(const real v,
 
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-real InfFE<Dim,T_radial,T_map>::eval_deriv(const real v,
+Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
 					   const Order o_radial,
 					   const unsigned int i)
 {

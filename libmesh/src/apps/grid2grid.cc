@@ -48,8 +48,8 @@ int main (int argc, char** argv)
   };
 
 
-  std::vector<real> coarse_solution;
-  std::vector<real> fine_solution;
+  std::vector<Real> coarse_solution;
+  std::vector<Real> fine_solution;
   std::vector<std::string> coarse_var_names;
   std::vector<std::string> fine_var_names;
   
@@ -72,7 +72,7 @@ int main (int argc, char** argv)
   assert (fine_var_names == coarse_var_names);
 
 
-  std::vector<real>        diff_solution  (fine_solution.size());
+  std::vector<Real>        diff_solution  (fine_solution.size());
   std::vector<std::string> diff_var_names (fine_var_names);
 
   // Declare an Octree.
@@ -121,11 +121,11 @@ int main (int argc, char** argv)
     fe_coarse.attach_quadrature_rule (&qrule);
     fe_fine.attach_quadrature_rule   (&qrule);
     
-    const std::vector<real>& JxW               = fe_fine.get_JxW();
+    const std::vector<Real>& JxW               = fe_fine.get_JxW();
     const std::vector<Point>& q_point          = fe_fine.get_xyz();
-    const std::vector<std::vector<real> >& phi = fe_fine.get_phi();
+    const std::vector<std::vector<Real> >& phi = fe_fine.get_phi();
     const int ivar = atoi(argv[1]);
-    real error = 0.;
+    Real error = 0.;
 
     // Initial coarse element
     Elem* coarse_element = mesh_coarse.elem(0);
@@ -145,7 +145,7 @@ int main (int argc, char** argv)
 
 	for (unsigned int gp=0; gp<q_point.size(); gp++)
 	  {
-	    real fine_soln=0., coarse_soln=0.;
+	    Real fine_soln=0., coarse_soln=0.;
 
 	    assert (fe_fine.n_shape_functions() == fine_element->n_nodes());
 	    
@@ -248,7 +248,7 @@ int main (int argc, char** argv)
 		
 		for (unsigned int c=0; c<nv; c++)
 		  {
-		    real coarse_soln = 0.;
+		    Real coarse_soln = 0.;
 		    
 		    // Interpolate the coarse grid solution.
 		    for (unsigned int i=0; i<fe_coarse.n_shape_functions(); i++)

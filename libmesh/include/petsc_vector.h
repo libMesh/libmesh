@@ -1,4 +1,4 @@
-//    $Id: petsc_vector.h,v 1.6 2003-01-25 05:33:10 jwpeterson Exp $
+//    $Id: petsc_vector.h,v 1.7 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -36,29 +36,34 @@
 #include <vector>
 
 
-// Petsc include files
-#ifdef USE_COMPLEX_NUMBERS
-#  define PETSC_USE_COMPLEX 1
-#endif
+
+/**
+ * Petsc include files.  PETSc with complex numbers 
+ * is actually C++.
+ */
+# ifndef USE_COMPLEX_NUMBERS
 
 namespace Petsc {
-  extern "C" {
-#include <petsc.h>
-#include <petscvec.h>
-#include <petscversion.h>
-  }
-  // for easy switching between Petsc 2.1.0/2.1.1
-  //typedef Scalar PetscScalar;
+extern "C" {
+#include "petscvec.h"
 }
-
-
+// for easy switching between Petsc 2.1.0/2.1.1
+// typedef Scalar PetscScalar;
+} 
 using namespace Petsc;
 
+#else
+
+#include "petscvec.h"
+
+#endif
 
 
 
+// forward declarations
 class PetscMatrix;
 class PetscInterface;
+
 
 /**
  * Petsc vector. Provides a nice interface to the
@@ -154,7 +159,7 @@ class PetscVector
   /**
    * $U(0-N) = s$: fill all components.
    */
-  PetscVector & operator= (const number s);
+  PetscVector & operator= (const Complex s);
     
   /**
    *  $U = V$: copy all components.
@@ -164,7 +169,7 @@ class PetscVector
   /**
    *  $U = V$: copy all components.
    */
-  PetscVector & operator= (const std::vector<number> &v);
+  PetscVector & operator= (const std::vector<Complex> &v);
 
   /**
    * @returns the scalar product of
@@ -177,41 +182,41 @@ class PetscVector
    * of the arguments of this
    * vector.
    */
-  number operator* (const PetscVector &V) const;
+  Complex operator* (const PetscVector &V) const;
 
   /**
    * @returns the minimum element in the vector.
    * In case of complex numbers, this returns the minimum
-   * real part.
+   * Real part.
    */
-  real min () const;
+  Real min () const;
   
   /**
    * @returns the maximum element in the vector.
    * In case of complex numbers, this returns the maximum
-   * real part.
+   * Real part.
    */
-  real max () const;
+  Real max () const;
   
   /**
    * @returns the $l_1$-norm of the vector, i.e.
    * the sum of the absolute values.
    */
-  real l1_norm () const;
+  Real l1_norm () const;
 
   /**
    * @returns the $l_2$-norm of the vector, i.e.
    * the square root of the sum of the
    * squares of the elements.
    */
-  real l2_norm () const;
+  Real l2_norm () const;
 
   /**
    * @returns the maximum absolute value of the
    * elements of this vector, which is the
    * $l_\infty$-norm of a vector.
    */
-  real linfty_norm () const;
+  Real linfty_norm () const;
 
   /**
    * @returns dimension of the vector. This
@@ -243,7 +248,7 @@ class PetscVector
   /**
    * Access components, returns \p U(i).
    */
-  number operator() (const unsigned int i) const;
+  Complex operator() (const unsigned int i) const;
     
   /**
    * Addition operator.
@@ -260,19 +265,19 @@ class PetscVector
   /**
    * v(i) = value
    */
-  void set (const unsigned int i, const number value);
+  void set (const unsigned int i, const Complex value);
     
   /**
    * v(i) += value
    */
-  void add (const unsigned int i, const number value);
+  void add (const unsigned int i, const Complex value);
     
   /**
    * $U(0-DIM)+=s$.
    * Addition of \p s to all components. Note
    * that \p s is a scalar and not a vector.
    */
-  void add (const number s);
+  void add (const Complex s);
     
   /**
    * U+=V.
@@ -286,14 +291,14 @@ class PetscVector
    * Simple vector addition, equal to the
    * \p operator +=.
    */
-  void add (const number a, const PetscVector& v);
+  void add (const Complex a, const PetscVector& v);
   
   /**
-   * U+=v where v is a std::vector<number> 
+   * U+=v where v is a std::vector<Complex> 
    * and you
    * want to specify WHERE to add it
    */
-  void add_vector (const std::vector<number>& v,
+  void add_vector (const std::vector<Complex>& v,
 		   const std::vector<unsigned int>& dof_indices);
 
   /**
@@ -311,7 +316,7 @@ class PetscVector
    * Scale each element of the
    * vector by the given factor.
    */
-  void scale (const number factor);
+  void scale (const Complex factor);
 
   /**
    * Scale each element of the
@@ -321,13 +326,13 @@ class PetscVector
    * function, except that it
    * returns a reference to itself.
    */
-  PetscVector & operator *= (const number factor);
+  PetscVector & operator *= (const Complex factor);
     
   /**
    * Creates a copy of the global vector in the
    * local vector \p v_local.
    */
-  void localize (std::vector<number>& v_local) const;
+  void localize (std::vector<Complex>& v_local) const;
 
   /**
    * Same, but fills a \p PetscVector instead of
@@ -349,7 +354,7 @@ class PetscVector
    * default the data is sent to processor 0.  This method
    * is useful for outputting data from one processor.
    */
-  void localize_to_one (std::vector<number>& v_local,
+  void localize_to_one (std::vector<Complex>& v_local,
 			const unsigned int proc_id=0) const;
     
   /**
@@ -587,7 +592,7 @@ unsigned int PetscVector::last_local_index () const
 
 
 inline
-number PetscVector::operator() (const unsigned int i) const
+Complex PetscVector::operator() (const unsigned int i) const
 {
   assert (initialized);
   assert ( ((i >= first_local_index()) &&
@@ -603,13 +608,13 @@ number PetscVector::operator() (const unsigned int i) const
   
   ierr = VecRestoreArray (vec, &values); CHKERRQ(ierr);
   
-  return static_cast<number>(value);
+  return static_cast<Complex>(value);
 };
 
 
 
 inline
-real PetscVector::min () const
+Real PetscVector::min () const
 {
   assert (initialized);
 
@@ -619,13 +624,13 @@ real PetscVector::min () const
   ierr = VecMin (vec, &index, &min); CHKERRQ(ierr);
 
   // this return value is correct: VecMin returns a PetscReal
-  return static_cast<real>(min);
+  return static_cast<Real>(min);
 };
 
 
 
 inline
-real PetscVector::max() const
+Real PetscVector::max() const
 {
   assert (initialized);
 
@@ -635,7 +640,7 @@ real PetscVector::max() const
   ierr = VecMax (vec, &index, &max); CHKERRQ(ierr);
 
   // this return value is correct: VecMax returns a PetscReal
-  return static_cast<real>(max);
+  return static_cast<Real>(max);
 };
 
 

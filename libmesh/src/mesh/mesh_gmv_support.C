@@ -1,4 +1,4 @@
-// $Id: mesh_gmv_support.C,v 1.5 2003-01-24 17:24:44 jwpeterson Exp $
+// $Id: mesh_gmv_support.C,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -58,7 +58,7 @@ void MeshBase::write_gmv (std::ostream& out,
 			  EquationSystems& es,
 			  const bool write_partitioning)
 {
-  std::vector<number> soln;
+  std::vector<Complex> soln;
   std::vector<std::string> names;
   
   es.build_variable_names  (names);
@@ -71,7 +71,7 @@ void MeshBase::write_gmv (std::ostream& out,
 
 
 void MeshBase::write_gmv (const std::string& name,
-			  const std::vector<number>* v,
+			  const std::vector<Complex>* v,
 			  const std::vector<std::string>* solution_names,
 			  const bool write_partitioning)
 {
@@ -84,7 +84,7 @@ void MeshBase::write_gmv (const std::string& name,
 
 
 void MeshBase::write_gmv(std::ostream& out,
-			 const std::vector<number>*  v,
+			 const std::vector<Complex>*  v,
 			 const std::vector<std::string>* solution_names,
 			 const bool write_partitioning)
 {
@@ -350,7 +350,7 @@ void MeshBase::write_gmv_binary (std::ostream& out,
 				 EquationSystems& es,
 				 const bool write_partitioning)
 {
-  std::vector<number> soln;
+  std::vector<Complex> soln;
   std::vector<std::string> names;
   
   es.build_variable_names  (names);
@@ -363,7 +363,7 @@ void MeshBase::write_gmv_binary (std::ostream& out,
 
 
 void MeshBase::write_gmv_binary (const std::string& name,
-				 const std::vector<number>* v,
+				 const std::vector<Complex>* v,
 				 const std::vector<std::string>* solution_names,
 				 const bool write_partitioning)
 {
@@ -376,7 +376,7 @@ void MeshBase::write_gmv_binary (const std::string& name,
 
 
 void MeshBase::write_gmv_binary(std::ostream& out,
-				const std::vector<number>* v,
+				const std::vector<Complex>* v,
 				const std::vector<std::string>* solution_names,
 				const bool write_partitioning)
 {
@@ -565,7 +565,7 @@ void MeshBase::write_gmv_binary(std::ostream& out,
 	  // for complex data, write two datasets
 
 
-	  // real part
+	  // Real part
 	  strcpy(buf, "r_");
 	  out.write(buf, 2);
 	  strcpy(buf, (*solution_names)[c].c_str());

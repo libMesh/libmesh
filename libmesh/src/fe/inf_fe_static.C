@@ -1,4 +1,4 @@
-// $Id: inf_fe_static.C,v 1.2 2003-01-29 20:58:30 benkirk Exp $
+// $Id: inf_fe_static.C,v 1.3 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -57,7 +57,7 @@ unsigned int InfFE<Dim,T_radial,T_map>::Radial::index(const FEType& base_fe_type
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 Point InfFE<Dim,T_radial,T_map>::Radial::inverse_map(const Elem*,
-						     const real)
+						     const Real)
 
 {
   std::cerr << "ERROR: Radial::inverse_map() not yet implemented." << std::endl;
@@ -230,8 +230,8 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_per_elem(const FEType& fet,
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 void InfFE<Dim,T_radial,T_map>::nodal_soln(const FEType&,
 					   const Elem*,
-					   const std::vector<number>&,
-					   std::vector<number>&)
+					   const std::vector<Complex>&,
+					   std::vector<Complex>&)
 {
   std::cerr << "ERROR: The concept of a nodal solution is not "
 	    << "applicable to infinite elements!" << std::endl;
@@ -267,7 +267,7 @@ For sure:
 
 //TODO:[DD] Probably have to fix on_reference_element() also for InfFE
 /*
-bool FEBase::on_reference_element(const Point& p, const ElemType t, const real eps)
+bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real eps)
 */
 
 
@@ -276,7 +276,7 @@ bool FEBase::on_reference_element(const Point& p, const ElemType t, const real e
 
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
+Real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
 				      const ElemType type,
 				      const unsigned int i,
 				      const Point& p)
@@ -289,7 +289,7 @@ real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
 
   const Order        o_radial ( fet.order );
   const unsigned int i_radial ( Radial::index(base_fet, base_et, i) );
-  const real         v        ( p(Dim-1) );  // holds for all Dim, except for 0, but we don't inst Dim=0 ;-)
+  const Real         v        ( p(Dim-1) );  // holds for all Dim, except for 0, but we don't inst Dim=0 ;-)
 
 
   if (Dim > 1)
@@ -307,7 +307,7 @@ real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
 
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
+Real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
 				      const Elem* elem,
 				      const unsigned int i,
 				      const Point& p)
@@ -321,7 +321,7 @@ real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
 
   const Order        o_radial ( fet.order );
   const unsigned int i_radial ( Radial::index(base_fet, base_et, i) );
-  const real         v        ( p(Dim-1) );  // holds for all Dim, except for 0, but we don't inst Dim=0 ;-)
+  const Real         v        ( p(Dim-1) );  // holds for all Dim, except for 0, but we don't inst Dim=0 ;-)
 
   AutoPtr<Elem>      base_el  = elem->build_side(0);
 

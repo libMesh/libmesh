@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.3 2003-01-25 05:33:10 jwpeterson Exp $
+// $Id: fe_base.h,v 1.4 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -122,7 +122,7 @@ public:
    */
   static bool on_reference_element(const Point& p,
 				   const ElemType t,
-				   const real eps=1.e-6);
+				   const Real eps=1.e-6);
   
   /**
    * @returns the \p xyz spatial locations of the quadrature
@@ -135,14 +135,14 @@ public:
    * @returns the shape function values at the quadrature points
    * on the element.
    */    
-  const std::vector<std::vector<real> >& get_phi() const
+  const std::vector<std::vector<Real> >& get_phi() const
   { return phi; };
   
   /**
    * @returns the element Jacobian times the quadrature weight for
    * each quadrature point.
    */    
-  const std::vector<real>& get_JxW() const
+  const std::vector<Real>& get_JxW() const
   { return JxW; };
 
   /**
@@ -156,21 +156,21 @@ public:
    * @returns the shape function x-derivative at the quadrature
    * points.
    */
-  const std::vector<std::vector<real> >& get_dphidx() const
+  const std::vector<std::vector<Real> >& get_dphidx() const
   { return dphidx; };
   
   /**
    * @returns the shape function y-derivative at the quadrature
    * points.
    */
-  const std::vector<std::vector<real> >& get_dphidy() const
+  const std::vector<std::vector<Real> >& get_dphidy() const
   { return dphidy; };
   
   /**
    * @returns the shape function z-derivative at the quadrature
    * points.
    */
-  const std::vector<std::vector<real> >& get_dphidz() const
+  const std::vector<std::vector<Real> >& get_dphidz() const
   { return dphidz; };
 
   
@@ -187,7 +187,7 @@ public:
    * @returns the multiplicative weight at each quadrature point.
    * To be implemented in derived classes.
    */
-  virtual const std::vector<real>& get_Sobolev_weight() const = 0;
+  virtual const std::vector<Real>& get_Sobolev_weight() const = 0;
 
   /**
    * @returns the first global derivative of the multiplicative 
@@ -324,63 +324,63 @@ protected:
    * be usable in derived classes, and therefore protected.
    * Returns the x value of the pth entry of the dxzydxi_map.
    */
-  real dxdxi_map(const unsigned int p) const   { return dxyzdxi_map[p](0); };
+  Real dxdxi_map(const unsigned int p) const   { return dxyzdxi_map[p](0); };
 
   /**
    * Used in \p FEBase::compute_map(), which should be
    * be usable in derived classes, and therefore protected.
    * Returns the y value of the pth entry of the dxzydxi_map.
    */
-  real dydxi_map(const unsigned int p) const   { return dxyzdxi_map[p](1); };
+  Real dydxi_map(const unsigned int p) const   { return dxyzdxi_map[p](1); };
 
   /**
    * Used in \p FEBase::compute_map(), which should be
    * be usable in derived classes, and therefore protected.
    * Returns the z value of the pth entry of the dxzydxi_map.
    */
-  real dzdxi_map(const unsigned int p) const   { return dxyzdxi_map[p](2); };
+  Real dzdxi_map(const unsigned int p) const   { return dxyzdxi_map[p](2); };
 
   /**
    * Used in \p FEBase::compute_map(), which should be
    * be usable in derived classes, and therefore protected.
    * Returns the x value of the pth entry of the dxzydeta_map.
    */
-  real dxdeta_map(const unsigned int p) const  { return dxyzdeta_map[p](0); };
+  Real dxdeta_map(const unsigned int p) const  { return dxyzdeta_map[p](0); };
 
   /**
    * Used in \p FEBase::compute_map(), which should be
    * be usable in derived classes, and therefore protected.
    * Returns the y value of the pth entry of the dxzydeta_map.
    */
-  real dydeta_map(const unsigned int p) const  { return dxyzdeta_map[p](1); }; 
+  Real dydeta_map(const unsigned int p) const  { return dxyzdeta_map[p](1); }; 
 
   /**
    * Used in \p FEBase::compute_map(), which should be
    * be usable in derived classes, and therefore protected.
    * Returns the z value of the pth entry of the dxzydeta_map.
    */
-  real dzdeta_map(const unsigned int p) const  { return dxyzdeta_map[p](2); };
+  Real dzdeta_map(const unsigned int p) const  { return dxyzdeta_map[p](2); };
 
   /**
    * Used in \p FEBase::compute_map(), which should be
    * be usable in derived classes, and therefore protected.
    * Returns the x value of the pth entry of the dxzydzeta_map.
    */
-  real dxdzeta_map(const unsigned int p) const { return dxyzdzeta_map[p](0); };
+  Real dxdzeta_map(const unsigned int p) const { return dxyzdzeta_map[p](0); };
 
   /**
    * Used in \p FEBase::compute_map(), which should be
    * be usable in derived classes, and therefore protected.
    * Returns the y value of the pth entry of the dxzydzeta_map.
    */
-  real dydzeta_map(const unsigned int p) const { return dxyzdzeta_map[p](1); };
+  Real dydzeta_map(const unsigned int p) const { return dxyzdzeta_map[p](1); };
 
   /**
    * Used in \p FEBase::compute_map(), which should be
    * be usable in derived classes, and therefore protected.
    * Returns the z value of the pth entry of the dxzydzeta_map.
    */
-  real dzdzeta_map(const unsigned int p) const { return dxyzdzeta_map[p](2); };
+  Real dzdzeta_map(const unsigned int p) const { return dxyzdzeta_map[p](2); };
 
 
 
@@ -421,19 +421,19 @@ protected:
    * Map for partial derivatives:
    * d(xi)/d(x). Needed for the Jacobian.
    */
-  std::vector<real>  dxidx_map;
+  std::vector<Real>  dxidx_map;
 
   /**
    * Map for partial derivatives:
    * d(xi)/d(y). Needed for the Jacobian.
    */
-  std::vector<real>  dxidy_map;
+  std::vector<Real>  dxidy_map;
 
   /**
    * Map for partial derivatives:
    * d(xi)/d(z). Needed for the Jacobian.
    */
-  std::vector<real>  dxidz_map;
+  std::vector<Real>  dxidz_map;
 
 
 
@@ -442,19 +442,19 @@ protected:
    * Map for partial derivatives:
    * d(eta)/d(x). Needed for the Jacobian.
    */
-  std::vector<real>  detadx_map;
+  std::vector<Real>  detadx_map;
 
   /**
    * Map for partial derivatives:
    * d(eta)/d(y). Needed for the Jacobian.
    */
-  std::vector<real>  detady_map;
+  std::vector<Real>  detady_map;
 
   /**
    * Map for partial derivatives:
    * d(eta)/d(z). Needed for the Jacobian.
    */
-  std::vector<real>  detadz_map;
+  std::vector<Real>  detadz_map;
 
 
 
@@ -464,26 +464,26 @@ protected:
    * Map for partial derivatives:
    * d(zeta)/d(x). Needed for the Jacobian.
    */
-  std::vector<real>  dzetadx_map;
+  std::vector<Real>  dzetadx_map;
 
   /**
    * Map for partial derivatives:
    * d(zeta)/d(y). Needed for the Jacobian.
    */
-  std::vector<real>  dzetady_map;
+  std::vector<Real>  dzetady_map;
 
   /**
    * Map for partial derivatives:
    * d(zeta)/d(z). Needed for the Jacobian.
    */
-  std::vector<real>  dzetadz_map;
+  std::vector<Real>  dzetadz_map;
 
 
   
   /**
    * Shape function values.
    */
-  std::vector<std::vector<real> >   phi;
+  std::vector<std::vector<Real> >   phi;
 
   /**
    * Shape function derivative values.
@@ -493,32 +493,32 @@ protected:
   /**
    * Shape function derivatives in the xi direction.
    */
-  std::vector<std::vector<real> >   dphidxi;
+  std::vector<std::vector<Real> >   dphidxi;
 
   /**
    * Shape function derivatives in the eta direction.
    */
-  std::vector<std::vector<real> >   dphideta;
+  std::vector<std::vector<Real> >   dphideta;
   
   /**
    * Shape function derivatives in the zeta direction.
    */
-  std::vector<std::vector<real> >   dphidzeta;
+  std::vector<std::vector<Real> >   dphidzeta;
 
   /**
    * Shape function derivatives in the x direction.
    */
-  std::vector<std::vector<real> >   dphidx;
+  std::vector<std::vector<Real> >   dphidx;
 
   /**
    * Shape function derivatives in the y direction.
    */
-  std::vector<std::vector<real> >   dphidy;
+  std::vector<std::vector<Real> >   dphidy;
 
   /**
    * Shape function derivatives in the z direction.
    */
-  std::vector<std::vector<real> >   dphidz;
+  std::vector<std::vector<Real> >   dphidz;
 
 
 
@@ -527,22 +527,22 @@ protected:
   /**
    * Map for the shape function phi.
    */
-  std::vector<std::vector<real> >   phi_map;
+  std::vector<std::vector<Real> >   phi_map;
 
   /**
    * Map for the derivative, d(phi)/d(xi).
    */
-  std::vector<std::vector<real> >   dphidxi_map;
+  std::vector<std::vector<Real> >   dphidxi_map;
 
   /**
    * Map for the derivative, d(phi)/d(eta).
    */
-  std::vector<std::vector<real> >   dphideta_map;
+  std::vector<std::vector<Real> >   dphideta_map;
 
   /**
    * Map for the derivative, d(phi)/d(zeta).
    */
-  std::vector<std::vector<real> >   dphidzeta_map;
+  std::vector<std::vector<Real> >   dphidzeta_map;
 
 
 
@@ -551,19 +551,19 @@ protected:
   /**
    * Map for the side shape functions, psi. 
    */
-  std::vector<std::vector<real> >   psi_map;
+  std::vector<std::vector<Real> >   psi_map;
 
   /**
    * Map for the derivative of the side functions,
    * d(psi)/d(xi).
    */
-  std::vector<std::vector<real> >   dpsidxi_map;
+  std::vector<std::vector<Real> >   dpsidxi_map;
 
   /**
    * Map for the derivative of the side function,
    * d(psi)/d(eta).
    */
-  std::vector<std::vector<real> >   dpsideta_map;
+  std::vector<std::vector<Real> >   dpsideta_map;
 
 
 
@@ -581,12 +581,12 @@ protected:
   /**
    * Jacobian values at quadrature points
    */
-  std::vector<real>                 jac;
+  std::vector<Real>                 jac;
   
   /**
    * Jacobian*Weight values at quadrature points
    */
-  std::vector<real>                 JxW;
+  std::vector<Real>                 JxW;
 
   /**
    * The finite element type for this object.  Note that this

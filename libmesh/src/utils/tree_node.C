@@ -1,4 +1,4 @@
-// $Id: tree_node.C,v 1.4 2003-01-24 17:24:46 jwpeterson Exp $
+// $Id: tree_node.C,v 1.5 2003-02-03 03:51:50 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -127,17 +127,17 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
       // How to refine an OctTree Node
     case 8:
       {
-	const real xmin = bounding_box.first(0);
-	const real ymin = bounding_box.first(1);
-	const real zmin = bounding_box.first(2);
+	const Real xmin = bounding_box.first(0);
+	const Real ymin = bounding_box.first(1);
+	const Real zmin = bounding_box.first(2);
 
-	const real xmax = bounding_box.second(0);
-	const real ymax = bounding_box.second(1);
-	const real zmax = bounding_box.second(2);
+	const Real xmax = bounding_box.second(0);
+	const Real ymax = bounding_box.second(1);
+	const Real zmax = bounding_box.second(2);
 
-	const real xc = xmin + .5*(xmax - xmin);
-	const real yc = ymin + .5*(ymax - ymin);
-	const real zc = zmin + .5*(zmax - zmin);
+	const Real xc = xmin + .5*(xmax - xmin);
+	const Real yc = ymin + .5*(ymax - ymin);
+	const Real zc = zmin + .5*(zmax - zmin);
 
 	
 	switch (c)

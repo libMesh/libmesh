@@ -1,4 +1,4 @@
-// $Id: quadrature.h,v 1.5 2003-01-24 17:24:39 jwpeterson Exp $
+// $Id: quadrature.h,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -78,7 +78,7 @@ public:
   /**
    * @returns a \p std::vector containing the quadrature weights.
    */
-  const std::vector<real>& get_weights() const { return _weights; };
+  const std::vector<Real>& get_weights() const { return _weights; };
 
   /**
    * @returns the \f$ i^{th} \f$ quadrature point on the reference object.
@@ -89,7 +89,7 @@ public:
   /**
    * @returns the \f$ i^{th} \f$ quadrature weight.
    */
-  real w(const unsigned int i) const
+  Real w(const unsigned int i) const
     { assert (i < _weights.size()); return _weights[i]; };
 
   /**
@@ -253,7 +253,7 @@ protected:
   /**
    * The value of the quadrature weights.
    */
-  std::vector<real> _weights;
+  std::vector<Real> _weights;
 };
 
 

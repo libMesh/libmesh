@@ -1,4 +1,4 @@
-// $Id: fe_lagrange_shape_2D.C,v 1.5 2003-01-24 17:24:41 jwpeterson Exp $
+// $Id: fe_lagrange_shape_2D.C,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,7 +30,7 @@
 
 
 template <>
-real FE<2,LAGRANGE>::shape(const ElemType type,
+Real FE<2,LAGRANGE>::shape(const ElemType type,
 			   const Order order,
 			   const unsigned int i,
 			   const Point& p)
@@ -49,8 +49,8 @@ real FE<2,LAGRANGE>::shape(const ElemType type,
 	  case QUAD9:
 	    {
 	      // Compute quad shape functions as a tensor-product
-	      const real xi  = p(0);
-	      const real eta = p(1);
+	      const Real xi  = p(0);
+	      const Real eta = p(1);
 	      
 	      assert (i<4);
 	      
@@ -65,9 +65,9 @@ real FE<2,LAGRANGE>::shape(const ElemType type,
 	  case TRI3:
 	  case TRI6:
 	    {
-	      const real zeta1 = p(0);
-	      const real zeta2 = p(1);
-	      const real zeta0 = 1. - zeta1 - zeta2;
+	      const Real zeta1 = p(0);
+	      const Real zeta2 = p(1);
+	      const Real zeta0 = 1. - zeta1 - zeta2;
 
 	      assert (i<3);
 	      
@@ -105,8 +105,8 @@ real FE<2,LAGRANGE>::shape(const ElemType type,
 	  {
 	  case QUAD8:
 	    {
-	      const real xi  = p(0);
-	      const real eta = p(1);
+	      const Real xi  = p(0);
+	      const Real eta = p(1);
 
 	      assert (i<8);
 
@@ -144,8 +144,8 @@ real FE<2,LAGRANGE>::shape(const ElemType type,
 	  case QUAD9:
 	    {
 	      // Compute quad shape functions as a tensor-product
-	      const real xi  = p(0);
-	      const real eta = p(1);
+	      const Real xi  = p(0);
+	      const Real eta = p(1);
 	      
 	      assert (i<9);
 	      
@@ -159,9 +159,9 @@ real FE<2,LAGRANGE>::shape(const ElemType type,
 	    
 	  case TRI6:
 	    {
-	      const real zeta1 = p(0);
-	      const real zeta2 = p(1);
-	      const real zeta0 = 1. - zeta1 - zeta2;
+	      const Real zeta1 = p(0);
+	      const Real zeta2 = p(1);
+	      const Real zeta0 = 1. - zeta1 - zeta2;
 	      
 	      assert (i<6);
 	      
@@ -220,7 +220,7 @@ real FE<2,LAGRANGE>::shape(const ElemType type,
 
 
 template <>
-real FE<2,LAGRANGE>::shape(const Elem* elem,
+Real FE<2,LAGRANGE>::shape(const Elem* elem,
 			   const Order order,
 			   const unsigned int i,
 			   const Point& p)
@@ -234,7 +234,7 @@ real FE<2,LAGRANGE>::shape(const Elem* elem,
 
 
 template <>
-real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
+Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
 				 const Order order,
 				 const unsigned int i,
 				 const unsigned int j,
@@ -257,8 +257,8 @@ real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
 	  case QUAD9:
 	    {
 	      // Compute quad shape functions as a tensor-product
-	      const real xi  = p(0);
-	      const real eta = p(1);
+	      const Real xi  = p(0);
+	      const Real eta = p(1);
 
 	      assert (i<4);
 	
@@ -288,13 +288,13 @@ real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
 	    {
 	      assert (i<3);
 	      
-	      const real dzeta0dxi  = -1.;
-	      const real dzeta1dxi  = 1.;
-	      const real dzeta2dxi  = 0.;
+	      const Real dzeta0dxi  = -1.;
+	      const Real dzeta1dxi  = 1.;
+	      const Real dzeta2dxi  = 0.;
 	      
-	      const real dzeta0deta = -1.;
-	      const real dzeta1deta = 0.;
-	      const real dzeta2deta = 1.;
+	      const Real dzeta0deta = -1.;
+	      const Real dzeta1deta = 0.;
+	      const Real dzeta2deta = 1.;
 	      
 	      switch (j)
 		{
@@ -357,8 +357,8 @@ real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
 	  {
 	  case QUAD8:
 	    {
-	      const real xi  = p(0);
-	      const real eta = p(1);
+	      const Real xi  = p(0);
+	      const Real eta = p(1);
 	
 	      assert (i<8);
 	
@@ -444,8 +444,8 @@ real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
 	  case QUAD9:
 	    {
 	      // Compute quad shape functions as a tensor-product
-	      const real xi  = p(0);
-	      const real eta = p(1);
+	      const Real xi  = p(0);
+	      const Real eta = p(1);
 	      
 	      assert (i<9);
 	      
@@ -474,17 +474,17 @@ real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
 	    {
 	      assert (i<6);
 		  
-	      const real zeta1 = p(0);
-	      const real zeta2 = p(1);
-	      const real zeta0 = 1. - zeta1 - zeta2;
+	      const Real zeta1 = p(0);
+	      const Real zeta2 = p(1);
+	      const Real zeta0 = 1. - zeta1 - zeta2;
 	
-	      const real dzeta0dxi  = -1.;
-	      const real dzeta1dxi  = 1.;
-	      const real dzeta2dxi  = 0.;
+	      const Real dzeta0dxi  = -1.;
+	      const Real dzeta1dxi  = 1.;
+	      const Real dzeta2dxi  = 0.;
 	
-	      const real dzeta0deta = -1.;
-	      const real dzeta1deta = 0.;
-	      const real dzeta2deta = 1.;
+	      const Real dzeta0deta = -1.;
+	      const Real dzeta1deta = 0.;
+	      const Real dzeta2deta = 1.;
 	
 	      switch(j)
 		{
@@ -576,7 +576,7 @@ real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
 
 
 template <>
-real FE<2,LAGRANGE>::shape_deriv(const Elem* elem,
+Real FE<2,LAGRANGE>::shape_deriv(const Elem* elem,
 				 const Order order,
 				 const unsigned int i,
 				 const unsigned int j,

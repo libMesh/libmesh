@@ -218,22 +218,22 @@ void assemble_primary(EquationSystems& es,
   
   
   // These are references to cell-specific data
-  const std::vector<real>& JxW_face            = fe_face->get_JxW();
-  const std::vector<real>& JxW                 = fe->get_JxW();
+  const std::vector<Real>& JxW_face            = fe_face->get_JxW();
+  const std::vector<Real>& JxW                 = fe->get_JxW();
   const std::vector<Point>& q_point            = fe->get_xyz();
-  const std::vector<std::vector<real> >& phi   = fe->get_phi();
+  const std::vector<std::vector<Real> >& phi   = fe->get_phi();
   const std::vector<std::vector<Point> >& dphi = fe->get_dphi();
   
   std::vector<unsigned int> dof_indices_U;
   std::vector<unsigned int> dof_indices_V;
   const DofMap& dof_map = es(system_name).get_dof_map();
   
-  DenseMatrix       Kuu;
-  DenseMatrix       Kvv;
-  std::vector<real> Fu;
-  std::vector<real> Fv;
+  RealDenseMatrix   Kuu;
+  RealDenseMatrix   Kvv;
+  std::vector<Real> Fu;
+  std::vector<Real> Fv;
   
-  real vol=0., area=0.;
+  Real vol=0., area=0.;
 
   for (unsigned int e=0; e<mesh.n_elem(); e++)
     {
@@ -276,8 +276,8 @@ void assemble_primary(EquationSystems& es,
 	      // the case of one unknown per node on one subdomain) so
 	      // we need to go through the dof_map
 		  
-	      const real f = q_point[gp]*q_point[gp];
-	      //		    const real f = (q_point[gp](0) +
+	      const Real f = q_point[gp]*q_point[gp];
+	      //		    const Real f = (q_point[gp](0) +
 	      //				    q_point[gp](1) +
 	      //				    q_point[gp](2));
 		    
@@ -355,16 +355,16 @@ void assemble_secondary(EquationSystems& es,
     
   
   // These are references to cell-specific data
-  const std::vector<real>& JxW                 = fe->get_JxW();
+  const std::vector<Real>& JxW                 = fe->get_JxW();
   const std::vector<Point>& q_point            = fe->get_xyz();
-  const std::vector<std::vector<real> >& phi   = fe->get_phi();
+  const std::vector<std::vector<Real> >& phi   = fe->get_phi();
   //const std::vector<std::vector<Point> >& dphi = fe->get_dphi();
   
   std::vector<unsigned int> dof_indices;
   const DofMap& dof_map = es(system_name).get_dof_map();
   
-  DenseMatrix       Kww;
-  std::vector<real> Fw;
+  RealDenseMatrix   Kww;
+  std::vector<Real> Fw;
   
 	
   for (unsigned int e=0; e<mesh.n_elem(); e++)
@@ -399,7 +399,7 @@ void assemble_secondary(EquationSystems& es,
 	    // the case of one unknown per node on one subdomain) so
 	    // we need to go through the dof_map
 	    
-	    const real f = q_point[gp]*q_point[gp];
+	    const Real f = q_point[gp]*q_point[gp];
 	    
 	    Fw[i] += JxW[gp]*f*phi[i][gp];
 	    

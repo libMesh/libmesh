@@ -1,4 +1,4 @@
-// $Id: inf_fe.h,v 1.7 2003-01-29 20:58:29 benkirk Exp $
+// $Id: inf_fe.h,v 1.8 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -96,7 +96,7 @@
  *
  * \author Daniel Dreyer
  * \date 2003
- * \version $Revision: 1.7 $
+ * \version $Revision: 1.8 $
  */
 
 //-------------------------------------------------------------
@@ -119,7 +119,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.7 $
+   * \version $Revision: 1.8 $
    */
   //-------------------------------------------------------------
   // InfFE::Radial class definition
@@ -136,24 +136,24 @@ protected:
      * @returns the decay in radial direction of
      * the \p Dim dimensional infinite element.
      */
-    static real decay(const real v);
+    static Real decay(const Real v);
 
     /**
      * @returns the first (local) derivative of the
      * decay in radial direction of the infinite element.
      */
-    static real decay_deriv(const real) { return .5; };
+    static Real decay_deriv(const Real) { return .5; };
 
     /**
      * @returns the radial weight D, used as an additional weight
      * for the test function, evaluated at local radial coordinate \p v.
      */
-    static real D(const real v) { return (1.-v)*(1.-v)/4.; };
+    static Real D(const Real v) { return (1.-v)*(1.-v)/4.; };
 
     /**
      * @returns the first (local) radial derivative of the radial weight D.
      */
-    static real D_deriv(const real v) { return (v-1.)/2.; };
+    static Real D_deriv(const Real v) { return (v-1.)/2.; };
 
     /**
      * @returns the index (0 for the base, 1,2,... for the outer shells) 
@@ -231,7 +231,7 @@ protected:
      * it is not trivial.
      */
     static Point inverse_map (const Elem* inf_elem,
-			      const real dist_origin);
+			      const Real dist_origin);
 
   };
 
@@ -244,7 +244,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.7 $
+   * \version $Revision: 1.8 $
    */
   //-------------------------------------------------------------
   // InfFE::Base class definition
@@ -343,7 +343,7 @@ public:
    * its counterpart in \p FE<Dim,T>, and is @e not employed
    * in the \p reinit() cycle.
    */
-  static real shape(const FEType& fet,
+  static Real shape(const FEType& fet,
 		    const ElemType t,
 		    const unsigned int i,
 		    const Point& p);
@@ -356,7 +356,7 @@ public:
    * counterpart in \p FE<Dim,T>, and is @e not employed 
    * in the \p reinit() cycle.
    */
-  static real shape(const FEType& fet,
+  static Real shape(const FEType& fet,
 		    const Elem* elem,
 		    const unsigned int i,
 		    const Point& p);
@@ -397,8 +397,8 @@ public:
    */
   static void nodal_soln(const FEType& fet,
 			 const Elem* elem, 
-			 const std::vector<number>& elem_soln,
-			 std::vector<number>& nodal_soln);
+			 const std::vector<Complex>& elem_soln,
+			 std::vector<Complex>& nodal_soln);
 
   /**
    * @returns the location (on the reference element) of the
@@ -476,7 +476,7 @@ public:
    * used for the trial function space.  This renders the
    * variational form easily computable.
    */
-  const std::vector<real>& get_Sobolev_weight() const
+  const std::vector<Real>& get_Sobolev_weight() const
       { return weight; };
 
   /**
@@ -516,7 +516,7 @@ protected:
    * Infinite elements in quasi-static materially nonlinear problems,
    * @e Computers @e and @e Structures, 1984.
    */
-  static real eval(const real v,
+  static Real eval(const Real v,
 		   const Order o_radial,
 		   const unsigned int i);
   
@@ -525,7 +525,7 @@ protected:
    * \f$ i^{th} \f$ polynomial at coordinate \p v.
    * See \p eval for details.
    */
-  static real eval_deriv(const real v,
+  static Real eval_deriv(const Real v,
 			 const Order o_radial,
 			 const unsigned int i);
 
@@ -646,7 +646,7 @@ protected:
    * the additional radial weight \f$ 1/{r^2} \f$ in local coordinates,
    * over @e all quadrature points.
    */
-  std::vector<real>  weight;
+  std::vector<Real>  weight;
 
 
 
@@ -655,7 +655,7 @@ protected:
   /**
    * the radial distance of the base nodes from the origin
    */
-  std::vector<real>  dist;
+  std::vector<Real>  dist;
 
   /**
    * the additional radial weight \f$ 1/{r^2} \f$ in local coordinates,
@@ -663,7 +663,7 @@ protected:
    * direction.  However, for uniform access to the data fields from the 
    * outside, this data field is expanded to @e all quadrature points.
    */
-  std::vector<real>  dweightdv;
+  std::vector<Real>  dweightdv;
 
   /**
    * the radial decay \f$ 1/r \f$ in local coordinates.
@@ -671,56 +671,56 @@ protected:
    * Note that it is this decay which assures to satisfy
    * the Sommerfeld radiation condition in advance.
    */
-  std::vector<real>  som;
+  std::vector<Real>  som;
   /**
    * the first local derivative of the radial decay \f$ 1/r \f$ in local 
    * coordinates.  Needed when setting up the overall shape functions.
    */
-  std::vector<real>  dsomdv;
+  std::vector<Real>  dsomdv;
 
   /**
    * the radial approximation shapes in local coordinates
    * Needed when setting up the overall shape functions.
    */
-  std::vector<std::vector<real> >   mode;
+  std::vector<std::vector<Real> >   mode;
 
   /**
    * the first local derivative of the radial approximation shapes.
    * Needed when setting up the overall shape functions.
    */
-  std::vector<std::vector<real> >   dmodedv;
+  std::vector<std::vector<Real> >   dmodedv;
   
   /**
    * the radial mapping shapes in local coordinates
    */
-  std::vector<std::vector<real> >   radial_map;
+  std::vector<std::vector<Real> >   radial_map;
 
 
   /**
    * the first local derivative of the radial mapping shapes
    */
-  std::vector<std::vector<real> >   dradialdv_map;
+  std::vector<std::vector<Real> >   dradialdv_map;
 
   /**
    * the first local derivative (for 3D, the first in the base) 
    * of the phase term in local coordinates.
    * Needed in the overall weak form of infinite element formulations.
    */
-  std::vector<real>  dphasedxi;
+  std::vector<Real>  dphasedxi;
 
   /**
    * the second local derivative (for 3D, the second in the base) 
    * of the phase term in local coordinates.
    * Needed in the overall weak form of infinite element formulations.
    */
-  std::vector<real>  dphasedeta;
+  std::vector<Real>  dphasedeta;
 
   /**
    * the third local derivative (for 3D, the derivative in radial
    * direction) of the phase term in local coordinates.
    * Needed in the overall weak form of infinite element formulations.
    */
-  std::vector<real>  dphasedzeta;
+  std::vector<Real>  dphasedzeta;
 
 
 
@@ -839,7 +839,7 @@ void InfFE<Dim,T_radial,T_base>::update_base_elem (const Elem* inf_elem)
 // InfFE::Radial class inline members
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 inline
-real InfFE<Dim,T_radial,T_map>::Radial::decay(const real v)
+Real InfFE<Dim,T_radial,T_map>::Radial::decay(const Real v)
 {
   switch (Dim)
   //TODO:[DD] What decay do i have in 2D and 1D?

@@ -1,4 +1,4 @@
-// $Id: quadrature_gauss_2D.C,v 1.5 2003-01-29 20:21:41 jwpeterson Exp $
+// $Id: quadrature_gauss_2D.C,v 1.6 2003-02-03 03:51:50 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -127,10 +127,10 @@ void QGauss::init_2D(const ElemType _type)
 	      _points.resize(7);
 	      _weights.resize(7);
 		  
-	      const real a1 = .0597158717;
-	      const real b1 = .4701420641;
-	      const real a2 = .7974269853;
-	      const real b2 = .1012865073;
+	      const Real a1 = .0597158717;
+	      const Real b1 = .4701420641;
+	      const Real a2 = .7974269853;
+	      const Real b2 = .1012865073;
 		  
 	      _points[0](0) = .33333333333333333333333333333333;
 	      _points[0](1) = .33333333333333333333333333333333;
@@ -174,10 +174,10 @@ void QGauss::init_2D(const ElemType _type)
 	      // quadrature rule.  For information, see
 	      // Approximate Calculation of Multiple Integrals,
 	      // Stroud, A. H. p 314
-	      std::vector<real> r(4);
-	      std::vector<real> s(4);
-	      std::vector<real> A(4);
-	      std::vector<real> B(4);
+	      std::vector<Real> r(4);
+	      std::vector<Real> s(4);
+	      std::vector<Real> A(4);
+	      std::vector<Real> B(4);
 
 	      // Interval Quadrature points
 	      r[0] = 0.0694318422; s[0] = 0.0571041961;

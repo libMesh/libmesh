@@ -1,4 +1,4 @@
-// $Id: cell_tet4.C,v 1.7 2003-01-25 01:42:46 jwpeterson Exp $
+// $Id: cell_tet4.C,v 1.8 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -128,7 +128,7 @@ void Tet4::vtk_connectivity(const unsigned int sc,
 
 #ifdef ENABLE_AMR
 
-const real Tet4::embedding_matrix[8][4][4] =
+const Real Tet4::embedding_matrix[8][4][4] =
 {
   // embedding matrix for child 0
   {

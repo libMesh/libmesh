@@ -1,4 +1,4 @@
-// $Id: face_quad.h,v 1.5 2003-01-24 17:24:38 jwpeterson Exp $
+// $Id: face_quad.h,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -98,14 +98,14 @@ public:
    * Based on the quality metric q specified by the user,
    * returns a quantitative assessment of element quality.
    */
-  real quality (const ElemQuality q) const;
+  Real quality (const ElemQuality q) const;
 
   /**
    * Returns the suggested quality bounds for
    * the hex based on quality measure q.  These are
    * the values suggested by the CUBIT User's Manual.
    */
-  std::pair<real, real> qual_bounds (const ElemQuality q) const;
+  std::pair<Real, Real> qual_bounds (const ElemQuality q) const;
 
 private:
     

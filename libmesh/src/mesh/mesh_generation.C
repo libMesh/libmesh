@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.6 2003-01-31 21:22:11 benkirk Exp $
+// $Id: mesh_generation.C,v 1.7 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -43,9 +43,9 @@
 void Mesh::build_cube(const unsigned int nx,
 		      const unsigned int ny,
 		      const unsigned int nz,
-		      const real xmin, const real xmax,
-		      const real ymin, const real ymax,
-		      const real zmin, const real zmax,
+		      const Real xmin, const Real xmax,
+		      const Real ymin, const Real ymax,
+		      const Real zmin, const Real zmax,
 		      const ElemType type)
 {
   switch (mesh_dimension())
@@ -63,7 +63,7 @@ void Mesh::build_cube(const unsigned int nx,
 
 	for (unsigned int i=0; i<=nx; i++)
 	  {
-	    node_ptr(i) = Node::build((real) ((real) i)/((real) nx), 0, 0, i);
+	    node_ptr(i) = Node::build((Real) ((Real) i)/((Real) nx), 0, 0, i);
 	  };
 	
 	for (unsigned int i=0; i<nx; i++)
@@ -111,8 +111,8 @@ void Mesh::build_cube(const unsigned int nx,
 	    
 	    for (unsigned int j=0; j<=ny; j++)
 	      for (unsigned int i=0; i<=nx; i++)
-		node_ptr(p) = Node::build((real) ((real) i)/((real) nx),
-					  (real) ((real) j)/((real) ny),
+		node_ptr(p) = Node::build((Real) ((Real) i)/((Real) nx),
+					  (Real) ((Real) j)/((Real) ny),
 					  0,
 					  p++);
 	    
@@ -161,8 +161,8 @@ void Mesh::build_cube(const unsigned int nx,
 	    
 	    for (unsigned int j=0; j<=ny; j++)
 	      for (unsigned int i=0; i<=nx; i++)
-		node_ptr(p) = Node::build((real) ((real) i)/((real) nx),
-					  (real) ((real) j)/((real) ny),
+		node_ptr(p) = Node::build((Real) ((Real) i)/((Real) nx),
+					  (Real) ((Real) j)/((Real) ny),
 					  0,
 					  p++);
 	    
@@ -207,8 +207,8 @@ void Mesh::build_cube(const unsigned int nx,
 	    
 	    for (unsigned int j=0; j<=(2*ny); j++)
 	      for (unsigned int i=0; i<=(2*nx); i++)
-		node_ptr(p) = Node::build((real) ((real) i)/((real) (2*nx)),
-					  (real) ((real) j)/((real) (2*ny)),
+		node_ptr(p) = Node::build((Real) ((Real) i)/((Real) (2*nx)),
+					  (Real) ((Real) j)/((Real) (2*ny)),
 					  0,
 					  p++);
 	    
@@ -266,8 +266,8 @@ void Mesh::build_cube(const unsigned int nx,
 	    
 	    for (unsigned int j=0; j<=(2*ny); j++)
 	      for (unsigned int i=0; i<=(2*nx); i++)
-		node_ptr(p) = Node::build((real) ((real) i)/((real) (2*nx)),
-					  (real) ((real) j)/((real) (2*ny)),
+		node_ptr(p) = Node::build((Real) ((Real) i)/((Real) (2*nx)),
+					  (Real) ((Real) j)/((Real) (2*ny)),
 					  0,
 					  p++);
 	    
@@ -353,9 +353,9 @@ void Mesh::build_cube(const unsigned int nx,
 	    for (unsigned int k=0; k<=nz; k++)
 	      for (unsigned int j=0; j<=ny; j++)
 		for (unsigned int i=0; i<=nx; i++)
-		  node_ptr(p) = Node::build((real) ((real) i)/((real) nx),
-					    (real) ((real) j)/((real) ny),
-					    (real) ((real) k)/((real) nz),
+		  node_ptr(p) = Node::build((Real) ((Real) i)/((Real) nx),
+					    (Real) ((Real) j)/((Real) ny),
+					    (Real) ((Real) k)/((Real) nz),
 					    p++);
 	    
 	    unsigned int e=0;
@@ -395,9 +395,9 @@ void Mesh::build_cube(const unsigned int nx,
 	    for (unsigned int k=0; k<=(2*nz); k++)
 	      for (unsigned int j=0; j<=(2*ny); j++)
 		for (unsigned int i=0; i<=(2*nx); i++)
-		  node_ptr(p) = Node::build((real) ((real) i)/((real) (2*nx)),
-					    (real) ((real) j)/((real) (2*ny)),
-					    (real) ((real) k)/((real) (2*nz)),
+		  node_ptr(p) = Node::build((Real) ((Real) i)/((Real) (2*nx)),
+					    (Real) ((Real) j)/((Real) (2*ny)),
+					    (Real) ((Real) k)/((Real) (2*nz)),
 					    p++);
 	    
 	    unsigned int e=0;
@@ -486,8 +486,8 @@ void Mesh::build_cube(const unsigned int nx,
 
 void Mesh::build_square (const unsigned int nx,
 			 const unsigned int ny,
-			 const real xmin, const real xmax,
-			 const real ymin, const real ymax,
+			 const Real xmin, const Real xmax,
+			 const Real ymin, const Real ymax,
 			 const ElemType type)
 {
   // This method only makes sense in 2D!
@@ -503,7 +503,7 @@ void Mesh::build_square (const unsigned int nx,
 
 
 
-void Mesh::build_sphere (const real rad,
+void Mesh::build_sphere (const Real rad,
 			 const unsigned int nr,
 			 const ElemType type)
 {
@@ -527,9 +527,9 @@ void Mesh::build_sphere (const real rad,
 
 #ifdef ENABLE_AMR
 
-	const real sqrt_2     = sqrt(2.);
-        const real rad_2      = .25*rad;
-        const real rad_sqrt_2 = rad/sqrt_2;
+	const Real sqrt_2     = sqrt(2.);
+        const Real rad_2      = .25*rad;
+        const Real rad_sqrt_2 = rad/sqrt_2;
   
 
 	// Linear elements
@@ -903,21 +903,21 @@ void Mesh::build_sphere (const real rad,
 	      for (unsigned int j=1; j<ny; j++)
 		for (unsigned int i=1; i<nx; i++)
 		  {
-		    const real xmin = point(G(0 ,j, k))(0);
-		    const real xmax = point(G(nx,j, k))(0);
-		    const real ymin = point(G(i, 0, k))(1);
-		    const real ymax = point(G(i,ny, k))(1);
-		    const real zmin = point(G(i, j, 0))(2);
-		    const real zmax = point(G(i, j,nz))(2);
+		    const Real xmin = point(G(0 ,j, k))(0);
+		    const Real xmax = point(G(nx,j, k))(0);
+		    const Real ymin = point(G(i, 0, k))(1);
+		    const Real ymax = point(G(i,ny, k))(1);
+		    const Real zmin = point(G(i, j, 0))(2);
+		    const Real zmax = point(G(i, j,nz))(2);
 
 		    node(G(i,j,k))(0) = xmin +
-		      (xmax - xmin)*((real) ((real) i)/((real) nx));
+		      (xmax - xmin)*((Real) ((Real) i)/((Real) nx));
 		  
 		    node(G(i,j,k))(1) = ymin +
-		      (ymax - ymin)*((real) ((real) j)/((real) ny));
+		      (ymax - ymin)*((Real) ((Real) j)/((Real) ny));
 		  
 		    node(G(i,j,k))(2) = zmin +
-		      (zmax - zmin)*((real) ((real) k)/((real) nz));
+		      (zmax - zmin)*((Real) ((Real) k)/((Real) nz));
 		  };
 
 	    // Do some smoothing steps.
@@ -991,21 +991,21 @@ void Mesh::build_sphere (const real rad,
 	      for (unsigned int j=1; j<2*ny; j++)
 		for (unsigned int i=1; i<2*nx; i++)
 		  {
-		    const real xmin = point(G(0,   j, k))(0);
-		    const real xmax = point(G(2*nx,j, k))(0);
-		    const real ymin = point(G(i,   0, k))(1);
-		    const real ymax = point(G(i,2*ny, k))(1);
-		    const real zmin = point(G(i, j,   0))(2);
-		    const real zmax = point(G(i, j,2*nz))(2);
+		    const Real xmin = point(G(0,   j, k))(0);
+		    const Real xmax = point(G(2*nx,j, k))(0);
+		    const Real ymin = point(G(i,   0, k))(1);
+		    const Real ymax = point(G(i,2*ny, k))(1);
+		    const Real zmin = point(G(i, j,   0))(2);
+		    const Real zmax = point(G(i, j,2*nz))(2);
 
 		    node(G(i,j,k))(0) = xmin +
-		      (xmax - xmin)*((real) ((real) i)/((real) 2*nx));
+		      (xmax - xmin)*((Real) ((Real) i)/((Real) 2*nx));
 		  
 		    node(G(i,j,k))(1) = ymin +
-		      (ymax - ymin)*((real) ((real) j)/((real) 2*ny));
+		      (ymax - ymin)*((Real) ((Real) j)/((Real) 2*ny));
 		  
 		    node(G(i,j,k))(2) = zmin +
-		      (zmax - zmin)*((real) ((real) k)/((real) 2*nz));
+		      (zmax - zmin)*((Real) ((Real) k)/((Real) 2*nz));
 		  };
 
 	    // Do some smoothing steps.

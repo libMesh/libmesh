@@ -1,4 +1,4 @@
-// $Id: face_quad.C,v 1.6 2003-01-25 01:42:46 jwpeterson Exp $
+// $Id: face_quad.C,v 1.7 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -80,7 +80,7 @@ AutoPtr<Elem> Quad::side (const unsigned int i) const
 
 
 
-real Quad::quality (const ElemQuality) const
+Real Quad::quality (const ElemQuality) const
 {
   return 0.0; // Not implemented
 }
@@ -90,9 +90,9 @@ real Quad::quality (const ElemQuality) const
 
 
 
-std::pair<real, real> Quad::qual_bounds (const ElemQuality q) const
+std::pair<Real, Real> Quad::qual_bounds (const ElemQuality q) const
 {
-  std::pair<real, real> bounds;
+  std::pair<Real, Real> bounds;
   
   switch (q)
     {

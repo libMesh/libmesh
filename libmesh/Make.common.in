@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.7 2003-01-24 17:24:35 jwpeterson Exp $
+# $Id: Make.common.in,v 1.8 2003-02-03 03:51:48 ddreyer Exp $
 
 
 ###############################################################################
@@ -229,18 +229,27 @@ ifeq ($(enable-optional),yes)
                 $(MPI_INCLUDE)
 
     ifeq ($(enable-complex),yes)
-      PETSC_LIB.g  = $(PETSC_DIR)/lib/libg_complex/$(PETSC_ARCH)
-      PETSC_LIB.o  = $(PETSC_DIR)/lib/libO_complex/$(PETSC_ARCH)
+      CXXFLAGS     += -DPETSC_USE_COMPLEX
+      CFLAGS       += -DPETSC_USE_COMPLEX
+      PETSC_BOPT.g = g_complex
+      PETSC_BOPT.o = O_complex
     else
-      PETSC_LIB.g  = $(PETSC_DIR)/lib/libg/$(PETSC_ARCH)
-      PETSC_LIB.o  = $(PETSC_DIR)/lib/libO/$(PETSC_ARCH)
+      PETSC_BOPT.g = g
+      PETSC_BOPT.o = O
     endif
 
     ifeq ($(debug-mode),on)
-      PETSC_LIB = $(PETSC_LIB.g)
+      PETSC_LIB = $(PETSC_DIR)/lib/lib$(PETSC_BOPT.g)/$(PETSC_ARCH)
     else	
-      PETSC_LIB = $(PETSC_LIB.o)
+      PETSC_LIB = $(PETSC_DIR)/lib/lib$(PETSC_BOPT.o)/$(PETSC_ARCH)
     endif	
+
+    ifeq ($(enable-shared),yes)
+      CXXFLAGS     += -DPETSC_USE_DYNAMIC_LIBRARIES
+      CFLAGS       += -DPETSC_USE_DYNAMIC_LIBRARIES 
+      LDFLAGS      += -Wl,-rpath,$(PETSC_LIB)
+    endif
+
 
 # Always link with PETSC's shared libs
 #    libs-PETSC = $(PETSC_LIB)/libpetscsles.a \
@@ -250,12 +259,11 @@ ifeq ($(enable-optional),yes)
 # 		 $(PETSC_LIB)/libpetsc.a
 
 #    ifeq ($(enable-shared),yes)
-
       libs-PETSC = -L$(PETSC_LIB) \
-	  	   -lpetscsles \
-		   -lpetscvec \
-		   -lpetscmat \
+		   -lpetscsles \
 		   -lpetscdm \
+		   -lpetscmat \
+		   -lpetscvec \
 		   -lpetsc
 #    endif
 

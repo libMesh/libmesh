@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex8.C,v 1.7 2003-01-25 01:42:46 jwpeterson Exp $
+// $Id: cell_inf_hex8.C,v 1.8 2003-02-03 03:51:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -173,7 +173,7 @@ void InfHex8::write_tecplot_connectivity(std::ostream &out) const
 
 #ifdef ENABLE_AMR
 
-const real InfHex8::embedding_matrix[4][8][8] =
+const Real InfHex8::embedding_matrix[4][8][8] =
 {
   // embedding matrix for child 0
   {
