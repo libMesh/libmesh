@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.17 2003-03-12 20:15:10 ddreyer Exp $
+// $Id: equation_systems.h,v 1.18 2003-03-14 09:56:40 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -61,7 +61,8 @@ public:
 		   // Default to PETSC solvers if they are there
 		   const SolverPackage sp = PETSC_SOLVERS
 		   
-#elif defined(HAVE_LASPACK) && !defined(USE_COMPLEX_NUMBERS)
+//#elif defined(HAVE_LASPACK) && !defined(USE_COMPLEX_NUMBERS)
+#elif defined(HAVE_LASPACK)
 		   
 		   // Try LASPACK if PETSC is not available
 		   const SolverPackage sp = LASPACK_SOLVERS

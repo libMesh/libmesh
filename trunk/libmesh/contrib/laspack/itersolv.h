@@ -16,7 +16,8 @@
 #ifndef ITERSOLV_H
 #define ITERSOLV_H
 
-#ifdef __cplusplus
+#include "laspack_config.h"
+#ifdef _LP_INCLUDED_FROM_CPLUSPLUS
 extern "C" {
 #endif
 
@@ -28,43 +29,44 @@ extern "C" {
 #include "copyrght.h"
 
 typedef QVector *(*IterProcType)(QMatrix *, QVector *, QVector *, int,
-				PrecondProcType, double);
+				PrecondProcType, _LPDouble);
 
 /* classical iterative methods */
 
 QVector *JacobiIter(QMatrix *A, QVector *x, QVector *b, int NoIter,
-	    PrecondProcType Dummy, double Omega);
+		    PrecondProcType Dummy, _LPDouble Omega);
 QVector *SORForwIter(QMatrix *A, QVector *x, QVector *b, int NoIter,
-            PrecondProcType Dummy, double Omega);
+            PrecondProcType Dummy, _LPDouble Omega);
 QVector *SORBackwIter(QMatrix *A, QVector *x, QVector *b, int NoIter,
-            PrecondProcType Dummy, double Omega);
+            PrecondProcType Dummy, _LPDouble Omega);
 QVector *SSORIter(QMatrix *A, QVector *x, QVector *b, int NoIter,
-            PrecondProcType Dummy, double Omega);
+            PrecondProcType Dummy, _LPDouble Omega);
 
 /* semi-iterative methods */
-
+#ifndef _LP_USE_COMPLEX_NUMBERS 
 QVector *ChebyshevIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
-            PrecondProcType PrecondProc, double OmegaPrecond);
+            PrecondProcType PrecondProc, _LPDouble OmegaPrecond);
+#endif
 
 /* CG and CG-like methods */
 
 QVector *CGIter(QMatrix *A, QVector *x, QVector *b, int MaxIter, 
-            PrecondProcType PrecondProc, double OmegaPrecond);
+            PrecondProcType PrecondProc, _LPDouble OmegaPrecond);
 QVector *CGNIter(QMatrix *A, QVector *x, QVector *b, int MaxIter, 
-            PrecondProcType PrecondProc, double OmegaPrecond);
+            PrecondProcType PrecondProc, _LPDouble OmegaPrecond);
 QVector *GMRESIter(QMatrix *A, QVector *x, QVector *b, int MaxIter, 
-            PrecondProcType PrecondProc, double OmegaPrecond);
+            PrecondProcType PrecondProc, _LPDouble OmegaPrecond);
 QVector *BiCGIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
-            PrecondProcType PrecondProc, double OmegaPrecond);
+            PrecondProcType PrecondProc, _LPDouble OmegaPrecond);
 QVector *QMRIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
-            PrecondProcType PrecondProc, double OmegaPrecond);
+            PrecondProcType PrecondProc, _LPDouble OmegaPrecond);
 QVector *CGSIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
-            PrecondProcType PrecondProc, double OmegaPrecond);
+            PrecondProcType PrecondProc, _LPDouble OmegaPrecond);
 QVector *BiCGSTABIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
-            PrecondProcType PrecondProc, double OmegaPrecond);
+            PrecondProcType PrecondProc, _LPDouble OmegaPrecond);
 void SetGMRESRestart(int MaxSteps);
 
-#ifdef __cplusplus
+#ifdef _LP_INCLUDED_FROM_CPLUSPLUS
 }
 #endif
 

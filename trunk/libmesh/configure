@@ -3914,6 +3914,9 @@ _ACEOF
 echo "${ECHO_T}<<< Configuring library with real number support >>>" >&6
 
 
+fi
+
+
 # Check whether --enable-laspack or --disable-laspack was given.
 if test "${enable_laspack+set}" = set; then
   enableval="$enable_laspack"
@@ -3964,7 +3967,6 @@ echo "${ECHO_T}<<< Configuring library with LASPACK version $laspack_version sup
 
 fi
 
-fi
 
 
 

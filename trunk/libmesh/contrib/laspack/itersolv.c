@@ -27,10 +27,10 @@
 static int GMRESSteps = 10;
 
 QVector *JacobiIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
-            PrecondProcType Dummy, double Omega)
+		    PrecondProcType Dummy, _LPDouble Omega)
 {
     int Iter;
-    double bNorm;
+    _LPReal bNorm;
     size_t Dim;
     QVector r;
 
@@ -39,14 +39,14 @@ QVector *JacobiIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
     V_Lock(b);
     
     Dim = Q_GetDim(A);
-    V_Constr(&r, "r", Dim, Normal, True);
+    V_Constr(&r, "r", Dim, Normal, _LPTrue);
 
     if (LASResult() == LASOK) {
         bNorm = l2Norm_V(b);
 
         Iter = 0;
         /* r = b - A * x(i) */
-        if (!IsZero(l1Norm_V(x) / Dim)) {
+        if (!_LPIsZeroReal(l1Norm_V(x) / Dim)) {
             if (Q_KerDefined(A))
 	       OrthoRightKer_VQ(x, A);
             Asgn_VV(&r, Sub_VV(b, Mul_QV(A, x)));
@@ -76,10 +76,10 @@ QVector *JacobiIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
 }
 
 QVector *SORForwIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
-            PrecondProcType Dummy, double Omega)
+            PrecondProcType Dummy, _LPDouble Omega)
 {
     int Iter;
-    double bNorm;
+    _LPReal bNorm;
     size_t Dim;
     QVector r;
 
@@ -88,14 +88,14 @@ QVector *SORForwIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
     V_Lock(b);
     
     Dim = Q_GetDim(A);
-    V_Constr(&r, "r", Dim, Normal, True);
+    V_Constr(&r, "r", Dim, Normal, _LPTrue);
 
     if (LASResult() == LASOK) {
         bNorm = l2Norm_V(b);
 
         Iter = 0;
         /* r = b - A * x(i) */
-        if (!IsZero(l1Norm_V(x) / Dim)) {
+        if (!_LPIsZeroReal(l1Norm_V(x) / Dim)) {
             if (Q_KerDefined(A))
 	       OrthoRightKer_VQ(x, A);
             Asgn_VV(&r, Sub_VV(b, Mul_QV(A, x)));
@@ -125,10 +125,10 @@ QVector *SORForwIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
 }
 
 QVector *SORBackwIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
-            PrecondProcType Dummy, double Omega)
+            PrecondProcType Dummy, _LPDouble Omega)
 {
     int Iter;
-    double bNorm;
+    _LPReal bNorm;
     size_t Dim;
     QVector r;
 
@@ -137,14 +137,14 @@ QVector *SORBackwIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
     V_Lock(b);
     
     Dim = Q_GetDim(A);
-    V_Constr(&r, "r", Dim, Normal, True);
+    V_Constr(&r, "r", Dim, Normal, _LPTrue);
 
     if (LASResult() == LASOK) {
         bNorm = l2Norm_V(b);
 
         Iter = 0;
         /* r = b - A * x(i) */
-        if (!IsZero(l1Norm_V(x) / Dim)) {
+        if (!_LPIsZeroReal(l1Norm_V(x) / Dim)) {
             if (Q_KerDefined(A))
 	       OrthoRightKer_VQ(x, A);
             Asgn_VV(&r, Sub_VV(b, Mul_QV(A, x)));
@@ -174,10 +174,10 @@ QVector *SORBackwIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
 }
 
 QVector *SSORIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
-            PrecondProcType Dummy, double Omega)
+            PrecondProcType Dummy, _LPDouble Omega)
 {
     int Iter;
-    double bNorm;
+    _LPReal bNorm;
     size_t Dim;
     QVector r;
 
@@ -186,14 +186,14 @@ QVector *SSORIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
     V_Lock(b);
     
     Dim = Q_GetDim(A);
-    V_Constr(&r, "r", Dim, Normal, True);
+    V_Constr(&r, "r", Dim, Normal, _LPTrue);
 
     if (LASResult() == LASOK) {
         bNorm = l2Norm_V(b);
 
         Iter = 0;
         /* r = b - A * x(i) */
-        if (!IsZero(l1Norm_V(x) / Dim)) {
+        if (!_LPIsZeroReal(l1Norm_V(x) / Dim)) {
             if (Q_KerDefined(A))
 	       OrthoRightKer_VQ(x, A);
             Asgn_VV(&r, Sub_VV(b, Mul_QV(A, x)));
@@ -226,8 +226,11 @@ QVector *SSORIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
     return(x);
 }
 
+
+#ifndef _LP_USE_COMPLEX_NUMBERS 
+
 QVector *ChebyshevIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
-            PrecondProcType PrecondProc, double OmegaPrecond)
+            PrecondProcType PrecondProc, _LPDouble OmegaPrecond)
 {
     /*
      *  for details to the algorithm see
@@ -249,10 +252,10 @@ QVector *ChebyshevIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
      */
      
     int Iter;
-    double MaxEigenval, MinEigenval;
-    double c, d, Alpha, Beta;
-    double T = 0.0, TOld = 0.0, TNew; /* values of Chebyshev polynomials */
-    double bNorm;
+    _LPDouble MaxEigenval, MinEigenval;
+    _LPDouble c, d, Alpha, Beta;
+    _LPDouble T = 0.0, TOld = 0.0, TNew; /* values of Chebyshev polynomials */
+    _LPReal bNorm;
     size_t Dim;
     QVector r, p, z;
     
@@ -262,10 +265,10 @@ QVector *ChebyshevIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
     V_Lock(b);
     
     Dim = Q_GetDim(A);
-    V_Constr(&r, "r", Dim, Normal, True);
-    V_Constr(&p, "p", Dim, Normal, True);
+    V_Constr(&r, "r", Dim, Normal, _LPTrue);
+    V_Constr(&p, "p", Dim, Normal, _LPTrue);
     if (PrecondProc != NULL || Q_KerDefined(A))
-        V_Constr(&z, "z", Dim, Normal, True);
+        V_Constr(&z, "z", Dim, Normal, _LPTrue);
 
     if (LASResult() == LASOK) {
         bNorm = l2Norm_V(b);
@@ -278,7 +281,7 @@ QVector *ChebyshevIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
 	
         Iter = 0;
         /* r = b - A * x(i) */
-        if (!IsZero(l1Norm_V(x) / Dim)) {
+        if (!_LPIsZeroReal(l1Norm_V(x) / Dim)) {
             if (Q_KerDefined(A))
 	       OrthoRightKer_VQ(x, A);
             Asgn_VV(&r, Sub_VV(b, Mul_QV(A, x)));
@@ -352,8 +355,21 @@ QVector *ChebyshevIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
     return(x);
 }
 
+#else
+
+QVector *ChebyshevIter(QMatrix * /* A */, QVector * /* x */, QVector * /* b */, int /* MaxIter */,
+		       PrecondProcType /* PrecondProc */, _LPDouble /* OmegaPrecond */)
+{
+    printf("ERROR: Chebyshev iteration not implemented for complex arithmetic.\n");
+    abort();
+}
+
+#endif /* _LP_USE_COMPLEX_NUMBERS */
+
+
+
 QVector *CGIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
-            PrecondProcType PrecondProc, double OmegaPrecond)
+            PrecondProcType PrecondProc, _LPDouble OmegaPrecond)
 {
     /*
      *  for details to the algorithm see
@@ -367,8 +383,8 @@ QVector *CGIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
      */
 
     int Iter;
-    double Alpha, Beta, Rho, RhoOld = 0.0;
-    double bNorm;
+    _LPDouble Alpha, Beta, Rho, RhoOld = 0.0;
+    _LPReal bNorm;
     size_t Dim;
     QVector r, p, q, z;
 
@@ -377,18 +393,18 @@ QVector *CGIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
     V_Lock(b);
     
     Dim = Q_GetDim(A);
-    V_Constr(&r, "r", Dim, Normal, True);
-    V_Constr(&p, "p", Dim, Normal, True);
-    V_Constr(&q, "q", Dim, Normal, True);
+    V_Constr(&r, "r", Dim, Normal, _LPTrue);
+    V_Constr(&p, "p", Dim, Normal, _LPTrue);
+    V_Constr(&q, "q", Dim, Normal, _LPTrue);
     if (PrecondProc != NULL || Q_KerDefined(A))
-        V_Constr(&z, "z", Dim, Normal, True);
+        V_Constr(&z, "z", Dim, Normal, _LPTrue);
 
     if (LASResult() == LASOK) {
         bNorm = l2Norm_V(b);
         
         Iter = 0;
         /* r = b - A * x(i) */
-        if (!IsZero(l1Norm_V(x) / Dim)) {
+        if (!_LPIsZeroReal(l1Norm_V(x) / Dim)) {
             if (Q_KerDefined(A))
 	       OrthoRightKer_VQ(x, A);
             Asgn_VV(&r, Sub_VV(b, Mul_QV(A, x)));
@@ -456,11 +472,11 @@ QVector *CGIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
 }
 
 QVector *CGNIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
-            PrecondProcType PrecondProc, double OmegaPrecond)
+            PrecondProcType PrecondProc, _LPDouble OmegaPrecond)
 {
     int Iter;
-    double Alpha, Beta, Rho, RhoOld = 0.0;
-    double bNorm;
+    _LPDouble Alpha, Beta, Rho, RhoOld = 0.0;
+    _LPReal bNorm;
     size_t Dim;
     QVector r, p, q, s, z;
 
@@ -469,19 +485,19 @@ QVector *CGNIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
     V_Lock(b);
     
     Dim = Q_GetDim(A);
-    V_Constr(&r, "r", Dim, Normal, True);
-    V_Constr(&p, "p", Dim, Normal, True);
-    V_Constr(&q, "q", Dim, Normal, True);
-    V_Constr(&z, "z", Dim, Normal, True);
+    V_Constr(&r, "r", Dim, Normal, _LPTrue);
+    V_Constr(&p, "p", Dim, Normal, _LPTrue);
+    V_Constr(&q, "q", Dim, Normal, _LPTrue);
+    V_Constr(&z, "z", Dim, Normal, _LPTrue);
     if (PrecondProc != NULL || Q_KerDefined(A))
-        V_Constr(&s, "s", Dim, Normal, True);
+        V_Constr(&s, "s", Dim, Normal, _LPTrue);
 
     if (LASResult() == LASOK) {
         bNorm = l2Norm_V(b);
         
         Iter = 0;
         /* r = b - A * x(i) */
-        if (!IsZero(l1Norm_V(x) / Dim)) {
+        if (!_LPIsZeroReal(l1Norm_V(x) / Dim)) {
             if (Q_KerDefined(A))
 	       OrthoRightKer_VQ(x, A);
             Asgn_VV(&r, Sub_VV(b, Mul_QV(A, x)));
@@ -560,7 +576,7 @@ QVector *CGNIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
 }
 
 QVector *GMRESIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
-            PrecondProcType PrecondProc, double OmegaPrecond)
+            PrecondProcType PrecondProc, _LPDouble OmegaPrecond)
 {
     /*
      *  for details to the algorithm see
@@ -575,11 +591,11 @@ QVector *GMRESIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
 
     char vName[10];
     int Iter, i, j, k;
-    double h1, h2, r;
-    double bNorm;
-    double **h, *y, *s, *c1, *c2;
+    _LPDouble h1, h2, r;
+    _LPReal bNorm;
+    _LPDouble **h, *y, *s, *c1, *c2;
     size_t Dim;
-    Boolean AllocOK;
+    _LPBoolean AllocOK;
     QVector *v;
 
     Q_Lock(A);
@@ -587,39 +603,39 @@ QVector *GMRESIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
     V_Lock(b);
     
     /* allocation of matrix H and vectors y, s, c1 and c2 */
-    AllocOK = True;
-    h = (double **)malloc((GMRESSteps + 1) * sizeof(double *));
+    AllocOK = _LPTrue;
+    h = (_LPDouble **)malloc((GMRESSteps + 1) * sizeof(_LPDouble *));
     if (h == NULL) {
-        AllocOK = False;
+        AllocOK = _LPFalse;
     } else {
         for (i = 1; i <= GMRESSteps; i++) {
-            h[i] = (double *)malloc((GMRESSteps + 2) * sizeof(double));
+            h[i] = (_LPDouble *)malloc((GMRESSteps + 2) * sizeof(_LPDouble));
             if (h[i] == NULL)
-                AllocOK = False;
+                AllocOK = _LPFalse;
 	}
     }
-    y = (double *)malloc((GMRESSteps + 1) * sizeof(double));
+    y = (_LPDouble *)malloc((GMRESSteps + 1) * sizeof(_LPDouble));
     if (y == NULL)
-        AllocOK = False;
-    s = (double *)malloc((GMRESSteps + 2) * sizeof(double));
+        AllocOK = _LPFalse;
+    s = (_LPDouble *)malloc((GMRESSteps + 2) * sizeof(_LPDouble));
     if (s == NULL)
-        AllocOK = False;
-    c1 = (double *)malloc((GMRESSteps + 1) * sizeof(double));
+        AllocOK = _LPFalse;
+    c1 = (_LPDouble *)malloc((GMRESSteps + 1) * sizeof(_LPDouble));
     if (c1 == NULL)
-        AllocOK = False;
-    c2 = (double *)malloc((GMRESSteps + 1) * sizeof(double));
+        AllocOK = _LPFalse;
+    c2 = (_LPDouble *)malloc((GMRESSteps + 1) * sizeof(_LPDouble));
     if (c2 == NULL)
-        AllocOK = False;
+        AllocOK = _LPFalse;
 
     /* ... and vectors u */    
     Dim = Q_GetDim(A);
     v = (QVector *)malloc((GMRESSteps + 2) * sizeof(QVector));
     if (v == NULL)
-        AllocOK = False;
+        AllocOK = _LPFalse;
     else
         for (i = 1; i <= GMRESSteps + 1; i++) {
 	    sprintf(vName, "v[%d]", i % 1000);
-            V_Constr(&v[i], vName, Dim, Normal, True);
+            V_Constr(&v[i], vName, Dim, Normal, _LPTrue);
 	}
 
     if (!AllocOK)
@@ -631,7 +647,7 @@ QVector *GMRESIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
         /* loop for 'MaxIter' GMRES cycles */
         Iter = 0;
         /* v[1] = r = b - A * x(i) */
-        if (!IsZero(l1Norm_V(x) / Dim)) {
+        if (!_LPIsZeroReal(l1Norm_V(x) / Dim)) {
             if (Q_KerDefined(A))
 	       OrthoRightKer_VQ(x, A);
             Asgn_VV(&v[1], Sub_VV(b, Mul_QV(A, x)));
@@ -647,7 +663,7 @@ QVector *GMRESIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
 
             /* GMRES iteration */
             i = 0;
-            while ((PrecondProc != NULL ? True : !RTCResult(Iter, fabs(s[i+1]),
+            while ((PrecondProc != NULL ? _LPTrue : !RTCResult(Iter, _LPfabs(s[i+1]),
                 bNorm, GMRESIterId)) && i < GMRESSteps && Iter < MaxIter) {
  	        i++;
 		Iter++;
@@ -730,7 +746,7 @@ QVector *GMRESIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
 }
 
 QVector *BiCGIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
-            PrecondProcType PrecondProc, double OmegaPrecond)
+            PrecondProcType PrecondProc, _LPDouble OmegaPrecond)
 {
     /*
      *  for details to the algorithm see
@@ -744,8 +760,8 @@ QVector *BiCGIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
      */
 
     int Iter;
-    double Alpha, Beta, Rho, RhoOld = 0.0;
-    double bNorm;
+    _LPDouble Alpha, Beta, Rho, RhoOld = 0.0;
+    _LPReal bNorm;
     size_t Dim;
     QVector r, r_, p, p_, q, z, z_;
 
@@ -754,14 +770,14 @@ QVector *BiCGIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
     V_Lock(b);
     
     Dim = Q_GetDim(A);
-    V_Constr(&r, "r", Dim, Normal, True);
-    V_Constr(&r_, "r_", Dim, Normal, True);
-    V_Constr(&p, "p", Dim, Normal, True);
-    V_Constr(&p_, "p_", Dim, Normal, True);
-    V_Constr(&q, "q", Dim, Normal, True);
+    V_Constr(&r, "r", Dim, Normal, _LPTrue);
+    V_Constr(&r_, "r_", Dim, Normal, _LPTrue);
+    V_Constr(&p, "p", Dim, Normal, _LPTrue);
+    V_Constr(&p_, "p_", Dim, Normal, _LPTrue);
+    V_Constr(&q, "q", Dim, Normal, _LPTrue);
     if (PrecondProc != NULL || Q_KerDefined(A)) {
-        V_Constr(&z, "z", Dim, Normal, True);
-        V_Constr(&z_, "z_", Dim, Normal, True);
+        V_Constr(&z, "z", Dim, Normal, _LPTrue);
+        V_Constr(&z_, "z_", Dim, Normal, _LPTrue);
     }
 
     if (LASResult() == LASOK) {
@@ -769,7 +785,7 @@ QVector *BiCGIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
 
         Iter = 0;
         /* r = b - A * x(i) */
-        if (!IsZero(l1Norm_V(x) / Dim)) {
+        if (!_LPIsZeroReal(l1Norm_V(x) / Dim)) {
             if (Q_KerDefined(A))
 	       OrthoRightKer_VQ(x, A);
             Asgn_VV(&r, Sub_VV(b, Mul_QV(A, x)));
@@ -795,7 +811,7 @@ QVector *BiCGIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
 		if (Q_KerDefined(A))
 		   OrthoRightKer_VQ(&z_, Transp_Q(A));
                 Rho = Mul_VV(&z, &r_);
-                if (IsZero(Rho)){
+                if (_LPIsZeroNumber(Rho)){
                     LASError(LASBreakdownErr, "BiCGIter", "Rho", NULL, NULL);
                     break;
                 }
@@ -821,7 +837,7 @@ QVector *BiCGIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
                 && Iter < MaxIter) {
                 Iter++;
                 Rho = Mul_VV(&r, &r_);
-                if (IsZero(Rho)) {
+                if (_LPIsZeroNumber(Rho)) {
                     LASError(LASBreakdownErr, "BiCGIter", "Rho", NULL, NULL);
                     break;
                 }
@@ -863,7 +879,7 @@ QVector *BiCGIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
 }
 
 QVector *QMRIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
-            PrecondProcType PrecondProc, double OmegaPrecond)
+            PrecondProcType PrecondProc, _LPDouble OmegaPrecond)
 {
     /*
      *  for details to the algorithm see
@@ -877,9 +893,9 @@ QVector *QMRIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
      */
 
     int Iter;
-    double Rho, RhoNew, Xi, Gamma, GammaOld, Eta, Delta, Beta, Epsilon = 0.0,
+    _LPDouble Rho, RhoNew, Xi, Gamma, GammaOld, Eta, Delta, Beta, Epsilon = 0.0,
         Theta, ThetaOld = 0.0;
-    double bNorm;
+    _LPReal bNorm;
     size_t Dim;
     QVector r, p, p_, q, y, y_, v, v_, w, w_, z, z_, s, d;
 
@@ -888,21 +904,21 @@ QVector *QMRIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
     V_Lock(b);
     
     Dim = Q_GetDim(A);
-    V_Constr(&r, "r", Dim, Normal, True);
-    V_Constr(&p, "p", Dim, Normal, True);
-    V_Constr(&p_, "p_", Dim, Normal, True);
-    V_Constr(&q, "q", Dim, Normal, True);
-    V_Constr(&v, "v", Dim, Normal, True);
-    V_Constr(&v_, "v_", Dim, Normal, True);
-    V_Constr(&w, "w", Dim, Normal, True);
-    V_Constr(&w_, "w_", Dim, Normal, True);
-    V_Constr(&s, "s", Dim, Normal, True);
-    V_Constr(&d, "d", Dim, Normal, True);
+    V_Constr(&r, "r", Dim, Normal, _LPTrue);
+    V_Constr(&p, "p", Dim, Normal, _LPTrue);
+    V_Constr(&p_, "p_", Dim, Normal, _LPTrue);
+    V_Constr(&q, "q", Dim, Normal, _LPTrue);
+    V_Constr(&v, "v", Dim, Normal, _LPTrue);
+    V_Constr(&v_, "v_", Dim, Normal, _LPTrue);
+    V_Constr(&w, "w", Dim, Normal, _LPTrue);
+    V_Constr(&w_, "w_", Dim, Normal, _LPTrue);
+    V_Constr(&s, "s", Dim, Normal, _LPTrue);
+    V_Constr(&d, "d", Dim, Normal, _LPTrue);
     if (PrecondProc != NULL || Q_KerDefined(A)) {
-        V_Constr(&y, "y", Dim, Normal, True);
-        V_Constr(&y_, "y_", Dim, Normal, True);
-        V_Constr(&z, "z", Dim, Normal, True);
-        V_Constr(&z_, "z_", Dim, Normal, True);
+        V_Constr(&y, "y", Dim, Normal, _LPTrue);
+        V_Constr(&y_, "y_", Dim, Normal, _LPTrue);
+        V_Constr(&z, "z", Dim, Normal, _LPTrue);
+        V_Constr(&z_, "z_", Dim, Normal, _LPTrue);
     }
 
     if (LASResult() == LASOK) {
@@ -910,7 +926,7 @@ QVector *QMRIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
 
         Iter = 0;
         /* r = b - A * x(i) */
-        if (!IsZero(l1Norm_V(x) / Dim)) {
+        if (!_LPIsZeroReal(l1Norm_V(x) / Dim)) {
             if (Q_KerDefined(A))
 	       OrthoRightKer_VQ(x, A);
             Asgn_VV(&r, Sub_VV(b, Mul_QV(A, x)));
@@ -937,7 +953,7 @@ QVector *QMRIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
                 && Iter < MaxIter) {
                 Iter++;
                 Rho = RhoNew;
-                if (IsZero(Rho) || IsZero(Xi)) {
+                if (_LPIsZeroNumber(Rho) || _LPIsZeroNumber(Xi)) {
                     LASError(LASBreakdownErr, "QMRIter", "Rho", "Xi", NULL);
                     break;
                 }
@@ -946,7 +962,7 @@ QVector *QMRIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
                 Asgn_VV(&w, Mul_SV(1.0 / Xi, &w_));
                 MulAsgn_VS(&z, 1.0 / Xi);
                 Delta = Mul_VV(&z, &y);
-                if (IsZero(Delta)) {
+                if (_LPIsZeroNumber(Delta)) {
                     LASError(LASBreakdownErr, "QMRIter", "Delta", NULL, NULL);
                     break;
                 }
@@ -966,12 +982,12 @@ QVector *QMRIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
                 }
                 Asgn_VV(&p_, Mul_QV(A, &p));
                 Epsilon = Mul_VV(&q, &p_);
-                if (IsZero(Epsilon)) {
+                if (_LPIsZeroNumber(Epsilon)) {
                     LASError(LASBreakdownErr, "QMRIter", "Epsilon", NULL, NULL);
                     break;
                 }
                 Beta = Epsilon / Delta;
-                if (IsZero(Beta)) {
+                if (_LPIsZeroNumber(Beta)) {
                     LASError(LASBreakdownErr, "QMRIter", "Beta", NULL, NULL);
                     break;
                 }
@@ -986,9 +1002,9 @@ QVector *QMRIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
                 Asgn_VV(&w_, Sub_VV(Mul_QV(Transp_Q(A), &q), Mul_SV(Beta, &w)));
                 Asgn_VV(&z, &w_);
                 Xi = l2Norm_V(&z);
-                Theta = RhoNew / (GammaOld * fabs(Beta));
+                Theta = RhoNew / (GammaOld * _LPfabs(Beta));
                 Gamma = 1.0 / sqrt(1.0 + Theta * Theta);
-                if (IsZero(Gamma)) {
+                if (_LPIsZeroNumber(Gamma)) {
                     LASError(LASBreakdownErr, "QMRIter", "Gamma", NULL, NULL);
                     break;
                 }
@@ -1020,7 +1036,7 @@ QVector *QMRIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
                 && Iter < MaxIter) {
                 Iter++;
                 Rho = RhoNew;
-                if (IsZero(Rho) || IsZero(Xi)) {
+                if (_LPIsZeroNumber(Rho) || _LPIsZeroNumber(Xi)) {
                     LASError(LASBreakdownErr, "QMRIter", "Rho", "Xi", NULL);
                     break;
                 }
@@ -1029,7 +1045,7 @@ QVector *QMRIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
                 Asgn_VV(&w, Mul_SV(1.0 / Xi, &w_));
                 MulAsgn_VS(&w_, 1.0 / Xi);
                 Delta = Mul_VV(&w_, &v_);
-                if (IsZero(Delta)) {
+                if (_LPIsZeroNumber(Delta)) {
                     LASError(LASBreakdownErr, "QMRIter", "Rho", "Xi", NULL);
                     break;
                 }
@@ -1042,12 +1058,12 @@ QVector *QMRIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
                 }
                 Asgn_VV(&p_, Mul_QV(A, &p));
                 Epsilon = Mul_VV(&q, &p_);
-                if (IsZero(Epsilon)) {
+                if (_LPIsZeroNumber(Epsilon)) {
                     LASError(LASBreakdownErr, "QMRIter", "Epsilon", NULL, NULL);
                     break;
                 }
                 Beta = Epsilon / Delta;
-                if (IsZero(Beta)) {
+                if (_LPIsZeroNumber(Beta)) {
                     LASError(LASBreakdownErr, "QMRIter", "Beta", NULL, NULL);
                     break;
                 }
@@ -1055,9 +1071,9 @@ QVector *QMRIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
                 RhoNew = l2Norm_V(&v);
                 Asgn_VV(&w_, Sub_VV(Mul_QV(Transp_Q(A), &q), Mul_SV(Beta, &w)));
                 Xi = l2Norm_V(&w_);
-                Theta = RhoNew / (GammaOld * fabs(Beta));
+                Theta = RhoNew / (GammaOld * _LPfabs(Beta));
                 Gamma = 1.0 / sqrt(1.0 + Theta * Theta);
-                if (IsZero(Gamma)) {
+                if (_LPIsZeroNumber(Gamma)) {
                     LASError(LASBreakdownErr, "QMRIter", "Gamma", NULL, NULL);
                     break;
                 }
@@ -1106,7 +1122,7 @@ QVector *QMRIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
 }
 
 QVector *CGSIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
-            PrecondProcType PrecondProc, double OmegaPrecond)
+            PrecondProcType PrecondProc, _LPDouble OmegaPrecond)
 {
     /*
      *  for details to the algorithm see
@@ -1120,8 +1136,8 @@ QVector *CGSIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
      */
 
     int Iter;
-    double Alpha, Beta, Rho, RhoOld = 0.0;
-    double bNorm;
+    _LPDouble Alpha, Beta, Rho, RhoOld = 0.0;
+    _LPReal bNorm;
     size_t Dim;
     QVector r, r_, p, p_, q, u, u_, v_;
 
@@ -1130,22 +1146,22 @@ QVector *CGSIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
     V_Lock(b);
     
     Dim = Q_GetDim(A);
-    V_Constr(&r, "r", Dim, Normal, True);
-    V_Constr(&r_, "r_", Dim, Normal, True);
-    V_Constr(&p, "p", Dim, Normal, True);
-    V_Constr(&q, "q", Dim, Normal, True);
-    V_Constr(&u, "u", Dim, Normal, True);
-    V_Constr(&u_, "u_", Dim, Normal, True);
-    V_Constr(&v_, "v_", Dim, Normal, True);
+    V_Constr(&r, "r", Dim, Normal, _LPTrue);
+    V_Constr(&r_, "r_", Dim, Normal, _LPTrue);
+    V_Constr(&p, "p", Dim, Normal, _LPTrue);
+    V_Constr(&q, "q", Dim, Normal, _LPTrue);
+    V_Constr(&u, "u", Dim, Normal, _LPTrue);
+    V_Constr(&u_, "u_", Dim, Normal, _LPTrue);
+    V_Constr(&v_, "v_", Dim, Normal, _LPTrue);
     if (PrecondProc != NULL || Q_KerDefined(A))
-        V_Constr(&p_, "p_", Dim, Normal, True);
+        V_Constr(&p_, "p_", Dim, Normal, _LPTrue);
 
     if (LASResult() == LASOK) {
         bNorm = l2Norm_V(b);
 
         Iter = 0;
         /* r = b - A * x(i) */
-        if (!IsZero(l1Norm_V(x) / Dim)) {
+        if (!_LPIsZeroReal(l1Norm_V(x) / Dim)) {
             if (Q_KerDefined(A))
 	       OrthoRightKer_VQ(x, A);
             Asgn_VV(&r, Sub_VV(b, Mul_QV(A, x)));
@@ -1159,7 +1175,7 @@ QVector *CGSIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
                 && Iter < MaxIter) {
                 Iter++;
                 Rho = Mul_VV(&r_, &r);
-                if (IsZero(Rho)) {
+                if (_LPIsZeroNumber(Rho)) {
                     LASError(LASBreakdownErr, "CGSIter", "Rho", NULL, NULL);
                     break;
                 }
@@ -1197,7 +1213,7 @@ QVector *CGSIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
                 && Iter < MaxIter) {
                 Iter++;
                 Rho = Mul_VV(&r_, &r);
-                if (IsZero(Rho)) {
+                if (_LPIsZeroNumber(Rho)) {
                     LASError(LASBreakdownErr, "CGSIter", "Rho", NULL, NULL);
                     break;
                 }
@@ -1240,7 +1256,7 @@ QVector *CGSIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
 }
 
 QVector *BiCGSTABIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
-            PrecondProcType PrecondProc, double OmegaPrecond)
+            PrecondProcType PrecondProc, _LPDouble OmegaPrecond)
 {
     /*
      *  for details to the algorithm see
@@ -1254,8 +1270,8 @@ QVector *BiCGSTABIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
      */
 
     int Iter;
-    double Alpha = 0.0, Beta, Rho, RhoOld = 0.0, Omega = 0.0;
-    double bNorm;
+    _LPDouble Alpha = 0.0, Beta, Rho, RhoOld = 0.0, Omega = 0.0;
+    _LPReal bNorm;
     size_t Dim;
     QVector r, r_, p, p_, v, s, s_, t;
 
@@ -1264,15 +1280,15 @@ QVector *BiCGSTABIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
     V_Lock(b);
     
     Dim = Q_GetDim(A);
-    V_Constr(&r, "r", Dim, Normal, True);
-    V_Constr(&r_, "r_", Dim, Normal, True);
-    V_Constr(&p, "p", Dim, Normal, True);
-    V_Constr(&v, "v", Dim, Normal, True);
-    V_Constr(&s, "s", Dim, Normal, True);
-    V_Constr(&t, "t", Dim, Normal, True);
+    V_Constr(&r, "r", Dim, Normal, _LPTrue);
+    V_Constr(&r_, "r_", Dim, Normal, _LPTrue);
+    V_Constr(&p, "p", Dim, Normal, _LPTrue);
+    V_Constr(&v, "v", Dim, Normal, _LPTrue);
+    V_Constr(&s, "s", Dim, Normal, _LPTrue);
+    V_Constr(&t, "t", Dim, Normal, _LPTrue);
     if (PrecondProc != NULL || Q_KerDefined(A)) {
-        V_Constr(&p_, "p_", Dim, Normal, True);
-        V_Constr(&s_, "s_", Dim, Normal, True);
+        V_Constr(&p_, "p_", Dim, Normal, _LPTrue);
+        V_Constr(&s_, "s_", Dim, Normal, _LPTrue);
     }
     
     if (LASResult() == LASOK) {
@@ -1280,7 +1296,7 @@ QVector *BiCGSTABIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
 
         Iter = 0;
         /* r = b - A * x(i) */
-        if (!IsZero(l1Norm_V(x) / Dim)) {
+        if (!_LPIsZeroReal(l1Norm_V(x) / Dim)) {
             if (Q_KerDefined(A))
 	       OrthoRightKer_VQ(x, A);
             Asgn_VV(&r, Sub_VV(b, Mul_QV(A, x)));
@@ -1294,7 +1310,7 @@ QVector *BiCGSTABIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
                 && Iter < MaxIter) {
                 Iter++;
                 Rho = Mul_VV(&r_, &r);
-                if (IsZero(Rho)) {
+                if (_LPIsZeroNumber(Rho)) {
                     LASError(LASBreakdownErr, "BiCGSTABIter", "Rho", NULL, NULL);
                     break;
                 }
@@ -1324,7 +1340,7 @@ QVector *BiCGSTABIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
                 AddAsgn_VV(x, Add_VV(Mul_SV(Alpha, &p_), Mul_SV(Omega, &s_)));
                 Asgn_VV(&r, Sub_VV(&s, Mul_SV(Omega, &t)));
                 RhoOld = Rho;
-                if (IsZero(Omega))
+                if (_LPIsZeroNumber(Omega))
                     break;
             }
         } else {
@@ -1334,7 +1350,7 @@ QVector *BiCGSTABIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
                 && Iter < MaxIter) {
                 Iter++;
                 Rho = Mul_VV(&r_, &r);
-                if (IsZero(Rho)) {
+                if (_LPIsZeroNumber(Rho)) {
                     LASError(LASBreakdownErr, "BiCGSTABIter", "Rho", NULL, NULL);
                     break;
                 }
@@ -1352,7 +1368,7 @@ QVector *BiCGSTABIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
                 AddAsgn_VV(x, Add_VV(Mul_SV(Alpha, &p), Mul_SV(Omega, &s)));
                 Asgn_VV(&r, Sub_VV(&s, Mul_SV(Omega, &t)));
                 RhoOld = Rho;
-                if (IsZero(Omega))
+                if (_LPIsZeroNumber(Omega))
                     break;
             }
         }

@@ -1,4 +1,4 @@
-// $Id: laspack_matrix.h,v 1.9 2003-03-03 02:15:57 benkirk Exp $
+// $Id: laspack_matrix.h,v 1.10 2003-03-14 09:56:40 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk, John W. Peterson
@@ -34,13 +34,12 @@
 #include "dense_matrix.h"
 
 
-namespace Laspack {
 #include <qmatrix.h>
-}
+
 
 
 // Forward declarations
-class LaspackInterface;
+template <typename T> class LaspackInterface;
 
 
 
@@ -59,7 +58,8 @@ class LaspackInterface;
  * @author Benjamin S. Kirk, 2003
  */
 
-class LaspackMatrix : public SparseMatrix<Real>
+template <typename T>
+class LaspackMatrix : public SparseMatrix<T>
 {
 
 public:
@@ -132,7 +132,7 @@ public:
    * this method \p closed() is true and the matrix can
    * be used in computations.
    */
-  void close () const { const_cast<LaspackMatrix*>(this)->_closed = true; }
+  void close () const { const_cast<LaspackMatrix<T>*>(this)->_closed = true; }
   
   /**
    * @returns \p m, the row-dimension of
@@ -166,7 +166,7 @@ public:
    */
   void set (const unsigned int i,
 	    const unsigned int j,
-	    const Real value);
+	    const T value);
     
   /**
    * Add \p value to the element
@@ -178,7 +178,7 @@ public:
    */
   void add (const unsigned int i,
 	    const unsigned int j,
-	    const Real value);
+	    const T value);
 
   /**
    * Add the full matrix to the
@@ -187,7 +187,7 @@ public:
    * at assembly time
    */
     
-  void add_matrix (const DenseMatrix<Real> &dm,
+  void add_matrix (const DenseMatrix<T> &dm,
 		   const std::vector<unsigned int> &rows,
 		   const std::vector<unsigned int> &cols);
   
@@ -195,7 +195,7 @@ public:
    * Same, but assumes the row and column maps are the same.
    * Thus the matrix \p dm must be square.
    */
-  void add_matrix (const DenseMatrix<Real> &dm,
+  void add_matrix (const DenseMatrix<T> &dm,
 		   const std::vector<unsigned int> &dof_indices);
       
   /**
@@ -216,8 +216,8 @@ public:
    * matrix), use the \p el
    * function.
    */
-  Real operator () (const unsigned int i,
-		    const unsigned int j) const;
+  T operator () (const unsigned int i,
+		 const unsigned int j) const;
 
   /**
    * Return the l1-norm of the matrix, that is
@@ -263,7 +263,7 @@ private:
   /**
    *  The Laspack sparse matrix pointer.
    */
-  Laspack::QMatrix _QMat;
+  QMatrix _QMat;
 
   /**
    * The compressed row indices.
@@ -284,35 +284,38 @@ private:
   /**
    * Make other Laspack datatypes friends
    */
-  friend class LaspackInterface;
+  friend class LaspackInterface<T>;
 };
 
 
 
 //-----------------------------------------------------------------------
 // LaspackMatrix class inline members
+template <typename T>
 inline
-LaspackMatrix::LaspackMatrix () :
+LaspackMatrix<T>::LaspackMatrix () :
   _closed (false)
 {
 }
 
 
 
+template <typename T>
 inline
-LaspackMatrix::~LaspackMatrix ()
+LaspackMatrix<T>::~LaspackMatrix ()
 {
   clear ();
 }
 
 
 
+template <typename T>
 inline
-void LaspackMatrix::clear ()
+void LaspackMatrix<T>::clear ()
 {
   if (initialized())
     {
-      Laspack::Q_Destr(&_QMat);
+      Q_Destr(&_QMat);
     }
   
   _csr.clear();
@@ -323,11 +326,10 @@ void LaspackMatrix::clear ()
 
 
 
+template <typename T> 
 inline
-void LaspackMatrix::zero ()
+void LaspackMatrix<T>::zero ()
 {
-  using namespace Laspack;
-
   const unsigned int n_rows = m();
   
   for (unsigned int row=0; row<n_rows; row++)
@@ -358,46 +360,51 @@ void LaspackMatrix::zero ()
 
 
 
+template <typename T> 
 inline
-unsigned int LaspackMatrix::m () const
+unsigned int LaspackMatrix<T>::m () const
 {
   assert (initialized());
 
-  return static_cast<unsigned int>(Laspack::Q_GetDim(const_cast<Laspack::QMatrix*>(&_QMat)));
+  return static_cast<unsigned int>(Q_GetDim(const_cast<QMatrix*>(&_QMat)));
 }
 
 
 
+template <typename T> 
 inline
-unsigned int LaspackMatrix::n () const
+unsigned int LaspackMatrix<T>::n () const
 {
   assert (initialized());
   
-  return static_cast<unsigned int>(Laspack::Q_GetDim(const_cast<Laspack::QMatrix*>(&_QMat)));
+  return static_cast<unsigned int>(Q_GetDim(const_cast<QMatrix*>(&_QMat)));
 }
 
 
 
+template <typename T> 
 inline
-unsigned int LaspackMatrix::row_start () const
+unsigned int LaspackMatrix<T>::row_start () const
 {
   return 0;
 }
 
 
 
+template <typename T> 
 inline
-unsigned int LaspackMatrix::row_stop () const
+unsigned int LaspackMatrix<T>::row_stop () const
 {
   return m();
 }
 
 
 
+template <typename T> 
 inline
-void LaspackMatrix::set (const unsigned int i,
-			 const unsigned int j,
-			 const Real value)
+void LaspackMatrix<T>::set (const unsigned int i,
+			    const unsigned int j,
+			    const T value)
 {
   assert (initialized());
   assert (i < m());
@@ -407,17 +414,18 @@ void LaspackMatrix::set (const unsigned int i,
 
   // Sanity check
   assert (_csr[_row_start[i]+position] == j);
-  assert ((j+1) == Laspack::Q_GetPos (&_QMat, i+1, position));
+  assert ((j+1) == Q_GetPos (&_QMat, i+1, position));
 
-  Laspack::Q_SetEntry (&_QMat, i+1, position, j+1, value);
+  Q_SetEntry (&_QMat, i+1, position, j+1, value);
 }
 
 
 
+template <typename T> 
 inline
-void LaspackMatrix::add (const unsigned int i,
-			 const unsigned int j,
-			 const Real value)
+void LaspackMatrix<T>::add (const unsigned int i,
+			    const unsigned int j,
+			    const T value)
 {
   assert (initialized());
   assert (i < m());
@@ -428,13 +436,14 @@ void LaspackMatrix::add (const unsigned int i,
   // Sanity check
   assert (_csr[_row_start[i]+position] == j);
 
-  Laspack::Q_AddVal (&_QMat, i+1, position, value);
+  Q_AddVal (&_QMat, i+1, position, value);
 }
 
 
 
+template <typename T> 
 inline
-void LaspackMatrix::add_matrix(const DenseMatrix<Real>& dm,
+void LaspackMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 			       const std::vector<unsigned int>& dof_indices)
 {
   add_matrix (dm, dof_indices, dof_indices);
@@ -442,8 +451,9 @@ void LaspackMatrix::add_matrix(const DenseMatrix<Real>& dm,
 
 
 
+template <typename T> 
 inline
-void LaspackMatrix::add_matrix(const DenseMatrix<Real>& dm,
+void LaspackMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 			       const std::vector<unsigned int>& rows,
 			       const std::vector<unsigned int>& cols)
 		    
@@ -460,24 +470,24 @@ void LaspackMatrix::add_matrix(const DenseMatrix<Real>& dm,
 
 
 
+template <typename T> 
 inline
-Real LaspackMatrix::operator () (const unsigned int i,
+T LaspackMatrix<T>::operator () (const unsigned int i,
 				 const unsigned int j) const
 {
   assert (initialized());
   assert (i < m());
   assert (j < n());
   
-  using namespace Laspack;
-
-  return Q_GetEl (const_cast<Laspack::QMatrix*>(&_QMat), i+1, j+1);
+  return Q_GetEl (const_cast<QMatrix*>(&_QMat), i+1, j+1);
 }
 
 
 
+template <typename T> 
 inline
-unsigned int LaspackMatrix::pos (const unsigned int i,
-				 const unsigned int j) const
+unsigned int LaspackMatrix<T>::pos (const unsigned int i,
+				    const unsigned int j) const
 {
   //std::cout << "m()=" << m() << std::endl;
   assert (i < this->m());

@@ -16,7 +16,8 @@
 #ifndef ERRHANDL_H
 #define ERRHANDL_H
 
-#ifdef __cplusplus
+#include "laspack_config.h"
+#ifdef _LP_INCLUDED_FROM_CPLUSPLUS
 extern "C" {
 #endif
 
@@ -48,7 +49,7 @@ void LASBreak(void);
 LASErrIdType LASResult(void);
 void WriteLASErrDescr(FILE *File);
 
-#ifdef __cplusplus
+#ifdef _LP_INCLUDED_FROM_CPLUSPLUS
 }
 #endif
 

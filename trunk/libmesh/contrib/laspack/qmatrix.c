@@ -26,8 +26,8 @@ static ElType ZeroEl = { 0, 0.0 };
 
 static int ElCompar(const void *El1, const void *El2);
 
-void Q_Constr(QMatrix *Q, char *Name, size_t Dim, Boolean Symmetry,
-              ElOrderType ElOrder, InstanceType Instance, Boolean OwnData)
+void Q_Constr(QMatrix *Q, char *Name, size_t Dim, _LPBoolean Symmetry,
+              ElOrderType ElOrder, InstanceType Instance, _LPBoolean OwnData)
 /* constructor of the type QMatrix */
 {
     size_t RoC;    
@@ -50,12 +50,12 @@ void Q_Constr(QMatrix *Q, char *Name, size_t Dim, Boolean Symmetry,
         if (LASResult() == LASOK) {
 	    Q->Len = (size_t *)malloc((Dim + 1) * sizeof(size_t));
 	    Q->El = (ElType **)malloc((Dim + 1) * sizeof(ElType *));
-	    Q->ElSorted = (Boolean *)malloc(sizeof(Boolean));
-	    Q->DiagElAlloc = (Boolean *)malloc(sizeof(Boolean));
+	    Q->ElSorted = (_LPBoolean *)malloc(sizeof(_LPBoolean));
+	    Q->DiagElAlloc = (_LPBoolean *)malloc(sizeof(_LPBoolean));
 	    Q->DiagEl = (ElType **)malloc((Dim + 1) * sizeof(ElType *));
-	    Q->ZeroInDiag = (Boolean *)malloc(sizeof(Boolean));
-            Q->InvDiagEl = (Real *)malloc((Dim + 1) * sizeof(Real));
-	    Q->ILUExists = (Boolean *)malloc(sizeof(Boolean));
+	    Q->ZeroInDiag = (_LPBoolean *)malloc(sizeof(_LPBoolean));
+            Q->InvDiagEl = (_LPNumber *)malloc((Dim + 1) * sizeof(_LPNumber));
+	    Q->ILUExists = (_LPBoolean *)malloc(sizeof(_LPBoolean));
             Q->ILU = (QMatrix *)malloc(sizeof(QMatrix));
 	    if (Q->Len != NULL && Q->El != NULL && Q->ElSorted != NULL
 	        && Q->DiagElAlloc != NULL && Q->DiagEl != NULL && Q->ZeroInDiag != NULL
@@ -66,10 +66,10 @@ void Q_Constr(QMatrix *Q, char *Name, size_t Dim, Boolean Symmetry,
                     Q->DiagEl[RoC] = NULL;
                     Q->InvDiagEl[RoC] = 0.0;
                 }
-                *Q->ElSorted = False;
-                *Q->DiagElAlloc = False;
-                *Q->ZeroInDiag = True;
-                *Q->ILUExists = False;
+                *Q->ElSorted = _LPFalse;
+                *Q->DiagElAlloc = _LPFalse;
+                *Q->ZeroInDiag = _LPTrue;
+                *Q->ILUExists = _LPFalse;
             } else {
 	        LASError(LASMemAllocErr, "Q_Constr", Name, NULL, NULL);
             }
@@ -85,9 +85,9 @@ void Q_Constr(QMatrix *Q, char *Name, size_t Dim, Boolean Symmetry,
 	    Q->ILU = NULL;
         }
     }
-    Q->UnitRightKer = False;
+    Q->UnitRightKer = _LPFalse;
     Q->RightKerCmp = NULL;
-    Q->UnitLeftKer = False;
+    Q->UnitLeftKer = _LPFalse;
     Q->LeftKerCmp = NULL;
     Q->EigenvalInfo = NULL;
 }
@@ -198,15 +198,15 @@ size_t Q_GetDim(QMatrix *Q)
     return(Dim);
 }
 
-Boolean Q_GetSymmetry(QMatrix *Q)
-/* returns True if Q is symmetric otherwise False */
+_LPBoolean Q_GetSymmetry(QMatrix *Q)
+/* returns _LPTrue if Q is symmetric otherwise _LPFalse */
 {
-    Boolean Symmetry;
+    _LPBoolean Symmetry;
 
     if (LASResult() == LASOK) {
         Symmetry = Q->Symmetry;
     } else {
-        Symmetry = (Boolean)0;
+        Symmetry = (_LPBoolean)0;
     }
     return(Symmetry);
 }
@@ -283,7 +283,7 @@ size_t Q_GetLen(QMatrix *Q, size_t RoC)
     return(Len);
 }
 
-void Q_SetEntry(QMatrix *Q, size_t RoC, size_t Entry, size_t Pos, Real Val)
+void Q_SetEntry(QMatrix *Q, size_t RoC, size_t Entry, size_t Pos, _LPNumber Val)
 /* set a new matrix entry */
 {
     if (LASResult() == LASOK) {
@@ -314,10 +314,10 @@ size_t Q_GetPos(QMatrix *Q, size_t RoC, size_t Entry)
     return(Pos);
 }
 
-Real Q_GetVal(QMatrix *Q, size_t RoC, size_t Entry)
+_LPNumber Q_GetVal(QMatrix *Q, size_t RoC, size_t Entry)
 /* returns the value of a matrix element */
 {
-    Real Val;
+    _LPNumber Val;
 
     if (LASResult() == LASOK)
         if (RoC > 0 && RoC <= Q->Dim && Entry < Q->Len[RoC]) {
@@ -331,7 +331,7 @@ Real Q_GetVal(QMatrix *Q, size_t RoC, size_t Entry)
     return(Val);
 }
 
-void Q_AddVal(QMatrix *Q, size_t RoC, size_t Entry, Real Val)
+void Q_AddVal(QMatrix *Q, size_t RoC, size_t Entry, _LPNumber Val)
 /* add a value to a matrix entry */
 {
     if (LASResult() == LASOK) {
@@ -342,10 +342,10 @@ void Q_AddVal(QMatrix *Q, size_t RoC, size_t Entry, Real Val)
     }
 }
 
-Real Q_GetEl(QMatrix *Q, size_t Row, size_t Clm)
+_LPNumber Q_GetEl(QMatrix *Q, size_t Row, size_t Clm)
 /* returns the value of a matrix element (all matrix elements are considered) */
 {
-    Real Val;
+    _LPNumber Val;
     
     size_t Len, ElCount;
     ElType *PtrEl;
@@ -427,11 +427,11 @@ void Q_SortEl(QMatrix *Q)
 /* sorts elements of a row or column in ascended order */
 {
     size_t Dim, RoC;
-    Boolean UpperOnly;
+    _LPBoolean UpperOnly;
 
     if (LASResult() == LASOK && !(*Q->ElSorted)) {
         Dim = Q->Dim;
-        UpperOnly = True;
+        UpperOnly = _LPTrue;
         for (RoC = 1; RoC <= Dim; RoC++) {
             /* sort of elements by the quick sort algorithms */
             qsort((void *)Q->El[RoC], Q->Len[RoC], sizeof(ElType), ElCompar);
@@ -440,17 +440,17 @@ void Q_SortEl(QMatrix *Q)
                (incl. diagonal) of the matrix only */
             if (Q->ElOrder == Rowws) {
                 if (Q->El[RoC][0].Pos < RoC)
-                    UpperOnly = False;
+                    UpperOnly = _LPFalse;
             }
             if (Q->ElOrder == Clmws) {
                 if (Q->El[RoC][Q->Len[RoC] - 1].Pos > RoC)
-                    UpperOnly = False;
+                    UpperOnly = _LPFalse;
             }
         }
         
-        *Q->ElSorted = True;
-        *Q->DiagElAlloc = False;
-        *Q->ZeroInDiag = True;
+        *Q->ElSorted = _LPTrue;
+        *Q->DiagElAlloc = _LPFalse;
+        *Q->ZeroInDiag = _LPTrue;
         
         if (Q->Symmetry) {
             if(!UpperOnly)
@@ -463,18 +463,18 @@ void Q_AllocInvDiagEl(QMatrix *Q)
 /* allocate pointers and compute inverse for diagonal elements of the matrix Q */
 {
     size_t Dim, RoC, Len, ElCount;
-    Boolean Found;
+    _LPBoolean Found;
     ElType *PtrEl;
 
     if (LASResult() == LASOK && !(*Q->DiagElAlloc)) {
         Dim = Q->Dim;
-        *Q->ZeroInDiag = False;
+        *Q->ZeroInDiag = _LPFalse;
         if (Q->Symmetry && Q->ElOrder == Rowws) {
             for (RoC = 1; RoC <= Dim; RoC++) {
                 if (Q->El[RoC][0].Pos == RoC) {
                     Q->DiagEl[RoC] = Q->El[RoC];
                 } else {
-                    *Q->ZeroInDiag = True;
+                    *Q->ZeroInDiag = _LPTrue;
                     Q->DiagEl[RoC] = &ZeroEl;
                 }
             }
@@ -485,30 +485,30 @@ void Q_AllocInvDiagEl(QMatrix *Q)
                 if (Q->El[RoC][Len - 1].Pos == RoC) {
                     Q->DiagEl[RoC] = Q->El[RoC] + Len - 1;
                 } else {
-                    *Q->ZeroInDiag = True;
+                    *Q->ZeroInDiag = _LPTrue;
                     Q->DiagEl[RoC] = &ZeroEl;
                 }
             }
         }
         if (!Q->Symmetry) {
             for (RoC = 1; RoC <= Dim; RoC++) {
-                Found = False;
+                Found = _LPFalse;
                 Len = Q->Len[RoC];
                 PtrEl = Q->El[RoC] + Len - 1;
                 for (ElCount = Len; ElCount > 0; ElCount--) {
                     if ((*PtrEl).Pos == RoC) {
-                        Found = True;
+                        Found = _LPTrue;
                         Q->DiagEl[RoC] = PtrEl;
                     }
                     PtrEl--;
                 }
                 if (!Found) {
-                    *Q->ZeroInDiag = True;
+                    *Q->ZeroInDiag = _LPTrue;
                     Q->DiagEl[RoC] = &ZeroEl;
                 }
             }
         }
-        *Q->DiagElAlloc = True;
+        *Q->DiagElAlloc = _LPTrue;
         
         if (!(*Q->ZeroInDiag)) {
             for (RoC = 1; RoC <= Dim; RoC++)
@@ -534,9 +534,9 @@ static int ElCompar(const void *El1, const void *El2)
 void Q_SetKer(QMatrix *Q, QVector *RightKer, QVector *LeftKer)
 /* defines the null space in the case of a singular matrix */
 {
-    double Sum, Mean, Cmp, Norm;
+    _LPDouble Sum, Mean, Cmp, Norm;
     size_t Dim, Ind;
-    Real *KerCmp;
+    _LPNumber *KerCmp;
 
     V_Lock(RightKer);
     V_Lock(LeftKer);
@@ -554,8 +554,8 @@ void Q_SetKer(QMatrix *Q, QVector *RightKer, QVector *LeftKer)
 	        free(Q->LeftKerCmp);
 	        Q->LeftKerCmp = NULL;
 	    }
-	    Q->UnitRightKer = False;
-	    Q->UnitLeftKer = False;
+	    Q->UnitRightKer = _LPFalse;
+	    Q->UnitLeftKer = _LPFalse;
 	    
 	    /* right null space */
             KerCmp = RightKer->Cmp;
@@ -563,14 +563,14 @@ void Q_SetKer(QMatrix *Q, QVector *RightKer, QVector *LeftKer)
 	    Sum = 0.0;
 	    for(Ind = 1; Ind <= Dim; Ind++)
 	        Sum += KerCmp[Ind];
-	    Mean = Sum / (double)Dim;
-	    Q->UnitRightKer = True;
-	    if (!IsZero(Mean)) {
+	    Mean = Sum / (_LPDouble)Dim;
+	    Q->UnitRightKer = _LPTrue;
+	    if (!_LPIsZeroNumber(Mean)) {
 	        for(Ind = 1; Ind <= Dim; Ind++)
-                    if (!IsOne(KerCmp[Ind] / Mean))
-		        Q->UnitRightKer = False;
+                    if (!_LPIsOneNumber(KerCmp[Ind] / Mean))
+		        Q->UnitRightKer = _LPFalse;
             } else {
-	        Q->UnitRightKer = False;
+	        Q->UnitRightKer = _LPFalse;
 	    }
 	    if (!Q->UnitRightKer) {
 	        Sum = 0.0;
@@ -579,8 +579,8 @@ void Q_SetKer(QMatrix *Q, QVector *RightKer, QVector *LeftKer)
 	            Sum += Cmp * Cmp;
 	        }
 		Norm = sqrt(Sum);
-		if (!IsZero(Norm)) {
-                    Q->RightKerCmp = (Real *)malloc((Dim + 1) * sizeof(Real));
+		if (!_LPIsZeroNumber(Norm)) {
+                    Q->RightKerCmp = (_LPNumber *)malloc((Dim + 1) * sizeof(_LPNumber));
 		    if (Q->RightKerCmp != NULL) {
 		        for(Ind = 1; Ind <= Dim; Ind++)
 	                    Q->RightKerCmp[Ind] = KerCmp[Ind] / Norm;
@@ -598,14 +598,14 @@ void Q_SetKer(QMatrix *Q, QVector *RightKer, QVector *LeftKer)
 	        Sum = 0.0;
 	        for(Ind = 1; Ind <= Dim; Ind++)
 	            Sum += KerCmp[Ind];
-	        Mean = Sum / (double)Dim;
-	        Q->UnitLeftKer = True;
-	        if (!IsZero(Mean)) {
+	        Mean = Sum / (_LPDouble)Dim;
+	        Q->UnitLeftKer = _LPTrue;
+	        if (!_LPIsZeroNumber(Mean)) {
 	            for(Ind = 1; Ind <= Dim; Ind++)
-                        if (!IsOne(KerCmp[Ind] / Mean))
-		            Q->UnitLeftKer = False;
+                        if (!_LPIsOneNumber(KerCmp[Ind] / Mean))
+		            Q->UnitLeftKer = _LPFalse;
                 } else {
-	            Q->UnitLeftKer = False;
+	            Q->UnitLeftKer = _LPFalse;
 	        }
 	        if (!Q->UnitLeftKer) {
 	            Sum = 0.0;
@@ -614,8 +614,8 @@ void Q_SetKer(QMatrix *Q, QVector *RightKer, QVector *LeftKer)
 	                Sum += Cmp * Cmp;
 	            }
 		    Norm = sqrt(Sum);
-		    if (!IsZero(Norm)) {
-                        Q->LeftKerCmp = (Real *)malloc((Dim + 1) * sizeof(Real));
+		    if (!_LPIsZeroNumber(Norm)) {
+                        Q->LeftKerCmp = (_LPNumber *)malloc((Dim + 1) * sizeof(_LPNumber));
 		        if (Q->LeftKerCmp != NULL) {
 		            for(Ind = 1; Ind <= Dim; Ind++)
 	                        Q->LeftKerCmp[Ind] = KerCmp[Ind] / Norm;
@@ -636,20 +636,20 @@ void Q_SetKer(QMatrix *Q, QVector *RightKer, QVector *LeftKer)
     V_Unlock(LeftKer);
 }
 
-Boolean Q_KerDefined(QMatrix *Q)
-/* returns True if Q is singular and the null space has been defined
-   otherwise False */ 
+_LPBoolean Q_KerDefined(QMatrix *Q)
+/* returns _LPTrue if Q is singular and the null space has been defined
+   otherwise _LPFalse */ 
 {
-    Boolean KerDefined;
+    _LPBoolean KerDefined;
 
     if (LASResult() == LASOK) {
-        if ((Q->UnitRightKer || Q->RightKerCmp != NULL) && !IsZero(Q->MultiplD)
-	    && IsOne(Q->MultiplU / Q->MultiplD) && IsOne(Q->MultiplL / Q->MultiplD))
-	    KerDefined = True;
+        if ((Q->UnitRightKer || Q->RightKerCmp != NULL) && !_LPIsZeroNumber(Q->MultiplD)
+	    && _LPIsOneNumber(Q->MultiplU / Q->MultiplD) && _LPIsOneNumber(Q->MultiplL / Q->MultiplD))
+	    KerDefined = _LPTrue;
 	else
-	    KerDefined = False;
+	    KerDefined = _LPFalse;
     } else {
-        KerDefined = (Boolean)0;
+        KerDefined = (_LPBoolean)0;
     }
     return(KerDefined);
 }

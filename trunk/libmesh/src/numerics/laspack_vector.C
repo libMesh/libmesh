@@ -1,4 +1,4 @@
-// $Id: laspack_vector.C,v 1.8 2003-03-04 22:31:15 benkirk Exp $
+// $Id: laspack_vector.C,v 1.9 2003-03-14 09:56:41 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,47 +31,51 @@
 
 
 
-
-// void LaspackVector::init (const NumericVector<Real>& v, const bool fast)
+// template <typename T>
+// void LaspackVector<T> ::init (const NumericVector<T>& v, const bool fast)
 // {
 //   error();
   
 //   init (v.local_size(), v.size(), fast);
 
-//   vec = dynamic_cast<const LaspackVector&>(v).vec;
+//   vec = dynamic_cast<const LaspackVector<T>&>(v).vec;
 // }
 
 
 
-Real LaspackVector::l1_norm () const
+template <typename T>
+Real LaspackVector<T>::l1_norm () const
 {
   assert(closed());
   
-  return static_cast<Real>(Laspack::l1Norm_V(const_cast<Laspack::QVector*>(&_vec)));
+  return static_cast<Real>(l1Norm_V(const_cast<QVector*>(&_vec)));
 }
 
 
 
-Real LaspackVector::l2_norm () const
+template <typename T>
+Real LaspackVector<T>::l2_norm () const
 {
   assert(closed());
   
-  return static_cast<Real>(Laspack::l2Norm_V(const_cast<Laspack::QVector*>(&_vec)));
+  return static_cast<Real>(l2Norm_V(const_cast<QVector*>(&_vec)));
 }
 
 
 
-Real LaspackVector::linfty_norm () const
+template <typename T>
+Real LaspackVector<T>::linfty_norm () const
 {
   assert(closed());
   
-  return static_cast<Real>(Laspack::MaxNorm_V(const_cast<Laspack::QVector*>(&_vec)));
+  return static_cast<Real>(MaxNorm_V(const_cast<QVector*>(&_vec)));
 }
 
 
 
 
-NumericVector<Real>& LaspackVector::operator += (const NumericVector<Real>& v)
+template <typename T>
+NumericVector<T>& LaspackVector<T>::operator += (const NumericVector<T>& v)
 {
   assert(closed());
   
@@ -83,7 +87,8 @@ NumericVector<Real>& LaspackVector::operator += (const NumericVector<Real>& v)
 
 
 
-NumericVector<Real>& LaspackVector::operator -= (const NumericVector<Real>& v)
+template <typename T>
+NumericVector<T>& LaspackVector<T>::operator -= (const NumericVector<T>& v)
 {
   assert(closed());
   
@@ -94,7 +99,8 @@ NumericVector<Real>& LaspackVector::operator -= (const NumericVector<Real>& v)
 
 
 
-void LaspackVector::add (const Real v)
+template <typename T>
+void LaspackVector<T>::add (const T v)
 {
   for (unsigned int i=0; i<size(); i++)
     add (i, v);
@@ -103,14 +109,16 @@ void LaspackVector::add (const Real v)
 
 
 
-void LaspackVector::add (const NumericVector<Real>& v)
+template <typename T>
+void LaspackVector<T>::add (const NumericVector<T>& v)
 {
   add (1., v);
 }
 
 
 
-void LaspackVector::add (const Real a, const NumericVector<Real>& v_in)
+template <typename T>
+void LaspackVector<T>::add (const T a, const NumericVector<T>& v_in)
 {
   const LaspackVector& v = dynamic_cast<const LaspackVector&>(v_in);
   
@@ -121,29 +129,32 @@ void LaspackVector::add (const Real a, const NumericVector<Real>& v_in)
 }
 
 
-void LaspackVector::scale (const Real factor)
+template <typename T>
+void LaspackVector<T>::scale (const T factor)
 {
   assert (initialized());
   
-  Laspack::Mul_SV (factor, &_vec);
+  Mul_SV (factor, &_vec);
 }
 
 
 
-NumericVector<Real>& 
-LaspackVector::operator = (const Real s)
+template <typename T>
+NumericVector<T>& 
+LaspackVector<T>::operator = (const T s)
 {
   assert (initialized());
 
-  Laspack::V_SetAllCmp (&_vec, s);
+  V_SetAllCmp (&_vec, s);
   
   return *this;
 }
 
 
 
-NumericVector<Real>&
-LaspackVector::operator = (const NumericVector<Real>& v_in)
+template <typename T>
+NumericVector<T>&
+LaspackVector<T>::operator = (const NumericVector<T>& v_in)
 {
   const LaspackVector& v = dynamic_cast<const LaspackVector&>(v_in);
 
@@ -154,22 +165,24 @@ LaspackVector::operator = (const NumericVector<Real>& v_in)
 
 
 
-LaspackVector&
-LaspackVector::operator = (const LaspackVector& v)
+template <typename T>
+LaspackVector<T>&
+LaspackVector<T>::operator = (const LaspackVector<T>& v)
 {
   assert (size() == v.size());
 
   if (size() != 0)    
-    Laspack::Asgn_VV (const_cast<Laspack::QVector*>(&_vec),
-		      const_cast<Laspack::QVector*>(&v._vec)
+    Asgn_VV (const_cast<QVector*>(&_vec),
+		      const_cast<QVector*>(&v._vec)
 		      );
   return *this;
 }
 
 
 
-NumericVector<Real>&
-LaspackVector::operator = (const std::vector<Real>& v)
+template <typename T>
+NumericVector<T>&
+LaspackVector<T>::operator = (const std::vector<T>& v)
 {
   /**
    * Case 1:  The vector is the same size of
@@ -186,8 +199,8 @@ LaspackVector::operator = (const std::vector<Real>& v)
 }
 
 
-
-void LaspackVector::localize (NumericVector<Real>& v_local_in) const
+template <typename T>
+void LaspackVector<T>::localize (NumericVector<T>& v_local_in) const
 {
   LaspackVector& v_local =
     dynamic_cast<LaspackVector&>(v_local_in);
@@ -197,8 +210,9 @@ void LaspackVector::localize (NumericVector<Real>& v_local_in) const
 
 
 
-void LaspackVector::localize (NumericVector<Real>& v_local_in,
-			      const std::vector<unsigned int>& send_list) const
+template <typename T>
+void LaspackVector<T>::localize (NumericVector<T>& v_local_in,
+				 const std::vector<unsigned int>& send_list) const
 {
   LaspackVector& v_local =
     dynamic_cast<LaspackVector&>(v_local_in);
@@ -210,7 +224,8 @@ void LaspackVector::localize (NumericVector<Real>& v_local_in,
 
 
 
-void LaspackVector::localize (std::vector<Real>& v_local) const
+template <typename T>
+void LaspackVector<T>::localize (std::vector<T>& v_local) const
 
 {
   v_local.resize(size());
@@ -221,8 +236,9 @@ void LaspackVector::localize (std::vector<Real>& v_local) const
 
 
 
-void LaspackVector::localize_to_one (std::vector<Real>& v_local,
-				     const unsigned int pid) const
+template <typename T>
+void LaspackVector<T>::localize_to_one (std::vector<T>& v_local,
+					const unsigned int pid) const
 {
   assert (pid == 0);
 
@@ -230,5 +246,52 @@ void LaspackVector::localize_to_one (std::vector<Real>& v_local,
 }
 
 
+// Full specialization for Real datatypes
+#ifdef USE_REAL_NUMBERS
+
+template <> 
+inline
+Real LaspackVector<Real>::min () const
+{
+  assert (initialized());
+
+  Real min = 1.e30;
+
+  for (unsigned int i=0; i<size(); i++)
+    min = std::min (min, (*this)(i));
+
+  return min;
+}
+
+
+#endif
+
+
+
+// Full specialization for Complex datatypes
+#ifdef USE_COMPLEX_NUMBERS
+
+template <> 
+inline
+Real LaspackVector<Complex>::min () const
+{
+  assert (initialized());
+
+  Real min = 1.e30;
+
+  for (unsigned int i=0; i<size(); i++)
+    min = std::min (min, (*this)(i).real() );
+
+  return min;
+}
+
+#endif
+
+
+
+//------------------------------------------------------------------
+// Explicit instantiations
+template class LaspackVector<Number>;
+ 
 
 #endif // #ifdef HAVE_LASPACK

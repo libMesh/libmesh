@@ -16,7 +16,8 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
-#ifdef __cplusplus
+#include "laspack_config.h"
+#ifdef _LP_INCLUDED_FROM_CPLUSPLUS
 extern "C" {
 #endif
 
@@ -34,15 +35,15 @@ typedef struct {
     ElOrderType ElOrder;
     InstanceType Instance;
     int LockLevel;
-    double Multipl;
-    Boolean OwnData;
+    _LPDouble Multipl;
+    _LPBoolean OwnData;
     size_t *Len;
     ElType **El;
-    Boolean *ElSorted;
+    _LPBoolean *ElSorted;
 } Matrix;
 
 void M_Constr(Matrix *M, char *Name, size_t RowDim, size_t ClmDim,
-              ElOrderType ElOrder, InstanceType Instance, Boolean OwnData);
+              ElOrderType ElOrder, InstanceType Instance, _LPBoolean OwnData);
 void M_Destr(Matrix *M);
 void M_SetName(Matrix *M, char *Name);
 char *M_GetName(Matrix *M);
@@ -51,10 +52,10 @@ size_t M_GetClmDim(Matrix *M);
 ElOrderType M_GetElOrder(Matrix *M);
 void M_SetLen(Matrix *M, size_t RoC, size_t Len);
 size_t M_GetLen(Matrix *M, size_t RoC);
-void M_SetEntry(Matrix *M, size_t RoC, size_t Entry, size_t Pos, Real Val);
+void M_SetEntry(Matrix *M, size_t RoC, size_t Entry, size_t Pos, _LPNumber Val);
 size_t M_GetPos(Matrix *M, size_t RoC, size_t Entry);
-Real M_GetVal(Matrix *M, size_t RoC, size_t Entry);
-void M_AddVal(Matrix *M, size_t RoC, size_t Entry, Real Val);
+_LPNumber M_GetVal(Matrix *M, size_t RoC, size_t Entry);
+void M_AddVal(Matrix *M, size_t RoC, size_t Entry, _LPNumber Val);
 
 /* macros for fast access */
 #define     M__GetLen(PtrM, RoC)               (PtrM)->Len[RoC]
@@ -68,14 +69,14 @@ void M_AddVal(Matrix *M, size_t RoC, size_t Entry, Real Val);
                 (PtrM)->El[RoC][Entry].Val += (Val_); \
             }
 
-Real M_GetEl(Matrix *M, size_t Row, size_t Clm);
+_LPNumber M_GetEl(Matrix *M, size_t Row, size_t Clm);
 
 void M_SortEl(Matrix *M);
 
 void M_Lock(Matrix *M);
 void M_Unlock(Matrix *M);
 
-#ifdef __cplusplus
+#ifdef _LP_INCLUDED_FROM_CPLUSPLUS
 }
 #endif
 

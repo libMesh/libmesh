@@ -16,7 +16,8 @@
 #ifndef QMATRIX_H
 #define QMATRIX_H
 
-#ifdef __cplusplus
+#include "laspack_config.h"
+#ifdef _LP_INCLUDED_FROM_CPLUSPLUS
 extern "C" {
 #endif
 
@@ -31,44 +32,44 @@ extern "C" {
 typedef struct QMatrixType {
     char *Name;
     size_t Dim;
-    Boolean Symmetry;
+    _LPBoolean Symmetry;
     ElOrderType ElOrder;
     InstanceType Instance;
     int LockLevel;
-    double MultiplD;
-    double MultiplU;
-    double MultiplL;
-    Boolean OwnData;
+    _LPDouble MultiplD;
+    _LPDouble MultiplU;
+    _LPDouble MultiplL;
+    _LPBoolean OwnData;
     size_t *Len;
     ElType **El;
-    Boolean *ElSorted;
-    Boolean *DiagElAlloc;
+    _LPBoolean *ElSorted;
+    _LPBoolean *DiagElAlloc;
     ElType **DiagEl;
-    Boolean *ZeroInDiag;
-    Real *InvDiagEl;
-    Boolean UnitRightKer;
-    Real *RightKerCmp;
-    Boolean UnitLeftKer;
-    Real *LeftKerCmp;
+    _LPBoolean *ZeroInDiag;
+    _LPNumber *InvDiagEl;
+    _LPBoolean UnitRightKer;
+    _LPNumber *RightKerCmp;
+    _LPBoolean UnitLeftKer;
+    _LPNumber *LeftKerCmp;
     void *EigenvalInfo;
-    Boolean *ILUExists;
+    _LPBoolean *ILUExists;
     struct QMatrixType *ILU;
 } QMatrix;
 
-void Q_Constr(QMatrix *Q, char *Name, size_t Dim, Boolean Symmetry,
-              ElOrderType ElOrder, InstanceType Instance, Boolean OwnData);
+void Q_Constr(QMatrix *Q, char *Name, size_t Dim, _LPBoolean Symmetry,
+              ElOrderType ElOrder, InstanceType Instance, _LPBoolean OwnData);
 void Q_Destr(QMatrix *Q);
 void Q_SetName(QMatrix *Q, char *Name);
 char *Q_GetName(QMatrix *Q);
 size_t Q_GetDim(QMatrix *Q);
-Boolean Q_GetSymmetry(QMatrix *Q);
+_LPBoolean Q_GetSymmetry(QMatrix *Q);
 ElOrderType Q_GetElOrder(QMatrix *Q);
 void Q_SetLen(QMatrix *Q, size_t RoC, size_t Len);
 size_t Q_GetLen(QMatrix *Q, size_t RoC);
-void Q_SetEntry(QMatrix *Q, size_t RoC, size_t Entry, size_t Pos, Real Val);
+void Q_SetEntry(QMatrix *Q, size_t RoC, size_t Entry, size_t Pos, _LPNumber Val);
 size_t Q_GetPos(QMatrix *Q, size_t RoC, size_t Entry);
-Real Q_GetVal(QMatrix *Q, size_t RoC, size_t Entry);
-void Q_AddVal(QMatrix *Q, size_t RoC, size_t Entry, Real Val);
+_LPNumber Q_GetVal(QMatrix *Q, size_t RoC, size_t Entry);
+void Q_AddVal(QMatrix *Q, size_t RoC, size_t Entry, _LPNumber Val);
 
 /* macros for fast access */
 #define     Q__GetLen(PtrQ, RoC)               (PtrQ)->Len[RoC]
@@ -81,20 +82,20 @@ void Q_AddVal(QMatrix *Q, size_t RoC, size_t Entry, Real Val);
 #define     Q__AddVal(PtrQ, RoC, Entry, Val_) \
                 (PtrQ)->El[RoC][Entry].Val += (Val_)
 
-Real Q_GetEl(QMatrix *Q, size_t Row, size_t Clm);
+_LPNumber Q_GetEl(QMatrix *Q, size_t Row, size_t Clm);
 
 void Q_SortEl(QMatrix *Q);
 void Q_AllocInvDiagEl(QMatrix *Q);
 
 void Q_SetKer(QMatrix *Q, QVector *RightKer, QVector *LeftKer);
-Boolean Q_KerDefined(QMatrix *Q);
+_LPBoolean Q_KerDefined(QMatrix *Q);
 
 void **Q_EigenvalInfo(QMatrix *Q);
 
 void Q_Lock(QMatrix *Q);
 void Q_Unlock(QMatrix *Q);
 
-#ifdef __cplusplus
+#ifdef _LP_INCLUDED_FROM_CPLUSPLUS
 }
 #endif
 

@@ -1,4 +1,4 @@
-// $Id: laspack_matrix.C,v 1.6 2003-02-20 04:59:58 benkirk Exp $
+// $Id: laspack_matrix.C,v 1.7 2003-03-14 09:56:41 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -33,8 +33,9 @@
 
 //-----------------------------------------------------------------------
 // LaspackMatrix members
-void LaspackMatrix::update_sparsity_pattern (std::vector<std::set<unsigned int> >&
-					     sparsity_pattern)
+template <typename T> 
+void LaspackMatrix<T>::update_sparsity_pattern (std::vector<std::set<unsigned int> >&
+					       sparsity_pattern)
 {
   // clear data, start over
   clear ();    
@@ -108,7 +109,7 @@ void LaspackMatrix::update_sparsity_pattern (std::vector<std::set<unsigned int> 
       const unsigned int length = _row_start[i+1] - rs;
       
       //std::cout << "m()=" << m() << std::endl;
-      Laspack::Q_SetLen (&_QMat, i+1, length);
+      Q_SetLen (&_QMat, i+1, length);
       //std::cout << "m()=" << m() << std::endl;
 
       for (unsigned int l=0; l<length; l++)
@@ -124,7 +125,7 @@ void LaspackMatrix::update_sparsity_pattern (std::vector<std::set<unsigned int> 
 	  //std::cout << "pos(i,j)=" << pos(i,j)
 	  //          << std::endl;	  
 	  assert (pos(i,j) == l);
-	  Laspack::Q_SetEntry (&_QMat, i+1, l, j+1, 0.);
+	  Q_SetEntry (&_QMat, i+1, l, j+1, 0.);
 	}
     }
   
@@ -134,12 +135,13 @@ void LaspackMatrix::update_sparsity_pattern (std::vector<std::set<unsigned int> 
 
 
 
-void LaspackMatrix::init (const unsigned int m,
-			  const unsigned int n,
-			  const unsigned int m_l,
-			  const unsigned int n_l,
-			  const unsigned int nnz,
-			  const unsigned int)
+template <typename T> 
+void LaspackMatrix<T>::init (const unsigned int m,
+			     const unsigned int n,
+			     const unsigned int m_l,
+			     const unsigned int n_l,
+			     const unsigned int nnz,
+			     const unsigned int)
 {
   // noz ignored...  only used for multiple processors!
   assert (m == m_l);
@@ -157,7 +159,8 @@ void LaspackMatrix::init (const unsigned int m,
 
 
 
-void LaspackMatrix::init ()
+template <typename T> 
+void LaspackMatrix<T>::init ()
 {
   // Ignore calls on initialized objects
   if (initialized())
@@ -188,9 +191,7 @@ void LaspackMatrix::init ()
   if (m==0)
     return;
 
-  using namespace Laspack;
-
-  Q_Constr(&_QMat, const_cast<char*>("Mat"), m, False, Rowws, Normal, True);
+  Q_Constr(&_QMat, const_cast<char*>("Mat"), m, _LPFalse, Rowws, Normal, _LPTrue);
 
   _is_initialized = true;
   
@@ -198,5 +199,9 @@ void LaspackMatrix::init ()
 }
 
 
+//------------------------------------------------------------------
+// Explicit instantiations
+template class LaspackMatrix<Number>;
+ 
 
 #endif // #ifdef HAVE_LASPACK

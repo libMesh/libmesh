@@ -22,35 +22,33 @@
 #include "operats.h"
 #include "rtc.h"
 #include "copyrght.h"
+#ifndef _LP_USE_COMPLEX_NUMBERS
 
 typedef struct {
-    double MinEigenval;
-    double MaxEigenval;
+    _LPDouble MinEigenval;
+    _LPDouble MaxEigenval;
     PrecondProcType PrecondProcUsed;
-    double OmegaPrecondUsed;
+    _LPDouble OmegaPrecondUsed;
 } EigenvalInfoType;
 
 /* accuracy for the estimation of extremal eigenvalues */
-static double EigenvalEps = 1e-4;
+static _LPReal EigenvalEps = 1e-4;
 
-static void EstimEigenvals(QMatrix *A, PrecondProcType PrecondProc, double OmegaPrecond);
-static void SearchEigenval(size_t n, double *Alpha, double *Beta, size_t k,
-	        double BoundMin, double BoundMax, Boolean *Found, double *Lambda);
-static size_t NoSmallerEigenvals(size_t n, double *Alpha, double *Beta, double Lambda);
+static void EstimEigenvals(QMatrix *A, PrecondProcType PrecondProc, _LPDouble OmegaPrecond);
+static void SearchEigenval(size_t n, _LPDouble *Alpha, _LPDouble *Beta, size_t k,
+	        _LPDouble BoundMin, _LPDouble BoundMax, _LPBoolean *Found, _LPDouble *Lambda);
+static size_t NoSmallerEigenvals(size_t n, _LPDouble *Alpha, _LPDouble *Beta, _LPDouble Lambda);
 
-#define max(x, y) ((x) > (y) ? (x) : (y))
-#define min(x, y) ((x) < (y) ? (x) : (y))
-
-void SetEigenvalAccuracy(double Eps)
+void SetEigenvalAccuracy(_LPReal Eps)
 /* set accuracy for the estimation of extremal eigenvalues */
 {
     EigenvalEps = Eps;
 }
 
-double GetMinEigenval(QMatrix *A, PrecondProcType PrecondProc, double OmegaPrecond)
+_LPDouble GetMinEigenval(QMatrix *A, PrecondProcType PrecondProc, _LPDouble OmegaPrecond)
 /* returns estimate for minimum eigenvalue of the matrix A */
 {
-    double MinEigenval;
+    _LPDouble MinEigenval;
     
     EigenvalInfoType *EigenvalInfo;
     
@@ -86,10 +84,10 @@ double GetMinEigenval(QMatrix *A, PrecondProcType PrecondProc, double OmegaPreco
     return(MinEigenval);             
 }
 
-double GetMaxEigenval(QMatrix *A, PrecondProcType PrecondProc, double OmegaPrecond)
+_LPDouble GetMaxEigenval(QMatrix *A, PrecondProcType PrecondProc, _LPDouble OmegaPrecond)
 /* returns estimate for maximum eigenvalue of the matrix A */
 {
-    double MaxEigenval;
+    _LPDouble MaxEigenval;
 
     EigenvalInfoType *EigenvalInfo;
     
@@ -125,7 +123,7 @@ double GetMaxEigenval(QMatrix *A, PrecondProcType PrecondProc, double OmegaPreco
     return(MaxEigenval);             
 }
 
-static void EstimEigenvals(QMatrix *A, PrecondProcType PrecondProc, double OmegaPrecond)
+static void EstimEigenvals(QMatrix *A, PrecondProcType PrecondProc, _LPDouble OmegaPrecond)
 /* estimates extremal eigenvalues of the matrix A by means of the Lanczos method */
 {
     /*
@@ -139,26 +137,26 @@ static void EstimEigenvals(QMatrix *A, PrecondProcType PrecondProc, double Omega
      *
      */
    
-    double LambdaMin = 0.0, LambdaMax = 0.0;
-    double LambdaMinOld, LambdaMaxOld;
-    double GershBoundMin = 0.0, GershBoundMax = 0.0;
-    double *Alpha, *Beta;
+    _LPDouble LambdaMin = 0.0, LambdaMax = 0.0;
+    _LPDouble LambdaMinOld, LambdaMaxOld;
+    _LPDouble GershBoundMin = 0.0, GershBoundMax = 0.0;
+    _LPDouble *Alpha, *Beta;
     size_t Dim, j;
-    Boolean Found;
+    _LPBoolean Found;
     QVector q, qOld, h, p;
 
     Q_Lock(A);
     
     Dim = Q_GetDim(A);
-    V_Constr(&q, "q", Dim, Normal, True);
-    V_Constr(&qOld, "qOld", Dim, Normal, True);
-    V_Constr(&h, "h", Dim, Normal, True);
+    V_Constr(&q, "q", Dim, Normal, _LPTrue);
+    V_Constr(&qOld, "qOld", Dim, Normal, _LPTrue);
+    V_Constr(&h, "h", Dim, Normal, _LPTrue);
     if (PrecondProc != NULL)
-        V_Constr(&p, "p", Dim, Normal, True);
+        V_Constr(&p, "p", Dim, Normal, _LPTrue);
    
     if (LASResult() == LASOK) {
-        Alpha = (double *)malloc((Dim + 1) * sizeof(double));
-        Beta = (double *)malloc((Dim + 1) * sizeof(double));
+        Alpha = (_LPDouble *)malloc((Dim + 1) * sizeof(_LPDouble));
+        Beta = (_LPDouble *)malloc((Dim + 1) * sizeof(_LPDouble));
         if (Alpha != NULL && Beta != NULL) {
 	    j = 0;
             
@@ -228,15 +226,15 @@ static void EstimEigenvals(QMatrix *A, PrecondProcType PrecondProc, double Omega
 		   by means of the method of bisection; bounds for eigenvalues
 		   are determined after Gershgorin circle theorem */
                 if (j == 1) {
-		    GershBoundMin = Alpha[1] - fabs(Beta[1]);
-	  	    GershBoundMax = Alpha[1] + fabs(Beta[1]);
+		    GershBoundMin = Alpha[1] - _LPfabs(Beta[1]);
+	  	    GershBoundMax = Alpha[1] + _LPfabs(Beta[1]);
 		    
                     LambdaMin = Alpha[1];
                     LambdaMax = Alpha[1];
 		} else {
-		    GershBoundMin = min(Alpha[j] - fabs(Beta[j]) - fabs(Beta[j - 1]),
+		    GershBoundMin = _LPmin(Alpha[j] - _LPfabs(Beta[j]) - _LPfabs(Beta[j - 1]),
 					GershBoundMin);
-		    GershBoundMax = max(Alpha[j] + fabs(Beta[j]) + fabs(Beta[j - 1]),
+		    GershBoundMax = _LPmax(Alpha[j] + _LPfabs(Beta[j]) + _LPfabs(Beta[j - 1]),
 				        GershBoundMax);
 
                     SearchEigenval(j, Alpha, Beta, 1, GershBoundMin, LambdaMin,
@@ -251,9 +249,9 @@ static void EstimEigenvals(QMatrix *A, PrecondProcType PrecondProc, double Omega
                         SearchEigenval(j, Alpha, Beta, j, GershBoundMin, GershBoundMax,
 		            &Found, &LambdaMax);
                 }
-            } while (!IsZero(Beta[j]) && j < Dim
-		&& (fabs(LambdaMin - LambdaMinOld) > EigenvalEps * LambdaMin
-                || fabs(LambdaMax - LambdaMaxOld) > EigenvalEps * LambdaMax)
+            } while (!_LPIsZeroReal(Beta[j]) && j < Dim
+		&& (_LPfabs(LambdaMin - LambdaMinOld) > EigenvalEps * LambdaMin
+                || _LPfabs(LambdaMax - LambdaMaxOld) > EigenvalEps * LambdaMax)
                 && LASResult() == LASOK);
                 
 	    if (Q_GetSymmetry(A)) {
@@ -292,8 +290,8 @@ static void EstimEigenvals(QMatrix *A, PrecondProcType PrecondProc, double Omega
     Q_Unlock(A);
 }
 
-static void SearchEigenval(size_t n, double *Alpha, double *Beta, size_t k,
-         double BoundMin, double BoundMax, Boolean *Found, double *Lambda)
+static void SearchEigenval(size_t n, _LPDouble *Alpha, _LPDouble *Beta, size_t k,
+         _LPDouble BoundMin, _LPDouble BoundMax, _LPBoolean *Found, _LPDouble *Lambda)
 /* search the k-th eigenvalue of the tridiagonal matrix
    (Beta[i-1] Alpha[i] Beta[i]) (where 1 <= i <= n) 
    by means of the method of bisection */
@@ -309,8 +307,8 @@ static void SearchEigenval(size_t n, double *Alpha, double *Beta, size_t k,
    
     if (NoSmallerEigenvals(n, Alpha, Beta, BoundMin) < k
 	&& NoSmallerEigenvals(n, Alpha, Beta, BoundMax) >= k) {
-        while (fabs(BoundMax - BoundMin) > 0.01 * EigenvalEps 
-	    * (fabs(BoundMin) + fabs(BoundMax))) {
+        while (_LPfabs(BoundMax - BoundMin) > 0.01 * EigenvalEps 
+	    * (_LPfabs(BoundMin) + _LPfabs(BoundMax))) {
             *Lambda = 0.5 * (BoundMin + BoundMax);
 	    if (NoSmallerEigenvals(n, Alpha, Beta, *Lambda) >= k) 
 	        BoundMax = *Lambda;
@@ -319,40 +317,71 @@ static void SearchEigenval(size_t n, double *Alpha, double *Beta, size_t k,
         }
 	*Lambda = BoundMax;
 
-	*Found = True;
+	*Found = _LPTrue;
     } else {
-	*Found = False;
+	*Found = _LPFalse;
     }
 }
 
-static size_t NoSmallerEigenvals(size_t n, double *Alpha, double *Beta, double Lambda)
+static size_t NoSmallerEigenvals(size_t n, _LPDouble *Alpha, _LPDouble *Beta, _LPDouble Lambda)
 /* returns number of eigenvalues of the tridiagonal matrix
    (Beta[i-1] Alpha[i] Beta[i]) (where 1 <= i <= n) 
    which are less then Lambda */
 {
     size_t No;
     
-    double p, pNew, pOld, Sign;
+    _LPDouble p, pNew, pOld, Sign;
     size_t i;
     
     No = 0;
     
     pOld = 1.0;
-    p = (Alpha[1] - Lambda) / fabs(Beta[1]);
+    p = (Alpha[1] - Lambda) / _LPfabs(Beta[1]);
     /* check for change of sign */
-    if (IsZero(p) || p * pOld < 0)
+    if (_LPIsZeroReal(p) || p * pOld < 0)
         No++;
     
     for (i = 2; i <= n; i++) {
-        Sign = Beta[i-1] / fabs(Beta[i-1]);
-        pNew = ((Alpha[i] - Lambda) * p - Beta[i-1] * Sign * pOld) / fabs(Beta[i]);
+        Sign = Beta[i-1] / _LPfabs(Beta[i-1]);
+        pNew = ((Alpha[i] - Lambda) * p - Beta[i-1] * Sign * pOld) / _LPfabs(Beta[i]);
         pOld = p;
         p = pNew;
 	
 	/* check for change of sign */
-	if (p * pOld < 0 || (IsZero(p) && !IsZero(pOld)))
+	if (p * pOld < 0 || (_LPIsZeroReal(p) && !_LPIsZeroReal(pOld)))
 	    No++;
     }
    
     return(No);
 }
+
+
+
+#else
+
+void SetEigenvalAccuracy(_LPReal /* Eps */)
+{
+    printf("ERROR: Eigenvalue estimation not implemented for complex arithmetic.\n");
+    abort();
+}
+
+
+_LPDouble GetMinEigenval(QMatrix * /* Q */, 
+			 PrecondProcType /* PrecondProc */, 
+			 _LPDouble /* OmegaPrecond */)
+{
+    printf("ERROR: Eigenvalue estimation not implemented for complex arithmetic.\n");
+    abort();
+}
+
+
+_LPDouble GetMaxEigenval(QMatrix * /* Q */, 
+			 PrecondProcType /* PrecondProc */, 
+			 _LPDouble /* OmegaPrecond */)
+{
+    printf("ERROR: Eigenvalue estimation not implemented for complex arithmetic.\n");
+    abort();
+}
+
+#endif /* _LP_USE_COMPLEX_NUMBERS */
+

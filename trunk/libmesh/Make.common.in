@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.17 2003-03-05 17:01:08 benkirk Exp $
+# $Id: Make.common.in,v 1.18 2003-03-14 09:56:36 ddreyer Exp $
 
 
 ###############################################################################
@@ -234,6 +234,10 @@ ifeq ($(enable-optional),yes)
   ifeq ($(enable-laspack),yes)
     LIBS    += $(EXTERNAL_LIBDIR)/liblaspack$(EXTERNAL_LIBEXT)
     INCLUDE += -I$(LASPACK_INCLUDE)
+    ifeq ($(enable-complex),yes)
+      CXXFLAGS     += -DUSE_COMPLEX_NUMBERS
+      CFLAGS       += -DUSE_REAL_NUMBERS
+    endif
   endif
 
   # if Metis is used we need the header path
@@ -269,7 +273,7 @@ ifeq ($(enable-optional),yes)
 
 
     INCLUDE += -I$(PETSC_DIR)/include -I$(PETSC_DIR)/bmake/$(PETSC_ARCH) \
-                $(MPI_INCLUDE)
+                $(MPI_INCLUDE) $(BLOCKSOLVE_INCLUDE) $(HYPRE_INCLUDE)
 
     ifeq ($(enable-complex),yes)
       CXXFLAGS     += -DPETSC_USE_COMPLEX
@@ -293,22 +297,12 @@ ifeq ($(enable-optional),yes)
       DLFLAGS      += -Wl,-rpath,$(PETSC_LIB)
     endif
 
-
-# Always link with PETSC's shared libs
-#    libs-PETSC = $(PETSC_LIB)/libpetscsles.a \
-# 		 $(PETSC_LIB)/libpetscvec.a \
-# 		 $(PETSC_LIB)/libpetscmat.a \
-# 		 $(PETSC_LIB)/libpetscdm.a \
-# 		 $(PETSC_LIB)/libpetsc.a
-
-#    ifeq ($(enable-shared),yes)
-      libs-PETSC = -L$(PETSC_LIB) \
-		   -lpetscsles \
-		   -lpetscdm \
-		   -lpetscmat \
-		   -lpetscvec \
-		   -lpetsc
-#    endif
+    libs-PETSC = -L$(PETSC_LIB) \
+	         -lpetscsles \
+		 -lpetscdm \
+		 -lpetscmat \
+		 -lpetscvec \
+		 -lpetsc
 
     LIBS += $(libs-PETSC) $(BLOCKSOLVE_LIB) $(SPOOLES_LIB) \
 	    $(HYPRE_LIB) $(BLASLAPACK_LIB) $(MPI_LIB) \
@@ -365,65 +359,111 @@ LIBS += $(DLFLAGS) $(LDFLAGS)
 # How to compile optimized C++
 #
 %.@host@.o : %.C
-	@echo "Compiling (in optimized mode) "$<"..."
+	@echo "Compiling C++ (in optimized mode) "$<"..."
 	@$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
 
 #
 # How to compile C++ with debugging flags
 #
 %.@host@.g.o : %.C
-	@echo "Compiling (in debug mode) "$<"..."
+	@echo "Compiling C++ (in debug mode) "$<"..."
 	@$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
 
 #
 # How to compile C++ with profiling flags
 #
 %.@host@.pg.o : %.C
-	@echo "Compiling (in profiler mode) "$<"..."
+	@echo "Compiling C++ (in profiler mode) "$<"..."
 	@$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
 
 #
 # How to compile C++ with syntax-checking flags
 #
 %.@host@.sy.o : %.C
-	@echo "Compiling (in syntax-checker mode) "$<"..."
+	@echo "Compiling C++ (in syntax-checker mode) "$<"..."
 	@$(CXX) $(CXXFLAGS) $(INCLUDE) -c $<
 	$(shell touch $@)
-
-
 
 ##################################
 # C rules                        #
 ##################################
-#
-# How to compile optimized C
-#
+
+# do not show this to the LASPACK Makefile
+ifeq (x$(included-from-laspack),x)
+  #
+  # How to compile optimized C
+  #
 %.@host@.o : %.c
-	@echo "Compiling (in optimized mode) "$<"..."
+	@echo "Compiling C (in optimized mode) "$<"..."
 	@$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
 
-#
-# How to compile C with debugging flags
-#
+  #
+  # How to compile C with debugging flags
+  #
 %.@host@.g.o : %.c
-	@echo "Compiling (in debug mode) "$<"..."
+	@echo "Compiling C (in debug mode) "$<"..."
 	@$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
 
-#
-# How to compile C with profiling flags
-#
+  #
+  # How to compile C with profiling flags
+  #
 %.@host@.pg.o : %.c
-	@echo "Compiling (in profiler mode) "$<"..."
+	@echo "Compiling C (in profiler mode) "$<"..."
 	@$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
 
-#
-# How to compile C with profiling flags
-#
+  #
+  # How to compile C with profiling flags
+  #
 %.@host@.sy.o : %.c
-	@echo "Compiling (in syntax-checker mode) "$<"..."
+	@echo "Compiling C (in syntax-checker mode) "$<"..."
 	@$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
 	$(shell touch $@)
 
+else
+
+  # only visible for LASPACK Makefile
+  ifeq ($(enable-complex),yes)
+
+    # complex: C++ rules for .c Laspack code
+%.@host@.o : %.c
+	@echo "Compiling C++ (in optimized mode) "$<"..."
+	@$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
+
+%.@host@.g.o : %.c
+	@echo "Compiling C++ (in debug mode) "$<"..."
+	@$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
+
+%.@host@.pg.o : %.c
+	@echo "Compiling C++ (in profiler mode) "$<"..."
+	@$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
+
+%.@host@.sy.o : %.c
+	@echo "Compiling C++ (in syntax-checker mode) "$<"..."
+	@$(CXX) $(CXXFLAGS) $(INCLUDE) -c $<
+	$(shell touch $@)
+
+  else
+
+    # real: C rules for .c Laspack code
+%.@host@.o : %.c
+	@echo "Compiling C (in optimized mode) "$<"..."
+	@$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
+
+%.@host@.g.o : %.c
+	@echo "Compiling C (in debug mode) "$<"..."
+	@$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
+
+%.@host@.pg.o : %.c
+	@echo "Compiling C (in profiler mode) "$<"..."
+	@$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
+
+%.@host@.sy.o : %.c
+	@echo "Compiling C (in syntax-checker mode) "$<"..."
+	@$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
+	$(shell touch $@)
+
+  endif
+endif
 
 ###############################################################################
 

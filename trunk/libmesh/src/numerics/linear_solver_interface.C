@@ -1,4 +1,4 @@
-// $Id: linear_solver_interface.C,v 1.4 2003-02-20 04:59:58 benkirk Exp $
+// $Id: linear_solver_interface.C,v 1.5 2003-03-14 09:56:41 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -42,10 +42,10 @@ LinearSolverInterface<Real>::build(const SolverPackage solver_package)
     {
 
 
-#if defined(HAVE_LASPACK)
+#if defined(HAVE_LASPACK) && defined(USE_REAL_NUMBERS)
     case LASPACK_SOLVERS:
       {
-	AutoPtr<LinearSolverInterface<Real> > ap(new LaspackInterface);
+	AutoPtr<LinearSolverInterface<Real> > ap(new LaspackInterface<Real>);
 	return ap;
       }
 #endif
@@ -79,6 +79,15 @@ LinearSolverInterface<Complex>::build(const SolverPackage solver_package)
 
   switch (solver_package)
     {
+
+#if defined(HAVE_LASPACK) && defined(USE_COMPLEX_NUMBERS)
+    case LASPACK_SOLVERS:
+      {
+	AutoPtr<LinearSolverInterface<Complex> > ap(new LaspackInterface<Complex>);
+	return ap;
+      }
+#endif
+
       
 #if defined(HAVE_PETSC) && defined(USE_COMPLEX_NUMBERS)
     case PETSC_SOLVERS:

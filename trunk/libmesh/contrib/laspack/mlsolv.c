@@ -26,9 +26,9 @@
 QVector *MGStep(int NoLevels, QMatrix *A, QVector *x, QVector *b,
             Matrix *R, Matrix *P, int Level, int Gamma,
             IterProcType SmoothProc, int Nu1, int Nu2, 
-	    PrecondProcType PrecondProc, double Omega,
+	    PrecondProcType PrecondProc, _LPDouble Omega,
             IterProcType SolvProc, int NuC,
-	    PrecondProcType PrecondProcC, double OmegaC)
+	    PrecondProcType PrecondProcC, _LPDouble OmegaC)
 /* one multigrid iteration */
 {
     int CoarseMGIter; /* multi grid iteration counter for coarser grid */
@@ -64,18 +64,18 @@ QVector *MGStep(int NoLevels, QMatrix *A, QVector *x, QVector *b,
 QVector *MGIter(int NoLevels, QMatrix *A, QVector *x, QVector *b,
 	    Matrix *R, Matrix *P, int MaxIter, int Gamma,
             IterProcType SmoothProc, int Nu1, int Nu2, 
-	    PrecondProcType PrecondProc, double Omega,
+	    PrecondProcType PrecondProc, _LPDouble Omega,
             IterProcType SolvProc, int NuC,
-	    PrecondProcType PrecondProcC, double OmegaC)
+	    PrecondProcType PrecondProcC, _LPDouble OmegaC)
 /* multigrid method with residual termination control */
 {
     int Iter;
-    double bNorm;
+    _LPReal bNorm;
     size_t Dim;
     QVector r;
 
     Dim = Q_GetDim(&A[NoLevels - 1]);
-    V_Constr(&r, "r", Dim, Normal, True);
+    V_Constr(&r, "r", Dim, Normal, _LPTrue);
 
     if (LASResult() == LASOK) {
         bNorm = l2Norm_V(&b[NoLevels - 1]);
@@ -103,9 +103,9 @@ QVector *MGIter(int NoLevels, QMatrix *A, QVector *x, QVector *b,
 QVector *NestedMGIter(int NoLevels, QMatrix *A, QVector *x, QVector *b,
 	    Matrix *R, Matrix *P, int Gamma,
             IterProcType SmoothProc, int Nu1, int Nu2, 
-	    PrecondProcType PrecondProc, double Omega,
+	    PrecondProcType PrecondProc, _LPDouble Omega,
             IterProcType SolvProc, int NuC,
-	    PrecondProcType PrecondProcC, double OmegaC)
+	    PrecondProcType PrecondProcC, _LPDouble OmegaC)
 /* nested multigrid method */
 {
     int Level;
@@ -140,21 +140,21 @@ QVector *NestedMGIter(int NoLevels, QMatrix *A, QVector *x, QVector *b,
 QVector *MGPCGIter(int NoLevels, QMatrix *A, QVector *z, QVector *r,
 		   Matrix *R, Matrix *P, int MaxIter, int NoMGIter, int Gamma,
                    IterProcType SmoothProc, int Nu1, int Nu2, 
-		   PrecondProcType PrecondProc, double Omega,
+		   PrecondProcType PrecondProc, _LPDouble Omega,
                    IterProcType SolvProc, int NuC,
-		   PrecondProcType PrecondProcC, double OmegaC)/* multigrid preconditioned CG method */
+		   PrecondProcType PrecondProcC, _LPDouble OmegaC)/* multigrid preconditioned CG method */
 {
     int Iter, MGIter;
-    double Alpha, Beta, Rho, RhoOld = 0.0;
-    double bNorm;
+    _LPDouble Alpha, Beta, Rho, RhoOld = 0.0;
+    _LPReal bNorm;
     size_t Dim;
     QVector x, p, q, b;
 
     Dim = Q_GetDim(&A[NoLevels - 1]);
-    V_Constr(&x, "x", Dim, Normal, True);
-    V_Constr(&p, "p", Dim, Normal, True);
-    V_Constr(&q, "q", Dim, Normal, True);
-    V_Constr(&b, "b", Dim, Normal, True);
+    V_Constr(&x, "x", Dim, Normal, _LPTrue);
+    V_Constr(&p, "p", Dim, Normal, _LPTrue);
+    V_Constr(&q, "q", Dim, Normal, _LPTrue);
+    V_Constr(&b, "b", Dim, Normal, _LPTrue);
 
     if (LASResult() == LASOK) {
         /* copy solution and right hand side stored in parameters z and r */
@@ -204,9 +204,9 @@ QVector *MGPCGIter(int NoLevels, QMatrix *A, QVector *z, QVector *r,
 QVector *BPXPrecond(int NoLevels, QMatrix *A, QVector *y, QVector *c,
             Matrix *R, Matrix *P, int Level, 
             IterProcType SmoothProc, int Nu, 
-            PrecondProcType PrecondProc, double Omega,
+            PrecondProcType PrecondProc, _LPDouble Omega,
             IterProcType SmoothProcC, int NuC,
-	    PrecondProcType PrecondProcC, double OmegaC)
+	    PrecondProcType PrecondProcC, _LPDouble OmegaC)
 /* BPX preconditioner (recursively defined) */
 {
     if (Level == 0) {
@@ -235,22 +235,22 @@ QVector *BPXPrecond(int NoLevels, QMatrix *A, QVector *y, QVector *c,
 QVector *BPXPCGIter(int NoLevels, QMatrix *A, QVector *z, QVector *r,
 		   Matrix *R, Matrix *P, int MaxIter,
                    IterProcType SmoothProc, int Nu, 
-		   PrecondProcType PrecondProc, double Omega,
+		   PrecondProcType PrecondProc, _LPDouble Omega,
                    IterProcType SmoothProcC, int NuC,
-		   PrecondProcType PrecondProcC, double OmegaC)
+		   PrecondProcType PrecondProcC, _LPDouble OmegaC)
 /* BPX preconditioned CG method */
 {
     int Iter;
-    double Alpha, Beta, Rho, RhoOld = 0.0;
-    double bNorm;
+    _LPDouble Alpha, Beta, Rho, RhoOld = 0.0;
+    _LPReal bNorm;
     size_t Dim;
     QVector x, p, q, b;
 
     Dim = Q_GetDim(&A[NoLevels - 1]);
-    V_Constr(&x, "x", Dim, Normal, True);
-    V_Constr(&p, "p", Dim, Normal, True);
-    V_Constr(&q, "q", Dim, Normal, True);
-    V_Constr(&b, "b", Dim, Normal, True);
+    V_Constr(&x, "x", Dim, Normal, _LPTrue);
+    V_Constr(&p, "p", Dim, Normal, _LPTrue);
+    V_Constr(&q, "q", Dim, Normal, _LPTrue);
+    V_Constr(&b, "b", Dim, Normal, _LPTrue);
 
     if (LASResult() == LASOK) {
         /* copy solution and right hand side stored in parameters z and r */

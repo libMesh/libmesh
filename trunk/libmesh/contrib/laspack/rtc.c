@@ -22,7 +22,7 @@
 #include "copyrght.h"
 
 /* accuracy for Residual Termination Control */
-static double RTCEps = 1e-8;
+static _LPReal RTCEps = 1e-8;
 
 /* auxiliary procedure to be performed by Residual Termination Control */
 static RTCAuxProcType RTCAuxProc = NULL;
@@ -31,9 +31,9 @@ static RTCAuxProcType RTCAuxProc = NULL;
 static int LastNoIter = 0;
 
 /* accuracy reached during last call of a iteration method */
-static double LastAcc = 0.0;
+static _LPReal LastAcc = 0.0;
 
-void SetRTCAccuracy(double Eps)
+void SetRTCAccuracy(_LPReal Eps)
 /* set accuracy for the RTC */
 {
     RTCEps = Eps;
@@ -45,19 +45,19 @@ void SetRTCAuxProc(RTCAuxProcType AuxProc)
     RTCAuxProc = AuxProc;
 }
 
-Boolean RTCResult(int Iter, double rNorm, double bNorm, IterIdType IterId)
+_LPBoolean RTCResult(int Iter, _LPReal rNorm, _LPReal bNorm, IterIdType IterId)
 /* get result of RTC */
 {
-    Boolean Result;
+    _LPBoolean Result;
 
     if (LASResult() == LASOK) {
-        if (rNorm < RTCEps * bNorm || (IsZero(bNorm) && IsOne(1.0 + rNorm)))
-            Result = True;
+        if (rNorm < RTCEps * bNorm || (_LPIsZeroReal(bNorm) && _LPIsOneReal(1.0 + rNorm)))
+            Result = _LPTrue;
         else
-            Result = False;
+            Result = _LPFalse;
 
         LastNoIter = Iter;
-        if (!IsZero(bNorm))
+        if (!_LPIsZeroReal(bNorm))
             LastAcc = rNorm / bNorm;
         else
             LastAcc = 1.0;
@@ -65,7 +65,7 @@ Boolean RTCResult(int Iter, double rNorm, double bNorm, IterIdType IterId)
         if (RTCAuxProc != NULL)
             (*RTCAuxProc)(Iter, rNorm, bNorm, IterId);
     } else {
-        Result = True;
+        Result = _LPTrue;
     }
 
     return(Result);
@@ -77,7 +77,7 @@ int GetLastNoIter()
     return(LastNoIter);
 }
 
-double GetLastAccuracy()
+_LPReal GetLastAccuracy()
 /* get accuracy reached during last call of a iteration method */
 {
     return(LastAcc);

@@ -23,7 +23,7 @@
 #include "copyrght.h"
 
 void V_Constr(QVector *V, char *Name, size_t Dim, InstanceType Instance,
-              Boolean OwnData)
+              _LPBoolean OwnData)
 /* constructor of the type QVector */
 {
   V->Name = (char *)malloc((strlen(Name) + 1) * sizeof(char));
@@ -38,7 +38,7 @@ void V_Constr(QVector *V, char *Name, size_t Dim, InstanceType Instance,
   V->OwnData = OwnData;
   if (OwnData) {
     if (LASResult() == LASOK) {
-      V->Cmp = (Real *)malloc((Dim + 1) * sizeof(Real));
+      V->Cmp = (_LPNumber *)malloc((Dim + 1) * sizeof(_LPNumber));
       if (V->Cmp == NULL) 
 	LASError(LASMemAllocErr, "V_Constr", Name, NULL, NULL);
     } else {
@@ -96,11 +96,11 @@ size_t V_GetDim(QVector *V)
     return(Dim);
 }
 
-void V_SetCmp(QVector *V, size_t Ind, Real Val)
+void V_SetCmp(QVector *V, size_t Ind, _LPNumber Val)
 /* set a value of a vector component */
 {
     if (LASResult() == LASOK) {
-        if (Ind > 0 && Ind <= V->Dim && V->Instance == Normal && V->OwnData == True) {
+        if (Ind > 0 && Ind <= V->Dim && V->Instance == Normal && V->OwnData == _LPTrue) {
             V->Cmp[Ind] = Val;
         } else {
             LASError(LASRangeErr, "V_SetCmp", V->Name, NULL, NULL);
@@ -108,11 +108,11 @@ void V_SetCmp(QVector *V, size_t Ind, Real Val)
     }
 }
 
-void V_SetAllCmp(QVector *V, Real Val)
+void V_SetAllCmp(QVector *V, _LPNumber Val)
 /* set all vector components equal Val */
 {
     size_t Dim, Ind;
-    Real *VCmp;
+    _LPNumber *VCmp;
 
     if (LASResult() == LASOK) {
         Dim = V->Dim;
@@ -127,22 +127,22 @@ void V_SetRndCmp(QVector *V)
 /* set random components of the vector V */
 {
     size_t Dim, Ind;
-    Real *VCmp;
+    _LPNumber *VCmp;
 
     if (LASResult() == LASOK) {
         Dim = V_GetDim(V);
         VCmp = V->Cmp;
         for (Ind = 1; Ind <= Dim; Ind++) {
-            VCmp[Ind] = (double)rand() / ((double)RAND_MAX + 1.0);
+            VCmp[Ind] = (_LPDouble)rand() / ((_LPDouble)RAND_MAX + 1.0);
         }
         V->Multipl = 1.0;
     }
 }
 
-Real V_GetCmp(QVector *V, size_t Ind)
+_LPNumber V_GetCmp(QVector *V, size_t Ind)
 /* returns the value of a vector component */
 {
-    Real Val;
+    _LPNumber Val;
 
     if (LASResult() == LASOK) {
         if (Ind > 0 && Ind <= V->Dim) {
@@ -157,11 +157,11 @@ Real V_GetCmp(QVector *V, size_t Ind)
     return(Val);
 }
 
-void V_AddCmp(QVector *V, size_t Ind, Real Val)
+void V_AddCmp(QVector *V, size_t Ind, _LPNumber Val)
 /* add a value to a vector component */
 {
     if (LASResult() == LASOK) {
-        if (Ind > 0 && Ind <= V->Dim && V->Instance == Normal && V->OwnData == True) {
+        if (Ind > 0 && Ind <= V->Dim && V->Instance == Normal && V->OwnData == _LPTrue) {
             V->Cmp[Ind] += Val;
         } else {
             LASError(LASRangeErr, "V_AddCmp", V->Name, NULL, NULL);

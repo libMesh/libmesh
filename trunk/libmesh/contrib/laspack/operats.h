@@ -16,7 +16,8 @@
 #ifndef OPERATS_H
 #define OPERATS_H
 
-#ifdef __cplusplus
+#include "laspack_config.h"
+#ifdef _LP_INCLUDED_FROM_CPLUSPLUS
 extern "C" {
 #endif
 
@@ -32,15 +33,15 @@ extern "C" {
 QVector *Asgn_VV(QVector *V1, QVector *V2);
 QVector *AddAsgn_VV(QVector *V1, QVector *V2);
 QVector *SubAsgn_VV(QVector *V1, QVector *V2);
-QVector *MulAsgn_VS(QVector *V, double S);
+QVector *MulAsgn_VS(QVector *V, _LPDouble S);
 QVector *Add_VV(QVector *V1, QVector *V2);
 QMatrix *Add_QQ(QMatrix *Q1, QMatrix *Q2);
 QVector *Sub_VV(QVector *V1, QVector *V2);
 QMatrix *Sub_QQ(QMatrix *Q1, QMatrix *Q2);
-QVector *Mul_SV(double S, QVector *V);
-Matrix *Mul_SM(double S, Matrix *M);
-QMatrix *Mul_SQ(double S, QMatrix *Q);
-double Mul_VV(QVector *V1, QVector *V2);
+QVector *Mul_SV(_LPDouble S, QVector *V);
+Matrix *Mul_SM(_LPDouble S, Matrix *M);
+QMatrix *Mul_SQ(_LPDouble S, QMatrix *Q);
+_LPDouble Mul_VV(QVector *V1, QVector *V2);
 QVector *Mul_MV(Matrix *M, QVector *V);
 QVector *Mul_QV(QMatrix *Q, QVector *V);
 QVector *MulInv_QV(QMatrix *Q, QVector *V);
@@ -49,13 +50,13 @@ QMatrix *Transp_Q(QMatrix *Q);
 QMatrix *Diag_Q(QMatrix *Q);
 QMatrix *Upper_Q(QMatrix *Q);
 QMatrix *Lower_Q(QMatrix *Q);
-double l1Norm_V(QVector *V);
-double l2Norm_V(QVector *V);
-double MaxNorm_V(QVector *V);
+_LPReal l1Norm_V(QVector *V);
+_LPReal l2Norm_V(QVector *V);
+_LPReal MaxNorm_V(QVector *V);
 QVector *OrthoRightKer_VQ(QVector *V, QMatrix *Q);
 QVector *OrthoLeftKer_VQ(QVector *V, QMatrix *Q);
 
-#ifdef __cplusplus
+#ifdef _LP_INCLUDED_FROM_CPLUSPLUS
 }
 #endif
 
