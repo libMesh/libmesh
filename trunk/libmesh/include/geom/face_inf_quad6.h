@@ -1,4 +1,4 @@
-// $Id: face_inf_quad6.h,v 1.4 2004-11-15 22:09:11 benkirk Exp $
+// $Id: face_inf_quad6.h,v 1.5 2005-02-15 05:23:32 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -93,7 +93,7 @@ public:
   Order default_order() const { return SECOND; }
   
   /**
-   * @returns an \p Edge3 for the base (0) side, and an \InfEdge2 for
+   * @returns an \p Edge3 for the base (0) side, and an \p InfEdge2 for
    * the sides 1, 2.
    */
   AutoPtr<Elem> build_side (const unsigned int i) const;
@@ -101,15 +101,6 @@ public:
   virtual void connectivity(const unsigned int sf,
 			    const IOPackage iop,
 			    std::vector<unsigned int>& conn) const;
-
-//   void tecplot_connectivity(const unsigned int sf,
-// 			    std::vector<unsigned int>& conn) const;
-  
-//   void vtk_connectivity(const unsigned int,
-// 			std::vector<unsigned int>*) const;
-  
-//   unsigned int vtk_element_type (const unsigned int) const
-//   { return 9; }
 
   /**
    * @returns 2 for all \p n

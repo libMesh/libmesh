@@ -1,4 +1,4 @@
-// $Id: exodusII_io.C,v 1.5 2004-11-17 07:52:17 benkirk Exp $
+// $Id: exodusII_io.C,v 1.6 2005-02-15 05:23:33 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -283,7 +283,7 @@ namespace
     /**
      * Reads all of the element
      * connectivity for
-     * block \p{block} in the
+     * block \p block in the
      * \p ExodusII mesh file.
      */
     void read_elem_in_block(int block);
@@ -548,7 +548,7 @@ namespace
     /**
      * All of the \p ExodusII
      * API functions return
-     * an \p{int} error value.
+     * an \p int error value.
      * This function checks
      * to see if the error has
      * been set, and if it has,

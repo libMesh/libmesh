@@ -1,4 +1,4 @@
-// $Id: parameters.h,v 1.3 2004-12-07 22:47:45 benkirk Exp $
+// $Id: parameters.h,v 1.4 2005-02-15 05:23:33 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -41,7 +41,7 @@
  *
  * \author Benjamin S. Kirk
  * \date 2004
- * \version $Revision: 1.3 $
+ * \version $Revision: 1.4 $
  */
 
 // ------------------------------------------------------------
@@ -159,7 +159,7 @@ private:
    * for a specified type.
    */
   template <typename T>
-  struct Parameter : public Value
+  class Parameter : public Value
   {
   public:
 
@@ -396,16 +396,14 @@ template <typename T>
 inline
 unsigned int Parameters::n_parameters () const
 {
-  Parameters::const_iterator it = _values.begin();
-
   unsigned int cnt = 0;  
   
-  while (it != _values.end())
-    {
-      if (dynamic_cast<Parameter<T>*>(it->second) != NULL) cnt++;
-
-      ++it;
-    }
+  Parameters::const_iterator       it  = _values.begin();
+  const Parameters::const_iterator end = _values.end();
+  
+  for (; it != end; ++it)
+    if (dynamic_cast<Parameter<T>*>(it->second) != NULL)
+      cnt++;
 
   return cnt;	 
 }

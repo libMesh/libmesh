@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.17 2005-01-19 21:56:33 benkirk Exp $
+// $Id: equation_systems.C,v 1.18 2005-02-15 05:23:34 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -65,17 +65,14 @@ void EquationSystems::clear ()
 
   // clear the systems.  We must delete them
   // since we newed them!
-  {
-    std::map<std::string, System*>::iterator
-      pos = _systems.begin();
-    
-    for (; pos != _systems.end(); ++pos)
-      {
-	delete pos->second; pos->second = NULL;
-      }
-    
-    _systems.clear ();
-  }
+  while (!_systems.empty())
+    {
+      system_iterator pos = _systems.begin();
+      
+      delete pos->second; pos->second = NULL;
+      
+      _systems.erase (pos);
+    }
 }
 
 
@@ -85,11 +82,9 @@ void EquationSystems::init ()
   const unsigned int n_sys = this->n_systems();
 
   assert (n_sys != 0);
-
-  /**
-   * Tell all the \p DofObject entities how many systems
-   * there are.
-   */
+  
+  // Tell all the \p DofObject entities how many systems
+  // there are.
   {
     MeshBase::node_iterator       node_it  = _mesh.nodes_begin();
     const MeshBase::node_iterator node_end = _mesh.nodes_end();
@@ -104,14 +99,12 @@ void EquationSystems::init ()
       (*elem_it)->set_n_systems(n_sys);
   }
 
-  std::map<std::string, System*>::iterator
-    pos = _systems.begin();
+  system_iterator       pos = _systems.begin();
+  const system_iterator end = _systems.end();
   
-  for (; pos != _systems.end();  ++pos)
+  for (; pos != end; ++pos)
     {
-      /**
-       * Initialize the system.
-       */
+      // Initialize the system.
       pos->second->init();
     }
 }
@@ -120,19 +113,14 @@ void EquationSystems::init ()
 
 void EquationSystems::reinit ()
 {
- const unsigned int n_sys = this->n_systems();
+  const unsigned int n_sys = this->n_systems();
 
- assert (n_sys != 0);
-
-  /**
-   * Tell all the \p DofObject entities how many systems
-   * there are.
-   */
+  assert (n_sys != 0);
+  
+  // Tell all the \p DofObject entities how many systems
+  // there are.
   {
     // All the nodes
-//     node_iterator       node_it  (_mesh.nodes_begin());
-//     const node_iterator node_end (_mesh.nodes_end());
-
     MeshBase::node_iterator       node_it  = _mesh.nodes_begin();
     const MeshBase::node_iterator node_end = _mesh.nodes_end();
 
@@ -140,9 +128,6 @@ void EquationSystems::reinit ()
       (*node_it)->set_n_systems(n_sys);
     
     // All the elements
-//     elem_iterator       elem_it (_mesh.elements_begin());
-//     const elem_iterator elem_end(_mesh.elements_end());
-
     MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
     const MeshBase::element_iterator elem_end = _mesh.elements_end();
     
@@ -150,14 +135,12 @@ void EquationSystems::reinit ()
       (*elem_it)->set_n_systems(n_sys);
   }
 
-  std::map<std::string, System*>::iterator
-    pos = _systems.begin();
+  system_iterator       pos = _systems.begin();
+  const system_iterator end = _systems.end();
   
-  for (; pos != _systems.end(); ++pos)
+  for (; pos != end; ++pos)
     {
-      /**
-       * Initialize the system.
-       */
+      // Re-initialize the system.
       pos->second->reinit();
     }
 }
@@ -230,107 +213,14 @@ void EquationSystems::delete_system (const std::string& name)
 
 
 
-const System& EquationSystems::get_system (const std::string& name) const
-{
-  return this->get_system<System> (name);
-}
-
-
-
-System& EquationSystems::get_system (const std::string& name)
-{
-  return this->get_system<System> (name);
-}
-
-
-
-
-System & EquationSystems::operator () (const std::string& name)
-{
-  std::map<std::string, System*>::iterator
-    pos = _systems.find(name);
-   
-  if (pos == _systems.end())
-    {
-      std::cerr << "ERROR: system "
-                << name
-                << " not found!"
-                << std::endl;
- 
-      error();
-    }
- 
-  return *(pos->second);
-}
-  
- 
- 
-const System & EquationSystems::operator () (const std::string& name) const
-{
-  std::map<std::string, System*>::const_iterator
-    pos = _systems.find(name);
-   
-  if (pos == _systems.end())
-    {
-      std::cerr << "ERROR: system "
-                << name
-                << " not found!"
-                << std::endl;
- 
-      error();
-    }
- 
-  return *(pos->second);
-}
-  
- 
- 
-System & EquationSystems::operator () (const unsigned int num)
-{
-  assert (num < this->n_systems());
- 
-  std::map<std::string, System*>::iterator
-    pos = _systems.begin();
-   
-  // New code
-#if (__GNUC__ == 2)
-  std::advance (pos, static_cast<int>(num));
-#else
-  std::advance (pos, num);
-#endif
-  
-  return *(pos->second);
-}
-
-
-
-const System & EquationSystems::operator ()  (const unsigned int num) const
-{
-  assert (num < this->n_systems());
-
-  std::map<std::string, System*>::const_iterator
-    pos = _systems.begin();
-
-  // New code
-#if (__GNUC__ == 2)
-  std::advance (pos, static_cast<int>(num));
-#else
-  std::advance (pos, num);
-#endif
-
-  return *(pos->second);
-}
-
-
-
 void EquationSystems::solve ()
 {
   assert (this->n_systems());
   
-  std::map<std::string, System*>::iterator
-    pos = _systems.begin();
-
-  for (; pos != _systems.end(); ++pos)
+  system_iterator       pos = _systems.begin();
+  const system_iterator end = _systems.end();
+  
+  for (; pos != end; ++pos)
     pos->second->solve ();
 }
  
@@ -342,11 +232,11 @@ void EquationSystems::build_variable_names (std::vector<std::string>& var_names)
   var_names.resize (this->n_vars());
 
   unsigned int var_num=0;
+  
+  const_system_iterator       pos = _systems.begin();
+  const const_system_iterator end = _systems.end();
 
-  std::map<std::string, System*>::const_iterator
-    pos = _systems.begin();
-
-  for (; pos != _systems.end(); ++pos)
+  for (; pos != end; ++pos)
     for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
       var_names[var_num++] = pos->second->variable_name(vn);       
 }
@@ -468,9 +358,6 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
   {
     std::vector<unsigned short int> node_conn_local (node_conn.size());
     
-//     active_local_elem_iterator       it (_mesh.elements_begin());
-//     const active_local_elem_iterator end(_mesh.elements_end());
-
     MeshBase::element_iterator       it  = _mesh.active_local_elements_begin();
     const MeshBase::element_iterator end = _mesh.active_local_elements_end(); 
 
@@ -505,10 +392,10 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
   // loop over the elements and build the nodal solution
   // from the element solution.  Then insert this nodal solution
   // into the vector passed to build_solution_vector.
-  std::map<std::string, System*>::const_iterator
-    pos = _systems.begin();
+  const_system_iterator       pos = _systems.begin();
+  const const_system_iterator end = _systems.end();
 
-  for (; pos != _systems.end(); ++pos)
+  for (; pos != end; ++pos)
     {  
       const System& system  = *(pos->second);
       const unsigned int nv_sys = system.n_vars();
@@ -523,9 +410,6 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
 	{
 	  const FEType& fe_type    = system.variable_type(var);
 	  
-//  	  active_local_elem_iterator       it (_mesh.elements_begin());
-// 	  const active_local_elem_iterator end(_mesh.elements_end());
-
 	  MeshBase::element_iterator       it  = _mesh.active_local_elements_begin();
 	  const MeshBase::element_iterator end = _mesh.active_local_elements_end(); 
 
@@ -623,9 +507,6 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number>& 
 
   // get the total weight
   {
-//     active_elem_iterator       it (_mesh.elements_begin());
-//     const active_elem_iterator end(_mesh.elements_end());
-
     MeshBase::element_iterator       it  = _mesh.active_elements_begin();
     const MeshBase::element_iterator end = _mesh.active_elements_end(); 
 
@@ -649,10 +530,10 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number>& 
   // loop over the elements and build the nodal solution
   // from the element solution.  Then insert this nodal solution
   // into the vector passed to build_solution_vector.
-  std::map<std::string, System*>::const_iterator
-    pos = _systems.begin();
+  const_system_iterator       pos = _systems.begin();
+  const const_system_iterator end = _systems.end();
 
-  for (; pos != _systems.end(); ++pos)
+  for (; pos != end; ++pos)
     {  
       const System& system  = *(pos->second);
       const unsigned int nv_sys = system.n_vars();
@@ -668,9 +549,6 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number>& 
 	  for (unsigned int var=0; var<nv_sys; var++)
 	    {
 	      const FEType& fe_type    = system.variable_type(var);
-
-// 	      active_elem_iterator       it (_mesh.elements_begin());
-// 	      const active_elem_iterator end(_mesh.elements_end());
 
 	      MeshBase::element_iterator       it  = _mesh.active_elements_begin();
 	      const MeshBase::element_iterator end = _mesh.active_elements_end(); 
@@ -739,10 +617,11 @@ bool EquationSystems::compare (const EquationSystems& other_es,
     }
   else
     {
-      // start comparing each system
-      std::map<std::string, System*>::const_iterator pos=_systems.begin();
-      
-      for (; pos != _systems.end(); ++pos)
+      // start comparing each system      
+      const_system_iterator       pos = _systems.begin();
+      const const_system_iterator end = _systems.end();
+
+      for (; pos != end; ++pos)
         {
 	  const std::string& sys_name = pos->first;
 	  const System&  system        = *(pos->second);
@@ -784,10 +663,11 @@ std::string EquationSystems::get_info () const
       << "  n_systems()=" << this->n_systems() << '\n';
 
   // Print the info for the individual systems
-  std::map<std::string, System*>::const_iterator it=_systems.begin();
+  const_system_iterator       pos = _systems.begin();
+  const const_system_iterator end = _systems.end();
 
-  for (; it != _systems.end(); ++it)
-    out << it->second->get_info();
+  for (; pos != end; ++pos)
+    out << pos->second->get_info();
 
   
 //   // Possibly print the parameters  
@@ -831,14 +711,12 @@ std::ostream& operator << (std::ostream& os, const EquationSystems& es)
 
 unsigned int EquationSystems::n_vars () const
 {
-  if (_systems.empty())
-    return 0;
-
   unsigned int tot=0;
-
-  std::map<std::string, System*>::const_iterator pos = _systems.begin();
   
-  for (; pos != _systems.end(); ++pos)
+  const_system_iterator       pos = _systems.begin();
+  const const_system_iterator end = _systems.end();
+
+  for (; pos != end; ++pos)
     tot += pos->second->n_vars();
 
   return tot;
@@ -848,14 +726,12 @@ unsigned int EquationSystems::n_vars () const
 
 unsigned int EquationSystems::n_dofs () const
 {
-  if (_systems.empty())
-    return 0;
-
   unsigned int tot=0;
 
-  std::map<std::string, System*>::const_iterator pos = _systems.begin();
-  
-  for (; pos != _systems.end(); ++pos)
+  const_system_iterator       pos = _systems.begin();
+  const const_system_iterator end = _systems.end();
+
+  for (; pos != end; ++pos)
     tot += pos->second->n_dofs();
 
   return tot;      
@@ -866,14 +742,12 @@ unsigned int EquationSystems::n_dofs () const
 
 unsigned int EquationSystems::n_active_dofs () const
 {
-  if (_systems.empty())
-    return 0;
-
   unsigned int tot=0;
 
-  std::map<std::string, System*>::const_iterator pos = _systems.begin();
-  
-  for (; pos != _systems.end(); ++pos)
+  const_system_iterator       pos = _systems.begin();
+  const const_system_iterator end = _systems.end();
+
+  for (; pos != end; ++pos)
     tot += pos->second->n_active_dofs();
 
   return tot;      

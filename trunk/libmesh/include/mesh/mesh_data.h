@@ -1,4 +1,4 @@
-// $Id: mesh_data.h,v 1.10 2004-11-12 20:55:20 benkirk Exp $
+// $Id: mesh_data.h,v 1.11 2005-02-15 05:23:33 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -729,7 +729,7 @@ public:
   void operator = (const MeshDataUnvHeader& omduh);
 
   /**
-   * @returns \p true when \p this and \omduh are equal,
+   * @returns \p true when \p this and \p omduh are equal,
    * \p false otherwise.
   */
   bool operator == (const MeshDataUnvHeader& omduh) const;

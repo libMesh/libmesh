@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.11 2004-12-07 22:47:45 benkirk Exp $
+// $Id: equation_systems.h,v 1.12 2005-02-15 05:23:33 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -96,16 +96,6 @@ public:
 
   /**
    * @returns a constant reference to the system named \p name.
-   */
-  const System & get_system(const std::string& name) const;
- 
-  /**
-   * @returns a constant reference to the system named \p name.
-   */
-  System & get_system(const std::string& name);
-
-  /**
-   * @returns a constant reference to the system named \p name.
    * The template argument defines the return type.  For example,
    * const SteadySystem& sys = eq.get_system<SteadySystem> ("sys");
    * is an example of how the method might be used
@@ -139,6 +129,26 @@ public:
    */
   template <typename T_sys>
   T_sys & get_system (const unsigned int num);
+
+  /**
+   * @returns a constant reference to the system named \p name.
+   */
+  const System & get_system (const std::string& name) const;
+
+  /**
+   * @returns a writeable referene to the system named \p name.
+   */
+  System & get_system (const std::string& name);
+
+  /**
+   * @returns a constant reference to system number \p num.
+   */
+  const System & get_system (const unsigned int num) const;
+
+  /**
+   * @returns a writeable referene to the system number \p num.
+   */
+  System & get_system (const unsigned int num);
   
   /**
    * @returns a reference to the system named \p name.
@@ -310,13 +320,24 @@ protected:
   
   /**
    * The mesh data structure
-   */ 
+   */
   Mesh& _mesh;
 
   /**
    * Data structure holding the systems.
    */
   std::map<std::string, System*> _systems;
+
+  /**
+   * Typedef for system iterators
+   */
+  typedef std::map<std::string, System*>::iterator       system_iterator;
+
+  /**
+   * Typedef for constatnt system iterators
+   */
+  typedef std::map<std::string, System*>::const_iterator const_system_iterator;
+  
 };
 
 
@@ -352,14 +373,13 @@ template <typename T_sys>
 inline
 T_sys & EquationSystems::add_system (const std::string& name)
 {
+  T_sys* ptr = NULL;
+  
   if (!_systems.count(name))
     {
-      const unsigned int num = this->n_systems();
+      ptr = new T_sys(*this, name, this->n_systems());
 
-      _systems.insert (std::make_pair(name, new T_sys(*this,
-						      name,
-						      num)));
-   
+      _systems.insert (std::make_pair(name, ptr));   
     }
   else
     {
@@ -370,13 +390,11 @@ T_sys & EquationSystems::add_system (const std::string& name)
       error();
     }
 
-
+  assert (ptr != NULL);
+  
   // Tell all the \p DofObject entities to add a system.
   {
     // All the nodes
-//     node_iterator       node_it  (_mesh.nodes_begin());
-//     const node_iterator node_end (_mesh.nodes_end());
-
     MeshBase::node_iterator       node_it  = _mesh.nodes_begin();
     const MeshBase::node_iterator node_end = _mesh.nodes_end();
  
@@ -384,9 +402,6 @@ T_sys & EquationSystems::add_system (const std::string& name)
       (*node_it)->add_system();
  
     // All the elements
-//     elem_iterator       elem_it (_mesh.elements_begin());
-//     const elem_iterator elem_end(_mesh.elements_end());
-
     MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
     const MeshBase::element_iterator elem_end = _mesh.elements_end();
  
@@ -394,7 +409,7 @@ T_sys & EquationSystems::add_system (const std::string& name)
       (*elem_it)->add_system();
   }
 
-  return *(dynamic_cast<T_sys*>(_systems[name]));
+  return *(dynamic_cast<T_sys*>(ptr));
 }
 
 
@@ -404,17 +419,22 @@ template <typename T_sys>
 inline
 const T_sys & EquationSystems::get_system (const std::string& name) const
 {
-  std::map<std::string, System*>::const_iterator
-    pos = _systems.find(name);
-  
+  const_system_iterator pos = _systems.find(name);
+
+  // Check for errors
   if (pos == _systems.end())
     {
-      std::cerr << "ERROR: no system named " << name << " found!"
+      std::cerr << "ERROR: no system named \"" << name << "\" found!"
 		<< std::endl;
       error();
     }
-
-  assert (pos->second != NULL);
+  else if (dynamic_cast<T_sys*>(pos->second) == NULL)
+    {
+      std::cerr << "ERROR: cannont convert system \""
+		<< name << "\" to requested type!"
+		<< std::endl;
+      error();
+    }
   
   return *(dynamic_cast<T_sys*>(pos->second));
 }
@@ -425,17 +445,22 @@ template <typename T_sys>
 inline
 T_sys & EquationSystems::get_system (const std::string& name)
 {
-  std::map<std::string, System*>::iterator
-    pos = _systems.find(name);
-  
+  system_iterator pos = _systems.find(name);
+
+  // Check for errors
   if (pos == _systems.end())
     {
       std::cerr << "ERROR: no system named " << name << " found!"
 		<< std::endl;
       error();
     }
-
-  assert (pos->second != NULL);
+  else if (dynamic_cast<T_sys*>(pos->second) == NULL)
+    {
+      std::cerr << "ERROR: cannont convert system \""
+		<< name << "\" to requested type!"
+		<< std::endl;
+      error();
+    }
   
   return *(dynamic_cast<T_sys*>(pos->second));
 }
@@ -447,21 +472,30 @@ inline
 const T_sys & EquationSystems::get_system (const unsigned int num) const
 {
   assert (num < this->n_systems());
-  
-  std::map<std::string, System*>::const_iterator
-    pos = _systems.begin();
 
-  for (; pos != _systems.end(); ++pos)
+
+  const_system_iterator       pos = _systems.begin();
+  const const_system_iterator end = _systems.end();
+
+  for (; pos != end; ++pos)
     if (pos->second->number() == num)
       break;
-  
-  if (pos == _systems.end())
+
+  // Check for errors
+  if (pos == end)
     {
       std::cerr << "ERROR: no system number " << num << " found!"
 		<< std::endl;
       error();
     }
-
+  else if (dynamic_cast<T_sys*>(pos->second) == NULL)
+    {
+      std::cerr << "ERROR: cannont convert system "
+		<< num << " to requested type!"
+		<< std::endl;
+      error();
+    }
+  
   return *(dynamic_cast<T_sys*>(pos->second));
 }
 
@@ -473,21 +507,93 @@ T_sys & EquationSystems::get_system (const unsigned int num)
 {
   assert (num < this->n_systems());
   
-  std::map<std::string, System*>::iterator
-    pos = _systems.begin();
+  const_system_iterator       pos = _systems.begin();
+  const const_system_iterator end = _systems.end();
 
-  for (; pos != _systems.end(); ++pos)
+  for (; pos != end; ++pos)
     if (pos->second->number() == num)
       break;
-  
-  if (pos == _systems.end())
+
+  // Check for errors
+  if (pos == end)
     {
       std::cerr << "ERROR: no system number " << num << " found!"
 		<< std::endl;
       error();
     }
-
+  else if (dynamic_cast<T_sys*>(pos->second) == NULL)
+    {
+      std::cerr << "ERROR: cannont convert system "
+		<< num << " to requested type!"
+		<< std::endl;
+      error();
+    }
+  
   return *(dynamic_cast<T_sys*>(pos->second));
+}
+
+
+
+
+inline
+const System & EquationSystems::get_system (const std::string& name) const
+{
+  return this->get_system<System>(name);
+}
+
+
+
+inline
+System & EquationSystems::get_system (const std::string& name)
+{
+  return this->get_system<System>(name);
+}
+
+
+
+inline
+const System & EquationSystems::get_system (const unsigned int num) const
+{
+  return this->get_system<System>(num);
+}
+
+
+
+inline
+System & EquationSystems::get_system (const unsigned int num)
+{
+  return this->get_system<System>(num);
+}
+
+
+
+inline
+System & EquationSystems::operator () (const std::string& name)
+{
+  return this->get_system (name);
+}
+  
+ 
+inline
+const System & EquationSystems::operator () (const std::string& name) const
+{
+  return this->get_system (name);
+}
+  
+ 
+ 
+inline
+System & EquationSystems::operator () (const unsigned int num)
+{
+  return this->get_system (num);
+}
+
+
+
+inline
+const System & EquationSystems::operator () (const unsigned int num) const
+{
+  return this->get_system (num);
 }
 
 
