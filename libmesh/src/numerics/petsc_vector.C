@@ -1,4 +1,4 @@
-// $Id: petsc_vector.C,v 1.31 2004-08-20 14:08:42 jwpeterson Exp $
+// $Id: petsc_vector.C,v 1.32 2004-10-15 00:39:42 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -180,10 +180,10 @@ void PetscVector<T>::add_vector (const NumericVector<T>& V,
 
 template <typename T>
 void PetscVector<T>::add_vector (const NumericVector<T>& V_in,
-				 SparseMatrix<T>& A_in)
+				 const SparseMatrix<T>& A_in)
 {
   const PetscVector<T>* V = dynamic_cast<const PetscVector<T>*>(&V_in);
-  PetscMatrix<T>*       A = dynamic_cast<PetscMatrix<T>*>(&A_in);
+  const PetscMatrix<T>* A = dynamic_cast<const PetscMatrix<T>*>(&A_in);
 
   assert (V != NULL);
   assert (A != NULL);
