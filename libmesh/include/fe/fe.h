@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.6 2004-05-11 21:18:33 benkirk Exp $
+// $Id: fe.h,v 1.7 2004-10-14 22:56:04 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -52,7 +52,7 @@ class InfFE;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.6 $
+ * \version $Revision: 1.7 $
  */
 
 //-------------------------------------------------------------
@@ -342,7 +342,7 @@ protected:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.6 $
+ * \version $Revision: 1.7 $
  */
 
 //-------------------------------------------------------------
@@ -367,7 +367,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.6 $
+ * \version $Revision: 1.7 $
  */
 
 //-------------------------------------------------------------
@@ -392,7 +392,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.6 $
+ * \version $Revision: 1.7 $
  */
 
 //-------------------------------------------------------------
@@ -418,7 +418,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.6 $
+ * \version $Revision: 1.7 $
  */
 
 //-------------------------------------------------------------
@@ -434,6 +434,14 @@ public:
    */
   FEXYZ(const FEType& fet);
     
+  /**
+   * Explicitly call base class method.  This prevents some
+   * compilers being confused by partially overriding this virtual function.
+   */
+  virtual void reinit (const Elem* elem,
+		       const std::vector<Point>* const pts = NULL)
+  { FE<Dim,XYZ>::reinit (elem, pts); }
+
   /**
    * Reinitializes all the physical element-dependent data based on
    * the \p side of \p face.

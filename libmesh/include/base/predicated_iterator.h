@@ -1,4 +1,4 @@
-// $Id: predicated_iterator.h,v 1.5 2004-07-12 22:54:59 jwpeterson Exp $
+// $Id: predicated_iterator.h,v 1.6 2004-10-14 22:56:09 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -38,7 +38,10 @@
  * \author John W. Peterson, 2002-2004
  */
 template <class T>
-#if defined(__GNUC__) && (__GNUC__ < 3) // for gcc-2.95.3 using old stl version
+
+// for gcc-2.95.3 using old stl version
+// Careful:  new Intel/icc versions pretend to be GNUC!
+#if defined(__GNUC__) && (__GNUC__ < 3)  && !defined(__INTEL_COMPILER)
 class PredicatedIterator : public std::forward_iterator<std::forward_iterator_tag, T>
 #else
 class PredicatedIterator : public std::iterator<std::forward_iterator_tag, T>
