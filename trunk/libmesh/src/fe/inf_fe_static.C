@@ -1,4 +1,4 @@
-// $Id: inf_fe_static.C,v 1.23 2003-09-25 21:46:56 benkirk Exp $
+// $Id: inf_fe_static.C,v 1.24 2003-10-01 10:37:36 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -349,25 +349,33 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType& fet,
 
 #else
 
-  //TODO:[DD/SP] fix this for time-dependency
-  //const Real time = data.equation_systems.parameter("current time");
+  const EquationSystems& es (data.equation_systems);
+  const Real speed = es.parameter("speed");
 
-  data.phase = interpolated_dist                                                        /* phase(s,t,v)              */
-      * InfFE<Dim,INFINITE_MAP,T_map>::eval(v, radial_mapping_order, 1); 
-  
+  /*
+   * This is quite weird: the phase is actually 
+   * a measure how @e advanced the pressure is that
+   * we compute.  In other words: the further away 
+   * the node \p data.p is, the further we look into
+   * the future... 
+   */
+  data.phase = interpolated_dist                                                       /* phase(s,t,v)/c  */
+      * InfFE<Dim,INFINITE_MAP,T_map>::eval(v, radial_mapping_order, 1) / speed;
+
   if (Dim > 1)
     {
       const unsigned int n_dof = n_dofs (fet, inf_elem->type());
       data.shape.resize(n_dof);
+
       for (unsigned int i=0; i<n_dof; i++)
         {
 	  // compute base and radial shape indices
 	  unsigned int i_base, i_radial;
 	  compute_shape_indices(fet, inf_elem->type(), i, i_base, i_radial);
  
-	  data.shape[i] = InfFE<Dim,T_radial,T_map>::Radial::decay(v)                  /* (1.-v)/2. in 3D          */
-	                  *  FEInterface::shape(Dim-1, fet, base_el.get(), i_base, p)  /* S_n(s,t)                 */
-			  * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial);    /* L_n(v)                   */
+	  data.shape[i] = InfFE<Dim,T_radial,T_map>::Radial::decay(v)                  /* (1.-v)/2. in 3D */
+	                  *  FEInterface::shape(Dim-1, fet, base_el.get(), i_base, p)  /* S_n(s,t)        */
+	                  * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial);    /* L_n(v)          */
 	}
     }
   else
@@ -376,19 +384,8 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType& fet,
       error();
     }
 
-  std::cerr << "compute_data() for time-domain InfFE not implemented." << std::endl;
-  error();
-
 #endif
-
-  return;
 }
-
-
-
-
-
-
 
 
 
