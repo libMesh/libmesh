@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.60 2003-11-05 22:26:45 benkirk Exp $
+// $Id: mesh_base.C,v 1.61 2003-11-14 14:47:36 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -980,8 +980,7 @@ Sphere MeshBase::subdomain_bounding_sphere (const unsigned int sid) const
 
 
 
-void MeshBase::read(const std::string&,
-		    const bool)
+void MeshBase::read (const std::string&)
 {
   std::cerr << "ERROR:  You shouldn't be calling this" << std::endl
 	    << " Use Mesh::read() instead." << std::endl;
