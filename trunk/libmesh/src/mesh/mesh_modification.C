@@ -1,4 +1,4 @@
-// $Id: mesh_modification.C,v 1.5 2004-11-14 18:51:59 jwpeterson Exp $
+// $Id: mesh_modification.C,v 1.6 2004-11-15 22:09:14 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -23,8 +23,9 @@
 #include <algorithm>
 #include <map>
 
-
 // Local includes
+#include "mesh_tools.h"
+#include "mesh_modification.h"
 #include "mesh.h"
 #include "libmesh.h"
 #include "elem.h"
@@ -36,6 +37,154 @@
 #include "cell_inf_hex16.h"
 #include "cell_inf_hex18.h"
 #include "libmesh_logging.h"
+
+
+
+// ------------------------------------------------------------
+// MeshTools::Modification functions for mesh modification
+void MeshTools::Modification::distort (MeshBase& mesh,
+				       const Real factor,
+				       const bool perturb_boundary)
+{
+  assert (mesh.mesh_dimension() != 1);
+  assert (mesh.n_nodes());
+  assert (mesh.n_elem());
+  assert ((factor >= 0.) && (factor <= 1.));
+
+  START_LOG("distort()", "MeshTools::Modification");
+
+
+
+  // First find nodes on the boundary and flag them
+  // so that we don't move them
+  // on_boundary holds false (not on boundary) and true (on boundary)
+  std::vector<bool> on_boundary (mesh.n_nodes(), false);
+  
+  if (!perturb_boundary) MeshTools::find_boundary_nodes (mesh, on_boundary);
+
+  // Now calculate the minimum distance to
+  // neighboring nodes for each node.
+  // hmin holds these distances.
+  std::vector<float> hmin (mesh.n_nodes(), 1.e20);
+
+  MeshBase::element_iterator       el  = mesh.active_elements_begin();
+  const MeshBase::element_iterator end = mesh.active_elements_end(); 
+
+  for (; el!=end; ++el)
+    for (unsigned int n=0; n<(*el)->n_nodes(); n++)
+      hmin[(*el)->node(n)] = std::min(hmin[(*el)->node(n)],
+				      static_cast<float>((*el)->hmin()));
+  
+  
+  // Now actually move the nodes
+  {
+    const unsigned int seed = 123456;
+    
+    // seed the random number generator
+    srand(seed);
+    
+    for (unsigned int n=0; n<mesh.n_nodes(); n++)
+      if (!on_boundary[n])
+	{
+	  // the direction, random but unit normalized
+	  
+	  Point dir( static_cast<Real>(rand())/static_cast<Real>(RAND_MAX),
+		     static_cast<Real>(rand())/static_cast<Real>(RAND_MAX),
+		     ((mesh.mesh_dimension() == 3) ?
+		      static_cast<Real>(rand())/static_cast<Real>(RAND_MAX) :
+		      0.)
+		     );
+	  
+	  dir(0) = (dir(0)-.5)*2.;
+	  dir(1) = (dir(1)-.5)*2.;
+
+	  if (mesh.mesh_dimension() == 3)
+	    dir(2) = (dir(2)-.5)*2.;
+	  
+	  dir = dir.unit();
+
+	  // if hmin[n]=1.e20 then the node is not
+	  // used by any element.  We should not
+	  // move it.
+	  if (hmin[n] != 1.e20)
+	    {
+	      mesh.node(n)(0) += dir(0)*factor*hmin[n];
+	      mesh.node(n)(1) += dir(1)*factor*hmin[n];
+	      
+	      if (mesh.mesh_dimension() == 3)
+		mesh.node(n)(2) += dir(2)*factor*hmin[n];
+	    }
+	}
+  }
+
+
+  // All done  
+  STOP_LOG("distort()", "MeshTools::Modification");
+}
+
+
+
+void MeshTools::Modification::translate (MeshBase& mesh,
+					 const Real xt,
+					 const Real yt,
+					 const Real zt)
+{
+  const Point p(xt, yt, zt);
+
+  for (unsigned int n=0; n<mesh.n_nodes(); n++)
+    mesh.node(n) += p;
+}
+
+
+
+void MeshTools::Modification::rotate (MeshBase& mesh,
+				      const Real,
+				      const Real,
+				      const Real)
+{
+  error();
+}
+
+
+
+void MeshTools::Modification::scale (MeshBase& mesh,
+				     const Real xs,
+				     const Real ys,
+				     const Real zs)
+{
+  const Real x_scale = xs;
+  Real y_scale       = ys;
+  Real z_scale       = zs;
+  
+  if (ys == 0.)
+    {
+      assert (zs == 0.);
+
+      y_scale = z_scale = x_scale;
+    }
+
+  // Scale the x coordinate in all dimensions
+  for (unsigned int n=0; n<mesh.n_nodes(); n++)
+    mesh.node(n)(0) *= x_scale;
+
+
+  // Only scale the y coordinate in 2 and 3D
+  if (mesh.spatial_dimension() > 1)
+    {
+
+      for (unsigned int n=0; n<mesh.n_nodes(); n++)
+	mesh.node(n)(1) *= y_scale;
+
+      // Only scale the z coordinate in 3D
+      if (mesh.spatial_dimension() == 3)
+	{
+	  for (unsigned int n=0; n<mesh.n_nodes(); n++)
+	    mesh.node(n)(2) *= z_scale;
+	}
+    }
+}
+
+
 
 
 // ------------------------------------------------------------

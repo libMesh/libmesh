@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.86 2004-11-14 18:51:58 jwpeterson Exp $
+// $Id: mesh_base.C,v 1.87 2004-11-15 22:09:13 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -127,9 +127,6 @@ unsigned int MeshBase::n_active_elem () const
 {
   unsigned int num=0;
 
-//   const_active_elem_iterator       el (this->elements_begin());
-//   const const_active_elem_iterator end(this->elements_end()); 
-
   const_element_iterator       el  = this->active_elements_begin();
   const const_element_iterator end = this->active_elements_end(); 
   
@@ -192,9 +189,6 @@ unsigned int MeshBase::n_elem_on_proc (const unsigned int proc_id) const
   assert (proc_id < libMesh::n_processors());
 
   unsigned int ne=0;
-  
-//   const_pid_elem_iterator       el (this->elements_begin(), proc_id);
-//   const const_pid_elem_iterator end(this->elements_end(),   proc_id);
 
   const_element_iterator       el  = this->pid_elements_begin(proc_id);
   const const_element_iterator end = this->pid_elements_end(proc_id);
@@ -212,9 +206,6 @@ unsigned int MeshBase::n_active_elem_on_proc (const unsigned int proc_id) const
   assert (proc_id < libMesh::n_processors());
 
   unsigned int ne=0;
-  
-//   const_active_pid_elem_iterator       el (this->elements_begin(), proc_id);
-//   const const_active_pid_elem_iterator end(this->elements_end(),   proc_id);
 
   const_element_iterator       el  = this->active_pid_elements_begin(proc_id);
   const const_element_iterator end = this->active_pid_elements_end(proc_id);
@@ -232,9 +223,6 @@ unsigned int MeshBase::n_sub_elem () const
 {
   unsigned int ne=0;
 
-//   const_elem_iterator       el (this->elements_begin());
-//   const const_elem_iterator end(this->elements_end());
-
   const_element_iterator       el  = this->elements_begin();
   const const_element_iterator end = this->elements_end(); 
 
@@ -249,9 +237,6 @@ unsigned int MeshBase::n_sub_elem () const
 unsigned int MeshBase::n_active_sub_elem () const
 {
   unsigned int ne=0;
-
-//   const_active_elem_iterator       el (this->elements_begin());
-//   const const_active_elem_iterator end(this->elements_end());
 
   const_element_iterator       el  = this->active_elements_begin();
   const const_element_iterator end = this->active_elements_end(); 
@@ -269,30 +254,19 @@ std::vector<ElemType> MeshBase::elem_types() const
   std::vector<ElemType> et;
 
   assert (n_elem());
-	
-//   const_elem_iterator       el (this->elements_begin());
-//   const const_elem_iterator end(this->elements_end());
 
   const_element_iterator       el  = this->elements_begin();
   const const_element_iterator end = this->elements_end(); 
 
-  /**
-   * Automatically get the first type
-   */
+  // Automatically get the first type
   et.push_back((*el)->type());  ++el;
 
-  /**
-   * Loop over the rest of the elements.
-   * If the current element type isn't in the
-   * vector, insert it.
-   */
+  // Loop over the rest of the elements.
+  // If the current element type isn't in the
+  // vector, insert it.
   for (; el != end; ++el)
-    {
-      if (!std::count(et.begin(), et.end(), (*el)->type()))
-	{
-	  et.push_back((*el)->type());
-	}
-    }
+    if (!std::count(et.begin(), et.end(), (*el)->type()))
+      et.push_back((*el)->type());
   
   return et;
 }
@@ -302,9 +276,6 @@ std::vector<ElemType> MeshBase::elem_types() const
 unsigned int MeshBase::n_elem_of_type(const ElemType type) const
 {
   unsigned int cnt=0;
-
-//   const_type_elem_iterator       el (this->elements_begin(), type);
-//   const const_type_elem_iterator end(this->elements_end(),   type);
 
   const_element_iterator       el  = this->type_elements_begin(type);
   const const_element_iterator end = this->type_elements_end(type);
@@ -321,9 +292,6 @@ unsigned int MeshBase::n_active_elem_of_type(const ElemType type) const
 {
   unsigned int cnt=0;
 
-//   const_active_type_elem_iterator       el (this->elements_begin(), type);
-//   const const_active_type_elem_iterator end(this->elements_end(),   type);
-
   const_element_iterator       el  = this->active_type_elements_begin(type);
   const const_element_iterator end = this->active_type_elements_end(type);
   
@@ -331,24 +299,6 @@ unsigned int MeshBase::n_active_elem_of_type(const ElemType type) const
     cnt++;
     
   return cnt;
-}
-
-
-
-unsigned int MeshBase::total_weight() const
-{
-  unsigned int weight=0;
-
-//   const_elem_iterator       el (this->elements_begin());
-//   const const_elem_iterator end(this->elements_end());
-
-  const_element_iterator       el  = this->elements_begin();
-  const const_element_iterator end = this->elements_end(); 
-
-  for ( ; el != end; ++el)
-    weight += (*el)->n_nodes();
-  
-  return weight;
 }
 
 
@@ -560,53 +510,6 @@ void MeshBase::find_neighbors()
 
 
 
-
-void MeshBase::build_nodes_to_elem_map (std::vector<std::vector<unsigned int> >&
-					nodes_to_elem_map) const
-{
-  nodes_to_elem_map.resize (this->n_nodes());
-
-//   const_elem_iterator       el (this->elements_begin());
-//   const const_elem_iterator end(this->elements_end());
-
-  const_element_iterator       el  = this->elements_begin();
-  const const_element_iterator end = this->elements_end();
-
-  for (; el != end; ++el)
-    for (unsigned int n=0; n<(*el)->n_nodes(); n++)
-      {
-	assert ((*el)->node(n) < nodes_to_elem_map.size());
-	assert ((*el)->id()    < this->n_elem());
-	
-	nodes_to_elem_map[(*el)->node(n)].push_back((*el)->id());
-      }
-}
-
-
-
-
-void MeshBase::build_nodes_to_elem_map (std::vector<std::vector<const Elem*> >&
-					nodes_to_elem_map) const
-{
-  nodes_to_elem_map.resize (this->n_nodes());
-
-//   const_elem_iterator       el (this->elements_begin());
-//   const const_elem_iterator end(this->elements_end());
-
-  const_element_iterator       el  = this->elements_begin();
-  const const_element_iterator end = this->elements_end();
-
-  for (; el != end; ++el)
-    for (unsigned int n=0; n<(*el)->n_nodes(); n++)
-      {
-	assert ((*el)->node(n) < nodes_to_elem_map.size());
-	
-	nodes_to_elem_map[(*el)->node(n)].push_back(*el);
-      }
-}
-
-
-
 void MeshBase::partition (const unsigned int n_parts)
 {
   MetisPartitioner partitioner;
@@ -775,316 +678,6 @@ void MeshBase::renumber_nodes_and_elements ()
 
 
 
-
-void MeshBase::find_boundary_nodes (std::vector<bool>& on_boundary) const
-{
-  // Resize the vector which holds boundary nodes and fill with false.
-  on_boundary.resize(this->n_nodes());
-  std::fill(on_boundary.begin(),
-	    on_boundary.end(),
-	    false);
-
-  // Loop over elements, find those on boundary, and
-  // mark them as true in on_boundary.
-//   const_active_elem_iterator       el (this->elements_begin());
-//   const const_active_elem_iterator end(this->elements_end());
-
-  const_element_iterator       el  = this->active_elements_begin();
-  const const_element_iterator end = this->active_elements_end(); 
-
-  for (; el != end; ++el)
-    for (unsigned int s=0; s<(*el)->n_neighbors(); s++)
-      if ((*el)->neighbor(s) == NULL) // on the boundary
-	{
-	  const AutoPtr<Elem> side((*el)->build_side(s));
-	  
-	  for (unsigned int n=0; n<side->n_nodes(); n++)
-	    on_boundary[side->node(n)] = true;
-	}
-}
-
-
-
-
-void MeshBase::distort (const Real factor,
-			const bool perturb_boundary)
-{
-  assert (this->mesh_dimension() != 1);
-  assert (this->n_nodes());
-  assert (this->n_elem());
-  assert ((factor >= 0.) && (factor <= 1.));
-
-  START_LOG("distort()", "MeshBase");
-
-
-
-  // First find nodes on the boundary and flag them
-  // so that we don't move them
-  // on_boundary holds false (not on boundary) and true (on boundary)
-  std::vector<bool> on_boundary (this->n_nodes(), false);
-  
-  if (!perturb_boundary)
-    this->find_boundary_nodes (on_boundary);
-
-  // Now calculate the minimum distance to
-  // neighboring nodes for each node.
-  // hmin holds these distances.
-  std::vector<float> hmin (this->n_nodes(), 1.e20);
-  
-//   active_elem_iterator       el (this->elements_begin());
-//   const active_elem_iterator end(this->elements_end());
-
-  element_iterator       el  = this->active_elements_begin();
-  const element_iterator end = this->active_elements_end(); 
-
-  for (; el!=end; ++el)
-    for (unsigned int n=0; n<(*el)->n_nodes(); n++)
-      hmin[(*el)->node(n)] = std::min(hmin[(*el)->node(n)],
-				      static_cast<float>((*el)->hmin()));		
-
-  
-  // Now actually move the nodes
-  {
-    const unsigned int seed = 123456;
-    
-    // seed the random number generator
-    srand(seed);
-    
-    for (unsigned int n=0; n<this->n_nodes(); n++)
-      if (!on_boundary[n])
-	{
-	  // the direction, random but unit normalized
-	  
-	  Point dir( static_cast<Real>(rand())/static_cast<Real>(RAND_MAX),
-		     static_cast<Real>(rand())/static_cast<Real>(RAND_MAX),
-		     ((this->mesh_dimension() == 3) ?
-		      static_cast<Real>(rand())/static_cast<Real>(RAND_MAX) :
-		      0.)
-		     );
-	  
-	  dir(0) = (dir(0)-.5)*2.;
-	  dir(1) = (dir(1)-.5)*2.;
-
-	  if (this->mesh_dimension() == 3)
-	    dir(2) = (dir(2)-.5)*2.;
-	  
-	  dir = dir.unit();
-
-	  // if hmin[n]=1.e20 then the node is not
-	  // used by any element.  We should not
-	  // move it.
-	  if (hmin[n] != 1.e20)
-	    {
-	      this->node(n)(0) += dir(0)*factor*hmin[n];
-	      this->node(n)(1) += dir(1)*factor*hmin[n];
-	      
-	      if (this->mesh_dimension() == 3)
-		this->node(n)(2) += dir(2)*factor*hmin[n];
-	    }
-	}
-  }
-
-
-  // All done  
-  STOP_LOG("distort()", "MeshBase");
-}
-
-
-
-void MeshBase::translate (const Real xt,
-			  const Real yt,
-			  const Real zt)
-{
-  const Point p(xt, yt, zt);
-
-  for (unsigned int n=0; n<this->n_nodes(); n++)
-    this->node(n) += p;
-}
-
-
-
-void MeshBase::rotate (const Real,
-		       const Real,
-		       const Real)
-{
-  error();
-}
-
-
-
-void MeshBase::scale (const Real xs,
-		      const Real ys,
-		      const Real zs)
-{
-  const Real x_scale = xs;
-  Real y_scale       = ys;
-  Real z_scale       = zs;
-  
-  if (ys == 0.)
-    {
-      assert (zs == 0.);
-
-      y_scale = z_scale = x_scale;
-    }
-
-  // Scale the x coordinate in all dimensions
-  for (unsigned int n=0; n<this->n_nodes(); n++)
-    this->node(n)(0) *= x_scale;
-
-
-  // Only scale the y coordinate in 2 and 3D
-  if (this->spatial_dimension() > 1)
-    {
-
-      for (unsigned int n=0; n<this->n_nodes(); n++)
-	this->node(n)(1) *= y_scale;
-
-      // Only scale the z coordinate in 3D
-      if (this->spatial_dimension() == 3)
-	{
-	  for (unsigned int n=0; n<this->n_nodes(); n++)
-	    this->node(n)(2) *= z_scale;
-	}
-    }
-}
-
-
-
-std::pair<Point, Point> 
-MeshBase::bounding_box() const
-{
-  // processor bounding box with no arguments
-  // computes the global bounding box
-  return this->processor_bounding_box();
-}
-
-
-
-Sphere
-MeshBase::bounding_sphere() const
-{
-  std::pair<Point, Point> bbox = this->bounding_box();
-
-  const Real  diag = (bbox.second - bbox.first).size();
-  const Point cent = (bbox.second + bbox.first)/2.;
-
-  return Sphere (cent, .5*diag);
-}
-
-
-
-std::pair<Point, Point> 
-MeshBase::processor_bounding_box (const unsigned int pid) const
-{
-  assert (this->n_nodes() != 0);
-
-  Point min(1.e30,   1.e30,  1.e30);
-  Point max(-1.e30, -1.e30, -1.e30);
-
-  // By default no processor is specified and we compute
-  // the bounding box for the whole domain.
-  if (pid == libMesh::invalid_uint)
-    {
-      for (unsigned int n=0; n<this->n_nodes(); n++)
-	for (unsigned int i=0; i<this->spatial_dimension(); i++)
-	  {
-	    min(i) = std::min(min(i), this->point(n)(i));
-	    max(i) = std::max(max(i), this->point(n)(i));
-	  }      
-    }
-  // if a specific processor id is specified then we need
-  // to only consider those elements living on that processor
-  else
-    {
-//       const_pid_elem_iterator       el (this->elements_begin(), pid);
-//       const const_pid_elem_iterator end(this->elements_end(),   pid);
-
-      const_element_iterator       el  = this->pid_elements_begin(pid);
-      const const_element_iterator end = this->pid_elements_end(pid);
-
-      for (; el != end; ++el)
-	for (unsigned int n=0; n<(*el)->n_nodes(); n++)
-	    for (unsigned int i=0; i<this->spatial_dimension(); i++)
-	      {
-		min(i) = std::min(min(i), this->point((*el)->node(n))(i));
-		max(i) = std::max(max(i), this->point((*el)->node(n))(i));
-	      }      
-    }
-
-  const std::pair<Point, Point> ret_val(min, max);
-
-  return ret_val;  
-}
-
-
-
-Sphere
-MeshBase::processor_bounding_sphere (const unsigned int pid) const
-{
-  std::pair<Point, Point> bbox = this->processor_bounding_box(pid);
-
-  const Real  diag = (bbox.second - bbox.first).size();
-  const Point cent = (bbox.second + bbox.first)/2.;
-
-  return Sphere (cent, .5*diag);
-}
-
-
-
-std::pair<Point, Point> 
-MeshBase::subdomain_bounding_box (const unsigned int sid) const
-{
-  assert (this->n_nodes() != 0);
-
-  Point min( 1.e30,  1.e30,  1.e30);
-  Point max(-1.e30, -1.e30, -1.e30);
-
-  // By default no subdomain is specified and we compute
-  // the bounding box for the whole domain.
-  if (sid == libMesh::invalid_uint)
-    {
-      for (unsigned int n=0; n<this->n_nodes(); n++)
-	for (unsigned int i=0; i<this->spatial_dimension(); i++)
-	  {
-	    min(i) = std::min(min(i), this->point(n)(i));
-	    max(i) = std::max(max(i), this->point(n)(i));
-	  }      
-    }
-
-  // if a specific subdomain id is specified then we need
-  // to only consider those elements living on that subdomain
-  else
-    {
-      for (unsigned int e=0; e<this->n_elem(); e++)
-	if (this->elem(e)->subdomain_id() == sid)
-	  for (unsigned int n=0; n<this->elem(e)->n_nodes(); n++)
-	    for (unsigned int i=0; i<this->spatial_dimension(); i++)
-	      {
-		min(i) = std::min(min(i), this->point(this->elem(e)->node(n))(i));
-		max(i) = std::max(max(i), this->point(this->elem(e)->node(n))(i));
-	      }      
-    }
-
-  const std::pair<Point, Point> ret_val(min, max);
-
-  return ret_val;  
-}
-
-
-
-Sphere MeshBase::subdomain_bounding_sphere (const unsigned int sid) const
-{
-  std::pair<Point, Point> bbox = this->subdomain_bounding_box(sid);
-
-  const Real  diag = (bbox.second - bbox.first).size();
-  const Point cent = (bbox.second + bbox.first)/2.;
-
-  return Sphere (cent, .5*diag);
-}
-
-
-
-//inline
 void MeshBase::delete_elem(Elem* e)
 {
   assert (e != NULL);

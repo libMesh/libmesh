@@ -1,4 +1,4 @@
-// $Id: face_quad8.C,v 1.18 2004-07-14 19:23:18 jwpeterson Exp $
+// $Id: face_quad8.C,v 1.19 2004-11-15 22:09:13 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -454,13 +454,13 @@ void Quad8::connectivity(const unsigned int sf,
 
 
 
-unsigned int Quad8::vtk_element_type (const unsigned int sf) const
-{
-  if (sf == 4)
-    return 9;
+// unsigned int Quad8::vtk_element_type (const unsigned int sf) const
+// {
+//   if (sf == 4)
+//     return 9;
 
-  return 5;
-}
+//   return 5;
+// }
 
 
 

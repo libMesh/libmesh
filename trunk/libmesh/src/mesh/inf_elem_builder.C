@@ -1,4 +1,4 @@
-// $Id: inf_elem_builder.C,v 1.1 2004-11-12 22:36:09 jwpeterson Exp $
+// $Id: inf_elem_builder.C,v 1.2 2004-11-15 22:09:13 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -23,6 +23,7 @@
 
 #include "inf_elem_builder.h"
 #include "libmesh_logging.h"
+#include "mesh_tools.h"
 #include "face_inf_quad4.h"
 #include "face_inf_quad6.h"
 #include "cell_inf_prism6.h"
@@ -38,7 +39,7 @@ const Point InfElemBuilder::build_inf_elem(bool be_verbose)
 
   // determine origin automatically,
   // works only if the mesh has no symmetry planes.
-  std::pair<Point, Point> b_box = this->_mesh.bounding_box();
+  const MeshTools::BoundingBox b_box = MeshTools::bounding_box(_mesh);
   Point origin = (b_box.first + b_box.second) / 2.;
     
   if (be_verbose)
@@ -100,7 +101,7 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue& origin_x,
   if ( !origin_x.first || !origin_y.first || !origin_z.first)
     {
       // determine origin
-      std::pair<Point, Point> b_box = this->_mesh.bounding_box();
+      const MeshTools::BoundingBox b_box = MeshTools::bounding_box(_mesh);
       const Point auto_origin = (b_box.first+b_box.second)/2.;
 
       // override default values, if necessary

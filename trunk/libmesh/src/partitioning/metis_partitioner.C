@@ -1,4 +1,4 @@
-// $Id: metis_partitioner.C,v 1.17 2004-11-14 18:51:59 jwpeterson Exp $
+// $Id: metis_partitioner.C,v 1.18 2004-11-15 22:09:15 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -254,7 +254,7 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
 	assert (elem->id() < forward_map.size());
 	assert (forward_map[elem->id()] != libMesh::invalid_uint);
 	
-	elem->set_processor_id() =
+	elem->processor_id() =
 	  static_cast<short int>(part[forward_map[elem->id()]]);	
       }
   }
