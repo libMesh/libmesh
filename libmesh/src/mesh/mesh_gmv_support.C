@@ -1,4 +1,4 @@
-// $Id: mesh_gmv_support.C,v 1.13 2003-02-26 16:05:46 ddreyer Exp $
+// $Id: mesh_gmv_support.C,v 1.14 2003-03-11 00:47:47 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -172,14 +172,10 @@ void MeshBase::write_gmv(std::ostream& out,
 	  for ( ; it != end; ++it)
 	    for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
 	      {
-		if (((*it)->type() == HEX8)   ||
-		    ((*it)->type() == HEX27)
-#ifdef ENABLE_INFINITE_ELEMENTS
-		    || ((*it)->type() == INFHEX8)
-		    || ((*it)->type() == INFHEX16)
-		    || ((*it)->type() == INFHEX18)
-#endif
-		    )
+
+#ifndef  ENABLE_INFINITE_ELEMENTS
+		if (((*it)->type() == HEX8)   ||    
+		    ((*it)->type() == HEX27))
 		  {
 		    out << "phex8 8" << std::endl;
 		    std::vector<unsigned int> conn = (*it)->tecplot_connectivity(se);
@@ -211,6 +207,25 @@ void MeshBase::write_gmv(std::ostream& out,
 			<< (*it)->node(14)+1 << " "
 			<< (*it)->node(15)+1 << " ";
 		  }
+#else
+		/*
+		 * In case of infinite elements, HEX20
+		 * should be handled just like the
+		 * INFHEX16, since these connect to each other
+		 */
+		if (((*it)->type() == HEX8)     ||
+		    ((*it)->type() == HEX27)    ||
+		    ((*it)->type() == INFHEX8)  ||
+		    ((*it)->type() == INFHEX16) ||
+		    ((*it)->type() == INFHEX18) ||
+		    ((*it)->type() == HEX20))
+		  {
+		    out << "phex8 8" << std::endl;
+		    std::vector<unsigned int> conn = (*it)->tecplot_connectivity(se);
+		    for (unsigned int i=0; i<conn.size(); i++)
+		      out << conn[i] << " ";
+		  }
+#endif
 		
 		else if (((*it)->type() == TET4)  ||
 			 ((*it)->type() == TET10))

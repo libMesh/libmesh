@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex16.C,v 1.14 2003-03-03 02:15:58 benkirk Exp $
+// $Id: cell_inf_hex16.C,v 1.15 2003-03-11 00:47:41 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,6 @@
 // C++ includes
 
 // Local includes cont'd
-#include "mesh_base.h"
 #include "cell_inf_hex16.h"
 #include "face_quad8.h"
 #include "face_inf_quad6.h"
@@ -37,15 +36,14 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i) const
 {
   assert (i < this->n_sides());
 
-
-
   // Think of a unit cube: (-1,1) x (-1,1)x (1,1)
   switch (i)
     {
-    case 0:  // the face at z=0
+    case 0: // the base face
       {
 	AutoPtr<Elem> face(new Quad8);
 
+	// Only here, the face element's normal points inward
 	face->set_node(0) = this->get_node(0);
 	face->set_node(1) = this->get_node(1);
 	face->set_node(2) = this->get_node(2);
@@ -64,11 +62,10 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i) const
 	face->set_node(6) = this->get_node(9);
 	face->set_node(7) = this->get_node(8);
 */
-
 	return face;
       }
 
-    case 1:  // the face at y = 0
+    case 1:  // connecting to another infinite element
       {
 	AutoPtr<Elem> face(new InfQuad6);
 
@@ -82,7 +79,7 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i) const
 	return face;
       }
 
-    case 2:  // the face at x=1
+    case 2:  // connecting to another infinite element
       {
 	AutoPtr<Elem> face(new InfQuad6);
 
@@ -95,7 +92,8 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i) const
 
 	return face;
       }
-    case 3: // the face at y=1
+
+    case 3:  // connecting to another infinite element
       {
 	AutoPtr<Elem> face(new InfQuad6);
 	
@@ -108,7 +106,8 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i) const
 
 	return face;
       }
-    case 4: // the face at x=0
+
+    case 4:  // connecting to another infinite element
       {
 	AutoPtr<Elem> face(new InfQuad6);
 
@@ -121,14 +120,7 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i) const
 
 	return face;
       }
-    case 5: // the face at z=1
-      // disable this face, since this is supposed to lie at infinity
-      {
-        std::cerr << "No face 5 in case of infinite elements!" << std::endl;
-        error();
-	AutoPtr<Elem> ap(NULL);  return ap;
 
-      }
     default:
       {
 	error();
@@ -176,22 +168,6 @@ const std::vector<unsigned int> InfHex16::tecplot_connectivity(const unsigned in
 }
 
 
-
-void InfHex16::write_tecplot_connectivity(std::ostream &out) const
-{
-  assert (out);
-  assert (_nodes != NULL);
-
-  for (unsigned int sc=0; sc <this->n_sub_elem(); sc++)
-    {
-      std::vector<unsigned int> conn = tecplot_connectivity(sc);
-
-      for (unsigned int i=0; i<conn.size(); i++)
-	out << conn[i] << " ";
-
-      out << std::endl;
-    }
-}
 
 
 
@@ -286,86 +262,6 @@ const float InfHex16::_embedding_matrix[4][16][16] =
 
 
 
-const unsigned int InfHex16::_side_children_matrix[6][5] =
-{
-  // note different storage scheme
-  {4,   0, 1, 2, 3}, // 4 side-0 children
-  {2,   0, 1,42,42}, // 2 side-1 children
-  {2,   1, 3,42,42}, // 2 side-2 children
-  {2,   2, 3,42,42}, // 2 side-3 children
-  {2,   0, 2,42,42}, // 2 side-4 children
-  {4,   0, 1, 2, 3}  // 4 side-5 children
-};
-
-
-
-void InfHex16::refine (MeshBase& mesh)
-{
-  assert (this->refinement_flag() == Elem::REFINE);
-  assert (this->active());
-  assert (_children == NULL);
-
-  // Create my children
-  {
-    _children = new Elem*[this->n_children()];
-
-    for (unsigned int c=0; c<this->n_children(); c++)
-      {
-	_children[c] = new InfHex16(this);
-	_children[c]->set_refinement_flag(Elem::JUST_REFINED);
-      }
-  }
-
-
-  // Compute new nodal locations
-  // and asssign nodes to children
-  {
-    std::vector<std::vector<Point> >  p(this->n_children());
-    
-    for (unsigned int c=0; c<this->n_children(); c++)
-      p[c].resize(this->child(c)->n_nodes());
-    
-
-    // compute new nodal locations
-    for (unsigned int c=0; c<this->n_children(); c++)
-      for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
-	for (unsigned int n=0; n<this->n_nodes(); n++)
-	  if (_embedding_matrix[c][nc][n] != 0.)
-	    p[c][nc].add_scaled (this->point(n), static_cast<Real>(_embedding_matrix[c][nc][n]));
-    
-    
-    // assign nodes to children & add them to the mesh
-    for (unsigned int c=0; c<this->n_children(); c++)
-      {
-	for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
-	  _children[c]->set_node(nc) = mesh.mesh_refinement.add_point(p[c][nc]);
-
-	mesh.add_elem(this->child(c), mesh.mesh_refinement.new_element_number());
-      }
-  }
-
-
-  
-  // Possibly add boundary information
-  {
-    for (unsigned int s=0; s<this->n_sides(); s++)
-      if (this->neighbor(s) == NULL)
-	{
-	  const short int id = mesh.boundary_info.boundary_id(this, s);
-	
-	  if (id != mesh.boundary_info.invalid_id)
-	    // the upper limit for sc is stored in the 0th column
-	    for (unsigned int sc=1; sc <= _side_children_matrix[s][0]; sc++)
-	      mesh.boundary_info.add_side(this->child(_side_children_matrix[s][sc]), s, id);
-	}
-  }
-
-
-  // Un-set my refinement flag now
-  this->set_refinement_flag(Elem::DO_NOTHING);
-}
-
-
 #endif
 
-#endif
+#endif  // ifdef ENABLE_INFINITE_ELEMENTS

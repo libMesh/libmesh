@@ -1,4 +1,4 @@
-// $Id: cell_tet.h,v 1.9 2003-02-28 23:37:38 benkirk Exp $
+// $Id: cell_tet.h,v 1.10 2003-03-11 00:47:40 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -45,12 +45,6 @@ public:
    * parent. Derived classes implement 'true' elements.
    */
   Tet  (const unsigned int nn, const Elem* p);
-  
-  /**
-   * @returns 4.  All tet-derivatives are guaranteed to have at
-   * least 4 nodes.
-   */
-  unsigned int n_nodes() const { return 4; }
 
   /**
    * @returns 4

@@ -1,4 +1,4 @@
-// $Id: edge_edge2.h,v 1.9 2003-02-28 23:37:42 benkirk Exp $
+// $Id: edge_edge2.h,v 1.10 2003-03-11 00:47:40 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -34,10 +34,10 @@
  * The \p Edge2 is an element in 1D composed of 2 nodes. It is numbered
  * like this:
  *
- * \verbatim
- *  EDGE2: o--------o
- *         0        1
- * \endverbatim
+   \verbatim
+    EDGE2: o--------o
+           0        1
+   \endverbatim
  */
 
 // ------------------------------------------------------------

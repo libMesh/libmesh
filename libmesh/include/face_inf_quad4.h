@@ -1,4 +1,4 @@
-// $Id: face_inf_quad4.h,v 1.11 2003-03-03 02:15:57 benkirk Exp $
+// $Id: face_inf_quad4.h,v 1.12 2003-03-11 00:47:40 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -22,66 +22,52 @@
 #define __inf_quad4_h__
 
 
-
-
-#include "mesh_common.h"
-
+#include "mesh_config.h"
 #ifdef ENABLE_INFINITE_ELEMENTS
-
-
 
 // C++ includes
 
 
 // Local includes
-#include "face_quad.h"
-
-
-
-
+#include "face_inf_quad.h"
 
 
 
 /**
  * The \p INFQUAD4 is an infinite element in 2D composed of 4 nodes.
  * It is numbered like this:
- * \verbatim
- *           3           2
- * INFQUAD4: o-----------o
- *           |           |
- *           |           |
- *           |           |  
- *           |           |
- *           |           |
- *           o-----------o
- *           0           1
- * \endverbatim
+   \verbatim
+             3           2
+   INFQUAD4: o           o   closer to infinity
+             |           |
+             |           |
+             |           |  
+             |           |
+             |           |
+             o-----------o   base side
+             0           1
+   \endverbatim
  */
 // ------------------------------------------------------------
 // InfQuad4 class definition
-class InfQuad4 : public Quad
+class InfQuad4 : public InfQuad
 {
 public:
 
   /**
    * Constructor.  By default this element has no parent.
    */
-  InfQuad4  (const Elem* p=NULL);
-  
-  /**
-   * @returns \p INFQUAD4 
-   */
-  ElemType type () const { return INFQUAD4; }
+  InfQuad4 (const Elem* p=NULL);
   
   /**
    * @returns 4
    */
-  unsigned int n_sides() const { return 4; }
-  
+  unsigned int n_nodes() const { return 4; }
+
   /**
-   * @returns 2
+   * @returns \p INFQUAD4 
    */
-  unsigned int n_children() const { return 2; }
+  ElemType type () const { return INFQUAD4; }
   
   /**
    * @returns 1
@@ -89,39 +75,27 @@ public:
   unsigned int n_sub_elem() const { return 1; }
   
   /**
-   * @returns FIRST
+   * @returns \p FIRST
    */
   Order default_order() const { return FIRST; }
   
   /**
-   * @returns an EDGE2 for the base (0) side, an INFEDGE2 for
-   * the sides 1, 3. Side 2 no supported.
+   * @returns an \p Edge2 for the base side, and an \p InfEdge2 for
+   * the sides 1, 2.
    */
-  AutoPtr<Elem> build_side (const unsigned int i) const;
+  AutoPtr<Elem> build_side (const unsigned int i) const
+  { return this->side(i); }
 
   const std::vector<unsigned int> tecplot_connectivity(const unsigned int sf=0) const;
   
   void vtk_connectivity(const unsigned int,
-			std::vector<unsigned int>*) const
-  { error(); }
+			std::vector<unsigned int>*) const;
   
   unsigned int vtk_element_type (const unsigned int) const
   { return 9; }
   
-  void write_tecplot_connectivity(std::ostream&) const
-  { error(); }
-    
   
-#ifdef ENABLE_AMR
-
-  /**
-   * Refine the element.
-   */
-  void refine (MeshBase& mesh);
-
-#endif
-  
-private:
+protected:
   
   
 #ifdef ENABLE_AMR
@@ -140,21 +114,9 @@ private:
    */
   static const float _embedding_matrix[2][4][4];
   
-  /**
-   * Matrix that tells which children share which of
-   * my sides.
-   */
-  static const unsigned int _side_children_matrix[4][3];
-  
 #endif
     
 };
-
-
-
-
-
-
 
 
 
@@ -162,11 +124,11 @@ private:
 // InfQuad4 class member functions
 inline
 InfQuad4::InfQuad4(const Elem* p) :
-  Quad(InfQuad4::n_nodes(), p) 
+  InfQuad(InfQuad4::n_nodes(), p) 
 {
 }
 
 
-#endif
+#endif // ifdef ENABLE_INFINITE_ELEMENTS
 
 #endif

@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism12.C,v 1.14 2003-03-03 02:15:58 benkirk Exp $
+// $Id: cell_inf_prism12.C,v 1.15 2003-03-11 00:47:42 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,6 @@
 // C++ includes
 
 // Local includes cont'd
-#include "mesh_base.h"
 #include "cell_inf_prism12.h"
 #include "face_tri6.h"
 #include "face_inf_quad6.h"
@@ -45,20 +44,13 @@ AutoPtr<Elem> InfPrism12::build_side (const unsigned int i) const
       {
 	AutoPtr<Elem> face(new Tri6);
 
+	// Note that for this face element, the normal points inward
 	face->set_node(0) = this->get_node(0);
 	face->set_node(1) = this->get_node(1);
 	face->set_node(2) = this->get_node(2);
 	face->set_node(3) = this->get_node(6);
 	face->set_node(4) = this->get_node(7);
 	face->set_node(5) = this->get_node(8);
-/* old code
-	face->set_node(0) = this->get_node(0);
-	face->set_node(1) = this->get_node(2);
-	face->set_node(2) = this->get_node(1);
-	face->set_node(3) = this->get_node(8);
-	face->set_node(4) = this->get_node(7);
-	face->set_node(5) = this->get_node(6);
-*/
 
 	return face;
       }
@@ -103,13 +95,6 @@ AutoPtr<Elem> InfPrism12::build_side (const unsigned int i) const
 	face->set_node(5) = this->get_node(11);
 	
 	return face;
-      }
-
-    case 4: // the triangular face at z=1
-      {
-        std::cerr << "No face 4 in case of infinite elements!" << std::endl;
-        error();
-	AutoPtr<Elem> ap(NULL);  return ap;
       }
 
     default:
@@ -199,23 +184,6 @@ const std::vector<unsigned int> InfPrism12::tecplot_connectivity(const unsigned 
 
 
 
-void InfPrism12::write_tecplot_connectivity(std::ostream &out) const
-{
-  assert (out);
-  assert (_nodes != NULL);
-
-  for (unsigned int sc=0; sc <this->n_sub_elem(); sc++)
-    {
-      std::vector<unsigned int> conn = tecplot_connectivity(sc);
-
-      for (unsigned int i=0; i<conn.size(); i++)
-	out << conn[i] << " ";
-
-      out << std::endl;
-    }
-}
-
-
 
 #ifdef ENABLE_AMR
 
@@ -287,92 +255,13 @@ const float InfPrism12::_embedding_matrix[4][12][12] =
     {         0.0,        0.0,        0.0,     -0.125,        0.0,     -0.125,        0.0,        0.0,        0.0,        0.5,        0.5,       0.25}, // 9
     {         0.0,        0.0,        0.0,     -0.125,     -0.125,        0.0,        0.0,        0.0,        0.0,       0.25,        0.5,        0.5}, // 10
     {         0.0,        0.0,        0.0,        0.0,     -0.125,     -0.125,        0.0,        0.0,        0.0,        0.5,       0.25,        0.5}  // 11
-  },
-
+  }
 
 };
 
 
 
-const unsigned int InfPrism12::_side_children_matrix[5][5] =
-{
-  {4,   0, 1, 2, 3}, // 4 side-0 children
-  {2,   0, 1,42,42}, // 2 side-1 children
-  {2,   1, 2,42,42}, // 2 side-2 children
-  {2,   0, 2,42,42}, // 2 side-3 children
-  {4,   0, 1, 2, 3}  // 4 side-4 children
-};
-
-
-
-void InfPrism12::refine (MeshBase& mesh)
-{
-  assert (this->refinement_flag() == Elem::REFINE);
-  assert (this->active());
-  assert (_children == NULL);
-
-  // Create my children
-  {
-    _children = new Elem*[this->n_children()];
-
-    for (unsigned int c=0; c<this->n_children(); c++)
-      {
-	_children[c] = new InfPrism12(this);
-	_children[c]->set_refinement_flag(Elem::JUST_REFINED);
-      }
-  }
-
-
-  // Compute new nodal locations
-  // and asssign nodes to children
-  {
-    std::vector<std::vector<Point> >  p(this->n_children());
-    
-    for (unsigned int c=0; c<this->n_children(); c++)
-      p[c].resize(this->child(c)->n_nodes());
-    
-
-    // compute new nodal locations
-    for (unsigned int c=0; c<this->n_children(); c++)
-      for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
-	for (unsigned int n=0; n<this->n_nodes(); n++)
-	  if (_embedding_matrix[c][nc][n] != 0.)
-	    p[c][nc].add_scaled (this->point(n), static_cast<Real>(_embedding_matrix[c][nc][n]));
-    
-    
-    // assign nodes to children & add them to the mesh
-    for (unsigned int c=0; c<this->n_children(); c++)
-      {
-	for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
-	  _children[c]->set_node(nc) = mesh.mesh_refinement.add_point(p[c][nc]);
-
-	mesh.add_elem(this->child(c), mesh.mesh_refinement.new_element_number());
-      }
-  }
-
-
-  
-  // Possibly add boundary information
-  {
-    for (unsigned int s=0; s<this->n_sides(); s++)
-      if (this->neighbor(s) == NULL)
-	{
-	  const short int id = mesh.boundary_info.boundary_id(this, s);
-	
-	  if (id != mesh.boundary_info.invalid_id)
-	    // the upper limit for sc is stored in the 0th column
-	    for (unsigned int sc=1; sc <= _side_children_matrix[s][0]; sc++)
-	      mesh.boundary_info.add_side(this->child(_side_children_matrix[s][sc]), s, id);
-
-	}
-  }
-
-
-  // Un-set my refinement flag now
-  this->set_refinement_flag(Elem::DO_NOTHING);
-}
-
 
 #endif
 
-#endif
+#endif // ifdef ENABLE_INFINITE_ELEMENTS

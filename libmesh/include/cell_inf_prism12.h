@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism12.h,v 1.11 2003-03-03 02:15:57 benkirk Exp $
+// $Id: cell_inf_prism12.h,v 1.12 2003-03-11 00:47:40 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,12 +26,12 @@
 
 // Local includes
 #include "mesh_config.h"
-#include "cell_prism.h"
-
-
-
-
 #ifdef ENABLE_INFINITE_ELEMENTS
+
+#include "cell_inf_prism.h"
+
+
+
 
 /**
  * The \p InfPrism12 is an infinite element in 3D composed of 12 nodes.
@@ -40,19 +40,19 @@
    INFPRISM12:
             5      
             o      
-           /|\     
-          / | \    
-         /  |  \
-     11 o   |   o 10
-       /   2|    \  
-      /     o     \ 
-     /     / \     \
-   3o-------o-------o4
-    |    /  9  \    |
-    |   o       o   |
-    |  / 8     7 \  |
-    | /           \ |
-    |/             \|
+            :      
+            :      
+            :   
+     11 o   :   o 10
+        :  2:   :   
+        :   o   :        closer to infinity
+        :  . .  :   
+   3o   : . o9. :   o4
+    |   :.  |  .:   |
+    |   o   |   o   |
+    |  . 8  |  7 .  |
+    | .     |     . |
+    |.      |      .|     base face
     o-------o-------o
     0       6       1
    \endverbatim
@@ -60,7 +60,7 @@
 
 // ------------------------------------------------------------
 // InfPrism12 class definition
-class InfPrism12 : public Prism
+class InfPrism12 : public InfPrism
 {
 public:
 
@@ -68,16 +68,16 @@ public:
    * Constructor.  By default this element has no parent.
    */
   InfPrism12  (const Elem* p=NULL);
+
+  /**
+   * @returns 12.  The \p InfPrism12 has 12 nodes.
+   */
+  unsigned int n_nodes() const { return 12; }
   
   /**
    * @returns \p INFPRISM12
    */
   ElemType     type () const   { return INFPRISM12; }
-
-  /**
-   * @returns 12
-   */
-  unsigned int n_nodes() const { return 12; }
   
   /**
    * @returns 4
@@ -90,10 +90,9 @@ public:
   Order default_order() const { return SECOND; }
   
   /**
-   * Returns a TRI6 built coincident with face 0, an INFQUAD6 
-   * built coincident with faces 1 to 3.  Face 4 not supported. 
-   * This method allocates memory, so be sure to delete
-   * the returned pointer when it is no longer needed.
+   * Returns a \p TRI6 built coincident with face 0, an \p INFQUAD6 
+   * built coincident with faces 1 to 3.  Note that the \p AutoPtr<Elem>
+   * takes care of freeing memory.
    */
   AutoPtr<Elem> build_side (const unsigned int i) const;
 
@@ -105,22 +104,11 @@ public:
   
   unsigned int vtk_element_type (const unsigned int) const
   { return 13; }
-  
-  void write_tecplot_connectivity(std::ostream &out) const;
-  
-#ifdef ENABLE_AMR
 
-  /**
-   * Refine the element.
-   */
-  void refine (MeshBase& mesh);
 
-#endif
-  
-  
-private:
 
-  
+protected:  
+
 #ifdef ENABLE_AMR
   
   /**
@@ -137,13 +125,6 @@ private:
    */
   static const float _embedding_matrix[4][12][12];
   
-  /**
-   * Matrix that tells which children share which of
-   * my sides. Note that infinite elements use different
-   * storage scheme than conventional elements.
-   */
-  static const unsigned int _side_children_matrix[5][5];
-  
 #endif
   
 };
@@ -154,12 +135,12 @@ private:
 // InfPrism12 class member functions
 inline
 InfPrism12::InfPrism12(const Elem* p) :
-  Prism(InfPrism12::n_nodes(), p) 
+  InfPrism(InfPrism12::n_nodes(), p) 
 {
 }
 
 
 
-#endif
+#endif  // ifdef ENABLE_INFINITE_ELEMENTS
 
 #endif

@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex8.h,v 1.11 2003-03-03 02:15:57 benkirk Exp $
+// $Id: cell_inf_hex8.h,v 1.12 2003-03-11 00:47:40 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,27 +26,27 @@
 
 // Local includes
 #include "mesh_config.h"
-#include "cell_hex.h"
-
-
-
-
 #ifdef ENABLE_INFINITE_ELEMENTS
+
+#include "cell_inf_hex.h"
+
+
+
 
 /**
  * The \p InfHex8 is an infinite element in 3D composed of 8 nodes.
  * It is numbered like this:
    \verbatim                
-  INFHEX8: 7        6         z^  / y
-           o--------o          | /
-          /|       /|          |/ 
-         / |      / |          +----> x
-      4 /  |   5 /  |           
-       o--------o   |           
-       |   o----|-- o 2         
-       |  /3    |  /            
-       | /      | /             
-       |/       |/              
+  INFHEX8: 7        6                             z^  / y
+           o        o    closer to infinity        | /
+           :        |                              |/ 
+           :        |                              +----> x
+      4    :   5    |           
+       o   :    o   |           
+       |   o....|...o 2         
+       |  .3    |  /            
+       | .      | /             
+       |.       |/       base face
        o--------o               
        0        1               
                              
@@ -54,8 +54,8 @@
  */
 
 // ------------------------------------------------------------
-// Hex class definition
-class InfHex8 : public Hex
+// InfHex8 class definition
+class InfHex8 : public InfHex
 {
 public:
 
@@ -63,11 +63,16 @@ public:
    * Constructor.  By default this element has no parent.
    */
   InfHex8  (const Elem* p=NULL);
-  
+    
+  /**
+   * @returns 8.  The \p InfHex8 has 8 nodes.
+   */
+  unsigned int n_nodes() const { return 8; }
+
   /**
    * @returns \p INFHEX8
    */
-  ElemType type () const { return INFHEX8; }
+  ElemType     type() const { return INFHEX8; }
 
   /**
    * @returns 1
@@ -77,15 +82,16 @@ public:
   /**
    * @returns FIRST
    */
-  Order default_order() const { return FIRST; }
+  Order        default_order() const { return FIRST; }
   
   /**
-   * Returns a QUAD4 built coincident with face 0, an INFQUAD4 
-   * built coincident with faces 1 to 4.  Face 5 not supported. 
-   * This method allocates memory, so be sure to delete
-   * the returned pointer when it is no longer needed.
+   * Returns a \p QUAD4 built coincident with face 0, an \p INFQUAD4 
+   * built coincident with faces 1 to 4. Note that the \p AutoPtr<Elem>
+   * takes care of freeing memory.  Here, this method is the same as 
+   * the \p InfHex::side(i).
    */
-  AutoPtr<Elem> build_side (const unsigned int i) const;
+  AutoPtr<Elem> build_side (const unsigned int i) const
+  { return  this->side(i); }
 
   const std::vector<unsigned int> tecplot_connectivity(const unsigned int sc=0) const;
   
@@ -96,19 +102,9 @@ public:
   unsigned int vtk_element_type (const unsigned int) const
   { return 12; }
   
-  void write_tecplot_connectivity(std::ostream &out) const;
-  
-#ifdef ENABLE_AMR
-
-  /**
-   * Refine the element.
-   */
-  void refine (MeshBase& mesh);
-  
-#endif
 
   
-private:
+protected:
   
   
 #ifdef ENABLE_AMR
@@ -126,14 +122,7 @@ private:
    * from current nodes/solution.
    */
   static const float _embedding_matrix[4][8][8];
-  
-  /**
-   * Matrix that tells which children share which of
-   * my sides. Note that infinite elements use different
-   * storage scheme than conventional elements.
-   */
-  static const unsigned int _side_children_matrix[6][5];
-  
+    
 #endif
 
 };
@@ -144,12 +133,12 @@ private:
 // InfHex8 class member functions
 inline
 InfHex8::InfHex8(const Elem* p) :
-  Hex(InfHex8::n_nodes(), p) 
+  InfHex(InfHex8::n_nodes(), p) 
 {
 }
 
 
 
-#endif
+#endif  // ifdef ENABLE_INFINITE_ELEMENTS
 
 #endif

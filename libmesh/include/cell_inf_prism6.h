@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism6.h,v 1.11 2003-03-03 02:15:57 benkirk Exp $
+// $Id: cell_inf_prism6.h,v 1.12 2003-03-11 00:47:40 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,12 +26,12 @@
 
 // Local includes
 #include "mesh_config.h"
-#include "cell_prism.h"
-
-
-
-
 #ifdef ENABLE_INFINITE_ELEMENTS
+
+#include "cell_inf_prism.h"
+
+
+
 
 /**
  * The \p InfPrism6 is an infinite element in 3D composed of 6 nodes.
@@ -40,20 +40,23 @@
    INFPRISM6:
            5
            o
-          /|\
-         / | \
-        /  o  \
-     3 o-------o 4
-       | / 2 \ |
-       |/     \|
-       o-------o
+           : 
+           :         closer to infinity
+           :
+     3 o   :   o 4
+       |   :   |
+       | 2 o   |
+       |  . .  |  
+       | .   . |
+       |.     .|
+       o-------o     base face
        0       1
    \endverbatim
  */
 
 // ------------------------------------------------------------
 // InfPrism6 class definition
-class InfPrism6 : public Prism
+class InfPrism6 : public InfPrism
 {
 public:
 
@@ -61,11 +64,16 @@ public:
    * Constructor.  By default this element has no parent.
    */
   InfPrism6  (const Elem* p=NULL);
+    
+  /**
+   * @returns 6.  The \p InfPrism6 has 6 nodes.
+   */
+  unsigned int n_nodes() const { return 6; }
   
   /**
    * @returns \p INFPRISM6
    */
-  ElemType     type () const   { return INFPRISM6; }
+  ElemType     type() const { return INFPRISM6; }
 
   /**
    * @returns 1
@@ -75,15 +83,16 @@ public:
   /**
    * @returns FIRST
    */
-  Order default_order() const { return FIRST; }
+  Order        default_order() const { return FIRST; }
   
   /**
-   * Returns a TRI3 built coincident with face 0, an INFQUAD4 
-   * built coincident with faces 1 to 3.  Face 4 not supported. 
-   * This method allocates memory, so be sure to delete
-   * the returned pointer when it is no longer needed.
+   * Returns a \p TRI3 built coincident with face 0, an \p INFQUAD4 
+   * built coincident with faces 1 to 3.  Note that the \p AutoPtr<Elem>
+   * takes care of freeing memory.  Here, this method is the same as 
+   * the \p InfPrism::side(i).
    */
-  AutoPtr<Elem> build_side (const unsigned int i) const;
+  AutoPtr<Elem> build_side (const unsigned int i) const 
+  { return  this->side(i); }
 
   const std::vector<unsigned int> tecplot_connectivity(const unsigned int sc=0) const;
   
@@ -94,19 +103,9 @@ public:
   unsigned int vtk_element_type (const unsigned int) const
   { return 13; }
   
-  void write_tecplot_connectivity(std::ostream &out) const;
-  
-#ifdef ENABLE_AMR
-
-  /**
-   * Refine the element.
-   */
-  void refine (MeshBase& mesh);
-
-#endif
   
   
-private:
+protected:
 
   
 #ifdef ENABLE_AMR
@@ -125,13 +124,6 @@ private:
    */
   static const float _embedding_matrix[4][6][6];
   
-  /**
-   * Matrix that tells which children share which of
-   * my sides. Note that infinite elements use different
-   * storage scheme than conventional elements.
-   */
-  static const unsigned int _side_children_matrix[5][5];
-  
 #endif
   
 };
@@ -142,12 +134,12 @@ private:
 // InfPrism6 class member functions
 inline
 InfPrism6::InfPrism6(const Elem* p) :
-  Prism(InfPrism6::n_nodes(), p) 
+  InfPrism(InfPrism6::n_nodes(), p) 
 {
 }
 
 
 
-#endif
+#endif  // ifdef ENABLE_INFINITE_ELEMENTS
 
 #endif
