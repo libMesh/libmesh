@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.38 2003-08-08 14:11:26 ddreyer Exp $
+// $Id: mesh_base.h,v 1.39 2003-08-11 19:48:23 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -34,7 +34,7 @@
 // forward declarations
 class Elem;
 class EquationSystems;
-template <typename T> class PetscMatrix;
+//template <typename T> class PetscMatrix;
 
 
 // Local Includes -----------------------------------
@@ -64,7 +64,7 @@ template <typename T> class PetscMatrix;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.38 $
+ * \version $Revision: 1.39 $
  */
 
 
@@ -444,19 +444,19 @@ public:
   subdomain_bounding_sphere (const unsigned int pid = static_cast<unsigned int>(-1)) const;
 
 
-  /**
-   * Builds the connectivity graph. The matrix \p conn is such that the
-   * valence of each node is on the diagonal and there is a -1 for each
-   * node connected to the node.
-   */
-  void build_L_graph (PetscMatrix<Number>& conn) const;
+//   /**
+//    * Builds the connectivity graph. The matrix \p conn is such that the
+//    * valence of each node is on the diagonal and there is a -1 for each
+//    * node connected to the node.
+//    */
+//   void build_L_graph (PetscMatrix<Number>& conn) const;
   
-  /**
-   * Builds the connectivity graph. The matrix \p conn is such that the
-   * valence of each node is on the diagonal and there is a -1 for each
-   * node connected to the node.
-   */
-  void build_script_L_graph (PetscMatrix<Number>& conn) const;
+//   /**
+//    * Builds the connectivity graph. The matrix \p conn is such that the
+//    * valence of each node is on the diagonal and there is a -1 for each
+//    * node connected to the node.
+//    */
+//   void build_script_L_graph (PetscMatrix<Number>& conn) const;
   
   /**
    * Returns the number of subdomains in the global mesh. Note that it is

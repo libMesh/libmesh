@@ -1364,8 +1364,12 @@ src/geom/cell_inf_hex18.$(obj-suffix):\
     include/type_vector.h
 src/geom/cell_inf_hex8.$(obj-suffix):\
     src/geom/cell_inf_hex8.C\
+    include/auto_ptr.h\
     include/cell_inf_hex.h\
     include/cell_inf_hex8.h\
+    include/dof_object.h\
+    include/elem.h\
+    include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
@@ -1375,7 +1379,10 @@ src/geom/cell_inf_hex8.$(obj-suffix):\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
+    include/node.h\
     include/point.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h\
     include/type_vector.h
 src/geom/cell_inf_prism.$(obj-suffix):\
     src/geom/cell_inf_prism.C\
@@ -2173,19 +2180,11 @@ src/mesh/mesh_base.$(obj-suffix):\
     include/cell_inf_prism.h\
     include/cell_inf_prism12.h\
     include/cell_inf_prism6.h\
-    include/coupling_matrix.h\
-    include/dense_matrix.h\
-    include/dense_matrix_base.h\
-    include/dense_vector.h\
-    include/dense_vector_base.h\
-    include/dof_map.h\
     include/dof_object.h\
     include/elem.h\
     include/elem_iterators.h\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
-    include/enum_fe_family.h\
-    include/enum_inf_map_type.h\
     include/enum_order.h\
     include/enum_solver_package.h\
     include/enum_xdr_mode.h\
@@ -2196,7 +2195,6 @@ src/mesh/mesh_base.$(obj-suffix):\
     include/face_tri.h\
     include/face_tri3.h\
     include/face_tri6.h\
-    include/fe_type.h\
     include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_base.h\
@@ -2212,12 +2210,10 @@ src/mesh/mesh_base.$(obj-suffix):\
     include/parmetis_partitioner.h\
     include/partitioner.h\
     include/perf_log.h\
-    include/petsc_matrix.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
-    include/sparse_matrix.h\
     include/sphere.h\
     include/surface.h\
     include/type_vector.h
