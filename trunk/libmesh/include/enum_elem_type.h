@@ -1,4 +1,4 @@
-// $Id: enum_elem_type.h,v 1.5 2003-02-13 22:56:07 benkirk Exp $
+// $Id: enum_elem_type.h,v 1.6 2003-02-25 18:34:42 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -42,41 +42,42 @@ namespace MeshEnums {
   /**
    * Defines an \p enum for geometric element types.
    */
-  enum ElemType {EDGE2=0,
-		 EDGE3,
-		 EDGE4,
+  enum ElemType {EDGE2=0,    // 0
+		 EDGE3,      // 1
+		 EDGE4,      // 2
 		 
-		 TRI3,
-		 TRI6,
+		 TRI3,       // 3
+		 TRI6,       // 4
 		 
-		 QUAD4,
-		 QUAD8,
-		 QUAD9,
+		 QUAD4,      // 5
+		 QUAD8,      // 6
+		 QUAD9,      // 7
 		 
-		 TET4,
-		 TET10,
+		 TET4,       // 8
+		 TET10,      // 9
 		 
-		 HEX8,
-		 HEX20,
-		 HEX27,
+		 HEX8,       // 10
+		 HEX20,      // 11
+		 HEX27,      // 12
 		 
-		 PRISM6,
-		 PRISM18,
+		 PRISM6,     // 13
+		 PRISM15,    // 14
+		 PRISM18,    // 15
 		 
-		 PYRAMID5,
+		 PYRAMID5,   // 16
 		 
 #ifdef ENABLE_INFINITE_ELEMENTS
-		 INFEDGE2,
+		 INFEDGE2,   // 17
 		 
-		 INFQUAD4,
-		 INFQUAD6,
+		 INFQUAD4,   // 18
+		 INFQUAD6,   // 19
 		 
-		 INFHEX8,
-		 INFHEX16,
-		 INFHEX18,
+		 INFHEX8,    // 20
+		 INFHEX16,   // 21
+		 INFHEX18,   // 22
 		 
-		 INFPRISM6,
-		 INFPRISM12,
+		 INFPRISM6,  // 23
+		 INFPRISM12, // 24
 #endif
 		 
 		 INVALID_ELEM};

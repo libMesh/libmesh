@@ -5,7 +5,7 @@ DEAL 003:003
 5	 # Num. Boundary Conds.
 65536	 # String Size (ignore) 
 1	 # Num. Element Blocks.
-15 	 # Element types in each block.
+16 	 # Element types in each block.
 1 	 # Num. of elements in each block.
 Id String
 Title String

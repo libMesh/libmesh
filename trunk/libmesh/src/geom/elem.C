@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.9 2003-02-13 22:56:11 benkirk Exp $
+// $Id: elem.C,v 1.10 2003-02-25 18:34:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -50,6 +50,8 @@
 #include "cell_inf_hex18.h"
 #include "cell_prism.h"
 #include "cell_prism6.h"
+#include "cell_prism15.h"
+#include "cell_prism18.h"
 #include "cell_inf_prism6.h"
 #include "cell_inf_prism12.h"
 #include "cell_pyramid.h"
@@ -123,10 +125,13 @@ Elem* Elem::build(const ElemType type)
       {
 	return new Prism6;
       }
+    case PRISM15:
+      {
+	return new Prism15;
+      }
     case PRISM18:
       {
-	error();
-	return new Prism6;
+	return new Prism18;
       }
     case PYRAMID5:
       {
