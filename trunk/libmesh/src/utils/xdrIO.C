@@ -1,4 +1,4 @@
-// "$Id: xdrIO.C,v 1.13 2003-10-02 03:39:25 jwpeterson Exp $\n"
+// "$Id: xdrIO.C,v 1.14 2003-11-15 14:58:19 benkirk Exp $\n"
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -18,11 +18,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// #include "libmesh_common.h" // Included by xdrIO.h
 
 // C++ includes
 #include <stdio.h>
-
 
 // Local includes
 #include "xdrIO.h"
@@ -32,7 +30,7 @@
 
 XdrIO::~XdrIO()
 {
-  fini();
+  this->fini();
 }
 
 
@@ -51,7 +49,7 @@ void XdrIO::fini()
   //std::cout << "Deleting the file handle pointer." << std::endl;
   delete mp_xdr_handle;
   
-  mp_xdr_handle = 0;
+  mp_xdr_handle = NULL;
   
 #endif
   
@@ -62,12 +60,12 @@ void XdrIO::fini()
       fclose(mp_fp);
     }
 
-  mp_fp = 0;
+  mp_fp = NULL;
 }
 
 
 
-const Originator XdrIO::get_originator()
+Originator XdrIO::get_originator()
 {
   const Originator orig("DEAL", 3, 3);
   return orig;
@@ -75,10 +73,12 @@ const Originator XdrIO::get_originator()
 
 
 
-void XdrIO::init(XdrIO::XdrIO_TYPE t, const char* fn, const char*, int)
+void XdrIO::init (XdrIO::XdrIO_TYPE t, const char* fn, const char*, int)
 {
   m_type=t;
-  if (mp_fp) fini(); // Close old file if necessary
+
+  // Close old file if necessary
+  if (mp_fp) this->fini(); 
 
   
   // Open file 
@@ -90,15 +90,24 @@ void XdrIO::init(XdrIO::XdrIO_TYPE t, const char* fn, const char*, int)
     case (XdrIO::ENCODE):
     case (XdrIO::DECODE):
       {
-	mp_fp = fopen(fn, (m_type == ENCODE) ? "w" : "r");
+	mp_fp = fopen (fn, (m_type == ENCODE) ? "w" : "r");
+
+	// Make sure the file is ready for use
 	if (!mp_fp)
 	  {
-	    fprintf(stderr,"%s:%d: XDR Error: Accessing file: %s Failed\n",
-		    __FILE__,__LINE__, fn);
-	    exit(1);
+	    std::cerr << "XDR Error: Accessing file: "
+		      << fn
+		      << " failed."
+		      << std::endl;
+	    error();
 	  }
+
+	// Create the XDR handle 
 	mp_xdr_handle = new XDR;
-	xdrstdio_create(mp_xdr_handle, mp_fp, ((m_type == ENCODE) ? XDR_ENCODE : XDR_DECODE));
+	xdrstdio_create(mp_xdr_handle,
+			mp_fp,
+			((m_type == ENCODE) ? XDR_ENCODE : XDR_DECODE));
+	
 	break;
       }
       
@@ -107,7 +116,16 @@ void XdrIO::init(XdrIO::XdrIO_TYPE t, const char* fn, const char*, int)
     case (XdrIO::R_ASCII):
       {
 	mp_in.open(fn, std::ios::in);
-	assert(mp_in.good());
+
+	// Make sure the file is ready for use
+	if (!mp_in.good())
+	  {
+	    std::cerr << "XDR Error: Accessing file: "
+		      << fn
+		      << " failed."
+		      << std::endl;
+	    error();
+	  }
 
 	break;
       }
@@ -115,7 +133,17 @@ void XdrIO::init(XdrIO::XdrIO_TYPE t, const char* fn, const char*, int)
     case (XdrIO::W_ASCII):
       {
 	mp_out.open(fn, std::ios::out);
-	assert(mp_out);
+
+	// Make sure the file is ready for use
+	if (!mp_out.good())
+	  {
+	    std::cerr << "XDR Error: Accessing file: "
+		      << fn
+		      << " failed."
+		      << std::endl;
+	    error();
+	  }
+
 	break;
       }
       
@@ -142,7 +170,7 @@ void XdrIO::init(XdrIO::XdrIO_TYPE t, const char* fn, const char*, int)
     case (XdrIO::ENCODE):
       {
 	char* p = &buf[0];
-	const Originator orig = get_originator();
+	const Originator orig = this->get_originator();
 	
 	sprintf(&buf[0], "%s %03d:%03d",
 		orig.get_name(),
@@ -157,6 +185,7 @@ void XdrIO::init(XdrIO::XdrIO_TYPE t, const char* fn, const char*, int)
       {
 	char* p = &buf[0];
 	xdr_string(mp_xdr_handle, &p, bufLen); // Reads binary signature
+	
 	break;
       }
       
@@ -164,12 +193,13 @@ void XdrIO::init(XdrIO::XdrIO_TYPE t, const char* fn, const char*, int)
       
     case (XdrIO::W_ASCII):
       {
-	const Originator orig = get_originator();
+	const Originator orig = this->get_originator();
 	sprintf(&buf[0], "%s %03d:%03d",
 		orig.get_name(),
 		orig.get_major(),
 		orig.get_minor());
 	mp_out << buf << std::endl;
+	
 	break;
       }
       
@@ -844,7 +874,7 @@ XdrHEAD::~XdrHEAD()
 
 char* XdrHEAD::cpyString(const char* src, int len)
 {
-  if(len == -1)
+  if (len == -1)
     len = strlen(src)+1;
   char* temp = new char[len];
   return (char *) memcpy(temp, (char *) src, (len)*sizeof(char));
