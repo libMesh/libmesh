@@ -1,4 +1,4 @@
-// $Id: mesh_common.h,v 1.17 2003-09-02 18:02:38 benkirk Exp $
+// $Id: mesh_common.h,v 1.18 2003-09-16 15:59:31 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -32,6 +32,11 @@
 #include <assert.h>
 #include <stdlib.h>
 
+// Include the MPI definition
+#ifdef HAVE_MPI
+# include <mpi.h>
+#endif
+
 // _basic_ library functionality
 #include "libmesh_base.h"
 
@@ -56,6 +61,10 @@
 #  undef COMPLEX
 #endif
 
+#ifdef MPI_REAL
+#  undef MPI_REAL
+#endif
+
 // Check to see if TOLERANCE has been defined by another
 // package, if so we might want to change the name...
 #ifdef TOLERANCE
@@ -69,9 +78,11 @@
 #ifndef SINGLE_PRECISION
   typedef double Real;
   typedef double REAL;
+# define MPI_REAL MPI_DOUBLE
 #else
   typedef float Real;
   typedef float REAL;
+# define MPI_REAL MPI_FLOAT
 #endif
 
 // Define the type to use for complex numbers
@@ -101,7 +112,11 @@ typedef std::complex<double> COMPLEX;
 #define here()     { std::cout << "[" << libMeshBase::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; }
 
 #undef error
-#define error()    { std::cerr << "[" << libMeshBase::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; abort(); }
+#ifdef HAVE_MPI
+#  define error()    { std::cerr << "[" << libMeshBase::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; abort(); }
+#else
+#  define error()    { std::cerr << "[" << libMeshBase::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; abort(); }
+#endif
 
 #undef untested
 #define untested() { std::cout << "*** Using untested code: " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl; }

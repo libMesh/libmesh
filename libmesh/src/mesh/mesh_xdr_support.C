@@ -1,4 +1,4 @@
-// $Id: mesh_xdr_support.C,v 1.15 2003-09-02 19:50:21 benkirk Exp $
+// $Id: mesh_xdr_support.C,v 1.16 2003-09-16 15:59:31 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -417,7 +417,7 @@ void XdrInterface::mesh_interface(const std::string& name,
     if ((access == XdrIO::DECODE) || (access == XdrIO::R_ASCII))
       {
 	int orig_type = m.get_orig_flag();
-	
+
 	if (orig_type == 0) // DEAL-style (0) hybrid mesh possible
 	  {
 	    unsigned int lastConnIndex = 0;
@@ -427,7 +427,8 @@ void XdrInterface::mesh_interface(const std::string& name,
 	      {             
 		for (unsigned int e=lastFaceIndex; e<lastFaceIndex+neeb[idx]; e++)  
 		  {       
-		    elements[e] = Elem::build(etypes[idx]);    
+		    elements[e] = Elem::build(etypes[idx]);
+		    elements[e]->set_id(e); 
                    
 		    /*             
 		     * Add elements with the same id as in libMesh.  
@@ -465,6 +466,8 @@ void XdrInterface::mesh_interface(const std::string& name,
 	    for (int ielm=0; ielm < numElem; ++ielm)
 	      {
 		elements[ielm] = new Hex27;
+		elements[ielm]->set_id(ielm);
+		
 		for (int innd=0; innd < 27; ++innd)
 		  elements[ielm]->set_node(innd) = nodes[conn[innd+2+(27+2)*ielm]];	
 	      }

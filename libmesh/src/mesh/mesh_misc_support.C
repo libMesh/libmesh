@@ -1,4 +1,4 @@
-// $Id: mesh_misc_support.C,v 1.11 2003-09-02 18:02:43 benkirk Exp $
+// $Id: mesh_misc_support.C,v 1.12 2003-09-16 15:59:31 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -97,6 +97,7 @@ void MeshBase::read_shanee (std::istream &in)
     for (unsigned int i=0; i<nElem; i++)
       {
        _elements[i] = new Quad4;
+       _elements[i]->set_id (i);
 
 	for (unsigned int n=0; n<elem(i)->n_nodes(); n++)
 	  {
@@ -214,6 +215,8 @@ void MeshBase::read_matlab(std::istream& in)
     for (unsigned int i=0; i<nElem; i++)
       {
 	_elements[i] = new Tri3; // Always build a triangle
+	_elements[i]->set_id (i);
+	
 	for (unsigned int n=0; n<3; n++)  // Always read three 3 nodes
 	  {
 	    in >> node;
@@ -295,6 +298,7 @@ void MeshBase::read_off(std::istream& in)
       assert (in.good());
       
       _elements[e] = new Tri3;
+      _elements[e]->set_id (e);
 
       // The number of nodes in the object
       in >> dummy;

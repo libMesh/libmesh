@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.C,v 1.29 2003-09-16 13:30:35 ddreyer Exp $
+// $Id: mesh_unv_support.C,v 1.30 2003-09-16 15:59:31 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -817,6 +817,7 @@ void UnvMeshInterface::element_in (std::istream& in_file)
 	case 41: // Plane Stress Linear Triangle
 	case 91: // Thin Shell   Linear Triangle
 	  _elements[i]=new Tri3;  // add new element
+	  _elements[i]->set_id (i);
 	  // _elements[i]= Elem::build(TRI3);
 	  assign_elem_nodes[1]=0;
 	  assign_elem_nodes[2]=2;
@@ -827,6 +828,7 @@ void UnvMeshInterface::element_in (std::istream& in_file)
 	case 92: // Thin Shell   Quadratic Triangle
 	  // _elements[i]= Elem::build(TRI6);
 	  _elements[i]=new Tri6;  // add new element
+	  _elements[i]->set_id (i);
 	  assign_elem_nodes[1]=0;
 	  assign_elem_nodes[2]=5;
 	  assign_elem_nodes[3]=2;
@@ -847,6 +849,7 @@ void UnvMeshInterface::element_in (std::istream& in_file)
 	case 94: // Thin Shell   Linear Quadrilateral
 	  // _elements[i]= Elem::build(QUAD4);
 	  _elements[i]=new Quad4; // add new element
+	  _elements[i]->set_id (i);
 	  assign_elem_nodes[1]=0;
 	  assign_elem_nodes[2]=3;
 	  assign_elem_nodes[3]=2;
@@ -857,6 +860,7 @@ void UnvMeshInterface::element_in (std::istream& in_file)
 	case 95: // Thin Shell   Quadratic Quadrilateral
 	  // _elements[i]= Elem::build(QUAD8);
 	  _elements[i]=new Quad8; // add new element
+	  _elements[i]->set_id (i);
 	  assign_elem_nodes[1]=0;
 	  assign_elem_nodes[2]=7;
 	  assign_elem_nodes[3]=3;
@@ -878,6 +882,7 @@ void UnvMeshInterface::element_in (std::istream& in_file)
 	case 111: // Solid Linear Tetrahedron
 	  // _elements[i]= Elem::build(TET4);
 	  _elements[i]=new Tet4;  // add new element
+	  _elements[i]->set_id (i);
 	  assign_elem_nodes[1]=0;
 	  assign_elem_nodes[2]=1;
 	  assign_elem_nodes[3]=2;
@@ -888,6 +893,7 @@ void UnvMeshInterface::element_in (std::istream& in_file)
 	case 112: // Solid Linear Prism
 	  // _elements[i]= Elem::build(PRISM6);
 	  _elements[i]=new Prism6;  // add new element
+	  _elements[i]->set_id (i);
 	  assign_elem_nodes[1]=0;
 	  assign_elem_nodes[2]=1;
 	  assign_elem_nodes[3]=2;
@@ -899,6 +905,7 @@ void UnvMeshInterface::element_in (std::istream& in_file)
 	case 115: // Solid Linear Brick
 	  // _elements[i]= Elem::build(HEX8);
 	  _elements[i]=new Hex8;  // add new element
+	  _elements[i]->set_id (i);
 	  assign_elem_nodes[1]=0;
 	  assign_elem_nodes[2]=4;
 	  assign_elem_nodes[3]=5;
@@ -913,6 +920,7 @@ void UnvMeshInterface::element_in (std::istream& in_file)
 	case 116: // Solid Quadratic Brick
 	  // _elements[i]= Elem::build(HEX20);
 	  _elements[i]=new Hex20; // add new element
+	  _elements[i]->set_id (i);
 	  assign_elem_nodes[1]=0;
 	  assign_elem_nodes[2]=12;
 	  assign_elem_nodes[3]=4;
@@ -950,6 +958,7 @@ void UnvMeshInterface::element_in (std::istream& in_file)
 	case 118: // Solid Quadratic Tetrahedron
 	  // _elements[i]= Elem::build(TET10);
 	  _elements[i]=new Tet10; // add new element
+	  _elements[i]->set_id (i);
 	  assign_elem_nodes[1]=0;
 	  assign_elem_nodes[2]=4;
 	  assign_elem_nodes[3]=1;

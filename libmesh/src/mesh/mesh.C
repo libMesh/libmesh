@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.24 2003-09-02 18:02:42 benkirk Exp $
+// $Id: mesh.C,v 1.25 2003-09-16 15:59:31 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -24,6 +24,7 @@
 // Local includes
 #include "mesh.h"
 #include "libmesh.h"
+#include "mesh_communication.h"
 #include "mesh_logging.h"
 
 
@@ -74,53 +75,64 @@ void Mesh::read (const std::string& name,
   START_LOG("read()", "Mesh");
 
   
-  // Read the file based on extension
+  // Read the file based on extension.  Only processor 0
+  // needs to read the mesh.  It will then broadcast it and
+  // the other processors will pick it up
+  if (libMesh::processor_id() == 0)
+    {
+      if (name.rfind(".mat") < name.size())
+	this->read_matlab (name);
+      
+      else if (name.rfind(".ucd") < name.size())
+	this->read_ucd (name);
+      
+      else if (name.rfind(".exd") < name.size())
+	this->read_exd (name);
+      
+      else if (name.rfind(".xda") < name.size())
+	this->read_xdr (name);
+      
+      else if ((name.rfind(".off")  < name.size()) ||
+	       (name.rfind(".ogl")  < name.size()) ||
+	       (name.rfind(".oogl") < name.size()))
+	this->read_off(name);
+      
+      else if ((name.rfind(".xdr")  < name.size()) ||
+	       (name.rfind(".0000") < name.size()))
+	this->read_xdr_binary (name);
+      
+      else if (name.rfind(".mesh") < name.size())
+	this->read_shanee (name);
+      
+      else if (name.rfind(".unv") < name.size())
+	this->read_unv (name);
+      
+      else
+	{
+	  std::cerr << " ERROR: Unrecognized file extension: " << name
+		    << "\n   I understand the following:\n\n"
+		    << "     *.mat  -- Matlab triangular ASCII file\n"
+		    << "     *.ucd  -- AVS's ASCII UCD format\n"
+		    << "     *.mesh -- Ben's \"shanee\" format\n"
+		    << "     *.off  -- OOGL OFF surface format\n"
+		    << "     *.exd  -- Sandia's ExodusII format\n"
+		    << "     *.xda  -- Internal ASCII format\n"
+		    << "     *.xdr  -- Internal binary format,\n"
+		    << "               compatible with XdrMGF\n"
+		    << "     *.unv  -- I-deas Universal format\n"
+		    << std::endl;
+	  error();	  
+	}    
+    }
+
+  // Send the mesh & bcs (which are now only on processor 0) to the other
+  // processors
   {
-    if (name.rfind(".mat") < name.size())
-      this->read_matlab (name);
-    
-    else if (name.rfind(".ucd") < name.size())
-      this->read_ucd (name);
-
-    else if (name.rfind(".exd") < name.size())
-      this->read_exd (name);
-
-    else if (name.rfind(".xda") < name.size())
-      this->read_xdr (name);
-
-    else if ((name.rfind(".off")  < name.size()) ||
-	     (name.rfind(".ogl")  < name.size()) ||
-	     (name.rfind(".oogl") < name.size()))
-      this->read_off(name);
-
-    else if ((name.rfind(".xdr")  < name.size()) ||
-	     (name.rfind(".0000") < name.size()))
-      this->read_xdr_binary (name);
-
-    else if (name.rfind(".mesh") < name.size())
-      this->read_shanee (name);
-
-    else if (name.rfind(".unv") < name.size())
-      this->read_unv (name);
-
-    else
-      {
-	std::cerr << " ERROR: Unrecognized file extension: " << name
-		  << "\n   I understand the following:\n\n"
-		  << "     *.mat  -- Matlab triangular ASCII file\n"
-		  << "     *.ucd  -- AVS's ASCII UCD format\n"
-		  << "     *.mesh -- Ben's \"shanee\" format\n"
-		  << "     *.off  -- OOGL OFF surface format\n"
-		  << "     *.exd  -- Sandia's ExodusII format\n"
-		  << "     *.xda  -- Internal ASCII format\n"
-		  << "     *.xdr  -- Internal binary format,\n"
-		  << "               compatible with XdrMGF\n"
-		  << "     *.unv  -- I-deas Universal format\n"
-		  << std::endl;
-	error();
-
-      }    
+    MeshCommunication mesh_communication;
+  
+    mesh_communication.distribute (*this);
   }
+  
   STOP_LOG("read()", "Mesh");
 
 
