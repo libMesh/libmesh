@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.23 2004-05-14 22:59:34 spetersen Exp $
+// $Id: mesh_base.h,v 1.24 2004-06-04 17:29:26 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -61,7 +61,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.23 $
+ * \version $Revision: 1.24 $
  */
 
 
@@ -252,6 +252,14 @@ public:
    * Add elem \p e to the end of the element array.
    */
   Elem* add_elem (Elem* e);
+
+  /**
+   * Removes element \p e from the mesh. Note that calling this
+   * method may produce isolated nodes, i.e. nodes not connected
+   * to any element.
+   */
+  void delete_elem (Elem* e);
+    
 
 #ifdef ENABLE_INFINITE_ELEMENTS
 
@@ -862,6 +870,22 @@ Node* & MeshBase::node_ptr (const unsigned int i)
   assert (i < this->n_nodes());
 
   return _nodes[i];
+}
+
+
+inline
+void MeshBase::delete_elem(Elem* e)
+{
+  assert (e != NULL);
+
+  std::vector<Elem*>::iterator pos = find (_elements.begin(),
+					   _elements.end(),
+					   e);
+
+  delete e;
+  _elements.erase(pos);
+
+  return;
 }
 
 
