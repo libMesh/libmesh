@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.1 2003-01-30 19:15:23 benkirk Exp $
+# $Id: Makefile,v 1.2 2003-01-30 21:56:15 benkirk Exp $
 
 
 # The location of the mesh library
@@ -42,7 +42,7 @@ endif
 ###############################################################################
 # Target:
 #
-target 	   := ex1
+target 	   := ex2
 
 
 all:: $(target)
