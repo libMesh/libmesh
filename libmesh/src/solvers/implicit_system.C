@@ -1,4 +1,4 @@
-// $Id: implicit_system.C,v 1.5 2004-12-07 22:47:46 benkirk Exp $
+// $Id: implicit_system.C,v 1.6 2005-01-03 00:06:49 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,7 @@
 #include "implicit_system.h"
 #include "equation_systems.h"
 #include "sparse_matrix.h"
-#include "linear_solver_interface.h"
+#include "linear_solver.h"
 #include "numeric_vector.h"
 #include "utility.h"
 #include "libmesh_logging.h"
@@ -41,12 +41,12 @@ ImplicitSystem::ImplicitSystem (EquationSystems& es,
 				const std::string& name,
 				const unsigned int number) :
   
-  ExplicitSystem          (es, name, number),
-  matrix                  (NULL),
-  linear_solver_interface (LinearSolverInterface<Number>::build()),
-  _can_add_matrices       (true),
-  _n_linear_iterations    (0),
-  _final_linear_residual         (1.e20)
+  ExplicitSystem         (es, name, number),
+  matrix                 (NULL),
+  linear_solver          (LinearSolver<Number>::build()),
+  _can_add_matrices      (true),
+  _n_linear_iterations   (0),
+  _final_linear_residual (1.e20)
 {
 }
 
@@ -149,7 +149,7 @@ void ImplicitSystem::reinit ()
     pos->second->clear();
 
   // Clear the linear solver interface
-  linear_solver_interface->clear();
+  linear_solver->clear();
 
   // Re-initialize the matrices
   this->init_matrices ();
@@ -194,9 +194,9 @@ void ImplicitSystem::solve ()
   const std::pair<unsigned int, Real> rval =
     (this->have_matrix("Preconditioner")) ?
     // 1.) User-supplied preconditioner
-    linear_solver_interface->solve (*matrix, this->get_matrix("Preconditioner"), *solution, *rhs, tol, maxits) :
+    linear_solver->solve (*matrix, this->get_matrix("Preconditioner"), *solution, *rhs, tol, maxits) :
     // 2.) Use system matrix for the preconditioner
-    linear_solver_interface->solve (*matrix, *solution, *rhs, tol, maxits);
+    linear_solver->solve (*matrix, *solution, *rhs, tol, maxits);
 
   // Store the number of linear iterations required to
   // solve and the final residual.

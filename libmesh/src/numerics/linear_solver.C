@@ -1,4 +1,4 @@
-// $Id: linear_solver_interface.C,v 1.15 2004-05-12 17:26:22 jwpeterson Exp $
+// $Id: linear_solver.C,v 1.1 2005-01-03 00:06:49 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -22,17 +22,17 @@
 // C++ includes
 
 // Local Includes
-#include "linear_solver_interface.h"
-#include "laspack_interface.h"
-#include "petsc_interface.h"
+#include "linear_solver.h"
+#include "laspack_linear_solver.h"
+#include "petsc_linear_solver.h"
 #include "auto_ptr.h"
 
 
 //------------------------------------------------------------------
-// LinearSolverInterface members
+// LinearSolver members
 template <typename T>
-AutoPtr<LinearSolverInterface<T> >
-LinearSolverInterface<T>::build(const SolverPackage solver_package)
+AutoPtr<LinearSolver<T> >
+LinearSolver<T>::build(const SolverPackage solver_package)
 {
   // Build the appropriate solver
   switch (solver_package)
@@ -42,7 +42,7 @@ LinearSolverInterface<T>::build(const SolverPackage solver_package)
 #ifdef HAVE_LASPACK
     case LASPACK_SOLVERS:
       {
-	AutoPtr<LinearSolverInterface<T> > ap(new LaspackInterface<T>);
+	AutoPtr<LinearSolver<T> > ap(new LaspackLinearSolver<T>);
 	return ap;
       }
 #endif
@@ -51,7 +51,7 @@ LinearSolverInterface<T>::build(const SolverPackage solver_package)
 #ifdef HAVE_PETSC
     case PETSC_SOLVERS:
       {
-	AutoPtr<LinearSolverInterface<T> > ap(new PetscInterface<T>);
+	AutoPtr<LinearSolver<T> > ap(new PetscLinearSolver<T>);
 	return ap;
       }
 #endif
@@ -63,7 +63,7 @@ LinearSolverInterface<T>::build(const SolverPackage solver_package)
       error();
     }
     
-  AutoPtr<LinearSolverInterface<T> > ap(NULL);
+  AutoPtr<LinearSolver<T> > ap(NULL);
   return ap;    
 }
 
@@ -71,7 +71,7 @@ LinearSolverInterface<T>::build(const SolverPackage solver_package)
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class LinearSolverInterface<Number>;
+template class LinearSolver<Number>;
 
 
 

@@ -1,4 +1,4 @@
-// $Id: petsc_interface.C,v 1.29 2004-10-19 16:58:08 jwpeterson Exp $
+// $Id: petsc_linear_solver.C,v 1.1 2005-01-03 00:06:49 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -27,13 +27,13 @@
 // C++ includes
 
 // Local Includes
-#include "petsc_interface.h"
+#include "petsc_linear_solver.h"
 
 
 
 /*----------------------- functions ----------------------------------*/
 template <typename T>
-void PetscInterface<T>::clear ()
+void PetscLinearSolver<T>::clear ()
 {
   if (this->initialized())
     {
@@ -67,7 +67,7 @@ void PetscInterface<T>::clear ()
 
 
 template <typename T>
-void PetscInterface<T>::init ()
+void PetscLinearSolver<T>::init ()
 {
   int ierr=0;
   
@@ -161,12 +161,12 @@ void PetscInterface<T>::init ()
 
 template <typename T>
 std::pair<unsigned int, Real> 
-PetscInterface<T>::solve (SparseMatrix<T>&  matrix_in,
-			  SparseMatrix<T>&  precond_in,
-			  NumericVector<T>& solution_in,
-			  NumericVector<T>& rhs_in,
-			  const double tol,
-			  const unsigned int m_its)
+PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
+			     SparseMatrix<T>&  precond_in,
+			     NumericVector<T>& solution_in,
+			     NumericVector<T>& rhs_in,
+			     const double tol,
+			     const unsigned int m_its)
 {
   this->init ();
   
@@ -204,7 +204,7 @@ PetscInterface<T>::solve (SparseMatrix<T>&  matrix_in,
 #if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 1)
       
   // Set operators. The input matrix works as the preconditioning matrix
-  ierr = SLESSetOperators(_sles, matrix->mat, precond->mat,
+  ierr = SLESSetOperators(_sles, matrix->mat(), precond->mat(),
 			  SAME_NONZERO_PATTERN);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
@@ -217,7 +217,7 @@ PetscInterface<T>::solve (SparseMatrix<T>&  matrix_in,
 
 
   // Solve the linear system
-  ierr = SLESSolve (_sles, rhs->vec, solution->vec, &its);
+  ierr = SLESSolve (_sles, rhs->vec(), solution->vec(), &its);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
 
@@ -229,7 +229,7 @@ PetscInterface<T>::solve (SparseMatrix<T>&  matrix_in,
 #elif (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)
       
   // Set operators. The input matrix works as the preconditioning matrix
-  ierr = KSPSetOperators(_ksp, matrix->mat, precond->mat,
+  ierr = KSPSetOperators(_ksp, matrix->mat(), precond->mat(),
 			 SAME_NONZERO_PATTERN);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
@@ -273,7 +273,7 @@ PetscInterface<T>::solve (SparseMatrix<T>&  matrix_in,
 #else
       
   // Set operators. The input matrix works as the preconditioning matrix
-  ierr = KSPSetOperators(_ksp, matrix->mat, precond->mat,
+  ierr = KSPSetOperators(_ksp, matrix->mat(), precond->mat(),
 			 SAME_NONZERO_PATTERN);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
@@ -284,7 +284,7 @@ PetscInterface<T>::solve (SparseMatrix<T>&  matrix_in,
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
   // Solve the linear system
-  ierr = KSPSolve (_ksp, rhs->vec, solution->vec);
+  ierr = KSPSolve (_ksp, rhs->vec(), solution->vec());
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 	 
   // Get the number of iterations required for convergence
@@ -304,7 +304,7 @@ PetscInterface<T>::solve (SparseMatrix<T>&  matrix_in,
 
 
 template <typename T>
-void PetscInterface<T>::get_residual_history(std::vector<double>& hist)
+void PetscLinearSolver<T>::get_residual_history(std::vector<double>& hist)
 {
   int ierr = 0;
   int its  = 0;
@@ -337,7 +337,7 @@ void PetscInterface<T>::get_residual_history(std::vector<double>& hist)
 
 
 template <typename T>
-Real PetscInterface<T>::get_initial_residual()
+Real PetscLinearSolver<T>::get_initial_residual()
 {
   int ierr = 0;
   int its  = 0;
@@ -367,7 +367,7 @@ Real PetscInterface<T>::get_initial_residual()
 
 
 template <typename T>
-void PetscInterface<T>::set_petsc_solver_type()
+void PetscLinearSolver<T>::set_petsc_solver_type()
 {
   int ierr = 0;
   
@@ -425,7 +425,7 @@ void PetscInterface<T>::set_petsc_solver_type()
 
 
 template <typename T>
-void PetscInterface<T>::set_petsc_preconditioner_type()
+void PetscLinearSolver<T>::set_petsc_preconditioner_type()
 {
   int ierr = 0;
  
@@ -481,7 +481,7 @@ void PetscInterface<T>::set_petsc_preconditioner_type()
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class PetscInterface<Number>;
+template class PetscLinearSolver<Number>;
  
 
 

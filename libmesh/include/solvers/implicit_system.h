@@ -1,4 +1,4 @@
-// $Id: implicit_system.h,v 1.5 2004-10-12 19:46:58 benkirk Exp $
+// $Id: implicit_system.h,v 1.6 2005-01-03 00:06:48 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -146,12 +146,12 @@ public:
   SparseMatrix<Number> * matrix;
 
   /**
-   * The \p LinearSolverInterface defines the interface used to
+   * The \p LinearSolver defines the interface used to
    * solve the implicit system.  This class handles all the
    * details of interfacing with various linear algebra packages
    * like PETSc or LASPACK.
    */
-  AutoPtr<LinearSolverInterface<Number> > linear_solver_interface;
+  AutoPtr<LinearSolver<Number> > linear_solver;
   
   /**
    * Returns  the number of iterations 

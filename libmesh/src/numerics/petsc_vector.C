@@ -1,4 +1,4 @@
-// $Id: petsc_vector.C,v 1.33 2004-11-29 18:37:10 benkirk Exp $
+// $Id: petsc_vector.C,v 1.34 2005-01-03 00:06:49 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -55,7 +55,7 @@ Real PetscVector<T>::l1_norm () const
   int ierr=0;
   double value=0.;
   
-  ierr = VecNorm (vec, NORM_1, &value);
+  ierr = VecNorm (_vec, NORM_1, &value);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
   
   return static_cast<Real>(value);
@@ -71,7 +71,7 @@ Real PetscVector<T>::l2_norm () const
   int ierr=0;
   double value=0.;
   
-  ierr = VecNorm (vec, NORM_2, &value);
+  ierr = VecNorm (_vec, NORM_2, &value);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
   
   return static_cast<Real>(value);
@@ -88,7 +88,7 @@ Real PetscVector<T>::linfty_norm () const
   int ierr=0;
   double value=0.;
   
-  ierr = VecNorm (vec, NORM_INFINITY, &value);
+  ierr = VecNorm (_vec, NORM_INFINITY, &value);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
   
   return static_cast<Real>(value);
@@ -132,7 +132,7 @@ void PetscVector<T>::set (const unsigned int i, const T value)
   int i_val = static_cast<int>(i);
   PetscScalar petsc_value = static_cast<PetscScalar>(value);
 
-  ierr = VecSetValues (vec, 1, &i_val, &petsc_value, INSERT_VALUES);
+  ierr = VecSetValues (_vec, 1, &i_val, &petsc_value, INSERT_VALUES);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 }
 
@@ -147,7 +147,7 @@ void PetscVector<T>::add (const unsigned int i, const T value)
   int i_val = static_cast<int>(i);
   PetscScalar petsc_value = static_cast<PetscScalar>(value);
 
-  ierr = VecSetValues (vec, 1, &i_val, &petsc_value, ADD_VALUES);
+  ierr = VecSetValues (_vec, 1, &i_val, &petsc_value, ADD_VALUES);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 }
 
@@ -191,7 +191,9 @@ void PetscVector<T>::add_vector (const NumericVector<T>& V_in,
 
   A->close();
 
-  ierr = MatMultAdd(A->mat, V->vec, vec, vec);
+  // The const_cast<> is not elegant, but it is required since PETSc
+  // is not const-correct.  
+  ierr = MatMultAdd(const_cast<PetscMatrix<T>*>(A)->mat(), V->_vec, _vec, _vec);
          CHKERRABORT(PETSC_COMM_WORLD,ierr); 
 }
 
@@ -220,17 +222,17 @@ void PetscVector<T>::add (const T v_in)
   
   for (int i=0; i<n; i++)
     {
-      ierr = VecGetArray (vec, &values);
+      ierr = VecGetArray (_vec, &values);
   	     CHKERRABORT(PETSC_COMM_WORLD,ierr);
       
       int ig = fli + i;      
       
       PetscScalar value = (values[ig] + v);
       
-      ierr = VecRestoreArray (vec, &values);
+      ierr = VecRestoreArray (_vec, &values);
   	     CHKERRABORT(PETSC_COMM_WORLD,ierr);
       
-      ierr = VecSetValues (vec, 1, &ig, &value, INSERT_VALUES);
+      ierr = VecSetValues (_vec, 1, &ig, &value, INSERT_VALUES);
  	     CHKERRABORT(PETSC_COMM_WORLD,ierr); 
     }
 }
@@ -256,7 +258,7 @@ void PetscVector<T>::add (const T a_in, const NumericVector<T>& v_in)
   assert (v != NULL);
   assert(this->size() == v->size());
   
-  ierr = VecAXPY(&a, v->vec, vec);
+  ierr = VecAXPY(&a, v->_vec, _vec);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 }
 
@@ -304,7 +306,7 @@ void PetscVector<T>::scale (const T factor_in)
   int ierr = 0;
   PetscScalar factor = static_cast<PetscScalar>(factor_in);
   
-  ierr = VecScale(&factor, vec);
+  ierr = VecScale(&factor, _vec);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 }
 
@@ -319,7 +321,7 @@ PetscVector<T>::operator = (const T s_in)
 
   if (this->size() != 0)
     {
-      ierr = VecSet(&s, vec);
+      ierr = VecSet(&s, _vec);
              CHKERRABORT(PETSC_COMM_WORLD,ierr);
     }
   
@@ -357,7 +359,7 @@ PetscVector<T>::operator = (const PetscVector<T>& v)
 	{
 	  int ierr = 0;
 
-	  ierr = VecCopy (v.vec, this->vec);
+	  ierr = VecCopy (v._vec, this->_vec);
        	         CHKERRABORT(PETSC_COMM_WORLD,ierr);
 	}
     }
@@ -382,13 +384,13 @@ PetscVector<T>::operator = (const std::vector<T>& v)
    */
   if (this->size() == v.size())
     {
-      ierr = VecGetArray (vec, &values);
+      ierr = VecGetArray (_vec, &values);
  	     CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
       for (unsigned int i=0; i<nl; i++)
 	values[i] =  static_cast<PetscScalar>(v[i+ioff]);
       
-      ierr = VecRestoreArray (vec, &values);
+      ierr = VecRestoreArray (_vec, &values);
 	     CHKERRABORT(PETSC_COMM_WORLD,ierr);
     }
 
@@ -400,13 +402,13 @@ PetscVector<T>::operator = (const std::vector<T>& v)
     {
       assert (this->local_size() == v.size());
 
-      ierr = VecGetArray (vec, &values);
+      ierr = VecGetArray (_vec, &values);
 	     CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
       for (unsigned int i=0; i<nl; i++)
 	values[i] = static_cast<PetscScalar>(v[i]);
       
-      ierr = VecRestoreArray (vec, &values);
+      ierr = VecRestoreArray (_vec, &values);
 	     CHKERRABORT(PETSC_COMM_WORLD,ierr);
     }
 
@@ -436,17 +438,17 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in) const
   ierr = ISCreateGeneral(PETSC_COMM_WORLD, n, &idx[0], &is);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
-  ierr = VecScatterCreate(vec,          is,
-			  v_local->vec, is,
+  ierr = VecScatterCreate(_vec,          is,
+			  v_local->_vec, is,
 			  &scatter);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
   // Perform the scatter
-  ierr = VecScatterBegin(vec, v_local->vec, INSERT_VALUES,
+  ierr = VecScatterBegin(_vec, v_local->_vec, INSERT_VALUES,
 			 SCATTER_FORWARD, scatter);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
   
-  ierr = VecScatterEnd  (vec, v_local->vec, INSERT_VALUES,
+  ierr = VecScatterEnd  (_vec, v_local->_vec, INSERT_VALUES,
 			 SCATTER_FORWARD, scatter);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
@@ -485,18 +487,18 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in,
   ierr = ISCreateGeneral(PETSC_COMM_WORLD, n_sl, &idx[0], &is);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
-  ierr = VecScatterCreate(vec,          is,
-			  v_local->vec, is,
+  ierr = VecScatterCreate(_vec,          is,
+			  v_local->_vec, is,
 			  &scatter);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
   
   // Perform the scatter
-  ierr = VecScatterBegin(vec, v_local->vec, INSERT_VALUES,
+  ierr = VecScatterBegin(_vec, v_local->_vec, INSERT_VALUES,
 			 SCATTER_FORWARD, scatter);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
   
-  ierr = VecScatterEnd  (vec, v_local->vec, INSERT_VALUES,
+  ierr = VecScatterEnd  (_vec, v_local->_vec, INSERT_VALUES,
 			 SCATTER_FORWARD, scatter);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
@@ -550,17 +552,17 @@ void PetscVector<T>::localize (const unsigned int first_local_idx,
     ierr = ISCreateGeneral(PETSC_COMM_WORLD, local_size, &idx[0], &is); 
            CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
-    ierr = VecScatterCreate(vec,              is,
-			    parallel_vec.vec, is,
+    ierr = VecScatterCreate(_vec,              is,
+			    parallel_vec._vec, is,
 			    &scatter);
            CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
     // Perform the scatter
-    ierr = VecScatterBegin(vec, parallel_vec.vec, INSERT_VALUES,
+    ierr = VecScatterBegin(_vec, parallel_vec._vec, INSERT_VALUES,
 			   SCATTER_FORWARD, scatter);
            CHKERRABORT(PETSC_COMM_WORLD,ierr);
   
-    ierr = VecScatterEnd  (vec, parallel_vec.vec, INSERT_VALUES,
+    ierr = VecScatterEnd  (_vec, parallel_vec._vec, INSERT_VALUES,
 			   SCATTER_FORWARD, scatter);
            CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
@@ -601,13 +603,13 @@ void PetscVector<Real>::localize (std::vector<Real>& v_local) const
   // only one processor
   if (n == nl)
     {      
-      ierr = VecGetArray (vec, &values);
+      ierr = VecGetArray (_vec, &values);
 	     CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
       for (int i=0; i<n; i++)
 	v_local[i] = static_cast<Real>(values[i]);
 
-      ierr = VecRestoreArray (vec, &values);
+      ierr = VecRestoreArray (_vec, &values);
 	     CHKERRABORT(PETSC_COMM_WORLD,ierr);
     }
 
@@ -618,13 +620,13 @@ void PetscVector<Real>::localize (std::vector<Real>& v_local) const
       std::vector<Real> local_values(n, 0.);
 
       {
-	ierr = VecGetArray (vec, &values);
+	ierr = VecGetArray (_vec, &values);
 	       CHKERRABORT(PETSC_COMM_WORLD,ierr);
 	
 	for (int i=0; i<nl; i++)
 	  local_values[i+ioff] = static_cast<Real>(values[i]);
 	
-	ierr = VecRestoreArray (vec, &values);
+	ierr = VecRestoreArray (_vec, &values);
 	       CHKERRABORT(PETSC_COMM_WORLD,ierr);
       }
 
@@ -657,13 +659,13 @@ void PetscVector<Complex>::localize (std::vector<Complex>& v_local) const
   // only one processor
   if (n == nl)
     {      
-      ierr = VecGetArray (vec, &values);
+      ierr = VecGetArray (_vec, &values);
 	     CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
       for (int i=0; i<n; i++)
 	v_local[i] = static_cast<Complex>(values[i]);
 
-      ierr = VecRestoreArray (vec, &values);
+      ierr = VecRestoreArray (_vec, &values);
 	     CHKERRABORT(PETSC_COMM_WORLD,ierr);
     }
 
@@ -679,7 +681,7 @@ void PetscVector<Complex>::localize (std::vector<Complex>& v_local) const
       std::vector<Real> imag_local_values(n, 0.);
 
       {
-	ierr = VecGetArray (vec, &values);
+	ierr = VecGetArray (_vec, &values);
 	       CHKERRABORT(PETSC_COMM_WORLD,ierr);
 	
 	// provide my local share to the real and imag buffers
@@ -689,7 +691,7 @@ void PetscVector<Complex>::localize (std::vector<Complex>& v_local) const
 	    imag_local_values[i+ioff] = static_cast<Complex>(values[i]).imag();
 	  }
 
-	ierr = VecRestoreArray (vec, &values);
+	ierr = VecRestoreArray (_vec, &values);
 	       CHKERRABORT(PETSC_COMM_WORLD,ierr);
       }
    
@@ -738,13 +740,13 @@ void PetscVector<Real>::localize_to_one (std::vector<Real>& v_local,
   // only one processor
   if (n == nl)
     {      
-      ierr = VecGetArray (vec, &values);
+      ierr = VecGetArray (_vec, &values);
 	     CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
       for (int i=0; i<n; i++)
 	v_local[i] = static_cast<Real>(values[i]);
 
-      ierr = VecRestoreArray (vec, &values);
+      ierr = VecRestoreArray (_vec, &values);
 	     CHKERRABORT(PETSC_COMM_WORLD,ierr);
     }
 
@@ -755,13 +757,13 @@ void PetscVector<Real>::localize_to_one (std::vector<Real>& v_local,
       std::vector<Real> local_values (n, 0.);
       
       {
-	ierr = VecGetArray (vec, &values);
+	ierr = VecGetArray (_vec, &values);
 	       CHKERRABORT(PETSC_COMM_WORLD,ierr);
 	
 	for (int i=0; i<nl; i++)
 	  local_values[i+ioff] = static_cast<Real>(values[i]);
 	
-	ierr = VecRestoreArray (vec, &values);
+	ierr = VecRestoreArray (_vec, &values);
 	       CHKERRABORT(PETSC_COMM_WORLD,ierr);
       }
       
@@ -796,13 +798,13 @@ void PetscVector<Complex>::localize_to_one (std::vector<Complex>& v_local,
   // only one processor
   if (n == nl)
     {      
-      ierr = VecGetArray (vec, &values);
+      ierr = VecGetArray (_vec, &values);
 	     CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
       for (int i=0; i<n; i++)
 	v_local[i] = static_cast<Complex>(values[i]);
 
-      ierr = VecRestoreArray (vec, &values);
+      ierr = VecRestoreArray (_vec, &values);
 	     CHKERRABORT(PETSC_COMM_WORLD,ierr);
     }
 
@@ -818,7 +820,7 @@ void PetscVector<Complex>::localize_to_one (std::vector<Complex>& v_local,
       std::vector<Real> imag_local_values(n, 0.);
 
       {
-	ierr = VecGetArray (vec, &values);
+	ierr = VecGetArray (_vec, &values);
 	       CHKERRABORT(PETSC_COMM_WORLD,ierr);
 	
 	// provide my local share to the real and imag buffers
@@ -828,7 +830,7 @@ void PetscVector<Complex>::localize_to_one (std::vector<Complex>& v_local,
 	    imag_local_values[i+ioff] = static_cast<Complex>(values[i]).imag();
 	  }
 
-	ierr = VecRestoreArray (vec, &values);
+	ierr = VecRestoreArray (_vec, &values);
 	       CHKERRABORT(PETSC_COMM_WORLD,ierr);
       }
    
@@ -888,7 +890,7 @@ void PetscVector<T>::print_matlab (const std::string name) const
 				   PETSC_VIEWER_ASCII_MATLAB);
              CHKERRABORT(PETSC_COMM_WORLD,ierr);
   
-      ierr = VecView (vec, petsc_viewer);
+      ierr = VecView (_vec, petsc_viewer);
              CHKERRABORT(PETSC_COMM_WORLD,ierr);
     }
 
@@ -901,7 +903,7 @@ void PetscVector<T>::print_matlab (const std::string name) const
 				   PETSC_VIEWER_ASCII_MATLAB);
              CHKERRABORT(PETSC_COMM_WORLD,ierr);
   
-      ierr = VecView (vec, PETSC_VIEWER_STDOUT_WORLD);
+      ierr = VecView (_vec, PETSC_VIEWER_STDOUT_WORLD);
              CHKERRABORT(PETSC_COMM_WORLD,ierr);
     }
 
@@ -944,9 +946,9 @@ void PetscVector<T>::create_subvector(NumericVector<T>& subvector,
       ierr = VecCreateMPI(PETSC_COMM_WORLD,
 			  PETSC_DECIDE,          // n_local
 			  rows.size(),           // n_global
-			  &(petsc_subvector->vec)); CHKERRABORT(PETSC_COMM_WORLD,ierr);
+			  &(petsc_subvector->_vec)); CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
-      ierr = VecSetFromOptions (petsc_subvector->vec); CHKERRABORT(PETSC_COMM_WORLD,ierr);
+      ierr = VecSetFromOptions (petsc_subvector->_vec); CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
       // Mark the subvector as initialized
       petsc_subvector->_is_initialized = true;
@@ -968,21 +970,21 @@ void PetscVector<T>::create_subvector(NumericVector<T>& subvector,
 			 &subvector_is); CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
   // Construct the scatter object
-  ierr = VecScatterCreate(this->vec,
+  ierr = VecScatterCreate(this->_vec,
 			  parent_is,
-			  petsc_subvector->vec,
+			  petsc_subvector->_vec,
 			  subvector_is,
 			  &scatter); CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
   // Actually perform the scatter
-  ierr = VecScatterBegin(this->vec,
-			 petsc_subvector->vec,
+  ierr = VecScatterBegin(this->_vec,
+			 petsc_subvector->_vec,
 			 INSERT_VALUES,
 			 SCATTER_FORWARD,
 			 scatter); CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
-  ierr = VecScatterEnd(this->vec,
-		       petsc_subvector->vec,
+  ierr = VecScatterEnd(this->_vec,
+		       petsc_subvector->_vec,
 		       INSERT_VALUES,
 		       SCATTER_FORWARD,
 		       scatter); CHKERRABORT(PETSC_COMM_WORLD,ierr);
