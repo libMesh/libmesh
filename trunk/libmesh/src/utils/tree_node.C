@@ -1,4 +1,4 @@
-// $Id: tree_node.C,v 1.13 2004-04-16 17:08:17 spetersen Exp $
+// $Id: tree_node.C,v 1.14 2004-04-17 02:16:23 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -80,9 +80,11 @@ void TreeNode<N>::insert (const Elem* elem)
     {
       elements.push_back (elem);
 
+#ifdef ENABLE_INFINITE_ELEMENTS
       if (elem->infinite() && !this->contains_ifems)
 	this->contains_ifems = true;
-
+#endif
+      
       // Refine ourself if we reach the target bin size for a TreeNode.
       if (elements.size() == tgt_bin_size)
 	this->refine();
@@ -416,9 +418,11 @@ void TreeNode<N>::transform_nodes_to_elements (std::vector<std::vector<const Ele
 	   pos != elements_set.end(); ++pos)
 	{
 	  elements.push_back(*pos);
-
+	  
+#ifdef ENABLE_INFINITE_ELEMENTS
 	  if ((*pos)->infinite() && !this->contains_ifems)
 	    this->contains_ifems = true;
+#endif
 	}
     }
   else
