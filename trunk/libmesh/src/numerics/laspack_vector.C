@@ -1,4 +1,4 @@
-// $Id: laspack_vector.C,v 1.22 2004-03-08 02:10:04 benkirk Exp $
+// $Id: laspack_vector.C,v 1.23 2004-03-10 17:33:55 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -304,7 +304,7 @@ Real LaspackVector<Complex>::min () const
 {
   assert (this->initialized());
 
-  Real min = (*this)(0);
+  Real min = (*this)(0).real();
 
   const unsigned int n = this->size();
   
