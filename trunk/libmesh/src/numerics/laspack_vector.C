@@ -1,4 +1,4 @@
-// $Id: laspack_vector.C,v 1.14 2003-06-12 01:36:00 benkirk Exp $
+// $Id: laspack_vector.C,v 1.15 2003-06-12 02:29:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -79,7 +79,7 @@ NumericVector<T>& LaspackVector<T>::operator += (const NumericVector<T>& v)
 {
   assert(this->closed());
   
-  add(1., v);
+  this->add(1., v);
   
   return *this;
 }
@@ -92,7 +92,7 @@ NumericVector<T>& LaspackVector<T>::operator -= (const NumericVector<T>& v)
 {
   assert(this->closed());
   
-  add(-1., v);
+  this->add(-1., v);
   
   return *this;
 }
@@ -102,8 +102,10 @@ NumericVector<T>& LaspackVector<T>::operator -= (const NumericVector<T>& v)
 template <typename T>
 void LaspackVector<T>::add (const T v)
 {
-  for (unsigned int i=0; i<size(); i++)
-    add (i, v);
+  const unsigned int n = this->size();
+  
+  for (unsigned int i=0; i<n; i++)
+    this->add (i, v);
 }
 
 
@@ -112,7 +114,7 @@ void LaspackVector<T>::add (const T v)
 template <typename T>
 void LaspackVector<T>::add (const NumericVector<T>& v)
 {
-  add (1., v);
+  this->add (1., v);
 }
 
 
@@ -122,10 +124,10 @@ void LaspackVector<T>::add (const T a, const NumericVector<T>& v_in)
 {
   const LaspackVector& v = dynamic_cast<const LaspackVector&>(v_in);
   
-  assert(size() == v.size());
+  assert(this->size() == v.size());
 
   for (unsigned int i=0; i<v.size(); i++)
-    add (i, a*v(i));
+    this->add (i, a*v(i));
 }
 
 
@@ -186,13 +188,18 @@ LaspackVector<T>::operator = (const LaspackVector<T>& v)
 {
   if (!this->initialized())
     this->init (v.size());
+
+  if (this->size() != v.size())
+    this->init (v.size());
   
+
   _is_closed = v._is_closed;
 
   if (v.size() != 0)    
     Asgn_VV (const_cast<QVector*>(&_vec),
-		      const_cast<QVector*>(&v._vec)
-		      );
+	     const_cast<QVector*>(&v._vec)
+	     );
+  
   return *this;
 }
 
@@ -206,7 +213,7 @@ LaspackVector<T>::operator = (const std::vector<T>& v)
    * Case 1:  The vector is the same size of
    * The global vector.  Only add the local components.
    */
-  if (size() == v.size())      
+  if (this->size() == v.size())      
     for (unsigned int i=0; i<v.size(); i++)
       set (i, v[i]);
   
@@ -273,7 +280,7 @@ void LaspackVector<T>::localize_to_one (std::vector<T>& v_local,
 {
   assert (pid == 0);
 
-  localize (v_local);
+  this->localize (v_local);
 }
 
 
@@ -288,7 +295,9 @@ Real LaspackVector<Real>::min () const
 
   Real min = 1.e30;
 
-  for (unsigned int i=0; i<size(); i++)
+  const unsigned int n = this->size();
+  
+  for (unsigned int i=0; i<n; i++)
     min = std::min (min, (*this)(i));
 
   return min;
@@ -310,7 +319,9 @@ Real LaspackVector<Complex>::min () const
 
   Real min = 1.e30;
 
-  for (unsigned int i=0; i<size(); i++)
+  const unsigned int n = this->size();
+  
+  for (unsigned int i=0; i<n; i++)
     min = std::min (min, (*this)(i).real() );
 
   return min;
