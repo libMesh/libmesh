@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.C,v 1.25 2003-09-11 19:10:53 benkirk Exp $
+// $Id: mesh_unv_support.C,v 1.26 2003-09-12 03:28:56 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -94,12 +94,8 @@ UnvMeshInterface::UnvMeshInterface (std::vector<Node*>& nodes,
   this->clear();
 
   if (_verbose)
-      std::cout << std::endl << " Universal file Interface:" << std::endl;
+    std::cout << std::endl << " Universal file Interface:" << std::endl;
 }
-
-
-
-
 
 
 
@@ -176,8 +172,8 @@ void UnvMeshInterface::read (const std::string& file_name)
      * dataset comes first: nodes or elements
      */
     if (_verbose)
-	std::cout << "  Counting nodes and elements" << std::endl;
-
+      std::cout << "  Counting nodes and elements" << std::endl;
+    
 
     bool reached_eof = false;
     bool found_node  = false;
@@ -194,13 +190,13 @@ void UnvMeshInterface::read (const std::string& file_name)
        * a "-1" followed by a number means the beginning of a dataset
        * stop combing at the end of the file
        */
-      while( ((olds != "-1") || (news == "-1") ) && !in_stream.eof() )
+      while ( ((olds != "-1") || (news == "-1") ) && !in_stream.eof() )
 	{	  
 	  olds = news;
 	  in_stream >> news;
 	}
 
-      if(in_stream.eof())
+      if (in_stream.eof())
         {
 	  break;
 	  reached_eof = true;
@@ -214,30 +210,30 @@ void UnvMeshInterface::read (const std::string& file_name)
         {
 	  found_node = true;
 	  order_of_datasets.push_back (_label_dataset_nodes);
-	  count_nodes (in_stream);
+	  this->count_nodes (in_stream);
 
 	  /*
-	   * we can safe some time scanning the file
+	   * we can save some time scanning the file
 	   * when we know we already have everything
 	   * we want
 	   */
 	  if (found_elem)
-	      break;
+	    break;
         }
 
       else if (news == _label_dataset_elements)
         {
 	  found_elem = true;
 	  order_of_datasets.push_back (_label_dataset_elements);
-	  count_elements (in_stream);
+	  this->count_elements (in_stream);
 
 	  /*
-	   * we can safe some time scanning the file
+	   * we can save some time scanning the file
 	   * when we know we already have everything
 	   * we want
 	   */
 	  if (found_node)
-	      break;
+	    break;
         }
     }
 
@@ -296,13 +292,13 @@ void UnvMeshInterface::read (const std::string& file_name)
     for (unsigned int ds=0; ds < order_of_datasets.size(); ds++)
       {
 	if (order_of_datasets[ds] == _label_dataset_nodes)
-	    node_in    (in_stream);
+	  this->node_in    (in_stream);
 
 	else if (order_of_datasets[ds] == _label_dataset_elements)
-	    element_in (in_stream);
+	  this->element_in (in_stream);
 
 	else
-	    error();
+	  error();
       }
 
 
@@ -315,7 +311,7 @@ void UnvMeshInterface::read (const std::string& file_name)
     in_stream.close();    
 
     if (_verbose)
-	std::cout << "  Finished." << std::endl << std::endl;
+      std::cout << "  Finished." << std::endl << std::endl;
   }
 
 
@@ -376,8 +372,8 @@ void UnvMeshInterface::write (const std::string& file_name)
   /*
    * write the nodes,  then the elements
    */
-  node_out    (out_file);
-  element_out (out_file);
+  this->node_out    (out_file);
+  this->element_out (out_file);
 }
 
 
@@ -445,12 +441,12 @@ void UnvMeshInterface::count_nodes (std::istream& in_file)
     if(position!=std::string::npos)     // npos means no position
       {
 	this->_need_D_to_e = true;
-
+	
 	if (_verbose)
-	    std::cout << "  Convert from \"D\" to \"e\"" << std::endl;
+	  std::cout << "  Convert from \"D\" to \"e\"" << std::endl;
       }
     else
-	this->_need_D_to_e = false;
+      this->_need_D_to_e = false;
   }
 
   /*
@@ -477,8 +473,8 @@ void UnvMeshInterface::count_nodes (std::istream& in_file)
       in_file >> data; 
 	   	
       if (data == "-1")
-	  // end of dataset is reached
-	  break;
+	// end of dataset is reached
+	break;
       
       // ignore the remaining data (coord_sys_label, color etc)
       in_file.ignore (256, '\n');
@@ -497,7 +493,7 @@ void UnvMeshInterface::count_nodes (std::istream& in_file)
     }
 
   if (_verbose)
-      std::cout << "  Nodes   : " << this->_n_nodes << std::endl;
+    std::cout << "  Nodes   : " << this->_n_nodes << std::endl;
 }
 
 
@@ -527,11 +523,11 @@ void UnvMeshInterface::count_elements (std::istream& in_file)
     {
       // read element label
       in_file >> data;
-
-
+      
+      
       // end of dataset?
       if (data == "-1") 
-	  break;
+	break;
 	
       /*
        * Skip related data,
@@ -552,7 +548,7 @@ void UnvMeshInterface::count_elements (std::istream& in_file)
     }
 
   if (_verbose)
-      std::cout << "  Elements: " << this->_n_elements << std::endl;
+    std::cout << "  Elements: " << this->_n_elements << std::endl;
 }
 
 
@@ -566,13 +562,13 @@ void UnvMeshInterface::count_elements (std::istream& in_file)
 void UnvMeshInterface::node_in (std::istream& in_file)
 {
   if (_verbose)
-      std::cout << "  Reading nodes" << std::endl;
+    std::cout << "  Reading nodes" << std::endl;
 
   /*
    * adjust the \p istream to our
    * position
    */
-  const bool ok = beginning_of_dataset(in_file, _label_dataset_nodes);
+  const bool ok = this->beginning_of_dataset(in_file, _label_dataset_nodes);
 
   if (!ok)
     {
@@ -593,6 +589,12 @@ void UnvMeshInterface::node_in (std::istream& in_file)
   this->_assign_nodes.reserve (this->_n_nodes);
 
 
+  /**
+   * always 3 coordinates in the UNV file, no matter
+   * which dimensionality libMesh is in
+   */
+  std::vector<Real> xyz (3);
+      
   /*
    * depending on whether we have to convert each
    * coordinate (float), we offer two versions.
@@ -603,13 +605,7 @@ void UnvMeshInterface::node_in (std::istream& in_file)
     {
       /*
        * ok, convert...
-       *
-       * always 3 coordinates in the UNV file, no matter
-       * which dimensionality libMesh is in
        */
-      std::vector<Real> xyz;
-      xyz.resize(3);
-
       std::string num_buf;
 
       for(unsigned int i=0;i<this->_n_nodes;i++)
@@ -628,7 +624,7 @@ void UnvMeshInterface::node_in (std::istream& in_file)
 	  for (unsigned int d=0; d<3; d++)
 	    {
 	      in_file >> num_buf;
-	      xyz[d] = D_to_e (num_buf);
+	      xyz[d] = this->D_to_e (num_buf);
 	    }
 
 	  // set up the id map
@@ -652,9 +648,7 @@ void UnvMeshInterface::node_in (std::istream& in_file)
        * very well, no need to convert anything,
        * just plain import.
        */
-      Real x, y, z;
-
-      for(unsigned int i=0;i<this->_n_nodes;i++)
+      for (unsigned int i=0;i<this->_n_nodes;i++)
         {
 	  assert (!in_file.eof());
 
@@ -662,15 +656,15 @@ void UnvMeshInterface::node_in (std::istream& in_file)
 		  >> exp_coord_sys_num       // (not supported yet)
 		  >> disp_coord_sys_num      // (not supported yet)
 		  >> color                   // (not supported yet)
-		  >> x                       // read x-coordinate
-		  >> y                       // read y-coordinate
-		  >> z;                      // read z-coordinate
+		  >> xyz[0]                  // read x-coordinate
+		  >> xyz[1]                  // read y-coordinate
+		  >> xyz[2];                 // read z-coordinate
 
 	  // set up the id map
 	  this->_assign_nodes.push_back (node_lab);
 	  
 	  // add node to the nodes vector.
-	  this->_nodes[i] = Node::build (x, y, z, i);
+	  this->_nodes[i] = Node::build (xyz[0], xyz[1], xyz[2], i);
 
 	  // tell the MeshData object the foreign node id
 	  this->_mesh_data.add_foreign_node_id (this->_nodes[i], node_lab);
@@ -690,14 +684,14 @@ void UnvMeshInterface::node_in (std::istream& in_file)
 void UnvMeshInterface::element_in (std::istream& in_file)
 {
   if (_verbose)
-      std::cout << "  Reading elements" << std::endl;
-
+    std::cout << "  Reading elements" << std::endl;
+  
 
   /*
    * adjust the \p istream to our
    * position
    */
-  const bool ok = beginning_of_dataset(in_file, _label_dataset_elements);
+  const bool ok = this->beginning_of_dataset(in_file, _label_dataset_elements);
 
   if (!ok)
     {
@@ -715,8 +709,7 @@ void UnvMeshInterface::element_in (std::istream& in_file)
 
 
   // vector that temporarily holds the node labels defining element
-  std::vector<unsigned int> node_labels;
-  node_labels.reserve(21);
+  std::vector<unsigned int> node_labels (21);
 
 
   // vector that assigns element nodes to their correct position
@@ -731,8 +724,7 @@ void UnvMeshInterface::element_in (std::istream& in_file)
   //
   // UNV is 1-based, we leave the 0th element of the vectors unused in order
   // to prevent confusion, this way we can store elements with up to 20 nodes
-  std::vector<unsigned int> assign_elem_nodes;
-  assign_elem_nodes.resize (21);
+  std::vector<unsigned int> assign_elem_nodes (21);
 
 
   // allocate the correct amount of memory for the vector
@@ -957,7 +949,6 @@ void UnvMeshInterface::element_in (std::istream& in_file)
 
       // tell the MeshData object the foreign element id
       this->_mesh_data.add_foreign_elem_id (this->_elements[i], element_lab);
-
     }
 }
 
@@ -972,7 +963,7 @@ void UnvMeshInterface::node_out (std::ostream& out_file)
 
 
   if (_verbose)
-      std::cout << "  Writing " << this->_nodes.size() << " nodes" << std::endl;
+    std::cout << "  Writing " << this->_nodes.size() << " nodes" << std::endl;
 
   /*
    * Write beginning of dataset
@@ -1001,22 +992,22 @@ void UnvMeshInterface::node_out (std::ostream& out_file)
 
       // the coordinates
       if (DIM == 3)
-	  sprintf(buf, "%25.16E%25.16E%25.16E\n", 
-		  (*current_node)(0),
-		  (*current_node)(1),
-		  (*current_node)(2));
+	sprintf(buf, "%25.16E%25.16E%25.16E\n", 
+		(*current_node)(0),
+		(*current_node)(1),
+		(*current_node)(2));
       else if (DIM == 2)
-	  sprintf(buf, "%25.16E%25.16E\n", 
-		  (*current_node)(0),
-		  (*current_node)(1));
+	sprintf(buf, "%25.16E%25.16E\n", 
+		(*current_node)(0),
+		(*current_node)(1));
       else
-	  sprintf(buf, "%25.16E\n", 
-		  (*current_node)(0));
-
+	sprintf(buf, "%25.16E\n", 
+		(*current_node)(0));
+      
       out_file << buf;
     }
- 
-
+  
+  
   /*
    * Write end of dataset
    */
@@ -1033,8 +1024,8 @@ void UnvMeshInterface::element_out(std::ostream& out_file)
   assert (_mesh_data.active() || _mesh_data.compatibility_mode());
 
   if (_verbose)
-      std::cout << "  Writing elements" << std::endl;
-
+    std::cout << "  Writing elements" << std::endl;
+  
   /*
    * Write beginning of dataset
    */
@@ -1069,20 +1060,16 @@ void UnvMeshInterface::element_out(std::ostream& out_file)
 
   unsigned int n_elem_written=0;
 
-// OLD CODE
-//   const_active_elem_iterator           elem_it  (std::make_pair(_elements.begin(), _elements.end()));
-//   const const_active_elem_iterator     elem_end (std::make_pair(_elements.end(),   _elements.end()));
-
   const_elem_iterator           elem_it  (std::make_pair(_elements.begin(), _elements.end()));
   const const_elem_iterator     elem_end (std::make_pair(_elements.end(),   _elements.end()));
-
-
+  
+  
   for (; elem_it != elem_end; ++elem_it)
     {
       const Elem* elem = *elem_it;
-
+      
       elem_n_nodes = elem->n_nodes();
-
+      
 
       switch (elem->type())
 	{
@@ -1234,7 +1221,7 @@ void UnvMeshInterface::element_out(std::ostream& out_file)
     }
 
   if (_verbose)
-      std::cout << "  Finished writing " << n_elem_written << " elements" << std::endl;
+    std::cout << "  Finished writing " << n_elem_written << " elements" << std::endl;
 
   /*
    * Write end of dataset

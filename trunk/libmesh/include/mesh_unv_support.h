@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.h,v 1.15 2003-09-11 19:10:52 benkirk Exp $
+// $Id: mesh_unv_support.h,v 1.16 2003-09-12 03:28:54 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -249,10 +249,10 @@ bool UnvMeshInterface::beginning_of_dataset(std::istream& in_file,
 	}
 
       if(in_file.eof())
-	  return false;
-
+	return false;
+      
       if (news == ds_name)
-	  return true;
+	return true;
     }
 
   // should never end up here
