@@ -1,4 +1,4 @@
-// $Id: inf_fe_static.C,v 1.17.2.1 2003-05-06 14:00:49 benkirk Exp $
+// $Id: inf_fe_static.C,v 1.17.2.2 2003-05-13 21:32:41 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -27,7 +27,7 @@
 #include "fe_interface.h"
 #include "fe_compute_data.h"
 #include "elem.h"
-#include "equation_systems_base.h"
+#include "equation_systems.h"
 
 
 // ------------------------------------------------------------
