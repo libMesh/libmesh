@@ -1,5 +1,5 @@
 dnl --------------------------------------------------------------
-dnl $Id: configure.in,v 1.21 2003-03-26 14:47:48 benkirk Exp $
+dnl $Id: configure.in,v 1.22 2003-03-26 14:51:38 benkirk Exp $
 dnl --------------------------------------------------------------
 dnl Process this file with autoconf to produce a configure script.
 
@@ -9,7 +9,7 @@ dnl you call ./configure subsequently on different systems without
 dnl clearing the cache 
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
-AC_REVISION($Revision: 1.21 $)
+AC_REVISION($Revision: 1.22 $)
 
 
 AC_INIT(Make.common.in)
@@ -70,7 +70,7 @@ dnl mpCC fails the AC_LANG tests. Set the compiler to
 dnl mpCC if it is there instead of xlC
 dnl --------------------------------------------------------------
 if ((test "$CXX" = xlC_r) || (test "$CXX" = xlC)) ; then
-  AC_CHECK_PROG(MPCXX, mpCC, $CXX, $PATH)
+  AC_CHECK_PROG(MPCXX, mpCC, mpCC, $CXX, $PATH)
   if test "x$MPCXX" != x ; then
     CXX=$MPCXX
     AC_MSG_RESULT(<<< Using $CXX instead of xlC >>>)
