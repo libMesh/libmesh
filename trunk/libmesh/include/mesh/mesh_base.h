@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.20 2004-05-05 15:23:50 spetersen Exp $
+// $Id: mesh_base.h,v 1.21 2004-05-09 15:40:22 fprill Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -61,7 +61,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.20 $
+ * \version $Revision: 1.21 $
  */
 
 
@@ -500,19 +500,36 @@ public:
    */
   void tetgen_pointset_convexhull();
   
-  /** Methods invoke TetGen library to compute a Delaunay tetrahedrization
-      with volume and/or quality boundary constraints.
-      See http://tetgen.berlios.de/ for details.
+  /** Method invokes TetGen library to compute a Delaunay tetrahedrization
+      with boundary constraints.
+      See http://tetgen.berlios.de/ for TetGen details.
    */
   void tetgen_triangulate();
+
+  /** Method invokes TetGen library to compute a Delaunay tetrahedrization
+      with boundary constraints and quality constraint. <br>
+      Same as "tetgen_triangulate(quality_constraint, 0)" <br>
+      See http://tetgen.berlios.de/ for TetGen details.
+   */
   void tetgen_triangulate_qconstraint(double quality_constraint);
+
+  /** Method invokes TetGen library to compute a Delaunay tetrahedrization
+      with boundary constraints and volume constraint. <br>
+      Same as "tetgen_triangulate(0, volume_constraint)" <br>
+      See http://tetgen.berlios.de/ for TetGen details.
+   */
   void tetgen_triangulate_vconstraint(double volume_constraint);
+
+  /** Method invokes TetGen library to compute a Delaunay tetrahedrization
+      with boundary constraints, volume and/or quality constraints. <br>
+      See http://tetgen.berlios.de/ for TetGen details.
+   */
   void tetgen_triangulate(double quality_constraint, double volume_constraint);
 
   /** Method invokes TetGen library to compute a Delaunay tetrahedrization
-      with volume and quality boundary constraints; takes another mesh structure as input which
-      is carved out from the main mesh. 
-      See http://tetgen.berlios.de/ for details.
+      with boundary constraints, volume and/or quality constraints; 
+      takes another mesh structure as input which is carved out from the main mesh. <br>
+      See http://tetgen.berlios.de/ for TetGen details.
    */
   void tetgen_triangulate_carvehole(std::vector< Node *>& holes,
           double quality_constraint, double volume_constraint);

@@ -1,4 +1,4 @@
-// $Id: tetgen_io.h,v 1.3 2004-05-05 15:23:50 spetersen Exp $
+// $Id: tetgen_io.h,v 1.4 2004-05-09 15:40:22 fprill Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -33,6 +33,8 @@ class Mesh;
 
 /**
  * This class implements reading and writing meshes in the TetGen format.
+ * Format description: 
+ * cf. <a href="http://tetgen.berlios.de/">TetGen home page</a>.
  *
  * @author Benjamin S. Kirk, 2004
  */
@@ -56,7 +58,8 @@ class TetGenIO : public MeshIO<Mesh>
   virtual void read (const std::string& );
 
   /**
-   * This method implements writing a mesh to a specified file.
+   * This method implements writing a mesh to a specified ".poly" file.
+   * ".poly" files defines so called Piecewise Linear Complex (PLC).
    */
   virtual void write (const std::string& );  
 

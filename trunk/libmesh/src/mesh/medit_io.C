@@ -1,10 +1,3 @@
-// >>> Complete file added by F. Prill, 04.04.04
-
-// Current lacks in implementation:
-//  (i)   only 3D meshes.
-//  (ii)  only QUAD4, TRI3, TET4 elements, others are omitted !
-//  (iii) no distinction between materials.
-
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
   
@@ -63,6 +56,11 @@ void MEDITIO::write_ascii (const std::string& fname,
 			   const std::vector<Number>* ,
 			   const std::vector<std::string>* )
 {
+  // Current lacks in implementation:
+  //  (i)   only 3D meshes.
+  //  (ii)  only QUAD4, TRI3, TET4 elements, others are omitted !
+  //  (iii) no distinction between materials.
+
   // assert three dimensions (should be extended later)
   assert (this->mesh().mesh_dimension() == 3);
 

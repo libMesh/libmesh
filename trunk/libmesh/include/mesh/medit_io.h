@@ -1,5 +1,3 @@
-// >>> Complete file added by F. Prill, 04.04.04
-
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
   
@@ -36,8 +34,8 @@ class MeshBase;
  * used by the MEdit visualization tool developed in the Gamma Project
  * at INRIA Roquencourt.
  * For a full description of the mesh format and to obtain the
- * MEdit software see
- * <a href="http://http://www-rocq1.inria.fr/gamma/medit/medit.html">the MEdit home page</a>
+ * MEdit software see the
+ * <a href="http://www-rocq1.inria.fr/gamma/medit/medit.html">MEdit home page</a>.
  *
  * @author F. Prill, 2004
  */
@@ -55,7 +53,7 @@ class MEDITIO : public MeshIO<MeshBase>
   MEDITIO (const MeshBase&);
   
   /**
-   * This method implements writing a mesh to a specified file.
+   * This method implements writing a mesh to a specified ".mesh" file.
    */
   virtual void write (const std::string& );
   
