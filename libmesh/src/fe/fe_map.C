@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.7 2003-02-06 17:13:37 benkirk Exp $
+// $Id: fe_map.C,v 1.8 2003-02-06 23:02:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -79,9 +79,8 @@ void FEBase::compute_map(const QBase* qrule,
 	    
 	    for (unsigned int p=0; p<n_qp; p++) // for each quadrature point
 	      {	  
-		xyz[p]         += elem_point*phi_map[i][p];
-		
-		dxyzdxi_map[p] += elem_point*dphidxi_map[i][p];
+		xyz[p].add_scaled        (elem_point, phi_map[i][p]    );
+		dxyzdxi_map[p].add_scaled(elem_point, dphidxi_map[i][p]);
 	      };
 	  };
 
@@ -169,11 +168,9 @@ void FEBase::compute_map(const QBase* qrule,
 	    
 	    for (unsigned int p=0; p<n_qp; p++) // for each quadrature point
 	      {	  
-		xyz[p]          += elem_point*phi_map[i][p];
-		
-		dxyzdxi_map[p]  += elem_point*dphidxi_map[i][p];
-		
-		dxyzdeta_map[p] += elem_point*dphideta_map[i][p];
+		xyz[p].add_scaled          (elem_point, phi_map[i][p]     );
+		dxyzdxi_map[p].add_scaled  (elem_point, dphidxi_map[i][p] );
+		dxyzdeta_map[p].add_scaled (elem_point, dphideta_map[i][p]);
 	      };
 	  };
 	
@@ -284,13 +281,10 @@ void FEBase::compute_map(const QBase* qrule,
 	    
 	    for (unsigned int p=0; p<n_qp; p++) // for each quadrature point
 	      {	  
-		xyz[p]           += elem_point*phi_map[i][p];
-		
-		dxyzdxi_map[p]   += elem_point*dphidxi_map[i][p];
-		
-		dxyzdeta_map[p]  += elem_point*dphideta_map[i][p];
-		
-		dxyzdzeta_map[p] += elem_point*dphidzeta_map[i][p];
+		xyz[p].add_scaled           (elem_point, phi_map[i][p]      );
+		dxyzdxi_map[p].add_scaled   (elem_point, dphidxi_map[i][p]  );
+		dxyzdeta_map[p].add_scaled  (elem_point, dphideta_map[i][p] );
+		dxyzdzeta_map[p].add_scaled (elem_point, dphidzeta_map[i][p]);
 	      };
 	  };
 	
@@ -382,8 +376,6 @@ Point FE<Dim,T>::map (const Elem* elem,
   assert (elem != NULL);
     
   Point p;
-    
-  p.clear();
 
   const ElemType type     = elem->type();
   const Order order       = elem->default_order();
@@ -391,10 +383,12 @@ Point FE<Dim,T>::map (const Elem* elem,
 
   // Lagrange basis functions are used for mapping
   for (unsigned int i=0; i<n_sf; i++)
-    p += elem->point(i)*FE<Dim,LAGRANGE>::shape(type,
-						order,
-						i,
-						reference_point);
+    p.add_scaled (elem->point(i),
+		  FE<Dim,LAGRANGE>::shape(type,
+					  order,
+					  i,
+					  reference_point)
+		  );
 
   return p;
 };
@@ -408,8 +402,6 @@ Point FE<Dim,T>::map_xi (const Elem* elem,
   assert (elem != NULL);
     
   Point p;
-    
-  p.clear();
 
   const ElemType type     = elem->type();
   const Order order       = elem->default_order();
@@ -417,11 +409,13 @@ Point FE<Dim,T>::map_xi (const Elem* elem,
 
   // Lagrange basis functions are used for mapping    
   for (unsigned int i=0; i<n_sf; i++)
-    p += elem->point(i)*FE<Dim,LAGRANGE>::shape_deriv(type,
-						      order,
-						      i,
-						      0,
-						      reference_point);
+    p.add_scaled (elem->point(i),
+		  FE<Dim,LAGRANGE>::shape_deriv(type,
+						order,
+						i,
+						0,
+						reference_point)
+		  );
     
   return p;
 };
@@ -435,8 +429,6 @@ Point FE<Dim,T>::map_eta (const Elem* elem,
   assert (elem != NULL);
     
   Point p;
-    
-  p.clear();
 
   const ElemType type     = elem->type();
   const Order order       = elem->default_order();
@@ -444,11 +436,13 @@ Point FE<Dim,T>::map_eta (const Elem* elem,
   
   // Lagrange basis functions are used for mapping
   for (unsigned int i=0; i<n_sf; i++)
-    p += elem->point(i)*FE<Dim,LAGRANGE>::shape_deriv(type,
-						  order,
-						  i,
-						  1,
-						  reference_point);
+    p.add_scaled (elem->point(i),
+		  FE<Dim,LAGRANGE>::shape_deriv(type,
+						order,
+						i,
+						1,
+						reference_point)
+		  );
     
   return p;
 };
@@ -462,8 +456,6 @@ Point FE<Dim,T>::map_zeta (const Elem* elem,
   assert (elem != NULL);
     
   Point p;
-    
-  p.clear();
 
   const ElemType type     = elem->type();
   const Order order       = elem->default_order();
@@ -471,11 +463,13 @@ Point FE<Dim,T>::map_zeta (const Elem* elem,
 
   // Lagrange basis functions are used for mapping
   for (unsigned int i=0; i<n_sf; i++)
-    p += elem->point(i)*FE<Dim,LAGRANGE>::shape_deriv(type,
-						      order,
-						      i,
-						      2,
-						      reference_point);
+    p.add_scaled (elem->point(i),
+		  FE<Dim,LAGRANGE>::shape_deriv(type,
+						order,
+						i,
+						2,
+						reference_point)
+		  );
     
   return p;
 };
@@ -488,6 +482,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 			      const Real tolerance)
 {
   assert (elem != NULL);
+  assert (tolerance >= 0.);
 
   /**
    * How much did the point on the reference
@@ -749,7 +744,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
       /**
        * P_n+1 = P_n + dp
        */
-      p += dp;
+      p.add (dp);
 
       /**
        * Increment the iteration count.

@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.10 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: elem.h,v 1.11 2003-02-06 23:02:32 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -156,11 +156,6 @@ class Elem : public ReferenceCountedObject<Elem>
    * data structure.
    */
   unsigned int key() const;
-
-  /**
-   * Code that actually computes the key.
-   */
-  unsigned int key(std::vector<unsigned int> vec) const;
   
   /**
    * @returns true if two elements are identical, false otherwise.
@@ -169,21 +164,6 @@ class Elem : public ReferenceCountedObject<Elem>
    * to the elements.
    */
   bool operator == (const Elem& rhs) const;
-
-  /**
-   * @returns true if the element is "less" than the \p rhs element.
-   * Note that this must return false if the elements are equal.  This
-   * is useful for building \p std::maps and other sorted data
-   * structures out of elements.
-   */
-  bool operator <  (const Elem& rhs) const;
-
-  /**
-   * @returns a constant reference to the \p nodes vector for this
-   * element.  This vector contains the global node numbers for the
-   * nodes connected to this element.
-   */
-  std::vector<unsigned int> get_nodes() const;
 
   /**
    * @returns a pointer to the \f$ i^{th} \f$ neighbor of this element.
@@ -444,7 +424,7 @@ class Elem : public ReferenceCountedObject<Elem>
   /**
    * Refine the element.
    */
-  virtual void refine(Mesh&) = 0;
+  virtual void refine (Mesh&) = 0;
   
   /**
    * Coarsen the element.  This is not
@@ -672,40 +652,6 @@ bool Elem::active() const
   
 #endif
 };
-
-
-
-inline
-std::vector<unsigned int> Elem::get_nodes() const
-{
-  // Print a warning message the first
-  // time we are called if compiled in
-  // DEBUB mode
-#ifdef DEBUG
-  
-  static bool called = false;
-
-  if (!called)
-    {
-      called = true;
-      here();
-      std::cerr << "\nAvoid using this...  It is not as\n"
-		<< "efficient as it used to be!\n"
-		<< std::endl;
-    };
-
-#endif
-
-
-  
-  std::vector<unsigned int> node_numbers (n_nodes(), 0);
-
-  for (unsigned int i=0; i<n_nodes(); i++)
-    node_numbers[i] = node(i);
-
-  return node_numbers;  
-};
-
 
 
 #endif // end #ifndef __elem_h__

@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.7 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: elem.C,v 1.8 2003-02-06 23:02:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -181,7 +181,7 @@ Elem* Elem::build(const ElemType type)
            
     default:
       {
-	std::cout << "Undefined element type!." << std::endl;
+	std::cerr << "ERROR: Undefined element type!." << std::endl;
 	error();
       };
     };
@@ -240,29 +240,27 @@ void Elem::write_tecplot_connectivity(std::ostream& out) const
 
 unsigned int Elem::key() const
 {
-  assert (n_nodes());
+  const unsigned int nv = n_vertices();
   
-  return key (get_nodes());
-};
+  assert (nv != 0);
 
+  std::vector<unsigned int> vec (nv, 0);
 
+  for (unsigned int v=0; v<nv; v++)
+    vec[v] = node(v);
 
-unsigned int Elem::key(std::vector<unsigned int> vec) const
-{
+  
   std::sort(vec.begin(), vec.end());
   
-  unsigned int n = vec[0];
-
-  unsigned int m = vec[0];
+  unsigned int n       = vec[0];
+  const unsigned int m = vec[0];
   
-  for (unsigned int i=1; i<vec.size(); i++)
-    {
-      n = n^vec[i];
-    };
+  for (unsigned int i=1; i<nv; i++)
+    n = n^vec[i];
+  
 
-  return n + m*m;
-};
- 
+  return n + m*m;  
+}; 
 
 
 
@@ -271,9 +269,9 @@ Point Elem::centroid() const
   Point cp;
 
   for (unsigned int n=0; n<n_vertices(); n++)
-    cp += point(n);
+    cp.add (point(n));
 
-  return cp/((Real) n_vertices());    
+  return (cp /= static_cast<Real>(n_vertices()));    
 };
 
 
@@ -362,38 +360,6 @@ bool Elem::operator == (const Elem& rhs) const
 
 
 
-bool Elem::operator < (const Elem& rhs) const
-{
-  //TODO: [BSK] Is this used anywhere?  If not then it should be deprecated... I am not sure it is right.
-  error();
-  
-  assert (n_nodes());
-  assert (rhs.n_nodes());
-
-  // lhs < rhs if lhs has fewer nodes than rhs
-  if (n_nodes() < rhs.n_nodes())
-    return true;
-
-  // lhs > rhs if lhs has more nodes than rhs
-  else if (n_nodes() > rhs.n_nodes())
-    return false;
-
-  // Make sure we return false for (a < a)
-  else if (*this == rhs)
-    return false;
-  
-  // n_nodes() == rhs.n_nodes()
-  // lhs < rhs if lhs.node(0) < rhs.node(0),
-  // otherwise lhs >= rhs.
-  else 
-    if (node(0) < rhs.node(0))
-      return true;
-
-  return false;
-};    
-
-
-
 void Elem::write_ucd_connectivity(std::ostream &out) const
 {
   assert (out);
@@ -402,12 +368,6 @@ void Elem::write_ucd_connectivity(std::ostream &out) const
   // Original Code
   for (unsigned int i=0; i<n_nodes(); i++)
     out << node(i)+1 << "\t";
-
-  // New code (incompatible with ptr to node data structure
-//   std::transform(_nodes.begin(),
-// 		 _nodes.end(),
-// 		 std::ostream_iterator<unsigned int>(out, "\t"),
-// 		 std::bind2nd(std::plus<unsigned int>(), 1));
 
   out << std::endl;
 };

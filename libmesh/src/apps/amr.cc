@@ -36,7 +36,7 @@ int main (int argc, char** argv)
 
     mesh.elem(0)->set_refinement_flag() = Elem::REFINE;
     mesh.mesh_refinement.refine_and_coarsen_elements();    
-    mesh.mesh_refinement.uniformly_refine(2);
+    mesh.mesh_refinement.uniformly_refine(3);
     
     mesh.print_info();
 

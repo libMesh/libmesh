@@ -1,4 +1,4 @@
-// $Id: point.h,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: point.h,v 1.7 2003-02-06 23:02:32 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -47,9 +47,9 @@ class Point
    * Constructor.  By default sets all entries to 0.  Gives the point 0 in
    * \p DIM dimensions.
    */
-  Point  (const Real x=0,
-	  const Real y=0,
-	  const Real z=0);
+  Point  (const Real x=0.,
+	  const Real y=0.,
+	  const Real z=0.);
 
   /**
    * Copy-constructor.
@@ -60,6 +60,11 @@ class Point
    * Destructor.
    */ 
   ~Point ();
+
+  /**
+   * Assign to a point without creating a temporary.
+   */
+  void assign (const Point &);
 
   /**
    * Return the \f$ i^{th} \f$ element of the point.
@@ -75,11 +80,22 @@ class Point
    * Add two points.
    */
   Point operator + (const Point &) const;
-  
+
   /**
    * Add to this points.
    */
-  Point operator += (const Point &);
+  const Point & operator += (const Point &);
+  
+  /**
+   * Add to this point without creating a temporary.
+   */
+  void add (const Point &); 
+  
+  /**
+   * Add a scaled value to this point without
+   * creating a temporary.
+   */
+  void add_scaled (const Point &, const Real); 
   
   /**
    * Subtract two points.
@@ -89,8 +105,19 @@ class Point
   /**
    * Subtract from this point.
    */
-  Point operator -= (const Point &);
+  const Point & operator -= (const Point &);
 
+  /**
+   * Subtract from this point without creating a temporary.
+   */
+  void subtract (const Point &); 
+  
+  /**
+   * Subtract a scaled value from this point without
+   * creating a temporary.
+   */
+  void subtract_scaled (const Point &, const Real); 
+  
   /**
    * Return the opposite of a point
    */
@@ -102,9 +129,19 @@ class Point
   Point operator * (const Real) const;
   
   /**
+   * Multiply this point by a number, i.e. scale.
+   */
+  const Point & operator *= (const Real);
+  
+  /**
    * Divide a point by a number, i.e. scale.
    */
   Point operator / (const Real) const;
+
+  /**
+   * Divide this point by a number, i.e. scale.
+   */
+  const Point & operator /= (const Real);
 
   /**
    * Multiply 2 points together, i.e. dot-product.
@@ -172,7 +209,7 @@ class Point
   /**
    * The coordinates of the \p Point
    */
-  Real coords[DIM];
+  Real _coords[DIM];
 
   /**
    * Make the derived class a friend
@@ -189,14 +226,14 @@ Point::Point (const Real x,
 	      const Real y,
 	      const Real z)
 {
-  coords[0] = x;
+  _coords[0] = x;
 
   if (DIM > 1)
     {
-      coords[1] = y;
+      _coords[1] = y;
 
       if (DIM == 3)
-	coords[2] = z;
+	_coords[2] = z;
     };
 };
 
@@ -207,7 +244,7 @@ Point::Point (const Point& p)
 {
   // copy the nodes from point p to me
   for (unsigned int i=0; i<DIM; i++)
-    coords[i] = p.coords[i];
+    _coords[i] = p._coords[i];
 };
 
 
@@ -219,6 +256,14 @@ Point::~Point ()
 
 
 
+inline
+void Point::assign (const Point &p)
+{
+  for (unsigned int i=0; i<DIM; i++)
+    _coords[i] = p._coords[i];
+};
+
+
 
 inline
 Real Point::operator () (const unsigned int i) const
@@ -228,9 +273,8 @@ Real Point::operator () (const unsigned int i) const
   if (i > (DIM-1))
     return 0.;
   
-  return coords[i];
+  return _coords[i];
 };
-
 
 
 
@@ -239,9 +283,8 @@ Real & Point::operator () (const unsigned int i)
 {
   assert (i<DIM);
   
-  return coords[i];
+  return _coords[i];
 };
-
 
 
 
@@ -250,35 +293,49 @@ Point Point::operator + (const Point &p) const
 {
  
 #if DIM == 1
-  return Point(coords[0] + p.coords[0]);
+  return Point(_coords[0] + p._coords[0]);
 #endif
 
 #if DIM == 2 
-  return Point(coords[0] + p.coords[0],
-	       coords[1] + p.coords[1]);
+  return Point(_coords[0] + p._coords[0],
+	       _coords[1] + p._coords[1]);
 #endif
 
 #if DIM == 3
-  return Point(coords[0] + p.coords[0],
-	       coords[1] + p.coords[1],
-	       coords[2] + p.coords[2]);
+  return Point(_coords[0] + p._coords[0],
+	       _coords[1] + p._coords[1],
+	       _coords[2] + p._coords[2]);
 #endif
 	       
 };
 
 
 
-
 inline
-Point Point::operator += (const Point &p)
+const Point & Point::operator += (const Point &p)
 {
-
-  for (unsigned int i=0; i<DIM; i++)
-    coords[i] += p.coords[i];
+  add (p);
 
   return *this;
 };
 
+
+
+inline
+void Point::add (const Point &p)
+{
+  for (unsigned int i=0; i<DIM; i++)
+    _coords[i] += p._coords[i];
+};
+
+
+
+inline
+void Point::add_scaled (const Point &p, const Real factor)
+{
+  for (unsigned int i=0; i<DIM; i++)
+    _coords[i] += factor*p._coords[i];
+};
 
 
 
@@ -287,36 +344,49 @@ Point Point::operator - (const Point &p) const
 {
 
 #if DIM == 1
-  return Point(coords[0] - p.coords[0]);
+  return Point(_coords[0] - p._coords[0]);
 #endif
 
 #if DIM == 2 
-  return Point(coords[0] - p.coords[0],
-	       coords[1] - p.coords[1]);
+  return Point(_coords[0] - p._coords[0],
+	       _coords[1] - p._coords[1]);
 #endif
 
 #if DIM == 3
-  return Point(coords[0] - p.coords[0],
-	       coords[1] - p.coords[1],
-	       coords[2] - p.coords[2]);
+  return Point(_coords[0] - p._coords[0],
+	       _coords[1] - p._coords[1],
+	       _coords[2] - p._coords[2]);
 #endif
 
-  
 };
-
 
 
 
 inline
-Point Point::operator -= (const Point &p)
+const Point & Point::operator -= (const Point &p)
 {
-
-  for (unsigned int i=0; i<DIM; i++)
-    coords[i] -= p.coords[i];
+  subtract (p);
 
   return *this;
 };
 
+
+
+inline
+void Point::subtract (const Point& p)
+{
+  for (unsigned int i=0; i<DIM; i++)
+    _coords[i] -= p._coords[i];
+};
+
+
+
+inline
+void Point::subtract_scaled (const Point &p, const Real factor)
+{
+  for (unsigned int i=0; i<DIM; i++)
+    _coords[i] -= factor*p._coords[i];
+};
 
 
 
@@ -325,22 +395,21 @@ Point Point::operator - () const
 {
   
 #if DIM == 1
-  return Point(-coords[0]);
+  return Point(-_coords[0]);
 #endif
 
 #if DIM == 2 
-  return Point(-coords[0],
-	       -coords[1]);
+  return Point(-_coords[0],
+	       -_coords[1]);
 #endif
 
 #if DIM == 3
-  return Point(-coords[0],
-	       -coords[1], 
-	       -coords[2]);
+  return Point(-_coords[0],
+	       -_coords[1], 
+	       -_coords[2]);
 #endif
   
 };
-
 
 
 
@@ -349,21 +418,34 @@ Point Point::operator * (const Real factor) const
 {
 
 #if DIM == 1
-  return Point(coords[0]*factor);
+  return Point(_coords[0]*factor);
 #endif
   
 #if DIM == 2 
-  return Point(coords[0]*factor,
-	       coords[1]*factor);
+  return Point(_coords[0]*factor,
+	       _coords[1]*factor);
 #endif
   
 #if DIM == 3
-  return Point(coords[0]*factor,
-	       coords[1]*factor, 
-	       coords[2]*factor);
+  return Point(_coords[0]*factor,
+	       _coords[1]*factor, 
+	       _coords[2]*factor);
 #endif
   
 };
+
+
+
+
+inline
+const Point & Point::operator *= (const Real factor)
+{
+  for (unsigned int i=0; i<DIM; i++)
+    _coords[i] *= factor;
+
+  return *this;
+};
+
 
 
 
@@ -373,21 +455,36 @@ Point Point::operator / (const Real factor) const
   assert (factor != static_cast<Real>(0.));
 
 #if DIM == 1
-  return Point(coords[0]/factor);
+  return Point(_coords[0]/factor);
 #endif
   
 #if DIM == 2 
-  return Point(coords[0]/factor,
-	       coords[1]/factor);
+  return Point(_coords[0]/factor,
+	       _coords[1]/factor);
 #endif
   
 #if DIM == 3
-  return Point(coords[0]/factor,
-	       coords[1]/factor, 
-	       coords[2]/factor);
+  return Point(_coords[0]/factor,
+	       _coords[1]/factor, 
+	       _coords[2]/factor);
 #endif
   
 };
+
+
+
+
+inline
+const Point & Point::operator /= (const Real factor)
+{
+  assert (factor != static_cast<Real>(0.));
+
+  for (unsigned int i=0; i<DIM; i++)
+    _coords[i] /= factor;
+
+  return *this;
+};
+
 
 
 
@@ -395,18 +492,18 @@ inline
 Real Point::operator * (const Point &p) const
 {
 #if DIM == 1
-  return coords[0]*p.coords[0];
+  return _coords[0]*p._coords[0];
 #endif
 
 #if DIM == 2
-  return (coords[0]*p.coords[0] +
-	  coords[1]*p.coords[1]);
+  return (_coords[0]*p._coords[0] +
+	  _coords[1]*p._coords[1]);
 #endif
 
 #if DIM == 3
-  return (coords[0]*p.coords[0] +
-	  coords[1]*p.coords[1] +
-	  coords[2]*p.coords[2]);
+  return (_coords[0]*p._coords[0] +
+	  _coords[1]*p._coords[1] +
+	  _coords[2]*p._coords[2]);
 #endif
 };
 
@@ -426,7 +523,7 @@ Real Point::size_sq() const
   Real val = 0.;
 
   for (unsigned int i=0; i<DIM; i++)
-    val += coords[i]*coords[i];
+    val += _coords[i]*_coords[i];
 
   return val;  
 };
