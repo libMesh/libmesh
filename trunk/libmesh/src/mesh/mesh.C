@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.14 2003-05-15 23:34:35 benkirk Exp $
+// $Id: mesh.C,v 1.15 2003-05-20 09:28:45 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -115,7 +115,7 @@ void Mesh::read (const std::string& name)
 		  << "     *.xda  -- Internal ASCII format\n"
 		  << "     *.xdr  -- Internal binary format,\n"
 		  << "               compatible with XdrMGF\n"
-		  << "     *.unv  -- I-deas format\n"
+		  << "     *.unv  -- I-deas Universal format\n"
 		  << std::endl;
 	error();
 
@@ -163,6 +163,9 @@ void Mesh::write (const std::string& name)
     else if (name.rfind(".xdr") < name.size())
       write_xdr_binary (name);
 
+    else if (name.rfind(".unv") < name.size())
+      write_unv (name);
+
     else
       {
 	std::cerr << " ERROR: Unrecognized file extension: " << name
@@ -174,7 +177,8 @@ void Mesh::write (const std::string& name)
 		  << "     *.gmv   -- LANL's GMV (General Mesh Viewer) format\n"
 		  << "     *.xda   -- Internal ASCII format\n"
 		  << "     *.xdr   -- Internal binary format,\n"
-		  << "               compatible with XdrMGF\n"
+		  << "                compatible with XdrMGF\n"
+		  << "     *.unv   -- I-deas Universal format\n"
 		  << std::endl
 		  << "\n Exiting without writing output\n";
       }    

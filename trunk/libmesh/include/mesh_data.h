@@ -1,4 +1,4 @@
-// $Id: mesh_data.h,v 1.3 2003-05-15 23:57:02 benkirk Exp $
+// $Id: mesh_data.h,v 1.4 2003-05-20 09:28:44 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -38,7 +38,7 @@
 
 // Forward Declarations
 class MeshBase;
-class UnvInterface;
+class UnvMeshInterface;
 class XdrInterface;
 
 
@@ -353,7 +353,7 @@ protected:
    * Make the mesh importer class \p UnvInterface friend, so
    * that it can communicate foreign node ids to this class.
    */
-  friend class UnvInterface;
+  friend class UnvMeshInterface;
 
   /**
    * Make the mesh importer class \p XdrInterface friend, so

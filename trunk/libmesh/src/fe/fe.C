@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.20 2003-05-16 19:29:13 benkirk Exp $
+// $Id: fe.C,v 1.21 2003-05-20 09:28:44 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -65,10 +65,10 @@ void FE<Dim,T>::reinit(const Elem* elem,
   
   // update the type in accordance to the current cell
   // and reinit if the cell type has changed or (as in
-  // the case of the hierarchics) the shape functions
-  // depend on the particular element
+  // the case of the hierarchics) the shape functions need
+  // reinit, since they depend on the particular element
   else if ((get_type() != elem->type()) ||
-	   (T == HIERARCHIC))
+	   shapes_need_reinit())
     {
       elem_type = elem->type();
       init_shape_functions (qrule->get_points(), elem);

@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.18 2003-05-15 23:34:33 benkirk Exp $
+// $Id: fe.h,v 1.19 2003-05-20 09:28:44 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -52,7 +52,7 @@ class InfFE;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.18 $
+ * \version $Revision: 1.19 $
  */
 
 //-------------------------------------------------------------
@@ -243,7 +243,13 @@ protected:
 
 private:
 
-
+  /**
+   * @returns \p true when the shape functions (for
+   * this \p FEFamily) depend on the particular 
+   * element, and therefore needs to be re-initialized
+   * for each new element.  \p false otherwise.
+   */
+  bool shapes_need_reinit() const;
   
   /** 
    * Update the various member data fields \p phi,
@@ -310,7 +316,7 @@ private:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.18 $
+ * \version $Revision: 1.19 $
  */
 
 //-------------------------------------------------------------
@@ -335,7 +341,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.18 $
+ * \version $Revision: 1.19 $
  */
 
 //-------------------------------------------------------------
@@ -360,7 +366,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.18 $
+ * \version $Revision: 1.19 $
  */
 
 //-------------------------------------------------------------

@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic.C,v 1.11 2003-04-02 14:55:12 benkirk Exp $
+// $Id: fe_hierarchic.C,v 1.12 2003-05-20 09:28:45 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -1226,6 +1226,12 @@ void FE<Dim,T>::compute_constraints (std::map<unsigned int,
 }
 
 
+
+template <unsigned int Dim, FEFamily T>
+bool FE<Dim,T>::shapes_need_reinit() const
+{
+  return true;
+}
 
 
 //--------------------------------------------------------------
