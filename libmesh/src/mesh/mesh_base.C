@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.7 2003-01-29 20:58:30 benkirk Exp $
+// $Id: mesh_base.C,v 1.8 2003-01-29 21:05:53 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -1304,6 +1304,14 @@ Sphere MeshBase::subdomain_bounding_sphere (const unsigned int sid) const
 
 void MeshBase::build_L_graph (PetscMatrix& conn) const
 {
+#ifndef HAVE_PETSC
+
+  std::cerr << "ERROR: This fuctionality requires PETSC support!"
+	    << std::endl;
+  error();
+
+#else
+
   // Initialize the connectivity matrix.
   {
     conn.init(n_nodes(),
@@ -1406,12 +1414,21 @@ void MeshBase::build_L_graph (PetscMatrix& conn) const
   conn.close();
   
   return;
+
+#endif
 };
 
 
 
 void MeshBase::build_script_L_graph (PetscMatrix& conn) const
 {
+#ifndef HAVE_PETSC
+
+  std::cerr << "ERROR: This fuctionality requires PETSC support!"
+	    << std::endl;
+  error();
+
+#else
 
   // Inefficient at the moment.  We build an L
   // matrix and use it to create the script L matrix
@@ -1512,6 +1529,8 @@ void MeshBase::build_script_L_graph (PetscMatrix& conn) const
   conn.close();
   
   return;  
+
+#endif
 };
 
 
