@@ -64,6 +64,23 @@ dev_table_entry("images/bbarth2.jpg",
 		"<a href=\"http://www.utexas.edu\">University of Texas at Austin</a>");
 ?>
 
+
+<?php
+dev_table_entry("images/spetersen.jpg",
+		"Steffen Petersen",
+		"http://www.tu-harburg.de",
+		"PhD Student, libMesh Developer",
+		"<a href=\"http://www.tu-harburg.de\">Technical University Hamburg-Harburg</a>");
+?>
+
+<?php
+dev_table_entry("images/dreyer.jpg",
+		"Daniel Dreyer",
+		"http://www.tu-harburg.de",
+		"PhD Student, libMesh Developer",
+		"<a href=\"http://www.tu-harburg.de\">Technical University Hamburg-Harburg</a>");
+?>
+
 </div>
 
 
@@ -72,8 +89,3 @@ dev_table_entry("images/bbarth2.jpg",
 </body>
 </html>
 
-<?php if (0) { ?>
-# Local Variables:
-# mode: html
-# End:
-<?php } ?>
