@@ -1,4 +1,4 @@
-// $Id: partitioner_factory.C,v 1.5 2004-01-03 15:37:44 benkirk Exp $
+// $Id: partitioner_factory.C,v 1.6 2004-02-27 19:54:30 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -37,7 +37,7 @@
 
 // ------------------------------------------------------------
 // Explicit instantiation of a Partitioner factory
-#if defined(__IBMCPP__)
+#if defined(__IBMCPP__) || defined(__HP_aCC)
 
   template <class Partitioner> std::map<std::string, FactoryBase* > Factory<Partitioner>::factory_map;
   template class Factory<Partitioner>;
