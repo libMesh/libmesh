@@ -1,4 +1,4 @@
-// $Id: dof_object.h,v 1.11 2003-04-30 21:09:21 benkirk Exp $
+// $Id: dof_object.h,v 1.12 2003-05-21 13:50:19 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -25,6 +25,7 @@
 // C++ includes
 
 // Local includes
+#include "mesh_config.h"
 #include "mesh_common.h"
 
 
@@ -47,7 +48,7 @@
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.11 $
+ * \version $Revision: 1.12 $
  */
 
 class DofObject
@@ -72,6 +73,8 @@ public:
    */ 
   virtual ~DofObject ();
 
+#ifdef ENABLE_AMR
+  
   /**
    * This object on the last mesh.  Useful for projecting
    * solutions from one mesh to another.
@@ -87,6 +90,8 @@ public:
    * Sets the \p old_dof_object to a copy of \p this
    */
   void set_old_dof_object ();
+
+#endif
   
   /**
    * Clear the \p DofMap data structures and return to

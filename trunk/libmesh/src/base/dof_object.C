@@ -1,4 +1,4 @@
-// $Id: dof_object.C,v 1.3 2003-04-30 21:09:28 benkirk Exp $
+// $Id: dof_object.C,v 1.4 2003-05-21 13:50:23 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -36,7 +36,9 @@ const unsigned short int DofObject::invalid_processor_id = static_cast<unsigned 
 // ------------------------------------------------------------
 // DofObject class members
 DofObject::DofObject () :
+#ifdef ENABLE_AMR
   old_dof_object(NULL),
+#endif
   _id (invalid_id),
   _processor_id (invalid_processor_id),
   _n_systems  (0),
@@ -52,7 +54,9 @@ DofObject::DofObject () :
 
 
 DofObject::DofObject (const DofObject& dof_obj) :
+#ifdef ENABLE_AMR
   old_dof_object(NULL),
+#endif
   _id (dof_obj._id),
   _processor_id (dof_obj._processor_id),
   _n_systems  (dof_obj._n_systems),
@@ -136,11 +140,15 @@ DofObject::DofObject (const DofObject& dof_obj) :
 DofObject::~DofObject ()
 {
   // Free all memory.
+#ifdef ENABLE_AMR
   this->clear_old_dof_object ();
+#endif
   this->clear_dofs ();
 }
 
 
+
+#ifdef ENABLE_AMR
 
 void  DofObject::clear_old_dof_object ()
 {
@@ -164,6 +172,8 @@ void DofObject::set_old_dof_object ()
   // Make a new DofObject, as a copy of \p this
   old_dof_object = new DofObject(*this);
 }
+
+#endif
 
 
 
