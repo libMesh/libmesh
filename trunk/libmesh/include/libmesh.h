@@ -1,4 +1,4 @@
-// $Id: libmesh.h,v 1.5 2003-03-20 11:51:24 ddreyer Exp $
+// $Id: libmesh.h,v 1.6 2003-04-03 14:17:23 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -104,13 +104,21 @@ public:
   /**
    * The imaginary unit, \f$ \sqrt{-1} \f$.
    */
-  static const Number Imaginary;
+  static const Number imaginary;
 #endif
 
   /**
    * \f$ \pi=3.14159... \f$.
    */
-  static const Real PI;
+  static const Real pi;
+
+
+  /**
+   * \f$ \pi=3.14159... \f$.
+   */
+  static const Number zero;
+
+
 
 private:
 

@@ -1,4 +1,4 @@
-// $Id: ex7.C,v 1.20 2003-03-20 14:40:39 benkirk Exp $
+// $Id: ex7.C,v 1.21 2003-04-03 14:17:19 ddreyer Exp $
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
   
@@ -728,14 +728,14 @@ void add_M_C_K_helmholtz(EquationSystems<FrequencySystem>& es,
    * Get the frequency, fluid density, and speed of sound
    * for which we should currently solve
    */
-  const Real frequency = es.parameter ("current_frequency");
+  const Real frequency = es.parameter ("current frequency");
   const Real rho       = es.parameter ("rho");
   const Real speed     = es.parameter ("wave speed");
 
   /**
    * Compute angular frequency omega and wave number k
    */
-  const Real omega = 2. * libMesh::PI * frequency;
+  const Real omega = 2. * libMesh::pi * frequency;
   const Real k     = omega / speed;
 
   /**

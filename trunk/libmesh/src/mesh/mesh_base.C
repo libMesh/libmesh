@@ -1,6 +1,6 @@
 
 
-// $Id: mesh_base.C,v 1.26 2003-03-24 18:16:12 benkirk Exp $
+// $Id: mesh_base.C,v 1.27 2003-04-03 14:17:25 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -32,6 +32,8 @@
 #include "libmesh.h"
 #include "face_tri3.h"
 #include "face_tri6.h"
+#include "face_inf_quad4.h"
+#include "face_inf_quad6.h"
 #include "cell_inf_prism6.h"
 #include "cell_inf_prism12.h"
 #include "cell_inf_hex8.h"
@@ -775,6 +777,7 @@ void MeshBase::build_inf_elem(const Point& origin,
         Elem* el;
 	switch(side->type())
 	{
+	  // 3D infinite elements
 	  // TRIs					
 	  case TRI3:	
 	    el=new InfPrism6;
@@ -807,6 +810,17 @@ void MeshBase::build_inf_elem(const Point& origin,
 	    is_higher_order_elem=true;
 	    break;
 
+	  // 2D infinite elements		 
+	  case EDGE2:
+	    el=new InfQuad4;
+	    break;
+
+	  case EDGE3:
+	    el=new InfQuad6;
+	    el->set_node(4) = side->get_node(2);
+	    break;
+
+	  // 1D infinite elements not supported
 	  default: 
 	    std::cout << "MeshBase::build_inf_elem(Point, bool, bool, bool, bool): invalid face element" 
 		      << std::endl;

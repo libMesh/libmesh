@@ -1,4 +1,4 @@
-// $Id: inf_fe.h,v 1.24 2003-04-01 14:19:47 ddreyer Exp $
+// $Id: inf_fe.h,v 1.25 2003-04-03 14:17:21 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -33,7 +33,7 @@
 
 // forward declarations
 class Elem;
-
+class FEComputeData;
 
 
 
@@ -66,7 +66,7 @@ class Elem;
  *
  * \author Daniel Dreyer
  * \date 2003
- * \version $Revision: 1.24 $
+ * \version $Revision: 1.25 $
  */
 
 //-------------------------------------------------------------
@@ -89,7 +89,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.24 $
+   * \version $Revision: 1.25 $
    */
   //-------------------------------------------------------------
   // InfFE::Radial class definition
@@ -181,7 +181,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.24 $
+   * \version $Revision: 1.25 $
    */
   //-------------------------------------------------------------
   // InfFE::Base class definition
@@ -264,6 +264,9 @@ public:
    * Note that this class member is by far not as efficient as 
    * its counterpart in \p FE<Dim,T>, and is @e not employed
    * in the \p reinit() cycle.
+   * Also note that this method does @e not return physically
+   * correct shapes, instead use \p compute_data().  The \p shape()
+   * methods should only be used for mapping.
    */
   static Real shape(const FEType& fet,
 		    const ElemType t,
@@ -277,18 +280,32 @@ public:
    * Note that this class member is not as efficient as its 
    * counterpart in \p FE<Dim,T>, and is @e not employed 
    * in the \p reinit() cycle.
+   * Also note that this method does @e not return physically
+   * correct shapes, instead use \p compute_data().  The \p shape()
+   * methods should only be used for mapping.
    */
   static Real shape(const FEType& fet,
 		    const Elem* elem,
 		    const unsigned int i,
 		    const Point& p);
+
+  /**
+   * Generalized version of \p shape(), takes an \p Elem*.  The \p data
+   * contains both input and output parameters.  For frequency domain
+   * simulations, the complex-valued shape is returned.  In time domain
+   * it may be possible to return both the computed shape and phase lag.
+   */
+  static void compute_data(const FEType& fe_t,
+			   const Elem* inf_elem,
+			   FEComputeData& data);
   
   /**
    * @returns the number of shape functions associated with
    * a finite element of type \p t and approximation order \p o.
    */
   static unsigned int n_shape_functions (const FEType& fet,
-					 const ElemType t);
+					 const ElemType t)
+    { return n_dofs(fet, t); }
 
   /**
    * @returns the number of shape functions associated with this
@@ -314,8 +331,11 @@ public:
 				      const ElemType inf_elem_type);
 
   /**
-   * Build the nodal soln from the element soln.
-   * This is the solution that will be plotted.
+   * Usually, this method would build the nodal soln from the 
+   * element soln.  But infinite elements require additional 
+   * simulation-specific data to compute physically correct 
+   * results.  Use \p compute_data() to compute results.  For
+   * compatibility an empty vector is returned.
    */
   static void nodal_soln(const FEType& fet,
 			 const Elem* elem, 
@@ -719,6 +739,17 @@ private:
    * element type helps initializing it to a default value.
    */
   static ElemType _compute_node_indices_fast_current_elem_type;
+
+
+#ifdef DEBUG
+
+  /**
+   * static members that are used to issue warning messages only once.
+   */
+  static bool _warned_for_nodal_soln;
+  static bool _warned_for_shape;
+
+#endif
 
   /**
    * Make all \p \InfFE<Dim,T_radial,T_map> classes

@@ -1,4 +1,4 @@
-// $Id: inf_fe_static.C,v 1.15 2003-04-02 21:58:44 benkirk Exp $
+// $Id: inf_fe_static.C,v 1.16 2003-04-03 14:17:24 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,9 @@
 #include "inf_fe.h"
 #include "fe.h"
 #include "fe_interface.h"
+#include "fe_compute_data.h"
 #include "elem.h"
+#include "equation_systems_base.h"
 
 
 // ------------------------------------------------------------
@@ -33,20 +35,22 @@
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 ElemType InfFE<Dim,T_radial,T_map>::_compute_node_indices_fast_current_elem_type = INVALID_ELEM;
 
+#ifdef DEBUG
+
+template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
+bool InfFE<Dim,T_radial,T_map>::_warned_for_nodal_soln = false;
+
+
+template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
+bool InfFE<Dim,T_radial,T_map>::_warned_for_shape      = false;
+
+#endif
+
 
 
 
 // ------------------------------------------------------------
 // InfFE static class members
-template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-unsigned int InfFE<Dim,T_radial,T_map>::n_shape_functions (const FEType& fet,
-							   const ElemType t)
-{
-  return InfFE<Dim,T_radial,T_map>::n_dofs(fet, t);
-}
-
-
-
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 unsigned int InfFE<Dim,T_radial,T_map>::n_dofs (const FEType& fet,
 						const ElemType inf_elem_type)
@@ -58,6 +62,9 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs (const FEType& fet,
   else
     return Radial::n_dofs(fet.radial_order);
 }
+
+
+
 
 
 
@@ -87,6 +94,9 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_at_node (const FEType& fet,
 
 
 
+
+
+
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_per_elem (const FEType& fet,
 							 const ElemType inf_elem_type)
@@ -102,24 +112,39 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_per_elem (const FEType& fet,
 
 
 
+
+
+
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 void InfFE<Dim,T_radial,T_map>::nodal_soln(const FEType& /* fet */,
-					   const Elem* elem,
+					   const Elem* /* elem */,
 					   const std::vector<Number>& /* elem_soln */,
 					   std::vector<Number>&       nodal_soln)
 {
-  const unsigned int n_nodes = elem->n_nodes();
-  
-//  const ElemType inf_elem_type = elem->type();
+#ifdef DEBUG
+  if (!_warned_for_nodal_soln)
+    {
+      std::cerr << "WARNING: nodal_soln(...) does _not_ work for infinite elements." << std::endl
+		<< " Will return an empty nodal solution.  Use " << std::endl
+		<< " InfFE<Dim,T_radial,T_map>::compute_data(..) instead!" << std::endl;
+      _warned_for_nodal_soln = true;
+    }
+#endif
 
-  nodal_soln.resize(n_nodes);
-
-//TODO:[DD] CONTINUE CONTINUE CONTINUE CONTINUE CONTINUE CONTINUE CONTINUE CONTINUE CONTINUE CONTINUE 
-
-  std::cerr << "ERROR: The concept of a nodal solution is not "
-	    << "applicable to infinite elements!" << std::endl;
-  error();  
+  /*
+   * In the base the infinite element couples to
+   * conventional finite elements.  To not destroy
+   * the values there, clear \p nodal_soln.  This
+   * indicates to the user of \p nodal_soln to
+   * not use this result.
+   */
+  nodal_soln.clear();
+  assert (nodal_soln.begin() == nodal_soln.end());
+  return;
 }
+
+
+
 
 
 
@@ -132,6 +157,18 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
 				      const Point& p)
 {
   assert (Dim != 0);
+
+#ifdef DEBUG
+  // this makes only sense when used for mapping
+  if ((T_radial != INFINITE_MAP) && !_warned_for_shape)
+    {
+      std::cerr << "WARNING: InfFE<Dim,T_radial,T_map>::shape(...) does _not_" << std::endl
+		<< " return the correct trial function!  Use " << std::endl
+		<< " InfFE<Dim,T_radial,T_map>::compute_data(..) instead!" 
+		<< std::endl;
+      _warned_for_shape = true;
+    }
+#endif
 
   const ElemType     base_et  (Base::get_elem_type(inf_elem_type));
   const Order        o_radial (fet.radial_order);
@@ -152,6 +189,9 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
 
 
 
+
+
+
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 Real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
 				      const Elem* inf_elem,
@@ -161,6 +201,18 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
   assert (inf_elem != NULL);
   assert (Dim != 0);
 
+#ifdef DEBUG
+  // this makes only sense when used for mapping
+  if ((T_radial != INFINITE_MAP) && !_warned_for_shape)
+    {
+      std::cerr << "WARNING: InfFE<Dim,T_radial,T_map>::shape(...) does _not_" << std::endl
+		<< " return the correct trial function!  Use " << std::endl
+		<< " InfFE<Dim,T_radial,T_map>::compute_data(..) instead!" 
+		<< std::endl;
+      _warned_for_shape = true;
+    }
+#endif
+
   const Order        o_radial (fet.radial_order);
   const Real         v        (p(Dim-1));
   AutoPtr<Elem>      base_el  (inf_elem->build_side(0));
@@ -168,7 +220,6 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
   unsigned int i_base, i_radial;
   compute_shape_indices(fet, inf_elem->type(), i, i_base, i_radial);
 
-  //TODO:[SP/DD]  exp(ikr) is still missing here!
   if (Dim > 1)
     return FEInterface::shape(Dim-1, fet, base_el.get(), i_base, p)
         * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial)
@@ -182,6 +233,136 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
 
 
 
+
+
+template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
+void InfFE<Dim,T_radial,T_map>::compute_data(const FEType& fet,
+					     const Elem* inf_elem,
+					     FEComputeData& data)
+{
+  assert (inf_elem != NULL);
+  assert (Dim != 0);
+
+  const Order        o_radial             (fet.radial_order);
+  const Order        radial_mapping_order (Radial::mapping_order());    
+  const Point&       p                    (data.p);
+  const Real         v                    (p(Dim-1));
+  AutoPtr<Elem>      base_el              (inf_elem->build_side(0));
+
+  /*
+   * compute \p interpolated_dist containing the mapping-interpolated 
+   * distance of the base point to the origin.  This is the same
+   * for all shape functions.  Set \p interpolated_dist to 0, it
+   * is added to.
+   */
+  Real interpolated_dist = 0.;
+  if (Dim > 1)
+    {
+      const unsigned int n_base_nodes = base_el->n_nodes();
+
+      const Point    origin                 = inf_elem->origin();
+      const Order    base_mapping_order     (base_el->default_order());
+      const ElemType base_mapping_elem_type (base_el->type());
+
+      // interpolate the base nodes' distances
+      for (unsigned int n=0; n<n_base_nodes; n++)
+	  interpolated_dist += Point(base_el->point(n) - origin).size()
+	      * FE<Dim-1,LAGRANGE>::shape (base_mapping_elem_type, base_mapping_order, n, p);
+    }
+  else
+    {	
+      assert (inf_elem->type() == INFEDGE2);
+      interpolated_dist =  Point(inf_elem->point(0) - inf_elem->point(1)).size();
+    }
+
+
+
+#ifdef USE_COMPLEX_NUMBERS
+
+  // assumption on time-harmonic behavior
+  const short int sign (-1);
+
+  // get the simulation-specific data
+  const EquationSystemsBase& es (data.equation_systems);
+  const Real wavenumber = 2. * libMesh::pi
+      * es.parameter("current frequency")
+      / es.parameter("wave speed");
+
+  // the exponent for time-harmonic behavior
+  const Real exponent = sign                                                            /* +1. or -1.                */
+      * wavenumber                                                                      /* k                         */
+      * interpolated_dist                                                               /* together with next line:  */
+      * InfFE<Dim,INFINITE_MAP,T_map>::eval(v, radial_mapping_order, 1);                /* phase(s,t,v)              */
+// OLD CODE
+//   const Real exponent = data.sign
+//       * data.wavenumber  
+//       *  interpolated_dist * (1.+v)/(1.-v); 
+
+
+  const Number time_harmonic = Number(cos(exponent), sin(exponent));                    /* e^(sign*i*k*phase(s,t,v)) */
+
+  /*
+   * compute \p shape for all dof in the element
+   */
+  if (Dim > 1)
+    {
+      const unsigned int n_dof = n_dofs (fet, inf_elem->type());
+      data.shape.resize(n_dof);
+
+      for (unsigned int i=0; i<n_dof; i++)
+        {
+	  // compute base and radial shape indices
+	  unsigned int i_base, i_radial;
+	  compute_shape_indices(fet, inf_elem->type(), i, i_base, i_radial);
+ 
+	  data.shape[i] = (InfFE<Dim,T_radial,T_map>::Radial::decay(v)                  /* (1.-v)/2. in 3D          */
+			   *  FEInterface::shape(Dim-1, fet, base_el.get(), i_base, p)  /* S_n(s,t)                 */
+			   * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial))    /* L_n(v)                   */
+	      * time_harmonic;                                                          /* e^(sign*i*k*phase(s,t,v) */
+	}
+    }
+  else
+    {	
+      std::cerr << "compute_data() for 1-dimensional InfFE not implemented." << std::endl;
+      error();
+    }
+
+#else
+
+  //TODO:[DD/SP] fix this for time-dependency
+  const Real time = data.equation_systems.parameter("current time");
+
+  data.phase = interpolated_dist                                                        /* phase(s,t,v)              */
+      * InfFE<Dim,INFINITE_MAP,T_map>::eval(v, radial_mapping_order, 1); 
+  
+  if (Dim > 1)
+    {
+      const unsigned int n_dof = n_dofs (fet, inf_elem->type());
+      data.shape.resize(n_dof);
+      for (unsigned int i=0; i<n_dof; i++)
+        {
+	  // compute base and radial shape indices
+	  unsigned int i_base, i_radial;
+	  compute_shape_indices(fet, inf_elem->type(), i, i_base, i_radial);
+ 
+	  data.shape[i] = InfFE<Dim,T_radial,T_map>::Radial::decay(v)                  /* (1.-v)/2. in 3D          */
+	                  *  FEInterface::shape(Dim-1, fet, base_el.get(), i_base, p)  /* S_n(s,t)                 */
+			  * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial);    /* L_n(v)                   */
+	}
+    }
+  else
+    {	
+      std::cerr << "compute_data() for 1-dimensional InfFE not implemented." << std::endl;
+      error();
+    }
+
+  std::cerr << "compute_data() for time-domain InfFE not implemented." << std::endl;
+  error();
+
+#endif
+
+  return;
+}
 
 
 

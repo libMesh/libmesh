@@ -1,4 +1,4 @@
-// $Id: frequency_system.C,v 1.8 2003-03-21 15:29:25 ddreyer Exp $
+// $Id: frequency_system.C,v 1.9 2003-04-03 14:17:23 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -73,7 +73,7 @@ FrequencySystem::~FrequencySystem ()
   // 2. in the local vector
   for (unsigned int n=0; n < this->n_frequencies(); n++)
       _equation_systems.unset_parameter(this->form_freq_param_name(n));
-  _equation_systems.unset_parameter("current_frequency");
+  _equation_systems.unset_parameter("current frequency");
 
   this->_frequencies.clear();
 
@@ -99,7 +99,7 @@ void FrequencySystem::clear ()
   // 2. in the local vector
   for (unsigned int n=0; n < this->n_frequencies(); n++)
       _equation_systems.unset_parameter(this->form_freq_param_name(n));
-  _equation_systems.unset_parameter("current_frequency");
+  _equation_systems.unset_parameter("current frequency");
 
   this->_frequencies.clear();
 }
@@ -364,7 +364,7 @@ void FrequencySystem::attach_solve_function(void fptr(EquationSystems<FrequencyS
 void FrequencySystem::set_current_frequency(unsigned int n)
 {
   assert(n < _frequencies.size());
-  _equation_systems.set_parameter("current_frequency") = _frequencies[n];
+  _equation_systems.set_parameter("current frequency") = _frequencies[n];
 }
 
 
