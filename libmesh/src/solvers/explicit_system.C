@@ -1,4 +1,4 @@
-// $Id: explicit_system.C,v 1.1 2004-01-03 15:37:44 benkirk Exp $
+// $Id: explicit_system.C,v 1.2 2004-02-29 18:28:10 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -30,9 +30,10 @@
 ExplicitSystem::ExplicitSystem (EquationSystems& es,
 				const std::string& name,
 				const unsigned int number) :
-  
+  rhs(NULL),
   System (es, name, number)
 {
+  rhs = &(this->add_vector ("RHS Vector"));
 }
 
 
