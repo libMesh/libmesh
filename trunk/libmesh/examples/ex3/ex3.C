@@ -1,4 +1,4 @@
-// $Id: ex3.C,v 1.1 2003-01-31 21:22:11 benkirk Exp $
+// $Id: ex3.C,v 1.2 2003-01-31 23:27:41 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -25,6 +25,7 @@
  */
 #include <iostream>
 #include <algorithm>
+#include <math.h>
 
 /**
  * Basic include file needed for the mesh functionality.
@@ -76,6 +77,27 @@
  */
 void assemble_poisson(EquationSystems& es,
                       const std::string& system_name);
+
+/**
+ * This is the exact solution that
+ * we are trying to obtain.  We will solve
+ *
+ * - (u_xx + u_yy) = f
+ *
+ * and take a finite difference approximation using this
+ * function to get f.  This is the well-known "method of
+ * manufactured solutions".
+ */
+real exact_solution (const real x,
+		     const real y,
+		     const real z = 0.)
+{
+  static const real pi = acos(-1.);
+
+  return cos(pi*x)*sin(pi*y)*cos(pi*z);
+};
+
+
 
 
 
@@ -192,6 +214,13 @@ int main (int argc, char** argv)
      * ./ex3 -ksp_xmonitor
      */
     equation_systems("Poisson").solve();
+
+
+    /**
+     * After solving the system write the solution
+     * to a GMV-formatted plot file.
+     */
+    mesh.write_gmv ("out.gmv", equation_systems);
   };
 
 
@@ -390,7 +419,27 @@ void assemble_poisson(EquationSystems& es,
 	   */
 	  for (unsigned int i=0; i<phi.size(); i++)
 	    {
-	      const real fxy = 0.;
+	      const real x = q_point[qp](0);
+	      const real y = q_point[qp](1);
+	      const real eps = 1.e-3;
+
+	      /**
+	       * fxy is the forcing function for the Poisson equation.
+	       * In this case we set fxy to be a finite difference
+	       * Laplacian approximation to the (known) exact solution.
+	       *
+	       * We will use the second-order accurate FD Laplacian
+	       * approximation, which in 2D is
+	       *
+	       * u_xx + u_yy = (u(i,j-1) + u(i,j+1) +
+	       *                u(i-1,j) + u(i+1,j) +
+	       *                -4*u(i,j))/h^2
+	       */
+	      const real fxy = -(exact_solution(x,y-eps) +
+				 exact_solution(x,y+eps) +
+				 exact_solution(x-eps,y) +
+				 exact_solution(x+eps,y) -
+				 4.*exact_solution(x,y))/eps/eps;
 	      
 	      Fe[i] += JxW[qp]*fxy*phi[i][qp];
 	    };
