@@ -1,4 +1,4 @@
-// $Id: system.h,v 1.7 2005-01-03 00:06:48 benkirk Exp $
+// $Id: system.h,v 1.8 2005-01-06 21:55:03 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -39,8 +39,6 @@ class System;
 class EquationSystems;
 class Mesh;
 class Xdr;
-template <typename T> class SparseMatrix;
-template <typename T> class LinearSolver;
 
 /**
  * This is the base class for classes which contain 
@@ -216,7 +214,13 @@ public:
    * Deactivates the system.  Only active systems are solved.
    */
   void deactivate ();
-    
+
+  /**
+   * Vector iterator typedefs.
+   */
+  typedef std::map<std::string, NumericVector<Number>* >::iterator       vectors_iterator;
+  typedef std::map<std::string, NumericVector<Number>* >::const_iterator const_vectors_iterator;
+
   /**
    * Adds the additional vector \p vec_name to this system.  Only
    * allowed @e prior to \p init().  All the additional vectors

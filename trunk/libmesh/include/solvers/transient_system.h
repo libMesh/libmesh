@@ -1,4 +1,4 @@
-// $Id: transient_system.h,v 1.2 2004-04-25 05:43:33 benkirk Exp $
+// $Id: transient_system.h,v 1.3 2005-01-06 21:55:03 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -26,7 +26,7 @@
 
 // Local Includes
 #include "system.h"
-#include "implicit_system.h"
+#include "linear_implicit_system.h"
 #include "explicit_system.h"
 
 
@@ -35,7 +35,7 @@
  * at transient systems, offering nothing more than just
  * the essentials needed to solve a system.  Note
  * that still additional vectors/matrices may be added,
- * as offered in the parent class \p System.
+ * as offered in the parent classes.
  */
 
 // ------------------------------------------------------------
@@ -61,7 +61,7 @@ public:
   /**
    * The type of system.
    */
-  typedef TransientSystem sys_type;
+  typedef TransientSystem<Base> sys_type;
 
   /**
    * @returns a clever pointer to the system.
@@ -141,7 +141,9 @@ protected:
 
 // -----------------------------------------------------------
 // Useful typedefs
-typedef TransientSystem<ImplicitSystem> TransientImplicitSystem;
+typedef TransientSystem<LinearImplicitSystem> TransientImplicitSystem;
+typedef TransientSystem<LinearImplicitSystem> TransientLinearImplicitSystem;
+//typedef TransientSystem<NonlinearImplicitSystem> TransientNonlinearImplicitSystem;
 typedef TransientSystem<ExplicitSystem> TransientExplicitSystem;
 
 

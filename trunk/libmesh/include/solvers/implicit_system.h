@@ -1,4 +1,4 @@
-// $Id: implicit_system.h,v 1.6 2005-01-03 00:06:48 benkirk Exp $
+// $Id: implicit_system.h,v 1.7 2005-01-06 21:55:03 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -26,10 +26,10 @@
 
 // Local Includes
 #include "explicit_system.h"
-#include "numeric_vector.h"
 
+// Forward declarations
+template <typename T> class SparseMatrix;
 
-// Forward Declarations
 
 
 /**
@@ -69,6 +69,11 @@ public:
    * @returns a clever pointer to the system.
    */
   sys_type & system () { return *this; }
+
+  /**
+   * The type of the parent.
+   */
+  typedef ExplicitSystem Parent;
   
   /**
    * Clear all the data structures associated with
@@ -90,16 +95,22 @@ public:
    */
   virtual void assemble ();
  
-  /**
-   * Assembles & solves the linear system Ax=b. 
-   */
-  virtual void solve ();
+//   /**
+//    * Assembles & solves the linear system Ax=b. 
+//    */
+//   virtual void solve ();
  
   /**
    * @returns \p "Implicit".  Helps in identifying
    * the system type in an equation system file.
    */
   virtual std::string system_type () const { return "Implicit"; }
+
+  /**
+   * Matrix iterator typedefs.
+   */
+  typedef std::map<std::string, SparseMatrix<Number>* >::iterator        matrices_iterator;
+  typedef std::map<std::string, SparseMatrix<Number>* >::const_iterator  const_matrices_iterator;
 
   /**
    * Adds the additional matrix \p mat_name to this system.  Only
@@ -145,27 +156,9 @@ public:
    */
   SparseMatrix<Number> * matrix;
 
-  /**
-   * The \p LinearSolver defines the interface used to
-   * solve the implicit system.  This class handles all the
-   * details of interfacing with various linear algebra packages
-   * like PETSc or LASPACK.
-   */
-  AutoPtr<LinearSolver<Number> > linear_solver;
-  
-  /**
-   * Returns  the number of iterations 
-   * taken for the most recent linear solve.
-   */
-  unsigned int n_linear_iterations() const { return _n_linear_iterations; }
 
-  /**
-   * Returns the final residual for the linear system solve.
-   */
-  Real final_linear_residual() const { return _final_linear_residual; }
   
 protected:
-
   
   /**
    * Initializes the member data fields associated with
@@ -188,20 +181,10 @@ protected:
    */
   bool _can_add_matrices;
 
-  /**
-   * The number of linear iterations required to solve the linear
-   * system Ax=b.
-   */
-  unsigned int _n_linear_iterations;
 
-  /**
-   * The final residual for the linear system Ax=b.
-   */
-  Real _final_linear_residual;
   
 private:
 
-  
   /**
    * Add the system matrix to the \p _matrices data structure.
    * Useful in initialization.

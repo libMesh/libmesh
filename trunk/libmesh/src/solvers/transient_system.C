@@ -1,4 +1,4 @@
-// $Id: transient_system.C,v 1.2 2004-02-18 12:13:35 spetersen Exp $
+// $Id: transient_system.C,v 1.3 2005-01-06 21:55:04 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -129,5 +129,5 @@ void TransientSystem<Base>::re_update ()
 
 // ------------------------------------------------------------
 // TransientSystem instantiations
-template class TransientSystem<ImplicitSystem>;
+template class TransientSystem<LinearImplicitSystem>;
 template class TransientSystem<ExplicitSystem>;

@@ -1,4 +1,4 @@
-// $Id: frequency_system.h,v 1.2 2004-11-09 12:20:57 spetersen Exp $
+// $Id: frequency_system.h,v 1.3 2005-01-06 21:55:03 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -22,22 +22,17 @@
 #ifndef __frequency_system_h__
 #define __frequency_system_h__
 
+#include "libmesh_config.h"
+
+// Frequency domain solutions only possible with complex arithmetic
+#if defined(USE_COMPLEX_NUMBERS)
+
 // C++ includes
 #include <string>
 #include <vector>
 
-
 // Local Includes
-#include "libmesh_config.h"
-
-/*
- * Frequency domain solutions only possible with complex arithmetic
- */
-#if defined(USE_COMPLEX_NUMBERS)
-
-#include "implicit_system.h"
-
-// Forward Declarations
+#include "linear_implicit_system.h"
 
 
 
@@ -70,7 +65,7 @@
 // ------------------------------------------------------------
 // FrequencySystem class definition
 
-class FrequencySystem : public ImplicitSystem
+class FrequencySystem : public LinearImplicitSystem
 {
 public:
 
@@ -284,7 +279,7 @@ protected:
 inline
 std::pair<unsigned int, Real> FrequencySystem::get_rval (unsigned int n) const
 {
-  assert(n<vec_rval.size());
+  assert (n < vec_rval.size());
 
   return vec_rval[n];
 }

@@ -1,4 +1,4 @@
-// $Id: frequency_system.C,v 1.5 2005-01-03 00:06:49 benkirk Exp $
+// $Id: frequency_system.C,v 1.6 2005-01-06 21:55:04 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -44,7 +44,7 @@
 FrequencySystem::FrequencySystem (EquationSystems& es,
 				  const std::string& name,
 				  const unsigned int number) :
-  ImplicitSystem            (es, name, number),
+  LinearImplicitSystem      (es, name, number),
   solve_system              (NULL),
   _finished_set_frequencies (false),
   _keep_solution_duplicates (true),
@@ -70,7 +70,7 @@ FrequencySystem::~FrequencySystem ()
 
 void FrequencySystem::clear ()
 {
-  ImplicitSystem::clear();
+  LinearImplicitSystem::clear();
 
   _finished_set_frequencies = false;
   _keep_solution_duplicates = true;
@@ -101,7 +101,7 @@ void FrequencySystem::clear_all ()
   if (_equation_systems.parameters.have_parameter<unsigned int> ("n_frequencies"))
     {
       for (unsigned int n=0; n < _equation_systems.parameters.get<unsigned int>("n_frequencies"); n++)
-	  _equation_systems.parameters.remove(this->form_freq_param_name(n));
+	_equation_systems.parameters.remove(this->form_freq_param_name(n));
       _equation_systems.parameters.remove("current frequency");
     }
 }
@@ -112,7 +112,7 @@ void FrequencySystem::clear_all ()
 void FrequencySystem::init_data ()
 {
   // initialize parent data and additional solution vectors
-  ImplicitSystem::init_data();
+  LinearImplicitSystem::init_data();
   
   // Log how long initializing the system takes
   START_LOG("init()", "FrequencySystem");
@@ -167,7 +167,7 @@ void FrequencySystem::assemble ()
   // prepare matrix with the help of the _dof_map, 
   // fill with sparsity pattern, initialize the
   // additional matrices
-  ImplicitSystem::assemble();
+  LinearImplicitSystem::assemble();
 
   //matrix.print ();
   //rhs.print    ();
@@ -196,7 +196,7 @@ void FrequencySystem::set_frequencies_by_steps (const Real base_freq,
     }
 
   // store number of frequencies as parameter
-  _equation_systems.parameters.set<Real>("n_frequencies") = n_freq;
+  _equation_systems.parameters.set<unsigned int>("n_frequencies") = n_freq;
 
   for (unsigned int n=0; n<n_freq; n++)
     {
@@ -206,7 +206,7 @@ void FrequencySystem::set_frequencies_by_steps (const Real base_freq,
 
       // build storage for solution vector, if wanted
       if (this->_keep_solution_duplicates)
-	  System::add_vector(this->form_solu_vec_name(n));
+	  this->add_vector(this->form_solu_vec_name(n));
     }  
 
   _finished_set_frequencies = true;
@@ -235,7 +235,7 @@ void FrequencySystem::set_frequencies_by_range (const Real min_freq,
     }
 
   // store number of frequencies as parameter
-  _equation_systems.parameters.set<Real>("n_frequencies") = n_freq;
+  _equation_systems.parameters.set<unsigned int>("n_frequencies") = n_freq;
 
   // set frequencies, build solution storage
   for (unsigned int n=0; n<n_freq; n++)
@@ -272,7 +272,7 @@ void FrequencySystem::set_frequencies (const std::vector<Real>& frequencies,
     }
 
   // store number of frequencies as parameter
-  _equation_systems.parameters.set<Real>("n_frequencies") = frequencies.size();
+  _equation_systems.parameters.set<unsigned int>("n_frequencies") = frequencies.size();
 
   // set frequencies, build solution storage
   for (unsigned int n=0; n<frequencies.size(); n++)
@@ -370,7 +370,7 @@ void FrequencySystem::solve (const unsigned int n_start,
        * store the current solution in the additional vector
        */
       if (this->_keep_solution_duplicates)
-	  this->get_vector(this->form_solu_vec_name(n)) = *solution;
+	this->get_vector(this->form_solu_vec_name(n)) = *solution;
     }  
 
   // sanity check

@@ -1,4 +1,4 @@
-// $Id: newmark_system.h,v 1.2 2004-10-20 21:42:33 benkirk Exp $
+// $Id: newmark_system.h,v 1.3 2005-01-06 21:55:03 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,7 @@
 // C++ includes
 
 // Local Includes
-#include "implicit_system.h"
+#include "linear_implicit_system.h"
 
 // Forward Declarations
 
@@ -50,7 +50,7 @@
 // ------------------------------------------------------------
 // NewmarkSystem class definition
 
-class NewmarkSystem : public ImplicitSystem
+class NewmarkSystem : public LinearImplicitSystem
 {
 public:
 

@@ -1,4 +1,4 @@
-// $Id: steady_system.h,v 1.1 2004-01-03 15:37:42 benkirk Exp $
+// $Id: steady_system.h,v 1.2 2005-01-06 21:55:03 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -25,12 +25,12 @@
 // C++ includes
 
 // Local Includes
-#include "implicit_system.h"
+#include "linear_implicit_system.h"
 
 
 // The SteadySystem is now simply a typedef for an
 // implicit system
-typedef ImplicitSystem SteadySystem;
+typedef LinearImplicitSystem SteadyLinearSystem;
 
 
 #endif // #ifndef __steady_system__

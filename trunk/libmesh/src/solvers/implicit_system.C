@@ -1,4 +1,4 @@
-// $Id: implicit_system.C,v 1.6 2005-01-03 00:06:49 benkirk Exp $
+// $Id: implicit_system.C,v 1.7 2005-01-06 21:55:04 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -25,14 +25,9 @@
 #include "implicit_system.h"
 #include "equation_systems.h"
 #include "sparse_matrix.h"
-#include "linear_solver.h"
-#include "numeric_vector.h"
 #include "utility.h"
 #include "libmesh_logging.h"
 
-// typedefs
-typedef std::map<std::string, SparseMatrix<Number>* >::iterator        matrices_iterator;
-typedef std::map<std::string, SparseMatrix<Number>* >::const_iterator  matrices_const_iterator;
 
 
 // ------------------------------------------------------------
@@ -41,12 +36,9 @@ ImplicitSystem::ImplicitSystem (EquationSystems& es,
 				const std::string& name,
 				const unsigned int number) :
   
-  ExplicitSystem         (es, name, number),
-  matrix                 (NULL),
-  linear_solver          (LinearSolver<Number>::build()),
-  _can_add_matrices      (true),
-  _n_linear_iterations   (0),
-  _final_linear_residual (1.e20)
+  Parent            (es, name, number),
+  matrix            (NULL),
+  _can_add_matrices (true)
 {
 }
 
@@ -63,7 +55,7 @@ ImplicitSystem::~ImplicitSystem ()
 void ImplicitSystem::clear ()
 {
   // clear the parent data
-  ExplicitSystem::clear();
+  Parent::clear();
 
   // clear any user-added matrices
   {
@@ -88,7 +80,7 @@ void ImplicitSystem::clear ()
 void ImplicitSystem::init_data ()
 {
   // initialize parent data
-  ExplicitSystem::init_data();
+  Parent::init_data();
 
   // Add the system matrix.
   this->add_system_matrix ();
@@ -141,15 +133,12 @@ void ImplicitSystem::init_matrices ()
 void ImplicitSystem::reinit ()
 {
   // initialize parent data
-  ExplicitSystem::reinit();  
+  Parent::reinit();  
 
   // Clear the matrices
   for (matrices_iterator pos = _matrices.begin();
        pos != _matrices.end(); ++pos)
     pos->second->clear();
-
-  // Clear the linear solver interface
-  linear_solver->clear();
 
   // Re-initialize the matrices
   this->init_matrices ();
@@ -169,45 +158,7 @@ void ImplicitSystem::assemble ()
   rhs->zero ();
 
   // Call the base class assemble function
-  ExplicitSystem::assemble ();
-}
-
-
-
-void ImplicitSystem::solve ()
-{
-  // Assemble the linear system
-  this->assemble (); 
-
-  // Log how long the linear solve takes.
-  START_LOG("solve()", "System");
-  
-  // Get the user-specifiied linear solver tolerance
-  const Real tol            =
-    _equation_systems.parameters.get<Real>("linear solver tolerance");
-
-  // Get the user-specified maximum # of linear solver iterations
-  const unsigned int maxits =
-    _equation_systems.parameters.get<unsigned int>("linear solver maximum iterations");
-
-  // Solve the linear system.  Two cases:
-  const std::pair<unsigned int, Real> rval =
-    (this->have_matrix("Preconditioner")) ?
-    // 1.) User-supplied preconditioner
-    linear_solver->solve (*matrix, this->get_matrix("Preconditioner"), *solution, *rhs, tol, maxits) :
-    // 2.) Use system matrix for the preconditioner
-    linear_solver->solve (*matrix, *solution, *rhs, tol, maxits);
-
-  // Store the number of linear iterations required to
-  // solve and the final residual.
-  _n_linear_iterations   = rval.first;
-  _final_linear_residual = rval.second;
-    
-  // Stop logging the linear solve
-  STOP_LOG("solve()", "System");
-
-  // Update the system after the solve
-  this->update();  
+  Parent::assemble ();
 }
 
 
@@ -240,7 +191,7 @@ SparseMatrix<Number> & ImplicitSystem::add_matrix (const std::string& mat_name)
 const SparseMatrix<Number> & ImplicitSystem::get_matrix (const std::string& mat_name) const
 {
   // Make sure the matrix exists
-  matrices_const_iterator pos = _matrices.find (mat_name);
+  const_matrices_iterator pos = _matrices.find (mat_name);
   
   if (pos == _matrices.end())
     {
