@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.25 2004-01-03 15:37:42 benkirk Exp $
+// $Id: fe.C,v 1.26 2004-02-10 22:48:53 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -109,9 +109,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
   assert (elem  != NULL);
 
   
-  /**
-   * Start logging the shape function initialization
-   */
+  // Start logging the shape function initialization
   START_LOG("init_shape_functions()", "FE");
 
   
@@ -310,9 +308,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
       error();
     }
   
-  /**
-   * Stop logging the shape function initialization
-   */
+  // Stop logging the shape function initialization
   STOP_LOG("init_shape_functions()", "FE");
 }
 
