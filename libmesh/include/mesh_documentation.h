@@ -142,22 +142,22 @@
  
  
   - GNU GCC
-    - gcc-3.2
-    - gcc-2.95.3
-    - gcc-2.96 (RedHat's compiler in the 7.x series)
+    - \p gcc 3.2
+    - \p gcc 2.95.3
+    - \p gcc 2.96 (RedHat's compiler in the 7.x series)
  
   - Intel ICC/ECC
-    - icc/ifc 7.0
-    - icc/ifc 6.0
+    - \p icc/ifc 7.0
+    - \p icc/ifc 6.0
     - Earlier versions (<= 5.0) not supported.
  
   - SGI MIPSPro Compilers
     - Version 7.30
     - Not tested (but will likely work) with others
  
-  - HP (use CXX="aCC -AA" and CC="cc -Aa" to get full std support) 
-    - aCC A.03.37
-    - aCC A.03.31
+  - HP (use \p CXX="aCC \p -AA" and \p CC="cc \p -Aa" to get full std support) 
+    - \p aCC A.03.37
+    - \p aCC A.03.31
 
   - IBM xlC version 5.0, 6.0
   - HP/Compaq/DEC \p cxx 6.3.9.6
