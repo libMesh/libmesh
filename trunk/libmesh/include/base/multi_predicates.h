@@ -1,4 +1,4 @@
-// $Id: multi_predicates.h,v 1.4 2005-02-22 22:17:30 jwpeterson Exp $
+// $Id: multi_predicates.h,v 1.5 2005-03-21 15:19:26 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -242,14 +242,28 @@ namespace Predicates
 
 
 
+  // Instantiation for the Level abstract_multi_predicate
+  template <typename T>
+  struct Level : abstract_multi_predicate<T>
+  {
+    Level(const unsigned int l)
+    {
+      this->_predicates.push_back(new not_null<T>);
+      this->_predicates.push_back(new level<T>(l));
+    }
+  };
+
+
+
+
   // Instantiation for the NotLevel abstract_multi_predicate
   template <typename T>
   struct NotLevel : abstract_multi_predicate<T>
   {
-    NotLevel(const unsigned int level)
+    NotLevel(const unsigned int l)
     {
       this->_predicates.push_back(new not_null<T>);
-      this->_predicates.push_back(new not_level<T>(level));
+      this->_predicates.push_back(new not_level<T>(l));
     }
   };
 

@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.39 2005-02-22 22:17:33 jwpeterson Exp $
+// $Id: mesh_base.h,v 1.40 2005-03-21 15:19:28 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -62,8 +62,8 @@ class EquationSystems;
  * mesh to disk in various formats.
  *
  * \author  Benjamin S. Kirk
- * \date    $Date: 2005-02-22 22:17:33 $
- * \version $Revision: 1.39 $
+ * \date    $Date: 2005-03-21 15:19:28 $
+ * \version $Revision: 1.40 $
  */
 
 
@@ -403,6 +403,9 @@ public:
   element_iterator active_local_elements_begin ();
   element_iterator active_local_elements_end   ();
 
+  element_iterator level_elements_begin (const unsigned int level);
+  element_iterator level_elements_end   (const unsigned int level);
+
   element_iterator not_level_elements_begin (const unsigned int level);
   element_iterator not_level_elements_end   (const unsigned int level);
 
@@ -438,11 +441,14 @@ public:
   const_element_iterator active_local_elements_begin () const;
   const_element_iterator active_local_elements_end   () const;
 
+  const_element_iterator level_elements_begin (const unsigned int level) const;
+  const_element_iterator level_elements_end   (const unsigned int level) const;
+
   const_element_iterator not_level_elements_begin (const unsigned int level) const;
-  const_element_iterator not_level_elements_end   (const unsigned int level)   const;
+  const_element_iterator not_level_elements_end   (const unsigned int level) const;
 
   const_element_iterator pid_elements_begin (const unsigned int proc_id) const;
-  const_element_iterator pid_elements_end   (const unsigned int proc_id)   const;
+  const_element_iterator pid_elements_end   (const unsigned int proc_id) const;
 
   const_element_iterator type_elements_begin (const ElemType type) const;
   const_element_iterator type_elements_end   (const ElemType type) const;
