@@ -1,4 +1,4 @@
-// $Id: elem_iterators.h,v 1.8 2003-02-26 13:59:52 benkirk Exp $
+// $Id: elem_iterators.h,v 1.9 2003-03-03 02:15:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,6 +26,8 @@
 #include "predicated_iterator.h"
 #include "libmesh_base.h"
 #include "elem.h"
+
+
 
 
 /**
@@ -60,8 +62,6 @@ protected:
 };
 
 
-
-
 /**
  * Specialization of the basic_elem_iterator class
  * for \p std::vector<Elem*>::iterator.  This is what
@@ -82,8 +82,6 @@ typedef basic_elem_iterator<std::vector<Elem*>::iterator> elem_iterator;
 typedef basic_elem_iterator<Elem**> neighbor_iterator;
 
 
-
-
 /**
  * Specialization of the basic_elem_iterator class
  * for \p std::vector<Elem*>::const_iterator.  This is what
@@ -102,6 +100,8 @@ typedef basic_elem_iterator<std::vector<Elem*>::const_iterator> const_elem_itera
  * all the neighbors of an element in const functions.
  */
 typedef basic_elem_iterator<const Elem**> const_neighbor_iterator;
+
+
 
 
 
@@ -142,11 +142,6 @@ protected:
 };
 
 
-
-
-
-
-
 /**
  * Specialization of the basic_active_elem_iterator class for
  * for \p std::vector<Elem*>::iterator.  This is what users
@@ -156,8 +151,6 @@ protected:
 typedef basic_active_elem_iterator<std::vector<Elem*>::iterator> active_elem_iterator;
 
 
-
-
 /**
  * Specialization of the basic_active_elem_iterator class for
  * for \p std::vector<Elem*>::const_iterator.  This is what users
@@ -165,6 +158,7 @@ typedef basic_active_elem_iterator<std::vector<Elem*>::iterator> active_elem_ite
  * elements in the mesh in const functions.
  */
 typedef basic_active_elem_iterator<std::vector<Elem*>::const_iterator> const_active_elem_iterator; 
+
 
 
 
@@ -206,8 +200,6 @@ protected:
 };
 
 
-
-
 /**
  * Specialization of the basic_not_active_elem_iterator class for
  * for \p std::vector<Elem*>::iterator.  This is what users
@@ -217,8 +209,6 @@ protected:
 typedef basic_not_active_elem_iterator<std::vector<Elem*>::iterator> not_active_elem_iterator;
 
 
-
-
 /**
  * Specialization of the basic_not_active_elem_iterator class for
  * for \p std::vector<Elem*>::const_iterator.  This is what users
@@ -226,6 +216,8 @@ typedef basic_not_active_elem_iterator<std::vector<Elem*>::iterator> not_active_
  * elements in the mesh in const functions.
  */
 typedef basic_not_active_elem_iterator<std::vector<Elem*>::const_iterator> const_not_active_elem_iterator; 
+
+
 
 
 
@@ -270,7 +262,6 @@ protected:
 };
 
 
-
 /**
  * Specialization of the basic_type_elem_iterator for
  * \p std::vector<Elem*>::iterator.  This is what users
@@ -287,7 +278,6 @@ typedef basic_type_elem_iterator<std::vector<Elem*>::iterator> type_elem_iterato
  * of a specific type in const functions.
  */
 typedef basic_type_elem_iterator<std::vector<Elem*>::const_iterator> const_type_elem_iterator;
-
 
 
 
@@ -347,6 +337,8 @@ typedef basic_not_type_elem_iterator<std::vector<Elem*>::const_iterator> const_n
 
 
 
+
+
 /**
  * The basic_active_type_elem_iterator is a templated unspecialized
  * iterator which can be used to iterate only over active elements
@@ -379,11 +371,6 @@ protected:
 };
 
 
-
-
-
-
-
 /**
  * Specialization of the basic_active_type_elem_iterator for
  * \p std::vector<Elem*>::iterator.  This is what users
@@ -393,7 +380,6 @@ protected:
 typedef basic_active_type_elem_iterator<std::vector<Elem*>::iterator> active_type_elem_iterator;
 
 
-
 /**
  * Specialization of the basic_active_type_elem_iterator for
  * \p std::vector<Elem*>::const_iterator.  This is what users
@@ -401,6 +387,7 @@ typedef basic_active_type_elem_iterator<std::vector<Elem*>::iterator> active_typ
  * of a specific type.
  */
 typedef basic_active_type_elem_iterator<std::vector<Elem*>::const_iterator> const_active_type_elem_iterator; 
+
 
 
 
@@ -446,9 +433,6 @@ protected:
 };
 
 
-
-
-
 /**
  * Specialization of the basic_level_elem_iterator for
  * \p std::vector<Elem*>::iterator.  This is what users
@@ -458,8 +442,6 @@ protected:
 typedef basic_level_elem_iterator<std::vector<Elem*>::iterator> level_elem_iterator;
 
 
-
-
 /**
  * Specialization of the basic_level_elem_iterator for
  * \p std::vector<Elem*>::const_iterator.  This is what users
@@ -467,6 +449,7 @@ typedef basic_level_elem_iterator<std::vector<Elem*>::iterator> level_elem_itera
  * of a specific type.
  */
 typedef basic_level_elem_iterator<std::vector<Elem*>::const_iterator> const_level_elem_iterator;
+
 
 
 
@@ -502,7 +485,6 @@ protected:
 };
 
 
-
 /**
  * Specialization of the basic_not_level_elem_iterator for
  * \p std::vector<Elem*>::iterator.  This is what users
@@ -519,9 +501,6 @@ typedef basic_not_level_elem_iterator<std::vector<Elem*>::iterator> not_level_el
  * NOT of a specific type.
  */
 typedef basic_not_level_elem_iterator<std::vector<Elem*>::const_iterator> const_not_level_elem_iterator;
-
-
-
 
 
 
@@ -565,6 +544,7 @@ protected:
   const unsigned int _pid;
 };
 
+
 /**
  * Specialization of the basic_pid_elem_iterator for
  * \p std::vector<Elem*>::iterator.  This is what users
@@ -581,6 +561,7 @@ typedef basic_pid_elem_iterator<std::vector<Elem*>::iterator> pid_elem_iterator;
  * with a specific processor id.
  */
 typedef basic_pid_elem_iterator<std::vector<Elem*>::const_iterator> const_pid_elem_iterator;
+
 
 
 
@@ -639,6 +620,9 @@ typedef basic_not_pid_elem_iterator<std::vector<Elem*>::const_iterator> const_no
 
 
 
+
+
+
 /**
  * The basic_active_pid_elem_iterator is a templated unspecialized
  * iterator which can be used to iterate only over active elements
@@ -689,6 +673,9 @@ typedef basic_active_pid_elem_iterator<std::vector<Elem*>::iterator> active_pid_
  * that have a specific processor id in const functions.
  */
 typedef basic_active_pid_elem_iterator<std::vector<Elem*>::const_iterator> const_active_pid_elem_iterator;
+
+
+
 
 
 
@@ -743,6 +730,9 @@ typedef basic_local_elem_iterator<std::vector<Elem*>::const_iterator> const_loca
 
 
 
+
+
+
 /**
  * The basic_active_local_elem_iterator is a templated unspecialized
  * iterator which can be used to iterate only over active elements
@@ -792,6 +782,7 @@ typedef basic_active_local_elem_iterator<std::vector<Elem*>::iterator> active_lo
  */
 typedef basic_active_local_elem_iterator<std::vector<Elem*>::const_iterator> const_active_local_elem_iterator;
 
-#endif
+
+#endif // #ifdef __elem_iterators_h__
 
 

@@ -6,6 +6,10 @@
 #include "general_system.h"
 #include "equation_systems.h"
 #include "mesh_refinement.h"
+#include "dense_matrix.h"
+#include "dense_vector.h"
+
+
 
 
 void assemble(EquationSystems& es,
@@ -34,7 +38,7 @@ int main (int argc, char** argv)
     // Read a mesh
     mesh.read(meshname);
 
-    mesh.elem(0)->set_refinement_flag() = Elem::REFINE;
+    mesh.elem(0)->set_refinement_flag(Elem::REFINE);
     mesh.mesh_refinement.refine_and_coarsen_elements();    
     mesh.mesh_refinement.uniformly_refine(3);
     
@@ -86,21 +90,18 @@ void assemble(EquationSystems& es,
   
   const Mesh& mesh       = es.get_mesh();
   const unsigned int dim = mesh.mesh_dimension();
-  const int proc_id      = mesh.processor_id();
   
   // Also use a 3x3x3 quadrature rule (3D).  Then tell the FE
   // about the geometry of the problem and the quadrature rule
   FEType fe_type (FIRST);
   
   AutoPtr<FEBase> fe(FEBase::build(dim, fe_type));
-  QGauss qrule(dim, SEVENTH);
-  //QTrap qrule(dim);
+  QGauss qrule(dim, FIFTH);
   
   fe->attach_quadrature_rule (&qrule);
   
-  AutoPtr<FEBase> fe_face(FEBase::build(dim, fe_type));
-  
-  QGauss   qface(dim-1, FIFTH);
+  AutoPtr<FEBase> fe_face(FEBase::build(dim, fe_type));  
+  QGauss qface(dim-1, FIFTH);
   
   fe_face->attach_quadrature_rule(&qface);
   
@@ -123,13 +124,12 @@ void assemble(EquationSystems& es,
   
   Real vol=0., area=0.;
 
-  for (unsigned int e=0; e<mesh.n_elem(); e++)
-    {
-      const Elem* elem = mesh.elem(e);
+  const_active_local_elem_iterator       el     (mesh.elements_begin());
+  const const_active_local_elem_iterator end_el (mesh.elements_end());
 
-      // Find the next active element on my processor
-      if (elem->processor_id() != proc_id) continue;
-      if (!elem->active())                 continue;
+  for (; el != end_el; ++el)
+    {
+      const Elem* elem = *el;
 
       // recompute the element-specific data for the current element
       fe->reinit (elem);

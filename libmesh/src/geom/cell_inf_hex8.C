@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex8.C,v 1.13 2003-02-27 00:55:29 benkirk Exp $
+// $Id: cell_inf_hex8.C,v 1.14 2003-03-03 02:15:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,7 @@
 // C++ includes
 
 // Local includes cont'd
-#include "mesh.h"
+#include "mesh_base.h"
 #include "cell_inf_hex8.h"
 #include "face_quad4.h"
 #include "face_inf_quad4.h"
@@ -243,7 +243,7 @@ const unsigned int InfHex8::_side_children_matrix[6][5] =
 
 
 
-void InfHex8::refine(Mesh& mesh)
+void InfHex8::refine (MeshBase& mesh)
 {
   assert (this->refinement_flag() == Elem::REFINE);
   assert (this->active());
@@ -256,7 +256,7 @@ void InfHex8::refine(Mesh& mesh)
     for (unsigned int c=0; c<this->n_children(); c++)
       {
 	_children[c] = new InfHex8(this);
-	_children[c]->set_refinement_flag() = Elem::JUST_REFINED;
+	_children[c]->set_refinement_flag(Elem::JUST_REFINED);
       }
   }
 
@@ -307,7 +307,7 @@ void InfHex8::refine(Mesh& mesh)
 
 
   // Un-set my refinement flag now
-  this->set_refinement_flag() = Elem::DO_NOTHING;
+  this->set_refinement_flag(Elem::DO_NOTHING);
 }
 
 

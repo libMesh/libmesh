@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.15 2003-02-28 23:37:48 benkirk Exp $
+// $Id: mesh_generation.C,v 1.16 2003-03-03 02:15:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -956,49 +956,41 @@ void Mesh::build_sphere (const Real rad,
 		    }
 	  }
 
+	
 	// Copy only the active elements to the current mesh
 	{
 	  mesh_refinement.clear();
-
-	  std::vector<Elem*> new_elements(n_active_elem());
 	  
-	  unsigned int ne=0;
+ 	  std::vector<Elem*> new_elements;
+
+	  new_elements.reserve (n_active_elem());
 	  
 	  for (unsigned int e=0; e<n_elem(); e++)
 	    {
+	      // Add only the active elements.   We can't just copy
+	      // the pointers, because that would break the tree.
+	      // We'll allocate new elements instead.
 	      if (elem(e)->active())
 		{
-		  // Build the new elements.  We can't just copy
-		  // the pointers since we must delete the parents to
-		  // avoid a memory leak.  Deleting the parents will
-		  // also delete the children, so we need to build a
-		  // whole new element for this to work properly.
-		  // Clear?
-		  new_elements[ne] = Elem::build(elem(e)->type());
-		  
-		  for (unsigned int n=0; n<elem(e)->n_nodes(); n++)
-		    new_elements[ne]->set_node(n) =
-		      elem(e)->get_node(n);
-		  
-		  ne++;
-		}
+		  new_elements.push_back(Elem::build(elem(e)->type()));
 
-	      // Delete the element
-	      delete elem(e);
+		  for (unsigned int n=0; n<elem(e)->n_nodes(); n++)
+		    new_elements.back()->set_node(n) =
+		      elem(e)->get_node(n);
+		}
+	      
+	      delete _elements[e];
 	      _elements[e] = NULL;
 	    }
 	  
 	  // Copy the new elements
 	  _elements = new_elements;
 	}
-
+	
 	// Possibly convert all the elements to triangles
 	if ((type == TRI6) ||
 	    (type == TRI3))
 	  all_tri();
-
-	// Finally, find the face neighbors
-	find_neighbors();
 
 #else
 

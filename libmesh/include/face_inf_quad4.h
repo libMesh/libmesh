@@ -1,4 +1,4 @@
-// $Id: face_inf_quad4.h,v 1.10 2003-02-28 23:37:42 benkirk Exp $
+// $Id: face_inf_quad4.h,v 1.11 2003-03-03 02:15:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -117,7 +117,7 @@ public:
   /**
    * Refine the element.
    */
-  void refine(Mesh& mesh);
+  void refine (MeshBase& mesh);
 
 #endif
   

@@ -1,4 +1,4 @@
-// $Id: face_inf_quad4.C,v 1.12 2003-02-27 00:55:30 benkirk Exp $
+// $Id: face_inf_quad4.C,v 1.13 2003-03-03 02:15:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,7 +26,7 @@
 
 
 // Local includes cont'd
-#include "mesh.h"
+#include "mesh_base.h"
 #include "face_inf_quad4.h"
 #include "edge_edge2.h"
 #include "edge_inf_edge2.h"
@@ -154,7 +154,7 @@ const std::vector<unsigned int> InfQuad4::tecplot_connectivity(const unsigned in
 
 #ifdef ENABLE_AMR
 
-void InfQuad4::refine(Mesh& mesh)
+void InfQuad4::refine (MeshBase& mesh)
 {
   assert (this->refinement_flag() == Elem::REFINE);
   assert (this->active());
@@ -167,7 +167,7 @@ void InfQuad4::refine(Mesh& mesh)
     for (unsigned int c=0; c<this->n_children(); c++)
       {
 	_children[c] = new InfQuad4(this);
-	_children[c]->set_refinement_flag() = Elem::JUST_REFINED;
+	_children[c]->set_refinement_flag(Elem::JUST_REFINED);
       }
   }
 
@@ -218,7 +218,7 @@ void InfQuad4::refine(Mesh& mesh)
 
   
   // Un-set my refinement flag now
-  this->set_refinement_flag() = Elem::DO_NOTHING;
+  this->set_refinement_flag(Elem::DO_NOTHING);
 }
 
 

@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.17 2003-02-28 23:37:42 benkirk Exp $
+// $Id: elem.h,v 1.18 2003-03-03 02:15:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -37,7 +37,7 @@
 
 
 // Forward declarations
-class Mesh;
+class MeshBase;
 class MeshRefinement;
 class Elem;
 
@@ -128,15 +128,13 @@ class Elem : public ReferenceCountedObject<Elem>,
    * @returns the subdomain that this element belongs to.
    * To conserve space this is stored as an unsigned char.
    */
-  unsigned char subdomain_id () const
-  { return _sbd_id; }
+  unsigned char subdomain_id () const;
   
   /**
    * @returns the subdomain that this element belongs to as a
    * writeable reference.
    */
-  unsigned char & set_subdomain_id ()
-  { return _sbd_id; }
+  unsigned char & set_subdomain_id ();
 
   /**
    * @returns an id assocated with this element.  The id is not
@@ -161,14 +159,12 @@ class Elem : public ReferenceCountedObject<Elem>,
    * has been called and this returns \p NULL then the side is on
    * a boundary of the domain. 
    */
-  Elem* neighbor(const unsigned int i) const
-  { assert (i < n_neighbors()); return _neighbors[i]; }
+  Elem* neighbor(const unsigned int i) const;
 
   /**
    * Assigns \p n as the \f$ i^{th} \f$ neighbor.
    */
-  void set_neighbor(const unsigned int i, Elem* n)
-  { assert (i < n_neighbors()); _neighbors[i]=n; return; }
+  void set_neighbor(const unsigned int i, Elem* n);
 
   /**
    * @returns \p true if this element has a side coincident
@@ -370,8 +366,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    * @returns a pointer to the element's parent.  Returns \p NULL if
    * the element was not created via refinement, i.e. was read from file.
    */
-  const Elem* parent() const
-  { return _parent; }
+  const Elem* parent() const;
   
   /**
    * @returns the magnitude of the distance between nodes n1 and n2.
@@ -386,7 +381,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    * Useful ENUM describing the refinement state of
    * an element.
    */
-  enum RefinementState { COARSEN = -1,
+  enum RefinementState { COARSEN = 0,
 			 DO_NOTHING,
 			 REFINE,
 			 JUST_REFINED };
@@ -403,30 +398,22 @@ class Elem : public ReferenceCountedObject<Elem>,
    * @returns a pointer to the \f$ i^{th} \f$ child for this element.
    * Returns \p NULL  if this element has no children, i.e. is active.
    */
-  Elem* child(const unsigned int i) const
-  {
-    assert (_children    != NULL);
-    assert (_children[i] != NULL);
-    return _children[i];
-  }
+  Elem* child(const unsigned int i) const;
 
   /**
    * Returns the value of the refinement flag for the element.
    */
-  RefinementState refinement_flag () const
-  { return _rflag; }
+  RefinementState refinement_flag () const;
 
   /**
-   * Returns the value of the refinement flag for the element
-   * as a writeable reference.
+   * Sets the value of the refinement flag for the element.
    */     
-  RefinementState & set_refinement_flag ()
-  { return _rflag; }
+  void set_refinement_flag (const RefinementState rflag);
 
   /**
    * Refine the element.
    */
-  virtual void refine (Mesh& mesh);
+  virtual void refine (MeshBase& mesh);
   
   /**
    * Coarsen the element.  This is not
@@ -440,22 +427,21 @@ class Elem : public ReferenceCountedObject<Elem>,
    * to the _neighbors array.  These make the accessor
    * functions easier to read.
    */
-  typedef std::pair<Elem**, Elem**> ElemPair;
+  typedef std::pair<Elem**, Elem**>             ElemPair;
   typedef std::pair<const Elem**, const Elem**> ConstElemPair;
 
   /**
    * The non-const begin and end accessor functions.
    */
-  ElemPair neighbors_begin() { return ElemPair (&_neighbors[0],         &_neighbors[n_neighbors()]); }
-  ElemPair neighbors_end()   { return ElemPair (&_neighbors[n_sides()], &_neighbors[n_neighbors()]); }
+  ElemPair neighbors_begin ();
+  ElemPair neighbors_end ();
 
   /**
    * The const begin and end accessor functions. 
    */
-  ConstElemPair neighbors_begin() const { return ConstElemPair (const_cast<const Elem**>(&_neighbors[0]),
-								const_cast<const Elem**>(&_neighbors[n_neighbors()])); }
-  ConstElemPair neighbors_end()   const { return ConstElemPair (const_cast<const Elem**>(&_neighbors[n_neighbors()]),
-								const_cast<const Elem**>(&_neighbors[n_neighbors()])); }
+  ConstElemPair neighbors_begin () const;
+  ConstElemPair neighbors_end () const;
+  
 #endif
 
   
@@ -525,9 +511,11 @@ class Elem : public ReferenceCountedObject<Elem>,
   Elem** _children;
 
   /**
-   * Refinement flag.
+   * Refinement flag. This is stored as an unsigned char
+   * to save space.
    */
-  RefinementState _rflag;
+  unsigned char _rflag;
+  //RefinementState _rflag;
   
 #endif
 
@@ -596,7 +584,7 @@ Elem::Elem(const unsigned int nn,
   
   _children = NULL;
 
-  this->set_refinement_flag() = Elem::DO_NOTHING;
+  this->set_refinement_flag(Elem::DO_NOTHING);
 
 #endif  
 }
@@ -682,6 +670,43 @@ Node* & Elem::set_node (const unsigned int i)
 }
 
 
+
+inline
+unsigned char Elem::subdomain_id () const
+{
+  return _sbd_id;
+}
+
+
+
+inline
+unsigned char & Elem::set_subdomain_id ()
+{
+  return _sbd_id;
+}
+
+
+
+inline
+Elem* Elem::neighbor (const unsigned int i) const
+{
+  assert (i < n_neighbors());
+
+  return _neighbors[i];
+}
+
+
+
+inline
+void Elem::set_neighbor (const unsigned int i, Elem* n)
+{
+  assert (i < n_neighbors());
+  
+  _neighbors[i] = n;
+}
+
+
+
 inline
 bool Elem::on_boundary () const
 {
@@ -713,6 +738,15 @@ bool Elem::active() const
 
 
 
+
+inline
+const Elem* Elem::parent () const
+{
+  return _parent;
+}
+
+
+
 #ifdef ENABLE_AMR
 
 inline
@@ -729,6 +763,79 @@ unsigned int Elem::level() const
   // higher than our parent
   return (this->parent()->level() + 1);
 }
+
+
+
+inline
+Elem* Elem::child (const unsigned int i) const
+{
+  assert (_children    != NULL);
+  assert (_children[i] != NULL);
+  
+  return _children[i];
+}
+
+
+
+inline
+Elem::RefinementState Elem::refinement_flag () const
+{
+  return static_cast<RefinementState>(_rflag);
+}
+
+
+
+inline
+void Elem::set_refinement_flag(RefinementState rflag)
+{
+  if (rflag != static_cast<RefinementState>(static_cast<unsigned char>(rflag)))
+    {
+      std::cerr << "ERROR: unsigned int too small to hold Elem::_rflag!"
+		<< std::endl
+		<< "Recompile with Elem:_flag set to something bigger!"
+		<< std::endl;
+      error();
+    }
+
+  _rflag = rflag;
+}
+
+
+
+inline
+Elem::ElemPair Elem::neighbors_begin ()
+{
+  return ElemPair (&_neighbors[0],
+		   &_neighbors[n_neighbors()]);
+}
+
+
+
+inline
+Elem::ElemPair Elem::neighbors_end ()
+{
+  return ElemPair (&_neighbors[n_neighbors()],
+		   &_neighbors[n_neighbors()]);
+}
+
+
+
+inline
+Elem::ConstElemPair Elem::neighbors_begin () const
+{
+  return ConstElemPair (const_cast<const Elem**>(&_neighbors[0]),
+			const_cast<const Elem**>(&_neighbors[n_neighbors()]));
+}
+
+
+
+inline
+Elem::ConstElemPair Elem::neighbors_end () const
+{
+  return ConstElemPair (const_cast<const Elem**>(&_neighbors[n_neighbors()]),
+			const_cast<const Elem**>(&_neighbors[n_neighbors()]));
+}
+
 
 #endif // endf #ifdef ENABLE_AMR
 

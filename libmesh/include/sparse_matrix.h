@@ -1,4 +1,4 @@
-// $Id: sparse_matrix.h,v 1.6 2003-02-20 23:18:09 benkirk Exp $
+// $Id: sparse_matrix.h,v 1.7 2003-03-03 02:15:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,6 +24,7 @@
 
 
 // C++ includes
+#include <iomanip>
 #include <vector>
 #include <set>
 
@@ -36,7 +37,7 @@
 
 
 // forward declarations
-//template <typename T> class SparseMatrix;
+template <typename T> class SparseMatrix;
 
 
 /**

@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.22 2003-02-28 23:37:43 benkirk Exp $
+// $Id: mesh_base.h,v 1.23 2003-03-03 02:15:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,6 +26,7 @@
 
 // C++ Includes   -----------------------------------
 #include <vector>
+#include <set>
 #include <string>
 
 
@@ -33,12 +34,14 @@
 // forward declarations
 class Elem;
 class EquationSystems;
-class BoundaryInfo;
 template <typename T> class PetscMatrix;
 
 
 // Local Includes -----------------------------------
 #include "mesh_common.h"
+#include "mesh_refinement.h"
+#include "mesh_communication.h"
+#include "boundary_info.h"
 #include "node.h"
 #include "enum_elem_type.h"
 #include "sphere.h"
@@ -60,7 +63,7 @@ template <typename T> class PetscMatrix;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.22 $
+ * \version $Revision: 1.23 $
  */
 
 
@@ -90,7 +93,29 @@ public:
    * Deletes all the data that are currently stored.
    */
   virtual void clear ();
+  
+#ifdef ENABLE_AMR
 
+  /**
+   * Class that handles adaptive mesh refinement implementation.
+   */  
+  MeshRefinement mesh_refinement;
+  
+#endif
+  
+  /**
+   * This class holds the boundary information.  It can store nodes, edges,
+   * and faces with a corresponding id that facilitates setting boundary
+   * conditions.
+   */
+  BoundaryInfo boundary_info;
+
+  /**
+   * This class enables parallelization of the mesh.  All
+   * required inter-processor communication is done via this class.
+   */
+  MeshCommunication mesh_communication;
+  
   /**
    * @returns \p true if the mesh has been prepared via a call
    * to \p prepare_for_use, \p false otherwise.
@@ -644,6 +669,7 @@ public:
 protected:
 
 
+  
   /**
    * Prepare a newly created (or read) mesh for use.
    * This involves 3 steps:
@@ -773,10 +799,20 @@ protected:
 			 const std::vector<std::string>* solution_names=NULL,
 			 const bool write_partitioning=false);
 
+#ifdef ENABLE_AMR
 
-  
-  //--------------------------------------------------------------------------
-  
+  /**
+   * After coarsening a mesh it is possible that
+   * there are some voids in the \p nodes and
+   * \p elements vectors that need to be cleaned
+   * up.  This functions does that.  The indices
+   * of the entities to be removed are contained
+   * in the two input sets.
+   */
+  void trim_unused_elements(std::set<unsigned int>& unused_elements);
+
+#endif
+
   /**
    * Returns a writeable reference to the number of subdomains.
    */
@@ -836,6 +872,21 @@ protected:
    * they can create a \p BoundaryMesh.
    */
   friend class BoundaryInfo;
+  
+  /**
+   * The \p MeshCommunication class needs to be a friend.
+   */
+  friend class MeshCommunication;
+  
+#ifdef ENABLE_AMR
+  
+  /**
+   * The \p MeshRefinement functions need to be able to
+   * call trim_unused_elements()
+   */
+  friend class MeshRefinement;
+  
+#endif
 };
 
 

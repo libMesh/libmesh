@@ -1,4 +1,4 @@
-// $Id: laspack_matrix.h,v 1.8 2003-02-20 23:18:06 benkirk Exp $
+// $Id: laspack_matrix.h,v 1.9 2003-03-03 02:15:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk, John W. Peterson
@@ -31,6 +31,7 @@
 
 // Local includes
 #include "sparse_matrix.h"
+#include "dense_matrix.h"
 
 
 namespace Laspack {

@@ -696,13 +696,13 @@ int main (int argc, char** argv)
 	      std::string boundary_name = "bndry_";
 	      boundary_name += names[1];
 	      
-	      mesh.boundary_info.sync();
+	      mesh.boundary_info.sync(mesh.boundary_mesh);
 	      
 	      if (names.size() == 2)
-		mesh.boundary_info.boundary_mesh.write(boundary_name);
+		mesh.boundary_mesh.write(boundary_name);
 	      else if (names.size() == 3)
-		mesh.boundary_info.boundary_mesh.write(boundary_name,
-						       soln, var_names);
+		mesh.boundary_mesh.write(boundary_name,
+					 soln, var_names);
 	    }
 	}
     };

@@ -1,4 +1,4 @@
-// $Id: mesh_diva_support.C,v 1.6 2003-02-13 22:56:12 benkirk Exp $
+// $Id: mesh_diva_support.C,v 1.7 2003-03-03 02:15:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -76,7 +76,7 @@ void Mesh::write_diva (std::ostream& out)
   
 
 
-  boundary_info.sync();
+  boundary_info.sync(boundary_mesh);
   
 
   /**
@@ -85,12 +85,12 @@ void Mesh::write_diva (std::ostream& out)
   {
     out << n_nodes() << " "
       
-	<< (boundary_info.boundary_mesh.n_active_elem_of_type(TRI3) +
-	    boundary_info.boundary_mesh.n_active_elem_of_type(TRI6)*4) << " "
+	<< (boundary_mesh.n_active_elem_of_type(TRI3) +
+	    boundary_mesh.n_active_elem_of_type(TRI6)*4) << " "
       
-	<< (boundary_info.boundary_mesh.n_active_elem_of_type(QUAD4)  +
-	    boundary_info.boundary_mesh.n_active_elem_of_type(QUAD8) +
-	    boundary_info.boundary_mesh.n_active_elem_of_type(QUAD9)*4) << " "
+	<< (boundary_mesh.n_active_elem_of_type(QUAD4)  +
+	    boundary_mesh.n_active_elem_of_type(QUAD8) +
+	    boundary_mesh.n_active_elem_of_type(QUAD9)*4) << " "
       
 	<< (n_active_elem_of_type(TET4) +
 	    n_active_elem_of_type(TET10)*8) << " "
@@ -108,7 +108,7 @@ void Mesh::write_diva (std::ostream& out)
   }
   
 
-  boundary_info.boundary_mesh.clear();
+  boundary_mesh.clear();
 
   
   /**

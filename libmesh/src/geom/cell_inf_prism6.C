@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism6.C,v 1.12 2003-02-27 00:55:29 benkirk Exp $
+// $Id: cell_inf_prism6.C,v 1.13 2003-03-03 02:15:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,7 @@
 // C++ includes
 
 // Local includes cont'd
-#include "mesh.h"
+#include "mesh_base.h"
 #include "cell_inf_prism6.h"
 #include "face_tri3.h"
 #include "face_inf_quad4.h"
@@ -214,7 +214,7 @@ const unsigned int InfPrism6::_side_children_matrix[5][5] =
 
 
 
-void InfPrism6::refine(Mesh& mesh)
+void InfPrism6::refine (MeshBase& mesh)
 {
   assert (this->refinement_flag() == Elem::REFINE);
   assert (this->active());
@@ -227,7 +227,7 @@ void InfPrism6::refine(Mesh& mesh)
     for (unsigned int c=0; c<this->n_children(); c++)
       {
 	_children[c] = new InfPrism6(this);
-	_children[c]->set_refinement_flag() = Elem::JUST_REFINED;
+	_children[c]->set_refinement_flag(Elem::JUST_REFINED);
       }
   }
 
@@ -278,7 +278,7 @@ void InfPrism6::refine(Mesh& mesh)
 
 
   // Un-set my refinement flag now
-  this->set_refinement_flag() = Elem::DO_NOTHING;
+  this->set_refinement_flag(Elem::DO_NOTHING);
 }
 
 

@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.h,v 1.6 2003-02-28 23:37:43 benkirk Exp $
+// $Id: mesh_refinement.h,v 1.7 2003-03-03 02:15:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -33,16 +33,17 @@
 // Local Includes -----------------------------------
 #include "mesh_config.h"
 
-
-class Mesh;
-class Point;
-
 #ifdef ENABLE_AMR
+
+class MeshBase;
+class Point;
+class Node;
+
 
 
 /**
  * This is the \p MeshRefinement class.  This class implements
- * adaptive mesh refinement algorithms for a \p Mesh.
+ * adaptive mesh refinement algorithms for a \p MeshBase.
  *
  * @author Benjamin S. Kirk, 2002-2003.
  */
@@ -57,7 +58,7 @@ public:
   /**
    * Constructor.
    */
-  MeshRefinement (Mesh& mesh);
+  MeshRefinement (MeshBase& mesh);
 
   /**
    * Destructor. Deletes all the elements that are currently stored.
@@ -110,6 +111,8 @@ public:
 
 private:
 
+
+  
   /**
    * @returns The index of the next unused node number
    * in the \p nodes vector.  If all the entries are
@@ -117,13 +120,17 @@ private:
    */
   unsigned int new_node_number();
 
-
   /**
-   * Updates the \p unused_nodes and \p unused_elements
-   * data structures to be compatible with the current
-   * state of the mesh.
+   * Updates the \p unused_elements data structure to
+   * be compatible with the current state of the mesh.
    */
-  void update_unused_database();
+  void update_unused_elements();
+  
+  /**
+   * Updates the \p unused_nodes data structure to
+   * be compatible with the current state of the mesh.
+   */
+  void update_unused_nodes() {}
   
   /**
    * Take user-specified coarsening flags and augment them
@@ -152,14 +159,14 @@ private:
   /**
    * Data structure that holds the indices of elements
    * that have been removed from the mesh but not
-   * yet removed from the \p elements vector.
+   * yet removed from the \p _elements vector.
    */
   std::set<unsigned int> unused_elements;
 
   /**
    * Reference to the mesh.
    */
-  Mesh& mesh;
+  MeshBase& mesh;
 };
 
 #endif // end #ifdef ENABLE_AMR

@@ -1,4 +1,4 @@
-//    $Id: petsc_matrix.h,v 1.17 2003-02-25 16:26:46 ddreyer Exp $
+//    $Id: petsc_matrix.h,v 1.18 2003-03-03 02:15:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -34,6 +34,7 @@
 
 // Local includes
 #include "sparse_matrix.h"
+#include "dense_matrix.h"
 
 
 

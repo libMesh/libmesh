@@ -1,4 +1,4 @@
-// $Id: node.h,v 1.7 2003-02-13 22:56:07 benkirk Exp $
+// $Id: node.h,v 1.8 2003-03-03 02:15:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -44,7 +44,7 @@ class Node;
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.7 $
+ * \version $Revision: 1.8 $
  */
 
 class Node : public Point,
@@ -75,6 +75,11 @@ public:
 	const unsigned int id = invalid_id);
 
   /**
+   * Destructor.
+   */ 
+  ~Node ();
+  
+  /**
    * Builds a \p Node and returns a \p Node* to the
    * newly-created object.  The \p id is copied from \p n.id()
    */
@@ -97,33 +102,15 @@ public:
 		      const unsigned int id);
 
   /**
-   * Destructor.
-   */ 
-  ~Node ();
-  
-//   /**
-//    * \returns the \p id for this \p Node
-//    */
-//   const unsigned int & id () const { return _id; }
-
-//   /**
-//    * \returns the \p id for this \p Node as a writeable reference.
-//    */
-//   unsigned int & set_id () { return _id; }
-
-//   /**
-//    * An invaild \p id to distinguish an uninitialized \p Node
-//    */
-//   static const unsigned int invalid_id;
+   * @returns \p true if the node is active.  An active node is
+   * defined as one for which \p id() is not \p Node::invalid_id.
+   * Inactive nodes are nodes that are in the mesh but are not
+   * connected to any elements.
+   */
+  bool active () const;
 
   
 private:
-
-  
-//   /**
-//    * The \p id of the \p Node
-//    */
-//   unsigned int _id;
 
 };
 
@@ -203,6 +190,13 @@ Node* Node::build(const Real x,
   return new Node(x,y,z,id);  
 }
 
+
+
+inline
+bool Node::active () const
+{
+  return (id() != Node::invalid_id);
+}
 
 
 #endif

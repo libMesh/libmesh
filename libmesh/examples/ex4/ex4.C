@@ -1,4 +1,4 @@
-// $Id: ex4.C,v 1.17 2003-02-28 23:37:33 benkirk Exp $
+// $Id: ex4.C,v 1.18 2003-03-03 02:15:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -50,6 +50,13 @@
  * indexing.
  */
 #include "dof_map.h"
+
+/**
+ * Define useful datatypes for finite element
+ * matrix and vector components.
+ */
+#include "dense_matrix.h"
+#include "dense_vector.h"
 
 /**
  * Define the PerfLog, a performance logging utility.

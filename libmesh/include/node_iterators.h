@@ -1,4 +1,4 @@
-// $Id: node_iterators.h,v 1.4 2003-02-25 16:26:46 ddreyer Exp $
+// $Id: node_iterators.h,v 1.5 2003-03-03 02:15:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -25,6 +25,8 @@
 // Local includes
 #include "predicated_iterator.h"
 #include "node.h"
+
+
 
 
 /**
@@ -58,8 +60,6 @@ protected:
 };
 
 
-
-
 /**
  * Specialization of the basic_node_iterator class
  * for \p std::vector<Node*>::iterator.  This is what
@@ -67,8 +67,6 @@ protected:
  * all the nodes in the mesh.
  */
 typedef basic_node_iterator<std::vector<Node*>::iterator> node_iterator;
-
-
 
 
 /**
@@ -81,6 +79,121 @@ typedef basic_node_iterator<std::vector<Node*>::const_iterator> const_node_itera
 
 
 
-#endif
+
+
+
+/**
+ * The basic_active_node_iterator class is an un-specialized templated
+ * class which iterates over active nodes.  Active nodes are
+ * those for which the member function active() returns true.  Use
+ * the typedefs active_node_iterator and const_active_node_iterator
+ * to instantiate non-const and const versions of the iterator,
+ * respectively.  Note the "false" argument to the basic_node_iterator
+ * constructor.  This basically tells that constructor to NOT advance();
+ */
+template <class T>
+class basic_active_node_iterator : public basic_node_iterator<T>
+{
+public:
+
+  /**
+   * Constructor
+   */
+  basic_active_node_iterator(const std::pair<T,T>& p,
+			     const bool b=true)
+    : basic_node_iterator<T>(p, false)
+  {
+    if (b) this->advance();
+  }
+
+  
+protected:
+ 
+  /**
+   * Re-Definition of the predicate.  Test the base class predicate
+   * first, this will avoid calling the \p active member on \p NULL
+   * nodes.
+   */
+  virtual bool predicate() const { return (basic_node_iterator<T>::predicate() && (*this->_current)->active()); }
+};
+
+
+/**
+ * Specialization of the basic_active_node_iterator class for
+ * for \p std::vector<Node*>::iterator.  This is what users
+ * will create if they want to iterate over the all the active
+ * nodes in the mesh.
+ */
+typedef basic_active_node_iterator<std::vector<Node*>::iterator> active_node_iterator;
+
+
+/**
+ * Specialization of the basic_active_node_iterator class for
+ * for \p std::vector<Node*>::const_iterator.  This is what users
+ * will create if they want to iterate over the all the active
+ * nodes in the mesh in const functions.
+ */
+typedef basic_active_node_iterator<std::vector<Node*>::const_iterator> const_active_node_iterator; 
+
+
+
+
+
+
+
+/**
+ * The basic_active_node_iterator class is an un-specialized templated
+ * class which iterates over inactive nodes.  Inactive nodes are
+ * those for which the member function active() returns false.  Use
+ * the typedefs not_active_node_iterator and const_not_active_node_iterator
+ * to instantiate non-const and const versions of the iterator,
+ * respectively.  Note the "false" argument to the basic_node_iterator
+ * constructor.  This basically tells that constructor to NOT advance();
+ */
+template <class T>
+class basic_not_active_node_iterator : public basic_active_node_iterator<T>
+{
+public:
+
+  /**
+   * Constructor
+   */
+  basic_not_active_node_iterator(const std::pair<T,T>& p,
+				 const bool b=true)
+    : basic_active_node_iterator<T>(p, false)
+  {
+    if (b) this->advance();
+  }
+  
+  
+protected:
+ 
+  /**
+   * Re-Definition of the predicate. 
+   */
+  virtual bool predicate() const { return !basic_active_node_iterator<T>::predicate(); }
+};
+
+
+/**
+ * Specialization of the basic_not_active_node_iterator class for
+ * for \p std::vector<Node*>::iterator.  This is what users
+ * will create if they want to iterate over the all the inactive
+ * nodes in the mesh.
+ */
+typedef basic_not_active_node_iterator<std::vector<Node*>::iterator> not_active_node_iterator;
+
+
+/**
+ * Specialization of the basic_not_active_node_iterator class for
+ * for \p std::vector<Node*>::const_iterator.  This is what users
+ * will create if they want to iterate over the all the inactive
+ * nodes in the mesh in const functions.
+ */
+typedef basic_not_active_node_iterator<std::vector<Node*>::const_iterator> const_not_active_node_iterator; 
+
+
+
+#endif // #ifndef __node_iterators_h__
 
 
