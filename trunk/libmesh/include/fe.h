@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.12 2003-02-20 04:59:58 benkirk Exp $
+// $Id: fe.h,v 1.13 2003-02-20 15:22:15 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -47,7 +47,7 @@
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.12 $
+ * \version $Revision: 1.13 $
  */
 
 //-------------------------------------------------------------
@@ -268,7 +268,7 @@ private:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.12 $
+ * \version $Revision: 1.13 $
  */
 
 //-------------------------------------------------------------
@@ -293,7 +293,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.12 $
+ * \version $Revision: 1.13 $
  */
 
 //-------------------------------------------------------------
@@ -318,7 +318,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.12 $
+ * \version $Revision: 1.13 $
  */
 
 //-------------------------------------------------------------
@@ -399,7 +399,7 @@ namespace FiniteElements
    * Monomial finite element.
    */
   typedef FE<3,MONOMIAL> FEMonomial3D;
-};
+}
 
 
 
@@ -415,7 +415,7 @@ FE<Dim,T>::FE (const FEType& fet) :
   // Family specified in the template instantiation
   // matches the one in the FEType object
   assert (T == fe_type.family);
-};
+}
 
 
 
@@ -426,7 +426,7 @@ inline
 FEHierarchic<Dim>::FEHierarchic (const FEType& fet) :
   FE<Dim,HIERARCHIC> (fet)
 {
-};
+}
 
 
 
