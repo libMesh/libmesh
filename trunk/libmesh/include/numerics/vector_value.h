@@ -1,4 +1,4 @@
-// $Id: vector_value.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: vector_value.h,v 1.3 2004-06-01 14:24:23 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -61,6 +61,17 @@ public:
    */
   VectorValue (const TypeVector<T>& p);
 
+
+#ifdef USE_COMPLEX_NUMBERS
+  /**
+   * Constructor that takes two \p TypeVecor<Real>
+   * representing the real and imaginary part as
+   * arguments.
+   */
+  VectorValue (const TypeVector<Real>& p_re,
+	       const TypeVector<Real>& p_im);
+#endif
+
   
 private:
 
@@ -108,6 +119,19 @@ VectorValue<T>::VectorValue (const TypeVector<T>& p) :
   TypeVector<T> (p)
 {
 }
+
+
+#ifdef USE_COMPLEX_NUMBERS
+template <typename T>
+inline
+VectorValue<T>::VectorValue (const TypeVector<Real>& p_re,
+			     const TypeVector<Real>& p_im) :
+  TypeVector<T> (Complex (p_re(0), p_im(0)),
+		 Complex (p_re(1), p_im(1)),
+		 Complex (p_re(2), p_im(2)))
+{
+}
+#endif
 
 
 #endif // #define __vector_value_h__
