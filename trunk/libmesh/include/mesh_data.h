@@ -1,4 +1,4 @@
-// $Id: mesh_data.h,v 1.15 2003-08-12 17:49:15 ddreyer Exp $
+// $Id: mesh_data.h,v 1.16 2003-08-16 21:19:27 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -547,7 +547,7 @@ protected:
   friend class XdrInterface;
 
   /**
-   * Make the MeshDataUnvHeader class a friend.
+   * Make the \p MeshDataUnvHeader class a friend.
    */
   friend class MeshDataUnvHeader;
   
@@ -571,6 +571,17 @@ protected:
  * This header is structured in records 1 to 13.  For more
  * details we refer to the general description of the I-DEAS
  * universal file format.
+ *
+ * An instance of this class may be attached to the \p MeshData 
+ * of some mesh.  Then the \p read() and \p write() methods
+ * of \p MeshData use this \p MeshDataUnvHeader instead of
+ * some empty default.  Also files that contain multiple
+ * datasets of type \p 2414 may be handled through the
+ * \p which_dataset() method.
+ *
+ * Note that an instance of this class has to be attached 
+ * to the \p MeshData @e prior to using the \p read() or
+ * \p write() methods of the \p MeshData.
  */
 class MeshDataUnvHeader
 {
@@ -588,15 +599,20 @@ public:
   ~MeshDataUnvHeader ();
 
   /**
-   * Read the header information from the stream \p in_file.
+   * Universal files may contain multiple data sets of type
+   * \p 2414.  These sets are identified through their
+   * labels (not to be confused with the dataset label \p 2414!).
+   * The user may provide a label of the dataset that she
+   * wants.  Then the file is scanned for this dataset, and
+   * datasets with a different label are skipped.
+   *
+   * When this method is @e not called, then simply the first
+   * dataset in the file is used.  Note that for this method
+   * to have any effect, this method has to be called prior to
+   * using the \p MeshData::read() or \p MeshData::write()
+   * methods.
    */
-  void read (std::ifstream& in_file);
-
-  /**
-   * Write the header information to the stream \p out_file.
-   */
-  void write (std::ofstream& out_file);
-
+  void which_dataset (const unsigned int ds_label);
 
   /**
    * Record 1.  User specified analysis dataset label.
@@ -656,13 +672,32 @@ public:
   std::vector<Real> record_12,
                     record_13;
 
+
+protected:
+
   /**
-   * Make the MeshDataUnvHeader class a friend.
+   * @returns \p true when this dataset is the one
+   * that the user wants, \p false otherwise.  When
+   * no desired dataset is given, always returns
+   * \p true.  Aside from this return value, this method
+   * also reads the header information from the 
+   * stream \p in_file.
    */
-  friend class MeshData;
+  bool read (std::ifstream& in_file);
+
+  /**
+   * Write the header information to the stream \p out_file.
+   */
+  void write (std::ofstream& out_file);
 
 
 private:
+
+  /**
+   * the desired dataset label.  defaults to -1
+   * if not given
+   */
+  unsigned int _desired_dataset_label;
 
   /**
    * @returns \p true when the string \p number
@@ -671,6 +706,11 @@ private:
    * the 'D' by an 'e'.
    */
   static bool need_D_to_e (std::string& number);
+
+  /**
+   * Make the \p MeshData class a friend.
+   */
+  friend class MeshData;
 
 };
 
