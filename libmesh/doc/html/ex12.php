@@ -88,6 +88,9 @@ Basic include files needed for the mesh and
 <div class ="fragment">
 <pre>
         #include "mesh.h"
+        #include "gmv_io.h"
+        
+        
         
 </pre>
 </div>
@@ -738,9 +741,9 @@ And write the data to a GMV file
         		  << "------------------------------------------------------------------------" 
         		  << std::endl;
         	
-        	mesh.write_gmv_binary (gmv_file,
-        			       &translated_data,
-        			       &data_names);
+        	GMVIO(mesh).write_nodal_data (gmv_file,
+        				      translated_data,
+        				      data_names);
         	
 </pre>
 </div>
@@ -864,6 +867,9 @@ the current node in the map.
   #include <FONT COLOR="#BC8F8F"><B>&quot;libmesh.h&quot;</FONT></B>
   
   #include <FONT COLOR="#BC8F8F"><B>&quot;mesh.h&quot;</FONT></B>
+  #include <FONT COLOR="#BC8F8F"><B>&quot;gmv_io.h&quot;</FONT></B>
+  
+  
   
   <FONT COLOR="#228B22"><B>void</FONT></B> create_artificial_data (<FONT COLOR="#228B22"><B>const</FONT></B> Mesh&amp; mesh,
   			     std::map&lt;<FONT COLOR="#228B22"><B>const</FONT></B> Node*, std::vector&lt;Number&gt; &gt;&amp; art_data);
@@ -1039,9 +1045,9 @@ the current node in the map.
   		  &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;------------------------------------------------------------------------&quot;</FONT></B> 
   		  &lt;&lt; std::endl;
   	
-  	mesh.write_gmv_binary (gmv_file,
-  			       &amp;translated_data,
-  			       &amp;data_names);
+  	GMVIO(mesh).write_nodal_data (gmv_file,
+  				      translated_data,
+  				      data_names);
   	
         }
         
@@ -1088,12 +1094,14 @@ the current node in the map.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+Compiling C++ (in debug mode) ex12.C...
+Linking ex12...
+/home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
+: the use of `mktemp' is dangerous, better use `mkstemp'
 ***************************************************************
 * Running Example  ./ex12
 ***************************************************************
  
-
- Universal file Interface:
   Counting nodes and elements
   Convert from "D" to "e"
   Nodes   : 3977
@@ -1176,8 +1184,8 @@ After re-reading the first file:
 | Reference count information                                                |
  ---------------------------------------------------------------------------- 
 | 4Elem reference count information:
-| Creations:    24984
-| Destructions: 24984
+| Creations:    24951
+| Destructions: 24951
 | 4Node reference count information:
 | Creations:    3977
 | Destructions: 3977
@@ -1186,8 +1194,6 @@ After re-reading the first file:
 ----------------------------------------------
 ---------- next example with MeshData --------
 ----------------------------------------------
-
- Universal file Interface:
   Counting nodes and elements
   Convert from "D" to "e"
   Nodes   : 3977
@@ -1218,17 +1224,12 @@ to see the differences in node numbers.
 ---------------------------------------
 
 
- Universal file Interface:
-
 *************************************************************************
 * WARNING: MeshData neither active nor in compatibility mode.           *
 *          Enable compatibility mode for MeshData.  Use this Universal  *
 *          file with caution: libMesh node and element ids are used.    *
 *************************************************************************
 
-  Writing 3977 nodes
-  Writing elements
-  Finished writing 3520 elements
 
 Writing MeshData to: data_third_with_libmesh_ids_out.unv
 ----------------------------------------------------------
@@ -1253,40 +1254,6 @@ Writing the data from the MeshData to the GMV file data_and_mesh_out.gmv
 WARNING! There are options you set that were not used!
 WARNING! could be spelling mistake, etc!
 Option left: name:-d value: 3
-
- ----------------------------------------------------------------------------
-| Time:           Mon Nov 10 22:57:39 2003
-| OS:             Linux
-| HostName:       ariel
-| OS Release      2.4.20-19.9smp
-| OS Version:     #1 SMP Tue Jul 15 17:04:18 EDT 2003
-| Machine:        i686
-| Username:       benkirk
- ----------------------------------------------------------------------------
- ----------------------------------------------------------------------------
-| libMesh Performance: Alive time=1.9689, Active time=1.78407
- ----------------------------------------------------------------------------
-| Event                         nCalls  Total       Avg         Percent of   |
-|                                       Time        Time        Active Time  |
-|----------------------------------------------------------------------------|
-|                                                                            |
-|                                                                            |
-| Mesh                                                                       |
-|   read()                      2       1.0212      0.510617    57.24        |
-|   write()                     1       0.1502      0.150198    8.42         |
-|                                                                            |
-| MeshBase                                                                   |
-|   find_neighbors()            2       0.2687      0.134364    15.06        |
-|   renumber_nodes_and_elem()   2       0.0093      0.004648    0.52         |
-|                                                                            |
-| MeshData                                                                   |
-|   read()                      1       0.1318      0.131848    7.39         |
-|   translate()                 1       0.0023      0.002320    0.13         |
-|   write()                     4       0.2004      0.050112    11.24        |
- ----------------------------------------------------------------------------
-| Totals:                       13      1.7841                  100.00       |
- ----------------------------------------------------------------------------
-
  
 ***************************************************************
 * Done Running Example  ./ex12

@@ -51,7 +51,8 @@ Basic include file needed for the mesh functionality.
 <pre>
         #include "libmesh.h"
         #include "mesh.h"
-        #include "steady_system.h"
+        #include "gmv_io.h"
+        #include "implicit_system.h"
         #include "equation_systems.h"
         
 </pre>
@@ -293,7 +294,7 @@ Creates a system named "Poisson"
 
 <div class ="fragment">
 <pre>
-              equation_systems.add_system&lt;SteadySystem&gt; ("Poisson");
+              equation_systems.add_system&lt;ImplicitSystem&gt; ("Poisson");
               
         
 </pre>
@@ -358,8 +359,8 @@ to a GMV-formatted plot file.
 
 <div class ="fragment">
 <pre>
-            mesh.write_gmv ((dim == 3) ? "out_3.gmv" : "out_2.gmv",
-        		    equation_systems);
+            GMVIO (mesh).write_equation_systems ((dim == 3) ? "out_3.gmv" : "out_2.gmv",
+        					 equation_systems);
           }
           
 </pre>
@@ -442,13 +443,36 @@ The dimension that we are running
 </pre>
 </div>
 <div class = "comment">
+Get a reference to the ImplicitSystem we are solving
+</div>
+
+<div class ="fragment">
+<pre>
+          ImplicitSystem&amp; system = es.get_system&lt;ImplicitSystem&gt;("Poisson");
+          
+</pre>
+</div>
+<div class = "comment">
+A reference to the \p DofMap object for this system.  The \p DofMap
+object handles the index translation from node and element numbers
+to degree of freedom numbers.  We will talk more about the \p DofMap
+in future examples.
+</div>
+
+<div class ="fragment">
+<pre>
+          const DofMap&amp; dof_map = system.get_dof_map();
+        
+</pre>
+</div>
+<div class = "comment">
 Get a constant reference to the Finite Element type
 for the first (and only) variable in the system.
 </div>
 
 <div class ="fragment">
 <pre>
-          FEType fe_type = es("Poisson").get_dof_map().variable_type(0);
+          FEType fe_type = dof_map.variable_type(0);
         
 </pre>
 </div>
@@ -562,19 +586,6 @@ points.
 <div class ="fragment">
 <pre>
           const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = fe-&gt;get_dphi();
-          
-</pre>
-</div>
-<div class = "comment">
-A reference to the \p DofMap object for this system.  The \p DofMap
-object handles the index translation from node and element numbers
-to degree of freedom numbers.  We will talk more about the \p DofMap
-in future examples.
-</div>
-
-<div class ="fragment">
-<pre>
-          const DofMap&amp; dof_map = es("Poisson").get_dof_map();
         
 </pre>
 </div>
@@ -951,10 +962,8 @@ Matrix contribution of the L2 projection.
 <pre>
                           for (unsigned int i=0; i&lt;phi_face.size(); i++)
         		    for (unsigned int j=0; j<phi_face.size(); j++)
-        		      {
-        			Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
-        		      }
-        
+        		      Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
+        		  
 </pre>
 </div>
 <div class = "comment">
@@ -965,9 +974,7 @@ projection.
 <div class ="fragment">
 <pre>
                           for (unsigned int i=0; i&lt;phi_face.size(); i++)
-        		    {
-        		      Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
-        		    }
+        		    Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
         		} 
         	    } 
         	
@@ -998,8 +1005,8 @@ matrix and vector into the global matrix and vector
 <pre>
               perf_log.start_event ("matrix insertion");
               
-              es("Poisson").matrix->add_matrix (Ke, dof_indices);
-              es("Poisson").rhs->add_vector    (Fe, dof_indices);
+              system.matrix->add_matrix (Ke, dof_indices);
+              system.rhs->add_vector    (Fe, dof_indices);
         
 </pre>
 </div>
@@ -1038,7 +1045,8 @@ it will print its log to the screen. Pretty easy, huh?
   
   #include <FONT COLOR="#BC8F8F"><B>&quot;libmesh.h&quot;</FONT></B>
   #include <FONT COLOR="#BC8F8F"><B>&quot;mesh.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;steady_system.h&quot;</FONT></B>
+  #include <FONT COLOR="#BC8F8F"><B>&quot;gmv_io.h&quot;</FONT></B>
+  #include <FONT COLOR="#BC8F8F"><B>&quot;implicit_system.h&quot;</FONT></B>
   #include <FONT COLOR="#BC8F8F"><B>&quot;equation_systems.h&quot;</FONT></B>
   
   #include <FONT COLOR="#BC8F8F"><B>&quot;fe.h&quot;</FONT></B>
@@ -1104,7 +1112,7 @@ it will print its log to the screen. Pretty easy, huh?
       EquationSystems equation_systems (mesh);
       
       {
-        equation_systems.add_system&lt;SteadySystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Poisson&quot;</FONT></B>);
+        equation_systems.add_system&lt;ImplicitSystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Poisson&quot;</FONT></B>);
         
   
         equation_systems(<FONT COLOR="#BC8F8F"><B>&quot;Poisson&quot;</FONT></B>).add_variable(<FONT COLOR="#BC8F8F"><B>&quot;u&quot;</FONT></B>, SECOND);
@@ -1118,8 +1126,8 @@ it will print its log to the screen. Pretty easy, huh?
   
       equation_systems(<FONT COLOR="#BC8F8F"><B>&quot;Poisson&quot;</FONT></B>).solve();
   
-      mesh.write_gmv ((dim == 3) ? <FONT COLOR="#BC8F8F"><B>&quot;out_3.gmv&quot;</FONT></B> : <FONT COLOR="#BC8F8F"><B>&quot;out_2.gmv&quot;</FONT></B>,
-  		    equation_systems);
+      GMVIO (mesh).write_equation_systems ((dim == 3) ? <FONT COLOR="#BC8F8F"><B>&quot;out_3.gmv&quot;</FONT></B> : <FONT COLOR="#BC8F8F"><B>&quot;out_2.gmv&quot;</FONT></B>,
+  					 equation_systems);
     }
     
     <B><FONT COLOR="#A020F0">return</FONT></B> libMesh::close ();
@@ -1140,7 +1148,11 @@ it will print its log to the screen. Pretty easy, huh?
   
     <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> dim = mesh.mesh_dimension();
   
-    FEType fe_type = es(<FONT COLOR="#BC8F8F"><B>&quot;Poisson&quot;</FONT></B>).get_dof_map().variable_type(0);
+    ImplicitSystem&amp; system = es.get_system&lt;ImplicitSystem&gt;(<FONT COLOR="#BC8F8F"><B>&quot;Poisson&quot;</FONT></B>);
+    
+    <FONT COLOR="#228B22"><B>const</FONT></B> DofMap&amp; dof_map = system.get_dof_map();
+  
+    FEType fe_type = dof_map.variable_type(0);
   
     AutoPtr&lt;FEBase&gt; fe (FEBase::build(dim, fe_type));
     
@@ -1161,8 +1173,6 @@ it will print its log to the screen. Pretty easy, huh?
     <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi = fe-&gt;get_phi();
   
     <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = fe-&gt;get_dphi();
-    
-    <FONT COLOR="#228B22"><B>const</FONT></B> DofMap&amp; dof_map = es(<FONT COLOR="#BC8F8F"><B>&quot;Poisson&quot;</FONT></B>).get_dof_map();
   
     DenseMatrix&lt;Number&gt; Ke;
     DenseVector&lt;Number&gt; Fe;
@@ -1255,14 +1265,10 @@ it will print its log to the screen. Pretty easy, huh?
   		  
   		  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i&lt;phi_face.size(); i++)
   		    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> j=0; j&lt;phi_face.size(); j++)
-  		      {
-  			Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
-  		      }
-  
+  		      Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
+  		  
   		  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i&lt;phi_face.size(); i++)
-  		    {
-  		      Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
-  		    }
+  		    Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
   		} 
   	    } 
   	
@@ -1272,8 +1278,8 @@ it will print its log to the screen. Pretty easy, huh?
   
         perf_log.start_event (<FONT COLOR="#BC8F8F"><B>&quot;matrix insertion&quot;</FONT></B>);
         
-        es(<FONT COLOR="#BC8F8F"><B>&quot;Poisson&quot;</FONT></B>).matrix-&gt;add_matrix (Ke, dof_indices);
-        es(<FONT COLOR="#BC8F8F"><B>&quot;Poisson&quot;</FONT></B>).rhs-&gt;add_vector    (Fe, dof_indices);
+        system.matrix-&gt;add_matrix (Ke, dof_indices);
+        system.rhs-&gt;add_vector    (Fe, dof_indices);
   
         perf_log.stop_event (<FONT COLOR="#BC8F8F"><B>&quot;matrix insertion&quot;</FONT></B>);
       }
@@ -1283,6 +1289,10 @@ it will print its log to the screen. Pretty easy, huh?
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+Compiling C++ (in debug mode) ex4.C...
+Linking ex4...
+/home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
+: the use of `mktemp' is dangerous, better use `mkstemp'
 ***************************************************************
 * Running Example  ./ex4
 ***************************************************************
@@ -1303,16 +1313,14 @@ Running ./ex4 -d 2
  EquationSystems
   n_systems()=1
    System "Poisson"
-    Type "Steady"
+    Type "Implicit"
     Variables="u" 
-    Finite Element Types="0", "12" 
-    Infinite Element Mapping="0" 
-    Approximation Orders="2", "3" 
+    Finite Element Types="0" 
+    Approximation Orders="2" 
     n_dofs()=961
     n_local_dofs()=961
     n_constrained_dofs()=0
-    n_additional_vectors()=0
-    n_additional_matrices()=0
+    n_vectors()=1
   n_parameters()=2
    Parameters:
     "linear solver maximum iterations"=5000
@@ -1320,37 +1328,34 @@ Running ./ex4 -d 2
 
 
  ----------------------------------------------------------------------------
-| Time:           Mon Nov 10 22:54:16 2003
+| Time:           Mon Apr 19 11:21:57 2004
 | OS:             Linux
-| HostName:       ariel
+| HostName:       arthur
 | OS Release      2.4.20-19.9smp
 | OS Version:     #1 SMP Tue Jul 15 17:04:18 EDT 2003
 | Machine:        i686
-| Username:       benkirk
+| Username:       peterson
  ----------------------------------------------------------------------------
  ----------------------------------------------------------------------------
-| Matrix Assembly Performance: Alive time=0.055012, Active time=0.050417
+| Matrix Assembly Performance: Alive time=0.046898, Active time=0.042308
  ----------------------------------------------------------------------------
 | Event                         nCalls  Total       Avg         Percent of   |
 |                                       Time        Time        Active Time  |
 |----------------------------------------------------------------------------|
 |                                                                            |
-| BCs                           225     0.0117      0.000052    23.23        |
-| Fe                            225     0.0075      0.000033    14.95        |
-| Ke                            225     0.0109      0.000049    21.66        |
-| elem init                     225     0.0130      0.000058    25.76        |
-| matrix insertion              225     0.0073      0.000032    14.41        |
+| BCs                           225     0.0087      0.000039    20.49        |
+| Fe                            225     0.0062      0.000028    14.71        |
+| Ke                            225     0.0120      0.000053    28.29        |
+| elem init                     225     0.0071      0.000032    16.76        |
+| matrix insertion              225     0.0084      0.000037    19.75        |
  ----------------------------------------------------------------------------
-| Totals:                       1125    0.0504                  100.00       |
+| Totals:                       1125    0.0423                  100.00       |
  ----------------------------------------------------------------------------
 
 
  ---------------------------------------------------------------------------- 
 | Reference count information                                                |
  ---------------------------------------------------------------------------- 
-| 10SystemBase reference count information:
-| Creations:    1
-| Destructions: 1
 | 12SparseMatrixIdE reference count information:
 | Creations:    1
 | Destructions: 1
@@ -1375,47 +1380,13 @@ Running ./ex4 -d 2
 | 6FEBase reference count information:
 | Creations:    2
 | Destructions: 2
+| 6System reference count information:
+| Creations:    1
+| Destructions: 1
  ---------------------------------------------------------------------------- 
 WARNING! There are options you set that were not used!
 WARNING! could be spelling mistake, etc!
 Option left: name:-d value: 2
- ----------------------------------------------------------------------------
-| libMesh Performance: Alive time=0.43848, Active time=0.327616
- ----------------------------------------------------------------------------
-| Event                         nCalls  Total       Avg         Percent of   |
-|                                       Time        Time        Active Time  |
-|----------------------------------------------------------------------------|
-|                                                                            |
-|                                                                            |
-| DofMap                                                                     |
-|   compute_sparsity()          1       0.0112      0.011246    3.43         |
-|   create_dof_constraints()    1       0.0001      0.000105    0.03         |
-|   distribute_dofs()           1       0.0011      0.001129    0.34         |
-|   dof_indices()               675     0.0067      0.000010    2.05         |
-|   reinit()                    1       0.0044      0.004379    1.34         |
-|                                                                            |
-| FE                                                                         |
-|   compute_face_map()          60      0.0006      0.000010    0.19         |
-|   compute_map()               285     0.0042      0.000015    1.27         |
-|   compute_shape_functions()   285     0.0031      0.000011    0.93         |
-|   init_face_shape_functions() 35      0.0003      0.000007    0.08         |
-|   init_shape_functions()      61      0.0025      0.000041    0.77         |
-|   inverse_map()               180     0.0034      0.000019    1.05         |
-|                                                                            |
-| Mesh                                                                       |
-|   build_cube()                1       0.0029      0.002908    0.89         |
-|                                                                            |
-| MeshBase                                                                   |
-|   find_neighbors()            1       0.0046      0.004590    1.40         |
-|   renumber_nodes_and_elem()   1       0.0002      0.000235    0.07         |
-|                                                                            |
-| SystemBase                                                                 |
-|   assemble()                  1       0.0562      0.056245    17.17        |
-|   solve()                     1       0.2260      0.225993    68.98        |
- ----------------------------------------------------------------------------
-| Totals:                       1590    0.3276                  100.00       |
- ----------------------------------------------------------------------------
-
 Running ./ex4 -d 3
 
  Mesh Information:
@@ -1432,16 +1403,14 @@ Running ./ex4 -d 3
  EquationSystems
   n_systems()=1
    System "Poisson"
-    Type "Steady"
+    Type "Implicit"
     Variables="u" 
-    Finite Element Types="0", "12" 
-    Infinite Element Mapping="0" 
-    Approximation Orders="2", "3" 
+    Finite Element Types="0" 
+    Approximation Orders="2" 
     n_dofs()=29791
     n_local_dofs()=29791
     n_constrained_dofs()=0
-    n_additional_vectors()=0
-    n_additional_matrices()=0
+    n_vectors()=1
   n_parameters()=2
    Parameters:
     "linear solver maximum iterations"=5000
@@ -1449,37 +1418,34 @@ Running ./ex4 -d 3
 
 
  ----------------------------------------------------------------------------
-| Time:           Mon Nov 10 22:54:26 2003
+| Time:           Mon Apr 19 11:22:11 2004
 | OS:             Linux
-| HostName:       ariel
+| HostName:       arthur
 | OS Release      2.4.20-19.9smp
 | OS Version:     #1 SMP Tue Jul 15 17:04:18 EDT 2003
 | Machine:        i686
-| Username:       benkirk
+| Username:       peterson
  ----------------------------------------------------------------------------
  ----------------------------------------------------------------------------
-| Matrix Assembly Performance: Alive time=8.77018, Active time=8.70021
+| Matrix Assembly Performance: Alive time=10.7224, Active time=10.5392
  ----------------------------------------------------------------------------
 | Event                         nCalls  Total       Avg         Percent of   |
 |                                       Time        Time        Active Time  |
 |----------------------------------------------------------------------------|
 |                                                                            |
-| BCs                           3375    2.1904      0.000649    25.18        |
-| Fe                            3375    0.4141      0.000123    4.76         |
-| Ke                            3375    3.9772      0.001178    45.71        |
-| elem init                     3375    1.1531      0.000342    13.25        |
-| matrix insertion              3375    0.9655      0.000286    11.10        |
+| BCs                           3375    2.7029      0.000801    25.65        |
+| Fe                            3375    0.4151      0.000123    3.94         |
+| Ke                            3375    5.1232      0.001518    48.61        |
+| elem init                     3375    1.1762      0.000349    11.16        |
+| matrix insertion              3375    1.1218      0.000332    10.64        |
  ----------------------------------------------------------------------------
-| Totals:                       16875   8.7002                  100.00       |
+| Totals:                       16875   10.5392                 100.00       |
  ----------------------------------------------------------------------------
 
 
  ---------------------------------------------------------------------------- 
 | Reference count information                                                |
  ---------------------------------------------------------------------------- 
-| 10SystemBase reference count information:
-| Creations:    1
-| Destructions: 1
 | 12SparseMatrixIdE reference count information:
 | Creations:    1
 | Destructions: 1
@@ -1504,47 +1470,13 @@ Running ./ex4 -d 3
 | 6FEBase reference count information:
 | Creations:    2
 | Destructions: 2
+| 6System reference count information:
+| Creations:    1
+| Destructions: 1
  ---------------------------------------------------------------------------- 
 WARNING! There are options you set that were not used!
 WARNING! could be spelling mistake, etc!
 Option left: name:-d value: 3
- ----------------------------------------------------------------------------
-| libMesh Performance: Alive time=26.6934, Active time=27.6373
- ----------------------------------------------------------------------------
-| Event                         nCalls  Total       Avg         Percent of   |
-|                                       Time        Time        Active Time  |
-|----------------------------------------------------------------------------|
-|                                                                            |
-|                                                                            |
-| DofMap                                                                     |
-|   compute_sparsity()          1       0.9591      0.959137    3.47         |
-|   create_dof_constraints()    1       0.0033      0.003260    0.01         |
-|   distribute_dofs()           1       0.0556      0.055556    0.20         |
-|   dof_indices()               10125   0.2296      0.000023    0.83         |
-|   reinit()                    1       0.1761      0.176052    0.64         |
-|                                                                            |
-| FE                                                                         |
-|   compute_face_map()          1350    0.0446      0.000033    0.16         |
-|   compute_map()               4725    0.5192      0.000110    1.88         |
-|   compute_shape_functions()   4725    0.5776      0.000122    2.09         |
-|   init_face_shape_functions() 687     0.0367      0.000053    0.13         |
-|   init_shape_functions()      1351    0.5946      0.000440    2.15         |
-|   inverse_map()               12150   0.8451      0.000070    3.06         |
-|                                                                            |
-| Mesh                                                                       |
-|   build_cube()                1       0.0952      0.095228    0.34         |
-|                                                                            |
-| MeshBase                                                                   |
-|   find_neighbors()            1       0.1160      0.116042    0.42         |
-|   renumber_nodes_and_elem()   1       0.0155      0.015537    0.06         |
-|                                                                            |
-| SystemBase                                                                 |
-|   assemble()                  1       8.7714      8.771411    31.74        |
-|   solve()                     1       14.5977     14.597655   52.82        |
- ----------------------------------------------------------------------------
-| Totals:                       35122   27.6373                 100.00       |
- ----------------------------------------------------------------------------
-
  
 ***************************************************************
 * Done Running Example  ./ex4

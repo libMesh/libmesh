@@ -42,7 +42,8 @@ Basic include files needed for the mesh functionality.
 <pre>
         #include "libmesh.h"
         #include "mesh.h"
-        #include "steady_system.h"
+        #include "gmv_io.h"
+        #include "implicit_system.h"
         #include "equation_systems.h"
         
 </pre>
@@ -217,7 +218,7 @@ The Poisson system is another example of a steady system.
 
 <div class ="fragment">
 <pre>
-            equation_systems.add_system&lt;SteadySystem&gt; ("Poisson");
+            equation_systems.add_system&lt;ImplicitSystem&gt; ("Poisson");
         
 </pre>
 </div>
@@ -295,7 +296,7 @@ to a GMV-formatted plot file.
 
 <div class ="fragment">
 <pre>
-            mesh.write_gmv ("out.gmv", equation_systems);
+            GMVIO (mesh).write_equation_systems ("out.gmv", equation_systems);
           }
         
 </pre>
@@ -358,6 +359,29 @@ The dimension that we are running
 <div class ="fragment">
 <pre>
           const unsigned int dim = mesh.mesh_dimension();
+        
+</pre>
+</div>
+<div class = "comment">
+Get a reference to the ImplicitSystem we are solving
+</div>
+
+<div class ="fragment">
+<pre>
+          ImplicitSystem&amp; system = es.get_system&lt;ImplicitSystem&gt; ("Poisson");
+        
+</pre>
+</div>
+<div class = "comment">
+A reference to the  DofMap object for this system.  The  DofMap
+object handles the index translation from node and element numbers
+to degree of freedom numbers.  We will talk more about the  DofMap
+in future examples.
+</div>
+
+<div class ="fragment">
+<pre>
+          const DofMap&amp; dof_map = system.get_dof_map();
           
 </pre>
 </div>
@@ -368,7 +392,7 @@ for the first (and only) variable in the system.
 
 <div class ="fragment">
 <pre>
-          FEType fe_type = es("Poisson").get_dof_map().variable_type(0);
+          FEType fe_type = dof_map.variable_type(0);
           
 </pre>
 </div>
@@ -484,19 +508,6 @@ points.
 <div class ="fragment">
 <pre>
           const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = fe-&gt;get_dphi();
-        
-</pre>
-</div>
-<div class = "comment">
-A reference to the  DofMap object for this system.  The  DofMap
-object handles the index translation from node and element numbers
-to degree of freedom numbers.  We will talk more about the  DofMap
-in future examples.
-</div>
-
-<div class ="fragment">
-<pre>
-          const DofMap&amp; dof_map = es("Poisson").get_dof_map();
         
 </pre>
 </div>
@@ -880,8 +891,8 @@ and  NumericVector::add_vector() members do this for us.
 
 <div class ="fragment">
 <pre>
-              es("Poisson").matrix-&gt;add_matrix (Ke, dof_indices);
-              es("Poisson").rhs->add_vector    (Fe, dof_indices);
+              system.matrix-&gt;add_matrix (Ke, dof_indices);
+              system.rhs->add_vector    (Fe, dof_indices);
             }
           
 </pre>
@@ -906,7 +917,8 @@ All done!
   
   #include <FONT COLOR="#BC8F8F"><B>&quot;libmesh.h&quot;</FONT></B>
   #include <FONT COLOR="#BC8F8F"><B>&quot;mesh.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;steady_system.h&quot;</FONT></B>
+  #include <FONT COLOR="#BC8F8F"><B>&quot;gmv_io.h&quot;</FONT></B>
+  #include <FONT COLOR="#BC8F8F"><B>&quot;implicit_system.h&quot;</FONT></B>
   #include <FONT COLOR="#BC8F8F"><B>&quot;equation_systems.h&quot;</FONT></B>
   
   #include <FONT COLOR="#BC8F8F"><B>&quot;fe.h&quot;</FONT></B>
@@ -954,7 +966,7 @@ All done!
       
       EquationSystems equation_systems (mesh);
       
-      equation_systems.add_system&lt;SteadySystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Poisson&quot;</FONT></B>);
+      equation_systems.add_system&lt;ImplicitSystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Poisson&quot;</FONT></B>);
   
       equation_systems(<FONT COLOR="#BC8F8F"><B>&quot;Poisson&quot;</FONT></B>).add_variable(<FONT COLOR="#BC8F8F"><B>&quot;u&quot;</FONT></B>, SECOND);
   
@@ -966,7 +978,7 @@ All done!
   
       equation_systems(<FONT COLOR="#BC8F8F"><B>&quot;Poisson&quot;</FONT></B>).solve();
   
-      mesh.write_gmv (<FONT COLOR="#BC8F8F"><B>&quot;out.gmv&quot;</FONT></B>, equation_systems);
+      GMVIO (mesh).write_equation_systems (<FONT COLOR="#BC8F8F"><B>&quot;out.gmv&quot;</FONT></B>, equation_systems);
     }
   
     <B><FONT COLOR="#A020F0">return</FONT></B> libMesh::close();
@@ -984,8 +996,12 @@ All done!
     <FONT COLOR="#228B22"><B>const</FONT></B> Mesh&amp; mesh = es.get_mesh();
   
     <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> dim = mesh.mesh_dimension();
+  
+    ImplicitSystem&amp; system = es.get_system&lt;ImplicitSystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Poisson&quot;</FONT></B>);
+  
+    <FONT COLOR="#228B22"><B>const</FONT></B> DofMap&amp; dof_map = system.get_dof_map();
     
-    FEType fe_type = es(<FONT COLOR="#BC8F8F"><B>&quot;Poisson&quot;</FONT></B>).get_dof_map().variable_type(0);
+    FEType fe_type = dof_map.variable_type(0);
     
     AutoPtr&lt;FEBase&gt; fe (FEBase::build(dim, fe_type));
     
@@ -1006,8 +1022,6 @@ All done!
     <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi = fe-&gt;get_phi();
   
     <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = fe-&gt;get_dphi();
-  
-    <FONT COLOR="#228B22"><B>const</FONT></B> DofMap&amp; dof_map = es(<FONT COLOR="#BC8F8F"><B>&quot;Poisson&quot;</FONT></B>).get_dof_map();
   
     DenseMatrix&lt;Number&gt; Ke;
     DenseVector&lt;Number&gt; Fe;
@@ -1093,8 +1107,8 @@ All done!
   	    }
         }
         
-        es(<FONT COLOR="#BC8F8F"><B>&quot;Poisson&quot;</FONT></B>).matrix-&gt;add_matrix (Ke, dof_indices);
-        es(<FONT COLOR="#BC8F8F"><B>&quot;Poisson&quot;</FONT></B>).rhs-&gt;add_vector    (Fe, dof_indices);
+        system.matrix-&gt;add_matrix (Ke, dof_indices);
+        system.rhs-&gt;add_vector    (Fe, dof_indices);
       }
     
   }
@@ -1102,6 +1116,11 @@ All done!
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+Compiling C++ (in debug mode) ex3.C...
+Compiling C++ (in debug mode) exact_solution.C...
+Linking ex3...
+/home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
+: the use of `mktemp' is dangerous, better use `mkstemp'
 ***************************************************************
 * Running Example  ./ex3
 ***************************************************************
@@ -1122,16 +1141,14 @@ Running ./ex3
  EquationSystems
   n_systems()=1
    System "Poisson"
-    Type "Steady"
+    Type "Implicit"
     Variables="u" 
-    Finite Element Types="0", "12" 
-    Infinite Element Mapping="0" 
-    Approximation Orders="2", "3" 
+    Finite Element Types="0" 
+    Approximation Orders="2" 
     n_dofs()=961
     n_local_dofs()=961
     n_constrained_dofs()=0
-    n_additional_vectors()=0
-    n_additional_matrices()=0
+    n_vectors()=1
   n_parameters()=2
    Parameters:
     "linear solver maximum iterations"=5000
@@ -1141,9 +1158,6 @@ Running ./ex3
  ---------------------------------------------------------------------------- 
 | Reference count information                                                |
  ---------------------------------------------------------------------------- 
-| 10SystemBase reference count information:
-| Creations:    1
-| Destructions: 1
 | 12SparseMatrixIdE reference count information:
 | Creations:    1
 | Destructions: 1
@@ -1168,54 +1182,10 @@ Running ./ex3
 | 6FEBase reference count information:
 | Creations:    2
 | Destructions: 2
+| 6System reference count information:
+| Creations:    1
+| Destructions: 1
  ---------------------------------------------------------------------------- 
-
- ----------------------------------------------------------------------------
-| Time:           Mon Nov 10 22:54:15 2003
-| OS:             Linux
-| HostName:       ariel
-| OS Release      2.4.20-19.9smp
-| OS Version:     #1 SMP Tue Jul 15 17:04:18 EDT 2003
-| Machine:        i686
-| Username:       benkirk
- ----------------------------------------------------------------------------
- ----------------------------------------------------------------------------
-| libMesh Performance: Alive time=0.423336, Active time=0.310941
- ----------------------------------------------------------------------------
-| Event                         nCalls  Total       Avg         Percent of   |
-|                                       Time        Time        Active Time  |
-|----------------------------------------------------------------------------|
-|                                                                            |
-|                                                                            |
-| DofMap                                                                     |
-|   compute_sparsity()          1       0.0111      0.011113    3.57         |
-|   create_dof_constraints()    1       0.0001      0.000104    0.03         |
-|   distribute_dofs()           1       0.0012      0.001152    0.37         |
-|   dof_indices()               675     0.0065      0.000010    2.10         |
-|   reinit()                    1       0.0043      0.004251    1.37         |
-|                                                                            |
-| FE                                                                         |
-|   compute_face_map()          60      0.0006      0.000010    0.19         |
-|   compute_map()               285     0.0039      0.000014    1.24         |
-|   compute_shape_functions()   285     0.0030      0.000010    0.95         |
-|   init_face_shape_functions() 35      0.0003      0.000008    0.09         |
-|   init_shape_functions()      61      0.0027      0.000045    0.87         |
-|   inverse_map()               180     0.0034      0.000019    1.08         |
-|                                                                            |
-| Mesh                                                                       |
-|   build_cube()                1       0.0028      0.002790    0.90         |
-|                                                                            |
-| MeshBase                                                                   |
-|   find_neighbors()            1       0.0045      0.004544    1.46         |
-|   renumber_nodes_and_elem()   1       0.0002      0.000239    0.08         |
-|                                                                            |
-| SystemBase                                                                 |
-|   assemble()                  1       0.0441      0.044065    14.17        |
-|   solve()                     1       0.2224      0.222375    71.52        |
- ----------------------------------------------------------------------------
-| Totals:                       1590    0.3109                  100.00       |
- ----------------------------------------------------------------------------
-
  
 ***************************************************************
 * Done Running Example  ./ex3

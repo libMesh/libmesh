@@ -72,7 +72,7 @@ Include file that defines a simple steady system
 
 <div class ="fragment">
 <pre>
-        #include "steady_system.h"
+        #include "transient_system.h"
         
         int main (int argc, char** argv)
         {
@@ -196,7 +196,7 @@ EquationSystems object, and we give it the name
 
 <div class ="fragment">
 <pre>
-            equation_systems.add_system&lt;SteadySystem&gt; ("Simple System");
+            equation_systems.add_system&lt;TransientImplicitSystem&gt; ("Simple System");
               
 </pre>
 </div>
@@ -332,7 +332,7 @@ MPI.
   #include <FONT COLOR="#BC8F8F"><B>&quot;libmesh.h&quot;</FONT></B>
   #include <FONT COLOR="#BC8F8F"><B>&quot;mesh.h&quot;</FONT></B>
   #include <FONT COLOR="#BC8F8F"><B>&quot;equation_systems.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;steady_system.h&quot;</FONT></B>
+  #include <FONT COLOR="#BC8F8F"><B>&quot;transient_system.h&quot;</FONT></B>
   
   <FONT COLOR="#228B22"><B>int</FONT></B> main (<FONT COLOR="#228B22"><B>int</FONT></B> argc, <FONT COLOR="#228B22"><B>char</FONT></B>** argv)
   {
@@ -357,7 +357,7 @@ MPI.
         
       equation_systems.set_parameter (<FONT COLOR="#BC8F8F"><B>&quot;nobody&quot;</FONT></B>) = 0.;
       
-      equation_systems.add_system&lt;SteadySystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Simple System&quot;</FONT></B>);
+      equation_systems.add_system&lt;TransientImplicitSystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Simple System&quot;</FONT></B>);
         
       equation_systems(<FONT COLOR="#BC8F8F"><B>&quot;Simple System&quot;</FONT></B>).add_variable(<FONT COLOR="#BC8F8F"><B>&quot;u&quot;</FONT></B>, FIRST);
         
@@ -391,6 +391,10 @@ MPI.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+Compiling C++ (in debug mode) ex2.C...
+Linking ex2...
+/home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
+: the use of `mktemp' is dangerous, better use `mkstemp'
 ***************************************************************
 * Running Example  ./ex2
 ***************************************************************
@@ -411,16 +415,14 @@ Running ./ex2
  EquationSystems
   n_systems()=1
    System "Simple System"
-    Type "Steady"
+    Type "TransientImplicit"
     Variables="u" 
-    Finite Element Types="0", "12" 
-    Infinite Element Mapping="0" 
-    Approximation Orders="1", "3" 
+    Finite Element Types="0" 
+    Approximation Orders="1" 
     n_dofs()=36
     n_local_dofs()=36
     n_constrained_dofs()=0
-    n_additional_vectors()=0
-    n_additional_matrices()=0
+    n_vectors()=1
   n_flags()=1
    Flags:
     "test"
@@ -435,15 +437,12 @@ Running ./ex2
  ---------------------------------------------------------------------------- 
 | Reference count information                                                |
  ---------------------------------------------------------------------------- 
-| 10SystemBase reference count information:
-| Creations:    1
-| Destructions: 1
 | 12SparseMatrixIdE reference count information:
 | Creations:    1
 | Destructions: 1
 | 13NumericVectorIdE reference count information:
-| Creations:    3
-| Destructions: 3
+| Creations:    5
+| Destructions: 5
 | 21LinearSolverInterfaceIdE reference count information:
 | Creations:    1
 | Destructions: 1
@@ -456,40 +455,10 @@ Running ./ex2
 | 6DofMap reference count information:
 | Creations:    1
 | Destructions: 1
+| 6System reference count information:
+| Creations:    1
+| Destructions: 1
  ---------------------------------------------------------------------------- 
-
- ----------------------------------------------------------------------------
-| Time:           Mon Nov 10 22:54:14 2003
-| OS:             Linux
-| HostName:       ariel
-| OS Release      2.4.20-19.9smp
-| OS Version:     #1 SMP Tue Jul 15 17:04:18 EDT 2003
-| Machine:        i686
-| Username:       benkirk
- ----------------------------------------------------------------------------
- ----------------------------------------------------------------------------
-| libMesh Performance: Alive time=0.077615, Active time=0.001467
- ----------------------------------------------------------------------------
-| Event                         nCalls  Total       Avg         Percent of   |
-|                                       Time        Time        Active Time  |
-|----------------------------------------------------------------------------|
-|                                                                            |
-|                                                                            |
-| DofMap                                                                     |
-|   create_dof_constraints()    1       0.0000      0.000028    1.91         |
-|   distribute_dofs()           1       0.0001      0.000106    7.23         |
-|   reinit()                    1       0.0002      0.000239    16.29        |
-|                                                                            |
-| Mesh                                                                       |
-|   build_cube()                1       0.0005      0.000537    36.61        |
-|                                                                            |
-| MeshBase                                                                   |
-|   find_neighbors()            1       0.0005      0.000534    36.40        |
-|   renumber_nodes_and_elem()   1       0.0000      0.000023    1.57         |
- ----------------------------------------------------------------------------
-| Totals:                       6       0.0015                  100.00       |
- ----------------------------------------------------------------------------
-
  
 Running ./ex2 eqn_sys.dat
 
@@ -507,16 +476,14 @@ Running ./ex2 eqn_sys.dat
  EquationSystems
   n_systems()=1
    System "Simple System"
-    Type "Steady"
+    Type "TransientImplicit"
     Variables="u" 
-    Finite Element Types="0", "12" 
-    Infinite Element Mapping="0" 
-    Approximation Orders="1", "3" 
+    Finite Element Types="0" 
+    Approximation Orders="1" 
     n_dofs()=36
     n_local_dofs()=36
     n_constrained_dofs()=0
-    n_additional_vectors()=0
-    n_additional_matrices()=0
+    n_vectors()=1
   n_flags()=1
    Flags:
     "test"
@@ -533,16 +500,14 @@ Running ./ex2 eqn_sys.dat
  EquationSystems
   n_systems()=1
    System "Simple System"
-    Type "Steady"
+    Type "TransientImplicit"
     Variables="u" 
-    Finite Element Types="0", "12" 
-    Infinite Element Mapping="0" 
-    Approximation Orders="1", "3" 
+    Finite Element Types="0" 
+    Approximation Orders="1" 
     n_dofs()=36
     n_local_dofs()=36
     n_constrained_dofs()=0
-    n_additional_vectors()=0
-    n_additional_matrices()=0
+    n_vectors()=1
   n_flags()=1
    Flags:
     "test"
@@ -557,15 +522,12 @@ Running ./ex2 eqn_sys.dat
  ---------------------------------------------------------------------------- 
 | Reference count information                                                |
  ---------------------------------------------------------------------------- 
-| 10SystemBase reference count information:
-| Creations:    2
-| Destructions: 2
 | 12SparseMatrixIdE reference count information:
 | Creations:    2
 | Destructions: 2
 | 13NumericVectorIdE reference count information:
-| Creations:    6
-| Destructions: 6
+| Creations:    10
+| Destructions: 10
 | 21LinearSolverInterfaceIdE reference count information:
 | Creations:    2
 | Destructions: 2
@@ -578,40 +540,10 @@ Running ./ex2 eqn_sys.dat
 | 6DofMap reference count information:
 | Creations:    2
 | Destructions: 2
+| 6System reference count information:
+| Creations:    2
+| Destructions: 2
  ---------------------------------------------------------------------------- 
-
- ----------------------------------------------------------------------------
-| Time:           Mon Nov 10 22:54:14 2003
-| OS:             Linux
-| HostName:       ariel
-| OS Release      2.4.20-19.9smp
-| OS Version:     #1 SMP Tue Jul 15 17:04:18 EDT 2003
-| Machine:        i686
-| Username:       benkirk
- ----------------------------------------------------------------------------
- ----------------------------------------------------------------------------
-| libMesh Performance: Alive time=0.084812, Active time=0.001735
- ----------------------------------------------------------------------------
-| Event                         nCalls  Total       Avg         Percent of   |
-|                                       Time        Time        Active Time  |
-|----------------------------------------------------------------------------|
-|                                                                            |
-|                                                                            |
-| DofMap                                                                     |
-|   create_dof_constraints()    2       0.0000      0.000023    2.65         |
-|   distribute_dofs()           2       0.0002      0.000089    10.26        |
-|   reinit()                    2       0.0005      0.000238    27.44        |
-|                                                                            |
-| Mesh                                                                       |
-|   build_cube()                1       0.0005      0.000477    27.49        |
-|                                                                            |
-| MeshBase                                                                   |
-|   find_neighbors()            1       0.0005      0.000536    30.89        |
-|   renumber_nodes_and_elem()   1       0.0000      0.000022    1.27         |
- ----------------------------------------------------------------------------
-| Totals:                       9       0.0017                  100.00       |
- ----------------------------------------------------------------------------
-
  
 ***************************************************************
 * Done Running Example  ./ex2

@@ -38,6 +38,7 @@ Basic include file needed for the mesh functionality.
 <pre>
         #include "libmesh.h"
         #include "mesh.h"
+        #include "gmv_io.h"
         #include "equation_systems.h"
         #include "fe.h"
         #include "quadrature_gauss.h"
@@ -46,7 +47,7 @@ Basic include file needed for the mesh functionality.
         #include "numeric_vector.h"
         #include "dense_matrix.h"
         #include "dense_vector.h"
-        #include "steady_system.h"
+        #include "implicit_system.h"
         #include "error_vector.h"
         #include "error_estimator.h"
         
@@ -170,8 +171,8 @@ Creates a transient system named "Convection-Diffusion"
 
 <div class ="fragment">
 <pre>
-              SteadySystem&amp; system = 
-        	equation_systems.add_system<SteadySystem> ("Stokes");
+              ImplicitSystem &amp; system = 
+        	equation_systems.add_system<ImplicitSystem> ("Stokes");
               
 </pre>
 </div>
@@ -243,8 +244,8 @@ then write the solution.
 <pre>
             equation_systems("Stokes").solve();
         
-            mesh.write_gmv ("out.gmv",
-        		    equation_systems);
+            GMVIO(mesh).write_equation_systems ("out.gmv",
+        					equation_systems);
           }
           
 </pre>
@@ -300,8 +301,8 @@ Get a reference to the Convection-Diffusion system object.
 
 <div class ="fragment">
 <pre>
-          SteadySystem&amp; system =
-            es.get_system<SteadySystem> ("Stokes");
+          ImplicitSystem &amp; system =
+            es.get_system<ImplicitSystem> ("Stokes");
         
 </pre>
 </div>
@@ -426,7 +427,7 @@ in future examples.
 
 <div class ="fragment">
 <pre>
-          const DofMap&amp; dof_map = system.get_dof_map();
+          const DofMap &amp; dof_map = system.get_dof_map();
         
 </pre>
 </div>
@@ -853,6 +854,7 @@ That's it.
   
   #include <FONT COLOR="#BC8F8F"><B>&quot;libmesh.h&quot;</FONT></B>
   #include <FONT COLOR="#BC8F8F"><B>&quot;mesh.h&quot;</FONT></B>
+  #include <FONT COLOR="#BC8F8F"><B>&quot;gmv_io.h&quot;</FONT></B>
   #include <FONT COLOR="#BC8F8F"><B>&quot;equation_systems.h&quot;</FONT></B>
   #include <FONT COLOR="#BC8F8F"><B>&quot;fe.h&quot;</FONT></B>
   #include <FONT COLOR="#BC8F8F"><B>&quot;quadrature_gauss.h&quot;</FONT></B>
@@ -861,7 +863,7 @@ That's it.
   #include <FONT COLOR="#BC8F8F"><B>&quot;numeric_vector.h&quot;</FONT></B>
   #include <FONT COLOR="#BC8F8F"><B>&quot;dense_matrix.h&quot;</FONT></B>
   #include <FONT COLOR="#BC8F8F"><B>&quot;dense_vector.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;steady_system.h&quot;</FONT></B>
+  #include <FONT COLOR="#BC8F8F"><B>&quot;implicit_system.h&quot;</FONT></B>
   #include <FONT COLOR="#BC8F8F"><B>&quot;error_vector.h&quot;</FONT></B>
   #include <FONT COLOR="#BC8F8F"><B>&quot;error_estimator.h&quot;</FONT></B>
   
@@ -889,8 +891,8 @@ That's it.
       EquationSystems equation_systems (mesh);
       
       {
-        SteadySystem&amp; system = 
-  	equation_systems.add_system&lt;SteadySystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Stokes&quot;</FONT></B>);
+        ImplicitSystem &amp; system = 
+  	equation_systems.add_system&lt;ImplicitSystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Stokes&quot;</FONT></B>);
         
         system.add_variable (<FONT COLOR="#BC8F8F"><B>&quot;u&quot;</FONT></B>, SECOND);
         system.add_variable (<FONT COLOR="#BC8F8F"><B>&quot;v&quot;</FONT></B>, SECOND);
@@ -909,8 +911,8 @@ That's it.
       
       equation_systems(<FONT COLOR="#BC8F8F"><B>&quot;Stokes&quot;</FONT></B>).solve();
   
-      mesh.write_gmv (<FONT COLOR="#BC8F8F"><B>&quot;out.gmv&quot;</FONT></B>,
-  		    equation_systems);
+      GMVIO(mesh).write_equation_systems (<FONT COLOR="#BC8F8F"><B>&quot;out.gmv&quot;</FONT></B>,
+  					equation_systems);
     }
     
     <B><FONT COLOR="#A020F0">return</FONT></B> libMesh::close ();
@@ -925,8 +927,8 @@ That's it.
     
     <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> dim = mesh.mesh_dimension();
     
-    SteadySystem&amp; system =
-      es.get_system&lt;SteadySystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Stokes&quot;</FONT></B>);
+    ImplicitSystem &amp; system =
+      es.get_system&lt;ImplicitSystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Stokes&quot;</FONT></B>);
   
     <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> u_var = system.variable_number (<FONT COLOR="#BC8F8F"><B>&quot;u&quot;</FONT></B>);
     <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> v_var = system.variable_number (<FONT COLOR="#BC8F8F"><B>&quot;v&quot;</FONT></B>);
@@ -951,7 +953,7 @@ That's it.
   
     <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; psi = fe_pres-&gt;get_phi();
     
-    <FONT COLOR="#228B22"><B>const</FONT></B> DofMap&amp; dof_map = system.get_dof_map();
+    <FONT COLOR="#228B22"><B>const</FONT></B> DofMap &amp; dof_map = system.get_dof_map();
   
     DenseMatrix&lt;Number&gt; Ke;
     DenseVector&lt;Number&gt; Fe;
@@ -1083,6 +1085,10 @@ That's it.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+Compiling C++ (in debug mode) ex11.C...
+Linking ex11...
+/home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
+: the use of `mktemp' is dangerous, better use `mkstemp'
 ***************************************************************
 * Running Example  ./ex11
 ***************************************************************
@@ -1101,16 +1107,14 @@ That's it.
  EquationSystems
   n_systems()=1
    System "Stokes"
-    Type "Steady"
+    Type "Implicit"
     Variables="u" "v" "p" 
-    Finite Element Types="0", "12" "0", "12" "0", "12" 
-    Infinite Element Mapping="0" "0" "0" 
-    Approximation Orders="2", "3" "2", "3" "1", "3" 
+    Finite Element Types="0" "0" "0" 
+    Approximation Orders="2" "2" "1" 
     n_dofs()=2178
     n_local_dofs()=2178
     n_constrained_dofs()=0
-    n_additional_vectors()=0
-    n_additional_matrices()=0
+    n_vectors()=1
   n_parameters()=2
    Parameters:
     "linear solver maximum iterations"=250
@@ -1120,9 +1124,6 @@ That's it.
  ---------------------------------------------------------------------------- 
 | Reference count information                                                |
  ---------------------------------------------------------------------------- 
-| 10SystemBase reference count information:
-| Creations:    1
-| Destructions: 1
 | 12SparseMatrixIdE reference count information:
 | Creations:    1
 | Destructions: 1
@@ -1147,53 +1148,10 @@ That's it.
 | 6FEBase reference count information:
 | Creations:    2
 | Destructions: 2
+| 6System reference count information:
+| Creations:    1
+| Destructions: 1
  ---------------------------------------------------------------------------- 
-
- ----------------------------------------------------------------------------
-| Time:           Mon Nov 10 22:57:37 2003
-| OS:             Linux
-| HostName:       ariel
-| OS Release      2.4.20-19.9smp
-| OS Version:     #1 SMP Tue Jul 15 17:04:18 EDT 2003
-| Machine:        i686
-| Username:       benkirk
- ----------------------------------------------------------------------------
- ----------------------------------------------------------------------------
-| libMesh Performance: Alive time=1.12511, Active time=0.997032
- ----------------------------------------------------------------------------
-| Event                         nCalls  Total       Avg         Percent of   |
-|                                       Time        Time        Active Time  |
-|----------------------------------------------------------------------------|
-|                                                                            |
-|                                                                            |
-| DofMap                                                                     |
-|   build_constraint_matrix()   225     0.0035      0.000015    0.35         |
-|   cnstrn_elem_mat_vec()       225     0.0009      0.000004    0.09         |
-|   compute_sparsity()          1       0.0461      0.046054    4.62         |
-|   create_dof_constraints()    1       0.0003      0.000269    0.03         |
-|   distribute_dofs()           1       0.0024      0.002434    0.24         |
-|   dof_indices()               1800    0.0156      0.000009    1.57         |
-|   reinit()                    1       0.0062      0.006166    0.62         |
-|                                                                            |
-| FE                                                                         |
-|   compute_map()               450     0.0059      0.000013    0.59         |
-|   compute_shape_functions()   450     0.0042      0.000009    0.42         |
-|   init_shape_functions()      2       0.0004      0.000179    0.04         |
-|                                                                            |
-| Mesh                                                                       |
-|   build_cube()                1       0.0027      0.002731    0.27         |
-|                                                                            |
-| MeshBase                                                                   |
-|   find_neighbors()            1       0.0047      0.004653    0.47         |
-|   renumber_nodes_and_elem()   1       0.0002      0.000243    0.02         |
-|                                                                            |
-| SystemBase                                                                 |
-|   assemble()                  1       0.1161      0.116145    11.65        |
-|   solve()                     1       0.7879      0.787867    79.02        |
- ----------------------------------------------------------------------------
-| Totals:                       3161    0.9970                  100.00       |
- ----------------------------------------------------------------------------
-
  
 ***************************************************************
 * Done Running Example  ./ex11

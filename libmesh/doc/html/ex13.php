@@ -48,6 +48,7 @@ Basic include file needed for the mesh functionality.
 <pre>
         #include "libmesh.h"
         #include "mesh.h"
+        #include "gmv_io.h"
         #include "equation_systems.h"
         #include "fe.h"
         #include "quadrature_gauss.h"
@@ -312,7 +313,20 @@ Get a reference to the Stokes system to use later.
 <pre>
             TransientImplicitSystem&amp;  stokes_system =
         	  equation_systems.get_system<TransientImplicitSystem>("Navier-Stokes");
-            
+        
+</pre>
+</div>
+<div class = "comment">
+The first thing to do is to get a copy of the solution at
+the current nonlinear iteration.  This value will be used to
+determine if we can exit the nonlinear loop.
+</div>
+
+<div class ="fragment">
+<pre>
+            AutoPtr&lt;NumericVector&lt;Number&gt; &gt;
+              last_nonlinear_soln (stokes_system.solution->clone());
+        
             for (unsigned int t_step=0; t_step<n_timesteps; ++t_step)
               {
 </pre>
@@ -358,7 +372,7 @@ the reference to the Stokes system.
 
 <div class ="fragment">
 <pre>
-                *stokes_system.old_local_solution = *stokes_system.current_local_solution;
+                *stokes_system.old_local_solution = *stokes_system.solution;
         
 </pre>
 </div>
@@ -373,15 +387,13 @@ Now we begin the nonlinear loop
 </pre>
 </div>
 <div class = "comment">
-The first thing to do is to get a copy of the solution at
-the current nonlinear iteration.  This value will be used to
-determine if we can exit the nonlinear loop.
+Update the nonlinear solution.
 </div>
 
 <div class ="fragment">
 <pre>
-                    AutoPtr&lt;NumericVector&lt;Number&gt; &gt;
-        	      last_nonlinear_soln (stokes_system.current_local_solution->clone());
+                    last_nonlinear_soln-&gt;zero();
+        	    last_nonlinear_soln->add(*stokes_system.solution);
         	    
 </pre>
 </div>
@@ -394,7 +406,7 @@ Assemble & solve the linear system.
                     perf_log.start_event("linear solve");
         	    equation_systems("Navier-Stokes").solve();
         	    perf_log.stop_event("linear solve");
-        	    
+        
 </pre>
 </div>
 <div class = "comment">
@@ -404,7 +416,7 @@ nonlinear iterate.
 
 <div class ="fragment">
 <pre>
-                    last_nonlinear_soln-&gt;add (-1., *stokes_system.current_local_solution);
+                    last_nonlinear_soln-&gt;add (-1., *stokes_system.solution);
         
 </pre>
 </div>
@@ -429,12 +441,17 @@ Compute the l2 norm of the difference
 </pre>
 </div>
 <div class = "comment">
-Print out convergence information
+Print out convergence information for the linear and
+nonlinear iterations.
 </div>
 
 <div class ="fragment">
 <pre>
-                    std::cout &lt;&lt; "Nonlinear convergence: ||u - u_old|| = "
+                    std::cout &lt;&lt; "Linear solver converged at step: "
+        		      << stokes_system.n_linear_iterations()
+        		      << ", final residual: "
+        		      << stokes_system.final_linear_residual()
+        		      << "  Nonlinear convergence: ||u - u_old|| = "
         		      << norm_delta
         		      << std::endl;
         
@@ -482,8 +499,8 @@ We write the file name in the gmv auto-read format.
                     file_name &lt;&lt; "out.gmv.";
         	    OSSRealzeroright(file_name,3,0, t_step + 1);
         	    
-        	    mesh.write_gmv (file_name.str(),
-        			    equation_systems);
+        	    GMVIO(mesh).write_equation_systems (file_name.str(),
+        						equation_systems);
         	  }
               } // end timestep loop.
           }
@@ -754,7 +771,14 @@ simulation, you should see that it is monotonically decreasing in time.
 <div class ="fragment">
 <pre>
           const Real dt    = es.parameter("dt");
-          const Real time  = es.parameter("time");
+</pre>
+</div>
+<div class = "comment">
+const Real time  = es.parameter("time");
+</div>
+
+<div class ="fragment">
+<pre>
           const Real theta = 1.;
             
 </pre>
@@ -1242,6 +1266,7 @@ That's it.
   
   #include <FONT COLOR="#BC8F8F"><B>&quot;libmesh.h&quot;</FONT></B>
   #include <FONT COLOR="#BC8F8F"><B>&quot;mesh.h&quot;</FONT></B>
+  #include <FONT COLOR="#BC8F8F"><B>&quot;gmv_io.h&quot;</FONT></B>
   #include <FONT COLOR="#BC8F8F"><B>&quot;equation_systems.h&quot;</FONT></B>
   #include <FONT COLOR="#BC8F8F"><B>&quot;fe.h&quot;</FONT></B>
   #include <FONT COLOR="#BC8F8F"><B>&quot;quadrature_gauss.h&quot;</FONT></B>
@@ -1313,7 +1338,10 @@ That's it.
   
       TransientImplicitSystem&amp;  stokes_system =
   	  equation_systems.get_system&lt;TransientImplicitSystem&gt;(<FONT COLOR="#BC8F8F"><B>&quot;Navier-Stokes&quot;</FONT></B>);
-      
+  
+      AutoPtr&lt;NumericVector&lt;Number&gt; &gt;
+        last_nonlinear_soln (stokes_system.solution-&gt;clone());
+  
       <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> t_step=0; t_step&lt;n_timesteps; ++t_step)
         {
   	time += dt;
@@ -1322,24 +1350,28 @@ That's it.
   
   	std::cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; Solving time step &quot;</FONT></B> &lt;&lt; t_step &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;, time = &quot;</FONT></B> &lt;&lt; time &lt;&lt; std::endl;
   
-  	*stokes_system.old_local_solution = *stokes_system.current_local_solution;
+  	*stokes_system.old_local_solution = *stokes_system.solution;
   
   	<B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> l=0; l&lt;n_nonlinear_steps; ++l)
   	  {
-  	    AutoPtr&lt;NumericVector&lt;Number&gt; &gt;
-  	      last_nonlinear_soln (stokes_system.current_local_solution-&gt;clone());
+  	    last_nonlinear_soln-&gt;zero();
+  	    last_nonlinear_soln-&gt;add(*stokes_system.solution);
   	    
   	    perf_log.start_event(<FONT COLOR="#BC8F8F"><B>&quot;linear solve&quot;</FONT></B>);
   	    equation_systems(<FONT COLOR="#BC8F8F"><B>&quot;Navier-Stokes&quot;</FONT></B>).solve();
   	    perf_log.stop_event(<FONT COLOR="#BC8F8F"><B>&quot;linear solve&quot;</FONT></B>);
-  	    
-  	    last_nonlinear_soln-&gt;add (-1., *stokes_system.current_local_solution);
+  
+  	    last_nonlinear_soln-&gt;add (-1., *stokes_system.solution);
   
   	    last_nonlinear_soln-&gt;close();
   
   	    <FONT COLOR="#228B22"><B>const</FONT></B> Real norm_delta = last_nonlinear_soln-&gt;l2_norm();
   
-  	    std::cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;Nonlinear convergence: ||u - u_old|| = &quot;</FONT></B>
+  	    std::cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;Linear solver converged at step: &quot;</FONT></B>
+  		      &lt;&lt; stokes_system.n_linear_iterations()
+  		      &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;, final residual: &quot;</FONT></B>
+  		      &lt;&lt; stokes_system.final_linear_residual()
+  		      &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;  Nonlinear convergence: ||u - u_old|| = &quot;</FONT></B>
   		      &lt;&lt; norm_delta
   		      &lt;&lt; std::endl;
   
@@ -1362,8 +1394,8 @@ That's it.
   	    file_name &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;out.gmv.&quot;</FONT></B>;
   	    OSSRealzeroright(file_name,3,0, t_step + 1);
   	    
-  	    mesh.write_gmv (file_name.str(),
-  			    equation_systems);
+  	    GMVIO(mesh).write_equation_systems (file_name.str(),
+  						equation_systems);
   	  }
         } <I><FONT COLOR="#B22222">// end timestep loop.
 </FONT></I>    }
@@ -1435,7 +1467,6 @@ That's it.
     std::vector&lt;<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B>&gt; dof_indices_p;
   
     <FONT COLOR="#228B22"><B>const</FONT></B> Real dt    = es.parameter(<FONT COLOR="#BC8F8F"><B>&quot;dt&quot;</FONT></B>);
-    <FONT COLOR="#228B22"><B>const</FONT></B> Real time  = es.parameter(<FONT COLOR="#BC8F8F"><B>&quot;time&quot;</FONT></B>);
     <FONT COLOR="#228B22"><B>const</FONT></B> Real theta = 1.;
       
     const_active_local_elem_iterator           el (mesh.elements_begin());
@@ -1602,6 +1633,166 @@ That's it.
     <B><FONT COLOR="#A020F0">return</FONT></B>;
   }
 </pre> 
+<a name="output"></a> 
+<br><br><br> <h1> The console output of the program: </h1> 
+<pre>
+Compiling C++ (in debug mode) ex13.C...
+Linking ex13...
+/home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
+: the use of `mktemp' is dangerous, better use `mkstemp'
+***************************************************************
+* Running Example  ./ex13
+***************************************************************
+ 
+ Mesh Information:
+  mesh_dimension()=2
+  spatial_dimension()=3
+  n_nodes()=1681
+  n_elem()=400
+   n_local_elem()=400
+   n_active_elem()=400
+  n_subdomains()=1
+  n_processors()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System "Navier-Stokes"
+    Type "TransientImplicit"
+    Variables="u" "v" "p" 
+    Finite Element Types="0" "0" "0" 
+    Approximation Orders="2" "2" "1" 
+    n_dofs()=3803
+    n_local_dofs()=3803
+    n_constrained_dofs()=0
+    n_vectors()=1
+  n_parameters()=2
+   Parameters:
+    "linear solver maximum iterations"=250
+    "linear solver tolerance"=0.001
+
+ Solving time step 0, time = 0.005
+Linear solver converged at step: 16, final residual: 0.121329  Nonlinear convergence: ||u - u_old|| = 223.471
+Linear solver converged at step: 24, final residual: 0.000317615  Nonlinear convergence: ||u - u_old|| = 6.5317
+Linear solver converged at step: 28, final residual: 2.58051e-07  Nonlinear convergence: ||u - u_old|| = 0.0072933
+ Nonlinear solver converged at step 2
+ Solving time step 1, time = 0.01
+Linear solver converged at step: 23, final residual: 0.0025053  Nonlinear convergence: ||u - u_old|| = 35.4701
+Linear solver converged at step: 24, final residual: 1.47282e-05  Nonlinear convergence: ||u - u_old|| = 0.0466908
+Linear solver converged at step: 24, final residual: 1.27369e-08  Nonlinear convergence: ||u - u_old|| = 0.00027294
+ Nonlinear solver converged at step 2
+ Solving time step 2, time = 0.015
+Linear solver converged at step: 24, final residual: 0.000790085  Nonlinear convergence: ||u - u_old|| = 9.79414
+Linear solver converged at step: 24, final residual: 3.41055e-06  Nonlinear convergence: ||u - u_old|| = 0.0208939
+Linear solver converged at step: 28, final residual: 2.96023e-09  Nonlinear convergence: ||u - u_old|| = 0.000135564
+ Nonlinear solver converged at step 2
+ Solving time step 3, time = 0.02
+Linear solver converged at step: 24, final residual: 0.000382917  Nonlinear convergence: ||u - u_old|| = 4.07167
+Linear solver converged at step: 25, final residual: 1.42401e-06  Nonlinear convergence: ||u - u_old|| = 0.00672638
+ Nonlinear solver converged at step 1
+ Solving time step 4, time = 0.025
+Linear solver converged at step: 23, final residual: 0.000247016  Nonlinear convergence: ||u - u_old|| = 2.13266
+Linear solver converged at step: 25, final residual: 8.20034e-07  Nonlinear convergence: ||u - u_old|| = 0.00772513
+ Nonlinear solver converged at step 1
+ Solving time step 5, time = 0.03
+Linear solver converged at step: 23, final residual: 0.000126994  Nonlinear convergence: ||u - u_old|| = 1.26206
+Linear solver converged at step: 27, final residual: 4.97111e-07  Nonlinear convergence: ||u - u_old|| = 0.0057915
+ Nonlinear solver converged at step 1
+ Solving time step 6, time = 0.035
+Linear solver converged at step: 24, final residual: 8.03056e-05  Nonlinear convergence: ||u - u_old|| = 0.805059
+Linear solver converged at step: 24, final residual: 2.93058e-07  Nonlinear convergence: ||u - u_old|| = 0.00147397
+ Nonlinear solver converged at step 1
+ Solving time step 7, time = 0.04
+Linear solver converged at step: 24, final residual: 7.94782e-05  Nonlinear convergence: ||u - u_old|| = 0.53619
+Linear solver converged at step: 23, final residual: 1.75705e-07  Nonlinear convergence: ||u - u_old|| = 0.000919154
+ Nonlinear solver converged at step 1
+ Solving time step 8, time = 0.045
+Linear solver converged at step: 23, final residual: 6.92094e-05  Nonlinear convergence: ||u - u_old|| = 0.368994
+Linear solver converged at step: 27, final residual: 9.13022e-08  Nonlinear convergence: ||u - u_old|| = 0.00104694
+ Nonlinear solver converged at step 1
+ Solving time step 9, time = 0.05
+Linear solver converged at step: 23, final residual: 4.73186e-05  Nonlinear convergence: ||u - u_old|| = 0.260159
+Linear solver converged at step: 27, final residual: 6.18452e-08  Nonlinear convergence: ||u - u_old|| = 0.000762091
+ Nonlinear solver converged at step 1
+ Solving time step 10, time = 0.055
+Linear solver converged at step: 22, final residual: 4.01872e-05  Nonlinear convergence: ||u - u_old|| = 0.187318
+Linear solver converged at step: 27, final residual: 3.72042e-08  Nonlinear convergence: ||u - u_old|| = 0.000711503
+ Nonlinear solver converged at step 1
+ Solving time step 11, time = 0.06
+Linear solver converged at step: 22, final residual: 2.7971e-05  Nonlinear convergence: ||u - u_old|| = 0.137235
+Linear solver converged at step: 28, final residual: 2.40094e-08  Nonlinear convergence: ||u - u_old|| = 0.000617341
+ Nonlinear solver converged at step 1
+ Solving time step 12, time = 0.065
+Linear solver converged at step: 21, final residual: 2.51357e-05  Nonlinear convergence: ||u - u_old|| = 0.102129
+Linear solver converged at step: 28, final residual: 2.11058e-08  Nonlinear convergence: ||u - u_old|| = 0.00086522
+ Nonlinear solver converged at step 1
+ Solving time step 13, time = 0.07
+Linear solver converged at step: 21, final residual: 1.78319e-05  Nonlinear convergence: ||u - u_old|| = 0.07677
+Linear solver converged at step: 28, final residual: 1.60542e-08  Nonlinear convergence: ||u - u_old|| = 0.000734319
+ Nonlinear solver converged at step 1
+ Solving time step 14, time = 0.075
+Linear solver converged at step: 21, final residual: 1.27677e-05  Nonlinear convergence: ||u - u_old|| = 0.0582848
+Linear solver converged at step: 28, final residual: 1.17971e-08  Nonlinear convergence: ||u - u_old|| = 0.000574086
+ Nonlinear solver converged at step 1
+
+ ----------------------------------------------------------------------------
+| Time:           Mon Apr 19 11:27:59 2004
+| OS:             Linux
+| HostName:       arthur
+| OS Release      2.4.20-19.9smp
+| OS Version:     #1 SMP Tue Jul 15 17:04:18 EDT 2003
+| Machine:        i686
+| Username:       peterson
+ ----------------------------------------------------------------------------
+ ----------------------------------------------------------------------------
+| Example 13 Performance: Alive time=52.7163, Active time=50.1666
+ ----------------------------------------------------------------------------
+| Event                         nCalls  Total       Avg         Percent of   |
+|                                       Time        Time        Active Time  |
+|----------------------------------------------------------------------------|
+|                                                                            |
+| linear solve                  33      50.1666     1.520200    100.00       |
+ ----------------------------------------------------------------------------
+| Totals:                       33      50.1666                 100.00       |
+ ----------------------------------------------------------------------------
+
+
+ ---------------------------------------------------------------------------- 
+| Reference count information                                                |
+ ---------------------------------------------------------------------------- 
+| 12SparseMatrixIdE reference count information:
+| Creations:    1
+| Destructions: 1
+| 13NumericVectorIdE reference count information:
+| Creations:    6
+| Destructions: 6
+| 21LinearSolverInterfaceIdE reference count information:
+| Creations:    1
+| Destructions: 1
+| 4Elem reference count information:
+| Creations:    4640
+| Destructions: 4640
+| 4Node reference count information:
+| Creations:    1681
+| Destructions: 1681
+| 5QBase reference count information:
+| Creations:    66
+| Destructions: 66
+| 6DofMap reference count information:
+| Creations:    1
+| Destructions: 1
+| 6FEBase reference count information:
+| Creations:    66
+| Destructions: 66
+| 6System reference count information:
+| Creations:    1
+| Destructions: 1
+ ---------------------------------------------------------------------------- 
+ 
+***************************************************************
+* Done Running Example  ./ex13
+***************************************************************
+</pre>
 </div>
 <?php make_footer() ?>
 </body>
