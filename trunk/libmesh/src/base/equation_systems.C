@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.15 2003-02-14 22:37:11 benkirk Exp $
+// $Id: equation_systems.C,v 1.16 2003-02-15 05:21:13 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -82,25 +82,25 @@ void EquationSystems::init ()
   
   assert (n_sys != 0);
 
-  /**
-   * Tell all the \p DofObject entities how many systems
-   * there are.
-   */
-  {
-    // All the nodes
-    node_iterator       node_it  (_mesh.nodes_begin());
-    const node_iterator node_end (_mesh.nodes_end());
+//   /**
+//    * Tell all the \p DofObject entities how many systems
+//    * there are.
+//    */
+//   {
+//     // All the nodes
+//     node_iterator       node_it  (_mesh.nodes_begin());
+//     const node_iterator node_end (_mesh.nodes_end());
     
-    for ( ; node_it != node_end; ++node_it)
-      (*node_it)->set_n_systems(n_sys);
+//     for ( ; node_it != node_end; ++node_it)
+//       (*node_it)->set_n_systems(n_sys);
     
-    // All the elements
-    elem_iterator       elem_it (_mesh.elements_begin());
-    const elem_iterator elem_end(_mesh.elements_end());
+//     // All the elements
+//     elem_iterator       elem_it (_mesh.elements_begin());
+//     const elem_iterator elem_end(_mesh.elements_end());
     
-    for ( ; elem_it != elem_end; ++elem_it)
-      (*elem_it)->set_n_systems(n_sys);
-  }
+//     for ( ; elem_it != elem_end; ++elem_it)
+//       (*elem_it)->set_n_systems(n_sys);
+//   }
 
 
   for (std::map<std::string, GeneralSystem*>::iterator
@@ -139,6 +139,26 @@ void EquationSystems::add_system (const std::string& name)
 
       error();
     }
+
+  
+  /**
+   * Tell all the \p DofObject entities to add a system.
+   */
+  {
+    // All the nodes
+    node_iterator       node_it  (_mesh.nodes_begin());
+    const node_iterator node_end (_mesh.nodes_end());
+    
+    for ( ; node_it != node_end; ++node_it)
+      (*node_it)->add_system();
+    
+    // All the elements
+    elem_iterator       elem_it (_mesh.elements_begin());
+    const elem_iterator elem_end(_mesh.elements_end());
+    
+    for ( ; elem_it != elem_end; ++elem_it)
+      (*elem_it)->add_system();
+  }
 }
 
 

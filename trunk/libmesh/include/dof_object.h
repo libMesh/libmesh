@@ -1,4 +1,4 @@
-// $Id: dof_object.h,v 1.4 2003-02-14 22:37:10 benkirk Exp $
+// $Id: dof_object.h,v 1.5 2003-02-15 05:21:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -46,7 +46,7 @@
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.4 $
+ * \version $Revision: 1.5 $
  */
 
 class DofObject
@@ -107,7 +107,6 @@ public:
   void set_id (const unsigned int id)
   { set_id() = id; }
 
-
   /**
    * @returns the number of systes associated with this
    * \p DofObject
@@ -118,6 +117,11 @@ public:
    *  Sets the number of systems for this \p DofObject
    */
   void set_n_systems (const unsigned int s);
+
+  /**
+   * Adds an additional system to the \p DofObject
+   */
+  void add_system ();
   
   /**
    * @returns the number of variables associated with system \p s
@@ -245,21 +249,18 @@ DofObject::DofObject (const DofObject& dof_obj) :
 #endif
   _dof_ids (NULL)
 {
-  // Allocate storage for the dof numbers and copy
-  // the values.
-  _n_vars = new unsigned char [n_systems()];
-
-  for (unsigned int s=0; s<n_systems(); s++)
-    _n_vars[s] = dof_obj._n_vars[s];
-
   
 #ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
 
-  _n_comp  = new unsigned char*  [n_systems()];
-  _dof_ids = new unsigned int**  [n_systems()];
+  // Allocate storage for the dof numbers and copy
+  // the values.
+  _n_vars  = new unsigned char  [n_systems()];
+  _n_comp  = new unsigned char* [n_systems()];
+  _dof_ids = new unsigned int** [n_systems()];
 
   for (unsigned int s=0; s<n_systems(); s++)
     {      
+      _n_vars[s]  = dof_obj._n_vars[s];
       _n_comp[s]  = new unsigned char [n_vars(s)];
       _dof_ids[s] = new unsigned int* [n_vars(s)];
   
@@ -276,10 +277,14 @@ DofObject::DofObject (const DofObject& dof_obj) :
 
 #else
 
+  // Allocate storage for the dof numbers and copy
+  // the values.
+  _n_vars  = new unsigned char [n_systems()];
   _dof_ids = new unsigned int* [n_systems()];
 
   for (unsigned int s=0; s<n_systems(); s++)
     {  
+      _n_vars[s]  = dof_obj._n_vars[s];
       _dof_ids[s] = new unsigned int [n_vars(s)];
   
       for (unsigned int v=0; v<n_vars(s); v++)
@@ -491,6 +496,115 @@ void DofObject::set_n_systems (const unsigned int ns)
 
 
 inline
+void DofObject::add_system()
+{
+  const unsigned int n_sys = n_systems();
+
+#ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
+
+  if (n_sys > 0)
+    {
+      // Copy the old systems to temporary storage
+      unsigned char  *old_n_vars  = new unsigned char  [n_sys];
+      unsigned char **old_n_comp  = new unsigned char* [n_sys];
+      unsigned int ***old_dof_ids = new unsigned int** [n_sys]; 
+      
+      for (unsigned int s=0; s<n_sys; s++)
+	{
+	  old_n_vars[s]  = _n_vars[s];
+	  old_n_comp[s]  = _n_comp[s];
+	  old_dof_ids[s] = _dof_ids[s];
+	}
+  
+      // Delete old storage
+      assert (_n_vars  != NULL); delete [] _n_vars;  _n_vars  = NULL;
+      assert (_n_comp  != NULL); delete [] _n_comp;  _n_comp  = NULL;
+      assert (_dof_ids != NULL); delete [] _dof_ids; _dof_ids = NULL;
+  
+      // Allocate space for new system
+      _n_vars  = new unsigned char  [n_sys+1];
+      _n_comp  = new unsigned char* [n_sys+1];
+      _dof_ids = new unsigned int** [n_sys+1];
+      
+      // Copy the other systems
+      for (unsigned int s=0; s<n_sys; s++)
+	{
+	  _n_vars[s]  = old_n_vars[s];
+	  _n_comp[s]  = old_n_comp[s];
+	  _dof_ids[s] = old_dof_ids[s];
+	}
+      
+      // Delete temporary storage
+      assert (old_n_vars  != NULL); delete [] old_n_vars;  old_n_vars  = NULL;
+      assert (old_n_comp  != NULL); delete [] old_n_comp;  old_n_comp  = NULL;
+      assert (old_dof_ids != NULL); delete [] old_dof_ids; old_dof_ids = NULL;
+    }
+  else
+    {
+      // Allocate space for new system
+      _n_vars  = new unsigned char  [n_sys+1];
+      _n_comp  = new unsigned char* [n_sys+1];
+      _dof_ids = new unsigned int** [n_sys+1];      
+    }
+  
+  // Initialize the new system
+  _n_vars[n_sys]  = 0;
+  _n_comp[n_sys]  = NULL;
+  _dof_ids[n_sys] = NULL;
+
+#else
+
+  if (n_sys > 0)
+    {
+      // Copy the old systems to temporary storage
+      unsigned char *old_n_vars  = new unsigned char [n_sys];
+      unsigned int **old_dof_ids = new unsigned int* [n_sys]; 
+      
+      for (unsigned int s=0; s<n_sys; s++)
+	{
+	  old_n_vars[s]  = _n_vars[s];
+	  old_dof_ids[s] = _dof_ids[s];
+	}
+      
+      // Delete old storage
+      assert (_n_vars  != NULL); delete [] _n_vars;  _n_vars  = NULL;
+      assert (_dof_ids != NULL); delete [] _dof_ids; _dof_ids = NULL;
+      
+      // Allocate space for new system
+      _n_vars  = new unsigned char [n_sys+1];
+      _dof_ids = new unsigned int* [n_sys+1];
+      
+      // Copy the other systems
+      for (unsigned int s=0; s<n_sys; s++)
+	{
+	  _n_vars[s]  = old_n_vars[s];
+	  _dof_ids[s] = old_dof_ids[s];
+	}
+
+      // Delete temporary storage
+      assert (old_n_vars  != NULL); delete [] old_n_vars;  old_n_vars  = NULL;
+      assert (old_dof_ids != NULL); delete [] old_dof_ids; old_dof_ids = NULL;
+    }
+  else
+    {
+      // Allocate space for new system
+      _n_vars  = new unsigned char [n_sys+1];
+      _dof_ids = new unsigned int* [n_sys+1];
+    }
+  
+  // Initialize the new system
+  _n_vars[n_sys]  = 0;
+  _dof_ids[n_sys] = NULL;
+
+#endif
+
+  // Don't forget to increment the number of systems!
+  _n_systems++;
+}
+
+
+
+inline
 unsigned int DofObject::n_vars(const unsigned int s) const
 {
   assert (s < n_systems());
@@ -556,7 +670,7 @@ void DofObject::set_n_vars(const unsigned int s,
 #else
 
   // If we already have memory allocated clear it.
-  if (n_vars(s))
+  if (n_vars(s) > 0)
     {
       assert (_dof_ids[s] != NULL); delete [] _dof_ids[s]; _dof_ids[s] = NULL;
     }
