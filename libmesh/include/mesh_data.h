@@ -1,4 +1,4 @@
-// $Id: mesh_data.h,v 1.10 2003-07-12 14:02:56 ddreyer Exp $
+// $Id: mesh_data.h,v 1.11 2003-07-27 14:56:11 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -431,7 +431,11 @@ protected:
   //--------------------------------------------------------
   /**
    * \p true when the mesh importer finished adding
-   * node id maps.
+   * node-foreign-id maps, and the node-foreign-id maps 
+   * exist.  Note that these maps may be deleted through
+   * \p slim() to save memory.  Then the data is
+   * still accessible through the \p Node* or \p Elem*,
+   * but the foreign id's are lost.
    */
   bool _node_id_map_closed;
 
@@ -445,7 +449,11 @@ protected:
   //--------------------------------------------------------
   /**
    * \p true when the mesh importer finished adding
-   * element id maps.
+   * element-id maps, and the element-id maps exist.  
+   * Note that these maps may be deleted through
+   * \p slim() to save memory.  Then the data is
+   * still accessible through the \p Elem*,
+   * but the foreign element id's are lost.
    */
   bool _elem_id_map_closed;
 
@@ -610,7 +618,6 @@ Number MeshData::operator() (const Node* node,
 			     const unsigned int i) const
 {
   assert (_active);
-  assert (_node_id_map_closed);
   assert (_node_data_closed);
 
   std::map<const Node*, 
@@ -630,7 +637,6 @@ inline
 bool MeshData::has_data (const Node* node) const
 {
   assert (_active);
-  assert (_node_id_map_closed);
   assert (_node_data_closed);
 
   std::map<const Node*, 
@@ -646,7 +652,6 @@ void MeshData::operator() (const Node* node,
 			   std::vector<Number>& data) const
 {
   assert (_active);
-  assert (_node_id_map_closed);
   assert (_node_data_closed);
 
   std::map<const Node*, 
@@ -669,7 +674,6 @@ Number MeshData::operator() (const Elem* elem,
 			     const unsigned int i) const
 {
   assert (_active);
-  assert (_elem_id_map_closed);
   assert (_elem_data_closed);
 
   std::map<const Elem*, 
@@ -689,7 +693,6 @@ inline
 bool MeshData::has_data (const Elem* elem) const
 {
   assert (_active);
-  assert (_elem_id_map_closed);
   assert (_elem_data_closed);
 
   std::map<const Elem*, 
@@ -705,7 +708,6 @@ void MeshData::operator() (const Elem* elem,
 			   std::vector<Number>& data) const
 {
   assert (_active);
-  assert (_elem_id_map_closed);
   assert (_elem_data_closed);
 
   std::map<const Elem*, 
