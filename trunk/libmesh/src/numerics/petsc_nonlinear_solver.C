@@ -1,4 +1,4 @@
-// $Id: petsc_nonlinear_solver.C,v 1.6 2005-01-31 22:16:18 benkirk Exp $
+// $Id: petsc_nonlinear_solver.C,v 1.7 2005-02-02 20:51:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -83,14 +83,13 @@ extern "C"
     PetscNonlinearSolver<Number>* solver =
       static_cast<PetscNonlinearSolver<Number>*> (ctx);
     
-    assert (solver->residual != NULL);
-
     PetscVector<Number> X_global(x), R(r);
     PetscVector<Number> X_local(X_global.size());
 
     X_global.localize (X_local);
   
-    solver->residual (X_local, R);
+    if (solver->residual != NULL) solver->residual (X_local, R);
+    if (solver->matvec   != NULL) solver->matvec   (X_local, &R, NULL);
 
     R.close();
         
@@ -115,16 +114,15 @@ extern "C"
     PetscNonlinearSolver<Number>* solver =
       static_cast<PetscNonlinearSolver<Number>*> (ctx);
     
-    assert (solver->jacobian != NULL);
-
     PetscMatrix<Number> PC(*pc);
     PetscMatrix<Number> Jac(*jac);
     PetscVector<Number> X_global(x);
     PetscVector<Number> X_local (X_global.size());
 
     X_global.localize (X_local);
-    
-    solver->jacobian (X_local, PC);
+
+    if (solver->jacobian != NULL) solver->jacobian (X_local, PC);
+    if (solver->matvec   != NULL) solver->matvec   (X_local, NULL, &PC);
     
     PC.close();
     Jac.close();

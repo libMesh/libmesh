@@ -1,4 +1,4 @@
-// $Id: nonlinear_solver.h,v 1.2 2005-01-03 22:10:10 benkirk Exp $
+// $Id: nonlinear_solver.h,v 1.3 2005-02-02 20:51:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -43,9 +43,9 @@ template <typename T> class NumericVector;
 /**
  * This class provides a uniform interface for nonlinear solvers.  This base
  * class is overloaded to provide nonlinear solvers from different packages
- * like PETSC or LASPACK.
+ * like PETSC.
  *
- * @author Benjamin Kirk, 2003
+ * @author Benjamin Kirk, 2005
  */
 
 template <typename T>
@@ -87,7 +87,7 @@ public:
   virtual void init () = 0;
 
   /**
-   *
+   * Solves the nonlinear system.
    */
   virtual std::pair<unsigned int, Real> solve (SparseMatrix<T>&,  // System Jacobian Matrix
 					       NumericVector<T>&, // Solution vector
@@ -108,6 +108,16 @@ public:
    */
   void (* jacobian) (const NumericVector<Number>& X,
 		     SparseMatrix<Number>& J);
+
+  /**
+   * Function that computes either the residual \f$ R(X) \f$ or the
+   * Jacobian \f$ J(X) \f$ of the nonlinear system at the input
+   * iterate \f$ X \f$.  Note that either \p R or \p J could be
+   * \p XSNULL.
+   */
+  void (* matvec) (const NumericVector<Number>& X,
+		   NumericVector<Number>* R,
+		   SparseMatrix<Number>*  J);
   
 protected:
 
@@ -127,6 +137,7 @@ inline
 NonlinearSolver<T>::NonlinearSolver () :
   residual        (NULL),
   jacobian        (NULL),
+  matvec          (NULL),
   _is_initialized (false)
 {
 }
