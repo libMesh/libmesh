@@ -1,4 +1,4 @@
-// $Id: tree.h,v 1.6 2003-02-13 22:56:08 benkirk Exp $
+// $Id: tree.h,v 1.7 2003-05-10 22:10:37 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,7 @@
 // C++ includes
 
 // Local includes
-#include "tree_node.h"
+#include "tree_base.h"
 
 
 /**
@@ -37,7 +37,7 @@
 // ------------------------------------------------------------
 // Tree class definition
 template <unsigned int N>
-class Tree
+class Tree : public TreeBase
 {
 public:
   
@@ -80,12 +80,6 @@ public:
 private:
 
   /**
-   * Constant reference to a mesh.  Declared
-   * at construction.
-   */
-  const MeshBase& mesh;
-
-  /**
    * The tree root.
    */
   TreeNode<N> root;
@@ -120,11 +114,9 @@ namespace Trees
 template <unsigned int N>
 inline
 Tree<N>::Tree (const MeshBase& m, const unsigned int level) :
-  mesh(m),
+  TreeBase(m),
   root(m,level)
 {
-  assert (mesh.n_nodes());
-
   // Set the root node bounding box equal to the bounding
   // box for the entire domain.
   root.set_bounding_box (mesh.bounding_box());
@@ -150,7 +142,7 @@ Tree<N>::Tree (const MeshBase& m, const unsigned int level) :
 template <unsigned int N>
 inline
 Tree<N>::Tree (const Tree<N>& other_tree) :
-  mesh(other_tree.mesh),
+  TreeBase(other_tree),
   root(other_tree.root)
 {
   error();
