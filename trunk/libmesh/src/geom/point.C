@@ -1,4 +1,4 @@
-// $Id: point.C,v 1.12 2003-05-21 15:27:38 benkirk Exp $
+// $Id: point.C,v 1.13 2003-05-22 21:18:03 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -21,7 +21,6 @@
 
 
 // C++ includes
-#include <iomanip>
 
 // Local includes
 #include "point.h"
@@ -31,184 +30,58 @@
 
 // ------------------------------------------------------------
 // Point class member funcions
-Point Point::cross(const Point& p) const
-{
-  assert (DIM == 3);
+// unsigned int Point::key() const
+// {
+//   unsigned int tempx,tempy,tempz;
 
-  // |     i          j          k    |
-  // |(*this)(0) (*this)(1) (*this)(2)|
-  // |   p(0)       p(1)       p(2)   |
-
-  return Point(  _coords[1]*p._coords[2] - _coords[2]*p._coords[1],
-	        -_coords[0]*p._coords[2] + _coords[2]*p._coords[0],
-	         _coords[0]*p._coords[1] - _coords[1]*p._coords[0]);
-}
-
-
-
-Point Point::unit() const
-{
-
-  const Real length = size();
+//   int i,j=2,cnt=0;
+//   unsigned int index[3];
+//   const Real deg = 1.e12;
   
-  assert (length != static_cast<Real>(0.));
-  
-#if DIM == 1
-  return Point(_coords[0]/length);
-#endif
-  
-#if DIM == 2 
-  return Point(_coords[0]/length,
-	       _coords[1]/length);
-#endif
-  
-#if DIM == 3
-  return Point(_coords[0]/length,
-	       _coords[1]/length, 
-	       _coords[2]/length);
-#endif
-  
-}
+//   tempx = static_cast<unsigned int>(((*this)(0)*deg));
+//   tempy = static_cast<unsigned int>(((*this)(1)*deg));
+//   tempz = static_cast<unsigned int>(((*this)(2)*deg));
 
+//   index[0]=0;
+//   index[1]=0;
+//   index[2]=0;
 
+//   for(i=sizeof(unsigned int)*8-1;i>=0;i--)
+//     {
+//       index[j] += (tempx >> i) & 01;
+//       index[j]  = index[j] << 01;
 
-void Point::print() const
-{
-#if DIM == 1
-  
-  std::cout << "x=" << (*this)(0) << std::endl;
-  
-#endif
-#if DIM == 2
-  
-  std::cout << "(x,y)=("
-	    << std::setw(8) << (*this)(0) << ", "
-	    << std::setw(8) << (*this)(1) << ")"
-	    << std::endl;
-
-#endif
-#if DIM == 3
-  
-  std::cout <<  "(x,y,z)=("
-	    << std::setw(8) << (*this)(0) << ", "
-	    << std::setw(8) << (*this)(1) << ", "
-	    << std::setw(8) << (*this)(2) << ")"
-	    << std::endl;
-#endif
-}
-
-
-
-
-void Point::write_unformatted (std::ostream &out,
-			       const bool newline) const
-{
-  assert (out);
-
-  out << std::setiosflags(std::ios::showpoint)
-      << (*this)(0) << " "
-      << (*this)(1) << " "
-      << (*this)(2) << " ";
-
-  if (newline)
-    out << std::endl;      
-}
-
-
-
-bool Point::operator < (const Point& rhs) const
-{
-  const unsigned int big     = static_cast<unsigned int>(1e5);
-  const unsigned int smaller = static_cast<unsigned int>(1e2);
-  
-  int lhs_x = static_cast<int>(ceil(((*this)(0))*big));
-  int lhs_y = static_cast<int>(ceil(((*this)(1))*big));
-  int lhs_z = static_cast<int>(ceil(((*this)(2))*big));
-  
-  int rhs_x = static_cast<int>(ceil(rhs(0)*big));
-  int rhs_y = static_cast<int>(ceil(rhs(1)*big));
-  int rhs_z = static_cast<int>(ceil(rhs(2)*big));
-  
-  lhs_x -= lhs_x % smaller;
-  lhs_y -= lhs_y % smaller;
-  lhs_z -= lhs_z % smaller;
-
-  rhs_x -= rhs_x % smaller;
-  rhs_y -= rhs_y % smaller;
-  rhs_z -= rhs_z % smaller;
-
-  if (lhs_z < rhs_z)
-    return true;
-  else
-    {
-      if (lhs_y < rhs_y)
-	return true;
-      else
-	{
-	  if (lhs_x < rhs_x)
-	    return true;
-	  else
-	    return false;
-	}
-    }
-
-  return false;
-}
-
-
-
-unsigned int Point::key() const
-{
-  unsigned int tempx,tempy,tempz;
-
-  int i,j=2,cnt=0;
-  unsigned int index[3];
-  const Real deg = 1.e12;
-  
-  tempx = static_cast<unsigned int>(((*this)(0)*deg));
-  tempy = static_cast<unsigned int>(((*this)(1)*deg));
-  tempz = static_cast<unsigned int>(((*this)(2)*deg));
-
-  index[0]=0;
-  index[1]=0;
-  index[2]=0;
-
-  for(i=sizeof(unsigned int)*8-1;i>=0;i--)
-    {
-      index[j] += (tempx >> i) & 01;
-      index[j]  = index[j] << 01;
-
-      if (( cnt % (sizeof(unsigned int)*8) == 0) && (cnt !=0 ) )
-	{
-	  cnt = 0;
-	  j--;
-	}
-      else
-	cnt++;
+//       if (( cnt % (sizeof(unsigned int)*8) == 0) && (cnt !=0 ) )
+// 	{
+// 	  cnt = 0;
+// 	  j--;
+// 	}
+//       else
+// 	cnt++;
     
-      index[j] += (tempy >> i) & 01;
-      index[j]  = index[j] << 01;
+//       index[j] += (tempy >> i) & 01;
+//       index[j]  = index[j] << 01;
 
-      if (( cnt % (sizeof(unsigned int)*8) == 0) && (cnt !=0 ) )
-	{
-	  cnt = 0;
-	  j--;
-	}
-      else
-	cnt++;
+//       if (( cnt % (sizeof(unsigned int)*8) == 0) && (cnt !=0 ) )
+// 	{
+// 	  cnt = 0;
+// 	  j--;
+// 	}
+//       else
+// 	cnt++;
     
-      index[j] += (tempz >> i) & 01;
-      index[j]  = index[j] << 01;
+//       index[j] += (tempz >> i) & 01;
+//       index[j]  = index[j] << 01;
 
-      if (( cnt % (sizeof(unsigned int)*8) == 0) && (cnt !=0 ) )
-	{
-	  cnt = 0;
-	  j--;
-	}
-      else
-	cnt++;
-    }
+//       if (( cnt % (sizeof(unsigned int)*8) == 0) && (cnt !=0 ) )
+// 	{
+// 	  cnt = 0;
+// 	  j--;
+// 	}
+//       else
+// 	cnt++;
+//     }
 
-  return index[2];
-}
+//   return index[2];
+// }
 

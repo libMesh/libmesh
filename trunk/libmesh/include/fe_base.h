@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.12 2003-05-15 23:34:33 benkirk Exp $
+// $Id: fe_base.h,v 1.13 2003-05-22 21:18:03 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -28,6 +28,7 @@
 // Local includes
 #include "reference_counted_object.h"
 #include "point.h"
+#include "vector_value.h"
 #include "enum_elem_type.h"
 #include "fe_type.h"
 #include "auto_ptr.h"
@@ -168,7 +169,7 @@ public:
    * @returns the shape function derivatives at the quadrature
    * points.
    */
-  const std::vector<std::vector<Point> >& get_dphi() const
+  const std::vector<std::vector<RealGradient> >& get_dphi() const
   { return dphi; }
   
   /**
@@ -205,7 +206,7 @@ public:
    * formulation for an @e infinite element returns correct element 
    * matrices for a mesh using both finite and infinite elements.
    */
-  const std::vector<Point>& get_dphase() const
+  const std::vector<RealGradient>& get_dphase() const
       { return dphase; }
 
 
@@ -229,7 +230,7 @@ public:
    * weight at each quadrature point. See \p get_Sobolev_weight()
    * for details.  In case of \p FE initialized to all zero.
    */
-  const std::vector<Point>& get_Sobolev_dweight() const
+  const std::vector<RealGradient>& get_Sobolev_dweight() const
       { return dweight; }
 
 #endif
@@ -439,19 +440,19 @@ protected:
    * Vector of parital derivatives: 
    * d(x)/d(xi), d(y)/d(xi), d(z)/d(xi) 
    */
-  std::vector<Point> dxyzdxi_map;
+  std::vector<RealGradient> dxyzdxi_map;
 
   /**
    * Vector of parital derivatives: 
    * d(x)/d(eta), d(y)/d(eta), d(z)/d(eta)
    */
-  std::vector<Point> dxyzdeta_map;
+  std::vector<RealGradient> dxyzdeta_map;
 
   /**
    * Vector of parital derivatives: 
    * d(x)/d(zeta), d(y)/d(zeta), d(z)/d(zeta)
    */
-  std::vector<Point> dxyzdzeta_map;
+  std::vector<RealGradient> dxyzdzeta_map;
   
 
   /**
@@ -525,7 +526,7 @@ protected:
   /**
    * Shape function derivative values.
    */
-  std::vector<std::vector<Point> >  dphi;
+  std::vector<std::vector<RealGradient> >  dphi;
 
   /**
    * Shape function derivatives in the xi direction.
@@ -618,14 +619,14 @@ protected:
    * the first derivatives of the phase term in global coordinates,
    * over @e all quadrature points.
    */
-  std::vector<Point> dphase;
+  std::vector<RealGradient> dphase;
 
   /**
    * Used for certain @e infinite element families:
    * the global derivative of the additional radial weight \f$ 1/{r^2} \f$,
    * over @e all quadrature points.
    */
-  std::vector<Point> dweight;
+  std::vector<RealGradient> dweight;
 
   /**
    * Used for certain @e infinite element families:

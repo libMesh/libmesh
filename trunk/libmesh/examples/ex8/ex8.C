@@ -1,4 +1,4 @@
-// $Id: ex8.C,v 1.3 2003-05-15 23:34:33 benkirk Exp $
+// $Id: ex8.C,v 1.4 2003-05-22 21:18:00 benkirk Exp $
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
   
@@ -530,7 +530,7 @@ void assemble_wave(EquationSystems& es,
    * The element shape function gradients evaluated at the quadrature
    * points.
    */
-  const std::vector<std::vector<Point> >& dphi = fe->get_dphi();
+  const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
 
   /**
    * A reference to the \p DofMap object for this system.  The \p DofMap

@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.h,v 1.11 2003-05-21 22:17:59 benkirk Exp $
+// $Id: mesh_refinement.h,v 1.12 2003-05-22 21:18:03 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -119,9 +119,9 @@ public:
   
   /**
    * Add point \p p to the mesh. The function returns a pointer to
-   * the new node.
+   * the new node.  The \p key tells the method where to look.
    */
-  Node* add_point (const Point& p);
+  Node* add_point (const Point& p, const unsigned int key);
   
   /**
    * @returns The index of the next unused element number
