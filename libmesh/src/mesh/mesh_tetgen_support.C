@@ -1,4 +1,4 @@
-// $Id: mesh_tetgen_support.C,v 1.15 2004-11-12 00:42:42 jwpeterson Exp $
+// $Id: mesh_tetgen_support.C,v 1.16 2004-11-12 01:57:27 jwpeterson Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -71,7 +71,7 @@ TetGen1_wrapper::~TetGen1_wrapper()
 
 
 
-void TetGen1_wrapper::set_node(int i, REAL x, REAL y, REAL z)
+void TetGen1_wrapper::set_node(const int i, const REAL x, const REAL y, const REAL z)
 {
   int index = i*3;
   tetgen_data.pointlist[index++] = x;
@@ -82,7 +82,7 @@ void TetGen1_wrapper::set_node(int i, REAL x, REAL y, REAL z)
 
 
 
-void TetGen1_wrapper::set_hole(int i, REAL x, REAL y, REAL z)
+void TetGen1_wrapper::set_hole(const int i, const REAL x, const REAL y, const REAL z)
 {
   int index = i*3;
   tetgen_data.holelist[index++] = x;
@@ -93,13 +93,13 @@ void TetGen1_wrapper::set_hole(int i, REAL x, REAL y, REAL z)
 
 
 
-void TetGen1_wrapper::set_numberofpoints(int i)
+void TetGen1_wrapper::set_numberofpoints(const int i)
 { tetgen_data.numberofpoints = i; }
 
 
 
 
-void TetGen1_wrapper::get_output_node(int i, REAL& x, REAL& y, REAL& z)
+void TetGen1_wrapper::get_output_node(const int i, REAL& x, REAL& y, REAL& z)
 {
   x = tetgen_output->pointlist[3*i];
   y = tetgen_output->pointlist[3*i+1];
@@ -167,11 +167,14 @@ void TetGen13_wrapper::set_pointlist(const int numofpoints)
 
 
 
-void TetGen13_wrapper::set_switches(std::string s)
+void TetGen13_wrapper::set_switches(const std::string& s)
 {
-  // this allocates memory!!!!!  You must free it at some point!!!!
-  switches = strdup(s.c_str()); 
-  if (!tetgen_be.parse_commandline(switches)) 
+  // Copy the string to a temporary buffer for passing to the C API
+  char buffer[256];
+  assert (s.size() < sizeof(buffer)-1);
+  buffer[ s.copy( buffer , sizeof( buffer ) - 1 ) ] = '\0' ;
+  
+  if (!tetgen_be.parse_commandline(buffer)) 
     std::cout << "TetGen replies: Wrong switches!" << std::endl;
 }
 
@@ -199,7 +202,7 @@ void TetGen13_wrapper::set_numberofholes(const int i)
 
 
 
-void TetGen13_wrapper::set_facetlist(int numoffacets, int numofholes)
+void TetGen13_wrapper::set_facetlist(const int numoffacets, const int numofholes)
 {
   set_numberoffacets(numoffacets);
   set_numberofholes(numofholes);
@@ -212,19 +215,19 @@ void TetGen13_wrapper::set_facetlist(int numoffacets, int numofholes)
 
 
 
-void TetGen13_wrapper::set_facet_numberofpolygons(int i, int num)
+void TetGen13_wrapper::set_facet_numberofpolygons(const int i, const int num)
 { this->tetgen_data.facetlist[i].numberofpolygons = num; }
 
 
 
 
-void TetGen13_wrapper::set_facet_numberofholes(int i, int num)
+void TetGen13_wrapper::set_facet_numberofholes(const int i, const int num)
 { this->tetgen_data.facetlist[i].numberofholes = num; }
 
 
 
 
-void TetGen13_wrapper::set_facet_polygonlist(int i, int numofpolygons)
+void TetGen13_wrapper::set_facet_polygonlist(const int i, const int numofpolygons)
 {
   set_facet_numberofpolygons(i, numofpolygons);
   set_facet_numberofholes(i, 0);
@@ -236,13 +239,13 @@ void TetGen13_wrapper::set_facet_polygonlist(int i, int numofpolygons)
 
 
 
-void TetGen13_wrapper::set_polygon_numberofvertices(int i, int j, int num)
+void TetGen13_wrapper::set_polygon_numberofvertices(const int i, const int j, const int num)
 { this->tetgen_data.facetlist[i].polygonlist[j].numberofvertices = num; }
 
 
 
 
-void TetGen13_wrapper::set_polygon_vertexlist(int i, int j, int numofvertices)
+void TetGen13_wrapper::set_polygon_vertexlist(const int i, const int j, const int numofvertices)
 {
   set_polygon_numberofvertices(i, j, numofvertices);
   this->tetgen_data.facetlist[i].polygonlist[j].vertexlist = new int[numofvertices];
@@ -251,7 +254,7 @@ void TetGen13_wrapper::set_polygon_vertexlist(int i, int j, int numofvertices)
 
 
 
-void TetGen13_wrapper::set_vertex(int i, int j, int k, int nodeindex)
+void TetGen13_wrapper::set_vertex(const int i, const int j, const int k, const int nodeindex)
 {
   this->tetgen_data.facetlist[i].polygonlist[j].vertexlist[k] = nodeindex;
 }
@@ -385,7 +388,7 @@ void TetGenMeshInterface::pointset_convexhull ()
 
 
 
-int TetGenMeshInterface::get_node_index (Node* inode)
+int TetGenMeshInterface::get_node_index (const Node* inode)
 {
   // This is NO elegant solution! (A linear search of the nodes.)
   unsigned int node_id;
