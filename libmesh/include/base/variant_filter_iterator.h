@@ -1,4 +1,4 @@
-// $Id: variant_filter_iterator.h,v 1.3 2004-11-09 21:46:16 benkirk Exp $
+// $Id: variant_filter_iterator.h,v 1.4 2004-11-09 22:24:32 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -24,6 +24,8 @@
 
 #include <iterator>
 #include <iostream>
+#include <algorithm> // for std::swap
+#include <stdlib.h>  // for abort()
 
 /**
  * Original Authors: Corwin Joy          * Michael Gradman
@@ -45,9 +47,11 @@ class variant_filter_iterator : public std::forward_iterator<std::forward_iterat
 class variant_filter_iterator : public std::iterator<std::forward_iterator_tag,  Type>
 #endif
 {
-public:
+private:
 
-  // Abstract base class for the iterator type.
+  /**
+   * Abstract base class for the iterator type.
+   */
   struct IterBase
   {
     virtual ~IterBase() {}
@@ -58,7 +62,10 @@ public:
   };
 
 
-  // Abstract base class for the predicate.
+  
+  /**
+   * Abstract base class for the predicate.
+   */
   struct PredBase
   {
     virtual ~PredBase() {}
@@ -68,21 +75,27 @@ public:
 
 
   
-  // The actual iterator object is held as a template parameter here.
+  /**
+   * The actual iterator object is held as a template parameter here.
+   */
   template<typename IterType>
   struct Iter : IterBase
   {
-    // Constructor
-    Iter ( IterType v ) : iter_data ( v )
-    {}
+    /**
+     * Constructor
+     */
+    Iter (const IterType& v) :
+      iter_data (v) {}
 
-
-    // Destructor
+    /**
+     * Destructor
+     */
     virtual ~Iter () {}
-
     
-    // Returns a copy of this object as a pointer to
-    // the base (non-templated) class.
+    /**
+     * @returns a copy of this object as a pointer to
+     * the base (non-templated) class.
+     */
     virtual IterBase* clone() const
     {
       variant_filter_iterator::Iter<IterType> *copy = 
@@ -90,60 +103,73 @@ public:
       return copy;
     }
 
-    
+    /**
+     * Custom interface method.
+     */
     virtual Type& operator*() const   // <-- CUSTOM INTERFACE METHOD
     {
       return *iter_data;
     }
 
-
-    
+    /**
+     * Custom interface method.
+     */
     virtual void operator++()         // <-- CUSTOM INTERFACE METHOD
     {
-      //std::cout << "called Iter::op++()" << std::endl;
       ++iter_data;
     }
 
-    // Use dynamic_cast to convert the base pointer
-    // passed in to the derived type.  If the cast
-    // fails it means you compared two different derived
-    // classes.
+    /**
+     * Use dynamic_cast to convert the base pointer
+     * passed in to the derived type.  If the cast
+     * fails it means you compared two different derived
+     * classes.
+     */
     virtual bool equal(const IterBase *other) const
     {
       const variant_filter_iterator::Iter<IterType>* p = 
 	dynamic_cast<const variant_filter_iterator::Iter<IterType>*>(other);
-
+      
       // Check for failed cast
-      if ( p == NULL )
+      if (p == NULL)
 	{
 	  std::cerr << "Dynamic cast failed in Iter::equal(...)" << std::endl;
 	  abort();
 	}
       
-      //std::cout << "called Iter::equal" << std::endl;
-      return iter_data == p->iter_data;
+      return (iter_data == p->iter_data);
     }
 
+    /**
+     * This is the iterator passed by the user.
+     */
     IterType iter_data;
   };
 
 
-
-
   
-  // The actual predicate is held as a template parameter here.
-  // There are two template arguments here, one for the actual type
-  // of the predicate and one for the iterator type.
+  /**
+   * The actual predicate is held as a template parameter here.
+   * There are two template arguments here, one for the actual type
+   * of the predicate and one for the iterator type.
+   */
   template <typename IterType, typename PredType>
   struct Pred : PredBase
   {
-    // Constructor
-    Pred ( PredType const& v ) : pred_data ( v ) {}
+    /**
+     * Constructor
+     */
+    Pred (const PredType& v) :
+      pred_data (v) {}
 
-    // Destructor
+    /**
+     * Destructor
+     */
     virtual ~Pred () {}
 
-    // Returns a copy of this object as a pointer to the base class.
+    /**
+     * Returns a copy of this object as a pointer to the base class.
+     */
     virtual PredBase* clone() const
     {
       variant_filter_iterator::Pred<IterType,PredType> *copy = 
@@ -151,10 +177,11 @@ public:
       return copy;
     }
     
-    // Re-implementation of op()
+    /**
+     * Re-implementation of op()
+     */
     virtual bool operator() (const IterBase* in) const
     {
-      //std::cout << "called Pred::op()" << std::endl;
       assert (in != NULL);
       
       // Attempt downcast
@@ -173,87 +200,105 @@ public:
       return pred_data(p->iter_data);
     }
     
-    // This is the predicate passed in by the user.
+    /**
+     * This is the predicate passed in by the user.
+     */
     PredType pred_data;
   };
 
 
- private:  
-  // Polymorphic pointer to the object.  Don't confuse
-  // with the data pointer located in the Iter!
+  
+  /**
+   * Polymorphic pointer to the object.  Don't confuse
+   * with the data pointer located in the \p Iter!
+   */
   IterBase* data;
 
-  // Also have a polymorphic pointer to the end object,
-  // this prevents iterating past the end.
+  /**
+   * Also have a polymorphic pointer to the end object,
+   * this prevents iterating past the end.
+   */
   IterBase* end;
 
-  // The predicate object.  Must have op() capable of
-  // operating on IterBase* pointers.  Therefore it has
-  // to follow the same paradigm as IterBase.
+  /**
+   * The predicate object.  Must have op() capable of
+   * operating on IterBase* pointers.  Therefore it has
+   * to follow the same paradigm as \p IterBase.
+   */
   PredBase* pred;
-
-
 
 
   
 public:
+
+  /**
+   * The iterator this class provides.
+   */
   typedef variant_filter_iterator<Type, Predicate> Iterator;
 
-  // Templated Constructor.  Allows you to construct the iterator
-  // and predicate from any types.  Also advances the data pointer
-  // to the first entry which satisfies the predicate.
+  /**
+   * Templated Constructor.  Allows you to construct the iterator
+   * and predicate from any types.  Also advances the data pointer
+   * to the first entry which satisfies the predicate.
+   */
   template<typename IterType, class PredType>
-  variant_filter_iterator ( IterType const& v, IterType const& e, PredType const& p )
-    : data ( new Iter<IterType>(v) ),
-      end  ( new Iter<IterType>(e) ),
-      pred ( new Pred<IterType,PredType>(p) )
+  variant_filter_iterator (const IterType& d,
+			   const IterType& e,
+			   const PredType& p ):
+    data ( new Iter<IterType>(d) ),
+    end  ( new Iter<IterType>(e) ),
+    pred ( new Pred<IterType,PredType>(p) )
   {
     this->satisfy_predicate();
   }
-
-
   
-  // Default Constructor.
-  variant_filter_iterator () : data(NULL), end(NULL), pred(NULL) {}
+  /**
+   * Default Constructor.
+   */
+  variant_filter_iterator () :
+    data(NULL),
+    end(NULL),
+    pred(NULL) {}
 
-
+  /**
+   * Copy Constructor.
+   * Copy the internal data instead of sharing it.
+   */
+  variant_filter_iterator (const Iterator& rhs) :
+    data (rhs.data != NULL ? rhs.data->clone() : NULL),
+    end  (rhs.end  != NULL ? rhs.end->clone()  : NULL),
+    pred (rhs.pred != NULL ? rhs.pred->clone() : NULL) {}
   
-  // Copy Constructor.
-  // * Copy the internal data instead of sharing it.
-  variant_filter_iterator( const Iterator& rhs ) :
-    data ( rhs.data != NULL ? rhs.data->clone() : NULL),
-    end  ( rhs.end  != NULL ? rhs.end->clone()  : NULL),
-    pred ( rhs.pred != NULL ? rhs.pred->clone() : NULL)
-  {}
-
-  
-
-  // Destructor
+  /**
+   * Destructor
+   */
   ~variant_filter_iterator()
   {
-    delete data;
-    delete end;
-    delete pred;
+    delete data; data = NULL;
+    delete end;  end  = NULL;
+    delete pred; pred = NULL;
   }
-
-
   
-  // unary op*() forwards on to Iter::op*()
+  /**
+   * unary op*() forwards on to \p Iter::op*()
+   */
   Type& operator*() const
   {
     return **data;
   }
 
 
-  // op->() 
+  /**
+   * op->()
+   */
   Type* operator->() const
   {
     return (&**this);
   }
-
-
   
-  // op++() forwards on to Iter::op++()
+  /**
+   * op++() forwards on to \p Iter::op++()
+   */
   Iterator& operator++()
   {
     ++*data;
@@ -261,7 +306,9 @@ public:
     return (*this);
   }
 
-  // postfix op++() creates a temporary!
+  /**
+   * postfix op++(), creates a temporary!
+   */
   const Iterator operator++(int) // const here to prevent iterator++++ type operations
   {
     Iterator oldValue(*this); // standard is to return old value
@@ -270,44 +317,35 @@ public:
     return oldValue;
   }
 
-
-  // forwards on the the equal function defined for the
-  // IterBase pointer.  Possibly also compare the end pointers,
-  // but this is usually not important and would require an
-  // additional dynamic_cast.
+  /**
+   * forwards on the the equal function defined for the
+   * IterBase pointer.  Possibly also compare the end pointers,
+   * but this is usually not important and would require an
+   * additional dynamic_cast.
+   */
   bool equal(const variant_filter_iterator& other) const
   {
     return data->equal(other.data);
   }
 
-
-  
-
-
-  // swap, used to implement op=
+  /**
+   * swap, used to implement op=
+   */
   void swap(Iterator& lhs, Iterator& rhs)
   {
-    IterBase *temp;
-
     // Swap the data pointers
-    temp = lhs.data;
-    lhs.data = rhs.data;
-    rhs.data = temp;
+    std::swap (lhs.data, rhs.data);
 
     // Swap the end pointers
-    temp = lhs.end;
-    lhs.end = rhs.end;
-    rhs.end = temp;
+    std::swap (lhs.end, rhs.end);
 
     // Also swap the predicate objects.
-    PredBase *tempp;
-    tempp    = lhs.pred;
-    lhs.pred = rhs.pred;
-    rhs.pred = tempp; 
+    std::swap (lhs.pred, rhs.pred);
   }
 
-
-  // op=
+  /**
+   * Assignment operator.
+   */
   Iterator& operator=(const Iterator& rhs)
   {
     Iterator temp(rhs);
@@ -318,14 +356,16 @@ public:
 
   
 private:
-  // Advances the data pointer until it reaches
-  // the end or the predicate is satisfied.
+  
+  /**
+   * Advances the data pointer until it reaches
+   * the end or the predicate is satisfied.
+   */
   void satisfy_predicate()
   {
-    while ( !(data->equal(end)) && ( !(*pred)(data) ) )
+    while ( !data->equal(end) && !(*pred)(data) )
       ++(*data);
-  }
-  
+  }  
 };
 
 
@@ -333,13 +373,13 @@ private:
 
 
 
+//---------------------------------------------------------------------------
 // op==
 template<class Type, class Predicate>
 inline
 bool operator==(const variant_filter_iterator<Type, Predicate>& x,
 		const variant_filter_iterator<Type, Predicate>& y)
 {
-  //std::cout << "Called op==() for variant_filter_iterators." << std::endl;
   return x.equal(y);
 }
 
@@ -351,8 +391,7 @@ inline
 bool operator!=(const variant_filter_iterator<Type, Predicate>& x,
 		const variant_filter_iterator<Type, Predicate>& y)
 {
-  //std::cout << "Called op!=() for variant_filter_iterators." << std::endl;
-  return (!(x == y));
+  return !(x == y);
 }
 
 
