@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.4 2004-05-27 04:35:09 jwpeterson Exp $ */
+/* $Id: ex14.C,v 1.5 2004-05-27 05:04:19 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -107,7 +107,8 @@ int main(int argc, char** argv)
     const unsigned int max_r_level = input_file("max_r_level", 3);
     const Real refine_percentage   = input_file("refine_percentage", 0.5);
     const Real coarsen_percentage  = input_file("coarsen_percentage", 0.5);
-
+    const unsigned int uniform_refine = input_file("uniform_refine",0);
+    
     // Output file for plotting the error as a function of
     // the number of degrees of freedom.
     std::ofstream out ("ex14.m");
@@ -159,8 +160,6 @@ int main(int argc, char** argv)
     // Convenient reference to the system
     ImplicitSystem& system = equation_systems.get_system<ImplicitSystem>("Laplace");
 
-    std::cout << "variable_number(\"u\")=" << system.variable_number("u") << std::endl;
-    
     // A refinement loop.
     for (unsigned int r_step=0; r_step<max_r_steps; r_step++)
       {
@@ -199,51 +198,55 @@ int main(int argc, char** argv)
 	if (r_step+1 != max_r_steps)
 	  {
 	    std::cout << "  Refining the mesh..." << std::endl;
+
+	    if (uniform_refine == 0)
+              {
+
+		// The \p ErrorVector is a particular \p StatisticsVector
+		// for computing error information on a finite element mesh.
+		ErrorVector error;
 		
-	    // The \p ErrorVector is a particular \p StatisticsVector
-	    // for computing error information on a finite element mesh.
-	    ErrorVector error;
+		// The \p ErrorEstimator class interrogates a finite element
+		// solution and assigns to each element a positive error value.
+		// This value is used for deciding which elements to refine
+		// and which to coarsen.
+		KellyErrorEstimator error_estimator;
 		
-	    // The \p ErrorEstimator class interrogates a finite element
-	    // solution and assigns to each element a positive error value.
-	    // This value is used for deciding which elements to refine
-	    // and which to coarsen.
-	    KellyErrorEstimator error_estimator;
+		// Compute the error for each active element using the provided
+		// \p flux_jump indicator.  Note in general you will need to
+		// provide an error estimator specifically designed for your
+		// application.
+		error_estimator.estimate_error (equation_systems,
+						"Laplace",
+						error);
 		
-	    // Compute the error for each active element using the provided
-	    // \p flux_jump indicator.  Note in general you will need to
-	    // provide an error estimator specifically designed for your
-	    // application.
-	    error_estimator.estimate_error (equation_systems,
-					    "Laplace",
-					    error);
+		// This takes the error in \p error and decides which elements
+		// will be coarsened or refined.  Any element within 20% of the
+		// maximum error on any element will be refined, and any
+		// element within 10% of the minimum error on any element might
+		// be coarsened. Note that the elements flagged for refinement
+		// will be refined, but those flagged for coarsening _might_ be
+		// coarsened.
+		mesh_refinement.flag_elements_by_error_fraction (error,
+								 refine_percentage,
+								 coarsen_percentage,
+								 max_r_level);
 		
-	    // This takes the error in \p error and decides which elements
-	    // will be coarsened or refined.  Any element within 20% of the
-	    // maximum error on any element will be refined, and any
-	    // element within 10% of the minimum error on any element might
-	    // be coarsened. Note that the elements flagged for refinement
-	    // will be refined, but those flagged for coarsening _might_ be
-	    // coarsened.
-	    mesh_refinement.flag_elements_by_error_fraction (error,
-							     refine_percentage,
-							     coarsen_percentage,
-							     max_r_level);
-		
-	    // This call actually refines and coarsens the flagged
-	    // elements.
-	    mesh_refinement.refine_and_coarsen_elements();
-		
+		// This call actually refines and coarsens the flagged
+		// elements.
+		mesh_refinement.refine_and_coarsen_elements();
+	      }
+
+	    else if (uniform_refine == 1)
+              mesh_refinement.uniformly_refine(1);
+	    
 	    // This call reinitializes the \p EquationSystems object for
 	    // the newly refined mesh.  One of the steps in the
 	    // reinitialization is projecting the \p solution,
 	    // \p old_solution, etc... vectors from the old mesh to
 	    // the current one.
 	    equation_systems.reinit ();
-
-	    // equation_systems.print_info();
 	  }
-	
       }	    
     
     
@@ -264,7 +267,10 @@ int main(int argc, char** argv)
     out << "set(gca,'YScale', 'Log');" << std::endl;
     out << "xlabel('dofs');" << std::endl;
     out << "legend('L2-error', 'H1-error');" << std::endl;
-
+    out << "disp('L2-error linear fit');" << std::endl;
+    out << "polyfit(log10(e(:,1)), log10(e(:,2)), 1)" << std::endl;
+    out << "disp('H1-error linear fit');" << std::endl;
+    out << "polyfit(log10(e(:,1)), log10(e(:,3)), 1)" << std::endl;
   }
 
   

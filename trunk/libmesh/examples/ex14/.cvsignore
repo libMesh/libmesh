@@ -12,5 +12,6 @@ gmon.out
 *.unv
 *.gz
 *.gmv.*
-ex13ex14
+ex13
 ex14
+ex14.m
