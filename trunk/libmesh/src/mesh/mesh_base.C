@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.70 2004-03-20 15:16:57 benkirk Exp $
+// $Id: mesh_base.C,v 1.71 2004-03-21 03:19:25 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -560,7 +560,7 @@ void MeshBase::build_nodes_to_elem_map (std::vector<std::vector<unsigned int> >&
 
 
 
-void MeshBase::build_nodes_to_elem_map (std::vector<std::vector<Elem*> >&
+void MeshBase::build_nodes_to_elem_map (std::vector<std::vector<const Elem*> >&
 					nodes_to_elem_map) const
 {
   nodes_to_elem_map.resize (this->n_nodes());

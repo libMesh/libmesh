@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.2 2004-01-03 15:37:41 benkirk Exp $
+// $Id: dof_map.h,v 1.3 2004-03-21 03:19:25 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -74,11 +74,6 @@ public:
    */
   ~DofMap();
 
-//   /**
-//    * Attach the matrix that is used with this \p DofMap.
-//    */
-//   void attach_matrix (SparseMatrix<Number>& matrix);
-
   /**
    * Additional matrices may be handled with this \p DofMap.
    * They are initialized to the same sparsity structure as
@@ -89,18 +84,6 @@ public:
 
 #ifdef ENABLE_AMR
 
-  /**
-   * A row of the Dof constraint matrix.  Store as a float
-   * to save space since the factors are simple rational
-   * fractions.
-   */
-  typedef std::map<unsigned int, float> DofConstraintRow;
-
-  /** 
-   * The constraint matrix storage format. 
-   */
-  typedef std::map<unsigned int, DofConstraintRow> DofConstraints;
-
 #endif
 
   /**
@@ -108,7 +91,7 @@ public:
    * processor \p proc_id, which defaults to 0 for ease of use in serial
    * applications. 
    */
-  void distribute_dofs(const MeshBase&);
+  void distribute_dofs(MeshBase&);
 
   /**
    * Computes the sparsity pattern for the matrix corresponding
@@ -125,22 +108,6 @@ public:
    * solution values needed for computation.
    */
   const std::vector<unsigned int>& get_send_list() const { return _send_list; }
-
-
-#ifdef ENABLE_AMR
-  
-  /**
-   * After a mesh is refined and repartitioned it is possible that the
-   * \p _send_list will need to be augmented.  This is the case when an
-   * element is refined and its children end up on different processors
-   * than the parent.  These children will need values from the parent
-   * when projecting the solution onto the refined mesh, hence the parent's
-   * DOF indices need to be included in the \p _send_list.
-   */
-  void augment_send_list_for_projection(const MeshBase &);
-  
-#endif
-
   
   /**
    * Returns a constant reference to the \p _n_nz list for this processor.
@@ -184,7 +151,7 @@ public:
    */  
   unsigned int n_variables() const
   { return _variable_types.size(); }
-
+  
   /**
    * @returns the total number of degrees of freedom in the problem.
    */
@@ -214,24 +181,13 @@ public:
   unsigned int last_dof(const unsigned int proc = libMesh::processor_id()) const
   { assert(proc < _last_df.size()); return _last_df[proc]; }  
 
-
-#ifdef ENABLE_AMR
-
-  /**
-   * @returns the total number of constrained degrees of freedom
-   * in the problem.
-   */
-  unsigned int n_constrained_dofs() const { return _dof_constraints.size(); }
-
-#endif
-
   
   /**
    * Fills the vector di with the global degree of freedom indices
    * for the element. If no variable number is specified then all
    * variables are returned.
    */
-  void dof_indices (const Elem* elem,
+  void dof_indices (const Elem* const elem,
 		    std::vector<unsigned int>& di,
 		    const unsigned int vn = libMesh::invalid_uint) const;
 
@@ -240,13 +196,44 @@ public:
 
 #ifdef ENABLE_AMR
 
+  //--------------------------------------------------------------------
+  // AMR-specific methods
+
+  /**
+   * A row of the Dof constraint matrix.  Store as a float
+   * to save space since the factors are simple rational
+   * fractions.
+   */
+  typedef std::map<unsigned int, float> DofConstraintRow;
+
+  /** 
+   * The constraint matrix storage format. 
+   */
+  typedef std::map<unsigned int, DofConstraintRow> DofConstraints;
+  
+  /**
+   * After a mesh is refined and repartitioned it is possible that the
+   * \p _send_list will need to be augmented.  This is the case when an
+   * element is refined and its children end up on different processors
+   * than the parent.  These children will need values from the parent
+   * when projecting the solution onto the refined mesh, hence the parent's
+   * DOF indices need to be included in the \p _send_list.
+   */
+  void augment_send_list_for_projection(const MeshBase &);
+
+  /**
+   * @returns the total number of constrained degrees of freedom
+   * in the problem.
+   */
+  unsigned int n_constrained_dofs() const { return _dof_constraints.size(); }
+
   /**
    * Fills the vector di with the global degree of freedom indices
    * for the element using the \p DofMap::old_dof_object.
    * If no variable number is specified then all
    * variables are returned.
    */
-  void old_dof_indices (const Elem* elem,
+  void old_dof_indices (const Elem* const elem,
 			std::vector<unsigned int>& di,
 			const unsigned int vn = libMesh::invalid_uint) const;
 
@@ -314,7 +301,7 @@ public:
   /**
    * Reinitialize the underlying data strucures conformal to the current mesh.
    */
-  void reinit (const MeshBase& mesh);
+  void reinit (MeshBase& mesh);
   
   /**
    * Free all memory associated with the object, but keep the mesh pointer.

@@ -1,4 +1,4 @@
-// $Id: elem_iterators.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: elem_iterators.h,v 1.3 2004-03-21 03:19:25 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -76,24 +76,24 @@ typedef basic_elem_iterator<std::vector<Elem*>::iterator>
 
 /**
  * Specialization of the basic_elem_iterator class
+ * for \p std::vector<const Elem*>::const_iterator.  This is what
+ * users will create if they want to iterate over
+ * all the elements in the mesh in const functions.
+ * The const_neighbor_iterator may be used to access the
+ * _neighbors array in the Elem class in const functions.
+ */
+typedef basic_elem_iterator<std::vector<const Elem*>::const_iterator>
+  const_elem_iterator; 
+
+
+/**
+ * Specialization of the basic_elem_iterator class
  * for \p Elem**.  This is what
  * users will create if they want to iterate over
  * all the neighbors of an element in non-const functions.
  */
 typedef basic_elem_iterator<Elem**>
   neighbor_iterator;
-
-
-/**
- * Specialization of the basic_elem_iterator class
- * for \p std::vector<Elem*>::const_iterator.  This is what
- * users will create if they want to iterate over
- * all the elements in the mesh in const functions.
- * The const_neighbor_iterator may be used to access the
- * _neighbors array in the Elem class in const functions.
- */
-typedef basic_elem_iterator<std::vector<Elem*>::const_iterator>
-  const_elem_iterator; 
 
 
 /**
@@ -159,11 +159,11 @@ typedef basic_active_elem_iterator<std::vector<Elem*>::iterator>
 
 /**
  * Specialization of the basic_active_elem_iterator class for
- * for \p std::vector<Elem*>::const_iterator.  This is what users
+ * for \p std::vector<const Elem*>::const_iterator.  This is what users
  * will create if they want to iterate over the all the active
  * elements in the mesh in const functions.
  */
-typedef basic_active_elem_iterator<std::vector<Elem*>::const_iterator>
+typedef basic_active_elem_iterator<std::vector<const Elem*>::const_iterator>
   const_active_elem_iterator; 
 
 
@@ -218,11 +218,11 @@ typedef basic_not_active_elem_iterator<std::vector<Elem*>::iterator>
 
 /**
  * Specialization of the basic_not_active_elem_iterator class for
- * for \p std::vector<Elem*>::const_iterator.  This is what users
+ * for \p std::vector<const Elem*>::const_iterator.  This is what users
  * will create if they want to iterate over the all the inactive
  * elements in the mesh in const functions.
  */
-typedef basic_not_active_elem_iterator<std::vector<Elem*>::const_iterator>
+typedef basic_not_active_elem_iterator<std::vector<const Elem*>::const_iterator>
   const_not_active_elem_iterator; 
 
 
@@ -282,11 +282,11 @@ typedef basic_type_elem_iterator<std::vector<Elem*>::iterator>
 
 /**
  * Specialization of the basic_type_elem_iterator for
- * \p std::vector<Elem*>::const_iterator.  This is what users
+ * \p std::vector<const Elem*>::const_iterator.  This is what users
  * create when they want to iterate over all elements
  * of a specific type in const functions.
  */
-typedef basic_type_elem_iterator<std::vector<Elem*>::const_iterator>
+typedef basic_type_elem_iterator<std::vector<const Elem*>::const_iterator>
   const_type_elem_iterator;
 
 
@@ -339,11 +339,11 @@ typedef basic_not_type_elem_iterator<std::vector<Elem*>::iterator>
 
 /**
  * Specialization of the basic_not_type_elem_iterator for
- * \p std::vector<Elem*>::const_iterator.  This is what users
+ * \p std::vector<const Elem*>::const_iterator.  This is what users
  * create when they want to iterate over all elements
  * which are NOT of a specific type in const functions.
  */
-typedef basic_not_type_elem_iterator<std::vector<Elem*>::const_iterator>
+typedef basic_not_type_elem_iterator<std::vector<const Elem*>::const_iterator>
   const_not_type_elem_iterator;
 
 
@@ -397,11 +397,11 @@ typedef basic_active_type_elem_iterator<std::vector<Elem*>::iterator>
 
 /**
  * Specialization of the basic_active_type_elem_iterator for
- * \p std::vector<Elem*>::const_iterator.  This is what users
+ * \p std::vector<const Elem*>::const_iterator.  This is what users
  * create when they want to iterate over all active elements
  * of a specific type.
  */
-typedef basic_active_type_elem_iterator<std::vector<Elem*>::const_iterator>
+typedef basic_active_type_elem_iterator<std::vector<const Elem*>::const_iterator>
   const_active_type_elem_iterator; 
 
 
@@ -462,11 +462,11 @@ typedef basic_level_elem_iterator<std::vector<Elem*>::iterator>
 
 /**
  * Specialization of the basic_level_elem_iterator for
- * \p std::vector<Elem*>::const_iterator.  This is what users
+ * \p std::vector<const Elem*>::const_iterator.  This is what users
  * create when they want to iterate over all active elements
  * of a specific type.
  */
-typedef basic_level_elem_iterator<std::vector<Elem*>::const_iterator>
+typedef basic_level_elem_iterator<std::vector<const Elem*>::const_iterator>
   const_level_elem_iterator;
 
 
@@ -517,11 +517,11 @@ typedef basic_not_level_elem_iterator<std::vector<Elem*>::iterator>
 
 /**
  * Specialization of the basic_not_level_elem_iterator for
- * \p std::vector<Elem*>::const_iterator.  This is what users
+ * \p std::vector<const Elem*>::const_iterator.  This is what users
  * create when they want to iterate over all active elements
  * NOT of a specific type.
  */
-typedef basic_not_level_elem_iterator<std::vector<Elem*>::const_iterator>
+typedef basic_not_level_elem_iterator<std::vector<const Elem*>::const_iterator>
   const_not_level_elem_iterator;
 
 
@@ -581,11 +581,11 @@ typedef basic_sbd_elem_iterator<std::vector<Elem*>::iterator>
 
 /**
  * Specialization of the basic_sbd_elem_iterator for
- * \p std::vector<Elem*>::const_iterator.  This is what users
+ * \p std::vector<const Elem*>::const_iterator.  This is what users
  * create when they want to iterate over all elements
  * with a specific processor id.
  */
-typedef basic_sbd_elem_iterator<std::vector<Elem*>::const_iterator>
+typedef basic_sbd_elem_iterator<std::vector<const Elem*>::const_iterator>
   const_sbd_elem_iterator;
 
 
@@ -645,11 +645,11 @@ typedef basic_pid_elem_iterator<std::vector<Elem*>::iterator>
 
 /**
  * Specialization of the basic_pid_elem_iterator for
- * \p std::vector<Elem*>::const_iterator.  This is what users
+ * \p std::vector<const Elem*>::const_iterator.  This is what users
  * create when they want to iterate over all elements
  * with a specific processor id.
  */
-typedef basic_pid_elem_iterator<std::vector<Elem*>::const_iterator>
+typedef basic_pid_elem_iterator<std::vector<const Elem*>::const_iterator>
   const_pid_elem_iterator;
 
 
@@ -704,11 +704,11 @@ typedef basic_not_pid_elem_iterator<std::vector<Elem*>::iterator>
 
 /**
  * Specialization of the basic_not_pid_elem_iterator for
- * \p std::vector<Elem*>::const_iterator.  This is what users
+ * \p std::vector<const Elem*>::const_iterator.  This is what users
  * create when they want to iterate over all active elements
  * with a specific processor id.
  */
-typedef basic_not_pid_elem_iterator<std::vector<Elem*>::const_iterator>
+typedef basic_not_pid_elem_iterator<std::vector<const Elem*>::const_iterator>
   const_not_pid_elem_iterator;
 
 
@@ -763,11 +763,11 @@ typedef basic_active_pid_elem_iterator<std::vector<Elem*>::iterator>
 
 /**
  * Specialization of the basic_active_pid_elem_iterator for
- * \p std::vector<Elem*>::const_iterator.  This is what users
+ * \p std::vector<const Elem*>::const_iterator.  This is what users
  * create when they want to iterate over all active elements
  * that have a specific processor id in const functions.
  */
-typedef basic_active_pid_elem_iterator<std::vector<Elem*>::const_iterator>
+typedef basic_active_pid_elem_iterator<std::vector<const Elem*>::const_iterator>
   const_active_pid_elem_iterator;
 
 
@@ -820,11 +820,11 @@ typedef basic_local_elem_iterator<std::vector<Elem*>::iterator>
 
 /**
  * Specialization of the basic_local_elem_iterator for
- * \p std::vector<Elem*>::const_iterator.  This is what users
+ * \p std::vector<const Elem*>::const_iterator.  This is what users
  * create when they want to iterate over all elements
  * on the local processor in const functions.
  */
-typedef basic_local_elem_iterator<std::vector<Elem*>::const_iterator>
+typedef basic_local_elem_iterator<std::vector<const Elem*>::const_iterator>
   const_local_elem_iterator;
 
 
@@ -877,11 +877,11 @@ typedef basic_active_local_elem_iterator<std::vector<Elem*>::iterator>
 
 /**
  * Specialization of the basic_active_local_elem_iterator for
- * \p std::vector<Elem*>::const_iterator.  This is what users
+ * \p std::vector<const Elem*>::const_iterator.  This is what users
  * create when they want to iterate over all active elements
  * on the local processor in const functions.
  */
-typedef basic_active_local_elem_iterator<std::vector<Elem*>::const_iterator>
+typedef basic_active_local_elem_iterator<std::vector<const Elem*>::const_iterator>
   const_active_local_elem_iterator;
 
 

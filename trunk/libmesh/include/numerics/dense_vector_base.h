@@ -1,4 +1,4 @@
-// $Id: dense_vector_base.h,v 1.3 2004-02-22 21:47:58 jwpeterson Exp $
+// $Id: dense_vector_base.h,v 1.4 2004-03-21 03:19:25 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -29,15 +29,12 @@
 #include "libmesh_common.h"
 
 
-// Forward Declarations
-
 
 
 /**
  * Defines an abstract dense vector base class for use in
- * Finite Element-type computations.
- * Specialized dense vectors, for example DenseSubVectors, can
- * be derived from this class.
+ * Finite Element-type computations. Specialized dense vectors,
+ * for example DenseSubVectors, can be derived from this class.
  *
  * @author John W. Peterson, 2003
  */ 
@@ -105,9 +102,11 @@ template<typename T>
 inline
 void DenseVectorBase<T>::print_scientific () const
 {
-    // save the initial format flags
+#ifndef BROKEN_IOSTREAM
+  
+  // save the initial format flags
   std::ios_base::fmtflags cout_flags = std::cout.flags();
-
+  
   // Print the vector entries.
   for (unsigned int i=0; i<this->size(); i++)
     std::cout << std::setw(10)
@@ -118,6 +117,16 @@ void DenseVectorBase<T>::print_scientific () const
   
   // reset the original format flags
   std::cout.flags(cout_flags);
+  
+#else
+  
+  // Print the matrix entries.
+  for (unsigned int i=0; i<this->size(); i++)
+    std::cout << std::setprecision(8)
+	      << this->el(i)
+	      << std::endl;
+  
+#endif
 }
 
 

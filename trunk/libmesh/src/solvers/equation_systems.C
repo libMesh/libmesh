@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.1 2004-01-03 15:37:44 benkirk Exp $
+// $Id: equation_systems.C,v 1.2 2004-03-21 03:19:26 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -98,15 +98,15 @@ void EquationSystems::init ()
    */
   {
     // All the nodes
-    const_node_iterator       node_it  (_mesh.nodes_begin());
-    const const_node_iterator node_end (_mesh.nodes_end());
+    node_iterator       node_it  (_mesh.nodes_begin());
+    const node_iterator node_end (_mesh.nodes_end());
     
     for ( ; node_it != node_end; ++node_it)
       (*node_it)->set_n_systems(n_sys);
     
     // All the elements
-    const_elem_iterator       elem_it (_mesh.elements_begin());
-    const const_elem_iterator elem_end(_mesh.elements_end());
+    elem_iterator       elem_it (_mesh.elements_begin());
+    const elem_iterator elem_end(_mesh.elements_end());
     
     for ( ; elem_it != elem_end; ++elem_it)
       (*elem_it)->set_n_systems(n_sys);
@@ -138,15 +138,15 @@ void EquationSystems::reinit ()
    */
   {
     // All the nodes
-    const_node_iterator       node_it  (_mesh.nodes_begin());
-    const const_node_iterator node_end (_mesh.nodes_end());
+    node_iterator       node_it  (_mesh.nodes_begin());
+    const node_iterator node_end (_mesh.nodes_end());
     
     for ( ; node_it != node_end; ++node_it)
       (*node_it)->set_n_systems(n_sys);
     
     // All the elements
-    const_elem_iterator       elem_it (_mesh.elements_begin());
-    const const_elem_iterator elem_end(_mesh.elements_end());
+    elem_iterator       elem_it (_mesh.elements_begin());
+    const elem_iterator elem_end(_mesh.elements_end());
     
     for ( ; elem_it != elem_end; ++elem_it)
       (*elem_it)->set_n_systems(n_sys);

@@ -1,4 +1,4 @@
-// $Id: node_iterators.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: node_iterators.h,v 1.3 2004-03-21 03:19:25 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -67,16 +67,18 @@ protected:
  * users will create if they want to iterate over
  * all the nodes in the mesh.
  */
-typedef basic_node_iterator<std::vector<Node*>::iterator> node_iterator;
+typedef basic_node_iterator<std::vector<Node*>::iterator>
+node_iterator;
 
 
 /**
  * Specialization of the basic_node_iterator class
- * for \p std::vector<Node*>::const_iterator.  This is what
+ * for \p std::vector<const Node*>::const_iterator.  This is what
  * users will create if they want to iterate over
  * all the elements in the mesh in const functions.
  */
-typedef basic_node_iterator<std::vector<Node*>::const_iterator> const_node_iterator; 
+typedef basic_node_iterator<std::vector<const Node*>::const_iterator>
+const_node_iterator; 
 
 
 
@@ -115,7 +117,11 @@ protected:
    * first, this will avoid calling the \p active member on \p NULL
    * nodes.
    */
-  virtual bool predicate() const { return (basic_node_iterator<T>::predicate() && (*this->_current)->active()); }
+  virtual bool predicate() const
+  {
+    return (basic_node_iterator<T>::predicate() &&
+					   (*this->_current)->active());
+  }
 };
 
 
@@ -125,16 +131,18 @@ protected:
  * will create if they want to iterate over the all the active
  * nodes in the mesh.
  */
-typedef basic_active_node_iterator<std::vector<Node*>::iterator> active_node_iterator;
+typedef basic_active_node_iterator<std::vector<Node*>::iterator>
+active_node_iterator;
 
 
 /**
  * Specialization of the basic_active_node_iterator class for
- * for \p std::vector<Node*>::const_iterator.  This is what users
+ * for \p std::vector<const Node*>::const_iterator.  This is what users
  * will create if they want to iterate over the all the active
  * nodes in the mesh in const functions.
  */
-typedef basic_active_node_iterator<std::vector<Node*>::const_iterator> const_active_node_iterator; 
+typedef basic_active_node_iterator<std::vector<const Node*>::const_iterator>
+const_active_node_iterator; 
 
 
 
@@ -182,16 +190,18 @@ protected:
  * will create if they want to iterate over the all the inactive
  * nodes in the mesh.
  */
-typedef basic_not_active_node_iterator<std::vector<Node*>::iterator> not_active_node_iterator;
+typedef basic_not_active_node_iterator<std::vector<Node*>::iterator>
+not_active_node_iterator;
 
 
 /**
  * Specialization of the basic_not_active_node_iterator class for
- * for \p std::vector<Node*>::const_iterator.  This is what users
+ * for \p std::vector<const Node*>::const_iterator.  This is what users
  * will create if they want to iterate over the all the inactive
  * nodes in the mesh in const functions.
  */
-typedef basic_not_active_node_iterator<std::vector<Node*>::const_iterator> const_not_active_node_iterator; 
+typedef basic_not_active_node_iterator<std::vector<const Node*>::const_iterator>
+const_not_active_node_iterator; 
 
 
 

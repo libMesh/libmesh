@@ -1,4 +1,4 @@
-// $Id: dense_matrix_base.h,v 1.4 2004-02-22 21:47:58 jwpeterson Exp $
+// $Id: dense_matrix_base.h,v 1.5 2004-03-21 03:19:25 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -34,9 +34,9 @@
 
 
 /**
- * Defines an abstract dense matrix base class for use in Finite Element-type computations.
- * Specialized dense matrices, for example DenseSubMatrices, can
- * be derived from this class.
+ * Defines an abstract dense matrix base class for use in Finite Element-type
+ * computations.  Specialized dense matrices, for example DenseSubMatrices,
+ * can be derived from this class.
  *
  * @author John W. Peterson, 2003
  */ 
@@ -160,13 +160,15 @@ template<typename T>
 inline
 void DenseMatrixBase<T>::print_scientific () const
 {
+#ifndef BROKEN_IOSTREAM
+  
   // save the initial format flags
   std::ios_base::fmtflags cout_flags = std::cout.flags();
-
+  
   // Print the matrix entries.
-  for (unsigned int i=0; i<_m; i++)
+  for (unsigned int i=0; i<this->m(); i++)
     {
-      for (unsigned int j=0; j<_n; j++)
+      for (unsigned int j=0; j<this->n(); j++)
 	std::cout << std::setw(15)
 		  << std::scientific
 		  << std::setprecision(8)
@@ -174,9 +176,25 @@ void DenseMatrixBase<T>::print_scientific () const
 
       std::cout << std::endl;
     }
-
+  
   // reset the original format flags
   std::cout.flags(cout_flags);
+
+#else
+  
+  // Print the matrix entries.
+  for (unsigned int i=0; i<this->m(); i++)
+    {
+      for (unsigned int j=0; j<this->n(); j++)	
+	std::cout << std::setprecision(8)
+		  << this->el(i,j)
+		  << " ";
+      
+      std::cout << std::endl;
+    }
+  
+  
+#endif
 }
 
 
@@ -185,9 +203,9 @@ template<typename T>
 inline
 void DenseMatrixBase<T>::print () const
 {  
-  for (unsigned int i=0; i<_m; i++)
+  for (unsigned int i=0; i<this->m(); i++)
     {
-      for (unsigned int j=0; j<_n; j++)
+      for (unsigned int j=0; j<this->n(); j++)
 	std::cout << std::setw(8)
 		  << this->el(i,j) << " ";
 
@@ -204,11 +222,11 @@ inline
 void DenseMatrixBase<T>::add (const T factor,
 			      const DenseMatrixBase<T>& mat)
 {
-  assert (_m == mat.m());
-  assert (_n == mat.n());
+  assert (this->m() == mat.m());
+  assert (this->n() == mat.n());
 
-  for (unsigned int j=0; j<_n; j++)
-    for (unsigned int i=0; i<_m; i++)
+  for (unsigned int j=0; j<this->n(); j++)
+    for (unsigned int i=0; i<this->m(); i++)
       this->el(i,j) += factor*mat.el(i,j);
 }
 
@@ -226,11 +244,11 @@ inline
 void DenseMatrixBase<Complex>::add (const Complex factor,
 				    const DenseMatrixBase<Real>& mat)
 {
-  assert (_m == mat.m());
-  assert (_n == mat.n());
+  assert (this->m() == mat.m());
+  assert (this->n() == mat.n());
 
-  for (unsigned int j=0; j<_n; j++)
-    for (unsigned int i=0; i<_m; i++)
+  for (unsigned int j=0; j<this->n(); j++)
+    for (unsigned int i=0; i<this->m(); i++)
       this->el(i,j) += factor*mat.el(i,j);
 }
 

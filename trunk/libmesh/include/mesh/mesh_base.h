@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.10 2004-03-20 15:16:56 benkirk Exp $
+// $Id: mesh_base.h,v 1.11 2004-03-21 03:19:25 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -62,7 +62,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.10 $
+ * \version $Revision: 1.11 $
  */
 
 
@@ -350,7 +350,7 @@ public:
   /**
    * The same, except element pointers are returned instead of indices.
    */
-  void build_nodes_to_elem_map (std::vector<std::vector<Elem*> >&
+  void build_nodes_to_elem_map (std::vector<std::vector<const Elem*> >&
 				nodes_to_elem_map) const;
 
 
