@@ -1,4 +1,4 @@
-// $Id: transient_system.C,v 1.4 2003-05-29 00:03:06 benkirk Exp $
+// $Id: transient_system.C,v 1.5 2003-05-29 21:31:36 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,7 @@
 // Local includes
 #include "transient_system.h"
 #include "mesh_logging.h"
-
+#include "utility.h"
 
 
 
@@ -48,6 +48,8 @@ TransientSystem::~TransientSystem ()
   // class is getting destructed it is pointless,
   // but a good habit.
   init_system = assemble_system = NULL;
+
+  this->clear();
 }
 
 
@@ -58,7 +60,7 @@ void TransientSystem::clear ()
   SteadySystem::clear();
 
   // clear the old & older local solutions
-  old_local_solution->clear();  
+  old_local_solution->clear();
   older_local_solution->clear();  
 }
 
@@ -83,26 +85,38 @@ void TransientSystem::reinit ()
   SteadySystem::reinit();
     
   // Project the old & older vectors to the new mesh
+  this->project_vector (*old_local_solution);
   this->project_vector (*older_local_solution);
-  this->project_vector (*old_local_solution);  
 }
 
 
 
+void TransientSystem::update ()
+{
+  // Update the parent system
+  SteadySystem::update ();
+}
+
+
 void TransientSystem::re_update ()
 {
-  const std::vector<unsigned int>& send_list = _dof_map.get_send_list();
-  const unsigned int first_local_dof         = _dof_map.first_dof();
-  const unsigned int last_local_dof          = _dof_map.last_dof();
+  // re_update the parent system
+  SteadySystem::re_update ();
+  
+  //const std::vector<unsigned int>& send_list = _dof_map.get_send_list ();
+
+  // Explicitly build a send_list
+  std::vector<unsigned int> send_list(solution->size());
+  Utility::iota (send_list.begin(), send_list.end(), 0);
+  
+  const unsigned int first_local_dof = _dof_map.first_dof();
+  const unsigned int last_local_dof  = _dof_map.last_dof();
 
   // Check sizes
   assert (last_local_dof > first_local_dof);
   assert (send_list.size() >= (last_local_dof - first_local_dof + 1));
   assert (older_local_solution->size() >= send_list.size());
   assert (old_local_solution->size()   >= send_list.size());
-
-  // re-update the parent data
-  SteadySystem::re_update ();
   
   // Update the old & older solutions with the send_list,
   // which may have changed since their last update.
@@ -112,5 +126,5 @@ void TransientSystem::re_update ()
   
   old_local_solution->localize (first_local_dof,
 				last_local_dof,
-				send_list);
+				send_list);  
 }

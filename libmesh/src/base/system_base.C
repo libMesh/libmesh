@@ -1,4 +1,4 @@
-// $Id: system_base.C,v 1.19 2003-05-28 22:03:15 benkirk Exp $
+// $Id: system_base.C,v 1.20 2003-05-29 21:31:36 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -75,7 +75,7 @@ SystemBase::~SystemBase ()
   init_system = assemble_system = NULL;
 
   // Clear data
-  SystemBase::clear ();
+  this->clear ();
 
   assert (!libMesh::closed());
 }
