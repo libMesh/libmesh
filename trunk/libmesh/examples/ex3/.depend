@@ -7,14 +7,17 @@ ex3.$(obj-suffix):\
     ../../include/base/libmesh_base.h\
     ../../include/base/libmesh_common.h\
     ../../include/base/libmesh_config.h\
+    ../../include/base/multi_predicates.h\
     ../../include/base/node.h\
-    ../../include/base/predicated_iterator.h\
     ../../include/base/reference_counted_object.h\
     ../../include/base/reference_counter.h\
+    ../../include/base/single_predicates.h\
+    ../../include/base/variant_filter_iterator.h\
     ../../include/enums/enum_elem_quality.h\
     ../../include/enums/enum_elem_type.h\
     ../../include/enums/enum_fe_family.h\
     ../../include/enums/enum_inf_map_type.h\
+    ../../include/enums/enum_io_package.h\
     ../../include/enums/enum_order.h\
     ../../include/enums/enum_quadrature_type.h\
     ../../include/enums/enum_solver_package.h\
@@ -27,11 +30,11 @@ ex3.$(obj-suffix):\
     ../../include/geom/sphere.h\
     ../../include/geom/surface.h\
     ../../include/mesh/boundary_info.h\
-    ../../include/mesh/elem_iterators.h\
+    ../../include/mesh/gmv_io.h\
     ../../include/mesh/mesh.h\
     ../../include/mesh/mesh_base.h\
     ../../include/mesh/mesh_data.h\
-    ../../include/mesh/node_iterators.h\
+    ../../include/mesh/mesh_io.h\
     ../../include/numerics/coupling_matrix.h\
     ../../include/numerics/dense_matrix.h\
     ../../include/numerics/dense_matrix_base.h\
@@ -41,9 +44,11 @@ ex3.$(obj-suffix):\
     ../../include/numerics/sparse_matrix.h\
     ../../include/numerics/type_vector.h\
     ../../include/numerics/vector_value.h\
+    ../../include/partitioning/partitioner.h\
     ../../include/quadrature/quadrature.h\
     ../../include/quadrature/quadrature_gauss.h\
     ../../include/solvers/equation_systems.h\
+    ../../include/solvers/explicit_system.h\
     ../../include/solvers/frequency_system.h\
     ../../include/solvers/implicit_system.h\
     ../../include/solvers/newmark_system.h\
@@ -52,8 +57,7 @@ ex3.$(obj-suffix):\
     ../../include/solvers/transient_system.h\
     ../../include/utils/data_map.h\
     ../../include/utils/data_object.h\
-    ../../include/utils/perf_log.h\
-    ../../include/utils/utility.h
+    ../../include/utils/perf_log.h
 exact_solution.$(obj-suffix):\
     exact_solution.C\
     ../../include/base/libmesh_base.h\
