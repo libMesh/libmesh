@@ -1,4 +1,4 @@
-// $Id: elem_iterators.h,v 1.4 2003-02-18 00:49:55 jwpeterson Exp $
+// $Id: elem_iterators.h,v 1.5 2003-02-21 22:40:59 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -50,6 +50,7 @@ public:
     if (b) advance();
   }
 
+protected:
   /**
    * Redefinition of the predicate
    */
@@ -68,6 +69,14 @@ public:
  * Elem class.
  */
 typedef basic_elem_iterator<std::vector<Elem*>::iterator> elem_iterator;
+
+
+/**
+ * Specialization of the basic_elem_iterator class
+ * for \p Elem**.  This is what
+ * users will create if they want to iterate over
+ * all the neighbors of an element in non-const functions.
+ */
 typedef basic_elem_iterator<Elem**> neighbor_iterator;
 
 
@@ -82,6 +91,14 @@ typedef basic_elem_iterator<Elem**> neighbor_iterator;
  * _neighbors array in the Elem class in const functions.
  */
 typedef basic_elem_iterator<std::vector<Elem*>::const_iterator> const_elem_iterator; 
+
+
+/**
+ * Specialization of the basic_elem_iterator class
+ * for \p const Elem**.  This is what
+ * users will create if they want to iterate over
+ * all the neighbors of an element in const functions.
+ */
 typedef basic_elem_iterator<const Elem**> const_neighbor_iterator;
 
 
@@ -112,7 +129,9 @@ public:
   {
     if (b) advance();
   }
+
   
+protected:
   /**
    * Re-Definition of the predicate.
    */
@@ -175,6 +194,7 @@ public:
     advance();
   }
   
+protected:
   /**
    * Re-definition of the predicate.  Returns the negation of the
    * basic_active_elem_iterator predicate.
@@ -233,12 +253,12 @@ public:
     if (b) advance();
   }
   
+protected:
   /**
    * Definition of the predicate.
    */
   virtual bool predicate() const { return (*_current)->type() == _type; }
 
-protected:
   const ElemType _type;
 };
 
@@ -295,6 +315,7 @@ public:
     if (b) advance();
   }
   
+protected:
   /**
    * Definition of the predicate.
    */
@@ -302,7 +323,21 @@ public:
 };
 
 
+/**
+ * Specialization of the basic_not_type_elem_iterator for
+ * \p std::vector<Elem*>::iterator.  This is what users
+ * create when they want to iterate over all elements
+ * which are NOT of a specific type in non-const functions.
+ */
 typedef basic_not_type_elem_iterator<std::vector<Elem*>::iterator> not_type_elem_iterator;
+
+
+/**
+ * Specialization of the basic_not_type_elem_iterator for
+ * \p std::vector<Elem*>::const_iterator.  This is what users
+ * create when they want to iterate over all elements
+ * which are NOT of a specific type in const functions.
+ */
 typedef basic_not_type_elem_iterator<std::vector<Elem*>::const_iterator> const_not_type_elem_iterator;
 
 
@@ -336,6 +371,7 @@ public:
     advance();
   }
   
+protected:
   /**
    * Definition of the predicate
    */
@@ -400,12 +436,12 @@ public:
     if (b) advance();
   }
 
+protected:
   /**
    * Definition of the predicate
    */
   virtual bool predicate() const { return (*_current)->level() == _level; }
   
-protected:
   const unsigned int _level;
 };
 
@@ -456,6 +492,7 @@ public:
     advance();
   }
   
+protected:
   /**
    * Redefinition of the predicate.  Simply negate the
    * predicate in the parent class.
@@ -515,12 +552,12 @@ public:
     if (b) advance();
   }
 
+protected:
   /**
    * Definition of the predicate
    */
   virtual bool predicate() const { return (*_current)->processor_id() == _pid; }
 
-protected:
   const unsigned int _pid;
 };
 
@@ -571,6 +608,7 @@ public:
     advance();
   }
 
+protected:
   /**
    * Definition of the predicate - negates the predicate of the parent class.
    */
@@ -625,6 +663,7 @@ public:
     advance();
   }
 
+protected:
   /**
    * Definition of the predicate
    */
@@ -636,13 +675,19 @@ public:
 
 
 /**
- * typedef for user instantiation.
+ * Specialization of the basic_active_pid_elem_iterator for
+ * \p std::vector<Elem*>::iterator.  This is what users
+ * create when they want to iterate over all active elements
+ * that have a specific processor id in non-const functions.
  */
 typedef basic_active_pid_elem_iterator<std::vector<Elem*>::iterator> active_pid_elem_iterator;
 
 
 /**
- * typedef for user instantiation.
+ * Specialization of the basic_active_pid_elem_iterator for
+ * \p std::vector<Elem*>::const_iterator.  This is what users
+ * create when they want to iterate over all active elements
+ * that have a specific processor id in const functions.
  */
 typedef basic_active_pid_elem_iterator<std::vector<Elem*>::const_iterator> const_active_pid_elem_iterator;
 
