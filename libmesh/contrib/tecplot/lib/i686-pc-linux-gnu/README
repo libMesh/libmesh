@@ -1,0 +1,6 @@
+This library contains additional symbols to properly link on Redhat 9
+machines.  If & when AMTEC releases a fixed library this should be
+replaced.
+
+Fri Aug  1 03:10:32 CDT 2003
+
