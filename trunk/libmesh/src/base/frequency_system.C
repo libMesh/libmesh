@@ -1,4 +1,4 @@
-// $Id: frequency_system.C,v 1.13 2003-05-15 23:34:34 benkirk Exp $
+// $Id: frequency_system.C,v 1.14 2003-05-22 18:31:19 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -106,8 +106,37 @@ void FrequencySystem::init_data ()
   // make sure we have frequencies to solve for
   if (!_finished_set_frequencies)
     {
-      std::cerr << "ERROR: Need to set frequencies before calling init(). " << std::endl;
-      error();
+      /*
+       * when this system was read from file, check
+       * if this has a "n_frequencies" parameter,
+       * and initialize us with these.
+       */
+      if (_equation_systems.parameter_exists ("n_frequencies"))
+        {
+	  const unsigned int n_freq = 
+	      static_cast<unsigned int>(_equation_systems.parameter("n_frequencies"));
+
+	  assert(this->n_frequencies() == 0);
+	  assert(n_freq > 0);
+
+	  _frequencies.resize (n_freq);
+
+	  /*
+	   * set frequencies.  No need to build solution storage,
+	   * since the additional vectors were already read from file
+	   */
+	  for (unsigned int n=0; n<n_freq; n++)
+	      _frequencies[n] = _equation_systems.parameter(this->form_freq_param_name(n));
+
+	  this->set_current_frequency(0);
+
+	  _finished_set_frequencies = true;
+        }
+      else
+        {
+	  std::cerr << "ERROR: Need to set frequencies before calling init(). " << std::endl;
+	  error();
+	}
     }
 
   // initialize parent data and additional solution vectors

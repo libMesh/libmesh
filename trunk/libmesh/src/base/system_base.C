@@ -1,4 +1,4 @@
-// $Id: system_base.C,v 1.16 2003-05-15 23:34:35 benkirk Exp $
+// $Id: system_base.C,v 1.17 2003-05-22 18:31:19 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -419,11 +419,11 @@ bool SystemBase::compare (const SystemBase& other_system,
 
 	  if (verbose)
 	    {
-	      if (solu_result == -1)
+	      if (ov_result[ov_result.size()-1] == -1)
 		std::cout << " identical up to threshold." << std::endl;
 	      else
 		std::cout << " first difference occured at" << std::endl
-			  << "  index = " << solu_result << "." << std::endl;
+			  << "   index = " << ov_result[ov_result.size()-1] << "." << std::endl;
 	    }
 
 	}
