@@ -1,4 +1,4 @@
-/* $Id: ex2.C,v 1.11 2003-11-06 21:23:28 jwpeterson Exp $ */
+/* $Id: ex2.C,v 1.12 2003-11-07 17:41:08 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -17,7 +17,7 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
- // Example 2 -- Using PETSc to Solve a Simple System
+ // Example 2 -- Defining a Simple System
  //
  // This is the second example program.  It demonstrates how to
  // create an equation system for a simple scalar system.  This
