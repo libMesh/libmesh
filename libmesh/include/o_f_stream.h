@@ -1,4 +1,4 @@
-// $Id: o_f_stream.h,v 1.1 2003-03-22 21:04:30 ddreyer Exp $
+// $Id: o_f_stream.h,v 1.2 2003-03-23 15:09:00 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,33 +31,92 @@
 #include "mesh_common.h"
 
 
-/*
- * Need sprintf for scientific format, while other 
- * compilers need iomanip
- */
-#ifdef BROKEN_IOSTREAM
-# include <stdio.h>
-#else
-# include <iomanip>
-#endif
 
 
 // Forward Declarations
 
 
 
-/**
- * This class provides a compatibility class for broken
- * features in the \p std::ofstream of the older \p GCC
- * versions.  For other compilers, this class is simply 
- * a \p std::ofstream.
+
+
+/*
+ * Some compilers, at least HP \p aCC do not even
+ * accept empty classes derived from \p std::ostringstream.
+ * Therefore, resort to preprocessor definitions. 
  */
 
-// ------------------------------------------------------------
-// OFStream class definition
-class OFStream : public std::ofstream
-{
-public:
+#ifndef BROKEN_IOSTREAM
+ /*
+  * ---------------------------------------------------------------------------------
+  * Everything for a clean iostream
+  */
+
+# include <iomanip>
+
+ /*
+  * Outputs \p Real \p d  with width
+  * \p v in scientific format to stream \p o.
+  */
+# define OFSRealscientific(o,v,d)       (o) << std::setw(v) << std::scientific << (d)
+
+ /*
+  * Outputs \p Number \p d, (note that \p Number
+  * may be either real or complex) with width
+  * \p v in scientific format to stream \p o.
+  */
+# if defined(USE_COMPLEX_NUMBERS) 
+#  define OFSNumberscientific(o,v,d)    (o) << std::setw(v) << std::scientific << (d).real() << " " \
+                                            << std::setw(v) << std::scientific << (d).imag()
+# else
+#  define OFSNumberscientific(o,v,d)    (o) << std::setw(v) << std::scientific << (d)
+#endif
+
+ /*
+  * class alias
+  */
+# define OFSOFStream                    std::ofstream
+
+
+#else
+ /*
+  * ---------------------------------------------------------------------------------
+  * Everything for broken iostream
+  */
+
+# include <stdio.h>
+
+ /*
+  * Outputs \p Real \p d with width 
+  * \p v in scientific format to stream \p o.
+  */
+# define OFSRealscientific(o,v,d)       (o).scientific( (v), (d) )
+
+ /*
+  * Outputs \p Number \p d, (note that \p Number
+  * may be either real or complex) with width
+  * \p v in scientific format to stream \p o.
+  */
+# define OFSNumberscientific(o,v,d)     (o).scientific( (v), (d) )
+
+ /*
+  * class alias
+  */
+# define OFSOFStream                    OFStream
+
+
+
+ /**
+  * This class provides a compatibility class for broken
+  * features in the \p std::ofstream of the older \p GCC
+  * versions.  For other compilers, this class is simply 
+  * a \p std::ofstream.
+  */
+
+ // ------------------------------------------------------------
+ // OFStream class definition
+ class OFStream : public std::ofstream
+ {
+ public:
 
   /**
    * Default constructor.
@@ -79,49 +138,19 @@ public:
    * was directed in scientific style with
    * size \p w.
    */
-  OFStream& scientific (const sizetype w,
-			const Real r);
-
-  /**
-   * @returns a \p OFStream, where all entries of
-   * \p v were directed in scientific style with
-   * size \p w, each float separated from the other
-   * by \p sep.  Works also for complex numbers,
-   * if enabled.  Note that the separator should 
-   * contain at most 10 characters, and defaults
-   * to just one whitespace.
-   */
   template <typename T>
   OFStream& scientific (const sizetype w,
-			const std::vector<T>& v,
-			const char* sep = " ");
+			const T r);
 
-};
-
+ };
 
 
-// ------------------------------------------------------------
-// OFStream inline methods
-inline
-OFStream& OFStream::scientific (const sizetype w,
-				const Real r)
-{
-#ifndef BROKEN_IOSTREAM
-  *this << std::setw(w)
-	<< std::scientific
-	<< r;
-#else
-  assert (w < 30);
-  char buf[30];  
-  char format[8];
-  // form the format for r
-  sprintf (format, "%%%de", w);
-  // form string as desired
-  sprintf (buf, format, r);
-  *this << buf;
-#endif
-  return *this;
-}
+ // ------------------------------------------------------------
+ // OFStream inline methods
+ 
+
+#endif // ifndef ... else ... BROKEN_IOSTREAM
+
 
 
 #endif // ifndef __o_f_stream_h__

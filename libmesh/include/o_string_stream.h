@@ -1,4 +1,4 @@
-// $Id: o_string_stream.h,v 1.2 2003-03-23 01:39:11 ddreyer Exp $
+// $Id: o_string_stream.h,v 1.3 2003-03-23 15:09:00 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -29,33 +29,120 @@
 #include "mesh_common.h"
 
 
-/*
- * Need sprintf for scientific format, while other 
- * compilers need iomanip
- */
-#ifdef BROKEN_IOSTREAM
-# include <stdio.h>
-#else
-# include <iomanip>
-#endif
-
-
 // Forward Declarations
 
 
 
-/**
- * This class provides a compatibility class for broken
- * features in the \p ostringstream of the older \p GCC
- * versions.  For other compilers, this class is simply 
- * a \p std::ostringstream.
+/*
+ * Some compilers, at least HP \p aCC do not even
+ * accept empty classes derived from \p std::ostringstream.
+ * Therefore, resort to preprocessor definitions. 
  */
 
-// ------------------------------------------------------------
-// OStringStream class definition
-class OStringStream : public std::ostringstream
-{
-public:
+#ifndef BROKEN_IOSTREAM
+ /*
+  * ---------------------------------------------------------------------------------
+  * Everything for a clean iostream
+  */
+
+# include <iomanip>
+
+ /*
+  * Outputs \p std::string \p d with width 
+  * \p v left-formatted to stream \p o.
+  */
+# define OSSStringleft(o,v,d)       (o).width(v);  (o) << std::left << (d)
+
+ /*
+  * Outputs \p std::string \p d with width 
+  * \p v right-formatted to stream \p o.
+  */
+# define OSSStringright(o,v,d)      (o).width(v);  (o) << std::right << (d)
+
+ /*
+  * Outputs \p Real \p d with width \p v and
+  * precision \p p to stream \p o.
+  */
+# define OSSRealleft(o,v,p,d)       (o).width(v);  (o).precision(p); (o) << (d)
+
+ /*
+  * Outputs \p Real \p d with width \p v
+  * in scientific format to stream \p o.
+  */
+# define OSSRealscientific(o,v,d)   (o) << std::setw(v) << std::scientific << (d)
+
+ /*
+  * Outputs \p int \p d with width 
+  * \p v to stream \p o.
+  */
+# define OSSInt(o,v,d)              (o).width(v);  (o) << (d)
+
+ /*
+  * class alias
+  */
+# define OSSOStringStream           std::ostringstream
+
+
+
+
+
+#else
+ /*
+  * ---------------------------------------------------------------------------------
+  * Everything for broken iostream
+  */
+
+# include <stdio.h>
+
+ /*
+  * Outputs \p std::string \p d with width 
+  * \p v left-formatted to stream \p o.
+  */
+# define OSSStringleft(o,v,d)       (o).left( (v), (d) )
+
+ /*
+  * Outputs \p std::string \p d with width 
+  * \p v right-formatted to stream \p o.
+  */
+# define OSSStringright(o,v,d)      (o).right( (v), (d) )
+
+ /*
+  * Outputs \p Real \p d with width \p v and
+  * precision \p p to stream \p o.
+  */
+# define OSSRealleft(o,v,p,d)       (o).left( (v), (p), (d) )
+
+ /*
+  * Outputs \p Real \p d with width \p v
+  * in scientific format to stream \p o.
+  */
+# define OSSRealscientific(o,v,d)   (o).scientific( (v), (d) )
+
+ /*
+  * Outputs \p int \p d with width 
+  * \p v to stream \p o.
+  */
+# define OSSInt(o,v,d)              (o).left( (v), (d) )
+
+ /*
+  * class alias
+  */
+# define OSSOStringStream           OStringStream
+
+
+
+ /**
+  * This class provides a compatibility class for broken
+  * features in the \p ostringstream of the older \p GCC
+  * versions.  For other compilers, this class is simply 
+  * a \p std::ostringstream.
+  */
+
+ // ------------------------------------------------------------
+ // OStringStream class definition
+ class OStringStream : public std::ostringstream
+ {
+ public:
 
   /**
    * Default constructor.
@@ -114,131 +201,97 @@ public:
   void scientific (const sizetype w,
 		   const Real r);
 
-protected:
-
-#ifdef BROKEN_IOSTREAM
+ protected:
   /**
    * Appends \p n whitespaces to the string \p s.
    */
   void print_ws (const sizetype n);
-#endif
 
-};
-
-
-
-// ------------------------------------------------------------
-// OStringStream inline methods
-inline
-void OStringStream::left (const sizetype w,
-			  const std::string& s)
-{
-#ifndef BROKEN_IOSTREAM
-  this->width(w);
-  *this << std::left << s;
-#else
-  *this << s;
-  // pad with whitespaces afterwards
-  print_ws ((w-s.size()));
-#endif
-}
+ };
 
 
 
-inline
-void OStringStream::left (const sizetype w,
-			  const sizetype prec,
-			  const Real r)
-{
-#ifndef BROKEN_IOSTREAM
-  this->width(w);
-  this->precision(prec);
-  *this << r;
-#else
-  assert (w < 30);
-  char buf[30];  
-  char format[8];
-  // form the format for r
-//  sprintf (format, "%%%d.%df", int((w-prec)/2), prec);
-  sprintf (format, "%%.%df", prec);
-  // form string as desired
-  sprintf (buf, format, r);
-  *this << buf;
-  // pad with whitespaces afterwards
-  print_ws (w-std::string(buf).size());
-//  print_ws (w-int((w-prec)/2));
-#endif
-}
-
-
-
-
-inline
-void OStringStream::left (const sizetype w,
-			  const int n)
-{
-#ifndef BROKEN_IOSTREAM
-  this->width(w);
-  *this << n;
-#else
-  assert (w < 30);
-  char buf[30];  
-  // form string as desired
-  sprintf (buf, "%d", n);
-  *this << buf;
-  // pad with whitespaces afterwards
-  print_ws (w-std::string(buf).size());
-#endif
-}
-
-
-
-inline
-void OStringStream::right (const sizetype w,
+ // ------------------------------------------------------------
+ // OStringStream inline methods
+ inline
+ void OStringStream::left (const sizetype w,
 			   const std::string& s)
-{
-#ifndef BROKEN_IOSTREAM
-  this->width(w);
-  *this << std::right << s;
-#else
-  // first pad with whitespaces
-  print_ws ((w-s.size()));
-  *this << s;
-#endif
-}
+ {
+   *this << s;
+   // pad with whitespaces afterwards
+   print_ws ((w-s.size()));
+ }
 
 
-
-inline
-void OStringStream::scientific (const sizetype w,
-				const Real r)
-{
-#ifndef BROKEN_IOSTREAM
-  *this << std::setw(w)
-	<< std::scientific
-	<< r;
-#else
-  assert (w < 30);
-  char buf[30];  
-  char format[8];
-  // form the format for r
-  sprintf (format, "%%%de", w);
-  // form string as desired
-  sprintf (buf, format, r);
-  *this << buf;
-#endif
-}
+ inline
+ void OStringStream::left (const sizetype w,
+			   const sizetype prec,
+			   const Real r)
+ {
+   assert (w < 30);
+   char buf[30];  
+   char format[8];
+   // form the format for r
+   // ALTERNATIVE: sprintf (format, "%%%d.%df", int((w-prec)/2), prec);
+   sprintf (format, "%%.%df", prec);
+   // form string as desired
+   sprintf (buf, format, r);
+   *this << buf;
+   // pad with whitespaces afterwards
+   print_ws (w-std::string(buf).size());
+   // ALTERNATIVE: print_ws (w-int((w-prec)/2));
+ }
 
 
+ inline
+ void OStringStream::left (const sizetype w,
+			   const int n)
+ {
+   assert (w < 30);
+   char buf[30];  
+   // form string as desired
+   sprintf (buf, "%d", n);
+   *this << buf;
+   // pad with whitespaces afterwards
+   print_ws (w-std::string(buf).size());
+ }
 
-#ifdef BROKEN_IOSTREAM
-inline
-void OStringStream::print_ws (const sizetype n)
-{
-  for (sizetype i = 0; i < n; i++)
-    *this << ' ';
-}
-#endif
+
+ inline
+ void OStringStream::right (const sizetype w,
+			    const std::string& s)
+ {
+   // first pad with whitespaces
+   print_ws ((w-s.size()));
+   *this << s;
+ }
+
+
+ inline
+ void OStringStream::scientific (const sizetype w,
+				 const Real r)
+ {
+   assert (w < 30);
+   char buf[30];  
+   char format[8];
+   // form the format for r
+   sprintf (format, "%%%de", w);
+   // form string as desired
+   sprintf (buf, format, r);
+   *this << buf;
+ }
+
+
+ inline
+ void OStringStream::print_ws (const sizetype n)
+ {
+   for (sizetype i = 0; i < n; i++)
+     *this << ' ';
+ }
+
+
+#endif // ifndef ... else ... BROKEN_IOSTREAM
+
 
 
 

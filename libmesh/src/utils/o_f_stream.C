@@ -1,4 +1,4 @@
-// $Id: o_f_stream.C,v 1.1 2003-03-22 21:04:31 ddreyer Exp $
+// $Id: o_f_stream.C,v 1.2 2003-03-23 15:09:19 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -25,38 +25,28 @@
 // Local Includes
 #include "o_f_stream.h"
 
+/*
+ * This class is only alive when iostream is broken
+ */
+#ifdef BROKEN_IOSTREAM
+
 
 
 // the template for reals
 template <typename T>
 OFStream& OFStream::scientific (const sizetype w,
-				const std::vector<T>& v,
-				const char* sep)
+				const T r)
 {
-#ifndef BROKEN_IOSTREAM
-  typename std::vector<T>::const_iterator pos = v.begin();
-  for (; pos != v.end(); ++pos)
-      *this << std::setw(w)
-	    << std::scientific
-	    << *pos 
-	    << sep;
-#else
   assert (w < 30);
   char buf[30];  
   char format[8];
   // form the format for r
   sprintf (format, "%%%de", w);
-  typename std::vector<T>::const_iterator pos = v.begin();
-  for (; pos != v.end(); ++pos)
-    {
-      sprintf (buf, format, *pos);
-      *this << buf << sep;
-    }
-#endif
+  // form string as desired
+  sprintf (buf, format, r);
+  *this << buf;
   return *this;
 }
-
-
 
 
 
@@ -65,34 +55,16 @@ OFStream& OFStream::scientific (const sizetype w,
 
 template <>
 OFStream& OFStream::scientific (const sizetype w,
-				const std::vector<Complex>& v,
-				const char* sep)
+				const Complex r)
 {
-#ifndef BROKEN_IOSTREAM
-  std::vector<Complex>::const_iterator pos = v.begin();
-  for (; pos != v.end(); ++pos)
-      *this << std::setw(w)
-	    << std::scientific
-	    << (*pos).real()
-	    << sep
-	    << std::setw(w)
-	    << std::scientific
-	    << (*pos).imag()
-	    << sep;
-#else
   assert (w < 30);
   char buf[60];  
-  char format[20];
+  char format[16];
   // form the format for r
-  sprintf (format, "%%%de%s%%%de%s", w, sep, w, sep);
-  std::vector<Complex>::const_iterator pos = v.begin();
-  unsigned int cnt=0;
-  for (; pos != v.end(); ++pos)
-    {
-      sprintf (buf, format, (*pos).real(), (*pos).imag());
-      *this << buf;
-    }
-#endif
+  sprintf (format, "%%%de %%%de", w, w);
+  // form string as desired
+  sprintf (buf, format, r.real(), r.imag());
+  *this << buf;
   return *this;
 }
 
@@ -100,14 +72,14 @@ OFStream& OFStream::scientific (const sizetype w,
 
 
 
-
-
 //--------------------------------------------------------------
 // Explicit instantiations for reals
 template OFStream& OFStream::scientific (const sizetype w,
-					 const std::vector<double>& v,
-					 const char* sep);
+					 const double r);
 
 template OFStream& OFStream::scientific (const sizetype w,
-					 const std::vector<float>& v,
-					 const char* sep);
+					 const float r);
+
+
+
+#endif // ifdef BROKEN_IOSTREAM
