@@ -1,4 +1,4 @@
-// $Id: sparse_matrix.C,v 1.1 2003-02-10 22:03:28 benkirk Exp $
+// $Id: sparse_matrix.C,v 1.2 2003-02-11 00:58:24 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -62,5 +62,7 @@ SparseMatrix::build(const SolverPackage solver_package)
 		<< std::endl;
       error();
     };
-    
+
+  AutoPtr<SparseMatrix> ap(NULL);
+  return ap;    
 };

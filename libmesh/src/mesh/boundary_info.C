@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.10 2003-02-04 16:29:51 benkirk Exp $
+// $Id: boundary_info.C,v 1.11 2003-02-11 00:58:21 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -390,8 +390,10 @@ std::vector<Real> BoundaryInfo::get_boundary_values(const unsigned int node) con
 
   std::cerr << "ERROR: No boundary values are specified for Node: "
 	    << node << std::endl;
-  error();
 
+  error();
+  std::vector<Real> v;
+  return v;
 };
 
 

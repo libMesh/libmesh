@@ -1,4 +1,4 @@
-// $Id: numeric_vector.C,v 1.1 2003-02-10 22:03:28 benkirk Exp $
+// $Id: numeric_vector.C,v 1.2 2003-02-11 00:58:24 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -63,4 +63,6 @@ NumericVector::build(const SolverPackage solver_package)
       error();
     };
     
+  AutoPtr<NumericVector> ap(NULL);
+  return ap;    
 };
