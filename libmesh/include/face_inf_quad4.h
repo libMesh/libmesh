@@ -1,4 +1,4 @@
-// $Id: face_inf_quad4.h,v 1.13 2003-04-01 14:19:47 ddreyer Exp $
+// $Id: face_inf_quad4.h,v 1.14 2003-05-16 00:30:08 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -84,7 +84,7 @@ public:
    * the sides 1, 2.
    */
   AutoPtr<Elem> build_side (const unsigned int i) const
-  { return this->side(i); }
+  { AutoPtr<Elem> ap(this->side(i)); return ap;}
 
   const std::vector<unsigned int> tecplot_connectivity(const unsigned int sf=0) const;
   

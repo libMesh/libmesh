@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism6.h,v 1.13 2003-04-01 14:19:46 ddreyer Exp $
+// $Id: cell_inf_prism6.h,v 1.14 2003-05-16 00:30:08 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -92,7 +92,7 @@ public:
    * the \p InfPrism::side(i).
    */
   AutoPtr<Elem> build_side (const unsigned int i) const 
-  { return  this->side(i); }
+  { AutoPtr<Elem> ap(this->side(i)); return ap; }
 
   const std::vector<unsigned int> tecplot_connectivity(const unsigned int sc=0) const;
   
