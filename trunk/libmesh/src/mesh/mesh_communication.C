@@ -1,4 +1,4 @@
-// $Id: mesh_communication.C,v 1.5 2004-03-21 04:44:40 benkirk Exp $
+// $Id: mesh_communication.C,v 1.6 2004-03-21 07:23:00 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -39,7 +39,7 @@ void MeshCommunication::clear ()
 
 
 
-void MeshCommunication::distribute (Mesh& mesh)
+void MeshCommunication::distribute (Mesh& mesh) const
 {
   // Don't need to do anything if there is
   // only one processor.
@@ -52,7 +52,7 @@ void MeshCommunication::distribute (Mesh& mesh)
 
 
 
-void MeshCommunication::distribute_mesh (MeshBase& mesh)
+void MeshCommunication::distribute_mesh (MeshBase& mesh) const
 {
   // Don't need to do anything if there is
   // only one processor.
@@ -205,7 +205,7 @@ void MeshCommunication::distribute_mesh (MeshBase& mesh)
 
 
 void MeshCommunication::distribute_bcs (MeshBase& mesh,
-					BoundaryInfo& boundary_info)
+					BoundaryInfo& boundary_info) const
 {
   // Don't need to do anything if there is
   // only one processor.

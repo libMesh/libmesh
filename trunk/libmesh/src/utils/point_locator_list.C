@@ -1,4 +1,4 @@
-// $Id: point_locator_list.C,v 1.4 2004-01-03 15:37:44 benkirk Exp $
+// $Id: point_locator_list.C,v 1.5 2004-03-21 07:23:00 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -150,7 +150,7 @@ void PointLocatorList::init ()
 
 
 
-const Elem* PointLocatorList::operator() (const Point& p)
+const Elem* PointLocatorList::operator() (const Point& p) const
 {
   assert (this->_initialized);
 
