@@ -1,4 +1,4 @@
-// $Id: factory.h,v 1.2 2004-01-03 15:37:41 benkirk Exp $
+// $Id: factory.h,v 1.3 2004-10-26 22:01:59 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -32,32 +32,12 @@
 #include "auto_ptr.h"
 
 
-/**
- * A base class.
- */
-class FactoryBase
-{
-public:
-
-protected:
-  /**
-   * Constructor.
-   */
-  FactoryBase () {}
-
-  /**
-   * Destructor.
-   */
-  virtual ~FactoryBase () {}  
-};
-
-
 
 /**
  * Factory class defintion.  
  */
 template <class Base>
-class Factory : public FactoryBase
+class Factory
 {  
 protected:
 
@@ -84,12 +64,13 @@ public:
    */
   virtual AutoPtr<Base> create () = 0;
 
-private:
+  
+protected:
 
   /**
    * Map from a name to a Factory<Base>* pointer.
    */
-  static std::map<std::string, FactoryBase*> factory_map;
+  static std::map<std::string, Factory<Base>*>& factory_map();
 };
 
 
@@ -131,9 +112,9 @@ Factory<Base>::Factory (const std::string& name)
 {
   // Make sure we haven't already added this name
   // to the map
-  assert (!factory_map.count(name));
+  assert (!factory_map().count(name));
 
-  factory_map[name] = this;
+  factory_map()[name] = this;
 }
 
 
@@ -143,14 +124,14 @@ inline
 AutoPtr<Base> Factory<Base>::build (const std::string& name)
 {
   // name not found in the map
-  if (!factory_map.count(name))
+  if (!factory_map().count(name))
     {
       std::cerr << "Tried to build an unknown type: " << name << std::endl;
 
       std::cerr << "valid options are:" << std::endl;
       
-      for (typename std::map<std::string,FactoryBase*>::const_iterator
-	     it = factory_map.begin(); it != factory_map.end(); ++it)
+      for (typename std::map<std::string,Factory<Base>*>::const_iterator
+	     it = factory_map().begin(); it != factory_map().end(); ++it)
         std::cerr << "  " << it->first << std::endl;
 
       // Do this the stoopid way for IBM xlC
@@ -160,11 +141,22 @@ AutoPtr<Base> Factory<Base>::build (const std::string& name)
     }
   
   // Do this the stoopid way for IBM xlC
-  Factory<Base> *f = dynamic_cast<Factory<Base>*> (factory_map[name]);
+  Factory<Base> *f = factory_map()[name];
   
   AutoPtr<Base> ret_val (f->create());
   
   return ret_val;
+}
+
+
+
+template <class Base>
+inline
+std::map<std::string, Factory<Base>*>& Factory<Base>::factory_map()
+{
+  static std::map<std::string, Factory<Base>*> _factory_map;
+
+  return _factory_map;
 }
 
 
