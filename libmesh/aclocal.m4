@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.33 2003-06-25 08:32:32 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.34 2003-08-27 18:55:51 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -19,17 +19,33 @@ AC_DEFUN(DETERMINE_CXX_BRAND, dnl
     dnl find out the right version
     GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
     case "$GXX_VERSION_STRING" in
-      *"egcs-1.1"*)
-  	AC_MSG_RESULT(<<< C++ compiler is egcs-1.1 >>>)
-  	GXX_VERSION=egcs1.1
+      *3.5*)
+  	AC_MSG_RESULT(<<< C++ compiler is gcc-3.5 >>>)
+  	GXX_VERSION=gcc3.5
   	;;
-      *2.95*)
-  	AC_MSG_RESULT(<<< C++ compiler is gcc-2.95 >>>)
-  	GXX_VERSION=gcc2.95
-	AC_DEFINE(BROKEN_IOSTREAM, 1,
-             [This compiler is known not to support some iostream
-              functionality])
-         AC_MSG_RESULT(<<< Configuring library for broken iostream >>>)
+      *3.4*)
+  	AC_MSG_RESULT(<<< C++ compiler is gcc-3.4 >>>)
+  	GXX_VERSION=gcc3.4
+  	;;
+      *3.3*)
+  	AC_MSG_RESULT(<<< C++ compiler is gcc-3.3 >>>)
+  	GXX_VERSION=gcc3.3
+  	;;
+      *3.2*)
+  	AC_MSG_RESULT(<<< C++ compiler is gcc-3.2 >>>)
+  	GXX_VERSION=gcc3.2
+  	;;
+      *3.1*)
+  	AC_MSG_RESULT(<<< C++ compiler is gcc-3.1 >>>)
+  	GXX_VERSION=gcc3.1
+  	;;
+      *3.0*)
+  	AC_MSG_RESULT(<<< C++ compiler is gcc-3.0 >>>)
+  	GXX_VERSION=gcc3.0
+  	;;
+      *2.97*)
+  	AC_MSG_RESULT(<<< C++ compiler is gcc-2.97 >>>)
+  	GXX_VERSION=gcc2.97
   	;;
       *2.96*)
   	AC_MSG_RESULT(<<< C++ compiler is gcc-2.96 >>>)
@@ -39,29 +55,17 @@ AC_DEFUN(DETERMINE_CXX_BRAND, dnl
               functionality])
          AC_MSG_RESULT(<<< Configuring library for broken iostream >>>)
   	;;
-      *2.97*)
-  	AC_MSG_RESULT(<<< C++ compiler is gcc-2.97 >>>)
-  	GXX_VERSION=gcc2.97
+      *2.95*)
+  	AC_MSG_RESULT(<<< C++ compiler is gcc-2.95 >>>)
+  	GXX_VERSION=gcc2.95
+	AC_DEFINE(BROKEN_IOSTREAM, 1,
+             [This compiler is known not to support some iostream
+              functionality])
+         AC_MSG_RESULT(<<< Configuring library for broken iostream >>>)
   	;;
-      *3.0*)
-  	AC_MSG_RESULT(<<< C++ compiler is gcc-3.0 >>>)
-  	GXX_VERSION=gcc3.0
-  	;;
-      *3.1*)
-  	AC_MSG_RESULT(<<< C++ compiler is gcc-3.1 >>>)
-  	GXX_VERSION=gcc3.1
-  	;;
-      *3.2*)
-  	AC_MSG_RESULT(<<< C++ compiler is gcc-3.2 >>>)
-  	GXX_VERSION=gcc3.2
-  	;;
-      *3.3*)
-  	AC_MSG_RESULT(<<< C++ compiler is gcc-3.3 >>>)
-  	GXX_VERSION=gcc3.3
-  	;;
-      *3.4*)
-  	AC_MSG_RESULT(<<< C++ compiler is gcc-3.4 >>>)
-  	GXX_VERSION=gcc3.4
+      *"egcs-1.1"*)
+  	AC_MSG_RESULT(<<< C++ compiler is egcs-1.1 >>>)
+  	GXX_VERSION=egcs1.1
   	;;
       *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
   	dnl These compilers are too old to support a useful subset
