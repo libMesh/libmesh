@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.42 2003-11-28 16:23:39 benkirk Exp $
+// $Id: equation_systems.C,v 1.43 2003-12-20 19:55:33 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -331,8 +331,8 @@ void EquationSystems::build_variable_names (std::vector<std::string>& var_names)
 
 
 void EquationSystems::build_solution_vector (std::vector<Number>& soln,
-						 std::string& system_name,
-						 std::string& variable_name) const
+					     std::string& system_name,
+					     std::string& variable_name) const
 {
   error();
 
@@ -501,6 +501,104 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
 			  assert (node_conn[elem->node(n)] != 0);
 			  soln[nv*(elem->node(n)) + (var + var_num)] +=
 			    nodal_soln[n]/static_cast<Real>(node_conn[elem->node(n)]);
+			}
+		    }
+		}
+	    }	 
+	}
+
+      var_num += nv_sys;
+    }
+}
+
+
+
+
+void EquationSystems::build_discontinuous_solution_vector (std::vector<Number>& soln) const
+{
+  assert (this->n_systems());
+
+  const unsigned int dim = _mesh.mesh_dimension();
+  const unsigned int nv  = this->n_vars();
+  unsigned int tw=0;
+
+  // get the total weight
+  {
+    const_active_elem_iterator       it (_mesh.elements_begin());
+    const const_active_elem_iterator end(_mesh.elements_end());
+    
+    for ( ; it != end; ++it)
+      tw += (*it)->n_nodes();
+  }
+  
+
+  // Only if we are on processor zero, allocate the storage
+  // to hold (number_of_nodes)*(number_of_variables) entries.
+  if (_mesh.processor_id() == 0)
+    soln.resize(tw*nv);
+
+  std::vector<Number>        sys_soln; 
+
+  
+  unsigned int var_num=0;
+
+  // For each system in this EquationSystems object,
+  // update the global solution and if we are on processor 0,
+  // loop over the elements and build the nodal solution
+  // from the element solution.  Then insert this nodal solution
+  // into the vector passed to build_solution_vector.
+  std::map<std::string, SystemBase*>::const_iterator
+    pos = _systems.begin();
+
+  for (; pos != _systems.end(); ++pos)
+    {  
+      const SystemBase& system  = *(pos->second);
+      const unsigned int nv_sys = system.n_vars();
+      
+      system.update_global_solution (sys_soln, 0);
+      
+      if (_mesh.processor_id() == 0)
+	{
+	  std::vector<Number>       elem_soln;   // The finite element solution
+	  std::vector<Number>       nodal_soln;  // The FE solution interpolated to the nodes
+	  std::vector<unsigned int> dof_indices; // The DOF indices for the finite element 
+	      
+	  for (unsigned int var=0; var<nv_sys; var++)
+	    {
+	      const FEType& fe_type    = system.variable_type(var);
+
+	      const_active_elem_iterator       it (_mesh.elements_begin());
+	      const const_active_elem_iterator end(_mesh.elements_end());
+
+	      unsigned int nn=0;
+	      
+	      for ( ; it != end; ++it)
+		{
+		  const Elem* elem = *it;
+		  system.get_dof_map().dof_indices (elem, dof_indices, var);
+		  
+		  elem_soln.resize(dof_indices.size());
+		  
+		  for (unsigned int i=0; i<dof_indices.size(); i++)
+		    elem_soln[i] = sys_soln[dof_indices[i]];
+		  
+		  FEInterface::nodal_soln (dim,
+					   fe_type,
+					   elem,
+					   elem_soln,
+					   nodal_soln);
+
+#ifdef ENABLE_INFINITE_ELEMENTS
+		  // infinite elements should be skipped...
+		  if (!elem->infinite())
+#endif
+		    { 
+		      assert (nodal_soln.size() == elem->n_nodes());
+		  
+		      for (unsigned int n=0; n<elem->n_nodes(); n++)
+			{
+			  soln[nv*(nn++) + (var + var_num)] +=
+			    nodal_soln[n];
 			}
 		    }
 		}
