@@ -1,4 +1,4 @@
-// $Id: factory.h,v 1.3 2004-10-26 22:01:59 benkirk Exp $
+// $Id: factory.h,v 1.4 2004-10-26 22:22:01 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -150,14 +150,14 @@ AutoPtr<Base> Factory<Base>::build (const std::string& name)
 
 
 
-template <class Base>
-inline
-std::map<std::string, Factory<Base>*>& Factory<Base>::factory_map()
-{
-  static std::map<std::string, Factory<Base>*> _factory_map;
+// Note - this cannot be inlined!
+// template <class Base>
+// std::map<std::string, Factory<Base>*>& Factory<Base>::factory_map()
+// {
+//   static std::map<std::string, Factory<Base>*> _factory_map;
 
-  return _factory_map;
-}
+//   return _factory_map;
+// }
 
 
 
