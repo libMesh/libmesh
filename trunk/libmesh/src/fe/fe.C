@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.13 2003-02-24 14:35:48 benkirk Exp $
+// $Id: fe.C,v 1.14 2003-03-03 18:03:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -80,7 +80,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
   /**
    * Start logging the shape function initialization
    */
-  libMesh::log.start_event("init_shape_functions()");
+  libMesh::log.start_event("init_shape_functions()", "FE");
 
   
   // The number of quadrature points.
@@ -279,7 +279,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
   /**
    * Stop logging the shape function initialization
    */
-  libMesh::log.stop_event("init_shape_functions()");
+  libMesh::log.stop_event("init_shape_functions()", "FE");
 }
 
 
