@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic_shape_1D.C,v 1.7 2003-02-13 22:56:09 benkirk Exp $
+// $Id: fe_hierarchic_shape_1D.C,v 1.8 2003-06-15 00:36:25 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -64,10 +64,10 @@ Real FE<1,HIERARCHIC>::shape(const ElemType,
 	    return (xi*xi - 1.)/2.;
 	    
 	  case 4:
-	    return (pow(xi,4) - 1.)/24.;
+	    return (pow(xi,4.) - 1.)/24.;
 	    
 	  case 6:
-	    return (pow(xi,6) - 1.)/720.;
+	    return (pow(xi,6.) - 1.)/720.;
 
 	    // All odd-terms have the same form.
 	    // (xi^p - xi)/p!
@@ -75,10 +75,10 @@ Real FE<1,HIERARCHIC>::shape(const ElemType,
 	    return (xi*xi*xi - xi)/6.;
 
 	  case 5:
-	    return (pow(xi,5) - xi)/120.;
+	    return (pow(xi,5.) - xi)/120.;
 
 	  case 7:
-	    return (pow(xi,7) - xi)/5040.;	    
+	    return (pow(xi,7.) - xi)/5040.;	    
 	    
 	  default:
 	    std::cerr << "Invalid shape function index!" << std::endl;
@@ -151,10 +151,10 @@ Real FE<1,HIERARCHIC>::shape_deriv(const ElemType,
 	    return xi;
 	    
 	  case 4:
-	    return pow(xi,3)/6.;
+	    return pow(xi,3.)/6.;
 	    
 	  case 6:
-	    return pow(xi,5)/120.;
+	    return pow(xi,5.)/120.;
 
 	    // All odd-terms have the same form.
 	    // (p*xi^(p-1) - 1.)/p!
@@ -162,10 +162,10 @@ Real FE<1,HIERARCHIC>::shape_deriv(const ElemType,
 	    return (3*xi*xi - 1.)/6.;
 
 	  case 5:
-	    return (5.*pow(xi,4) - 1.)/120.;
+	    return (5.*pow(xi,4.) - 1.)/120.;
 
 	  case 7:
-	    return (7.*pow(xi,6) - 1.)/5040.;	    
+	    return (7.*pow(xi,6.) - 1.)/5040.;	    
 	    
 	  default:
 	    std::cerr << "Invalid shape function index!" << std::endl;
