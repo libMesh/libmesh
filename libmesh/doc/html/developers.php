@@ -76,9 +76,9 @@ dev_table_entry("images/spetersen.jpg",
 <?php
 dev_table_entry("images/dreyer.jpg",
 		"Daniel Dreyer",
-		"http://www.tu-harburg.de",
+		"http://www.audi.com",
 		"PhD Student, libMesh Developer",
-		"<a href=\"http://www.tu-harburg.de\">Technical University Hamburg-Harburg</a>");
+		"<a href=\"http://www.audi.com\">Audi AG</a>");
 ?>
 
 <?php
