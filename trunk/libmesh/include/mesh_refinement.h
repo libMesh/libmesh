@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.h,v 1.9 2003-05-19 21:21:11 benkirk Exp $
+// $Id: mesh_refinement.h,v 1.10 2003-05-20 20:55:01 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -79,7 +79,8 @@ public:
    */
   void flag_elements_by_error_fraction (const ErrorVector& error_per_cell,
 					const Real refine_fraction  = 0.3,
-					const Real coarsen_fraction = 0.0);
+					const Real coarsen_fraction = 0.0,
+					const unsigned int max_level = static_cast<unsigned int>(-1));
 		      
   /**
    * Refines and coarsens user-requested elements. Will also

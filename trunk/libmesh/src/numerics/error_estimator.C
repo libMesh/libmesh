@@ -1,4 +1,4 @@
-// $Id: error_estimator.C,v 1.4 2003-05-19 21:21:13 benkirk Exp $
+// $Id: error_estimator.C,v 1.5 2003-05-20 20:55:04 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -46,6 +46,12 @@ namespace Mpi
 #include "quadrature_gauss.h"
 #include "mesh_logging.h"
 
+
+
+
+//-----------------------------------------------------------------
+// ErrorEstimator implementations
+std::vector<unsigned char> ErrorEstimator::component_mask(0);
 
 
 
@@ -101,6 +107,9 @@ void ErrorEstimator::flux_jump (const EquationSystems& es,
   // The System object to estimate the error for
   const SteadySystem& system = es.get_system<SteadySystem>(name);
 
+  // The number of variables in the system
+  const unsigned int n_vars = system.n_vars();
+  
   // The DofMap for this system
   const DofMap& dof_map = system.get_dof_map();
 
@@ -109,12 +118,29 @@ void ErrorEstimator::flux_jump (const EquationSystems& es,
   error_per_cell.resize (mesh.n_elem());
   std::fill (error_per_cell.begin(), error_per_cell.end(), 0.);
 
+
+  // Check for a valid component_mask
+  if (!component_mask.empty())
+    if (component_mask.size() != n_vars)
+      {
+	std::cerr << "ERROR: component_mask is the wrong size:"
+		  << std::endl
+		  << " component_mask.size()=" << component_mask.size()
+		  << std::endl
+		  << " n_vars=" << n_vars
+		  << std::endl;
+	error();
+      }
   
 
   
   // Loop over all the variables in the system
-  for (unsigned int var=0; var<system.n_vars(); var++)
+  for (unsigned int var=0; var<n_vars; var++)
     {
+      // Possibly skip this variable
+      if (!component_mask.empty())
+	if (component_mask[var] == 0) continue;
+      
       // The type of finite element to use for this variable
       const FEType& fe_type = dof_map.variable_type (var);
 
@@ -209,7 +235,7 @@ void ErrorEstimator::flux_jump (const EquationSystems& es,
 		    fe_f->reinit (f, &qp_f);
 
 		    // The error contribution from this face
-		    Real error = 0.;
+		    Real error = 1.e-10;
 
 		    
 		    
