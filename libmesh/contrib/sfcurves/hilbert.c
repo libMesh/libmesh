@@ -136,9 +136,9 @@ void fhsfc3d(
 {
   const double imax = ~(0u);
   unsigned c[3] ;
-  c[0] = coord[0] * imax ;
-  c[1] = coord[1] * imax ;
-  c[2] = coord[2] * imax ;
+  c[0] = (unsigned) (coord[0] * imax) ;
+  c[1] = (unsigned) (coord[1] * imax) ;
+  c[2] = (unsigned) (coord[2] * imax) ;
   hsfc3d( c , nkey , key );
 }
 
@@ -148,7 +148,7 @@ void hilbert(double *x, double *y, double *z, int *N, int *table)
 {
 #undef INT
 #define INT unsigned
-  
+
   INT index[3];
 
   double extrx[2];
@@ -159,7 +159,7 @@ void hilbert(double *x, double *y, double *z, int *N, int *table)
   int i;
 
   double temp[3]={0.0, 0.0, 0.0};
-  unsigned leng[1]={sizeof(INT )/4};
+  unsigned leng=3;
 
   
   s=malloc((*N)*sizeof(struct m_str ));
@@ -185,7 +185,7 @@ void hilbert(double *x, double *y, double *z, int *N, int *table)
     temp[1]=(y[i]-extry[0])/(extry[1]-extry[0]);
     temp[2]=(z[i]-extrz[0])/(extrz[1]-extrz[0]);
 
-    fhsfc3d(temp,leng,index);
+    fhsfc3d(temp,&leng,index);
     
     s[i].x=x[i];
     s[i].y=y[i];
