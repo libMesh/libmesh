@@ -1,4 +1,4 @@
-// $Id: sparse_matrix.h,v 1.8 2004-10-20 00:33:06 jwpeterson Exp $
+// $Id: sparse_matrix.h,v 1.9 2004-10-20 14:47:49 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -38,7 +38,7 @@
 
 // forward declarations
 template <typename T> class SparseMatrix;
-template <typename T> std::ostream& operator << (std::ostream& os, const SparseMatrix<T>& m);
+template <typename T> inline std::ostream& operator << (std::ostream& os, const SparseMatrix<T>& m);
 
 
 /**
@@ -279,7 +279,8 @@ public:
    * Same as the print method above, but allows you
    * to print to a stream in the standard syntax.
    */
-  friend std::ostream& operator << <T> (std::ostream& os, const SparseMatrix<T>& m);
+  template <typename U>
+  friend std::ostream& operator << (std::ostream& os, const SparseMatrix<U>& m);
   
   /**
    * Print the contents of the matrix to the screen
