@@ -1,4 +1,4 @@
-// $Id: boundary_info.h,v 1.12 2003-03-03 22:23:32 benkirk Exp $
+// $Id: boundary_info.h,v 1.13 2003-03-04 12:59:47 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -52,7 +52,7 @@ class BoundaryInfo
   /**
    * Constructor.  Takes a reference to the mesh.
    */ 
-  BoundaryInfo (unsigned int d, const MeshBase& m);
+  BoundaryInfo (const MeshBase& m);
 
   /**
    * Destructor.  Not much to do.
@@ -119,13 +119,6 @@ class BoundaryInfo
   short int boundary_id (const Node* node) const;
 
   /**
-   * Returns the boundary id associated with node number \p node.
-   * Returns \p invalid_id if the node is not found, so \p invalid_id
-   * can be thought of as a "default" boundary id.
-   */
-  short int boundary_id (const unsigned int node) const;
-
-  /**
    * Returns the boundary id associated with the \p side side of
    * element \p elem.  Note that only one id per side is allowed,
    * however multiple sides per element are allowed.  Returns \p invalid_id
@@ -136,52 +129,23 @@ class BoundaryInfo
 			 const unsigned short int side) const;
 
   /**
-   * Returns the boundary id associated with the \p side side of
-   * element number \p elem.  Note that only one id per side is allowed,
-   * however multiple sides per element are allowed.  Returns \p invalid_id
-   * if the \p side does not have an associated boundary id, hence
-   * \p invalid_id can be used as the default boundary id.
-   */
-  short int boundary_id (const unsigned int elem,
-			 const unsigned short int side) const;
-
-  /**
    * @returns the number of element-based boundary conditions.
    */
   unsigned int n_boundary_conds () const
-  { return elem_list.size(); }
+  { return boundary_side_id.size(); }
   
   /**
-   * @returns a list of nodes that have boundary conditions.
+   * Creates a list of nodes and ids for those nodes.
    */
-  const std::vector<unsigned int>& get_node_list () const
-  { assert(node_list.size() == node_id_list.size()); return node_list; }
-  
-  /**
-   * @returns a list of elements that have boundary conditions.
-   */
-  const std::vector<unsigned int>& get_elem_list () const
-  { assert(elem_list.size() == elem_id_list.size()); return elem_list; }
-  
-  /**
-   * @returns the side of each element that has a boundary condition.
-   */
-  const std::vector<unsigned short int>& get_side_list () const
-  { assert(elem_list.size() == side_list.size()); return side_list; }
+  void build_node_list (std::vector<unsigned int>& nl,
+			std::vector<short int>&    il) const;
 
   /**
-   * @returns a list of boundary condition ids for the nodes.  This
-   * vector is the same size as \p node_list.
+   * Creates a list of element numbers, sides, and  and ids for those sides.
    */
-  const std::vector<short int>& get_node_id_list () const
-  { assert(node_list.size() == node_id_list.size()); return node_id_list; }
-
-  /**
-   * @returns a list of boundary condition ids for the elements.
-   * This vector is the same size as \p elem_list.
-   */
-  const std::vector<short int>& get_elem_id_list () const
-  {  assert(elem_list.size() == elem_id_list.size()); return elem_id_list; }
+  void build_side_list (std::vector<unsigned int>&       el,
+			std::vector<unsigned short int>& sl,
+			std::vector<short int>&          il) const;
 
   /**
    * @returns the user-specified boundary ids.
@@ -211,11 +175,6 @@ class BoundaryInfo
   std::vector<Real> get_boundary_values (const Node* node) const;
 
   /**
-   * @returns the boundary values specified for node number \p node.
-   */
-  std::vector<Real> get_boundary_values (const unsigned int node) const;
-
-  /**
    * Print the boundary information data structure.
    */
   void print_info () const;
@@ -229,30 +188,35 @@ class BoundaryInfo
 
  private:
 
-  
-  const unsigned int dim;
-  
+
+  /**
+   * The Mesh this boundary info pertains to.
+   */
   const MeshBase& mesh;
-  
-  
+
+  /**
+   * Data structure that maps nodes in the mesh
+   * to boundary ids.
+   */  
   std::map<const Node*,
 	   short int> boundary_node_id;
-  
+
+  /**
+   * Data structure that maps sides of elements
+   * to boundary ids.
+   */
   std::multimap<const Elem*,
                 std::pair<unsigned short int, short int> >
                                              boundary_side_id;
-  
+
+  /**
+   * A collection of user-specified boundary ids.
+   */
   std::set<short int> boundary_ids;
 
-
-  std::vector<unsigned int>       node_list;
-  std::vector<short int>          node_id_list;
-  
-  std::vector<unsigned int>       elem_list;
-  std::vector<unsigned short int> side_list;
-  std::vector<short int>          elem_id_list;
-
-  // a vector for boundary values
+  /**
+   * A vector for boundary values
+   */
   std::vector<std::pair<const Node*,
               std::vector<Real> > >   boundary_values;
   
@@ -283,24 +247,18 @@ class BoundaryInfo
   class PrintSideInfo
   {
   public:
-    PrintSideInfo(const std::map<const Elem*, unsigned int>& m) : estn(m) {}
+    PrintSideInfo() {}
     
     inline
     void operator() (const std::pair<const Elem*, std::pair<unsigned short int,short int> >& sp) const
     {
-      std::map<const Elem*, unsigned int>::const_iterator e_num_it =
-	estn.find(sp.first);
-
-      assert (e_num_it != estn.end());
-      
-      std::cout << "  (" << e_num_it->second
+      std::cout << "  (" << sp.first->id()
 		<< ", "  << sp.second.first
 		<< ", "  << sp.second.second 
 		<< ")"   << std::endl;
     }
 
   private:
-    const std::map<const Elem*, unsigned int>& estn;
   };
 
 

@@ -1,4 +1,4 @@
-// $Id: mesh_xdr_support.C,v 1.9 2003-02-20 04:59:58 benkirk Exp $
+// $Id: mesh_xdr_support.C,v 1.10 2003-03-04 12:59:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -464,9 +464,11 @@ void XdrInterface::mesh_interface(const std::string& name,
 	std::cout << "numBCs=" << numBCs << std::endl;
 	
 	//std::cout << "Preparing to write boundary conditions." << std::endl;
-	const std::vector<unsigned int>& elem_list = boundary_info.get_elem_list();
-	const std::vector<unsigned short int>& side_list = boundary_info.get_side_list();
-	const std::vector<short int>& elem_id_list = boundary_info.get_elem_id_list();
+	std::vector<unsigned int> elem_list;
+	std::vector<unsigned short int> side_list;
+	std::vector<short int> elem_id_list;
+
+	boundary_info.build_side_list (elem_list, side_list, elem_id_list);
 	
 	for (int ibc=0;  ibc<numBCs; ibc++)
 	  {

@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.20 2003-03-03 18:03:37 benkirk Exp $
+// $Id: mesh_base.C,v 1.21 2003-03-04 12:59:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -58,7 +58,7 @@ MeshBase::MeshBase (unsigned int d,
 #ifdef ENABLE_AMR
   mesh_refinement    (*this),
 #endif
-  boundary_info      (d,   *this),
+  boundary_info      (*this),
   mesh_communication (*this),
   _n_sbd             (1),
   _n_proc            (1),
@@ -77,7 +77,7 @@ MeshBase::MeshBase (const MeshBase& other_mesh) :
 #ifdef ENABLE_AMR
   mesh_refinement    (*this),
 #endif
-  boundary_info      (other_mesh._dim, *this),
+  boundary_info      (*this),
   mesh_communication (*this),
   _nodes             (other_mesh._nodes),
   _elements          (other_mesh._elements),
