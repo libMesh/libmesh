@@ -1,4 +1,4 @@
-// $Id: libmesh.C,v 1.28 2004-10-19 12:44:10 benkirk Exp $
+// $Id: libmesh.C,v 1.29 2004-10-26 16:16:16 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -154,14 +154,7 @@ void libMesh::init (int &argc, char** & argv)
   // that are not relevant to this application in the above calls.
   // We don't want a false-positive by detecting those arguments.
   command_line->parse_command_line (argc, argv);
-    
-  // redirect std::cout to nothing on all
-  // other processors unless explicitly told
-  // not to via the --keep-cout command-line argument.
-  if (libMesh::processor_id() != 0)
-    if (!libMesh::on_command_line ("--keep-cout"))
-      std::cout.rdbuf (NULL);
-    
+
   // The following line is an optimization when simultaneous
   // C and C++ style access to output streams is not required.
   // The amount of benefit which occurs is probably implementation
@@ -169,6 +162,13 @@ void libMesh::init (int &argc, char** & argv)
   // some IO tests where IO peformance improves by a factor of two.
   if (!libMesh::on_command_line ("--sync-with-stdio"))
     std::ios::sync_with_stdio(false);
+  
+  // redirect std::cout to nothing on all
+  // other processors unless explicitly told
+  // not to via the --keep-cout command-line argument.
+  if (libMesh::processor_id() != 0)
+    if (!libMesh::on_command_line ("--keep-cout"))
+      std::cout.rdbuf (NULL);
 
   
   // The library is now ready for use
