@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.17 2003-03-03 22:23:43 benkirk Exp $
+// $Id: boundary_info.C,v 1.18 2003-03-04 12:59:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -36,11 +36,10 @@
 const short int BoundaryInfo::invalid_id = -1234;
 
 
+
 //------------------------------------------------------
 // BoundaryInfo functions
-BoundaryInfo::BoundaryInfo(unsigned int d,
-			   const MeshBase& m) :
-  dim(d),
+BoundaryInfo::BoundaryInfo(const MeshBase& m) :
   mesh(m)
 {
 }
@@ -60,12 +59,6 @@ void BoundaryInfo::clear()
   boundary_side_id.clear();
   boundary_ids.clear();
   boundary_values.clear();
-  
-  node_list.clear();
-  elem_list.clear();
-  side_list.clear();
-  node_id_list.clear();
-  elem_id_list.clear();
 }
 
 
@@ -185,9 +178,6 @@ void BoundaryInfo::add_node(const Node* node,
   
   boundary_node_id[node] = id;
   boundary_ids.insert(id);
-
-  node_list.push_back(node->id());
-  node_id_list.push_back(id);
 }
 
 
@@ -196,10 +186,6 @@ void BoundaryInfo::add_side(const unsigned int e,
 			    const unsigned short int side,
 			    const short int id)
 {
-  elem_list.push_back(e);
-  side_list.push_back(side);
-  elem_id_list.push_back(id);
-
   add_side (mesh.elem(e), side, id);
 }
 
@@ -238,19 +224,11 @@ void BoundaryInfo::add_side(const Elem* elem,
     AutoPtr<Elem> side_elem(elem->build_side(side));
 
     for (unsigned int n=0; n<side_elem->n_nodes(); n++)
-      if (boundary_id(side_elem->node(n)) == invalid_id)
- 	add_node(side_elem->node(n), id);
+      if (boundary_id(side_elem->get_node(n)) == invalid_id)
+ 	add_node(side_elem->get_node(n), id);
   }
 #endif
   
-}
-
-
-
-
-short int BoundaryInfo::boundary_id(const unsigned int node) const
-{
-  return boundary_id(mesh.node_ptr(node));
 }
 
 
@@ -269,22 +247,14 @@ short int BoundaryInfo::boundary_id(const Node* node) const
 
 
 
-short int BoundaryInfo::boundary_id(const unsigned int e,
-				    const unsigned short int side) const
-{
-  return boundary_id(mesh.elem(e), side);
-}
-
-
-
 short int BoundaryInfo::boundary_id(const Elem* elem,
 				    const unsigned short int side) const
 { 
   std::pair<std::multimap<const Elem*,
-    std::pair<unsigned short int, short int> >::const_iterator,
-    std::multimap<const Elem*,
-    std::pair<unsigned short int, short int> >::const_iterator > 
-    e=boundary_side_id.equal_range(elem);
+                          std::pair<unsigned short int, short int> >::const_iterator,
+            std::multimap<const Elem*,
+                          std::pair<unsigned short int, short int> >::const_iterator > 
+    e = boundary_side_id.equal_range(elem);
 
   // elem not in the data structure
   if (e.first == e.second)
@@ -327,13 +297,6 @@ void BoundaryInfo::add_boundary_values(const Node* node,
 
 
 
-std::vector<Real> BoundaryInfo::get_boundary_values(const unsigned int node) const
-{
-  return get_boundary_values (mesh.node_ptr(node));
-}
-
-
-
 std::vector<Real> BoundaryInfo::get_boundary_values(const Node* node) const
 {
   std::vector<std::pair<const Node*,
@@ -356,6 +319,50 @@ std::vector<Real> BoundaryInfo::get_boundary_values(const Node* node) const
 }
 
 
+
+void BoundaryInfo::build_node_list (std::vector<unsigned int>& nl,
+				    std::vector<short int>&    il) const
+{
+  // Reserve the size, then use push_back
+  nl.reserve (boundary_node_id.size());
+  il.reserve (boundary_node_id.size());
+  
+  std::map<const Node*, short int>::const_iterator pos;
+
+  for (pos=boundary_node_id.begin(); pos != boundary_node_id.end();
+       ++pos)
+    {
+      nl.push_back (pos->first->id());
+      il.push_back (pos->second);
+    }
+}
+
+
+
+void BoundaryInfo::build_side_list (std::vector<unsigned int>&       el,
+				    std::vector<unsigned short int>& sl,
+				    std::vector<short int>&          il) const
+{
+  // Reserve the size, then use push_back
+  el.reserve (boundary_side_id.size());
+  sl.reserve (boundary_side_id.size());
+  il.reserve (boundary_side_id.size());
+
+  std::multimap<const Elem*,
+                std::pair<unsigned short int,
+                          short int> >::const_iterator pos;
+
+  for (pos=boundary_side_id.begin(); pos != boundary_side_id.end();
+       ++pos)
+    {
+      el.push_back (pos->first->id());
+      sl.push_back (pos->second.first);
+      il.push_back (pos->second.second);
+    }
+}
+
+
+
 void BoundaryInfo::print_info() const
 {
   // Print out the nodal BCs
@@ -365,16 +372,6 @@ void BoundaryInfo::print_info() const
 		<< "--------------------------" << std::endl
 		<< "  (Node No., ID)               " << std::endl;
 
-      
-      // Original Code
-      // for (std::map<unsigned int, short int>::const_iterator
-      // 	     it = boundary_node_id.begin(); it != boundary_node_id.end();
-      // 	   ++it)
-      // 	std::cout << "  (" << it->first
-      // 		  << ", "  << it->second
-      //
-
-      // New code
       std::for_each(boundary_node_id.begin(),
 		    boundary_node_id.end(),
 		    PrintNodeInfo());
@@ -383,30 +380,13 @@ void BoundaryInfo::print_info() const
   // Print out the element BCs
   if (!boundary_side_id.empty())
     {
-      // This map must remain local to this scope.
-      std::map<const Elem*, unsigned int> elem_star_to_num;
-
-      for (unsigned int e=0; e<mesh.n_elem(); e++)
-	elem_star_to_num[mesh.elem(e)] = e;      
-
-
       std::cout << "Side Boundary conditions:" << std::endl
 		<< "-------------------------" << std::endl
 		<< "  (Elem No., Side No., ID)      " << std::endl;
 
-      // Original Code
-      // for (std::map<const Elem*, std::pair<unsigned short int, short int> >::const_iterator
-      // 	     it = boundary_side_id.begin(); it != boundary_side_id.end();
-      // 	   ++it)
-      // 	std::cout << "  (" << elem_star_to_num[it->first]
-      // 		  << ", "  << it->second.first
-      // 		  << ", "  << it->second.second 
-      // 		  << ")"   << std::endl;
-
-      // New code
       std::for_each(boundary_side_id.begin(),
 		    boundary_side_id.end(),
-  		    PrintSideInfo(elem_star_to_num)); 
+  		    PrintSideInfo()); 
     }
 }
 

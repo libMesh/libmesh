@@ -1,4 +1,4 @@
-// $Id: boundary_mesh.C,v 1.7 2003-03-03 02:15:58 benkirk Exp $
+// $Id: boundary_mesh.C,v 1.8 2003-03-04 12:59:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -52,9 +52,12 @@ void BoundaryMesh::clear()
 
   // Clear the elements data structure
   {
-    for (unsigned int e=0; e<n_elem(); e++)
-      if (elem(e) != NULL)
-	delete elem(e);
+    for (unsigned int e=0; e<_elements.size(); e++)
+      if (_elements[e] != NULL)
+	{
+	  delete _elements[e];
+	  _elements[e] = NULL;
+	}	    
     
     _elements.clear();
   }
