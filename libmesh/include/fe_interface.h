@@ -1,4 +1,4 @@
-// $Id: fe_interface.h,v 1.17 2003-04-03 14:17:20 ddreyer Exp $
+// $Id: fe_interface.h,v 1.18 2003-04-18 15:46:32 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -131,7 +131,8 @@ public:
 			    const FEType& fe_t,
 			    const Elem* elem,
 			    const Point& p,
-			    const Real tolerance = 1.e-4);
+			    const Real tolerance = 1.e-4,
+			    const bool secure = true);
 
   /**
    * @returns true if the point p is located on the reference element
@@ -240,7 +241,8 @@ private:
 				 const FEType& fe_t,
 				 const Elem* elem,
 				 const Point& p,
-				 const Real tolerance);
+				 const Real tolerance,
+				 const bool secure = true);
 
   static bool ifem_on_reference_element(const Point& p,
 					const ElemType t,

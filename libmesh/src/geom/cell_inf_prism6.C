@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism6.C,v 1.15 2003-04-01 14:19:48 ddreyer Exp $
+// $Id: cell_inf_prism6.C,v 1.16 2003-04-18 15:46:30 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -82,7 +82,9 @@ bool InfPrism6::contains_point (const Point& p) const
       const Point mapped_point = FEInterface::inverse_map(dim(),
 							  fe_type,
 							  this,
-							  p);
+							  p,
+							  1.e-4,
+							  false);
 
       return FEInterface::on_reference_element(mapped_point, this->type());
     }

@@ -1,4 +1,4 @@
-// $Id: inf_fe.h,v 1.25 2003-04-03 14:17:21 ddreyer Exp $
+// $Id: inf_fe.h,v 1.26 2003-04-18 15:46:32 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -66,7 +66,7 @@ class FEComputeData;
  *
  * \author Daniel Dreyer
  * \date 2003
- * \version $Revision: 1.25 $
+ * \version $Revision: 1.26 $
  */
 
 //-------------------------------------------------------------
@@ -89,7 +89,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.25 $
+   * \version $Revision: 1.26 $
    */
   //-------------------------------------------------------------
   // InfFE::Radial class definition
@@ -181,7 +181,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.25 $
+   * \version $Revision: 1.26 $
    */
   //-------------------------------------------------------------
   // InfFE::Base class definition
@@ -356,7 +356,8 @@ public:
    */
   static Point inverse_map (const Elem* elem,
 			    const Point& p,
-			    const Real tolerance = TOLERANCE);
+			    const Real tolerance = TOLERANCE,
+			    const bool secure = true);
 
 
 

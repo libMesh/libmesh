@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.17 2003-04-09 19:27:00 ddreyer Exp $
+// $Id: fe_map.C,v 1.18 2003-04-18 15:46:22 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -483,7 +483,8 @@ Point FE<Dim,T>::map_zeta (const Elem* elem,
 template <unsigned int Dim, FEFamily T>
 Point FE<Dim,T>::inverse_map (const Elem* elem,
 			      const Point& physical_point,
-			      const Real tolerance)
+			      const Real tolerance,
+			      const bool secure)
 {
   assert (elem != NULL);
   assert (tolerance >= 0.);
@@ -569,7 +570,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 	     *
 	     * Where {X}, {X_n} are 3x1 vectors, [J] is a 3x1 matrix
 	     * d(x,y,z)/dxi, and we seek dp, a scalar.  Since the above
-	     * system is either overdermined or rank-deficient, we will
+	     * system is either overdetermined or rank-deficient, we will
 	     * solve the normal equations for this system
 	     *
 	     * [J]^T ({X} - {X_n}) = [J]^T [J] {dp}
@@ -579,7 +580,8 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 	     */	    
 	    const Real G = dxi*dxi;
 	    
-	    assert (G > 0.);
+	    if (secure)
+	      assert (G > 0.);
 	    
 	    const Real Ginv = 1./G;
 	    
@@ -630,9 +632,12 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 	    
 	    const Real det = (G11*G22 - G12*G21);
 	    
-	    assert (det > 0.);
-	    assert (fabs(det) > 1.e-10);
-	    
+	    if (secure)
+	      {
+		assert (det > 0.);
+		assert (fabs(det) > 1.e-10);
+	      }
+
 	    const Real inv_det = 1./det;
 	    
 	    const Real
@@ -693,9 +698,12 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 			      J12*(J23*J31 - J21*J33) +
 			      J13*(J21*J32 - J22*J31));
 	    
-	    assert (det > 0.);
-	    assert (fabs(det) > 1.e-10);
-	    
+	    if (secure)
+	      {
+		assert (det > 0.);
+		assert (fabs(det) > 1.e-10);
+	      }
+
 	    const Real inv_det = 1./det;
 	    
 	    const Real
@@ -757,35 +765,46 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
        */
       if (cnt > 10)
 	{
-	  here();
-	  {
-	    std::cerr << "WARNING: Newton scheme has not converged in "
-		      << cnt << " iterations:" << std::endl
-		      << "   physical_point=";
-	    
-	    physical_point.print();
-	    
-	    std::cerr << "   physical_guess=";
-	    
-	    physical_guess.print();
-	    
-	    std::cerr << "   dp=";
-	    
-	    dp.print();
-	    
-	    std::cerr << "   p=";
-	    
-	    p.print();
-	    
-	    std::cerr << "   error=" << error
-		      << std::endl;
-	  }
-	  
-	  if (cnt > 20)
+	  /**
+	   * Do not bother about devergence when secure is false.
+	   */
+	  if (secure)
 	    {
+	      here();
+	      {
+		std::cerr << "WARNING: Newton scheme has not converged in "
+			  << cnt << " iterations:" << std::endl
+			  << "   physical_point=";
+		
+		physical_point.print();
+		
+		std::cerr << "   physical_guess=";
+		
+		physical_guess.print();
+		
+		std::cerr << "   dp=";
+		
+		dp.print();
+		
+		std::cerr << "   p=";
+		
+		p.print();
+		
+		std::cerr << "   error=" << error
+			  << std::endl;
+	      }
+	    }
+	  if (cnt > 20 && secure)
+	    {
+	     
 	      std::cerr << "ERROR: Newton scheme FAILED to converge in "
 			<< cnt << " iterations!" << std::endl;
+
 	      error();
+	    }
+	  else
+	    {
+	      break;
 	    }
 	}
     }

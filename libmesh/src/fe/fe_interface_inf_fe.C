@@ -1,4 +1,4 @@
-// $Id: fe_interface_inf_fe.C,v 1.6 2003-04-03 14:17:24 ddreyer Exp $
+// $Id: fe_interface_inf_fe.C,v 1.7 2003-04-18 15:46:22 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -471,7 +471,8 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
 				     const FEType& fe_t,
 				     const Elem* elem,
 				     const Point& p,
-				     const Real tolerance)
+				     const Real tolerance,
+				     const bool secure)
 {
   switch (dim)
     {
@@ -481,7 +482,7 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
 	switch (fe_t.inf_map)
 	  {
 	  case CARTESIAN:
-	    return InfFE<1,JACOBI_20_00,CARTESIAN>::inverse_map(elem, p, tolerance);
+	    return InfFE<1,JACOBI_20_00,CARTESIAN>::inverse_map(elem, p, tolerance, secure);
 
 	  case SPHERICAL:
 	  case ELLIPSOIDAL:
@@ -511,7 +512,7 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
 	switch (fe_t.inf_map)
 	  {
 	  case CARTESIAN:
-	    return InfFE<2,JACOBI_20_00,CARTESIAN>::inverse_map(elem, p, tolerance);
+	    return InfFE<2,JACOBI_20_00,CARTESIAN>::inverse_map(elem, p, tolerance, secure);
 
 	  case SPHERICAL:
 	  case ELLIPSOIDAL:
@@ -542,7 +543,7 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
 	switch (fe_t.inf_map)
 	  {
 	  case CARTESIAN:
-	    return InfFE<3,JACOBI_20_00,CARTESIAN>::inverse_map(elem, p, tolerance);
+	    return InfFE<3,JACOBI_20_00,CARTESIAN>::inverse_map(elem, p, tolerance, secure);
 
 	  case SPHERICAL:
 	  case ELLIPSOIDAL:
