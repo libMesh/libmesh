@@ -1,4 +1,4 @@
-// $Id: mesh_gmv_support.C,v 1.17 2003-05-15 23:34:35 benkirk Exp $
+// $Id: mesh_gmv_support.C,v 1.18 2003-05-23 00:30:38 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -238,7 +238,8 @@ void MeshBase::write_gmv(std::ostream& out,
 			<< conn[4] << " ";
 		    }
 
-		else if ((*it)->type() == PRISM6)
+		else if (((*it)->type() == PRISM6) ||
+			 ((*it)->type() == INFPRISM6))
 		  {
 		    /**
 		     * Note that here PRISM6 is treted as
