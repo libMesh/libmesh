@@ -1,4 +1,4 @@
-// $Id: face.h,v 1.8 2003-02-28 23:37:42 benkirk Exp $
+// $Id: face.h,v 1.9 2003-03-26 01:08:15 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -69,6 +69,17 @@ public:
    * @returns 2
    */
   unsigned int n_children_per_side(const unsigned int) const { return 2; }
+
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+  /**
+   * @returns \p false.  All classes derived from \p Face
+   * are finite elements. 
+   */
+  bool infinite () const { return false; }
+
+#endif
+
 };
 
 #endif

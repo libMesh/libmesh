@@ -1,4 +1,4 @@
-// $Id: face_inf_quad.h,v 1.1 2003-03-11 00:47:40 ddreyer Exp $
+// $Id: face_inf_quad.h,v 1.2 2003-03-26 01:08:15 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -130,6 +130,16 @@ public:
    */
   std::pair<Real, Real> qual_bounds (const ElemQuality q) const;
 
+
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+  /**
+   * @returns \p true.  All classes derived from \p InfQuad
+   * are infinite elements. 
+   */
+  bool infinite () const { return true; }
+
+#endif
 
 
 protected:

@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.19 2003-03-05 13:11:57 benkirk Exp $
+// $Id: elem.h,v 1.20 2003-03-26 01:08:15 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -444,7 +444,19 @@ class Elem : public ReferenceCountedObject<Elem>,
   
 #endif
 
-  
+
+
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+  /**
+   * @returns \p true if the element is an infinite element,
+   * \p false  otherwise.  
+   */
+  virtual bool infinite () const = 0;
+
+#endif
+
+
  protected:
 
   
