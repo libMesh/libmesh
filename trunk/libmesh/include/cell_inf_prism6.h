@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism6.h,v 1.9 2003-02-27 00:55:28 benkirk Exp $
+// $Id: cell_inf_prism6.h,v 1.10 2003-02-28 23:37:37 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -60,7 +60,7 @@ public:
   /**
    * Constructor.  By default this element has no parent.
    */
-  InfPrism6  (Cell* p=NULL);
+  InfPrism6  (const Elem* p=NULL);
   
   /**
    * @returns \p INFPRISM6
@@ -141,7 +141,7 @@ private:
 // ------------------------------------------------------------
 // InfPrism6 class member functions
 inline
-InfPrism6::InfPrism6(Cell* p) :
+InfPrism6::InfPrism6(const Elem* p) :
   Prism(InfPrism6::n_nodes(), p) 
 {
 }

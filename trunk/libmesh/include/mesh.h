@@ -1,4 +1,4 @@
-// $Id: mesh.h,v 1.10 2003-02-24 14:35:50 benkirk Exp $
+// $Id: mesh.h,v 1.11 2003-02-28 23:37:43 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -29,6 +29,7 @@
 
 // Local Includes -----------------------------------
 #include "mesh_base.h"
+#include "mesh_communication.h"
 #include "mesh_refinement.h"
 #include "boundary_info.h"
 
@@ -50,20 +51,13 @@ class Mesh : public MeshBase
    * a processor id.  Note that \p proc_id should always
    * be provided for multiprocessor applications.
    */
-  Mesh(unsigned int d,
-       unsigned int proc_id=libMeshBase::processor_id());
+  Mesh (unsigned int d,
+	unsigned int proc_id=libMeshBase::processor_id());
 
   /**
    * Destructor.
    */
   ~Mesh();
-  
-  /**
-   * This class holds the boundary information.  It can store nodes, edges,
-   * and faces with a corresponding id that facilitates setting boundary
-   * conditions.
-   */
-  BoundaryInfo boundary_info;
   
 #ifdef ENABLE_AMR
 
@@ -74,6 +68,19 @@ class Mesh : public MeshBase
   
 #endif
   
+  /**
+   * This class enables parallelization of the mesh.  All
+   * required inter-processor communication is done via this class.
+   */
+  MeshCommunication mesh_communication;
+  
+  /**
+   * This class holds the boundary information.  It can store nodes, edges,
+   * and faces with a corresponding id that facilitates setting boundary
+   * conditions.
+   */
+  BoundaryInfo boundary_info;
+
   /**
    * Builds a \f$ nx \times ny \times nz \f$ (elements) cube.
    * Defaults to a unit cube (or line in 1D, square in 2D),
@@ -106,75 +113,50 @@ class Mesh : public MeshBase
   
   /**
    * Reads the file specified by \p name.  Attempts to figure out the
-   * proper method by the file extension.
+   * proper method by the file extension.  This is now the only
+   * way to read a mesh.  It allows the library to so some initialization
+   * after the mesh is read (particularly for for parallel data layout).
+   * This simplifies life by centralizing this code.
    */
-  void read(const std::string& name);
+  void read (const std::string& name);
 
   
-  /**
-   * Open the file named \p name and read the mesh in Sandia National Lab's
-   * ExodusII format. This is the method to use for reading in meshes generated
-   * by cubit.  Works in 2D for \p TRIs, \p TRI6s, \p QUAD s, and \p QUAD9s.
-   * Works in 3D for \p TET4s, \p TET10s, \p HEX8s, and \p HEX27s.  This only
-   * works for \p Mesh since it needs access to the \p boundary_info
-   * structure.
-   */
-  void read_exd(const std::string& name);
-
-  /**
-   * Read meshes in mgflo's XDR format.
-   * Should be compatible with the mgf
-   * mesh file formats.  This method actualy
-   * expects an ASCII-file.
-   */
-  void read_xdr(const std::string& name);
-
-  /**
-   * Same, but expects a true XDR-Encoded binary file.
-   */
-  void read_xdr_binary(const std::string& name);
-
   /**
    * Read solutions in mgflo's XDR format.
    * Should be compatible with the mgf
    * solution file format. This method expects
    * an ASCII file.
    */
-  void read_xdr_soln(const std::string& name,
-		     std::vector<Number>& soln,
-		     std::vector<std::string>& var_names);
+  void read_xdr_soln (const std::string& name,
+		      std::vector<Number>& soln,
+		      std::vector<std::string>& var_names);
 
   /**
    * Same, but expects a true XDR-Encoded binary file.
    */
-  void read_xdr_soln_binary(const std::string& name,
-			    std::vector<Number>& soln,
-			    std::vector<std::string>& var_names);
+  void read_xdr_soln_binary (const std::string& name,
+			     std::vector<Number>& soln,
+			     std::vector<std::string>& var_names);
   
-  /** 
-   * Read mesh from the file specified by \p name in Universal (unv) format.  
-   */
-  void read_unv(const std::string& name);
-
   /**
    * Write the file specified by \p name.  Attempts to figure out the
    * proper method by the file extension.
    */
-  void write(const std::string& name);
+  void write (const std::string& name);
   
   /**
    * Write to the file specified by \p name.  Attempts to figure out the
    * proper method by the file extension. Also writes data.
    */
-  void write(const std::string& name,
-	     std::vector<Number>& values,
-	     std::vector<std::string>& variable_names);
+  void write (const std::string& name,
+	      std::vector<Number>& values,
+	      std::vector<std::string>& variable_names);
   
   /**
    * Write meshes in DIVA's ASCII
    * format for visualization.
    */
-  void write_diva(const std::string& name);
+  void write_diva (const std::string& name);
     
   /**
    * Write meshes in mgflo's XDR format.
@@ -182,7 +164,7 @@ class Mesh : public MeshBase
    * meshes in general since they will be
    * hybrid meshes.
    */
-  void write_xdr(const std::string& name);
+  void write_xdr (const std::string& name);
 
   /**
    * Write meshes in mgflo's binary XDR format.
@@ -190,23 +172,23 @@ class Mesh : public MeshBase
    * meshes in general since they will be
    * hybrid meshes.
    */
-  void write_xdr_binary(const std::string& name);
+  void write_xdr_binary (const std::string& name);
 
   /**
    * Write solutions in mgflo's XDR format.
    * Should be compatible with the mgf
    * solution file format.  Writes an ASCII file.
    */
-  void write_xdr_soln(const std::string& name,
-		      std::vector<Number>& soln,
-		      std::vector<std::string>& var_names);
-
+  void write_xdr_soln (const std::string& name,
+		       std::vector<Number>& soln,
+		       std::vector<std::string>& var_names);
+  
   /**
    * Same, but writes an XDR-Encoded binary file.
    */
-  void write_xdr_soln_binary(const std::string& name,
-			     std::vector<Number>& soln,
-			     std::vector<std::string>& var_names);
+  void write_xdr_soln_binary (const std::string& name,
+			      std::vector<Number>& soln,
+			      std::vector<std::string>& var_names);
 
   /**
    * Clear all internal data.
@@ -215,6 +197,34 @@ class Mesh : public MeshBase
 
 
  protected:
+
+  /**
+   * Open the file named \p name and read the mesh in Sandia National Lab's
+   * ExodusII format. This is the method to use for reading in meshes generated
+   * by cubit.  Works in 2D for \p TRIs, \p TRI6s, \p QUAD s, and \p QUAD9s.
+   * Works in 3D for \p TET4s, \p TET10s, \p HEX8s, and \p HEX27s.  This only
+   * works for \p Mesh since it needs access to the \p boundary_info
+   * structure.
+   */
+  void read_exd (const std::string& name);
+
+  /**
+   * Read meshes in mgflo's XDR format.
+   * Should be compatible with the mgf
+   * mesh file formats.  This method actualy
+   * expects an ASCII-file.
+   */
+  void read_xdr (const std::string& name);
+
+  /**
+   * Same, but expects a true XDR-Encoded binary file.
+   */
+  void read_xdr_binary (const std::string& name);
+
+  /** 
+   * Read mesh from the file specified by \p name in Universal (unv) format.  
+   */
+  void read_unv (const std::string& name);
 
   /** 
    * Actual implementation of reading a mesh in Universal (unv) format from
@@ -244,9 +254,16 @@ class Mesh : public MeshBase
    */
   void trim_unused_elements(std::set<unsigned int>& unused_elements);
 
-  // The MeshRefinement functions need to be able to
-  // call trim_unused_elements()
+  /**
+   * The \p MeshRefinement functions need to be able to
+   * call trim_unused_elements()
+   */
   friend class MeshRefinement;
+
+  /**
+   * The \p MeshCommunication class needs to be a friend.
+   */
+  friend class MeshCommunication;
   
 #endif
   

@@ -1,4 +1,4 @@
-// $Id: numeric_vector.h,v 1.7 2003-02-20 23:18:07 benkirk Exp $
+// $Id: numeric_vector.h,v 1.8 2003-02-28 23:37:43 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -35,6 +35,8 @@
 
 // forward declarations
 template <typename T> class NumericVector;
+template <typename T> class DenseVector;
+
 
 
 /**
@@ -282,6 +284,15 @@ public:
    * the NumericVector<T> V 
    */
   virtual void add_vector (const NumericVector<T>& V,
+			   const std::vector<unsigned int>& dof_indices) = 0;
+    
+  /**
+   * U+=V where U and V are type 
+   * DenseVector<T> and you
+   * want to specify WHERE to add
+   * the DenseVector<T> V 
+   */
+  virtual void add_vector (const DenseVector<T>& V,
 			   const std::vector<unsigned int>& dof_indices) = 0;
     
   /**

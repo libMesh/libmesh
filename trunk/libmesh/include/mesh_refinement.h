@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.h,v 1.5 2003-01-24 17:24:39 jwpeterson Exp $
+// $Id: mesh_refinement.h,v 1.6 2003-02-28 23:37:43 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -41,9 +41,10 @@ class Point;
 
 
 /**
- * This is the \p MeshRefinement class.
+ * This is the \p MeshRefinement class.  This class implements
+ * adaptive mesh refinement algorithms for a \p Mesh.
  *
- * @author Benjamin S. Kirk, 2002
+ * @author Benjamin S. Kirk, 2002-2003.
  */
 
 
@@ -161,5 +162,5 @@ private:
   Mesh& mesh;
 };
 
-#endif // end #ifdef ENABLE_ARM
+#endif // end #ifdef ENABLE_AMR
 #endif // end #ifndef __mesh_refinement_h__ 

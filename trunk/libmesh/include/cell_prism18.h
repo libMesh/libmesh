@@ -1,4 +1,4 @@
-// $Id: cell_prism18.h,v 1.3 2003-02-27 00:55:28 benkirk Exp $
+// $Id: cell_prism18.h,v 1.4 2003-02-28 23:37:38 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -76,7 +76,7 @@ public:
   /**
    * Constructor.  By default this element has no parent.
    */
-  Prism18  (Cell* p=NULL);
+  Prism18  (const Elem* p=NULL);
   
   /**
    * @returns \p PRISM18
@@ -143,7 +143,7 @@ protected:
 // ------------------------------------------------------------
 // Prism18 class member functions
 inline
-Prism18::Prism18(Cell* p) :
+Prism18::Prism18(const Elem* p) :
   Prism(Prism18::n_nodes(), p) 
 {
 }

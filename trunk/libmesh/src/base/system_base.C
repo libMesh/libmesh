@@ -1,4 +1,4 @@
-// $Id: system_base.C,v 1.7 2003-02-20 04:59:58 benkirk Exp $
+// $Id: system_base.C,v 1.8 2003-02-28 23:37:46 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -81,6 +81,8 @@ void SystemBase::clear ()
 
 void SystemBase::init ()
 {
+  assert (_mesh.is_prepared());
+  
   _dof_map.distribute_dofs (_mesh);
 
 #ifdef ENABLE_AMR

@@ -1,4 +1,4 @@
-// $Id: cell_pyramid5.h,v 1.8 2003-02-27 00:55:28 benkirk Exp $
+// $Id: cell_pyramid5.h,v 1.9 2003-02-28 23:37:38 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -57,7 +57,7 @@ public:
   /**
    * Constructor.  By default this element has no parent.
    */
-  Pyramid5  (Cell* p=NULL);
+  Pyramid5  (const Elem* p=NULL);
   
   /**
    * @returns \p PRYAMID
@@ -112,7 +112,7 @@ protected:
 // ------------------------------------------------------------
 // Pyramid5 class member functions
 inline
-Pyramid5::Pyramid5(Cell* p) :
+Pyramid5::Pyramid5(const Elem* p) :
   Pyramid(Pyramid5::n_nodes(), p) 
 {
 }

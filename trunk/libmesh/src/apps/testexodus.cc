@@ -95,14 +95,6 @@ int main (int argc, char** argv)
 	PerfMon pm("Mesh Input performance");
 	mesh.read(in_name);
       }
-      {
-	PerfMon pm("Find_neighbors performance");
-	mesh.find_neighbors();
-      }
-      {
-	PerfMon pm("Partitioner performance");
-	mesh.metis_partition();
-      }
       mesh.print_info();
     }
 

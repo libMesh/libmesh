@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.21 2003-02-26 04:43:12 jwpeterson Exp $
+// $Id: equation_systems.C,v 1.22 2003-02-28 23:37:45 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -76,6 +76,7 @@ void EquationSystems::init ()
 {
   const unsigned int n_sys = this->n_systems();
   
+  assert (_mesh.is_prepared());
   assert (n_sys != 0);
 
 //   /**
@@ -465,8 +466,8 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln)
       
       if (_mesh.processor_id() == 0)
 	{
-	  std::vector<Number>      elem_soln;   // The finite element solution
-	  std::vector<Number>      nodal_soln;  // The finite elemnt solution interpolated to the nodes
+	  std::vector<Number>       elem_soln;   // The finite element solution
+	  std::vector<Number>       nodal_soln;  // The FE solution interpolated to the nodes
 	  std::vector<unsigned int> dof_indices; // The DOF indices for the finite element 
 	      
 	  for (unsigned int var=0; var<nv_sys; var++)

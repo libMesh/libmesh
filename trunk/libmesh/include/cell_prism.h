@@ -1,4 +1,4 @@
-// $Id: cell_prism.h,v 1.7 2003-02-27 00:55:28 benkirk Exp $
+// $Id: cell_prism.h,v 1.8 2003-02-28 23:37:38 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -44,8 +44,8 @@ public:
    * Default prismatic element, takes number of nodes and 
    * parent. Derived classes implement 'true' elements.
    */
-  Prism(const unsigned int nn, Cell* p);
-
+  Prism(const unsigned int nn, const Elem* p);
+  
   /**
    * @returns 6.  All prism-derivatives are guaranteed to have at
    * least 6 nodes.
@@ -122,11 +122,9 @@ private:
 // ------------------------------------------------------------
 // Prism class member functions
 inline
-Prism::Prism(const unsigned int nn, Cell* p) :
+Prism::Prism(const unsigned int nn, const Elem* p) :
   Cell(nn, Prism::n_sides(), p) 
 {
 }
-
-
 
 #endif

@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.17 2003-02-27 22:26:51 benkirk Exp $
+// $Id: mesh_base.C,v 1.18 2003-02-28 23:37:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -58,7 +58,8 @@ MeshBase::MeshBase (unsigned int d,
   _n_sbd(1),
   _n_proc(1),
   _dim(d),
-  _proc_id(pid)
+  _proc_id(pid),
+  _is_prepared(false)
 {
   assert (DIM <= 3);
   assert (DIM >= _dim);
@@ -68,10 +69,11 @@ MeshBase::MeshBase (unsigned int d,
 
 
 MeshBase::MeshBase (const MeshBase& other_mesh) :
-  _n_sbd   (other_mesh._n_sbd),
-  _n_proc  (other_mesh._n_proc),
-  _dim     (other_mesh._dim),
-  _proc_id (other_mesh._proc_id)
+  _n_sbd       (other_mesh._n_sbd),
+  _n_proc      (other_mesh._n_proc),
+  _dim         (other_mesh._dim),
+  _proc_id     (other_mesh._proc_id),
+  _is_prepared (other_mesh._is_prepared)
 
 {
   _nodes = other_mesh._nodes;
@@ -88,8 +90,8 @@ MeshBase::~MeshBase()
 
 
 
-Node* MeshBase::add_point(const Point& p,
-			  const unsigned int num)
+Node* MeshBase::add_point (const Point& p,
+			   const unsigned int num)
 {  
   libMesh::log.start_event("add_point()");
 
@@ -124,7 +126,7 @@ Node* MeshBase::add_point(const Point& p,
 
 
 
-void MeshBase::add_elem(Elem* e, const unsigned int n)
+void MeshBase::add_elem (Elem* e, const unsigned int n)
 {
   libMesh::log.start_event("add_elem()");
 
@@ -143,14 +145,14 @@ void MeshBase::add_elem(Elem* e, const unsigned int n)
 
 
 
-unsigned int MeshBase::n_active_elem() const
+unsigned int MeshBase::n_active_elem () const
 {
   unsigned int num=0;
 
-  const_active_elem_iterator       it (elements_begin());
-  const const_active_elem_iterator end(elements_end()); 
+  const_active_elem_iterator       el (this->elements_begin());
+  const const_active_elem_iterator end(this->elements_end()); 
 
-  for (; it!=end; ++it)
+  for (; el!=end; ++el)
     num++;
 
   return num;
@@ -158,7 +160,7 @@ unsigned int MeshBase::n_active_elem() const
 
 
 
-void MeshBase::clear()
+void MeshBase::clear ()
 {
   // Reset the number of subdomains and the
   // number of processors
@@ -167,46 +169,58 @@ void MeshBase::clear()
 
   // Clear the elements data structure
   {
-    for (unsigned int e=0; e<n_elem(); e++)
-      if (elem(e) != NULL)
-	delete elem(e);
+    for (unsigned int e=0; e<_elements.size(); e++)
+      if (_elements[e] != NULL)
+	{
+	  delete _elements[e];
+	  _elements[e] = NULL;
+	}
     
     _elements.clear();
   }
 
   // clear the nodes data structure
   {
-    for (unsigned int n=0; n<n_nodes(); n++)
-      if (node_ptr(n) != NULL)
-	delete node_ptr(n);
+    for (unsigned int n=0; n<_nodes.size(); n++)
+      if (_nodes[n] != NULL)
+	{
+	  delete _nodes[n];
+	  _nodes[n] = NULL;
+	}
     
     _nodes.clear();
-  }  
+  }
+
+  // Reset the _is_prepared flag
+  _is_prepared = false;
 }
 
 
 
-unsigned int MeshBase::n_sub_elem() const
+unsigned int MeshBase::n_sub_elem () const
 {
   unsigned int ne=0;
 
-  for (unsigned int i=0; i<n_elem(); i++)
-    ne += elem(i)->n_sub_elem();
+  const_elem_iterator       el (this->elements_begin());
+  const const_elem_iterator end(this->elements_end());
+  
+  for (; el!=end; ++el)
+    ne += (*el)->n_sub_elem(); 
 
   return ne;
 }
 
 
 
-unsigned int MeshBase::n_active_sub_elem() const
+unsigned int MeshBase::n_active_sub_elem () const
 {
   unsigned int ne=0;
 
-  const_active_elem_iterator       it (elements_begin());
-  const const_active_elem_iterator end(elements_end());
+  const_active_elem_iterator       el (this->elements_begin());
+  const const_active_elem_iterator end(this->elements_end());
   
-  for (; it!=end; ++it)
-    ne += (*it)->n_sub_elem(); 
+  for (; el!=end; ++el)
+    ne += (*el)->n_sub_elem(); 
 
   return ne;
 }
@@ -219,21 +233,24 @@ std::vector<ElemType> MeshBase::elem_types() const
 
   assert (n_elem());
 	
+  const_elem_iterator       el (this->elements_begin());
+  const const_elem_iterator end(this->elements_end());
+  
   /**
    * Automatically get the first type
    */
-  et.push_back(elem(0)->type()); 
+  et.push_back((*el)->type());  ++el;
 
   /**
    * Loop over the rest of the elements.
    * If the current element type isn't in the
    * vector, insert it.
    */
-  for (unsigned int e=1; e<n_elem(); e++)
+  for (; el != end; ++el)
     {
-      if (!std::count(et.begin(), et.end(), elem(e)->type()))
+      if (!std::count(et.begin(), et.end(), (*el)->type()))
 	{
-	  et.push_back(elem(e)->type());
+	  et.push_back((*el)->type());
 	}
     }
   
@@ -246,10 +263,10 @@ unsigned int MeshBase::n_elem_of_type(const ElemType type) const
 {
   unsigned int cnt=0;
 
-  const_type_elem_iterator       it (elements_begin(), type);
-  const const_type_elem_iterator end(elements_end(),   type);
+  const_type_elem_iterator       el (this->elements_begin(), type);
+  const const_type_elem_iterator end(this->elements_end(),   type);
 
-  for (; it!=end; ++it)
+  for (; el!=end; ++el)
     cnt++;
   
   return cnt;
@@ -261,10 +278,10 @@ unsigned int MeshBase::n_active_elem_of_type(const ElemType type) const
 {
   unsigned int cnt=0;
 
-  const_active_type_elem_iterator       it (elements_begin(), type);
-  const const_active_type_elem_iterator end(elements_end(),   type);
+  const_active_type_elem_iterator       el (this->elements_begin(), type);
+  const const_active_type_elem_iterator end(this->elements_end(),   type);
   
-  for (; it!=end; ++it)
+  for (; el!=end; ++el)
     cnt++;
     
   return cnt;
@@ -276,11 +293,11 @@ unsigned int MeshBase::total_weight() const
 {
   unsigned int weight=0;
 
-  const_elem_iterator       it (elements_begin());
-  const const_elem_iterator end(elements_end());
+  const_elem_iterator       el (this->elements_begin());
+  const const_elem_iterator end(this->elements_end());
 
-  for ( ; it != end; ++it)
-    weight += (*it)->n_nodes();
+  for ( ; el != end; ++el)
+    weight += (*el)->n_nodes();
   
   return weight;
 }
@@ -351,83 +368,83 @@ void MeshBase::find_neighbors()
   
   //TODO [BSK]: This should be removed later?!
   for (unsigned int e=0; e<n_elem(); e++)
-    for (unsigned int s=0; s<elem(e)->n_sides(); s++)
+    for (unsigned int s=0; s<elem(e)->n_neighbors(); s++)
       elem(e)->set_neighbor(s,NULL);
-
-  unsigned int c0=0, c1=0;
 
   // Find neighboring elements by first finding elements
   // with identical side keys and then check to see if they
   // are neighbors
-  for (unsigned int e=0; e<n_elem(); e++)
-    {
-      Elem* element = elem(e);
-      
-      for (unsigned int ms=0; ms<element->n_sides(); ms++)
-	{
-	next_side:
-	  
-	  if (element->neighbor(ms) == NULL)
-	    {
-	      const AutoPtr<Elem> my_side(element->side(ms));
-	      const unsigned int key      = my_side->key();
-
-	      // Look for elements that have an identical side key
-	      std::pair <std::multimap<unsigned int, Elem*>::iterator,
-		std::multimap<unsigned int, Elem*>::iterator >
-		bounds = side_to_elem.equal_range(key);
-
-	      // If no side corresponding to the key was found...
-	      if (bounds.first == bounds.second)
-		{
-		  c0++;
-		  
-		  // use the lower bound as a hint for
-		  // where to put it.
-		  side_to_elem.insert (bounds.first,
-				       key_val_pair(key, element));	      
-		}
-
-	      // Otherwise may be multiple keys, check all the possible
-	      // elements which _might_ be neighbors.  Be sure not to check
-	      // the element of interest to avoid a false match!
-	      else
-		{
-		  c1++;
-		  for (std::multimap<unsigned int, Elem*>::iterator
-			 it = bounds.first; it != bounds.second; ++it)
-		    if (it->second != element)
-		      {
-			Elem* neighbor = it->second;
-			
-			// look at all their sides
-			for (unsigned int ns=0; ns<neighbor->n_sides(); ns++) 
-			  {
-			    const AutoPtr<Elem> their_side(neighbor->side(ns));
-
-			    // and find a match with my side
-			    if (*my_side == *their_side) 
-			      {
-				// So we are neighbors. Tell the other
-				// element to avoid duplicate searches.
-				element->set_neighbor (ms,neighbor);
-				neighbor->set_neighbor(ns,element);
-				
-				side_to_elem.erase (it);
-				
-				// get out of this nested crap
-				goto next_side; 
-			      }
-			  }
-		      }
-		  
-		  // didn't find a match...
-		  side_to_elem.insert (bounds.first,
-				       key_val_pair(key, element));
-		}
-	    }
-	}
-    }
+  {
+    elem_iterator       el (this->elements_begin());
+    const elem_iterator end(this->elements_end());
+    
+    for (; el != end; ++el)
+      {
+	Elem* element = *el;
+	
+	for (unsigned int ms=0; ms<element->n_neighbors(); ms++)
+	  {
+	  next_side:
+	    
+	    if (element->neighbor(ms) == NULL)
+	      {
+		const AutoPtr<Elem> my_side(element->side(ms));
+		const unsigned int key = my_side->key();
+		
+		// Look for elements that have an identical side key
+		std::pair <std::multimap<unsigned int, Elem*>::iterator,
+		  std::multimap<unsigned int, Elem*>::iterator >
+		  bounds = side_to_elem.equal_range(key);
+		
+		// If no side corresponding to the key was found...
+		if (bounds.first == bounds.second)
+		  {
+		    // use the lower bound as a hint for
+		    // where to put it.
+		    side_to_elem.insert (bounds.first,
+					 key_val_pair(key, element));	      
+		  }
+		
+		// Otherwise may be multiple keys, check all the possible
+		// elements which _might_ be neighbors.  Be sure not to check
+		// the element of interest to avoid a false match!
+		else
+		  {
+		    for (std::multimap<unsigned int, Elem*>::iterator
+			   it = bounds.first; it != bounds.second; ++it)
+		      if (it->second != element)
+			{
+			  Elem* neighbor = it->second;
+			  
+			  // look at all their sides
+			  for (unsigned int ns=0; ns<neighbor->n_neighbors(); ns++) 
+			    {
+			      const AutoPtr<Elem> their_side(neighbor->side(ns));
+			      
+			      // and find a match with my side
+			      if (*my_side == *their_side) 
+				{
+				  // So we are neighbors. Tell the other
+				  // element to avoid duplicate searches.
+				  element->set_neighbor (ms,neighbor);
+				  neighbor->set_neighbor(ns,element);
+				  
+				  side_to_elem.erase (it);
+				  
+				  // get out of this nested crap
+				  goto next_side; 
+				}
+			    }
+			}
+		    
+		    // didn't find a match...
+		    side_to_elem.insert (bounds.first,
+					 key_val_pair(key, element));
+		  }
+	      }
+	  }
+      }
+  }
   
   side_to_elem.clear();
 
@@ -446,19 +463,19 @@ void MeshBase::find_neighbors()
    * Furthermore, that neighbor better be active,
    * otherwise we missed a child somewhere.
    */
-  not_level_elem_iterator it(elements_begin(), 0);
-  not_level_elem_iterator end(elements_end(),   0);
+  not_level_elem_iterator el (this->elements_begin(), 0);
+  not_level_elem_iterator end(this->elements_end(),   0);
 
-  for (; it!=end; ++it)
+  for (; el != end; ++el)
     {
-      for (unsigned int s=0; s < (*it)->n_sides(); s++)
-	if ((*it)->neighbor(s) == NULL)
+      for (unsigned int s=0; s < (*el)->n_neighbors(); s++)
+	if ((*el)->neighbor(s) == NULL)
 	  {
-	    (*it)->set_neighbor(s, (*it)->parent()->neighbor(s));
+	    (*el)->set_neighbor(s, (*el)->parent()->neighbor(s));
 	    
 #ifdef DEBUG	    
-	    if ((*it)->neighbor(s) != NULL)
-	      assert ((*it)->neighbor(s)->active());
+	    if ((*el)->neighbor(s) != NULL)
+	      assert ((*el)->neighbor(s)->active());
 #endif
 	  }
     }
@@ -543,7 +560,7 @@ void MeshBase::build_inf_elem(const Point& origin,
       if (!(elem(e)->active()))
    	continue;
       
-      for (unsigned int s=0; s<elem(e)->n_sides(); s++)
+      for (unsigned int s=0; s<elem(e)->n_neighbors(); s++)
 	{
 	  if (elem(e)->neighbor(s) != NULL)
 	    continue;	 // check if elem(e) is on the boundary
@@ -767,9 +784,14 @@ void MeshBase::build_nodes_to_elem_map (std::vector<std::vector<unsigned int> >&
 {
   nodes_to_elem_map.resize (n_nodes());
 
-  for (unsigned int e=0; e<n_elem(); e++)
-    for (unsigned int n=0; n<elem(e)->n_nodes(); n++)
-      nodes_to_elem_map[elem(e)->node(n)].push_back(e);
+  const_elem_iterator       el (this->elements_begin());
+  const const_elem_iterator end(this->elements_end());
+
+  unsigned int e=0;
+  
+  for (; el != end; ++el)
+    for (unsigned int n=0; n<(*el)->n_nodes(); n++)
+      nodes_to_elem_map[(*el)->node(n)].push_back(e++);
 }
 
 
@@ -781,148 +803,148 @@ void MeshBase::all_tri ()
   std::vector<Elem*> new_elements;
   new_elements.reserve (2*n_elem());
 
-  active_elem_iterator it(elements_begin());
-  active_elem_iterator end(elements_end());
+  active_elem_iterator el (this->elements_begin());
+  active_elem_iterator end(this->elements_end());
 
-  for (; it!=end; ++it)
+  for (; el!=end; ++el)
     {
-      if ((*it)->type() == QUAD4)
+      if ((*el)->type() == QUAD4)
 	{
 	  Elem* tri0 = new Tri3;
 	  Elem* tri1 = new Tri3;
 	  
 	  // Check for possible edge swap
-	  if (((*it)->point(0) - (*it)->point(2)).size() <
-	      ((*it)->point(1) - (*it)->point(3)).size())
+	  if (((*el)->point(0) - (*el)->point(2)).size() <
+	      ((*el)->point(1) - (*el)->point(3)).size())
 	    {	      
-	      tri0->set_node(0) = (*it)->get_node(0);
-	      tri0->set_node(1) = (*it)->get_node(1);
-	      tri0->set_node(2) = (*it)->get_node(2);
+	      tri0->set_node(0) = (*el)->get_node(0);
+	      tri0->set_node(1) = (*el)->get_node(1);
+	      tri0->set_node(2) = (*el)->get_node(2);
 	      
-	      tri1->set_node(0) = (*it)->get_node(0);
-	      tri1->set_node(1) = (*it)->get_node(2);
-	      tri1->set_node(2) = (*it)->get_node(3);
+	      tri1->set_node(0) = (*el)->get_node(0);
+	      tri1->set_node(1) = (*el)->get_node(2);
+	      tri1->set_node(2) = (*el)->get_node(3);
 	    }
 
 	  else
 	    {
-	      tri0->set_node(0) = (*it)->get_node(0);
-	      tri0->set_node(1) = (*it)->get_node(1);
-	      tri0->set_node(2) = (*it)->get_node(3);
+	      tri0->set_node(0) = (*el)->get_node(0);
+	      tri0->set_node(1) = (*el)->get_node(1);
+	      tri0->set_node(2) = (*el)->get_node(3);
 	      
-	      tri1->set_node(0) = (*it)->get_node(1);
-	      tri1->set_node(1) = (*it)->get_node(2);
-	      tri1->set_node(2) = (*it)->get_node(3);
+	      tri1->set_node(0) = (*el)->get_node(1);
+	      tri1->set_node(1) = (*el)->get_node(2);
+	      tri1->set_node(2) = (*el)->get_node(3);
 	    }
 	  
 	  new_elements.push_back(tri0);
 	  new_elements.push_back(tri1);
 	  
-	  delete *it; //_elements[e];
+	  delete *el; //_elements[e];
 	}
       
-      else if ((*it)->type() == QUAD8)
+      else if ((*el)->type() == QUAD8)
 	{
 	  Elem* tri0 = new Tri6;
 	  Elem* tri1 = new Tri6;
 	  
-	  Node* new_node = add_point((node((*it)->node(0)) +
-				      node((*it)->node(1)) +
-				      node((*it)->node(2)) +
-				      node((*it)->node(3)))*.25
+	  Node* new_node = add_point((node((*el)->node(0)) +
+				      node((*el)->node(1)) +
+				      node((*el)->node(2)) +
+				      node((*el)->node(3)))*.25
 				     );
 	  
 	  // Check for possible edge swap
-	  if (((*it)->point(0) - (*it)->point(2)).size() <
-	      ((*it)->point(1) - (*it)->point(3)).size())
+	  if (((*el)->point(0) - (*el)->point(2)).size() <
+	      ((*el)->point(1) - (*el)->point(3)).size())
 	    {	      
-	      tri0->set_node(0) = (*it)->get_node(0);
-	      tri0->set_node(1) = (*it)->get_node(1);
-	      tri0->set_node(2) = (*it)->get_node(2);
-	      tri0->set_node(3) = (*it)->get_node(4);
-	      tri0->set_node(4) = (*it)->get_node(5);
+	      tri0->set_node(0) = (*el)->get_node(0);
+	      tri0->set_node(1) = (*el)->get_node(1);
+	      tri0->set_node(2) = (*el)->get_node(2);
+	      tri0->set_node(3) = (*el)->get_node(4);
+	      tri0->set_node(4) = (*el)->get_node(5);
 	      tri0->set_node(5) = new_node;
 	      
-	      tri1->set_node(0) = (*it)->get_node(0);
-	      tri1->set_node(1) = (*it)->get_node(2);
-	      tri1->set_node(2) = (*it)->get_node(3);
+	      tri1->set_node(0) = (*el)->get_node(0);
+	      tri1->set_node(1) = (*el)->get_node(2);
+	      tri1->set_node(2) = (*el)->get_node(3);
 	      tri1->set_node(3) = new_node;
-	      tri1->set_node(4) = (*it)->get_node(6);
-	      tri1->set_node(5) = (*it)->get_node(7);
+	      tri1->set_node(4) = (*el)->get_node(6);
+	      tri1->set_node(5) = (*el)->get_node(7);
 
 	    }
 	  
 	  else
 	    {
-	      tri0->set_node(0) = (*it)->get_node(3);
-	      tri0->set_node(1) = (*it)->get_node(0);
-	      tri0->set_node(2) = (*it)->get_node(1);
-	      tri0->set_node(3) = (*it)->get_node(7);
-	      tri0->set_node(4) = (*it)->get_node(4);
+	      tri0->set_node(0) = (*el)->get_node(3);
+	      tri0->set_node(1) = (*el)->get_node(0);
+	      tri0->set_node(2) = (*el)->get_node(1);
+	      tri0->set_node(3) = (*el)->get_node(7);
+	      tri0->set_node(4) = (*el)->get_node(4);
 	      tri0->set_node(5) = new_node;
 	      
-	      tri1->set_node(0) = (*it)->get_node(1);
-	      tri1->set_node(1) = (*it)->get_node(2);
-	      tri1->set_node(2) = (*it)->get_node(3);
-	      tri1->set_node(3) = (*it)->get_node(5);
-	      tri1->set_node(4) = (*it)->get_node(6);
+	      tri1->set_node(0) = (*el)->get_node(1);
+	      tri1->set_node(1) = (*el)->get_node(2);
+	      tri1->set_node(2) = (*el)->get_node(3);
+	      tri1->set_node(3) = (*el)->get_node(5);
+	      tri1->set_node(4) = (*el)->get_node(6);
 	      tri1->set_node(5) = new_node;
 	    }
 	  
 	  new_elements.push_back(tri0);
 	  new_elements.push_back(tri1);
 	  
-	  delete *it; //_elements[e];
+	  delete *el; //_elements[e];
 	}
       
-      else if ((*it)->type() == QUAD9)
+      else if ((*el)->type() == QUAD9)
 	{
 	  Elem* tri0 = new Tri6;
 	  Elem* tri1 = new Tri6;
 
 	  // Check for possible edge swap
-	  if (((*it)->point(0) - (*it)->point(2)).size() <
-	      ((*it)->point(1) - (*it)->point(3)).size())
+	  if (((*el)->point(0) - (*el)->point(2)).size() <
+	      ((*el)->point(1) - (*el)->point(3)).size())
 	    {	      
-	      tri0->set_node(0) = (*it)->get_node(0);
-	      tri0->set_node(1) = (*it)->get_node(1);
-	      tri0->set_node(2) = (*it)->get_node(2);
-	      tri0->set_node(3) = (*it)->get_node(4);
-	      tri0->set_node(4) = (*it)->get_node(5);
-	      tri0->set_node(5) = (*it)->get_node(8);
+	      tri0->set_node(0) = (*el)->get_node(0);
+	      tri0->set_node(1) = (*el)->get_node(1);
+	      tri0->set_node(2) = (*el)->get_node(2);
+	      tri0->set_node(3) = (*el)->get_node(4);
+	      tri0->set_node(4) = (*el)->get_node(5);
+	      tri0->set_node(5) = (*el)->get_node(8);
 	      
-	      tri1->set_node(0) = (*it)->get_node(0);
-	      tri1->set_node(1) = (*it)->get_node(2);
-	      tri1->set_node(2) = (*it)->get_node(3);
-	      tri1->set_node(3) = (*it)->get_node(8);
-	      tri1->set_node(4) = (*it)->get_node(6);
-	      tri1->set_node(5) = (*it)->get_node(7);
+	      tri1->set_node(0) = (*el)->get_node(0);
+	      tri1->set_node(1) = (*el)->get_node(2);
+	      tri1->set_node(2) = (*el)->get_node(3);
+	      tri1->set_node(3) = (*el)->get_node(8);
+	      tri1->set_node(4) = (*el)->get_node(6);
+	      tri1->set_node(5) = (*el)->get_node(7);
 	    }
 
 	  else
 	    {
-	      tri0->set_node(0) = (*it)->get_node(0);
-	      tri0->set_node(1) = (*it)->get_node(1);
-	      tri0->set_node(2) = (*it)->get_node(3);
-	      tri0->set_node(3) = (*it)->get_node(4);
-	      tri0->set_node(4) = (*it)->get_node(8);
-	      tri0->set_node(5) = (*it)->get_node(7);
+	      tri0->set_node(0) = (*el)->get_node(0);
+	      tri0->set_node(1) = (*el)->get_node(1);
+	      tri0->set_node(2) = (*el)->get_node(3);
+	      tri0->set_node(3) = (*el)->get_node(4);
+	      tri0->set_node(4) = (*el)->get_node(8);
+	      tri0->set_node(5) = (*el)->get_node(7);
 	      
-	      tri1->set_node(0) = (*it)->get_node(1);
-	      tri1->set_node(1) = (*it)->get_node(2);
-	      tri1->set_node(2) = (*it)->get_node(3);
-	      tri1->set_node(3) = (*it)->get_node(5);
-	      tri1->set_node(4) = (*it)->get_node(6);
-	      tri1->set_node(5) = (*it)->get_node(8);
+	      tri1->set_node(0) = (*el)->get_node(1);
+	      tri1->set_node(1) = (*el)->get_node(2);
+	      tri1->set_node(2) = (*el)->get_node(3);
+	      tri1->set_node(3) = (*el)->get_node(5);
+	      tri1->set_node(4) = (*el)->get_node(6);
+	      tri1->set_node(5) = (*el)->get_node(8);
 	    }
 	  
 	  new_elements.push_back(tri0);
 	  new_elements.push_back(tri1);
 
-	  delete *it; //_elements[e];
+	  delete *el; //_elements[e];
 	}
       else
-	new_elements.push_back(*it);
+	new_elements.push_back(*el);
     }
   
   _elements = new_elements;
@@ -982,8 +1004,8 @@ void MeshBase::sfc_partition(const unsigned int n_sbdmns,
   if (n_sbdmns == 1)
     {
       for (unsigned int e=0; e<n_elem(); e++)
-	elem(e)->subdomain_id() = 
-	  elem(e)->processor_id() = 0;
+	elem(e)->set_subdomain_id() = 
+	  elem(e)->set_processor_id() = 0;
       
       return;
     }
@@ -1025,15 +1047,15 @@ void MeshBase::sfc_partition(const unsigned int n_sbdmns,
 	
   for (unsigned int e=0; e<n_elem(); e++)
     {
-      elem(table[e]-1)->subdomain_id() = 
-	elem(table[e]-1)->processor_id() = 
+      elem(table[e]-1)->set_subdomain_id() = 
+	elem(table[e]-1)->set_processor_id() = 
 	wgt/wgt_per_proc;
 
       wgt += elem(table[e]-1)->n_nodes();
     }
   
   libMesh::log.stop_event("sfc_partition()");
-
+  
   return;
   
 #endif
@@ -1041,8 +1063,112 @@ void MeshBase::sfc_partition(const unsigned int n_sbdmns,
 
 
 
-void MeshBase::distort(const Real factor,
-		       const bool perturb_boundary)
+void MeshBase::renumber_nodes_and_elements ()
+{
+  libMesh::log.start_event("renumber_nodes_and_elements()");
+
+  // Begin by setting all node and element ids
+  // to an invalid value.
+  {
+    elem_iterator       el    (this->elements_begin());
+    const elem_iterator end_el(this->elements_end());
+
+    for (; el != end_el; ++el)
+      (*el)->invalidate_id();
+    
+    node_iterator       nd    (this->nodes_begin());
+    const node_iterator end_nd(this->nodes_end());
+
+    for (; nd != end_nd; ++nd)
+      {
+	(*nd)->invalidate_id();
+	(*nd)->invalidate_processor_id();
+      }
+  }
+
+
+  // Now loop over all the processors
+  {
+    unsigned int next_free_elem = 0;
+    unsigned int next_free_node = 0;
+    
+    for (unsigned int proc_id=0;
+	 proc_id<this->n_processors(); proc_id++)
+      {
+
+	// Loop over the elements on the processor proc_id
+	pid_elem_iterator       el    (this->elements_begin(), proc_id);
+	const pid_elem_iterator end_el(this->elements_end(),   proc_id);
+
+	for (; el != end_el; ++el)
+	  {
+	    // restate the obvious...
+	    assert ((*el)->processor_id() == proc_id);
+	    
+	    // this element should _not_ have been numbered already
+	    assert ((*el)->id() == Elem::invalid_id);
+	    
+	    (*el)->set_id(next_free_elem++);
+
+	    // Number the nodes on the element that
+	    // have not been numbered already.
+	    for (unsigned int n=0; n<(*el)->n_nodes(); n++)
+	      if ((*el)->get_node(n)->id() == Node::invalid_id)
+		{
+		  (*el)->get_node(n)->set_id(next_free_node++);
+
+		  // How could this fail?  Only if something is WRONG!
+		  assert ((*el)->get_node(n)->processor_id() ==
+			  Node::invalid_processor_id);
+		  
+		  (*el)->get_node(n)->set_processor_id((*el)->processor_id());
+		}
+	  }
+      }
+  }
+
+
+  // Finally, reassign the _nodes and _elem vectors
+  {
+    std::vector<Elem*> new_elem  (_elements.size(), NULL);
+    std::vector<Node*> new_nodes (_nodes.size(),    NULL);
+
+    elem_iterator       el    (this->elements_begin());
+    const elem_iterator end_el(this->elements_end());
+
+    for (; el != end_el; ++el)
+      {
+	assert ((*el)->id() < new_elem.size());
+	assert (new_elem[(*el)->id()] == NULL);
+
+	new_elem[(*el)->id()] = *el;
+      }
+
+    node_iterator       nd    (this->nodes_begin());
+    const node_iterator end_nd(this->nodes_end());
+
+    for (; nd != end_nd; ++nd)
+      {
+	assert ((*nd)->id() < new_nodes.size());
+	assert (new_nodes[(*nd)->id()] == NULL);
+
+	new_nodes[(*nd)->id()] = *nd;
+      }
+
+    // Overwrite the nodes and elements containers with the
+    // new, renumbered and sorted values.
+    _elements = new_elem;
+    _nodes    = new_nodes;
+  }
+
+  
+  libMesh::log.stop_event("renumber_nodes_and_elements()");
+}
+
+
+
+void MeshBase::distort (const Real factor,
+			const bool perturb_boundary)
 {
   assert (mesh_dimension() != 1);
   assert (n_nodes());
@@ -1059,13 +1185,13 @@ void MeshBase::distort(const Real factor,
   // so that we don't move them
   if (!perturb_boundary)
     {
-      active_elem_iterator       it (elements_begin());
-      const active_elem_iterator end(elements_end());
-      for (; it!=end; ++it)
-	for (unsigned int s=0; s<(*it)->n_sides(); s++)
-	  if ((*it)->neighbor(s) == NULL) // on the boundary
+      active_elem_iterator       el (this->elements_begin());
+      const active_elem_iterator end(this->elements_end());
+      for (; el != end; ++el)
+	for (unsigned int s=0; s<(*el)->n_neighbors(); s++)
+	  if ((*el)->neighbor(s) == NULL) // on the boundary
 	    {
-	      const AutoPtr<Elem> side((*it)->build_side(s));
+	      const AutoPtr<Elem> side((*el)->build_side(s));
 	      
 	      for (unsigned int n=0; n<side->n_nodes(); n++)
 		on_boundary[side->node(n)] = 1;
@@ -1075,12 +1201,12 @@ void MeshBase::distort(const Real factor,
 
   // Now calculate the minimum distance to
   // neighboring nodes for each node
-  active_elem_iterator       it (elements_begin());
-  const active_elem_iterator end(elements_end());
-  for (; it!=end; ++it)
-    for (unsigned int n=0; n<(*it)->n_nodes(); n++)
-      hmin[(*it)->node(n)] = std::min(hmin[(*it)->node(n)],
-				      (*it)->hmin());		
+  active_elem_iterator       el (this->elements_begin());
+  const active_elem_iterator end(this->elements_end());
+  for (; el!=end; ++el)
+    for (unsigned int n=0; n<(*el)->n_nodes(); n++)
+      hmin[(*el)->node(n)] = std::min(hmin[(*el)->node(n)],
+				      (*el)->hmin());		
 
   
   // Now actually move the nodes
@@ -1240,13 +1366,15 @@ MeshBase::processor_bounding_box (const unsigned int pid) const
   // to only consider those elements living on that processor
   else
     {
-      for (unsigned int e=0; e<n_elem(); e++)
-	if (elem(e)->processor_id() == pid)
-	  for (unsigned int n=0; n<elem(e)->n_nodes(); n++)
+      const_pid_elem_iterator       el (this->elements_begin(), pid);
+      const const_pid_elem_iterator end(this->elements_end(),   pid);
+
+      for (; el != end; ++el)
+	for (unsigned int n=0; n<(*el)->n_nodes(); n++)
 	    for (unsigned int i=0; i<spatial_dimension(); i++)
 	      {
-		min(i) = std::min(min(i), point(elem(e)->node(n))(i));
-		max(i) = std::max(max(i), point(elem(e)->node(n))(i));
+		min(i) = std::min(min(i), point((*el)->node(n))(i));
+		max(i) = std::max(max(i), point((*el)->node(n))(i));
 	      }      
     }
 
@@ -1366,24 +1494,26 @@ void MeshBase::build_L_graph (PetscMatrix<Number>& conn) const
       // at element edges.
     case 2:
       {
-	for (unsigned int e=0; e<n_elem(); e++)
-	  if (elem(e)->active())
-	    for (unsigned int s=0; s<elem(e)->n_sides(); s++)
-	      if ((elem(e)->neighbor(s) == NULL) ||
-		  (elem(e) > elem(e)->neighbor(s)))
-		{
-		  AutoPtr<Elem> side(elem(e)->build_side(s));
-
-		  const unsigned int n0 = side->node(0);
-		  const unsigned int n1 = side->node(1);
-
-		  conn.set(n0,n0, conn(n0,n0) + 1.);		  
-		  conn.set(n0,n1, -1.);
-
-		  conn.set(n1,n1, conn(n1,n1) + 1.);
-		  conn.set(n1,n0, -1.);
-		}
-
+	const_active_elem_iterator       el (this->elements_begin());
+	const const_active_elem_iterator end(this->elements_end());
+	
+	for (; el != end; ++el)
+	  for (unsigned int s=0; s<(*el)->n_neighbors(); s++)
+	    if (((*el)->neighbor(s) == NULL) ||
+		((*el) > (*el)->neighbor(s)))
+	      {
+		AutoPtr<Elem> side((*el)->build_side(s));
+		
+		const unsigned int n0 = side->node(0);
+		const unsigned int n1 = side->node(1);
+		
+		conn.set(n0,n0, conn(n0,n0) + 1.);		  
+		conn.set(n0,n1, -1.);
+		
+		conn.set(n1,n1, conn(n1,n1) + 1.);
+		conn.set(n1,n0, -1.);
+	      }
+	
 	// All done.
 	break;
       }
@@ -1394,34 +1524,36 @@ void MeshBase::build_L_graph (PetscMatrix<Number>& conn) const
       // at element faces, then at the edges of the face.
     case 3:
       {
-	for (unsigned int e=0; e<n_elem(); e++)
-	  if (elem(e)->active())
-	    for (unsigned int f=0; f<elem(e)->n_sides(); f++) // Loop over faces
-	      if ((elem(e)->neighbor(f) == NULL) ||
-		  (elem(e) > elem(e)->neighbor(f)))
-		{
-		  AutoPtr<Elem> face(elem(e)->build_side(f));
+	const_active_elem_iterator       el (this->elements_begin());
+	const const_active_elem_iterator end(this->elements_end());
 
-		  for (unsigned int s=0; s<face->n_sides(); s++) // Loop over face's edges
-		    {
-		      AutoPtr<Elem> side(face->build_side(s));
-
-		      const unsigned int n0 = side->node(0);
-		      const unsigned int n1 = side->node(1);
-
-		      // If this is the first time we've seen this edge
-		      if (conn(n0,n1) == 0.)
-			{
-			  assert (conn(n1,n0) == 0.);
-			  
-			  conn.set(n0,n0, conn(n0,n0) + 1.);		  
-			  conn.set(n0,n1, -1.);
-			  
-			  conn.set(n1,n1, conn(n1,n1) + 1.);
-			  conn.set(n1,n0, -1.);
-			}
-		    }
-		}
+	for (; el != end; ++el)
+	  for (unsigned int f=0; f<(*el)->n_neighbors(); f++) // Loop over faces
+	    if (((*el)->neighbor(f) == NULL) ||
+		((*el) > (*el)->neighbor(f)))
+	      {
+		AutoPtr<Elem> face((*el)->build_side(f));
+		
+		for (unsigned int s=0; s<face->n_neighbors(); s++) // Loop over face's edges
+		  {
+		    AutoPtr<Elem> side(face->build_side(s));
+		    
+		    const unsigned int n0 = side->node(0);
+		    const unsigned int n1 = side->node(1);
+		    
+		    // If this is the first time we've seen this edge
+		    if (conn(n0,n1) == 0.)
+		      {
+			assert (conn(n1,n0) == 0.);
+			
+			conn.set(n0,n0, conn(n0,n0) + 1.);		  
+			conn.set(n0,n1, -1.);
+			
+			conn.set(n1,n1, conn(n1,n1) + 1.);
+			conn.set(n1,n0, -1.);
+		      }
+		  }
+	      }
 
 	// All done
 	break;
@@ -1483,29 +1615,31 @@ void MeshBase::build_script_L_graph (PetscMatrix<Number>& conn) const
       // at element edges.
     case 2:
       {
-	for (unsigned int e=0; e<n_elem(); e++)
-	  if (elem(e)->active())
-	    for (unsigned int s=0; s<elem(e)->n_sides(); s++)
-	      if ((elem(e)->neighbor(s) == NULL) ||
-		  (elem(e) > elem(e)->neighbor(s)))
-		{
-		  AutoPtr<Elem> side(elem(e)->build_side(s));
-
-		  const unsigned int n0 = side->node(0);
-		  const unsigned int n1 = side->node(1);
-
-		  conn.set(n0,n0, 1.);
-		  conn.set(n1,n1, 1.);
-
+	const_active_elem_iterator       el (this->elements_begin());
+	const const_active_elem_iterator end(this->elements_end());
+	
+	for (; el != end; ++el)
+	  for (unsigned int s=0; s<(*el)->n_neighbors(); s++)
+	    if (((*el)->neighbor(s) == NULL) ||
+	        ((*el) > (*el)->neighbor(s)))
+	      {
+		AutoPtr<Elem> side((*el)->build_side(s));
+		
+		const unsigned int n0 = side->node(0);
+		const unsigned int n1 = side->node(1);
+		
+		conn.set(n0,n0, 1.);
+		conn.set(n1,n1, 1.);
+		
 #ifdef USE_COMPLEX_NUMBERS
-		  const Real prod_term = -1./sqrt(l_conn(n0,n0).real()*l_conn(n1,n1).real());
+		const Real prod_term = -1./sqrt(l_conn(n0,n0).real()*l_conn(n1,n1).real());
 #else
-		  const Real prod_term = -1./sqrt(l_conn(n0,n0)*l_conn(n1,n1));
+		const Real prod_term = -1./sqrt(l_conn(n0,n0)*l_conn(n1,n1));
 #endif
-		  
-		  conn.set(n0,n1, prod_term);
-		  conn.set(n1,n0, prod_term);
-		}
+		
+		conn.set(n0,n1, prod_term);
+		conn.set(n1,n0, prod_term);
+	      }
 
 	// All done.
 	break;
@@ -1517,35 +1651,37 @@ void MeshBase::build_script_L_graph (PetscMatrix<Number>& conn) const
       // at element faces, then at the edges of the face.
     case 3:
       {
-	for (unsigned int e=0; e<n_elem(); e++)
-	  if (elem(e)->active())
-	    for (unsigned int f=0; f<elem(e)->n_sides(); f++) // Loop over faces
-	      if ((elem(e)->neighbor(f) == NULL) ||
-		  (elem(e) > elem(e)->neighbor(f)))
-		{
-		  AutoPtr<Elem> face(elem(e)->build_side(f));
-
-		  for (unsigned int s=0; s<face->n_sides(); s++) // Loop over face's edges
-		    {
-		      AutoPtr<Elem> side(face->build_side(s));
-
-		      const unsigned int n0 = side->node(0);
-		      const unsigned int n1 = side->node(1);
-
-		      conn.set(n0,n0, 1.);
-		      conn.set(n1,n1, 1.);
-		      
+	const_active_elem_iterator       el (this->elements_begin());
+	const const_active_elem_iterator end(this->elements_end());
+	
+	for (; el != end; ++el)
+	  for (unsigned int f=0; f<(*el)->n_neighbors(); f++) // Loop over faces
+	    if (((*el)->neighbor(f) == NULL) ||
+		((*el) > (*el)->neighbor(f)))
+	      {
+		AutoPtr<Elem> face((*el)->build_side(f));
+		
+		for (unsigned int s=0; s<face->n_neighbors(); s++) // Loop over face's edges
+		  {
+		    AutoPtr<Elem> side(face->build_side(s));
+		    
+		    const unsigned int n0 = side->node(0);
+		    const unsigned int n1 = side->node(1);
+		    
+		    conn.set(n0,n0, 1.);
+		    conn.set(n1,n1, 1.);
+		    
 #ifdef USE_COMPLEX_NUMBERS
-		      const Real prod_term = -1./sqrt(l_conn(n0,n0).real()*l_conn(n1,n1).real());
+		    const Real prod_term = -1./sqrt(l_conn(n0,n0).real()*l_conn(n1,n1).real());
 #else
-		      const Real prod_term = -1./sqrt(l_conn(n0,n0)*l_conn(n1,n1));
+		    const Real prod_term = -1./sqrt(l_conn(n0,n0)*l_conn(n1,n1));
 #endif
-		      
-		      conn.set(n0,n1, prod_term);
-		      conn.set(n1,n0, prod_term);
-		    }
-		}
-
+		    
+		    conn.set(n0,n1, prod_term);
+		    conn.set(n1,n0, prod_term);
+		  }
+	      }
+	
 	// All done
 	break;
       }

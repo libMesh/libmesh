@@ -1,4 +1,4 @@
-// $Id: cell_tet4.h,v 1.9 2003-02-27 00:55:28 benkirk Exp $
+// $Id: cell_tet4.h,v 1.10 2003-02-28 23:37:39 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -58,7 +58,7 @@ public:
   /**
    * Constructor.  By default this element has no parent.
    */
-  Tet4  (Cell* p=NULL);
+  Tet4  (const Elem* p=NULL);
   
   /**
    * @returns \p TET4
@@ -120,7 +120,7 @@ protected:
 // ------------------------------------------------------------
 // Tet4 class member functions
 inline
-Tet4::Tet4(Cell* p) :
+Tet4::Tet4(const Elem* p) :
   Tet(Tet4::n_nodes(), p) 
 {
 }

@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex16.h,v 1.10 2003-02-27 00:55:28 benkirk Exp $
+// $Id: cell_inf_hex16.h,v 1.11 2003-02-28 23:37:36 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -76,7 +76,7 @@ public:
   /**
    * Constructor.  By default this element has no parent.
    */
-  InfHex16  (Cell* p=NULL);
+  InfHex16  (const Elem* p=NULL);
   
   /**
    * @returns \p INFHEX16
@@ -161,7 +161,7 @@ private:
 // ------------------------------------------------------------
 // InfHex16 class member functions
 inline
-InfHex16::InfHex16(Cell* p) :
+InfHex16::InfHex16(const Elem* p) :
   Hex(InfHex16::n_nodes(), p) 
 {
 }

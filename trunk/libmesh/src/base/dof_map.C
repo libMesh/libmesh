@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.24 2003-02-26 00:47:52 jwpeterson Exp $
+// $Id: dof_map.C,v 1.25 2003-02-28 23:37:45 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -50,6 +50,8 @@ void DofMap::attach_matrix (SparseMatrix<Number>& matrix)
 
 void DofMap::reinit(MeshBase& mesh)
 {
+  assert (mesh.is_prepared());
+  
   libMesh::log.start_event("reinit()");
   
   clear();
@@ -150,6 +152,8 @@ void DofMap::clear()
 
 void DofMap::distribute_dofs(MeshBase& mesh)
 {
+  assert (mesh.is_prepared());
+  
   const unsigned int proc_id = mesh.processor_id();
   const unsigned int n_proc  = mesh.n_processors();
   
@@ -273,6 +277,7 @@ void DofMap::distribute_dofs(MeshBase& mesh)
 
 void DofMap::compute_sparsity(MeshBase& mesh)
 {
+  assert (mesh.is_prepared());
   assert (this->n_variables());
 
   libMesh::log.start_event("compute_sparsity()");
@@ -529,6 +534,8 @@ void DofMap::dof_indices (const Elem* elem,
 
 void DofMap::create_dof_constraints(MeshBase& mesh)
 {
+  assert (mesh.is_prepared());
+  
   libMesh::log.start_event("create_dof_constraints()");
 
   const unsigned int dim = mesh.mesh_dimension();

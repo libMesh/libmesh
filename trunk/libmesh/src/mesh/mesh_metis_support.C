@@ -1,4 +1,4 @@
-// $Id: mesh_metis_support.C,v 1.7 2003-02-14 15:22:50 benkirk Exp $
+// $Id: mesh_metis_support.C,v 1.8 2003-02-28 23:37:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -59,8 +59,8 @@ void MeshBase::metis_partition(const unsigned int n_sbdmns,
   if (n_sbdmns == 1)
     {
       for (unsigned int e=0; e<n_elem(); e++)
-	elem(e)->subdomain_id() = 
-	  elem(e)->processor_id() = 0;
+	elem(e)->set_subdomain_id() = 
+	  elem(e)->set_processor_id() = 0;
       
       return;
     }
@@ -159,11 +159,11 @@ void MeshBase::metis_partition(const unsigned int n_sbdmns,
 
 
   for (unsigned int e=0; e<n_elem(); e++)
-    elem(e)->subdomain_id() = 
-      elem(e)->processor_id() = 
+    elem(e)->set_subdomain_id() = 
+      elem(e)->set_processor_id() = 
       static_cast<short int>(part[e]);
 
   libMesh::log.stop_event("metis_partition()");
-  
+
 #endif
 }

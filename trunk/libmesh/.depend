@@ -3,6 +3,7 @@ src/base/dof_map.$(obj-suffix):\
     include/auto_ptr.h\
     include/coupling_matrix.h\
     include/dense_matrix.h\
+    include/dense_vector.h\
     include/dof_map.h\
     include/dof_object.h\
     include/elem.h\
@@ -43,6 +44,7 @@ src/base/equation_systems.$(obj-suffix):\
     include/boundary_mesh.h\
     include/coupling_matrix.h\
     include/dense_matrix.h\
+    include/dense_vector.h\
     include/dof_map.h\
     include/dof_object.h\
     include/elem.h\
@@ -65,6 +67,7 @@ src/base/equation_systems.$(obj-suffix):\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
+    include/mesh_communication.h\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
@@ -87,6 +90,7 @@ src/base/equation_systems_io.$(obj-suffix):\
     include/boundary_mesh.h\
     include/coupling_matrix.h\
     include/dense_matrix.h\
+    include/dense_vector.h\
     include/dof_map.h\
     include/dof_object.h\
     include/elem.h\
@@ -107,6 +111,7 @@ src/base/equation_systems_io.$(obj-suffix):\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
+    include/mesh_communication.h\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
@@ -131,6 +136,7 @@ src/base/frequency_system.$(obj-suffix):\
     include/boundary_mesh.h\
     include/coupling_matrix.h\
     include/dense_matrix.h\
+    include/dense_vector.h\
     include/dof_map.h\
     include/dof_object.h\
     include/elem.h\
@@ -151,6 +157,7 @@ src/base/frequency_system.$(obj-suffix):\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
+    include/mesh_communication.h\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
@@ -172,6 +179,7 @@ src/base/general_system.$(obj-suffix):\
     include/boundary_mesh.h\
     include/coupling_matrix.h\
     include/dense_matrix.h\
+    include/dense_vector.h\
     include/dof_map.h\
     include/dof_object.h\
     include/elem.h\
@@ -193,6 +201,7 @@ src/base/general_system.$(obj-suffix):\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
+    include/mesh_communication.h\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
@@ -245,6 +254,7 @@ src/base/system_base.$(obj-suffix):\
     include/boundary_mesh.h\
     include/coupling_matrix.h\
     include/dense_matrix.h\
+    include/dense_vector.h\
     include/dof_map.h\
     include/dof_object.h\
     include/elem.h\
@@ -264,6 +274,7 @@ src/base/system_base.$(obj-suffix):\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
+    include/mesh_communication.h\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
@@ -908,6 +919,7 @@ src/geom/cell_inf_hex16.$(obj-suffix):\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
+    include/mesh_communication.h\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
@@ -939,6 +951,7 @@ src/geom/cell_inf_hex18.$(obj-suffix):\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
+    include/mesh_communication.h\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
@@ -970,6 +983,7 @@ src/geom/cell_inf_hex8.$(obj-suffix):\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
+    include/mesh_communication.h\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
@@ -1003,6 +1017,7 @@ src/geom/cell_inf_prism12.$(obj-suffix):\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
+    include/mesh_communication.h\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
@@ -1036,6 +1051,7 @@ src/geom/cell_inf_prism6.$(obj-suffix):\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
+    include/mesh_communication.h\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
@@ -1348,6 +1364,7 @@ src/geom/elem.$(obj-suffix):\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
+    include/mesh_communication.h\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
@@ -1396,6 +1413,7 @@ src/geom/face_inf_quad4.$(obj-suffix):\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
+    include/mesh_communication.h\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
@@ -1427,6 +1445,7 @@ src/geom/face_inf_quad6.$(obj-suffix):\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
+    include/mesh_communication.h\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
@@ -1619,6 +1638,7 @@ src/mesh/boundary_info.$(obj-suffix):\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
+    include/mesh_communication.h\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
@@ -1663,6 +1683,7 @@ src/mesh/mesh_base.$(obj-suffix):\
     include/cell_prism.h\
     include/coupling_matrix.h\
     include/dense_matrix.h\
+    include/dense_vector.h\
     include/dof_map.h\
     include/dof_object.h\
     include/elem.h\
@@ -1710,6 +1731,7 @@ src/mesh/mesh.$(obj-suffix):\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
+    include/mesh_communication.h\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
@@ -1736,6 +1758,7 @@ src/mesh/mesh_diva_support.$(obj-suffix):\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
+    include/mesh_communication.h\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
@@ -1761,6 +1784,7 @@ src/mesh/mesh_exodus_support.$(obj-suffix):\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
+    include/mesh_communication.h\
     include/mesh_config.h\
     include/mesh_exodus_support.h\
     include/mesh_refinement.h\
@@ -1807,6 +1831,7 @@ src/mesh/mesh_generation.$(obj-suffix):\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
+    include/mesh_communication.h\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
@@ -1906,6 +1931,7 @@ src/mesh/mesh_refinement.$(obj-suffix):\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
+    include/mesh_communication.h\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
@@ -2000,6 +2026,7 @@ src/mesh/mesh_unv_support.$(obj-suffix):\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
+    include/mesh_communication.h\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/mesh_unv_support.h\
@@ -2028,6 +2055,7 @@ src/mesh/mesh_xdr_support.$(obj-suffix):\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
+    include/mesh_communication.h\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/mesh_xdr_support.h\
@@ -2051,6 +2079,7 @@ src/numerics/dense_matrix.$(obj-suffix):\
 src/numerics/distributed_vector.$(obj-suffix):\
     src/numerics/distributed_vector.C\
     include/auto_ptr.h\
+    include/dense_vector.h\
     include/distributed_vector.h\
     include/enum_solver_package.h\
     include/libmesh_base.h\
@@ -2064,6 +2093,7 @@ src/numerics/laspack_interface.$(obj-suffix):\
     include/auto_ptr.h\
     include/coupling_matrix.h\
     include/dense_matrix.h\
+    include/dense_vector.h\
     include/dof_map.h\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
@@ -2088,6 +2118,7 @@ src/numerics/laspack_matrix.$(obj-suffix):\
     include/auto_ptr.h\
     include/coupling_matrix.h\
     include/dense_matrix.h\
+    include/dense_vector.h\
     include/dof_map.h\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
@@ -2104,6 +2135,7 @@ src/numerics/laspack_matrix.$(obj-suffix):\
 src/numerics/laspack_vector.$(obj-suffix):\
     src/numerics/laspack_vector.C\
     include/auto_ptr.h\
+    include/dense_vector.h\
     include/enum_solver_package.h\
     include/laspack_vector.h\
     include/libmesh_base.h\
@@ -2117,6 +2149,7 @@ src/numerics/linear_solver_interface.$(obj-suffix):\
     include/auto_ptr.h\
     include/coupling_matrix.h\
     include/dense_matrix.h\
+    include/dense_vector.h\
     include/dof_map.h\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
@@ -2142,6 +2175,7 @@ src/numerics/linear_solver_interface.$(obj-suffix):\
 src/numerics/numeric_vector.$(obj-suffix):\
     src/numerics/numeric_vector.C\
     include/auto_ptr.h\
+    include/dense_vector.h\
     include/enum_solver_package.h\
     include/laspack_vector.h\
     include/libmesh_base.h\
@@ -2156,6 +2190,7 @@ src/numerics/petsc_interface.$(obj-suffix):\
     include/auto_ptr.h\
     include/coupling_matrix.h\
     include/dense_matrix.h\
+    include/dense_vector.h\
     include/dof_map.h\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
@@ -2180,6 +2215,7 @@ src/numerics/petsc_matrix.$(obj-suffix):\
     include/auto_ptr.h\
     include/coupling_matrix.h\
     include/dense_matrix.h\
+    include/dense_vector.h\
     include/dof_map.h\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
@@ -2198,6 +2234,7 @@ src/numerics/petsc_matrix.$(obj-suffix):\
 src/numerics/petsc_vector.$(obj-suffix):\
     src/numerics/petsc_vector.C\
     include/auto_ptr.h\
+    include/dense_vector.h\
     include/enum_solver_package.h\
     include/libmesh_base.h\
     include/mesh_common.h\
@@ -2211,6 +2248,7 @@ src/numerics/sparse_matrix.$(obj-suffix):\
     include/auto_ptr.h\
     include/coupling_matrix.h\
     include/dense_matrix.h\
+    include/dense_vector.h\
     include/dof_map.h\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\

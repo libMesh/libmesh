@@ -1,4 +1,4 @@
-// $Id: cell_prism15.h,v 1.2 2003-02-27 00:55:28 benkirk Exp $
+// $Id: cell_prism15.h,v 1.3 2003-02-28 23:37:38 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -76,7 +76,7 @@ public:
   /**
    * Constructor.  By default this element has no parent.
    */
-  Prism15  (Cell* p=NULL);
+  Prism15  (const Elem* p=NULL);
   
   /**
    * @returns \p PRISM15
@@ -137,7 +137,7 @@ protected:
 // ------------------------------------------------------------
 // Prism15 class member functions
 inline
-Prism15::Prism15(Cell* p) :
+Prism15::Prism15(const Elem* p) :
   Prism(Prism15::n_nodes(), p) 
 {
 }

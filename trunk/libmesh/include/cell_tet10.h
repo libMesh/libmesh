@@ -1,4 +1,4 @@
-// $Id: cell_tet10.h,v 1.8 2003-02-27 00:55:28 benkirk Exp $
+// $Id: cell_tet10.h,v 1.9 2003-02-28 23:37:38 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -65,7 +65,7 @@ public:
   /**
    * Constructor.  By default this element has no parent.
    */
-  Tet10  (Cell* p=NULL);
+  Tet10  (const Elem* p=NULL);
   
   /**
    * @returns \p TET10
@@ -132,7 +132,7 @@ protected:
 // ------------------------------------------------------------
 // Tet10 class member functions
 inline
-Tet10::Tet10(Cell* p) :
+Tet10::Tet10(const Elem* p) :
   Tet(Tet10::n_nodes(), p) 
 {
 }

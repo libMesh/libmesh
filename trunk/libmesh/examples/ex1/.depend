@@ -10,9 +10,11 @@ ex1.$(obj-suffix):\
     ../../include/enum_elem_type.h\
     ../../include/enum_order.h\
     ../../include/libmesh.h\
+    ../../include/libmesh_base.h\
     ../../include/mesh.h\
     ../../include/mesh_base.h\
     ../../include/mesh_common.h\
+    ../../include/mesh_communication.h\
     ../../include/mesh_config.h\
     ../../include/mesh_refinement.h\
     ../../include/node.h\

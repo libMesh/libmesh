@@ -1,4 +1,4 @@
-// $Id: dof_object.h,v 1.5 2003-02-15 05:21:11 benkirk Exp $
+// $Id: dof_object.h,v 1.6 2003-02-28 23:37:42 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -46,7 +46,7 @@
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.5 $
+ * \version $Revision: 1.6 $
  */
 
 class DofObject
@@ -83,6 +83,21 @@ public:
   void invalidate_dofs ();
 
   /**
+   * Sets the id to \p invalid_id
+   */
+  void invalidate_id ();
+
+  /**
+   * Sets the processor id to \p invalid_processor_id
+   */
+  void invalidate_processor_id ();
+
+  /**
+   * Invalidates all the indices for this \p DofObject
+   */
+  void invalidate ();
+  
+  /**
    * @returns the number of degrees of freedom associated with
    * system \p s for this object. Optionally only counts degrees
    * of freedom for variable number \p var
@@ -107,6 +122,23 @@ public:
   void set_id (const unsigned int id)
   { set_id() = id; }
 
+  /**
+   * @returns the processor that this element belongs to.
+   * To conserve space this is stored as a short integer.
+   */
+  unsigned short int processor_id () const;
+  
+  /**
+   * @returns the processor that this element belongs to as a
+   * writeable reference.
+   */
+  unsigned short int & set_processor_id ();
+
+  /**
+   * Sets the \p processor_id for this \p DofObject.
+   */  
+  void set_processor_id (const unsigned int id);
+  
   /**
    * @returns the number of systes associated with this
    * \p DofObject
@@ -169,9 +201,15 @@ public:
 		      const unsigned int dn);
   
   /**
-   * An invaild \p id to distinguish an uninitialized \p Node
+   * An invaild \p id to distinguish an uninitialized \p DofObject
    */
   static const unsigned int invalid_id;
+
+  /**
+   * An invalid \p processor_id to distinguish DOFs that have
+   * not been assigned to a processor.
+   */
+  static const unsigned short int invalid_processor_id;
 
   
 private:
@@ -181,6 +219,17 @@ private:
    * The \p id of the \p DofObject
    */
   unsigned int _id;
+
+  /**
+   * The \p processor_id of the \p DofObject.
+   * Degrees of freedom are wholly owned by processors,
+   * however they may be duplicated on other processors.
+   *
+   * This is stored as an unsigned short int since we cannot
+   * expect to be solving on 65000+ processors any time soon,
+   * can we??
+   */
+  unsigned short int _processor_id;
 
   /**
    * The number of systems.
@@ -228,6 +277,7 @@ private:
 inline
 DofObject::DofObject () :
   _id (invalid_id),
+  _processor_id (invalid_processor_id),
   _n_systems  (0),
   _n_vars (NULL),
 #ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
@@ -235,6 +285,7 @@ DofObject::DofObject () :
 #endif
   _dof_ids (NULL)
 {
+  this->invalidate();
 }
 
 
@@ -242,6 +293,7 @@ DofObject::DofObject () :
 inline
 DofObject::DofObject (const DofObject& dof_obj) :
   _id (dof_obj._id),
+  _processor_id (dof_obj._processor_id),
   _n_systems  (dof_obj._n_systems),
   _n_vars (NULL),
 #ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
@@ -309,12 +361,12 @@ void DofObject::clear_dofs ()
 {
 #ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
 
-  if (n_systems() != 0)
+  if (this->n_systems() != 0)
     {
-      for (unsigned int s=0; s<n_systems(); s++)
+      for (unsigned int s=0; s<this->n_systems(); s++)
 	{
-	  for (unsigned int v=0; v<n_vars(s); v++)
-	    if (n_comp(s,v) != 0)
+	  for (unsigned int v=0; v<this->n_vars(s); v++)
+	    if (this->n_comp(s,v) != 0)
 	      {
 		assert (_dof_ids[s][v] != NULL); delete [] _dof_ids[s][v]; _dof_ids[s][v] = NULL;
 	      }
@@ -330,9 +382,9 @@ void DofObject::clear_dofs ()
   
 #else
 
-  if (n_systems() != 0)
+  if (this->n_systems() != 0)
     {
-      for (unsigned int s=0; s<n_systems(); s++)
+      for (unsigned int s=0; s<this->n_systems(); s++)
 	{
 	  assert(_dof_ids[s] != NULL); delete [] _dof_ids[s] ; _dof_ids[s] = NULL;
 	}
@@ -345,8 +397,8 @@ void DofObject::clear_dofs ()
 
   
 
-  _n_systems = 0;
-  _id = invalid_id;
+  _n_systems    = 0;
+  this->invalidate ();
 }
 
 
@@ -357,28 +409,54 @@ void DofObject::invalidate_dofs ()
   for (unsigned int s=0; s<n_systems(); s++)
     for (unsigned int v=0; v<n_vars(s); v++)
       for (unsigned int c=0; c<n_comp(s,v); c++)
-	set_dof_number(s,v,c,invalid_id);
+	this->set_dof_number(s,v,c,invalid_id);
 }
 
+
+
+inline
+void DofObject::invalidate_id ()
+{
+  this->set_id (invalid_id);
+}
+
+
+
+inline
+void DofObject::invalidate_processor_id ()
+{
+  this->set_processor_id (invalid_processor_id);
+}
+
+
+
+inline
+void DofObject::invalidate ()
+{
+  this->invalidate_dofs ();
+  this->invalidate_id ();
+  this->invalidate_processor_id ();
+}
+  
 
 
 inline
 unsigned int DofObject::n_dofs (const unsigned int s,
 				const unsigned int var) const
 {
-  assert (s < n_systems());
+  assert (s < this->n_systems());
   
   unsigned int num = 0;
 
   // Count all variables
   if (var == static_cast<unsigned int>(-1))
-    for (unsigned int v=0; v<n_vars(s); v++)
-      num += n_comp(s,v);
+    for (unsigned int v=0; v<this->n_vars(s); v++)
+      num += this->n_comp(s,v);
   
   // Only count specified variable
   else
     {
-      num = n_comp(s,var);
+      num = this->n_comp(s,var);
     }
 
   return num;
@@ -389,8 +467,6 @@ unsigned int DofObject::n_dofs (const unsigned int s,
 inline
 unsigned int DofObject::id () const
 {
-  assert (_id != invalid_id);
-
   return _id;
 }
 
@@ -400,6 +476,38 @@ inline
 unsigned int & DofObject::set_id ()
 {
   return _id;
+}
+
+
+
+inline
+unsigned short int DofObject::processor_id () const
+{
+  return _processor_id;
+}
+
+
+
+inline
+unsigned short int & DofObject::set_processor_id ()
+{
+  return _processor_id;
+}
+ 
+
+
+inline
+void DofObject::set_processor_id (const unsigned int id)
+{
+  if (id != static_cast<unsigned int>(static_cast<unsigned short int>(id)))
+    {
+      std::cerr << "ERROR: id too large for unsigned short int!" << std::endl
+		<< "Recompile with DofObject::_processor_id larger!" << std::endl;
+      
+      error();
+    }
+  
+  this->set_processor_id() = id;
 }
 
 
@@ -433,12 +541,12 @@ void DofObject::set_n_systems (const unsigned int ns)
 #ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
 
   // Free memory and start over
-  if (n_systems())
+  if (this->n_systems())
     {
-      for (unsigned int s=0; s<n_systems(); s++)
+      for (unsigned int s=0; s<this->n_systems(); s++)
 	{
-	  for (unsigned int v=0; v<n_vars(s); v++)
-	    if (n_comp(s,v) != 0)
+	  for (unsigned int v=0; v<this->n_vars(s); v++)
+	    if (this->n_comp(s,v) != 0)
 	      {
 		assert (_dof_ids[s][v] != NULL); delete [] _dof_ids[s][v]; _dof_ids[s][v] = NULL;
 	      }
@@ -458,7 +566,7 @@ void DofObject::set_n_systems (const unsigned int ns)
   _n_comp    = new unsigned char* [n_systems()];
   _dof_ids   = new unsigned int** [n_systems()];
   
-  for (unsigned int s=0; s<n_systems(); s++)
+  for (unsigned int s=0; s<this->n_systems(); s++)
     {
       _n_vars[s]  = 0;
       _n_comp[s]  = NULL;
@@ -468,9 +576,9 @@ void DofObject::set_n_systems (const unsigned int ns)
 #else
 
   // Free memory and start over
-  if (n_systems())
+  if (this->n_systems())
     {
-      for (unsigned int s=0; s<n_systems(); s++)
+      for (unsigned int s=0; s<this->n_systems(); s++)
 	{
 	  assert (_dof_ids[s] != NULL); delete [] _dof_ids[s]; _dof_ids[s] = NULL;
 	}
@@ -484,7 +592,7 @@ void DofObject::set_n_systems (const unsigned int ns)
   _n_vars    = new unsigned char  [n_systems()];
   _dof_ids   = new unsigned int*  [n_systems()];
   
-  for (unsigned int s=0; s<n_systems(); s++)
+  for (unsigned int s=0; s<this->n_systems(); s++)
     {
       _n_vars[s]  = 0;
       _dof_ids[s] = NULL;
@@ -607,7 +715,7 @@ void DofObject::add_system()
 inline
 unsigned int DofObject::n_vars(const unsigned int s) const
 {
-  assert (s < n_systems());
+  assert (s < this->n_systems());
   assert (_n_vars != NULL);
   
   return static_cast<unsigned int>(_n_vars[s]);
@@ -619,7 +727,7 @@ inline
 void DofObject::set_n_vars(const unsigned int s,
 			   const unsigned int nvars)
 {
-  assert (s < n_systems());
+  assert (s < this->n_systems());
   assert (_n_vars != NULL);
   
 //#if !defined(NDEBUG)
@@ -639,9 +747,9 @@ void DofObject::set_n_vars(const unsigned int s,
 #ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
   
   // If we already have memory allocated clear it.
-  if (n_vars(s))
+  if (this->n_vars(s))
     {
-      for (unsigned int v=0; v<n_vars(s); v++)
+      for (unsigned int v=0; v<this->n_vars(s); v++)
 	if (n_comp(s,v) != 0)
 	  {
 	    assert (_dof_ids[s][v] != NULL); delete [] _dof_ids[s][v]; _dof_ids[s][v] = NULL;
@@ -655,12 +763,12 @@ void DofObject::set_n_vars(const unsigned int s,
   
   _n_vars[s] = static_cast<unsigned char>(nvars);
 
-  if (n_vars(s) > 0)
+  if (this->n_vars(s) > 0)
     {
-      _n_comp[s]  = new unsigned char [n_vars(s)];
-      _dof_ids[s] = new unsigned int* [n_vars(s)];
+      _n_comp[s]  = new unsigned char [this->n_vars(s)];
+      _dof_ids[s] = new unsigned int* [this->n_vars(s)];
       
-      for (unsigned int v=0; v<n_vars(s); v++)
+      for (unsigned int v=0; v<this->n_vars(s); v++)
 	{
 	  _n_comp[s][v]  = 0;
 	  _dof_ids[s][v] = NULL;
@@ -670,19 +778,19 @@ void DofObject::set_n_vars(const unsigned int s,
 #else
 
   // If we already have memory allocated clear it.
-  if (n_vars(s) > 0)
+  if (this->n_vars(s) > 0)
     {
       assert (_dof_ids[s] != NULL); delete [] _dof_ids[s]; _dof_ids[s] = NULL;
     }
   
   _n_vars[s] = static_cast<unsigned char>(nvars);
 
-  if (n_vars(s) > 0)
+  if (this->n_vars(s) > 0)
     {
-      _dof_ids[s] = new unsigned int [n_vars(s)];
+      _dof_ids[s] = new unsigned int [this->n_vars(s)];
       
       // We use (invalid_id - 1) to signify n_comp(s,var) = 0.
-      for (unsigned int v=0; v<n_vars(s); v++)
+      for (unsigned int v=0; v<this->n_vars(s); v++)
 	_dof_ids[s][v] = invalid_id - 1;
     }
   
@@ -695,7 +803,7 @@ inline
 unsigned int DofObject::n_comp(const unsigned int s,
 			       const unsigned int var) const
 {
-  assert (s < n_systems());
+  assert (s < this->n_systems());
   assert (_dof_ids != NULL);
   assert (_dof_ids[s] != NULL);
 
@@ -704,7 +812,7 @@ unsigned int DofObject::n_comp(const unsigned int s,
   assert (_n_comp != NULL);
   assert (_n_comp[s] != NULL);
   
-  if (var >= n_vars(s))
+  if (var >= this->n_vars(s))
     return 0;
   
   return static_cast<unsigned int>(_n_comp[s][var]);
@@ -728,8 +836,8 @@ void DofObject::set_n_comp(const unsigned int s,
 			   const unsigned int var,
 			   const unsigned int ncomp)
 {
-  assert (s < n_systems());
-  assert (var < n_vars(s));
+  assert (s < this->n_systems());
+  assert (var < this->n_vars(s));
   assert (_dof_ids != NULL);
   assert (_dof_ids[s] != NULL);
 
@@ -753,14 +861,14 @@ void DofObject::set_n_comp(const unsigned int s,
   assert (_n_comp[s] != NULL);
     
   // If we already have memory allocated clear it.
-  if (n_comp(s,var))
+  if (this->n_comp(s,var))
     {
       assert (_dof_ids[s][var] != NULL); delete [] _dof_ids[s][var]; _dof_ids[s][var] = NULL;
     }
   
   _n_comp[s][var]  = static_cast<unsigned char>(ncomp);
 
-  if (n_comp(s,var) > 0)
+  if (this->n_comp(s,var) > 0)
     {
       _dof_ids[s][var] = new unsigned int [ncomp];
       
@@ -795,9 +903,9 @@ unsigned int DofObject::dof_number(const unsigned int s,
 				   const unsigned int var,
 				   const unsigned int comp) const
 {
-  assert (s < n_systems());
-  assert (var  < n_vars(s));
-  assert (comp < n_comp(s,var));
+  assert (s < this->n_systems());
+  assert (var  < this->n_vars(s));
+  assert (comp < this->n_comp(s,var));
   assert (_dof_ids != NULL);
   assert (_dof_ids[s] != NULL);
   
@@ -823,9 +931,9 @@ void DofObject::set_dof_number(const unsigned int s,
 			       const unsigned int dn)
 {
   assert (dn != invalid_id);
-  assert (s < n_systems());
-  assert (var  < n_vars(s));
-  assert (comp < n_comp(s,var));
+  assert (s < this->n_systems());
+  assert (var  < this->n_vars(s));
+  assert (comp < this->n_comp(s,var));
   assert (_dof_ids != NULL);
   assert (_dof_ids[s] != NULL);
     

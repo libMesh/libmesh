@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.21 2003-02-26 01:08:14 benkirk Exp $
+// $Id: mesh_base.h,v 1.22 2003-02-28 23:37:43 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -60,7 +60,7 @@ template <typename T> class PetscMatrix;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.21 $
+ * \version $Revision: 1.22 $
  */
 
 
@@ -89,50 +89,57 @@ public:
   /**
    * Deletes all the data that are currently stored.
    */
-  virtual void clear();
+  virtual void clear ();
 
+  /**
+   * @returns \p true if the mesh has been prepared via a call
+   * to \p prepare_for_use, \p false otherwise.
+   */
+  bool is_prepared () const
+  { return _is_prepared; }
+  
   /**
    * Returns the logical dimension of the mesh.
    */
-  unsigned int mesh_dimension() const
+  unsigned int mesh_dimension () const
   { return static_cast<unsigned int>(_dim); }
   
   /**
    * Returns the spatial dimension of the mesh.
    */
-  unsigned int spatial_dimension() const
+  unsigned int spatial_dimension () const
   { return static_cast<unsigned int>(DIM); }
   
   /**
    * Returns the number of nodes in the mesh.
    */
-  unsigned int n_nodes() const { return _nodes.size(); }
+  unsigned int n_nodes () const { return _nodes.size(); }
 
   /**
    * Returns the number of elements in the mesh.
    */
-  unsigned int n_elem()  const { return _elements.size(); }
+  unsigned int n_elem ()  const { return _elements.size(); }
 
   /**
    * Returns the number of active elements in the mesh.
    */
-  unsigned int n_active_elem() const;
+  unsigned int n_active_elem () const;
 
   /**
    * Return a vector of all
    * element types for the mesh.
    */
-  std::vector<ElemType> elem_types() const;
+  std::vector<ElemType> elem_types () const;
   
   /**
    * Return the number of elements of type \p type.
    */
-  unsigned int n_elem_of_type(const ElemType type) const;
+  unsigned int n_elem_of_type (const ElemType type) const;
 
   /**
    * Return the number of active elements of type \p type.
    */
-  unsigned int n_active_elem_of_type(const ElemType type) const;
+  unsigned int n_active_elem_of_type (const ElemType type) const;
 
   /**
    * This function returns the number of elements that will be written
@@ -140,12 +147,12 @@ public:
    * be broken into 4 linear sub-elements for plotting purposes.  Thus, for
    * a mesh of 2 \p QUAD9 elements  \p n_tecplot_elem() will return 8.
    */
-  unsigned int n_sub_elem() const;
+  unsigned int n_sub_elem () const;
 
   /**
    * Same, but only counts active elements.
    */
-  unsigned int n_active_sub_elem() const;
+  unsigned int n_active_sub_elem () const;
 
   /**
    * This function returns the sum over all the elemenents of the number
@@ -153,24 +160,24 @@ public:
    * A feasible load balancing scheme is to keep the weight per processor as
    * uniform as possible.
    */
-  unsigned int total_weight() const;
+  unsigned int total_weight () const;
   
   /**
    * Return a constant reference (for reading only) to the
    * \f$ i^{th} \f$ point.
    */  
-  const Point& point(const unsigned int i) const;
+  const Point& point (const unsigned int i) const;
   
   /**
    * Return a reference to the \f$ i^{th} \f$ node.
    */  
-  Node& node(const unsigned int i);
+  Node& node (const unsigned int i);
 
   /**
    * Return a constant reference (for reading only) to the
    * \f$ i^{th} \f$ node.
    */  
-  const Node& node(const unsigned int i) const;
+  const Node& node (const unsigned int i) const;
 
   /**
    * Return a constant reference to the \p nodes vector holding the nodes.
@@ -180,13 +187,13 @@ public:
   /**
    * Add \p Node \p n to the vertex array, optionally at the specified position \p nn.
    */
-  Node* add_point(const Point& n,
-		  const unsigned int nn=static_cast<unsigned int>(-1));
+  Node* add_point (const Point& n,
+		   const unsigned int nn=static_cast<unsigned int>(-1));
 
   /**
    * Return a pointer to the \f$ i^{th} \f$ element.
    */
-  Elem* elem(const unsigned int i) const;
+  Elem* elem (const unsigned int i) const;
 
   /**
    * Return a reference to the \p cells vector holding the elements.
@@ -196,21 +203,9 @@ public:
   /**
    * Add elem \p e to the elem array.
    */
-  void add_elem(Elem* e,
-		const unsigned int n=static_cast<unsigned int>(-1));
+  void add_elem (Elem* e,
+		 const unsigned int n=static_cast<unsigned int>(-1));
 
-  /**
-   * Locate element face (edge in 2D) neighbors.  This is done with the help
-   * of a \p std::map that functions like a hash table.  When this function is
-   * called only elements with \p NULL neighbor pointers are considered, so
-   * the first call should take the longest.  Subsequent calls will only
-   * consider new elements and the elements that lie on the boundary.
-
-   * After this routine is called all the elements with a \p NULL neighbor
-   * pointer are guaranteed to be on the boundary.  Thus this routine is
-   * useful for automatically determining the boundaries of the domain.
-   */
-  void find_neighbors();
 #ifdef ENABLE_INFINITE_ELEMENTS
 
   /**
@@ -223,7 +218,7 @@ public:
    *   
    * The flag \p be_verbose enables some diagnostic output.
    */
-  const Point build_inf_elem(const bool be_verbose = false);
+  const Point build_inf_elem (const bool be_verbose = false);
   
   /**
    * Build infinite elements atop a volume-based mesh.
@@ -238,14 +233,27 @@ public:
    *   
    * The flag \p be_verbose enables some diagnostic output.
    */
-  void build_inf_elem(const Point& origin,
-		      const bool x_sym = false,
-		      const bool y_sym = false,
-		      const bool z_sym = false,
-		      const bool be_verbose = false);
+  void build_inf_elem (const Point& origin,
+		       const bool x_sym = false,
+		       const bool y_sym = false,
+		       const bool z_sym = false,
+		       const bool be_verbose = false);
 		      
 #endif
 		      
+  /**
+   * Locate element face (edge in 2D) neighbors.  This is done with the help
+   * of a \p std::map that functions like a hash table.  When this function is
+   * called only elements with \p NULL neighbor pointers are considered, so
+   * the first call should take the longest.  Subsequent calls will only
+   * consider new elements and the elements that lie on the boundary.
+
+   * After this routine is called all the elements with a \p NULL neighbor
+   * pointer are guaranteed to be on the boundary.  Thus this routine is
+   * useful for automatically determining the boundaries of the domain.
+   */
+  void find_neighbors ();
+  
   /**
    * After calling this function the input vector \p nodes_to_elem_map
    * will contain the node to element connectivity.  That is to say
@@ -268,16 +276,28 @@ public:
    * uses Bill Barth's space-filling curve library to do the partitioning,
    * and the default is a \p hilbert curve, but \p morton is also supported.
    */
-  virtual void sfc_partition(const unsigned int n_sbdmns=libMeshBase::n_processors(),
-			     const std::string& type="hilbert");
+  virtual void sfc_partition (const unsigned int n_sbdmns=libMeshBase::n_processors(),
+			      const std::string& type="hilbert");
 
   /**
    * Partition the mesh using the Metis library. Only works if \p ./configure
    * detected the library.
    */
-  virtual void metis_partition(const unsigned int n_sbdmns=libMeshBase::n_processors(),
-			       const std::string& type="kway");
+  virtual void metis_partition (const unsigned int n_sbdmns=libMeshBase::n_processors(),
+				const std::string& type="kway");
 
+  /**
+   * Call the default partitioner (currently \p metis_partition()).
+   */
+  virtual void partition (const unsigned int n_sbdmns=libMeshBase::n_processors())
+  { this->metis_partition(n_sbdmns); }
+
+  /**
+   * After partitoning a mesh it is useful to renumber the nodes and elements
+   * so that they lie in contiguous blocks on the processors.  This method
+   * does just that.
+   */
+  void renumber_nodes_and_elements ();    
 
   /**
    * Randomly perturb the nodal locations.  This function will
@@ -286,21 +306,21 @@ public:
    * by default, however they may be by setting the flag
    * \p perturb_boundary true.
    */
-  void distort(const Real factor, const bool perturb_boundary=false);
+  void distort (const Real factor, const bool perturb_boundary=false);
   
   /**
    * Translates the mesh.  The grid points are translated in the
    * \p x direction by \p xt, in the \p y direction by \p yt,
    * etc...
    */
-  void translate(const Real xt=0., const Real yt=0., const Real zt=0.); 
+  void translate (const Real xt=0., const Real yt=0., const Real zt=0.); 
 
   /**
    * Rotates the mesh.  The grid points are rotated about the 
    * \p x axis by \p xr , about the \p y axis by \p yr,
    * etc...  
    */
-  void rotate(const Real xr, const Real yr=0., const Real zr=0.); 
+  void rotate (const Real xr, const Real yr=0., const Real zr=0.); 
 
   /**
    * Scales the mesh.  The grid points are scaled in the
@@ -308,7 +328,7 @@ public:
    * etc...  If only \p xs is specified then the scaling is
    * assumed uniform in all directions.
    */
-  void scale(const Real xs, const Real ys=0., const Real zs=0.);
+  void scale (const Real xs, const Real ys=0., const Real zs=0.);
     
   /**
    * @returns two points defining a cartesian box that bounds the
@@ -320,7 +340,7 @@ public:
   /**
    * Same, but returns a sphere instead of a box.
    */
-  Sphere bounding_sphere() const;
+  Sphere bounding_sphere () const;
   
   /**
    * @returns two points defining a cartesian box that bounds the
@@ -372,96 +392,55 @@ public:
    * processor.
    *
    */
-  unsigned int n_subdomains() const { return _n_sbd; }
+  unsigned int n_subdomains () const { return _n_sbd; }
 
   /**
    * @returns the number of processors used in the
    * current simulation.
    */
-  unsigned int n_processors() const { return _n_proc; }
+  unsigned int n_processors () const { return _n_proc; }
 
 
   /**
    * @returns the subdomain id for this processor.
    */
-  unsigned int processor_id() const { return _proc_id; }
-  
-
-  //-------------------------------------------------------------------------
-  // Read/Write methods
+  unsigned int processor_id () const { return _proc_id; }
   
   /**
    * Reads the file specified by \p name.  Attempts to figure out the
    * proper method by the file extension.
    */
-  virtual void read(const std::string& name);
-  
-  /**
-   * Reads an unstructured 2D triangular mesh from the file
-   * specified by \p name.  The format is described in the 
-   * implementation.  This function facilitates reading meshes 
-   * created by Matlab's PDE Toolkit.
-   */
-  void read_matlab(const std::string& name);
-
-  /**
-   * Reads an unstructured, triangulated surface in the
-   * standard OFF OOGL format from the file specified by \p name.
-   */
-  void read_off(const std::string& name);
-  
-  /**
-   * Read meshes in AVS's UCD format from the file specified by \p name.
-   * For the format description see the AVS Developer's guide.
-   * This is the format of choice for reading meshes
-   * created by Gridgen, since that tool can output UCD files.
-   */
-  void read_ucd(const std::string& name);
-  
-  /**
-   * Read a 2D mesh in the shanee format from the file specified
-   * by \p name.  This is for compatibility with
-   * Ben Kirk's old code, and may be removed at any time in the future.
-   *
-   * @sect2{Write Methods}
-   *
-   */
-  void read_shanee(const std::string& name);
-
-  
-
-  
-  //--------------------------------------------------------------------------
+  virtual void read (const std::string& name);
   
   /**
    * Write to the file specified by \p name.  Attempts to figure out the
    * proper method by the file extension.
    */
-  virtual void write(const std::string& name);
+  virtual void write (const std::string& name);
   
   /**
    * Write to the file specified by \p name.  Attempts to figure out the
    * proper method by the file extension. Also writes data.
    */
-  virtual void write(const std::string& name,
-		     std::vector<Number>& values,
-		     std::vector<std::string>& variable_names);
+  virtual void write (const std::string& name,
+		      std::vector<Number>& values,
+		      std::vector<std::string>& variable_names);
   
   /**
    * Write a Tecplot-formatted ASCII text file to the file specified by 
    * \p name.  Writes both the mesh and the solution from \p es. 
    */
-  void write_tecplot(const std::string& name,
-		     EquationSystems& es);
+  void write_tecplot (const std::string& name,
+		      EquationSystems& es);
   
   /**
    * Write a Tecplot-formatted ASCII text file to the file specified by 
    * \p name.  The optional parameters can be used to write nodal data 
    * in addition to the mesh.
    */
-  void write_tecplot(const std::string& name,
-		     const std::vector<Number>* v=NULL,
-		     const std::vector<std::string>* solution_names=NULL);
+  void write_tecplot (const std::string& name,
+		      const std::vector<Number>* v=NULL,
+		      const std::vector<std::string>* solution_names=NULL);
   
   /**
    * Write a Tecplot-formatted binary file to the file specified by \p name.
@@ -469,8 +448,8 @@ public:
    * For this to work properly the Tecplot API must be available.  If the API 
    * is not present this function will simply call the ASCII output version.
    */
-  void write_tecplot_binary(const std::string& name,
-			    EquationSystems& es);
+  void write_tecplot_binary (const std::string& name,
+			     EquationSystems& es);
   
   /**
    * Write a Tecplot-formatted binary file to the file specified by \p name.
@@ -479,16 +458,16 @@ public:
    * For this to work properly the Tecplot API must be available.  If the API 
    * is not present this function will simply call the ASCII output version.
    */
-  void write_tecplot_binary(const std::string& name,
-			    const std::vector<Number>* v=NULL,
-			    const std::vector<std::string>* solution_names=NULL);
+  void write_tecplot_binary (const std::string& name,
+			     const std::vector<Number>* v=NULL,
+			     const std::vector<std::string>* solution_names=NULL);
 
   /**
    * Write the mesh in AVS's UCD format to  the file specified by \p name.
    * May be expanded in the future to handle data as well.
    */
-  void write_ucd(const std::string& name);  
-
+  void write_ucd (const std::string& name);  
+  
   /**
    * Write the mesh in the GMV ASCII format to a file specified by \p name.
    * GMV is the General Mesh Viewer from
@@ -496,9 +475,9 @@ public:
    * since GMV understands cell-based data, this function can optionally
    * write the partitioning information.
    */
-  void write_gmv(const std::string& name,
-		 EquationSystems& es,
-		 const bool write_partitioning=true);
+  void write_gmv (const std::string& name,
+		  EquationSystems& es,
+		  const bool write_partitioning=true);
 
   /**
    * Write the mesh in the GMV ASCII format to a file specified by \p name.
@@ -507,10 +486,10 @@ public:
    * since GMV understands cell-based data, this function can optionally
    * write the partitioning information.
    */
-  void write_gmv(const std::string& name,
-		 const std::vector<Number>* v=NULL,
-		 const std::vector<std::string>* solution_names=NULL,
-		 const bool write_partitioning=true);
+  void write_gmv (const std::string& name,
+		  const std::vector<Number>* v=NULL,
+		  const std::vector<std::string>* solution_names=NULL,
+		  const bool write_partitioning=true);
   
   /**
    * Write the mesh in the GMV binary format to  a file specified by \p name.
@@ -519,9 +498,9 @@ public:
    * since GMV understands cell-based data, this function can optionally
    * write the partitioning information.
    */
-  void write_gmv_binary(const std::string& name,
-			EquationSystems& es,
-			const bool write_partitioning=true);
+  void write_gmv_binary (const std::string& name,
+			 EquationSystems& es,
+			 const bool write_partitioning=true);
 
   /**
    * Write the mesh in the GMV binary format to  a file specified by \p name.
@@ -530,22 +509,22 @@ public:
    * since GMV understands cell-based data, this function can optionally
    * write the partitioning information.
    */
-  void write_gmv_binary(const std::string& name,
-			const std::vector<Number>* v=NULL,
-			const std::vector<std::string>* solution_names=NULL,
-			const bool write_partitioning=true);
+  void write_gmv_binary (const std::string& name,
+			 const std::vector<Number>* v=NULL,
+			 const std::vector<std::string>* solution_names=NULL,
+			 const bool write_partitioning=true);
 
 
   /**
    * @returns a string containing relevant information
    * about the mesh.
    */
-  std::string get_info() const;
+  std::string get_info () const;
 
   /**
    * Prints relevant information about the mesh.
    */
-  void print_info() const;
+  void print_info () const;
   
 
 #ifdef USE_COMPLEX_NUMBERS
@@ -555,15 +534,15 @@ public:
    * of complex data, and for  \p r_o_c = 1 the filename for the imaginary 
    * part.
    */
-  const char* complex_filename(const std::string& _n,
-			       unsigned int r_o_c=0) const;
+  const char* complex_filename (const std::string& _n,
+				unsigned int r_o_c=0) const;
 
   /**
    * Prepare complex data for writing.
    */
-  void prepare_complex_data(const std::vector<Number>* source,
-			    std::vector<Real>* real_part,
-			    std::vector<Real>* imag_part) const;
+  void prepare_complex_data (const std::vector<Number>* source,
+			     std::vector<Real>* real_part,
+			     std::vector<Real>* imag_part) const;
 
 #endif
 
@@ -588,27 +567,31 @@ public:
    * Returns a pair of std::vector<Elem*>::iterators which point
    * to the beginning and end of the _elements vector.
    */
-  ElemPair elements_begin()  { return ElemPair (_elements.begin(), _elements.end());  }
+  ElemPair elements_begin ()
+  { return ElemPair (_elements.begin(), _elements.end());  }
 
   /**
    * Returns a pair of std::vector<Elem*>::const_iterators which point
    * to the beginning and end of the _elements vector.
    */
-  ConstElemPair elements_begin() const  { return ConstElemPair (_elements.begin(), _elements.end());  }
+  ConstElemPair elements_begin () const
+  { return ConstElemPair (_elements.begin(), _elements.end());  }
 
   /**
    * Returns a pair of std::vector<Elem*>::iterators which point
    * to the end of the _elements vector.  This simulates a normal
    * end() iterator.
    */
-  ElemPair elements_end()  { return ElemPair (_elements.end(), _elements.end());  }
+  ElemPair elements_end ()
+  { return ElemPair (_elements.end(), _elements.end());  }
   
   /**
    * Returns a pair of std::vector<Elem*>::const_iterators which point
    * to the end of the _elements vector.  This simulates a normal
    * end() const_iterator.
    */
-  ConstElemPair elements_end() const  { return ConstElemPair (_elements.end(), _elements.end());  }
+  ConstElemPair elements_end () const
+  { return ConstElemPair (_elements.end(), _elements.end());  }
 
   /**
    * This typedef is for convenience.  It allows you to get
@@ -630,124 +613,165 @@ public:
    * Returns a pair of std::vector<Node*>::iterators which point
    * to the beginning and end of the _nodeents vector.
    */
-  NodePair nodes_begin()  { return NodePair (_nodes.begin(), _nodes.end());  }
-
+  NodePair nodes_begin ()
+  { return NodePair (_nodes.begin(), _nodes.end());  }
+  
   /**
    * Returns a pair of std::vector<Node*>::const_iterators which point
    * to the beginning and end of the _nodes vector.
    */
-  ConstNodePair nodes_begin() const  { return ConstNodePair (_nodes.begin(), _nodes.end());  }
+  ConstNodePair nodes_begin () const
+  { return ConstNodePair (_nodes.begin(), _nodes.end());  }
 
   /**
    * Returns a pair of std::vector<Node*>::iterators which point
    * to the end of the _nodes vector.  This simulates a normal
    * end() iterator.
    */
-  NodePair nodes_end()  { return NodePair (_nodes.end(), _nodes.end());  }
+  NodePair nodes_end ()
+  { return NodePair (_nodes.end(), _nodes.end());  }
   
   /**
    * Returns a pair of std::vector<Node*>::const_iterators which point
    * to the end of the _nodes vector.  This simulates a normal
    * end() const_iterator.
    */
-  ConstNodePair nodes_end() const  { return ConstNodePair (_nodes.end(), _nodes.end());  }
+  ConstNodePair nodes_end () const
+  { return ConstNodePair (_nodes.end(), _nodes.end());  }
   
   
   
 protected:
 
+
+  /**
+   * Prepare a newly created (or read) mesh for use.
+   * This involves 3 steps:
+   *  1.) call \p find_neighbors()
+   *  2.) call \p partition()
+   *  3.) call \p renumber_nodes_and_elements() 
+   */
+  virtual void prepare_for_use ();
+  
   /**
    * Return a pointer to the \f$ i^{th} \f$ node.
    */  
-  Node* node_ptr(const unsigned int i) const;
+  Node* node_ptr (const unsigned int i) const;
 
   /**
    * Return a pointer to the \f$ i^{th} \f$ node.
    */  
-  Node* & node_ptr(const unsigned int i);
+  Node* & node_ptr (const unsigned int i);
+    
+  /**
+   * Reads an unstructured 2D triangular mesh from the file
+   * specified by \p name.  The format is described in the 
+   * implementation.  This function facilitates reading meshes 
+   * created by Matlab's PDE Toolkit.
+   */
+  void read_matlab (const std::string& name);
   
   /**
    * Reads a matlab-format mesh from a stream.  
    * Implements the read process initiated by the associated public method.
    */
-  void read_matlab(std::istream& in);
+  void read_matlab (std::istream& in);
+
+  /**
+   * Reads an unstructured, triangulated surface in the
+   * standard OFF OOGL format from the file specified by \p name.
+   */
+  void read_off (const std::string& name);
   
   /**
    * Reads an unstructured, triangulated surface in the
    * standard OFF OOGL format from a stream.
    * Implements the read process initiated by the associated public method.
    */
-  void read_off(std::istream& in);
+  void read_off (std::istream& in);
+  
+  /**
+   * Read meshes in AVS's UCD format from the file specified by \p name.
+   * For the format description see the AVS Developer's guide.
+   * This is the format of choice for reading meshes
+   * created by Gridgen, since that tool can output UCD files.
+   */
+  void read_ucd (const std::string& name);
   
   /**
    * Read meshes in AVS's UCD format from a stream.
    * Implements the read process initiated by the associated public method.
    */
-  void read_ucd(std::istream& in);
+  void read_ucd (std::istream& in);
+  
+  /**
+   * Read a 2D mesh in the shanee format from the file specified
+   * by \p name.  This is for compatibility with
+   * Ben Kirk's old code, and may be removed at any time in the future.
+   *
+   * @sect2{Write Methods}
+   *
+   */
+  void read_shanee (const std::string& name);
 
   /**
    * Read a 2D mesh in the shanee format from a stream.
    * Implements the read process initiated by the associated public method.
    */
-  void read_shanee(std::istream& in);
-
-
-
-  //--------------------------------------------------------------------------
-
+  void read_shanee (std::istream& in);
 
   /**
    * Write a Tecplot-formatted ASCII text file to a stream.  Fetches
    * nodal data from \p es.
    */
-  void write_tecplot(std::ostream& out,
-		     EquationSystems& es);
+  void write_tecplot (std::ostream& out,
+		      EquationSystems& es);
   
   /**
    * Actual Implementation of writing a Tecplot-formatted 
    * ASCII text file to a stream.
    */
-  void write_tecplot(std::ostream& out,
-		     const std::vector<Number>* v=NULL,
-		     const std::vector<std::string>* solution_names=NULL);
+  void write_tecplot (std::ostream& out,
+		      const std::vector<Number>* v=NULL,
+		      const std::vector<std::string>* solution_names=NULL);
 
   /**
    * Actual implementation of writing a mesh in AVS's UCD format.
    */
-  void write_ucd(std::ostream& out);
+  void write_ucd (std::ostream& out);
   
   /**
    * Write the mesh and solution from \p es in the GMV ASCII 
    * format to a stream.
    */
-  void write_gmv(std::ostream& out,
-		 EquationSystems& es,
-		 const bool write_partitioning=false);
+  void write_gmv (std::ostream& out,
+		  EquationSystems& es,
+		  const bool write_partitioning=false);
 
   /**
    * Actual implementation of writing a mesh in the GMV ASCII format.
    */
-  void write_gmv(std::ostream& out,
-		 const std::vector<Number>* v=NULL,
-		 const std::vector<std::string>* solution_names=NULL,
-		 const bool write_partitioning=false);
+  void write_gmv (std::ostream& out,
+		  const std::vector<Number>* v=NULL,
+		  const std::vector<std::string>* solution_names=NULL,
+		  const bool write_partitioning=false);
 
 
   /**
    * Write the mesh and solution from \p es in the GMV binary
    * format to a stream.
    */
-  void write_gmv_binary(std::ostream& out,
-			EquationSystems& es,
-			const bool write_partitioning=false);
+  void write_gmv_binary (std::ostream& out,
+			 EquationSystems& es,
+			 const bool write_partitioning=false);
   
   /**
    * Actual implementation of writing a mesh in the GMV binary format.
    */
-  void write_gmv_binary(std::ostream& out,
-			const std::vector<Number>* v=NULL,
-			const std::vector<std::string>* solution_names=NULL,
-			const bool write_partitioning=false);
+  void write_gmv_binary (std::ostream& out,
+			 const std::vector<Number>* v=NULL,
+			 const std::vector<std::string>* solution_names=NULL,
+			 const bool write_partitioning=false);
 
 
   
@@ -756,12 +780,14 @@ protected:
   /**
    * Returns a writeable reference to the number of subdomains.
    */
-  unsigned int& set_n_subdomains() { return _n_sbd; }
+  unsigned int& set_n_subdomains ()
+  { return _n_sbd; }
 
   /**
    * Returns a writeable reference to the number of processors.
    */
-  unsigned int& set_n_processors() { return _n_proc; }
+  unsigned int& set_n_processors ()
+  { return _n_proc; }
 
   /**
    * Reads input from \p in, skipping all the lines
@@ -801,6 +827,11 @@ protected:
   const unsigned int _proc_id;
 
   /**
+   * Flag indicating if the mesh has been prepared for use.
+   */
+  bool _is_prepared;
+  
+  /**
    * Make the \p BoundaryInfo class a friend so that
    * they can create a \p BoundaryMesh.
    */
@@ -812,9 +843,9 @@ protected:
 // ------------------------------------------------------------
 // MeshBase inline methods
 inline
-Elem* MeshBase::elem(const unsigned int i) const
+Elem* MeshBase::elem (const unsigned int i) const
 {
-  assert (i < n_elem());
+  assert (i < this->n_elem());
   assert (_elements[i] != NULL);
   
   return _elements[i];
@@ -823,9 +854,9 @@ Elem* MeshBase::elem(const unsigned int i) const
 
 
 inline
-const Point& MeshBase::point(const unsigned int i) const
+const Point& MeshBase::point (const unsigned int i) const
 {
-  assert (i < n_nodes());
+  assert (i < this->n_nodes());
   assert (_nodes[i] != NULL);
   assert (_nodes[i]->id() != Node::invalid_id);  
 
@@ -835,9 +866,9 @@ const Point& MeshBase::point(const unsigned int i) const
 
 
 inline
-const Node& MeshBase::node(const unsigned int i) const
+const Node& MeshBase::node (const unsigned int i) const
 {
-  assert (i < n_nodes());
+  assert (i < this->n_nodes());
   assert (_nodes[i] != NULL);
   assert (_nodes[i]->id() != Node::invalid_id);  
   
@@ -847,17 +878,17 @@ const Node& MeshBase::node(const unsigned int i) const
 
 
 inline
-Node& MeshBase::node(const unsigned int i)
+Node& MeshBase::node (const unsigned int i)
 {
-  if (i >= n_nodes())
+  if (i >= this->n_nodes())
     {
       std::cout << " i=" << i
-		<< ", n_nodes()=" << n_nodes()
+		<< ", n_nodes()=" << this->n_nodes()
 		<< std::endl;
       error();
     }
   
-  assert (i < n_nodes());
+  assert (i < this->n_nodes());
   assert (_nodes[i] != NULL);
 
   return (*_nodes[i]);
@@ -866,9 +897,28 @@ Node& MeshBase::node(const unsigned int i)
 
 
 inline
-Node* MeshBase::node_ptr(const unsigned int i) const
+void MeshBase::prepare_for_use ()
 {
-  assert (i < n_nodes());
+  // Let all the elements find their neighbors
+  this->find_neighbors();
+  
+  // Partition the mesh.
+  this->partition();
+
+  // Renumber the nodes and elements so that they in
+  // contiguous blocks per processor.
+  this->renumber_nodes_and_elements();
+
+  // The mesh is now prepared for use.
+  _is_prepared = true;
+}
+
+
+
+inline
+Node* MeshBase::node_ptr (const unsigned int i) const
+{
+  assert (i < this->n_nodes());
   assert (_nodes[i] != NULL);
   assert (_nodes[i]->id() != Node::invalid_id);  
   
@@ -878,9 +928,9 @@ Node* MeshBase::node_ptr(const unsigned int i) const
 
 
 inline
-Node* & MeshBase::node_ptr(const unsigned int i)
+Node* & MeshBase::node_ptr (const unsigned int i)
 {
-  assert (i < n_nodes());
+  assert (i < this->n_nodes());
 
   return _nodes[i];
 }

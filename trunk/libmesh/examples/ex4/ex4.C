@@ -1,4 +1,4 @@
-// $Id: ex4.C,v 1.16 2003-02-27 00:15:06 ddreyer Exp $
+// $Id: ex4.C,v 1.17 2003-02-28 23:37:33 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -172,19 +172,6 @@ int main (int argc, char** argv)
 		     (dim == 2) ? QUAD9 : HEX27);
 
     /**
-     * Let the elements find their neighbors.
-     */
-    mesh.find_neighbors();
-
-    /**
-     * Partiton the mesh.  By default the number of partitons
-     * created equals the number of processors you are running on.
-     *
-     * ----- PARALLEL CHANGE -----
-     */
-    mesh.metis_partition();
-    
-    /**
      * Print information about the mesh to the screen.
      */
     mesh.print_info();
@@ -344,12 +331,10 @@ void assemble_poisson(EquationSystems& es,
    * Define data structures to contain the element matrix
    * and right-hand-side vector contribution.  Following
    * basic finite element terminology we will denote these
-   * "Ke" and "Fe".  Use the complex versions, so that
-   * this example compiles successfully, and the error 
-   * message in \p main() can catch this irregularity.
+   * "Ke" and "Fe". More detail is in example 3.
    */
   DenseMatrix<Number> Ke;
-  std::vector<Number> Fe;
+  DenseVector<Number> Fe;
 
   /**
    * This vector will hold the degree of freedom indices for
@@ -415,18 +400,11 @@ void assemble_poisson(EquationSystems& es,
        * the last element.  Note that this will be the case if the
        * element type is different (i.e. the last element was a
        * triangle, now we are on a quadrilateral).
-       *
-       * The \p DenseMatrix::resize() member will automatically
-       * zero out the matrix.  Since we are using a \p std::vector
-       * for the right-hand-side we will use the \p std::fill algorithm
-       * to zero out Fe.
        */
       Ke.resize (dof_indices.size(),
 		 dof_indices.size());
 
       Fe.resize (dof_indices.size());
-
-      std::fill (Fe.begin(), Fe.end(), 0.);
 
       /**
        * Stop logging the shape function initialization.
@@ -507,7 +485,7 @@ void assemble_poisson(EquationSystems& es,
 	    
 	    const Real fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
 	    
-	    Fe[i] += JxW[qp]*fxy*phi[i][qp];
+	    Fe(i) += JxW[qp]*fxy*phi[i][qp];
 	  } // end of the RHS summation loop
 	  
       /**
@@ -623,7 +601,7 @@ void assemble_poisson(EquationSystems& es,
 		   */
 		  for (unsigned int i=0; i<phi_face.size(); i++)
 		    {
-		      Fe[i] += JxW_face[qp]*penalty*value*phi_face[i][qp];
+		      Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
 		    }
 		  
 		} // end face quadrature point loop	  

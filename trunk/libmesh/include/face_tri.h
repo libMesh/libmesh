@@ -1,4 +1,4 @@
-// $Id: face_tri.h,v 1.8 2003-02-27 00:55:28 benkirk Exp $
+// $Id: face_tri.h,v 1.9 2003-02-28 23:37:43 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -62,7 +62,7 @@ public:
    * Default triangular element, takes number of nodes and 
    * parent. Derived classes implement 'true' elements.
    */
-  Tri  (const unsigned int nn, Face* p);
+  Tri  (const unsigned int nn, const Elem* p);
 
   /**
    * @returns 3.  All tri-derivatives are guaranteed to have at
@@ -137,7 +137,7 @@ protected:
 // ------------------------------------------------------------
 // Tri class member functions
 inline
-Tri::Tri(const unsigned int nn, Face* p) :
+Tri::Tri(const unsigned int nn, const Elem* p) :
   Face(nn, Tri::n_sides(), p)
 {
 }

@@ -1,4 +1,4 @@
-// $Id: distributed_vector.h,v 1.6 2003-02-25 16:26:46 ddreyer Exp $
+// $Id: distributed_vector.h,v 1.7 2003-02-28 23:37:41 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -268,6 +268,15 @@ public:
    * the NumericVector<T> V 
    */
   void add_vector (const NumericVector<T>& V,
+		   const std::vector<unsigned int>& dof_indices);
+  
+  /**
+   * U+=V where U and V are type 
+   * DenseVector<T> and you
+   * want to specify WHERE to add
+   * the DenseVector<T> V 
+   */
+  void add_vector (const DenseVector<T>& V,
 		   const std::vector<unsigned int>& dof_indices);
   
   /**

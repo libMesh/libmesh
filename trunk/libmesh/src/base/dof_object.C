@@ -1,4 +1,4 @@
-// $Id: dof_object.C,v 1.1 2003-02-13 01:49:49 benkirk Exp $
+// $Id: dof_object.C,v 1.2 2003-02-28 23:37:45 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -28,7 +28,8 @@
 
 // ------------------------------------------------------------
 // DofObject class static member initialization
-const unsigned int DofObject::invalid_id = static_cast<unsigned int>(-1);
+const unsigned int       DofObject::invalid_id           = static_cast<unsigned int>(-1);
+const unsigned short int DofObject::invalid_processor_id = static_cast<unsigned short int>(-1);
 
 
 

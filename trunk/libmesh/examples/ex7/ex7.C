@@ -1,4 +1,4 @@
-// $Id: ex7.C,v 1.15 2003-02-26 11:34:36 ddreyer Exp $
+// $Id: ex7.C,v 1.16 2003-02-28 23:37:35 benkirk Exp $
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
   
@@ -214,11 +214,6 @@ int main (int argc, char** argv)
 		       QUAD4);
 
     /**
-     * Let the elements find their neighbors.
-     */
-    mesh.find_neighbors();
-    
-    /**
      * Print information about the mesh to the screen.
      */
     mesh.print_info();
@@ -371,7 +366,7 @@ void assemble_helmholtz(EquationSystems& es,
    */
   DenseMatrix<Number>   Ae;
   DenseMatrix<Number>   Ke, Ce, Me;
-  std::vector<Number>   Fe;
+  DenseVector<Number>   Fe;
 
   /**
    * Calculate the circular frequency omega and define the fluid
@@ -448,8 +443,6 @@ void assemble_helmholtz(EquationSystems& es,
 		 dof_indices.size());
 
       Fe.resize (dof_indices.size());
-
-      std::fill (Fe.begin(), Fe.end(), 0.);
 
 
       /**
@@ -551,7 +544,7 @@ void assemble_helmholtz(EquationSystems& es,
 		   */
 		  for (unsigned int i=0; i<phi_face.size(); i++)
 		    {
-		      Fe[i] += -I*vn_value*rho*omega
+		      Fe(i) += -I*vn_value*rho*omega
 			*phi_face[i][qp]*JxW_face[qp];
 		    };
 

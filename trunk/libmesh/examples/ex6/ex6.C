@@ -1,4 +1,4 @@
-// $Id: ex6.C,v 1.13 2003-02-27 00:15:10 ddreyer Exp $
+// $Id: ex6.C,v 1.14 2003-02-28 23:37:34 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -171,8 +171,6 @@ int main (int argc, char** argv)
 		     -1., 1.,
 		     (dim == 2) ? QUAD4 : HEX8); //HEX20); //HEX27);
 
-    mesh.find_neighbors();
-    
     /**
      * Print information about the mesh to the screen.
      */
@@ -373,11 +371,11 @@ void assemble_wave(EquationSystems& es,
    * of the projectors.  The final overall system, however, 
    * resembles the conventional notation, again.
    */
-  DenseMatrix<Number>   Ke;
-  DenseMatrix<Number>   Ce;
-  DenseMatrix<Number>   Me;
+  DenseMatrix<Number> Ke;
+  DenseMatrix<Number> Ce;
+  DenseMatrix<Number> Me;
 
-  std::vector<Number> Fe;
+  DenseVector<Number> Fe;
 
   /**
    * This vector will hold the degree of freedom indices for
@@ -473,7 +471,6 @@ void assemble_wave(EquationSystems& es,
 	       * Zero the RHS for this element. 
 	       */
 	      Fe.resize (dof_indices.size());
-	      std::fill (Fe.begin(), Fe.end(), 0.);
 
 
 	      /**
@@ -537,7 +534,7 @@ void assemble_wave(EquationSystems& es,
 			   */
 			  for (unsigned int i=0; i<fe_face->n_shape_functions(); i++)
 			    {
-			      Fe[i] += JxW_face[qp]*value*phi_face[i][qp];
+			      Fe(i) += JxW_face[qp]*value*phi_face[i][qp];
 			    };
 		  
 			}; // end face quadrature point loop	  

@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.9 2003-02-20 04:59:58 benkirk Exp $
+// $Id: mesh.C,v 1.10 2003-02-28 23:37:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -39,39 +39,38 @@ namespace sfc {
 
 // ------------------------------------------------------------
 // Mesh class member functions
-Mesh::Mesh(unsigned int d,
-	   unsigned int pid) :
-  MeshBase(d, pid),
+Mesh::Mesh (unsigned int d,
+	    unsigned int pid) :
+  MeshBase           (d, pid),
 #ifdef ENABLE_AMR
-  boundary_info(d,*this),
-  mesh_refinement(*this)
-#else
-  boundary_info(d,*this)
+  mesh_refinement    (*this),
 #endif
+  mesh_communication (*this),
+  boundary_info      (d,*this)
 {
   assert (libMesh::initialized());
 }
 
 
 
-Mesh::~Mesh()
+Mesh::~Mesh ()
 {
-  boundary_info.clear();
-  
-  MeshBase::clear();
+  clear ();
   
   assert (!libMesh::closed());
 }
 
 
 
-void Mesh::clear()
+void Mesh::clear ()
 {
 #ifdef ENABLE_AMR
   
   mesh_refinement.clear();
   
 #endif
+
+  mesh_communication.clear();
   
   boundary_info.clear();
 
@@ -80,7 +79,7 @@ void Mesh::clear()
 
 
 
-void Mesh::read(const std::string& name)
+void Mesh::read (const std::string& name)
 {
   libMesh::log.start_event("read()");
 
@@ -133,11 +132,15 @@ void Mesh::read(const std::string& name)
       }    
   }
   libMesh::log.stop_event("read()");
+
+
+  // Done reading the mesh.  Now prepare it for use.
+  this->prepare_for_use();
 }
 
 
 
-void Mesh::write(const std::string& name)
+void Mesh::write (const std::string& name)
 {
   libMesh::log.start_event("write()");
   
@@ -192,9 +195,9 @@ void Mesh::write(const std::string& name)
 
 
 
-void Mesh::write(const std::string& name,
-		 std::vector<Number>& v,
-		 std::vector<std::string>& vn)
+void Mesh::write (const std::string& name,
+		  std::vector<Number>& v,
+		  std::vector<std::string>& vn)
 {
   libMesh::log.start_event("write()");
 
@@ -231,7 +234,7 @@ void Mesh::write(const std::string& name,
 
 #ifdef ENABLE_AMR
 
-void Mesh::trim_unused_elements(std::set<unsigned int>& unused_elements)
+void Mesh::trim_unused_elements (std::set<unsigned int>& unused_elements)
 {
   /**
    * Anything we clear in this routiune

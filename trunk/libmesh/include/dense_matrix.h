@@ -1,4 +1,4 @@
-// $Id: dense_matrix.h,v 1.12 2003-02-21 21:03:52 benkirk Exp $
+// $Id: dense_matrix.h,v 1.13 2003-02-28 23:37:39 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,6 +31,7 @@
 
 
 // Forward Declarations
+template <typename T> class DenseSubMatrix;
 template <typename T> class PetscMatrix;
 
 
@@ -187,6 +188,13 @@ private:
    * The column dimension.
    */
   unsigned int n_dim;
+
+  /**
+   * Make the DenseSubMatrix<T> class a friend
+   * so that they can access values directly
+   * from our matrix.
+   */
+  friend class DenseSubMatrix<T>;
 
   /**
    * Make the PetscMatrix<T> class a friend

@@ -1,4 +1,4 @@
-// $Id: ex3.C,v 1.16 2003-02-24 22:03:35 benkirk Exp $
+// $Id: ex3.C,v 1.17 2003-02-28 23:37:30 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -133,18 +133,6 @@ int main (int argc, char** argv)
 		       -1., 1.,
 		       QUAD9);
 
-    /**
-     * This is the first use of the \p Mesh::find_neighbors() method.
-     * When this method is called all the elements are interrogated
-     * and neighbors are found.  After this method is called then
-     * calling mesh.elem(3)->neighbor(2) will return a pointer to
-     * the element in the mesh that borders side 2 of element number
-     * 3.  The \p Elem::neighbor(unsigned int s)  member returns
-     * \p NULL if the \p s side of the element is on a boundary of
-     * the domain.
-     */
-    mesh.find_neighbors();
-    
     /**
      * Print information about the mesh to the screen.
      * Note that 5x5 \p Quad9 elements actually has 11x11 nodes,
@@ -312,12 +300,12 @@ void assemble_poisson(EquationSystems& es,
    * Define data structures to contain the element matrix
    * and right-hand-side vector contribution.  Following
    * basic finite element terminology we will denote these
-   * "Ke" and "Fe".  Use the complex versions, so that
-   * this example compiles successfully, and the error 
-   * message in \p main() can catch this irregularity.
+   * "Ke" and "Fe".  These datatypes are templated on
+   * \p Number, which allows the same code to work for real
+   * or complex numbers.
    */
   DenseMatrix<Number> Ke;
-  std::vector<Number> Fe;
+  DenseVector<Number> Fe;
 
   /**
    * This vector will hold the degree of freedom indices for
@@ -385,17 +373,13 @@ void assemble_poisson(EquationSystems& es,
        * element type is different (i.e. the last element was a
        * triangle, now we are on a quadrilateral).
        *
-       * The \p DenseMatrix::resize() member will automatically
-       * zero out the matrix.  Since we are using a \p std::vector
-       * for the right-hand-side we will use the \p std::fill algorithm
-       * to zero out Fe.
+       * The \p DenseMatrix::resize() and the \p DenseVector::resize()
+       * members will automatically zero out the matrix  and vector.
        */
       Ke.resize (dof_indices.size(),
 		 dof_indices.size());
 
       Fe.resize (dof_indices.size());
-
-      std::fill (Fe.begin(), Fe.end(), 0.);
 
 
 
@@ -448,7 +432,7 @@ void assemble_poisson(EquationSystems& es,
 				 exact_solution(x+eps,y) -
 				 4.*exact_solution(x,y))/eps/eps;
 	      
-	      Fe[i] += JxW[qp]*fxy*phi[i][qp];
+	      Fe(i) += JxW[qp]*fxy*phi[i][qp];
 	    }; // end of the RHS summation loop
 	  
 	}; // end of quadrature point loop
@@ -576,7 +560,7 @@ void assemble_poisson(EquationSystems& es,
 		   */
 		  for (unsigned int i=0; i<phi_face.size(); i++)
 		    {
-		      Fe[i] += JxW_face[qp]*penalty*value*phi_face[i][qp];
+		      Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
 		    }		  
 		} // end face quadrature point loop	  
 	    } // end if (elem->neighbor(side) == NULL)
@@ -590,11 +574,11 @@ void assemble_poisson(EquationSystems& es,
        *----------------------------------------------------------------
        * The element matrix and right-hand-side are now built
        * for this element.  Add them to the global matrix and
-       * right-hand-side vector.  The \p PetscMatrix::add_matrix()
-       * and \p PetscVector::add_vector() members do this for us.
+       * right-hand-side vector.  The \p SparseMatrix::add_matrix()
+       * and \p NumericVector::add_vector() members do this for us.
        */
       es("Poisson").matrix->add_matrix (Ke, dof_indices);
-      es("Poisson").rhs->add_vector (Fe, dof_indices);
+      es("Poisson").rhs->add_vector    (Fe, dof_indices);
       
     }; // end of element loop
 

@@ -1,4 +1,4 @@
-// $Id: face_quad.h,v 1.8 2003-02-27 00:55:28 benkirk Exp $
+// $Id: face_quad.h,v 1.9 2003-02-28 23:37:42 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -60,8 +60,8 @@ public:
    * Default quadrilateral element, takes number of nodes and 
    * parent. Derived classes implement 'true' elements.
    */
-  Quad  (const unsigned int nn, Face* p);
-  
+  Quad  (const unsigned int nn, const Elem* p);
+
   /**
    * @returns 4.  All quad-derivatives are guaranteed to have at
    * least 4 nodes.
@@ -142,7 +142,7 @@ private:
 // ------------------------------------------------------------
 // Quad class member functions
 inline
-Quad::Quad(const unsigned int nn, Face* p) :
+Quad::Quad(const unsigned int nn, const Elem* p) :
   Face(nn, Quad::n_sides(), p)
 {
 }

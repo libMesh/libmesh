@@ -1,4 +1,4 @@
-// $Id: laspack_vector.h,v 1.8 2003-02-20 23:18:06 benkirk Exp $
+// $Id: laspack_vector.h,v 1.9 2003-02-28 23:37:43 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -37,6 +37,7 @@
 
 // Local includes
 #include "numeric_vector.h"
+#include "dense_vector.h"
 
 
 
@@ -284,6 +285,15 @@ class LaspackVector : public NumericVector<Real>
    * the NumericVector<Real> V 
    */
   void add_vector (const NumericVector<Real>& V,
+		   const std::vector<unsigned int>& dof_indices);
+  
+  /**
+   * U+=V where U and V are type 
+   * DenseVector<Real> and you
+   * want to specify WHERE to add
+   * the DenseVector<Real> V 
+   */
+  void add_vector (const DenseVector<Real>& V,
 		   const std::vector<unsigned int>& dof_indices);
   
   /**
@@ -538,8 +548,21 @@ void LaspackVector::add_vector (const std::vector<Real>& v,
 }
 
 
+
 inline
 void LaspackVector::add_vector (const NumericVector<Real>& V,
+				const std::vector<unsigned int>& dof_indices)
+{
+  assert (V.size() == dof_indices.size());
+
+  for (unsigned int i=0; i<V.size(); i++)
+    add (dof_indices[i], V(i));
+}
+
+
+
+inline
+void LaspackVector::add_vector (const DenseVector<Real>& V,
 				const std::vector<unsigned int>& dof_indices)
 {
   assert (V.size() == dof_indices.size());
