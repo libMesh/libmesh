@@ -1,4 +1,4 @@
-// $Id: error_vector.C,v 1.5 2004-01-03 15:37:44 benkirk Exp $
+// $Id: error_vector.C,v 1.6 2004-05-12 18:28:25 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -36,9 +36,11 @@ float ErrorVector::minimum() const
   float min = 1.e30;
   
   for (unsigned int i=0; i<n; i++)
-    if ((*this)[i] != 0.)
+    {
+      // Only positive (or zero) values in the error vector
+      assert((*this)[i] >= 0.);
       min = std::min (min, (*this)[i]);
-
+    }
   STOP_LOG ("minimum()", "ErrorVector");
 
   // ErrorVectors are for positive values
