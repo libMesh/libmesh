@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.13 2003-05-22 21:18:03 benkirk Exp $
+// $Id: fe_base.h,v 1.14 2003-05-30 20:15:45 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -675,6 +675,14 @@ protected:
 
 
 private:
+
+  /**
+   * @returns \p true when the shape functions (for
+   * this \p FEFamily) depend on the particular
+   * element, and therefore needs to be re-initialized
+   * for each new element.  \p false otherwise.
+   */
+  virtual bool shapes_need_reinit() const = 0;
 
 
 #ifdef ENABLE_INFINITE_ELEMENTS

@@ -1,4 +1,4 @@
-// $Id: inf_fe.h,v 1.27 2003-05-15 23:34:33 benkirk Exp $
+// $Id: inf_fe.h,v 1.28 2003-05-30 20:15:45 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -66,7 +66,7 @@ class FEComputeData;
  *
  * \author Daniel Dreyer
  * \date 2003
- * \version $Revision: 1.27 $
+ * \version $Revision: 1.28 $
  */
 
 //-------------------------------------------------------------
@@ -89,7 +89,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.27 $
+   * \version $Revision: 1.28 $
    */
   //-------------------------------------------------------------
   // InfFE::Radial class definition
@@ -181,7 +181,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.27 $
+   * \version $Revision: 1.28 $
    */
   //-------------------------------------------------------------
   // InfFE::Base class definition
@@ -731,8 +731,13 @@ protected:
   FEType current_fe_type;
 
 
-
 private:
+
+  /**
+   * @returns \p false, currently not required.
+   */
+  bool shapes_need_reinit() const;
+
   /**
    * When \p compute_node_indices_fast() is used, this static
    * variable remembers the element type for which the
