@@ -1,4 +1,4 @@
-// $Id: distributed_vector.h,v 1.8 2003-03-23 02:47:51 benkirk Exp $
+// $Id: distributed_vector.h,v 1.9 2003-05-05 22:23:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -101,6 +101,11 @@ public:
    * faster. 
    */
   void zero ();    
+
+  /**
+   * Creates a copy of this vector and returns it in an \p AutoPtr.
+   */
+  AutoPtr<NumericVector<T> > clone () const;
 
   /**
    * Change the dimension of the vector to \p N. The reserved memory for
@@ -523,6 +528,19 @@ void DistributedVector<T>::zero ()
   std::fill (_values.begin(),
 	     _values.end(),
 	     0.);
+}
+
+
+
+template <typename T>
+inline
+AutoPtr<NumericVector<T> > DistributedVector<T>::clone () const
+{
+  AutoPtr<NumericVector<T> > cloned_vector (new DistributedVector<T>);
+
+  *cloned_vector = *this;
+
+  return cloned_vector;
 }
 
 

@@ -1,4 +1,4 @@
-// $Id: numeric_vector.h,v 1.13 2003-05-04 23:58:52 benkirk Exp $
+// $Id: numeric_vector.h,v 1.14 2003-05-05 22:23:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -104,13 +104,19 @@ public:
    * @returns the \p NumericVector<T> to a pristine state.
    */
   virtual void clear ();
-  
+
   /**
    * Set all entries to zero. Equivalent to \p v = 0, but more obvious and
    * faster. 
    */
   virtual void zero () = 0;    
 
+  /**
+   * Creates a copy of this vector and returns it in an \p AutoPtr.
+   * This must be overloaded in the derived classes.
+   */
+  virtual AutoPtr<NumericVector<T> > clone () const = 0;
+  
   /**
    * Change the dimension of the vector to \p N. The reserved memory for
    * this vector remains unchanged if possible, to make things faster, but
