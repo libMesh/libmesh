@@ -1,4 +1,4 @@
-// $Id: type_vector.h,v 1.8 2004-12-24 15:02:32 benkirk Exp $
+// $Id: type_vector.h,v 1.9 2005-01-19 15:18:34 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -30,6 +30,9 @@
 #include "libmesh_common.h"
 
 
+// Forward declaration for friend class
+template <typename T>
+class TypeTensor;
 
 
 /**
@@ -46,6 +49,8 @@
 template <typename T>
 class TypeVector
 {
+friend class TypeTensor<T>;
+
 protected:
 
   /**
@@ -136,7 +141,7 @@ public:
    * Multiply a vector by a number, i.e. scale.
    */
   TypeVector<T> operator * (const T) const;
-  
+
   /**
    * Multiply this vector by a number, i.e. scale.
    */
@@ -507,6 +512,14 @@ TypeVector<T> TypeVector<T>::operator * (const T factor) const
 #endif  
 }
 
+
+
+template <typename T>
+TypeVector<T> operator * (const T factor,
+			  const TypeVector<T> &v)
+{
+  return v * factor;
+}
 
 
 
