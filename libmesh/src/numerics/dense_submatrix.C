@@ -1,4 +1,4 @@
-// $Id: dense_submatrix.C,v 1.1 2003-03-07 04:44:38 jwpeterson Exp $
+// $Id: dense_submatrix.C,v 1.2 2003-03-08 07:30:56 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -35,8 +35,8 @@ void DenseSubMatrix<T>::left_multiply (const DenseMatrixBase<T>& M2)
   // M2      = (m x p),
   // M3      = (p x n)
 
-  // M3 is a simply acopy of *this 
-  DenseSubMatrix<T>& M3(*this);
+  // M3 is a simply a copy of *this 
+  DenseSubMatrix<T> M3(*this);
 
   // Call the multiply function in the base class
   this->multiply(*this, M2, M3);
@@ -54,7 +54,7 @@ void DenseSubMatrix<T>::right_multiply (const DenseMatrixBase<T>& M3)
   // M3      = (p x n)
 
   // M2 is simply a copy of *this 
-  DenseSubMatrix<T>& M2(*this);
+  DenseSubMatrix<T> M2(*this);
 
   // Call the multiply function in the base class
   this->multiply(*this, M2, M3);

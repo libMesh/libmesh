@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.8 2003-02-21 18:31:24 benkirk Exp $
+# $Id: Makefile,v 1.9 2003-03-08 07:30:56 benkirk Exp $
 
 
 # The location of the mesh library
@@ -50,7 +50,7 @@ clean:
 
 clobber:
 	@$(MAKE) clean
-	@rm -f $(target)
+	@rm -f $(target) eqn_sys.dat
 
 distclean:
 	@$(MAKE) clobber
@@ -62,6 +62,8 @@ run: $(target)
 	@echo "***************************************************************"
 	@echo " "
 	@$(target)
+	@echo " "
+	@$(target) eqn_sys.dat
 	@echo " "
 	@echo "***************************************************************"
 	@echo "* Done Running Example " $(target)

@@ -1,4 +1,4 @@
-// $Id: dense_matrix_base.C,v 1.1 2003-03-07 04:44:38 jwpeterson Exp $
+// $Id: dense_matrix_base.C,v 1.2 2003-03-08 07:30:56 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,13 +30,13 @@ void DenseMatrixBase<T>::multiply (DenseMatrixBase<T>& M1,
 {
   // Assertions to make sure we have been
   // passed matrices of the correct dimension.
-  assert (M1._m == M2._m);
-  assert (M1._n == M3._n);
-  assert (M2._n == M3._m);
+  assert (M1.m() == M2.m());
+  assert (M1.n() == M3.n());
+  assert (M2.n() == M3.m());
 	  
-  const unsigned int m_s = M2._m;
-  const unsigned int p_s = M2._n; 
-  const unsigned int n_s = M1._n;
+  const unsigned int m_s = M2.m();
+  const unsigned int p_s = M2.n(); 
+  const unsigned int n_s = M1.n();
   
   // Do it this way because there is a
   // decent chance (at least for constraint matrices)
