@@ -1,4 +1,4 @@
-// $Id: predicated_iterator.h,v 1.4 2004-03-21 03:18:52 benkirk Exp $
+// $Id: predicated_iterator.h,v 1.5 2004-07-12 22:54:59 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -68,6 +68,11 @@ protected:
 
 public:
 
+  /**
+   * Virtual destructor.
+   */
+  virtual ~PredicatedIterator() {};
+  
   /**
    * Copy constructor. Do we need it ?
    */
