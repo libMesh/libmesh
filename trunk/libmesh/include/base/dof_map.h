@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.6 2005-02-22 22:17:17 jwpeterson Exp $
+// $Id: dof_map.h,v 1.7 2005-03-01 15:50:21 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -56,6 +56,26 @@ template <typename T> class SparseMatrix;
  * @author Benjamin S. Kirk, 2002-2003
  */
 
+// ------------------------------------------------------------
+// AMR constraint matrix types
+
+/**
+ * A row of the Dof constraint matrix.  Store as a float
+ * to save space since the factors are simple rational
+ * fractions.
+ */
+typedef std::map<unsigned int, double> DofConstraintRow;
+
+/** 
+ * The constraint matrix storage format. 
+ * We're using a class instead of a typedef to allow forward
+ * declarations and future flexibility.
+ */
+class DofConstraints : public std::map<unsigned int, DofConstraintRow>
+{
+};
+
+  
 // ------------------------------------------------------------
 // Dof Map class definition
 
@@ -199,18 +219,6 @@ public:
   //--------------------------------------------------------------------
   // AMR-specific methods
 
-  /**
-   * A row of the Dof constraint matrix.  Store as a float
-   * to save space since the factors are simple rational
-   * fractions.
-   */
-  typedef std::map<unsigned int, float> DofConstraintRow;
-
-  /** 
-   * The constraint matrix storage format. 
-   */
-  typedef std::map<unsigned int, DofConstraintRow> DofConstraints;
-  
   /**
    * After a mesh is refined and repartitioned it is possible that the
    * \p _send_list will need to be augmented.  This is the case when an
