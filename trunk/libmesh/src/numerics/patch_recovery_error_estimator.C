@@ -1,4 +1,4 @@
-// $Id: patch_recovery_error_estimator.C,v 1.1 2004-06-02 20:32:02 benkirk Exp $
+// $Id: patch_recovery_error_estimator.C,v 1.2 2004-06-02 20:55:17 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -75,7 +75,7 @@ void PatchRecoveryErrorEstimator::estimate_error (const SteadySystem& system,
       }
 
 
-      //------------------------------------------------------------
+  //------------------------------------------------------------
   // Iterate over all the active elements in the mesh
   // that live on this processor.
   const_active_local_elem_iterator       elem_it (mesh.elements_begin());
@@ -219,6 +219,12 @@ void PatchRecoveryErrorEstimator::estimate_error (const SteadySystem& system,
 	  
 	} // end variable loop  
     } // end element loop
+
+  
+  // Each processor has now computed the error contribuions
+  // for its local elements.  We need to sum the vector
+  this->reduce_error(error_per_cell);
+
   
   STOP_LOG("estimate_error()", "PatchRecoveryErrorEstimator");
 }
@@ -228,7 +234,7 @@ void PatchRecoveryErrorEstimator::estimate_error (const SteadySystem& system,
 void PatchRecoveryErrorEstimator::build_patch_from_local_neighbors (const Elem* e0,
 								    std::set<const Elem*> patch,
 								    const unsigned int target_patch_size)
-  {
+{
   START_LOG("build_patch_from_local_neighbors()", "PatchRecoveryErrorEstimator");
   
   // Make sure we are building a patch for an active, local element.
