@@ -1,4 +1,4 @@
-// "$Id: xdrIO.C,v 1.10 2003-09-02 18:02:45 benkirk Exp $\n"
+// "$Id: xdrIO.C,v 1.11 2003-09-06 22:57:12 ddreyer Exp $\n"
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -111,7 +111,8 @@ void XdrIO::init(XdrIO::XdrIO_TYPE t, const char* fn, const char*, int)
     case (XdrIO::R_ASCII):
       {
 	mp_in.open(fn, std::ios::in);
-	assert(mp_in);
+	assert(mp_in.good());
+
 	break;
       }
       
@@ -178,7 +179,20 @@ void XdrIO::init(XdrIO::XdrIO_TYPE t, const char* fn, const char*, int)
       
     case (XdrIO::R_ASCII):
       {
+
+#ifdef __HP_aCC
+	// weirdly, _only_ here aCC
+	// is not fond of mp_in.getline()
+	// however, using mp_in.getline()
+	// further below is ok...
+	std::string buf_buf;
+	std::getline (mp_in, buf_buf, '\n');
+	assert (buf_buf.size() <= bufLen);
+
+	buf_buf.copy (buf, std::string::npos);
+#else
 	mp_in.getline(buf, bufLen+1);
+#endif
 
 	break;
       }
@@ -220,8 +234,6 @@ void XdrIO::init(XdrIO::XdrIO_TYPE t, const char* fn, const char*, int)
 	  error();
 	}
     }
-
-
   
 }
 
@@ -400,6 +412,9 @@ int XdrMESH::header(XdrMHEAD *hd)
 	mp_in >> hd->m_sumWghts ; mp_in.getline(comment, comm_len);
 	mp_in >> hd->m_numBCs   ; mp_in.getline(comment, comm_len);
 	mp_in >> hd->m_strSize  ; mp_in.getline(comment, comm_len);
+
+	assert(mp_in.good());
+
 	break;
       }
 

@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.C,v 1.21 2003-09-02 18:02:43 benkirk Exp $
+// $Id: mesh_unv_support.C,v 1.22 2003-09-06 22:57:11 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -1026,12 +1026,17 @@ void UnvMeshInterface::element_out(std::ostream& out_file)
 
 std::string& UnvMeshInterface::D_to_e(std::string& number)
 {
-  // position of the "D" in the string
-  unsigned int position;
-
   // find "D" in string, start looking at 6th element, to improve speed.
   // We dont expect a "D" earlier
-  position = number.find("D",6);
+
+#ifdef __HP_aCC
+  // Use an int instead of an unsigned int,
+  // otherwise HP aCC may crash!
+  const int position = number.find("D",6);
+#else
+  const unsigned int position = number.find("D",6);
+#endif
+
 
   if(position!=std::string::npos)     // npos means no position
       // replace "D" in string

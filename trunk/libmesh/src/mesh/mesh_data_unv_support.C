@@ -1,4 +1,4 @@
-// $Id: mesh_data_unv_support.C,v 1.14 2003-09-02 18:02:43 benkirk Exp $
+// $Id: mesh_data_unv_support.C,v 1.15 2003-09-06 22:57:11 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -593,9 +593,6 @@ bool MeshDataUnvHeader::read (std::ifstream& in_file)
   for (unsigned int n=0; n<5; n++)
       std::getline(in_file, this->id_lines_1_to_5[n], '\n');
 
-//   // ID lines are ignored when reading
-//   for(unsigned int i=0; i<6; i++)
-//     in_file.ignore(256,'\n');
 
   in_file >> this->model_type     
 	  >> this->analysis_type
@@ -708,12 +705,16 @@ void MeshDataUnvHeader::write (std::ofstream& out_file)
 
 bool MeshDataUnvHeader::need_D_to_e (std::string& number)
 {
-  // position of the "D" in the string
-  unsigned int position;
-
   // find "D" in string, start looking at 6th element, to improve speed.
   // We dont expect a "D" earlier
-  position = number.find("D",6);
+
+#ifdef __HP_aCC
+  // Use an "int" instead of unsigned int,
+  // otherwise HP aCC may crash!
+  const int position = number.find("D",6);
+#else
+  const unsigned int position = number.find("D",6);
+#endif
 
   if(position!=std::string::npos)     // npos means no position
     {
