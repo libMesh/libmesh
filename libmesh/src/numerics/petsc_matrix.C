@@ -1,4 +1,4 @@
-//    $Id: petsc_matrix.C,v 1.7 2003-02-03 03:51:50 ddreyer Exp $
+//    $Id: petsc_matrix.C,v 1.8 2003-02-07 22:18:54 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -25,27 +25,14 @@
 
 #include "petsc_matrix.h"
 #include "petsc_vector.h"
+#include "dof_map.h"
 #include <petscviewer.h>
 
 
 
 
-
-PetscMatrix::PetscMatrix () :
-  is_initialized(false)
-{};
-
-
-
-
-PetscMatrix::~PetscMatrix ()
-{
-  clear ();
-};
-
-
-
-
+//-----------------------------------------------------------------------
+// PetscMatrix members
 void PetscMatrix::init (const unsigned int m,
 			const unsigned int n,
 			const unsigned int m_l,
@@ -167,86 +154,6 @@ void PetscMatrix::init (const DofMap& dof_map)
   zero();
 };
 
-
-
-
-
-void PetscMatrix::init (const DofMap& dof_map,
-			PetscMatrix& parent_matrix)
-{
-  {
-    if (initialized())
-      {
-	std::cerr << "ERROR: Matrix already initialized!"
-		  << std::endl;
-	
-	error();
-      }
-
-    is_initialized = true;
-  };
-
-  
-  int proc_id = 0;
-
-  MPI_Comm_rank (PETSC_COMM_WORLD, &proc_id);
-  
-  const unsigned int m   = dof_map.n_dofs();
-  const unsigned int m_l = dof_map.n_dofs_on_processor(proc_id); 
-  const unsigned int n_l = m_l;
-
-
-  const std::vector<unsigned int>& n_nz = dof_map.get_n_nz();
-  const std::vector<unsigned int>& n_oz = dof_map.get_n_oz();
-
-  // Make sure the sparsity pattern isn't empty
-  assert (n_nz.size() == n_l);
-  assert (n_oz.size() == n_l);
-
-  // Make sure our matrix will fit inside the parent matrix
-  {
-    assert (n_nz.size() <= (parent_matrix.row_stop() -
-			    parent_matrix.row_start()) );
-    
-    for (unsigned int row=0; row<n_nz.size(); row++)
-      assert (n_nz[row] <= (parent_matrix.row_stop() -
-			    parent_matrix.row_start()) );
-  };
-
-  
-  if (m==0)
-    return;
-  
-  int ierr=0;
-  int n_local=static_cast<int>(n_l);
-
-
-  // create the index sets with which we will extract storage
-  // from the parent matrix
-  IS is_rows, is_cols;
-  {
-    std::vector<int> local_rows(m_l, 0);
-
-    unsigned int next_row = parent_matrix.row_start();
-  
-    for (unsigned int row=0; row<m_l; row++)
-      local_rows[row] = next_row++;
-
-    ierr = ISCreateGeneral(PETSC_COMM_WORLD, m_l, &local_rows[0], &is_rows);
-                                           CHKERRQ(ierr);
-
-    ierr = ISAllGather(is_rows, &is_cols); CHKERRQ(ierr);
-
-    ierr = MatGetSubMatrix(parent_matrix.mat, is_rows, is_cols,
-			   n_local, MAT_INITIAL_MATRIX, &mat);
-                                           CHKERRQ(ierr);
-
-    ierr = ISDestroy(is_rows); CHKERRQ(ierr); 
-    ierr = ISDestroy(is_cols); CHKERRQ(ierr); 					   
-  };
-
-  zero();
-};
 
 
 

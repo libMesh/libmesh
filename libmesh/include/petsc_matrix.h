@@ -1,4 +1,4 @@
-//    $Id: petsc_matrix.h,v 1.8 2003-02-03 03:51:49 ddreyer Exp $
+//    $Id: petsc_matrix.h,v 1.9 2003-02-07 22:18:53 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -19,21 +19,21 @@
 
 
 
+#ifndef __petsc_matrix_h__
+#define __petsc_matrix_h__
+
 #include "mesh_common.h"
 
 #ifdef HAVE_PETSC
 
-#ifndef __petsc_matrix_h__
-#define __petsc_matrix_h__
-
-// TODO:[BSK} This seems necessary to use petsc on IBM Power3 at NERSC, but only there?  This will need to be wrapped in an ifdef with a variable set by configure
+// TODO:[BSK} This seems necessary to use petsc on IBM Power3 at NERSC, but only there?  
 #include <cmath>
 
 
 // C++ includes
 
 // Local includes
-#include "dof_map.h"
+#include "sparse_matrix.h"
 
 
 
@@ -45,16 +45,14 @@
 
 namespace Petsc {
 extern "C" {
-#include "petscmat.h"
+#include <petscmat.h>
 }
-// for easy switching between Petsc 2.1.0/2.1.1
-// typedef Scalar PetscScalar;
 } 
 using namespace Petsc;
 
 #else
 
-#include "petscmat.h"
+#include <petscmat.h>
 
 #endif
 
@@ -74,7 +72,7 @@ class PetscInterface;
  * @author Benjamin S. Kirk, 2002
  */
 
-class PetscMatrix 
+class PetscMatrix : public SparseMatrix
 {
  public:
   /**
@@ -120,16 +118,6 @@ class PetscMatrix
    * Initialize using sparsity structure computed by \p dof_map.
    */   
   void init (const DofMap& dof_map);
-
-  /**
-   * Creates the matrix using sparsity structure computed
-   * by \p dof_map. The matrix will be created as a subset of
-   * the input matrix \p parent_matrix, so clearly \p parent_matrix
-   * should be at least the same size (possibly bigger) than the
-   * matrix to be created.
-   */
-  void init (const DofMap& dof_map,
-	     PetscMatrix& parent_matrix);
   
   /**
    * Release all memory and return
@@ -181,7 +169,8 @@ class PetscMatrix
    * not exist. Still, it is allowed to store
    * zero values in non-existent fields.
    */
-  void set (const unsigned int i, const unsigned int j,
+  void set (const unsigned int i,
+	    const unsigned int j,
 	    const Complex value);
     
   /**
@@ -192,7 +181,8 @@ class PetscMatrix
    * store zero values in
    * non-existent fields.
    */
-  void add (const unsigned int i, const unsigned int j,
+  void add (const unsigned int i,
+	    const unsigned int j,
 	    const Complex value);
 
   /**
@@ -267,13 +257,6 @@ class PetscMatrix
    */
   bool closed() const;
 
-
-  /**
-   * @returns true if the matrix has been initialized,
-   * false otherwise.
-   */
-  bool initialized() const { return is_initialized; };
-
   /**
    * Print the contents of the matrix to the screen.
    */
@@ -297,19 +280,28 @@ class PetscMatrix
   Mat mat;
 
   /**
-   * Flag indicating whether or not the matrix
-   * has been initialized
-   */
-  bool is_initialized;
-  
-  /**
    * Make other Petsc datatypes friends
    */
   friend class PetscInterface;
 };
 
 
-/*---------------------- Inline functions -----------------------------------*/
+
+
+//-----------------------------------------------------------------------
+// PetscMatrix inline members
+inline
+PetscMatrix::PetscMatrix()
+{};
+
+
+
+
+inline
+PetscMatrix::~PetscMatrix()
+{
+  clear();
+};
 
 
 
