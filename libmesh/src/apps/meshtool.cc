@@ -733,14 +733,45 @@ int main (int argc, char** argv)
     {
       if (names.size() >= 2)
 	{
-	  if (names.size() == 2)
-	    mesh.write(names[1]);
-	  else if (names.size() == 3)
-	    mesh.write(names[1], soln, var_names);
-	  else
-	    error();
+	  /*
+	   * When the mesh got refined, it is likely that
+	   * the user does _not_ want to write also
+	   * the coarse elements, but only the active ones.
+	   * Use Mesh::create_submesh() to create a mesh
+	   * of only active elements, and then write _this_
+	   * new mesh.
+	   */
+	  if (n_rsteps > 0)
+	    {
+	      if (verbose)
+		  std::cout << " Mesh got refined, will write only _active_ elements." << std::endl;
 
-	  
+	      Mesh new_mesh (dim);
+
+	      const_active_elem_iterator       it     (mesh.elements_begin());
+	      const const_active_elem_iterator it_end (mesh.elements_end());
+	      mesh.create_submesh(new_mesh, it, it_end);
+
+	      // now write the new_mesh
+	      if (names.size() == 2)
+		  new_mesh.write(names[1]);
+	      else if (names.size() == 3)
+		  new_mesh.write(names[1], soln, var_names);
+	      else
+		  error();
+	    }
+	  else
+	    {
+	      if (names.size() == 2)
+		  mesh.write(names[1]);
+	      else if (names.size() == 3)
+		  mesh.write(names[1], soln, var_names);
+	      else
+		  error();
+	    }
+
+
+
 	  /**
 	   * Possibly write the BCs
 	   */
