@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.56 2004-03-08 02:09:49 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.57 2004-03-08 02:30:00 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -454,10 +454,10 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           ;;
   
       sun_studio | sun_forte)
-          CXXFLAGSG="-DDEBUG -w -library=stlport4"
-          CXXFLAGSO="-DNDEBUG -w -library=stlport4"
-          CFLAGSG="-DDEBUG -w"
-          CFLAGSO="-DNDEBUG -w"
+          CXXFLAGSG="-DDEBUG -library=stlport4 -g"
+          CXXFLAGSO="-DNDEBUG -library=stlport4 -xO4"
+          CFLAGSG="-DDEBUG -g"
+          CFLAGSO="-DNDEBUG -xO4"
 
           CXXSHAREDFLAG="-G"
           CSHAREDFLAG="-G"
