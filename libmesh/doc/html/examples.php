@@ -21,6 +21,8 @@ menu on the left to navigate the examples.
 <br>
 <br>
 
+
+
 <h2><a href="ex1.php">Example 1</a> -- Creation of a Mesh Object</h2>
 This is the first example program.  It simply demonstrates
 how to create a mesh object.  A mesh is read from file,
@@ -30,7 +32,9 @@ written.
 <br>
 <br>
 
-<h2><a href="ex2.php">Example 2</a> -- Using PETSc to Solve a Simple System</h2>
+
+
+<h2><a href="ex2.php">Example 2</a> -- Defining a Simple System</h2>
 The second example program demonstrates how to
 create an equation system for a simple scalar system.  This
 example will also introduce some of the issues involved with using Petsc
@@ -39,7 +43,9 @@ in your application.
 <br>
 <br>
 
-<h2><a href="ex3.php">Example 3</a> -- Solving a Poisson Problem</h2>
+
+
+<h2><a href="ex3.php">Example 3</a> -- Solving a 2D Poisson Problem</h2>
 This is the third example program.  It builds on
 the second example program by showing how to solve a simple
 Poisson system.  This example also introduces the notion
@@ -48,15 +54,33 @@ exact solution, and using element iterators.
 We will not comment on things that
 were already explained in the second example.
 
+<br>
+<br>
 
-<br><br>
 
-<h2><a href="ex4.php">Example 4</a> -- Solving the Poisson Problem in Parallel</h2>
+
+<h2><a href="ex4.php">Example 4</a> -- Solving a 2D or 3D Poisson Problem in Parallel</h2>
 This is the fourth example program.  It builds on
 the third example program by showing how to formulate
 the code in a dimension-independent way.  Very minor
-changes to the example will allow the problem to be
-solved in two or three dimensions.
+changes allow rhe example will allow the problem to be
+solved in two or three dimensions and in parallel. 
+
+<br>
+<br>
+
+
+
+<h2><a href="ex5.php">Example 5</a> -- Run-time Selection of Quadrature Rules</h2>
+This example changes the previous example by enabling
+run-time selection of quadrature rules. 
+
+<br>
+<br>
+
+
+
+
 </div>
 
 <!--

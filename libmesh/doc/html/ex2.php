@@ -11,7 +11,7 @@
  
 <div class="content">
 <div class = "comment">
-Example 2 -- Using PETSc to Solve a Simple System
+Example 2 -- Defining a Simple System
 
 <br><br>This is the second example program.  It demonstrates how to
 create an equation system for a simple scalar system.  This

@@ -1,4 +1,4 @@
-/* $Id: ex4.C,v 1.33 2003-11-07 02:59:25 jwpeterson Exp $ */
+/* $Id: ex4.C,v 1.34 2003-11-07 17:41:08 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -19,7 +19,7 @@
 
 
 
- // Example 4 -- Solve the Poisson Problem in Parallel
+ // Example 4 -- Solving a 2D or 3D Poisson Problem in Parallel
  //
  // This is the fourth example program.  It builds on
  // the third example program by showing how to formulate
@@ -88,7 +88,7 @@ Real exact_solution (const Real x,
 // Begin the main program.
 int main (int argc, char** argv)
 {
-    // Initialize Petsc, like in example 2.
+  // Initialize libMesh and any dependent libaries, like in example 2.
   libMesh::init (argc, argv);
 
   
@@ -178,6 +178,12 @@ int main (int argc, char** argv)
   return libMesh::close ();
 }
 
+
+
+
+//
+//
+//
 // We now define the matrix assembly function for the
 // Poisson system.  We need to first compute element
 // matrices and right-hand sides, and then take into
@@ -329,13 +335,12 @@ void assemble_poisson(EquationSystems& es,
       //
       // Now start logging the element matrix computation
       perf_log.start_event ("Ke");
-      
+
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
 	for (unsigned int i=0; i<phi.size(); i++)
 	  for (unsigned int j=0; j<phi.size(); j++)
-	    {
-	      Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-	    }
+	    Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+	    
 
       // Stop logging the matrix computation
       perf_log.stop_event ("Ke");
@@ -349,33 +354,42 @@ void assemble_poisson(EquationSystems& es,
       
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
 	{
-	  const Real x = q_point[qp](0);
-	  const Real y = q_point[qp](1);
-	  const Real eps = 1.e-3;
-	  
 	  // fxy is the forcing function for the Poisson equation.
 	  // In this case we set fxy to be a finite difference
 	  // Laplacian approximation to the (known) exact solution.
 	  //
 	  // We will use the second-order accurate FD Laplacian
-	  // approximation, which in 2D is
+	  // approximation, which in 2D on a structured grid is
 	  //
-	  // u_xx + u_yy = (u(i,j-1) + u(i,j+1) +
-	  //                u(i-1,j) + u(i+1,j) +
+	  // u_xx + u_yy = (u(i-1,j) + u(i+1,j) +
+	  //                u(i,j-1) + u(i,j+1) +
 	  //                -4*u(i,j))/h^2
 	  //
 	  // Since the value of the forcing function depends only
 	  // on the location of the quadrature point (q_point[qp])
-	  // we will compute it here, outside of the i-loop
-	  const Real fxy = -(exact_solution(x,y-eps) +
-			     exact_solution(x,y+eps) +
-			     exact_solution(x-eps,y) +
-			     exact_solution(x+eps,y) -
-			     4.*exact_solution(x,y))/eps/eps;
+	  // we will compute it here, outside of the i-loop	  
+	  const Real x = q_point[qp](0);
+	  const Real y = q_point[qp](1);
+	  const Real z = q_point[qp](2);
+	  const Real eps = 1.e-3;
+
+	  const Real uxx = (exact_solution(x-eps,y,z) +
+			    exact_solution(x+eps,y,z) +
+			    -2.*exact_solution(x,y,z))/eps/eps;
+	      
+	  const Real uyy = (exact_solution(x,y-eps,z) +
+			    exact_solution(x,y+eps,z) +
+			    -2.*exact_solution(x,y,z))/eps/eps;
 	  
+	  const Real uzz = (exact_solution(x,y,z-eps) +
+			    exact_solution(x,y,z+eps) +
+			    -2.*exact_solution(x,y,z))/eps/eps;
+
+	  const Real fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
+
+	  // Add the RHS contribution
 	  for (unsigned int i=0; i<phi.size(); i++)
-	    Fe(i) += JxW[qp]*fxy*phi[i][qp];
-	  
+	    Fe(i) += JxW[qp]*fxy*phi[i][qp];	  
 	}
       
       // Stop logging the right-hand-side computation

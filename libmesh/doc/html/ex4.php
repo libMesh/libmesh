@@ -11,7 +11,7 @@
  
 <div class="content">
 <div class = "comment">
-Example 4 -- Solve the Poisson Problem in Parallel
+Example 4 -- Solving a 2D or 3D Poisson Problem in Parallel
 
 <br><br>This is the fourth example program.  It builds on
 the third example program by showing how to formulate
@@ -152,7 +152,7 @@ Begin the main program.
 </pre>
 </div>
 <div class = "comment">
-Initialize Petsc, like in example 2.
+Initialize libMesh and any dependent libaries, like in example 2.
 </div>
 
 <div class ="fragment">
@@ -372,10 +372,16 @@ All done.
           return libMesh::close ();
         }
         
+        
+        
+        
 </pre>
 </div>
 <div class = "comment">
-We now define the matrix assembly function for the
+
+<br><br>
+<br><br>
+<br><br>We now define the matrix assembly function for the
 Poisson system.  We need to first compute element
 matrices and right-hand sides, and then take into
 account the boundary conditions, which will be handled
@@ -712,13 +718,12 @@ computation seperately.
 <div class ="fragment">
 <pre>
               perf_log.start_event ("Ke");
-              
+        
               for (unsigned int qp=0; qp&lt;qrule.n_points(); qp++)
                 for (unsigned int i=0; i&lt;phi.size(); i++)
                   for (unsigned int j=0; j&lt;phi.size(); j++)
-                    {
-                      Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-                    }
+                    Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+                    
         
 </pre>
 </div>
@@ -746,10 +751,6 @@ This involves a single loop in which we integrate the
               
               for (unsigned int qp=0; qp&lt;qrule.n_points(); qp++)
                 {
-                  const Real x = q_point[qp](0);
-                  const Real y = q_point[qp](1);
-                  const Real eps = 1.e-3;
-                  
 </pre>
 </div>
 <div class = "comment">
@@ -758,28 +759,48 @@ In this case we set fxy to be a finite difference
 Laplacian approximation to the (known) exact solution.
 
 <br><br>We will use the second-order accurate FD Laplacian
-approximation, which in 2D is
+approximation, which in 2D on a structured grid is
 
-<br><br>u_xx + u_yy = (u(i,j-1) + u(i,j+1) +
-u(i-1,j) + u(i+1,j) +
+<br><br>u_xx + u_yy = (u(i-1,j) + u(i+1,j) +
+u(i,j-1) + u(i,j+1) +
 -4*u(i,j))/h^2
 
 <br><br>Since the value of the forcing function depends only
 on the location of the quadrature point (q_point[qp])
-we will compute it here, outside of the i-loop
+we will compute it here, outside of the i-loop          
 </div>
 
 <div class ="fragment">
 <pre>
-                  const Real fxy = -(exact_solution(x,y-eps) +
-                                     exact_solution(x,y+eps) +
-                                     exact_solution(x-eps,y) +
-                                     exact_solution(x+eps,y) -
-                                     4.*exact_solution(x,y))/eps/eps;
+                  const Real x = q_point[qp](0);
+                  const Real y = q_point[qp](1);
+                  const Real z = q_point[qp](2);
+                  const Real eps = 1.e-3;
+        
+                  const Real uxx = (exact_solution(x-eps,y,z) +
+                                    exact_solution(x+eps,y,z) +
+                                    -2.*exact_solution(x,y,z))/eps/eps;
+                      
+                  const Real uyy = (exact_solution(x,y-eps,z) +
+                                    exact_solution(x,y+eps,z) +
+                                    -2.*exact_solution(x,y,z))/eps/eps;
                   
+                  const Real uzz = (exact_solution(x,y,z-eps) +
+                                    exact_solution(x,y,z+eps) +
+                                    -2.*exact_solution(x,y,z))/eps/eps;
+        
+                  const Real fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
+        
+</pre>
+</div>
+<div class = "comment">
+Add the RHS contribution
+</div>
+
+<div class ="fragment">
+<pre>
                   for (unsigned int i=0; i&lt;phi.size(); i++)
-                    Fe(i) += JxW[qp]*fxy*phi[i][qp];
-                  
+                    Fe(i) += JxW[qp]*fxy*phi[i][qp];          
                 }
               
 </pre>
@@ -1102,6 +1123,9 @@ it will print its log to the screen. Pretty easy, huh?
     <B><FONT COLOR="#A020F0">return</FONT></B> libMesh::close ();
   }
   
+  
+  
+  
   <FONT COLOR="#228B22"><B>void</FONT></B> assemble_poisson(EquationSystems&amp; es,
                         <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp; system_name)
   {
@@ -1164,13 +1188,12 @@ it will print its log to the screen. Pretty easy, huh?
         perf_log.stop_event(<FONT COLOR="#BC8F8F"><B>&quot;elem init&quot;</FONT></B>);      
   
         perf_log.start_event (<FONT COLOR="#BC8F8F"><B>&quot;Ke&quot;</FONT></B>);
-        
+  
         <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> qp=0; qp&lt;qrule.n_points(); qp++)
   	<B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i&lt;phi.size(); i++)
   	  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> j=0; j&lt;phi.size(); j++)
-  	    {
-  	      Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-  	    }
+  	    Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+  	    
   
         perf_log.stop_event (<FONT COLOR="#BC8F8F"><B>&quot;Ke&quot;</FONT></B>);
   
@@ -1180,17 +1203,25 @@ it will print its log to the screen. Pretty easy, huh?
   	{
   	  <FONT COLOR="#228B22"><B>const</FONT></B> Real x = q_point[qp](0);
   	  <FONT COLOR="#228B22"><B>const</FONT></B> Real y = q_point[qp](1);
+  	  <FONT COLOR="#228B22"><B>const</FONT></B> Real z = q_point[qp](2);
   	  <FONT COLOR="#228B22"><B>const</FONT></B> Real eps = 1.e-3;
+  
+  	  <FONT COLOR="#228B22"><B>const</FONT></B> Real uxx = (exact_solution(x-eps,y,z) +
+  			    exact_solution(x+eps,y,z) +
+  			    -2.*exact_solution(x,y,z))/eps/eps;
+  	      
+  	  <FONT COLOR="#228B22"><B>const</FONT></B> Real uyy = (exact_solution(x,y-eps,z) +
+  			    exact_solution(x,y+eps,z) +
+  			    -2.*exact_solution(x,y,z))/eps/eps;
   	  
-  	  <FONT COLOR="#228B22"><B>const</FONT></B> Real fxy = -(exact_solution(x,y-eps) +
-  			     exact_solution(x,y+eps) +
-  			     exact_solution(x-eps,y) +
-  			     exact_solution(x+eps,y) -
-  			     4.*exact_solution(x,y))/eps/eps;
-  	  
+  	  <FONT COLOR="#228B22"><B>const</FONT></B> Real uzz = (exact_solution(x,y,z-eps) +
+  			    exact_solution(x,y,z+eps) +
+  			    -2.*exact_solution(x,y,z))/eps/eps;
+  
+  	  <FONT COLOR="#228B22"><B>const</FONT></B> Real fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
+  
   	  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i&lt;phi.size(); i++)
-  	    Fe(i) += JxW[qp]*fxy*phi[i][qp];
-  	  
+  	    Fe(i) += JxW[qp]*fxy*phi[i][qp];	  
   	}
         
         perf_log.stop_event (<FONT COLOR="#BC8F8F"><B>&quot;Fe&quot;</FONT></B>);

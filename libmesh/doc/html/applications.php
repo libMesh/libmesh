@@ -17,9 +17,9 @@
   <li>    Bar </li>
 </ul>
 
-<h2>Sub-Heading 1</h2>
+<h2>Natural Convection</h2>
 <ul>
-  <li> Foo </li>
+  <li> <a href="http://cfdlab.ae.utexas.edu/~benkirk/adv_flows_project.pdf">Ben's Adavnced Flows Class Project</a> </li>
   <li> Bar </li>
 </ul>
 
