@@ -5,7 +5,9 @@ ex4.$(obj-suffix):\
     ../../include/boundary_mesh.h\
     ../../include/coupling_matrix.h\
     ../../include/dense_matrix.h\
+    ../../include/dense_matrix_base.h\
     ../../include/dense_vector.h\
+    ../../include/dense_vector_base.h\
     ../../include/dof_map.h\
     ../../include/dof_object.h\
     ../../include/elem.h\
@@ -20,6 +22,7 @@ ex4.$(obj-suffix):\
     ../../include/enum_solver_package.h\
     ../../include/enum_solver_type.h\
     ../../include/equation_systems.h\
+    ../../include/equation_systems_base.h\
     ../../include/fe.h\
     ../../include/fe_base.h\
     ../../include/fe_type.h\
@@ -36,6 +39,7 @@ ex4.$(obj-suffix):\
     ../../include/node.h\
     ../../include/node_iterators.h\
     ../../include/numeric_vector.h\
+    ../../include/o_f_stream.h\
     ../../include/perf_log.h\
     ../../include/point.h\
     ../../include/predicated_iterator.h\
@@ -50,6 +54,9 @@ ex4.$(obj-suffix):\
     ../../include/xdr_cxx.h
 ../ex3/exact_solution.$(obj-suffix):\
     ../ex3/exact_solution.C\
+    ../../include/auto_ptr.h\
+    ../../include/libmesh.h\
     ../../include/libmesh_base.h\
     ../../include/mesh_common.h\
-    ../../include/mesh_config.h
+    ../../include/mesh_config.h\
+    ../../include/perf_log.h
