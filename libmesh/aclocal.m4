@@ -1,6 +1,5 @@
-
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.68 2004-10-15 04:27:27 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.69 2004-10-19 20:12:45 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -194,6 +193,8 @@ dnl              has been removed as of this version of GCC.
 dnl
 dnl Usage: SET_CXX_FLAGS
 dnl
+dnl (Note the CXXFLAGS and the CPPFLAGS used for further tests may
+dnl  be augmented)
 dnl -------------------------------------------------------------
 AC_DEFUN(SET_CXX_FLAGS, dnl
 [
@@ -312,8 +313,8 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           ;;
   
       MIPSpro)
-          CXXFLAGSG="-DDEBUG -LANG:std -no_auto_include -ansi -g -woff 1460"
-          CXXFLAGSO="-DNDEBUG -LANG:std -no_auto_include -ansi -O2 -w"
+          CXXFLAGSG="-DDEBUG -LANG:std -LANG:libc_in_namespace_std=OFF -no_auto_include -ansi -g -woff 1460"
+          CXXFLAGSO="-DNDEBUG -LANG:std -LANG:libc_in_namespace_std=OFF -no_auto_include -ansi -O2 -w"
           CFLAGSG="-DDEBUG"
           CFLAGSO="-DNDEBUG -O2 -w"
 
@@ -332,6 +333,12 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
             CFLAGSP="$CFLAGSP -KPIC"
 
             LDFLAGS="$LDFLAGS -KPIC"
+          fi
+
+	  dnl Augment CXXFLAGS to include -LANG:std if not there.  This is
+          dnl needed to compile the remaining configure tests
+          if test "x`echo $CXXFLAGS | grep 'LANG:std'`" = "x" ; then
+	    CXXFLAGS="$CXXFLAGS -LANG:std"
           fi
           ;;
   
