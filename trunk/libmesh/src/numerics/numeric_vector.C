@@ -1,4 +1,4 @@
-// $Id: numeric_vector.C,v 1.6 2003-03-21 15:29:29 ddreyer Exp $
+// $Id: numeric_vector.C,v 1.7 2003-04-08 03:21:26 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -33,28 +33,45 @@
 // NumericVector methods
 
 // Full specialization for Real datatypes
-template <>
-AutoPtr<NumericVector<Real> >
-NumericVector<Real>::build(const SolverPackage solver_package)
+template <typename T>
+AutoPtr<NumericVector<T> >
+NumericVector<T>::build(const SolverPackage solver_package_in)
 {
+  // Possibly overload the solver package based on
+  // command-line arguments
+  SolverPackage solver_package = solver_package_in;
+  
+#ifdef HAVE_PETSC
+  if (libMesh::on_command_line ("--use-petsc"))
+    solver_package = PETSC_SOLVERS;
+#endif
+  
+#ifdef HAVE_LASPACK
+  if (libMesh::on_command_line("--use-laspack"))
+    solver_package = LASPACK_SOLVERS;
+#endif
 
+
+
+
+  // Build the appropriate vector
   switch (solver_package)
     {
 
 
-#if defined(HAVE_LASPACK) && defined(USE_REAL_NUMBERS)
+#ifdef HAVE_LASPACK
     case LASPACK_SOLVERS:
       {
-	AutoPtr<NumericVector<Real> > ap(new LaspackVector<Real>);
+	AutoPtr<NumericVector<T> > ap(new LaspackVector<T>);
 	return ap;
       }
 #endif
 
 
-#if defined(HAVE_PETSC) && defined(USE_REAL_NUMBERS)
+#ifdef HAVE_PETSC
     case PETSC_SOLVERS:
       {
-	AutoPtr<NumericVector<Real> > ap(new PetscVector<Real>);
+	AutoPtr<NumericVector<T> > ap(new PetscVector<T>);
 	return ap;
       }
 #endif
@@ -66,47 +83,7 @@ NumericVector<Real>::build(const SolverPackage solver_package)
       error();
     }
     
-  AutoPtr<NumericVector<Real> > ap(NULL);
-  return ap;    
-}
-
-
-
-// Full specialization for Complex datatypes
-template <>
-AutoPtr<NumericVector<Complex> >
-NumericVector<Complex>::build(const SolverPackage solver_package)
-{
-
-  switch (solver_package)
-    {
-
-
-#if defined(HAVE_LASPACK) && defined(USE_COMPLEX_NUMBERS)
-    case LASPACK_SOLVERS:
-      {
-	AutoPtr<NumericVector<Complex> > ap(new LaspackVector<Complex>);
-	return ap;
-      }
-#endif
-
-
-#if defined(HAVE_PETSC) && defined(USE_COMPLEX_NUMBERS)
-    case PETSC_SOLVERS:
-      {
-	AutoPtr<NumericVector<Complex> > ap(new PetscVector<Complex>);
-	return ap;
-      }
-#endif
-
-    default:
-      std::cerr << "ERROR:  Unrecognized solver package: "
-		<< solver_package
-		<< std::endl;
-      error();
-    }
-    
-  AutoPtr<NumericVector<Complex> > ap(NULL);
+  AutoPtr<NumericVector<T> > ap(NULL);
   return ap;    
 }
 
@@ -114,8 +91,8 @@ NumericVector<Complex>::build(const SolverPackage solver_package)
 
 // Full specialization for float datatypes (DistributedVector wants this)
 template <>
-int NumericVector<float>:: compare (const NumericVector<float> &other_vector,
-				    const Real threshold) const
+int NumericVector<float>::compare (const NumericVector<float> &other_vector,
+				   const Real threshold) const
 {
   assert (this->initialized());
   assert (other_vector.initialized());
@@ -141,8 +118,8 @@ int NumericVector<float>:: compare (const NumericVector<float> &other_vector,
 
 // Full specialization for Real datatypes
 template <>
-int NumericVector<Real>:: compare (const NumericVector<Real> &other_vector,
-				   const Real threshold) const
+int NumericVector<Real>::compare (const NumericVector<Real> &other_vector,
+				  const Real threshold) const
 {
   assert (this->initialized());
   assert (other_vector.initialized());
@@ -168,8 +145,8 @@ int NumericVector<Real>:: compare (const NumericVector<Real> &other_vector,
 
 // Full specialization for Complex datatypes
 template <>
-int NumericVector<Complex>:: compare (const NumericVector<Complex> &other_vector,
-				      const Real threshold) const
+int NumericVector<Complex>::compare (const NumericVector<Complex> &other_vector,
+				     const Real threshold) const
 {
   assert (this->initialized());
   assert (other_vector.initialized());
@@ -191,6 +168,7 @@ int NumericVector<Complex>:: compare (const NumericVector<Complex> &other_vector
 
   return rvalue;
 }
+
 
 
 //------------------------------------------------------------------

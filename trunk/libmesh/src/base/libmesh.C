@@ -1,4 +1,4 @@
-// $Id: libmesh.C,v 1.10 2003-04-07 18:34:48 benkirk Exp $
+// $Id: libmesh.C,v 1.11 2003-04-08 03:21:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,7 +26,9 @@
 
 // Local includes
 #include "libmesh.h"
+#include "getpot.h"
 #include "reference_counter.h"
+
 
 
 #if defined(HAVE_PETSC)
@@ -86,20 +88,17 @@ PerfLog      libMesh::log ("libMesh",
 			   );
 
 
-std::ostream *libMesh::_out            = NULL;
-std::ostream *libMesh::_err            = NULL;
-bool          libMesh::_is_initialized = false;
+AutoPtr<GetPot>  libMesh::_command_line (NULL);
+std::ostream    *libMesh::_out            = NULL;
+std::ostream    *libMesh::_err            = NULL;
+bool             libMesh::_is_initialized = false;
 
 
 
 
 // ------------------------------------------------------------
 // libMesh member functions
-#if defined(HAVE_MPI)
 void libMesh::init (int & argc, char** & argv)
-#else
-void libMesh::init (int &     , char** &     )
-#endif
 {
 #if defined(HAVE_PETSC)
 
@@ -142,6 +141,8 @@ void libMesh::init (int &     , char** &     )
       _err = new std::ostream(NULL);
     }
 
+  // Parse the command-line arguments
+  _command_line.reset(new GetPot (argc, (const char**) argv));
   
   // The library is now ready for use
   _is_initialized = true;
@@ -216,4 +217,13 @@ int libMesh::close ()
   // the reference counted objects have been
   // deleted.
   return static_cast<int>(ReferenceCounter::n_objects());
+}
+
+
+
+bool libMesh::on_command_line (const std::string& arg)
+{
+  assert (_command_line.get() != NULL);
+
+  return _command_line->search (arg);
 }

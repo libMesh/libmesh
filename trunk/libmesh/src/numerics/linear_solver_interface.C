@@ -1,4 +1,4 @@
-// $Id: linear_solver_interface.C,v 1.6 2003-03-17 01:27:08 benkirk Exp $
+// $Id: linear_solver_interface.C,v 1.7 2003-04-08 03:21:26 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -33,14 +33,31 @@
 // LinearSolverInterface members
 template <typename T>
 AutoPtr<LinearSolverInterface<T> >
-LinearSolverInterface<T>::build(const SolverPackage solver_package)
+LinearSolverInterface<T>::build(const SolverPackage solver_package_in)
 {
+  // Possibly overload the solver package based on
+  // command-line arguments
+  SolverPackage solver_package = solver_package_in;
+  
+#ifdef HAVE_PETSC
+  if (libMesh::on_command_line ("--use-petsc"))
+    solver_package = PETSC_SOLVERS;
+#endif
+  
+#ifdef HAVE_LASPACK
+  if (libMesh::on_command_line("--use-laspack"))
+    solver_package = LASPACK_SOLVERS;
+#endif
 
+
+
+
+  // Build the appropriate solver
   switch (solver_package)
     {
 
 
-#if defined(HAVE_LASPACK)
+#ifdef HAVE_LASPACK
     case LASPACK_SOLVERS:
       {
 	AutoPtr<LinearSolverInterface<T> > ap(new LaspackInterface<T>);
@@ -49,7 +66,7 @@ LinearSolverInterface<T>::build(const SolverPackage solver_package)
 #endif
 
 
-#if defined(HAVE_PETSC)
+#ifdef HAVE_PETSC
     case PETSC_SOLVERS:
       {
 	AutoPtr<LinearSolverInterface<T> > ap(new PetscInterface<T>);
