@@ -1,4 +1,4 @@
-// $Id: plane.h,v 1.1 2003-11-05 22:26:43 benkirk Exp $
+// $Id: plane.h,v 1.2 2003-12-19 13:25:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -127,14 +127,30 @@ public:
    */
   Point unit_normal (const Point& p) const;
 
+  
 private:
+
+
+  /**
+   * Returns the normal for the plane.
+   */
+  const Point& normal () const;
   
   /**
    *  The plane is defined by a point and a normal.
    */
-  Point point;
-  Point normal;
+  Point _point;
+  Point _normal;
 
 };
+
+
+
+// ------------------------------------------------------------
+// Plane class inline members
+const Point & Plane::normal () const
+{
+  return _normal;
+}
 
 #endif

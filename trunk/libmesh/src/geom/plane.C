@@ -1,4 +1,4 @@
-// $Id: plane.C,v 1.8 2003-09-02 18:02:42 benkirk Exp $
+// $Id: plane.C,v 1.9 2003-12-19 13:25:36 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -37,7 +37,7 @@ Plane::Plane ()
 Plane::Plane (const Point& p, 
 	      const Point& n)
 {
-  create_from_point_normal (p, n);
+  this->create_from_point_normal (p, n);
 }
 
 
@@ -46,7 +46,7 @@ Plane::Plane (const Point& p0,
 	      const Point& p1, 
 	      const Point& p2)
 {
-  create_from_three_points (p0, p1, p2);
+  this->create_from_three_points (p0, p1, p2);
 }
 
 
@@ -54,8 +54,8 @@ Plane::Plane (const Point& p0,
 Plane::Plane (const Plane& other_plane) :
   Surface()
 {
-  create_from_point_normal(other_plane.point,
-			   other_plane.normal);
+  this->create_from_point_normal(other_plane._point,
+				 other_plane._normal);
 }
 
 
@@ -68,8 +68,8 @@ Plane::~Plane ()
 
 void Plane::create_from_point_normal (const Point& p, const Point& n)
 {
-  normal = n.unit();
-  point  = p;
+  _normal = n.unit();
+  _point  = p;
 }
 
 
@@ -79,13 +79,13 @@ void Plane::create_from_three_points (const Point& p0,
 				      const Point& p2)
 {
   // Just use p0 for the point.
-  point = p0;
+  _point = p0;
   
-  Point e0 = p1 - p0;
-  Point e1 = p2 - p0;
-  Point n  = e0.cross(e1);
+  const Point e0 = p1 - p0;
+  const Point e1 = p2 - p0;
+  const Point n  = e0.cross(e1);
 
-  Point normal = n.unit(); 
+  _normal = n.unit(); 
 }
 
 
@@ -95,8 +95,8 @@ void Plane::xy_plane (const Real zpos)
   const Point p (0., 0., zpos);
   const Point n (0., 0., 1.);
 
-  point  = p;
-  normal = n;
+  _point  = p;
+  _normal = n;
 }
 
 
@@ -106,8 +106,8 @@ void Plane::xz_plane (const Real ypos)
   const Point p (0., ypos, 0.);
   const Point n (0., 1., 0.);
 
-  point  = p;
-  normal = n;
+  _point  = p;
+  _normal = n;
 }
 
 
@@ -117,8 +117,8 @@ void Plane::yz_plane (const Real xpos)
   const Point p (xpos, 0., 0.);
   const Point n (1., 0., 0.);
 
-  point  = p;
-  normal = n;
+  _point  = p;
+  _normal = n;
 }
 
 
@@ -126,11 +126,11 @@ void Plane::yz_plane (const Real xpos)
 bool Plane::above_surface (const Point& p) const 
 {
   // Create a vector from the surface to point p;
-  const Point w = p - point;
+  const Point w = p - _point;
 
   // The point is above the surface if the projection
   // of that vector onto the normal is positive 
-  const Real proj = w*normal;
+  const Real proj = w*this->normal();
   
   if (proj > 0.) 
     return true;
@@ -142,7 +142,7 @@ bool Plane::above_surface (const Point& p) const
 
 bool Plane::below_surface (const Point& p) const 
 {
-  return ( !above_surface (p) );
+  return ( !this->above_surface (p) );
 }
 
 
@@ -150,12 +150,12 @@ bool Plane::below_surface (const Point& p) const
 bool Plane::on_surface (const Point& p) const 
 {
   // Create a vector from the surface to point p;
-  const Point w = p - point;
+  const Point w = p - _point;
 
   // If the projection of that vector onto the
   // plane's normal is 0 then the point is in
   // the plane.
-  if (w.size() < 1.e-10)
+  if (w.size_sq() < 1.e-12)
     return true;
 
   return false;
@@ -166,12 +166,12 @@ bool Plane::on_surface (const Point& p) const
 Point Plane::closest_point (const Point& p) const
 {
   // Create a vector from the surface to point p;
-  const Point w = p - point;
+  const Point w = p - _point;
 
   // The closest point in the plane to point p
-  // is in the negative direction normal direction
+  // is in the negative normal direction
   // a distance w (dot) p.
-  const Point cp = p - normal*(w*normal);
+  const Point cp = p - this->normal()*(w*this->normal());
   
   return cp;
 }
@@ -180,5 +180,5 @@ Point Plane::closest_point (const Point& p) const
 
 Point Plane::unit_normal (const Point&) const
 {
-  return normal;
+  return _normal;
 }
