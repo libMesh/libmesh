@@ -1,4 +1,4 @@
-// $Id: tree.h,v 1.4 2004-03-24 04:32:59 jwpeterson Exp $
+// $Id: tree.h,v 1.5 2004-04-19 17:36:11 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -89,9 +89,16 @@ public:
    * @returns a pointer to the element containing point p.
    */
   const Elem* find_element(const Point& p) const;
+
+  /**
+   * @returns a pointer to the element containing point p.
+   */
+  const Elem* operator() (const Point& p) const;
+  
   
 private:
 
+  
   /**
    * The tree root.
    */
@@ -188,5 +195,16 @@ Tree<N>::Tree (const Tree<N>& other_tree) :
 {
   error();
 }
+
+
+
+template <unsigned int N>
+inline
+const Elem* Tree<N>::operator() (const Point& p) const
+{
+  return this->find_element(p);
+}
+
+
 
 #endif
