@@ -31,15 +31,15 @@ QMatrix *ILUFactor(QMatrix *Q)
     size_t MaxLen, Dim, RoC, RoC_, Len, Len_, ElCount, ElCount_;
     size_t LDim, i, j, k;
     size_t *IndexMapp;
-    Boolean AllocOK, ElFound;
+    _LPBoolean AllocOK, ElFound;
     ElType *PtrEl, *PtrEl_;
-    Real **L;
+    _LPNumber **L;
 
     Q_Lock(Q);
     
     if (LASResult() == LASOK) {
         if (!(*Q->ILUExists)) {
-            Q_Constr(Q->ILU, "", Q->Dim, Q->Symmetry, Q->ElOrder, Normal, True);
+            Q_Constr(Q->ILU, "", Q->Dim, Q->Symmetry, Q->ElOrder, Normal, _LPTrue);
             /* copy entries, detemine maximum len of rows or columns */
             Dim = Q->ILU->Dim;
             MaxLen = 0;
@@ -52,7 +52,7 @@ QMatrix *ILUFactor(QMatrix *Q)
                 if (Len > MaxLen)
                     MaxLen = Len;
             } 
-            *Q->ILUExists = True;
+            *Q->ILUExists = _LPTrue;
                            
             /* sort elements, allocate diagonal elements and compute thier inverse */
             Q_SortEl(Q->ILU);
@@ -68,10 +68,10 @@ QMatrix *ILUFactor(QMatrix *Q)
 
             if (LASResult() == LASOK && *Q->ILU->ElSorted && !(*Q->ILU->ZeroInDiag)) {
                 /* allocate an auxiliary vector for index mapping */
-                AllocOK = True;
+                AllocOK = _LPTrue;
                 IndexMapp = (size_t *)malloc((Dim + 1) * sizeof(size_t));
                 if (IndexMapp == NULL) {
-                    AllocOK = False;
+                    AllocOK = _LPFalse;
                 } else {
                     /* initialization */
                     for(i = 1; i <= Dim; i++)
@@ -79,14 +79,14 @@ QMatrix *ILUFactor(QMatrix *Q)
                 }
                 /* allocate a dense matrix L for elements which have influence
                    on new elements arising during the factorization */
-                L = (Real **)malloc((MaxLen + 1) * sizeof(Real *));
+                L = (_LPNumber **)malloc((MaxLen + 1) * sizeof(_LPNumber *));
                 if (L == NULL) {
-                    AllocOK = False;
+                    AllocOK = _LPFalse;
                 } else {
                     for (j = 0; j <= MaxLen; j++) {
-                        L[j] = (Real *)malloc((MaxLen + 1) * sizeof(Real));
+                        L[j] = (_LPNumber *)malloc((MaxLen + 1) * sizeof(_LPNumber));
                         if (L[j] == NULL)
-                            AllocOK = False;
+                            AllocOK = _LPFalse;
                     }
                 }
                     
@@ -137,7 +137,7 @@ QMatrix *ILUFactor(QMatrix *Q)
                                     L[LDim][k] -= L[LDim][j] * L[k][j] / L[j][j];
                             for (j = 1; j < LDim; j++)
                                 L[LDim][LDim] -= L[LDim][j] * L[LDim][j] / L[j][j];
-                            if (IsZero(L[LDim][LDim]))
+                            if (_LPIsZeroNumber(L[LDim][LDim]))
                                 LASError(LASZeroPivotErr, "ILUFactor", Q_GetName(Q), NULL, NULL);
                             
                             /* set back factorized elements */
@@ -152,7 +152,7 @@ QMatrix *ILUFactor(QMatrix *Q)
                             PtrEl = Q->ILU->El[RoC] + Len - 1;
                             for (ElCount = 0; ElCount < Len && (*PtrEl).Pos >= RoC;
                                 ElCount++) {
-                                IndexMapp[(*PtrEl).Pos] = 0.0;
+                                IndexMapp[(*PtrEl).Pos] = 0; /* 0.0; */
                                 PtrEl--;
                             }
                         }
@@ -217,7 +217,7 @@ QMatrix *ILUFactor(QMatrix *Q)
                                 for (j = 1; j < LDim; j++)
                                     L[LDim][LDim] -= L[j][LDim] * L[LDim][j] / L[j][j];
                             }
-                            if (IsZero(L[LDim][LDim]))
+                            if (_LPIsZeroNumber(L[LDim][LDim]))
                                 LASError(LASZeroPivotErr, "ILUFactor", Q_GetName(Q), NULL, NULL);
                             
                             /* set back factorized elements */
@@ -235,12 +235,12 @@ QMatrix *ILUFactor(QMatrix *Q)
                                     RoC_ = (*PtrEl).Pos;
                                     Len_ = Q->ILU->Len[RoC_];
                                     PtrEl_ = Q->ILU->El[RoC_];
-                                    ElFound = False;
+                                    ElFound = _LPFalse;
                                     for (ElCount_ = 0; ElCount_ < Len_ && (*PtrEl_).Pos <= RoC;
                                         ElCount_++) {
                                         if ((*PtrEl_).Pos == RoC) {
                                             (*PtrEl_).Val = L[ElCount + 1][LDim];
-                                            ElFound = True;
+                                            ElFound = _LPTrue;
                                         }
                                         PtrEl_++;
                                     }
@@ -254,14 +254,14 @@ QMatrix *ILUFactor(QMatrix *Q)
                             PtrEl = Q->ILU->El[RoC];
                             for (ElCount = 0; ElCount < Len && (*PtrEl).Pos <= RoC;
                                 ElCount++) {
-                                IndexMapp[(*PtrEl).Pos] = 0.0;
+                                IndexMapp[(*PtrEl).Pos] = 0; /* 0.0; */
                                 PtrEl++;
                             }
                         }
                     }
                     
                     /* invert diagonal elements */
-                    *Q->ILU->DiagElAlloc = False;
+                    *Q->ILU->DiagElAlloc = _LPFalse;
                     Q_AllocInvDiagEl(Q->ILU);
                 } else {
                     LASError(LASMemAllocErr, "ILUFactor", Q_GetName(Q), NULL, NULL);

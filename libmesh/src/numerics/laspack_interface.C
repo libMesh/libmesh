@@ -1,4 +1,4 @@
-// $Id: laspack_interface.C,v 1.5 2003-03-04 22:31:14 benkirk Exp $
+// $Id: laspack_interface.C,v 1.6 2003-03-14 09:56:40 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,12 +30,15 @@
 // Local Includes
 #include "laspack_interface.h"
 
+#ifndef USE_COMPLEX_NUMBERS
 extern "C"
 {
+#endif
+
   void print_iter_accuracy(int Iter,
-			   double rNorm,
-			   double bNorm,
-			   Laspack::IterIdType IterId)
+			   _LPReal rNorm,
+			   _LPReal bNorm,
+			   IterIdType IterId)
     /* put out accuracy reached after each solver iteration */
   {
     
@@ -49,15 +52,15 @@ extern "C"
 	icall=1;
       }
     
-    if ( Iter%1==0 && (IterId == Laspack::CGIterId ||
-		       IterId == Laspack::CGNIterId ||
-		       IterId == Laspack::GMRESIterId ||
-		       IterId == Laspack::BiCGIterId ||
-		       IterId == Laspack::QMRIterId ||
-		       IterId == Laspack::CGSIterId ||
-		       IterId == Laspack::BiCGSTABIterId)  )
+    if ( Iter%1==0 && (IterId == CGIterId ||
+		       IterId == CGNIterId ||
+		       IterId == GMRESIterId ||
+		       IterId == BiCGIterId ||
+		       IterId == QMRIterId ||
+		       IterId == CGSIterId ||
+		       IterId == BiCGSTABIterId)  )
       {
-	if (!IsZero(bNorm))
+	if (!_LPIsZeroReal(bNorm))
 	  printf("%d    \t %g\n", Iter, rNorm/bNorm);
 	else
 	  printf("%d     (fnorm == 0)\n", Iter);
@@ -65,11 +68,14 @@ extern "C"
     
     //fclose(out);
   }
+
+#ifndef USE_COMPLEX_NUMBERS
 }
-  
+#endif  
 
 /*----------------------- functions ----------------------------------*/
-void LaspackInterface::clear ()
+template <typename T>
+void LaspackInterface<T>::clear ()
 {
   if (initialized())
     {
@@ -82,7 +88,8 @@ void LaspackInterface::clear ()
 
 
 
-void LaspackInterface::init ()
+template <typename T>
+void LaspackInterface<T>::init ()
 {
   // Initialize the data structures if not done so already.
   if (!initialized())
@@ -90,23 +97,24 @@ void LaspackInterface::init ()
       _is_initialized = true;
     }
 
-  Laspack::SetRTCAuxProc (print_iter_accuracy);
+  SetRTCAuxProc (print_iter_accuracy);
 }
 
 
 
+template <typename T>
 std::pair<unsigned int, Real> 
-LaspackInterface::solve (SparseMatrix<Real> &matrix_in,
-			 NumericVector<Real> &solution_in,
-			 NumericVector<Real> &rhs_in,
+LaspackInterface<T>::solve (SparseMatrix<T> &matrix_in,
+			 NumericVector<T> &solution_in,
+			 NumericVector<T> &rhs_in,
 			 const double tol,
 			 const unsigned int m_its)
 {
   init ();
 
-  LaspackMatrix& matrix   = dynamic_cast<LaspackMatrix&>(matrix_in);
-  LaspackVector& solution = dynamic_cast<LaspackVector&>(solution_in);
-  LaspackVector& rhs      = dynamic_cast<LaspackVector&>(rhs_in);
+  LaspackMatrix<T>& matrix   = dynamic_cast<LaspackMatrix<T>&>(matrix_in);
+  LaspackVector<T>& solution = dynamic_cast<LaspackVector<T>&>(solution_in);
+  LaspackVector<T>& rhs      = dynamic_cast<LaspackVector<T>&>(rhs_in);
   
   // Close the matrix and vectors in case this wasn't already done.
   matrix.close ();
@@ -123,7 +131,7 @@ LaspackInterface::solve (SparseMatrix<Real> &matrix_in,
   switch (_solver_type)
     {
     case CG:
-      Laspack::CGIter (&matrix._QMat,
+      CGIter (&matrix._QMat,
 		       &solution._vec,
 		       &rhs._vec,
 		       m_its,
@@ -131,7 +139,7 @@ LaspackInterface::solve (SparseMatrix<Real> &matrix_in,
 		       1.); break;
 
     case CGN:
-      Laspack::CGNIter (&matrix._QMat,
+      CGNIter (&matrix._QMat,
 			&solution._vec,
 			&rhs._vec,
 			m_its,
@@ -139,7 +147,7 @@ LaspackInterface::solve (SparseMatrix<Real> &matrix_in,
 			1.); break;
       
     case CGS:
-      Laspack::CGSIter (&matrix._QMat,
+      CGSIter (&matrix._QMat,
 			&solution._vec,
 			&rhs._vec,
 			m_its,
@@ -147,7 +155,7 @@ LaspackInterface::solve (SparseMatrix<Real> &matrix_in,
 			1.); break;
 
     case BICG:
-      Laspack::BiCGIter (&matrix._QMat,
+      BiCGIter (&matrix._QMat,
 			 &solution._vec,
 			 &rhs._vec,
 			 m_its,
@@ -155,7 +163,7 @@ LaspackInterface::solve (SparseMatrix<Real> &matrix_in,
 			 1.); break;
 
     case BICGSTAB:
-      Laspack::BiCGSTABIter (&matrix._QMat,
+      BiCGSTABIter (&matrix._QMat,
 			     &solution._vec,
 			     &rhs._vec,
 			     m_its,
@@ -163,7 +171,7 @@ LaspackInterface::solve (SparseMatrix<Real> &matrix_in,
 			     1.); break;
 
     case QMR:
-      Laspack::QMRIter (&matrix._QMat,
+      QMRIter (&matrix._QMat,
 			&solution._vec,
 			&rhs._vec,
 			m_its,
@@ -171,7 +179,7 @@ LaspackInterface::solve (SparseMatrix<Real> &matrix_in,
 			1.); break;
 
     case SSOR:
-      Laspack::SSORIter (&matrix._QMat,
+      SSORIter (&matrix._QMat,
 			 &solution._vec,
 			 &rhs._vec,
 			 m_its,
@@ -179,7 +187,7 @@ LaspackInterface::solve (SparseMatrix<Real> &matrix_in,
 			 1.); break;
 
     case JACOBI:
-      Laspack::JacobiIter (&matrix._QMat,
+      JacobiIter (&matrix._QMat,
 			   &solution._vec,
 			   &rhs._vec,
 			   m_its,
@@ -187,8 +195,8 @@ LaspackInterface::solve (SparseMatrix<Real> &matrix_in,
 			   1.); break;
 
      case GMRES:
-       Laspack::SetGMRESRestart (30);
-       Laspack::GMRESIter (&matrix._QMat,
+       SetGMRESRestart (30);
+       GMRESIter (&matrix._QMat,
 			   &solution._vec,
 			   &rhs._vec,
 			   m_its,
@@ -209,22 +217,23 @@ LaspackInterface::solve (SparseMatrix<Real> &matrix_in,
 		    m_its);
     }
 
-  if (Laspack::LASResult() != Laspack::LASOK)
+  if (LASResult() != LASOK)
     {
       std::cerr << "ERROR:  LASPACK Error: " << std::endl;
-      Laspack::WriteLASErrDescr(stdout);
+      WriteLASErrDescr(stdout);
       error();
     }
         
-  std::pair<unsigned int, Real> p (Laspack::GetLastNoIter(),
-				   Laspack::GetLastAccuracy());
+  std::pair<unsigned int, Real> p (GetLastNoIter(),
+				   GetLastAccuracy());
   
   return p;
 }
 
 
 
-void LaspackInterface::set_laspack_preconditioner_type ()
+template <typename T>
+void LaspackInterface<T>::set_laspack_preconditioner_type ()
 {
   switch (_preconditioner_type)
     {
@@ -232,13 +241,13 @@ void LaspackInterface::set_laspack_preconditioner_type ()
       _precond_type = NULL; return;
 
     case ILU_PRECOND:
-      _precond_type = Laspack::ILUPrecond; return;
+      _precond_type = ILUPrecond; return;
 
     case JACOBI_PRECOND:
-      _precond_type = Laspack::JacobiPrecond; return;
+      _precond_type = JacobiPrecond; return;
 
     case SSOR_PRECOND:
-      _precond_type = Laspack::SSORPrecond; return;
+      _precond_type = SSORPrecond; return;
 
 
     default:
@@ -251,5 +260,10 @@ void LaspackInterface::set_laspack_preconditioner_type ()
 }
 
 
+
+//------------------------------------------------------------------
+// Explicit instantiations
+template class LaspackInterface<Number>;
+ 
 
 #endif // #ifdef HAVE_LASPACK

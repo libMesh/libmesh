@@ -1,4 +1,4 @@
-// $Id: numeric_vector.C,v 1.4 2003-02-20 04:59:58 benkirk Exp $
+// $Id: numeric_vector.C,v 1.5 2003-03-14 09:56:41 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -42,10 +42,10 @@ NumericVector<Real>::build(const SolverPackage solver_package)
     {
 
 
-#if defined(HAVE_LASPACK)
+#if defined(HAVE_LASPACK) && defined(USE_REAL_NUMBERS)
     case LASPACK_SOLVERS:
       {
-	AutoPtr<NumericVector<Real> > ap(new LaspackVector);
+	AutoPtr<NumericVector<Real> > ap(new LaspackVector<Real>);
 	return ap;
       }
 #endif
@@ -80,6 +80,15 @@ NumericVector<Complex>::build(const SolverPackage solver_package)
 
   switch (solver_package)
     {
+
+
+#if defined(HAVE_LASPACK) && defined(USE_COMPLEX_NUMBERS)
+    case LASPACK_SOLVERS:
+      {
+	AutoPtr<NumericVector<Complex> > ap(new LaspackVector<Complex>);
+	return ap;
+      }
+#endif
 
 
 #if defined(HAVE_PETSC) && defined(USE_COMPLEX_NUMBERS)

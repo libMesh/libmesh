@@ -16,22 +16,32 @@
 #ifndef LASTYPES_H
 #define LASTYPES_H
 
-#ifdef __cplusplus
+#include "laspack_config.h"
+#ifdef _LP_INCLUDED_FROM_CPLUSPLUS
 extern "C" {
 #endif
 
   
 #include "copyrght.h"
 
-#ifndef BOOLEAN
-#define BOOLEAN
-
-typedef enum {
-    False = 0,
-    True  = 1
-} Boolean; /* boolean type */
-
-#endif /* BOOLEAN */
+#if defined(_LP_USE_COMPLEX_NUMBERS)
+   /* complex arithmetic, use bool for internal boolean */
+   typedef bool    _LPBoolean;
+#  ifndef _LP_DEFINED_BOOLEAN
+#     define _LP_DEFINED_BOOLEAN
+#     define _LPFalse false
+#     define _LPTrue  true
+#  endif /* _LP_DEFINED_BOOLEAN */
+#else
+    /* use LASPACK enum */
+#  ifndef _LP_DEFINED_BOOLEAN
+#     define _LP_DEFINED_BOOLEAN
+         typedef enum {
+             _LPFalse = 0,
+             _LPTrue  = 1
+         } _LPBoolean; /* boolean type */
+#  endif /* _LP_DEFINED_BOOLEAN */
+#endif /* _LP_USE_COMPLEX_NUMBERS */
 
 typedef enum {
     Rowws,
@@ -43,7 +53,7 @@ typedef enum {
     Tempor
 } InstanceType;
 
-#ifdef __cplusplus
+#ifdef _LP_INCLUDED_FROM_CPLUSPLUS
 }
 #endif
 

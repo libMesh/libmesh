@@ -1,4 +1,4 @@
-// $Id: laspack_vector.h,v 1.9 2003-02-28 23:37:43 benkirk Exp $
+// $Id: laspack_vector.h,v 1.10 2003-03-14 09:56:40 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -42,28 +42,24 @@
 
 
 
-namespace Laspack {
 #include <qvector.h>
 #include <operats.h>
-}  
 
 
 // Forward declarations
-class LaspackInterface;
+template <typename T> class LaspackInterface;
 
 
 
 /**
- * Laspack vector. Provides a nice interface to the
- * Laspack C-based data structures for parallel vectors.
- * Currently Laspack only supports real datatypes, so
- * this class is a full specialization of \p NumericVector<>
- * with \p T = \p Real
+ * Laspack vector.  Provides a nice interface to the
+ * Laspack C-based data structures for serial vectors.
  *
  * @author Benjamin S. Kirk, 2002
  */
 
-class LaspackVector : public NumericVector<Real>
+template <typename T> 
+class LaspackVector : public NumericVector<T>
 {
  public:
 
@@ -138,28 +134,28 @@ class LaspackVector : public NumericVector<Real>
 //    * this function is the same as calling
 //    * \p init(V.size(),fast).
 //    */
-//   void init (const NumericVector<Real>& V,
+//   void init (const NumericVector<T>& V,
 // 	     const bool fast=false);
 
   /**
    * $U(0-N) = s$: fill all components.
    */
-  NumericVector<Real> & operator= (const Real s);
+  NumericVector<T> & operator= (const T s);
     
   /**
    *  $U = V$: copy all components.
    */
-  NumericVector<Real> & operator= (const NumericVector<Real> &V);
+  NumericVector<T> & operator= (const NumericVector<T> &V);
   
   /**
    *  $U = V$: copy all components.
    */
-  LaspackVector & operator= (const LaspackVector &V);
+  LaspackVector<T> & operator= (const LaspackVector<T> &V);
 
   /**
    *  $U = V$: copy all components.
    */
-  NumericVector<Real> & operator= (const std::vector<Real> &v);
+  NumericVector<T> & operator= (const std::vector<T> &v);
 
   /**
    * @returns the minimum element in the vector.
@@ -225,101 +221,101 @@ class LaspackVector : public NumericVector<Real>
   /**
    * Access components, returns \p U(i).
    */
-  Real operator() (const unsigned int i) const;
+  T operator() (const unsigned int i) const;
     
   /**
    * Addition operator.
    * Fast equivalent to \p U.add(1, V).
    */
-  NumericVector<Real> & operator += (const NumericVector<Real> &V);
+  NumericVector<T> & operator += (const NumericVector<T> &V);
 
   /**
    * Subtraction operator.
    * Fast equivalent to \p U.add(-1, V).
    */
-  NumericVector<Real> & operator -= (const NumericVector<Real> &V);
+  NumericVector<T> & operator -= (const NumericVector<T> &V);
     
   /**
    * v(i) = value
    */
-  void set (const unsigned int i, const Real value);
+  void set (const unsigned int i, const T value);
     
   /**
    * v(i) += value
    */
-  void add (const unsigned int i, const Real value);
+  void add (const unsigned int i, const T value);
     
   /**
    * $U(0-DIM)+=s$.
    * Addition of \p s to all components. Note
    * that \p s is a scalar and not a vector.
    */
-  void add (const Real s);
+  void add (const T s);
     
   /**
    * U+=V.
    * Simple vector addition, equal to the
    * \p operator +=.
    */
-  void add (const NumericVector<Real>& V);
+  void add (const NumericVector<T>& V);
 
   /**
    * U+=a*V.
    * Simple vector addition, equal to the
    * \p operator +=.
    */
-  void add (const Real a, const NumericVector<Real>& v);
+  void add (const T a, const NumericVector<T>& v);
   
   /**
-   * U+=v where v is a std::vector<Real> 
+   * U+=v where v is a std::vector<T> 
    * and you
    * want to specify WHERE to add it
    */
-  void add_vector (const std::vector<Real>& v,
+  void add_vector (const std::vector<T>& v,
 		   const std::vector<unsigned int>& dof_indices);
 
   /**
    * U+=V where U and V are type 
-   * NumericVector<Real> and you
+   * NumericVector<T> and you
    * want to specify WHERE to add
-   * the NumericVector<Real> V 
+   * the NumericVector<T> V 
    */
-  void add_vector (const NumericVector<Real>& V,
+  void add_vector (const NumericVector<T>& V,
 		   const std::vector<unsigned int>& dof_indices);
   
   /**
    * U+=V where U and V are type 
-   * DenseVector<Real> and you
+   * DenseVector<T> and you
    * want to specify WHERE to add
-   * the DenseVector<Real> V 
+   * the DenseVector<T> V 
    */
-  void add_vector (const DenseVector<Real>& V,
+  void add_vector (const DenseVector<T>& V,
 		   const std::vector<unsigned int>& dof_indices);
   
   /**
    * Scale each element of the
    * vector by the given factor.
    */
-  void scale (const Real factor);
+  void scale (const T factor);
     
   /**
    * Creates a copy of the global vector in the
    * local vector \p v_local.
    */
-  void localize (std::vector<Real>& v_local) const;
+  void localize (std::vector<T>& v_local) const;
 
   /**
-   * Same, but fills a \p NumericVector<Real> instead of
+   * Same, but fills a \p NumericVector<T> instead of
    * a \p std::vector.
    */
-  void localize (NumericVector<Real>& v_local) const;
+  void localize (NumericVector<T>& v_local) const;
 
   /**
    * Creates a local vector \p v_local containing
    * only information relevant to this processor, as
    * defined by the \p send_list.
    */
-  void localize (NumericVector<Real>& v_local,
+  void localize (NumericVector<T>& v_local,
 		 const std::vector<unsigned int>& send_list) const;
   
   /**
@@ -328,7 +324,7 @@ class LaspackVector : public NumericVector<Real>
    * default the data is sent to processor 0.  This method
    * is useful for outputting data from one processor.
    */
-  void localize_to_one (std::vector<Real>& v_local,
+  void localize_to_one (std::vector<T>& v_local,
 			const unsigned int proc_id=0) const;
     
  private:
@@ -337,54 +333,59 @@ class LaspackVector : public NumericVector<Real>
    * Actual Laspack vector datatype
    * to hold vector entries
    */
-  Laspack::QVector _vec;
+  QVector _vec;
 
   /**
    * Make other Laspack datatypes friends
    */
-  friend class LaspackInterface;
+  friend class LaspackInterface<T>;
 };
 
 
 
 //----------------------- ----------------------------------
 // LaspackVector inline methods
+template <typename T>
 inline
-LaspackVector::LaspackVector ()
+LaspackVector<T>::LaspackVector ()
 {
 }
 
 
 
+template <typename T> 
 inline
-LaspackVector::LaspackVector (const unsigned int n)
+LaspackVector<T>::LaspackVector (const unsigned int n)
 {
   init(n, n, false);
 }
 
 
 
+template <typename T> 
 inline
-LaspackVector::LaspackVector (const unsigned int n,
-			      const unsigned int n_local)
+LaspackVector<T>::LaspackVector (const unsigned int n,
+				 const unsigned int n_local)
 {
   init(n, n_local, false);
 }
 
 
 
+template <typename T> 
 inline
-LaspackVector::~LaspackVector ()
+LaspackVector<T>::~LaspackVector ()
 {
   clear ();
 }
 
 
 
+template <typename T> 
 inline
-void LaspackVector::init (const unsigned int n,
-			  const unsigned int n_local,
-			  const bool fast)
+void LaspackVector<T>::init (const unsigned int n,
+			     const unsigned int n_local,
+			     const bool fast)
 {
   // Laspack vectors only for serial cases.
   assert (n == n_local);
@@ -398,13 +399,12 @@ void LaspackVector::init (const unsigned int n,
     }
 
   // create a sequential vector
-  using namespace Laspack;
 
   static int cnt = 0;
   char foo[80];
   sprintf(foo,  "Vec-%d", cnt++); 
 
-  V_Constr(&_vec, const_cast<char*>(foo), n, Normal, True);
+  V_Constr(&_vec, const_cast<char*>(foo), n, Normal, _LPTrue);
     
   _is_initialized = true;
   
@@ -417,8 +417,9 @@ void LaspackVector::init (const unsigned int n,
 
 
 
+template <typename T> 
 inline
-void LaspackVector::init (const unsigned int n,
+void LaspackVector<T>::init (const unsigned int n,
 			  const bool fast)
 {
   init(n,n,fast);
@@ -426,8 +427,9 @@ void LaspackVector::init (const unsigned int n,
 
 
 
+template <typename T> 
 inline
-void LaspackVector::close ()
+void LaspackVector<T>::close ()
 {
   assert (initialized());
   
@@ -438,12 +440,13 @@ void LaspackVector::close ()
 
 
 
+template <typename T> 
 inline
-void LaspackVector::clear ()
+void LaspackVector<T>::clear ()
 {
   if (initialized())
     {
-      Laspack::V_Destr (&_vec);
+      V_Destr (&_vec);
     }
 
   _is_closed = _is_initialized = false;
@@ -451,28 +454,30 @@ void LaspackVector::clear ()
 
 
 
-inline
-void LaspackVector::zero ()
+template <typename T> inline
+void LaspackVector<T>::zero ()
 {
   assert (initialized());
 
-  Laspack::V_SetAllCmp (&_vec, 0.);
+  V_SetAllCmp (&_vec, 0.);
 }
 
 
 
+template <typename T> 
 inline
-unsigned int LaspackVector::size () const
+unsigned int LaspackVector<T>::size () const
 {
   assert (initialized());
 
-  return static_cast<unsigned int>(Laspack::V_GetDim(const_cast<Laspack::QVector*>(&_vec)));
+  return static_cast<unsigned int>(V_GetDim(const_cast<QVector*>(&_vec)));
 }
 
 
 
+template <typename T> 
 inline
-unsigned int LaspackVector::local_size () const
+unsigned int LaspackVector<T>::local_size () const
 {
   assert (initialized());
   
@@ -481,8 +486,9 @@ unsigned int LaspackVector::local_size () const
 
 
 
+template <typename T> 
 inline
-unsigned int LaspackVector::first_local_index () const
+unsigned int LaspackVector<T>::first_local_index () const
 {
   assert (initialized());
   
@@ -491,8 +497,9 @@ unsigned int LaspackVector::first_local_index () const
 
 
 
+template <typename T> 
 inline
-unsigned int LaspackVector::last_local_index () const
+unsigned int LaspackVector<T>::last_local_index () const
 {
   assert (initialized());
   
@@ -501,44 +508,48 @@ unsigned int LaspackVector::last_local_index () const
 
 
 
+template <typename T> 
 inline
-void LaspackVector::set (const unsigned int i, const Real value)
+void LaspackVector<T>::set (const unsigned int i, const T value)
 {
   assert(initialized());
   assert(i<size());
   
-  Laspack::V_SetCmp (&_vec, i+1, value);
+  V_SetCmp (&_vec, i+1, value);
 }
 
 
 
+template <typename T> 
 inline
-void LaspackVector::add (const unsigned int i, const Real value)
+void LaspackVector<T>::add (const unsigned int i, const T value)
 {
   assert(initialized());
   assert(i<size());
   
-  Laspack::V_AddCmp (&_vec, i+1, value);
+  V_AddCmp (&_vec, i+1, value);
 }
 
 
 
+template <typename T> 
 inline
-Real LaspackVector::operator() (const unsigned int i) const
+T LaspackVector<T>::operator() (const unsigned int i) const
 {
   assert (initialized());
   assert ( ((i >= first_local_index()) &&
 	    (i <  last_local_index())) );
 
   
-  return static_cast<Real>(Laspack::V_GetCmp(const_cast<Laspack::QVector*>(&_vec), i+1));
+  return static_cast<T>(V_GetCmp(const_cast<QVector*>(&_vec), i+1));
 }
 
 
 
+template <typename T> 
 inline
-void LaspackVector::add_vector (const std::vector<Real>& v,
-				const std::vector<unsigned int>& dof_indices)
+void LaspackVector<T>::add_vector (const std::vector<T>& v,
+				   const std::vector<unsigned int>& dof_indices)
 {
   assert (!v.empty());
   assert (v.size() == dof_indices.size());
@@ -549,9 +560,10 @@ void LaspackVector::add_vector (const std::vector<Real>& v,
 
 
 
+template <typename T> 
 inline
-void LaspackVector::add_vector (const NumericVector<Real>& V,
-				const std::vector<unsigned int>& dof_indices)
+void LaspackVector<T>::add_vector (const NumericVector<T>& V,
+				   const std::vector<unsigned int>& dof_indices)
 {
   assert (V.size() == dof_indices.size());
 
@@ -561,9 +573,10 @@ void LaspackVector::add_vector (const NumericVector<Real>& V,
 
 
 
+template <typename T> 
 inline
-void LaspackVector::add_vector (const DenseVector<Real>& V,
-				const std::vector<unsigned int>& dof_indices)
+void LaspackVector<T>::add_vector (const DenseVector<T>& V,
+				   const std::vector<unsigned int>& dof_indices)
 {
   assert (V.size() == dof_indices.size());
 
@@ -573,27 +586,13 @@ void LaspackVector::add_vector (const DenseVector<Real>& V,
 
 
 
+template <typename T> 
 inline
-Real LaspackVector::min () const
+Real LaspackVector<T>::max() const
 {
   assert (initialized());
 
-  Real min = 1.e30;
-
-  for (unsigned int i=0; i<size(); i++)
-    min = std::min (min, (*this)(i));
-
-  return min;
-}
-
-
-
-inline
-Real LaspackVector::max() const
-{
-  assert (initialized());
-
-  return static_cast<Real>(Laspack::MaxNorm_V(const_cast<Laspack::QVector*>(&_vec)));
+  return static_cast<Real>(MaxNorm_V(const_cast<QVector*>(&_vec)));
 }
 
 

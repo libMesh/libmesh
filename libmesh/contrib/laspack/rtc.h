@@ -16,7 +16,8 @@
 #ifndef RTC_H
 #define RTC_H
 
-#ifdef __cplusplus
+#include "laspack_config.h"
+#ifdef _LP_INCLUDED_FROM_CPLUSPLUS
 extern "C" {
 #endif
 
@@ -54,16 +55,16 @@ typedef enum {
     BPXPCGIterId
 } IterIdType;
 
-typedef void (*RTCAuxProcType)(int, double, double, IterIdType);
+typedef void (*RTCAuxProcType)(int, _LPReal, _LPReal, IterIdType);
 
-void SetRTCAccuracy(double Eps);
+void SetRTCAccuracy(_LPReal Eps);
 void SetRTCAuxProc(RTCAuxProcType AuxProc);
-Boolean RTCResult(int Iter, double rNorm, double bNorm, IterIdType IterId);
+_LPBoolean RTCResult(int Iter, _LPReal rNorm, _LPReal bNorm, IterIdType IterId);
 int GetLastNoIter(void);
-double GetLastAccuracy(void);
+_LPReal GetLastAccuracy(void);
 
 
-#ifdef __cplusplus
+#ifdef _LP_INCLUDED_FROM_CPLUSPLUS
 }
 #endif
 

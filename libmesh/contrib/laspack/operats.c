@@ -34,9 +34,9 @@ QVector *Asgn_VV(QVector *V1, QVector *V2)
 {
     QVector *VRes;
 
-    double Multipl;
+    _LPDouble Multipl;
     size_t Dim, Ind;
-    Real *V1Cmp, *V2Cmp;
+    _LPNumber *V1Cmp, *V2Cmp;
 
     V_Lock(V1);
     V_Lock(V2);
@@ -54,7 +54,7 @@ QVector *Asgn_VV(QVector *V1, QVector *V2)
                     V1->Cmp = V2Cmp;
                     V2->Cmp = V1Cmp;
                 } else {
-                    if (IsOne(V2->Multipl)) {
+                    if (_LPIsOneNumber(V2->Multipl)) {
                         Dim = V1->Dim;
                         for_AllCmp
 			    V1Cmp[Ind] = V2Cmp[Ind];
@@ -89,9 +89,9 @@ QVector *AddAsgn_VV(QVector *V1, QVector *V2)
 {
     QVector *VRes;
 
-    double Multipl;
+    _LPDouble Multipl;
     size_t Dim, Ind;
-    Real *V1Cmp, *V2Cmp;
+    _LPNumber *V1Cmp, *V2Cmp;
 
     V_Lock(V1);
     V_Lock(V2);
@@ -101,7 +101,7 @@ QVector *AddAsgn_VV(QVector *V1, QVector *V2)
             Dim = V1->Dim;
             V1Cmp = V1->Cmp;
             V2Cmp = V2->Cmp;
-            if (IsOne(V2->Multipl)) {
+            if (_LPIsOneNumber(V2->Multipl)) {
 	       for_AllCmp
 		    V1Cmp[Ind] += V2Cmp[Ind];
             } else {
@@ -132,9 +132,9 @@ QVector *SubAsgn_VV(QVector *V1, QVector *V2)
 {
     QVector *VRes;
 
-    double Multipl;
+    _LPDouble Multipl;
     size_t Dim, Ind;
-    Real *V1Cmp, *V2Cmp;
+    _LPNumber *V1Cmp, *V2Cmp;
 
     V_Lock(V1);
     V_Lock(V2);
@@ -144,7 +144,7 @@ QVector *SubAsgn_VV(QVector *V1, QVector *V2)
             Dim = V1->Dim;
             V1Cmp = V1->Cmp;
             V2Cmp = V2->Cmp;
-            if (IsOne(V2->Multipl)) {
+            if (_LPIsOneNumber(V2->Multipl)) {
 	       for_AllCmp
 		    V1Cmp[Ind] -= V2Cmp[Ind];
             } else {
@@ -170,13 +170,13 @@ QVector *SubAsgn_VV(QVector *V1, QVector *V2)
     return(VRes);
 }
 
-QVector *MulAsgn_VS(QVector *V, double S)
+QVector *MulAsgn_VS(QVector *V, _LPDouble S)
 /* VRes = V *= S */
 {
     QVector *VRes;
 
     size_t Dim, Ind;
-    Real *VCmp;
+    _LPNumber *VCmp;
 
     V_Lock(V);
     
@@ -206,9 +206,9 @@ QVector *Add_VV(QVector *V1, QVector *V2)
     QVector *VRes;
 
     char *VResName;
-    double Multipl1, Multipl2;
+    _LPDouble Multipl1, Multipl2;
     size_t Dim, Ind;
-    Real *V1Cmp, *V2Cmp, *VResCmp;
+    _LPNumber *V1Cmp, *V2Cmp, *VResCmp;
 
     V_Lock(V1);
     V_Lock(V2);
@@ -221,13 +221,13 @@ QVector *Add_VV(QVector *V1, QVector *V2)
 		           * sizeof(char));
             if (VRes != NULL && VResName != NULL) {
 	        sprintf(VResName, "%s + %s", V_GetName(V1), V_GetName(V2));
-                V_Constr(VRes, VResName, Dim, Tempor, True);
+                V_Constr(VRes, VResName, Dim, Tempor, _LPTrue);
                 if (LASResult() == LASOK) {
                     V1Cmp = V1->Cmp;
                     V2Cmp = V2->Cmp;
                     VResCmp = VRes->Cmp;
-                    if (IsOne(V1->Multipl)) {
-                        if (IsOne(V2->Multipl)) {
+                    if (_LPIsOneNumber(V1->Multipl)) {
+                        if (_LPIsOneNumber(V2->Multipl)) {
 			   for_AllCmp
 			        VResCmp[Ind] = V1Cmp[Ind] + V2Cmp[Ind];
                         } else {
@@ -237,7 +237,7 @@ QVector *Add_VV(QVector *V1, QVector *V2)
                         }
                     } else {
                         Multipl1 = V1->Multipl;
-                        if (IsOne(V2->Multipl)) {
+                        if (_LPIsOneNumber(V2->Multipl)) {
 			   for_AllCmp
 			       VResCmp[Ind] = Multipl1 * V1Cmp[Ind] + V2Cmp[Ind];
                         } else {
@@ -291,7 +291,7 @@ QMatrix *Add_QQ(QMatrix *Q1, QMatrix *Q2)
 		           * sizeof(char));
                 if (QRes != NULL && QResName != NULL) {
 	            sprintf(QResName, "%s + %s", Q_GetName(Q1), Q_GetName(Q2));
-                    Q_Constr(QRes, QResName, Q1->Dim, Q1->Symmetry, Q1->ElOrder, Tempor, False);
+                    Q_Constr(QRes, QResName, Q1->Dim, Q1->Symmetry, Q1->ElOrder, Tempor, _LPFalse);
                     if (LASResult() == LASOK) {
                         QRes->MultiplD = Q1->MultiplD + Q2->MultiplD;
                         QRes->MultiplU = Q1->MultiplU + Q2->MultiplU;
@@ -342,9 +342,9 @@ QVector *Sub_VV(QVector *V1, QVector *V2)
     QVector *VRes;
 
     char *VResName;
-    double Multipl1, Multipl2;
+    _LPDouble Multipl1, Multipl2;
     size_t Dim, Ind;
-    Real *V1Cmp, *V2Cmp, *VResCmp;
+    _LPNumber *V1Cmp, *V2Cmp, *VResCmp;
 
     V_Lock(V1);
     V_Lock(V2);
@@ -357,13 +357,13 @@ QVector *Sub_VV(QVector *V1, QVector *V2)
 		           * sizeof(char));
             if (VRes != NULL && VResName != NULL) {
 	        sprintf(VResName, "%s - %s", V_GetName(V1), V_GetName(V2));
-                V_Constr(VRes, VResName, Dim, Tempor, True);
+                V_Constr(VRes, VResName, Dim, Tempor, _LPTrue);
                 if (LASResult() == LASOK) {
                     V1Cmp = V1->Cmp;
                     V2Cmp = V2->Cmp;
                     VResCmp = VRes->Cmp;
-                    if (IsOne(V1->Multipl)) {
-                        if (IsOne(V2->Multipl)) {
+                    if (_LPIsOneNumber(V1->Multipl)) {
+                        if (_LPIsOneNumber(V2->Multipl)) {
 			   for_AllCmp
 			        VResCmp[Ind] = V1Cmp[Ind] - V2Cmp[Ind];
                         } else {
@@ -373,7 +373,7 @@ QVector *Sub_VV(QVector *V1, QVector *V2)
                         }
                     } else {
                         Multipl1 = V1->Multipl;
-                        if (IsOne(V2->Multipl)) {
+                        if (_LPIsOneNumber(V2->Multipl)) {
 			   for_AllCmp
 			        VResCmp[Ind] = Multipl1 * V1Cmp[Ind] - V2Cmp[Ind];
                         } else {
@@ -427,7 +427,7 @@ QMatrix *Sub_QQ(QMatrix *Q1, QMatrix *Q2)
 		           * sizeof(char));
                 if (QRes != NULL && QResName != NULL) {
 	            sprintf(QResName, "%s - %s", Q_GetName(Q1), Q_GetName(Q2));
-                    Q_Constr(QRes, QResName, Q1->Dim, Q1->Symmetry, Q1->ElOrder, Tempor, False);
+                    Q_Constr(QRes, QResName, Q1->Dim, Q1->Symmetry, Q1->ElOrder, Tempor, _LPFalse);
                     if (LASResult() == LASOK) {
                         QRes->MultiplD = Q1->MultiplD - Q2->MultiplD;
                         QRes->MultiplU = Q1->MultiplU - Q2->MultiplU;
@@ -472,7 +472,7 @@ QMatrix *Sub_QQ(QMatrix *Q1, QMatrix *Q2)
     return(QRes);
 }
 
-QVector *Mul_SV(double S, QVector *V)
+QVector *Mul_SV(_LPDouble S, QVector *V)
 /* VRes = S * V */
 {
     QVector *VRes;
@@ -485,13 +485,13 @@ QVector *Mul_SV(double S, QVector *V)
         VRes = (QVector *)malloc(sizeof(QVector));
 	VResName = (char *)malloc((strlen(V_GetName(V)) + 20) * sizeof(char));
         if (VRes != NULL && VResName != NULL) {
-	    sprintf(VResName, "%12.5e * (%s)", S, V_GetName(V));
-            V_Constr(VRes, VResName, V->Dim, Tempor, False);
+	    sprintf(VResName, "%12.5e * (%s)", _LPPrintFormat(S), V_GetName(V));
+            V_Constr(VRes, VResName, V->Dim, Tempor, _LPFalse);
             if (LASResult() == LASOK) {
                 VRes->Multipl = S * V->Multipl;
                 if (V->Instance == Tempor && V->OwnData) {
-                    V->OwnData = False;
-                    VRes->OwnData = True;
+                    V->OwnData = _LPFalse;
+                    VRes->OwnData = _LPTrue;
                 }
                 VRes->Cmp = V->Cmp;
             }
@@ -512,7 +512,7 @@ QVector *Mul_SV(double S, QVector *V)
     return(VRes);
 }
 
-Matrix *Mul_SM(double S, Matrix *M)
+Matrix *Mul_SM(_LPDouble S, Matrix *M)
 /* MRes = S * M */
 {
     Matrix *MRes;
@@ -525,8 +525,8 @@ Matrix *Mul_SM(double S, Matrix *M)
         MRes = (Matrix *)malloc(sizeof(Matrix));
 	MResName = (char *)malloc((strlen(M_GetName(M)) + 20) * sizeof(char));
         if (MRes != NULL && MResName != NULL) {
-	    sprintf(MResName, "%12.5e * (%s)", S, M_GetName(M));
-            M_Constr(MRes, MResName,  M->RowDim, M->ClmDim, M->ElOrder, Tempor, False);
+	    sprintf(MResName, "%12.5e * (%s)", _LPPrintFormat(S), M_GetName(M));
+            M_Constr(MRes, MResName,  M->RowDim, M->ClmDim, M->ElOrder, Tempor, _LPFalse);
             if (LASResult() == LASOK) {
                 MRes->Multipl = S * M->Multipl;
                 MRes->Len = M->Len;
@@ -550,7 +550,7 @@ Matrix *Mul_SM(double S, Matrix *M)
     return(MRes);
 }
 
-QMatrix *Mul_SQ(double S, QMatrix *Q)
+QMatrix *Mul_SQ(_LPDouble S, QMatrix *Q)
 /* QRes = S * Q */
 {
     QMatrix *QRes;
@@ -563,12 +563,12 @@ QMatrix *Mul_SQ(double S, QMatrix *Q)
         QRes = (QMatrix *)malloc(sizeof(QMatrix));
 	QResName = (char *)malloc((strlen(Q_GetName(Q)) + 20) * sizeof(char));
         if (QRes != NULL && QResName != NULL) {
-	    sprintf(QResName, "%12.5e * (%s)", S, Q_GetName(Q));
-            Q_Constr(QRes, QResName, Q->Dim, Q->Symmetry, Q->ElOrder, Tempor, False);
+	    sprintf(QResName, "%12.5e * (%s)", _LPPrintFormat(S), Q_GetName(Q));
+            Q_Constr(QRes, QResName, Q->Dim, Q->Symmetry, Q->ElOrder, Tempor, _LPFalse);
             if (LASResult() == LASOK) {
                 if (Q->Instance == Tempor && Q->OwnData) {
-                    Q->OwnData = False;
-                    QRes->OwnData = True;
+                    Q->OwnData = _LPFalse;
+                    QRes->OwnData = _LPTrue;
                 }
                 QRes->MultiplD = S * Q->MultiplD;
                 QRes->MultiplU = S * Q->MultiplU;
@@ -604,13 +604,13 @@ QMatrix *Mul_SQ(double S, QMatrix *Q)
     return(QRes);
 }
 
-double Mul_VV(QVector *V1, QVector *V2)
+_LPDouble Mul_VV(QVector *V1, QVector *V2)
 /* S = V1 * V2 */
 {
-    double SRes;
+    _LPDouble SRes;
 
     size_t Dim, Ind;
-    Real *V1Cmp, *V2Cmp;
+    _LPNumber *V1Cmp, *V2Cmp;
 
     V_Lock(V1);
     V_Lock(V2);
@@ -644,13 +644,13 @@ QVector *Mul_MV(Matrix *M, QVector *V)
     QVector *VRes;
 
     char *VResName;
-    double MultiplMV;
-    double Sum, Cmp;
+    _LPDouble MultiplMV;
+    _LPDouble Sum, Cmp;
     size_t RowDim, ClmDim, Row, Clm, Len, ElCount;
     size_t *MLen;
-    Boolean MultiplMVIsOne;
+    _LPBoolean MultiplMVIsOne;
     ElType **MEl, *PtrEl;
-    Real *VCmp, *VResCmp;
+    _LPNumber *VCmp, *VResCmp;
 
     M_Lock(M);
     V_Lock(V);
@@ -664,7 +664,7 @@ QVector *Mul_MV(Matrix *M, QVector *V)
 		           * sizeof(char));
             if (VRes != NULL && VResName != NULL) {
 	        sprintf(VResName, "(%s) * (%s)", M_GetName(M), V_GetName(V));
-                V_Constr(VRes, VResName, RowDim, Tempor, True);
+                V_Constr(VRes, VResName, RowDim, Tempor, _LPTrue);
 		if (LASResult() == LASOK) {
                     /* assignment of auxiliary lokal variables */
                     MLen = M->Len;
@@ -678,10 +678,10 @@ QVector *Mul_MV(Matrix *M, QVector *V)
 
                     /* analysis of multipliers of the matrix M and the vector V */
                     MultiplMV = M->Multipl * V->Multipl;
-                    if (IsOne(MultiplMV)) {
-                        MultiplMVIsOne = True;
+                    if (_LPIsOneNumber(MultiplMV)) {
+                        MultiplMVIsOne = _LPTrue;
                     } else {
-                        MultiplMVIsOne = False;
+                        MultiplMVIsOne = _LPFalse;
                     }
 
                     /* multiplication of matrix elements by vector components */
@@ -743,15 +743,15 @@ QVector *Mul_QV(QMatrix *Q, QVector *V)
     QVector *VRes;
 
     char *VResName;
-    double MultiplDV, MultiplUV, MultiplLV;
-    double Sum, PartSum, Cmp, PartCmp;
+    _LPDouble MultiplDV, MultiplUV, MultiplLV;
+    _LPDouble Sum, PartSum, Cmp, PartCmp;
     size_t Dim, Row, Clm, RoC, Len, ElCount;
     size_t *QLen;
-    Boolean MultiplDVIsZero, MultiplUVIsZero, MultiplLVIsZero;
-    Boolean MultiplDVIsOne, MultiplUVIsOne, MultiplLVIsOne;
-    Boolean MultiplDULVEquals;
+    _LPBoolean MultiplDVIsZero, MultiplUVIsZero, MultiplLVIsZero;
+    _LPBoolean MultiplDVIsOne, MultiplUVIsOne, MultiplLVIsOne;
+    _LPBoolean MultiplDULVEquals;
     ElType **QEl, **QDiagEl, *PtrEl;
-    Real *VCmp, *VResCmp;
+    _LPNumber *VCmp, *VResCmp;
 
     Q_Lock(Q);
     V_Lock(V);
@@ -764,7 +764,7 @@ QVector *Mul_QV(QMatrix *Q, QVector *V)
 		           * sizeof(char));
             if (VRes != NULL && VResName != NULL) {
 	        sprintf(VResName, "(%s) * (%s)", Q_GetName(Q), V_GetName(V));
-                V_Constr(VRes, VResName, Dim, Tempor, True);
+                V_Constr(VRes, VResName, Dim, Tempor, _LPTrue);
 		
                 /* sort of elements and allocation of diagonal elements
                    of the matrix Q */
@@ -788,17 +788,17 @@ QVector *Mul_QV(QMatrix *Q, QVector *V)
                     MultiplDV = Q->MultiplD * V->Multipl;
                     MultiplUV = Q->MultiplU * V->Multipl;
                     MultiplLV = Q->MultiplL * V->Multipl;
-                    MultiplDVIsZero = IsZero(MultiplDV);
-                    MultiplUVIsZero = IsZero(MultiplUV);
-                    MultiplLVIsZero = IsZero(MultiplLV);
-                    MultiplDVIsOne = IsOne(MultiplDV);
-                    MultiplUVIsOne = IsOne(MultiplUV);
-                    MultiplLVIsOne = IsOne(MultiplLV);
-                    if (!IsZero(MultiplDV) && IsOne(MultiplUV / MultiplDV)
-			&& IsOne(MultiplLV / MultiplDV)) {
-                        MultiplDULVEquals = True;
+                    MultiplDVIsZero = _LPIsZeroNumber(MultiplDV);
+                    MultiplUVIsZero = _LPIsZeroNumber(MultiplUV);
+                    MultiplLVIsZero = _LPIsZeroNumber(MultiplLV);
+                    MultiplDVIsOne = _LPIsOneNumber(MultiplDV);
+                    MultiplUVIsOne = _LPIsOneNumber(MultiplUV);
+                    MultiplLVIsOne = _LPIsOneNumber(MultiplLV);
+                    if (!_LPIsZeroNumber(MultiplDV) && _LPIsOneNumber(MultiplUV / MultiplDV)
+			&& _LPIsOneNumber(MultiplLV / MultiplDV)) {
+                        MultiplDULVEquals = _LPTrue;
                     } else {
-                        MultiplDULVEquals = False;
+                        MultiplDULVEquals = _LPFalse;
                     }
 
                     /* multiplication of the lower, diagonal and upper part
@@ -1006,16 +1006,16 @@ QVector *MulInv_QV(QMatrix *Q, QVector *V)
     QVector *VRes;
 
     char *VResName;
-    double MultiplD, MultiplU, MultiplL, MultiplV, MultiplDV;
-    double Sum, Cmp;
+    _LPDouble MultiplD, MultiplU, MultiplL, MultiplV, MultiplDV;
+    _LPDouble Sum, Cmp;
     size_t Dim, Row, Clm, Ind, Len, ElCount;
     size_t *QLen;
-    Boolean MultiplDIsZero, MultiplUIsZero, MultiplLIsZero;
-    Boolean MultiplDIsOne, MultiplUIsOne, MultiplLIsOne, MultiplVIsOne,
+    _LPBoolean MultiplDIsZero, MultiplUIsZero, MultiplLIsZero;
+    _LPBoolean MultiplDIsOne, MultiplUIsOne, MultiplLIsOne, MultiplVIsOne,
         MultiplDVIsOne;
     ElType **QEl, *PtrEl;
-    Real *QInvDiagEl;
-    Real *VCmp, *VResCmp;
+    _LPNumber *QInvDiagEl;
+    _LPNumber *VCmp, *VResCmp;
 
     Q_Lock(Q);
     V_Lock(V);
@@ -1028,7 +1028,7 @@ QVector *MulInv_QV(QMatrix *Q, QVector *V)
 		           * sizeof(char));
             if (VRes != NULL && VResName != NULL) {
 	        sprintf(VResName, "(%s)^(-1) * (%s)", Q_GetName(Q), V_GetName(V));
-                V_Constr(VRes, VResName, Dim, Tempor, True);
+                V_Constr(VRes, VResName, Dim, Tempor, _LPTrue);
 
                 /* sort of elements and allocation of the inverse of diagonal elements
                    of the matrix Q */
@@ -1036,7 +1036,7 @@ QVector *MulInv_QV(QMatrix *Q, QVector *V)
                 Q_AllocInvDiagEl(Q);
 
 		if (LASResult() == LASOK && *Q->ElSorted && !(*Q->ZeroInDiag)
-		    && !IsZero(Q->MultiplD)) {
+		    && !_LPIsZeroNumber(Q->MultiplD)) {
                     /* assignment of auxiliary lokal variables */
                     QLen = Q->Len;
                     QEl = Q->El;
@@ -1055,14 +1055,14 @@ QVector *MulInv_QV(QMatrix *Q, QVector *V)
                     MultiplL = Q->MultiplL;
                     MultiplV = V->Multipl;
                     MultiplDV = V->Multipl / Q->MultiplD;  /* attention here !!! */
-                    MultiplDIsZero = IsZero(MultiplD);
-                    MultiplUIsZero = IsZero(MultiplU);
-                    MultiplLIsZero = IsZero(MultiplL);
-                    MultiplDIsOne = IsOne(MultiplD);
-                    MultiplUIsOne = IsOne(MultiplU);
-                    MultiplLIsOne = IsOne(MultiplL);
-                    MultiplVIsOne = IsOne(MultiplV);
-                    MultiplDVIsOne = IsOne(MultiplDV);
+                    MultiplDIsZero = _LPIsZeroNumber(MultiplD);
+                    MultiplUIsZero = _LPIsZeroNumber(MultiplU);
+                    MultiplLIsZero = _LPIsZeroNumber(MultiplL);
+                    MultiplDIsOne = _LPIsOneNumber(MultiplD);
+                    MultiplUIsOne = _LPIsOneNumber(MultiplU);
+                    MultiplLIsOne = _LPIsOneNumber(MultiplL);
+                    MultiplVIsOne = _LPIsOneNumber(MultiplV);
+                    MultiplDVIsOne = _LPIsOneNumber(MultiplDV);
 
                     /* multiplication of the vector V by the inverse matrix
                        of the diagonal of M */
@@ -1191,7 +1191,7 @@ QVector *MulInv_QV(QMatrix *Q, QVector *V)
                 } else {
                     if (LASResult() == LASOK && !(*Q->ElSorted))
                         LASError(LASElNotSortedErr, "MulInv_QV", Q_GetName(Q), V_GetName(V), NULL);
-                    if (LASResult() == LASOK && (*Q->ZeroInDiag || IsZero(Q->MultiplD)))
+                    if (LASResult() == LASOK && (*Q->ZeroInDiag || _LPIsZeroNumber(Q->MultiplD)))
                         LASError(LASZeroInDiagErr, "MulInv_QV", Q_GetName(Q), V_GetName(V), NULL);
                 }
 	    } else {
@@ -1219,6 +1219,13 @@ QVector *MulInv_QV(QMatrix *Q, QVector *V)
 Matrix *Transp_M(Matrix *M)
 /* MRes = M^T, returns transposed matrix M */
 {
+#if defined(_LP_USE_COMPLEX_NUMBERS)
+    printf("ERROR: Transpose of a complex matrix not implemented.\n");
+    abort();
+
+    Matrix *MRes;
+    return(MRes);
+#else
     Matrix *MRes;
 
     char *MResName;
@@ -1230,7 +1237,7 @@ Matrix *Transp_M(Matrix *M)
 	MResName = (char *)malloc((strlen(M_GetName(M)) + 10) * sizeof(char));
         if (MRes != NULL && MResName != NULL) {
 	    sprintf(MResName, "(%s)^T", M_GetName(M));
-            M_Constr(MRes, MResName,  M->ClmDim, M->RowDim, M->ElOrder, Tempor, False);
+            M_Constr(MRes, MResName,  M->ClmDim, M->RowDim, M->ElOrder, Tempor, _LPFalse);
             if (LASResult() == LASOK) {
                 if (M->ElOrder == Rowws)
                     MRes->ElOrder = Clmws;
@@ -1238,8 +1245,8 @@ Matrix *Transp_M(Matrix *M)
                     MRes->ElOrder = Rowws;
                 MRes->Multipl = M->Multipl;
                 if (M->Instance == Tempor && M->OwnData) {
-                    M->OwnData = False;
-                    MRes->OwnData = True;
+                    M->OwnData = _LPFalse;
+                    MRes->OwnData = _LPTrue;
                 }
                 MRes->Len = M->Len;
                 MRes->El = M->El;
@@ -1260,6 +1267,7 @@ Matrix *Transp_M(Matrix *M)
     M_Unlock(M);
 
     return(MRes);
+#endif
 }
 
 QMatrix *Transp_Q(QMatrix *Q)
@@ -1276,11 +1284,11 @@ QMatrix *Transp_Q(QMatrix *Q)
 	QResName = (char *)malloc((strlen(Q_GetName(Q)) + 10) * sizeof(char));
         if (QRes != NULL && QResName != NULL) {
 	    sprintf(QResName, "(%s)^T", Q_GetName(Q));
-            Q_Constr(QRes, QResName, Q->Dim, Q->Symmetry, Q->ElOrder, Tempor, False);
+            Q_Constr(QRes, QResName, Q->Dim, Q->Symmetry, Q->ElOrder, Tempor, _LPFalse);
             if (LASResult() == LASOK) {
                 if (Q->Instance == Tempor && Q->OwnData) {
-                    Q->OwnData = False;
-                    QRes->OwnData = True;
+                    Q->OwnData = _LPFalse;
+                    QRes->OwnData = _LPTrue;
                 }
                 if (!Q->Symmetry) {
                     if (Q->ElOrder == Rowws)
@@ -1343,11 +1351,11 @@ QMatrix *Diag_Q(QMatrix *Q)
 	QResName = (char *)malloc((strlen(Q_GetName(Q)) + 10) * sizeof(char));
         if (QRes != NULL && QResName != NULL) {
 	    sprintf(QResName, "Diag(%s)", Q_GetName(Q));
-            Q_Constr(QRes, QResName, Q->Dim, Q->Symmetry, Q->ElOrder, Tempor, False);
+            Q_Constr(QRes, QResName, Q->Dim, Q->Symmetry, Q->ElOrder, Tempor, _LPFalse);
             if (LASResult() == LASOK) {
                 if (Q->Instance == Tempor && Q->OwnData) {
-                    Q->OwnData = False;
-                    QRes->OwnData = True;
+                    Q->OwnData = _LPFalse;
+                    QRes->OwnData = _LPTrue;
                 }
                 QRes->MultiplD = Q->MultiplD;
                 QRes->MultiplU = 0.0;
@@ -1397,11 +1405,11 @@ QMatrix *Upper_Q(QMatrix *Q)
 	QResName = (char *)malloc((strlen(Q_GetName(Q)) + 10) * sizeof(char));
         if (QRes != NULL && QResName != NULL) {
 	    sprintf(QResName, "Upper(%s)", Q_GetName(Q));
-            Q_Constr(QRes, QResName, Q->Dim, Q->Symmetry, Q->ElOrder, Tempor, False);
+            Q_Constr(QRes, QResName, Q->Dim, Q->Symmetry, Q->ElOrder, Tempor, _LPFalse);
             if (LASResult() == LASOK) {
                 if (Q->Instance == Tempor && Q->OwnData) {
-                    Q->OwnData = False;
-                    QRes->OwnData = True;
+                    Q->OwnData = _LPFalse;
+                    QRes->OwnData = _LPTrue;
                 }
                 QRes->MultiplD = 0.0;
                 QRes->MultiplU = Q->MultiplU;
@@ -1451,11 +1459,11 @@ QMatrix *Lower_Q(QMatrix *Q)
 	QResName = (char *)malloc((strlen(Q_GetName(Q)) + 10) * sizeof(char));
         if (QRes != NULL && QResName != NULL) {
 	    sprintf(QResName, "Lower(%s)", Q_GetName(Q));
-            Q_Constr(QRes, QResName, Q->Dim, Q->Symmetry, Q->ElOrder, Tempor, False);
+            Q_Constr(QRes, QResName, Q->Dim, Q->Symmetry, Q->ElOrder, Tempor, _LPFalse);
             if (LASResult() == LASOK) {
                 if (Q->Instance == Tempor && Q->OwnData) {
-                    Q->OwnData = False;
-                    QRes->OwnData = True;
+                    Q->OwnData = _LPFalse;
+                    QRes->OwnData = _LPTrue;
                 }
                 QRes->MultiplD = 0.0;
                 QRes->MultiplU = 0.0;
@@ -1491,14 +1499,39 @@ QMatrix *Lower_Q(QMatrix *Q)
     return(QRes);
 }
 
-double l1Norm_V(QVector *V)
+_LPReal l1Norm_V(QVector *V)
 /* SRes = l1-Norm of the vector V */
 {
-    double SRes;
+#if defined(_LP_USE_COMPLEX_NUMBERS)
+    _LPReal SRes, Sum;
 
-    double Sum;
+    _LPNumber Multipl;
     size_t Dim, Ind;
-    Real *VCmp;
+    _LPNumber *VCmp;
+
+    V_Lock(V);
+    
+    if (LASResult() == LASOK) {
+	Dim = V->Dim;
+        VCmp = V->Cmp;
+	Sum = 0.0;
+	Multipl = V->Multipl;
+	for_AllCmp
+	   Sum += _LPfabs(VCmp[Ind]*Multipl);
+	SRes = Sum;
+    } else {
+	SRes = 1.0;
+    }
+
+    V_Unlock(V);
+
+    return(SRes);
+#else
+    _LPReal SRes;
+
+    _LPReal Sum;
+    size_t Dim, Ind;
+    _LPNumber *VCmp;
 
     V_Lock(V);
     
@@ -1507,7 +1540,7 @@ double l1Norm_V(QVector *V)
         VCmp = V->Cmp;
 	Sum = 0.0;
 	for_AllCmp
-	   Sum += fabs(VCmp[Ind]);
+	   Sum += _LPfabs(VCmp[Ind]);
         Sum *= V->Multipl;
 	SRes = Sum;
     } else {
@@ -1517,16 +1550,42 @@ double l1Norm_V(QVector *V)
     V_Unlock(V);
 
     return(SRes);
+#endif
 }
 
-double l2Norm_V(QVector *V)
+_LPReal l2Norm_V(QVector *V)
 /* SRes = l2-Norm of the vector V */
 {
-    double SRes;
-
-    double Sum, Cmp;
+#if defined(_LP_USE_COMPLEX_NUMBERS)
+    _LPReal SRes, Sum;
+    _LPNumber Cmp, Multipl;
     size_t Dim, Ind;
-    Real *VCmp;
+    _LPNumber *VCmp;
+
+    V_Lock(V);
+    
+    if (LASResult() == LASOK) {
+	Dim = V->Dim;
+        VCmp = V->Cmp;
+	Multipl = V->Multipl;
+	Sum = 0.0;
+	for_AllCmp {
+	    Cmp = VCmp[Ind]*Multipl;
+	    Sum += _LPNormxNorm(Cmp);
+	}
+	SRes = sqrt(Sum);
+    } else {
+	SRes = 1.0;
+    }
+
+    V_Unlock(V);
+
+    return(SRes);
+#else
+    _LPReal SRes, Sum;
+    _LPNumber Cmp;
+    size_t Dim, Ind;
+    _LPNumber *VCmp;
 
     V_Lock(V);
     
@@ -1536,7 +1595,7 @@ double l2Norm_V(QVector *V)
 	Sum = 0.0;
 	for_AllCmp {
 	    Cmp = VCmp[Ind];
-	    Sum += Cmp * Cmp;
+	    Sum += _LPNormxNorm(Cmp);
 	}
         Sum *= V->Multipl * V->Multipl;
 	SRes = sqrt(Sum);
@@ -1547,16 +1606,45 @@ double l2Norm_V(QVector *V)
     V_Unlock(V);
 
     return(SRes);
+#endif
 }
 
-double MaxNorm_V(QVector *V)
+_LPReal MaxNorm_V(QVector *V)
 /* SRes = max-Norm of the vector V */
 {
-    double SRes;
+#if defined(_LP_USE_COMPLEX_NUMBERS)
+    _LPReal SRes;
 
-    double MaxCmp, Cmp;
+    _LPNumber MaxCmp, Cmp, Multipl;
     size_t Dim, Ind;
-    Real *VCmp;
+    _LPNumber *VCmp;
+
+    V_Lock(V);
+    
+    if (LASResult() == LASOK) {
+	Dim = V->Dim;
+        VCmp = V->Cmp;
+	Multipl = V->Multipl;
+	MaxCmp = 0.0;
+	for_AllCmp {
+	   Cmp = _LPAbsRealPart(VCmp[Ind] * Multipl);
+	   if (_LPIsGreater(Cmp, MaxCmp)) 
+	       MaxCmp = Cmp;
+	}
+	SRes = _LPRealPart(MaxCmp);
+    } else {
+	SRes = 1.0;
+    }
+
+    V_Unlock(V);
+
+    return(SRes);
+#else
+    _LPReal SRes;
+
+    _LPNumber MaxCmp, Cmp;
+    size_t Dim, Ind;
+    _LPNumber *VCmp;
 
     V_Lock(V);
     
@@ -1565,12 +1653,12 @@ double MaxNorm_V(QVector *V)
         VCmp = V->Cmp;
 	MaxCmp = 0.0;
 	for_AllCmp {
-	   Cmp = fabs(VCmp[Ind]);
-	   if (Cmp > MaxCmp) 
+	   Cmp = _LPAbsRealPart(VCmp[Ind]);
+	   if (_LPIsGreater(Cmp, MaxCmp)) 
 	       MaxCmp = Cmp;
 	}
         MaxCmp *= V->Multipl;
-	SRes = MaxCmp;
+	SRes = _LPRealPart(MaxCmp);
     } else {
 	SRes = 1.0;
     }
@@ -1578,6 +1666,7 @@ double MaxNorm_V(QVector *V)
     V_Unlock(V);
 
     return(SRes);
+#endif
 }
 
 QVector *OrthoRightKer_VQ(QVector *V, QMatrix *Q)
@@ -1585,9 +1674,9 @@ QVector *OrthoRightKer_VQ(QVector *V, QMatrix *Q)
 {
     QVector *VRes;
 
-    double Sum, Mean;
+    _LPDouble Sum, Mean;
     size_t Dim, Ind;
-    Real *VCmp, *KerCmp;
+    _LPNumber *VCmp, *KerCmp;
 
     V_Lock(V);
     
@@ -1602,7 +1691,7 @@ QVector *OrthoRightKer_VQ(QVector *V, QMatrix *Q)
 	            Sum = 0.0;
    	            for_AllCmp 
 	                Sum += VCmp[Ind];
-	    	    Mean = Sum / (double)Dim;
+	    	    Mean = Sum / (_LPDouble)Dim;
    	            for_AllCmp 
 	                VCmp[Ind] -= Mean;
                 } else {
@@ -1638,9 +1727,9 @@ QVector *OrthoLeftKer_VQ(QVector *V, QMatrix *Q)
 {
     QVector *VRes;
 
-    double Sum, Mean;
+    _LPDouble Sum, Mean;
     size_t Dim, Ind;
-    Real *VCmp, *KerCmp;
+    _LPNumber *VCmp, *KerCmp;
 
     V_Lock(V);
     
@@ -1658,7 +1747,7 @@ QVector *OrthoLeftKer_VQ(QVector *V, QMatrix *Q)
 	            Sum = 0.0;
    	            for_AllCmp 
 	                Sum += VCmp[Ind];
-	    	    Mean = Sum / (double)Dim;
+	    	    Mean = Sum / (_LPDouble)Dim;
    	            for_AllCmp 
 	                VCmp[Ind] -= Mean;
                 } else {

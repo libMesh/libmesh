@@ -1,4 +1,4 @@
-// $Id: laspack_interface.h,v 1.5 2003-02-20 23:18:05 benkirk Exp $
+// $Id: laspack_interface.h,v 1.6 2003-03-14 09:56:40 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,8 @@
 
 #include "mesh_common.h"
 
-#if defined(HAVE_LASPACK) && !defined(USE_COMPLEX_NUMBERS)
+#if defined(HAVE_LASPACK)
+//#if defined(HAVE_LASPACK) && !defined(USE_COMPLEX_NUMBERS)
 
 
 // C++ includes
@@ -35,25 +36,20 @@
 #include "laspack_matrix.h"
 
 
-namespace Laspack {
 #include <itersolv.h>
 #include <rtc.h>
 #include <errhandl.h>
-}
-
 
 
 
 /**
  * This class provides a deal.II interface to the Laspack
  * iterative solver library.
- * Currently Laspack only supports real datatypes, so
- * this class is a full specialization of \p NumericVector<>
- * with \p T = \p Real*
+ * 
  * @author Benjamin Kirk, 2002
  */
-
-class LaspackInterface : public LinearSolverInterface<Real>
+template <typename T>
+class LaspackInterface : public LinearSolverInterface<T>
 {
  public:
   /**
@@ -82,9 +78,9 @@ class LaspackInterface : public LinearSolverInterface<Real>
    */
     
   std::pair<unsigned int, Real> 
-    solve (SparseMatrix<Real> &matrix,
-	   NumericVector<Real> &solution,
-	   NumericVector<Real> &rhs,
+    solve (SparseMatrix<T> &matrix,
+	   NumericVector<T> &solution,
+	   NumericVector<T> &rhs,
 	   const double tol,
 	   const unsigned int m_its);
    
@@ -99,21 +95,23 @@ class LaspackInterface : public LinearSolverInterface<Real>
   /**
    * Preconditioner type
    */
-  Laspack::PrecondProcType _precond_type;
+  PrecondProcType _precond_type;
 };
 
 
 /*----------------------- functions ----------------------------------*/
+template <typename T>
 inline
-LaspackInterface::LaspackInterface () :
-  _precond_type (Laspack::ILUPrecond)
+LaspackInterface<T>::LaspackInterface () :
+  _precond_type (ILUPrecond)
 {
 }
 
 
 
+template <typename T>
 inline
-LaspackInterface::~LaspackInterface ()
+LaspackInterface<T>::~LaspackInterface ()
 {
   clear ();
 }

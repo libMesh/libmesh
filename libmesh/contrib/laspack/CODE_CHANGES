@@ -6,3 +6,17 @@
 
 Benjamin S. Kirk
 Fri Feb  7 10:51:37 CST 2003
+
+
+5.) extended parts of the library to complex support:
+    ATTENTION: the complex part is not at all well tested!
+    - the real part should have remained the same
+    - added several typedefs and preprocessor definitions
+    - explicitly fixed the vector norms for complex arithmetic
+      to match with PETSc definition
+6.) for better complex support, added laspack_config.h which
+    defines some preprocessor macros
+
+
+Daniel Dreyer
+Fri Mar 14 09:41:11 CET 2003

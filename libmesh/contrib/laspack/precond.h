@@ -16,7 +16,8 @@
 #ifndef PRECOND_H
 #define PRECOND_H
 
-#ifdef __cplusplus
+#include "laspack_config.h"
+#ifdef _LP_INCLUDED_FROM_CPLUSPLUS
 extern "C" {
 #endif
 
@@ -26,15 +27,15 @@ extern "C" {
 #include "qmatrix.h"
 #include "copyrght.h"
 
-typedef QVector *(*PrecondProcType)(QMatrix *, QVector *, QVector *, double);
+typedef QVector *(*PrecondProcType)(QMatrix *, QVector *, QVector *, _LPDouble);
 
 /* declaration of preconditioners */
 
-QVector *JacobiPrecond(QMatrix *A, QVector *y, QVector *c, double Omega);
-QVector *SSORPrecond(QMatrix *A, QVector *y, QVector *c, double Omega);
-QVector *ILUPrecond(QMatrix *A, QVector *y, QVector *c, double Omega);
+QVector *JacobiPrecond(QMatrix *A, QVector *y, QVector *c, _LPDouble Omega);
+QVector *SSORPrecond(QMatrix *A, QVector *y, QVector *c, _LPDouble Omega);
+QVector *ILUPrecond(QMatrix *A, QVector *y, QVector *c, _LPDouble Omega);
 
-#ifdef __cplusplus
+#ifdef _LP_INCLUDED_FROM_CPLUSPLUS
 }
 #endif
 

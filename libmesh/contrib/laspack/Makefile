@@ -1,3 +1,10 @@
+#
+# let Make.common know that we are the Laspack
+# Makefile, so that it can decide which compilation
+# rules to tell
+#
+included-from-laspack := yes
+
 include ../../Make.common
 
 INCLUDES = -I.
@@ -21,10 +28,25 @@ all:: $(target)
 	@$(shell mkdir -p ../lib/$(hosttype)_$(METHOD))
 	@$(AR) rv $@ $(OBJS)
 
+ifeq ($(enable-complex),yes)
+#
+# Complex arithmetic: use C++ 
+#
+../lib/$(hosttype)_$(METHOD)/liblaspack.so: $(OBJS)
+	@echo "Linking "$@
+	@$(shell mkdir -p ../lib/$(hosttype)_$(METHOD))
+	@$(CXX) $(CXXSHAREDFLAG) -o $@ $(OBJS) $(LDFLAGS)
+
+else
+#
+# Real arithmetic: use C
+#
 ../lib/$(hosttype)_$(METHOD)/liblaspack.so: $(OBJS)
 	@echo "Linking "$@
 	@$(shell mkdir -p ../lib/$(hosttype)_$(METHOD))
 	@$(CC) $(CSHAREDFLAG) -o $@ $(OBJS) $(LDFLAGS)
+
+endif
 
 
 .PHONY: clean clobber distclean

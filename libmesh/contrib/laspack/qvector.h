@@ -16,7 +16,8 @@
 #ifndef QVECTOR_H
 #define QVECTOR_H
 
-#ifdef __cplusplus
+#include "laspack_config.h"
+#ifdef _LP_INCLUDED_FROM_CPLUSPLUS
 extern "C" {
 #endif
 
@@ -32,22 +33,22 @@ typedef struct {
     size_t Dim;
     InstanceType Instance;
     int LockLevel;
-    double Multipl;
-    Boolean OwnData;
-    Real *Cmp;
+    _LPNumber Multipl;   /* "stretch" factor */
+    _LPBoolean OwnData;
+    _LPNumber *Cmp;
 } QVector;
 
 void V_Constr(QVector *V, char *Name, size_t Dim, InstanceType Instance,
-	      Boolean OwnData);
+	      _LPBoolean OwnData);
 void V_Destr(QVector *V);
 void V_SetName(QVector *V, char *Name);
 char *V_GetName(QVector *V);
 size_t V_GetDim(QVector *V);
-void V_SetCmp(QVector *V, size_t Ind, Real Val);
-void V_SetAllCmp(QVector *V, Real Val);
+void V_SetCmp(QVector *V, size_t Ind, _LPNumber Val);
+void V_SetAllCmp(QVector *V, _LPNumber Val);
 void V_SetRndCmp(QVector *V);
-Real V_GetCmp(QVector *V, size_t Ind);
-void V_AddCmp(QVector *V, size_t Ind, Real Val);
+_LPNumber V_GetCmp(QVector *V, size_t Ind);
+void V_AddCmp(QVector *V, size_t Ind, _LPNumber Val);
 
 /* macros for fast access */
 #define     V__SetCmp(PtrV, Ind, Val)       (PtrV)->Cmp[Ind] = (Val)
@@ -57,7 +58,7 @@ void V_AddCmp(QVector *V, size_t Ind, Real Val);
 void V_Lock(QVector *V);
 void V_Unlock(QVector *V);
 
-#ifdef __cplusplus
+#ifdef _LP_INCLUDED_FROM_CPLUSPLUS
 }
 #endif
 

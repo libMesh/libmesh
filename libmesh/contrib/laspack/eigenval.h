@@ -16,7 +16,8 @@
 #ifndef EIGENVAL_H
 #define EIGENVAL_H
 
-#ifdef __cplusplus
+#include "laspack_config.h"
+#ifdef _LP_INCLUDED_FROM_CPLUSPLUS
 extern "C" {
 #endif
 
@@ -28,12 +29,13 @@ extern "C" {
 
 /* estimation of extremal eigenvalues */
 
-void SetEigenvalAccuracy(double Eps);
-double GetMinEigenval(QMatrix *Q, PrecondProcType PrecondProc, double OmegaPrecond);
-double GetMaxEigenval(QMatrix *Q, PrecondProcType PrecondProc, double OmegaPrecond);
+void SetEigenvalAccuracy(_LPReal Eps);
+_LPDouble GetMinEigenval(QMatrix *Q, PrecondProcType PrecondProc, _LPDouble OmegaPrecond);
+_LPDouble GetMaxEigenval(QMatrix *Q, PrecondProcType PrecondProc, _LPDouble OmegaPrecond);
 
-#ifdef __cplusplus
+#ifdef _LP_INCLUDED_FROM_CPLUSPLUS
 }
 #endif
+
 
 #endif /* EIGENVAL_H */

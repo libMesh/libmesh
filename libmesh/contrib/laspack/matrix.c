@@ -27,7 +27,7 @@ static ElType ZeroEl = { 0, 0.0 };
 static int ElCompar(const void *El1, const void *El2);
 
 void M_Constr(Matrix *M, char *Name, size_t RowDim, size_t ClmDim,
-              ElOrderType ElOrder, InstanceType Instance, Boolean OwnData)
+              ElOrderType ElOrder, InstanceType Instance, _LPBoolean OwnData)
 /* constructor of the type Matrix */
 {
     size_t Dim, RoC;
@@ -52,13 +52,13 @@ void M_Constr(Matrix *M, char *Name, size_t RowDim, size_t ClmDim,
                 Dim = ClmDim;
 	    M->Len = (size_t *)malloc((Dim + 1) * sizeof(size_t));
 	    M->El = (ElType **)malloc((Dim + 1) * sizeof(ElType *));
-	    M->ElSorted = (Boolean *)malloc(sizeof(Boolean));
+	    M->ElSorted = (_LPBoolean *)malloc(sizeof(_LPBoolean));
 	    if (M->Len != NULL && M->El != NULL) {
                 for (RoC = 1; RoC <= Dim; RoC++) {
                     M->Len[RoC] = 0;
                     M->El[RoC] = NULL;
                 }
-                *M->ElSorted = False;
+                *M->ElSorted = _LPFalse;
             } else {
 	        LASError(LASMemAllocErr, "M_Constr", Name, NULL, NULL);
             }
@@ -226,7 +226,7 @@ size_t M_GetLen(Matrix *M, size_t RoC)
     return(Len);
 }
 
-void M_SetEntry(Matrix *M, size_t RoC, size_t Entry, size_t Pos, Real Val)
+void M_SetEntry(Matrix *M, size_t RoC, size_t Entry, size_t Pos, _LPNumber Val)
 /* set a new matrix entry */
 {
     if (LASResult() == LASOK) {
@@ -260,10 +260,10 @@ size_t M_GetPos(Matrix *M, size_t RoC, size_t Entry)
     return(Pos);
 }
 
-Real M_GetVal(Matrix *M, size_t RoC, size_t Entry)
+_LPNumber M_GetVal(Matrix *M, size_t RoC, size_t Entry)
 /* returns the value of a matrix entry */
 {
-    Real Val;
+    _LPNumber Val;
 
     if (LASResult() == LASOK)
         if ((M->ElOrder == Rowws && RoC > 0 && RoC <= M->RowDim) ||
@@ -279,7 +279,7 @@ Real M_GetVal(Matrix *M, size_t RoC, size_t Entry)
     return(Val);
 }
 
-void M_AddVal(Matrix *M, size_t RoC, size_t Entry, Real Val)
+void M_AddVal(Matrix *M, size_t RoC, size_t Entry, _LPNumber Val)
 /* add a value to a matrix entry */
 {
     if (LASResult() == LASOK) {
@@ -292,10 +292,10 @@ void M_AddVal(Matrix *M, size_t RoC, size_t Entry, Real Val)
     }
 }
 
-Real M_GetEl(Matrix *M, size_t Row, size_t Clm)
+_LPNumber M_GetEl(Matrix *M, size_t Row, size_t Clm)
 /* returns the value of a matrix element (all matrix elements are considered) */
 {
-    Real Val;
+    _LPNumber Val;
     
     size_t Len, ElCount;
     ElType *PtrEl;
@@ -345,7 +345,7 @@ void M_SortEl(Matrix *M)
             qsort((void *)M->El[RoC], M->Len[RoC], sizeof(ElType), ElCompar);
         }
         
-        *M->ElSorted = True;
+        *M->ElSorted = _LPTrue;
     }
 }
 
