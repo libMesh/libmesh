@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.45 2003-11-30 06:21:32 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.46 2003-11-30 06:29:47 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -1321,16 +1321,30 @@ if (test -e $MPI_LIBS_PATH/libmpich.a || test -e $MPI_LIBS_PATH/libmpich.so) ; t
 	AC_LANG_CPLUSPLUS
 	LIBS="-L$MPI_LIBS_PATH $LIBS"
 
-	# Quadrics MPICH requires the gm library to be included too
+	# Myricomm MPICH requires the gm library to be included too
 	if (nm $MPI_LIBS_PATH/libmpich.a | grep gm_open > /dev/null); then
 	  echo "note: MPICH found to use Myricomm's Myrinet, looking for gm library"
-		 AC_CHECK_LIB([gm],
-	                      [gm_open],
-	                      [
-                                LIBS    ="-lgm $LIBS"
-                                MPI_LIBS="-lgm $MPI_LIBS"
-                              ],
-	                      [AC_MSG_ERROR( [Could not find gm library... exiting] )] )
+
+          if (test "x$GMHOME" = x) ; then
+            GMHOME="/usr"
+          fi 
+          AC_ARG_WITH([gm],
+	              [  --with-gm=PATH			Prefix where GM is installed (GMHOME)],
+		      [GM="$withval"],
+		      [
+                        echo "note: GM library path not given... trying prefix=$MPIHOME"
+	                GM=$GMHOME
+                      ])
+
+          LIBS="-L$GM/lib $LIBS"
+
+          AC_CHECK_LIB([gm],
+	               [gm_open],
+	               [
+                         LIBS    ="-lgm $LIBS"
+                         MPI_LIBS="-lgm $MPI_LIBS"
+                       ],
+	               [AC_MSG_ERROR( [Could not find gm library... exiting] )] )
 	fi
 
 	# look for MPI_Init in libmpich.(a/so)
