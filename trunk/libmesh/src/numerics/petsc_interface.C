@@ -1,4 +1,4 @@
-// $Id: petsc_interface.C,v 1.16 2003-09-09 17:13:36 ddreyer Exp $
+// $Id: petsc_interface.C,v 1.17 2003-09-09 17:40:45 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -124,99 +124,14 @@ PetscInterface<T>::solve (SparseMatrix<T> &matrix_in,
 			  SAME_NONZERO_PATTERN);             CHKERRQ(ierr);
 
 
-//BLA
-  {
-    Real n_val = solution.l1_norm();
-    std::cout << "l1_norm of solution=" << n_val << std::endl
-	      << " max               =" << solution.max() << std::endl
-	      << " min               =" << solution.min() << std::endl;
-  }
-
-//   PetscTruth check = PETSC_FALSE;
-//   ierr = KSPGetInitialGuessNonzero(_ksp, &check);            CHKERRQ(ierr);
-//   if (check == PETSC_TRUE)
-//       std::cout << "KSP: we succeeded!" << std::endl;
-//   else if (check == PETSC_FALSE)
-//       std::cout << "KSP: failed to set non-zero initial guess..." << std::endl;
-//   else
-//       std::cout << "KSP: what is this value?" << std::endl;
-//BLA
-
-
-// OLD CODE
-   // Set the tolerances for the iterative solver.  Use the user-supplied
-   // tolerance for the relative residual & leave the others at default values.
-   ierr = KSPSetTolerances (_ksp, tol, PETSC_DEFAULT,
+  // Set the tolerances for the iterative solver.  Use the user-supplied
+  // tolerance for the relative residual & leave the others at default values.
+  ierr = KSPSetTolerances (_ksp, tol, PETSC_DEFAULT,
  			   PETSC_DEFAULT, max_its);          CHKERRQ(ierr);
 
-  // Set the tolerances for the iterative solver.  
-  //            relative tolerance     abs. tolerance divergence tolerance
-  //                             rtol, atol,          dtol 
-//  ierr = KSPSetTolerances (_ksp, 0., 1.e-8, PETSC_DEFAULT, max_its); CHKERRQ(ierr);
-// //  ierr = KSPSetTolerances (_ksp, 1.e-15, 1.e-8, PETSC_DEFAULT, max_its); CHKERRQ(ierr);
 
-  
   // Solve the linear system
   ierr = SLESSolve (_sles, rhs.vec, solution.vec, &its);     CHKERRQ(ierr);
-  
-
-
-// Get the reason for convergence/divergence...
-// typedef enum {/* converged */
-//               KSP_CONVERGED_RTOL               =  2,
-//               KSP_CONVERGED_ATOL               =  3,
-//               KSP_CONVERGED_ITS                =  4,
-//               KSP_CONVERGED_QCG_NEG_CURVE      =  5,
-//               KSP_CONVERGED_QCG_CONSTRAINED    =  6,
-//               KSP_CONVERGED_STEP_LENGTH        =  7,
-//               /* diverged */
-//               KSP_DIVERGED_ITS                 = -3,
-//               KSP_DIVERGED_DTOL                = -4,
-//               KSP_DIVERGED_BREAKDOWN           = -5,
-//               KSP_DIVERGED_BREAKDOWN_BICG      = -6,
-//               KSP_DIVERGED_NONSYMMETRIC        = -7,
-//               KSP_DIVERGED_INDEFINITE_PC       = -8,
- 
-//               KSP_CONVERGED_ITERATING          =  0} KSPConvergedReason;
-
-
-  KSPConvergedReason reason;
-  ierr = KSPGetConvergedReason(_ksp, &reason);      CHKERRQ(ierr);
-
-  std::string reason_text="";
-
-  switch (reason)
-  {
-    case KSP_CONVERGED_RTOL:
-      reason_text = "Relative tolerance: KSP_CONVERGED_RTOL";
-      break;
-
-    case KSP_CONVERGED_ATOL:
-      reason_text = "Absolute tolerance: KSP_CONVERGED_ATOL";
-      break;
-
-    case KSP_CONVERGED_ITS:
-      reason_text = "By iterations:      KSP_CONVERGED_ITS";
-      break;
-
-    case KSP_CONVERGED_QCG_NEG_CURVE:
-    case KSP_CONVERGED_QCG_CONSTRAINED:
-    case KSP_CONVERGED_STEP_LENGTH:
-      reason_text = "Other reason for convergence.";
-      break;
-     
-    default:
-      reason_text = "DIVERGENCE!";
-  }  
-
-
-  std::cout << std::endl << "Convergene reason: " << reason_text << std::endl;
-
-
-
-
-
-
 
 
   // Get the norm of the final residual to return to the user.
