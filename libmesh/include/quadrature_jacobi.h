@@ -1,4 +1,4 @@
-// $Id: quadrature_jacobi.h,v 1.2 2003-02-06 17:58:34 ddreyer Exp $
+// $Id: quadrature_jacobi.h,v 1.3 2003-02-07 15:21:31 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -33,7 +33,7 @@
 
 
 /**
- * This class implemenets two (for now) Jacobi-Gauss quadrature
+ * This class implements two (for now) Jacobi-Gauss quadrature
  * rules.  These rules have the same order of accuracy as the
  * normal Gauss quadrature rules, but instead of integrating
  * a weight function w(x)=1, they integrate w(x)=(1-x)^alpha * (1+x)^beta.
@@ -42,14 +42,20 @@
  * Although these product rules are non-optimal (use more points
  * than necessary) they are automatically constructable for high
  * orders of accuracy where other formulae may not exist. 
+ *
+ * There is not much sense in using this class directly,
+ * since it only provides 1D rules, weighted, as described before.
+ * Still, this class is particularly helpful: check \p QGauss
+ * for triangles and tetrahedra, with orders beyond \p FIFTH.
  */
 class QJacobi : public QBase
 {
  public:
 
   /**
-   * Constructor.  Declares the dimension of the quadrature rule.
-   * Also 
+   * Constructor.  Currently, only one-dimensional rules provided.
+   * Check \p QGauss for versions of Jacobi quadrature rule for
+   * higher dimensions.
    */
   QJacobi (const unsigned int _dim,
 	   const Order _order=INVALID_ORDER,
