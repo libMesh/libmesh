@@ -1,6 +1,4 @@
-
-
-// $Id: mesh_base.C,v 1.28.2.1 2003-05-06 14:00:49 benkirk Exp $
+// $Id: mesh_base.C,v 1.28.2.2 2003-05-15 17:53:27 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -546,7 +544,9 @@ void MeshBase::build_inf_elem(const Point& origin,
 			      const bool x_sym, 
 			      const bool y_sym, 
 			      const bool z_sym,
-			      const bool be_verbose)
+			      const bool be_verbose,
+			      std::set< std::pair<unsigned int,
+			                          unsigned int> >* inner_faces)
 {
 
   if (be_verbose)
@@ -565,6 +565,7 @@ void MeshBase::build_inf_elem(const Point& origin,
 
   START_LOG("build_inf_elem()", "MeshBase");
 
+  // pairs: (first: element number, second: side number)
   std::set< std::pair<unsigned int,unsigned int> > faces,ofaces;
   std::set< std::pair<unsigned int,unsigned int> > :: iterator face_it;
 	
@@ -729,7 +730,19 @@ void MeshBase::build_inf_elem(const Point& origin,
 	      << std::endl;
 #endif	
 	
-  faces.clear();		//free memory
+  /*
+   * When the user provided a non-null pointer to
+   * inner_faces, that implies he wants to have
+   * this std::set.  For now, simply copy the data.
+   */
+  if (inner_faces != NULL)
+      *inner_faces = faces;
+
+  /*
+   * free memory, clear our local variable, no need
+   * for it any more.
+   */
+  faces.clear();
 
 
   // outer_nodes maps onodes to their duplicates
@@ -1321,6 +1334,33 @@ void MeshBase::renumber_nodes_and_elements ()
 
 
 
+
+void MeshBase::find_boundary_nodes(std::vector<short int>& on_boundary)
+{
+  // Resize the vector which holds boundary nodes and fill with zeros.
+  on_boundary.resize(this->n_nodes());
+  std::fill(on_boundary.begin(),
+	    on_boundary.end(),
+	    0);
+
+  // Loop over elements, find those on boundary, and
+  // mark them as 1 in on_boundary.
+  active_elem_iterator       el (this->elements_begin());
+  const active_elem_iterator end(this->elements_end());
+  for (; el != end; ++el)
+    for (unsigned int s=0; s<(*el)->n_neighbors(); s++)
+      if ((*el)->neighbor(s) == NULL) // on the boundary
+	{
+	  const AutoPtr<Elem> side((*el)->build_side(s));
+	  
+	  for (unsigned int n=0; n<side->n_nodes(); n++)
+	    on_boundary[side->node(n)] = 1;
+	}
+}
+
+
+
+
 void MeshBase::distort (const Real factor,
 			const bool perturb_boundary)
 {
@@ -1331,30 +1371,21 @@ void MeshBase::distort (const Real factor,
 
   START_LOG("distort()", "MeshBase");
 
-  std::vector<Real>      hmin(n_nodes(), 1.e20);
-  std::vector<short int> on_boundary(n_nodes(), 0);
 
 
   // First find nodes on the boundary and flag them
   // so that we don't move them
+  // on_boundary holds 0's (not on boundary) and 1's (on boundary)
+  std::vector<short int> on_boundary(this->n_nodes(), 0);
+  
   if (!perturb_boundary)
-    {
-      active_elem_iterator       el (this->elements_begin());
-      const active_elem_iterator end(this->elements_end());
-      for (; el != end; ++el)
-	for (unsigned int s=0; s<(*el)->n_neighbors(); s++)
-	  if ((*el)->neighbor(s) == NULL) // on the boundary
-	    {
-	      const AutoPtr<Elem> side((*el)->build_side(s));
-	      
-	      for (unsigned int n=0; n<side->n_nodes(); n++)
-		on_boundary[side->node(n)] = 1;
-	    }
-    }
-
+    this->find_boundary_nodes(on_boundary);
 
   // Now calculate the minimum distance to
-  // neighboring nodes for each node
+  // neighboring nodes for each node.
+  // hmin holds these distances.
+  std::vector<Real>          hmin(n_nodes(), 1.e20);
+  
   active_elem_iterator       el (this->elements_begin());
   const active_elem_iterator end(this->elements_end());
   for (; el!=end; ++el)
@@ -1407,8 +1438,6 @@ void MeshBase::distort (const Real factor,
 
   // All done  
   STOP_LOG("distort()", "MeshBase");
-
-  return;
 }
 
 

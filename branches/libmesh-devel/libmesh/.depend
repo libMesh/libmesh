@@ -1,6 +1,7 @@
 src/base/dof_map.$(obj-suffix):\
     src/base/dof_map.C\
     include/auto_ptr.h\
+    include/boundary_data.h\
     include/boundary_info.h\
     include/coupling_matrix.h\
     include/dense_matrix.h\
@@ -46,6 +47,7 @@ src/base/dof_object.$(obj-suffix):\
 src/base/equation_systems.$(obj-suffix):\
     src/base/equation_systems.C\
     include/auto_ptr.h\
+    include/boundary_data.h\
     include/boundary_info.h\
     include/boundary_mesh.h\
     include/coupling_matrix.h\
@@ -230,6 +232,7 @@ src/base/steady_system.$(obj-suffix):\
 src/base/system_base.$(obj-suffix):\
     src/base/system_base.C\
     include/auto_ptr.h\
+    include/boundary_data.h\
     include/boundary_info.h\
     include/boundary_mesh.h\
     include/coupling_matrix.h\
@@ -275,6 +278,7 @@ src/base/system_base.$(obj-suffix):\
 src/base/system_base_io.$(obj-suffix):\
     src/base/system_base_io.C\
     include/auto_ptr.h\
+    include/boundary_data.h\
     include/boundary_info.h\
     include/boundary_mesh.h\
     include/coupling_matrix.h\
@@ -314,6 +318,7 @@ src/base/system_base_io.$(obj-suffix):\
 src/base/system_base_projection.$(obj-suffix):\
     src/base/system_base_projection.C\
     include/auto_ptr.h\
+    include/boundary_data.h\
     include/boundary_info.h\
     include/boundary_mesh.h\
     include/coupling_matrix.h\
@@ -1460,6 +1465,7 @@ src/geom/edge_inf_edge2.$(obj-suffix):\
 src/geom/elem.$(obj-suffix):\
     src/geom/elem.C\
     include/auto_ptr.h\
+    include/boundary_data.h\
     include/boundary_info.h\
     include/cell_hex.h\
     include/cell_hex20.h\
@@ -1493,6 +1499,7 @@ src/geom/elem.$(obj-suffix):\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/face.h\
     include/face_inf_quad.h\
     include/face_inf_quad4.h\
@@ -1506,6 +1513,7 @@ src/geom/elem.$(obj-suffix):\
     include/face_tri6.h\
     include/fe_interface.h\
     include/fe_type.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_base.h\
     include/mesh_common.h\
@@ -1514,6 +1522,7 @@ src/geom/elem.$(obj-suffix):\
     include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
+    include/perf_log.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -1764,17 +1773,48 @@ src/geom/surface.$(obj-suffix):\
     include/mesh_config.h\
     include/point.h\
     include/surface.h
-src/mesh/boundary_info.$(obj-suffix):\
-    src/mesh/boundary_info.C\
+src/mesh/boundary_data.$(obj-suffix):\
+    src/mesh/boundary_data.C\
     include/auto_ptr.h\
+    include/boundary_data.h\
     include/boundary_info.h\
-    include/boundary_mesh.h\
     include/dof_object.h\
     include/elem.h\
     include/elem_iterators.h\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
+    include/libmesh.h\
+    include/libmesh_base.h\
+    include/mesh_base.h\
+    include/mesh_common.h\
+    include/mesh_communication.h\
+    include/mesh_config.h\
+    include/mesh_logging.h\
+    include/mesh_refinement.h\
+    include/node.h\
+    include/node_iterators.h\
+    include/perf_log.h\
+    include/point.h\
+    include/predicated_iterator.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h\
+    include/sphere.h\
+    include/surface.h
+src/mesh/boundary_data_unv_support.$(obj-suffix):\
+    src/mesh/boundary_data_unv_support.C\
+    include/auto_ptr.h\
+    include/boundary_data.h\
+    include/boundary_info.h\
+    include/dof_object.h\
+    include/elem.h\
+    include/elem_iterators.h\
+    include/enum_elem_quality.h\
+    include/enum_elem_type.h\
+    include/enum_order.h\
+    include/enum_solver_package.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_base.h\
     include/mesh_common.h\
@@ -1783,6 +1823,64 @@ src/mesh/boundary_info.$(obj-suffix):\
     include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
+    include/perf_log.h\
+    include/point.h\
+    include/predicated_iterator.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h\
+    include/sphere.h\
+    include/surface.h
+src/mesh/boundary_data_xdr_support.$(obj-suffix):\
+    src/mesh/boundary_data_xdr_support.C\
+    include/auto_ptr.h\
+    include/boundary_data.h\
+    include/boundary_info.h\
+    include/dof_object.h\
+    include/elem.h\
+    include/elem_iterators.h\
+    include/enum_elem_quality.h\
+    include/enum_elem_type.h\
+    include/enum_order.h\
+    include/enum_solver_package.h\
+    include/libmesh.h\
+    include/libmesh_base.h\
+    include/mesh_base.h\
+    include/mesh_common.h\
+    include/mesh_communication.h\
+    include/mesh_config.h\
+    include/mesh_refinement.h\
+    include/node.h\
+    include/node_iterators.h\
+    include/perf_log.h\
+    include/point.h\
+    include/predicated_iterator.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h\
+    include/sphere.h\
+    include/surface.h
+src/mesh/boundary_info.$(obj-suffix):\
+    src/mesh/boundary_info.C\
+    include/auto_ptr.h\
+    include/boundary_data.h\
+    include/boundary_info.h\
+    include/boundary_mesh.h\
+    include/dof_object.h\
+    include/elem.h\
+    include/elem_iterators.h\
+    include/enum_elem_quality.h\
+    include/enum_elem_type.h\
+    include/enum_order.h\
+    include/enum_solver_package.h\
+    include/libmesh.h\
+    include/libmesh_base.h\
+    include/mesh_base.h\
+    include/mesh_common.h\
+    include/mesh_communication.h\
+    include/mesh_config.h\
+    include/mesh_refinement.h\
+    include/node.h\
+    include/node_iterators.h\
+    include/perf_log.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -1792,6 +1890,7 @@ src/mesh/boundary_info.$(obj-suffix):\
 src/mesh/boundary_mesh.$(obj-suffix):\
     src/mesh/boundary_mesh.C\
     include/auto_ptr.h\
+    include/boundary_data.h\
     include/boundary_info.h\
     include/boundary_mesh.h\
     include/dof_object.h\
@@ -1800,6 +1899,8 @@ src/mesh/boundary_mesh.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_base.h\
     include/mesh_common.h\
@@ -1808,6 +1909,7 @@ src/mesh/boundary_mesh.$(obj-suffix):\
     include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
+    include/perf_log.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -1817,6 +1919,7 @@ src/mesh/boundary_mesh.$(obj-suffix):\
 src/mesh/mesh.$(obj-suffix):\
     src/mesh/mesh.C\
     include/auto_ptr.h\
+    include/boundary_data.h\
     include/boundary_info.h\
     include/boundary_mesh.h\
     include/dof_object.h\
@@ -1847,6 +1950,7 @@ src/mesh/mesh.$(obj-suffix):\
 src/mesh/mesh_base.$(obj-suffix):\
     src/mesh/mesh_base.C\
     include/auto_ptr.h\
+    include/boundary_data.h\
     include/boundary_info.h\
     include/cell_inf_hex.h\
     include/cell_inf_hex16.h\
@@ -1900,6 +2004,7 @@ src/mesh/mesh_base.$(obj-suffix):\
 src/mesh/mesh_diva_support.$(obj-suffix):\
     src/mesh/mesh_diva_support.C\
     include/auto_ptr.h\
+    include/boundary_data.h\
     include/boundary_info.h\
     include/boundary_mesh.h\
     include/dof_object.h\
@@ -1908,6 +2013,8 @@ src/mesh/mesh_diva_support.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh.h\
     include/mesh_base.h\
@@ -1917,6 +2024,7 @@ src/mesh/mesh_diva_support.$(obj-suffix):\
     include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
+    include/perf_log.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -1926,6 +2034,7 @@ src/mesh/mesh_diva_support.$(obj-suffix):\
 src/mesh/mesh_exodus_support.$(obj-suffix):\
     src/mesh/mesh_exodus_support.C\
     include/auto_ptr.h\
+    include/boundary_data.h\
     include/boundary_info.h\
     include/boundary_mesh.h\
     include/dof_object.h\
@@ -1934,6 +2043,8 @@ src/mesh/mesh_exodus_support.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh.h\
     include/mesh_base.h\
@@ -1944,6 +2055,7 @@ src/mesh/mesh_exodus_support.$(obj-suffix):\
     include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
+    include/perf_log.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -1953,6 +2065,7 @@ src/mesh/mesh_exodus_support.$(obj-suffix):\
 src/mesh/mesh_generation.$(obj-suffix):\
     src/mesh/mesh_generation.C\
     include/auto_ptr.h\
+    include/boundary_data.h\
     include/boundary_info.h\
     include/boundary_mesh.h\
     include/cell_hex.h\
@@ -2002,6 +2115,7 @@ src/mesh/mesh_generation.$(obj-suffix):\
 src/mesh/mesh_gmv_support.$(obj-suffix):\
     src/mesh/mesh_gmv_support.C\
     include/auto_ptr.h\
+    include/boundary_data.h\
     include/boundary_info.h\
     include/data_map.h\
     include/data_object.h\
@@ -2011,8 +2125,10 @@ src/mesh/mesh_gmv_support.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/enum_xdr_mode.h\
     include/equation_systems.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_base.h\
     include/mesh_common.h\
@@ -2021,6 +2137,7 @@ src/mesh/mesh_gmv_support.$(obj-suffix):\
     include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
+    include/perf_log.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -2030,6 +2147,7 @@ src/mesh/mesh_gmv_support.$(obj-suffix):\
 src/mesh/mesh_metis_support.$(obj-suffix):\
     src/mesh/mesh_metis_support.C\
     include/auto_ptr.h\
+    include/boundary_data.h\
     include/boundary_info.h\
     include/dof_object.h\
     include/elem.h\
@@ -2058,6 +2176,7 @@ src/mesh/mesh_metis_support.$(obj-suffix):\
 src/mesh/mesh_misc_support.$(obj-suffix):\
     src/mesh/mesh_misc_support.C\
     include/auto_ptr.h\
+    include/boundary_data.h\
     include/boundary_info.h\
     include/dof_object.h\
     include/elem.h\
@@ -2065,11 +2184,13 @@ src/mesh/mesh_misc_support.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/face.h\
     include/face_quad.h\
     include/face_quad4.h\
     include/face_tri.h\
     include/face_tri3.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_base.h\
     include/mesh_common.h\
@@ -2078,6 +2199,7 @@ src/mesh/mesh_misc_support.$(obj-suffix):\
     include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
+    include/perf_log.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -2087,6 +2209,7 @@ src/mesh/mesh_misc_support.$(obj-suffix):\
 src/mesh/mesh_refinement.$(obj-suffix):\
     src/mesh/mesh_refinement.C\
     include/auto_ptr.h\
+    include/boundary_data.h\
     include/boundary_info.h\
     include/dof_object.h\
     include/elem.h\
@@ -2094,6 +2217,8 @@ src/mesh/mesh_refinement.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_base.h\
     include/mesh_common.h\
@@ -2102,6 +2227,41 @@ src/mesh/mesh_refinement.$(obj-suffix):\
     include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
+    include/perf_log.h\
+    include/point.h\
+    include/predicated_iterator.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h\
+    include/sphere.h\
+    include/surface.h
+src/mesh/mesh_smoother.$(obj-suffix):\
+    src/mesh/mesh_smoother.C
+src/mesh/mesh_smoother_laplace.$(obj-suffix):\
+    src/mesh/mesh_smoother_laplace.C\
+    include/auto_ptr.h\
+    include/boundary_data.h\
+    include/boundary_info.h\
+    include/boundary_mesh.h\
+    include/dof_object.h\
+    include/elem.h\
+    include/elem_iterators.h\
+    include/enum_elem_quality.h\
+    include/enum_elem_type.h\
+    include/enum_order.h\
+    include/enum_solver_package.h\
+    include/libmesh.h\
+    include/libmesh_base.h\
+    include/mesh.h\
+    include/mesh_base.h\
+    include/mesh_common.h\
+    include/mesh_communication.h\
+    include/mesh_config.h\
+    include/mesh_refinement.h\
+    include/mesh_smoother.h\
+    include/mesh_smoother_laplace.h\
+    include/node.h\
+    include/node_iterators.h\
+    include/perf_log.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -2111,6 +2271,7 @@ src/mesh/mesh_refinement.$(obj-suffix):\
 src/mesh/mesh_tecplot_support.$(obj-suffix):\
     src/mesh/mesh_tecplot_support.C\
     include/auto_ptr.h\
+    include/boundary_data.h\
     include/boundary_info.h\
     include/data_map.h\
     include/data_object.h\
@@ -2120,8 +2281,10 @@ src/mesh/mesh_tecplot_support.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/enum_xdr_mode.h\
     include/equation_systems.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_base.h\
     include/mesh_common.h\
@@ -2130,6 +2293,7 @@ src/mesh/mesh_tecplot_support.$(obj-suffix):\
     include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
+    include/perf_log.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -2139,6 +2303,7 @@ src/mesh/mesh_tecplot_support.$(obj-suffix):\
 src/mesh/mesh_ucd_support.$(obj-suffix):\
     src/mesh/mesh_ucd_support.C\
     include/auto_ptr.h\
+    include/boundary_data.h\
     include/boundary_info.h\
     include/cell_hex.h\
     include/cell_hex8.h\
@@ -2152,11 +2317,13 @@ src/mesh/mesh_ucd_support.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/face.h\
     include/face_quad.h\
     include/face_quad4.h\
     include/face_tri.h\
     include/face_tri3.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_base.h\
     include/mesh_common.h\
@@ -2165,6 +2332,7 @@ src/mesh/mesh_ucd_support.$(obj-suffix):\
     include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
+    include/perf_log.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -2174,6 +2342,7 @@ src/mesh/mesh_ucd_support.$(obj-suffix):\
 src/mesh/mesh_unv_support.$(obj-suffix):\
     src/mesh/mesh_unv_support.C\
     include/auto_ptr.h\
+    include/boundary_data.h\
     include/boundary_info.h\
     include/boundary_mesh.h\
     include/cell_hex.h\
@@ -2190,6 +2359,7 @@ src/mesh/mesh_unv_support.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
     include/face.h\
     include/face_quad.h\
     include/face_quad4.h\
@@ -2197,6 +2367,7 @@ src/mesh/mesh_unv_support.$(obj-suffix):\
     include/face_tri.h\
     include/face_tri3.h\
     include/face_tri6.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh.h\
     include/mesh_base.h\
@@ -2207,6 +2378,7 @@ src/mesh/mesh_unv_support.$(obj-suffix):\
     include/mesh_unv_support.h\
     include/node.h\
     include/node_iterators.h\
+    include/perf_log.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -2216,6 +2388,7 @@ src/mesh/mesh_unv_support.$(obj-suffix):\
 src/mesh/mesh_xdr_support.$(obj-suffix):\
     src/mesh/mesh_xdr_support.C\
     include/auto_ptr.h\
+    include/boundary_data.h\
     include/boundary_info.h\
     include/boundary_mesh.h\
     include/cell_hex.h\
@@ -2226,6 +2399,8 @@ src/mesh/mesh_xdr_support.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh.h\
     include/mesh_base.h\
@@ -2237,6 +2412,7 @@ src/mesh/mesh_xdr_support.$(obj-suffix):\
     include/node.h\
     include/node_iterators.h\
     include/o_f_stream.h\
+    include/perf_log.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -2317,6 +2493,52 @@ src/numerics/distributed_vector.$(obj-suffix):\
     include/perf_log.h\
     include/reference_counted_object.h\
     include/reference_counter.h
+src/numerics/error_estimator.$(obj-suffix):\
+    src/numerics/error_estimator.C\
+    include/auto_ptr.h\
+    include/boundary_data.h\
+    include/boundary_info.h\
+    include/boundary_mesh.h\
+    include/coupling_matrix.h\
+    include/data_map.h\
+    include/data_object.h\
+    include/dof_map.h\
+    include/dof_object.h\
+    include/elem.h\
+    include/elem_iterators.h\
+    include/enum_elem_quality.h\
+    include/enum_elem_type.h\
+    include/enum_fe_family.h\
+    include/enum_inf_map_type.h\
+    include/enum_order.h\
+    include/enum_quadrature_type.h\
+    include/enum_solver_package.h\
+    include/enum_xdr_mode.h\
+    include/equation_systems.h\
+    include/error_estimator.h\
+    include/fe.h\
+    include/fe_base.h\
+    include/fe_type.h\
+    include/libmesh.h\
+    include/libmesh_base.h\
+    include/mesh.h\
+    include/mesh_base.h\
+    include/mesh_common.h\
+    include/mesh_communication.h\
+    include/mesh_config.h\
+    include/mesh_refinement.h\
+    include/node.h\
+    include/node_iterators.h\
+    include/perf_log.h\
+    include/point.h\
+    include/predicated_iterator.h\
+    include/quadrature.h\
+    include/quadrature_gauss.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h\
+    include/sphere.h\
+    include/surface.h\
+    include/system_base.h
 src/numerics/function_base.$(obj-suffix):\
     src/numerics/function_base.C\
     include/function_base.h\
@@ -2436,9 +2658,12 @@ src/numerics/linear_solver_interface.$(obj-suffix):\
 src/numerics/mesh_function.$(obj-suffix):\
     src/numerics/mesh_function.C\
     include/auto_ptr.h\
+    include/boundary_data.h\
     include/boundary_info.h\
     include/boundary_mesh.h\
     include/coupling_matrix.h\
+    include/data_map.h\
+    include/data_object.h\
     include/dense_vector.h\
     include/dense_vector_base.h\
     include/dof_map.h\
@@ -2452,6 +2677,8 @@ src/numerics/mesh_function.$(obj-suffix):\
     include/enum_order.h\
     include/enum_point_locator_type.h\
     include/enum_solver_package.h\
+    include/enum_xdr_mode.h\
+    include/equation_systems.h\
     include/fe_compute_data.h\
     include/fe_interface.h\
     include/fe_type.h\
@@ -2805,6 +3032,7 @@ src/utils/perf_log.$(obj-suffix):\
 src/utils/point_locator.$(obj-suffix):\
     src/utils/point_locator.C\
     include/auto_ptr.h\
+    include/boundary_data.h\
     include/boundary_info.h\
     include/boundary_mesh.h\
     include/dof_object.h\
@@ -2814,6 +3042,8 @@ src/utils/point_locator.$(obj-suffix):\
     include/enum_elem_type.h\
     include/enum_order.h\
     include/enum_point_locator_type.h\
+    include/enum_solver_package.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh.h\
     include/mesh_base.h\
@@ -2823,6 +3053,7 @@ src/utils/point_locator.$(obj-suffix):\
     include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
+    include/perf_log.h\
     include/point.h\
     include/point_locator.h\
     include/point_locator_base.h\
@@ -2836,6 +3067,7 @@ src/utils/point_locator.$(obj-suffix):\
 src/utils/point_locator_base.$(obj-suffix):\
     src/utils/point_locator_base.C\
     include/auto_ptr.h\
+    include/boundary_data.h\
     include/boundary_info.h\
     include/boundary_mesh.h\
     include/dof_object.h\
@@ -2845,6 +3077,8 @@ src/utils/point_locator_base.$(obj-suffix):\
     include/enum_elem_type.h\
     include/enum_order.h\
     include/enum_point_locator_type.h\
+    include/enum_solver_package.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh.h\
     include/mesh_base.h\
@@ -2854,6 +3088,7 @@ src/utils/point_locator_base.$(obj-suffix):\
     include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
+    include/perf_log.h\
     include/point.h\
     include/point_locator.h\
     include/point_locator_base.h\
@@ -2871,6 +3106,7 @@ src/utils/statistics.$(obj-suffix):\
 src/utils/tree.$(obj-suffix):\
     src/utils/tree.C\
     include/auto_ptr.h\
+    include/boundary_data.h\
     include/boundary_info.h\
     include/dof_object.h\
     include/elem.h\
@@ -2878,6 +3114,8 @@ src/utils/tree.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_base.h\
     include/mesh_common.h\
@@ -2886,6 +3124,7 @@ src/utils/tree.$(obj-suffix):\
     include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
+    include/perf_log.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -2898,6 +3137,7 @@ src/utils/tree.$(obj-suffix):\
 src/utils/tree_base.$(obj-suffix):\
     src/utils/tree_base.C\
     include/auto_ptr.h\
+    include/boundary_data.h\
     include/boundary_info.h\
     include/dof_object.h\
     include/elem.h\
@@ -2905,6 +3145,8 @@ src/utils/tree_base.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_base.h\
     include/mesh_common.h\
@@ -2913,6 +3155,7 @@ src/utils/tree_base.$(obj-suffix):\
     include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
+    include/perf_log.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -2925,6 +3168,7 @@ src/utils/tree_base.$(obj-suffix):\
 src/utils/tree_node.$(obj-suffix):\
     src/utils/tree_node.C\
     include/auto_ptr.h\
+    include/boundary_data.h\
     include/boundary_info.h\
     include/dof_object.h\
     include/elem.h\
@@ -2932,6 +3176,8 @@ src/utils/tree_node.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
+    include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_base.h\
     include/mesh_common.h\
@@ -2940,6 +3186,7 @@ src/utils/tree_node.$(obj-suffix):\
     include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
+    include/perf_log.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\

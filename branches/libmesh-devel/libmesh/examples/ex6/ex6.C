@@ -1,4 +1,4 @@
-// $Id: ex6.C,v 1.21.2.2 2003-05-13 22:08:21 benkirk Exp $
+// $Id: ex6.C,v 1.21.2.3 2003-05-15 17:53:26 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -75,12 +75,12 @@
  * Element class.  Note that the library must be compiled
  * with Infinite Elements enabled.  Otherwise, this
  * example will abort.
- * This example intends to demonstrate the general use
- * of the infinite elements implemented in libMesh.
+ * This example intends to demonstrate the similarities
+ * between the \p FE and the \p InfFE classes in libMesh.
  * The matrices are assembled according to the wave equation.
  * However, for practical applications a time integration
  * scheme (as introduced in a subsequent example) should be
- * included.
+ * used.
  */
 
 
@@ -174,10 +174,20 @@ int main (int argc, char** argv)
     mesh.print_info();
 
     /**
-     * Build infinite elements on the outer boundary of the existing 
-     * volume mesh.  This method automatically determines the
-     * origin of the infinite elements.  The \p bool determines
-     * whether to be verbose.
+     * Normally, when a mesh is imported or created in
+     * libMesh, only conventional elements exist.  The infinite
+     * elements used here, however, require prescribed
+     * nodal locations (with specified distances from an imaginary
+     * origin) and configurations that a conventional mesh creator 
+     * in general does not offer.  Therefore, an efficient method
+     * for building infinite elements is offered.  It can account
+     * for symmetry planes and creates infinite elements in a fully
+     * automatic way.  
+     * Right now, the simplified interface is used, automatically
+     * determining the origin.  Check \p MeshBase for a generalized
+     * method that can even return the element faces of interior
+     * vibrating surfaces.  The \p bool determines whether to be 
+     * verbose.
      */
     mesh.build_inf_elem(true);
 
@@ -192,14 +202,17 @@ int main (int argc, char** argv)
     mesh.write_gmv ("ifems_added.gmv");
 
     /**
-     * After building finite elements, we have to let 
+     * After building infinite elements, we have to let 
      * the elements find their neighbors.
      */
     mesh.find_neighbors();
 
     
     /**
-     * Create an equation systems object.
+     * Create an equation systems object, where \p ThinSystem
+     * offers only the crucial functionality for solving a 
+     * system.  Use \p ThinSystem when you want the sleekest
+     * system possible.
      */
     EquationSystems equation_systems (mesh);
 
@@ -265,10 +278,16 @@ int main (int argc, char** argv)
 
 
     /**
-     * After solving the system write the solution
-     * to a GMV-formatted plot file.
+     * Write the whole EquationSystems object to file.
+     * For infinite elements, the concept of nodal_soln()
+     * is not applicable. Therefore, writing the mesh in
+     * some format @e always gives all-zero results at
+     * the nodes of the infinite elements.  Instead,
+     * use the FEInterface::compute_data() methods to
+     * determine physically correct results within an
+     * infinite element.
      */
-    mesh.write_gmv ("out.gmv", equation_systems);
+    equation_systems.write ("eqn_sys.dat", libMeshEnums::WRITE);
   }
 
   
@@ -363,7 +382,8 @@ void assemble_wave(EquationSystems& es,
    */
   inf_fe->attach_quadrature_rule (&qrule);
 
-
+  
+  
   /**
    * Define data structures to contain the element matrix
    * and right-hand-side vector contribution.  Following

@@ -1,4 +1,4 @@
-// $Id: boundary_data_unv_support.C,v 1.1 2003-05-14 11:54:37 ddreyer Exp $
+// $Id: boundary_data_unv_support.C,v 1.1.2.1 2003-05-15 17:53:27 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -34,7 +34,7 @@ void BoundaryData::read_unv(const std::string& name)
 {
   std::ifstream file (name.c_str());
 
-  static const string label_unv_dataset   = "2414";
+  static const std::string label_unv_dataset   = "2414";
 
   // check file
   if ( !file.good() )

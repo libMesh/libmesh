@@ -11,6 +11,7 @@ examples:
 	@$(MAKE) -C ex3 $(MAKECMDGOALS)
 	@$(MAKE) -C ex4 $(MAKECMDGOALS)
 	@$(MAKE) -C ex5 $(MAKECMDGOALS)
+	@$(MAKE) -C ex6 $(MAKECMDGOALS)
 	@$(MAKE) -C ex7 $(MAKECMDGOALS)
 	@$(MAKE) -C ex8 $(MAKECMDGOALS)
 	@echo "----------------------------------------------"
@@ -28,6 +29,7 @@ clean:
 	@$(MAKE) -C ex3 $(MAKECMDGOALS)
 	@$(MAKE) -C ex4 $(MAKECMDGOALS)
 	@$(MAKE) -C ex5 $(MAKECMDGOALS)
+	@$(MAKE) -C ex6 $(MAKECMDGOALS)
 	@$(MAKE) -C ex7 $(MAKECMDGOALS)
 	@$(MAKE) -C ex8 $(MAKECMDGOALS)
 
@@ -40,6 +42,7 @@ clobber:
 	@$(MAKE) -C ex3 $(MAKECMDGOALS)
 	@$(MAKE) -C ex4 $(MAKECMDGOALS)
 	@$(MAKE) -C ex5 $(MAKECMDGOALS)
+	@$(MAKE) -C ex6 $(MAKECMDGOALS)
 	@$(MAKE) -C ex7 $(MAKECMDGOALS)
 	@$(MAKE) -C ex8 $(MAKECMDGOALS)
 
@@ -52,6 +55,7 @@ distclean:
 	@$(MAKE) -C ex3 $(MAKECMDGOALS)
 	@$(MAKE) -C ex4 $(MAKECMDGOALS)
 	@$(MAKE) -C ex5 $(MAKECMDGOALS)
+	@$(MAKE) -C ex6 $(MAKECMDGOALS)
 	@$(MAKE) -C ex7 $(MAKECMDGOALS)
 	@$(MAKE) -C ex8 $(MAKECMDGOALS)
 
@@ -63,6 +67,7 @@ run: $(wildcard examples/ex?/ex?.C)
 	@$(MAKE) -C ex3 $(MAKECMDGOALS)
 	@$(MAKE) -C ex4 $(MAKECMDGOALS)
 	@$(MAKE) -C ex5 $(MAKECMDGOALS)
+	@$(MAKE) -C ex6 $(MAKECMDGOALS)
 	@$(MAKE) -C ex7 $(MAKECMDGOALS)
 	@$(MAKE) -C ex8 $(MAKECMDGOALS)
 

@@ -1,6 +1,7 @@
 ex1.$(obj-suffix):\
     ex1.C\
     ../../include/auto_ptr.h\
+    ../../include/boundary_data.h\
     ../../include/boundary_info.h\
     ../../include/boundary_mesh.h\
     ../../include/dof_object.h\
@@ -9,6 +10,7 @@ ex1.$(obj-suffix):\
     ../../include/enum_elem_quality.h\
     ../../include/enum_elem_type.h\
     ../../include/enum_order.h\
+    ../../include/enum_solver_package.h\
     ../../include/libmesh.h\
     ../../include/libmesh_base.h\
     ../../include/mesh.h\

@@ -1,9 +1,12 @@
 ex7.$(obj-suffix):\
     ex7.C\
     ../../include/auto_ptr.h\
+    ../../include/boundary_data.h\
     ../../include/boundary_info.h\
     ../../include/boundary_mesh.h\
     ../../include/coupling_matrix.h\
+    ../../include/data_map.h\
+    ../../include/data_object.h\
     ../../include/dense_matrix.h\
     ../../include/dense_matrix_base.h\
     ../../include/dense_vector.h\
@@ -32,6 +35,7 @@ ex7.$(obj-suffix):\
     ../../include/mesh_common.h\
     ../../include/mesh_communication.h\
     ../../include/mesh_config.h\
+    ../../include/mesh_logging.h\
     ../../include/mesh_refinement.h\
     ../../include/node.h\
     ../../include/node_iterators.h\

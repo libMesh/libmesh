@@ -1,9 +1,12 @@
 ex2.$(obj-suffix):\
     ex2.C\
     ../../include/auto_ptr.h\
+    ../../include/boundary_data.h\
     ../../include/boundary_info.h\
     ../../include/boundary_mesh.h\
     ../../include/coupling_matrix.h\
+    ../../include/data_map.h\
+    ../../include/data_object.h\
     ../../include/dof_map.h\
     ../../include/dof_object.h\
     ../../include/elem.h\

@@ -1,6 +1,7 @@
 ex6.$(obj-suffix):\
     ex6.C\
     ../../include/auto_ptr.h\
+    ../../include/boundary_data.h\
     ../../include/boundary_info.h\
     ../../include/boundary_mesh.h\
     ../../include/coupling_matrix.h\
@@ -45,6 +46,7 @@ ex6.$(obj-suffix):\
     ../../include/quadrature_gauss.h\
     ../../include/reference_counted_object.h\
     ../../include/reference_counter.h\
+    ../../include/sparse_matrix.h\
     ../../include/sphere.h\
     ../../include/steady_system.h\
     ../../include/surface.h\

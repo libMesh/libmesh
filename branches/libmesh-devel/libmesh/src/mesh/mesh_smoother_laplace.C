@@ -1,4 +1,4 @@
-// $Id: mesh_smoother_laplace.C,v 1.1 2003-05-14 02:27:08 jwpeterson Exp $
+// $Id: mesh_smoother_laplace.C,v 1.1.2.1 2003-05-15 17:53:28 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
