@@ -1,4 +1,4 @@
-// $Id: equation_systems_base.C,v 1.2 2003-03-20 11:51:24 ddreyer Exp $
+// $Id: equation_systems_base.C,v 1.3 2003-04-05 02:25:42 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -184,13 +184,14 @@ std::string EquationSystemsBase::get_info () const
 {
   std::ostringstream out;
   
+  out << "  n_flags()=" << this->n_flags() << std::endl;
   if (!_flags.empty())
     {  
-      out << "  Flags:" << std::endl;
+      out << "   Flags:" << std::endl;
       
       for (std::set<std::string>::const_iterator flag = _flags.begin();
 	   flag != _flags.end(); ++flag)
-	out << "   "
+	out << "    "
 	    << "\""
 	    << *flag
 	    << "\""
@@ -198,14 +199,15 @@ std::string EquationSystemsBase::get_info () const
     }
   
   
+  out << "  n_parameters()=" << this->n_parameters() << std::endl;
   if (!_parameters.empty())
     {  
-      out << "  Parameters:" << std::endl;
+      out << "   Parameters:" << std::endl;
       
       for (std::map<std::string, Real>::const_iterator
 	     param = _parameters.begin(); param != _parameters.end();
 	   ++param)
-	out << "   "
+	out << "    "
 	    << "\""
 	    << param->first
 	    << "\""

@@ -1,4 +1,4 @@
-// $Id: system_base.h,v 1.11 2003-03-21 15:29:09 ddreyer Exp $
+// $Id: system_base.h,v 1.12 2003-04-05 02:25:42 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -40,6 +40,7 @@
 
 // Forward Declarations
 class SystemBase;
+class Xdr;
 
 
 /**
@@ -217,11 +218,6 @@ public:
    */
   unsigned int n_additional_vectors () const { return _other_vectors.size(); }
 
-/*   /\** */
-/*    * Zeros the additional vectors.  Gives an error when none exist. */
-/*    *\/ */
-/*   void zero_vectors(); */
-
   /**
    * @returns the number of variables in the system
    */
@@ -279,7 +275,38 @@ public:
    * @returns the finite element type for variable \p var.
    */
   const FEType & variable_type (const std::string& var) const;
-  
+
+  /**
+   * Reads the basic data for this System.
+   */
+  void read (Xdr& io, 
+	     const bool read_header=true,
+	     const bool read_additional_data=true);
+
+  /**
+   * Reads additional data, namely vectors, for this System.
+   */
+  void read_data (Xdr& io,
+		  const bool read_additional_data=true);
+
+  /**
+   * Writes the basic data for this System.
+   */
+  void write (Xdr& io);
+
+  /**
+   * Writes additional data, namely vectors, for this System.
+   */
+  void write_data (Xdr& io,
+		   const bool write_additional_data = true);
+
+  /**
+   * @returns a string containing information about the
+   * system.
+   */
+  std::string get_info () const;
+
+
   /**
    * Data structure to hold solution values.
    */

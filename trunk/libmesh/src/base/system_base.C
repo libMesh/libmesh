@@ -1,4 +1,4 @@
-// $Id: system_base.C,v 1.11 2003-03-21 15:29:28 ddreyer Exp $
+// $Id: system_base.C,v 1.12 2003-04-05 02:25:42 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -22,11 +22,14 @@
 // C++ includes
 #include <math.h>
 #include <algorithm>
+#include <sstream>
+
 
 // Local includes
 #include "mesh.h"
 #include "libmesh.h"
 #include "system_base.h"
+
 
 // typedef
 typedef std::map<std::string, SparseMatrix<Number>* >::iterator        other_matrices_iterator;
@@ -564,33 +567,6 @@ NumericVector<Number> &  SystemBase::get_vector(const std::string& vec_name)
 
 
 
-// void SystemBase::zero_vectors()
-// {
-//   // do this only when we cannot add vectors anymore, since
-//   // then the vectors are already initialized
-//   if (_can_add_vectors)
-//     {
-//       std::cerr << "ERROR: Too early.  Can only zero the vectors when"
-// 		<< std::endl
-// 		<< "these are already properly initialized."
-// 		<< std::endl;
-//       error();
-//     }
-
-//   other_vectors_iterator pos = _other_vectors.begin();
-//   if (pos == _other_vectors.end())
-//     {
-//       std::cerr << "ERROR: No additional vectors to zero!"
-// 		<< std::endl;      
-//       error(); 
-//     }
-//   else
-//     // zero the other vectors
-//     for(; pos != _other_vectors.end(); ++pos)
-// 	pos->second->zero ();
-// }
-
-
 
 void SystemBase::add_variable (const std::string& var,
 			       const FEType& type)
@@ -644,3 +620,70 @@ unsigned short int SystemBase::variable_number (const std::string& var) const
   return pos->second;
 }
 
+
+
+
+
+
+
+std::string SystemBase::get_info() const
+{
+  std::ostringstream out;
+
+  
+  const std::string& sys_name = this->name();
+      
+  out << "   System \"" << sys_name << "\"" << std::endl
+      << "    Variables=";
+  for (unsigned int vn=0; vn<this->n_vars(); vn++)
+      out << "\"" << this->variable_name(vn) << "\" ";
+     
+  out << std::endl;
+
+#ifndef ENABLE_INFINITE_ELEMENTS
+  out << "    Finite Element Types=";
+  for (unsigned int vn=0; vn<this->n_vars(); vn++)
+  {
+      out << "\"" << this->get_dof_map().variable_type(vn).family << "\" ";
+  }
+#else
+  out << "    Finite Element Types=";
+  for (unsigned int vn=0; vn<this->n_vars(); vn++)
+  {
+      out << "\"" << this->get_dof_map().variable_type(vn).family << "\", ";
+      out << "\"" << this->get_dof_map().variable_type(vn).radial_family << "\" ";
+  }
+
+  out << std::endl << "    Infinite Element Mapping=";
+  for (unsigned int vn=0; vn<this->n_vars(); vn++)
+  {
+      out << "\"" << this->get_dof_map().variable_type(vn).inf_map << "\" ";
+  }
+#endif      
+
+  out << std::endl;
+      
+  out << "    Approximation Orders=";
+  for (unsigned int vn=0; vn<this->n_vars(); vn++)
+  {
+#ifndef ENABLE_INFINITE_ELEMENTS
+      out << "\"" << this->get_dof_map().variable_type(vn).order << "\" ";
+#else
+      out << "\"" << this->get_dof_map().variable_type(vn).order << "\", ";
+      out << "\"" << this->get_dof_map().variable_type(vn).radial_order << "\" ";
+#endif
+  }
+
+  out << std::endl;
+      
+  out << "    n_dofs()="             << this->n_dofs()             << std::endl;
+  out << "    n_local_dofs()="       << this->n_local_dofs()       << std::endl;
+#ifdef ENABLE_AMR
+  out << "    n_constrained_dofs()=" << this->n_constrained_dofs() << std::endl;
+#endif
+
+  out << "    " << "n_additional_vectors()="  << this->n_additional_vectors()  << std::endl;
+  out << "    " << "n_additional_matrices()=" << this->n_additional_matrices() << std::endl;
+  
+  return out.str();
+}

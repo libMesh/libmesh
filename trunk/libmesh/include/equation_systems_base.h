@@ -1,4 +1,4 @@
-// $Id: equation_systems_base.h,v 1.1 2003-03-11 04:35:18 ddreyer Exp $
+// $Id: equation_systems_base.h,v 1.2 2003-04-05 02:25:42 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -95,6 +95,11 @@ public:
    * Undefines the flag \p fl.
    */
   void unset_flag (const std::string& fl);
+
+  /**
+   * @returns the number of flags. 
+   */
+  unsigned int n_flags () const;
   
   /**
    * @returns the parameter value assoicated with \p id.
@@ -113,6 +118,11 @@ public:
    * Undefines the value of parameter \p id. 
    */
   void unset_parameter (const std::string& id);
+
+  /**
+   * @returns the number of parameters. 
+   */
+  unsigned int n_parameters () const;
 
   /**
    * Fill the input vector \p var_names with the names
@@ -194,5 +204,18 @@ Mesh & EquationSystemsBase::get_mesh ()
   return _mesh;
 }
 
+
+inline
+unsigned int EquationSystemsBase::n_flags () const
+{
+  return _flags.size();
+}
+
+
+inline
+unsigned int EquationSystemsBase::n_parameters () const
+{
+  return _parameters.size();
+}
 
 #endif

@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.27 2003-04-03 14:17:23 ddreyer Exp $
+// $Id: equation_systems.C,v 1.28 2003-04-05 02:25:42 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -42,8 +42,6 @@ EquationSystems<T_sys>::EquationSystems (Mesh& m,
 					 const SolverPackage sp) :
   EquationSystemsBase(m, sp)
 {
-  // remember the type of system as flag, useful when writing equation systems
-  this->set_flag(T_sys::system_type());
   // Default parameters
   this->set_parameter("linear solver tolerance")          = 1.e-12;
   this->set_parameter("linear solver maximum iterations") = 5000;
@@ -479,60 +477,8 @@ std::string EquationSystems<T_sys>::get_info () const
   typename std::map<std::string, T_sys*>::const_iterator it=_systems.begin();
 
   for (; it != _systems.end(); ++it)
-    {
-      const std::string& sys_name = it->first;
-      const T_sys&  system        = *(it->second);
-      
-      out << "   System \"" << sys_name << "\"" << std::endl
-	  << "    Variables=";
-      for (unsigned int vn=0; vn<system.n_vars(); vn++)
-	out << "\"" << system.variable_name(vn) << "\" ";
-     
-      out << std::endl;
+    out << it->second->get_info();
 
-#ifndef ENABLE_INFINITE_ELEMENTS
-      out << "    Finite Element Types=";
-      for (unsigned int vn=0; vn<system.n_vars(); vn++)
-      {
-	out << "\"" << system.get_dof_map().variable_type(vn).family << "\" ";
-      }
-#else
-      out << "    Finite Element Types=";
-      for (unsigned int vn=0; vn<system.n_vars(); vn++)
-      {
-	out << "\"" << system.get_dof_map().variable_type(vn).family << "\", ";
-	out << "\"" << system.get_dof_map().variable_type(vn).radial_family << "\" ";
-      }
-
-      out << std::endl << "    Infinite Element Mapping=";
-      for (unsigned int vn=0; vn<system.n_vars(); vn++)
-      {
-	out << "\"" << system.get_dof_map().variable_type(vn).inf_map << "\" ";
-      }
-#endif      
-
-      out << std::endl;
-      
-      out << "    Approximation Orders=";
-      for (unsigned int vn=0; vn<system.n_vars(); vn++)
-      {
-#ifndef ENABLE_INFINITE_ELEMENTS
-	out << "\"" << system.get_dof_map().variable_type(vn).order << "\" ";
-#else
-	out << "\"" << system.get_dof_map().variable_type(vn).order << "\", ";
-	out << "\"" << system.get_dof_map().variable_type(vn).radial_order << "\" ";
-#endif
-      }
-
-      out << std::endl;
-      
-      out << "    n_dofs()="             << system.n_dofs()             << std::endl;
-      out << "    n_local_dofs()="       << system.n_local_dofs()       << std::endl;
-#ifdef ENABLE_AMR
-      out << "    n_constrained_dofs()=" << system.n_constrained_dofs() << std::endl;
-#endif
-    }
-  
   return out.str();
 }
 
