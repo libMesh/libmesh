@@ -1,4 +1,4 @@
-// $Id: ex4.C,v 1.13 2003-02-24 14:35:51 benkirk Exp $
+// $Id: ex4.C,v 1.14 2003-02-24 22:03:47 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -353,9 +353,14 @@ void assemble_poisson(EquationSystems& es,
    *--------------------------------------------------------------------
    * Now we will loop over all the elements in the mesh.
    * We will compute the element matrix and right-hand-side
-   * contribution.
+   * contribution.  See example 3 for a discussion of the
+   * element iterators.
    */
-  for (unsigned int e=0; e<mesh.n_elem(); e++)
+
+  const_elem_iterator           el (mesh.elements_begin());
+  const const_elem_iterator end_el (mesh.elements_end());
+  
+  for ( ; el != end_el; ++el)
     {
       /**
        * Start logging the shape function initialization.
@@ -368,7 +373,7 @@ void assemble_poisson(EquationSystems& es,
        * Store a pointer to the element we are currently
        * working on.  This allows for nicer syntax later.
        */
-      const Elem* elem = mesh.elem(e);
+      const Elem* elem = *el;
 
       /**
        * Get the degree of freedom indices for the
