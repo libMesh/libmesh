@@ -1,4 +1,4 @@
-// $Id: inf_fe.h,v 1.17 2003-02-20 12:55:07 spetersen Exp $
+// $Id: inf_fe.h,v 1.18 2003-02-20 17:09:20 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -95,7 +95,7 @@ class Elem;
  *
  * \author Daniel Dreyer
  * \date 2003
- * \version $Revision: 1.17 $
+ * \version $Revision: 1.18 $
  */
 
 //-------------------------------------------------------------
@@ -118,7 +118,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.17 $
+   * \version $Revision: 1.18 $
    */
   //-------------------------------------------------------------
   // InfFE::Radial class definition
@@ -247,7 +247,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.17 $
+   * \version $Revision: 1.18 $
    */
   //-------------------------------------------------------------
   // InfFE::Base class definition
@@ -519,7 +519,7 @@ protected:
   // The bigger internal methods used during assembly  
   /** 
    * Initialize all the data fields like \p weight, \p mode, 
-   * \p dist, \p phi, \p dphidxi, \p dphideta, \p dphidzeta, etc.
+   * \p phi, \p dphidxi, \p dphideta, \p dphidzeta, etc.
    * for the current element.  Of these data fields, only
    * the ones that are independent of base approximation
    * are evaluated.  For constant radial \p order in the mesh, 
@@ -534,6 +534,12 @@ protected:
   void init_shape_functions(const QBase* q,
 			    const Elem* e,
 			    const unsigned int s);
+
+  /**
+   * Calculates the radial distances from the origin
+   * to the base nodes.
+   */
+  void compute_dist(const Elem* inf_elem);
 
   /** 
    * Combines the base approximation, mapping etc. with
@@ -670,6 +676,11 @@ protected:
 
   //--------------------------------------------------------------
   // some protected members
+
+  /**
+   * The Number of base shape functions used to construct the map.
+   */
+  unsigned int n_base_mapping_shape_functions;
 
   /**
    * The number of total approximation shape functions for 
