@@ -1,2 +1,3 @@
-i686-pc-linux-gnu*
-powerpc-ibm-aix5.1.0.0*
+*_opt
+*_dbg
+*_pro
