@@ -846,6 +846,7 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-shared Set compiler flags to enable shared libraries
   --enable-amr build with adaptive mesh refinement (AMR) suppport
+  --enable-2D-only build with support for 1D and 2D meshes only
   --enable-expensive build with expensive data structures turned on
   --enable-ifem build with infinite elements
   --enable-xdr Set compiler flags to enable xdr binary I/O
@@ -4200,6 +4201,26 @@ fi
 
 
 
+# Check whether --enable-2D-only or --disable-2D-only was given.
+if test "${enable_2D_only+set}" = set; then
+  enableval="$enable_2D_only"
+  enable2D=$enableval
+else
+  enable2D=no
+fi;
+
+if test "$enable2D" != no ; then
+
+cat >>confdefs.h <<\_ACEOF
+#define DIM 2
+_ACEOF
+
+  echo "$as_me:$LINENO: result: <<< Configuring library for 2D meshes only >>>" >&5
+echo "${ECHO_T}<<< Configuring library for 2D meshes only >>>" >&6
+fi
+
+
+
 # Check whether --enable-expensive or --disable-expensive was given.
 if test "${enable_expensive+set}" = set; then
   enableval="$enable_expensive"
@@ -5121,7 +5142,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:5124:" \
+echo "$as_me:5145:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -5287,7 +5308,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_verb"
-(eval echo $as_me:5290: \"$ac_link\") >&5
+(eval echo $as_me:5311: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -5366,7 +5387,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_cv_prog_f77_v"
-(eval echo $as_me:5369: \"$ac_link\") >&5
+(eval echo $as_me:5390: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
