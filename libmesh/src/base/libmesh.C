@@ -1,4 +1,4 @@
-// $Id: libmesh.C,v 1.26 2004-08-17 03:03:51 benkirk Exp $
+// $Id: libmesh.C,v 1.27 2004-10-14 20:12:20 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -110,7 +110,7 @@ void libMesh::init (int &argc, char** & argv)
   // The amount of benefit which occurs is probably implementation
   // defined, and may be nothing.  On the other hand, I have seen
   // some IO tests where IO peformance improves by a factor of two.
-  std::ios_base::sync_with_stdio(false);
+  std::ios::sync_with_stdio(false);
   
   // Build a command-line parser.
   command_line.reset(new GetPot (argc, argv));
