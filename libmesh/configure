@@ -868,6 +868,7 @@ Optional Features:
   --enable-expensive      build with expensive data structures
   --enable-pfem           build with support for higher order p-FEM shapes
   --enable-ifem           build with infinite elements
+  --enable-second         build with second derivatives
   --enable-xdr            enable XDR platform-independent binary I/O
   --enable-complex        build with complex number support
   --enable-reference-counting
@@ -7554,6 +7555,26 @@ fi
 
 
 
+# Check whether --enable-second or --disable-second was given.
+if test "${enable_second+set}" = set; then
+  enableval="$enable_second"
+  enablesecond=$enableval
+else
+  enablesecond=no
+fi;
+
+if test "$enablesecond" != no ; then
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_SECOND_DERIVATIVES 1
+_ACEOF
+
+  echo "$as_me:$LINENO: result: <<< Configuring library with second derivatives >>>" >&5
+echo "${ECHO_T}<<< Configuring library with second derivatives >>>" >&6
+fi
+
+
+
 # Check whether --enable-xdr or --disable-xdr was given.
 if test "${enable_xdr+set}" = set; then
   enableval="$enable_xdr"
@@ -8199,7 +8220,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:8202:" \
+echo "$as_me:8223:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -8393,7 +8414,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_verb"
-(eval echo $as_me:8396: \"$ac_link\") >&5
+(eval echo $as_me:8417: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -8471,7 +8492,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_cv_prog_f77_v"
-(eval echo $as_me:8474: \"$ac_link\") >&5
+(eval echo $as_me:8495: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
