@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic_shape_2D.C,v 1.15 2005-01-13 22:10:14 roystgnr Exp $
+// $Id: fe_hierarchic_shape_2D.C,v 1.16 2005-01-14 19:38:31 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -1151,7 +1151,7 @@ Real FE<2,HIERARCHIC>::shape_second_deriv(const Elem* elem,
   // to compute the derivatives!
   const Real eps = 1.e-6;
   Point pp, pm;
-  unsigned int prevj;
+  unsigned int prevj = libMesh::invalid_uint;
 	      
   switch (j)
   {
@@ -1185,6 +1185,6 @@ Real FE<2,HIERARCHIC>::shape_second_deriv(const Elem* elem,
       error();
   }
   return (FE<2,HIERARCHIC>::shape_deriv(elem, order, i, prevj, pp) -
-	  FE<2,HIERARCHIC>::shape_deriv(elem, order, i, prevj,
-					pm))/2./eps;
+	  FE<2,HIERARCHIC>::shape_deriv(elem, order, i, prevj, pm)
+	  )/2./eps;
 }
