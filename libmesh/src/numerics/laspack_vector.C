@@ -1,4 +1,4 @@
-// $Id: laspack_vector.C,v 1.9 2003-03-14 09:56:41 ddreyer Exp $
+// $Id: laspack_vector.C,v 1.10 2003-03-23 01:39:14 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -46,7 +46,7 @@
 template <typename T>
 Real LaspackVector<T>::l1_norm () const
 {
-  assert(closed());
+  assert(this->closed());
   
   return static_cast<Real>(l1Norm_V(const_cast<QVector*>(&_vec)));
 }
@@ -56,7 +56,7 @@ Real LaspackVector<T>::l1_norm () const
 template <typename T>
 Real LaspackVector<T>::l2_norm () const
 {
-  assert(closed());
+  assert(this->closed());
   
   return static_cast<Real>(l2Norm_V(const_cast<QVector*>(&_vec)));
 }
@@ -66,7 +66,7 @@ Real LaspackVector<T>::l2_norm () const
 template <typename T>
 Real LaspackVector<T>::linfty_norm () const
 {
-  assert(closed());
+  assert(this->closed());
   
   return static_cast<Real>(MaxNorm_V(const_cast<QVector*>(&_vec)));
 }
@@ -77,7 +77,7 @@ Real LaspackVector<T>::linfty_norm () const
 template <typename T>
 NumericVector<T>& LaspackVector<T>::operator += (const NumericVector<T>& v)
 {
-  assert(closed());
+  assert(this->closed());
   
   add(1., v);
   
@@ -90,7 +90,7 @@ NumericVector<T>& LaspackVector<T>::operator += (const NumericVector<T>& v)
 template <typename T>
 NumericVector<T>& LaspackVector<T>::operator -= (const NumericVector<T>& v)
 {
-  assert(closed());
+  assert(this->closed());
   
   add(-1., v);
   
@@ -132,7 +132,7 @@ void LaspackVector<T>::add (const T a, const NumericVector<T>& v_in)
 template <typename T>
 void LaspackVector<T>::scale (const T factor)
 {
-  assert (initialized());
+  assert (this->initialized());
   
   Mul_SV (factor, &_vec);
 }
@@ -143,7 +143,7 @@ template <typename T>
 NumericVector<T>& 
 LaspackVector<T>::operator = (const T s)
 {
-  assert (initialized());
+  assert (this->initialized());
 
   V_SetAllCmp (&_vec, s);
   
@@ -253,7 +253,7 @@ template <>
 inline
 Real LaspackVector<Real>::min () const
 {
-  assert (initialized());
+  assert (this->initialized());
 
   Real min = 1.e30;
 
@@ -275,7 +275,7 @@ template <>
 inline
 Real LaspackVector<Complex>::min () const
 {
-  assert (initialized());
+  assert (this->initialized());
 
   Real min = 1.e30;
 

@@ -1,4 +1,4 @@
-// $Id: laspack_interface.C,v 1.6 2003-03-14 09:56:40 ddreyer Exp $
+// $Id: laspack_interface.C,v 1.7 2003-03-23 01:39:14 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -77,12 +77,12 @@ extern "C"
 template <typename T>
 void LaspackInterface<T>::clear ()
 {
-  if (initialized())
+  if (this->initialized())
     {
-      _is_initialized = false;
+      this->_is_initialized = false;
       
-      _solver_type = GMRES;
-      _preconditioner_type = ILU_PRECOND;
+      this->_solver_type = GMRES;
+      this->_preconditioner_type = ILU_PRECOND;
     }
 }
 
@@ -92,9 +92,9 @@ template <typename T>
 void LaspackInterface<T>::init ()
 {
   // Initialize the data structures if not done so already.
-  if (!initialized())
+  if (!this->initialized())
     {
-      _is_initialized = true;
+      this->_is_initialized = true;
     }
 
   SetRTCAuxProc (print_iter_accuracy);
@@ -122,13 +122,13 @@ LaspackInterface<T>::solve (SparseMatrix<T> &matrix_in,
   rhs.close ();
 
   // Set the preconditioner type
-  set_preconditioner_type(JACOBI_PRECOND);
-  set_solver_type(CG);
+  this->set_preconditioner_type(JACOBI_PRECOND);
+  this->set_solver_type(CG);
   set_laspack_preconditioner_type ();
 
 
   // Solve the linear system
-  switch (_solver_type)
+  switch (this->_solver_type)
     {
     case CG:
       CGIter (&matrix._QMat,
@@ -205,10 +205,10 @@ LaspackInterface<T>::solve (SparseMatrix<T> &matrix_in,
       
     default:
       std::cerr << "ERROR:  Unsupported LASPACK Solver: "
-		<< _solver_type            << std::endl
+		<< this->_solver_type      << std::endl
 		<< "Continuing with GMRES" << std::endl;
       
-      _solver_type = GMRES;
+      this->_solver_type = GMRES;
       
       return solve (matrix,
 		    solution,
@@ -235,7 +235,7 @@ LaspackInterface<T>::solve (SparseMatrix<T> &matrix_in,
 template <typename T>
 void LaspackInterface<T>::set_laspack_preconditioner_type ()
 {
-  switch (_preconditioner_type)
+  switch (this->_preconditioner_type)
     {
     case IDENTITY_PRECOND:
       _precond_type = NULL; return;
@@ -252,9 +252,9 @@ void LaspackInterface<T>::set_laspack_preconditioner_type ()
 
     default:
       std::cerr << "ERROR:  Unsupported LASPACK Preconditioner: "
-		<< _preconditioner_type  << std::endl
-		<< "Continuing with ILU" << std::endl;
-      _preconditioner_type = ILU_PRECOND;
+		<< this->_preconditioner_type << std::endl
+		<< "Continuing with ILU"      << std::endl;
+      this->_preconditioner_type = ILU_PRECOND;
       set_laspack_preconditioner_type();      
     }
 }
