@@ -1,4 +1,4 @@
-// $Id: ex7.C,v 1.25 2003-05-22 21:18:00 benkirk Exp $
+// $Id: ex7.C,v 1.26 2003-11-06 06:21:39 jwpeterson Exp $
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
   
@@ -31,7 +31,7 @@
  */
 #include "libmesh.h"
 #include "mesh.h"
-#include "mesh_logging.h"
+//#include "mesh_logging.h" // No longer exists?
 #include "equation_systems.h"
 
 
