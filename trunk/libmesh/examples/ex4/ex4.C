@@ -1,4 +1,4 @@
-// $Id: ex4.C,v 1.21 2003-04-06 16:58:59 benkirk Exp $
+// $Id: ex4.C,v 1.22 2003-04-06 17:01:27 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -172,7 +172,7 @@ int main (int argc, char** argv)
      * elements in 3D.  Building these higher-order elements allows
      * us to use higher-order approximation, as in example 3.
      */
-    mesh.build_cube (25, 25, 25,
+    mesh.build_cube (15, 15, 15,
 		     -1., 1.,
 		     -1., 1.,
 		     -1., 1.,
