@@ -1,4 +1,4 @@
-// $Id: laspack_vector.h,v 1.18 2003-06-12 02:29:01 benkirk Exp $
+// $Id: laspack_vector.h,v 1.19 2003-07-23 21:49:04 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -424,7 +424,7 @@ void LaspackVector<T>::init (const unsigned int n,
 
   V_Constr(&_vec, const_cast<char*>(foo), n, Normal, _LPTrue);
     
-  _is_initialized = true;
+  this->_is_initialized = true;
   
   // Optionally zero out all components
   if (fast == false)
@@ -451,7 +451,7 @@ void LaspackVector<T>::close ()
 {
   assert (this->initialized());
   
-  _is_closed = true;
+  this->_is_closed = true;
   
   return;
 }
@@ -467,7 +467,7 @@ void LaspackVector<T>::clear ()
       V_Destr (&_vec);
     }
 
-  _is_closed = _is_initialized = false;
+  this->_is_closed = this->_is_initialized = false;
 }
 
 
