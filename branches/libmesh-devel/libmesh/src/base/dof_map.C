@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.38 2003-05-01 18:44:31 benkirk Exp $
+// $Id: dof_map.C,v 1.38.2.1 2003-05-05 23:55:28 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -68,7 +68,7 @@ void DofMap::attach_other_matrix (std::pair<std::string, SparseMatrix<Number>*> 
 }
 
 
-void DofMap::reinit(MeshBase& mesh)
+void DofMap::reinit(const MeshBase& mesh)
 {
   assert (mesh.is_prepared());
   
@@ -242,7 +242,7 @@ void DofMap::clear()
 
 
 
-void DofMap::distribute_dofs(MeshBase& mesh)
+void DofMap::distribute_dofs(const MeshBase& mesh)
 {
   assert (mesh.is_prepared());
   
@@ -364,7 +364,7 @@ void DofMap::distribute_dofs(MeshBase& mesh)
 
 
 
-void DofMap::compute_sparsity(MeshBase& mesh)
+void DofMap::compute_sparsity(const MeshBase& mesh)
 {
   assert (mesh.is_prepared());
   assert (this->n_variables());
@@ -713,7 +713,7 @@ void DofMap::old_dof_indices (const Elem* elem,
 #ifdef ENABLE_AMR
 
 
-void DofMap::create_dof_constraints(MeshBase& mesh)
+void DofMap::create_dof_constraints(const MeshBase& mesh)
 {
   START_LOG("create_dof_constraints()", "DofMap");
 

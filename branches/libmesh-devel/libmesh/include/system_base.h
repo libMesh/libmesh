@@ -1,4 +1,4 @@
-// $Id: system_base.h,v 1.14 2003-05-04 23:58:53 benkirk Exp $
+// $Id: system_base.h,v 1.14.2.1 2003-05-05 23:57:32 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,24 +23,23 @@
 #define __system_base_h__
 
 // C++ includes
-#include <set>
 
 // Local Includes
 #include "mesh_common.h"
-#include "mesh.h"
-#include "dof_map.h"
 #include "fe_type.h"
+#include "dof_map.h"
 #include "auto_ptr.h"
-#include "sparse_matrix.h"
-#include "numeric_vector.h"
-#include "linear_solver_interface.h"
 #include "reference_counted_object.h"
 
 
 // Forward Declarations
 class SystemBase;
+class EquationSystemsBase;
+class Mesh;
 class Xdr;
-
+template <typename T> class SparseMatrix;
+template <typename T> class NumericVector;
+template <typename T> class LinearSolverInterface;
 
 /**
  * This is the base class for classes which contain 
@@ -51,7 +50,7 @@ class Xdr;
  * one or more of the children of this class.
  * Note that templating \p EqnSystems relaxes the use of virtual members.
  *
- * @author Benjamin S. Kirk, 2002
+ * @author Benjamin S. Kirk, 2002-2003.
  */
 
 // ------------------------------------------------------------
@@ -65,9 +64,12 @@ protected:
    * data structures.  Protected so that this base class
    * cannot be explicitly instantiated.
    */
-  SystemBase (Mesh&               mesh,
+  SystemBase (const Mesh&         mesh,
 	      const std::string&  name,
 	      const unsigned int  number);
+  
+public:
+
   
   /**
    * Clear all the data structures associated with
@@ -113,8 +115,8 @@ protected:
 		const bool verbose) const;
 
 
-public:
 
+  
   /**
    * Destructor.
    */
@@ -163,18 +165,34 @@ public:
   /**
    * @returns a constant reference to this systems's \p _mesh.
    */
-  const Mesh & get_mesh() const { return _mesh; }
+  const Mesh & get_mesh() const;
   
   /**
    * @returns a constant reference to this system's \p _dof_map.
    */
-  const DofMap & get_dof_map() const { return _dof_map; }
+  const DofMap & get_dof_map() const;
   
   /**
    * @returns a writeable reference to this system's \p _dof_map.
    */
-  DofMap & get_dof_map() { return _dof_map; }
+  DofMap & get_dof_map();
 
+  /**
+   * @returns \p true if the system is active, false otherwise.
+   * An active system will be solved.
+   */
+  bool active () const;
+
+  /**
+   * Activates the system.  Only active systems are solved.
+   */
+  void activate ();
+
+  /**
+   * Deactivates the system.  Only active systems are solved.
+   */
+  void deactivate ();
+    
   /**
    * Adds the additional matrix \p mat_name to this system.  Only
    * allowed @e prior to \p assemble().  All additional matrices
@@ -204,7 +222,7 @@ public:
   /**
    * @returns the number of additional vectors handled by this system
    */
-  unsigned int n_additional_matrices () const { return _other_matrices.size(); }
+  unsigned int n_additional_matrices () const;
 
   /**
    * Adds the additional vector \p vec_name to this system.  Only
@@ -231,7 +249,7 @@ public:
   /**
    * @returns the number of additional vectors handled by this system
    */
-  unsigned int n_additional_vectors () const { return _other_vectors.size(); }
+  unsigned int n_additional_vectors () const;
 
   /**
    * @returns the number of variables in the system
@@ -307,13 +325,13 @@ public:
   /**
    * Writes the basic data for this System.
    */
-  void write (Xdr& io);
+  void write (Xdr& io) const;
 
   /**
    * Writes additional data, namely vectors, for this System.
    */
   void write_data (Xdr& io,
-		   const bool write_additional_data = true);
+		   const bool write_additional_data = true) const;
 
   /**
    * @returns a string containing information about the
@@ -322,6 +340,11 @@ public:
   std::string get_info () const;
 
 
+
+  //--------------------------------------------------
+  // The data & solver interface for solving the linear
+  // system Ax=b
+  
   /**
    * Data structure to hold solution values.
    */
@@ -345,6 +368,7 @@ public:
 
 protected:
 
+  
   /**
    * A name associated with this system.
    */
@@ -394,6 +418,11 @@ protected:
   bool _can_add_vectors;
 
   /**
+   * Flag stating if the system is active or not.
+   */
+  bool _active;
+  
+  /**
    * Data structure describing the relationship between
    * nodes, variables, etc... and degrees of freedom.
    */
@@ -403,7 +432,13 @@ protected:
    * Constant reference to the \p mesh data structure used
    * for the simulation.   
    */
-  Mesh& _mesh;
+  const Mesh& _mesh;
+
+  /**
+   * Constant reference to the \p EquationSystemsBase object
+   * used for the simulation.
+   */
+  //const EquationSystemsBase& _equation_systems;
 };
 
 
@@ -422,6 +457,54 @@ inline
 unsigned int SystemBase::number() const
 {
   return _sys_number;
+}
+
+
+
+inline
+const Mesh& SystemBase::get_mesh() const
+{
+  return _mesh;
+}
+
+
+
+inline
+const DofMap& SystemBase::get_dof_map() const
+{
+  return _dof_map;
+}
+
+
+
+inline
+DofMap& SystemBase::get_dof_map()
+{
+  return _dof_map;
+}
+
+
+
+inline
+bool SystemBase::active() const
+{
+  return _active;  
+}
+
+
+
+inline
+void SystemBase::activate ()
+{
+  _active = true;
+}
+
+
+
+inline
+void SystemBase::deactivate ()
+{
+  _active = false;
 }
 
 
@@ -475,8 +558,6 @@ unsigned int SystemBase::n_dofs() const
 
 
 
-
-
 inline
 unsigned int SystemBase::n_constrained_dofs() const
 {
@@ -495,13 +576,27 @@ unsigned int SystemBase::n_constrained_dofs() const
 
 
 
-
 inline
 unsigned int SystemBase::n_local_dofs() const
 {
-  return _dof_map.n_dofs_on_processor(_mesh.processor_id());
+  return _dof_map.n_dofs_on_processor(libMesh::processor_id());
 }
 
+
+
+inline
+unsigned int SystemBase::n_additional_matrices () const
+{
+ return _other_matrices.size(); 
+}
+
+
+
+inline
+unsigned int SystemBase::n_additional_vectors () const
+{
+ return _other_vectors.size(); 
+}
 
 
 #endif

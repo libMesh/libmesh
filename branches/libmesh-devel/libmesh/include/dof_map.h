@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.25 2003-04-30 21:09:20 benkirk Exp $
+// $Id: dof_map.h,v 1.25.2.1 2003-05-05 23:57:31 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -105,14 +105,14 @@ public:
    * processor \p proc_id, which defaults to 0 for ease of use in serial
    * applications. 
    */
-  void distribute_dofs(MeshBase&);
+  void distribute_dofs(const MeshBase&);
 
   /**
    * Computes the sparsity pattern for the matrix corresponding
    * to \p proc_id.  Produces data that can be fed to Petsc for
    * preallocation of sparse matrices.
    */
-  void compute_sparsity (MeshBase&);
+  void compute_sparsity (const MeshBase&);
 
   /**
    * Returns a constant reference to the \p _send_list for this processor.  The
@@ -227,7 +227,7 @@ public:
   /**
    * Rebuilds the degree of freedom constraints.
    */ 
-  void create_dof_constraints (MeshBase& mesh);
+  void create_dof_constraints (const MeshBase& mesh);
 
   /**
    * Adds the user-defined row to the constraint matrix.
@@ -288,7 +288,7 @@ public:
   /**
    * Reinitialize the underlying data strucures conformal to the current mesh.
    */
-  void reinit (MeshBase& mesh);
+  void reinit (const MeshBase& mesh);
   
   /**
    * Free all memory associated with the object, but keep the mesh pointer.

@@ -1,4 +1,4 @@
-// $Id: equation_systems_io.C,v 1.25 2003-04-11 23:57:05 ddreyer Exp $
+// $Id: equation_systems_io.C,v 1.25.2.1 2003-05-05 23:55:28 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -22,21 +22,14 @@
 
 
 // System Includes
-#ifdef HAVE_RPC_RPC_H
-# include <rpc/rpc.h>
-#endif
 
 
 
 // Local Includes
+#include "equation_systems_base.h"
+#include "system_base.h"
 #include "fe_type.h"
-#include "petsc_interface.h"
-#include "equation_systems.h"
-#include "general_system.h"
-#include "frequency_system.h"
-#include "thin_system.h"
-#include "newmark_system.h"
-#include "equation_systems_macro.h"
+#include "xdr_cxx.h"
 
 // Forward Declarations
 
@@ -45,12 +38,11 @@
 
 // ------------------------------------------------------------
 // EquationSystem class implementation
-template <typename T_sys>
-void EquationSystems<T_sys>::read (const std::string& name,
-				   const Xdr::XdrMODE mode,
-				   const bool read_header,
-				   const bool read_data,
-				   const bool read_additional_data)
+void EquationSystemsBase::read (const std::string& name,
+				const libMeshEnums::XdrMODE mode,
+				const bool read_header,
+				const bool read_data,
+				const bool read_additional_data)
 {
   /**
    * This program implements the output of an 
@@ -152,20 +144,20 @@ void EquationSystems<T_sys>::read (const std::string& name,
       
   io.data (sys_type);
       
-  if (sys_type != T_sys::system_type())
-    {
-      // wrong T_sys for this file
-//       std::cerr << "ERROR: System mismatch: This EquationSystems object handles" 
-// 		<< std::endl
-// 		<< " systems of type " << T_sys::system_type() 
-// 		<< ", while the file" << std::endl
-// 		<< " contains systems of type " << sys_type << std::endl;
-//       error();
-      std::cout << "Warning: This EquationSystems object handles" << std::endl
-		<< " systems of type \"" << T_sys::system_type() 
-		<< "\", while the file" << std::endl
-		<< " contains systems of type \"" << sys_type << "\"" << std::endl;
-    }
+//   if (sys_type != T_sys::system_type())
+//     {
+//       // wrong T_sys for this file
+// //       std::cerr << "ERROR: System mismatch: This EquationSystems object handles" 
+// // 		<< std::endl
+// // 		<< " systems of type " << T_sys::system_type() 
+// // 		<< ", while the file" << std::endl
+// // 		<< " contains systems of type " << sys_type << std::endl;
+// //       error();
+//       std::cout << "Warning: This EquationSystems object handles" << std::endl
+// 		<< " systems of type \"" << T_sys::system_type() 
+// 		<< "\", while the file" << std::endl
+// 		<< " contains systems of type \"" << sys_type << "\"" << std::endl;
+//     }
 
 
   /**
@@ -262,7 +254,7 @@ void EquationSystems<T_sys>::read (const std::string& name,
 	 *
 	 * Let SystemBase::read() do the job
 	 */
-	T_sys& new_system = (*this)(sys_name);
+	SystemBase& new_system = this->get_system(sys_name);
 	  
 	new_system.read (io,
 			 read_header,
@@ -288,14 +280,14 @@ void EquationSystems<T_sys>::read (const std::string& name,
    * Read and set the numeric vector values
    */
   if (read_data)
-    for (unsigned int sys=0; sys<this->n_systems(); sys++)
-      {
-	T_sys& system = (*this)(sys);
-
-	system.read_data (io,
-			  read_additional_data);
-
-      }
+    {
+      std::map<std::string, SystemBase*>::iterator
+	pos = _systems.begin();
+      
+      for (; pos != _systems.end(); ++pos)
+	pos->second->read_data (io,
+				read_additional_data);       
+    }  
 }
 
 
@@ -312,11 +304,10 @@ void EquationSystems<T_sys>::read (const std::string& name,
 
 
 
-template <typename T_sys>
-void EquationSystems<T_sys>::write(const std::string& name,
-				   const Xdr::XdrMODE mode,
-				   const bool write_data,
-				   const bool write_additional_data)
+void EquationSystemsBase::write(const std::string& name,
+				const libMeshEnums::XdrMODE mode,
+				const bool write_data,
+				const bool write_additional_data) const
 {
   /**
    * This program implements the output of an 
@@ -401,10 +392,11 @@ void EquationSystems<T_sys>::write(const std::string& name,
 
   assert (io.writing());
 
-  const unsigned int proc_id = _mesh.processor_id();
+  const unsigned int proc_id = libMesh::processor_id();
   unsigned int n_sys         = this->n_systems();
 
-  typename std::map<std::string, T_sys*>::iterator pos = _systems.begin();
+  std::map<std::string, SystemBase*>::const_iterator
+    pos = _systems.begin();
   
   std::string comment;
   char buf[80];
@@ -425,7 +417,7 @@ void EquationSystems<T_sys>::write(const std::string& name,
       {
         // set up the comment
 	comment =  "# System Type";
-	std::string sys_type = T_sys::system_type();
+	std::string sys_type = "foobar";//T_sys::system_type();
 	io.data (sys_type, comment.c_str());
       }
 
@@ -551,7 +543,7 @@ void EquationSystems<T_sys>::write(const std::string& name,
   pos = _systems.begin();
 
   if (write_data)
-    while (pos != _systems.end())
+    for (; pos != _systems.end(); ++pos) 
       {
 	/**
 	 * 14.) + 15.)
@@ -560,16 +552,5 @@ void EquationSystems<T_sys>::write(const std::string& name,
 	 */
 	pos->second->write_data (io,
 				 write_additional_data);
-	
-	++pos;
       }
 }
-
-
-
-
-//--------------------------------------------------------------
-// Explicit instantiations using the macro from equation_systems_macro.h
-
-INSTANTIATE_EQUATION_SYSTEMS;
-

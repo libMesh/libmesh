@@ -1,4 +1,4 @@
-// $Id: system_base.C,v 1.14 2003-05-04 23:59:00 benkirk Exp $
+// $Id: system_base.C,v 1.14.2.1 2003-05-05 23:55:28 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,9 +26,12 @@
 
 
 // Local includes
+#include "system_base.h"
 #include "mesh.h"
 #include "libmesh.h"
-#include "system_base.h"
+#include "sparse_matrix.h"
+#include "numeric_vector.h"
+#include "linear_solver_interface.h"
 
 
 // typedef
@@ -41,7 +44,7 @@ typedef std::map<std::string, NumericVector<Number>* >::const_iterator other_vec
 // ------------------------------------------------------------
 // SystemBase implementation
 
-SystemBase::SystemBase (Mesh& mesh,
+SystemBase::SystemBase (const Mesh& mesh,
 			const std::string&  name,
 			const unsigned int  number) :
   
@@ -51,6 +54,7 @@ SystemBase::SystemBase (Mesh& mesh,
   linear_solver_interface (LinearSolverInterface<Number>::build()),
   _sys_name               (name),
   _sys_number             (number),
+  _active                 (true),
   _can_add_matrices       (true),
   _can_add_vectors        (true),
   _dof_map                (number),
@@ -66,6 +70,7 @@ SystemBase::~SystemBase ()
 
   assert (!libMesh::closed());
 }
+
 
 
 void SystemBase::clear ()
@@ -116,7 +121,6 @@ void SystemBase::clear ()
 
 
 
-
 void SystemBase::init ()
 {
   assert (_mesh.is_prepared());
@@ -147,7 +151,6 @@ void SystemBase::init ()
 
 
 
-
 void SystemBase::reinit ()
 {
   assert (_mesh.is_prepared());
@@ -174,7 +177,6 @@ void SystemBase::reinit ()
   // construct the system matrices
   SystemBase::assemble();
 }
-
 
 
 
@@ -448,7 +450,6 @@ void SystemBase::add_matrix (const std::string& mat_name)
 
 
 
-
 const SparseMatrix<Number> &  SystemBase::get_matrix(const std::string& mat_name) const
 {
   // only enable access _after_ the matrices are properly initialized
@@ -474,7 +475,6 @@ const SparseMatrix<Number> &  SystemBase::get_matrix(const std::string& mat_name
   
   return *(pos->second);
 }
-
 
 
 
@@ -506,7 +506,6 @@ SparseMatrix<Number> &  SystemBase::get_matrix(const std::string& mat_name)
 
 
 
-
 void SystemBase::add_vector (const std::string& vec_name)
 {
   // only add vectors before initializing...
@@ -533,7 +532,6 @@ void SystemBase::add_vector (const std::string& vec_name)
   NumericVector<Number>* buf(NumericVector<Number>::build().release());
   _other_vectors[vec_name] = buf;
 }
-
 
 
 
@@ -595,7 +593,6 @@ NumericVector<Number> &  SystemBase::get_vector(const std::string& vec_name)
 
 
 
-
 void SystemBase::add_variable (const std::string& var,
 			       const FEType& type)
 {  
@@ -647,10 +644,6 @@ unsigned short int SystemBase::variable_number (const std::string& var) const
   
   return pos->second;
 }
-
-
-
-
 
 
 

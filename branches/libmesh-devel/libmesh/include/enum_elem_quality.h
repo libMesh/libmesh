@@ -1,4 +1,4 @@
-// $Id: enum_elem_quality.h,v 1.5 2003-02-13 22:56:07 benkirk Exp $
+// $Id: enum_elem_quality.h,v 1.5.2.1 2003-05-05 23:57:32 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,7 +31,7 @@
 
 // ------------------------------------------------------------
 // enum ElemType definition
-namespace MeshEnums
+namespace libMeshEnums
 {    
   /**
    * Defines an \p enum for element quality metrics.
@@ -55,7 +55,7 @@ namespace MeshEnums
 }
 
 
-using namespace MeshEnums;
+using namespace libMeshEnums;
 
 
 
