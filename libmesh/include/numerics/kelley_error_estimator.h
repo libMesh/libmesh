@@ -1,4 +1,4 @@
-// $Id: kelley_error_estimator.h,v 1.1 2004-05-20 19:48:46 jwpeterson Exp $
+// $Id: kelley_error_estimator.h,v 1.2 2004-05-20 22:14:12 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -65,13 +65,11 @@ public:
   virtual void estimate_error (const SteadySystem& system,
 			       std::vector<float>& error_per_cell);
 
-  /**
-   * Calls the function above, by first pulling out the system name.
-   */
-  virtual void estimate_error (const EquationSystems& es,
-			       const std::string& name,
-			       std::vector<float>& error_per_cell)
-  { this->estimate_error (es.get_system<SteadySystem>(name), error_per_cell); }
+
+  // Bring the base class functionality into the name lookup
+  // procedure.  This allows for alternative calling formats
+  // defined in the base class.  Thanks Wolfgang.
+  using ErrorEstimator::estimate_error;
 };
 
 
