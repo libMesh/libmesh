@@ -1,4 +1,4 @@
-// $Id: parmetis_partitioner.C,v 1.4 2003-07-25 20:58:24 benkirk Exp $
+// $Id: parmetis_partitioner.C,v 1.5 2003-08-17 19:06:35 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -324,6 +324,8 @@ void ParmetisPartitioner::build_graph ()
 
 		  _adjncy.push_back (_forward_map[neighbor->id()]);
 		}
+  
+#ifdef ENABLE_AMR
 	      
 	      // Otherwise we need to find all of the
 	      // neighbor's children that are connected to
@@ -361,6 +363,10 @@ void ParmetisPartitioner::build_graph ()
 			}
 		    }
 		}
+
+#endif /* ifdef ENABLE_AMR */
+
+
 	    }
 	}
     }
