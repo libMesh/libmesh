@@ -1,4 +1,4 @@
-// $Id: xdrIO.h,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: xdrIO.h,v 1.7 2003-02-10 14:31:16 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -141,7 +141,7 @@ class XdrIO
    * to/from the current \p xdr
    * file/file handle.
    */
-  int dataBlk(Real* array, int numvar, int size);
+  int dataBlk(REAL* array, int numvar, int size);
 
   /**
    * Return an Originator data structure

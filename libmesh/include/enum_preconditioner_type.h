@@ -1,4 +1,4 @@
-// $Id: enum_preconditioner_type.h,v 1.1 2003-02-10 03:55:50 benkirk Exp $
+// $Id: enum_preconditioner_type.h,v 1.2 2003-02-10 14:31:13 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,7 +30,7 @@
 
 
 
-/**
+/*
  * The \p MeshEnums namespace is the namespace all \p enum definitions
  * should be put into.
  */
