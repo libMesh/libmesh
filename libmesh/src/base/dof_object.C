@@ -1,4 +1,4 @@
-// $Id: dof_object.C,v 1.8 2004-01-03 15:37:42 benkirk Exp $
+// $Id: dof_object.C,v 1.9 2004-01-11 15:56:46 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -56,7 +56,7 @@ void DofObject::set_old_dof_object ()
 
   assert (old_dof_object == NULL);
   
-  // Make a new DofObject, as a copy of \p this
+  // Make a new DofObject, assign a copy of \p this
   old_dof_object = new DofObject(*this);
 }
 

@@ -1,4 +1,4 @@
-// $Id: system_projection.C,v 1.1 2004-01-03 15:37:44 benkirk Exp $
+// $Id: system_projection.C,v 1.2 2004-01-11 15:56:46 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -63,9 +63,20 @@ void System::project_vector (const NumericVector<Number>& old_vector,
   new_vector.clear();
 
   // Resize the new vector.
-  // Note that this will zero-out the new_vector
-  new_vector.init (this->n_dofs(),
-		   this->n_local_dofs());  
+  {
+    // If the old vector was uniprocessor, make the new
+    // vector uniprocessor
+    if (old_vector.size() == old_vector.local_size())
+      new_vector.init (this->n_dofs(),
+		       this->n_dofs());
+    
+    // Otherwise it is a parallel, distributed vector.
+    else
+      new_vector.init (this->n_dofs(),
+		       this->n_local_dofs());
+    
+    // Note that the init above will have zeroed the new_vector
+  }
 
   // A vector indicating if we have visited a DOF yet
   std::vector<bool> already_done (this->n_dofs(), false);
