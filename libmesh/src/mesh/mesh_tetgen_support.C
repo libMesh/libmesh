@@ -1,4 +1,4 @@
-// $Id: mesh_tetgen_support.C,v 1.8 2004-05-17 21:53:20 spetersen Exp $
+// $Id: mesh_tetgen_support.C,v 1.9 2004-06-19 21:36:43 fprill Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -33,7 +33,6 @@
 #include "mesh.h"
 
 #ifdef TETGEN_13
-#include "predicates.h"
 #include "tetgen.h"
 #endif // TETGEN_13
 
@@ -260,7 +259,7 @@ void TetGenMeshInterface::pointset_convexhull ()
   int n_nodes     = 3;                                  // (Tri3 elements)
   _num_elements   = tetgen_wrapper.get_numberoftrifaces();
   //  int firstnumber = _elements.size()+1;                 // append position
-  int firstnumber = 0;                 // append position
+  int firstnumber = 0;                                      // trivial append position
 
   // Delete old elements:
   std::vector< Elem *>::iterator j;
