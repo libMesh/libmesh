@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.44 2003-09-02 18:02:38 benkirk Exp $
+// $Id: mesh_base.h,v 1.45 2003-09-11 15:46:12 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -64,7 +64,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.44 $
+ * \version $Revision: 1.45 $
  */
 
 
@@ -398,7 +398,7 @@ public:
   /**
    * Call the default partitioner (currently \p metis_partition()).
    */
-  virtual void partition ();
+  virtual void partition (const unsigned int n_parts=libMesh::n_processors());
 
   /**
    * After partitoning a mesh it is useful to renumber the nodes and elements

@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.51 2003-09-02 19:49:07 benkirk Exp $
+// $Id: mesh_base.C,v 1.52 2003-09-11 15:46:12 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -777,28 +777,28 @@ void MeshBase::all_tri ()
 
 
 
-void MeshBase::partition ()
+void MeshBase::partition (const unsigned int n_parts)
 {
   // HilbertSFCPartitioner hsfcp(*this);
-  // hsfcp.partition();
+  // hsfcp.partition(n_parts);
   
   // MortonSFCPartitioner msfcp(*this);
-  //   msfcp.partition();
+  //   msfcp.partition(n_parts);
   
   //  LinearPartitioner lp(*this);
-  //lp.partition();
+  //lp.partition(n_parts);
   
   //CentroidPartitioner cp (*this, CentroidPartitioner::X);
-  //cp.partition();
+  //cp.partition(n_parts);
   
   MetisPartitioner mp     (*this);
-  mp.partition();
+  mp.partition(n_parts);
 
    //   ParmetisPartitioner pmp (*this);
-   // pmp.partition();
+   // pmp.partition(n_parts);
    
    //SFCPartitioner sfcp (*this);
-   //sfcp.partition();
+   //sfcp.partition(n_parts);
    
   
 }
