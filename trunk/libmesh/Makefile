@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.27 2003-11-07 23:10:59 jwpeterson Exp $
+# $Id: Makefile,v 1.28 2003-11-10 04:24:54 jwpeterson Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -142,7 +142,7 @@ doc:
 #
 doc_upload:
 	$(MAKE) doc
-	rsync -rltzve ssh ./doc/html/ $(shell cat CVS/Root | cut -d"@" -f1)@libmesh.sourceforge.net:/home/groups/l/li/libmesh/htdocs
+	rsync -rltzve ssh ./doc/html/ $(shell cat CVS/Root | cut -d"@" -f1 | cut -d":" -f3)@libmesh.sourceforge.net:/home/groups/l/li/libmesh/htdocs
 
 
 log: $(loggedfiles)
