@@ -1,4 +1,4 @@
-// $Id: point_locator_tree.C,v 1.6 2004-04-16 17:08:17 spetersen Exp $
+// $Id: point_locator_tree.C,v 1.7 2004-07-26 15:01:33 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -170,7 +170,7 @@ const Elem* PointLocatorTree::operator() (const Point& p) const
 	// e.g. when a point is located in an element that is not
 	// entirely bounded by the tree node's bounding box.
 	// In those cases we take a safe but slow way.
-	if(this->_element == NULL)
+	if (this->_element == NULL)
 	  {
 	    const_elem_iterator pos           (this->_mesh.const_elements_begin());
 	    const const_elem_iterator end_pos (this->_mesh.const_elements_end());

@@ -1,4 +1,4 @@
-// $Id: point_locator_list.C,v 1.6 2004-03-22 22:41:46 benkirk Exp $
+// $Id: point_locator_list.C,v 1.7 2004-07-26 15:01:33 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -105,7 +105,7 @@ void PointLocatorList::init ()
 	  const const_active_elem_iterator end(this->_mesh.elements_end()); 
 
 	  for (; el!=end; ++el)
-	      my_list.push_back((*el)->centroid());
+	    my_list.push_back((*el)->centroid());
 	}
 
       else
@@ -147,7 +147,7 @@ const Elem* PointLocatorList::operator() (const Point& p) const
   // Ask the list.  This is quite expensive, since
   // we loop through the whole list to try to find
   // the @e nearest element.
-  // However, there is not much other to do: when
+  // However, there is not much else to do: when
   // we would use bounding boxes like in a tree,
   // it may happen that a surface element is just
   // in plane with a bounding box face, and quite
