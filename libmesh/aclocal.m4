@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.71 2004-10-28 19:01:38 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.72 2004-11-14 01:20:21 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -105,8 +105,25 @@ AC_DEFUN(DETERMINE_CXX_BRAND, dnl
         dnl Intel's ICC C++ compiler?
         is_intel_icc="`($CXX -V 2>&1) | grep 'Intel(R) C++ Compiler'`"
         if test "x$is_intel_icc" != "x" ; then
-          AC_MSG_RESULT(<<< C++ compiler is Intel ICC >>>)
-          GXX_VERSION=intel_icc	
+          GXX_VERSION_STRING="`($CXX -V 2>&1) | grep 'Version '`"
+          case "$GXX_VERSION_STRING" in
+            *8.1*)
+              AC_MSG_RESULT(<<< C++ compiler is Intel ICC 8.1 >>>)
+  	      GXX_VERSION=intel_icc_v8.1
+              ;;
+            *8.0*)
+              AC_MSG_RESULT(<<< C++ compiler is Intel ICC 8.0 >>>)
+  	      GXX_VERSION=intel_icc_v8.0
+              ;;
+            *7.1*)
+              AC_MSG_RESULT(<<< C++ compiler is Intel ICC 7.1 >>>)
+  	      GXX_VERSION=intel_icc_v7.1
+              ;;
+            *7.0*)
+              AC_MSG_RESULT(<<< C++ compiler is Intel ICC 7.0 >>>)
+  	      GXX_VERSION=intel_icc_v7.0
+              ;;
+          esac
         else	
   	
           dnl Intel's ECC C++ compiler for Itanium?
@@ -115,50 +132,50 @@ AC_DEFUN(DETERMINE_CXX_BRAND, dnl
             AC_MSG_RESULT(<<< C++ compiler is Intel Itanium ECC >>>)
             GXX_VERSION=intel_ecc
           else
-  
+  	
             dnl Or Compaq's cxx compiler?
             is_dec_cxx="`($CXX -V 2>&1) | grep 'Compaq C++'`"
             if test "x$is_dec_cxx" != "x" ; then
               AC_MSG_RESULT(<<< C++ compiler is Compaq cxx >>>)
               GXX_VERSION=compaq_cxx
             else
-  
+  	
   	      dnl Sun ONE Studio?
               is_sun_cc="`($CXX -V 2>&1) | grep 'Sun C++'`"
               if test "x$is_sun_cc" != "x" ; then
                 AC_MSG_RESULT(<<< C++ compiler is Sun ONE Studio compiler >>>)
                 GXX_VERSION=sun_studio
               else
-  
+  	
   	        dnl Sun Forte?
                 is_sun_forte_cc="`($CXX -V 2>&1) | grep 'Forte'`"
                 if test "x$is_sun_forte_cc" != "x" ; then
                   AC_MSG_RESULT(<<< C++ compiler is Sun Forte compiler >>>)
                   GXX_VERSION=sun_forte
                 else
-  
+  	
   	          dnl KAI C++?
   	          is_kai_cc="`($CXX -V 2>&1) | grep 'KAI C++'`"
   	          if test "x$is_kai_cc" != "x" ; then
   	            AC_MSG_RESULT(<<< C++ compiler is KAI C++ >>>)
   	            GXX_VERSION=kai_cc
   	          else
-  
+  	
   	            dnl Portland Group C++?
   	            is_pgcc="`($CXX -V 2>&1) | grep 'Portland Group'`"
   	            if test "x$is_pgcc" != "x" ; then
   	              AC_MSG_RESULT(<<< C++ compiler is Portland Group C++ >>>)
   	              GXX_VERSION=portland_group
   	            else
-
+	
                       dnl HP-UX 11.11 aCC?
                       is_hpux_acc="`($CXX -V 2>&1) | grep 'aCC: HP ANSI C++'`"
   	              if test "x$is_hpux_acc" != "x" ; then
   	                AC_MSG_RESULT(<<< C++ compiler is HP-UX C++ >>>)
     	                GXX_VERSION=hpux_acc
   	              else
-
-
+	
+	
                         dnl  Aw, nothing suitable found...
                         AC_MSG_ERROR(Unrecognized compiler, sorry)
                         exit 1
@@ -341,17 +358,50 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
 	    CXXFLAGS="$CXXFLAGS -LANG:std"
           fi
           ;;
-  
-      intel_icc)
+
+      dnl Intel ICC >= 8.1	
+      intel_icc_v8.1)	
+          dnl Disable some warning messages:
+          dnl #266: 'function declared implicitly'
+          dnl       Metis function "GKfree" caused this error
+          dnl       in almost every file.
+          dnl #1572: 'floating-point equality and inequality comparisons are unreliable'
+          dnl        Well, duh, when the tested value is computed...  OK when it
+          dnl        was from an assignment.
+          dnl Note: In Version 8.1 (and possibly newer?) the -inline_debug_info
+          dnl       option causes a segmentation fault in libmesh.C, probably others...
+          CXXFLAGSG="-Kc++eh -Krtti -O1 -w1 -DDEBUG -g -wd504 -wd1572"
+          CXXFLAGSO="-Kc++eh -Krtti -O2 -Ob2 -DNDEBUG -tpp6 -axK -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
+          CXXFLAGSP="$CXXFLAGSO -g -pg"
+          CFLAGSG="-w1 -DDEBUG -inline_debug_info -wd266 -wd1572"
+          CFLAGSO="-O2 -Ob2 -DNDEBUG -tpp6 -axK -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
+          CFLAGSP="$CFLAGSO -g -pg"
+
+          dnl Position-independent code for shared libraries
+          if test "$enableshared" = yes ; then
+            CXXFLAGSO="$CXXFLAGSO -KPIC"
+            CXXFLAGSG="$CXXFLAGSG -KPIC"
+            CXXFLAGSP="$CXXFLAGSP -KPIC"
+
+            CFLAGSO="$CFLAGSO -KPIC"
+            CFLAGSG="$CFLAGSG -KPIC"
+            CFLAGSP="$CFLAGSP -KPIC"
+
+            LDFLAGS="$LDFLAGS -KPIC"
+          fi
+          ;;
+
+      dnl Intel ICC < v8.1
+      intel_icc*)
           dnl Disable some warning messages:
           dnl #266: 'function declared implicitly'
           dnl       Metis function "GKfree" caused this error
           dnl       in almost every file.
           CXXFLAGSG="-Kc++eh -Krtti -O1 -w1 -DDEBUG -inline_debug_info -g -wd504"
-          CXXFLAGSO="-Kc++eh -Krtti -O2 -Ob2 -DNDEBUG -tpp6 -axiMK -unroll -w0"
+          CXXFLAGSO="-Kc++eh -Krtti -O2 -Ob2 -DNDEBUG -tpp6 -axiMK -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
           CXXFLAGSP="$CXXFLAGSO -g -pg"
           CFLAGSG="-w1 -DDEBUG -inline_debug_info -wd266"
-          CFLAGSO="-O2 -Ob2 -DNDEBUG -tpp6 -axiMK -unroll -w0 -vec"
+          CFLAGSO="-O2 -Ob2 -DNDEBUG -tpp6 -axiMK -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
           CFLAGSP="$CFLAGSO -g -pg"
 
           dnl Position-independent code for shared libraries
