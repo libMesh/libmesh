@@ -1,6 +1,6 @@
 
 
-// $Id: mesh_base.C,v 1.25 2003-03-19 23:43:56 benkirk Exp $
+// $Id: mesh_base.C,v 1.26 2003-03-24 18:16:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -1350,7 +1350,7 @@ void MeshBase::distort (const Real factor,
   
   // Now actually move the nodes
   {
-    const int seed = 123456;
+    const unsigned int seed = 123456;
     
     // seed the random number generator
     srand(seed);
