@@ -1,4 +1,4 @@
-// $Id: mesh_data.h,v 1.14 2003-08-08 14:11:26 ddreyer Exp $
+// $Id: mesh_data.h,v 1.15 2003-08-12 17:49:15 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -42,6 +42,8 @@ class MeshBase;
 class UnvMeshInterface;
 class XdrInterface;
 class MeshDataUnvHeader;
+class MeshData;
+class BoundaryInfo;
 
 
 
@@ -332,18 +334,26 @@ public:
   // datasets.
 
   /**
-   * Read access to the MeshDataUnvHeader data structure.
+   * Read access to the \p MeshDataUnvHeader data structure.
    */
   const MeshDataUnvHeader & get_unv_header() const;
 
   /**
-   * Set the MeshDataUnvHeader data structure that will be
+   * Set the \p MeshDataUnvHeader data structure that will be
    * used for output.
    */
   void set_unv_header(MeshDataUnvHeader& unv_header);
 
 
 protected:
+
+  /**
+   * Assign to \p this the data from the other \p MeshData.
+   * Used by \p BoundaryInfo when copying the \p MeshData
+   * from the \p d dimensional mesh to the \p d-1 dimensional mesh
+   * (the boundary mesh).
+   */
+  void assign (const MeshData& omd);
 
 
   //----------------------------------------------------------
@@ -540,6 +550,13 @@ protected:
    * Make the MeshDataUnvHeader class a friend.
    */
   friend class MeshDataUnvHeader;
+  
+  /**
+   * Make the \p BoundaryInfo class a friend so that
+   * they can use the assignment operator when
+   * synchronizing the \p BoundaryMesh.
+   */
+  friend class BoundaryInfo;
 
 };
 
