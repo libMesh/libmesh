@@ -25,6 +25,11 @@
 #include "elem_quality.h"
 #include "statistics.h"
 
+// Conditionally include Petsc stuff
+#ifdef HAVE_PETSC
+#include "petsc_interface.h"
+#include "petsc_matrix.h"
+#endif
 
 
 void usage(char *progName)
@@ -53,6 +58,8 @@ void usage(char *progName)
     "    -Y                            treats mesh as x/y/z-symmetric\n"
     "    -Z                            \n"
 #endif
+    "    -l                            Build the L connectivity matrix \n"
+    "    -L                            Build the script L connectivity matrix \n"
     "    -v                            Verbose\n"
     "    -h                            Print help menu\n"
     "\n"
@@ -133,7 +140,9 @@ void process_cmd_line(int argc, char **argv,
 		      double& origin_z,
 		      bool& x_sym,
 		      bool& y_sym,
-		      bool& z_sym
+		      bool& z_sym,
+		      bool& build_l,
+		      bool& build_script_l
 		      )
 {
 
@@ -144,12 +153,12 @@ void process_cmd_line(int argc, char **argv,
   x_sym    = y_sym    = z_sym    = false;
 
   char optionStr[] =
-    "i:o:s:d:r:p:bv?h";
+    "i:o:s:d:r:p:bvlLm?h";
 
 #else
 
   char optionStr[] =
-    "i:o:s:d:r:p:ba::x:y:z:XYZv?h";
+    "i:o:s:d:r:p:ba::x:y:z:XYZvlLm?h";
 
 #endif
 
@@ -314,9 +323,24 @@ void process_cmd_line(int argc, char **argv,
 
 #endif //ifdef ENABLE_INFINITE_ELEMENTS
 
+	case 'l':
+	  {
+	    build_l = true;
+	    break;
+	  }
+	case 'L':
+	  {
+	    build_script_l = true;
+	    break;
+	  }
+
+
+	case 'h':
+	case '?':
+	  usage(argv[0]);
 	  
 	default:
-	  usage(argv[0]);
+	  return;
 	};
     };
 
@@ -327,6 +351,12 @@ void process_cmd_line(int argc, char **argv,
 int main (int argc, char** argv)
 {
   PerfMon perfmon(argv[0]);
+
+#ifdef HAVE_PETSC
+  
+  PetscInitialize (&argc, &argv, (char *)0, NULL);
+  
+#endif
   
   {
     unsigned int n_subdomains = 1;
@@ -341,6 +371,8 @@ int main (int argc, char** argv)
     bool x_sym=false;
     bool y_sym=false;
     bool z_sym=false;
+    bool build_l=false;
+    bool build_script_l=false;
     
       
     std::vector<std::string> names;
@@ -350,7 +382,9 @@ int main (int argc, char** argv)
     process_cmd_line(argc, argv, names,
 		     n_subdomains, n_rsteps,
 		     dim, verbose, write_bndry, 
-		     addinfelems, origin_x, origin_y, origin_z, x_sym, y_sym, z_sym);
+		     addinfelems, origin_x, origin_y, origin_z, x_sym, y_sym, z_sym,
+		     build_l,
+		     build_script_l);
 
     if (dim == static_cast<unsigned int>(-1))
       {
@@ -379,34 +413,35 @@ int main (int argc, char** argv)
 	std::cout << "No input specified." << std::endl;
 	return 1;
       }
+       	
 
 
 #ifdef ENABLE_INFINITE_ELEMENTS
 
     if(addinfelems)
-    {
-      if (names.size() == 3)
       {
-	std::cout << "ERROR: Invalid combination: Building infinite elements " << std::endl
-		  << "not compatible with solution import." << std::endl;
-	exit(1);
-      }
-
-      if (write_bndry)
-      {
-	std::cout << "ERROR: Invalid combination: Building infinite elements " << std::endl
-		  << "not compatible with writing boundary conditions." << std::endl;
-	exit(1);
-      }
-
-      mesh.build_inf_elem(Point(origin_x, origin_y, origin_z),
-			  x_sym, y_sym, z_sym, 
-			  verbose);
-
-      if (verbose)
+	if (names.size() == 3)
+	  {
+	    std::cout << "ERROR: Invalid combination: Building infinite elements " << std::endl
+		      << "not compatible with solution import." << std::endl;
+	    exit(1);
+	  }
+	
+	if (write_bndry)
+	  {
+	    std::cout << "ERROR: Invalid combination: Building infinite elements " << std::endl
+		      << "not compatible with writing boundary conditions." << std::endl;
+	    exit(1);
+	  }
+	
+	mesh.build_inf_elem(Point(origin_x, origin_y, origin_z),
+			    x_sym, y_sym, z_sym, 
+			    verbose);
+	
+	if (verbose)
 	  mesh.print_info();
-    }
-
+      }
+    
 #endif
 
 
@@ -583,6 +618,41 @@ int main (int argc, char** argv)
 
     
     /**
+     * Maybe create Damien's connectivity
+     * graph matrices.
+     */
+    {
+      if (build_l)
+	{
+#ifdef HAVE_PETSC	  
+	  PetscMatrix conn;
+	  mesh.build_L_graph (conn);
+	  conn.print_matlab();
+#else
+	  std::cerr << "This functionality requires PETSC support!"
+		    << std::endl;
+	  error();
+#endif
+	};
+      
+      
+      if (build_script_l)
+	{
+#ifdef HAVE_PETSC	  
+	  PetscMatrix conn;
+	  mesh.build_script_L_graph (conn);
+	  conn.print_matlab();
+#else
+	  std::cerr << "This functionality requires PETSC support!"
+		    << std::endl;
+	  error();
+#endif
+	};
+    };
+
+
+    
+    /**
      * Possibly write the mesh
      */
     {
@@ -621,6 +691,14 @@ int main (int argc, char** argv)
       ;
     */
   };
+
+
+#ifdef HAVE_PETSC
+
+  PetscFinalize();
+   
+#endif
+
   
   return 0;
 };

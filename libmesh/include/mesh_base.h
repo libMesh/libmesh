@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.6 2003-01-25 05:33:10 jwpeterson Exp $
+// $Id: mesh_base.h,v 1.7 2003-01-29 20:58:29 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -33,6 +33,7 @@
 // forward declarations
 class Elem;
 class EquationSystems;
+class PetscMatrix;
 
 
 // Local Includes -----------------------------------
@@ -59,7 +60,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.6 $
+ * \version $Revision: 1.7 $
  */
 
 
@@ -209,22 +210,24 @@ public:
 
   /**
    * Build infinite elements atop a volume-based mesh,
-   * determine origin automatically.  When symmetry planes                                
-   * are present, use the version with optional symmetry                                  
+   * determine origin automatically.  When symmetry planes
+   * are present, use the version with optional symmetry
    * switches.
    */
   void build_inf_elem();
   
   /**
-   * Build infinite elements atop a volume-based mesh.                                    
-   * Find all faces on the outer boundary and build infinite element                      
-   * on them, based on the origin.                                                        
-   * Faces which lie in at least one symmetry plane are skipped.                          
-   * The source of the infinite elements must be given to \p origin,                      
-   * the three optional booleans \p x_sym, \p y_sym,                                      
-   * \p z_sym indicate symmetry planes perpendicular to the \p x,                         
-   * \p y and \p z direction, respectively.                                               
-   * The flag \p be_verbose enables some diagnostic output.                               
+   * Build infinite elements atop a volume-based mesh.
+   * Find all faces on the outer boundary and build infinite element
+   * on them, based on the origin.
+   *
+   * Faces which lie in at least one symmetry plane are skipped.
+   * The source of the infinite elements must be given to \p origin,
+   * the three optional booleans \p x_sym, \p y_sym,
+   * \p z_sym indicate symmetry planes perpendicular to the \p x,
+   * \p y and \p z direction, respectively.
+   *   
+   * The flag \p be_verbose enables some diagnostic output.
    */
   void build_inf_elem(const Point& origin,
 		      const bool x_sym = false,
@@ -338,6 +341,21 @@ public:
   Sphere 
   subdomain_bounding_sphere (const unsigned int pid = static_cast<unsigned int>(-1)) const;
 
+
+  /**
+   * Builds the connectivity graph. The matrix \p conn is such that the
+   * valence of each node is on the diagonal and there is a -1 for each
+   * node connected to the node.
+   */
+  void build_L_graph (PetscMatrix& conn) const;
+  
+  /**
+   * Builds the connectivity graph. The matrix \p conn is such that the
+   * valence of each node is on the diagonal and there is a -1 for each
+   * node connected to the node.
+   */
+  void build_script_L_graph (PetscMatrix& conn) const;
+  
   /**
    * Returns the number of subdomains in the global mesh. Note that it is
    * convenient to have one subdomain on each processor on parallel machines,

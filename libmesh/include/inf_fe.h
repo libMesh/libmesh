@@ -1,4 +1,4 @@
-// $Id: inf_fe.h,v 1.6 2003-01-25 05:33:10 jwpeterson Exp $
+// $Id: inf_fe.h,v 1.7 2003-01-29 20:58:29 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -96,7 +96,7 @@
  *
  * \author Daniel Dreyer
  * \date 2003
- * \version $Revision: 1.6 $
+ * \version $Revision: 1.7 $
  */
 
 //-------------------------------------------------------------
@@ -119,7 +119,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.6 $
+   * \version $Revision: 1.7 $
    */
   //-------------------------------------------------------------
   // InfFE::Radial class definition
@@ -244,7 +244,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.6 $
+   * \version $Revision: 1.7 $
    */
   //-------------------------------------------------------------
   // InfFE::Base class definition
@@ -794,7 +794,7 @@ private:
 
 // ------------------------------------------------------------
 // InfFE class inline members
-template <unsigned int Dim, FEFamily T_radial, FEFamily T_base>
+template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
 inline
 bool InfFE<Dim,T_radial,T_base>::is_InfFE_elem(const ElemType et)
 {
@@ -824,7 +824,7 @@ bool InfFE<Dim,T_radial,T_base>::is_InfFE_elem(const ElemType et)
 
 
 
-template <unsigned int Dim, FEFamily T_radial, FEFamily T_base>
+template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
 inline
 void InfFE<Dim,T_radial,T_base>::update_base_elem (const Elem* inf_elem)
 {

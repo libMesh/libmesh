@@ -1,4 +1,4 @@
-//    $Id: petsc_matrix.h,v 1.6 2003-01-25 05:33:10 jwpeterson Exp $
+//    $Id: petsc_matrix.h,v 1.7 2003-01-29 20:58:29 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -274,6 +274,14 @@ class PetscMatrix
    * Print the contents of the matrix to the screen.
    */
   void print() const;
+  
+  /**
+   * Print the contents of the matrix in Matlab's
+   * sparse matrix format. Optionally prints the
+   * matrix to the file named \p name.  If \p name
+   * is not specified it is dumped to the screen.
+   */
+  void print_matlab(const std::string name="NULL") const;
 
   
  private:
@@ -558,7 +566,7 @@ void PetscMatrix::print() const
 
 #endif
 
-}
+};
 
 
 
