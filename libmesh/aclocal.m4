@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.77 2004-11-22 21:18:39 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.78 2005-01-28 21:43:50 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -451,13 +451,14 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           dnl #266: 'function declared implicitly'
           dnl       Metis function "GKfree" caused this error
           dnl       in almost every file.
+          dnl #1476: 'field uses tail padding of a base class'
 	  dnl #1505: 'size of class is affected by tail padding'
           dnl        simply warns of a possible incompatibility with
           dnl        the g++ ABI for this case
           dnl #1572: 'floating-point equality and inequality comparisons are unreliable'
           dnl        Well, duh, when the tested value is computed...  OK when it
           dnl        was from an assignment.
-          CXXFLAGSG="-Kc++eh -Krtti -w1 -DDEBUG -inline_debug_info -g -wd1572 -wd1505"
+          CXXFLAGSG="-Kc++eh -Krtti -w1 -DDEBUG -inline_debug_info -g -wd1476 -wd1505 -wd1572"
           CXXFLAGSO="-Kc++eh -Krtti -O2 -DNDEBUG -unroll -w0 -ftz -vec_report0 -par_report0 -openmp_report0"
           CXXFLAGSP="$CXXFLAGSO -g -pg"
           CFLAGSG="-w1 -DDEBUG -inline_debug_info -wd266 -wd1572"
