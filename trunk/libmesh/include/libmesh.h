@@ -1,4 +1,4 @@
-// $Id: libmesh.h,v 1.6 2003-04-03 14:17:23 ddreyer Exp $
+// $Id: libmesh.h,v 1.7 2003-04-07 18:34:47 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,6 +24,7 @@
 
 
 // C++ includes
+#include <iostream>
 
 // Local includes
 #include "mesh_common.h"
@@ -100,11 +101,23 @@ public:
    */
   static PerfLog log;
 
+  /**
+   * @returns an \p std::ostream to print messages with.
+   */
+  static std::ostream & msg ();
+  
+  /**
+   * @returns an \p std::ostream to print messages with.
+   */
+  static std::ostream & err ();
+  
+
 #if defined(USE_COMPLEX_NUMBERS)
   /**
    * The imaginary unit, \f$ \sqrt{-1} \f$.
    */
   static const Number imaginary;
+  
 #endif
 
   /**
@@ -114,18 +127,31 @@ public:
 
 
   /**
-   * \f$ \pi=3.14159... \f$.
+   * \f$ \zero=0. \f$.
    */
   static const Number zero;
 
-
-
 private:
 
+  
+  /**
+   * A \p std::ostream to print messages into.  This is useful
+   * since it allows messages to be printed just from processor 0.
+   */
+  static std::ostream *_out;
+  
+  /**
+   * A \p std::ostream to print messages into.  This is useful
+   * since it allows messages to be printed just from processor 0.
+   */
+  static std::ostream *_err;
+
+  
   /**
    * Flag that tells if \p init() has been called.
    */
   static bool _is_initialized;
+  
 };
 
 
@@ -166,6 +192,25 @@ bool libMesh::closed()
   return false;
 }
 
+
+
+inline
+std::ostream & libMesh::msg ()
+{
+  assert (_out != NULL);
+
+  return *_out;
+}
+
+
+
+inline
+std::ostream & libMesh::err ()
+{
+  assert (_err != NULL);
+
+  return *_err;
+}
 
 
 #endif // #define __libmesh_h__

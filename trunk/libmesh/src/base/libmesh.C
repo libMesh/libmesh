@@ -1,4 +1,4 @@
-// $Id: libmesh.C,v 1.9 2003-04-03 14:17:23 ddreyer Exp $
+// $Id: libmesh.C,v 1.10 2003-04-07 18:34:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -20,6 +20,7 @@
  
 
 // C++ includes
+#include <fstream>
 #include <math.h>
 
 
@@ -84,7 +85,10 @@ PerfLog      libMesh::log ("libMesh",
 #endif
 			   );
 
-bool         libMesh::_is_initialized = false;
+
+std::ostream *libMesh::_out            = NULL;
+std::ostream *libMesh::_err            = NULL;
+bool          libMesh::_is_initialized = false;
 
 
 
@@ -125,6 +129,20 @@ void libMesh::init (int &     , char** &     )
   assert (_n_processors >  0);
   assert (_processor_id >= 0);
 
+
+  // Open the output streams.
+  if (processor_id() == 0)
+    {
+      _out = &std::cout;
+      _err = &std::cerr;
+    }
+  else
+    {
+      _out = new std::ostream(NULL);
+      _err = new std::ostream(NULL);
+    }
+
+  
   // The library is now ready for use
   _is_initialized = true;
 
@@ -159,9 +177,7 @@ int libMesh::close ()
   ReferenceCounter::print_info ();
   
 
-  _is_initialized = false;
-  
-
+  // Print an informative message if we detect a memory leak
   if (ReferenceCounter::n_objects() != 0)
     {
       std::cerr << "Memory leak detected!"
@@ -176,7 +192,25 @@ int libMesh::close ()
 #endif
   
     }
+
+
+  // Close the output streams.
+  {
+    if (processor_id() != 0)
+      {
+	delete _out;
+	delete _err;
+      }
+    
+    _out = NULL;
+    _err = NULL;
+  }
+
   
+  // Set the initialized() flag to false
+  _is_initialized = false;
+  
+
   // Return the number of outstanding objects.
   // This is equivalent to return 0 if all of
   // the reference counted objects have been

@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.15 2003-04-03 14:17:24 ddreyer Exp $
+// $Id: fe_interface.C,v 1.16 2003-04-07 18:34:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -840,7 +840,7 @@ void FEInterface::compute_constraints (std::map<unsigned int,
 						 elem); return;
 
 	  default:
-	    error();
+	    return;
 	  }
       }
 
@@ -856,7 +856,7 @@ void FEInterface::compute_constraints (std::map<unsigned int,
 						 fe_t,
 						 elem); return;      
 	  default:
-	    error();
+	    return;
 	  }
       }
 

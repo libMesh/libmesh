@@ -1,4 +1,4 @@
-// $Id: getpot.h,v 1.2 2003-03-25 21:06:59 benkirk Exp $
+// $Id: getpot.h,v 1.3 2003-04-07 18:34:47 benkirk Exp $
 //
 // (with patches from Michael Anderson for more general variable types)
 
@@ -311,10 +311,11 @@ GetPot::GetPot(int argc_, char *argv_[])
 
   // -- make an internal copy of the argument list:
   std::vector<std::string> __argv;
-  __argv.push_back(std::string(argv_[0]));
-  for(int i=1; i<argc_; i++) {
-    std::string tmp(argv_[i]);   // recall the problem with temporaries,
-    __argv.push_back(tmp);  // reference counting in arguement lists ...
+  __argv.reserve (argc_);
+  
+  for(int i=0; i<argc_; i++) {
+    std::string tmp(argv_[i]);
+    __argv.push_back(tmp);
   }
   __parse_argument_vector(__argv); 
 }
@@ -388,14 +389,18 @@ GetPot::__parse_argument_vector(const std::vector<std::string>& ARGV)
   section = "";
   std::vector<std::string>  section_stack;
   unsigned i=0;
-  std::vector<std::string>::const_iterator it = ARGV.begin();
+  std::vector<std::string>::const_iterator it     = ARGV.begin();
+  std::vector<std::string>::const_iterator it_end = ARGV.end();
   argv.push_back(*it);
-  for(it++; it != ARGV.end(); it++, i++) {
+  
+  for(++it; it != it_end; ++it, i++) {
     std::string arg = *it;
     if( arg.length() == 0 ) continue;
 
     // -- [section] labels
-    if( arg.length() > 1 && arg[0] == '[' && arg[arg.length()-1] == ']' ) {
+    if( (arg.length() > 1) &&
+	(arg[0] == '[' )   &&
+	(arg[arg.length()-1] == ']') ) {
       const std::string Name = __DBE_expand_string(arg.substr(1, arg.length()-2));
       section = __process_section_label(Name, section_stack);
       // new section --> append to list of sections
@@ -420,8 +425,12 @@ GetPot::__parse_argument_vector(const std::vector<std::string>& ARGV)
 	char* o = (char*)p++;
 	*o = '\0';
 	const GetPot::variable* Var = __find_variable(arg.c_str());
-	if( Var == 0 ) variables.push_back(variable(arg.c_str(), p)); 
-	else           ((GetPot::variable*)Var)->take(p);
+	
+	if( Var == 0 )
+	  variables.push_back(variable(arg.c_str(), p)); 
+	else
+	  ((GetPot::variable*)Var)->take(p);
+	
 	*o = '=';
 	break;
       }
@@ -449,7 +458,7 @@ GetPot::__read_in_stream(std::istream& istr)
   while(istr) {
     __skip_whitespace(istr);
     const std::string Token = __get_next_token(istr);
-    if( Token.length() == 0 || Token[0] == EOF) break;
+    if( (Token.length() == 0) || (Token[0] == EOF) ) break;
     brute_tokens.push_back(Token);
   }
 
@@ -725,7 +734,7 @@ GetPot::search(const char* Option)
   if( ! search_loop_f ) return false;
 
   // (*) second loop from 0 to old cursor position
-  for(c = 1; c < OldCursor; c++) {
+  for(c = 0; c < OldCursor; c++) {
     if( argv[c] == SearchTerm ) 
     { cursor = c; search_failed_f = false; return true; }
   }
