@@ -1,4 +1,4 @@
-/* $Id: ex9.C,v 1.11 2003-11-11 14:18:13 benkirk Exp $ */
+/* $Id: ex9.C,v 1.12 2004-01-03 15:37:41 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -51,7 +51,7 @@
 #include "o_string_stream.h"
 
 // This example will solve a linear transient system,
-// so we need to include the \p TransientSystem definition.
+// so we need to include the \p TransientImplicitSystem definition.
 #include "transient_system.h"
 #include "vector_value.h"
 
@@ -116,8 +116,8 @@ int main (int argc, char** argv)
     
     // Add a transient system to the EquationSystems
     // object named "Convection-Diffusion".
-    TransientSystem& system = 
-      equation_systems.add_system<TransientSystem> ("Convection-Diffusion");
+    TransientImplicitSystem & system = 
+      equation_systems.add_system<TransientImplicitSystem> ("Convection-Diffusion");
       
     // Adds the variable "u" to "Convection-Diffusion".  "u"
     // will be approximated using first-order approximation.
@@ -191,8 +191,8 @@ int main (int argc, char** argv)
 	// vector assignment.  Since only \p TransientSystems
 	// (and systems derived from them) contain old solutions
 	// we need to specify the system type when we ask for it.
-	TransientSystem&  system =
-	  equation_systems.get_system<TransientSystem>("Convection-Diffusion");
+	TransientImplicitSystem&  system =
+	  equation_systems.get_system<TransientImplicitSystem>("Convection-Diffusion");
 
 	*system.old_local_solution = *system.current_local_solution;
 	
@@ -233,7 +233,8 @@ void init_cd (EquationSystems& es,
   const Mesh& mesh = es.get_mesh();
   
   // Get a reference to the Convection-Diffusion system object.
-  TransientSystem& system = es.get_system<TransientSystem> ("Convection-Diffusion");
+  TransientImplicitSystem & system =
+    es.get_system<TransientImplicitSystem> ("Convection-Diffusion");
   
   // Get a reference to the \p DofMap for this system.
   const DofMap& dof_map = system.get_dof_map();
@@ -308,7 +309,8 @@ void assemble_cd (EquationSystems& es,
   const unsigned int dim = mesh.mesh_dimension();
   
   // Get a reference to the Convection-Diffusion system object.
-  TransientSystem& system = es.get_system<TransientSystem> ("Convection-Diffusion");
+  TransientImplicitSystem & system =
+    es.get_system<TransientImplicitSystem> ("Convection-Diffusion");
   
   // Get a constant reference to the Finite Element type
   // for the first (and only) variable in the system.
@@ -511,8 +513,8 @@ void assemble_cd (EquationSystems& es,
       // for this element.  Add them to the global matrix and
       // right-hand-side vector.  The \p PetscMatrix::add_matrix()
       // and \p PetscVector::add_vector() members do this for us.
-      es("Convection-Diffusion").matrix->add_matrix (Ke, dof_indices);
-      es("Convection-Diffusion").rhs->add_vector    (Fe, dof_indices);
+      system.matrix->add_matrix (Ke, dof_indices);
+      system.rhs->add_vector    (Fe, dof_indices);
     }
   
   // That concludes the system matrix assembly routine.

@@ -1,4 +1,4 @@
-/* $Id: ex11.C,v 1.4 2003-11-11 04:58:33 benkirk Exp $ */
+/* $Id: ex11.C,v 1.5 2004-01-03 15:37:41 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -39,7 +39,7 @@
 #include "numeric_vector.h"
 #include "dense_matrix.h"
 #include "dense_vector.h"
-#include "steady_system.h"
+#include "implicit_system.h"
 #include "error_vector.h"
 #include "error_estimator.h"
 
@@ -86,8 +86,8 @@ int main (int argc, char** argv)
     // Declare the system and its variables.
     {
       // Creates a transient system named "Convection-Diffusion"
-      SteadySystem& system = 
-	equation_systems.add_system<SteadySystem> ("Stokes");
+      ImplicitSystem & system = 
+	equation_systems.add_system<ImplicitSystem> ("Stokes");
       
       // Add the variables "u" & "v" to "Stokes".  They
       // will be approximated using second-order approximation.
@@ -139,8 +139,8 @@ void assemble_stokes (EquationSystems& es,
   const unsigned int dim = mesh.mesh_dimension();
   
   // Get a reference to the Convection-Diffusion system object.
-  SteadySystem& system =
-    es.get_system<SteadySystem> ("Stokes");
+  ImplicitSystem & system =
+    es.get_system<ImplicitSystem> ("Stokes");
 
   // Numeric ids corresponding to each variable in the system
   const unsigned int u_var = system.variable_number ("u");
@@ -188,7 +188,7 @@ void assemble_stokes (EquationSystems& es,
   // object handles the index translation from node and element numbers
   // to degree of freedom numbers.  We will talk more about the \p DofMap
   // in future examples.
-  const DofMap& dof_map = system.get_dof_map();
+  const DofMap & dof_map = system.get_dof_map();
 
   // Define data structures to contain the element matrix
   // and right-hand-side vector contribution.  Following

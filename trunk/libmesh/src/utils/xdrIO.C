@@ -1,7 +1,7 @@
-// "$Id: xdrIO.C,v 1.14 2003-11-15 14:58:19 benkirk Exp $\n"
+// "$Id: xdrIO.C,v 1.15 2004-01-03 15:37:44 benkirk Exp $\n"
 
-// The Next Great Finite Element Library.
-// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

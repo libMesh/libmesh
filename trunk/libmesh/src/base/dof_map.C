@@ -1,7 +1,7 @@
-// $Id: dof_map.C,v 1.50 2003-11-05 22:26:44 benkirk Exp $
+// $Id: dof_map.C,v 1.51 2004-01-03 15:37:42 benkirk Exp $
 
-// The Next Great Finite Element Library.
-// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -41,29 +41,11 @@
 // DofMap member functions
 void DofMap::attach_matrix (SparseMatrix<Number>& matrix)
 {
-  _matrix = &matrix;
+  _matrices.push_back(&matrix);
   
-  _matrix->attach_dof_map (*this);
+  matrix.attach_dof_map (*this);
 }
 
-
-
-void DofMap::attach_other_matrix (std::pair<std::string, SparseMatrix<Number>*> _new)
-{
-  if (_other_matrices.count(_new.first))
-    {
-      std::cerr << "ERROR: matrix "
-		<< _new.first
-		<< " has already been added to this system!"
-		<< std::endl;
-      error();
-    }
-  else
-    {
-      _other_matrices.insert(_new);
-      _new.second->attach_dof_map(*this);
-    }
-}
 
 
 void DofMap::reinit(const MeshBase& mesh)
@@ -234,9 +216,7 @@ void DofMap::clear()
 
 #endif
 
-  _matrix = NULL;
-
-  _other_matrices.clear();
+  _matrices.clear();
 
   _n_dfs = 0;
 }
@@ -356,6 +336,7 @@ void DofMap::distribute_dofs(const MeshBase& mesh)
   // The _send_list now only contains entries from the local processor.
   // We need to add the DOFs from elements that live on neighboring processors
   // that are neighbors of the elements on the local processor
+  // (for discontinuous elements)
   {
     const_active_local_elem_iterator       elem_it (mesh.elements_begin());
     const const_active_local_elem_iterator elem_end(mesh.elements_end());
@@ -623,15 +604,12 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
   // When additional matrices are handled, let the major matrix
   // be the first to get to know the sparsity pattern, so that
   // it has the best chance to be allocated successfully...
-  if (_matrix != NULL)
-    _matrix->update_sparsity_pattern (sparsity_pattern);
-      
-  std::map<std::string, SparseMatrix<Number>* >::iterator
-    pos = _other_matrices.begin(),
-    end = _other_matrices.end();
+  std::vector<SparseMatrix<Number>* >::iterator
+    pos = _matrices.begin(),
+    end = _matrices.end();
       
   for (; pos != end; ++pos)
-    pos->second->update_sparsity_pattern (sparsity_pattern);     
+    (*pos)->update_sparsity_pattern (sparsity_pattern);     
 }
  
 

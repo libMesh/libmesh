@@ -1,7 +1,7 @@
-// $Id: system_base_io.C,v 1.4 2003-09-25 21:46:55 benkirk Exp $
+// $Id: system_io.C,v 1.1 2004-01-03 15:37:44 benkirk Exp $
 
-// The Next Great Finite Element Library.
-// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -24,8 +24,7 @@
 // System Includes
 
 // Local Includes
-#include "system_base.h"
-#include "numeric_vector.h"
+#include "system.h"
 #include "libmesh.h"
 #include "mesh.h"
 #include "xdr_cxx.h"
@@ -36,14 +35,14 @@
 
 
 // ------------------------------------------------------------
-// SystemBase class implementation
-void SystemBase::read (Xdr& io,
-		       const bool read_header,
-		       const bool read_additional_data)
+// System class implementation
+void System::read (Xdr& io,
+		   const bool read_header,
+		   const bool read_additional_data)
 {
   /**
    * This program implements the output of a
-   * SystemBase object, embedded in the output of
+   * System object, embedded in the output of
    * an EquationSystems<T_sys>.  This warrants some 
    * documentation.  The output file essentially
    * consists of 4 sections:
@@ -85,13 +84,13 @@ void SystemBase::read (Xdr& io,
    * Possibly clear data structures and start from scratch.
    */
   if (read_header)
-    clear ();
+    this->clear ();
 
 
   /**
    * 1.) 
    *
-   * Read the number of variables in the ith system
+   * Read the number of variables in the system
    */
   {
     unsigned int n_vars=0;
@@ -138,32 +137,29 @@ void SystemBase::read (Xdr& io,
 
 	FEType type;
 
-#ifndef ENABLE_INFINITE_ELEMENTS
-
 	type.order  = static_cast<Order>(order);
 	type.family = static_cast<FEFamily>(fam);
+	
+#ifdef ENABLE_INFINITE_ELEMENTS
 
-#else
-
+	/**
+	 * Read additional information for infinite elements
+	 */
 	int radial_fam=0;
 	int i_map=0;
 	  
 	io.data (radial_fam);
 	io.data (i_map);
 
-	type.order         = static_cast<Order>(order);
 	type.radial_order  = static_cast<Order>(rad_order);
-	type.family        = static_cast<FEFamily>(fam);
 	type.radial_family = static_cast<FEFamily>(radial_fam);
 	type.inf_map       = static_cast<InfMapType>(i_map);	  
 
 #endif
 
-
 	if (read_header) 
 	  this->add_variable (var_name,
 			      type);
-
       }
   }
 
@@ -181,7 +177,6 @@ void SystemBase::read (Xdr& io,
 
     for (unsigned int vec=0; vec<n_vectors; vec++)
       {
-
  	/**
 	 * 5.)
 	 *
@@ -196,10 +191,9 @@ void SystemBase::read (Xdr& io,
 	  {
 	    // sanity checks
 	    assert(this->_can_add_vectors);
-	    assert(this->_other_vectors.count(vec_name)==0);
+	    assert(this->_vectors.count(vec_name) == 0);
 
 	    this->add_vector(vec_name);
-
 	  }
       }
   }
@@ -209,12 +203,12 @@ void SystemBase::read (Xdr& io,
 
 
 
-void SystemBase::read_data (Xdr& io,
-			    const bool read_additional_data)
+void System::read_data (Xdr& io,
+			const bool read_additional_data)
 {
   /**
    * This program implements the output of the vectors
-   * contained in this SystemBase object, embedded in the 
+   * contained in this System object, embedded in the 
    * output of an EquationSystems<T_sys>. 
    *
    *   14.) The global solution vector, re-ordered to be node-major 
@@ -310,12 +304,10 @@ void SystemBase::read_data (Xdr& io,
    */
 
   std::map<std::string, NumericVector<Number>* >::iterator
-    pos = this->_other_vectors.begin();
+    pos = this->_vectors.begin();
   
-  for(; pos != this->_other_vectors.end(); ++pos)
+  for (; pos != this->_vectors.end(); ++pos)
     {
-
-
       /**
        * 15.)
        *
@@ -336,7 +328,9 @@ void SystemBase::read_data (Xdr& io,
 	   * We need to put it into whatever application-specific
 	   * ordering we may have using the dof_map.
 	   */
-	  std::fill (reordered_vector.begin(), reordered_vector.end(), libMesh::zero);
+	  std::fill (reordered_vector.begin(),
+		     reordered_vector.end(),
+		     libMesh::zero);
 	
 	  reordered_vector.resize(global_vector.size());
 	
@@ -393,11 +387,11 @@ void SystemBase::read_data (Xdr& io,
 
 
 
-void SystemBase::write(Xdr& io) const
+void System::write(Xdr& io) const
 {
   /**
    * This program implements the output of a
-   * SystemBase object, embedded in the output of
+   * System object, embedded in the output of
    * an EquationSystems<T_sys>.  This warrants some 
    * documentation.  The output of this part 
    * consists of 5 sections:
@@ -603,7 +597,7 @@ void SystemBase::write(Xdr& io) const
       comment += "\"";
     }
 	  
-    unsigned int n_vectors = this->n_additional_vectors ();
+    unsigned int n_vectors = this->n_vectors ();
     io.data (n_vectors, comment.c_str());
   }
 
@@ -611,11 +605,11 @@ void SystemBase::write(Xdr& io) const
 
   {
     std::map<std::string, NumericVector<Number>* >::const_iterator
-      vec_pos = this->_other_vectors.begin();
+      vec_pos = this->_vectors.begin();
     
     unsigned int cnt=0;
 
-    for(;  vec_pos != this->_other_vectors.end(); ++vec_pos)
+    for(;  vec_pos != this->_vectors.end(); ++vec_pos)
       {
 	/**
 	 * 5.)
@@ -643,12 +637,12 @@ void SystemBase::write(Xdr& io) const
 
 
 
-void SystemBase::write_data (Xdr& io,
-			     const bool write_additional_data) const
+void System::write_data (Xdr& io,
+			 const bool write_additional_data) const
 {
   /**
    * This program implements the output of the vectors
-   * contained in this SystemBase object, embedded in the 
+   * contained in this System object, embedded in the 
    * output of an EquationSystems<T_sys>. 
    *
    *   14.) The global solution vector, re-ordered to be node-major 
@@ -767,9 +761,9 @@ void SystemBase::write_data (Xdr& io,
     {	  
 
       std::map<std::string, NumericVector<Number>* >::const_iterator
-	pos = _other_vectors.begin();
+	pos = _vectors.begin();
   
-      for(; pos != this->_other_vectors.end(); ++pos)
+      for(; pos != this->_vectors.end(); ++pos)
         {
 	  /**
 	   * fill with zero.  In general, a resize is not necessary

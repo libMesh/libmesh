@@ -1,6 +1,6 @@
-// $Id: mesh_tetgen_support.C,v 1.1 2003-12-08 19:14:43 benkirk Exp $
+// $Id: mesh_tetgen_support.C,v 1.2 2004-01-03 15:37:43 benkirk Exp $
 
-// The Next Great Finite Element Library.
+// The libMesh Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
 
 // This library is free software; you can redistribute it and/or

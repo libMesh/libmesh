@@ -1,7 +1,7 @@
-// $Id: fe_base.C,v 1.19 2003-11-05 22:26:44 benkirk Exp $
+// $Id: fe_base.C,v 1.20 2004-01-03 15:37:42 benkirk Exp $
 
-// The Next Great Finite Element Library.
-// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

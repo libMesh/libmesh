@@ -1,4 +1,4 @@
-/* $Id: ex7.C,v 1.30 2003-11-18 18:48:08 benkirk Exp $ */
+/* $Id: ex7.C,v 1.31 2004-01-03 15:37:41 benkirk Exp $ */
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
 
@@ -168,12 +168,10 @@ int main (int argc, char** argv)
     // a frequency system, as opposed to previous examples.
     EquationSystems equation_systems (mesh);
     
-    // Create a system named "Helmholtz"
-    equation_systems.add_system<FrequencySystem> ("Helmholtz");
-    
-    // Use a handy reference to this system
-    FrequencySystem & f_system =
-      equation_systems.get_system<FrequencySystem> ("Helmholtz");
+    // Create a FrequencySystem named "Helmholtz" & store a
+    // reference to it.
+    FrequencySystem & f_system =      
+      equation_systems.add_system<FrequencySystem> ("Helmholtz");
     
     // Add the variable "p" to "Helmholtz".  "p"
     // will be approximated using second-order approximation.

@@ -1,4 +1,4 @@
-/* $Id: ex6.C,v 1.30 2003-11-18 18:48:07 benkirk Exp $ */
+/* $Id: ex6.C,v 1.31 2004-01-03 15:37:41 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -42,7 +42,7 @@
 // Basic include file needed for the mesh functionality.
 #include "libmesh.h"
 #include "mesh.h"
-#include "steady_system.h"
+#include "implicit_system.h"
 #include "equation_systems.h"
 
 // Define the Finite and Infinite Element object.
@@ -65,8 +65,8 @@
 
 // Function prototype.  This is similar to the Poisson
 // assemble function of example 4.  
-void assemble_wave(EquationSystems& es,
-		   const std::string& system_name);
+void assemble_wave (EquationSystems& es,
+		    const std::string& system_name);
 
 // Begin the main program.
 int main (int argc, char** argv)
@@ -148,7 +148,7 @@ int main (int argc, char** argv)
     {
       // Create a system named "Wave".  This can
       // be a simple, steady system
-      equation_systems.add_system<SteadySystem> ("Wave");
+      equation_systems.add_system<ImplicitSystem> ("Wave");
             
       // Create an FEType describing the approximation
       // characteristics of the InfFE object.  Note that
@@ -216,10 +216,13 @@ void assemble_wave(EquationSystems& es,
   // Get a constant reference to the mesh object.
   const Mesh& mesh = es.get_mesh();
 
+  // Get a reference to the system we are solving.
+  ImplicitSystem & system = es.get_system<ImplicitSystem>("Wave");
+  
   // A reference to the \p DofMap object for this system.  The \p DofMap
   // object handles the index translation from node and element numbers
   // to degree of freedom numbers.
-  const DofMap& dof_map = es("Wave").get_dof_map();
+  const DofMap& dof_map = system.get_dof_map();
   
   // The dimension that we are running.
   const unsigned int dim = mesh.mesh_dimension();
@@ -327,7 +330,7 @@ void assemble_wave(EquationSystems& es,
 	    // Zero the RHS for this element. 	       
 	    Fe.resize (dof_indices.size());
 	    
-	    es("Wave").rhs->add_vector (Fe, dof_indices);
+	    system.rhs->add_vector (Fe, dof_indices);
 	  } // end boundary condition section	     
 	} // else ( if (elem->infinite())) )
 
@@ -445,7 +448,7 @@ void assemble_wave(EquationSystems& es,
       Ke.add(1./speed        , Ce);
       Ke.add(1./(speed*speed), Me);
 
-      es("Wave").matrix->add_matrix (Ke, dof_indices);
+      system.matrix->add_matrix (Ke, dof_indices);
     } // end of element loop
 
   // Note that we have not applied any boundary conditions so far.
@@ -467,7 +470,7 @@ void assemble_wave(EquationSystems& es,
 	    // The global number of the respective degree of freedom.
 	    unsigned int dn = curr_node.dof_number(0,0,0);
 
-	    es("Wave").rhs->add (dn, 1.);
+	    system.rhs->add (dn, 1.);
 	  }
       }
   }

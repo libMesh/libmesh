@@ -1,7 +1,7 @@
-// $Id: newmark_system.C,v 1.9 2003-11-05 22:26:44 benkirk Exp $
+// $Id: newmark_system.C,v 1.1 2004-01-03 15:37:44 benkirk Exp $
 
-// The Next Great Finite Element Library.
-// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -43,7 +43,7 @@ const Real NewmarkSystem::_default_timestep = 1.;
 NewmarkSystem::NewmarkSystem (EquationSystems& es,
 			      const std::string& name,
 			      const unsigned int number) :  
-  TransientSystem    (es, name, number),
+  ImplicitSystem    (es, name, number),
   _a_0               (1./(_default_alpha*_default_timestep*_default_timestep)),
   _a_1               (_default_delta/(_default_alpha*_default_timestep)),
   _a_2               (1./(_default_alpha*_default_timestep)),
@@ -64,7 +64,7 @@ NewmarkSystem::NewmarkSystem (EquationSystems& es,
 
   // add additional matrices and vectors that will be used in the
   // newmark algorithm to the data structure
-  // functions TransientSystem::add_matrix and TransientSystem::add_vector
+  // functions ImplicitSystem::add_matrix and ImplicitSystem::add_vector
   // are used so we do not have to bother about initialization and
   // dof mapping
 
@@ -103,7 +103,7 @@ void NewmarkSystem::clear ()
 {
   // use parent clear this will also clear the
   // matrices and vectors added in the constructor
-  TransientSystem::clear();
+  ImplicitSystem::clear();
 
   // default values of the newmark parameters
   _equation_systems.set_parameter("Newmark alpha") = _default_alpha;
@@ -123,7 +123,7 @@ void NewmarkSystem::reinit ()
   error();
   
   // initialize parent data
-  TransientSystem::reinit();
+  ImplicitSystem::reinit();
 }
 
 
@@ -136,7 +136,7 @@ void NewmarkSystem::assemble ()
     {
       // prepare matrix with the help of the _dof_map, 
       // fill with sparsity pattern
-      TransientSystem::assemble();
+      ImplicitSystem::assemble();
       
       // compute the effective system matrix
       this->compute_matrix();

@@ -1,7 +1,7 @@
-// $Id: mesh_base.h,v 1.4 2003-12-12 22:42:53 jwpeterson Exp $
+// $Id: mesh_base.h,v 1.5 2004-01-03 15:37:42 benkirk Exp $
 
-// The Next Great Finite Element Library.
-// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -62,7 +62,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.4 $
+ * \version $Revision: 1.5 $
  */
 
 
@@ -553,6 +553,13 @@ public:
 		  const std::vector<Number>* v=NULL,
 		  const std::vector<std::string>* solution_names=NULL,
 		  const bool write_partitioning=true);
+
+  /**
+   * Writes a GMV file with discontinuous data
+   */ 
+  void write_discontinuous_gmv (const std::string& name, 
+				EquationSystems& es,
+				const bool write_partitioning);
   
   /**
    * Write the mesh in the GMV binary format to  a file specified by \p name.

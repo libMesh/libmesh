@@ -1,7 +1,7 @@
-// $Id: newmark_system.h,v 1.1 2003-11-05 22:26:42 benkirk Exp $
+// $Id: newmark_system.h,v 1.1 2004-01-03 15:37:42 benkirk Exp $
 
-// The Next Great Finite Element Library.
-// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -25,7 +25,7 @@
 // C++ includes
 
 // Local Includes
-#include "transient_system.h"
+#include "implicit_system.h"
 
 // Forward Declarations
 
@@ -50,7 +50,7 @@
 // ------------------------------------------------------------
 // NewmarkSystem class definition
 
-class NewmarkSystem : public TransientSystem
+class NewmarkSystem : public ImplicitSystem
 {
 public:
 
@@ -67,29 +67,35 @@ public:
    */
   ~NewmarkSystem ();
   
+
+  /**
+   * The type of system.
+   */
+  typedef NewmarkSystem sys_type;
+  
   /**
    * Clear all the data structures associated with
    * the system. 
    */
-  void clear ();
+  virtual void clear ();
 
   /**
    * Reinitializes the member data fields associated with
    * the system, so that, e.g., \p assemble() may be used.
    */
-  void reinit ();
+  virtual void reinit ();
 
   /**
    * Assemble the linear system.  Does not
    * actually call the solver.
    */
-  void assemble ();
+  virtual void assemble ();
   
   /**
    * @returns \p "Newmark".  Helps in identifying
    * the system type in an equation system file.
    */
-  std::string system_type () const { return "Newmark"; }
+  virtual std::string system_type () const { return "Newmark"; }
 
 
   //---------------------------------------------------------

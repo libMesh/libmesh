@@ -1,4 +1,4 @@
-/* $Id: ex5.C,v 1.25 2003-11-11 04:58:33 benkirk Exp $ */
+/* $Id: ex5.C,v 1.26 2004-01-03 15:37:41 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -37,7 +37,7 @@
 // Basic include file needed for the mesh functionality.
 #include "libmesh.h"
 #include "mesh.h"
-#include "steady_system.h"
+#include "implicit_system.h"
 #include "equation_systems.h"
 
 // Define the Finite Element object.
@@ -160,7 +160,7 @@ int main (int argc, char** argv)
     EquationSystems equation_systems (mesh);
     
     {
-      equation_systems.add_system<SteadySystem> ("Poisson");
+      equation_systems.add_system<ImplicitSystem> ("Poisson");
       
       equation_systems("Poisson").add_variable("u", FIRST);
 
@@ -198,7 +198,11 @@ void assemble_poisson(EquationSystems& es,
 
   const unsigned int dim = mesh.mesh_dimension();
 
-  FEType fe_type = es("Poisson").get_dof_map().variable_type(0);
+  ImplicitSystem& system = es.get_system<ImplicitSystem>("Poisson");
+  
+  const DofMap& dof_map = system.get_dof_map();
+  
+  FEType fe_type = dof_map.variable_type(0);
 
   
   // Build a Finite Element object of the specified type.  Since the
@@ -274,9 +278,7 @@ void assemble_poisson(EquationSystems& es,
   const std::vector<std::vector<Real> >& phi = fe->get_phi();
   
   const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
-  
-  const DofMap& dof_map = es("Poisson").get_dof_map();
-  
+    
   DenseMatrix<Number> Ke;
   DenseVector<Number> Fe;
   
@@ -416,8 +418,8 @@ void assemble_poisson(EquationSystems& es,
       // for this element.  Add them to the global matrix and
       // right-hand-side vector.  The \p PetscMatrix::add_matrix()
       // and \p PetscVector::add_vector() members do this for us.
-      es("Poisson").matrix->add_matrix (Ke, dof_indices);
-      es("Poisson").rhs->add_vector    (Fe, dof_indices);
+      system.matrix->add_matrix (Ke, dof_indices);
+      system.rhs->add_vector    (Fe, dof_indices);
       
     } // end of element loop
   

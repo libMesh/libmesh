@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.31 2003-11-30 07:04:17 benkirk Exp $
+# $Id: Make.common.in,v 1.32 2004-01-03 15:37:40 benkirk Exp $
 
 
 ###############################################################################
@@ -197,6 +197,7 @@ LIBMESH_INCLUDES = -I$(libmesh_dir)/include/base \
                    -I$(libmesh_dir)/include/numerics \
                    -I$(libmesh_dir)/include/partitioning \
                    -I$(libmesh_dir)/include/quadrature \
+                   -I$(libmesh_dir)/include/solvers \
                    -I$(libmesh_dir)/include/utils
 
 INCLUDE += $(LIBMESH_INCLUDES)

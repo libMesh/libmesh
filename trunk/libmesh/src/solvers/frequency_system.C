@@ -1,7 +1,7 @@
-// $Id: frequency_system.C,v 1.22 2003-11-05 22:26:44 benkirk Exp $
+// $Id: frequency_system.C,v 1.1 2004-01-03 15:37:44 benkirk Exp $
 
-// The Next Great Finite Element Library.
-// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -44,7 +44,7 @@
 FrequencySystem::FrequencySystem (EquationSystems& es,
 				  const std::string& name,
 				  const unsigned int number) :
-  SteadySystem              (es, name, number),
+  ImplicitSystem            (es, name, number),
   solve_system              (NULL),
   _finished_set_frequencies (false),
   _keep_solution_duplicates (true),
@@ -62,7 +62,7 @@ FrequencySystem::~FrequencySystem ()
 {
   this->clear ();
   
-  // the additional matrices and vectors are cleared and zero'ed in SystemBase
+  // the additional matrices and vectors are cleared and zero'ed in System
 }
 
 
@@ -70,7 +70,7 @@ FrequencySystem::~FrequencySystem ()
 
 void FrequencySystem::clear ()
 {
-  SteadySystem::clear();
+  ImplicitSystem::clear();
 
   _finished_set_frequencies = false;
   _keep_solution_duplicates = true;
@@ -94,12 +94,7 @@ void FrequencySystem::clear ()
 
 void FrequencySystem::clear_all ()
 {
-  SteadySystem::clear();
-
-  _finished_set_frequencies = false;
-  _keep_solution_duplicates = true;
-  _finished_init            = false;
-  _finished_assemble        = false;
+  this->clear ();
 
   // clear frequencies in the parameters section of the 
   // EquationSystems object
@@ -116,6 +111,9 @@ void FrequencySystem::clear_all ()
 
 void FrequencySystem::init_data ()
 {
+  // initialize parent data and additional solution vectors
+  ImplicitSystem::init_data();
+  
   // Log how long initializing the system takes
   START_LOG("init()", "FrequencySystem");
 
@@ -145,9 +143,6 @@ void FrequencySystem::init_data ()
 	}
     }
 
-  // initialize parent data and additional solution vectors
-  SteadySystem::init_data();
-
   _finished_init = true;
 
   // Stop logging init()
@@ -172,13 +167,7 @@ void FrequencySystem::assemble ()
   // prepare matrix with the help of the _dof_map, 
   // fill with sparsity pattern, initialize the
   // additional matrices
-  SteadySystem::assemble();
-
-//   // Optionally call the user-specified matrix assembly function,
-//   // if the user provided it.  Note that \p FrequencySystem also
-//   // works without an _assemble_fptr function
-//   if (_assemble_fptr != NULL)
-//     this->_assemble_fptr (_equation_systems, this->name());
+  ImplicitSystem::assemble();
 
   //matrix.print ();
   //rhs.print    ();
@@ -217,7 +206,7 @@ void FrequencySystem::set_frequencies_by_steps (const Real base_freq,
 
       // build storage for solution vector, if wanted
       if (this->_keep_solution_duplicates)
-	  SystemBase::add_vector(this->form_solu_vec_name(n));
+	  System::add_vector(this->form_solu_vec_name(n));
     }  
 
   _finished_set_frequencies = true;
@@ -257,7 +246,7 @@ void FrequencySystem::set_frequencies_by_range (const Real min_freq,
       
       // build storage for solution vector, if wanted
       if (this->_keep_solution_duplicates)
-	  SystemBase::add_vector(this->form_solu_vec_name(n));
+	  System::add_vector(this->form_solu_vec_name(n));
     }  
 
   _finished_set_frequencies = true;
@@ -293,7 +282,7 @@ void FrequencySystem::set_frequencies (const std::vector<Real>& frequencies,
       
       // build storage for solution vector, if wanted
       if (this->_keep_solution_duplicates)
-	  SystemBase::add_vector(this->form_solu_vec_name(n));
+	  System::add_vector(this->form_solu_vec_name(n));
     }  
 
   _finished_set_frequencies = true;
@@ -313,11 +302,18 @@ unsigned int FrequencySystem::n_frequencies () const
 
 
 
+void FrequencySystem::solve ()
+{
+  assert (this->n_frequencies() > 0);
+
+  // Solve for all the specified frequencies
+  this->solve (0, this->n_frequencies()-1);
+}
 
 
-std::vector< std::pair<unsigned int, Real> >
-FrequencySystem::solve (const unsigned int n_start_in, 
-			const unsigned int n_stop_in)
+
+void FrequencySystem::solve (const unsigned int n_start,
+			     const unsigned int n_stop)
 {
   // Assemble the linear system, if not already done
   if (!_finished_assemble)
@@ -326,31 +322,9 @@ FrequencySystem::solve (const unsigned int n_start_in,
   // the user-supplied solve method _has_ to be provided by the user
   assert (solve_system != NULL);
 
-//  Do not call this, otherwise perflog may count the time twice,
-//  due to the additional START/STOP_LOGs below
-//  // Log how long solve() takes
-//  START_LOG("solve()", "FrequencySystem");
-
-
-  // default values, solve for whole frequency range
-  unsigned int n_start = 0;
-  unsigned int n_stop  = this->n_frequencies()-1;
-
-  if ((n_start_in!=libMesh::invalid_uint) &&
-      (n_stop_in !=libMesh::invalid_uint))
-    {
-      n_start = n_start_in;
-      n_stop  = n_stop_in;
-    }
-  else if (n_stop ==libMesh::invalid_uint)
-    {
-      std::cerr << "ERROR: Forgot to set n_stop." << std::endl;
-      error();
-    }
-
   // existence & range checks
-  assert(n_frequencies() > 0);
-  assert(n_stop < n_frequencies());
+  assert(this->n_frequencies() > 0);
+  assert(n_stop < this->n_frequencies());
 
 
   // Get the user-specified linear solver tolerance,
@@ -359,11 +333,11 @@ FrequencySystem::solve (const unsigned int n_start_in,
   const Real tol            =
     _equation_systems.parameter("linear solver tolerance");
   const unsigned int maxits =
-    static_cast<unsigned int>(_equation_systems.parameter("linear solver maximum iterations"));
+    _equation_systems.parameter<unsigned int>("linear solver maximum iterations");
 
 
-  // return values
-  std::vector< std::pair<unsigned int, Real> > vec_rval;
+//   // return values
+//   std::vector< std::pair<unsigned int, Real> > vec_rval;
 
   // start solver loop
   for (unsigned int n=n_start; n<= n_stop; n++)
@@ -382,30 +356,24 @@ FrequencySystem::solve (const unsigned int n_start_in,
       START_LOG("linear_equation_solve()", "FrequencySystem");
 
       // Solve the linear system for this specific frequency
-      const std::pair<unsigned int, Real> rval = 
+      //const std::pair<unsigned int, Real> rval = 
 	linear_solver_interface->solve (*matrix, *solution, *rhs, tol, maxits);
 
       STOP_LOG("linear_equation_solve()", "FrequencySystem");
 
-      vec_rval.push_back(rval);      
+      //vec_rval.push_back(rval);      
 
       /**
        * store the current solution in the additional vector
        */
       if (this->_keep_solution_duplicates)
 	  this->get_vector(this->form_solu_vec_name(n)) = *solution;
-
     }  
 
   // sanity check
-  assert (vec_rval.size() == (n_stop-n_start+1));
+  //assert (vec_rval.size() == (n_stop-n_start+1));
 
-//  Do not call this, otherwise perflog may count the time twice,
-//  due to the additional START/STOP_LOGs below
-//  // Log how long solve() takes
-//  STOP_LOG("solve()", "FrequencySystem");
-
-  return vec_rval; 
+  //return vec_rval; 
 }
 
 

@@ -1,7 +1,7 @@
-// $Id: libmesh.C,v 1.19 2003-09-29 19:54:12 benkirk Exp $
+// $Id: libmesh.C,v 1.20 2004-01-03 15:37:42 benkirk Exp $
 
-// The Next Great Finite Element Library.
-// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -269,7 +269,8 @@ SolverPackage libMesh::default_solver_package ()
 #endif
       
 #ifdef HAVE_LASPACK
-      if (libMesh::on_command_line ("--use-laspack"))
+      if (libMesh::on_command_line ("--use-laspack"  ) ||
+	  libMesh::on_command_line ("--disable-petsc"))
 	libMeshPrivateData::_solver_package = LASPACK_SOLVERS;
 #endif
       

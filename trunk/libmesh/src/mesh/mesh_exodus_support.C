@@ -1,7 +1,7 @@
-// $Id: mesh_exodus_support.C,v 1.10 2003-10-02 03:39:25 jwpeterson Exp $
+// $Id: mesh_exodus_support.C,v 1.11 2004-01-03 15:37:43 benkirk Exp $
 
-// The Next Great Finite Element Library.
-// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

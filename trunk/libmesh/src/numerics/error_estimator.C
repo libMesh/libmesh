@@ -1,7 +1,7 @@
-// $Id: error_estimator.C,v 1.12 2003-11-05 22:26:45 benkirk Exp $
+// $Id: error_estimator.C,v 1.13 2004-01-03 15:37:43 benkirk Exp $
 
-// The Next Great Finite Element Library.
-// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -46,8 +46,7 @@
 
 //-----------------------------------------------------------------
 // ErrorEstimator implementations
-void ErrorEstimator::flux_jump (const EquationSystems& es,
-				const std::string& name,
+void ErrorEstimator::flux_jump (const SteadySystem& system,
 				std::vector<float>& error_per_cell)
 {
   START_LOG("flux_jump()", "ErrorEstimator");
@@ -88,13 +87,10 @@ void ErrorEstimator::flux_jump (const EquationSystems& es,
 */
    
   // The current mesh
-  const Mesh& mesh = es.get_mesh();
+  const Mesh& mesh = system.get_mesh();
 
   // The dimensionality of the mesh
   const unsigned int dim = mesh.mesh_dimension();
-  
-  // The System object to estimate the error for
-  const SteadySystem& system = es.get_system<SteadySystem>(name);
   
   // The number of variables in the system
   const unsigned int n_vars = system.n_vars();

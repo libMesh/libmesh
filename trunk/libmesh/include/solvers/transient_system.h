@@ -1,7 +1,7 @@
-// $Id: transient_system.h,v 1.1 2003-11-05 22:26:42 benkirk Exp $
+// $Id: transient_system.h,v 1.1 2004-01-03 15:37:42 benkirk Exp $
 
-// The Next Great Finite Element Library.
-// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -25,10 +25,9 @@
 // C++ includes
 
 // Local Includes
-#include "steady_system.h"
-
-
-// Forward Declarations
+#include "system.h"
+#include "implicit_system.h"
+#include "explicit_system.h"
 
 
 /**
@@ -36,13 +35,13 @@
  * at transient systems, offering nothing more than just
  * the essentials needed to solve a system.  Note
  * that still additional vectors/matrices may be added,
- * as offered in the parent class \p SystemBase.
+ * as offered in the parent class \p System.
  */
 
 // ------------------------------------------------------------
 // TransientSystem class definition
-
-class TransientSystem : public SteadySystem
+template <class Base>
+class TransientSystem : public Base
 {
 public:
 
@@ -60,65 +59,33 @@ public:
   ~TransientSystem ();
   
   /**
+   * The type of system.
+   */
+  typedef TransientSystem sys_type;
+
+  /**
+   * @returns a clever pointer to the system.
+   */
+  sys_type & system () { return *this; }
+
+  /**
    * Clear all the data structures associated with
    * the system. 
    */
-  void clear ();
+  virtual void clear ();
 
   /**
    * Reinitializes the member data fields associated with
    * the system, so that, e.g., \p assemble() may be used.
    */
-  void reinit ();
-   
-  /**
-   * Update the local values to reflect the solution
-   * on neighboring processors.
-   */
-  void update ();
-
-//   /**
-//    * Assemble the linear system.  Does not
-//    * actually call the solver.
-//    */
-//   void assemble ();
-  
-//   /**
-//    * Assemble & solve the linear system.
-//    */
-//   std::pair<unsigned int, Real> solve ();
+  virtual void reinit ();
   
   /**
-   * @returns \p "Transient".  Helps in identifying
-   * the system type in an equation system file.
+   * @returns \p "Transient" prepended to T::system_type().
+   * Helps in identifying the system type in an equation
+   * system file.
    */
-  std::string system_type () const { return "Transient"; }
-
-//   /**
-//    * Register a user function to use in initializing the system.
-//    */
-//   void attach_init_function (void fptr(EquationSystems& es,
-// 				       const std::string& name));
-  
-//   /**
-//    * Register a user function to use in assembling the system
-//    * matrix and RHS.
-//    */
-//   void attach_assemble_function (void fptr(EquationSystems& es,
-// 					   const std::string& name));
-  
-//   /**
-//    * Function that initializes the system.
-//    */
-//   void (* init_system) (EquationSystems& es,
-// 			const std::string& name);
-  
-//   /**
-//    * Function that assembles the system.
-//    */
-//   void (* assemble_system) (EquationSystems& es,
-// 			    const std::string& name);
-
+  virtual std::string system_type () const;
 
   
   //-----------------------------------------------------------------
@@ -160,22 +127,42 @@ protected:
    * Initializes the member data fields associated with
    * the system, so that, e.g., \p assemble() may be used.
    */
-  void init_data ();
+  virtual void init_data ();
 
   /**
    * Re-update the local values when the mesh has changed.
    * This method takes the data updated by \p update() and
    * makes it up-to-date on the current mesh.
    */
-  void re_update ();
+  virtual void re_update ();
 };
+
+
+
+// -----------------------------------------------------------
+// Useful typedefs
+typedef TransientSystem<ImplicitSystem> TransientImplicitSystem;
+typedef TransientSystem<ExplicitSystem> TransientExplicitSystem;
 
 
 
 // ------------------------------------------------------------
 // TransientSystem inline methods
+template <class Base>
 inline
-Number TransientSystem::old_solution (const unsigned int global_dof_number) const
+std::string TransientSystem<Base>::system_type () const
+{
+  std::string type = "Transient";
+  type += Base::system_type ();
+  
+  return type;
+}
+
+
+
+template <class Base>
+inline
+Number TransientSystem<Base>::old_solution (const unsigned int global_dof_number) const
 {
   // Check the sizes
   assert (global_dof_number < _dof_map.n_dofs());
@@ -186,8 +173,9 @@ Number TransientSystem::old_solution (const unsigned int global_dof_number) cons
 
 
 
+template <class Base>
 inline
-Number TransientSystem::older_solution (const unsigned int global_dof_number) const
+Number TransientSystem<Base>::older_solution (const unsigned int global_dof_number) const
 {
   // Check the sizes
   assert (global_dof_number < _dof_map.n_dofs());
