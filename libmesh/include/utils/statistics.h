@@ -1,4 +1,4 @@
-// $Id: statistics.h,v 1.4 2005-02-22 22:17:35 jwpeterson Exp $
+// $Id: statistics.h,v 1.5 2005-03-21 21:29:26 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -166,27 +166,25 @@ class StatisticsVector : public std::vector<T>
   { return std::sqrt(this->variance(mean)); }
 
   /**
-   * Computes and returns a histogram with
-   * n_bins bins for the data set.
-   * For simplicity, the bins are assumed to
-   * be of uniform size.  The return values
-   * are unsigned integers which give the number
-   * of members in each bin.
+   * Computes and returns a histogram with n_bins bins for the data
+   * set.  For simplicity, the bins are assumed to be of uniform size.
+   * Upon return, the bin_members vector will contain unsigned
+   * integers which give the number of members in each bin.
    * Source: GNU Scientific Library
    */
-  virtual std::vector<unsigned int> histogram(unsigned int n_bins=10);
+  virtual void histogram (std::vector<unsigned int>& bin_members,
+			  unsigned int n_bins=10);
 
   /**
-   * A const version of the median function.
-   * Requires twice the memory of the data set
-   * but does not change the original.
+   * A const version of the histogram function.
    */
-  virtual std::vector<unsigned int> histogram(unsigned int n_bins=10) const;
+  virtual void histogram (std::vector<unsigned int>& bin_members,
+			  unsigned int n_bins=10) const;
 
   /**
    * Returns a vector of unsigned ints which correspond
    * to the indices of every member of the data set
-   * below the cutoff value cut.
+   * below the cutoff value "cut".
    */
   virtual std::vector<unsigned int> cut_below(Real cut) const;
 

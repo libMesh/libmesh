@@ -1,4 +1,4 @@
-// $Id: statistics.C,v 1.15 2005-02-22 22:17:43 jwpeterson Exp $
+// $Id: statistics.C,v 1.16 2005-03-21 21:29:26 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -157,7 +157,8 @@ Real StatisticsVector<T>::variance(const Real mean) const
 
 
 template <typename T>
-std::vector<unsigned int> StatisticsVector<T>::histogram(unsigned int n_bins)
+void StatisticsVector<T>::histogram(std::vector<unsigned int>& bin_members,
+				    unsigned int n_bins)
 {
   const unsigned int n   = this->size();
   
@@ -171,39 +172,38 @@ std::vector<unsigned int> StatisticsVector<T>::histogram(unsigned int n_bins)
   
   std::vector<T> bin_bounds(n_bins+1);
   for (unsigned int i=0; i<n_bins+1; i++)
-      bin_bounds[i] = min + i * bin_size;
+    bin_bounds[i] = min + i * bin_size;
   
-  std::vector<unsigned int> bin_members(n_bins);
-
+  // std::vector<unsigned int> bin_members(n_bins);
+  bin_members.resize(n_bins+1);
+  
   unsigned int data_index = 0;
   for (unsigned int j=1; j<n_bins+1; j++) 
-    {
-      for (unsigned int i=data_index; i<n; i++) 
-	{
-	  if ( (*this)[i] > bin_bounds[j] ) 
-	    {
-	      data_index = i+1; 
-	      bin_members[j]++; 
-	      break;
-	    }
-	  
-	  bin_members[j-1]++; 
-	}
-    }
+    for (unsigned int i=data_index; i<n; i++) 
+      {
+	if ( (*this)[i] > bin_bounds[j] ) 
+	  {
+	    data_index = i+1; 
+	    bin_members[j]++; 
+	    break;
+	  }
+	
+	bin_members[j-1]++; 
+      }
+
   
   STOP_LOG ("histogram()", "StatisticsVector");
-  
- return bin_members; 
 }
 
 
 
 template <typename T>
-std::vector<unsigned int> StatisticsVector<T>::histogram(unsigned int n_bins) const
+void StatisticsVector<T>::histogram(std::vector<unsigned int>& bin_members,
+				    unsigned int n_bins) const
 {
   StatisticsVector<T> sv = (*this);
   
-  return sv.histogram(n_bins);
+  return sv.histogram(bin_members, n_bins);
 }
 
 
