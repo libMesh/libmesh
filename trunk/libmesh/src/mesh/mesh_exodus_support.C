@@ -1,4 +1,4 @@
-// $Id: mesh_exodus_support.C,v 1.6 2003-02-13 22:56:12 benkirk Exp $
+// $Id: mesh_exodus_support.C,v 1.7 2003-06-12 21:56:31 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -54,12 +54,12 @@ const int ExodusII::ElementMaps::quad8_node_map[8] = {0, 1, 2, 3, 4, 5, 6, 7};
   
 const int ExodusII::ElementMaps::quad9_node_map[9] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
   
-const int ExodusII::ElementMaps::tri3_node_map[3]  = {0, 2, 1};
+const int ExodusII::ElementMaps::tri3_node_map[3]  = {0, 1, 2};
   
-const int ExodusII::ElementMaps::tri6_node_map[6]  = {0, 2, 1, 5, 4, 3};
+const int ExodusII::ElementMaps::tri6_node_map[6]  = {0, 1, 2, 3, 4, 5};
 
 // 2D edge map definitions
-const int ExodusII::ElementMaps::tri_edge_map[3] = {2, 0, 1};
+const int ExodusII::ElementMaps::tri_edge_map[3] = {0, 1, 2};
 
 const int ExodusII::ElementMaps::quad_edge_map[4] = {0, 1, 2, 3};
 
