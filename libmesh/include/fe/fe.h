@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.1 2003-11-05 22:26:43 benkirk Exp $
+// $Id: fe.h,v 1.2 2003-12-12 22:42:52 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -52,7 +52,7 @@ class InfFE;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.1 $
+ * \version $Revision: 1.2 $
  */
 
 //-------------------------------------------------------------
@@ -102,13 +102,43 @@ public:
 
   /**
    * @returns the \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
-   * shape functionelement type, and order directly.
+   * shape function.  You must specify element type, and order directly.
    */
   static Real shape_deriv(const Elem* elem,
 			  const Order o,
 			  const unsigned int i,
 			  const unsigned int j,
 			  const Point& p);
+
+  /**
+   * @returns the second \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
+   * shape function at the point \p p.  Note that cross-derivatives are
+   * also possible, i.e.
+   * j = 0 ==> d^2 phi / dxi^2
+   * j = 1 ==> d^2 phi / dxi deta
+   * j = 2 ==> d^2 phi / deta^2
+   *
+   * Note 1) Computing second derivatives is currently only supported
+   * for 2D element types, since the second derivaties are needed
+   * for the computation of curvature in e.g. surface tension boundary
+   * conditions for deformed surfaces.  The 1D element type EDGE3
+   * does have its second derivatives calculated since it is used in
+   * the tensor product for QUAD9.  All 3D element types should
+   * throw an error for the method.
+   *
+   * Note 2) We only need second derivatives (typically) for computing
+   * the curvature of element faces.  Since only quadratic (and biquadratic)
+   * Lagrange shape functions are used to compute the map between the
+   * physical element and the reference element, only Lagrange second
+   * derivatives have been provided.  All other element types return
+   * an error when asked for second derivatives.
+   */
+  static Real shape_second_deriv(const ElemType t,
+				 const Order o,
+				 const unsigned int i,
+				 const unsigned int j,
+				 const Point& p);
+
   
   /**
    * Build the nodal soln from the element soln.
@@ -315,7 +345,7 @@ private:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.1 $
+ * \version $Revision: 1.2 $
  */
 
 //-------------------------------------------------------------
@@ -340,7 +370,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.1 $
+ * \version $Revision: 1.2 $
  */
 
 //-------------------------------------------------------------
@@ -365,7 +395,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.1 $
+ * \version $Revision: 1.2 $
  */
 
 //-------------------------------------------------------------

@@ -1,4 +1,4 @@
-// $Id: fe_lagrange_shape_1D.C,v 1.8 2003-09-02 18:02:41 benkirk Exp $
+// $Id: fe_lagrange_shape_1D.C,v 1.9 2003-12-12 22:42:53 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -248,4 +248,62 @@ Real FE<1,LAGRANGE>::shape_deriv(const Elem* elem,
   
   return FE<1,LAGRANGE>::shape_deriv(elem->type(),
 				     order, i, j, p);
+}
+
+
+
+
+template <>
+Real FE<1,LAGRANGE>::shape_second_deriv(const ElemType,
+					const Order order,
+					const unsigned int i,
+					const unsigned int j,
+					const Point&)
+{
+  // Don't need to switch on j.  1D shape functions
+  // depend on xi only!
+
+  assert (j == 0);
+  
+  switch (order)
+    {
+      // linear Lagrange shape functions
+    case FIRST:
+      {
+	// All second derivatives of linears are zero....
+	return 0.;
+      }
+
+      // quadratic Lagrange shape functions
+    case SECOND:
+      {
+	switch (i)
+	  {
+	  case 0:
+	    return 1.;
+	    
+	  case 1:
+	    return 1.;
+	    
+	  case 2:
+	    return -2.;
+	    
+	  default:
+	    {
+	      std::cerr << "Invalid shape function index requested!"
+			<< std::endl;
+	      error();
+	    }
+	  }
+      } // end case SECOND
+
+    default:
+      {
+	std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
+	error();
+      }
+    } // end switch (order)
+  
+  error();
+  return 0.;
 }

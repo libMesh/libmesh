@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.1 2003-11-05 22:26:43 benkirk Exp $
+// $Id: fe_base.h,v 1.2 2003-12-12 22:42:52 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -247,6 +247,12 @@ public:
    */
   const std::vector<Point>& get_normals() const
   { return normals; }
+
+  /**
+   * @returns the curvatures for use in face integration.
+   */
+  const std::vector<Real>& get_curvatures() const
+  { return curvatures;}
   
   /**
    * Provides the class with the quadrature rule.  Implement
@@ -453,7 +459,24 @@ protected:
    */
   std::vector<RealGradient> dxyzdzeta_map;
   
+  /**
+   * Vector of second partial derivatives in xi:
+   * d^2(x)/d(xi)^2, d^2(y)/d(xi)^2, d^2(z)/d(xi)^2
+   */
+  std::vector<RealGradient> d2xyzdxi2_map;
 
+  /**
+   * Vector of mixed second partial derivatives in xi-eta:
+   * d^2(x)/d(xi)d(eta) d^2(y)/d(xi)d(eta) d^2(z)/d(xi)d(eta)
+   */
+  std::vector<RealGradient> d2xyzdxideta_map;
+
+  /**
+   * Vector of second partial derivatives in eta:
+   * d^2(x)/d(eta)^2 
+   */
+  std::vector<RealGradient> d2xyzdeta2_map;
+  
   /**
    * Map for partial derivatives:
    * d(xi)/d(x). Needed for the Jacobian.
@@ -602,9 +625,27 @@ protected:
    */
   std::vector<std::vector<Real> >   dpsideta_map;
 
+  /**
+   * Map for the second derivatives (in xi) of the
+   * side shape functions.  Useful for computing
+   * the curvature at the quadrature points.
+   */
+  std::vector<std::vector<Real> > d2psidxi2_map;
 
+  /**
+   * Map for the second (cross) derivatives in xi, eta
+   * of the side shape functions.  Useful for
+   * computing the curvature at the quadrature points.
+   */
+  std::vector<std::vector<Real> > d2psidxideta_map;
 
-
+  /**
+   * Map for the second derivatives (in eta) of the
+   * side shape functions.  Useful for computing the
+   * curvature at the quadrature points.
+   */
+  std::vector<std::vector<Real> > d2psideta2_map;
+  
 #ifdef ENABLE_INFINITE_ELEMENTS
 
   //--------------------------------------------------------------
@@ -649,6 +690,13 @@ protected:
    */
   std::vector<Point>                normals;
 
+  /**
+   * The mean curvature (= one half the sum of the principal
+   * curvatures) on the boundary at the quadrature points.
+   * The mean curvature is a scalar value.
+   */
+  std::vector<Real>                 curvatures;
+  
   /**
    * Jacobian*Weight values at quadrature points
    */

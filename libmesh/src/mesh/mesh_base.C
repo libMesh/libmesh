@@ -1,9 +1,9 @@
-// $Id: mesh_base.C,v 1.61 2003-11-14 14:47:36 benkirk Exp $
+// $Id: mesh_base.C,v 1.62 2003-12-12 22:42:53 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
   
-// This library is free software; you can redistribute it and/or
+// This library is free software; you can redistribute and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.

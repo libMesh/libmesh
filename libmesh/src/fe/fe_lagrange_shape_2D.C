@@ -1,4 +1,4 @@
-// $Id: fe_lagrange_shape_2D.C,v 1.8 2003-09-02 18:02:41 benkirk Exp $
+// $Id: fe_lagrange_shape_2D.C,v 1.9 2003-12-12 22:42:53 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -589,3 +589,392 @@ Real FE<2,LAGRANGE>::shape_deriv(const Elem* elem,
   return FE<2,LAGRANGE>::shape_deriv(elem->type(), order, i, j, p);
 }
 
+
+
+
+template <>
+Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
+					const Order order,
+					const unsigned int i,
+					const unsigned int j,
+					const Point& p)
+{
+#if DIM > 1
+
+  // j = 0 ==> d^2 phi / dxi^2
+  // j = 1 ==> d^2 phi / dxi deta
+  // j = 2 ==> d^2 phi / deta^2
+  assert (j < 3);
+
+  switch (order)
+    {
+      // linear Lagrange shape functions
+    case FIRST:
+      {
+	switch (type)
+	  {
+	  case QUAD4:
+	  case QUAD8:
+	  case QUAD9:
+	    {
+	      // Compute quad shape functions as a tensor-product
+	      const Real xi  = p(0);
+	      const Real eta = p(1);
+	      
+	      assert (i<4);
+	      
+	      //                                0  1  2  3  
+	      static const unsigned int i0[] = {0, 1, 1, 0};
+	      static const unsigned int i1[] = {0, 0, 1, 1};
+	      
+	      switch (j)
+		{
+		  // d^2() / dxi^2
+		case 0:
+		  return 0.;
+		  
+		  // d^2() / dxi deta
+		case 1:
+		  return (FE<1,LAGRANGE>::shape_deriv(EDGE2, FIRST, i0[i], 0, xi)*
+			  FE<1,LAGRANGE>::shape_deriv(EDGE2, FIRST, i1[1], 0, eta));
+		  
+		  // d^2() / deta^2
+		case 2:
+		  return 0.;
+
+		default:
+		  {
+		    std::cerr << "ERROR: Invalid derivative requested! "
+			      << std::endl;
+		    error();
+		  }
+		}
+	    }
+
+	  case TRI3:
+	  case TRI6:
+	    {
+	      // All second derivatives for linear triangles are zero.
+	      return 0.;
+	    }
+
+	  default:
+	    {
+	      std::cerr << "ERROR: Unsupported 2D element type!: " << type
+			<< std::endl;
+	      error();
+	    }
+	    
+	  } // end switch (type)
+      } // end case FIRST
+
+      
+      // quadratic Lagrange shape functions
+    case SECOND:
+      {
+	switch (type)
+	  {
+	  case QUAD8:
+	    {
+	      const Real xi  = p(0);
+	      const Real eta = p(1);
+
+	      assert (j < 3);
+	      
+	      switch (j)
+		{
+		  // d^2() / dxi^2
+		case 0:
+		  {
+		    switch (i)
+		      {
+		      case 0:
+		      case 1:
+			return 0.5*(1.-eta);
+
+		      case 2:
+		      case 3:
+			return 0.5*(1.+eta);
+
+		      case 4:
+			return eta - 1.;
+
+		      case 5:
+		      case 7:
+			return 0.0;
+
+		      case 6:
+			return -1. - eta;
+
+		      default:
+			{
+			  std::cerr << "Invalid shape function index requested!"
+				    << std::endl;
+			  error();
+			}
+		      }
+		  }
+		  
+		  // d^2() / dxi deta
+		case 1:
+		  {
+		    switch (i)
+		      {
+		      case 0:
+			return 0.25*( 1. - 2.*xi - 2.*eta);
+
+		      case 1:
+			return 0.25*(-1. - 2.*xi + 2.*eta);
+
+		      case 2:
+			return 0.25*( 1. + 2.*xi + 2.*eta);
+
+		      case 3:
+			return 0.25*(-1. + 2.*xi - 2.*eta);
+
+		      case 4:
+			return xi;
+
+		      case 5:
+			return -eta;
+
+		      case 6:
+			return -xi;
+
+		      case 7:
+			return eta;
+
+		      default:
+			{
+			  std::cerr << "Invalid shape function index requested!"
+				    << std::endl;
+			  error();
+			}
+		      }
+		  }
+
+		  // d^2() / deta^2
+		case 2:
+		  {
+		    switch (i)
+		      {
+		      case 0:
+		      case 3:
+			return 0.5*(1.-xi);
+
+		      case 1:
+		      case 2:
+			return 0.5*(1.+xi);
+
+		      case 4:
+		      case 6:
+			return 0.0;
+
+		      case 5:
+			return -1.0 - xi;
+
+		      case 7:
+			return xi - 1.0;
+			
+		      default:
+			{
+			  std::cerr << "Invalid shape function index requested!"
+				    << std::endl;
+			  error();
+			}
+		      }
+		  }
+
+		  
+		default:
+		  {
+		    std::cerr << "ERROR: Invalid derivative requested! "
+			      << std::endl;
+		    error();
+		  }
+		} // end switch (j)
+	    } // end case QUAD8
+
+	  case QUAD9:
+	    {
+	      // Compute QUAD9 second derivatives as tensor product
+	      const Real xi  = p(0);
+	      const Real eta = p(1);
+
+	      assert (i<9);
+
+	      //                                0  1  2  3  4  5  6  7  8
+	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 1, 2, 0, 2};
+	      static const unsigned int i1[] = {0, 0, 1, 1, 0, 2, 1, 2, 2};
+
+	      switch (j)
+		{
+		  // d^2() / dxi^2
+		case 0:
+		  return (FE<1,LAGRANGE>::shape_second_deriv(EDGE3, SECOND, i0[i], 0, xi)*
+			  FE<1,LAGRANGE>::shape             (EDGE3, SECOND, i1[i], eta));
+		  
+		  // d^2() / dxi deta
+		case 1:
+		  return (FE<1,LAGRANGE>::shape_deriv(EDGE3, SECOND, i0[i], 0, xi)*
+			  FE<1,LAGRANGE>::shape_deriv(EDGE3, SECOND, i1[i], 0, eta));
+
+		  // d^2() / deta^2
+		case 2:
+		  return (FE<1,LAGRANGE>::shape             (EDGE3, SECOND, i0[i], xi)*
+			  FE<1,LAGRANGE>::shape_second_deriv(EDGE3, SECOND, i1[i], 0, eta));
+
+		default:
+		  {
+		    std::cerr << "ERROR: Invalid derivative requested! "
+			      << std::endl;
+		    error();
+		  }
+		}  // end switch (j)
+	    } // end case QUAD9
+
+	  case TRI6:
+	    {
+	      const Real dzeta0dxi  = -1.;
+	      const Real dzeta1dxi  = 1.;
+	      const Real dzeta2dxi  = 0.;
+
+	      const Real dzeta0deta = -1.;
+	      const Real dzeta1deta = 0.;
+	      const Real dzeta2deta = 1.;
+
+	      assert (j < 3);
+
+	      switch (j)
+		{
+		  // d^2() / dxi^2
+		case 0:
+		  {
+		    switch (i)
+		      {
+		      case 0:
+			return 4.*dzeta0dxi*dzeta0dxi;
+			
+		      case 1:
+			return 4.*dzeta1dxi*dzeta1dxi;
+			
+		      case 2:
+			return 4.*dzeta2dxi*dzeta2dxi;
+			
+		      case 3:
+			return 8.*dzeta0dxi*dzeta1dxi;
+			
+		      case 4:
+			return 8.*dzeta1dxi*dzeta2dxi;
+			
+		      case 5:
+			return 8.*dzeta0dxi*dzeta2dxi;
+			
+		      default:
+			{
+			  std::cerr << "Invalid shape function index requested!"
+				    << std::endl;
+			  error();
+			}
+		      }
+		  }
+		  
+		  // d^2() / dxi deta
+		case 1:
+		  {
+		    switch (i)
+		      {
+		      case 0:
+			return 4.*dzeta0dxi*dzeta0deta;
+			
+		      case 1:
+			return 4.*dzeta1dxi*dzeta1deta;
+			
+		      case 2:
+			return 4.*dzeta2dxi*dzeta2deta;
+			
+		      case 3:
+			return 4.*dzeta1deta*dzeta0dxi + 4.*dzeta0deta*dzeta1dxi;
+			
+		      case 4:
+			return 4.*dzeta2deta*dzeta1dxi + 4.*dzeta1deta*dzeta2dxi;
+			
+		      case 5:
+			return 4.*dzeta2deta*dzeta0dxi + 4.*dzeta0deta*dzeta2dxi;
+
+		      default:
+			{
+			  std::cerr << "Invalid shape function index requested!"
+				    << std::endl;
+			  error();
+			}
+		      }
+		  }
+
+		  // d^2() / deta^2
+		case 2:
+		  {
+		    switch (i)
+		      {
+		      case 0:
+			return 4.*dzeta0deta*dzeta0deta;
+			
+		      case 1:
+			return 4.*dzeta1deta*dzeta1deta;
+			
+		      case 2:
+			return 4.*dzeta2deta*dzeta2deta;
+			
+		      case 3:
+			return 8.*dzeta0deta*dzeta1deta;
+			
+		      case 4:
+			return 8.*dzeta1deta*dzeta2deta;
+			
+		      case 5:
+			return 8.*dzeta0deta*dzeta2deta;
+
+		      default:
+			{
+			  std::cerr << "Invalid shape function index requested!"
+				    << std::endl;
+			  error();
+			} 
+		      }
+		  }
+
+		default:
+		  {
+		    std::cerr << "ERROR: Invalid derivative requested! "
+			      << std::endl;
+		    error();
+		  }
+		} // end switch (j)
+	    }  // end case TRI6
+	    
+	  default:
+	    {
+	      std::cerr << "ERROR: Unsupported 2D element type!: " << type
+			<< std::endl;
+	      error();
+	    }
+	  }
+      } // end case SECOND
+
+
+
+      // unsupported order
+    default:
+      {
+	std::cerr << "ERROR: Unsupported 2D FE order!: " << order
+		  << std::endl;
+	error();
+      }
+      
+    } // end switch (order)
+
+  
+  error();
+  return 0.;
+#endif // DIM > 1
+}

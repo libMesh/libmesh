@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.3 2003-12-08 19:14:41 benkirk Exp $
+// $Id: mesh_base.h,v 1.4 2003-12-12 22:42:53 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -62,7 +62,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.3 $
+ * \version $Revision: 1.4 $
  */
 
 
@@ -650,7 +650,7 @@ public:
   
   /**
    * Returns a pair of std::vector<Node*>::iterators which point
-   * to the beginning and end of the _nodeents vector.
+   * to the beginning and end of the _nodes vector.
    */
   std::pair<std::vector<Node*>::iterator,
 	    std::vector<Node*>::iterator>
