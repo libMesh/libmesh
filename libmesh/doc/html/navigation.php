@@ -91,8 +91,3 @@ function load_style($root)
 <?php } ?>
 
 
-<?php if (0) { ?>
-# Local Variables:
-# mode: html
-# End:
-<?php } ?>
