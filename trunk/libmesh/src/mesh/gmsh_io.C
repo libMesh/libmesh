@@ -1,4 +1,4 @@
-// $Id: gmsh_io.C,v 1.9 2005-03-30 15:21:14 benkirk Exp $
+// $Id: gmsh_io.C,v 1.10 2005-03-31 20:40:06 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -251,6 +251,16 @@ namespace
           const unsigned int nodes_imp[] = {1,2,3,4,5,6,7,10,8,9,11,12,13,15,14,16,18,17};
           std::vector<unsigned int>(nodes_imp, nodes_imp+nnodes).swap(eledef.nodes);
           eletypes_imp[13]      = eledef;
+	}
+
+	// PYRAMID5
+	{
+          eledef.type    = PYRAMID5;
+	  eledef.exptype = 7;
+	  eledef.nodes.clear();
+	  
+	  eletypes_exp[PYRAMID5] = eledef;
+          eletypes_imp[7]        = eledef;
 	}
 	//==============================      
       }
