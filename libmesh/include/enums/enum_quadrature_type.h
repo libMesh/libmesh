@@ -1,4 +1,4 @@
-// $Id: enum_quadrature_type.h,v 1.2 2004-01-03 15:37:41 benkirk Exp $
+// $Id: enum_quadrature_type.h,v 1.3 2005-01-13 21:06:50 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -41,8 +41,11 @@ namespace libMeshEnums {
 
 		       QSIMPSON    = 3,
 		       QTRAP       = 4,
+		       QGRID       = 5,
 
-		       INVALID_Q_RULE};
+		       QCLOUGH     = 21,
+
+		       INVALID_Q_RULE = 127};
 }
 
 using namespace libMeshEnums;
