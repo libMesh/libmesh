@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.23 2003-03-03 02:15:57 benkirk Exp $
+// $Id: mesh_base.h,v 1.24 2003-03-03 22:23:32 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -63,7 +63,7 @@ template <typename T> class PetscMatrix;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.23 $
+ * \version $Revision: 1.24 $
  */
 
 
@@ -682,7 +682,7 @@ protected:
   /**
    * Return a pointer to the \f$ i^{th} \f$ node.
    */  
-  Node* node_ptr (const unsigned int i) const;
+  const Node* node_ptr (const unsigned int i) const;
 
   /**
    * Return a pointer to the \f$ i^{th} \f$ node.
@@ -967,7 +967,7 @@ void MeshBase::prepare_for_use ()
 
 
 inline
-Node* MeshBase::node_ptr (const unsigned int i) const
+const Node* MeshBase::node_ptr (const unsigned int i) const
 {
   assert (i < this->n_nodes());
   assert (_nodes[i] != NULL);
