@@ -1,4 +1,4 @@
-// $Id: mesh_data.C,v 1.2 2003-05-15 23:34:35 benkirk Exp $
+// $Id: mesh_data.C,v 1.3 2003-05-15 23:57:02 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -213,7 +213,7 @@ const Node* MeshData::foreign_id_to_node (const unsigned int fid) const
   assert (_active);
   assert (_node_id_map_closed);
 
-  std::map<const unsigned int,
+  std::map<unsigned int,
            const Node*>::const_iterator pos = _id_node.find(fid);
 
   if (pos == _id_node.end())
@@ -243,7 +243,7 @@ unsigned int MeshData::node_to_foreign_id (const Node* n) const
    * look it up in the map
    */
   std::map<const Node*,
-	   const unsigned int>::const_iterator pos = _node_id.find(n);
+	   unsigned int>::const_iterator pos = _node_id.find(n);
 
   if (pos == _node_id.end())
     {
@@ -270,7 +270,7 @@ const Elem* MeshData::foreign_id_to_elem (const unsigned int fid) const
   assert (_active);
   assert (_elem_id_map_closed);
 
-  std::map<const unsigned int,
+  std::map<unsigned int,
            const Elem*>::const_iterator pos = _id_elem.find(fid);
 
   if (pos == _id_elem.end())
@@ -300,7 +300,7 @@ unsigned int MeshData::elem_to_foreign_id (const Elem* e) const
    * look it up in the map
    */
   std::map<const Elem*,
-	   const unsigned int>::const_iterator pos = _elem_id.find(e);
+	   unsigned int>::const_iterator pos = _elem_id.find(e);
 
   if (pos == _elem_id.end())
     {

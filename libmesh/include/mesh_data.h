@@ -1,4 +1,4 @@
-// $Id: mesh_data.h,v 1.2 2003-05-15 23:34:34 benkirk Exp $
+// $Id: mesh_data.h,v 1.3 2003-05-15 23:57:02 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -270,13 +270,13 @@ protected:
    * format.  
    */
   std::map<const Node*,
-           const unsigned int> _node_id;
+           unsigned int> _node_id;
 
   /**
    * Maps @e foreign node ids to node pointers of the
    * current mesh.
    */
-  std::map<const unsigned int,
+  std::map<unsigned int,
            const Node*> _id_node;
 
   /**
@@ -299,12 +299,12 @@ protected:
    * format.  
    */
   std::map<const Elem*,
-           const unsigned int> _elem_id;
+           unsigned int> _elem_id;
   /**
    * Maps @e foreign element labels to element pointers of the
    * current mesh.
    */
-  std::map<const unsigned int,
+  std::map<unsigned int,
            const Elem*> _id_elem;
 
   /**
@@ -434,11 +434,10 @@ Number MeshData::safe (const Node* node,
 #endif
       error();
     }
-  else
-    {
-      assert (i < (*pos).second.size());
-      return (*pos).second[i];
-    }
+
+
+  assert (i < (*pos).second.size());
+  return (*pos).second[i];
 }
 
 
@@ -479,12 +478,11 @@ Number MeshData::operator() (const Elem* elem,
            std::vector<Number> >::const_iterator pos = _elem_data.find(elem);
 
   if (pos == _elem_data.end())
-      return libMesh::zero;
-  else
-    {
-      assert (i < (*pos).second.size());
-      return (*pos).second[i];
-    }
+    return libMesh::zero;
+  
+  
+  assert (i < (*pos).second.size());
+  return (*pos).second[i];
 }
 
 
@@ -508,11 +506,10 @@ Number MeshData::safe (const Elem* elem,
 #endif
       error();
     }
-  else
-    {
-      assert (i < (*pos).second.size());
-      return (*pos).second[i];
-    }
+
+
+  assert (i < (*pos).second.size());
+  return (*pos).second[i];
 }
 
 
@@ -552,7 +549,7 @@ bool MeshData::active() const
 inline
 bool MeshData::elem_initialized() const
 {
-    return (_active && _elem_data_closed);
+  return (_active && _elem_data_closed);
 }
 
 
@@ -560,7 +557,7 @@ bool MeshData::elem_initialized() const
 inline
 bool MeshData::node_initialized() const
 {
-    return (_active && _node_data_closed);
+  return (_active && _node_data_closed);
 }
 
 
