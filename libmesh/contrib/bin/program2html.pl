@@ -2,7 +2,7 @@
 # With modifications for libmesh by John W. Peterson, 2003.
 
 # print "<a name=\"CommProg\"></a>\n";
-print "<h1> The commented program</h1>\n";
+# print "<h1> The commented program</h1>\n";
 
 # ignore comments at the start of the program. this includes CVS
 # tags and copyright notices.

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# The first argument is the C file name (ex1.C) which
+# The first argument is the C file name e.g. (ex1.C) which
 # is going to be converted to html.
 # The output file name is implied by it.
 input_file=$1;
@@ -39,7 +39,14 @@ echo "</html>" >> $output_file;
 
 # Put in a few emacs comments to force syntax highlighting
 echo "<?php if (0) { ?>" >> $output_file;
-echo "\# Local Variables:" >> $output_file;
-echo "\# mode: html" >> $output_file;
-echo "\# End:" >> $output_file;
+echo "\#Local Variables:" >> $output_file;
+echo "\#mode: html" >> $output_file;
+echo "\#End:" >> $output_file;
 echo "<?php } ?>" >> $output_file;
+
+# Finally, move the output_file to the html directory
+mv $output_file ../../doc/html
+
+# Local Variables:
+# mode: shell-script
+# End:

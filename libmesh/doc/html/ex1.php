@@ -6,15 +6,14 @@
 </head>
  
 <body>
-
  
 <?php make_navigation("examples",$root)?>
  
 <div class="content">
-<h1> The commented program</h1>
 <div class = "comment">
-Example 1
-This is the first example program.  It simply demonstrates
+Example 1 -- Creation of a Mesh Object
+
+<br><br>This is the first example program.  It simply demonstrates
 how to create a mesh object.  A mesh is read from file,
 information is printed to the screen, and the mesh is then
 written.
@@ -217,7 +216,7 @@ can be useful for testing purposes.
 </body>
 </html>
 <?php if (0) { ?>
-\# Local Variables:
-\# mode: html
-\# End:
+\#Local Variables:
+\#mode: html
+\#End:
 <?php } ?>

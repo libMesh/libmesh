@@ -1,4 +1,4 @@
-/* $Id: ex1.C,v 1.5 2003-11-06 20:51:36 jwpeterson Exp $ */
+/* $Id: ex1.C,v 1.6 2003-11-06 21:23:28 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -17,7 +17,8 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
- // Example 1
+ // Example 1 -- Creation of a Mesh Object
+ // 
  // This is the first example program.  It simply demonstrates
  // how to create a mesh object.  A mesh is read from file,
  // information is printed to the screen, and the mesh is then
