@@ -1,4 +1,4 @@
-// $Id: linear_implicit_system.C,v 1.2 2005-02-22 22:17:43 jwpeterson Exp $
+// $Id: linear_implicit_system.C,v 1.3 2005-03-18 16:56:12 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -83,14 +83,18 @@ void LinearImplicitSystem::solve ()
 
   // Log how long the linear solve takes.
   START_LOG("solve()", "System");
+
+  // Get a reference to the EquationSystems
+  const EquationSystems& es =
+    this->get_equation_systems();
   
   // Get the user-specifiied linear solver tolerance
   const Real tol            =
-    _equation_systems.parameters.get<Real>("linear solver tolerance");
+    es.parameters.get<Real>("linear solver tolerance");
 
   // Get the user-specified maximum # of linear solver iterations
   const unsigned int maxits =
-    _equation_systems.parameters.get<unsigned int>("linear solver maximum iterations");
+    es.parameters.get<unsigned int>("linear solver maximum iterations");
 
   // Solve the linear system.  Two cases:
   const std::pair<unsigned int, Real> rval =

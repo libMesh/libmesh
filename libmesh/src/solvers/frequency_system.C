@@ -1,4 +1,4 @@
-// $Id: frequency_system.C,v 1.8 2005-02-22 22:17:43 jwpeterson Exp $
+// $Id: frequency_system.C,v 1.9 2005-03-18 16:56:12 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -96,13 +96,16 @@ void FrequencySystem::clear_all ()
 {
   this->clear ();
 
+  EquationSystems& es =
+    this->get_equation_systems();
+  
   // clear frequencies in the parameters section of the 
   // EquationSystems object
-  if (_equation_systems.parameters.have_parameter<unsigned int> ("n_frequencies"))
+  if (es.parameters.have_parameter<unsigned int> ("n_frequencies"))
     {
-      for (unsigned int n=0; n < _equation_systems.parameters.get<unsigned int>("n_frequencies"); n++)
-	_equation_systems.parameters.remove(this->form_freq_param_name(n));
-      _equation_systems.parameters.remove("current frequency");
+      for (unsigned int n=0; n < es.parameters.get<unsigned int>("n_frequencies"); n++)
+	es.parameters.remove(this->form_freq_param_name(n));
+      es.parameters.remove("current frequency");
     }
 }
 
@@ -117,6 +120,9 @@ void FrequencySystem::init_data ()
   // Log how long initializing the system takes
   START_LOG("init()", "FrequencySystem");
 
+  EquationSystems& es =
+    this->get_equation_systems();
+
   // make sure we have frequencies to solve for
   if (!_finished_set_frequencies)
     {
@@ -125,10 +131,10 @@ void FrequencySystem::init_data ()
        * if this has a "n_frequencies" parameter,
        * and initialize us with these.
        */
-      if (_equation_systems.parameters.have_parameter<unsigned int> ("n_frequencies"))
+      if (es.parameters.have_parameter<unsigned int> ("n_frequencies"))
         {
 	  const unsigned int n_freq = 
-	    _equation_systems.parameters.get<unsigned int>("n_frequencies");
+	    es.parameters.get<unsigned int>("n_frequencies");
 
 	  assert(n_freq > 0);
 
@@ -195,13 +201,16 @@ void FrequencySystem::set_frequencies_by_steps (const Real base_freq,
       error();
     }
 
+  EquationSystems& es =
+    this->get_equation_systems();
+
   // store number of frequencies as parameter
-  _equation_systems.parameters.set<unsigned int>("n_frequencies") = n_freq;
+  es.parameters.set<unsigned int>("n_frequencies") = n_freq;
 
   for (unsigned int n=0; n<n_freq; n++)
     {
       // remember frequencies as parameters
-      _equation_systems.parameters.set<Real>(this->form_freq_param_name(n)) = 
+      es.parameters.set<Real>(this->form_freq_param_name(n)) = 
 	  base_freq + n * freq_step;
 
       // build storage for solution vector, if wanted
@@ -234,14 +243,17 @@ void FrequencySystem::set_frequencies_by_range (const Real min_freq,
       error();
     }
 
+  EquationSystems& es =
+    this->get_equation_systems();
+
   // store number of frequencies as parameter
-  _equation_systems.parameters.set<unsigned int>("n_frequencies") = n_freq;
+  es.parameters.set<unsigned int>("n_frequencies") = n_freq;
 
   // set frequencies, build solution storage
   for (unsigned int n=0; n<n_freq; n++)
     {
       // remember frequencies as parameters
-      _equation_systems.parameters.set<Real>(this->form_freq_param_name(n)) = 
+      es.parameters.set<Real>(this->form_freq_param_name(n)) = 
 	  min_freq + n*(max_freq-min_freq)/(n_freq-1);
       
       // build storage for solution vector, if wanted
@@ -271,14 +283,17 @@ void FrequencySystem::set_frequencies (const std::vector<Real>& frequencies,
       error();
     }
 
+  EquationSystems& es =
+    this->get_equation_systems();
+
   // store number of frequencies as parameter
-  _equation_systems.parameters.set<unsigned int>("n_frequencies") = frequencies.size();
+  es.parameters.set<unsigned int>("n_frequencies") = frequencies.size();
 
   // set frequencies, build solution storage
   for (unsigned int n=0; n<frequencies.size(); n++)
     {
       // remember frequencies as parameters
-      _equation_systems.parameters.set<Real>(this->form_freq_param_name(n)) = frequencies[n];
+      es.parameters.set<Real>(this->form_freq_param_name(n)) = frequencies[n];
       
       // build storage for solution vector, if wanted
       if (this->_keep_solution_duplicates)
@@ -297,7 +312,7 @@ void FrequencySystem::set_frequencies (const std::vector<Real>& frequencies,
 unsigned int FrequencySystem::n_frequencies () const
 {
   assert(_finished_set_frequencies);
-  return _equation_systems.parameters.get<unsigned int>("n_frequencies");
+  return this->get_equation_systems().parameters.get<unsigned int>("n_frequencies");
 }
 
 
@@ -326,14 +341,16 @@ void FrequencySystem::solve (const unsigned int n_start,
   assert(this->n_frequencies() > 0);
   assert(n_stop < this->n_frequencies());
 
+  EquationSystems& es =
+    this->get_equation_systems();
 
   // Get the user-specified linear solver tolerance,
   //     the user-specified maximum # of linear solver iterations,
   //     the user-specified wave speed
   const Real tol            =
-    _equation_systems.parameters.get<Real>("linear solver tolerance");
+    es.parameters.get<Real>("linear solver tolerance");
   const unsigned int maxits =
-    _equation_systems.parameters.get<unsigned int>("linear solver maximum iterations");
+    es.parameters.get<unsigned int>("linear solver maximum iterations");
 
 
 //   // return values
@@ -348,7 +365,7 @@ void FrequencySystem::solve (const unsigned int n_start,
       // Call the user-supplied pre-solve method
       START_LOG("user_pre_solve()", "FrequencySystem");
       
-      this->solve_system (_equation_systems, this->name());
+      this->solve_system (es, this->name());
       
       STOP_LOG("user_pre_solve()", "FrequencySystem");
 
@@ -394,8 +411,12 @@ void FrequencySystem::attach_solve_function(void fptr(EquationSystems& es,
 void FrequencySystem::set_current_frequency(unsigned int n)
 {
   assert(n < n_frequencies());
-  _equation_systems.parameters.set<Real>("current frequency") = 
-    _equation_systems.parameters.get<Real>(this->form_freq_param_name(n));
+  
+  EquationSystems& es =
+    this->get_equation_systems();
+
+  es.parameters.set<Real>("current frequency") = 
+    es.parameters.get<Real>(this->form_freq_param_name(n));
 }
 
 

@@ -1,4 +1,4 @@
-// $Id: implicit_system.h,v 1.8 2005-02-22 22:17:35 jwpeterson Exp $
+// $Id: implicit_system.h,v 1.9 2005-03-18 16:56:09 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -171,16 +171,6 @@ protected:
    */
   virtual void init_matrices ();
 
-  /**
-   * Some systems need an arbitrary number of matrices.
-   */
-  std::map<std::string, SparseMatrix<Number>* > _matrices;
-
-  /**
-   * \p true when additional matrices may still be added, \p false otherwise.
-   */
-  bool _can_add_matrices;
-
 
   
 private:
@@ -190,6 +180,16 @@ private:
    * Useful in initialization.
    */
   void add_system_matrix ();
+
+  /**
+   * Some systems need an arbitrary number of matrices.
+   */
+  std::map<std::string, SparseMatrix<Number>* > _matrices;
+
+  /**
+   * \p true when additional matrices may still be added, \p false otherwise.
+   */
+  bool _can_add_matrices;
 };
 
 
