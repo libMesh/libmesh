@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.24 2003-05-23 23:17:47 benkirk Exp $
+// $Id: elem.h,v 1.25 2003-05-27 17:18:14 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -583,6 +583,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    */
   friend class XdrInterface;
   friend class MeshRefinement;
+  friend class MeshBase;
   friend class Mesh;
 };
 

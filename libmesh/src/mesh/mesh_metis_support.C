@@ -1,4 +1,4 @@
-// $Id: mesh_metis_support.C,v 1.12 2003-05-15 23:34:35 benkirk Exp $
+// $Id: mesh_metis_support.C,v 1.13 2003-05-27 17:18:17 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -52,10 +52,12 @@ void MeshBase::metis_partition(const unsigned int n_sbdmns,
   
 #else
 
-  assert (n_sbdmns <= n_elem());
+  const unsigned int n_active_elem = this->n_active_elem();
   
-  set_n_subdomains() = n_sbdmns;
-  set_n_processors() = n_sbdmns;
+  assert (n_sbdmns <= n_active_elem);
+  
+  this->set_n_subdomains() = n_sbdmns;
+  this->set_n_processors() = n_sbdmns;
 
   // check for easy return
   if (n_sbdmns == 1)
@@ -72,83 +74,132 @@ void MeshBase::metis_partition(const unsigned int n_sbdmns,
 
   START_LOG("metis_partition()", "MeshBase");
 
-  // new way, build the graph
-  std::vector<int> xadj;
-  std::vector<int> adjncy;
-  std::vector<int> options(5);
-  std::vector<int> vwgt(n_elem());
-  std::vector<int> part(n_elem());  
+  // build the graph
+  // the forward_map maps the active element id
+  // into a contiguous block of indices for Metis
+  std::vector<unsigned int> forward_map (this->n_elem());
+  
+  std::vector<int>          xadj;
+  std::vector<int>          adjncy;
+  std::vector<int>          options(5);
+  std::vector<int>          vwgt(n_active_elem);
+  std::vector<int>          part(n_active_elem);
   
   int
-    n = static_cast<int>(n_elem()),      // number of "nodes" (elements)
-                                         //  in the graph
+    n = static_cast<int>(n_active_elem), // number of "nodes" (elements)
+                                         //   in the graph
     wgtflag = 2,                         // weights on vertices only
     numflag = 0,                         // C-style 0-based numbering
     nparts = static_cast<int>(n_sbdmns), // number of subdomains to create
     edgecut = 0;                         // the numbers of edges cut by the
-                                         //  partition
+                                         //   partition
 
   options[0] = 0; // use default options
 
+
+  // Metis will only consider the active elements.
+  // We need to map the active element ids into a
+  // contiguous range for Metis
+  {
+    active_elem_iterator       elem_it (this->elements_begin());
+    const active_elem_iterator elem_end(this->elements_end());
+
+    unsigned int el_num = 0;
+
+    for (; elem_it != elem_end; ++elem_it)
+      {
+	forward_map[(*elem_it)->id()] = el_num;
+	el_num++;
+      }
+
+    assert (el_num == n_active_elem);
+   }
+  
+  
   // build the graph in CSR format.  Note that
   // the edges in the graph will correspond to
   // face neighbors
   {
-    std::map<const Elem*, int> elem_numbers;
+    active_elem_iterator       elem_it (this->elements_begin());
+    const active_elem_iterator elem_end(this->elements_end());
     
-    for (unsigned int e=0; e<n_elem(); e++)
+    for (; elem_it != elem_end; ++elem_it)
       {
-        vwgt[e] = elem(e)->n_nodes(); // maybe there is a better weight? 
-        elem_numbers[elem(e)] = static_cast<int>(e);
-      }
+	const Elem* elem = *elem_it;
 
-    bool found_a_neighbor = false;
-    
-    for (unsigned int e=0; e<n_elem(); e++)
-      {
-        xadj.push_back(adjncy.size());
-        for (unsigned int s=0; s<elem(e)->n_sides(); s++)
-          {
-            const Elem* neighbor = elem(e)->neighbor(s);
-            if (neighbor != NULL)
-              {
-                found_a_neighbor = true;
-                adjncy.push_back(elem_numbers[neighbor]);
-              }
-          }
+	// maybe there is a better weight?
+	vwgt[forward_map[elem->id()]]
+	     = elem->n_nodes(); 
+
+	// The beginning of the adjacency array for this elem
+	xadj.push_back(adjncy.size());
+
+	// Loop over the element's neighbors.  An element
+	// adjacency corresponds to a face neighbor
+	for (unsigned int ms=0; ms<elem->n_neighbors(); ms++)
+	  {
+	    const Elem* neighbor = elem->neighbor(ms);
+	    
+	    if (neighbor != NULL)
+	      {  
+		// If the neighbor is active treat it
+		// as a connection
+		if (neighbor->active())
+		  adjncy.push_back (forward_map[neighbor->id()]);
+		
+		// Otherwise we need to find all of the
+		// neighbor's children that are connected to
+		// us and add them
+		else
+		  {
+		    // The side of the neighbor to which
+		    // we are connected
+		    const unsigned int ns =
+		      neighbor->which_neighbor_am_i (elem);
+		    
+		    // Get all the neighbor's children that
+		    // live on that side and are thus connected
+		    // to us
+		    for (unsigned int nc=0;
+			 nc<neighbor->n_children_per_side(ns); nc++)
+		      {
+			const Elem* child =
+			  neighbor->child (neighbor->side_children_matrix(ns,nc));
+			
+			// This assumes a level-1 mesh
+			assert (child->active());
+			
+			adjncy.push_back (forward_map[child->id()]);
+		      }
+		  }
+	      }
+	  }
       }
+    
+    // The end of the adjacency array for this elem
     xadj.push_back(adjncy.size());
-
-    // If we didn't find _any_ neighbors it is a safe bet the
-    // user didn't call find_neighbors().  Print an informative
-    // message and use a space-filling curve instead.
-    if (!found_a_neighbor)
-      {
-	std::cerr << "ERROR: something is amiss..." << std::endl
-		  << " I couldn't find any elements with neighbors." << std::endl
-		  << " Did you forget to call find_neighbors()" << std::endl
-		  << " BEFORE calling the graph partitioner?" << std::endl << std::endl
-		  << " I'll use a space-filling curves instead." << std::endl;
-	
-	STOP_LOG("metis_partition()", "MeshBase");
-	sfc_partition(n_sbdmns);
-	return;
-      }
-  } // done with the map.
+    
+  } // done building the graph
 
 
+  // Select which type of partitioning to create
+
+  // Use recursive if specified or if the number of partitions is
+  // less than or equal to 8
   if ((type == "recursive") ||
       (n_sbdmns <= 8))
     Metis::METIS_PartGraphRecursive(&n, &xadj[0], &adjncy[0], &vwgt[0], NULL,
 				    &wgtflag, &numflag, &nparts, &options[0],
 				    &edgecut, &part[0]);
 
+  // Maybe use kway if specified
   else if (type == "kway")
     Metis::METIS_PartGraphKway(&n, &xadj[0], &adjncy[0], &vwgt[0], NULL,
 			       &wgtflag, &numflag, &nparts, &options[0],
 			       &edgecut, &part[0]);
   
 
+  // Otherwise throw an error message.
   else
     {
       std::cerr << " ERROR:  valid options:" << std::endl
@@ -161,11 +212,22 @@ void MeshBase::metis_partition(const unsigned int n_sbdmns,
       return;
     }
 
+  
+  // Assign the returned processor ids
+  {
+    active_elem_iterator       elem_it (this->elements_begin());
+    const active_elem_iterator elem_end(this->elements_end());
 
-  for (unsigned int e=0; e<n_elem(); e++)
-    elem(e)->set_subdomain_id() = 
-      elem(e)->set_processor_id() = 
-      static_cast<short int>(part[e]);
+    for (; elem_it != elem_end; ++elem_it)
+      {
+	Elem* elem = *elem_it;
+
+	elem->set_subdomain_id() =
+	  elem->set_processor_id() =
+
+	  static_cast<short int>(part[forward_map[elem->id()]]);
+      }
+  }
 
   STOP_LOG("metis_partition()", "MeshBase");
 
