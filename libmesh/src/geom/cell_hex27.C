@@ -1,4 +1,4 @@
-// $Id: cell_hex27.C,v 1.26 2005-02-22 22:17:38 jwpeterson Exp $
+// $Id: cell_hex27.C,v 1.27 2005-02-24 17:49:02 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -62,6 +62,8 @@ bool Hex27::is_edge(const unsigned int i) const
 
 bool Hex27::is_face(const unsigned int i) const
 {
+  if (i == 26)
+    return false;
   if (i > 19)
     return true;
   return false;
