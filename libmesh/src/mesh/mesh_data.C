@@ -1,4 +1,4 @@
-// $Id: mesh_data.C,v 1.9 2003-08-04 17:23:51 ddreyer Exp $
+// $Id: mesh_data.C,v 1.10 2003-08-08 14:11:27 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -40,6 +40,7 @@ MeshData::MeshData(const MeshBase& m) :
   _elem_id_map_closed (false),
   _elem_data_closed   (false),
   _active             (false),
+  _compatibility_mode (false),
   _unv_header         (NULL)
 {
 }
@@ -58,8 +59,42 @@ MeshData::~MeshData()
 
 void MeshData::activate (const std::string& descriptor)
 {
+#ifdef DEBUG
+  if (_compatibility_mode)
+      std::cerr << "WARNING: MeshData was in compatibility mode, now being activated."
+		<< std::endl;
+#endif
+
+  _compatibility_mode = false;
   _active = true;
   _data_descriptor = descriptor;
+}
+
+
+
+
+
+void MeshData::enable_compatibility_mode (const std::string& descriptor)
+{
+  if (!_active)
+    {
+      _compatibility_mode = true;
+      _active = false;
+      // do as if the id maps are already closed
+      _node_id_map_closed = true;
+      _elem_id_map_closed = true;
+      _data_descriptor = descriptor;
+      // we can safely clear the id maps
+      _node_id.clear();
+      _id_node.clear();
+      _elem_id.clear();
+      _id_elem.clear();
+    }
+#ifdef DEBUG
+  else
+      std::cerr << "WARNING: MeshData was in compatibility mode, now being activated."
+		<< std::endl;
+#endif
 }
 
 
@@ -83,27 +118,36 @@ void MeshData::clear()
 void  MeshData::slim (const bool node_id_map,
 		      const bool elem_id_map)
 {
-  assert (_active);
-
-  if (node_id_map)
+  if (this->active())
     {
-      // dumb check
-      assert (_node_id_map_closed);
 
-      _node_id_map_closed = false;
-      _node_id.clear();
-      _id_node.clear();
+      if (node_id_map)
+        {
+	  // dumb check
+	  assert (_node_id_map_closed);
+
+	  _node_id_map_closed = false;
+	  _node_id.clear();
+	  _id_node.clear();
+	}
+
+      if (elem_id_map)
+        {
+	  // dumb check
+	  assert (_elem_id_map_closed);
+
+	  _elem_id_map_closed = false;
+	  _elem_id.clear();
+	  _id_elem.clear();
+	}
     }
 
-  if (elem_id_map)
+#ifdef DEBUG
+  else if (this->compatibility_mode())
     {
-      // dumb check
-      assert (_elem_id_map_closed);
-
-      _elem_id_map_closed = false;
-      _elem_id.clear();
-      _id_elem.clear();
+      std::cerr << "WARNING: No need for MeshData::slim() in compatibility mode." << std::endl;
     }
+#endif
 }
 
 
@@ -113,6 +157,10 @@ void MeshData::translate (const MeshBase& out_mesh,
 			  std::vector<Number>& values,
 			  std::vector<std::string>& names) const
 {
+  assert (_active || _compatibility_mode);
+
+  START_LOG("translate()", "MeshData");
+
   const unsigned int n_comp = this->n_val_per_node();
 
   /*
@@ -174,6 +222,7 @@ void MeshData::translate (const MeshBase& out_mesh,
       }
   }
 
+  STOP_LOG("translate()", "MeshData");
 }
 
 
@@ -201,10 +250,17 @@ void MeshData::read (const std::string& name)
 {
   START_LOG("read()", "MeshData");
 
-  assert (_active);
+  assert (_active || _compatibility_mode);
 
   // the id maps have to be closed before reading
+  // (note that in compatibility mode these are also true)
   assert (_elem_id_map_closed && _node_id_map_closed);
+
+#ifdef DEBUG
+  if (this->compatibility_mode())
+      std::cerr << "WARNING: MeshData in compatibility mode, node and element ids" << std::endl
+		<< "         stored in file may be totally different from libMesh ids!" << std::endl;
+#endif
 
   // Read the file based on extension
   {
@@ -241,11 +297,19 @@ void MeshData::write (const std::string& name)
 {
   START_LOG("write()", "MeshData");
 
-  assert (_active);
+  assert (_active || _compatibility_mode);
 
-  // the id maps have to be closed before reading
+  // the id maps have to be closed before writing
+  // (note that in compatibility mode these are also true)
   assert (_elem_id_map_closed && _node_id_map_closed);
   
+#ifdef DEBUG
+  if (this->compatibility_mode())
+      std::cerr << "WARNING: MeshData in compatibility mode.  Node and element ids" << std::endl
+		<< "         written to file may differ from libMesh numbering" << std::endl
+		<< "         next time this file is read!" << std::endl;
+#endif
+
   // Read the file based on extension
   {
     if (name.rfind(".xta") < name.size())
@@ -279,9 +343,13 @@ std::string MeshData::get_info() const
 {
   std::ostringstream out;
 
-  if (this->active())
+  if (this->active() || this->compatibility_mode())
     {
       out << " MeshData Information:" << std::endl;
+      if (this->active())
+	  out << "  object activated." << std::endl;
+      if (this->compatibility_mode())
+	  out << "  object in compatibility mode." << std::endl;
       if (this->_data_descriptor != "")
 	  out << "  descriptor=" << this->_data_descriptor << std::endl;
       if (this->elem_initialized())
@@ -294,7 +362,7 @@ std::string MeshData::get_info() const
 	      << "   n_node_data()=" << this->n_node_data() << std::endl;
     }
   else
-      out << " MeshData inactive." << std::endl;
+      out << " MeshData neither active nor in compatibility mode." << std::endl;
 
   return out.str();
 }
@@ -313,22 +381,34 @@ void MeshData::print_info() const
 
 const Node* MeshData::foreign_id_to_node (const unsigned int fid) const
 {
-  assert (_active);
-  assert (_node_id_map_closed);
-
-  std::map<unsigned int,
-           const Node*>::const_iterator pos = _id_node.find(fid);
-
-  if (pos == _id_node.end())
+  if (_active)
     {
-      std::cerr << "ERROR: Have no Node* associated with the foreign id = "
-		<< fid
-		<< std::endl;
-      error();
-      return NULL;
+      // when active, use our _id_node map
+      assert (_node_id_map_closed);
+
+      std::map<unsigned int,
+	       const Node*>::const_iterator pos = _id_node.find(fid);
+
+      if (pos == _id_node.end())
+        {
+	  std::cerr << "ERROR: Have no Node* associated with the foreign id = "
+		    << fid
+		    << std::endl;
+	  error();
+	  return NULL;
+	}
+      else
+	  return (*pos).second;
     }
-  else
-    return (*pos).second;
+  else if (_compatibility_mode)
+      // when only in compatibility mode, 
+      // return the node stored in the MeshBase 
+      // under its current id
+      return this->_mesh.node_ptr(fid);
+
+  // should never get here
+  error();
+  return NULL;
 }
 
 
@@ -337,28 +417,39 @@ const Node* MeshData::foreign_id_to_node (const unsigned int fid) const
 
 unsigned int MeshData::node_to_foreign_id (const Node* n) const
 {
-  assert (_active);
-  assert (_node_id_map_closed);
-
   assert (n != NULL);
 
-  /*
-   * look it up in the map
-   */
-  std::map<const Node*,
-	   unsigned int>::const_iterator pos = _node_id.find(n);
-
-  if (pos == _node_id.end())
+  if (_active)
     {
-      std::cerr << "ERROR: No foreign id stored for the node "
-		<< "with the libMesh id = "
-		<< n->id()
-		<< std::endl;
-      error();
-      return 0;
+      // when active, use our _node_id map
+      assert (_node_id_map_closed);
+
+      /*
+       * look it up in the map
+       */
+      std::map<const Node*,
+	  unsigned int>::const_iterator pos = _node_id.find(n);
+
+      if (pos == _node_id.end())
+        {
+	  std::cerr << "ERROR: No foreign id stored for the node "
+		    << "with the libMesh id = "
+		    << n->id()
+		    << std::endl;
+	  error();
+	  return 0;
+	}
+      else
+	  return (*pos).second;
     }
-  else
-    return (*pos).second;
+  else if (_compatibility_mode)
+      // when only in compatibility mode, 
+      // return libMesh's node id
+      return n->id();
+
+  // should never get here
+  error();
+  return 0;
 }
 
 
@@ -370,22 +461,33 @@ unsigned int MeshData::node_to_foreign_id (const Node* n) const
 
 const Elem* MeshData::foreign_id_to_elem (const unsigned int fid) const
 {
-  assert (_active);
-  assert (_elem_id_map_closed);
-
-  std::map<unsigned int,
-           const Elem*>::const_iterator pos = _id_elem.find(fid);
-
-  if (pos == _id_elem.end())
+  if (_active)
     {
-      std::cerr << "ERROR: Have no Elem* associated with the foreign id = "
-		<< fid
-		<< std::endl;
-      error();
-      return NULL;
+      // when active, use our _id_elem map
+      assert (_elem_id_map_closed);
+
+      std::map<unsigned int,
+	       const Elem*>::const_iterator pos = _id_elem.find(fid);
+
+      if (pos == _id_elem.end())
+        {
+	  std::cerr << "ERROR: Have no Elem* associated with the foreign id = "
+		    << fid
+		    << std::endl;
+	  error();
+	  return NULL;
+	}
+      else
+	  return (*pos).second;
     }
-  else
-    return (*pos).second;
+  else if (_compatibility_mode)
+      // when only in compatibility mode, 
+      // return element using the libMesh id
+      return this->_mesh.elem(fid);
+
+  // should never get here
+  error();
+  return NULL;
 }
 
 
@@ -394,28 +496,39 @@ const Elem* MeshData::foreign_id_to_elem (const unsigned int fid) const
 
 unsigned int MeshData::elem_to_foreign_id (const Elem* e) const
 {
-  assert (_active);
-  assert (_elem_id_map_closed);
-
   assert (e != NULL);
 
-  /*
-   * look it up in the map
-   */
-  std::map<const Elem*,
-	   unsigned int>::const_iterator pos = _elem_id.find(e);
-
-  if (pos == _elem_id.end())
+  if (_active)
     {
-      std::cerr << "ERROR: No foreign id stored for the element "
-		<< "with the libMesh id = "
-		<< e->id()
-		<< std::endl;
-      error();
-      return 0;
+      // when active, use our _id_elem map
+      assert (_elem_id_map_closed);
+
+      /*
+       * look it up in the map
+       */
+      std::map<const Elem*,
+	       unsigned int>::const_iterator pos = _elem_id.find(e);
+
+      if (pos == _elem_id.end())
+        {
+	  std::cerr << "ERROR: No foreign id stored for the element "
+		    << "with the libMesh id = "
+		    << e->id()
+		    << std::endl;
+	  error();
+	  return 0;
+	}
+      else
+	  return (*pos).second;
     }
-  else
-    return (*pos).second;
+  else if (_compatibility_mode)
+      // when only in compatibility mode, 
+      // return libMesh's element id
+      return e->id();
+
+  // should never get here
+  error();
+  return 0;
 }
 
 
@@ -428,7 +541,8 @@ void MeshData::insert_node_data (std::map<const Node*,
 				 std::vector<Number> >& nd,
 				 const bool close_elem_data)
 {
-  assert (this->_active);
+  assert (this->_active || this->_compatibility_mode);
+  // these are also true in compatibility mode
   assert (this->_node_id_map_closed);
 
   if (this->_node_data_closed)
@@ -490,6 +604,7 @@ void MeshData::insert_elem_data (std::map<const Elem*,
 				 const bool close_node_data)
 {
   assert (this->_active);
+  // these are also true in compatibility mode
   assert (this->_elem_id_map_closed);
 
   if (this->_elem_data_closed)
@@ -549,7 +664,6 @@ void MeshData::insert_elem_data (std::map<const Elem*,
 unsigned int MeshData::n_val_per_node () const
 {
   assert (_active);
-  assert (_node_id_map_closed);
   assert (_node_data_closed);
 
   if (!_node_data.empty())
@@ -580,7 +694,6 @@ unsigned int MeshData::n_node_data () const
 unsigned int MeshData::n_val_per_elem () const
 {
   assert (_active);
-  assert (_elem_id_map_closed);
   assert (_elem_data_closed);
 
   if (!_elem_data.empty())

@@ -1,4 +1,4 @@
-// $Id: mesh_data.h,v 1.13 2003-08-04 17:23:48 ddreyer Exp $
+// $Id: mesh_data.h,v 1.14 2003-08-08 14:11:26 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -47,10 +47,14 @@ class MeshDataUnvHeader;
 
 /**
  * Yet another Mesh-something class...  What's this good for: 
- * \p MeshData handles actual data on entities (nodes, elements)
- * of meshes.  \p MeshBase owns a \p MeshData for dealing with files
+ * \p MeshData handles actual data and the corresponding I/O
+ * on entities (nodes, elements) of meshes.  
+ * \p MeshBase owns a \p MeshData for dealing with files
  * that contain nodal or element-oriented data, numbered in the same 
- * format as the corresponding mesh file.
+ * format as the corresponding mesh file (when activated) or with
+ * the \p MeshBase element and node ids (when in compatibility mode).  
+ * To use \p MeshData, it has to be activated or the compatibility 
+ * mode has to be enabled.
  *
  * @author Daniel Dreyer, 2003
  */
@@ -79,6 +83,20 @@ public:
    * in identifying the data later on.
    */
   void activate (const std::string& descriptor="");
+
+  /**
+   * When the \p MeshData should be used, but was @e not activated
+   * prior to reading in a mesh, then the compatibility mode enables
+   * to still use this object as if the \p MeshData was active.
+   * The foreign node and element ids are simply assigned the
+   * indices used in \p libMesh.  Note that the compatibility mode
+   * should be used with caution, since the node and element
+   * indices in \p libMesh may be renumbered any time.  This
+   * \p MeshData always employs the current node and element ids,
+   * it does @e not create an image of ids when compatibility
+   * mode was activated.
+   */
+  void enable_compatibility_mode (const std::string& descriptor="");
 
   /**
    * Clears the data fields, but leaves the id maps
@@ -266,6 +284,11 @@ public:
    * Use \p activate() to bring this object alive.
    */
   bool active () const;
+  /**
+   * @returns \p true when this object is in compatibility
+   * mode.  See \p enable_compatibility_mode() for details.
+   */
+  bool compatibility_mode () const;
 
   /**
    * @returns \p true when this object is properly initialized
@@ -488,6 +511,13 @@ protected:
    * during mesh import).
    */
   bool _active;
+
+  /**
+   * \p true when this object is in compatibility mode
+   * (use libMesh's node and element numbers as fake 
+   * foreign id's)
+   */
+  bool _compatibility_mode;
 
   /**
    * A pointer to the header information of universal files.
@@ -747,6 +777,14 @@ inline
 bool MeshData::active() const
 {
   return _active;
+}
+
+
+
+inline
+bool MeshData::compatibility_mode() const
+{
+  return _compatibility_mode;
 }
 
 

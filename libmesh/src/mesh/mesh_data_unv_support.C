@@ -1,4 +1,4 @@
-// $Id: mesh_data_unv_support.C,v 1.8 2003-08-04 17:23:51 ddreyer Exp $
+// $Id: mesh_data_unv_support.C,v 1.9 2003-08-08 14:11:27 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -33,6 +33,11 @@
 // MeshData UNV support functions
 void MeshData::read_unv(const std::string& name)
 {
+  /*
+   * we should better be active or in compatibility mode
+   */
+  assert (_active || _compatibility_mode);
+
   /*
    * When reading data, make sure the id maps are ok
    */
@@ -293,6 +298,11 @@ void MeshData::read_unv(const std::string& name)
 
 void MeshData::write_unv (const std::string& name)
 {
+  /*
+   * we should better be active or in compatibility mode
+   */
+  assert (_active || _compatibility_mode);
+
   /*
    * make sure the id maps are ready
    * and that we have data to write
