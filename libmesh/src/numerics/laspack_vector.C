@@ -1,4 +1,4 @@
-// $Id: laspack_vector.C,v 1.11 2003-04-21 15:22:20 benkirk Exp $
+// $Id: laspack_vector.C,v 1.12 2003-04-29 21:39:36 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -184,9 +184,10 @@ template <typename T>
 LaspackVector<T>&
 LaspackVector<T>::operator = (const LaspackVector<T>& v)
 {
-  assert (size() == v.size());
+  _is_closed      = v._is_closed;
+  _is_initialized = v._is_initialized;
 
-  if (size() != 0)    
+  if (v.size() != 0)    
     Asgn_VV (const_cast<QVector*>(&_vec),
 		      const_cast<QVector*>(&v._vec)
 		      );

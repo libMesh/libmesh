@@ -1,4 +1,4 @@
-// $Id: petsc_vector.h,v 1.19 2003-03-26 13:55:24 benkirk Exp $
+// $Id: petsc_vector.h,v 1.20 2003-04-29 21:37:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -417,14 +417,9 @@ void PetscVector<T>::init (const unsigned int n,
   int petsc_n_local=static_cast<int>(n_local);
 
 
-  
+  // Clear initialized vectors 
   if (this->initialized())
-    {
-      std::cerr << "ERROR: Vector already initialized!"
-		<< std::endl;
-      
-      error();
-    }
+    this->clear();
 
   
   // create a sequential vector if on only 1 processor 

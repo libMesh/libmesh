@@ -1,4 +1,4 @@
-// $Id: distributed_vector.C,v 1.8 2003-03-04 22:31:14 benkirk Exp $
+// $Id: distributed_vector.C,v 1.9 2003-04-29 21:39:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -270,10 +270,6 @@ template <typename T>
 NumericVector<T>&
 DistributedVector<T>::operator = (const NumericVector<T>& v_in)
 {
-  assert (this->initialized());
-  assert (_values.size() == _local_size);
-  assert ((_last_local_index - _first_local_index) == _local_size);
-
   const DistributedVector<T>& v = dynamic_cast<const DistributedVector<T>&>(v_in);
   
   *this = v;
@@ -287,15 +283,17 @@ template <typename T>
 DistributedVector<T>&
 DistributedVector<T>::operator = (const DistributedVector<T>& v)
 {
-  assert (this->initialized());
-  assert (v.local_size() == local_size());
-  assert (_values.size() == _local_size);
-  assert ((_last_local_index - _first_local_index) == _local_size);
+  _is_initialized = v._is_initialized;
+  _is_closed      = v._is_closed;
 
-  if (v.local_size() == local_size())
+  _global_size       = v._global_size;
+  _local_size        = v._local_size;
+  _first_local_index = v._first_local_index;
+  _last_local_index  = v._last_local_index;
+  
+  if (v.local_size() == this->local_size())
     {
-      for (unsigned int i=0; i<local_size(); i++)
-	_values[i] = v._values[i];
+      _values = v._values;
     }
   else
     {
