@@ -51,3 +51,5 @@ CHANGELOG
 *.png
 *.rgb
 it_test*
+ii_files
+so_locations
