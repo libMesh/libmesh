@@ -1,4 +1,4 @@
-// $Id: quadrature_gauss_2D.C,v 1.4 2003-01-24 17:24:45 jwpeterson Exp $
+// $Id: quadrature_gauss_2D.C,v 1.5 2003-01-29 20:21:41 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -199,7 +199,7 @@ void QGauss::init_2D(const ElemType _type)
 		for (unsigned int j=0; j<4; j++)
 		  {
 		    _points[gp](0) = s[j];
-		    _points[gp](1) = r[i]*(1-s[j]);
+		    _points[gp](1) = r[i]*(1.-s[j]);
 		    _weights[gp]   = A[i]*B[j];
 		    gp++;
 		  }
