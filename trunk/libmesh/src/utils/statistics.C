@@ -1,4 +1,4 @@
-// $Id: statistics.C,v 1.9 2003-05-19 21:21:14 benkirk Exp $
+// $Id: statistics.C,v 1.10 2003-06-05 19:33:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,17 +30,6 @@
 
 // ------------------------------------------------------------
 // StatisticsVector class member functions
-template <typename T>
-StatisticsVector<T>::StatisticsVector (unsigned int i, T val)
-{
-  this->resize (i);
-
-  std::fill (this->begin(), this->end(), val);
-}
-
-
-
-
 template <typename T>
 T StatisticsVector<T>::minimum() const
 {
@@ -142,11 +131,9 @@ Real StatisticsVector<T>::median() const
 
 
 template <typename T>
-Real StatisticsVector<T>::variance() const
+Real StatisticsVector<T>::variance(const Real mean) const
 {
   const unsigned int n   = this->size();
-  
-  const Real mean = this->mean();
   
   START_LOG ("variance()", "StatisticsVector");
   
@@ -157,6 +144,9 @@ Real StatisticsVector<T>::variance() const
       const Real delta = ( static_cast<Real>((*this)[i]) - mean );
       variance += (delta * delta - variance) / (i + 1);
     }
+
+  if (n > 1)
+    variance *= static_cast<Real>(n) / static_cast<Real>(n - 1);
   
   STOP_LOG ("variance()", "StatisticsVector");
   
