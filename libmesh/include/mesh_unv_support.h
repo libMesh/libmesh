@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.h,v 1.14 2003-09-09 14:11:56 ddreyer Exp $
+// $Id: mesh_unv_support.h,v 1.15 2003-09-11 19:10:52 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,6 @@
 // C++ includes
 #include <fstream>
 #include <vector>
-#include <map>
 
 
 
@@ -179,7 +178,7 @@ protected:
   /**
    * maps node id's from UNV to internal.  Used when reading.
    */
-  std::map<unsigned int,unsigned int> _assign_nodes;
+  std::vector<unsigned int> _assign_nodes;
 
   /**
    * stores positions of relevant datasets in the file, should

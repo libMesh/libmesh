@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.C,v 1.24 2003-09-09 17:13:35 ddreyer Exp $
+// $Id: mesh_unv_support.C,v 1.25 2003-09-11 19:10:53 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -21,6 +21,7 @@
 // C++ includes
 #include <stdio.h>
 #include <iomanip>
+#include <algorithm>
 
 
 // Local includes
@@ -588,7 +589,8 @@ void UnvMeshInterface::node_in (std::istream& in_file)
    * allocate the correct amount 
    * of memory for the node vector
    */
-  this->_nodes.resize(this->_n_nodes);
+  this->_nodes.resize         (this->_n_nodes);
+  this->_assign_nodes.reserve (this->_n_nodes);
 
 
   /*
@@ -629,9 +631,9 @@ void UnvMeshInterface::node_in (std::istream& in_file)
 	      xyz[d] = D_to_e (num_buf);
 	    }
 
-	  // store the new position of the node under its label
-	  this->_assign_nodes[node_lab]=i;
-
+	  // set up the id map
+	  this->_assign_nodes.push_back (node_lab);
+	  
 	  // add node to the nodes vector.
 	  this->_nodes[i] = Node::build (xyz[0],
 					 xyz[1],
@@ -664,9 +666,9 @@ void UnvMeshInterface::node_in (std::istream& in_file)
 		  >> y                       // read y-coordinate
 		  >> z;                      // read z-coordinate
 
-	  // store the new position of the node under its label
-	  this->_assign_nodes[node_lab]=i;
-
+	  // set up the id map
+	  this->_assign_nodes.push_back (node_lab);
+	  
 	  // add node to the nodes vector.
 	  this->_nodes[i] = Node::build (x, y, z, i);
 
@@ -674,6 +676,11 @@ void UnvMeshInterface::node_in (std::istream& in_file)
 	  this->_mesh_data.add_foreign_node_id (this->_nodes[i], node_lab);
 	}
     }
+
+  // now we need to sort the _assign_nodes vector so we can
+  // search it efficiently like a map
+  std::sort (this->_assign_nodes.begin(),
+	     this->_assign_nodes.end());
 }
 
 
@@ -731,8 +738,18 @@ void UnvMeshInterface::element_in (std::istream& in_file)
   // allocate the correct amount of memory for the vector
   // that holds the elements
   this->_elements.resize (this->_n_elements);
+  
+
+  // Get the beginning and end of the _assign_nodes vector
+  // to eliminate repeated function calls
+  const std::vector<unsigned int>::const_iterator it_begin =
+    this->_assign_nodes.begin();
+  
+  const std::vector<unsigned int>::const_iterator it_end   =
+    this->_assign_nodes.end();
 
 
+      
   // read from the virtual file
   for (unsigned int i=0;i<this->_n_elements;i++)
     {
@@ -911,7 +928,31 @@ void UnvMeshInterface::element_in (std::istream& in_file)
 
       // nodes are being stored in element
       for (unsigned int j=1;j<=n_nodes;j++)
-	this->_elements[i]->set_node(assign_elem_nodes[j]) = this->_nodes[this->_assign_nodes[node_labels[j]]];
+	{
+	  // Find the position of node_labels[j] in the _assign_nodes vector.
+	  const std::pair<std::vector<unsigned int>::const_iterator,
+	                  std::vector<unsigned int>::const_iterator>	    
+	    it = std::equal_range (it_begin,
+				   it_end,
+				   node_labels[j]);
+
+	  // it better be there, so assert that it was found.
+	  assert (it.first  != it.second);
+	  assert (*(it.first) == node_labels[j]);
+
+	  // Now, the distance between this UNV id and the beginning of
+	  // the _assign_nodes vector will give us a unique id in the
+	  // range [0,n_nodes) that we can use for defining a contiguous
+	  // connectivity.
+	  const unsigned int assigned_node = std::distance (it_begin,
+							    it.first);
+
+	  // Make sure we didn't get an out-of-bounds id
+	  assert (assigned_node < this->_nodes.size());
+	  
+	  this->_elements[i]->set_node(assign_elem_nodes[j]) =
+	    this->_nodes[assigned_node];
+	}
 
 
       // tell the MeshData object the foreign element id
