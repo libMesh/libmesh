@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.32 2005-01-28 21:29:50 benkirk Exp $
+// $Id: mesh_generation.C,v 1.33 2005-02-14 22:29:37 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -53,7 +53,8 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 				       const Real xmin, const Real xmax,
 				       const Real ymin, const Real ymax,
 				       const Real zmin, const Real zmax,
-				       const ElemType type)
+				       const ElemType type,
+				       const bool gauss_lobatto_grid)
 {
   START_LOG("build_cube()", "MeshTools::Generation");
 
@@ -74,9 +75,16 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 	mesh.reserve_elem (nx);
 
 	for (unsigned int i=0; i<=nx; i++)
-	  mesh.add_point (Point(static_cast<Real>(i)/static_cast<Real>(nx), 
-				0, 
-				0));
+	  {
+	    if (gauss_lobatto_grid)
+	      mesh.add_point (Point(0.5*(cos(libMesh::pi*static_cast<Real>(nx-i)/static_cast<Real>(nx))+1.0),
+				    0, 
+				    0));
+	    else
+	      mesh.add_point (Point(static_cast<Real>(i)/static_cast<Real>(nx), 
+				    0, 
+				    0));
+	  }
 	
 	for (unsigned int i=0; i<nx; i++)
 	  {
@@ -109,188 +117,297 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 	assert (nx != 0);
 	assert (ny != 0);
 
-	if ((type == INVALID_ELEM) ||
-	    (type == QUAD4))
+	// Reserve elements.  The TRI3 and TRI6 meshes
+	// have twice as many elements...
+	switch (type)
 	  {
-	    // Build a QUAD4
+	  case INVALID_ELEM:
+	  case QUAD4:
+	  case QUAD8:
+	  case QUAD9:
+	    {
+	      mesh.reserve_elem (nx*ny);
+	      break;
+	    }
 
-	    mesh.reserve_nodes( (nx+1)*(ny+1) );
-	    mesh.reserve_elem (nx*ny);
-	    
-	    for (unsigned int j=0; j<=ny; j++)
-	      for (unsigned int i=0; i<=nx; i++)
-		mesh.add_point (Point(static_cast<Real>(i)/static_cast<Real>(nx),
-				      static_cast<Real>(j)/static_cast<Real>(ny),
-				      0));
-	    
-#define G(i,j) ( (i) + (j)*(nx+1) )
+	  case TRI3:
+	  case TRI6:
+	    {
+	      mesh.reserve_elem (2*nx*ny);
+	      break;
+	    }
+
+	  default:
+	    {
+	      std::cerr << "ERROR: Unrecognized 2D element type." << std::endl;
+	      error();
+	    }
+	  }
+
+
 	
-	    for (unsigned int j=0; j<ny; j++)
-	      for (unsigned int i=0; i<nx; i++)
-		{
-		  Elem* elem = mesh.add_elem(new Quad4);
+	// Reserve nodes.  The quadratic element types
+	// need to reserve more nodes than the linear types.
+	switch (type)
+	  {
+	  case INVALID_ELEM:
+	  case QUAD4:
+	  case TRI3:
+	    {
+	      mesh.reserve_nodes( (nx+1)*(ny+1) );
+	      break;
+	    }
+	    
+	  case QUAD8:
+	  case QUAD9:
+	  case TRI6:
+	    {
+	      mesh.reserve_nodes( (2*nx+1)*(2*ny+1) );
+	      break;
+	    }
 
-		  elem->set_node(0) = mesh.node_ptr(G(i,j)    );
-		  elem->set_node(1) = mesh.node_ptr(G(i+1,j)  );
-		  elem->set_node(2) = mesh.node_ptr(G(i+1,j+1));
-		  elem->set_node(3) = mesh.node_ptr(G(i,j+1)  );
+	    
+	  default:
+	    {
+	      std::cerr << "ERROR: Unrecognized 2D element type." << std::endl;
+	      error();
+	    }
+	  }
 
-		  if (j == 0)
-		    mesh.boundary_info.add_side(elem, 0, 0);
+
+
+	// Build the nodes. Depends on whether you are using a linear
+	// or quadratic element, and whether you are using a uniform
+	// grid or the Gauss-Lobatto grid points.
+	switch (type)
+	  {
+	  case INVALID_ELEM:
+	  case QUAD4:
+	  case TRI3:
+	    {
+	      for (unsigned int j=0; j<=ny; j++)
+		for (unsigned int i=0; i<=nx; i++)
+		  {
+		    if (gauss_lobatto_grid)
+		      {
+			// Shortcut variable
+			const Real pi = libMesh::pi;
+
+			mesh.add_point (Point(0.5*(1.0 - cos(pi*static_cast<Real>(i)/static_cast<Real>(nx))),
+					      0.5*(1.0 - cos(pi*static_cast<Real>(j)/static_cast<Real>(ny))),
+					      0.));
+		      }
 		  
-		  if (j == (ny-1))
-		    mesh.boundary_info.add_side(elem, 2, 2);
+		    else
+		      mesh.add_point (Point(static_cast<Real>(i)/static_cast<Real>(nx),
+					    static_cast<Real>(j)/static_cast<Real>(ny),
+					    0.));
+		  }
+
+	      break;
+	    }
+	    
+	  case QUAD8:
+	  case QUAD9:
+	  case TRI6:
+	    {
+	      for (unsigned int j=0; j<=(2*ny); j++)
+		for (unsigned int i=0; i<=(2*nx); i++)
+		  {
+		    if (gauss_lobatto_grid)
+		      {
+			// The x,y locations of the point.
+			Real x=0., y=0.;
+
+			// Shortcut variable
+			const Real pi = libMesh::pi;
+			
+			// Shortcut quantities (do not depend on i,j)
+			const Real a = cos( pi / static_cast<Real>(2*nx) );
+			const Real b = cos( pi / static_cast<Real>(2*ny) );
+
+			// Shortcut quantities (depend on i,j)
+			const Real c = cos( pi*i / static_cast<Real>(2*nx) );
+			const Real d = cos( pi*j / static_cast<Real>(2*ny) );
+			
+			// If i is even, compute a normal Gauss-Lobatto point
+			if (i%2 == 0)
+			  x = 0.5*(1.0 - c);
+
+			// Otherwise, it is the average of the previous and next points
+			else
+			  x = 0.5*(1.0 - a*c);
+		      
+			// If j is even, compute a normal Gauss-Lobatto point
+			if (j%2 == 0)
+			  y = 0.5*(1.0 - d);
+		      
+			// Otherwise, it is the average of the previous and next points
+			else
+			  y = 0.5*(1.0 - b*d);
+		      
+
+			mesh.add_point (Point(x,y,0.));
+		      } 
+
 		  
-		  if (i == 0)
-		    mesh.boundary_info.add_side(elem, 3, 3);
-		  
-		  if (i == (nx-1))
-		    mesh.boundary_info.add_side(elem, 1, 1);
+		    else
+		      mesh.add_point (Point(static_cast<Real>(i)/static_cast<Real>(2*nx),
+					    static_cast<Real>(j)/static_cast<Real>(2*ny),
+					    0));
 		}
+
+	      break;
+	    }
+
 	    
-#undef G
+	  default:
+	    {
+	      std::cerr << "ERROR: Unrecognized 2D element type." << std::endl;
+	      error();
+	    }
 	  }
 
 
-	
-	else if (type == TRI3)
+
+
+
+
+	// Build the elements.  Each one is a bit different.
+	switch (type)
 	  {
-	    // Build a TRI3
-	
-	    mesh.reserve_nodes( (nx+1)*(ny+1) );
-	    mesh.reserve_elem (2*nx*ny);
-	    
-	    for (unsigned int j=0; j<=ny; j++)
-	      for (unsigned int i=0; i<=nx; i++)
-		mesh.add_point (Point(static_cast<Real>(i)/static_cast<Real>(nx),
-				      static_cast<Real>(j)/static_cast<Real>(ny),
-				      0));
-	    
-#define G(i,j) ( (i) + (j)*(nx+1) )
-	
-	    for (unsigned int j=0; j<ny; j++)
-	      for (unsigned int i=0; i<nx; i++)
-		{
-		  Elem* elem = NULL;
-		  
-		  elem = mesh.add_elem(new Tri3);
 
-		  elem->set_node(0) = mesh.node_ptr(G(i,j)    );
-		  elem->set_node(1) = mesh.node_ptr(G(i+1,j)  );
-		  elem->set_node(2) = mesh.node_ptr(G(i+1,j+1));
-		  
-		  elem = mesh.add_elem(new Tri3);
+	  case INVALID_ELEM:
+	  case QUAD4:
+	    {
+	      for (unsigned int j=0; j<ny; j++)
+		for (unsigned int i=0; i<nx; i++)
+		  {
+		    Elem* elem = mesh.add_elem(new Quad4);
 
-		  elem->set_node(0) = mesh.node_ptr(G(i,j)    );
-		  elem->set_node(1) = mesh.node_ptr(G(i+1,j+1));
-		  elem->set_node(2) = mesh.node_ptr(G(i,j+1)  );
-		}
+		    elem->set_node(0) = mesh.node_ptr(idx(type,nx,i,j)    );
+		    elem->set_node(1) = mesh.node_ptr(idx(type,nx,i+1,j)  );
+		    elem->set_node(2) = mesh.node_ptr(idx(type,nx,i+1,j+1));
+		    elem->set_node(3) = mesh.node_ptr(idx(type,nx,i,j+1)  );
+
+		    if (j == 0)
+		      mesh.boundary_info.add_side(elem, 0, 0);
+		  
+		    if (j == (ny-1))
+		      mesh.boundary_info.add_side(elem, 2, 2);
+		  
+		    if (i == 0)
+		      mesh.boundary_info.add_side(elem, 3, 3);
+		  
+		    if (i == (nx-1))
+		      mesh.boundary_info.add_side(elem, 1, 1);
+		  }
+	      break;
+	    }
+
+
+	  case TRI3:
+	    {
+	      for (unsigned int j=0; j<ny; j++)
+		for (unsigned int i=0; i<nx; i++)
+		  {
+		    Elem* elem = NULL;
+		  
+		    elem = mesh.add_elem(new Tri3);
+
+		    elem->set_node(0) = mesh.node_ptr(idx(type,nx,i,j)    );
+		    elem->set_node(1) = mesh.node_ptr(idx(type,nx,i+1,j)  );
+		    elem->set_node(2) = mesh.node_ptr(idx(type,nx,i+1,j+1));
+		  
+		    elem = mesh.add_elem(new Tri3);
+
+		    elem->set_node(0) = mesh.node_ptr(idx(type,nx,i,j)    );
+		    elem->set_node(1) = mesh.node_ptr(idx(type,nx,i+1,j+1));
+		    elem->set_node(2) = mesh.node_ptr(idx(type,nx,i,j+1)  );
+		  }
+	      break;
+	    }
+
+
+
+	  case QUAD8:
+	  case QUAD9:
+	    {
+	      for (unsigned int j=0; j<(2*ny); j += 2)
+		for (unsigned int i=0; i<(2*nx); i += 2)
+		  {
+		    Elem* elem = (type == QUAD8) ?
+		      mesh.add_elem(new Quad8) :
+		      mesh.add_elem(new Quad9);
+		  
+
+		    elem->set_node(0) = mesh.node_ptr(idx(type,nx,i,j)    );
+		    elem->set_node(1) = mesh.node_ptr(idx(type,nx,i+2,j)  );
+		    elem->set_node(2) = mesh.node_ptr(idx(type,nx,i+2,j+2));
+		    elem->set_node(3) = mesh.node_ptr(idx(type,nx,i,j+2)  );
+		    elem->set_node(4) = mesh.node_ptr(idx(type,nx,i+1,j)  );
+		    elem->set_node(5) = mesh.node_ptr(idx(type,nx,i+2,j+1));
+		    elem->set_node(6) = mesh.node_ptr(idx(type,nx,i+1,j+2));
+		    elem->set_node(7) = mesh.node_ptr(idx(type,nx,i,j+1)  );
+		    if (type == QUAD9)
+		      elem->set_node(8) = mesh.node_ptr(idx(type,nx,i+1,j+1));
+		  
+
+		    if (j == 0)
+		      mesh.boundary_info.add_side(elem, 0, 0);
+		  
+		    if (j == 2*(ny-1))
+		      mesh.boundary_info.add_side(elem, 2, 2);
+		  
+		    if (i == 0)
+		      mesh.boundary_info.add_side(elem, 3, 3);
+		  
+		    if (i == 2*(nx-1))
+		      mesh.boundary_info.add_side(elem, 1, 1);
+		  }
+	      break;
+	    }
+
+
+	  case TRI6:
+	    {
+	      for (unsigned int j=0; j<(2*ny); j += 2)
+		for (unsigned int i=0; i<(2*nx); i += 2)
+		  {
+		    Elem* elem = NULL;
+		  
+		    elem = mesh.add_elem(new Tri6);
+
+		    elem->set_node(0) = mesh.node_ptr(idx(type,nx,i,j)    );
+		    elem->set_node(1) = mesh.node_ptr(idx(type,nx,i+2,j)  );
+		    elem->set_node(2) = mesh.node_ptr(idx(type,nx,i+2,j+2));
+		    elem->set_node(3) = mesh.node_ptr(idx(type,nx,i+1,j)  );
+		    elem->set_node(4) = mesh.node_ptr(idx(type,nx,i+2,j+1));
+		    elem->set_node(5) = mesh.node_ptr(idx(type,nx,i+1,j+1));
+
+		  
+		    elem = mesh.add_elem(new Tri6);
+
+		    elem->set_node(0) = mesh.node_ptr(idx(type,nx,i,j)    );
+		    elem->set_node(1) = mesh.node_ptr(idx(type,nx,i+2,j+2));
+		    elem->set_node(2) = mesh.node_ptr(idx(type,nx,i,j+2)  );
+		    elem->set_node(3) = mesh.node_ptr(idx(type,nx,i+1,j+1));
+		    elem->set_node(4) = mesh.node_ptr(idx(type,nx,i+1,j+2));
+		    elem->set_node(5) = mesh.node_ptr(idx(type,nx,i,j+1)  );
+		  }
+	      break;
+	    };
+
 	    
-#undef G
+	  default:
+	    {
+	      std::cerr << "ERROR: Unrecognized 2D element type." << std::endl;
+	      error();
+	    }
 	  }
 
 
-	
-	else if ((type == QUAD8) ||
-		 (type == QUAD9))
-	  {
-	    // Build a Quad8 or a QUAD9
-	
-	    mesh.reserve_nodes( (2*nx+1)*(2*ny+1) );
-	    mesh.reserve_elem (nx*ny);
-	    
-	    for (unsigned int j=0; j<=(2*ny); j++)
-	      for (unsigned int i=0; i<=(2*nx); i++)
-		mesh.add_point (Point(static_cast<Real>(i)/static_cast<Real>(2*nx),
-				      static_cast<Real>(j)/static_cast<Real>(2*ny),
-				      0));
-	    
-#define G(i,j) ( (i) + (j)*(2*nx+1) )
-	
-	    for (unsigned int j=0; j<(2*ny); j += 2)
-	      for (unsigned int i=0; i<(2*nx); i += 2)
-		{
-		  Elem* elem = (type == QUAD8) ?
-		    mesh.add_elem(new Quad8) :
-		    mesh.add_elem(new Quad9);
-		  
 
-		  elem->set_node(0) = mesh.node_ptr(G(i,j)    );
-		  elem->set_node(1) = mesh.node_ptr(G(i+2,j)  );
-		  elem->set_node(2) = mesh.node_ptr(G(i+2,j+2));
-		  elem->set_node(3) = mesh.node_ptr(G(i,j+2)  );
-		  elem->set_node(4) = mesh.node_ptr(G(i+1,j)  );
-		  elem->set_node(5) = mesh.node_ptr(G(i+2,j+1));
-		  elem->set_node(6) = mesh.node_ptr(G(i+1,j+2));
-		  elem->set_node(7) = mesh.node_ptr(G(i,j+1)  );
-		  if (type == QUAD9)
-		    elem->set_node(8) = mesh.node_ptr(G(i+1,j+1));
-		  
-
-		  if (j == 0)
-		    mesh.boundary_info.add_side(elem, 0, 0);
-		  
-		  if (j == 2*(ny-1))
-		    mesh.boundary_info.add_side(elem, 2, 2);
-		  
-		  if (i == 0)
-		    mesh.boundary_info.add_side(elem, 3, 3);
-		  
-		  if (i == 2*(nx-1))
-		    mesh.boundary_info.add_side(elem, 1, 1);
-		}
-	    
-#undef G
-	  }
-
-	else if (type == TRI6)
-	  {
-	    // Build a TRI6
-	
-	    mesh.reserve_nodes( (2*nx+1)*(2*ny+1) );
-	    mesh.reserve_elem(2*nx*ny);
-	    
-	    for (unsigned int j=0; j<=(2*ny); j++)
-	      for (unsigned int i=0; i<=(2*nx); i++)
-		mesh.add_point (Point(static_cast<Real>(i)/static_cast<Real>(2*nx),
-				      static_cast<Real>(j)/static_cast<Real>(2*ny),
-				      0));
-	    
-#define G(i,j) ( (i) + (j)*(2*nx+1) )
-	
-	    for (unsigned int j=0; j<(2*ny); j += 2)
-	      for (unsigned int i=0; i<(2*nx); i += 2)
-		{
-		  Elem* elem = NULL;
-		  
-		  elem = mesh.add_elem(new Tri6);
-
-		  elem->set_node(0) = mesh.node_ptr(G(i,j)    );
-		  elem->set_node(1) = mesh.node_ptr(G(i+2,j)  );
-		  elem->set_node(2) = mesh.node_ptr(G(i+2,j+2));
-		  elem->set_node(3) = mesh.node_ptr(G(i+1,j)  );
-		  elem->set_node(4) = mesh.node_ptr(G(i+2,j+1));
-		  elem->set_node(5) = mesh.node_ptr(G(i+1,j+1));
-
-		  
-		  elem = mesh.add_elem(new Tri6);
-
-		  elem->set_node(0) = mesh.node_ptr(G(i,j)    );
-		  elem->set_node(1) = mesh.node_ptr(G(i+2,j+2));
-		  elem->set_node(2) = mesh.node_ptr(G(i,j+2)  );
-		  elem->set_node(3) = mesh.node_ptr(G(i+1,j+1));
-		  elem->set_node(4) = mesh.node_ptr(G(i+1,j+2));
-		  elem->set_node(5) = mesh.node_ptr(G(i,j+1)  );
-		}
-	    
-#undef G
-	  }
-
-	
-	else
-	  {
-	    error();
-	  }
 	
 	// Scale the nodal positions
 	for (unsigned int p=0; p<mesh.n_nodes(); p++)
@@ -314,7 +431,7 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 
 
       //---------------------------------------------------------------------
-      // Build a 3D hexahedral
+      // Build a 3D mesh using hexahedral or prismatic elements.
     case 3:
       {
 	assert (nx != 0);
@@ -322,248 +439,400 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 	assert (nz != 0);
 
 
-	if ((type == INVALID_ELEM) ||
-	    (type == HEX8) ||
-	    (type == PRISM6))
+	// Reserve elements.  Meshes with prismatic elements require
+	// twice as many elements.
+	switch (type)
 	  {
-	    // Build a HEX8
-	    mesh.reserve_nodes( (nx+1)*(ny+1)*(nz+1) );
-	    
-	    if (type == PRISM6)
-	      mesh.reserve_elem(2*nx*ny*nz);
-	    else
+	  case INVALID_ELEM:
+	  case HEX8:
+	  case HEX20:
+	  case HEX27:
+	    {
 	      mesh.reserve_elem(nx*ny*nz);
-	    
-	    for (unsigned int k=0; k<=nz; k++)
-	      for (unsigned int j=0; j<=ny; j++)
-		for (unsigned int i=0; i<=nx; i++)
-		  mesh.add_point(Point(static_cast<Real>(i)/static_cast<Real>(nx),
-				       static_cast<Real>(j)/static_cast<Real>(ny),
-				       static_cast<Real>(k)/static_cast<Real>(nz)));
-	    
-#define G(i,j,k) ( (i) + (nx+1)*((j) + (k)*(ny+1)) )
-	    
-	    for (unsigned int k=0; k<nz; k++)
-	      for (unsigned int j=0; j<ny; j++)
-		for (unsigned int i=0; i<nx; i++)
-		  {
-		    if ((type == INVALID_ELEM) ||
-			(type == HEX8))
-		      {
-			Elem* elem = mesh.add_elem(new Hex8);
-			
-			elem->set_node(0) = mesh.node_ptr(G(i,j,k)      );
-			elem->set_node(1) = mesh.node_ptr(G(i+1,j,k)    );
-			elem->set_node(2) = mesh.node_ptr(G(i+1,j+1,k)  );
-			elem->set_node(3) = mesh.node_ptr(G(i,j+1,k)    );
-			elem->set_node(4) = mesh.node_ptr(G(i,j,k+1)    );
-			elem->set_node(5) = mesh.node_ptr(G(i+1,j,k+1)  );
-			elem->set_node(6) = mesh.node_ptr(G(i+1,j+1,k+1));
-			elem->set_node(7) = mesh.node_ptr(G(i,j+1,k+1)  );
-			
-			if (k == 0)
-			  mesh.boundary_info.add_side(elem, 0, 0);
-			
-			if (k == (nz-1))
-			  mesh.boundary_info.add_side(elem, 5, 5);
-			
-			if (j == 0)
-			  mesh.boundary_info.add_side(elem, 1, 1);
+	      break;
+	    }
 
-			if (j == (ny-1))
-			  mesh.boundary_info.add_side(elem, 3, 3);
- 			
-			if (i == 0)
-			  mesh.boundary_info.add_side(elem, 4, 4);
- 			
-			if (i == (nx-1))
-			  mesh.boundary_info.add_side(elem, 2, 2);
-		      }
+	  case PRISM6:
+	  case PRISM15:
+	  case PRISM18:
+	    {
+	      mesh.reserve_elem(2*nx*ny*nz);
+	      break;
+	    }
 
-		    else if (type == PRISM6)
-		      {
-			Elem* elem = NULL;
-			elem = mesh.add_elem(new Prism6);
-
-			elem->set_node(0) = mesh.node_ptr(G(i,j,k)      );
-			elem->set_node(1) = mesh.node_ptr(G(i+1,j,k)    );
-			elem->set_node(2) = mesh.node_ptr(G(i,j+1,k)    );
-			elem->set_node(3) = mesh.node_ptr(G(i,j,k+1)    );
-			elem->set_node(4) = mesh.node_ptr(G(i+1,j,k+1)  );
-			elem->set_node(5) = mesh.node_ptr(G(i,j+1,k+1)  );
-
-			elem = mesh.add_elem(new Prism6);
-
-			elem->set_node(0) = mesh.node_ptr(G(i+1,j,k)    );
-			elem->set_node(1) = mesh.node_ptr(G(i+1,j+1,k)  );
-			elem->set_node(2) = mesh.node_ptr(G(i,j+1,k)    );
-			elem->set_node(3) = mesh.node_ptr(G(i+1,j,k+1)  );
-			elem->set_node(4) = mesh.node_ptr(G(i+1,j+1,k+1));
-			elem->set_node(5) = mesh.node_ptr(G(i,j+1,k+1)  );
-		      }
-
-		    else
-		      error();
-		  }
-#undef G
-
+	  default:
+	    {
+	      std::cerr << "ERROR: Unrecognized 3D element type." << std::endl;
+	      error();
+	    }
 	  }
-	
 
-	else if ((type == HEX20) ||
-		 (type == HEX27) ||
-		 (type == PRISM15) ||
-		 (type == PRISM18))
+
+
+
+	
+	// Reserve nodes.  Quadratic elements need twice as many nodes as linear elements.
+	switch (type)
 	  {
-	    // Build a HEX20 or HEX27 or PRISM15 or PRISM18
-	    mesh.reserve_nodes( (2*nx+1)*(2*ny+1)*(2*nz+1) );
+	  case INVALID_ELEM:
+	  case HEX8:
+	  case PRISM6:
+	    {
+	      mesh.reserve_nodes( (nx+1)*(ny+1)*(nz+1) );
+	      break;
+	    }
+
+	  case HEX20:
+	  case HEX27:
+	  case PRISM15:
+	  case PRISM18:
+	    {
+	      mesh.reserve_nodes( (2*nx+1)*(2*ny+1)*(2*nz+1) );
+	      break;
+	    }
+
+	  default:
+	    {
+	      std::cerr << "ERROR: Unrecognized 3D element type." << std::endl;
+	      error();
+	    }
+	  }
+
+
+
+
+	// Build the nodes.
+	switch (type)
+	  {
+	  case INVALID_ELEM:
+	  case HEX8:
+	  case PRISM6:
+	    {
+	      for (unsigned int k=0; k<=nz; k++)
+		for (unsigned int j=0; j<=ny; j++)
+		  for (unsigned int i=0; i<=nx; i++)
+		    {
+		      if (gauss_lobatto_grid)
+			{
+			  // Shortcut variable
+			  const Real pi = libMesh::pi;
+
+			  mesh.add_point (Point(0.5*(1.0 - cos(pi*static_cast<Real>(i)/static_cast<Real>(nx))),
+						0.5*(1.0 - cos(pi*static_cast<Real>(j)/static_cast<Real>(ny))),
+						0.5*(1.0 - cos(pi*static_cast<Real>(k)/static_cast<Real>(nz)))));
+			}
+		      
+		      else
+			mesh.add_point(Point(static_cast<Real>(i)/static_cast<Real>(nx),
+					     static_cast<Real>(j)/static_cast<Real>(ny),
+					     static_cast<Real>(k)/static_cast<Real>(nz)));
+		    }
+	      break;
+	    }
 	    
-	    if ((type == HEX20) || (type == HEX27))
-	      mesh.reserve_elem(nx*ny*nz);
-	    else
-	      mesh.reserve_elem(2*nx*ny*nz);
+	  case HEX20:
+	  case HEX27:
+	  case PRISM15:
+	  case PRISM18:
+	    {
+	      for (unsigned int k=0; k<=(2*nz); k++)
+		for (unsigned int j=0; j<=(2*ny); j++)
+		  for (unsigned int i=0; i<=(2*nx); i++)
+		    {
+		      if (gauss_lobatto_grid)
+			{
+			  // Shortcut variable
+			  const Real pi = libMesh::pi;
+			  
+			  // The x,y locations of the point.
+			  Real x=0., y=0., z=0.;
+
+			  // Shortcut quantities (do not depend on i,j)
+			  const Real a = cos( pi / static_cast<Real>(2*nx) );
+			  const Real b = cos( pi / static_cast<Real>(2*ny) );
+
+			  // Shortcut quantities (depend on i,j)
+			  const Real c = cos( pi*i / static_cast<Real>(2*nx) );
+			  const Real d = cos( pi*j / static_cast<Real>(2*ny) );
+			  
+			  // Additional shortcut quantities (for 3D)
+			  const Real e = cos( pi / static_cast<Real>(2*nz) );
+			  const Real f = cos( pi*k / static_cast<Real>(2*nz) );
+			  
+			  // If i is even, compute a normal Gauss-Lobatto point
+			  if (i%2 == 0)
+			    x = 0.5*(1.0 - c);
+
+			  // Otherwise, it is the average of the previous and next points
+			  else
+			    x = 0.5*(1.0 - a*c);
+		      
+			  // If j is even, compute a normal Gauss-Lobatto point
+			  if (j%2 == 0)
+			    y = 0.5*(1.0 - d);
+		      
+			  // Otherwise, it is the average of the previous and next points
+			  else
+			    y = 0.5*(1.0 - b*d);
+
+			  // If k is even, compute a normal Gauss-Lobatto point
+			  if (k%2 == 0)
+			    z = 0.5*(1.0 - f);
+		      
+			  // Otherwise, it is the average of the previous and next points
+			  else
+			    z = 0.5*(1.0 - e*f);
+		      
+			  
+			  mesh.add_point (Point(x,y,z));
+			}
+
+		      else
+			mesh.add_point(Point(static_cast<Real>(i)/static_cast<Real>(2*nx),
+					     static_cast<Real>(j)/static_cast<Real>(2*ny),
+					     static_cast<Real>(k)/static_cast<Real>(2*nz)));
+		    }
+	      break;
+	    }
+
+
+	  default:
+	    {
+	      std::cerr << "ERROR: Unrecognized 3D element type." << std::endl;
+	      error();
+	    }
+	  }
+
 	    
-	    for (unsigned int k=0; k<=(2*nz); k++)
-	      for (unsigned int j=0; j<=(2*ny); j++)
-		for (unsigned int i=0; i<=(2*nx); i++)
-		  mesh.add_point(Point(static_cast<Real>(i)/static_cast<Real>(2*nx),
-				       static_cast<Real>(j)/static_cast<Real>(2*ny),
-				       static_cast<Real>(k)/static_cast<Real>(2*nz)));
+
+	
+	// Build the elements.
+	switch (type)
+	  {
+	  case INVALID_ELEM:
+	  case HEX8:
+	    {
+	      for (unsigned int k=0; k<nz; k++)
+		for (unsigned int j=0; j<ny; j++)
+		  for (unsigned int i=0; i<nx; i++)
+		    {
+		      Elem* elem = mesh.add_elem(new Hex8);
+			
+		      elem->set_node(0) = mesh.node_ptr(idx(type,nx,ny,i,j,k)      );
+		      elem->set_node(1) = mesh.node_ptr(idx(type,nx,ny,i+1,j,k)    );
+		      elem->set_node(2) = mesh.node_ptr(idx(type,nx,ny,i+1,j+1,k)  );
+		      elem->set_node(3) = mesh.node_ptr(idx(type,nx,ny,i,j+1,k)    );
+		      elem->set_node(4) = mesh.node_ptr(idx(type,nx,ny,i,j,k+1)    );
+		      elem->set_node(5) = mesh.node_ptr(idx(type,nx,ny,i+1,j,k+1)  );
+		      elem->set_node(6) = mesh.node_ptr(idx(type,nx,ny,i+1,j+1,k+1));
+		      elem->set_node(7) = mesh.node_ptr(idx(type,nx,ny,i,j+1,k+1)  );
+			
+		      if (k == 0)
+			mesh.boundary_info.add_side(elem, 0, 0);
+			
+		      if (k == (nz-1))
+			mesh.boundary_info.add_side(elem, 5, 5);
+			
+		      if (j == 0)
+			mesh.boundary_info.add_side(elem, 1, 1);
+
+		      if (j == (ny-1))
+			mesh.boundary_info.add_side(elem, 3, 3);
+ 			
+		      if (i == 0)
+			mesh.boundary_info.add_side(elem, 4, 4);
+ 			
+		      if (i == (nx-1))
+			mesh.boundary_info.add_side(elem, 2, 2);
+		    }
+	      break;
+	    }
+
+
+
+
 	    
-#define G(i,j,k) ( (i) + (2*nx+1)*((j) + (k)*(2*ny+1)) )
+	  case PRISM6:
+	    {
+	      for (unsigned int k=0; k<nz; k++)
+		for (unsigned int j=0; j<ny; j++)
+		  for (unsigned int i=0; i<nx; i++)
+		    {
+		      Elem* elem = NULL;
+		      elem = mesh.add_elem(new Prism6);
+
+		      elem->set_node(0) = mesh.node_ptr(idx(type,nx,ny,i,j,k)      );
+		      elem->set_node(1) = mesh.node_ptr(idx(type,nx,ny,i+1,j,k)    );
+		      elem->set_node(2) = mesh.node_ptr(idx(type,nx,ny,i,j+1,k)    );
+		      elem->set_node(3) = mesh.node_ptr(idx(type,nx,ny,i,j,k+1)    );
+		      elem->set_node(4) = mesh.node_ptr(idx(type,nx,ny,i+1,j,k+1)  );
+		      elem->set_node(5) = mesh.node_ptr(idx(type,nx,ny,i,j+1,k+1)  );
+
+		      elem = mesh.add_elem(new Prism6);
+
+		      elem->set_node(0) = mesh.node_ptr(idx(type,nx,ny,i+1,j,k)    );
+		      elem->set_node(1) = mesh.node_ptr(idx(type,nx,ny,i+1,j+1,k)  );
+		      elem->set_node(2) = mesh.node_ptr(idx(type,nx,ny,i,j+1,k)    );
+		      elem->set_node(3) = mesh.node_ptr(idx(type,nx,ny,i+1,j,k+1)  );
+		      elem->set_node(4) = mesh.node_ptr(idx(type,nx,ny,i+1,j+1,k+1));
+		      elem->set_node(5) = mesh.node_ptr(idx(type,nx,ny,i,j+1,k+1)  );
+
+		    }
+	      break;
+	    }
+
+
+
+
 	    
-	    for (unsigned int k=0; k<(2*nz); k += 2)
-	      for (unsigned int j=0; j<(2*ny); j += 2)
-		for (unsigned int i=0; i<(2*nx); i += 2)
-		  {
-		    if ((type == HEX20) ||
-			(type == HEX27))
-		      {
-			Elem* elem = (type == HEX20) ?
-			  mesh.add_elem(new Hex20) :
-			  mesh.add_elem(new Hex27);
+	    
+	  case HEX20:
+	  case HEX27:
+	    {
+	      for (unsigned int k=0; k<(2*nz); k += 2)
+		for (unsigned int j=0; j<(2*ny); j += 2)
+		  for (unsigned int i=0; i<(2*nx); i += 2)
+		    {
+		      Elem* elem = (type == HEX20) ?
+			mesh.add_elem(new Hex20) :
+			mesh.add_elem(new Hex27);
 		    
-			elem->set_node(0)  = mesh.node_ptr(G(i,  j,  k)  );
-			elem->set_node(1)  = mesh.node_ptr(G(i+2,j,  k)  );
-			elem->set_node(2)  = mesh.node_ptr(G(i+2,j+2,k)  );
-			elem->set_node(3)  = mesh.node_ptr(G(i,  j+2,k)  );
-			elem->set_node(4)  = mesh.node_ptr(G(i,  j,  k+2));
-			elem->set_node(5)  = mesh.node_ptr(G(i+2,j,  k+2));
-			elem->set_node(6)  = mesh.node_ptr(G(i+2,j+2,k+2));
-			elem->set_node(7)  = mesh.node_ptr(G(i,  j+2,k+2));
-			elem->set_node(8)  = mesh.node_ptr(G(i+1,j,  k)  );
-			elem->set_node(9)  = mesh.node_ptr(G(i+2,j+1,k)  );
-			elem->set_node(10) = mesh.node_ptr(G(i+1,j+2,k)  );
-			elem->set_node(11) = mesh.node_ptr(G(i,  j+1,k)  );
-			elem->set_node(12) = mesh.node_ptr(G(i,  j,  k+1));
-			elem->set_node(13) = mesh.node_ptr(G(i+2,j,  k+1));
-			elem->set_node(14) = mesh.node_ptr(G(i+2,j+2,k+1));
-			elem->set_node(15) = mesh.node_ptr(G(i,  j+2,k+1));
-			elem->set_node(16) = mesh.node_ptr(G(i+1,j,  k+2));
-			elem->set_node(17) = mesh.node_ptr(G(i+2,j+1,k+2));
-			elem->set_node(18) = mesh.node_ptr(G(i+1,j+2,k+2));
-			elem->set_node(19) = mesh.node_ptr(G(i,  j+1,k+2));
-			if (type == HEX27)
-			  {
-			    elem->set_node(20) = mesh.node_ptr(G(i+1,j+1,k)  );
-			    elem->set_node(21) = mesh.node_ptr(G(i+1,j,  k+1));
-			    elem->set_node(22) = mesh.node_ptr(G(i+2,j+1,k+1));
-			    elem->set_node(23) = mesh.node_ptr(G(i+1,j+2,k+1));
-			    elem->set_node(24) = mesh.node_ptr(G(i,  j+1,k+1));
-			    elem->set_node(25) = mesh.node_ptr(G(i+1,j+1,k+2));
-			    elem->set_node(26) = mesh.node_ptr(G(i+1,j+1,k+1));
-			  }
+		      elem->set_node(0)  = mesh.node_ptr(idx(type,nx,ny,i,  j,  k)  );
+		      elem->set_node(1)  = mesh.node_ptr(idx(type,nx,ny,i+2,j,  k)  );
+		      elem->set_node(2)  = mesh.node_ptr(idx(type,nx,ny,i+2,j+2,k)  );
+		      elem->set_node(3)  = mesh.node_ptr(idx(type,nx,ny,i,  j+2,k)  );
+		      elem->set_node(4)  = mesh.node_ptr(idx(type,nx,ny,i,  j,  k+2));
+		      elem->set_node(5)  = mesh.node_ptr(idx(type,nx,ny,i+2,j,  k+2));
+		      elem->set_node(6)  = mesh.node_ptr(idx(type,nx,ny,i+2,j+2,k+2));
+		      elem->set_node(7)  = mesh.node_ptr(idx(type,nx,ny,i,  j+2,k+2));
+		      elem->set_node(8)  = mesh.node_ptr(idx(type,nx,ny,i+1,j,  k)  );
+		      elem->set_node(9)  = mesh.node_ptr(idx(type,nx,ny,i+2,j+1,k)  );
+		      elem->set_node(10) = mesh.node_ptr(idx(type,nx,ny,i+1,j+2,k)  );
+		      elem->set_node(11) = mesh.node_ptr(idx(type,nx,ny,i,  j+1,k)  );
+		      elem->set_node(12) = mesh.node_ptr(idx(type,nx,ny,i,  j,  k+1));
+		      elem->set_node(13) = mesh.node_ptr(idx(type,nx,ny,i+2,j,  k+1));
+		      elem->set_node(14) = mesh.node_ptr(idx(type,nx,ny,i+2,j+2,k+1));
+		      elem->set_node(15) = mesh.node_ptr(idx(type,nx,ny,i,  j+2,k+1));
+		      elem->set_node(16) = mesh.node_ptr(idx(type,nx,ny,i+1,j,  k+2));
+		      elem->set_node(17) = mesh.node_ptr(idx(type,nx,ny,i+2,j+1,k+2));
+		      elem->set_node(18) = mesh.node_ptr(idx(type,nx,ny,i+1,j+2,k+2));
+		      elem->set_node(19) = mesh.node_ptr(idx(type,nx,ny,i,  j+1,k+2));
+		      if (type == HEX27)
+			{
+			  elem->set_node(20) = mesh.node_ptr(idx(type,nx,ny,i+1,j+1,k)  );
+			  elem->set_node(21) = mesh.node_ptr(idx(type,nx,ny,i+1,j,  k+1));
+			  elem->set_node(22) = mesh.node_ptr(idx(type,nx,ny,i+2,j+1,k+1));
+			  elem->set_node(23) = mesh.node_ptr(idx(type,nx,ny,i+1,j+2,k+1));
+			  elem->set_node(24) = mesh.node_ptr(idx(type,nx,ny,i,  j+1,k+1));
+			  elem->set_node(25) = mesh.node_ptr(idx(type,nx,ny,i+1,j+1,k+2));
+			  elem->set_node(26) = mesh.node_ptr(idx(type,nx,ny,i+1,j+1,k+1));
+			}
 			
 			
-			if (k == 0)
-			  mesh.boundary_info.add_side(elem, 0, 0);
+		      if (k == 0)
+			mesh.boundary_info.add_side(elem, 0, 0);
 			
-			if (k == 2*(nz-1))
-			  mesh.boundary_info.add_side(elem, 5, 5);
+		      if (k == 2*(nz-1))
+			mesh.boundary_info.add_side(elem, 5, 5);
 			
-			if (j == 0)
-			  mesh.boundary_info.add_side(elem, 1, 1);
+		      if (j == 0)
+			mesh.boundary_info.add_side(elem, 1, 1);
 
-			if (j == 2*(ny-1))
-			  mesh.boundary_info.add_side(elem, 3, 3);
+		      if (j == 2*(ny-1))
+			mesh.boundary_info.add_side(elem, 3, 3);
  			
-			if (i == 0)
-			  mesh.boundary_info.add_side(elem, 4, 4);
+		      if (i == 0)
+			mesh.boundary_info.add_side(elem, 4, 4);
  			
-			if (i == 2*(nx-1))
-			  mesh.boundary_info.add_side(elem, 2, 2);
-		      }
+		      if (i == 2*(nx-1))
+			mesh.boundary_info.add_side(elem, 2, 2);
+		    }
+	      break;
+	    }
 
-		    else if ((type == PRISM15) ||
-			     (type == PRISM18))
-		      {
-			Elem* elem = NULL;
-			elem = ((type == PRISM15) ?
-				mesh.add_elem(new Prism15) :
-				mesh.add_elem(new Prism18));
 
-			elem->set_node(0)  = mesh.node_ptr(G(i,  j,  k)  );
-			elem->set_node(1)  = mesh.node_ptr(G(i+2,j,  k)  );
-			elem->set_node(2)  = mesh.node_ptr(G(i,  j+2,k)  );
-			elem->set_node(3)  = mesh.node_ptr(G(i,  j,  k+2));
-			elem->set_node(4)  = mesh.node_ptr(G(i+2,j,  k+2));
-			elem->set_node(5)  = mesh.node_ptr(G(i,  j+2,k+2));
-			elem->set_node(6)  = mesh.node_ptr(G(i+1,j,  k)  );
-			elem->set_node(7)  = mesh.node_ptr(G(i+1,j+1,k)  );
-			elem->set_node(8)  = mesh.node_ptr(G(i,  j+1,k)  );
-			elem->set_node(9)  = mesh.node_ptr(G(i,  j,  k+1));
-			elem->set_node(10) = mesh.node_ptr(G(i+2,j,  k+1));
-			elem->set_node(11) = mesh.node_ptr(G(i,  j+2,k+1));
-			elem->set_node(12) = mesh.node_ptr(G(i+1,j,  k+2));
-			elem->set_node(13) = mesh.node_ptr(G(i+1,j+1,k+2));
-			elem->set_node(14) = mesh.node_ptr(G(i,  j+1,k+2));
-			if (type == PRISM18)
-			  {
-			    elem->set_node(15) = mesh.node_ptr(G(i+1,j,  k+1));
-			    elem->set_node(16) = mesh.node_ptr(G(i+1,j+1,k+1));
-			    elem->set_node(17) = mesh.node_ptr(G(i,  j+1,k+1));
-			  }
+
+	    
+	    // TODO: Add the proper sides to the boundary_info object.
+	  case PRISM15:
+	  case PRISM18:
+	    {
+	      for (unsigned int k=0; k<(2*nz); k += 2)
+		for (unsigned int j=0; j<(2*ny); j += 2)
+		  for (unsigned int i=0; i<(2*nx); i += 2)
+		    {
+		      Elem* elem = NULL;
+		      elem = ((type == PRISM15) ?
+			      mesh.add_elem(new Prism15) :
+			      mesh.add_elem(new Prism18));
+
+		      elem->set_node(0)  = mesh.node_ptr(idx(type,nx,ny,i,  j,  k)  );
+		      elem->set_node(1)  = mesh.node_ptr(idx(type,nx,ny,i+2,j,  k)  );
+		      elem->set_node(2)  = mesh.node_ptr(idx(type,nx,ny,i,  j+2,k)  );
+		      elem->set_node(3)  = mesh.node_ptr(idx(type,nx,ny,i,  j,  k+2));
+		      elem->set_node(4)  = mesh.node_ptr(idx(type,nx,ny,i+2,j,  k+2));
+		      elem->set_node(5)  = mesh.node_ptr(idx(type,nx,ny,i,  j+2,k+2));
+		      elem->set_node(6)  = mesh.node_ptr(idx(type,nx,ny,i+1,j,  k)  );
+		      elem->set_node(7)  = mesh.node_ptr(idx(type,nx,ny,i+1,j+1,k)  );
+		      elem->set_node(8)  = mesh.node_ptr(idx(type,nx,ny,i,  j+1,k)  );
+		      elem->set_node(9)  = mesh.node_ptr(idx(type,nx,ny,i,  j,  k+1));
+		      elem->set_node(10) = mesh.node_ptr(idx(type,nx,ny,i+2,j,  k+1));
+		      elem->set_node(11) = mesh.node_ptr(idx(type,nx,ny,i,  j+2,k+1));
+		      elem->set_node(12) = mesh.node_ptr(idx(type,nx,ny,i+1,j,  k+2));
+		      elem->set_node(13) = mesh.node_ptr(idx(type,nx,ny,i+1,j+1,k+2));
+		      elem->set_node(14) = mesh.node_ptr(idx(type,nx,ny,i,  j+1,k+2));
+		      if (type == PRISM18)
+			{
+			  elem->set_node(15) = mesh.node_ptr(idx(type,nx,ny,i+1,j,  k+1));
+			  elem->set_node(16) = mesh.node_ptr(idx(type,nx,ny,i+1,j+1,k+1));
+			  elem->set_node(17) = mesh.node_ptr(idx(type,nx,ny,i,  j+1,k+1));
+			}
 
 			
-			elem = ((type == PRISM15) ?
-				mesh.add_elem(new Prism15) :
-				mesh.add_elem(new Prism18));
+		      elem = ((type == PRISM15) ?
+			      mesh.add_elem(new Prism15) :
+			      mesh.add_elem(new Prism18));
 			
-			elem->set_node(0)  = mesh.node_ptr(G(i+2,j,k)     );
-			elem->set_node(1)  = mesh.node_ptr(G(i+2,j+2,k)   );
-			elem->set_node(2)  = mesh.node_ptr(G(i,j+2,k)     );
-			elem->set_node(3)  = mesh.node_ptr(G(i+2,j,k+2)   );
-			elem->set_node(4)  = mesh.node_ptr(G(i+2,j+2,k+2) );
-			elem->set_node(5)  = mesh.node_ptr(G(i,j+2,k+2)   );
-			elem->set_node(6)  = mesh.node_ptr(G(i+2,j+1,k)  );
-			elem->set_node(7)  = mesh.node_ptr(G(i+1,j+2,k)  );
-			elem->set_node(8)  = mesh.node_ptr(G(i+1,j+1,k)  );
-			elem->set_node(9)  = mesh.node_ptr(G(i+2,j,k+1)  );
-			elem->set_node(10) = mesh.node_ptr(G(i+2,j+2,k+1));
-			elem->set_node(11) = mesh.node_ptr(G(i,j+2,k+1)  );
-			elem->set_node(12) = mesh.node_ptr(G(i+2,j+1,k+2));
-			elem->set_node(13) = mesh.node_ptr(G(i+1,j+2,k+2));
-			elem->set_node(14) = mesh.node_ptr(G(i+1,j+1,k+2));
-			if (type == PRISM18)
-			  {
-			    elem->set_node(15)  = mesh.node_ptr(G(i+2,j+1,k+1));
-			    elem->set_node(16)  = mesh.node_ptr(G(i+1,j+2,k+1));
-			    elem->set_node(17)  = mesh.node_ptr(G(i+1,j+1,k+1));
-			  }
-		      }
+		      elem->set_node(0)  = mesh.node_ptr(idx(type,nx,ny,i+2,j,k)     );
+		      elem->set_node(1)  = mesh.node_ptr(idx(type,nx,ny,i+2,j+2,k)   );
+		      elem->set_node(2)  = mesh.node_ptr(idx(type,nx,ny,i,j+2,k)     );
+		      elem->set_node(3)  = mesh.node_ptr(idx(type,nx,ny,i+2,j,k+2)   );
+		      elem->set_node(4)  = mesh.node_ptr(idx(type,nx,ny,i+2,j+2,k+2) );
+		      elem->set_node(5)  = mesh.node_ptr(idx(type,nx,ny,i,j+2,k+2)   );
+		      elem->set_node(6)  = mesh.node_ptr(idx(type,nx,ny,i+2,j+1,k)  );
+		      elem->set_node(7)  = mesh.node_ptr(idx(type,nx,ny,i+1,j+2,k)  );
+		      elem->set_node(8)  = mesh.node_ptr(idx(type,nx,ny,i+1,j+1,k)  );
+		      elem->set_node(9)  = mesh.node_ptr(idx(type,nx,ny,i+2,j,k+1)  );
+		      elem->set_node(10) = mesh.node_ptr(idx(type,nx,ny,i+2,j+2,k+1));
+		      elem->set_node(11) = mesh.node_ptr(idx(type,nx,ny,i,j+2,k+1)  );
+		      elem->set_node(12) = mesh.node_ptr(idx(type,nx,ny,i+2,j+1,k+2));
+		      elem->set_node(13) = mesh.node_ptr(idx(type,nx,ny,i+1,j+2,k+2));
+		      elem->set_node(14) = mesh.node_ptr(idx(type,nx,ny,i+1,j+1,k+2));
+		      if (type == PRISM18)
+			{
+			  elem->set_node(15)  = mesh.node_ptr(idx(type,nx,ny,i+2,j+1,k+1));
+			  elem->set_node(16)  = mesh.node_ptr(idx(type,nx,ny,i+1,j+2,k+1));
+			  elem->set_node(17)  = mesh.node_ptr(idx(type,nx,ny,i+1,j+1,k+1));
+			}
+		    }
+	      break;
+	    }
 
-		    else
-		      error();
-		  }
-#undef G
 
+
+
+	    
+	  default:
+	    {
+	      std::cerr << "ERROR: Unrecognized 3D element type." << std::endl;
+	      error();
+	    }
 	  }
 
-	else
-	  {
-	    error();
-	  }
-	
+	    
+
+
+	//.......................................
 	// Scale the nodal positions
 	for (unsigned int p=0; p<mesh.n_nodes(); p++)
 	  {
@@ -592,12 +861,20 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 
 
 
+
+
+
+
+
+
+
 void MeshTools::Generation::build_square (Mesh& mesh,
 					  const unsigned int nx,
 					  const unsigned int ny,
 					  const Real xmin, const Real xmax,
 					  const Real ymin, const Real ymax,
-					  const ElemType type)
+					  const ElemType type,
+					  const bool gauss_lobatto_grid)
 {
   // This method only makes sense in 2D!
   assert (mesh.mesh_dimension() == 2);
@@ -608,8 +885,15 @@ void MeshTools::Generation::build_square (Mesh& mesh,
 	      xmin, xmax,
 	      ymin, ymax,
 	      0., 0.,
-	      type);
+	      type,
+	      gauss_lobatto_grid);
 }
+
+
+
+
+
+
 
 
 

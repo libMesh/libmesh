@@ -1,4 +1,4 @@
-// $Id: mesh_generation.h,v 1.2 2004-12-02 18:18:56 benkirk Exp $
+// $Id: mesh_generation.h,v 1.3 2005-02-14 22:29:35 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -29,6 +29,7 @@
 // Local Includes -----------------------------------
 #include "libmesh_common.h"
 #include "enum_elem_type.h"
+#include "libmesh.h"
 
 // forward declarations
 class Mesh;
@@ -44,7 +45,7 @@ namespace MeshTools
    *
    * \author Benjamin S. Kirk
    * \date 2004
-   * \version $Revision: 1.2 $
+   * \version $Revision: 1.3 $
    */
   namespace Generation
   {
@@ -61,7 +62,8 @@ namespace MeshTools
 		     const Real xmin=0., const Real xmax=1.,
 		     const Real ymin=0., const Real ymax=1.,
 		     const Real zmin=0., const Real zmax=1.,
-		     const ElemType type=INVALID_ELEM);
+		     const ElemType type=INVALID_ELEM,
+		     const bool gauss_lobatto_grid=false);
 
     /**
      * A specialized \p build_cube() for 2D meshes.
@@ -71,7 +73,8 @@ namespace MeshTools
 		       const unsigned int ny,
 		       const Real xmin=0., const Real xmax=1.,
 		       const Real ymin=0., const Real ymax=1.,
-		       const ElemType type=INVALID_ELEM);
+		       const ElemType type=INVALID_ELEM,
+		       const bool gauss_lobatto_grid=false);
 
     /**
      * Meshes a spherical or mapped-spherical domain.
@@ -80,6 +83,86 @@ namespace MeshTools
 		       const Real rad=1,
 		       const unsigned int nr=2,
 		       const ElemType type=INVALID_ELEM);
+
+    /**
+     * A useful inline function which replaces the #defines
+     * used previously.  Not private since this is a namespace,
+     * but would be if this were a class.  The first one returns
+     * the proper node number for 2D elements while the second
+     * one returns the node number for 3D elements.
+     */
+    inline
+    unsigned int idx(const ElemType type,
+		     const unsigned int nx,
+		     const unsigned int i,
+		     const unsigned int j)
+    {
+      switch(type)
+	{
+	case INVALID_ELEM:
+	case QUAD4:
+	case TRI3:
+	  {
+	    return i + j*(nx+1);
+	    break;
+	  }
+
+	case QUAD8:
+	case QUAD9:
+	case TRI6:
+	  {
+	    return i + j*(2*nx+1);
+	    break;
+	  }
+	  
+	default:
+	  {
+	    std::cerr << "ERROR: Unrecognized 2D element type." << std::endl;
+	    error();
+	  }
+	}
+
+      return libMesh::invalid_uint;
+    }
+
+
+    // Same as the function above, but for 3D elements
+    inline
+    unsigned int idx(const ElemType type,
+		     const unsigned int nx,
+		     const unsigned int ny,
+		     const unsigned int i,
+		     const unsigned int j,
+		     const unsigned int k)
+    {
+      switch(type)
+	{
+	case INVALID_ELEM:
+	case HEX8:
+	case PRISM6:
+	  {
+	    return i + (nx+1)*(j + k*(ny+1));
+	    break;
+	  }
+
+	case HEX20:
+	case HEX27:
+	case PRISM15:
+	case PRISM18:
+	  {
+	    return i + (2*nx+1)*(j + k*(2*ny+1));
+	    break;
+	  }
+	  
+	default:
+	  {
+	    std::cerr << "ERROR: Unrecognized 2D element type." << std::endl;
+	    error();
+	  }
+	}
+      
+      return libMesh::invalid_uint;
+    }
     
   } // end namespace Meshtools::Generation
 } // end namespace MeshTools
