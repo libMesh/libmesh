@@ -2635,10 +2635,10 @@ fi;
   if (test "$GXX" = yes -a "x$REAL_GXX" != "x" ) ; then
         GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
     case "$GXX_VERSION_STRING" in
-      *3.5*)
-  	echo "$as_me:$LINENO: result: <<< C++ compiler is gcc-3.5 >>>" >&5
-echo "${ECHO_T}<<< C++ compiler is gcc-3.5 >>>" >&6
-  	GXX_VERSION=gcc3.5
+      *4.0*)
+  	echo "$as_me:$LINENO: result: <<< C++ compiler is gcc-4.0 >>>" >&5
+echo "${ECHO_T}<<< C++ compiler is gcc-4.0 >>>" >&6
+  	GXX_VERSION=gcc4.0
   	;;
       *3.4*)
   	echo "$as_me:$LINENO: result: <<< C++ compiler is gcc-3.4 >>>" >&5
@@ -2829,7 +2829,7 @@ echo "$as_me: error: Unrecognized compiler" >&2;}
 
     if (test "$GXX" = yes -a "x$REAL_GXX" != "x" ) ; then
     CXXFLAGSO="-O2 -felide-constructors -DNDEBUG"
-    CXXFLAGSG=" -O2 -felide-constructors -g -ansi -pedantic -W -Wall -Wunused -Wpointer-arith -Wimplicit -Wformat -Wparentheses -Wuninitialized -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -DDEBUG"
+    CXXFLAGSG="-O2 -felide-constructors -g -ansi -pedantic -W -Wall -Wunused -Wpointer-arith -Wimplicit -Wformat -Wparentheses -Wuninitialized -DDEBUG"
     CXXFLAGSP="$CXXFLAGSO -g -pg"
     CXXFLAGSS="-fsyntax-only"
 
@@ -2846,8 +2846,7 @@ echo "$as_me: error: Unrecognized compiler" >&2;}
       CFLAGSO="$CFLAGSO -fPIC"
       CFLAGSG="$CFLAGSG -fPIC"
       CFLAGSP="$CFLAGSP -fPIC"
-
-          fi
+    fi
 
 
     case "$GXX_VERSION" in
@@ -2874,14 +2873,17 @@ echo "$as_me: error: Unrecognized compiler" >&2;}
 
 
     case "$GXX_VERSION" in
-      egcs1.1 | gcc2.95)
-          CXXFLAGSO="$CXXFLAGSO -fnonnull-objects"
-          CXXFLAGSG="$CXXFLAGSG -Wmissing-declarations -Wbad-function-cast -Wtraditional -Wnested-externs"
-          CXXFLAGSP="$CXXFLAGSP -fnonnull-objects"
-          ;;
+                        egcs1.1 | gcc2.95)
+         CXXFLAGSO="$CXXFLAGSO -fnonnull-objects"
+         CXXFLAGSG="$CXXFLAGSG -Wmissing-declarations -Wbad-function-cast -Wtraditional -Wnested-externs"
+         CXXFLAGSP="$CXXFLAGSP -fnonnull-objects"
+         ;;
 
+                              gcc3.* | gcc4.*)
+         CXXFLAGSG="$CXXFLAGSG -Woverloaded-virtual -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
+  	 ;;
       *)
-          ;;
+         ;;
     esac
 
 
@@ -7582,7 +7584,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:7585:" \
+echo "$as_me:7587:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -7750,7 +7752,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_verb"
-(eval echo $as_me:7753: \"$ac_link\") >&5
+(eval echo $as_me:7755: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -7830,7 +7832,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_cv_prog_f77_v"
-(eval echo $as_me:7833: \"$ac_link\") >&5
+(eval echo $as_me:7835: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS

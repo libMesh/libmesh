@@ -56,6 +56,7 @@ The library is known to work with the following compilers:
 <ul>
   <li>GNU GCC</li>
     <ul>
+      <li><code>gcc</code> 4.0.0-cvs</li>
       <li><code>gcc</code> 3.x</li>
       <li><code>gcc</code> 2.95.3</li>
       <li><code>gcc</code> 2.96 (RedHat's compiler in the 7.x series)</li>

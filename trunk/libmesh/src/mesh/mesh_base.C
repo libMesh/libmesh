@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.83 2004-11-12 00:42:42 jwpeterson Exp $
+// $Id: mesh_base.C,v 1.84 2004-11-14 03:50:31 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -415,12 +415,10 @@ void MeshBase::find_neighbors()
 #if   defined(HAVE_HASH_MAP)    
     typedef std::hash_multimap<key_type, val_type> map_type;    
 #elif defined(HAVE_EXT_HASH_MAP)
-# if  __GNUC__ >= 3
-#   if __GNUC_MINOR__ == 0    
-       typedef std::hash_multimap<key_type, val_type> map_type;
-#   else
-       typedef __gnu_cxx::hash_multimap<key_type, val_type> map_type;
-#   endif
+# if    (__GNUC__ == 3) && (__GNUC_MINOR__ == 0) // gcc 3.0   
+    typedef std::hash_multimap<key_type, val_type> map_type;
+# elif (__GNUC__ >= 3)                          // gcc 3.1 & newer
+    typedef __gnu_cxx::hash_multimap<key_type, val_type> map_type;
 # else
     DIE A HORRIBLE DEATH
 # endif
@@ -854,10 +852,10 @@ void MeshBase::distort (const Real factor,
 	{
 	  // the direction, random but unit normalized
 	  
-	  Point dir( ((Real) rand())/((Real) RAND_MAX),
-		     ((Real) rand())/((Real) RAND_MAX),
+	  Point dir( static_cast<Real>(rand())/static_cast<Real>(RAND_MAX),
+		     static_cast<Real>(rand())/static_cast<Real>(RAND_MAX),
 		     ((this->mesh_dimension() == 3) ?
-		      ((Real) rand())/((Real) RAND_MAX) :
+		      static_cast<Real>(rand())/static_cast<Real>(RAND_MAX) :
 		      0.)
 		     );
 	  
