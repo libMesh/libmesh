@@ -1,4 +1,4 @@
-// $Id: quadrature.h,v 1.8 2003-02-06 17:58:34 ddreyer Exp $
+// $Id: quadrature.h,v 1.9 2003-02-13 22:56:08 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -65,7 +65,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~QBase() {};
+  virtual ~QBase() {}
 
   /**
    * @returns the quadrature type in derived classes.
@@ -87,30 +87,30 @@ public:
    * @returns the number of points associated with the quadrature rule.
    */    
   unsigned int n_points() const
-    { assert (!_points.empty()); return _points.size(); };
+    { assert (!_points.empty()); return _points.size(); }
 
   /**
    * @returns a \p std::vector containing the quadrature point locations
    * on a reference object.
    */
-  const std::vector<Point>& get_points()  const { return _points;  };
+  const std::vector<Point>& get_points()  const { return _points;  }
 
   /**
    * @returns a \p std::vector containing the quadrature weights.
    */
-  const std::vector<Real>& get_weights() const { return _weights; };
+  const std::vector<Real>& get_weights() const { return _weights; }
 
   /**
    * @returns the \f$ i^{th} \f$ quadrature point on the reference object.
    */
   Point qp(const unsigned int i) const
-    { assert (i < _points.size()); return _points[i]; };
+    { assert (i < _points.size()); return _points[i]; }
 
   /**
    * @returns the \f$ i^{th} \f$ quadrature weight.
    */
   Real w(const unsigned int i) const
-    { assert (i < _weights.size()); return _weights[i]; };
+    { assert (i < _weights.size()); return _weights[i]; }
   
   /**
    * Initializes the data structures to contain a quadrature rule
@@ -128,7 +128,7 @@ public:
   /**
    * @returns the order of the quadrature rule.   
    */
-  Order get_order() const { return _order; };
+  Order get_order() const { return _order; }
   
   /**
    * Prints information relevant to the quadrature rule.
@@ -159,13 +159,13 @@ protected:
    */
   virtual void init_2D (const ElemType)
 #ifndef DEBUG
-  {};
+  {}
 #else
   {  
     std::cerr << "ERROR: Seems as if this quadrature rule" << std::endl
 	      << " is not implemented for 2D." << std::endl;
     error();
-  };
+  }
 #endif
 
   /**
@@ -178,13 +178,13 @@ protected:
    */
   virtual void init_3D (const ElemType)
 #ifndef DEBUG
-  {};
+  {}
 #else
   {  
     std::cerr << "ERROR: Seems as if this quadrature rule" << std::endl
 	      << " is not implemented for 3D." << std::endl;
     error();
-  };
+  }
 #endif
 
   
@@ -196,13 +196,13 @@ protected:
    */
   virtual void init_2D (const ElemType, const unsigned int)
 #ifndef DEBUG
-  {};
+  {}
 #else
   {  
     std::cerr << "ERROR: Seems as if this quadrature rule" << std::endl
 	      << " is not implemented for 2D side(line) integration." << std::endl;
     error();
-  };
+  }
 #endif
 
 
@@ -214,13 +214,13 @@ protected:
    */
   virtual void init_3D (const ElemType, const unsigned int)
 #ifndef DEBUG
-  {};
+  {}
 #else
   {  
     std::cerr << "ERROR: Seems as if this quadrature rule" << std::endl
 	      << " is not implemented for 3D side(face) integration." << std::endl;
     error();
-  };
+  }
 #endif
 
   
@@ -372,7 +372,7 @@ QBase::QBase(const unsigned int d,
   _order(o),
   _type(INVALID_ELEM)
 {
-};
+}
 
 
 
@@ -390,7 +390,7 @@ void QBase::print_info() const
       _points[qp].print();
       std::cout << " Weight: " << std::endl;
       std::cout << "  w=" << _weights[qp] << std::endl << std::endl;
-    };
-};
+    }
+}
 
 #endif

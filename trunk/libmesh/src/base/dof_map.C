@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.13 2003-02-13 16:34:30 benkirk Exp $
+// $Id: dof_map.C,v 1.14 2003-02-13 22:56:08 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -56,13 +56,13 @@ DofMap::DofMap() :
 #endif
   
 {
-};
+}
 
 
 
 DofMap::~DofMap()
 {
-};
+}
 
 
 
@@ -71,7 +71,7 @@ void DofMap::attach_matrix (SparseMatrix& matrix)
   _matrix = &matrix;
   
   _matrix->attach_dof_map (*this);
-};
+}
 
 
 
@@ -103,7 +103,7 @@ void DofMap::reinit(MeshBase& mesh)
 
     for ( ; elem_it != elem_end; ++elem_it)
       (*elem_it)->set_n_vars(n_comp);
-  };
+  }
 
 
   
@@ -128,7 +128,7 @@ void DofMap::reinit(MeshBase& mesh)
 	      
 	      if (dofs_at_node > elem->get_node(n)->n_comp(c))
 		elem->get_node(n)->set_n_comp(c, dofs_at_node);
-	    };
+	    }
 	     
 	  // Allocate the element DOFs
 	  const unsigned int dofs_per_elem =
@@ -136,11 +136,11 @@ void DofMap::reinit(MeshBase& mesh)
 	  
 	  if (dofs_per_elem > elem->n_comp(c))
 	    elem->set_n_comp(c,dofs_per_elem);
-	};
-    };
+	}
+    }
   
   perf_log.stop_event("reinit()");
-};
+}
 
 
 
@@ -170,7 +170,7 @@ void DofMap::clear()
     _n_nodes =
     _n_elem =
     0;
-};
+}
 
 
 
@@ -238,9 +238,9 @@ void DofMap::distribute_dofs(MeshBase& mesh)
 			  {
 			    if (processor == proc_id)
 			      _send_list.push_back(node->dof_number(comp,index));
-			  };
-		      };
-		  };
+			  }
+		      }
+		  }
 		  
 		// Now number the element DOFS
 		for (unsigned int index=0; index<elem->n_comp(comp); index++)
@@ -253,11 +253,11 @@ void DofMap::distribute_dofs(MeshBase& mesh)
 		    
 		    if (processor == proc_id)
 		      _send_list.push_back(elem->dof_number(comp,index));
-		  };
-	      };
+		  }
+	      }
       
       _last_df[processor] = (next_free_dof-1);
-    };
+    }
   
   _n_dfs = next_free_dof;
 
@@ -285,11 +285,11 @@ void DofMap::distribute_dofs(MeshBase& mesh)
 	new_send_list.push_back(_send_list[i]);
 
     _send_list = new_send_list;
-  };
+  }
   
   perf_log.stop_event("distribute_dofs()");
     
-};
+}
 
 
 
@@ -357,10 +357,10 @@ void DofMap::compute_sparsity(MeshBase& mesh)
 			const unsigned int jg = element_dofs[j];
 			
 			row.insert(jg);
-		      };
-		  };
-	      };
-	  };      
+		      }
+		  }
+	      }
+	  }      
     } 
 
 
@@ -423,12 +423,12 @@ void DofMap::compute_sparsity(MeshBase& mesh)
 				const unsigned int jg = element_dofs_j[j];
 			
 				row.insert(jg);
-			      };
-			  };
-		      };
-		  };
-	    };
-    };      
+			      }
+			  }
+		      }
+		  }
+	    }
+    }      
 
 
 
@@ -457,7 +457,7 @@ void DofMap::compute_sparsity(MeshBase& mesh)
 	  _n_nz[i]++;
 	else
 	  _n_oz[i]++;
-    };
+    }
 
 
   // We are done with the sparsity_pattern.  However, quite a
@@ -477,8 +477,8 @@ void DofMap::compute_sparsity(MeshBase& mesh)
     // it is about to go out of scope, but maybe this
     // will expedite freeing up its memory?
     sparsity_pattern.clear();
-  };
-};
+  }
+}
 
 
 
@@ -517,8 +517,8 @@ void DofMap::dof_indices (const Elem* elem,
 			DofObject::invalid_id);
 		
 		di.push_back(node->dof_number(c, i));
-	      };
-	  };
+	      }
+	  }
 	
 	// Get the element-based DOF numbers	  
 	for (unsigned int i=0; i<elem->n_comp(c); i++)
@@ -527,9 +527,9 @@ void DofMap::dof_indices (const Elem* elem,
 		    DofObject::invalid_id);
 	    
 	    di.push_back(elem->dof_number(c, i));
-	  };
-      };
-};
+	  }
+      }
+}
 
 
 
@@ -633,14 +633,14 @@ void DofMap::create_dof_constraints(MeshBase& mesh)
 								      static_cast<float>(their_dof_value));
 
 			      constraint_row.insert(p);
-			    };
-			};		      
-		    };
-		};
-	    };
+			    }
+			}		      
+		    }
+		}
+	    }
   
   perf_log.stop_event("create_dof_constraints()");
-};
+}
 
 
 
@@ -655,7 +655,7 @@ void DofMap::add_constraint_row (const unsigned int dof_number,
   std::pair<unsigned int, DofConstraintRow> kv(dof_number, constraint_row);
 
   _dof_constraints.insert(kv);
-};
+}
 
 
 
@@ -679,8 +679,8 @@ void DofMap::print_dof_constraints() const
 		  << pos->second << ")\t";
 
       std::cout << std::endl;
-    };
-};
+    }
+}
 
 
 
@@ -735,9 +735,9 @@ void DofMap::constrain_element_matrix (RealDenseMatrix& matrix,
 	      for (unsigned int j=0; j<elem_dofs.size(); j++)
 		if (elem_dofs[j] == it->first)
 		  matrix(i,j) = -it->second;	
-	  };
-    }; // end if is constrained...
-};
+	  }
+    } // end if is constrained...
+}
 
 
 
@@ -794,7 +794,7 @@ void DofMap::constrain_element_matrix_and_vector (RealDenseMatrix& matrix,
 	      for (unsigned int j=0; j<elem_dofs.size(); j++)
 		if (elem_dofs[j] == it->first)
 		  matrix(i,j) = -it->second;	
-	  };
+	  }
 
       
       // Compute the matrix-vector product C^T F
@@ -810,7 +810,7 @@ void DofMap::constrain_element_matrix_and_vector (RealDenseMatrix& matrix,
 	  
 	  for (unsigned int j=0; j<old_rhs.size(); j++)
 	    rhs[i] += C.transpose(i,j)*old_rhs[j];
-	};
+	}
 
 
       assert (elem_dofs.size() == rhs.size());
@@ -820,9 +820,9 @@ void DofMap::constrain_element_matrix_and_vector (RealDenseMatrix& matrix,
 	  {	
 	    // If the DOF is constrained
 	    rhs[i] = 0.;
-	  };
-    }; // end if is constrained...
-};
+	  }
+    } // end if is constrained...
+}
 
 
 
@@ -894,9 +894,9 @@ void DofMap::constrain_element_matrix (RealDenseMatrix& matrix,
 	      for (unsigned int j=0; j<col_dofs.size(); j++)
 		if (col_dofs[j] == it->first)
 		  matrix(i,j) = -it->second;	
-	  };
-    }; // end if is constrained...
-};
+	  }
+    } // end if is constrained...
+}
 
 
 
@@ -929,7 +929,7 @@ void DofMap::constrain_element_vector (std::vector<Real>&         rhs,
 	  
 	  for (unsigned int j=0; j<old_rhs.size(); j++)
 	    rhs[i] += R.transpose(i,j)*old_rhs[j];
-	};
+	}
 
 
       assert (row_dofs.size() == rhs.size());
@@ -939,9 +939,9 @@ void DofMap::constrain_element_vector (std::vector<Real>&         rhs,
 	  {	
 	    // If the DOF is constrained
 	    rhs[i] = 0.;
-	  };
-    }; // end if the RHS is constrained.
-};
+	  }
+    } // end if the RHS is constrained.
+}
 
 
 
@@ -957,7 +957,7 @@ void DofMap::build_constraint_matrix (RealDenseMatrix& C,
   {
     for (unsigned int i=0; i<elem_dofs.size(); i++)
       dof_set.insert(elem_dofs[i]);
-  };
+  }
   
 
   // Next insert any dofs those might be constrained in terms
@@ -985,14 +985,14 @@ void DofMap::build_constraint_matrix (RealDenseMatrix& C,
 		 it=constraint_row.begin(); it != constraint_row.end();
 	       ++it)
 	    dof_set.insert (it->first);
-	};
+	}
 
     // If we added any DOFS then we need to do this recursively.
     // It is possible that we just added a DOF that is also
     // constrained!
     if (dof_set.size() != orig_dof_set_size)
       done = false;
-  };
+  }
 
 
   // If not done then we need to do more work
@@ -1009,7 +1009,7 @@ void DofMap::build_constraint_matrix (RealDenseMatrix& C,
 	for (RCSet::const_iterator it=dof_set.begin();
 	     it != end_it; ++it)
 	  new_elem_dofs[i++] = *it;
-      };
+      }
       
       // Now we can build the constraint matrix.
       // Note that resize also zeros for a RealDenseMatrix.
@@ -1042,9 +1042,9 @@ void DofMap::build_constraint_matrix (RealDenseMatrix& C,
 	      for (unsigned int j=0; j<new_elem_dofs.size(); j++)
 		if (new_elem_dofs[j] == elem_dofs[i])
 		  C(i,j) =  1.;
-	    };	
+	    }	
 	//C.print();
-      };
+      }
 
       // May need to do this recursively.  It is possible
       // that we just replaced a constrained DOF with another
@@ -1060,11 +1060,11 @@ void DofMap::build_constraint_matrix (RealDenseMatrix& C,
 	{                                 // is constrained...
 	  //here();
 	  C.right_multiply(Cnew, false);
-	};
+	}
       
       assert (C.n() == elem_dofs.size());
-    }; // end if (!done)
-};
+    } // end if (!done)
+}
 
 
 // endif of ENABLE_AMR
@@ -1119,14 +1119,14 @@ void DofMap::find_connected_dofs (std::vector<unsigned int>& elem_dofs) const
 		 it=constraint_row.begin(); it != constraint_row.end();
 	       ++it)
 	    dof_set.insert (it->first);
-	};
+	}
 
     // If we added any DOFS then we need to do this recursively.
     // It is possible that we just added a DOF that is also
     // constrained!
     if (dof_set.size() != orig_dof_set_size)
       done = false;
-  };
+  }
 
 
   // If not done then we need to do more work
@@ -1143,7 +1143,7 @@ void DofMap::find_connected_dofs (std::vector<unsigned int>& elem_dofs) const
 	for (RCSet::const_iterator it=dof_set.begin();
 	     it != end_it; ++it)
 	  elem_dofs[i++] = *it;
-      };
+      }
       
 
       // May need to do this recursively.  It is possible
@@ -1151,9 +1151,9 @@ void DofMap::find_connected_dofs (std::vector<unsigned int>& elem_dofs) const
       // constrained DOF.
       find_connected_dofs (elem_dofs);
       
-    }; // end if (!done)
+    } // end if (!done)
 
 
 #endif
 
-};
+}

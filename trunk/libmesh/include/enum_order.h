@@ -1,4 +1,4 @@
-// $Id: enum_order.h,v 1.4 2003-01-24 17:24:38 jwpeterson Exp $
+// $Id: enum_order.h,v 1.5 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -60,7 +60,7 @@ namespace MeshEnums {
 	      TWENTYTHIRD  = 23,	      
 	      INVALID_ORDER};
 
-};
+}
 
 using namespace MeshEnums;
 

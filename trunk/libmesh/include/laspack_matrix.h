@@ -1,4 +1,4 @@
-// $Id: laspack_matrix.h,v 1.5 2003-02-11 00:08:41 benkirk Exp $
+// $Id: laspack_matrix.h,v 1.6 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk, John W. Peterson
@@ -127,7 +127,7 @@ class LaspackMatrix : public SparseMatrix
    * this method \p closed() is true and the matrix can
    * be used in computations.
    */
-  void close () const { const_cast<LaspackMatrix*>(this)->_closed = true; };
+  void close () const { const_cast<LaspackMatrix*>(this)->_closed = true; }
   
   /**
    * @returns \p m, the row-dimension of
@@ -224,7 +224,7 @@ class LaspackMatrix : public SparseMatrix
    * to the l1-norm for vectors, i.e.
    * $|Mv|_1\leq |M|_1 |v|_1$.
    */
-  Real l1_norm () const { error(); return 0.; };
+  Real l1_norm () const { error(); return 0.; }
 
   /**
    * Return the linfty-norm of the
@@ -237,13 +237,13 @@ class LaspackMatrix : public SparseMatrix
    * to the linfty-norm of vectors, i.e.
    * $|Mv|_infty \leq |M|_infty |v|_infty$.
    */
-  Real linfty_norm () const { error(); return 0.; };
+  Real linfty_norm () const { error(); return 0.; }
 
   /**
    * see if Laspack matrix has been closed
    * and fully assembled yet
    */
-  bool closed() const { return _closed; };
+  bool closed() const { return _closed; }
 
   
 private:
@@ -290,7 +290,7 @@ inline
 LaspackMatrix::LaspackMatrix () :
   _closed (false)
 {
-};
+}
 
 
 
@@ -298,7 +298,7 @@ inline
 LaspackMatrix::~LaspackMatrix ()
 {
   clear ();
-};
+}
 
 
 
@@ -308,13 +308,13 @@ void LaspackMatrix::clear ()
   if (initialized())
     {
       Laspack::Q_Destr(&_QMat);
-    };
+    }
   
   _csr.clear();
   _row_start.clear();
   _closed = false;
   _is_initialized = false;
-};
+}
 
 
 
@@ -347,9 +347,9 @@ void LaspackMatrix::zero ()
 	  assert ((j+1) == Q_GetPos (&_QMat, row+1, l));
 	  
 	  Q_SetEntry (&_QMat, row+1, l, j+1, 0.);
-	};
-    };    
-};
+	}
+    }    
+}
 
 
 
@@ -359,7 +359,7 @@ unsigned int LaspackMatrix::m () const
   assert (initialized());
 
   return static_cast<unsigned int>(Laspack::Q_GetDim(const_cast<Laspack::QMatrix*>(&_QMat)));
-};
+}
 
 
 
@@ -369,7 +369,7 @@ unsigned int LaspackMatrix::n () const
   assert (initialized());
   
   return static_cast<unsigned int>(Laspack::Q_GetDim(const_cast<Laspack::QMatrix*>(&_QMat)));
-};
+}
 
 
 
@@ -377,7 +377,7 @@ inline
 unsigned int LaspackMatrix::row_start () const
 {
   return 0;
-};
+}
 
 
 
@@ -385,7 +385,7 @@ inline
 unsigned int LaspackMatrix::row_stop () const
 {
   return m();
-};
+}
 
 
 
@@ -405,7 +405,7 @@ void LaspackMatrix::set (const unsigned int i,
   assert ((j+1) == Laspack::Q_GetPos (&_QMat, i+1, position));
 
   Laspack::Q_SetEntry (&_QMat, i+1, position, j+1, value);
-};
+}
 
 
 
@@ -424,7 +424,7 @@ void LaspackMatrix::add (const unsigned int i,
   assert (_csr[_row_start[i]+position] == j);
 
   Laspack::Q_AddVal (&_QMat, i+1, position, value);
-};
+}
 
 
 
@@ -433,7 +433,7 @@ void LaspackMatrix::add_matrix(const ComplexDenseMatrix& dm,
 			       const std::vector<unsigned int>& dof_indices)
 {
   add_matrix (dm, dof_indices, dof_indices);
-};
+}
 
 
 
@@ -451,7 +451,7 @@ void LaspackMatrix::add_matrix(const ComplexDenseMatrix& dm,
   for (unsigned int i=0; i<rows.size(); i++)
     for (unsigned int j=0; j<cols.size(); j++)
       add(rows[i],cols[j],dm(i,j));
-};
+}
 
 
 
@@ -466,7 +466,7 @@ Complex LaspackMatrix::operator () (const unsigned int i,
   using namespace Laspack;
 
   return Q_GetEl (const_cast<Laspack::QMatrix*>(&_QMat), i+1, j+1);
-};
+}
 
 
 
@@ -494,7 +494,7 @@ unsigned int LaspackMatrix::pos (const unsigned int i,
 
   // Return the position in the compressed row
   return std::distance (&_csr[_row_start[i]], p.first);
-};
+}
 
 
 #endif // #ifdef HAVE_LASPACK

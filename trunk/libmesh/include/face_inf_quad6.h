@@ -1,4 +1,4 @@
-// $Id: face_inf_quad6.h,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: face_inf_quad6.h,v 1.7 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -72,32 +72,32 @@ public:
   /**
    * @returns \p INFQUAD6
    */
-  ElemType type () const { return INFQUAD6; };
+  ElemType type () const { return INFQUAD6; }
 
   /**
    * @returns 6
    */
-  unsigned int n_nodes() const { return 6; };
+  unsigned int n_nodes() const { return 6; }
   
   /**
    * @returns 4
    */
-  unsigned int n_sides() const { return 4; };
+  unsigned int n_sides() const { return 4; }
   
   /**
    * @returns 2
    */
-  unsigned int n_children() const { return 2; };
+  unsigned int n_children() const { return 2; }
   
   /**
    * @returns 2
    */
-  unsigned int n_sub_elem() const { return 2; };
+  unsigned int n_sub_elem() const { return 2; }
   
   /**
    * @returns SECOND
    */
-  Order default_order() const { return SECOND; };
+  Order default_order() const { return SECOND; }
   
   /**
    * @returns an EDGE3 for the base (0) side, an INFEDGE2 for
@@ -109,13 +109,13 @@ public:
   
   void vtk_connectivity(const unsigned int,
 			std::vector<unsigned int>*) const
-  { error(); };
+  { error(); }
   
   unsigned int vtk_element_type (const unsigned int) const
-  { return 9; };
+  { return 9; }
   
   void write_tecplot_connectivity(std::ostream&) const
-  { error(); };
+  { error(); }
   
 #ifdef ENABLE_AMR
 
@@ -162,7 +162,7 @@ inline
 InfQuad6::InfQuad6(Face* p) :
   Quad(InfQuad6::n_nodes(), p) 
 {
-};
+}
 
 #endif
 

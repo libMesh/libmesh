@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.11 2003-02-13 01:49:49 benkirk Exp $
+// $Id: fe_map.C,v 1.12 2003-02-13 22:56:10 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -60,14 +60,14 @@ void FEBase::compute_map(const QBase* qrule,
 	  dxidx_map.resize(n_qp);
 	  
 	  JxW.resize(n_qp);
-	};
+	}
 	
 	// Clear the entities that will be summed
 	for (unsigned int p=0; p<n_qp; p++)
 	  {
 	    xyz[p].zero();
 	    dxyzdxi_map[p].zero();
-	  };
+	  }
 	
 	
 	// compute x, dxdxi at the quadrature points    
@@ -81,8 +81,8 @@ void FEBase::compute_map(const QBase* qrule,
 	      {	  
 		xyz[p].add_scaled        (elem_point, phi_map[i][p]    );
 		dxyzdxi_map[p].add_scaled(elem_point, dphidxi_map[i][p]);
-	      };
-	  };
+	      }
+	  }
 
 	/*
         // Test the inverse map
@@ -94,7 +94,7 @@ void FEBase::compute_map(const QBase* qrule,
 	qrule->qp(p).print();
 	std::cout << "inv_map = ";
 	p_inv.print();
-	};
+	}
 	*/
 
 	// compute the jacobian at the quadrature points
@@ -115,18 +115,18 @@ void FEBase::compute_map(const QBase* qrule,
 			  << jac
 			  << std::endl;
 		error();
-	      };
+	      }
 	    
 	    assert (dxdxi_map(p) != 0.);
 	    
 	    dxidx_map[p] = 1./dxdxi_map(p);
 	    
 	    JxW[p] = jac*qw[p];
-	  };
+	  }
 
 	// done computing the map
 	return;
-      };
+      }
 
       
       //--------------------------------------------------------------------
@@ -148,7 +148,7 @@ void FEBase::compute_map(const QBase* qrule,
 	  detady_map.resize(n_qp);
 	  
 	  JxW.resize(n_qp);
-	};
+	}
 	
 	// Clear the entities that will be summed
 	for (unsigned int p=0; p<n_qp; p++)
@@ -156,7 +156,7 @@ void FEBase::compute_map(const QBase* qrule,
 	    xyz[p].zero();
 	    dxyzdxi_map[p].zero();
 	    dxyzdeta_map[p].zero();
-	  };
+	  }
 	
 	
 	// compute (x,y), dxdxi, dydxi, dxdeta, dydeta at the quadrature points
@@ -171,8 +171,8 @@ void FEBase::compute_map(const QBase* qrule,
 		xyz[p].add_scaled          (elem_point, phi_map[i][p]     );
 		dxyzdxi_map[p].add_scaled  (elem_point, dphidxi_map[i][p] );
 		dxyzdeta_map[p].add_scaled (elem_point, dphideta_map[i][p]);
-	      };
-	  };
+	      }
+	  }
 	
 	/*
         // Test the inverse map
@@ -184,7 +184,7 @@ void FEBase::compute_map(const QBase* qrule,
 	qrule->qp(p).print();
 	std::cout << "inv_map = ";
 	p_inv.print();
-	};
+	}
 	*/
 	
 	// compute the jacobian at the quadrature points
@@ -211,7 +211,7 @@ void FEBase::compute_map(const QBase* qrule,
 			  << jac
 			  << std::endl;
 		error();
-	      };
+	      }
 	    
 	    JxW[p] = jac*qw[p];
 	    
@@ -224,11 +224,11 @@ void FEBase::compute_map(const QBase* qrule,
 	    dxidy_map[p]  = -dx_deta*inv_jac; //dxi/dy  = -(1/J)*dx/deta
 	    detadx_map[p] = -dy_dxi* inv_jac; //deta/dx = -(1/J)*dy/dxi
 	    detady_map[p] =  dx_dxi* inv_jac; //deta/dy =  (1/J)*dx/dxi
-	  };
+	  }
        
 	// done computing the map
 	return;
-      };
+      }
 
 
       
@@ -257,7 +257,7 @@ void FEBase::compute_map(const QBase* qrule,
 	  dzetadz_map.resize   (n_qp);
 	  
 	  JxW.resize (n_qp);
-	};
+	}
     
 	// Clear the entities that will be summed
 	for (unsigned int p=0; p<n_qp; p++)
@@ -266,7 +266,7 @@ void FEBase::compute_map(const QBase* qrule,
 	    dxyzdxi_map[p].zero   ();
 	    dxyzdeta_map[p].zero  ();
 	    dxyzdzeta_map[p].zero ();
-	  };
+	  }
 	
 	
 	// compute (x,y,z), dxdxi,   dydxi,   dzdxi,
@@ -285,8 +285,8 @@ void FEBase::compute_map(const QBase* qrule,
 		dxyzdxi_map[p].add_scaled   (elem_point, dphidxi_map[i][p]  );
 		dxyzdeta_map[p].add_scaled  (elem_point, dphideta_map[i][p] );
 		dxyzdzeta_map[p].add_scaled (elem_point, dphidzeta_map[i][p]);
-	      };
-	  };
+	      }
+	  }
 	
 	/*
         // Test the inverse map
@@ -298,7 +298,7 @@ void FEBase::compute_map(const QBase* qrule,
 	qrule->qp(p).print();
 	std::cout << "inv_map = ";
 	p_inv.print();
-	};
+	}
 	*/
 	  
 	// compute the jacobian at the quadrature points
@@ -329,7 +329,7 @@ void FEBase::compute_map(const QBase* qrule,
 			  << jac
 			  << std::endl;
 		error();
-	      };
+	      }
 
 	    JxW[p] = jac*qw[p];
 	    
@@ -349,18 +349,18 @@ void FEBase::compute_map(const QBase* qrule,
 	    dzetadx_map[p] = (dy_dxi*dz_deta   - dz_dxi*dy_deta  )*inv_jac;
 	    dzetady_map[p] = (dz_dxi*dx_deta   - dx_dxi*dz_deta  )*inv_jac;
 	    dzetadz_map[p] = (dx_dxi*dy_deta   - dy_dxi*dx_deta  )*inv_jac;
-	  };
+	  }
 	
 	// done computing the map
 	return;
-      };
+      }
 
 
 
     default:
       error();
-    };
-};
+    }
+}
 
 
 
@@ -387,7 +387,7 @@ Point FE<Dim,T>::map (const Elem* elem,
 		  );
 
   return p;
-};
+}
 
 
 
@@ -414,7 +414,7 @@ Point FE<Dim,T>::map_xi (const Elem* elem,
 		  );
     
   return p;
-};
+}
 
 
 
@@ -441,7 +441,7 @@ Point FE<Dim,T>::map_eta (const Elem* elem,
 		  );
     
   return p;
-};
+}
 
 
 
@@ -468,7 +468,7 @@ Point FE<Dim,T>::map_zeta (const Elem* elem,
 		  );
     
   return p;
-};
+}
 
 
 
@@ -576,7 +576,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 	    dp(0) = Ginv*dxidelta;
 
 	    break;
-	  };
+	  }
 
 
 
@@ -638,7 +638,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 	    dp(1) = (Ginv21*dxidelta + Ginv22*detadelta);
 
 	    break;
-	  };
+	  }
 	  
 
 	  
@@ -712,7 +712,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 		     Jinv33*delta(2));
 
 	    break;
-	  };
+	  }
 
 
 	  /**
@@ -720,7 +720,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 	   */
 	default:
 	  error();
-	}; // end switch(Dim), dp now computed
+	} // end switch(Dim), dp now computed
 
 
 
@@ -756,8 +756,8 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 			<< cnt << " iterations!" << std::endl
 			<< "p="; 
 	      error();
-	    };
-	};
+	    }
+	}
     }
   while (error > tolerance);
 
@@ -779,14 +779,14 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
       std::cerr << "WARNING:  diff is "
 		<< diff.size()
 		<< std::endl;
-    };
+    }
   
 #endif
 
 
   
   return p;
-};
+}
 
 
 

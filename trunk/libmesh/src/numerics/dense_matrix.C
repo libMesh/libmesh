@@ -1,4 +1,4 @@
-// $Id: dense_matrix.C,v 1.6 2003-02-03 03:51:50 ddreyer Exp $
+// $Id: dense_matrix.C,v 1.7 2003-02-13 22:56:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -83,8 +83,8 @@ void DenseMatrix<Tp>::left_multiply (const DenseMatrix<Tp>& A,
       std::cout << "C=" << std::endl;
       C.print();
       */
-    };    	     
-};
+    }    	     
+}
 
 
 
@@ -144,8 +144,8 @@ void DenseMatrix<Tp>::right_multiply (const DenseMatrix<Tp>& B,
 	for (unsigned int j=0; j<n_s; j++)
 	  for (unsigned int k=0; k<p_s; k++)
 	    C(i,j) += A(i,k)*B.transpose(k,j);	           
-    };    	     
-};
+    }    	     
+}
 
 
 //--------------------------------------------------------------

@@ -1,4 +1,4 @@
-// $Id: coupling_matrix.h,v 1.4 2003-01-24 17:24:37 jwpeterson Exp $
+// $Id: coupling_matrix.h,v 1.5 2003-02-13 22:56:06 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -110,7 +110,7 @@ CouplingMatrix::CouplingMatrix (const unsigned int n) :
   _size(n)
 {
   resize(n);
-};
+}
 
 
 
@@ -122,7 +122,7 @@ unsigned char CouplingMatrix::operator() (const unsigned int i,
   assert (j < _size);
 
   return values[i*_size + j];
-};
+}
 
 
 
@@ -134,7 +134,7 @@ unsigned char & CouplingMatrix::operator() (const unsigned int i,
   assert (j < _size);
 
   return values[i*_size + j];
-};
+}
 
 
 
@@ -142,7 +142,7 @@ inline
 unsigned int CouplingMatrix::size() const
 {
   return _size;
-};
+}
 
 
 
@@ -155,7 +155,7 @@ void CouplingMatrix::resize(const unsigned int n)
 
   for (unsigned int i=0; i<values.size(); i++)
     values[i] = 0;
-};
+}
 
 
 
@@ -165,7 +165,7 @@ void CouplingMatrix::clear()
   _size = 0;
 
   values.clear();
-};
+}
 
 
 
@@ -173,7 +173,7 @@ inline
 bool CouplingMatrix::empty() const
 {
   return (_size == 0);
-};
+}
 
 
 

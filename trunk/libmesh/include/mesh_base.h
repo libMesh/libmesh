@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.14 2003-02-13 16:34:23 benkirk Exp $
+// $Id: mesh_base.h,v 1.15 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -60,7 +60,7 @@ class PetscMatrix;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.14 $
+ * \version $Revision: 1.15 $
  */
 
 
@@ -95,23 +95,23 @@ public:
    * Returns the logical dimension of the mesh.
    */
   unsigned int mesh_dimension() const
-  { return static_cast<unsigned int>(_dim); };
+  { return static_cast<unsigned int>(_dim); }
   
   /**
    * Returns the spatial dimension of the mesh.
    */
   unsigned int spatial_dimension() const
-  { return static_cast<unsigned int>(DIM); };
+  { return static_cast<unsigned int>(DIM); }
   
   /**
    * Returns the number of nodes in the mesh.
    */
-  unsigned int n_nodes() const { return _nodes.size(); };
+  unsigned int n_nodes() const { return _nodes.size(); }
 
   /**
    * Returns the number of elements in the mesh.
    */
-  unsigned int n_elem()  const { return _elements.size(); };
+  unsigned int n_elem()  const { return _elements.size(); }
 
   /**
    * Returns the number of active elements in the mesh.
@@ -175,7 +175,7 @@ public:
   /**
    * Return a constant reference to the \p nodes vector holding the nodes.
    */
-  const std::vector<Node*> & get_nodes () const { return _nodes; };
+  const std::vector<Node*> & get_nodes () const { return _nodes; }
 
   /**
    * Add \p Node \p n to the vertex array, optionally at the specified position \p nn.
@@ -191,7 +191,7 @@ public:
   /**
    * Return a reference to the \p cells vector holding the elements.
    */
-  const std::vector<Elem*> & get_elem () const { return _elements; };
+  const std::vector<Elem*> & get_elem () const { return _elements; }
 
   /**
    * Add elem \p e to the elem array.
@@ -372,19 +372,19 @@ public:
    * processor.
    *
    */
-  unsigned int n_subdomains() const { return _n_sbd; };
+  unsigned int n_subdomains() const { return _n_sbd; }
 
   /**
    * @returns the number of processors used in the
    * current simulation.
    */
-  unsigned int n_processors() const { return _n_proc; };
+  unsigned int n_processors() const { return _n_proc; }
 
 
   /**
    * @returns the subdomain id for this processor.
    */
-  unsigned int processor_id() const { return _proc_id; };
+  unsigned int processor_id() const { return _proc_id; }
   
 
   //-------------------------------------------------------------------------
@@ -551,7 +551,7 @@ public:
    * @returns the performance data (and possibly the information
    * header) as a string.
    */
-  std::string get_performance_info () const { return _perf_log.get_log(); };
+  std::string get_performance_info () const { return _perf_log.get_log(); }
 
   /**
    * @returns ONLY the performance information, never the header.
@@ -775,12 +775,12 @@ protected:
   /**
    * Returns a writeable reference to the number of subdomains.
    */
-  unsigned int& set_n_subdomains() { return _n_sbd; };
+  unsigned int& set_n_subdomains() { return _n_sbd; }
 
   /**
    * Returns a writeable reference to the number of processors.
    */
-  unsigned int& set_n_processors() { return _n_proc; };
+  unsigned int& set_n_processors() { return _n_proc; }
 
   /**
    * Reads input from \p in, skipping all the lines
@@ -837,7 +837,7 @@ Elem* MeshBase::elem(const unsigned int i) const
   assert (_elements[i] != NULL);
   
   return _elements[i];
-};
+}
 
 
 
@@ -849,7 +849,7 @@ const Point& MeshBase::point(const unsigned int i) const
   assert (_nodes[i]->id() != Node::invalid_id);  
 
   return (*_nodes[i]);
-};
+}
 
 
 
@@ -861,7 +861,7 @@ const Node& MeshBase::node(const unsigned int i) const
   assert (_nodes[i]->id() != Node::invalid_id);  
   
   return (*_nodes[i]);
-};
+}
 
 
 
@@ -880,7 +880,7 @@ Node& MeshBase::node(const unsigned int i)
   assert (_nodes[i] != NULL);
 
   return (*_nodes[i]);
-};
+}
 
 
 
@@ -892,7 +892,7 @@ Node* MeshBase::node_ptr(const unsigned int i) const
   assert (_nodes[i]->id() != Node::invalid_id);  
   
   return _nodes[i];
-};
+}
 
 
 
@@ -902,7 +902,7 @@ Node* & MeshBase::node_ptr(const unsigned int i)
   assert (i < n_nodes());
 
   return _nodes[i];
-};
+}
 
 
 

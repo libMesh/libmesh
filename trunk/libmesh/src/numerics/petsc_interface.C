@@ -1,4 +1,4 @@
-// $Id: petsc_interface.C,v 1.7 2003-02-10 03:55:51 benkirk Exp $
+// $Id: petsc_interface.C,v 1.8 2003-02-13 22:56:13 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -45,8 +45,8 @@ void PetscInterface::clear ()
 
       _solver_type         = GMRES;
       _preconditioner_type = ILU_PRECOND;
-    };
-};
+    }
+}
 
 
 
@@ -84,8 +84,8 @@ void PetscInterface::init ()
       //  routines.
       
       ierr = SLESSetFromOptions (_sles);                   CHKERRQ(ierr);
-    };
-};
+    }
+}
 
 
 
@@ -131,7 +131,7 @@ PetscInterface::solve (SparseMatrix &matrix_in,
   std::pair<unsigned int, Real> p (its, final_resid);
 
   return p;
-};
+}
 
 
 
@@ -182,8 +182,8 @@ void PetscInterface::set_petsc_solver_type()
       std::cerr << "ERROR:  Unsupported PETSC Solver: "
 		<< _solver_type                     << std::endl
 		<< "Continuing with PETSC defaults" << std::endl;
-    };
-};
+    }
+}
 
 
 
@@ -227,8 +227,8 @@ void PetscInterface::set_petsc_preconditioner_type()
       std::cerr << "ERROR:  Unsupported PETSC Preconditioner: "
 		<< _preconditioner_type             << std::endl
 		<< "Continuing with PETSC defaults" << std::endl;
-    };
-};
+    }
+}
 
 
 

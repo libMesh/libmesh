@@ -1,4 +1,4 @@
-// $Id: inf_fe_lagrange_eval.C,v 1.3 2003-02-05 20:51:44 ddreyer Exp $
+// $Id: inf_fe_lagrange_eval.C,v 1.4 2003-02-13 22:56:10 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -43,7 +43,7 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
         default:
           std::cerr << "bad index i = " << i << std::endl;
           error();
-        };
+        }
 
 
     case FIRST:
@@ -58,7 +58,7 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
         default:
           std::cerr << "bad index i = " << i << std::endl;
           error();
-        };
+        }
 
 
     case SECOND:
@@ -76,7 +76,7 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
         default:
           std::cerr << "bad index i = " << i << std::endl;
           error();
-        };
+        }
 
 
     case THIRD:
@@ -97,7 +97,7 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
         default:
           std::cerr << "bad index i = " << i << std::endl;
           error();
-        };
+        }
 
 
     case FOURTH:
@@ -121,7 +121,7 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
         default:
           std::cerr << "bad index i = " << i << std::endl;
           error();
-        };
+        }
 
 
     case FIFTH:
@@ -148,7 +148,7 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
         default:
           std::cerr << "bad index i = " << i << std::endl;
           error();
-        };
+        }
 
 
     case SIXTH:
@@ -178,7 +178,7 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
         default:
           std::cerr << "bad index i = " << i << std::endl;
           error();
-        };
+        }
 
 
     case SEVENTH:
@@ -211,7 +211,7 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
         default:
           std::cerr << "bad index i = " << i << std::endl;
           error();
-        };
+        }
 
 
     case EIGHTH:
@@ -247,7 +247,7 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
         default:
           std::cerr << "bad index i = " << i << std::endl;
           error();
-        };
+        }
 
 
     case NINTH:
@@ -286,7 +286,7 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
         default:
           std::cerr << "bad index i = " << i << std::endl;
           error();
-        };
+        }
 
 
     case TENTH:
@@ -328,7 +328,7 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
         default:
           std::cerr << "bad index i = " << i << std::endl;
           error();
-        };
+        }
 
 
     case ELEVENTH:
@@ -373,7 +373,7 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
         default:
           std::cerr << "bad index i = " << i << std::endl;
           error();
-        };
+        }
 
 
     case TWELFTH:
@@ -421,7 +421,7 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
         default:
           std::cerr << "bad index i = " << i << std::endl;
           error();
-        };
+        }
 
 
     case THIRTEENTH:
@@ -472,7 +472,7 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
         default:
           std::cerr << "bad index i = " << i << std::endl;
           error();
-        };
+        }
 
 
     case FOURTEENTH:
@@ -526,7 +526,7 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
         default:
           std::cerr << "bad index i = " << i << std::endl;
           error();
-        };
+        }
 
 
     // provided the constructor worked fine, we should never end up here.
@@ -534,11 +534,11 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
       std::cerr << "Lagrange polynomials only defined up to 15. "
 		<< std::endl;
       error();
-    };
+    }
 
   // we never end up here.
   return 0.;
-};
+}
 
 
 
@@ -560,7 +560,7 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
         default:
           std::cerr << "bad index i = " << i << std::endl;
           error();
-        };
+        }
 
 
     case FIRST:
@@ -575,7 +575,7 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
         default:
           std::cerr << "bad index i = " << i << std::endl;
           error();
-        };
+        }
 
 
     case SECOND:
@@ -593,7 +593,7 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
         default:
           std::cerr << "bad index i = " << i << std::endl;
           error();
-        };
+        }
 
 
     case THIRD:
@@ -614,7 +614,7 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
         default:
           std::cerr << "bad index i = " << i << std::endl;
           error();
-        };
+        }
 
 
     case FOURTH:
@@ -638,7 +638,7 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
         default:
           std::cerr << "bad index i = " << i << std::endl;
           error();
-        };
+        }
 
 
     case FIFTH:
@@ -665,7 +665,7 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
         default:
           std::cerr << "bad index i = " << i << std::endl;
           error();
-        };
+        }
 
 
     case SIXTH:
@@ -695,7 +695,7 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
         default:
           std::cerr << "bad index i = " << i << std::endl;
           error();
-        };
+        }
 
 
     case SEVENTH:
@@ -728,7 +728,7 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
         default:
           std::cerr << "bad index i = " << i << std::endl;
           error();
-        };
+        }
 
 
     case EIGHTH:
@@ -764,7 +764,7 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
         default:
           std::cerr << "bad index i = " << i << std::endl;
           error();
-        };
+        }
 
 
     case NINTH:
@@ -803,7 +803,7 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
         default:
           std::cerr << "bad index i = " << i << std::endl;
           error();
-        };
+        }
 
 
     case TENTH:
@@ -845,7 +845,7 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
         default:
           std::cerr << "bad index i = " << i << std::endl;
           error();
-        };
+        }
 
 
     case ELEVENTH:
@@ -890,7 +890,7 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
         default:
           std::cerr << "bad index i = " << i << std::endl;
           error();
-        };
+        }
 
 
     case TWELFTH:
@@ -938,7 +938,7 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
         default:
           std::cerr << "bad index i = " << i << std::endl;
           error();
-        };
+        }
 
 
     case THIRTEENTH:
@@ -989,7 +989,7 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
         default:
           std::cerr << "bad index i = " << i << std::endl;
           error();
-        };
+        }
 
 
     case FOURTEENTH:
@@ -1043,7 +1043,7 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
         default:
           std::cerr << "bad index i = " << i << std::endl;
           error();
-        };
+        }
 
 
     // provided the constructor worked fine, we should never end up here.
@@ -1051,11 +1051,11 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
       std::cerr << "Lagrange polynomials only defined up to 15. "
 		<< std::endl;
       error();
-    };
+    }
 
   // we never end up here.
   return 0.;
-};
+}
 
 
 

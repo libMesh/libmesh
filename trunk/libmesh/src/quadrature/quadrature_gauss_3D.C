@@ -1,4 +1,4 @@
-// $Id: quadrature_gauss_3D.C,v 1.7 2003-02-06 06:02:42 jwpeterson Exp $
+// $Id: quadrature_gauss_3D.C,v 1.8 2003-02-13 22:56:14 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -399,7 +399,7 @@ void QGauss::init_3D(const ElemType _type)
 		    
 	      error();
 	    }
-	  };
+	  }
       }
 
       
@@ -489,14 +489,14 @@ void QGauss::init_3D(const ElemType _type)
 	std::cerr << "ERROR: Unsupported type: " << _type << std::endl;
 	error();
       }
-    };
+    }
 
   error();
 
   return;
   
 #endif
-};
+}
 
 
 
@@ -569,14 +569,14 @@ void QGauss::init_3D(const ElemType _type,
 	std::cerr << "ERROR: Unsupported type: " << _type << std::endl;
 	error();
       }
-    };
+    }
 
   error();
   
   return;
   
 #endif
-};
+}
 
 
 

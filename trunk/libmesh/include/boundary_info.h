@@ -1,4 +1,4 @@
-// $Id: boundary_info.h,v 1.9 2003-02-07 16:19:11 spetersen Exp $
+// $Id: boundary_info.h,v 1.10 2003-02-13 22:56:06 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -155,39 +155,39 @@ class BoundaryInfo
    * @returns a list of nodes that have boundary conditions.
    */
   const std::vector<unsigned int>& get_node_list() const
-  { assert(node_list.size() == node_id_list.size()); return node_list; };
+  { assert(node_list.size() == node_id_list.size()); return node_list; }
 
   /**
    * @returns a list of elements that have boundary conditions.
    */
    const std::vector<unsigned int>& get_elem_list() const
-  { assert(elem_list.size() == elem_id_list.size()); return elem_list; };
+  { assert(elem_list.size() == elem_id_list.size()); return elem_list; }
 
   /**
    * @returns the side of each element that has a boundary condition.
    */
   const std::vector<unsigned short int>& get_side_list() const
-  { assert(elem_list.size() == side_list.size()); return side_list; };
+  { assert(elem_list.size() == side_list.size()); return side_list; }
 
   /**
    * @returns a list of boundary condition ids for the nodes.  This
    * vector is the same size as \p node_list.
    */
   const std::vector<short int>& get_node_id_list() const
-  { assert(node_list.size() == node_id_list.size()); return node_id_list; };
+  { assert(node_list.size() == node_id_list.size()); return node_id_list; }
 
   /**
    * @returns a list of boundary condition ids for the elements.
    * This vector is the same size as \p elem_list.
    */
   const std::vector<short int>& get_elem_id_list() const
-  {  assert(elem_list.size() == elem_id_list.size()); return elem_id_list; };
+  {  assert(elem_list.size() == elem_id_list.size()); return elem_id_list; }
 
   /**
    * @returns the user-specified boundary ids.
    */
   const std::set<short int>& get_boundary_ids() const
-  { return boundary_ids; };
+  { return boundary_ids; }
 
   /**
    * Add boundary values for node \p node with id \p id to the boundary

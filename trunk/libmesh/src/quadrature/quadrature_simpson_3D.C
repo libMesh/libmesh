@@ -1,4 +1,4 @@
-// $Id: quadrature_simpson_3D.C,v 1.4 2003-01-24 17:24:45 jwpeterson Exp $
+// $Id: quadrature_simpson_3D.C,v 1.5 2003-02-13 22:56:14 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -106,7 +106,7 @@ void QSimpson::init_3D(const ElemType _type)
 	_weights[9] = _weights[4];
 	
 	return;
-      };
+      }
       
       
       
@@ -129,7 +129,7 @@ void QSimpson::init_3D(const ElemType _type)
 	tensor_product_prism(&q1D, &q2D);
 
 	return;
-      };
+      }
 
       
       //---------------------------------------------
@@ -139,14 +139,14 @@ void QSimpson::init_3D(const ElemType _type)
 	std::cerr << "ERROR: Unsupported type: " << _type << std::endl;
 	error();
       }
-    };
+    }
 
   error();
 
   return;
   
 #endif
-};
+}
 
 
 
@@ -209,12 +209,12 @@ void QSimpson::init_3D(const ElemType _type,
 	std::cerr << "ERROR: Unsupported type: " << _type << std::endl;
 	error();
       }
-    };
+    }
 
   error();
   
   return;
   
 #endif
-};
+}
 

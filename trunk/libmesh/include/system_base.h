@@ -1,4 +1,4 @@
-// $Id: system_base.h,v 1.2 2003-02-13 01:49:49 benkirk Exp $
+// $Id: system_base.h,v 1.3 2003-02-13 22:56:08 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -124,12 +124,12 @@ public:
   /**
    * @returns a constant reference to this system's \p _dof_map.
    */
-  const DofMap & get_dof_map() const { return _dof_map; };
+  const DofMap & get_dof_map() const { return _dof_map; }
   
   /**
    * @returns a writeable reference to this system's \p _dof_map.
    */
-  DofMap & get_dof_map() { return _dof_map; };
+  DofMap & get_dof_map() { return _dof_map; }
 
   /**
    * @returns the number of variables in the system
@@ -256,7 +256,7 @@ inline
 std::string SystemBase::name() const
 {
   return _sys_name;
-};
+}
 
 
 
@@ -266,7 +266,7 @@ unsigned int SystemBase::n_vars() const
   assert (!_var_names.empty());
 
   return _var_names.size();
-};
+}
 
 
 
@@ -276,7 +276,7 @@ std::string SystemBase::variable_name (const unsigned int i) const
   assert (i < n_vars());
 
   return _var_names[i];
-};
+}
 
 
 
@@ -284,7 +284,7 @@ inline
 FEType SystemBase::variable_type (const unsigned int i) const
 {
   return variable_type(_var_names[i]);
-};
+}
 
 
 
@@ -297,7 +297,7 @@ FEType SystemBase::variable_type (const std::string& var) const
   assert (pos != _var_type.end());
   
   return pos->second;
-};
+}
 
 
 
@@ -305,7 +305,7 @@ inline
 unsigned int SystemBase::n_dofs() const
 {
   return _dof_map.n_dofs();
-};
+}
 
 
 
@@ -325,7 +325,7 @@ unsigned int SystemBase::n_constrained_dofs() const
   return 0;
 
 #endif
-};
+}
 
 
 
@@ -334,7 +334,7 @@ inline
 unsigned int SystemBase::n_local_dofs() const
 {
   return _dof_map.n_dofs_on_processor(_mesh.processor_id());
-};
+}
 
 
 

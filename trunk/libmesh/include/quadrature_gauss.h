@@ -1,4 +1,4 @@
-// $Id: quadrature_gauss.h,v 1.5 2003-02-06 17:58:34 ddreyer Exp $
+// $Id: quadrature_gauss.h,v 1.6 2003-02-13 22:56:08 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -55,7 +55,7 @@ class QGauss : public QBase
   /**
    * @returns \p QGAUSS
    */
-  QuadratureType type() const { return QGAUSS; };
+  QuadratureType type() const { return QGAUSS; }
 
  
  private:
@@ -86,7 +86,7 @@ QGauss::QGauss(const unsigned int d,
   // be smart and return, thinking it had already done the work.
   if (_dim == 1)
     init(EDGE2);
-};
+}
 
 
 
@@ -94,7 +94,7 @@ QGauss::QGauss(const unsigned int d,
 inline
 QGauss::~QGauss()
 {
-};
+}
 
 
 

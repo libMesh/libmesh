@@ -1,4 +1,4 @@
-// $Id: mesh_exodus_support.C,v 1.5 2003-01-24 17:24:44 jwpeterson Exp $
+// $Id: mesh_exodus_support.C,v 1.6 2003-02-13 22:56:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -425,7 +425,7 @@ const ExodusII::Conversion ExodusII::ElementMaps::assign_conversion(const ElemTy
       
     default:
       error();
-    };
+    }
 
   error();
   
@@ -524,10 +524,10 @@ void Mesh::read_exd(const std::string& name)
 		elem(j)->set_node(k) = node_ptr((node_number-1)); // Set node number
 		// Subtract 1 since
 		// exodus is internally 1-based
-	      };
-	  };
+	      }
+	  }
 	nelem_last_block += ex.get_num_elem_this_blk();
-      };
+      }
 
     
     // Read in sideset information -- this is useful for applying boundary conditions
@@ -538,7 +538,7 @@ void Mesh::read_exd(const std::string& name)
 	{
 	  offset += (i > 0 ? ex.get_num_sides_per_set(i-1) : 0); // Compute new offset
 	  ex.read_sideset(i, offset);
-	};
+	}
       
       
       //ex.print_sideset_info();
@@ -555,12 +555,12 @@ void Mesh::read_exd(const std::string& name)
 	  boundary_info.add_side(elem_list[e]-1,
 				 conv.get_side_map(side_list[e]-1),
 				 id_list[e]);
-	};
-    };
+	}
+    }
 
     
     ex.close();            // Close the exodus file, if possible
-  };
+  }
 
 #endif
-};
+}

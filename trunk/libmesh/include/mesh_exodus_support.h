@@ -1,4 +1,4 @@
-// $Id: mesh_exodus_support.h,v 1.5 2003-01-24 17:24:39 jwpeterson Exp $
+// $Id: mesh_exodus_support.h,v 1.6 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -392,7 +392,7 @@ class ExodusII
       /**
        * Constructor.
        */
-      ElementMaps() {};
+      ElementMaps() {}
 
       /**
        * 2D node maps.  These define

@@ -1,4 +1,4 @@
-// $Id: auto_ptr.h,v 1.6 2003-02-13 17:42:59 benkirk Exp $
+// $Id: auto_ptr.h,v 1.7 2003-02-13 22:56:06 benkirk Exp $
 
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -161,7 +161,7 @@ public:
   {
     reset(a.release());
     return *this;
-  };
+  }
     
   /**
    *  @brief  %AutoPtr assignment operator.

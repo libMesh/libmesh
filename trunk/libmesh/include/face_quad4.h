@@ -1,4 +1,4 @@
-// $Id: face_quad4.h,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: face_quad4.h,v 1.7 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -66,17 +66,17 @@ public:
   /**
    * @returns \p QUAD4
    */
-  ElemType type () const { return QUAD4; };
+  ElemType type () const { return QUAD4; }
   
   /**
    * @returns 1
    */
-  unsigned int n_sub_elem() const { return 1; };
+  unsigned int n_sub_elem() const { return 1; }
   
   /**
    * @returns FIRST
    */
-  Order default_order() const { return FIRST; };
+  Order default_order() const { return FIRST; }
   
   AutoPtr<Elem> build_side (const unsigned int i) const;
 
@@ -87,7 +87,7 @@ public:
 			std::vector<unsigned int> *conn = NULL) const;
 
   unsigned int vtk_element_type (const unsigned int) const
-  { return 9; };
+  { return 9; }
   
   
 #ifdef ENABLE_AMR
@@ -134,6 +134,6 @@ inline
 Quad4::Quad4(Face* p) :
   Quad(Quad::n_nodes(), p) 
 {
-};
+}
 
 #endif

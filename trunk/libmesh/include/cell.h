@@ -1,4 +1,4 @@
-// $Id: cell.h,v 1.5 2003-01-24 17:24:37 jwpeterson Exp $
+// $Id: cell.h,v 1.6 2003-02-13 22:56:06 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -51,12 +51,12 @@ public:
 	const unsigned int ns,
 	Cell* p) :
     Elem (nn, ns, p)
-  {};
+  {}
 
   /**
    * @returns 3, the dimensionality of the object.
    */
-  unsigned int dim () const { return 3; };
+  unsigned int dim () const { return 3; }
 };
 
 

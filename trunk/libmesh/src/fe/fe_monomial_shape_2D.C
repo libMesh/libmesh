@@ -1,4 +1,4 @@
-// $Id: fe_monomial_shape_2D.C,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: fe_monomial_shape_2D.C,v 1.7 2003-02-13 22:56:10 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -106,8 +106,8 @@ Real FE<2,MONOMIAL>::shape(const ElemType,
 	  default:
 	    std::cerr << "Invalid shape function index!" << std::endl;
 	    error();
-	  };
-      };
+	  }
+      }
 
       
       // unsupported order
@@ -116,14 +116,14 @@ Real FE<2,MONOMIAL>::shape(const ElemType,
 	std::cerr << "ERROR: Unsupported 2D FE order!: " << order
 		  << std::endl;
 	error();
-      };
-    };
+      }
+    }
 
   error();
   return 0.;
 
 #endif
-};
+}
 
 
 
@@ -137,7 +137,7 @@ Real FE<2,MONOMIAL>::shape(const Elem* elem,
   
   // by default call the orientation-independent shape functions
   return FE<2,MONOMIAL>::shape(elem->type(), order, i, p);
-};
+}
 
 
 
@@ -227,8 +227,8 @@ Real FE<2,MONOMIAL>::shape_deriv(const ElemType,
 		default:
 		  std::cerr << "Invalid shape function index!" << std::endl;
 		  error();
-		};
-	    };
+		}
+	    }
 
 	      
 	    // d()/deta
@@ -289,14 +289,14 @@ Real FE<2,MONOMIAL>::shape_deriv(const ElemType,
 		default:
 		  std::cerr << "Invalid shape function index!" << std::endl;
 		  error();
-		};
-	    };
+		}
+	    }
 	      
 	      
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 
       
       
@@ -307,13 +307,13 @@ Real FE<2,MONOMIAL>::shape_deriv(const ElemType,
 		  << std::endl;
 	error();
       }
-    };
+    }
 
   error();
   return 0.;
 
 #endif
-};
+}
 
 
 
@@ -328,5 +328,5 @@ Real FE<2,MONOMIAL>::shape_deriv(const Elem* elem,
 
   // by default call the orientation-independent shape functions
   return FE<2,MONOMIAL>::shape_deriv(elem->type(), order, i, j, p); 
-};
+}
 

@@ -1,4 +1,4 @@
-// $Id: cell_hex.h,v 1.6 2003-02-03 03:51:48 ddreyer Exp $
+// $Id: cell_hex.h,v 1.7 2003-02-13 22:56:06 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -50,27 +50,27 @@ public:
    * @returns 8.  All hex-derivatives are guaranteed to have at
    * least 8 nodes.
    */
-  unsigned int n_nodes() const { return 8; };
+  unsigned int n_nodes() const { return 8; }
 
   /**
    * @returns 6
    */
-  unsigned int n_sides() const { return 6; };
+  unsigned int n_sides() const { return 6; }
 
   /**
    * @returns 8.  All hexahedrals have 8 vertices.
    */
-  unsigned int n_vertices() const { return 8; };
+  unsigned int n_vertices() const { return 8; }
 
   /**
    * @returns 12.  All hexahedrals have 12 edges.
    */
-  unsigned int n_edges() const { return 12; };
+  unsigned int n_edges() const { return 12; }
 
   /**
    * @returns 6.  All hexahedrals have 6 faces.
    */
-  unsigned int n_faces() const { return 6; };
+  unsigned int n_faces() const { return 6; }
   
   /**
    * @returns 8
@@ -108,7 +108,7 @@ inline
 Hex::Hex(const unsigned int nn, Cell* p) :
   Cell(nn, Hex::n_sides(), p) 
 {
-};
+}
 
 
 

@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic.C,v 1.8 2003-02-07 04:00:41 jwpeterson Exp $
+// $Id: fe_hierarchic.C,v 1.9 2003-02-13 22:56:09 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -55,7 +55,7 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 	  nodal_soln[n] = val;
 	
 	return;
-      };
+      }
 
 
       // For other bases do interpolation at the nodes
@@ -86,17 +86,17 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 							     order,
 							     i,
 							     mapped_point);	    
-	  };
+	  }
 
 	return;
-      };
+      }
       
     default:
       {
 	error();
-      };
-    };
-};
+      }
+    }
+}
 
 
 
@@ -132,9 +132,9 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 			<< std::endl;
 #endif
 	      error();	    
-	    };
-	  };
-      };
+	    }
+	  }
+      }
 
 
       // Hierarchic 2nd-order polynomials.
@@ -164,9 +164,9 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 			<< std::endl;
 #endif
 	      error();	    
-	    };
-	  };
-      };
+	    }
+	  }
+      }
 
 
       // Hierarchic 3rd-order polynomials.
@@ -196,9 +196,9 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 			<< std::endl;
 #endif
 	      error();	    
-	    };
-	  };
-      };
+	    }
+	  }
+      }
 
 
       // Hierarchic 4th-order polynomials.
@@ -228,9 +228,9 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 			<< std::endl;
 #endif
 	      error();	    
-	    };
-	  };
-      };
+	    }
+	  }
+      }
 
 
       // Hierarchic 5th-order polynomials.
@@ -260,20 +260,20 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 			<< std::endl;
 #endif
 	      error();	    
-	    };
-	  };
-      };
+	    }
+	  }
+      }
 
       
     default:
       {
 	error();
-      };
-    };
+      }
+    }
   
   error();  
   return 0;
-};
+}
 
 
 
@@ -304,8 +304,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 		  
 		default:
 		  error();		  
-		};
-	    };
+		}
+	    }
 
 	    
 	    // The 2D hierarchic defined on a 6-noded triangle
@@ -325,8 +325,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 	    
 
 	    // The 2D tensor-product hierarchics defined on a
@@ -353,8 +353,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 		  
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 
 	    // The 3D tensor-product hierarchics defined on a
 	    // twenty-seven noded hexahedral.
@@ -396,8 +396,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 		  
 		case 26:
 		  return 0;
-		};
-	    };
+		}
+	    }
 	    
 	  default:
 	    {
@@ -407,10 +407,10 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 			<< std::endl;
 #endif
 	      error();	    
-	    };
+	    }
 	    
-	  };
-      };
+	  }
+      }
 
 
 
@@ -434,8 +434,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 		  
 		default:
 		  error();		  
-		};
-	    };
+		}
+	    }
 
 	    
 	    // The 2D hierarchic defined on a 6-noded triangle
@@ -455,8 +455,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 
 
 	    // The 2D tensor-product hierarchics defined on a
@@ -483,8 +483,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 		  
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 
 	    // The 3D tensor-product hierarchics defined on a
 	    // twenty-seven noded hexahedral.
@@ -526,8 +526,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 		  
 		case 26:
 		  return 1;
-		};
-	    };
+		}
+	    }
 	    
 	  default:
 	    {
@@ -537,10 +537,10 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 			<< std::endl;
 #endif
 	      error();	    
-	    };
+	    }
 	    
-	  };
-      };
+	  }
+      }
 
 
 
@@ -564,8 +564,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 		  
 		default:
 		  error();		  
-		};
-	    };
+		}
+	    }
 
 	    
 	    // The 2D hierarchic defined on a 6-noded triangle
@@ -585,8 +585,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 
 
 	    // The 2D tensor-product hierarchics defined on a
@@ -613,8 +613,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 		  
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 
 	    // The 3D tensor-product hierarchics defined on a
 	    // twenty-seven noded hexahedral.
@@ -656,8 +656,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 		  
 		case 26:
 		  return 8;
-		};
-	    };
+		}
+	    }
 	    
 	  default:
 	    {
@@ -667,10 +667,10 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 			<< std::endl;
 #endif
 	      error();	    
-	    };
+	    }
 	    
-	  };
-      };
+	  }
+      }
 
 
 
@@ -694,8 +694,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 		  
 		default:
 		  error();		  
-		};
-	    };
+		}
+	    }
 
 	    
 	    // The 2D hierarchic defined on a 6-noded triangle
@@ -715,8 +715,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 
 
 	    // The 2D tensor-product hierarchics defined on a
@@ -743,8 +743,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 		  
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 
 	    // The 3D tensor-product hierarchics defined on a
 	    // twenty-seven noded hexahedral.
@@ -786,8 +786,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 		  
 		case 26:
 		  return 27;
-		};
-	    };
+		}
+	    }
 	    
 	  default:
 	    {
@@ -797,10 +797,10 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 			<< std::endl;
 #endif
 	      error();	    
-	    };
+	    }
 	    
-	  };
-      };
+	  }
+      }
 
 
 
@@ -824,8 +824,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 		  
 		default:
 		  error();		  
-		};
-	    };
+		}
+	    }
 
 	    
 	    // The 2D hierarchic defined on a 6-noded triangle
@@ -845,8 +845,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 
 
 	    // The 2D tensor-product hierarchics defined on a
@@ -873,8 +873,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 		  
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 
 	    // The 3D tensor-product hierarchics defined on a
 	    // twenty-seven noded hexahedral.
@@ -916,8 +916,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 		  
 		case 26:
 		  return 64;
-		};
-	    };
+		}
+	    }
 	    
 	  default:
 	    {
@@ -927,23 +927,23 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 			<< std::endl;
 #endif
 	      error();	    
-	    };
+	    }
 	    
-	  };
-      };
+	  }
+      }
 
 
       
     default:
       {
 	error();
-      };
-    };
+      }
+    }
   
   error();
   
   return 0;
-};
+}
 
 
 
@@ -995,10 +995,10 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 			<< std::endl;
 #endif
 	      error();	    
-	    };
+	    }
 	    
-	  };
-      };
+	  }
+      }
 
 
 
@@ -1044,10 +1044,10 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 			<< std::endl;
 #endif
 	      error();	    
-	    };
+	    }
 	    
-	  };
-      };
+	  }
+      }
 
 
 
@@ -1093,10 +1093,10 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 			<< std::endl;
 #endif
 	      error();	    
-	    };
+	    }
 	    
-	  };
-      };
+	  }
+      }
 
 
 
@@ -1142,10 +1142,10 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 			<< std::endl;
 #endif
 	      error();	    
-	    };
+	    }
 	    
-	  };
-      };
+	  }
+      }
 
 
 
@@ -1191,10 +1191,10 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 			<< std::endl;
 #endif
 	      error();	    
-	    };
+	    }
 	    
-	  };
-      };
+	  }
+      }
 
 
 
@@ -1202,8 +1202,8 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
       // Otherwise no DOFS per element
     default:
       return 0;
-    };
-};
+    }
+}
 
 
 

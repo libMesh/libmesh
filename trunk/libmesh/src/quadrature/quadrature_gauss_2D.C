@@ -1,4 +1,4 @@
-// $Id: quadrature_gauss_2D.C,v 1.8 2003-02-06 06:02:42 jwpeterson Exp $
+// $Id: quadrature_gauss_2D.C,v 1.9 2003-02-13 22:56:13 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -214,7 +214,7 @@ void QGauss::init_2D(const ElemType _type)
 
 	      error();
 	    }
-	  };
+	  }
       }
 
 	    
@@ -225,14 +225,14 @@ void QGauss::init_2D(const ElemType _type)
 	std::cerr << "Element type not supported!:" << _type << std::endl;
 	error();
       }
-    };
+    }
 
   error();
 
   return;
 
 #endif
-};
+}
 
 
 
@@ -274,14 +274,14 @@ void QGauss::init_2D(const ElemType _type,
 	std::cerr << "Element type not supported!:" << _type << std::endl;
 	error();
       }
-    };
+    }
   
   error();
   
   return;
 
 #endif
-};
+}
 
 
 

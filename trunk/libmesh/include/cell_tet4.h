@@ -1,4 +1,4 @@
-// $Id: cell_tet4.h,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: cell_tet4.h,v 1.7 2003-02-13 22:56:06 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -63,17 +63,17 @@ public:
   /**
    * @returns \p TET4
    */
-  ElemType type () const { return TET4; };
+  ElemType type () const { return TET4; }
 
   /**
    * @returns 1
    */
-  unsigned int n_sub_elem() const { return 1; };
+  unsigned int n_sub_elem() const { return 1; }
     
   /**
    * @returns FIRST
    */
-  Order default_order() const { return FIRST; };
+  Order default_order() const { return FIRST; }
   
   /**
    * Builds a TRI3 built coincident with face i.  This
@@ -89,7 +89,7 @@ public:
 			std::vector<unsigned int> *conn = NULL) const;
   
   unsigned int vtk_element_type (const unsigned int) const
-  { return 10; };
+  { return 10; }
   
 #ifdef ENABLE_AMR
 
@@ -135,7 +135,7 @@ inline
 Tet4::Tet4(Cell* p) :
   Tet(Tet4::n_nodes(), p) 
 {
-};
+}
 
 
 

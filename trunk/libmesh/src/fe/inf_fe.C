@@ -1,4 +1,4 @@
-// $Id: inf_fe.C,v 1.10 2003-02-06 17:58:34 ddreyer Exp $
+// $Id: inf_fe.C,v 1.11 2003-02-13 22:56:10 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -71,7 +71,7 @@ InfFE<Dim,T_radial,T_map>::InfFE (const FEType& fet) :
   // build the base_fe object, handle the AutoPtr
   AutoPtr<FEBase> ap_fb(FEBase::build(Dim-1, fet));
   base_fe = ap_fb.release();
-};
+}
 
 
 
@@ -92,7 +92,7 @@ InfFE<Dim,T_radial,T_map>::~InfFE ()
 
   if (base_fe != NULL)
     delete base_fe;
-};
+}
 
 
 
@@ -117,7 +117,7 @@ void InfFE<Dim,T_radial,T_map>:: attach_quadrature_rule (QBase* q)
     AutoPtr<QBase> apq( QBase::build(q->type(), Dim-1, base_int_order) );
     base_qrule = apq.release();
     base_fe->attach_quadrature_rule(base_qrule);
-  };
+  }
 
   // in radial direction, always use Gauss quadrature
   radial_qrule = new QGauss(1, radial_int_order);
@@ -125,7 +125,7 @@ void InfFE<Dim,T_radial,T_map>:: attach_quadrature_rule (QBase* q)
   /* currently not used. But maybe helpful to store the QBase*
    * with which we initialized our own quadrature rules */
   qrule = q;
-};
+}
 
 
 
@@ -137,7 +137,7 @@ void InfFE<Dim,T_radial,T_base>::update_base_elem (const Elem* inf_elem)
   if (base_elem != NULL)
     delete base_elem;
   base_elem = Base::build_elem(inf_elem);
-};
+}
 
 
 
@@ -185,7 +185,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem)
       // initialize the shape functions in the base
       base_fe->init_base_shape_functions( base_fe->qrule, base_elem );
 
-    };
+    }
 
 
   // -----------------------------------------------------------------
@@ -212,7 +212,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem)
 
       // initialize the radial shape functions
       init_shape_functions (inf_elem);
-    };
+    }
 
 
   // -----------------------------------------------------------------
@@ -232,7 +232,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem)
   compute_shape_functions ();
 
 
-};
+}
 
 
 
@@ -443,7 +443,7 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 	if (Dim == 3)	     
 	  dphidzeta[i].resize (n_total_qp);
 	     
-      };
+      }
        
     for (unsigned int i=0; i<n_total_mapping_shape_functions; i++)
       {
@@ -455,7 +455,7 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 	   
 	if (Dim == 3)
 	  dphidzeta_map[i].resize (n_total_qp);
-      };
+      }
   }
 
 
@@ -464,7 +464,7 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
     {
       radial_map[i].resize    (n_radial_qp);
       dradialdv_map[i].resize (n_radial_qp);
-    };
+    }
 
 
   // these approximation shapes are required at the radial quadrature points
@@ -472,7 +472,7 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
     {
       mode[i].resize    (n_radial_qp);
       dmodedv[i].resize (n_radial_qp);
-    };
+    }
 
 
   // zero  the phase, since it is to be summed up
@@ -481,7 +481,7 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
       dphasedxi[p]   = 0.;
       dphasedeta[p]  = 0.;
       dphasedzeta[p] = 0.;
-    };
+    }
 
 
 
@@ -502,7 +502,7 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
       // same manner for the base element as for the infinite element
       dist[i] = Point( inf_elem->node(i) 
 		       - inf_elem->node(i+n_base_mapping_shape_functions) ).size();
-    };
+    }
   
 
 
@@ -512,7 +512,7 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
     {
       som[p]       = Radial::decay       (radial_qp[p](0)); 
       dsomdv[p]    = Radial::decay_deriv (radial_qp[p](0)); 
-    };
+    }
 
 
 
@@ -524,7 +524,7 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
       {
         weight   [ bp+rp*n_base_qp ] = Radial::D       (radial_qp[rp](0)); 
         dweightdv[ bp+rp*n_base_qp ] = Radial::D_deriv (radial_qp[rp](0));
-      };
+      }
   
   
 
@@ -535,7 +535,7 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
       {
         mode[i][p]    = InfFE<Dim,T_radial,T_map>::eval       (radial_qp[p](0), radial_approx_order, i);
         dmodedv[i][p] = InfFE<Dim,T_radial,T_map>::eval_deriv (radial_qp[p](0), radial_approx_order, i);
-      };
+      }
 
 
 
@@ -546,10 +546,10 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
       {
 	radial_map[i][p]    = InfFE<Dim,INFINITE_MAP,T_map>::eval       (radial_qp[p](0), radial_mapping_order, i);
 	dradialdv_map[i][p] = InfFE<Dim,INFINITE_MAP,T_map>::eval_deriv (radial_qp[p](0), radial_mapping_order, i);
-      };
+      }
 
  
-};
+}
 
 
 
@@ -573,7 +573,7 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial()
 	std::cout << "ERROR: Not implemented." << std::endl;
 	error();
 	return;
-      };
+      }
 
 
       
@@ -584,7 +584,7 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial()
 	std::cout << "ERROR: Not implemented." << std::endl;
 	error();
      	return;
-      };
+      }
 
 
       
@@ -632,14 +632,14 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial()
 				<< " rp = " << rp
 				<< std::endl;	      
 		      error();
-		    };
+		    }
 #endif		    
 
-		  };
+		  }
 
 		tp++;
 
-	      };
+	      }
 
 	}
 
@@ -656,7 +656,7 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial()
 		  dphideta [ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = St[bi][bp] * mode[ri][rp] * som[ri];
 		  dphidzeta[ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = S [bi][bp] 
 		      * (dmodedv[ri][rp] * som[ri] + mode[ri][rp] * dsomdv[ri]);
-		};
+		}
 
 	
 	// compute the overall mapping functions
@@ -670,21 +670,21 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial()
 		  dphidxi_map  [ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = Ss_map[bi][bp] * radial_map   [ri][rp];
 		  dphideta_map [ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = St_map[bi][bp] * radial_map   [ri][rp];
 		  dphidzeta_map[ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = S_map [bi][bp] * dradialdv_map[ri][rp];
-		};
+		}
 			
 
 	return;
-      };
+      }
 
 
     default:
       error();
-    };
+    }
 
   error();
   return;
 
-};
+}
 
 
 
@@ -719,14 +719,14 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions()
 	std::cout << "ERROR: Not implemented." << std::endl;
 	error();
 	break;
-      };
+      }
 
     case 2:
       {
 	std::cout << "ERROR: Not implemented." << std::endl;
 	error();
 	break;
-      };
+      }
     
     case 3:
       {
@@ -751,7 +751,7 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions()
 		dphidz[i][p] = (dphidxi[i][p]*dxidz_map[p] +
 				dphideta[i][p]*detadz_map[p] +
 				dphidzeta[i][p]*dzetadz_map[p]);	      
-	    };
+	    }
 
 
 	// This is the derivative of the phase term of this infinite element
@@ -778,19 +778,19 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions()
 		
 	    dweight[p](2) = dweightdv[p] * dzetadz_map[p];
 
-	  };
+	  }
 
 	break;
-      };
+      }
 
 
 
     default:
       {
 	error();
-      };
-    };
-};
+      }
+    }
+}
 
 
 

@@ -1,4 +1,4 @@
-// $Id: face_quad8.h,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: face_quad8.h,v 1.7 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -67,32 +67,32 @@ public:
   /**
    * @returns \p QUAD8
    */
-  ElemType type () const { return QUAD8; };
+  ElemType type () const { return QUAD8; }
 
   /**
    * @returns 8
    */
-  unsigned int n_nodes() const { return 8; };
+  unsigned int n_nodes() const { return 8; }
   
   /**
    * @returns 4
    */
-  unsigned int n_sides() const { return 4; };
+  unsigned int n_sides() const { return 4; }
   
   /**
    * @returns 4
    */
-  unsigned int n_children() const { return 4; };
+  unsigned int n_children() const { return 4; }
   
   /**
    * @returns 5
    */
-  unsigned int n_sub_elem() const { return 5; };
+  unsigned int n_sub_elem() const { return 5; }
   
   /**
    * @returns SECOND
    */
-  Order default_order() const { return SECOND; };
+  Order default_order() const { return SECOND; }
   
   AutoPtr<Elem> build_side (const unsigned int i) const;
 
@@ -146,6 +146,6 @@ inline
 Quad8::Quad8(Face* p) :
   Quad(Quad8::n_nodes(), p) 
 {
-};
+}
 
 #endif

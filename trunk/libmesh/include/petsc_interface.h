@@ -1,4 +1,4 @@
-// $Id: petsc_interface.h,v 1.8 2003-02-10 22:03:24 benkirk Exp $
+// $Id: petsc_interface.h,v 1.9 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -135,7 +135,7 @@ class PetscInterface : public LinearSolverInterface
 inline
 PetscInterface::PetscInterface ()
 {
-};
+}
 
 
 
@@ -143,7 +143,7 @@ inline
 PetscInterface::~PetscInterface ()
 {
   clear ();
-};
+}
 
 
 

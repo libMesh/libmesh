@@ -1,4 +1,4 @@
-// $Id: face_quad9.C,v 1.8 2003-02-06 23:02:56 benkirk Exp $
+// $Id: face_quad9.C,v 1.9 2003-02-13 22:56:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -152,13 +152,13 @@ AutoPtr<Elem> Quad9::build_side (const unsigned int i) const
       {
 	error();
       }
-    };
+    }
 
 
   // We will never get here...  Look at the code above.
   error();
   AutoPtr<Elem> ap(NULL);  return ap;
-};
+}
 
 
 
@@ -209,12 +209,12 @@ const std::vector<unsigned int> Quad9::tecplot_connectivity(const unsigned int s
 
     default:
       error();
-    };
+    }
 
   error();
   
   return conn;
-};
+}
 
 
 
@@ -272,12 +272,12 @@ void Quad9::vtk_connectivity(const unsigned int sf,
 
     default:
       error();
-    };
+    }
 
   error();
   
   return;
-};
+}
 
 
 
@@ -297,8 +297,8 @@ void Quad9::refine(Mesh& mesh)
       {
 	_children[c] = new Quad9(this);
 	_children[c]->set_refinement_flag() = Elem::JUST_REFINED;
-      };
-  };
+      }
+  }
 
   // Compute new nodal locations
   // and asssign nodes to children
@@ -324,8 +324,8 @@ void Quad9::refine(Mesh& mesh)
 	  _children[c]->set_node(nc) = mesh.mesh_refinement.add_point(p[c][nc]);
 
 	mesh.add_elem(child(c), mesh.mesh_refinement.new_element_number());
-      };
-  };
+      }
+  }
 
 
   
@@ -339,13 +339,13 @@ void Quad9::refine(Mesh& mesh)
 	  if (id != mesh.boundary_info.invalid_id)
 	    for (unsigned int sc=0; sc<2; sc++)
 	      mesh.boundary_info.add_side(child(side_children_matrix[s][sc]), s, id);
-	};
-  };
+	}
+  }
 
   
   // Un-set my refinement flag now
   set_refinement_flag() = Elem::DO_NOTHING;
-};
+}
 
 
 

@@ -1,4 +1,4 @@
-// $Id: cell_pyramid5.h,v 1.5 2003-01-24 17:24:37 jwpeterson Exp $
+// $Id: cell_pyramid5.h,v 1.6 2003-02-13 22:56:06 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -62,17 +62,17 @@ public:
   /**
    * @returns \p PRYAMID
    */
-  ElemType     type () const   { return PYRAMID5; };
+  ElemType     type () const   { return PYRAMID5; }
 
   /**
    * @returns 1
    */
-  unsigned int n_sub_elem() const { return 1; };
+  unsigned int n_sub_elem() const { return 1; }
   
   /**
    * @returns FIRST
    */
-  Order default_order() const { return FIRST; };
+  Order default_order() const { return FIRST; }
   
   /**
    * Builds a QUAD4 or TRI3 built coincident with face i.  This
@@ -88,7 +88,7 @@ public:
 			std::vector<unsigned int> *conn = NULL) const;
   
   unsigned int vtk_element_type (const unsigned int) const
-  { return 14; };
+  { return 14; }
   
 #ifdef ENABLE_AMR
 
@@ -116,7 +116,7 @@ inline
 Pyramid5::Pyramid5(Cell* p) :
   Pyramid(Pyramid5::n_nodes(), p) 
 {
-};
+}
 
 
 

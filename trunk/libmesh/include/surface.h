@@ -1,4 +1,4 @@
-// $Id: surface.h,v 1.5 2003-01-24 17:24:39 jwpeterson Exp $
+// $Id: surface.h,v 1.6 2003-02-13 22:56:08 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -48,17 +48,17 @@ public:
   /**
    * Constructor.  Does nothing at the moment.
    */
-  Surface () {};
+  Surface () {}
 
   /**
    * Copy-constructor.
    */
-  Surface (const Surface&) {};
+  Surface (const Surface&) {}
 
   /**
    * Destructor.
    */
-  virtual ~Surface () {};
+  virtual ~Surface () {}
 
   /**
    * @returns true if the point p is above the surface,

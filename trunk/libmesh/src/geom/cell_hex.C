@@ -1,4 +1,4 @@
-// $Id: cell_hex.C,v 1.7 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: cell_hex.C,v 1.8 2003-02-13 22:56:10 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -100,12 +100,12 @@ AutoPtr<Elem> Hex::side (const unsigned int i) const
 	error();
 	return face;
       }
-    };
+    }
 
   // We'll never get here.
   error();
   return face;
-};
+}
 
 
 
@@ -253,7 +253,7 @@ Real Hex::quality (const ElemQuality q) const
     // Will never get here...
     error();
     return 0.;
-};
+}
 
 
 
@@ -322,4 +322,4 @@ std::pair<Real, Real> Hex::qual_bounds (const ElemQuality q) const
     }
 
   return bounds;
-};
+}

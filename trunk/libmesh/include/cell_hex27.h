@@ -1,4 +1,4 @@
-// $Id: cell_hex27.h,v 1.6 2003-02-03 03:51:48 ddreyer Exp $
+// $Id: cell_hex27.h,v 1.7 2003-02-13 22:56:06 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -78,22 +78,22 @@ public:
   /**
    * @returns \p HEX27
    */
-  ElemType     type ()   const { return HEX27; };
+  ElemType     type ()   const { return HEX27; }
 
   /**
    * @returns 27
    */
-  unsigned int n_nodes() const { return 27; };
+  unsigned int n_nodes() const { return 27; }
   
   /**
    * @returns 8
    */
-  unsigned int n_sub_elem() const { return 8; };
+  unsigned int n_sub_elem() const { return 8; }
   
   /**
    * @returns SECOND
    */
-  Order default_order() const { return SECOND; };
+  Order default_order() const { return SECOND; }
 
   /**
    * Builds a QUAD9 built coincident with face i.  This
@@ -109,7 +109,7 @@ public:
 			std::vector<unsigned int> *conn = NULL) const;
   
   unsigned int vtk_element_type (const unsigned int) const
-  { return 12; };
+  { return 12; }
   
 #ifdef ENABLE_AMR
 
@@ -154,7 +154,7 @@ inline
 Hex27::Hex27(Cell* p) :
   Hex(Hex27::n_nodes(), p) 
 {
-};
+}
 
 
 

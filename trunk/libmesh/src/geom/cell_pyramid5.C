@@ -1,4 +1,4 @@
-// $Id: cell_pyramid5.C,v 1.6 2003-01-24 21:19:54 jwpeterson Exp $
+// $Id: cell_pyramid5.C,v 1.7 2003-02-13 22:56:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -96,13 +96,13 @@ AutoPtr<Elem> Pyramid5::build_side (const unsigned int i) const
       {
 	error();
       }
-    };
+    }
 
   // We'll never get here.
   error();
 
   AutoPtr<Elem> ap(NULL);  return ap;
-};
+}
 
 
 
@@ -123,7 +123,7 @@ const std::vector<unsigned int> Pyramid5::tecplot_connectivity(const unsigned in
   conn[7] = node(4)+1;
 
   return conn;
-};
+}
 
 
 
@@ -148,7 +148,7 @@ void Pyramid5::vtk_connectivity(const unsigned int sc,
   (*conn)[4] = node(4);
 
   return;
-};
+}
 
 
 
@@ -175,9 +175,9 @@ void Pyramid5::refine(Mesh&)
   //       {
   // 	_children[c] = new Tet4(this);
   //       	_children[c]->set_refinement_flag() = Elem::JUST_REFINED;
-  //       };
+  //       }
 
-  //   };
+  //   }
 
   //   /**
   //    * Build the nodes so we can look for them.	 
@@ -286,7 +286,7 @@ void Pyramid5::refine(Mesh&)
   //       _children[0]->node(4) = n0_4;
       
   //       mesh.add_elem(_children[0], mesh.mesh_refinement.new_element_number());
-  //     };
+  //     }
     
   //     // Child 1 (Pyramid)
   //     {
@@ -297,7 +297,7 @@ void Pyramid5::refine(Mesh&)
   //       _children[1]->node(4) = n1_4;
 
   //       mesh.add_elem(_children[1], mesh.mesh_refinement.new_element_number());
-  //     };
+  //     }
     
   //     // Child 2 (Pyramid)
   //     {
@@ -308,7 +308,7 @@ void Pyramid5::refine(Mesh&)
   //       _children[2]->node(4) = n3_4;
 
   //       mesh.add_elem(_children[2], mesh.mesh_refinement.new_element_number());
-  //     };
+  //     }
     
   //     // Child 3 (Pyramid)
   //     {
@@ -319,7 +319,7 @@ void Pyramid5::refine(Mesh&)
   //       _children[3]->node(4) = n2_4;
  
   //       mesh.add_elem(_children[3], mesh.mesh_refinement.new_element_number());
-  //     };
+  //     }
     
   //     // Child 4 (Pyramid)
   //     {
@@ -330,7 +330,7 @@ void Pyramid5::refine(Mesh&)
   //       _children[4]->node(4) = node(4);
 
   //       mesh.add_elem(_children[4], mesh.mesh_refinement.new_element_number());
-  //     };
+  //     }
     
   //     // Child 5 (Pyramid)
   //     {
@@ -341,7 +341,7 @@ void Pyramid5::refine(Mesh&)
   //       _children[5]->node(4) = n0;
 
   //       mesh.add_elem(_children[5], mesh.mesh_refinement.new_element_number());
-  //     };
+  //     }
     
   //     // Child 6 (Tet)
   //     {
@@ -351,7 +351,7 @@ void Pyramid5::refine(Mesh&)
   //       _children[6]->node(3) = n0;
 
   //       mesh.add_elem(_children[6], mesh.mesh_refinement.new_element_number());
-  //     };
+  //     }
     
   //     // Child 7 (Tet)
   //     {
@@ -361,7 +361,7 @@ void Pyramid5::refine(Mesh&)
   //       _children[7]->node(3) = n2_4;
 
   //       mesh.add_elem(_children[7], mesh.mesh_refinement.new_element_number());
-  //     };
+  //     }
     
   //     // Child 8 (Tet)
   //     {
@@ -371,7 +371,7 @@ void Pyramid5::refine(Mesh&)
   //       _children[8]->node(3) = n3_4;
 
   //       mesh.add_elem(_children[8], mesh.mesh_refinement.new_element_number());
-  //     };
+  //     }
     
   //     // Child 9 (Tet)
   //     {
@@ -381,8 +381,8 @@ void Pyramid5::refine(Mesh&)
   //       _children[9]->node(3) = n0_4;
 
   //       mesh.add_elem(_children[9], mesh.mesh_refinement.new_element_number());
-  //     };    
-  //   };
+  //     }    
+  //   }
 
 
   
@@ -460,13 +460,13 @@ void Pyramid5::refine(Mesh&)
   // 	    mesh.boundary_info.add_side(_children[3], 4, id);
   // 	  }
   //       }
-  //   };
+  //   }
 
 
   
   //   // Un-set my refinement flag now
   //   set_refinement_flag() = Elem::DO_NOTHING;
-};
+}
 
 
 #endif

@@ -1,4 +1,4 @@
-// $Id: inf_fe_static.C,v 1.8 2003-02-13 17:43:07 benkirk Exp $
+// $Id: inf_fe_static.C,v 1.9 2003-02-13 22:56:10 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -37,7 +37,7 @@ InfFE<Dim,T_radial,T_base>::Radial::Radial ()
   std::cerr << "Do not define an object of this type." 
 	    << std::endl;  
   error(); 
-};
+}
 
 
 
@@ -50,7 +50,7 @@ unsigned int InfFE<Dim,T_radial,T_map>::Radial::index(const FEType& fe_type,
     return Radial::index( FEInterface::n_dofs(Dim-1, fe_type, base_elem_type), i);
   else
     return Radial::index(1, i);
-};
+}
 
 
 
@@ -66,7 +66,7 @@ Point InfFE<Dim,T_radial,T_map>::Radial::inverse_map(const Elem*,
 
   Point p;
   return p;
-};
+}
 
 
 
@@ -83,7 +83,7 @@ InfFE<Dim,T_radial,T_base>::Base::Base ()
   std::cerr << "Do not define an object of this type." 
 	    << std::endl;  
   error(); 
-};
+}
 
 
 
@@ -93,7 +93,7 @@ Elem* InfFE<Dim,T_radial,T_base>::Base::build_elem (const Elem* inf_elem)
 { 
   AutoPtr<Elem> ape(inf_elem->build_side(0)); 
   return ape.release(); 
-};
+}
 
 
 
@@ -107,7 +107,7 @@ unsigned int InfFE<Dim,T_radial,T_map>::Base::index(const FEType& fe_type,
     return Base::index(FEInterface::n_dofs(Dim-1, fe_type, base_elem_type), i);
   else
     return Base::index(1, i);
-};
+}
 
 
 
@@ -161,7 +161,7 @@ ElemType InfFE<Dim,T_radial,T_base>::Base::get_elem_type(const ElemType type)
 
   error();
   return INVALID_ELEM;
-};
+}
 
 
 
@@ -180,7 +180,7 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_shape_functions (const FEType& fet,
 							   const ElemType t)
 {
   return InfFE<Dim,T_radial,T_map>::n_dofs(fet, t);
-};
+}
 
 
 
@@ -198,7 +198,7 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs(const FEType& fet,
     return FEInterface::n_dofs(Dim-1, fet, base_et) * Radial::n_dofs(inf_elem_type, fet.radial_order);
   else
     return Radial::n_dofs(inf_elem_type, fet.radial_order);
-};
+}
 		
 
 
@@ -241,7 +241,7 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_per_elem(const FEType& fet,
         * Radial::n_dofs_per_elem(inf_elem_type, fet.radial_order);
   else
     return Radial::n_dofs_per_elem(inf_elem_type, fet.radial_order);
-};
+}
 
 
 
@@ -258,7 +258,7 @@ void InfFE<Dim,T_radial,T_map>::nodal_soln(const FEType&,
   std::cerr << "ERROR: The concept of a nodal solution is not "
 	    << "applicable to infinite elements!" << std::endl;
   error();  
-};
+}
 
 
 
@@ -284,7 +284,7 @@ For sure:
 */
 
   return physical_point;
-};
+}
 
 
 
@@ -321,7 +321,7 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
   else
     return InfFE<Dim,T_radial,T_map>::eval (v, o_radial, i_radial)
         * InfFE<Dim,T_radial,T_map>::Radial::decay(v);
-};
+}
 
 
 
@@ -353,7 +353,7 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
   else
     return InfFE<Dim,T_radial,T_map>::eval (v, o_radial, i_radial)
         * InfFE<Dim,T_radial,T_map>::Radial::decay(v);
-};
+}
 
 
 

@@ -1,4 +1,4 @@
-// $Id: mesh_metis_support.C,v 1.5 2003-01-24 17:24:44 jwpeterson Exp $
+// $Id: mesh_metis_support.C,v 1.6 2003-02-13 22:56:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -62,7 +62,7 @@ void MeshBase::metis_partition(const unsigned int n_sbdmns,
 	  elem(e)->processor_id() = 0;
       
       return;
-    };
+    }
   
   
   assert (_dim != 1);
@@ -165,4 +165,4 @@ void MeshBase::metis_partition(const unsigned int n_sbdmns,
   _perf_log.stop_event("metis_partition()");
   
 #endif
-};
+}

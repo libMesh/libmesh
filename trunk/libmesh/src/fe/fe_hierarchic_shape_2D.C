@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic_shape_2D.C,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: fe_hierarchic_shape_2D.C,v 1.7 2003-02-13 22:56:09 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -41,7 +41,7 @@ Real FE<2,HIERARCHIC>::shape(const ElemType,
   
   error();
   return 0.;
-};
+}
 
 
 
@@ -95,8 +95,8 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
 
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 	    
 
 	    // Hierarchic shape functions on the quadrilateral.
@@ -116,13 +116,13 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
 	      return (FE<1,HIERARCHIC>::shape(EDGE3, order, i0[i], xi)*
 		      FE<1,HIERARCHIC>::shape(EDGE3, order, i1[i], eta));
 	      
-	    };
+	    }
 
 	    
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 	   
 
       
@@ -201,8 +201,8 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
 		  
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 	    
 
 	    // Hierarchic shape functions on the quadrilateral.
@@ -259,12 +259,12 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
 
 	      return f*(FE<1,HIERARCHIC>::shape(EDGE3, order, i0[i], xi)*
 			FE<1,HIERARCHIC>::shape(EDGE3, order, i1[i], eta));
-	    };
+	    }
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 	   
 
       
@@ -361,8 +361,8 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
 		  
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 	    
 
 	    // Hierarchic shape functions on the quadrilateral.
@@ -419,12 +419,12 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
 
 	      return f*(FE<1,HIERARCHIC>::shape(EDGE3, order, i0[i], xi)*
 			FE<1,HIERARCHIC>::shape(EDGE3, order, i1[i], eta));
-	    };
+	    }
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 	   
 
       
@@ -542,8 +542,8 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
 		  
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 	    
 
 	    // Hierarchic shape functions on the quadrilateral.
@@ -600,12 +600,12 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
 
 	      return f*(FE<1,HIERARCHIC>::shape(EDGE3, order, i0[i], xi)*
 			FE<1,HIERARCHIC>::shape(EDGE3, order, i1[i], eta));	      
-	    };
+	    }
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 
 
 
@@ -614,12 +614,12 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
     default:
       std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
       error();
-    };
+    }
 
   
   error();
   return 0.;
-};
+}
 
 
 
@@ -636,7 +636,7 @@ Real FE<2,HIERARCHIC>::shape_deriv(const ElemType,
 
   error();
   return 0.;
-};
+}
 
 
 
@@ -681,7 +681,7 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 
 		    return (FE<2,HIERARCHIC>::shape(elem, order, i, pp) -
 			    FE<2,HIERARCHIC>::shape(elem, order, i, pm))/2./eps;
-		  };
+		  }
 
 		  // d()/deta
 		case 1:
@@ -691,13 +691,13 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 
 		    return (FE<2,HIERARCHIC>::shape(elem, order, i, pp) -
 			    FE<2,HIERARCHIC>::shape(elem, order, i, pm))/2./eps;
-		  };
+		  }
 		  
 
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 
 	    
 
@@ -729,13 +729,13 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 
 		default:
 		  error();
-		};	      
-	    };
+		}	      
+	    }
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 
       
 
@@ -764,7 +764,7 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 
 		    return (FE<2,HIERARCHIC>::shape(elem, order, i, pp) -
 			    FE<2,HIERARCHIC>::shape(elem, order, i, pm))/2./eps;
-		  };
+		  }
 
 		  // d()/deta
 		case 1:
@@ -774,13 +774,13 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 
 		    return (FE<2,HIERARCHIC>::shape(elem, order, i, pp) -
 			    FE<2,HIERARCHIC>::shape(elem, order, i, pm))/2./eps;
-		  };
+		  }
 		  
 
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 
 	    
 
@@ -850,13 +850,13 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 	   
 
       
@@ -886,7 +886,7 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 
 		    return (FE<2,HIERARCHIC>::shape(elem, order, i, pp) -
 			    FE<2,HIERARCHIC>::shape(elem, order, i, pm))/2./eps;
-		  };
+		  }
 
 		  // d()/deta
 		case 1:
@@ -896,13 +896,13 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 
 		    return (FE<2,HIERARCHIC>::shape(elem, order, i, pp) -
 			    FE<2,HIERARCHIC>::shape(elem, order, i, pm))/2./eps;
-		  };
+		  }
 		  
 
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 
 	    
 
@@ -972,13 +972,13 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 	   
 
       
@@ -1009,7 +1009,7 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 
 		    return (FE<2,HIERARCHIC>::shape(elem, order, i, pp) -
 			    FE<2,HIERARCHIC>::shape(elem, order, i, pm))/2./eps;
-		  };
+		  }
 
 		  // d()/deta
 		case 1:
@@ -1019,13 +1019,13 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 
 		    return (FE<2,HIERARCHIC>::shape(elem, order, i, pp) -
 			    FE<2,HIERARCHIC>::shape(elem, order, i, pm))/2./eps;
-		  };
+		  }
 		  
 
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 
 	    
 
@@ -1094,13 +1094,13 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 
 
 
@@ -1109,10 +1109,10 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
     default:
       std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
       error();
-    };
+    }
 
   
   error();
   return 0.;
-};
+}
 

@@ -1,4 +1,4 @@
-// $Id: numeric_vector.C,v 1.2 2003-02-11 00:58:24 benkirk Exp $
+// $Id: numeric_vector.C,v 1.3 2003-02-13 22:56:13 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -44,7 +44,7 @@ NumericVector::build(const SolverPackage solver_package)
       {
 	AutoPtr<NumericVector> ap(new LaspackVector);
 	return ap;
-      };
+      }
 #endif
 
 
@@ -53,7 +53,7 @@ NumericVector::build(const SolverPackage solver_package)
       {
 	AutoPtr<NumericVector> ap(new PetscVector);
 	return ap;
-      };
+      }
 #endif
 
     default:
@@ -61,8 +61,8 @@ NumericVector::build(const SolverPackage solver_package)
 		<< solver_package
 		<< std::endl;
       error();
-    };
+    }
     
   AutoPtr<NumericVector> ap(NULL);
   return ap;    
-};
+}

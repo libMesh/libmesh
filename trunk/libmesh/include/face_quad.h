@@ -1,4 +1,4 @@
-// $Id: face_quad.h,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: face_quad.h,v 1.7 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -66,27 +66,27 @@ public:
    * @returns 4.  All quad-derivatives are guaranteed to have at
    * least 4 nodes.
    */
-  unsigned int n_nodes() const { return 4; };
+  unsigned int n_nodes() const { return 4; }
 
   /**
    * @returns 4
    */
-  unsigned int n_sides() const { return 4; };  
+  unsigned int n_sides() const { return 4; }  
 
   /**
    * @returns 4.  All quadrilaterals have 4 vertices.
    */
-  unsigned int n_vertices() const { return 4; };
+  unsigned int n_vertices() const { return 4; }
 
   /**
    * @returns 4.  All quadrilaterals have 4 edges.
    */
-  unsigned int n_edges() const { return 4; };
+  unsigned int n_edges() const { return 4; }
 
   /**
    * @returns 4
    */
-  unsigned int n_children() const { return 4; };
+  unsigned int n_children() const { return 4; }
 
   /**
    * @returns a primitive (2-noded) edge for 
@@ -118,6 +118,6 @@ inline
 Quad::Quad(const unsigned int nn, Face* p) :
   Face(nn, Quad::n_sides(), p)
 {
-};
+}
 
 #endif

@@ -1,4 +1,4 @@
-// $Id: tree_node.C,v 1.5 2003-02-03 03:51:50 ddreyer Exp $
+// $Id: tree_node.C,v 1.6 2003-02-13 22:56:14 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -57,7 +57,7 @@ void TreeNode<N>::insert (const unsigned int n)
     {
       refine();
     }
-};
+}
 
 
 
@@ -82,7 +82,7 @@ void TreeNode<N>::refine ()
   // We don't need to store any nodes any more
   node_numbers.clear(); 
   elements.clear();
-};
+}
 
 
 
@@ -90,7 +90,7 @@ template <unsigned int N>
 void TreeNode<N>::set_bounding_box (const std::pair<Point, Point>& bbox)
 {
   bounding_box = bbox;
-};
+}
 
 
 
@@ -113,7 +113,7 @@ bool TreeNode<N>::bounds_point (const Point& p) const
    
 
   return false;
-};
+}
 
 
 
@@ -211,7 +211,7 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
 	  default:
 	    std::cerr << "c >= N!" << std::endl;
 	    error();
-	  };
+	  }
 
 
 
@@ -222,7 +222,7 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
       std::cerr << "Only implemented for Octrees!" << std::endl;
       error();
 
-    };
+    }
 
   // How did we get here?
   error();
@@ -230,7 +230,7 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
   Point min, max;
   
   return std::pair<Point, Point> (min, max);
-};
+}
 
 
 
@@ -251,8 +251,8 @@ void TreeNode<N>::print_nodes() const
     {
       for (unsigned int child=0; child<children.size(); child++)
 	children[child]->print_nodes();
-    };
-};
+    }
+}
 
 
 
@@ -273,8 +273,8 @@ void TreeNode<N>::print_elements() const
     {
       for (unsigned int child=0; child<children.size(); child++)
 	children[child]->print_elements();
-    };
-};
+    }
+}
 
 
 
@@ -301,7 +301,7 @@ void TreeNode<N>::transform_nodes_to_elements (std::vector<std::vector<unsigned 
 	  
 	  for (unsigned int e=0; e<nodes_to_elem[node_number].size(); e++)
 	    elements_set.insert(mesh.elem(nodes_to_elem[node_number][e]));
-	};
+	}
 
       // Done with the node numbers.
       node_numbers.clear();
@@ -322,9 +322,9 @@ void TreeNode<N>::transform_nodes_to_elements (std::vector<std::vector<unsigned 
     {
       for (unsigned int child=0; child<children.size(); child++)
 	children[child]->transform_nodes_to_elements (nodes_to_elem);
-    };
+    }
  
-};
+}
 
 
 
@@ -342,7 +342,7 @@ unsigned int TreeNode<N>::n_active_bins() const
 
       return sum;
     }
-};
+}
 
 
 
@@ -372,7 +372,7 @@ Elem* TreeNode<N>::find_element(const Point& p) const
   error();
   
   return NULL;
-};
+}
 
 
 
@@ -443,7 +443,7 @@ Elem* TreeNode<N>::find_element_in_children(const Point& p) const
   // _no_ elements in the tree claim to contain point p.
   
   return NULL;     
-};
+}
 
 
 

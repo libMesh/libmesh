@@ -1,4 +1,4 @@
-// $Id: cell_tet10.h,v 1.5 2003-01-24 17:24:37 jwpeterson Exp $
+// $Id: cell_tet10.h,v 1.6 2003-02-13 22:56:06 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -70,22 +70,22 @@ public:
   /**
    * @returns \p TET10
    */
-  ElemType     type ()   const { return TET10; };
+  ElemType     type ()   const { return TET10; }
 
   /**
    * @returns 10
    */
-  unsigned int n_nodes() const { return 10; };
+  unsigned int n_nodes() const { return 10; }
 
   /**
    * @returns 8
    */
-  unsigned int n_sub_elem() const { return 8; };
+  unsigned int n_sub_elem() const { return 8; }
   
   /**
    * @returns SECOND
    */
-  Order default_order() const { return SECOND; };
+  Order default_order() const { return SECOND; }
   
   /**
    * Builds a TRI6 built coincident with face i.  This
@@ -101,7 +101,7 @@ public:
 			std::vector<unsigned int> *conn = NULL) const;
   
   unsigned int vtk_element_type (const unsigned int) const
-  { return 10; };
+  { return 10; }
   
 #ifdef ENABLE_AMR
 
@@ -109,13 +109,13 @@ public:
    * Refine the element.
    */
   void refine(Mesh&)
-  { error(); return; };
+  { error(); return; }
   
   /**
    * Coarsen the element.
    */
   void coarsen()
-  { error(); return; };
+  { error(); return; }
 
 #endif
   
@@ -131,7 +131,7 @@ inline
 Tet10::Tet10(Cell* p) :
   Tet(Tet10::n_nodes(), p) 
 {
-};
+}
 
 
 

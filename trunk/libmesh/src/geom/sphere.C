@@ -1,4 +1,4 @@
-// $Id: sphere.C,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: sphere.C,v 1.7 2003-02-13 22:56:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -33,7 +33,7 @@
 Sphere::Sphere () : 
   rad(-1.)
 {
-};
+}
 
 
 
@@ -43,7 +43,7 @@ Sphere::Sphere (const Point& c,
   assert (r > 0.);
 
   create_from_center_radius (c, r);
-};
+}
 
 
 
@@ -52,13 +52,13 @@ Sphere::Sphere (const Sphere& other_sphere) :
 {
   create_from_center_radius (other_sphere.cent,
 			     other_sphere.rad);
-};
+}
 
 
 
 Sphere::~Sphere ()
 {
-};
+}
 
 
 
@@ -68,7 +68,7 @@ void Sphere::create_from_center_radius (const Point& c, const Real r)
   rad = r;
 
   assert (rad > 0.);
-};
+}
 
 
 
@@ -83,7 +83,7 @@ bool Sphere::intersects (const Sphere& other_sphere) const
     return true;
   
   return false;
-};
+}
 
 
 
@@ -98,7 +98,7 @@ bool Sphere::above_surface (const Point& p) const
     return true;
 
   return false;
-};
+}
 
 
 
@@ -107,7 +107,7 @@ bool Sphere::below_surface (const Point& p) const
   assert (rad > 0.);
 
   return ( !above_surface (p) );
-};
+}
 
 
 
@@ -124,7 +124,7 @@ bool Sphere::on_surface (const Point& p) const
     return true;
 
   return false;
-};
+}
 
 
 
@@ -141,7 +141,7 @@ Point Sphere::closest_point (const Point& p) const
   const Point cp = cent + normal*rad;
   
   return cp;
-};
+}
 
 
 
@@ -153,4 +153,4 @@ Point Sphere::unit_normal (const Point& p) const
   Point n = p - cent;
 
   return n.unit();
-};
+}

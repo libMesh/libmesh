@@ -1,4 +1,4 @@
-// $Id: cell_hex20.C,v 1.9 2003-02-06 23:02:55 benkirk Exp $
+// $Id: cell_hex20.C,v 1.10 2003-02-13 22:56:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -52,7 +52,7 @@ AutoPtr<Elem> Hex20::build_side (const unsigned int i) const
 	face->set_node(7) = get_node(8);
 
 	return face;
-      };
+      }
     case 1:  // the face at y = 0
       {
 	face->set_node(0) = get_node(0);
@@ -65,7 +65,7 @@ AutoPtr<Elem> Hex20::build_side (const unsigned int i) const
 	face->set_node(7) = get_node(12);
 
 	return face;
-      };
+      }
     case 2:  // the face at x=1
       {
 	face->set_node(0) = get_node(1);
@@ -78,7 +78,7 @@ AutoPtr<Elem> Hex20::build_side (const unsigned int i) const
 	face->set_node(7) = get_node(13);
 
 	return face;
-      };
+      }
     case 3: // the face at y=1
       {
 	face->set_node(0) = get_node(2);
@@ -91,7 +91,7 @@ AutoPtr<Elem> Hex20::build_side (const unsigned int i) const
 	face->set_node(7) = get_node(14);
 
 	return face;
-      };
+      }
     case 4: // the face at x=0
       {
 	face->set_node(0) = get_node(3);
@@ -104,7 +104,7 @@ AutoPtr<Elem> Hex20::build_side (const unsigned int i) const
 	face->set_node(7) = get_node(15);
 
 	return face;
-      };
+      }
     case 5: // the face at z=1
       {
 	face->set_node(0) = get_node(4);
@@ -117,18 +117,18 @@ AutoPtr<Elem> Hex20::build_side (const unsigned int i) const
 	face->set_node(7) = get_node(19);
 
 	return face;
-      };
+      }
     default:
       {
 	error();
 	return face;
       }
-    };
+    }
 
   // We'll never get here.
   error();
   return face;
-};
+}
 
 
 
@@ -159,10 +159,10 @@ const std::vector<unsigned int> Hex20::tecplot_connectivity(const unsigned int s
     default:
       error();
       
-    };
+    }
   
   return conn;
-};
+}
 
 
 
@@ -190,7 +190,7 @@ void Hex20::vtk_connectivity(const unsigned int sc,
   (*conn)[7] = node(7);
 
   return;
-};
+}
 
 
 
@@ -427,8 +427,8 @@ void Hex20::refine(Mesh& mesh)
       {
 	_children[c] = new Hex20(this);
 	_children[c]->set_refinement_flag() = Elem::JUST_REFINED;
-      };
-  };
+      }
+  }
 
 
   // Compute new nodal locations
@@ -455,8 +455,8 @@ void Hex20::refine(Mesh& mesh)
 	  _children[c]->set_node(nc) = mesh.mesh_refinement.add_point(p[c][nc]);
 
 	mesh.add_elem(child(c), mesh.mesh_refinement.new_element_number());
-      };
-  };
+      }
+  }
 
 
   
@@ -470,13 +470,13 @@ void Hex20::refine(Mesh& mesh)
 	  if (id != mesh.boundary_info.invalid_id)
 	    for (unsigned int sc=0; sc<4; sc++)
 	      mesh.boundary_info.add_side(child(side_children_matrix[s][sc]), s, id);
-	};
-  };
+	}
+  }
 
 
   // Un-set my refinement flag now
   set_refinement_flag() = Elem::DO_NOTHING;
-};
+}
 
 
 #endif

@@ -1,4 +1,4 @@
-// $Id: tree_node.h,v 1.4 2003-01-24 17:24:39 jwpeterson Exp $
+// $Id: tree_node.h,v 1.5 2003-02-13 22:56:08 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -46,7 +46,7 @@ public:
   /**
    * Dummy constructor.
    */
-  //TreeNode () {};
+  //TreeNode () {}
 
 
   /**
@@ -69,13 +69,13 @@ public:
    * @returns true if this node is the root node, false
    * otherwise.
    */
-  bool is_root() const { return (parent == NULL); };
+  bool is_root() const { return (parent == NULL); }
 
   /**
    * @returns true if this node is active (i.e. has no 
    * children), false otherwise.
    */
-  bool active() const { return children.empty(); };
+  bool active() const { return children.empty(); }
 
   /**
    * Inserts node number n into the TreeNode.
@@ -98,7 +98,7 @@ public:
    * false otherwise.
    */
   bool bounds_node (const unsigned int n) const { assert (n < mesh.n_nodes()); 
-  return bounds_point(mesh.point(n)); };
+  return bounds_point(mesh.point(n)); }
 
   /**
    * @returns true if this TreeNode (or its children) contain point p,
@@ -212,7 +212,7 @@ TreeNode<N>::TreeNode (const MeshBase& m,
 {
   // Assert our children are empty, thus we are active.
   assert (children.empty());
-};
+}
 
 
 
@@ -229,7 +229,7 @@ TreeNode<N>::~TreeNode ()
 
   children.clear();
   elements.clear();
-};
+}
 
 
 
@@ -245,7 +245,7 @@ unsigned int TreeNode<N>::level () const
 
   error();
   return static_cast<unsigned int>(-1);
-};
+}
 
 
 

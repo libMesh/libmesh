@@ -1,4 +1,4 @@
-// $Id: edge_edge3.h,v 1.5 2003-01-24 17:24:38 jwpeterson Exp $
+// $Id: edge_edge3.h,v 1.6 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -53,22 +53,22 @@ class Edge3 : public Edge
   /**
    * @returns 3
    */
-  unsigned int n_nodes() const { return 3; };
+  unsigned int n_nodes() const { return 3; }
 
   /**
    * @returns 2
    */
-  unsigned int n_sub_elem() const { return 2; };
+  unsigned int n_sub_elem() const { return 2; }
 
   /**
    * @returns \p EDGE3
    */
-  ElemType type()  const { return EDGE3; };
+  ElemType type()  const { return EDGE3; }
   
   /**
    * @returns SECOND
    */
-  Order default_order() const { return SECOND; };
+  Order default_order() const { return SECOND; }
 
   const std::vector<unsigned int> tecplot_connectivity(const unsigned int se=0) const;
 
@@ -76,7 +76,7 @@ class Edge3 : public Edge
 			std::vector<unsigned int> *conn = NULL) const;
   
   unsigned int vtk_element_type (const unsigned int) const
-  { return 3; };
+  { return 3; }
   
 #ifdef ENABLE_AMR
 
@@ -84,12 +84,12 @@ class Edge3 : public Edge
    * Refine the element.
    */
   void refine(Mesh&)
-    { error(); return; };
+    { error(); return; }
   
   /**
    * Refine the element.
    */
-  void coarsen() { error(); return; };
+  void coarsen() { error(); return; }
 
 #endif
   
@@ -106,7 +106,7 @@ inline
 Edge3::Edge3(Edge* p) :
   Edge(Edge3::n_nodes(), p) 
 {
-};
+}
 
 
 

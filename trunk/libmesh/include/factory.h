@@ -1,4 +1,4 @@
-// $Id: factory.h,v 1.5 2003-01-24 17:24:38 jwpeterson Exp $
+// $Id: factory.h,v 1.6 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -53,7 +53,7 @@ public:
   /**
    * Destructor. (Empty.)
    */
-  virtual ~Factory() {};
+  virtual ~Factory() {}
 
   /**
    * Builds an object of type Base identified by name.
@@ -87,19 +87,19 @@ public:
   /**
    * Constructor.  Takes a name as input.
    */
-  FactoryImp(const std::string& name) : Factory<Base>(name) { };
+  FactoryImp(const std::string& name) : Factory<Base>(name) { }
 
   /**
    * Destructor.  Empty.
    */
-  ~FactoryImp() {};
+  ~FactoryImp() {}
 
 private:
 
   /**
    * @returns a new object of type Derived. 
    */
-  AutoPtr<Base> create() { return AutoPtr<Base>(new Derived); };
+  AutoPtr<Base> create() { return AutoPtr<Base>(new Derived); }
 };
 
 
@@ -115,7 +115,7 @@ Factory<Base>::Factory(const std::string& name)
     assert(!factory_map.count(name));
   
   factory_map[name] = this;
-};
+}
 
 
 
@@ -136,7 +136,7 @@ AutoPtr<Base> Factory<Base>::build(const std::string& name)
       return AutoPtr<Base>(NULL);
     }
   return AutoPtr<Base>(factory_map[name]->create());  
-};
+}
 
 
 

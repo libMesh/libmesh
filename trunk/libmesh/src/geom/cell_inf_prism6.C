@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism6.C,v 1.8 2003-02-06 23:02:55 benkirk Exp $
+// $Id: cell_inf_prism6.C,v 1.9 2003-02-13 22:56:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -103,12 +103,12 @@ AutoPtr<Elem> InfPrism6::build_side (const unsigned int i) const
 	error(); 
 	AutoPtr<Elem> ap(NULL);  return ap;
       }
-    };
+    }
 
   // We'll never get here.
   error();
   AutoPtr<Elem> ap(NULL);  return ap;
-};
+}
 
 
 
@@ -130,7 +130,7 @@ const std::vector<unsigned int> InfPrism6::tecplot_connectivity(const unsigned i
   conn[7] = node(5)+1;
 
   return conn;
-};
+}
 
 
 
@@ -147,8 +147,8 @@ void InfPrism6::write_tecplot_connectivity(std::ostream &out) const
 	out << conn[i] << " ";
 
       out << std::endl;
-    };
-};
+    }
+}
 
 
 
@@ -228,8 +228,8 @@ void InfPrism6::refine(Mesh& mesh)
       {
 	_children[c] = new InfPrism6(this);
 	_children[c]->set_refinement_flag() = Elem::JUST_REFINED;
-      };
-  };
+      }
+  }
 
 
   // Compute new nodal locations
@@ -256,8 +256,8 @@ void InfPrism6::refine(Mesh& mesh)
 	  _children[c]->set_node(nc) = mesh.mesh_refinement.add_point(p[c][nc]);
 
 	mesh.add_elem(child(c), mesh.mesh_refinement.new_element_number());
-      };
-  };
+      }
+  }
 
 
   
@@ -273,13 +273,13 @@ void InfPrism6::refine(Mesh& mesh)
 	    for (unsigned int sc=1; sc<=side_children_matrix[s][0]; sc++)
 	      mesh.boundary_info.add_side(child(side_children_matrix[s][sc]), s, id);
 	
-	};
-  };
+	}
+  }
 
 
   // Un-set my refinement flag now
   set_refinement_flag() = Elem::DO_NOTHING;
-};
+}
 
 
 #endif

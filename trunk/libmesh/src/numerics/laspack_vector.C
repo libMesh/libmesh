@@ -1,4 +1,4 @@
-// $Id: laspack_vector.C,v 1.5 2003-02-11 22:59:35 benkirk Exp $
+// $Id: laspack_vector.C,v 1.6 2003-02-13 22:56:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -40,7 +40,7 @@
 //   init (v.local_size(), v.size(), fast);
 
 //   vec = reinterpret_cast<const LaspackVector&>(v).vec;
-// };
+// }
 
 
 
@@ -49,7 +49,7 @@ Real LaspackVector::l1_norm () const
   assert(closed());
   
   return static_cast<Real>(Laspack::l1Norm_V(const_cast<Laspack::QVector*>(&_vec)));
-};
+}
 
 
 
@@ -58,7 +58,7 @@ Real LaspackVector::l2_norm () const
   assert(closed());
   
   return static_cast<Real>(Laspack::l2Norm_V(const_cast<Laspack::QVector*>(&_vec)));
-};
+}
 
 
 
@@ -67,7 +67,7 @@ Real LaspackVector::linfty_norm () const
   assert(closed());
   
   return static_cast<Real>(Laspack::MaxNorm_V(const_cast<Laspack::QVector*>(&_vec)));
-};
+}
 
 
 
@@ -79,7 +79,7 @@ NumericVector& LaspackVector::operator += (const NumericVector& v)
   add(1., v);
   
   return *this;
-};
+}
 
 
 
@@ -91,7 +91,7 @@ NumericVector& LaspackVector::operator -= (const NumericVector& v)
   add(-1., v);
   
   return *this;
-};
+}
 
 
 
@@ -99,7 +99,7 @@ void LaspackVector::add (const Complex v)
 {
   for (unsigned int i=0; i<size(); i++)
     add (i, v);
-};
+}
 
 
 
@@ -107,7 +107,7 @@ void LaspackVector::add (const Complex v)
 void LaspackVector::add (const NumericVector& v)
 {
   add (1., v);
-};
+}
 
 
 
@@ -119,7 +119,7 @@ void LaspackVector::add (const Complex a, const NumericVector& v_in)
 
   for (unsigned int i=0; i<v.size(); i++)
     add (i, a*v(i));
-};
+}
 
 
 void LaspackVector::scale (const Complex factor)
@@ -127,7 +127,7 @@ void LaspackVector::scale (const Complex factor)
   assert (initialized());
   
   Laspack::Mul_SV (factor, &_vec);
-};
+}
 
 
 
@@ -139,7 +139,7 @@ LaspackVector::operator = (const Complex s)
   Laspack::V_SetAllCmp (&_vec, s);
   
   return *this;
-};
+}
 
 
 
@@ -151,7 +151,7 @@ LaspackVector::operator = (const NumericVector& v_in)
   *this = v;
 
   return *this;
-};
+}
 
 
 
@@ -165,7 +165,7 @@ LaspackVector::operator = (const LaspackVector& v)
 		      const_cast<Laspack::QVector*>(&v._vec)
 		      );
   return *this;
-};
+}
 
 
 
@@ -184,7 +184,7 @@ LaspackVector::operator = (const std::vector<Complex>& v)
     error();
 
   return *this;
-};
+}
 
 
 
@@ -194,7 +194,7 @@ void LaspackVector::localize (NumericVector& v_local_in) const
     reinterpret_cast<LaspackVector&>(v_local_in);
 
   v_local = *this;
-};
+}
 
 
 
@@ -207,7 +207,7 @@ void LaspackVector::localize (NumericVector& v_local_in,
   assert (send_list.size() == v_local.size());
 
   v_local = *this;
-};
+}
 
 
 
@@ -218,7 +218,7 @@ void LaspackVector::localize (std::vector<Complex>& v_local) const
 
   for (unsigned int i=0; i<v_local.size(); i++)
     v_local[i] = (*this)(i);  
-};
+}
 
 
 
@@ -228,7 +228,7 @@ void LaspackVector::localize_to_one (std::vector<Complex>& v_local,
   assert (pid == 0);
 
   localize (v_local);
-};
+}
 
 
 

@@ -1,4 +1,4 @@
-// $Id: laspack_interface.C,v 1.2 2003-02-10 22:03:26 benkirk Exp $
+// $Id: laspack_interface.C,v 1.3 2003-02-13 22:56:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -77,8 +77,8 @@ void LaspackInterface::clear ()
       
       _solver_type = GMRES;
       _preconditioner_type = ILU_PRECOND;
-    };
-};
+    }
+}
 
 
 
@@ -88,10 +88,10 @@ void LaspackInterface::init ()
   if (!initialized())
     {
       _is_initialized = true;
-    };
+    }
 
   Laspack::SetRTCAuxProc (print_iter_accuracy);
-};
+}
 
 
 
@@ -207,7 +207,7 @@ LaspackInterface::solve (SparseMatrix &matrix_in,
 		    rhs,
 		    tol,
 		    m_its);
-    };
+    }
 
   if (Laspack::LASResult() != Laspack::LASOK)
     {
@@ -220,7 +220,7 @@ LaspackInterface::solve (SparseMatrix &matrix_in,
 				   Laspack::GetLastAccuracy());
   
   return p;
-};
+}
 
 
 
@@ -247,8 +247,8 @@ void LaspackInterface::set_laspack_preconditioner_type ()
 		<< "Continuing with ILU" << std::endl;
       _preconditioner_type = ILU_PRECOND;
       set_laspack_preconditioner_type();      
-    };
-};
+    }
+}
 
 
 

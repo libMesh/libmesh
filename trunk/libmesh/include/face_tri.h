@@ -1,4 +1,4 @@
-// $Id: face_tri.h,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: face_tri.h,v 1.7 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -68,27 +68,27 @@ public:
    * @returns 3.  All tri-derivatives are guaranteed to have at
    * least 3 nodes.
    */
-  unsigned int n_nodes() const { return 3; };
+  unsigned int n_nodes() const { return 3; }
 
   /**
    * @returns 3
    */
-  unsigned int n_sides() const { return 3; };
+  unsigned int n_sides() const { return 3; }
 
   /**
    * @returns 3.  All triangles have 3 vertices.
    */
-  unsigned int n_vertices() const { return 3; };
+  unsigned int n_vertices() const { return 3; }
 
   /**
    * @returns 3.  All triangles have 3 edges.
    */
-  unsigned int n_edges() const { return 3; };
+  unsigned int n_edges() const { return 3; }
 
   /**
    * @returns 4
    */
-  unsigned int n_children() const { return 4; };
+  unsigned int n_children() const { return 4; }
 
   /**
    * @returns a primitive (2-noded) edge for 
@@ -119,7 +119,7 @@ inline
 Tri::Tri(const unsigned int nn, Face* p) :
   Face(nn, Tri::n_sides(), p)
 {
-};
+}
 
 #endif
 

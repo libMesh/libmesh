@@ -1,4 +1,4 @@
-// $Id: perf_log.C,v 1.8 2003-02-07 15:22:17 benkirk Exp $
+// $Id: perf_log.C,v 1.9 2003-02-13 22:56:14 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -48,7 +48,7 @@ PerfLog::PerfLog(const std::string cn,
 {
   if (log_events)
     clear();
-};
+}
 
 
 
@@ -56,7 +56,7 @@ PerfLog::~PerfLog()
 {
   if (log_events)
     print_log();
-};
+}
 
 
 
@@ -83,7 +83,7 @@ void PerfLog::clear()
   
       log.clear();
     }
-};
+}
 
 
 std::string PerfLog::get_info_header() const
@@ -263,7 +263,7 @@ std::string PerfLog::get_log() const
 #endif
   
   return out.str();
-};
+}
 
 
 
@@ -271,4 +271,4 @@ void PerfLog::print_log() const
 {
   if (log_events)
     std::cout << get_log() << std::endl;
-};
+}

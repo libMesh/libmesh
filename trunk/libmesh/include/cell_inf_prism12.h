@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism12.h,v 1.6 2003-02-03 03:51:48 ddreyer Exp $
+// $Id: cell_inf_prism12.h,v 1.7 2003-02-13 22:56:06 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -72,22 +72,22 @@ public:
   /**
    * @returns \p INFPRISM12
    */
-  ElemType     type () const   { return INFPRISM12; };
+  ElemType     type () const   { return INFPRISM12; }
 
   /**
    * @returns 12
    */
-  unsigned int n_nodes() const { return 12; };
+  unsigned int n_nodes() const { return 12; }
   
   /**
    * @returns 4
    */
-  unsigned int n_sub_elem() const { return 4; };
+  unsigned int n_sub_elem() const { return 4; }
   
   /**
    * @returns SECOND
    */
-  Order default_order() const { return SECOND; };
+  Order default_order() const { return SECOND; }
   
   /**
    * Returns a TRI6 built coincident with face 0, an INFQUAD6 
@@ -101,10 +101,10 @@ public:
   
   void vtk_connectivity(const unsigned int,
 			std::vector<unsigned int>*) const
-  { error(); };
+  { error(); }
   
   unsigned int vtk_element_type (const unsigned int) const
-  { return 13; };
+  { return 13; }
   
   void write_tecplot_connectivity(std::ostream &out) const;
   
@@ -153,7 +153,7 @@ inline
 InfPrism12::InfPrism12(Cell* p) :
   Prism(InfPrism12::n_nodes(), p) 
 {
-};
+}
 
 
 

@@ -1,4 +1,4 @@
-// $Id: dense_matrix.h,v 1.7 2003-02-07 18:07:45 ddreyer Exp $
+// $Id: dense_matrix.h,v 1.8 2003-02-13 22:56:06 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -135,19 +135,19 @@ class DenseMatrix
   /**
    * @returns the row-dimension of the matrix.
    */
-  unsigned int m() const { return m_dim; };
+  unsigned int m() const { return m_dim; }
   
   /**
    * @returns the column-dimension of the matrix.
    */
-  unsigned int n() const { return n_dim; };
+  unsigned int n() const { return n_dim; }
 
   /**
    * Access to the values array.  This should be used with
    * caution but can  be used to speed up code compilation
    * significantly.
    */
-  std::vector<Tp>& get_values() { return val; };
+  std::vector<Tp>& get_values() { return val; }
 
   /**
    * Condense-out the \p (i,j) entry of the matrix, forcing
@@ -212,7 +212,7 @@ namespace DenseMatrices
    */
   typedef DenseMatrix<Complex> ComplexDenseMatrix;  
 
-};
+}
 
 
 
@@ -232,7 +232,7 @@ DenseMatrix<Tp>::DenseMatrix(const unsigned int m,
   resize(m,n);
 
   zero();
-};
+}
 
 
 
@@ -244,7 +244,7 @@ DenseMatrix<Tp>::DenseMatrix (const DenseMatrix& other_matrix)
   n_dim = other_matrix.n_dim;
   
   val = other_matrix.val;
-};
+}
 
 
 
@@ -252,7 +252,7 @@ template<typename Tp>
 inline
 DenseMatrix<Tp>::~DenseMatrix()
 {
-};
+}
 
 
 
@@ -270,7 +270,7 @@ void DenseMatrix<Tp>::resize(const unsigned int m,
   zero();
   
   return;
-};
+}
 
 
 
@@ -280,7 +280,7 @@ void DenseMatrix<Tp>::zero()
 {
   for (unsigned int i=0; i<val.size(); i++)
     val[i] = 0.;
-};
+}
 
 
 
@@ -294,7 +294,7 @@ DenseMatrix<Tp>& DenseMatrix<Tp>::operator = (const DenseMatrix<Tp>& other_matri
   val   = other_matrix.val;
   
   return *this;
-};
+}
 
 
 
@@ -307,7 +307,7 @@ Tp DenseMatrix<Tp>::operator () (const unsigned int i,
   
   //  return val[(i) + (m_dim)*(j)]; // row-major
   return val[(i)*(n_dim) + (j)]; // col-major
-};
+}
 
 
 
@@ -320,7 +320,7 @@ Tp & DenseMatrix<Tp>::operator () (const unsigned int i,
   
   //return val[(i) + (m_dim)*(j)]; // col-major
   return val[(i)*(n_dim) + (j)]; // row-major
-};
+}
 
 
 
@@ -333,7 +333,7 @@ Tp DenseMatrix<Tp>::transpose (const unsigned int i,
   
   //return val[(j) + (m_dim)*(i)]; // col-major
   return val[(j)*(n_dim) + (i)]; // row-major
-};
+}
   
     
 
@@ -344,7 +344,7 @@ void DenseMatrix<Tp>::scale (const Tp factor)
 {
   for (unsigned int i=0; i<val.size(); i++)
     val[i] *= factor;
-};
+}
 
 
 
@@ -382,7 +382,7 @@ void DenseMatrix<Tp>::scale (const Tp factor)
   
 // #endif
 
-// };
+// }
     
     
 
@@ -410,7 +410,7 @@ void DenseMatrix<Tp>::scale (const Tp factor)
 //   error();
 
 // #endif
-// };
+// }
 
 
 
@@ -428,7 +428,7 @@ void DenseMatrix<Tp>::add (const Tp factor,
       (*this)(i,j) += factor*mat(i,j);
 
   return;
-};
+}
 
 
 
@@ -453,7 +453,7 @@ void DenseMatrix<Complex>::add (const Complex factor,
       (*this)(i,j) += factor*mat(i,j);
 
   return;
-};
+}
 
 
 #endif
@@ -485,7 +485,7 @@ void DenseMatrix<Tp>::condense(const unsigned int iv,
   (*this)(iv,jv) = 1.;
   rhs[iv] = val;
   
-};
+}
 
 
 
@@ -503,7 +503,7 @@ void DenseMatrix<Tp>::print () const
     }
 
   return;
-};
+}
   
 
 

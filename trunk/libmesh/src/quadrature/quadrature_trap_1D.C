@@ -1,4 +1,4 @@
-// $Id: quadrature_trap_1D.C,v 1.4 2003-01-24 17:24:45 jwpeterson Exp $
+// $Id: quadrature_trap_1D.C,v 1.5 2003-02-13 22:56:14 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -38,4 +38,4 @@ void QTrap::init_1D(const ElemType)
   _weights[1] = 1.;
   
   return;
-};
+}

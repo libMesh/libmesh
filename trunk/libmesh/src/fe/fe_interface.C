@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.10 2003-02-12 02:03:50 ddreyer Exp $
+// $Id: fe_interface.C,v 1.11 2003-02-13 22:56:09 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -32,7 +32,7 @@ FEInterface::FEInterface()
   std::cerr << "ERROR: Do not define an object of this type." 
 	    << std::endl;
   error();
-};
+}
 
 
 
@@ -74,8 +74,8 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 
       
       // 2D
@@ -94,8 +94,8 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 
       
       // 3D
@@ -114,18 +114,18 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 
 
     default:
       error();
-    };
+    }
 
   
   error();
   return 0;
-};
+}
 
 
 
@@ -162,8 +162,8 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 
       
       // 2D
@@ -182,8 +182,8 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 
       
       // 3D
@@ -202,18 +202,18 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 
 
     default:
       error();
-    };
+    }
 
   
   error();
   return 0;
-};
+}
 
 		
 
@@ -250,8 +250,8 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 
       
       // 2D
@@ -270,8 +270,8 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 
       
       // 3D
@@ -290,18 +290,18 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 
 
     default:
       error();
-    };
+    }
 
   
   error();
   return 0;
-};
+}
 
 
 
@@ -338,8 +338,8 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 
       
       // 2D
@@ -358,8 +358,8 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 
       
       // 3D
@@ -378,18 +378,18 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 
 
     default:
       error();
-    };
+    }
 
   
   error();
   return 0;
-};
+}
 
 
 
@@ -408,7 +408,7 @@ void FEInterface::nodal_soln(const unsigned int dim,
   {
     ifem_nodal_soln(dim, fe_t, elem, elem_soln, nodal_soln);
     return;
-  };
+  }
 
 #endif
 
@@ -438,8 +438,8 @@ void FEInterface::nodal_soln(const unsigned int dim,
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 
       
       // 2D
@@ -464,8 +464,8 @@ void FEInterface::nodal_soln(const unsigned int dim,
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 
       
       // 3D
@@ -490,14 +490,14 @@ void FEInterface::nodal_soln(const unsigned int dim,
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 
 
     default:
       error();
-    };
-};
+    }
+}
 
 
 
@@ -533,8 +533,8 @@ Point FEInterface::inverse_map (const unsigned int dim,
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 
       
       // 2D
@@ -553,8 +553,8 @@ Point FEInterface::inverse_map (const unsigned int dim,
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 
       
       // 3D
@@ -573,19 +573,19 @@ Point FEInterface::inverse_map (const unsigned int dim,
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 
 
     default:
       error();
-    };
+    }
 
   
   error();
   Point pt;
   return pt;
-};
+}
 
 
 
@@ -594,7 +594,7 @@ bool FEInterface::on_reference_element(const Point& p,
 				       const Real eps)
 {
   return FEBase::on_reference_element(p,t,eps);
-};
+}
 
 
 
@@ -632,8 +632,8 @@ Real FEInterface::shape(const unsigned int dim,
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 
       
       // 2D
@@ -652,8 +652,8 @@ Real FEInterface::shape(const unsigned int dim,
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 
       
       // 3D
@@ -672,18 +672,18 @@ Real FEInterface::shape(const unsigned int dim,
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 
 
     default:
       error();
-    };
+    }
 
   
   error();
   return 0.;
-};
+}
 
 
 
@@ -721,8 +721,8 @@ Real FEInterface::shape(const unsigned int dim,
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 
       
       // 2D
@@ -741,8 +741,8 @@ Real FEInterface::shape(const unsigned int dim,
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 
       
       // 3D
@@ -761,17 +761,17 @@ Real FEInterface::shape(const unsigned int dim,
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 
 
     default:
       error();
-    };
+    }
 
   
   error();
   return 0.;
-};
+}
 
 

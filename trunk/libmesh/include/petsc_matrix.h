@@ -1,4 +1,4 @@
-//    $Id: petsc_matrix.h,v 1.11 2003-02-10 03:55:51 benkirk Exp $
+//    $Id: petsc_matrix.h,v 1.12 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -287,7 +287,7 @@ class PetscMatrix : public SparseMatrix
 // PetscMatrix inline members
 inline
 PetscMatrix::PetscMatrix()
-{};
+{}
 
 
 
@@ -296,7 +296,7 @@ inline
 PetscMatrix::~PetscMatrix()
 {
   clear();
-};
+}
 
 
 
@@ -313,7 +313,7 @@ void PetscMatrix::close () const
   ierr = MatAssemblyEnd   (mat, MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
   
   return;
-};
+}
 
 
 
@@ -328,7 +328,7 @@ unsigned int PetscMatrix::m () const
   ierr = MatGetSize (mat, &petsc_m, &petsc_n);
 
   return static_cast<unsigned int>(petsc_m);
-};
+}
 
 
 
@@ -343,7 +343,7 @@ unsigned int PetscMatrix::n () const
   ierr = MatGetSize (mat, &petsc_m, &petsc_n);
 
   return static_cast<unsigned int>(petsc_n);
-};
+}
 
 
 
@@ -358,7 +358,7 @@ unsigned int PetscMatrix::row_start () const
   ierr = MatGetOwnershipRange(mat, &start, &stop); CHKERRQ(ierr);
 
   return start;
-};
+}
 
 
 
@@ -373,7 +373,7 @@ unsigned int PetscMatrix::row_stop () const
   ierr = MatGetOwnershipRange(mat, &start, &stop); CHKERRQ(ierr);
 
   return stop;
-};
+}
 
 
 
@@ -392,7 +392,7 @@ void PetscMatrix::set (const unsigned int i,
 		      &petsc_value, INSERT_VALUES); CHKERRQ(ierr);
 
   return;
-};
+}
 
 
 
@@ -411,7 +411,7 @@ void PetscMatrix::add (const unsigned int i,
 		      &petsc_value, ADD_VALUES); CHKERRQ(ierr);
   
   return;
-};
+}
 
 
 
@@ -420,7 +420,7 @@ void PetscMatrix::add_matrix(const ComplexDenseMatrix& dm,
 			     const std::vector<unsigned int>& dof_indices)
 {
   add_matrix (dm, dof_indices, dof_indices);
-};
+}
 
 
 inline
@@ -456,7 +456,7 @@ void PetscMatrix::add_matrix(const ComplexDenseMatrix& dm,
 		      ADD_VALUES);   CHKERRQ(ierr);
 
   return;
-};
+}
 
 
 
@@ -492,13 +492,13 @@ Complex PetscMatrix::operator () (const unsigned int i,
 			     &ncols, &petsc_cols, &petsc_row); CHKERRQ(ierr);
 	  
 	return value;
-      };
+      }
   
   // Otherwise the entry is not in the sparse matrix,
   // i.e. it is 0.
   
   return 0.;
-};
+}
 
 
 
@@ -517,7 +517,7 @@ bool PetscMatrix::closed() const
     return true;
 
   return false;
-};
+}
 
 
 

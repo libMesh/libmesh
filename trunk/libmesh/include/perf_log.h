@@ -1,4 +1,4 @@
-// $Id: perf_log.h,v 1.7 2003-02-07 15:21:55 benkirk Exp $
+// $Id: perf_log.h,v 1.8 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -55,7 +55,7 @@ class PerfData
     tot_time(0.),
     count(0),
     open(false)
-    {};
+    {}
 
   /**
    * Total time spent in this event.
@@ -229,7 +229,7 @@ void PerfLog::start_event(const std::string &label)
       
       gettimeofday (&perf_data.tstart, NULL);
     }
-};
+}
 
 
 
@@ -264,7 +264,7 @@ void PerfLog::stop_event(const std::string &label)
       perf_data.tot_time += elapsed_time;
       perf_data.count++;	 
     }
-};
+}
 
 
 
@@ -296,7 +296,7 @@ void PerfLog::pause_event(const std::string &label)
       total_time         += elapsed_time;
       perf_data.tot_time += elapsed_time;
     }
-};
+}
 
 
 
@@ -320,7 +320,7 @@ void PerfLog::restart_event(const std::string &label)
       
       gettimeofday (&perf_data.tstart, NULL);
     }
-};
+}
 
 // Typedefs we might need
 #ifdef HAVE_LOCALE

@@ -1,4 +1,4 @@
-// $Id: quadrature_build.C,v 1.2 2003-02-07 15:21:32 ddreyer Exp $
+// $Id: quadrature_build.C,v 1.3 2003-02-13 22:56:13 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -46,12 +46,12 @@ AutoPtr<QBase> QBase::build(const QuadratureType _qt,
 	  {
 	    std::cout << "WARNING: Gauss quadrature implemented" << std::endl
 		      << " up to TWENTYTHIRD order." << std::endl;
-	  };
+	  }
 #endif
 
 	AutoPtr<QBase> ap(new QGauss(_dim, _order));
 	return ap;
-      };
+      }
 
     case QJACOBI_1_0:
       {
@@ -61,18 +61,18 @@ AutoPtr<QBase> QBase::build(const QuadratureType _qt,
 	  {
 	    std::cout << "WARNING: Jacobi(1,0) quadrature implemented" << std::endl
 		      << " up to TWENTYTHIRD order." << std::endl;
-	  };
+	  }
 
 	if (_dim > 1)
 	  {
 	    std::cout << "WARNING: Jacobi(1,0) quadrature implemented" << std::endl
 		      << " in 1D only." << std::endl;
-	  };
+	  }
 #endif
 
 	AutoPtr<QBase> ap(new QJacobi(_dim, _order, 1, 0));
 	return ap;
-      };
+      }
 
     case QJACOBI_2_0:
       {
@@ -82,18 +82,18 @@ AutoPtr<QBase> QBase::build(const QuadratureType _qt,
 	  {
 	    std::cout << "WARNING: Jacobi(2,0) quadrature implemented" << std::endl
 		      << " up to TWENTYTHIRD order." << std::endl;
-	  };
+	  }
 
 	if (_dim > 1)
 	  {
 	    std::cout << "WARNING: Jacobi(2,0) quadrature implemented" << std::endl
 		      << " in 1D only." << std::endl;
-	  };
+	  }
 #endif
 
 	AutoPtr<QBase> ap(new QJacobi(_dim, _order, 2, 0));
 	return ap;
-      };
+      }
 
     case QSIMPSON:
       {
@@ -103,12 +103,12 @@ AutoPtr<QBase> QBase::build(const QuadratureType _qt,
 	  {
 	    std::cout << "WARNING: Simpson rule provides only" << std::endl
 		      << " THIRD order!" << std::endl;
-	  };
+	  }
 #endif
 
 	AutoPtr<QBase> ap(new QSimpson(_dim));
 	return ap;
-      };
+      }
 
     case QTRAP:
       {
@@ -118,24 +118,24 @@ AutoPtr<QBase> QBase::build(const QuadratureType _qt,
 	  {
 	    std::cout << "WARNING: Trapezoidal rule provides only" << std::endl
 		      << " FIRST order!" << std::endl;
-	  };
+	  }
 #endif
 
 	AutoPtr<QBase> ap(new QTrap(_dim));
 	return ap;
-      };
+      }
 
 
     default:
       { 
 	std::cerr << "ERROR: Bad qt=" << _qt << std::endl;
 	error();
-      };
-    };
+      }
+    }
 
 
   error();
   AutoPtr<QBase> ap(NULL);
   return ap;
-};
+}
 

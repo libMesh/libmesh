@@ -1,4 +1,4 @@
-// $Id: quadrature_jacobi.h,v 1.3 2003-02-07 15:21:31 ddreyer Exp $
+// $Id: quadrature_jacobi.h,v 1.4 2003-02-13 22:56:08 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -65,7 +65,7 @@ class QJacobi : public QBase
   /**
    * Destructor. Empty.
    */
-  ~QJacobi() {};
+  ~QJacobi() {}
 
   /**
    * @returns the \p QuadratureType, either 
@@ -100,7 +100,7 @@ QJacobi::QJacobi(const unsigned int d,
   // be smart and return, thinking it had already done the work.
   if (_dim == 1)
     init(EDGE2);
-};
+}
 
 
 
@@ -117,8 +117,8 @@ QuadratureType QJacobi::type() const
     { 
       error();
       return INVALID_Q_RULE;
-    };
-};
+    }
+}
 
 
 

@@ -1,4 +1,4 @@
-// $Id: quadrature_jacobi_1D.C,v 1.1 2003-02-06 06:02:42 jwpeterson Exp $
+// $Id: quadrature_jacobi_1D.C,v 1.2 2003-02-13 22:56:14 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -50,7 +50,7 @@ void QJacobi::init_1D(const ElemType)
 	    _weights[0]    = 0.50000000000000;
 	
 	    return;
-	  };
+	  }
 	case SECOND:
 	case THIRD:
 	  {
@@ -64,7 +64,7 @@ void QJacobi::init_1D(const ElemType)
 	    _weights[1]   = 0.18195861825602;
 
 	    return;
-	  };
+	  }
 	case FOURTH:
 	case FIFTH:
 	  {
@@ -80,7 +80,7 @@ void QJacobi::init_1D(const ElemType)
 	    _weights[2]   = 0.06982697990145;
 
 	    return;
-	  };
+	  }
 	case SIXTH:
 	case SEVENTH:
 	  {
@@ -98,7 +98,7 @@ void QJacobi::init_1D(const ElemType)
 	    _weights[3]   = 0.03118097095001;
 
 	    return;
-	  };
+	  }
 	case EIGHTH:
 	case NINTH:
 	  {
@@ -118,7 +118,7 @@ void QJacobi::init_1D(const ElemType)
 	    _weights[4]   = 0.01574791452169;
 
 	    return;
-	  };
+	  }
 	case TENTH:
 	case ELEVENTH:
 	  {
@@ -141,7 +141,7 @@ void QJacobi::init_1D(const ElemType)
 	    _weights[5]   = 0.00873830181361;
 
 	    return;
-	  };
+	  }
 	case TWELFTH:
 	case THIRTEENTH:
 	  {
@@ -165,7 +165,7 @@ void QJacobi::init_1D(const ElemType)
 	    _weights[6]   = 0.00521436220281;
 
 	    return;
-	  };
+	  }
 	case FOURTEENTH:
 	case FIFTEENTH:
 	  {
@@ -191,7 +191,7 @@ void QJacobi::init_1D(const ElemType)
 	    _weights[7]   = 0.00329519144225;
 
 	    return;
-	  };
+	  }
 	case SIXTEENTH:
 	case SEVENTEENTH:
 	  {
@@ -219,7 +219,7 @@ void QJacobi::init_1D(const ElemType)
 	    _weights[8]   = 0.00218084708577;
 
 	    return;
-	  };
+	  }
 	case EIGHTTEENTH:
 	case NINTEENTH:
 	  {
@@ -249,7 +249,7 @@ void QJacobi::init_1D(const ElemType)
 	    _weights[9]   = 0.00149914060241;
 
 	    return;
-	  };      
+	  }      
 	case TWENTIETH:
 	case TWENTYFIRST:
 	  {
@@ -281,7 +281,7 @@ void QJacobi::init_1D(const ElemType)
 	    _weights[10]  = 0.00106366729324;
 
 	    return;
-	  };
+	  }
 	case TWENTYSECOND:
 	case TWENTYTHIRD:
 	  {
@@ -315,15 +315,15 @@ void QJacobi::init_1D(const ElemType)
 	    _weights[11]  = 0.00077518222094;
 
 	    return;
-	  };      
+	  }      
 	default:
 	  {
 	    std::cerr << "Quadrature rule " << _order
 		      << " not supported!" << std::endl;
 	      
 	    error();
-	  };
-	};
+	  }
+	}
 
       error();
     }
@@ -346,7 +346,7 @@ void QJacobi::init_1D(const ElemType)
 	    _weights[0]    = 0.33333333333333;
 	
 	    return;
-	  };
+	  }
 	case SECOND:
 	case THIRD:
 	  {
@@ -360,7 +360,7 @@ void QJacobi::init_1D(const ElemType)
 	    _weights[1]   = 0.10078588207983;
 
 	    return;
-	  };
+	  }
 	case FOURTH:
 	case FIFTH:
 	  {
@@ -376,7 +376,7 @@ void QJacobi::init_1D(const ElemType)
 	    _weights[2]   = 0.02995070300858;
 
 	    return;
-	  };
+	  }
 	case SIXTH:
 	case SEVENTH:
 	  {
@@ -394,7 +394,7 @@ void QJacobi::init_1D(const ElemType)
 	    _weights[3]   = 0.01035224074992;
 
 	    return;
-	  };
+	  }
 	case EIGHTH:
 	case NINTH:
 	  {
@@ -414,7 +414,7 @@ void QJacobi::init_1D(const ElemType)
 	    _weights[4]   = 0.00411382520310;
 
 	    return;
-	  };
+	  }
 	case TENTH:
 	case ELEVENTH:
 	  {
@@ -437,7 +437,7 @@ void QJacobi::init_1D(const ElemType)
 	    _weights[5]   = 0.00183107580687;
 
 	    return;
-	  };
+	  }
 	case TWELFTH:
 	case THIRTEENTH:
 	  {
@@ -461,7 +461,7 @@ void QJacobi::init_1D(const ElemType)
 	    _weights[6]   = 0.00089268803369;
 
 	    return;
-	  };
+	  }
 	case FOURTEENTH:
 	case FIFTEENTH:
 	  {
@@ -487,7 +487,7 @@ void QJacobi::init_1D(const ElemType)
 	    _weights[7]   = 0.00046851778403;
 
 	    return;
-	  };
+	  }
 	case SIXTEENTH:
 	case SEVENTEENTH:
 	  {
@@ -515,7 +515,7 @@ void QJacobi::init_1D(const ElemType)
 	    _weights[8]   = 0.00026126234652;
 
 	    return;
-	  };
+	  }
 	case EIGHTTEENTH:
 	case NINTEENTH:
 	  {
@@ -545,7 +545,7 @@ void QJacobi::init_1D(const ElemType)
 	    _weights[9]   = 0.00015324003670;
 
 	    return;
-	  };      
+	  }      
 	case TWENTIETH:
 	case TWENTYFIRST:
 	  {
@@ -577,7 +577,7 @@ void QJacobi::init_1D(const ElemType)
 	    _weights[10]  = 0.00009380048601;
 
 	    return;
-	  };
+	  }
 	case TWENTYSECOND:
 	case TWENTYTHIRD:
 	  {
@@ -611,15 +611,15 @@ void QJacobi::init_1D(const ElemType)
 	    _weights[11]  = 0.00005955035981;
 
 	    return;
-	  };      
+	  }      
 	default:
 	  {
 	    std::cerr << "Quadrature rule " << _order
 		      << " not supported!" << std::endl;
 	      
 	    error();
-	  };
-	};
+	  }
+	}
 
       error();
     }
@@ -636,6 +636,6 @@ void QJacobi::init_1D(const ElemType)
 
   
   return;
-};
+}
  
 

@@ -1,4 +1,4 @@
-// $Id: inf_fe_boundary.C,v 1.2 2003-01-29 20:58:30 benkirk Exp $
+// $Id: inf_fe_boundary.C,v 1.3 2003-02-13 22:56:10 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -43,7 +43,7 @@ void InfFE<Dim,T_radial,T_base>::reinit(QBase*,
   std::cerr << "ERROR: Boundary conditions for infinite elements "
 	    << "not implemented!" << std::endl;
   error();
-};
+}
 
 
 
@@ -59,7 +59,7 @@ void InfFE<Dim,T_radial,T_base>::init_shape_functions(const QBase*,
   std::cerr << "ERROR: Boundary conditions for infinite elements "
 	    << "not implemented!" << std::endl;
   error();
-};
+}
 
 
 

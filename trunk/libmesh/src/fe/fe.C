@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.10 2003-02-13 01:49:49 benkirk Exp $
+// $Id: fe.C,v 1.11 2003-02-13 22:56:09 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -33,7 +33,7 @@ unsigned int FE<Dim,T>::n_quadrature_points () const
 { 
   assert (qrule != NULL);  
   return qrule->n_points(); 
-};
+}
 
 
 
@@ -64,7 +64,7 @@ void FE<Dim,T>::reinit(const Elem* elem)
   // Compute the shape functions and the derivatives at all of the
   // quadrature points.  This part is dimension-independet
   compute_shape_functions (qrule);
-};
+}
 
 
 
@@ -140,7 +140,7 @@ void FE<Dim,T>::init_shape_functions(const QBase* qrule,
 	if (Dim == 3)	     
 	  dphidzeta[i].resize (n_qp);
 	     
-      };
+      }
        
     for (unsigned int i=0; i<n_mapping_shape_functions; i++)
       {
@@ -152,8 +152,8 @@ void FE<Dim,T>::init_shape_functions(const QBase* qrule,
 	   
 	if (Dim == 3)
 	  dphidzeta_map[i].resize (n_qp);
-      };
-  };
+      }
+  }
 
 
       
@@ -174,7 +174,7 @@ void FE<Dim,T>::init_shape_functions(const QBase* qrule,
         weight[p] = 1.;
 	dweight[p].zero();
 	dphase[p].zero();
-      };
+      }
 
  }
 #endif // ifdef ENABLE_INFINITE_ELEMENTS
@@ -194,7 +194,7 @@ void FE<Dim,T>::init_shape_functions(const QBase* qrule,
 	    {
 	      phi[i][p]      = FE<Dim,T>::shape       (elem, get_order(), i,    qp[p]);
 	      dphidxi[i][p]  = FE<Dim,T>::shape_deriv (elem, get_order(), i, 0, qp[p]);
-	    };
+	    }
 	
 	// Compute the value of the mapping shape function i at quadrature point p
 	// (Lagrange shape functions are used for mapping)
@@ -203,10 +203,10 @@ void FE<Dim,T>::init_shape_functions(const QBase* qrule,
 	    {
 	      phi_map[i][p]      = FE<Dim,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[p]);
 	      dphidxi_map[i][p]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
-	    };
+	    }
 		
 	return;
-      };
+      }
 
 
       
@@ -221,7 +221,7 @@ void FE<Dim,T>::init_shape_functions(const QBase* qrule,
 	      phi[i][p]      = FE<Dim,T>::shape       (elem, get_order(), i,    qp[p]);
 	      dphidxi[i][p]  = FE<Dim,T>::shape_deriv (elem, get_order(), i, 0, qp[p]);
 	      dphideta[i][p] = FE<Dim,T>::shape_deriv (elem, get_order(), i, 1, qp[p]);
-	    };
+	    }
 	
 	// Compute the value of the mapping shape function i at quadrature point p
 	// (Lagrange shape functions are used for mapping)
@@ -231,10 +231,10 @@ void FE<Dim,T>::init_shape_functions(const QBase* qrule,
 	      phi_map[i][p]      = FE<Dim,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[p]);
 	      dphidxi_map[i][p]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
 	      dphideta_map[i][p] = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 1, qp[p]);
-	    };
+	    }
 			
        	return;
-      };
+      }
 
 
       
@@ -250,7 +250,7 @@ void FE<Dim,T>::init_shape_functions(const QBase* qrule,
 	      dphidxi[i][p]   = FE<Dim,T>::shape_deriv (elem, get_order(), i, 0, qp[p]);
 	      dphideta[i][p]  = FE<Dim,T>::shape_deriv (elem, get_order(), i, 1, qp[p]);
 	      dphidzeta[i][p] = FE<Dim,T>::shape_deriv (elem, get_order(), i, 2, qp[p]);
-	    };
+	    }
 	
 	// Compute the value of the mapping shape function i at quadrature point p
 	// (Lagrange shape functions are used for mapping)
@@ -261,16 +261,16 @@ void FE<Dim,T>::init_shape_functions(const QBase* qrule,
 	      dphidxi_map[i][p]   = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
 	      dphideta_map[i][p]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 1, qp[p]);
 	      dphidzeta_map[i][p] = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 2, qp[p]);
-	    };
+	    }
 			
 	return;
-      };
+      }
 
 
     default:
       error();
-    };
-};
+    }
+}
 
 
 
@@ -284,7 +284,7 @@ void FE<Dim,T>::init_base_shape_functions(const QBase* q,
 { 
   elem_type = e->type(); 
   init_shape_functions(q, e); 
-};
+}
 
 #endif
 

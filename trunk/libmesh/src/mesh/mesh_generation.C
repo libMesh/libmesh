@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.10 2003-02-07 15:22:09 benkirk Exp $
+// $Id: mesh_generation.C,v 1.11 2003-02-13 22:56:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -68,14 +68,14 @@ void Mesh::build_cube(const unsigned int nx,
 	for (unsigned int i=0; i<=nx; i++)
 	  {
 	    node_ptr(i) = Node::build(static_cast<Real>(i)/static_cast<Real>(nx), 0, 0, i);
-	  };
+	  }
 	
 	for (unsigned int i=0; i<nx; i++)
 	  {
 	    _elements[i] = new Edge2;
 	    elem(i)->set_node(0) = _nodes[i];
 	    elem(i)->set_node(1) = _nodes[i+1];
-	  };
+	  }
 
 
 	// Scale the nodal positions
@@ -121,7 +121,7 @@ void Mesh::build_cube(const unsigned int nx,
 					    0,
 					    p);
 		  p++;
-		};
+		}
 	    
 	    unsigned int e=0;
 	    
@@ -150,7 +150,7 @@ void Mesh::build_cube(const unsigned int nx,
 		    boundary_info.add_side(elem(e), 1, 1);
 		  
 		  e++;
-		};
+		}
 	    
 #undef G
 	  }
@@ -174,7 +174,7 @@ void Mesh::build_cube(const unsigned int nx,
 					    0,
 					    p);
 		  p++;
-		};
+		}
 	    
 	    unsigned int e=0;
 	    
@@ -198,7 +198,7 @@ void Mesh::build_cube(const unsigned int nx,
 		  elem(e)->set_node(2) = _nodes[G(i,j+1)  ];
 		  
 		  e++;
-		};
+		}
 	    
 #undef G
 	  }
@@ -223,7 +223,7 @@ void Mesh::build_cube(const unsigned int nx,
 					    0,
 					    p);
 		  p++;
-		};
+		}
 	    
 	    unsigned int e=0;
 	    
@@ -263,7 +263,7 @@ void Mesh::build_cube(const unsigned int nx,
 		    boundary_info.add_side(elem(e), 1, 1);
 		  
 		  e++;
-		};
+		}
 	    
 #undef G
 	  }
@@ -285,7 +285,7 @@ void Mesh::build_cube(const unsigned int nx,
 					    0,
 					    p);
 		  p++;
-		};
+		}
 	    
 	    unsigned int e=0;
 	    
@@ -316,7 +316,7 @@ void Mesh::build_cube(const unsigned int nx,
 		  
 		  e++;
 		  
-		};
+		}
 	    
 #undef G
 	  }
@@ -375,7 +375,7 @@ void Mesh::build_cube(const unsigned int nx,
 					      static_cast<Real>(k)/static_cast<Real>(nz),
 					      p);
 		    p++;
-		  };
+		  }
 	    
 	    unsigned int e=0;
 	    
@@ -397,7 +397,7 @@ void Mesh::build_cube(const unsigned int nx,
 		    elem(e)->set_node(7) = _nodes[G(i,j+1,k+1)  ];
 		    
 		    e++;
-		  };
+		  }
 #undef G
 
 	  }
@@ -422,7 +422,7 @@ void Mesh::build_cube(const unsigned int nx,
 					      static_cast<Real>(k)/static_cast<Real>(2*nz),
 					      p);
 		    p++;
-		  };
+		  }
 	    
 	    unsigned int e=0;
 	    
@@ -466,10 +466,10 @@ void Mesh::build_cube(const unsigned int nx,
 			elem(e)->set_node(24) = _nodes[G(i,  j+1,k+1)];
 			elem(e)->set_node(25) = _nodes[G(i+1,j+1,k+2)];
 			elem(e)->set_node(26) = _nodes[G(i+1,j+1,k+1)];
-		      };
+		      }
 		    
 		    e++;
-		  };
+		  }
 #undef G
 
 	  }
@@ -495,10 +495,10 @@ void Mesh::build_cube(const unsigned int nx,
       {
 	error();
       }
-    };  
+    }  
 
   _perf_log.stop_event("build_cube()");
-};
+}
 
 
 
@@ -517,7 +517,7 @@ void Mesh::build_square (const unsigned int nx,
 	      ymin, ymax,
 	      0., 0.,
 	      type);
-};
+}
 
 
 
@@ -795,8 +795,8 @@ void Mesh::build_sphere (const Real rad,
 		      for (unsigned int n=0; n<side->n_nodes(); n++)
 			side->point(n) =
 			  sphere.closest_point(side->point(n));
-		    };
-	  };
+		    }
+	  }
 
 	// Copy only the active elements to the current mesh
 	{
@@ -823,16 +823,16 @@ void Mesh::build_sphere (const Real rad,
 		      elem(e)->get_node(n);
 		  
 		  ne++;
-		};
+		}
 
 	      // Delete the element
 	      delete elem(e);
 	      _elements[e] = NULL;
-	    };
+	    }
 	  
 	  // Copy the new elements
 	  _elements = new_elements;
-	};
+	}
 
 	// Possibly convert all the elements to triangles
 	if ((type == TRI6) ||
@@ -851,7 +851,7 @@ void Mesh::build_sphere (const Real rad,
 
 	
 	break;
-      };
+      }
 
 
       
@@ -886,7 +886,7 @@ void Mesh::build_sphere (const Real rad,
 		
 		  node(G(i,j,k)) =
 		    sphere.closest_point( point(G(i,j,k)) );
-		};
+		}
 	    
 	    // Pop JK boundary to the sphere
 	    for (unsigned int j=0; j<=ny; j++)
@@ -901,7 +901,7 @@ void Mesh::build_sphere (const Real rad,
 		
 		  node(G(i,j,k)) =
 		    sphere.closest_point( point(G(i,j,k)) );
-		};
+		}
 	    
 	    // Pop IK boundary to the sphere
 	    for (unsigned int i=0; i<=nx; i++)
@@ -916,7 +916,7 @@ void Mesh::build_sphere (const Real rad,
 		
 		  node(G(i,j,k)) =
 		    sphere.closest_point( point(G(i,j,k)) );
-		};
+		}
 	    
 	    // Handle internal nodes
 	    for (unsigned int k=1; k<nz; k++)
@@ -938,7 +938,7 @@ void Mesh::build_sphere (const Real rad,
 		  
 		    node(G(i,j,k))(2) = zmin +
 		      (zmax - zmin)*static_cast<Real>(k)/static_cast<Real>(nz);
-		  };
+		  }
 
 	    // Do some smoothing steps.
 	    for (unsigned int l=0; l<10; l++)
@@ -974,7 +974,7 @@ void Mesh::build_sphere (const Real rad,
 		
 		  node(G(i,j,k)) =
 		    sphere.closest_point( point(G(i,j,k)) );
-		};
+		}
 	    
 	    // Pop JK boundary to the sphere
 	    for (unsigned int j=0; j<=2*ny; j++)
@@ -989,7 +989,7 @@ void Mesh::build_sphere (const Real rad,
 		
 		  node(G(i,j,k)) =
 		    sphere.closest_point( point(G(i,j,k)) );
-		};
+		}
 	    
 	    // Pop IK boundary to the sphere
 	    for (unsigned int i=0; i<=2*nx; i++)
@@ -1004,7 +1004,7 @@ void Mesh::build_sphere (const Real rad,
 		
 		  node(G(i,j,k)) =
 		    sphere.closest_point( point(G(i,j,k)) );
-		};
+		}
 	    
 	    // Handle internal nodes
 	    for (unsigned int k=1; k<2*nz; k++)
@@ -1026,7 +1026,7 @@ void Mesh::build_sphere (const Real rad,
 		  
 		    node(G(i,j,k))(2) = zmin +
 		      (zmax - zmin)*static_cast<Real>(k)/static_cast<Real>(2*nz);
-		  };
+		  }
 
 	    // Do some smoothing steps.
 	    for (unsigned int l=0; l<10; l++)
@@ -1049,14 +1049,14 @@ void Mesh::build_sphere (const Real rad,
 
 
 	break;
-      };
+      }
 
 
       
     default:
       error();
-    };
+    }
 
   
   _perf_log.stop_event("build_sphere()");
-};
+}

@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: mesh.C,v 1.7 2003-02-13 22:56:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -48,7 +48,7 @@ Mesh::Mesh(unsigned int d,
   boundary_info(d,*this)
 #endif
 {
-};
+}
 
 
 
@@ -56,7 +56,7 @@ Mesh::~Mesh()
 {
   boundary_info.clear();
   MeshBase::clear();
-};
+}
 
 
 
@@ -71,7 +71,7 @@ void Mesh::clear()
   boundary_info.clear();
 
   MeshBase::clear();
-};
+}
 
 
 
@@ -126,9 +126,9 @@ void Mesh::read(const std::string& name)
 	error();
 
       }    
-  };
+  }
   _perf_log.stop_event("read()");
-};
+}
 
 
 
@@ -180,10 +180,10 @@ void Mesh::write(const std::string& name)
 		  << std::endl
 		  << "\n Exiting without writing output\n";
       }    
-  };
+  }
   
   _perf_log.stop_event("write()");
-};
+}
 
 
 
@@ -217,10 +217,10 @@ void Mesh::write(const std::string& name,
 		  << "     *.gmv  -- LANL's GMV (General Mesh Viewer) format\n"
 		  << "\n Exiting without writing output\n";
       }
-  };
+  }
 
   _perf_log.stop_event("write()");
-};
+}
 
 
 
@@ -272,8 +272,8 @@ void Mesh::trim_unused_elements(std::set<unsigned int>& unused_elements)
     
 #endif
     
-  };
-};
+  }
+}
 
 
 #endif

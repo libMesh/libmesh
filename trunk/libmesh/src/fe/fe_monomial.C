@@ -1,4 +1,4 @@
-// $Id: fe_monomial.C,v 1.8 2003-02-07 04:00:42 jwpeterson Exp $
+// $Id: fe_monomial.C,v 1.9 2003-02-13 22:56:10 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -55,7 +55,7 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 	  nodal_soln[n] = val;
 	
 	return;
-      };
+      }
 
 
       // For other bases do interpolation at the nodes
@@ -85,17 +85,17 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 							     order,
 							     i,
 							     mapped_point);	    
-	  };
+	  }
 
 	return;
-      };
+      }
       
     default:
       {
 	error();
-      };
-    };
-};
+      }
+    }
+}
 
 
 
@@ -147,9 +147,9 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 			<< std::endl;
 #endif
 	      error();	    
-	    };
-	  };
-      };
+	    }
+	  }
+      }
 
 
       // Discontinuous quadratic shape functions
@@ -188,9 +188,9 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 			<< std::endl;
 #endif
 	      error();	    
-	    };
-	  };
-      };
+	    }
+	  }
+      }
 
 
       // Discontinuous cubic shape functions
@@ -229,9 +229,9 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 			<< std::endl;
 #endif
 	      error();	    
-	    };
-	  };
-      };
+	    }
+	  }
+      }
 
 
       // Discontinuous quartic shape functions
@@ -269,21 +269,21 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 			<< std::endl;
 #endif
 	      error();	    
-	    };
-	  };
-      };
+	    }
+	  }
+      }
 
       
     default:
       {
 	error();
-      };
-    };
+      }
+    }
   
   error();
   
   return 0;
-};
+}
 
 
 
@@ -295,7 +295,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType,
   // Monomials elements have no dofs at nodes
   // (just on the element)
   return 0;
-};
+}
 
 
 
@@ -349,9 +349,9 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 			<< std::endl;
 #endif
 	      error();	    
-	    };
-	  };
-      };
+	    }
+	  }
+      }
 
 
       // Discontinuous quadratic shape functions
@@ -393,9 +393,9 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 			<< std::endl;
 #endif
 	      error();	    
-	    };
-	  };
-      };
+	    }
+	  }
+      }
 
 
       // Discontinuous cubic shape functions
@@ -434,9 +434,9 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 			<< std::endl;
 #endif
 	      error();	    
-	    };
-	  };
-      };
+	    }
+	  }
+      }
 
 
       // Discontinuous quartic shape functions
@@ -475,17 +475,17 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 			<< std::endl;
 #endif
 	      error();	    
-	    };
-	  };
-      };
+	    }
+	  }
+      }
 
 
       
       // Otherwise no DOFS per element
     default:
       return 0;
-    };
-};
+    }
+}
 
 
 

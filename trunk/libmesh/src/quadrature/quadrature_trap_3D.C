@@ -1,4 +1,4 @@
-// $Id: quadrature_trap_3D.C,v 1.4 2003-01-24 17:24:45 jwpeterson Exp $
+// $Id: quadrature_trap_3D.C,v 1.5 2003-02-13 22:56:14 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -84,7 +84,7 @@ void QTrap::init_3D(const ElemType _type)
 	_weights[3] = _weights[0];
 	
 	return;
-      };
+      }
       
       
       
@@ -107,7 +107,7 @@ void QTrap::init_3D(const ElemType _type)
 	tensor_product_prism(&q1D, &q2D);
 	
 	return;
-      };
+      }
 
       
       //---------------------------------------------
@@ -117,14 +117,14 @@ void QTrap::init_3D(const ElemType _type)
 	std::cerr << "ERROR: Unsupported type: " << _type << std::endl;
 	error();
       }
-    };
+    }
 
   error();
 
   return;
   
 #endif
-};
+}
 
 
 
@@ -179,7 +179,7 @@ void QTrap::init_3D(const ElemType _type,
 	// the side could be either a quad or a tri.
 	side_rule_prism(&q2D, side);
 	return;
-      };
+      }
 
 
       
@@ -190,12 +190,12 @@ void QTrap::init_3D(const ElemType _type,
 	std::cerr << "ERROR: Unsupported type: " << _type << std::endl;
 	error();
       }
-    };
+    }
 
   error();
   
   return;
   
 #endif
-};
+}
 

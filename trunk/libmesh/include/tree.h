@@ -1,4 +1,4 @@
-// $Id: tree.h,v 1.5 2003-01-24 17:24:39 jwpeterson Exp $
+// $Id: tree.h,v 1.6 2003-02-13 22:56:08 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -54,23 +54,23 @@ public:
   /**
    * Destructor.
    */
-  ~Tree() {};
+  ~Tree() {}
 
   /**
    * Prints the nodes.
    */
-  void print_nodes() const { std::cout << "Printing nodes...\n"; root.print_nodes(); };
+  void print_nodes() const { std::cout << "Printing nodes...\n"; root.print_nodes(); }
 
   /**
    * Prints the nodes.
    */
-  void print_elements() const { std::cout << "Printing elements...\n"; root.print_elements(); };
+  void print_elements() const { std::cout << "Printing elements...\n"; root.print_elements(); }
   
 
   /**
    * @returns the number of active bins.
    */
-  unsigned int n_active_bins() const { return root.n_active_bins(); };
+  unsigned int n_active_bins() const { return root.n_active_bins(); }
 
   /**
    * @returns a pointer to the element containing point p.
@@ -109,7 +109,7 @@ namespace Trees
    * for 3D meshes.
    */
   typedef Tree<8> OctTree;
-};
+}
 
 
 
@@ -142,7 +142,7 @@ Tree<N>::Tree (const MeshBase& m, const unsigned int level) :
   mesh.build_nodes_to_elem_map (nodes_to_elem);
 
   root.transform_nodes_to_elements (nodes_to_elem);
-};
+}
 
 
 
@@ -154,6 +154,6 @@ Tree<N>::Tree (const Tree<N>& other_tree) :
   root(other_tree.root)
 {
   error();
-};
+}
 
 #endif

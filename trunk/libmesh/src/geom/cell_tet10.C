@@ -1,4 +1,4 @@
-// $Id: cell_tet10.C,v 1.6 2003-01-25 01:42:46 jwpeterson Exp $
+// $Id: cell_tet10.C,v 1.7 2003-02-13 22:56:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -87,12 +87,12 @@ AutoPtr<Elem> Tet10::build_side (const unsigned int i) const
       {
 	error();
       }
-    };
+    }
 
   // We'll never get here.
   error();
   return face;
-};
+}
 
 
 
@@ -223,10 +223,10 @@ const std::vector<unsigned int> Tet10::tecplot_connectivity(const unsigned int s
     default:
 
       error();
-    };
+    }
   
   return conn;
-};
+}
 
 
 
@@ -328,10 +328,10 @@ void Tet10::vtk_connectivity(const unsigned int sc,
     default:
 
       error();
-    };
+    }
   
   return;
-};
+}
 
 
 

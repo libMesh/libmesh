@@ -1,4 +1,4 @@
-// $Id: fe_lagrange_shape_3D.C,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: fe_lagrange_shape_3D.C,v 1.7 2003-02-13 22:56:10 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -65,7 +65,7 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
 	      return (FE<1,LAGRANGE>::shape(EDGE2, FIRST, i0[i], xi)*
 		      FE<1,LAGRANGE>::shape(EDGE2, FIRST, i1[i], eta)*
 		      FE<1,LAGRANGE>::shape(EDGE2, FIRST, i2[i], zeta));
-	    };
+	    }
 	    
 	    // linear tetrahedral shape functions	    
 	  case TET4:
@@ -95,8 +95,8 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
 	   
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 	    
 	    // linear prism shape functions	    
 	  case PRISM6:
@@ -138,8 +138,8 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
 
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 
 	    // linear pyramid shape functions
 	  case PYRAMID5:
@@ -170,8 +170,8 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
 	    
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 	    
 	    
 	  default:
@@ -179,9 +179,9 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
 	      std::cerr << "ERROR: Unsupported 3D element type!: " << type
 			<< std::endl;
 	      error();
-	    };
-	  };
-      };
+	    }
+	  }
+      }
 
       
       // quadratic Lagrange shape functions
@@ -269,8 +269,8 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
 
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 
 	    // triquadraic hexahedral shape funcions	    
 	  case HEX27:
@@ -293,7 +293,7 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
 	      return (FE<1,LAGRANGE>::shape(EDGE3, SECOND, i0[i], xi)*
 		      FE<1,LAGRANGE>::shape(EDGE3, SECOND, i1[i], eta)*
 		      FE<1,LAGRANGE>::shape(EDGE3, SECOND, i2[i], zeta));
-	    };
+	    }
 	    
 	    // quadratic tetrahedral shape functions	    
 	  case TET10:
@@ -340,8 +340,8 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
 	   
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 	    
 	    // quadradic prism shape functions	    
 	  case PRISM18:
@@ -355,7 +355,7 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
 	      Point p1d(p(2));
 	
 	      error();
-	    };
+	    }
 	    
 	    
 	  default:
@@ -363,9 +363,9 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
 	      std::cerr << "ERROR: Unsupported 3D element type!: " << type
 			<< std::endl;
 	      error();
-	    };
-	  };
-      };
+	    }
+	  }
+      }
             
       
       // unsupported order
@@ -375,13 +375,13 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
 		  << std::endl;
 	error();
       }
-    };
+    }
 
 #endif
   
   error();
   return 0.;
-};
+}
 
 
 
@@ -395,7 +395,7 @@ Real FE<3,LAGRANGE>::shape(const Elem* elem,
       
   // call the orientation-independent shape functions
   return FE<3,LAGRANGE>::shape(elem->type(), order, i, p);
-};
+}
 
 
 
@@ -455,8 +455,8 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 		  {
 		    error();
 		  }
-		};
-	    };
+		}
+	    }
 	    
 	    // linear tetrahedral shape functions	    
 	  case TET4:
@@ -501,8 +501,8 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 		 
 		      default:
 			error();
-		      };
-		  };
+		      }
+		  }
 	    
 		  // d()/deta
 		case 1:
@@ -523,8 +523,8 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 		 
 		      default:
 			error();
-		      };
-		  };
+		      }
+		  }
 	    
 		  // d()/dzeta
 		case 2:
@@ -545,10 +545,10 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 		 
 		      default:
 			error();
-		      };
-		  };
-		};
-	    };
+		      }
+		  }
+		}
+	    }
 	    
 	    // linear prism shape functions	    
 	  case PRISM6:
@@ -594,7 +594,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 			return (FE<2,LAGRANGE>::shape_deriv(TRI3,  FIRST, 2, 0, p2d)*
 				FE<1,LAGRANGE>::shape      (EDGE2, FIRST, 1, p1d));
 		 	 		      			  
-		      };	 	         		  
+		      }	 	         		  
 		  }		 	         		  
 		      	 		      			  
 		  // d()/deta	 	         		  
@@ -626,7 +626,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 			return (FE<2,LAGRANGE>::shape_deriv(TRI3,  FIRST, 2, 1, p2d)*
 				FE<1,LAGRANGE>::shape      (EDGE2, FIRST, 1, p1d));
 		 	 
-		      };	 
+		      }	 
 		  }		 
 	    		 
 		  // d()/dzeta 
@@ -657,13 +657,13 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 		      case 5:	          			        
 			return (FE<2,LAGRANGE>::shape      (TRI3,  FIRST, 2, p2d)*
 				FE<1,LAGRANGE>::shape_deriv(EDGE2, FIRST, 1, 0, p1d));
-		      };
+		      }
 		  }
 	    
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 
 	    // linear pyramid shape functions
 	  case PYRAMID5:
@@ -698,7 +698,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 		
 		    default:
 		      error();
-		    };
+		    }
 
 
 		  // d/deta
@@ -722,7 +722,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 	    
 		    default:
 		      error();
-		    };
+		    }
 
 
 		  // d/dzeta
@@ -777,13 +777,13 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 		
 		    default:
 		      error();
-		    };
+		    }
 	    
 
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 	    
 	    
 	  default:
@@ -791,9 +791,9 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 	      std::cerr << "ERROR: Unsupported 3D element type!: " << type
 			<< std::endl;
 	      error();
-	    };
-	  };
-      };
+	    }
+	  }
+      }
 
       
       // quadratic Lagrange shape functions
@@ -897,7 +897,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 		
 		    default:
 		      error();
-		    };
+		    }
 
 
 		  // d/dy*dy/deta
@@ -974,7 +974,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 		
 		    default:
 		      error();
-		    };
+		    }
 
 
 		  // d/dz*dz/dzeta
@@ -1051,9 +1051,9 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 		
 		    default:
 		      error();
-		    };
-		};
-	    };
+		    }
+		}
+	    }
 
 	    // triquadraic hexahedral shape funcions	    
 	  case HEX27:
@@ -1094,8 +1094,8 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 		  {
 		    error();
 		  }
-		};
-	    };
+		}
+	    }
 	    
 	    // quadratic tetrahedral shape functions	    
 	  case TET10:
@@ -1162,8 +1162,8 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 		 
 		      default:
 			error();
-		      };
-		  };
+		      }
+		  }
 		      
 		  // d()/deta
 		case 1:
@@ -1202,8 +1202,8 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 		 
 		      default:
 			error();
-		      };
-		  };
+		      }
+		  }
 		      
 		  // d()/dzeta
 		case 2:
@@ -1242,13 +1242,13 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 		 
 		      default:
 			error();
-		      };
-		  };
+		      }
+		  }
 
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 	    
 	    // quadradic prism shape functions	    
 	  case PRISM18:
@@ -1263,7 +1263,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 	
 	
 	      error();
-	    };
+	    }
 	    
 	    
 	  default:
@@ -1271,9 +1271,9 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 	      std::cerr << "ERROR: Unsupported 3D element type!: " << type
 			<< std::endl;
 	      error();
-	    };
-	  };
-      };
+	    }
+	  }
+      }
       
       
       // unsupported order
@@ -1283,13 +1283,13 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 		  << std::endl;
 	error();
       }
-    };
+    }
 
 #endif
   
   error();
   return 0.;  
-};
+}
 
 
 
@@ -1304,4 +1304,4 @@ Real FE<3,LAGRANGE>::shape_deriv(const Elem* elem,
       
   // call the orientation-independent shape function derivatives
   return FE<3,LAGRANGE>::shape_deriv(elem->type(), order, i, j, p);
-};
+}

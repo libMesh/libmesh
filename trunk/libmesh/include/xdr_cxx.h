@@ -1,4 +1,4 @@
-// $Id: xdr_cxx.h,v 1.5 2003-01-24 17:24:39 jwpeterson Exp $
+// $Id: xdr_cxx.h,v 1.6 2003-02-13 22:56:08 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -100,19 +100,19 @@ public:
    * Returns true if the file is opened in a reading
    * state, false otherwise.
    */
-  bool reading() const { return ((mode == DECODE) || (mode == READ)); };
+  bool reading() const { return ((mode == DECODE) || (mode == READ)); }
 
   /**
    * Returns true if the file is opened in a writing
    * state, false otherwise.
    */
-  bool writing() const { return ((mode == ENCODE) || (mode == WRITE)); };
+  bool writing() const { return ((mode == ENCODE) || (mode == WRITE)); }
 
   /**
    * Returns the mode used to access the file.  Valid modes
    * are ENCODE, DECODE, READ, or WRITE.
    */
-  XdrMODE access_mode() const { return mode; };
+  XdrMODE access_mode() const { return mode; }
 
   // Data access methods
 
@@ -124,12 +124,12 @@ public:
   /**
    * Same, but provides an \p ostream like interface.
    */
-  Xdr& operator << (int& a) { assert (writing()); data(a); return *this; };
+  Xdr& operator << (int& a) { assert (writing()); data(a); return *this; }
 
   /**
    * Same, but provides an \p istream like interface.
    */
-  Xdr& operator >> (int& a) { assert (reading()); data(a); return *this; };
+  Xdr& operator >> (int& a) { assert (reading()); data(a); return *this; }
   
   /**
    * Inputs or outputs a single unsigned integer.
@@ -139,12 +139,12 @@ public:
   /**
    * Same, but provides an \p ostream like interface.
    */
-  Xdr& operator << (unsigned int& a) { assert (writing()); data(a); return *this; };
+  Xdr& operator << (unsigned int& a) { assert (writing()); data(a); return *this; }
 
   /**
    * Same, but provides an \p istream like interface.
    */
-  Xdr& operator >> (unsigned int& a) { assert (reading()); data(a); return *this; };
+  Xdr& operator >> (unsigned int& a) { assert (reading()); data(a); return *this; }
 
   /**
    * Inputs or outputs a single short integer.
@@ -154,12 +154,12 @@ public:
   /**
    * Same, but provides an \p ostream like interface.
    */
-  Xdr& operator << (short int& a) { assert (writing()); data(a); return *this; };
+  Xdr& operator << (short int& a) { assert (writing()); data(a); return *this; }
 
   /**
    * Same, but provides an \p istream like interface.
    */
-  Xdr& operator >> (short int& a) { assert (reading()); data(a); return *this; };
+  Xdr& operator >> (short int& a) { assert (reading()); data(a); return *this; }
 
   /**
    * Inputs or outputs a single unsigned short integer.
@@ -169,12 +169,12 @@ public:
   /**
    * Same, but provides an \p ostream like interface.
    */
-  Xdr& operator << (unsigned short int& a) { assert (writing()); data(a); return *this; };
+  Xdr& operator << (unsigned short int& a) { assert (writing()); data(a); return *this; }
 
   /**
    * Same, but provides an \p istream like interface.
    */
-  Xdr& operator >> (unsigned short int& a) { assert (reading()); data(a); return *this; };
+  Xdr& operator >> (unsigned short int& a) { assert (reading()); data(a); return *this; }
 
   /**
    * Inputs or outputs a single float.
@@ -184,12 +184,12 @@ public:
   /**
    * Same, but provides an \p ostream like interface.
    */
-  Xdr& operator << (float& a) { assert (writing()); data(a); return *this; };
+  Xdr& operator << (float& a) { assert (writing()); data(a); return *this; }
 
   /**
    * Same, but provides an \p istream like interface.
    */
-  Xdr& operator >> (float& a) { assert (reading()); data(a); return *this; };
+  Xdr& operator >> (float& a) { assert (reading()); data(a); return *this; }
 
   /**
    * Inputs or outputs a single double.
@@ -199,12 +199,12 @@ public:
   /**
    * Same, but provides an \p ostream like interface.
    */
-  Xdr& operator << (double& a) { assert (writing()); data(a); return *this; };
+  Xdr& operator << (double& a) { assert (writing()); data(a); return *this; }
 
   /**
    * Same, but provides an \p istream like interface.
    */
-  Xdr& operator >> (double& a) { assert (reading()); data(a); return *this; };
+  Xdr& operator >> (double& a) { assert (reading()); data(a); return *this; }
 
 
 #ifdef USE_COMPLEX_NUMBERS
@@ -217,12 +217,12 @@ public:
   /**
    * Same, but provides an \p ostream like interface.
    */
-  Xdr& operator << (std::complex<float>& a) { assert (writing()); data(a); return *this; };
+  Xdr& operator << (std::complex<float>& a) { assert (writing()); data(a); return *this; }
 
   /**
    * Same, but provides an \p istream like interface.
    */
-  Xdr& operator >> (std::complex<float>& a) { assert (reading()); data(a); return *this; };
+  Xdr& operator >> (std::complex<float>& a) { assert (reading()); data(a); return *this; }
 
   /**
    * Inputs or outputs a single complex<double>.
@@ -232,12 +232,12 @@ public:
   /**
    * Same, but provides an \p ostream like interface.
    */
-  Xdr& operator << (std::complex<double>& a) { assert (writing()); data(a); return *this; };
+  Xdr& operator << (std::complex<double>& a) { assert (writing()); data(a); return *this; }
 
   /**
    * Same, but provides an \p istream like interface.
    */
-  Xdr& operator >> (std::complex<double>& a) { assert (reading()); data(a); return *this; };
+  Xdr& operator >> (std::complex<double>& a) { assert (reading()); data(a); return *this; }
 
 
 #endif
@@ -250,12 +250,12 @@ public:
   /**
    * Same, but provides an \p ostream like interface.
    */
-  Xdr& operator << (std::vector<int>& v) { assert (writing()); data(v); return *this; };
+  Xdr& operator << (std::vector<int>& v) { assert (writing()); data(v); return *this; }
 
   /**
    * Same, but provides an \p istream like interface.
    */
-  Xdr& operator >> (std::vector<int>& v) { assert (reading()); data(v); return *this; };
+  Xdr& operator >> (std::vector<int>& v) { assert (reading()); data(v); return *this; }
 
   /**
    * Inputs or outputs a vector of unsigned integers.
@@ -265,12 +265,12 @@ public:
   /**
    * Same, but provides an \p ostream like interface.
    */
-  Xdr& operator << (std::vector<unsigned int>& v) { assert (writing()); data(v); return *this; };
+  Xdr& operator << (std::vector<unsigned int>& v) { assert (writing()); data(v); return *this; }
 
   /**
    * Same, but provides an \p istream like interface.
    */
-  Xdr& operator >> (std::vector<unsigned int>& v) { assert (reading()); data(v); return *this; };
+  Xdr& operator >> (std::vector<unsigned int>& v) { assert (reading()); data(v); return *this; }
 
   /**
    * Inputs or outputs a vector of short integers.
@@ -280,12 +280,12 @@ public:
   /**
    * Same, but provides an \p ostream like interface.
    */
-  Xdr& operator << (std::vector<short int>& v) { assert (writing()); data(v); return *this; };
+  Xdr& operator << (std::vector<short int>& v) { assert (writing()); data(v); return *this; }
 
   /**
    * Same, but provides an \p istream like interface.
    */
-  Xdr& operator >> (std::vector<short int>& v) { assert (reading()); data(v); return *this; };
+  Xdr& operator >> (std::vector<short int>& v) { assert (reading()); data(v); return *this; }
 
   /**
    * Inputs or outputs a vector of unsigned short integers.
@@ -295,12 +295,12 @@ public:
   /**
    * Same, but provides an \p ostream like interface.
    */
-  Xdr& operator << (std::vector<unsigned short int>& v) { assert (writing()); data(v); return *this; };
+  Xdr& operator << (std::vector<unsigned short int>& v) { assert (writing()); data(v); return *this; }
 
   /**
    * Same, but provides an \p istream like interface.
    */
-  Xdr& operator >> (std::vector<unsigned short int>& v) { assert (reading()); data(v); return *this; };
+  Xdr& operator >> (std::vector<unsigned short int>& v) { assert (reading()); data(v); return *this; }
 
   /**
    * Inputs or outputs a vector of floats.
@@ -310,12 +310,12 @@ public:
   /**
    * Same, but provides an \p ostream like interface.
    */
-  Xdr& operator << (std::vector<float>& v) { assert (writing()); data(v); return *this; };
+  Xdr& operator << (std::vector<float>& v) { assert (writing()); data(v); return *this; }
 
   /**
    * Same, but provides an \p istream like interface.
    */
-  Xdr& operator >> (std::vector<float>& v) { assert (reading()); data(v); return *this; };
+  Xdr& operator >> (std::vector<float>& v) { assert (reading()); data(v); return *this; }
 
   /**
    * Inputs or outputs a vector of doubles.
@@ -325,12 +325,12 @@ public:
   /**
    * Same, but provides an \p ostream like interface.
    */
-  Xdr& operator << (std::vector<double>& v) { assert (writing()); data(v); return *this; };
+  Xdr& operator << (std::vector<double>& v) { assert (writing()); data(v); return *this; }
 
   /**
    * Same, but provides an \p istream like interface.
    */
-  Xdr& operator >> (std::vector<double>& v) { assert (reading()); data(v); return *this; };
+  Xdr& operator >> (std::vector<double>& v) { assert (reading()); data(v); return *this; }
 
 
 #ifdef USE_COMPLEX_NUMBERS
@@ -343,12 +343,12 @@ public:
   /**
    * Same, but provides an \p ostream like interface.
    */
-  Xdr& operator << (std::vector< std::complex<float> >& v) { assert (writing()); data(v); return *this; };
+  Xdr& operator << (std::vector< std::complex<float> >& v) { assert (writing()); data(v); return *this; }
 
   /**
    * Same, but provides an \p istream like interface.
    */
-  Xdr& operator >> (std::vector< std::complex<float> >& v) { assert (reading()); data(v); return *this; };
+  Xdr& operator >> (std::vector< std::complex<float> >& v) { assert (reading()); data(v); return *this; }
 
   /**
    * Inputs or outputs a vector of complex<double>.
@@ -358,12 +358,12 @@ public:
   /**
    * Same, but provides an \p ostream like interface.
    */
-  Xdr& operator << (std::vector< std::complex<double> >& v) { assert (writing()); data(v); return *this; };
+  Xdr& operator << (std::vector< std::complex<double> >& v) { assert (writing()); data(v); return *this; }
 
   /**
    * Same, but provides an \p istream like interface.
    */
-  Xdr& operator >> (std::vector< std::complex<double> >& v) { assert (reading()); data(v); return *this; };
+  Xdr& operator >> (std::vector< std::complex<double> >& v) { assert (reading()); data(v); return *this; }
 
 #endif
 
@@ -376,12 +376,12 @@ public:
   /**
    * Same, but provides an \p ostream like interface.
    */
-  Xdr& operator << (std::string& v) { assert (writing()); data(v); return *this; };
+  Xdr& operator << (std::string& v) { assert (writing()); data(v); return *this; }
 
   /**
    * Same, but provides an \p istream like interface.
    */
-  Xdr& operator >> (std::string& v) { assert (reading()); data(v); return *this; };
+  Xdr& operator >> (std::string& v) { assert (reading()); data(v); return *this; }
 
 
 private:

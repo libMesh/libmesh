@@ -1,4 +1,4 @@
-// $Id: fe_lagrange.C,v 1.8 2003-02-07 04:00:41 jwpeterson Exp $
+// $Id: fe_lagrange.C,v 1.9 2003-02-13 22:56:10 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -59,7 +59,7 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 	      nodal_soln[2] = .5*(elem_soln[0] + elem_soln[1]);
 
 	      return;
-	    };
+	    }
 
 	    
 	  case TRI6:
@@ -75,7 +75,7 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 	      nodal_soln[5] = .5*(elem_soln[2] + elem_soln[0]);
 
 	      return;
-	    };
+	    }
 	    
 
 	  case QUAD8:
@@ -102,7 +102,7 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 		nodal_soln[8] = .25*(elem_soln[0] + elem_soln[1] + elem_soln[2] + elem_soln[3]);
 
 	      return;
-	    };
+	    }
 
 	    
 	  case TET10:
@@ -122,7 +122,7 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 	      nodal_soln[9] = .5*(elem_soln[3] + elem_soln[2]);
 	      
 	      return;
-	    };
+	    }
 
 	    
 	  case HEX20:
@@ -167,10 +167,10 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 
 		  nodal_soln[26] = .125*(elem_soln[0] + elem_soln[1] + elem_soln[2] + elem_soln[3] +
 					 elem_soln[4] + elem_soln[5] + elem_soln[6] + elem_soln[7]);
-		};
+		}
 	      
 	      return;
-	    };
+	    }
 	    
 	    
 	  case PRISM18:
@@ -178,7 +178,7 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 	      error();
 	      
 	      return;
-	    };
+	    }
 
 
 	    
@@ -189,9 +189,9 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 	      nodal_soln = elem_soln;
 	      
 	      return;
-	    };
-	  };
-      };
+	    }
+	  }
+      }
 
 
       
@@ -202,9 +202,9 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 	nodal_soln = elem_soln;
 	
 	return;
-      };      
-    };
-};
+      }      
+    }
+}
 
 
 
@@ -257,9 +257,9 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 			<< std::endl;
 #endif
 	      error();	    
-	    };
-	  };
-      };
+	    }
+	  }
+      }
 
       
       // quadratic Lagrange shape functions
@@ -299,18 +299,18 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 			<< std::endl;
 #endif
 	      error();	    
-	    };
-	  };
-      };
+	    }
+	  }
+      }
 
       
     default:
       error();
-    };
+    }
   
   error();  
   return 0;
-};
+}
 
 
 
@@ -338,8 +338,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 		  
 		default:
 		  return 0;
-		};
-	    };
+		}
+	    }
 
 	  case TRI3:
 	  case TRI6:
@@ -353,8 +353,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 		  
 		default:
 		  return 0;
-		};
-	    };
+		}
+	    }
 
 	  case QUAD4:
 	  case QUAD8:
@@ -370,8 +370,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 		  
 		default:
 		  return 0;
-		};
-	    };
+		}
+	    }
 
 
 	  case TET4:
@@ -387,8 +387,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 		  
 		default:
 		  return 0;
-		};
-	    };
+		}
+	    }
 		    
 	  case HEX8:
 	  case HEX20:
@@ -408,8 +408,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 		  
 		default:
 		  return 0;
-		};
-	    };
+		}
+	    }
 
 	  case PRISM6:
 	  case PRISM18:
@@ -426,8 +426,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 		  
 		default:
 		  return 0;
-		};
-	    };
+		}
+	    }
 
 	  case PYRAMID5:
 	    {
@@ -442,8 +442,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 		  
 		default:
 		  return 0;
-		};
-	    };
+		}
+	    }
 
 	  default:
 	    {
@@ -453,9 +453,9 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 			<< std::endl;
 #endif
 	      error();	    
-	    };
-	  };
-      };
+	    }
+	  }
+      }
 
       // quadratic Lagrange shape functions
     case SECOND:
@@ -481,18 +481,18 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 			<< std::endl;
 #endif
 	      error();	    
-	    };
-	  };
-      };
+	    }
+	  }
+      }
 
       
     default:
       error();
-    };
+    }
   
   error();  
   return 0;
-};
+}
 
 
 
@@ -504,7 +504,7 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType,
   // (just at the nodes)
   
   return 0;
-};
+}
 
 
 

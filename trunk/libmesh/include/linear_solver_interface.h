@@ -1,4 +1,4 @@
-// $Id: linear_solver_interface.h,v 1.1 2003-02-10 22:03:24 benkirk Exp $
+// $Id: linear_solver_interface.h,v 1.2 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -74,12 +74,12 @@ class LinearSolverInterface : public ReferenceCountedObject<LinearSolverInterfac
    * @returns true if the data structures are
    * initialized, false otherwise.
    */
-  bool initialized () const { return _is_initialized; };
+  bool initialized () const { return _is_initialized; }
   
   /**
    * Release all memory and clear data structures.
    */
-  virtual void clear () {};
+  virtual void clear () {}
 
   /**
    * Initialize data structures if not done so already.
@@ -89,25 +89,25 @@ class LinearSolverInterface : public ReferenceCountedObject<LinearSolverInterfac
   /**
    * Returns the type of solver to use.
    */
-  SolverType solver_type () const { return _solver_type; };
+  SolverType solver_type () const { return _solver_type; }
 
   /**
    * Sets the type of solver to use.
    */
   void set_solver_type (const SolverType st)
-  { _solver_type = st; };
+  { _solver_type = st; }
 
   /**
    * Returns the type of preconditioner to use.
    */
   PreconditionerType preconditioner_type () const
-  { return _preconditioner_type; };
+  { return _preconditioner_type; }
 
   /**
    * Sets the type of preconditioner to use.
    */
   void set_preconditioner_type (const PreconditionerType  pct)
-  { _preconditioner_type = pct; };
+  { _preconditioner_type = pct; }
   
 
   /**
@@ -145,7 +145,7 @@ LinearSolverInterface::LinearSolverInterface () :
   _solver_type (GMRES),
   _preconditioner_type (ILU_PRECOND),
   _is_initialized (false)
-{};
+{}
 
 
 
@@ -153,7 +153,7 @@ inline
 LinearSolverInterface::~LinearSolverInterface ()
 {
   clear ();
-};
+}
 
 
 

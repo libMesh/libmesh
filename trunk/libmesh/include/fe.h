@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.10 2003-02-09 22:47:17 ddreyer Exp $
+// $Id: fe.h,v 1.11 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -47,7 +47,7 @@
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.10 $
+ * \version $Revision: 1.11 $
  */
 
 //-------------------------------------------------------------
@@ -118,7 +118,7 @@ public:
    * this finite element.
    */
   unsigned int n_shape_functions () const
-  { return n_dofs (elem_type, fe_type.order); };
+  { return n_dofs (elem_type, fe_type.order); }
 
   /**
    * @returns the number of shape functions associated with
@@ -126,7 +126,7 @@ public:
    */
   static unsigned int n_shape_functions (const ElemType t,
 					 const Order o)
-  { return n_dofs (t,o); };
+  { return n_dofs (t,o); }
 
   /**
    * @returns the number of shape functions associated with this
@@ -185,7 +185,7 @@ public:
    * to be calculated.
    */
   void attach_quadrature_rule (QBase* q)
-  { assert (q != NULL); qrule = q; return; };
+  { assert (q != NULL); qrule = q; return; }
   
   /**
    * @returns the total number of quadrature points.  Call this
@@ -268,7 +268,7 @@ private:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.10 $
+ * \version $Revision: 1.11 $
  */
 
 //-------------------------------------------------------------
@@ -293,7 +293,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.10 $
+ * \version $Revision: 1.11 $
  */
 
 //-------------------------------------------------------------
@@ -318,7 +318,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.10 $
+ * \version $Revision: 1.11 $
  */
 
 //-------------------------------------------------------------
@@ -437,7 +437,7 @@ inline
 FELagrange<Dim>::FELagrange (const FEType& fet) :
   FE<Dim,LAGRANGE> (fet)
 {
-};
+}
 
 
 
@@ -448,6 +448,6 @@ inline
 FEMonomial<Dim>::FEMonomial (const FEType& fet) :
   FE<Dim,MONOMIAL> (fet)
 {
-};
+}
 
 #endif

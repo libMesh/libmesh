@@ -1,4 +1,4 @@
-// $Id: face_tri6.h,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: face_tri6.h,v 1.7 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -66,22 +66,22 @@ public:
   /**
    * @returns \p TRI6
    */
-  ElemType type ()   const { return TRI6; };
+  ElemType type ()   const { return TRI6; }
 
   /**
    * @returns 6
    */
-  unsigned int n_nodes() const { return 6; };
+  unsigned int n_nodes() const { return 6; }
   
   /**
    * @returns 4
    */
-  unsigned int n_sub_elem() const { return 4; };
+  unsigned int n_sub_elem() const { return 4; }
   
   /**
    * @returns SECOND
    */
-  Order default_order() const { return SECOND; };
+  Order default_order() const { return SECOND; }
   
   AutoPtr<Elem> build_side (const unsigned int i) const;
 
@@ -92,7 +92,7 @@ public:
 			std::vector<unsigned int> *conn = NULL) const;
 
   unsigned int vtk_element_type (const unsigned int) const
-  { return 6; };
+  { return 6; }
   
   
 #ifdef ENABLE_AMR
@@ -139,7 +139,7 @@ inline
 Tri6::Tri6(Face* p) :
   Tri(Tri6::n_nodes(), p) 
 {
-};
+}
 
 
 #endif

@@ -1,4 +1,4 @@
-// $Id: quadrature.C,v 1.8 2003-02-07 04:00:42 jwpeterson Exp $
+// $Id: quadrature.C,v 1.9 2003-02-13 22:56:13 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -53,8 +53,8 @@ void QBase::init(const ElemType t)
 
     default:
       error();
-    };
-};
+    }
+}
 
 
 
@@ -95,8 +95,8 @@ void QBase::init(const ElemType t,
     default:
       error();
 
-    };
-};
+    }
+}
 
 
 
@@ -153,7 +153,7 @@ void QBase::tensor_product_quad(QBase* q1D)
 	_weights[qp] = q1D->w(i)*q1D->w(j);
 	
 	qp++;
-      };
+      }
 }
 
 
@@ -212,7 +212,7 @@ void QBase::tensor_product_hex(QBase* q1D)
 	  _weights[qp] = q1D->w(i) * q1D->w(j) * q1D->w(k);
 	  
 	  qp++;
-	};
+	}
 }
 
 
@@ -238,7 +238,7 @@ void QBase::tensor_product_prism(QBase* q1D, QBase* q2D)
 	_weights[qp] = q2D->w(i) * q1D->w(j);
 
 	qp++;
-      };
+      }
   
 }
 
@@ -399,7 +399,7 @@ void QBase::side_rule_tri(QBase* q1D, unsigned int side)
 
     default:
       error();
-    };
+    }
   
 }
 
@@ -604,7 +604,7 @@ void QBase::side_rule_tet(QBase* q2D, unsigned int side)
 
     default:
       error();
-    };
+    }
   
 }
 
@@ -719,7 +719,7 @@ void QBase::side_rule_prism(QBase* q2D, unsigned int side)
       }
     default:
       error();
-    };
+    }
 }
 
 
@@ -848,5 +848,5 @@ void QBase::side_rule_pyramid(QBase* q2D, unsigned int side)
 
     default:
       error();
-    };
+    }
 }

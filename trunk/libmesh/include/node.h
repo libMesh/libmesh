@@ -1,4 +1,4 @@
-// $Id: node.h,v 1.6 2003-02-13 01:49:49 benkirk Exp $
+// $Id: node.h,v 1.7 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -44,7 +44,7 @@ class Node;
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.6 $
+ * \version $Revision: 1.7 $
  */
 
 class Node : public Point,
@@ -104,12 +104,12 @@ public:
 //   /**
 //    * \returns the \p id for this \p Node
 //    */
-//   const unsigned int & id () const { return _id; };
+//   const unsigned int & id () const { return _id; }
 
 //   /**
 //    * \returns the \p id for this \p Node as a writeable reference.
 //    */
-//   unsigned int & set_id () { return _id; };
+//   unsigned int & set_id () { return _id; }
 
 //   /**
 //    * An invaild \p id to distinguish an uninitialized \p Node
@@ -139,7 +139,7 @@ Node::Node (const Real x,
   Point(x,y,z)
 {
   set_id() = id;
-};
+}
 
 
 
@@ -150,7 +150,7 @@ Node::Node (const Node& n) :
   ReferenceCountedObject<Node>()
 {
 //  _id = n._id;
-};
+}
 
 
 
@@ -166,14 +166,14 @@ Node::Node (const Point& p,
   if (id != invalid_id)
     set_id() = id;
 //    _id = id;
-};
+}
 
 
 
 inline
 Node::~Node ()
 {
-};
+}
 
 
 
@@ -181,7 +181,7 @@ inline
 Node* Node::build(const Node& n)
 {
   return new Node(n);  
-};
+}
 
 
 
@@ -190,7 +190,7 @@ Node* Node::build(const Point& p,
 		  const unsigned int id)
 {
   return new Node(p, id);  
-};
+}
 
 
 
@@ -201,7 +201,7 @@ Node* Node::build(const Real x,
 		  const unsigned int id)
 {
   return new Node(x,y,z,id);  
-};
+}
 
 
 

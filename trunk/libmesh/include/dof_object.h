@@ -1,4 +1,4 @@
-// $Id: dof_object.h,v 1.1 2003-02-13 01:49:48 benkirk Exp $
+// $Id: dof_object.h,v 1.2 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -46,7 +46,7 @@
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.1 $
+ * \version $Revision: 1.2 $
  */
 
 class DofObject
@@ -104,7 +104,7 @@ public:
    * Sets the \p id for this \p DofObject
    */
   void set_id (const unsigned int id)
-  { set_id() = id; };
+  { set_id() = id; }
 
   /**
    * @returns the number of variables associated with this
@@ -208,7 +208,7 @@ DofObject::DofObject () :
 #endif
   _dof_ids (NULL)
 {
-};
+}
 
 
 
@@ -237,7 +237,7 @@ DofObject::DofObject (const DofObject& dof_obj) :
 
       for (unsigned int c=0; c<n_comp(v); c++)
 	set_dof_number(v,c,dof_obj.dof_number(v,c));
-    };
+    }
 
 #else
   
@@ -247,7 +247,7 @@ DofObject::DofObject (const DofObject& dof_obj) :
     _dof_ids[v] = dof_obj._dof_ids[v];
   
 #endif
-};
+}
 
 
 
@@ -255,7 +255,7 @@ inline
 DofObject::~DofObject ()
 {
   clear_dofs ();
-};
+}
 
 
 
@@ -267,7 +267,7 @@ void DofObject::clear_dofs ()
   for (unsigned int v=0; v<n_vars(); v++)
     {
       delete [] _dof_ids[v]; _dof_ids[v] = NULL;
-    };
+    }
 
   delete [] _dof_ids; _dof_ids = NULL;
   delete [] _n_comp;  _n_comp  = NULL;
@@ -280,7 +280,7 @@ void DofObject::clear_dofs ()
 
   _n_vars = 0;
   _id = invalid_id;
- };
+ }
 
 
 
@@ -290,7 +290,7 @@ void DofObject::invalidate_dofs ()
   for (unsigned int v=0; v<n_vars(); v++)
     for (unsigned int c=0; c<n_comp(v); c++)
       set_dof_number(v,c,invalid_id);
-};
+}
 
 
 
@@ -312,10 +312,10 @@ unsigned int DofObject::n_dofs (const unsigned int var) const
 
       for (unsigned int c=0; c<n_comp(var); c++)
 	num++;	
-    };
+    }
 
   return num;
-};
+}
 
 
 
@@ -325,7 +325,7 @@ unsigned int DofObject::id () const
   assert (_id != invalid_id);
 
   return _id;
-};
+}
 
 
 
@@ -333,7 +333,7 @@ inline
 unsigned int & DofObject::set_id ()
 {
   return _id;
-};
+}
 
 
 
@@ -341,7 +341,7 @@ inline
 unsigned int DofObject::n_vars() const
 {
   return static_cast<unsigned int>(_n_vars);
-};
+}
 
 
 
@@ -358,7 +358,7 @@ void DofObject::set_n_vars(const unsigned int nvars)
 		<< std::endl;
       
       error();
-    };
+    }
 					
 //#endif
 
@@ -374,11 +374,11 @@ void DofObject::set_n_vars(const unsigned int nvars)
 	    delete [] _dof_ids[v]; _dof_ids[v] = NULL;
 	    
 	    _n_comp[v] = 0;
-	  };
+	  }
       
       delete [] _n_comp;  _n_comp  = NULL;
       delete [] _dof_ids; _dof_ids = NULL;
-    };
+    }
   
   _n_vars = static_cast<unsigned char>(nvars);
 
@@ -389,7 +389,7 @@ void DofObject::set_n_vars(const unsigned int nvars)
     {
       _n_comp[v]  = 0;
       _dof_ids[v] = NULL;
-    };
+    }
 
 #else
 
@@ -397,7 +397,7 @@ void DofObject::set_n_vars(const unsigned int nvars)
   if (n_vars())
     {
       delete [] _dof_ids; _dof_ids = NULL;
-    };
+    }
   
   _n_vars = static_cast<unsigned char>(nvars);
 
@@ -408,7 +408,7 @@ void DofObject::set_n_vars(const unsigned int nvars)
     _dof_ids[v] = invalid_id - 1;
   
 #endif
-};
+}
 
 
 
@@ -432,7 +432,7 @@ unsigned int DofObject::n_comp(const unsigned int var) const
   return 1;
   
 #endif
-};
+}
 
 
 
@@ -450,7 +450,7 @@ void DofObject::set_n_comp(const unsigned int var,
 		<< std::endl;
       
       error();
-    };
+    }
 					
 //#endif
 
@@ -463,7 +463,7 @@ void DofObject::set_n_comp(const unsigned int var,
   if (n_comp(var))
     {
       delete [] _dof_ids[var]; _dof_ids[var] = NULL;
-    };
+    }
   
   _n_comp[var]  = static_cast<unsigned char>(ncomp);
   _dof_ids[var] = new unsigned int [ncomp];
@@ -489,7 +489,7 @@ void DofObject::set_n_comp(const unsigned int var,
   _dof_ids[var] = invalid_id;
   
 #endif
-};
+}
 
 
 
@@ -509,7 +509,7 @@ unsigned int DofObject::dof_number(const unsigned int var,
   return _dof_ids[var];
 
 #endif
-};
+}
 
 
 
@@ -535,7 +535,7 @@ void DofObject::set_dof_number(const unsigned int var,
   _dof_ids[var] = dn;
 
 #endif
-};
+}
   
 
 

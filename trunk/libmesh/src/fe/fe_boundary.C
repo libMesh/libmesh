@@ -1,4 +1,4 @@
-// $Id: fe_boundary.C,v 1.9 2003-02-13 01:49:49 benkirk Exp $
+// $Id: fe_boundary.C,v 1.10 2003-02-13 22:56:09 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -41,7 +41,7 @@ void FE<1,HIERARCHIC>::reinit(QBase*,
   std::cerr << "ERROR: This method only makes sense for 2D, 3D elements!"
 	    << std::endl;
   error();
-};
+}
 
 
 
@@ -55,7 +55,7 @@ void FE<1,LAGRANGE>::reinit(QBase*,
   std::cerr << "ERROR: This method only makes sense for 2D, 3D elements!"
 	    << std::endl;
   error();
-};
+}
 
 
 
@@ -69,7 +69,7 @@ void FE<1,MONOMIAL>::reinit(QBase*,
   std::cerr << "ERROR: This method only makes sense for 2D, 3D elements!"
 	    << std::endl;
   error();
-};
+}
 
 
 
@@ -102,7 +102,7 @@ void FE<Dim,T>::reinit(QBase* qside,
     elem_type = side->type();
     init_shape_functions (qside, elem, s);
     compute_map          (qside, elem, s);
-  };
+  }
   
   // make a copy of the Jacobian for integration
   const std::vector<Real>  JxW_int(JxW);
@@ -114,14 +114,14 @@ void FE<Dim,T>::reinit(QBase* qside,
     init_shape_functions    (qrule, elem);
     compute_map             (qrule, elem);
     compute_shape_functions (qrule);
-  };  
+  }  
   
   // copy back old data
   {
     JxW = JxW_int;
     xyz = xyz_int;
-  };
-};
+  }
+}
 
 
 
@@ -161,8 +161,8 @@ void FE<Dim,T>::init_shape_functions(const QBase* qrule,
 	dpsidxi_map[i].resize    (n_qp);
 	if (Dim == 3)
 	  dpsideta_map[i].resize (n_qp);
-      };
-  };
+      }
+  }
   
   
   // Compute the value of shape function i at quadrature point p
@@ -174,7 +174,7 @@ void FE<Dim,T>::init_shape_functions(const QBase* qrule,
 	dpsidxi_map[i][p]    = FE<Dim-1,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
 	if (Dim == 3)
 	  dpsideta_map[i][p] = FE<Dim-1,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 1, qp[p]);
-      };
+      }
 
   // compute the normal vectors at each quadrature point p
   tangents.resize(n_qp);
@@ -210,15 +210,15 @@ void FE<Dim,T>::init_shape_functions(const QBase* qrule,
 	    {
 	      dxyzdxi_map  += side->point(i)*dpsidxi_map [i][p];
 	      dxyzdeta_map += side->point(i)*dpsideta_map[i][p];
-	    };
+	    }
 	  
 	  const Point n  = dxyzdxi_map.cross(dxyzdeta_map);
 	  normals[p]     = n.unit();
 	  tangents[p][0] = dxyzdxi_map.unit();
 	  tangents[p][1] = n.cross(dxyzdxi_map).unit();
-	};
-    };
-};
+	}
+    }
+}
 
   
 
@@ -255,7 +255,7 @@ void FEBase::compute_map(const QBase* qrule,
 	    {
 	      xyz[p].zero();
 	      dxyzdxi_map[p].zero();
-	    };
+	    }
 	  
 	  // compute x, dxdxi at the quadrature points    
 	  for (unsigned int i=0; i<psi_map.size(); i++) // sum over the nodes
@@ -263,7 +263,7 @@ void FEBase::compute_map(const QBase* qrule,
 	      {	  
 		xyz[p]         += side->point(i)*psi_map[i][p];
 		dxyzdxi_map[p] += side->point(i)*dpsidxi_map[i][p];
-	      };
+	      }
 	  
 	  
 	  // compute the jacobian at the quadrature points
@@ -276,8 +276,8 @@ void FEBase::compute_map(const QBase* qrule,
 	      assert (jac > 0.);
 	      
 	      JxW[p] = jac*qw[p];
-	    };
-	};
+	    }
+	}
 	// done computing the map
 	
 	return;
@@ -312,7 +312,7 @@ void FEBase::compute_map(const QBase* qrule,
 	      xyz[p].zero();
 	      dxyzdxi_map[p].zero();
 	      dxyzdeta_map[p].zero();
-	    };
+	    }
     
 	  // compute x, dxdxi at the quadrature points    
 	  for (unsigned int i=0; i<psi_map.size(); i++) // sum over the nodes
@@ -350,8 +350,8 @@ void FEBase::compute_map(const QBase* qrule,
 	      assert (jac > 0.);
 
 	      JxW[p] = jac*qw[p];
-	    };
-	};
+	    }
+	}
 	// done computing the map
 
 	return;  
@@ -361,8 +361,8 @@ void FEBase::compute_map(const QBase* qrule,
     default:
       error();
 
-    };
-};
+    }
+}
 
 
 

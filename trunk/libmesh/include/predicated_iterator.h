@@ -1,4 +1,4 @@
-// $Id: predicated_iterator.h,v 1.2 2003-02-13 00:16:48 jwpeterson Exp $
+// $Id: predicated_iterator.h,v 1.3 2003-02-13 22:56:08 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -74,7 +74,7 @@ public:
   //   {
   //     std::cout << "In PredicatedIterator(const PredicatedIterator& p)"
   // 	      << std::endl;
-  //   };
+  //   }
 
   
   /**

@@ -1,4 +1,4 @@
-// $Id: enum_fe_family.h,v 1.5 2003-02-05 20:51:36 ddreyer Exp $
+// $Id: enum_fe_family.h,v 1.6 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -48,7 +48,7 @@ namespace MeshEnums {
 #endif
 		 
 		 INVALID_FE};
-};
+}
 
 using namespace MeshEnums;
 

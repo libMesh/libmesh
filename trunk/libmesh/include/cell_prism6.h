@@ -1,4 +1,4 @@
-// $Id: cell_prism6.h,v 1.6 2003-02-03 03:51:48 ddreyer Exp $
+// $Id: cell_prism6.h,v 1.7 2003-02-13 22:56:06 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -62,17 +62,17 @@ public:
   /**
    * @returns \p PRISM6
    */
-  ElemType     type () const   { return PRISM6; };
+  ElemType     type () const   { return PRISM6; }
 
   /**
    * @returns 1
    */
-  unsigned int n_sub_elem() const { return 1; };
+  unsigned int n_sub_elem() const { return 1; }
   
   /**
    * @returns FIRST
    */
-  Order default_order() const { return FIRST; };
+  Order default_order() const { return FIRST; }
   
   /**
    * Builds a QUAD4 or TRI3 built coincident with face i.  This
@@ -88,7 +88,7 @@ public:
 			std::vector<unsigned int> *conn = NULL) const;
   
   unsigned int vtk_element_type (const unsigned int) const
-  { return 13; };
+  { return 13; }
   
 #ifdef ENABLE_AMR
 
@@ -134,7 +134,7 @@ inline
 Prism6::Prism6(Cell* p) :
   Prism(Prism6::n_nodes(), p) 
 {
-};
+}
 
 
 
