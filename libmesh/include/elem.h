@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.18 2003-03-03 02:15:57 benkirk Exp $
+// $Id: elem.h,v 1.19 2003-03-05 13:11:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -375,6 +375,14 @@ class Elem : public ReferenceCountedObject<Elem>,
   Real length (const unsigned int n1, 
 	       const unsigned int n2) const;
   
+  /**
+   * @returns the refinement level of the current element.  If the
+   * element's parent is \p NULL then by convention it is at
+   * level 0, otherwise it is simply at one level greater than
+   * its parent.
+   */
+  unsigned int level() const;
+  
 #ifdef ENABLE_AMR
 
   /**
@@ -385,14 +393,6 @@ class Elem : public ReferenceCountedObject<Elem>,
 			 DO_NOTHING,
 			 REFINE,
 			 JUST_REFINED };
-  
-  /**
-   * @returns the refinement level of the current element.  If the
-   * element's parent is \p NULL then by convention it is at
-   * level 0, otherwise it is simply at one level greater than
-   * its parent.
-   */
-  unsigned int level() const;
   
   /**
    * @returns a pointer to the \f$ i^{th} \f$ child for this element.
@@ -747,11 +747,11 @@ const Elem* Elem::parent () const
 
 
 
-#ifdef ENABLE_AMR
-
 inline
 unsigned int Elem::level() const
 {
+#ifdef ENABLE_AMR
+
   // if I don't have a parent I was
   // created directly from file
   // or by the user, so I am a
@@ -762,9 +762,18 @@ unsigned int Elem::level() const
   // otherwise we are at a level one
   // higher than our parent
   return (this->parent()->level() + 1);
+
+#else
+
+  // Without AMR all elements are
+  // at level 0.
+  return 0;
+  
+#endif
 }
 
 
+#ifdef ENABLE_AMR
 
 inline
 Elem* Elem::child (const unsigned int i) const
