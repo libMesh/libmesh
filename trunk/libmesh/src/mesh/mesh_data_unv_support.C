@@ -1,4 +1,4 @@
-// $Id: mesh_data_unv_support.C,v 1.4 2003-05-22 16:20:52 benkirk Exp $
+// $Id: mesh_data_unv_support.C,v 1.5 2003-07-09 10:10:16 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -20,7 +20,6 @@
 
 
 // C++ includes
-#include <fstream>
 #include <stdio.h>
 
 // Local includes
@@ -53,7 +52,7 @@ void MeshData::read_unv(const std::string& name)
       error();
     }
 
-  const std::string  _label_dataset_mesh_data    = "2414";
+  const std::string _label_dataset_mesh_data = "2414";
 
   /**
    * locate the beginning of data set
@@ -80,43 +79,91 @@ void MeshData::read_unv(const std::string& name)
 	break;
 
       /*
-       * if beginning of dataset, buffer it in
-       * temp_buffer, if desired
+       * if beginning of dataset
        */
       if (news == _label_dataset_mesh_data)
         {
 
 	  /**
 	   * Now read the data of interest.
+	   * Start with the header.
 	   */
 
-	  /**
-	   * Ignore the first lines that stand for
-	   * analysis dataset label and name.
-	   */ 
-	  for(unsigned int i=0; i<3; i++)
-	    in_file.ignore(256,'\n');
-
 	  unsigned int Dataset_location;
-
+	      
 	  unsigned int Model_type,          
-	               Analysis_type,
-	               Data_characteristic,
-	               Result_type,
-	               Data_type,
-	               NVALDC;
-
+	    Analysis_type,
+	    Data_characteristic,
+	    Result_type,
+	    Data_type,
+	    NVALDC;
+	      
 	  Real dummy_Real;
 
 	  /**
-	   * Read the dataset location, where
-	   * 1: Data at nodes
-	   * 2: Data on elements
-	   * other sets are currently not supported.
+	   * If there is no MeshDataUnvHeader object
+	   * attached
 	   */
-	  in_file >> Dataset_location;
+	  if (_unv_header==NULL)
+	    {
+	      /**
+	       * Ignore the first lines that stand for
+	       * analysis dataset label and name.
+	       */ 
+	      for(unsigned int i=0; i<3; i++)
+		in_file.ignore(256,'\n');	      
+	      
+	      /**
+	       * Read the dataset location, where
+	       * 1: Data at nodes
+	       * 2: Data on elements
+	       * other sets are currently not supported.
+	       */
+	      in_file >> Dataset_location;
 
+	      /**
+	       * Ignore five ID lines.
+	       */ 
+	      for(unsigned int i=0; i<6; i++)
+		in_file.ignore(256,'\n');
+	      
+	      /**
+	       * Read record 9.
+	       */
+	      in_file >> Model_type           // not used here
+		      >> Analysis_type        // not used here
+		      >> Data_characteristic  // not used here
+		      >> Result_type          // not used here
+		      >> Data_type
+		      >> NVALDC;
+	      
+	      
+	      /**
+	       * Ignore record 10 and 11
+	       * (Integer analysis type specific data).
+	       */ 
+	      for (unsigned int i=0; i<3; i++)
+		in_file.ignore(256,'\n');
+	      
+	      /**
+	       * Ignore record 12 and record 13.
+	       */
+	      for (unsigned int i=0; i<12; i++)
+		in_file >> dummy_Real;
 
+	    }
+	  else
+	    {
+	      _unv_header->read (in_file);
+
+	      Dataset_location = _unv_header->dataset_location;
+	      NVALDC = _unv_header->nvaldc;
+	      Data_type = _unv_header->data_type;
+	    }
+
+	  /**
+	   * Check the location of the dataset.
+	   */
 	  if (Dataset_location != 1)
 	    {
 	      std::cerr << "ERROR: Currently only Data at nodes is supported." 
@@ -124,35 +171,6 @@ void MeshData::read_unv(const std::string& name)
 	      error();
 	    }
 
-	  /**
-	   * Ignore five ID lines.
-	   */ 
-	  for(unsigned int i=0; i<6; i++)
-	    in_file.ignore(256,'\n');
-
-	  /**
-	   * Read record 9.
-	   */
-	  in_file >> Model_type           // not supported yet
-		  >> Analysis_type        // not supported yet
-		  >> Data_characteristic  // not supported yet
-		  >> Result_type          // not supported yet
-		  >> Data_type
-		  >> NVALDC;
-
-
-	  /**
-	   * Ignore record 10 and 11
-	   * (Integer analysis type specific data).
-	   */ 
-	  for (unsigned int i=0; i<3; i++)
-	    in_file.ignore(256,'\n');
-
-	  /**
-	   * Ignore record 12 and record 13.
-	   */
-	  for (unsigned int i=0; i<12; i++)
-	      in_file >> dummy_Real;
 
 	  /**
 	   * Now get the foreign node id number and the respective nodal data.
@@ -279,50 +297,63 @@ void MeshData::write_unv (const std::string& name)
 	   << "\n";
 
   /**
-   * Record 1 (analysis dataset label, currently just a dummy).
+   * Write the header
    */
-  char buf[78];
-  sprintf(buf, "%10i\n",1);
-  out_file << buf;
+  if (_unv_header==NULL)
+    {
+      /**
+       * Write a dummy header.
+       *
+       * Record 1 (analysis dataset label, currently just a dummy).
+       */
+      char buf[81];
+      sprintf(buf, "%10i\n",0);
+      out_file << buf;
+      
+      /**
+       * Record 2 (analysis dataset name, currently just a dummy).
+       */
+      std::string _dummy_string = "libMesh\n";
+      out_file << _dummy_string;
+      
+      /**
+       * Record 3 (dataset location).
+       */
+      sprintf(buf, "%10i\n",1);
+      out_file << buf;
+      
+      /**
+       * Record 4 trough 8 (ID lines).
+       */
+      for (unsigned int i=0; i<5;i++)
+	out_file << _dummy_string;
+      
+      /**
+       * Record 9 trough 11.
+       */
+      sprintf(buf, "%10i%10i%10i%10i%10i%10i\n", 0, 0, 0, 0, 0, 0);
+      out_file << buf;
+      
+      sprintf(buf, "%10i%10i%10i%10i%10i%10i%10i%10i\n", 0, 0, 0, 0, 0, 0, 0, 0);
+      out_file << buf;
+      
+      sprintf(buf, "%10i%10i\n", 0, 0);
+      out_file << buf;
+      
+      /**
+       * Record 12 and 13.
+       */
+      sprintf(buf, "%13.5E%13.5E%13.5E%13.5E%13.5E%13.5E\n", 0., 0., 0., 0., 0., 0.);
+      out_file << buf;
+      
+      sprintf(buf, "%13.5E%13.5E%13.5E%13.5E%13.5E%13.5E\n", 0., 0., 0., 0., 0., 0.);
+      out_file << buf;
+    }
 
-  /**
-   * Record 2 (analysis dataset name, currently just a dummy).
-   */
-  std::string _dummy_string = "libMesh\n";
-  out_file << _dummy_string;
-
-  /**
-   * Record 3 (dataset location).
-   */
-  sprintf(buf, "%10i\n",1);
-  out_file << buf;
-
-  /**
-   * Record 4 trough 8 (ID lines).
-   */
-  for (unsigned int i=0; i<5;i++)
-    out_file << _dummy_string;
-
-  /**
-   * Record 9 trough 11.
-   */
-  sprintf(buf, "%10i%10i%10i%10i%10i%10i\n", 0, 0, 0, 0, 0, 0);
-  out_file << buf;
-
-  sprintf(buf, "%10i%10i%10i%10i%10i%10i%10i%10i\n", 0, 0, 0, 0, 0, 0, 0, 0);
-  out_file << buf;
-
-  sprintf(buf, "%10i%10i\n", 0, 0);
-  out_file << buf;
-
-  /**
-   * Record 12 and 13.
-   */
-  sprintf(buf, "%13.5E%13.5E%13.5E%13.5E%13.5E%13.5E\n", 0., 0., 0., 0., 0., 0.);
-  out_file << buf;
-
-  sprintf(buf, "%13.5E%13.5E%13.5E%13.5E%13.5E%13.5E\n", 0., 0., 0., 0., 0., 0.);
-  out_file << buf;
+  else
+    {
+      _unv_header->write (out_file);
+    }
 
   /**
    * Write the foreign node number and the respective data.
@@ -330,6 +361,7 @@ void MeshData::write_unv (const std::string& name)
   std::map<const Node*, 
     std::vector<Number> >::const_iterator nit = _node_data.begin();
 
+  char buf[27];
   for (; nit != _node_data.end(); ++nit)
     {
       const Node* node = (*nit).first;
@@ -363,6 +395,129 @@ void MeshData::write_unv (const std::string& name)
    */
   out_file << "    -1\n";
 
+}
+
+
+//------------------------------------------------------
+// MeshDataUnvHeader functions
+
+
+MeshDataUnvHeader::MeshDataUnvHeader() :
+  dataset_label        (0),
+  dataset_name         ("libMesh mesh data"),
+  dataset_location     (1),  // default to nodal data
+  id_line_1            ("libMesh"),
+  id_line_2            ("libMesh"),
+  id_line_3            ("libMesh"),
+  id_line_4            ("libMesh"),
+  id_line_5            ("libMesh"),
+  model_type           (0),          
+  analysis_type        (0),
+  data_characteristic  (0),
+  result_type          (0),
+  data_type            (5),  // default to single precision complex
+  nvaldc               (3)   // default to 3 (principal directions)
+{
+  /**
+   * resize analysis specific data.
+   */
+  record_10.resize(8);
+  record_11.resize(2);
+  record_12.resize(6);
+  record_13.resize(8);
 
 }
+
+
+MeshDataUnvHeader::~MeshDataUnvHeader()
+{
+}
+
+
+void MeshDataUnvHeader::read (std::ifstream& in_file)
+{
+
+  in_file >> this->dataset_label;
+
+  in_file.ignore(256,'\n');
+  std::getline(in_file, dataset_name, '\n');
+
+  in_file >> this->dataset_location;
+
+  // ID lines are ignored when reading
+  for(unsigned int i=0; i<6; i++)
+    in_file.ignore(256,'\n');
+
+  in_file >> this->model_type     
+	  >> this->analysis_type
+	  >> this->data_characteristic
+	  >> this->result_type
+	  >> this->data_type
+	  >> this->nvaldc;
+    
+  for (unsigned int i=0; i<8; i++)
+    in_file >> this->record_10[i];
+
+  for (unsigned int i=0; i<2; i++)
+    in_file >> this->record_11[i];
+
+  for (unsigned int i=0; i<6; i++)
+    in_file >> this->record_12[i];
+
+  for (unsigned int i=0; i<6; i++)
+    in_file >> this->record_13[i];
+
+}
+
+void MeshDataUnvHeader::write (std::ofstream& out_file)
+{
+  char buf[81];
+
+  sprintf(buf, "%6i\n",this->dataset_label);
+  out_file << buf;
+ 
+  out_file << this->dataset_name << "\n";
+
+  sprintf(buf, "%6i\n",this->dataset_location);
+  out_file << buf;
+
+  out_file << this->id_line_1 << "\n";
+  out_file << this->id_line_2 << "\n";
+  out_file << this->id_line_3 << "\n";
+  out_file << this->id_line_4 << "\n";
+  out_file << this->id_line_5 << "\n";
+
+  sprintf(buf, "%10i%10i%10i%10i%10i%10i\n",
+	  model_type,  analysis_type, data_characteristic,
+	  result_type, data_type,     nvaldc);
+  out_file << buf;
+
+  sprintf(buf, "%10i%10i%10i%10i%10i%10i%10i%10i\n",
+	  record_10[0], record_10[1], record_10[2], record_10[3],
+	  record_10[4], record_10[5], record_10[6], record_10[7]);
+  out_file << buf;
+
+  sprintf(buf, "%10i%10i\n", record_11[0], record_11[1]);
+  out_file << buf;
+
+  sprintf(buf, "%13.5E%13.5E%13.5E%13.5E%13.5E%13.5E\n",
+	  record_12[0], record_12[1], record_12[2],
+	  record_12[3], record_12[4], record_12[5]);
+  out_file << buf;
+
+  sprintf(buf, "%13.5E%13.5E%13.5E%13.5E%13.5E%13.5E\n",
+	  record_13[0], record_13[1], record_13[2],
+	  record_13[3], record_13[4], record_13[5]);
+  out_file << buf;
+
+}
+
+
+
+
+
+
+
+
+
 
