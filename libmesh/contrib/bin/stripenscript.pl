@@ -34,5 +34,5 @@ do {
 
 # Now print your own footer if you want.  You probably
 # want to leave this since we are now at the end of the file.
-print "</html> \n";
+# print "</html> \n";
 
