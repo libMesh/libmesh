@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.16 2003-03-28 20:38:07 benkirk Exp $
+// $Id: fe_map.C,v 1.17 2003-04-09 19:27:00 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -28,6 +28,7 @@
 #include "libmesh.h"
 #include "quadrature.h"
 #include "elem.h"
+#include "fe_macro.h"
 
 
 
@@ -826,15 +827,11 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 
 
 //--------------------------------------------------------------
-// Explicit instantiations
-template class FE<1,HIERARCHIC>;
-template class FE<2,HIERARCHIC>;
-template class FE<3,HIERARCHIC>;
+// Explicit instantiations using the macro from fe_macro.h
 
-template class FE<1,LAGRANGE>;
-template class FE<2,LAGRANGE>;
-template class FE<3,LAGRANGE>;
+INSTANTIATE_FE(1);
 
-template class FE<1,MONOMIAL>;
-template class FE<2,MONOMIAL>;
-template class FE<3,MONOMIAL>;
+INSTANTIATE_FE(2);
+
+INSTANTIATE_FE(3);
+

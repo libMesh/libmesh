@@ -65,6 +65,7 @@ src/base/equation_systems.$(obj-suffix):\
     include/enum_solver_type.h\
     include/equation_systems.h\
     include/equation_systems_base.h\
+    include/equation_systems_macro.h\
     include/fe_interface.h\
     include/fe_type.h\
     include/frequency_system.h\
@@ -78,6 +79,7 @@ src/base/equation_systems.$(obj-suffix):\
     include/mesh_communication.h\
     include/mesh_config.h\
     include/mesh_refinement.h\
+    include/newmark_system.h\
     include/node.h\
     include/node_iterators.h\
     include/numeric_vector.h\
@@ -147,6 +149,7 @@ src/base/equation_systems_io.$(obj-suffix):\
     include/enum_solver_type.h\
     include/equation_systems.h\
     include/equation_systems_base.h\
+    include/equation_systems_macro.h\
     include/fe_type.h\
     include/frequency_system.h\
     include/general_system.h\
@@ -159,6 +162,7 @@ src/base/equation_systems_io.$(obj-suffix):\
     include/mesh_communication.h\
     include/mesh_config.h\
     include/mesh_refinement.h\
+    include/newmark_system.h\
     include/node.h\
     include/node_iterators.h\
     include/numeric_vector.h\
@@ -280,6 +284,51 @@ src/base/libmesh.$(obj-suffix):\
 src/base/libmesh_base.$(obj-suffix):\
     src/base/libmesh_base.C\
     include/libmesh_base.h
+src/base/newmark_system.$(obj-suffix):\
+    src/base/newmark_system.C\
+    include/auto_ptr.h\
+    include/boundary_info.h\
+    include/boundary_mesh.h\
+    include/coupling_matrix.h\
+    include/dof_map.h\
+    include/dof_object.h\
+    include/elem.h\
+    include/elem_iterators.h\
+    include/enum_elem_quality.h\
+    include/enum_elem_type.h\
+    include/enum_fe_family.h\
+    include/enum_inf_map_type.h\
+    include/enum_order.h\
+    include/enum_preconditioner_type.h\
+    include/enum_solver_package.h\
+    include/enum_solver_type.h\
+    include/equation_systems.h\
+    include/equation_systems_base.h\
+    include/fe_type.h\
+    include/libmesh.h\
+    include/libmesh_base.h\
+    include/linear_solver_interface.h\
+    include/mesh.h\
+    include/mesh_base.h\
+    include/mesh_common.h\
+    include/mesh_communication.h\
+    include/mesh_config.h\
+    include/mesh_refinement.h\
+    include/newmark_system.h\
+    include/node.h\
+    include/node_iterators.h\
+    include/numeric_vector.h\
+    include/o_f_stream.h\
+    include/perf_log.h\
+    include/point.h\
+    include/predicated_iterator.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h\
+    include/sparse_matrix.h\
+    include/sphere.h\
+    include/surface.h\
+    include/system_base.h\
+    include/xdr_cxx.h
 src/base/node.$(obj-suffix):\
     src/base/node.C\
     include/auto_ptr.h\
@@ -449,6 +498,7 @@ src/fe/fe.$(obj-suffix):\
     include/enum_quadrature_type.h\
     include/fe.h\
     include/fe_base.h\
+    include/fe_macro.h\
     include/fe_type.h\
     include/libmesh.h\
     include/libmesh_base.h\
@@ -494,6 +544,7 @@ src/fe/fe_boundary.$(obj-suffix):\
     include/enum_quadrature_type.h\
     include/fe.h\
     include/fe_base.h\
+    include/fe_macro.h\
     include/fe_type.h\
     include/libmesh.h\
     include/libmesh_base.h\
@@ -744,6 +795,7 @@ src/fe/fe_map.$(obj-suffix):\
     include/enum_quadrature_type.h\
     include/fe.h\
     include/fe_base.h\
+    include/fe_macro.h\
     include/fe_type.h\
     include/libmesh.h\
     include/libmesh_base.h\

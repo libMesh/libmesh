@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.1 2003-04-09 14:08:39 spetersen Exp $
+# $Id: Makefile,v 1.2 2003-04-09 19:26:57 ddreyer Exp $
 
 
 # The location of the mesh library
@@ -54,7 +54,7 @@ clean:
 
 clobber:
 	@$(MAKE) clean
-	@rm -f $(target) out*.gmv *.dat
+	@rm -f $(target) out*.gmv *.res
 
 distclean:
 	@$(MAKE) clobber
@@ -65,7 +65,7 @@ run: $(target)
 	@echo "* Running Example " $(target)
 	@echo "***************************************************************"
 	@echo " "
-	@$(target) -f .7
+	@$(target) pipe-mesh.unv
 	@echo " "
 	@echo "***************************************************************"
 	@echo "* Done Running Example " $(target)

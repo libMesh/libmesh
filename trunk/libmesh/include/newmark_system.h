@@ -1,4 +1,4 @@
-// $Id: newmark_system.h,v 1.1 2003-04-09 15:27:40 spetersen Exp $
+// $Id: newmark_system.h,v 1.2 2003-04-09 19:26:57 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -25,12 +25,12 @@
 // C++ includes
 
 // Local Includes
-#include "equation_systems.h"
 #include "system_base.h"
 
 
 // Forward Declarations
 class NewmarkSystem;
+template <class T_sys> class EquationSystems;
 
 
 /**
@@ -40,10 +40,12 @@ class NewmarkSystem;
  *
  * In the algorithm implemented here the system is solved for
  * displacements.
- * Curently the newmark scheme is implemented for constant
- * time step sizes only. In this case the matrix only has to be
+ * Curently the Newmark scheme is implemented for constant
+ * time step sizes only. This time step is stored in the
+ * \p EquationSystems parameter named \p "Newmark \p time \p step".
+ * For the case of constant time steps the matrix only has to be
  * assembled once, whereas the rhs has to be updated in each timestep.
- * Default values of the newmark parameter alpha and delta
+ * Default values of the Newmark parameters \p alpha and \p delta
  * used for time integration are provided.
  * For details refer to the examples section.
  */
@@ -60,9 +62,9 @@ public:
    * data structures.
    */
   NewmarkSystem (EquationSystems<NewmarkSystem>& es,
-		 const std::string&           name,
-		 const unsigned int           number,
-		 const SolverPackage          solver_package);
+		 const std::string&              name,
+		 const unsigned int              number,
+		 const SolverPackage             solver_package);
 
   /**
    * Destructor.
@@ -135,7 +137,7 @@ public:
   /**
    * Set the time step size and the newmark parameter alpha and
    * delta and calculate the constant parameters used for
-   * time integratin.
+   * time integration.
    */
   void set_newmark_parameters (const Real delta_T,
 			       const Real alpha=.25,
@@ -193,16 +195,6 @@ protected:
 
 private:
 
-
-    /**
-     * The parameter alpha and delta used for the Newmark
-     * integration scheme. The defaultvalues of alpha and delta
-     * are .25 and .5 respectively corresponding
-     * to the trapezoidal rule.
-     */
-    Real _alpha;
-    Real _delta;
-
     /**
      * Constants used for the time integration.
      */
@@ -216,16 +208,9 @@ private:
     Real _a_7;
 
     /**
-     * The time step size. Note that currently the algorithm
-     * is implemented for a constant step size only.
-     */
-    Real _delta_T;
-
-    /**
      * Returns true if the matrix assambly is finished.
      */
     bool _finished_assemble;
-
   
 };
 

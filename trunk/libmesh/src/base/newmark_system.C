@@ -1,4 +1,4 @@
-// $Id: newmark_system.C,v 1.1 2003-04-09 16:22:00 spetersen Exp $
+// $Id: newmark_system.C,v 1.2 2003-04-09 19:26:59 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,6 +24,7 @@
 
 // Local includes
 #include "newmark_system.h"
+#include "equation_systems.h"
 
 
 
@@ -40,8 +41,8 @@ NewmarkSystem::NewmarkSystem (EquationSystems<NewmarkSystem>& es,
   _equation_systems      (es)
 {
   // default values of the newmark parameters
-  _equation_systems.set_parameter("newmark_alpha") = .25;
-  _equation_systems.set_parameter("newmark_delta") = .5;
+  _equation_systems.set_parameter("Newmark alpha") = .25;
+  _equation_systems.set_parameter("Newmark delta") = .5;
 
   // add additional matrices and vectors that will be used in the
   // newmark algorithm to the data structure
@@ -80,8 +81,8 @@ NewmarkSystem::~NewmarkSystem ()
 {
   //init_system_fptr = assemble_fptr = NULL;
   // clear the parameters and integration constants
-  _equation_systems.unset_parameter("newmark_alpha");
-  _equation_systems.unset_parameter("newmark_delta");
+  _equation_systems.unset_parameter("Newmark alpha");
+  _equation_systems.unset_parameter("Newmark delta");
 
 }
 
@@ -94,8 +95,8 @@ void NewmarkSystem::clear ()
   SystemBase::clear();
 
   // clear the parameters and integration constants
-  _equation_systems.unset_parameter("newmark_alpha");
-  _equation_systems.unset_parameter("newmark_delta");
+  _equation_systems.unset_parameter("Newmark alpha");
+  _equation_systems.unset_parameter("Newmark delta");
 
 
   // set bool to false
@@ -293,22 +294,18 @@ NewmarkSystem::solve ()
 
 
 
-void NewmarkSystem::set_newmark_parameters (const Real delta_T, const Real alpha,
+void NewmarkSystem::set_newmark_parameters (const Real delta_T, 
+					    const Real alpha,
 					    const Real delta)
 {
-
   assert(delta_T != 0.);
 
-  // the newmark parameter
+  // the newmark parameters
+  _equation_systems.set_parameter("Newmark alpha") = alpha;
+  _equation_systems.set_parameter("Newmark delta") = delta;
 
-  _equation_systems.set_parameter("newmark_alpha") = alpha;
-  _equation_systems.set_parameter("newmark_delta") = delta;
-
-  // time step size
-  _delta_T = delta_T;
-
-  // _alpha = alpha;
-  // _delta = delta;
+  // time step size.  should be handled at a later stage through EquationSystems?
+  _equation_systems.set_parameter("Newmark time step") = delta_T;
 
   // the constants for time integration
   _a_0 = 1./(alpha*delta_T*delta_T);
@@ -330,8 +327,10 @@ bool NewmarkSystem::compare (const NewmarkSystem& other_system,
 			     const Real threshold,
 			     const bool verbose) const
 {
-  // we have no additional data to compare,
-  // let SystemBase do the job
+  /* provided the parameters alpha and delta are identical
+   * (what EquationSystems will check, since it owns the parameters),
+   * we have no additional data to compare, so let SystemBase do the job
+   */
   const SystemBase& other_system_base = static_cast<const SystemBase&>(other_system);
   return SystemBase::compare (other_system_base, threshold, verbose);
 }

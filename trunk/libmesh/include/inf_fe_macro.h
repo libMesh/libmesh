@@ -1,4 +1,4 @@
-// $Id: inf_fe_macro.h,v 1.4 2003-04-01 14:19:47 ddreyer Exp $
+// $Id: inf_fe_macro.h,v 1.5 2003-04-09 19:26:57 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,7 +31,7 @@
 
 /**
  * This macro helps in instantiating specific versions
- * of the InfFE class.  Better do not use this macro
+ * of the \p InfFE class.  Better do not use this macro
  * directly, but instantiate through #include`ing the
  * file(s) \p inf_fe_instantiate_1D.h, \p inf_fe_instantiate_2D.h, 
  * and \p inf_fe_instantiate_3D.h for 1D, 2D and 3D, respectively.
