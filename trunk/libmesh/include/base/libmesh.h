@@ -1,4 +1,4 @@
-// $Id: libmesh.h,v 1.2 2004-01-03 15:37:41 benkirk Exp $
+// $Id: libmesh.h,v 1.3 2004-02-27 22:43:47 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -89,7 +89,7 @@ namespace libMesh {
    * A \p PerfLog object to log performance.  If the library is configured
    * with \p --enable-perflog then it will log key functions.
    */
-  extern PerfLog log;
+  extern PerfLog perflog;
 
   /**
    * @returns true if the argument \p arg was specified on the command line,

@@ -1,4 +1,4 @@
-// $Id: libmesh_logging.h,v 1.2 2004-01-03 15:37:41 benkirk Exp $
+// $Id: libmesh_logging.h,v 1.3 2004-02-27 22:43:47 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -34,10 +34,10 @@
 
 // Note the log is in libMesh, so we need to include it.
 #  include "libmesh.h"
-#  define START_LOG(a,b)   { libMesh::log.start_event(a,b); }
-#  define STOP_LOG(a,b)    { libMesh::log.stop_event(a,b); }
-#  define PAUSE_LOG(a,b)   { libMesh::log.pause_event(a,b); }
-#  define RESTART_LOG(a,b) { libMesh::log.restart_event(a,b); }
+#  define START_LOG(a,b)   { libMesh::perflog.start_event(a,b); }
+#  define STOP_LOG(a,b)    { libMesh::perflog.stop_event(a,b); }
+#  define PAUSE_LOG(a,b)   { libMesh::perflog.pause_event(a,b); }
+#  define RESTART_LOG(a,b) { libMesh::perflog.restart_event(a,b); }
 
 #else
 
