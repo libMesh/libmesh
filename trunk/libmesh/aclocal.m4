@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.31 2003-06-24 05:33:50 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.32 2003-06-25 05:21:10 jwpeterson Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -510,12 +510,16 @@ AC_DEFUN(CONFIGURE_PETSC,
 	      [Flag indicating whether or not Petsc is available])
     AC_DEFINE(HAVE_MPI, 1,
 	      [Flag indicating whether or not MPI is available])
+
+    dnl Some tricks to discover the version of petsc.
+    dnl You have to have grep and sed for this to work.
     petscmajor=`grep "define PETSC_VERSION_MAJOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_MAJOR[ ]*//g"`
     petscminor=`grep "define PETSC_VERSION_MINOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_MINOR[ ]*//g"`
     petscsubminor=`grep "define PETSC_VERSION_SUBMINOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_SUBMINOR[ ]*//g"`
     petscversion=$petscmajor.$petscminor.$petscsubminor
     AC_MSG_RESULT(<<< Configuring library with PETSc version $petscversion support >>>)
     AC_SUBST(petscversion)
+
   else
     enablepetsc=no  
   fi
@@ -534,12 +538,21 @@ AC_DEFUN(CONFIGURE_MPI,
   AC_CHECK_FILE($MPIHOME/include/mpi.h,
                 MPI_INCLUDE_PATH=$MPIHOME/include)
 
+  dnl check for libmpich
   AC_CHECK_FILE($MPIHOME/lib/libmpich.a,
                 MPI_LIBRARY_PATH=$MPIHOME/lib/libmpich.a,
                 MPI_LIBRARY_PATH=/mpich_bar_not_there)
 
   if (test -r $MPI_INCLUDE_PATH/mpi.h -a -r $MPI_LIBRARY_PATH) ; then
     AC_SUBST(MPI_INCLUDE_PATH)
+    dnl Here is a little hack.  If MPI_LIBRARY_PATH is valid 
+    dnl for libmpich, we assume it will also be available for
+    dnl libpmpich, which we will also require.  Therefore we
+    dnl deftly change MPI_LIBRARY_PATH to link with both
+    dnl mpich and pmpich.  This has no hope of working if
+    dnl you are using some sort of specialized mpi instead
+    dnl of mpich.
+    MPI_LIBRARY_PATH="-L $MPIHOME/lib -lmpich -lpmpich"
     AC_SUBST(MPI_LIBRARY_PATH)
     AC_DEFINE(HAVE_MPI, 1,
 	      [Flag indicating whether or not MPI is available])

@@ -1,6 +1,20 @@
 include ../../../Make.common
 
-INCLUDE = $(MPI_INCLUDE) -I. 
+# If enable-mpi is set, that means
+# petsc has been disabled, and we need
+# to include the mpi headers with an
+# additional -I.
+# Otherwise there will be one too many
+# -I's.  (This is a hack)
+#
+# If both petsc and mpi are explicitly
+# disabled, better not try to build anything!
+ifeq ($(enable-mpi),yes)
+  INCLUDE = -I$(MPI_INCLUDE) -I.
+else
+  INCLUDE = $(MPI_INCLUDE) -I.
+endif
+
 
 SRC     := $(wildcard *.c)
 OBJS   	:= $(patsubst %.c, %.$(obj-suffix), $(SRC))
@@ -40,3 +54,6 @@ clobber:
 distclean:
 	@$(MAKE) clobber
 	@rm -f ../../lib/*/libparmetis.*
+
+echo:
+	@echo $(MPI_INCLUDE)
