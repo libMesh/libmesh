@@ -1,5 +1,5 @@
 dnl --------------------------------------------------------------
-dnl $Id: configure.in,v 1.17 2003-03-26 14:18:35 benkirk Exp $
+dnl $Id: configure.in,v 1.18 2003-03-26 14:27:36 benkirk Exp $
 dnl --------------------------------------------------------------
 dnl Process this file with autoconf to produce a configure script.
 
@@ -9,7 +9,7 @@ dnl you call ./configure subsequently on different systems without
 dnl clearing the cache 
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
-AC_REVISION($Revision: 1.17 $)
+AC_REVISION($Revision: 1.18 $)
 
 
 AC_INIT(Make.common.in)
@@ -32,14 +32,14 @@ if test "$host" != powerpc-ibm-aix5.1.0.0 ; then
   AC_PROG_CC
 else
   dnl Special configuration for Power4
-  if test "x$CXX" == x ; then
+  if test "x$CXX" = x; then
     CXX=mpCC
   fi
-  if test "x$CC" == x ; then
+  if test "x$CC" = x; then
     CC=mpcc
   fi
-  if test "x$F77" == x ; then
-    F77=mpf77
+  if test "x$F77" = x; then
+    F77=mpxlf
   fi
 fi
 dnl --------------------------------------------------------------

@@ -2423,14 +2423,14 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 else
-    if test "x$CXX" == x ; then
+    if test "x$CXX" = x; then
     CXX=mpCC
   fi
-  if test "x$CC" == x ; then
+  if test "x$CC" = x; then
     CC=mpcc
   fi
-  if test "x$F77" == x ; then
-    F77=mpf77
+  if test "x$F77" = x; then
+    F77=mpxlf
   fi
 fi
 
