@@ -1,4 +1,4 @@
-// $Id: laspack_matrix.C,v 1.13 2003-06-03 05:33:35 benkirk Exp $
+// $Id: laspack_matrix.C,v 1.14 2003-08-28 20:55:27 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -41,7 +41,7 @@ void LaspackMatrix<T>::update_sparsity_pattern (const std::vector<std::vector<un
   this->clear ();    
 
   // big trouble if this fails!
-  assert (this->_dof_map != NULL);
+  assert (_dof_map != NULL);
   
   const unsigned int n_rows = sparsity_pattern.size();
 
@@ -150,7 +150,7 @@ void LaspackMatrix<T>::init (const unsigned int m,
 	    << "DofMap is implemented for Laspack matrices!" << std::endl;
   error();
 
-  this->_is_initialized = true;
+  _is_initialized = true;
 }
 
 
@@ -163,15 +163,15 @@ void LaspackMatrix<T>::init ()
     return;
   
   // We need the DofMap for this!
-  assert (this->_dof_map != NULL);
+  assert (_dof_map != NULL);
 
   // Clear intialized matrices
   if (this->initialized())
     this->clear();
 
-  const unsigned int m   = this->_dof_map->n_dofs();
+  const unsigned int m   = _dof_map->n_dofs();
   const unsigned int n   = m;
-  const unsigned int n_l = this->_dof_map->n_dofs_on_processor(0); 
+  const unsigned int n_l = _dof_map->n_dofs_on_processor(0); 
   const unsigned int m_l = n_l;
 
   // Laspack Matrices only work for uniprocessor cases
@@ -179,8 +179,8 @@ void LaspackMatrix<T>::init ()
   assert (m_l == m);
   assert (n_l == n);
 
-  const std::vector<unsigned int>& n_nz = this->_dof_map->get_n_nz();
-  const std::vector<unsigned int>& n_oz = this->_dof_map->get_n_oz();
+  const std::vector<unsigned int>& n_nz = _dof_map->get_n_nz();
+  const std::vector<unsigned int>& n_oz = _dof_map->get_n_oz();
 
   // Make sure the sparsity pattern isn't empty
   assert (n_nz.size() == n_l);
@@ -191,7 +191,7 @@ void LaspackMatrix<T>::init ()
 
   Q_Constr(&_QMat, const_cast<char*>("Mat"), m, _LPFalse, Rowws, Normal, _LPTrue);
 
-  this->_is_initialized = true;
+  _is_initialized = true;
   
   assert (m == this->m());
 }

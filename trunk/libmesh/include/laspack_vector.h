@@ -1,4 +1,4 @@
-// $Id: laspack_vector.h,v 1.20 2003-08-04 12:43:06 ddreyer Exp $
+// $Id: laspack_vector.h,v 1.21 2003-08-28 20:55:26 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -130,18 +130,6 @@ class LaspackVector : public NumericVector<T>
   void init (const unsigned int N,
 	     const bool         fast=false);
     
-//   /**
-//    * Change the dimension to that of the
-//    * vector \p V. The same applies as for
-//    * the other \p init function.
-//    *
-//    * The elements of \p V are not copied, i.e.
-//    * this function is the same as calling
-//    * \p init(V.size(),fast).
-//    */
-//   void init (const NumericVector<T>& V,
-// 	     const bool fast=false);
-
   /**
    * \f$U(0-N) = s\f$: fill all components.
    */
@@ -378,7 +366,7 @@ template <typename T>
 inline
 LaspackVector<T>::LaspackVector (const unsigned int n)
 {
-  init(n, n, false);
+  this->init(n, n, false);
 }
 
 
@@ -388,7 +376,7 @@ inline
 LaspackVector<T>::LaspackVector (const unsigned int n,
 				 const unsigned int n_local)
 {
-  init(n, n_local, false);
+  this->init(n, n_local, false);
 }
 
 
@@ -450,9 +438,7 @@ void LaspackVector<T>::close ()
 {
   assert (this->initialized());
   
-  this->_is_closed = true;
-  
-  return;
+  _is_closed = true;
 }
 
 
@@ -466,7 +452,7 @@ void LaspackVector<T>::clear ()
       V_Destr (&_vec);
     }
 
-  this->_is_closed = this->_is_initialized = false;
+  _is_closed = _is_initialized = false;
 }
 
 
@@ -542,8 +528,8 @@ template <typename T>
 inline
 void LaspackVector<T>::set (const unsigned int i, const T value)
 {
-  assert(this->initialized());
-  assert(i<this->size());
+  assert (this->initialized());
+  assert (i < this->size());
   
   V_SetCmp (&_vec, i+1, value);
 }
@@ -554,8 +540,8 @@ template <typename T>
 inline
 void LaspackVector<T>::add (const unsigned int i, const T value)
 {
-  assert(this->initialized());
-  assert(i<this->size());
+  assert (this->initialized());
+  assert (i < this->size());
   
   V_AddCmp (&_vec, i+1, value);
 }
@@ -567,8 +553,8 @@ inline
 T LaspackVector<T>::operator() (const unsigned int i) const
 {
   assert (this->initialized());
-  assert ( ((i >= first_local_index()) &&
-	    (i <  last_local_index())) );
+  assert ( ((i >= this->first_local_index()) &&
+	    (i <  this->last_local_index())) );
 
   
   return static_cast<T>(V_GetCmp(const_cast<QVector*>(&_vec), i+1));

@@ -1,4 +1,4 @@
-// $Id: petsc_vector.h,v 1.25 2003-08-28 19:35:42 benkirk Exp $
+// $Id: petsc_vector.h,v 1.26 2003-08-28 20:55:26 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -598,8 +598,8 @@ inline
 T PetscVector<T>::operator() (const unsigned int i) const
 {
   assert (this->initialized());
-  assert ( ((i >= first_local_index()) &&
-	    (i <  last_local_index())) );
+  assert ( ((i >= this->first_local_index()) &&
+	    (i <  this->last_local_index())) );
 
   int ierr=0;
   PetscScalar *values, value=0.;
