@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.42 2003-06-25 19:53:05 jwpeterson Exp $
+// $Id: mesh_base.C,v 1.43 2003-07-12 19:37:17 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -1867,6 +1867,9 @@ void MeshBase::write(const std::string& name)
 	else
 	  this->write_gmv_binary(name);
       }
+
+    else if (name.rfind(".unv") < name.size())
+      this->write_unv (name);
   }
 
   STOP_LOG("write()", "MeshBase");
