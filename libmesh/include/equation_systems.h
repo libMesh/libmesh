@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.10 2003-02-12 02:03:47 ddreyer Exp $
+// $Id: equation_systems.h,v 1.11 2003-02-13 01:49:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -59,7 +59,7 @@ public:
    * will be used, but this is optional via the \p sp
    * flag.
    */
-  EquationSystems (const Mesh& mesh,
+  EquationSystems (Mesh& mesh,
 
 #if defined(HAVE_PETSC)
 		   
@@ -199,9 +199,14 @@ public:
   const Mesh & get_mesh() const;
 
   /**
+   * @returns a reference to the mesh
+   */
+  Mesh & get_mesh();
+
+  /**
    * @returns the solver package type currently in use
    */
-  const SolverPackage get_solver_package() const 
+  SolverPackage get_solver_package() const 
   { return _solver_package; };
 
   /**
@@ -246,7 +251,7 @@ public:
   /**
    * The mesh data structure
    */ 
-  const Mesh& _mesh;
+  Mesh& _mesh;
   
   /**
    * Flag indicating what linear solver package to use
@@ -283,6 +288,14 @@ unsigned int EquationSystems::n_systems () const
 
 inline
 const Mesh & EquationSystems::get_mesh () const
+{
+  return _mesh;
+};
+
+
+
+inline
+Mesh & EquationSystems::get_mesh ()
 {
   return _mesh;
 };

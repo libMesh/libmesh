@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.12 2003-02-13 00:16:47 jwpeterson Exp $
+// $Id: elem.h,v 1.13 2003-02-13 01:49:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -27,6 +27,7 @@
 
 // Local includes
 #include "mesh_common.h"
+#include "dof_object.h"
 #include "reference_counted_object.h"
 #include "node.h"
 #include "enum_elem_type.h"
@@ -74,7 +75,8 @@ class Elem;
 
 // ------------------------------------------------------------
 // Elem class definition
-class Elem : public ReferenceCountedObject<Elem>
+class Elem : public ReferenceCountedObject<Elem>,
+	     public DofObject
 {
  protected:
   

@@ -1,4 +1,4 @@
-// $Id: system_base.h,v 1.1 2003-02-12 02:03:48 ddreyer Exp $
+// $Id: system_base.h,v 1.2 2003-02-13 01:49:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -65,7 +65,7 @@ protected:
    * data structures.  Protected so that this base class
    * cannot be explicitly instantiated.
    */
-  SystemBase (const Mesh& mesh,
+  SystemBase (Mesh& mesh,
 	      const std::string&  name,
 	      const SolverPackage solver_package);
   
@@ -245,7 +245,7 @@ protected:
    * Constant reference to the \p mesh data structure used
    * for the simulation.   
    */
-  const Mesh& _mesh;
+  Mesh& _mesh;
 };
 
 

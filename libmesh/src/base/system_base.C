@@ -1,4 +1,4 @@
-// $Id: system_base.C,v 1.1 2003-02-12 02:03:49 ddreyer Exp $
+// $Id: system_base.C,v 1.2 2003-02-13 01:49:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -32,7 +32,7 @@
 // ------------------------------------------------------------
 // SystemBase implementation
 
-SystemBase::SystemBase (const Mesh& mesh,
+SystemBase::SystemBase (Mesh& mesh,
 			const std::string& name,
 			const SolverPackage solver_package) :
   solution                (NumericVector::build(solver_package)),
@@ -40,7 +40,7 @@ SystemBase::SystemBase (const Mesh& mesh,
   matrix                  (SparseMatrix::build (solver_package)),
   linear_solver_interface (LinearSolverInterface::build(solver_package)),
   _sys_name               (name),
-  _dof_map                (mesh),
+//  _dof_map                (mesh),
   _mesh                   (mesh)
 {
 };
@@ -75,11 +75,11 @@ void SystemBase::clear ()
 
 void SystemBase::init ()
 {
-  _dof_map.distribute_dofs (_mesh.processor_id());
+  _dof_map.distribute_dofs (_mesh);
 
 #ifdef ENABLE_AMR
 
-  _dof_map.create_dof_constraints();
+  _dof_map.create_dof_constraints(_mesh);
 
 #endif
 
@@ -107,7 +107,7 @@ void SystemBase::assemble ()
 
       // Compute the sparisty pattern for the current
       // mesh and DOF distribution
-      _dof_map.compute_sparsity (_mesh.processor_id());
+      _dof_map.compute_sparsity (_mesh);
 
       // Initialize the matrix conformal to this
       // sparsity pattern

@@ -1,4 +1,4 @@
-// $Id: laspack_vector.h,v 1.4 2003-02-10 23:42:57 benkirk Exp $
+// $Id: laspack_vector.h,v 1.5 2003-02-13 01:49:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,6 +31,7 @@
 
 
 // C++ includes
+#include <stdio.h> // Needed by gcc 2.96
 
 // Local includes
 #include "numeric_vector.h"

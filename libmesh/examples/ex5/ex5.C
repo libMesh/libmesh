@@ -1,4 +1,4 @@
-// $Id: ex5.C,v 1.7 2003-02-12 02:03:47 ddreyer Exp $
+// $Id: ex5.C,v 1.8 2003-02-13 01:49:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -304,7 +304,7 @@ void assemble_poisson(EquationSystems& es,
     {
       const Elem* elem = mesh.elem(e);
 
-      dof_map.dof_indices (e, dof_indices);
+      dof_map.dof_indices (elem, dof_indices);
 
       fe->reinit (elem);
 

@@ -1,4 +1,4 @@
-// $Id: point.C,v 1.7 2003-02-06 23:02:56 benkirk Exp $
+// $Id: point.C,v 1.8 2003-02-13 01:49:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -68,14 +68,6 @@ Point Point::unit() const
 	       _coords[2]/length);
 #endif
   
-};
-
-
-
-void Point::clear()
-{
-  for (unsigned int i=0; i<DIM; i++)
-    _coords[i] = 0;
 };
 
 

@@ -1,4 +1,4 @@
-// $Id: ex4.C,v 1.8 2003-02-12 02:03:46 ddreyer Exp $
+// $Id: ex4.C,v 1.9 2003-02-13 01:49:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -366,7 +366,7 @@ void assemble_poisson(EquationSystems& es,
        * matrix and right-hand-side this element will
        * contribute to.
        */
-      dof_map.dof_indices (e, dof_indices);
+      dof_map.dof_indices (elem, dof_indices);
 
       /**
        * Compute the element-specific data for the current

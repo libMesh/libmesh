@@ -1,4 +1,4 @@
-// $Id: general_system.h,v 1.1 2003-02-12 02:03:47 ddreyer Exp $
+// $Id: general_system.h,v 1.2 2003-02-13 01:49:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -342,7 +342,7 @@ Complex GeneralSystem::current_nodal_solution (const unsigned int node,
 					       const unsigned short int var,
 					       const unsigned int index) const
 {
-  return (*current_local_solution)(_dof_map.node_dof_number(node, var, index));
+  return (*current_local_solution)(_mesh.node(node).dof_number(var, index));
 };
 
 
@@ -363,7 +363,7 @@ Complex GeneralSystem::current_elem_solution (const unsigned int elem,
 					      const unsigned short int var,
 					      const unsigned int index) const
 {
-  return (*current_local_solution)(_dof_map.elem_dof_number(elem, var, index));
+  return (*current_local_solution)(_mesh.elem(elem)->dof_number(var, index));
 };
 
 
@@ -404,7 +404,7 @@ Complex GeneralSystem::old_nodal_solution (const unsigned int node,
 					   const unsigned short int var,
 					   const unsigned int index) const
 {
-  return (*old_local_solution)(_dof_map.node_dof_number(node, var, index));
+  return (*old_local_solution)(_mesh.node(node).dof_number(var, index));
 };
 
 
@@ -424,7 +424,7 @@ Complex GeneralSystem::older_nodal_solution (const unsigned int node,
 					     const unsigned short int var,
 					     const unsigned int index) const
 {
-  return (*older_local_solution)(_dof_map.node_dof_number(node, var, index));
+  return (*older_local_solution)(_mesh.node(node).dof_number(var, index));
 };
 
 
@@ -444,7 +444,7 @@ Complex GeneralSystem::old_elem_solution (const unsigned int elem,
 					  const unsigned short int var,
 					  const unsigned int index) const
 {
-  return (*old_local_solution)(_dof_map.elem_dof_number(elem, var, index));
+  return (*old_local_solution)(_mesh.elem(elem)->dof_number(var, index));
 };
 
 
@@ -464,7 +464,7 @@ Complex GeneralSystem::older_elem_solution (const unsigned int elem,
 					    const unsigned short int var,
 					    const unsigned int index) const
 {
-  return (*older_local_solution)(_dof_map.elem_dof_number(elem, var, index));
+  return (*older_local_solution)(_mesh.elem(elem)->dof_number(var, index));
 };
 
 

@@ -1,4 +1,4 @@
-// $Id: system_data.h,v 1.12 2003-02-12 02:03:48 ddreyer Exp $
+// $Id: dof_object.C,v 1.1 2003-02-13 01:49:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -17,11 +17,20 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-// C++ includes
+
+
 
 // Local includes
+#include "dof_object.h"
 
 
-// class SystemData no longer exists.  Check system_base.h, general_system.h
 
 
+// ------------------------------------------------------------
+// DofObject class static member initialization
+const unsigned int DofObject::invalid_id = static_cast<unsigned int>(-1);
+
+
+
+// ------------------------------------------------------------
+// DofObject class members
