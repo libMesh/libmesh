@@ -887,6 +887,7 @@ Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-mpi=PATH	Prefix where MPI is installed (MPIHOME)
+  --with-gm=PATH			Prefix where GM is installed (GMHOME)
   --with-tecplot=PATH Specify the path where the Tecplot is installed
 
 Some influential environment variables:
@@ -7382,7 +7383,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:7385:" \
+echo "$as_me:7386:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -7550,7 +7551,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_verb"
-(eval echo $as_me:7553: \"$ac_link\") >&5
+(eval echo $as_me:7554: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -7630,7 +7631,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_cv_prog_f77_v"
-(eval echo $as_me:7633: \"$ac_link\") >&5
+(eval echo $as_me:7634: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -8102,10 +8103,28 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 	LIBS="-L$MPI_LIBS_PATH $LIBS"
 
-	# Quadrics MPICH requires the gm library to be included too
+	# Myricomm MPICH requires the gm library to be included too
 	if (nm $MPI_LIBS_PATH/libmpich.a | grep gm_open > /dev/null); then
 	  echo "note: MPICH found to use Myricomm's Myrinet, looking for gm library"
-		 echo "$as_me:$LINENO: checking for gm_open in -lgm" >&5
+
+          if (test "x$GMHOME" = x) ; then
+            GMHOME="/usr"
+          fi
+
+# Check whether --with-gm or --without-gm was given.
+if test "${with_gm+set}" = set; then
+  withval="$with_gm"
+  GM="$withval"
+else
+
+                        echo "note: GM library path not given... trying prefix=$MPIHOME"
+	                GM=$GMHOME
+
+fi;
+
+          LIBS="-L$GM/lib $LIBS"
+
+          echo "$as_me:$LINENO: checking for gm_open in -lgm" >&5
 echo $ECHO_N "checking for gm_open in -lgm... $ECHO_C" >&6
 if test "${ac_cv_lib_gm_gm_open+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -8161,8 +8180,8 @@ echo "$as_me:$LINENO: result: $ac_cv_lib_gm_gm_open" >&5
 echo "${ECHO_T}$ac_cv_lib_gm_gm_open" >&6
 if test $ac_cv_lib_gm_gm_open = yes; then
 
-                                LIBS    ="-lgm $LIBS"
-                                MPI_LIBS="-lgm $MPI_LIBS"
+                         LIBS    ="-lgm $LIBS"
+                         MPI_LIBS="-lgm $MPI_LIBS"
 
 else
   { { echo "$as_me:$LINENO: error: Could not find gm library... exiting " >&5
@@ -8766,10 +8785,28 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 	LIBS="-L$MPI_LIBS_PATH $LIBS"
 
-	# Quadrics MPICH requires the gm library to be included too
+	# Myricomm MPICH requires the gm library to be included too
 	if (nm $MPI_LIBS_PATH/libmpich.a | grep gm_open > /dev/null); then
 	  echo "note: MPICH found to use Myricomm's Myrinet, looking for gm library"
-		 echo "$as_me:$LINENO: checking for gm_open in -lgm" >&5
+
+          if (test "x$GMHOME" = x) ; then
+            GMHOME="/usr"
+          fi
+
+# Check whether --with-gm or --without-gm was given.
+if test "${with_gm+set}" = set; then
+  withval="$with_gm"
+  GM="$withval"
+else
+
+                        echo "note: GM library path not given... trying prefix=$MPIHOME"
+	                GM=$GMHOME
+
+fi;
+
+          LIBS="-L$GM/lib $LIBS"
+
+          echo "$as_me:$LINENO: checking for gm_open in -lgm" >&5
 echo $ECHO_N "checking for gm_open in -lgm... $ECHO_C" >&6
 if test "${ac_cv_lib_gm_gm_open+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -8825,8 +8862,8 @@ echo "$as_me:$LINENO: result: $ac_cv_lib_gm_gm_open" >&5
 echo "${ECHO_T}$ac_cv_lib_gm_gm_open" >&6
 if test $ac_cv_lib_gm_gm_open = yes; then
 
-                                LIBS    ="-lgm $LIBS"
-                                MPI_LIBS="-lgm $MPI_LIBS"
+                         LIBS    ="-lgm $LIBS"
+                         MPI_LIBS="-lgm $MPI_LIBS"
 
 else
   { { echo "$as_me:$LINENO: error: Could not find gm library... exiting " >&5
