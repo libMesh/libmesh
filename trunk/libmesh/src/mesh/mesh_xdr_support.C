@@ -1,4 +1,4 @@
-// $Id: mesh_xdr_support.C,v 1.14 2003-09-02 18:02:43 benkirk Exp $
+// $Id: mesh_xdr_support.C,v 1.15 2003-09-02 19:50:21 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -647,7 +647,7 @@ void XdrInterface::soln_interface_impl(const std::string& name,
    */
   int         numVar      = 0;       
   int         numNodes    = 0;
-  int         strSize     = 0;
+  //int         strSize     = 0;
   const char* varNames;
 	
   switch (access)
@@ -669,7 +669,7 @@ void XdrInterface::soln_interface_impl(const std::string& name,
 	 */
 	numVar   = sh->getWrtVar();
 	numNodes = sh->getNumNodes();
-	strSize  = sh->getStrSize();
+	//strSize  = sh->getStrSize();
 	varNames = sh->getVarTitle();
 
 	// Get the variable names

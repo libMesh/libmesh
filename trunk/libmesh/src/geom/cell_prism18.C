@@ -1,4 +1,4 @@
-// $Id: cell_prism18.C,v 1.8 2003-09-02 19:50:20 benkirk Exp $
+// $Id: cell_prism18.C,v 1.9 2003-09-02 19:52:41 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -408,6 +408,8 @@ unsigned int Prism18::n_second_order_adjacent_vertices (const unsigned int n) co
       default:
 	error();
     }
+  error();
+  return static_cast<unsigned int>(-1);
 }
 
 
