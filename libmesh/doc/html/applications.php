@@ -24,8 +24,8 @@
 
 <h2>Exterior Acoustics</h2>
 <ul>
-  <li> <a href="http://www.mum.tu-harburg.de/ddreyer/project.html">Acoustic Radiation of Ocean Engineering Structures</a> </li>
-  <li> <a href="http://www.mum.tu-harburg.de/spetersen/project.html">Tire Rolling Noise</a> </li>
+  <li> <a href="http://www.mum.tu-harburg.de/ovestorff/projects/project_dd.html">Acoustic Radiation of Ocean Engineering Structures</a> </li>
+  <li> <a href="http://www.mum.tu-harburg.de/ovestorff/projects/project_sp.html">Tire Rolling Noise</a> </li>
 </ul>
 
 </div>

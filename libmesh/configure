@@ -893,7 +893,7 @@ Optional Packages:
   --with-mpi=PATH         Prefix where MPI is installed (MPIHOME)
   --with-gm=PATH          Prefix where GM is installed (GMHOME)
   --with-tecplot=PATH     Specify the path where Tecplot is installed
-  --with-tetgen=PATH      Specify the path where Tetgen is installed
+  --with-tetgen=PATH      Specify the full to the Tetgen installation
 
 Some influential environment variables:
   CXX         C++ compiler command
