@@ -1,4 +1,4 @@
-// $Id: frequency_system.C,v 1.3 2004-11-09 12:20:50 spetersen Exp $
+// $Id: frequency_system.C,v 1.4 2004-12-07 22:47:46 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -52,8 +52,8 @@ FrequencySystem::FrequencySystem (EquationSystems& es,
   _finished_assemble        (false)
 {
   // default value for wave speed & fluid density
-  //_equation_systems.set_parameter("wave speed") = 340.;
-  //_equation_systems.set_parameter("rho")        = 1.225;
+  //_equation_systems.parameters.set<Real>("wave speed") = 340.;
+  //_equation_systems.parameters.set<Real>("rho")        = 1.225;
 }
 
 
@@ -98,11 +98,11 @@ void FrequencySystem::clear_all ()
 
   // clear frequencies in the parameters section of the 
   // EquationSystems object
-  if (_equation_systems.parameter_exists ("n_frequencies"))
+  if (_equation_systems.parameters.have_parameter<unsigned int> ("n_frequencies"))
     {
-      for (unsigned int n=0; n < _equation_systems.parameter("n_frequencies"); n++)
-	  _equation_systems.unset_parameter(this->form_freq_param_name(n));
-      _equation_systems.unset_parameter("current frequency");
+      for (unsigned int n=0; n < _equation_systems.parameters.get<unsigned int>("n_frequencies"); n++)
+	  _equation_systems.parameters.remove(this->form_freq_param_name(n));
+      _equation_systems.parameters.remove("current frequency");
     }
 }
 
@@ -125,10 +125,10 @@ void FrequencySystem::init_data ()
        * if this has a "n_frequencies" parameter,
        * and initialize us with these.
        */
-      if (_equation_systems.parameter_exists ("n_frequencies"))
+      if (_equation_systems.parameters.have_parameter<unsigned int> ("n_frequencies"))
         {
 	  const unsigned int n_freq = 
-	      static_cast<unsigned int>(_equation_systems.parameter("n_frequencies"));
+	    _equation_systems.parameters.get<unsigned int>("n_frequencies");
 
 	  assert(n_freq > 0);
 
@@ -196,12 +196,12 @@ void FrequencySystem::set_frequencies_by_steps (const Real base_freq,
     }
 
   // store number of frequencies as parameter
-  _equation_systems.set_parameter("n_frequencies") = n_freq;
+  _equation_systems.parameters.set<Real>("n_frequencies") = n_freq;
 
   for (unsigned int n=0; n<n_freq; n++)
     {
       // remember frequencies as parameters
-      _equation_systems.set_parameter(this->form_freq_param_name(n)) = 
+      _equation_systems.parameters.set<Real>(this->form_freq_param_name(n)) = 
 	  base_freq + n * freq_step;
 
       // build storage for solution vector, if wanted
@@ -235,13 +235,13 @@ void FrequencySystem::set_frequencies_by_range (const Real min_freq,
     }
 
   // store number of frequencies as parameter
-  _equation_systems.set_parameter("n_frequencies") = n_freq;
+  _equation_systems.parameters.set<Real>("n_frequencies") = n_freq;
 
   // set frequencies, build solution storage
   for (unsigned int n=0; n<n_freq; n++)
     {
       // remember frequencies as parameters
-      _equation_systems.set_parameter(this->form_freq_param_name(n)) = 
+      _equation_systems.parameters.set<Real>(this->form_freq_param_name(n)) = 
 	  min_freq + n*(max_freq-min_freq)/(n_freq-1);
       
       // build storage for solution vector, if wanted
@@ -272,13 +272,13 @@ void FrequencySystem::set_frequencies (const std::vector<Real>& frequencies,
     }
 
   // store number of frequencies as parameter
-  _equation_systems.set_parameter("n_frequencies") = frequencies.size();
+  _equation_systems.parameters.set<Real>("n_frequencies") = frequencies.size();
 
   // set frequencies, build solution storage
   for (unsigned int n=0; n<frequencies.size(); n++)
     {
       // remember frequencies as parameters
-      _equation_systems.set_parameter(this->form_freq_param_name(n)) = frequencies[n];
+      _equation_systems.parameters.set<Real>(this->form_freq_param_name(n)) = frequencies[n];
       
       // build storage for solution vector, if wanted
       if (this->_keep_solution_duplicates)
@@ -297,7 +297,7 @@ void FrequencySystem::set_frequencies (const std::vector<Real>& frequencies,
 unsigned int FrequencySystem::n_frequencies () const
 {
   assert(_finished_set_frequencies);
-  return (static_cast<unsigned int>(_equation_systems.parameter("n_frequencies")));
+  return _equation_systems.parameters.get<unsigned int>("n_frequencies");
 }
 
 
@@ -331,9 +331,9 @@ void FrequencySystem::solve (const unsigned int n_start,
   //     the user-specified maximum # of linear solver iterations,
   //     the user-specified wave speed
   const Real tol            =
-    _equation_systems.parameter("linear solver tolerance");
+    _equation_systems.parameters.get<Real>("linear solver tolerance");
   const unsigned int maxits =
-    _equation_systems.parameter<unsigned int>("linear solver maximum iterations");
+    _equation_systems.parameters.get<unsigned int>("linear solver maximum iterations");
 
 
 //   // return values
@@ -394,8 +394,8 @@ void FrequencySystem::attach_solve_function(void fptr(EquationSystems& es,
 void FrequencySystem::set_current_frequency(unsigned int n)
 {
   assert(n < n_frequencies());
-  _equation_systems.set_parameter("current frequency") = 
-      _equation_systems.parameter(this->form_freq_param_name(n));
+  _equation_systems.parameters.set<Real>("current frequency") = 
+    _equation_systems.parameters.get<Real>(this->form_freq_param_name(n));
 }
 
 

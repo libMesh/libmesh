@@ -1,4 +1,4 @@
-/* $Id: ex13.C,v 1.8 2004-11-15 22:09:06 benkirk Exp $ */
+/* $Id: ex13.C,v 1.9 2004-12-07 22:47:42 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -125,8 +125,8 @@ int main (int argc, char** argv)
       // Initialize the data structures for the equation system.
       equation_systems.init ();
 
-      equation_systems.set_parameter("linear solver maximum iterations") = 250;
-      equation_systems.set_parameter("linear solver tolerance") = 1.e-3;
+      equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = 250;
+      equation_systems.parameters.set<Real>        ("linear solver tolerance") = 1.e-3;
       
       // Prints information about the system to the screen.
       equation_systems.print_info();
@@ -149,7 +149,7 @@ int main (int argc, char** argv)
     // Tell the system of equations what the timestep is by using
     // the set_parameter function.  The matrix assembly routine can
     // then reference this parameter.
-    equation_systems.set_parameter ("dt")   = dt;
+    equation_systems.parameters.set<Real> ("dt")   = dt;
 
     // Get a reference to the Stokes system to use later.
     TransientImplicitSystem&  stokes_system =
@@ -170,7 +170,7 @@ int main (int argc, char** argv)
 	// Let the system of equations know the current time.
 	// This might be necessary for a time-dependent forcing
 	// function for example.
-	equation_systems.set_parameter ("time") = time;
+	equation_systems.parameters.set<Real> ("time") = time;
 
 	// A pretty update message
 	std::cout << " Solving time step " << t_step << ", time = " << time << std::endl;
@@ -358,8 +358,8 @@ void assemble_stokes (EquationSystems& es,
   // reaches steady state relatively quickly we can afford to take small
   // timesteps.  If you monitor the initial nonlinear residual for this
   // simulation, you should see that it is monotonically decreasing in time.
-  const Real dt    = es.parameter("dt");
-  // const Real time  = es.parameter("time");
+  const Real dt    = es.parameters.get<Real>("dt");
+  // const Real time  = es.parameters.get<Real>("time");
   const Real theta = 1.;
     
   // Now we will loop over all the elements in the mesh that

@@ -1,4 +1,4 @@
-/* $Id: ex6.C,v 1.36 2004-11-15 22:09:08 benkirk Exp $ */
+/* $Id: ex6.C,v 1.37 2004-12-07 22:47:43 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -176,8 +176,8 @@ int main (int argc, char** argv)
       // Set the speed of sound and fluid density
       // as \p EquationSystems parameter,
       // so that \p assemble_wave() can access it.
-      equation_systems.set_parameter("speed")          = 1.;
-      equation_systems.set_parameter("fluid density")  = 1.;
+      equation_systems.parameters.set<Real>("speed")          = 1.;
+      equation_systems.parameters.set<Real>("fluid density")  = 1.;
       
       // Initialize the data structures for the equation system.
       equation_systems.init();
@@ -233,7 +233,7 @@ void assemble_wave(EquationSystems& es,
   const unsigned int dim = mesh.mesh_dimension();
   
   // Copy the speed of sound to a local variable.
-  const Real speed = es.parameter("speed");
+  const Real speed = es.parameters.get<Real>("speed");
   
   // Get a constant reference to the Finite Element type
   // for the first (and only) variable in the system.

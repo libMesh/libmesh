@@ -1,4 +1,4 @@
-/* $Id: ex8.C,v 1.12 2004-11-08 00:11:02 jwpeterson Exp $ */
+/* $Id: ex8.C,v 1.13 2004-12-07 22:47:44 benkirk Exp $ */
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
 
@@ -187,13 +187,13 @@ int main (int argc, char** argv)
       // Set the speed of sound and fluid density
       // as \p EquationSystems parameter,
       // so that \p assemble_wave() can access it.
-      equation_systems.set_parameter("speed")          = 1000.;
-      equation_systems.set_parameter("fluid density")  = 1000.;
+      equation_systems.parameters.set<Real>("speed")          = 1000.;
+      equation_systems.parameters.set<Real>("fluid density")  = 1000.;
 
       // Store the current time as an
       // \p EquationSystems parameter, so that
       // \p fill_dirichlet_bc() can access it.
-      equation_systems.set_parameter("time")           = 0.;
+      equation_systems.parameters.set<Real>("time")           = 0.;
 
       // Initialize the data structures for the equation system.
       equation_systems.init();
@@ -237,7 +237,7 @@ int main (int argc, char** argv)
 	// Update the time.  Both here and in the
 	// \p EquationSystems object
 	t_time += delta_t;
-	equation_systems.set_parameter("time")  = t_time;
+	equation_systems.parameters.set<Real>("time")  = t_time;
 
 	// Update the rhs.
 	t_system.update_rhs();
@@ -255,12 +255,12 @@ int main (int argc, char** argv)
 	    // matrix.  When you set the flag as shown below,
 	    // the flag will return true.  If you want it to return
 	    // false, simply do not set it.
-	    equation_systems.set_flag("Newmark set BC for Matrix");
+	    equation_systems.parameters.set<bool>("Newmark set BC for Matrix") = true;
 
 	    fill_dirichlet_bc(equation_systems, "Wave");
 
 	    // unset the flag, so that it returns false
-	    equation_systems.unset_flag("Newmark set BC for Matrix");
+	    equation_systems.parameters.set<bool>("Newmark set BC for Matrix") = false;
 	  }
 	else
 	  fill_dirichlet_bc(equation_systems, "Wave");
@@ -313,8 +313,8 @@ void assemble_wave(EquationSystems& es,
 
   // Copy the speed of sound and fluid density
   // to a local variable.
-  const Real speed = es.parameter("speed");
-  const Real rho   = es.parameter("fluid density");
+  const Real speed = es.parameters.get<Real>("speed");
+  const Real rho   = es.parameters.get<Real>("fluid density");
 
   // Get a reference to our system, as before.
   NewmarkSystem & t_system = es.get_system<NewmarkSystem> (system_name);
@@ -564,10 +564,11 @@ void fill_dirichlet_bc(EquationSystems& es,
 
   // Ask the \p EquationSystems flag whether
   // we should do this also for the matrix
-  const bool do_for_matrix = es.flag("Newmark set BC for Matrix");
+  const bool do_for_matrix =
+    es.parameters.get<bool>("Newmark set BC for Matrix");
 
   // Ge the current time from \p EquationSystems
-  const Real current_time = es.parameter("time");
+  const Real current_time = es.parameters.get<Real>("time");
 
   // Number of nodes in the mesh.
   unsigned int n_nodes = mesh.n_nodes();

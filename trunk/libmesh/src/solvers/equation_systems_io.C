@@ -1,4 +1,4 @@
-// $Id: equation_systems_io.C,v 1.4 2004-09-27 13:41:48 jwpeterson Exp $
+// $Id: equation_systems_io.C,v 1.5 2004-12-07 22:47:46 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -135,67 +135,67 @@ void EquationSystems::read (const std::string& name,
     this->clear ();
 
 
-  /**
-   * 1.)  
-   *
-   * Read the number of flags that are set
-   */
-  {
-    unsigned int n_flags=0;
+//   /**
+//    * 1.)  
+//    *
+//    * Read the number of flags that are set
+//    */
+//   {
+//     unsigned int n_flags=0;
   
-    io.data (n_flags);
+//     io.data (n_flags);
   
-    for (unsigned int flags=0; flags<n_flags; flags++)
-      {
-	/**
-	 * 2.)
-	 *
-	 * Read the name of the ith flag
-	 */
-	std::string flag_name;
+//     for (unsigned int flags=0; flags<n_flags; flags++)
+//       {
+// 	/**
+// 	 * 2.)
+// 	 *
+// 	 * Read the name of the ith flag
+// 	 */
+// 	std::string flag_name;
      
-	io.data (flag_name);
+// 	io.data (flag_name);
        
-	if (read_header)
-	  this->set_flag (flag_name);
-      }
-  }
+// 	if (read_header)
+// 	  this->parameters.set<bool> (flag_name) = true;
+//       }
+//   }
 
 
-  /**
-   * 3.)  
-   *
-   * Read the number of params that are set
-   */
-  {
-    unsigned int n_params=0;
+//   /**
+//    * 3.)  
+//    *
+//    * Read the number of params that are set
+//    */
+//   {
+//     unsigned int n_params=0;
   
-    io.data (n_params);
+//     io.data (n_params);
   
-    for (unsigned int params=0; params<n_params; params++)
-      {
-        /**
-	 * 4.)
-	 *
-	 * Read the name of the ith param
-	 */
-	std::string param_name;
+//     for (unsigned int params=0; params<n_params; params++)
+//       {
+//         /**
+// 	 * 4.)
+// 	 *
+// 	 * Read the name of the ith param
+// 	 */
+// 	std::string param_name;
      
-	io.data (param_name);
+// 	io.data (param_name);
  
-	/**
-	 * 5.)
-	 *
-	 * Read the value of the ith param
-	 */
-	Real param_value;
+// 	/**
+// 	 * 5.)
+// 	 *
+// 	 * Read the value of the ith param
+// 	 */
+// 	Real param_value;
      
-	io.data (param_value);
+// 	io.data (param_value);
 
-	if (read_header)
-	  this->set_parameter (param_name) = param_value;
-      }
-  }
+// 	if (read_header)
+// 	  this->parameters.set<Real> (param_name) = param_value;
+//       }
+//   }
 
 
 	  
@@ -392,75 +392,75 @@ void EquationSystems::write(const std::string& name,
    */
   if (proc_id == 0) 
     {
-      /**
-       * 1.)  
-       *
-       * Write the number of flags
-       */
-      {
-        unsigned int n_flags = this->_flags.size();
-	io.data (n_flags, "# No. of Flags");
-      }
+//       /**
+//        * 1.)  
+//        *
+//        * Write the number of flags
+//        */
+//       {
+//         unsigned int n_flags = this->_flags.size();
+// 	io.data (n_flags, "# No. of Flags");
+//       }
 
 
 
-      /**
-       * 2.)  
-       *
-       * Write the flags
-       */
-      {
-        std::set<std::string>::const_iterator flag_pos = _flags.begin();
-	std::set<std::string>::const_iterator flag_end = _flags.end();
-	unsigned int cnt=0;
-	for (; flag_pos!= flag_end; ++flag_pos)
-          {
-	    comment =  "# Name, Flag ";
-	    sprintf(buf, "%d", cnt++);
-	    comment += buf;
-	    std::string flag_name = *flag_pos;
-	    io.data (flag_name, comment.c_str());
-	  }
-      }
+//       /**
+//        * 2.)  
+//        *
+//        * Write the flags
+//        */
+//       {
+//         std::set<std::string>::const_iterator flag_pos = _flags.begin();
+// 	std::set<std::string>::const_iterator flag_end = _flags.end();
+// 	unsigned int cnt=0;
+// 	for (; flag_pos!= flag_end; ++flag_pos)
+//           {
+// 	    comment =  "# Name, Flag ";
+// 	    sprintf(buf, "%d", cnt++);
+// 	    comment += buf;
+// 	    std::string flag_name = *flag_pos;
+// 	    io.data (flag_name, comment.c_str());
+// 	  }
+//       }
 
 
 
-      /**
-       * 3.)  
-       *
-       * Write the number of parameters
-       */
-      {
-        unsigned int n_params = this->_parameters.size();
-	io.data (n_params, "# No. of Parameters");
-      }
+//       /**
+//        * 3.)  
+//        *
+//        * Write the number of parameters
+//        */
+//       {
+//         unsigned int n_params = this->_parameters.size();
+// 	io.data (n_params, "# No. of Parameters");
+//       }
 
 
 
-      /**
-       * 4.) + 5.)
-       *
-       * Write the parameter names and values
-       */
-      {
-        std::map<std::string, Real>::const_iterator param_pos = _parameters.begin();
-	std::map<std::string, Real>::const_iterator param_end = _parameters.end();
-	unsigned int cnt=0;
-	for (; param_pos!= param_end; ++param_pos)
-          {
-	    comment =  "# Name,  Parameter No. ";
-	    sprintf(buf, "%d", cnt);
-	    comment += buf;
-	    std::string param_name = param_pos->first;
-	    io.data (param_name, comment.c_str());
+//       /**
+//        * 4.) + 5.)
+//        *
+//        * Write the parameter names and values
+//        */
+//       {
+//         std::map<std::string, Real>::const_iterator param_pos = _parameters.begin();
+// 	std::map<std::string, Real>::const_iterator param_end = _parameters.end();
+// 	unsigned int cnt=0;
+// 	for (; param_pos!= param_end; ++param_pos)
+//           {
+// 	    comment =  "# Name,  Parameter No. ";
+// 	    sprintf(buf, "%d", cnt);
+// 	    comment += buf;
+// 	    std::string param_name = param_pos->first;
+// 	    io.data (param_name, comment.c_str());
 
-	    comment = "# Value, Parameter No. ";
-	    sprintf(buf, "%d", cnt++);
-	    comment += buf;
-	    Real param_value = param_pos->second;
-	    io.data (param_value, comment.c_str());
-	  }
-      }
+// 	    comment = "# Value, Parameter No. ";
+// 	    sprintf(buf, "%d", cnt++);
+// 	    comment += buf;
+// 	    Real param_value = param_pos->second;
+// 	    io.data (param_value, comment.c_str());
+// 	  }
+//       }
 
 
 

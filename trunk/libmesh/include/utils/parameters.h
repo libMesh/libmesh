@@ -1,4 +1,4 @@
-// $Id: parameters.h,v 1.2 2004-12-06 04:52:41 benkirk Exp $
+// $Id: parameters.h,v 1.3 2004-12-07 22:47:45 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -41,7 +41,7 @@
  *
  * \author Benjamin S. Kirk
  * \date 2004
- * \version $Revision: 1.2 $
+ * \version $Revision: 1.3 $
  */
 
 // ------------------------------------------------------------
@@ -94,6 +94,22 @@ public:
   T& set (const std::string&);
 
   /**
+   * Removes the specified parameter from the list, if it exists.
+   */
+  void remove (const std::string&);
+
+  /**
+   * @returns the total number of parameters.
+   */
+  unsigned int n_parameters () const { return _values.size(); }
+
+  /**
+   * @returns the number of parameters of the requested type.
+   */
+  template <typename T>
+  unsigned int n_parameters () const;
+  
+  /**
    * Clears internal data structures & frees any allocated memory.
    */
   void clear ();
@@ -109,7 +125,7 @@ private:
   /**
    * Abstract definition of a parameter value.
    */
-  class Value
+  class Value : public ReferenceCountedObject<Value>
   {
   public:
 
@@ -143,8 +159,7 @@ private:
    * for a specified type.
    */
   template <typename T>
-  struct Parameter : public Value,
-                     public ReferenceCountedObject<Parameter<T> >
+  struct Parameter : public Value
   {
   public:
 
@@ -302,15 +317,6 @@ void Parameters::print (std::ostream& os) const
 
 
 
-inline
-std::ostream& operator << (std::ostream& os, const Parameters& p)
-{
-  p.print(os);
-  return os;
-}
-
-
-
 template <typename T>
 inline
 bool Parameters::have_parameter (const std::string& name) const
@@ -366,6 +372,50 @@ T& Parameters::set (const std::string& name)
   assert (param != NULL);
   
   return param->set();
+}
+
+
+
+inline
+void Parameters::remove (const std::string& name)
+{
+  Parameters::iterator it = _values.find(name);
+
+  if (it != _values.end())
+    {
+      delete it->second;
+      it->second = NULL;
+
+      _values.erase(it);
+    }
+}
+
+
+
+template <typename T>
+inline
+unsigned int Parameters::n_parameters () const
+{
+  Parameters::const_iterator it = _values.begin();
+
+  unsigned int cnt = 0;  
+  
+  while (it != _values.end())
+    {
+      if (dynamic_cast<Parameter<T>*>(it->second) != NULL) cnt++;
+
+      ++it;
+    }
+
+  return cnt;	 
+}
+
+
+inline
+std::ostream& operator << (std::ostream& os, const Parameters& p)
+{
+  p.print(os);
+  return os;
 }
 
 #endif // #define __parameters_h__

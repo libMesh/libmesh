@@ -1,4 +1,4 @@
-// $Id: newmark_system.C,v 1.2 2004-10-20 21:42:34 benkirk Exp $
+// $Id: newmark_system.C,v 1.3 2004-12-07 22:47:46 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -56,11 +56,11 @@ NewmarkSystem::NewmarkSystem (EquationSystems& es,
   
 {
   // default values of the newmark parameters
-  _equation_systems.set_parameter("Newmark alpha") = _default_alpha;
-  _equation_systems.set_parameter("Newmark delta") = _default_delta;
+  _equation_systems.parameters.set<Real>("Newmark alpha") = _default_alpha;
+  _equation_systems.parameters.set<Real>("Newmark delta") = _default_delta;
 
   // time step size.  should be handled at a later stage through EquationSystems?
-  _equation_systems.set_parameter("Newmark time step") = _default_timestep;
+  _equation_systems.parameters.set<Real>("Newmark time step") = _default_timestep;
 
   // add additional matrices and vectors that will be used in the
   // newmark algorithm to the data structure
@@ -106,11 +106,11 @@ void NewmarkSystem::clear ()
   ImplicitSystem::clear();
 
   // default values of the newmark parameters
-  _equation_systems.set_parameter("Newmark alpha") = _default_alpha;
-  _equation_systems.set_parameter("Newmark delta") = _default_delta;
+  _equation_systems.parameters.set<Real>("Newmark alpha") = _default_alpha;
+  _equation_systems.parameters.set<Real>("Newmark delta") = _default_delta;
 
   // time step size.  should be handled at a later stage through EquationSystems?
-  _equation_systems.set_parameter("Newmark time step") = _default_timestep;
+  _equation_systems.parameters.set<Real>("Newmark time step") = _default_timestep;
 
   // set bool to false
   _finished_assemble = false;
@@ -269,11 +269,11 @@ void NewmarkSystem::set_newmark_parameters (const Real delta_T,
   assert(delta_T != 0.);
 
   // the newmark parameters
-  _equation_systems.set_parameter("Newmark alpha") = alpha;
-  _equation_systems.set_parameter("Newmark delta") = delta;
+  _equation_systems.parameters.set<Real>("Newmark alpha") = alpha;
+  _equation_systems.parameters.set<Real>("Newmark delta") = delta;
 
   // time step size.  should be handled at a later stage through EquationSystems?
-  _equation_systems.set_parameter("Newmark time step") = delta_T;
+  _equation_systems.parameters.set<Real>("Newmark time step") = delta_T;
 
   // the constants for time integration
   _a_0 = 1./(alpha*delta_T*delta_T);

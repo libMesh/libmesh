@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.10 2004-11-14 20:16:08 jwpeterson Exp $
+// $Id: equation_systems.h,v 1.11 2004-12-07 22:47:45 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -30,9 +30,9 @@
 
 // Local Includes
 #include "libmesh_common.h"
+#include "parameters.h"
 #include "system.h"
 #include "mesh.h"
-#include "data_map.h"
 #include "enum_xdr_mode.h"
 #include "elem.h"
 
@@ -283,97 +283,6 @@ public:
    */
   friend std::ostream& operator << (std::ostream& os, const EquationSystems& es);
 
-  
-
-  //-------------------------------------------------
-  // Methods for accessing additional data
-  //
-
-//   /**
-//    * @returns a pointet to an object of type \p T.  If the
-//    * user has specified such an object then a vaild pointer
-//    * is returned, otherwise \p NULL is returned.
-//    */
-//   template <class T>
-//   T* additional_data (const std::string& name) const;
-
-//   /**
-//    * Set or get a pointer to an arbitrary type identified by \p name.
-//    */
-//   void* & additional_data (const std::string& name);
-
-//   /**
-//    * Removes any additional data associated with the name \p name.
-//    */
-//   void unset_additional_data (const std::string& name);
-
-  
-  
-  //-------------------------------------------------
-  // Methods for accessing flags
-  // 
-  /**
-   * @returns \p true if the flag \p fl is set, returns
-   * \p false otherwise.
-   */
-  bool flag (const std::string& fl) const;
-
-  /**
-   * Defines the flag \p fl as \p true. This flag will
-   * be used for all systems.
-   */ 
-  void set_flag (const std::string& fl);
-
-  /**
-   * Undefines the flag \p fl.
-   */
-  void unset_flag (const std::string& fl);
-
-  /**
-   * @returns the number of flags. 
-   */
-  unsigned int n_flags () const;
-
-
-
-  //-------------------------------------------------
-  // Methods for accessing parameters
-  //
-  /**
-   * @returns the parameter value assoicated with \p id as a Real number.
-   */
-  Real parameter (const std::string& id) const;
-
-  /**
-   * @returns the parameter value assoicated with \p id as a specified type.
-   */
-  template <typename T>
-  T parameter (const std::string& id) const;
-
-  /**
-   * Defines the value of parameter \p id as \p value.
-   * This parameter will be used for all systems, so
-   * this method makes sure the parameter isn't already
-   * set to avoid accidental overwriting.
-   */
-  Real & set_parameter (const std::string& id);
-  
-  /**
-   * Undefines the value of parameter \p id. 
-   */
-  void unset_parameter (const std::string& id);
-
-  /**
-   * @returns the number of parameters. 
-   */
-  unsigned int n_parameters () const;
-
-  /**
-   * @returns \p true when this parameter exists,
-   * \p false otherwise.
-   */
-  bool parameter_exists (const std::string& id) const;
-
   /**
    * @returns a constant reference to the mesh
    */
@@ -385,9 +294,9 @@ public:
   Mesh & get_mesh();
 
   /**
-   * Data structure holding user-supplied additional data.
+   * Data structure holding arbitrary parameters.
    */
-  DataMap data_map;
+  Parameters parameters;
 
   /**
    * A pointer to the MeshData object you would like to use.
@@ -408,16 +317,6 @@ protected:
    * Data structure holding the systems.
    */
   std::map<std::string, System*> _systems;
-  
-  /**
-   * Data structure to hold user-specified flags.
-   */
-  std::set<std::string> _flags;
-
-  /**
-   * Data structore to hold user-specified parameters 
-   */
-  std::map<std::string, Real> _parameters;
 };
 
 
@@ -444,22 +343,6 @@ inline
 unsigned int EquationSystems::n_systems () const
 {
   return _systems.size();
-}
-
-
-
-inline
-unsigned int EquationSystems::n_flags () const
-{
-  return _flags.size();
-}
-
-
-
-inline
-unsigned int EquationSystems::n_parameters () const
-{
-  return _parameters.size();
 }
 
 
@@ -605,56 +488,6 @@ T_sys & EquationSystems::get_system (const unsigned int num)
     }
 
   return *(dynamic_cast<T_sys*>(pos->second));
-}
-
-
-
-// template <class T>
-// inline
-// T* EquationSystems::additional_data (const std::string& name) const
-// {
-//   // Look for name in the additional data map
-//   std::map<std::string, void*>::const_iterator
-//     pos = _additional_data.find(name);
-
-//   if (pos == _additional_data.end())
-//     {
-//       here();
-
-//       std::cerr << "WARNING: no object matching \"" << name
-// 		<< "\" found.  Returning NULL"
-// 		<< std::endl;
-
-//       return NULL;
-//     }
-
-//   // Better not be NULL!
-//   assert (pos->second != NULL);
-  
-//   return static_cast<T*>(pos->second);
-// }
-
-
-
-template <typename T>
-inline
-T EquationSystems::parameter (const std::string& id) const
-{
-  // Look for the id in the database
-  std::map<std::string, Real>::const_iterator
-    pos = _parameters.find(id);
-  
-  if (pos == _parameters.end())
-    {
-      std::cerr << "ERROR: parameter " << id
-		<< " was not set!"
-		<< std::endl;
-      error();
-    }
-
-  
-  // Return the parameter value if found
-  return static_cast<T>(pos->second);
 }
 
 

@@ -56,10 +56,9 @@ ex10.$(obj-suffix):\
     ../../include/solvers/steady_system.h\
     ../../include/solvers/system.h\
     ../../include/solvers/transient_system.h\
-    ../../include/utils/data_map.h\
-    ../../include/utils/data_object.h\
     ../../include/utils/error_vector.h\
     ../../include/utils/o_string_stream.h\
+    ../../include/utils/parameters.h\
     ../../include/utils/perf_log.h\
     ../../include/utils/statistics.h
 ../ex9/exact_solution.$(obj-suffix):\
