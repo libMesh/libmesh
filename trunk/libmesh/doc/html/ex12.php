@@ -1094,6 +1094,9 @@ the current node in the map.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+Linking ex12...
+/home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
+: the use of `mktemp' is dangerous, better use `mkstemp'
 ***************************************************************
 * Running Example  ./ex12
 ***************************************************************
@@ -1180,8 +1183,8 @@ After re-reading the first file:
 | Reference count information                                                |
  ---------------------------------------------------------------------------- 
 | 4Elem reference count information:
-| Creations:    24951
-| Destructions: 24951
+| Creations:    24983
+| Destructions: 24983
 | 4Node reference count information:
 | Creations:    3977
 | Destructions: 3977
@@ -1226,6 +1229,9 @@ to see the differences in node numbers.
 *          file with caution: libMesh node and element ids are used.    *
 *************************************************************************
 
+  Writing 3977 nodes
+  Writing elements
+  Finished writing 3520 elements
 
 Writing MeshData to: data_third_with_libmesh_ids_out.unv
 ----------------------------------------------------------

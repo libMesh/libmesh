@@ -156,6 +156,31 @@ example takes a little over a minute to run.  If you would like to see
 a more detailed time history, or compute more timesteps, that is certainly
 possible by changing the n_timesteps and dt variables below.
 
+<h2><a href="ex14.php">Example 14</a> - Laplace's Equation in an L-Shaped Domain</h2>
+This example solves the Laplace equation on the classic "L-shaped"
+domain with adaptive mesh refinement.  In this case, the exact
+solution is u(r,\theta) = r^{2/3} * \sin ( (2/3) * \theta), but
+the standard Kelley error indicator is used to estimate the error.
+The initial mesh contains three QUAD9 elements which represent the
+standard quadrants I, II, and III of the domain [-1,1]x[-1,1],
+i.e.
+Element 0: [-1,0]x[ 0,1]
+Element 1: [ 0,1]x[ 0,1]
+Element 2: [-1,0]x[-1,0]
+The mesh is provided in the standard libMesh ASCII format file
+named "lshaped.xda".  In addition, an input file named "ex14.in"
+is provided which allows the user to set several parameters for
+the solution so that the problem can be re-run without a
+re-compile.  The solution technique employed is to have a
+refinement loop with a linear solve inside followed by a
+refinement of the grid and projection of the solution to the new grid
+In the final loop iteration, there is no additional
+refinement after the solve.  In the input file "ex14.in", the variable
+"max_r_steps" controls the number of refinement steps,
+"max_r_level" controls the maximum element refinement level, and
+"refine_percentage" / "coarsen_percentage" determine the number of
+elements which will be refined / coarsened at each step.
+
 
 </div>
 

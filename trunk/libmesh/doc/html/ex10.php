@@ -86,7 +86,7 @@ object to figure out which elements to refine.
 <div class ="fragment">
 <pre>
         #include "error_vector.h"
-        #include "error_estimator.h"
+        #include "kelley_error_estimator.h"
         
 </pre>
 </div>
@@ -443,11 +443,12 @@ The \p ErrorEstimator class interrogates a finite element
 solution and assigns to each element a positive error value.
 This value is used for deciding which elements to refine
 and which to coarsen.
+ErrorEstimator* error_estimator = new KelleyErrorEstimator;
 </div>
 
 <div class ="fragment">
 <pre>
-                        ErrorEstimator error_estimator;
+                        KelleyErrorEstimator error_estimator;
         		
 </pre>
 </div>
@@ -460,9 +461,9 @@ application.
 
 <div class ="fragment">
 <pre>
-                        error_estimator.flux_jump (equation_systems,
-        					   "Convection-Diffusion",
-        					   error);
+                        error_estimator.estimate_error (equation_systems,
+        						"Convection-Diffusion",
+        						error);
         		
 </pre>
 </div>
@@ -1274,7 +1275,7 @@ Finished computing the sytem matrix and right-hand side.
   #include <FONT COLOR="#BC8F8F"><B>&quot;vector_value.h&quot;</FONT></B>
   
   #include <FONT COLOR="#BC8F8F"><B>&quot;error_vector.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;error_estimator.h&quot;</FONT></B>
+  #include <FONT COLOR="#BC8F8F"><B>&quot;kelley_error_estimator.h&quot;</FONT></B>
   
   <FONT COLOR="#228B22"><B>void</FONT></B> assemble_cd (EquationSystems&amp; es,
   		  <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp; system_name);
@@ -1362,11 +1363,11 @@ Finished computing the sytem matrix and right-hand side.
   
   		ErrorVector error;
   
-  		ErrorEstimator error_estimator;
+  		KelleyErrorEstimator error_estimator;
   		
-  		error_estimator.flux_jump (equation_systems,
-  					   <FONT COLOR="#BC8F8F"><B>&quot;Convection-Diffusion&quot;</FONT></B>,
-  					   error);
+  		error_estimator.estimate_error (equation_systems,
+  						<FONT COLOR="#BC8F8F"><B>&quot;Convection-Diffusion&quot;</FONT></B>,
+  						error);
   		
   		mesh_refinement.flag_elements_by_error_fraction (error,
   								 0.80,
@@ -1566,6 +1567,10 @@ Finished computing the sytem matrix and right-hand side.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+Compiling C++ (in debug mode) ex10.C...
+Linking ex10...
+/home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
+: the use of `mktemp' is dangerous, better use `mkstemp'
 ***************************************************************
 * Running Example  ./ex10
 ***************************************************************
@@ -1711,14 +1716,14 @@ Finished computing the sytem matrix and right-hand side.
 | Creations:    1
 | Destructions: 1
 | 4Elem reference count information:
-| Creations:    561467
-| Destructions: 561467
+| Creations:    562259
+| Destructions: 562259
 | 4Node reference count information:
-| Creations:    8397
-| Destructions: 8397
+| Creations:    8391
+| Destructions: 8391
 | 5QBase reference count information:
-| Creations:    2538
-| Destructions: 2538
+| Creations:    2519
+| Destructions: 2519
 | 6DofMap reference count information:
 | Creations:    1
 | Destructions: 1

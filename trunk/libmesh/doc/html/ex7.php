@@ -35,8 +35,8 @@ complex numbers enabled.
 <div class ="fragment">
 <pre>
         #include &lt;iostream&gt;
-        #include <algorithm>
-        #include <stdio.h>
+        #include &lt;algorithm&gt;
+        #include &lt;stdio.h&gt;
         
 </pre>
 </div>
@@ -49,6 +49,7 @@ Basic include files needed for overall functionality.
         #include "libmesh.h"
         #include "libmesh_logging.h"
         #include "mesh.h"
+        #include "gmv_io.h"
         #include "equation_systems.h"
         
 </pre>
@@ -130,7 +131,7 @@ form an overall system matrix ready for solution.
 
 <div class ="fragment">
 <pre>
-        void assemble_helmholtz(EquationSystems&amp; es,
+        void assemble_helmholtz(EquationSystems& es,
         			const std::string& system_name);
         
 </pre>
@@ -143,7 +144,7 @@ to the overall matrix, which then renders ready for solution.
 
 <div class ="fragment">
 <pre>
-        void add_M_C_K_helmholtz(EquationSystems&amp; es,
+        void add_M_C_K_helmholtz(EquationSystems& es,
         			 const std::string& system_name);
         
 </pre>
@@ -182,8 +183,8 @@ This example is designed for complex numbers.
 <pre>
         #ifndef USE_COMPLEX_NUMBERS
         
-          std::cerr << "ERROR: This example is intended for " << std::endl
-        	    << " use with complex numbers." << std::endl;
+          std::cerr &lt;&lt; "ERROR: This example is intended for " &lt;&lt; std::endl
+        	    &lt;&lt; " use with complex numbers." &lt;&lt; std::endl;
           here();
         
           return 0;
@@ -209,8 +210,8 @@ Check for proper usage.
 <pre>
             if (argc &lt; 3)
               {
-        	std::cerr << "Usage: " << argv[0] << " -f [frequency]"
-        		  << std::endl;
+        	std::cerr &lt;&lt; "Usage: " &lt;&lt; argv[0] &lt;&lt; " -f [frequency]"
+        		  &lt;&lt; std::endl;
         	
         	error();
               }
@@ -225,12 +226,12 @@ Tell the user what we are doing.
 <pre>
             else 
               {
-        	std::cout << "Running " << argv[0];
+        	std::cout &lt;&lt; "Running " &lt;&lt; argv[0];
         	
-        	for (int i=1; i<argc; i++)
-        	  std::cout << " " << argv[i];
+        	for (int i=1; i&lt;argc; i++)
+        	  std::cout &lt;&lt; " " &lt;&lt; argv[i];
         	
-        	std::cout << std::endl << std::endl;
+        	std::cout &lt;&lt; std::endl &lt;&lt; std::endl;
               }
             
 </pre>
@@ -265,7 +266,7 @@ mesh discretization depends on frequency (badly guessed estimate...?)
 <div class ="fragment">
 <pre>
             const unsigned int n_el_per_dim =
-              static_cast<unsigned int>(frequency_in*40.);
+              static_cast&lt;unsigned int&gt;(frequency_in*40.);
             
 </pre>
 </div>
@@ -276,10 +277,10 @@ Tell the user the number of elements
 <div class ="fragment">
 <pre>
             std::cout &lt;&lt; " Using " &lt;&lt; n_el_per_dim &lt;&lt; " x " 
-        	      << n_el_per_dim << " = " 
-        	      << n_el_per_dim*n_el_per_dim
-        	      << " QUAD9 elements"
-        	      << std::endl << std::endl;
+        	      &lt;&lt; n_el_per_dim &lt;&lt; " = " 
+        	      &lt;&lt; n_el_per_dim*n_el_per_dim
+        	      &lt;&lt; " QUAD9 elements"
+        	      &lt;&lt; std::endl &lt;&lt; std::endl;
             
 </pre>
 </div>
@@ -330,23 +331,14 @@ a frequency system, as opposed to previous examples.
 </pre>
 </div>
 <div class = "comment">
-Create a system named "Helmholtz"
+Create a FrequencySystem named "Helmholtz" & store a
+reference to it.
 </div>
 
 <div class ="fragment">
 <pre>
-            equation_systems.add_system&lt;FrequencySystem&gt; ("Helmholtz");
-            
-</pre>
-</div>
-<div class = "comment">
-Use a handy reference to this system
-</div>
-
-<div class ="fragment">
-<pre>
-            FrequencySystem &amp; f_system =
-              equation_systems.get_system<FrequencySystem> ("Helmholtz");
+            FrequencySystem & f_system =      
+              equation_systems.add_system&lt;FrequencySystem&gt; ("Helmholtz");
             
 </pre>
 </div>
@@ -441,7 +433,7 @@ Prints information about the system to the screen.
 <pre>
             equation_systems.print_info ();
         
-            for (unsigned int n=0; n < n_frequencies; n++)
+            for (unsigned int n=0; n &lt; n_frequencies; n++)
               {
 </pre>
 </div>
@@ -475,7 +467,8 @@ respectively.
 <pre>
                 char buf[14];
         	sprintf (buf, "out%04d.gmv", n);
-        	mesh.write_gmv (buf, equation_systems);
+        	GMVIO(mesh).write_equation_systems (buf,
+        					    equation_systems);
               }
             
 </pre>
@@ -515,7 +508,7 @@ called to form the stiffness matrix and right-hand side.
 
 <div class ="fragment">
 <pre>
-        void assemble_helmholtz(EquationSystems&amp; es,
+        void assemble_helmholtz(EquationSystems& es,
         			const std::string& system_name)
         {
         #ifdef USE_COMPLEX_NUMBERS
@@ -539,7 +532,7 @@ Get a constant reference to the mesh object.
 
 <div class ="fragment">
 <pre>
-          const Mesh&amp; mesh = es.get_mesh();
+          const Mesh& mesh = es.get_mesh();
           
 </pre>
 </div>
@@ -559,8 +552,8 @@ Get a reference to our system, as before
 
 <div class ="fragment">
 <pre>
-          FrequencySystem &amp; f_system =
-            es.get_system<FrequencySystem> (system_name);
+          FrequencySystem & f_system =
+            es.get_system&lt;FrequencySystem&gt; (system_name);
           
 </pre>
 </div>
@@ -572,7 +565,7 @@ to degree of freedom numbers.
 
 <div class ="fragment">
 <pre>
-          const DofMap&amp; dof_map = f_system.get_dof_map();
+          const DofMap& dof_map = f_system.get_dof_map();
           
 </pre>
 </div>
@@ -608,10 +601,10 @@ references to them
 
 <div class ="fragment">
 <pre>
-          SparseMatrix&lt;Number&gt;&amp;   stiffness      = f_system.get_matrix("stiffness");
-          SparseMatrix<Number>&   damping        = f_system.get_matrix("damping");
-          SparseMatrix<Number>&   mass           = f_system.get_matrix("mass");
-          NumericVector<Number>&  freq_indep_rhs = f_system.get_vector("rhs");
+          SparseMatrix&lt;Number&gt;&   stiffness      = f_system.get_matrix("stiffness");
+          SparseMatrix&lt;Number&gt;&   damping        = f_system.get_matrix("damping");
+          SparseMatrix&lt;Number&gt;&   mass           = f_system.get_matrix("mass");
+          NumericVector&lt;Number&gt;&  freq_indep_rhs = f_system.get_vector("rhs");
           
 </pre>
 </div>
@@ -627,7 +620,7 @@ encounter identical sparsity structures.
 
 <div class ="fragment">
 <pre>
-          SparseMatrix&lt;Number&gt;&amp;  matrix           = *f_system.matrix;
+          SparseMatrix&lt;Number&gt;&  matrix           = *f_system.matrix;
           
 </pre>
 </div>
@@ -663,7 +656,7 @@ Tell the finite element object to use our quadrature rule.
 
 <div class ="fragment">
 <pre>
-          fe-&gt;attach_quadrature_rule (&amp;qrule);
+          fe-&gt;attach_quadrature_rule (&qrule);
           
 </pre>
 </div>
@@ -673,7 +666,7 @@ The element Jacobian// quadrature weight at each integration point.
 
 <div class ="fragment">
 <pre>
-          const std::vector&lt;Real&gt;&amp; JxW = fe-&gt;get_JxW();
+          const std::vector&lt;Real&gt;& JxW = fe-&gt;get_JxW();
         
 </pre>
 </div>
@@ -683,7 +676,7 @@ The element shape functions evaluated at the quadrature points.
 
 <div class ="fragment">
 <pre>
-          const std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi = fe-&gt;get_phi();
+          const std::vector&lt;std::vector&lt;Real&gt; &gt;& phi = fe-&gt;get_phi();
           
 </pre>
 </div>
@@ -694,7 +687,7 @@ points.
 
 <div class ="fragment">
 <pre>
-          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = fe-&gt;get_dphi();
+          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;& dphi = fe-&gt;get_dphi();
           
 </pre>
 </div>
@@ -714,7 +707,7 @@ matrix.  This will definitely save memory.
 <div class ="fragment">
 <pre>
           DenseMatrix&lt;Number&gt; Ke, Ce, Me, zero_matrix;
-          DenseVector<Number> Fe;
+          DenseVector&lt;Number&gt; Fe;
           
 </pre>
 </div>
@@ -829,9 +822,9 @@ the numeric integration.
 
 <div class ="fragment">
 <pre>
-              START_LOG("stiffness &amp; mass","assemble_helmholtz");
+              START_LOG("stiffness & mass","assemble_helmholtz");
         
-              for (unsigned int qp=0; qp<qrule.n_points(); qp++)
+              for (unsigned int qp=0; qp&lt;qrule.n_points(); qp++)
         	{
 </pre>
 </div>
@@ -846,7 +839,7 @@ Real*(Point*Point) = Real, and not something else...
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;phi.size(); i++)
-        	    for (unsigned int j=0; j<phi.size(); j++)
+        	    for (unsigned int j=0; j&lt;phi.size(); j++)
         	      {
         		Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
         		Me(i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp]);
@@ -872,7 +865,7 @@ side MUST live on a boundary of the domain.
 <div class ="fragment">
 <pre>
               for (unsigned int side=0; side&lt;elem-&gt;n_sides(); side++)
-        	if (elem->neighbor(side) == NULL)
+        	if (elem-&gt;neighbor(side) == NULL)
         	  {
         	    START_LOG("damping & rhs","assemble_helmholtz");
         	      
@@ -908,7 +901,7 @@ quadrature rule.
 
 <div class ="fragment">
 <pre>
-                    fe_face-&gt;attach_quadrature_rule (&amp;qface);
+                    fe_face-&gt;attach_quadrature_rule (&qface);
         	      
 </pre>
 </div>
@@ -919,8 +912,8 @@ points.
 
 <div class ="fragment">
 <pre>
-                    const std::vector&lt;std::vector&lt;Real&gt; &gt;&amp;  phi_face =
-        	      fe_face->get_phi();
+                    const std::vector&lt;std::vector&lt;Real&gt; &gt;&  phi_face =
+        	      fe_face-&gt;get_phi();
         	      
 </pre>
 </div>
@@ -931,7 +924,7 @@ points on the face.
 
 <div class ="fragment">
 <pre>
-                    const std::vector&lt;Real&gt;&amp; JxW_face = fe_face-&gt;get_JxW();
+                    const std::vector&lt;Real&gt;& JxW_face = fe_face-&gt;get_JxW();
         	      
 </pre>
 </div>
@@ -998,7 +991,7 @@ admittance boundary conditions.
 <div class ="fragment">
 <pre>
                         for (unsigned int i=0; i&lt;phi_face.size(); i++)
-        		  for (unsigned int j=0; j<phi_face.size(); j++)
+        		  for (unsigned int j=0; j&lt;phi_face.size(); j++)
         		    Ce(i,j) += rho*an_value*JxW_face[qp]*phi_face[i][qp]*phi_face[j][qp];
         	      }
         
@@ -1054,7 +1047,7 @@ damping matrices into a single system matrix.
 
 <div class ="fragment">
 <pre>
-        void add_M_C_K_helmholtz(EquationSystems&amp; es,
+        void add_M_C_K_helmholtz(EquationSystems& es,
         			 const std::string& system_name)
         {
         #ifdef USE_COMPLEX_NUMBERS
@@ -1080,8 +1073,8 @@ Get a reference to our system, as before
 
 <div class ="fragment">
 <pre>
-          FrequencySystem &amp; f_system =
-            es.get_system<FrequencySystem> (system_name);
+          FrequencySystem & f_system =
+            es.get_system&lt;FrequencySystem&gt; (system_name);
           
 </pre>
 </div>
@@ -1116,8 +1109,8 @@ frequency-dependent system is to be collected
 
 <div class ="fragment">
 <pre>
-          SparseMatrix&lt;Number&gt;&amp;  matrix          = *f_system.matrix;
-          NumericVector<Number>& rhs             = *f_system.rhs;
+          SparseMatrix&lt;Number&gt;&  matrix          = *f_system.matrix;
+          NumericVector&lt;Number&gt;& rhs             = *f_system.rhs;
           
 </pre>
 </div>
@@ -1130,10 +1123,10 @@ before they can extract values for computation.
 
 <div class ="fragment">
 <pre>
-          SparseMatrix&lt;Number&gt;&amp;   stiffness      = f_system.get_matrix("stiffness");
-          SparseMatrix<Number>&   damping        = f_system.get_matrix("damping");
-          SparseMatrix<Number>&   mass           = f_system.get_matrix("mass");
-          NumericVector<Number>&  freq_indep_rhs = f_system.get_vector("rhs");
+          SparseMatrix&lt;Number&gt;&   stiffness      = f_system.get_matrix("stiffness");
+          SparseMatrix&lt;Number&gt;&   damping        = f_system.get_matrix("damping");
+          SparseMatrix&lt;Number&gt;&   mass           = f_system.get_matrix("mass");
+          NumericVector&lt;Number&gt;&  freq_indep_rhs = f_system.get_vector("rhs");
           
 </pre>
 </div>
@@ -1146,7 +1139,7 @@ form the scaling values for the coming matrix and vector axpy's
           const Number scale_stiffness (  1., 0.   );
           const Number scale_damping   (  0., omega);
           const Number scale_mass      (-k*k, 0.   );
-          const Number scale_rhs (0., -(rho*omega));
+          const Number scale_rhs       (  0., -(rho*omega));
           
 </pre>
 </div>
@@ -1226,6 +1219,7 @@ The "matrix" and "rhs" are now ready for solution
   #include <FONT COLOR="#BC8F8F"><B>&quot;libmesh.h&quot;</FONT></B>
   #include <FONT COLOR="#BC8F8F"><B>&quot;libmesh_logging.h&quot;</FONT></B>
   #include <FONT COLOR="#BC8F8F"><B>&quot;mesh.h&quot;</FONT></B>
+  #include <FONT COLOR="#BC8F8F"><B>&quot;gmv_io.h&quot;</FONT></B>
   #include <FONT COLOR="#BC8F8F"><B>&quot;equation_systems.h&quot;</FONT></B>
   
   #include <FONT COLOR="#BC8F8F"><B>&quot;frequency_system.h&quot;</FONT></B>
@@ -1306,10 +1300,8 @@ The "matrix" and "rhs" are now ready for solution
       
       EquationSystems equation_systems (mesh);
       
-      equation_systems.add_system&lt;FrequencySystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Helmholtz&quot;</FONT></B>);
-      
-      FrequencySystem &amp; f_system =
-        equation_systems.get_system&lt;FrequencySystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Helmholtz&quot;</FONT></B>);
+      FrequencySystem &amp; f_system =      
+        equation_systems.add_system&lt;FrequencySystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Helmholtz&quot;</FONT></B>);
       
       f_system.add_variable(<FONT COLOR="#BC8F8F"><B>&quot;p&quot;</FONT></B>, SECOND);
       
@@ -1338,7 +1330,8 @@ The "matrix" and "rhs" are now ready for solution
   	
   	<FONT COLOR="#228B22"><B>char</FONT></B> buf[14];
   	sprintf (buf, <FONT COLOR="#BC8F8F"><B>&quot;out%04d.gmv&quot;</FONT></B>, n);
-  	mesh.write_gmv (buf, equation_systems);
+  	GMVIO(mesh).write_equation_systems (buf,
+  					    equation_systems);
         }
       
       equation_systems.write (<FONT COLOR="#BC8F8F"><B>&quot;eqn_sys.dat&quot;</FONT></B>, libMeshEnums::WRITE);
@@ -1511,7 +1504,7 @@ The "matrix" and "rhs" are now ready for solution
     <FONT COLOR="#228B22"><B>const</FONT></B> Number scale_stiffness (  1., 0.   );
     <FONT COLOR="#228B22"><B>const</FONT></B> Number scale_damping   (  0., omega);
     <FONT COLOR="#228B22"><B>const</FONT></B> Number scale_mass      (-k*k, 0.   );
-    <FONT COLOR="#228B22"><B>const</FONT></B> Number scale_rhs (0., -(rho*omega));
+    <FONT COLOR="#228B22"><B>const</FONT></B> Number scale_rhs       (  0., -(rho*omega));
     
     matrix.zero ();
     rhs.zero    ();
@@ -1538,145 +1531,11 @@ The "matrix" and "rhs" are now ready for solution
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+Linking ex7...
+/home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
+: the use of `mktemp' is dangerous, better use `mkstemp'
 ***************************************************************
-* Running Example  ./ex7
-***************************************************************
- 
-Running ./ex7 -f .7
-
- Using 27 x 27 = 729 QUAD9 elements
-
- Mesh Information:
-  mesh_dimension()=2
-  spatial_dimension()=3
-  n_nodes()=3025
-  n_elem()=729
-   n_local_elem()=729
-   n_active_elem()=729
-  n_subdomains()=1
-  n_processors()=1
-  processor_id()=0
-
- EquationSystems
-  n_systems()=1
-   System "Helmholtz"
-    Type "Frequency"
-    Variables="p" 
-    Finite Element Types="0" 
-    Approximation Orders="2" 
-    n_dofs()=3025
-    n_local_dofs()=3025
-    n_constrained_dofs()=0
-    n_additional_vectors()=4
-    n_additional_matrices()=3
-  n_parameters()=9
-   Parameters:
-    "current frequency"=0.233333
-    "frequency 0000"=0.233333
-    "frequency 0001"=0.933333
-    "frequency 0002"=1.63333
-    "linear solver maximum iterations"=5000
-    "linear solver tolerance"=1e-12
-    "n_frequencies"=3
-    "rho"=1
-    "wave speed"=1
-
-
- ---------------------------------------------------------------------------- 
-| Reference count information                                                |
- ---------------------------------------------------------------------------- 
-| 10SystemBase reference count information:
-| Creations:    1
-| Destructions: 1
-| 12SparseMatrixISt7complexIdEE reference count information:
-| Creations:    4
-| Destructions: 4
-| 13NumericVectorISt7complexIdEE reference count information:
-| Creations:    7
-| Destructions: 7
-| 21LinearSolverInterfaceISt7complexIdEE reference count information:
-| Creations:    1
-| Destructions: 1
-| 4Elem reference count information:
-| Creations:    3753
-| Destructions: 3753
-| 4Node reference count information:
-| Creations:    3025
-| Destructions: 3025
-| 5QBase reference count information:
-| Creations:    110
-| Destructions: 110
-| 6DofMap reference count information:
-| Creations:    1
-| Destructions: 1
-| 6FEBase reference count information:
-| Creations:    109
-| Destructions: 109
- ---------------------------------------------------------------------------- 
-
- ----------------------------------------------------------------------------
-| Time:           Tue Nov 11 07:50:37 2003
-| OS:             Linux
-| HostName:       hactar
-| OS Release      2.4.20-19.9smp
-| OS Version:     #1 SMP Tue Jul 15 17:04:18 EDT 2003
-| Machine:        i686
-| Username:       benkirk
- ----------------------------------------------------------------------------
- ----------------------------------------------------------------------------
-| libMesh Performance: Alive time=5.35949, Active time=5.19776
- ----------------------------------------------------------------------------
-| Event                         nCalls  Total       Avg         Percent of   |
-|                                       Time        Time        Active Time  |
-|----------------------------------------------------------------------------|
-|                                                                            |
-|                                                                            |
-| DofMap                                                                     |
-|   compute_sparsity()          1       0.0326      0.032593    0.63         |
-|   create_dof_constraints()    1       0.0003      0.000283    0.01         |
-|   distribute_dofs()           1       0.0019      0.001889    0.04         |
-|   dof_indices()               3645    0.0270      0.000007    0.52         |
-|   reinit()                    1       0.0096      0.009618    0.19         |
-|                                                                            |
-| FE                                                                         |
-|   compute_face_map()          108     0.0013      0.000012    0.03         |
-|   compute_map()               837     0.0085      0.000010    0.16         |
-|   compute_shape_functions()   837     0.0075      0.000009    0.14         |
-|   init_face_shape_functions() 108     0.0013      0.000012    0.03         |
-|   init_shape_functions()      109     0.0085      0.000078    0.16         |
-|   inverse_map()               216     0.0036      0.000017    0.07         |
-|                                                                            |
-| FrequencySystem                                                            |
-|   assemble()                  1       0.1916      0.191594    3.69         |
-|   init()                      1       0.0138      0.013830    0.27         |
-|   linear_equation_solve()     3       4.5010      1.500333    86.60        |
-|   user_pre_solve()            3       0.0642      0.021411    1.24         |
-|                                                                            |
-| Mesh                                                                       |
-|   build_cube()                1       0.0078      0.007829    0.15         |
-|                                                                            |
-| MeshBase                                                                   |
-|   find_neighbors()            1       0.0112      0.011202    0.22         |
-|   renumber_nodes_and_elem()   1       0.0006      0.000586    0.01         |
-|                                                                            |
-| SystemBase                                                                 |
-|   assemble()                  1       0.1444      0.144351    2.78         |
-|                                                                            |
-| add_M_C_K_helmholtz                                                        |
-|   global matrix & vector additions3       0.0606      0.020200    1.17         |
-|   init phase                  3       0.0035      0.001180    0.07         |
-|                                                                            |
-| assemble_helmholtz                                                         |
-|   damping & rhs               108     0.0244      0.000226    0.47         |
-|   elem init                   729     0.0391      0.000054    0.75         |
-|   stiffness & mass            729     0.0333      0.000046    0.64         |
- ----------------------------------------------------------------------------
-| Totals:                       7448    5.1978                  100.00       |
- ----------------------------------------------------------------------------
-
- 
-***************************************************************
-* Done Running Example  ./ex7
+*** Skipping Example  ./ex7 , only good with --enable-complex
 ***************************************************************
 </pre>
 </div>

@@ -1715,6 +1715,9 @@ if desired.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+Linking ex8...
+/home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
+: the use of `mktemp' is dangerous, better use `mkstemp'
 ***************************************************************
 * Running Example  ./ex8
 ***************************************************************
@@ -1777,8 +1780,8 @@ Mesh file is: pipe-mesh.unv
 | Creations:    1
 | Destructions: 1
 | 4Elem reference count information:
-| Creations:    24951
-| Destructions: 24951
+| Creations:    24983
+| Destructions: 24983
 | 4Node reference count information:
 | Creations:    3977
 | Destructions: 3977
