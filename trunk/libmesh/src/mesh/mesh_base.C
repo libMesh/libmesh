@@ -1,6 +1,6 @@
 
 
-// $Id: mesh_base.C,v 1.29 2003-05-14 01:28:39 jwpeterson Exp $
+// $Id: mesh_base.C,v 1.30 2003-05-14 09:03:05 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -545,7 +545,9 @@ void MeshBase::build_inf_elem(const Point& origin,
 			      const bool x_sym, 
 			      const bool y_sym, 
 			      const bool z_sym,
-			      const bool be_verbose)
+			      const bool be_verbose,
+			      std::set< std::pair<unsigned int,
+			                          unsigned int> >* inner_faces)
 {
 
   if (be_verbose)
@@ -564,6 +566,7 @@ void MeshBase::build_inf_elem(const Point& origin,
 
   START_LOG("build_inf_elem()", "MeshBase");
 
+  // pairs: (first: element number, second: side number)
   std::set< std::pair<unsigned int,unsigned int> > faces,ofaces;
   std::set< std::pair<unsigned int,unsigned int> > :: iterator face_it;
 	
@@ -728,7 +731,19 @@ void MeshBase::build_inf_elem(const Point& origin,
 	      << std::endl;
 #endif	
 	
-  faces.clear();		//free memory
+  /*
+   * When the user provided a non-null pointer to
+   * inner_faces, that implies he wants to have
+   * this std::set.  For now, simply copy the data.
+   */
+  if (inner_faces != NULL)
+      *inner_faces = faces;
+
+  /*
+   * free memory, clear our local variable, no need
+   * for it any more.
+   */
+  faces.clear();
 
 
   // outer_nodes maps onodes to their duplicates

@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.26 2003-05-14 01:28:39 jwpeterson Exp $
+// $Id: mesh_base.h,v 1.27 2003-05-14 09:02:46 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -63,7 +63,7 @@ template <typename T> class PetscMatrix;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.26 $
+ * \version $Revision: 1.27 $
  */
 
 
@@ -239,30 +239,36 @@ public:
    * origin as a \p const \p Point to make it more obvious that
    * the origin should not change after the infinite elements 
    * have been built.  When symmetry planes are present, use 
-   * the version with optional symmetry switches.
-   *   
+   * the version with optional symmetry switches.  
    * The flag \p be_verbose enables some diagnostic output.
    */
   const Point build_inf_elem (const bool be_verbose = false);
-  
+
   /**
    * Build infinite elements atop a volume-based mesh.
-   * Find all faces on the outer boundary and build infinite element
-   * on them, based on the origin.
+   * Find all faces on the outer boundary and build infinite elements
+   * on them, based on the \p origin.  During the search for faces
+   * on which infinite elements are built, @e interior faces that 
+   * are not on symmetry planes are found, too.  When an (optional)
+   * pointer to \p inner_faces is provided, a set of pairs (first:
+   * element number, second: side number) of inner faces is returned
+   * that may be used for identifying interior boundaries.
    *
    * Faces which lie in at least one symmetry plane are skipped.
    * The source of the infinite elements must be given to \p origin,
    * the three optional booleans \p x_sym, \p y_sym,
-   * \p z_sym indicate symmetry planes perpendicular to the \p x,
-   * \p y and \p z direction, respectively.
-   *   
+   * \p z_sym indicate symmetry planes (through the origin, obviously)
+   * perpendicular to the \p x, \p y and \p z direction, 
+   * respectively.  
    * The flag \p be_verbose enables some diagnostic output.
    */
   void build_inf_elem (const Point& origin,
 		       const bool x_sym = false,
 		       const bool y_sym = false,
 		       const bool z_sym = false,
-		       const bool be_verbose = false);
+		       const bool be_verbose = false,
+		       std::set<std::pair<unsigned int,
+		                          unsigned int> >* inner_faces = NULL);
 		      
 #endif
 		      
