@@ -1,4 +1,4 @@
-// $Id: fe_base.C,v 1.21 2004-01-09 19:25:35 spetersen Exp $
+// $Id: fe_base.C,v 1.22 2004-02-10 22:50:22 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -469,9 +469,7 @@ void FEBase::compute_shape_functions ()
   // at the Quadrature points.  Note that the actual values
   // have already been computed via init_shape_functions
 
-  /**
-   * Start logging the shape function computation
-   */
+  // Start logging the shape function computation
   START_LOG("compute_shape_functions()", "FE");
 
   // Compute the value of the derivative shape function i at quadrature point p
@@ -509,9 +507,14 @@ void FEBase::compute_shape_functions ()
 	      dphi[i][p](1) =
 		dphidy[i][p] = (dphidxi[i][p]*dxidy_map[p] +
 				dphideta[i][p]*detady_map[p]);
+	      
+	      // dphi/dz    = (dphi/dxi)*(dxi/dz) + (dphi/deta)*(deta/dz)
+#if DIM == 3  
+	      dphi[i][p](2) = // can only assign to the Z component if DIM==3
+#endif
+		dphidz[i][p] = (dphidxi[i][p]*dxidz_map[p] +
+				dphideta[i][p]*detadz_map[p]);
 
-	      // dphi[i][p](2) = Can't assign to this if DIM != 3
-		dphidz[i][p] = 0.;
 	    }
 
 	// All done
@@ -552,9 +555,7 @@ void FEBase::compute_shape_functions ()
       }
     }
   
-  /**
-   * Stop logging the shape function computation
-   */
+  // Stop logging the shape function computation
   STOP_LOG("compute_shape_functions()", "FE");
 }
 

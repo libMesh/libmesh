@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.23 2004-01-03 15:37:42 benkirk Exp $
+// $Id: fe_map.C,v 1.24 2004-02-10 22:49:48 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -39,9 +39,7 @@ void FEBase::compute_map(const std::vector<Real>& qw,
 {
   assert (elem  != NULL);
   
-  /**
-   * Start logging the map computation.
-   */
+   // Start logging the map computation.
   START_LOG("compute_map()", "FE");
   
   const unsigned int        n_qp = qw.size();
@@ -148,8 +146,10 @@ void FEBase::compute_map(const std::vector<Real>& qw,
 	  dxyzdeta_map.resize(n_qp);
 	  dxidx_map.resize(n_qp);
 	  dxidy_map.resize(n_qp);
+	  dxidz_map.resize(n_qp);
 	  detadx_map.resize(n_qp);
 	  detady_map.resize(n_qp);
+	  detadz_map.resize(n_qp);
 	  
 	  JxW.resize(n_qp);
 	}
@@ -195,19 +195,22 @@ void FEBase::compute_map(const std::vector<Real>& qw,
 	for (unsigned int p=0; p<n_qp; p++)
 	  {
 	    const Real
-	      dx_dxi  = dxdxi_map(p),  dy_dxi  = dydxi_map(p),
-	      dx_deta = dxdeta_map(p), dy_deta = dydeta_map(p);
+	      dx_dxi = dxdxi_map(p), dx_deta = dxdeta_map(p),
+	      dy_dxi = dydxi_map(p), dy_deta = dydeta_map(p),
+	      dz_dxi = dzdxi_map(p), dz_deta = dzdeta_map(p);
 	    
-	    // Symbolically, the matrix determinant is
-	    //
-	    //         | dx/dxi   dy/dxi  |
-	    // jac =   | dx/deta  dy/deta |
-	    //         
-	    // jac = dx/dxi*dy/deta - dx/deta*dy/dxi 
-	    
+
+#if DIM == 2
 	    // Compute the Jacobian.  This assumes the 2D face
 	    // lives in 2D space
-	    const Real jac = (dx_dxi*dy_deta - dx_deta*dy_dxi);	    
+	    //
+	    // Symbolically, the matrix determinant is
+	    //
+	    //         | dx/dxi  dx/deta |
+	    // jac =   | dy/dxi  dy/deta |
+	    //         
+	    // jac = dx/dxi*dy/deta - dx/deta*dy/dxi 
+	    const Real jac = (dx_dxi*dy_deta - dx_deta*dy_dxi);
 	    
 	    if (jac <= 0.)
 	      {
@@ -228,6 +231,73 @@ void FEBase::compute_map(const std::vector<Real>& qw,
 	    dxidy_map[p]  = -dx_deta*inv_jac; //dxi/dy  = -(1/J)*dx/deta
 	    detadx_map[p] = -dy_dxi* inv_jac; //deta/dx = -(1/J)*dy/dxi
 	    detady_map[p] =  dx_dxi* inv_jac; //deta/dy =  (1/J)*dx/dxi
+
+	    dxidz_map[p] = detadz_map[p] = 0.;
+#else
+	    // Compute the Jacobian.  This assumes a 2D face in
+	    // 3D space.
+	    //
+	    // The transformation matrix T from local to global
+	    // coordinates is
+	    //
+	    //         | dx/dxi  dx/deta |
+	    //     T = | dy/dxi  dy/deta |
+	    //         | dz/dxi  dz/deta |
+	    // note det(T' T) = det(T')det(T) = det(T)det(T)
+	    // so det(T) = sqrt(det(T' T))
+	    //
+	    //----------------------------------------------
+	    // Notes:
+	    //
+	    //       dX = R dXi -> R'dX = R'R dXi
+	    // (R^-1)dX =   dXi    [(R'R)^-1 R']dX = dXi 
+	    //
+	    // so R^-1 = (R'R)^-1 R'
+	    //
+	    // and R^-1 R = (R'R)^-1 R'R = I.
+	    //
+	    const Real g11 = (dx_dxi*dx_dxi +
+			      dy_dxi*dy_dxi +
+			      dz_dxi*dz_dxi);
+	    
+	    const Real g12 = (dx_dxi*dx_deta +
+			      dy_dxi*dy_deta +
+			      dz_dxi*dz_deta);
+	    
+	    const Real g21 = g12;
+	    
+	    const Real g22 = (dx_deta*dx_deta +
+			      dy_deta*dy_deta +
+			      dz_deta*dz_deta);
+
+	    const Real det = (g11*g22 - g12*g21);
+
+	    if (det <= 0.)
+	      {
+		std::cerr << "ERROR: negative Jacobian! "
+			  << std::endl;
+		error();
+	      }
+	      
+	    const Real inv_det = 1./det;
+	    const Real jac = sqrt(det);
+	    
+	    JxW[p] = jac*qw[p];
+
+	    const Real g11inv =  g22*inv_det;
+	    const Real g12inv = -g12*inv_det;
+	    const Real g21inv = -g21*inv_det;
+	    const Real g22inv =  g11*inv_det;
+
+	    dxidx_map[p]  = g11inv*dx_dxi + g12inv*dx_deta;
+	    dxidy_map[p]  = g11inv*dy_dxi + g12inv*dy_deta;
+	    dxidz_map[p]  = g11inv*dz_dxi + g12inv*dz_deta;
+	    
+	    detadx_map[p] = g21inv*dx_dxi + g22inv*dx_deta;
+	    detady_map[p] = g21inv*dy_dxi + g22inv*dy_deta;
+	    detadz_map[p] = g21inv*dz_dxi + g22inv*dz_deta;
+	    	    	    
+#endif
 	  }
        
 	// done computing the map
@@ -365,9 +435,7 @@ void FEBase::compute_map(const std::vector<Real>& qw,
       error();
     }
   
-  /**
-   * Stop logging the map computation.
-   */
+  // Stop logging the map computation.
   STOP_LOG("compute_map()", "FE");  
 }
 
@@ -490,99 +558,78 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
   assert (elem != NULL);
   assert (tolerance >= 0.);
 
-  /**
-   * Start logging the map inversion.
-   */
+  
+  // Start logging the map inversion.  
   START_LOG("inverse_map()", "FE");
   
-  /**
-   * How much did the point on the reference
-   * element change by in this Newton step?
-   */
+  // How much did the point on the reference
+  // element change by in this Newton step?
   Real error = 0.;
   
-  /**
-   * The point on the reference element.  This is
-   * the "initial guess" for Newton's method.  The
-   * centroid seems like a good idea, but computing
-   * it is a little more intensive than, say taking
-   * the zero point.  
-   *
-   * Convergence should be insensitive of this choice
-   * for "good" elements.
-   */
+  //  The point on the reference element.  This is
+  //  the "initial guess" for Newton's method.  The
+  //  centroid seems like a good idea, but computing
+  //  it is a little more intensive than, say taking
+  //  the zero point.  
+  // 
+  //  Convergence should be insensitive of this choice
+  //  for "good" elements.
   Point p; // the zero point.  No computation required
 
-  /**
-   * The number of iterations in the map inversion process.
-   */
+  //  The number of iterations in the map inversion process.
   unsigned int cnt = 0;
 
 
 
 
-  /**
-   * Newton iteration loop.
-   */
+  //  Newton iteration loop.
   do
     {
-      /**
-       * Where our current iterate \p p maps to.
-       */
+      //  Where our current iterate \p p maps to.
       const Point physical_guess = FE<Dim,T>::map (elem, p);
 
-      /**
-       * How far our current iterate is from the actual point.
-       */
+      //  How far our current iterate is from the actual point.
       const Point delta = physical_point - physical_guess;
 
-      /**
-       * Increment in current iterate \p p, will be computed.
-       */
+      //  Increment in current iterate \p p, will be computed.
       Point dp;
 
 
-      /**
-       * The form of the map and how we invert it depends
-       * on the dimension that we are in.
-       */      
+      //  The form of the map and how we invert it depends
+      //  on the dimension that we are in.
       switch (Dim)
 	{
 	  
-	  /**	 
-	   *------------------------------------------------------------------
-	   * 1D map inversion
-	   *
-	   * Here we find the point on a 1D reference element that maps to
-	   * the point \p physical_point in the domain.  This is a bit tricky
-	   * since we do not want to assume that the point \p physical_point
-	   * is also in a 1D domain.  In particular, this method might get
-	   * called on the edge of a 3D element, in which case \p physical_point
-	   * actually lives in 3D.
-	   */
+	  // ------------------------------------------------------------------
+	  //  1D map inversion
+	  // 
+	  //  Here we find the point on a 1D reference element that maps to
+	  //  the point \p physical_point in the domain.  This is a bit tricky
+	  //  since we do not want to assume that the point \p physical_point
+	  //  is also in a 1D domain.  In particular, this method might get
+	  //  called on the edge of a 3D element, in which case
+	  //  \p physical_point actually lives in 3D.
 	case 1:
 	  {
-	    const Point dxi            = FE<Dim,T>::map_xi (elem, p);
+	    const Point dxi = FE<Dim,T>::map_xi (elem, p);
 	    
-	    /**
-	     * Newton's method in this case looks like
-	     *
-	     * {X} - {X_n} = [J]*dp
-	     *
-	     * Where {X}, {X_n} are 3x1 vectors, [J] is a 3x1 matrix
-	     * d(x,y,z)/dxi, and we seek dp, a scalar.  Since the above
-	     * system is either overdetermined or rank-deficient, we will
-	     * solve the normal equations for this system
-	     *
-	     * [J]^T ({X} - {X_n}) = [J]^T [J] {dp}
-	     *
-	     * which involves the trivial inversion of the scalar
-	     * G = [J]^T [J]
-	     */	    
+	    //  Newton's method in this case looks like
+	    // 
+	    //  {X} - {X_n} = [J]*dp
+	    // 
+	    //  Where {X}, {X_n} are 3x1 vectors, [J] is a 3x1 matrix
+	    //  d(x,y,z)/dxi, and we seek dp, a scalar.  Since the above
+	    //  system is either overdetermined or rank-deficient, we will
+	    //  solve the normal equations for this system
+	    // 
+	    //  [J]^T ({X} - {X_n}) = [J]^T [J] {dp}
+	    // 
+	    //  which involves the trivial inversion of the scalar
+	    //  G = [J]^T [J]
 	    const Real G = dxi*dxi;
 	    
 	    if (secure)
-	      assert (G > 0.);
+	      assert (G > 1.e-20);
 	    
 	    const Real Ginv = 1./G;
 	    
@@ -595,37 +642,33 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 
 
 
-	  /**	 
-	   *------------------------------------------------------------------
-	   * 2D map inversion
-	   *
-	   * Here we find the point on a 2D reference element that maps to
-	   * the point \p physical_point in the domain.  This is a bit tricky
-	   * since we do not want to assume that the point \p physical_point
-	   * is also in a 2D domain.  In particular, this method might get
-	   * called on the face of a 3D element, in which case \p physical_point
-	   * actually lives in 3D.
-	   */
+	  // ------------------------------------------------------------------
+	  //  2D map inversion
+	  // 
+	  //  Here we find the point on a 2D reference element that maps to
+	  //  the point \p physical_point in the domain.  This is a bit tricky
+	  //  since we do not want to assume that the point \p physical_point
+	  //  is also in a 2D domain.  In particular, this method might get
+	  //  called on the face of a 3D element, in which case
+	  //  \p physical_point actually lives in 3D.
 	case 2:
 	  {
-	    const Point dxi            = FE<Dim,T>::map_xi  (elem, p);
-	    const Point deta           = FE<Dim,T>::map_eta (elem, p);
+	    const Point dxi  = FE<Dim,T>::map_xi  (elem, p);
+	    const Point deta = FE<Dim,T>::map_eta (elem, p);
 	    
-	    /**
-	     * Newton's method in this case looks like
-	     *
-	     * {X} - {X_n} = [J]*{dp}
-	     *
-	     * Where {X}, {X_n} are 3x1 vectors, [J] is a 3x2 matrix
-	     * d(x,y,z)/d(xi,eta), and we seek {dp}, a 2x1 vector.  Since
-	     * the above system is either overdermined or rank-deficient,
-	     * we will solve the normal equations for this system
-	     *
-	     * [J]^T ({X} - {X_n}) = [J]^T [J] {dp}
-	     *
-	     * which involves the inversion of the 2x2 matrix
-	     * [G] = [J]^T [J]
-	     */
+	    //  Newton's method in this case looks like
+	    // 
+	    //  {X} - {X_n} = [J]*{dp}
+	    // 
+	    //  Where {X}, {X_n} are 3x1 vectors, [J] is a 3x2 matrix
+	    //  d(x,y,z)/d(xi,eta), and we seek {dp}, a 2x1 vector.  Since
+	    //  the above system is either overdermined or rank-deficient,
+	    //  we will solve the normal equations for this system
+	    // 
+	    //  [J]^T ({X} - {X_n}) = [J]^T [J] {dp}
+	    // 
+	    //  which involves the inversion of the 2x2 matrix
+	    //  [G] = [J]^T [J]
 	    const Real
 	      G11 = dxi*dxi,  G12 = dxi*deta,
 	      G21 = dxi*deta, G22 = deta*deta;
@@ -634,10 +677,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 	    const Real det = (G11*G22 - G12*G21);
 	    
 	    if (secure)
-	      {
-		assert (det > 0.);
-		assert (fabs(det) > 1.e-20);
-	      }
+	      assert (det > 1.e-20);
 
 	    const Real inv_det = 1./det;
 	    
@@ -660,36 +700,32 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 	  
 
 	  
-	  /**	 
-	   *------------------------------------------------------------------
-	   * 3D map inversion
-	   *
-	   * Here we find the point in a 3D reference element that maps to
-	   * the point \p physical_point in a 3D domain. Nothing special
-	   * has to happen here, since (unless the map is singular because
-	   * you have a BAD element) the map will be invertable and we can
-	   * apply Newton's method directly.
-	   */
+	  // ------------------------------------------------------------------
+	  //  3D map inversion
+	  // 
+	  //  Here we find the point in a 3D reference element that maps to
+	  //  the point \p physical_point in a 3D domain. Nothing special
+	  //  has to happen here, since (unless the map is singular because
+	  //  you have a BAD element) the map will be invertable and we can
+	  //  apply Newton's method directly.
 	case 3:
 	  {
        	    const Point dxi   = FE<Dim,T>::map_xi   (elem, p);
 	    const Point deta  = FE<Dim,T>::map_eta  (elem, p);
 	    const Point dzeta = FE<Dim,T>::map_zeta (elem, p);
 	    
-	    /**
-	     * Newton's method in this case looks like
-	     *
-	     * {X} = {X_n} + [J]*{dp}
-	     *
-	     * Where {X}, {X_n} are 3x1 vectors, [J] is a 3x3 matrix
-	     * d(x,y,z)/d(xi,eta,zeta), and we seek {dp}, a 3x1 vector.
-	     * Since the above system is nonsingular for invertable maps
-	     * we will solve 
-	     *
-	     * {dp} = [J]^-1 ({X} - {X_n})
-	     *
-	     * which involves the inversion of the 3x3 matrix [J]
-	     */	    
+	    //  Newton's method in this case looks like
+	    // 
+	    //  {X} = {X_n} + [J]*{dp}
+	    // 
+	    //  Where {X}, {X_n} are 3x1 vectors, [J] is a 3x3 matrix
+	    //  d(x,y,z)/d(xi,eta,zeta), and we seek {dp}, a 3x1 vector.
+	    //  Since the above system is nonsingular for invertable maps
+	    //  we will solve 
+	    // 
+	    //  {dp} = [J]^-1 ({X} - {X_n})
+	    // 
+	    //  which involves the inversion of the 3x3 matrix [J]
 	    const Real
 	      J11 = dxi(0), J12 = deta(0), J13 = dzeta(0),
 	      J21 = dxi(1), J22 = deta(1), J23 = dzeta(1),
@@ -700,10 +736,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 			      J13*(J21*J32 - J22*J31));
 	    
 	    if (secure)
-	      {
-		assert (det > 0.);
-		assert (fabs(det) > 1.e-10);
-	      }
+	      assert (fabs(det) > 1.e-20);
 
 	    const Real inv_det = 1./det;
 	    
@@ -736,39 +769,27 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 	  }
 
 
-	  /**
-	   * Some other dimension?
-	   */
+	  //  Some other dimension?
 	default:
 	  error();
 	} // end switch(Dim), dp now computed
 
 
 
-      /**
-       * ||P_n+1 - P_n||
-       */
+      //  ||P_n+1 - P_n||
       error = dp.size();
 
-      /**
-       * P_n+1 = P_n + dp
-       */
+      //  P_n+1 = P_n + dp
       p.add (dp);
-
-      /**
-       * Increment the iteration count.
-       */
+      
+      //  Increment the iteration count.
       cnt++;
-
-      /**
-       * Watch for divergence of Newton's
-       * method.
-       */
+      
+      //  Watch for divergence of Newton's
+      //  method.
       if (cnt > 10)
 	{
-	  /**
-	   * Do not bother about devergence when secure is false.
-	   */
+	  //  Do not bother about devergence when secure is false.
 	  if (secure)
 	    {
 	      here();
@@ -813,11 +834,9 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 
 
 
-  /**
-   * If we are in debug mode do a sanity check.  Make sure
-   * the point \p p on the reference element actually does
-   * map to the point \p physical_point within a tolerance.
-   */ 
+  //  If we are in debug mode do a sanity check.  Make sure
+  //  the point \p p on the reference element actually does
+  //  map to the point \p physical_point within a tolerance.
 #ifdef DEBUG
 	
   const Point check = FE<Dim,T>::map (elem, p);
@@ -835,9 +854,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 
 
   
-  /**
-   * Stop logging the map inversion.
-   */
+  //  Stop logging the map inversion.
   STOP_LOG("inverse_map()", "FE");
   
   return p;
