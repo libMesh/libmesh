@@ -1,4 +1,4 @@
-// $Id: error_vector.C,v 1.1 2003-05-19 21:21:14 benkirk Exp $
+// $Id: error_vector.C,v 1.2 2003-07-18 18:53:00 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -108,11 +108,9 @@ Real ErrorVector::median() const
 
 
 
-Real ErrorVector::variance() const
+Real ErrorVector::variance(const Real mean) const
 {
   const unsigned int n   = this->size();
-  
-  const Real mean = this->mean();
   
   START_LOG ("variance()", "ErrorVector");
   
