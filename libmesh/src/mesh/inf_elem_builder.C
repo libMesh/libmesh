@@ -1,4 +1,4 @@
-// $Id: inf_elem_builder.C,v 1.3 2004-11-18 21:23:23 benkirk Exp $
+// $Id: inf_elem_builder.C,v 1.4 2004-11-19 03:19:08 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -288,12 +288,10 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
     }
 
 
-  PAUSE_LOG("build_inf_elem()", "InfElemBuilder");
-
   // update element neighbors
   this->_mesh.find_neighbors();	
 
-  RESTART_LOG("build_inf_elem()", "InfElemBuilder");
+  START_LOG("build_inf_elem()", "InfElemBuilder");
 
   // A set for storing element number, side number pairs.
   // pair.first == element number, pair.second == side number
