@@ -101,8 +101,8 @@ that can be inserted into a <code>MeshData</code> object.
 
 <div class ="fragment">
 <pre>
-        void create_artificial_data (const Mesh&amp; mesh,
-        			     std::map<const Node*, std::vector<Number> >& art_data);
+        void create_artificial_data (const Mesh& mesh,
+        			     std::map&lt;const Node*, std::vector&lt;Number&gt; &gt;& art_data);
         
 </pre>
 </div>
@@ -148,8 +148,8 @@ where in_mesh.unv should be a Universal file.
 <pre>
             if (argc &lt; 4)
               {
-        	std::cerr << "Usage: " << argv[0] << " -d <dim> in_mesh.unv"
-        		  << std::endl;
+        	std::cerr &lt;&lt; "Usage: " &lt;&lt; argv[0] &lt;&lt; " -d &lt;dim&gt; in_mesh.unv"
+        		  &lt;&lt; std::endl;
         	
         	error();
               }
@@ -185,8 +185,8 @@ only with a Universal file
 <pre>
             if (mesh_file.rfind(".unv") &gt;= mesh_file.size())
               {
-        	std::cerr << "ERROR:  This example works only properly with a Universal mesh file!"
-        		  << std::endl;
+        	std::cerr &lt;&lt; "ERROR:  This example works only properly with a Universal mesh file!"
+        		  &lt;&lt; std::endl;
         	
         	error();
               }
@@ -314,8 +314,8 @@ to the screen.  Obviously, there is no data
 <div class ="fragment">
 <pre>
               std::cout &lt;&lt; std::endl 
-        		<< "Finished reading the mesh.  MeshData is active but empty:" << std::endl
-        		<< "---------------------------------------------------------" << std::endl;
+        		&lt;&lt; "Finished reading the mesh.  MeshData is active but empty:" &lt;&lt; std::endl
+        		&lt;&lt; "---------------------------------------------------------" &lt;&lt; std::endl;
               
               mesh.print_info();
               mesh.data.print_info();
@@ -331,7 +331,7 @@ Let the function <code>create_artificial_data()</code> do the work.
 <div class ="fragment">
 <pre>
               {
-        	std::map<const Node*, std::vector<Number> > artificial_data;
+        	std::map&lt;const Node*, std::vector&lt;Number&gt; &gt; artificial_data;
         	
         	create_artificial_data (mesh, artificial_data);
         	
@@ -367,8 +367,8 @@ Print information about the data to the screen.
 <div class ="fragment">
 <pre>
               std::cout &lt;&lt; std::endl 
-        		<< "After inserting artificial data into the MeshData:" << std::endl
-        		<< "--------------------------------------------------" << std::endl;
+        		&lt;&lt; "After inserting artificial data into the MeshData:" &lt;&lt; std::endl
+        		&lt;&lt; "--------------------------------------------------" &lt;&lt; std::endl;
               
               mesh.data.print_info();
         
@@ -382,7 +382,7 @@ file.  Use a default header for this.
 <div class ="fragment">
 <pre>
               std::string first_out_data="data_first_out_with_default_header.unv";
-              std::cout << "Writing MeshData to: " << first_out_data << std::endl;
+              std::cout &lt;&lt; "Writing MeshData to: " &lt;&lt; first_out_data &lt;&lt; std::endl;
               mesh.data.write(first_out_data);
         
 </pre>
@@ -394,10 +394,10 @@ Alternatively, create your own header.
 <div class ="fragment">
 <pre>
               std::cout &lt;&lt; std::endl 
-        		<< "Attach our own MeshDataUnvHeader to the MeshData:" << std::endl
-        		<< "-------------------------------------------------" << std::endl
-        		<< " (note the warning: the number of values per node in" << std::endl
-        		<< "  my_header is not correct)" << std::endl << std::endl;
+        		&lt;&lt; "Attach our own MeshDataUnvHeader to the MeshData:" &lt;&lt; std::endl
+        		&lt;&lt; "-------------------------------------------------" &lt;&lt; std::endl
+        		&lt;&lt; " (note the warning: the number of values per node in" &lt;&lt; std::endl
+        		&lt;&lt; "  my_header is not correct)" &lt;&lt; std::endl &lt;&lt; std::endl;
               MeshDataUnvHeader my_header;
         
 </pre>
@@ -450,7 +450,7 @@ the same file again, but with the personalized header.
 
 <div class ="fragment">
 <pre>
-              mesh.data.set_unv_header(&amp;my_header);
+              mesh.data.set_unv_header(&my_header);
         
 </pre>
 </div>
@@ -461,7 +461,7 @@ Write again to file.
 <div class ="fragment">
 <pre>
               std::string second_out_data="data_second_with_header_out.unv";
-              std::cout << "Writing MeshData to: " << second_out_data << std::endl;
+              std::cout &lt;&lt; "Writing MeshData to: " &lt;&lt; second_out_data &lt;&lt; std::endl;
               mesh.data.write(second_out_data);
               
 </pre>
@@ -473,8 +473,8 @@ Print information about the data to the screen.
 <div class ="fragment">
 <pre>
               std::cout &lt;&lt; std::endl 
-        		<< "Before clearing the MeshData:" << std::endl
-        		<< "-----------------------------" << std::endl;
+        		&lt;&lt; "Before clearing the MeshData:" &lt;&lt; std::endl
+        		&lt;&lt; "-----------------------------" &lt;&lt; std::endl;
               mesh.data.print_info();
         
 </pre>
@@ -498,8 +498,8 @@ Print information about the data to the screen.
 <div class ="fragment">
 <pre>
               std::cout &lt;&lt; std::endl 
-        		<< "After clearing the MeshData:" << std::endl
-        		<< "----------------------------" << std::endl;
+        		&lt;&lt; "After clearing the MeshData:" &lt;&lt; std::endl
+        		&lt;&lt; "----------------------------" &lt;&lt; std::endl;
               mesh.data.print_info();
         
 </pre>
@@ -513,9 +513,9 @@ file.  Read the file that we created first.
 <pre>
               mesh.data.read(first_out_data);
               
-              std::cout << std::endl 
-        		<< "After re-reading the first file:" << std::endl
-        		<< "--------------------------------" << std::endl;
+              std::cout &lt;&lt; std::endl 
+        		&lt;&lt; "After re-reading the first file:" &lt;&lt; std::endl
+        		&lt;&lt; "--------------------------------" &lt;&lt; std::endl;
               mesh.data.print_info();
         
 </pre>
@@ -529,10 +529,10 @@ do another example.
 <pre>
             }
         
-            std::cout << std::endl 
-        	      << "----------------------------------------------" << std::endl
-        	      << "---------- next example with MeshData --------" << std::endl
-        	      << "----------------------------------------------" << std::endl;
+            std::cout &lt;&lt; std::endl 
+        	      &lt;&lt; "----------------------------------------------" &lt;&lt; std::endl
+        	      &lt;&lt; "---------- next example with MeshData --------" &lt;&lt; std::endl
+        	      &lt;&lt; "----------------------------------------------" &lt;&lt; std::endl;
         
 </pre>
 </div>
@@ -570,8 +570,8 @@ to the screen.
 <div class ="fragment">
 <pre>
               std::cout &lt;&lt; std::endl 
-        		<< "De-activated MeshData:" << std::endl
-        		<< "----------------------" << std::endl;
+        		&lt;&lt; "De-activated MeshData:" &lt;&lt; std::endl
+        		&lt;&lt; "----------------------" &lt;&lt; std::endl;
               mesh.print_info();
               mesh.data.print_info();
          
@@ -588,11 +588,11 @@ ids from libMesh.
 <div class ="fragment">
 <pre>
               const std::string out_mesh = "mesh_with_libmesh_ids.unv";
-              std::cout << "Writing _Mesh_ to: " << out_mesh << std::endl
-        		<< "Try 'diff " << out_mesh << " " << mesh_file << "'" << std::endl
-        		<< "to see the differences in node numbers." << std::endl
-        		<< "---------------------------------------" << std::endl
-        		<< std::endl;
+              std::cout &lt;&lt; "Writing _Mesh_ to: " &lt;&lt; out_mesh &lt;&lt; std::endl
+        		&lt;&lt; "Try 'diff " &lt;&lt; out_mesh &lt;&lt; " " &lt;&lt; mesh_file &lt;&lt; "'" &lt;&lt; std::endl
+        		&lt;&lt; "to see the differences in node numbers." &lt;&lt; std::endl
+        		&lt;&lt; "---------------------------------------" &lt;&lt; std::endl
+        		&lt;&lt; std::endl;
               mesh.write(out_mesh);
         
 </pre>
@@ -605,7 +605,7 @@ as before.
 <div class ="fragment">
 <pre>
               {
-        	std::map<const Node*, std::vector<Number> > artificial_data;
+        	std::map&lt;const Node*, std::vector&lt;Number&gt; &gt; artificial_data;
         	create_artificial_data (mesh, artificial_data);
         	mesh.data.insert_node_data(artificial_data);
               }
@@ -636,10 +636,10 @@ statement).
 <div class ="fragment">
 <pre>
               std::string mesh_data_file = "data_third_with_libmesh_ids_out.unv";
-              std::cout << std::endl 
-        		<< "Writing MeshData to: " << mesh_data_file << std::endl
-        		<< "----------------------------------------------------------" 
-        		<< std::endl << std::endl;
+              std::cout &lt;&lt; std::endl 
+        		&lt;&lt; "Writing MeshData to: " &lt;&lt; mesh_data_file &lt;&lt; std::endl
+        		&lt;&lt; "----------------------------------------------------------" 
+        		&lt;&lt; std::endl &lt;&lt; std::endl;
               mesh.data.write (mesh_data_file);
         
         #ifdef HAVE_ZLIB_H
@@ -664,13 +664,13 @@ be gzip'ed or not.
 <div class ="fragment">
 <pre>
               std::string packed_mesh_data_file =  "packed_" + mesh_data_file + ".gz";
-              std::cout << std::endl 
-        		<< "Writing gzip'ed MeshData to: " << packed_mesh_data_file << std::endl
-        		<< "---------------------------------------------------------------------------" << std::endl
-        		<< " To verify the integrity of the packed version, type:" << std::endl << std::endl
-        		<< "   gunzip " << packed_mesh_data_file << "; " << std::endl
-        		<< "   diff packed_" << mesh_data_file << " " 
-        		<< mesh_data_file << std::endl << std::endl;
+              std::cout &lt;&lt; std::endl 
+        		&lt;&lt; "Writing gzip'ed MeshData to: " &lt;&lt; packed_mesh_data_file &lt;&lt; std::endl
+        		&lt;&lt; "---------------------------------------------------------------------------" &lt;&lt; std::endl
+        		&lt;&lt; " To verify the integrity of the packed version, type:" &lt;&lt; std::endl &lt;&lt; std::endl
+        		&lt;&lt; "   gunzip " &lt;&lt; packed_mesh_data_file &lt;&lt; "; " &lt;&lt; std::endl
+        		&lt;&lt; "   diff packed_" &lt;&lt; mesh_data_file &lt;&lt; " " 
+        		&lt;&lt; mesh_data_file &lt;&lt; std::endl &lt;&lt; std::endl;
               
               mesh.data.write (packed_mesh_data_file);
               
@@ -710,7 +710,7 @@ for the names of the data available.
 <div class ="fragment">
 <pre>
                 std::vector&lt;Number&gt; translated_data;
-        	std::vector<std::string> data_names;
+        	std::vector&lt;std::string&gt; data_names;
         	
 </pre>
 </div>
@@ -735,11 +735,11 @@ And write the data to a GMV file
 <div class ="fragment">
 <pre>
                 const std::string gmv_file = "data_and_mesh_out.gmv";
-        	std::cout << std::endl 
-        		  << "Writing the data from the MeshData to the GMV file " 
-        		  << gmv_file << std::endl
-        		  << "------------------------------------------------------------------------" 
-        		  << std::endl;
+        	std::cout &lt;&lt; std::endl 
+        		  &lt;&lt; "Writing the data from the MeshData to the GMV file " 
+        		  &lt;&lt; gmv_file &lt;&lt; std::endl
+        		  &lt;&lt; "------------------------------------------------------------------------" 
+        		  &lt;&lt; std::endl;
         	
         	GMVIO(mesh).write_nodal_data (gmv_file,
         				      translated_data,
@@ -786,8 +786,8 @@ This function creates the data to populate the <code> MeshData</code> object
 
 <div class ="fragment">
 <pre>
-        void create_artificial_data (const Mesh&amp; mesh,
-        			     std::map<const Node*, std::vector<Number> >& art_data)
+        void create_artificial_data (const Mesh& mesh,
+        			     std::map&lt;const Node*, std::vector&lt;Number&gt; &gt;& art_data)
         {
 </pre>
 </div>
@@ -801,11 +801,11 @@ get the bounding box to have some sensible data
         
           const Real z_min = b_box.first (2);
           const Real z_max = b_box.second(2);
-          assert (fabs(z_max-z_min) > TOLERANCE);
+          assert (fabs(z_max-z_min) &gt; TOLERANCE);
         
           const Real x_min = b_box.first (0);
           const Real x_max = b_box.second(0);
-          assert (fabs(x_max-x_min) > TOLERANCE);
+          assert (fabs(x_max-x_min) &gt; TOLERANCE);
         
         
           const_node_iterator node_it = mesh.nodes_begin();
@@ -835,7 +835,7 @@ increase in x-direction
 
 <div class ="fragment">
 <pre>
-              const Point&amp; p = **node_it;
+              const Point& p = **node_it;
         	
               const Real z_normalized = (p(2)-z_min)/(z_max-z_min);
               const Real x_normalized = (p(0)-x_min)/(x_max-x_min);
@@ -1094,10 +1094,6 @@ the current node in the map.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-Compiling C++ (in debug mode) ex12.C...
-Linking ex12...
-/home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
-: the use of `mktemp' is dangerous, better use `mkstemp'
 ***************************************************************
 * Running Example  ./ex12
 ***************************************************************

@@ -35,8 +35,8 @@ possible by changing the n_timesteps and dt variables below.
 <div class ="fragment">
 <pre>
         #include &lt;iostream&gt;
-        #include <algorithm>
-        #include <math.h>
+        #include &lt;algorithm&gt;
+        #include &lt;math.h&gt;
         
 </pre>
 </div>
@@ -97,7 +97,7 @@ matrix and right-hand-side.
 
 <div class ="fragment">
 <pre>
-        void assemble_stokes (EquationSystems&amp; es,
+        void assemble_stokes (EquationSystems& es,
         		      const std::string& system_name);
         
 </pre>
@@ -194,8 +194,8 @@ Creates a transient system named "Navier-Stokes"
 
 <div class ="fragment">
 <pre>
-              TransientImplicitSystem &amp; system = 
-        	equation_systems.add_system<TransientImplicitSystem> ("Navier-Stokes");
+              TransientImplicitSystem & system = 
+        	equation_systems.add_system&lt;TransientImplicitSystem&gt; ("Navier-Stokes");
               
 </pre>
 </div>
@@ -311,8 +311,8 @@ Get a reference to the Stokes system to use later.
 
 <div class ="fragment">
 <pre>
-            TransientImplicitSystem&amp;  stokes_system =
-        	  equation_systems.get_system<TransientImplicitSystem>("Navier-Stokes");
+            TransientImplicitSystem&  stokes_system =
+        	  equation_systems.get_system&lt;TransientImplicitSystem&gt;("Navier-Stokes");
         
 </pre>
 </div>
@@ -325,9 +325,9 @@ determine if we can exit the nonlinear loop.
 <div class ="fragment">
 <pre>
             AutoPtr&lt;NumericVector&lt;Number&gt; &gt;
-              last_nonlinear_soln (stokes_system.solution->clone());
+              last_nonlinear_soln (stokes_system.solution-&gt;clone());
         
-            for (unsigned int t_step=0; t_step<n_timesteps; ++t_step)
+            for (unsigned int t_step=0; t_step&lt;n_timesteps; ++t_step)
               {
 </pre>
 </div>
@@ -393,7 +393,7 @@ Update the nonlinear solution.
 <div class ="fragment">
 <pre>
                     last_nonlinear_soln-&gt;zero();
-        	    last_nonlinear_soln->add(*stokes_system.solution);
+        	    last_nonlinear_soln-&gt;add(*stokes_system.solution);
         	    
 </pre>
 </div>
@@ -448,12 +448,12 @@ nonlinear iterations.
 <div class ="fragment">
 <pre>
                     std::cout &lt;&lt; "Linear solver converged at step: "
-        		      << stokes_system.n_linear_iterations()
-        		      << ", final residual: "
-        		      << stokes_system.final_linear_residual()
-        		      << "  Nonlinear convergence: ||u - u_old|| = "
-        		      << norm_delta
-        		      << std::endl;
+        		      &lt;&lt; stokes_system.n_linear_iterations()
+        		      &lt;&lt; ", final residual: "
+        		      &lt;&lt; stokes_system.final_linear_residual()
+        		      &lt;&lt; "  Nonlinear convergence: ||u - u_old|| = "
+        		      &lt;&lt; norm_delta
+        		      &lt;&lt; std::endl;
         
 </pre>
 </div>
@@ -466,9 +466,9 @@ this iteration and the last is sufficiently small.
 <pre>
                     if (norm_delta &lt; nonlinear_tolerance)
         	      {
-        		std::cout << " Nonlinear solver converged at step "
-        			  << l
-        			  << std::endl;
+        		std::cout &lt;&lt; " Nonlinear solver converged at step "
+        			  &lt;&lt; l
+        			  &lt;&lt; std::endl;
         		break;
         	      }
         	    
@@ -530,7 +530,7 @@ prepare for the linear solve.
 
 <div class ="fragment">
 <pre>
-        void assemble_stokes (EquationSystems&amp; es,
+        void assemble_stokes (EquationSystems& es,
         		      const std::string& system_name)
         {
 </pre>
@@ -552,7 +552,7 @@ Get a constant reference to the mesh object.
 
 <div class ="fragment">
 <pre>
-          const Mesh&amp; mesh = es.get_mesh();
+          const Mesh& mesh = es.get_mesh();
           
 </pre>
 </div>
@@ -572,8 +572,8 @@ Get a reference to the Stokes system object.
 
 <div class ="fragment">
 <pre>
-          TransientImplicitSystem &amp; stokes_system =
-            es.get_system<TransientImplicitSystem> ("Navier-Stokes");
+          TransientImplicitSystem & stokes_system =
+            es.get_system&lt;TransientImplicitSystem&gt; ("Navier-Stokes");
         
 </pre>
 </div>
@@ -649,8 +649,8 @@ Tell the finite element objects to use our quadrature rule.
 
 <div class ="fragment">
 <pre>
-          fe_vel-&gt;attach_quadrature_rule (&amp;qrule);
-          fe_pres->attach_quadrature_rule (&qrule);
+          fe_vel-&gt;attach_quadrature_rule (&qrule);
+          fe_pres-&gt;attach_quadrature_rule (&qrule);
           
 </pre>
 </div>
@@ -663,7 +663,7 @@ will be used to assemble the linear system.
 
 <div class ="fragment">
 <pre>
-          const std::vector&lt;Real&gt;&amp; JxW = fe_vel-&gt;get_JxW();
+          const std::vector&lt;Real&gt;& JxW = fe_vel-&gt;get_JxW();
         
 </pre>
 </div>
@@ -673,7 +673,7 @@ The element shape functions evaluated at the quadrature points.
 
 <div class ="fragment">
 <pre>
-          const std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi = fe_vel-&gt;get_phi();
+          const std::vector&lt;std::vector&lt;Real&gt; &gt;& phi = fe_vel-&gt;get_phi();
         
 </pre>
 </div>
@@ -684,7 +684,7 @@ variables evaluated at the quadrature points.
 
 <div class ="fragment">
 <pre>
-          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = fe_vel-&gt;get_dphi();
+          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;& dphi = fe_vel-&gt;get_dphi();
         
 </pre>
 </div>
@@ -695,7 +695,7 @@ evaluated at the quadrature points.
 
 <div class ="fragment">
 <pre>
-          const std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; psi = fe_pres-&gt;get_phi();
+          const std::vector&lt;std::vector&lt;Real&gt; &gt;& psi = fe_pres-&gt;get_phi();
         
 </pre>
 </div>
@@ -712,7 +712,7 @@ in future examples.
 
 <div class ="fragment">
 <pre>
-          const DofMap &amp; dof_map = stokes_system.get_dof_map();
+          const DofMap & dof_map = stokes_system.get_dof_map();
         
 </pre>
 </div>
@@ -726,14 +726,14 @@ basic finite element terminology we will denote these
 <div class ="fragment">
 <pre>
           DenseMatrix&lt;Number&gt; Ke;
-          DenseVector<Number> Fe;
+          DenseVector&lt;Number&gt; Fe;
         
-          DenseSubMatrix<Number>
+          DenseSubMatrix&lt;Number&gt;
             Kuu(Ke), Kuv(Ke), Kup(Ke),
             Kvu(Ke), Kvv(Ke), Kvp(Ke),
             Kpu(Ke), Kpv(Ke), Kpp(Ke);
         
-          DenseSubVector<Number>
+          DenseSubVector&lt;Number&gt;
             Fu(Fe),
             Fv(Fe),
             Fp(Fe);
@@ -749,9 +749,9 @@ the element degrees of freedom get mapped.
 <div class ="fragment">
 <pre>
           std::vector&lt;unsigned int&gt; dof_indices;
-          std::vector<unsigned int> dof_indices_u;
-          std::vector<unsigned int> dof_indices_v;
-          std::vector<unsigned int> dof_indices_p;
+          std::vector&lt;unsigned int&gt; dof_indices_u;
+          std::vector&lt;unsigned int&gt; dof_indices_v;
+          std::vector&lt;unsigned int&gt; dof_indices_p;
         
 </pre>
 </div>
@@ -842,7 +842,7 @@ quadrature points (q_point) and the shape functions
 <div class ="fragment">
 <pre>
               fe_vel-&gt;reinit  (elem);
-              fe_pres->reinit (elem);
+              fe_pres-&gt;reinit (elem);
         
 </pre>
 </div>
@@ -1075,7 +1075,7 @@ negative one.  Here we do not.
 <pre>
                   for (unsigned int i=0; i&lt;n_p_dofs; i++)
         	    {
-        	      for (unsigned int j=0; j<n_u_dofs; j++)
+        	      for (unsigned int j=0; j&lt;n_u_dofs; j++)
         		{
         		  Kpu(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](0);
         		  Kpv(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](1);
@@ -1111,9 +1111,9 @@ side MUST live on a boundary of the domain.
 <div class ="fragment">
 <pre>
                 for (unsigned int s=0; s&lt;elem-&gt;n_sides(); s++)
-        	  if (elem->neighbor(s) == NULL)
+        	  if (elem-&gt;neighbor(s) == NULL)
         	    {
-        	      AutoPtr<Elem> side (elem->build_side(s));
+        	      AutoPtr&lt;Elem&gt; side (elem-&gt;build_side(s));
         	      	      
 </pre>
 </div>
@@ -1183,7 +1183,7 @@ the boundary condition will be applied.
 <div class ="fragment">
 <pre>
                           for (unsigned int n=0; n&lt;elem-&gt;n_nodes(); n++)
-        		    if (elem->node(n) == side->node(ns))
+        		    if (elem-&gt;node(n) == side-&gt;node(ns))
         		      {
 </pre>
 </div>
@@ -1208,7 +1208,7 @@ Right-hand-side contribution.
         			Fv(n) += penalty*v_value;
         		      }
         		} // end face node loop	  
-        	    } // end if (elem->neighbor(side) == NULL)
+        	    } // end if (elem-&gt;neighbor(side) == NULL)
               } // end boundary condition section	  
               
 </pre>
@@ -1240,7 +1240,7 @@ and \p PetscVector::add_vector() members do this for us.
 <div class ="fragment">
 <pre>
               stokes_system.matrix-&gt;add_matrix (Ke, dof_indices);
-              stokes_system.rhs->add_vector    (Fe, dof_indices);
+              stokes_system.rhs-&gt;add_vector    (Fe, dof_indices);
             } // end of element loop
           
 </pre>
@@ -1636,10 +1636,6 @@ That's it.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-Compiling C++ (in debug mode) ex13.C...
-Linking ex13...
-/home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
-: the use of `mktemp' is dangerous, better use `mkstemp'
 ***************************************************************
 * Running Example  ./ex13
 ***************************************************************
@@ -1736,7 +1732,7 @@ Linear solver converged at step: 28, final residual: 1.17971e-08  Nonlinear conv
  Nonlinear solver converged at step 1
 
  ----------------------------------------------------------------------------
-| Time:           Mon Apr 19 11:27:59 2004
+| Time:           Mon Apr 19 12:06:05 2004
 | OS:             Linux
 | HostName:       arthur
 | OS Release      2.4.20-19.9smp
@@ -1745,15 +1741,15 @@ Linear solver converged at step: 28, final residual: 1.17971e-08  Nonlinear conv
 | Username:       peterson
  ----------------------------------------------------------------------------
  ----------------------------------------------------------------------------
-| Example 13 Performance: Alive time=52.7163, Active time=50.1666
+| Example 13 Performance: Alive time=53.0525, Active time=50.2831
  ----------------------------------------------------------------------------
 | Event                         nCalls  Total       Avg         Percent of   |
 |                                       Time        Time        Active Time  |
 |----------------------------------------------------------------------------|
 |                                                                            |
-| linear solve                  33      50.1666     1.520200    100.00       |
+| linear solve                  33      50.2831     1.523732    100.00       |
  ----------------------------------------------------------------------------
-| Totals:                       33      50.1666                 100.00       |
+| Totals:                       33      50.2831                 100.00       |
  ----------------------------------------------------------------------------
 
 

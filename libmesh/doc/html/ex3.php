@@ -29,8 +29,8 @@ were already explained in the second example.
 <div class ="fragment">
 <pre>
         #include &lt;iostream&gt;
-        #include <algorithm>
-        #include <math.h>
+        #include &lt;algorithm&gt;
+        #include &lt;math.h&gt;
         
 </pre>
 </div>
@@ -104,7 +104,7 @@ other objects we might need.
 
 <div class ="fragment">
 <pre>
-        void assemble_poisson(EquationSystems&amp; es,
+        void assemble_poisson(EquationSystems& es,
                               const std::string& system_name);
         
 </pre>
@@ -154,10 +154,10 @@ and command line arguments.
 <pre>
             std::cout &lt;&lt; "Running " &lt;&lt; argv[0];
             
-            for (int i=1; i<argc; i++)
-              std::cout << " " << argv[i];
+            for (int i=1; i&lt;argc; i++)
+              std::cout &lt;&lt; " " &lt;&lt; argv[i];
             
-            std::cout << std::endl << std::endl;
+            std::cout &lt;&lt; std::endl &lt;&lt; std::endl;
             
 </pre>
 </div>
@@ -324,7 +324,7 @@ via a penalty method.
 
 <div class ="fragment">
 <pre>
-        void assemble_poisson(EquationSystems&amp; es,
+        void assemble_poisson(EquationSystems& es,
                               const std::string& system_name)
         {
           
@@ -348,7 +348,7 @@ Get a constant reference to the mesh object.
 
 <div class ="fragment">
 <pre>
-          const Mesh&amp; mesh = es.get_mesh();
+          const Mesh& mesh = es.get_mesh();
         
 </pre>
 </div>
@@ -368,7 +368,7 @@ Get a reference to the ImplicitSystem we are solving
 
 <div class ="fragment">
 <pre>
-          ImplicitSystem&amp; system = es.get_system&lt;ImplicitSystem&gt; ("Poisson");
+          ImplicitSystem& system = es.get_system&lt;ImplicitSystem&gt; ("Poisson");
         
 </pre>
 </div>
@@ -381,7 +381,7 @@ in future examples.
 
 <div class ="fragment">
 <pre>
-          const DofMap&amp; dof_map = system.get_dof_map();
+          const DofMap& dof_map = system.get_dof_map();
           
 </pre>
 </div>
@@ -427,7 +427,7 @@ Tell the finite element object to use our quadrature rule.
 
 <div class ="fragment">
 <pre>
-          fe-&gt;attach_quadrature_rule (&amp;qrule);
+          fe-&gt;attach_quadrature_rule (&qrule);
           
 </pre>
 </div>
@@ -461,7 +461,7 @@ quadrature rule.
 
 <div class ="fragment">
 <pre>
-          fe_face-&gt;attach_quadrature_rule (&amp;qface);
+          fe_face-&gt;attach_quadrature_rule (&qface);
         
 </pre>
 </div>
@@ -474,7 +474,7 @@ will be used to assemble the linear system.
 
 <div class ="fragment">
 <pre>
-          const std::vector&lt;Real&gt;&amp; JxW = fe-&gt;get_JxW();
+          const std::vector&lt;Real&gt;& JxW = fe-&gt;get_JxW();
         
 </pre>
 </div>
@@ -486,7 +486,7 @@ properties at the quadrature points.
 
 <div class ="fragment">
 <pre>
-          const std::vector&lt;Point&gt;&amp; q_point = fe-&gt;get_xyz();
+          const std::vector&lt;Point&gt;& q_point = fe-&gt;get_xyz();
         
 </pre>
 </div>
@@ -496,7 +496,7 @@ The element shape functions evaluated at the quadrature points.
 
 <div class ="fragment">
 <pre>
-          const std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi = fe-&gt;get_phi();
+          const std::vector&lt;std::vector&lt;Real&gt; &gt;& phi = fe-&gt;get_phi();
         
 </pre>
 </div>
@@ -507,7 +507,7 @@ points.
 
 <div class ="fragment">
 <pre>
-          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = fe-&gt;get_dphi();
+          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;& dphi = fe-&gt;get_dphi();
         
 </pre>
 </div>
@@ -523,7 +523,7 @@ or complex numbers.
 <div class ="fragment">
 <pre>
           DenseMatrix&lt;Number&gt; Ke;
-          DenseVector<Number> Fe;
+          DenseVector&lt;Number&gt; Fe;
         
         
 </pre>
@@ -655,7 +655,7 @@ the trial functions (j).
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;phi.size(); i++)
-        	    for (unsigned int j=0; j<phi.size(); j++)
+        	    for (unsigned int j=0; j&lt;phi.size(); j++)
         	      {
         		Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
         	      }
@@ -704,7 +704,7 @@ we will compute it here, outside of the i-loop
         			       exact_solution(x+eps,y) -
         			       4.*exact_solution(x,y))/eps/eps;
         	    
-        	    for (unsigned int i=0; i<phi.size(); i++)
+        	    for (unsigned int i=0; i&lt;phi.size(); i++)
         	      Fe(i) += JxW[qp]*fxy*phi[i][qp];
         	  } 
         	} 
@@ -759,7 +759,7 @@ side MUST live on a boundary of the domain.
 <div class ="fragment">
 <pre>
                 for (unsigned int side=0; side&lt;elem-&gt;n_sides(); side++)
-        	  if (elem->neighbor(side) == NULL)
+        	  if (elem-&gt;neighbor(side) == NULL)
         	    {
 </pre>
 </div>
@@ -770,7 +770,7 @@ points.
 
 <div class ="fragment">
 <pre>
-                      const std::vector&lt;std::vector&lt;Real&gt; &gt;&amp;  phi_face = fe_face-&gt;get_phi();
+                      const std::vector&lt;std::vector&lt;Real&gt; &gt;&  phi_face = fe_face-&gt;get_phi();
         	      
 </pre>
 </div>
@@ -781,7 +781,7 @@ points on the face.
 
 <div class ="fragment">
 <pre>
-                      const std::vector&lt;Real&gt;&amp; JxW_face = fe_face-&gt;get_JxW();
+                      const std::vector&lt;Real&gt;& JxW_face = fe_face-&gt;get_JxW();
         	      
 </pre>
 </div>
@@ -793,7 +793,7 @@ we will interpolate the boundary value function.
 
 <div class ="fragment">
 <pre>
-                      const std::vector&lt;Point &gt;&amp; qface_point = fe_face-&gt;get_xyz();
+                      const std::vector&lt;Point &gt;& qface_point = fe_face-&gt;get_xyz();
         	      
 </pre>
 </div>
@@ -859,7 +859,7 @@ Matrix contribution of the L2 projection.
 <div class ="fragment">
 <pre>
                           for (unsigned int i=0; i&lt;phi_face.size(); i++)
-        		    for (unsigned int j=0; j<phi_face.size(); j++)
+        		    for (unsigned int j=0; j&lt;phi_face.size(); j++)
         		      Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
         
 </pre>
@@ -892,7 +892,7 @@ and  NumericVector::add_vector() members do this for us.
 <div class ="fragment">
 <pre>
               system.matrix-&gt;add_matrix (Ke, dof_indices);
-              system.rhs->add_vector    (Fe, dof_indices);
+              system.rhs-&gt;add_vector    (Fe, dof_indices);
             }
           
 </pre>
@@ -1116,11 +1116,6 @@ All done!
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-Compiling C++ (in debug mode) ex3.C...
-Compiling C++ (in debug mode) exact_solution.C...
-Linking ex3...
-/home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
-: the use of `mktemp' is dangerous, better use `mkstemp'
 ***************************************************************
 * Running Example  ./ex3
 ***************************************************************

@@ -28,8 +28,8 @@ time-stepping strategy.
 <div class ="fragment">
 <pre>
         #include &lt;iostream&gt;
-        #include <algorithm>
-        #include <math.h>
+        #include &lt;algorithm&gt;
+        #include &lt;math.h&gt;
         
 </pre>
 </div>
@@ -89,7 +89,7 @@ system matrix.
 
 <div class ="fragment">
 <pre>
-        void assemble_cd (EquationSystems&amp; es,
+        void assemble_cd (EquationSystems& es,
         		  const std::string& system_name);
         
 </pre>
@@ -104,7 +104,7 @@ solution is provided.
 
 <div class ="fragment">
 <pre>
-        void init_cd (EquationSystems&amp; es,
+        void init_cd (EquationSystems& es,
         	      const std::string& system_name);
         
 </pre>
@@ -220,8 +220,8 @@ object named "Convection-Diffusion".
 
 <div class ="fragment">
 <pre>
-            TransientImplicitSystem &amp; system = 
-              equation_systems.add_system<TransientImplicitSystem> ("Convection-Diffusion");
+            TransientImplicitSystem & system = 
+              equation_systems.add_system&lt;TransientImplicitSystem&gt; ("Convection-Diffusion");
               
 </pre>
 </div>
@@ -307,7 +307,7 @@ system and call the linear solver.
             const Real dt = 0.025;
             Real time     = 0.;
             
-            for (unsigned int t_step = 0; t_step < 50; t_step++)
+            for (unsigned int t_step = 0; t_step &lt; 50; t_step++)
               {
 </pre>
 </div>
@@ -351,10 +351,10 @@ locality.
         	  OStringStream out;
         
         	  OSSInt(out,2,t_step);
-        	  out << ", time=";
+        	  out &lt;&lt; ", time=";
         	  OSSRealzeroleft(out,6,3,time);
-        	  out <<  "..." << std::endl;
-        	  std::cout << out.str();
+        	  out &lt;&lt;  "..." &lt;&lt; std::endl;
+        	  std::cout &lt;&lt; out.str();
         	}
         	
 </pre>
@@ -372,8 +372,8 @@ we need to specify the system type when we ask for it.
 
 <div class ="fragment">
 <pre>
-                TransientImplicitSystem&amp;  system =
-        	  equation_systems.get_system<TransientImplicitSystem>("Convection-Diffusion");
+                TransientImplicitSystem&  system =
+        	  equation_systems.get_system&lt;TransientImplicitSystem&gt;("Convection-Diffusion");
         
         	*system.old_local_solution = *system.current_local_solution;
         	
@@ -399,9 +399,9 @@ Output evey 10 timesteps to file.
         	  {
         	    OStringStream file_name;
         
-        	    file_name << "out_";
+        	    file_name &lt;&lt; "out_";
         	    OSSRealzeroright(file_name,3,0,t_step+1);
-        	    file_name << ".gmv";
+        	    file_name &lt;&lt; ".gmv";
         
         	    GMVIO(mesh).write_equation_systems (file_name.str(),
         						equation_systems);
@@ -431,7 +431,7 @@ conditions and boundary conditions.
 
 <div class ="fragment">
 <pre>
-        void init_cd (EquationSystems&amp; es,
+        void init_cd (EquationSystems& es,
         	      const std::string& system_name)
         {
 </pre>
@@ -453,7 +453,7 @@ Get a constant reference to the mesh object.
 
 <div class ="fragment">
 <pre>
-          const Mesh&amp; mesh = es.get_mesh();
+          const Mesh& mesh = es.get_mesh();
           
 </pre>
 </div>
@@ -463,8 +463,8 @@ Get a reference to the Convection-Diffusion system object.
 
 <div class ="fragment">
 <pre>
-          TransientImplicitSystem &amp; system =
-            es.get_system<TransientImplicitSystem> ("Convection-Diffusion");
+          TransientImplicitSystem & system =
+            es.get_system&lt;TransientImplicitSystem&gt; ("Convection-Diffusion");
           
 </pre>
 </div>
@@ -474,7 +474,7 @@ Get a reference to the \p DofMap for this system.
 
 <div class ="fragment">
 <pre>
-          const DofMap&amp; dof_map = system.get_dof_map();
+          const DofMap& dof_map = system.get_dof_map();
           
 </pre>
 </div>
@@ -484,7 +484,7 @@ Get a reference to the solution vector.
 
 <div class ="fragment">
 <pre>
-          NumericVector&lt;Number&gt;&amp; solution = *system.solution;
+          NumericVector&lt;Number&gt;& solution = *system.solution;
           
 </pre>
 </div>
@@ -540,10 +540,10 @@ value if the DOF is local to the processor.
 <div class ="fragment">
 <pre>
               for (unsigned int i=0; i&lt;dof_indices.size(); i++)
-        	if ((dof_indices[i] >= solution.first_local_index()) &&
-        	    (dof_indices[i] <  solution.last_local_index()))
+        	if ((dof_indices[i] &gt;= solution.first_local_index()) &&
+        	    (dof_indices[i] &lt;  solution.last_local_index()))
         	  {
-        	    const Point&  p = elem->point (i);
+        	    const Point&  p = elem-&gt;point (i);
         	    const Real    x = p(0);
         	    const Real    y = p(1);
         	    const Real time = 0.;
@@ -581,7 +581,7 @@ the linear system for solution.
 
 <div class ="fragment">
 <pre>
-        void assemble_cd (EquationSystems&amp; es,
+        void assemble_cd (EquationSystems& es,
         		  const std::string& system_name)
         {
 </pre>
@@ -603,7 +603,7 @@ Get a constant reference to the mesh object.
 
 <div class ="fragment">
 <pre>
-          const Mesh&amp; mesh = es.get_mesh();
+          const Mesh& mesh = es.get_mesh();
           
 </pre>
 </div>
@@ -623,8 +623,8 @@ Get a reference to the Convection-Diffusion system object.
 
 <div class ="fragment">
 <pre>
-          TransientImplicitSystem &amp; system =
-            es.get_system<TransientImplicitSystem> ("Convection-Diffusion");
+          TransientImplicitSystem & system =
+            es.get_system&lt;TransientImplicitSystem&gt; ("Convection-Diffusion");
           
 </pre>
 </div>
@@ -669,7 +669,7 @@ Tell the finite element object to use our quadrature rule.
 
 <div class ="fragment">
 <pre>
-          fe-&gt;attach_quadrature_rule (&amp;qrule);
+          fe-&gt;attach_quadrature_rule (&qrule);
           
 </pre>
 </div>
@@ -681,7 +681,7 @@ with the element Jacobian * quadrature weight at each integration point.
 
 <div class ="fragment">
 <pre>
-          const std::vector&lt;Real&gt;&amp; JxW = fe-&gt;get_JxW();
+          const std::vector&lt;Real&gt;& JxW = fe-&gt;get_JxW();
           
 </pre>
 </div>
@@ -691,7 +691,7 @@ The element shape functions evaluated at the quadrature points.
 
 <div class ="fragment">
 <pre>
-          const std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi = fe-&gt;get_phi();
+          const std::vector&lt;std::vector&lt;Real&gt; &gt;& phi = fe-&gt;get_phi();
           
 </pre>
 </div>
@@ -702,7 +702,7 @@ points.
 
 <div class ="fragment">
 <pre>
-          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = fe-&gt;get_dphi();
+          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;& dphi = fe-&gt;get_dphi();
           
 </pre>
 </div>
@@ -715,7 +715,7 @@ in future examples.
 
 <div class ="fragment">
 <pre>
-          const DofMap&amp; dof_map = system.get_dof_map();
+          const DofMap& dof_map = system.get_dof_map();
         
 </pre>
 </div>
@@ -729,7 +729,7 @@ basic finite element terminology we will denote these
 <div class ="fragment">
 <pre>
           DenseMatrix&lt;Number&gt; Ke;
-          DenseVector<Number> Fe;
+          DenseVector&lt;Number&gt; Fe;
           
 </pre>
 </div>
@@ -753,7 +753,7 @@ EquationSystems object.
 <div class ="fragment">
 <pre>
           const RealVectorValue velocity =
-            es.data_map.get_data<RealVectorValue> ("velocity");
+            es.data_map.get_data&lt;RealVectorValue&gt; ("velocity");
         
           const Real dt = es.parameter   ("dt");
           const Real time = es.parameter ("time");
@@ -933,7 +933,7 @@ Diffusion term
                                                 0.01*(grad_u_old*dphi[i][qp]))     
         				);
         	      
-        	      for (unsigned int j=0; j<phi.size(); j++)
+        	      for (unsigned int j=0; j&lt;phi.size(); j++)
         		{
 </pre>
 </div>
@@ -999,9 +999,9 @@ side MUST live on a boundary of the domain.
 <div class ="fragment">
 <pre>
               for (unsigned int s=0; s&lt;elem-&gt;n_sides(); s++)
-        	if (elem->neighbor(s) == NULL)
+        	if (elem-&gt;neighbor(s) == NULL)
         	  {
-        	    AutoPtr<Elem> side (elem->build_side(s));
+        	    AutoPtr&lt;Elem&gt; side (elem-&gt;build_side(s));
         	    
         	    
 </pre>
@@ -1024,7 +1024,7 @@ node.
 <div class ="fragment">
 <pre>
                         const Real xf = side-&gt;point(ns)(0);
-        		const Real yf = side->point(ns)(1);
+        		const Real yf = side-&gt;point(ns)(1);
         		  
 </pre>
 </div>
@@ -1057,7 +1057,7 @@ the boundary condition will be applied.
 <div class ="fragment">
 <pre>
                         for (unsigned int n=0; n&lt;elem-&gt;n_nodes(); n++)
-        		  if (elem->node(n) == side->node(ns))
+        		  if (elem-&gt;node(n) == side-&gt;node(ns))
         		    {
 </pre>
 </div>
@@ -1094,7 +1094,7 @@ and \p PetscVector::add_vector() members do this for us.
 <div class ="fragment">
 <pre>
               system.matrix-&gt;add_matrix (Ke, dof_indices);
-              system.rhs->add_vector    (Fe, dof_indices);
+              system.rhs-&gt;add_vector    (Fe, dof_indices);
             }
           
 </pre>
@@ -1398,11 +1398,6 @@ That concludes the system matrix assembly routine.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-Compiling C++ (in debug mode) ex9.C...
-Compiling C++ (in debug mode) exact_solution.C...
-Linking ex9...
-/home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
-: the use of `mktemp' is dangerous, better use `mkstemp'
 ***************************************************************
 * Running Example  ./ex9
 ***************************************************************

@@ -28,9 +28,9 @@ determine the quadrature rule at run time.
 <div class ="fragment">
 <pre>
         #include &lt;iostream&gt;
-        #include <sstream> 
-        #include <algorithm>
-        #include <math.h>
+        #include &lt;sstream&gt; 
+        #include &lt;algorithm&gt;
+        #include &lt;math.h&gt;
         
 </pre>
 </div>
@@ -118,7 +118,7 @@ Function prototype, as before.
 
 <div class ="fragment">
 <pre>
-        void assemble_poisson(EquationSystems&amp; es,
+        void assemble_poisson(EquationSystems& es,
                               const std::string& system_name);
         
         
@@ -190,9 +190,9 @@ must be given at run time.
 <pre>
             if (argc &lt; 3)
               {
-        	std::cerr << "Usage: " << argv[0] << " -q n"
-        		  << std::endl;
-        	std::cerr << "  where n stands for:" << std::endl;
+        	std::cerr &lt;&lt; "Usage: " &lt;&lt; argv[0] &lt;&lt; " -q n"
+        		  &lt;&lt; std::endl;
+        	std::cerr &lt;&lt; "  where n stands for:" &lt;&lt; std::endl;
         
         	
 </pre>
@@ -207,11 +207,11 @@ included in QGauss.
 <div class ="fragment">
 <pre>
                 for (unsigned int n=0; n&lt;QuadratureRules::num_valid_elem_rules; n++)
-        	  std::cerr << "  " << QuadratureRules::valid_elem_rules[n] << "    " 
-        		    << QuadratureRules::name(QuadratureRules::valid_elem_rules[n])
-        		    << std::endl;
+        	  std::cerr &lt;&lt; "  " &lt;&lt; QuadratureRules::valid_elem_rules[n] &lt;&lt; "    " 
+        		    &lt;&lt; QuadratureRules::name(QuadratureRules::valid_elem_rules[n])
+        		    &lt;&lt; std::endl;
         	
-        	std::cerr << std::endl;
+        	std::cerr &lt;&lt; std::endl;
         	
         	error();
               }
@@ -227,12 +227,12 @@ Tell the user what we are doing.
 <pre>
             else 
               {
-        	std::cout << "Running " << argv[0];
+        	std::cout &lt;&lt; "Running " &lt;&lt; argv[0];
         	
-        	for (int i=1; i<argc; i++)
-        	  std::cout << " " << argv[i];
+        	for (int i=1; i&lt;argc; i++)
+        	  std::cout &lt;&lt; " " &lt;&lt; argv[i];
         	
-        	std::cout << std::endl << std::endl;
+        	std::cout &lt;&lt; std::endl &lt;&lt; std::endl;
               }
             
         
@@ -292,7 +292,7 @@ space.
             EquationSystems equation_systems (mesh);
             
             {
-              equation_systems.add_system<ImplicitSystem> ("Poisson");
+              equation_systems.add_system&lt;ImplicitSystem&gt; ("Poisson");
               
               equation_systems("Poisson").add_variable("u", FIRST);
         
@@ -315,7 +315,7 @@ number of the quadrature rule appended.
 <div class ="fragment">
 <pre>
             std::ostringstream f_name;
-            f_name << "out_" << quad_type << ".gmv";
+            f_name &lt;&lt; "out_" &lt;&lt; quad_type &lt;&lt; ".gmv";
         
             GMVIO(mesh).write_equation_systems (f_name.str(),
         					equation_systems);
@@ -345,7 +345,7 @@ All done.
         
           const unsigned int dim = mesh.mesh_dimension();
         
-          ImplicitSystem& system = es.get_system<ImplicitSystem>("Poisson");
+          ImplicitSystem& system = es.get_system&lt;ImplicitSystem&gt;("Poisson");
           
           const DofMap& dof_map = system.get_dof_map();
           
@@ -467,18 +467,18 @@ This is again identical to example 4, and not commented.
 
 <div class ="fragment">
 <pre>
-          const std::vector&lt;Real&gt;&amp; JxW = fe-&gt;get_JxW();
+          const std::vector&lt;Real&gt;& JxW = fe-&gt;get_JxW();
           
-          const std::vector<Point>& q_point = fe->get_xyz();
+          const std::vector&lt;Point&gt;& q_point = fe-&gt;get_xyz();
           
-          const std::vector<std::vector<Real> >& phi = fe->get_phi();
+          const std::vector&lt;std::vector&lt;Real&gt; &gt;& phi = fe-&gt;get_phi();
           
-          const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
+          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;& dphi = fe-&gt;get_dphi();
             
-          DenseMatrix<Number> Ke;
-          DenseVector<Number> Fe;
+          DenseMatrix&lt;Number&gt; Ke;
+          DenseVector&lt;Number&gt; Fe;
           
-          std::vector<unsigned int> dof_indices;
+          std::vector&lt;unsigned int&gt; dof_indices;
           
           
           
@@ -502,7 +502,7 @@ See example 3 for details.
               
               dof_map.dof_indices (elem, dof_indices);
               
-              fe->reinit (elem);
+              fe-&gt;reinit (elem);
               
               Ke.resize (dof_indices.size(),
         		 dof_indices.size());
@@ -533,7 +533,7 @@ Add the matrix contribution
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;phi.size(); i++)
-        	    for (unsigned int j=0; j<phi.size(); j++)
+        	    for (unsigned int j=0; j&lt;phi.size(); j++)
         	      Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
         	  
         	  
@@ -605,12 +605,12 @@ for the build routines of QBase, described below
 <div class ="fragment">
 <pre>
               {
-        	for (unsigned int side=0; side<elem->n_sides(); side++)
-        	  if (elem->neighbor(side) == NULL)
+        	for (unsigned int side=0; side&lt;elem-&gt;n_sides(); side++)
+        	  if (elem-&gt;neighbor(side) == NULL)
         	    {	      
-        	      const std::vector<std::vector<Real> >& phi_face    = fe_face->get_phi();
-        	      const std::vector<Real>&               JxW_face    = fe_face->get_JxW();	      
-        	      const std::vector<Point >&             qface_point = fe_face->get_xyz();
+        	      const std::vector&lt;std::vector&lt;Real&gt; &gt;& phi_face    = fe_face-&gt;get_phi();
+        	      const std::vector&lt;Real&gt;&               JxW_face    = fe_face-&gt;get_JxW();	      
+        	      const std::vector&lt;Point &gt;&             qface_point = fe_face-&gt;get_xyz();
         	      
         	      
 </pre>
@@ -650,16 +650,16 @@ to "safe pointers".
         		  
         		  const Real value = exact_solution(xf, yf, zf);
         		  
-        		  for (unsigned int i=0; i<phi_face.size(); i++)
-        		    for (unsigned int j=0; j<phi_face.size(); j++)
+        		  for (unsigned int i=0; i&lt;phi_face.size(); i++)
+        		    for (unsigned int j=0; j&lt;phi_face.size(); j++)
         		      Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
         		  
         		  
-        		  for (unsigned int i=0; i<phi_face.size(); i++)
+        		  for (unsigned int i=0; i&lt;phi_face.size(); i++)
         		    Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
         		  
         		} // end face quadrature point loop	  
-        	    } // end if (elem->neighbor(side) == NULL)
+        	    } // end if (elem-&gt;neighbor(side) == NULL)
               } // end boundary condition section	  
               
               
@@ -678,7 +678,7 @@ and \p PetscVector::add_vector() members do this for us.
 <div class ="fragment">
 <pre>
               system.matrix-&gt;add_matrix (Ke, dof_indices);
-              system.rhs->add_vector    (Fe, dof_indices);
+              system.rhs-&gt;add_vector    (Fe, dof_indices);
               
             } // end of element loop
           
@@ -991,10 +991,6 @@ All done!
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-Compiling C++ (in debug mode) ex5.C...
-Linking ex5...
-/home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
-: the use of `mktemp' is dangerous, better use `mkstemp'
 ***************************************************************
 * Running Example  ./ex5
 ***************************************************************
