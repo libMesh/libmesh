@@ -1,4 +1,4 @@
-// "$Id: xdr_cxx.C,v 1.11 2003-04-09 01:20:25 benkirk Exp $\n"
+// "$Id: xdr_cxx.C,v 1.12 2003-07-23 21:32:27 jwpeterson Exp $\n"
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -34,7 +34,7 @@ Xdr::Xdr (const std::string& name, const XdrMODE m) :
   fp(NULL),
   comm_len(xdr_MAX_STRING_LENGTH)
 {
-  open(name);
+  this->open(name);
 }
 
 
@@ -80,14 +80,14 @@ void Xdr::open (const std::string& name)
     case READ:
       {
 	in.open(name.c_str(), std::ios::in);
-	assert (!in.bad());
+	assert (in.good());
 	return;
       }
 
     case WRITE:
       {
 	out.open(name.c_str(), std::ios::out);
-	assert (!out.bad());
+	assert (out.good());
 	return;
       }
       
@@ -234,7 +234,7 @@ void Xdr::data (int& a, const char* comment)
 
     case READ:
       {
-	assert (!in.bad());
+	assert (in.good());
 	
 	in >> a; in.getline(comm, comm_len);
 
@@ -243,7 +243,7 @@ void Xdr::data (int& a, const char* comment)
 
     case WRITE:
       {
-	assert (!out.bad());
+	assert (out.good());
 	
 	out << a << "\t " << comment << std::endl;
 
@@ -286,7 +286,7 @@ void Xdr::data (unsigned int& a, const char* comment)
 
     case READ:
       {
-	assert (!in.bad());
+	assert (in.good());
 	
 	in >> a; in.getline(comm, comm_len);
 
@@ -295,7 +295,7 @@ void Xdr::data (unsigned int& a, const char* comment)
 
     case WRITE:
       {
-	assert (!out.bad());
+	assert (out.good());
 
 	out << a << "\t " << comment << std::endl;
 	
@@ -338,7 +338,7 @@ void Xdr::data (short int& a, const char* comment)
 
     case READ:
       {
-	assert (!in.bad());
+	assert (in.good());
 	
 	in >> a; in.getline(comm, comm_len);
 
@@ -347,7 +347,7 @@ void Xdr::data (short int& a, const char* comment)
 
     case WRITE:
       {
-	assert (!out.bad());
+	assert (out.good());
 
 	out << a << "\t " << comment << std::endl;
 	
@@ -390,7 +390,7 @@ void Xdr::data (unsigned short int& a, const char* comment)
 
     case READ:
       {
-	assert (!in.bad());
+	assert (in.good());
 	
 	in >> a; in.getline(comm, comm_len);
 
@@ -399,7 +399,7 @@ void Xdr::data (unsigned short int& a, const char* comment)
 
     case WRITE:
       {
-	assert (!out.bad());
+	assert (out.good());
 
 	out << a << "\t " << comment << std::endl;
 	
@@ -442,7 +442,7 @@ void Xdr::data (float& a, const char* comment)
 
     case READ:
       {
-	assert (!in.bad());
+	assert (in.good());
 	
 	in >> a; in.getline(comm, comm_len);
 
@@ -451,7 +451,7 @@ void Xdr::data (float& a, const char* comment)
 
     case WRITE:
       {
-	assert (!out.bad());
+	assert (out.good());
 
 	out << a << "\t " << comment << std::endl;
 	
@@ -494,7 +494,7 @@ void Xdr::data (double& a, const char* comment)
 
     case READ:
       {
-	assert (!in.bad());
+	assert (in.good());
 	
 	in >> a; in.getline(comm, comm_len);
 
@@ -503,7 +503,7 @@ void Xdr::data (double& a, const char* comment)
 
     case WRITE:
       {
-	assert (!out.bad());
+	assert (out.good());
 
 	out << a << "\t " << comment << std::endl;
 	
@@ -551,7 +551,7 @@ void Xdr::data (std::complex<double>& a, const char* comment)
 
     case READ:
       {
-	assert (!in.bad());
+	assert (in.good());
 	
 	double _r, _i;
 	in >> _r;
@@ -564,7 +564,7 @@ void Xdr::data (std::complex<double>& a, const char* comment)
 
     case WRITE:
       {
-	assert (!out.bad());
+	assert (out.good());
 
 	out << a.real() << "\t " 
 	    << a.imag() << "\t "
@@ -650,7 +650,7 @@ void Xdr::data (std::vector<int>& v, const char* comment)
 
     case READ:
       {
-	assert (!in.bad());
+	assert (in.good());
 
 	unsigned int length=0;
 
@@ -660,7 +660,7 @@ void Xdr::data (std::vector<int>& v, const char* comment)
 
 	for (unsigned int i=0; i<v.size(); i++)
 	  {
-	    assert (!in.bad());
+	    assert (in.good());
 	    in >> v[i];
 	  }
 
@@ -671,7 +671,7 @@ void Xdr::data (std::vector<int>& v, const char* comment)
 
     case WRITE:
       {
-	assert (!out.bad());
+	assert (out.good());
 
 	unsigned int length=v.size();
 
@@ -679,7 +679,7 @@ void Xdr::data (std::vector<int>& v, const char* comment)
 
 	for (unsigned int i=0; i<v.size(); i++)
 	  {
-	    assert (!out.bad());
+	    assert (out.good());
 	    out << v[i] << " ";
 	  }
 
@@ -763,7 +763,7 @@ void Xdr::data (std::vector<unsigned int>& v, const char* comment)
 
     case READ:
       {
-	assert (!in.bad());
+	assert (in.good());
 
 	unsigned int length=0;
 
@@ -773,7 +773,7 @@ void Xdr::data (std::vector<unsigned int>& v, const char* comment)
 
 	for (unsigned int i=0; i<v.size(); i++)
 	  {
-	    assert (!in.bad());
+	    assert (in.good());
 	    in >> v[i];
 	  }
 
@@ -784,7 +784,7 @@ void Xdr::data (std::vector<unsigned int>& v, const char* comment)
 
     case WRITE:
       {
-	assert (!out.bad());
+	assert (out.good());
 
 	unsigned int length=v.size();
 
@@ -792,7 +792,7 @@ void Xdr::data (std::vector<unsigned int>& v, const char* comment)
 
 	for (unsigned int i=0; i<v.size(); i++)
 	  {
-	    assert (!out.bad());
+	    assert (out.good());
 	    out << v[i] << " ";
 	  }
 
@@ -876,7 +876,7 @@ void Xdr::data (std::vector<short int>& v, const char* comment)
 
     case READ:
       {
-	assert (!in.bad());
+	assert (in.good());
 
 	unsigned int length=0;
 
@@ -886,7 +886,7 @@ void Xdr::data (std::vector<short int>& v, const char* comment)
 
 	for (unsigned int i=0; i<v.size(); i++)
 	  {
-	    assert (!in.bad());
+	    assert (in.good());
 	    in >> v[i];
 	  }
 
@@ -897,7 +897,7 @@ void Xdr::data (std::vector<short int>& v, const char* comment)
 
     case WRITE:
       {
-	assert (!out.bad());
+	assert (out.good());
 
 	unsigned int length=v.size();
 
@@ -905,7 +905,7 @@ void Xdr::data (std::vector<short int>& v, const char* comment)
 
 	for (unsigned int i=0; i<v.size(); i++)
 	  {
-	    assert (!out.bad());
+	    assert (out.good());
 	    out << v[i] << " ";
 	  }
 
@@ -989,7 +989,7 @@ void Xdr::data (std::vector<unsigned short int>& v, const char* comment)
 
     case READ:
       {
-	assert (!in.bad());
+	assert (in.good());
 
 	unsigned int length=0;
 
@@ -999,7 +999,7 @@ void Xdr::data (std::vector<unsigned short int>& v, const char* comment)
 
 	for (unsigned int i=0; i<v.size(); i++)
 	  {
-	    assert (!in.bad());
+	    assert (in.good());
 	    in >> v[i];
 	  }
 
@@ -1010,7 +1010,7 @@ void Xdr::data (std::vector<unsigned short int>& v, const char* comment)
 
     case WRITE:
       {
-	assert (!out.bad());
+	assert (out.good());
 
 	unsigned int length=v.size();
 
@@ -1018,7 +1018,7 @@ void Xdr::data (std::vector<unsigned short int>& v, const char* comment)
 
 	for (unsigned int i=0; i<v.size(); i++)
 	  {
-	    assert (!out.bad());
+	    assert (out.good());
 	    out << v[i] << " ";
 	  }
 
@@ -1102,7 +1102,7 @@ void Xdr::data (std::vector<float>& v, const char* comment)
 
     case READ:
       {
-	assert (!in.bad());
+	assert (in.good());
 
 	unsigned int length=0;
 
@@ -1112,7 +1112,7 @@ void Xdr::data (std::vector<float>& v, const char* comment)
 
 	for (unsigned int i=0; i<v.size(); i++)
 	  {
-	    assert (!in.bad());
+	    assert (in.good());
 	    in >> v[i];
 	  }
 
@@ -1123,7 +1123,7 @@ void Xdr::data (std::vector<float>& v, const char* comment)
 
     case WRITE:
       {
-	assert (!out.bad());
+	assert (out.good());
 
 	unsigned int length=v.size();
 
@@ -1131,7 +1131,7 @@ void Xdr::data (std::vector<float>& v, const char* comment)
 
 	for (unsigned int i=0; i<v.size(); i++)
 	  {
-	    assert (!out.bad());
+	    assert (out.good());
 	    OFSRealscientific(out,12,v[i]) << " ";
  	  }
 
@@ -1215,7 +1215,7 @@ void Xdr::data (std::vector<double>& v, const char* comment)
 
     case READ:
       {
-	assert (!in.bad());
+	assert (in.good());
 
 	unsigned int length=0;
 
@@ -1225,7 +1225,7 @@ void Xdr::data (std::vector<double>& v, const char* comment)
 
 	for (unsigned int i=0; i<v.size(); i++)
 	  {
-	    assert (!in.bad());
+	    assert (in.good());
 	    in >> v[i];
 	  }
 
@@ -1236,7 +1236,7 @@ void Xdr::data (std::vector<double>& v, const char* comment)
 
     case WRITE:
       {
-	assert (!out.bad());
+	assert (out.good());
 
 	unsigned int length=v.size();
 
@@ -1244,7 +1244,7 @@ void Xdr::data (std::vector<double>& v, const char* comment)
 
 	for (unsigned int i=0; i<v.size(); i++)
 	  {
-	    assert (!out.bad());
+	    assert (out.good());
 	    OFSRealscientific(out,12,v[i]) << " ";
  	  }
 
@@ -1411,7 +1411,7 @@ void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
 
     case READ:
       {
-	assert (!in.bad());
+	assert (in.good());
 
 	unsigned int length=0;
 
@@ -1421,7 +1421,7 @@ void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
 
 	for (unsigned int i=0; i<v.size(); i++)
 	  {
-	    assert (!in.bad());
+	    assert (in.good());
 	
 	    double _r, _i;
 	    in >> _r;
@@ -1436,7 +1436,7 @@ void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
 
     case WRITE:
       {
-	assert (!out.bad());
+	assert (out.good());
 
 	unsigned int length=v.size();
 
@@ -1444,7 +1444,7 @@ void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
 
  	for (unsigned int i=0; i<v.size(); i++)
  	  {
- 	    assert (!out.bad());
+ 	    assert (out.good());
 	    OFSNumberscientific(out,12,v[i]) << " ";
  	  }
 
@@ -1539,7 +1539,7 @@ void Xdr::data (std::string& s, const char* comment)
 
     case READ:
       {
-	assert (!in.bad());
+	assert (in.good());
 
 	in.getline(comm, comm_len);
 
@@ -1562,7 +1562,7 @@ void Xdr::data (std::string& s, const char* comment)
 
     case WRITE:
       {
-	assert (!out.bad());
+	assert (out.good());
 
 	out << s << "\t " << comment << std::endl;
 
