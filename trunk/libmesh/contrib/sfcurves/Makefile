@@ -14,7 +14,12 @@ ifeq ($(enable-shared),yes)
 endif
 
 
-all:: $(target)
+ifeq ($(enable-sfcurves),no)
+  all::
+	@echo "<<< sfcurves is disabled, not building >>>"
+else
+  all:: $(target)
+endif
 
 ../lib/$(hosttype)_$(METHOD)/libsfcurves.a: $(OBJS)
 	@echo "Linking "$@

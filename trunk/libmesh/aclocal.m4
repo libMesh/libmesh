@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.51 2003-11-30 21:42:56 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.52 2004-02-12 20:52:12 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -596,8 +596,9 @@ AC_DEFUN(CONFIGURE_SFC,
                   AC_DEFINE(HAVE_SFCURVES, 1,
                              [Flag indicating whether or not Space filling curves are available])
                   AC_MSG_RESULT(<<< Configuring library with SFC support >>>)
+		  enablesfc=yes
                 ],
-                [])
+                [enablesfc=no])
 ])
 dnl -------------------------------------------------------------
 
@@ -622,9 +623,9 @@ AC_DEFUN(CONFIGURE_GZ,
                      AC_DEFINE(HAVE_GZSTREAM, 1,
                                 [Flag indicating whether or not gzstreams are available])
                      AC_MSG_RESULT(<<< Configuring library with gzstreams support >>>)
-                     
+		     enablegz=yes                     
                    ],
-                   [])
+                   [enablegz=no])
   fi
 ])
 dnl -------------------------------------------------------------
@@ -670,6 +671,7 @@ AC_DEFUN(CONFIGURE_METIS,
                   AC_DEFINE(HAVE_METIS, 1,
 	                     [Flag indicating whether or not Metis is available])
                   AC_MSG_RESULT(<<< Configuring library with Metis support >>>)
+	          enablemetis=yes
                 ],
                 [enablemetis=no])
 ])
@@ -697,8 +699,9 @@ AC_DEFUN(CONFIGURE_PARMETIS,
                   AC_DEFINE(HAVE_PARMETIS, 1,
   	                     [Flag indicating whether or not ParMetis is available])
                   AC_MSG_RESULT(<<< Configuring library with ParMetis support >>>)
+	          enableparmetis=yes
                 ],
-                [])
+                [enableparmetis=no])
 ])
 dnl -------------------------------------------------------------
 

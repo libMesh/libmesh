@@ -1,5 +1,5 @@
 dnl --------------------------------------------------------------
-dnl $Id: configure.in,v 1.39 2004-02-08 20:25:23 benkirk Exp $
+dnl $Id: configure.in,v 1.40 2004-02-12 20:52:12 benkirk Exp $
 dnl --------------------------------------------------------------
 dnl Process this file with autoconf to produce a configure script.
 
@@ -9,7 +9,7 @@ dnl you call ./configure subsequently on different systems without
 dnl clearing the cache 
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
-AC_REVISION($Revision: 1.39 $)
+AC_REVISION($Revision: 1.40 $)
 
 
 AC_INIT
@@ -399,6 +399,7 @@ AC_ARG_ENABLE(laspack,
 if test "$enablelaspack" != no ; then
    CONFIGURE_LASPACK
 fi
+AC_SUBST(enablelaspack)
 dnl -------------------------------------------------------------
 
 
@@ -416,6 +417,7 @@ AC_ARG_ENABLE(sfc,
 if test "$enablesfc" != no ; then
    CONFIGURE_SFC
 fi
+AC_SUBST(enablesfc)
 dnl -------------------------------------------------------------
 
 
@@ -432,6 +434,7 @@ AC_ARG_ENABLE(gzstreams,
 if test "$enablegz" != no ; then
    CONFIGURE_GZ
 fi
+AC_SUBST(enablegz)
 dnl -------------------------------------------------------------
 
 
@@ -480,6 +483,8 @@ if (test "$enablemetis" != no) ; then
    fi
    dnl -------------------------------------------------------------
 fi
+AC_SUBST(enablemetis)
+AC_SUBST(enableparmetis)
 dnl -------------------------------------------------------------
 
 
@@ -507,12 +512,24 @@ fi
 dnl -------------------------------------------------------------
 
 
-dnl end of --disable-optional test
+
    AC_MSG_RESULT(----------------------------------------------)
    AC_MSG_RESULT(--- Done configuring for optional packages ---)
    AC_MSG_RESULT(----------------------------------------------)
+else
+  dnl --disable-optional, so don't build any optional packages!
+   enablelaspack=no
+   enablemetis=no
+   enableparmetis=no
+   enablesfc=no
+   enablegz=no
+   AC_SUBST(enablelaspack)
+   AC_SUBST(enablemetis)
+   AC_SUBST(enableparmetis)
+   AC_SUBST(enablesfc)
+   AC_SUBST(enablegz)
 fi
- 
+dnl end of --disable-optional test 
 
 
 dnl -------------------------------------------------------------

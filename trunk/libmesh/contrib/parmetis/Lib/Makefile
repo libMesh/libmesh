@@ -18,14 +18,13 @@ ifeq ($(enable-shared),yes)
 endif
 
 
-ifeq (x$(MPI_IMPL),x)
-  # Do nothing
+#ifeq (x$(MPI_IMPL),x)
+ifeq ($(enable-parmetis),no)
   all::
-	@echo "<<< Cannot build Parmetis without MPI >>>"
-
+	@echo "<<< parmetis is disabled, not building >>>"
 else
-
-all:: $(target)
+  all:: $(target)
+endif
 
 ../../lib/$(hosttype)_$(METHOD)/libparmetis.a: $(OBJS)
 	@echo "Linking "$@
@@ -36,7 +35,6 @@ all:: $(target)
 	@echo "Linking "$@
 	@$(shell mkdir -p ../../lib/$(hosttype)_$(METHOD))
 	@$(CC) $(CSHAREDFLAG) -o $@ $(OBJS) $(LDFLAGS)
-endif
 
 clean:
 	@rm -f $(OBJS) *~

@@ -18,8 +18,8 @@
 # ============================================================================
 # 
 # File          : Makefile
-# Revision      : $Revision: 1.2 $
-# Revision_date : $Date: 2003-10-01 19:47:07 $
+# Revision      : $Revision: 1.3 $
+# Revision_date : $Date: 2004-02-12 20:52:14 $
 # Author(s)     : Deepak Bandyopadhyay, Lutz Kettner
 # 
 # ============================================================================
@@ -58,7 +58,7 @@ ifeq ($(enable-shared),yes)
   target := ../lib/$(hosttype)_$(METHOD)/$(library_name).so
 endif
 
-ifeq ($(enable-gzstreams),no)
+ifeq ($(enable-gzstream),no)
   # Do nothing
   all::
 	@echo "<<< libgzstream is disabled, not building >>>"

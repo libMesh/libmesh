@@ -21,7 +21,12 @@ ifeq ($(enable-shared),yes)
 endif
 
 
-all:: $(target)
+ifeq ($(enable-laspack),no)
+  all::
+	@echo "<<< laspack is disabled, not building >>>"
+else
+  all:: $(target)
+endif
 
 ../lib/$(hosttype)_$(METHOD)/liblaspack.a: $(OBJS)
 	@echo "Linking "$@
