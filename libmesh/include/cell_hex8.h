@@ -1,4 +1,4 @@
-// $Id: cell_hex8.h,v 1.8 2003-02-20 23:18:00 benkirk Exp $
+// $Id: cell_hex8.h,v 1.9 2003-02-27 00:55:28 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -91,32 +91,25 @@ public:
   unsigned int vtk_element_type (const unsigned int) const
   { return 12; }
   
+
+protected:
+  
+  
 #ifdef ENABLE_AMR
 
   /**
-   * Refine the element.
+   * Matrix used to create the elements children.
    */
-  void refine(Mesh& mesh);
-  
-#endif
-
-  
-private:
-  
-  
-#ifdef ENABLE_AMR
+  Real embedding_matrix (const unsigned int i,
+			 const unsigned int j,
+			 const unsigned int k) const
+  { return static_cast<Real>(_embedding_matrix[i][j][k]); }
 
   /**
    * Matrix that computes new nodal locations/solution values
    * from current nodes/solution.
    */
-  static const float embedding_matrix[8][8][8];
-  
-  /**
-   * Matrix that tells which children share which of
-   * my sides.
-   */
-  static const unsigned int side_children_matrix[6][4];
+  static const float _embedding_matrix[8][8][8];
   
 #endif
 

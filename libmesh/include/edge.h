@@ -1,4 +1,4 @@
-// $Id: edge.h,v 1.6 2003-02-13 22:56:07 benkirk Exp $
+// $Id: edge.h,v 1.7 2003-02-27 00:55:28 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -86,6 +86,11 @@ class Edge : public Elem
   unsigned int n_children() const { return 2; }
 
   /**
+   * @returns 1
+   */
+  unsigned int n_children_per_side(const unsigned int) const { return 1; }
+  
+  /**
    * The \p Elem::side() member makes no sense for edges.
    */
   AutoPtr<Elem> side (const unsigned int) const
@@ -96,8 +101,21 @@ class Edge : public Elem
    */
   AutoPtr<Elem> build_side (const unsigned int) const
   { error(); AutoPtr<Elem> ap(NULL); return ap; }
+
   
- private:
+ protected:
+
+
+#ifdef ENABLE_AMR
+  
+  /**
+   * Matrix that allows children to inherit boundary conditions.
+   */
+  unsigned int side_children_matrix (const unsigned int, 
+				     const unsigned int) const
+  { error(); return 0; }
+
+#endif
   
 };
 

@@ -1,4 +1,4 @@
-// $Id: cell.h,v 1.6 2003-02-13 22:56:06 benkirk Exp $
+// $Id: cell.h,v 1.7 2003-02-27 00:55:28 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -57,6 +57,12 @@ public:
    * @returns 3, the dimensionality of the object.
    */
   unsigned int dim () const { return 3; }
+  
+  /**
+   * @returns 4
+   */
+  unsigned int n_children_per_side(const unsigned int) const { return 4; }
+
 };
 
 

@@ -1,4 +1,4 @@
-// $Id: cell_prism.C,v 1.8 2003-02-26 04:43:14 jwpeterson Exp $
+// $Id: cell_prism.C,v 1.9 2003-02-27 00:55:29 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -93,3 +93,18 @@ AutoPtr<Elem> Prism::side (const unsigned int i) const
   error();
   return facet;
 }
+
+
+
+#ifdef ENABLE_AMR
+
+const unsigned int Prism::_side_children_matrix[5][4] =
+{
+  {0, 1, 2, 3}, // side-0 children
+  {0, 1, 4, 5}, // side-1 children
+  {1, 2, 5, 6}, // side-2 children
+  {0, 2, 4, 6}, // side-3 children
+  {4, 5, 6, 7}  // side-4 children
+};
+
+#endif

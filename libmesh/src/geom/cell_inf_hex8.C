@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex8.C,v 1.12 2003-02-26 04:43:14 jwpeterson Exp $
+// $Id: cell_inf_hex8.C,v 1.13 2003-02-27 00:55:29 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -173,7 +173,7 @@ void InfHex8::write_tecplot_connectivity(std::ostream &out) const
 
 #ifdef ENABLE_AMR
 
-const float  InfHex8::embedding_matrix[4][8][8] =
+const float InfHex8::_embedding_matrix[4][8][8] =
 {
   // embedding matrix for child 0
   {
@@ -230,7 +230,7 @@ const float  InfHex8::embedding_matrix[4][8][8] =
 
 
 
-const unsigned int InfHex8::side_children_matrix[6][5] =
+const unsigned int InfHex8::_side_children_matrix[6][5] =
 {
   // note different storage scheme
   {4,   0, 1, 2, 3}, // 4 side-0 children
@@ -274,8 +274,8 @@ void InfHex8::refine(Mesh& mesh)
     for (unsigned int c=0; c<this->n_children(); c++)
       for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
 	for (unsigned int n=0; n<this->n_nodes(); n++)
-	  if (embedding_matrix[c][nc][n] != 0.)
-	    p[c][nc].add_scaled (this->point(n), static_cast<Real>(embedding_matrix[c][nc][n]));
+	  if (_embedding_matrix[c][nc][n] != 0.)
+	    p[c][nc].add_scaled (this->point(n), static_cast<Real>(_embedding_matrix[c][nc][n]));
     
     
     // assign nodes to children & add them to the mesh
@@ -299,8 +299,8 @@ void InfHex8::refine(Mesh& mesh)
 	
 	  if (id != mesh.boundary_info.invalid_id)
 	    // the upper limit for sc is stored in the 0th column
-	    for (unsigned int sc=1; sc <=side_children_matrix[s][0]; sc++)
-	      mesh.boundary_info.add_side(this->child(side_children_matrix[s][sc]), s, id);
+	    for (unsigned int sc=1; sc <= _side_children_matrix[s][0]; sc++)
+	      mesh.boundary_info.add_side(this->child(_side_children_matrix[s][sc]), s, id);
 
 	}
   }

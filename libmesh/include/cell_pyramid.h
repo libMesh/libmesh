@@ -1,4 +1,4 @@
-// $Id: cell_pyramid.h,v 1.6 2003-02-13 22:56:06 benkirk Exp $
+// $Id: cell_pyramid.h,v 1.7 2003-02-27 00:55:28 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -84,8 +84,21 @@ public:
    */
   AutoPtr<Elem> side (const unsigned int i) const;
   
-private:
+  
+ protected:
 
+
+#ifdef ENABLE_AMR
+  
+  /**
+   * Matrix that allows children to inherit boundary conditions.
+   */
+  unsigned int side_children_matrix (const unsigned int, 
+				     const unsigned int) const
+  { error(); return 0; }
+
+#endif
+  
 };
 
 

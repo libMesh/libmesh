@@ -1,4 +1,4 @@
-// $Id: edge_edge2.h,v 1.7 2003-02-20 23:18:04 benkirk Exp $
+// $Id: edge_edge2.h,v 1.8 2003-02-27 00:55:28 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -73,19 +73,22 @@ class Edge2 : public Edge
   
   unsigned int vtk_element_type (const unsigned int) const
   { return 3; }
+
+  
+protected:
+
   
 #ifdef ENABLE_AMR
 
   /**
-   * Refine the element.
+   * Matrix used to create the elements children.
    */
-  void refine(Mesh&)
-  { error(); return; }
+  Real embedding_matrix (const unsigned int,
+			 const unsigned int,
+			 const unsigned int) const
+  { error(); return 0.; }
 
 #endif
-  
- private:
-  
 };
 
 // ------------------------------------------------------------

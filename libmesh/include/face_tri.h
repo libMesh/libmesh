@@ -1,4 +1,4 @@
-// $Id: face_tri.h,v 1.7 2003-02-13 22:56:07 benkirk Exp $
+// $Id: face_tri.h,v 1.8 2003-02-27 00:55:28 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -108,9 +108,30 @@ public:
    * the values suggested by the CUBIT User's Manual.
    */
   std::pair<Real, Real> qual_bounds (const ElemQuality q) const;
+
+
   
-private:
-    
+protected:
+
+
+  
+#ifdef ENABLE_AMR
+  
+  /**
+   * Matrix that allows children to inherit boundary conditions.
+   */
+  unsigned int side_children_matrix (const unsigned int i,
+				     const unsigned int j) const
+  { return _side_children_matrix[i][j]; }
+
+  
+  /**
+   * Matrix that tells which children share which of
+   * my sides.
+   */
+  static const unsigned int _side_children_matrix[3][2];
+
+#endif
 };
 
 // ------------------------------------------------------------

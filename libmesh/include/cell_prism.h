@@ -1,4 +1,4 @@
-// $Id: cell_prism.h,v 1.6 2003-02-13 22:56:06 benkirk Exp $
+// $Id: cell_prism.h,v 1.7 2003-02-27 00:55:28 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -83,8 +83,38 @@ public:
    */
   AutoPtr<Elem> side (const unsigned int i) const;
 
+
+
+protected:
+
+
+  
+#ifdef ENABLE_AMR
+  
+  /**
+   * Matrix that allows children to inherit boundary conditions.
+   */
+  unsigned int side_children_matrix (const unsigned int i,
+				     const unsigned int j) const
+  { return _side_children_matrix[i][j]; }
+
+#endif  
+
+
+
 private:
 
+
+  
+#ifdef ENABLE_AMR
+  
+  /**
+   * Matrix that tells which children share which of
+   * my sides.
+   */
+  static const unsigned int _side_children_matrix[5][4];
+  
+#endif  
 };
 
 

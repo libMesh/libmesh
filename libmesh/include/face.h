@@ -1,4 +1,4 @@
-// $Id: face.h,v 1.6 2003-02-13 22:56:07 benkirk Exp $
+// $Id: face.h,v 1.7 2003-02-27 00:55:28 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -64,6 +64,11 @@ public:
    * edges.
    */
   unsigned int n_faces() const { return 0; }
+
+  /**
+   * @returns 2
+   */
+  unsigned int n_children_per_side(const unsigned int) const { return 2; }
 };
 
 #endif
