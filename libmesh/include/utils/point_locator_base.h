@@ -1,4 +1,4 @@
-// $Id: point_locator_base.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: point_locator_base.h,v 1.3 2004-03-21 07:23:00 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -98,10 +98,9 @@ public:
 
   /**
    * Locates the element in which the point with global coordinates
-   * \p p is located.  Purely virtual.  Check derived classes
-   * why this cannot be a const method.
+   * \p p is located.  Purely virtual.  
    */
-  virtual const Elem* operator() (const Point& p) = 0;
+  virtual const Elem* operator() (const Point& p) const = 0;
 
   /**
    * @returns \p true when this object is properly initialized

@@ -1,4 +1,4 @@
-// $Id: mesh_communication.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: mesh_communication.h,v 1.3 2004-03-21 07:22:59 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -73,7 +73,7 @@ public:
    * It also distributes any boundary information the mesh has
    * associated with it.
    */
-  void distribute (Mesh& );
+  void distribute (Mesh& ) const;
 
   /**
    * Finds all the processors that may contain
@@ -91,12 +91,12 @@ private:
   /**
    *
    */
-  void distribute_mesh (MeshBase& );
+  void distribute_mesh (MeshBase& ) const;
 
   /**
    *
    */
-  void distribute_bcs (MeshBase&, BoundaryInfo&);
+  void distribute_bcs (MeshBase&, BoundaryInfo&) const;
 };
 
 

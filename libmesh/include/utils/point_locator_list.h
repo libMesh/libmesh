@@ -1,4 +1,4 @@
-// $Id: point_locator_list.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: point_locator_list.h,v 1.3 2004-03-21 07:23:00 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -100,10 +100,9 @@ public:
 
   /**
    * Locates the element in which the point with global coordinates
-   * \p p is located.  This cannot be a const method, because the
-   * resulting element is remembered for the next request.
+   * \p p is located.  
    */
-  const Elem* operator() (const Point& p);
+  const Elem* operator() (const Point& p) const;
 
 
 protected:
