@@ -1,4 +1,4 @@
-/* $Id: ex8.C,v 1.8 2003-11-11 04:58:33 benkirk Exp $ */
+/* $Id: ex8.C,v 1.9 2003-11-11 13:19:41 benkirk Exp $ */
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
 
@@ -90,17 +90,6 @@ int main (int argc, char** argv)
   // Initialize Petsc, like in example 2.
   libMesh::init (argc, argv);
 
-  // This example is not designed for complex numbers.
-#ifdef USE_COMPLEX_NUMBERS
-
-  std::cerr << "ERROR: Not intended for use with complex numbers."
-	    << std::endl;
-  here();
-
-  return 0;
-
-#endif
-
   // Braces are used to force object scope.
   {
     // Check for proper usage.
@@ -109,9 +98,6 @@ int main (int argc, char** argv)
 	std::cerr << "Usage: " << argv[0] << " [meshfile]"
 		  << std::endl;
 	
-	// This handy function will print the file name, line number,
-	// and then abort.  Currrently the library does not use C++
-	// exception handling.
 	error();
       }
     

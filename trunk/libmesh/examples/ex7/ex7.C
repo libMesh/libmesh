@@ -1,4 +1,4 @@
-/* $Id: ex7.C,v 1.28 2003-11-11 04:58:33 benkirk Exp $ */
+/* $Id: ex7.C,v 1.29 2003-11-11 13:19:40 benkirk Exp $ */
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
 
@@ -15,6 +15,9 @@
 /* You should have received a copy of the GNU Lesser General Public */
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
+
+
+
 
  // <h1>Example 7 - Introduction to Complex Numbers and the "FrequencySystem"</h1>
  //
@@ -39,6 +42,7 @@
 
 // Basic include files needed for overall functionality.
 #include "libmesh.h"
+#include "libmesh_logging.h"
 #include "mesh.h"
 #include "equation_systems.h"
 
@@ -53,7 +57,7 @@
 // Define Gauss quadrature rules.
 #include "quadrature_gauss.h"
 
-// Define useful datatypes for finite @e element
+// Define useful datatypes for finite element
 // matrix and vector components.
 #include "dense_matrix.h"
 #include "dense_vector.h"
@@ -70,7 +74,7 @@
 #include "dof_map.h"
 
 // Function prototype.  This is the function that will assemble
-// the mass, damping and stiffness matrices.  It will @e not
+// the mass, damping and stiffness matrices.  It will <i>not</i>
 // form an overall system matrix ready for solution.
 void assemble_helmholtz(EquationSystems& es,
 			const std::string& system_name);
@@ -93,8 +97,7 @@ int main (int argc, char** argv)
   // Initialize Petsc, like in example 2.
   libMesh::init (argc, argv);
   
-  // This example is designed for complex numbers.
-   
+  // This example is designed for complex numbers.   
 #ifndef USE_COMPLEX_NUMBERS
 
   std::cerr << "ERROR: This example is intended for " << std::endl
@@ -113,9 +116,6 @@ int main (int argc, char** argv)
 	std::cerr << "Usage: " << argv[0] << " -f [frequency]"
 		  << std::endl;
 	
-	// This handy function will print the file name, line number,
-	// and then abort.  Currrently the library does not use C++
-	// exception handling.
 	error();
       }
     
@@ -134,13 +134,14 @@ int main (int argc, char** argv)
     // may easily be changed, see example 4
     const unsigned int dim = 2;
     
-    // Get the frequency from argv[2] as a @e float,
+    // Get the frequency from argv[2] as a <i>float</i>,
     // currently, solve for 1/3rd, 2/3rd and 1/1th of the given frequency
     const Real frequency_in = atof(argv[2]);
     const unsigned int n_frequencies = 3;
     
     // mesh discretization depends on frequency (badly guessed estimate...?)
-    const unsigned int n_el_per_dim = static_cast<unsigned int>(frequency_in*30.);
+    const unsigned int n_el_per_dim =
+      static_cast<unsigned int>(frequency_in*40.);
     
     // Tell the user the number of elements
     std::cout << " Using " << n_el_per_dim << " x " 
@@ -175,8 +176,8 @@ int main (int argc, char** argv)
       equation_systems.get_system<FrequencySystem> ("Helmholtz");
     
     // Add the variable "p" to "Helmholtz".  "p"
-    // will be approximated using first-order approximation.
-    f_system.add_variable("p", FIRST);
+    // will be approximated using second-order approximation.
+    f_system.add_variable("p", SECOND);
     
     // Tell the frequency system about the two user-provided
     // functions.  In other circumstances, at least the
@@ -185,7 +186,7 @@ int main (int argc, char** argv)
     f_system.attach_solve_function    (add_M_C_K_helmholtz);
     
     // To enable the fast solution scheme, additional
-    // @e global matrices and one global vector, all appropriately sized,
+    // <i>global</i> matrices and one global vector, all appropriately sized,
     // have to be added.  The system object takes care of the
     // appropriate size, but the user should better fill explicitly
     // the sparsity structure of the overall matrix, so that the
@@ -211,7 +212,7 @@ int main (int argc, char** argv)
     equation_systems.set_parameter ("wave speed") = 1.;
     equation_systems.set_parameter ("rho")        = 1.;
     
-    // Initialize the data structures for the equation system.  @e Always
+    // Initialize the data structures for the equation system.  <i>Always</i>
     // prior to this, the frequencies have to be communicated to the system.
     equation_systems.init ();
     
@@ -230,7 +231,7 @@ int main (int argc, char** argv)
 	
 	// After solving the system, write the solution
 	// to a GMV-formatted plot file, for every frequency.  
-	// Now this is nice ;-) : we have the @e identical 
+	// Now this is nice ;-) : we have the <i>identical</i> 
 	// interface to the mesh write method as in the real-only 
 	// case, but we output the real and imaginary 
 	// part, and the magnitude, where the variable 
@@ -290,7 +291,7 @@ void assemble_helmholtz(EquationSystems& es,
   const Real rho = es.parameter("rho");
   
   // In here, we will add the element matrices to the
-  // @e additional matrices "stiffness_mass", "damping",
+  // <i>additional</i> matrices "stiffness_mass", "damping",
   // and the additional vector "rhs", not to the members 
   // "matrix" and "rhs".  Therefore, get writable
   // references to them
@@ -317,7 +318,7 @@ void assemble_helmholtz(EquationSystems& es,
   // of as a pointer that will clean up after itself.
   AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
   
-  // A 2nd order Gauss quadrature rule for numerical integration.
+  // A 5th order Gauss quadrature rule for numerical integration.
   QGauss qrule (dim, FIFTH);
 
   // Tell the finite element object to use our quadrature rule.
@@ -404,14 +405,13 @@ void assemble_helmholtz(EquationSystems& es,
 	  // a double loop to integrate the test funcions (i) against
 	  // the trial functions (j).  Note the braces on the rhs
 	  // of Ke(i,j): these are quite necessary to finally compute
-	  // Real// (Point// Point) = Real, and not something else...
+	  // Real*(Point*Point) = Real, and not something else...
 	  for (unsigned int i=0; i<phi.size(); i++)
 	    for (unsigned int j=0; j<phi.size(); j++)
 	      {
-		Ke(i,j) += JxW[qp]//  (dphi[i][qp]// dphi[j][qp]);
-		Me(i,j) += JxW[qp]//   phi[i][qp] // phi[j][qp];
+		Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+		Me(i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp]);
 	      }	  
-
 	}
 
       STOP_LOG("stiffness & mass","assemble_helmholtz");
@@ -579,8 +579,7 @@ void add_M_C_K_helmholtz(EquationSystems& es,
 
   STOP_LOG("global matrix & vector additions","add_M_C_K_helmholtz");
   
-  // The "matrix" and "rhs" are now ready for solution
-   
+  // The "matrix" and "rhs" are now ready for solution   
 #endif
 }
 
