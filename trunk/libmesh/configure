@@ -7932,7 +7932,7 @@ echo "$as_me:$LINENO: result: $ac_cv_lib_lam_lam_show_version" >&5
 echo "${ECHO_T}$ac_cv_lib_lam_lam_show_version" >&6
 if test $ac_cv_lib_lam_lam_show_version = yes; then
 
-                       LIBS    ="-llam $LIBS"
+                       LIBS="-llam $LIBS"
                        MPI_LIBS="-llam $MPI_LIBS"
                        MPI_IMPL="lam"
 
@@ -7998,7 +7998,7 @@ echo "$as_me:$LINENO: result: $ac_cv_lib_elan_elan_init" >&5
 echo "${ECHO_T}$ac_cv_lib_elan_elan_init" >&6
 if test $ac_cv_lib_elan_elan_init = yes; then
 
-                                LIBS    ="-lelan $LIBS"
+                                LIBS="-lelan $LIBS"
                                 MPI_LIBS="-lelan $MPI_LIBS"
 
 else
@@ -8180,7 +8180,7 @@ echo "$as_me:$LINENO: result: $ac_cv_lib_gm_gm_open" >&5
 echo "${ECHO_T}$ac_cv_lib_gm_gm_open" >&6
 if test $ac_cv_lib_gm_gm_open = yes; then
 
-                         LIBS    ="-lgm $LIBS"
+                         LIBS="-lgm $LIBS"
                          MPI_LIBS="-lgm $MPI_LIBS"
 
 else
@@ -8614,7 +8614,7 @@ echo "$as_me:$LINENO: result: $ac_cv_lib_lam_lam_show_version" >&5
 echo "${ECHO_T}$ac_cv_lib_lam_lam_show_version" >&6
 if test $ac_cv_lib_lam_lam_show_version = yes; then
 
-                       LIBS    ="-llam $LIBS"
+                       LIBS="-llam $LIBS"
                        MPI_LIBS="-llam $MPI_LIBS"
                        MPI_IMPL="lam"
 
@@ -8680,7 +8680,7 @@ echo "$as_me:$LINENO: result: $ac_cv_lib_elan_elan_init" >&5
 echo "${ECHO_T}$ac_cv_lib_elan_elan_init" >&6
 if test $ac_cv_lib_elan_elan_init = yes; then
 
-                                LIBS    ="-lelan $LIBS"
+                                LIBS="-lelan $LIBS"
                                 MPI_LIBS="-lelan $MPI_LIBS"
 
 else
@@ -8862,7 +8862,7 @@ echo "$as_me:$LINENO: result: $ac_cv_lib_gm_gm_open" >&5
 echo "${ECHO_T}$ac_cv_lib_gm_gm_open" >&6
 if test $ac_cv_lib_gm_gm_open = yes; then
 
-                         LIBS    ="-lgm $LIBS"
+                         LIBS="-lgm $LIBS"
                          MPI_LIBS="-lgm $MPI_LIBS"
 
 else
