@@ -1,4 +1,4 @@
-// $Id: petsc_interface.C,v 1.25 2004-08-20 14:01:55 jwpeterson Exp $
+// $Id: petsc_interface.C,v 1.26 2004-09-27 14:54:26 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -349,9 +349,11 @@ void PetscInterface<T>::set_petsc_preconditioner_type()
     case EISENSTAT_PRECOND:
       ierr = PCSetType (_pc, (char*) PCEISENSTAT); CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
 
+#if !((PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 1) && (PETSC_VERSION_SUBMINOR <= 1))
     case USER_PRECOND:
       ierr = PCSetType (_pc, (char*) PCMAT);       CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
-
+#endif
+      
     default:
       std::cerr << "ERROR:  Unsupported PETSC Preconditioner: "
 		<< this->_preconditioner_type       << std::endl
