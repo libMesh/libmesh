@@ -1,4 +1,4 @@
-// $Id: inf_fe_static.C,v 1.12 2003-03-12 20:20:54 ddreyer Exp $
+// $Id: inf_fe_static.C,v 1.13 2003-03-29 12:45:33 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -190,8 +190,6 @@ template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 unsigned int InfFE<Dim,T_radial,T_map>::n_dofs(const FEType& fet,
 					       const ElemType inf_elem_type)
 {
-  assert ( FEInterface::is_InfFE_elem(inf_elem_type) );
-
   const ElemType base_et(Base::get_elem_type(inf_elem_type));
     
   if (Dim > 1)
@@ -209,8 +207,6 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_at_node(const FEType& fet,
 						       const ElemType inf_elem_type,
 						       const unsigned int n)
 {
-  assert ( FEInterface::is_InfFE_elem(inf_elem_type) );
-
   const ElemType     base_et  ( Base::get_elem_type(inf_elem_type) );
 
   const unsigned int n_base   ( Base::index  (fet, base_et, n) );
@@ -230,8 +226,6 @@ template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_per_elem(const FEType& fet,
 							const ElemType inf_elem_type)
 {
-  assert ( FEInterface::is_InfFE_elem(inf_elem_type) );
-
   const ElemType     base_et  ( Base::get_elem_type(inf_elem_type) );
 
   if (Dim > 1)

@@ -1,4 +1,4 @@
-// $Id: fe_interface.h,v 1.12 2003-03-28 20:38:04 benkirk Exp $
+// $Id: fe_interface.h,v 1.13 2003-03-29 12:45:33 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -163,7 +163,8 @@ public:
 		    const Point& p);
 
 
-  
+private:
+
 #ifdef ENABLE_INFINITE_ELEMENTS 
   /**
    * @returns true if \p et is an element to be processed by
@@ -182,12 +183,7 @@ public:
 
 
 
-
-
 #ifdef ENABLE_INFINITE_ELEMENTS
-
-
-private:
 
   // ------------------------------------------------------------
   /*
