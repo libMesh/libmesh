@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.1 2003-11-05 22:26:44 benkirk Exp $
+// $Id: mesh_base.h,v 1.2 2003-11-14 14:47:25 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -62,7 +62,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.1 $
+ * \version $Revision: 1.2 $
  */
 
 
@@ -473,8 +473,7 @@ public:
    * Reads the file specified by \p name.  Attempts to figure out the
    * proper method by the file extension.
    */
-  virtual void read (const std::string& name,
-		     const bool do_prepare_for_use = true);
+  virtual void read (const std::string& name);
   
   /**
    * Write to the file specified by \p name.  Attempts to figure out the
