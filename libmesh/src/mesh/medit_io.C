@@ -96,66 +96,88 @@ void MEDITIO::write_ascii (const std::string& fname,
     int n_quad4 = 0;
     int n_tet4  = 0;
 
-    const_active_elem_iterator       it (mesh.elements_begin());
-    const const_active_elem_iterator end(mesh.elements_end());
-
-    for ( ; it != end; ++it) {
-      if ((*it)->type() == TRI3)  n_tri3++;
-      if ((*it)->type() == QUAD4) n_quad4++;
-      if ((*it)->type() == QUAD9) n_quad4+=4; // (QUAD9 is written as 4 QUAD4.)
-      if ((*it)->type() == TET4)  n_tet4++;
-    } // for
+    {
+      const_active_elem_iterator       it (mesh.elements_begin());
+      const const_active_elem_iterator end(mesh.elements_end());
       
+      for ( ; it != end; ++it)
+	{
+	  if ((*it)->type() == TRI3)  n_tri3++;
+	  if ((*it)->type() == QUAD4) n_quad4++;
+	  if ((*it)->type() == QUAD9) n_quad4+=4; // (QUAD9 is written as 4 QUAD4.)
+	  if ((*it)->type() == TET4)  n_tet4++;
+	} // for
+    }
+    
     // First: write out TRI3 elements:
     out << "Triangles\n";
     out << n_tri3 << "\n";
 
-    for (it=mesh.elements_begin() ; it != end; ++it) 
-      if ((*it)->type() == TRI3) {
-	out << (*it)->node(0)+1  << " " << (*it)->node(1)+1  << " " << (*it)->node(2)+1  << " 0\n";
-      } // if
-
+    {
+      const_active_elem_iterator       it (mesh.elements_begin());
+      const const_active_elem_iterator end(mesh.elements_end());
+    
+      for ( ; it != end; ++it) 
+	if ((*it)->type() == TRI3)
+	  out << (*it)->node(0)+1  << " " << (*it)->node(1)+1  << " " << (*it)->node(2)+1  << " 0\n";
+    }
+    
     // Second: write out QUAD4 elements:
     out << "Quadrilaterals\n";
     out << n_quad4 << "\n";
 
-    for (it=mesh.elements_begin() ; it != end; ++it) 
-      if ((*it)->type() == QUAD4) {
-	out << (*it)->node(0)+1  << " " 
-	    << (*it)->node(1)+1  << " " 
-	    << (*it)->node(2)+1  << " " 
-	    << (*it)->node(3)+1  <<" 0\n";
-      } // if
-      else if ((*it)->type() == QUAD9) {
-	out << (*it)->node(0)+1  << " " 
-	    << (*it)->node(4)+1  << " " 
-	    << (*it)->node(8)+1  << " " 
-	    << (*it)->node(7)+1  <<" 0\n";
-	out << (*it)->node(7)+1  << " " 
-	    << (*it)->node(8)+1  << " " 
-	    << (*it)->node(6)+1  << " " 
-	    << (*it)->node(3)+1  <<" 0\n";
-	out << (*it)->node(4)+1  << " " 
-	    << (*it)->node(1)+1  << " " 
-	    << (*it)->node(5)+1  << " " 
-	    << (*it)->node(8)+1  <<" 0\n";
-	out << (*it)->node(8)+1  << " " 
-	    << (*it)->node(5)+1  << " " 
-	    << (*it)->node(2)+1  << " " 
-	    << (*it)->node(6)+1  <<" 0\n";
-      } // if
+    {
+      const_active_elem_iterator       it (mesh.elements_begin());
+      const const_active_elem_iterator end(mesh.elements_end());
 
+      for ( ; it != end; ++it) 
+	if ((*it)->type() == QUAD4)
+	  {
+	    out << (*it)->node(0)+1  << " " 
+		<< (*it)->node(1)+1  << " " 
+		<< (*it)->node(2)+1  << " " 
+		<< (*it)->node(3)+1  <<" 0\n";
+	  } // if
+	else if ((*it)->type() == QUAD9)
+	  {
+	    out << (*it)->node(0)+1  << " " 
+		<< (*it)->node(4)+1  << " " 
+		<< (*it)->node(8)+1  << " " 
+		<< (*it)->node(7)+1  <<" 0\n";
+	    out << (*it)->node(7)+1  << " " 
+		<< (*it)->node(8)+1  << " " 
+		<< (*it)->node(6)+1  << " " 
+		<< (*it)->node(3)+1  <<" 0\n";
+	    out << (*it)->node(4)+1  << " " 
+		<< (*it)->node(1)+1  << " " 
+		<< (*it)->node(5)+1  << " " 
+		<< (*it)->node(8)+1  <<" 0\n";
+	    out << (*it)->node(8)+1  << " " 
+		<< (*it)->node(5)+1  << " " 
+		<< (*it)->node(2)+1  << " " 
+		<< (*it)->node(6)+1  <<" 0\n";
+	  } // if
+    }
+
+    
     // Third: write out TET4 elements:
     out << "Tetrahedra\n";
     out << n_tet4 << "\n";
 
-    for (it=mesh.elements_begin() ; it != end; ++it) 
-      if ((*it)->type() == TET4) {
-	out << (*it)->node(0)+1  << " " 
-	    << (*it)->node(1)+1  << " " 
-	    << (*it)->node(2)+1  << " " 
-	    << (*it)->node(3)+1  <<" 0\n";
-      } // if
+    {
+      const_active_elem_iterator       it (mesh.elements_begin());
+      const const_active_elem_iterator end(mesh.elements_end());
+      
+      for ( ; it != end; ++it) 
+	if ((*it)->type() == TET4)
+	  {
+	    out << (*it)->node(0)+1  << " " 
+		<< (*it)->node(1)+1  << " " 
+		<< (*it)->node(2)+1  << " " 
+		<< (*it)->node(3)+1  <<" 0\n";
+	  } // if
+    }
+    
   }  
   // end of the out file
   out << std::endl << "# end of file" << std::endl;
