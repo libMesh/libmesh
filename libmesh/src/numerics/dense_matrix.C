@@ -1,4 +1,4 @@
-// $Id: dense_matrix.C,v 1.16 2004-02-22 21:47:59 jwpeterson Exp $
+// $Id: dense_matrix.C,v 1.17 2004-02-25 18:45:31 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -384,6 +384,7 @@ void DenseMatrix<T>::_cholesky_decompose ()
 
 	  if (i == j)
 	    {
+#ifndef USE_COMPLEX_NUMBERS
 	      if (A(i,j) <= 0.0)
 		{
 		  std::cerr << "Error! Can only use Cholesky decomposition "
@@ -391,6 +392,8 @@ void DenseMatrix<T>::_cholesky_decompose ()
 			    << std::endl;
 		  error();
 		}
+#endif
+
 	      A(i,i) = sqrt(A(i,j));
 	    }
 	  else
