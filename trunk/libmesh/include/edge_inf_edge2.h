@@ -1,4 +1,4 @@
-// $Id: edge_inf_edge2.h,v 1.10 2003-03-11 00:47:40 ddreyer Exp $
+// $Id: edge_inf_edge2.h,v 1.11 2003-03-26 01:08:15 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -80,6 +80,16 @@ class InfEdge2 : public Edge
   
   unsigned int vtk_element_type (const unsigned int) const
   { return 3; }
+
+
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+  /**
+   * @returns \p true.  This is an infinite element. 
+   */
+  bool infinite () const { return true; }
+
+#endif
 
   
 protected:

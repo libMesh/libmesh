@@ -1,4 +1,4 @@
-// $Id: cell_inf.h,v 1.1 2003-03-11 00:47:40 ddreyer Exp $
+// $Id: cell_inf.h,v 1.2 2003-03-26 01:08:15 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -57,6 +57,17 @@ public:
    * @returns 3, the dimensionality of the object.
    */
   unsigned int dim () const { return 3; }
+
+
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+  /**
+   * @returns \p true.  All classes derived from \p InfCell
+   * are infinite elements. 
+   */
+  bool infinite () const { return true; }
+
+#endif
   
 };
 
