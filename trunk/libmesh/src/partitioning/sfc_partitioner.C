@@ -1,4 +1,4 @@
-// $Id: sfc_partitioner.C,v 1.12 2004-05-11 20:29:07 jwpeterson Exp $
+// $Id: sfc_partitioner.C,v 1.13 2004-11-08 00:11:06 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -92,8 +92,11 @@ void SFCPartitioner::_do_partition (MeshBase& mesh,
   // We need to map the active element ids into a
   // contiguous range.
   {
-    active_elem_iterator       elem_it (mesh.elements_begin());
-    const active_elem_iterator elem_end(mesh.elements_end());
+//     active_elem_iterator       elem_it (mesh.elements_begin());
+//     const active_elem_iterator elem_end(mesh.elements_end());
+
+    MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
+    const MeshBase::element_iterator elem_end = mesh.active_elements_end(); 
 
     unsigned int el_num = 0;
 
@@ -112,8 +115,11 @@ void SFCPartitioner::_do_partition (MeshBase& mesh,
 
   // Get the centroid for each active element
   {
-    const_active_elem_iterator       elem_it (mesh.const_elements_begin());
-    const const_active_elem_iterator elem_end(mesh.const_elements_end());
+//     const_active_elem_iterator       elem_it (mesh.const_elements_begin());
+//     const const_active_elem_iterator elem_end(mesh.const_elements_end());
+
+    MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
+    const MeshBase::element_iterator elem_end = mesh.active_elements_end(); 
     
     for (; elem_it != elem_end; ++elem_it)
       {

@@ -1,4 +1,4 @@
-/* $Id: ex4.C,v 1.38 2004-07-13 17:31:31 jwpeterson Exp $ */
+/* $Id: ex4.C,v 1.39 2004-11-08 00:11:01 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -292,9 +292,12 @@ void assemble_poisson(EquationSystems& es,
   // its components of the global matrix.
   //
   // "PARALLEL CHANGE"
-  const_local_elem_iterator           el (mesh.elements_begin());
-  const const_local_elem_iterator end_el (mesh.elements_end());
-  
+//   const_local_elem_iterator           el (mesh.elements_begin());
+//   const const_local_elem_iterator end_el (mesh.elements_end());
+
+  MeshBase::const_element_iterator       el     = mesh.local_elements_begin();
+  const MeshBase::const_element_iterator end_el = mesh.local_elements_end();
+
   for ( ; el != end_el; ++el)
     {
       // Start logging the shape function initialization.

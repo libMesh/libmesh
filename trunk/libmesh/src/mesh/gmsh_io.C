@@ -1,4 +1,4 @@
-// $Id: gmsh_io.C,v 1.4 2004-10-19 12:44:10 benkirk Exp $
+// $Id: gmsh_io.C,v 1.5 2004-11-08 00:11:05 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -101,8 +101,11 @@ void GmshIO::write_stream (std::ostream& out)
     out << mesh.n_active_sub_elem() << '\n';
 
 
-    const_active_elem_iterator       it (mesh.elements_begin());
-    const const_active_elem_iterator end(mesh.elements_end());
+//     const_active_elem_iterator       it (mesh.elements_begin());
+//     const const_active_elem_iterator end(mesh.elements_end());
+
+    MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+    const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
     
     switch (mesh.mesh_dimension())
       {

@@ -11,7 +11,7 @@
 #include "fe.h"
 #include "tree.h"
 #include "perf_log.h"
-
+#include "tecplot_io.h"
 
 
 int main (int argc, char** argv)
@@ -31,7 +31,7 @@ int main (int argc, char** argv)
 		  << std::endl;
 	
 	error();
-      };
+      }
 
     // declare the coarse and fine meshes.
     Mesh mesh_coarse(dim);
@@ -43,41 +43,42 @@ int main (int argc, char** argv)
       mesh_coarse.read(argv[2]);
       mesh_coarse.print_info();
       std::cout << std::endl;
-    };
+    }
     // Read the fine mesh
     {
       std::cout << "Reading Mesh " << argv[3] << std::endl;
       mesh_fine.read(argv[3]);
       mesh_fine.print_info();
       std::cout << std::endl;
-    };
+    }
 
 
-    std::vector<Real> coarse_solution;
-    std::vector<Real> fine_solution;
+    std::vector<Number> coarse_solution;
+    std::vector<Number> fine_solution;
     std::vector<std::string> coarse_var_names;
     std::vector<std::string> fine_var_names;
   
     // Read the coarse solution
     {
       std::cout << "Reading Soln " << argv[4] << std::endl;
-      mesh_coarse.read_xdr_soln_binary(argv[4],
+      mesh_coarse.read_xdr_soln_binary(std::string(argv[4]),
 				       coarse_solution,
 				       coarse_var_names);
-    };
+    }
+
     // Read the fine solution
     {
       std::cout << "Reading Soln " << argv[5] << std::endl;
-      mesh_fine.read_xdr_soln_binary(argv[5],
+      mesh_fine.read_xdr_soln_binary(std::string(argv[5]),
 				     fine_solution,
 				     fine_var_names);
-    };
+    }
 
   
     assert (fine_var_names == coarse_var_names);
 
 
-    std::vector<Real>        diff_solution  (fine_solution.size());
+    std::vector<Number>      diff_solution  (fine_solution.size());
     std::vector<std::string> diff_var_names (fine_var_names);
 
     // Declare an Octree.
@@ -130,7 +131,7 @@ int main (int argc, char** argv)
       const std::vector<Point>& q_point          = fe_fine.get_xyz();
       const std::vector<std::vector<Real> >& phi = fe_fine.get_phi();
       const int ivar = atoi(argv[1]);
-      Real error = 0.;
+      Number error = 0.;
 
       // Initial coarse element
       Elem* coarse_element = mesh_coarse.elem(0);
@@ -150,7 +151,7 @@ int main (int argc, char** argv)
 
 	  for (unsigned int gp=0; gp<q_point.size(); gp++)
 	    {
-	      Real fine_soln=0., coarse_soln=0.;
+	      Number fine_soln=0., coarse_soln=0.;
 
 	      assert (fe_fine.n_shape_functions() == fine_element->n_nodes());
 	    
@@ -160,7 +161,7 @@ int main (int argc, char** argv)
 		  const unsigned int gn = fine_element->node(i); // Global node number
 				
 		  fine_soln += fine_solution[gn*nv + ivar]*phi[i][gp];
-		};
+		}
 
 
 	      // Chances are this Gauss point is contained in the coarse-mesh element that contained
@@ -171,7 +172,7 @@ int main (int argc, char** argv)
 		  perf_log.pause_event("gp_loop");
 		  perf_log.start_event("element lookup");
 
-		  coarse_element = octree_coarse.find_element(q_point[gp]);
+		  coarse_element = const_cast<Elem*>(octree_coarse.find_element(q_point[gp]));
 		
 		  assert (coarse_element != NULL);
 				
@@ -197,15 +198,15 @@ int main (int argc, char** argv)
 									       SECOND,
 									       i,
 									       mapped_point);
-		};
+		}
 
 	      // Accumulate the error.
 	      error += JxW[gp]*(coarse_soln - fine_soln)*(coarse_soln - fine_soln);
-	    };
+	    }
 
 	  perf_log.stop_event("gp_loop");
 
-	}; // End element loop
+	} // End element loop
 
       error = sqrt(error);
 
@@ -238,7 +239,7 @@ int main (int argc, char** argv)
 		      perf_log.pause_event ("diff_soln_loop");
 		      perf_log.start_event ("element lookup 2");
 		    
-		      coarse_element = octree_coarse.find_element(p);
+		      coarse_element = const_cast<Elem*>(octree_coarse.find_element(p));
 		
 		      assert (coarse_element != NULL);
 		    
@@ -253,7 +254,7 @@ int main (int argc, char** argv)
 		
 		  for (unsigned int c=0; c<nv; c++)
 		    {
-		      Real coarse_soln = 0.;
+		      Number coarse_soln = 0.;
 		    
 		      // Interpolate the coarse grid solution.
 		      for (unsigned int i=0; i<fe_coarse.n_shape_functions(); i++)
@@ -263,17 +264,19 @@ int main (int argc, char** argv)
 												       mapped_point);
 		    
 		      diff_solution[gn*nv + c] = coarse_soln - fine_solution[gn*nv + c];
-		    };	    
-		};
-	    };
+		    }	    
+		}
+	    }
 	perf_log.stop_event ("diff_soln_loop");
-      };
-      mesh_fine.write_tecplot_binary("foo.plt", &diff_solution, &diff_var_names);
+      }
 
-    };
-  };
+      std::string plot_name = "foo.plt";
+      TecplotIO(mesh_fine).write_nodal_data(plot_name, diff_solution, diff_var_names);
+
+    }
+  }
   
     
   return libMesh::close();
-};
+}
   

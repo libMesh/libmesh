@@ -1,4 +1,4 @@
-// $Id: error_estimator.h,v 1.4 2004-06-02 20:32:53 benkirk Exp $
+// $Id: error_estimator.h,v 1.5 2004-11-08 00:11:03 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -69,10 +69,10 @@ public:
    * first extracts the System named "name" and then calls the
    * function above.
    */
-  virtual void estimate_error (const EquationSystems& es,
-			       const std::string& name,
-			       std::vector<float>& error_per_cell)
-  { this->estimate_error (es.get_system<SteadySystem>(name), error_per_cell); }
+//   virtual void estimate_error (const EquationSystems& es,
+// 			       const std::string& name,
+// 			       std::vector<float>& error_per_cell)
+//   { this->estimate_error (es.get_system<SteadySystem>(name), error_per_cell); }
 
   /**
    * This vector can be used to "mask" certain

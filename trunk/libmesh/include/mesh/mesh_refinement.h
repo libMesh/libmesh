@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.h,v 1.3 2004-02-25 14:27:24 benkirk Exp $
+// $Id: mesh_refinement.h,v 1.4 2004-11-08 00:11:03 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -348,7 +348,10 @@ private:
    * that have been removed from the mesh but not
    * yet removed from the \p _elements vector.
    */
-  std::list<std::vector<Elem*>::iterator> _unused_elements;
+  // This optimization is currently turned off...turn back
+  // on when new iterators are working.
+  // std::list<std::vector<Elem*>::iterator> _unused_elements;
+  // std::list<Elem*> _unused_elements;
 
   /**
    * Reference to the mesh.

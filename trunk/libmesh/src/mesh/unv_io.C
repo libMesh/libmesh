@@ -1,4 +1,4 @@
-// $Id: unv_io.C,v 1.12 2004-10-26 22:00:46 jwpeterson Exp $
+// $Id: unv_io.C,v 1.13 2004-11-08 00:11:05 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -936,8 +936,11 @@ void UNVIO::node_out (std::ostream& out_file)
   // A reference to the parent class's mesh
   const Mesh& mesh = this->cmesh();
 
-  const_node_iterator       nd  (mesh.nodes_begin());
-  const const_node_iterator end (mesh.nodes_end());
+//   const_node_iterator       nd  (mesh.nodes_begin());
+//   const const_node_iterator end (mesh.nodes_end());
+
+  MeshBase::const_node_iterator       nd  = mesh.nodes_begin();
+  const MeshBase::const_node_iterator end = mesh.nodes_end();
 
   for (; nd != end; ++nd)
     {
@@ -1018,9 +1021,12 @@ void UNVIO::element_out(std::ostream& out_file)
   // A reference to the parent class's mesh
   const Mesh& mesh = this->cmesh();
 
-  const_elem_iterator        it  (mesh.elements_begin());
-  const const_elem_iterator  end (mesh.elements_end());
-						        
+//   const_elem_iterator        it  (mesh.elements_begin());
+//   const const_elem_iterator  end (mesh.elements_end());
+
+  MeshBase::const_element_iterator it  = mesh.elements_begin();
+  const MeshBase::const_element_iterator end = mesh.elements_end();
+
   for (; it != end; ++it)
     {
       const Elem* elem = *it;

@@ -1,4 +1,4 @@
-// $Id: mesh_tetgen_support.C,v 1.13 2004-11-02 19:21:10 spetersen Exp $
+// $Id: mesh_tetgen_support.C,v 1.14 2004-11-08 00:11:05 jwpeterson Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -63,10 +63,16 @@ TetGen1_wrapper::TetGen1_wrapper()
   tetgen_output = new tetgenio;
 }
 
+
+
+
 TetGen1_wrapper::~TetGen1_wrapper()
 {
   delete tetgen_output;
 }
+
+
+
 
 void TetGen1_wrapper::set_node(int i, REAL x, REAL y, REAL z)
 {
@@ -76,6 +82,9 @@ void TetGen1_wrapper::set_node(int i, REAL x, REAL y, REAL z)
   tetgen_data.pointlist[index++] = z;
 }
 
+
+
+
 void TetGen1_wrapper::set_hole(int i, REAL x, REAL y, REAL z)
 {
   int index = i*3;
@@ -84,8 +93,14 @@ void TetGen1_wrapper::set_hole(int i, REAL x, REAL y, REAL z)
   tetgen_data.holelist[index++] = z;
 }
 
+
+
+
 void TetGen1_wrapper::set_numberofpoints(int i)
 { tetgen_data.numberofpoints = i; }
+
+
+
 
 void TetGen1_wrapper::get_output_node(int i, REAL& x, REAL& y, REAL& z)
 {
@@ -94,20 +109,37 @@ void TetGen1_wrapper::get_output_node(int i, REAL& x, REAL& y, REAL& z)
   z = tetgen_output->pointlist[3*i+2];
 }
 
+
+
+
 int TetGen1_wrapper::get_numberoftetrahedra()
 { return tetgen_output->numberoftetrahedra; }
+
+
+
 
 int TetGen1_wrapper::get_numberoftrifaces()
 { return tetgen_output->numberoftrifaces; }
 
+
+
+
 int TetGen1_wrapper::get_numberofpoints()
 { return tetgen_output->numberofpoints; }
+
+
+
 
 int TetGen1_wrapper::get_element_node(int i, int j)
 { return tetgen_output->tetrahedronlist[i*4+j]; }
 
+
+
+
 int TetGen1_wrapper::get_triface_node(int i, int j)
 { return tetgen_output->trifacelist[i*3+j]; }
+
+
 
 
 // =============================================================================
@@ -121,15 +153,24 @@ TetGen13_wrapper::TetGen13_wrapper()
   tetgen_data.firstnumber             = 0;
 }
 
+
+
+
 TetGen13_wrapper::~TetGen13_wrapper()
 { }
-  
+
+
+
+
 void TetGen13_wrapper::set_pointlist(int numofpoints)
 {
   set_numberofpoints(numofpoints);
   tetgen_data.pointlist = new REAL[tetgen_data.numberofpoints * 3];
 }
-  
+
+
+
+
 void TetGen13_wrapper::set_switches(std::string s)
 { 
   switches = strdup(s.c_str()); 
@@ -138,16 +179,28 @@ void TetGen13_wrapper::set_switches(std::string s)
   } // if
 }
 
+
+
+
 void TetGen13_wrapper::run_tetgen()
 {
   tetrahedralize(&tetgen_be, &tetgen_data, tetgen_output);
 }
 
+
+
+
 void TetGen13_wrapper::set_numberoffacets(int i)
 { tetgen_data.numberoffacets = i; }
 
+
+
+
 void TetGen13_wrapper::set_numberofholes(int i)
 { tetgen_data.numberofholes = i; }
+
+
+
 
 void TetGen13_wrapper::set_facetlist(int numoffacets, int numofholes)
 {
@@ -159,11 +212,20 @@ void TetGen13_wrapper::set_facetlist(int numoffacets, int numofholes)
   tetgen_data.holelist = new REAL[tetgen_data.numberofholes * 3];
 }
 
+
+
+
 void TetGen13_wrapper::set_facet_numberofpolygons(int i, int num)
 { tetgen_data.facetlist[i].numberofpolygons = num; }
 
+
+
+
 void TetGen13_wrapper::set_facet_numberofholes(int i, int num)
 { tetgen_data.facetlist[i].numberofholes = num; }
+
+
+
 
 void TetGen13_wrapper::set_facet_polygonlist(int i, int numofpolygons)
 {
@@ -174,8 +236,14 @@ void TetGen13_wrapper::set_facet_polygonlist(int i, int numofpolygons)
     tetgen_data.init(&(tetgen_data.facetlist[i].polygonlist[j]));
 }
 
+
+
+
 void TetGen13_wrapper::set_polygon_numberofvertices(int i, int j, int num)
 { tetgen_data.facetlist[i].polygonlist[j].numberofvertices = num; }
+
+
+
 
 void TetGen13_wrapper::set_polygon_vertexlist(int i, int j, int numofvertices)
 {
@@ -183,10 +251,16 @@ void TetGen13_wrapper::set_polygon_vertexlist(int i, int j, int numofvertices)
   tetgen_data.facetlist[i].polygonlist[j].vertexlist = new int[numofvertices];
 }
 
+
+
+
 void TetGen13_wrapper::set_vertex(int i, int j, int k, int nodeindex)
 {
   tetgen_data.facetlist[i].polygonlist[j].vertexlist[k] = nodeindex;
 }
+
+
+
 
 // class type TetGen_access is cast to TetGen_Wrapper class for current TetGen version:
 typedef TetGen13_wrapper TetGen_access;

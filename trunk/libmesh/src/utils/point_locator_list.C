@@ -1,4 +1,4 @@
-// $Id: point_locator_list.C,v 1.8 2004-07-26 16:27:48 jwpeterson Exp $
+// $Id: point_locator_list.C,v 1.9 2004-11-08 00:11:06 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -100,8 +100,11 @@ void PointLocatorList::init ()
 	  // fill our list with the centroids and element
 	  // pointers of the mesh.  For this use the handy
 	  // element iterators.
-	  const_active_elem_iterator       el (this->_mesh.elements_begin());
-	  const const_active_elem_iterator end(this->_mesh.elements_end()); 
+// 	  const_active_elem_iterator       el (this->_mesh.elements_begin());
+// 	  const const_active_elem_iterator end(this->_mesh.elements_end()); 
+
+	  MeshBase::const_element_iterator       el  = _mesh.active_elements_begin();
+	  const MeshBase::const_element_iterator end = _mesh.active_elements_end(); 
 
 	  for (; el!=end; ++el)
 	    my_list.push_back((*el)->centroid());

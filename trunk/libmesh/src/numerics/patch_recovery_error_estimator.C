@@ -1,4 +1,4 @@
-// $Id: patch_recovery_error_estimator.C,v 1.3 2004-06-08 14:45:50 spetersen Exp $
+// $Id: patch_recovery_error_estimator.C,v 1.4 2004-11-08 00:11:06 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -78,8 +78,11 @@ void PatchRecoveryErrorEstimator::estimate_error (const SteadySystem& system,
   //------------------------------------------------------------
   // Iterate over all the active elements in the mesh
   // that live on this processor.
-  const_active_local_elem_iterator       elem_it (mesh.elements_begin());
-  const const_active_local_elem_iterator elem_end(mesh.elements_end());
+//   const_active_local_elem_iterator       elem_it (mesh.elements_begin());
+//   const const_active_local_elem_iterator elem_end(mesh.elements_end());
+
+  MeshBase::const_element_iterator       elem_it  = mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end(); 
   
   for (; elem_it != elem_end; ++elem_it)
     {

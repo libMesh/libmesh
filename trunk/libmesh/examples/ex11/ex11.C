@@ -1,4 +1,4 @@
-/* $Id: ex11.C,v 1.6 2004-03-20 15:16:56 benkirk Exp $ */
+/* $Id: ex11.C,v 1.7 2004-11-08 00:10:59 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -221,8 +221,11 @@ void assemble_stokes (EquationSystems& es,
   // matrix and right-hand-side contribution.  Since the mesh
   // will be refined we want to only consider the ACTIVE elements,
   // hence we use a variant of the \p active_elem_iterator.
-  const_active_local_elem_iterator           el (mesh.elements_begin());
-  const const_active_local_elem_iterator end_el (mesh.elements_end());
+//   const_active_local_elem_iterator           el (mesh.elements_begin());
+//   const const_active_local_elem_iterator end_el (mesh.elements_end());
+
+  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end(); 
   
   for ( ; el != end_el; ++el)
     {    

@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.35 2004-10-26 22:00:43 jwpeterson Exp $
+// $Id: boundary_info.C,v 1.36 2004-11-08 00:11:04 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -98,9 +98,12 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
   boundary_mesh.set_n_subdomains() = id_map.size();
 
   // Add additional sides that aren't flagged with boundary conditions
-  const_active_elem_iterator       el     (_mesh.elements_begin());
-  const const_active_elem_iterator end_el (_mesh.elements_end());
-  
+//   const_active_elem_iterator       el     (_mesh.elements_begin());
+//   const const_active_elem_iterator end_el (_mesh.elements_end());
+
+  MeshBase::const_element_iterator       el     = _mesh.active_elements_begin();
+  const MeshBase::const_element_iterator end_el = _mesh.active_elements_end(); 
+
   for ( ; el != end_el; ++el)
     {
       const Elem* elem = *el;

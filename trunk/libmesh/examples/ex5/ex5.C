@@ -1,4 +1,4 @@
-/* $Id: ex5.C,v 1.27 2004-03-20 15:16:56 benkirk Exp $ */
+/* $Id: ex5.C,v 1.28 2004-11-08 00:11:01 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -292,8 +292,11 @@ void assemble_poisson(EquationSystems& es,
   
   // Now we will loop over all the elements in the mesh.
   // See example 3 for details.
-  const_elem_iterator           el (mesh.elements_begin());
-  const const_elem_iterator end_el (mesh.elements_end());
+//   const_elem_iterator           el (mesh.elements_begin());
+//   const const_elem_iterator end_el (mesh.elements_end());
+
+  MeshBase::const_element_iterator       el     = mesh.elements_begin();
+  const MeshBase::const_element_iterator end_el = mesh.elements_end();
   
   for ( ; el != end_el; ++el)
     {

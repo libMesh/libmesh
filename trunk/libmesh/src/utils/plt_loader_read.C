@@ -1,4 +1,4 @@
-// $Id: plt_loader_read.C,v 1.2 2004-10-15 04:44:28 benkirk Exp $
+// $Id: plt_loader_read.C,v 1.3 2004-11-08 00:11:06 jwpeterson Exp $
 
 // Copyright (C) 2002-2004  Benjamin S. Kirk
   
@@ -72,7 +72,8 @@ void PltLoader::read_header (std::istream& in)
   {
     in.read (buf, 8);
 
-    this->version().clear();
+    // Using erase for GCC 2.95.3
+    this->version().erase();
 
     for (unsigned int i=0; i<8; i++)
       this->version() += buf[i];
@@ -117,7 +118,9 @@ void PltLoader::read_header (std::istream& in)
       // Read the title
       {
 	int i=0;
-	this->title().clear();
+	
+	// Using erase for GCC 2.95.3
+	this->title().erase();
 	
 	do
 	  {
@@ -146,7 +149,9 @@ void PltLoader::read_header (std::istream& in)
       for (unsigned int v=0; v<this->n_vars(); v++)
 	{
 	  int i=0;
-	  this->var_name(v).clear();
+
+	  // Using erase for GCC 2.95.3
+	  this->var_name(v).erase();
       
 	  do
 	    {
@@ -320,8 +325,9 @@ void PltLoader::read_header (std::istream& in)
       // Read the title
       {
 	int i=0;
-    
-	this->title().clear();
+
+	// Using erase() for GCC 2.95.3
+	this->title().erase();
 	do
 	  {
 	    in.read (buf, SIZEOF_INT);
@@ -349,7 +355,9 @@ void PltLoader::read_header (std::istream& in)
       for (unsigned int v=0; v<this->n_vars(); v++)
 	{
 	  int i=0;
-	  this->var_name(v).clear();
+
+	  // Using erase() for GCC 2.95.3
+	  this->var_name(v).erase();
       
 	  do
 	    {

@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.81 2004-10-28 20:06:14 benkirk Exp $
+// $Id: mesh_base.C,v 1.82 2004-11-08 00:11:05 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -126,9 +126,12 @@ unsigned int MeshBase::n_active_elem () const
 {
   unsigned int num=0;
 
-  const_active_elem_iterator       el (this->elements_begin());
-  const const_active_elem_iterator end(this->elements_end()); 
+//   const_active_elem_iterator       el (this->elements_begin());
+//   const const_active_elem_iterator end(this->elements_end()); 
 
+  const_element_iterator       el  = this->active_elements_begin();
+  const const_element_iterator end = this->active_elements_end(); 
+  
   for (; el!=end; ++el)
     num++;
 
@@ -186,8 +189,11 @@ unsigned int MeshBase::n_elem_on_proc (const unsigned int proc_id) const
 
   unsigned int ne=0;
   
-  const_pid_elem_iterator       el (this->elements_begin(), proc_id);
-  const const_pid_elem_iterator end(this->elements_end(),   proc_id);
+//   const_pid_elem_iterator       el (this->elements_begin(), proc_id);
+//   const const_pid_elem_iterator end(this->elements_end(),   proc_id);
+
+  const_element_iterator       el  = this->pid_elements_begin(proc_id);
+  const const_element_iterator end = this->pid_elements_end(proc_id);
 
   for (; el!=end; ++el)
     ne++;
@@ -203,9 +209,13 @@ unsigned int MeshBase::n_active_elem_on_proc (const unsigned int proc_id) const
 
   unsigned int ne=0;
   
-  const_active_pid_elem_iterator       el (this->elements_begin(), proc_id);
-  const const_active_pid_elem_iterator end(this->elements_end(),   proc_id);
+//   const_active_pid_elem_iterator       el (this->elements_begin(), proc_id);
+//   const const_active_pid_elem_iterator end(this->elements_end(),   proc_id);
 
+  const_element_iterator       el  = this->active_pid_elements_begin(proc_id);
+  const const_element_iterator end = this->active_pid_elements_end(proc_id);
+
+  
   for (; el!=end; ++el)
     ne++;
 
@@ -218,9 +228,12 @@ unsigned int MeshBase::n_sub_elem () const
 {
   unsigned int ne=0;
 
-  const_elem_iterator       el (this->elements_begin());
-  const const_elem_iterator end(this->elements_end());
-  
+//   const_elem_iterator       el (this->elements_begin());
+//   const const_elem_iterator end(this->elements_end());
+
+  const_element_iterator       el  = this->elements_begin();
+  const const_element_iterator end = this->elements_end(); 
+
   for (; el!=end; ++el)
     ne += (*el)->n_sub_elem(); 
 
@@ -233,9 +246,12 @@ unsigned int MeshBase::n_active_sub_elem () const
 {
   unsigned int ne=0;
 
-  const_active_elem_iterator       el (this->elements_begin());
-  const const_active_elem_iterator end(this->elements_end());
-  
+//   const_active_elem_iterator       el (this->elements_begin());
+//   const const_active_elem_iterator end(this->elements_end());
+
+  const_element_iterator       el  = this->active_elements_begin();
+  const const_element_iterator end = this->active_elements_end(); 
+
   for (; el!=end; ++el)
     ne += (*el)->n_sub_elem(); 
 
@@ -250,9 +266,12 @@ std::vector<ElemType> MeshBase::elem_types() const
 
   assert (n_elem());
 	
-  const_elem_iterator       el (this->elements_begin());
-  const const_elem_iterator end(this->elements_end());
-  
+//   const_elem_iterator       el (this->elements_begin());
+//   const const_elem_iterator end(this->elements_end());
+
+  const_element_iterator       el  = this->elements_begin();
+  const const_element_iterator end = this->elements_end(); 
+
   /**
    * Automatically get the first type
    */
@@ -280,8 +299,11 @@ unsigned int MeshBase::n_elem_of_type(const ElemType type) const
 {
   unsigned int cnt=0;
 
-  const_type_elem_iterator       el (this->elements_begin(), type);
-  const const_type_elem_iterator end(this->elements_end(),   type);
+//   const_type_elem_iterator       el (this->elements_begin(), type);
+//   const const_type_elem_iterator end(this->elements_end(),   type);
+
+  const_element_iterator       el  = this->type_elements_begin(type);
+  const const_element_iterator end = this->type_elements_end(type);
 
   for (; el!=end; ++el)
     cnt++;
@@ -295,8 +317,11 @@ unsigned int MeshBase::n_active_elem_of_type(const ElemType type) const
 {
   unsigned int cnt=0;
 
-  const_active_type_elem_iterator       el (this->elements_begin(), type);
-  const const_active_type_elem_iterator end(this->elements_end(),   type);
+//   const_active_type_elem_iterator       el (this->elements_begin(), type);
+//   const const_active_type_elem_iterator end(this->elements_end(),   type);
+
+  const_element_iterator       el  = this->active_type_elements_begin(type);
+  const const_element_iterator end = this->active_type_elements_end(type);
   
   for (; el!=end; ++el)
     cnt++;
@@ -310,8 +335,11 @@ unsigned int MeshBase::total_weight() const
 {
   unsigned int weight=0;
 
-  const_elem_iterator       el (this->elements_begin());
-  const const_elem_iterator end(this->elements_end());
+//   const_elem_iterator       el (this->elements_begin());
+//   const const_elem_iterator end(this->elements_end());
+
+  const_element_iterator       el  = this->elements_begin();
+  const const_element_iterator end = this->elements_end(); 
 
   for ( ; el != end; ++el)
     weight += (*el)->n_nodes();
@@ -402,8 +430,11 @@ void MeshBase::find_neighbors()
     // A map from side keys to corresponding elements & side numbers  
     map_type side_to_elem_map;
   
-    elem_iterator       el (this->elements_begin());
-    const elem_iterator end(this->elements_end());
+//     elem_iterator       el (this->elements_begin());
+//     const elem_iterator end(this->elements_end());
+
+    element_iterator       el  = this->elements_begin();
+    const element_iterator end = this->elements_end();
     
     for (; el != end; ++el)
       {
@@ -491,8 +522,11 @@ void MeshBase::find_neighbors()
    * Furthermore, that neighbor better be active,
    * otherwise we missed a child somewhere.
    */
-  not_level_elem_iterator el (this->elements_begin(), 0);
-  not_level_elem_iterator end(this->elements_end(),   0);
+//   not_level_elem_iterator el (this->elements_begin(), 0);
+//   not_level_elem_iterator end(this->elements_end(),   0);
+
+  element_iterator el  = this->not_level_elements_begin(0);
+  element_iterator end = this->not_level_elements_end(0);
 
   for (; el != end; ++el)
     {
@@ -530,8 +564,11 @@ void MeshBase::build_nodes_to_elem_map (std::vector<std::vector<unsigned int> >&
 {
   nodes_to_elem_map.resize (this->n_nodes());
 
-  const_elem_iterator       el (this->elements_begin());
-  const const_elem_iterator end(this->elements_end());
+//   const_elem_iterator       el (this->elements_begin());
+//   const const_elem_iterator end(this->elements_end());
+
+  const_element_iterator       el  = this->elements_begin();
+  const const_element_iterator end = this->elements_end();
 
   for (; el != end; ++el)
     for (unsigned int n=0; n<(*el)->n_nodes(); n++)
@@ -551,8 +588,11 @@ void MeshBase::build_nodes_to_elem_map (std::vector<std::vector<const Elem*> >&
 {
   nodes_to_elem_map.resize (this->n_nodes());
 
-  const_elem_iterator       el (this->elements_begin());
-  const const_elem_iterator end(this->elements_end());
+//   const_elem_iterator       el (this->elements_begin());
+//   const const_elem_iterator end(this->elements_end());
+
+  const_element_iterator       el  = this->elements_begin();
+  const const_element_iterator end = this->elements_end();
 
   for (; el != end; ++el)
     for (unsigned int n=0; n<(*el)->n_nodes(); n++)
@@ -588,8 +628,12 @@ void MeshBase::renumber_nodes_and_elements ()
       
       // Number the elements
       {
-	elem_iterator       it(this->elements_begin());
-	const elem_iterator end(this->elements_end());
+// 	elem_iterator       it(this->elements_begin());
+// 	const elem_iterator end(this->elements_end());
+
+	element_iterator       it  = this->elements_begin();
+	const element_iterator end = this->elements_end();
+	
 	unsigned int id=0;
 
 	for (; it != end; ++it)
@@ -598,8 +642,13 @@ void MeshBase::renumber_nodes_and_elements ()
 
       // Number the nodes
       {
-	node_iterator       it(this->nodes_begin());
-	const node_iterator end(this->nodes_end());
+// 	node_iterator       it(this->nodes_begin());
+// 	const node_iterator end(this->nodes_end());
+
+	node_iterator       it  = this->nodes_begin();
+	const node_iterator end = this->nodes_end();
+
+	
 	unsigned int id=0;
 
 	for (; it != end; ++it)
@@ -735,9 +784,12 @@ void MeshBase::find_boundary_nodes (std::vector<bool>& on_boundary) const
 
   // Loop over elements, find those on boundary, and
   // mark them as true in on_boundary.
-  const_active_elem_iterator       el (this->elements_begin());
-  const const_active_elem_iterator end(this->elements_end());
-  
+//   const_active_elem_iterator       el (this->elements_begin());
+//   const const_active_elem_iterator end(this->elements_end());
+
+  const_element_iterator       el  = this->active_elements_begin();
+  const const_element_iterator end = this->active_elements_end(); 
+
   for (; el != end; ++el)
     for (unsigned int s=0; s<(*el)->n_neighbors(); s++)
       if ((*el)->neighbor(s) == NULL) // on the boundary
@@ -777,9 +829,12 @@ void MeshBase::distort (const Real factor,
   // hmin holds these distances.
   std::vector<float> hmin (this->n_nodes(), 1.e20);
   
-  active_elem_iterator       el (this->elements_begin());
-  const active_elem_iterator end(this->elements_end());
-  
+//   active_elem_iterator       el (this->elements_begin());
+//   const active_elem_iterator end(this->elements_end());
+
+  element_iterator       el  = this->active_elements_begin();
+  const element_iterator end = this->active_elements_end(); 
+
   for (; el!=end; ++el)
     for (unsigned int n=0; n<(*el)->n_nodes(); n++)
       hmin[(*el)->node(n)] = std::min(hmin[(*el)->node(n)],
@@ -939,8 +994,11 @@ MeshBase::processor_bounding_box (const unsigned int pid) const
   // to only consider those elements living on that processor
   else
     {
-      const_pid_elem_iterator       el (this->elements_begin(), pid);
-      const const_pid_elem_iterator end(this->elements_end(),   pid);
+//       const_pid_elem_iterator       el (this->elements_begin(), pid);
+//       const const_pid_elem_iterator end(this->elements_end(),   pid);
+
+      const_element_iterator       el  = this->pid_elements_begin(pid);
+      const const_element_iterator end = this->pid_elements_end(pid);
 
       for (; el != end; ++el)
 	for (unsigned int n=0; n<(*el)->n_nodes(); n++)

@@ -1,4 +1,4 @@
-// $Id: plt_loader_write.C,v 1.4 2004-10-19 12:44:11 benkirk Exp $
+// $Id: plt_loader_write.C,v 1.5 2004-11-08 00:11:06 jwpeterson Exp $
 
 // Copyright (C) 2002-2004  Benjamin S. Kirk
   
@@ -497,9 +497,15 @@ void PltLoader::write_dat (const std::string& name,
 		for (unsigned int j=0; j<this->jmax(z); j++)
 		  for (unsigned int i=0; i<this->imax(z); i++)
 		    {
+		      // GCC 2.95.3 has scientific in the ios class instead
+		      // of in namespace std::
+#ifndef BROKEN_IOSTREAM
 		      out << std::scientific
 			  << _data[z][v][l++] << " ";
-
+#else
+		      out << std::ios::scientific
+			  << _data[z][v][l++] << " ";
+#endif
 		      // Throw in a newline every 5 entries to
 		      // avoid really long lines.
  		      if (l%5 == 0)
@@ -539,9 +545,16 @@ void PltLoader::write_dat (const std::string& name,
 		for (unsigned int i=0; i<this->imax(z); i++)
 		  {
 		    for (unsigned int v=0; v<this->n_vars(); v++)
+
+		      // GCC 2.95.3 has scientific in the ios class instead
+		      // of in namespace std::
+#ifndef BROKEN_IOSTREAM
 		      out << std::scientific
 			  << _data[z][v][l] << " ";
-		    
+#else
+		      out << std::ios::scientific
+			  << _data[z][v][l] << " ";
+#endif
 		    out << '\n';
 		    
 		    l++;

@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.8 2004-11-05 17:19:42 spetersen Exp $
+// $Id: equation_systems.h,v 1.9 2004-11-08 00:11:03 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -34,6 +34,7 @@
 #include "mesh.h"
 #include "data_map.h"
 #include "enum_xdr_mode.h"
+//#include "node_iterators.h"
 
 // HP aCC needs these for some reason
 #ifdef __HP_aCC
@@ -490,15 +491,21 @@ T_sys & EquationSystems::add_system (const std::string& name)
   // Tell all the \p DofObject entities to add a system.
   {
     // All the nodes
-    node_iterator       node_it  (_mesh.nodes_begin());
-    const node_iterator node_end (_mesh.nodes_end());
+//     node_iterator       node_it  (_mesh.nodes_begin());
+//     const node_iterator node_end (_mesh.nodes_end());
+
+    MeshBase::node_iterator       node_it  = _mesh.nodes_begin();
+    const MeshBase::node_iterator node_end = _mesh.nodes_end();
  
     for ( ; node_it != node_end; ++node_it)
       (*node_it)->add_system();
  
     // All the elements
-    elem_iterator       elem_it (_mesh.elements_begin());
-    const elem_iterator elem_end(_mesh.elements_end());
+//     elem_iterator       elem_it (_mesh.elements_begin());
+//     const elem_iterator elem_end(_mesh.elements_end());
+
+    MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
+    const MeshBase::element_iterator elem_end = _mesh.elements_end();
  
     for ( ; elem_it != elem_end; ++elem_it)
       (*elem_it)->add_system();

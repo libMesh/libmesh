@@ -430,6 +430,21 @@ void process_cmd_line(int argc, char **argv,
 
 
 
+// A helper function for creating a submesh of active elements.  Why do we need this?
+// Well, the create submesh function is expecting const_element_iterators,
+// and this is just one way to get them...
+void construct_mesh_of_active_elements(Mesh& new_mesh, const Mesh& mesh)
+{
+  MeshBase::const_element_iterator       it     = mesh.active_elements_begin();
+  const MeshBase::const_element_iterator it_end = mesh.active_elements_end();
+  mesh.create_submesh(new_mesh, it, it_end);
+}
+
+
+
+
+
+
 int main (int argc, char** argv)
 {
   libMesh::init (argc, argv);
@@ -483,7 +498,8 @@ int main (int argc, char** argv)
       }
 
     Mesh mesh(dim);
-       
+    MeshData mesh_data(mesh);
+    
     /**
      * Read the input mesh
      */      
@@ -493,13 +509,14 @@ int main (int argc, char** argv)
 	 * activate the MeshData of the dim mesh,
 	 * so that it can be copied to the boundary
 	 */
-//	if (write_bndry == BM_WITH_MESHDATA)
-//	  {
-//	    mesh.data.activate();
-//
-//	    if (verbose)
-//		mesh.data.print_info();
-//	  }
+
+	if (write_bndry == BM_WITH_MESHDATA)
+	  {
+	    mesh_data.activate();
+
+	    if (verbose)
+	      mesh_data.print_info();
+	  }
 
 
 	mesh.read(names[0]);
@@ -816,9 +833,7 @@ int main (int argc, char** argv)
 
 	      Mesh new_mesh (dim);
 
-	      const_active_elem_iterator       it     (mesh.const_elements_begin());
-	      const const_active_elem_iterator it_end (mesh.const_elements_end());
-	      mesh.create_submesh(new_mesh, it, it_end);
+	      construct_mesh_of_active_elements(new_mesh, mesh);
 
 	      // now write the new_mesh
 	      if (names.size() == 2)
@@ -846,14 +861,17 @@ int main (int argc, char** argv)
 	  if (write_bndry != BM_DISABLED)
 	    {
 	      BoundaryMesh boundary_mesh (mesh.mesh_dimension()-1);
+	      MeshData boundary_mesh_data (boundary_mesh);
 	      
 	      std::string boundary_name = "bndry_";
 	      boundary_name += names[1];
 	      
 	      if (write_bndry == BM_MESH_ONLY)
-		mesh.boundary_info.sync(boundary_mesh, false);
-//	      else if  (write_bndry == BM_WITH_MESHDATA)
-//		mesh.boundary_info.sync(boundary_mesh, true);
+		mesh.boundary_info.sync(boundary_mesh);
+	      
+	      else if  (write_bndry == BM_WITH_MESHDATA)
+		mesh.boundary_info.sync(boundary_mesh, &boundary_mesh_data, &mesh_data);
+
 	      else
 		error();
 	      

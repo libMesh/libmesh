@@ -1,4 +1,4 @@
-/* $Id: ex10.C,v 1.15 2004-08-06 16:48:38 jwpeterson Exp $ */
+/* $Id: ex10.C,v 1.16 2004-11-08 00:10:59 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -223,8 +223,7 @@ int main (int argc, char** argv)
 		// \p flux_jump indicator.  Note in general you will need to
 		// provide an error estimator specifically designed for your
 		// application.
-		error_estimator.estimate_error (equation_systems,
-						"Convection-Diffusion",
+		error_estimator.estimate_error (system,
 						error);
 		
 		// This takes the error in \p error and decides which elements
@@ -304,8 +303,11 @@ void init_cd (EquationSystems& es,
   // catch, however...  We only want to assign the components that
   // live on the local processor, hence there will be an if-test
   // in the loop.
-  const_active_local_elem_iterator       elem_it (mesh.elements_begin());
-  const const_active_local_elem_iterator elem_end(mesh.elements_end());
+//   const_active_local_elem_iterator       elem_it (mesh.elements_begin());
+//   const const_active_local_elem_iterator elem_end(mesh.elements_end());
+
+  MeshBase::const_element_iterator       elem_it  = mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end(); 
 
   for ( ; elem_it != elem_end; ++elem_it)
     {
@@ -426,8 +428,13 @@ void assemble_cd (EquationSystems& es,
   // matrix and right-hand-side contribution.  Since the mesh
   // will be refined we want to only consider the ACTIVE elements,
   // hence we use a variant of the \p active_elem_iterator.
-  const_active_local_elem_iterator           el (mesh.elements_begin());
-  const const_active_local_elem_iterator end_el (mesh.elements_end());
+//   const_active_local_elem_iterator           el (mesh.elements_begin());
+//   const const_active_local_elem_iterator end_el (mesh.elements_end());
+
+  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end(); 
+
+
   
   for ( ; el != end_el; ++el)
     {    

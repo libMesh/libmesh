@@ -1,4 +1,4 @@
-/* $Id: ex12.C,v 1.8 2004-10-26 22:00:26 jwpeterson Exp $ */
+/* $Id: ex12.C,v 1.9 2004-11-08 00:11:00 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -502,8 +502,11 @@ void create_artificial_data (const Mesh& mesh,
   assert (fabs(x_max-x_min) > TOLERANCE);
 
 
-  const_node_iterator node_it = mesh.nodes_begin();
-  const const_node_iterator node_end = mesh.nodes_end();
+ //  const_node_iterator node_it = mesh.nodes_begin();
+//   const const_node_iterator node_end = mesh.nodes_end();
+
+  MeshBase::const_node_iterator       node_it  = mesh.nodes_begin();
+  const MeshBase::const_node_iterator node_end = mesh.nodes_end();
 
   for (; node_it != node_end; ++node_it)
     {

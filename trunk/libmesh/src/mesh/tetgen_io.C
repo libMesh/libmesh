@@ -1,4 +1,4 @@
-// $Id: tetgen_io.C,v 1.8 2004-10-28 19:09:27 benkirk Exp $
+// $Id: tetgen_io.C,v 1.9 2004-11-08 00:11:05 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -254,10 +254,13 @@ void TetGenIO::write (const std::string& fname)
     out << "# Facets:\n"
 	<< mesh.n_elem() << " 0\n";
     
-    const_active_elem_iterator       it (mesh.elements_begin());
-    const const_active_elem_iterator end(mesh.elements_end());
+//     const_active_elem_iterator       it (mesh.elements_begin());
+//     const const_active_elem_iterator end(mesh.elements_end());
+
+    MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+    const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
       
-    for (it=mesh.elements_begin() ; it != end; ++it)
+    for ( ; it != end; ++it)
       out << "1\n" // no. of facet polygons
 	  << (*it)->n_nodes() << " "
 	  << (*it)->node(0)   << " "
