@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.10 2003-02-10 22:02:59 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.11 2003-02-11 22:59:25 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -433,7 +433,10 @@ AC_DEFUN(CONFIGURE_PETSC,
     AC_PROG_F77            dnl Petsc requires linking with FORTRAN libraries 
     AC_F77_LIBRARY_LDFLAGS
     AC_SUBST(PETSC_DIR)
-    AC_DEFINE(HAVE_PETSC, 1, [Flag indicating whether or not Petsc is available])
+    AC_DEFINE(HAVE_PETSC, 1,
+	      [Flag indicating whether or not Petsc is available])
+    AC_DEFINE(HAVE_MPI, 1,
+	      [Flag indicating whether or not MPI is available])
     petscmajor=`grep "define PETSC_VERSION_MAJOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_MAJOR[ ]*//g"`
     petscminor=`grep "define PETSC_VERSION_MINOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_MINOR[ ]*//g"`
     petscsubminor=`grep "define PETSC_VERSION_SUBMINOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_SUBMINOR[ ]*//g"`
@@ -445,6 +448,34 @@ AC_DEFUN(CONFIGURE_PETSC,
   fi
 
   AC_SUBST(enablepetsc)
+])
+dnl -------------------------------------------------------------
+
+
+
+dnl -------------------------------------------------------------
+dnl Mpi
+dnl -------------------------------------------------------------
+AC_DEFUN(CONFIGURE_MPI, 
+[
+  AC_CHECK_FILE($MPIHOME/include/mpi.h,
+                MPI_INCLUDE_PATH=$MPIHOME/include)
+
+  AC_CHECK_FILE($MPIHOME/lib/libmpich.a,
+                MPI_LIBRARY_PATH=$MPIHOME/lib/libmpich.a,
+                MPI_LIBRARY_PATH=/mpich_bar_not_there)
+
+  if (test -r $MPI_INCLUDE_PATH/mpi.h -a -r $MPI_LIBRARY_PATH) ; then
+    AC_SUBST(MPI_INCLUDE_PATH)
+    AC_SUBST(MPI_LIBRARY_PATH)
+    AC_DEFINE(HAVE_MPI, 1,
+	      [Flag indicating whether or not MPI is available])
+    AC_MSG_RESULT(<<< Configuring library with MPI support >>>)
+  else
+    enablempi=no
+  fi
+
+  AC_SUBST(enablempi)	
 ])
 dnl -------------------------------------------------------------
 

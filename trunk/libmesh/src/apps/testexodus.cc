@@ -20,13 +20,17 @@
 #include "equation_systems.h"
 #include "perfmon.h"
 
+#if defined(HAVE_PETSC)
 extern "C" {
-#ifdef HAVE_PETSC
 #include <petsc.h>
-#else
-//#include <mpi.h>
-#endif
 }
+#elif defined(HAVE_MPI)
+extern "C" {
+#include <mpi.h>
+}
+#endif
+
+
 
 void assemble_primary(EquationSystems& es,
 		      const std::string& system_name);
@@ -62,10 +66,17 @@ int main (int argc, char** argv)
       
     int proc_id = 0;
     int n_procs = 1;
-    
-    //MPI_Comm_rank (PETSC_COMM_WORLD, &proc_id);
-    //MPI_Comm_size (PETSC_COMM_WORLD, &n_procs);
 
+#ifdef HAVE_MPI    
+    MPI_Comm_rank (MPI_COMM_WORLD, &proc_id);
+    MPI_Comm_size (MPI_COMM_WORLD, &n_procs);
+
+    std::cout << "Running " << argv[0] << " on " << n_procs
+	      << " processors, I am processor "  << proc_id
+	      << std::endl
+	      << std::endl;
+#endif
+    
     PerfMon perfmon("Code performance");
 
     // declare a mesh...

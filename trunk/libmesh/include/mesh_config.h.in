@@ -42,12 +42,6 @@
 /* Flag indicating whether or not LASPACK iterative solvers are available */
 #undef HAVE_LASPACK
 
-/* Define to 1 if you have the `papi' library (-lpapi). */
-#undef HAVE_LIBPAPI
-
-/* Define to 1 if you have the `perfctr' library (-lperfctr). */
-#undef HAVE_LIBPERFCTR
-
 /* Define to 1 if you have the <locale> header file. */
 #undef HAVE_LOCALE
 
@@ -57,12 +51,12 @@
 /* Flag indicating whether or not Metis is available */
 #undef HAVE_METIS
 
+/* Flag indicating whether or not MPI is available */
+#undef HAVE_MPI
+
 /* Flag indicating whether the library shall be compiled to support netcdf
    files */
 #undef HAVE_NETCDF
-
-/* Define to 1 if you have the <papi.h> header file. */
-#undef HAVE_PAPI_H
 
 /* Flag indicating whether or not Petsc is available */
 #undef HAVE_PETSC
