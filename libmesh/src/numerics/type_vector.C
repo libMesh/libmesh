@@ -1,4 +1,4 @@
-// $Id: type_vector.C,v 1.8 2004-10-19 16:26:21 jwpeterson Exp $
+// $Id: type_vector.C,v 1.9 2005-01-13 21:19:04 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -125,26 +125,13 @@ void TypeVector<T>::write_unformatted (std::ostream &out,
 template <>
 bool TypeVector<Real>::operator < (const TypeVector<Real>& rhs) const
 {
-  if (*this == rhs)
-    return false;
-
-
-  
-  if ((*this)(2) < rhs(2))
-    return true;
-    
-  else
-    if ((*this)(1) < rhs(1))
-      return true;
-  
-      else
-	if ((*this)(0) < rhs(0))
-	  return true;
-  
-	else
-	  return false;
-
-  
+  for (unsigned int i=0; i<DIM; i++)
+    {
+      if ((*this)(i) < rhs(i))
+        return true;
+      if ((*this)(i) > rhs(i))
+        return false;
+    }
   return false;
 }
 
@@ -154,29 +141,17 @@ bool TypeVector<Real>::operator < (const TypeVector<Real>& rhs) const
 template <>
 bool TypeVector<Complex>::operator < (const TypeVector<Complex>& rhs) const
 {
-  if (*this == rhs)
-    return false;
-
-
-  
-  if ((*this)(2).real() < rhs(2).real() ||
-      (*this)(2).imag() < rhs(2).imag())
-    return true;
-    
-  else
-    if ((*this)(1).real() < rhs(1).real() ||
-	(*this)(1).imag() < rhs(1).imag())
-      return true;
-  
-      else
-	if ((*this)(0).real() < rhs(0).real() ||
-	    (*this)(0).imag() < rhs(0).imag())
-	  return true;
-	
-	else
-	  return false;
-
-  
+  for (unsigned int i=0; i<DIM; i++)
+    {
+      if ((*this)(i).real() < rhs(i).real())
+        return true;
+      if ((*this)(i).real() > rhs(i).real())
+        return false;
+      if ((*this)(i).imag() < rhs(i).imag())
+        return true;
+      if ((*this)(i).imag() > rhs(i).imag())
+        return false;
+    }
   return false;
 }
 
