@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.12 2003-02-13 01:49:49 benkirk Exp $
+// $Id: dof_map.C,v 1.13 2003-02-13 16:34:30 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -89,40 +89,54 @@ void DofMap::reinit(MeshBase& mesh)
 
   // First set the number of variables for each \p DofObject
   // equal to n_components()
-  for (unsigned int n=0; n<_n_nodes; n++)
-    mesh.node(n).set_n_vars(n_comp);
+  {
+    // All the nodes
+    node_iterator       node_it  (mesh.nodes_begin());
+    const node_iterator node_end (mesh.nodes_end());
 
-  for (unsigned int e=0; e<_n_elem; e++)
-    mesh.elem(e)->set_n_vars(n_comp);
+    for ( ; node_it != node_end; ++node_it)
+      (*node_it)->set_n_vars(n_comp);
+    
+    // All the elements
+    elem_iterator       elem_it (mesh.elements_begin());
+    const elem_iterator elem_end(mesh.elements_end());
+
+    for ( ; elem_it != elem_end; ++elem_it)
+      (*elem_it)->set_n_vars(n_comp);
+  };
+
 
   
   for (unsigned int c=0; c<n_components(); c++)
     {
       const FEType& fe_type = component_type(c);
-       
-      for (unsigned int e=0; e<_n_elem; e++)
-	if (mesh.elem(e)->active())
-	  {
-	    Elem*    elem       = mesh.elem(e);
-	    const ElemType type = elem->type();
-	     
-	    // Allocate the nodal DOFs
-	    for (unsigned int n=0; n<elem->n_nodes(); n++)
-	      {
-		const unsigned int dofs_at_node =
-		  FEInterface::n_dofs_at_node(dim, fe_type, type, n);
 
-		if (dofs_at_node > elem->get_node(n)->n_comp(c))
-		  elem->get_node(n)->set_n_comp(c, dofs_at_node);
-	      };
+      // For all the active elements
+      active_elem_iterator       elem_it (mesh.elements_begin());
+      const active_elem_iterator elem_end(mesh.elements_end());
+      
+      for ( ; elem_it != elem_end; ++elem_it)
+	{
+	  Elem*    elem       = *elem_it;
+	  const ElemType type = elem->type();
 	     
-	    // Allocate the element DOFs
-	    const unsigned int dofs_per_elem =
-	      FEInterface::n_dofs_per_elem(dim, fe_type, type);
-
-	    if (dofs_per_elem > elem->n_comp(c))
-	      elem->set_n_comp(c,dofs_per_elem);
-	  };
+	  // Allocate the nodal DOFs
+	  for (unsigned int n=0; n<elem->n_nodes(); n++)
+	    {
+	      const unsigned int dofs_at_node =
+		FEInterface::n_dofs_at_node(dim, fe_type, type, n);
+	      
+	      if (dofs_at_node > elem->get_node(n)->n_comp(c))
+		elem->get_node(n)->set_n_comp(c, dofs_at_node);
+	    };
+	     
+	  // Allocate the element DOFs
+	  const unsigned int dofs_per_elem =
+	    FEInterface::n_dofs_per_elem(dim, fe_type, type);
+	  
+	  if (dofs_per_elem > elem->n_comp(c))
+	    elem->set_n_comp(c,dofs_per_elem);
+	};
     };
   
   perf_log.stop_event("reinit()");
@@ -179,11 +193,9 @@ void DofMap::distribute_dofs(MeshBase& mesh)
 
   unsigned int next_free_dof=0;
 
-  _first_df.resize(n_proc);
-  _last_df.resize (n_proc);
-
-  std::fill(_first_df.begin(), _first_df.end(), 0);
-  std::fill(_last_df.begin(),  _last_df.end(),  0);
+  // Resize the _first_df and _last_df arrays, fill with 0.
+  _first_df.resize(n_proc); std::fill(_first_df.begin(), _first_df.end(), 0);
+  _last_df.resize (n_proc); std::fill(_last_df.begin(),  _last_df.end(),  0);
 
   _send_list.clear();
   
