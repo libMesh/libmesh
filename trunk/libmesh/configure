@@ -2574,7 +2574,7 @@ echo "$as_me: error: Unrecognized compiler" >&2;}
 
     if test "$GXX" = yes ; then
     CXXFLAGSO="-O2 -felide-constructors -DNDEBUG"
-    CXXFLAGSG="-g -ansi -pedantic -W -Wall -Wunused -Wpointer-arith -Wimplicit -Wformat -Wparentheses -O -Wuninitialized -DDEBUG"
+    CXXFLAGSG="-g -ansi -pedantic -Wall -Wunused -Wpointer-arith -Wimplicit -Wformat -Wparentheses -O -Wuninitialized -DDEBUG"
     CXXFLAGSP="-O2 -felide-constructors -DNDEBUG -g -pg"
     CXXFLAGSS="-fsyntax-only"
 
