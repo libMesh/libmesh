@@ -28,28 +28,19 @@ if (NW_IS_IE)
 else
 {
   // You can get these numbers using the 'file' command on most linux systems.
-  $pic_widths = array( 417,
-		       417,
-		       417,
-		       417,
-		       417,
-		       400,
-		       345,
-		       270,
-		       205,
-		       145,
-		       80 );
+  $pic_widths  = array( 417, 417, 417, 417, 417, 400, 345, 270, 205, 145, 80 );
+  $pic_heights = array( 26,   26,  26,  26,  26,  13,  13,  13,  13,  13, 13 );
 
   for ($i=0; $i<11; $i++)
     {
       if ($i < 10)
 	{
-	  echo "<img class=\"slant\" width=$pic_widths[$i] src=\"images/libmesh_mesh_layer_0$i.png\">";
+	  echo "<img class=\"slant\" width=$pic_widths[$i] height=$pic_heights[$i] src=\"images/libmesh_mesh_layer_0$i.png\">";
 	}
       
       else
 	{
-	  echo "<img class=\"slant\" width=$pic_widths[$i] src=\"images/libmesh_mesh_layer_10.png\">";
+	  echo "<img class=\"slant\" width=$pic_widths[$i] height=$pic_heights[$i] src=\"images/libmesh_mesh_layer_10.png\">";
 	}
     }
 }
