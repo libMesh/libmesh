@@ -1,4 +1,4 @@
-// $Id: dof_object.C,v 1.9 2004-01-11 15:56:46 benkirk Exp $
+// $Id: dof_object.C,v 1.10 2004-01-20 13:36:03 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -244,9 +244,6 @@ void DofObject::set_n_vars(const unsigned int s,
 {
   assert (s < this->n_systems());
   assert (_n_vars != NULL);
-
-  // Check for trivial return
-  if (nvars == this->n_vars(s)) return;
 
 #ifdef DEBUG
 

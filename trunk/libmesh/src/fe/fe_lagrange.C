@@ -1,4 +1,4 @@
-// $Id: fe_lagrange.C,v 1.16 2004-01-03 15:37:42 benkirk Exp $
+// $Id: fe_lagrange.C,v 1.17 2004-01-20 13:36:04 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -624,10 +624,8 @@ void FE<Dim,T>::compute_constraints (std::map<unsigned int,
 		      // A reference to the constraint row.
 		      std::map<unsigned int, float>& constraint_row = constraints[my_dof_g];
 		      
-		      const std::pair<unsigned int, float> p (their_dof_g,
-							      static_cast<float>(their_dof_value));
-		      
-		      constraint_row.insert(p);
+		      constraint_row.insert(std::make_pair (their_dof_g,
+							    static_cast<float>(their_dof_value)));
 		    }
 		}		      
 	    }

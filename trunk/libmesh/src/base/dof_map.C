@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.52 2004-01-17 22:56:54 benkirk Exp $
+// $Id: dof_map.C,v 1.53 2004-01-20 13:36:03 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -155,12 +155,18 @@ void DofMap::reinit(const MeshBase& mesh)
 	  // Allocate the nodal DOFs
 	  for (unsigned int n=0; n<elem->n_nodes(); n++)
 	    {
+	      Node* node = elem->get_node(n);
+
 	      const unsigned int dofs_at_node =
 		FEInterface::n_dofs_at_node(dim, fe_type, type, n);
-	      
-	      elem->get_node(n)->set_n_comp(this->sys_number(),
-					    var,
-					    dofs_at_node);
+
+	      // Consider the possibility that a neighboring element
+	      // has assigned more components than we will use.  In that
+	      // case do not step on their toes...
+	      if (dofs_at_node > node->n_comp(this->sys_number(), var))
+		node->set_n_comp(this->sys_number(),
+				 var,
+				 dofs_at_node);
 	    }
 	     
 	  // Allocate the element DOFs
