@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.61 2004-04-20 11:22:29 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.62 2004-04-20 11:57:55 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -481,10 +481,12 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           ;;
   
       portland_group)
-	  CXXFLAGSG="-A -Xa -DDEBUG"
-          CXXFLAGSO="-A -Xa -DNDEBUG"
-	  CFLAGSG="-A -Xa -DDEBUG"
-          CFLAGSO="-A -Xa -DNDEBUG"
+	  CXXFLAGSG="-g --no_using_std --instantiate=used -DDEBUG"
+          CXXFLAGSO="-O2 --no_using_std --instantiate=used -DNDEBUG"
+	  CFLAGSG="-g -DDEBUG"
+          CFLAGSO="-O2 -DNDEBUG"
+
+	  LDFLAGS="$LDFLAGS -fpic"
           ;;
 
       hpux_acc)
