@@ -1,4 +1,4 @@
-// $Id: xdrIO.h,v 1.4 2004-03-07 23:11:33 benkirk Exp $
+// $Id: xdrIO.h,v 1.5 2004-07-26 14:02:49 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -706,16 +706,16 @@ class XdrMHEAD : public XdrHEAD
 
   /**
    * Element block types are defined in elem_type.h.
-   * They may be for example TRI, TRI6, QUAD, etc.
+   * They may be for example TRI3, TRI6, QUAD4, etc.
    *
-   * @return The vector of element block types.
+   * @return A writeable reference to the vector of element block types.
    */
-  std::vector<ElemType> get_block_elt_types() const { return block_elt_types; }
+  void get_block_elt_types(std::vector<ElemType>& bet) const { bet = block_elt_types; }
 
   /**
    * Set the vector of element block types
    */
-  void set_block_elt_types(const std::vector<ElemType> bet) { block_elt_types = bet; }
+  void set_block_elt_types(const std::vector<ElemType>& bet) { block_elt_types = bet; }
 
   /**
    * The size of each element block is
@@ -724,12 +724,12 @@ class XdrMHEAD : public XdrHEAD
    *
    * @return The vector of block sizes
    */
-  std::vector<unsigned int> get_num_elem_each_block() const { return num_elem_each_block; }
+  void get_num_elem_each_block(std::vector<unsigned int>& neeb) const { neeb = num_elem_each_block; }
 
   /**
    * Set the vector of block sizes
    */
-  void set_num_elem_each_block(const std::vector<unsigned int> neeb) { num_elem_each_block = neeb; }
+  void set_num_elem_each_block(const std::vector<unsigned int>& neeb) { num_elem_each_block = neeb; }
 
 
 
