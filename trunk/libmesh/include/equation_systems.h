@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.26 2003-06-04 01:30:07 benkirk Exp $
+// $Id: equation_systems.h,v 1.27 2003-07-22 19:14:44 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -419,6 +419,55 @@ unsigned int EquationSystems::n_parameters () const
 {
   return _parameters.size();
 }
+
+
+
+
+template <typename T_sys>
+inline
+T_sys& EquationSystems::add_system (const std::string& name)
+{
+  if (!_systems.count(name))
+    {
+      const unsigned int num = this->n_systems();
+
+      _systems.insert (std::make_pair(name, new T_sys(*this,
+						      name,
+						      num)));
+   
+    }
+  else
+    {
+      std::cerr << "ERROR: There was already a system"
+		<< " named " << name
+		<< std::endl;
+
+      error();
+    }
+
+
+  /**
+   * Tell all the \p DofObject entities to add a system.
+   */
+  {
+    // All the nodes
+    const_node_iterator       node_it  (_mesh.nodes_begin());
+    const const_node_iterator node_end (_mesh.nodes_end());
+ 
+    for ( ; node_it != node_end; ++node_it)
+      (*node_it)->add_system();
+ 
+    // All the elements
+    const_elem_iterator       elem_it (_mesh.elements_begin());
+    const const_elem_iterator elem_end(_mesh.elements_end());
+ 
+    for ( ; elem_it != elem_end; ++elem_it)
+      (*elem_it)->add_system();
+  }
+
+  return *(dynamic_cast<T_sys*>(_systems[name]));
+}
+
 
 
 
