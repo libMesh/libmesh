@@ -3384,52 +3384,7 @@ src/numerics/distributed_vector.$(obj-suffix):\
     include/numerics/numeric_vector.h\
     include/utils/perf_log.h
 src/numerics/error_estimator.$(obj-suffix):\
-    src/numerics/error_estimator.C\
-    include/base/auto_ptr.h\
-    include/base/dof_map.h\
-    include/base/dof_object.h\
-    include/base/libmesh.h\
-    include/base/libmesh_base.h\
-    include/base/libmesh_common.h\
-    include/base/libmesh_config.h\
-    include/base/node.h\
-    include/base/predicated_iterator.h\
-    include/base/reference_counted_object.h\
-    include/base/reference_counter.h\
-    include/enums/enum_elem_quality.h\
-    include/enums/enum_elem_type.h\
-    include/enums/enum_fe_family.h\
-    include/enums/enum_inf_map_type.h\
-    include/enums/enum_order.h\
-    include/enums/enum_solver_package.h\
-    include/enums/enum_xdr_mode.h\
-    include/fe/fe_type.h\
-    include/geom/elem.h\
-    include/geom/point.h\
-    include/geom/sphere.h\
-    include/geom/surface.h\
-    include/mesh/boundary_info.h\
-    include/mesh/elem_iterators.h\
-    include/mesh/mesh.h\
-    include/mesh/mesh_base.h\
-    include/mesh/mesh_data.h\
-    include/mesh/node_iterators.h\
-    include/numerics/coupling_matrix.h\
-    include/numerics/error_estimator.h\
-    include/numerics/numeric_vector.h\
-    include/numerics/type_vector.h\
-    include/partitioning/partitioner.h\
-    include/solvers/equation_systems.h\
-    include/solvers/explicit_system.h\
-    include/solvers/frequency_system.h\
-    include/solvers/implicit_system.h\
-    include/solvers/newmark_system.h\
-    include/solvers/steady_system.h\
-    include/solvers/system.h\
-    include/solvers/transient_system.h\
-    include/utils/data_map.h\
-    include/utils/data_object.h\
-    include/utils/perf_log.h
+    src/numerics/error_estimator.C
 src/numerics/function_base.$(obj-suffix):\
     src/numerics/function_base.C\
     include/base/libmesh_base.h\
@@ -3438,8 +3393,8 @@ src/numerics/function_base.$(obj-suffix):\
     include/geom/point.h\
     include/numerics/function_base.h\
     include/numerics/type_vector.h
-src/numerics/kelley_error_estimator.$(obj-suffix):\
-    src/numerics/kelley_error_estimator.C\
+src/numerics/kelly_error_estimator.$(obj-suffix):\
+    src/numerics/kelly_error_estimator.C\
     include/base/auto_ptr.h\
     include/base/dof_map.h\
     include/base/dof_object.h\
@@ -3476,7 +3431,7 @@ src/numerics/kelley_error_estimator.$(obj-suffix):\
     include/mesh/node_iterators.h\
     include/numerics/coupling_matrix.h\
     include/numerics/error_estimator.h\
-    include/numerics/kelley_error_estimator.h\
+    include/numerics/kelly_error_estimator.h\
     include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\

@@ -1,4 +1,4 @@
-// $Id: kelley_error_estimator.C,v 1.1 2004-05-20 19:48:46 jwpeterson Exp $
+// $Id: kelly_error_estimator.C,v 1.1 2004-05-20 22:56:52 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -31,7 +31,7 @@
 
 
 // Local Includes
-#include "kelley_error_estimator.h"
+#include "kelly_error_estimator.h"
 #include "dof_map.h"
 #include "fe.h"
 #include "fe_interface.h"
@@ -43,10 +43,10 @@
 
 //-----------------------------------------------------------------
 // ErrorEstimator implementations
-void KelleyErrorEstimator::estimate_error (const SteadySystem& system,
+void KellyErrorEstimator::estimate_error (const SteadySystem& system,
 					   std::vector<float>& error_per_cell)
 {
-  START_LOG("flux_jump()", "KelleyErrorEstimator");
+  START_LOG("flux_jump()", "KellyErrorEstimator");
   
   /*
 
@@ -291,5 +291,5 @@ void KelleyErrorEstimator::estimate_error (const SteadySystem& system,
     if (error_per_cell[i] != 0.)
       error_per_cell[i] = sqrt(error_per_cell[i]);
   
-  STOP_LOG("flux_jump()", "KelleyErrorEstimator");
+  STOP_LOG("flux_jump()", "KellyErrorEstimator");
 }

@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.1 2004-05-20 19:51:13 jwpeterson Exp $ */
+/* $Id: ex14.C,v 1.2 2004-05-20 22:56:51 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -22,7 +22,7 @@
  // This example solves the Laplace equation on the classic "L-shaped"
  // domain with adaptive mesh refinement.  In this case, the exact
  // solution is u(r,\theta) = r^{2/3} * \sin ( (2/3) * \theta), but
- // the standard Kelley error indicator is used to estimate the error.
+ // the standard Kelly error indicator is used to estimate the error.
  // The initial mesh contains three QUAD9 elements which represent the
  // standard quadrants I, II, and III of the domain [-1,1]x[-1,1],
  // i.e.
@@ -56,7 +56,7 @@
 #include "sparse_matrix.h"
 #include "mesh_refinement.h"
 #include "error_vector.h"
-#include "kelley_error_estimator.h"
+#include "kelly_error_estimator.h"
 #include "getpot.h"
 
 // Function prototype.  This is the function that will assemble
@@ -165,7 +165,7 @@ int main(int argc, char** argv)
 	    // solution and assigns to each element a positive error value.
 	    // This value is used for deciding which elements to refine
 	    // and which to coarsen.
-	    KelleyErrorEstimator error_estimator;
+	    KellyErrorEstimator error_estimator;
 		
 	    // Compute the error for each active element using the provided
 	    // \p flux_jump indicator.  Note in general you will need to
