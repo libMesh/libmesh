@@ -1,4 +1,4 @@
-// $Id: tecplot_io.h,v 1.3 2004-11-12 20:55:20 benkirk Exp $
+// $Id: tecplot_io.h,v 1.4 2004-11-17 07:52:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,7 @@
 
 // Local includes
 #include "libmesh_common.h"
-#include "mesh_io.h"
+#include "mesh_output.h"
 
 // Forward declarations
 class MeshBase;
@@ -39,7 +39,7 @@ class MeshBase;
 
 // ------------------------------------------------------------
 // TecplotIO class definition
-class TecplotIO : public MeshIO<MeshBase>
+class TecplotIO : public MeshOutput<MeshBase>
 {
  public:
 
@@ -109,7 +109,7 @@ class TecplotIO : public MeshIO<MeshBase>
 // TecplotIO inline members
 inline
 TecplotIO::TecplotIO (const MeshBase& mesh, const bool binary) :
-  MeshIO<MeshBase> (mesh),
+  MeshOutput<MeshBase> (mesh),
   _binary (binary)
 {
 }

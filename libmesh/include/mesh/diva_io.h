@@ -1,4 +1,4 @@
-// $Id: diva_io.h,v 1.3 2004-04-07 21:42:30 benkirk Exp $
+// $Id: diva_io.h,v 1.4 2004-11-17 07:52:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -23,7 +23,7 @@
 
 // Local includes
 #include "libmesh_common.h"
-#include "mesh_io.h"
+#include "mesh_output.h"
 
 // Forward declarations
 class Mesh;
@@ -41,7 +41,7 @@ class Mesh;
 
 // ------------------------------------------------------------
 // DivaIO class definition
-class DivaIO : public MeshIO<Mesh>
+class DivaIO : public MeshOutput<Mesh>
 {
 public:
   /**
@@ -49,7 +49,7 @@ public:
    * not a mesh generator.
    */
   //TODO:[JWP] figure out how to implement a const write method!
-  DivaIO (Mesh&);
+  DivaIO (const Mesh&);
 
   /**
    * This method implements writing a mesh to a specified file.
@@ -57,6 +57,7 @@ public:
   virtual void write (const std::string& );
 
 private:
+  
   /**
    * The actual implementation of writing the diva file.  This
    * file is called by the public interface file after it
@@ -71,8 +72,8 @@ private:
 // ------------------------------------------------------------
 // DivaIO inline members
 inline
-DivaIO::DivaIO (Mesh& mesh) :
-  MeshIO<Mesh>  (mesh)
+DivaIO::DivaIO (const Mesh& mesh) :
+  MeshOutput<Mesh>  (mesh)
 {}
 
 

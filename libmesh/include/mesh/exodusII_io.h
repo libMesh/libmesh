@@ -1,4 +1,4 @@
-// $Id: exodusII_io.h,v 1.1 2004-11-12 20:55:19 benkirk Exp $
+// $Id: exodusII_io.h,v 1.2 2004-11-17 07:52:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -26,10 +26,10 @@
 // C++ inludes
 
 // Local includes
-#include "mesh_io.h"
+#include "mesh_input.h"
 
 // Forward declarations
-class Mesh;
+class MeshBase;
 
 
 /**
@@ -45,7 +45,7 @@ class Mesh;
 
 // ------------------------------------------------------------
 // ExodusII_IO class definition
-class ExodusII_IO : public MeshIO<Mesh>
+class ExodusII_IO : public MeshInput<MeshBase>
 {
 
  public:
@@ -54,7 +54,7 @@ class ExodusII_IO : public MeshIO<Mesh>
    * Constructor.  Takes a writeable reference to a mesh object.
    * This is the constructor required to read a mesh.
    */
-  ExodusII_IO (Mesh& mesh);
+  ExodusII_IO (MeshBase& mesh);
   
   /**
    * Destructor.
@@ -93,8 +93,8 @@ class ExodusII_IO : public MeshIO<Mesh>
 // ------------------------------------------------------------
 // MeshIO inline members
 inline
-ExodusII_IO::ExodusII_IO (Mesh& mesh) :
-  MeshIO<Mesh> (mesh),
+ExodusII_IO::ExodusII_IO (MeshBase& mesh) :
+  MeshInput<MeshBase> (mesh),
   _verbose (false)
 {
 }

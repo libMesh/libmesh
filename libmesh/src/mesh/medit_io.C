@@ -61,7 +61,7 @@ void MEDITIO::write_ascii (const std::string& fname,
   //  (iv)  no vector output, just first scalar as output
 
   // assert three dimensions (should be extended later)
-  assert (this->cmesh().mesh_dimension() == 3);
+  assert (MeshOutput<MeshBase>::mesh().mesh_dimension() == 3);
 
   // Open the output file stream
   std::ofstream out (fname.c_str());
@@ -69,7 +69,7 @@ void MEDITIO::write_ascii (const std::string& fname,
   assert (out.good());
 
   // Get a reference to the mesh
-  const MeshBase& mesh = this->cmesh();
+  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
   
   // Begin interfacing with the MEdit data file
   {

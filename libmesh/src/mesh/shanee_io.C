@@ -1,4 +1,4 @@
-// $Id: shanee_io.C,v 1.3 2004-07-26 16:27:48 jwpeterson Exp $
+// $Id: shanee_io.C,v 1.4 2004-11-17 07:52:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -22,6 +22,7 @@
 
 // Local includes
 #include "shanee_io.h"
+#include "mesh_base.h"
 #include "face_quad4.h"
 
 
@@ -39,7 +40,7 @@ void ShaneeIO::read(const std::string& name)
 void ShaneeIO::read_stream (std::istream &in)
 {
   // Get a reference to the mesh
-  MeshBase& mesh = this->mesh();
+  MeshBase& mesh = MeshInput<MeshBase>::mesh();
   
   // Clear any existing mesh data
   mesh.clear();

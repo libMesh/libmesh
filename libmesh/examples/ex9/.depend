@@ -32,7 +32,7 @@ ex9.$(obj-suffix):\
     ../../include/mesh/mesh.h\
     ../../include/mesh/mesh_base.h\
     ../../include/mesh/mesh_data.h\
-    ../../include/mesh/mesh_io.h\
+    ../../include/mesh/mesh_output.h\
     ../../include/mesh/mesh_refinement.h\
     ../../include/numerics/coupling_matrix.h\
     ../../include/numerics/dense_matrix.h\

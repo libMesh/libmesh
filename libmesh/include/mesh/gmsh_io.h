@@ -1,4 +1,4 @@
-// $Id: gmsh_io.h,v 1.1 2004-07-13 21:48:41 jwpeterson Exp $
+// $Id: gmsh_io.h,v 1.2 2004-11-17 07:52:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,8 @@
 
 // Local includes
 #include "libmesh_common.h"
-#include "mesh_io.h"
+#include "mesh_input.h"
+#include "mesh_output.h"
 
 // Forward declarations
 class MeshBase;
@@ -42,7 +43,8 @@ class MeshBase;
 
 // ------------------------------------------------------------
 // GMVIO class definition
-class GmshIO : public MeshIO<MeshBase>
+class GmshIO : public MeshInput<MeshBase>,
+               public MeshOutput<MeshBase>
 {
  public:
 
@@ -92,14 +94,15 @@ private:
 // GmshIO inline members
 inline
 GmshIO::GmshIO (const MeshBase& mesh) :
-  MeshIO<MeshBase> (mesh)
+  MeshOutput<MeshBase> (mesh)
 {
 }
 
 
 inline
 GmshIO::GmshIO (MeshBase& mesh) :
-  MeshIO<MeshBase>  (mesh)
+  MeshInput<MeshBase>  (mesh),
+  MeshOutput<MeshBase> (mesh)
 {}
 
 
