@@ -140,6 +140,23 @@ This example describes the use of the <code>MeshData</code> class.  More on this
 later. 
 
 
+
+<h2><a href="ex13.php">Example 13</a> - Unsteady Navier-Stokes Equations - Unsteady Nonlinear System</h2>
+This example shows how a simple, unsteady, nonlinear system of equations
+can be solved in parallel.  The system of equations are the familiar
+Navier-Stokes equations for low-speed incompressible fluid flow.  This
+example introduces the concept of the inner nonlinear loop for each
+timestep, and requires a good deal of linear algebra number-crunching
+at each step.  If you have the General Mesh Viewer (GMV) installed,
+the script movie.sh in this directory will also take appropriate screen
+shots of each of the solution files in the time sequence.  These rgb files
+can then be animated with the "animate" utility of ImageMagick if it is
+installed on your system.  On a PIII 1GHz machine in debug mode, this
+example takes a little over a minute to run.  If you would like to see
+a more detailed time history, or compute more timesteps, that is certainly
+possible by changing the n_timesteps and dt variables below.
+
+
 </div>
 
 <!--
