@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.19 2003-03-05 17:01:08 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.20 2003-03-25 15:19:02 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -190,6 +190,10 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
   dnl Flag for creating shared objects; can be modified at a later stage
   CXXSHAREDFLAG="-shared"
 
+  dnl Flag to add directories to the dynamic library search path; can
+  dnl be changed at a later stage
+  RPATHFLAG="-Wl,-rpath,"
+
   dnl First the flags for gcc compilers
   if test "$GXX" = yes ; then
     CXXFLAGSO="-O2 -felide-constructors -DNDEBUG"
@@ -280,6 +284,7 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
 	  CXXSHAREDFLAG="-G -qmkshrobj -bnoerrmsg"
 	  CSHAREDFLAG="-G -qmkshrobj"
 	  CXXDEPFLAG="-qmakedep"
+	  RPATHFLAG="-Qoption,link,-rpath,"
           ;;
   
       MIPSpro)

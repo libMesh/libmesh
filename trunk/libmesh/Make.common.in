@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.18 2003-03-14 09:56:36 ddreyer Exp $
+# $Id: Make.common.in,v 1.19 2003-03-25 15:19:01 benkirk Exp $
 
 
 ###############################################################################
@@ -93,6 +93,7 @@ GXX-VERSION          = @GXX_VERSION@
 CXXDEPFLAG           = @CXXDEPFLAG@
 CXXSHAREDFLAG        = @CXXSHAREDFLAG@
 CSHAREDFLAG          = @CXXSHAREDFLAG@
+RPATHFLAG            = @RPATHFLAG@
 
 # Complex variable support
 enable-complex       = @enablecomplex@
@@ -173,7 +174,7 @@ mesh_library_dir := $(pwd)/lib/$(hosttype)_$(METHOD)
 mesh_library     := $(mesh_library_dir)/libmesh.a
 ifeq ($(enable-shared),yes) 
   mesh_library   := $(mesh_library_dir)/libmesh.so
-  DLFLAGS += -Wl,-rpath,$(mesh_library_dir)
+  DLFLAGS += $(RPATHFLAG)$(mesh_library_dir)
 endif
 
 LIBS += $(mesh_library)
@@ -221,7 +222,7 @@ EXTERNAL_LIBDIR := $(pwd)/contrib/lib/$(hosttype)_$(METHOD)
 EXTERNAL_LIBEXT := .a
 ifeq ($(enable-shared),yes) 
   EXTERNAL_LIBEXT := .so
-  DLFLAGS += -Wl,-rpath,$(EXTERNAL_LIBDIR)
+  DLFLAGS += $(RPATHFLAG)$(EXTERNAL_LIBDIR)
 endif
 
 
@@ -294,7 +295,7 @@ ifeq ($(enable-optional),yes)
     ifeq ($(enable-shared),yes)
       CXXFLAGS     += -DPETSC_USE_DYNAMIC_LIBRARIES
       CFLAGS       += -DPETSC_USE_DYNAMIC_LIBRARIES 
-      DLFLAGS      += -Wl,-rpath,$(PETSC_LIB)
+      DLFLAGS      += $(RPATHFLAG)$(PETSC_LIB)
     endif
 
     libs-PETSC = -L$(PETSC_LIB) \
