@@ -1,4 +1,4 @@
-// $Id: mesh_io.C,v 1.1 2004-03-19 19:16:53 benkirk Exp $
+// $Id: mesh_io.C,v 1.2 2004-04-07 21:42:38 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -20,6 +20,8 @@
 
 
 // Local includes
+#include "mesh_base.h"
+#include "mesh.h"
 #include "mesh_io.h"
 #include "equation_systems.h"
 
@@ -27,8 +29,9 @@
 
 // ------------------------------------------------------------
 // MeshIO members
-void MeshIO::write_equation_systems (const std::string& fname,
-				     const EquationSystems& es)
+template <class MT>
+void MeshIO<MT>::write_equation_systems (const std::string& fname,
+					 const EquationSystems& es)
 {
   // Build the nodal solution values & get the variable
   // names from the EquationSystems object
@@ -43,8 +46,9 @@ void MeshIO::write_equation_systems (const std::string& fname,
 
 
 
-void MeshIO::skip_comment_lines (std::istream &in,
-				 const char comment_start)
+template <class MT>
+void MeshIO<MT>::skip_comment_lines (std::istream &in,
+				     const char comment_start)
 {    
   char c, line[256];
   
@@ -55,3 +59,9 @@ void MeshIO::skip_comment_lines (std::istream &in,
   // first non-comment line
   in.putback (c);
 }
+
+
+//--------------------------------------------------------------
+// template instantiations
+template class MeshIO<MeshBase>;
+template class MeshIO<Mesh>;

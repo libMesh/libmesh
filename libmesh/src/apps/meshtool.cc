@@ -26,6 +26,7 @@
 #include "perfmon.h"
 #include "point.h"
 #include "elem_quality.h"
+#include "gmv_io.h"
 #include "statistics.h"
 
 // Conditionally include Petsc stuff
@@ -855,10 +856,10 @@ int main (int argc, char** argv)
 		error();
 	      
 	      if (names.size() == 2)
-		boundary_mesh.write(boundary_name);
+		GMVIO(boundary_mesh).write(boundary_name);
 	      else if (names.size() == 3)
-		boundary_mesh.write(boundary_name,
-				    soln, var_names);
+		GMVIO(boundary_mesh).write_nodal_data(boundary_name,
+						      soln, var_names);
 	    }
 	}
     };

@@ -1,4 +1,4 @@
-// $Id: gmv_io.C,v 1.4 2004-03-24 05:49:12 jwpeterson Exp $
+// $Id: gmv_io.C,v 1.5 2004-04-07 21:42:38 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -65,7 +65,7 @@ void GMVIO::write_ascii (const std::string& fname,
   assert (out.good());
 
   // Get a reference to the mesh
-  const Mesh& mesh = this->cmesh();
+  const MeshBase& mesh = this->cmesh();
   
   // Begin interfacing with the GMV data file
   {
@@ -372,7 +372,7 @@ void GMVIO::write_binary (const std::string& fname,
   assert (out.good());
 
   // get a reference to the mesh
-  const Mesh& mesh = this->cmesh();
+  const MeshBase& mesh = this->cmesh();
   
   char buf[80];
 

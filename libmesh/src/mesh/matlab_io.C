@@ -1,4 +1,4 @@
-// $Id: matlab_io.C,v 1.1 2004-03-23 04:17:26 jwpeterson Exp $
+// $Id: matlab_io.C,v 1.2 2004-04-07 21:42:38 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -39,7 +39,7 @@ void MatlabIO::read(const std::string& name)
 void MatlabIO::read_stream(std::istream& in)
 {
   // Get a reference to the mesh
-  Mesh& mesh = this->mesh();
+  MeshBase& mesh = this->mesh();
 
   // Clear any existing mesh data
   mesh.clear();

@@ -1,4 +1,4 @@
-// $Id: matlab_io.h,v 1.1 2004-03-23 04:17:26 jwpeterson Exp $
+// $Id: matlab_io.h,v 1.2 2004-04-07 21:42:31 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -24,6 +24,10 @@
 // Local includes
 #include "libmesh_common.h"
 #include "mesh_io.h"
+
+// Forward declarations
+class MeshBase;
+
 
 
 /**
@@ -79,14 +83,14 @@
 
 // ------------------------------------------------------------
 // MatlabIO class definition
-class MatlabIO : public MeshIO
+class MatlabIO : public MeshIO<MeshBase>
 {
 public:
   /**
    *  Constructor.  Takes a non-const Mesh reference which it
    * will fill up with elements.
    */
-  MatlabIO (Mesh&);
+  MatlabIO (MeshBase&);
 
   /**
    * Reads in a matlab data file based on the string
@@ -107,8 +111,8 @@ private:
 // ------------------------------------------------------------
 // MatlabIO inline members
 inline
-MatlabIO::MatlabIO (Mesh& mesh) :
-  MeshIO  (mesh)
+MatlabIO::MatlabIO (MeshBase& mesh) :
+  MeshIO<MeshBase>  (mesh)
 {}
 
 
