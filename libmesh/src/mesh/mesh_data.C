@@ -1,4 +1,4 @@
-// $Id: mesh_data.C,v 1.8 2003-07-30 16:14:05 ddreyer Exp $
+// $Id: mesh_data.C,v 1.9 2003-08-04 17:23:51 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -133,28 +133,18 @@ void MeshData::translate (const MeshBase& out_mesh,
     const std::vector<Node*>::const_iterator nodes_end = mesh_nodes.end();
 
     /*
-     * the buffer vector. The MeshData _always_ returns the
-     * same data_buf size, so we could have defined \p buf_end
-     * already here.  But defining it in the loop is safer,
-     * and this program is not truly aimed at performance.
+     * Do not use the \p get_data() method, but the operator()
+     * method, since this returns by default a zero value,
+     * when there is no nodal data.
      */
-    std::vector<Number> data_buf;
-    data_buf.reserve (n_comp);
-
     for (; nodes_it != nodes_end; ++nodes_it)
       {
 	const Node* node = *nodes_it;
 
-	// get the data
-	this->operator()(node, data_buf);
-
-	// store consecutively
-	std::vector<Number>::const_iterator buf_it = data_buf.begin();
-	const std::vector<Number>::const_iterator buf_end = data_buf.end();
-
-	for (; buf_it != buf_end; ++buf_it)
+	for (unsigned int c= 0; c<n_comp; c++)
 	  {
-	    *values_it = *buf_it;
+	    // store the data, then advance
+	    *values_it = this->operator()(node, c);
 	    ++values_it;
 	  }
       }

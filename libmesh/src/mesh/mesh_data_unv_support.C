@@ -1,4 +1,4 @@
-// $Id: mesh_data_unv_support.C,v 1.7 2003-07-12 20:39:30 ddreyer Exp $
+// $Id: mesh_data_unv_support.C,v 1.8 2003-08-04 17:23:51 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -374,8 +374,13 @@ void MeshData::write_unv (const std::string& name)
       sprintf(buf, "%10i\n", f_n_id);
       out_file << buf;
 
-      std::vector<Number> values;
-      this->operator()(node, values);
+      /* since we are iterating over our own map, this assert
+       * should never break...
+       */
+      assert (this->has_data(node));
+
+      // const reference to the nodal values
+      const std::vector<Number>& values = this->get_data(node);
 
       for (unsigned int v_cnt=0; v_cnt<values.size(); v_cnt++)
 	{

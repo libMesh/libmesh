@@ -1,4 +1,4 @@
-// $Id: mesh_data_xdr_support.C,v 1.4 2003-05-22 19:10:49 ddreyer Exp $
+// $Id: mesh_data_xdr_support.C,v 1.5 2003-08-04 17:23:51 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -158,6 +158,8 @@ void MeshData::read_xdr (const std::string& name,
   unsigned int n_elem = 0;
   io.data (n_elem);
 
+  unsigned int previous_values_size = 0;
+
   for (unsigned int n_cnt=0; n_cnt < n_node; n_cnt++)
     {
       /**
@@ -182,6 +184,25 @@ void MeshData::read_xdr (const std::string& name,
         std::vector<Number> values;
 	io.data (values);
 
+
+#ifdef DEBUG
+	/*
+	 * make sure the size of the values vectors
+	 * are identical for all nodes
+	 */
+	if (n_cnt == 0)
+	    previous_values_size = values.size();
+	else
+	  {
+	    if (previous_values_size != values.size())
+	      {
+		std::cerr << "ERROR: Size mismatch for n_cnt = " << n_cnt << std::endl;
+		error();
+	      }
+	  }
+#endif
+
+
 	/**
 	 * insert this node and the values in the _node_data 
 	 */
@@ -190,6 +211,8 @@ void MeshData::read_xdr (const std::string& name,
     }
 
 
+
+  previous_values_size = 0;
 
   for (unsigned int n_cnt=0; n_cnt < n_elem; n_cnt++)
     {
@@ -213,6 +236,25 @@ void MeshData::read_xdr (const std::string& name,
       {
         std::vector<Number> values;
 	io.data (values);
+
+
+#ifdef DEBUG
+	/*
+	 * make sure the size of the values vectors
+	 * are identical for all elements
+	 */
+	if (n_cnt == 0)
+	    previous_values_size = values.size();
+	else
+	  {
+	    if (previous_values_size != values.size())
+	      {
+		std::cerr << "ERROR: Size mismatch for n_cnt = " << n_cnt << std::endl;
+		error();
+	      }
+	  }
+#endif
+
 
 	/**
 	 * insert this elem and the values in our _elem_data 
@@ -369,13 +411,23 @@ better_you_choke_this...
       /**
        * 6.)  
        *
-       * the actual values for this node, fetched
-       * using the operator()
+       * the actual values for this node
        */
       {
-	std::vector<Number> buf;
+	/* 
+	 * since we are iterating over our @e own 
+	 * map, this assert should never break...
+	 */
+	assert (this->has_data(node));
 
-	this->operator()(node, buf);
+	const std::vector<Number>& values = this->get_data(node);
+	
+	/*
+	 * copy the data to a local buf, since
+	 * the Xdr class needs write access, even
+	 * when only reading data
+	 */
+	std::vector<Number> buf = values;
 	io.data (buf, "# Values");
       }
     }
@@ -407,13 +459,23 @@ better_you_choke_this...
       /**
        * 8.)  
        *
-       * the actual values for this element, fetched
-       * using the operator()
+       * the actual values for this element
        */
       {
-	std::vector<Number> buf;
+	/* 
+	 * since we are iterating over our @e own 
+	 * map, this assert should never break...
+	 */
+	assert (this->has_data(elem));
 
-	this->operator()(elem, buf);
+	const std::vector<Number>& values = this->get_data(elem);
+	
+	/*
+	 * copy the data to a local buf, since
+	 * the Xdr class needs write access, even
+	 * when only reading data
+	 */
+	std::vector<Number> buf = values;
 	io.data (buf, "# Values");
       }
     }
