@@ -1,4 +1,4 @@
-// $Id: ex7.C,v 1.21 2003-04-03 14:17:19 ddreyer Exp $
+// $Id: ex7.C,v 1.22 2003-04-05 02:25:42 ddreyer Exp $
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
   
@@ -334,8 +334,16 @@ int main (int argc, char** argv)
 	mesh.write_gmv (buf, equation_systems);
       }
 
+
+    /**
+     * Alternatively, the whole EquationSystems object can be
+     * written to disk.  By default, the additional vectors are also
+     * saved.
+     */
+    equation_systems.write ("eqn_sys.dat", Xdr::WRITE);
+
   }
-  
+
   /**
    * All done.  
    */

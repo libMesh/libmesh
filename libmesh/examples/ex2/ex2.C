@@ -1,4 +1,4 @@
-// $Id: ex2.C,v 1.7 2003-03-26 13:55:23 benkirk Exp $
+// $Id: ex2.C,v 1.8 2003-04-05 02:25:38 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -131,6 +131,23 @@ int main (int argc, char** argv)
      * object, so the order of construction here is important.
      */
     EquationSystems<GeneralSystem> equation_systems (mesh);
+
+    /**
+     * Add a flag "test" that is visible for all systems.  This
+     * helps in inter-system-communication.
+     */
+    equation_systems.set_flag ("test");
+      
+    /**
+     * Set a simulation-specific parameter visible for all systems.
+     * This helps in inter-system-communication.
+     */
+    equation_systems.set_parameter ("dummy") = 42.;
+      
+    /**
+     * Set another simulation-specific parameter 
+     */
+    equation_systems.set_parameter ("nobody") = 0.;
     
     /**
      * Declare the system and its variables.
@@ -175,7 +192,7 @@ int main (int argc, char** argv)
     if (argc == 2)
       if (argv[1][0] != '-')
 	{
-	  std::cout << "Writing system to file " << argv[1]
+	  std::cout << "<<< Writing system to file " << argv[1]
 		    << std::endl;
 
 	  /**
@@ -189,8 +206,8 @@ int main (int argc, char** argv)
 	   */
 	  equation_systems.clear ();
 
-	  std::cout << "Reading system from file " << argv[1]
-		    << std::endl;
+	  std::cout << ">>> Reading system from file " << argv[1]
+		    << std::endl << std::endl;
 	  /**
 	   * Read the file we just wrote.  This better
 	   * work!

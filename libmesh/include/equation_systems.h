@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.19 2003-03-21 15:29:06 ddreyer Exp $
+// $Id: equation_systems.h,v 1.20 2003-04-05 02:25:42 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -169,7 +169,8 @@ public:
   void read(const std::string& name,
 	    const Xdr::XdrMODE,
 	    const bool read_header=true,
-	    const bool read_data=true);
+	    const bool read_data=true,
+	    const bool read_additional_data=true);
 
   /**
    * Write the systems to disk using the XDR data format.
@@ -180,7 +181,8 @@ public:
    */
   void write(const std::string& name,
 	     const Xdr::XdrMODE,
-	     const bool write_data=true);
+	     const bool write_data=true,
+	     const bool write_additional_data=true);
 
   /**
    * @returns \p true when this equation system contains

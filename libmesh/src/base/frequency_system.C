@@ -1,4 +1,4 @@
-// $Id: frequency_system.C,v 1.9 2003-04-03 14:17:23 ddreyer Exp $
+// $Id: frequency_system.C,v 1.10 2003-04-05 02:25:42 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -311,6 +311,12 @@ FrequencySystem::solve (const unsigned int n_start_in,
       STOP_LOG("linear_equation_solve()", "FrequencySystem");
 
       vec_rval.push_back(rval);      
+
+      /**
+       * store the current solution in the additional vector
+       */
+      this->get_vector(this->form_solu_vec_name(n)) = *solution;
+
     }  
 
   // sanity check
