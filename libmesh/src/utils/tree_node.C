@@ -1,4 +1,4 @@
-// $Id: tree_node.C,v 1.14 2004-04-17 02:16:23 jwpeterson Exp $
+// $Id: tree_node.C,v 1.15 2004-04-17 03:02:50 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -22,6 +22,7 @@
 // C++ includes
 
 // Local includes
+#include "libmesh_config.h"
 #include "tree_node.h"
 #include "elem.h"
 #include "mesh_base.h"
@@ -81,8 +82,12 @@ void TreeNode<N>::insert (const Elem* elem)
       elements.push_back (elem);
 
 #ifdef ENABLE_INFINITE_ELEMENTS
-      if (elem->infinite() && !this->contains_ifems)
+
+      // flag indicating this node contains
+      // infinite elements
+      if (elem->infinite())	
 	this->contains_ifems = true;
+      
 #endif
       
       // Refine ourself if we reach the target bin size for a TreeNode.
@@ -420,8 +425,12 @@ void TreeNode<N>::transform_nodes_to_elements (std::vector<std::vector<const Ele
 	  elements.push_back(*pos);
 	  
 #ifdef ENABLE_INFINITE_ELEMENTS
-	  if ((*pos)->infinite() && !this->contains_ifems)
+
+	  // flag indicating this node contains
+	  // infinite elements
+	  if ((*pos)->infinite())
 	    this->contains_ifems = true;
+	  
 #endif
 	}
     }
@@ -473,9 +482,8 @@ const Elem* TreeNode<N>::find_element(const Point& p) const
       return NULL;	    
     }
   else
-    {
-      return this->find_element_in_children(p);
-    }
+    return this->find_element_in_children(p);
+  
     
 
   // Should never get here.  See if-else structure

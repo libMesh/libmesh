@@ -1,4 +1,4 @@
-// $Id: petsc_interface.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: petsc_interface.h,v 1.3 2004-04-17 03:02:50 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -37,10 +37,20 @@
 
 #ifndef USE_COMPLEX_NUMBERS
 extern "C" {
-# include <petscsles.h>
+# include <petscversion.h>
+# if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 1)
+#   include <petscsles.h>
+# else
+#   include <petscksp.h>
+# endif
 }
 #else
-# include <petscsles.h>
+# include <petscversion.h>
+# if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 1)
+#   include <petscsles.h>
+# else
+#   include <petscksp.h>
+# endif
 #endif
 
 
@@ -100,11 +110,16 @@ private:
    */
   void set_petsc_preconditioner_type ();
 
+  // SLES removed from >= PETSc 2.2.0
+#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 1)
+  
   /**
    * Linear solver context
    */
   SLES _sles;
-    
+
+#endif
+  
   /**
    * Preconditioner context
    */

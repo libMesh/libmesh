@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.34 2004-02-12 20:52:12 benkirk Exp $
+# $Id: Make.common.in,v 1.35 2004-04-17 03:02:48 benkirk Exp $
 
 
 ###############################################################################
@@ -277,7 +277,7 @@ ifeq ($(enable-optional),yes)
     endif
 
     # Depending on petsc version, we include different files
-    ifeq ($(petsc-version),2.1.0)
+    ifeq ($(petsc-version),2.1.*)
       include $(PETSC_DIR)/bmake/$(PETSC_ARCH)/base.site # 2.1.0 style
     else
       C_CLINKER_SLFLAG = $(RPATHFLAG)# necessary for PETSc 2.1.6
@@ -296,12 +296,22 @@ ifeq ($(enable-optional),yes)
       DLFLAGS      += $(RPATHFLAG)$(PETSC_LIB)
     endif
 
-    libs-PETSC = -L$(PETSC_LIB) \
-	         -lpetscsles \
-		 -lpetscdm \
-		 -lpetscmat \
-		 -lpetscvec \
-		 -lpetsc
+    # Depending on petsc version, we link with different libs :-(
+    ifeq ($(petsc-version),2.1.*)  # 2.1.x style
+      libs-PETSC = -L$(PETSC_LIB) \
+	           -lpetscsles \
+		   -lpetscdm \
+		   -lpetscmat \
+		   -lpetscvec \
+		   -lpetsc
+    else                           # 2.2.0 & newer style
+      libs-PETSC = -L$(PETSC_LIB) \
+	           -lpetscksp \
+		   -lpetscdm \
+		   -lpetscmat \
+		   -lpetscvec \
+		   -lpetsc
+    endif
 
     LIBS += $(libs-PETSC) $(BLOCKSOLVE_LIB) $(SPOOLES_LIB) \
 	    $(HYPRE_LIB) $(BLASLAPACK_LIB) $(MPI_LIB) \
