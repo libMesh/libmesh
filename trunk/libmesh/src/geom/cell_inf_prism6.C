@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism6.C,v 1.17 2003-09-02 18:02:42 benkirk Exp $
+// $Id: cell_inf_prism6.C,v 1.18 2003-09-12 21:31:22 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -52,19 +52,23 @@ bool InfPrism6::contains_point (const Point& p) const
    */
   const Point origin (this->origin());
 
-  // determine the minimal distance of the base from the origin
-  const Real min_distance = std::min((Point(this->point(0)-origin)).size(),
-				     std::min((Point(this->point(1)-origin)).size(),
-					      (Point(this->point(2)-origin)).size()));
+  /*
+   * determine the minimal distance of the base from the origin
+   * use size_sq(), it is faster than size() and produces
+   * the same behavior
+   */
+  const Real min_distance_sq = std::min((Point(this->point(0)-origin)).size_sq(),
+				     std::min((Point(this->point(1)-origin)).size_sq(),
+					      (Point(this->point(2)-origin)).size_sq()));
 
   /*
    * work with 1% allowable deviation.  We can still fall
    * back to the InfFE::inverse_map()
    */
-  const Real conservative_p_dist = 1.01 * (Point(p-origin).size());
+  const Real conservative_p_dist_sq = 1.01 * (Point(p-origin).size_sq());
 
 
-  if (conservative_p_dist < min_distance)
+  if (conservative_p_dist_sq < min_distance_sq)
     {
       /*
        * the physical point is definitely not contained in the element

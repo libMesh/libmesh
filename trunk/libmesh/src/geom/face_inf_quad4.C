@@ -1,4 +1,4 @@
-// $Id: face_inf_quad4.C,v 1.17 2003-09-02 18:02:42 benkirk Exp $
+// $Id: face_inf_quad4.C,v 1.18 2003-09-12 21:31:22 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -49,17 +49,18 @@ bool InfQuad4::contains_point (const Point& p) const
 
   /*
    * determine the minimal distance of the base from the origin
+   * use size_sq() instead of size(), it is slightly faster
    */
-  const Real min_distance = std::min((Point(this->point(0)-origin)).size(),
-				     (Point(this->point(1)-origin)).size());
+  const Real min_distance_sq = std::min((Point(this->point(0)-origin)).size_sq(),
+				     (Point(this->point(1)-origin)).size_sq());
 
   /*
    * work with 1% allowable deviation.  Can still fall
    * back to the InfFE::inverse_map()
    */
-  const Real conservative_p_dist = 1.01 * (Point(p-origin).size());
+  const Real conservative_p_dist_sq = 1.01 * (Point(p-origin).size_sq());
 
-  if (conservative_p_dist < min_distance)
+  if (conservative_p_dist_sq < min_distance_sq)
     {
       /*
        * the physical point is definitely not contained
