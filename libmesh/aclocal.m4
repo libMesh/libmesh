@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.22 2003-03-26 14:18:34 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.23 2003-03-26 14:26:34 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -73,11 +73,9 @@ AC_DEFUN(DETERMINE_CXX_BRAND, dnl
     dnl variables, moon position, and other reasons unknown to me, the
     dnl compiler displays different names in the first line of output, so
     dnl check various possibilities
-    is_ibm_xlc="`($CXX 2>&1) | egrep 'VisualAge C++|C Set ++|C for AIX Compiler'`"
+    is_ibm_xlc="`($CXX 2>&1) | egrep 'xlC'`"
     if test "x$is_ibm_xlc" != "x"  ; then
-      dnl Ah, this is IBM's C++ compiler. Unfortunately, we don't presently
-      dnl know how to check the version number, so assume that is sufficiently
-      dnl high...
+      dnl IBM's C++ compiler.
       AC_MSG_RESULT(<<< C++ compiler is IBM xlC >>>)
       GXX_VERSION=ibm_xlc
     else
