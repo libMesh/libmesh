@@ -1,4 +1,4 @@
-// $Id: transient_system.h,v 1.3 2005-01-06 21:55:03 benkirk Exp $
+// $Id: transient_system.h,v 1.4 2005-01-19 21:59:53 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -27,6 +27,7 @@
 // Local Includes
 #include "system.h"
 #include "linear_implicit_system.h"
+#include "nonlinear_implicit_system.h"
 #include "explicit_system.h"
 
 
@@ -143,7 +144,7 @@ protected:
 // Useful typedefs
 typedef TransientSystem<LinearImplicitSystem> TransientImplicitSystem;
 typedef TransientSystem<LinearImplicitSystem> TransientLinearImplicitSystem;
-//typedef TransientSystem<NonlinearImplicitSystem> TransientNonlinearImplicitSystem;
+typedef TransientSystem<NonlinearImplicitSystem> TransientNonlinearImplicitSystem;
 typedef TransientSystem<ExplicitSystem> TransientExplicitSystem;
 
 

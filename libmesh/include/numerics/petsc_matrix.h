@@ -1,4 +1,4 @@
-// $Id: petsc_matrix.h,v 1.10 2005-01-03 00:06:48 benkirk Exp $
+// $Id: petsc_matrix.h,v 1.11 2005-01-19 21:54:34 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -291,7 +291,7 @@ public:
    * not required in user-level code. Just don't do anything crazy like
    * calling MatDestroy()!
    */
-  Mat mat () { return _mat; }
+  Mat mat () { assert (_mat != NULL); return _mat; }
 
   
 protected:
@@ -363,8 +363,12 @@ template <typename T>
 inline
 void PetscMatrix<T>::close () const
 {
-  if (this->closed())
-    return;
+  // BSK - 1/19/2004
+  // strictly this check should be OK, but it seems to
+  // fail on matrix-free matrices.  Do they falsely
+  // state they are assembled?  Check with the developers...
+//   if (this->closed())
+//     return;
   
   int ierr=0;
  

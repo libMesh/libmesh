@@ -1,4 +1,4 @@
-// $Id: petsc_vector.h,v 1.8 2005-01-03 00:06:48 benkirk Exp $
+// $Id: petsc_vector.h,v 1.9 2005-01-19 21:54:34 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -409,7 +409,7 @@ public:
    * not required in user-level code. Just don't do anything crazy like
    * calling VecDestroy()!
    */
-  Vec vec () { return _vec; }
+  Vec vec () { assert (_vec != NULL); return _vec; }
 
 
   

@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.16 2005-01-06 21:55:04 benkirk Exp $
+// $Id: equation_systems.C,v 1.17 2005-01-19 21:56:33 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -176,11 +176,15 @@ System & EquationSystems::add_system (const std::string& sys_type,
 	   (sys_type == "Steady"  ))
     this->add_system<ImplicitSystem> (name);
 
-  // build a transient implicit system
+  // build a transient implicit linear system
   else if ((sys_type == "Transient") ||
 	   (sys_type == "TransientImplicit") ||
 	   (sys_type == "TransientLinearImplicit"))
     this->add_system<TransientLinearImplicitSystem> (name);
+
+  // build a transient implicit nonlinear system
+  else if (sys_type == "TransientNonlinearImplicit")
+    this->add_system<TransientNonlinearImplicitSystem> (name);
 
   // build a transient explicit system
   else if (sys_type == "TransientExplicit")
