@@ -1,4 +1,4 @@
-// $Id: libmesh.h,v 1.1 2003-02-14 15:22:40 benkirk Exp $
+// $Id: libmesh.h,v 1.2 2003-02-17 04:05:39 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -59,7 +59,7 @@ public:
    * PetscInitialize if PETSC is available.  You must call
    * this method before using any of the library functionality.
    */
-  static void init (int argc=0, char** argv=NULL);
+  static void init (int & argc, char** & argv);
 
   /**
    * Checks that the \p init() member has been called.  If it

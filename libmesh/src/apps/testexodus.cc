@@ -48,9 +48,27 @@ int main (int argc, char** argv)
   {
     if (argc < 4)
       std::cout << "Usage: ./prog -d DIM filename" << std::endl;
+    else
+      {
+	std::cout << " Running ";
+
+	for (int i=0; i<argc; i++)
+	  std::cout << argv[i] << " ";
+
+	std::cout << " on " << libMesh::n_processors()
+		  << " processors, I am processor "  << libMesh::processor_id()
+		  << std::endl
+		  << std::endl;	    
+      }
     
     // Variables to get us started
     const unsigned int dim = atoi(argv[2]);
+
+    std::cout << std::endl
+	      << "Processor = " << libMesh::processor_id()
+	      << ", dim = " << dim
+	      << std::endl
+	      << std::endl;
     
     std::string basename  (argv[3]);
     std::string in_name    = basename;
@@ -62,24 +80,11 @@ int main (int argc, char** argv)
     bndry_name += "_bndry.gmv";
     tec_name   += ".plt";
     gmv_name   += ".gmv";
-      
-    int proc_id = 0;
-    int n_procs = 1;
-
-#ifdef HAVE_MPI    
-    MPI_Comm_rank (MPI_COMM_WORLD, &proc_id);
-    MPI_Comm_size (MPI_COMM_WORLD, &n_procs);
-
-    std::cout << "Running " << argv[0] << " on " << n_procs
-	      << " processors, I am processor "  << proc_id
-	      << std::endl
-	      << std::endl;
-#endif
     
     PerfMon perfmon("Code performance");
 
     // declare a mesh...
-    Mesh mesh(dim, proc_id);
+    Mesh mesh(dim, libMesh::processor_id());
   
     // Read an Exodus mesh
     //
@@ -96,7 +101,7 @@ int main (int argc, char** argv)
       }
       {
 	PerfMon pm("Partitioner performance");
-	mesh.metis_partition(n_procs);
+	mesh.metis_partition(libMesh::n_processors());
       }
       mesh.print_info();
     }
@@ -165,11 +170,8 @@ int main (int argc, char** argv)
     {
       PerfMon pm ("Solver Performance");
       
-      // call the solver.  Don't solve
-      // the secondary system if not in 3D
-      if (dim == 3)
-	es("secondary").solve ();
-
+      // call the solver.
+      es("secondary").solve ();
     };
     
 
