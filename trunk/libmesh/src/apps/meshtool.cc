@@ -160,9 +160,7 @@ void process_cmd_line(int argc, char **argv,
 
 		      bool& x_sym,
 		      bool& y_sym,
-		      bool& z_sym,
-		      bool& build_l,
-		      bool& build_script_l
+		      bool& z_sym
 		      )
 {
 
@@ -385,16 +383,6 @@ void process_cmd_line(int argc, char **argv,
 
 #endif //ifdef ENABLE_INFINITE_ELEMENTS
 
-	case 'l':
-	  {
-	    build_l = true;
-	    break;
-	  }
-	case 'L':
-	  {
-	    build_script_l = true;
-	    break;
-	  }
 
 
 	case 'h':
@@ -435,8 +423,6 @@ int main (int argc, char** argv)
     bool x_sym=false;
     bool y_sym=false;
     bool z_sym=false;
-    bool build_l=false;
-    bool build_script_l=false;
     
       
     std::vector<std::string> names;
@@ -453,11 +439,7 @@ int main (int argc, char** argv)
 		     origin_x, origin_y, origin_z, 
 #endif
 
-		     x_sym, y_sym, z_sym,
-
-		     build_l,
-		     build_script_l);
-
+		     x_sym, y_sym, z_sym);
 
     if (dim == static_cast<unsigned int>(-1))
       {
@@ -735,54 +717,14 @@ int main (int argc, char** argv)
     */
 
 #endif
+    
 
     
-    /**
-     * Maybe create Damien's connectivity
-     * graph matrices.
-     */
-    {
-      if (build_l)
-	{
-	  std::cerr << "Deactivated!"
-		    << std::endl;
-	  error();	    
-// #ifdef HAVE_PETSC	  
-// 	  PetscMatrix<Number> conn;
-// 	  mesh.build_L_graph (conn);
-// 	  conn.print_matlab();
-// #else
-// 	  std::cerr << "This functionality requires PETSC support!"
-// 		    << std::endl;
-// 	  error();
-// #endif
-	};
-      
-      
-      if (build_script_l)
-	{
-	  std::cerr << "Deactivated!"
-		    << std::endl;
-	  error();	    
-// #ifdef HAVE_PETSC	  
-// 	  PetscMatrix<Number> conn;
-// 	  mesh.build_script_L_graph (conn);
-// 	  conn.print_matlab();
-// #else
-// 	  std::cerr << "This functionality requires PETSC support!"
-// 		    << std::endl;
-// 	  error();
-// #endif
-	};
-    };
-
-
-    
-    /**
-     * Possibly partition the mesh
-     */
-    if (n_subdomains > 1)
-      mesh.partition(n_subdomains);
+//     /**
+//      * Possibly partition the mesh
+//      */
+//     if (n_subdomains > 1)
+//       mesh.partition(n_subdomains);
     
     
     /**
