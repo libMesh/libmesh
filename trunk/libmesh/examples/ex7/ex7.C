@@ -1,4 +1,4 @@
-// $Id: ex7.C,v 1.12 2003-02-24 14:35:50 benkirk Exp $
+// $Id: ex7.C,v 1.13 2003-02-24 22:03:50 benkirk Exp $
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
   
@@ -392,13 +392,17 @@ void assemble_helmholtz(EquationSystems& es,
    * We will compute the element matrix and right-hand-side
    * contribution.
    */
-  for (unsigned int e=0; e<mesh.n_elem(); e++)
+
+  const_elem_iterator           el (mesh.elements_begin());
+  const const_elem_iterator end_el (mesh.elements_end());
+  
+  for ( ; el != end_el; ++el)
     {
       /**
        * Store a pointer to the element we are currently
        * working on.  This allows for nicer syntax later.
        */
-      const Elem* elem = mesh.elem(e);
+      const Elem* elem = *el;
 
       /**
        * Get the degree of freedom indices for the

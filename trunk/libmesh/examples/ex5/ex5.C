@@ -1,4 +1,4 @@
-// $Id: ex5.C,v 1.12 2003-02-24 14:35:51 benkirk Exp $
+// $Id: ex5.C,v 1.13 2003-02-24 22:03:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -287,11 +287,15 @@ void assemble_poisson(EquationSystems& es,
   /**
    *--------------------------------------------------------------------
    * Now we will loop over all the elements in the mesh.
-   * See example 4 for details.
+   * See example 3 for details.
    */
-  for (unsigned int e=0; e<mesh.n_elem(); e++)
+  
+  const_elem_iterator           el (mesh.elements_begin());
+  const const_elem_iterator end_el (mesh.elements_end());
+  
+  for ( ; el != end_el; ++el)
     {
-      const Elem* elem = mesh.elem(e);
+      const Elem* elem = *el;
 
       dof_map.dof_indices (elem, dof_indices);
 

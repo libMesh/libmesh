@@ -14,7 +14,9 @@
   supports 2D and 3D steady and transient finite element simulations.
   <a href="http://www-fp.mcs.anl.gov/petsc"> PETSc </a> is
   currently used for the solution of linear systems on both serial and
-  parallel platforms, and \p LASPACK is included with the library to provide
+  parallel platforms, and
+  <a href="http://www.tu-dresden.de/mwism/skalicky/laspack/laspack.html">
+   LASPACK </a> is included with the library to provide
   linear solver support on serial machines.
  
   The \p libMesh library is actively developed at The University of Texas at
@@ -146,7 +148,7 @@
  
   - HP aCC
   - IBM xlC version 5.0, 6.0
-  - HP/Compaq/DEC (?) \p cxx 6.3.9.6
+  - HP/Compaq/DEC \p cxx 6.3.9.6
  
  
  

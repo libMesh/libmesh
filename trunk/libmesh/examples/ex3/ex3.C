@@ -1,4 +1,4 @@
-// $Id: ex3.C,v 1.15 2003-02-24 14:35:52 benkirk Exp $
+// $Id: ex3.C,v 1.16 2003-02-24 22:03:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -335,13 +335,31 @@ void assemble_poisson(EquationSystems& es,
    * We will compute the element matrix and right-hand-side
    * contribution.
    */
-  for (unsigned int e=0; e<mesh.n_elem(); e++)
+
+  /**
+   * Element iterators are a nice way to iterate through
+   * all the elements, or all the elements that have some property.
+   * There are many types of element iterators, but here we will
+   * use the most basic type, the \p const_elem_iterator.  The iterator
+   * \p el will iterate from the first to the last element.  The
+   * iterator \p end_el tells us when to stop.  It is smart to make
+   * this one \p const so that we don't accidentally mess it up!
+   */
+  const_elem_iterator           el (mesh.elements_begin());
+  const const_elem_iterator end_el (mesh.elements_end());
+
+  /**
+   * Loop over the elements.  Note that \p ++el is preferred to
+   * \p el++ since the latter requires an unnecessary temporary
+   * object.
+   */
+  for ( ; el != end_el ; ++el)
     {
       /**
        * Store a pointer to the element we are currently
        * working on.  This allows for nicer syntax later.
        */
-      const Elem* elem = mesh.elem(e);
+      const Elem* elem = *el;
 
       /**
        * Get the degree of freedom indices for the
