@@ -1,4 +1,4 @@
-// $Id: transient_system.C,v 1.1 2004-01-03 15:37:44 benkirk Exp $
+// $Id: transient_system.C,v 1.2 2004-02-18 12:13:35 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -99,14 +99,14 @@ void TransientSystem<Base>::re_update ()
   // re_update the parent system
   Base::re_update ();
   
-  //const std::vector<unsigned int>& send_list = _dof_map.get_send_list ();
+  //const std::vector<unsigned int>& send_list = Base::_dof_map.get_send_list ();
 
   // Explicitly build a send_list
-  std::vector<unsigned int> send_list(solution->size());
+  std::vector<unsigned int> send_list(Base::solution->size());
   Utility::iota (send_list.begin(), send_list.end(), 0);
   
-  const unsigned int first_local_dof = _dof_map.first_dof();
-  const unsigned int last_local_dof  = _dof_map.last_dof();
+  const unsigned int first_local_dof = Base::_dof_map.first_dof();
+  const unsigned int last_local_dof  = Base::_dof_map.last_dof();
 
   // Check sizes
   assert (last_local_dof > first_local_dof);
