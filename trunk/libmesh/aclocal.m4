@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.67 2004-09-22 18:42:58 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.68 2004-10-15 04:27:27 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -761,7 +761,7 @@ dnl -------------------------------------------------------------
 AC_DEFUN(CONFIGURE_TECPLOT,
 [
   AC_ARG_WITH(tecplot,
-              AC_HELP_STRING([--with-tecplot=PATH],[Specify the path where the Tecplot is installed]),
+              AC_HELP_STRING([--with-tecplot=PATH],[Specify the path where Tecplot is installed]),
               withtecplot=$withval,
               withtecplot=no)
 
@@ -798,24 +798,30 @@ AC_DEFUN(CONFIGURE_TETGEN,
 [
 dnl if TetGen is used we need the header path and the lib
 dnl all necessary files are believed to be in environment 
-dnl variable $TETGEN_DIR
-  if test $TETGEN_DIR; then
+dnl variable $TETGEN_DIR or the directory specified by
+dnl --with-tetgen=PATH
+  AC_ARG_WITH(tetgen,
+              AC_HELP_STRING([--with-tetgen=PATH],[Specify the path where Tetgen is installed]),
+              TETGEN_DIR=$withval)
+
+  if (test $TETGEN_DIR) ; then
      TETGEN_VERSION="-DTETGEN_13"
      TETGEN_INCLUDE="-I$TETGEN_DIR"
      TETGEN_LIBRARY="$TETGEN_DIR/libtet.a"
+     AC_DEFINE(HAVE_TETGEN, 1, [Flag indicating whether the library will be compiled with TetGen support])
+     AC_MSG_RESULT(<<< Configuring library with TetGen v1.3 support >>>)
   else
      TETGEN_VERSION=""
      TETGEN_INCLUDE=""
      TETGEN_LIBRARY=""
      enabletetgen=no
   fi
-dnl TetGen version 1.3:
-	AC_SUBST(TETGEN_VERSION)
-	AC_SUBST(TETGEN_INCLUDE)
-	AC_SUBST(TETGEN_LIBRARY)	
-	AC_SUBST(enabletetgen)
-	AC_DEFINE(HAVE_TETGEN, 1, [Flag indicating whether the library will be compiled with TetGen support])
-        AC_MSG_RESULT(<<< Configuring library with TetGen support >>>)
+
+  dnl TetGen version 1.3:
+  AC_SUBST(TETGEN_VERSION)
+  AC_SUBST(TETGEN_INCLUDE)
+  AC_SUBST(TETGEN_LIBRARY)	
+  AC_SUBST(enabletetgen)
 ])
 dnl -------------------------------------------------------------
 
