@@ -1,4 +1,4 @@
-// $Id: mesh_tetgen_support.h,v 1.9 2004-10-28 19:02:20 benkirk Exp $
+// $Id: mesh_tetgen_support.h,v 1.10 2004-10-29 23:24:54 benkirk Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,7 +31,7 @@
 #include <string>
 
 // Local includes
-#include "mesh_base.h"
+#include "mesh.h"
 
 #ifdef TETGEN_13
 #include "tetgen.h"
@@ -39,6 +39,7 @@
 
 
 // Forward Declarations
+class Mesh;
 class MeshData;
 
 
