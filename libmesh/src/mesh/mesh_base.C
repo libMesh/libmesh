@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.50 2003-09-02 18:02:42 benkirk Exp $
+// $Id: mesh_base.C,v 1.51 2003-09-02 19:49:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -447,7 +447,7 @@ void MeshBase::find_neighbors()
 
   START_LOG("find_neighbors()", "MeshBase");
   
-  //TODO [BSK]: This should be removed later?!
+  //TODO:[BSK] This should be removed later?!
   for (unsigned int e=0; e<this->n_elem(); e++)
     for (unsigned int s=0; s<this->elem(e)->n_neighbors(); s++)
       this->elem(e)->set_neighbor(s,NULL);

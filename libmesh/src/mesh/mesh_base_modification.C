@@ -1,4 +1,4 @@
-// $Id: mesh_base_modification.C,v 1.8 2003-09-02 18:02:43 benkirk Exp $
+// $Id: mesh_base_modification.C,v 1.9 2003-09-02 19:49:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -478,13 +478,14 @@ const Point MeshBase::build_inf_elem (const InfElemOriginValue& origin_x,
        * front, while to leftovers are @e not deleted.  Instead,
        * it returns a pointer to the end of the unique range.
        */
+      //TODO:[BSK] int_ibn_size_before is not the same type as unique_size!
       const unsigned int ibn_size_before = inner_boundary_node_numbers.size();
       std::sort (inner_boundary_node_numbers.begin(), inner_boundary_node_numbers.end());
       std::vector<unsigned int>::iterator unique_end = 
 	  std::unique (inner_boundary_node_numbers.begin(), inner_boundary_node_numbers.end());
 
       const int unique_size = std::distance(inner_boundary_node_numbers.begin(), unique_end);
-      assert (unique_size <= static_cast<const int>(ibn_size_before));
+      assert (unique_size <= static_cast<unsigned int>(ibn_size_before));
 
       /*
        * Finally, create const Node* in the inner_boundary_nodes
