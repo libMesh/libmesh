@@ -1,4 +1,4 @@
-// $Id: mesh_communication.C,v 1.7 2004-05-14 22:59:34 spetersen Exp $
+// $Id: mesh_communication.C,v 1.8 2004-05-14 23:06:33 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -246,7 +246,7 @@ void MeshCommunication::distribute_bcs (MeshBase& mesh,
     MPI_Bcast (&el_id[0],   n_bcs, MPI_UNSIGNED,       0, MPI_COMM_WORLD);
 
     // Broadcast the side ids for those elements
-    MPI_Bcast (&side_id[0], n_bcs, MPI_SHORT, 0, MPI_COMM_WORLD);
+    MPI_Bcast (&side_id[0], n_bcs, MPI_UNSIGNED_SHORT, 0, MPI_COMM_WORLD);
 
     // Broadcast the bc ids for each side
     MPI_Bcast (&bc_id[0],   n_bcs, MPI_SHORT,          0, MPI_COMM_WORLD);
