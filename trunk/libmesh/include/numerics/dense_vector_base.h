@@ -1,4 +1,4 @@
-// $Id: dense_vector_base.h,v 1.4 2004-03-21 03:19:25 benkirk Exp $
+// $Id: dense_vector_base.h,v 1.5 2004-04-18 00:51:50 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -83,6 +83,16 @@ public:
    */
   void print() const;
 
+  /**
+   * Same as above, but allows you to print using the
+   * usual stream syntax.
+   */
+  friend std::ostream& operator << (std::ostream& os, const DenseVectorBase<T>& v)
+  {
+    v.print();
+    return os;
+  }
+  
   /**
    * Prints the entries of the vector with additional
    * decimal places in scientific notation.

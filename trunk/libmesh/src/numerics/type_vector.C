@@ -1,4 +1,4 @@
-// $Id: type_vector.C,v 1.4 2004-03-24 05:49:12 jwpeterson Exp $
+// $Id: type_vector.C,v 1.5 2004-04-18 00:51:50 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -99,6 +99,7 @@ void TypeVector<T>::print() const
 	    << std::endl;
 #endif
 }
+
 
 
 

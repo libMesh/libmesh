@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.4 2004-02-18 23:04:08 benkirk Exp $
+// $Id: fe_base.h,v 1.5 2004-04-18 00:51:47 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -316,7 +316,11 @@ public:
    * Prints all the relevant information about the current element.
    */
   void print_info() const;
-  
+
+  /**
+   * Same as above, but allows you to print to a stream.
+   */
+  friend std::ostream& operator << (std::ostream& os, const FEBase& fe);
   
   
 protected:

@@ -1,4 +1,4 @@
-// $Id: mesh_data.C,v 1.19 2004-03-21 16:14:10 benkirk Exp $
+// $Id: mesh_data.C,v 1.20 2004-04-18 00:51:50 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -362,6 +362,13 @@ void MeshData::print_info() const
 {
   std::cout << this->get_info()
 	    << std::endl;
+}
+
+
+std::ostream& operator << (std::ostream& os, const MeshData& m)
+{
+  m.print_info();
+  return os;
 }
 
 
