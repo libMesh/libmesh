@@ -7932,7 +7932,7 @@ echo "${ECHO_T}$ac_cv_lib_lam_lam_show_version" >&6
 if test $ac_cv_lib_lam_lam_show_version = yes; then
 
                        LIBS="$LIBS -llam"
-                       MPI_LIBS="-llam"
+                       MPI_LIBS="-llam $MPI_LIBS"
                        MPI_IMPL="lam"
 
 fi
@@ -8522,7 +8522,7 @@ echo "${ECHO_T}$ac_cv_lib_lam_lam_show_version" >&6
 if test $ac_cv_lib_lam_lam_show_version = yes; then
 
                        LIBS="$LIBS -llam"
-                       MPI_LIBS="-llam"
+                       MPI_LIBS="-llam $MPI_LIBS"
                        MPI_IMPL="lam"
 
 fi
