@@ -1,4 +1,4 @@
-// $Id: libmesh.h,v 1.7 2003-04-07 18:34:47 benkirk Exp $
+// $Id: libmesh.h,v 1.8 2003-04-08 03:21:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,6 +30,7 @@
 #include "mesh_common.h"
 #include "libmesh_base.h"
 #include "perf_log.h"
+#include "auto_ptr.h"
 
 
 
@@ -40,6 +41,11 @@
 // __perf_log_h__ already #define'd, but the
 // class has not been declared yet!.
 class PerfLog;
+
+// Forward declaration required for the GetPot
+// command line parser.
+class GetPot;
+
 
 
 /**
@@ -102,6 +108,12 @@ public:
   static PerfLog log;
 
   /**
+   * @returns true if the argument \p arg was specified on the command line,
+   * \p false otherwise.
+   */
+  static bool on_command_line (const std::string& arg);
+  
+  /**
    * @returns an \p std::ostream to print messages with.
    */
   static std::ostream & msg ();
@@ -131,9 +143,19 @@ public:
    */
   static const Number zero;
 
+  
 private:
 
   
+  /**
+   * A \p GetPot object that contains the command-line arguments
+   * as passed to the \p init member.  This object can be used to
+   * parse the command line for user-specified run-time options.
+   * This is stored as an \p AutoPtr so this header file does
+   * not need to actually include the heavyweight \p GetPot header. 
+   */
+  static AutoPtr<GetPot> _command_line;
+
   /**
    * A \p std::ostream to print messages into.  This is useful
    * since it allows messages to be printed just from processor 0.

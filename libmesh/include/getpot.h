@@ -1,4 +1,4 @@
-// $Id: getpot.h,v 1.3 2003-04-07 18:34:47 benkirk Exp $
+// $Id: getpot.h,v 1.4 2003-04-08 03:21:35 benkirk Exp $
 //
 // (with patches from Michael Anderson for more general variable types)
 
@@ -28,7 +28,7 @@
 #define __GETPOT_H__
 
 #if defined(WIN32) || defined(SOLARIS_RAW) || (__GNUC__ == 2) || defined(__HP_aCC)
-#define strtok_r(a, b, c) strtok(a, b)
+#  define strtok_r(a, b, c) strtok(a, b)
 #endif // WINDOWS or SOLARIS or gcc 2.* or HP aCC
 
 
@@ -39,13 +39,12 @@ extern "C" {
 #include <stdio.h>
 
 #ifdef GETPOT_ALLOW_VARGS
-#include <stdarg.h>
+#  include <stdarg.h>
 #endif
 
 }
 
 #include <math.h>
-
 #include <iostream>
 #include <string>
 #include <vector>
@@ -65,12 +64,17 @@ class GetPot {
   // (*) constructors, destructor, assignment operator -----------------------
   inline GetPot();
   inline GetPot(const GetPot&);
-  inline GetPot(int argc_, char * argv_[]);
+  inline GetPot(const int argc_, const char ** argv_);
   inline GetPot(const char* FileName);
   inline GetPot(const std::string &FileName);
   inline ~GetPot();
   inline GetPot& operator=(const GetPot&);
 
+  // (*) parse methods for command line & input files ------------------------
+  inline void         parse_command_line (const int argc_, const char ** argv_);
+  inline void         parse_input_file   (const std::string& FileName);
+  inline void         parse_input_file   (const char* FileName);
+  
   // (*) direct access to command line arguments -----------------------------
   inline const char*  operator[](unsigned Idx) const;
   inline int          get(unsigned Idx, int         Default) const;
@@ -79,8 +83,8 @@ class GetPot {
   inline unsigned     size() const; 
 
   // (*) flags ---------------------------------------------------------------
-  inline bool   options_contain(const char* FlagList) const;
-  inline bool   argument_contains(unsigned Idx, const char* FlagList) const;
+  inline bool         options_contain(const char* FlagList) const;
+  inline bool         argument_contains(unsigned Idx, const char* FlagList) const;
 
   // (*) variables -----------------------------------------------------------
   //     -- scalar values
@@ -93,7 +97,7 @@ class GetPot {
   inline int          operator()(const char* VarName, int         Default, unsigned Idx) const;
   inline double       operator()(const char* VarName, double      Default, unsigned Idx) const;
   inline const char*  operator()(const char* VarName, const char* Default, unsigned Idx) const;
-  inline unsigned       vector_variable_size(const char* VarName) const;
+  inline unsigned     vector_variable_size(const char* VarName) const;
   inline std::vector<std::string> get_variable_names() const;
   inline std::vector<std::string> get_section_names() const;
 
@@ -300,13 +304,54 @@ GetPot::__basic_initialization()
 
 inline 
 GetPot::GetPot()
-{ __basic_initialization(); }
+{
+  __basic_initialization();
+}
 
 
 
 inline 
-GetPot::GetPot(int argc_, char *argv_[])
-{ 
+GetPot::GetPot(int argc_, const char ** argv_)
+{
+  parse_command_line (argc_, argv_);
+}
+
+
+
+inline 
+GetPot::GetPot(const char* FileName)
+{
+  parse_input_file (FileName);
+}
+
+
+
+inline 
+GetPot::GetPot(const std::string &FileName)
+{
+  parse_input_file (FileName);
+}
+
+
+
+inline 
+GetPot::GetPot(const GetPot& Other)
+{
+  GetPot::operator=(Other);
+}
+
+
+
+inline 
+GetPot::~GetPot()
+{
+}
+
+
+
+inline
+void GetPot::parse_command_line (int argc_, const char ** argv_)
+{
   __basic_initialization();
 
   // -- make an internal copy of the argument list:
@@ -322,23 +367,9 @@ GetPot::GetPot(int argc_, char *argv_[])
 
 
 
-inline 
-GetPot::GetPot(const char* FileName)
-{ 
-  __basic_initialization();
-
-  std::vector<std::string> __argv;
-  __argv.push_back(std::string(FileName)); 
-  std::vector<std::string> args = __read_in_file(FileName);
-  __argv.insert(__argv.begin()+1, args.begin(), args.end());
-  __parse_argument_vector(__argv); 
-}
-
-
-
-inline 
-GetPot::GetPot(const std::string &FileName)
-{ 
+inline
+void GetPot::parse_input_file (const std::string& FileName)
+{
   __basic_initialization();
 
   std::vector<std::string> __argv;
@@ -350,15 +381,17 @@ GetPot::GetPot(const std::string &FileName)
 
 
 
-inline 
-GetPot::GetPot(const GetPot& Other)
-{ GetPot::operator=(Other); }
+inline
+void GetPot::parse_input_file (const char* FileName)
+{
+  __basic_initialization();
 
-
-
-inline 
-GetPot::~GetPot()
-{ }
+  std::vector<std::string> __argv;
+  __argv.push_back(FileName); 
+  std::vector<std::string> args = __read_in_file(FileName);
+  __argv.insert(__argv.begin()+1, args.begin(), args.end());
+  __parse_argument_vector(__argv); 
+}
 
 
 

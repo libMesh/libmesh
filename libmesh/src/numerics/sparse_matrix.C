@@ -1,4 +1,4 @@
-// $Id: sparse_matrix.C,v 1.5 2003-03-14 09:56:41 ddreyer Exp $
+// $Id: sparse_matrix.C,v 1.6 2003-04-08 03:21:26 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -33,28 +33,45 @@
 // SparseMatrix Methods
 
 // Full specialization for Real datatypes
-template <>
-AutoPtr<SparseMatrix<Real> >
-SparseMatrix<Real>::build(const SolverPackage solver_package)
+template <typename T>
+AutoPtr<SparseMatrix<T> >
+SparseMatrix<T>::build(const SolverPackage solver_package_in)
 {
+  // Possibly overload the solver package based on
+  // command-line arguments
+  SolverPackage solver_package = solver_package_in;
+  
+#ifdef HAVE_PETSC
+  if (libMesh::on_command_line ("--use-petsc"))
+    solver_package = PETSC_SOLVERS;
+#endif
+  
+#ifdef HAVE_LASPACK
+  if (libMesh::on_command_line("--use-laspack"))
+    solver_package = LASPACK_SOLVERS;
+#endif
 
+
+
+
+  // Build the appropriate vector
   switch (solver_package)
     {
 
 
-#if defined(HAVE_LASPACK) && defined(USE_REAL_NUMBERS)
+#ifdef HAVE_LASPACK
     case LASPACK_SOLVERS:
       {
-	AutoPtr<SparseMatrix<Real> > ap(new LaspackMatrix<Real>);
+	AutoPtr<SparseMatrix<T> > ap(new LaspackMatrix<Real>);
 	return ap;
       }
 #endif
 
 
-#if defined(HAVE_PETSC) && defined(USE_REAL_NUMBERS)
+#ifdef HAVE_PETSC
     case PETSC_SOLVERS:
       {
-	AutoPtr<SparseMatrix<Real> > ap(new PetscMatrix<Real>);
+	AutoPtr<SparseMatrix<T> > ap(new PetscMatrix<Real>);
 	return ap;
       }
 #endif
@@ -66,50 +83,10 @@ SparseMatrix<Real>::build(const SolverPackage solver_package)
       error();
     }
 
-  AutoPtr<SparseMatrix<Real> > ap(NULL);
+  AutoPtr<SparseMatrix<T> > ap(NULL);
   return ap;    
 }
 
-
-
-
-// Full specialization for Complex datatypes
-template <>
-AutoPtr<SparseMatrix<Complex> >
-SparseMatrix<Complex>::build(const SolverPackage solver_package)
-{
-
-  switch (solver_package)
-    {
-
-
-#if defined(HAVE_LASPACK) && defined(USE_COMPLEX_NUMBERS)
-    case LASPACK_SOLVERS:
-      {
-	AutoPtr<SparseMatrix<Complex> > ap(new LaspackMatrix<Complex>);
-	return ap;
-      }
-#endif
-
-
-#if defined(HAVE_PETSC) && defined(USE_COMPLEX_NUMBERS)
-    case PETSC_SOLVERS:
-      {
-	AutoPtr<SparseMatrix<Complex> > ap(new PetscMatrix<Complex>);
-	return ap;
-      }
-#endif
-
-    default:
-      std::cerr << "ERROR:  Unrecognized solver package: "
-		<< solver_package
-		<< std::endl;
-      error();
-    }
-
-  AutoPtr<SparseMatrix<Complex> > ap(NULL);
-  return ap;    
-}
 
 
 //------------------------------------------------------------------
