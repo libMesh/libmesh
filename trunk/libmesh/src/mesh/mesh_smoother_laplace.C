@@ -1,4 +1,4 @@
-// $Id: mesh_smoother_laplace.C,v 1.3 2003-06-25 19:53:05 jwpeterson Exp $
+// $Id: mesh_smoother_laplace.C,v 1.4 2003-06-26 07:16:29 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,7 +31,7 @@
 // Member functions for the Laplace smoother
 void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
 {
-  if (not _initialized)
+  if (!_initialized)
     this->init();
   
   // Don't smooth the nodes on the boundary...
@@ -44,7 +44,7 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
     {
       for (unsigned int i=0; i<_mesh.n_nodes(); ++i)
 	{
-	  if (not on_boundary[i])
+	  if (!on_boundary[i])
 	    {
 	      // Smooth!
 	      Real avg_x = 0.;
