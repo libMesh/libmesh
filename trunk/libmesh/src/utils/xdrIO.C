@@ -1,4 +1,4 @@
-// "$Id: xdrIO.C,v 1.15 2004-01-03 15:37:44 benkirk Exp $\n"
+// "$Id: xdrIO.C,v 1.16 2004-03-02 12:59:44 benkirk Exp $\n"
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -398,7 +398,7 @@ int XdrIO::dataBlk(REAL* array, int numvar, int size)
 int XdrMESH::header(XdrMHEAD *hd)
 {
   // Temporary variables to facilitate stream reading
-  const int comm_len= 80;  
+  const int comm_len= 256;  
   char comment[comm_len];
   
   switch (m_type)
