@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.C,v 1.30 2003-09-16 15:59:31 benkirk Exp $
+// $Id: mesh_unv_support.C,v 1.31 2003-10-01 19:47:09 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -25,6 +25,7 @@
 
 
 // Local includes
+#include "libmesh_config.h"
 #include "mesh_unv_support.h"
 #include "mesh_data.h"
 #include "face_quad4.h"
@@ -36,7 +37,10 @@
 #include "cell_hex20.h"
 #include "cell_tet10.h"
 #include "cell_prism6.h"
-#include "gzstream.h" // For reading/writing compressed streams
+
+#ifdef HAVE_GZSTREAM
+# include "gzstream.h" // For reading/writing compressed streams
+#endif
 
 //-----------------------------------------------------------------------------
 // MeshBase methods
@@ -129,7 +133,7 @@ void UnvMeshInterface::read (const std::string& file_name)
   
   if (file_name.rfind(".gz") < file_name.size())
     {
-#ifdef HAVE_ZLIB_H
+#ifdef HAVE_GZSTREAM
       igzstream in_stream(file_name.c_str());
       this->read_implementation (in_stream);
 #else
@@ -360,7 +364,7 @@ void UnvMeshInterface::write (const std::string& file_name)
 {
   if (file_name.rfind(".gz") < file_name.size())
     {
-#ifdef HAVE_ZLIB_H
+#ifdef HAVE_GZSTREAM
       ogzstream out_stream(file_name.c_str());
       this->write_implementation (out_stream);
 #else

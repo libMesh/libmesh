@@ -1,4 +1,4 @@
-// $Id: mesh_data_unv_support.C,v 1.16 2003-09-16 16:44:04 ddreyer Exp $
+// $Id: mesh_data_unv_support.C,v 1.17 2003-10-01 19:47:09 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -23,11 +23,14 @@
 #include <stdio.h>
 
 // Local includes
+#include "libmesh_config.h"
 #include "mesh_data.h"
 #include "mesh_base.h"
 #include "auto_ptr.h"
-#include "gzstream.h" // For reading/writing compressed streams
 
+#ifdef  HAVE_GZSTREAM
+# include "gzstream.h" // For reading/writing compressed streams
+#endif
 
 
 //------------------------------------------------------
@@ -56,7 +59,7 @@ void MeshData::read_unv (const std::string& file_name)
    */
   if (file_name.rfind(".gz") < file_name.size())
     {
-#ifdef HAVE_ZLIB_H
+#ifdef HAVE_GZSTREAM
       igzstream in_stream(file_name.c_str());
       this->read_unv_implementation (in_stream);
 #else
@@ -413,7 +416,7 @@ void MeshData::write_unv (const std::string& file_name)
 
   if (file_name.rfind(".gz") < file_name.size())
     {
-#ifdef HAVE_ZLIB_H
+#ifdef HAVE_GZSTREAM
       ogzstream out_stream(file_name.c_str());
       this->write_unv_implementation (out_stream);
 #else
