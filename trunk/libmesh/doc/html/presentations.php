@@ -26,6 +26,7 @@
     <li>  <a href="http://www.cfdlab.ae.utexas.edu/~peterson/usnccm.pdf">USNCCM VII</a> Presentation.</li>
 
     <li>  <a href="http://www.cfdlab.ae.utexas.edu/~peterson/scraper.pdf">Scraper Flow</a> Presentation with I. Schoegl.</li>
+    <li> <a href="http://www.challenge.nm.org/FinalReports/08.pdf">Albuquerque Academy</a> Presentation on Stress Analysis in a Torus.</li>
   <li> ICIAM </li>
   <li>  <a href="http://www.saviac.org/74th_Symposium/abstracts/U040.htm">SAVIAC</a> conference abstract.</li>
 
