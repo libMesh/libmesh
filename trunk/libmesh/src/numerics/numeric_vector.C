@@ -1,4 +1,4 @@
-// $Id: numeric_vector.C,v 1.5 2003-03-14 09:56:41 ddreyer Exp $
+// $Id: numeric_vector.C,v 1.6 2003-03-21 15:29:29 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -108,6 +108,88 @@ NumericVector<Complex>::build(const SolverPackage solver_package)
     
   AutoPtr<NumericVector<Complex> > ap(NULL);
   return ap;    
+}
+
+
+
+// Full specialization for float datatypes (DistributedVector wants this)
+template <>
+int NumericVector<float>:: compare (const NumericVector<float> &other_vector,
+				    const Real threshold) const
+{
+  assert (this->initialized());
+  assert (other_vector.initialized());
+  assert (this->first_local_index() == other_vector.first_local_index());
+  assert (this->last_local_index()  == other_vector.last_local_index());
+
+  int rvalue     = -1;
+  unsigned int i = first_local_index();
+
+  do
+    {
+      if ( fabs( (*this)(i) - other_vector(i) ) > threshold )
+	rvalue = i;
+      else
+	i++;
+    }
+  while (rvalue==-1 && i<last_local_index());
+
+  return rvalue;
+}
+
+
+
+// Full specialization for Real datatypes
+template <>
+int NumericVector<Real>:: compare (const NumericVector<Real> &other_vector,
+				   const Real threshold) const
+{
+  assert (this->initialized());
+  assert (other_vector.initialized());
+  assert (this->first_local_index() == other_vector.first_local_index());
+  assert (this->last_local_index()  == other_vector.last_local_index());
+
+  int rvalue     = -1;
+  unsigned int i = first_local_index();
+
+  do
+    {
+      if ( fabs( (*this)(i) - other_vector(i) ) > threshold )
+	rvalue = i;
+      else
+	i++;
+    }
+  while (rvalue==-1 && i<last_local_index());
+
+  return rvalue;
+}
+
+
+
+// Full specialization for Complex datatypes
+template <>
+int NumericVector<Complex>:: compare (const NumericVector<Complex> &other_vector,
+				      const Real threshold) const
+{
+  assert (this->initialized());
+  assert (other_vector.initialized());
+  assert (this->first_local_index() == other_vector.first_local_index());
+  assert (this->last_local_index()  == other_vector.last_local_index());
+
+  int rvalue     = -1;
+  unsigned int i = first_local_index();
+
+  do
+    {
+      if (( fabs( (*this)(i).real() - other_vector(i).real() ) > threshold ) ||
+	  ( fabs( (*this)(i).imag() - other_vector(i).imag() ) > threshold ))
+	rvalue = i;
+      else
+	i++;
+    }
+  while (rvalue==-1 && i<last_local_index());
+
+  return rvalue;
 }
 
 

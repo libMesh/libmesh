@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.18 2003-03-14 09:56:40 ddreyer Exp $
+// $Id: equation_systems.h,v 1.19 2003-03-21 15:29:06 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -181,6 +181,16 @@ public:
   void write(const std::string& name,
 	     const Xdr::XdrMODE,
 	     const bool write_data=true);
+
+  /**
+   * @returns \p true when this equation system contains
+   * identical data, up to the given threshold.  Delegates
+   * most of the comparisons to perform to the responsible
+   * systems
+   */
+  bool compare (const EquationSystems<T_sys>& other_es, 
+		const Real threshold,
+		const bool verbose) const;
 
   /**
    * Prints information about the equation systems.

@@ -1,4 +1,4 @@
-// $Id: system_base.h,v 1.10 2003-03-20 11:51:24 ddreyer Exp $
+// $Id: system_base.h,v 1.11 2003-03-21 15:29:09 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -95,6 +95,16 @@ protected:
    */
   void assemble ();
 
+  /**
+   * @returns \p true when the other system contains
+   * identical data, up to the given threshold.  Outputs
+   * some diagnostic info when \p verbose is set.
+   */
+  bool compare (const SystemBase& other_system, 
+		const Real threshold,
+		const bool verbose) const;
+
+
 public:
 
   /**
@@ -110,7 +120,7 @@ public:
   /**
    * @returns the type of system, helpful in identifying
    * which system type to use when reading equation system
-   * data from file.  Has to be overloaded in derived classes.
+   * data from file.  Has be overloaded in derived classes.
    */
   static const std::string system_type () { error(); return ""; }
 
@@ -160,12 +170,25 @@ public:
   void add_matrix (const std::string& mat_name);
 
   /**
+   * @returns a const reference to this system's @e additional matrix
+   * named \p mat_name.  @e None of these matrices is involved in the 
+   * solution process.  Access is only granted when the matrix is already
+   * properly initialized.
+   */
+  const SparseMatrix<Number> & get_matrix(const std::string& mat_name) const;
+
+  /**
    * @returns a writeable reference to this system's @e additional matrix
    * named \p mat_name.  @e None of these matrices is involved in the 
    * solution process.  Access is only granted when the matrix is already
    * properly initialized.
    */
   SparseMatrix<Number> & get_matrix(const std::string& mat_name);
+
+  /**
+   * @returns the number of additional vectors handled by this system
+   */
+  unsigned int n_additional_matrices () const { return _other_matrices.size(); }
 
   /**
    * Adds the additional vector \p vec_name to this system.  Only
@@ -176,11 +199,23 @@ public:
   void add_vector (const std::string& vec_name);
 
   /**
+   * @returns a const reference to this system's @e additional vector
+   * named \p vec_name.  Access is only granted when the vector is already
+   * properly initialized.
+   */
+  const NumericVector<Number> & get_vector(const std::string& vec_name) const;
+
+  /**
    * @returns a writeable reference to this system's @e additional vector
    * named \p vec_name.  Access is only granted when the vector is already
    * properly initialized.
    */
   NumericVector<Number> & get_vector(const std::string& vec_name);
+
+  /**
+   * @returns the number of additional vectors handled by this system
+   */
+  unsigned int n_additional_vectors () const { return _other_vectors.size(); }
 
 /*   /\** */
 /*    * Zeros the additional vectors.  Gives an error when none exist. */

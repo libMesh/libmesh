@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.25 2003-03-20 11:51:24 ddreyer Exp $
+// $Id: equation_systems.C,v 1.26 2003-03-21 15:29:11 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -28,6 +28,7 @@
 #include "equation_systems.h"
 #include "general_system.h"
 #include "frequency_system.h"
+#include "thin_system.h"
 
 // Forward Declarations
 
@@ -400,6 +401,69 @@ void EquationSystems<T_sys>::build_solution_vector (std::vector<Number>& soln)
 
 
 template <typename T_sys>
+bool EquationSystems<T_sys>::compare (const EquationSystems<T_sys>& other_es, 
+				      const Real threshold,
+				      const bool verbose) const
+{
+  // safety check, whether we handle at least the same number
+  // of systems
+  std::vector<bool> os_result;
+
+  if (this->n_systems() != other_es.n_systems())
+    {
+      if (verbose)
+        {
+	  std::cout << "  Fatal difference. This system handles " 
+		    << this->n_systems() << " systems," << std::endl
+		    << "  while the other system handles "
+		    << other_es.n_systems() 
+		    << " systems." << std::endl
+		    << "  Aborting comparison." << std::endl;
+	}
+      return false;
+    }
+  else
+    {
+      // start comparing each system
+      typename std::map<std::string, T_sys*>::const_iterator pos=_systems.begin();
+      
+      for (; pos != _systems.end(); ++pos)
+        {
+	  const std::string& sys_name = pos->first;
+	  const T_sys&  system        = *(pos->second);
+      
+	  // get the other system
+	  const T_sys& other_system   = other_es (sys_name);
+
+	  os_result.push_back (system.compare (other_system, threshold, verbose));
+
+	}
+
+    }
+  
+
+  // sum up the results
+  if (os_result.size()==0)
+    return true;
+  else
+    {
+      bool os_identical;
+      unsigned int n = 0;
+	  do
+	    {
+	      os_identical = os_result[n];
+	      n++;
+	    }
+	  while (os_identical && n<os_result.size());
+	  return os_identical;
+	}
+}
+
+
+
+
+
+template <typename T_sys>
 std::string EquationSystems<T_sys>::get_info () const
 {
   std::ostringstream out;
@@ -475,6 +539,7 @@ std::string EquationSystems<T_sys>::get_info () const
 //--------------------------------------------------------------
 // Explicit instantiations
 template class EquationSystems<GeneralSystem>;
+template class EquationSystems<ThinSystem>;
 
 #if defined(USE_COMPLEX_NUMBERS) 
 template class EquationSystems<FrequencySystem>;

@@ -1,4 +1,4 @@
-// $Id: system_base.C,v 1.10 2003-03-20 11:51:25 ddreyer Exp $
+// $Id: system_base.C,v 1.11 2003-03-21 15:29:28 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -235,6 +235,135 @@ void SystemBase::assemble ()
 
 
 
+bool SystemBase::compare (const SystemBase& other_system, 
+			  const Real threshold,
+			  const bool verbose) const
+{
+  // we do not care for matrices, but for vectors
+  assert (!_can_add_vectors);
+  assert (!other_system._can_add_vectors);
+
+  if (verbose)
+    {
+      std::cout << "  Systems \"" << _sys_name << "\"" << std::endl;
+      std::cout << "   comparing matrices not supported." << std::endl;
+      std::cout << "   comparing names...";
+    }
+
+  // compare the name: 0 means identical
+  const int name_result = _sys_name.compare(other_system.name());
+  if (verbose)
+    {
+      if (name_result == 0)
+	std::cout << " identical." << std::endl;
+      else
+	std::cout << "  names not identical." << std::endl;
+      std::cout << "   comparing solution vector...";
+    }
+
+
+  // compare the solution: -1 means identical
+  const int solu_result = solution->compare (*other_system.solution.get(),
+					     threshold);
+
+  if (verbose)
+    {
+      if (solu_result == -1)
+	std::cout << " identical up to threshold." << std::endl;
+      else
+	std::cout << "  first difference occured at index = " 
+		  << solu_result << "." << std::endl;
+    }
+
+
+  // safety check, whether we handle at least the same number
+  // of vectors
+  std::vector<int> ov_result;
+
+  if (this->n_additional_vectors() != other_system.n_additional_vectors())
+    {
+      if (verbose)
+        {
+	  std::cout << "   Fatal difference. This system handles " 
+		    << this->n_additional_vectors() << " add'l vectors," << std::endl
+		    << "   while the other system handles "
+		    << other_system.n_additional_vectors() 
+		    << " add'l vectors." << std::endl
+		    << "   Aborting comparison." << std::endl;
+	}
+      return false;
+    }
+  else if (this->n_additional_vectors() == 0)
+    {
+      // there are no additional vectors...
+      ov_result.clear ();
+    }
+  else
+    {
+      // compare other vectors
+      for(other_vectors_const_iterator pos = _other_vectors.begin();
+	  pos != _other_vectors.end(); ++pos)
+        {
+	  if (verbose)
+	      std::cout << "   comparing vector \""
+			<< pos->first << "\" ...";
+
+	  // assume they have the same name
+	  const NumericVector<Number>& other_system_vector = 
+	      other_system.get_vector(pos->first);
+
+	  ov_result.push_back(pos->second->compare (other_system_vector,
+						    threshold));
+
+	  if (verbose)
+	    {
+	      if (solu_result == -1)
+		std::cout << " identical up to threshold." << std::endl;
+	      else
+		std::cout << " first difference occured at" << std::endl
+			  << "  index = " << solu_result << "." << std::endl;
+	    }
+
+	}
+
+    } // finished comparing additional vectors
+
+
+  bool overall_result;
+       
+  // sum up the results
+  if ((name_result==0) && (solu_result==-1))
+    {
+      if (ov_result.size()==0)
+	overall_result = true;
+      else
+        {
+	  bool ov_identical;
+	  unsigned int n    = 0;
+	  do
+	    {
+	      ov_identical = (ov_result[n]==-1);
+	      n++;
+	    }
+	  while (ov_identical && n<ov_result.size());
+	  overall_result = ov_identical;
+	}
+    }
+  else
+    overall_result = false;
+
+  if (verbose)
+    {
+      std::cout << "   finished comparisons, ";
+      if (overall_result)
+	std::cout << "found no differences." << std::endl << std::endl;
+      else 
+	std::cout << "found differences." << std::endl << std::endl;
+    }
+	  
+  return overall_result;
+}
+
 
 
 void SystemBase::update_global_solution (std::vector<Number>& global_soln) const
@@ -284,6 +413,35 @@ void SystemBase::add_matrix (const std::string& mat_name)
   _other_matrices[mat_name] = buf;
 
   // assemble() adds the matrix to the _dof_map
+}
+
+
+
+
+const SparseMatrix<Number> &  SystemBase::get_matrix(const std::string& mat_name) const
+{
+  // only enable access _after_ the matrices are properly initialized
+  if (_can_add_matrices)
+    {
+      std::cerr << "ERROR: Too early.  Access to additional matrices granted only when "
+		<< std::endl
+		<< "these are already properly initialized."
+		<< std::endl;
+      error();
+    }
+
+   // Make sure the matrix exists
+  other_matrices_const_iterator pos = _other_matrices.find(mat_name);  
+  if (pos == _other_matrices.end())
+    {
+      std::cerr << "ERROR: matrix "
+		<< mat_name
+		<< " does not exist in this system!"
+		<< std::endl;      
+      error();
+    }
+  
+  return *(pos->second);
 }
 
 
@@ -345,6 +503,35 @@ void SystemBase::add_vector (const std::string& vec_name)
   _other_vectors[vec_name] = buf;
 }
 
+
+
+
+const NumericVector<Number> &  SystemBase::get_vector(const std::string& vec_name) const
+{
+  // only enable access after the vectors are properly initialized
+  if (_can_add_vectors)
+    {
+      std::cerr << "ERROR: Too early.  Access to vectors granted only when "
+		<< std::endl
+		<< "these are already properly initialized."
+		<< std::endl;
+      error();
+    }
+
+  // Make sure the vector exists
+  other_vectors_const_iterator pos = _other_vectors.find(vec_name);
+  
+  if (pos == _other_vectors.end())
+    {
+      std::cerr << "ERROR: vector "
+		<< vec_name
+		<< " does not exist in this system!"
+		<< std::endl;      
+      error();
+    }
+  
+  return *(pos->second);
+}
 
 
 
