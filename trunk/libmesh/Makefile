@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.5 2003-01-30 19:12:56 benkirk Exp $
+# $Id: Makefile,v 1.6 2003-01-30 19:53:58 benkirk Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -77,6 +77,13 @@ $(targ)/libmesh.so: $(objects)
 	@echo ""
 	@echo "Linking "$@
 	@$(CXX) $(CXXSHAREDFLAG) -o $(target) $(objects)
+
+#
+# Build the examples
+#
+examples: $(target)
+	@$(MAKE) -C examples
+
 
 #
 # Useful for checking make rules
