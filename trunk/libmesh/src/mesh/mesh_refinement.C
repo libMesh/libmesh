@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.32 2005-02-22 22:17:41 jwpeterson Exp $
+// $Id: mesh_refinement.C,v 1.33 2005-03-10 22:05:14 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -153,14 +153,10 @@ void MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
 {
   assert (_mesh.mesh_dimension() != 1);
 
-  bool satisfied = false;
 
 
   // Possibly clean up the refinement flags from
   // a previous step
-//   elem_iterator       elem_it (_mesh.elements_begin());
-//   const elem_iterator elem_end(_mesh.elements_end());
-  
   MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
   const MeshBase::element_iterator elem_end = _mesh.elements_end();
 
@@ -180,6 +176,7 @@ void MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
   /**
    * Repeat until coarsening & refinement flags jive
    */
+  bool satisfied = false;
   do
     {
       const bool coarsening_satisfied =
@@ -202,19 +199,161 @@ void MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
    * First coarsen the flagged elements.  This
    * will free space.
    */
-  this->coarsen_elements ();
+  this->_coarsen_elements ();
 
   /**
    * Now refine the flagged elements.  This will
    * take up some space, maybe more than what was freed.
    */
-  this->refine_elements();
+  this->_refine_elements();
   
   /**
    * Finally, the new mesh needs to be prepared for use
    */
   _mesh.prepare_for_use ();
 }
+
+
+
+
+
+
+
+void MeshRefinement::coarsen_elements (const bool maintain_level_one)
+{
+  assert (_mesh.mesh_dimension() != 1);
+
+
+  // Possibly clean up the refinement flags from
+  // a previous step
+  MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
+  const MeshBase::element_iterator elem_end = _mesh.elements_end();
+
+  for ( ; elem_it != elem_end; ++elem_it)
+    {
+      // Pointer to the element
+      Elem* elem = *elem_it;
+      
+      // Set refinement flag to DO_NOTHING if the
+      // element isn't active
+      if ( !elem->active())
+	elem->set_refinement_flag(Elem::DO_NOTHING);
+
+      // This might be left over from the last step
+      if (elem->refinement_flag() == Elem::JUST_REFINED)
+	elem->set_refinement_flag(Elem::DO_NOTHING);
+    }
+
+  
+  /**
+   * Repeat until the flags form a conforming mesh.
+   */
+  bool satisfied = false;
+  while (!satisfied)
+    {
+      const bool coarsening_satisfied =
+	this->make_coarsening_compatible(maintain_level_one);
+      
+//       const bool refinement_satisfied =
+// 	this->make_refinement_compatible(maintain_level_one);
+
+      const bool smoothing_satisfied = 
+ 	!this->eliminate_unrefined_patches();// &&
+// 	!this->limit_level_mismatch_at_node(1);
+      
+      satisfied = (coarsening_satisfied &&
+		   //		   refinement_satisfied &&
+		   smoothing_satisfied);
+    }
+
+  
+  /**
+   * Coarsen the flagged elements.  This
+   * will free space.
+   */
+  this->_coarsen_elements ();
+
+  /**
+   * Now refine the flagged elements.  This will
+   * take up some space, maybe more than what was freed.
+   */
+  // this->_refine_elements();
+  
+  /**
+   * Finally, the new mesh needs to be prepared for use
+   */
+  _mesh.prepare_for_use ();
+}
+
+
+
+
+
+
+
+void MeshRefinement::refine_elements (const bool maintain_level_one)
+{
+  assert (_mesh.mesh_dimension() != 1);
+
+  // Possibly clean up the refinement flags from
+  // a previous step
+  MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
+  const MeshBase::element_iterator elem_end = _mesh.elements_end();
+
+  for ( ; elem_it != elem_end; ++elem_it)
+    {
+      // Set refinement flag to DO_NOTHING if the
+      // element isn't active
+      if ( !(*elem_it)->active())
+	(*elem_it)->set_refinement_flag(Elem::DO_NOTHING);
+
+      // This might be left over from the last step
+      if ((*elem_it)->refinement_flag() == Elem::JUST_REFINED)
+	(*elem_it)->set_refinement_flag(Elem::DO_NOTHING);
+    }
+
+  
+  /**
+   * Repeat until coarsening & refinement flags jive
+   */
+  bool satisfied = false;
+  while (!satisfied)
+    {
+//       const bool coarsening_satisfied =
+// 	this->make_coarsening_compatible(maintain_level_one);
+      
+      const bool refinement_satisfied =
+	this->make_refinement_compatible(maintain_level_one);
+
+      const bool smoothing_satisfied = 
+ 	!this->eliminate_unrefined_patches();// &&
+// 	!this->limit_level_mismatch_at_node(1);
+      
+      satisfied = ( // coarsening_satisfied &&
+		   refinement_satisfied &&
+		   smoothing_satisfied);
+    }
+
+//   /**
+//    * First coarsen the flagged elements.  This
+//    * will free space.
+//    */
+//   this->_coarsen_elements ();
+
+  /**
+   * Now refine the flagged elements.  This will
+   * take up some space, maybe more than what was freed.
+   */
+  this->_refine_elements();
+  
+  /**
+   * Finally, the new mesh needs to be prepared for use
+   */
+  _mesh.prepare_for_use ();
+}
+
+
+
 
 
 
@@ -396,6 +535,11 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 
 
 
+
+
+
+
+
 bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 {
   START_LOG ("make_refinement_compatible()", "MeshRefinement");
@@ -509,18 +653,19 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 
 
 
-void MeshRefinement::coarsen_elements ()
+
+
+
+
+void MeshRefinement::_coarsen_elements ()
 {
-  START_LOG ("coarsen_elements()", "MeshRefinement");
+  START_LOG ("_coarsen_elements()", "MeshRefinement");
 
   // Clear the unused_elements data structure.
   // The elements have been packed since it was built,
   // so there are _no_ unused elements.  We cannot trust
   // any iterators currently in this data structure.
   // _unused_elements.clear();
-
-//   elem_iterator it        (_mesh.elements_begin());
-//   const elem_iterator end (_mesh.elements_end());
 
   MeshBase::element_iterator       it  = _mesh.elements_begin();
   const MeshBase::element_iterator end = _mesh.elements_end();
@@ -555,11 +700,19 @@ void MeshRefinement::coarsen_elements ()
 	    // The _unused_elements optimization is currently off.
 	    // _unused_elements.push_back (it);
 	    
+	    // Is this element's parent active??
+	    if (!elem->parent()->active())
+	      {
+		std::cerr << "Element being deleted has inactive parent." << std::endl;
+	      }
+	    
 	    // Delete the element, make sure the corresponding
 	    // entry in the vector is set to NULL
-	    delete elem;
-	    *it = NULL;
-	    
+// 	    delete elem;
+// 	    *it = NULL;
+
+	    // Use the mesh interface to delete the element
+	    _mesh.delete_elem(elem);
 	  }
       
       // inactive elements flagged for coarsening
@@ -571,18 +724,22 @@ void MeshRefinement::coarsen_elements ()
 	  }
     }
   
-  STOP_LOG ("coarsen_elements()", "MeshRefinement");  
+  STOP_LOG ("_coarsen_elements()", "MeshRefinement");  
 }
 
 
 
-void MeshRefinement::refine_elements ()
+
+
+
+
+void MeshRefinement::_refine_elements ()
 {
   // Update the _new_nodes_map so that elements can
   // find nodes to connect to.
   this->update_nodes_map ();
 
-  START_LOG ("refine_elements()", "MeshRefinement");
+  START_LOG ("_refine_elements()", "MeshRefinement");
 
   // Get the original number of elements.
   const unsigned int orig_n_elem = _mesh.n_elem();
@@ -617,8 +774,12 @@ void MeshRefinement::refine_elements ()
   // Clear the _new_nodes_map and _unused_elements data structures.
   this->clear();
   
-  STOP_LOG ("refine_elements()", "MeshRefinement");
+  STOP_LOG ("_refine_elements()", "MeshRefinement");
 }
+
+
+
+
 
 
 
@@ -631,9 +792,6 @@ void MeshRefinement::uniformly_refine (unsigned int n)
       this->clean_refinement_flags();
       
       // Flag all the active elements for refinement.       
-//       active_elem_iterator       elem_it (_mesh.elements_begin());
-//       const active_elem_iterator elem_end(_mesh.elements_end());
-
       MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
       const MeshBase::element_iterator elem_end = _mesh.active_elements_end(); 
 
@@ -641,7 +799,7 @@ void MeshRefinement::uniformly_refine (unsigned int n)
 	(*elem_it)->set_refinement_flag(Elem::REFINE);
 
       // Refine all the elements we just flagged.
-      this->refine_elements();
+      this->_refine_elements();
     }
   
   // Finally, the new mesh needs to be prepared for use

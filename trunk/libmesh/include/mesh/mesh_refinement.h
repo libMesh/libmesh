@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.h,v 1.6 2005-02-22 22:17:33 jwpeterson Exp $
+// $Id: mesh_refinement.h,v 1.7 2005-03-10 22:05:11 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -123,16 +123,17 @@ public:
    * refine/coarsen additional elements to satisy level-one rule.
    */
   void refine_and_coarsen_elements (const bool maintain_level_one=true);
-  
+
   /**
-   * Coarsens user-requested elements.
+   * Only coarsens the user-requested elements. Some elements
+   * will not be coarsened to satisfy the level one rule.
    */
-  void coarsen_elements ();
-  
+  void coarsen_elements (const bool maintain_level_one=true);
+
   /**
-   * Refines user-requested elements.
+   * Only refines the user-requested elements. 
    */
-  void refine_elements ();
+  void refine_elements (const bool maintain_level_one=true);
   
   /**
    * Uniformly refines the mesh \p n times.
@@ -166,6 +167,22 @@ public:
 
 
 private:
+
+  /**
+   * Coarsens user-requested elements.  Both coarsen_elements
+   * and refine_elements used to be in the public interface for the
+   * MeshRefinement object.  Unfortunately, without proper
+   * preparation (make_refinement_compatible, make_coarsening_compatible)
+   * at least coarsen_elements() did not work alone.  By making them
+   * private, we signal to the user that they are not part of the
+   * interface.
+   */
+  void _coarsen_elements ();
+  
+  /**
+   * Refines user-requested elements.
+   */
+  void _refine_elements ();
 
 
 
