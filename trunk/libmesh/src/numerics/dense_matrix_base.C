@@ -1,4 +1,4 @@
-// $Id: dense_matrix_base.C,v 1.6 2004-01-03 15:37:43 benkirk Exp $
+// $Id: dense_matrix_base.C,v 1.7 2004-10-10 19:07:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -20,6 +20,7 @@
 
 // Local Includes
 #include "dense_matrix_base.h"
+#include "dense_vector_base.h"
 
 
 
@@ -46,6 +47,35 @@ void DenseMatrixBase<T>::multiply (DenseMatrixBase<T>& M1,
       if (M3.el(k,j) != 0.)
 	for (unsigned int i=0; i<m_s; i++)
 	  M1.el(i,j) += M2.el(i,k) * M3.el(k,j);	          
+}
+
+
+
+template<typename T>
+void DenseMatrixBase<T>::condense(const unsigned int iv,
+				  const unsigned int jv,
+				  const T val,
+				  DenseVectorBase<T>& rhs)
+{
+  assert (this->_m == rhs.size());
+  assert (iv == jv);
+
+
+  // move the known value into the RHS
+  // and zero the column
+  for (unsigned int i=0; i<this->m(); i++)
+    {
+      rhs.el(i) -= this->el(i,jv)*val;
+      this->el(i,jv) = 0.;
+    }
+
+  // zero the row
+  for (unsigned int j=0; j<this->n(); j++)
+    this->el(iv,j) = 0.;
+
+  this->el(iv,jv) = 1.;
+  rhs.el(iv) = val;
+  
 }
 
 

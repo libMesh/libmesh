@@ -1,4 +1,4 @@
-// $Id: dense_submatrix.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: dense_submatrix.h,v 1.3 2004-10-10 19:07:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -28,7 +28,7 @@
 #include "libmesh_common.h"
 #include "dense_matrix_base.h"
 #include "dense_matrix.h"
-
+#include "dense_subvector.h"
 
 
 
@@ -69,6 +69,11 @@ public:
    */     
   virtual ~DenseSubMatrix() {};
 
+  
+  /**
+   * @returns a reference to the parent matrix.
+   */
+  DenseMatrix<T>& parent () { return _parent_matrix; }
   
   /**
    * Set every element in the submatrix to 0.
@@ -127,7 +132,24 @@ public:
    */
   unsigned int j_off() const { return _j_off; }
 
+  /**
+   * Condense-out the \p (i,j) entry of the matrix, forcing
+   * it to take on the value \p val.  This is useful in numerical
+   * simulations for applying boundary conditions.  Preserves the
+   * symmetry of the matrix.
+   */
+  void condense(const unsigned int i,
+		const unsigned int j,
+		const T val,
+		DenseSubVector<T>& rhs)
+  {
+    this->parent().condense(this->i_off()+i,
+			    this->j_off()+j,
+			    val, rhs.parent());
+  }
+  
 private:
+  
   /**
    * The parent matrix that contains this submatrix.
    */

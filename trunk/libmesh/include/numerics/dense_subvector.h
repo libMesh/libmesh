@@ -1,4 +1,4 @@
-// $Id: dense_subvector.h,v 1.4 2004-08-17 03:03:49 benkirk Exp $
+// $Id: dense_subvector.h,v 1.5 2004-10-10 19:07:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -58,9 +58,14 @@ public:
   /**
    * Destructor.  Does nothing.
    */     
-  ~DenseSubVector() {}
+  virtual ~DenseSubVector() {}
 
 
+  /**
+   * @returns a reference to the parent vector.
+   */
+  DenseVector<T>& parent () { return _parent_vector; }
+  
   /**
    * Set every element in the subvector to 0.
    */

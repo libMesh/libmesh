@@ -3401,7 +3401,8 @@ src/numerics/dense_matrix_base.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
-    include/numerics/dense_matrix_base.h
+    include/numerics/dense_matrix_base.h\
+    include/numerics/dense_vector_base.h
 src/numerics/dense_matrix.$(obj-suffix):\
     src/numerics/dense_matrix.C\
     include/base/libmesh.h\
@@ -3422,6 +3423,7 @@ src/numerics/dense_submatrix.$(obj-suffix):\
     include/numerics/dense_matrix.h\
     include/numerics/dense_matrix_base.h\
     include/numerics/dense_submatrix.h\
+    include/numerics/dense_subvector.h\
     include/numerics/dense_vector.h\
     include/numerics/dense_vector_base.h
 src/numerics/dense_subvector.$(obj-suffix):\
