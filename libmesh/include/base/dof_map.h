@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.8 2005-03-07 12:41:41 spetersen Exp $
+// $Id: dof_map.h,v 1.9 2005-03-17 19:20:04 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -60,9 +60,7 @@ template <typename T> class SparseMatrix;
 // AMR constraint matrix types
 
 /**
- * A row of the Dof constraint matrix.  Store as a float
- * to save space since the factors are simple rational
- * fractions.
+ * A row of the Dof constraint matrix.
  */
 typedef std::map<unsigned int, Number> DofConstraintRow;
 
@@ -100,11 +98,6 @@ public:
    * the major matrix.
    */
   void attach_matrix (SparseMatrix<Number>& matrix);
-
-
-#ifdef ENABLE_AMR
-
-#endif
 
   /**
    * Distrubute dofs on the current mesh.  Also builds the send list for
@@ -203,7 +196,7 @@ public:
 
   
   /**
-   * Fills the vector di with the global degree of freedom indices
+   * Fills the vector \p di with the global degree of freedom indices
    * for the element. If no variable number is specified then all
    * variables are returned.
    */
@@ -211,9 +204,7 @@ public:
 		    std::vector<unsigned int>& di,
 		    const unsigned int vn = libMesh::invalid_uint) const;
 
-
-
-
+  
 #ifdef ENABLE_AMR
 
   //--------------------------------------------------------------------
