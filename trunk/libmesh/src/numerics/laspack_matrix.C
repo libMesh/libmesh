@@ -1,4 +1,4 @@
-// $Id: laspack_matrix.C,v 1.18 2004-03-24 05:49:12 jwpeterson Exp $
+// $Id: laspack_matrix.C,v 1.19 2004-10-20 21:42:33 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -44,47 +44,39 @@ void LaspackMatrix<T>::update_sparsity_pattern (const std::vector<std::vector<un
   
   const unsigned int n_rows = sparsity_pattern.size();
 
-  //assert (n_rows == n());
-  
-  _row_start.resize(n_rows+1);
-
   // Initialize the _row_start data structure,
   // allocate storage for the _csr array
   {
     unsigned int size = 0;
  
     for (unsigned int row=0; row<n_rows; row++)
-      {
-	_row_start[row] = size;  
-	size += sparsity_pattern[row].size();
-	_row_start[row+1] = size;
-      }
+      size += sparsity_pattern[row].size();
     
-    _csr.resize(size);
+    _csr.resize       (size);
+    _row_start.reserve(n_rows + 1);
   }
 
 
   // Initize the _csr data structure.
   {
-    unsigned int pos = 0;
+    std::vector<unsigned int>::iterator pos = _csr.begin();
+    
+    _row_start.push_back (pos);
     
     for (unsigned int row=0; row<n_rows; row++)
       {
-	// make sure that _row_start is set up properly
-	assert (pos == _row_start[row]);
-	 
-	const std::vector<unsigned int>& sparsity_row =
-	  sparsity_pattern[row];
+	// insert the row indices
+	for (std::vector<unsigned int>::const_iterator col =
+	       sparsity_pattern[row].begin();
+	     col != sparsity_pattern[row].end(); ++col)
+	  {
+	    assert (pos != _csr.end());
+	    *pos = *col;
+	    ++pos;
+	  }
 	
-	// make sure that _row_start is set up properly
-	assert (pos+sparsity_row.size() == _row_start[row+1]);
-
-	for (unsigned int col=0; col<sparsity_row.size(); col++)
-	  _csr[pos++] = sparsity_row[col];
+	_row_start.push_back (pos);
       }
-    
-    // make sure that _row_start is set up properly
-    assert (pos == _row_start[n_rows]);
   }
 
 
@@ -100,16 +92,16 @@ void LaspackMatrix<T>::update_sparsity_pattern (const std::vector<std::vector<un
   // to zero.
   for (unsigned int i=0; i<n_rows; i++)
     {
-      const unsigned int rs     = _row_start[i];
+      const std::vector<unsigned int>::const_iterator
+	rs = _row_start[i];
+      
       const unsigned int length = _row_start[i+1] - rs;
       
-      //std::cout << "m()=" << m() << std::endl;
       Q_SetLen (&_QMat, i+1, length);
-      //std::cout << "m()=" << m() << std::endl;
 
       for (unsigned int l=0; l<length; l++)
 	{
-	  const unsigned int j = _csr[rs+l];
+	  const unsigned int j = *(rs+l);
 
 	  // sanity check
 	  //std::cout << "m()=" << m() << std::endl;

@@ -1,4 +1,4 @@
-// $Id: laspack_matrix.h,v 1.4 2004-10-19 16:58:04 jwpeterson Exp $
+// $Id: laspack_matrix.h,v 1.5 2004-10-20 21:42:32 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2003-2003  Benjamin S. Kirk, John W. Peterson
@@ -290,7 +290,7 @@ private:
    * The start of each row in the compressed
    * row index data structure.
    */
-  std::vector<unsigned int> _row_start;
+  std::vector<std::vector<unsigned int>::const_iterator> _row_start;
 
   /**
    * Flag indicating if the matrix has been closed yet.
@@ -351,21 +351,17 @@ void LaspackMatrix<T>::zero ()
 
   for (unsigned int row=0; row<n_rows; row++)
     {
-      const unsigned int r_start = _row_start[row];
-      const unsigned int len     = Q_GetLen(&_QMat, row+1);
-
-      //       std::cout << "row=" << row << ", \t"
-      // 		<< "len=" << len << ", \t"
-      // 		<< "_row_start[row+1]-_row_start[row]="
-      // 		<<  _row_start[row+1]-_row_start[row]
-      // 		<< std::endl;
+      const std::vector<unsigned int>::const_iterator
+	r_start = _row_start[row];
+      
+      const unsigned int len = (_row_start[row+1] - _row_start[row]);
 	
       // Make sure we agree on the row length
-      assert (len == (_row_start[row+1]-_row_start[row]));
+      assert (len == Q_GetLen(&_QMat, row+1));
       
       for (unsigned int l=0; l<len; l++)
 	{
-	  const unsigned int j = _csr[r_start + l];
+	  const unsigned int j = *(r_start + l);
 
 	  // Make sure the data structures are working
 	  assert ((j+1) == Q_GetPos (&_QMat, row+1, l));
@@ -430,7 +426,7 @@ void LaspackMatrix<T>::set (const unsigned int i,
   const unsigned int position = this->pos(i,j);
 
   // Sanity check
-  assert (_csr[_row_start[i]+position] == j);
+  assert (*(_row_start[i]+position) == j);
   assert ((j+1) == Q_GetPos (&_QMat, i+1, position));
 
   Q_SetEntry (&_QMat, i+1, position, j+1, value);
@@ -451,7 +447,7 @@ void LaspackMatrix<T>::add (const unsigned int i,
   const unsigned int position = this->pos(i,j);
 
   // Sanity check
-  assert (_csr[_row_start[i]+position] == j);
+  assert (*(_row_start[i]+position) == j);
 
   Q_AddVal (&_QMat, i+1, position, value);
 }
@@ -505,18 +501,20 @@ void LaspackMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
 
   for (unsigned int row=0; row<n_rows; row++)
     {
-      const unsigned int r_start = _row_start[row];
-      const unsigned int len     = Q_GetLen(&_QMat, row+1);
+      const std::vector<unsigned int>::const_iterator
+	r_start = _row_start[row];
+      
+      const unsigned int len = (_row_start[row+1] - _row_start[row]);
 
+      // Make sure we agree on the row length
+      assert (len == Q_GetLen(&_QMat, row+1));
       // compare matrix sparsity structures
       assert (len == Q_GetLen(&(X->_QMat), row+1));
 	
-      // Make sure we agree on the row length
-      assert (len == (_row_start[row+1]-_row_start[row]));
       
       for (unsigned int l=0; l<len; l++)
 	{
-	  const unsigned int j = _csr[r_start + l];
+	  const unsigned int j = *(r_start + l);
 
 	  // Make sure the data structures are working
 	  assert ((j+1) == Q_GetPos (&_QMat, row+1, l));
@@ -553,12 +551,13 @@ unsigned int LaspackMatrix<T>::pos (const unsigned int i,
   assert (i < this->m());
   assert (j < this->n());
   assert (i+1 < _row_start.size());
-  assert (_row_start.back() == _csr.size());
+  assert (_row_start.back() == _csr.end());
 
-  std::pair<const unsigned int*,
-    const unsigned int*> p =
-    std::equal_range (&_csr[_row_start[i]],
-		      &_csr[_row_start[i+1]],
+  // note this requires the _csr to be 
+  std::pair<std::vector<unsigned int>::const_iterator,
+	    std::vector<unsigned int>::const_iterator> p =
+    std::equal_range (_row_start[i],
+		      _row_start[i+1],
 		      j);
 
   // Make sure the row contains the element j
@@ -568,7 +567,7 @@ unsigned int LaspackMatrix<T>::pos (const unsigned int i,
   assert (*p.first == j);
 
   // Return the position in the compressed row
-  return std::distance (&_csr[_row_start[i]], p.first);
+  return std::distance (_row_start[i], p.first);
 }
 
 
