@@ -1,6 +1,7 @@
 # Copyright (C) 1999, 2000, 2001, 2002 by Wolfgang Bangerth, University of Heidelberg
+# With modifications for libmesh by John W. Peterson, 2003.
 
-print "<a name=\"CommProg\"></a>\n";
+# print "<a name=\"CommProg\"></a>\n";
 print "<h1> The commented program</h1>\n";
 
 # ignore comments at the start of the program. this includes CVS
@@ -16,7 +17,7 @@ $comment_mode = 0;
 $program_mode = 1;
 $state =  $comment_mode;
 
-print "<p>\n";
+print "<div class = \"comment\">\n";
 
 do {
     # substitute special characters
@@ -28,18 +29,27 @@ do {
     if (($state == $program_mode) && m!^\s*//!)
     {     
 	$state = $comment_mode;
-	print "</code></pre>\n";
-	print "\n";
-	print "<p>\n";
+	# End the preceeding code div
+	print "</pre>\n";
+	print "</div>\n";
+	
+	# Begin a new comment division
+	print "<div class = \"comment\">\n";
     }
+    
     # if in comment mode and no comment line: toggle state.
     # don't do so, if only a blank line
     elsif (($state == $comment_mode) && !m!^\s*//! && !m!^\s*$!)
     {     
 	$state = $program_mode;
-	print "</p>\n";
-	print "\n";
-	print "<pre><code>\n";
+	# End the comment division
+	print "</div>\n\n";
+
+	# Begin a code fragment div
+	print "<div class =\"fragment\">\n";
+
+	# Also start a <pre> block
+	print "<pre>\n";
     }
     
     if ($state == $comment_mode) 
@@ -49,19 +59,19 @@ do {
 	s!\s*//\s*(.*)\n!$1!;
 
 	# second, replace section headers, and generate addressable
-	# anchor
-	if ( /\@sect/ ) {
-	   s!\@sect(\d)\{(.*)\}\s*$!<h$1>$2</h$1>!g;
-	   $sect_name = $2;
-	   $sect_name =~ s/\s/_/g;
-	   $_ = "\n<a name=\"$sect_name\"></a>" . $_;
-	}
+	# anchor...don't need this
+	# if ( /\@sect/ ) {
+# 	   s!\@sect(\d)\{(.*)\}\s*$!<h$1>$2</h$1>!g;
+# 	   $sect_name = $2;
+# 	   $sect_name =~ s/\s/_/g;
+# 	   $_ = "\n<a name=\"$sect_name\"></a>" . $_;
+# 	}
 
 	# finally print this line
 	print $_, "\n";
 
 	# if empty line, introduce paragraph break
-	print "</p>\n\n<p>" if  $1 =~ m!^\s*$!;
+	print "<br><br>" if  $1 =~ m!^\s*$!;
     }
     else
     {
@@ -69,7 +79,10 @@ do {
     }
 } while (<>);
 
+
+# Close off the last code section
 if ($state == $program_mode) {
-   print "</code></pre>\n";
+    print "</pre>\n";
+    print "</div>\n\n";
 }
 

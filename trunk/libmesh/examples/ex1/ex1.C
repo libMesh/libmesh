@@ -1,4 +1,4 @@
-/* $Id: ex1.C,v 1.4 2003-11-06 05:49:23 jwpeterson Exp $ */
+/* $Id: ex1.C,v 1.5 2003-11-06 20:51:36 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -17,29 +17,25 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
-// C++ include files that we need
-#include <iostream>
+ // Example 1
+ // This is the first example program.  It simply demonstrates
+ // how to create a mesh object.  A mesh is read from file,
+ // information is printed to the screen, and the mesh is then
+ // written.
 
+ // C++ include files that we need
+#include <iostream>
 // Functions to initialize the library.
 #include "libmesh.h"
-
 // Basic include files needed for the mesh functionality.
 #include "mesh.h"
 
-// Example 1
-// Introduction
-// This is the first example program.  It simply demonstrates
-// how to create a mesh object.  A mesh is read from file,
-// information is printed to the screen, and the mesh is then
-// written 
 int main (int argc, char** argv)
 {
-  
   // Initialize the library.  This is necessary because the library
   // may depend on a number of other libraries (i.e. MPI  and Petsc)
   // that require initialization before use.
   libMesh::init (argc, argv);
-  
   // Force all our objects to have local scope.  By declaring
   // libMesh objects in the next pair of braces we can assert
   // that they will go out of scope (and should have been deleted)
@@ -57,7 +53,7 @@ int main (int argc, char** argv)
 		  << std::endl;
 	
 	// This handy function will print the file name, line number,
-	// and then abort.  Currrently the library does not use C++
+	// and then abort.  Currently the library does not use C++
 	// exception handling.
 	error();
       }
@@ -78,11 +74,9 @@ int main (int argc, char** argv)
     // output file name.
     if (argc == 5)
       mesh.write (argv[4]);
-    
     // At this closing brace all of our objects will be forced
     // out of scope and will get deconstructed.
   }
-
   // All done.  Call the libMesh::close() function to close any
   // external libraries and check for leaked memory.  To be absolutey
   // certain this is called last we will return its value.  This
