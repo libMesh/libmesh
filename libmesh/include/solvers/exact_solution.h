@@ -1,4 +1,4 @@
-// $Id: exact_solution.h,v 1.2 2004-05-27 04:37:12 jwpeterson Exp $
+// $Id: exact_solution.h,v 1.3 2004-06-01 14:24:23 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -69,10 +69,10 @@ public:
    * which computes the exact value of the solution
    * at any point, time.
    */
-  void attach_exact_value ( Real fptr(const Point& p,
-				      const Real time,
-				      const std::string& sys_name,
-				      const std::string& unknown_name));
+  void attach_exact_value ( Number fptr(const Point& p,
+					const Real time,
+					const std::string& sys_name,
+					const std::string& unknown_name));
 
   /**
    * Attach function similar to system.h which
@@ -80,10 +80,10 @@ public:
    * which computes the exact derivative of the solution
    * at any point, time.
    */
-  void attach_exact_deriv ( RealGradient fptr(const Point& p,
-					      const Real time,
-					      const std::string& sys_name,
-					      const std::string& unknown_name));
+  void attach_exact_deriv ( Gradient fptr(const Point& p,
+					  const Real time,
+					  const std::string& sys_name,
+					  const std::string& unknown_name));
 
   /**
    * Computes and stores the error in the solution value e = u-u_h
@@ -99,16 +99,16 @@ public:
    * sys_name for the unknown unknown_name.  Note that no error computations
    * are actually performed, you must call compute_error() for that.
    */
-  Real l2_error(const std::string& sys_name,
-		const std::string& unknown_name);
+  Number l2_error(const std::string& sys_name,
+		  const std::string& unknown_name);
   
   /**
    * This function computes and returns the H1 (energy) error for the system
    * sys_name for the unknown unknown_name.  Note that no error computations
    * are actually performed, you must call compute_error() for that.
    */
-  Real h1_error(const std::string& sys_name,
-		const std::string& unknown_name);
+  Number h1_error(const std::string& sys_name,
+		  const std::string& unknown_name);
   
 private:
   
@@ -120,33 +120,33 @@ private:
    */
   void _compute_error(const std::string& sys_name,
 		      const std::string& unknown_name,
-		      std::pair<Real, Real>& error_pair);
+		      std::pair<Number, Number>& error_pair);
 
   /**
    * This function is responsible for checking the validity of
    * the sys_name and unknown_name inputs, and returning a
    * reference to the proper pair for storing the values.
    */
-  std::pair<Real, Real>& _check_inputs(const std::string& sys_name,
-				       const std::string& unknown_name);
+  std::pair<Number, Number>& _check_inputs(const std::string& sys_name,
+					   const std::string& unknown_name);
   
   /**
    * Function pointer to user-provided function which
    * computes the exact value of the solution.
    */
-  Real (* _exact_value) (const Point& p,
-			 const Real   time,
-			 const std::string& sys_name,
-			 const std::string& unknown_name);
+  Number (* _exact_value) (const Point& p,
+			   const Real   time,
+			   const std::string& sys_name,
+			   const std::string& unknown_name);
 
   /**
    * Function pointer to user-provided function which
    * computes the exact derivative of the solution.
    */
-  RealGradient (* _exact_deriv) (const Point& p,
-				 const Real   time,
-				 const std::string& sys_name,
-				 const std::string& unknown_name);
+  Gradient (* _exact_deriv) (const Point& p,
+			     const Real   time,
+			     const std::string& sys_name,
+			     const std::string& unknown_name);
 
   /**
    * Data structure which stores the errors:
@@ -156,7 +156,7 @@ private:
    * The name of the unknown is
    * the key for the map.
    */
-  typedef std::map<std::string, std::pair<Real, Real> > SystemErrorMap;
+  typedef std::map<std::string, std::pair<Number, Number> > SystemErrorMap;
 
   /**
    * A map of SystemErrorMaps, which contains entries

@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.5 2004-05-27 05:04:19 jwpeterson Exp $ */
+/* $Id: ex14.C,v 1.6 2004-06-01 14:24:17 spetersen Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -89,9 +89,18 @@ RealGradient exact_derivative(const Point& p,
 
 int main(int argc, char** argv)
 {
-
   // Initialize libMesh.
   libMesh::init (argc, argv);
+
+  // Only for real numbers
+#ifdef USE_COMPLEX_NUMBERS
+  std::cout << "This example is not intended for use with complex numbers!\n"
+	    << "No simulations are performed."
+	    << std::endl;
+  here();
+  return libMesh::close();
+#endif
+
   {
     // Set the dimensionality of the mesh = 2
     const unsigned int dim = 2;
