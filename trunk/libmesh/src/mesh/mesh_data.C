@@ -1,4 +1,4 @@
-// $Id: mesh_data.C,v 1.17 2004-01-03 15:37:43 benkirk Exp $
+// $Id: mesh_data.C,v 1.18 2004-03-21 04:19:30 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -767,8 +767,8 @@ void MeshData::assign (const MeshData& omd)
    */
   if ((this->_active) && (omd._elem_id.size() != 0))
     {
-      std::vector<Elem*>::const_iterator elem_it        = this->_mesh.elements_begin().first;
-      const std::vector<Elem*>::const_iterator elem_end = this->_mesh.elements_end().first;
+      std::vector<const Elem*>::const_iterator elem_it        = this->_mesh.elements_begin().first;
+      const std::vector<const Elem*>::const_iterator elem_end = this->_mesh.elements_end().first;
       for (; elem_it != elem_end; ++elem_it)
         {
 	  const Elem* elem = *elem_it;  
