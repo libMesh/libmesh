@@ -1,4 +1,4 @@
-// $Id: dof_map_constraints.C,v 1.10 2004-11-08 00:11:04 jwpeterson Exp $
+// $Id: dof_map_constraints.C,v 1.11 2004-11-19 13:57:52 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -394,15 +394,12 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
 				      std::vector<unsigned int>& elem_dofs,
 				      const bool called_recursively) const
 {
-  START_LOG("build_constraint_matrix()", "DofMap");
+  if (!called_recursively) START_LOG("build_constraint_matrix()", "DofMap");
 
   // Create a set containing the DOFs we already depend on
   typedef std::set<unsigned int> RCSet;
   RCSet dof_set;
 
-  // no constrained dofs by default
-  bool has_constrained_dofs = false;
-  
   // Next insert any other dofs the current dofs might be constrained
   // in terms of.  Note that in this case we may not be done: Those
   // may in turn depend on others.  So, we need to repeat this process
@@ -412,8 +409,6 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
     if (this->is_constrained_dof(elem_dofs[i]))
       {
 	// If the DOF is constrained
-	has_constrained_dofs = true;
-	
 	DofConstraints::const_iterator
 	  pos = _dof_constraints.find(elem_dofs[i]);
 	
@@ -430,7 +425,12 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
       }
 
   // May be safe to return at this point
-  if (!has_constrained_dofs) return;
+  // (but remember to stop the perflog)
+  if (dof_set.empty())
+    {
+      STOP_LOG("build_constraint_matrix()", "DofMap");
+      return;
+    }
 
   // delay inserting elem_dofs for efficiency in the case of
   // no constraints.  In that case we don't get here!
@@ -490,11 +490,7 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
       
       DenseMatrix<Number> Cnew;
       
-      STOP_LOG("build_constraint_matrix()", "DofMap");
-      
       this->build_constraint_matrix (Cnew, elem_dofs, true);
-      
-      START_LOG("build_constraint_matrix()", "DofMap");  
 
       if ((C.n() == Cnew.m()) &&
 	  (Cnew.n() == elem_dofs.size())) // If the constraint matrix	                                 
@@ -503,7 +499,7 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
       assert (C.n() == elem_dofs.size());
     }
   
-  STOP_LOG("build_constraint_matrix()", "DofMap");  
+  if (!called_recursively) STOP_LOG("build_constraint_matrix()", "DofMap");  
 }
 
 #endif // #ifdef ENABLE_AMR

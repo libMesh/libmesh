@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.74 2004-11-15 22:08:39 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.75 2004-11-19 13:57:50 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -193,9 +193,14 @@ AC_DEFUN(DETERMINE_CXX_BRAND, dnl
   	              else
 	
 	
-                        dnl  Aw, nothing suitable found...
-                        AC_MSG_ERROR(Unrecognized compiler, sorry)
-                        exit 1
+                        dnl No recognized compiler found...
+			dnl warn the user and continue
+			AC_MSG_RESULT( WARNING:)
+                        AC_MSG_RESULT( >>> Unrecognized compiler: "$CXX" <<<)
+			AC_MSG_RESULT( You will likely need to modify)
+			AC_MSG_RESULT( Make.common directly to specify)
+			AC_MSG_RESULT( proper compiler flags)
+			GXX_VERSION=unknown
                       fi
                     fi
                   fi
@@ -629,9 +634,15 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           ;;
 
       *)
-          AC_MSG_ERROR(No compiler options for this C++ compiler
-                       specified at present)
-          ;;
+          AC_MSG_RESULT(No specific options for this C++ compiler known)
+	  CXXFLAGSG="$CXXFLAGS -DDEBUG"
+	  CXXFLAGSO="$CXXFLAGS -DNDEBUG"
+	  CXXFLAGSP="$CXXFLAGS -DNDEBUG"
+
+	  CFLAGSG="$CFLAGS -DDEBUG"
+	  CFLAGSO="$CFLAGS -DNDEBUG"
+	  CFLAGSP="$CFLAGS -DNDEBUG"
+	  ;;
     esac
   fi
 ])
@@ -680,53 +691,11 @@ AC_DEFUN(CONFIGURE_PETSC,
   
       dnl PETSc config failed.  Try MPI.
       enablepetsc=no
-  
-      dnl -------------------------------------------------------------
-      if (test "$enablempi" != no) ; then
-        ACX_MPI
-      fi
-      dnl -------------------------------------------------------------
+      ACX_MPI
   
     fi
   fi
   AC_SUBST(enablepetsc)
-])
-dnl -------------------------------------------------------------
-
-
-
-dnl -------------------------------------------------------------
-dnl Mpi
-dnl -------------------------------------------------------------
-AC_DEFUN(CONFIGURE_MPI, 
-[
-  AC_CHECK_FILE($MPIHOME/include/mpi.h,
-                MPI_INCLUDE_PATH=-I$MPIHOME/include)
-
-  dnl check for libmpich
-  AC_CHECK_FILE($MPIHOME/lib/libmpich.a,
-                MPI_LIBRARY_PATH=$MPIHOME/lib/libmpich.a,
-                MPI_LIBRARY_PATH=/mpich_bar_not_there)
-
-  if (test -r $MPIHOME/include/mpi.h -a -r $MPI_LIBRARY_PATH) ; then
-    AC_SUBST(MPI_INCLUDE_PATH)
-    dnl Here is a little hack.  If MPI_LIBRARY_PATH is valid 
-    dnl for libmpich, we assume it will also be available for
-    dnl libpmpich, which we will also require.  Therefore we
-    dnl deftly change MPI_LIBRARY_PATH to link with both
-    dnl mpich and pmpich.  This has no hope of working if
-    dnl you are using some sort of specialized mpi instead
-    dnl of mpich.
-    MPI_LIBRARY_PATH="-L $MPIHOME/lib -lmpich -lpmpich"
-    AC_SUBST(MPI_LIBRARY_PATH)
-    AC_DEFINE(HAVE_MPI, 1,
-	      [Flag indicating whether or not MPI is available])
-    AC_MSG_RESULT(<<< Configuring library with MPI support >>>)
-  else
-    enablempi=no
-  fi
-
-  AC_SUBST(enablempi)	
 ])
 dnl -------------------------------------------------------------
 

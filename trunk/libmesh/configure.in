@@ -1,5 +1,5 @@
 dnl --------------------------------------------------------------
-dnl $Id: configure.in,v 1.49 2004-10-15 04:27:36 benkirk Exp $
+dnl $Id: configure.in,v 1.50 2004-11-19 13:57:50 benkirk Exp $
 dnl --------------------------------------------------------------
 dnl Process this file with autoconf to produce a configure script.
 
@@ -9,7 +9,7 @@ dnl you call ./configure subsequently on different systems without
 dnl clearing the cache 
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
-AC_REVISION($Revision: 1.49 $)
+AC_REVISION($Revision: 1.50 $)
 
 
 AC_INIT
@@ -116,6 +116,25 @@ PWD=`pwd`
 AC_SUBST(PWD)
 
 
+dnl -------------------------------------------------------------
+dnl Allow user to specify --enable-everything
+dnl
+dnl This flag will cause all (non-conflicting) options to be
+dnl enabled for the purposes of configuration.  For example, by
+dnl performance logging is off by default, however
+dnl --enable-everything will change it to be on by default.
+dnl
+dnl Note specific flags will override --enable-everything for
+dnl that particular package, i.e.
+dnl  ./configure --enable-everything --disable-perflog
+dnl
+dnl -------------------------------------------------------------
+AC_ARG_ENABLE(everything,
+              AC_HELP_STRING([--enable-everything],
+                             [treat all applicable options as enabled]),
+              enableeverything=$enableval,
+              enableeverything=no)
+
 
 dnl -------------------------------------------------------------
 dnl AMR -- enabled by default
@@ -198,7 +217,7 @@ AC_ARG_ENABLE(ifem,
               AC_HELP_STRING([--enable-ifem],
                              [build with infinite elements]),
               enableifem=$enableval,
-              enableifem=no)
+              enableifem=$enableeverything)
 
 if test "$enableifem" != no ; then
   AC_DEFINE(ENABLE_INFINITE_ELEMENTS, 1,
@@ -230,29 +249,7 @@ if test "$enablexdr" != no ; then
                                    [enablexdr=no])
                     ],
                     [enablexdr=no])
-
-   dnl --------------------------------------------------------------
-   dnl Broken MGF XDR mesh support - disabled by default
-   dnl only do this if XDR is enabled
-   dnl --------------------------------------------------------------
-   AC_ARG_ENABLE(mgf-workaround,
-                 AC_HELP_STRING([--enable-mgf-workaround],
-                                [deprecated, use runtime --enable-mgf-workaround instead]),
-                 enablemgfworkaround=$enableval,
-                 enablemgfworkaround=no)
-
-   if test "$enablemgfworkaround" != no ; then
-     AC_MSG_RESULT( )
-     AC_MSG_RESULT(*** WARNING: ./configure option --enable-mgf-workaround is deprecated. ***)
-     AC_MSG_RESULT(********    Use runtime option --enable-mgf-workaround instead    ********)
-     AC_MSG_RESULT( )
-     dnl AC_DEFINE(ENABLE_MGF_WORKAROUND, 1,
-     dnl          [Flag indicating if the library should be built to work around broken MGF boundary conditions])
-     dnl AC_MSG_RESULT(<<< Configuring library to work around broken MGF boundary conditions >>>)
-   fi
-   dnl -------------------------------------------------------------
 fi
-
 AC_SUBST(enablexdr)	
 dnl -------------------------------------------------------------
 
@@ -308,7 +305,7 @@ AC_ARG_ENABLE(perflog,
               AC_HELP_STRING([--enable-perflog],
                              [build with performance logging turned on]),
               enableperflog=$enableval,
-              enableperflog=no)
+              enableperflog=$enableeverything)
 
 if test "$enableperflog" != no ; then
   AC_DEFINE(ENABLE_PERFORMANCE_LOGGING, 1,
