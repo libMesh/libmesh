@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.19 2003-03-03 02:15:57 benkirk Exp $
+// $Id: dof_map.h,v 1.20 2003-03-17 11:34:54 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -74,6 +74,14 @@ public:
    * Attach the matrix that is used with this \p DofMap.
    */
   void attach_matrix (SparseMatrix<Number>& matrix);
+
+  /**
+   * Additional matrices may be handled with this \p DofMap.
+   * They are initialized to the same sparsity structure as
+   * the mayor matrix.
+   */
+  void attach_other_matrix (SparseMatrix<Number>& mat);
+
 
 #ifdef ENABLE_AMR
 
@@ -339,6 +347,13 @@ private:
    * Pointer to the matrix used with this object.
    */
   SparseMatrix<Number>* _matrix;
+  
+  /**
+   * Vector of pointers to the additional matrices handled by this object.
+   * These pointers do @e not handle the memory, instead, \p SystemBase, who
+   * told \p DofMap about them, owns them.
+   */
+  std::vector<SparseMatrix<Number>* > _other_matrices;
   
   /**
    * The number of nodes that _were_ in the mesh

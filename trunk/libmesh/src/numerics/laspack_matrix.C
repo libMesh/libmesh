@@ -1,4 +1,4 @@
-// $Id: laspack_matrix.C,v 1.7 2003-03-14 09:56:41 ddreyer Exp $
+// $Id: laspack_matrix.C,v 1.8 2003-03-17 11:35:00 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -34,8 +34,8 @@
 //-----------------------------------------------------------------------
 // LaspackMatrix members
 template <typename T> 
-void LaspackMatrix<T>::update_sparsity_pattern (std::vector<std::set<unsigned int> >&
-					       sparsity_pattern)
+void LaspackMatrix<T>::const_update_sparsity_pattern (const std::vector<std::set<unsigned int> >&
+						      sparsity_pattern)
 {
   // clear data, start over
   clear ();    
@@ -131,6 +131,17 @@ void LaspackMatrix<T>::update_sparsity_pattern (std::vector<std::set<unsigned in
   
   // That's it!
   //here();
+}
+
+
+
+template <typename T> 
+void LaspackMatrix<T>::update_sparsity_pattern (std::vector<std::set<unsigned int> >&
+					       sparsity_pattern)
+{
+  // for now, there is no need that \p LaspackMatrix<T> destroys the
+  // sparsity pattern.  Use the const version.
+  const_update_sparsity_pattern(sparsity_pattern);
 }
 
 
