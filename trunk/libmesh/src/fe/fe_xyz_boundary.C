@@ -1,4 +1,4 @@
-// $Id: fe_boundary.C,v 1.28 2004-05-11 21:18:33 benkirk Exp $
+// $Id: fe_xyz_boundary.C,v 1.1 2004-05-11 21:18:34 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -37,73 +37,20 @@
 //-------------------------------------------------------
 // Full specialization for 1D when this is a useless method
 template <>
-void FE<1,HIERARCHIC>::reinit(const Elem*,
-			      const unsigned int)
-{
-  std::cerr << "ERROR: This method only makes sense for 2D, 3D elements!"
-	    << std::endl;
-  error();
-}
-
-
-
-//-------------------------------------------------------
-// Full specialization for 1D when this is a useless method
-template <>
-void FE<1,LAGRANGE>::reinit(const Elem*,
-			    const unsigned int)
-{
-  std::cerr << "ERROR: This method only makes sense for 2D, 3D elements!"
-	    << std::endl;
-  error();
-}
-
-
-
-//-------------------------------------------------------
-// Full specialization for 1D when this is a useless method
-template <>
-void FE<1,XYZ>::reinit(const Elem*,
-		       const unsigned int)
-{
-  std::cerr << "ERROR: This method only makes sense for 2D, 3D elements!"
-	    << std::endl;
-  error();
-}
-
-
-
-//-------------------------------------------------------
-// Full specialization for 1D when this is a useless method
-template <>
-void FE<1,MONOMIAL>::reinit(const Elem*,
-			    const unsigned int)
-{
-  std::cerr << "ERROR: This method only makes sense for 2D, 3D elements!"
-	    << std::endl;
-  error();
-}
-
-
-//-------------------------------------------------------
-// Full specialization for 1D when this is a useless method
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
-template <>
-void FE<1,SZABAB>::reinit(const Elem*,
-			    const unsigned int)
+void FEXYZ<1>::reinit(const Elem*,
+		      const unsigned int)
 {
   std::cerr << "ERROR: This method only makes sense for 2D elements!"
 	    << std::endl;
   error();
 }
-#endif
 
 
 //-------------------------------------------------------
 // Method for 2D, 3D
-template <unsigned int Dim, FEFamily T>
-void FE<Dim,T>::reinit(const Elem* elem,
-		       const unsigned int s)
+template <unsigned int Dim>
+void FEXYZ<Dim>::reinit(const Elem* elem,
+			const unsigned int s)
 {
   assert (elem  != NULL);
   assert (qrule != NULL);
@@ -116,136 +63,61 @@ void FE<Dim,T>::reinit(const Elem* elem,
   // initialize quadrature rule
   qrule->init(side->type());
 
-  // The last side we computed the shape functions for
-  static unsigned int last_s = libMesh::invalid_uint;
-
-  // We might not need to reinitialize the shape functions
-  if ((this->get_type() != elem->type()) ||
-      (s != last_s) ||
-      this->shapes_need_reinit())
+  // We might not need to reinitialize the shape functions.
+  // Note that the face shape functions are LAGRANGE and only
+  // depend on the type of face
+  if (this->get_type() != elem->type())
     {
       // Set the element type
       elem_type = elem->type();
-
-      // Set the last_s
-      last_s = s;
       
       // Initialize the face shape functions
       this->init_face_shape_functions (qrule->get_points(),  side.get());
     }
   
-  // Compute the Jacobian*Weight on the face for integration
-  this->compute_face_map (qrule->get_weights(), side.get());
-
-  // make a copy of the Jacobian for integration
-  const std::vector<Real> JxW_int(JxW);
-
-  // Find where the integration points are located on the
-  // full element.
-  std::vector<Point> qp; this->inverse_map (elem, xyz, qp);
-  
-  // compute the shape function and derivative values
-  // at the points qp
-  this->reinit  (elem, &qp);
-      
-  // copy back old data
-  JxW = JxW_int;
+  // Compute data on the face for integration
+  this->compute_face_values (elem, side.get());
 }
 
 
 
-template <unsigned int Dim, FEFamily T>
-void FE<Dim,T>::init_face_shape_functions(const std::vector<Point>& qp,
-					  const Elem* side)
+template <unsigned int Dim>
+void FEXYZ<Dim>::compute_face_values(const Elem* elem,
+				     const Elem* side)
 {
-  assert (side  != NULL);
+  assert (elem != NULL);
+  assert (side != NULL);
+
+  START_LOG("compute_face_values()", "FEXYZ");
+
+  // The quadrature weights.
+  const std::vector<Real>& qw = qrule->get_weights();
   
-  /**
-   * Start logging the shape function initialization
-   */
-  START_LOG("init_face_shape_functions()", "FE");
-
-  // The element type and order to use in
-  // the map
-  const Order    mapping_order     (side->default_order()); 
-  const ElemType mapping_elem_type (side->type());
-
-  // The number of quadrature points.
-  const unsigned int n_qp = qp.size();
-	
-  const unsigned int n_mapping_shape_functions =
-    FE<Dim,LAGRANGE>::n_shape_functions (mapping_elem_type,
-					 mapping_order);
-  
-  // resize the vectors to hold current data
-  // Psi are the shape functions used for the FE mapping
-  psi_map.resize        (n_mapping_shape_functions);
-  dpsidxi_map.resize    (n_mapping_shape_functions);
-  d2psidxi2_map.resize  (n_mapping_shape_functions);
-  
-  if (Dim == 3)
-    {
-      dpsideta_map.resize     (n_mapping_shape_functions);
-      d2psidxideta_map.resize (n_mapping_shape_functions);
-      d2psideta2_map.resize   (n_mapping_shape_functions);
-    }
-  
-  for (unsigned int i=0; i<n_mapping_shape_functions; i++)
-    {
-      // Allocate space to store the values of the shape functions
-      // and their first and second derivatives at the quadrature points.
-      psi_map[i].resize        (n_qp);
-      dpsidxi_map[i].resize    (n_qp);
-      d2psidxi2_map[i].resize  (n_qp);
-      if (Dim == 3)
-	{
-	  dpsideta_map[i].resize     (n_qp);
-	  d2psidxideta_map[i].resize (n_qp);
-	  d2psideta2_map[i].resize   (n_qp);
-	}
-  
-      // Compute the value of shape function i, and its first and
-      // second derivatives at quadrature point p
-      // (Lagrange shape functions are used for the mapping)
-      for (unsigned int p=0; p<n_qp; p++)
-	{
-	  psi_map[i][p]        = FE<Dim-1,LAGRANGE>::shape             (mapping_elem_type, mapping_order, i,    qp[p]);
-	  dpsidxi_map[i][p]    = FE<Dim-1,LAGRANGE>::shape_deriv       (mapping_elem_type, mapping_order, i, 0, qp[p]);
-	  d2psidxi2_map[i][p]  = FE<Dim-1,LAGRANGE>::shape_second_deriv(mapping_elem_type, mapping_order, i, 0, qp[p]);
-	  // std::cout << "d2psidxi2_map["<<i<<"][p]=" << d2psidxi2_map[i][p] << std::endl;
-
-	  // If we are in 3D, then our sides are 2D faces.
-	  // For the second derivatives, we must also compute the cross
-	  // derivative d^2() / dxi deta
-	  if (Dim == 3)
-	    {
-	      dpsideta_map[i][p]     = FE<Dim-1,LAGRANGE>::shape_deriv       (mapping_elem_type, mapping_order, i, 1, qp[p]);
-	      d2psidxideta_map[i][p] = FE<Dim-1,LAGRANGE>::shape_second_deriv(mapping_elem_type, mapping_order, i, 1, qp[p]); 
-	      d2psideta2_map[i][p]   = FE<Dim-1,LAGRANGE>::shape_second_deriv(mapping_elem_type, mapping_order, i, 2, qp[p]);
-	    }
-	}
-    }
-
-  
-  /**
-   * Stop logging the shape function initialization
-   */
-  STOP_LOG("init_face_shape_functions()", "FE");
-}
-
-  
-
-void FEBase::compute_face_map(const std::vector<Real>& qw,
-			      const Elem* side)
-{
-  assert (side  != NULL);
-
-  START_LOG("compute_face_map()", "FE");
-
   // The number of quadrature points.
   const unsigned int n_qp = qw.size();
   
-  
+  // Number of shape functions in the finite element approximation
+  // space.
+  const unsigned int n_approx_shape_functions =
+    this->n_shape_functions(this->get_type(),
+			    this->get_order());
+
+  // Resize the shape functions and their gradients
+  this->phi.resize    (n_approx_shape_functions);
+  this->dphi.resize   (n_approx_shape_functions);
+  this->dphidx.resize (n_approx_shape_functions);
+  this->dphidy.resize (n_approx_shape_functions);
+  this->dphidz.resize (n_approx_shape_functions);
+
+  for (unsigned int i=0; i<n_approx_shape_functions; i++)
+    {
+      this->phi[i].resize    (n_qp);
+      this->dphi[i].resize   (n_qp);
+      this->dphidx[i].resize (n_qp);
+      this->dphidy[i].resize (n_qp);
+      this->dphidz[i].resize (n_qp);
+    }
+ 
   switch (dim)
     {
       
@@ -256,12 +128,12 @@ void FEBase::compute_face_map(const std::vector<Real>& qw,
 	// and EDGE2 or EDGE3.
 	// Resize the vectors to hold data at the quadrature points
 	{  
-	  xyz.resize(n_qp);
-	  dxyzdxi_map.resize(n_qp);
-	  d2xyzdxi2_map.resize(n_qp);
-	  tangents.resize(n_qp);
-	  normals.resize(n_qp);
-	  curvatures.resize(n_qp);
+	  this->xyz.resize(n_qp);
+	  this->dxyzdxi_map.resize(n_qp);
+	  this->d2xyzdxi2_map.resize(n_qp);
+	  this->tangents.resize(n_qp);
+	  this->normals.resize(n_qp);
+	  this->curvatures.resize(n_qp);
 	  
 	  JxW.resize(n_qp);
 	}
@@ -324,8 +196,26 @@ void FEBase::compute_face_map(const std::vector<Real>& qw,
 	    
 	    JxW[p] = jac*qw[p];
 	  }
+
+	// compute the shape function values & gradients
+	for (unsigned int i=0; i<n_approx_shape_functions; i++)
+	  for (unsigned int p=0; p<n_qp; p++)
+	    {
+	      this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->get_order(), i, xyz[p]);
+
+	      this->dphi[i][p](0) =
+		this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 0, xyz[p]);
+	      
+	      this->dphi[i][p](1) =
+		this->dphidy[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 1, xyz[p]);
+	      
+#if DIM == 3  
+	      this->dphi[i][p](2) = // can only assign to the Z component if DIM==3
+#endif
+		this->dphidz[i][p] = 0.;
+	    }
 	
-	// done computing the map
+	// done computing face values
 	break;
       }
 
@@ -430,7 +320,23 @@ void FEBase::compute_face_map(const std::vector<Real>& qw,
 	    JxW[p] = jac*qw[p];
 	  }
 	
-	// done computing the map
+	// compute the shape function values & gradients
+	for (unsigned int i=0; i<n_approx_shape_functions; i++)
+	  for (unsigned int p=0; p<n_qp; p++)
+	    {
+	      this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->get_order(), i, xyz[p]);
+	       
+	      this->dphi[i][p](0) =
+		this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 0, xyz[p]);
+		
+	      this->dphi[i][p](1) =
+		this->dphidy[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 1, xyz[p]);
+		
+	      this->dphi[i][p](2) =
+		this->dphidz[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 2, xyz[p]);	      
+	    }
+
+	// done computing face values
 	break;
       }
 
@@ -439,7 +345,7 @@ void FEBase::compute_face_map(const std::vector<Real>& qw,
       error();
       
     }
-  STOP_LOG("compute_face_map()", "FE");
+  STOP_LOG("compute_face_values()", "FE");
 }
 
 
@@ -448,5 +354,6 @@ void FEBase::compute_face_map(const std::vector<Real>& qw,
 //--------------------------------------------------------------
 // Explicit instantiations (doesn't make sense in 1D!) using fe_macro.h's macro
 
-INSTANTIATE_FE(2);
-INSTANTIATE_FE(3);
+template class FEXYZ<2>;
+template class FEXYZ<3>;
+

@@ -1,4 +1,4 @@
-// $Id: fe_xyz.C,v 1.2 2004-04-25 05:43:33 benkirk Exp $
+// $Id: fe_xyz.C,v 1.3 2004-05-11 21:18:33 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -371,7 +371,7 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 
 
       // Discontinuous linear shape functions
-      // expressed in the monomials.
+      // expressed in the XYZ monomials.
     case FIRST:
       {
 	switch (t)
@@ -413,7 +413,7 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 
 
       // Discontinuous quadratic shape functions
-      // expressed in the monomials.
+      // expressed in the XYZ monomials.
     case SECOND:
       {
 	switch (t)
@@ -455,7 +455,7 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 
 
       // Discontinuous cubic shape functions
-      // expressed in the monomials.
+      // expressed in the XYZ monomials.
     case THIRD:
       {
 	switch (t)
@@ -497,7 +497,7 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 
 
       // Discontinuous quartic shape functions
-      // expressed in the monomials.
+      // expressed in the XYZ monomials.
     case FOURTH:
       {
 	switch (t)
@@ -574,7 +574,7 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 
       
       // Discontinuous linear shape functions
-      // expressed in the monomials.
+      // expressed in the XYZ monomials.
     case FIRST:
       {
 	switch (t)
@@ -619,7 +619,7 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 
 
       // Discontinuous quadratic shape functions
-      // expressed in the monomials.
+      // expressed in the XYZ monomials.
     case SECOND:
       {
 	switch (t)
@@ -664,7 +664,7 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 
 
       // Discontinuous cubic shape functions
-      // expressed in the monomials.
+      // expressed in the XYZ monomials.
     case THIRD:
       {
 	switch (t)
@@ -706,7 +706,7 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 
 
       // Discontinuous quartic shape functions
-      // expressed in the monomials.
+      // expressed in the XYZ monomials.
     case FOURTH:
       {
 	switch (t)
