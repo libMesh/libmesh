@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.18 2003-02-17 01:23:01 benkirk Exp $
+// $Id: dof_map.C,v 1.19 2003-02-18 13:38:20 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -186,55 +186,59 @@ void DofMap::distribute_dofs(MeshBase& mesh)
       _first_df[processor] = next_free_dof;
       
       for (unsigned var=0; var<n_variables(); var++)
-	for (unsigned int e=0; e<_n_elem; ++e)
-	  if (mesh.elem(e)->active())  
-	    if (mesh.elem(e)->processor_id() == processor)  
-	      {   // Only number dofs connected to active
-		// elements on this processor.
-		
-		Elem* elem                 = mesh.elem(e);
-		const unsigned int n_nodes = elem->n_nodes();
-		
-		// First number the nodal DOFS
-		for (unsigned int n=0; n<n_nodes; n++)
-		  {
-		    Node* node = elem->get_node(n);
-		    
-		    for (unsigned int index=0; index<node->n_comp(sys_number(),var); index++)
-		      {
-			// only assign a dof number if there isn't one
-			// already there
-			if (node->dof_number(sys_number(),var,index) == DofObject::invalid_id)
-			  {
-			    node->set_dof_number(sys_number(),var,index,next_free_dof++);
-			    
-			    if (processor == proc_id)
-				_send_list.push_back(node->dof_number(sys_number(),var,index));
-			  }
-			// if there is an entry there and it isn't on this
-			// processor it also needs to be added to the send list
-			else if (node->dof_number(sys_number(),var,index) <
-				 _first_df[proc_id])
-			  {
-			    if (processor == proc_id)
-			      _send_list.push_back(node->dof_number(sys_number(),var,index));
-			  }
-		      }
-		  }
+	{
+	  active_pid_elem_iterator       elem_it (mesh.elements_begin(), processor);
+	  const active_pid_elem_iterator elem_end(mesh.elements_end(),   processor);
+
+	  for ( ; elem_it != elem_end; ++elem_it)
+	    {
+	      // Only number dofs connected to active
+	      // elements on this processor.
+	      
+	      Elem* elem                 = *elem_it;
+	      const unsigned int n_nodes = elem->n_nodes();
+	      
+	      // First number the nodal DOFS
+	      for (unsigned int n=0; n<n_nodes; n++)
+		{
+		  Node* node = elem->get_node(n);
 		  
-		// Now number the element DOFS
-		for (unsigned int index=0; index<elem->n_comp(sys_number(),var); index++)
-		  {		  
-		    // No way we could have already numbered this DOF!
-		    assert (elem->dof_number(sys_number(),var,index) ==
-			    DofObject::invalid_id);
-		    
-		    elem->set_dof_number(sys_number(),var,index,next_free_dof++);
-		    
-		    if (processor == proc_id)
-		      _send_list.push_back(elem->dof_number(sys_number(),var,index));
-		  }
-	      }
+		  for (unsigned int index=0; index<node->n_comp(sys_number(),var); index++)
+		    {
+		      // only assign a dof number if there isn't one
+		      // already there
+		      if (node->dof_number(sys_number(),var,index) == DofObject::invalid_id)
+			{
+			  node->set_dof_number(sys_number(),var,index,next_free_dof++);
+			  
+			  if (processor == proc_id)
+			    _send_list.push_back(node->dof_number(sys_number(),var,index));
+			}
+		      // if there is an entry there and it isn't on this
+		      // processor it also needs to be added to the send list
+		      else if (node->dof_number(sys_number(),var,index) <
+			       _first_df[proc_id])
+			{
+			  if (processor == proc_id)
+			    _send_list.push_back(node->dof_number(sys_number(),var,index));
+			}
+		    }
+		}
+		  
+	      // Now number the element DOFS
+	      for (unsigned int index=0; index<elem->n_comp(sys_number(),var); index++)
+		{		  
+		  // No way we could have already numbered this DOF!
+		  assert (elem->dof_number(sys_number(),var,index) ==
+			  DofObject::invalid_id);
+		  
+		  elem->set_dof_number(sys_number(),var,index,next_free_dof++);
+		  
+		  if (processor == proc_id)
+		    _send_list.push_back(elem->dof_number(sys_number(),var,index));
+		}
+	    }
+	}
       
       _last_df[processor] = (next_free_dof-1);
     }
