@@ -1,4 +1,4 @@
-// $Id: laspack_vector.C,v 1.13 2003-05-28 22:03:15 benkirk Exp $
+// $Id: laspack_vector.C,v 1.14 2003-06-12 01:36:00 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -172,7 +172,7 @@ NumericVector<T>&
 LaspackVector<T>::operator = (const NumericVector<T>& v_in)
 {
   const LaspackVector& v = dynamic_cast<const LaspackVector&>(v_in);
-
+  
   *this = v;
 
   return *this;
@@ -184,8 +184,10 @@ template <typename T>
 LaspackVector<T>&
 LaspackVector<T>::operator = (const LaspackVector<T>& v)
 {
-  _is_closed      = v._is_closed;
-  _is_initialized = v._is_initialized;
+  if (!this->initialized())
+    this->init (v.size());
+  
+  _is_closed = v._is_closed;
 
   if (v.size() != 0)    
     Asgn_VV (const_cast<QVector*>(&_vec),

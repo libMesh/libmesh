@@ -27,7 +27,7 @@
   <a href="http://sourceforge.net"> SourceForge </a>
   for <a href="http://sourceforge.net/projects/libmesh"> hosting the project</a>. 
   You can find out what is currently happening in the development branch
-  by checking out the <a href="http://libmesh.sourceforge.net/cvshtml"> CVS Logs</a>
+  by checking out the <a href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/libmesh"> CVS Logs</a>
   online. 
   
   A major goal of the library is to provide support for adaptive mesh
