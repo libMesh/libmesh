@@ -1,4 +1,4 @@
-/* $Id: ex6.C,v 1.32 2004-03-20 15:16:56 benkirk Exp $ */
+/* $Id: ex6.C,v 1.33 2004-03-21 03:19:15 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -109,7 +109,7 @@ int main (int argc, char** argv)
     mesh.print_info();
 
     // Write the mesh before the infinite elements are added
-    mesh.write_gmv ("orig_mesh.gmv");
+    GMVIO(mesh).write ("orig_mesh.gmv");
     
     // Normally, when a mesh is imported or created in
     // libMesh, only conventional elements exist.  The infinite
@@ -133,7 +133,7 @@ int main (int argc, char** argv)
 
     // Write the mesh with the infinite elements added.
     // Compare this to the original mesh.
-    mesh.write_gmv ("ifems_added.gmv");
+    GMVIO(mesh).write ("ifems_added.gmv");
     
     // After building infinite elements, we have to let 
     // the elements find their neighbors again.

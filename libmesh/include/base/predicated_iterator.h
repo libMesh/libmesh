@@ -1,4 +1,4 @@
-// $Id: predicated_iterator.h,v 1.3 2004-03-18 23:22:40 jwpeterson Exp $
+// $Id: predicated_iterator.h,v 1.4 2004-03-21 03:18:52 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -35,7 +35,7 @@
  * predicate.  Thanks to Michael, Bill, and Ben
  * for fine tuning.
  *
- * \author John W. Peterson, 2002-2003
+ * \author John W. Peterson, 2002-2004
  */
 template <class T>
 #if defined(__GNUC__) && (__GNUC__ < 3) // for gcc-2.95.3 using old stl version
@@ -132,13 +132,13 @@ public:
    * A dereferencing operator.  Returns a reference
    * to what is currently being iterated to.
    */
-  reference operator* () { return _current.operator*(); }
+  reference operator* () { return *_current; }
 
   /**
    * A const dereferencing operator.  Returns a const
    * reference to what is currently being iterated to.
    */
-  const reference operator* () const { return _current.operator*(); }
+  reference operator* () const { return _current; }
 
 
   /**
@@ -151,7 +151,7 @@ public:
    * A const dereferencing operator.  Returns a const pointer
    * to what is currently being iterated to.
    */
-  const pointer operator-> () const { return _current.operator->(); }
+  pointer operator-> () const { return _current.operator->(); }
   
   
   

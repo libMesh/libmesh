@@ -1,4 +1,4 @@
-// $Id: inf_fe.C,v 1.27 2004-01-03 15:37:42 benkirk Exp $
+// $Id: inf_fe.C,v 1.28 2004-03-21 03:19:25 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -168,10 +168,8 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem,
 
   bool init_shape_functions_required = false;
 
-  /*
-   * -----------------------------------------------------------------
-   * init the radial data fields only when the radial order changes
-   */
+  // -----------------------------------------------------------------
+  // init the radial data fields only when the radial order changes
   if (current_fe_type.radial_order != fe_type.radial_order)
     {
       current_fe_type.radial_order = fe_type.radial_order;
@@ -182,7 +180,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem,
       radial_qrule->init(EDGE2);
 
       // initialize the radial shape functions
-      init_radial_shape_functions(inf_elem);
+      this->init_radial_shape_functions(inf_elem);
 
       init_shape_functions_required=true;      
     }
@@ -190,24 +188,20 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem,
 
   bool update_base_elem_required=true;
 
-  /*
-   * -----------------------------------------------------------------
-   * update the type in accordance to the current cell
-   * and reinit if the cell type has changed or (as in
-   * the case of the hierarchics) the shape functions
-   * depend on the particular element and need a reinit
-  */
+  // -----------------------------------------------------------------
+  // update the type in accordance to the current cell
+  // and reinit if the cell type has changed or (as in
+  // the case of the hierarchics) the shape functions
+  // depend on the particular element and need a reinit
   if (  ( Dim != 1) &&
-	(  (get_type() != inf_elem->type())  ||  
+	(  (this->get_type() != inf_elem->type())  ||  
 	   (base_fe->shapes_need_reinit())  )  )
     {
-      /*
-       * store the new element type, update base_elem
-       * here.  Through \p update_base_elem_required,
-       * remember whether it has to be updated (see below).
-       */
+      // store the new element type, update base_elem
+      // here.  Through \p update_base_elem_required,
+      // remember whether it has to be updated (see below).
       elem_type = inf_elem->type();
-      update_base_elem(inf_elem);
+      this->update_base_elem(inf_elem);
       update_base_elem_required=false;
 
       // initialize the base quadrature rule for the new element
@@ -221,36 +215,27 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem,
     }
 
 
-  /* 
-   * when either the radial or base part change, 
-   * we have to init the whole fields
-   */
+  // when either the radial or base part change, 
+  // we have to init the whole fields
   if (init_shape_functions_required)
-    init_shape_functions (inf_elem);
+    this->init_shape_functions (inf_elem);
 
-  /*
-   * computing the distance only works when we have the current
-   * base_elem stored.  This happens when fe_type is const,
-   * the inf_elem->type remains the same.  Then we have to
-   * update the base elem _here_.
-   */
+  // computing the distance only works when we have the current
+  // base_elem stored.  This happens when fe_type is const,
+  // the inf_elem->type remains the same.  Then we have to
+  // update the base elem _here_.
   if (update_base_elem_required)
-      update_base_elem(inf_elem);
+      this->update_base_elem(inf_elem);
 
-  /*
-   * compute dist (depends on geometry, therefore has to be updated for
-   * each and every new element), throw radial and base part together
-   */
-  combine_base_radial (inf_elem);
+  // compute dist (depends on geometry, therefore has to be updated for
+  // each and every new element), throw radial and base part together
+  this->combine_base_radial (inf_elem);
 
-  compute_map (_total_qrule_weights, inf_elem);
+  this->compute_map (_total_qrule_weights, inf_elem);
 
-  /*
-   * Compute the shape functions and the derivatives 
-   * at all quadrature points.
-   */
-  compute_shape_functions ();
-
+  // Compute the shape functions and the derivatives 
+  // at all quadrature points.
+  this->compute_shape_functions (inf_elem);
 }
 
 
@@ -760,7 +745,7 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
 
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-void InfFE<Dim,T_radial,T_map>::compute_shape_functions()
+void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem*)
 {
   assert (radial_qrule != NULL);
 

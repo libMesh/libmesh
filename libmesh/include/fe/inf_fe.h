@@ -1,4 +1,4 @@
-// $Id: inf_fe.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: inf_fe.h,v 1.3 2004-03-21 03:19:25 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -66,7 +66,7 @@ class FEComputeData;
  *
  * \author Daniel Dreyer
  * \date 2003
- * \version $Revision: 1.2 $
+ * \version $Revision: 1.3 $
  */
 
 //-------------------------------------------------------------
@@ -89,7 +89,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.2 $
+   * \version $Revision: 1.3 $
    */
   //-------------------------------------------------------------
   // InfFE::Radial class definition
@@ -181,7 +181,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.2 $
+   * \version $Revision: 1.3 $
    */
   //-------------------------------------------------------------
   // InfFE::Base class definition
@@ -373,16 +373,16 @@ public:
    * element-dependent data based on the current element 
    * \p elem.
    */
-  void reinit (const Elem* elem,
-	       const std::vector<Point>* const pts);
+  virtual void reinit (const Elem* elem,
+		       const std::vector<Point>* const pts);
     
   /**
    * Not implemented yet.  Reinitializes all the physical 
    * element-dependent data based on the \p side of an infinite 
    * element.
    */
-  void reinit (const Elem* elem,
-	       const unsigned int side);
+  virtual void reinit (const Elem* elem,
+		       const unsigned int side);
 
   /**
    * The use of quadrature rules with the \p InfFE class is somewhat
@@ -395,21 +395,22 @@ public:
    * and another for base integration, using the convenient
    * \p QBase::build() method.
    */
-  void attach_quadrature_rule (QBase* q);
+  virtual void attach_quadrature_rule (QBase* q);
+
+  /**
+   * @returns the number of shape functions associated with
+   * this infinite element.
+   */
+  virtual unsigned int n_shape_functions () const
+  { return _n_total_approx_sf; }
   
   /**
    * @returns the total number of quadrature points.  Call this
    * to get an upper bound for the \p for loop in your simulation
    * for matrix assembly of the current element.
    */
-  unsigned int n_quadrature_points () const
-      { assert (radial_qrule != NULL); return _n_total_qp; }
-
-  /**
-   * @returns the number of shape functions associated with
-   * this infinite element.
-   */
-  unsigned int n_shape_functions () const { return _n_total_approx_sf; }
+  virtual unsigned int n_quadrature_points () const
+  { assert (radial_qrule != NULL); return _n_total_qp; }
 
 
 protected:
@@ -458,8 +459,8 @@ protected:
   /**
    * Do not use this derived member in \p InfFE<Dim,T_radial,T_map>.
    */
-  void init_base_shape_functions(const std::vector<Point>&,
-				 const Elem*)
+  virtual void init_base_shape_functions(const std::vector<Point>&,
+					 const Elem*)
   { error(); }
 
   /**
@@ -505,7 +506,7 @@ protected:
    * it protected.
    * Overloaded method from the \p FEBase version.
    */
-  void compute_shape_functions();
+  virtual void compute_shape_functions(const Elem*);
 
 
 
@@ -738,7 +739,7 @@ private:
   /**
    * @returns \p false, currently not required.
    */
-  bool shapes_need_reinit() const;
+  virtual bool shapes_need_reinit() const;
 
   /**
    * When \p compute_node_indices_fast() is used, this static

@@ -1,4 +1,4 @@
-// $Id: system.h,v 1.1 2004-01-03 15:37:42 benkirk Exp $
+// $Id: system.h,v 1.2 2004-03-21 03:19:25 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -185,6 +185,11 @@ public:
    * @returns a constant reference to this systems's \p _mesh.
    */
   const Mesh & get_mesh() const;
+  
+  /**
+   * @returns a reference to this systems's \p _mesh.
+   */
+  Mesh & get_mesh();
   
   /**
    * @returns a constant reference to this system's \p _dof_map.
@@ -468,7 +473,7 @@ protected:
    * Constant reference to the \p mesh data structure used
    * for the simulation.   
    */
-  const Mesh& _mesh;
+  Mesh& _mesh;
 };
 
 
@@ -493,6 +498,14 @@ unsigned int System::number() const
 
 inline
 const Mesh & System::get_mesh() const
+{
+  return _mesh;
+}
+
+
+
+inline
+Mesh & System::get_mesh()
 {
   return _mesh;
 }

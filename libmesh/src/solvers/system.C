@@ -1,4 +1,4 @@
-// $Id: system.C,v 1.3 2004-02-10 13:28:07 benkirk Exp $
+// $Id: system.C,v 1.4 2004-03-21 03:19:26 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -122,12 +122,12 @@ void System::init ()
 void System::init_data ()
 {
   // Distribute the degrees of freedom on the mesh
-  _dof_map.distribute_dofs (_mesh);
+  _dof_map.distribute_dofs (this->get_mesh());
 
 #ifdef ENABLE_AMR
 
   // Recreate any hanging node constraints
-  _dof_map.create_dof_constraints(_mesh);
+  _dof_map.create_dof_constraints(this->get_mesh());
 
 #endif
 
@@ -153,17 +153,17 @@ void System::reinit ()
 
 //   // Augment the send_list for the old mesh to handle
 //   // additional data dependencies introduced by refinement
-//   _dof_map.augment_send_list_for_projection (_mesh);
+//   _dof_map.augment_send_list_for_projection (this->get_mesh());
 
   // Re-update the data in this system using the
   // augmented send_list
   this->re_update ();
   
   // Distribute the degrees of freedom on the mesh
-  _dof_map.distribute_dofs (_mesh);
+  _dof_map.distribute_dofs (this->get_mesh());
   
   // Recreate any hanging node constraints
-  _dof_map.create_dof_constraints(_mesh);
+  _dof_map.create_dof_constraints(this->get_mesh());
 
   // Clear the _vectors and reinitialize them
   for (vectors_iterator pos = _vectors.begin(); pos != _vectors.end(); ++pos)
@@ -388,7 +388,7 @@ void System::update_global_solution (std::vector<Number>& global_soln) const
 {
   global_soln.resize (solution->size());
 
-  solution->localize  (global_soln);
+  solution->localize (global_soln);
 }
 
 
@@ -396,7 +396,7 @@ void System::update_global_solution (std::vector<Number>& global_soln) const
 void System::update_global_solution (std::vector<Number>& global_soln,
 				     const unsigned int   dest_proc) const
 {
-  global_soln.resize       (solution->size());
+  global_soln.resize        (solution->size());
 
   solution->localize_to_one (global_soln, dest_proc);
 }

@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.4 2004-02-18 23:04:08 benkirk Exp $
+// $Id: fe.h,v 1.5 2004-03-21 03:19:25 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -52,7 +52,7 @@ class InfFE;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.4 $
+ * \version $Revision: 1.5 $
  */
 
 //-------------------------------------------------------------
@@ -152,8 +152,8 @@ public:
    * @returns the number of shape functions associated with
    * this finite element.
    */
-  unsigned int n_shape_functions () const
-  { return n_dofs (elem_type, fe_type.order); }
+  virtual unsigned int n_shape_functions () const
+  { return FE<Dim,T>::n_dofs (elem_type, fe_type.order); }
 
   /**
    * @returns the number of shape functions associated with
@@ -161,7 +161,7 @@ public:
    */
   static unsigned int n_shape_functions (const ElemType t,
 					 const Order o)
-  { return n_dofs (t,o); }
+  { return FE<Dim,T>::n_dofs (t,o); }
 
   /**
    * @returns the number of shape functions associated with this
@@ -219,22 +219,22 @@ public:
    * specified on the reference element specified in the optional
    * argument \p pts.
    */
-  void reinit (const Elem* elem,
-	       const std::vector<Point>* const pts = NULL);
+  virtual void reinit (const Elem* elem,
+		       const std::vector<Point>* const pts = NULL);
     
   /**
    * Reinitializes all the physical element-dependent data based on
    * the \p side of \p face.
    */
-  void reinit (const Elem* elem,
-	       const unsigned int side);
+  virtual void reinit (const Elem* elem,
+		       const unsigned int side);
 
   /**
    * Provides the class with the quadrature rule, which provides the
    * locations (on a reference element) where the shape functions are
    * to be calculated.
    */
-  void attach_quadrature_rule (QBase* q)
+  virtual void attach_quadrature_rule (QBase* q)
   { assert (q != NULL); qrule = q; return; }
   
   /**
@@ -242,7 +242,7 @@ public:
    * to get an upper bound for the \p for loop in your simulation
    * for matrix assembly of the current element.
    */
-  unsigned int n_quadrature_points () const;
+  virtual unsigned int n_quadrature_points () const;
 
   /**
    * Computes the constraint matrix contributions (for
@@ -279,7 +279,7 @@ private:
    * element, and therefore needs to be re-initialized
    * for each new element.  \p false otherwise.
    */
-  bool shapes_need_reinit() const;
+  virtual bool shapes_need_reinit() const;
   
   /** 
    * Update the various member data fields \p phi,
@@ -345,7 +345,7 @@ private:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.4 $
+ * \version $Revision: 1.5 $
  */
 
 //-------------------------------------------------------------
@@ -370,7 +370,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.4 $
+ * \version $Revision: 1.5 $
  */
 
 //-------------------------------------------------------------
@@ -395,7 +395,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.4 $
+ * \version $Revision: 1.5 $
  */
 
 //-------------------------------------------------------------
@@ -421,7 +421,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.4 $
+ * \version $Revision: 1.5 $
  */
 
 //-------------------------------------------------------------
