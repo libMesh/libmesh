@@ -1,4 +1,4 @@
-// $Id: frequency_system.h,v 1.10 2003-05-15 23:34:33 benkirk Exp $
+// $Id: frequency_system.h,v 1.11 2003-05-20 13:38:05 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -138,7 +138,7 @@ public:
    */
   void set_frequencies_by_steps (const Real base_freq,
 				 const Real freq_step=0.,
-				 const unsigned int n_freq=0);
+				 const unsigned int n_freq=1);
 
   /**
    * Set the frequency range for which the system should 
