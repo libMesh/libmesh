@@ -1,4 +1,4 @@
-// $Id: mesh_data_unv_support.C,v 1.22 2004-08-09 17:34:58 jwpeterson Exp $
+// $Id: mesh_data_unv_support.C,v 1.23 2004-10-18 22:10:07 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -799,14 +799,15 @@ bool MeshDataUnvHeader::need_D_to_e (std::string& number)
   // find "D" in string, start looking at 6th element, to improve speed.
   // We dont expect a "D" earlier
 
-#ifdef __HP_aCC
-  // Use an "int" instead of unsigned int,
-  // otherwise HP aCC may crash!
-  const int position = number.find("D",6);
-#else
-  const unsigned int position = number.find("D",6);
-#endif
-
+// #ifdef __HP_aCC
+//   // Use an "int" instead of unsigned int,
+//   // otherwise HP aCC may crash!
+//   const int position = number.find("D",6);
+// #else
+//   const unsigned int position = number.find("D",6);
+// #endif
+  std::string::size_type position = number.find("D",6);
+    
   if(position!=std::string::npos)     // npos means no position
     {
       // replace "D" in string
