@@ -13,12 +13,12 @@
  * supports 2D and 3D steady and transient finite element simulations.
  * \p PETSc (http://www-fp.mcs.anl.gov/petsc) is currently used for
  * the solution of linear systems on both serial and parallel
- * platforms, however the extensibility of the library allows for
- * other solvers to be added with ease.
+ * platforms, and \p LASPACK is included with the library to provide
+ * linear solver support on serial machines.
  *
  * A major goal of the library is to provide support for adaptive mesh
  * refinement (AMR) computations in parallel while allowing a research
- * scientist to focus on the physics they are modelling.  The library
+ * scientist to focus on the physics they are modeling.  The library
  * currently offers:
  *
  *   - Partitioning Algorithms
@@ -44,6 +44,22 @@
  *     - Hierarchic
  *     - Discontinuous Monomials
  *
+ *  - Dimension-independence
+ *     - Operators are defined to allow the same code
+ *       to run unmodified on 2D and 3D applications
+ *     - The code you debug and verify on small 2D problems
+ *       can immediately be applied to large, parallel 3D applications
+ *
+ *  - Sparse Linear Algebra
+ *     - \p PETSc provides a suite of iterative solvers and preconditioners
+ *       for serial and parallel applications
+ *     - Complex values are supported with \p PETSc
+ *     - \p LASPACK provides iterative solvers and preconditioners for serial
+ *       applications
+ *     - The \p SparseMatrix, \p NumericVector, and \p LinearSolverInterface
+ *       allow for transparent switching between solver packages.  Adding
+ *       a new solver interface is as simple as deriving from these classes
+ *
  *  - Mesh IO & Format Translation Utilities
  *     - Ideas Universal (UNV) format (.unv)
  *     - Sandia National Labs ExodusII format (.exd)
@@ -64,7 +80,7 @@
  *     - determine bounding boxes/spheres
  *     - extract the mesh boundary for BC handling or as a separate mesh
  *
- * \p libMesh is actively developed at The University ot Texas at
+ * \p libMesh is actively developed at The University of Texas at
  * Austin in the CFDLab and at Technische Universit&auml;t Hamburg-Harburg,
  * Mechanics and Ocean Engineering in Germany.  Many thanks to SourceForge 
  * for hosting the project at http://sourceforge.net/projects/libmesh
@@ -93,6 +109,17 @@
  *
  * \subsection compilers Compilers
  *
+ * \p libMesh makes extensive use of the standard C++ library, so you will need a
+ * decent, standards-compliant compiler.  We have tried very hard to make the code
+ * completely compiler-agnostic by avoiding questionable (but legal) constructs.
+ * If you have a compiler that won't build the code please let us know.
+ *
+ * You will also need a decent C compiler if you want to build the contributed
+ * packages that add functionality to the library.  If you only have a C++ compiler,
+ * you should shoot your system administrator.  Many of the contributed packages
+ * use constructs that are invalid in C++, so forget compiling them with your C++
+ * compiler.
+ *
  * The library is known to work with the following compilers:
  *
  *
@@ -111,8 +138,8 @@
  *   - Not tested (but will likely work) with others
  *
  * - HP aCC
- * - IBM xlC version 5.0
- * - Compaq CXX 6.3.9.6
+ * - IBM xlC version 5.0, 6.0
+ * - HP/Compaq/DEC (?) \p cxx 6.3.9.6
  *
  *
  *
@@ -153,7 +180,37 @@
  * should be built in.  Valid values for \p METHOD are \p opt
  * (optimized mode, the default if \p METHOD is empty), \p debug
  * (build with debug symbols), and \p pro (build with profiling
- * support for use with \p gprof).
+ * support for use with \p gprof).  Once the library is configured
+ * you can build it simply by typing
+ * \verbatim
+     make \endverbatim
+ * 
  *
- * \subsection link Linking
+ *
+ *
+ * \subsection test Testing the Library
+ *
+ * \p libMesh includes a number of examples in the \p ./examples
+ * directory.  From the top-level directory you can build and run
+ * the example programs by typing 
+ * \verbatim
+     make run_examples \endverbatim
+ *
+ * Note that the example programs all create output in the \p GMV
+ * format, since you can download \p GMV for free from Los Alamos National
+ * Lab at http://laws.lanl.gov/XCM/gmv/GMVHome.html  It is a simple
+ * matter to change the source in the example to write a different format,
+ * just replace the \p write_gmv function call with whatever you like.
+ *
+ *
+ *
+ * \subsection link Linking With Your Application
+ *
+ * Since \p libMesh can be configured with many additional packages
+ * we recommend including the \p Make.common file created in the
+ * top-level directory in the \p Makefile of any application you want to
+ * use with the library.  This will properly set the \p INCLUDE and
+ * \p LIBS variables, which you can append to with your own stuff.  You
+ * could of course figure out what these need to be yourself, but don't
+ * complain that it is hard.
  */
