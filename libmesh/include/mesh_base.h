@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.41 2003-08-18 14:44:52 ddreyer Exp $
+// $Id: mesh_base.h,v 1.42 2003-08-26 22:58:45 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -64,7 +64,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.41 $
+ * \version $Revision: 1.42 $
  */
 
 
@@ -263,8 +263,8 @@ public:
   /**
    * Add elem \p e to the elem array.
    */
-  void add_elem (Elem* e,
-		 const unsigned int n=static_cast<unsigned int>(-1));
+  Elem* add_elem (Elem* e,
+		  const unsigned int n=static_cast<unsigned int>(-1));
 
 #ifdef ENABLE_INFINITE_ELEMENTS
 
@@ -398,7 +398,7 @@ public:
   /**
    * Call the default partitioner (currently \p metis_partition()).
    */
-  virtual void partition (const unsigned int n_sbdmns=libMeshBase::n_processors());
+  virtual void partition ();
 
   /**
    * After partitoning a mesh it is useful to renumber the nodes and elements

@@ -1,4 +1,4 @@
-// $Id: sfc_partitioner.C,v 1.2 2003-07-25 20:58:24 benkirk Exp $
+// $Id: sfc_partitioner.C,v 1.3 2003-08-26 22:58:45 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -40,12 +40,13 @@
 
 // ------------------------------------------------------------
 // SFCPartitioner implementation
-void SFCPartitioner::partition (const unsigned int n_sbdmns)
+void SFCPartitioner::partition (const unsigned int n)
 {
-  assert (n_sbdmns > 0);
+  
+  assert (n > 0);
 
   // Check for an easy return
-  if (n_sbdmns == 1)
+  if (n == 1)
     {
       this->single_partition ();
       return;
@@ -61,7 +62,7 @@ void SFCPartitioner::partition (const unsigned int n_sbdmns)
 
   LinearPartitioner lp(_mesh);
 
-  lp.partition (n_sbdmns);
+  lp.partition (n);
   
 // What to do if the sfcurves library IS present
 #else
@@ -147,7 +148,7 @@ void SFCPartitioner::partition (const unsigned int n_sbdmns)
   
   // Assign the partitioning to the active elements
   {
-    const unsigned int blksize = n_active_elem/n_sbdmns; 
+    const unsigned int blksize = n_active_elem/n; 
 
     for (unsigned int i=0; i<n_active_elem; i++)
       {
@@ -155,9 +156,7 @@ void SFCPartitioner::partition (const unsigned int n_sbdmns)
 		
 	Elem* elem = reverse_map[table[i]-1];
 
-	elem->set_subdomain_id() = 
-	  elem->set_processor_id() =
-	  i/blksize;
+	elem->set_processor_id() = i/blksize;
       }
   }
   

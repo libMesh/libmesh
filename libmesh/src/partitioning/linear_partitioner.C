@@ -1,4 +1,4 @@
-// $Id: linear_partitioner.C,v 1.2 2003-07-25 20:58:24 benkirk Exp $
+// $Id: linear_partitioner.C,v 1.3 2003-08-26 22:58:45 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,12 +30,12 @@
 
 // ------------------------------------------------------------
 // LinearPartitioner implementation
-void LinearPartitioner::partition (const unsigned int n_sbdmns)
+void LinearPartitioner::partition (const unsigned int n)
 {
-  assert (n_sbdmns > 0);
+  assert (n > 0);
 
   // Check for an easy return
-  if (n_sbdmns == 1)
+  if (n == 1)
     {
       this->single_partition ();
       return;
@@ -46,7 +46,7 @@ void LinearPartitioner::partition (const unsigned int n_sbdmns)
     START_LOG ("partition()", "LinearPartitioner");
     
     const unsigned int n_active_elem = _mesh.n_active_elem();
-    const unsigned int blksize       = n_active_elem/n_sbdmns;
+    const unsigned int blksize       = n_active_elem/n;
     
     unsigned int e = 0;
         
@@ -55,9 +55,7 @@ void LinearPartitioner::partition (const unsigned int n_sbdmns)
     
     for ( ; elem_it != elem_end; ++elem_it)
       {
-	(*elem_it)->set_subdomain_id() = 
-	  (*elem_it)->set_processor_id() = 
-	  e/blksize;
+	(*elem_it)->set_processor_id() = e/blksize;
 	
 	e++;
       }

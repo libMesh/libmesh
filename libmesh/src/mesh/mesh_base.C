@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.47 2003-08-17 11:39:10 ddreyer Exp $
+// $Id: mesh_base.C,v 1.48 2003-08-26 22:58:45 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -43,9 +43,13 @@
 //#include "petsc_matrix.h"
 #include "mesh_logging.h"
 
+//#include "hilbert_sfc_partitioner.h"
+//#include "morton_sfc_partitioner.h"
+//#include "linear_partitioner.h"
+//#include "centroid_partitioner.h"
 #include "metis_partitioner.h"
-#include "parmetis_partitioner.h"
-
+//#include "parmetis_partitioner.h"
+//#include "sfc_partitioner.h"
 
 
 
@@ -151,7 +155,7 @@ Node* MeshBase::add_point (const Point& p,
 
 
 
-void MeshBase::add_elem (Elem* e, const unsigned int n)
+Elem* MeshBase::add_elem (Elem* e, const unsigned int n)
 {
   START_LOG("add_elem()", "MeshBase");
 
@@ -174,6 +178,8 @@ void MeshBase::add_elem (Elem* e, const unsigned int n)
     }
 
   STOP_LOG("add_elem()", "MeshBase");
+
+  return e;
 }
 
 
@@ -771,15 +777,30 @@ void MeshBase::all_tri ()
 
 
 
-void MeshBase::partition (const unsigned int n_sbdmns)
+void MeshBase::partition ()
 {
-  assert (n_sbdmns > 0);
-
-   MetisPartitioner mp     (*this);
-//   ParmetisPartitioner pmp (*this);
+  // HilbertSFCPartitioner hsfcp(*this);
+  // hsfcp.partition();
   
-  mp.partition(n_sbdmns);
-//  pmp.partition(n_sbdmns);
+  // MortonSFCPartitioner msfcp(*this);
+  //   msfcp.partition();
+  
+  //  LinearPartitioner lp(*this);
+  //lp.partition();
+  
+  //CentroidPartitioner cp (*this, CentroidPartitioner::X);
+  //cp.partition();
+  
+  MetisPartitioner mp     (*this);
+  mp.partition();
+
+   //   ParmetisPartitioner pmp (*this);
+   // pmp.partition();
+   
+   //SFCPartitioner sfcp (*this);
+   //sfcp.partition();
+   
+  
 }
 
 

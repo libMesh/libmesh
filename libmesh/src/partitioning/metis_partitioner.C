@@ -1,4 +1,4 @@
-// $Id: metis_partitioner.C,v 1.5 2003-08-18 14:12:44 benkirk Exp $
+// $Id: metis_partitioner.C,v 1.6 2003-08-26 22:58:45 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -40,12 +40,12 @@
 
 // ------------------------------------------------------------
 // MetisPartitioner implementation
-void MetisPartitioner::partition (const unsigned int n_sbdmns)
+void MetisPartitioner::partition (const unsigned int n_pieces)
 {
-  assert (n_sbdmns > 0);
+  assert (n_pieces > 0);
 
   // Check for an easy return
-  if (n_sbdmns == 1)
+  if (n_pieces == 1)
     {
       this->single_partition();
       return;
@@ -61,7 +61,7 @@ void MetisPartitioner::partition (const unsigned int n_sbdmns)
 
   SFCPartitioner sfcp(_mesh);
 
-  sfcp.partition (n_sbdmns);
+  sfcp.partition (n_pieces);
   
 // What to do if the Metis library IS present
 #else
@@ -88,7 +88,7 @@ void MetisPartitioner::partition (const unsigned int n_sbdmns)
                                           //   in the graph
     wgtflag = 2,                          // weights on vertices only
     numflag = 0,                          // C-style 0-based numbering
-    nparts  = static_cast<int>(n_sbdmns), // number of subdomains to create
+    nparts  = static_cast<int>(n_pieces), // number of subdomains to create
     edgecut = 0;                          // the numbers of edges cut by the
                                           //   partition
 
@@ -215,7 +215,7 @@ void MetisPartitioner::partition (const unsigned int n_sbdmns)
   // Select which type of partitioning to create
 
   // Use recursive if the number of partitions is less than or equal to 8
-  if (n_sbdmns <= 8)
+  if (n_pieces <= 8)
     Metis::METIS_PartGraphRecursive(&n, &xadj[0], &adjncy[0], &vwgt[0], NULL,
 				    &wgtflag, &numflag, &nparts, &options[0],
 				    &edgecut, &part[0]);
@@ -240,8 +240,7 @@ void MetisPartitioner::partition (const unsigned int n_sbdmns)
 	assert (forward_map[elem->id()] !=
 		static_cast<unsigned int>(-1));
 	
-	elem->set_subdomain_id() =
-	  elem->set_processor_id() =
+	elem->set_processor_id() =
 	  static_cast<short int>(part[forward_map[elem->id()]]);
 	
       }

@@ -1,4 +1,4 @@
-// $Id: centroid_partitioner.h,v 1.2 2003-08-23 00:36:08 jwpeterson Exp $
+// $Id: centroid_partitioner.h,v 1.3 2003-08-26 22:58:45 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -73,16 +73,8 @@ public:
    * Partitions the mesh into n subdomains.  This is
    * a required interface for the class.
    */
-  virtual void partition (const unsigned int n);
+  virtual void partition (const unsigned int n = libMesh::n_processors());
 
-  /**
-   * Repartitions the mesh.  This is a required interface
-   * for the class.  At this point, we'll just
-   * call this->partition().  In the future, we can
-   * optimize it maybe.
-   */
-  virtual void repartition(const unsigned int n);
-  
 private:
 
   /**

@@ -1,4 +1,4 @@
-// $Id: parmetis_partitioner.h,v 1.2 2003-07-16 18:42:11 benkirk Exp $
+// $Id: parmetis_partitioner.h,v 1.3 2003-08-26 22:58:45 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -49,7 +49,7 @@ class ParmetisPartitioner : public Partitioner
   /**
    * Partition the \p MeshBase into \p n subdomains.
    */
-  void partition (const unsigned int n);
+  virtual void partition (const unsigned int n = libMesh::n_processors());
 
   /**
    * Parmetis can handle dynamically repartitioning a mesh such
@@ -57,7 +57,7 @@ class ParmetisPartitioner : public Partitioner
    * takes a previously partitioned domain (which may have
    * then been adaptively refined) and repartitions it.
    */
-  void repartition (const unsigned int n);
+  virtual void repartition (const unsigned int n = libMesh::n_processors());
 
 private:
 

@@ -1364,8 +1364,12 @@ src/geom/cell_inf_hex18.$(obj-suffix):\
     include/type_vector.h
 src/geom/cell_inf_hex8.$(obj-suffix):\
     src/geom/cell_inf_hex8.C\
+    include/auto_ptr.h\
     include/cell_inf_hex.h\
     include/cell_inf_hex8.h\
+    include/dof_object.h\
+    include/elem.h\
+    include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
@@ -1375,7 +1379,10 @@ src/geom/cell_inf_hex8.$(obj-suffix):\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
+    include/node.h\
     include/point.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h\
     include/type_vector.h
 src/geom/cell_inf_prism.$(obj-suffix):\
     src/geom/cell_inf_prism.C\
@@ -2190,7 +2197,6 @@ src/mesh/mesh_base.$(obj-suffix):\
     include/metis_partitioner.h\
     include/node.h\
     include/node_iterators.h\
-    include/parmetis_partitioner.h\
     include/partitioner.h\
     include/perf_log.h\
     include/point.h\
@@ -3256,6 +3262,38 @@ src/numerics/type_vector.$(obj-suffix):\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
+    include/type_vector.h
+src/partitioning/centroid_partitioner.$(obj-suffix):\
+    src/partitioning/centroid_partitioner.C\
+    include/auto_ptr.h\
+    include/boundary_info.h\
+    include/centroid_partitioner.h\
+    include/dof_object.h\
+    include/elem.h\
+    include/elem_iterators.h\
+    include/enum_elem_quality.h\
+    include/enum_elem_type.h\
+    include/enum_order.h\
+    include/enum_solver_package.h\
+    include/enum_xdr_mode.h\
+    include/libmesh.h\
+    include/libmesh_base.h\
+    include/mesh_base.h\
+    include/mesh_common.h\
+    include/mesh_communication.h\
+    include/mesh_config.h\
+    include/mesh_data.h\
+    include/mesh_refinement.h\
+    include/node.h\
+    include/node_iterators.h\
+    include/partitioner.h\
+    include/perf_log.h\
+    include/point.h\
+    include/predicated_iterator.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h\
+    include/sphere.h\
+    include/surface.h\
     include/type_vector.h
 src/partitioning/linear_partitioner.$(obj-suffix):\
     src/partitioning/linear_partitioner.C\
