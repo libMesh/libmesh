@@ -1,4 +1,4 @@
-// $Id: mesh_data.h,v 1.12 2003-07-30 16:14:04 ddreyer Exp $
+// $Id: mesh_data.h,v 1.13 2003-08-04 17:23:48 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -158,12 +158,12 @@ public:
   bool has_data (const Node* node) const;
 
   /**
-   * Stores @e all data associated with the node \p node 
-   * in the vector \p data.  May resize \p data.  Clears
-   * \p data when there is no data associated with \p node.
+   * @returns a const reference to the values associated with 
+   * the node \p node.  @e Beware: this method will crash
+   * when there is no data associated with the node \p node!
+   * Check existence through \p has_data() first.
    */
-  void operator() (const Node* node,
-		   std::vector<Number>& data) const;
+  const std::vector<Number>& get_data (const Node* node) const;
 
   /**
    * @returns the number of \p Number -type data 
@@ -217,12 +217,12 @@ public:
   bool has_data (const Elem* elem) const;
 
   /**
-   * Stores @e all data associated with the element \p elem
-   * in the vector \p data.  May resize \p data.  Clears
-   * \p data when there is no data associated with \p elem.
+   * @returns a const reference to the values associated with 
+   * the element \p elem.  @e Beware: this method will crash
+   * when there is no data associated with the element \p elem!
+   * Check existence through \p has_data() first.
    */
-  void operator() (const Elem* elem,
-		   std::vector<Number>& data) const;
+  const std::vector<Number>& get_data (const Elem* elem) const;
 
   /**
    * @returns the number of \p Number -type data 
@@ -666,8 +666,7 @@ bool MeshData::has_data (const Node* node) const
 
 
 inline
-void MeshData::operator() (const Node* node,
-			   std::vector<Number>& data) const
+const std::vector<Number>& MeshData::get_data (const Node* node) const
 {
   assert (_active);
   assert (_node_data_closed);
@@ -675,14 +674,15 @@ void MeshData::operator() (const Node* node,
   std::map<const Node*, 
            std::vector<Number> >::const_iterator pos = _node_data.find(node);
 
+#ifdef DEBUG
   if (pos == _node_data.end())
     {
-      data.clear();
+      std::cerr << "ERROR: No data for this node.  Use has_data() first!" << std::endl;
+      error();
     }
-  else
-    {
-      data = (*pos).second;
-    }
+#endif
+
+  return (*pos).second;
 }
 
 
@@ -722,8 +722,7 @@ bool MeshData::has_data (const Elem* elem) const
 
 
 inline
-void MeshData::operator() (const Elem* elem,
-			   std::vector<Number>& data) const
+const std::vector<Number>& MeshData::get_data (const Elem* elem) const
 {
   assert (_active);
   assert (_elem_data_closed);
@@ -731,14 +730,15 @@ void MeshData::operator() (const Elem* elem,
   std::map<const Elem*, 
            std::vector<Number> >::const_iterator pos = _elem_data.find(elem);
 
+#ifdef DEBUG
   if (pos == _elem_data.end())
     {
-      data.clear();
+      std::cerr << "ERROR: No data for this element.  Use has_data() first!" << std::endl;
+      error();
     }
-  else
-    {
-      data = (*pos).second;
-    }
+#endif
+
+  return pos->second;
 }
 
 
