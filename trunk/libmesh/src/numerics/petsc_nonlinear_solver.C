@@ -1,4 +1,4 @@
-// $Id: petsc_nonlinear_solver.C,v 1.5 2005-01-19 21:59:53 benkirk Exp $
+// $Id: petsc_nonlinear_solver.C,v 1.6 2005-01-31 22:16:18 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -246,7 +246,9 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
 //       ierr = MatDestroy(A);
 //              CHKERRABORT(PETSC_COMM_WORLD,ierr);
 //     }
-	 
+ 	 
+ ierr = SNESDestroy(_snes);
+        CHKERRABORT(PETSC_COMM_WORLD,ierr);
 	 
   // return the # of its. and the final residual norm.  Note that
   // n_iterations may be zero for PETSc versions 2.2.x and greater.
