@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.2 2004-03-21 03:19:26 benkirk Exp $
+// $Id: equation_systems.C,v 1.3 2004-03-21 04:48:50 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -465,8 +465,8 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
   {
     std::vector<unsigned short int> node_conn_local (node_conn.size());
     
-    const_active_local_elem_iterator       it (_mesh.elements_begin());
-    const const_active_local_elem_iterator end(_mesh.elements_end());
+    active_local_elem_iterator       it (_mesh.elements_begin());
+    const active_local_elem_iterator end(_mesh.elements_end());
     
     for ( ; it != end; ++it)
       for (unsigned int n=0; n<(*it)->n_nodes(); n++)
@@ -517,8 +517,8 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
 	{
 	  const FEType& fe_type    = system.variable_type(var);
 	  
-	  const_active_local_elem_iterator       it (_mesh.elements_begin());
-	  const const_active_local_elem_iterator end(_mesh.elements_end());
+	  active_local_elem_iterator       it (_mesh.elements_begin());
+	  const active_local_elem_iterator end(_mesh.elements_end());
 	  
 	  for ( ; it != end; ++it)
 	    {
@@ -614,8 +614,8 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number>& 
 
   // get the total weight
   {
-    const_active_elem_iterator       it (_mesh.elements_begin());
-    const const_active_elem_iterator end(_mesh.elements_end());
+    active_elem_iterator       it (_mesh.elements_begin());
+    const active_elem_iterator end(_mesh.elements_end());
     
     for ( ; it != end; ++it)
       tw += (*it)->n_nodes();
@@ -657,8 +657,8 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number>& 
 	    {
 	      const FEType& fe_type    = system.variable_type(var);
 
-	      const_active_elem_iterator       it (_mesh.elements_begin());
-	      const const_active_elem_iterator end(_mesh.elements_end());
+	      active_elem_iterator       it (_mesh.elements_begin());
+	      const active_elem_iterator end(_mesh.elements_end());
 
 	      unsigned int nn=0;
 	      
