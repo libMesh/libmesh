@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.57 2004-03-08 02:30:00 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.58 2004-04-01 16:36:39 jwpeterson Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -528,40 +528,47 @@ AC_DEFUN(CONFIGURE_PETSC,
   AC_CHECK_FILE($PETSC_DIR/include/petsc.h,
                 PETSC_H_PATH=$PETSC_DIR/include/petsc.h)
 
-  if (test -r $PETSC_DIR/include/petsc.h) ; then
-    AC_PROG_F77            dnl Petsc requires linking with FORTRAN libraries 
-    AC_F77_LIBRARY_LDFLAGS
-    AC_SUBST(PETSC_ARCH)
-    AC_SUBST(PETSC_DIR)
-    AC_DEFINE(HAVE_PETSC, 1,
-	      [Flag indicating whether or not Petsc is available])
-    AC_DEFINE(HAVE_MPI, 1,
-	      [Flag indicating whether or not MPI is available])
-    MPI_IMPL="petsc_snooped"
-
-    dnl Some tricks to discover the version of petsc.
-    dnl You have to have grep and sed for this to work.
-    petscmajor=`grep "define PETSC_VERSION_MAJOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_MAJOR[ ]*//g"`
-    petscminor=`grep "define PETSC_VERSION_MINOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_MINOR[ ]*//g"`
-    petscsubminor=`grep "define PETSC_VERSION_SUBMINOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_SUBMINOR[ ]*//g"`
-    petscversion=$petscmajor.$petscminor.$petscsubminor
-    AC_MSG_RESULT(<<< Configuring library with PETSc version $petscversion support >>>)
-    AC_SUBST(petscversion)
-    AC_SUBST(MPI_IMPL)
+  dnl Test to see if PETSC_ARCH set by user.  If not set, then
+  dnl disable petsc.
+  if test "x$PETSC_ARCH" = x ; then
+    enablepetsc=no
+    AC_MSG_RESULT(<<< PETSc disabled.  Please set your "\$PETSC_ARCH" environment variable correctly. >>>)
 
   else
-
-    dnl PETSc config failed.  Try MPI.
-    enablepetsc=no
-
-    dnl -------------------------------------------------------------
-    if (test "$enablempi" != no) ; then
-      ACX_MPI
+    if (test -r $PETSC_DIR/include/petsc.h) ; then
+      AC_PROG_F77            dnl Petsc requires linking with FORTRAN libraries 
+      AC_F77_LIBRARY_LDFLAGS
+      AC_SUBST(PETSC_ARCH)
+      AC_SUBST(PETSC_DIR)
+      AC_DEFINE(HAVE_PETSC, 1,
+  	      [Flag indicating whether or not Petsc is available])
+      AC_DEFINE(HAVE_MPI, 1,
+  	      [Flag indicating whether or not MPI is available])
+      MPI_IMPL="petsc_snooped"
+  
+      dnl Some tricks to discover the version of petsc.
+      dnl You have to have grep and sed for this to work.
+      petscmajor=`grep "define PETSC_VERSION_MAJOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_MAJOR[ ]*//g"`
+      petscminor=`grep "define PETSC_VERSION_MINOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_MINOR[ ]*//g"`
+      petscsubminor=`grep "define PETSC_VERSION_SUBMINOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_SUBMINOR[ ]*//g"`
+      petscversion=$petscmajor.$petscminor.$petscsubminor
+      AC_MSG_RESULT(<<< Configuring library with PETSc version $petscversion support >>>)
+      AC_SUBST(petscversion)
+      AC_SUBST(MPI_IMPL)
+  
+      else
+  
+      dnl PETSc config failed.  Try MPI.
+      enablepetsc=no
+  
+      dnl -------------------------------------------------------------
+      if (test "$enablempi" != no) ; then
+        ACX_MPI
+      fi
+      dnl -------------------------------------------------------------
+  
     fi
-    dnl -------------------------------------------------------------
-
   fi
-
   AC_SUBST(enablepetsc)
 ])
 dnl -------------------------------------------------------------
