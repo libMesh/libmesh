@@ -1,4 +1,4 @@
-// $Id: dense_matrix.C,v 1.13 2003-09-02 18:02:43 benkirk Exp $
+// $Id: dense_matrix.C,v 1.14 2003-12-09 20:24:09 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -21,11 +21,12 @@
 // Local Includes
 #include "dense_matrix.h"
 
+#include "libmesh.h"
 
 
 
-// // ------------------------------------------------------------
-// // Dense Matrix member functions
+// ------------------------------------------------------------
+// Dense Matrix member functions
 template<typename T>
 void DenseMatrix<T>::left_multiply (const DenseMatrixBase<T>& M2)
 {
@@ -126,6 +127,127 @@ void DenseMatrix<T>::right_multiply_transpose (const DenseMatrix<T>& B)
 	  (*this)(i,j) += A(i,k)*B.transpose(k,j);	            
 }
 
+
+
+template<typename T>
+void DenseMatrix<T>::lu_solve (DenseVector<T>& b,
+			       DenseVector<T>& x,
+			       const bool partial_pivot)
+{
+  // Perform LU decomposition
+  this->lu_decompose (partial_pivot);
+
+  // Perform back substitution
+  this->lu_back_substitute (b, x, partial_pivot);
+}
+
+  
+
+template<typename T>
+void DenseMatrix<T>::lu_back_substitute (DenseVector<T>& b,
+					 DenseVector<T>& x,
+					 const bool ) const
+{
+  const unsigned int
+    m = this->m(),
+    n = this->n();
+
+  assert (m == n);
+  assert (b.size() == m);
+  
+  x.resize (n);
+
+  
+  // Transform the RHS vector
+  for (unsigned int i=0; i<(n-1); i++)
+    {
+      // Get the diagonal entry and take its inverse
+      const T diag = (*this)(i,i);
+      
+      assert (diag != libMesh::zero);
+  
+      const T diag_inv = 1./diag;
+
+      // Get the entry b(i) and store it
+      const T bi = b(i);
+      
+      for (unsigned int j=(i+1); j<n; j++)
+	b(j) -= bi*(*this)(j,i)*diag_inv;
+    }
+
+
+  // Perform back-substitution
+  {
+    x(n-1) = b(n-1)/(*this)(n-1,n-1);
+
+    for (unsigned int i=0; i<=(n-1); i++)
+      {
+	const unsigned int ib = (n-1)-i;
+
+	// Get the diagonal and take its inverse
+	const T diag = (*this)(ib,ib);
+
+	assert (diag != libMesh::zero);
+
+	const T diag_inv = 1./diag;
+	
+	for (unsigned int j=(ib+1); j<n; j++)
+	  {
+	    b(ib) -= (*this)(ib,j)*x(j);
+	    x(ib)  = b(ib)*diag_inv;
+	  }
+      }
+  }
+}
+
+
+template<typename T>
+void DenseMatrix<T>::lu_decompose (const bool partial_pivot)
+{
+
+  // Get the matrix size and make sure it is square
+  const unsigned int
+    m = this->m(),
+    n = this->n();
+
+  assert (m == n);
+
+
+  
+  // Straight, vanilla LU factorization without pivoting
+  if (!partial_pivot)
+    {
+      
+      // For each row in the matrix
+      for (unsigned int i=0; i<m; i++)
+	{
+	  // Get the diagonal entry and take its inverse
+	  const T diag = (*this)(i,i);
+
+	  assert (diag != libMesh::zero);
+
+	  const T diag_inv = 1./diag;
+	  
+	  // For each row in the submatrix
+	  for (unsigned int j=i+1; j<m; j++)
+	    {
+	      // Get the scale factor for this row
+	      const T fact = (*this)(j,i)*diag_inv;
+	      
+	      // For each column in the subrow scale it
+	      // by the factor
+	      for (unsigned int k=i+1; k<m; k++)
+		(*this)(j,k) -= fact*(*this)(i,k);	      
+	    }
+	}      
+    }
+
+  // Do partial pivoting.
+  else
+    {
+      error();
+    }
+}
 
 
 
