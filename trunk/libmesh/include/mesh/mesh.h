@@ -1,4 +1,4 @@
-// $Id: mesh.h,v 1.5 2004-03-18 16:40:59 jwpeterson Exp $
+// $Id: mesh.h,v 1.6 2004-03-20 05:36:26 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -134,12 +134,6 @@ class Mesh : public MeshBase
 	      const std::vector<std::string>& variable_names);
   
   /**
-   * Write meshes in DIVA's ASCII
-   * format for visualization.
-   */
-  void write_diva (const std::string& name);
-    
-  /**
    * Write meshes in mgflo's XDR format.
    * Note: MGF won't be able to read these
    * meshes in general since they will be
@@ -228,13 +222,6 @@ class Mesh : public MeshBase
    * Same, but expects a true XDR-Encoded binary file.
    */
   void read_xdr_binary (const std::string& name);
-
-  /**
-   * Actual implementation of writing meshes in DIVA's ASCII
-   * format.
-   */
-  void write_diva (std::ostream& out);
-
   
  private:
 };
