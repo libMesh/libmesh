@@ -1,4 +1,4 @@
-// $Id: laspack_vector.h,v 1.19 2003-07-23 21:49:04 ddreyer Exp $
+// $Id: laspack_vector.h,v 1.20 2003-08-04 12:43:06 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -143,22 +143,22 @@ class LaspackVector : public NumericVector<T>
 // 	     const bool fast=false);
 
   /**
-   * $U(0-N) = s$: fill all components.
+   * \f$U(0-N) = s\f$: fill all components.
    */
   NumericVector<T> & operator= (const T s);
     
   /**
-   *  $U = V$: copy all components.
+   *  \f$U = V\f$: copy all components.
    */
   NumericVector<T> & operator= (const NumericVector<T> &V);
   
   /**
-   *  $U = V$: copy all components.
+   *  \f$U = V\f$: copy all components.
    */
   LaspackVector<T> & operator= (const LaspackVector<T> &V);
 
   /**
-   *  $U = V$: copy all components.
+   *  \f$U = V\f$: copy all components.
    */
   NumericVector<T> & operator= (const std::vector<T> &v);
 
@@ -177,13 +177,13 @@ class LaspackVector : public NumericVector<T>
   Real max () const;
   
   /**
-   * @returns the $l_1$-norm of the vector, i.e.
+   * @returns the \f$l_1\f$-norm of the vector, i.e.
    * the sum of the absolute values.
    */
   Real l1_norm () const;
 
   /**
-   * @returns the $l_2$-norm of the vector, i.e.
+   * @returns the \f$l_2\f$-norm of the vector, i.e.
    * the square root of the sum of the
    * squares of the elements.
    */
@@ -192,7 +192,7 @@ class LaspackVector : public NumericVector<T>
   /**
    * @returns the maximum absolute value of the
    * elements of this vector, which is the
-   * $l_\infty$-norm of a vector.
+   * \f$l_\infty\f$-norm of a vector.
    */
   Real linfty_norm () const;
 
@@ -251,28 +251,28 @@ class LaspackVector : public NumericVector<T>
   void add (const unsigned int i, const T value);
     
   /**
-   * $U(0-DIM)+=s$.
+   * \f$U(0-DIM)+=s\f$.
    * Addition of \p s to all components. Note
    * that \p s is a scalar and not a vector.
    */
   void add (const T s);
     
   /**
-   * U+=V.
+   * \f$ U+=V \f$.
    * Simple vector addition, equal to the
    * \p operator +=.
    */
   void add (const NumericVector<T>& V);
 
   /**
-   * U+=a*V.
+   * \f$ U+=a*V \f$.
    * Simple vector addition, equal to the
    * \p operator +=.
    */
   void add (const T a, const NumericVector<T>& v);
   
   /**
-   * U+=v where v is a std::vector<T> 
+   * \f$ U+=v \f$ where v is a std::vector<T> 
    * and you
    * want to specify WHERE to add it
    */
@@ -280,7 +280,7 @@ class LaspackVector : public NumericVector<T>
 		   const std::vector<unsigned int>& dof_indices);
 
   /**
-   * U+=V where U and V are type 
+   * \f$ U+=V \f$ where U and V are type 
    * NumericVector<T> and you
    * want to specify WHERE to add
    * the NumericVector<T> V 
@@ -289,15 +289,14 @@ class LaspackVector : public NumericVector<T>
 		   const std::vector<unsigned int>& dof_indices);
  
   /**
-   * U+=U+A*V.
-   * Add the product of a Sparse matrix \p A
-   * and a Numeric vector \p V to this Numeric vector.
+   * \f$U+=A*V\f$, add the product of a \p SparseMatrix \p A
+   * and a \p NumericVector \p V to \p this, where \p this=U.
    */
   void add_vector (const NumericVector<T> &,
 		   SparseMatrix<T> &);
       
   /**
-   * U+=V where U and V are type 
+   * \f$U+=V \f$ where U and V are type 
    * DenseVector<T> and you
    * want to specify WHERE to add
    * the DenseVector<T> V 

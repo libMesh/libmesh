@@ -1,4 +1,4 @@
-// $Id: numeric_vector.h,v 1.17 2003-05-28 22:03:01 benkirk Exp $
+// $Id: numeric_vector.h,v 1.18 2003-08-04 12:43:06 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -153,17 +153,17 @@ public:
   // 		     const bool = false) {}
 
   /**
-   * $U(0-N) = s$: fill all components.
+   * \f$U(0-N) = s\f$: fill all components.
    */
   virtual NumericVector<T> & operator= (const T s);
   
   /**
-   *  $U = V$: copy all components.
+   *  \f$U = V\f$: copy all components.
    */
   virtual NumericVector<T> & operator= (const NumericVector<T> &V);
 
   /**
-   *  $U = V$: copy all components.
+   *  \f$U = V\f$: copy all components.
    */
   virtual NumericVector<T> & operator= (const std::vector<T> &v);
 
@@ -182,13 +182,13 @@ public:
   virtual Real max () const = 0;
   
   /**
-   * @returns the $l_1$-norm of the vector, i.e.
+   * @returns the \f$l_1\f$-norm of the vector, i.e.
    * the sum of the absolute values.
    */
   virtual Real l1_norm () const = 0;
 
   /**
-   * @returns the $l_2$-norm of the vector, i.e.
+   * @returns the \f$l_2\f$-norm of the vector, i.e.
    * the square root of the sum of the
    * squares of the elements.
    */
@@ -197,7 +197,7 @@ public:
   /**
    * @returns the maximum absolute value of the
    * elements of this vector, which is the
-   * $l_\infty$-norm of a vector.
+   * \f$l_\infty\f$-norm of a vector.
    */
   virtual Real linfty_norm () const = 0;
 
@@ -258,28 +258,28 @@ public:
   virtual void add (const unsigned int i, const T value) = 0;
     
   /**
-   * $U(0-DIM)+=s$.
+   * \f$U(0-DIM)+=s\f$.
    * Addition of \p s to all components. Note
    * that \p s is a scalar and not a vector.
    */
   virtual void add (const T s) = 0;
     
   /**
-   * U+=V.
+   * \f$U+=V\f$:
    * Simple vector addition, equal to the
    * \p operator +=.
    */
   virtual void add (const NumericVector<T>& V) = 0;
 
   /**
-   * U+=a*V.
+   * \f$U+=a*V\f$.
    * Simple vector addition, equal to the
    * \p operator +=.
    */
   virtual void add (const T a, const NumericVector<T>& v) = 0;
 
   /**
-   * U+=v where v is a DenseVector<T> 
+   * \f$ U+=v \f$ where v is a DenseVector<T> 
    * and you
    * want to specify WHERE to add it
    */
@@ -287,7 +287,7 @@ public:
 			   const std::vector<unsigned int>& dof_indices) = 0;
 
   /**
-   * U+=V where U and V are type 
+   * \f$U+=V\f$, where U and V are type 
    * NumericVector<T> and you
    * want to specify WHERE to add
    * the NumericVector<T> V 
@@ -296,15 +296,14 @@ public:
 			   const std::vector<unsigned int>& dof_indices) = 0;
 
   /**
-   * U+=U+A*V.
-   * Add the product of a Sparse matrix \p A
-   * and a Numeric vector \p V to this Numeric vector.
+   * \f$U+=A*V\f$, add the product of a \p SparseMatrix \p A
+   * and a \p NumericVector \p V to \p this, where \p this=U.
    */
   virtual void add_vector (const NumericVector<T> &,
 			   SparseMatrix<T> &) = 0;
       
   /**
-   * U+=V where U and V are type 
+   * \f$ U+=V \f$ where U and V are type 
    * DenseVector<T> and you
    * want to specify WHERE to add
    * the DenseVector<T> V 

@@ -1,4 +1,4 @@
-//    $Id: petsc_matrix.h,v 1.25 2003-03-26 13:55:24 benkirk Exp $
+//    $Id: petsc_matrix.h,v 1.26 2003-08-04 12:43:06 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -239,13 +239,13 @@ public:
 
   /**
    * Return the l1-norm of the matrix, that is
-   * $|M|_1=max_{all columns j}\sum_{all 
-   * rows i} |M_ij|$,
+   * \f$|M|_1=max_{all columns j}\sum_{all 
+   * rows i} |M_ij|\f$,
    * (max. sum of columns).
    * This is the
    * natural matrix norm that is compatible
    * to the l1-norm for vectors, i.e.
-   * $|Mv|_1\leq |M|_1 |v|_1$.
+   * \f$|Mv|_1\leq |M|_1 |v|_1\f$.
    * (cf. Haemmerlin-Hoffmann : Numerische Mathematik)
    */
   Real l1_norm () const;
@@ -253,13 +253,13 @@ public:
   /**
    * Return the linfty-norm of the
    * matrix, that is
-   * $|M|_infty=max_{all rows i}\sum_{all 
-   * columns j} |M_ij|$,
+   * \f$|M|_infty=max_{all rows i}\sum_{all 
+   * columns j} |M_ij|\f$,
    * (max. sum of rows).
    * This is the
    * natural matrix norm that is compatible
    * to the linfty-norm of vectors, i.e.
-   * $|Mv|_infty \leq |M|_infty |v|_infty$.
+   * \f$|Mv|_infty \leq |M|_infty |v|_infty\f$.
    * (cf. Haemmerlin-Hoffmann : Numerische Mathematik)
    */
   Real linfty_norm () const;
