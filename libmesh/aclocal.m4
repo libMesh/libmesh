@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.24 2003-04-02 21:58:28 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.25 2003-04-02 22:34:36 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -274,7 +274,7 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
     case "$GXX_VERSION" in
       ibm_xlc)
           CXXFLAGSG="-DDEBUG -qmaxmem=-1 -qansialias -qrtti=all -g -qstaticinline"
-          CXXFLAGSO="-DNDEBUG -O3 -qmaxmem=-1 -w -qansialias -qrtti=all -Q -qstaticinline"
+          CXXFLAGSO="-DNDEBUG -04 -qmaxmem=-1 -w -qansialias -qrtti=all -Q -qstaticinline"
           CXXFLAGSP="$CXXFLAGSO -g -pg"
           CFLAGSG="-DDEBUG -qansialias -g"
           CFLAGSO="-DNDEBUG -O2 -w -qansialias"
@@ -315,8 +315,8 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           dnl #266: 'function declared implicitly'
           dnl       Metis function "GKfree" caused this error
           dnl       in almost every file.
-          CXXFLAGSG="-Kc++eh -Krtti -w1 -DDEBUG -inline_debug_info -g -wd504"
-          CXXFLAGSO="-Kc++eh -Krtti -O2 -Ob2 -DNDEBUG -tpp6 -axiMK -unroll -w0 -vec"
+          CXXFLAGSG="-Kc++eh -Krtti -O1 -w1 -DDEBUG -inline_debug_info -g -wd504"
+          CXXFLAGSO="-Kc++eh -Krtti -O2 -Ob2 -DNDEBUG -tpp6 -axiMK -unroll -w0"
           CXXFLAGSP="$CXXFLAGSO -g -pg"
           CFLAGSG="-w1 -DDEBUG -inline_debug_info -wd266"
           CFLAGSO="-O2 -Ob2 -DNDEBUG -tpp6 -axiMK -unroll -w0 -vec"
