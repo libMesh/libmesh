@@ -13,7 +13,7 @@
 <div class="content">
 <h1>Presentations</h1>
 <ul>
-  <h2>Ben's Presentations</h2>
+  <li> <h2>Ben's Presentations</h2> </li>
   <ul>
     <li> <a href="http://cfdlab.ae.utexas.edu/~benkirk/adv_flows_project.pdf">Adavnced Flows Class Project</a> (natural convection, 2002)</li>
     <li> <a href="http://cfdlab.ae.utexas.edu/~benkirk/siam_geo.pdf">SIAM Geosciences 2003</a></li>
