@@ -1,4 +1,4 @@
-// $Id: mesh_tetgen_support.h,v 1.7 2004-05-14 22:59:34 spetersen Exp $
+// $Id: mesh_tetgen_support.h,v 1.8 2004-06-19 21:37:24 fprill Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -34,7 +34,6 @@
 #include "mesh_base.h"
 
 #ifdef TETGEN_13
-#include "predicates.h"
 #include "tetgen.h"
 #endif // TETGEN_13
 
