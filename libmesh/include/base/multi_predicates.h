@@ -1,3 +1,22 @@
+// $Id: multi_predicates.h,v 1.2 2004-11-08 18:05:29 jwpeterson Exp $
+
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
+  
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+  
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+  
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
 #ifndef __multi_predicates_h__
 #define __multi_predicates_h__
 
@@ -8,6 +27,8 @@
  * This namespace defines several multi_predicates which are used by
  * the element and node iterators.  These classes are not in general
  * used by the user, although they could be.
+ *
+ * @author John W. Peterson, 2004
  */
 namespace Predicates
 {
