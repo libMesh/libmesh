@@ -1,4 +1,4 @@
-// $Id: laspack_interface.h,v 1.4 2004-10-12 19:46:57 benkirk Exp $
+// $Id: laspack_interface.h,v 1.5 2004-10-15 04:38:19 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -141,6 +141,9 @@ LaspackInterface<T>::solve (SparseMatrix<T>&,
   std::cerr << "ERROR: LASPACK does not support a user-supplied preconditioner!"
 	    << std::endl;
   error();
+
+  std::pair<unsigned int, Real> p;
+  return p;
 }
 
 #endif // #ifdef HAVE_LASPACK
