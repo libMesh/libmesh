@@ -1,4 +1,4 @@
-// $Id: ex6.C,v 1.24 2003-05-15 23:34:32 benkirk Exp $
+// $Id: ex6.C,v 1.25 2003-05-22 21:18:00 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -525,7 +525,7 @@ void assemble_wave(EquationSystems& es,
        * The element shape function gradients evaluated at the quadrature
        * points.
        */
-      const std::vector<std::vector<Point> >& dphi = cfe->get_dphi();
+      const std::vector<std::vector<RealGradient> >& dphi = cfe->get_dphi();
 
       /**
        * The infinite elements need more data fields than conventional FE.  
@@ -537,9 +537,9 @@ void assemble_wave(EquationSystems& es,
        * the \p FE method, so that the weak form (below) is valid for both
        * finite and infinite elements.
        */
-      const std::vector<Point>& dphase  = cfe->get_dphase();
-      const std::vector<Real>&  weight  = cfe->get_Sobolev_weight();
-      const std::vector<Point>& dweight = cfe->get_Sobolev_dweight();
+      const std::vector<RealGradient>& dphase  = cfe->get_dphase();
+      const std::vector<Real>&         weight  = cfe->get_Sobolev_weight();
+      const std::vector<RealGradient>& dweight = cfe->get_Sobolev_dweight();
 
 
       /**

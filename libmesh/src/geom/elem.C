@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.20 2003-05-15 23:34:35 benkirk Exp $
+// $Id: elem.C,v 1.21 2003-05-22 21:18:03 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -473,6 +473,12 @@ void Elem::refine (MeshBase& mesh)
   assert (this->active());
   assert (_children == NULL);
 
+  // Two big prime numbers less than
+  // sqrt(max_unsigned_int) for key creation.
+  static const unsigned int bp1 = 65449;
+  static const unsigned int bp2 = 48661;
+  
+  
   // Create my children
   {
     _children = new Elem*[this->n_children()];
@@ -488,27 +494,76 @@ void Elem::refine (MeshBase& mesh)
   // Compute new nodal locations
   // and asssign nodes to children
   {
-    std::vector<std::vector<Point> >  p(this->n_children());
-    
-    for (unsigned int c=0; c<this->n_children(); c++)
-      p[c].resize(this->child(c)->n_nodes());
+    // Make these static.  It is unlikely the
+    // sizes will change from call to call, so having these
+    // static should save on reallocations
+    static std::vector<std::vector<Point> >         p;
+    static std::vector<std::vector<unsigned int> >  keys;
+    static std::vector<std::vector<Node*> >         nodes;
+
+    p.resize    (this->n_children());
+    keys.resize (this->n_children());
+    nodes.resize(this->n_children());
     
 
     // compute new nodal locations
     for (unsigned int c=0; c<this->n_children(); c++)
+      {	
+	p[c].resize    (this->child(c)->n_nodes());
+	keys[c].resize (this->child(c)->n_nodes());
+	nodes[c].resize(this->child(c)->n_nodes());
+	
       for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
-	for (unsigned int n=0; n<this->n_nodes(); n++)
-	  if (this->embedding_matrix(c,nc,n) != 0.)
-	    p[c][nc].add_scaled (this->point(n), this->embedding_matrix(c,nc,n));
-    
+	{
+	  // zero entries
+	  p[c][nc].zero();
+	  keys[c][nc]  = 0;
+	  nodes[c][nc] = NULL;
+	  
+	  for (unsigned int n=0; n<this->n_nodes(); n++)
+	    {
+	      // The value from the embedding matrix
+	      const float em_val = this->embedding_matrix(c,nc,n);
+	      
+	      if (em_val != 0.)
+		{
+		  p[c][nc].add_scaled (this->point(n), em_val);
+		  
+		  // Build the key to look for the node
+		  keys[c][nc] +=
+		    ((static_cast<unsigned int>(em_val*100000.)%bp1 *
+		      (this->node(n)%bp1))%bp1)*bp2;
+		}
+
+	      // We may have found the node, in which case we
+	      // won't need to look it up later.
+	      if (em_val == 1.)
+		nodes[c][nc] = this->get_node(n);
+	    }
+	  // Mod one last time
+	  keys[c][nc] = keys[c][nc]%bp1;
+	}
+      }
     
     // assign nodes to children & add them to the mesh
     for (unsigned int c=0; c<this->n_children(); c++)
       {
 	for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
-	  _children[c]->set_node(nc) = mesh.mesh_refinement.add_point(p[c][nc]);
-
-	mesh.add_elem(this->child(c), mesh.mesh_refinement.new_element_number());
+	  {
+	    if (nodes[c][nc] != NULL)
+	      {
+		_children[c]->set_node(nc) = nodes[c][nc];
+	      }
+	    else
+	      {
+		_children[c]->set_node(nc) =
+		  mesh.mesh_refinement.add_point(p[c][nc],
+						 keys[c][nc]);
+	      }
+	  }
+	
+	mesh.add_elem(this->child(c),
+		      mesh.mesh_refinement.new_element_number());
       }
   }
 
@@ -522,7 +577,9 @@ void Elem::refine (MeshBase& mesh)
 	
 	if (id != mesh.boundary_info.invalid_id)
 	  for (unsigned int sc=0; sc<this->n_children_per_side(s); sc++)
-	    mesh.boundary_info.add_side(this->child(this->side_children_matrix(s,sc)), s, id);
+	    mesh.boundary_info.add_side(this->child(this->side_children_matrix(s,sc)),
+					s,
+					id);
       }
 
   

@@ -1,4 +1,4 @@
-// $Id: error_estimator.C,v 1.6 2003-05-22 18:31:19 ddreyer Exp $
+// $Id: error_estimator.C,v 1.7 2003-05-22 21:18:03 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -167,8 +167,8 @@ void ErrorEstimator::flux_jump (const EquationSystems& es,
       std::vector<Point> qp_f;
       
       // The shape function gradients on elements e & f
-      const std::vector<std::vector<Point> > & dphi_e = fe_e->get_dphi();
-      const std::vector<std::vector<Point> > & dphi_f = fe_f->get_dphi();
+      const std::vector<std::vector<RealGradient> > & dphi_e = fe_e->get_dphi();
+      const std::vector<std::vector<RealGradient> > & dphi_f = fe_f->get_dphi();
       
       // The global DOF indices for elements e & f
       std::vector<unsigned int> dof_indices_e;
@@ -243,36 +243,31 @@ void ErrorEstimator::flux_jump (const EquationSystems& es,
 		    for (unsigned int qp=0; qp<n_qp; qp++)
 		      {
 			// The solution gradient from each element
-			Point grad_e, grad_f;
+			Gradient grad_e, grad_f;
 			
 			// Compute the solution gradient on element e
 			for (unsigned int i=0; i<n_dofs_e; i++)
-#if   defined (USE_REAL_NUMBERS)
 			  grad_e.add_scaled (dphi_e[i][qp],
 					     system.current_solution(dof_indices_e[i]));
-#elif defined (USE_COMPLEX_NUMBERS)
-			  grad_e.add_scaled (dphi_e[i][qp],
-					     system.current_solution(dof_indices_e[i]).real()
-					     + system.current_solution(dof_indices_e[i]).imag());
-#endif
 			
 			// Compute the solution gradient on element f
 			for (unsigned int i=0; i<n_dofs_f; i++)
-#if   defined (USE_REAL_NUMBERS)
 			  grad_f.add_scaled (dphi_f[i][qp],
 					     system.current_solution(dof_indices_f[i]));
-#elif defined (USE_COMPLEX_NUMBERS)
-			  grad_f.add_scaled (dphi_f[i][qp],
-					     system.current_solution(dof_indices_f[i]).real()
-					     + system.current_solution(dof_indices_f[i]).imag());
-#endif
-
+			
 
 			// The flux jump at the face 
-			const Real jump = (grad_e - grad_f)*face_normals[qp];
+			const Number jump = (grad_e - grad_f)*face_normals[qp];
+
+			// The flux jump squared
+#ifndef USE_COMPLEX_NUMBERS
+			const Real jump2 = jump*jump;
+#else
+			const Real jump2 = std::norm(jump);
+#endif
 
 			// Integrate the error on the face
-			error += JxW_face[qp]*h*jump*jump;			
+			error += JxW_face[qp]*h*jump2;			
 			
 		      } // End quadrature point loop
 

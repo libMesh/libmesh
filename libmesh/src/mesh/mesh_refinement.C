@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.16 2003-05-21 22:17:59 benkirk Exp $
+// $Id: mesh_refinement.C,v 1.17 2003-05-22 21:18:03 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -55,20 +55,13 @@ void MeshRefinement::clear ()
 
 
 
-Node* MeshRefinement::add_point(const Point& p)
+Node* MeshRefinement::add_point(const Point& p, const unsigned int key)
 {
-  // if the new_nodes data structure is empty we need to fill it.
-  if (new_nodes.empty())
-    for (unsigned int n=0; n<mesh.n_nodes(); n++)
-      new_nodes.insert(std::pair<unsigned int,
-		                 unsigned int>(mesh.point(n).key(),n));
-
-  
   unsigned int n;
   
   std::pair<std::multimap<unsigned int, unsigned int>::iterator,
             std::multimap<unsigned int, unsigned int>::iterator>
-    pos = new_nodes.equal_range(p.key());
+    pos = new_nodes.equal_range(key);
   
       
   while (pos.first != pos.second) 
@@ -76,9 +69,10 @@ Node* MeshRefinement::add_point(const Point& p)
       if (mesh.point(pos.first->second) == p)
 	{
 	  n = pos.first->second;
-	  
-	  break;
+
+	  return mesh.node_ptr(n);
 	}
+      
       ++pos.first;
     }
   
@@ -88,7 +82,7 @@ Node* MeshRefinement::add_point(const Point& p)
       
       new_nodes.insert(pos.first,
 		       std::pair<unsigned int,
-		                 unsigned int>(p.key(),n));
+		                 unsigned int>(key,n));
     }
     
   

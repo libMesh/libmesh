@@ -1,4 +1,4 @@
-// $Id: ex5.C,v 1.19 2003-05-15 23:34:32 benkirk Exp $
+// $Id: ex5.C,v 1.20 2003-05-22 21:18:00 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -277,7 +277,7 @@ void assemble_poisson(EquationSystems& es,
 
   const std::vector<std::vector<Real> >& phi = fe->get_phi();
 
-  const std::vector<std::vector<Point> >& dphi = fe->get_dphi();
+  const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
 
   const DofMap& dof_map = es("Poisson").get_dof_map();
 

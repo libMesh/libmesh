@@ -147,7 +147,7 @@
     - \p gcc 2.96 (RedHat's compiler in the 7.x series)
  
   - Intel ICC/ECC
-    - \p icc/ifc 7.0
+    - \p icc/ifc 7.x
     - \p icc/ifc 6.0
     - Earlier versions (<= 5.0) not supported.
  

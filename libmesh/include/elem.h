@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.22 2003-05-22 17:06:21 jwpeterson Exp $
+// $Id: elem.h,v 1.23 2003-05-22 21:18:02 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -484,7 +484,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    * Matrix that transforms the parents nodes into the children's
    * nodes
    */
-  virtual Real embedding_matrix (const unsigned int i,
+  virtual float embedding_matrix (const unsigned int i,
 				 const unsigned int j,
 				 const unsigned int k) const = 0;
 

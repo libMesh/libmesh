@@ -1,4 +1,4 @@
-// $Id: cell_prism15.h,v 1.5 2003-04-01 14:19:46 ddreyer Exp $
+// $Id: cell_prism15.h,v 1.6 2003-05-22 21:18:02 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -122,7 +122,7 @@ protected:
   /**
    * Matrix used to create the elements children.
    */
-  Real embedding_matrix (const unsigned int,
+  float embedding_matrix (const unsigned int,
 			 const unsigned int,
 			 const unsigned int) const
   { error(); return 0.; }

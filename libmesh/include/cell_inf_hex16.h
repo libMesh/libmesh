@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex16.h,v 1.13 2003-03-11 00:47:40 ddreyer Exp $
+// $Id: cell_inf_hex16.h,v 1.14 2003-05-22 21:18:01 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -124,10 +124,10 @@ protected:
   /**
    * Matrix used to create the elements children.
    */
-  Real embedding_matrix (const unsigned int i,
-			 const unsigned int j,
-			 const unsigned int k) const
-  { return static_cast<Real>(_embedding_matrix[i][j][k]); }
+  float embedding_matrix (const unsigned int i,
+			  const unsigned int j,
+			  const unsigned int k) const
+  { return _embedding_matrix[i][j][k]; }
 
   /**
    * Matrix that computes new nodal locations/solution values

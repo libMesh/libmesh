@@ -1,4 +1,4 @@
-// $Id: edge_edge2.h,v 1.11 2003-03-26 01:08:15 ddreyer Exp $
+// $Id: edge_edge2.h,v 1.12 2003-05-22 21:18:02 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -93,7 +93,7 @@ protected:
   /**
    * Matrix used to create the elements children.
    */
-  Real embedding_matrix (const unsigned int,
+  float embedding_matrix (const unsigned int,
 			 const unsigned int,
 			 const unsigned int) const
   { error(); return 0.; }
