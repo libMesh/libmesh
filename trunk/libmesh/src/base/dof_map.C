@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.16 2003-02-14 17:02:45 benkirk Exp $
+// $Id: dof_map.C,v 1.17 2003-02-14 22:37:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -45,22 +45,6 @@
 
 // ------------------------------------------------------------
 // DofMap member functions
-DofMap::DofMap() :
-  _matrix(NULL),
-  _n_nodes(0),
-  _n_elem(0),
-  _n_dfs(0)  
-{
-}
-
-
-
-DofMap::~DofMap()
-{
-}
-
-
-
 void DofMap::attach_matrix (SparseMatrix& matrix)
 {
   _matrix = &matrix;
@@ -83,23 +67,23 @@ void DofMap::reinit(MeshBase& mesh)
   const unsigned int dim    = mesh.mesh_dimension();
 
   // First set the number of variables for each \p DofObject
-  // equal to n_components()
+  // equal to n_components() for this system.
   {
     // All the nodes
     node_iterator       node_it  (mesh.nodes_begin());
     const node_iterator node_end (mesh.nodes_end());
 
     for ( ; node_it != node_end; ++node_it)
-      (*node_it)->set_n_vars(n_comp);
+      (*node_it)->set_n_vars(sys_number(),n_comp);
     
     // All the elements
     elem_iterator       elem_it (mesh.elements_begin());
     const elem_iterator elem_end(mesh.elements_end());
 
     for ( ; elem_it != elem_end; ++elem_it)
-      (*elem_it)->set_n_vars(n_comp);
+      (*elem_it)->set_n_vars(sys_number(),n_comp);
   }
-
+  
 
   
   for (unsigned int c=0; c<n_components(); c++)
@@ -121,16 +105,16 @@ void DofMap::reinit(MeshBase& mesh)
 	      const unsigned int dofs_at_node =
 		FEInterface::n_dofs_at_node(dim, fe_type, type, n);
 	      
-	      if (dofs_at_node > elem->get_node(n)->n_comp(c))
-		elem->get_node(n)->set_n_comp(c, dofs_at_node);
+	      if (dofs_at_node > elem->get_node(n)->n_comp(sys_number(),c))
+		elem->get_node(n)->set_n_comp(sys_number(), c, dofs_at_node);
 	    }
 	     
 	  // Allocate the element DOFs
 	  const unsigned int dofs_per_elem =
 	    FEInterface::n_dofs_per_elem(dim, fe_type, type);
 	  
-	  if (dofs_per_elem > elem->n_comp(c))
-	    elem->set_n_comp(c,dofs_per_elem);
+	  if (dofs_per_elem > elem->n_comp(sys_number(), c))
+	    elem->set_n_comp(sys_number(), c, dofs_per_elem);
 	}
     }
   
@@ -216,39 +200,39 @@ void DofMap::distribute_dofs(MeshBase& mesh)
 		  {
 		    Node* node = elem->get_node(n);
 		    
-		    for (unsigned int index=0; index<node->n_comp(comp); index++)
+		    for (unsigned int index=0; index<node->n_comp(sys_number(),comp); index++)
 		      {
 			// only assign a dof number if there isn't one
 			// already there
-			if (node->dof_number(comp,index) == DofObject::invalid_id)
+			if (node->dof_number(sys_number(),comp,index) == DofObject::invalid_id)
 			  {
-			    node->set_dof_number(comp, index, next_free_dof++);
+			    node->set_dof_number(sys_number(), comp, index, next_free_dof++);
 			    
 			    if (processor == proc_id)
-				_send_list.push_back(node->dof_number(comp,index));
+				_send_list.push_back(node->dof_number(sys_number(),comp,index));
 			  }
 			// if there is an entry there and it isn't on this
 			// processor it also needs to be added to the send list
-			else if (node->dof_number(comp,index) <
+			else if (node->dof_number(sys_number(),comp,index) <
 				 _first_df[proc_id])
 			  {
 			    if (processor == proc_id)
-			      _send_list.push_back(node->dof_number(comp,index));
+			      _send_list.push_back(node->dof_number(sys_number(),comp,index));
 			  }
 		      }
 		  }
 		  
 		// Now number the element DOFS
-		for (unsigned int index=0; index<elem->n_comp(comp); index++)
+		for (unsigned int index=0; index<elem->n_comp(sys_number(),comp); index++)
 		  {		  
 		    // No way we could have already numbered this DOF!
-		    assert (elem->dof_number(comp,index) ==
+		    assert (elem->dof_number(sys_number(),comp,index) ==
 			    DofObject::invalid_id);
 		    
-		    elem->set_dof_number(comp, index, next_free_dof++);
+		    elem->set_dof_number(sys_number(), comp, index, next_free_dof++);
 		    
 		    if (processor == proc_id)
-		      _send_list.push_back(elem->dof_number(comp,index));
+		      _send_list.push_back(elem->dof_number(sys_number(),comp,index));
 		  }
 	      }
       
@@ -513,22 +497,22 @@ void DofMap::dof_indices (const Elem* elem,
 	  {
 	    const Node* node = elem->get_node(n);
 	    
-	    for (unsigned int i=0; i<node->n_comp(c); i++)
+	    for (unsigned int i=0; i<node->n_comp(sys_number(),c); i++)
 	      {
-		assert (node->dof_number(c, i) !=
+		assert (node->dof_number(sys_number(), c, i) !=
 			DofObject::invalid_id);
 		
-		di.push_back(node->dof_number(c, i));
+		di.push_back(node->dof_number(sys_number(), c, i));
 	      }
 	  }
 	
 	// Get the element-based DOF numbers	  
-	for (unsigned int i=0; i<elem->n_comp(c); i++)
+	for (unsigned int i=0; i<elem->n_comp(sys_number(),c); i++)
 	  {
-	    assert (elem->dof_number(c, i) !=
+	    assert (elem->dof_number(sys_number(), c, i) !=
 		    DofObject::invalid_id);
 	    
-	    di.push_back(elem->dof_number(c, i));
+	    di.push_back(elem->dof_number(sys_number(), c, i));
 	  }
       }
 
@@ -598,7 +582,7 @@ void DofMap::create_dof_constraints(MeshBase& mesh)
 
 		      // My global node and dof indices.
 		      const Node* my_node          = my_side->get_node(my_dof);
-		      const unsigned int my_dof_g  = my_node->dof_number(component, 0);
+		      const unsigned int my_dof_g  = my_node->dof_number(sys_number(), component, 0);
 
 		      // The support point of the DOF
 		      const Point& support_point = my_side->point(my_dof);
@@ -617,7 +601,7 @@ void DofMap::create_dof_constraints(MeshBase& mesh)
 			  
 			  // Their global node and dof indices.
 			  const Node* their_node          = parent_side->get_node(their_dof);
-			  const unsigned int their_dof_g  = their_node->dof_number(component, 0);
+			  const unsigned int their_dof_g  = their_node->dof_number(sys_number(), component, 0);
 
 			  const Real their_dof_value = FEInterface::shape(dim-1,
 									  fe_type,

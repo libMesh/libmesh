@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.14 2003-02-14 15:22:43 benkirk Exp $
+// $Id: equation_systems.C,v 1.15 2003-02-14 22:37:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -78,7 +78,29 @@ void EquationSystems::clear ()
 
 void EquationSystems::init ()
 {
-  assert (!_systems.empty());
+  const unsigned int n_sys = n_systems();
+  
+  assert (n_sys != 0);
+
+  /**
+   * Tell all the \p DofObject entities how many systems
+   * there are.
+   */
+  {
+    // All the nodes
+    node_iterator       node_it  (_mesh.nodes_begin());
+    const node_iterator node_end (_mesh.nodes_end());
+    
+    for ( ; node_it != node_end; ++node_it)
+      (*node_it)->set_n_systems(n_sys);
+    
+    // All the elements
+    elem_iterator       elem_it (_mesh.elements_begin());
+    const elem_iterator elem_end(_mesh.elements_end());
+    
+    for ( ; elem_it != elem_end; ++elem_it)
+      (*elem_it)->set_n_systems(n_sys);
+  }
 
 
   for (std::map<std::string, GeneralSystem*>::iterator
@@ -98,29 +120,24 @@ void EquationSystems::add_system (const std::string& name)
 {
   if (!_systems.count(name))
     {
-      // Requires a number of temporaries
+      const unsigned int num = n_systems();
       
-//       GeneralSystem sd(*this, name);
-      
-//       std::pair<std::string, GeneralSystem>
-// 	kv(name, sd);
-      
-//       systems.insert (kv);
-      
-      // Requires no unnecessary temporaries
       _systems.insert (std::pair<std::string,
-	 	                 GeneralSystem*>(name,
+		                 GeneralSystem*>(name,
 						 new GeneralSystem(*this,
 								   name,
+								   num,
 								   _solver_package)
-					        )
-		      );
+						 )
+		       );
     }
   else
     {
-      std::cerr << "WARNING: There was already a system"
+      std::cerr << "ERROR: There was already a system"
 		<< " named " << name
 		<< std::endl;
+
+      error();
     }
 }
 

@@ -1,4 +1,4 @@
-// $Id: frequency_system.C,v 1.2 2003-02-13 22:56:08 benkirk Exp $
+// $Id: frequency_system.C,v 1.3 2003-02-14 22:37:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -34,10 +34,11 @@
 
 // ------------------------------------------------------------
 // FrequencySystem implementation
-FrequencySystem::FrequencySystem (EquationSystems& es,
-				  const std::string& name,
+FrequencySystem::FrequencySystem (EquationSystems&    es,
+				  const std::string&  name,
+				  const unsigned int  number,
 				  const SolverPackage solver_package) :
-  SystemBase       (es.get_mesh(), name, solver_package),
+  SystemBase       (es.get_mesh(), name, number, solver_package),
   init_system_fptr (NULL),
   assemble_fptr    (NULL),
   mass             (SparseMatrix::build (solver_package)),

@@ -1,4 +1,4 @@
-// $Id: general_system.h,v 1.3 2003-02-13 22:56:07 benkirk Exp $
+// $Id: general_system.h,v 1.4 2003-02-14 22:37:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -50,8 +50,9 @@ public:
    * Constructor.  Optionally initializes required
    * data structures.
    */
-  GeneralSystem (EquationSystems& es,
-		 const std::string& name,
+  GeneralSystem (EquationSystems&    es,
+		 const std::string&  name,
+		 const unsigned int  number,
 		 const SolverPackage solver_package);
 
   /**
@@ -342,7 +343,7 @@ Complex GeneralSystem::current_nodal_solution (const unsigned int node,
 					       const unsigned short int var,
 					       const unsigned int index) const
 {
-  return (*current_local_solution)(_mesh.node(node).dof_number(var, index));
+  return (*current_local_solution)(_mesh.node(node).dof_number(number(), var, index));
 }
 
 
@@ -363,7 +364,7 @@ Complex GeneralSystem::current_elem_solution (const unsigned int elem,
 					      const unsigned short int var,
 					      const unsigned int index) const
 {
-  return (*current_local_solution)(_mesh.elem(elem)->dof_number(var, index));
+  return (*current_local_solution)(_mesh.elem(elem)->dof_number(number(), var, index));
 }
 
 
@@ -404,7 +405,7 @@ Complex GeneralSystem::old_nodal_solution (const unsigned int node,
 					   const unsigned short int var,
 					   const unsigned int index) const
 {
-  return (*old_local_solution)(_mesh.node(node).dof_number(var, index));
+  return (*old_local_solution)(_mesh.node(node).dof_number(number(), var, index));
 }
 
 
@@ -424,7 +425,7 @@ Complex GeneralSystem::older_nodal_solution (const unsigned int node,
 					     const unsigned short int var,
 					     const unsigned int index) const
 {
-  return (*older_local_solution)(_mesh.node(node).dof_number(var, index));
+  return (*older_local_solution)(_mesh.node(node).dof_number(number(), var, index));
 }
 
 
@@ -444,7 +445,7 @@ Complex GeneralSystem::old_elem_solution (const unsigned int elem,
 					  const unsigned short int var,
 					  const unsigned int index) const
 {
-  return (*old_local_solution)(_mesh.elem(elem)->dof_number(var, index));
+  return (*old_local_solution)(_mesh.elem(elem)->dof_number(number(), var, index));
 }
 
 
@@ -464,7 +465,7 @@ Complex GeneralSystem::older_elem_solution (const unsigned int elem,
 					    const unsigned short int var,
 					    const unsigned int index) const
 {
-  return (*older_local_solution)(_mesh.elem(elem)->dof_number(var, index));
+  return (*older_local_solution)(_mesh.elem(elem)->dof_number(number(), var, index));
 }
 
 

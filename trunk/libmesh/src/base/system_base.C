@@ -1,4 +1,4 @@
-// $Id: system_base.C,v 1.4 2003-02-14 15:22:48 benkirk Exp $
+// $Id: system_base.C,v 1.5 2003-02-14 22:37:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -34,7 +34,8 @@
 // SystemBase implementation
 
 SystemBase::SystemBase (Mesh& mesh,
-			const std::string& name,
+			const std::string&  name,
+			const unsigned int  number,
 			const SolverPackage solver_package) :
   
   solution                (NumericVector::build(solver_package)),
@@ -42,6 +43,8 @@ SystemBase::SystemBase (Mesh& mesh,
   matrix                  (SparseMatrix::build (solver_package)),
   linear_solver_interface (LinearSolverInterface::build(solver_package)),
   _sys_name               (name),
+  _sys_number             (number),
+  _dof_map                (number),
   _mesh                   (mesh)
 {
 }
