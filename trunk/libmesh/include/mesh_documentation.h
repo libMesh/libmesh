@@ -11,9 +11,9 @@
  * providing a friendly interface to a number of high-quality software
  * packages that are currently available.  Currently the library
  * supports 2D and 3D steady and transient finite element simulations.
- * \p PETSc (http://www-fp.mcs.anl.gov/petsc) is currently used for
- * the solution of linear systems on both serial and parallel
- * platforms, and \p LASPACK is included with the library to provide
+ * <a href="http://www-fp.mcs.anl.gov/petsc"> PETSc </a> is
+ * currently used for the solution of linear systems on both serial and
+ * parallel platforms, and \p LASPACK is included with the library to provide
  * linear solver support on serial machines.
  *
  * A major goal of the library is to provide support for adaptive mesh
@@ -81,12 +81,14 @@
  *     - extract the mesh boundary for BC handling or as a separate mesh
  *
  * \p libMesh is actively developed at The University of Texas at
- * Austin in the CFDLab and at Technische Universit&auml;t Hamburg-Harburg,
- * Mechanics and Ocean Engineering in Germany.  Many thanks to SourceForge 
- * for hosting the project at http://sourceforge.net/projects/libmesh
+ * Austin in the <a href="http://cfdlab.ae.utexas.edu">CFDLab</a>
+ * and at Technische Universit&auml;t Hamburg-Harburg,
+ * Mechanics and Ocean Engineering in Germany.  Many thanks to
+ * <a href="http://sourceforge.net> SourceForge </a>
+ * for <a href="http://sourceforge.net/projects/libmesh"> hosting the project</a>. 
  * You can find out what is currently happening in the development branch
- * by checking out the online CVS logs at
- * http://libmesh.sourceforge.net/cvshtml
+ * by checking out the online CVS logs <a href="http://libmesh.sourceforge.net/cvshtml">
+ * here</a>.
  *
  *
  * \section install Installation
@@ -95,8 +97,9 @@
  *
  * \subsection getsoftware Getting the Software
  *
- * The \p libMesh source can be downloaded from the project's SourceForge
- * homepage: http://sourceforge.net/projects/libmesh  Stable releases are
+ * The \p libMesh source can be downloaded from the project's
+ * <a href="http://sourceforge.net/projects/libmesh">SourceForge
+ * homepage</a>.   Stable releases are
  * located there as compressed tar archives. You may also access the CVS
  * source tree for the latest code.  You can get read-only access to the
  * CVS repository via:
@@ -197,8 +200,8 @@
      make run_examples \endverbatim
  *
  * Note that the example programs all create output in the \p GMV
- * format, since you can download \p GMV for free from Los Alamos National
- * Lab at http://laws.lanl.gov/XCM/gmv/GMVHome.html  It is a simple
+ * format, since you can <a href="http://laws.lanl.gov/XCM/gmv/GMVHome.html">download GMV</a>
+ * for free from Los Alamos National Lab.  It is a simple
  * matter to change the source in the example to write a different format,
  * just replace the \p write_gmv function call with whatever you like.
  *

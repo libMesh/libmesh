@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# This script uploads documentation to sourceforge
+
+
+rsync -azve ssh ./doc/html/ libmesh.sourceforge.net:/home/groups/l/li/libmesh/htdocs

@@ -407,7 +407,7 @@ HTML_OUTPUT            =
 # each generated HTML page. If it is left blank doxygen will generate a 
 # standard header.
 
-HTML_HEADER            = 
+HTML_HEADER            = ./doc/header.html
 
 # The HTML_FOOTER tag can be used to specify a personal HTML footer for 
 # each generated HTML page. If it is left blank doxygen will generate a 
@@ -420,7 +420,7 @@ HTML_FOOTER            = ./doc/footer.html
 # fine-tune the look of the HTML output. If the tag is left blank doxygen 
 # will generate a default style sheet
 
-HTML_STYLESHEET        = 
+HTML_STYLESHEET        = ./doc/stylesheet.css
 
 # If the HTML_ALIGN_MEMBERS tag is set to YES, the members of classes, 
 # files or namespaces will be aligned in HTML using tables. If set to 
@@ -521,7 +521,7 @@ LATEX_HEADER           =
 # contain links (just like the HTML output) instead of page references 
 # This makes the output suitable for online browsing using a pdf viewer.
 
-PDF_HYPERLINKS         = YES
+PDF_HYPERLINKS         = NO
 
 # If the USE_PDFLATEX tag is set to YES, pdflatex will be used instead of 
 # plain latex in the generated Makefile. Set this option to YES to get a 
@@ -614,7 +614,7 @@ MAN_LINKS              = NO
 # evaluate all C-preprocessor directives found in the sources and include 
 # files.
 
-ENABLE_PREPROCESSING   = YES
+ENABLE_PREPROCESSING   = NO
 
 # If the MACRO_EXPANSION tag is set to YES Doxygen will expand all macro 
 # names in the source code. If set to NO (the default) only conditional 
