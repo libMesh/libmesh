@@ -10,13 +10,12 @@ extern "C" {
 
 #define MIN(a,b) ((a)<(b)?(a):(b))
 #define MAX(a,b) ((a)>(b)?(a):(b))
-#define INT unsigned
 
 struct m_str {
   double x;
   double y;
   double z;
-  INT index[3];
+  unsigned int index[3];
   int table;
 };
 
@@ -24,7 +23,7 @@ struct m_str {
 /*--------------------- Prototypes ---------------------------*/
 void hsfc3d(unsigned coord[], unsigned * nkey, unsigned   key[]);   
 
-void interleave(double x, double y, double z, double deg, INT index[3]);
+void interleave(double x, double y, double z, double deg, unsigned int index[3]);
 
 int cmp_indx(const void *a, const void *b);
  
