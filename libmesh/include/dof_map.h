@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.21 2003-03-20 11:51:23 ddreyer Exp $
+// $Id: dof_map.h,v 1.22 2003-04-02 14:55:02 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -96,7 +96,7 @@ public:
   /** 
    * The constraint matrix storage format. 
    */
-  typedef std::map <unsigned int, DofConstraintRow> DofConstraints;
+  typedef std::map<unsigned int, DofConstraintRow> DofConstraints;
 
 #endif
 

@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.15 2003-04-01 14:19:47 ddreyer Exp $
+// $Id: fe.h,v 1.16 2003-04-02 14:55:03 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -52,7 +52,7 @@ class InfFE;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.15 $
+ * \version $Revision: 1.16 $
  */
 
 //-------------------------------------------------------------
@@ -198,7 +198,19 @@ public:
    */
   unsigned int n_quadrature_points () const;
 
-    
+  /**
+   * Computes the constraint matrix contributions (for
+   * non-conforming adapted meshes) corresponding to 
+   * variable number \p var_number.
+   */
+  static void compute_constraints (std::map<unsigned int,
+				            std::map<unsigned int,
+				                     float> > & constraints,
+				   const unsigned int system_number,
+				   const unsigned int variable_number,
+				   const FEType& fe_t,
+				   const Elem* elem);
+  
 #ifdef ENABLE_INFINITE_ELEMENTS
 
 protected:
@@ -282,7 +294,7 @@ private:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.15 $
+ * \version $Revision: 1.16 $
  */
 
 //-------------------------------------------------------------
@@ -307,7 +319,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.15 $
+ * \version $Revision: 1.16 $
  */
 
 //-------------------------------------------------------------
@@ -332,7 +344,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.15 $
+ * \version $Revision: 1.16 $
  */
 
 //-------------------------------------------------------------
