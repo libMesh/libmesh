@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism6.h,v 1.3 2004-07-14 19:23:17 jwpeterson Exp $
+// $Id: cell_inf_prism6.h,v 1.4 2004-11-15 22:09:11 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -105,8 +105,8 @@ public:
 // 			std::vector<unsigned int>*) const
 //   { error(); }
   
-  unsigned int vtk_element_type (const unsigned int) const
-  { return 13; }
+//   unsigned int vtk_element_type (const unsigned int) const
+//   { return 13; }
 
   /**
    * @returns \p true when this element contains the point

@@ -1,4 +1,4 @@
-// $Id: dof_object.h,v 1.6 2004-08-17 03:03:46 benkirk Exp $
+// $Id: dof_object.h,v 1.7 2004-11-15 22:09:10 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -48,7 +48,7 @@
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.6 $
+ * \version $Revision: 1.7 $
  */
 
 class DofObject
@@ -160,12 +160,12 @@ public:
    * @returns the processor that this element belongs to as a
    * writeable reference.
    */
-  unsigned short int & set_processor_id ();
+  unsigned short int & processor_id ();
 
   /**
    * Sets the \p processor_id for this \p DofObject.
    */  
-  void set_processor_id (const unsigned int id);
+  void processor_id (const unsigned int id);
 
   /**
    * @returns \p true if this \p DofObject has a valid \p id set,
@@ -459,7 +459,7 @@ void DofObject::invalidate_id ()
 inline
 void DofObject::invalidate_processor_id ()
 {
-  this->set_processor_id (invalid_processor_id);
+  this->processor_id (invalid_processor_id);
 }
 
 
@@ -593,7 +593,7 @@ unsigned short int DofObject::processor_id () const
 
 
 inline
-unsigned short int & DofObject::set_processor_id ()
+unsigned short int & DofObject::processor_id ()
 {
   return _processor_id;
 }
@@ -601,7 +601,7 @@ unsigned short int & DofObject::set_processor_id ()
 
 
 inline
-void DofObject::set_processor_id (const unsigned int id)
+void DofObject::processor_id (const unsigned int id)
 {
 #ifdef DEBUG
   
@@ -615,7 +615,7 @@ void DofObject::set_processor_id (const unsigned int id)
 
 #endif
   
-  this->set_processor_id() = id;
+  this->processor_id() = id;
 }
 
 

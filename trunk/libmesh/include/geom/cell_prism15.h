@@ -1,4 +1,4 @@
-// $Id: cell_prism15.h,v 1.3 2004-07-14 19:23:17 jwpeterson Exp $
+// $Id: cell_prism15.h,v 1.4 2004-11-15 22:09:11 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -115,8 +115,8 @@ public:
 //   void vtk_connectivity(const unsigned int sc,
 // 			std::vector<unsigned int> *conn = NULL) const;
   
-  unsigned int vtk_element_type (const unsigned int) const
-  { return 13; }
+//   unsigned int vtk_element_type (const unsigned int) const
+//   { return 13; }
 
   /**
    * @returns 2 for all \p n

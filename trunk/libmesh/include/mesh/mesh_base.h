@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.36 2004-11-14 18:51:58 jwpeterson Exp $
+// $Id: mesh_base.h,v 1.37 2004-11-15 22:09:12 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -41,7 +41,6 @@ class EquationSystems;
 #include "boundary_info.h"
 #include "node.h"
 #include "enum_elem_type.h"
-#include "sphere.h"
 #include "enum_order.h"
 #include "partitioner.h"
 #include "variant_filter_iterator.h"
@@ -62,9 +61,9 @@ class EquationSystems;
  * Furthermore, this class provides functions for reading and writing a
  * mesh to disk in various formats.
  *
- * \author Benjamin S. Kirk
- * \date 2002-2003
- * \version $Revision: 1.36 $
+ * \author  Benjamin S. Kirk
+ * \date    $Date: 2004-11-15 22:09:12 $
+ * \version $Revision: 1.37 $
  */
 
 
@@ -204,14 +203,6 @@ public:
    * Same, but only counts active elements.
    */
   unsigned int n_active_sub_elem () const;
-
-  /**
-   * This function returns the sum over all the elemenents of the number
-   * of nodes per element.  This can be useful for partitioning hybrid meshes.
-   * A feasible load balancing scheme is to keep the weight per processor as
-   * uniform as possible.
-   */
-  unsigned int total_weight () const;
   
   /**
    * Return a constant reference (for reading only) to the
@@ -276,22 +267,6 @@ public:
   void find_neighbors ();
   
   /**
-   * After calling this function the input vector \p nodes_to_elem_map
-   * will contain the node to element connectivity.  That is to say
-   * \p nodes_to_elem_map[i][j] is the global number of \f$ j^{th} \f$
-   * element connected to node \p i.
-   */
-  void build_nodes_to_elem_map (std::vector<std::vector<unsigned int> >&
-				nodes_to_elem_map) const;
-  
-  /**
-   * The same, except element pointers are returned instead of indices.
-   */
-  void build_nodes_to_elem_map (std::vector<std::vector<const Elem*> >&
-				nodes_to_elem_map) const;
-
-
-  /**
    * Calling this function on a 2D mesh will convert all the elements
    * to triangles.  \p QUAD4s will be converted to \p TRI3s, \p QUAD8s
    * and \p QUAD9s will be converted to \p TRI6s. 
@@ -309,78 +284,6 @@ public:
    * does just that.
    */
   void renumber_nodes_and_elements ();    
-
-  /**
-   * Randomly perturb the nodal locations.  This function will
-   * move each node \p factor fraction of its minimum neighboring
-   * node separation distance.  Nodes on the boundary are not moved
-   * by default, however they may be by setting the flag
-   * \p perturb_boundary true.
-   */
-  void distort (const Real factor, const bool perturb_boundary=false);
-  
-  /**
-   * Translates the mesh.  The grid points are translated in the
-   * \p x direction by \p xt, in the \p y direction by \p yt,
-   * etc...
-   */
-  void translate (const Real xt=0., const Real yt=0., const Real zt=0.); 
-
-  /**
-   * Rotates the mesh.  The grid points are rotated about the 
-   * \p x axis by \p xr , about the \p y axis by \p yr,
-   * etc...  
-   */
-  void rotate (const Real xr, const Real yr=0., const Real zr=0.); 
-
-  /**
-   * Scales the mesh.  The grid points are scaled in the
-   * \p x direction by \p xs, in the \p y direction by \p ys,
-   * etc...  If only \p xs is specified then the scaling is
-   * assumed uniform in all directions.
-   */
-  void scale (const Real xs, const Real ys=0., const Real zs=0.);
-    
-  /**
-   * @returns two points defining a cartesian box that bounds the
-   * mesh.  The first entry in the pair is the mininum, the second 
-   * is the maximim.
-   */
-  std::pair<Point, Point> bounding_box () const;
-
-  /**
-   * Same, but returns a sphere instead of a box.
-   */
-  Sphere bounding_sphere () const;
-  
-  /**
-   * @returns two points defining a cartesian box that bounds the
-   * elements belonging to processor pid.  If no processor id is specified
-   * the bounding box for the whole mesh is returned.
-   */
-  std::pair<Point, Point> 
-  processor_bounding_box (const unsigned int pid = libMesh::invalid_uint) const;
-
-  /**
-   * Same, but returns a sphere instead of a box.
-   */
-  Sphere 
-  processor_bounding_sphere (const unsigned int pid = libMesh::invalid_uint) const;
-
-  /**
-   * @returns two points defining a Cartesian box that bounds the
-   * elements belonging to subdomain sid.  If no subdomain id is specified
-   * the bounding box for the whole mesh is returned.
-   */
-  std::pair<Point, Point> 
-  subdomain_bounding_box (const unsigned int sid = libMesh::invalid_uint) const;
-
-  /**
-   * Same, but returns a sphere instead of a box.
-   */
-  Sphere 
-  subdomain_bounding_sphere (const unsigned int pid = libMesh::invalid_uint) const;
-
 
 //   /**
 //    * Builds the connectivity graph. The matrix \p conn is such that the
@@ -566,12 +469,6 @@ public:
 
   
 
-  
-  /**
-   * Fills the vector "on_boundary" with flags that tell whether each node
-   * is on the domain boundary (true)) or not (false).
-   */
-  void find_boundary_nodes(std::vector<bool>& on_boundary) const;
   
   /**
    * Prepare a newly created (or read) mesh for use.

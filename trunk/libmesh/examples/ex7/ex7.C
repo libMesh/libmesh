@@ -1,4 +1,4 @@
-/* $Id: ex7.C,v 1.33 2004-11-08 00:11:02 jwpeterson Exp $ */
+/* $Id: ex7.C,v 1.34 2004-11-15 22:09:09 benkirk Exp $ */
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
 
@@ -44,6 +44,7 @@
 #include "libmesh.h"
 #include "libmesh_logging.h"
 #include "mesh.h"
+#include "mesh_generation.h"
 #include "gmv_io.h"
 #include "equation_systems.h"
 
@@ -157,10 +158,11 @@ int main (int argc, char** argv)
     // Use the internal mesh generator to create a uniform
     // grid on the square [-1,1]^2.  We instruct the mesh generator
     // to build a mesh of n x n Quad9 elements.
-    mesh.build_square (n_el_per_dim, n_el_per_dim,
-		       -1., 1.,
-		       -1., 1.,
-		       QUAD9);
+    MeshTools::Generation::build_square (mesh,
+					 n_el_per_dim, n_el_per_dim,
+					 -1., 1.,
+					 -1., 1.,
+					 QUAD9);
     
     // Print information about the mesh to the screen.
     mesh.print_info();

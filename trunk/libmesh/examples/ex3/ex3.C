@@ -1,4 +1,4 @@
-/* $Id: ex3.C,v 1.29 2004-11-08 00:11:00 jwpeterson Exp $ */
+/* $Id: ex3.C,v 1.30 2004-11-15 22:09:07 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -36,6 +36,7 @@
 // Basic include files needed for the mesh functionality.
 #include "libmesh.h"
 #include "mesh.h"
+#include "mesh_generation.h"
 #include "gmv_io.h"
 #include "implicit_system.h"
 #include "equation_systems.h"
@@ -94,15 +95,16 @@ int main (int argc, char** argv)
     Mesh mesh (2);
     
     
-    // Use the internal mesh generator to create a uniform
+    // Use the MeshTools::Generation mesh generator to create a uniform
     // grid on the square [-1,1]^2.  We instruct the mesh generator
     // to build a mesh of 15x15 QUAD9 elements.  Building QUAD9
     // elements instead of the default QUAD4's we used in example 2
     // allow us to use higher-order approximation.
-    mesh.build_square (15, 15,
-		       -1., 1.,
-		       -1., 1.,
-		       QUAD9);
+    MeshTools::Generation::build_square (mesh, 
+					 15, 15,
+					 -1., 1.,
+					 -1., 1.,
+					 QUAD9);
 
     // Print information about the mesh to the screen.
     // Note that 5x5 QUAD9 elements actually has 11x11 nodes,

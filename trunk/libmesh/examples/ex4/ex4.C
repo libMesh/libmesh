@@ -1,4 +1,4 @@
-/* $Id: ex4.C,v 1.39 2004-11-08 00:11:01 jwpeterson Exp $ */
+/* $Id: ex4.C,v 1.40 2004-11-15 22:09:07 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -45,6 +45,7 @@
 // Basic include file needed for the mesh functionality.
 #include "libmesh.h"
 #include "mesh.h"
+#include "mesh_generation.h"
 #include "gmv_io.h"
 #include "implicit_system.h"
 #include "equation_systems.h"
@@ -126,22 +127,22 @@ int main (int argc, char** argv)
     
     // Get the problem size from argv[4]
     const unsigned int ps = atoi(argv[4]);
-    // std::cout << "problem_size=" << ps << std::endl;
     
     // Create a mesh with user-defined dimension.
     Mesh mesh (dim);
     
 
-    // Use the internal mesh generator to create a uniform
+    // Use the MeshTools::Generation mesh generator to create a uniform
     // grid on the square [-1,1]^D.  We instruct the mesh generator
     // to build a mesh of 8x8 \p Quad9 elements in 2D, or \p Hex27
     // elements in 3D.  Building these higher-order elements allows
     // us to use higher-order approximation, as in example 3.
-    mesh.build_cube (ps, ps, ps,
-		     -1., 1.,
-		     -1., 1.,
-		     -1., 1.,
-		     (dim == 2) ? QUAD9 : HEX27);
+    MeshTools::Generation::build_cube (mesh,
+				       ps, ps, ps,
+				       -1., 1.,
+				       -1., 1.,
+				       -1., 1.,
+				       (dim == 2) ? QUAD9 : HEX27);
 
     // Print information about the mesh to the screen.
     mesh.print_info();

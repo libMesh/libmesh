@@ -1,4 +1,4 @@
-// $Id: face_inf_quad.h,v 1.3 2004-10-25 21:49:24 benkirk Exp $
+// $Id: face_inf_quad.h,v 1.4 2004-11-15 22:09:11 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -64,17 +64,28 @@ public:
   /**
    * Constructor.  Derived classes implement 'true' elements.
    */
-  InfQuad (const unsigned int nn, const Elem* p);
+  InfQuad (const unsigned int nn,
+	   const Elem* p) :
+    Elem(nn, InfQuad::n_sides(), p) {}
 
+  /**
+   * Constructor.  Explicitly specifies the number of
+   * nodes and neighbors for which storage will be allocated.
+   */
+  InfQuad (const unsigned int nn,
+	   const unsigned int ns,
+	   const Elem* p) :
+    Elem(nn, ns, p) {}
+ 
   /**
    * @returns 2, the dimensionality of the object.
    */
   unsigned int dim() const { return 2; }
 
-  /**
-   * @returns 2 for the base, 1 otherwise
-   */
-  unsigned int n_children_per_side(const unsigned int s) const;
+//   /**
+//    * @returns 2 for the base, 1 otherwise
+//    */
+//   unsigned int n_children_per_side(const unsigned int s) const;
 
   /**
    * @returns 3.  Infinite faces have one side less
@@ -148,30 +159,22 @@ public:
 
 // ------------------------------------------------------------
 // InfQuad class member functions
-inline
-InfQuad::InfQuad(const unsigned int nn, const Elem* p) :
-  Elem(nn, InfQuad::n_sides(), p) 
-{
-}
+// inline
+// unsigned int InfQuad::n_children_per_side(const unsigned int s) const
+// {
+//   assert (s < this->n_sides());
 
+//   switch (s)
+//   {
+//     case 0:
+//       // every infinite face has 2 children in the base edge
+//       return 2;
 
-
-inline
-unsigned int InfQuad::n_children_per_side(const unsigned int s) const
-{
-  assert (s < this->n_sides());
-
-  switch (s)
-  {
-    case 0:
-      // every infinite face has 2 children in the base edge
-      return 2;
-
-    default:
-      // on infinite edges only 1 child
-      return 1;
-  }
-}
+//     default:
+//       // on infinite edges only 1 child
+//       return 1;
+//   }
+// }
 
 
 

@@ -1,4 +1,4 @@
-// $Id: mesh.h,v 1.10 2004-11-12 20:55:19 benkirk Exp $
+// $Id: mesh.h,v 1.11 2004-11-15 22:09:12 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -60,35 +60,35 @@ class Mesh : public MeshBase
    */
   ~Mesh();
 
-  /**
-   * Builds a \f$ nx \times ny \times nz \f$ (elements) cube.
-   * Defaults to a unit cube (or line in 1D, square in 2D),
-   * but the dimensions can be specified through the optional
-   * arguments.
-   */  
-  void build_cube (const unsigned int nx=0,
-		   const unsigned int ny=0,
-		   const unsigned int nz=0,
-		   const Real xmin=0., const Real xmax=1.,
-		   const Real ymin=0., const Real ymax=1.,
-		   const Real zmin=0., const Real zmax=1.,
-		   const ElemType type=INVALID_ELEM);
+//   /**
+//    * Builds a \f$ nx \times ny \times nz \f$ (elements) cube.
+//    * Defaults to a unit cube (or line in 1D, square in 2D),
+//    * but the dimensions can be specified through the optional
+//    * arguments.
+//    */  
+//   void build_cube (const unsigned int nx=0,
+// 		   const unsigned int ny=0,
+// 		   const unsigned int nz=0,
+// 		   const Real xmin=0., const Real xmax=1.,
+// 		   const Real ymin=0., const Real ymax=1.,
+// 		   const Real zmin=0., const Real zmax=1.,
+// 		   const ElemType type=INVALID_ELEM);
 
-  /**
-   * A specialized \p build_cube() for 2D meshes.
-   */
-  void build_square (const unsigned int nx,
-		     const unsigned int ny,
-		     const Real xmin=0., const Real xmax=1.,
-		     const Real ymin=0., const Real ymax=1.,
-		     const ElemType type=INVALID_ELEM);
+//   /**
+//    * A specialized \p build_cube() for 2D meshes.
+//    */
+//   void build_square (const unsigned int nx,
+// 		     const unsigned int ny,
+// 		     const Real xmin=0., const Real xmax=1.,
+// 		     const Real ymin=0., const Real ymax=1.,
+// 		     const ElemType type=INVALID_ELEM);
 
-  /**
-   * Meshes a spherical or mapped-spherical domain.
-   */
-  void build_sphere (const Real rad=1,
-		     const unsigned int nr=2,
-		     const ElemType type=INVALID_ELEM);
+//   /**
+//    * Meshes a spherical or mapped-spherical domain.
+//    */
+//   void build_sphere (const Real rad=1,
+// 		     const unsigned int nr=2,
+// 		     const ElemType type=INVALID_ELEM);
 
   /**
    * Reads the file specified by \p name.  Attempts to figure out the

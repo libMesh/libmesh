@@ -24,14 +24,13 @@ ex12.$(obj-suffix):\
     ../../include/fe/fe_type.h\
     ../../include/geom/elem.h\
     ../../include/geom/point.h\
-    ../../include/geom/sphere.h\
-    ../../include/geom/surface.h\
     ../../include/mesh/boundary_info.h\
     ../../include/mesh/gmv_io.h\
     ../../include/mesh/mesh.h\
     ../../include/mesh/mesh_base.h\
     ../../include/mesh/mesh_data.h\
     ../../include/mesh/mesh_io.h\
+    ../../include/mesh/mesh_tools.h\
     ../../include/mesh/unv_io.h\
     ../../include/numerics/coupling_matrix.h\
     ../../include/numerics/numeric_vector.h\

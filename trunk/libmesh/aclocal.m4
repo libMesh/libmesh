@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.73 2004-11-14 03:50:29 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.74 2004-11-15 22:08:39 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -126,11 +126,28 @@ AC_DEFUN(DETERMINE_CXX_BRAND, dnl
           esac
         else	
   	
-          dnl Intel's ECC C++ compiler for Itanium?
+          dnl Intel's ICC C++ compiler for Itanium?
           is_intel_ecc="`($CXX -V 2>&1) | grep 'Intel(R) C++ Itanium(R) Compiler'`"
           if test "x$is_intel_ecc" != "x" ; then
-            AC_MSG_RESULT(<<< C++ compiler is Intel Itanium ECC >>>)
-            GXX_VERSION=intel_ecc
+            GXX_VERSION_STRING="`($CXX -V -help 2>&1) | grep 'Version '`"
+            case "$GXX_VERSION_STRING" in
+              *8.1*)
+                AC_MSG_RESULT(<<< C++ compiler is Intel Itanium ICC 8.1 >>>)
+  	        GXX_VERSION=intel_itanium_icc_v8.1
+                ;;
+              *8.0*)
+                AC_MSG_RESULT(<<< C++ compiler is Intel Itanium ICC 8.0 >>>)
+  	        GXX_VERSION=intel_itanium_icc_v8.0
+                ;;
+              *7.1*)
+                AC_MSG_RESULT(<<< C++ compiler is Intel Itanium ICC 7.1 >>>)
+  	        GXX_VERSION=intel_itanium_icc_v7.1
+                ;;
+              *7.0*)
+                AC_MSG_RESULT(<<< C++ compiler is Intel Itanium ICC 7.0 >>>)
+  	        GXX_VERSION=intel_itanium_icc_v7.0
+                ;;
+            esac
           else
   	
             dnl Or Compaq's cxx compiler?
@@ -422,8 +439,42 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
             LDFLAGS="$LDFLAGS -KPIC"
           fi
           ;;
-  
-      intel_ecc)
+
+      dnl Intel Itanium ICC >= v8.1
+      intel_itanium_icc_v8.1)
+          dnl Disable some warning messages:
+          dnl #266: 'function declared implicitly'
+          dnl       Metis function "GKfree" caused this error
+          dnl       in almost every file.
+	  dnl #1505: 'size of class is affected by tail padding'
+          dnl        simply warns of a possible incompatibility with
+          dnl        the g++ ABI for this case
+          dnl #1572: 'floating-point equality and inequality comparisons are unreliable'
+          dnl        Well, duh, when the tested value is computed...  OK when it
+          dnl        was from an assignment.
+          CXXFLAGSG="-Kc++eh -Krtti -w1 -DDEBUG -inline_debug_info -g -wd1572 -wd1505"
+          CXXFLAGSO="-Kc++eh -Krtti -O2 -DNDEBUG -unroll -w0 -ftz -vec_report0 -par_report0 -openmp_report0"
+          CXXFLAGSP="$CXXFLAGSO -g -pg"
+          CFLAGSG="-w1 -DDEBUG -inline_debug_info -wd266 -wd1572"
+          CFLAGSO="-O2 -DNDEBUG -unroll -w0 -ftz -vec_report0 -par_report0 -openmp_report0"
+          CFLAGSP="$CFLAGSO -g -pg"
+
+          dnl Position-independent code for shared libraries
+          if test "$enableshared" = yes ; then
+            CXXFLAGSO="$CXXFLAGSO -KPIC"
+            CXXFLAGSG="$CXXFLAGSG -KPIC"
+            CXXFLAGSP="$CXXFLAGSP -KPIC"
+
+            CFLAGSO="$CFLAGSO -KPIC"
+            CFLAGSG="$CFLAGSG -KPIC"
+            CFLAGSP="$CFLAGSP -KPIC"
+
+            LDFLAGS="$LDFLAGS -KPIC"
+          fi
+          ;;
+
+      dnl Intel Itanium ICC < v8.1
+      intel_itanium_icc*)
           dnl Disable some warning messages:
           dnl #266: 'function declared implicitly'
           dnl       Metis function "GKfree" caused this error
