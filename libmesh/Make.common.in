@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.9 2003-02-04 00:49:08 benkirk Exp $
+# $Id: Make.common.in,v 1.10 2003-02-04 16:29:49 benkirk Exp $
 
 
 ###############################################################################
@@ -47,21 +47,21 @@ endif
 # If METHOD=dbg, compile in debug mode.
 ifeq ($(METHOD),dbg)
   debug-mode := on
-  obj-suffix := @host@.go
+  obj-suffix := @host@.g.o
 endif
 
 #
 # If METHOD=pro, compile in profiler mode
 ifeq ($(METHOD),pro)
   prof-mode  := on
-  obj-suffix := @host@.pgo
+  obj-suffix := @host@.pg.o
 endif
 
 #
 # If METHOD=syn, compile in syntax-checking mode
 ifeq ($(METHOD),syn)
   syn-mode  := on
-  obj-suffix := @host@.syo
+  obj-suffix := @host@.sy.o
 endif
 
 #
@@ -325,21 +325,21 @@ endif
 #
 # How to compile C++ with debugging flags
 #
-%.@host@.go : %.C
+%.@host@.g.o : %.C
 	@echo "Compiling (in debug mode) "$<"..."
 	@$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
 
 #
 # How to compile C++ with profiling flags
 #
-%.@host@.pgo : %.C
+%.@host@.pg.o : %.C
 	@echo "Compiling (in profiler mode) "$<"..."
 	@$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
 
 #
 # How to compile C++ with syntax-checking flags
 #
-%.@host@.syo : %.C
+%.@host@.sy.o : %.C
 	@echo "Compiling (in syntax-checker mode) "$<"..."
 	@$(CXX) $(CXXFLAGS) $(INCLUDE) -c $<
 	$(shell touch $@)
@@ -359,21 +359,21 @@ endif
 #
 # How to compile C with debugging flags
 #
-%.@host@.go : %.c
+%.@host@.g.o : %.c
 	@echo "Compiling (in debug mode) "$<"..."
 	@$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
 
 #
 # How to compile C with profiling flags
 #
-%.@host@.pgo : %.c
+%.@host@.pg.o : %.c
 	@echo "Compiling (in profiler mode) "$<"..."
 	@$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
 
 #
 # How to compile C with profiling flags
 #
-%.@host@.syo : %.c
+%.@host@.sy.o : %.c
 	@echo "Compiling (in syntax-checker mode) "$<"..."
 	@$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
 	$(shell touch $@)

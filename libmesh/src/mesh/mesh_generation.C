@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.7 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: mesh_generation.C,v 1.8 2003-02-04 16:29:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -111,10 +111,13 @@ void Mesh::build_cube(const unsigned int nx,
 	    
 	    for (unsigned int j=0; j<=ny; j++)
 	      for (unsigned int i=0; i<=nx; i++)
-		node_ptr(p) = Node::build((Real) ((Real) i)/((Real) nx),
-					  (Real) ((Real) j)/((Real) ny),
-					  0,
-					  p++);
+		{
+		  node_ptr(p) = Node::build((Real) ((Real) i)/((Real) nx),
+					    (Real) ((Real) j)/((Real) ny),
+					    0,
+					    p);
+		  p++;
+		};
 	    
 	    unsigned int e=0;
 	    
@@ -161,10 +164,13 @@ void Mesh::build_cube(const unsigned int nx,
 	    
 	    for (unsigned int j=0; j<=ny; j++)
 	      for (unsigned int i=0; i<=nx; i++)
-		node_ptr(p) = Node::build((Real) ((Real) i)/((Real) nx),
-					  (Real) ((Real) j)/((Real) ny),
-					  0,
-					  p++);
+		{
+		  node_ptr(p) = Node::build((Real) ((Real) i)/((Real) nx),
+					    (Real) ((Real) j)/((Real) ny),
+					    0,
+					    p);
+		  p++;
+		};
 	    
 	    unsigned int e=0;
 	    
@@ -207,10 +213,13 @@ void Mesh::build_cube(const unsigned int nx,
 	    
 	    for (unsigned int j=0; j<=(2*ny); j++)
 	      for (unsigned int i=0; i<=(2*nx); i++)
-		node_ptr(p) = Node::build((Real) ((Real) i)/((Real) (2*nx)),
-					  (Real) ((Real) j)/((Real) (2*ny)),
-					  0,
-					  p++);
+		{
+		  node_ptr(p) = Node::build((Real) ((Real) i)/((Real) (2*nx)),
+					    (Real) ((Real) j)/((Real) (2*ny)),
+					    0,
+					    p);
+		  p++;
+		};
 	    
 	    unsigned int e=0;
 	    
@@ -240,13 +249,13 @@ void Mesh::build_cube(const unsigned int nx,
 		  if (j == 0)
 		    boundary_info.add_side(elem(e), 0, 0);
 		  
-		  else if (j == (ny-1))
+		  else if (j == (2*ny-1))
 		    boundary_info.add_side(elem(e), 2, 2);
 		  
 		  if (i == 0)
 		    boundary_info.add_side(elem(e), 3, 3);
 		  
-		  else if (i == (nx-1))
+		  else if (i == (2*nx-1))
 		    boundary_info.add_side(elem(e), 1, 1);
 		  
 		  e++;
@@ -266,10 +275,13 @@ void Mesh::build_cube(const unsigned int nx,
 	    
 	    for (unsigned int j=0; j<=(2*ny); j++)
 	      for (unsigned int i=0; i<=(2*nx); i++)
-		node_ptr(p) = Node::build((Real) ((Real) i)/((Real) (2*nx)),
-					  (Real) ((Real) j)/((Real) (2*ny)),
-					  0,
-					  p++);
+		{
+		  node_ptr(p) = Node::build((Real) ((Real) i)/((Real) (2*nx)),
+					    (Real) ((Real) j)/((Real) (2*ny)),
+					    0,
+					    p);
+		  p++;
+		};
 	    
 	    unsigned int e=0;
 	    
@@ -353,10 +365,13 @@ void Mesh::build_cube(const unsigned int nx,
 	    for (unsigned int k=0; k<=nz; k++)
 	      for (unsigned int j=0; j<=ny; j++)
 		for (unsigned int i=0; i<=nx; i++)
-		  node_ptr(p) = Node::build((Real) ((Real) i)/((Real) nx),
-					    (Real) ((Real) j)/((Real) ny),
-					    (Real) ((Real) k)/((Real) nz),
-					    p++);
+		  {
+		    node_ptr(p) = Node::build((Real) ((Real) i)/((Real) nx),
+					      (Real) ((Real) j)/((Real) ny),
+					      (Real) ((Real) k)/((Real) nz),
+					      p);
+		    p++;
+		  };
 	    
 	    unsigned int e=0;
 	    
@@ -395,10 +410,13 @@ void Mesh::build_cube(const unsigned int nx,
 	    for (unsigned int k=0; k<=(2*nz); k++)
 	      for (unsigned int j=0; j<=(2*ny); j++)
 		for (unsigned int i=0; i<=(2*nx); i++)
-		  node_ptr(p) = Node::build((Real) ((Real) i)/((Real) (2*nx)),
-					    (Real) ((Real) j)/((Real) (2*ny)),
-					    (Real) ((Real) k)/((Real) (2*nz)),
-					    p++);
+		  {
+		    node_ptr(p) = Node::build((Real) ((Real) i)/((Real) (2*nx)),
+					      (Real) ((Real) j)/((Real) (2*ny)),
+					      (Real) ((Real) k)/((Real) (2*nz)),
+					      p);
+		    p++;
+		  };
 	    
 	    unsigned int e=0;
 	    

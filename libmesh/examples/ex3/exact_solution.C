@@ -1,4 +1,4 @@
-// $Id: exact_solution.C,v 1.1 2003-02-04 02:02:23 benkirk Exp $
+// $Id: exact_solution.C,v 1.2 2003-02-04 16:29:50 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -18,6 +18,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
+
+// C++ Includes
+#include <math.h>
 
 // Mesh library includes
 #include "mesh_common.h"

@@ -26,11 +26,16 @@ all:: $(target)
 	$(shell mkdir -p ../lib/$(hosttype)_$(METHOD))
 	@$(CC) -shared -o $@ $(OBJS)
 
+
+.PHONY: clean clobber distclean
+
+
+
 clean:
 	@rm -f $(OBJS) *~
 
 clobber:
-	@rm -f *.o *.go *.pgo *.syo
+	@rm -f *.o *.g.o *.pg.o *.sy.o
 	@rm -f ../lib/$(hosttype)_$(METHOD)/libsfcurves.*
 
 distclean:
