@@ -1,4 +1,4 @@
-// $Id: node_iterators.h,v 1.3 2003-02-24 14:35:49 benkirk Exp $
+// $Id: node_iterators.h,v 1.4 2003-02-25 16:26:46 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -47,14 +47,14 @@ public:
 		      const bool b=true)
     : PredicatedIterator<T>(p.first, p.second)
   {
-    if (b) advance();
+    if (b) this->advance();
   }
 
 protected:
   /**
    * Redefinition of the predicate
    */
-  virtual bool predicate() const { return (*_current != NULL); }
+  virtual bool predicate() const { return (*this->_current != NULL); }
 };
 
 

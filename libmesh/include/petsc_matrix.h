@@ -1,4 +1,4 @@
-//    $Id: petsc_matrix.h,v 1.16 2003-02-21 18:31:29 benkirk Exp $
+//    $Id: petsc_matrix.h,v 1.17 2003-02-25 16:26:46 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -320,7 +320,7 @@ template <typename T>
 inline
 unsigned int PetscMatrix<T>::m () const
 {
-  assert (initialized());
+  assert (this->initialized());
   
   int petsc_m=0, petsc_n=0, ierr=0;
 
@@ -335,7 +335,7 @@ template <typename T>
 inline
 unsigned int PetscMatrix<T>::n () const
 {
-  assert (initialized());
+  assert (this->initialized());
   
   int petsc_m=0, petsc_n=0, ierr=0;
 
@@ -350,7 +350,7 @@ template <typename T>
 inline
 unsigned int PetscMatrix<T>::row_start () const
 {
-  assert (initialized());
+  assert (this->initialized());
   
   int start=0, stop=0, ierr=0;
 
@@ -365,7 +365,7 @@ template <typename T>
 inline
 unsigned int PetscMatrix<T>::row_stop () const
 {
-  assert (initialized());
+  assert (this->initialized());
   
   int start=0, stop=0, ierr=0;
 
@@ -382,7 +382,7 @@ void PetscMatrix<T>::set (const unsigned int i,
 			  const unsigned int j,
 			  const T value)
 {  
-  assert (initialized());
+  assert (this->initialized());
   
   int ierr=0, i_val=i, j_val=j;
 
@@ -401,7 +401,7 @@ void PetscMatrix<T>::add (const unsigned int i,
 			  const unsigned int j,
 			  const T value)
 {
-  assert (initialized());
+  assert (this->initialized());
   
   int ierr=0, i_val=i, j_val=j;
 
@@ -430,7 +430,7 @@ void PetscMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 				const std::vector<unsigned int>& rows,
 				const std::vector<unsigned int>& cols)
 {
-  assert (initialized());
+  assert (this->initialized());
   
   const unsigned int m = dm.m();
   const unsigned int n = dm.n();
@@ -466,7 +466,7 @@ inline
 T PetscMatrix<T>::operator () (const unsigned int i,
 			       const unsigned int j) const
 {
-  assert (initialized());
+  assert (this->initialized());
   
   PetscScalar *petsc_row;
   T value=0.;
@@ -510,7 +510,7 @@ template <typename T>
 inline
 bool PetscMatrix<T>::closed() const
 {
-  assert (initialized());
+  assert (this->initialized());
   
   int ierr=0;
   PetscTruth assembled;

@@ -1,4 +1,4 @@
-// $Id: distributed_vector.C,v 1.5 2003-02-20 23:18:16 benkirk Exp $
+// $Id: distributed_vector.C,v 1.6 2003-02-25 16:26:47 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -35,7 +35,7 @@
 template <typename T>
 Real DistributedVector<T>::l1_norm () const
 {
-  assert (initialized());
+  assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 
@@ -64,7 +64,7 @@ Real DistributedVector<T>::l1_norm () const
 template <typename T>
 Real DistributedVector<T>::l2_norm () const
 {
-  assert (initialized());
+  assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 
@@ -93,7 +93,7 @@ Real DistributedVector<T>::l2_norm () const
 template <typename T>
 Real DistributedVector<T>::linfty_norm () const
 {
-  assert (initialized());
+  assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 
@@ -126,8 +126,8 @@ Real DistributedVector<T>::linfty_norm () const
 template <typename T>
 NumericVector<T>& DistributedVector<T>::operator += (const NumericVector<T>& v)
 {
-  assert(closed());
-  assert (initialized());
+  assert (this->closed());
+  assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
   
@@ -141,8 +141,8 @@ NumericVector<T>& DistributedVector<T>::operator += (const NumericVector<T>& v)
 template <typename T>
 NumericVector<T>& DistributedVector<T>::operator -= (const NumericVector<T>& v)
 {
-  assert(closed());
-  assert (initialized());
+  assert (this->closed());
+  assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
   
@@ -159,7 +159,7 @@ void DistributedVector<T>::add_vector (const std::vector<T>& v,
 {
   assert (!v.empty());
   assert (v.size() == dof_indices.size());
-  assert (initialized());
+  assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
   
@@ -174,7 +174,7 @@ void DistributedVector<T>::add_vector (const NumericVector<T>& V,
 				       const std::vector<unsigned int>& dof_indices)
 {
   assert (V.size() == dof_indices.size());
-  assert (initialized());
+  assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 
@@ -187,7 +187,7 @@ void DistributedVector<T>::add_vector (const NumericVector<T>& V,
 template <typename T>
 void DistributedVector<T>::add (const T v)
 {
-  assert (initialized());
+  assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 
@@ -200,7 +200,7 @@ void DistributedVector<T>::add (const T v)
 template <typename T>
 void DistributedVector<T>::add (const NumericVector<T>& v)
 {
-  assert (initialized());
+  assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 
@@ -212,7 +212,7 @@ void DistributedVector<T>::add (const NumericVector<T>& v)
 template <typename T>
 void DistributedVector<T>::add (const T a, const NumericVector<T>& v)
 {
-  assert (initialized());
+  assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 
@@ -224,7 +224,7 @@ void DistributedVector<T>::add (const T a, const NumericVector<T>& v)
 template <typename T>
 void DistributedVector<T>::scale (const T factor)
 {
-  assert (initialized());
+  assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 
@@ -238,7 +238,7 @@ template <typename T>
 NumericVector<T>& 
 DistributedVector<T>::operator = (const T s)
 {
-  assert (initialized());
+  assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 
@@ -254,7 +254,7 @@ template <typename T>
 NumericVector<T>&
 DistributedVector<T>::operator = (const NumericVector<T>& v_in)
 {
-  assert (initialized());
+  assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 
@@ -271,7 +271,7 @@ template <typename T>
 DistributedVector<T>&
 DistributedVector<T>::operator = (const DistributedVector<T>& v)
 {
-  assert (initialized());
+  assert (this->initialized());
   assert (v.local_size() == local_size());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
@@ -295,7 +295,7 @@ template <typename T>
 NumericVector<T>&
 DistributedVector<T>::operator = (const std::vector<T>& v)
 {
-  assert (initialized());
+  assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 
@@ -321,7 +321,7 @@ template <typename T>
 void DistributedVector<T>::localize (NumericVector<T>& v_local_in) const
 
 {
-  assert (initialized());
+  assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 
@@ -353,7 +353,7 @@ template <typename T>
 void DistributedVector<T>::localize (NumericVector<T>& v_local_in,
 				     const std::vector<unsigned int>&) const
 {
-  assert (initialized());
+  assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 
@@ -367,7 +367,7 @@ template <>
 void DistributedVector<float>::localize (std::vector<float>& v_local) const
 
 {
-  assert (initialized());
+  assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 
@@ -400,7 +400,7 @@ template <>
 void DistributedVector<double>::localize (std::vector<double>& v_local) const
 
 {
-  assert (initialized());
+  assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 
@@ -433,7 +433,7 @@ template <>
 void DistributedVector<float>::localize_to_one (std::vector<float>& v_local,
 						const unsigned int pid) const
 {
-  assert (initialized());
+  assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 
@@ -466,7 +466,7 @@ template <>
 void DistributedVector<double>::localize_to_one (std::vector<double>& v_local,
 						 const unsigned int pid) const
 {
-  assert (initialized());
+  assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 

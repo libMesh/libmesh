@@ -1,4 +1,4 @@
-// $Id: petsc_vector.h,v 1.14 2003-02-21 21:03:53 benkirk Exp $
+// $Id: petsc_vector.h,v 1.15 2003-02-25 16:26:46 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -398,7 +398,7 @@ void PetscVector<T>::init (const unsigned int n,
 
 
   
-  if (initialized())
+  if (this->initialized())
     {
       std::cerr << "ERROR: Vector already initialized!"
 		<< std::endl;
@@ -424,7 +424,7 @@ void PetscVector<T>::init (const unsigned int n,
       ierr = VecSetFromOptions (vec);                   CHKERRQ(ierr);
     }  
   
-  _is_initialized = true;
+  this->_is_initialized = true;
 
   
   if (fast == false)
@@ -451,14 +451,14 @@ template <typename T>
 inline
 void PetscVector<T>::close ()
 {
-  assert (initialized());
+  assert (this->initialized());
   
   int ierr=0;
   
   ierr = VecAssemblyBegin(vec); CHKERRQ(ierr);
   ierr = VecAssemblyEnd(vec);   CHKERRQ(ierr);
 
-  _is_closed = true;
+  this->_is_closed = true;
   
   return;
 }
@@ -469,14 +469,14 @@ template <typename T>
 inline
 void PetscVector<T>::clear ()
 {
-  if (initialized())
+  if (this->initialized())
     {
       int ierr=0;
 
       ierr = VecDestroy(vec); CHKERRQ(ierr);
     }
 
-  _is_closed = _is_initialized = false;
+  this->_is_closed = this->_is_initialized = false;
 }
 
 
@@ -485,7 +485,7 @@ template <typename T>
 inline
 void PetscVector<T>::zero ()
 {
-  assert (initialized());
+  assert (this->initialized());
   
   int ierr=0;
 
@@ -500,11 +500,11 @@ template <typename T>
 inline
 unsigned int PetscVector<T>::size () const
 {
-  assert (initialized());
+  assert (this->initialized());
   
   int ierr=0, petsc_size=0;
   
-  if (!initialized())
+  if (!this->initialized())
     return 0;
   
   ierr = VecGetSize(vec, &petsc_size); CHKERRQ(ierr);
@@ -518,7 +518,7 @@ template <typename T>
 inline
 unsigned int PetscVector<T>::local_size () const
 {
-  assert (initialized());
+  assert (this->initialized());
   
   int ierr=0, petsc_size=0;
   
@@ -533,7 +533,7 @@ template <typename T>
 inline
 unsigned int PetscVector<T>::first_local_index () const
 {
-  assert (initialized());
+  assert (this->initialized());
   
   int ierr=0, petsc_first=0, petsc_last=0;
   
@@ -548,7 +548,7 @@ template <typename T>
 inline
 unsigned int PetscVector<T>::last_local_index () const
 {
-  assert (initialized());
+  assert (this->initialized());
   
   int ierr=0, petsc_first=0, petsc_last=0;
   
@@ -563,7 +563,7 @@ template <typename T>
 inline
 T PetscVector<T>::operator() (const unsigned int i) const
 {
-  assert (initialized());
+  assert (this->initialized());
   assert ( ((i >= first_local_index()) &&
 	    (i <  last_local_index())) );
 
@@ -586,7 +586,7 @@ template <typename T>
 inline
 Real PetscVector<T>::min () const
 {
-  assert (initialized());
+  assert (this->initialized());
 
   int index=0, ierr=0;
   PetscReal min=0.;
@@ -603,7 +603,7 @@ template <typename T>
 inline
 Real PetscVector<T>::max() const
 {
-  assert (initialized());
+  assert (this->initialized());
 
   int index=0, ierr=0;
   PetscReal max=0.;
