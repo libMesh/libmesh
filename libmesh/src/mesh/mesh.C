@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.12 2003-03-03 18:03:37 benkirk Exp $
+// $Id: mesh.C,v 1.13 2003-03-04 15:31:23 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -70,7 +70,7 @@ void Mesh::clear ()
 
 void Mesh::read (const std::string& name)
 {
-  libMesh::log.start_event("read()", "Mesh");
+  START_LOG("read()", "Mesh");
 
   
   // Read the file based on extension
@@ -120,7 +120,7 @@ void Mesh::read (const std::string& name)
 
       }    
   }
-  libMesh::log.stop_event("read()", "Mesh");
+  STOP_LOG("read()", "Mesh");
 
 
   // Done reading the mesh.  Now prepare it for use.
@@ -131,7 +131,7 @@ void Mesh::read (const std::string& name)
 
 void Mesh::write (const std::string& name)
 {
-  libMesh::log.start_event("write()", "Mesh");
+  START_LOG("write()", "Mesh");
   
   // Write the file based on extension
   {
@@ -179,7 +179,7 @@ void Mesh::write (const std::string& name)
       }    
   }
   
-  libMesh::log.stop_event("write()", "Mesh");
+  STOP_LOG("write()", "Mesh");
 }
 
 
@@ -188,7 +188,7 @@ void Mesh::write (const std::string& name,
 		  std::vector<Number>& v,
 		  std::vector<std::string>& vn)
 {
-  libMesh::log.start_event("write()", "Mesh");
+  START_LOG("write()", "Mesh");
 
   // Write the file based on extension
   {
@@ -216,5 +216,5 @@ void Mesh::write (const std::string& name,
       }
   }
 
-  libMesh::log.stop_event("write()", "Mesh");
+  STOP_LOG("write()", "Mesh");
 }

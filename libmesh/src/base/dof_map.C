@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.27 2003-03-03 18:03:35 benkirk Exp $
+// $Id: dof_map.C,v 1.28 2003-03-04 15:31:10 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -54,7 +54,7 @@ void DofMap::reinit(MeshBase& mesh)
 {
   assert (mesh.is_prepared());
   
-  libMesh::log.start_event("reinit()", "DofMap");
+  START_LOG("reinit()", "DofMap");
   
   clear();
 
@@ -116,7 +116,7 @@ void DofMap::reinit(MeshBase& mesh)
 	}
     }
   
-  libMesh::log.stop_event("reinit()", "DofMap");
+  STOP_LOG("reinit()", "DofMap");
 }
 
 
@@ -169,7 +169,7 @@ void DofMap::distribute_dofs(MeshBase& mesh)
   assert (_n_elem);
 
   // Log how long it takes to distribute the degrees of freedom
-  libMesh::log.start_event("distribute_dofs()", "DofMap");
+  START_LOG("distribute_dofs()", "DofMap");
 
   unsigned int next_free_dof=0;
 
@@ -272,7 +272,7 @@ void DofMap::distribute_dofs(MeshBase& mesh)
   }
 
   // All done. Stop logging.
-  libMesh::log.stop_event("distribute_dofs()", "DofMap");    
+  STOP_LOG("distribute_dofs()", "DofMap");    
 }
 
 
@@ -282,7 +282,7 @@ void DofMap::compute_sparsity(MeshBase& mesh)
   assert (mesh.is_prepared());
   assert (this->n_variables());
 
-  libMesh::log.start_event("compute_sparsity()", "DofMap");
+  START_LOG("compute_sparsity()", "DofMap");
 
 
   
@@ -445,7 +445,7 @@ void DofMap::compute_sparsity(MeshBase& mesh)
     }
 
   
-  libMesh::log.stop_event("compute_sparsity()", "DofMap");
+  STOP_LOG("compute_sparsity()", "DofMap");
 
   // We are done with the sparsity_pattern.  However, quite a
   // lot has gone into computing it.  It is possible that some
@@ -538,7 +538,7 @@ void DofMap::create_dof_constraints(MeshBase& mesh)
 {
   assert (mesh.is_prepared());
   
-  libMesh::log.start_event("create_dof_constraints()", "DofMap");
+  START_LOG("create_dof_constraints()", "DofMap");
 
   const unsigned int dim = mesh.mesh_dimension();
 
@@ -634,7 +634,7 @@ void DofMap::create_dof_constraints(MeshBase& mesh)
 		}
 	    }
   
-  libMesh::log.stop_event("create_dof_constraints()", "DofMap");
+  STOP_LOG("create_dof_constraints()", "DofMap");
 }
 
 

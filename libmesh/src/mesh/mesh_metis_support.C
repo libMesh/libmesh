@@ -1,4 +1,4 @@
-// $Id: mesh_metis_support.C,v 1.10 2003-03-03 18:09:04 benkirk Exp $
+// $Id: mesh_metis_support.C,v 1.11 2003-03-04 15:31:24 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -69,7 +69,7 @@ void MeshBase::metis_partition(const unsigned int n_sbdmns,
   
   assert (_dim != 1);
 
-  libMesh::log.start_event("metis_partition()", "MeshBase");
+  START_LOG("metis_partition()", "MeshBase");
 
   // new way, build the graph
   std::vector<int> xadj;
@@ -129,7 +129,7 @@ void MeshBase::metis_partition(const unsigned int n_sbdmns,
 		  << " BEFORE calling the graph partitioner?" << std::endl << std::endl
 		  << " I'll use a space-filling curves instead." << std::endl;
 	
-	libMesh::log.stop_event("metis_partition()", "MeshBase");
+	STOP_LOG("metis_partition()", "MeshBase");
 	sfc_partition(n_sbdmns);
 	return;
       }
@@ -155,7 +155,7 @@ void MeshBase::metis_partition(const unsigned int n_sbdmns,
 		<< "   \"kway\"  "     << std::endl
 		<< " Using space-filling curves instead." << std::endl;
 
-      libMesh::log.stop_event("metis_partition()", "MeshBase");
+      STOP_LOG("metis_partition()", "MeshBase");
       sfc_partition(n_sbdmns);
       return;
     }
@@ -166,7 +166,7 @@ void MeshBase::metis_partition(const unsigned int n_sbdmns,
       elem(e)->set_processor_id() = 
       static_cast<short int>(part[e]);
 
-  libMesh::log.stop_event("metis_partition()", "MeshBase");
+  STOP_LOG("metis_partition()", "MeshBase");
 
 #endif
 }

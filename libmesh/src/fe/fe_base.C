@@ -1,4 +1,4 @@
-// $Id: fe_base.C,v 1.10 2003-03-03 18:03:36 benkirk Exp $
+// $Id: fe_base.C,v 1.11 2003-03-04 15:31:21 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -445,7 +445,7 @@ void FEBase::compute_shape_functions ()
   /**
    * Start logging the shape function computation
    */
-  libMesh::log.start_event("compute_shape_functions()", "FE");
+  START_LOG("compute_shape_functions()", "FE");
 
   // Compute the value of the derivative shape function i at quadrature point p
   switch (dim)
@@ -527,7 +527,7 @@ void FEBase::compute_shape_functions ()
   /**
    * Stop logging the shape function computation
    */
-  libMesh::log.stop_event("compute_shape_functions()", "FE");
+  STOP_LOG("compute_shape_functions()", "FE");
 }
 
 
