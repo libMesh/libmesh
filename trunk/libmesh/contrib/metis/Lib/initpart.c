@@ -9,7 +9,7 @@
  * Started 7/23/97
  * George
  *
- * $Id: initpart.c,v 1.1 2003-01-21 17:35:30 benkirk Exp $
+ * $Id: initpart.c,v 1.2 2003-01-21 19:24:26 benkirk Exp $
  *
  */
 

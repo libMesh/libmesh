@@ -8,7 +8,7 @@
  * Started 10/19/95
  * George
  *
- * $Id: proto.h,v 1.1 2003-01-21 17:35:44 benkirk Exp $
+ * $Id: proto.h,v 1.2 2003-01-21 19:24:33 benkirk Exp $
  *
  */
 

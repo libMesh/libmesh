@@ -8,7 +8,7 @@
  * Started 7/28/97
  * George
  *
- * $Id: mkwayrefine.c,v 1.1 2003-01-21 17:35:36 benkirk Exp $
+ * $Id: mkwayrefine.c,v 1.2 2003-01-21 19:24:31 benkirk Exp $
  */
 
 #include <metis.h>

@@ -8,7 +8,7 @@
  * Started 8/1/97
  * George
  *
- * $Id: separator.c,v 1.1 2003-01-21 17:35:44 benkirk Exp $
+ * $Id: separator.c,v 1.2 2003-01-21 19:24:33 benkirk Exp $
  *
  */
 

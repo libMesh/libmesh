@@ -9,7 +9,7 @@
  * Started 7/23/97
  * George
  *
- * $Id: minitpart2.c,v 1.1 2003-01-21 17:35:34 benkirk Exp $
+ * $Id: minitpart2.c,v 1.2 2003-01-21 19:24:31 benkirk Exp $
  *
  */
 
