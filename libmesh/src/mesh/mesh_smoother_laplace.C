@@ -1,4 +1,4 @@
-// $Id: mesh_smoother_laplace.C,v 1.4 2003-06-26 07:16:29 benkirk Exp $
+// $Id: mesh_smoother_laplace.C,v 1.5 2003-07-15 12:40:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -85,6 +85,11 @@ void LaplaceMeshSmoother::init()
   switch (_mesh.mesh_dimension())
     {
       
+
+
+      //TODO:[BSK] Fix this to work for refined meshes...  I think
+      // the implementation was done quickly for Damien, who did not have
+      // refined grids.  Fix it here and in the original Mesh member.
       
     case 2: // Stolen directly from build_L_graph in mesh_base.C
       {

@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.34 2003-07-12 16:56:39 ddreyer Exp $
+// $Id: mesh_base.h,v 1.35 2003-07-15 12:40:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -64,7 +64,7 @@ template <typename T> class PetscMatrix;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.34 $
+ * \version $Revision: 1.35 $
  */
 
 
@@ -174,6 +174,28 @@ public:
    */
   unsigned int n_active_elem_of_type (const ElemType type) const;
 
+  /**
+   * Returns the number of elements on processor \p proc.
+   */
+  unsigned int n_elem_on_proc (const unsigned int proc) const;
+
+  /**
+   * Returns the number of elements on the local processor.
+   */
+  unsigned int n_local_elem () const
+  { return this->n_elem_on_proc (libMeshBase::processor_id()); }
+
+  /**
+   * Returns the number of active elements on processor \p proc.
+   */
+  unsigned int n_active_elem_on_proc (const unsigned int proc) const;
+
+  /**
+   * Returns the number of active elements on the local processor.
+   */
+  unsigned int n_active_local_elem () const
+  { return this->n_active_elem_on_proc (libMeshBase::processor_id()); }
+  
   /**
    * This function returns the number of elements that will be written
    * out in the Tecplot format.  For example, a 9-noded quadrilateral will

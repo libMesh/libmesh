@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.27 2003-06-24 05:33:51 benkirk Exp $
+// $Id: elem.h,v 1.28 2003-07-15 12:40:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -174,6 +174,12 @@ class Elem : public ReferenceCountedObject<Elem>,
    */
   void set_neighbor (const unsigned int i, Elem* n);
 
+  /**
+   * @returns \p true if the element \p elem in question is a neighbor
+   * of this element, \p false otherwise.
+   */
+  bool is_neighbor (const Elem* elem) const;
+  
   /**
    * @returns \p true if this element has a side coincident
    * with a boundary (indicated by a \p NULL neighbor), \p false
@@ -409,6 +415,26 @@ class Elem : public ReferenceCountedObject<Elem>,
    */
   Elem* child (const unsigned int i) const;
 
+  /**
+   * Fills the vector \p family with the children of this element,
+   * recursively.  So, calling this method on a twice-refined element
+   * will give you the element itself, its direct children, and their
+   * children, etc...  When the optional parameter \p reset is
+   * true then the vector will be cleared before the element and its
+   * descendants are added.
+   */
+  void family_tree (std::vector<const Elem*>& family,
+		    const bool reset=true) const;
+
+  /**
+   * Same as the \p family_tree() member, but only adds the active
+   * children.  Can be thought of as removing all the inactive
+   * elements from the vector created by \p family_tree, but is
+   * implemented more efficiently.
+   */
+  void active_family_tree (std::vector<const Elem*>& active_family,
+			   const bool reset=true) const;
+  
   /**
    * Returns the value of the refinement flag for the element.
    */
@@ -749,7 +775,7 @@ unsigned char & Elem::set_subdomain_id ()
 inline
 Elem* Elem::neighbor (const unsigned int i) const
 {
-  assert (i < n_neighbors());
+  assert (i < this->n_neighbors());
 
   return _neighbors[i];
 }
@@ -759,7 +785,7 @@ Elem* Elem::neighbor (const unsigned int i) const
 inline
 void Elem::set_neighbor (const unsigned int i, Elem* n)
 {
-  assert (i < n_neighbors());
+  assert (i < this->n_neighbors());
   
   _neighbors[i] = n;
 }
@@ -767,13 +793,43 @@ void Elem::set_neighbor (const unsigned int i, Elem* n)
 
 
 inline
-bool Elem::on_boundary () const
+bool Elem::is_neighbor (const Elem* elem) const
 {
   for (unsigned int n=0; n<this->n_neighbors(); n++)
-    if (this->neighbor(n) == NULL)
+    if (this->neighbor(n) == elem)
       return true;
 
   return false;
+}
+
+
+
+inline
+bool Elem::on_boundary () const
+{
+  // By convention, the element is on the boundary
+  // if it has a NULL neighbor.
+  return this->is_neighbor(NULL);
+}
+
+
+
+inline
+unsigned int Elem::which_neighbor_am_i (const Elem* e) const
+{
+  assert (e != NULL);
+  
+  for (unsigned int s=0; s<this->n_neighbors(); s++)
+    if (this->neighbor(s) == e)
+      return s;
+    
+
+  std::cerr << "ERROR:  Elements are not neighbors!" 
+	    << std::endl;
+
+  error();
+
+  return static_cast<unsigned int>(-1);
 }
 
 
@@ -874,7 +930,7 @@ inline
 std::pair<Elem**, Elem**> Elem::neighbors_begin ()
 {
   return std::make_pair (&_neighbors[0],
-			 &_neighbors[n_neighbors()]);
+			 &_neighbors[this->n_neighbors()]);
 }
 
 
@@ -882,8 +938,8 @@ std::pair<Elem**, Elem**> Elem::neighbors_begin ()
 inline
 std::pair<Elem**, Elem**> Elem::neighbors_end ()
 {
-  return std::make_pair (&_neighbors[n_neighbors()],
-			 &_neighbors[n_neighbors()]);
+  return std::make_pair (&_neighbors[this->n_neighbors()],
+			 &_neighbors[this->n_neighbors()]);
 }
 
 
@@ -892,7 +948,7 @@ inline
 std::pair<const Elem**, const Elem**> Elem::neighbors_begin () const
 {
   return std::make_pair (const_cast<const Elem**>(&_neighbors[0]),
-			 const_cast<const Elem**>(&_neighbors[n_neighbors()]));
+			 const_cast<const Elem**>(&_neighbors[this->n_neighbors()]));
 }
 
 
@@ -900,8 +956,8 @@ std::pair<const Elem**, const Elem**> Elem::neighbors_begin () const
 inline
 std::pair<const Elem**, const Elem**> Elem::neighbors_end () const
 {
-  return std::make_pair (const_cast<const Elem**>(&_neighbors[n_neighbors()]),
-			 const_cast<const Elem**>(&_neighbors[n_neighbors()]));
+  return std::make_pair (const_cast<const Elem**>(&_neighbors[this->n_neighbors()]),
+			 const_cast<const Elem**>(&_neighbors[this->n_neighbors()]));
 }
 
 

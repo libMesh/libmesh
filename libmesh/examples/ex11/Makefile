@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.1 2003-06-06 14:42:45 benkirk Exp $
+# $Id: Makefile,v 1.2 2003-07-15 12:40:12 benkirk Exp $
 
 
 # The location of the mesh library
@@ -19,7 +19,7 @@ include .depend
 
 #
 # source files
-srcfiles 	:= $(wildcard *.C) ../ex9/exact_solution.C
+srcfiles 	:= $(wildcard *.C)
 
 #
 # object files
