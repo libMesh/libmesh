@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.15 2003-05-20 20:55:03 benkirk Exp $
+// $Id: mesh_refinement.C,v 1.16 2003-05-21 22:17:59 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,6 @@
 // only compile these functions if the user requests AMR support
 #ifdef ENABLE_AMR
 
-#include "error_vector.h"
 #include "mesh_refinement.h"
 #include "mesh_base.h"
 #include "elem.h"
@@ -139,86 +138,6 @@ void MeshRefinement::update_unused_elements()
 
 
 
-void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_per_cell,
-						      const Real refine_fraction,
-						      const Real coarsen_fraction,
-						      const unsigned int max_level)
-{
-  // Check for valid fractions..
-  // The fraction values must be in [0,1]
-  assert (refine_fraction  >= 0.);  assert (refine_fraction  <= 1.);
-  assert (coarsen_fraction >= 0.);  assert (coarsen_fraction <= 1.);
-
-  // Clean up the refinement flags.  These could be left
-  // over from previous refinement steps.
-  this->clean_refinement_flags();
-  
-
-  // Get the minimum, maximum, and delta error values
-  // for the elements
-  const Real error_max   = error_per_cell.maximum();
-  const Real error_min   = error_per_cell.minimum();
-  const Real error_delta = (error_max - error_min);
-
-
-  // Compute the cutoff values for coarsening and refinement
-  const Real refine_cutoff  = (1.- refine_fraction)*error_max;
-  const Real coarsen_cutoff = coarsen_fraction*error_delta + error_min;
-
-  // Print information about the error
-  std::cout << " Error Information:"                     << std::endl
-	    << " ------------------"                     << std::endl
-	    << "   min:              " << error_min      << std::endl
-	    << "   max:              " << error_max      << std::endl
-	    << "   delta:            " << error_delta    << std::endl
-	    << "     refine_cutoff:  " << refine_cutoff  << std::endl
-	    << "     coarsen_cutoff: " << coarsen_cutoff << std::endl;
-  
-  
-
-  // Loop over the elements and flag them for coarsening or
-  // refinement based on the element error
-  active_elem_iterator       elem_it (mesh.elements_begin());
-  const active_elem_iterator elem_end(mesh.elements_end());
-
-  for (; elem_it != elem_end; ++elem_it)
-    {
-      Elem* elem             = *elem_it;
-      const unsigned int id  = elem->id();
-
-      assert (id < error_per_cell.size());
-      
-      const float elem_error = error_per_cell[id];
-
-      // Flag the element for refinement if its error
-      // is >= refinement_cutoff.
-      if (elem_error >= refine_cutoff)
-	if (elem->level() < max_level)
-	  elem->set_refinement_flag(Elem::REFINE);
-
-      // Flag the element for coarsening if its error
-      // is <= coarsen_fraction*delta + error_min
-      else if (elem_error <=  coarsen_cutoff)
-	elem->set_refinement_flag(Elem::COARSEN);
-    }
-}
-
-
-
-
-void MeshRefinement::clean_refinement_flags ()
-{
-  // Possibly clean up the refinement flags from
-  // a previous step
-  elem_iterator       elem_it (mesh.elements_begin());
-  const elem_iterator elem_end(mesh.elements_end());
-
-  for ( ; elem_it != elem_end; ++elem_it)
-    (*elem_it)->set_refinement_flag(Elem::DO_NOTHING);
-}
-
-
-
 
 void MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
 {
@@ -255,9 +174,17 @@ void MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
       
       const bool refinement_satisfied =
 	this->make_refinement_compatible(maintain_level_one);
+
+      const bool smoothing_satisfied =
+	!this->eliminate_unrefined_patches() &&
+	!this->limit_level_mismatch_at_node(1);
       
-      if (coarsening_satisfied && refinement_satisfied)
-	satisfied = true;
+      if (coarsening_satisfied &&
+	  refinement_satisfied &&
+	  smoothing_satisfied)
+	{
+	  satisfied = true;
+	}
     }
   while (!satisfied);
 
