@@ -1,4 +1,4 @@
-// $Id: petsc_interface.C,v 1.13 2003-03-11 23:36:46 ddreyer Exp $
+// $Id: petsc_interface.C,v 1.14 2003-03-22 13:23:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -123,18 +123,21 @@ PetscInterface<T>::solve (SparseMatrix<T> &matrix_in,
   ierr = SLESSetOperators(_sles, matrix.mat, matrix.mat,
 			  SAME_NONZERO_PATTERN);             CHKERRQ(ierr);
 
-  
-  ierr = KSPSetTolerances (_ksp, tol, tol,
-			   PETSC_DEFAULT,
-			   max_its);                         CHKERRQ(ierr);
+
+  // Set the tolerances for the iterative solver.  Use the user-supplied
+  // tolerance for the relative residual & leave the others at default values.
+  ierr = KSPSetTolerances (_ksp, tol, PETSC_DEFAULT,
+			   PETSC_DEFAULT, max_its);          CHKERRQ(ierr);
 
   
   // Solve the linear system
   ierr = SLESSolve (_sles, rhs.vec, solution.vec, &its);     CHKERRQ(ierr);
   
-  
+
+  // Get the norm of the final residual to return to the user.
   ierr = KSPGetResidualNorm (_ksp, &final_resid);            CHKERRQ(ierr);
-  
+
+  // return the # of its. and the final residual norm.
   std::pair<unsigned int, Real> p (its, final_resid);
 
   return p;
