@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.12 2004-11-22 21:32:34 jwpeterson Exp $
+// $Id: elem.h,v 1.13 2005-02-19 19:07:31 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -277,6 +277,21 @@ class Elem : public ReferenceCountedObject<Elem>,
    * from this class may have.
    */
   virtual unsigned int n_children () const = 0;
+
+  /**
+   * @returns true iff the specified (local) node number is a vertex.
+   */
+  virtual bool is_vertex(const unsigned int i) const = 0;
+
+  /**
+   * @returns true iff the specified (local) node number is an edge.
+   */
+  virtual bool is_edge(const unsigned int i) const = 0;
+
+  /**
+   * @returns true iff the specified (local) node number is a face.
+   */
+  virtual bool is_face(const unsigned int i) const = 0;
 
 //   /**
 //    * @returns the number of children this element has that

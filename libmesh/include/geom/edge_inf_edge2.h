@@ -1,4 +1,4 @@
-// $Id: edge_inf_edge2.h,v 1.4 2004-11-15 22:09:11 benkirk Exp $
+// $Id: edge_inf_edge2.h,v 1.5 2005-02-19 19:07:31 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -72,6 +72,21 @@ class InfEdge2 : public Edge
    * @returns 1
    */
   unsigned int n_sub_elem() const { return 1; }
+  
+  /**
+   * @returns true iff the specified (local) node number is a vertex.
+   */
+  virtual bool is_vertex(const unsigned int i) const;
+
+  /**
+   * @returns true iff the specified (local) node number is an edge.
+   */
+  virtual bool is_edge(const unsigned int i) const;
+
+  /**
+   * @returns true iff the specified (local) node number is a face.
+   */
+  virtual bool is_face(const unsigned int i) const;
   
   /**
    * @returns \p INFEDGE2
