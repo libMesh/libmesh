@@ -1,4 +1,4 @@
-// $Id: perf_log.C,v 1.15 2003-03-23 15:09:19 ddreyer Exp $
+// $Id: perf_log.C,v 1.16 2003-04-02 21:58:45 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -88,13 +88,13 @@ void PerfLog::clear()
 
 std::string PerfLog::get_info_header() const
 {
-  OSSOStringStream out;
+  OStringStream out;
   
   if (log_events)
     {
 
 #ifdef HAVE_LOCALE
-      OSSOStringStream  dateStr;
+      OStringStream  dateStr;
       time_t tm         = time(NULL);
       struct tm* tmb    = localtime(&tm);
       std::locale loc;
@@ -142,7 +142,7 @@ std::string PerfLog::get_info_header() const
 
 std::string PerfLog::get_perf_info() const
 {
-  OSSOStringStream out;
+  OStringStream out;
   
   if (log_events && !log.empty())
     {
@@ -275,7 +275,7 @@ std::string PerfLog::get_perf_info() const
 
 std::string PerfLog::get_log() const
 {
-  OSSOStringStream out;
+  OStringStream out;
   
   if (log_events)
     {

@@ -1,4 +1,4 @@
-// $Id: o_f_stream.h,v 1.3 2003-03-23 15:23:30 ddreyer Exp $
+// $Id: o_f_stream.h,v 1.4 2003-04-02 21:58:39 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -27,15 +27,9 @@
 #include <string>
 #include <vector>
 
+
 // Local Includes
 #include "mesh_common.h"
-
-
-
-
-// Forward Declarations
-
-
 
 
 
@@ -69,12 +63,12 @@
                                             << std::setw(v) << std::scientific << (d).imag()
 # else
 #  define OFSNumberscientific(o,v,d)    (o) << std::setw(v) << std::scientific << (d)
-#endif
+# endif
 
  /*
   * class alias
   */
-# define OFSOFStream                    std::ofstream
+# define OFStream                    std::ofstream
 
 
 #else
@@ -98,10 +92,10 @@
   */
 # define OFSNumberscientific(o,v,d)     (o).scientific( (v), (d) )
 
- /*
-  * class alias
-  */
-# define OFSOFStream                    OFStream
+//  /*
+//   * class alias
+//   */
+// # define OFSOFStream                    OFStream
 
 
 

@@ -1,4 +1,4 @@
-// $Id: inf_fe_static.C,v 1.14 2003-04-01 14:19:48 ddreyer Exp $
+// $Id: inf_fe_static.C,v 1.15 2003-04-02 21:58:44 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -562,7 +562,7 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_indices (const FEType& fet,
    * 8. element-associated dof further out
    */
 
-  const unsigned int radial_order       = static_cast<const unsigned int>(fet.radial_order);       // 4
+  const unsigned int radial_order       = static_cast<unsigned int>(fet.radial_order);             // 4
   const unsigned int radial_order_p_one = radial_order+1;                                          // 5
 
   const ElemType base_elem_type           (Base::get_elem_type(inf_elem_type));                    // QUAD9

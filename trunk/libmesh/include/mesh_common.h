@@ -1,4 +1,4 @@
-// $Id: mesh_common.h,v 1.11 2003-03-16 20:11:38 benkirk Exp $
+// $Id: mesh_common.h,v 1.12 2003-04-02 21:58:38 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,14 +23,16 @@
 #define __mesh_common_h__
 
 
+// The library configuration options
+#include "mesh_config.h"
+
 // C++ includes everyone should know about
 #include <iostream>
 #include <complex>
 #include <assert.h>
 #include <stdlib.h>
 
-// The library configuration options
-#include "mesh_config.h"
+// _basic_ library functionality
 #include "libmesh_base.h"
 
 

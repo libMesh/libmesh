@@ -1,4 +1,4 @@
-// $Id: xdrIO.h,v 1.10 2003-03-23 15:09:00 ddreyer Exp $
+// $Id: xdrIO.h,v 1.11 2003-04-02 21:58:40 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -212,7 +212,7 @@ class XdrIO
    * features also for compilers with broken
    * iostream
    */
-  OFSOFStream mp_out;
+  OFStream mp_out;
   
  private:
   FILE* mp_fp;
