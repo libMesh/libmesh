@@ -2617,22 +2617,40 @@ fi;
   if test "$GXX" = yes ; then
         GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
     case "$GXX_VERSION_STRING" in
-      *"egcs-1.1"*)
-  	echo "$as_me:$LINENO: result: <<< C++ compiler is egcs-1.1 >>>" >&5
-echo "${ECHO_T}<<< C++ compiler is egcs-1.1 >>>" >&6
-  	GXX_VERSION=egcs1.1
+      *3.5*)
+  	echo "$as_me:$LINENO: result: <<< C++ compiler is gcc-3.5 >>>" >&5
+echo "${ECHO_T}<<< C++ compiler is gcc-3.5 >>>" >&6
+  	GXX_VERSION=gcc3.5
   	;;
-      *2.95*)
-  	echo "$as_me:$LINENO: result: <<< C++ compiler is gcc-2.95 >>>" >&5
-echo "${ECHO_T}<<< C++ compiler is gcc-2.95 >>>" >&6
-  	GXX_VERSION=gcc2.95
-
-cat >>confdefs.h <<\_ACEOF
-#define BROKEN_IOSTREAM 1
-_ACEOF
-
-         echo "$as_me:$LINENO: result: <<< Configuring library for broken iostream >>>" >&5
-echo "${ECHO_T}<<< Configuring library for broken iostream >>>" >&6
+      *3.4*)
+  	echo "$as_me:$LINENO: result: <<< C++ compiler is gcc-3.4 >>>" >&5
+echo "${ECHO_T}<<< C++ compiler is gcc-3.4 >>>" >&6
+  	GXX_VERSION=gcc3.4
+  	;;
+      *3.3*)
+  	echo "$as_me:$LINENO: result: <<< C++ compiler is gcc-3.3 >>>" >&5
+echo "${ECHO_T}<<< C++ compiler is gcc-3.3 >>>" >&6
+  	GXX_VERSION=gcc3.3
+  	;;
+      *3.2*)
+  	echo "$as_me:$LINENO: result: <<< C++ compiler is gcc-3.2 >>>" >&5
+echo "${ECHO_T}<<< C++ compiler is gcc-3.2 >>>" >&6
+  	GXX_VERSION=gcc3.2
+  	;;
+      *3.1*)
+  	echo "$as_me:$LINENO: result: <<< C++ compiler is gcc-3.1 >>>" >&5
+echo "${ECHO_T}<<< C++ compiler is gcc-3.1 >>>" >&6
+  	GXX_VERSION=gcc3.1
+  	;;
+      *3.0*)
+  	echo "$as_me:$LINENO: result: <<< C++ compiler is gcc-3.0 >>>" >&5
+echo "${ECHO_T}<<< C++ compiler is gcc-3.0 >>>" >&6
+  	GXX_VERSION=gcc3.0
+  	;;
+      *2.97*)
+  	echo "$as_me:$LINENO: result: <<< C++ compiler is gcc-2.97 >>>" >&5
+echo "${ECHO_T}<<< C++ compiler is gcc-2.97 >>>" >&6
+  	GXX_VERSION=gcc2.97
   	;;
       *2.96*)
   	echo "$as_me:$LINENO: result: <<< C++ compiler is gcc-2.96 >>>" >&5
@@ -2646,35 +2664,22 @@ _ACEOF
          echo "$as_me:$LINENO: result: <<< Configuring library for broken iostream >>>" >&5
 echo "${ECHO_T}<<< Configuring library for broken iostream >>>" >&6
   	;;
-      *2.97*)
-  	echo "$as_me:$LINENO: result: <<< C++ compiler is gcc-2.97 >>>" >&5
-echo "${ECHO_T}<<< C++ compiler is gcc-2.97 >>>" >&6
-  	GXX_VERSION=gcc2.97
+      *2.95*)
+  	echo "$as_me:$LINENO: result: <<< C++ compiler is gcc-2.95 >>>" >&5
+echo "${ECHO_T}<<< C++ compiler is gcc-2.95 >>>" >&6
+  	GXX_VERSION=gcc2.95
+
+cat >>confdefs.h <<\_ACEOF
+#define BROKEN_IOSTREAM 1
+_ACEOF
+
+         echo "$as_me:$LINENO: result: <<< Configuring library for broken iostream >>>" >&5
+echo "${ECHO_T}<<< Configuring library for broken iostream >>>" >&6
   	;;
-      *3.0*)
-  	echo "$as_me:$LINENO: result: <<< C++ compiler is gcc-3.0 >>>" >&5
-echo "${ECHO_T}<<< C++ compiler is gcc-3.0 >>>" >&6
-  	GXX_VERSION=gcc3.0
-  	;;
-      *3.1*)
-  	echo "$as_me:$LINENO: result: <<< C++ compiler is gcc-3.1 >>>" >&5
-echo "${ECHO_T}<<< C++ compiler is gcc-3.1 >>>" >&6
-  	GXX_VERSION=gcc3.1
-  	;;
-      *3.2*)
-  	echo "$as_me:$LINENO: result: <<< C++ compiler is gcc-3.2 >>>" >&5
-echo "${ECHO_T}<<< C++ compiler is gcc-3.2 >>>" >&6
-  	GXX_VERSION=gcc3.2
-  	;;
-      *3.3*)
-  	echo "$as_me:$LINENO: result: <<< C++ compiler is gcc-3.3 >>>" >&5
-echo "${ECHO_T}<<< C++ compiler is gcc-3.3 >>>" >&6
-  	GXX_VERSION=gcc3.3
-  	;;
-      *3.4*)
-  	echo "$as_me:$LINENO: result: <<< C++ compiler is gcc-3.4 >>>" >&5
-echo "${ECHO_T}<<< C++ compiler is gcc-3.4 >>>" >&6
-  	GXX_VERSION=gcc3.4
+      *"egcs-1.1"*)
+  	echo "$as_me:$LINENO: result: <<< C++ compiler is egcs-1.1 >>>" >&5
+echo "${ECHO_T}<<< C++ compiler is egcs-1.1 >>>" >&6
+  	GXX_VERSION=egcs1.1
   	;;
       *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
   	  	  	echo "$as_me:$LINENO: result: <<< C++ compiler is $GXX_VERSION_STRING >>>" >&5
@@ -7695,7 +7700,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:7698:" \
+echo "$as_me:7703:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -7863,7 +7868,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_verb"
-(eval echo $as_me:7866: \"$ac_link\") >&5
+(eval echo $as_me:7871: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -7943,7 +7948,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_cv_prog_f77_v"
-(eval echo $as_me:7946: \"$ac_link\") >&5
+(eval echo $as_me:7951: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
