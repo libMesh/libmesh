@@ -1,4 +1,4 @@
-// $Id: kelly_error_estimator.C,v 1.1 2004-05-20 22:56:52 jwpeterson Exp $
+// $Id: kelly_error_estimator.C,v 1.2 2004-06-02 20:32:58 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -18,19 +18,13 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// libMesh Configuration
-#include "libmesh_config.h"
-
 // C++ includes
 #include <algorithm> // for std::fill
 #include <math.h>    // for sqrt
 
-#ifdef HAVE_MPI
-# include <mpi.h>
-#endif
-
 
 // Local Includes
+#include "libmesh_common.h"
 #include "kelly_error_estimator.h"
 #include "dof_map.h"
 #include "fe.h"
@@ -273,18 +267,9 @@ void KellyErrorEstimator::estimate_error (const SteadySystem& system,
   // processors, and we only need to take the square-root
   // if the value is nonzero.  There will in general be many
   // zeros for the inactive elements.
-#ifdef HAVE_MPI
-  if (libMesh::n_processors() > 1)
-    {
-      // Allreduce requires 2 buffers.  Copy the
-      // error_per_cell vector into the epc vector
-      std::vector<float> epc (error_per_cell);
-      
-      MPI_Allreduce (&epc[0], &error_per_cell[0],
-		     error_per_cell.size(),
-		     MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
-    }  
-#endif
+
+  // First sum the vector
+  this->reduce_error(error_per_cell);
 
   // Compute the square-root of each component.
   for (unsigned int i=0; i<error_per_cell.size(); i++)
