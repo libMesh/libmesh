@@ -1,4 +1,4 @@
-// $Id: mesh_gmv_support.C,v 1.19 2003-05-23 03:21:47 benkirk Exp $
+// $Id: mesh_gmv_support.C,v 1.20 2003-05-23 14:44:37 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -593,7 +593,7 @@ void MeshBase::write_gmv_binary(std::ostream& out,
 	{
 
 #ifdef USE_COMPLEX_NUMBERS
-	  // for complex data, write two datasets
+	  // for complex data, write three datasets
 
 
 	  // Real part
@@ -626,6 +626,19 @@ void MeshBase::write_gmv_binary(std::ostream& out,
 	  
 	  out.write(reinterpret_cast<char *>(temp), sizeof(float)*n_nodes());
 
+	  // magnitude
+	  strcpy(buf, "a_");
+	  out.write(buf, 2);
+	  strcpy(buf, (*solution_names)[c].c_str());
+	  out.write(buf, 6);
+	  
+	  memcpy(buf, &tempint, sizeof(unsigned int));
+	  out.write(buf, sizeof(unsigned int));
+	  
+	  for (unsigned int n=0; n<n_nodes(); n++)
+	    temp[n] = static_cast<float>(std::abs((*v)[n*n_vars + c]));
+	  
+	  out.write(reinterpret_cast<char *>(temp), sizeof(float)*n_nodes());
 
 #else
 
