@@ -1,4 +1,4 @@
-// $Id: ex7.C,v 1.17 2003-03-03 02:15:57 benkirk Exp $
+// $Id: ex7.C,v 1.18 2003-03-11 04:35:18 ddreyer Exp $
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
   
@@ -78,7 +78,7 @@
  * Function prototype.  This is the function that will assemble
  * the linear system for our Helmholz problem.
  */
-void assemble_helmholtz(EquationSystems& es,
+void assemble_helmholtz(EquationSystems<GeneralSystem>& es,
 			const std::string& system_name);
 
 
@@ -228,7 +228,7 @@ int main (int argc, char** argv)
     /**
      * Create an equation systems object.
      */
-    EquationSystems equation_systems (mesh);
+    EquationSystems<GeneralSystem> equation_systems (mesh);
     
     /**
      * Declare the system and its variables.
@@ -291,7 +291,7 @@ int main (int argc, char** argv)
 
 
 
-void assemble_helmholtz(EquationSystems& es,
+void assemble_helmholtz(EquationSystems<GeneralSystem>& es,
 			const std::string& system_name)
 {
 #ifdef USE_COMPLEX_NUMBERS

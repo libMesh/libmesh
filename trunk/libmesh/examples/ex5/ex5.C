@@ -1,4 +1,4 @@
-// $Id: ex5.C,v 1.16 2003-03-03 02:15:57 benkirk Exp $
+// $Id: ex5.C,v 1.17 2003-03-11 04:35:18 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -86,7 +86,7 @@
 /**
  * Function prototype, as before.
  */
-void assemble_poisson(EquationSystems& es,
+void assemble_poisson(EquationSystems<GeneralSystem>& es,
                       const std::string& system_name);
 
 
@@ -184,7 +184,7 @@ int main (int argc, char** argv)
     
     mesh.print_info();
     
-    EquationSystems equation_systems (mesh);
+    EquationSystems<GeneralSystem> equation_systems (mesh);
     
     {
       equation_systems.add_system("Poisson");
@@ -221,7 +221,7 @@ int main (int argc, char** argv)
 
 
 
-void assemble_poisson(EquationSystems& es,
+void assemble_poisson(EquationSystems<GeneralSystem>& es,
                       const std::string& system_name)
 {
   assert (system_name == "Poisson");

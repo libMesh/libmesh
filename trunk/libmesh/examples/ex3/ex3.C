@@ -1,4 +1,4 @@
-// $Id: ex3.C,v 1.18 2003-03-03 02:15:54 benkirk Exp $
+// $Id: ex3.C,v 1.19 2003-03-11 04:35:17 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -83,7 +83,7 @@
  * \p EquationSystems object we have acess to the \p Mesh and
  * other objects we might need.
  */
-void assemble_poisson(EquationSystems& es,
+void assemble_poisson(EquationSystems<GeneralSystem>& es,
                       const std::string& system_name);
 
 
@@ -150,7 +150,7 @@ int main (int argc, char** argv)
     /**
      * Create an equation systems object.
      */
-    EquationSystems equation_systems (mesh);
+    EquationSystems<GeneralSystem> equation_systems (mesh);
     
     /**
      * Declare the system and its variables.
@@ -220,7 +220,7 @@ int main (int argc, char** argv)
 
 
 
-void assemble_poisson(EquationSystems& es,
+void assemble_poisson(EquationSystems<GeneralSystem>& es,
                       const std::string& system_name)
 {
   /**

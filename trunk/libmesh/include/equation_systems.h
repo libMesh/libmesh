@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.14 2003-02-24 14:35:50 benkirk Exp $
+// $Id: equation_systems.h,v 1.15 2003-03-11 04:35:18 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,19 +23,14 @@
 #define __equation_systems_h__
 
 // C++ includes
-#include <set>
-#include <map>
 
 // Local Includes
-#include "mesh_common.h"
 #include "xdr_cxx.h"
-#include "enum_solver_package.h"
+#include "equation_systems_base.h"
 
 
 // Forward Declarations
-class GeneralSystem;
-class Mesh;
-
+class SystemBase;
 
 
 /**
@@ -48,8 +43,9 @@ class Mesh;
  */
 
 // ------------------------------------------------------------
-// EquationSystems class definition
-class EquationSystems
+// EquationSystems<T_sys> class definition
+template <class T_sys>
+class EquationSystems : public EquationSystemsBase
 {
 public:
 
@@ -78,6 +74,8 @@ public:
 #endif
 		   
 		   );
+
+
   /**
    * Destructor.
    */
@@ -123,63 +121,28 @@ public:
   /**
    * @returns a reference to the system named \p name.
    */
-  GeneralSystem & operator () (const std::string& name);
+  T_sys & operator () (const std::string& name);
 
   /**
    * @returns a constant reference to the system name
    */
-  const GeneralSystem & operator () (const std::string& name) const;
+  const T_sys & operator () (const std::string& name) const;
 
   /**
    * @returns a reference to system number \p num.
    */
-  GeneralSystem & operator () (const unsigned int num);
+  T_sys & operator () (const unsigned int num);
 
   /**
    * @returns a constant reference to system number \p num.
    */
-  const GeneralSystem & operator () (const unsigned int num) const;
+  const T_sys & operator () (const unsigned int num) const;
 
   /**
    * @returns the name of the system number num.
    */
   const std::string & name (const unsigned int num) const;
   
-  /**
-   * @returns \p true if the flag \p fl is set, returns
-   * \p false otherwise.
-   */
-  bool flag (const std::string& fl) const;
-
-  /**
-   * Defines the flag \p fl as \p true. This flag will
-   * be used for all systems.
-   */ 
-  void set_flag (const std::string& fl);
-
-  /**
-   * Undefines the flag \p fl.
-   */
-  void unset_flag (const std::string& fl);
-  
-  /**
-   * @returns the parameter value assoicated with \p id.
-   */
-  Real parameter (const std::string& id) const;
-
-  /**
-   * Defines the value of parameter \p id as \p value.
-   * This parameter will be used for all systems, so
-   * this method makes sure the parameter isn't already
-   * set to avoid accidental overwriting.
-   */
-  Real & set_parameter (const std::string& id);
-  
-  /**
-   * Undefines the value of parameter \p id. 
-   */
-  void unset_parameter (const std::string& id);
-
   /**
    * Fill the input vector \p var_names with the names
    * of the variables for each system.
@@ -196,23 +159,7 @@ public:
   void build_solution_vector (std::vector<Number>& soln);
 
   /**
-   * @returns a constant reference to the mesh
-   */
-  const Mesh & get_mesh() const;
-
-  /**
-   * @returns a reference to the mesh
-   */
-  Mesh & get_mesh();
-
-  /**
-   * @returns the solver package type currently in use
-   */
-  SolverPackage get_solver_package() const 
-  { return _solver_package; }
-
-  /**
-   * Read & initialize the systems from disk using the XDR data format. 
+   * Read & initialize the systems from disk using the XDR data format.
    * This format allows for machine-independent binary output.
    *
    * Note that the equation system can be defined without initializing
@@ -225,7 +172,7 @@ public:
 	    const bool read_data=true);
 
   /**
-   * Write the systems to disk using the XDR data format. 
+   * Write the systems to disk using the XDR data format.
    * This format allows for machine-independent binary output.
    *
    * Note that the solution data can be omitted by calling
@@ -238,7 +185,7 @@ public:
   /**
    * Prints information about the equation systems.
    */
-  void print_info () const {std::cout << get_info() << std::endl; }
+  void print_info () const;
 
   /**
    * @returns a string containing information about the
@@ -248,59 +195,34 @@ public:
   
   
  protected:
-
   
   /**
-   * The mesh data structure
-   */ 
-  Mesh& _mesh;
-  
-  /**
-   * Flag indicating what linear solver package to use
-   */
-  const SolverPackage _solver_package;
-
-  /**     
    * Data structure that holds the systems.
    */
-  std::map<std::string, GeneralSystem*> _systems;
-  
-  /**
-   * Data structure to hold user-specified flags.
-   */
-  std::set<std::string> _flags;
+  std::map<std::string, SystemBase*> _systems;
 
-  /**
-   * Data structore to hold user-specified parameters 
-   */
-  std::map<std::string, Real> _parameters;
 };
 
 
 
 // ------------------------------------------------------------
 // EquationSystems inline methods
+template <class T_sys>
 inline
-unsigned int EquationSystems::n_systems () const
+unsigned int EquationSystems<T_sys>::n_systems () const
 {
   return _systems.size();
 }
 
 
 
+template <class T_sys>
 inline
-const Mesh & EquationSystems::get_mesh () const
+void EquationSystems<T_sys>::print_info() const
 {
-  return _mesh;
+  std::cout << this->get_info() 
+	    << EquationSystemsBase::get_info()
+	    << std::endl;
 }
-
-
-
-inline
-Mesh & EquationSystems::get_mesh ()
-{
-  return _mesh;
-}
-
 
 #endif

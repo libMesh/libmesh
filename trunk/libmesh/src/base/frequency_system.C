@@ -1,4 +1,4 @@
-// $Id: frequency_system.C,v 1.5 2003-02-26 04:43:12 jwpeterson Exp $
+// $Id: frequency_system.C,v 1.6 2003-03-11 04:35:19 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -34,7 +34,7 @@
 
 // ------------------------------------------------------------
 // FrequencySystem implementation
-FrequencySystem::FrequencySystem (EquationSystems&    es,
+FrequencySystem::FrequencySystem (EquationSystems<FrequencySystem>& es,
 				  const std::string&  name,
 				  const unsigned int  number,
 				  const SolverPackage solver_package) :
@@ -237,7 +237,7 @@ FrequencySystem::solve ()
 
 
 
-void FrequencySystem::attach_init_function(void fptr(EquationSystems& es,
+void FrequencySystem::attach_init_function(void fptr(EquationSystems<FrequencySystem>& es,
 						   const std::string& name))
 {
   assert (fptr != NULL);
@@ -247,7 +247,7 @@ void FrequencySystem::attach_init_function(void fptr(EquationSystems& es,
 
 
 
-void FrequencySystem::attach_assemble_function(void fptr(EquationSystems& es,
+void FrequencySystem::attach_assemble_function(void fptr(EquationSystems<FrequencySystem>& es,
 						       const std::string& name))
 {
   assert (fptr != NULL);

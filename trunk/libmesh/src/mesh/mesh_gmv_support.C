@@ -1,4 +1,4 @@
-// $Id: mesh_gmv_support.C,v 1.14 2003-03-11 00:47:47 ddreyer Exp $
+// $Id: mesh_gmv_support.C,v 1.15 2003-03-11 04:35:19 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -25,14 +25,14 @@
 #include <stdio.h>
 
 // Local includes
-#include "equation_systems.h"
+#include "equation_systems_base.h"
 #include "mesh_base.h"
 #include "elem.h"
 
 
 
 void MeshBase::write_gmv (const std::string& name,
-			  EquationSystems& es,
+			  EquationSystemsBase& es,
 			  const bool write_partitioning)
 {
   std::ofstream out(name.c_str());
@@ -43,7 +43,7 @@ void MeshBase::write_gmv (const std::string& name,
 
 
 void MeshBase::write_gmv (std::ostream& out,
-			  EquationSystems& es,
+			  EquationSystemsBase& es,
 			  const bool write_partitioning)
 {
   std::vector<Number> soln;
@@ -349,7 +349,7 @@ void MeshBase::write_gmv(std::ostream& out,
 
 
 void MeshBase::write_gmv_binary (const std::string& name,
-				 EquationSystems& es,
+				 EquationSystemsBase& es,
 				 const bool write_partitioning)
 {
   std::ofstream out(name.c_str());
@@ -360,7 +360,7 @@ void MeshBase::write_gmv_binary (const std::string& name,
 
 
 void MeshBase::write_gmv_binary (std::ostream& out,
-				 EquationSystems& es,
+				 EquationSystemsBase& es,
 				 const bool write_partitioning)
 {
   std::vector<Number> soln;
