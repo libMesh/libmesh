@@ -1,4 +1,4 @@
-// $Id: system_base.C,v 1.13 2003-04-30 21:09:29 benkirk Exp $
+// $Id: system_base.C,v 1.14 2003-05-04 23:59:00 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -43,18 +43,16 @@ typedef std::map<std::string, NumericVector<Number>* >::const_iterator other_vec
 
 SystemBase::SystemBase (Mesh& mesh,
 			const std::string&  name,
-			const unsigned int  number,
-			const SolverPackage solver_package) :
+			const unsigned int  number) :
   
-  solution                (NumericVector<Number>::build(solver_package)),
-  rhs                     (NumericVector<Number>::build(solver_package)),
-  matrix                  (SparseMatrix<Number>::build (solver_package)),
-  linear_solver_interface (LinearSolverInterface<Number>::build(solver_package)),
+  solution                (NumericVector<Number>::build()),
+  rhs                     (NumericVector<Number>::build()),
+  matrix                  (SparseMatrix<Number>::build ()),
+  linear_solver_interface (LinearSolverInterface<Number>::build()),
   _sys_name               (name),
   _sys_number             (number),
   _can_add_matrices       (true),
   _can_add_vectors        (true),
-  _solver_package         (solver_package),
   _dof_map                (number),
   _mesh                   (mesh)
 {
@@ -442,7 +440,7 @@ void SystemBase::add_matrix (const std::string& mat_name)
     }
   
   // build the matrix, add it to the map
-  SparseMatrix<Number>* buf(SparseMatrix<Number>::build(_solver_package).release());
+  SparseMatrix<Number>* buf(SparseMatrix<Number>::build().release());
   _other_matrices[mat_name] = buf;
 
   // assemble() adds the matrix to the _dof_map
@@ -532,7 +530,7 @@ void SystemBase::add_vector (const std::string& vec_name)
     }
   
   // Add the vector to the map
-  NumericVector<Number>* buf(NumericVector<Number>::build(_solver_package).release());
+  NumericVector<Number>* buf(NumericVector<Number>::build().release());
   _other_vectors[vec_name] = buf;
 }
 

@@ -1,4 +1,4 @@
-// $Id: general_system.C,v 1.12 2003-04-30 21:09:28 benkirk Exp $
+// $Id: general_system.C,v 1.13 2003-05-04 23:59:00 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -32,12 +32,11 @@
 // GeneralSystem implementation
 GeneralSystem::GeneralSystem (EquationSystems<GeneralSystem>&    es,
 			      const std::string&  name,
-			      const unsigned int  number,
-			      const SolverPackage solver_package) :
-  SystemBase             (es.get_mesh(), name, number, solver_package),
-  current_local_solution (NumericVector<Number>::build(solver_package)),
-  old_local_solution     (NumericVector<Number>::build(solver_package)),
-  older_local_solution   (NumericVector<Number>::build(solver_package)),
+			      const unsigned int  number) :
+  SystemBase             (es.get_mesh(), name, number),
+  current_local_solution (NumericVector<Number>::build()),
+  old_local_solution     (NumericVector<Number>::build()),
+  older_local_solution   (NumericVector<Number>::build()),
   init_system_fptr       (NULL),
   assemble_fptr          (NULL),
   equation_systems       (es)
@@ -112,7 +111,7 @@ void GeneralSystem::reinit ()
   
   // Project the solution to the new mesh
   AutoPtr<NumericVector<Number> >
-    old_solution (NumericVector<Number>::build(_solver_package));
+    old_solution (NumericVector<Number>::build());
 
   *old_solution = *current_local_solution;
 

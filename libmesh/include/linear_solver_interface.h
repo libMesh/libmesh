@@ -1,4 +1,4 @@
-// $Id: linear_solver_interface.h,v 1.5 2003-03-25 04:26:55 jwpeterson Exp $
+// $Id: linear_solver_interface.h,v 1.6 2003-05-04 23:58:52 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -34,7 +34,7 @@
 #include "enum_solver_type.h"
 #include "enum_preconditioner_type.h"
 #include "reference_counted_object.h"
-
+#include "libmesh.h"
 
 // forward declarations
 //template <typename T> class LinearSolverInterface;
@@ -44,8 +44,9 @@
 
 
 /**
- * This class provides a deal.II interface to the Solver
- * iterative solver library.
+ * This class provides a uniform interface for linear solvers.  This base
+ * class is overloaded to provide linear solvers from different packages
+ * like PETSC or LASPACK.
  *
  * @author Benjamin Kirk, 2003
  */
@@ -69,7 +70,7 @@ public:
    * Builds a \p LinearSolverInterface using the linear solver package specified by
    * \p solver_package
    */
-  static AutoPtr<LinearSolverInterface<T> > build(const SolverPackage solver_package);
+  static AutoPtr<LinearSolverInterface<T> > build(const SolverPackage solver_package = libMesh::default_solver_package());
   
   /**
    * @returns true if the data structures are

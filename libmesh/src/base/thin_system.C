@@ -1,4 +1,4 @@
-// $Id: thin_system.C,v 1.2 2003-04-30 21:09:29 benkirk Exp $
+// $Id: thin_system.C,v 1.3 2003-05-04 23:59:00 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,9 +31,8 @@
 // ThinSystem implementation
 ThinSystem::ThinSystem (EquationSystems<ThinSystem>& es,
 			const std::string&           name,
-			const unsigned int           number,
-			const SolverPackage          solver_package) :
-  SystemBase       (es.get_mesh(), name, number, solver_package),
+			const unsigned int           number) :
+  SystemBase       (es.get_mesh(), name, number),
   init_system_fptr (NULL),
   assemble_fptr    (NULL),
   _equation_systems (es)

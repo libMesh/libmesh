@@ -1,4 +1,4 @@
-// $Id: system_base.h,v 1.13 2003-04-30 21:09:25 benkirk Exp $
+// $Id: system_base.h,v 1.14 2003-05-04 23:58:53 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,7 +31,6 @@
 #include "dof_map.h"
 #include "fe_type.h"
 #include "auto_ptr.h"
-#include "enum_solver_package.h"
 #include "sparse_matrix.h"
 #include "numeric_vector.h"
 #include "linear_solver_interface.h"
@@ -68,8 +67,7 @@ protected:
    */
   SystemBase (Mesh&               mesh,
 	      const std::string&  name,
-	      const unsigned int  number,
-	      const SolverPackage solver_package);
+	      const unsigned int  number);
   
   /**
    * Clear all the data structures associated with
@@ -394,12 +392,6 @@ protected:
    * \p true when additional vectors may still be added, \p false otherwise.
    */
   bool _can_add_vectors;
-
-  /**
-   * remember the solver package, in case we have to add additional
-   * vectors/matrices.
-   */
-  SolverPackage _solver_package;
 
   /**
    * Data structure describing the relationship between
