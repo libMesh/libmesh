@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.24 2004-06-04 17:29:26 spetersen Exp $
+// $Id: mesh_base.h,v 1.25 2004-06-15 20:17:20 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -61,7 +61,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.24 $
+ * \version $Revision: 1.25 $
  */
 
 
@@ -489,18 +489,10 @@ public:
    */
   unsigned int n_processors () const { return libMesh::n_processors(); }
 
-
   /**
    * @returns the subdomain id for this processor.
    */
   unsigned int processor_id () const { return libMesh::processor_id(); }
-  
-  /**
-   * Writes a GMV file with discontinuous data
-   */ 
-  void write_discontinuous_gmv (const std::string& name, 
-				const EquationSystems& es,
-				const bool write_partitioning) const;
 
   /**
    * @returns a string containing relevant information

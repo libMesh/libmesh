@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.60 2004-03-24 05:49:11 jwpeterson Exp $
+// $Id: dof_map.C,v 1.61 2004-06-15 20:17:23 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -433,6 +433,7 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
   if (_dof_coupling.empty())
     {
       std::vector<unsigned int> element_dofs;
+      std::vector<unsigned int> neighbor_dofs;
 
       const_active_elem_iterator       elem_it (mesh.elements_begin());
       const const_active_elem_iterator elem_end(mesh.elements_end());
@@ -465,7 +466,7 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
 		  std::vector<unsigned int>& row =
 		    sparsity_pattern[ig - first_dof_on_proc];
 		  
-		  for (unsigned int j=0; j<n_dofs_on_element; j++)
+ 		  for (unsigned int j=0; j<n_dofs_on_element; j++)
 		    {
 		      const unsigned int jg = element_dofs[j];
 
@@ -478,6 +479,33 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
 		      if (pos.first == pos.second)
 			row.insert (pos.first, jg);
 		    }
+
+		  // Now add dofs from neighboring elements
+		  for (unsigned int s=0; s<elem->n_sides(); s++)
+		    if (elem->neighbor(s) != NULL)
+		      {
+			const Elem* const neighbor = elem->neighbor(s);
+
+			this->dof_indices (neighbor, neighbor_dofs);
+			this->find_connected_dofs (neighbor_dofs);
+
+			const unsigned int n_dofs_on_neighbor = neighbor_dofs.size();
+
+			for (unsigned int j=0; j<n_dofs_on_neighbor; j++)
+			  {
+			    const unsigned int jg = neighbor_dofs[j];
+			    
+			    // See if jg is in the sorted range
+			    std::pair<std::vector<unsigned int>::iterator,
+			              std::vector<unsigned int>::iterator>
+			      pos = std::equal_range (row.begin(), row.end(), jg);
+			    
+			    // Insert jg if it wasn't found
+			    if (pos.first == pos.second)
+			      row.insert (pos.first, jg);
+			  }
+			
+		      }
 		}
 	    }
 	}      
