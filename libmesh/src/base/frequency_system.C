@@ -1,4 +1,4 @@
-// $Id: frequency_system.C,v 1.15 2003-07-07 21:01:30 ddreyer Exp $
+// $Id: frequency_system.C,v 1.16 2003-07-07 23:19:28 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -51,8 +51,8 @@ FrequencySystem::FrequencySystem (EquationSystems& es,
   _finished_assemble        (false)
 {
   // default value for wave speed & fluid density
-  _equation_systems.set_parameter("wave speed") = 340.;
-  _equation_systems.set_parameter("rho")        = 1.225;
+  //_equation_systems.set_parameter("wave speed") = 340.;
+  //_equation_systems.set_parameter("rho")        = 1.225;
 }
 
 
