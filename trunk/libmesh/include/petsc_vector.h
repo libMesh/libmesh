@@ -1,4 +1,4 @@
-// $Id: petsc_vector.h,v 1.13 2003-02-20 23:18:08 benkirk Exp $
+// $Id: petsc_vector.h,v 1.14 2003-02-21 21:03:53 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -340,6 +340,9 @@ private:
    */
   Vec vec;
   
+  /**
+   * Make other Petsc datatypes friends
+   */
   friend class PetscInterface<T>;
 };
 

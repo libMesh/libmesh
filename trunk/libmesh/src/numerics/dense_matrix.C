@@ -1,4 +1,4 @@
-// $Id: dense_matrix.C,v 1.9 2003-02-20 23:18:15 benkirk Exp $
+// $Id: dense_matrix.C,v 1.10 2003-02-21 21:03:56 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -50,10 +50,14 @@ void DenseMatrix<T>::left_multiply (const DenseMatrix<T>& A,
       const unsigned int n_s = C.n();
       const unsigned int p_s = A.n(); 
 
+      // Do it this way because there is a
+      // decent chance (at least for constraint matrices)
+      // that A(i,k) = 0.
       for (unsigned int i=0; i<m_s; i++)
-	for (unsigned int j=0; j<n_s; j++)
-	  for (unsigned int k=0; k<p_s; k++)
-	    C(i,j) += A(i,k)*B(k,j);	           
+	for (unsigned int k=0; k<p_s; k++)
+	  if (A(i,k) != 0.)
+	    for (unsigned int j=0; j<n_s; j++)
+	      C(i,j) += A(i,k)*B(k,j);	           
     }
   else
     {
@@ -74,10 +78,14 @@ void DenseMatrix<T>::left_multiply (const DenseMatrix<T>& A,
       const unsigned int n_s = C.n();
       const unsigned int p_s = A.m(); 
 
+      // Do it this way because there is a
+      // decent chance (at least for constraint matrices)
+      // that A.transpose(i,k) = 0.
       for (unsigned int i=0; i<m_s; i++)
-	for (unsigned int j=0; j<n_s; j++)
-	  for (unsigned int k=0; k<p_s; k++)
-	    C(i,j) += A.transpose(i,k)*B(k,j);
+	for (unsigned int k=0; k<p_s; k++)
+	  if (A.transpose(i,k) != 0.)
+	    for (unsigned int j=0; j<n_s; j++)
+	      C(i,j) += A.transpose(i,k)*B(k,j);
 
       /*
 	std::cout << "C=" << std::endl;
@@ -118,10 +126,14 @@ void DenseMatrix<T>::right_multiply (const DenseMatrix<T>& B,
       const unsigned int n_s = C.n();
       const unsigned int p_s = A.n(); 
 
-      for (unsigned int i=0; i<m_s; i++)
-	for (unsigned int j=0; j<n_s; j++)
-	  for (unsigned int k=0; k<p_s; k++)
-	    C(i,j) += A(i,k)*B(k,j);
+      // Do it this way because there is a
+      // decent chance (at least for constraint matrices)
+      // that B(k,j) = 0.
+      for (unsigned int j=0; j<n_s; j++)
+	for (unsigned int k=0; k<p_s; k++)
+	  if (B(k,j) != 0.)
+	    for (unsigned int i=0; i<m_s; i++)
+	      C(i,j) += A(i,k)*B(k,j);
 
       /*
 	std::cout << "C=" << std::endl;
@@ -140,10 +152,14 @@ void DenseMatrix<T>::right_multiply (const DenseMatrix<T>& B,
       const unsigned int n_s = C.n();
       const unsigned int p_s = A.n(); 
 
-      for (unsigned int i=0; i<m_s; i++)
-	for (unsigned int j=0; j<n_s; j++)
-	  for (unsigned int k=0; k<p_s; k++)
-	    C(i,j) += A(i,k)*B.transpose(k,j);	           
+      // Do it this way because there is a
+      // decent chance (at least for constraint matrices)
+      // that B.transpose(k,j) = 0.
+      for (unsigned int j=0; j<n_s; j++)
+	for (unsigned int k=0; k<p_s; k++)
+	  if (B.transpose(k,j) != 0.)
+	    for (unsigned int i=0; i<m_s; i++)
+	      C(i,j) += A(i,k)*B.transpose(k,j);	           
     }    	     
 }
 

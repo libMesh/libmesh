@@ -4,7 +4,8 @@
   \mainpage libMesh Documentation
  
   \section intro Introduction
- 
+
+   
   The \p libMesh library is a C++ framework for the numerical
   simulation of partial differential equations on serial and parallel
   platforms.  Development began in March 2002 with the intent of
@@ -16,12 +17,22 @@
   parallel platforms, and \p LASPACK is included with the library to provide
   linear solver support on serial machines.
  
+  The \p libMesh library is actively developed at The University of Texas at
+  Austin in the <a href="http://cfdlab.ae.utexas.edu">CFDLab</a>
+  and at Technische Universit&auml;t Hamburg-Harburg,
+  Mechanics and Ocean Engineering in Germany.  Many thanks to
+  <a href="http://sourceforge.net"> SourceForge </a>
+  for <a href="http://sourceforge.net/projects/libmesh"> hosting the project</a>. 
+  You can find out what is currently happening in the development branch
+  by checking out the <a href="http://libmesh.sourceforge.net/cvshtml"> CVS Logs</a>
+  online. 
+  
   A major goal of the library is to provide support for adaptive mesh
   refinement (AMR) computations in parallel while allowing a research
   scientist to focus on the physics they are modeling.  The library
   currently offers:
  
-    - Partitioning Algorithms
+   - Partitioning Algorithms
       - Metis K-Way weighted graph partitioning
       - Hilbert and Morton-ordered space filling curves
  
@@ -79,18 +90,9 @@
       - distort/translate/rotate/scale a mesh
       - determine bounding boxes/spheres
       - extract the mesh boundary for BC handling or as a separate mesh
- 
-  \p libMesh is actively developed at The University of Texas at
-  Austin in the <a href="http://cfdlab.ae.utexas.edu">CFDLab</a>
-  and at Technische Universit&auml;t Hamburg-Harburg,
-  Mechanics and Ocean Engineering in Germany.  Many thanks to
-  <a href="http://sourceforge.net"> SourceForge </a>
-  for <a href="http://sourceforge.net/projects/libmesh"> hosting the project</a>. 
-  You can find out what is currently happening in the development branch
-  by checking out the online CVS logs <a href="http://libmesh.sourceforge.net/cvshtml">
-  here</a>.
- 
- 
+
+
+       
   \section install Installation
  
  

@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.20 2003-02-20 04:59:58 benkirk Exp $
+// $Id: dof_map.C,v 1.21 2003-02-21 21:03:53 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -1052,9 +1052,8 @@ void DofMap::build_constraint_matrix (RealDenseMatrix& C,
     } // end if (!done)
 }
 
+#endif // #ifdef ENABLE_AMR
 
-// endif of ENABLE_AMR
-#endif
 
 
 
@@ -1140,6 +1139,7 @@ void DofMap::find_connected_dofs (std::vector<unsigned int>& elem_dofs) const
     } // end if (!done)
 
 
-#endif
+#endif // #ifdef ENABLE_AMR
+
 
 }
