@@ -30,3 +30,4 @@ distclean:
 	@$(MAKE) clobber
 	@$(MAKE) -C metis/Lib $(MAKECMDGOALS)
 	@$(MAKE) -C sfcurves $(MAKECMDGOALS)
+	@rm -rf lib/*_opt lib/*_dbg lib/*_pro
