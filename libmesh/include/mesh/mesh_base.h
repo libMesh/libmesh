@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.14 2004-03-22 01:11:58 jwpeterson Exp $
+// $Id: mesh_base.h,v 1.15 2004-03-23 04:17:26 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -61,7 +61,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.14 $
+ * \version $Revision: 1.15 $
  */
 
 
@@ -480,26 +480,6 @@ public:
   unsigned int processor_id () const { return libMesh::processor_id(); }
   
   /**
-   * Reads the file specified by \p name.  Attempts to figure out the
-   * proper method by the file extension.
-   */
-  virtual void read (const std::string& name);
-  
-  /**
-   * Write to the file specified by \p name.  Attempts to figure out the
-   * proper method by the file extension.
-   */
-  virtual void write (const std::string& name);
-  
-  /**
-   * Write to the file specified by \p name.  Attempts to figure out the
-   * proper method by the file extension. Also writes data.
-   */
-  virtual void write (const std::string& name,
-		      const std::vector<Number>& values,
-		      const std::vector<std::string>& variable_names);
-
-  /**
    * Writes a GMV file with discontinuous data
    */ 
   void write_discontinuous_gmv (const std::string& name, 
@@ -692,20 +672,6 @@ protected:
    * Return a reference to the \p cells vector holding the elements.
    */
   std::vector<Elem*> & get_elem () { return _elements; }
-
-  /**
-   * Reads an unstructured 2D triangular mesh from the file
-   * specified by \p name.  The format is described in the 
-   * implementation.  This function facilitates reading meshes 
-   * created by Matlab's PDE Toolkit.
-   */
-  void read_matlab (const std::string& name);
-  
-  /**
-   * Reads a matlab-format mesh from a stream.  
-   * Implements the read process initiated by the associated public method.
-   */
-  void read_matlab (std::istream& in);
 
   /**
    * Reads an unstructured, triangulated surface in the

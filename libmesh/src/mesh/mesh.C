@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.35 2004-03-20 15:16:56 benkirk Exp $
+// $Id: mesh.C,v 1.36 2004-03-23 04:17:26 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -34,7 +34,7 @@
 #include "tetgen_io.h"
 #include "ucd_io.h"
 #include "unv_io.h"
-
+#include "matlab_io.h"
 
 // ------------------------------------------------------------
 // Mesh class member functions
@@ -74,7 +74,7 @@ void Mesh::read (const std::string& name)
   if (libMesh::processor_id() == 0)
     {
       if (name.rfind(".mat") < name.size())
-	this->read_matlab (name);
+	MatlabIO (*this).read(name);
       
       else if (name.rfind(".ucd") < name.size())
 	UCDIO (*this).read (name);

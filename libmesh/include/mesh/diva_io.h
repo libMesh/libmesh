@@ -1,4 +1,4 @@
-// $Id: diva_io.h,v 1.1 2004-03-20 05:36:26 jwpeterson Exp $
+// $Id: diva_io.h,v 1.2 2004-03-23 04:17:26 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -27,7 +27,7 @@
 
 
 /**
- * This class implements reading and writing meshes in the Diva format.
+ * This class implements writing meshes in the Diva format.
  * This is a scientific visualization program created by Kelly Gaither.
  * More information on Diva can be found here:
  * http://www.erc.msstate.edu/simcenter/docs/diva/

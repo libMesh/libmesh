@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.72 2004-03-22 22:41:46 benkirk Exp $
+// $Id: mesh_base.C,v 1.73 2004-03-23 04:17:26 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -1034,33 +1034,4 @@ Sphere MeshBase::subdomain_bounding_sphere (const unsigned int sid) const
   const Point cent = (bbox.second + bbox.first)/2.;
 
   return Sphere (cent, .5*diag);
-}
-
-
-
-void MeshBase::read (const std::string&)
-{
-  std::cerr << "ERROR:  You shouldn't be calling this" << std::endl
-	    << " Use Mesh::read() instead." << std::endl;
-  error();
-}
-
-
-
-void MeshBase::write(const std::string&)
-{
-  std::cerr << "ERROR:  You shouldn't be calling this" << std::endl
-	    << " Use Mesh::write() instead." << std::endl;
-  error();
-}
-
-
-
-void MeshBase::write(const std::string&,
-		     const std::vector<Number>&,
-		     const std::vector<std::string>&)
-{
-  std::cerr << "ERROR:  You shouldn't be calling this" << std::endl
-	    << " Use Mesh::write() instead." << std::endl;
-  error();
 }
