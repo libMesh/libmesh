@@ -1,0 +1,286 @@
+<!DOCTYPE HTML PUBLIC "-//W3O//DTD W3 HTML 2.0//EN">
+<!Converted with LaTeX2HTML 95 (Thu Jan 19 1995) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds >
+<HEAD>
+<TITLE> ITERSOLV(3LAS)</TITLE>
+</HEAD>
+<BODY>
+<meta name="description" value=" ITERSOLV(3LAS)">
+<meta name="keywords" value="html">
+<meta name="resource-type" value="document">
+<meta name="distribution" value="global">
+<P>
+ <BR> <HR><A NAME=tex2html388 HREF="node21.html"><IMG ALIGN=BOTTOM ALT="next" SRC="next_motif.gif"></A> <A NAME=tex2html386 HREF="node15.html"><IMG ALIGN=BOTTOM ALT="up" SRC="up_motif.gif"></A> <A NAME=tex2html380 HREF="node19.html"><IMG ALIGN=BOTTOM ALT="previous" SRC="previous_motif.gif"></A> <A NAME=tex2html390 HREF="node1.html"><IMG ALIGN=BOTTOM ALT="contents" SRC="contents_motif.gif"></A>   <A HREF="node28.html#SectionIndex"><IMG ALIGN=BOTTOM ALT="index" SRC="index_motif.gif"></A> <BR>
+<B> Next:</B> <A NAME=tex2html389 HREF="node21.html"> MATRIX(3LAS)</A>
+<B>Up:</B> <A NAME=tex2html387 HREF="node15.html"> Manual Pages</A>
+<B> Previous:</B> <A NAME=tex2html381 HREF="node19.html"> FACTOR(3LAS)</A>
+<BR> <HR> <P>
+<H2><A NAME=SECTION00085000000000000000>&#160</A><A NAME=ITERSOLV> ITERSOLV(3LAS)</A></H2>
+<P>
+<P>
+
+<H3><A NAME=SECTION00085100000000000000> NAME</A></H3>
+<P>
+
+<P>
+<tt> JacobiIter</tt>,
+<tt> SORForwIter</tt>, <tt> SORBackwIter</tt>, <tt> SSORIter</tt>,
+<tt> ChebyshevIter</tt>,
+<tt> CGIter</tt>, <tt> CGNIter</tt>, <tt> GMRESIter</tt>, <tt> BiCGIter</tt>, <tt> QMRIter</tt>,
+<tt> CGSIter</tt>, <tt> BiCGSTABIter</tt>, <tt> SetGMRESRestart</tt>
+-- classical iterative, semi-iterative, CG, and CG-like solvers
+<P>
+<H3><A NAME=SECTION00085200000000000000> SYNOPSIS</A></H3>
+<P>
+
+<PRE>#include &lt;laspack/itersolv.h&gt;
+
+typedef Vector *(*IterProcType)(QMatrix *, Vector *, Vector *, int,
+            PrecondProcType, double) 
+
+Vector *JacobiIter(QMatrix *A, Vector *x, Vector *b, int MaxIter, 
+            PrecondProcType Dummy, double Omega);
+Vector *SORForwIter(QMatrix *A, Vector *x, Vector *b, int MaxIter, 
+            PrecondProcType Dummy, double Omega);
+Vector *SORBackwIter(QMatrix *A, Vector *x, Vector *b, int MaxIter, 
+            PrecondProcType Dummy, double Omega);
+Vector *SSORIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
+            PrecondProcType Dummy, double Omega);
+Vector *ChebyshevIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
+            PrecondProcType PrecondProc, double OmegaPrecond);
+Vector *CGIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
+            PrecondProcType PrecondProc, double OmegaPrecond);
+Vector *CGNIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
+            PrecondProcType PrecondProc, double OmegaPrecond);
+Vector *GMRESIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
+            PrecondProcType PrecondProc, double OmegaPrecond);
+Vector *BiCGIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
+            PrecondProcType PrecondProc, double OmegaPrecond);
+Vector *QMRIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
+            PrecondProcType PrecondProc, double OmegaPrecond);
+Vector *CGSIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
+            PrecondProcType PrecondProc, double OmegaPrecond);
+Vector *BiCGSTABIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
+            PrecondProcType PrecondProc, double OmegaPrecond);
+Vector *SetGMRESRestart(int Steps);
+</PRE>
+<H3><A NAME=SECTION00085300000000000000> DESCRIPTION</A></H3>
+<P>
+<H6><A NAME=JacobiIter>&#160;</A><A NAME=SORForwIter>&#160;</A><A NAME=SORBackwIter>&#160;</A><A NAME=SSORIter>&#160;</A></H6>
+The procedures <tt> JacobiIter</tt>,
+<tt> SORForwIter</tt>, <tt> SORBackwIter</tt>, and <tt> SSORIter</tt>
+can be used for the iterative solution of the system of linear equations
+
+<PRE>  A x = b
+</PRE>
+<P>
+by the Jacobi or Successive Over-relaxation Method.
+For the SOR method,
+lexicographically forward, lexicographically backward, and symmetric variants
+are implemented.
+The parameter <tt> Omega</tt> is used as relaxation parameter.
+The blank parameter <tt> Dummy</tt> ensures the consistency
+of the procedure prototype with other solvers and
+should be set to <tt> NULL</tt>.
+<P>
+<H6><A NAME=ChebyshevIter>&#160;</A><A NAME=CGIter>&#160;</A><A NAME=CGNIter>&#160;</A><A NAME=GMRESIter>&#160;</A><A NAME=BiCGIter>&#160;</A><A NAME=QMRIter>&#160;</A><A NAME=CGSIter>&#160;</A><A NAME=BiCGSTABIter>&#160;</A></H6>
+The procedures <tt> ChebyshevIter</tt>,
+<tt> CGIter</tt>, <tt> CGNIter</tt>, <tt> GMRESIter</tt>, <tt> BiCGIter</tt>, <tt> QMRIter</tt>, 
+<tt> CGSIter</tt>, <tt> BiCGSTABIter</tt>
+treat the system by the Chebyshev method,
+Conjugate Gradient method (CG), CG on the Normal Equations (CGN),
+Generalized Minimal Residual (GMRES), BiConjugate Gradient (BiCG),
+Quasi-Minimal Residual (QMR, without lock-ahead),
+Conjugate Gradient Squared method (CGS), 
+and BiConjugate Gradient Stabilized (BiCGSTAB), respectively.
+<P>
+If any procedure for preconditioning of the system of equations
+is specified by the parameter <tt> PrecondProc</tt>
+(i.e. if <tt> PrecondProc != NULL</tt>),
+the corresponding preconditioned variant of these methods is applied.
+The procedure used should have the prototype
+
+<PRE>  Vector *(*PrecondProcType)(QMatrix *, Vector *, Vector *, double)
+</PRE>
+
+The parameter <tt> OmegaPrecond</tt> will be passed as relaxation parameter 
+to the preconditioner.
+<P>
+<H6><A NAME=SetGMRESRestart>&#160;</A></H6>
+For GMRES, one could specify the number of step after which the method
+should be restarted by the procedure <tt> SetGMRESRestart</tt>.
+By default, 10 steps are applied.
+<P>
+All procedures are terminated either after <tt> MaxIter</tt> iteration steps
+or if the residual satisfies the condition
+
+<PRE>    || r ||_2 = || b - A x ||_2 &lt;= eps || b ||_2,
+</PRE>
+<P>
+where <tt> eps</tt>
+ is the accuracy defined by <tt> LASPack</tt>
+  termination control
+(module <A HREF="node26.html#RTC"><b> RTC</b></A>).
+<P>
+For systems with singular matrices,
+orthogonalization of the solution vector to the null space of the matrix
+(which should be specified)
+is applied in all solvers to ensure unique solution as well as convergence
+in the resulting subspace.
+<P>
+<H3><A NAME=SECTION00085400000000000000> REFERENCES</A></H3>
+<P>
+The algorithms used are based on:
+
+<blockquote> R. Barrett, M. Berry, T. F. Chan, J. Demmel, J. Donato, J. Dongarra, 
+  V. Eijkhout, R. Pozo, Ch. Romine, H. van der Vorst:
+  <A NAME=tex2html13 HREF="http://www.netlib.org/templates/templates.ps">
+  Templates for the Solution of Linear Systems: Building Blocks
+  for Iterative Solvers</A>,
+  SIAM, Philadelphia, 1994.
+  (A <A NAME=tex2html14 HREF="http://www.netlib.org/templates/Templates.html">HTML version</A> is also available).
+</blockquote>
+
+For a theoretical foundation of above iterative methods see references therein
+or e.g.:
+
+<blockquote> W. Hackbusch:
+  Iterative Solution of Large Sparse Systems of Equations,
+  Springer-Verlag, Berlin, 1994.
+</blockquote><H3><A NAME=SECTION00085500000000000000> FILES</A></H3>
+<P>
+  <tt> itersolv.h ... </tt> header file <BR> 
+
+  <tt> itersolv.c ... </tt> source file
+<P>
+<H3><A NAME=SECTION00085600000000000000> EXAMPLES</A></H3>
+<P>
+The implementation of all the above iterative solvers is based
+on matrix-vector operations,
+especially the procedures <tt> Mul_QV</tt> and <tt> MulInv_QV</tt>
+from the module <A HREF="node23.html#OPERATS"><b> OPERATS</b></A>.
+This approach allows us to formulate the algorithms independently
+on matrix storage formats.
+Moreover, the usage of residuals which have to be computed in any way
+for convergence control leads to computational costs
+which is comparable to point-wise solvers.
+Numerical experiments showed differences
+of about <tt> 10%</tt>
+ depending on the computer architecture.
+The following example demonstrates how e.g. the Jacobi method
+is implemented in <tt> LASPack</tt>
+ .
+
+<PRE>Vector *JacobiIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
+            PrecondProcType Dummy, double Omega)
+{
+    int Iter;
+    double bNorm;
+    size_t Dim;
+    Vector r;
+
+    Q_Lock(A);
+    V_Lock(x);
+    V_Lock(b);
+    
+    Dim = Q_GetDim(A);
+    V_Constr(&amp;r, &quot;r&quot;, Dim, Normal, True);
+
+    if (LASResult() == LASOK) {
+        bNorm = l2Norm_V(b);
+
+        Iter = 0;
+        /* r = b - A * x(i) */
+        if (!IsZero(l1Norm_V(x) / Dim)) {
+            if (Q_KerDefined(A))
+                OrthoRightKer_VQ(x, A);
+            Asgn_VV(&amp;r, Sub_VV(b, Mul_QV(A, x)));
+   } else {
+            Asgn_VV(&amp;r, b);
+   }
+        while (!RTCResult(Iter, l2Norm_V(&amp;r), bNorm, JacobiIterId)
+            &amp;&amp; Iter &lt; MaxIter) {
+            Iter++;
+            /* x(i+1) = x(i) + Omega * D^(-1) * r */
+            AddAsgn_VV(x, Mul_SV(Omega, MulInv_QV(Diag_Q(A), &amp;r)));
+            if (Q_KerDefined(A))
+                OrthoRightKer_VQ(x, A);
+            /* r = b - A * x(i) */
+            if (Iter &lt; MaxIter)
+                Asgn_VV(&amp;r, Sub_VV(b, Mul_QV(A, x)));
+   }
+    }
+
+    V_Destr(&amp;r);
+
+    Q_Unlock(A);
+    V_Unlock(x);
+    V_Unlock(b);
+
+    return(x);
+}
+</PRE>
+<P>
+The following code fragment shows how the system of linear equations
+<tt> A x = b</tt>
+ could be solved
+by the conjugate gradient method with SSOR preconditioning. 
+The solution process should be terminated if the accuracy
+of 1e-5
+ was reached but at least after 100 iterations.
+The relaxation parameter for the SSOR preconditioner is set to 1.2.
+
+<PRE>QMatrix A;
+Vector x, b;
+size_t Dim;
+
+Dim = ... ;
+Q_Constr(&amp;A, &quot;A&quot;, Dim, True, Rowws, Normal, True);
+V_Constr(&amp;x, &quot;x&quot;, Dim, Normal, True);
+V_Constr(&amp;b, &quot;b&quot;, Dim, Normal, True);
+
+/* generation of the matrix A and the right hand side vector b */
+
+...
+
+/***/
+    
+SetRTCAccuracy(1e-5); 
+V_SetAllCmp(&amp;x, 0.0);
+CGIter(&amp;A, &amp;x, &amp;b, 100, SSORPrecond, 1.2);
+       
+/* output of the solution vector x */
+
+...
+
+Q_Destr(&amp;A);
+V_Destr(&amp;x);
+V_Destr(&amp;b);
+</PRE>
+<P>
+If the matrix <tt> A</tt>
+ is singular, symmetric, and
+its null space consists e.g. of vectors with equals components,
+the code should be extended at the point marked by <tt> /***/</tt>
+with the following two statements:
+<P>
+<PRE>V_SetAllCmp(&amp;x, 1.0);
+Q_SetKer(&amp;A, &amp;x, NULL);
+</PRE>
+<P>
+<H3><A NAME=SECTION00085700000000000000> SEE ALSO</A></H3>
+<P>
+<A HREF="node25.html#QMATRIX">qmatrix(3LAS)</A>, <A HREF="node27.html#VECTOR">vector(3LAS)</A>,
+<A HREF="node24.html#PRECOND">precond(3LAS)</A>, <A HREF="node26.html#RTC">rtc(3LAS)</A>,
+<A HREF="node23.html#OPERATS">operats(3LAS)</A>, <A HREF="node18.html#ERRHANDL">errhandl(3LAS)</A>
+<P>
+<BR> <HR><A NAME=tex2html388 HREF="node21.html"><IMG ALIGN=BOTTOM ALT="next" SRC="next_motif.gif"></A> <A NAME=tex2html386 HREF="node15.html"><IMG ALIGN=BOTTOM ALT="up" SRC="up_motif.gif"></A> <A NAME=tex2html380 HREF="node19.html"><IMG ALIGN=BOTTOM ALT="previous" SRC="previous_motif.gif"></A> <A NAME=tex2html390 HREF="node1.html"><IMG ALIGN=BOTTOM ALT="contents" SRC="contents_motif.gif"></A>   <A HREF="node28.html#SectionIndex"><IMG ALIGN=BOTTOM ALT="index" SRC="index_motif.gif"></A> <BR>
+<B> Next:</B> <A NAME=tex2html389 HREF="node21.html"> MATRIX(3LAS)</A>
+<B>Up:</B> <A NAME=tex2html387 HREF="node15.html"> Manual Pages</A>
+<B> Previous:</B> <A NAME=tex2html381 HREF="node19.html"> FACTOR(3LAS)</A>
+<BR> <HR> <P>
+<BR> <HR>
+<P><ADDRESS>
+Tomas Skalicky (skalicky@msmfs1.mw.tu-dresden.de)
+</ADDRESS>
+</BODY>
+</BODY>
