@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.29 2003-11-06 20:30:17 benkirk Exp $
+# $Id: Make.common.in,v 1.30 2003-11-30 05:00:36 benkirk Exp $
 
 
 ###############################################################################
@@ -37,37 +37,10 @@ RPATHFLAG            = @RPATHFLAG@
 
 # Complex variable support
 enable-complex       = @enablecomplex@
-
-# NetCDF platform-independent binary file support.
-# Needed for ExodusII support
-enable-netcdf 	     = @enablenetcdf@
-NETCDF_INCLUDE	     = @NETCDF_INCLUDE_PATH@
-NETCDF_LIBRARY	     = @LIBNETCDF@ 
-
-# HDF Version 4 support for platform-independent
-# binary files.  Precludes (because it includes) NetCDF
-enable-hdf4          = @enablehdf4@
-HDF4_INCLUDE	     = @HDF4_INCLUDE_PATH@
-HDF4_LIB_DIR	     = @HDF4_LIB_PATH@ 
-HDF4_LIBS            = @HDF4_LIB_NAMES@
-
-# ExodusII binary file support for reading meshes in 
-# Sandia National Lab's ExodusII format
-enable-exodus        = @enableexodus@
-EXODUS_INCLUDE       = @EXODUS_INCLUDE_PATH@
-EXODUS_LIBRARY       = @LIBEXOII@
-
-# Metis graph partitiong software for domain decomposition
-enable-metis         = @enablemetis@
-METIS_INCLUDE	     = @METIS_INCLUDE_PATH@
-
-# Parmetis graph partitiong software for domain decomposition
-enable-parmetis      = @enableparmetis@
-PARMETIS_INCLUDE     = @PARMETIS_INCLUDE_PATH@
-
-# Laspack iterative solvers for uniprocessor applications
-enable-laspack       = @enablelaspack@
-LASPACK_INCLUDE	     = @LASPACK_INCLUDE_PATH@
+ifeq ($(enable-complex),yes)
+  CXXFLAGS     += -DUSE_COMPLEX_NUMBERS
+  CFLAGS       += -DUSE_REAL_NUMBERS
+endif
 
 # Petsc iterative solvers for parallel and uniprocessor
 # applications
@@ -76,25 +49,10 @@ petsc-version        = @petscversion@
 PETSC_ARCH           = @PETSC_ARCH@
 PETSC_DIR            = @PETSC_DIR@
 
-# MPI message passing interface for parallel communication.
-# Only configured explicitly if Petsc is absent, otherwise
-# just snoop Petsc's MPI configuration
-enable-mpi           = @enablempi@
-MPI_INCLUDE          = @MPI_INCLUDE_PATH@
-MPI_LIBRARY          = @MPI_LIBRARY_PATH@
-
-# Hilbert and Morton space filling curves for domain decomposition
-enable-sfc	     = @enablesfc@
-SFC_INCLUDE	     = @SFC_INCLUDE_PATH@
-
-# gzstreams for reading/writing compressed files using streams
-enable-gzstreams     = @enablegz@
-GZ_INCLUDE	     = @GZ_INCLUDE_PATH@
-
-# Tecplot binary API support
-enable-tecplot       = @enabletecplot@
-TECIO_INCLUDE        = @TECPLOT_INCLUDE_PATH@
-TECIO_LIBRARY        = @TECPLOT_LIBRARY@
+# MPI configuration
+# (only explicitly defined when PETSc is absent, otherwise snooped from PETSc)
+MPI_INCLUDE = @MPI_INCLUDES_PATHS@
+MPI_LIB     = @MPI_LIBS_PATHS@ @MPI_LIBS@
 
 # Doxygen for generating documentation
 doxygen		     = @DOXYGEN@
@@ -263,49 +221,32 @@ ifeq ($(enable-optional),yes)
 
   # if Laspack is used we need the header path
   # and the lib
-  ifeq ($(enable-laspack),yes)
-    LIBS    += $(EXTERNAL_LIBDIR)/liblaspack$(EXTERNAL_LIBEXT)
-    INCLUDE += -I$(LASPACK_INCLUDE)
-    ifeq ($(enable-complex),yes)
-      CXXFLAGS     += -DUSE_COMPLEX_NUMBERS
-      CFLAGS       += -DUSE_REAL_NUMBERS
-    endif
-  endif
+  LIBS    += @LASPACK_LIB@
+  INCLUDE += @LASPACK_INCLUDE@
 
   # if Metis is used we need the header path
   # and the lib
-  ifeq ($(enable-metis),yes)
-    LIBS    += $(EXTERNAL_LIBDIR)/libmetis$(EXTERNAL_LIBEXT)
-    INCLUDE += -I$(METIS_INCLUDE)
+  LIBS    += @METIS_LIB@
+  INCLUDE += @METIS_INCLUDE@
 
-    # if Paretis is used we need the header path
-    # and the lib
-    ifeq ($(enable-parmetis),yes)
-      LIBS    += $(EXTERNAL_LIBDIR)/libparmetis$(EXTERNAL_LIBEXT)
-      INCLUDE += -I$(PARMETIS_INCLUDE)
-    endif
-  endif
+  # if Paretis is used we need the header path
+  # and the lib
+  LIBS    += @PARMETIS_LIB@
+  INCLUDE += @PARMETIS_INCLUDE@
 
   # if Space filling curves are used we need the
   # header path and the lib
-  ifeq ($(enable-sfc),yes)
-    LIBS    += $(EXTERNAL_LIBDIR)/libsfcurves$(EXTERNAL_LIBEXT)
-    INCLUDE += -I$(SFC_INCLUDE)
-  endif
+  LIBS    += @SFC_LIB@
+  INCLUDE += @SFC_INCLUDE@
 
   # if gzstreams are used, we need the 
   # header path and the lib
-  ifeq ($(enable-gzstreams),yes)
-    LIBS    += $(EXTERNAL_LIBDIR)/libgzstream$(EXTERNAL_LIBEXT) -lz
-    INCLUDE += -I$(GZ_INCLUDE)
-  endif
-
+  LIBS    += @GZSTREAM_LIB@
+  INCLUDE += @GZSTREAM_INCLUDE@
 
   #if Tecplot is used, link against tecio.a
-  ifeq ($(enable-tecplot),yes)
-    LIBS    += $(TECIO_LIBRARY)
-    INCLUDE += -I$(TECIO_INCLUDE)
-  endif	
+  LIBS    += @TECPLOT_LIBRARY@
+  INCLUDE += @TECPLOT_INCLUDE@
 
   #############################################################################
   # Petsc
@@ -358,39 +299,27 @@ ifeq ($(enable-optional),yes)
     LIBS += $(libs-PETSC) $(BLOCKSOLVE_LIB) $(SPOOLES_LIB) \
 	    $(HYPRE_LIB) $(BLASLAPACK_LIB) $(MPI_LIB) \
 	    $(X11_LIB) $(MATLAB_LIB) $(FLIBS)
-  else
-
-    # MPI configuration when Petsc is absent
-    ifeq ($(enable-mpi),yes)
-      LIBS    += $(MPI_LIBRARY)
-      INCLUDE += $(MPI_INCLUDE)
-    endif
 
   endif #end ifeq ($(enable-petsc),yes)
+
+  # MPI configuration when Petsc is absent
+  LIBS    += $(MPI_LIB)
+  INCLUDE += $(MPI_INCLUDE)
+
 
 endif # End of disable-optional test
 
 
 
 #if Exodus is used, link against libexoIIv2c.a
-ifeq ($(enable-exodus),yes)
-  LIBS += $(EXODUS_LIBRARY)
-  INCLUDE += -I$(EXODUS_INCLUDE)
-endif
+LIBS    += @EXODUS_LIB@
+INCLUDE += @EXODUS_INCLUDE@
 
 #if netCDF is used, link against libnetcdf.a
 # (note that netCDF is required by exodus if available,
 # so we need to link to this _after_ exodus.
-ifeq ($(enable-netcdf),yes)
-  LIBS += $(NETCDF_LIBRARY)
-  INCLUDE += -I$(NETCDF_INCLUDE)
-endif
-
-#if HDF4 is used, link against its libraries
-ifeq ($(enable-hdf4),yes)
-  LIBS += -L$(HDF4_LIB_DIR) $(HDF4_LIBS)
-  INCLUDE += -I$(HDF4_INCLUDE)
-endif
+LIBS    += @NETCDF_LIB@
+INCLUDE += @NETCDF_INCLUDE@
 
 
 #

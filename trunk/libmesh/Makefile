@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.32 2003-11-11 20:51:47 benkirk Exp $
+# $Id: Makefile,v 1.33 2003-11-30 05:00:36 benkirk Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -33,7 +33,7 @@ objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
 
 #
 # logged files -- all files you might want to log information for
-loggedfiles     := $(srcfiles) $(filter-out include/mesh_config.h, $(headerfiles))
+loggedfiles     := $(srcfiles) $(filter-out include/base/libmesh_config.h, $(headerfiles))
 ###############################################################################
 
 
@@ -124,7 +124,8 @@ distclean:
 	@$(MAKE) clobber
 	@$(MAKE) -C contrib $(MAKECMDGOALS)
 	@$(MAKE) -C examples $(MAKECMDGOALS)
-	@rm -rf doc/html/*.html doc/html/*.png doc/html/*.gif doc/latex \
+	@rm -rf doc/html/*.html doc/html/*.png doc/html/*.gif \
+                doc/html/doxygen/*.html doc/latex \
                 doc/man/man3 doc/cvshtml/*.html doc/cvshtml/diff \
 	        src/*/*.o src/*/*.g.o src/*/*.pg.o \
 	        lib/*_opt lib/*_dbg lib/*_pro
