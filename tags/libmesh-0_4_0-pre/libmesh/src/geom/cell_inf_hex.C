@@ -1,0 +1,355 @@
+// $Id: cell_inf_hex.C,v 1.1 2003-03-11 00:47:41 ddreyer Exp $
+
+// The Next Great Finite Element Library.
+// Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
+  
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+  
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+  
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+// Local includes
+#include "mesh_config.h"
+
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+
+// C++ includes
+#include <algorithm>
+
+// Local includes cont'd
+#include "cell_inf_hex.h"
+#include "face_quad4.h"
+#include "face_inf_quad4.h"
+
+
+
+
+// ------------------------------------------------------------
+// InfHex class member functions
+AutoPtr<Elem> InfHex::side (const unsigned int i) const
+{
+  assert (i < this->n_sides());
+
+  /*
+   *Think of a unit cube: (-1,1) x (-1,1)x (-1,1),
+   * with (in general) the normals pointing outwards
+   */
+  switch (i)
+    {
+    case 0:  // the face at z = -1
+      // the base, where the infinite element couples to conventional
+      // elements
+      {  
+        AutoPtr<Elem> face(new Quad4);
+
+	/*
+	 * Oops, here we are, claiming the normal of the face
+	 * elements point outwards -- and this is the exception:
+	 * For the side built from the base face, 
+	 * the normal is pointing _into_ the element!
+	 * Why is that? - In agreement with build_side(),
+	 * which in turn _has_ to build the face in this
+	 * way as to enable the cool way \p InfFE re-uses \p FE.
+	 */
+	face->set_node(0) = this->get_node(0);
+	face->set_node(1) = this->get_node(1);
+	face->set_node(2) = this->get_node(2);
+	face->set_node(3) = this->get_node(3);
+/* old code
+	face->set_node(0) = this->get_node(0);
+	face->set_node(1) = this->get_node(3);
+	face->set_node(2) = this->get_node(2);
+	face->set_node(3) = this->get_node(1);
+*/
+
+	return face;
+      }
+
+    case 1:  // the face at y = -1
+      // this face connects to another infinite element
+      {
+	AutoPtr<Elem> face(new InfQuad4);
+
+	face->set_node(0) = this->get_node(0);
+	face->set_node(1) = this->get_node(1);
+	face->set_node(2) = this->get_node(5);
+	face->set_node(3) = this->get_node(4);
+	
+	return face;
+      }
+
+    case 2:  // the face at x = 1
+      // this face connects to another infinite element
+      {
+	AutoPtr<Elem> face(new InfQuad4);
+
+	face->set_node(0) = this->get_node(1);
+	face->set_node(1) = this->get_node(2);
+	face->set_node(2) = this->get_node(6);
+	face->set_node(3) = this->get_node(5);
+
+	return face;
+      }
+
+    case 3: // the face at y = 1
+      // this face connects to another infinite element
+      {
+	AutoPtr<Elem> face(new InfQuad4);
+
+	face->set_node(0) = this->get_node(2);
+	face->set_node(1) = this->get_node(3);
+	face->set_node(2) = this->get_node(7);
+	face->set_node(3) = this->get_node(6);
+	
+	return face;
+      }
+
+    case 4: // the face at x = -1
+      // this face connects to another infinite element
+      {  
+	AutoPtr<Elem> face(new InfQuad4);
+
+	face->set_node(0) = this->get_node(3);
+	face->set_node(1) = this->get_node(0);
+	face->set_node(2) = this->get_node(4);
+	face->set_node(3) = this->get_node(7);
+
+	return face;
+      }
+
+    default:
+      {
+	error();
+	AutoPtr<Elem> ap(NULL);  return ap;
+      }
+    }
+
+  // We'll never get here.
+  error();
+  AutoPtr<Elem> ap(NULL);  return ap;
+}
+
+
+
+
+Real InfHex::quality (const ElemQuality q) const
+{
+  switch (q)
+    {
+      
+      /**
+       * Compue the min/max diagonal ratio.
+       * Source: CUBIT User's Manual.
+       *
+       * For infinite elements, we just only compute
+       * the diagonal in the face...
+       * Don't know whether this makes sense,
+       * but should be a feasible way.
+       */
+    case DIAGONAL:
+      {
+	// Diagonal between node 0 and node 2
+	const Real d02 = this->length(0,2);
+
+	// Diagonal between node 1 and node 3
+	const Real d13 = this->length(1,3);
+
+	// Find the biggest and smallest diagonals
+	const Real min = std::min(d02, d13);
+	const Real max = std::max(d02, d13);
+
+	assert (max != 0.0);
+	
+	return min / max;
+
+	break;
+      }
+
+      /**
+       * Minimum ratio of lengths derived from opposite edges.
+       * Source: CUBIT User's Manual.
+       *
+       * For IFEMs, do this only for the base face...
+       * Does this make sense?
+       */
+    case TAPER:
+      {
+
+	/**
+	 * Compute the side lengths.
+	 */
+	const Real d01 = this->length(0,1);
+	const Real d12 = this->length(1,2);
+	const Real d23 = this->length(2,3);
+	const Real d03 = this->length(0,3);
+
+	std::vector<Real> edge_ratios(2);
+
+	// Bottom
+	edge_ratios[8] = std::min(d01, d23) / std::max(d01, d23);
+	edge_ratios[9] = std::min(d03, d12) / std::max(d03, d12);
+	
+	return *(std::min_element(edge_ratios.begin(), edge_ratios.end())) ;
+
+	break;
+      }
+
+
+      /**
+       * Minimum edge length divided by max diagonal length.
+       * Source: CUBIT User's Manual.
+       *
+       * And again, we mess around a bit, for the IFEMs...
+       * Do this only for the base.
+       */
+    case STRETCH:
+      {
+	/**
+	 * Should this be a sqrt2, when we do this for the base only?
+	 */
+	const Real sqrt3 = 1.73205080756888;
+
+	/**
+	 * Compute the maximum diagonal in the base.
+	 */
+	const Real d02 = this->length(0,2);
+	const Real d13 = this->length(1,3);
+	const Real max_diag = std::max(d02, d13);
+
+	assert ( max_diag != 0.0 );
+
+	/**
+	 * Compute the minimum edge length in the base.
+	 */
+	std::vector<Real> edges(4);
+	edges[0]  = this->length(0,1);
+	edges[1]  = this->length(1,2);
+	edges[2]  = this->length(2,3);
+	edges[3]  = this->length(0,3);
+
+	const Real min_edge = *(std::min_element(edges.begin(), edges.end()));
+	return sqrt3 * min_edge / max_diag ;
+	break;
+      }
+
+      
+      /**
+       * I don't know what to do for this metric. 
+       * Maybe the base class knows...
+       */
+    default:
+      {
+	return Elem::quality(q);
+      }
+    }
+
+    
+    // Will never get here...
+    error();
+    return 0.;
+}
+
+
+
+std::pair<Real, Real> InfHex::qual_bounds (const ElemQuality) const
+{
+  std::cerr << "ERROR: Not implemented." << std::endl;
+  error();
+
+  std::pair<Real, Real> bounds;
+
+/*
+  switch (q)
+    {
+
+    case ASPECT_RATIO:
+      bounds.first  = 1.;
+      bounds.second = 4.;
+      break;
+      
+    case SKEW:
+      bounds.first  = 0.;
+      bounds.second = 0.5;
+      break;
+
+    case SHEAR:
+    case SHAPE:
+      bounds.first  = 0.3;
+      bounds.second = 1.;
+      break;
+
+    case CONDITION:
+      bounds.first  = 1.;
+      bounds.second = 8.;
+      break;
+
+    case JACOBIAN:
+      bounds.first  = 0.5;
+      bounds.second = 1.;
+      break;  
+      
+    case DISTORTION:
+      bounds.first  = 0.6;
+      bounds.second = 1.;
+      break;  
+
+    case TAPER:
+      bounds.first  = 0.;
+      bounds.second = 0.4;
+      break;
+      
+    case STRETCH:
+      bounds.first  = 0.25;
+      bounds.second = 1.;
+      break;
+      
+    case DIAGONAL:
+      bounds.first  = 0.65;
+      bounds.second = 1.;
+      break;
+
+    case SIZE:
+      bounds.first  = 0.5;
+      bounds.second = 1.;
+      break;
+      
+    default:
+      std::cout << "Warning: Invalid quality measure chosen." << std::endl;
+      bounds.first  = -1;
+      bounds.second = -1;
+    }
+*/
+
+  return bounds;
+}
+
+
+
+
+
+#ifdef ENABLE_AMR
+
+const unsigned int InfHex::_side_children_matrix[5][4] =
+{
+  {0, 1,  2,  3}, // 4 side-0 children
+  {0, 1, 42, 42}, // 2 side-1 children
+  {1, 3, 42, 42}, // 2 side-2 children
+  {2, 3, 42, 42}, // 2 side-3 children
+  {0, 2, 42, 42}  // 2 side-4 children
+};
+
+#endif
+
+
+
+#endif // ifdef ENABLE_INFINITE_ELEMENTS
