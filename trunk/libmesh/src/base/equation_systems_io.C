@@ -1,4 +1,4 @@
-// $Id: equation_systems_io.C,v 1.24 2003-04-09 19:26:58 ddreyer Exp $
+// $Id: equation_systems_io.C,v 1.25 2003-04-11 23:57:05 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -155,12 +155,16 @@ void EquationSystems<T_sys>::read (const std::string& name,
   if (sys_type != T_sys::system_type())
     {
       // wrong T_sys for this file
-      std::cerr << "ERROR: System mismatch: This EquationSystems object handles" 
-		<< std::endl
-		<< " systems of type " << T_sys::system_type() 
-		<< ", while the file" << std::endl
-		<< " contains systems of type " << sys_type << std::endl;
-      error();
+//       std::cerr << "ERROR: System mismatch: This EquationSystems object handles" 
+// 		<< std::endl
+// 		<< " systems of type " << T_sys::system_type() 
+// 		<< ", while the file" << std::endl
+// 		<< " contains systems of type " << sys_type << std::endl;
+//       error();
+      std::cout << "Warning: This EquationSystems object handles" << std::endl
+		<< " systems of type \"" << T_sys::system_type() 
+		<< "\", while the file" << std::endl
+		<< " contains systems of type \"" << sys_type << "\"" << std::endl;
     }
 
 

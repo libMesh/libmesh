@@ -1,4 +1,4 @@
-// $Id: frequency_system.C,v 1.10 2003-04-05 02:25:42 ddreyer Exp $
+// $Id: frequency_system.C,v 1.11 2003-04-11 23:57:05 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -180,6 +180,10 @@ void FrequencySystem::set_frequencies_by_steps (const Real base_freq,
 
   _frequencies.resize (n_freq);
 
+  // store number of frequencies as parameter
+  _equation_systems.set_parameter("n_frequencies") = n_freq;
+  
+
   for (unsigned int n=0; n<n_freq; n++)
     {
       // local storage of frequencies
@@ -216,6 +220,9 @@ void FrequencySystem::set_frequencies_by_range (const Real min_freq,
     }
 
   _frequencies.resize (n_freq);
+
+  // store number of frequencies as parameter
+  _equation_systems.set_parameter("n_frequencies") = n_freq;
 
   // set frequencies, build solution storage
   for (unsigned int n=0; n<n_freq; n++)
