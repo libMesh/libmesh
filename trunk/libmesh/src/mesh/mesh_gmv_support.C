@@ -1,4 +1,4 @@
-// $Id: mesh_gmv_support.C,v 1.15 2003-03-11 04:35:19 ddreyer Exp $
+// $Id: mesh_gmv_support.C,v 1.16 2003-03-27 18:30:05 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -237,6 +237,18 @@ void MeshBase::write_gmv(std::ostream& out,
 			<< conn[1] << " "
 			<< conn[4] << " ";
 		    }
+
+		else if ((*it)->type() == PRISM6)
+		  {
+		    /**
+		     * Note that here PRISM6 is treted as
+		     * a degenerated phex8.
+		     */
+		    out << "phex8 8" << std::endl;
+		    std::vector<unsigned int> conn = (*it)->tecplot_connectivity(se);
+		    for (unsigned int i=0; i<conn.size(); i++)
+		      out << conn[i] << " ";
+		  }
 		
 		else
 		  {
