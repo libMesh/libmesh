@@ -1,4 +1,4 @@
-// $Id: explicit_system.C,v 1.6 2005-02-22 22:17:43 jwpeterson Exp $
+// $Id: explicit_system.C,v 1.7 2005-03-18 16:56:12 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -99,7 +99,7 @@ void ExplicitSystem::add_system_rhs ()
 {
   // Possible that we cleared the _vectors but
   // forgot to NULL-out the rhs?
-  if (_vectors.empty()) rhs = NULL;
+  if (this->n_vectors() == 0) rhs = NULL;
 
 
   // Only need to add the rhs if it isn't there

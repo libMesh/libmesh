@@ -1,4 +1,4 @@
-// $Id: system.h,v 1.10 2005-03-10 22:05:14 jwpeterson Exp $
+// $Id: system.h,v 1.11 2005-03-18 16:56:09 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -205,6 +205,11 @@ public:
   const EquationSystems & get_equation_systems() const { return _equation_systems; }
 
   /**
+   * @returns a reference to this system's parent EquationSystems object.
+   */
+  EquationSystems & get_equation_systems() { return _equation_systems; }
+
+  /**
    * @returns \p true if the system is active, \p false otherwise.
    * An active system will be solved.
    */
@@ -369,18 +374,19 @@ public:
    */
   void attach_assemble_function (void fptr(EquationSystems& es,
 					   const std::string& name));
+
+
+  /**
+   * User-provided initialization function.  Can be overloaded
+   * in derived classes.
+   */
+  virtual void user_initialization ();
   
   /**
-   * Function that initializes the system.
+   * User-provided  assembly function.  Can be overloaded
+   * in derived classes.
    */
-  void (* init_system) (EquationSystems& es,
-			const std::string& name);
-  
-  /**
-   * Function that assembles the system.
-   */
-  void (* assemble_system) (EquationSystems& es,
-			    const std::string& name);
+  virtual void user_assembly ();
 
 
 
@@ -427,6 +433,42 @@ protected:
    * makes it up-to-date on the current mesh.
    */
   virtual void re_update ();
+  // -------------------------------------------------
+  // Necessary classes
+  //
+  
+private:
+
+  
+  /**
+   * Function that initializes the system.
+   */
+  void (* _init_system) (EquationSystems& es,
+			 const std::string& name);
+  
+  /**
+   * Function that assembles the system.
+   */
+  void (* _assemble_system) (EquationSystems& es,
+			     const std::string& name);
+  
+  /**
+   * Data structure describing the relationship between
+   * nodes, variables, etc... and degrees of freedom.
+   */
+  DofMap _dof_map;
+
+  /**
+   * Constant reference to the \p EquationSystems object
+   * used for the simulation.
+   */
+  EquationSystems& _equation_systems;
+  
+  /**
+   * Constant reference to the \p mesh data structure used
+   * for the simulation.   
+   */
+  Mesh& _mesh;
   
   /**
    * A name associated with this system.
@@ -481,27 +523,6 @@ protected:
    */
   bool _additional_data_written;
   
-  // -------------------------------------------------
-  // Necessary classes
-  //
-  
-  /**
-   * Data structure describing the relationship between
-   * nodes, variables, etc... and degrees of freedom.
-   */
-  DofMap _dof_map;
-
-  /**
-   * Constant reference to the \p EquationSystems object
-   * used for the simulation.
-   */
-  EquationSystems& _equation_systems;
-  
-  /**
-   * Constant reference to the \p mesh data structure used
-   * for the simulation.   
-   */
-  Mesh& _mesh;
 };
 
 

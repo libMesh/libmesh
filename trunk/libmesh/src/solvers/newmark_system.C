@@ -1,4 +1,4 @@
-// $Id: newmark_system.C,v 1.5 2005-02-22 22:17:43 jwpeterson Exp $
+// $Id: newmark_system.C,v 1.6 2005-03-18 16:56:12 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -56,11 +56,12 @@ NewmarkSystem::NewmarkSystem (EquationSystems& es,
   
 {
   // default values of the newmark parameters
-  _equation_systems.parameters.set<Real>("Newmark alpha") = _default_alpha;
-  _equation_systems.parameters.set<Real>("Newmark delta") = _default_delta;
+  es.parameters.set<Real>("Newmark alpha") = _default_alpha;
+  es.parameters.set<Real>("Newmark delta") = _default_delta;
 
-  // time step size.  should be handled at a later stage through EquationSystems?
-  _equation_systems.parameters.set<Real>("Newmark time step") = _default_timestep;
+  // time step size.
+  // should be handled at a later stage through EquationSystems?
+  es.parameters.set<Real>("Newmark time step") = _default_timestep;
 
   // add additional matrices and vectors that will be used in the
   // newmark algorithm to the data structure
@@ -105,12 +106,16 @@ void NewmarkSystem::clear ()
   // matrices and vectors added in the constructor
   LinearImplicitSystem::clear();
 
+  // Get a reference to the EquationSystems
+  EquationSystems& es =
+    this->get_equation_systems();
+  
   // default values of the newmark parameters
-  _equation_systems.parameters.set<Real>("Newmark alpha") = _default_alpha;
-  _equation_systems.parameters.set<Real>("Newmark delta") = _default_delta;
+  es.parameters.set<Real>("Newmark alpha") = _default_alpha;
+  es.parameters.set<Real>("Newmark delta") = _default_delta;
 
   // time step size.  should be handled at a later stage through EquationSystems?
-  _equation_systems.parameters.set<Real>("Newmark time step") = _default_timestep;
+  es.parameters.set<Real>("Newmark time step") = _default_timestep;
 
   // set bool to false
   _finished_assemble = false;
@@ -130,8 +135,6 @@ void NewmarkSystem::reinit ()
 
 void NewmarkSystem::assemble ()
 {
-  assert (assemble_system != NULL);
-
   if (!_finished_assemble)
     {
       // prepare matrix with the help of the _dof_map, 
@@ -156,17 +159,12 @@ void NewmarkSystem::initial_conditions ()
   // Log how long the user's matrix assembly code takes
   START_LOG("initial_conditions ()", "NewmarkSystem");
   
-  // Call the user-specified function for initial conditions.
-  // If this function is not provided by the user
-  // we simply assume at rest conditions and zero the vectors.
-  if (init_system != NULL)
-    this->init_system (_equation_systems, this->name());
-  else
-    { 
-      this->get_vector("displacement").zero();
-      this->get_vector("velocity").zero();
-      this->get_vector("acceleration").zero();
-    }
+  // Set all values to 0, then
+  // call the user-specified function for initial conditions.
+  this->get_vector("displacement").zero();
+  this->get_vector("velocity").zero();
+  this->get_vector("acceleration").zero();
+  this->user_initialization();
 
   // Stop logging the user code
   STOP_LOG("initial_conditions ()", "NewmarkSystem");
@@ -268,12 +266,17 @@ void NewmarkSystem::set_newmark_parameters (const Real delta_T,
 {
   assert(delta_T != 0.);
 
-  // the newmark parameters
-  _equation_systems.parameters.set<Real>("Newmark alpha") = alpha;
-  _equation_systems.parameters.set<Real>("Newmark delta") = delta;
+    // Get a reference to the EquationSystems
+  EquationSystems& es =
+    this->get_equation_systems();
 
-  // time step size.  should be handled at a later stage through EquationSystems?
-  _equation_systems.parameters.set<Real>("Newmark time step") = delta_T;
+  // the newmark parameters
+  es.parameters.set<Real>("Newmark alpha") = alpha;
+  es.parameters.set<Real>("Newmark delta") = delta;
+
+  // time step size.
+  // should be handled at a later stage through EquationSystems?
+  es.parameters.set<Real>("Newmark time step") = delta_T;
 
   // the constants for time integration
   _a_0 = 1./(alpha*delta_T*delta_T);

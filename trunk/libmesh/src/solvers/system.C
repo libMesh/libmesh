@@ -1,4 +1,4 @@
-// $Id: system.C,v 1.11 2005-02-22 22:17:43 jwpeterson Exp $
+// $Id: system.C,v 1.12 2005-03-18 16:56:12 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -39,18 +39,18 @@ System::System (EquationSystems& es,
 		const std::string& name,
 		const unsigned int number) :
   
-  init_system              (NULL),
-  assemble_system          (NULL),
   solution                 (NumericVector<Number>::build()),
   current_local_solution   (NumericVector<Number>::build()),
+  _init_system             (NULL),
+  _assemble_system         (NULL),
+  _dof_map                 (number),
+  _equation_systems        (es),
+  _mesh                    (es.get_mesh()),
   _sys_name                (name),
   _sys_number              (number),
   _active                  (true),
   _can_add_vectors         (true),
-  _additional_data_written (false),
-  _dof_map                 (number),
-  _equation_systems        (es),
-  _mesh                    (es.get_mesh())
+  _additional_data_written (false)
 {
 }
 
@@ -61,7 +61,7 @@ System::~System ()
   // Null-out the function pointers.  Since this
   // class is getting destructed it is pointless,
   // but a good habit.
-  init_system = assemble_system = NULL;
+  _init_system = _assemble_system = NULL;
 
   // Clear data
   this->clear ();
@@ -106,10 +106,8 @@ void System::init ()
   // First initialize any required data
   this->init_data();
 
-  // Then call the user-provided intialization function,
-  // if it was provided
-  if (init_system != NULL)
-    this->init_system (_equation_systems, this->name()); 
+  // Then call the user-provided intialization function
+  this->user_initialization();
 }
 
 
@@ -238,9 +236,8 @@ void System::assemble ()
   // Log how long the user's matrix assembly code takes
   START_LOG("assemble()", "System");
   
-  // Call the user-specified matrix assembly function
-  if (this->assemble_system != NULL)
-    this->assemble_system (_equation_systems, this->name());
+  // Call the user-specified assembly function
+  this->user_assembly();
 
   // Stop logging the user code
   STOP_LOG("assemble()", "System");
@@ -249,8 +246,8 @@ void System::assemble ()
 
 
 bool System::compare (const System& other_system, 
-			  const Real threshold,
-			  const bool verbose) const
+		      const Real threshold,
+		      const bool verbose) const
 {
   // we do not care for matrices, but for vectors
   assert (!_can_add_vectors);
@@ -589,7 +586,7 @@ void System::attach_init_function (void fptr(EquationSystems& es,
 {
   assert (fptr != NULL);
   
-  init_system = fptr;
+  _init_system = fptr;
 }
 
 
@@ -599,5 +596,26 @@ void System::attach_assemble_function (void fptr(EquationSystems& es,
 {
   assert (fptr != NULL);
   
-  assemble_system = fptr;  
+  _assemble_system = fptr;  
 }
+
+
+
+void System::user_initialization ()
+{
+  // Call the user-provided intialization function,
+  // if it was provided
+  if (_init_system != NULL)
+    this->_init_system (_equation_systems, this->name());
+}
+
+
+
+void System::user_assembly ()
+{
+  // Call the user-provided assembly function,
+  // if it was provided
+  if (_assemble_system != NULL)
+    this->_assemble_system (_equation_systems, this->name());
+}
+  

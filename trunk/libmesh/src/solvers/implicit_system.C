@@ -1,4 +1,4 @@
-// $Id: implicit_system.C,v 1.8 2005-02-22 22:17:43 jwpeterson Exp $
+// $Id: implicit_system.C,v 1.9 2005-03-18 16:56:12 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -100,6 +100,9 @@ void ImplicitSystem::init_matrices ()
   // been initialized
   if (matrix->initialized())
     return;
+
+  // Get a reference to the DofMap
+  DofMap& dof_map = this->get_dof_map();
   
   // no chance to add other matrices
   _can_add_matrices = false;
@@ -109,13 +112,13 @@ void ImplicitSystem::init_matrices ()
        pos != _matrices.end(); ++pos)
     {
       assert (!pos->second->initialized());
-      _dof_map.attach_matrix (*(pos->second));
+      dof_map.attach_matrix (*(pos->second));
     }
   
   // Compute the sparsity pattern for the current
   // mesh and DOF distribution.  This also updates
   // additional matrices, \p DofMap now knows them
-  _dof_map.compute_sparsity (this->get_mesh());
+  dof_map.compute_sparsity (this->get_mesh());
   
   // Initialize matrices
   for (matrices_iterator pos = _matrices.begin(); 
