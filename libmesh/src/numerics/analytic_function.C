@@ -1,4 +1,4 @@
-// $Id: analytic_function.C,v 1.1 2003-05-10 22:10:38 ddreyer Exp $
+// $Id: analytic_function.C,v 1.2 2003-05-15 23:34:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson

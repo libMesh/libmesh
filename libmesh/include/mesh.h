@@ -1,4 +1,4 @@
-// $Id: mesh.h,v 1.12 2003-03-03 02:15:57 benkirk Exp $
+// $Id: mesh.h,v 1.13 2003-05-15 23:34:33 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -22,14 +22,13 @@
 #ifndef __mesh_h__
 #define __mesh_h__
 
-
-
 // C++ Includes   -----------------------------------
-
 
 // Local Includes -----------------------------------
 #include "mesh_base.h"
 #include "boundary_mesh.h"
+
+
 
 
 /**

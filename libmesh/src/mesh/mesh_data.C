@@ -1,4 +1,4 @@
-// $Id: mesh_data.C,v 1.1 2003-05-15 19:43:34 ddreyer Exp $
+// $Id: mesh_data.C,v 1.2 2003-05-15 23:34:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,6 +24,7 @@
 // Local includes
 #include "mesh_data.h"
 #include "mesh_base.h"
+#include "mesh_logging.h"
 
 
 
@@ -231,7 +232,7 @@ const Node* MeshData::foreign_id_to_node (const unsigned int fid) const
 
 
 
-const unsigned int MeshData::node_to_foreign_id (const Node* n) const
+unsigned int MeshData::node_to_foreign_id (const Node* n) const
 {
   assert (_active);
   assert (_node_id_map_closed);
@@ -288,7 +289,7 @@ const Elem* MeshData::foreign_id_to_elem (const unsigned int fid) const
 
 
 
-const unsigned int MeshData::elem_to_foreign_id (const Elem* e) const
+unsigned int MeshData::elem_to_foreign_id (const Elem* e) const
 {
   assert (_active);
   assert (_elem_id_map_closed);

@@ -1,4 +1,4 @@
-// $Id: frequency_system.h,v 1.9 2003-05-12 14:16:48 ddreyer Exp $
+// $Id: frequency_system.h,v 1.10 2003-05-15 23:34:33 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -28,19 +28,17 @@
 
 
 // Local Includes
-#include "libmesh.h"
-#include "system_base.h"
-
-
-// Forward Declarations
-class FrequencySystem;
-template <class T_sys> class EquationSystems;
-
+#include "mesh_config.h"
 
 /*
  * Frequency domain solutions only possible with complex arithmetic
  */
 #if defined(USE_COMPLEX_NUMBERS)
+
+#include "steady_system.h"
+
+// Forward Declarations
+
 
 
 
@@ -71,7 +69,7 @@ template <class T_sys> class EquationSystems;
 // ------------------------------------------------------------
 // FrequencySystem class definition
 
-class FrequencySystem : public SystemBase
+class FrequencySystem : public SteadySystem
 {
 public:
 
@@ -79,10 +77,9 @@ public:
    * Constructor.  Optionally initializes required
    * data structures.
    */
-  FrequencySystem (EquationSystems<FrequencySystem>& es,
-		   const std::string&                name,
-		   const unsigned int                number);
-
+  FrequencySystem (EquationSystems& es,
+		   const std::string& name,
+		   const unsigned int number);
   /**
    * Destructor.
    */
@@ -93,30 +90,42 @@ public:
    * the system. 
    */
   void clear ();
-
-  /**
-   * Initializes the member data fields associated with
-   * the system, so that, e.g., \p assemble() may be used.  
-   * The frequenices have to be set @e prior to calling 
-   * \p init().
-   */
-  void init ();
-
-  /**
-   * Re-initializes the member data fields associated with
-   * the system.  The \p DofMap re-computes the dof, the
-   * additional vectors and the \p rhs are re-initialized
-   * (while the \p solution is not?).  However, the frequencies 
-   * already registered with this system have to remain 
-   * untouched.  Useful for refined meshes?
-   */
-  void reinit ();
  
+//   /**
+//    * Reinitializes the member data fields associated with
+//    * the system, so that, e.g., \p assemble() may be used.
+//    */
+//   void reinit ();
+
   /**
    * Assemble the linear system.  Does not
    * actually call the solver.
    */
   void assemble ();
+
+  
+  /**
+   * Solves the linear system for the
+   * \f$ [ \texttt{n\_start\_in, n\_stop\_in} ]^{th} \f$ 
+   * frequencies.  When neither \p n_start nor \p n_stop are given, solves for
+   * all frequencies.  The solution vectors are stored in automatically
+   * allocated vectors named \p solution_nnnn.  For access to these vectors,
+   * see \p SystemBase. When calling this, the frequency range should better
+   * be already set.
+   */
+  std::vector< std::pair<unsigned int, Real> > solve (const unsigned int n_start_in = static_cast<unsigned int>(-1),
+						      const unsigned int n_stop_in  = static_cast<unsigned int>(-1));
+  
+  /**
+   * @returns \p "Frequency".  Helps in identifying
+   * the system type in an equation system file.
+   */
+  std::string system_type () const { return "Frequency"; }
+
+
+  //--------------------------------------------------------
+  // Methods specific to the FrequencySystem
+  //
   
   /**
    * Set the frequency range for which the
@@ -151,61 +160,21 @@ public:
    */
   const std::vector<Real>& get_frequencies () const
     { assert (_finished_set_frequencies); return _frequencies; }
-
-  /**
-   * Solves the linear system for the \f$ [ \texttt{n\_start\_in, n\_stop\_in} ]^{th} \f$ 
-   * frequencies.  When neither \p n_start nor \p n_stop are given, solves for all 
-   * frequencies.  The solution vectors are stored in automatically allocated
-   * vectors named \p solution_nnnn.  For access to these vectors, see \p SystemBase.
-   * When calling this, the frequency range should better be already set.
-   */
-  std::vector< std::pair<unsigned int, Real> > solve (const unsigned int n_start_in = static_cast<unsigned int>(-1),
-						      const unsigned int n_stop_in  = static_cast<unsigned int>(-1));
   
   /**
-   * @returns \p "Frequency".  Helps in identifying
-   * the system type in an equation system file.
-   */
-  static const std::string system_type () { return "Frequency"; }
-  
-  /**
-   * @returns \p true when the other system contains
-   * identical data, up to the given threshold.
-   */
-  bool compare (const FrequencySystem& other_system, 
-		const Real threshold,
-		const bool verbose) const;
-
-  /**
-   * Register an optional user function to use in pre-assembling the system
-   * matrix and RHS.  Since this function is called only once
-   * for multiple frequencies, this function should better compute
-   * only @e frequency-independent data.
-   */
-  void attach_assemble_function(void fptr(EquationSystems<FrequencySystem>& es,
-					  const std::string& name));
-
-  /**
-   * Register a required user function to use in assembling/solving the system.  
-   * Right before solving for a new frequency, this function is called.
+   * Register a required user function to use in assembling/solving the system.
    * It is intended to compute @e frequency-dependent data.  For proper
    * work of \p FrequencySystem, at least @e this function has to be provided 
    * by the user.
    */
-  void attach_solve_function(void fptr(EquationSystems<FrequencySystem>& es,
-				      const std::string& name));
-  
-  /**
-   * Function that computes frequency-independent data of the system.
-   */
-  void (* _assemble_fptr) (EquationSystems<FrequencySystem>& es,
-			   const std::string& name);
+  void attach_solve_function(void fptr(EquationSystems& es,
+				       const std::string& name));
   
   /**
    * Function that computes frequency-dependent data of the system.
    */
-  void (* _solve_fptr) (EquationSystems<FrequencySystem>& es,
-			const std::string& name);
+  void (* solve_system) (EquationSystems& es,
+			 const std::string& name);
 
   /**
    * @returns a string of the form \p "frequency_x", where \p x is
@@ -224,17 +193,20 @@ public:
 
 protected:
 
+
+  /**
+   * Initializes the member data fields associated with
+   * the system, so that, e.g., \p assemble() may be used.  
+   * The frequenices have to be set @e prior to calling 
+   * \p init().
+   */
+  void init_data ();
+  
   /**
    * Sets the current frequency to the \p n-th entry in the vector
    * \p _frequencies.
    */
   void set_current_frequency(unsigned int n);
-
-  /**
-   * Reference to the \p _equation_systems data structure 
-   * that handles us.   
-   */
-  EquationSystems<FrequencySystem>& _equation_systems;
 
   /**
    * true when we have frequencies to solve for. 
@@ -279,6 +251,5 @@ protected:
 
 
 #endif // if defined(USE_COMPLEX_NUMBERS)
-
 
 #endif // ifndef __frequency_system_h__

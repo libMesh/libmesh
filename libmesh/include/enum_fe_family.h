@@ -1,4 +1,4 @@
-// $Id: enum_fe_family.h,v 1.7 2003-04-11 23:57:04 ddreyer Exp $
+// $Id: enum_fe_family.h,v 1.8 2003-05-15 23:34:33 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,10 +31,10 @@
 
 // ------------------------------------------------------------
 // enum FEFamily definition
-namespace MeshEnums {
+namespace libMeshEnums {
   
   /**
-   * \enum MeshEnums::FEFamily defines an \p enum for finite element families.
+   * \enum libMeshEnums::FEFamily defines an \p enum for finite element families.
    * Explicity assign numbers so that one can differentiate between enabled
    * and disabled infinite elements even when these are disabled.
    */
@@ -52,7 +52,7 @@ namespace MeshEnums {
 		 INVALID_FE   = 42};
 }
 
-using namespace MeshEnums;
+using namespace libMeshEnums;
 
 
 

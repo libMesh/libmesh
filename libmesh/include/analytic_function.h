@@ -1,4 +1,4 @@
-// $Id: analytic_function.h,v 1.1 2003-05-10 22:10:37 ddreyer Exp $
+// $Id: analytic_function.h,v 1.2 2003-05-15 23:34:33 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -100,9 +100,9 @@ public:
    * Like before, but returns the values in a 
    * writable reference.
    */
-  void operator() (DenseVector<Number>& output,
-		   const Point& p,
-		   const Real time=0.);
+  void operator() (const Point& p,
+		   const Real time,
+		   DenseVector<Number>& output);
 
 };
 
@@ -121,9 +121,9 @@ Number AnalyticFunction::operator() (const Point& p,
 
 
 inline
-void AnalyticFunction::operator() (DenseVector<Number>& output,
-				   const Point& p,
-				   const Real time)
+void AnalyticFunction::operator() (const Point& p,
+				   const Real time,
+				   DenseVector<Number>& output)
 {
   assert (this->initialized());
   this->_vector_fptr(output, p, time);

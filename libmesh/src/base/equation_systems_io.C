@@ -1,4 +1,4 @@
-// $Id: equation_systems_io.C,v 1.25 2003-04-11 23:57:05 ddreyer Exp $
+// $Id: equation_systems_io.C,v 1.26 2003-05-15 23:34:34 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -22,21 +22,14 @@
 
 
 // System Includes
-#ifdef HAVE_RPC_RPC_H
-# include <rpc/rpc.h>
-#endif
 
 
 
 // Local Includes
-#include "fe_type.h"
-#include "petsc_interface.h"
 #include "equation_systems.h"
-#include "general_system.h"
-#include "frequency_system.h"
-#include "thin_system.h"
-#include "newmark_system.h"
-#include "equation_systems_macro.h"
+#include "system_base.h"
+#include "fe_type.h"
+#include "xdr_cxx.h"
 
 // Forward Declarations
 
@@ -45,42 +38,41 @@
 
 // ------------------------------------------------------------
 // EquationSystem class implementation
-template <typename T_sys>
-void EquationSystems<T_sys>::read (const std::string& name,
-				   const Xdr::XdrMODE mode,
-				   const bool read_header,
-				   const bool read_data,
-				   const bool read_additional_data)
+void EquationSystems::read (const std::string& name,
+			    const libMeshEnums::XdrMODE mode,
+			    const bool read_header,
+			    const bool read_data,
+			    const bool read_additional_data)
 {
   /**
    * This program implements the output of an 
    * EquationSystems object.  This warrants some 
    * documentation.  The output file essentially
-   * consists of 12 sections:
+   * consists of 13 sections:
    *
-   * 1.) The type of system handled (string),
-   * 2.) The number of flags that are set (unsigned int),
+   * 1.) The number of flags that are set (unsigned int),
    *
    * for each flag in the equation system object
    *
-   *   3.) the name (string)
+   *   2.) the name (string)
    *
    * end flag loop
    *
-   * 4.) The number of parameters that are set (unsigned int),
+   * 3.) The number of parameters that are set (unsigned int),
    *
    * for each parameter in the equation system object
    *
-   *   5.) the name of the parameter  (string)
-   *   6.) the value of the parameter (real)
+   *   4.) the name of the parameter  (string)
+   *   5.) the value of the parameter (real)
    *
    * end parameter loop
    * 
-   * 7.) The number of individual equation systems (unsigned int)
+   * 6.) The number of individual equation systems (unsigned int)
    * 
    *   for each system
    *                                                      
-   *    8.)  The name of the system (string)            
+   *    7.)  The name of the system (string)
+   *    8.)  The type of the system (string)
    *
    *    handled through SystemBase::read():
    *
@@ -143,33 +135,25 @@ void EquationSystems<T_sys>::read (const std::string& name,
   if (read_header)
     clear ();
       
-  /**
-   * 1.)
-   *
-   * Read the type of system handled
-   */
-  std::string sys_type;
-      
-  io.data (sys_type);
-      
-  if (sys_type != T_sys::system_type())
-    {
-      // wrong T_sys for this file
-//       std::cerr << "ERROR: System mismatch: This EquationSystems object handles" 
-// 		<< std::endl
-// 		<< " systems of type " << T_sys::system_type() 
-// 		<< ", while the file" << std::endl
-// 		<< " contains systems of type " << sys_type << std::endl;
-//       error();
-      std::cout << "Warning: This EquationSystems object handles" << std::endl
-		<< " systems of type \"" << T_sys::system_type() 
-		<< "\", while the file" << std::endl
-		<< " contains systems of type \"" << sys_type << "\"" << std::endl;
-    }
+  
+//   if (sys_type != T_sys::system_type())
+//     {
+//       // wrong T_sys for this file
+// //       std::cerr << "ERROR: System mismatch: This EquationSystems object handles" 
+// // 		<< std::endl
+// // 		<< " systems of type " << T_sys::system_type() 
+// // 		<< ", while the file" << std::endl
+// // 		<< " contains systems of type " << sys_type << std::endl;
+// //       error();
+//       std::cout << "Warning: This EquationSystems object handles" << std::endl
+// 		<< " systems of type \"" << T_sys::system_type() 
+// 		<< "\", while the file" << std::endl
+// 		<< " contains systems of type \"" << sys_type << "\"" << std::endl;
+//     }
 
 
   /**
-   * 2.)  
+   * 1.)  
    *
    * Read the number of flags that are set
    */
@@ -181,7 +165,7 @@ void EquationSystems<T_sys>::read (const std::string& name,
     for (unsigned int flags=0; flags<n_flags; flags++)
       {
 	/**
-	 * 3.)
+	 * 2.)
 	 *
 	 * Read the name of the ith flag
 	 */
@@ -196,7 +180,7 @@ void EquationSystems<T_sys>::read (const std::string& name,
 
 
   /**
-   * 4.)  
+   * 3.)  
    *
    * Read the number of params that are set
    */
@@ -208,7 +192,7 @@ void EquationSystems<T_sys>::read (const std::string& name,
     for (unsigned int params=0; params<n_params; params++)
       {
         /**
-	 * 5.)
+	 * 4.)
 	 *
 	 * Read the name of the ith param
 	 */
@@ -217,7 +201,7 @@ void EquationSystems<T_sys>::read (const std::string& name,
 	io.data (param_name);
  
 	/**
-	 * 6.)
+	 * 5.)
 	 *
 	 * Read the value of the ith param
 	 */
@@ -233,7 +217,7 @@ void EquationSystems<T_sys>::read (const std::string& name,
 
 	  
   /**
-   * 7.)  
+   * 6.)  
    *
    * Read the number of equation systems
    */
@@ -245,7 +229,7 @@ void EquationSystems<T_sys>::read (const std::string& name,
     for (unsigned int sys=0; sys<n_sys; sys++)
       {
 	/**
-	 * 8.)
+	 * 7.)
 	 *
 	 * Read the name of the sys-th equation system
 	 */
@@ -253,16 +237,24 @@ void EquationSystems<T_sys>::read (const std::string& name,
       
 	io.data (sys_name);
       
-	if (read_header)
-	  this->add_system (sys_name);
-
+	/**
+	 * 8.)
+	 *
+	 * Read the type of the sys-th equation system
+	 */
+	std::string sys_type;
 	
+	io.data (sys_type);
+	
+	if (read_header)
+	  this->add_system (sys_type, sys_name);
+
 	/**
 	 * 9.) - 11.)
 	 *
 	 * Let SystemBase::read() do the job
 	 */
-	T_sys& new_system = (*this)(sys_name);
+	SystemBase& new_system = this->get_system(sys_name);
 	  
 	new_system.read (io,
 			 read_header,
@@ -278,7 +270,7 @@ void EquationSystems<T_sys>::read (const std::string& name,
    * storage, the dof_map, etc...
    */ 
   if (read_header) 
-    init();
+    this->init();
 
 
 
@@ -288,14 +280,14 @@ void EquationSystems<T_sys>::read (const std::string& name,
    * Read and set the numeric vector values
    */
   if (read_data)
-    for (unsigned int sys=0; sys<this->n_systems(); sys++)
-      {
-	T_sys& system = (*this)(sys);
-
-	system.read_data (io,
-			  read_additional_data);
-
-      }
+    {
+      std::map<std::string, SystemBase*>::iterator
+	pos = _systems.begin();
+      
+      for (; pos != _systems.end(); ++pos)
+	pos->second->read_data (io,
+				read_additional_data);       
+    }  
 }
 
 
@@ -312,41 +304,40 @@ void EquationSystems<T_sys>::read (const std::string& name,
 
 
 
-template <typename T_sys>
-void EquationSystems<T_sys>::write(const std::string& name,
-				   const Xdr::XdrMODE mode,
-				   const bool write_data,
-				   const bool write_additional_data)
+void EquationSystems::write(const std::string& name,
+			    const libMeshEnums::XdrMODE mode,
+			    const bool write_data,
+			    const bool write_additional_data) const
 {
   /**
    * This program implements the output of an 
    * EquationSystems object.  This warrants some 
    * documentation.  The output file essentially
-   * consists of 12 sections:
+   * consists of 13 sections:
    *
-   * 1.) The type of system handled (string),
-   * 2.) The number of flags that are set (unsigned int),
+   * 1.) The number of flags that are set (unsigned int),
    *
    * for each flag in the equation system object
    *
-   *   3.) the name (string)
+   *   2.) the name (string)
    *
    * end flag loop
    *
-   * 4.) The number of parameters that are set (unsigned int),
+   * 3.) The number of parameters that are set (unsigned int),
    *
    * for each parameter in the equation system object
    *
-   *   5.) the name of the parameter  (string)
-   *   6.) the value of the parameter (real)
+   *   4.) the name of the parameter  (string)
+   *   5.) the value of the parameter (real)
    *
    * end parameter loop
    * 
-   * 7.) The number of individual equation systems (unsigned int)
+   * 6.) The number of individual equation systems (unsigned int)
    * 
    *   for each system
    *                                                      
-   *    8.)  The name of the system (string)            
+   *    7.)  The name of the system (string)            
+   *    8.)  The type of the system (string)            
    *
    *    handled through SystemBase::read():
    *
@@ -401,10 +392,11 @@ void EquationSystems<T_sys>::write(const std::string& name,
 
   assert (io.writing());
 
-  const unsigned int proc_id = _mesh.processor_id();
+  const unsigned int proc_id = libMeshBase::processor_id();
   unsigned int n_sys         = this->n_systems();
 
-  typename std::map<std::string, T_sys*>::iterator pos = _systems.begin();
+  std::map<std::string, SystemBase*>::const_iterator
+    pos = _systems.begin();
   
   std::string comment;
   char buf[80];
@@ -418,21 +410,7 @@ void EquationSystems<T_sys>::write(const std::string& name,
   if (proc_id == 0) 
     {
       /**
-       * 1.)
-       *
-       * Write the type of system handled
-       */
-      {
-        // set up the comment
-	comment =  "# System Type";
-	std::string sys_type = T_sys::system_type();
-	io.data (sys_type, comment.c_str());
-      }
-
-
-
-      /**
-       * 2.)  
+       * 1.)  
        *
        * Write the number of flags
        */
@@ -444,7 +422,7 @@ void EquationSystems<T_sys>::write(const std::string& name,
 
 
       /**
-       * 3.)  
+       * 2.)  
        *
        * Write the flags
        */
@@ -465,7 +443,7 @@ void EquationSystems<T_sys>::write(const std::string& name,
 
 
       /**
-       * 4.)  
+       * 3.)  
        *
        * Write the number of parameters
        */
@@ -477,7 +455,7 @@ void EquationSystems<T_sys>::write(const std::string& name,
 
 
       /**
-       * 5.) + 6.)
+       * 4.) + 5.)
        *
        * Write the parameter names and values
        */
@@ -504,7 +482,7 @@ void EquationSystems<T_sys>::write(const std::string& name,
 
 
       /**
-       * 7.)  
+       * 6.)  
        *
        * Write the number of equation systems
        */
@@ -514,7 +492,7 @@ void EquationSystems<T_sys>::write(const std::string& name,
       while (pos != _systems.end())
 	{
 	  /**
-	   * 8.)
+	   * 7.)
 	   *
 	   * Write the name of the sys_num-th system
 	   */
@@ -528,6 +506,25 @@ void EquationSystems<T_sys>::write(const std::string& name,
 	  
 	    io.data (sys_name, comment.c_str());
 	  }
+
+
+
+	  /**
+	   * 8.)
+	   *
+	   * Write the type of system handled
+	   */
+	  {
+	    const unsigned int sys_num = pos->second->number();
+	    std::string sys_type       = pos->second->system_type();
+
+	    comment =  "# Type, System No. ";
+	    sprintf(buf, "%d", sys_num);
+	    comment += buf;
+	  
+	    io.data (sys_type, comment.c_str());
+	  }
+
 
 	
 	  /**
@@ -551,7 +548,7 @@ void EquationSystems<T_sys>::write(const std::string& name,
   pos = _systems.begin();
 
   if (write_data)
-    while (pos != _systems.end())
+    for (; pos != _systems.end(); ++pos) 
       {
 	/**
 	 * 14.) + 15.)
@@ -560,16 +557,5 @@ void EquationSystems<T_sys>::write(const std::string& name,
 	 */
 	pos->second->write_data (io,
 				 write_additional_data);
-	
-	++pos;
       }
 }
-
-
-
-
-//--------------------------------------------------------------
-// Explicit instantiations using the macro from equation_systems_macro.h
-
-INSTANTIATE_EQUATION_SYSTEMS;
-

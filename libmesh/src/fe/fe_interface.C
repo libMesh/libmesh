@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.17 2003-04-18 15:46:22 spetersen Exp $
+// $Id: fe_interface.C,v 1.18 2003-05-15 23:34:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -795,7 +795,7 @@ void FEInterface::compute_data(const unsigned int dim,
 #endif
 
   const unsigned int n_dof = n_dofs (dim, fe_t, elem->type());
-  const Point&       p     (data.p);
+  const Point&       p     = data.p;
   data.shape.resize(n_dof);
 
   // set default values for all the output fields

@@ -1,4 +1,4 @@
-// $Id: enum_solver_package.h,v 1.3 2003-02-13 22:56:07 benkirk Exp $
+// $Id: enum_solver_package.h,v 1.4 2003-05-15 23:34:33 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,13 +31,13 @@
 
 
 /*
- * The \p MeshEnums namespace is the namespace all \p enum definitions
+ * The \p libMeshEnums namespace is the namespace all \p enum definitions
  * should be put into.
  */
 
 // ------------------------------------------------------------
 // enum SolverType definition
-namespace MeshEnums {
+namespace libMeshEnums {
   
   /**
    * Defines an \p enum for various linear solver packages.
@@ -57,7 +57,7 @@ namespace MeshEnums {
     };
 }
 
-using namespace MeshEnums;
+using namespace libMeshEnums;
 
 
 

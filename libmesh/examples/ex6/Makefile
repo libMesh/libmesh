@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.6 2003-05-14 19:48:22 ddreyer Exp $
+# $Id: Makefile,v 1.7 2003-05-15 23:34:32 benkirk Exp $
 
 
 # The location of the mesh library
@@ -50,7 +50,7 @@ clean:
 
 clobber:
 	@$(MAKE) clean
-	@rm -f $(target) ifems_added.gmv eqn_sys.dat
+	@rm -f $(target) ifems_added.gmv out.gmv
 
 distclean:
 	@$(MAKE) clobber

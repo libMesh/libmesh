@@ -1,4 +1,4 @@
-// $Id: fe_type.h,v 1.8 2003-02-13 22:56:07 benkirk Exp $
+// $Id: fe_type.h,v 1.9 2003-05-15 23:34:33 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -51,6 +51,8 @@ public:
     family(f)
   {}
 
+
+  //TODO:[BSK] Could these data types all be const?  
   /**
    * The approximation order of the element.  
    */
@@ -84,7 +86,7 @@ public:
     inf_map(im)
   {}
 
-  
+
   /**
    * The approximation order in radial direction of the infinite element.  
    */
@@ -118,9 +120,28 @@ public:
   
 #endif // ifndef ENABLE_INFINITE_ELEMENTS
 
+  /**
+   * @returns the default quadrature order for this \p FEType.  The
+   * default quadrature order is calculated assuming a polynomial of
+   * degree \p order and is based on integrating the mass matrix for
+   * such an element exactly.
+   */
+  Order default_quadrature_order () const;
+
+  
 private:  
   
 };
+
+
+
+//-------------------------------------------------------------------
+// FEType inline methods
+inline
+Order FEType::default_quadrature_order () const
+{
+  return static_cast<Order>(2*static_cast<unsigned int>(order) + 1);
+}
 
 
 #endif // #ifndef __fe_type_h__

@@ -1,4 +1,4 @@
-// $Id: ex4.C,v 1.24 2003-04-08 22:54:09 benkirk Exp $
+// $Id: ex4.C,v 1.25 2003-05-15 23:34:32 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -32,7 +32,7 @@
  */
 #include "libmesh.h"
 #include "mesh.h"
-#include "general_system.h"
+#include "steady_system.h"
 #include "equation_systems.h"
 
 /**
@@ -55,6 +55,8 @@
  * Define useful datatypes for finite element
  * matrix and vector components.
  */
+#include "sparse_matrix.h"
+#include "numeric_vector.h"
 #include "dense_matrix.h"
 #include "dense_vector.h"
 
@@ -98,7 +100,7 @@
  * \p EquationSystems object we have acess to the \p Mesh and
  * other objects we might need.
  */
-void assemble_poisson(EquationSystems<GeneralSystem>& es,
+void assemble_poisson(EquationSystems& es,
                       const std::string& system_name);
 
 
@@ -142,9 +144,7 @@ int main (int argc, char** argv)
       }
     
     /**
-     * Tell the user what we are doing. Here we use the libMesh::msg()
-     * method instead of std::cout.  The reason for this is so messages
-     * are not duplicated (and jumbled) across processors.
+     * Tell the user what we are doing. 
      */
     else 
       {
@@ -188,7 +188,7 @@ int main (int argc, char** argv)
     /**
      * Create an equation systems object.
      */
-    EquationSystems<GeneralSystem> equation_systems (mesh);
+    EquationSystems equation_systems (mesh);
     
     /**
      * Declare the system and its variables.
@@ -197,7 +197,7 @@ int main (int argc, char** argv)
       /**
        * Creates a system named "Poisson"
        */
-      equation_systems.add_system("Poisson");
+      equation_systems.add_system<SteadySystem> ("Poisson");
       
       /**
        * Adds the variable "u" to "Poisson".  "u"
@@ -247,7 +247,7 @@ int main (int argc, char** argv)
 
 
 
-void assemble_poisson(EquationSystems<GeneralSystem>& es,
+void assemble_poisson(EquationSystems& es,
                       const std::string& system_name)
 {
   /**

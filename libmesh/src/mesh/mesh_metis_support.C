@@ -1,4 +1,4 @@
-// $Id: mesh_metis_support.C,v 1.11 2003-03-04 15:31:24 benkirk Exp $
+// $Id: mesh_metis_support.C,v 1.12 2003-05-15 23:34:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,6 +26,7 @@
 #include "mesh_base.h"
 #include "libmesh.h"
 #include "elem.h"
+#include "mesh_logging.h"
 
 
 #ifdef HAVE_METIS

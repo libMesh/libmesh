@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.23 2003-05-04 23:58:51 benkirk Exp $
+// $Id: equation_systems.h,v 1.24 2003-05-15 23:34:33 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,36 +23,49 @@
 #define __equation_systems_h__
 
 // C++ includes
+#include <set>
+#include <map>
+#include <vector>
+#include <string>
 
 // Local Includes
-#include "xdr_cxx.h"
-#include "equation_systems_base.h"
-
+#include "mesh_common.h"
+#include "data_map.h"
+#include "enum_xdr_mode.h"
 
 // Forward Declarations
+class Mesh;
+class SystemBase;
+
+// HP aCC needs these for some reason
+#ifdef __HP_aCC
+# include "system_base.h"
+# include "frequency_system.h"
+# include "transient_system.h"
+# include "newmark_system.h"
+# include "steady_system.h"
+#endif
 
 
 /**
- * This contains one or more equation systems that are
- * to be solved in a simulation.  These equation systems
- * are identified by a user-specified name and are solved
- * in the order that they are declared.
+ * This is the base class for the \p EquationSystems<T_sys>,
+ * providing rudimentary functionality concerning flags,
+ * parameters etc.  The interesting things are handled in
+ * the derived class.
  *
  * @author Benjamin S. Kirk, 2002-2003
  */
 
 // ------------------------------------------------------------
-// EquationSystems<T_sys> class definition
-template <typename T_sys>
-class EquationSystems : public EquationSystemsBase
+// EquationSystems class definition
+class EquationSystems
 {
 public:
-
+  
   /**
-   * Constructor.  Optionally initializes required
-   * data structures. 
+   * Constructor.
    */
-  EquationSystems (Mesh& mesh);
+  EquationSystems (const Mesh& mesh);
 
   /**
    * Destructor.
@@ -68,7 +81,7 @@ public:
    * Initialize all the systems
    */
   void init ();
-
+  
   /**
    * Reinitialize all the systems
    */
@@ -80,8 +93,83 @@ public:
   unsigned int n_systems() const;
 
   /**
-   * Add the system named \p name to the systems array.
+   * @returns a constant reference to the system named \p name.
    */
+  const SystemBase & get_system(const std::string& name) const;
+ 
+  /**
+   * @returns a constant reference to the system named \p name.
+   */
+  SystemBase& get_system(const std::string& name);
+
+  /**
+   * @returns a constant reference to the system named \p name.
+   * The template argument defines the return type.  For example,
+   * const SteadySystem& sys = eq.get_system<SteadySystem> ("sys");
+   * is an example of how the method might be used
+   */
+  template <typename T_sys>
+  const T_sys& get_system (const std::string& name) const;
+
+  /**
+   * @returns a writeable referene to the system named \p name.
+   * The template argument defines the return type.  For example,
+   * const SteadySystem& sys = eq.get_system<SteadySystem> ("sys");
+   * is an example of how the method might be used
+   */
+  template <typename T_sys>
+  T_sys& get_system (const std::string& name);
+
+  /**
+   * @returns a constant reference to system number \p num.
+   * The template argument defines the return type.  For example,
+   * const SteadySystem& sys = eq.get_system<SteadySystem> (0);
+   * is an example of how the method might be used
+   */
+  template <typename T_sys>
+  const T_sys& get_system (const unsigned int num) const;
+
+  /**
+   * @returns a writeable referene to the system number \p num.
+   * The template argument defines the return type.  For example,
+   * const SteadySystem& sys = eq.get_system<SteadySystem> (0);
+   * is an example of how the method might be used
+   */
+  template <typename T_sys>
+  T_sys& get_system (const unsigned int num);
+  
+  /**
+   * @returns a reference to the system named \p name.
+   */
+  SystemBase& operator () (const std::string& name);
+ 
+  /**
+   * @returns a constant reference to the system name
+   */
+  const SystemBase& operator () (const std::string& name) const;
+ 
+  /**
+   * @returns a reference to system number \p num.
+   */
+  SystemBase& operator () (const unsigned int num);
+ 
+  /**
+   * @returns a constant reference to system number \p num.
+   */
+  const SystemBase& operator () (const unsigned int num) const;
+  
+  /**
+   * Add the system of type \p system_type named \p name to the
+   * systems array. Must be overloaded in the derived classes.
+   */
+  void add_system (const std::string& system_type,
+		   const std::string& name);
+  
+  /**
+   * Add the system named \p name to the systems array.
+   * Must be overloaded in the derived classes.
+   */
+  template <typename T_sys>
   void add_system (const std::string& name);
   
   /**
@@ -100,37 +188,12 @@ public:
    * in all systems.
    */
   unsigned int n_dofs () const;
-
-  /**
-   * @returns a reference to the system named \p name.
-   */
-  T_sys & operator () (const std::string& name);
-
-  /**
-   * @returns a constant reference to the system name
-   */
-  const T_sys & operator () (const std::string& name) const;
-
-  /**
-   * @returns a reference to system number \p num.
-   */
-  T_sys & operator () (const unsigned int num);
-
-  /**
-   * @returns a constant reference to system number \p num.
-   */
-  const T_sys & operator () (const unsigned int num) const;
-
-  /**
-   * @returns the name of the system number num.
-   */
-  const std::string & name (const unsigned int num) const;
   
   /**
    * Fill the input vector \p var_names with the names
    * of the variables for each system.
    */
-  void build_variable_names (std::vector<std::string>& var_names);
+  void build_variable_names (std::vector<std::string>& var_names) const;
 
   /**
    * Fill the input vector \p soln with the solution values for the
@@ -139,8 +202,8 @@ public:
    * method is only applicable to outputting plot files from processor 0.
    */
   void build_solution_vector (std::vector<Number>& soln,
-			      std::string& system_name,
-			      std::string& variable_name);
+                              std::string& system_name,
+                              std::string& variable_name) const;
   
   /**
    * Fill the input vector \p soln with solution values.  The
@@ -149,7 +212,7 @@ public:
    * vector \p soln will only be assembled on processor 0, so this
    * method is only applicable to outputting plot files from processor 0.
    */
-  void build_solution_vector (std::vector<Number>& soln);
+  void build_solution_vector (std::vector<Number>& soln) const;
   
   /**
    * Read & initialize the systems from disk using the XDR data format.
@@ -160,10 +223,10 @@ public:
    * by calling the routine with the read_data flag set to false.
    */
   void read(const std::string& name,
-	    const Xdr::XdrMODE,
-	    const bool read_header=true,
-	    const bool read_data=true,
-	    const bool read_additional_data=true);
+            const libMeshEnums::XdrMODE,
+            const bool read_header=true,
+            const bool read_data=true,
+            const bool read_additional_data=true);
 
   /**
    * Write the systems to disk using the XDR data format.
@@ -173,9 +236,9 @@ public:
    * this routine with the write_data flag set to false.
    */
   void write(const std::string& name,
-	     const Xdr::XdrMODE,
-	     const bool write_data=true,
-	     const bool write_additional_data=true);
+             const libMeshEnums::XdrMODE,
+             const bool write_data=true,
+             const bool write_additional_data=true) const;
 
   /**
    * @returns \p true when this equation system contains
@@ -183,51 +246,317 @@ public:
    * most of the comparisons to perform to the responsible
    * systems
    */
-  bool compare (const EquationSystems<T_sys>& other_es, 
-		const Real threshold,
-		const bool verbose) const;
+  bool compare (const EquationSystems& other_es, 
+                const Real threshold,
+                const bool verbose) const;
 
+  /**
+   * @returns a string containing information about the
+   * systems, flags, and parameters.
+   */
+  std::string get_info() const;
+    
   /**
    * Prints information about the equation systems.
    */
   void print_info () const;
 
-  /**
-   * @returns a string containing information about the
-   * equation systems.
-   */
-  std::string get_info() const;
   
-  
- protected:
-  
-  /**
-   * Data structure that holds the systems.
-   */
-  std::map<std::string, T_sys*> _systems;
 
+  //-------------------------------------------------
+  // Methods for accessing additional data
+  //
+
+//   /**
+//    * @returns a pointet to an object of type \p T.  If the
+//    * user has specified such an object then a vaild pointer
+//    * is returned, otherwise \p NULL is returned.
+//    */
+//   template <class T>
+//   T* additional_data (const std::string& name) const;
+
+//   /**
+//    * Set or get a pointer to an arbitrary type identified by \p name.
+//    */
+//   void* & additional_data (const std::string& name);
+
+//   /**
+//    * Removes any additional data associated with the name \p name.
+//    */
+//   void unset_additional_data (const std::string& name);
+
+  
+  
+  //-------------------------------------------------
+  // Methods for accessing flags
+  // 
+  /**
+   * @returns \p true if the flag \p fl is set, returns
+   * \p false otherwise.
+   */
+  bool flag (const std::string& fl) const;
+
+  /**
+   * Defines the flag \p fl as \p true. This flag will
+   * be used for all systems.
+   */ 
+  void set_flag (const std::string& fl);
+
+  /**
+   * Undefines the flag \p fl.
+   */
+  void unset_flag (const std::string& fl);
+
+  /**
+   * @returns the number of flags. 
+   */
+  unsigned int n_flags () const;
+
+
+
+  //-------------------------------------------------
+  // Methods for accessing parameters
+  //
+  /**
+   * @returns the parameter value assoicated with \p id as a Real number.
+   */
+  Real parameter (const std::string& id) const;
+
+  /**
+   * @returns the parameter value assoicated with \p id as a specified type.
+   */
+  template <typename T>
+  T parameter (const std::string& id) const;
+
+  /**
+   * Defines the value of parameter \p id as \p value.
+   * This parameter will be used for all systems, so
+   * this method makes sure the parameter isn't already
+   * set to avoid accidental overwriting.
+   */
+  Real & set_parameter (const std::string& id);
+  
+  /**
+   * Undefines the value of parameter \p id. 
+   */
+  void unset_parameter (const std::string& id);
+
+  /**
+   * @returns the number of parameters. 
+   */
+  unsigned int n_parameters () const;
+
+  /**
+   * @returns a constant reference to the mesh
+   */
+  const Mesh & get_mesh() const;
+
+  /**
+   * Data structure holding user-supplied additional data.
+   */
+  DataMap data_map;
+
+  
+protected:
+
+  
+  /**
+   * The mesh data structure
+   */ 
+  const Mesh& _mesh;
+
+  /**
+   * Data structure holding the systems.
+   */
+  std::map<std::string, SystemBase*> _systems;
+  
+  /**
+   * Data structure to hold user-specified flags.
+   */
+  std::set<std::string> _flags;
+
+  /**
+   * Data structore to hold user-specified parameters 
+   */
+  std::map<std::string, Real> _parameters;
 };
 
 
 
 // ------------------------------------------------------------
 // EquationSystems inline methods
-template <class T_sys>
 inline
-unsigned int EquationSystems<T_sys>::n_systems () const
+const Mesh & EquationSystems::get_mesh () const
+{
+  return _mesh;
+}
+
+
+
+inline
+unsigned int EquationSystems::n_systems () const
 {
   return _systems.size();
 }
 
 
 
-template <class T_sys>
 inline
-void EquationSystems<T_sys>::print_info() const
+unsigned int EquationSystems::n_flags () const
 {
-  std::cout << this->get_info() 
-	    << EquationSystemsBase::get_info()
-	    << std::endl;
+  return _flags.size();
 }
+
+
+
+inline
+unsigned int EquationSystems::n_parameters () const
+{
+  return _parameters.size();
+}
+
+
+
+template <typename T_sys>
+inline
+const T_sys& EquationSystems::get_system (const std::string& name) const
+{
+  std::map<std::string, SystemBase*>::const_iterator
+    pos = _systems.find(name);
+  
+  if (pos == _systems.end())
+    {
+      std::cerr << "ERROR: no system named " << name << " found!"
+		<< std::endl;
+      error();
+    }
+
+  assert (pos->second != NULL);
+  
+  return *(dynamic_cast<T_sys*>(pos->second));
+}
+
+
+
+template <typename T_sys>
+inline
+T_sys& EquationSystems::get_system (const std::string& name)
+{
+  std::map<std::string, SystemBase*>::iterator
+    pos = _systems.find(name);
+  
+  if (pos == _systems.end())
+    {
+      std::cerr << "ERROR: no system named " << name << " found!"
+		<< std::endl;
+      error();
+    }
+
+  assert (pos->second != NULL);
+  
+  return *(dynamic_cast<T_sys*>(pos->second));
+}
+
+
+
+template <typename T_sys>
+inline
+const T_sys& EquationSystems::get_system (const unsigned int num) const
+{
+  assert (num < this->n_systems());
+  
+  std::map<std::string, SystemBase*>::const_iterator
+    pos = _systems.begin();
+
+  for (; pos != _systems.end(); ++pos)
+    if (pos->second->number() == num)
+      break;
+  
+  if (pos == _systems.end())
+    {
+      std::cerr << "ERROR: no system number " << num << " found!"
+		<< std::endl;
+      error();
+    }
+
+  return *(dynamic_cast<T_sys*>(pos->second));
+}
+
+
+
+template <typename T_sys>
+inline
+T_sys& EquationSystems::get_system (const unsigned int num)
+{
+  assert (num < this->n_systems());
+  
+  std::map<std::string, SystemBase*>::iterator
+    pos = _systems.begin();
+
+  for (; pos != _systems.end(); ++pos)
+    if (pos->second->number() == num)
+      break;
+  
+  if (pos == _systems.end())
+    {
+      std::cerr << "ERROR: no system number " << num << " found!"
+		<< std::endl;
+      error();
+    }
+
+  return *(dynamic_cast<T_sys*>(pos->second));
+}
+
+
+
+// template <class T>
+// inline
+// T* EquationSystems::additional_data (const std::string& name) const
+// {
+//   // Look for name in the additional data map
+//   std::map<std::string, void*>::const_iterator
+//     pos = _additional_data.find(name);
+
+//   if (pos == _additional_data.end())
+//     {
+//       here();
+
+//       std::cerr << "WARNING: no object matching \"" << name
+// 		<< "\" found.  Returning NULL"
+// 		<< std::endl;
+
+//       return NULL;
+//     }
+
+//   // Better not be NULL!
+//   assert (pos->second != NULL);
+  
+//   return static_cast<T*>(pos->second);
+// }
+
+
+
+template <typename T>
+inline
+T EquationSystems::parameter (const std::string& id) const
+{
+  // Look for the id in the database
+  std::map<std::string, Real>::const_iterator
+    pos = _parameters.find(id);
+  
+  if (pos == _parameters.end())
+    {
+      std::cerr << "ERROR: parameter " << id
+		<< " was not set!"
+		<< std::endl;
+      error();
+    }
+
+  
+  // Return the parameter value if found
+  return static_cast<T>(pos->second);
+}
+
+
 
 #endif

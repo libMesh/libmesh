@@ -1,4 +1,4 @@
-// $Id: fe_compute_data.h,v 1.1 2003-04-03 14:17:20 ddreyer Exp $
+// $Id: fe_compute_data.h,v 1.2 2003-05-15 23:34:33 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,7 +30,7 @@
 
 
 // Forward declarations
-class EquationSystemsBase;
+class EquationSystems;
 
 
 /**
@@ -55,7 +55,7 @@ public:
    * Constructor.  Takes the required input data and clears
    * the output data using \p clear().
    */
-  FEComputeData (const EquationSystemsBase& es,
+  FEComputeData (const EquationSystems& es,
 		 const Point& pin) :
     equation_systems(es),
     p(pin)
@@ -70,7 +70,7 @@ public:
    * Const reference to the \p EquationSystems object
    * that contains simulation-specific data.
    */
-  const EquationSystemsBase& equation_systems;
+  const EquationSystems& equation_systems;
   /**
    * Holds the point where the data are to be computed
    */
@@ -81,7 +81,7 @@ public:
   //----------------------------------------------------
   // Output data
   /**
-   * Storage for the computed shape function values
+   * Storage for the computed shape function values.
    */
   std::vector<Number> shape;
 
@@ -114,7 +114,7 @@ public:
   void init () 
     { 
       if (!(this->shape.empty()))
-        std::fill (this->shape.begin(),   this->shape.end(),   libMesh::zero);
+        std::fill (this->shape.begin(),   this->shape.end(),   0.);
 #if defined(ENABLE_INFINITE_ELEMENTS) && !defined(USE_COMPLEX_NUMBERS)
       this->phase = 0.;
 #endif

@@ -1,4 +1,4 @@
-// $Id: ex8.C,v 1.2 2003-04-09 19:26:57 ddreyer Exp $
+// $Id: ex8.C,v 1.3 2003-05-15 23:34:33 benkirk Exp $
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
   
@@ -23,7 +23,9 @@
  * C++ include files that we need
  */
 #include <iostream>
+#include <fstream>
 #include <algorithm>
+#include <stdio.h>
 #include <math.h>
 
 /**
@@ -90,8 +92,8 @@
  * the linear system for our problem, governed by the linear
  * wave equation
  */
-void assemble_wave(EquationSystems<NewmarkSystem>& es,
-			const std::string& system_name);
+void assemble_wave(EquationSystems& es,
+		   const std::string& system_name);
 
 
 
@@ -99,7 +101,7 @@ void assemble_wave(EquationSystems<NewmarkSystem>& es,
  * Function Prototype. This function will be used to apply the
  * initial conditions.
  */
-void apply_initial(EquationSystems<NewmarkSystem>& es,
+void apply_initial(EquationSystems& es,
 		   const std::string& system_name);
 
 
@@ -109,7 +111,7 @@ void apply_initial(EquationSystems<NewmarkSystem>& es,
  * Dirichlet Boundary conditions via the penalty
  * method after the system is assembled.
  */
-void fill_dirichlet_bc(EquationSystems<NewmarkSystem>& es,
+void fill_dirichlet_bc(EquationSystems& es,
 		       const std::string& system_name);
 
 
@@ -235,21 +237,21 @@ int main (int argc, char** argv)
      *--------------------------------------------------------------------
      * Create an equation systems object.
      */
-    EquationSystems<NewmarkSystem> equation_systems (mesh);
+    EquationSystems equation_systems (mesh);
 
     /**
      * Declare the system and its variables.
      */
     {
       /**
-       * Creates a system named "Wave"
+       * Creates a NewmarkSystem named "Wave"
        */
-      equation_systems.add_system("Wave");
+      equation_systems.add_system<NewmarkSystem> ("Wave");
 
       /**
        * Use a handy reference to this system
        */
-      NewmarkSystem & t_system = equation_systems("Wave");
+      NewmarkSystem & t_system = equation_systems.get_system<NewmarkSystem> ("Wave");
       
       /**
        * Adds the variable "p" to "Wave".  "p"
@@ -262,8 +264,8 @@ int main (int argc, char** argv)
        * function and the initial condition function defined
        * below.
        */
-      t_system.attach_assemble_function (assemble_wave);
-      t_system.attach_init_cond_function (apply_initial);
+      t_system.attach_assemble_function  (assemble_wave);
+      t_system.attach_init_function      (apply_initial);
   
       /**
        * Set the time step size, and optionally the
@@ -318,7 +320,7 @@ int main (int argc, char** argv)
     /**
      * Use a handy reference to this system
      */
-    NewmarkSystem& t_system = equation_systems("Wave");
+    NewmarkSystem& t_system = equation_systems.get_system<NewmarkSystem> ("Wave");
        
     /**
      * Assemble the time independent system matrices and rhs.
@@ -413,7 +415,7 @@ int main (int argc, char** argv)
 	/**
 	 * Write nodal results to file. The results can then
 	 * be viewed with e.g. gnuplot (run gnuplot and type
-	 * 'plot "result_file.dat" with lines' in the command line)
+	 * 'plot "pressure_node.res" with lines' in the command line)
 	 */
 	res_out << t_time << "\t"
 		<< t_system.get_vector("displacement")(dof_no)
@@ -433,8 +435,8 @@ int main (int argc, char** argv)
 
 
 
-void assemble_wave(EquationSystems<NewmarkSystem>& es,
-			const std::string& system_name)
+void assemble_wave(EquationSystems& es,
+		   const std::string& system_name)
 {
   
   /**
@@ -463,13 +465,13 @@ void assemble_wave(EquationSystems<NewmarkSystem>& es,
   /**
    * Get a reference to our system, as before
    */
-  NewmarkSystem & t_system = es (system_name);
+  NewmarkSystem & t_system = es.get_system<NewmarkSystem> (system_name);
 
   /**
    * Get a constant reference to the Finite Element type
    * for the first (and only) variable in the system.
    */
-  FEType fe_type = es("Wave").get_dof_map().variable_type(0);
+  FEType fe_type = t_system.get_dof_map().variable_type(0);
 
   /**
    * In here, we will add the element matrices to the
@@ -478,11 +480,11 @@ void assemble_wave(EquationSystems<NewmarkSystem>& es,
    * "matrix" and "rhs".  Therefore, get writable
    * references to them
    */
-  SparseMatrix<Number>&   stiffness      = t_system.get_matrix("stiffness");
-  SparseMatrix<Number>&   damping        = t_system.get_matrix("damping");
-  SparseMatrix<Number>&   mass           = t_system.get_matrix("mass");
+  SparseMatrix<Number>&   stiffness = t_system.get_matrix("stiffness");
+  SparseMatrix<Number>&   damping   = t_system.get_matrix("damping");
+  SparseMatrix<Number>&   mass      = t_system.get_matrix("mass");
 
-  NumericVector<Number>&  force          = t_system.get_vector("force");
+  NumericVector<Number>&  force     = t_system.get_vector("force");
 
   /**
    * Some solver packages (PETSc) are especially picky about
@@ -493,7 +495,7 @@ void assemble_wave(EquationSystems<NewmarkSystem>& es,
    * values in the collective matrix, so that matrix additions
    * encounter identical sparsity structures.
    */
-  SparseMatrix<Number>&  matrix           = *t_system.matrix;
+  SparseMatrix<Number>&  matrix     = *t_system.matrix;
 
 
   /**
@@ -744,11 +746,11 @@ void assemble_wave(EquationSystems<NewmarkSystem>& es,
        * Finally, simply add the contributions to the additional
        * matrices and vector.
        */
-      stiffness.add_matrix   (Ke, dof_indices);
-      damping.add_matrix     (Ce, dof_indices);
-      mass.add_matrix        (Me, dof_indices);
+      stiffness.add_matrix (Ke, dof_indices);
+      damping.add_matrix   (Ce, dof_indices);
+      mass.add_matrix      (Me, dof_indices);
 
-      force.add_vector       (Fe, dof_indices);
+      force.add_vector     (Fe, dof_indices);
     
       /**
        * For the overall matrix, explicitly zero the entries where
@@ -769,13 +771,13 @@ void assemble_wave(EquationSystems<NewmarkSystem>& es,
 
 
 
-void apply_initial(EquationSystems<NewmarkSystem>& es,
+void apply_initial(EquationSystems& es,
 		   const std::string& system_name)
 {
   /**
    * Get a reference to our system, as before
    */
-  NewmarkSystem & t_system = es (system_name);
+  NewmarkSystem & t_system = es.get_system<NewmarkSystem> (system_name);
 
   /**
    * Numeric vectors for the pressure, velocity and acceleration
@@ -801,7 +803,7 @@ void apply_initial(EquationSystems<NewmarkSystem>& es,
 
 
 
-void fill_dirichlet_bc(EquationSystems<NewmarkSystem>& es,
+void fill_dirichlet_bc(EquationSystems& es,
 		       const std::string& system_name)
 {
   /**
@@ -813,13 +815,13 @@ void fill_dirichlet_bc(EquationSystems<NewmarkSystem>& es,
   /**
    * Get a reference to our system, as before.
    */
-  NewmarkSystem & t_system = es (system_name);
+  NewmarkSystem & t_system = es.get_system<NewmarkSystem> (system_name);
 
   /**
    * Get writable references to the overall matrix and vector.
    */
-  SparseMatrix<Number>&  matrix                = *t_system.matrix;
-  NumericVector<Number>& rhs                   = *t_system.rhs;
+  SparseMatrix<Number>&  matrix = *t_system.matrix;
+  NumericVector<Number>& rhs    = *t_system.rhs;
 
   /**
    * Get a constant reference to the mesh object.

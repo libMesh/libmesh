@@ -170,3 +170,12 @@ font.comment       { color: #800000 }
 font.preprocessor  { color: darkgreen }
 font.stringliteral { color: maroon }
 font.charliteral   { color: #008080 }
+
+
+span.keyword       { color: teal }
+span.keywordtype   { color: lightgreen }
+span.keywordflow   { color: cyan }
+span.comment       { color: #800000 }
+span.preprocessor  { color: darkgreen }
+span.stringliteral { color: maroon }
+span.charliteral   { color: #008080 }

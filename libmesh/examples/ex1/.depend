@@ -9,6 +9,7 @@ ex1.$(obj-suffix):\
     ../../include/enum_elem_quality.h\
     ../../include/enum_elem_type.h\
     ../../include/enum_order.h\
+    ../../include/enum_solver_package.h\
     ../../include/libmesh.h\
     ../../include/libmesh_base.h\
     ../../include/mesh.h\
@@ -16,6 +17,7 @@ ex1.$(obj-suffix):\
     ../../include/mesh_common.h\
     ../../include/mesh_communication.h\
     ../../include/mesh_config.h\
+    ../../include/mesh_data.h\
     ../../include/mesh_refinement.h\
     ../../include/node.h\
     ../../include/node_iterators.h\

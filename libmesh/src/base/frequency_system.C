@@ -1,4 +1,4 @@
-// $Id: frequency_system.C,v 1.12 2003-05-12 14:16:48 ddreyer Exp $
+// $Id: frequency_system.C,v 1.13 2003-05-15 23:34:34 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -19,13 +19,8 @@
 
 
 
-// C++ includes
-#include <stdio.h>          /* avoid the ostringstream */
-
 // Local includes
-#include "frequency_system.h"
-#include "equation_systems.h"
-
+#include "mesh_config.h"
 
 /*
  * Require complex arithmetic
@@ -33,15 +28,24 @@
 #if defined(USE_COMPLEX_NUMBERS)
 
 
+// C++ includes
+#include <stdio.h>          /* avoid the ostringstream */
+
+// Local includes
+#include "frequency_system.h"
+#include "equation_systems.h"
+#include "mesh_logging.h"
+#include "linear_solver_interface.h"
+
+
+
 // ------------------------------------------------------------
 // FrequencySystem implementation
-FrequencySystem::FrequencySystem (EquationSystems<FrequencySystem>& es,
-				  const std::string&  name,
-				  const unsigned int  number) :
-  SystemBase                (es.get_mesh(), name, number),
-  _assemble_fptr            (NULL),
-  _solve_fptr               (NULL),
-  _equation_systems         (es),
+FrequencySystem::FrequencySystem (EquationSystems& es,
+				  const std::string& name,
+				  const unsigned int number) :
+  SteadySystem              (es, name, number),
+  solve_system              (NULL),
   _finished_set_frequencies (false),
   _finished_init            (false),
   _finished_assemble        (false)
@@ -64,18 +68,8 @@ FrequencySystem::FrequencySystem (EquationSystems<FrequencySystem>& es,
 
 FrequencySystem::~FrequencySystem ()
 {
-  //_assemble_fptr = _solve_fptr = NULL;
-
-  // clear frequencies: 
-  // 1. in the parameters section of the 
-  //    EquationSystems<FrequencySystem> object
-  // 2. in the local vector
-  for (unsigned int n=0; n < this->n_frequencies(); n++)
-      _equation_systems.unset_parameter(this->form_freq_param_name(n));
-  _equation_systems.unset_parameter("current frequency");
-
-  this->_frequencies.clear();
-
+  this->clear ();
+  
   // the additional matrices and vectors are cleared and zero'ed in SystemBase
 }
 
@@ -84,9 +78,7 @@ FrequencySystem::~FrequencySystem ()
 
 void FrequencySystem::clear ()
 {
-  SystemBase::clear();
-
-  //_assemble_fptr = _solve_fptr = NULL;
+  SteadySystem::clear();
 
   _finished_set_frequencies = false;
   _finished_init            = false;
@@ -106,7 +98,7 @@ void FrequencySystem::clear ()
 
 
 
-void FrequencySystem::init ()
+void FrequencySystem::init_data ()
 {
   // Log how long initializing the system takes
   START_LOG("init()", "FrequencySystem");
@@ -119,37 +111,12 @@ void FrequencySystem::init ()
     }
 
   // initialize parent data and additional solution vectors
-  SystemBase::init();
+  SteadySystem::init_data();
 
   _finished_init = true;
 
   // Stop logging init()
   STOP_LOG("init()", "FrequencySystem");
-}
-
-
-
-void FrequencySystem::reinit ()
-{
-  //just do the same as in init(), but for the PerfLog, repeat the code
-
-  // Log how long initializing the system takes
-  START_LOG("reinit()", "FrequencySystem");
-
-  // make sure we have frequencies to solve for
-  if (!_finished_set_frequencies)
-    {
-      std::cerr << "ERROR: Need to set frequencies before calling reinit(). " << std::endl;
-      error();
-    }
-
-  // initialize parent data and additional solution vectors
-  SystemBase::init();
-
-  _finished_init = true;
-
-  // Stop logging init()
-  STOP_LOG("reinit()", "FrequencySystem");
 }
 
 
@@ -170,13 +137,13 @@ void FrequencySystem::assemble ()
   // prepare matrix with the help of the _dof_map, 
   // fill with sparsity pattern, initialize the
   // additional matrices
-  SystemBase::assemble();
+  SteadySystem::assemble();
 
-  // Optionally call the user-specified matrix assembly function,
-  // if the user provided it.  Note that \p FrequencySystem also
-  // works without an _assemble_fptr function
-  if (_assemble_fptr != NULL)
-    this->_assemble_fptr (_equation_systems, this->name());
+//   // Optionally call the user-specified matrix assembly function,
+//   // if the user provided it.  Note that \p FrequencySystem also
+//   // works without an _assemble_fptr function
+//   if (_assemble_fptr != NULL)
+//     this->_assemble_fptr (_equation_systems, this->name());
 
   //matrix.print ();
   //rhs.print    ();
@@ -278,7 +245,7 @@ FrequencySystem::solve (const unsigned int n_start_in,
     this->assemble (); 
 
   // the user-supplied solve method _has_ to be provided by the user
-  assert (_solve_fptr != NULL);
+  assert (solve_system != NULL);
 
 //  Do not call this, otherwise perflog may count the time twice,
 //  due to the additional START/STOP_LOGs below
@@ -328,7 +295,7 @@ FrequencySystem::solve (const unsigned int n_start_in,
       // Call the user-supplied pre-solve method
       START_LOG("user_pre_solve()", "FrequencySystem");
       
-      this->_solve_fptr (_equation_systems, this->name());
+      this->solve_system (_equation_systems, this->name());
       
       STOP_LOG("user_pre_solve()", "FrequencySystem");
 
@@ -363,37 +330,12 @@ FrequencySystem::solve (const unsigned int n_start_in,
 
 
 
-
-bool FrequencySystem::compare (const FrequencySystem& other_system, 
-			       const Real threshold,
-			       const bool verbose) const
-{
-  // we have no additional data to compare,
-  // let SystemBase do the job
-  const SystemBase& other_system_base = static_cast<const SystemBase&>(other_system);
-  return SystemBase::compare (other_system_base, threshold, verbose);
-}
-
-
-
-
-void FrequencySystem::attach_assemble_function(void fptr(EquationSystems<FrequencySystem>& es,
-							 const std::string& name))
-{
-  assert (fptr != NULL);
-  
-  _assemble_fptr = fptr;  
-}
-
-
-
-
-void FrequencySystem::attach_solve_function(void fptr(EquationSystems<FrequencySystem>& es,
+void FrequencySystem::attach_solve_function(void fptr(EquationSystems& es,
 						      const std::string& name))
 {
   assert (fptr != NULL);
   
-  _solve_fptr = fptr;
+  solve_system = fptr;
 }
 
 
@@ -413,7 +355,6 @@ std::string FrequencySystem::form_freq_param_name(const unsigned int n) const
   sprintf(buf, "frequency_%04d", n);
   return (buf);
 }
-
 
 
 

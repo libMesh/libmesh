@@ -1,4 +1,4 @@
-// $Id: system_base.h,v 1.14 2003-05-04 23:58:53 benkirk Exp $
+// $Id: system_base.h,v 1.15 2003-05-15 23:34:34 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,24 +23,23 @@
 #define __system_base_h__
 
 // C++ includes
-#include <set>
 
 // Local Includes
 #include "mesh_common.h"
-#include "mesh.h"
-#include "dof_map.h"
 #include "fe_type.h"
+#include "dof_map.h"
 #include "auto_ptr.h"
-#include "sparse_matrix.h"
-#include "numeric_vector.h"
-#include "linear_solver_interface.h"
 #include "reference_counted_object.h"
 
 
 // Forward Declarations
 class SystemBase;
+class EquationSystems;
+class Mesh;
 class Xdr;
-
+template <typename T> class SparseMatrix;
+template <typename T> class NumericVector;
+template <typename T> class LinearSolverInterface;
 
 /**
  * This is the base class for classes which contain 
@@ -51,7 +50,7 @@ class Xdr;
  * one or more of the children of this class.
  * Note that templating \p EqnSystems relaxes the use of virtual members.
  *
- * @author Benjamin S. Kirk, 2002
+ * @author Benjamin S. Kirk, 2002-2003.
  */
 
 // ------------------------------------------------------------
@@ -65,16 +64,24 @@ protected:
    * data structures.  Protected so that this base class
    * cannot be explicitly instantiated.
    */
-  SystemBase (Mesh&               mesh,
-	      const std::string&  name,
-	      const unsigned int  number);
+  SystemBase (EquationSystems& es,
+	      const std::string& name,
+	      const unsigned int number);
   
+public:
+
+  
+  /**
+   * Destructor.
+   */
+  virtual ~SystemBase ();
+
   /**
    * Clear all the data structures associated with
    * the system.  Protected so that only children can
    * use it.
    */
-  void clear ();
+  virtual void clear ();
   
   /**
    * Initializes degrees of freedom and other 
@@ -92,7 +99,13 @@ protected:
    * for all applications. @e Should be overloaded in derived classes.
    * Protected so that only children can use it.
    */
-  void reinit ();
+  virtual void reinit ();
+  
+  /**
+   * Update the local values to reflect the solution
+   * on neighboring processors.
+   */
+  virtual void update () = 0;
   
   /**
    * Prepares \p matrix and \p _dof_map for matrix assembly.
@@ -101,24 +114,21 @@ protected:
    * @e Should be overloaded in derived classes.
    * Protected so that only children can use it.
    */
-  void assemble ();
+  virtual void assemble ();
 
+  /**
+   * Assembles & solves the linear system Ax=b. 
+   */
+  virtual std::pair<unsigned int, Real> solve ();
+  
   /**
    * @returns \p true when the other system contains
    * identical data, up to the given threshold.  Outputs
    * some diagnostic info when \p verbose is set.
    */
-  bool compare (const SystemBase& other_system, 
-		const Real threshold,
-		const bool verbose) const;
-
-
-public:
-
-  /**
-   * Destructor.
-   */
-  virtual ~SystemBase ();
+  virtual bool compare (const SystemBase& other_system, 
+			const Real threshold,
+			const bool verbose) const;
 
   /**
    * @returns the system name.
@@ -130,14 +140,21 @@ public:
    * which system type to use when reading equation system
    * data from file.  Has be overloaded in derived classes.
    */
-  static const std::string system_type () { error(); return ""; }
+  virtual std::string system_type () const = 0;
 
   /**
-   * Projects the solution vector to the new mesh.  The input indices
-   * give the old DOF numbers in terms of the new DOF numbers.
+   * Projects the vector defined on the old mesh onto the
+   * new mesh. 
    */
-  void project_vector(const NumericVector<Number>*,
-                      NumericVector<Number>*) const;
+  void project_vector (NumericVector<Number>&) const;
+
+  /**
+   * Projects the vector defined on the old mesh onto the
+   * new mesh. The original vector is unchanged and the new vector
+   * is passed through the second argument.
+   */
+  void project_vector (const NumericVector<Number>&,
+		       NumericVector<Number>&) const;
   
   /**
    * @returns the system number.   
@@ -159,22 +176,37 @@ public:
   void update_global_solution (std::vector<Number>& global_soln,
 			       const unsigned int dest_proc) const;
 
-
   /**
    * @returns a constant reference to this systems's \p _mesh.
    */
-  const Mesh & get_mesh() const { return _mesh; }
+  const Mesh & get_mesh() const;
   
   /**
    * @returns a constant reference to this system's \p _dof_map.
    */
-  const DofMap & get_dof_map() const { return _dof_map; }
+  const DofMap & get_dof_map() const;
   
   /**
    * @returns a writeable reference to this system's \p _dof_map.
    */
-  DofMap & get_dof_map() { return _dof_map; }
+  DofMap & get_dof_map();
 
+  /**
+   * @returns \p true if the system is active, false otherwise.
+   * An active system will be solved.
+   */
+  bool active () const;
+
+  /**
+   * Activates the system.  Only active systems are solved.
+   */
+  void activate ();
+
+  /**
+   * Deactivates the system.  Only active systems are solved.
+   */
+  void deactivate ();
+    
   /**
    * Adds the additional matrix \p mat_name to this system.  Only
    * allowed @e prior to \p assemble().  All additional matrices
@@ -204,7 +236,7 @@ public:
   /**
    * @returns the number of additional vectors handled by this system
    */
-  unsigned int n_additional_matrices () const { return _other_matrices.size(); }
+  unsigned int n_additional_matrices () const;
 
   /**
    * Adds the additional vector \p vec_name to this system.  Only
@@ -231,7 +263,7 @@ public:
   /**
    * @returns the number of additional vectors handled by this system
    */
-  unsigned int n_additional_vectors () const { return _other_vectors.size(); }
+  unsigned int n_additional_vectors () const;
 
   /**
    * @returns the number of variables in the system
@@ -307,13 +339,13 @@ public:
   /**
    * Writes the basic data for this System.
    */
-  void write (Xdr& io);
+  void write (Xdr& io) const;
 
   /**
    * Writes additional data, namely vectors, for this System.
    */
   void write_data (Xdr& io,
-		   const bool write_additional_data = true);
+		   const bool write_additional_data = true) const;
 
   /**
    * @returns a string containing information about the
@@ -321,7 +353,37 @@ public:
    */
   std::string get_info () const;
 
+  /**
+   * Register a user function to use in initializing the system.
+   */
+  void attach_init_function (void fptr(EquationSystems& es,
+				       const std::string& name));
+  
+  /**
+   * Register a user function to use in assembling the system
+   * matrix and RHS.
+   */
+  void attach_assemble_function (void fptr(EquationSystems& es,
+					   const std::string& name));
+  
+  /**
+   * Function that initializes the system.
+   */
+  void (* init_system) (EquationSystems& es,
+			const std::string& name);
+  
+  /**
+   * Function that assembles the system.
+   */
+  void (* assemble_system) (EquationSystems& es,
+			    const std::string& name);
 
+
+
+  //--------------------------------------------------
+  // The data & solver interface for solving the linear
+  // system Ax=b
+  
   /**
    * Data structure to hold solution values.
    */
@@ -345,6 +407,14 @@ public:
 
 protected:
 
+  
+  /**
+   * Initializes the data for the system.  Note that this is called
+   * before any user-supplied intitialization function so that all
+   * required storage will be available.
+   */
+  virtual void init_data ();
+  
   /**
    * A name associated with this system.
    */
@@ -372,6 +442,11 @@ protected:
    * names.
    */
   std::map<std::string, unsigned short int> _var_num;
+
+  /**
+   * Flag stating if the system is active or not.
+   */
+  bool _active;
   
   /**
    * Some systems need multiple matrices.
@@ -393,6 +468,12 @@ protected:
    */
   bool _can_add_vectors;
 
+
+
+  // -------------------------------------------------
+  // Necessary classes
+  //
+  
   /**
    * Data structure describing the relationship between
    * nodes, variables, etc... and degrees of freedom.
@@ -400,10 +481,16 @@ protected:
   DofMap _dof_map;
 
   /**
+   * Constant reference to the \p EquationSystems object
+   * used for the simulation.
+   */
+  EquationSystems& _equation_systems;
+  
+  /**
    * Constant reference to the \p mesh data structure used
    * for the simulation.   
    */
-  Mesh& _mesh;
+  const Mesh& _mesh;
 };
 
 
@@ -422,6 +509,54 @@ inline
 unsigned int SystemBase::number() const
 {
   return _sys_number;
+}
+
+
+
+inline
+const Mesh& SystemBase::get_mesh() const
+{
+  return _mesh;
+}
+
+
+
+inline
+const DofMap& SystemBase::get_dof_map() const
+{
+  return _dof_map;
+}
+
+
+
+inline
+DofMap& SystemBase::get_dof_map()
+{
+  return _dof_map;
+}
+
+
+
+inline
+bool SystemBase::active() const
+{
+  return _active;  
+}
+
+
+
+inline
+void SystemBase::activate ()
+{
+  _active = true;
+}
+
+
+
+inline
+void SystemBase::deactivate ()
+{
+  _active = false;
 }
 
 
@@ -475,8 +610,6 @@ unsigned int SystemBase::n_dofs() const
 
 
 
-
-
 inline
 unsigned int SystemBase::n_constrained_dofs() const
 {
@@ -495,13 +628,27 @@ unsigned int SystemBase::n_constrained_dofs() const
 
 
 
-
 inline
 unsigned int SystemBase::n_local_dofs() const
 {
-  return _dof_map.n_dofs_on_processor(_mesh.processor_id());
+  return _dof_map.n_dofs_on_processor(libMeshBase::processor_id());
 }
 
+
+
+inline
+unsigned int SystemBase::n_additional_matrices () const
+{
+ return _other_matrices.size(); 
+}
+
+
+
+inline
+unsigned int SystemBase::n_additional_vectors () const
+{
+ return _other_vectors.size(); 
+}
 
 
 #endif

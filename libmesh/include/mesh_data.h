@@ -1,4 +1,4 @@
-// $Id: mesh_data.h,v 1.1 2003-05-15 19:43:33 ddreyer Exp $
+// $Id: mesh_data.h,v 1.2 2003-05-15 23:34:34 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -376,7 +376,7 @@ private:
   /**
    * @returns the foreign id this \p Node* maps to.
    */
-  const unsigned int node_to_foreign_id (const Node* n) const;
+  unsigned int node_to_foreign_id (const Node* n) const;
 
   /**
    * @returns the \p Elem* that this foreign id maps to.
@@ -386,7 +386,7 @@ private:
   /**
    * @returns the foreign id this \p Elem* maps to.
    */
-  const unsigned int elem_to_foreign_id (const Elem* n) const;
+  unsigned int elem_to_foreign_id (const Elem* n) const;
 
 };
 

@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.19 2003-05-05 22:23:09 benkirk Exp $
+// $Id: elem.C,v 1.20 2003-05-15 23:34:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -291,19 +291,11 @@ Real Elem::hmin() const
 {
   Real h_min=1.e30;
 
-//   for (unsigned int n_outer=0; n_outer<n_vertices(); n_outer++)
-//     for (unsigned int n_inner=0; n_inner<n_vertices(); n_inner++)
-//       if (n_outer != n_inner) // would create false 0
-// 	{
-// 	  const Point diff(point(n_outer) - point(n_inner));
-	  
-// 	  h_min = std::min(h_min,diff.size());
-// 	}
-
   for (unsigned int n_outer=0; n_outer<n_vertices(); n_outer++)
-    for (unsigned int n_inner=n_outer+1; n_inner<n_vertices(); n_inner++)
+    for (unsigned int n_inner=0; n_inner<n_vertices(); n_inner++)
+      if (n_outer != n_inner) // would create false 0
 	{
-	  const Point diff(point(n_outer) - point(n_inner));
+	  const Point diff = (point(n_outer) - point(n_inner));
 	  
 	  h_min = std::min(h_min,diff.size());
 	}
@@ -317,22 +309,14 @@ Real Elem::hmax() const
 {
   Real h_max=0;
 
-//   for (unsigned int n_outer=0; n_outer<n_vertices(); n_outer++)
-//     for (unsigned int n_inner=0; n_inner<n_vertices(); n_inner++)
-//       if (n_outer != n_inner) // will be 0, definately _not_ max
-// 	{
-// 	  const Point diff = (point(n_outer) - point(n_inner));
-	  
-// 	  h_max = std::max(h_max,diff.size());
-// 	}
-  
   for (unsigned int n_outer=0; n_outer<n_vertices(); n_outer++)
-    for (unsigned int n_inner=n_outer+1; n_inner<n_vertices(); n_inner++)
-      {
-	const Point diff(point(n_outer) - point(n_inner));
-	
-	h_max = std::max(h_max,diff.size());
-      }
+    for (unsigned int n_inner=0; n_inner<n_vertices(); n_inner++)
+      if (n_outer != n_inner) // will be 0, definately _not_ max
+	{
+	  const Point diff = (point(n_outer) - point(n_inner));
+	  
+	  h_max = std::max(h_max,diff.size());
+	}
 
   return h_max;
 }

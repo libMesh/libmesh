@@ -1,4 +1,4 @@
-// $Id: enum_quadrature_type.h,v 1.2 2003-02-13 22:56:07 benkirk Exp $
+// $Id: enum_quadrature_type.h,v 1.3 2003-05-15 23:34:33 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -29,7 +29,7 @@
 
 // ------------------------------------------------------------
 // enum QuadratureType definition
-namespace MeshEnums {
+namespace libMeshEnums {
   
   /**
    * Defines an \p enum for currently available quadrature rules.
@@ -45,7 +45,7 @@ namespace MeshEnums {
 		       INVALID_Q_RULE};
 }
 
-using namespace MeshEnums;
+using namespace libMeshEnums;
 
 
 

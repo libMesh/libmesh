@@ -1,4 +1,4 @@
-// $Id: point_locator.C,v 1.1 2003-05-10 22:10:38 ddreyer Exp $
+// $Id: point_locator.C,v 1.2 2003-05-15 23:34:36 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -136,7 +136,8 @@ void PointLocator<T>::init ()
 	   * the master's tree.  But for this we first transform
 	   * the master in a state for which we are friends
 	   */
-	  const PointLocator<T>* my_master = static_cast<const PointLocator<T>*>(this->_master);
+	  const PointLocator<T>* my_master =
+	    dynamic_cast<const PointLocator<T>*>(this->_master);
 
 	  this->_tree = my_master->_tree;
         }
@@ -146,7 +147,7 @@ void PointLocator<T>::init ()
        * Not all PointLocators may own a tree, but all of them
        * use their own element pointer.  Let the element pointer
        * be unique for every interpolator.
-       * Ssupposed the interpolators are used concurrently
+       * Suppose the interpolators are used concurrently
        * at different locations in the mesh, then it makes quite
        * sense to have unique start elements.
        */
@@ -178,13 +179,13 @@ const Elem* PointLocator<T>::operator() (const Point& p)
 
 	if (this->_element == NULL)
 	  {
-	    std::cout << std::endl
+	    std::cerr << std::endl
 		      << " ******** Serious Problem.  Could not find an Element "
 		      << "in the Mesh" 
 		      << std:: endl
 		      << " ******** that contains the Point ";
 	    p.print();
-	    exit(1);
+	    error();
 	  }
     }
 

@@ -1,4 +1,4 @@
-// $Id: ex5.C,v 1.18 2003-03-26 13:55:24 benkirk Exp $
+// $Id: ex5.C,v 1.19 2003-05-15 23:34:32 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -33,7 +33,7 @@
  */
 #include "libmesh.h"
 #include "mesh.h"
-#include "general_system.h"
+#include "steady_system.h"
 #include "equation_systems.h"
 
 /**
@@ -57,6 +57,8 @@
  * Define useful datatypes for finite element
  * matrix and vector components.
  */
+#include "sparse_matrix.h"
+#include "numeric_vector.h"
 #include "dense_matrix.h"
 #include "dense_vector.h"
 
@@ -86,7 +88,7 @@
 /**
  * Function prototype, as before.
  */
-void assemble_poisson(EquationSystems<GeneralSystem>& es,
+void assemble_poisson(EquationSystems& es,
                       const std::string& system_name);
 
 
@@ -184,15 +186,15 @@ int main (int argc, char** argv)
     
     mesh.print_info();
     
-    EquationSystems<GeneralSystem> equation_systems (mesh);
+    EquationSystems equation_systems (mesh);
     
     {
-      equation_systems.add_system("Poisson");
+      equation_systems.add_system<SteadySystem> ("Poisson");
       
       equation_systems("Poisson").add_variable("u", FIRST);
 
       equation_systems("Poisson").attach_assemble_function (assemble_poisson);
-      
+
       equation_systems.init();
       
       equation_systems.print_info();
@@ -220,7 +222,7 @@ int main (int argc, char** argv)
 
 
 
-void assemble_poisson(EquationSystems<GeneralSystem>& es,
+void assemble_poisson(EquationSystems& es,
                       const std::string& system_name)
 {
   assert (system_name == "Poisson");

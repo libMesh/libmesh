@@ -1,4 +1,4 @@
-// $Id: linear_solver_interface.h,v 1.6 2003-05-04 23:58:52 benkirk Exp $
+// $Id: linear_solver_interface.h,v 1.7 2003-05-15 23:34:33 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -27,9 +27,6 @@
 
 // Local includes
 #include "mesh_common.h"
-#include "auto_ptr.h"
-#include "sparse_matrix.h"
-#include "numeric_vector.h"
 #include "enum_solver_package.h"
 #include "enum_solver_type.h"
 #include "enum_preconditioner_type.h"
@@ -37,7 +34,9 @@
 #include "libmesh.h"
 
 // forward declarations
-//template <typename T> class LinearSolverInterface;
+template <typename T> class AutoPtr;
+template <typename T> class SparseMatrix;
+template <typename T> class NumericVector;
 
 
 
@@ -70,7 +69,8 @@ public:
    * Builds a \p LinearSolverInterface using the linear solver package specified by
    * \p solver_package
    */
-  static AutoPtr<LinearSolverInterface<T> > build(const SolverPackage solver_package = libMesh::default_solver_package());
+  static AutoPtr<LinearSolverInterface<T> > build(const SolverPackage solver_package =
+						  libMesh::default_solver_package());
   
   /**
    * @returns true if the data structures are
@@ -108,7 +108,7 @@ public:
   /**
    * Sets the type of preconditioner to use.
    */
-  void set_preconditioner_type (const PreconditionerType  pct)
+  void set_preconditioner_type (const PreconditionerType pct)
   { _preconditioner_type = pct; }
   
 
@@ -117,14 +117,15 @@ public:
    * and the final residual.
    * Call the Solver solver
    */    
-  virtual std::pair<unsigned int, Real> 
-  solve (SparseMatrix<T>&,
-	 NumericVector<T>&,
-	 NumericVector<T>&,
-	 const double,
-	 const unsigned int) = 0;
-   
+  virtual std::pair<unsigned int, Real> solve (SparseMatrix<T>&,
+					       NumericVector<T>&,
+					       NumericVector<T>&,
+					       const double,
+					       const unsigned int) = 0;
+
+  
 protected:
+
   
   /**
    * Enum stating which type of iterative solver to use.
@@ -143,14 +144,18 @@ protected:
 };
 
 
+
+
 /*----------------------- inline functions ----------------------------------*/
 template <typename T>
 inline
 LinearSolverInterface<T>::LinearSolverInterface () :
-  _solver_type (GMRES),
+  
+  _solver_type         (GMRES),
   _preconditioner_type (ILU_PRECOND),
-  _is_initialized (false)
-{}
+  _is_initialized      (false)
+{
+}
 
 
 
@@ -158,7 +163,7 @@ template <typename T>
 inline
 LinearSolverInterface<T>::~LinearSolverInterface ()
 {
-  clear ();
+  this->clear ();
 }
 
 

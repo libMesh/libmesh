@@ -1,4 +1,4 @@
-// "$Id: xdrIO.C,v 1.8 2003-03-23 15:09:19 ddreyer Exp $\n"
+// "$Id: xdrIO.C,v 1.9 2003-05-15 23:34:36 benkirk Exp $\n"
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -265,6 +265,8 @@ int XdrIO::dataBlk(int* array, int numvar, int size)
 
     case (XdrIO::R_ASCII):
       {
+	assert (mp_in.good());
+	
 	for (int i=0; i<size; i++)
 	  {
 	    for (int j=0; j<numvar; j++)
@@ -330,8 +332,12 @@ int XdrIO::dataBlk(REAL* array, int numvar, int size)
 
     case (XdrIO::R_ASCII):
       {
+	assert (mp_in.good());
+	
 	for (int i=0; i<size; i++)
 	  {
+	    assert (mp_in.good());
+	
 	    for (int j=0; j<numvar; j++)
 	      mp_in >> array[i*numvar + j];
 	  
@@ -387,6 +393,8 @@ int XdrMESH::header(XdrMHEAD *hd)
 
     case (XdrIO::R_ASCII):
       {
+	assert (mp_in.good());
+	
 	mp_in >> hd->m_numel    ; mp_in.getline(comment, comm_len);
 	mp_in >> hd->m_numNodes ; mp_in.getline(comment, comm_len);
 	mp_in >> hd->m_sumWghts ; mp_in.getline(comment, comm_len);
@@ -429,6 +437,8 @@ int XdrMESH::header(XdrMHEAD *hd)
 
 	case (XdrIO::R_ASCII):
 	  {
+	    assert (mp_in.good());
+	
 	    mp_in >> hd->n_blocks; mp_in.getline(comment, comm_len);
 	    break;
 	  }
@@ -473,6 +483,8 @@ int XdrMESH::header(XdrMHEAD *hd)
 
 	case (XdrIO::R_ASCII):
 	  {
+	    assert (mp_in.good());
+	
 	    for (unsigned int i=0; i<hd->n_blocks; i++)
 	      {
 		// convoluted way of doing it to
@@ -531,6 +543,8 @@ int XdrMESH::header(XdrMHEAD *hd)
 
 	case (XdrIO::R_ASCII):
 	  {
+	    assert (mp_in.good());
+	
 	    for (unsigned int i=0; i<hd->n_blocks; i++)
 	      mp_in >> neeb[i] ;
 	      
@@ -586,9 +600,13 @@ int XdrMESH::header(XdrMHEAD *hd)
 
     case (XdrIO::R_ASCII):
       {
+	assert (mp_in.good());
+	
 	mp_in.getline(comment, comm_len);
 	hd->setId(comment);
 
+	assert (mp_in.good());
+	
 	mp_in.getline(comment, comm_len);
 	hd->setTitle(comment);
 
@@ -694,6 +712,8 @@ int XdrSOLN::header(XdrSHEAD *hd)
 
     case (XdrIO::R_ASCII):
       {
+	assert (mp_in.good());
+	
 	mp_in >> hd->m_numNodes ; mp_in.getline(comment, comm_len);
 	mp_in >> hd->m_wrtVar   ; mp_in.getline(comment, comm_len);
 	mp_in >> hd->m_strSize  ; mp_in.getline(comment, comm_len);

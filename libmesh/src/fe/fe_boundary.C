@@ -1,4 +1,4 @@
-// $Id: fe_boundary.C,v 1.14 2003-04-09 19:27:00 ddreyer Exp $
+// $Id: fe_boundary.C,v 1.15 2003-05-15 23:34:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -100,10 +100,9 @@ void FE<Dim,T>::reinit(const Elem* elem,
 
   // Find where the integration points are located on the
   // full element.
-  std::vector<Point> qp(xyz);
+  std::vector<Point> qp;
   
-  for (unsigned int p=0; p<qp.size(); p++)
-    qp[p] = inverse_map (elem, qp[p]);
+  inverse_map (elem, xyz, qp);
   
 
   // compute the shape function and derivative values
