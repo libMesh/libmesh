@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.84 2004-11-14 03:50:31 benkirk Exp $
+// $Id: mesh_base.C,v 1.85 2004-11-14 05:40:52 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -149,6 +149,9 @@ void MeshBase::clear ()
   
   // Reset the number of subdomains
   _n_sbd  = 1;
+
+  // Reset the number of partitions
+  _n_parts = 1;
 
   // Clear the elements data structure
   {
