@@ -1,4 +1,4 @@
-/* $Id: ex6.C,v 1.29 2003-11-11 04:58:33 benkirk Exp $ */
+/* $Id: ex6.C,v 1.30 2003-11-18 18:48:07 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -85,17 +85,6 @@ int main (int argc, char** argv)
 
 #else
   
-  // This example is designed for real numbers only.   
-#ifdef USE_COMPLEX_NUMBERS
-  
-  std::cerr << "ERROR: Not intended for use with complex numbers."
-	    << std::endl;
-  here();
-  
-  return 0;
-  
-#endif
-  
   // Braces are used to force object scope, like in example 2      
   {        
     // For the moment, only allow 3D     
@@ -117,6 +106,9 @@ int main (int argc, char** argv)
     
     // Print information about the mesh to the screen.
     mesh.print_info();
+
+    // Write the mesh before the infinite elements are added
+    mesh.write_gmv ("orig_mesh.gmv");
     
     // Normally, when a mesh is imported or created in
     // libMesh, only conventional elements exist.  The infinite
@@ -138,7 +130,8 @@ int main (int argc, char** argv)
     // Print information about the mesh to the screen.
     mesh.print_info();
 
-    // Save only the mesh, with infinite elements added.
+    // Write the mesh with the infinite elements added.
+    // Compare this to the original mesh.
     mesh.write_gmv ("ifems_added.gmv");
     
     // After building infinite elements, we have to let 

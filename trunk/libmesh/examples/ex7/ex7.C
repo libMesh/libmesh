@@ -1,4 +1,4 @@
-/* $Id: ex7.C,v 1.29 2003-11-11 13:19:40 benkirk Exp $ */
+/* $Id: ex7.C,v 1.30 2003-11-18 18:48:08 benkirk Exp $ */
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
 
@@ -545,7 +545,7 @@ void add_M_C_K_helmholtz(EquationSystems& es,
   const Number scale_stiffness (  1., 0.   );
   const Number scale_damping   (  0., omega);
   const Number scale_mass      (-k*k, 0.   );
-  const Number scale_rhs (0., -(rho*omega));
+  const Number scale_rhs       (  0., -(rho*omega));
   
   // Now simply add the matrices together, store the result
   // in matrix and rhs.  Clear them first.
