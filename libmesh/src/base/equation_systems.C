@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.36 2003-05-16 19:29:12 benkirk Exp $
+// $Id: equation_systems.C,v 1.37 2003-05-22 18:31:19 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -181,6 +181,12 @@ void EquationSystems::add_system (const std::string& sys_type,
   // build a transient system
   else if (sys_type == "Transient")
     this->add_system<TransientSystem> (name);
+
+#if defined(USE_COMPLEX_NUMBERS)
+  // build a frequency system
+  else if (sys_type == "Frequency")
+    this->add_system<FrequencySystem> (name);
+#endif
 
   else
     {
@@ -787,6 +793,16 @@ void EquationSystems::unset_parameter (const std::string& id)
     _parameters.erase(pos);
 }
 
+
+
+bool EquationSystems::parameter_exists (const std::string& id) const
+{
+  // Look for the id in the database
+  std::map<std::string, Real>::const_iterator
+    pos = _parameters.find(id);
+
+  return (pos != _parameters.end());
+}
 
 
 //--------------------------------------------------------------------------

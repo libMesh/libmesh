@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.24 2003-05-15 23:34:33 benkirk Exp $
+// $Id: equation_systems.h,v 1.25 2003-05-22 18:31:18 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -345,6 +345,12 @@ public:
    * @returns the number of parameters. 
    */
   unsigned int n_parameters () const;
+
+  /**
+   * @returns \p true when this parameter exists,
+   * \p false otherwise.
+   */
+  bool parameter_exists (const std::string& id) const;
 
   /**
    * @returns a constant reference to the mesh

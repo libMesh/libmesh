@@ -16,26 +16,10 @@
 // Local Includes
 #include "libmesh.h"
 #include "equation_systems.h"
-#include "general_system.h"
-#include "frequency_system.h"
-#include "thin_system.h"
 #include "mesh.h"
 #include "perfmon.h"
+#include "enum_xdr_mode.h"
 
-
-/** 
- * convenient enums
- */
-enum EqnSystemsFormat {EQNSYS_ASCII=0, 
-		       EQNSYS_BINARY, 
-		       EQNSYS_INVALID_IO};
-
-enum SystemTypeHandled {GENERAL_SYSTEM=0,
-#if defined(USE_COMPLEX_NUMBERS)
-			FREQUENCY_SYSTEM, 
-#endif
-			THIN_SYSTEM,
-			INVALID_SYSTEM};
 
 
 
@@ -50,18 +34,13 @@ void usage(char *progName)
     "	%s [options] ...\n"
     "\n"
     "options:\n"
-    "    -m <string>                   Mesh file name\n"
     "    -d <dim>                      <dim>-dimensional mesh\n"
-    "    -l <string>                   Left Equationn Systems file name\n"
+    "    -m <string>                   Mesh file name\n"
+    "    -l <string>                   Left Equation Systems file name\n"
     "    -r <string>                   Right Equation Systems file name\n"
     "    -t <float>                    threshold\n"
     "    -a                            ASCII format (default)\n"
     "    -b                            binary format\n"
-    "    -G                            GeneralSystem system type (default)\n"
-#if defined(USE_COMPLEX_NUMBERS)
-    "    -F                            FrequencySystem system type\n"
-#endif
-    "    -T                            ThinSystem system type\n"
     "    -v                            Verbose\n"
     "    -q                            really quiet\n"
     "    -h                            Print help menu\n"
@@ -69,7 +48,7 @@ void usage(char *progName)
     "\n"
     " This program is used to compare equation systems to a user-specified\n"
     " threshold.  Equation systems are imported in the libMesh format\n"
-    " provided through the read and write methods in class EquationSystems<T>.\n"
+    " provided through the read and write methods in class EquationSystems.\n"
     " \n"
     "  ./compare -d 3 -m grid.xda -l leftfile.dat -r rightfile.dat -b -t 1.e-8\n"
     "\n"
@@ -78,12 +57,7 @@ void usage(char *progName)
     " floats stored in vectors.  The comparison is said to be passed when the\n"
     " floating point values agree up to the given threshold.  When no threshold\n"
     " is set the default libMesh tolerance is used.  If neither -a or -b are set,\n"
-    " ASCII format is assumed.  The same holds for -G,"
-#if defined(USE_COMPLEX_NUMBERS)
-" -F,"
-#endif
-    " and -T, where the\n"
-    " default is -G.  For mesh import formats, please consult the meshtool help.\n"
+    " ASCII format is assumed.\n"
     "\n"
     " Direct questions to:\n"
     " benkirk@cfdlab.ae.utexas.edu\n";
@@ -107,23 +81,16 @@ void process_cmd_line(int argc, char **argv,
 		      std::vector<std::string>& names,
 		      unsigned int& dim,
 		      double& threshold,
-		      EqnSystemsFormat& format,
-		      SystemTypeHandled& type,
+		      libMeshEnums::XdrMODE& format,
 		      bool& verbose,
 		      bool& quiet)
 {
-#if defined(USE_COMPLEX_NUMBERS)
   char optionStr[] =
-    "d:m:l:r:t:abGFTvq?h";
-#else
-  char optionStr[] =
-    "d:m:l:r:t:abGTvq?h";
-#endif
+    "d:m:l:r:t:abvq?h";
 
   int opt;
 
   bool format_set    = false;
-  bool type_set      = false;
   bool left_name_set = false;
 
   if (argc < 3)
@@ -180,7 +147,7 @@ void process_cmd_line(int argc, char **argv,
 	  }
 	  
 	  /**
-	   * Get output file name
+	   * Get right file name
 	   */
 	case 'r':
 	  {
@@ -218,7 +185,7 @@ void process_cmd_line(int argc, char **argv,
 	      }
 	    else
 	      {
-		format = EQNSYS_ASCII;
+		format = libMeshEnums::READ;
 		format_set = true;
 	      }
 	    break;
@@ -237,74 +204,13 @@ void process_cmd_line(int argc, char **argv,
 	      }
 	    else
 	      {
-	        format = EQNSYS_BINARY;
+	        format = libMeshEnums::DECODE;
 		format_set = true;
 	      }
 	    break;
 	  }
-
 	  
-	  /**
-	   * Load GeneralSystem
-	   */
-	case 'G':
-	  {
-	    if (type_set)
-	      {
-		std::cout << "ERROR: Equation system type already set!"
-			  << std::endl;
-		exit(1);
-	      }
-	    else
-	      {
-	        type = GENERAL_SYSTEM;
-		type_set = true;
-	      }
-	    break;
-	  }
-	  
-
-#if defined(USE_COMPLEX_NUMBERS)
-	  /**
-	   * Load FrequencySystem
-	   */
-	case 'F':
-	  {
-	    if (type_set)
-	      {
-		std::cout << "ERROR: Equation system type already set!"
-			  << std::endl;
-		exit(1);
-	      }
-	    else
-	      {
-	        type = FREQUENCY_SYSTEM;
-		type_set = true;
-	      }
-	    break;
-	  }
-#endif	  
-
-
-	  /**
-	   * Load ThinSystem
-	   */
-	case 'T':
-	  {
-	    if (type_set)
-	      {
-		std::cout << "ERROR: Equation system type already set!"
-			  << std::endl;
-		exit(1);
-	      }
-	    else
-	      {
-	        type = THIN_SYSTEM;
-		type_set = true;
-	      }
-	    break;
-	  }
-	  
+	  	  
 	  /**
 	   * Be verbose
 	   */
@@ -339,29 +245,24 @@ void process_cmd_line(int argc, char **argv,
 
 
 /**
- * template function for the different systems;
- * should get automatically instantiated due to
- * the calls below
- *
  * everything that is identical for the systems, and
- * should _not_ go into EquationSystems<T_sys>::compare(),
+ * should _not_ go into EquationSystems::compare(),
  * can go in this do_compare().
  */
-template <typename T_sys>
-bool do_compare (EquationSystems<T_sys>& les,
-		 EquationSystems<T_sys>& res,
+bool do_compare (EquationSystems& les,
+		 EquationSystems& res,
 		 double threshold,
 		 bool verbose)
 {
 
   if (verbose)
     {
-      std::cout << std::endl
-		<< "*********   LEFT SYSTEM    *********" << std::endl;
+      std::cout	<< "*********   LEFT SYSTEM    *********" << std::endl;
       les.print_info  ();
       std::cout << "*********   RIGHT SYSTEM   *********" << std::endl;
       res.print_info ();
-      std::cout << "********* COMPARISON PHASE *********" << std::endl;
+      std::cout << "********* COMPARISON PHASE *********" << std::endl
+		<< std::endl;
     }
  
   /**
@@ -370,8 +271,7 @@ bool do_compare (EquationSystems<T_sys>& les,
   bool result = les.compare(res, threshold, verbose);
   if (verbose)
     {
-      std::cout << std::endl
-		<< "*********     FINISHED     *********" << std::endl;
+      std::cout	<< "*********     FINISHED     *********" << std::endl;
     }
   return result;
 }
@@ -390,7 +290,7 @@ int main (int argc, char** argv)
   libMesh::init (argc, argv);
   
   // these should better be not contained in the following braces
-  bool quiet                      = false;
+  bool quiet = false;
   bool are_equal;
 
   {
@@ -400,8 +300,7 @@ int main (int argc, char** argv)
     std::vector<std::string> names;
     unsigned int dim                = static_cast<unsigned int>(-1);
     double threshold                = TOLERANCE;
-    EqnSystemsFormat format         = EQNSYS_ASCII;
-    SystemTypeHandled type          = GENERAL_SYSTEM;
+    libMeshEnums::XdrMODE format    = libMeshEnums::READ;
     bool verbose                    = false;
  
     // get commands
@@ -410,7 +309,6 @@ int main (int argc, char** argv)
 		     dim,
 		     threshold,
 		     format,
-		     type,
 		     verbose,
 		     quiet);
 
@@ -463,150 +361,24 @@ int main (int argc, char** argv)
 
 
     /**
-     * build an appropriate EquationSystems object, read them
+     * build EquationSystems objects, read them
      */
-    switch (type)
+    EquationSystems left_system  (left_mesh);
+    EquationSystems right_system (right_mesh);
+
+    if (names.size() == 3)
       {
-	  
-      case GENERAL_SYSTEM:
-        {
-	  EquationSystems<GeneralSystem> left_system  (left_mesh);
-	  EquationSystems<GeneralSystem> right_system (right_mesh);
-
-	  if (names.size() == 3)
-	    {
-	      switch (format)
-	        {	  
-		  case EQNSYS_ASCII:
-		  {
-		      left_system.read  (names[1], Xdr::READ);
-		      right_system.read (names[2], Xdr::READ);
-		      break;
-		  }
-		  
-		  case EQNSYS_BINARY:
-		  {
-		      left_system.read  (names[1], Xdr::DECODE);
-		      right_system.read (names[2], Xdr::DECODE);
-		      break;
-		  }
-
-		  default:
-		  {
-		      std::cout << "Bad system type." << std::endl;
-		      error();
-		  }
-		}
-	  
-	    }    
-	  else
-	    {
-	      std::cout << "Bad input specified." << std::endl;
-	      error();
-	    }
-
-	  are_equal = do_compare (left_system, right_system, threshold, verbose);
-
-	  break;
-	}
-
-
-#if defined(USE_COMPLEX_NUMBERS)
-
-      case FREQUENCY_SYSTEM:
-        {
-	  EquationSystems<FrequencySystem> left_system  (left_mesh);
-	  EquationSystems<FrequencySystem> right_system (right_mesh);
-
-	  if (names.size() == 3)
-	    {
-	      switch (format)
-	        {	  
-		  case EQNSYS_ASCII:
-		  {
-		      left_system.read  (names[1], Xdr::READ);
-		      right_system.read (names[2], Xdr::READ);
-		      break;
-		  }
-		  
-		  case EQNSYS_BINARY:
-		  {
-		      left_system.read  (names[1], Xdr::DECODE);
-		      right_system.read (names[2], Xdr::DECODE);
-		      break;
-		  }
-
-		  default:
-		  {
-		      std::cout << "Bad system type." << std::endl;
-		      error();
-		  }
-		}
-	  
-	    }    
-	  else
-	    {
-	      std::cout << "Bad input specified." << std::endl;
-	      error();
-	    }
-
-	  are_equal = do_compare (left_system, right_system, threshold, verbose);
-
-	  break;
-	}
-	  
-#endif
-
-
-      case THIN_SYSTEM:
-        {
-	  EquationSystems<ThinSystem> left_system  (left_mesh);
-	  EquationSystems<ThinSystem> right_system (right_mesh);
-
-	  if (names.size() == 3)
-	    {
-	      switch (format)
-	        {	  
-		  case EQNSYS_ASCII:
-		  {
-		      left_system.read  (names[1], Xdr::READ);
-		      right_system.read (names[2], Xdr::READ);
-		      break;
-		  }
-		  
-		  case EQNSYS_BINARY:
-		  {
-		      left_system.read  (names[1], Xdr::DECODE);
-		      right_system.read (names[2], Xdr::DECODE);
-		      break;
-		  }
-
-		  default:
-		  {
-		      std::cout << "Bad system type." << std::endl;
-		      error();
-		  }
-		}
-	  
-	    }    
-	  else
-	    {
-	      std::cout << "Bad input specified." << std::endl;
-	      error();
-	    }
-
-	  are_equal = do_compare (left_system, right_system, threshold, verbose);
-
-	  break;
-	}
-
-
-      default:
-        {
-	  std::cout << "Bad system type." << std::endl;
-	  error();
-	}
+	left_system.read  (names[1], format);
+	right_system.read (names[2], format);	  
       }    
+    else
+      {
+	std::cout << "Bad input specified." << std::endl;
+	error();
+      }
+
+    are_equal = do_compare (left_system, right_system, threshold, verbose);
+
   }
 
   /**
@@ -617,16 +389,21 @@ int main (int argc, char** argv)
   if (are_equal)
     {
       if (!quiet)
-	  std::cout << " Congrat's, up to the defined threshold, the two"  << std::endl
-		    << " are identical." << std::endl;
+	  std::cout << std::endl
+		    << " Congrat's, up to the defined threshold, the two"  
+		    << std::endl
+		    << " are identical." 
+		    << std::endl;
       our_result=0;
     }
   else
     {
       if (!quiet)
-        std::cout << " Oops, differences occured!"  << std::endl
-		  << " Use -v to obtain more information where differences occured."
-		  << std::endl;
+	  std::cout << std::endl
+		    << " Oops, differences occured!"  
+		    << std::endl
+		    << " Use -v to obtain more information where differences occured."
+		    << std::endl;
       our_result=1;
     }
 
