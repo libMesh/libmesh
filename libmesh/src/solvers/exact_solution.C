@@ -1,4 +1,4 @@
-// $Id: exact_solution.C,v 1.4 2004-06-01 14:24:23 spetersen Exp $
+// $Id: exact_solution.C,v 1.5 2004-06-02 15:08:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -328,4 +328,39 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 	  error_pair.second += JxW[qp]*(grad_error*grad_error);
 	} // end qp loop
     } // end element loop
+
+#ifdef HAVE_MPI
+  if (libMesh::n_processors() > 1)
+    {
+      
+#ifndef USE_COMPLEX_NUMBERS
+      std::vector<Real> local_errors(2);
+
+      // Set local error entries.
+      local_errors[0] = error_pair.first;
+      local_errors[1] = error_pair.second;
+      
+      std::vector<Real> global_errors(2);
+      
+      
+      MPI_Allreduce (&local_errors[0],
+		     &global_errors[0],
+		     local_errors.size(),
+		     MPI_DOUBLE,
+		     MPI_SUM,
+		     MPI_COMM_WORLD);
+
+      // Store result back in the pair
+      error_pair.first  = global_errors[0];
+      error_pair.second = global_errors[1];
+
+      // Sanity check
+      assert (global_errors[0] >= local_errors[0]);
+      assert (global_errors[1] >= local_errors[1]);
+
+#endif
+      
+    }
+#endif  
+  
 }

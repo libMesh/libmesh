@@ -14,5 +14,5 @@ gmon.out
 *.gmv.*
 ex13
 ex14
-ex14.m*.m
+*.m
 *.fig
