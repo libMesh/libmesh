@@ -157,7 +157,6 @@
  
   - HP (use \p CXX="aCC \p -AA" and \p CC="cc \p -Aa" to get full std support) 
     - \p aCC A.03.37
-    - \p aCC A.03.31
 
   - IBM \p xlC version 5.0, 6.0
   - HP/Compaq/DEC \p cxx 6.3.9.6

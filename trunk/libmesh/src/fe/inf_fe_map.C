@@ -1,4 +1,4 @@
-// $Id: inf_fe_map.C,v 1.1 2003-04-01 14:19:48 ddreyer Exp $
+// $Id: inf_fe_map.C,v 1.2 2003-04-05 12:16:35 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -49,10 +49,22 @@ Point InfFE<Dim,T_radial,T_map>::map (const Elem* inf_elem,
 
   // map in the base face
   Point base_point;
-  if (Dim > 1)
-    base_point = FE<Dim-1,LAGRANGE>::map (base_elem.get(), reference_point);
-  else
-    base_point = inf_elem->point(0);
+  switch (Dim)
+    {  
+    case 1:
+      base_point = inf_elem->point(0);
+      break;
+    case 2:
+      base_point = FE<1,LAGRANGE>::map (base_elem.get(), reference_point);
+      break;
+    case 3:
+      base_point = FE<2,LAGRANGE>::map (base_elem.get(), reference_point);
+      break;
+#ifdef DEBUG
+    default:
+	error();
+#endif
+    }
       
 
   // map in the outer node face not necessary. Simply
@@ -367,10 +379,10 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 	    const Real dist_i = Point( inf_elem->point(i) 
 				       - inf_elem->point(i+n_base_mapping_sf) ).size();
 	    // weight with the corresponding shape function
-	    a_interpolated += dist_i * FE<Dim-1,LAGRANGE>::shape(base_mapping_elem_type,
-								 base_mapping_order,
-								 i,
-								 p);
+	    a_interpolated += dist_i * FE<1,LAGRANGE>::shape(base_mapping_elem_type,
+							     base_mapping_order,
+							     i,
+							     p);
 	  }
 
 	p(1) = 1. - 2*a_interpolated/physical_point(1);
@@ -401,10 +413,10 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 	    const Real dist_i = Point( inf_elem->point(i) 
 				       - inf_elem->point(i+n_base_mapping_sf) ).size();
 	    // weight with the corresponding shape function
-	    a_interpolated += dist_i * FE<Dim-1,LAGRANGE>::shape(base_mapping_elem_type,
-								 base_mapping_order,
-								 i,
-								 p);
+	    a_interpolated += dist_i * FE<2,LAGRANGE>::shape(base_mapping_elem_type,
+							     base_mapping_order,
+							     i,
+							     p);
 	  }
 
 	p(2) = 1. - 2*a_interpolated/physical_point(2);
