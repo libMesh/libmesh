@@ -1,4 +1,4 @@
-// $Id: quadrature.C,v 1.7 2003-02-06 06:02:42 jwpeterson Exp $
+// $Id: quadrature.C,v 1.8 2003-02-07 04:00:42 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -18,8 +18,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include <numeric>
+// C++ includes
 
+// Local includes
 #include "quadrature.h"
 
 void QBase::init(const ElemType t)
@@ -53,10 +54,6 @@ void QBase::init(const ElemType t)
     default:
       error();
     };
-
-  error();
-  
-  return;
 };
 
 
@@ -99,10 +96,6 @@ void QBase::init(const ElemType t,
       error();
 
     };
-
-  error();
-
-  return;
 };
 
 
@@ -124,7 +117,6 @@ void QBase::scale(std::pair<Real, Real> old_range,
   // We're mapping from old_range -> new_range 
   for (unsigned int i=0; i<_points.size(); i++)
     {
-      //_points[i](0) = (_points[i](0)-y1) * (x2-x1) / (y2-y1) + x1;
       _points[i](0) = (_points[i](0) - old_range.first) *
 	              (new_range.second - new_range.first) /
 	              (old_range.second - old_range.first) +
@@ -162,7 +154,6 @@ void QBase::tensor_product_quad(QBase* q1D)
 	
 	qp++;
       };
-
 }
 
 
@@ -286,16 +277,12 @@ void QBase::tensor_product_tet(QBase* gauss1D, QBase* jacA1D, QBase* jacB1D)
 	_weights[gp]   = gauss1D->w(i)     * jacA1D->w(j)          * jacB1D->w(k);          //A[i]*B[j]*C[k];
 	gp++;
       }
-  
-  std::cout << "Sum of weights is: "
-	    << std::accumulate(_weights.begin(), _weights.end(), 0., std::plus<Real>()) << std::endl;
 }
 
 
 
 void QBase::side_rule_quad(QBase* q1D, unsigned int side)
 {
-
   const unsigned int n_points = q1D->n_points();
   
   _points.resize(n_points);
@@ -357,7 +344,6 @@ void QBase::side_rule_quad(QBase* q1D, unsigned int side)
     default:
       error();
     }
-  
 }
 
 
@@ -863,10 +849,4 @@ void QBase::side_rule_pyramid(QBase* q2D, unsigned int side)
     default:
       error();
     };
-  
-
-  
-
-  
-      
 }

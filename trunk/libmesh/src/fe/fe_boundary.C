@@ -1,4 +1,4 @@
-// $Id: fe_boundary.C,v 1.7 2003-02-06 17:13:36 benkirk Exp $
+// $Id: fe_boundary.C,v 1.8 2003-02-07 04:00:40 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -121,8 +121,6 @@ void FE<Dim,T>::reinit(QBase* qside,
     JxW = JxW_int;
     xyz = xyz_int;
   };
-  
-  return;
 };
 
 
@@ -220,8 +218,6 @@ void FE<Dim,T>::init_shape_functions(const QBase* qrule,
 	  tangents[p][1] = n.cross(dxyzdxi_map).unit();
 	};
     };
-  
-  return;
 };
 
   
@@ -366,10 +362,6 @@ void FEBase::compute_map(const QBase* qrule,
       error();
 
     };
-
-  error();
-
-  return;
 };
 
 

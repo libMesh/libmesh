@@ -1,4 +1,4 @@
-// $Id: fe_monomial.C,v 1.7 2003-02-06 05:41:15 ddreyer Exp $
+// $Id: fe_monomial.C,v 1.8 2003-02-07 04:00:42 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -93,14 +93,8 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
     default:
       {
 	error();
-	return;
       };
     };
-
-  
-  // How did we get here?
-  error();  
-  return;
 };
 
 
