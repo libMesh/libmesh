@@ -155,7 +155,7 @@
     - Version 7.30
     - Not tested (but will likely work) with others
  
-  - HP 
+  - HP (use CXX="aCC -AA" and CC="cc -Aa" to get full std support) 
     - aCC A.03.37
     - aCC A.03.31
 

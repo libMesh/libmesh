@@ -52,9 +52,9 @@ int main (int argc, char** argv)
     es("primary").add_variable("U", FIRST);
     es("primary").add_variable("V", FIRST);
 
-    es("primary").get_dof_map().dof_coupling.resize(2);      
-    es("primary").get_dof_map().dof_coupling(0,0) = 1;
-    es("primary").get_dof_map().dof_coupling(1,1) = 1;
+    es("primary").get_dof_map()._dof_coupling.resize(2);      
+    es("primary").get_dof_map()._dof_coupling(0,0) = 1;
+    es("primary").get_dof_map()._dof_coupling(1,1) = 1;
     
     es("primary").attach_assemble_function(assemble);
     
