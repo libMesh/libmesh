@@ -1,4 +1,4 @@
-// $Id: petsc_vector.h,v 1.27 2003-09-02 18:02:38 benkirk Exp $
+// $Id: petsc_vector.h,v 1.28 2003-09-06 02:23:59 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -451,7 +451,7 @@ void PetscVector<T>::init (const unsigned int n,
       ierr = VecSetFromOptions (vec);                   CHKERRQ(ierr);
     }  
   
-  _is_initialized = true;
+  this->_is_initialized = true;
   
   
   if (fast == false)
@@ -481,7 +481,7 @@ void PetscVector<T>::close ()
   ierr = VecAssemblyBegin(vec); CHKERRQ(ierr);
   ierr = VecAssemblyEnd(vec);   CHKERRQ(ierr);
 
-  _is_closed = true;
+  this->_is_closed = true;
 }
 
 
@@ -497,7 +497,7 @@ void PetscVector<T>::clear ()
       ierr = VecDestroy(vec); CHKERRQ(ierr);
     }
 
-  _is_closed = _is_initialized = false;
+  this->_is_closed = this->_is_initialized = false;
 }
 
 

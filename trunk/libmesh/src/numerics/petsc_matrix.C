@@ -1,4 +1,4 @@
-// $Id: petsc_matrix.C,v 1.17 2003-09-02 18:02:44 benkirk Exp $
+// $Id: petsc_matrix.C,v 1.18 2003-09-06 02:24:00 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -49,7 +49,7 @@ void PetscMatrix<T>::init (const unsigned int m,
     if (this->initialized())
       this->clear();
 
-    _is_initialized = true;
+    this->_is_initialized = true;
   }
 
   
@@ -88,14 +88,14 @@ void PetscMatrix<T>::init (const unsigned int m,
 template <typename T>
 void PetscMatrix<T>::init ()
 {
-  assert (_dof_map != NULL);
+  assert (this->_dof_map != NULL);
   
   {
     // Clear initialized matrices
     if (this->initialized())
       this->clear();
 
-    _is_initialized = true;
+    this->_is_initialized = true;
   }
 
   
@@ -103,14 +103,14 @@ void PetscMatrix<T>::init ()
 
   MPI_Comm_rank (PETSC_COMM_WORLD, &proc_id);
   
-  const unsigned int m   = _dof_map->n_dofs();
+  const unsigned int m   = this->_dof_map->n_dofs();
   const unsigned int n   = m;
-  const unsigned int n_l = _dof_map->n_dofs_on_processor(proc_id); 
+  const unsigned int n_l = this->_dof_map->n_dofs_on_processor(proc_id); 
   const unsigned int m_l = n_l;
 
 
-  const std::vector<unsigned int>& n_nz = _dof_map->get_n_nz();
-  const std::vector<unsigned int>& n_oz = _dof_map->get_n_oz();
+  const std::vector<unsigned int>& n_nz = this->_dof_map->get_n_nz();
+  const std::vector<unsigned int>& n_oz = this->_dof_map->get_n_oz();
 
   // Make sure the sparsity pattern isn't empty
   assert (n_nz.size() == n_l);
@@ -172,7 +172,7 @@ void PetscMatrix<T>::clear ()
     {
       ierr = MatDestroy (mat); CHKERRQ(ierr);
       
-      _is_initialized = false;
+      this->_is_initialized = false;
     }
 }
 
