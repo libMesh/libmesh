@@ -1,4 +1,4 @@
-// $Id: quadrature_gauss_3D.C,v 1.15 2005-02-22 22:17:43 jwpeterson Exp $
+// $Id: quadrature_gauss_3D.C,v 1.16 2005-03-23 14:03:45 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -180,7 +180,7 @@ void QGauss::init_3D(const ElemType _type)
 		const Real a = 0.399403576166799;
 		const Real b = 0.100596423833201;
 		
-		_points[5](0) = a;
+		_points[5](0) = b;
 		_points[5](1) = a;
 		_points[5](2) = a;
 		
@@ -200,9 +200,9 @@ void QGauss::init_3D(const ElemType _type)
 		_points[9](1) = b;
 		_points[9](2) = a;
 		
-		_points[10](0) = b;
+		_points[10](0) = a;
 		_points[10](1) = b;
-		_points[10](2) = b;
+		_points[10](2) = a;
 	      }
 	      
 	      _weights[0]  = -0.013155555555555555555555555555555555555555555555555555555555555555555556;
@@ -272,7 +272,7 @@ void QGauss::init_3D(const ElemType _type)
 		const Real a = 0.066550153573664;
 		const Real b = 0.433449846426336;
 		
-		_points[9](0) = a;
+		_points[9](0) = b;
 		_points[9](1) = a;
 		_points[9](2) = a;
 		
@@ -292,9 +292,9 @@ void QGauss::init_3D(const ElemType _type)
 		_points[13](1) = b;
 		_points[13](2) = a;
 		
-		_points[14](0) = b;
+		_points[14](0) = a;
 		_points[14](1) = b;
-		_points[14](2) = b;		
+		_points[14](2) = a;		
 	      }
 	      
 	      _weights[0]  = 0.030283678097089;
