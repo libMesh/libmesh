@@ -1,4 +1,4 @@
-// $Id: quadrature_gauss_2D.C,v 1.10 2003-02-24 14:35:45 benkirk Exp $
+// $Id: quadrature_gauss_2D.C,v 1.11 2003-05-22 17:06:23 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -44,7 +44,7 @@ void QGauss::init_2D(const ElemType _type)
 	// product of the 1D quadrature rule.
 	QGauss q1D(1,_order);
 	q1D.init(EDGE2);
-	tensor_product_quad( &q1D );
+	tensor_product_quad( q1D );
 	return;
       }
 
@@ -204,7 +204,7 @@ void QGauss::init_2D(const ElemType _type)
 			    new_range);
 
 	      // Compute the tensor product
-	      tensor_product_tri(&gauss1D, &jac1D);
+	      tensor_product_tri(gauss1D, jac1D);
 	      return;
 	    }
 	    

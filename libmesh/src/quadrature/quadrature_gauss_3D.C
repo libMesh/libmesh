@@ -1,4 +1,4 @@
-// $Id: quadrature_gauss_3D.C,v 1.10 2003-02-26 01:08:11 benkirk Exp $
+// $Id: quadrature_gauss_3D.C,v 1.11 2003-05-22 17:06:23 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -43,7 +43,7 @@ void QGauss::init_3D(const ElemType _type)
 	QGauss q1D(1,_order);
 	q1D.init(EDGE2);
 
-	tensor_product_hex( &q1D );
+	tensor_product_hex( q1D );
 	
 	return;
       }
@@ -390,7 +390,7 @@ void QGauss::init_3D(const ElemType _type)
 			    new_range);
 
 	      // Compute the tensor product
-	      tensor_product_tet(&gauss1D, &jacA1D, &jacB1D);
+	      tensor_product_tet(gauss1D, jacA1D, jacB1D);
 	      return;
 	    }
 	  default:
@@ -421,7 +421,7 @@ void QGauss::init_3D(const ElemType _type)
 	q1D.init(EDGE2);
 	q2D.init(TRI3);
 
-	tensor_product_prism(&q1D, &q2D);
+	tensor_product_prism(q1D, q2D);
 	
 	return;
       }

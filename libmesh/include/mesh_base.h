@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.29 2003-05-15 23:34:33 benkirk Exp $
+// $Id: mesh_base.h,v 1.30 2003-05-22 17:06:21 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -64,7 +64,7 @@ template <typename T> class PetscMatrix;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.29 $
+ * \version $Revision: 1.30 $
  */
 
 
@@ -588,96 +588,72 @@ public:
 
 
   /**
-   * This typedef is for convenience.  It allows you to get
-   * a pair of std::vector<Elem*>::iterators without
-   * writing so much stuff.
-   */
-  typedef std::pair<std::vector<Elem*>::iterator,
-		    std::vector<Elem*>::iterator> ElemPair;
-
-  /**
-   * This typedef is for convenience.  It allows you to get
-   * a pair of std::vector<Elem*>::const_iterators without
-   * writing so much stuff.
-   */
-  typedef std::pair<std::vector<Elem*>::const_iterator,
-		    std::vector<Elem*>::const_iterator> ConstElemPair;
-  
-  /**
    * Returns a pair of std::vector<Elem*>::iterators which point
    * to the beginning and end of the _elements vector.
    */
-  ElemPair elements_begin ()
-  { return ElemPair (_elements.begin(), _elements.end());  }
+  std::pair<std::vector<Elem*>::iterator,
+	    std::vector<Elem*>::iterator>
+  elements_begin ();
 
   /**
    * Returns a pair of std::vector<Elem*>::const_iterators which point
    * to the beginning and end of the _elements vector.
    */
-  ConstElemPair elements_begin () const
-  { return ConstElemPair (_elements.begin(), _elements.end());  }
-
+  std::pair<std::vector<Elem*>::const_iterator,
+	    std::vector<Elem*>::const_iterator>
+  elements_begin () const;
+  
   /**
    * Returns a pair of std::vector<Elem*>::iterators which point
    * to the end of the _elements vector.  This simulates a normal
    * end() iterator.
    */
-  ElemPair elements_end ()
-  { return ElemPair (_elements.end(), _elements.end());  }
+  std::pair<std::vector<Elem*>::iterator,
+	    std::vector<Elem*>::iterator>
+  elements_end ();
   
   /**
    * Returns a pair of std::vector<Elem*>::const_iterators which point
    * to the end of the _elements vector.  This simulates a normal
    * end() const_iterator.
    */
-  ConstElemPair elements_end () const
-  { return ConstElemPair (_elements.end(), _elements.end());  }
-
-  /**
-   * This typedef is for convenience.  It allows you to get
-   * a pair of std::vector<Node*>::iterators without
-   * writing so much stuff.
-   */
-  typedef std::pair<std::vector<Node*>::iterator,
-		    std::vector<Node*>::iterator> NodePair;
-
-  /**
-   * This typedef is for convenience.  It allows you to get
-   * a pair of std::vector<Node*>::const_iterators without
-   * writing so much stuff.
-   */
-  typedef std::pair<std::vector<Node*>::const_iterator,
-		    std::vector<Node*>::const_iterator> ConstNodePair;
+  std::pair<std::vector<Elem*>::const_iterator,
+	    std::vector<Elem*>::const_iterator>
+  elements_end () const;
   
   /**
    * Returns a pair of std::vector<Node*>::iterators which point
    * to the beginning and end of the _nodeents vector.
    */
-  NodePair nodes_begin ()
-  { return NodePair (_nodes.begin(), _nodes.end());  }
+  std::pair<std::vector<Node*>::iterator,
+	    std::vector<Node*>::iterator>
+  nodes_begin (); 
   
   /**
    * Returns a pair of std::vector<Node*>::const_iterators which point
    * to the beginning and end of the _nodes vector.
    */
-  ConstNodePair nodes_begin () const
-  { return ConstNodePair (_nodes.begin(), _nodes.end());  }
+  std::pair<std::vector<Node*>::const_iterator,
+	    std::vector<Node*>::const_iterator>
+  nodes_begin () const;
 
   /**
    * Returns a pair of std::vector<Node*>::iterators which point
    * to the end of the _nodes vector.  This simulates a normal
    * end() iterator.
    */
-  NodePair nodes_end ()
-  { return NodePair (_nodes.end(), _nodes.end());  }
+  std::pair<std::vector<Node*>::iterator,
+	    std::vector<Node*>::iterator>
+  nodes_end ();
   
   /**
    * Returns a pair of std::vector<Node*>::const_iterators which point
    * to the end of the _nodes vector.  This simulates a normal
    * end() const_iterator.
    */
-  ConstNodePair nodes_end () const
-  { return ConstNodePair (_nodes.end(), _nodes.end());  }
+  std::pair<std::vector<Node*>::const_iterator,
+	    std::vector<Node*>::const_iterator>
+  nodes_end () const;
   
   
   
@@ -1008,6 +984,85 @@ Node* & MeshBase::node_ptr (const unsigned int i)
   return _nodes[i];
 }
 
+
+
+inline
+std::pair<std::vector<Elem*>::iterator,
+	  std::vector<Elem*>::iterator>
+MeshBase::elements_begin ()
+{
+  return std::make_pair(_elements.begin(), _elements.end());
+}
+  
+
+
+inline
+std::pair<std::vector<Elem*>::const_iterator,
+	  std::vector<Elem*>::const_iterator>
+MeshBase::elements_begin () const
+{
+  return std::make_pair(_elements.begin(), _elements.end());
+}
+
+
+
+inline
+std::pair<std::vector<Elem*>::iterator,
+	  std::vector<Elem*>::iterator>
+MeshBase::elements_end ()
+{
+  return std::make_pair(_elements.end(), _elements.end());
+}
+
+
+
+inline
+std::pair<std::vector<Elem*>::const_iterator,
+	  std::vector<Elem*>::const_iterator>
+MeshBase::elements_end () const
+{
+  return std::make_pair(_elements.end(), _elements.end());
+}
+  
+
+
+inline
+std::pair<std::vector<Node*>::iterator,
+	  std::vector<Node*>::iterator>
+MeshBase::nodes_begin ()
+{
+  return std::make_pair(_nodes.begin(), _nodes.end());
+}
+
+
+
+inline
+std::pair<std::vector<Node*>::const_iterator,
+	  std::vector<Node*>::const_iterator>
+MeshBase::nodes_begin () const
+  {
+    return std::make_pair(_nodes.begin(), _nodes.end());
+  }
+
+
+
+inline
+std::pair<std::vector<Node*>::iterator,
+	  std::vector<Node*>::iterator>
+MeshBase::nodes_end ()
+{
+  return std::make_pair(_nodes.end(), _nodes.end());
+}
+
+
+
+inline
+std::pair<std::vector<Node*>::const_iterator,
+	  std::vector<Node*>::const_iterator>
+MeshBase::nodes_end () const
+{
+  return std::make_pair(_nodes.end(), _nodes.end());
+}
 
 
 #endif
