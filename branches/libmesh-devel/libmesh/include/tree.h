@@ -1,4 +1,4 @@
-// $Id: tree.h,v 1.6.2.1 2003-05-13 21:32:41 benkirk Exp $
+// $Id: tree.h,v 1.6.2.2 2003-05-14 22:29:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -85,6 +85,8 @@ private:
   TreeNode<N> root;
   
 };
+
+
 
 /**
  * For convenience we define QuadTrees and OctTrees 

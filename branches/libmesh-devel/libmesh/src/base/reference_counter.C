@@ -1,4 +1,4 @@
-// $Id: reference_counter.C,v 1.8 2003-02-22 16:01:10 benkirk Exp $
+// $Id: reference_counter.C,v 1.8.2.1 2003-05-14 22:29:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -62,7 +62,7 @@ std::string ReferenceCounter::get_info ()
 
       out << "| "
 	  << name
-	  << " class reference count information:"
+	  << " reference count information:"
 	  << std::endl
 	  << "| Creations:    " << creations
 	  << std::endl
@@ -70,7 +70,7 @@ std::string ReferenceCounter::get_info ()
 	  << std::endl;
 
       if (creations != destructions)
-	out << "| WARNING: class "
+	out << "| WARNING: "
 	    << name << " "
 	    << creations - destructions
 	    << " items leaked!"

@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.17 2003-04-18 15:46:31 spetersen Exp $
+// $Id: fe.h,v 1.17.2.1 2003-05-14 22:29:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -52,7 +52,7 @@ class InfFE;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.17 $
+ * \version $Revision: 1.17.2.1 $
  */
 
 //-------------------------------------------------------------
@@ -168,6 +168,16 @@ public:
 			    const Point& p,
 			    const Real tolerance = TOLERANCE,
 			    const bool secure = true);
+
+  /**
+   * Takes a number points in physical space (in the \p physical_points
+   * vector) and finds their location on the reference element for the
+   * input element \p elem.  The values on the reference element are
+   * returned in the vector \p reference_points
+   */
+  static void inverse_map (const Elem* elem,
+			   const std::vector<Point>& physical_points,
+			   std::vector<Point>&       reference_points);
   
   /**
    * This is at the core of this class. Use this for each
@@ -295,7 +305,7 @@ private:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.17 $
+ * \version $Revision: 1.17.2.1 $
  */
 
 //-------------------------------------------------------------
@@ -320,7 +330,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.17 $
+ * \version $Revision: 1.17.2.1 $
  */
 
 //-------------------------------------------------------------
@@ -345,7 +355,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.17 $
+ * \version $Revision: 1.17.2.1 $
  */
 
 //-------------------------------------------------------------

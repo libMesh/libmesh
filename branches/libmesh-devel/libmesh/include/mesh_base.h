@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.25.2.1 2003-05-06 14:00:39 benkirk Exp $
+// $Id: mesh_base.h,v 1.25.2.2 2003-05-14 22:29:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -34,6 +34,7 @@
 // forward declarations
 class Elem;
 class EquationSystems;
+class MeshBase;
 template <typename T> class PetscMatrix;
 
 
@@ -48,6 +49,8 @@ template <typename T> class PetscMatrix;
 #include "enum_order.h"
 #include "elem_iterators.h"
 #include "node_iterators.h"
+#include "reference_counted_object.h"
+
 
 
 /**
@@ -63,13 +66,13 @@ template <typename T> class PetscMatrix;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.25.2.1 $
+ * \version $Revision: 1.25.2.2 $
  */
 
 
 // ------------------------------------------------------------
 // MeshBase class definition
-class MeshBase
+class MeshBase : public ReferenceCountedObject<MeshBase>
 {
 public:
 

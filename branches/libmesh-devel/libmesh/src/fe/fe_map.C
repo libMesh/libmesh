@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.18.2.1 2003-05-06 14:00:48 benkirk Exp $
+// $Id: fe_map.C,v 1.18.2.2 2003-05-14 22:29:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -841,6 +841,28 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
   STOP_LOG("inverse_map()", "FE");
   
   return p;
+}
+
+
+
+template <unsigned int Dim, FEFamily T>
+void FE<Dim,T>::inverse_map (const Elem* elem,
+			     const std::vector<Point>& physical_points,
+			     std::vector<Point>&       reference_points)
+{
+  // The number of points to find the
+  // inverse map of
+  const unsigned int n_points = physical_points.size();
+
+  // Resize the vector to hold the points
+  // on the reference element
+  reference_points.resize(n_points);
+
+  // Find the coordinates on the reference
+  // element of each point in physical space
+  for (unsigned int p=0; p<n_points; p++)
+    reference_points[p] =
+      FE<Dim,T>::inverse_map (elem, physical_points[p]);
 }
 
 

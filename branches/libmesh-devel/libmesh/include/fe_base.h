@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.11 2003-02-24 14:35:50 benkirk Exp $
+// $Id: fe_base.h,v 1.11.2.1 2003-05-14 22:29:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -122,7 +122,7 @@ public:
     
   /**
    * Reinitializes all the physical element-dependent data based on
-   * the \p side of \p face.
+   * the \p side of the element \p elem.
    */
   virtual void reinit (const Elem* elem,
 		       const unsigned int side) = 0;

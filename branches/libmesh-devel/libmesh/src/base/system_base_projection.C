@@ -1,4 +1,4 @@
-// $Id: system_base_projection.C,v 1.1.2.3 2003-05-13 04:25:35 benkirk Exp $
+// $Id: system_base_projection.C,v 1.1.2.4 2003-05-14 22:29:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -79,9 +79,6 @@ void SystemBase::project_vector (const NumericVector<Number>& old_vector,
   // The number of variables in this system
   const unsigned int n_variables = this->n_vars();
 
-  // The number of this system
-  const unsigned int system_number = this->number();
-  
   // The dimensionality of the current mesh
   const unsigned int dim = _mesh.mesh_dimension();
 

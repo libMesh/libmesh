@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.25.2.1 2003-05-05 23:57:31 benkirk Exp $
+// $Id: dof_map.h,v 1.25.2.2 2003-05-14 22:29:34 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -32,8 +32,10 @@
 #include "enum_order.h"
 #include "fe_type.h"
 #include "coupling_matrix.h"
+#include "reference_counted_object.h"
 
 // Forward Declarations
+class DofMap;
 class Elem;
 class MeshBase;
 template <typename T> class DenseVector;
@@ -56,7 +58,7 @@ template <typename T> class SparseMatrix;
 // ------------------------------------------------------------
 // Dof Map class definition
 
-class DofMap
+class DofMap : public ReferenceCountedObject<DofMap>
 {
 public:
 
