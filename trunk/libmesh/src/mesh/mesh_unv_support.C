@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.C,v 1.28 2003-09-16 00:41:29 jwpeterson Exp $
+// $Id: mesh_unv_support.C,v 1.29 2003-09-16 13:30:35 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -356,11 +356,37 @@ void UnvMeshInterface::read_implementation (std::istream& in_stream)
 
 
 
-
 void UnvMeshInterface::write (const std::string& file_name)
 {
-  std::ofstream out_file (file_name.c_str());
+  if (file_name.rfind(".gz") < file_name.size())
+    {
+#ifdef HAVE_ZLIB_H
+      ogzstream out_stream(file_name.c_str());
+      this->write_implementation (out_stream);
+#else
+      std::cerr << "ERROR:  You must have the zlib.h header "
+		<< "files and libraries to read and write "
+		<< "compressed streams."
+		<< std::endl;
+      error();
+#endif
+      return;
+      
+    }
+  
+  else
+    {
+      std::ofstream out_stream(file_name.c_str());
+      this->write_implementation (out_stream);
+      return;
+    }
+}
 
+
+
+
+void UnvMeshInterface::write_implementation (std::ostream& out_file)
+{
   if ( !out_file.good() )
     {
       std::cerr << "ERROR: Output file not good." 

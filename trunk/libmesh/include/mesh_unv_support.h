@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.h,v 1.17 2003-09-16 00:41:29 jwpeterson Exp $
+// $Id: mesh_unv_support.h,v 1.18 2003-09-16 13:30:23 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -39,7 +39,11 @@ class MeshData;
 /**
  * Class \p UnvMeshInterface provides an interface
  * for reading a mesh (datasets 2411 and 2412)
- * from a file in I-deas Universal file format.
+ * from a file in I-deas Universal file format,
+ * \p .unv.   Thanks to ,John: when \p zlib.h was 
+ * found (see \p configure), then this interface 
+ * may also read and write packed files of format 
+ * \p .unv.gz @e directly.  Cool, hm?
  *
  * @author: Tammo Kaschner, Daniel Dreyer
  */
@@ -55,10 +59,10 @@ public:
    * read access is needed.  Optionally produces
    * some babble on \p std::cout with \p be_verbose.
    */
-  UnvMeshInterface(std::vector<Node*>& nodes,
-		   std::vector<Elem*>& elements,
-		   MeshData& md,
-		   const bool be_verbose=false);
+  UnvMeshInterface (std::vector<Node*>& nodes,
+		    std::vector<Elem*>& elements,
+		    MeshData& md,
+		    const bool be_verbose=false);
 
   /**
    * Reads a mesh (nodes & elements) from the file
@@ -85,6 +89,13 @@ protected:
    * type of stream to pass the implementation.
    */
   void read_implementation (std::istream& in_stream);
+
+  /**
+   * The actual implementation of the write function.
+   * The public write interface simply decides which
+   * type of stream to pass the implementation.
+   */
+  void write_implementation (std::ostream& out_stream);
   
   /**
    * Clears the data structures to a pristine
