@@ -62,7 +62,7 @@ void MEDITIO::write_ascii (const std::string& fname,
   //  (iii) no distinction between materials.
 
   // assert three dimensions (should be extended later)
-  assert (this->mesh().mesh_dimension() == 3);
+  assert (this->cmesh().mesh_dimension() == 3);
 
   // Open the output file stream
   std::ofstream out (fname.c_str());

@@ -1,4 +1,4 @@
-// $Id: mesh_base_modification.C,v 1.15 2004-03-24 05:49:12 jwpeterson Exp $
+// $Id: mesh_base_modification.C,v 1.16 2004-05-13 15:58:35 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -43,7 +43,7 @@
 // MeshBase class member functions for mesh modification
 void MeshBase::all_tri ()
 {
-  assert (this->mesh_dimension() == 2);
+  // assert (this->mesh_dimension() == 2);
 	  
   std::vector<Elem*> new_elements;
   new_elements.reserve (2*this->n_active_elem());
