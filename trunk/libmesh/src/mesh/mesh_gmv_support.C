@@ -1,4 +1,4 @@
-// $Id: mesh_gmv_support.C,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: mesh_gmv_support.C,v 1.7 2003-02-07 16:18:56 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -291,7 +291,7 @@ void MeshBase::write_gmv(std::ostream& out,
 
 #ifdef USE_COMPLEX_NUMBERS
 
-	  // in case of complex data, write _two_ data sets
+	  // in case of complex data, write _tree_ data sets
 	  // for each component
 
 	  // this is the real part
@@ -309,6 +309,14 @@ void MeshBase::write_gmv(std::ostream& out,
 	  for (unsigned int n=0; n<n_nodes(); n++)
 	    out << std::setprecision(10) << (*v)[n*n_vars + c].imag() << " ";
 	  
+	  out << std::endl << std::endl;
+
+	  // this is the magnitude
+	  out << "abs_" << (*solution_names)[c] << " 1" << std::endl;
+	  for (unsigned int n=0; n<n_nodes(); n++)
+	    out << std::setprecision(10)
+		<< abs((*v)[n*n_vars + c]) << " ";
+
 	  out << std::endl << std::endl;
 
 #else
