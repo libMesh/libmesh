@@ -7,9 +7,10 @@
  
 <body>
  
-<?php make_navigation("examples",$root)?>
+<?php make_navigation("ex2",$root)?>
  
 <div class="content">
+<a name="comments"></a> 
 <div class = "comment">
 Example 2 -- Defining a Simple System
 
@@ -323,6 +324,7 @@ MPI.
 </pre>
 </div>
 
+<a name="nocomments"></a> 
 <br><br><br> <h1> The program without comments: </h1> 
 <pre> 
   
@@ -386,6 +388,166 @@ MPI.
     <B><FONT COLOR="#A020F0">return</FONT></B> libMesh::close();
   }
 </pre> 
+<a name="output"></a> 
+<br><br><br> <h1> The console output of the program: </h1> 
+<pre>
+***************************************************************
+* Running Example  ./ex2
+***************************************************************
+ 
+Running ./ex2
+
+ Mesh Information:
+  mesh_dimension()=2
+  spatial_dimension()=3
+  n_nodes()=36
+  n_elem()=25
+   n_local_elem()=25
+   n_active_elem()=25
+  n_subdomains()=1
+  n_processors()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System "Simple System"
+    Type "Steady"
+    Variables="u" 
+    Finite Element Types="0" 
+    Approximation Orders="1" 
+    n_dofs()=36
+    n_local_dofs()=36
+    n_constrained_dofs()=0
+    n_additional_vectors()=0
+    n_additional_matrices()=0
+  n_flags()=1
+   Flags:
+    "test"
+  n_parameters()=4
+   Parameters:
+    "dummy"=42
+    "linear solver maximum iterations"=5000
+    "linear solver tolerance"=1e-12
+    "nobody"=0
+
+
+ ---------------------------------------------------------------------------- 
+| Reference count information                                                |
+ ---------------------------------------------------------------------------- 
+| 10SystemBase reference count information:
+| Creations:    1
+| Destructions: 1
+| 12SparseMatrixIdE reference count information:
+| Creations:    1
+| Destructions: 1
+| 13NumericVectorIdE reference count information:
+| Creations:    3
+| Destructions: 3
+| 21LinearSolverInterfaceIdE reference count information:
+| Creations:    1
+| Destructions: 1
+| 4Elem reference count information:
+| Creations:    125
+| Destructions: 125
+| 4Node reference count information:
+| Creations:    36
+| Destructions: 36
+| 6DofMap reference count information:
+| Creations:    1
+| Destructions: 1
+ ---------------------------------------------------------------------------- 
+ 
+Running ./ex2 eqn_sys.dat
+
+ Mesh Information:
+  mesh_dimension()=2
+  spatial_dimension()=3
+  n_nodes()=36
+  n_elem()=25
+   n_local_elem()=25
+   n_active_elem()=25
+  n_subdomains()=1
+  n_processors()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System "Simple System"
+    Type "Steady"
+    Variables="u" 
+    Finite Element Types="0" 
+    Approximation Orders="1" 
+    n_dofs()=36
+    n_local_dofs()=36
+    n_constrained_dofs()=0
+    n_additional_vectors()=0
+    n_additional_matrices()=0
+  n_flags()=1
+   Flags:
+    "test"
+  n_parameters()=4
+   Parameters:
+    "dummy"=42
+    "linear solver maximum iterations"=5000
+    "linear solver tolerance"=1e-12
+    "nobody"=0
+
+<<< Writing system to file eqn_sys.dat
+>>> Reading system from file eqn_sys.dat
+
+ EquationSystems
+  n_systems()=1
+   System "Simple System"
+    Type "Steady"
+    Variables="u" 
+    Finite Element Types="0" 
+    Approximation Orders="1" 
+    n_dofs()=36
+    n_local_dofs()=36
+    n_constrained_dofs()=0
+    n_additional_vectors()=0
+    n_additional_matrices()=0
+  n_flags()=1
+   Flags:
+    "test"
+  n_parameters()=4
+   Parameters:
+    "dummy"=42
+    "linear solver maximum iterations"=5000
+    "linear solver tolerance"=1e-12
+    "nobody"=0
+
+
+ ---------------------------------------------------------------------------- 
+| Reference count information                                                |
+ ---------------------------------------------------------------------------- 
+| 10SystemBase reference count information:
+| Creations:    2
+| Destructions: 2
+| 12SparseMatrixIdE reference count information:
+| Creations:    2
+| Destructions: 2
+| 13NumericVectorIdE reference count information:
+| Creations:    6
+| Destructions: 6
+| 21LinearSolverInterfaceIdE reference count information:
+| Creations:    2
+| Destructions: 2
+| 4Elem reference count information:
+| Creations:    125
+| Destructions: 125
+| 4Node reference count information:
+| Creations:    36
+| Destructions: 36
+| 6DofMap reference count information:
+| Creations:    2
+| Destructions: 2
+ ---------------------------------------------------------------------------- 
+ 
+***************************************************************
+* Done Running Example  ./ex2
+***************************************************************
+</pre>
 </div>
 <?php make_footer() ?>
 </body>

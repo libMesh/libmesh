@@ -7,9 +7,10 @@
  
 <body>
  
-<?php make_navigation("examples",$root)?>
+<?php make_navigation("ex4",$root)?>
  
 <div class="content">
+<a name="comments"></a> 
 <div class = "comment">
 Example 4 -- Solving a 2D or 3D Poisson Problem in Parallel
 
@@ -1026,6 +1027,7 @@ it will print its log to the screen. Pretty easy, huh?
 </pre>
 </div>
 
+<a name="nocomments"></a> 
 <br><br><br> <h1> The program without comments: </h1> 
 <pre> 
   
@@ -1278,6 +1280,200 @@ it will print its log to the screen. Pretty easy, huh?
   
   }
 </pre> 
+<a name="output"></a> 
+<br><br><br> <h1> The console output of the program: </h1> 
+<pre>
+***************************************************************
+* Running Example  ./ex4
+***************************************************************
+ 
+Running ./ex4 -d 2
+
+ Mesh Information:
+  mesh_dimension()=2
+  spatial_dimension()=3
+  n_nodes()=961
+  n_elem()=225
+   n_local_elem()=225
+   n_active_elem()=225
+  n_subdomains()=1
+  n_processors()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System "Poisson"
+    Type "Steady"
+    Variables="u" 
+    Finite Element Types="0" 
+    Approximation Orders="2" 
+    n_dofs()=961
+    n_local_dofs()=961
+    n_constrained_dofs()=0
+    n_additional_vectors()=0
+    n_additional_matrices()=0
+  n_parameters()=2
+   Parameters:
+    "linear solver maximum iterations"=5000
+    "linear solver tolerance"=1e-12
+
+
+ ----------------------------------------------------------------------------
+| Time:           Mon Nov 10 14:12:36 2003
+| OS:             Linux
+| HostName:       arthur
+| OS Release      2.4.20-19.9smp
+| OS Version:     #1 SMP Tue Jul 15 17:04:18 EDT 2003
+| Machine:        i686
+| Username:       peterson
+ ----------------------------------------------------------------------------
+ ----------------------------------------------------------------------------
+| Matrix Assembly Performance: Alive time=0.04601, Active time=0.041468
+ ----------------------------------------------------------------------------
+| Event                         nCalls  Total       Avg         Percent of   |
+|                                       Time        Time        Active Time  |
+|----------------------------------------------------------------------------|
+|                                                                            |
+| BCs                           225     0.0077      0.000034    18.59        |
+| Fe                            225     0.0083      0.000037    20.00        |
+| Ke                            225     0.0110      0.000049    26.54        |
+| elem init                     225     0.0071      0.000031    17.07        |
+| matrix insertion              225     0.0074      0.000033    17.80        |
+ ----------------------------------------------------------------------------
+| Totals:                       1125    0.0415                  100.00       |
+ ----------------------------------------------------------------------------
+
+
+ ---------------------------------------------------------------------------- 
+| Reference count information                                                |
+ ---------------------------------------------------------------------------- 
+| 10SystemBase reference count information:
+| Creations:    1
+| Destructions: 1
+| 12SparseMatrixIdE reference count information:
+| Creations:    1
+| Destructions: 1
+| 13NumericVectorIdE reference count information:
+| Creations:    3
+| Destructions: 3
+| 21LinearSolverInterfaceIdE reference count information:
+| Creations:    1
+| Destructions: 1
+| 4Elem reference count information:
+| Creations:    1185
+| Destructions: 1185
+| 4Node reference count information:
+| Creations:    961
+| Destructions: 961
+| 5QBase reference count information:
+| Creations:    3
+| Destructions: 3
+| 6DofMap reference count information:
+| Creations:    1
+| Destructions: 1
+| 6FEBase reference count information:
+| Creations:    2
+| Destructions: 2
+ ---------------------------------------------------------------------------- 
+WARNING! There are options you set that were not used!
+WARNING! could be spelling mistake, etc!
+Option left: name:-d value: 2
+Running ./ex4 -d 3
+
+ Mesh Information:
+  mesh_dimension()=3
+  spatial_dimension()=3
+  n_nodes()=29791
+  n_elem()=3375
+   n_local_elem()=3375
+   n_active_elem()=3375
+  n_subdomains()=1
+  n_processors()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System "Poisson"
+    Type "Steady"
+    Variables="u" 
+    Finite Element Types="0" 
+    Approximation Orders="2" 
+    n_dofs()=29791
+    n_local_dofs()=29791
+    n_constrained_dofs()=0
+    n_additional_vectors()=0
+    n_additional_matrices()=0
+  n_parameters()=2
+   Parameters:
+    "linear solver maximum iterations"=5000
+    "linear solver tolerance"=1e-12
+
+
+ ----------------------------------------------------------------------------
+| Time:           Mon Nov 10 14:12:47 2003
+| OS:             Linux
+| HostName:       arthur
+| OS Release      2.4.20-19.9smp
+| OS Version:     #1 SMP Tue Jul 15 17:04:18 EDT 2003
+| Machine:        i686
+| Username:       peterson
+ ----------------------------------------------------------------------------
+ ----------------------------------------------------------------------------
+| Matrix Assembly Performance: Alive time=8.52849, Active time=8.46075
+ ----------------------------------------------------------------------------
+| Event                         nCalls  Total       Avg         Percent of   |
+|                                       Time        Time        Active Time  |
+|----------------------------------------------------------------------------|
+|                                                                            |
+| BCs                           3375    1.9966      0.000592    23.60        |
+| Fe                            3375    0.4423      0.000131    5.23         |
+| Ke                            3375    4.0631      0.001204    48.02        |
+| elem init                     3375    0.9730      0.000288    11.50        |
+| matrix insertion              3375    0.9857      0.000292    11.65        |
+ ----------------------------------------------------------------------------
+| Totals:                       16875   8.4608                  100.00       |
+ ----------------------------------------------------------------------------
+
+
+ ---------------------------------------------------------------------------- 
+| Reference count information                                                |
+ ---------------------------------------------------------------------------- 
+| 10SystemBase reference count information:
+| Creations:    1
+| Destructions: 1
+| 12SparseMatrixIdE reference count information:
+| Creations:    1
+| Destructions: 1
+| 13NumericVectorIdE reference count information:
+| Creations:    3
+| Destructions: 3
+| 21LinearSolverInterfaceIdE reference count information:
+| Creations:    1
+| Destructions: 1
+| 4Elem reference count information:
+| Creations:    24975
+| Destructions: 24975
+| 4Node reference count information:
+| Creations:    29791
+| Destructions: 29791
+| 5QBase reference count information:
+| Creations:    4
+| Destructions: 4
+| 6DofMap reference count information:
+| Creations:    1
+| Destructions: 1
+| 6FEBase reference count information:
+| Creations:    2
+| Destructions: 2
+ ---------------------------------------------------------------------------- 
+WARNING! There are options you set that were not used!
+WARNING! could be spelling mistake, etc!
+Option left: name:-d value: 3
+ 
+***************************************************************
+* Done Running Example  ./ex4
+***************************************************************
+</pre>
 </div>
 <?php make_footer() ?>
 </body>

@@ -7,9 +7,10 @@
  
 <body>
  
-<?php make_navigation("examples",$root)?>
+<?php make_navigation("ex5",$root)?>
  
 <div class="content">
+<a name="comments"></a> 
 <div class = "comment">
 Example 5 -- Run-Time Quadrature Rule Selection
 
@@ -693,6 +694,7 @@ All done!
 </pre>
 </div>
 
+<a name="nocomments"></a> 
 <br><br><br> <h1> The program without comments: </h1> 
 <pre> 
   
@@ -978,6 +980,83 @@ All done!
     <B><FONT COLOR="#A020F0">return</FONT></B>;
   }
 </pre> 
+<a name="output"></a> 
+<br><br><br> <h1> The console output of the program: </h1> 
+<pre>
+***************************************************************
+* Running Example  ./ex5
+***************************************************************
+ 
+Running ./ex5 -q 0
+
+ Mesh Information:
+  mesh_dimension()=3
+  spatial_dimension()=3
+  n_nodes()=4913
+  n_elem()=4096
+   n_local_elem()=4096
+   n_active_elem()=4096
+  n_subdomains()=1
+  n_processors()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System "Poisson"
+    Type "Steady"
+    Variables="u" 
+    Finite Element Types="0" 
+    Approximation Orders="1" 
+    n_dofs()=4913
+    n_local_dofs()=4913
+    n_constrained_dofs()=0
+    n_additional_vectors()=0
+    n_additional_matrices()=0
+  n_parameters()=2
+   Parameters:
+    "linear solver maximum iterations"=5000
+    "linear solver tolerance"=1e-12
+
+
+ ---------------------------------------------------------------------------- 
+| Reference count information                                                |
+ ---------------------------------------------------------------------------- 
+| 10SystemBase reference count information:
+| Creations:    1
+| Destructions: 1
+| 12SparseMatrixIdE reference count information:
+| Creations:    1
+| Destructions: 1
+| 13NumericVectorIdE reference count information:
+| Creations:    3
+| Destructions: 3
+| 21LinearSolverInterfaceIdE reference count information:
+| Creations:    1
+| Destructions: 1
+| 4Elem reference count information:
+| Creations:    30429
+| Destructions: 30429
+| 4Node reference count information:
+| Creations:    4913
+| Destructions: 4913
+| 5QBase reference count information:
+| Creations:    4
+| Destructions: 4
+| 6DofMap reference count information:
+| Creations:    1
+| Destructions: 1
+| 6FEBase reference count information:
+| Creations:    2
+| Destructions: 2
+ ---------------------------------------------------------------------------- 
+WARNING! There are options you set that were not used!
+WARNING! could be spelling mistake, etc!
+Option left: name:-q value: 0
+ 
+***************************************************************
+* Done Running Example  ./ex5
+***************************************************************
+</pre>
 </div>
 <?php make_footer() ?>
 </body>

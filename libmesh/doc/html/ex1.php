@@ -7,9 +7,10 @@
  
 <body>
  
-<?php make_navigation("examples",$root)?>
+<?php make_navigation("ex1",$root)?>
  
 <div class="content">
+<a name="comments"></a> 
 <div class = "comment">
 Example 1 -- Creation of a Mesh Object
 
@@ -178,6 +179,7 @@ can be useful for testing purposes.
 </pre>
 </div>
 
+<a name="nocomments"></a> 
 <br><br><br> <h1> The program without comments: </h1> 
 <pre> 
   
@@ -211,6 +213,43 @@ can be useful for testing purposes.
     <B><FONT COLOR="#A020F0">return</FONT></B> libMesh::close();
   }
 </pre> 
+<a name="output"></a> 
+<br><br><br> <h1> The console output of the program: </h1> 
+<pre>
+***************************************************************
+* Running Example  ./ex1
+***************************************************************
+ 
+ Mesh Information:
+  mesh_dimension()=3
+  spatial_dimension()=3
+  n_nodes()=27
+  n_elem()=1
+   n_local_elem()=1
+   n_active_elem()=1
+  n_subdomains()=1
+  n_processors()=1
+  processor_id()=0
+
+
+ ---------------------------------------------------------------------------- 
+| Reference count information                                                |
+ ---------------------------------------------------------------------------- 
+| 4Elem reference count information:
+| Creations:    7
+| Destructions: 7
+| 4Node reference count information:
+| Creations:    27
+| Destructions: 27
+ ---------------------------------------------------------------------------- 
+WARNING! There are options you set that were not used!
+WARNING! could be spelling mistake, etc!
+Option left: name:-d value: 3
+ 
+***************************************************************
+* Done Running Example  ./ex1
+***************************************************************
+</pre>
 </div>
 <?php make_footer() ?>
 </body>

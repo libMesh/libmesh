@@ -7,11 +7,12 @@
  
 <body>
  
-<?php make_navigation("examples",$root)?>
+<?php make_navigation("ex6",$root)?>
  
 <div class="content">
+<a name="comments"></a> 
 <div class = "comment">
-Example 6 -- Infinite Elements
+Example 6 -- Infinite Elements for the Wave Equation
 
 <br><br>This is the sixth example program.  It builds on
 the previous examples, and introduces the Infinite
@@ -1021,6 +1022,7 @@ All done!
 </pre>
 </div>
 
+<a name="nocomments"></a> 
 <br><br><br> <h1> The program without comments: </h1> 
 <pre> 
   
@@ -1275,6 +1277,20 @@ All done!
   }
   
 </pre> 
+<a name="output"></a> 
+<br><br><br> <h1> The console output of the program: </h1> 
+<pre>
+***************************************************************
+* Running Example  ./ex6
+***************************************************************
+ 
+ERROR: This example requires the library to be compiled with Infinite Element support!
+[0] ex6.C, line 82, compiled Nov 10 2003 at 13:26:04
+ 
+***************************************************************
+* Done Running Example  ./ex6
+***************************************************************
+</pre>
 </div>
 <?php make_footer() ?>
 </body>
