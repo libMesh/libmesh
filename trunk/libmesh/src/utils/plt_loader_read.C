@@ -1,4 +1,4 @@
-// $Id: plt_loader_read.C,v 1.1 2004-09-30 21:21:49 benkirk Exp $
+// $Id: plt_loader_read.C,v 1.2 2004-10-15 04:44:28 benkirk Exp $
 
 // Copyright (C) 2002-2004  Benjamin S. Kirk
   
@@ -17,8 +17,11 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-
+// C++ includes
 #include <fstream>
+#include <string.h>
+
+// Local includes
 #include "utility.h"
 #include "plt_loader.h"
 
