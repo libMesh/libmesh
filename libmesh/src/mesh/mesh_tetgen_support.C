@@ -1,4 +1,4 @@
-// $Id: mesh_tetgen_support.C,v 1.7 2004-05-14 22:59:34 spetersen Exp $
+// $Id: mesh_tetgen_support.C,v 1.8 2004-05-17 21:53:20 spetersen Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -259,7 +259,15 @@ void TetGenMeshInterface::pointset_convexhull ()
   // save SURFACE elements to mesh structure, nodes will not be changed:
   int n_nodes     = 3;                                  // (Tri3 elements)
   _num_elements   = tetgen_wrapper.get_numberoftrifaces();
-  int firstnumber = _elements.size()+1;                 // append position
+  //  int firstnumber = _elements.size()+1;                 // append position
+  int firstnumber = 0;                 // append position
+
+  // Delete old elements:
+  std::vector< Elem *>::iterator j;
+  for (j=_elements.begin(); j!=_elements.end(); ++j) {
+    delete (*j);
+  } 
+
   // Reserve space in the appropriate vector to avoid unnecessary allocations.
   _elements.resize (_num_elements+firstnumber);
 
@@ -276,6 +284,8 @@ void TetGenMeshInterface::pointset_convexhull ()
 	_elements[firstnumber+i]->set_node(assign_elm_nodes[j]) = _nodes[node_labels[j]];
     } // for
 } // pointset_convexhull
+
+
 
 
 int TetGenMeshInterface::get_node_index (Node* inode)
