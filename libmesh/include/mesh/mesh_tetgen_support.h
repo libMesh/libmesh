@@ -1,4 +1,4 @@
-// $Id: mesh_tetgen_support.h,v 1.6 2004-05-13 15:58:52 spetersen Exp $
+// $Id: mesh_tetgen_support.h,v 1.7 2004-05-14 22:59:34 spetersen Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -198,12 +198,10 @@ class TetGenMeshInterface
 public:
 
   /**
-   * Constructor.  Takes the data relevant 
-   * for reading mesh or reading data.
+   * Constructor. Takes a reference to the mesh.
    */
-  TetGenMeshInterface(std::vector<Node*>& nodes,
-		      std::vector<Elem*>& elements,
-		      MeshData& md);
+  TetGenMeshInterface (Mesh& mesh);
+
 
   /**
    * Method invokes TetGen library to compute a Delaunay tetrahedrization

@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.5 2004-04-18 00:51:51 jwpeterson Exp $
+// $Id: equation_systems.C,v 1.6 2004-05-14 22:59:34 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -480,7 +480,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
     // standard does not require that MPI_SUM, MPI_PROD etc... be
     // implemented for char data types. 12/23/2003 - BSK)  
     MPI_Allreduce (&node_conn_local[0], &node_conn[0], node_conn.size(),
-		   MPI_UNSIGNED_SHORT, MPI_SUM, MPI_COMM_WORLD);
+		   MPI_SHORT, MPI_SUM, MPI_COMM_WORLD);
     
 #else
     // Without MPI the node_conn_local and the node_conn arrays

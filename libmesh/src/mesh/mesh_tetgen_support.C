@@ -1,4 +1,4 @@
-// $Id: mesh_tetgen_support.C,v 1.6 2004-05-13 15:58:35 spetersen Exp $
+// $Id: mesh_tetgen_support.C,v 1.7 2004-05-14 22:59:34 spetersen Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,6 +30,7 @@
 #include "mesh_data.h"
 #include "cell_tet4.h"
 #include "face_tri3.h"
+#include "mesh.h"
 
 #ifdef TETGEN_13
 #include "predicates.h"
@@ -39,14 +40,12 @@
 
 //----------------------------------------------------------------------
 // TetGenMeshInterface class members
-TetGenMeshInterface::TetGenMeshInterface (std::vector<Node*>& nodes,
-					  std::vector<Elem*>& elements,
-					  MeshData& md) :
-  _nodes        (nodes),
-  _elements     (elements),
+TetGenMeshInterface::TetGenMeshInterface (Mesh& mesh) :
+  _nodes        (mesh._nodes),
+  _elements     (mesh._elements),
   _num_nodes    (0),
   _num_elements (0),
-  _mesh_data    (md)
+  _mesh_data    (mesh.data)
 {
 }
 
@@ -57,97 +56,8 @@ TetGenMeshInterface::~TetGenMeshInterface()
 }
 
 
-// ---------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------
-
-#ifdef HAVE_TETGEN 
-
-void MeshBase::tetgen_triangulate_pointset()
-{
-  TetGenMeshInterface tetgen_interface (_nodes,
-					_elements,
-					data);
-  tetgen_interface.triangulate_pointset();
-
-   // Send the mesh & bcs (which are now only on processor 0) to the other
-//   // processors
-//   {
-//     MeshCommunication mesh_communication;
-//     mesh_communication.distribute (*this);
-//   }
-  // Done triangulating the mesh.  Now prepare it for use.
-  this->prepare_for_use();
-} 
-
-void MeshBase::tetgen_pointset_convexhull()
-{
-  TetGenMeshInterface tetgen_interface (_nodes,
-					_elements,
-					data);
-  tetgen_interface.pointset_convexhull();
-
-   // Send the mesh & bcs (which are now only on processor 0) to the other
-//   // processors
-//   {
-//     MeshCommunication mesh_communication;
-//     mesh_communication.distribute (*this);
-//   }
-  
-  // Done triangulating the mesh.  Now prepare it for use.
-  this->prepare_for_use();
-} 
-
-void MeshBase::tetgen_triangulate(double quality_constraint, double volume_constraint)
-{
-  TetGenMeshInterface tetgen_interface (_nodes,
-					_elements,
-					data);
-  tetgen_interface.triangulate_conformingDelaunayMesh(quality_constraint, volume_constraint);
-  
-   // Send the mesh & bcs (which are now only on processor 0) to the other
-//   // processors
-//   {
-//     MeshCommunication mesh_communication;
-//     mesh_communication.distribute (*this);
-//   }
-  
-  // Done triangulating the mesh.  Now prepare it for use.
-  this->prepare_for_use();
-}
-
-void MeshBase::tetgen_triangulate_qconstraint(double quality_constraint)
-{ tetgen_triangulate(quality_constraint, 0); }
-
-void MeshBase::tetgen_triangulate_vconstraint(double volume_constraint)
-{ tetgen_triangulate(0, volume_constraint); }
-
-void MeshBase::tetgen_triangulate()
-{ tetgen_triangulate(0, 0); }
-
-void MeshBase::tetgen_triangulate_carvehole(std::vector< Node *>& holes,
-       double quality_constraint, double volume_constraint)
-{
-  TetGenMeshInterface tetgen_interface (_nodes,
-					_elements,
-					data);
-  tetgen_interface.triangulate_conformingDelaunayMesh_carvehole(holes, quality_constraint, volume_constraint);
-  
-   // Send the mesh & bcs (which are now only on processor 0) to the other
-//   // processors
-//   {
-//     MeshCommunication mesh_communication;
-//     mesh_communication.distribute (*this);
-//   }
-  
-  // Done triangulating the mesh.  Now prepare it for use.
-  this->prepare_for_use();
-}
-
-#endif
-
 // =============================================================================
 
-#ifdef HAVE_TETGEN 
 
 TetGen1_wrapper::TetGen1_wrapper()
 {
@@ -200,7 +110,6 @@ int TetGen1_wrapper::get_element_node(int i, int j)
 int TetGen1_wrapper::get_triface_node(int i, int j)
 { return tetgen_output->trifacelist[i*3+j]; }
 
-#endif
 
 // =============================================================================
 
@@ -283,11 +192,9 @@ void TetGen13_wrapper::set_vertex(int i, int j, int k, int nodeindex)
 // class type TetGen_access is cast to TetGen_Wrapper class for current TetGen version:
 typedef TetGen13_wrapper TetGen_access;
 
-#endif // TETGEN_13
 
 // =============================================================================
 
-#ifdef TETGEN_13
 
 void TetGenMeshInterface::triangulate_pointset ()   
 {
