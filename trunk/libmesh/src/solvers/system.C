@@ -1,4 +1,4 @@
-// $Id: system.C,v 1.7 2004-09-27 15:56:49 jwpeterson Exp $
+// $Id: system.C,v 1.8 2004-10-12 19:46:58 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -414,7 +414,7 @@ NumericVector<Number> & System::add_vector (const std::string& vec_name)
     }
 
   // Return the vector if it is already there.
-  if (_vectors.count(vec_name))
+  if (this->have_vector(vec_name))
     {
       return *(_vectors[vec_name]);
     }
@@ -428,7 +428,7 @@ NumericVector<Number> & System::add_vector (const std::string& vec_name)
 
 
 
-const NumericVector<Number> & System::get_vector(const std::string& vec_name) const
+const NumericVector<Number> & System::get_vector (const std::string& vec_name) const
 {
   // Make sure the vector exists
   vectors_const_iterator pos = _vectors.find(vec_name);
@@ -447,7 +447,7 @@ const NumericVector<Number> & System::get_vector(const std::string& vec_name) co
 
 
 
-NumericVector<Number> & System::get_vector(const std::string& vec_name)
+NumericVector<Number> & System::get_vector (const std::string& vec_name)
 {
   // Make sure the vector exists
   vectors_iterator pos = _vectors.find(vec_name);

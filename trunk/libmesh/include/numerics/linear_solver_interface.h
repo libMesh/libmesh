@@ -1,4 +1,4 @@
-// $Id: linear_solver_interface.h,v 1.3 2004-08-20 13:58:02 jwpeterson Exp $
+// $Id: linear_solver_interface.h,v 1.4 2004-10-12 19:46:57 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -117,10 +117,24 @@ public:
    * This function calls the solver
    * "_solver_type" preconditioned with the
    * "_preconditioner_type" preconditioner.  Note that this method
-   * simply calls the one above and specifies the preconditioning
-   * matrix as the system matrix.
+   * will compute the preconditioner from the system matrix.
    */
   virtual std::pair<unsigned int, Real> solve (SparseMatrix<T>&,  // System Matrix
+					       NumericVector<T>&, // Solution vector
+					       NumericVector<T>&, // RHS vector
+					       const double,      // Stopping tolerance
+					       const unsigned int) = 0; // N. Iterations
+  
+
+
+  /**
+   * This function calls the solver
+   * "_solver_type" preconditioned with the
+   * "_preconditioner_type" preconditioner.  Note that this method
+   * will compute the preconditioner from the system matrix.
+   */
+  virtual std::pair<unsigned int, Real> solve (SparseMatrix<T>&,  // System Matrix
+					       SparseMatrix<T>&,  // Preconditioning Matrix
 					       NumericVector<T>&, // Solution vector
 					       NumericVector<T>&, // RHS vector
 					       const double,      // Stopping tolerance

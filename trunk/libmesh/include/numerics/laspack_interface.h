@@ -1,4 +1,4 @@
-// $Id: laspack_interface.h,v 1.3 2004-09-22 18:43:01 benkirk Exp $
+// $Id: laspack_interface.h,v 1.4 2004-10-12 19:46:57 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -76,10 +76,19 @@ class LaspackInterface : public LinearSolverInterface<T>
 
   /**
    * Call the Laspack solver
-   */
-    
+   */    
   std::pair<unsigned int, Real> 
     solve (SparseMatrix<T>  &matrix,
+	   NumericVector<T> &solution,
+	   NumericVector<T> &rhs,
+	   const double tol,
+	   const unsigned int m_its);
+  /**
+   * Call the Laspack solver
+   */    
+  std::pair<unsigned int, Real> 
+    solve (SparseMatrix<T>  &matrix,
+	   SparseMatrix<T>  &pc,
 	   NumericVector<T> &solution,
 	   NumericVector<T> &rhs,
 	   const double tol,
@@ -117,6 +126,22 @@ LaspackInterface<T>::~LaspackInterface ()
   this->clear ();
 }
 
+
+
+template <typename T>
+inline
+std::pair<unsigned int, Real>
+LaspackInterface<T>::solve (SparseMatrix<T>&,
+			    SparseMatrix<T>&,
+			    NumericVector<T>&,
+			    NumericVector<T>&,
+			    const double,
+			    const unsigned int)
+{
+  std::cerr << "ERROR: LASPACK does not support a user-supplied preconditioner!"
+	    << std::endl;
+  error();
+}
 
 #endif // #ifdef HAVE_LASPACK
 #endif // #ifndef __laspack_interface_h__

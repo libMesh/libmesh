@@ -1,4 +1,4 @@
-// $Id: implicit_system.h,v 1.4 2004-08-20 14:09:30 jwpeterson Exp $
+// $Id: implicit_system.h,v 1.5 2004-10-12 19:46:58 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -112,6 +112,12 @@ public:
   SparseMatrix<Number> & add_matrix (const std::string& mat_name);
 
   /**
+   * @returns \p true if this \p System has a matrix associated with the
+   * given name, \p false otherwise.
+   */
+  bool have_matrix (const std::string& mat_name) const;
+
+  /**
    * @returns a const reference to this system's @e additional matrix
    * named \p mat_name.  @e None of these matrices is involved in the 
    * solution process.  Access is only granted when the matrix is already
@@ -207,6 +213,13 @@ private:
 
 // ------------------------------------------------------------
 // ImplicitSystem inline methods
+inline
+bool ImplicitSystem::have_matrix (const std::string& mat_name) const
+{
+  return (_matrices.count(mat_name));
+}
+
+
 inline
 unsigned int ImplicitSystem::n_matrices () const
 {

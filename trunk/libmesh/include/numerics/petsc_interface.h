@@ -1,4 +1,4 @@
-// $Id: petsc_interface.h,v 1.5 2004-09-22 18:43:01 benkirk Exp $
+// $Id: petsc_interface.h,v 1.6 2004-10-12 19:46:57 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -92,7 +92,7 @@ public:
    * same matrix for the system and preconditioner matrices.
    */    
   std::pair<unsigned int, Real> 
-  solve (SparseMatrix<T> &matrix_in,
+  solve (SparseMatrix<T>  &matrix_in,
 	 NumericVector<T> &solution_in,
 	 NumericVector<T> &rhs_in,
 	 const double tol,
@@ -117,8 +117,8 @@ public:
    * if you wanted.
    */
   std::pair<unsigned int, Real> 
-  solve (SparseMatrix<T> &matrix,
-	 SparseMatrix<T> &preconditioner,
+  solve (SparseMatrix<T>  &matrix,
+	 SparseMatrix<T>  &preconditioner,
 	 NumericVector<T> &solution,
 	 NumericVector<T> &rhs,
 	 const double tol,
