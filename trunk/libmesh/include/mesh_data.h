@@ -1,4 +1,4 @@
-// $Id: mesh_data.h,v 1.6 2003-06-07 14:36:08 ddreyer Exp $
+// $Id: mesh_data.h,v 1.7 2003-07-07 21:01:30 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -120,13 +120,10 @@ public:
 		     const unsigned int i=0) const;
 
   /**
-   * @returns the \f$ i^{th} \f$ value associated with the 
-   * node \p node.  Other than before, this function terminates
-   * with an error when data for a non-existent \p Node* is
-   * requested.
+   * @returns \p true when the node \p node has data,
+   * \p false otherwise.
    */
-  Number safe (const Node* node, 
-	       const unsigned int i=0) const;
+  bool has_data (const Node* node) const;
 
   /**
    * Stores @e all data associated with the node \p node 
@@ -144,13 +141,10 @@ public:
 		     const unsigned int i=0) const;
 
   /**
-   * @returns the \f$ i^{th} \f$ value associated with the 
-   * element \p elem.  Other than before, this function terminates
-   * with an error when data for a non-existent \p Elem* is
-   * requested.
+   * @returns \p true when the element \p elem has data,
+   * \p false otherwise.
    */
-  Number safe (const Elem* elem, 
-	       const unsigned int i=0) const;
+  bool has_data (const Elem* elem) const;
 
   /**
    * Stores @e all data associated with the element \p elem
@@ -414,8 +408,7 @@ Number MeshData::operator() (const Node* node,
 
 
 inline
-Number MeshData::safe (const Node* node, 
-		       const unsigned int i) const
+bool MeshData::has_data (const Node* node) const
 {
   assert (_active);
   assert (_node_id_map_closed);
@@ -424,18 +417,7 @@ Number MeshData::safe (const Node* node,
   std::map<const Node*, 
            std::vector<Number> >::const_iterator pos = _node_data.find(node);
 
-  if (pos == _node_data.end())
-    {
-#ifdef DEBUG
-      std::cerr << "ERROR: No data stored for the node with id" 
-		<< node->id() << std::endl;
-#endif
-      error();
-    }
-
-
-  assert (i < (*pos).second.size());
-  return (*pos).second[i];
+  return (pos != _node_data.end());
 }
 
 
@@ -486,8 +468,7 @@ Number MeshData::operator() (const Elem* elem,
 
 
 inline
-Number MeshData::safe (const Elem* elem, 
-		       const unsigned int i) const
+bool MeshData::has_data (const Elem* elem) const
 {
   assert (_active);
   assert (_elem_id_map_closed);
@@ -496,18 +477,7 @@ Number MeshData::safe (const Elem* elem,
   std::map<const Elem*, 
            std::vector<Number> >::const_iterator pos = _elem_data.find(elem);
 
-  if (pos == _elem_data.end())
-    {
-#ifdef DEBUG
-      std::cerr << "ERROR: No data stored for the element with id " 
-		<< elem->id() << std::endl;
-#endif
-      error();
-    }
-
-
-  assert (i < (*pos).second.size());
-  return (*pos).second[i];
+  return (pos != _elem_data.end());
 }
 
 

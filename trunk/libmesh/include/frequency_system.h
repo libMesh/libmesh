@@ -1,4 +1,4 @@
-// $Id: frequency_system.h,v 1.11 2003-05-20 13:38:05 ddreyer Exp $
+// $Id: frequency_system.h,v 1.12 2003-07-07 21:01:30 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -151,15 +151,15 @@ public:
 				 const unsigned int n_freq);
 
   /**
-   * @returns the number of frequencies to solve
+   * Set the frequency range by simply copying the values
+   * from \p frequencies.
    */
-  unsigned int n_frequencies () const { return _frequencies.size(); }
+  void set_frequencies (const std::vector<Real>& frequencies);
 
   /**
-   * @returns a const reference to the frequencies to solve
+   * @returns the number of frequencies to solve
    */
-  const std::vector<Real>& get_frequencies () const
-    { assert (_finished_set_frequencies); return _frequencies; }
+  unsigned int n_frequencies () const;
   
   /**
    * Register a required user function to use in assembling/solving the system.
@@ -235,12 +235,6 @@ protected:
    * different frequencies. 
    */
   bool _finished_assemble;
-
-  /**
-   * The frequencies for which to solve the frequency-dependent
-   * system.
-   */
-  std::vector<Real> _frequencies;
 };
 
 
