@@ -1,4 +1,4 @@
-// $Id: exact_solution.C,v 1.2 2004-05-27 04:37:12 jwpeterson Exp $
+// $Id: exact_solution.C,v 1.3 2004-05-27 04:39:28 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -191,9 +191,6 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 				   std::pair<Real, Real>& error_pair)
 {
   // Get a reference to the system whose error is being computed.
-  //const ImplicitSystem& computed_system
-  //  = _equation_systems.get_system<ImplicitSystem> (sys_name);
-
   const System& computed_system
     = _equation_systems.get_system (sys_name);
 
