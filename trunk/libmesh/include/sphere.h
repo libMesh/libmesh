@@ -1,4 +1,4 @@
-// $Id: sphere.h,v 1.7 2003-02-13 22:56:08 benkirk Exp $
+// $Id: sphere.h,v 1.8 2003-08-29 20:09:37 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,15 +23,50 @@
 #define __sphere_h__
 
 // C++ includes
+#include <math.h>
+
 
 // Local includes
 #include "surface.h"
+#include "libmesh.h"
 
 
 /**
- * This class defines a sphere.
+ * This class defines a sphere.  It also computes coordinate
+ * transformations between cartesian  \f$ (x, y, z) \f$
+ * and spherical  \f$ (r, \theta, \phi) \f$ coordinates.
+ * The spherical coordinates are valid in the ranges:  
  *
- * @author Benjamin S. Kirk, 2002
+ * - \f$ 0 \le r      < \infty \f$
+ * - \f$ 0 \le \theta < \pi \f$
+ * - \f$ 0 \le \phi   < 2\pi \f$
+ *
+ * The coordinates are related as follows:
+ * \f$ \phi \f$ is the angle in the xy plane
+ * starting with 0. from the positive x axis,
+ * \f$ \theta \f$ is measured against the positive
+ * z axis.
+   \verbatim
+
+          \      | Z
+           \theta|  
+            \    |    .
+             \   |   .
+              \  |  .
+               \ | .
+                \|.
+  ---------------+---------.---------
+                /|\       .          Y
+               /phi\     .  
+              /  |  \   .  
+             /   |   \ .  
+            /.........\  
+           /     |
+        X /      
+   \endverbatim
+ *
+ * \author Benjamin S. Kirk, Daniel Dreyer
+ * \date 2002-2003
  */
 
 // ------------------------------------------------------------
@@ -112,6 +147,18 @@ public:
    */ 
   const Point& center() const { return cent; }
 
+  /**
+   * @returns the spherical coordinates for the
+   * cartesian coordinates \p cart.
+   */ 
+  Point surface_coords (const Point& cart) const;
+
+  /**
+   * @returns the cartesian coordinates for the
+   * spherical coordinates \p sph.
+   */ 
+  Point world_coords (const Point& sph) const;
+
   
 private:
 
@@ -126,5 +173,41 @@ private:
    */
   Real  rad;
 };
+
+
+
+// ------------------------------------------------------------
+// Sphere inline functions
+inline
+Point Sphere::surface_coords (const Point& cart) const
+{
+  // constant translation in the origin
+  const Point c (cart-cent);
+
+  // phi: special care, so that it gives 0..2pi results
+  const Real phi = atan2(c(1), c(0));
+
+  return Point(/* radius */ c.size(),
+	       /* theta  */ atan2( sqrt( c(0)*c(0) + c(1)*c(1) ), c(2) ),
+	       /* phi    */ ( (phi < 0)  ?  2.*libMesh::pi+phi  :  phi ) );
+}
+
+
+
+inline
+Point Sphere::world_coords (const Point& sph) const
+{
+  const Real r     = sph(0);
+  const Real theta = sph(1);
+  const Real phi   = sph(2);
+
+  // constant translation out of the origin
+  return Point (/* x */ r*sin(theta)*cos(phi) + cent(0),
+		/* y */ r*sin(theta)*sin(phi) + cent(1),
+		/* z */ r*cos(theta)          + cent(2));
+}
+
+
+
 
 #endif

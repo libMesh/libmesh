@@ -1,4 +1,4 @@
-// $Id: surface.h,v 1.6 2003-02-13 22:56:08 benkirk Exp $
+// $Id: surface.h,v 1.7 2003-08-29 20:09:37 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -91,8 +91,49 @@ public:
    */
   virtual Point unit_normal (const Point& p) const = 0;
 
+  /**
+   * @returns the \p Point \p world_coords in the 
+   * surface's coordinate system.  \p world_coords 
+   * is in the world coordinate system.  This method
+   * is not purely virtual, because there may be surfaces
+   * that do not have an own coordinate system.  These
+   * simply do not have to overload this method.
+   */ 
+  virtual Point surface_coords (const Point& world_coords) const;
+
+  /**
+   * @returns the world (cartesian) coordinates for the
+   * surface coordinates \p surf_coords.  This method
+   * is not purely virtual, because there may be surfaces
+   * that do not have an own coordinate system.  These
+   * simply do not have to overload this method.
+   */ 
+  virtual Point world_coords (const Point& surf_coords) const;
+
 protected:
 
 };
+
+// ------------------------------------------------------------
+// Surface class member functions
+inline
+Point Surface::surface_coords (const Point& world_coords) const
+{
+  Point p (world_coords);
+  return p;
+}
+
+
+
+inline
+Point Surface::world_coords (const Point& surf_coords) const
+{
+  Point p (surf_coords);
+  return p;
+}
+
+
+
+
 
 #endif
