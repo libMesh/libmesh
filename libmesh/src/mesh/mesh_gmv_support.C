@@ -1,4 +1,4 @@
-// $Id: mesh_gmv_support.C,v 1.9 2003-02-20 04:59:58 benkirk Exp $
+// $Id: mesh_gmv_support.C,v 1.10 2003-02-21 18:31:32 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -118,158 +118,160 @@ void MeshBase::write_gmv(std::ostream& out,
     // write the connectivity
     
     out << "cells " << n_active_sub_elem() << std::endl;
+
+    const_active_elem_iterator       it (elements_begin());
+    const const_active_elem_iterator end(elements_end());
     
     switch (_dim)
       {
       case 1:
 	{
-	  for (unsigned int e=0; e<n_elem(); e++)
-	    if (elem(e)->active())
-	      for (unsigned int se=0; se<elem(e)->n_sub_elem(); se++)
-		{
-		  out << "line 2" << std::endl;
-		  std::vector<unsigned int> conn = elem(e)->tecplot_connectivity(se);
-		  for (unsigned int i=0; i<conn.size(); i++)
-		    out << conn[i] << " ";
+	  for ( ; it != end; ++it)
+	    for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+	      {
+		out << "line 2" << std::endl;
+		std::vector<unsigned int> conn = (*it)->tecplot_connectivity(se);
+		for (unsigned int i=0; i<conn.size(); i++)
+		  out << conn[i] << " ";
 		
-		  out << std::endl;
-		}
+		out << std::endl;
+	      }
 	  
 	  break;
 	}
 	
       case 2:
 	{
-	  for (unsigned int e=0; e<n_elem(); e++)
-	    if (elem(e)->active())
-	      for (unsigned int se=0; se<elem(e)->n_sub_elem(); se++)
-		{
-		  if ((elem(e)->type() == QUAD4) ||
-		      (elem(e)->type() == QUAD8) ||
-		      (elem(e)->type() == QUAD9)
+	  for ( ; it != end; ++it)
+	    for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+	      {
+		if (((*it)->type() == QUAD4) ||
+		    ((*it)->type() == QUAD8) ||
+		    ((*it)->type() == QUAD9)
 #ifdef ENABLE_INFINITE_ELEMENTS
-		      || (elem(e)->type() == INFQUAD4)
-		      || (elem(e)->type() == INFQUAD6)
+		    || ((*it)->type() == INFQUAD4)
+		    || ((*it)->type() == INFQUAD6)
 #endif
-		      )
-		    {
-		      out << "quad 4" << std::endl;
-		      std::vector<unsigned int> conn = elem(e)->tecplot_connectivity(se);
-		      for (unsigned int i=0; i<conn.size(); i++)
-			out << conn[i] << " ";
-		    }
-		  else if ((elem(e)->type() == TRI3) ||
-			   (elem(e)->type() == TRI6))
+		    )
+		  {
+		    out << "quad 4" << std::endl;
+		    std::vector<unsigned int> conn = (*it)->tecplot_connectivity(se);
+		    for (unsigned int i=0; i<conn.size(); i++)
+		      out << conn[i] << " ";
+		  }
+		  else if (((*it)->type() == TRI3) ||
+			   ((*it)->type() == TRI6))
 		    {
 		      out << "tri 3" << std::endl;
-		      std::vector<unsigned int> conn = elem(e)->tecplot_connectivity(se);
+		      std::vector<unsigned int> conn = (*it)->tecplot_connectivity(se);
 		      for (unsigned int i=0; i<3; i++)
 			out << conn[i] << " ";
 		    }
-		  else
-		    {
-		      error();
-		    }
-			 
-		  out << std::endl;
-		}
-	
+		else
+		  {
+		    error();
+		  }
+		
+		out << std::endl;
+	      }
+	  
 	  break;
 	}
 	
 	
       case 3:
 	{
-	  for (unsigned int e=0; e<n_elem(); e++)
-	    if (elem(e)->active())
-	      for (unsigned int se=0; se<elem(e)->n_sub_elem(); se++)
-		{
-		  if ((elem(e)->type() == HEX8)   ||
-		      (elem(e)->type() == HEX27)
+	  for ( ; it != end; ++it)
+	    for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+	      {
+		if (((*it)->type() == HEX8)   ||
+		    ((*it)->type() == HEX27)
 #ifdef ENABLE_INFINITE_ELEMENTS
-		      || (elem(e)->type() == INFHEX8)
-		      || (elem(e)->type() == INFHEX16)
-		      || (elem(e)->type() == INFHEX18)
+		    || ((*it)->type() == INFHEX8)
+		    || ((*it)->type() == INFHEX16)
+		    || ((*it)->type() == INFHEX18)
 #endif
-		      )
-		    {
-		      out << "phex8 8" << std::endl;
-		      std::vector<unsigned int> conn = elem(e)->tecplot_connectivity(se);
-		      for (unsigned int i=0; i<conn.size(); i++)
-			out << conn[i] << " ";
+		    )
+		  {
+		    out << "phex8 8" << std::endl;
+		    std::vector<unsigned int> conn = (*it)->tecplot_connectivity(se);
+		    for (unsigned int i=0; i<conn.size(); i++)
+		      out << conn[i] << " ";
+		  }
+		
+		else if ((*it)->type() == HEX20)
+		  {
+		    out << "phex20 20" << std::endl;
+		    out << (*it)->node(0)+1  << " "
+			<< (*it)->node(1)+1  << " "
+			<< (*it)->node(2)+1  << " "
+			<< (*it)->node(3)+1  << " "
+			<< (*it)->node(4)+1  << " "
+			<< (*it)->node(5)+1  << " "
+			<< (*it)->node(6)+1  << " "
+			<< (*it)->node(7)+1  << " "
+			<< (*it)->node(8)+1  << " "
+			<< (*it)->node(9)+1  << " "
+			<< (*it)->node(10)+1 << " "
+			<< (*it)->node(11)+1 << " "
+			<< (*it)->node(16)+1 << " "
+			<< (*it)->node(17)+1 << " "
+			<< (*it)->node(18)+1 << " "
+			<< (*it)->node(19)+1 << " "
+			<< (*it)->node(12)+1 << " "
+			<< (*it)->node(13)+1 << " "
+			<< (*it)->node(14)+1 << " "
+			<< (*it)->node(15)+1 << " ";
+		  }
+		
+		else if (((*it)->type() == TET4)  ||
+			 ((*it)->type() == TET10))
+		  {
+		    out << "tet 4" << std::endl;
+		    std::vector<unsigned int> conn = (*it)->tecplot_connectivity(se);
+		    out << conn[0] << " "
+			<< conn[2] << " "
+			<< conn[1] << " "
+			<< conn[4] << " ";
 		    }
-		  
-		  else if (elem(e)->type() == HEX20)
-		    {
-		      out << "phex20 20" << std::endl;
-		      out << elem(e)->node(0)+1  << " "
-			  << elem(e)->node(1)+1  << " "
-			  << elem(e)->node(2)+1  << " "
-			  << elem(e)->node(3)+1  << " "
-			  << elem(e)->node(4)+1  << " "
-			  << elem(e)->node(5)+1  << " "
-			  << elem(e)->node(6)+1  << " "
-			  << elem(e)->node(7)+1  << " "
-			  << elem(e)->node(8)+1  << " "
-			  << elem(e)->node(9)+1  << " "
-			  << elem(e)->node(10)+1 << " "
-			  << elem(e)->node(11)+1 << " "
-			  << elem(e)->node(16)+1 << " "
-			  << elem(e)->node(17)+1 << " "
-			  << elem(e)->node(18)+1 << " "
-			  << elem(e)->node(19)+1 << " "
-			  << elem(e)->node(12)+1 << " "
-			  << elem(e)->node(13)+1 << " "
-			  << elem(e)->node(14)+1 << " "
-			  << elem(e)->node(15)+1 << " ";
-		    }
-		  
-		  else if ((elem(e)->type() == TET4)  ||
-			   (elem(e)->type() == TET10))
-		    {
-		      out << "tet 4" << std::endl;
-		      std::vector<unsigned int> conn = elem(e)->tecplot_connectivity(se);
-		      out << conn[0] << " "
-			  << conn[2] << " "
-			  << conn[1] << " "
-			  << conn[4] << " ";
-		    }
-		  
-		  else
-		    {
-		      error();
-		    }
-		  
-		  out << std::endl;
-		}
-
+		
+		else
+		  {
+		    error();
+		  }
+		
+		out << std::endl;
+	      }
+	  
 	  break;
 	}
-      
+	
       default:
 	error();
       }
     
     out << std::endl;
   }
-
+  
 
   
   // optionally write the partition information
   if (write_partitioning)
     {
       out << "material "
-	  << n_subdomains()
+	  << n_processors()
 	  << " 0"<< std::endl;
 
-      for (unsigned int sbd=0; sbd<n_subdomains(); sbd++)
+      for (unsigned int sbd=0; sbd<n_processors(); sbd++)
 	out << "sbd_" << sbd << std::endl;
       
-      for (unsigned int e=0; e<n_elem(); e++)
-	if (elem(e)->active())
-	  for (unsigned int se=0; se<elem(e)->n_sub_elem(); se++)
-	    out << elem(e)->subdomain_id()+1 << std::endl;
+      const_active_elem_iterator       it (elements_begin());
+      const const_active_elem_iterator end(elements_end());
 
+      for ( ; it != end; ++it)
+	for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+	    out << (*it)->processor_id()+1 << std::endl;
+      
       out << std::endl;
     }
 
@@ -446,67 +448,67 @@ void MeshBase::write_gmv_binary(std::ostream& out,
     
     out.write(buf, sizeof(unsigned int));
 
+    const_active_elem_iterator       it (elements_begin());
+    const const_active_elem_iterator end(elements_end());
+
     switch (_dim)
       {
 
       case 1:
        
-	for (unsigned int e = 0; e < n_elem(); ++e)
-	  if (elem(e)->active())
-	    for(unsigned se = 0; se < elem(e)->n_sub_elem(); ++se)
-	      {
-		strcpy(buf, "line    ");
-		out.write(buf, strlen(buf));
-		
-		tempint = 2;
-		memcpy(buf, &tempint, sizeof(unsigned int));
-		out.write(buf, sizeof(unsigned int));
-		
-		std::vector<unsigned int> conn = elem(e)->tecplot_connectivity(se);
-		
-		out.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
-	      }
+	for ( ; it != end; ++it)
+	  for(unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
+	    {
+	      strcpy(buf, "line    ");
+	      out.write(buf, strlen(buf));
+	      
+	      tempint = 2;
+	      memcpy(buf, &tempint, sizeof(unsigned int));
+	      out.write(buf, sizeof(unsigned int));
+	      
+	      std::vector<unsigned int> conn = (*it)->tecplot_connectivity(se);
+	      
+	      out.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
+	    }
 	
 	break;
 	
       case 2:
        
-	for (unsigned int e = 0; e < n_elem(); ++e)
-	  if (elem(e)->active())
-	    for(unsigned se = 0; se < elem(e)->n_sub_elem(); ++se)
-	      {
-		strcpy(buf, "quad    ");
-		out.write(buf, strlen(buf));
+      for ( ; it != end; ++it)
+	for(unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
+	  {
+	    strcpy(buf, "quad    ");
+	    out.write(buf, strlen(buf));
+	    
+	    tempint = 4;
+	    memcpy(buf, &tempint, sizeof(unsigned int));
+	    out.write(buf, sizeof(unsigned int));
 		
-		tempint = 4;
-		memcpy(buf, &tempint, sizeof(unsigned int));
-		out.write(buf, sizeof(unsigned int));
-		
-		std::vector<unsigned int> conn = elem(e)->tecplot_connectivity(se);
-		
-		out.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
-	      }
+	    std::vector<unsigned int> conn = (*it)->tecplot_connectivity(se);
+	    
+	    out.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
+	  }
 	
 	break;
 	
       case 3:
        
-	for (unsigned int e = 0; e < n_elem(); ++e)
-	  if (elem(e)->active())
-	    for(unsigned se = 0; se < elem(e)->n_sub_elem(); ++se)
-	      {
-		strcpy(buf, "phex8   ");
-		out.write(buf, strlen(buf));
-		
-		tempint = 8;
-		memcpy(buf, &tempint, sizeof(unsigned int));
-		out.write(buf, sizeof(unsigned int));
-		
-		std::vector<unsigned int> conn = elem(e)->tecplot_connectivity(se);
-		
-		out.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
-	      }
-	
+      for ( ; it != end; ++it)
+	for(unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
+	  {
+	    strcpy(buf, "phex8   ");
+	    out.write(buf, strlen(buf));
+	    
+	    tempint = 8;
+	    memcpy(buf, &tempint, sizeof(unsigned int));
+	    out.write(buf, sizeof(unsigned int));
+	    
+	    std::vector<unsigned int> conn = (*it)->tecplot_connectivity(se);
+	    
+	    out.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
+	  }
+      
 	break;
 	
       default:
@@ -523,7 +525,7 @@ void MeshBase::write_gmv_binary(std::ostream& out,
       strcpy(buf, "material");
       out.write(buf, strlen(buf));
       
-      unsigned int tmpint = n_subdomains();
+      unsigned int tmpint = n_processors();
       memcpy(buf, &tmpint, sizeof(unsigned int));
       out.write(buf, sizeof(unsigned int));
 
@@ -532,7 +534,7 @@ void MeshBase::write_gmv_binary(std::ostream& out,
       out.write(buf, sizeof(unsigned int));
 
 
-      for (unsigned int sbd=0; sbd<n_subdomains(); sbd++)
+      for (unsigned int sbd=0; sbd<n_processors(); sbd++)
 	{
 	  sprintf(buf, "sbd_%d", sbd);
 	  out.write(buf, 8);
@@ -542,10 +544,12 @@ void MeshBase::write_gmv_binary(std::ostream& out,
       
       unsigned int n=0;
       
-      for (unsigned int e=0; e<n_elem(); e++)
-	if (elem(e)->active())
-	  for (unsigned int se=0; se<elem(e)->n_sub_elem(); se++)
-	    sbd_id[n++] = elem(e)->subdomain_id()+1;
+      const_active_elem_iterator       it (elements_begin());
+      const const_active_elem_iterator end(elements_end());
+
+      for ( ; it != end; ++it)
+	for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+	  sbd_id[n++] = (*it)->processor_id()+1;
       
       
       out.write(reinterpret_cast<char *>(sbd_id), sizeof(unsigned int)*n_active_sub_elem());

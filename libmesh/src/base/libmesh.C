@@ -1,4 +1,4 @@
-// $Id: libmesh.C,v 1.2 2003-02-17 04:05:48 benkirk Exp $
+// $Id: libmesh.C,v 1.3 2003-02-21 18:31:30 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -136,6 +136,9 @@ int libMesh::close ()
 
   _is_initialized = false;
   
-  // Return 0 if everything has gone well.
-  return 0;
+  // Return the number of outstanding objects.
+  // This is equivalent to return 0 if all of
+  // the reference counted objects have been
+  // deleted.
+  return static_cast<int>(ReferenceCounter::n_objects());
 }

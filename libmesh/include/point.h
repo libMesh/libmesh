@@ -1,4 +1,4 @@
-// $Id: point.h,v 1.9 2003-02-13 22:56:08 benkirk Exp $
+// $Id: point.h,v 1.10 2003-02-21 18:31:30 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -194,9 +194,10 @@ class Point
 
   /**
    * Unformatted print to the stream \p out.  Simply prints the elements
-   * of the point separated by spaces.
+   * of the point separated by spaces.  Optionally prints a newline,
+   * which it does by default.
    */ 
-  void write_unformatted (std::ostream &out) const;
+  void write_unformatted (std::ostream &out, const bool newline = true) const;
     
  protected:
 

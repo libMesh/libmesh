@@ -1,4 +1,4 @@
-//    $Id: petsc_matrix.h,v 1.15 2003-02-20 23:18:08 benkirk Exp $
+//    $Id: petsc_matrix.h,v 1.16 2003-02-21 18:31:29 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -423,12 +423,12 @@ void PetscMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 }
 
 
+
 template <typename T>
 inline
 void PetscMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 				const std::vector<unsigned int>& rows,
 				const std::vector<unsigned int>& cols)
-		    
 {
   assert (initialized());
   
@@ -440,20 +440,20 @@ void PetscMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
   
   int ierr=0;
 
-  // make this static to the function to aviod repeated allocations
-  static std::vector<PetscScalar> values;
+//   // make this static to the function to aviod repeated allocations
+//   static std::vector<PetscScalar> values;
 
-  values.resize (m*n);
+//   values.resize (m*n);
 
-  // notice values is row-major by default in Petsc
-  for (unsigned int i=0; i<m; i++)
-    for (unsigned int j=0; j<n; j++)
-      values[(i)*(n) + (j)] = static_cast<PetscScalar>(dm(i,j)); 
+//   // notice values is row-major by default in Petsc
+//   for (unsigned int i=0; i<m; i++)
+//     for (unsigned int j=0; j<n; j++)
+//       values[(i)*(n) + (j)] = static_cast<PetscScalar>(dm(i,j)); 
 
   ierr = MatSetValues(mat,
 		      m, (int*) &rows[0],
 		      n, (int*) &cols[0],
-		      &values[0],
+		      (PetscScalar*) &dm.val[0],
 		      ADD_VALUES);   CHKERRQ(ierr);
 
   return;

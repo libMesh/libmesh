@@ -1,4 +1,4 @@
- // $Id: reference_counter.h,v 1.7 2003-02-14 15:22:42 benkirk Exp $
+ // $Id: reference_counter.h,v 1.8 2003-02-21 18:31:30 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -71,6 +71,13 @@ public:
    * Prints the reference information to \p std::cout.
    */
   static void print_info ();
+
+  /**
+   * Prints the number of outstanding (created, but not yet
+   * destroyed) objects.
+   */
+  static unsigned int n_objects ()
+  { return _n_objects; }
 
   
 protected:

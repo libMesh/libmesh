@@ -1,4 +1,4 @@
-// $Id: point.C,v 1.9 2003-02-13 22:56:12 benkirk Exp $
+// $Id: point.C,v 1.10 2003-02-21 18:31:30 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -100,14 +100,18 @@ void Point::print() const
 
 
 
-void Point::write_unformatted (std::ostream &out) const
+void Point::write_unformatted (std::ostream &out,
+			       const bool newline) const
 {
   assert (out);
 
   out << std::setiosflags(std::ios::showpoint)
       << (*this)(0) << " "
       << (*this)(1) << " "
-      << (*this)(2) << std::endl;
+      << (*this)(2) << " ";
+
+  if (newline)
+    out << std::endl;      
 }
 
 

@@ -1,4 +1,4 @@
-// $Id: dense_matrix.h,v 1.10 2003-02-20 23:18:02 benkirk Exp $
+// $Id: dense_matrix.h,v 1.11 2003-02-21 18:31:28 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -28,6 +28,12 @@
 
 // Local Includes
 #include "mesh_common.h"
+
+
+// Forward Declarations
+template <typename Tp> class PetscMatrix;
+
+
 
 
 /**
@@ -182,6 +188,12 @@ private:
    */
   unsigned int n_dim;
 
+  /**
+   * Make the PetscMatrix<T> class a friend
+   * so that they can insert values directly
+   * from our matrix.
+   */
+  friend class PetscMatrix<Tp>;
 };
 
 

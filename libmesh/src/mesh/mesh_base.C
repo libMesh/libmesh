@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.15 2003-02-20 04:59:58 benkirk Exp $
+// $Id: mesh_base.C,v 1.16 2003-02-21 18:31:31 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -147,8 +147,8 @@ unsigned int MeshBase::n_active_elem() const
 {
   unsigned int num=0;
 
-  const_active_elem_iterator it(elements_begin());
-  const_active_elem_iterator end(elements_end()); 
+  const_active_elem_iterator       it (elements_begin());
+  const const_active_elem_iterator end(elements_end()); 
 
   for (; it!=end; ++it)
     num++;
@@ -202,8 +202,9 @@ unsigned int MeshBase::n_active_sub_elem() const
 {
   unsigned int ne=0;
 
-  const_active_elem_iterator it(elements_begin());
-  const_active_elem_iterator end(elements_end());
+  const_active_elem_iterator       it (elements_begin());
+  const const_active_elem_iterator end(elements_end());
+  
   for (; it!=end; ++it)
     ne += (*it)->n_sub_elem(); 
 
@@ -245,8 +246,8 @@ unsigned int MeshBase::n_elem_of_type(const ElemType type) const
 {
   unsigned int cnt=0;
 
-  const_type_elem_iterator it(elements_begin(), type);
-  const_type_elem_iterator end(elements_end(),   type);
+  const_type_elem_iterator       it (elements_begin(), type);
+  const const_type_elem_iterator end(elements_end(),   type);
 
   for (; it!=end; ++it)
     cnt++;
@@ -260,8 +261,9 @@ unsigned int MeshBase::n_active_elem_of_type(const ElemType type) const
 {
   unsigned int cnt=0;
 
-  const_active_type_elem_iterator it(elements_begin(), type);
-  const_active_type_elem_iterator end(elements_end(), type);
+  const_active_type_elem_iterator       it (elements_begin(), type);
+  const const_active_type_elem_iterator end(elements_end(),   type);
+  
   for (; it!=end; ++it)
     cnt++;
     
@@ -274,8 +276,11 @@ unsigned int MeshBase::total_weight() const
 {
   unsigned int weight=0;
 
-  for (unsigned int e=0; e<n_elem(); e++)
-    weight += elem(e)->n_nodes();
+  const_elem_iterator       it (elements_begin());
+  const const_elem_iterator end(elements_end());
+
+  for ( ; it != end; ++it)
+    weight += (*it)->n_nodes();
   
   return weight;
 }
@@ -1054,8 +1059,8 @@ void MeshBase::distort(const Real factor,
   // so that we don't move them
   if (!perturb_boundary)
     {
-      active_elem_iterator it(elements_begin());
-      active_elem_iterator end(elements_end());
+      active_elem_iterator       it (elements_begin());
+      const active_elem_iterator end(elements_end());
       for (; it!=end; ++it)
 	for (unsigned int s=0; s<(*it)->n_sides(); s++)
 	  if ((*it)->neighbor(s) == NULL) // on the boundary
@@ -1070,8 +1075,8 @@ void MeshBase::distort(const Real factor,
 
   // Now calculate the minimum distance to
   // neighboring nodes for each node
-  active_elem_iterator it(elements_begin());
-  active_elem_iterator end(elements_end());
+  active_elem_iterator       it (elements_begin());
+  const active_elem_iterator end(elements_end());
   for (; it!=end; ++it)
     for (unsigned int n=0; n<(*it)->n_nodes(); n++)
       hmin[(*it)->node(n)] = std::min(hmin[(*it)->node(n)],
