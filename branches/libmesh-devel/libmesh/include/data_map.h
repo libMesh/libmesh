@@ -1,4 +1,4 @@
-// $Id: data_map.h,v 1.1.2.1 2003-05-09 12:55:39 benkirk Exp $
+// $Id: data_map.h,v 1.1.2.2 2003-05-09 14:18:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -50,7 +50,8 @@ public:
   virtual ~DataObjectBase () {}
   
   /**
-   * Returns the name of the class used in construction.
+   * Returns the name of the class used in the construction
+   * of derived objects.
    */
   const std::string & class_name () const { return _class_name; }
 
@@ -73,13 +74,17 @@ protected:
   static DataObjectBase* build (const T& data);
   
   /**
-   * Build an object of the requested type.
+   * Build an object of the requested type, taking a pointer
+   * to the type. For this to work properly we must be able
+   * to derive from \p T, and furthermore \p T needs an accessible
+   * default constructor.
    */
   template <typename T>
   static DataObjectBase* build (const T* data_ptr);
 
 
 private:
+
   
   /**
    * The class name.
@@ -87,7 +92,8 @@ private:
   const std::string _class_name;
     
   /**
-   * Friends 
+   * Friends.  The \p DataMap needs to call the
+   * \p DataObjectBase::build () members.
    */
   friend class DataMap;
 };
@@ -102,6 +108,8 @@ private:
 /**
  * Derived class.  Implements storage of arbtrary data types.
  * This class copies the data, so it is safe to use with literals.
+ * Since it copies the data be careful not to call this with
+ * heavy objects.
  */
 template <typename T>
 class DataObject : public DataObjectBase
@@ -110,6 +118,8 @@ private:
   
   /**
    * Construct from an object.  NOTE THAT THIS COPIES THE OBJECT!
+   * Tells the \p DataObjectBase class what type \p T is for
+   * possible debugging.
    */
   DataObject (const T& data) :
     DataObjectBase(typeid(T).name()),
@@ -127,7 +137,9 @@ private:
   const T _data;
 
   /**
-   * Friends 
+   * Friends.  These are the only classes that should
+   * ever be able to use one of these objects since the
+   * class is completely private.
    */
   friend class DataObjectBase;
   friend class DataMap;
@@ -139,7 +151,9 @@ private:
  * Derived class.  This class is multiply inherited based on input type,
  * so it is only safe to use with objects.  Furthermore, this class
  * must be able to inherit from \p T, and T needs an accessible default
- * constructor.
+ * constructor.  By inheriting from \p T a \p DataObjectPtr<T> can
+ * be successfully cast to a \p T or any related class via
+ * \p dynamic_cast<>
  */
 template <class T>
 class DataObjectPtr : public DataObjectBase, public T
@@ -160,7 +174,9 @@ private:
   const T* _data_ptr;
 
   /**
-   * Friends 
+   * Friend. This is the only class that should
+   * ever be able to use one of these objects since
+   * the class is completely private. 
    */
   friend class DataObjectBase;
 };
@@ -172,7 +188,12 @@ private:
 
 /**
  * Class that maps a string to an arbitrary data type with
- * type safety.
+ * type safety.  A \p DataMap can map a name to a copy of
+ * data or a name to a pointer to an object.  Which method
+ * is right for you depends on the data type.
+ *
+ * @author Michael Anderson, Bill Barth, Benjamin Kirk,
+ *  and John Peterson, 2003. 
  */
 class DataMap
 {
@@ -195,38 +216,48 @@ public:
   void clear ();
 
   /**
-   * Add the data \p data with the associated \p name;
+   * Add the data \p data with the associated \p name.
+   * This method will create a copy of the data.
    */
   template <typename T>
   void add_data (const std::string& name, const T& data);
   
   /**
-   * Add the data \p data with the associated \p name;
+   * Add the data \p data with the associated \p name.
+   * We must be able to derive from a \p T, and \p T
+   * must have an accessible default constructor.
    */
   template <typename T>
   void add_data_ptr (const std::string& name, const T* data_ptr);
   
   /**
    * Get the data specified by \p name.  The return type is
-   * specified by the template parameter.
+   * specified by the template parameter.  Note that \p T
+   * must be the same type that was used in the \p add_data()
+   * member.
    */
   template <typename T>
   const T & get_data (const std::string& name) const;
   
   /**
    * Get the data specified by \p name.  The return type is
-   * specified by the template parameter.
+   * specified by the template parameter.  Note that \p T
+   * may be any type that is related to the type used
+   * in the \p add_data() member.  
    */
   template <typename T>
   const T * get_data_ptr (const std::string& name) const;
-   
+
+  
 private:
 
+  
   /**
    * Data container.
    */
   std::map<std::string, DataObjectBase*> _data_map;
 };
+
 
 
 
