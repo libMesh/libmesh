@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.32 2004-03-18 15:10:32 jwpeterson Exp $
+// $Id: mesh.C,v 1.33 2004-03-19 19:16:52 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -27,15 +27,10 @@
 #include "mesh_communication.h"
 #include "libmesh_logging.h"
 
-
-#ifdef HAVE_SFCURVES
-// prototype for SFC code
-namespace sfc {
-  extern "C" {
-#include "sfcurves.h"
-  }
-}
-#endif
+#include "ucd_io.h"
+#include "unv_io.h"
+#include "tecplot_io.h"
+#include "tetgen_io.h"
 
 
 
@@ -80,7 +75,7 @@ void Mesh::read (const std::string& name)
 	this->read_matlab (name);
       
       else if (name.rfind(".ucd") < name.size())
-	this->read_ucd (name);
+	UCDIO (*this).read (name);
       
       else if (name.rfind(".exd") < name.size())
 	this->read_exd (name);
@@ -101,11 +96,11 @@ void Mesh::read (const std::string& name)
 	this->read_shanee (name);
       
       else if (name.rfind(".unv") < name.size())
-	this->read_unv (name);
+	UNVIO(*this).read (name);
       
       else if ((name.rfind(".node")  < name.size()) ||
 	       (name.rfind(".ele")   < name.size()))
-	this->read_tetgen (name);
+	TetGenIO(*this).read (name);
       
       else
 	{
@@ -149,13 +144,21 @@ void Mesh::write (const std::string& name)
   // Write the file based on extension
   {
     if (name.rfind(".dat") < name.size())
-      this->write_tecplot (name);
+      {
+	TecplotIO io(*this);
+	io.binary() = false;
+	io.write (name);
+      }
     
     else if (name.rfind(".plt") < name.size())
-      this->write_tecplot_binary (name);
-
+      {
+	TecplotIO io(*this);
+	io.binary() = true;
+	io.write (name);
+      }
+    
     else if (name.rfind(".ucd") < name.size())
-      this->write_ucd (name);
+      UCDIO (*this).write (name);
 
     else if (name.rfind(".gmv") < name.size())
       {
@@ -164,7 +167,6 @@ void Mesh::write (const std::string& name)
 	else
 	  this->write_gmv_binary(name);
       }
-
 
     else if (name.rfind(".ugrid") < name.size())
       this->write_diva (name);
@@ -176,7 +178,7 @@ void Mesh::write (const std::string& name)
       this->write_xdr_binary (name);
 
     else if (name.rfind(".unv") < name.size())
-      this->write_unv (name);
+      UNVIO (*this).write (name);
 
     else
       {
@@ -210,10 +212,18 @@ void Mesh::write (const std::string& name,
   // Write the file based on extension
   {
     if (name.rfind(".dat") < name.size())
-      this->write_tecplot (name, &v, &vn);
-    
-    else if (name.rfind(".plt") < name.size())
-      this->write_tecplot_binary (name, &v, &vn);
+      {
+	TecplotIO io(*this);
+	io.binary() = false;
+	io.write_nodal_data (name, v, vn);
+      }
+
+    if (name.rfind(".plt") < name.size())
+      {
+	TecplotIO io(*this);
+	io.binary() = true;
+	io.write_nodal_data (name, v, vn);
+      }
 
     else if (name.rfind(".gmv") < name.size())
       {

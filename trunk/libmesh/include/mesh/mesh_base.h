@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.8 2004-03-18 15:10:32 jwpeterson Exp $
+// $Id: mesh_base.h,v 1.9 2004-03-19 19:16:52 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -62,7 +62,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.8 $
+ * \version $Revision: 1.9 $
  */
 
 
@@ -499,49 +499,7 @@ public:
   virtual void write (const std::string& name,
 		      const std::vector<Number>& values,
 		      const std::vector<std::string>& variable_names);
-  
-  /**
-   * Write a Tecplot-formatted ASCII text file to the file specified by 
-   * \p name.  Writes both the mesh and the solution from \p es. 
-   */
-  void write_tecplot (const std::string& name,
-		      const EquationSystems& es) const;
-  
-  /**
-   * Write a Tecplot-formatted ASCII text file to the file specified by 
-   * \p name.  The optional parameters can be used to write nodal data 
-   * in addition to the mesh.
-   */
-  void write_tecplot (const std::string& name,
-		      const std::vector<Number>* v=NULL,
-		      const std::vector<std::string>* solution_names=NULL) const;
-  
-  /**
-   * Write a Tecplot-formatted binary file to the file specified by \p name.
-   * Also writes the solution from \p es.
-   * For this to work properly the Tecplot API must be available.  If the API 
-   * is not present this function will simply call the ASCII output version.
-   */
-  void write_tecplot_binary (const std::string& name,
-			     const EquationSystems& es) const;
-  
-  /**
-   * Write a Tecplot-formatted binary file to the file specified by \p name.
-   * The optional parameters can be used to write nodal data in addition to
-   * the mesh.
-   * For this to work properly the Tecplot API must be available.  If the API 
-   * is not present this function will simply call the ASCII output version.
-   */
-  void write_tecplot_binary (const std::string& name,
-			     const std::vector<Number>* v=NULL,
-			     const std::vector<std::string>* solution_names=NULL) const;
 
-  /**
-   * Write the mesh in AVS's UCD format to  the file specified by \p name.
-   * May be expanded in the future to handle data as well.
-   */
-  void write_ucd (const std::string& name) const;  
-  
   /**
    * Write the mesh in the GMV ASCII format to a file specified by \p name.
    * GMV is the General Mesh Viewer from
@@ -594,11 +552,6 @@ public:
 			 const std::vector<Number>* v=NULL,
 			 const std::vector<std::string>* solution_names=NULL,
 			 const bool write_partitioning=true) const;
-
-  /** 
-   * Write mesh to file specified by \p name in Universal (unv) format.
-   */
-  void write_unv (const std::string& name);
 
   /**
    * @returns a string containing relevant information
@@ -756,32 +709,6 @@ protected:
    * Implements the read process initiated by the associated public method.
    */
   void read_off (std::istream& in);
-  
-  /**
-   * Read meshes in AVS's UCD format from the file specified by \p name.
-   * For the format description see the AVS Developer's guide.
-   * This is the format of choice for reading meshes
-   * created by Gridgen, since that tool can output UCD files.
-   */
-  void read_ucd (const std::string& name);
-  
-  /**
-   * Read meshes in AVS's UCD format from a stream.
-   * Implements the read process initiated by the associated public method.
-   */
-  void read_ucd (std::istream& in);
-  
-  /** 
-   * Read mesh from the file specified by \p name in Universal (unv) format.  
-   */
-  void read_unv (const std::string& name);
-
-   /** 
-   * Read mesh from the file specified by \p name in TetGen format.
-	 * Both files (*.node and *.ele) are required. But only one works as 
-	 * parameter for the function. The other is determined at runtime.
-   */
-  void read_tetgen (const std::string& name);
 
   /**
    * Read a 2D mesh in the shanee format from the file specified
@@ -798,26 +725,6 @@ protected:
    * Implements the read process initiated by the associated public method.
    */
   void read_shanee (std::istream& in);
-
-  /**
-   * Write a Tecplot-formatted ASCII text file to a stream.  Fetches
-   * nodal data from \p es.
-   */
-  void write_tecplot (std::ostream& out,
-		      const EquationSystems& es) const;
-  
-  /**
-   * Actual Implementation of writing a Tecplot-formatted 
-   * ASCII text file to a stream.
-   */
-  void write_tecplot (std::ostream& out,
-		      const std::vector<Number>* v=NULL,
-		      const std::vector<std::string>* solution_names=NULL) const;
-
-  /**
-   * Actual implementation of writing a mesh in AVS's UCD format.
-   */
-  void write_ucd (std::ostream& out) const;
   
   /**
    * Write the mesh and solution from \p es in the GMV ASCII 

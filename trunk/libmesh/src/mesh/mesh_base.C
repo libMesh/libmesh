@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.68 2004-03-18 15:10:32 jwpeterson Exp $
+// $Id: mesh_base.C,v 1.69 2004-03-19 19:16:53 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -40,7 +40,6 @@
 #include "libmesh.h"
 #include "face_tri3.h"
 #include "face_tri6.h"
-//#include "petsc_matrix.h"
 #include "libmesh_logging.h"
 #include "metis_partitioner.h" // for default partitioning
 
@@ -1052,27 +1051,13 @@ void MeshBase::write(const std::string& name)
   START_LOG("write()", "MeshBase");
   
   // Write the file based on extension
-  {
-    if (name.rfind(".dat") < name.size())
-      this->write_tecplot (name);
-    
-    else if (name.rfind(".plt") < name.size())
-      this->write_tecplot_binary (name);
-
-    else if (name.rfind(".ucd") < name.size())
-      this->write_ucd (name);
-
-    else if (name.rfind(".gmv") < name.size())
-      {
-	if (n_subdomains() > 1)
-	  this->write_gmv_binary(name, NULL, NULL, true);
-	else
-	  this->write_gmv_binary(name);
-      }
-
-    else if (name.rfind(".unv") < name.size())
-      this->write_unv (name);
-  }
+  if (name.rfind(".gmv") < name.size())
+    {
+      if (n_subdomains() > 1)
+	this->write_gmv_binary(name, NULL, NULL, true);
+      else
+	this->write_gmv_binary(name);
+    }
 
   STOP_LOG("write()", "MeshBase");
 }
@@ -1086,21 +1071,13 @@ void MeshBase::write(const std::string& name,
   START_LOG("write()", "MeshBase");
   
   // Write the file based on extension
-  {
-    if (name.rfind(".dat") < name.size())
-      this->write_tecplot (name, &v, &vn);
-    
-    else if (name.rfind(".plt") < name.size())
-      this->write_tecplot_binary (name, &v, &vn);
-    
-    else if (name.rfind(".gmv") < name.size())
-      {
-	if (this->n_subdomains() > 1)
-	  this->write_gmv_binary(name, &v, &vn, true);
-	else
-	  this->write_gmv_binary(name, &v, &vn);
-      }
-  }
+  if (name.rfind(".gmv") < name.size())
+    {
+      if (this->n_subdomains() > 1)
+	this->write_gmv_binary(name, &v, &vn, true);
+      else
+	this->write_gmv_binary(name, &v, &vn);
+    }
 
   STOP_LOG("write()", "MeshBase");
 }

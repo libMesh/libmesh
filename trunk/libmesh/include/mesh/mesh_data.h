@@ -1,4 +1,4 @@
-// $Id: mesh_data.h,v 1.3 2004-01-03 15:37:42 benkirk Exp $
+// $Id: mesh_data.h,v 1.4 2004-03-19 19:16:52 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -39,8 +39,8 @@
 
 // Forward Declarations
 class MeshBase;
-class UnvMeshInterface;
-class TetGenMeshInterface;
+class UNVIO;
+class TetGenIO;
 class XdrInterface;
 class MeshDataUnvHeader;
 class MeshData;
@@ -615,16 +615,16 @@ protected:
   MeshDataUnvHeader* _unv_header;
 
   /**
-   * Make the mesh importer class \p UnvInterface friend, so
+   * Make the mesh importer class \p UNVIO a friend, so
    * that it can communicate foreign node ids to this class.
    */
-  friend class UnvMeshInterface;
+  friend class UNVIO;
 
   /**
-   * Make the mesh importer class \p TetGenInterface friend, so
+   * Make the mesh importer class \p TetGenIO friend, so
    * that it can communicate foreign node ids to this class.
    */
-  friend class TetGenMeshInterface;
+  friend class TetGenIO;
 
   /**
    * Make the mesh importer class \p XdrInterface friend, so
