@@ -1,4 +1,4 @@
-// $Id: cell_hex27.C,v 1.19 2003-09-02 18:02:42 benkirk Exp $
+// $Id: cell_hex27.C,v 1.20 2003-09-02 19:50:19 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -469,6 +469,9 @@ unsigned int Hex27::n_second_order_adjacent_vertices (const unsigned int n) cons
       default:
 	error();
     }
+
+  error();
+  return libMesh::invalid_uint;
 }
 
 

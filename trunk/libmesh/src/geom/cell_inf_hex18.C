@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex18.C,v 1.20 2003-09-02 18:02:42 benkirk Exp $
+// $Id: cell_inf_hex18.C,v 1.21 2003-09-02 19:50:19 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -275,6 +275,9 @@ unsigned int InfHex18::n_second_order_adjacent_vertices (const unsigned int n) c
       default:
 	error();
     }
+
+  error();
+  return libMesh::invalid_uint;
 }
 
 
