@@ -1,4 +1,4 @@
-// $Id: petsc_linear_solver.C,v 1.1 2005-01-03 00:06:49 benkirk Exp $
+// $Id: petsc_linear_solver.C,v 1.2 2005-01-03 20:16:07 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -69,13 +69,13 @@ void PetscLinearSolver<T>::clear ()
 template <typename T>
 void PetscLinearSolver<T>::init ()
 {
-  int ierr=0;
-  
   // Initialize the data structures if not done so already.
   if (!this->initialized())
     {
       this->_is_initialized = true;
-
+      
+      int ierr=0;
+  
 // 2.1.x & earlier style      
 #if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 1)
       
