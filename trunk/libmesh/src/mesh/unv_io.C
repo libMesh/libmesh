@@ -1,4 +1,4 @@
-// $Id: unv_io.C,v 1.1 2004-03-19 19:16:53 benkirk Exp $
+// $Id: unv_io.C,v 1.2 2004-03-21 04:20:40 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -75,8 +75,6 @@ void UNVIO::clear ()
 
 void UNVIO::read (const std::string& file_name)
 {
-  here();
-  
   if (file_name.rfind(".gz") < file_name.size())
     {
 #ifdef HAVE_GZSTREAM
@@ -275,8 +273,6 @@ void UNVIO::read_implementation (std::istream& in_stream)
 
 void UNVIO::write (const std::string& file_name)
 {
-  here();
-  
   if (file_name.rfind(".gz") < file_name.size())
     {
 #ifdef HAVE_GZSTREAM
