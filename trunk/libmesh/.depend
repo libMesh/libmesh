@@ -2731,7 +2731,6 @@ src/mesh/mesh_unv_support.$(obj-suffix):\
     src/mesh/mesh_unv_support.C\
     include/auto_ptr.h\
     include/boundary_info.h\
-    include/boundary_mesh.h\
     include/cell_hex.h\
     include/cell_hex20.h\
     include/cell_hex8.h\
@@ -2757,7 +2756,6 @@ src/mesh/mesh_unv_support.$(obj-suffix):\
     include/face_tri6.h\
     include/libmesh.h\
     include/libmesh_base.h\
-    include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
     include/mesh_communication.h\

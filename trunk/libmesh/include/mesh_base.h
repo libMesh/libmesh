@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.33 2003-06-25 19:53:04 jwpeterson Exp $
+// $Id: mesh_base.h,v 1.34 2003-07-12 16:56:39 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -64,7 +64,7 @@ template <typename T> class PetscMatrix;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.33 $
+ * \version $Revision: 1.34 $
  */
 
 
@@ -552,6 +552,15 @@ public:
 			 const std::vector<std::string>* solution_names=NULL,
 			 const bool write_partitioning=true);
 
+  /** 
+   * Write mesh to file specified by \p name in Universal (unv) format.
+   */
+  void write_unv (const std::string& name);
+
+  /** 
+   * Read mesh from the file specified by \p name in Universal (unv) format.  
+   */
+  void read_unv (const std::string& name);
 
   /**
    * @returns a string containing relevant information
