@@ -1,4 +1,4 @@
-/* $Id: ex9.C,v 1.10 2003-11-11 04:58:33 benkirk Exp $ */
+/* $Id: ex9.C,v 1.11 2003-11-11 14:18:13 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -86,16 +86,6 @@ Real exact_solution (const Real x,
 // since it was designed to be run only with real numbers.
 int main (int argc, char** argv)
 {
-#ifdef USE_COMPLEX_NUMBERS
-  
-  std::cerr << "ERROR: Not intended for use with complex numbers."
-	    << std::endl;
-  here();
-
-  return 0;
-  
-#else
-    
   // Initialize libMesh.
   libMesh::init (argc, argv);
 
@@ -226,8 +216,6 @@ int main (int argc, char** argv)
 
   // All done.  
   return libMesh::close ();
-  
-#endif
 }
 
 // We now define the function which provides the
@@ -237,8 +225,6 @@ int main (int argc, char** argv)
 void init_cd (EquationSystems& es,
 	      const std::string& system_name)
 {
-#ifndef USE_COMPLEX_NUMBERS
-  
   // It is a good idea to make sure we are initializing
   // the proper system.
   assert (system_name == "Convection-Diffusion");
@@ -253,7 +239,7 @@ void init_cd (EquationSystems& es,
   const DofMap& dof_map = system.get_dof_map();
   
   // Get a reference to the solution vector.
-  NumericVector<Real>& solution = *system.solution;
+  NumericVector<Number>& solution = *system.solution;
   
   // A vector to hold the global DOF indices for this element.
   std::vector<unsigned int> dof_indices;
@@ -301,8 +287,6 @@ void init_cd (EquationSystems& es,
   // the TransientSystem::update() member will do that
   // for us.
   system.update ();
-
-#endif 
 }
 
 
@@ -313,8 +297,6 @@ void init_cd (EquationSystems& es,
 void assemble_cd (EquationSystems& es,
 		  const std::string& system_name)
 {
-#ifndef USE_COMPLEX_NUMBERS
-  
   // It is a good idea to make sure we are assembling
   // the proper system.
   assert (system_name == "Convection-Diffusion");
@@ -367,8 +349,8 @@ void assemble_cd (EquationSystems& es,
   // and right-hand-side vector contribution.  Following
   // basic finite element terminology we will denote these
   // "Ke" and "Fe".
-  DenseMatrix<Real> Ke;
-  DenseVector<Real> Fe;
+  DenseMatrix<Number> Ke;
+  DenseVector<Number> Fe;
   
   // This vector will hold the degree of freedom indices for
   // the element.  These define where in the global system
@@ -429,8 +411,8 @@ void assemble_cd (EquationSystems& es,
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
 	{
 	  // Values to hold the old solution & its gradient.
-	  Real         u_old = 0.;
-	  RealGradient grad_u_old;
+	  Number   u_old = 0.;
+	  Gradient grad_u_old;
 	  
 	  // Compute the old solution & its gradient.
 	  for (unsigned int l=0; l<phi.size(); l++)
@@ -452,7 +434,9 @@ void assemble_cd (EquationSystems& es,
 				u_old*phi[i][qp] +
 				-.5*dt*(
 					// Convection term
-					(velocity*grad_u_old)*phi[i][qp] +
+					// (grad_u_old may be complex, so the
+					// order here is important!)
+					(grad_u_old*velocity)*phi[i][qp] +
 					
 					// Diffusion term
 					0.01*(grad_u_old*dphi[i][qp]))     
@@ -532,6 +516,4 @@ void assemble_cd (EquationSystems& es,
     }
   
   // That concludes the system matrix assembly routine.
-
-#endif
 }
