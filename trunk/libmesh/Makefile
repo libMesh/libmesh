@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.23 2003-10-02 03:39:24 jwpeterson Exp $
+# $Id: Makefile,v 1.24 2003-11-05 21:22:40 jwpeterson Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -149,8 +149,10 @@ log: $(loggedfiles)
 	cvs log $(loggedfiles) > cvs_log
 
 #
-# CVS documentation
-#
+# Web-based CVS documentation
+# Please note: SourceForge provides a nice web interface to the CVS
+# logs for the library.  You probably shouldn't need this target for
+# anything.
 cvsweb:
 	./contrib/bin/cvs2html -f -p -o doc/cvshtml/index.html -v -a -b -n 2 -C crono.html
 

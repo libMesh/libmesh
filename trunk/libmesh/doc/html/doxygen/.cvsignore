@@ -1,6 +1,7 @@
+*.html
 *.png
 *.gif
-doxygen.css 
+doxygen.css
 formula.repository
 graph_legend.dot
 ii_files
