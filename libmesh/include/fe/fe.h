@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.5 2004-03-21 03:19:25 benkirk Exp $
+// $Id: fe.h,v 1.6 2004-05-11 21:18:33 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -52,7 +52,7 @@ class InfFE;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.5 $
+ * \version $Revision: 1.6 $
  */
 
 //-------------------------------------------------------------
@@ -270,9 +270,6 @@ protected:
 
 #endif
 
-
-private:
-
   /**
    * @returns \p true when the shape functions (for
    * this \p FEFamily) depend on the particular 
@@ -345,7 +342,7 @@ private:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.5 $
+ * \version $Revision: 1.6 $
  */
 
 //-------------------------------------------------------------
@@ -370,7 +367,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.5 $
+ * \version $Revision: 1.6 $
  */
 
 //-------------------------------------------------------------
@@ -395,7 +392,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.5 $
+ * \version $Revision: 1.6 $
  */
 
 //-------------------------------------------------------------
@@ -421,7 +418,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.5 $
+ * \version $Revision: 1.6 $
  */
 
 //-------------------------------------------------------------
@@ -436,9 +433,16 @@ public:
    * to be used in dimension \p Dim.
    */
   FEXYZ(const FEType& fet);
+    
+  /**
+   * Reinitializes all the physical element-dependent data based on
+   * the \p side of \p face.
+   */
+  virtual void reinit (const Elem* elem,
+		       const unsigned int side);
 
-  
-private:
+
+protected:
     
   /** 
    * Update the various member data fields \p phi,
@@ -461,6 +465,12 @@ private:
    * it protected.
    */
   virtual void compute_shape_functions(const Elem*);
+
+  /**
+   * Compute the map & shape functions for this face.
+   */
+  void compute_face_values (const Elem* elem,
+			    const Elem* side);
 };
 
 

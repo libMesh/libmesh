@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.37 2004-03-31 04:05:59 jwpeterson Exp $
+# $Id: Makefile,v 1.38 2004-05-11 21:18:31 benkirk Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -96,7 +96,7 @@ echo:
 	@echo -e "Object Files:\n$(objects)\n"
 	@echo -e "Target:\n$(target)\n"
 	@echo -e "Examples Source Files:\n$(examplesrcfiles)\n"
-	@echo -e "CFLAGS:\n$(CXXFLAGS)\n"
+	@echo -e "CFLAGS:\n$(CFLAGS)\n"
 	@echo -e "CXXFLAGS:\n$(CXXFLAGS)\n"
 	@echo -e "INCLUDE:\n$(INCLUDE)\n"
 	@echo -e "LIBS:\n$(LIBS)\n"
@@ -122,13 +122,15 @@ echo_ldflags:
 	@echo -n " " $(LIBS) $(LDFLAGS) $(DLFLAGS) " "
 
 #	
-# Remove project object files for the current mode
+# Remove object files for the current mode
 #
 clean:
+	@$(MAKE) -C contrib $(MAKECMDGOALS)
+	@$(MAKE) -C examples $(MAKECMDGOALS)
 	@rm -f *~ include/*~ include/*/*~ src/*/*~ src/*/*.$(obj-suffix) doc/html/*~
 
 #
-# Make clean, remove contributed objects, and remove binaries
+# Make clean, remove all binaries and generated files.  Leaves libraries in-tact
 #
 clobber:
 	@$(MAKE) clean
@@ -137,7 +139,7 @@ clobber:
 	@rm -rf config.status $(targ_dir) bin/grid2grid bin/meshtool bin/testexodus bin/amr bin/compare
 
 #
-# Make clobber, remove documentation, removes all libraries
+# Make clobber, remove documentation, removes all libraries & object files for all modes
 # Should restore to a pristine state, except for files you
 # have added
 distclean:

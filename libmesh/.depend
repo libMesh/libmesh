@@ -687,6 +687,35 @@ src/fe/fe_szabab_shape_3D.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
     include/utils/perf_log.h
+src/fe/fe_xyz_boundary.$(obj-suffix):\
+    src/fe/fe_xyz_boundary.C\
+    include/base/auto_ptr.h\
+    include/base/dof_object.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_logging.h\
+    include/base/node.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
+    include/enums/enum_order.h\
+    include/enums/enum_quadrature_type.h\
+    include/enums/enum_solver_package.h\
+    include/fe/fe.h\
+    include/fe/fe_base.h\
+    include/fe/fe_macro.h\
+    include/fe/fe_type.h\
+    include/geom/elem.h\
+    include/geom/point.h\
+    include/numerics/type_vector.h\
+    include/numerics/vector_value.h\
+    include/quadrature/quadrature.h\
+    include/utils/perf_log.h
 src/fe/fe_xyz.$(obj-suffix):\
     src/fe/fe_xyz.C\
     include/base/auto_ptr.h\
