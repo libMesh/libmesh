@@ -15,21 +15,24 @@
 elisp_file=keywords.el
 compiled_elisp_file=keywords.elc
 
+# Set the location of the files to check
+files_location="../../../s3/include/*.h ../../include/*/*.h"
+
 # Write the elisp file header
 echo    "(provide 'keywords)" > $elisp_file
 echo    "(font-lock-add-keywords 'c++-mode " >> $elisp_file
 echo -n " '( (\"\\\\<\\\\(Real\\\\|Complex\\\\|Number\\\\|" >> $elisp_file
 
 # Get the class list and declare an array of class names
-class_list=`/usr/bin/ebrowse --very-verbose --output-file=/dev/null ../s3/include/*.h include/*/*.h`
+class_list=`/usr/bin/ebrowse --very-verbose --output-file=/dev/null $files_location`
 counter=0
 declare -a class_array
 
 # Get the enum list
-enum_list=`grep enum include/*/*.h -h | grep "[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]" | grep -v include | grep "{" | cut -d" " -f 4`
+enum_list=`grep enum $files_location -h | grep "[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]" | grep -v include | grep "{" | cut -d" " -f 4`
 
 # Get the namespace list
-namespace_list=`grep namespace include/*/*.h -h | grep "{" | cut -d" " -f 2`
+namespace_list=`grep namespace $files_location -h | grep "{" | cut -d" " -f 2`
 namespace_list=$namespace_list" libMeshPrivateData"
 
 # Throw the classes into the class_array.
