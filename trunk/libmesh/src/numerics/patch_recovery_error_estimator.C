@@ -1,4 +1,4 @@
-// $Id: patch_recovery_error_estimator.C,v 1.2 2004-06-02 20:55:17 jwpeterson Exp $
+// $Id: patch_recovery_error_estimator.C,v 1.3 2004-06-08 14:45:50 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -169,7 +169,9 @@ void PatchRecoveryErrorEstimator::estimate_error (const SteadySystem& system,
 		  Gradient grad_u_h;
 
 		  for (unsigned int i=0; i<n_dofs; i++)
-		    grad_u_h += dphi[i][qp]*system.current_solution(dof_indices[i]);
+		    // grad_u_h += dphi[i][qp]*system.current_solution(dof_indices[i]);
+		    grad_u_h.add_scaled (dphi[i][qp],
+				       system.current_solution(dof_indices[i]));
 
 		  // Construct the shape function values for the patch projection
 		  std::vector<Real> psi;
