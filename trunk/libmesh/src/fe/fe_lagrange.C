@@ -1,4 +1,4 @@
-// $Id: fe_lagrange.C,v 1.22 2005-02-28 18:16:39 roystgnr Exp $
+// $Id: fe_lagrange.C,v 1.23 2005-03-01 16:42:57 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -546,9 +546,7 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType,
 
 
 template <unsigned int Dim, FEFamily T>
-void FE<Dim,T>::compute_constraints (std::map<unsigned int,
-				            std::map<unsigned int,
-				                     float> > & constraints,
+void FE<Dim,T>::compute_constraints (DofConstraints &constraints,
 				     DofMap &dof_map,
 				     const unsigned int variable_number,
 				     const Elem* elem)
@@ -626,10 +624,10 @@ void FE<Dim,T>::compute_constraints (std::map<unsigned int,
 		      (std::abs(their_dof_value) < .999)) 
 		    {
 		      // A reference to the constraint row.
-		      std::map<unsigned int, float>& constraint_row = constraints[my_dof_g];
+		      DofConstraintRow& constraint_row = constraints[my_dof_g];
 		      
 		      constraint_row.insert(std::make_pair (their_dof_g,
-							    static_cast<float>(their_dof_value)));
+							    their_dof_value));
 		    }
 #ifdef DEBUG
 		  // Protect for the case u_i = 0.999 u_j,
