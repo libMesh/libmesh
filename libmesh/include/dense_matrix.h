@@ -1,4 +1,4 @@
-// $Id: dense_matrix.h,v 1.16 2003-03-11 23:36:41 ddreyer Exp $
+// $Id: dense_matrix.h,v 1.17 2003-03-18 18:20:14 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -27,11 +27,11 @@
 
 // Local Includes
 #include "mesh_common.h"
+#include "dense_vector.h"
 #include "dense_matrix_base.h"
 
 
 // Forward Declarations (for friends)
-
 
 
 
@@ -149,7 +149,7 @@ public:
   void condense(const unsigned int i,
 		const unsigned int j,
 		const T val,
-		std::vector<T>& rhs);
+		DenseVector<T>& rhs);
   
   
 private:
@@ -322,7 +322,7 @@ inline
 void DenseMatrix<T>::condense(const unsigned int iv,
 			      const unsigned int jv,
 			      const T val,
-			      std::vector<T>& rhs)
+			      DenseVector<T>& rhs)
 {
   assert (this->_m == rhs.size());
   assert (iv == jv);
@@ -332,7 +332,7 @@ void DenseMatrix<T>::condense(const unsigned int iv,
   // and zero the column
   for (unsigned int i=0; i<this->m(); i++)
     {
-      rhs[i] -= ((*this)(i,jv))*val;
+      rhs(i) -= ((*this)(i,jv))*val;
       (*this)(i,jv) = 0.;
     }
 
@@ -341,7 +341,7 @@ void DenseMatrix<T>::condense(const unsigned int iv,
     (*this)(iv,j) = 0.;
 
   (*this)(iv,jv) = 1.;
-  rhs[iv] = val;
+  rhs(iv) = val;
   
 }
 

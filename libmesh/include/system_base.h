@@ -1,4 +1,4 @@
-// $Id: system_base.h,v 1.7 2003-03-17 11:34:54 ddreyer Exp $
+// $Id: system_base.h,v 1.8 2003-03-18 18:20:15 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -126,6 +126,11 @@ public:
    */
   void update_global_solution (std::vector<Number>& global_soln,
 			       const unsigned int dest_proc) const;
+
+  /**
+   * @returns a constant reference to this systems's \p _mesh.
+   */
+  const Mesh & get_mesh() const { return _mesh; }
   
   /**
    * @returns a constant reference to this system's \p _dof_map.
