@@ -1,4 +1,4 @@
-// $Id: perf_log.h,v 1.5 2003-01-24 17:24:39 jwpeterson Exp $
+// $Id: perf_log.h,v 1.6 2003-02-06 23:28:46 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -181,6 +181,11 @@ class PerfLog
   const bool log_events;
 
   /**
+   * The total running time for recorded events.
+   */  
+  double total_time;
+  
+  /**
    * The time we were constructed or last cleared.
    */
   struct timeval tstart;
@@ -249,6 +254,7 @@ void PerfLog::stop_event(const std::string &label)
       const double elapsed_time = ((double) (tstop.tv_sec  - log[label].tstart.tv_sec)) +
 	                          ((double) (tstop.tv_usec - log[label].tstart.tv_usec))/1000000.;
 
+      total_time += elapsed_time;
       log[label].tot_time += elapsed_time;
       log[label].count++;	 
     }
