@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.14 2003-03-03 18:03:36 benkirk Exp $
+// $Id: fe_map.C,v 1.15 2003-03-04 15:31:22 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -40,7 +40,7 @@ void FEBase::compute_map(const std::vector<Real>& qw,
   /**
    * Start logging the map computation.
    */
-  libMesh::log.start_event("compute_map()", "FE");
+  START_LOG("compute_map()", "FE");
   
   const unsigned int        n_qp = qw.size();
 
@@ -366,7 +366,7 @@ void FEBase::compute_map(const std::vector<Real>& qw,
   /**
    * Stop logging the map computation.
    */
-  libMesh::log.stop_event("compute_map()", "FE");  
+  STOP_LOG("compute_map()", "FE");  
 }
 
 
@@ -490,7 +490,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
   /**
    * Start logging the map inversion.
    */
-  libMesh::log.start_event("inverse_map()", "FE");
+  START_LOG("inverse_map()", "FE");
   
   /**
    * How much did the point on the reference
@@ -800,7 +800,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
   /**
    * Stop logging the map inversion.
    */
-  libMesh::log.stop_event("inverse_map()", "FE");
+  STOP_LOG("inverse_map()", "FE");
   
   return p;
 }

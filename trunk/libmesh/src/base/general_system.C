@@ -1,4 +1,4 @@
-// $Id: general_system.C,v 1.8 2003-03-03 18:03:35 benkirk Exp $
+// $Id: general_system.C,v 1.9 2003-03-04 15:31:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -128,13 +128,13 @@ void GeneralSystem::assemble ()
   SystemBase::assemble();
 
   // Log how long the user's matrix assembly code takes
-  libMesh::log.start_event("assemble()", "GeneralSystem");
+  START_LOG("assemble()", "GeneralSystem");
   
   // Call the user-specified matrix assembly function
   this->assemble_fptr (equation_systems, this->name());
 
   // Stop logging the user code
-  libMesh::log.stop_event("assemble()", "GeneralSystem");
+  STOP_LOG("assemble()", "GeneralSystem");
 }
 
 
@@ -146,7 +146,7 @@ GeneralSystem::solve ()
   this->assemble (); 
 
   // Log how long the linear solve takes.
-  libMesh::log.start_event("solve()", "GeneralSystem");
+  START_LOG("solve()", "GeneralSystem");
   
   // Get the user-specifiied linear solver tolerance
   const Real tol            =
@@ -164,7 +164,7 @@ GeneralSystem::solve ()
   this->update ();
 
   // Stop logging the linear solve
-  libMesh::log.stop_event("solve()", "GeneralSystem");
+  STOP_LOG("solve()", "GeneralSystem");
 
   return rval; 
 }
