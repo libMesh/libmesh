@@ -1,4 +1,4 @@
-// $Id: parmetis_partitioner.h,v 1.1 2003-06-24 05:33:51 benkirk Exp $
+// $Id: parmetis_partitioner.h,v 1.2 2003-07-16 18:42:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -60,10 +60,56 @@ class ParmetisPartitioner : public Partitioner
   void repartition (const unsigned int n);
 
 private:
+
+// These methods & data only need to be available if the
+// ParMETIS library is available.
+#ifdef HAVE_PARMETIS
+
+  /**
+   * Initialize data structures.
+   */
+  void initialize (const unsigned int n_sbdmns);
   
+  /**
+   * Build the graph.
+   */
+  void build_graph ();
+
+  /**
+   * Assign the computed partitioning to the mesh.
+   */
+  void assign_partitioning ();
+
+  /**
+   * Maps active element ids into a contiguous range, as needed by ParMETIS.
+   */
+  std::vector<unsigned int> _forward_map;
+  unsigned int _first_local_elem;
+  
+  /**
+   * Data structures used by ParMETIS to describe the connectivity graph
+   * of the mesh.  Consult the ParMETIS documentation.
+   */
+  std::vector<int>    _vtxdist;
+  std::vector<int>    _xadj;
+  std::vector<int>    _adjncy;
+  std::vector<int>    _part;
+  std::vector<float>  _tpwgts;
+  std::vector<float>  _ubvec;
+  std::vector<int>    _options;
+  std::vector<int>    _vwgt;
+
+  int _wgtflag;
+  int _ncon;
+  int _numflag;
+  int _nparts;
+  int _edgecut;
+
+
+#endif
 };
 
 
 
 
-#endif // #define __sfc_partitioner_h__
+#endif // #define __parmetis_partitioner_h__
