@@ -1,4 +1,4 @@
-// $Id: mesh_tetgen_support.h,v 1.5 2004-05-09 15:40:22 fprill Exp $
+// $Id: mesh_tetgen_support.h,v 1.6 2004-05-13 15:58:52 spetersen Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -132,7 +132,7 @@ class TetGen1_wrapper : public TetGenWrapper
   TetGen1_wrapper();
 
   /** Destructor class */
-  ~TetGen1_wrapper();
+  virtual ~TetGen1_wrapper();
 
   void set_node(int i, REAL x, REAL y, REAL z);
   void set_hole(int i, REAL x, REAL y, REAL z);

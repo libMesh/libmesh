@@ -1,4 +1,4 @@
-// $Id: mesh_tetgen_support.C,v 1.5 2004-05-09 15:39:38 fprill Exp $
+// $Id: mesh_tetgen_support.C,v 1.6 2004-05-13 15:58:35 spetersen Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -397,7 +397,7 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh (double quality_con
     Elem* actual = current.back();
     visited.insert(actual);
     current.pop_back();
-    for (int i=0; i<actual->n_neighbors(); ++i) {
+    for (unsigned int i=0; i<actual->n_neighbors(); ++i) {
       int new_n = 0; // number of non-visited neighbours
       if (visited.find(actual->neighbor(i))==visited.end()) {
 	new_n++;
@@ -424,10 +424,10 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole
 
   // count number of facet elements:
   // (by the way check number of element neighbours - should be 3!)
-  int tri3_num  = 0;
-  int min_nb    = 4;
-  int total_num = _elements.size();  
-  for (int i=0; i<total_num; i++) {
+  unsigned int tri3_num  = 0;
+  unsigned int min_nb    = 4;
+  unsigned int total_num = _elements.size();  
+  for (unsigned int i=0; i<total_num; i++) {
     if (_elements[i]->type() == TRI3) { 
       tri3_num++;
       if (_elements[i]->n_neighbors() < min_nb) 
@@ -462,7 +462,7 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole
 
   // fill facetlist: each facet consists of only one polygon:
   int insertnum = 0;
-  for (int i=0; i<total_num; i++) {
+  for (unsigned int i=0; i<total_num; i++) {
     tetgen_wrapper.set_facet_polygonlist(insertnum, 1);
     tetgen_wrapper.set_polygon_vertexlist(insertnum, 0, 3);
     for (int j=0; j<3; j++)
