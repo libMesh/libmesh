@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.70 2005-03-01 01:32:00 roystgnr Exp $
+// $Id: dof_map.C,v 1.71 2005-03-01 17:43:54 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1053,7 +1053,7 @@ void DofMap::dof_indices (const Elem* const elem,
 	  }
 	else
 	  {
-	    assert(!elem->active());
+	    assert(!elem->active() || fe_type.family == LAGRANGE);
 	    di.resize(di.size() + nc, DofObject::invalid_id);
 	  }
       }
@@ -1173,7 +1173,7 @@ void DofMap::old_dof_indices (const Elem* const elem,
 	  }
 	else
 	  {
-	    assert(!elem->active());
+	    assert(!elem->active() || fe_type.family == LAGRANGE);
 	    di.resize(di.size() + nc, DofObject::invalid_id);
 	  }
       }
