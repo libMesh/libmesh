@@ -1,4 +1,4 @@
-// $Id: frequency_system.h,v 1.12 2003-07-07 21:01:30 ddreyer Exp $
+// $Id: frequency_system.h,v 1.13 2003-07-10 12:10:04 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -48,20 +48,21 @@
  * Generally two solution flavors are possible:
  *
  * - @e fast solution of moderately-sized systems:
- *   For moderate numbers of dof, it is possible to keep the mass, 
- *   damping and stiffness contribution of all elements in memory.
- *   These values may be stored in additional matrices.  The user-provided
- *   functions \p _assemble_fptr and \p _solve_fptr then should compute
- *   the element contributions, and simply add these contributions
- *   to give the frequency-dependent overall matrix, respectively.
- *   For details refer to the examples section.
+ *   For moderate numbers of dof, it is possible to keep 
+ *   frequency-independent matrices in memory.  For this,
+ *   simply provide multiple frequencies prior to \p ini().
+ *   Also provide functions \p _assemble_fptr and \p _solve_fptr 
+ *   that should compute the element contributions, and simply add 
+ *   these contributions to give the frequency-dependent overall 
+ *   matrix, respectively. For details see the examples section.
  *
- * - solution of @e large systems with some support for multiple frequencies:
+ * - solution of @e large systems:
  *   When there is not enough space to keep the frequency-independent
  *   contributions in memory, the user need only provide a function
  *   \p _solve_fptr which assembles the overall, frequency-dependent
  *   matrix for the current frequency given in the parameter section
  *   of \p EquationSystems<FrequencySystem> named \p current \p frequency.
+ *   For this to work, only provide @e one frequency.
  *
  * \author Daniel Dreyer, 2003
  */
@@ -87,15 +88,18 @@ public:
   
   /**
    * Clear all the data structures associated with
-   * the system. 
+   * the system, but leave the frequencies untouched.
+   * The frequencies belong to the \p EquationSystems
+   * object.
    */
   void clear ();
- 
-//   /**
-//    * Reinitializes the member data fields associated with
-//    * the system, so that, e.g., \p assemble() may be used.
-//    */
-//   void reinit ();
+  
+  /**
+   * The full clear method also clears the frequencies
+   * (stored as parameters of the \p EquationSystems
+   * object).
+   */
+  void clear_all ();
 
   /**
    * Assemble the linear system.  Does not
