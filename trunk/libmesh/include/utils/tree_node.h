@@ -1,4 +1,4 @@
-// $Id: tree_node.h,v 1.7 2004-07-26 16:27:48 jwpeterson Exp $
+// $Id: tree_node.h,v 1.8 2005-01-28 21:29:49 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -218,7 +218,7 @@ TreeNode<N>::TreeNode (const MeshBase& m,
   parent         (p),
   contains_ifems (false)
 {
-  // Assert our children are empty, thus we are active.
+  // assert our children are empty, thus we are active.
   assert (children.empty());
   assert (this->active());
   

@@ -1,4 +1,4 @@
-// $Id: statistics.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: statistics.h,v 1.3 2005-01-28 21:29:49 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,7 @@
 
 // C++ includes
 #include <vector>
-#include <math.h>
+#include <cmath>
 
 // Local includes
 #include "libmesh_common.h"
@@ -154,7 +154,7 @@ class StatisticsVector : public std::vector<T>
    * of the variance.
    */  
   virtual Real stddev() const
-  { return sqrt(this->variance()); }
+  { return std::sqrt(this->variance()); }
   
   /**
    * Computes the standard deviation of
@@ -163,7 +163,7 @@ class StatisticsVector : public std::vector<T>
    * efficiency when the \p mean has already been computed.
    */  
   virtual Real stddev(const Real mean) const
-  { return sqrt(this->variance(mean)); }
+  { return std::sqrt(this->variance(mean)); }
 
   /**
    * Computes and returns a histogram with

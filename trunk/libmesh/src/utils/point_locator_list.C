@@ -1,4 +1,4 @@
-// $Id: point_locator_list.C,v 1.10 2004-11-14 18:52:11 jwpeterson Exp $
+// $Id: point_locator_list.C,v 1.11 2005-01-28 21:29:52 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -163,7 +163,7 @@ const Elem* PointLocatorList::operator() (const Point& p) const
   // it!
   //
   // We _can_, however, use size_sq() instead of size()
-  // here to avoid repeated calls to sqrt(), which is
+  // here to avoid repeated calls to std::sqrt(), which is
   // pretty expensive.
   {
     std::vector<Point>& my_list = *(this->_list);

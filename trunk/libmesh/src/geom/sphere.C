@@ -1,4 +1,4 @@
-// $Id: sphere.C,v 1.11 2004-03-24 05:49:12 jwpeterson Exp $
+// $Id: sphere.C,v 1.12 2005-01-28 21:29:49 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -20,7 +20,7 @@
 
 
 // C++ includes
-#include <math.h> // for fabs
+#include <cmath> // for std::abs
 
 
 // Local includes
@@ -120,7 +120,7 @@ bool Sphere::on_surface (const Point& p) const
 
   // if the size of that vector is the same as the rad then
   // the point is on the surface.
-  if (fabs(w.size() - rad) < 1.e-10)
+  if (std::abs(w.size() - rad) < 1.e-10)
     return true;
 
   return false;

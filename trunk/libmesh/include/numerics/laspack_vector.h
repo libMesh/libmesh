@@ -1,4 +1,4 @@
-// $Id: laspack_vector.h,v 1.6 2005-01-03 00:06:48 benkirk Exp $
+// $Id: laspack_vector.h,v 1.7 2005-01-28 21:29:48 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -33,7 +33,7 @@
 
 
 // C++ includes
-#include <stdio.h> // for sprintf
+#include <cstdio> // for sprintf
 
 // Local includes
 #include "numeric_vector.h"

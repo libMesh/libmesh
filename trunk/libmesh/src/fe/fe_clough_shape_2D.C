@@ -1,4 +1,4 @@
-// $Id: fe_clough_shape_2D.C,v 1.2 2005-01-25 17:07:37 benkirk Exp $
+// $Id: fe_clough_shape_2D.C,v 1.3 2005-01-28 21:29:49 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -123,17 +123,17 @@ void clough_compute_coefs(const Elem* elem)
   // Calculate midpoint normal vectors
   Real N1x = dydeta[3] - dydxi[3];
   Real N1y = dxdxi[3] - dxdeta[3];
-  Real Nlength = sqrt(static_cast<Real>(N1x*N1x + N1y*N1y));
+  Real Nlength = std::sqrt(static_cast<Real>(N1x*N1x + N1y*N1y));
   N1x /= Nlength; N1y /= Nlength;
 
   Real N2x = - dydeta[4];
   Real N2y = dxdeta[4];
-  Nlength = sqrt(static_cast<Real>(N2x*N2x + N2y*N2y));
+  Nlength = std::sqrt(static_cast<Real>(N2x*N2x + N2y*N2y));
   N2x /= Nlength; N2y /= Nlength;
 
   Real N3x = dydxi[5];
   Real N3y = - dxdxi[5];
-  Nlength = sqrt(static_cast<Real>(N3x*N3x + N3y*N3y));
+  Nlength = std::sqrt(static_cast<Real>(N3x*N3x + N3y*N3y));
   N3x /= Nlength; N3y /= Nlength;
 
 //  for (int i=0; i != 6; ++i) {
@@ -591,9 +591,9 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
             case 0:
               return 0;
             case 1:
-              return sqrt(2.) * (8 - 10*xi - 14*eta);
+              return std::sqrt(2.) * (8 - 10*xi - 14*eta);
             case 2:
-              return sqrt(2.) * (-2*xi + 2*eta);
+              return std::sqrt(2.) * (-2*xi + 2*eta);
           }
       case 10:
         switch (subtriangle_lookup(p))
@@ -716,11 +716,11 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
         switch (subtriangle_lookup(p))
           {
             case 0:
-              return sqrt(2.) * (2*eta);
+              return std::sqrt(2.) * (2*eta);
             case 1:
-              return sqrt(2.) * (10 - 14*xi - 14*eta);
+              return std::sqrt(2.) * (10 - 14*xi - 14*eta);
             case 2:
-              return sqrt(2.) * (2*xi);
+              return std::sqrt(2.) * (2*xi);
           }
       case 10:
         switch (subtriangle_lookup(p))
@@ -842,9 +842,9 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
         switch (subtriangle_lookup(p))
           {
             case 0:
-              return sqrt(2.) * (2*xi - 2*eta);
+              return std::sqrt(2.) * (2*xi - 2*eta);
             case 1:
-              return sqrt(2.) * (8 - 14*xi - 10*eta);
+              return std::sqrt(2.) * (8 - 14*xi - 10*eta);
             case 2:
               return 0;
           }
@@ -1017,13 +1017,13 @@ Real clough_raw_shape_deriv(const unsigned int basis_num,
         switch (subtriangle_lookup(p))
           {
             case 0:
-              return sqrt(2.) * eta*eta;
+              return std::sqrt(2.) * eta*eta;
             case 1:
-              return sqrt(2.) * (-3 + 8*xi - 5*xi*xi
+              return std::sqrt(2.) * (-3 + 8*xi - 5*xi*xi
                 + 10*eta - 14*xi*eta
                 - 7*eta*eta);
             case 2:
-              return sqrt(2.) * (-xi*xi + 2*xi*eta);
+              return std::sqrt(2.) * (-xi*xi + 2*xi*eta);
           }
       case 10:
         switch (subtriangle_lookup(p))
@@ -1169,12 +1169,12 @@ Real clough_raw_shape_deriv(const unsigned int basis_num,
         switch (subtriangle_lookup(p))
           {
             case 0:
-              return sqrt(2.) * (2*xi*eta - eta*eta);
+              return std::sqrt(2.) * (2*xi*eta - eta*eta);
             case 1:
-              return sqrt(2.) * (- 3 + 10*xi - 7*xi*xi
+              return std::sqrt(2.) * (- 3 + 10*xi - 7*xi*xi
                 + 8*eta - 14*xi*eta - 5*eta*eta);
             case 2:
-              return sqrt(2.) * (xi*xi);
+              return std::sqrt(2.) * (xi*xi);
           }
       case 10:
         switch (subtriangle_lookup(p))
@@ -1346,13 +1346,13 @@ Real clough_raw_shape(const unsigned int basis_num,
         switch (subtriangle_lookup(p))
           {
             case 0:
-              return sqrt(2.) * (xi*eta*eta - 1./3.*eta*eta*eta);
+              return std::sqrt(2.) * (xi*eta*eta - 1./3.*eta*eta*eta);
             case 1:
-              return sqrt(2.) * (2./3. - 3*xi + 4*xi*xi - 5./3.*xi*xi*xi
+              return std::sqrt(2.) * (2./3. - 3*xi + 4*xi*xi - 5./3.*xi*xi*xi
                 - 3*eta + 10*xi*eta - 7*xi*xi*eta
                 + 4*eta*eta - 7*xi*eta*eta - 5./3.*eta*eta*eta);
             case 2:
-              return sqrt(2.) * (-1./3.*xi*xi*xi + xi*xi*eta);
+              return std::sqrt(2.) * (-1./3.*xi*xi*xi + xi*xi*eta);
           }
       case 10:
         switch (subtriangle_lookup(p))

@@ -1,4 +1,4 @@
-// $Id: sphere.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: sphere.h,v 1.3 2005-01-28 21:29:48 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -23,7 +23,7 @@
 #define __sphere_h__
 
 // C++ includes
-#include <math.h>
+#include <cmath>
 
 
 // Local includes
@@ -188,7 +188,7 @@ Point Sphere::surface_coords (const Point& cart) const
   const Real phi = atan2(c(1), c(0));
 
   return Point(/* radius */ c.size(),
-	       /* theta  */ atan2( sqrt( c(0)*c(0) + c(1)*c(1) ), c(2) ),
+	       /* theta  */ atan2( std::sqrt( c(0)*c(0) + c(1)*c(1) ), c(2) ),
 	       /* phi    */ ( (phi < 0)  ?  2.*libMesh::pi+phi  :  phi ) );
 }
 

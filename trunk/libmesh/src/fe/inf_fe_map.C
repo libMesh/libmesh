@@ -1,4 +1,4 @@
-// $Id: inf_fe_map.C,v 1.10 2004-01-03 15:37:43 benkirk Exp $
+// $Id: inf_fe_map.C,v 1.11 2005-01-28 21:29:49 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -352,7 +352,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 	    if (secure)
 	      {
 		assert (det > 0.);
-		assert (fabs(det) > 1.e-10);
+		assert (std::abs(det) > 1.e-10);
 	      }
 
 	    const Real inv_det = 1./det;

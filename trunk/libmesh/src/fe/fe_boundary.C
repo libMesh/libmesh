@@ -1,4 +1,4 @@
-// $Id: fe_boundary.C,v 1.29 2005-01-13 22:10:14 roystgnr Exp $
+// $Id: fe_boundary.C,v 1.30 2005-01-28 21:29:49 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -20,7 +20,7 @@
 
 
 // C++ includes
-#include <math.h> // for sqrt
+#include <cmath> // for std::sqrt
 
 
 // Local includes
@@ -330,8 +330,8 @@ void FEBase::compute_face_map(const std::vector<Real>& qw,
 	// compute the jacobian at the quadrature points
 	for (unsigned int p=0; p<n_qp; p++)
 	  {
-	    const Real jac = sqrt(dxdxi_map(p)*dxdxi_map(p) +
-				  dydxi_map(p)*dydxi_map(p));
+	    const Real jac = std::sqrt(dxdxi_map(p)*dxdxi_map(p) +
+				       dydxi_map(p)*dydxi_map(p));
 	    
 	    assert (jac > 0.);
 	    
@@ -436,7 +436,7 @@ void FEBase::compute_face_map(const std::vector<Real>& qw,
 			      dzdeta_map(p)*dzdeta_map(p));
 	    
 	    
-	    const Real jac = sqrt(g11*g22 - g12*g21);
+	    const Real jac = std::sqrt(g11*g22 - g12*g21);
 	    
 	    assert (jac > 0.);
 

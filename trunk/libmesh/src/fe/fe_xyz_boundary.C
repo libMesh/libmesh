@@ -1,4 +1,4 @@
-// $Id: fe_xyz_boundary.C,v 1.2 2004-07-12 22:56:18 jwpeterson Exp $
+// $Id: fe_xyz_boundary.C,v 1.3 2005-01-28 21:29:49 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -20,7 +20,7 @@
 
 
 // C++ includes
-#include <math.h> // for sqrt
+#include <cmath> // for std::sqrt
 
 
 // Local includes
@@ -189,8 +189,8 @@ void FEXYZ<Dim>::compute_face_values(const Elem* elem,
 	// compute the jacobian at the quadrature points
 	for (unsigned int p=0; p<n_qp; p++)
 	  {
-	    const Real jac = sqrt(this->dxdxi_map(p)*this->dxdxi_map(p) +
-				  this->dydxi_map(p)*this->dydxi_map(p));
+	    const Real jac = std::sqrt(this->dxdxi_map(p)*this->dxdxi_map(p) +
+				       this->dydxi_map(p)*this->dydxi_map(p));
 	    
 	    assert (jac > 0.);
 	    
@@ -313,7 +313,7 @@ void FEXYZ<Dim>::compute_face_values(const Elem* elem,
 			      this->dzdeta_map(p)*this->dzdeta_map(p));
 	    
 	    
-	    const Real jac = sqrt(g11*g22 - g12*g21);
+	    const Real jac = std::sqrt(g11*g22 - g12*g21);
 	    
 	    assert (jac > 0.);
 

@@ -1,4 +1,4 @@
-// $Id: mesh_refinement_flagging.C,v 1.13 2004-12-06 00:48:01 jwpeterson Exp $
+// $Id: mesh_refinement_flagging.C,v 1.14 2005-01-28 21:29:50 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -285,7 +285,7 @@ void MeshRefinement::flag_elements_by_mean_stddev (const ErrorVector& error_per_
   
   // Get the standard deviation.  This equals the
   // square-root of the variance
-  const Real stddev = sqrt (error_per_cell.variance());
+  const Real stddev = std::sqrt (error_per_cell.variance());
   
   // Check for valid fractions
   assert (refine_fraction  >= 0.);

@@ -1,4 +1,4 @@
-// $Id: type_tensor.h,v 1.2 2005-01-19 15:18:35 roystgnr Exp $
+// $Id: type_tensor.h,v 1.3 2005-01-28 21:29:48 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -23,7 +23,7 @@
 #define __type_tensor_h__
 
 // C++ includes
-#include <math.h>
+#include <cmath>
 #include <iostream>
 
 // Local includes
@@ -701,7 +701,7 @@ template <typename T>
 inline
 Real TypeTensor<T>::size() const
 {
-  return sqrt(this->size_sq());  
+  return std::sqrt(this->size_sq());  
 }
 
 
@@ -749,28 +749,28 @@ inline
 bool TypeTensor<Real>::operator == (const TypeTensor<Real>& rhs) const
 {
 #if DIM == 1
-  return (fabs(_coords[0] - rhs._coords[0])
+  return (std::abs(_coords[0] - rhs._coords[0])
 	  < TOLERANCE);
 #endif
   
 #if DIM == 2
-  return ((fabs(_coords[0] - rhs._coords[0]) +
-	   fabs(_coords[1] - rhs._coords[1]) +
-	   fabs(_coords[2] - rhs._coords[2]) +
-	   fabs(_coords[3] - rhs._coords[3]))
+  return ((std::abs(_coords[0] - rhs._coords[0]) +
+	   std::abs(_coords[1] - rhs._coords[1]) +
+	   std::abs(_coords[2] - rhs._coords[2]) +
+	   std::abs(_coords[3] - rhs._coords[3]))
 	  < 4.*TOLERANCE);
 #endif
   
 #if DIM == 3
-  return ((fabs(_coords[0] - rhs._coords[0]) +
-	   fabs(_coords[1] - rhs._coords[1]) +
-	   fabs(_coords[2] - rhs._coords[2]) +
-	   fabs(_coords[3] - rhs._coords[3]) +
-	   fabs(_coords[4] - rhs._coords[4]) +
-	   fabs(_coords[5] - rhs._coords[5]) +
-	   fabs(_coords[6] - rhs._coords[6]) +
-	   fabs(_coords[7] - rhs._coords[7]) +
-	   fabs(_coords[8] - rhs._coords[8]))
+  return ((std::abs(_coords[0] - rhs._coords[0]) +
+	   std::abs(_coords[1] - rhs._coords[1]) +
+	   std::abs(_coords[2] - rhs._coords[2]) +
+	   std::abs(_coords[3] - rhs._coords[3]) +
+	   std::abs(_coords[4] - rhs._coords[4]) +
+	   std::abs(_coords[5] - rhs._coords[5]) +
+	   std::abs(_coords[6] - rhs._coords[6]) +
+	   std::abs(_coords[7] - rhs._coords[7]) +
+	   std::abs(_coords[8] - rhs._coords[8]))
 	  < 9.*TOLERANCE);
 #endif
   

@@ -1,4 +1,4 @@
-// $Id: plt_loader_read.C,v 1.3 2004-11-08 00:11:06 jwpeterson Exp $
+// $Id: plt_loader_read.C,v 1.4 2005-01-28 21:29:52 benkirk Exp $
 
 // Copyright (C) 2002-2004  Benjamin S. Kirk
   
@@ -19,7 +19,7 @@
 
 // C++ includes
 #include <fstream>
-#include <string.h>
+#include <cstring>
 
 // Local includes
 #include "utility.h"

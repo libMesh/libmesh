@@ -1,4 +1,4 @@
-// $Id: gmv_io.C,v 1.17 2004-11-17 07:52:17 benkirk Exp $
+// $Id: gmv_io.C,v 1.18 2005-01-28 21:29:50 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -25,8 +25,8 @@
 
 // C++ includes
 #include <fstream>
-#include <string.h> // for strcpy, memcpy
-#include <stdio.h>  // for sprintf
+#include <cstring> // for strcpy, memcpy
+#include <cstdio>  // for sprintf
 #include <vector>
 
 // Local includes

@@ -1,4 +1,4 @@
-// $Id: kelly_error_estimator.C,v 1.5 2005-01-06 21:55:04 benkirk Exp $
+// $Id: kelly_error_estimator.C,v 1.6 2005-01-28 21:29:51 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -20,7 +20,7 @@
 
 // C++ includes
 #include <algorithm> // for std::fill
-#include <math.h>    // for sqrt
+#include <cmath>    // for sqrt
 
 
 // Local Includes
@@ -277,7 +277,7 @@ void KellyErrorEstimator::estimate_error (const System& system,
   // Compute the square-root of each component.
   for (unsigned int i=0; i<error_per_cell.size(); i++)
     if (error_per_cell[i] != 0.)
-      error_per_cell[i] = sqrt(error_per_cell[i]);
+      error_per_cell[i] = std::sqrt(error_per_cell[i]);
   
   STOP_LOG("flux_jump()", "KellyErrorEstimator");
 }

@@ -1,4 +1,4 @@
-// $Id: exact_solution.C,v 1.7 2004-11-14 18:52:11 jwpeterson Exp $
+// $Id: exact_solution.C,v 1.8 2005-01-28 21:29:52 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -150,7 +150,7 @@ Number ExactSolution::l2_error(const std::string& sys_name,
   
   // Return the square root of the first component of the
   // computed error.
-  return sqrt(error_pair.first);
+  return std::sqrt(error_pair.first);
 }
 
 
@@ -177,7 +177,7 @@ Number ExactSolution::h1_error(const std::string& sys_name,
 							     unknown_name);
   
   // Return the square root of the sum of the computed errors.
-  return sqrt(error_pair.first + error_pair.second);
+  return std::sqrt(error_pair.first + error_pair.second);
 }
 
 
