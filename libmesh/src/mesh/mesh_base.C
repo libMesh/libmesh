@@ -1,6 +1,6 @@
 
 
-// $Id: mesh_base.C,v 1.35 2003-05-23 03:21:47 benkirk Exp $
+// $Id: mesh_base.C,v 1.36 2003-05-23 14:28:40 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -391,8 +391,8 @@ void MeshBase::find_neighbors()
   START_LOG("find_neighbors()", "MeshBase");
   
   // data structures
-  typedef std::pair<unsigned int, Elem*> key_val_pair;
-  std::multimap<unsigned int, Elem*>     side_to_elem;
+  typedef std::pair<unsigned int, std::pair<Elem*, unsigned char> > key_val_pair;
+  std::multimap<unsigned int, std::pair<Elem*, unsigned char> >     side_to_elem;
   
   //TODO [BSK]: This should be removed later?!
   for (unsigned int e=0; e<n_elem(); e++)
@@ -420,60 +420,56 @@ void MeshBase::find_neighbors()
 		const unsigned int key = my_side->key();
 		
 		// Look for elements that have an identical side key
-		std::pair <std::multimap<unsigned int, Elem*>::iterator,
-		  std::multimap<unsigned int, Elem*>::iterator >
+		std::pair <std::multimap<unsigned int, std::pair<Elem*, unsigned char> >::iterator,
+		           std::multimap<unsigned int, std::pair<Elem*, unsigned char> >::iterator >
 		  bounds = side_to_elem.equal_range(key);
 		
-		// If no side corresponding to the key was found...
-		if (bounds.first == bounds.second)
+		// May be multiple keys, check all the possible
+		// elements which _might_ be neighbors.
+		if (bounds.first != bounds.second)
 		  {
-		    // use the lower bound as a hint for
-		    // where to put it.
-		    side_to_elem.insert (bounds.first,
-					 key_val_pair(key, element));	      
-		  }
-		
-		// Otherwise may be multiple keys, check all the possible
-		// elements which _might_ be neighbors.  Be sure not to check
-		// the element of interest to avoid a false match!
-		else
-		  {
-		    for (std::multimap<unsigned int, Elem*>::iterator
+		    for (std::multimap<unsigned int, std::pair<Elem*, unsigned char> >::iterator
 			   it = bounds.first; it != bounds.second; ++it)
-		      if (it->second != element)
-			{
-			  Elem* neighbor = it->second;
-			  
-			  // look at all their sides
-			  for (unsigned int ns=0; ns<neighbor->n_neighbors(); ns++) 
-			    {
-			      const AutoPtr<Elem> their_side(neighbor->side(ns));
-			      
-			      // and find a match with my side
-			      if (*my_side == *their_side) 
-				{
-				  // So we are neighbors. Tell the other
-				  // element to avoid duplicate searches.
-				  element->set_neighbor (ms,neighbor);
-				  neighbor->set_neighbor(ns,element);
-				  
-				  side_to_elem.erase (it);
-				  
-				  // get out of this nested crap
-				  goto next_side; 
-				}
-			    }
-			}
-		    
-		    // didn't find a match...
-		    side_to_elem.insert (bounds.first,
-					 key_val_pair(key, element));
+		      {
+			// Get the potential element
+			Elem* neighbor = it->second.first;
+			
+			// Get the side
+			const unsigned int ns = it->second.second;
+			const AutoPtr<Elem> their_side(neighbor->side(ns));
+			
+			// If found a match with my side
+			if (*my_side == *their_side) 
+			  {
+			    // So we are neighbors. Tell the other element 
+			    element->set_neighbor (ms,neighbor);
+			    neighbor->set_neighbor(ns,element);
+			    
+			    side_to_elem.erase (it);
+			    
+			    // get out of this nested crap
+			    goto next_side; 
+			  }
+		      }
 		  }
+		    
+		// didn't find a match...
+		// Build the map entry for this element
+		key_val_pair kvp;
+		
+		kvp.first         = key;
+		kvp.second.first  = element;
+		kvp.second.second = ms;
+		
+		// use the lower bound as a hint for
+		// where to put it.
+		side_to_elem.insert (bounds.first, kvp);
 	      }
 	  }
       }
   }
-  
+
+  // Explicitly clear the map.  It could be big!
   side_to_elem.clear();
 
   
