@@ -3,6 +3,9 @@
 /* This compiler is known not to support some iostream functionality */
 #undef BROKEN_IOSTREAM
 
+/* Flag indicating if the library should be built with 2D support only */
+#undef DIM
+
 /* Flag indicating if the library should be built with AMR support */
 #undef ENABLE_AMR
 
