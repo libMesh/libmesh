@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.15 2005-02-25 19:15:41 roystgnr Exp $
+// $Id: elem.h,v 1.16 2005-03-22 22:01:54 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -535,8 +535,14 @@ public:
    * Useful iterator typedefs
    */
   typedef Predicates::multi_predicate Predicate;
-  typedef variant_filter_iterator<Elem*, Predicate> side_iterator;
+  //typedef variant_filter_iterator<Elem*, Predicate> side_iterator;
 
+  /**
+   * Data structure for iterating over sides.  Defined at the end of
+   * this header file.
+   */
+  struct side_iterator;
+  
   /**
    * Iterator accessor functions
    */
@@ -1111,7 +1117,22 @@ unsigned int Elem::compute_key (unsigned int n0,
 
 
 
-
+/**
+ * The definition of the struct used for iterating over sides.
+ */
+struct
+Elem::side_iterator :
+variant_filter_iterator<Elem::Predicate,
+			Elem*>
+{
+  // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
+  template <typename PredType, typename IterType>
+  side_iterator (const IterType& d,
+		 const IterType& e,
+		 const PredType& p ) :
+    variant_filter_iterator<Elem::Predicate,
+			    Elem*>(d,e,p) {}
+};
 
 
 

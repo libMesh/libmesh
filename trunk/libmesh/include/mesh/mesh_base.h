@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.40 2005-03-21 15:19:28 benkirk Exp $
+// $Id: mesh_base.h,v 1.41 2005-03-22 22:01:55 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -62,8 +62,8 @@ class EquationSystems;
  * mesh to disk in various formats.
  *
  * \author  Benjamin S. Kirk
- * \date    $Date: 2005-03-21 15:19:28 $
- * \version $Revision: 1.40 $
+ * \date    $Date: 2005-03-22 22:01:55 $
+ * \version $Revision: 1.41 $
  */
 
 
@@ -345,20 +345,26 @@ public:
   typedef Predicates::multi_predicate Predicate;
 
   /**
-   * Convenient typedefs for the element_iterators returned by the accessor functions.
+   * structs for the element_iterator's.
    * Note that these iterators were designed so that derived mesh classes could use the
-   * _same_ typedefs.
+   * _same_ base class iterators interchangeably.  Their definition comes later in the
+   * header file.
    */
-  typedef variant_filter_iterator<Elem*      , Predicate>       element_iterator;
-  typedef variant_filter_iterator<Elem* const, Predicate> const_element_iterator;
+  struct element_iterator;
+  struct const_element_iterator;
+  //typedef variant_filter_iterator<Elem*      , Predicate>       element_iterator;
+  //typedef variant_filter_iterator<Elem* const, Predicate> const_element_iterator;
 
   /**
-   * Convenient typedefs for the node_iterators returned by the accessor functions.
-   * Note that these iterators were designed so that derived classes could use the
-   * _same_ typedefs.
+   * structs for the node_iterator's.
+   * Note that these iterators were designed so that derived mesh classes could use the
+   * _same_ base class iterators interchangeably.  Their definition comes later in the
+   * header file.
    */
-  typedef variant_filter_iterator<Node*      , Predicate>       node_iterator;
-  typedef variant_filter_iterator<Node* const, Predicate> const_node_iterator;
+  struct node_iterator;
+  struct const_node_iterator;
+  //typedef variant_filter_iterator<Node*      , Predicate>       node_iterator;
+  //typedef variant_filter_iterator<Node* const, Predicate> const_node_iterator;
 
 private:
   /**
@@ -377,11 +383,6 @@ private:
 
 
 public:
-
-  
-
-
-
 
 
   
@@ -655,7 +656,119 @@ Node* & MeshBase::node_ptr (const unsigned int i)
 
 
 
+/**
+ * The definition of the element_iterator struct.
+ */
+struct
+MeshBase::element_iterator :
+variant_filter_iterator<MeshBase::Predicate,
+			Elem*>
+{
+  // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
+  template <typename PredType, typename IterType>
+  element_iterator (const IterType& d,
+		    const IterType& e,
+		    const PredType& p ) :
+    variant_filter_iterator<MeshBase::Predicate,
+			    Elem*>(d,e,p) {}
+};
 
+
+
+
+/**
+ * The definition of the const_element_iterator struct.  It is similar to the regular
+ * iterator above, but also provides an additional conversion-to-const ctor.
+ */
+struct
+MeshBase::const_element_iterator :
+variant_filter_iterator<MeshBase::Predicate,
+			Elem* const,
+			Elem* const&,
+			Elem* const*>
+{
+  // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
+  template <typename PredType, typename IterType>
+  const_element_iterator (const IterType& d,
+			  const IterType& e,
+			  const PredType& p ) :
+    variant_filter_iterator<MeshBase::Predicate,
+			    Elem* const,
+			    Elem* const&,
+			    Elem* const*>(d,e,p)  {}
+
+
+  // The conversion-to-const ctor.  Takes a regular iterator and calls the appropriate
+  // variant_filter_iterator copy constructor.  Note that this one is *not* templated!
+  const_element_iterator (const MeshBase::element_iterator& rhs) :
+    variant_filter_iterator<Predicate,
+			    Elem* const,
+			    Elem* const&,
+			    Elem* const*>(rhs)
+  {
+    std::cout << "Called element_iterator conversion-to-const ctor." << std::endl;
+  }
+};
+
+
+
+
+
+
+
+/**
+ * The definition of the node_iterator struct.
+ */
+struct
+MeshBase::node_iterator :
+variant_filter_iterator<MeshBase::Predicate,
+			Node*>
+{
+  // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
+  template <typename PredType, typename IterType>
+  node_iterator (const IterType& d,
+		 const IterType& e,
+		 const PredType& p ) :
+    variant_filter_iterator<MeshBase::Predicate,
+			    Node*>(d,e,p) {}
+};
+
+
+
+
+/**
+ * The definition of the const_node_iterator struct.  It is similar to the regular
+ * iterator above, but also provides an additional conversion-to-const ctor.
+ */
+struct
+MeshBase::const_node_iterator :
+variant_filter_iterator<MeshBase::Predicate,
+			Node* const,
+			Node* const &,
+			Node* const *>
+{
+  // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
+  template <typename PredType, typename IterType>
+  const_node_iterator (const IterType& d,
+		       const IterType& e,
+		       const PredType& p ) :
+    variant_filter_iterator<MeshBase::Predicate,
+			    Node* const,
+			    Node* const &,
+			    Node* const *>(d,e,p)  {}
+
+
+  // The conversion-to-const ctor.  Takes a regular iterator and calls the appropriate
+  // variant_filter_iterator copy constructor.  Note that this one is *not* templated!
+  const_node_iterator (const MeshBase::node_iterator& rhs) :
+    variant_filter_iterator<Predicate,
+			    Node* const,
+			    Node* const &,
+			    Node* const *>(rhs)
+  {
+    std::cout << "Called node_iterator conversion-to-const ctor." << std::endl;
+  }
+};
 
 
 #endif
