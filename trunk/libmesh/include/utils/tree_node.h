@@ -1,4 +1,4 @@
-// $Id: tree_node.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: tree_node.h,v 1.3 2004-03-08 02:10:04 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -243,7 +243,14 @@ unsigned int TreeNode<N>::level () const
   else
     return parent->level()+1;
 
+  // I have NO idea why error() doesn't work here for the Sun compiler!
+#ifndef __SUNPRO_CC
   error();
+#else
+  here();
+  abort();
+#endif
+
   return libMesh::invalid_uint;
 }
 

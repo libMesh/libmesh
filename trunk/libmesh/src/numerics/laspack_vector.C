@@ -1,4 +1,4 @@
-// $Id: laspack_vector.C,v 1.21 2004-02-10 13:28:07 benkirk Exp $
+// $Id: laspack_vector.C,v 1.22 2004-03-08 02:10:04 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -277,16 +277,15 @@ void LaspackVector<T>::localize_to_one (std::vector<T>& v_local,
 #ifdef USE_REAL_NUMBERS
 
 template <> 
-inline
 Real LaspackVector<Real>::min () const
 {
   assert (this->initialized());
 
-  Real min = 1.e30;
+  Real min = (*this)(0);
 
   const unsigned int n = this->size();
   
-  for (unsigned int i=0; i<n; i++)
+  for (unsigned int i=1; i<n; i++)
     min = std::min (min, (*this)(i));
 
   return min;
@@ -301,16 +300,15 @@ Real LaspackVector<Real>::min () const
 #ifdef USE_COMPLEX_NUMBERS
 
 template <> 
-inline
 Real LaspackVector<Complex>::min () const
 {
   assert (this->initialized());
 
-  Real min = 1.e30;
+  Real min = (*this)(0);
 
   const unsigned int n = this->size();
   
-  for (unsigned int i=0; i<n; i++)
+  for (unsigned int i=1; i<n; i++)
     min = std::min (min, (*this)(i).real() );
 
   return min;

@@ -1,4 +1,4 @@
-// $Id: getpot.h,v 1.2 2004-02-25 03:44:44 benkirk Exp $
+// $Id: getpot.h,v 1.3 2004-03-08 02:10:04 benkirk Exp $
 //
 // (with patches from Michael Anderson for more general variable types)
 
@@ -27,7 +27,7 @@
 #ifndef __GETPOT_H__
 #define __GETPOT_H__
 
-#if defined(WIN32) || defined(SOLARIS_RAW) || (__GNUC__ == 2) || defined(__HP_aCC) || defined (__CYGWIN__)
+#if defined(WIN32) || defined(SOLARIS_RAW) || defined(__SUNPRO_CC) || (__GNUC__ == 2) || defined(__HP_aCC) || defined (__CYGWIN__)
 #  define strtok_r(a, b, c) strtok(a, b)
 #endif // WINDOWS or SOLARIS or gcc 2.* or HP aCC or CYGWIN
 
@@ -37,6 +37,7 @@
 extern "C" {
 #include <ctype.h> 
 #include <stdio.h>
+#include <string.h>
 
 #ifdef GETPOT_ALLOW_VARGS
 #  include <stdarg.h>
