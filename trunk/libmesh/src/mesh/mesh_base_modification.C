@@ -1,4 +1,4 @@
-// $Id: mesh_base_modification.C,v 1.1 2003-08-07 19:25:31 ddreyer Exp $
+// $Id: mesh_base_modification.C,v 1.2 2003-08-08 09:13:24 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -64,19 +64,51 @@ void MeshBase::all_second_order ()
    * is uniquely defined through a set of adjacent
    * vertices.  This set of adjacent vertices is
    * used to identify already added higher-order
-   * nodes
+   * nodes.  We are safe to use node id's since we
+   * make sure that these are correctly numbered.
    */
-//  std::map<std::vector<Node*>, Node*> adj_vertices_to_so_nodes;
-  // since we assert _is_prepared, the nodes are correctly numbered
-  // use these global id's, instead of Node* here
   std::map<std::vector<unsigned int>, Node*> adj_vertices_to_so_nodes;
 
 
   /*
-   * we will have to add nodes, so remember
-   * the next free node id
+   * for speed-up of the \p add_point() method, we
+   * can reserve memory.  Guess the number of additional
+   * nodes for different dimensions
    */
-  unsigned int next_free_node_id = this->n_nodes();
+  switch (this->mesh_dimension())
+  {
+    case 1:
+      /*
+       * in 1D, there can only be order-increase from Edge2
+       * to Edge3.  Something like 1/2 of n_nodes() have
+       * to be added
+       */
+      this->_nodes.reserve(static_cast<unsigned int>(1.5*this->_nodes.size()));
+      break;
+
+    case 2:
+      /*
+       * in 2D, either refine from Tri3 to Tri6 (double the nodes)
+       * or from Quad4 to Quad8 (again, double) or Quad9 (2.25 that much)
+       */
+      this->_nodes.reserve(static_cast<unsigned int>(2*this->_nodes.size()));
+      break;
+
+
+    case 3:
+      /*
+       * in 3D, either refine from Tet4 to Tet10 (factor = 2.5) up to
+       * Hex8 to Hex27 (something  > 3).  Since in 3D there _are_ already
+       * quite some nodes, and since we do not want to overburden the memory by
+       * a too conservative guess, use the lower bound
+       */
+      this->_nodes.reserve(static_cast<unsigned int>(2.5*this->_nodes.size()));
+      break;
+	
+    default:
+	  // Hm?
+	  error();
+  }
 
 
 
@@ -145,6 +177,14 @@ void MeshBase::all_second_order ()
 	  for (unsigned int v=0; v<n_adjacent_vertices; v++)
 	      adjacent_vertices_ids[v] = so_elem->node( so_elem->second_order_adjacent_vertex(son,v) );
 
+	  /*
+	   * \p adjacent_vertices_ids is now in order of the current
+	   * side.  sort it, so that comparisons  with the 
+	   * \p adjacent_vertices_ids created through other elements' 
+	   * sides can match
+	   */
+	  std::sort(adjacent_vertices_ids.begin(), adjacent_vertices_ids.end());
+
 
 	  // does this set of vertices already has a mid-node added?
 	  std::map<std::vector<unsigned int>, Node*>::const_iterator pos =  
@@ -165,9 +205,8 @@ void MeshBase::all_second_order ()
 
 	      new_location /= static_cast<Real>(n_adjacent_vertices);
 
-	      // build the node
-	      Node* so_node = Node::build(new_location,
-					  next_free_node_id++);
+	      // add the new point to the mesh
+	      Node* so_node = this->add_point (new_location);
 
 	      /* 
 	       * insert the new node with its defining vertex
@@ -194,9 +233,12 @@ void MeshBase::all_second_order ()
     }
 
 
+  // we can clear the map
+  adj_vertices_to_so_nodes.clear();
+
 
   /*
-   * Now, the \p _elements vector has to be replaced
+   * the \p _elements vector has to be replaced
    * by the \p new_elements vector.  Delete the
    * old element, then put the new element in place.
    */
@@ -210,30 +252,6 @@ void MeshBase::all_second_order ()
 
     // now we can safely clear our local \p new_elements vector
     new_elements.clear();
-  }
-
-
-  /*
-   * The nodes are not that easily updated as the 
-   * elements.  We have to keep the old nodes,
-   * @e and add the new nodes, for which pointers
-   * are currently only stored in the map
-   * \p adj_vertices_to_so_nodes
-   */
-  {
-    // first reserve memory for @e all nodes
-    const unsigned int n_all_nodes = this->n_nodes() + adj_vertices_to_so_nodes.size();
-    _nodes.reserve(n_all_nodes);
-
-    std::map<std::vector<unsigned int>, Node*>::const_iterator new_nodes_it        = adj_vertices_to_so_nodes.begin();
-    const std::map<std::vector<unsigned int>, Node*>::const_iterator new_nodes_end = adj_vertices_to_so_nodes.end();
-
-    for (; new_nodes_it != new_nodes_end; ++new_nodes_it)
-	_nodes.push_back(new_nodes_it->second);
-
-
-    // now we can clear the map
-    adj_vertices_to_so_nodes.clear();
   }
 
 
