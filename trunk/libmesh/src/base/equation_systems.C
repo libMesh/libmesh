@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.17 2003-02-17 01:23:01 benkirk Exp $
+// $Id: equation_systems.C,v 1.18 2003-02-17 05:33:09 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -530,7 +530,7 @@ std::string EquationSystems::get_info () const
       out << "    Finite Element Types=";
       for (unsigned int vn=0; vn<system.n_vars(); vn++)
       {
-	out << "\"" << system.get_dof_map().component_type(vn).family << "\" ";
+	out << "\"" << system.get_dof_map().variable_type(vn).family << "\" ";
       }
 #else
       out << "    Finite Element Types=";
