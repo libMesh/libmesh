@@ -1,4 +1,4 @@
-// $Id: fe_compute_data.h,v 1.3 2003-09-02 18:02:38 benkirk Exp $
+// $Id: fe_compute_data.h,v 1.4 2003-09-30 18:22:18 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -27,6 +27,7 @@
 
 // Local includes
 #include "libmesh.h"
+#include "point.h"
 
 
 // Forward declarations

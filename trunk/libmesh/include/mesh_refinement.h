@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.h,v 1.18 2003-09-27 00:54:57 benkirk Exp $
+// $Id: mesh_refinement.h,v 1.19 2003-09-30 18:22:18 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -149,6 +149,18 @@ public:
    * Adds the element \p elem to the mesh.
    */
   Elem* add_elem (Elem* elem);
+
+  /**
+   * @returns a constant reference to the \p MeshBase object associated
+   * with this object.
+   */
+  const MeshBase& get_mesh () const { return _mesh; }
+
+  /**
+   * @returns a writeable reference to the \p MeshBase object associated
+   * with this object.
+   */
+  MeshBase&       get_mesh ()       { return _mesh; }
 
 
 
@@ -337,7 +349,7 @@ private:
   /**
    * Reference to the mesh.
    */
-  MeshBase& mesh;
+  MeshBase& _mesh;
 };
 
 #endif // end #ifdef ENABLE_AMR

@@ -1,4 +1,4 @@
-// $Id: mesh_data.C,v 1.13 2003-09-02 18:02:43 benkirk Exp $
+// $Id: mesh_data.C,v 1.14 2003-09-30 18:22:18 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -398,7 +398,7 @@ const Node* MeshData::foreign_id_to_node (const unsigned int fid) const
 	  return NULL;
 	}
       else
-	  return (*pos).second;
+	  return pos->second;
     }
   else if (_compatibility_mode)
       // when only in compatibility mode, 
@@ -440,7 +440,7 @@ unsigned int MeshData::node_to_foreign_id (const Node* n) const
 	  return 0;
 	}
       else
-	  return (*pos).second;
+	  return pos->second;
     }
   else if (_compatibility_mode)
       // when only in compatibility mode, 
@@ -478,7 +478,7 @@ const Elem* MeshData::foreign_id_to_elem (const unsigned int fid) const
 	  return NULL;
 	}
       else
-	  return (*pos).second;
+	  return pos->second;
     }
   else if (_compatibility_mode)
       // when only in compatibility mode, 
@@ -519,7 +519,7 @@ unsigned int MeshData::elem_to_foreign_id (const Elem* e) const
 	  return 0;
 	}
       else
-	  return (*pos).second;
+	  return pos->second;
     }
   else if (_compatibility_mode)
       // when only in compatibility mode, 
@@ -677,7 +677,7 @@ unsigned int MeshData::n_val_per_node () const
       std::map<const Node*, 
 	       std::vector<Number> >::const_iterator pos = _node_data.begin();
       assert (pos != _node_data.end());
-      return ((*pos).second.size());
+      return (pos->second.size());
     }
   else
       return 0;
@@ -707,7 +707,7 @@ unsigned int MeshData::n_val_per_elem () const
       std::map<const Elem*, 
 	       std::vector<Number> >::const_iterator pos = _elem_data.begin();
       assert (pos != _elem_data.end());
-      return ((*pos).second.size());
+      return (pos->second.size());
     }
   else
       return 0;

@@ -1,4 +1,4 @@
-// $Id: mesh_diva_support.C,v 1.9 2003-09-25 21:46:56 benkirk Exp $
+// $Id: mesh_diva_support.C,v 1.10 2003-09-30 18:22:18 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -26,6 +26,7 @@
 // Local includes
 #include "libmesh_common.h"
 #include "mesh.h"
+#include "boundary_mesh.h"
 
 
 
@@ -76,6 +77,7 @@ void Mesh::write_diva (std::ostream& out)
   
 
 
+  BoundaryMesh boundary_mesh (this->mesh_dimension()-1);
   boundary_info.sync(boundary_mesh);
   
 
@@ -83,7 +85,7 @@ void Mesh::write_diva (std::ostream& out)
    * Write the header
    */ 
   {
-    out << n_nodes() << " "
+    out << this->n_nodes() << " "
       
 	<< (boundary_mesh.n_active_elem_of_type(TRI3) +
 	    boundary_mesh.n_active_elem_of_type(TRI6)*4) << " "

@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.27 2003-09-25 21:46:56 benkirk Exp $
+// $Id: boundary_info.C,v 1.28 2003-09-30 18:22:18 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -110,18 +110,19 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
       for (unsigned int s=0; s<elem->n_sides(); s++)
 	if (elem->neighbor(s) == NULL) // on the boundary
 	  {
+	    
 	    // Build the side
 	    AutoPtr<Elem> side (elem->build_side(s));
 	    
-	    // The side lives on the same processor as the parent
-	    //side->set_processor_id() = elem->processor_id();
+	    // Get the top-level parent for this element
+	    const Elem* top_parent = elem->top_parent();
 	    
 	    // Find the right id number for that side
 	    std::pair<std::multimap<const Elem*,
 		                    std::pair<unsigned short int, short int> >::iterator,
 		      std::multimap<const Elem*,
 		                    std::pair<unsigned short int, short int> >::iterator > 
-	      pos = _boundary_side_id.equal_range(elem);
+	      pos = _boundary_side_id.equal_range(top_parent);
 
 	    while (pos.first != pos.second)
 	      {
@@ -201,6 +202,11 @@ void BoundaryInfo::add_side(const Elem* elem,
 			    const unsigned short int side,
 			    const short int id)
 {
+  assert (elem != NULL);
+
+  // Only add BCs for level-0 elements.
+  assert (elem->level() == 0);
+  
   if (id == invalid_id)
     {
       std::cerr << "ERROR: You may not set a boundary ID of "
@@ -239,26 +245,6 @@ void BoundaryInfo::add_side(const Elem* elem,
 
 
 
-void BoundaryInfo::remove (const Node* node)
-{
-  assert (node != NULL);
-  
-  // Erase everything associated with node
-  _boundary_node_id.erase (node);
-}
-
-
-
-void BoundaryInfo::remove (const Elem* elem)
-{
-  assert (elem != NULL);
-  
-  // Erase everything associated with elem
-  _boundary_side_id.erase (elem);
-}
-
-
-
 short int BoundaryInfo::boundary_id(const Node* node) const
 { 
   std::map<const Node*, short int>::const_iterator
@@ -275,7 +261,13 @@ short int BoundaryInfo::boundary_id(const Node* node) const
 
 short int BoundaryInfo::boundary_id(const Elem* elem,
 				    const unsigned short int side) const
-{ 
+{
+  assert (elem != NULL);
+
+  // Only level-0 elements store BCs.  If this is not a level-0
+  // element get its level-0 parent and infer the BCs.
+  if (elem->level() != 0) elem = elem->top_parent ();
+  
   std::pair<std::multimap<const Elem*,
                           std::pair<unsigned short int, short int> >::const_iterator,
             std::multimap<const Elem*,

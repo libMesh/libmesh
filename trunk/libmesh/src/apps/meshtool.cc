@@ -20,6 +20,8 @@
 // Local Includes
 #include "libmesh.h"
 #include "mesh.h"
+#include "boundary_mesh.h"
+#include "mesh_refinement.h"
 #include "dof_map.h"
 #include "perfmon.h"
 #include "point.h"
@@ -710,8 +712,9 @@ int main (int argc, char** argv)
 	  std::cout << "Refining the mesh "
 		    << n_rsteps << " times"
 		    << std::endl;
-	
-	mesh.mesh_refinement.uniformly_refine(n_rsteps);
+
+	MeshRefinement mesh_refinement (mesh);
+	mesh_refinement.uniformly_refine(n_rsteps);
 	
 	if (verbose)
 	  mesh.print_info();
@@ -839,21 +842,23 @@ int main (int argc, char** argv)
 	   */
 	  if (write_bndry != BM_DISABLED)
 	    {
+	      BoundaryMesh boundary_mesh (mesh.mesh_dimension()-1);
+	      
 	      std::string boundary_name = "bndry_";
 	      boundary_name += names[1];
 	      
 	      if (write_bndry == BM_MESH_ONLY)
-		  mesh.boundary_info.sync(mesh.boundary_mesh, false);
+		mesh.boundary_info.sync(boundary_mesh, false);
 	      else if  (write_bndry == BM_WITH_MESHDATA)
-		  mesh.boundary_info.sync(mesh.boundary_mesh, true);
+		mesh.boundary_info.sync(boundary_mesh, true);
 	      else
-		  error();
+		error();
 	      
 	      if (names.size() == 2)
-		mesh.boundary_mesh.write(boundary_name);
+		boundary_mesh.write(boundary_name);
 	      else if (names.size() == 3)
-		mesh.boundary_mesh.write(boundary_name,
-					 soln, var_names);
+		boundary_mesh.write(boundary_name,
+				    soln, var_names);
 	    }
 	}
     };

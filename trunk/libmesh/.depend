@@ -23,7 +23,6 @@ src/base/dof_map.$(obj-suffix):\
     include/mesh_base.h\
     include/mesh_data.h\
     include/mesh_logging.h\
-    include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
     include/perf_log.h\
@@ -65,7 +64,6 @@ src/base/dof_map_constraints.$(obj-suffix):\
     include/mesh_base.h\
     include/mesh_data.h\
     include/mesh_logging.h\
-    include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
     include/perf_log.h\
@@ -90,7 +88,6 @@ src/base/equation_systems.$(obj-suffix):\
     src/base/equation_systems.C\
     include/auto_ptr.h\
     include/boundary_info.h\
-    include/boundary_mesh.h\
     include/coupling_matrix.h\
     include/data_map.h\
     include/data_object.h\
@@ -116,7 +113,6 @@ src/base/equation_systems.$(obj-suffix):\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_data.h\
-    include/mesh_refinement.h\
     include/newmark_system.h\
     include/node.h\
     include/node_iterators.h\
@@ -137,7 +133,6 @@ src/base/equation_systems_io.$(obj-suffix):\
     src/base/equation_systems_io.C\
     include/auto_ptr.h\
     include/boundary_info.h\
-    include/boundary_mesh.h\
     include/coupling_matrix.h\
     include/data_map.h\
     include/data_object.h\
@@ -162,7 +157,6 @@ src/base/equation_systems_io.$(obj-suffix):\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_data.h\
-    include/mesh_refinement.h\
     include/newmark_system.h\
     include/node.h\
     include/node_iterators.h\
@@ -185,7 +179,6 @@ src/base/frequency_system.$(obj-suffix):\
     src/base/frequency_system.C\
     include/auto_ptr.h\
     include/boundary_info.h\
-    include/boundary_mesh.h\
     include/coupling_matrix.h\
     include/data_map.h\
     include/data_object.h\
@@ -214,7 +207,6 @@ src/base/frequency_system.$(obj-suffix):\
     include/mesh_base.h\
     include/mesh_data.h\
     include/mesh_logging.h\
-    include/mesh_refinement.h\
     include/newmark_system.h\
     include/node.h\
     include/node_iterators.h\
@@ -246,7 +238,6 @@ src/base/newmark_system.$(obj-suffix):\
     src/base/newmark_system.C\
     include/auto_ptr.h\
     include/boundary_info.h\
-    include/boundary_mesh.h\
     include/coupling_matrix.h\
     include/data_map.h\
     include/data_object.h\
@@ -272,7 +263,6 @@ src/base/newmark_system.$(obj-suffix):\
     include/mesh_base.h\
     include/mesh_data.h\
     include/mesh_logging.h\
-    include/mesh_refinement.h\
     include/newmark_system.h\
     include/node.h\
     include/node_iterators.h\
@@ -317,7 +307,6 @@ src/base/steady_system.$(obj-suffix):\
     src/base/steady_system.C\
     include/auto_ptr.h\
     include/boundary_info.h\
-    include/boundary_mesh.h\
     include/coupling_matrix.h\
     include/data_map.h\
     include/data_object.h\
@@ -345,7 +334,6 @@ src/base/steady_system.$(obj-suffix):\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_data.h\
-    include/mesh_refinement.h\
     include/newmark_system.h\
     include/node.h\
     include/node_iterators.h\
@@ -367,7 +355,6 @@ src/base/system_base.$(obj-suffix):\
     src/base/system_base.C\
     include/auto_ptr.h\
     include/boundary_info.h\
-    include/boundary_mesh.h\
     include/coupling_matrix.h\
     include/data_map.h\
     include/data_object.h\
@@ -396,7 +383,6 @@ src/base/system_base.$(obj-suffix):\
     include/mesh_base.h\
     include/mesh_data.h\
     include/mesh_logging.h\
-    include/mesh_refinement.h\
     include/newmark_system.h\
     include/node.h\
     include/node_iterators.h\
@@ -418,7 +404,6 @@ src/base/system_base_io.$(obj-suffix):\
     src/base/system_base_io.C\
     include/auto_ptr.h\
     include/boundary_info.h\
-    include/boundary_mesh.h\
     include/coupling_matrix.h\
     include/dof_map.h\
     include/dof_object.h\
@@ -439,7 +424,6 @@ src/base/system_base_io.$(obj-suffix):\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_data.h\
-    include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
     include/numeric_vector.h\
@@ -459,7 +443,6 @@ src/base/system_base_projection.$(obj-suffix):\
     src/base/system_base_projection.C\
     include/auto_ptr.h\
     include/boundary_info.h\
-    include/boundary_mesh.h\
     include/coupling_matrix.h\
     include/dof_map.h\
     include/dof_object.h\
@@ -482,7 +465,6 @@ src/base/system_base_projection.$(obj-suffix):\
     include/mesh_base.h\
     include/mesh_data.h\
     include/mesh_logging.h\
-    include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
     include/numeric_vector.h\
@@ -1216,7 +1198,6 @@ src/fe/inf_fe_static.$(obj-suffix):\
     src/fe/inf_fe_static.C\
     include/auto_ptr.h\
     include/boundary_info.h\
-    include/boundary_mesh.h\
     include/coupling_matrix.h\
     include/data_map.h\
     include/data_object.h\
@@ -1250,7 +1231,6 @@ src/fe/inf_fe_static.$(obj-suffix):\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_data.h\
-    include/mesh_refinement.h\
     include/newmark_system.h\
     include/node.h\
     include/node_iterators.h\
@@ -1927,7 +1907,6 @@ src/geom/elem.$(obj-suffix):\
     include/libmesh_config.h\
     include/mesh_base.h\
     include/mesh_data.h\
-    include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
     include/perf_log.h\
@@ -1950,31 +1929,22 @@ src/geom/elem_quality.$(obj-suffix):\
 src/geom/elem_refinement.$(obj-suffix):\
     src/geom/elem_refinement.C\
     include/auto_ptr.h\
-    include/boundary_info.h\
     include/dof_object.h\
     include/elem.h\
-    include/elem_iterators.h\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
     include/enum_solver_package.h\
-    include/enum_xdr_mode.h\
     include/libmesh.h\
     include/libmesh_base.h\
     include/libmesh_common.h\
     include/libmesh_config.h\
-    include/mesh_base.h\
-    include/mesh_data.h\
     include/mesh_refinement.h\
     include/node.h\
-    include/node_iterators.h\
     include/perf_log.h\
     include/point.h\
-    include/predicated_iterator.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
-    include/sphere.h\
-    include/surface.h\
     include/type_vector.h\
     include/utility.h
 src/geom/elem_type.$(obj-suffix):\
@@ -2289,7 +2259,6 @@ src/mesh/boundary_info.$(obj-suffix):\
     include/libmesh_config.h\
     include/mesh_base.h\
     include/mesh_data.h\
-    include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
     include/perf_log.h\
@@ -2320,7 +2289,6 @@ src/mesh/boundary_mesh.$(obj-suffix):\
     include/libmesh_config.h\
     include/mesh_base.h\
     include/mesh_data.h\
-    include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
     include/perf_log.h\
@@ -2355,7 +2323,6 @@ src/mesh/mesh_base.$(obj-suffix):\
     include/mesh_base.h\
     include/mesh_data.h\
     include/mesh_logging.h\
-    include/mesh_refinement.h\
     include/metis_partitioner.h\
     include/node.h\
     include/node_iterators.h\
@@ -2402,7 +2369,6 @@ src/mesh/mesh_base_modification.$(obj-suffix):\
     include/mesh_base.h\
     include/mesh_data.h\
     include/mesh_logging.h\
-    include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
     include/perf_log.h\
@@ -2418,7 +2384,6 @@ src/mesh/mesh.$(obj-suffix):\
     src/mesh/mesh.C\
     include/auto_ptr.h\
     include/boundary_info.h\
-    include/boundary_mesh.h\
     include/dof_object.h\
     include/elem.h\
     include/elem_iterators.h\
@@ -2436,7 +2401,6 @@ src/mesh/mesh.$(obj-suffix):\
     include/mesh_communication.h\
     include/mesh_data.h\
     include/mesh_logging.h\
-    include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
     include/perf_log.h\
@@ -2452,7 +2416,6 @@ src/mesh/mesh_communication.$(obj-suffix):\
     src/mesh/mesh_communication.C\
     include/auto_ptr.h\
     include/boundary_info.h\
-    include/boundary_mesh.h\
     include/dof_object.h\
     include/elem.h\
     include/elem_iterators.h\
@@ -2469,7 +2432,6 @@ src/mesh/mesh_communication.$(obj-suffix):\
     include/mesh_base.h\
     include/mesh_communication.h\
     include/mesh_data.h\
-    include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
     include/perf_log.h\
@@ -2500,7 +2462,6 @@ src/mesh/mesh_data.$(obj-suffix):\
     include/mesh_base.h\
     include/mesh_data.h\
     include/mesh_logging.h\
-    include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
     include/perf_log.h\
@@ -2530,7 +2491,6 @@ src/mesh/mesh_data_unv_support.$(obj-suffix):\
     include/libmesh_config.h\
     include/mesh_base.h\
     include/mesh_data.h\
-    include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
     include/perf_log.h\
@@ -2560,7 +2520,6 @@ src/mesh/mesh_data_xdr_support.$(obj-suffix):\
     include/libmesh_config.h\
     include/mesh_base.h\
     include/mesh_data.h\
-    include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
     include/o_f_stream.h\
@@ -2594,7 +2553,6 @@ src/mesh/mesh_diva_support.$(obj-suffix):\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_data.h\
-    include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
     include/perf_log.h\
@@ -2627,7 +2585,6 @@ src/mesh/mesh_exodus_support.$(obj-suffix):\
     include/mesh_base.h\
     include/mesh_data.h\
     include/mesh_exodus_support.h\
-    include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
     include/perf_log.h\
@@ -2643,7 +2600,6 @@ src/mesh/mesh_generation.$(obj-suffix):\
     src/mesh/mesh_generation.C\
     include/auto_ptr.h\
     include/boundary_info.h\
-    include/boundary_mesh.h\
     include/cell_hex.h\
     include/cell_hex20.h\
     include/cell_hex27.h\
@@ -2695,7 +2651,6 @@ src/mesh/mesh_gmv_support.$(obj-suffix):\
     src/mesh/mesh_gmv_support.C\
     include/auto_ptr.h\
     include/boundary_info.h\
-    include/boundary_mesh.h\
     include/coupling_matrix.h\
     include/data_map.h\
     include/data_object.h\
@@ -2720,7 +2675,6 @@ src/mesh/mesh_gmv_support.$(obj-suffix):\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_data.h\
-    include/mesh_refinement.h\
     include/newmark_system.h\
     include/node.h\
     include/node_iterators.h\
@@ -2760,7 +2714,6 @@ src/mesh/mesh_misc_support.$(obj-suffix):\
     include/libmesh_config.h\
     include/mesh_base.h\
     include/mesh_data.h\
-    include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
     include/perf_log.h\
@@ -2776,7 +2729,6 @@ src/mesh/mesh_modification.$(obj-suffix):\
     src/mesh/mesh_modification.C\
     include/auto_ptr.h\
     include/boundary_info.h\
-    include/boundary_mesh.h\
     include/cell_inf_hex.h\
     include/cell_inf_hex16.h\
     include/cell_inf_hex18.h\
@@ -2803,7 +2755,6 @@ src/mesh/mesh_modification.$(obj-suffix):\
     include/mesh_base.h\
     include/mesh_data.h\
     include/mesh_logging.h\
-    include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
     include/perf_log.h\
@@ -2914,7 +2865,6 @@ src/mesh/mesh_smoother_laplace.$(obj-suffix):\
     src/mesh/mesh_smoother_laplace.C\
     include/auto_ptr.h\
     include/boundary_info.h\
-    include/boundary_mesh.h\
     include/dof_object.h\
     include/elem.h\
     include/elem_iterators.h\
@@ -2930,7 +2880,6 @@ src/mesh/mesh_smoother_laplace.$(obj-suffix):\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_data.h\
-    include/mesh_refinement.h\
     include/mesh_smoother.h\
     include/mesh_smoother_laplace.h\
     include/node.h\
@@ -2948,7 +2897,6 @@ src/mesh/mesh_tecplot_support.$(obj-suffix):\
     src/mesh/mesh_tecplot_support.C\
     include/auto_ptr.h\
     include/boundary_info.h\
-    include/boundary_mesh.h\
     include/coupling_matrix.h\
     include/data_map.h\
     include/data_object.h\
@@ -2973,7 +2921,6 @@ src/mesh/mesh_tecplot_support.$(obj-suffix):\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_data.h\
-    include/mesh_refinement.h\
     include/newmark_system.h\
     include/node.h\
     include/node_iterators.h\
@@ -3019,7 +2966,6 @@ src/mesh/mesh_ucd_support.$(obj-suffix):\
     include/libmesh_config.h\
     include/mesh_base.h\
     include/mesh_data.h\
-    include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
     include/perf_log.h\
@@ -3064,7 +3010,6 @@ src/mesh/mesh_unv_support.$(obj-suffix):\
     include/libmesh_config.h\
     include/mesh_base.h\
     include/mesh_data.h\
-    include/mesh_refinement.h\
     include/mesh_unv_support.h\
     include/node.h\
     include/node_iterators.h\
@@ -3081,7 +3026,6 @@ src/mesh/mesh_xdr_support.$(obj-suffix):\
     src/mesh/mesh_xdr_support.C\
     include/auto_ptr.h\
     include/boundary_info.h\
-    include/boundary_mesh.h\
     include/cell_hex.h\
     include/cell_hex27.h\
     include/dof_object.h\
@@ -3099,7 +3043,6 @@ src/mesh/mesh_xdr_support.$(obj-suffix):\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_data.h\
-    include/mesh_refinement.h\
     include/mesh_xdr_support.h\
     include/node.h\
     include/node_iterators.h\
@@ -3192,7 +3135,6 @@ src/numerics/error_estimator.$(obj-suffix):\
     src/numerics/error_estimator.C\
     include/auto_ptr.h\
     include/boundary_info.h\
-    include/boundary_mesh.h\
     include/coupling_matrix.h\
     include/data_map.h\
     include/data_object.h\
@@ -3223,7 +3165,6 @@ src/numerics/error_estimator.$(obj-suffix):\
     include/mesh_base.h\
     include/mesh_data.h\
     include/mesh_logging.h\
-    include/mesh_refinement.h\
     include/newmark_system.h\
     include/node.h\
     include/node_iterators.h\
@@ -3364,7 +3305,6 @@ src/numerics/mesh_function.$(obj-suffix):\
     src/numerics/mesh_function.C\
     include/auto_ptr.h\
     include/boundary_info.h\
-    include/boundary_mesh.h\
     include/coupling_matrix.h\
     include/data_map.h\
     include/data_object.h\
@@ -3396,7 +3336,6 @@ src/numerics/mesh_function.$(obj-suffix):\
     include/mesh_base.h\
     include/mesh_data.h\
     include/mesh_function.h\
-    include/mesh_refinement.h\
     include/newmark_system.h\
     include/node.h\
     include/node_iterators.h\
@@ -3559,7 +3498,6 @@ src/partitioning/centroid_partitioner.$(obj-suffix):\
     include/libmesh_config.h\
     include/mesh_base.h\
     include/mesh_data.h\
-    include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
     include/partitioner.h\
@@ -3576,7 +3514,6 @@ src/partitioning/linear_partitioner.$(obj-suffix):\
     src/partitioning/linear_partitioner.C\
     include/auto_ptr.h\
     include/boundary_info.h\
-    include/boundary_mesh.h\
     include/dof_object.h\
     include/elem.h\
     include/elem_iterators.h\
@@ -3594,7 +3531,6 @@ src/partitioning/linear_partitioner.$(obj-suffix):\
     include/mesh_base.h\
     include/mesh_data.h\
     include/mesh_logging.h\
-    include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
     include/partitioner.h\
@@ -3611,7 +3547,6 @@ src/partitioning/metis_partitioner.$(obj-suffix):\
     src/partitioning/metis_partitioner.C\
     include/auto_ptr.h\
     include/boundary_info.h\
-    include/boundary_mesh.h\
     include/dof_object.h\
     include/elem.h\
     include/elem_iterators.h\
@@ -3628,7 +3563,6 @@ src/partitioning/metis_partitioner.$(obj-suffix):\
     include/mesh_base.h\
     include/mesh_data.h\
     include/mesh_logging.h\
-    include/mesh_refinement.h\
     include/metis_partitioner.h\
     include/node.h\
     include/node_iterators.h\
@@ -3647,7 +3581,6 @@ src/partitioning/parmetis_partitioner.$(obj-suffix):\
     src/partitioning/parmetis_partitioner.C\
     include/auto_ptr.h\
     include/boundary_info.h\
-    include/boundary_mesh.h\
     include/dof_object.h\
     include/elem.h\
     include/elem_iterators.h\
@@ -3664,7 +3597,6 @@ src/partitioning/parmetis_partitioner.$(obj-suffix):\
     include/mesh_base.h\
     include/mesh_data.h\
     include/mesh_logging.h\
-    include/mesh_refinement.h\
     include/metis_partitioner.h\
     include/node.h\
     include/node_iterators.h\
@@ -3697,7 +3629,6 @@ src/partitioning/partitioner.$(obj-suffix):\
     include/libmesh_config.h\
     include/mesh_base.h\
     include/mesh_data.h\
-    include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
     include/partitioner.h\
@@ -3714,7 +3645,6 @@ src/partitioning/sfc_partitioner.$(obj-suffix):\
     src/partitioning/sfc_partitioner.C\
     include/auto_ptr.h\
     include/boundary_info.h\
-    include/boundary_mesh.h\
     include/dof_object.h\
     include/elem.h\
     include/elem_iterators.h\
@@ -3732,7 +3662,6 @@ src/partitioning/sfc_partitioner.$(obj-suffix):\
     include/mesh_base.h\
     include/mesh_data.h\
     include/mesh_logging.h\
-    include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
     include/partitioner.h\
@@ -3980,7 +3909,6 @@ src/utils/point_locator_base.$(obj-suffix):\
     src/utils/point_locator_base.C\
     include/auto_ptr.h\
     include/boundary_info.h\
-    include/boundary_mesh.h\
     include/dof_object.h\
     include/elem.h\
     include/elem_iterators.h\
@@ -3997,7 +3925,6 @@ src/utils/point_locator_base.$(obj-suffix):\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_data.h\
-    include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
     include/perf_log.h\
@@ -4016,7 +3943,6 @@ src/utils/point_locator_list.$(obj-suffix):\
     src/utils/point_locator_list.C\
     include/auto_ptr.h\
     include/boundary_info.h\
-    include/boundary_mesh.h\
     include/dof_object.h\
     include/elem.h\
     include/elem_iterators.h\
@@ -4033,7 +3959,6 @@ src/utils/point_locator_list.$(obj-suffix):\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_data.h\
-    include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
     include/perf_log.h\
@@ -4051,7 +3976,6 @@ src/utils/point_locator_tree.$(obj-suffix):\
     src/utils/point_locator_tree.C\
     include/auto_ptr.h\
     include/boundary_info.h\
-    include/boundary_mesh.h\
     include/dof_object.h\
     include/elem.h\
     include/elem_iterators.h\
@@ -4068,7 +3992,6 @@ src/utils/point_locator_tree.$(obj-suffix):\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_data.h\
-    include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
     include/perf_log.h\
@@ -4112,7 +4035,6 @@ src/utils/tree_base.$(obj-suffix):\
     include/libmesh_config.h\
     include/mesh_base.h\
     include/mesh_data.h\
-    include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
     include/perf_log.h\
@@ -4145,7 +4067,6 @@ src/utils/tree.$(obj-suffix):\
     include/libmesh_config.h\
     include/mesh_base.h\
     include/mesh_data.h\
-    include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
     include/perf_log.h\
@@ -4178,7 +4099,6 @@ src/utils/tree_node.$(obj-suffix):\
     include/libmesh_config.h\
     include/mesh_base.h\
     include/mesh_data.h\
-    include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
     include/perf_log.h\

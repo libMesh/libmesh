@@ -41,8 +41,11 @@ int main (int argc, char** argv)
     mesh.read(meshname);
 
     mesh.elem(0)->set_refinement_flag (Elem::REFINE);
-    mesh.mesh_refinement.refine_and_coarsen_elements ();    
-    mesh.mesh_refinement.uniformly_refine (2);
+
+    MeshRefinement mesh_refinement (mesh);
+    
+    mesh_refinement.refine_and_coarsen_elements ();    
+    mesh_refinement.uniformly_refine (2);
     
     mesh.print_info();
 
@@ -74,7 +77,7 @@ int main (int argc, char** argv)
 
 
     // Refine uniformly
-    mesh.mesh_refinement.uniformly_refine (1);
+    mesh_refinement.uniformly_refine (1);
     es.reinit ();
 
     // Write out the projected solution
