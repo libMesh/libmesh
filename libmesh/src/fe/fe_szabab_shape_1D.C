@@ -1,4 +1,4 @@
-// $Id: fe_szabab_shape_1D.C,v 1.1 2004-01-09 19:33:22 spetersen Exp $
+// $Id: fe_szabab_shape_1D.C,v 1.2 2004-01-16 11:01:52 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -53,15 +53,15 @@ Real FE<1,SZABAB>::shape(const ElemType,
       switch(i)
 	{				
 	  //nodal shape functions
-	case 0: return (1.-xi)/2.;
-	case 1:	return (1.+xi)/2.;
-	case 2:	return 1./4.*sqrt(6.)*(pow(xi,2)-1.);
-	case 3:	return 1./4.*sqrt(10.)*(pow(xi,3)-xi);
-	case 4: return 1./16.*sqrt(14.)*(5.*pow(xi,4)-6.*pow(xi,2)+1.);
-	case 5:	return 3./16.*sqrt(2.)*(7.*pow(xi,5)-10.*pow(xi,3)+3.*xi);
-	case 6:	return 1./32.*sqrt(22.)*(21.*pow(xi,6)-35.*pow(xi,4)+15.*pow(xi,2)-1.);
-	case 7: return 1./32.*sqrt(26.)*(33.*pow(xi,7)-63.*pow(xi,5)+35.*pow(xi,3)-5.*xi);
-	case 8: return 1./256.*sqrt(30.)*(429.*pow(xi,8)-924.*pow(xi,6)+630.*pow(xi,4)-140.*pow(xi,2)+5.);
+	case 0: return 1./2.-1./2.*xi;
+	case 1: return 1./2.+1./2.*xi;
+	case 2: return 1./4.  *2.4494897427831780982*(pow(xi,2)-1.);
+	case 3: return 1./4.  *3.1622776601683793320*(pow(xi,2)-1.)*xi;
+	case 4: return 1./16. *3.7416573867739413856*((5.*pow(xi,2)-6.)*pow(xi,2)+1.);
+	case 5: return 3./16. *1.4142135623730950488*(3.+(-10.+7.*pow(xi,2))*pow(xi,2))*xi;
+	case 6: return 1./32. *4.6904157598234295546*(-1.+(15.+(-35.+21.*pow(xi,2))*pow(xi,2))*pow(xi,2));
+	case 7: return 1./32. *5.0990195135927848300*(-5.+(35.+(-63.+33.*pow(xi,2))*pow(xi,2))*pow(xi,2))*xi;
+	case 8: return 1./256.*5.4772255750516611346*(5.+(-140.+(630.+(-924.+429.*pow(xi,2))*pow(xi,2))*pow(xi,2))*pow(xi,2));
 	  
 	default:
 	  std::cerr << "Invalid shape function index!" << std::endl;
@@ -119,15 +119,15 @@ Real FE<1,SZABAB>::shape_deriv(const ElemType,
       
       switch(i)
 	{
-	case 0:	return -0.5;
-	case 1:	return  0.5;
-	case 2:	return 1./ 2.*sqrt( 6.)*xi;
-	case 3:	return 3./ 4.*sqrt(10.)*pow(xi,2)-1./4.*sqrt(10.);
-	case 4:	return 1./ 4.*sqrt(14.)*(5.  *pow(xi,3)-3.*xi);
-	case 5:	return 1./16.*sqrt( 2.)*(105.*pow(xi,4)-90.*pow(xi,2)+9.); 
-	case 6:	return 1./16.*sqrt(22.)*(63. *pow(xi,5)-70.*pow(xi,3)+15.*xi);
-	case 7: return 1./32.*sqrt(26.)*(231.*pow(xi,6)-315.*pow(xi,4)+105.*pow(xi,2)-5.);
-	case 8: return 1./32.*sqrt(30.)*(429.*pow(xi,7)-693.*pow(xi,5)+315.*pow(xi,3)-35.*xi);
+	case 0:	return -1./2.;
+	case 1:	return 1./2.;
+	case 2:	return 1./2.*2.4494897427831780982*xi;
+	case 3:	return -1./4.*3.1622776601683793320+3./4.*3.1622776601683793320*pow(xi,2);
+	case 4:	return 1./16.*3.7416573867739413856*(-12.+20*pow(xi,2))*xi;
+	case 5:	return 9./16.*1.4142135623730950488+(-45./8.*1.4142135623730950488+105./16.*1.4142135623730950488*pow(xi,2))*pow(xi,2);
+	case 6:	return 1./32.*4.6904157598234295546*(30.+(-140.+126.*pow(xi,2))*pow(xi,2))*xi;
+	case 7:	return -5./32.*5.0990195135927848300+(105./32.*5.0990195135927848300+(-315./32.*5.0990195135927848300+231./32.*5.0990195135927848300*pow(xi,2))*pow(xi,2))*pow(xi,2);
+	case 8:	return 1./256.*5.4772255750516611346*(-280.+(2520.+(-5544.+3432.*pow(xi,2))*pow(xi,2))*pow(xi,2))*xi;
 	  
 	default:
 	  std::cerr << "Invalid shape function index!" << std::endl;
