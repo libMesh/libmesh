@@ -1,4 +1,4 @@
-// $Id: metis_partitioner.C,v 1.3 2003-07-25 20:58:24 benkirk Exp $
+// $Id: metis_partitioner.C,v 1.4 2003-08-17 19:06:35 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -160,6 +160,8 @@ void MetisPartitioner::partition (const unsigned int n_sbdmns)
 
 		    adjncy.push_back (forward_map[neighbor->id()]);
 		  }
+  
+#ifdef ENABLE_AMR
 		
 		// Otherwise we need to find all of the
 		// neighbor's children that are connected to
@@ -217,6 +219,9 @@ void MetisPartitioner::partition (const unsigned int n_sbdmns)
 			  }
 		      }
 		  }
+
+#endif /* ifdef ENABLE_AMR */
+
 	      }
 	  }
       }

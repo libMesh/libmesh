@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.29 2003-08-07 19:25:31 ddreyer Exp $
+// $Id: elem.h,v 1.30 2003-08-17 19:06:33 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -991,6 +991,8 @@ std::pair<const Elem**, const Elem**> Elem::neighbors_end () const
 }
 
 
+#endif /* ifdef ENABLE_AMR */
+
 
 inline
 unsigned int Elem::compute_key (unsigned int n0)
@@ -1125,7 +1127,5 @@ unsigned int Elem::compute_key (unsigned int n0,
 }
 				
 
-
-#endif // endf #ifdef ENABLE_AMR
 
 #endif // end #ifndef __elem_h__
