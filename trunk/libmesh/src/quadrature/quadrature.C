@@ -1,4 +1,4 @@
-// $Id: quadrature.C,v 1.20 2005-02-22 22:17:42 jwpeterson Exp $
+// $Id: quadrature.C,v 1.21 2005-03-23 20:24:48 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -207,8 +207,6 @@ void QBase::tensor_product_prism(const QBase& q1D, const QBase& q2D)
 
 void QBase::tensor_product_tet(const QBase& gauss1D, const QBase& jacA1D, const QBase& jacB1D)
 {
-  here();
-
   // All rules should be of the same order
   assert(gauss1D.n_points() == jacA1D.n_points());
   assert(jacA1D.n_points()  == jacB1D.n_points());
