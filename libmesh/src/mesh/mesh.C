@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.40 2004-05-11 20:29:07 jwpeterson Exp $
+// $Id: mesh.C,v 1.41 2004-07-13 21:48:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -38,6 +38,7 @@
 #include "off_io.h"
 #include "shanee_io.h"
 #include "medit_io.h"
+#include "gmsh_io.h"
 
 // ------------------------------------------------------------
 // Mesh class member functions
@@ -106,6 +107,9 @@ void Mesh::read (const std::string& name)
       else if ((name.rfind(".node")  < name.size()) ||
 	       (name.rfind(".ele")   < name.size()))
 	TetGenIO(*this).read (name);
+
+      else if (name.rfind(".msh") < name.size())
+	GmshIO(*this).read (name);
       
       else
 	{
@@ -195,6 +199,9 @@ void Mesh::write (const std::string& name)
     else if (name.rfind(".poly") < name.size())
       TetGenIO (*this).write (name);
 
+    else if (name.rfind(".msh") < name.size())
+      GmshIO (*this).write (name);
+    
     else
       {
 	std::cerr << " ERROR: Unrecognized file extension: " << name
