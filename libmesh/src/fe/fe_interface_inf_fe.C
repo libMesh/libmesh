@@ -1,4 +1,4 @@
-// $Id: fe_interface_inf_fe.C,v 1.1 2003-02-05 20:51:43 ddreyer Exp $
+// $Id: fe_interface_inf_fe.C,v 1.2 2003-02-06 17:13:37 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -196,7 +196,8 @@ void FEInterface::ifem_nodal_soln(const unsigned int,
 Point FEInterface::ifem_inverse_map (const unsigned int dim,
 				     const FEType& fe_t,
 				     const Elem* elem,
-				     const Point& p)
+				     const Point& p,
+				     const Real tolerance)
 {
   switch (dim)
     {
@@ -206,7 +207,7 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
 	switch (fe_t.inf_map)
 	  {
 	  case CARTESIAN:
-	    return InfFE<1,JACOBI_20_00,CARTESIAN>::inverse_map(elem, p);
+	    return InfFE<1,JACOBI_20_00,CARTESIAN>::inverse_map(elem, p, tolerance);
 
 	  case SPHERICAL:
 	  case ELLIPSOIDAL:
@@ -218,10 +219,10 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
 
 /*
 	  case SPHERICAL:
-	    return InfFE<1,JACOBI_20_00,SPHERICAL>::inverse_map(elem, p);
+	    return InfFE<1,JACOBI_20_00,SPHERICAL>::inverse_map(elem, p, tolerance);
 
 	  case ELLIPSOIDAL:
-	    return InfFE<1,JACOBI_20_00,ELLIPSOIDAL>::inverse_map(elem, p);
+	    return InfFE<1,JACOBI_20_00,ELLIPSOIDAL>::inverse_map(elem, p, tolerance);
 */
 
 	  default:
@@ -236,7 +237,7 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
 	switch (fe_t.inf_map)
 	  {
 	  case CARTESIAN:
-	    return InfFE<2,JACOBI_20_00,CARTESIAN>::inverse_map(elem, p);
+	    return InfFE<2,JACOBI_20_00,CARTESIAN>::inverse_map(elem, p, tolerance);
 
 	  case SPHERICAL:
 	  case ELLIPSOIDAL:
@@ -248,10 +249,10 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
 
 /*
 	  case SPHERICAL:
-	    return InfFE<2,JACOBI_20_00,SPHERICAL>::inverse_map(elem, p);
+	    return InfFE<2,JACOBI_20_00,SPHERICAL>::inverse_map(elem, p, tolerance);
 
 	  case ELLIPSOIDAL:
-	    return InfFE<2,JACOBI_20_00,ELLIPSOIDAL>::inverse_map(elem, p);
+	    return InfFE<2,JACOBI_20_00,ELLIPSOIDAL>::inverse_map(elem, p, tolerance);
 */
 
 	  default:
@@ -267,7 +268,7 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
 	switch (fe_t.inf_map)
 	  {
 	  case CARTESIAN:
-	    return InfFE<3,JACOBI_20_00,CARTESIAN>::inverse_map(elem, p);
+	    return InfFE<3,JACOBI_20_00,CARTESIAN>::inverse_map(elem, p, tolerance);
 
 	  case SPHERICAL:
 	  case ELLIPSOIDAL:
@@ -279,10 +280,10 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
 
 /*
 	  case SPHERICAL:
-	    return InfFE<3,JACOBI_20_00,SPHERICAL>::inverse_map(elem, p);
+	    return InfFE<3,JACOBI_20_00,SPHERICAL>::inverse_map(elem, p, tolerance);
 
 	  case ELLIPSOIDAL:
-	    return InfFE<3,JACOBI_20_00,ELLIPSOIDAL>::inverse_map(elem, p);
+	    return InfFE<3,JACOBI_20_00,ELLIPSOIDAL>::inverse_map(elem, p, tolerance);
 */
 
 	  default:

@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.5 2003-02-05 20:51:36 ddreyer Exp $
+// $Id: fe_base.h,v 1.6 2003-02-06 17:13:34 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -590,11 +590,6 @@ protected:
    */
   std::vector<Point>                normals;
 
-  /**
-   * Jacobian values at quadrature points
-   */
-  std::vector<Real>                 jac;
-  
   /**
    * Jacobian*Weight values at quadrature points
    */

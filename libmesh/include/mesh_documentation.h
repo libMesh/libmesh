@@ -68,6 +68,9 @@
  * Austin in the CFDLab and at Technische Universit&auml;t Hamburg-Harburg,
  * Mechanics and Ocean Engineering in Germany.  Many thanks to SourceForge 
  * for hosting the project at http://sourceforge.net/projects/libmesh
+ * You can find out what is currently happening in the development branch
+ * by checking out the online CVS logs at
+ * http://libmesh.sourceforge.net/cvshtml
  *
  *
  * \section install Installation

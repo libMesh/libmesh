@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: fe_map.C,v 1.7 2003-02-06 17:13:37 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -35,7 +35,7 @@ void FEBase::compute_map(const QBase* qrule,
 			 const Elem* elem)
 {
   assert (qrule != NULL);
-  assert (elem != NULL);
+  assert (elem  != NULL);
   
   const unsigned int        n_qp = qrule->n_points();
   const std::vector<Real> &   qw = qrule->get_weights();
@@ -51,7 +51,7 @@ void FEBase::compute_map(const QBase* qrule,
       {
 	//------------------------------------------------------------------
 	// Compute the values at the quadrature points,
-	// the Jacobian at the quadrature points, etc...
+	// the Jacobian at the quadrature points
 	
 	// Resize the vectors to hold data at the quadrature points
 	{  
@@ -59,7 +59,6 @@ void FEBase::compute_map(const QBase* qrule,
 	  dxyzdxi_map.resize(n_qp);
 	  dxidx_map.resize(n_qp);
 	  
-	  jac.resize(n_qp);
 	  JxW.resize(n_qp);
 	};
 	
@@ -73,12 +72,18 @@ void FEBase::compute_map(const QBase* qrule,
 	
 	// compute x, dxdxi at the quadrature points    
 	for (unsigned int i=0; i<phi_map.size(); i++) // sum over the nodes
-	  for (unsigned int p=0; p<n_qp; p++) // for each quadrature point...
-	    {	  
-	      xyz[p]         += elem->point(i)*phi_map[i][p];
-	      
-	      dxyzdxi_map[p] += elem->point(i)*dphidxi_map[i][p];
-	    };
+	  {
+	    // Reference to the point, helps eliminate
+	    // exessive temporaries in the inner loop
+	    const Point& elem_point = elem->point(i);
+	    
+	    for (unsigned int p=0; p<n_qp; p++) // for each quadrature point
+	      {	  
+		xyz[p]         += elem_point*phi_map[i][p];
+		
+		dxyzdxi_map[p] += elem_point*dphidxi_map[i][p];
+	      };
+	  };
 
 	/*
         // Test the inverse map
@@ -96,12 +101,19 @@ void FEBase::compute_map(const QBase* qrule,
 	// compute the jacobian at the quadrature points
 	for (unsigned int p=0; p<n_qp; p++)
 	  {
-	    jac[p] = dxdxi_map(p);
+	    // Symbolically, the matrix determinant is
+	    //
+	    // jac = | dx/dxi | = dx/dxi
+	    //         
 	    
-	    if (jac[p] <= 0.)
+	    // Compute the Jacobian.  This assumes the
+	    // 1D edge lives in 1D space.
+	    const Real jac = dxdxi_map(p);
+	    
+	    if (jac <= 0.)
 	      {
 		std::cerr << "ERROR: negative Jacobian: "
-			  << jac[p]
+			  << jac
 			  << std::endl;
 		error();
 	      };
@@ -110,13 +122,12 @@ void FEBase::compute_map(const QBase* qrule,
 	    
 	    dxidx_map[p] = 1./dxdxi_map(p);
 	    
-	    JxW[p] = jac[p]*qw[p];
+	    JxW[p] = jac*qw[p];
 	  };
 
 	// done computing the map
 	return;
       };
-
 
       
       //--------------------------------------------------------------------
@@ -125,7 +136,7 @@ void FEBase::compute_map(const QBase* qrule,
       {
 	//------------------------------------------------------------------
 	// Compute the (x,y) values at the quadrature points,
-	// the Jacobian at the quadrature points, etc..
+	// the Jacobian at the quadrature points
 
 	// Resize the vectors to hold data at the quadrature points
 	{  
@@ -137,7 +148,6 @@ void FEBase::compute_map(const QBase* qrule,
 	  detadx_map.resize(n_qp);
 	  detady_map.resize(n_qp);
 	  
-	  jac.resize(n_qp);
 	  JxW.resize(n_qp);
 	};
 	
@@ -150,23 +160,29 @@ void FEBase::compute_map(const QBase* qrule,
 	  };
 	
 	
-	// compute (x,y), dxdxi, dydxi, dxdeta, dydeta at the quadrature points    
+	// compute (x,y), dxdxi, dydxi, dxdeta, dydeta at the quadrature points
 	for (unsigned int i=0; i<phi_map.size(); i++) // sum over the nodes
-	  for (unsigned int p=0; p<n_qp; p++) // for each quadrature point...
-	    {	  
-	      xyz[p]          += elem->point(i)*phi_map[i][p];
-	      
-	      dxyzdxi_map[p]  += elem->point(i)*dphidxi_map[i][p];
-	      
-	      dxyzdeta_map[p] += elem->point(i)*dphideta_map[i][p];
-	    };
+	  {
+	    // Reference to the point, helps eliminate
+	    // exessive temporaries in the inner loop
+	    const Point& elem_point = elem->point(i);
+	    
+	    for (unsigned int p=0; p<n_qp; p++) // for each quadrature point
+	      {	  
+		xyz[p]          += elem_point*phi_map[i][p];
+		
+		dxyzdxi_map[p]  += elem_point*dphidxi_map[i][p];
+		
+		dxyzdeta_map[p] += elem_point*dphideta_map[i][p];
+	      };
+	  };
 	
 	/*
         // Test the inverse map
 	for (unsigned int p=0; p<n_qp; p++)
 	{
 	const Point p_inv = inverse_map (elem, xyz[p]);
-	    
+	
 	std::cout << "qp[p]   = ";
 	qrule->qp(p).print();
 	std::cout << "inv_map = ";
@@ -177,30 +193,42 @@ void FEBase::compute_map(const QBase* qrule,
 	// compute the jacobian at the quadrature points
 	for (unsigned int p=0; p<n_qp; p++)
 	  {
-	    jac[p] = (dxdxi_map(p)*dydeta_map(p) - dxdeta_map(p)*dydxi_map(p));
+	    const Real
+	      dx_dxi  = dxdxi_map(p),  dy_dxi  = dydxi_map(p),
+	      dx_deta = dxdeta_map(p), dy_deta = dydeta_map(p);
 	    
-	    if (jac[p] <= 0.)
+	    // Symbolically, the matrix determinant is
+	    //
+	    //         | dx/dxi   dy/dxi  |
+	    // jac =   | dx/deta  dy/deta |
+	    //         
+	    // jac = dx/dxi*dy/deta - dx/deta*dy/dxi 
+	    
+	    // Compute the Jacobian.  This assumes the 2D face
+	    // lives in 2D space
+	    const Real jac = (dx_dxi*dy_deta - dx_deta*dy_dxi);	    
+	    
+	    if (jac <= 0.)
 	      {
 		std::cerr << "ERROR: negative Jacobian: "
-			  << jac[p]
+			  << jac
 			  << std::endl;
 		error();
 	      };
 	    
-	    JxW[p] = jac[p]*qw[p];
+	    JxW[p] = jac*qw[p];
+	    
+	    // Compute the shape function derivatives wrt x,y at the
+	    // quadrature points
+	    const Real
+	      inv_jac = 1./jac;
+	    
+	    dxidx_map[p]  =  dy_deta*inv_jac; //dxi/dx  =  (1/J)*dy/deta
+	    dxidy_map[p]  = -dx_deta*inv_jac; //dxi/dy  = -(1/J)*dx/deta
+	    detadx_map[p] = -dy_dxi* inv_jac; //deta/dx = -(1/J)*dy/dxi
+	    detady_map[p] =  dx_dxi* inv_jac; //deta/dy =  (1/J)*dx/dxi
 	  };
-	
-	
-	// Compute the shape function derivatives wrt x,y at the
-	// quadrature points
-	for (unsigned int p=0; p<n_qp; p++)
-	  {
-	    dxidx_map[p]  =  (dydeta_map(p))/jac[p];  // dxi/dx  =  (1/J)*dy/deta
-	    dxidy_map[p]  = -(dxdeta_map(p))/jac[p];  // dxi/dy  = -(1/J)*dx/deta
-	    detadx_map[p] = -(dydxi_map(p))/jac[p];   // deta/dx = -(1/J)*dy/dxi;
-	    detady_map[p] =  (dxdxi_map(p))/jac[p];   // deta/dy =  (1/J)*dx/dxi;
-	  };        
-
+       
 	// done computing the map
 	return;
       };
@@ -213,7 +241,7 @@ void FEBase::compute_map(const QBase* qrule,
       {
 	//------------------------------------------------------------------
 	// Compute the (x,y,z) values at the quadrature points,
-	// the Jacobian at the quadrature points, etc..
+	// the Jacobian at the quadrature points
 
 	// Resize the vectors to hold data at the quadrature points
 	{  
@@ -231,7 +259,6 @@ void FEBase::compute_map(const QBase* qrule,
 	  dzetady_map.resize   (n_qp);
 	  dzetadz_map.resize   (n_qp);
 	  
-	  jac.resize (n_qp);
 	  JxW.resize (n_qp);
 	};
     
@@ -245,18 +272,27 @@ void FEBase::compute_map(const QBase* qrule,
 	  };
 	
 	
-	// compute (x,y,z), dxdxi, dydxi, dxdeta, dydeta at the quadrature points    
+	// compute (x,y,z), dxdxi,   dydxi,   dzdxi,
+	//                  dxdeta,  dydeta,  dzdeta,
+	//                  dxdzeta, dydzeta, dzdzeta
+	// at the quadrature points    
 	for (unsigned int i=0; i<phi_map.size(); i++) // sum over the nodes
-	  for (unsigned int p=0; p<n_qp; p++) // for each quadrature point...
-	    {	  
-	      xyz[p]           += elem->point(i)*phi_map[i][p];
-	      
-	      dxyzdxi_map[p]   += elem->point(i)*dphidxi_map[i][p];
-	      
-	      dxyzdeta_map[p]  += elem->point(i)*dphideta_map[i][p];
-	      
-	      dxyzdzeta_map[p] += elem->point(i)*dphidzeta_map[i][p];
-	    };
+	  {
+	    // Reference to the point, helps eliminate
+	    // exessive temporaries in the inner loop
+	    const Point& elem_point = elem->point(i);
+	    
+	    for (unsigned int p=0; p<n_qp; p++) // for each quadrature point
+	      {	  
+		xyz[p]           += elem_point*phi_map[i][p];
+		
+		dxyzdxi_map[p]   += elem_point*dphidxi_map[i][p];
+		
+		dxyzdeta_map[p]  += elem_point*dphideta_map[i][p];
+		
+		dxyzdzeta_map[p] += elem_point*dphidzeta_map[i][p];
+	      };
+	  };
 	
 	/*
         // Test the inverse map
@@ -274,43 +310,53 @@ void FEBase::compute_map(const QBase* qrule,
 	// compute the jacobian at the quadrature points
 	for (unsigned int p=0; p<n_qp; p++)
 	  {
+	    const Real
+	      dx_dxi   = dxdxi_map(p),   dy_dxi   = dydxi_map(p),   dz_dxi   = dzdxi_map(p),
+	      dx_deta  = dxdeta_map(p),  dy_deta  = dydeta_map(p),  dz_deta  = dzdeta_map(p),
+	      dx_dzeta = dxdzeta_map(p), dy_dzeta = dydzeta_map(p), dz_dzeta = dzdzeta_map(p);
+	    
+	    // Symbolically, the matrix determinant is
+	    //
+	    //         | dx/dxi   dy/dxi   dz/dxi   |
+	    // jac =   | dx/deta  dy/deta  dz/deta  |
+	    //         | dx/dzeta dy/dzeta dz/dzeta |
+	    // 
 	    // jac = dx/dxi*(dy/deta*dz/dzeta - dz/deta*dy/dzeta) +
 	    //       dy/dxi*(dz/deta*dx/dzeta - dx/deta*dz/dzeta) +
 	    //       dz/dxi*(dx/deta*dy/dzeta - dy/deta*dx/dzeta)
 	    
-	    jac[p] = (dxdxi_map(p)*(dydeta_map(p)*dzdzeta_map(p) - dzdeta_map(p)*dydzeta_map(p))  +
-		      dydxi_map(p)*(dzdeta_map(p)*dxdzeta_map(p) - dxdeta_map(p)*dzdzeta_map(p))  +
-		      dzdxi_map(p)*(dxdeta_map(p)*dydzeta_map(p) - dydeta_map(p)*dxdzeta_map(p)));
+	    const Real jac = (dx_dxi*(dy_deta*dz_dzeta - dz_deta*dy_dzeta)  +
+			      dy_dxi*(dz_deta*dx_dzeta - dx_deta*dz_dzeta)  +
+			      dz_dxi*(dx_deta*dy_dzeta - dy_deta*dx_dzeta));
 	    
-	    if (jac[p] <= 0.)
+	    if (jac <= 0.)
 	      {
 		std::cerr << "ERROR: negative Jacobian: "
-			  << jac[p]
+			  << jac
 			  << std::endl;
 		error();
 	      };
 
-	    JxW[p] = jac[p]*qw[p];
+	    JxW[p] = jac*qw[p];
+	    
+	    // Compute the shape function derivatives wrt x,y at the
+	    // quadrature points
+	    const Real
+	      inv_jac  = 1./jac;	    
+	    
+	    dxidx_map[p]   = (dy_deta*dz_dzeta - dz_deta*dy_dzeta)*inv_jac;
+	    dxidy_map[p]   = (dz_deta*dx_dzeta - dx_deta*dz_dzeta)*inv_jac;
+	    dxidz_map[p]   = (dx_deta*dy_dzeta - dy_deta*dx_dzeta)*inv_jac;
+	    
+	    detadx_map[p]  = (dz_dxi*dy_dzeta  - dy_dxi*dz_dzeta )*inv_jac;
+	    detady_map[p]  = (dx_dxi*dz_dzeta  - dz_dxi*dx_dzeta )*inv_jac;
+	    detadz_map[p]  = (dy_dxi*dx_dzeta  - dx_dxi*dy_dzeta )*inv_jac;
+	    
+	    dzetadx_map[p] = (dy_dxi*dz_deta   - dz_dxi*dy_deta  )*inv_jac;
+	    dzetady_map[p] = (dz_dxi*dx_deta   - dx_dxi*dz_deta  )*inv_jac;
+	    dzetadz_map[p] = (dx_dxi*dy_deta   - dy_dxi*dx_deta  )*inv_jac;
 	  };
-
-
-	// Compute the shape function derivatives wrt x,y at the
-	// quadrature points
-	for (unsigned int p=0; p<n_qp; p++)
-	  {
-	    dxidx_map[p] = (dydeta_map(p)*dzdzeta_map(p) - dzdeta_map(p)*dydzeta_map(p))/jac[p];
-	    dxidy_map[p] = (dzdeta_map(p)*dxdzeta_map(p) - dxdeta_map(p)*dzdzeta_map(p))/jac[p];
-	    dxidz_map[p] = (dxdeta_map(p)*dydzeta_map(p) - dydeta_map(p)*dxdzeta_map(p))/jac[p];
-	    
-	    detadx_map[p] = (dzdxi_map(p)*dydzeta_map(p) - dydxi_map(p)*dzdzeta_map(p))/jac[p];
-	    detady_map[p] = (dxdxi_map(p)*dzdzeta_map(p) - dzdxi_map(p)*dxdzeta_map(p))/jac[p];
-	    detadz_map[p] = (dydxi_map(p)*dxdzeta_map(p) - dxdxi_map(p)*dydzeta_map(p))/jac[p];
-	    
-	    dzetadx_map[p] = (dydxi_map(p)*dzdeta_map(p) - dzdxi_map(p)*dydeta_map(p))/jac[p];
-	    dzetady_map[p] = (dzdxi_map(p)*dxdeta_map(p) - dxdxi_map(p)*dzdeta_map(p))/jac[p];
-	    dzetadz_map[p] = (dxdxi_map(p)*dydeta_map(p) - dydxi_map(p)*dxdeta_map(p))/jac[p];
-	  };        
-
+	
 	// done computing the map
 	return;
       };
@@ -438,320 +484,323 @@ Point FE<Dim,T>::map_zeta (const Elem* elem,
 
 template <unsigned int Dim, FEFamily T>
 Point FE<Dim,T>::inverse_map (const Elem* elem,
-			      const Point& physical_point)
+			      const Point& physical_point,
+			      const Real tolerance)
 {
   assert (elem != NULL);
 
-  switch (Dim)
+  /**
+   * How much did the point on the reference
+   * element change by in this Newton step?
+   */
+  Real error = 0.;
+
+  /**
+   * The point on the reference element.  This is
+   * the "initial guess" for Newton's method.  The
+   * centroid seems like a good idea, but computing
+   * it is a little more intensive than, say taking
+   * the zero point.  
+   *
+   * Convergence should be insensitive of this choice
+   * for "good" elements.
+   */
+  //Point p = elem->centroid(); // A reasonable guess.  Requires computation
+  Point p; // the zero point.  No computation required
+
+  /**
+   * The XYZ locations of the point of interest.
+   */
+  const Real
+    X = physical_point(0), 
+    Y = physical_point(1), 
+    Z = physical_point(2);
+
+  /**
+   * The number of iterations in the map inversion process.
+   */
+  unsigned int cnt = 0;
+
+
+
+
+  /**
+   * Newton iteration loop.
+   */
+  do
     {
-      
-      //------------------------------------------------------------------
-      // 1D map inversion
-    case 1:
-      {
-	Real error = 0.;
+      /**
+       * Where our current iterate \p p maps to.
+       */
+      const Point physical_guess = FE<Dim,T>::map (elem, p);
 
-	Point p;
-	
-	const Real
-	  X = physical_point(0);
+      /**
+       * How far our current iterate is from the actual point.
+       */
+      const Point delta = physical_point - physical_guess;
 
-	unsigned int cnt = 0;
-	
-	do
+      /**
+       * Increment in current iterate \p p, will be computed.
+       */
+      Point dp;
+
+
+      /**
+       * The form of the map and how we invert it depends
+       * on the dimension that we are in.
+       */      
+      switch (Dim)
+	{
+	  
+	  /**	 
+	   *------------------------------------------------------------------
+	   * 1D map inversion
+	   *
+	   * Here we find the point on a 1D reference element that maps to
+	   * the point \p physical_point in the domain.  This is a bit tricky
+	   * since we do not want to assume that the point \p physical_point
+	   * is also in a 1D domain.  In particular, this method might get
+	   * called on the edge of a 3D element, in which case \p physical_point
+	   * actually lives in 3D.
+	   */
+	case 1:
 	  {
-	    // The actual update step
+	    const Point dxi            = FE<Dim,T>::map_xi (elem, p);
+	    
+	    /**
+	     * Newton's method in this case looks like
+	     *
+	     * {X} - {X_n} = [J]*dp
+	     *
+	     * Where {X}, {X_n} are 3x1 vectors, [J] is a 3x1 matrix
+	     * d(x,y,z)/dxi, and we seek dp, a scalar.  Since the above
+	     * system is either overdermined or rank-deficient, we will
+	     * solve the normal equations for this system
+	     *
+	     * [J]^T ({X} - {X_n}) = [J]^T [J] {dp}
+	     *
+	     * which involves the trivial inversion of the scalar
+	     * G = [J]^T [J]
+	     */	    
+	    const Real G = dxi*dxi;
+	    
+	    assert (G > 0.);
+	    
+	    const Real Ginv = 1./G;
+	    
+	    const Real  dxidelta = dxi*delta;
+	    
+	    dp(0) = Ginv*dxidelta;
+
+	    break;
+	  };
+
+
+
+	  /**	 
+	   *------------------------------------------------------------------
+	   * 2D map inversion
+	   *
+	   * Here we find the point on a 2D reference element that maps to
+	   * the point \p physical_point in the domain.  This is a bit tricky
+	   * since we do not want to assume that the point \p physical_point
+	   * is also in a 2D domain.  In particular, this method might get
+	   * called on the face of a 3D element, in which case \p physical_point
+	   * actually lives in 3D.
+	   */
+	case 2:
+	  {
+	    const Point dxi            = FE<Dim,T>::map_xi  (elem, p);
+	    const Point deta           = FE<Dim,T>::map_eta (elem, p);
+	    
+	    /**
+	     * Newton's method in this case looks like
+	     *
+	     * {X} - {X_n} = [J]*{dp}
+	     *
+	     * Where {X}, {X_n} are 3x1 vectors, [J] is a 3x2 matrix
+	     * d(x,y,z)/d(xi,eta), and we seek {dp}, a 2x1 vector.  Since
+	     * the above system is either overdermined or rank-deficient,
+	     * we will solve the normal equations for this system
+	     *
+	     * [J]^T ({X} - {X_n}) = [J]^T [J] {dp}
+	     *
+	     * which involves the inversion of the 2x2 matrix
+	     * [G] = [J]^T [J]
+	     */
+	    const Real
+	      G11 = dxi*dxi,  G12 = dxi*deta,
+	      G21 = dxi*deta, G22 = deta*deta;
+	    
+	    
+	    const Real det = (G11*G22 - G12*G21);
+	    
+	    assert (det > 0.);
+	    assert (fabs(det) > 1.e-10);
+	    
+	    const Real inv_det = 1./det;
+	    
+	    const Real
+	      Ginv11 =  G22*inv_det,
+	      Ginv12 = -G12*inv_det,
+	      
+	      Ginv21 = -G21*inv_det,
+	      Ginv22 =  G11*inv_det;
+	    
+	    
+	    const Real  dxidelta  = dxi*delta;
+	    const Real  detadelta = deta*delta;
+	    
+	    dp(0) = (Ginv11*dxidelta + Ginv12*detadelta);
+	    dp(1) = (Ginv21*dxidelta + Ginv22*detadelta);
+
+	    break;
+	  };
+	  
+
+	  
+	  /**	 
+	   *------------------------------------------------------------------
+	   * 3D map inversion
+	   *
+	   * Here we find the point in a 3D reference element that maps to
+	   * the point \p physical_point in a 3D domain. Nothing special
+	   * has to happen here, since (unless the map is singular because
+	   * you have a BAD element) the map will be invertable and we can
+	   * apply Newton's method directly.
+	   */
+	case 3:
+	  {
+       	    const Point dxi   = FE<Dim,T>::map_xi   (elem, p);
+	    const Point deta  = FE<Dim,T>::map_eta  (elem, p);
+	    const Point dzeta = FE<Dim,T>::map_zeta (elem, p);
+	    
+	    /**
+	     * Newton's method in this case looks like
+	     *
+	     * {X} - {X_n} = [J]*{dp}
+	     *
+	     * Where {X}, {X_n} are 3x1 vectors, [J] is a 3x3 matrix
+	     * d(x,y,z)/dxi, and we seek {dp}, a 3x1 vector. Since the above
+	     * system is nonsingular for invertable maps we will solve 
+	     *
+	     * ({X} - {X_n}) = [J] {dp}
+	     *
+	     * which involves the inversion of the 3x3 matrix [J]
+	     */	    
+	    const Real
+	      J11 = dxi(0), J12 = deta(0), J13 = dzeta(0),
+	      J21 = dxi(1), J22 = deta(1), J23 = dzeta(1),
+	      J31 = dxi(2), J32 = deta(2), J33 = dzeta(2);
+	    
+	    const Real det = (J11*(J22*J33 - J23*J32) +
+			      J12*(J23*J31 - J21*J33) +
+			      J13*(J21*J32 - J22*J31));
+	    
+	    assert (det > 0.);
+	    assert (fabs(det) > 1.e-10);
+	    
+	    const Real inv_det = 1./det;
+	    
+	    const Real
+	      Jinv11 =  (J22*J33 - J23*J32)*inv_det,
+	      Jinv12 = -(J12*J33 - J13*J32)*inv_det,
+	      Jinv13 =  (J12*J23 - J13*J22)*inv_det,
+	      
+	      Jinv21 = -(J21*J33 - J23*J31)*inv_det,
+	      Jinv22 =  (J11*J33 - J13*J31)*inv_det,
+	      Jinv23 = -(J11*J23 - J13*J21)*inv_det,
+	      
+	      Jinv31 =  (J21*J32 - J22*J31)*inv_det,
+	      Jinv32 = -(J11*J32 - J12*J31)*inv_det,
+	      Jinv33 =  (J11*J22 - J12*J21)*inv_det;
+	    
+	    
+	    dp(0) = (Jinv11*delta(0) +
+		     Jinv12*delta(1) +
+		     Jinv13*delta(2));
+	    
+	    dp(1) = (Jinv21*delta(0) +
+		     Jinv22*delta(1) +
+		     Jinv23*delta(2));
+	    
+	    dp(2) = (Jinv31*delta(0) +
+		     Jinv32*delta(1) +
+		     Jinv33*delta(2));
+
+	    break;
+	  };
+
+
+	  /**
+	   * Some other dimension?
+	   */
+	default:
+	  error();
+	}; // end switch(Dim), dp now computed
+
+
+
+      /**
+       * ||P_n+1 - P_n||
+       */
+      error = dp.size();
+
+      /**
+       * P_n+1 = P_n + dp
+       */
+      p += dp;
+
+      /**
+       * Increment the iteration count.
+       */
+      cnt++;
+
+      /**
+       * Watch for divergence of Newton's
+       * method.
+       */
+      if (cnt > 10)
+	{
+	  here();
+	  std::cerr << "WARNING: Newton scheme has not converged in "
+		    << cnt << " iterations!"
+		    << std::endl;
+	  
+	  if (cnt > 20)
 	    {
-	      const Point physical_guess = FE<Dim,T>::map    (elem, p);
-	      
-	      const Point dxi            = FE<Dim,T>::map_xi (elem, p);
-	      
-	      const Real
-		J = dxi(0);
-	      
-	      assert (J != 0.);
-	      
-	      const Real
-		Jinv =  1./J;
-
-	      
-	      Point dp;
-	      
-	      dp(0) = Jinv*(-physical_guess(0) + X);
-	      
-	      error = dp.size();
-
-	      p += dp;
+	      std::cerr << "ERROR: Newton scheme FAILED to converge in "
+			<< cnt << " iterations!" << std::endl
+			<< "p="; 
+	      error();
 	    };
-	    
-	    cnt++;
-	    
-	    if (cnt > 10)
-	      {
-		here();
-		std::cerr << "WARNING: Newton scheme has not converged in "
-			  << cnt << " iterations!"
-			  << std::endl;
-		
-		if (cnt > 20)
-		  {
-		    std::cerr << "WARNING: Newton scheme FAILED to converge in "
-			      << cnt << " iterations!"
-			      << std::endl;
-		    error();
-		  };
-	      };
-	  }
-	while (error > 1.e-6);
+	};
+    }
+  while (error > tolerance);
 
+
+
+  /**
+   * If we are in debug mode do a sanity check.  Make sure
+   * the point \p p on the reference element actually does
+   * map to the point \p physical_point within a tolerance.
+   */ 
 #ifdef DEBUG
 	
-	const Point check = FE<Dim,T>::map (elem, p);
-	const Point diff  = physical_point - check;
-
-	if (diff.size() > 1.e-6)
-	  {
-	    here();
-	    std::cerr << "WARNING:  diff is "
-		      << diff.size()
-		      << std::endl;
-	  };
-       
-#endif
-
-	return p;
-      };
-
-
-
-
-
-
-
-
-
-
-      //------------------------------------------------------------------
-      // 2D map inversion
-    case 2:
-      {
-	Real error = 0.;
-
-	Point p;
-	
-	const Real
-	  X = physical_point(0), 
-	  Y = physical_point(1);
-
-	unsigned int cnt = 0;
-	
-	do
-	  {
-	    // The actual update step
-	    {
-	      const Point physical_guess = FE<Dim,T>::map (elem, p);
-	      
-	      const Point dxi   = FE<Dim,T>::map_xi   (elem, p);
-	      const Point deta  = FE<Dim,T>::map_eta  (elem, p);
-	      
-	      const Real
-		J11 = dxi(0), J12 = deta(0),
-		J21 = dxi(1), J22 = deta(1);
-	      
-	      const Real det = (J11*J22 - J12*J21);
-	      
-	      assert (det > 0.);
-	      assert (fabs(det) > 1.e-10);
-	      
-	      const Real inv_det = 1./det;
-	      
-	      const Real
-		Jinv11 =  J22*inv_det,
-		Jinv12 = -J12*inv_det,
-		
-		Jinv21 = -J21*inv_det,
-		Jinv22 =  J11*inv_det;
-
-	      
-	      Point dp;
-	      
-	      dp(0) = (Jinv11*(-physical_guess(0) + X) +
-		       Jinv12*(-physical_guess(1) + Y));
-	      
-	      dp(1) = (Jinv21*(-physical_guess(0) + X) +
-		       Jinv22*(-physical_guess(1) + Y));
-	      
-	      error = dp.size();
-
-	      p += dp;
-	    };
-	    
-	    cnt++;
-
-	    if (cnt > 10)
-	      {
-		here();
-		std::cerr << "WARNING: Newton scheme has not converged in "
-			  << cnt << " iterations!"
-			  << std::endl;
-		
-		if (cnt > 20)
-		  {
-		    std::cerr << "WARNING: Newton scheme FAILED to converge in "
-			      << cnt << " iterations!"
-			      << std::endl;
-		    error();
-		  };
-	      };
-	  }
-	while (error > 1.e-6);
-	
-#ifdef DEBUG
-	
-	const Point check = FE<Dim,T>::map (elem, p);
-	const Point diff  = physical_point - check;
-
-	if (diff.size() > 1.e-6)
-	  {
-	    here();
-	    std::cerr << "WARNING:  diff is "
-		      << diff.size()
-		      << std::endl;
-	  };
-       
-#endif
-
-	return p;
-      };
-
-
-
-
-
-
-
-
-
-
-      //------------------------------------------------------------------
-      // 3D map inversion
-    case 3:
-      {
-	Real error = 0.;
-
-	Point p;
-	
-	const Real
-	  X = physical_point(0), 
-	  Y = physical_point(1), 
-	  Z = physical_point(2);
-
-	unsigned int cnt = 0;
-	
-	do
-	  {
-	    // The actual update step
-	    {
-	      const Point physical_guess = FE<Dim,T>::map (elem, p);
-	      
-	      const Point dxi   = FE<Dim,T>::map_xi   (elem, p);
-	      const Point deta  = FE<Dim,T>::map_eta  (elem, p);
-	      const Point dzeta = FE<Dim,T>::map_zeta (elem, p);
-	      
-	      const Real
-		J11 = dxi(0), J12 = deta(0), J13 = dzeta(0),
-		J21 = dxi(1), J22 = deta(1), J23 = dzeta(1),
-		J31 = dxi(2), J32 = deta(2), J33 = dzeta(2);
-	      
-	      const Real det = (J11*(J22*J33 - J23*J32) +
-				J12*(J23*J31 - J21*J33) +
-				J13*(J21*J32 - J22*J31));
-	      
-	      assert (det > 0.);
-	      assert (fabs(det) > 1.e-10);
-	      
-	      const Real inv_det = 1./det;
-	      
-	      const Real
-		Jinv11 =  (J22*J33 - J23*J32)*inv_det,
-		Jinv12 = -(J12*J33 - J13*J32)*inv_det,
-		Jinv13 =  (J12*J23 - J13*J22)*inv_det,
-		
-		Jinv21 = -(J21*J33 - J23*J31)*inv_det,
-		Jinv22 =  (J11*J33 - J13*J31)*inv_det,
-		Jinv23 = -(J11*J23 - J13*J21)*inv_det,
-		
-		Jinv31 =  (J21*J32 - J22*J31)*inv_det,
-		Jinv32 = -(J11*J32 - J12*J31)*inv_det,
-		Jinv33 =  (J11*J22 - J12*J21)*inv_det;
-	      
-	      
-	      Point dp;
-	      
-	      dp(0) = (Jinv11*(-physical_guess(0) + X) +
-		       Jinv12*(-physical_guess(1) + Y) +
-		       Jinv13*(-physical_guess(2) + Z));
-	      
-	      dp(1) = (Jinv21*(-physical_guess(0) + X) +
-		       Jinv22*(-physical_guess(1) + Y) +
-		       Jinv23*(-physical_guess(2) + Z));
-	      
-	      dp(2) = (Jinv31*(-physical_guess(0) + X) +
-		       Jinv32*(-physical_guess(1) + Y) +
-		       Jinv33*(-physical_guess(2) + Z));
-	      
-	      error = dp.size();
-
-	      p += dp;
-	    };
-	    
-	    cnt++;
-	    
-	    if (cnt > 10)
-	      {
-		here();
-		std::cerr << "WARNING: Newton scheme has not converged in "
-			  << cnt << " iterations!"
-			  << std::endl;
-		
-		if (cnt > 20)
-		  {
-		    std::cerr << "ERROR: Newton scheme FAILED to converge in "
-			      << cnt << " iterations!"
-			      << std::endl;
-		    return p;
-		  };
-	      };
-	  }
-	while (error > 1.e-6);
-
-#ifdef DEBUG
-	
-	const Point check = FE<Dim,T>::map (elem, p);
-	const Point diff  = physical_point - check;
-
-	if (diff.size() > 1.e-6)
-	  {
-	    here();
-	    std::cerr << "WARNING:  diff is "
-		      << diff.size()
-		      << std::endl;
-	  };
-       
-#endif
-
-	return p;
-      };
-
-      
-    default:
-      error();
-      
+  const Point check = FE<Dim,T>::map (elem, p);
+  const Point diff  = physical_point - check;
+  
+  if (diff.size() > tolerance)
+    {
+      here();
+      std::cerr << "WARNING:  diff is "
+		<< diff.size()
+		<< std::endl;
     };
+  
+#endif
 
-  error();
 
-  Point p;
   
   return p;
 };

@@ -1,4 +1,4 @@
-// $Id: inf_fe_static.C,v 1.5 2003-02-06 05:41:15 ddreyer Exp $
+// $Id: inf_fe_static.C,v 1.6 2003-02-06 17:13:37 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -57,6 +57,7 @@ unsigned int InfFE<Dim,T_radial,T_map>::Radial::index(const FEType& fe_type,
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 Point InfFE<Dim,T_radial,T_map>::Radial::inverse_map(const Elem*,
+						     const Real,
 						     const Real)
 
 {
@@ -259,7 +260,8 @@ void InfFE<Dim,T_radial,T_map>::nodal_soln(const FEType&,
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem*,
-					      const Point& physical_point)
+					      const Point& physical_point,
+					      const Real)
 {
 //To do: fix inverse_map() for all three dimensions, specialize for each Dim, so that this gets more effective (for field point processing...)
 
