@@ -1,4 +1,4 @@
-// $Id: ex3.C,v 1.5 2003-02-04 01:57:17 benkirk Exp $
+// $Id: ex4.C,v 1.1 2003-02-04 01:57:17 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -56,14 +56,15 @@
 
 
 /**
- * \mainpage Example 3
+ * \mainpage Example 4
  *
  * \section Introduction
  *
- * This is the third example program.  It builds on
- * the second example program by showing how to solve a simple
- * Poisson system.  Note that we will not comment on things that
- * were already explained in the second example.
+ * This is the fourth example program.  It builds on
+ * the third example program by showing how to formulate
+ * the code in a dimension-independent way.  Very minor
+ * changes to the example will allow the problem to be
+ * solved in two or three dimensions.
  */
 
 
@@ -136,51 +137,65 @@ int main (int argc, char** argv)
    */   
   {
     /**
+     * Check for proper usage.
+     */
+    if (argc != 3)
+      {
+	std::cerr << "Usage: " << argv[0] << " -d 2"
+		  << std::endl;
+	
+	/**
+	 * This handy function will print the file name, line number,
+	 * and then abort.  Currrently the library does not use C++
+	 * exception handling.
+	 */
+	error();
+      }
+    
+    /**
      * Tell the user what we are doing.
      */
-    {
-      std::cout << "Running " << argv[0];
-      
-      for (int i=1; i<argc; i++)
-	std::cout << " " << argv[i];
-      
-      std::cout << std::endl << std::endl;
-    };
+    else 
+      {
+	std::cout << "Running " << argv[0];
+	
+	for (int i=1; i<argc; i++)
+	  std::cout << " " << argv[i];
+	
+	std::cout << std::endl << std::endl;
+      };
     
+
+    /**
+     * Get the dimensionality of the mesh from argv[2]
+     */
+    const unsigned int dim = atoi(argv[2]);     
     
     /**
      * Create a 2D mesh.
      */
-    Mesh mesh (2);
+    Mesh mesh (dim);
     
     /**
      * Use the internal mesh generator to create a uniform
-     * grid on the square [-1,1]^2.  We instruct the mesh generator
-     * to build a mesh of 5x5 \p Quad9 elements.  Building \p Quad9
-     * elements instead of the default \p Quad4's we used in example 2
-     * allow us to use higher-order approximation.
+     * grid on the square [-1,1]^D.  We instruct the mesh generator
+     * to build a mesh of 5x5 \p Quad9 elements in 2D, or \p Hex27
+     * elements in 3D.  Building these higher-order elements allows
+     * us to use higher-order approximation, as in example 3.
      */
-    mesh.build_square (5, 5,
-		       -1., 1.,
-		       -1., 1.,
-		       QUAD9);
+    mesh.build_cube (5, 5, 5,
+		     -1., 1.,
+		     -1., 1.,
+		     -1., 1.,
+		     (dim == 2) ? QUAD9 : HEX27);
 
     /**
-     * This is the first use of the \p Mesh::find_neighbors() method.
-     * When this method is called all the elements are interrogated
-     * and neighbors are found.  After this method is called then
-     * calling mesh.elem(3)->neighbor(2) will return a pointer to
-     * the element in the mesh that borders side 2 of element number
-     * 3.  The \p Elem::neighbor(unsigned int s)  member returns
-     * \p NULL if the \p s side of the element is on a boundary of
-     * the domain.
+     * Let the elements find their neighbors.
      */
     mesh.find_neighbors();
     
     /**
      * Print information about the mesh to the screen.
-     * Note that 5x5 \p Quad9 elements actually has 11x11 nodes,
-     * so this mesh is significantly larger than the one in example 2.
      */
     mesh.print_info();
     
@@ -206,8 +221,7 @@ int main (int argc, char** argv)
 
       /**
        * Give the system a pointer to the matrix assembly
-       * function.  This will be called when needed by the
-       * library.
+       * function.
        */
       equation_systems("Poisson").attach_assemble_function (assemble_poisson);
       
@@ -224,18 +238,7 @@ int main (int argc, char** argv)
 
 
     /**
-     * Solve the system "Poisson"  Note that calling this
-     * member will assemble the linear system and invoke
-     * the default Petsc solver, however the solver can be
-     * controlled from the command line.  For example,
-     * you can invoke conjugate gradient with
-     *
-     * ./ex3 -ksp_type cg
-     *
-     * and you can get a nice X-window that monitors the solver
-     * convergence with
-     *
-     * ./ex3 -ksp_xmonitor
+     * Solve the system "Poisson", just like example 2.
      */
     equation_systems("Poisson").solve();
 
@@ -447,6 +450,7 @@ void assemble_poisson(EquationSystems& es,
 	    {
 	      const Real x = q_point[qp](0);
 	      const Real y = q_point[qp](1);
+	      const Real z = q_point[qp](2);
 	      const Real eps = 1.e-3;
 
 	      /**
@@ -454,23 +458,28 @@ void assemble_poisson(EquationSystems& es,
 	       * In this case we set fxy to be a finite difference
 	       * Laplacian approximation to the (known) exact solution.
 	       *
-	       * We will use the second-order accurate FD Laplacian
-	       * approximation, which in 2D is
-	       *
-	       * u_xx + u_yy = (u(i,j-1) + u(i,j+1) +
-	       *                u(i-1,j) + u(i+1,j) +
-	       *                -4*u(i,j))/h^2
+	       * Note that in 2D the Laplacian of u = u_xx + u_yy,
+	       * but in 3D Laplacian of u = u_xx + u_yy + u_zz
 	       */
-	      const Real fxy = -(exact_solution(x,y-eps) +
-				 exact_solution(x,y+eps) +
-				 exact_solution(x-eps,y) +
-				 exact_solution(x+eps,y) -
-				 4.*exact_solution(x,y))/eps/eps;
+	      const Real uxx = (exact_solution(x-eps,y,z) +
+				exact_solution(x+eps,y,z) +
+				-2.*exact_solution(x,y,z))/eps/eps;
+	      
+	      const Real uyy = (exact_solution(x,y-eps,z) +
+				exact_solution(x,y+eps,z) +
+				-2.*exact_solution(x,y,z))/eps/eps;
+	      
+	      const Real uzz = (exact_solution(x,y,z-eps) +
+				exact_solution(x,y,z+eps) +
+				-2.*exact_solution(x,y,z))/eps/eps;
+
+	      const Real fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
 	      
 	      Fe[i] += JxW[qp]*fxy*phi[i][qp];
 	    }; // end of the RHS summation loop
 	  
 	}; // end of quadrature point loop
+
 
 
 
@@ -480,29 +489,9 @@ void assemble_poisson(EquationSystems& es,
        * At this point the interior element integration has
        * been completed.  However, we have not yet addressed
        * boundary conditions.  For this example we will only
-       * consider simple Dirichlet boundary conditions.
-       *
-       * There are several ways Dirichlet boundary conditions
-       * can be imposed.  A simple approach, which works for
-       * interpolary bases like you have with standard Lagrange
-       * finite elements, is to assing function values to the
-       * degrees of freedom living on the domain boundary. This
-       * works well for interpolary bases, but is more difficult
-       * when non-interpolary (e.g Legendre or Hierarchic) bases
-       * are used.
-       *
-       * Dirichlet boundary conditions can also be imposed with a
-       * "penalty" method.  In this case essentially the L2 projection
-       * of the boundary values are added to the matrix. The
-       * projection is multiplied by some large factor so that, in
-       * floating point arithmetic, the existing (smaller) entries
-       * in the matrix and right-hand-side are effectively ignored.
-       *
-       * This amounts to adding a term of the form
-       *
-       * \f$ \frac{1}{\epsilon} \int_{\delta \Omega} \phi_i \phi_j = \frac{1}{\epsilon} \int_{\delta \Omega} u \phi_i \f$
-       *
-       * where \f$ \frac{1}{\epsilon} \f$ is the penalty parameter when \f$ \epsilon \lle 1 \f$
+       * consider simple Dirichlet boundary conditions imposed
+       * via the penalty method. This is discussed at length in
+       * example 3.
        */
       {
 	/**
@@ -569,6 +558,7 @@ void assemble_poisson(EquationSystems& es,
 		   */
 		  const Real xf = qface_point[qp](0);
 		  const Real yf = qface_point[qp](1);
+		  const Real zf = qface_point[qp](2);
 		  
 		  /**
 		   * The penalty value.  \f$ \frac{1}{\epsilon \f$
@@ -579,7 +569,7 @@ void assemble_poisson(EquationSystems& es,
 		  /**
 		   * The boundary value.
 		   */
-		  const Real value = exact_solution(xf, yf);
+		  const Real value = exact_solution(xf, yf, zf);
 		  
 		  /**
 		   * Matrix contribution of the L2 projection. 
@@ -615,7 +605,7 @@ void assemble_poisson(EquationSystems& es,
        * and \p PetscVector::add_vector() members do this for us.
        */
       es("Poisson").matrix.add_matrix (Ke, dof_indices);
-      es("Poisson").rhs.add_vector (Fe, dof_indices);
+      es("Poisson").rhs.add_vector    (Fe, dof_indices);
       
     }; // end of element loop
 

@@ -1,0 +1,7 @@
+*~
+*.go
+*.o
+*.pgo
+*.syo
+ex4
+out.gmv
