@@ -1,4 +1,4 @@
-// $Id: fe_interface.h,v 1.13 2003-03-29 12:45:33 ddreyer Exp $
+// $Id: fe_interface.h,v 1.14 2003-04-01 14:19:47 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -165,22 +165,14 @@ public:
 
 private:
 
-#ifdef ENABLE_INFINITE_ELEMENTS 
+
   /**
    * @returns true if \p et is an element to be processed by
-   * class \p InfFE.  Otherwise, it returns false, and
-   * this element should be processed using \p FE.
-   * This method is particularly helpful during the actual
-   * matrix assembly process.
+   * class \p InfFE.  Otherwise, it returns false.
+   * For compatibility with disabled infinite elements
+   * it always returns false.
    */
-#else
-  /**
-   * @returns always false.  For compatibility with disabled 
-   * infinite elements.
-   */
-#endif
   static bool is_InfFE_elem(const ElemType et);
-
 
 
 #ifdef ENABLE_INFINITE_ELEMENTS
@@ -219,11 +211,11 @@ private:
 				 const FEType& fe_t,
 				 const Elem* elem,
 				 const Point& p,
-				 const Real tolerance = 1.e-6);
+				 const Real tolerance);
 
   static bool ifem_on_reference_element(const Point& p,
 					const ElemType t,
-					const Real eps=1.e-6);
+					const Real eps);
 
   static Real ifem_shape(const unsigned int dim,
 			 const FEType& fe_t,

@@ -1,4 +1,4 @@
-// $Id: cell_inf.h,v 1.2 2003-03-26 01:08:15 ddreyer Exp $
+// $Id: cell_inf.h,v 1.3 2003-04-01 14:19:45 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -58,18 +58,28 @@ public:
    */
   unsigned int dim () const { return 3; }
 
-
-#ifdef ENABLE_INFINITE_ELEMENTS
-
   /**
    * @returns \p true.  All classes derived from \p InfCell
    * are infinite elements. 
    */
   bool infinite () const { return true; }
 
-#endif
+  /**
+   * @returns the origin of this infinite element.
+   */
+  Point origin () const;
   
 };
+
+
+// ------------------------------------------------------------
+// InfCell inline functions
+inline
+Point InfCell::origin () const
+{
+  return ( this->point(0)*2. - this->point( this->n_vertices()/2 ) );
+}
+
 
 
 #endif // ifdef ENABLE_INFINITE_ELEMENTS

@@ -397,7 +397,6 @@ src/fe/fe.$(obj-suffix):\
     include/fe.h\
     include/fe_base.h\
     include/fe_type.h\
-    include/inf_fe.h\
     include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
@@ -818,6 +817,34 @@ src/fe/inf_fe.$(obj-suffix):\
     include/quadrature_gauss.h\
     include/reference_counted_object.h\
     include/reference_counter.h
+src/fe/inf_fe_base_radial.$(obj-suffix):\
+    src/fe/inf_fe_base_radial.C\
+    include/auto_ptr.h\
+    include/dof_object.h\
+    include/elem.h\
+    include/enum_elem_quality.h\
+    include/enum_elem_type.h\
+    include/enum_fe_family.h\
+    include/enum_inf_map_type.h\
+    include/enum_order.h\
+    include/fe.h\
+    include/fe_base.h\
+    include/fe_interface.h\
+    include/fe_type.h\
+    include/inf_fe.h\
+    include/inf_fe_instantiate_1D.h\
+    include/inf_fe_instantiate_2D.h\
+    include/inf_fe_instantiate_3D.h\
+    include/inf_fe_macro.h\
+    include/libmesh.h\
+    include/libmesh_base.h\
+    include/mesh_common.h\
+    include/mesh_config.h\
+    include/node.h\
+    include/perf_log.h\
+    include/point.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h
 src/fe/inf_fe_boundary.$(obj-suffix):\
     src/fe/inf_fe_boundary.C\
     include/auto_ptr.h\
@@ -912,6 +939,30 @@ src/fe/inf_fe_legendre_eval.$(obj-suffix):\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h
+src/fe/inf_fe_map.$(obj-suffix):\
+    src/fe/inf_fe_map.C\
+    include/auto_ptr.h\
+    include/dof_object.h\
+    include/elem.h\
+    include/enum_elem_quality.h\
+    include/enum_elem_type.h\
+    include/enum_fe_family.h\
+    include/enum_inf_map_type.h\
+    include/enum_order.h\
+    include/fe.h\
+    include/fe_base.h\
+    include/fe_type.h\
+    include/inf_fe.h\
+    include/inf_fe_macro.h\
+    include/libmesh.h\
+    include/libmesh_base.h\
+    include/mesh_common.h\
+    include/mesh_config.h\
+    include/node.h\
+    include/perf_log.h\
+    include/point.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h
 src/fe/inf_fe_map_eval.$(obj-suffix):\
     src/fe/inf_fe_map_eval.C\
     include/auto_ptr.h\
@@ -940,6 +991,7 @@ src/fe/inf_fe_static.$(obj-suffix):\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
     include/enum_order.h\
+    include/fe.h\
     include/fe_base.h\
     include/fe_interface.h\
     include/fe_type.h\
@@ -1128,7 +1180,11 @@ src/geom/cell_inf_hex8.$(obj-suffix):\
     include/elem.h\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
+    include/enum_fe_family.h\
+    include/enum_inf_map_type.h\
     include/enum_order.h\
+    include/fe_interface.h\
+    include/fe_type.h\
     include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
@@ -1197,7 +1253,11 @@ src/geom/cell_inf_prism6.$(obj-suffix):\
     include/elem.h\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
+    include/enum_fe_family.h\
+    include/enum_inf_map_type.h\
     include/enum_order.h\
+    include/fe_interface.h\
+    include/fe_type.h\
     include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
@@ -1596,9 +1656,13 @@ src/geom/face_inf_quad4.$(obj-suffix):\
     include/elem.h\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
+    include/enum_fe_family.h\
+    include/enum_inf_map_type.h\
     include/enum_order.h\
     include/face_inf_quad.h\
     include/face_inf_quad4.h\
+    include/fe_interface.h\
+    include/fe_type.h\
     include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_common.h\
@@ -2238,6 +2302,8 @@ src/mesh/mesh_unv_support.$(obj-suffix):\
     include/cell_hex.h\
     include/cell_hex20.h\
     include/cell_hex8.h\
+    include/cell_prism.h\
+    include/cell_prism6.h\
     include/cell_tet.h\
     include/cell_tet10.h\
     include/cell_tet4.h\

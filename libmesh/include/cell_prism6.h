@@ -1,4 +1,4 @@
-// $Id: cell_prism6.h,v 1.11 2003-03-11 00:47:40 ddreyer Exp $
+// $Id: cell_prism6.h,v 1.12 2003-04-01 14:19:46 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -37,12 +37,12 @@
    PRISM6:
            5
            o
-          /|\
-         / | \
+          /:\
+         / : \
         /  o  \
      3 o-------o 4
-       | / 2 \ |
-       |/     \|
+       | . 2 . |
+       |.     .|
        o-------o
        0       1
    \endverbatim

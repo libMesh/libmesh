@@ -1,4 +1,4 @@
-// $Id: face_inf_quad4.h,v 1.12 2003-03-11 00:47:40 ddreyer Exp $
+// $Id: face_inf_quad4.h,v 1.13 2003-04-01 14:19:47 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -37,7 +37,7 @@
  * The \p INFQUAD4 is an infinite element in 2D composed of 4 nodes.
  * It is numbered like this:
    \verbatim
-             3           2
+             2           3
    INFQUAD4: o           o   closer to infinity
              |           |
              |           |
@@ -88,12 +88,20 @@ public:
 
   const std::vector<unsigned int> tecplot_connectivity(const unsigned int sf=0) const;
   
-  void vtk_connectivity(const unsigned int,
-			std::vector<unsigned int>*) const;
+  void vtk_connectivity(const unsigned int sc,
+			std::vector<unsigned int>*conn = NULL) const;
   
   unsigned int vtk_element_type (const unsigned int) const
   { return 9; }
   
+  /**
+   * @returns \p true when this element contains the point
+   * \p p.  Customized for this \p InfQuad4, since knowledge
+   * about the envelope can help avoiding slightly more 
+   * expensive computations.
+   */
+  bool contains_point (const Point& p) const;
+
   
 protected:
   

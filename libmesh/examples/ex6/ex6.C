@@ -1,4 +1,4 @@
-// $Id: ex6.C,v 1.19 2003-03-29 12:45:30 ddreyer Exp $
+// $Id: ex6.C,v 1.20 2003-04-01 14:19:44 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -166,8 +166,8 @@ int main (int argc, char** argv)
 		     -1., 1.,
 		     -1., 1.,
 		     -1., 1.,
-		     (dim == 2) ? QUAD8 : HEX27);
-//		     (dim == 2) ? QUAD4 : HEX8); //HEX20); //HEX27);
+// 		     (dim == 2) ? QUAD8 : HEX27);
+		     (dim == 2) ? QUAD4 : HEX8); //HEX20); //HEX27);
 
     /**
      * Print information about the mesh to the screen.
@@ -239,6 +239,8 @@ int main (int argc, char** argv)
        */
       equation_systems("Wave").attach_assemble_function (assemble_wave);
       
+
+      _p(kurz_vor_eqnsys_init);
       /**
        * Initialize the data structures for the equation system.
        */

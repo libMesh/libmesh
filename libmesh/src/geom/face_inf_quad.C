@@ -1,4 +1,4 @@
-// $Id: face_inf_quad.C,v 1.1 2003-03-11 00:47:45 ddreyer Exp $
+// $Id: face_inf_quad.C,v 1.2 2003-04-01 14:19:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -56,7 +56,7 @@ AutoPtr<Elem> InfQuad::side (const unsigned int i) const
         InfEdge2* edge = new InfEdge2;
 
 	edge->set_node(0) = this->get_node(1);
-	edge->set_node(1) = this->get_node(2);	
+	edge->set_node(1) = this->get_node(3);	
 
 	AutoPtr<Elem> ap(edge);  return ap;
       }
@@ -67,7 +67,7 @@ AutoPtr<Elem> InfQuad::side (const unsigned int i) const
 	InfEdge2* edge = new InfEdge2;
 
 	edge->set_node(0) = this->get_node(0); // be aware of swapped nodes,
-	edge->set_node(1) = this->get_node(3); // compared to conventional side numbering
+	edge->set_node(1) = this->get_node(2); // compared to conventional side numbering
 
 	AutoPtr<Elem> ap(edge);  return ap;
       }

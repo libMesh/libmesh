@@ -1,4 +1,4 @@
-// $Id: face_inf_quad6.h,v 1.12 2003-03-11 00:47:40 ddreyer Exp $
+// $Id: face_inf_quad6.h,v 1.13 2003-04-01 14:19:47 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -39,7 +39,7 @@
  * The \p INFQUAD6 is an infinite element in 2D composed of 6 nodes.
  * It is numbered like this:
    \verbatim
-             3     5     2
+             2     5     3
    INFQUAD6: o     o     o   closer to infinity
              |           |
              |           |
