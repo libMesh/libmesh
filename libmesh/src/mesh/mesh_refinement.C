@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.9 2003-03-03 02:15:58 benkirk Exp $
+// $Id: mesh_refinement.C,v 1.10 2003-04-29 21:41:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -193,7 +193,7 @@ void MeshRefinement::refine_and_coarsen_elements ()
   for (unsigned int e=0; e<mesh.n_elem(); e++)
     {
       assert (mesh.elem(e) != NULL);
-      mesh.elem(e)->set_refinement_flag(Elem::DO_NOTHING);
+      //mesh.elem(e)->set_refinement_flag(Elem::DO_NOTHING);
     }
   
   /**
