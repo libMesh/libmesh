@@ -126,7 +126,7 @@ z-index:3; /* This allows the content to overlap the right menu in narrow window
 }
 
 #navAlpha {
-position:fixed;/*biatch*/
+position:absolute; 
 width:150px;
 top:20px;
 left:20px;
