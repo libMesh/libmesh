@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.46 2003-11-30 06:29:47 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.47 2003-11-30 06:33:38 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -1278,7 +1278,7 @@ if (test -e $MPI_LIBS_PATH/libmpi.a || test -e $MPI_LIBS_PATH/libmpi.so) ; then
 	AC_CHECK_LIB([lam],
                      [lam_show_version],
                      [
-                       LIBS    ="-llam $LIBS"
+                       LIBS="-llam $LIBS"
                        MPI_LIBS="-llam $MPI_LIBS"
                        MPI_IMPL="lam"
                      ],	
@@ -1290,7 +1290,7 @@ if (test -e $MPI_LIBS_PATH/libmpi.a || test -e $MPI_LIBS_PATH/libmpi.so) ; then
 		 AC_CHECK_LIB([elan],
 	                      [elan_init],
 	                      [
-                                LIBS    ="-lelan $LIBS"
+                                LIBS="-lelan $LIBS"
                                 MPI_LIBS="-lelan $MPI_LIBS"
                               ],
 	                      [AC_MSG_ERROR( [Could not find elan library... exiting] )] )
@@ -1341,7 +1341,7 @@ if (test -e $MPI_LIBS_PATH/libmpich.a || test -e $MPI_LIBS_PATH/libmpich.so) ; t
           AC_CHECK_LIB([gm],
 	               [gm_open],
 	               [
-                         LIBS    ="-lgm $LIBS"
+                         LIBS="-lgm $LIBS"
                          MPI_LIBS="-lgm $MPI_LIBS"
                        ],
 	               [AC_MSG_ERROR( [Could not find gm library... exiting] )] )

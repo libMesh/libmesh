@@ -8123,6 +8123,7 @@ else
 fi;
 
           LIBS="-L$GM/lib $LIBS"
+          MPI_LIBS="-L$GM/lib $MPI_LIBS"
 
           echo "$as_me:$LINENO: checking for gm_open in -lgm" >&5
 echo $ECHO_N "checking for gm_open in -lgm... $ECHO_C" >&6
@@ -8805,6 +8806,7 @@ else
 fi;
 
           LIBS="-L$GM/lib $LIBS"
+          MPI_LIBS="-L$GM/lib $MPI_LIBS"
 
           echo "$as_me:$LINENO: checking for gm_open in -lgm" >&5
 echo $ECHO_N "checking for gm_open in -lgm... $ECHO_C" >&6
