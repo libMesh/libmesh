@@ -1,4 +1,4 @@
-// $Id: equation_systems_io.C,v 1.13 2003-02-13 22:56:08 benkirk Exp $
+// $Id: equation_systems_io.C,v 1.14 2003-02-14 22:37:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -244,29 +244,29 @@ void EquationSystems::read(const std::string& name,
 	  {
 	    // First reorder the nodal DOF values
 	    for (unsigned int node=0; node<n_nodes; node++)
-	      for (unsigned int index=0; index<_mesh.node(node).n_comp(var); index++)
+	      for (unsigned int index=0; index<_mesh.node(node).n_comp(sys,var); index++)
 		{
 		  
-		  assert (_mesh.node(node).dof_number(var, index) !=
+		  assert (_mesh.node(node).dof_number(sys, var, index) !=
 			  DofObject::invalid_id);
 
 		  assert (cnt < global_soln.size());
 		  
-		  reordered_soln[_mesh.node(node).dof_number(var, index)] =
+		  reordered_soln[_mesh.node(node).dof_number(sys, var, index)] =
 		    global_soln[cnt++]; 
 		}
 
 	    // Then reorder the element DOF values
 	    for (unsigned int elem=0; elem<n_elem; elem++)
-	      for (unsigned int index=0; index<_mesh.elem(elem)->n_comp(var); index++)
+	      for (unsigned int index=0; index<_mesh.elem(elem)->n_comp(sys,var); index++)
 		{
 		  
-		  assert (_mesh.elem(elem)->dof_number(var, index) !=
+		  assert (_mesh.elem(elem)->dof_number(sys, var, index) !=
 			  DofObject::invalid_id);
 		  
 		  assert (cnt < global_soln.size());
 		  
-		  reordered_soln[_mesh.elem(elem)->dof_number(var, index)] =
+		  reordered_soln[_mesh.elem(elem)->dof_number(sys, var, index)] =
 		    global_soln[cnt++]; 
 		}
 	  }
@@ -329,7 +329,6 @@ void EquationSystems::write(const std::string& name,
   std::map<std::string, GeneralSystem*>::iterator
     pos = _systems.begin();
   
-  unsigned int sys_num=0;
   std::string comment;
   char buf[80];
 
@@ -350,10 +349,10 @@ void EquationSystems::write(const std::string& name,
         
       while (pos != _systems.end())
 	{
-	  std::string sys_name  = pos->first;
-	  GeneralSystem& system = *pos->second;
+	  std::string sys_name       = pos->first;
+	  GeneralSystem& system      = *pos->second;
+	  const unsigned int sys_num = system.number();
 	  
-
 
 	  /**
 	   * 2.)
@@ -491,12 +490,10 @@ void EquationSystems::write(const std::string& name,
 	    }
 
 	  ++pos;
-	  ++sys_num;
 	}      
     }
 
-  pos     = _systems.begin();
-  sys_num = 0;
+  pos = _systems.begin();
 
   /**
    * All processors contribute numeric vector values
@@ -505,9 +502,10 @@ void EquationSystems::write(const std::string& name,
     while (pos != _systems.end())
       {
 	// Convenient references
-	std::string sys_name  = pos->first;
-	GeneralSystem& system = *pos->second;
-
+	std::string sys_name       = pos->first;
+	GeneralSystem& system      = *pos->second;
+	const unsigned int sys_num = system.number();
+	
 	std::vector<Complex> global_soln;
 	
 	/**
@@ -545,29 +543,29 @@ void EquationSystems::write(const std::string& name,
 	      {		
 		// First write the nodal DOF values
 		for (unsigned int node=0; node<n_nodes; node++)
-		  for (unsigned int index=0; index<_mesh.node(node).n_comp(var); index++)
+		  for (unsigned int index=0; index<_mesh.node(node).n_comp(sys_num, var); index++)
 		    {
-		      assert (_mesh.node(node).dof_number(var, index) !=
+		      assert (_mesh.node(node).dof_number(sys_num, var, index) !=
 			      DofObject::invalid_id);
 		      
 		      assert (cnt < reordered_soln.size());
 		      
 		      reordered_soln[cnt++] = 
-			global_soln[_mesh.node(node).dof_number(var, index)];
+			global_soln[_mesh.node(node).dof_number(sys_num, var, index)];
 		    }
 
 		// Then write the element DOF values
 		for (unsigned int elem=0; elem<n_elem; elem++)
 		  if (_mesh.elem(elem)->active())
-		    for (unsigned int index=0; index<_mesh.elem(elem)->n_comp(var); index++)
+		    for (unsigned int index=0; index<_mesh.elem(elem)->n_comp(sys_num, var); index++)
 		      {
-			assert (_mesh.elem(elem)->dof_number(var, index) !=
+			assert (_mesh.elem(elem)->dof_number(sys_num, var, index) !=
 				DofObject::invalid_id);
 			
 			assert (cnt < reordered_soln.size());
 			
 			reordered_soln[cnt++] = 
-			  global_soln[_mesh.elem(elem)->dof_number(var, index)];
+			  global_soln[_mesh.elem(elem)->dof_number(sys_num, var, index)];
 		      }
 	      }
 	    
@@ -590,6 +588,5 @@ void EquationSystems::write(const std::string& name,
 	  }
 
 	++pos;
-	++sys_num;
       }
 }

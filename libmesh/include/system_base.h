@@ -1,4 +1,4 @@
-// $Id: system_base.h,v 1.3 2003-02-13 22:56:08 benkirk Exp $
+// $Id: system_base.h,v 1.4 2003-02-14 22:37:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -65,8 +65,9 @@ protected:
    * data structures.  Protected so that this base class
    * cannot be explicitly instantiated.
    */
-  SystemBase (Mesh& mesh,
+  SystemBase (Mesh&               mesh,
 	      const std::string&  name,
+	      const unsigned int  number,
 	      const SolverPackage solver_package);
   
   /**
@@ -106,6 +107,11 @@ public:
    */
   std::string name () const;
 
+  /**
+   * @returns the system number.   
+   */
+  unsigned int number () const;
+  
   /**
    * Fill the input vector \p global_soln so that it contains
    * the global solution on all processors.
@@ -218,6 +224,11 @@ protected:
   const std::string _sys_name;
 
   /**
+   * The number associated with this system
+   */
+  const unsigned int _sys_number;
+
+  /**
    * The names of the variables associated with this
    * system.
    */
@@ -256,6 +267,14 @@ inline
 std::string SystemBase::name() const
 {
   return _sys_name;
+}
+
+
+
+inline
+unsigned int SystemBase::number() const
+{
+  return _sys_number;
 }
 
 

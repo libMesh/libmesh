@@ -1,4 +1,4 @@
-// $Id: frequency_system.h,v 1.2 2003-02-13 22:56:07 benkirk Exp $
+// $Id: frequency_system.h,v 1.3 2003-02-14 22:37:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -58,8 +58,9 @@ public:
    * Constructor.  Optionally initializes required
    * data structures.
    */
-  FrequencySystem (EquationSystems& es,
-		   const std::string& name,
+  FrequencySystem (EquationSystems&    es,
+		   const std::string&  name,
+		   const unsigned int  number, 
 		   const SolverPackage solver_package);
 
   /**

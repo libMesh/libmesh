@@ -15,10 +15,12 @@ src/base/dof_map.$(obj-suffix):\
     include/enum_solver_package.h\
     include/fe_interface.h\
     include/fe_type.h\
+    include/libmesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/node_iterators.h\
     include/perf_log.h\
     include/point.h\
     include/predicated_iterator.h\
@@ -55,6 +57,7 @@ src/base/equation_systems.$(obj-suffix):\
     include/fe_interface.h\
     include/fe_type.h\
     include/general_system.h\
+    include/libmesh.h\
     include/linear_solver_interface.h\
     include/mesh.h\
     include/mesh_base.h\
@@ -62,6 +65,7 @@ src/base/equation_systems.$(obj-suffix):\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
+    include/node_iterators.h\
     include/numeric_vector.h\
     include/perf_log.h\
     include/point.h\
@@ -102,8 +106,8 @@ src/base/equation_systems_io.$(obj-suffix):\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
+    include/node_iterators.h\
     include/numeric_vector.h\
-    include/perf_log.h\
     include/petsc_interface.h\
     include/petsc_matrix.h\
     include/petsc_vector.h\
@@ -145,8 +149,8 @@ src/base/frequency_system.$(obj-suffix):\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
+    include/node_iterators.h\
     include/numeric_vector.h\
-    include/perf_log.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -178,6 +182,7 @@ src/base/general_system.$(obj-suffix):\
     include/equation_systems.h\
     include/fe_type.h\
     include/general_system.h\
+    include/libmesh.h\
     include/linear_solver_interface.h\
     include/mesh.h\
     include/mesh_base.h\
@@ -185,6 +190,7 @@ src/base/general_system.$(obj-suffix):\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
+    include/node_iterators.h\
     include/numeric_vector.h\
     include/perf_log.h\
     include/point.h\
@@ -196,11 +202,13 @@ src/base/general_system.$(obj-suffix):\
     include/surface.h\
     include/system_base.h\
     include/xdr_cxx.h
-src/base/mesh_init.$(obj-suffix):\
-    src/base/mesh_init.C\
+src/base/libmesh.$(obj-suffix):\
+    src/base/libmesh.C\
+    include/libmesh.h\
     include/mesh_common.h\
     include/mesh_config.h\
-    include/mesh_init.h
+    include/perf_log.h\
+    include/reference_counter.h
 src/base/node.$(obj-suffix):\
     src/base/node.C\
     include/dof_object.h\
@@ -239,6 +247,7 @@ src/base/system_base.$(obj-suffix):\
     include/enum_solver_package.h\
     include/enum_solver_type.h\
     include/fe_type.h\
+    include/libmesh.h\
     include/linear_solver_interface.h\
     include/mesh.h\
     include/mesh_base.h\
@@ -246,6 +255,7 @@ src/base/system_base.$(obj-suffix):\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
+    include/node_iterators.h\
     include/numeric_vector.h\
     include/perf_log.h\
     include/point.h\
@@ -258,6 +268,28 @@ src/base/system_base.$(obj-suffix):\
     include/system_base.h
 src/base/system_data.$(obj-suffix):\
     src/base/system_data.C
+src/fe/fe.$(obj-suffix):\
+    src/fe/fe.C\
+    include/auto_ptr.h\
+    include/dof_object.h\
+    include/elem.h\
+    include/enum_elem_quality.h\
+    include/enum_elem_type.h\
+    include/enum_fe_family.h\
+    include/enum_inf_map_type.h\
+    include/enum_order.h\
+    include/enum_quadrature_type.h\
+    include/fe.h\
+    include/fe_base.h\
+    include/fe_type.h\
+    include/inf_fe.h\
+    include/mesh_common.h\
+    include/mesh_config.h\
+    include/node.h\
+    include/point.h\
+    include/quadrature.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h
 src/fe/fe_base.$(obj-suffix):\
     src/fe/fe_base.C\
     include/auto_ptr.h\
@@ -290,28 +322,6 @@ src/fe/fe_boundary.$(obj-suffix):\
     include/fe.h\
     include/fe_base.h\
     include/fe_type.h\
-    include/mesh_common.h\
-    include/mesh_config.h\
-    include/node.h\
-    include/point.h\
-    include/quadrature.h\
-    include/reference_counted_object.h\
-    include/reference_counter.h
-src/fe/fe.$(obj-suffix):\
-    src/fe/fe.C\
-    include/auto_ptr.h\
-    include/dof_object.h\
-    include/elem.h\
-    include/enum_elem_quality.h\
-    include/enum_elem_type.h\
-    include/enum_fe_family.h\
-    include/enum_inf_map_type.h\
-    include/enum_order.h\
-    include/enum_quadrature_type.h\
-    include/fe.h\
-    include/fe_base.h\
-    include/fe_type.h\
-    include/inf_fe.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
@@ -609,25 +619,6 @@ src/fe/fe_monomial_shape_3D.$(obj-suffix):\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h
-src/fe/inf_fe_boundary.$(obj-suffix):\
-    src/fe/inf_fe_boundary.C\
-    include/auto_ptr.h\
-    include/enum_elem_type.h\
-    include/enum_fe_family.h\
-    include/enum_inf_map_type.h\
-    include/enum_order.h\
-    include/fe_base.h\
-    include/fe_type.h\
-    include/inf_fe.h\
-    include/inf_fe_instantiate_1D.h\
-    include/inf_fe_instantiate_2D.h\
-    include/inf_fe_instantiate_3D.h\
-    include/inf_fe_macro.h\
-    include/mesh_common.h\
-    include/mesh_config.h\
-    include/point.h\
-    include/reference_counted_object.h\
-    include/reference_counter.h
 src/fe/inf_fe.$(obj-suffix):\
     src/fe/inf_fe.C\
     include/auto_ptr.h\
@@ -653,6 +644,25 @@ src/fe/inf_fe.$(obj-suffix):\
     include/point.h\
     include/quadrature.h\
     include/quadrature_gauss.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h
+src/fe/inf_fe_boundary.$(obj-suffix):\
+    src/fe/inf_fe_boundary.C\
+    include/auto_ptr.h\
+    include/enum_elem_type.h\
+    include/enum_fe_family.h\
+    include/enum_inf_map_type.h\
+    include/enum_order.h\
+    include/fe_base.h\
+    include/fe_type.h\
+    include/inf_fe.h\
+    include/inf_fe_instantiate_1D.h\
+    include/inf_fe_instantiate_2D.h\
+    include/inf_fe_instantiate_3D.h\
+    include/inf_fe_macro.h\
+    include/mesh_common.h\
+    include/mesh_config.h\
+    include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h
 src/fe/inf_fe_jacobi_20_00_eval.$(obj-suffix):\
@@ -756,6 +766,24 @@ src/fe/inf_fe_static.$(obj-suffix):\
     include/reference_counter.h
 src/geom/cell.$(obj-suffix):\
     src/geom/cell.C
+src/geom/cell_hex.$(obj-suffix):\
+    src/geom/cell_hex.C\
+    include/auto_ptr.h\
+    include/cell_hex.h\
+    include/dof_object.h\
+    include/elem.h\
+    include/enum_elem_quality.h\
+    include/enum_elem_type.h\
+    include/enum_order.h\
+    include/face.h\
+    include/face_quad.h\
+    include/face_quad4.h\
+    include/mesh_common.h\
+    include/mesh_config.h\
+    include/node.h\
+    include/point.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h
 src/geom/cell_hex20.$(obj-suffix):\
     src/geom/cell_hex20.C\
     include/auto_ptr.h\
@@ -778,7 +806,7 @@ src/geom/cell_hex20.$(obj-suffix):\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
-    include/perf_log.h\
+    include/node_iterators.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -807,7 +835,7 @@ src/geom/cell_hex27.$(obj-suffix):\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
-    include/perf_log.h\
+    include/node_iterators.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -836,31 +864,13 @@ src/geom/cell_hex8.$(obj-suffix):\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
-    include/perf_log.h\
+    include/node_iterators.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
     include/sphere.h\
     include/surface.h
-src/geom/cell_hex.$(obj-suffix):\
-    src/geom/cell_hex.C\
-    include/auto_ptr.h\
-    include/cell_hex.h\
-    include/dof_object.h\
-    include/elem.h\
-    include/enum_elem_quality.h\
-    include/enum_elem_type.h\
-    include/enum_order.h\
-    include/face.h\
-    include/face_quad.h\
-    include/face_quad4.h\
-    include/mesh_common.h\
-    include/mesh_config.h\
-    include/node.h\
-    include/point.h\
-    include/reference_counted_object.h\
-    include/reference_counter.h
 src/geom/cell_inf_hex16.$(obj-suffix):\
     src/geom/cell_inf_hex16.C\
     include/auto_ptr.h\
@@ -884,7 +894,7 @@ src/geom/cell_inf_hex16.$(obj-suffix):\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
-    include/perf_log.h\
+    include/node_iterators.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -914,7 +924,7 @@ src/geom/cell_inf_hex18.$(obj-suffix):\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
-    include/perf_log.h\
+    include/node_iterators.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -944,7 +954,7 @@ src/geom/cell_inf_hex8.$(obj-suffix):\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
-    include/perf_log.h\
+    include/node_iterators.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -976,7 +986,7 @@ src/geom/cell_inf_prism12.$(obj-suffix):\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
-    include/perf_log.h\
+    include/node_iterators.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -1008,39 +1018,7 @@ src/geom/cell_inf_prism6.$(obj-suffix):\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
-    include/perf_log.h\
-    include/point.h\
-    include/predicated_iterator.h\
-    include/reference_counted_object.h\
-    include/reference_counter.h\
-    include/sphere.h\
-    include/surface.h
-src/geom/cell_prism6.$(obj-suffix):\
-    src/geom/cell_prism6.C\
-    include/auto_ptr.h\
-    include/boundary_info.h\
-    include/boundary_mesh.h\
-    include/cell.h\
-    include/cell_prism.h\
-    include/cell_prism6.h\
-    include/dof_object.h\
-    include/elem.h\
-    include/elem_iterators.h\
-    include/enum_elem_quality.h\
-    include/enum_elem_type.h\
-    include/enum_order.h\
-    include/face.h\
-    include/face_quad.h\
-    include/face_quad4.h\
-    include/face_tri.h\
-    include/face_tri3.h\
-    include/mesh.h\
-    include/mesh_base.h\
-    include/mesh_common.h\
-    include/mesh_config.h\
-    include/mesh_refinement.h\
-    include/node.h\
-    include/perf_log.h\
+    include/node_iterators.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -1068,19 +1046,15 @@ src/geom/cell_prism.$(obj-suffix):\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h
-src/geom/cell_pyramid5.$(obj-suffix):\
-    src/geom/cell_pyramid5.C\
+src/geom/cell_prism6.$(obj-suffix):\
+    src/geom/cell_prism6.C\
     include/auto_ptr.h\
     include/boundary_info.h\
     include/boundary_mesh.h\
     include/cell.h\
-    include/cell_pyramid.h\
-    include/cell_pyramid5.h\
-    include/cell_tet.h\
-    include/cell_tet4.h\
+    include/cell_prism.h\
+    include/cell_prism6.h\
     include/dof_object.h\
-    include/edge.h\
-    include/edge_edge2.h\
     include/elem.h\
     include/elem_iterators.h\
     include/enum_elem_quality.h\
@@ -1097,7 +1071,7 @@ src/geom/cell_pyramid5.$(obj-suffix):\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
-    include/perf_log.h\
+    include/node_iterators.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -1128,7 +1102,72 @@ src/geom/cell_pyramid.$(obj-suffix):\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
-    include/perf_log.h\
+    include/node_iterators.h\
+    include/point.h\
+    include/predicated_iterator.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h\
+    include/sphere.h\
+    include/surface.h
+src/geom/cell_pyramid5.$(obj-suffix):\
+    src/geom/cell_pyramid5.C\
+    include/auto_ptr.h\
+    include/boundary_info.h\
+    include/boundary_mesh.h\
+    include/cell.h\
+    include/cell_pyramid.h\
+    include/cell_pyramid5.h\
+    include/cell_tet.h\
+    include/cell_tet4.h\
+    include/dof_object.h\
+    include/edge.h\
+    include/edge_edge2.h\
+    include/elem.h\
+    include/elem_iterators.h\
+    include/enum_elem_quality.h\
+    include/enum_elem_type.h\
+    include/enum_order.h\
+    include/face.h\
+    include/face_quad.h\
+    include/face_quad4.h\
+    include/face_tri.h\
+    include/face_tri3.h\
+    include/mesh.h\
+    include/mesh_base.h\
+    include/mesh_common.h\
+    include/mesh_config.h\
+    include/mesh_refinement.h\
+    include/node.h\
+    include/node_iterators.h\
+    include/point.h\
+    include/predicated_iterator.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h\
+    include/sphere.h\
+    include/surface.h
+src/geom/cell_tet.$(obj-suffix):\
+    src/geom/cell_tet.C\
+    include/auto_ptr.h\
+    include/boundary_info.h\
+    include/boundary_mesh.h\
+    include/cell.h\
+    include/cell_tet.h\
+    include/dof_object.h\
+    include/elem.h\
+    include/elem_iterators.h\
+    include/enum_elem_quality.h\
+    include/enum_elem_type.h\
+    include/enum_order.h\
+    include/face.h\
+    include/face_tri.h\
+    include/face_tri3.h\
+    include/mesh.h\
+    include/mesh_base.h\
+    include/mesh_common.h\
+    include/mesh_config.h\
+    include/mesh_refinement.h\
+    include/node.h\
+    include/node_iterators.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -1158,7 +1197,7 @@ src/geom/cell_tet10.$(obj-suffix):\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
-    include/perf_log.h\
+    include/node_iterators.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -1188,36 +1227,7 @@ src/geom/cell_tet4.$(obj-suffix):\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
-    include/perf_log.h\
-    include/point.h\
-    include/predicated_iterator.h\
-    include/reference_counted_object.h\
-    include/reference_counter.h\
-    include/sphere.h\
-    include/surface.h
-src/geom/cell_tet.$(obj-suffix):\
-    src/geom/cell_tet.C\
-    include/auto_ptr.h\
-    include/boundary_info.h\
-    include/boundary_mesh.h\
-    include/cell.h\
-    include/cell_tet.h\
-    include/dof_object.h\
-    include/elem.h\
-    include/elem_iterators.h\
-    include/enum_elem_quality.h\
-    include/enum_elem_type.h\
-    include/enum_order.h\
-    include/face.h\
-    include/face_tri.h\
-    include/face_tri3.h\
-    include/mesh.h\
-    include/mesh_base.h\
-    include/mesh_common.h\
-    include/mesh_config.h\
-    include/mesh_refinement.h\
-    include/node.h\
-    include/perf_log.h\
+    include/node_iterators.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -1360,7 +1370,7 @@ src/geom/face_inf_quad4.$(obj-suffix):\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
-    include/perf_log.h\
+    include/node_iterators.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -1390,13 +1400,31 @@ src/geom/face_inf_quad6.$(obj-suffix):\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
-    include/perf_log.h\
+    include/node_iterators.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
     include/sphere.h\
     include/surface.h
+src/geom/face_quad.$(obj-suffix):\
+    src/geom/face_quad.C\
+    include/auto_ptr.h\
+    include/dof_object.h\
+    include/edge.h\
+    include/edge_edge2.h\
+    include/elem.h\
+    include/enum_elem_quality.h\
+    include/enum_elem_type.h\
+    include/enum_order.h\
+    include/face.h\
+    include/face_quad.h\
+    include/mesh_common.h\
+    include/mesh_config.h\
+    include/node.h\
+    include/point.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h
 src/geom/face_quad4.$(obj-suffix):\
     src/geom/face_quad4.C\
     include/auto_ptr.h\
@@ -1419,7 +1447,7 @@ src/geom/face_quad4.$(obj-suffix):\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
-    include/perf_log.h\
+    include/node_iterators.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -1448,7 +1476,7 @@ src/geom/face_quad8.$(obj-suffix):\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
-    include/perf_log.h\
+    include/node_iterators.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -1477,15 +1505,15 @@ src/geom/face_quad9.$(obj-suffix):\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
-    include/perf_log.h\
+    include/node_iterators.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
     include/sphere.h\
     include/surface.h
-src/geom/face_quad.$(obj-suffix):\
-    src/geom/face_quad.C\
+src/geom/face_tri.$(obj-suffix):\
+    src/geom/face_tri.C\
     include/auto_ptr.h\
     include/dof_object.h\
     include/edge.h\
@@ -1495,7 +1523,7 @@ src/geom/face_quad.$(obj-suffix):\
     include/enum_elem_type.h\
     include/enum_order.h\
     include/face.h\
-    include/face_quad.h\
+    include/face_tri.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
@@ -1524,7 +1552,7 @@ src/geom/face_tri3.$(obj-suffix):\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
-    include/perf_log.h\
+    include/node_iterators.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -1553,31 +1581,13 @@ src/geom/face_tri6.$(obj-suffix):\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
-    include/perf_log.h\
+    include/node_iterators.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
     include/sphere.h\
     include/surface.h
-src/geom/face_tri.$(obj-suffix):\
-    src/geom/face_tri.C\
-    include/auto_ptr.h\
-    include/dof_object.h\
-    include/edge.h\
-    include/edge_edge2.h\
-    include/elem.h\
-    include/enum_elem_quality.h\
-    include/enum_elem_type.h\
-    include/enum_order.h\
-    include/face.h\
-    include/face_tri.h\
-    include/mesh_common.h\
-    include/mesh_config.h\
-    include/node.h\
-    include/point.h\
-    include/reference_counted_object.h\
-    include/reference_counter.h
 src/geom/plane.$(obj-suffix):\
     src/geom/plane.C\
     include/mesh_common.h\
@@ -1620,7 +1630,7 @@ src/mesh/boundary_info.$(obj-suffix):\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
-    include/perf_log.h\
+    include/node_iterators.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -1641,6 +1651,32 @@ src/mesh/boundary_mesh.$(obj-suffix):\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/node_iterators.h\
+    include/point.h\
+    include/predicated_iterator.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h\
+    include/sphere.h\
+    include/surface.h
+src/mesh/mesh.$(obj-suffix):\
+    src/mesh/mesh.C\
+    include/auto_ptr.h\
+    include/boundary_info.h\
+    include/boundary_mesh.h\
+    include/dof_object.h\
+    include/elem.h\
+    include/elem_iterators.h\
+    include/enum_elem_quality.h\
+    include/enum_elem_type.h\
+    include/enum_order.h\
+    include/libmesh.h\
+    include/mesh.h\
+    include/mesh_base.h\
+    include/mesh_common.h\
+    include/mesh_config.h\
+    include/mesh_refinement.h\
+    include/node.h\
+    include/node_iterators.h\
     include/perf_log.h\
     include/point.h\
     include/predicated_iterator.h\
@@ -1675,10 +1711,12 @@ src/mesh/mesh_base.$(obj-suffix):\
     include/face_tri3.h\
     include/face_tri6.h\
     include/fe_type.h\
+    include/libmesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/node_iterators.h\
     include/perf_log.h\
     include/petsc_matrix.h\
     include/point.h\
@@ -1686,30 +1724,6 @@ src/mesh/mesh_base.$(obj-suffix):\
     include/reference_counted_object.h\
     include/reference_counter.h\
     include/sparse_matrix.h\
-    include/sphere.h\
-    include/surface.h
-src/mesh/mesh.$(obj-suffix):\
-    src/mesh/mesh.C\
-    include/auto_ptr.h\
-    include/boundary_info.h\
-    include/boundary_mesh.h\
-    include/dof_object.h\
-    include/elem.h\
-    include/elem_iterators.h\
-    include/enum_elem_quality.h\
-    include/enum_elem_type.h\
-    include/enum_order.h\
-    include/mesh.h\
-    include/mesh_base.h\
-    include/mesh_common.h\
-    include/mesh_config.h\
-    include/mesh_refinement.h\
-    include/node.h\
-    include/perf_log.h\
-    include/point.h\
-    include/predicated_iterator.h\
-    include/reference_counted_object.h\
-    include/reference_counter.h\
     include/sphere.h\
     include/surface.h
 src/mesh/mesh_diva_support.$(obj-suffix):\
@@ -1729,7 +1743,7 @@ src/mesh/mesh_diva_support.$(obj-suffix):\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
-    include/perf_log.h\
+    include/node_iterators.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -1754,7 +1768,7 @@ src/mesh/mesh_exodus_support.$(obj-suffix):\
     include/mesh_exodus_support.h\
     include/mesh_refinement.h\
     include/node.h\
-    include/perf_log.h\
+    include/node_iterators.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -1787,12 +1801,14 @@ src/mesh/mesh_generation.$(obj-suffix):\
     include/face_tri.h\
     include/face_tri3.h\
     include/face_tri6.h\
+    include/libmesh.h\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
+    include/node_iterators.h\
     include/perf_log.h\
     include/point.h\
     include/predicated_iterator.h\
@@ -1828,8 +1844,8 @@ src/mesh/mesh_gmv_support.$(obj-suffix):\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
+    include/node_iterators.h\
     include/numeric_vector.h\
-    include/perf_log.h\
     include/petsc_interface.h\
     include/petsc_matrix.h\
     include/petsc_vector.h\
@@ -1850,10 +1866,12 @@ src/mesh/mesh_metis_support.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/libmesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
+    include/node_iterators.h\
     include/perf_log.h\
     include/point.h\
     include/predicated_iterator.h\
@@ -1879,7 +1897,7 @@ src/mesh/mesh_misc_support.$(obj-suffix):\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
-    include/perf_log.h\
+    include/node_iterators.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -1903,7 +1921,7 @@ src/mesh/mesh_refinement.$(obj-suffix):\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
-    include/perf_log.h\
+    include/node_iterators.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -1938,8 +1956,8 @@ src/mesh/mesh_tecplot_support.$(obj-suffix):\
     include/mesh_config.h\
     include/mesh_refinement.h\
     include/node.h\
+    include/node_iterators.h\
     include/numeric_vector.h\
-    include/perf_log.h\
     include/petsc_interface.h\
     include/petsc_matrix.h\
     include/petsc_vector.h\
@@ -1975,7 +1993,7 @@ src/mesh/mesh_ucd_support.$(obj-suffix):\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
-    include/perf_log.h\
+    include/node_iterators.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -2013,7 +2031,7 @@ src/mesh/mesh_unv_support.$(obj-suffix):\
     include/mesh_refinement.h\
     include/mesh_unv_support.h\
     include/node.h\
-    include/perf_log.h\
+    include/node_iterators.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -2040,7 +2058,7 @@ src/mesh/mesh_xdr_support.$(obj-suffix):\
     include/mesh_refinement.h\
     include/mesh_xdr_support.h\
     include/node.h\
-    include/perf_log.h\
+    include/node_iterators.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -2075,7 +2093,6 @@ src/numerics/laspack_interface.$(obj-suffix):\
     include/mesh_common.h\
     include/mesh_config.h\
     include/numeric_vector.h\
-    include/perf_log.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
     include/sparse_matrix.h
@@ -2093,7 +2110,6 @@ src/numerics/laspack_matrix.$(obj-suffix):\
     include/laspack_matrix.h\
     include/mesh_common.h\
     include/mesh_config.h\
-    include/perf_log.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
     include/sparse_matrix.h
@@ -2127,7 +2143,6 @@ src/numerics/linear_solver_interface.$(obj-suffix):\
     include/mesh_common.h\
     include/mesh_config.h\
     include/numeric_vector.h\
-    include/perf_log.h\
     include/petsc_interface.h\
     include/petsc_matrix.h\
     include/petsc_vector.h\
@@ -2162,7 +2177,6 @@ src/numerics/petsc_interface.$(obj-suffix):\
     include/mesh_common.h\
     include/mesh_config.h\
     include/numeric_vector.h\
-    include/perf_log.h\
     include/petsc_interface.h\
     include/petsc_matrix.h\
     include/petsc_vector.h\
@@ -2183,7 +2197,6 @@ src/numerics/petsc_matrix.$(obj-suffix):\
     include/mesh_common.h\
     include/mesh_config.h\
     include/numeric_vector.h\
-    include/perf_log.h\
     include/petsc_matrix.h\
     include/petsc_vector.h\
     include/reference_counted_object.h\
@@ -2213,11 +2226,22 @@ src/numerics/sparse_matrix.$(obj-suffix):\
     include/laspack_matrix.h\
     include/mesh_common.h\
     include/mesh_config.h\
-    include/perf_log.h\
     include/petsc_matrix.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
     include/sparse_matrix.h
+src/quadrature/quadrature.$(obj-suffix):\
+    src/quadrature/quadrature.C\
+    include/auto_ptr.h\
+    include/enum_elem_type.h\
+    include/enum_order.h\
+    include/enum_quadrature_type.h\
+    include/mesh_common.h\
+    include/mesh_config.h\
+    include/point.h\
+    include/quadrature.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h
 src/quadrature/quadrature_build.$(obj-suffix):\
     src/quadrature/quadrature_build.C\
     include/auto_ptr.h\
@@ -2234,18 +2258,8 @@ src/quadrature/quadrature_build.$(obj-suffix):\
     include/quadrature_trap.h\
     include/reference_counted_object.h\
     include/reference_counter.h
-src/quadrature/quadrature.$(obj-suffix):\
-    src/quadrature/quadrature.C\
-    include/auto_ptr.h\
-    include/enum_elem_type.h\
-    include/enum_order.h\
-    include/enum_quadrature_type.h\
-    include/mesh_common.h\
-    include/mesh_config.h\
-    include/point.h\
-    include/quadrature.h\
-    include/reference_counted_object.h\
-    include/reference_counter.h
+src/quadrature/quadrature_gauss.$(obj-suffix):\
+    src/quadrature/quadrature_gauss.C
 src/quadrature/quadrature_gauss_1D.$(obj-suffix):\
     src/quadrature/quadrature_gauss_1D.C\
     include/auto_ptr.h\
@@ -2287,8 +2301,8 @@ src/quadrature/quadrature_gauss_3D.$(obj-suffix):\
     include/quadrature_jacobi.h\
     include/reference_counted_object.h\
     include/reference_counter.h
-src/quadrature/quadrature_gauss.$(obj-suffix):\
-    src/quadrature/quadrature_gauss.C
+src/quadrature/quadrature_jacobi.$(obj-suffix):\
+    src/quadrature/quadrature_jacobi.C
 src/quadrature/quadrature_jacobi_1D.$(obj-suffix):\
     src/quadrature/quadrature_jacobi_1D.C\
     include/auto_ptr.h\
@@ -2302,14 +2316,14 @@ src/quadrature/quadrature_jacobi_1D.$(obj-suffix):\
     include/quadrature_jacobi.h\
     include/reference_counted_object.h\
     include/reference_counter.h
-src/quadrature/quadrature_jacobi.$(obj-suffix):\
-    src/quadrature/quadrature_jacobi.C
 src/quadrature/quadrature_rules.$(obj-suffix):\
     src/quadrature/quadrature_rules.C\
     include/enum_quadrature_type.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/quadrature_rules.h
+src/quadrature/quadrature_simpson.$(obj-suffix):\
+    src/quadrature/quadrature_simpson.C
 src/quadrature/quadrature_simpson_1D.$(obj-suffix):\
     src/quadrature/quadrature_simpson_1D.C\
     include/auto_ptr.h\
@@ -2349,8 +2363,8 @@ src/quadrature/quadrature_simpson_3D.$(obj-suffix):\
     include/quadrature_simpson.h\
     include/reference_counted_object.h\
     include/reference_counter.h
-src/quadrature/quadrature_simpson.$(obj-suffix):\
-    src/quadrature/quadrature_simpson.C
+src/quadrature/quadrature_trap.$(obj-suffix):\
+    src/quadrature/quadrature_trap.C
 src/quadrature/quadrature_trap_1D.$(obj-suffix):\
     src/quadrature/quadrature_trap_1D.C\
     include/auto_ptr.h\
@@ -2390,8 +2404,6 @@ src/quadrature/quadrature_trap_3D.$(obj-suffix):\
     include/quadrature_trap.h\
     include/reference_counted_object.h\
     include/reference_counter.h
-src/quadrature/quadrature_trap.$(obj-suffix):\
-    src/quadrature/quadrature_trap.C
 src/utils/perf_log.$(obj-suffix):\
     src/utils/perf_log.C\
     include/mesh_common.h\
@@ -2415,7 +2427,7 @@ src/utils/tree.$(obj-suffix):\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
-    include/perf_log.h\
+    include/node_iterators.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -2437,7 +2449,7 @@ src/utils/tree_node.$(obj-suffix):\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
-    include/perf_log.h\
+    include/node_iterators.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -2449,14 +2461,14 @@ src/utils/utility.$(obj-suffix):\
     src/utils/utility.C\
     include/mesh_config.h\
     include/utility.h
-src/utils/xdr_cxx.$(obj-suffix):\
-    src/utils/xdr_cxx.C\
-    include/mesh_common.h\
-    include/mesh_config.h\
-    include/xdr_cxx.h
 src/utils/xdrIO.$(obj-suffix):\
     src/utils/xdrIO.C\
     include/enum_elem_type.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/xdrIO.h
+src/utils/xdr_cxx.$(obj-suffix):\
+    src/utils/xdr_cxx.C\
+    include/mesh_common.h\
+    include/mesh_config.h\
+    include/xdr_cxx.h

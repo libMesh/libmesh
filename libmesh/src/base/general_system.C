@@ -1,4 +1,4 @@
-// $Id: general_system.C,v 1.3 2003-02-14 15:22:46 benkirk Exp $
+// $Id: general_system.C,v 1.4 2003-02-14 22:37:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,10 +31,11 @@
 
 // ------------------------------------------------------------
 // GeneralSystem implementation
-GeneralSystem::GeneralSystem (EquationSystems& es,
-			      const std::string& name,
+GeneralSystem::GeneralSystem (EquationSystems&    es,
+			      const std::string&  name,
+			      const unsigned int  number,
 			      const SolverPackage solver_package) :
-  SystemBase             (es.get_mesh(), name, solver_package),
+  SystemBase             (es.get_mesh(), name, number, solver_package),
   current_local_solution (NumericVector::build(solver_package)),
   old_local_solution     (NumericVector::build(solver_package)),
   older_local_solution   (NumericVector::build(solver_package)),

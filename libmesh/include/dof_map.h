@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.11 2003-02-14 15:22:37 benkirk Exp $
+// $Id: dof_map.h,v 1.12 2003-02-14 22:37:10 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -58,9 +58,10 @@ class DofMap
  public:
 
   /**
-   * Constructor.
+   * Constructor.  Requires the number of the system for which we
+   * will be numbering degrees of freedom.
    */
-  DofMap();
+  DofMap(const unsigned int sys_number);
 
   /**
    * Destructor.
@@ -298,7 +299,12 @@ class DofMap
  private:
 
 
-
+  /**
+   * @returns the number of the system we are responsible for.
+   */
+  unsigned int sys_number() const;
+    
+  
 #ifdef ENABLE_AMR
 
   /**
@@ -321,6 +327,11 @@ class DofMap
    * The finite element type for each component.
    */
   std::vector<FEType> _component_types;
+
+  /**
+   * The number of the system we manage DOFs for.
+   */
+  const unsigned int _sys_number;
   
   /**
    * Pointer to the matrix used with this object.
@@ -388,6 +399,24 @@ class DofMap
 
 // ------------------------------------------------------------
 // Dof Map inline member functions
+inline
+DofMap::DofMap(const unsigned int number) :
+  _sys_number(number),
+  _matrix(NULL),
+  _n_nodes(0),
+  _n_elem(0),
+  _n_dfs(0)  
+{
+}
+
+
+inline
+DofMap::~DofMap()
+{
+}
+
+
+
 #ifdef ENABLE_AMR
 
 inline
@@ -400,6 +429,14 @@ bool DofMap::is_constrained_dof (const unsigned int dof) const
 }
 
 #endif
+
+
+inline
+unsigned int DofMap::sys_number() const
+{
+  return _sys_number;
+}
+
 
 
 #endif
