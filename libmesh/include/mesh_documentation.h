@@ -75,7 +75,9 @@
         a new solver interface is as simple as deriving from these classes
  
    - Mesh IO & Format Translation Utilities
-      - Ideas Universal (UNV) format (.unv)
+      - Ideas Universal (UNV) format (.unv) with support through
+        \p MeshData for arbitrary float data, like boundary conditions, 
+        associated with mesh entities
       - Sandia National Labs ExodusII format (.exd)
       - Amtec Engineering's Tecplot binary format (.plt)
       - Amtec Engineering's Tecplot ascii format (.dat)
@@ -90,9 +92,13 @@
            \p Quad8, \p Quad9, \p Hex8
       - add infinite elements to a volume-based mesh, handle symmetry planes
       - convert \p Quad4, \p Quad8, \p Quad9 to \p Tri3, \p Tri6
+      - convert a mesh consisting of any of the fore-mentioned
+        n-dimensional linear elements to their second-order
+        counterparts
       - distort/translate/rotate/scale a mesh
       - determine bounding boxes/spheres
-      - extract the mesh boundary for BC handling or as a separate mesh
+      - extract the mesh boundary for boundary condition handling or
+        as a separate mesh
 
 
        
