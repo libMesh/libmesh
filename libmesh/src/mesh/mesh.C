@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.33 2004-03-19 19:16:52 benkirk Exp $
+// $Id: mesh.C,v 1.34 2004-03-20 05:36:27 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -31,7 +31,7 @@
 #include "unv_io.h"
 #include "tecplot_io.h"
 #include "tetgen_io.h"
-
+#include "diva_io.h"
 
 
 // ------------------------------------------------------------
@@ -169,7 +169,7 @@ void Mesh::write (const std::string& name)
       }
 
     else if (name.rfind(".ugrid") < name.size())
-      this->write_diva (name);
+      DivaIO (*this).write(name);
     
     else if (name.rfind(".xda") < name.size())
       this->write_xdr (name);
