@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.28 2004-10-15 19:46:58 jwpeterson Exp $
+// $Id: fe_map.C,v 1.29 2004-10-26 15:31:17 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -45,7 +45,7 @@ void FEBase::compute_map(const std::vector<Real>& qw,
   const unsigned int        n_qp = qw.size();
 
 
-  switch (dim)
+  switch (this->dim)
     {
       //--------------------------------------------------------------------
       // 1D

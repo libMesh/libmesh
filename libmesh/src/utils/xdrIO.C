@@ -1,4 +1,4 @@
-// "$Id: xdrIO.C,v 1.25 2004-09-30 20:10:31 benkirk Exp $\n"
+// "$Id: xdrIO.C,v 1.26 2004-10-26 15:31:19 jwpeterson Exp $\n"
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -85,6 +85,10 @@ Originator XdrIO::get_originator()
                 << orig_flag << std::endl;
       error();
     }
+
+  error();
+  Originator never ("EROR", 0, 0);
+  return never;
 }
 
 

@@ -1,4 +1,4 @@
-// $Id: mesh_data.h,v 1.8 2004-08-17 03:03:48 benkirk Exp $
+// $Id: mesh_data.h,v 1.9 2004-10-26 15:31:16 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -184,7 +184,7 @@ public:
   /**
    * Prints relevant information about the mesh.
    */
-  void print_info () const;
+  void print_info (std::ostream& os=std::cout) const;
 
   /**
    * Same as above, but allows you to use the stream syntax.

@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.77 2004-10-19 12:44:10 benkirk Exp $
+// $Id: mesh_base.C,v 1.78 2004-10-26 15:31:18 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -344,16 +344,16 @@ std::string MeshBase::get_info() const
 }
 
 
-void MeshBase::print_info() const
+void MeshBase::print_info(std::ostream& os) const
 {
-  std::cout << this->get_info()
-	    << std::endl;
+  os << this->get_info()
+     << std::endl;
 }
 
 
 std::ostream& operator << (std::ostream& os, const MeshBase& m)
 {
-  m.print_info();
+  m.print_info(os);
   return os;
 }
 
