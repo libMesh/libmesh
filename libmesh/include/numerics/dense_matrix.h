@@ -1,4 +1,4 @@
-// $Id: dense_matrix.h,v 1.7 2004-03-05 21:07:00 jwpeterson Exp $
+// $Id: dense_matrix.h,v 1.8 2004-10-10 19:07:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -161,7 +161,8 @@ public:
   void condense(const unsigned int i,
 		const unsigned int j,
 		const T val,
-		DenseVector<T>& rhs);
+		DenseVector<T>& rhs)
+  { DenseMatrixBase<T>::condense (i, j, val, rhs); }
 
   
   /**
@@ -417,33 +418,33 @@ T DenseMatrix<T>::transpose (const unsigned int i,
 
 
 
-template<typename T>
-inline
-void DenseMatrix<T>::condense(const unsigned int iv,
-			      const unsigned int jv,
-			      const T val,
-			      DenseVector<T>& rhs)
-{
-  assert (this->_m == rhs.size());
-  assert (iv == jv);
+// template<typename T>
+// inline
+// void DenseMatrix<T>::condense(const unsigned int iv,
+// 			      const unsigned int jv,
+// 			      const T val,
+// 			      DenseVector<T>& rhs)
+// {
+//   assert (this->_m == rhs.size());
+//   assert (iv == jv);
 
 
-  // move the known value into the RHS
-  // and zero the column
-  for (unsigned int i=0; i<this->m(); i++)
-    {
-      rhs(i) -= ((*this)(i,jv))*val;
-      (*this)(i,jv) = 0.;
-    }
+//   // move the known value into the RHS
+//   // and zero the column
+//   for (unsigned int i=0; i<this->m(); i++)
+//     {
+//       rhs(i) -= ((*this)(i,jv))*val;
+//       (*this)(i,jv) = 0.;
+//     }
 
-  // zero the row
-  for (unsigned int j=0; j<this->n(); j++)
-    (*this)(iv,j) = 0.;
+//   // zero the row
+//   for (unsigned int j=0; j<this->n(); j++)
+//     (*this)(iv,j) = 0.;
 
-  (*this)(iv,jv) = 1.;
-  rhs(iv) = val;
+//   (*this)(iv,jv) = 1.;
+//   rhs(iv) = val;
   
-}
+// }
 
 
 

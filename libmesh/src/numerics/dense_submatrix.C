@@ -1,4 +1,4 @@
-// $Id: dense_submatrix.C,v 1.4 2004-01-03 15:37:43 benkirk Exp $
+// $Id: dense_submatrix.C,v 1.5 2004-10-10 19:07:27 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -59,10 +59,6 @@ void DenseSubMatrix<T>::right_multiply (const DenseMatrixBase<T>& M3)
   // Call the multiply function in the base class
   this->multiply(*this, M2, M3);
 }
-
-
-
-
 
 
 

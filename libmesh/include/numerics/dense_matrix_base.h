@@ -1,4 +1,4 @@
-// $Id: dense_matrix_base.h,v 1.9 2004-08-17 03:03:49 benkirk Exp $
+// $Id: dense_matrix_base.h,v 1.10 2004-10-10 19:07:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -29,7 +29,8 @@
 // Local Includes
 #include "libmesh_common.h"
 
-
+// Forward Delcarations
+template <typename T> class DenseVectorBase;
 
 
 
@@ -144,6 +145,7 @@ public:
 #endif
    
 protected:
+  
   /**
    * Performs the computation M1 = M2 * M3 where:
    * M1 = (m x n)
@@ -153,6 +155,17 @@ protected:
   void multiply (DenseMatrixBase<T>& M1,
 		 const DenseMatrixBase<T>& M2,
 		 const DenseMatrixBase<T>& M3);
+
+  /**
+   * Condense-out the \p (i,j) entry of the matrix, forcing
+   * it to take on the value \p val.  This is useful in numerical
+   * simulations for applying boundary conditions.  Preserves the
+   * symmetry of the matrix.
+   */
+  void condense(const unsigned int i,
+		const unsigned int j,
+		const T val,
+		DenseVectorBase<T>& rhs);
 
   /**
    * The row dimension.
