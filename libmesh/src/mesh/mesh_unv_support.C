@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.C,v 1.8 2003-02-13 22:56:12 benkirk Exp $
+// $Id: mesh_unv_support.C,v 1.9 2003-03-27 18:30:04 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -32,6 +32,7 @@
 #include "cell_hex8.h"
 #include "cell_hex20.h"
 #include "cell_tet10.h"
+#include "cell_prism6.h"
 
 //-----------------------------------------------------------------------------
 // Mesh methods
@@ -612,6 +613,16 @@ void UnvInterface::element_in()
 	  assign_elm_nodes[4]=3;
 	  break;
 
+
+	case 112: // Solid Linear Prism
+	  elements[i]=new Prism6;  // add new element
+	  assign_elm_nodes[1]=0;
+	  assign_elm_nodes[2]=1;
+	  assign_elm_nodes[3]=2;
+	  assign_elm_nodes[4]=3;
+	  assign_elm_nodes[5]=4;
+	  assign_elm_nodes[6]=5;
+	  break;
 	
 	case 115: // Solid Linear Brick
 	  elements[i]=new Hex8;  // add new element
