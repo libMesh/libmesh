@@ -1,4 +1,4 @@
-// $Id: getpot.h,v 1.3 2004-03-08 02:10:04 benkirk Exp $
+// $Id: getpot.h,v 1.4 2004-10-15 04:27:37 benkirk Exp $
 //
 // (with patches from Michael Anderson for more general variable types)
 
@@ -681,12 +681,12 @@ GetPot::__process_section_label(const std::string& Section,
     }	   
     section_stack.push_back(sname);
   } 
-  std::string section = "";
+  std::string section_name = "";
   if( section_stack.size() != 0 )
     victorate(std::string, section_stack, it) {
-      section += *it + "/";
+      section_name += *it + "/";
     }
-  return section;
+  return section_name;
 }
 
 
