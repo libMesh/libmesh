@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.36 2004-03-23 04:17:26 jwpeterson Exp $
+// $Id: mesh.C,v 1.37 2004-03-23 04:47:29 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -35,6 +35,7 @@
 #include "ucd_io.h"
 #include "unv_io.h"
 #include "matlab_io.h"
+#include "off_io.h"
 
 // ------------------------------------------------------------
 // Mesh class member functions
@@ -88,7 +89,7 @@ void Mesh::read (const std::string& name)
       else if ((name.rfind(".off")  < name.size()) ||
 	       (name.rfind(".ogl")  < name.size()) ||
 	       (name.rfind(".oogl") < name.size()))
-	this->read_off(name);
+	OFFIO (*this).read (name);
       
       else if ((name.rfind(".xdr")  < name.size()) ||
 	       (name.rfind(".0000") < name.size()))

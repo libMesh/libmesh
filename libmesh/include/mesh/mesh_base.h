@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.15 2004-03-23 04:17:26 jwpeterson Exp $
+// $Id: mesh_base.h,v 1.16 2004-03-23 04:47:28 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -61,7 +61,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.15 $
+ * \version $Revision: 1.16 $
  */
 
 
@@ -674,19 +674,6 @@ protected:
   std::vector<Elem*> & get_elem () { return _elements; }
 
   /**
-   * Reads an unstructured, triangulated surface in the
-   * standard OFF OOGL format from the file specified by \p name.
-   */
-  void read_off (const std::string& name);
-  
-  /**
-   * Reads an unstructured, triangulated surface in the
-   * standard OFF OOGL format from a stream.
-   * Implements the read process initiated by the associated public method.
-   */
-  void read_off (std::istream& in);
-
-  /**
    * Read a 2D mesh in the shanee format from the file specified
    * by \p name.  This is for compatibility with
    * Ben Kirk's old code, and may be removed at any time in the future.
@@ -702,39 +689,6 @@ protected:
    */
   void read_shanee (std::istream& in);
   
-  /**
-   * Write the mesh and solution from \p es in the GMV ASCII 
-   * format to a stream.
-   */
-  void write_gmv (std::ostream& out,
-		  const EquationSystems& es,
-		  const bool write_partitioning=false) const;
-
-  /**
-   * Actual implementation of writing a mesh in the GMV ASCII format.
-   */
-  void write_gmv (std::ostream& out,
-		  const std::vector<Number>* v=NULL,
-		  const std::vector<std::string>* solution_names=NULL,
-		  const bool write_partitioning=false) const;
-
-
-  /**
-   * Write the mesh and solution from \p es in the GMV binary
-   * format to a stream.
-   */
-  void write_gmv_binary (std::ostream& out,
-			 const EquationSystems& es,
-			 const bool write_partitioning=false) const;
-  
-  /**
-   * Actual implementation of writing a mesh in the GMV binary format.
-   */
-  void write_gmv_binary (std::ostream& out,
-			 const std::vector<Number>* v=NULL,
-			 const std::vector<std::string>* solution_names=NULL,
-			 const bool write_partitioning=false) const;
-
   /**
    * Returns a writeable reference to the number of subdomains.
    */

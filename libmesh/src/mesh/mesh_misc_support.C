@@ -1,4 +1,4 @@
-// $Id: mesh_misc_support.C,v 1.14 2004-03-23 04:17:26 jwpeterson Exp $
+// $Id: mesh_misc_support.C,v 1.15 2004-03-23 04:47:29 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -113,83 +113,83 @@ void MeshBase::read_shanee (std::istream &in)
 
 
 
-void MeshBase::read_off(const std::string& name)
-{
-  std::ifstream in (name.c_str());
+// void MeshBase::read_off(const std::string& name)
+// {
+//   std::ifstream in (name.c_str());
 
-  read_off(in);
+//   read_off(in);
 
-  return;
-}
-
-
+//   return;
+// }
 
 
-void MeshBase::read_off(std::istream& in)
-{
-  /**
-   * Clear any existing mesh data
-   */
-  clear();
+
+
+// void MeshBase::read_off(std::istream& in)
+// {
+//   /**
+//    * Clear any existing mesh data
+//    */
+//   clear();
   
-  // STL only works in 2D
-  assert (_dim == 2);
+//   // STL only works in 2D
+//   assert (_dim == 2);
 
-  // Check the input buffer
-  assert (in.good());
+//   // Check the input buffer
+//   assert (in.good());
 
-  unsigned int nn, ne, nf;
+//   unsigned int nn, ne, nf;
 
-  std::string label;
+//   std::string label;
 
-  // Read the first string.  It should say "OFF"
-  in >> label;
+//   // Read the first string.  It should say "OFF"
+//   in >> label;
 
-  assert (label == "OFF");
+//   assert (label == "OFF");
 
-  // read the number of nodes, faces, and edges
-  in >> nn >> nf >> ne;
+//   // read the number of nodes, faces, and edges
+//   in >> nn >> nf >> ne;
 
-  // resize local vectors.
-  _nodes.resize(nn);
-  _elements.resize(nf);
+//   // resize local vectors.
+//   _nodes.resize(nn);
+//   _elements.resize(nf);
 
   
-  Real x=0., y=0., z=0.;
+//   Real x=0., y=0., z=0.;
   
-  // Read the nodes
-  for (unsigned int n=0; n<nn; n++)
-    {
-      assert (in.good());
+//   // Read the nodes
+//   for (unsigned int n=0; n<nn; n++)
+//     {
+//       assert (in.good());
 
-      in >> x
-	 >> y
-	 >> z;
+//       in >> x
+// 	 >> y
+// 	 >> z;
       
-      node_ptr(n) = Node::build(x,y,z,n);
-    }
+//       node_ptr(n) = Node::build(x,y,z,n);
+//     }
 
-  unsigned int dummy, n0, n1, n2;
+//   unsigned int dummy, n0, n1, n2;
   
-  // Read the triangles
-  for (unsigned int e=0; e<nf; e++)
-    {
-      assert (in.good());
+//   // Read the triangles
+//   for (unsigned int e=0; e<nf; e++)
+//     {
+//       assert (in.good());
       
-      _elements[e] = new Tri3;
-      _elements[e]->set_id (e);
+//       _elements[e] = new Tri3;
+//       _elements[e]->set_id (e);
 
-      // The number of nodes in the object
-      in >> dummy;
+//       // The number of nodes in the object
+//       in >> dummy;
 
-      assert (dummy == 3);
+//       assert (dummy == 3);
 
-      in >> n0
-	 >> n1
-	 >> n2;
+//       in >> n0
+// 	 >> n1
+// 	 >> n2;
       
-      _elements[e]->set_node(0) = node_ptr(n0);
-      _elements[e]->set_node(1) = node_ptr(n1);
-      _elements[e]->set_node(2) = node_ptr(n2);
-    }  
-}
+//       _elements[e]->set_node(0) = node_ptr(n0);
+//       _elements[e]->set_node(1) = node_ptr(n1);
+//       _elements[e]->set_node(2) = node_ptr(n2);
+//     }  
+// }
