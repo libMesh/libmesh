@@ -1,4 +1,4 @@
-// $Id: mesh_communication.C,v 1.4 2004-01-03 15:37:43 benkirk Exp $
+// $Id: mesh_communication.C,v 1.5 2004-03-21 04:44:40 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -91,8 +91,8 @@ void MeshCommunication::distribute_mesh (MeshBase& mesh)
       {
 	pts.reserve (3*n_nodes);
 	
-	const_node_iterator       it     (mesh.nodes_begin());
-	const const_node_iterator it_end (mesh.nodes_end());
+	node_iterator       it     (mesh.nodes_begin());
+	const node_iterator it_end (mesh.nodes_end());
 	
 	for (; it != it_end; ++it)
 	  {
@@ -142,8 +142,8 @@ void MeshCommunication::distribute_mesh (MeshBase& mesh)
       {
 	conn.reserve (n_elem + total_weight);
 	
-	const_elem_iterator       it     (mesh.elements_begin());
-	const const_elem_iterator it_end (mesh.elements_end());
+	elem_iterator       it     (mesh.elements_begin());
+	const elem_iterator it_end (mesh.elements_end());
 	
 	for (; it != it_end; ++it)
 	  {
