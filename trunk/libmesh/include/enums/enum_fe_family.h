@@ -1,4 +1,4 @@
-// $Id: enum_fe_family.h,v 1.4 2004-02-18 23:04:08 benkirk Exp $
+// $Id: enum_fe_family.h,v 1.5 2005-01-13 21:06:49 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -53,6 +53,7 @@ namespace libMeshEnums {
                  JACOBI_30_00 = 13,     //   i_max = 19
 		 LEGENDRE     = 14,     //   i_max = 19
 #endif
+		 CLOUGH       = 21,
 		 
 		 INVALID_FE   = 42};
 }
