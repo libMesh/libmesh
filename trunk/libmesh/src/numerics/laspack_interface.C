@@ -1,4 +1,4 @@
-// $Id: laspack_interface.C,v 1.13 2004-03-10 07:11:26 benkirk Exp $
+// $Id: laspack_interface.C,v 1.14 2004-03-13 16:39:02 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -270,10 +270,7 @@ LaspackInterface<T>::solve (SparseMatrix<T> &matrix_in,
     }
 
   // Get the convergence step # and residual 
-  std::pair<unsigned int, Real> p (GetLastNoIter(),
-				   GetLastAccuracy());
-  
-  return p;
+  return std::make_pair(GetLastNoIter(), GetLastAccuracy());
 }
 
 
