@@ -1,4 +1,4 @@
-// $Id: distributed_vector.C,v 1.17 2003-09-25 21:46:56 benkirk Exp $
+// $Id: distributed_vector.C,v 1.18 2003-12-12 18:57:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -109,7 +109,7 @@ Real DistributedVector<T>::linfty_norm () const
 #ifdef HAVE_MPI
 
   MPI_Allreduce (&local_linfty, &global_linfty, 1,
-		 MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+		 MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
   
 #endif
 
