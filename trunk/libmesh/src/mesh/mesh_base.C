@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.57 2003-09-30 18:22:18 benkirk Exp $
+// $Id: mesh_base.C,v 1.58 2003-10-01 16:28:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -42,14 +42,8 @@
 #include "face_tri6.h"
 //#include "petsc_matrix.h"
 #include "mesh_logging.h"
-
-//#include "hilbert_sfc_partitioner.h"
-//#include "morton_sfc_partitioner.h"
-//#include "linear_partitioner.h"
-//#include "centroid_partitioner.h"
-#include "metis_partitioner.h"
-//#include "parmetis_partitioner.h"
-//#include "sfc_partitioner.h"
+#include "partitioner.h"
+#include "factory.h"
 
 
 
@@ -563,28 +557,10 @@ void MeshBase::build_nodes_to_elem_map (std::vector<std::vector<unsigned int> >&
 
 void MeshBase::partition (const unsigned int n_parts)
 {
-  // HilbertSFCPartitioner hsfcp(*this);
-  // hsfcp.partition(n_parts);
+  AutoPtr<Partitioner> partitioner = 
+    Factory<Partitioner>::build ("Metis");
   
-  // MortonSFCPartitioner msfcp(*this);
-  //   msfcp.partition(n_parts);
-  
-  //  LinearPartitioner lp(*this);
-  //lp.partition(n_parts);
-  
-  //CentroidPartitioner cp (*this, CentroidPartitioner::X);
-  //cp.partition(n_parts);
-  
-  MetisPartitioner mp     (*this);
-  mp.partition(n_parts);
-
-   //   ParmetisPartitioner pmp (*this);
-   // pmp.partition(n_parts);
-   
-   //SFCPartitioner sfcp (*this);
-   //sfcp.partition(n_parts);
-   
-  
+  partitioner->partition (*this, n_parts); 
 }
 
 

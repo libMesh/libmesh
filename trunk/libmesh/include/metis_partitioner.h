@@ -1,4 +1,4 @@
-// $Id: metis_partitioner.h,v 1.4 2003-09-02 18:02:38 benkirk Exp $
+// $Id: metis_partitioner.h,v 1.5 2003-10-01 16:28:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -41,14 +41,15 @@ class MetisPartitioner : public Partitioner
  public:
 
   /**
-   * Constructor.  Requires a \p MeshBase.
+   * Constructor.
    */
-  MetisPartitioner (MeshBase& mesh) : Partitioner(mesh) {}
+  MetisPartitioner () {}
 
   /**
    * Partition the \p MeshBase into \p n subdomains.
    */
-  virtual void partition (const unsigned int n = libMesh::n_processors());
+  virtual void partition (MeshBase& mesh,
+			  const unsigned int n = libMesh::n_processors());
 
 private:
 };

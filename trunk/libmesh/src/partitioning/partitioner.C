@@ -1,4 +1,4 @@
-// $Id: partitioner.C,v 1.3 2003-09-02 18:02:44 benkirk Exp $
+// $Id: partitioner.C,v 1.4 2003-10-01 16:28:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -29,11 +29,11 @@
 
 // ------------------------------------------------------------
 // Partitioner implementation
-void Partitioner::single_partition ()
+void Partitioner::single_partition (MeshBase& mesh)
 {
   // Loop over all the elements and assign them to processor 0.
-  elem_iterator       elem_it (_mesh.elements_begin());
-  const elem_iterator elem_end(_mesh.elements_end());
+  elem_iterator       elem_it (mesh.elements_begin());
+  const elem_iterator elem_end(mesh.elements_end());
       
   for ( ; elem_it != elem_end; ++elem_it)
     (*elem_it)->set_processor_id() = 0;

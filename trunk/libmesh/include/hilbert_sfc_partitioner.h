@@ -1,4 +1,4 @@
-// $Id: hilbert_sfc_partitioner.h,v 1.3 2003-09-02 18:02:38 benkirk Exp $
+// $Id: hilbert_sfc_partitioner.h,v 1.4 2003-10-01 16:28:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -41,10 +41,9 @@ class HilbertSFCPartitioner : public SFCPartitioner
  public:
 
   /**
-   * Constructor.  Requires a \p MeshBase.
+   * Constructor.
    */
-  HilbertSFCPartitioner (MeshBase& mesh) :
-    SFCPartitioner(mesh)
+  HilbertSFCPartitioner () {}
   {
     this->set_sfc_type ("Hilbert");
   }
@@ -52,7 +51,8 @@ class HilbertSFCPartitioner : public SFCPartitioner
   /**
    * Partition the \p MeshBase into \p n subdomains.
    */
-  virtual void partition (const unsigned int n = libMesh::n_processors()) { SFCPartitioner::partition(n); }
+  virtual void partition (MeshBase& mesh,
+			  const unsigned int n = libMesh::n_processors()) { SFCPartitioner::partition (mesh, n); }
 
 
   

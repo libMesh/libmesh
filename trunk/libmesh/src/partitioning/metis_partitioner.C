@@ -1,4 +1,4 @@
-// $Id: metis_partitioner.C,v 1.9 2003-09-25 21:46:56 benkirk Exp $
+// $Id: metis_partitioner.C,v 1.10 2003-10-01 16:28:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -23,7 +23,7 @@
 
 // Local Includes -----------------------------------
 #include "libmesh_config.h"
-#include "mesh.h"
+#include "mesh_base.h"
 #include "metis_partitioner.h"
 #include "mesh_logging.h"
 
@@ -38,16 +38,18 @@
 #endif
 
 
+
 // ------------------------------------------------------------
 // MetisPartitioner implementation
-void MetisPartitioner::partition (const unsigned int n_pieces)
+void MetisPartitioner::partition (MeshBase& mesh,
+				  const unsigned int n_pieces)
 {
   assert (n_pieces > 0);
 
   // Check for an easy return
   if (n_pieces == 1)
     {
-      this->single_partition();
+      this->single_partition (mesh);
       return;
     }
 
@@ -59,17 +61,17 @@ void MetisPartitioner::partition (const unsigned int n_pieces)
 	    << "Metis support.  Using a space-filling curve"  << std::endl
 	    << "partitioner instead!"                         << std::endl;
 
-  SFCPartitioner sfcp(_mesh);
+  SFCPartitioner sfcp;
 
-  sfcp.partition (n_pieces);
+  sfcp.partition (mesh, n_pieces);
   
 // What to do if the Metis library IS present
 #else
 
   START_LOG("partition()", "MetisPartitioner");
 
-  const unsigned int n_active_elem = _mesh.n_active_elem();
-  const unsigned int n_elem        = _mesh.n_elem();
+  const unsigned int n_active_elem = mesh.n_active_elem();
+  const unsigned int n_elem        = mesh.n_elem();
   
   // build the graph
   // the forward_map maps the active element id
@@ -100,8 +102,8 @@ void MetisPartitioner::partition (const unsigned int n_pieces)
   // We need to map the active element ids into a
   // contiguous range.
   {
-    active_elem_iterator       elem_it (_mesh.elements_begin());
-    const active_elem_iterator elem_end(_mesh.elements_end());
+    active_elem_iterator       elem_it (mesh.elements_begin());
+    const active_elem_iterator elem_end(mesh.elements_end());
 
     unsigned int el_num = 0;
 
@@ -123,8 +125,8 @@ void MetisPartitioner::partition (const unsigned int n_pieces)
   {
     std::vector<const Elem*> neighbors_offspring;
     
-    active_elem_iterator       elem_it (_mesh.elements_begin());
-    const active_elem_iterator elem_end(_mesh.elements_end());
+    active_elem_iterator       elem_it (mesh.elements_begin());
+    const active_elem_iterator elem_end(mesh.elements_end());
     
     
     for (; elem_it != elem_end; ++elem_it)
@@ -229,8 +231,8 @@ void MetisPartitioner::partition (const unsigned int n_pieces)
   
   // Assign the returned processor ids
   {
-    active_elem_iterator       elem_it (_mesh.elements_begin());
-    const active_elem_iterator elem_end(_mesh.elements_end());
+    active_elem_iterator       elem_it (mesh.elements_begin());
+    const active_elem_iterator elem_end(mesh.elements_end());
 
     for (; elem_it != elem_end; ++elem_it)
       {

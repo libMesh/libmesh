@@ -1,4 +1,4 @@
-// $Id: parmetis_partitioner.C,v 1.9 2003-09-25 21:46:56 benkirk Exp $
+// $Id: parmetis_partitioner.C,v 1.10 2003-10-01 16:28:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -23,7 +23,7 @@
 
 // Local Includes -----------------------------------
 #include "libmesh_config.h"
-#include "mesh.h"
+#include "mesh_base.h"
 #include "parmetis_partitioner.h"
 #include "mesh_logging.h"
 
@@ -49,14 +49,15 @@ namespace Parmetis {
 
 // ------------------------------------------------------------
 // ParmetisPartitioner implementation
-void ParmetisPartitioner::partition (const unsigned int n_sbdmns)
+void ParmetisPartitioner::partition (MeshBase& mesh,
+				     const unsigned int n_sbdmns)
 {
   assert (n_sbdmns > 0);
 
   // Check for an easy return
   if (n_sbdmns == 1)
     {
-      this->single_partition ();
+      this->single_partition (mesh);
       return;
     }
 
@@ -68,9 +69,9 @@ void ParmetisPartitioner::partition (const unsigned int n_sbdmns)
 	    << "Parmetis support.  Using a Metis"           << std::endl
 	    << "partitioner instead!"                       << std::endl;
 
-  MetisPartitioner mp(_mesh);
+  MetisPartitioner mp;
 
-  mp.partition (n_sbdmns);
+  mp.partition (mesh, n_sbdmns);
   
 // What to do if the Parmetis library IS present
 #else
@@ -78,10 +79,10 @@ void ParmetisPartitioner::partition (const unsigned int n_sbdmns)
   START_LOG("partition()", "ParmetisPartitioner");
 
   // Initialize the data structures required by ParMETIS
-  this->initialize (n_sbdmns);
+  this->initialize (mesh, n_sbdmns);
 
-  // build the graph corresponding to the _mesh
-  this->build_graph ();
+  // build the graph corresponding to the mesh
+  this->build_graph (mesh);
   
 
   // Partition the graph
@@ -101,7 +102,7 @@ void ParmetisPartitioner::partition (const unsigned int n_sbdmns)
 		 MPI_COMM_WORLD);
   
   // Assign the returned processor ids
-  this->assign_partitioning ();
+  this->assign_partitioning (mesh);
   
 
   STOP_LOG ("partition()", "ParmetisPartitioner");
@@ -112,15 +113,16 @@ void ParmetisPartitioner::partition (const unsigned int n_sbdmns)
 
 
 
-void ParmetisPartitioner::repartition (const unsigned int n_sbdmns)
+void ParmetisPartitioner::repartition (MeshBase& mesh,
+				       const unsigned int n_sbdmns)
 {
   assert (n_sbdmns > 0);
 
   // Check for an easy return
   if (n_sbdmns == 1)
     {
-      elem_iterator       elem_it (_mesh.elements_begin());
-      const elem_iterator elem_end(_mesh.elements_end());
+      elem_iterator       elem_it (mesh.elements_begin());
+      const elem_iterator elem_end(mesh.elements_end());
       
       for ( ; elem_it != elem_end; ++elem_it)
 	(*elem_it)->set_processor_id() = 0;
@@ -136,9 +138,9 @@ void ParmetisPartitioner::repartition (const unsigned int n_sbdmns)
 	    << "Parmetis support.  Using a Metis"           << std::endl
 	    << "partitioner instead!"                       << std::endl;
 
-  MetisPartitioner mp(_mesh);
+  MetisPartitioner mp;
 
-  mp.partition (n_sbdmns);
+  mp.partition (mesh, n_sbdmns);
   
 // What to do if the Parmetis library IS present
 #else
@@ -148,10 +150,10 @@ void ParmetisPartitioner::repartition (const unsigned int n_sbdmns)
   START_LOG("repartition()", "ParmetisPartitioner");
 
   // Initialize the data structures required by ParMETIS
-  this->initialize (n_sbdmns);
+  this->initialize (mesh, n_sbdmns);
 
-  // build the graph corresponding to the _mesh
-  this->build_graph ();
+  // build the graph corresponding to the mesh
+  this->build_graph (mesh);
   
 
   // Partition the graph
@@ -177,7 +179,7 @@ void ParmetisPartitioner::repartition (const unsigned int n_sbdmns)
 		 MPI_COMM_WORLD);
   
   // Assign the returned processor ids
-  this->assign_partitioning ();
+  this->assign_partitioning (mesh);
   
 
   STOP_LOG ("repartition()", "ParmetisPartitioner");
@@ -191,12 +193,9 @@ void ParmetisPartitioner::repartition (const unsigned int n_sbdmns)
 // Only need to compile these methods if ParMETIS is present
 #ifdef HAVE_PARMETIS
 
-void ParmetisPartitioner::initialize (const unsigned int n_sbdmns)
+void ParmetisPartitioner::initialize (const MeshBase& mesh,
+				      const unsigned int n_sbdmns)
 {
-  // Get a constant reference to the _mesh, use that to avoid
-  // corrupting the non-const _mesh
-  const MeshBase& mesh = _mesh;
-
   const unsigned int n_elem               = mesh.n_elem();
   const unsigned int n_active_local_elem  = mesh.n_active_local_elem();
   const unsigned int n_active_elem        = mesh.n_active_elem();
@@ -273,12 +272,8 @@ void ParmetisPartitioner::initialize (const unsigned int n_sbdmns)
 
 
 
-void ParmetisPartitioner::build_graph ()
+void ParmetisPartitioner::build_graph (const MeshBase& mesh)
 {
-  // Get a constant reference to the _mesh, use that to avoid
-  // corrupting the non-const _mesh
-  const MeshBase& mesh = _mesh;
-  
   // build the graph in distributed CSR format.  Note that
   // the edges in the graph will correspond to
   // face neighbors
@@ -375,11 +370,11 @@ void ParmetisPartitioner::build_graph ()
 
 
 
-void ParmetisPartitioner::assign_partitioning ()
+void ParmetisPartitioner::assign_partitioning (MeshBase& mesh)
 {
   // Assign the returned processor ids
-  active_elem_iterator       elem_it (_mesh.elements_begin());
-  const active_elem_iterator elem_end(_mesh.elements_end());
+  active_elem_iterator       elem_it (mesh.elements_begin());
+  const active_elem_iterator elem_end(mesh.elements_end());
   
   for (; elem_it != elem_end; ++elem_it)
     {

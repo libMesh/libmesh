@@ -1,4 +1,4 @@
-// $Id: centroid_partitioner.h,v 1.4 2003-09-02 18:02:36 benkirk Exp $
+// $Id: centroid_partitioner.h,v 1.5 2003-10-01 16:28:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -33,6 +33,7 @@
 // Forward declarations
 class Elem;
 
+
 /**
  * The centroid partitioner partitions simply based on the
  * locations of element centroids.  You must define what
@@ -54,8 +55,8 @@ public:
   
   /**
    * A typedef which is reserved only for use within
-   * this class.  If X is chosen, then centroid locations
-   * will be sorted according to 
+   * this class.  If \p X is chosen, then centroid locations
+   * will be sorted according to their X-location, etc...
    */
   enum CentroidSortMethod {X=0,
 			   Y,
@@ -64,17 +65,28 @@ public:
 			   INVALID_METHOD};
 
   /**
-   * Constructor.  Requires a reference to a MeshBase
-   * and constructs the base class.
+   * Constructor.  Takes the \p CentroidSortMethod to use, which
+   * defaults to \p X ordering.
    */
-  CentroidPartitioner (MeshBase& mesh, CentroidSortMethod sm);
+  CentroidPartitioner (const CentroidSortMethod sm=X) : _sort_method(sm) {}
 
   /**
    * Partitions the mesh into n subdomains.  This is
    * a required interface for the class.
    */
-  virtual void partition (const unsigned int n = libMesh::n_processors());
+  virtual void partition (MeshBase& mesh,
+			  const unsigned int n = libMesh::n_processors());
 
+  /**
+   * Specifies how the elements will be sorted.
+   */
+  CentroidSortMethod sort_method () const { return _sort_method; }
+
+  /**
+   * Change how the elements will be sorted.
+   */
+  void set_sort_method (const CentroidSortMethod sm) {_sort_method = sm; }
+  
 private:
 
   /**
@@ -82,7 +94,7 @@ private:
    * This list will be kept around in case a repartition
    * is desired.
    */
-  void compute_centroids();
+  void compute_centroids (MeshBase& mesh);
 
   /**
    * Partition the list of centroids based on the
@@ -90,8 +102,8 @@ private:
    * a function which may be passed to the std::sort
    * routine for sorting the elements by centroid.
    */
-  static bool sort_x(const std::pair<Point, Elem*>& lhs,
-		     const std::pair<Point, Elem*>& rhs);
+  static bool sort_x (const std::pair<Point, Elem*>& lhs,
+		      const std::pair<Point, Elem*>& rhs);
 
   /**
    * Partition the list of centroids based on the
@@ -99,8 +111,8 @@ private:
    * a function which may be passed to the std::sort
    * routine for sorting the elements by centroid.
    */
-  static bool sort_y(const std::pair<Point, Elem*>& lhs,
-		     const std::pair<Point, Elem*>& rhs);
+  static bool sort_y (const std::pair<Point, Elem*>& lhs,
+		      const std::pair<Point, Elem*>& rhs);
 
   /**
    * Partition the list of centroids based on the
@@ -108,8 +120,8 @@ private:
    * a function which may be passed to the std::sort
    * routine for sorting the elements by centroid.
    */
-  static bool sort_z(const std::pair<Point, Elem*>& lhs,
-		     const std::pair<Point, Elem*>& rhs);
+  static bool sort_z (const std::pair<Point, Elem*>& lhs,
+		      const std::pair<Point, Elem*>& rhs);
 
   
   /**
@@ -118,17 +130,15 @@ private:
    * a function which may be passed to the std::sort
    * routine for sorting the elements by centroid.
    */
-  static bool sort_radial(const std::pair<Point, Elem*>& lhs,
-			  const std::pair<Point, Elem*>& rhs);
+  static bool sort_radial (const std::pair<Point, Elem*>& lhs,
+			   const std::pair<Point, Elem*>& rhs);
 
   /**
    * Store a flag which tells which type of
    * sort method we are using.
    */
-  const CentroidSortMethod _sort_method;
+  CentroidSortMethod _sort_method;
 
-
-  
   /**
    * Vector which holds pairs of centroids and
    * their respective element pointers.

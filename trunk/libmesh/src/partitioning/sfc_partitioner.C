@@ -1,4 +1,4 @@
-// $Id: sfc_partitioner.C,v 1.6 2003-09-25 21:46:56 benkirk Exp $
+// $Id: sfc_partitioner.C,v 1.7 2003-10-01 16:28:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -23,7 +23,7 @@
 
 // Local Includes -----------------------------------
 #include "libmesh_config.h"
-#include "mesh.h"
+#include "mesh_base.h"
 #include "sfc_partitioner.h"
 #include "mesh_logging.h"
 
@@ -40,7 +40,8 @@
 
 // ------------------------------------------------------------
 // SFCPartitioner implementation
-void SFCPartitioner::partition (const unsigned int n)
+void SFCPartitioner::partition (MeshBase& mesh,
+				const unsigned int n)
 {
   
   assert (n > 0);
@@ -48,7 +49,7 @@ void SFCPartitioner::partition (const unsigned int n)
   // Check for an easy return
   if (n == 1)
     {
-      this->single_partition ();
+      this->single_partition (mesh);
       return;
     }
 
@@ -56,21 +57,21 @@ void SFCPartitioner::partition (const unsigned int n)
 #ifndef HAVE_SFCURVES
 
   here();
-  std::cerr << "ERROR: The library has been built without"  << std::endl
-	    << "Space Filling Curve support.  Using a linear"  << std::endl
+  std::cerr << "ERROR: The library has been built without"    << std::endl
+	    << "Space Filling Curve support.  Using a linear" << std::endl
 	    << "partitioner instead!" << std::endl;
 
-  LinearPartitioner lp(_mesh);
+  LinearPartitioner lp;
 
-  lp.partition (n);
+  lp.partition (mesh, n);
   
 // What to do if the sfcurves library IS present
 #else
 
   START_LOG("sfc_partition()", "SFCPartitioner");
 
-  const unsigned int n_active_elem = _mesh.n_active_elem();
-  const unsigned int n_elem        = _mesh.n_elem();
+  const unsigned int n_active_elem = mesh.n_active_elem();
+  const unsigned int n_elem        = mesh.n_elem();
   
   // the forward_map maps the active element id
   // into a contiguous block of indices
@@ -91,8 +92,8 @@ void SFCPartitioner::partition (const unsigned int n)
   // We need to map the active element ids into a
   // contiguous range.
   {
-    active_elem_iterator       elem_it (_mesh.elements_begin());
-    const active_elem_iterator elem_end(_mesh.elements_end());
+    active_elem_iterator       elem_it (mesh.elements_begin());
+    const active_elem_iterator elem_end(mesh.elements_end());
 
     unsigned int el_num = 0;
 
@@ -111,8 +112,8 @@ void SFCPartitioner::partition (const unsigned int n)
 
   // Get the centroid for each active element
   {
-    active_elem_iterator       elem_it (_mesh.elements_begin());
-    const active_elem_iterator elem_end(_mesh.elements_end());
+    active_elem_iterator       elem_it (mesh.elements_begin());
+    const active_elem_iterator elem_end(mesh.elements_end());
     
     for (; elem_it != elem_end; ++elem_it)
       {
@@ -131,18 +132,22 @@ void SFCPartitioner::partition (const unsigned int n)
 
   // build the space-filling curve
   if (_sfc_type == "Hilbert")
-    Sfc::hilbert(&x[0], &y[0], &z[0], &size, &table[0]);
+    Sfc::hilbert (&x[0], &y[0], &z[0], &size, &table[0]);
   
   else if (_sfc_type == "Morton")
-    Sfc::morton(&x[0], &y[0], &z[0], &size, &table[0]);
+    Sfc::morton  (&x[0], &y[0], &z[0], &size, &table[0]);
   
   else
     {
+      here();
       std::cerr << "ERROR: Unknown type: " << _sfc_type << std::endl
-		<< " Valid types are" << std::endl
-		<< "  \"Hilbert\"" << std::endl
-		<< "  \"Morton\""  << std::endl;
-      error();
+		<< " Valid types are"                   << std::endl
+		<< "  \"Hilbert\""                      << std::endl
+		<< "  \"Morton\""                       << std::endl
+		<< " "                                  << std::endl
+		<< "Proceeding with a Hilbert curve."   << std::endl;
+      
+      Sfc::hilbert (&x[0], &y[0], &z[0], &size, &table[0]);
     }
 
   

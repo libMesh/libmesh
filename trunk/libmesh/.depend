@@ -2316,6 +2316,7 @@ src/mesh/mesh_base.$(obj-suffix):\
     include/face_tri.h\
     include/face_tri3.h\
     include/face_tri6.h\
+    include/factory.h\
     include/libmesh.h\
     include/libmesh_base.h\
     include/libmesh_common.h\
@@ -2323,7 +2324,6 @@ src/mesh/mesh_base.$(obj-suffix):\
     include/mesh_base.h\
     include/mesh_data.h\
     include/mesh_logging.h\
-    include/metis_partitioner.h\
     include/node.h\
     include/node_iterators.h\
     include/partitioner.h\
@@ -3527,7 +3527,6 @@ src/partitioning/linear_partitioner.$(obj-suffix):\
     include/libmesh_common.h\
     include/libmesh_config.h\
     include/linear_partitioner.h\
-    include/mesh.h\
     include/mesh_base.h\
     include/mesh_data.h\
     include/mesh_logging.h\
@@ -3559,7 +3558,6 @@ src/partitioning/metis_partitioner.$(obj-suffix):\
     include/libmesh_base.h\
     include/libmesh_common.h\
     include/libmesh_config.h\
-    include/mesh.h\
     include/mesh_base.h\
     include/mesh_data.h\
     include/mesh_logging.h\
@@ -3593,7 +3591,6 @@ src/partitioning/parmetis_partitioner.$(obj-suffix):\
     include/libmesh_base.h\
     include/libmesh_common.h\
     include/libmesh_config.h\
-    include/mesh.h\
     include/mesh_base.h\
     include/mesh_data.h\
     include/mesh_logging.h\
@@ -3641,6 +3638,24 @@ src/partitioning/partitioner.$(obj-suffix):\
     include/surface.h\
     include/type_vector.h\
     include/utility.h
+src/partitioning/partitioner_factory.$(obj-suffix):\
+    src/partitioning/partitioner_factory.C\
+    include/auto_ptr.h\
+    include/centroid_partitioner.h\
+    include/enum_solver_package.h\
+    include/factory.h\
+    include/libmesh.h\
+    include/libmesh_base.h\
+    include/libmesh_common.h\
+    include/libmesh_config.h\
+    include/linear_partitioner.h\
+    include/metis_partitioner.h\
+    include/parmetis_partitioner.h\
+    include/partitioner.h\
+    include/perf_log.h\
+    include/point.h\
+    include/sfc_partitioner.h\
+    include/type_vector.h
 src/partitioning/sfc_partitioner.$(obj-suffix):\
     src/partitioning/sfc_partitioner.C\
     include/auto_ptr.h\
@@ -3658,7 +3673,6 @@ src/partitioning/sfc_partitioner.$(obj-suffix):\
     include/libmesh_common.h\
     include/libmesh_config.h\
     include/linear_partitioner.h\
-    include/mesh.h\
     include/mesh_base.h\
     include/mesh_data.h\
     include/mesh_logging.h\

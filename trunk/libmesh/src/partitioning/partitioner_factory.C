@@ -1,4 +1,4 @@
-// $Id: morton_sfc_partitioner.h,v 1.4 2003-10-01 16:28:51 benkirk Exp $
+// $Id: partitioner_factory.C,v 1.1 2003-10-01 16:28:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -19,45 +19,43 @@
 
 
 
-#ifndef __morton_sfc_partitioner_h__
-#define __morton_sfc_partitioner_h__
-
 // C++ Includes   -----------------------------------
 
 // Local Includes -----------------------------------
+#include "libmesh_config.h"
+#include "partitioner.h"
+#include "centroid_partitioner.h"
+#include "metis_partitioner.h"
+#include "parmetis_partitioner.h"
+#include "linear_partitioner.h"
 #include "sfc_partitioner.h"
+#include "factory.h"
 
 
-
-/**
- * The \p MortonSFCPartitioner uses a Morton space
- * filling curve to partition the elements.
- */
 
 // ------------------------------------------------------------
-// MortonSFCLinearPartitioner class definition
-class MortonSFCPartitioner : public SFCPartitioner
-{
- public:
+// Explicit instantiation of Partitioner factory
+std::map<std::string, Factory<Partitioner>* > Factory<Partitioner>::factory_map;
 
-  /**
-   * Constructor.
-   */
-  MortonSFCPartitioner () {}
-  {
-    this->set_sfc_type ("Morton");
-  }
 
-  /**
-   * Partition the \p MeshBase into \p n subdomains.
-   */
-  virtual void partition (MeshBase& mesh,
-			  const unsigned int n = libMesh::n_processors()) { SFCPartitioner::partition (mesh, n); }
 
+// ------------------------------------------------------------
+// Register Partitioning classes with the factory
+namespace libMeshPartitioners {
   
-private:
+#ifdef HAVE_METIS
+  FactoryImp<MetisPartitioner, Partitioner> metis_factory ("Metis");
+#endif
   
-};
+#ifdef HAVE_PARMETIS
+  FactoryImp<ParmetisPartitioner, Partitioner> parmetis_factory ("Parmetis");
+#endif
 
+#ifdef HAVE_SFCURVES
+  FactoryImp<SFCPartitioner, Partitioner> sfc_factory ("SFCurves");
+#endif
 
-#endif // #define __morton_sfc_partitioner_h__
+  FactoryImp<LinearPartitioner,   Partitioner> linear_factory ("Linear");
+  FactoryImp<CentroidPartitioner, Partitioner> cent_factory   ("Centroid");
+  
+}

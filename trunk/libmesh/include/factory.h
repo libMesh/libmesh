@@ -1,4 +1,4 @@
-// $Id: factory.h,v 1.9 2003-09-25 21:46:55 benkirk Exp $
+// $Id: factory.h,v 1.10 2003-10-01 16:28:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -46,25 +46,25 @@ protected:
   /**
    * Constructor. Takes the name to be mapped.
    */
-  Factory(const std::string& name);
+  Factory (const std::string& name);
 
 public:
 
   /**
    * Destructor. (Empty.)
    */
-  virtual ~Factory() {}
+  virtual ~Factory () {}
 
   /**
    * Builds an object of type Base identified by name.
    */
-  static AutoPtr<Base> build(const std::string& name);
+  static AutoPtr<Base> build (const std::string& name);
 
   /**
    * Create a Base class.  Force this to be implemented
    * later.
    */
-  virtual AutoPtr<Base> create() = 0;
+  virtual AutoPtr<Base> create () = 0;
 
 private:
 
@@ -79,7 +79,7 @@ private:
 /**
  * Factory class implementation.
  */
-template<class Derived, class Base>
+template <class Derived, class Base>
 class FactoryImp: public Factory<Base>
 {
 public:
@@ -87,19 +87,19 @@ public:
   /**
    * Constructor.  Takes a name as input.
    */
-  FactoryImp(const std::string& name) : Factory<Base>(name) { }
+  FactoryImp (const std::string& name) : Factory<Base>(name) { }
 
   /**
    * Destructor.  Empty.
    */
-  ~FactoryImp() {}
+  ~FactoryImp () {}
 
 private:
 
   /**
    * @returns a new object of type Derived. 
    */
-  AutoPtr<Base> create();
+  AutoPtr<Base> create ();
 
 };
 
@@ -107,23 +107,25 @@ private:
 
 // -----------------------------------------------------
 // Factory members
-template<class Base>
+template <class Base>
 inline
-Factory<Base>::Factory(const std::string& name)
+Factory<Base>::Factory (const std::string& name)
 {
-  if(!factory_map.empty())
-    assert(!factory_map.count(name));
-  
+  // Make sure we haven't already added this name
+  // to the map
+  assert (!factory_map.count(name));
+
   factory_map[name] = this;
 }
 
 
 
-template<class Base>
+template <class Base>
 inline
-AutoPtr<Base> Factory<Base>::build(const std::string& name)
-{  
-  if(!factory_map.count(name))
+AutoPtr<Base> Factory<Base>::build (const std::string& name)
+{
+  // name not found in the map
+  if (!factory_map.count(name))
     {
       std::cerr << "Tried to build an unknown type: " << name << std::endl;
 
@@ -134,7 +136,7 @@ AutoPtr<Base> Factory<Base>::build(const std::string& name)
         std::cerr << "  " << it->first << std::endl;
 
       // Do this the stoopid way for IBM xlC
-      AutoPtr<Base> ret_val(NULL);
+      AutoPtr<Base> ret_val (NULL);
       
       return ret_val;
     }
@@ -147,12 +149,12 @@ AutoPtr<Base> Factory<Base>::build(const std::string& name)
 
 
 
-template<class Derived, class Base>
+template <class Derived, class Base>
 inline
 AutoPtr<Base> FactoryImp<Derived,Base>::create ()
 {  
   // Do this the stoopid way for IBM xlC
-  AutoPtr<Base> ret_val(new Derived);
+  AutoPtr<Base> ret_val (new Derived);
 
   return ret_val;
 }
