@@ -1,4 +1,4 @@
-// $Id: sparse_matrix.h,v 1.10 2003-05-04 23:58:52 benkirk Exp $
+// $Id: sparse_matrix.h,v 1.11 2003-06-02 22:50:08 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,7 +26,6 @@
 // C++ includes
 #include <iomanip>
 #include <vector>
-#include <set>
 
 // Local includes
 #include "mesh_common.h"
@@ -106,7 +105,7 @@ public:
    * implementation does not need this data simply do
    * not overload this method.
    */
-  virtual void const_update_sparsity_pattern (const std::vector<std::set<unsigned int> >&) {}
+  virtual void const_update_sparsity_pattern (const std::vector<std::vector<unsigned int> >&) {}
   
   /**
    * Updates the matrix sparsity pattern, and may freely trash
@@ -116,7 +115,7 @@ public:
    * implementation does not need this data simply do
    * not overload this method.
    */
-  virtual void update_sparsity_pattern (std::vector<std::set<unsigned int> >&) {}
+  virtual void update_sparsity_pattern (std::vector<std::vector<unsigned int> >&) {}
   
   /**
    * Initialize a Sparse matrix that is of global

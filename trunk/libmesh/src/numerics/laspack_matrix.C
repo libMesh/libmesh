@@ -1,4 +1,4 @@
-// $Id: laspack_matrix.C,v 1.11 2003-04-29 21:39:36 benkirk Exp $
+// $Id: laspack_matrix.C,v 1.12 2003-06-02 22:50:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -34,11 +34,11 @@
 //-----------------------------------------------------------------------
 // LaspackMatrix members
 template <typename T> 
-void LaspackMatrix<T>::const_update_sparsity_pattern (const std::vector<std::set<unsigned int> >&
+void LaspackMatrix<T>::const_update_sparsity_pattern (const std::vector<std::vector<unsigned int> >&
 						      sparsity_pattern)
 {
   // clear data, start over
-  clear ();    
+  this->clear ();    
 
   // big trouble if this fails!
   assert (this->_dof_map != NULL);
@@ -74,18 +74,14 @@ void LaspackMatrix<T>::const_update_sparsity_pattern (const std::vector<std::set
 	// make sure that _row_start is set up properly
 	assert (pos == _row_start[row]);
 	 
-	const std::set<unsigned int>& sparsity_row =
+	const std::vector<unsigned int>& sparsity_row =
 	  sparsity_pattern[row];
 	
 	// make sure that _row_start is set up properly
 	assert (pos+sparsity_row.size() == _row_start[row+1]);
 
-	std::set<unsigned int>::const_iterator it_end =
-	  sparsity_row.end();
-
-	for (std::set<unsigned int>::const_iterator it =
-	       sparsity_row.begin(); it != it_end; ++it)
-	  _csr[pos++] = *it;
+	for (unsigned int col=0; col<sparsity_row.size(); col++)
+	  _csr[pos++] = sparsity_row[col];
       }
     
     // make sure that _row_start is set up properly
@@ -136,7 +132,7 @@ void LaspackMatrix<T>::const_update_sparsity_pattern (const std::vector<std::set
 
 
 template <typename T> 
-void LaspackMatrix<T>::update_sparsity_pattern (std::vector<std::set<unsigned int> >&
+void LaspackMatrix<T>::update_sparsity_pattern (std::vector<std::vector<unsigned int> >&
 					       sparsity_pattern)
 {
   // for now, there is no need that \p LaspackMatrix<T> destroys the
