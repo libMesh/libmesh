@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.24 2003-03-03 22:23:32 benkirk Exp $
+// $Id: mesh_base.h,v 1.25 2003-03-11 04:35:18 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -33,7 +33,7 @@
 
 // forward declarations
 class Elem;
-class EquationSystems;
+class EquationSystemsBase;
 template <typename T> class PetscMatrix;
 
 
@@ -63,7 +63,7 @@ template <typename T> class PetscMatrix;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.24 $
+ * \version $Revision: 1.25 $
  */
 
 
@@ -456,7 +456,7 @@ public:
    * \p name.  Writes both the mesh and the solution from \p es. 
    */
   void write_tecplot (const std::string& name,
-		      EquationSystems& es);
+		      EquationSystemsBase& es);
   
   /**
    * Write a Tecplot-formatted ASCII text file to the file specified by 
@@ -474,7 +474,7 @@ public:
    * is not present this function will simply call the ASCII output version.
    */
   void write_tecplot_binary (const std::string& name,
-			     EquationSystems& es);
+			     EquationSystemsBase& es);
   
   /**
    * Write a Tecplot-formatted binary file to the file specified by \p name.
@@ -501,7 +501,7 @@ public:
    * write the partitioning information.
    */
   void write_gmv (const std::string& name,
-		  EquationSystems& es,
+		  EquationSystemsBase& es,
 		  const bool write_partitioning=true);
 
   /**
@@ -524,7 +524,7 @@ public:
    * write the partitioning information.
    */
   void write_gmv_binary (const std::string& name,
-			 EquationSystems& es,
+			 EquationSystemsBase& es,
 			 const bool write_partitioning=true);
 
   /**
@@ -751,7 +751,7 @@ protected:
    * nodal data from \p es.
    */
   void write_tecplot (std::ostream& out,
-		      EquationSystems& es);
+		      EquationSystemsBase& es);
   
   /**
    * Actual Implementation of writing a Tecplot-formatted 
@@ -771,7 +771,7 @@ protected:
    * format to a stream.
    */
   void write_gmv (std::ostream& out,
-		  EquationSystems& es,
+		  EquationSystemsBase& es,
 		  const bool write_partitioning=false);
 
   /**
@@ -788,7 +788,7 @@ protected:
    * format to a stream.
    */
   void write_gmv_binary (std::ostream& out,
-			 EquationSystems& es,
+			 EquationSystemsBase& es,
 			 const bool write_partitioning=false);
   
   /**

@@ -1,4 +1,4 @@
-// $Id: equation_systems_io.C,v 1.16 2003-02-26 04:43:12 jwpeterson Exp $
+// $Id: equation_systems_io.C,v 1.17 2003-03-11 04:35:18 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -33,6 +33,7 @@
 #include "petsc_interface.h"
 #include "equation_systems.h"
 #include "general_system.h"
+#include "frequency_system.h"
 
 // Forward Declarations
 
@@ -41,10 +42,11 @@
 
 // ------------------------------------------------------------
 // EquationSystem class implementation
-void EquationSystems::read(const std::string& name,
-			   const Xdr::XdrMODE mode,
-			   const bool read_header,
-			   const bool read_data)
+template <class T_sys>
+void EquationSystems<T_sys>::read(const std::string& name,
+				  const Xdr::XdrMODE mode,
+				  const bool read_header,
+				  const bool read_data)
 {
   /**
    * This program implements the output of an 
@@ -119,7 +121,7 @@ void EquationSystems::read(const std::string& name,
       if (read_header)
 	this->add_system (sys_name);
 	  
-      GeneralSystem& new_system = (*this)(sys_name);
+      T_sys& new_system = (*this)(sys_name);
 	  
       /**
        * 3.) 
@@ -220,7 +222,7 @@ void EquationSystems::read(const std::string& name,
   if (read_data)
     for (unsigned int sys=0; sys<this->n_systems(); sys++)
       {
-	GeneralSystem& system = (*this)(sys);
+	T_sys&              system = (*this)(sys);
 	std::vector<Number> global_soln;
 	std::vector<Number> reordered_soln;
 	
@@ -278,9 +280,10 @@ void EquationSystems::read(const std::string& name,
 
 
 
-void EquationSystems::write(const std::string& name,
-			    const Xdr::XdrMODE mode,
-			    const bool write_data)
+template <class T_sys>
+void EquationSystems<T_sys>::write(const std::string& name,
+				   const Xdr::XdrMODE mode,
+				   const bool write_data)
 {
   /**
    * This program implements the output of an 
@@ -327,7 +330,7 @@ void EquationSystems::write(const std::string& name,
   const unsigned int proc_id = _mesh.processor_id();
   unsigned int n_sys         = this->n_systems();
 
-  std::map<std::string, GeneralSystem*>::iterator
+  std::map<std::string, SystemBase*>::iterator
     pos = _systems.begin();
   
   std::string comment;
@@ -351,7 +354,7 @@ void EquationSystems::write(const std::string& name,
       while (pos != _systems.end())
 	{
 	  std::string sys_name       = pos->first;
-	  GeneralSystem& system      = *pos->second;
+	  T_sys& system              = static_cast<T_sys&>(*pos->second);
 	  const unsigned int sys_num = system.number();
 	  
 
@@ -504,7 +507,7 @@ void EquationSystems::write(const std::string& name,
       {
 	// Convenient references
 	std::string sys_name       = pos->first;
-	GeneralSystem& system      = *pos->second;
+	T_sys& system              = static_cast<T_sys&>(*pos->second);
 	const unsigned int sys_num = system.number();
 	
 	std::vector<Number> global_soln;
@@ -591,3 +594,16 @@ void EquationSystems::write(const std::string& name,
 	++pos;
       }
 }
+
+
+
+
+//--------------------------------------------------------------
+// Explicit instantiations
+template class EquationSystems<GeneralSystem>;
+
+#if defined(USE_COMPLEX_NUMBERS) && defined(HAVE_PETSC)
+template class EquationSystems<FrequencySystem>;
+#endif
+
+

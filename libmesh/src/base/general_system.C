@@ -1,4 +1,4 @@
-// $Id: general_system.C,v 1.9 2003-03-04 15:31:11 benkirk Exp $
+// $Id: general_system.C,v 1.10 2003-03-11 04:35:19 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -20,18 +20,17 @@
 
 
 // C++ includes
-#include <math.h>
-#include <algorithm>
+//#include <math.h>
+//#include <algorithm>
 
 // Local includes
 #include "general_system.h"
-#include "libmesh.h"
 
 
 
 // ------------------------------------------------------------
 // GeneralSystem implementation
-GeneralSystem::GeneralSystem (EquationSystems&    es,
+GeneralSystem::GeneralSystem (EquationSystems<GeneralSystem>&    es,
 			      const std::string&  name,
 			      const unsigned int  number,
 			      const SolverPackage solver_package) :
@@ -171,7 +170,7 @@ GeneralSystem::solve ()
 
 
 
-void GeneralSystem::attach_init_function(void fptr(EquationSystems& es,
+void GeneralSystem::attach_init_function(void fptr(EquationSystems<GeneralSystem>& es,
 						   const std::string& name))
 {
   assert (fptr != NULL);
@@ -181,7 +180,7 @@ void GeneralSystem::attach_init_function(void fptr(EquationSystems& es,
 
 
 
-void GeneralSystem::attach_assemble_function(void fptr(EquationSystems& es,
+void GeneralSystem::attach_assemble_function(void fptr(EquationSystems<GeneralSystem>& es,
 						       const std::string& name))
 {
   assert (fptr != NULL);

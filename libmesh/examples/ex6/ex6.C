@@ -1,4 +1,4 @@
-// $Id: ex6.C,v 1.15 2003-03-03 02:15:57 benkirk Exp $
+// $Id: ex6.C,v 1.16 2003-03-11 04:35:18 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -98,7 +98,7 @@
  * Function prototype.  This is similar to the Poisson
  * assemble function of example 4. 
  */
-void assemble_wave(EquationSystems& es,
+void assemble_wave(EquationSystems<GeneralSystem>& es,
 		   const std::string& system_name);
 
 
@@ -213,7 +213,7 @@ int main (int argc, char** argv)
     /**
      * Create an equation systems object.
      */
-    EquationSystems equation_systems (mesh);
+    EquationSystems<GeneralSystem> equation_systems (mesh);
 
     /**
      * Declare the system and its variables.
@@ -288,7 +288,7 @@ int main (int argc, char** argv)
 
 
 
-void assemble_wave(EquationSystems& es,
+void assemble_wave(EquationSystems<GeneralSystem>& es,
 		   const std::string& system_name)
 {
   _p(starting assemble_wave);

@@ -61,8 +61,10 @@ src/base/equation_systems.$(obj-suffix):\
     include/enum_solver_package.h\
     include/enum_solver_type.h\
     include/equation_systems.h\
+    include/equation_systems_base.h\
     include/fe_interface.h\
     include/fe_type.h\
+    include/frequency_system.h\
     include/general_system.h\
     include/libmesh.h\
     include/libmesh_base.h\
@@ -86,6 +88,36 @@ src/base/equation_systems.$(obj-suffix):\
     include/surface.h\
     include/system_base.h\
     include/xdr_cxx.h
+src/base/equation_systems_base.$(obj-suffix):\
+    src/base/equation_systems_base.C\
+    include/auto_ptr.h\
+    include/boundary_info.h\
+    include/boundary_mesh.h\
+    include/dof_object.h\
+    include/elem.h\
+    include/elem_iterators.h\
+    include/enum_elem_quality.h\
+    include/enum_elem_type.h\
+    include/enum_order.h\
+    include/enum_solver_package.h\
+    include/equation_systems_base.h\
+    include/libmesh.h\
+    include/libmesh_base.h\
+    include/mesh.h\
+    include/mesh_base.h\
+    include/mesh_common.h\
+    include/mesh_communication.h\
+    include/mesh_config.h\
+    include/mesh_refinement.h\
+    include/node.h\
+    include/node_iterators.h\
+    include/perf_log.h\
+    include/point.h\
+    include/predicated_iterator.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h\
+    include/sphere.h\
+    include/surface.h
 src/base/equation_systems_io.$(obj-suffix):\
     src/base/equation_systems_io.C\
     include/auto_ptr.h\
@@ -107,7 +139,9 @@ src/base/equation_systems_io.$(obj-suffix):\
     include/enum_solver_package.h\
     include/enum_solver_type.h\
     include/equation_systems.h\
+    include/equation_systems_base.h\
     include/fe_type.h\
+    include/frequency_system.h\
     include/general_system.h\
     include/libmesh_base.h\
     include/linear_solver_interface.h\
@@ -151,6 +185,7 @@ src/base/frequency_system.$(obj-suffix):\
     include/enum_solver_package.h\
     include/enum_solver_type.h\
     include/equation_systems.h\
+    include/equation_systems_base.h\
     include/fe_type.h\
     include/frequency_system.h\
     include/libmesh_base.h\
@@ -192,9 +227,9 @@ src/base/general_system.$(obj-suffix):\
     include/enum_solver_package.h\
     include/enum_solver_type.h\
     include/equation_systems.h\
+    include/equation_systems_base.h\
     include/fe_type.h\
     include/general_system.h\
-    include/libmesh.h\
     include/libmesh_base.h\
     include/linear_solver_interface.h\
     include/mesh.h\
@@ -206,7 +241,6 @@ src/base/general_system.$(obj-suffix):\
     include/node.h\
     include/node_iterators.h\
     include/numeric_vector.h\
-    include/perf_log.h\
     include/point.h\
     include/predicated_iterator.h\
     include/reference_counted_object.h\
@@ -1832,7 +1866,7 @@ src/mesh/mesh_gmv_support.$(obj-suffix):\
     include/enum_elem_type.h\
     include/enum_order.h\
     include/enum_solver_package.h\
-    include/equation_systems.h\
+    include/equation_systems_base.h\
     include/libmesh_base.h\
     include/mesh_base.h\
     include/mesh_common.h\
@@ -1846,8 +1880,7 @@ src/mesh/mesh_gmv_support.$(obj-suffix):\
     include/reference_counted_object.h\
     include/reference_counter.h\
     include/sphere.h\
-    include/surface.h\
-    include/xdr_cxx.h
+    include/surface.h
 src/mesh/mesh_metis_support.$(obj-suffix):\
     src/mesh/mesh_metis_support.C\
     include/auto_ptr.h\
@@ -1938,7 +1971,7 @@ src/mesh/mesh_tecplot_support.$(obj-suffix):\
     include/enum_elem_type.h\
     include/enum_order.h\
     include/enum_solver_package.h\
-    include/equation_systems.h\
+    include/equation_systems_base.h\
     include/libmesh_base.h\
     include/mesh_base.h\
     include/mesh_common.h\
@@ -1952,8 +1985,7 @@ src/mesh/mesh_tecplot_support.$(obj-suffix):\
     include/reference_counted_object.h\
     include/reference_counter.h\
     include/sphere.h\
-    include/surface.h\
-    include/xdr_cxx.h
+    include/surface.h
 src/mesh/mesh_ucd_support.$(obj-suffix):\
     src/mesh/mesh_ucd_support.C\
     include/auto_ptr.h\

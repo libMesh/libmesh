@@ -1,4 +1,4 @@
-// $Id: ex2.C,v 1.5 2003-02-14 15:22:33 benkirk Exp $
+// $Id: ex2.C,v 1.6 2003-03-11 04:35:17 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -120,15 +120,17 @@ int main (int argc, char** argv)
     
     /**
      * Create an equation systems object. This object can
-     * contain multiple systems for solving loosely coupled
-     * physics.  Each system can contain multiple variables
-     * of different approximation orders.  Here we will simply
-     * create a single system with one variable.
+     * contain multiple systems (here: GeneralSystem) of different 
+     * flavors for solving loosely coupled physics.  Each system can 
+     * contain multiple variables of different approximation orders.  
+     * Here we will simply create a single system with one variable.  
+     * Later on, other flavors of systems will be introduced.  For the 
+     * moment, we use the general system.
      *
      * The EquationSystems object needs a reference to the mesh
      * object, so the order of construction here is important.
      */
-    EquationSystems equation_systems (mesh);
+    EquationSystems<GeneralSystem> equation_systems (mesh);
     
     /**
      * Declare the system and its variables.

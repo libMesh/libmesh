@@ -1,4 +1,4 @@
-// $Id: frequency_system.h,v 1.4 2003-02-20 04:59:58 benkirk Exp $
+// $Id: frequency_system.h,v 1.5 2003-03-11 04:35:18 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,6 +30,8 @@
 #include "system_base.h"
 
 // Forward Declarations
+class FrequencySystem;
+
 
 
 /*
@@ -58,10 +60,10 @@ public:
    * Constructor.  Optionally initializes required
    * data structures.
    */
-  FrequencySystem (EquationSystems&    es,
-		   const std::string&  name,
-		   const unsigned int  number, 
-		   const SolverPackage solver_package);
+  FrequencySystem (EquationSystems<FrequencySystem>& es,
+		   const std::string&                name,
+		   const unsigned int                number, 
+		   const SolverPackage               solver_package);
 
   /**
    * Destructor.
@@ -125,26 +127,26 @@ public:
   /**
    * Register a user function to use in initializing the system.
    */
-  void attach_init_function(void fptr(EquationSystems& es,
+  void attach_init_function(void fptr(EquationSystems<FrequencySystem>& es,
 				      const std::string& name));
   
   /**
    * Register a user function to use in assembling the system
    * matrix and RHS.
    */
-  void attach_assemble_function(void fptr(EquationSystems& es,
+  void attach_assemble_function(void fptr(EquationSystems<FrequencySystem>& es,
 					  const std::string& name));
   
   /**
    * Function that initializes the system.
    */
-  void (* init_system_fptr) (EquationSystems& es,
+  void (* init_system_fptr) (EquationSystems<FrequencySystem>& es,
 			     const std::string& name);
   
   /**
    * Function that assembles the system.
    */
-  void (* assemble_fptr) (EquationSystems& es,
+  void (* assemble_fptr) (EquationSystems<FrequencySystem>& es,
 			  const std::string& name);
   
   /**
@@ -169,7 +171,7 @@ protected:
    * Reference to the \p equation_systems data structure 
    * that handles us.   
    */
-  EquationSystems& equation_systems;
+  EquationSystems<FrequencySystem>& equation_systems;
 
 
   /**

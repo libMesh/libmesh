@@ -12,7 +12,7 @@
 
 
 
-void assemble(EquationSystems& es,
+void assemble(EquationSystems<GeneralSystem>& es,
 	      const std::string& system_name);
 
 
@@ -46,7 +46,7 @@ int main (int argc, char** argv)
 
     
     // Set up the equation system(s)
-    EquationSystems es(mesh);
+    EquationSystems<GeneralSystem> es(mesh);
 
     es.add_system("primary");
     es("primary").add_variable("U", FIRST);
@@ -79,7 +79,7 @@ int main (int argc, char** argv)
 
 
 
-void assemble(EquationSystems& es,
+void assemble(EquationSystems<GeneralSystem>& es,
 	      const std::string& system_name)
 {
   assert (system_name == "primary");
