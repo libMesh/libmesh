@@ -1,4 +1,4 @@
-// $Id: frequency_system.h,v 1.1 2004-01-03 15:37:42 benkirk Exp $
+// $Id: frequency_system.h,v 1.2 2004-11-09 12:20:57 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -196,6 +196,11 @@ public:
 			 const std::string& name);
 
   /**
+   * @returns the number of iterations and the final residual.
+   */
+  std::pair<unsigned int, Real> get_rval (unsigned int n) const;
+
+  /**
    * @returns a string of the form \p "frequency_x", where \p x is
    * the integer \p n.  Useful for identifying frequencies and 
    * solution vectors in the parameters set of \p _equation_systems.
@@ -263,13 +268,26 @@ protected:
    * different frequencies. 
    */
   bool _finished_assemble;
+
+  /**
+   * The number of iterations and the final residual
+   * when the Ax=b is solved for multiple frequencies.
+   */
+  std::vector<std::pair<unsigned int, Real> > vec_rval;
+
 };
 
 
 
 // ------------------------------------------------------------
 // FrequencySystem inline methods
+inline
+std::pair<unsigned int, Real> FrequencySystem::get_rval (unsigned int n) const
+{
+  assert(n<vec_rval.size());
 
+  return vec_rval[n];
+}
 
 
 #endif // if defined(USE_COMPLEX_NUMBERS)
