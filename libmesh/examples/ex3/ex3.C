@@ -1,4 +1,4 @@
-// $Id: ex3.C,v 1.12 2003-02-14 15:22:33 benkirk Exp $
+// $Id: ex3.C,v 1.13 2003-02-17 01:23:00 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -136,11 +136,11 @@ int main (int argc, char** argv)
     /**
      * Use the internal mesh generator to create a uniform
      * grid on the square [-1,1]^2.  We instruct the mesh generator
-     * to build a mesh of 5x5 \p Quad9 elements.  Building \p Quad9
+     * to build a mesh of 8x8 \p Quad9 elements.  Building \p Quad9
      * elements instead of the default \p Quad4's we used in example 2
      * allow us to use higher-order approximation.
      */
-    mesh.build_square (5, 5,
+    mesh.build_square (8, 8,
 		       -1., 1.,
 		       -1., 1.,
 		       QUAD9);
@@ -260,7 +260,7 @@ void assemble_poisson(EquationSystems& es,
    * Get a constant reference to the Finite Element type
    * for the first (and only) variable in the system.
    */
-  FEType fe_type = es("Poisson").get_dof_map().component_type(0);
+  FEType fe_type = es("Poisson").get_dof_map().variable_type(0);
 
   /**
    * Build a Finite Element object of the specified type.  Since the

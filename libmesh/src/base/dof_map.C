@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.17 2003-02-14 22:37:11 benkirk Exp $
+// $Id: dof_map.C,v 1.18 2003-02-17 01:23:01 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -63,32 +63,32 @@ void DofMap::reinit(MeshBase& mesh)
   _n_nodes = mesh.n_nodes();
   _n_elem  = mesh.n_elem();
 
-  const unsigned int n_comp = n_components();
+  const unsigned int n_var = n_variables();
   const unsigned int dim    = mesh.mesh_dimension();
 
   // First set the number of variables for each \p DofObject
-  // equal to n_components() for this system.
+  // equal to n_variables() for this system.
   {
     // All the nodes
     node_iterator       node_it  (mesh.nodes_begin());
     const node_iterator node_end (mesh.nodes_end());
 
     for ( ; node_it != node_end; ++node_it)
-      (*node_it)->set_n_vars(sys_number(),n_comp);
+      (*node_it)->set_n_vars(sys_number(),n_var);
     
     // All the elements
     elem_iterator       elem_it (mesh.elements_begin());
     const elem_iterator elem_end(mesh.elements_end());
 
     for ( ; elem_it != elem_end; ++elem_it)
-      (*elem_it)->set_n_vars(sys_number(),n_comp);
+      (*elem_it)->set_n_vars(sys_number(),n_var);
   }
   
 
   
-  for (unsigned int c=0; c<n_components(); c++)
+  for (unsigned int var=0; var<n_variables(); var++)
     {
-      const FEType& fe_type = component_type(c);
+      const FEType& fe_type = variable_type(var);
 
       // For all the active elements
       active_elem_iterator       elem_it (mesh.elements_begin());
@@ -105,16 +105,16 @@ void DofMap::reinit(MeshBase& mesh)
 	      const unsigned int dofs_at_node =
 		FEInterface::n_dofs_at_node(dim, fe_type, type, n);
 	      
-	      if (dofs_at_node > elem->get_node(n)->n_comp(sys_number(),c))
-		elem->get_node(n)->set_n_comp(sys_number(), c, dofs_at_node);
+	      if (dofs_at_node > elem->get_node(n)->n_comp(sys_number(),var))
+		elem->get_node(n)->set_n_comp(sys_number(), var, dofs_at_node);
 	    }
 	     
 	  // Allocate the element DOFs
 	  const unsigned int dofs_per_elem =
 	    FEInterface::n_dofs_per_elem(dim, fe_type, type);
 	  
-	  if (dofs_per_elem > elem->n_comp(sys_number(), c))
-	    elem->set_n_comp(sys_number(), c, dofs_per_elem);
+	  if (dofs_per_elem > elem->n_comp(sys_number(), var))
+	    elem->set_n_comp(sys_number(), var, dofs_per_elem);
 	}
     }
   
@@ -159,7 +159,7 @@ void DofMap::distribute_dofs(MeshBase& mesh)
   const unsigned int proc_id = mesh.processor_id();
   const unsigned int n_proc  = mesh.n_processors();
   
-  assert (n_components() != 0);
+  assert (n_variables() != 0);
   assert (proc_id < mesh.n_processors());
   
   // re-init in case the mesh has changed
@@ -185,7 +185,7 @@ void DofMap::distribute_dofs(MeshBase& mesh)
     {
       _first_df[processor] = next_free_dof;
       
-      for (unsigned comp=0; comp<n_components(); comp++)
+      for (unsigned var=0; var<n_variables(); var++)
 	for (unsigned int e=0; e<_n_elem; ++e)
 	  if (mesh.elem(e)->active())  
 	    if (mesh.elem(e)->processor_id() == processor)  
@@ -200,39 +200,39 @@ void DofMap::distribute_dofs(MeshBase& mesh)
 		  {
 		    Node* node = elem->get_node(n);
 		    
-		    for (unsigned int index=0; index<node->n_comp(sys_number(),comp); index++)
+		    for (unsigned int index=0; index<node->n_comp(sys_number(),var); index++)
 		      {
 			// only assign a dof number if there isn't one
 			// already there
-			if (node->dof_number(sys_number(),comp,index) == DofObject::invalid_id)
+			if (node->dof_number(sys_number(),var,index) == DofObject::invalid_id)
 			  {
-			    node->set_dof_number(sys_number(), comp, index, next_free_dof++);
+			    node->set_dof_number(sys_number(),var,index,next_free_dof++);
 			    
 			    if (processor == proc_id)
-				_send_list.push_back(node->dof_number(sys_number(),comp,index));
+				_send_list.push_back(node->dof_number(sys_number(),var,index));
 			  }
 			// if there is an entry there and it isn't on this
 			// processor it also needs to be added to the send list
-			else if (node->dof_number(sys_number(),comp,index) <
+			else if (node->dof_number(sys_number(),var,index) <
 				 _first_df[proc_id])
 			  {
 			    if (processor == proc_id)
-			      _send_list.push_back(node->dof_number(sys_number(),comp,index));
+			      _send_list.push_back(node->dof_number(sys_number(),var,index));
 			  }
 		      }
 		  }
 		  
 		// Now number the element DOFS
-		for (unsigned int index=0; index<elem->n_comp(sys_number(),comp); index++)
+		for (unsigned int index=0; index<elem->n_comp(sys_number(),var); index++)
 		  {		  
 		    // No way we could have already numbered this DOF!
-		    assert (elem->dof_number(sys_number(),comp,index) ==
+		    assert (elem->dof_number(sys_number(),var,index) ==
 			    DofObject::invalid_id);
 		    
-		    elem->set_dof_number(sys_number(), comp, index, next_free_dof++);
+		    elem->set_dof_number(sys_number(),var,index,next_free_dof++);
 		    
 		    if (processor == proc_id)
-		      _send_list.push_back(elem->dof_number(sys_number(),comp,index));
+		      _send_list.push_back(elem->dof_number(sys_number(),var,index));
 		  }
 	      }
       
@@ -275,7 +275,7 @@ void DofMap::distribute_dofs(MeshBase& mesh)
 
 void DofMap::compute_sparsity(MeshBase& mesh)
 {
-  assert (n_components());
+  assert (n_variables());
 
   libMesh::log.start_event("compute_sparsity()");
 
@@ -352,9 +352,9 @@ void DofMap::compute_sparsity(MeshBase& mesh)
   else
     {
       assert (dof_coupling.size() ==
-	      n_components());
+	      n_variables());
       
-      const unsigned int n_comp = n_components();
+      const unsigned int n_var = n_variables();
       
       std::vector<unsigned int> element_dofs_i;
       std::vector<unsigned int> element_dofs_j;
@@ -362,19 +362,19 @@ void DofMap::compute_sparsity(MeshBase& mesh)
       
       for (unsigned int e=0; e<_n_elem; e++)
 	if (mesh.elem(e)->active())
-	  for (unsigned int ci=0; ci<n_comp; ci++)
+	  for (unsigned int vi=0; vi<n_var; vi++)
 	    {
-	      // Find element dofs for component ci
-	      dof_indices (mesh.elem(e), element_dofs_i, ci);
+	      // Find element dofs for variable vi
+	      dof_indices (mesh.elem(e), element_dofs_i, vi);
 	      find_connected_dofs (element_dofs_i);
 	      
 	      const unsigned int n_dofs_on_element_i = element_dofs_i.size();
 
-	      for (unsigned int cj=0; cj<n_comp; cj++)
-		if (dof_coupling(ci,cj)) // If ci couples to cj
+	      for (unsigned int vj=0; vj<n_var; vj++)
+		if (dof_coupling(vi,vj)) // If vi couples to vj
 		  {
-		    // Find element dofs for component cj
-		    dof_indices (mesh.elem(e), element_dofs_j, cj);
+		    // Find element dofs for variable vj
+		    dof_indices (mesh.elem(e), element_dofs_j, vj);
 		    find_connected_dofs (element_dofs_j);	    
 		    
 		    const unsigned int n_dofs_on_element_j = element_dofs_j.size();
@@ -466,7 +466,7 @@ void DofMap::compute_sparsity(MeshBase& mesh)
 
 void DofMap::dof_indices (const Elem* elem,
 			  std::vector<unsigned int>& di,
-			  const unsigned int cn) const
+			  const unsigned int vn) const
 {
   assert (elem != NULL);
 
@@ -480,11 +480,11 @@ void DofMap::dof_indices (const Elem* elem,
   unsigned int tot_size = 0;
   
   // Get the dof numbers
-  for (unsigned int c=0; c<n_components(); c++)
-    if ((c == cn) || (cn == static_cast<unsigned int>(-1)))
-      { // Do this for all the components if one was not specified
-	// or just for the specified component
-	const FEType& fe_type = component_type(c);
+  for (unsigned int v=0; v<n_variables(); v++)
+    if ((v == vn) || (vn == static_cast<unsigned int>(-1)))
+      { // Do this for all the variables if one was not specified
+	// or just for the specified variable
+	const FEType& fe_type = variable_type(v);
 
 	const unsigned int size = FEInterface::n_dofs(elem->dim(), fe_type, type);
 	tot_size += size;
@@ -497,22 +497,22 @@ void DofMap::dof_indices (const Elem* elem,
 	  {
 	    const Node* node = elem->get_node(n);
 	    
-	    for (unsigned int i=0; i<node->n_comp(sys_number(),c); i++)
+	    for (unsigned int i=0; i<node->n_comp(sys_number(),v); i++)
 	      {
-		assert (node->dof_number(sys_number(), c, i) !=
+		assert (node->dof_number(sys_number(),v,i) !=
 			DofObject::invalid_id);
 		
-		di.push_back(node->dof_number(sys_number(), c, i));
+		di.push_back(node->dof_number(sys_number(),v,i));
 	      }
 	  }
 	
 	// Get the element-based DOF numbers	  
-	for (unsigned int i=0; i<elem->n_comp(sys_number(),c); i++)
+	for (unsigned int i=0; i<elem->n_comp(sys_number(),v); i++)
 	  {
-	    assert (elem->dof_number(sys_number(), c, i) !=
+	    assert (elem->dof_number(sys_number(),v,i) !=
 		    DofObject::invalid_id);
 	    
-	    di.push_back(elem->dof_number(sys_number(), c, i));
+	    di.push_back(elem->dof_number(sys_number(),v,i));
 	  }
       }
 
@@ -568,11 +568,11 @@ void DofMap::create_dof_constraints(MeshBase& mesh)
 	      const AutoPtr<Elem> my_side     (elem->build_side(s));
 	      const AutoPtr<Elem> parent_side (parent->build_side(s));
 
-	      // Look at all the components in the system
-	      for (unsigned int component=0; component<n_components();
-		   ++component)
+	      // Look at all the variables in the system
+	      for (unsigned int variable=0; variable<n_variables();
+		   ++variable)
 		{
-		  const FEType& fe_type = component_type(component);
+		  const FEType& fe_type = variable_type(variable);
 	      
 		  for (unsigned int my_dof=0;
 		       my_dof<FEInterface::n_dofs(dim-1, fe_type, my_side->type());
@@ -582,7 +582,7 @@ void DofMap::create_dof_constraints(MeshBase& mesh)
 
 		      // My global node and dof indices.
 		      const Node* my_node          = my_side->get_node(my_dof);
-		      const unsigned int my_dof_g  = my_node->dof_number(sys_number(), component, 0);
+		      const unsigned int my_dof_g  = my_node->dof_number(sys_number(), variable, 0);
 
 		      // The support point of the DOF
 		      const Point& support_point = my_side->point(my_dof);
@@ -601,7 +601,7 @@ void DofMap::create_dof_constraints(MeshBase& mesh)
 			  
 			  // Their global node and dof indices.
 			  const Node* their_node          = parent_side->get_node(their_dof);
-			  const unsigned int their_dof_g  = their_node->dof_number(sys_number(), component, 0);
+			  const unsigned int their_dof_g  = their_node->dof_number(sys_number(), variable, 0);
 
 			  const Real their_dof_value = FEInterface::shape(dim-1,
 									  fe_type,

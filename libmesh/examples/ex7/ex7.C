@@ -1,4 +1,4 @@
-// $Id: ex7.C,v 1.9 2003-02-14 15:22:36 benkirk Exp $
+// $Id: ex7.C,v 1.10 2003-02-17 01:23:01 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -319,7 +319,7 @@ void assemble_helmholtz(EquationSystems& es,
    * Get a constant reference to the Finite Element type
    * for the first (and only) variable in the system.
    */
-  FEType fe_type = es("Helmholtz").get_dof_map().component_type(0);
+  FEType fe_type = es("Helmholtz").get_dof_map().variable_type(0);
 
   /**
    * Build a Finite Element object of the specified type.  Since the
