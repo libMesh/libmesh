@@ -1,4 +1,4 @@
-// $Id: mesh_data.C,v 1.11 2003-08-12 17:49:18 ddreyer Exp $
+// $Id: mesh_data.C,v 1.12 2003-09-01 18:12:37 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -609,7 +609,7 @@ void MeshData::insert_elem_data (std::map<const Elem*,
 				 std::vector<Number> >& ed,
 				 const bool close_node_data)
 {
-  assert (this->_active);
+  assert (this->_active || this->_compatibility_mode);
   // these are also true in compatibility mode
   assert (this->_elem_id_map_closed);
 
@@ -669,10 +669,10 @@ void MeshData::insert_elem_data (std::map<const Elem*,
 
 unsigned int MeshData::n_val_per_node () const
 {
-  assert (_active);
-  assert (_node_data_closed);
+  assert (this->_active || this->_compatibility_mode);
+  assert (this->_node_data_closed);
 
-  if (!_node_data.empty())
+  if (!this->_node_data.empty())
     {
       std::map<const Node*, 
 	       std::vector<Number> >::const_iterator pos = _node_data.begin();
@@ -688,10 +688,10 @@ unsigned int MeshData::n_val_per_node () const
 
 unsigned int MeshData::n_node_data () const
 {
-  assert (_active);
-  assert (_node_data_closed);
+  assert (this->_active || this->_compatibility_mode);
+  assert (this->_node_data_closed);
 
-  return _node_data.size();
+  return this->_node_data.size();
 }
 
 
@@ -699,8 +699,8 @@ unsigned int MeshData::n_node_data () const
 
 unsigned int MeshData::n_val_per_elem () const
 {
-  assert (_active);
-  assert (_elem_data_closed);
+  assert (this->_active || this->_compatibility_mode);
+  assert (this->_elem_data_closed);
 
   if (!_elem_data.empty())
     {
@@ -718,8 +718,8 @@ unsigned int MeshData::n_val_per_elem () const
 
 unsigned int MeshData::n_elem_data () const
 {
-  assert (_active);
-  assert (_elem_data_closed);
+  assert (this->_active || this->_compatibility_mode);
+  assert (this->_elem_data_closed);
 
   return _elem_data.size();
 }
