@@ -1,4 +1,4 @@
-// $Id: inf_fe_static.C,v 1.21 2003-09-02 18:02:41 benkirk Exp $
+// $Id: inf_fe_static.C,v 1.22 2003-09-13 21:32:36 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -655,7 +655,7 @@ void InfFE<Dim,T_radial,T_map>::compute_node_indices_fast (const ElemType inf_el
       // store the map for _all_ nodes for this element type
       _compute_node_indices_fast_current_elem_type = inf_elem_type;
 
-      unsigned int n_nodes;
+      unsigned int n_nodes = libMesh::invalid_uint;
 
       switch (inf_elem_type)
         {
@@ -769,14 +769,14 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_indices (const FEType& fet,
   const ElemType base_elem_type           (Base::get_elem_type(inf_elem_type));                    // QUAD9
 
   // assume that the number of dof is the same for all vertices
-  unsigned int n_base_vertices;                                                                    // 4
+  unsigned int n_base_vertices         = libMesh::invalid_uint;                                    // 4
   const unsigned int n_base_vertex_dof = FEInterface::n_dofs_at_node  (Dim-1, fet, base_elem_type, 0);// 2
 
-  unsigned int n_base_side_nodes;                                                                  // 4
-  unsigned int n_base_side_dof;                                                                    // 3
+  unsigned int n_base_side_nodes       = libMesh::invalid_uint;                                    // 4
+  unsigned int n_base_side_dof         = libMesh::invalid_uint;                                    // 3
 
-  unsigned int n_base_face_nodes;                                                                  // 1
-  unsigned int n_base_face_dof;                                                                    // 5
+  unsigned int n_base_face_nodes       = libMesh::invalid_uint;                                    // 1
+  unsigned int n_base_face_dof         = libMesh::invalid_uint;                                    // 5
 
   const unsigned int n_base_elem_dof   = FEInterface::n_dofs_per_elem (Dim-1, fet, base_elem_type);// 9
 

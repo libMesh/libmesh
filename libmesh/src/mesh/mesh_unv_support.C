@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.C,v 1.26 2003-09-12 03:28:56 benkirk Exp $
+// $Id: mesh_unv_support.C,v 1.27 2003-09-13 21:32:35 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -1184,6 +1184,7 @@ void UnvMeshInterface::element_out(std::ostream& out_file)
 	
 	
 	default:
+	  fe_descriptor_id = libMesh::invalid_uint;
 	  std::cerr << "ERROR: Element type = " 
 		    << elem->type() 
 		    << " not supported in "
