@@ -1,4 +1,4 @@
-// $Id: quadrature.h,v 1.4 2004-04-18 00:51:50 jwpeterson Exp $
+// $Id: quadrature.h,v 1.5 2004-10-26 15:31:16 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -137,7 +137,7 @@ public:
   /**
    * Prints information relevant to the quadrature rule.
    */
-  void print_info() const;
+  void print_info(std::ostream& os=std::cout) const;
 
   /**
    * Same as above, but allows you to use ethe stream syntax.
@@ -300,18 +300,18 @@ QBase::QBase(const unsigned int d,
 
 
 inline
-void QBase::print_info() const
+void QBase::print_info(std::ostream& os) const
 {
   assert(!_points.empty());
   assert(!_weights.empty());
 
-  std::cout << "N_Q_Points=" << this->n_points() << std::endl << std::endl;
+  os << "N_Q_Points=" << this->n_points() << std::endl << std::endl;
   for (unsigned int qp=0; qp<this->n_points(); qp++)
     {
-      std::cout << " Point " << qp << ":" << std::endl << "  ";
+      os << " Point " << qp << ":" << std::endl << "  ";
       _points[qp].print();
-      std::cout << " Weight: " << std::endl;
-      std::cout << "  w=" << _weights[qp] << std::endl << std::endl;
+      os << " Weight: " << std::endl;
+      os << "  w=" << _weights[qp] << std::endl << std::endl;
     }
 }
 

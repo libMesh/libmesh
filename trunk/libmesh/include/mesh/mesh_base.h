@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.28 2004-08-17 03:03:48 benkirk Exp $
+// $Id: mesh_base.h,v 1.29 2004-10-26 15:31:16 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -61,7 +61,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.28 $
+ * \version $Revision: 1.29 $
  */
 
 
@@ -503,7 +503,7 @@ public:
   /**
    * Prints relevant information about the mesh.
    */
-  void print_info () const;
+  void print_info (std::ostream& os=std::cout) const;
 
   /**
    * Equivalent to calling print_info() above, but now you can write:

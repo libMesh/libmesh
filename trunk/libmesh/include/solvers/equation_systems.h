@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.6 2004-06-02 15:08:27 jwpeterson Exp $
+// $Id: equation_systems.h,v 1.7 2004-10-26 15:31:17 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -275,7 +275,7 @@ public:
   /**
    * Prints information about the equation systems.
    */
-  void print_info () const;
+  void print_info (std::ostream& os=std::cout) const;
 
   /**
    * Same as above, but allows you to also use stream syntax.

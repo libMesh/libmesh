@@ -1,4 +1,4 @@
-// $Id: quadrature.C,v 1.18 2004-04-18 00:51:51 jwpeterson Exp $
+// $Id: quadrature.C,v 1.19 2004-10-26 15:31:18 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -244,6 +244,6 @@ void QBase::tensor_product_tet(const QBase& gauss1D, const QBase& jacA1D, const 
 
 std::ostream& operator << (std::ostream& os, const QBase& q)
 {
-  q.print_info();
+  q.print_info(os);
   return os;
 }

@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.6 2004-08-02 18:46:47 spetersen Exp $
+// $Id: fe_base.h,v 1.7 2004-10-26 15:31:12 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -325,29 +325,29 @@ public:
   /**
    * Prints the Jacobian times the weight for each quadrature point.
    */ 
-  void print_JxW() const; 
+  void print_JxW(std::ostream& os=std::cout) const; 
   
   /**
    * Prints the value of each shape function at each quadrature point.
    */ 
-  void print_phi() const; 
+  void print_phi(std::ostream& os=std::cout) const; 
   
   /**
    * Prints the value of each shape function's derivative
    * at each quadrature point.
    */ 
-  void print_dphi() const;
+  void print_dphi(std::ostream& os=std::cout) const;
   
   /**
    * Prints the spatial location of each quadrature point
    * (on the physical element).
    */ 
-  void print_xyz() const;
+  void print_xyz(std::ostream& os=std::cout) const;
 
   /**
    * Prints all the relevant information about the current element.
    */
-  void print_info() const;
+  void print_info(std::ostream& os=std::cout) const;
 
   /**
    * Same as above, but allows you to print to a stream.
@@ -809,61 +809,57 @@ FEBase::~FEBase()
 
 
 inline
-void FEBase::print_JxW() const
+void FEBase::print_JxW(std::ostream& os) const
 {
-  for (unsigned int i=0; i<JxW.size(); ++i) std::cout << JxW[i] << std::endl;
+  for (unsigned int i=0; i<JxW.size(); ++i)
+    os << JxW[i] << std::endl;
 }
 
 
 
 inline
-void FEBase::print_phi() const
+void FEBase::print_phi(std::ostream& os) const
 {
   for (unsigned int i=0; i<phi.size(); ++i)
-    {
-      for (unsigned int j=0; j<phi[i].size(); ++j)
-	{
-	  std::cout << " phi[" << i << "][" << j << "]=" << phi[i][j] << std::endl;
-	}
-    }
+    for (unsigned int j=0; j<phi[i].size(); ++j)
+      os << " phi[" << i << "][" << j << "]=" << phi[i][j] << std::endl;
 }
 
 
 
 inline
-void FEBase::print_dphi() const
+void FEBase::print_dphi(std::ostream& os) const
 {
   for (unsigned int i=0; i<dphi.size(); ++i)
-    {
-      for (unsigned int j=0; j<dphi[i].size(); ++j)
-	{
-	  std::cout << " dphi[" << i << "][" << j << "]=";
-	  dphi[i][j].print();
-	}
-    }
+    for (unsigned int j=0; j<dphi[i].size(); ++j)
+      os << " dphi[" << i << "][" << j << "]=" << dphi[i][j];
 }
 
 
 
 inline
-void FEBase::print_xyz() const
+void FEBase::print_xyz(std::ostream& os) const
 {
-  for (unsigned int i=0; i<xyz.size(); ++i) xyz[i].print();
+  for (unsigned int i=0; i<xyz.size(); ++i)
+    os << xyz[i];
 }
 
 
 
 inline
-void FEBase::print_info() const
+void FEBase::print_info(std::ostream& os) const
 {
-  std::cout << "Shape functions at the Gauss pts." << std::endl;
-  print_phi();
-  std::cout << "Shape function gradients at the Gauss pts." << std::endl;
-  print_dphi();
-  std::cout << "XYZ locations of the Gauss pts." << std::endl;
-  print_xyz();
-  std::cout << "Values of JxW at the Gauss pts." << std::endl;
-  print_JxW();
+  os << "Shape functions at the Gauss pts." << std::endl;
+  this->print_phi(os);
+  
+  os << "Shape function gradients at the Gauss pts." << std::endl;
+  this->print_dphi(os);
+  
+  os << "XYZ locations of the Gauss pts." << std::endl;
+  this->print_xyz(os);
+  
+  os << "Values of JxW at the Gauss pts." << std::endl;
+  this->print_JxW(os);
 }
 
 

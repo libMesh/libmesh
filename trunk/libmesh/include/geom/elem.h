@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.7 2004-10-25 21:49:24 benkirk Exp $
+// $Id: elem.h,v 1.8 2004-10-26 15:31:16 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -531,7 +531,6 @@ class Elem : public ReferenceCountedObject<Elem>,
 #endif
 
 
- protected:
 
   
   /**
@@ -543,6 +542,7 @@ class Elem : public ReferenceCountedObject<Elem>,
   static Elem* build (const ElemType type,
 		      const Elem* p=NULL);
 
+ protected:
 
   //-------------------------------------------------------
   // These methods compute has keys from the specified
