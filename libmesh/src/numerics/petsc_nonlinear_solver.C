@@ -1,4 +1,4 @@
-// $Id: petsc_nonlinear_solver.C,v 1.10 2005-02-22 22:17:42 jwpeterson Exp $
+// $Id: petsc_nonlinear_solver.C,v 1.11 2005-03-17 19:23:37 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -184,10 +184,6 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
 				const unsigned int) 
 {
   this->init ();
-
-//   std::cout << "x.size()=" << x_in.size()
-// 	    << ", r.size()=" << r_in.size()
-// 	    << std::endl;
   
   PetscMatrix<T>* jac = dynamic_cast<PetscMatrix<T>*>(&jac_in);
   PetscVector<T>* x   = dynamic_cast<PetscVector<T>*>(&x_in);
@@ -202,24 +198,12 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
   int ierr=0;
   int n_iterations =0;
 
-  //Mat A = jac->mat();
-
-//   ierr = SNESCreate(PETSC_COMM_WORLD,&_snes);
-//          CHKERRABORT(PETSC_COMM_WORLD,ierr);
-	 
-//   ierr = SNESSetMonitor (_snes, __libmesh_petsc_snes_monitor,
-// 			 this, PETSC_NULL);
-//          CHKERRABORT(PETSC_COMM_WORLD,ierr);
-
   ierr = SNESSetFunction (_snes, r->vec(), __libmesh_petsc_snes_residual, this);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
   ierr = SNESSetJacobian (_snes, jac->mat(), jac->mat(), __libmesh_petsc_snes_jacobian, this);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
-	     
-//   ierr = SNESSetFromOptions(_snes);
-//          CHKERRABORT(PETSC_COMM_WORLD,ierr);
-
+	 
   // Older versions (at least up to 2.1.5) of SNESSolve took 3 arguments,
   // the last one being a pointer to an int to hold the number of iterations required.
 # if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 1)
@@ -230,15 +214,8 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
         CHKERRABORT(PETSC_COMM_WORLD,ierr);
 #endif
 
-//   if (A != jac->mat())
-//     {
-//       ierr = MatDestroy(A);
-//              CHKERRABORT(PETSC_COMM_WORLD,ierr);
-//     }
- 	 
-//  ierr = SNESDestroy(_snes);
-//         CHKERRABORT(PETSC_COMM_WORLD,ierr);
-	 
+  this->clear();
+		 
   // return the # of its. and the final residual norm.  Note that
   // n_iterations may be zero for PETSc versions 2.2.x and greater.
   return std::make_pair(n_iterations, 0.);
