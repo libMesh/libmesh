@@ -1,4 +1,4 @@
-// $Id: boundary_mesh.h,v 1.8 2003-05-15 23:34:33 benkirk Exp $
+// $Id: boundary_mesh.h,v 1.9 2003-05-28 03:17:47 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -45,8 +45,7 @@ class BoundaryMesh : public MeshBase
   /**
    * Constructor. Initializes dimenstion and processor id.
    */
-  BoundaryMesh(unsigned int d,
-	       unsigned int proc_id=libMeshBase::processor_id());
+  BoundaryMesh(unsigned int d);
   
   /**
    * Destructor. Empty.

@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.25 2003-05-27 17:18:14 benkirk Exp $
+// $Id: elem.h,v 1.26 2003-05-28 03:17:47 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -166,12 +166,12 @@ class Elem : public ReferenceCountedObject<Elem>,
    * has been called and this returns \p NULL then the side is on
    * a boundary of the domain. 
    */
-  Elem* neighbor(const unsigned int i) const;
+  Elem* neighbor (const unsigned int i) const;
 
   /**
    * Assigns \p n as the \f$ i^{th} \f$ neighbor.
    */
-  void set_neighbor(const unsigned int i, Elem* n);
+  void set_neighbor (const unsigned int i, Elem* n);
 
   /**
    * @returns \p true if this element has a side coincident
@@ -193,15 +193,16 @@ class Elem : public ReferenceCountedObject<Elem>,
    * hexahedrals in 3D, which can be useful for writing hybrid meshes
    * for visualization. 
    */
-  virtual const std::vector<unsigned int> tecplot_connectivity(const unsigned int sc=0) const = 0;
+  virtual const std::vector<unsigned int>
+  tecplot_connectivity (const unsigned int sc=0) const = 0;
 
   /**
    * @returns the connectivity of the \f$ sc^{th} \f$
    * sub-element in the VTK format.
    */
-  virtual void vtk_connectivity(const unsigned int sc,
- 				std::vector<unsigned int>* conn) const = 0;
-
+  virtual void vtk_connectivity (const unsigned int sc,
+				 std::vector<unsigned int>* conn) const = 0;
+  
   /**
    * @returns the VTK element type of the sc-th sub-element.
    */
@@ -212,20 +213,20 @@ class Elem : public ReferenceCountedObject<Elem>,
    * This function is actually defined in the Elem base class
    * because it works the same for all element types.
    */
-  virtual void write_tecplot_connectivity(std::ostream &out) const;
+  virtual void write_tecplot_connectivity (std::ostream &out) const;
   
   /**
    * Writes the \p UCD connectivity to the \p out stream.
    * This function is actually defined in the Elem base class
    * because it works the same for all element types.
    */
-  virtual void write_ucd_connectivity(std::ostream &out) const;
-
+  virtual void write_ucd_connectivity (std::ostream &out) const;
+  
   /**
    * @returns the type of element that has been derived from this
    * base class.
    */
-  virtual ElemType type() const = 0;
+  virtual ElemType type () const = 0;
 
   /**
    * @returns the dimensionality of the object.
@@ -235,14 +236,14 @@ class Elem : public ReferenceCountedObject<Elem>,
   /**
    * @returns the number of nodes this element contains. 
    */
-  virtual unsigned int n_nodes() const = 0;
+  virtual unsigned int n_nodes () const = 0;
 
   /**
    * @returns the number of sides the element that has been derived
    * from this class has. In 2D the number of sides is the number
    * of edges, in 3D the number of sides is the number of faces.
    */
-  virtual unsigned int n_sides() const = 0;
+  virtual unsigned int n_sides () const = 0;
 
   /**
    * @returns the number of neighbors the element that has been derived
@@ -250,45 +251,45 @@ class Elem : public ReferenceCountedObject<Elem>,
    * neighbors are stored, so this method returns n_sides(),
    * however it may be overloaded in a derived class
    */
-  virtual unsigned int n_neighbors() const
-  { return n_sides(); }
+  virtual unsigned int n_neighbors () const
+  { return this->n_sides(); }
 
   /**
    * @returns the number of vertices the element that has been derived
    * from this class has.
    */
-  virtual unsigned int n_vertices() const = 0;
+  virtual unsigned int n_vertices () const = 0;
 
   /**
    * @returns the number of edges the element that has been derived
    * from this class has.
    */
-  virtual unsigned int n_edges() const = 0;
+  virtual unsigned int n_edges () const = 0;
 
   /**
    * @returns the number of faces the element that has been derived
    * from this class has.
    */
-  virtual unsigned int n_faces() const = 0;
+  virtual unsigned int n_faces () const = 0;
   
   /**
    * @returns the number of children the element that has been derived
    * from this class may have.
    */
-  virtual unsigned int n_children() const = 0;
+  virtual unsigned int n_children () const = 0;
 
   /**
    * @returns the number of children this element has that
    * share side \p s
    */
-  virtual unsigned int n_children_per_side(const unsigned int) const = 0;
+  virtual unsigned int n_children_per_side (const unsigned int) const = 0;
   
   /**
    * @returns the number of sub-elements this element may be broken
    * down into for visualization purposes.  For example, this returns
    * 1 for a linear triangle, 4 for a quadratic (6-noded) triangle, etc...
    */
-  virtual unsigned int n_sub_elem() const = 0;
+  virtual unsigned int n_sub_elem () const = 0;
 
   /**
    * @returns an element coincident with side \p i.  This method returns
@@ -298,7 +299,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    * you want the full-ordered face (i.e. a 9-noded quad face for a 27-noded
    * hexahedral) use the build_side method.
    */
-  virtual AutoPtr<Elem> side(const unsigned int i) const = 0;
+  virtual AutoPtr<Elem> side (const unsigned int i) const = 0;
   
   /**
    * Creates an element coincident with side \p i. The element returned is
@@ -309,14 +310,14 @@ class Elem : public ReferenceCountedObject<Elem>,
    * A \p AutoPtr<Elem> is returned to prevent a memory leak.
    * This way the user need not remember to delete the object.
    */
-  virtual AutoPtr<Elem> build_side(const unsigned int i) const = 0;
+  virtual AutoPtr<Elem> build_side (const unsigned int i) const = 0;
 
   /**
    * @returns the default approximation order for this element type.
    * This is the order that will be used to compute the map to the
    * reference element.
    */
-  virtual Order default_order() const = 0;
+  virtual Order default_order () const = 0;
   
   /**
    * @returns the centriod of the element. The centroid is 
@@ -324,27 +325,27 @@ class Elem : public ReferenceCountedObject<Elem>,
    * This method is overloadable since some derived elements 
    * might want to use shortcuts to compute their centroid.
    */
-  virtual Point centroid() const;
+  virtual Point centroid () const;
   
   /**
    * @returns the minimum vertex separation for the element.  
    * This method is overloadable since some derived elements 
    * might want to use shortcuts to compute their centroid.
    */
-  virtual Real hmin() const;
+  virtual Real hmin () const;
   
   /**
    * @returns the maximum vertex separation for the element.
    * This method is overloadable since some derived elements 
    * might want to use shortcuts to compute their centroid.
    */
-  virtual Real hmax() const;
+  virtual Real hmax () const;
   
   /**
    * Based on the quality metric q specified by the user,
    * returns a quantitative assessment of element quality.
    */
-  virtual Real quality(const ElemQuality q) const;  
+  virtual Real quality (const ElemQuality q) const;  
 
   /**
    * Returns the suggested quality bounds for
@@ -367,13 +368,13 @@ class Elem : public ReferenceCountedObject<Elem>,
    * \p false  otherwise. Note that it suffices to check the first
    * child only. Always returns \p true if AMR is disabled. 
    */
-  bool active() const;
+  bool active () const;
   
   /**
    * @returns a pointer to the element's parent.  Returns \p NULL if
    * the element was not created via refinement, i.e. was read from file.
    */
-  const Elem* parent() const;
+  const Elem* parent () const;
   
   /**
    * @returns the magnitude of the distance between nodes n1 and n2.
@@ -388,7 +389,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    * level 0, otherwise it is simply at one level greater than
    * its parent.
    */
-  unsigned int level() const;
+  unsigned int level () const;
   
 #ifdef ENABLE_AMR
 
@@ -405,7 +406,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    * @returns a pointer to the \f$ i^{th} \f$ child for this element.
    * Returns \p NULL  if this element has no children, i.e. is active.
    */
-  Elem* child(const unsigned int i) const;
+  Elem* child (const unsigned int i) const;
 
   /**
    * Returns the value of the refinement flag for the element.
@@ -427,7 +428,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    * virtual since it is the same for all
    * element types.
    */
-  void coarsen();
+  void coarsen ();
 
   /**
    * The non-const begin and end accessor functions.
@@ -526,9 +527,9 @@ class Elem : public ReferenceCountedObject<Elem>,
    * nodes
    */
   virtual float embedding_matrix (const unsigned int i,
-				 const unsigned int j,
-				 const unsigned int k) const = 0;
-
+				  const unsigned int j,
+				  const unsigned int k) const = 0;
+  
   /**
    * Matrix that allows children to inherit boundary conditions.
    */

@@ -1,6 +1,6 @@
 
 
-// $Id: mesh_base.C,v 1.37 2003-05-23 23:17:56 benkirk Exp $
+// $Id: mesh_base.C,v 1.38 2003-05-28 03:17:50 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -44,9 +44,9 @@
 
 #ifdef HAVE_SFCURVES
 // prototype for SFC code
-namespace sfc {
+namespace Sfc {
   extern "C" {
-#include "sfcurves.h"
+#   include "sfcurves.h"
   }
 }
 #endif
@@ -57,8 +57,7 @@ namespace sfc {
 
 // ------------------------------------------------------------
 // MeshBase class member functions
-MeshBase::MeshBase (unsigned int d,
-		    unsigned int pid) :
+MeshBase::MeshBase (unsigned int d) :
 #ifdef ENABLE_AMR
   mesh_refinement    (*this),
 #endif
@@ -66,9 +65,7 @@ MeshBase::MeshBase (unsigned int d,
   data               (*this),
   mesh_communication (*this),
   _n_sbd             (1),
-  _n_proc            (1),
   _dim               (d),
-  _proc_id           (pid),
   _is_prepared       (false)
 {
   assert (DIM <= 3);
@@ -88,20 +85,37 @@ MeshBase::MeshBase (const MeshBase& other_mesh) :
   _nodes             (other_mesh._nodes),
   _elements          (other_mesh._elements),
   _n_sbd             (other_mesh._n_sbd),
-  _n_proc            (other_mesh._n_proc),
   _dim               (other_mesh._dim),
-  _proc_id           (other_mesh._proc_id),
   _is_prepared       (other_mesh._is_prepared)
 
 {
 }
 
 
+
 MeshBase::~MeshBase()
 {
-  clear();
+  this->clear();
 
   assert (!libMesh::closed());
+}
+
+
+
+void MeshBase::prepare_for_use ()
+{
+  // Renumber the nodes and elements so that they in
+  // contiguous blocks.
+  this->renumber_nodes_and_elements();
+  
+  // Let all the elements find their neighbors
+  this->find_neighbors();
+
+  // Partition the mesh.
+  this->partition();
+  
+  // The mesh is now prepared for use.
+  _is_prepared = true;
 }
 
 
@@ -111,27 +125,28 @@ Node* MeshBase::add_point (const Point& p,
 {  
   START_LOG("add_point()", "MeshBase");
 
-  if ((num == static_cast<unsigned int>(-1)) ||
-      (num == n_nodes()))
+  if (num >= this->n_nodes())
     {
-      _nodes.push_back(Node::build(p, n_nodes()));
+      _nodes.push_back (Node::build(p, this->n_nodes()));
 
       STOP_LOG("add_point()", "MeshBase");
   
-      return node_ptr(n_nodes()-1);
+      return _nodes.back();
     }
+  
   else
     {
-      assert (num < n_nodes() );
-      assert (node_ptr(num) != NULL);
-      assert (node_ptr(num)->id() != Node::invalid_id);
+      assert (num < this->n_nodes());
+      assert (this->node_ptr(num)       != NULL);
+      assert (this->node_ptr(num)->id() != Node::invalid_id);
       
-      this->node(num)      = p;
-      assert (node(num).id() == num);
+      this->node(num) = p;
+      
+      assert (this->node(num).id() == num);
       
       STOP_LOG("add_point()", "MeshBase");
   
-      return node_ptr(num);
+      return this->node_ptr(num);
     }
 
   
@@ -146,13 +161,21 @@ void MeshBase::add_elem (Elem* e, const unsigned int n)
 {
   START_LOG("add_elem()", "MeshBase");
 
-  if ((n == static_cast<unsigned int>(-1)) ||
-      (n == n_elem()))
-    _elements.push_back(e);
+  if (n >= _elements.size())
+    {
+      if (e != NULL)
+	e->set_id (_elements.size());
+      
+      _elements.push_back(e);
+    }
+  
   else
     {
-      assert( n < n_elem() );
+      assert (n < _elements.size());
 
+      if (e != NULL)
+	e->set_id (n);
+      
       _elements[n] = e;
     }
 
@@ -193,7 +216,6 @@ void MeshBase::clear ()
   // Reset the number of subdomains and the
   // number of processors
   _n_sbd  = 1;
-  _n_proc = 1;
 
   // Clear the elements data structure
   {
@@ -336,17 +358,17 @@ std::string MeshBase::get_info() const
 {
   std::ostringstream out;
 
-  out << " Mesh Information:" << std::endl
-      << "  mesh_dimension()=" << mesh_dimension() << std::endl
-      << "  spatial_dimension()=" << spatial_dimension() << std::endl
-      << "  n_nodes()=" << n_nodes() << std::endl
-      << "  n_elem()=" << n_elem() << std::endl
+  out << " Mesh Information:"     << std::endl
+      << "  mesh_dimension()="    << this->mesh_dimension()    << std::endl
+      << "  spatial_dimension()=" << this->spatial_dimension() << std::endl
+      << "  n_nodes()="           << this->n_nodes()           << std::endl
+      << "  n_elem()="            << this->n_elem()            << std::endl
 #ifdef ENABLE_AMR
-      << "  n_active_elem()=" << n_active_elem() << std::endl
+      << "   n_active_elem()="    << this->n_active_elem()     << std::endl
 #endif
-      << "  n_subdomains()=" << n_subdomains() << std::endl
-      << "  n_processors()=" << n_processors() << std::endl
-      << "  processor_id()=" << processor_id() << std::endl;
+      << "  n_subdomains()="      << this->n_subdomains()      << std::endl
+      << "  n_processors()="      << this->n_processors()      << std::endl
+      << "  processor_id()="      << this->processor_id()      << std::endl;
 
   return out.str();
 }
@@ -354,7 +376,7 @@ std::string MeshBase::get_info() const
 
 void MeshBase::print_info() const
 {
-  std::cout << get_info()
+  std::cout << this->get_info()
 	    << std::endl;
 }
 
@@ -380,8 +402,8 @@ void MeshBase::skip_comment_lines (std::istream &in,
 
 void MeshBase::find_neighbors()
 {
-  assert(n_nodes() != 0);
-  assert(n_elem() != 0);
+  assert(this->n_nodes() != 0);
+  assert(this->n_elem()  != 0);
 
   
   if (_dim == 1)
@@ -390,19 +412,19 @@ void MeshBase::find_neighbors()
 
   START_LOG("find_neighbors()", "MeshBase");
   
-  // data structures
-  typedef std::pair<unsigned int, std::pair<Elem*, unsigned char> > key_val_pair;
-  std::multimap<unsigned int, std::pair<Elem*, unsigned char> >     side_to_elem;
-  
   //TODO [BSK]: This should be removed later?!
-  for (unsigned int e=0; e<n_elem(); e++)
-    for (unsigned int s=0; s<elem(e)->n_neighbors(); s++)
-      elem(e)->set_neighbor(s,NULL);
+  for (unsigned int e=0; e<this->n_elem(); e++)
+    for (unsigned int s=0; s<this->elem(e)->n_neighbors(); s++)
+      this->elem(e)->set_neighbor(s,NULL);
 
   // Find neighboring elements by first finding elements
   // with identical side keys and then check to see if they
   // are neighbors
   {
+    // data structures
+    typedef std::pair<unsigned int, std::pair<Elem*, unsigned char> > key_val_pair;
+    std::multimap<unsigned int, std::pair<Elem*, unsigned char> >     side_to_elem;
+  
     elem_iterator       el (this->elements_begin());
     const elem_iterator end(this->elements_end());
     
@@ -473,9 +495,6 @@ void MeshBase::find_neighbors()
       }
   }
 
-  // Explicitly clear the map.  It could be big!
-  side_to_elem.clear();
-
   
   
 #ifdef ENABLE_AMR
@@ -496,14 +515,18 @@ void MeshBase::find_neighbors()
 
   for (; el != end; ++el)
     {
-      for (unsigned int s=0; s < (*el)->n_neighbors(); s++)
-	if ((*el)->neighbor(s) == NULL)
-	  {
-	    (*el)->set_neighbor(s, (*el)->parent()->neighbor(s));
+      Elem* elem = *el;
+      
+      assert (elem->parent() != NULL);
+      
+      for (unsigned int s=0; s < elem->n_neighbors(); s++)
+	if (elem->neighbor(s) == NULL)
+	  {	    
+	    elem->set_neighbor(s, elem->parent()->neighbor(s));
 	    
 #ifdef DEBUG	    
-	    if ((*el)->neighbor(s) != NULL)
-	      if (!(*el)->neighbor(s)->active())
+	    if (elem->neighbor(s) != NULL)
+	      if (!elem->neighbor(s)->active())
 		{
 		  std::cerr << "I'm confused..." << std::endl;
 		  this->write_gmv("bad_mesh.gmv");
@@ -937,10 +960,10 @@ void MeshBase::build_nodes_to_elem_map (std::vector<std::vector<unsigned int> >&
 
 void MeshBase::all_tri ()
 {
-  assert (mesh_dimension() == 2);
+  assert (this->mesh_dimension() == 2);
 	  
   std::vector<Elem*> new_elements;
-  new_elements.reserve (2*n_active_elem());
+  new_elements.reserve (2*this->n_active_elem());
 
   active_elem_iterator el (this->elements_begin());
   active_elem_iterator end(this->elements_end());
@@ -1096,106 +1119,89 @@ void MeshBase::all_tri ()
 void MeshBase::sfc_partition(const unsigned int n_sbdmns,
 			     const std::string& type)
 {
-  // won't work without Bill's library!
-#ifndef HAVE_SFCURVES
-
-  {
-    std::cerr << "ERROR:  Not compiled with space-filling curve" << std::endl
-	      << " support.  Using linear partitioning instead" << std::endl
-	      << " This partitioning could be arbitrarily bad!" << std::endl
-	      <<  std::endl;
-    
-    set_n_subdomains() = n_sbdmns;
-    set_n_processors() = n_sbdmns;
-
-    // check for easy return
-    if (n_sbdmns == 1)
-      {
-	for (unsigned int e=0; e<n_elem(); e++)
-	  elem(e)->set_subdomain_id() = 
-	    elem(e)->set_processor_id() = 0;
-	
-	return;
-      }
-
-    
-    const unsigned int blksize = n_elem()/n_sbdmns; 
-    
-    for (unsigned int e=0; e<n_elem(); e++)
-      elem(e)->set_subdomain_id() = 
-	elem(e)->set_processor_id() = 
-	(int) (e/blksize);
-    
-    return;
-  }
-  
-#else
-
-  assert (n_nodes() != 0);
+  assert (this->n_nodes() != 0);
   assert (n_sbdmns > 0);
-  assert (n_sbdmns <= n_elem());
+  assert (n_sbdmns <= this->n_elem());
+
+  // Set the number of subdomains
+  this->set_n_subdomains() = n_sbdmns;
   
-
-  set_n_subdomains() = n_sbdmns;
-  set_n_processors() = n_sbdmns;
-
   // check for easy return
   if (n_sbdmns == 1)
     {
-      for (unsigned int e=0; e<n_elem(); e++)
-	elem(e)->set_subdomain_id() = 
-	  elem(e)->set_processor_id() = 0;
+      for (unsigned int e=0; e<this->n_elem(); e++)
+	this->elem(e)->set_subdomain_id() = 
+	  this->elem(e)->set_processor_id() = 0;
       
       return;
     }
+
+  
+  
+  // won't work without Bill's library!
+#ifndef HAVE_SFCURVES
+  
+  std::cerr << "ERROR:  Not compiled with space-filling curve" << std::endl
+	    << " support.  Using linear partitioning instead"  << std::endl
+	    << " This partitioning could be arbitrarily bad!"  << std::endl
+	    << std::endl;
+
+  here();
+  
+  const unsigned int blksize = this->n_elem()/n_sbdmns; 
+  
+  for (unsigned int e=0; e<this->n_elem(); e++)
+    this->elem(e)->set_subdomain_id() = 
+      this->elem(e)->set_processor_id() = 
+      (e/blksize);
+
+
+  
+#else
+
   
   START_LOG("sfc_partition()", "MeshBase");
     
-  std::vector<double> x;
-  std::vector<double> y;
-  std::vector<double> z;
-  std::vector<unsigned int> table;
+  int size = static_cast<int>(this->n_elem());
+  std::vector<double> x     (size);
+  std::vector<double> y     (size);
+  std::vector<double> z     (size);
+  std::vector<int>    table (size);
   
-  x.resize(n_elem(),0.);
-  y.resize(n_elem(),0.);
-  z.resize(n_elem(),0.);
-  
-  for (unsigned int e=0; e<n_elem(); e++)
+  for (unsigned int e=0; e<this->n_elem(); e++)
     {
-      const Point p = elem(e)->centroid();      
+      const Point p =
+	this->elem(e)->centroid();      
       
       x[e] = p(0);
       y[e] = p(1);
-
-      if (_dim == 3)
-	z[e] = p(2);
+      z[e] = p(2);
     }
-
-  int size = static_cast<int>(n_elem());
-  table.resize(size);
   
   if (type == "hilbert")
-    sfc::hilbert(&x[0], &y[0], &z[0], &size, (int*) &table[0]);
+    Sfc::hilbert(&x[0], &y[0], &z[0], &size, &table[0]);
+  
   else if (type == "morton")
-    sfc::morton(&x[0], &y[0], &z[0], &size, (int*) &table[0]);
+    Sfc::morton(&x[0], &y[0], &z[0], &size, &table[0]);
+  
   else
     error();
 
-  const unsigned int wgt_per_proc = total_weight()/n_subdomains();
+  const unsigned int wgt_per_proc =
+    this->total_weight()/this->n_subdomains();
+  
   unsigned int wgt = 0;
 	
-  for (unsigned int e=0; e<n_elem(); e++)
+  for (unsigned int e=0; e<this->n_elem(); e++)
     {
-      elem(table[e]-1)->set_subdomain_id() = 
-	elem(table[e]-1)->set_processor_id() = 
+      this->elem(table[e]-1)->set_subdomain_id() = 
+	this->elem(table[e]-1)->set_processor_id() = 
 	wgt/wgt_per_proc;
 
-      wgt += elem(table[e]-1)->n_nodes();
+      wgt += this->elem(table[e]-1)->n_nodes();
     }
   
   STOP_LOG("sfc_partition()", "MeshBase");
-  
-  return;
   
 #endif
 }
@@ -1237,7 +1243,8 @@ void MeshBase::renumber_nodes_and_elements ()
     
     // If there is only one processor, loop over the nodes and elements
     // and set their ids based on where they lie in their vectors.
-    if (this->n_processors() == 1)
+    //if (this->n_processors() == 1)
+    if (true)
       {
 	elem_iterator       el    (this->elements_begin());
 	const elem_iterator end_el(this->elements_end());
@@ -1265,7 +1272,7 @@ void MeshBase::renumber_nodes_and_elements ()
 	    
 	    (*nd)->set_id(next_free_node++);
 
-	    assert (this->processor_id() == 0);
+	    //assert (this->processor_id() == 0);
 	    
 	    (*nd)->set_processor_id(0);
 	     
@@ -1276,47 +1283,47 @@ void MeshBase::renumber_nodes_and_elements ()
 	  
 
   
-    // Otherwise renumber the elements to be in contiguous blocks
-    // on the processors.  The nodes are numbered in the order they
-    // are encountered on the element.
-    else
-      {    
-	for (unsigned int proc_id=0;
-	     proc_id<this->n_processors(); proc_id++)
-	  {
-	    // Loop over the elements on the processor proc_id
-	    pid_elem_iterator       el    (this->elements_begin(), proc_id);
-	    const pid_elem_iterator end_el(this->elements_end(),   proc_id);
+//     // Otherwise renumber the elements to be in contiguous blocks
+//     // on the processors.  The nodes are numbered in the order they
+//     // are encountered on the element.
+//     else
+//       {    
+// 	for (unsigned int proc_id=0;
+// 	     proc_id<this->n_processors(); proc_id++)
+// 	  {
+// 	    // Loop over the elements on the processor proc_id
+// 	    pid_elem_iterator       el    (this->elements_begin(), proc_id);
+// 	    const pid_elem_iterator end_el(this->elements_end(),   proc_id);
 	    
-	    for (; el != end_el; ++el)
-	      {
-		// this element should _not_ have been numbered already
-		assert ((*el)->id() == Elem::invalid_id);
+// 	    for (; el != end_el; ++el)
+// 	      {
+// 		// this element should _not_ have been numbered already
+// 		assert ((*el)->id() == Elem::invalid_id);
 		
-		(*el)->set_id(next_free_elem++);
+// 		(*el)->set_id(next_free_elem++);
 		
-		// Add the element to the new list
-		new_elem.push_back(*el);
+// 		// Add the element to the new list
+// 		new_elem.push_back(*el);
 		
-		// Number the nodes on the element that
-		// have not been numbered already.
-		for (unsigned int n=0; n<(*el)->n_nodes(); n++)
-		  if ((*el)->get_node(n)->id() == Node::invalid_id)
-		    {
-		      (*el)->get_node(n)->set_id(next_free_node++);
+// 		// Number the nodes on the element that
+// 		// have not been numbered already.
+// 		for (unsigned int n=0; n<(*el)->n_nodes(); n++)
+// 		  if ((*el)->get_node(n)->id() == Node::invalid_id)
+// 		    {
+// 		      (*el)->get_node(n)->set_id(next_free_node++);
 		      
-		      // Add the node to the new list
-		      new_nodes.push_back((*el)->get_node(n));
+// 		      // Add the node to the new list
+// 		      new_nodes.push_back((*el)->get_node(n));
 		      
-		      // How could this fail?  Only if something is WRONG!
-		      assert ((*el)->get_node(n)->processor_id() ==
-			      Node::invalid_processor_id);
+// 		      // How could this fail?  Only if something is WRONG!
+// 		      assert ((*el)->get_node(n)->processor_id() ==
+// 			      Node::invalid_processor_id);
 		      
-		      (*el)->get_node(n)->set_processor_id((*el)->processor_id());
-		    }
-	      }
-	  }
-      }
+// 		      (*el)->get_node(n)->set_processor_id((*el)->processor_id());
+// 		    }
+// 	      }
+// 	  }
+//       }
 
     // This could only fail if we did something seriously WRONG!
     assert (new_elem.size()  == next_free_elem);
@@ -1324,14 +1331,14 @@ void MeshBase::renumber_nodes_and_elements ()
   }
 
 
-  // Delete the inactive nodes
-  for (unsigned int n=0; n<_nodes.size(); n++)
-    if (_nodes[n] != NULL)
-      if (!_nodes[n]->active())
-	{
-	  delete _nodes[n];
-	  _nodes[n] = NULL;
-	}
+//   // Delete the inactive nodes
+//   for (unsigned int n=0; n<_nodes.size(); n++)
+//     if (_nodes[n] != NULL)
+//       if (!_nodes[n]->active())
+// 	{
+// 	  delete _nodes[n];
+// 	  _nodes[n] = NULL;
+// 	}
     
   // Finally, reassign the _nodes and _elem vectors
   _elements = new_elem;
@@ -1343,18 +1350,19 @@ void MeshBase::renumber_nodes_and_elements ()
 
 
 
-void MeshBase::find_boundary_nodes(std::vector<short int>& on_boundary)
+void MeshBase::find_boundary_nodes(std::vector<bool>& on_boundary)
 {
   // Resize the vector which holds boundary nodes and fill with zeros.
   on_boundary.resize(this->n_nodes());
   std::fill(on_boundary.begin(),
 	    on_boundary.end(),
-	    0);
+	    false);
 
   // Loop over elements, find those on boundary, and
   // mark them as 1 in on_boundary.
   active_elem_iterator       el (this->elements_begin());
   const active_elem_iterator end(this->elements_end());
+  
   for (; el != end; ++el)
     for (unsigned int s=0; s<(*el)->n_neighbors(); s++)
       if ((*el)->neighbor(s) == NULL) // on the boundary
@@ -1362,7 +1370,7 @@ void MeshBase::find_boundary_nodes(std::vector<short int>& on_boundary)
 	  const AutoPtr<Elem> side((*el)->build_side(s));
 	  
 	  for (unsigned int n=0; n<side->n_nodes(); n++)
-	    on_boundary[side->node(n)] = 1;
+	    on_boundary[side->node(n)] = true;
 	}
 }
 
@@ -1384,7 +1392,7 @@ void MeshBase::distort (const Real factor,
   // First find nodes on the boundary and flag them
   // so that we don't move them
   // on_boundary holds 0's (not on boundary) and 1's (on boundary)
-  std::vector<short int> on_boundary(this->n_nodes(), 0);
+  std::vector<bool> on_boundary(this->n_nodes());
   
   if (!perturb_boundary)
     this->find_boundary_nodes(on_boundary);
@@ -1392,14 +1400,15 @@ void MeshBase::distort (const Real factor,
   // Now calculate the minimum distance to
   // neighboring nodes for each node.
   // hmin holds these distances.
-  std::vector<Real>          hmin(n_nodes(), 1.e20);
+  std::vector<float> hmin(this->n_nodes(), 1.e20);
   
   active_elem_iterator       el (this->elements_begin());
   const active_elem_iterator end(this->elements_end());
+  
   for (; el!=end; ++el)
     for (unsigned int n=0; n<(*el)->n_nodes(); n++)
       hmin[(*el)->node(n)] = std::min(hmin[(*el)->node(n)],
-				      (*el)->hmin());		
+				      static_cast<float>((*el)->hmin()));		
 
   
   // Now actually move the nodes
@@ -1409,14 +1418,14 @@ void MeshBase::distort (const Real factor,
     // seed the random number generator
     srand(seed);
     
-    for (unsigned int n=0; n<n_nodes(); n++)
+    for (unsigned int n=0; this->n_nodes(); n++)
       if (!on_boundary[n])
 	{
 	  // the direction, random but unit normalized
 	  
 	  Point dir( ((Real) rand())/((Real) RAND_MAX),
 		     ((Real) rand())/((Real) RAND_MAX),
-		     ((mesh_dimension() == 3) ?
+		     ((this->mesh_dimension() == 3) ?
 		      ((Real) rand())/((Real) RAND_MAX) :
 		      0.)
 		     );
@@ -1424,7 +1433,7 @@ void MeshBase::distort (const Real factor,
 	  dir(0) = (dir(0)-.5)*2.;
 	  dir(1) = (dir(1)-.5)*2.;
 
-	  if (spatial_dimension() == 3)
+	  if (this->mesh_dimension() == 3)
 	    dir(2) = (dir(2)-.5)*2.;
 	  
 	  dir = dir.unit();
@@ -1434,11 +1443,11 @@ void MeshBase::distort (const Real factor,
 	  // move it.
 	  if (hmin[n] != 1.e20)
 	    {
-	      node(n)(0) += dir(0)*factor*hmin[n];
-	      node(n)(1) += dir(1)*factor*hmin[n];
+	      this->node(n)(0) += dir(0)*factor*hmin[n];
+	      this->node(n)(1) += dir(1)*factor*hmin[n];
 	      
-	      if (spatial_dimension() == 3)
-		node(n)(2) += dir(2)*factor*hmin[n];
+	      if (this->mesh_dimension() == 3)
+		this->node(n)(2) += dir(2)*factor*hmin[n];
 	    }
 	}
   }
@@ -1456,8 +1465,8 @@ void MeshBase::translate (const Real xt,
 {
   const Point p(xt, yt, zt);
 
-  for (unsigned int n=0; n<n_nodes(); n++)
-    node(n) += p;
+  for (unsigned int n=0; n<this->n_nodes(); n++)
+    this->node(n) += p;
 }
 
 
@@ -1487,22 +1496,22 @@ void MeshBase::scale (const Real xs,
     }
 
   // Scale the x coordinate in all dimensions
-  for (unsigned int n=0; n<n_nodes(); n++)
-    node(n)(0) = node(n)(0)*x_scale;
+  for (unsigned int n=0; n<this->n_nodes(); n++)
+    this->node(n)(0) *= x_scale;
 
 
   // Only scale the y coordinate in 2 and 3D
-  if (spatial_dimension() > 1)
+  if (this->spatial_dimension() > 1)
     {
 
-      for (unsigned int n=0; n<n_nodes(); n++)
-	node(n)(1) = node(n)(1)*y_scale;
+      for (unsigned int n=0; n<this->n_nodes(); n++)
+	this->node(n)(1) *= y_scale;
 
       // Only scale the z coordinate in 3D
-      if (spatial_dimension() == 3)
+      if (this->spatial_dimension() == 3)
 	{
-	  for (unsigned int n=0; n<n_nodes(); n++)
-	    node(n)(2) = node(n)(2)*z_scale;
+	  for (unsigned int n=0; n<this->n_nodes(); n++)
+	    this->node(n)(2) *= z_scale;
 	}
     }
 }
@@ -1514,7 +1523,7 @@ MeshBase::bounding_box() const
 {
   // processor bounding box with no arguments
   // computes the global bounding box
-  return processor_bounding_box();
+  return this->processor_bounding_box();
 }
 
 
@@ -1522,14 +1531,12 @@ MeshBase::bounding_box() const
 Sphere
 MeshBase::bounding_sphere() const
 {
-  std::pair<Point, Point> bbox = bounding_box();
+  std::pair<Point, Point> bbox = this->bounding_box();
 
   const Real  diag = (bbox.second - bbox.first).size();
   const Point cent = (bbox.second + bbox.first)/2.;
 
-  Sphere sphere (cent, .5*diag);
-
-  return sphere;
+  return Sphere (cent, .5*diag);
 }
 
 
@@ -1537,20 +1544,20 @@ MeshBase::bounding_sphere() const
 std::pair<Point, Point> 
 MeshBase::processor_bounding_box (const unsigned int pid) const
 {
-  assert (n_nodes() != 0);
+  assert (this->n_nodes() != 0);
 
-  Point min(1.e30, 1.e30, 1.e30);
+  Point min(1.e30,   1.e30,  1.e30);
   Point max(-1.e30, -1.e30, -1.e30);
 
   // By default no processor is specified and we compute
   // the bounding box for the whole domain.
   if (pid == static_cast<unsigned int>(-1))
     {
-      for (unsigned int n=0; n<n_nodes(); n++)
-	for (unsigned int i=0; i<spatial_dimension(); i++)
+      for (unsigned int n=0; n<this->n_nodes(); n++)
+	for (unsigned int i=0; i<this->spatial_dimension(); i++)
 	  {
-	    min(i) = std::min(min(i), point(n)(i));
-	    max(i) = std::max(max(i), point(n)(i));
+	    min(i) = std::min(min(i), this->point(n)(i));
+	    max(i) = std::max(max(i), this->point(n)(i));
 	  }      
     }
   // if a specific processor id is specified then we need
@@ -1562,10 +1569,10 @@ MeshBase::processor_bounding_box (const unsigned int pid) const
 
       for (; el != end; ++el)
 	for (unsigned int n=0; n<(*el)->n_nodes(); n++)
-	    for (unsigned int i=0; i<spatial_dimension(); i++)
+	    for (unsigned int i=0; i<this->spatial_dimension(); i++)
 	      {
-		min(i) = std::min(min(i), point((*el)->node(n))(i));
-		max(i) = std::max(max(i), point((*el)->node(n))(i));
+		min(i) = std::min(min(i), this->point((*el)->node(n))(i));
+		max(i) = std::max(max(i), this->point((*el)->node(n))(i));
 	      }      
     }
 
@@ -1579,14 +1586,12 @@ MeshBase::processor_bounding_box (const unsigned int pid) const
 Sphere
 MeshBase::processor_bounding_sphere (const unsigned int pid) const
 {
-  std::pair<Point, Point> bbox = processor_bounding_box(pid);
+  std::pair<Point, Point> bbox = this->processor_bounding_box(pid);
 
   const Real  diag = (bbox.second - bbox.first).size();
   const Point cent = (bbox.second + bbox.first)/2.;
 
-  Sphere sphere (cent, .5*diag);
-
-  return sphere;
+  return Sphere (cent, .5*diag);
 }
 
 
@@ -1594,20 +1599,20 @@ MeshBase::processor_bounding_sphere (const unsigned int pid) const
 std::pair<Point, Point> 
 MeshBase::subdomain_bounding_box (const unsigned int sid) const
 {
-  assert (n_nodes() != 0);
+  assert (this->n_nodes() != 0);
 
-  Point min(1.e30, 1.e30, 1.e30);
+  Point min( 1.e30,  1.e30,  1.e30);
   Point max(-1.e30, -1.e30, -1.e30);
 
   // By default no subdomain is specified and we compute
   // the bounding box for the whole domain.
   if (sid == static_cast<unsigned int>(-1))
     {
-      for (unsigned int n=0; n<n_nodes(); n++)
-	for (unsigned int i=0; i<spatial_dimension(); i++)
+      for (unsigned int n=0; n<this->n_nodes(); n++)
+	for (unsigned int i=0; i<this->spatial_dimension(); i++)
 	  {
-	    min(i) = std::min(min(i), point(n)(i));
-	    max(i) = std::max(max(i), point(n)(i));
+	    min(i) = std::min(min(i), this->point(n)(i));
+	    max(i) = std::max(max(i), this->point(n)(i));
 	  }      
     }
 
@@ -1615,13 +1620,13 @@ MeshBase::subdomain_bounding_box (const unsigned int sid) const
   // to only consider those elements living on that subdomain
   else
     {
-      for (unsigned int e=0; e<n_elem(); e++)
-	if (elem(e)->subdomain_id() == sid)
-	  for (unsigned int n=0; n<elem(e)->n_nodes(); n++)
-	    for (unsigned int i=0; i<spatial_dimension(); i++)
+      for (unsigned int e=0; e<this->n_elem(); e++)
+	if (this->elem(e)->subdomain_id() == sid)
+	  for (unsigned int n=0; n<this->elem(e)->n_nodes(); n++)
+	    for (unsigned int i=0; i<this->spatial_dimension(); i++)
 	      {
-		min(i) = std::min(min(i), point(elem(e)->node(n))(i));
-		max(i) = std::max(max(i), point(elem(e)->node(n))(i));
+		min(i) = std::min(min(i), this->point(this->elem(e)->node(n))(i));
+		max(i) = std::max(max(i), this->point(this->elem(e)->node(n))(i));
 	      }      
     }
 
@@ -1634,14 +1639,12 @@ MeshBase::subdomain_bounding_box (const unsigned int sid) const
 
 Sphere MeshBase::subdomain_bounding_sphere (const unsigned int sid) const
 {
-  std::pair<Point, Point> bbox = subdomain_bounding_box(sid);
+  std::pair<Point, Point> bbox = this->subdomain_bounding_box(sid);
 
   const Real  diag = (bbox.second - bbox.first).size();
   const Point cent = (bbox.second + bbox.first)/2.;
 
-  Sphere sphere (cent, .5*diag);
-
-  return sphere;
+  return Sphere (cent, .5*diag);
 }
 
 
@@ -1658,18 +1661,18 @@ void MeshBase::build_L_graph (PetscMatrix<Number>& conn) const
 
   // Initialize the connectivity matrix.
   {
-    conn.init(n_nodes(),
-	      n_nodes(),
-	      n_nodes(),
-	      n_nodes());
+    conn.init(this->n_nodes(),
+	      this->n_nodes(),
+	      this->n_nodes(),
+	      this->n_nodes());
 
     // be sure the diagonals are all 0 so that ++ works.
-    for (unsigned int n=0; n<n_nodes(); n++)
+    for (unsigned int n=0; n<this->n_nodes(); n++)
       conn.set(n,n,0.);
 
   }
   
-  switch (mesh_dimension())
+  switch (this->mesh_dimension())
     {
     case 1:
       {
@@ -1691,7 +1694,7 @@ void MeshBase::build_L_graph (PetscMatrix<Number>& conn) const
 	for (; el != end; ++el)
 	  for (unsigned int s=0; s<(*el)->n_neighbors(); s++)
 	    if (((*el)->neighbor(s) == NULL) ||
-		((*el) > (*el)->neighbor(s)))
+		((*el)->id() > (*el)->neighbor(s)->id()))
 	      {
 		AutoPtr<Elem> side((*el)->build_side(s));
 		
@@ -1721,7 +1724,7 @@ void MeshBase::build_L_graph (PetscMatrix<Number>& conn) const
 	for (; el != end; ++el)
 	  for (unsigned int f=0; f<(*el)->n_neighbors(); f++) // Loop over faces
 	    if (((*el)->neighbor(f) == NULL) ||
-		((*el) > (*el)->neighbor(f)))
+		((*el)->id() > (*el)->neighbor(f)->id()))
 	      {
 		AutoPtr<Elem> face((*el)->build_side(f));
 		
@@ -1911,20 +1914,20 @@ void MeshBase::write(const std::string& name)
   // Write the file based on extension
   {
     if (name.rfind(".dat") < name.size())
-      write_tecplot (name);
+      this->write_tecplot (name);
     
     else if (name.rfind(".plt") < name.size())
-      write_tecplot_binary (name);
+      this->write_tecplot_binary (name);
 
     else if (name.rfind(".ucd") < name.size())
-      write_ucd (name);
+      this->write_ucd (name);
 
     else if (name.rfind(".gmv") < name.size())
       {
 	if (n_subdomains() > 1)
-	  write_gmv_binary(name, NULL, NULL, true);
+	  this->write_gmv_binary(name, NULL, NULL, true);
 	else
-	  write_gmv_binary(name);
+	  this->write_gmv_binary(name);
       }
   }
 
@@ -1942,17 +1945,17 @@ void MeshBase::write(const std::string& name,
   // Write the file based on extension
   {
     if (name.rfind(".dat") < name.size())
-      write_tecplot (name, &v, &vn);
+      this->write_tecplot (name, &v, &vn);
     
     else if (name.rfind(".plt") < name.size())
-      write_tecplot_binary (name, &v, &vn);
+      this->write_tecplot_binary (name, &v, &vn);
     
     else if (name.rfind(".gmv") < name.size())
       {
-	if (n_subdomains() > 1)
-	  write_gmv_binary(name, &v, &vn, true);
+	if (this->n_subdomains() > 1)
+	  this->write_gmv_binary(name, &v, &vn, true);
 	else
-	  write_gmv_binary(name, &v, &vn);
+	  this->write_gmv_binary(name, &v, &vn);
       }
   }
 
@@ -1967,10 +1970,13 @@ const char* MeshBase::complex_filename(const std::string& _n,
 				       unsigned int r_o_c) const
 {
   std::string loc=_n;
+  
   if (r_o_c == 0)
     loc.append(".real");
+  
   else
     loc.append(".imag");
+  
   return loc.c_str();
 }
 
@@ -1984,7 +1990,7 @@ void MeshBase::prepare_complex_data(const std::vector<Number>* source,
   imag_part->resize(source->size());
 
 
-  for (unsigned int i=0; i< source->size(); i++)
+  for (unsigned int i=0; i<source->size(); i++)
     {
       (*real_part)[i] = (*source)[i].real();
       (*imag_part)[i] = (*source)[i].imag();
@@ -2024,11 +2030,11 @@ void MeshBase::trim_unused_elements (std::set<unsigned int>& unused_elements)
     // to std::vector<>::erase()    
     std::vector<Elem*> new_elements;
     
-    new_elements.resize(n_elem());
+    new_elements.resize(this->n_elem());
 
     unsigned int ne=0;
     
-    for (unsigned int e=0; e<n_elem(); e++)
+    for (unsigned int e=0; e<this->n_elem(); e++)
       if (_elements[e] != NULL)
 	new_elements[ne++] = _elements[e]; 
 
@@ -2042,7 +2048,7 @@ void MeshBase::trim_unused_elements (std::set<unsigned int>& unused_elements)
      */
 #ifdef DEBUG
 
-    for (unsigned int e=0; e<n_elem(); e++)
+    for (unsigned int e=0; e<this->n_elem(); e++)
       assert (_elements[e] != NULL);
     
 #endif

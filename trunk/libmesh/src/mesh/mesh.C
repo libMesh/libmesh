@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.15 2003-05-20 09:28:45 ddreyer Exp $
+// $Id: mesh.C,v 1.16 2003-05-28 03:17:50 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -40,10 +40,9 @@ namespace sfc {
 
 // ------------------------------------------------------------
 // Mesh class member functions
-Mesh::Mesh (unsigned int d,
-	    unsigned int pid) :
-  MeshBase           (d, pid),
-  boundary_mesh      (d-1, pid)
+Mesh::Mesh (unsigned int d) :
+  MeshBase      (d),
+  boundary_mesh (d-1)
 {
   assert (libMesh::initialized());
 }
@@ -52,7 +51,7 @@ Mesh::Mesh (unsigned int d,
 
 Mesh::~Mesh ()
 {
-  clear ();
+  this->clear ();
   
   assert (!libMesh::closed());
 }
@@ -77,31 +76,31 @@ void Mesh::read (const std::string& name)
   // Read the file based on extension
   {
     if (name.rfind(".mat") < name.size())
-      read_matlab (name);
+      this->read_matlab (name);
     
     else if (name.rfind(".ucd") < name.size())
-      read_ucd (name);
+      this->read_ucd (name);
 
     else if (name.rfind(".exd") < name.size())
-      read_exd (name);
+      this->read_exd (name);
 
     else if (name.rfind(".xda") < name.size())
-      read_xdr (name);
+      this->read_xdr (name);
 
     else if ((name.rfind(".off")  < name.size()) ||
 	     (name.rfind(".ogl")  < name.size()) ||
 	     (name.rfind(".oogl") < name.size()))
-      read_off(name);
+      this->read_off(name);
 
     else if ((name.rfind(".xdr")  < name.size()) ||
 	     (name.rfind(".0000") < name.size()))
-      read_xdr_binary (name);
+      this->read_xdr_binary (name);
 
     else if (name.rfind(".mesh") < name.size())
-      read_shanee (name);
+      this->read_shanee (name);
 
     else if (name.rfind(".unv") < name.size())
-      read_unv (name);
+      this->read_unv (name);
 
     else
       {
@@ -137,34 +136,34 @@ void Mesh::write (const std::string& name)
   // Write the file based on extension
   {
     if (name.rfind(".dat") < name.size())
-      write_tecplot (name);
+      this->write_tecplot (name);
     
     else if (name.rfind(".plt") < name.size())
-      write_tecplot_binary (name);
+      this->write_tecplot_binary (name);
 
     else if (name.rfind(".ucd") < name.size())
-      write_ucd (name);
+      this->write_ucd (name);
 
     else if (name.rfind(".gmv") < name.size())
       {
 	if (n_subdomains() > 1)
-	  write_gmv_binary(name, NULL, NULL, true);
+	  this->write_gmv_binary(name, NULL, NULL, true);
 	else
-	  write_gmv_binary(name);
+	  this->write_gmv_binary(name);
       }
 
 
     else if (name.rfind(".ugrid") < name.size())
-      write_diva (name);
+      this->write_diva (name);
     
     else if (name.rfind(".xda") < name.size())
-      write_xdr (name);
+      this->write_xdr (name);
     
     else if (name.rfind(".xdr") < name.size())
-      write_xdr_binary (name);
+      this->write_xdr_binary (name);
 
     else if (name.rfind(".unv") < name.size())
-      write_unv (name);
+      this->write_unv (name);
 
     else
       {
@@ -198,17 +197,17 @@ void Mesh::write (const std::string& name,
   // Write the file based on extension
   {
     if (name.rfind(".dat") < name.size())
-      write_tecplot (name, &v, &vn);
+      this->write_tecplot (name, &v, &vn);
     
     else if (name.rfind(".plt") < name.size())
-      write_tecplot_binary (name, &v, &vn);
+      this->write_tecplot_binary (name, &v, &vn);
 
     else if (name.rfind(".gmv") < name.size())
       {
 	if (n_subdomains() > 1)
-	  write_gmv_binary(name, &v, &vn, true);
+	  this->write_gmv_binary(name, &v, &vn, true);
 	else
-	  write_gmv_binary(name, &v, &vn);
+	  this->write_gmv_binary(name, &v, &vn);
       }    
     else
       {

@@ -1,4 +1,4 @@
-// $Id: system_base.C,v 1.17 2003-05-22 18:31:19 ddreyer Exp $
+// $Id: system_base.C,v 1.18 2003-05-28 03:17:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -110,7 +110,7 @@ void SystemBase::clear ()
 	pos = _other_matrices.begin();
       }
 
-    _can_add_matrices=true;
+    _can_add_matrices = true;
   }
 
   // clear other vectors, if existent
@@ -124,7 +124,7 @@ void SystemBase::clear ()
 	pos = _other_vectors.begin();
       }
 
-    _can_add_vectors=true;
+    _can_add_vectors = true;
   }
 }
 
@@ -160,7 +160,7 @@ void SystemBase::init_data ()
   rhs->init      (this->n_dofs(), this->n_local_dofs());
 
   // from now on, no chance to add additional vectors
-  _can_add_vectors=false;
+  _can_add_vectors = false;
 
   // initialize & zero other vectors, if necessary
   for (other_vectors_iterator pos = _other_vectors.begin();
@@ -186,7 +186,7 @@ void SystemBase::reinit ()
 #endif
 
   // Resize the RHS conformal to the current mesh
-  rhs->init      (this->n_dofs(), this->n_local_dofs());
+  rhs->init (this->n_dofs(), this->n_local_dofs());
 
   // Clear the matrices
   matrix->clear();
@@ -209,7 +209,7 @@ void SystemBase::assemble ()
   // Initiaize the matrices if not already done
   { 
     // no chance to add other matrices
-    _can_add_matrices=false;
+    _can_add_matrices = false;
     
     // initialize the matrix if not 
     // already initialized

@@ -1,4 +1,4 @@
-// $Id: error_estimator.C,v 1.7 2003-05-22 21:18:03 benkirk Exp $
+// $Id: error_estimator.C,v 1.8 2003-05-28 03:17:50 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -106,7 +106,7 @@ void ErrorEstimator::flux_jump (const EquationSystems& es,
   
   // The System object to estimate the error for
   const SteadySystem& system = es.get_system<SteadySystem>(name);
-
+  
   // The number of variables in the system
   const unsigned int n_vars = system.n_vars();
   
@@ -188,10 +188,10 @@ void ErrorEstimator::flux_jump (const EquationSystems& es,
 	  const unsigned int e_id = e->id();
 	  
 	  // Loop over the neighbors of element e
-	  for (unsigned int s_e=0; s_e<e->n_neighbors(); s_e++)
-	    if (e->neighbor(s_e) != NULL) // e is not on the boundary
+	  for (unsigned int n_e=0; n_e<e->n_neighbors(); n_e++)
+	    if (e->neighbor(n_e) != NULL) // e is not on the boundary
 	      {
-		const Elem* f           = e->neighbor(s_e);
+		const Elem* f           = e->neighbor(n_e);
 		const unsigned int f_id = f->id();
 		
 		if (   //-------------------------------------
@@ -207,10 +207,10 @@ void ErrorEstimator::flux_jump (const EquationSystems& es,
 		  {		    
 		    // Update the shape functions on side s_e of
 		    // element e
-		    fe_e->reinit (e, s_e);
+		    fe_e->reinit (e, n_e);
 
 		    // Build the side
-		    AutoPtr<Elem> side (e->side(s_e));
+		    AutoPtr<Elem> side (e->side(n_e));
 
 		    // Get the maximum h for this side
 		    const Real h = side->hmax();
@@ -277,7 +277,7 @@ void ErrorEstimator::flux_jump (const EquationSystems& es,
 		    
 		    
 		  }
-	      } // if (e->neigbor(s_e) != NULL)
+	      } // if (e->neigbor(n_e) != NULL)
 	  
 	} // End loop over active local elements
       
@@ -295,8 +295,12 @@ void ErrorEstimator::flux_jump (const EquationSystems& es,
   if (libMesh::n_processors() > 1)
     {
       using namespace Mpi;
+
+      // Allreduce requires 2 buffers.  Copy the
+      // error_per_cell vector into the epc vector
+      std::vector<float> epc (error_per_cell);
       
-      MPI_Allreduce (&error_per_cell[0], &error_per_cell[0],
+      MPI_Allreduce (&epc[0], &error_per_cell[0],
 		     error_per_cell.size(),
 		     MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
     }  

@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.41 2003-05-21 13:50:23 benkirk Exp $
+// $Id: dof_map.C,v 1.42 2003-05-28 03:17:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -161,7 +161,7 @@ void DofMap::reinit(const MeshBase& mesh)
   // Next allocate space for the DOF indices
   for (unsigned int var=0; var<this->n_variables(); var++)
     {
-      const FEType& fe_type = variable_type(var);
+      const FEType& fe_type = this->variable_type(var);
 
       // For all the active elements
       const_active_elem_iterator       elem_it (mesh.elements_begin());
@@ -178,7 +178,9 @@ void DofMap::reinit(const MeshBase& mesh)
 	      const unsigned int dofs_at_node =
 		FEInterface::n_dofs_at_node(dim, fe_type, type, n);
 	      
-	      elem->get_node(n)->set_n_comp(this->sys_number(), var, dofs_at_node);
+	      elem->get_node(n)->set_n_comp(this->sys_number(),
+					    var,
+					    dofs_at_node);
 	    }
 	     
 	  // Allocate the element DOFs
@@ -303,14 +305,14 @@ void DofMap::distribute_dofs(const MeshBase& mesh)
 			  if (processor == proc_id)
 			    _send_list.push_back(node->dof_number(this->sys_number(),var,index));
 			}
-		      // if there is an entry there and it isn't on this
-		      // processor it also needs to be added to the send list
-		      else if (node->dof_number(this->sys_number(),var,index) <
-			       _first_df[proc_id])
-			{
-			  if (processor == proc_id)
-			    _send_list.push_back(node->dof_number(this->sys_number(),var,index));
-			}
+// 		      // if there is an entry there and it isn't on this
+// 		      // processor it also needs to be added to the send list
+// 		      else if (node->dof_number(this->sys_number(),var,index) <
+// 			       _first_df[proc_id])
+// 			{
+// 			  if (processor == proc_id)
+// 			    _send_list.push_back(node->dof_number(this->sys_number(),var,index));
+// 			}
 		    }
 		}
 		  
@@ -333,6 +335,40 @@ void DofMap::distribute_dofs(const MeshBase& mesh)
     }
   
   _n_dfs = next_free_dof;
+
+  
+
+  // The _send_list now only contains entries from the local processor.
+  // We need to add the DOFs from elements that live on neighboring processors
+  // that are neighbors of the elements on the local processor
+  {
+    const_active_local_elem_iterator       elem_it (mesh.elements_begin());
+    const const_active_local_elem_iterator elem_end(mesh.elements_end());
+
+    std::vector<unsigned int> di;
+
+    // Loop over the active local elements
+    for ( ; elem_it != elem_end; ++elem_it)
+      {
+	Elem* elem = *elem_it;
+
+	// Loop over the neighbors of those elements
+	for (unsigned int s=0; s<elem->n_neighbors(); s++)
+	  if (elem->neighbor(s) != NULL)
+	    
+	    // If the neighbor lives on a different processoe
+	    if (elem->neighbor(s)->processor_id() != libMesh::processor_id())
+	      {
+		// Get the DOF indices for this neighboring element
+		this->dof_indices (elem->neighbor(s), di);
+
+		// Insert the DOF indices into the send list
+		_send_list.insert (_send_list.end(),
+				   di.begin(), di.end());
+	      }
+      }
+  }
+
 
   
   // Note that in the code above nodes on processor boundaries

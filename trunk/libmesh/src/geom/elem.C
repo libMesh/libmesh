@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.23 2003-05-23 03:21:47 benkirk Exp $
+// $Id: elem.C,v 1.24 2003-05-28 03:17:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -446,159 +446,11 @@ void Elem::nullify_neighbors ()
 	// but they don't see me, so avoid that case.
 	if (neighbor->level() == this->level())
 	  {	
-// 	    std::cout << "this=" << this
-// 		      << ", neighbor=" << neighbor
-// 		      << ", this->id()=" << this->id()
-// 		      << std::endl;
-	
 	    const unsigned int w_n_a_i = neighbor->which_neighbor_am_i(this);
 	    neighbor->set_neighbor(w_n_a_i, NULL);
 	    this->set_neighbor(n, NULL);
 	  }
       }
 }
-
-
-
-/**
- * The following functions only apply when
- * AMR is enabled and thus are not present
- * otherwise.
- */ 
-#ifdef ENABLE_AMR
-
-void Elem::refine (MeshBase& mesh)
-{
-  assert (this->refinement_flag() == Elem::REFINE);
-  assert (this->active());
-  assert (_children == NULL);
-
-  // Two big prime numbers less than
-  // sqrt(max_unsigned_int) for key creation.
-  const unsigned int bp1 = 65449;
-  const unsigned int bp2 = 48661;
-  
-  
-  // Create my children
-  {
-    _children = new Elem*[this->n_children()];
-
-    for (unsigned int c=0; c<this->n_children(); c++)
-      {
-	_children[c] = Elem::build(this->type(), this);
-	_children[c]->set_refinement_flag(Elem::JUST_REFINED);
-      }
-  }
-
-
-  // Compute new nodal locations
-  // and asssign nodes to children
-  {
-    // Make these static.  It is unlikely the
-    // sizes will change from call to call, so having these
-    // static should save on reallocations
-    std::vector<std::vector<Point> >         p(this->n_children());
-    std::vector<std::vector<unsigned int> >  keys(this->n_children());
-    std::vector<std::vector<Node*> >         nodes(this->n_children());
-    
-
-    // compute new nodal locations
-    for (unsigned int c=0; c<this->n_children(); c++)
-      {	
-	p[c].resize    (this->child(c)->n_nodes());
-	keys[c].resize (this->child(c)->n_nodes());
-	nodes[c].resize(this->child(c)->n_nodes());
-	
-      for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
-	{
-	  // zero entries
-	  p[c][nc].zero();
-	  keys[c][nc]  = 0;
-	  nodes[c][nc] = NULL;
-	  
-	  for (unsigned int n=0; n<this->n_nodes(); n++)
-	    {
-	      // The value from the embedding matrix
-	      const float em_val = this->embedding_matrix(c,nc,n);
-	      
-	      if (em_val != 0.)
-		{
-		  p[c][nc].add_scaled (this->point(n), em_val);
-		  
-		  // We may have found the node, in which case we
-		  // won't need to look it up later.
-		  if (em_val == 1.)
-		    nodes[c][nc] = this->get_node(n);
-		  
-		  // Otherwise build the key to look for the node
-		  else
-		    keys[c][nc] +=
-		      ((static_cast<unsigned int>(em_val*100000.)%bp1 *
-			(this->node(n)%bp1))%bp1)*bp2;
-		}
-	    }
-	  // Mod one last time
-	  //keys[c][nc] = keys[c][nc]%bp1;
-	}
-      }
-    
-    // assign nodes to children & add them to the mesh
-    for (unsigned int c=0; c<this->n_children(); c++)
-      {
-	for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
-	  {
-	    if (nodes[c][nc] != NULL)
-	      {
-		_children[c]->set_node(nc) = nodes[c][nc];
-	      }
-	    else
-	      {
-		_children[c]->set_node(nc) =
-		  mesh.mesh_refinement.add_point(p[c][nc],
-						 keys[c][nc]);
-	      }
-	  }
-	
-	mesh.add_elem(this->child(c),
-		      mesh.mesh_refinement.new_element_number());
-      }
-  }
-
-
-  
-  // Possibly add boundary information
-  for (unsigned int s=0; s<this->n_neighbors(); s++)
-    if (this->neighbor(s) == NULL)
-      {
-	const short int id = mesh.boundary_info.boundary_id(this, s);
-	
-	if (id != mesh.boundary_info.invalid_id)
-	  for (unsigned int sc=0; sc<this->n_children_per_side(s); sc++)
-	    mesh.boundary_info.add_side(this->child(this->side_children_matrix(s,sc)),
-					s,
-					id);
-      }
-
-  
-  // Un-set my refinement flag now
-  this->set_refinement_flag(Elem::DO_NOTHING);
-}
-
-
-
-void Elem::coarsen()
-{
-  assert (this->refinement_flag() == Elem::COARSEN);
-  assert (!this->active());
-
-  // Delete the storage for my children
-  delete [] _children;
-
-  _children = NULL;
-
-  this->set_refinement_flag(Elem::DO_NOTHING);
-}
-
-#endif // #ifdef ENABLE_AMR
 
 

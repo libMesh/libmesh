@@ -1,4 +1,4 @@
-// $Id: dof_object.h,v 1.13 2003-05-23 03:21:47 benkirk Exp $
+// $Id: dof_object.h,v 1.14 2003-05-28 03:17:47 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -48,7 +48,7 @@
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.13 $
+ * \version $Revision: 1.14 $
  */
 
 class DofObject
@@ -142,7 +142,7 @@ public:
    * Sets the \p id for this \p DofObject
    */
   void set_id (const unsigned int id)
-  { set_id() = id; }
+  { this->set_id() = id; }
 
   /**
    * @returns the processor that this element belongs to.

@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.20 2003-05-15 23:34:35 benkirk Exp $
+// $Id: mesh_generation.C,v 1.21 2003-05-28 03:17:50 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -654,8 +654,7 @@ void Mesh::build_cube(const unsigned int nx,
 
   
   // Done building the mesh.  Now prepare it for use.
-  this->prepare_for_use ();
-  
+  this->prepare_for_use ();  
 }
 
 

@@ -1,4 +1,4 @@
-// $Id: elem_iterators.h,v 1.9 2003-03-03 02:15:57 benkirk Exp $
+// $Id: elem_iterators.h,v 1.10 2003-05-28 03:17:47 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -47,8 +47,8 @@ public:
    * Constructor.
    */
   basic_elem_iterator(const std::pair<T,T>& p,
-		      const bool b=true)
-    : PredicatedIterator<T>(p.first, p.second)
+		      const bool b=true) 
+  : PredicatedIterator<T>(p.first, p.second)
   {
     if (b) this->advance();
   }
@@ -70,7 +70,8 @@ protected:
  * may be used to access the _neighbors array in the
  * Elem class.
  */
-typedef basic_elem_iterator<std::vector<Elem*>::iterator> elem_iterator;
+typedef basic_elem_iterator<std::vector<Elem*>::iterator>
+  elem_iterator;
 
 
 /**
@@ -79,7 +80,8 @@ typedef basic_elem_iterator<std::vector<Elem*>::iterator> elem_iterator;
  * users will create if they want to iterate over
  * all the neighbors of an element in non-const functions.
  */
-typedef basic_elem_iterator<Elem**> neighbor_iterator;
+typedef basic_elem_iterator<Elem**>
+  neighbor_iterator;
 
 
 /**
@@ -90,7 +92,8 @@ typedef basic_elem_iterator<Elem**> neighbor_iterator;
  * The const_neighbor_iterator may be used to access the
  * _neighbors array in the Elem class in const functions.
  */
-typedef basic_elem_iterator<std::vector<Elem*>::const_iterator> const_elem_iterator; 
+typedef basic_elem_iterator<std::vector<Elem*>::const_iterator>
+  const_elem_iterator; 
 
 
 /**
@@ -99,7 +102,8 @@ typedef basic_elem_iterator<std::vector<Elem*>::const_iterator> const_elem_itera
  * users will create if they want to iterate over
  * all the neighbors of an element in const functions.
  */
-typedef basic_elem_iterator<const Elem**> const_neighbor_iterator;
+typedef basic_elem_iterator<const Elem**>
+  const_neighbor_iterator;
 
 
 
@@ -138,7 +142,8 @@ protected:
    * first, this will avoid calling the \p active member on \p NULL
    * elements.
    */
-  virtual bool predicate() const { return (basic_elem_iterator<T>::predicate() && (*this->_current)->active()); }
+  virtual bool predicate() const { return (basic_elem_iterator<T>::predicate() &&
+					   (*this->_current)->active()); }
 };
 
 
@@ -148,7 +153,8 @@ protected:
  * will create if they want to iterate over the all the active
  * elements in the mesh.
  */
-typedef basic_active_elem_iterator<std::vector<Elem*>::iterator> active_elem_iterator;
+typedef basic_active_elem_iterator<std::vector<Elem*>::iterator>
+  active_elem_iterator;
 
 
 /**
@@ -157,7 +163,8 @@ typedef basic_active_elem_iterator<std::vector<Elem*>::iterator> active_elem_ite
  * will create if they want to iterate over the all the active
  * elements in the mesh in const functions.
  */
-typedef basic_active_elem_iterator<std::vector<Elem*>::const_iterator> const_active_elem_iterator; 
+typedef basic_active_elem_iterator<std::vector<Elem*>::const_iterator>
+  const_active_elem_iterator; 
 
 
 
@@ -172,8 +179,6 @@ typedef basic_active_elem_iterator<std::vector<Elem*>::const_iterator> const_act
  * to instantiate non-const and const versions of the iterator,
  * respectively.  Note the "false" argument to the basic_active_elem_iterator
  * constructor.  This basically tells that constructor to NOT advance();
- * Note that this class needs to explicilty instantiate the basic_elem_iterator
- * in its initialization list since its parent is a public basic_elem_iterator.
  */
 template <class T>
 class basic_not_active_elem_iterator : public basic_active_elem_iterator<T>
@@ -184,10 +189,11 @@ public:
    * Note that it passes the false parameter so that the base class
    * does not call the advance() function.
    */
-  basic_not_active_elem_iterator(const std::pair<T,T>& p)
+  basic_not_active_elem_iterator(const std::pair<T,T>& p,
+				 const bool b=true) 
     : basic_active_elem_iterator<T>(p, false)
   {
-    this->advance();
+    if (b) this->advance();
   }
   
 protected:
@@ -206,7 +212,8 @@ protected:
  * will create if they want to iterate over the all the inactive
  * elements in the mesh.
  */
-typedef basic_not_active_elem_iterator<std::vector<Elem*>::iterator> not_active_elem_iterator;
+typedef basic_not_active_elem_iterator<std::vector<Elem*>::iterator>
+  not_active_elem_iterator;
 
 
 /**
@@ -215,7 +222,8 @@ typedef basic_not_active_elem_iterator<std::vector<Elem*>::iterator> not_active_
  * will create if they want to iterate over the all the inactive
  * elements in the mesh in const functions.
  */
-typedef basic_not_active_elem_iterator<std::vector<Elem*>::const_iterator> const_not_active_elem_iterator; 
+typedef basic_not_active_elem_iterator<std::vector<Elem*>::const_iterator>
+  const_not_active_elem_iterator; 
 
 
 
@@ -268,7 +276,8 @@ protected:
  * create when they want to iterate over all elements
  * of a specific type.
  */
-typedef basic_type_elem_iterator<std::vector<Elem*>::iterator> type_elem_iterator;
+typedef basic_type_elem_iterator<std::vector<Elem*>::iterator>
+  type_elem_iterator;
 
 
 /**
@@ -277,7 +286,8 @@ typedef basic_type_elem_iterator<std::vector<Elem*>::iterator> type_elem_iterato
  * create when they want to iterate over all elements
  * of a specific type in const functions.
  */
-typedef basic_type_elem_iterator<std::vector<Elem*>::const_iterator> const_type_elem_iterator;
+typedef basic_type_elem_iterator<std::vector<Elem*>::const_iterator>
+  const_type_elem_iterator;
 
 
 
@@ -323,7 +333,8 @@ protected:
  * create when they want to iterate over all elements
  * which are NOT of a specific type in non-const functions.
  */
-typedef basic_not_type_elem_iterator<std::vector<Elem*>::iterator> not_type_elem_iterator;
+typedef basic_not_type_elem_iterator<std::vector<Elem*>::iterator>
+  not_type_elem_iterator;
 
 
 /**
@@ -332,7 +343,8 @@ typedef basic_not_type_elem_iterator<std::vector<Elem*>::iterator> not_type_elem
  * create when they want to iterate over all elements
  * which are NOT of a specific type in const functions.
  */
-typedef basic_not_type_elem_iterator<std::vector<Elem*>::const_iterator> const_not_type_elem_iterator;
+typedef basic_not_type_elem_iterator<std::vector<Elem*>::const_iterator>
+  const_not_type_elem_iterator;
 
 
 
@@ -353,10 +365,11 @@ public:
    * Constructor.
    */
   basic_active_type_elem_iterator(const std::pair<T,T>& p,
-				  const ElemType t)
+				  const ElemType t,
+				  const bool b=true)
     : basic_type_elem_iterator<T>(p, t, false)
   {
-    this->advance();
+    if (b) this->advance();
   }
   
 protected:
@@ -366,7 +379,8 @@ protected:
    */
   virtual bool predicate() const
   {
-    return (basic_type_elem_iterator<T>::predicate() && (*this->_current)->active() );
+    return (basic_type_elem_iterator<T>::predicate() &&
+	    (*this->_current)->active() );
   }
 };
 
@@ -377,7 +391,8 @@ protected:
  * create when they want to iterate over all active elements
  * of a specific type.
  */
-typedef basic_active_type_elem_iterator<std::vector<Elem*>::iterator> active_type_elem_iterator;
+typedef basic_active_type_elem_iterator<std::vector<Elem*>::iterator>
+  active_type_elem_iterator;
 
 
 /**
@@ -386,7 +401,8 @@ typedef basic_active_type_elem_iterator<std::vector<Elem*>::iterator> active_typ
  * create when they want to iterate over all active elements
  * of a specific type.
  */
-typedef basic_active_type_elem_iterator<std::vector<Elem*>::const_iterator> const_active_type_elem_iterator; 
+typedef basic_active_type_elem_iterator<std::vector<Elem*>::const_iterator>
+  const_active_type_elem_iterator; 
 
 
 
@@ -427,7 +443,8 @@ protected:
    * first, this will avoid calling the \p active member on \p NULL
    * elements.
    */
-  virtual bool predicate() const { return (basic_elem_iterator<T>::predicate() && (*this->_current)->level() == _level); }
+  virtual bool predicate() const { return (basic_elem_iterator<T>::predicate() &&
+					   (*this->_current)->level() == _level); }
   
   const unsigned int _level;
 };
@@ -439,7 +456,8 @@ protected:
  * create when they want to iterate over all active elements
  * of a specific level.
  */
-typedef basic_level_elem_iterator<std::vector<Elem*>::iterator> level_elem_iterator;
+typedef basic_level_elem_iterator<std::vector<Elem*>::iterator>
+  level_elem_iterator;
 
 
 /**
@@ -448,7 +466,8 @@ typedef basic_level_elem_iterator<std::vector<Elem*>::iterator> level_elem_itera
  * create when they want to iterate over all active elements
  * of a specific type.
  */
-typedef basic_level_elem_iterator<std::vector<Elem*>::const_iterator> const_level_elem_iterator;
+typedef basic_level_elem_iterator<std::vector<Elem*>::const_iterator>
+  const_level_elem_iterator;
 
 
 
@@ -469,10 +488,11 @@ public:
    * Constructor.
    */
   basic_not_level_elem_iterator(const std::pair<T,T>& p,
-				const unsigned int l)
+				const unsigned int l,
+				const bool b=true)
     : basic_level_elem_iterator<T>(p, l, false)
   {
-    this->advance();
+    if (b) this->advance();
   }
   
 protected:
@@ -491,7 +511,8 @@ protected:
  * create when they want to iterate over all active elements
  * NOT of a specific level.
  */
-typedef basic_not_level_elem_iterator<std::vector<Elem*>::iterator> not_level_elem_iterator;
+typedef basic_not_level_elem_iterator<std::vector<Elem*>::iterator>
+  not_level_elem_iterator;
 
 
 /**
@@ -500,7 +521,8 @@ typedef basic_not_level_elem_iterator<std::vector<Elem*>::iterator> not_level_el
  * create when they want to iterate over all active elements
  * NOT of a specific type.
  */
-typedef basic_not_level_elem_iterator<std::vector<Elem*>::const_iterator> const_not_level_elem_iterator;
+typedef basic_not_level_elem_iterator<std::vector<Elem*>::const_iterator>
+  const_not_level_elem_iterator;
 
 
 
@@ -539,7 +561,8 @@ protected:
    * first, this will avoid calling the \p active member on \p NULL
    * elements.
    */
-  virtual bool predicate() const { return (basic_elem_iterator<T>::predicate() && (*this->_current)->processor_id() == _pid); }
+  virtual bool predicate() const { return (basic_elem_iterator<T>::predicate() &&
+					   (*this->_current)->processor_id() == _pid); }
 
   const unsigned int _pid;
 };
@@ -551,7 +574,8 @@ protected:
  * create when they want to iterate over all elements
  * with a specific processor id.
  */
-typedef basic_pid_elem_iterator<std::vector<Elem*>::iterator> pid_elem_iterator;
+typedef basic_pid_elem_iterator<std::vector<Elem*>::iterator>
+  pid_elem_iterator;
 
 
 /**
@@ -560,7 +584,8 @@ typedef basic_pid_elem_iterator<std::vector<Elem*>::iterator> pid_elem_iterator;
  * create when they want to iterate over all elements
  * with a specific processor id.
  */
-typedef basic_pid_elem_iterator<std::vector<Elem*>::const_iterator> const_pid_elem_iterator;
+typedef basic_pid_elem_iterator<std::vector<Elem*>::const_iterator>
+  const_pid_elem_iterator;
 
 
 
@@ -586,10 +611,11 @@ class basic_not_pid_elem_iterator : public basic_pid_elem_iterator<T>
 {
 public:
   basic_not_pid_elem_iterator(const std::pair<T,T>& p,
-			      const unsigned int pid)
+			      const unsigned int pid,
+			      const bool b=true)
     : basic_pid_elem_iterator<T>(p, pid, false)
   {
-    this->advance();
+    if (b) this->advance();
   }
 
 protected:
@@ -597,7 +623,7 @@ protected:
   /**
    * Definition of the predicate - negates the predicate of the parent class.
    */
-  virtual bool predicate() const { return !(basic_pid_elem_iterator<T>::predicate()); }
+  virtual bool predicate() const { return !basic_pid_elem_iterator<T>::predicate(); }
 };
 
 
@@ -607,7 +633,8 @@ protected:
  * create when they want to iterate over all elements
  * that DO NOT have a specific processor id.
  */
-typedef basic_not_pid_elem_iterator<std::vector<Elem*>::iterator> not_pid_elem_iterator;
+typedef basic_not_pid_elem_iterator<std::vector<Elem*>::iterator>
+  not_pid_elem_iterator;
 
 
 /**
@@ -616,7 +643,8 @@ typedef basic_not_pid_elem_iterator<std::vector<Elem*>::iterator> not_pid_elem_i
  * create when they want to iterate over all active elements
  * with a specific processor id.
  */
-typedef basic_not_pid_elem_iterator<std::vector<Elem*>::const_iterator> const_not_pid_elem_iterator;
+typedef basic_not_pid_elem_iterator<std::vector<Elem*>::const_iterator>
+  const_not_pid_elem_iterator;
 
 
 
@@ -652,7 +680,8 @@ protected:
    */
   virtual bool predicate() const
   {
-    return (basic_pid_elem_iterator<T>::predicate() && (*this->_current)->active());
+    return (basic_pid_elem_iterator<T>::predicate() &&
+	    (*this->_current)->active());
   }
 };
 
@@ -663,7 +692,8 @@ protected:
  * create when they want to iterate over all active elements
  * that have a specific processor id in non-const functions.
  */
-typedef basic_active_pid_elem_iterator<std::vector<Elem*>::iterator> active_pid_elem_iterator;
+typedef basic_active_pid_elem_iterator<std::vector<Elem*>::iterator>
+  active_pid_elem_iterator;
 
 
 /**
@@ -672,7 +702,8 @@ typedef basic_active_pid_elem_iterator<std::vector<Elem*>::iterator> active_pid_
  * create when they want to iterate over all active elements
  * that have a specific processor id in const functions.
  */
-typedef basic_active_pid_elem_iterator<std::vector<Elem*>::const_iterator> const_active_pid_elem_iterator;
+typedef basic_active_pid_elem_iterator<std::vector<Elem*>::const_iterator>
+  const_active_pid_elem_iterator;
 
 
 
@@ -693,10 +724,11 @@ public:
   /**
    * Constructor.
    */
-  basic_local_elem_iterator(const std::pair<T,T>& p)
+  basic_local_elem_iterator(const std::pair<T,T>& p,
+			    const bool b=true)
     : basic_pid_elem_iterator<T>(p, libMeshBase::processor_id(), false)
   {
-    this->advance();
+    if (b) this->advance();
   }
 
 protected:
@@ -717,7 +749,8 @@ protected:
  * create when they want to iterate over all elements
  * on the local processor in non-const functions.
  */
-typedef basic_local_elem_iterator<std::vector<Elem*>::iterator> local_elem_iterator;
+typedef basic_local_elem_iterator<std::vector<Elem*>::iterator>
+  local_elem_iterator;
 
 
 /**
@@ -726,7 +759,8 @@ typedef basic_local_elem_iterator<std::vector<Elem*>::iterator> local_elem_itera
  * create when they want to iterate over all elements
  * on the local processor in const functions.
  */
-typedef basic_local_elem_iterator<std::vector<Elem*>::const_iterator> const_local_elem_iterator;
+typedef basic_local_elem_iterator<std::vector<Elem*>::const_iterator>
+  const_local_elem_iterator;
 
 
 
@@ -747,10 +781,11 @@ public:
   /**
    * Constructor.
    */
-  basic_active_local_elem_iterator(const std::pair<T,T>& p)
+  basic_active_local_elem_iterator(const std::pair<T,T>& p,
+				   const bool b=true)
     : basic_active_pid_elem_iterator<T>(p, libMeshBase::processor_id(), false)
   {
-    this->advance();
+    if (b) this->advance();
   }
 
 protected:
@@ -771,7 +806,8 @@ protected:
  * create when they want to iterate over all active elements
  * on the local processor in non-const functions.
  */
-typedef basic_active_local_elem_iterator<std::vector<Elem*>::iterator> active_local_elem_iterator;
+typedef basic_active_local_elem_iterator<std::vector<Elem*>::iterator>
+  active_local_elem_iterator;
 
 
 /**
@@ -780,7 +816,8 @@ typedef basic_active_local_elem_iterator<std::vector<Elem*>::iterator> active_lo
  * create when they want to iterate over all active elements
  * on the local processor in const functions.
  */
-typedef basic_active_local_elem_iterator<std::vector<Elem*>::const_iterator> const_active_local_elem_iterator;
+typedef basic_active_local_elem_iterator<std::vector<Elem*>::const_iterator>
+  const_active_local_elem_iterator;
 
 
 #endif // #ifdef __elem_iterators_h__

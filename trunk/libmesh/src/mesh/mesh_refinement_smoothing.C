@@ -1,4 +1,4 @@
-// $Id: mesh_refinement_smoothing.C,v 1.1 2003-05-21 22:17:59 benkirk Exp $
+// $Id: mesh_refinement_smoothing.C,v 1.2 2003-05-28 03:17:50 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -50,7 +50,8 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
     for (; elem_it != elem_end; ++elem_it)
       {
 	const Elem* elem = *elem_it;	
-	const unsigned char elem_level = elem->level();
+	const unsigned char elem_level =
+	  elem->level() + ((elem->refinement_flag() == Elem::REFINE) ? 1 : 0);
 
 	// Set the max_level at each node
 	for (unsigned int n=0; n<elem->n_nodes(); n++)

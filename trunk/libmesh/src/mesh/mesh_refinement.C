@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.17 2003-05-22 21:18:03 benkirk Exp $
+// $Id: mesh_refinement.C,v 1.18 2003-05-28 03:17:50 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -170,8 +170,8 @@ void MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
 	this->make_refinement_compatible(maintain_level_one);
 
       const bool smoothing_satisfied =
-	!this->eliminate_unrefined_patches() &&
-	!this->limit_level_mismatch_at_node(1);
+ 	!this->eliminate_unrefined_patches() &&
+ 	!this->limit_level_mismatch_at_node(1);
       
       if (coarsening_satisfied &&
 	  refinement_satisfied &&
@@ -251,7 +251,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
     
   /**
    * First we look at all the active level-0 elements.  Since it doesn't make
-   * sense to coarsen them we must de-set their coarsen flags if
+   * sense to coarsen them we must un-set their coarsen flags if
    * they are set.
    */
   for (unsigned int e=0; e<mesh.n_elem(); e++)

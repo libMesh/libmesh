@@ -1,4 +1,4 @@
-// $Id: node.h,v 1.9 2003-04-30 21:09:24 benkirk Exp $
+// $Id: node.h,v 1.10 2003-05-28 03:17:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -44,7 +44,7 @@ class Node;
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.9 $
+ * \version $Revision: 1.10 $
  */
 
 class Node : public Point,
@@ -191,7 +191,7 @@ inline
 Node* Node::build(const Point& p,
 		  const unsigned int id)
 {
-  return new Node(p, id);  
+  return new Node(p,id);  
 }
 
 
@@ -210,7 +210,7 @@ Node* Node::build(const Real x,
 inline
 bool Node::active () const
 {
-  return (id() != Node::invalid_id);
+  return (this->id() != Node::invalid_id);
 }
 
 

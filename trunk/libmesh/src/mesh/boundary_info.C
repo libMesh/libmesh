@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.21 2003-05-15 23:34:35 benkirk Exp $
+// $Id: boundary_info.C,v 1.22 2003-05-28 03:17:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -95,7 +95,6 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh)
     
 
   boundary_mesh.set_n_subdomains() = id_map.size();
-  boundary_mesh.set_n_processors() = id_map.size();
 
   // Add additional sides that aren't flagged with boundary conditions
   const_active_elem_iterator       el     (mesh.elements_begin());
