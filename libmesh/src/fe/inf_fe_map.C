@@ -1,4 +1,4 @@
-// $Id: inf_fe_map.C,v 1.5 2003-05-15 23:34:35 benkirk Exp $
+// $Id: inf_fe_map.C,v 1.6 2003-06-08 17:28:42 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -189,33 +189,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 	
 	// The intersection of the plane and the line is given by
 	// can be computed solving a linear 3x3 system
-	// a*({p1}-{p0})+b*({p2}-{p0})-c*({fp}-{o})={fp}-{p0}.
-	
-	// old code works only if the origin of the infinite element is (0,0,0)	    
-	/*
-	  const Real c_factor = (p1(0)*fp(2)*p0(1)-p1(1)*fp(2)*p0(0)
-	  +p1(1)*fp(2)*p2(0)-p1(0)*fp(2)*p2(1)
-	  -p0(1)*fp(2)*p2(0)+p1(0)*fp(1)*p2(2)
-	  +p1(2)*fp(0)*p2(1)-p1(2)*fp(0)*p0(1)
-	  -p1(0)*fp(1)*p0(2)+p1(1)*fp(0)*p0(2)
-	  +p1(2)*fp(1)*p0(0)-p1(2)*p0(0)*p2(1)
-	  +p1(2)*p0(1)*p2(0)+p2(2)*p1(1)*p0(0)
-	  -p2(2)*p1(0)*p0(1)-p1(1)*fp(0)*p2(2)
-	  -p1(2)*fp(1)*p2(0)+p0(2)*p1(0)*p2(1)
-	  -p0(2)*p1(1)*p2(0)+p0(0)*fp(2)*p2(1)
-	  +p0(2)*fp(1)*p2(0)+p0(1)*fp(0)*p2(2)
-	  -p0(0)*fp(1)*p2(2)-p0(2)*fp(0)*p2(1))/
-	  (p1(0)*fp(2)*p2(1)-p1(0)*fp(2)*p0(1)
-	  -p1(0)*fp(1)*p2(2)+p1(0)*fp(1)*p0(2)
-	  -p0(0)*fp(2)*p2(1)+p0(0)*fp(1)*p2(2)
-	  -p1(1)*fp(2)*p2(0)+p1(1)*fp(2)*p0(0)
-	  +p1(1)*fp(0)*p2(2)-p1(1)*fp(0)*p0(2)
-	  +p0(1)*fp(2)*p2(0)-p0(1)*fp(0)*p2(2)
-	  +p1(2)*fp(1)*p2(0)-p1(2)*fp(1)*p0(0)
-	  -p1(2)*fp(0)*p2(1)+p1(2)*fp(0)*p0(1)
-	  -p0(2)*fp(1)*p2(0)+p0(2)*fp(0)*p2(1));
-	*/
-	
+	// a*({p1}-{p0})+b*({p2}-{p0})-c*({fp}-{o})={fp}-{p0}.  	
 	const Real c_factor = -(p1(0)*fp(1)*p0(2)-p1(0)*fp(2)*p0(1)
 				+fp(0)*p1(2)*p0(1)-p0(0)*fp(1)*p1(2)
 				+p0(0)*fp(2)*p1(1)+p2(0)*fp(2)*p0(1)
@@ -470,6 +444,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
     }
   while (error > tolerance);
 
+
   /*
    * 4.
    *
@@ -506,6 +481,9 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
       {
         Real a_interpolated = 0.;
 
+	// the distance between the origin and the physical point
+	const Real fp_o_dist = Point(o-physical_point).size(); 
+
 	for (unsigned int i=0; i<n_base_mapping_sf; i++)
 	  {
 	    // the radial distance of the i-th base mapping point
@@ -518,18 +496,18 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 							     p);
 	  }
 
-	p(1) = 1. - 2*a_interpolated/physical_point(1);
+	p(1) = 1. - 2*a_interpolated/fp_o_dist;
 
 #ifdef DEBUG
 	// the radial distance should always be >= -1.
 
-	if (p(1)+1 < tolerance)
-	  {
-	    here();
-	    std::cerr << "WARNING: radial distance p(1) is "
-		      << p(1)
-		      << std::endl;
-	  }
+	// if (p(1)+1 < tolerance)
+	//  {
+	//    here();
+	//    std::cerr << "WARNING: radial distance p(1) is "
+	//	      << p(1)
+	//	      << std::endl;
+	//  }
 #endif
 	
 	break;
@@ -539,6 +517,9 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
     case 3:
       {
         Real a_interpolated = 0.;
+
+	// the distance between the origin and the physical point
+	const Real fp_o_dist = Point(o-physical_point).size(); 
 
 	for (unsigned int i=0; i<n_base_mapping_sf; i++)
 	  {
@@ -554,20 +535,18 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 
 	  }
 
-	p(2) = 1. - 2*a_interpolated/physical_point.size();
-
-
+	p(2) = 1. - 2*a_interpolated/fp_o_dist;
 
 #ifdef DEBUG
 	// the radial distance should always be >= -1.
 
-	if (p(2)+1 < tolerance)
-	  {
-	    here();
-	    std::cerr << "WARNING: radial distance p(2) is "
-		      << p(2)
-		      << std::endl;
-	  }
+	// if (p(2)+1 < tolerance)
+	//  {
+	    // here();
+	    // std::cerr << "WARNING: radial distance p(2) is "
+	    //	      << p(2)
+	    //	      << std::endl;
+	//  }
 #endif
 	
 	break;
@@ -603,24 +582,10 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
    * Stop logging the map inversion.
    */
   STOP_LOG("inverse_map()", "InfFE");
-
-  // std::cout << "This is the point we found: " << std::endl;
-  // p.print();
   
   return p;
 }
 
-
-
-// No need to overload this
-//
-// bool InfFE<Dim,T_radial,T_map>::on_reference_element(const Point& p, 
-// const ElemType t, 
-// const Real eps)
-// {
-//   error();
-//   return false;
-// }
 
 
 
