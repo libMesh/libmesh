@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.13 2003-02-25 18:34:52 benkirk Exp $
+// $Id: mesh_generation.C,v 1.14 2003-02-27 22:26:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -256,13 +256,13 @@ void Mesh::build_cube(const unsigned int nx,
 		  if (j == 0)
 		    boundary_info.add_side(elem(e), 0, 0);
 		  
-		  else if (j == (2*ny-1))
+		  else if (j == 2*(ny-1))
 		    boundary_info.add_side(elem(e), 2, 2);
 		  
 		  if (i == 0)
 		    boundary_info.add_side(elem(e), 3, 3);
 		  
-		  else if (i == (2*nx-1))
+		  else if (i == 2*(nx-1))
 		    boundary_info.add_side(elem(e), 1, 1);
 		  
 		  e++;
@@ -394,8 +394,7 @@ void Mesh::build_cube(const unsigned int nx,
 		for (unsigned int i=0; i<nx; i++)
 		  {
 		    if ((type == INVALID_ELEM) ||
-			(type == HEX8) ||
-			(type == PRISM6))
+			(type == HEX8))
 		      {
 			_elements[e] = new Hex8;
 			
@@ -408,6 +407,24 @@ void Mesh::build_cube(const unsigned int nx,
 			elem(e)->set_node(6) = _nodes[G(i+1,j+1,k+1)];
 			elem(e)->set_node(7) = _nodes[G(i,j+1,k+1)  ];
 			
+			if (k == 0)
+			  boundary_info.add_side(elem(e), 0, 0);
+			
+			else if (k == (nz-1))
+			  boundary_info.add_side(elem(e), 5, 5);
+			
+			if (j == 0)
+			  boundary_info.add_side(elem(e), 1, 1);
+
+			else if (j == (ny-1))
+			  boundary_info.add_side(elem(e), 3, 3);
+ 			
+			if (i == 0)
+			  boundary_info.add_side(elem(e), 4, 4);
+ 			
+			else if (i == (nx-1))
+			  boundary_info.add_side(elem(e), 2, 2);
+		  
 			e++;
 		      }
 
@@ -518,6 +535,25 @@ void Mesh::build_cube(const unsigned int nx,
 			    elem(e)->set_node(26) = _nodes[G(i+1,j+1,k+1)];
 			  }
 			
+			
+			if (k == 0)
+			  boundary_info.add_side(elem(e), 0, 0);
+			
+			else if (k == 2*(nz-1))
+			  boundary_info.add_side(elem(e), 5, 5);
+			
+			if (j == 0)
+			  boundary_info.add_side(elem(e), 1, 1);
+
+			else if (j == 2*(ny-1))
+			  boundary_info.add_side(elem(e), 3, 3);
+ 			
+			if (i == 0)
+			  boundary_info.add_side(elem(e), 4, 4);
+ 			
+			else if (i == 2*(nx-1))
+			  boundary_info.add_side(elem(e), 2, 2);
+
 			e++;
 		      }
 

@@ -25,3 +25,12 @@ div.fragment {
     background-attachment: fixed;
     background-position: center;
 }
+
+
+
+tr {
+    background-image: url(images/bg_more_muted.png);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+}

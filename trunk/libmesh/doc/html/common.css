@@ -151,6 +151,11 @@ td.indexvalue {
 }
 
 
+tr {
+    background: #eeeeee;
+}
+
+
 p,ul,ol {
    padding-left   : 0;
    margin-left    : 1.5em;

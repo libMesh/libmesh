@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.16 2003-02-21 18:31:31 benkirk Exp $
+// $Id: mesh_base.C,v 1.17 2003-02-27 22:26:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -1032,7 +1032,7 @@ void MeshBase::sfc_partition(const unsigned int n_sbdmns,
       wgt += elem(table[e]-1)->n_nodes();
     }
   
-  libMesh::log.stop_event("sfc_partiton()");
+  libMesh::log.stop_event("sfc_partition()");
 
   return;
   
