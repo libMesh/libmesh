@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.23 2003-07-05 09:59:14 ddreyer Exp $
+# $Id: Make.common.in,v 1.24 2003-08-09 21:34:42 ddreyer Exp $
 
 
 ###############################################################################
@@ -284,17 +284,7 @@ ifeq ($(enable-optional),yes)
   # Petsc
   ifeq ($(enable-petsc),yes)
 
-    # Depending on petsc version, we include different files
-    ifeq ($(petsc-version),2.1.0)
-      include $(PETSC_DIR)/bmake/$(PETSC_ARCH)/base.site # 2.1.0 style
-    else
-      include $(PETSC_DIR)/bmake/$(PETSC_ARCH)/packages  # 2.1.1 or later style
-    endif
-
-
-    INCLUDE += -I$(PETSC_DIR)/include -I$(PETSC_DIR)/bmake/$(PETSC_ARCH) \
-                $(MPI_INCLUDE) $(BLOCKSOLVE_INCLUDE) $(HYPRE_INCLUDE)
-
+    # define BOPT first since it may be used in the packages file
     ifeq ($(enable-complex),yes)
       CXXFLAGS     += -DPETSC_USE_COMPLEX
       CFLAGS       += -DPETSC_USE_COMPLEX
@@ -306,10 +296,22 @@ ifeq ($(enable-optional),yes)
     endif
 
     ifeq ($(debug-mode),on)
-      PETSC_LIB = $(PETSC_DIR)/lib/lib$(PETSC_BOPT.g)/$(PETSC_ARCH)
-    else	
-      PETSC_LIB = $(PETSC_DIR)/lib/lib$(PETSC_BOPT.o)/$(PETSC_ARCH)
-    endif	
+      BOPT = $(PETSC_BOPT.g)
+    else
+      BOPT = $(PETSC_BOPT.o)
+    endif
+
+    # Depending on petsc version, we include different files
+    ifeq ($(petsc-version),2.1.0)
+      include $(PETSC_DIR)/bmake/$(PETSC_ARCH)/base.site # 2.1.0 style
+    else
+      C_CLINKER_SLFLAG = $(RPATHFLAG)# necessary for PETSc 2.1.6
+      include $(PETSC_DIR)/bmake/$(PETSC_ARCH)/packages  # 2.1.1 or later style
+    endif
+
+
+    INCLUDE += -I$(PETSC_DIR)/include -I$(PETSC_DIR)/bmake/$(PETSC_ARCH) \
+                $(MPI_INCLUDE) $(BLOCKSOLVE_INCLUDE) $(HYPRE_INCLUDE)
 
     ifeq ($(enable-shared),yes)
       CXXFLAGS     += -DPETSC_USE_DYNAMIC_LIBRARIES
@@ -317,7 +319,7 @@ ifeq ($(enable-optional),yes)
       DLFLAGS      += $(RPATHFLAG)$(PETSC_LIB)
     endif
 
-    libs-PETSC = -L$(PETSC_LIB) \
+    libs-PETSC = -L$(PETSC_DIR)/lib/lib$(BOPT)/$(PETSC_ARCH) \
 	         -lpetscsles \
 		 -lpetscdm \
 		 -lpetscmat \
