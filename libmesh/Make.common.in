@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.39 2005-01-03 22:10:07 benkirk Exp $
+# $Id: Make.common.in,v 1.40 2005-01-04 16:40:26 jwpeterson Exp $
 
 
 ###############################################################################
@@ -315,6 +315,7 @@ ifeq ($(enable-optional),yes)
 		   -lpetscdm \
 		   -lpetscmat \
 		   -lpetscvec \
+                   -lpetscsnes \
 		   -lpetsc
     else                           # 2.1.6 & older style
       libs-PETSC = -L$(PETSC_LIB) \
@@ -323,6 +324,7 @@ ifeq ($(enable-optional),yes)
 		   -lpetscdm \
 		   -lpetscmat \
 		   -lpetscvec \
+                   -lpetscsnes \
 		   -lpetsc
     endif
 

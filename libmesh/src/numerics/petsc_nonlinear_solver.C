@@ -1,4 +1,4 @@
-// $Id: petsc_nonlinear_solver.C,v 1.3 2005-01-04 03:03:26 benkirk Exp $
+// $Id: petsc_nonlinear_solver.C,v 1.4 2005-01-04 16:40:28 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -41,6 +41,15 @@
 // Give them an obscure name to avoid namespace pollution.
 extern "C"
 {
+  // Older versions of PETSc do not have the different int typedefs.
+  // On 64-bit machines, PetscInt may actually be a long long int.
+  // This change occurred in Petsc-2.2.1.
+# if (((PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)) || \
+      ((PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 1)))
+  typedef int PetscErrorCode;
+  typedef int PetscInt;
+#endif
+  
   //-------------------------------------------------------------------
   // this function is called by PETSc at the end of each nonlinear step  
   PetscErrorCode
@@ -183,6 +192,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
   assert(r   != NULL);
 
   int ierr=0;
+  int n_iterations =0;
 
   ierr = SNESSetFunction (_snes, r->vec(), __libmesh_petsc_snes_residual, this);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
@@ -190,12 +200,19 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
   ierr = SNESSetJacobian (_snes, jac->mat(), jac->mat(), __libmesh_petsc_snes_jacobian, this);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
-  ierr = SNESSolve (_snes, x->vec());
+  // Older versions (at least up to 2.1.5) of SNESSolve took 3 arguments,
+  // the last one being a pointer to an int to hold the number of iterations required.
+# if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 1)
+ ierr = SNESSolve (_snes, x->vec(), &n_iterations);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
-
+#else 	 
+ ierr = SNESSolve (_snes, x->vec());
+         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+#endif
 	 
-  // return the # of its. and the final residual norm.
-  return std::make_pair(0, 0.);
+  // return the # of its. and the final residual norm.  Note that
+  // n_iterations may be zero for PETSc versions 2.2.x and greater.
+  return std::make_pair(n_iterations, 0.);
 }
 
 
