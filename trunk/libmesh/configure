@@ -850,18 +850,18 @@ Optional Features:
   --enable-ifem build with infinite elements
   --enable-xdr Set compiler flags to enable xdr binary I/O
   --enable-mgf-workaround Set compiler flags to work around MGF bc problem
+  --enable-complex Set compiler flags to build with complex number support
+  --enable-reference-counting build with reference counting suppport
+  --enable-perflog build with performance logging turned on
+  --enable-optional Set compiler flags to disable optional external libraries
   --enable-hdf4 Set compiler flags to enable HDF4 binary I/O
   --enable-netcdf Set compiler flags to enable netCDF binary I/O
   --enable-exodus build with ExodusII binary support
-  --enable-optional Set compiler flags to disable optional external libraries
   --enable-sfc Set compiler flags to build with Sfc suppport
   --enable-metis Set compiler flags to build with Metis suppport
   --enable-tecplot build with Tecplot binary support
   --enable-papi Set compiler flags to build with Papi suppport
   --enable-petsc Set compiler flags to build with Petsc suppport
-  --enable-complex Set compiler flags to build with complex number support
-  --enable-reference-counting build with reference counting suppport
-  --enable-perflog build with performance logging turned on
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -3523,6 +3523,7 @@ echo "${ECHO_T}<<< Configuring library with expensive data structures enabled >>
 fi
 
 
+
 # Check whether --enable-ifem or --disable-ifem was given.
 if test "${enable_ifem+set}" = set; then
   enableval="$enable_ifem"
@@ -3540,9 +3541,6 @@ _ACEOF
   echo "$as_me:$LINENO: result: <<< Configuring library with infinite elements >>>" >&5
 echo "${ECHO_T}<<< Configuring library with infinite elements >>>" >&6
 fi
-
-
-
 
 
 
@@ -3688,6 +3686,86 @@ _ACEOF
 echo "${ECHO_T}<<< Configuring library to work around broken MGF boundary conditions >>>" >&6
    fi
    fi
+
+
+
+# Check whether --enable-complex or --disable-complex was given.
+if test "${enable_complex+set}" = set; then
+  enableval="$enable_complex"
+  enablecomplex=$enableval
+else
+  enablecomplex=no
+fi;
+
+if test "$enablecomplex" != no ; then
+
+cat >>confdefs.h <<\_ACEOF
+#define USE_COMPLEX_NUMBERS 1
+_ACEOF
+
+  echo "$as_me:$LINENO: result: <<< Configuring library with complex number support >>>" >&5
+echo "${ECHO_T}<<< Configuring library with complex number support >>>" >&6
+
+fi
+
+
+
+# Check whether --enable-reference-counting or --disable-reference-counting was given.
+if test "${enable_reference_counting+set}" = set; then
+  enableval="$enable_reference_counting"
+  enablerefct=$enableval
+else
+  enablerefct=yes
+fi;
+
+if test "$enablerefct" != no ; then
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_REFERENCE_COUNTING 1
+_ACEOF
+
+  echo "$as_me:$LINENO: result: <<< Configuring library with reference counting support >>>" >&5
+echo "${ECHO_T}<<< Configuring library with reference counting support >>>" >&6
+fi
+
+
+
+# Check whether --enable-perflog or --disable-perflog was given.
+if test "${enable_perflog+set}" = set; then
+  enableval="$enable_perflog"
+  enableperflog=$enableval
+else
+  enableperflog=no
+fi;
+
+if test "$enableperflog" != no ; then
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_PERFORMANCE_LOGGING 1
+_ACEOF
+
+  echo "$as_me:$LINENO: result: <<< Configuring library with performance logging support >>>" >&5
+echo "${ECHO_T}<<< Configuring library with performance logging support >>>" >&6
+fi
+
+
+
+# Check whether --enable-optional or --disable-optional was given.
+if test "${enable_optional+set}" = set; then
+  enableval="$enable_optional"
+  enableoptional=$enableval
+else
+  enableoptional=yes
+fi;
+
+
+if test "$enableoptional" != no ; then
+   echo "$as_me:$LINENO: result: ---------------------------------------------" >&5
+echo "${ECHO_T}---------------------------------------------" >&6
+   echo "$as_me:$LINENO: result: ----- Configuring for optional packages -----" >&5
+echo "${ECHO_T}----- Configuring for optional packages -----" >&6
+   echo "$as_me:$LINENO: result: ---------------------------------------------" >&5
+echo "${ECHO_T}---------------------------------------------" >&6
 
 
 # Check whether --enable-hdf4 or --disable-hdf4 was given.
@@ -3920,25 +3998,6 @@ fi
 
 fi
 
-
-
-
-# Check whether --enable-optional or --disable-optional was given.
-if test "${enable_optional+set}" = set; then
-  enableval="$enable_optional"
-  enableoptional=$enableval
-else
-  enableoptional=yes
-fi;
-
-
-if test "$enableoptional" != no ; then
-   echo "$as_me:$LINENO: result: ---------------------------------------------" >&5
-echo "${ECHO_T}---------------------------------------------" >&6
-   echo "$as_me:$LINENO: result: ----- Configuring for optional packages -----" >&5
-echo "${ECHO_T}----- Configuring for optional packages -----" >&6
-   echo "$as_me:$LINENO: result: ---------------------------------------------" >&5
-echo "${ECHO_T}---------------------------------------------" >&6
 
 
 # Check whether --enable-sfc or --disable-sfc was given.
@@ -4547,7 +4606,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:4550:" \
+echo "$as_me:4609:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -4713,7 +4772,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_verb"
-(eval echo $as_me:4716: \"$ac_link\") >&5
+(eval echo $as_me:4775: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -4792,7 +4851,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_cv_prog_f77_v"
-(eval echo $as_me:4795: \"$ac_link\") >&5
+(eval echo $as_me:4854: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -4978,67 +5037,6 @@ _ACEOF
 
 
 
-fi
-
-
-
-# Check whether --enable-complex or --disable-complex was given.
-if test "${enable_complex+set}" = set; then
-  enableval="$enable_complex"
-  enablecomplex=$enableval
-else
-  enablecomplex=no
-fi;
-
-if test "$enablecomplex" != no ; then
-
-cat >>confdefs.h <<\_ACEOF
-#define USE_COMPLEX_NUMBERS 1
-_ACEOF
-
-  echo "$as_me:$LINENO: result: <<< Configuring library with complex number support >>>" >&5
-echo "${ECHO_T}<<< Configuring library with complex number support >>>" >&6
-
-fi
-
-
-
-# Check whether --enable-reference-counting or --disable-reference-counting was given.
-if test "${enable_reference_counting+set}" = set; then
-  enableval="$enable_reference_counting"
-  enablerefct=$enableval
-else
-  enablerefct=yes
-fi;
-
-if test "$enablerefct" != no ; then
-
-cat >>confdefs.h <<\_ACEOF
-#define ENABLE_REFERENCE_COUNTING 1
-_ACEOF
-
-  echo "$as_me:$LINENO: result: <<< Configuring library with reference counting support >>>" >&5
-echo "${ECHO_T}<<< Configuring library with reference counting support >>>" >&6
-fi
-
-
-
-# Check whether --enable-perflog or --disable-perflog was given.
-if test "${enable_perflog+set}" = set; then
-  enableval="$enable_perflog"
-  enableperflog=$enableval
-else
-  enableperflog=no
-fi;
-
-if test "$enableperflog" != no ; then
-
-cat >>confdefs.h <<\_ACEOF
-#define ENABLE_PERFORMANCE_LOGGING 1
-_ACEOF
-
-  echo "$as_me:$LINENO: result: <<< Configuring library with performance logging support >>>" >&5
-echo "${ECHO_T}<<< Configuring library with performance logging support >>>" >&6
 fi
 
 
@@ -5723,6 +5721,8 @@ s,@CXXCPP@,$CXXCPP,;t t
 s,@PWD@,$PWD,;t t
 s,@enableshared@,$enableshared,;t t
 s,@enablexdr@,$enablexdr,;t t
+s,@enablecomplex@,$enablecomplex,;t t
+s,@enableoptional@,$enableoptional,;t t
 s,@HDF4_INCLUDE_PATH@,$HDF4_INCLUDE_PATH,;t t
 s,@HDF4_LIB_PATH@,$HDF4_LIB_PATH,;t t
 s,@HDF4_LIB_NAMES@,$HDF4_LIB_NAMES,;t t
@@ -5733,7 +5733,6 @@ s,@enablenetcdf@,$enablenetcdf,;t t
 s,@LIBEXOII@,$LIBEXOII,;t t
 s,@EXODUS_INCLUDE_PATH@,$EXODUS_INCLUDE_PATH,;t t
 s,@enableexodus@,$enableexodus,;t t
-s,@enableoptional@,$enableoptional,;t t
 s,@SFC_INCLUDE_PATH@,$SFC_INCLUDE_PATH,;t t
 s,@enablesfc@,$enablesfc,;t t
 s,@METIS_INCLUDE_PATH@,$METIS_INCLUDE_PATH,;t t
@@ -5749,7 +5748,6 @@ s,@FLIBS@,$FLIBS,;t t
 s,@PETSC_DIR@,$PETSC_DIR,;t t
 s,@petscversion@,$petscversion,;t t
 s,@enablepetsc@,$enablepetsc,;t t
-s,@enablecomplex@,$enablecomplex,;t t
 s,@DOXYGEN@,$DOXYGEN,;t t
 s,@DOT@,$DOT,;t t
 s,@DOTPATH@,$DOTPATH,;t t
@@ -6733,6 +6731,8 @@ s,@CXXCPP@,$CXXCPP,;t t
 s,@PWD@,$PWD,;t t
 s,@enableshared@,$enableshared,;t t
 s,@enablexdr@,$enablexdr,;t t
+s,@enablecomplex@,$enablecomplex,;t t
+s,@enableoptional@,$enableoptional,;t t
 s,@HDF4_INCLUDE_PATH@,$HDF4_INCLUDE_PATH,;t t
 s,@HDF4_LIB_PATH@,$HDF4_LIB_PATH,;t t
 s,@HDF4_LIB_NAMES@,$HDF4_LIB_NAMES,;t t
@@ -6743,7 +6743,6 @@ s,@enablenetcdf@,$enablenetcdf,;t t
 s,@LIBEXOII@,$LIBEXOII,;t t
 s,@EXODUS_INCLUDE_PATH@,$EXODUS_INCLUDE_PATH,;t t
 s,@enableexodus@,$enableexodus,;t t
-s,@enableoptional@,$enableoptional,;t t
 s,@SFC_INCLUDE_PATH@,$SFC_INCLUDE_PATH,;t t
 s,@enablesfc@,$enablesfc,;t t
 s,@METIS_INCLUDE_PATH@,$METIS_INCLUDE_PATH,;t t
@@ -6759,7 +6758,6 @@ s,@FLIBS@,$FLIBS,;t t
 s,@PETSC_DIR@,$PETSC_DIR,;t t
 s,@petscversion@,$petscversion,;t t
 s,@enablepetsc@,$enablepetsc,;t t
-s,@enablecomplex@,$enablecomplex,;t t
 s,@DOXYGEN@,$DOXYGEN,;t t
 s,@DOT@,$DOT,;t t
 s,@DOTPATH@,$DOTPATH,;t t
