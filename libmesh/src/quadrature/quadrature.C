@@ -1,4 +1,4 @@
-// $Id: quadrature.C,v 1.16 2004-01-03 15:37:44 benkirk Exp $
+// $Id: quadrature.C,v 1.17 2004-03-18 16:41:00 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -93,7 +93,7 @@ void QBase::scale(std::pair<Real, Real> old_range,
 
 
 
-void QBase::tensor_product_quad(QBase& q1D)
+void QBase::tensor_product_quad(const QBase& q1D)
 {
   
   const unsigned int n_points = q1D.n_points();
@@ -119,7 +119,7 @@ void QBase::tensor_product_quad(QBase& q1D)
 
 
 
-void QBase::tensor_product_tri(QBase& gauss1D, QBase& jac1D)
+void QBase::tensor_product_tri(const QBase& gauss1D, const QBase& jac1D)
 {
   
   // Both rules should be of the same order
@@ -151,7 +151,7 @@ void QBase::tensor_product_tri(QBase& gauss1D, QBase& jac1D)
 
 
 
-void QBase::tensor_product_hex(QBase& q1D)
+void QBase::tensor_product_hex(const QBase& q1D)
 {
   const unsigned int n_points = q1D.n_points();
   
@@ -178,7 +178,7 @@ void QBase::tensor_product_hex(QBase& q1D)
 
 
 
-void QBase::tensor_product_prism(QBase& q1D, QBase& q2D)
+void QBase::tensor_product_prism(const QBase& q1D, const QBase& q2D)
 {
   const unsigned int n_points1D = q1D.n_points();
   const unsigned int n_points2D = q2D.n_points();
@@ -205,7 +205,7 @@ void QBase::tensor_product_prism(QBase& q1D, QBase& q2D)
 
 
 
-void QBase::tensor_product_tet(QBase& gauss1D, QBase& jacA1D, QBase& jacB1D)
+void QBase::tensor_product_tet(const QBase& gauss1D, const QBase& jacA1D, const QBase& jacB1D)
 {
   here();
 

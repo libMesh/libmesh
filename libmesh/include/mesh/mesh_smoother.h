@@ -1,4 +1,4 @@
-// $Id: mesh_smoother.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: mesh_smoother.h,v 1.3 2004-03-18 16:40:59 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -40,7 +40,7 @@
  *
  * \author John W. Peterson
  * \date 2002-2003
- * \version $Revision: 1.2 $
+ * \version $Revision: 1.3 $
  */
 
 
@@ -50,7 +50,7 @@ class MeshSmoother
 {
 public:
   /**
-   * Constructor.  Sets the constant mesh reference
+   * Constructor.  Sets the mesh reference
    * in the protected data section of the class.
    */
   MeshSmoother(Mesh& mesh) : _mesh(mesh) {}

@@ -1,4 +1,4 @@
-// $Id: mesh_smoother_laplace.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: mesh_smoother_laplace.h,v 1.3 2004-03-18 16:40:59 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -45,7 +45,7 @@
  *
  * \author John W. Peterson
  * \date 2002-2003
- * \version $Revision: 1.2 $
+ * \version $Revision: 1.3 $
  */
 
 
@@ -95,7 +95,7 @@ public:
    * Mainly for debugging, this function will print
    * out the connectivity graph which has been created.
    */
-  void print_graph();
+  void print_graph() const;
   
 private:
 

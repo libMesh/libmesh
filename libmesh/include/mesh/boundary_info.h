@@ -1,4 +1,4 @@
-// $Id: boundary_info.h,v 1.4 2004-03-18 15:43:37 jwpeterson Exp $
+// $Id: boundary_info.h,v 1.5 2004-03-18 16:40:59 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -85,7 +85,7 @@ public:
    * \p MeshData (disabled by default).
    */
   void sync (BoundaryMesh& boundary_mesh,
-	     const bool transfer_mesh_data = false) const;
+	     const bool transfer_mesh_data = false);
   
   /**
    * Add \p Node \p node with boundary id \p id to the boundary
