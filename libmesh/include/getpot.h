@@ -1,4 +1,4 @@
-// $Id: getpot.h,v 1.8 2003-06-26 11:00:31 benkirk Exp $
+// $Id: getpot.h,v 1.9 2003-09-03 16:35:23 benkirk Exp $
 //
 // (with patches from Michael Anderson for more general variable types)
 
@@ -587,6 +587,8 @@ GetPot::__get_next_token(std::istream& istr)
       continue;              // don't append un-backslashed backslashes
     token += tmp;
   }
+
+  return token;
 }
 
 
@@ -607,6 +609,8 @@ GetPot::__get_string(std::istream& istr)
 
     str += tmp;
   }
+
+  return str;
 }
 
 
@@ -632,6 +636,8 @@ GetPot::__get_until_closing_bracket(std::istream& istr)
     }
     str += tmp;
   }
+
+  return str;
 }
 
 
