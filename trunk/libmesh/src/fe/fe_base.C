@@ -1,4 +1,4 @@
-// $Id: fe_base.C,v 1.1 2003-01-24 19:38:45 jwpeterson Exp $
+// $Id: fe_base.C,v 1.2 2003-01-27 13:13:50 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,7 +31,7 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 {
   // The stupid AutoPtr<FEBase> ap(); return ap;
   // construct is required to satisfy IBM's xlC
-  
+
   switch (dim)
     {
       // 1D

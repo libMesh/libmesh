@@ -205,7 +205,7 @@ void assemble_primary(EquationSystems& es,
   
   fe->attach_quadrature_rule (&qrule);
   
-  AutoPtr<FEBase> fe_face(FEBase::build(3, fe_type));
+  AutoPtr<FEBase> fe_face(FEBase::build(dim, fe_type));
   QGauss   qface0(dim, FIFTH);
   //QTrap   qface0(dim);
   //QSimpson   qface0(dim);
@@ -348,7 +348,7 @@ void assemble_secondary(EquationSystems& es,
   // The Finite Element type.
   FEType fe_type (es("secondary").dof_map.component_type(0));
   
-  AutoPtr<FEBase> fe(FEBase::build(3, fe_type));
+  AutoPtr<FEBase> fe(FEBase::build(dim, fe_type));
   QGauss qrule(dim, FIFTH);
   
   fe->attach_quadrature_rule (&qrule);
