@@ -1,4 +1,4 @@
-// $Id: exact_solution.h,v 1.1 2004-05-24 19:58:39 jwpeterson Exp $
+// $Id: exact_solution.h,v 1.2 2004-05-27 04:37:12 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -25,6 +25,7 @@
 
 // Local Includes
 #include "equation_systems.h"
+#include "vector_value.h" // for RealGradient
 
 // Forward Declarations
 
@@ -54,11 +55,7 @@ public:
    * must be initialized with an EquationSystems
    * object.
    */
-  ExactSolution (EquationSystems& es) :
-    _exact_value (NULL),
-    _exact_deriv (NULL),
-    _equation_systems(es)
-    {}
+  ExactSolution (EquationSystems& es);
 
   /**
    * Destructor.
@@ -83,19 +80,55 @@ public:
    * which computes the exact derivative of the solution
    * at any point, time.
    */
-  void attach_exact_deriv ( Point fptr(const Point& p,
-				       const Real time,
-				       const std::string& sys_name,
-				       const std::string& unknown_name));
-				      
+  void attach_exact_deriv ( RealGradient fptr(const Point& p,
+					      const Real time,
+					      const std::string& sys_name,
+					      const std::string& unknown_name));
+
+  /**
+   * Computes and stores the error in the solution value e = u-u_h
+   * and the gradient grad(e) = grad(u) - grad(u_h).  Does not return
+   * any value.  For that you need to call the l2_error() or h1_error()
+   * functions respectively.
+   */
+  void compute_error(const std::string& sys_name,
+		     const std::string& unknown_name);
+  
+  /**
+   * This function returns the integrated L2 error for the system
+   * sys_name for the unknown unknown_name.  Note that no error computations
+   * are actually performed, you must call compute_error() for that.
+   */
+  Real l2_error(const std::string& sys_name,
+		const std::string& unknown_name);
+  
+  /**
+   * This function computes and returns the H1 (energy) error for the system
+   * sys_name for the unknown unknown_name.  Note that no error computations
+   * are actually performed, you must call compute_error() for that.
+   */
+  Real h1_error(const std::string& sys_name,
+		const std::string& unknown_name);
   
 private:
-  /**
-   * This function computes the error for a single unknown in a single
-   * system.  It is a private function since it is used by the implementation
-   * when solving for several unknowns in several systems.
-   */
   
+  /**
+   * This function computes the error (in the solution and its first
+   * derivative) for a single unknown in a single system.  It is a
+   * private function since it is used by the implementation when
+   * solving for several unknowns in several systems.
+   */
+  void _compute_error(const std::string& sys_name,
+		      const std::string& unknown_name,
+		      std::pair<Real, Real>& error_pair);
+
+  /**
+   * This function is responsible for checking the validity of
+   * the sys_name and unknown_name inputs, and returning a
+   * reference to the proper pair for storing the values.
+   */
+  std::pair<Real, Real>& _check_inputs(const std::string& sys_name,
+				       const std::string& unknown_name);
   
   /**
    * Function pointer to user-provided function which
@@ -110,16 +143,39 @@ private:
    * Function pointer to user-provided function which
    * computes the exact derivative of the solution.
    */
-  Point (* _exact_deriv) (const Point& p,
-			  const Real   time,
-			  const std::string& sys_name,
-			  const std::string& unknown_name);
+  RealGradient (* _exact_deriv) (const Point& p,
+				 const Real   time,
+				 const std::string& sys_name,
+				 const std::string& unknown_name);
+
+  /**
+   * Data structure which stores the errors:
+   * ||e|| = ||u - u_h||
+   * ||grad(e)|| = ||grad(u) - grad(u_h)||
+   * for each unknown in a single system.
+   * The name of the unknown is
+   * the key for the map.
+   */
+  typedef std::map<std::string, std::pair<Real, Real> > SystemErrorMap;
+
+  /**
+   * A map of SystemErrorMaps, which contains entries
+   * for each system in the EquationSystems object.
+   * This is required, since it is possible for two
+   * systems to have unknowns with the *same name*.
+   */
+  std::map<std::string, SystemErrorMap> _errors;
   
   /**
    * Constant reference to the \p EquationSystems object
    * used for the simulation.
    */
   EquationSystems& _equation_systems;
+
+  /**
+   * Constant reference to the mesh in the EquationSystems object.
+   */
+  const Mesh& _mesh;
 };
 
 
