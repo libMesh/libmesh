@@ -1,4 +1,4 @@
-// $Id: petsc_vector.C,v 1.13 2003-02-28 23:37:49 benkirk Exp $
+// $Id: petsc_vector.C,v 1.14 2003-03-04 22:31:17 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -36,7 +36,7 @@
   
 //   init (v.local_size(), v.size(), fast);
 
-//   vec = reinterpret_cast<const PetscVector<T>&>(v).vec;
+//   vec = dynamic_cast<const PetscVector<T>&>(v).vec;
 // }
 
 
@@ -215,7 +215,7 @@ void PetscVector<T>::add (const T a, const NumericVector<T>& v_in)
   int ierr=0;
   PetscScalar petsc_a=static_cast<PetscScalar>(a);
 
-  const PetscVector<T>& v = reinterpret_cast<const PetscVector<T>&>(v_in);
+  const PetscVector<T>& v = dynamic_cast<const PetscVector<T>&>(v_in);
   
   assert(size() == v.size());
   
@@ -258,7 +258,7 @@ PetscVector<T>::operator = (const NumericVector<T>& v_in)
 {
   int ierr=0;
   
-  const PetscVector<T>& v = reinterpret_cast<const PetscVector<T>&>(v_in);
+  const PetscVector<T>& v = dynamic_cast<const PetscVector<T>&>(v_in);
 
   assert (size() == v.size());
 
@@ -337,7 +337,7 @@ PetscVector<T>::operator = (const std::vector<T>& v)
 template <typename T>
 void PetscVector<T>::localize (NumericVector<T>& v_local_in) const
 {
-  PetscVector<T>& v_local = reinterpret_cast<PetscVector<T>&>(v_local_in);
+  PetscVector<T>& v_local = dynamic_cast<PetscVector<T>&>(v_local_in);
 
   assert (v_local.local_size() == size());
 
@@ -374,7 +374,7 @@ template <typename T>
 void PetscVector<T>::localize (NumericVector<T>& v_local_in,
 			       const std::vector<unsigned int>& send_list) const
 {
-  PetscVector<T>& v_local = reinterpret_cast<PetscVector<T>&>(v_local_in);
+  PetscVector<T>& v_local = dynamic_cast<PetscVector<T>&>(v_local_in);
 
   assert (v_local.local_size() == size());
   assert (send_list.size() <= v_local.size());

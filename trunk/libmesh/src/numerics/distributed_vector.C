@@ -1,4 +1,4 @@
-// $Id: distributed_vector.C,v 1.7 2003-02-28 23:37:49 benkirk Exp $
+// $Id: distributed_vector.C,v 1.8 2003-03-04 22:31:14 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -274,7 +274,7 @@ DistributedVector<T>::operator = (const NumericVector<T>& v_in)
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 
-  const DistributedVector<T>& v = reinterpret_cast<const DistributedVector<T>&>(v_in);
+  const DistributedVector<T>& v = dynamic_cast<const DistributedVector<T>&>(v_in);
   
   *this = v;
   
@@ -341,7 +341,7 @@ void DistributedVector<T>::localize (NumericVector<T>& v_local_in) const
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 
-  DistributedVector<T>& v_local = reinterpret_cast<DistributedVector<T>&>(v_local_in);
+  DistributedVector<T>& v_local = dynamic_cast<DistributedVector<T>&>(v_local_in);
 
   v_local._first_local_index = 0;
   

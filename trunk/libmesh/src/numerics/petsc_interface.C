@@ -1,4 +1,4 @@
-// $Id: petsc_interface.C,v 1.11 2003-02-26 13:59:52 benkirk Exp $
+// $Id: petsc_interface.C,v 1.12 2003-03-04 22:31:16 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -105,9 +105,9 @@ PetscInterface<T>::solve (SparseMatrix<T> &matrix_in,
 {
   init ();
   
-  PetscMatrix<T>& matrix   = reinterpret_cast<PetscMatrix<T>&>(matrix_in);
-  PetscVector<T>& solution = reinterpret_cast<PetscVector<T>&>(solution_in);
-  PetscVector<T>& rhs      = reinterpret_cast<PetscVector<T>&>(rhs_in);
+  PetscMatrix<T>& matrix   = dynamic_cast<PetscMatrix<T>&>(matrix_in);
+  PetscVector<T>& solution = dynamic_cast<PetscVector<T>&>(solution_in);
+  PetscVector<T>& rhs      = dynamic_cast<PetscVector<T>&>(rhs_in);
   
   int ierr=0;
   int its=0, max_its = static_cast<int>(m_its);

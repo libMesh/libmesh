@@ -1,4 +1,4 @@
-// $Id: laspack_interface.C,v 1.4 2003-02-20 04:59:58 benkirk Exp $
+// $Id: laspack_interface.C,v 1.5 2003-03-04 22:31:14 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -104,9 +104,9 @@ LaspackInterface::solve (SparseMatrix<Real> &matrix_in,
 {
   init ();
 
-  LaspackMatrix& matrix   = reinterpret_cast<LaspackMatrix&>(matrix_in);
-  LaspackVector& solution = reinterpret_cast<LaspackVector&>(solution_in);
-  LaspackVector& rhs      = reinterpret_cast<LaspackVector&>(rhs_in);
+  LaspackMatrix& matrix   = dynamic_cast<LaspackMatrix&>(matrix_in);
+  LaspackVector& solution = dynamic_cast<LaspackVector&>(solution_in);
+  LaspackVector& rhs      = dynamic_cast<LaspackVector&>(rhs_in);
   
   // Close the matrix and vectors in case this wasn't already done.
   matrix.close ();

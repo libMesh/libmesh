@@ -1,4 +1,4 @@
-// $Id: laspack_vector.C,v 1.7 2003-02-20 04:59:58 benkirk Exp $
+// $Id: laspack_vector.C,v 1.8 2003-03-04 22:31:15 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -38,7 +38,7 @@
   
 //   init (v.local_size(), v.size(), fast);
 
-//   vec = reinterpret_cast<const LaspackVector&>(v).vec;
+//   vec = dynamic_cast<const LaspackVector&>(v).vec;
 // }
 
 
@@ -112,7 +112,7 @@ void LaspackVector::add (const NumericVector<Real>& v)
 
 void LaspackVector::add (const Real a, const NumericVector<Real>& v_in)
 {
-  const LaspackVector& v = reinterpret_cast<const LaspackVector&>(v_in);
+  const LaspackVector& v = dynamic_cast<const LaspackVector&>(v_in);
   
   assert(size() == v.size());
 
@@ -145,7 +145,7 @@ LaspackVector::operator = (const Real s)
 NumericVector<Real>&
 LaspackVector::operator = (const NumericVector<Real>& v_in)
 {
-  const LaspackVector& v = reinterpret_cast<const LaspackVector&>(v_in);
+  const LaspackVector& v = dynamic_cast<const LaspackVector&>(v_in);
 
   *this = v;
 
@@ -190,7 +190,7 @@ LaspackVector::operator = (const std::vector<Real>& v)
 void LaspackVector::localize (NumericVector<Real>& v_local_in) const
 {
   LaspackVector& v_local =
-    reinterpret_cast<LaspackVector&>(v_local_in);
+    dynamic_cast<LaspackVector&>(v_local_in);
 
   v_local = *this;
 }
@@ -201,7 +201,7 @@ void LaspackVector::localize (NumericVector<Real>& v_local_in,
 			      const std::vector<unsigned int>& send_list) const
 {
   LaspackVector& v_local =
-    reinterpret_cast<LaspackVector&>(v_local_in);
+    dynamic_cast<LaspackVector&>(v_local_in);
 
   assert (send_list.size() == v_local.size());
 
