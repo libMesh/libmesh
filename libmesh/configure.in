@@ -1,5 +1,5 @@
 dnl --------------------------------------------------------------
-dnl $Id: configure.in,v 1.40 2004-02-12 20:52:12 benkirk Exp $
+dnl $Id: configure.in,v 1.41 2004-03-07 21:56:56 benkirk Exp $
 dnl --------------------------------------------------------------
 dnl Process this file with autoconf to produce a configure script.
 
@@ -9,7 +9,7 @@ dnl you call ./configure subsequently on different systems without
 dnl clearing the cache 
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
-AC_REVISION($Revision: 1.40 $)
+AC_REVISION($Revision: 1.41 $)
 
 
 AC_INIT
@@ -480,6 +480,8 @@ if (test "$enablemetis" != no) ; then
          -a "$enablemetis"    != no \
          -a "$enablempi"      != no) ; then
       CONFIGURE_PARMETIS
+   else
+     enableparmetis=no
    fi
    dnl -------------------------------------------------------------
 fi

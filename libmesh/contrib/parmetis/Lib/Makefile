@@ -18,12 +18,16 @@ ifeq ($(enable-shared),yes)
 endif
 
 
-#ifeq (x$(MPI_IMPL),x)
 ifeq ($(enable-parmetis),no)
   all::
 	@echo "<<< parmetis is disabled, not building >>>"
 else
-  all:: $(target)
+    ifeq (x$(MPI_IMPL),x)
+      all::
+	@echo "<<< no MPI found, not building parmetis >>>"
+    else
+      all:: $(target)
+    endif
 endif
 
 ../../lib/$(hosttype)_$(METHOD)/libparmetis.a: $(OBJS)
