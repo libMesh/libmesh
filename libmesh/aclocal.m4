@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.32 2003-06-25 05:21:10 jwpeterson Exp $
+dnl $Id: aclocal.m4,v 1.33 2003-06-25 08:32:32 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -536,14 +536,14 @@ dnl -------------------------------------------------------------
 AC_DEFUN(CONFIGURE_MPI, 
 [
   AC_CHECK_FILE($MPIHOME/include/mpi.h,
-                MPI_INCLUDE_PATH=$MPIHOME/include)
+                MPI_INCLUDE_PATH=-I$MPIHOME/include)
 
   dnl check for libmpich
   AC_CHECK_FILE($MPIHOME/lib/libmpich.a,
                 MPI_LIBRARY_PATH=$MPIHOME/lib/libmpich.a,
                 MPI_LIBRARY_PATH=/mpich_bar_not_there)
 
-  if (test -r $MPI_INCLUDE_PATH/mpi.h -a -r $MPI_LIBRARY_PATH) ; then
+  if (test -r $MPIHOME/include/mpi.h -a -r $MPI_LIBRARY_PATH) ; then
     AC_SUBST(MPI_INCLUDE_PATH)
     dnl Here is a little hack.  If MPI_LIBRARY_PATH is valid 
     dnl for libmpich, we assume it will also be available for

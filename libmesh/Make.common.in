@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.21 2003-06-24 05:33:50 benkirk Exp $
+# $Id: Make.common.in,v 1.22 2003-06-25 08:32:32 benkirk Exp $
 
 
 ###############################################################################
@@ -332,7 +332,7 @@ ifeq ($(enable-optional),yes)
     # MPI configuration when Petsc is absent
     ifeq ($(enable-mpi),yes)
       LIBS    += $(MPI_LIBRARY)
-      INCLUDE += -I$(MPI_INCLUDE)
+      INCLUDE += $(MPI_INCLUDE)
     endif
 
   endif #end ifeq ($(enable-petsc),yes)
