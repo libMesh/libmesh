@@ -1,4 +1,4 @@
-// $Id: fe_lagrange.C,v 1.17 2004-01-20 13:36:04 benkirk Exp $
+// $Id: fe_lagrange.C,v 1.18 2005-01-19 16:49:49 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -627,6 +627,12 @@ void FE<Dim,T>::compute_constraints (std::map<unsigned int,
 		      constraint_row.insert(std::make_pair (their_dof_g,
 							    static_cast<float>(their_dof_value)));
 		    }
+#ifdef DEBUG
+		  // Protect for the case u_i = 0.999 u_j,
+		  // in which case i better equal j.
+		  else if (their_dof_value >= .999)
+		    assert (my_dof_g == their_dof_g);
+#endif
 		}		      
 	    }
 	}
