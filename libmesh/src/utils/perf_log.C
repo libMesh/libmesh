@@ -1,4 +1,4 @@
-// $Id: perf_log.C,v 1.5 2003-01-24 17:24:45 jwpeterson Exp $
+// $Id: perf_log.C,v 1.6 2003-02-06 23:28:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -43,7 +43,8 @@ bool PerfLog::called = false;
 PerfLog::PerfLog(std::string cn,
 		 const bool le) :
   class_name(cn),
-  log_events(le)
+  log_events(le),
+  total_time(0.)
 {
   if (log_events)
     clear();
@@ -148,7 +149,8 @@ std::string PerfLog::get_perf_info() const
 	((double) (tstop.tv_usec - tstart.tv_usec))/1000000.;      
       
       out << " ---------------------------------------------------------------------"  << std::endl;
-      out << "| " << class_name << " Performance: elapsed_time=" << elapsed_time       << std::endl;
+      out << "| " << class_name << " Performance: Alive time=" << elapsed_time
+	  << ", Active time=" << total_time << std::endl;
       out << " ---------------------------------------------------------------------"  << std::endl;
       out << "| ";
       out.width(24);
@@ -163,7 +165,7 @@ std::string PerfLog::get_perf_info() const
       out.width(12);
       out << std::left << "Avg";
       
-      out.width(12);
+      out.width(13);
       out << std::left << "Percent of";
       
       out << "|" << std::endl;
@@ -181,8 +183,8 @@ std::string PerfLog::get_perf_info() const
       out.width(12);
       out << std::left << "Time";
       
-      out.width(12);
-      out << std::left << "Total Time";
+      out.width(13);
+      out << std::left << "Active Time";
       
       out << "|" << std::endl;
       out << "|---------------------------------------------------------------------|" << std::endl
@@ -210,12 +212,15 @@ std::string PerfLog::get_perf_info() const
 	      out << perf_data.tot_time;
 	      
 	      out.width(12);
-	      out.precision(4);
+	      out.precision(6);
 	      out << perf_data.tot_time/static_cast<double>(perf_data.count);
 	      
-	      out.width(12);
+	      out.width(13);
 	      out.precision(2);
-	      out << perf_data.tot_time/elapsed_time*100.;
+	      if (total_time != 0.)
+		out << perf_data.tot_time/total_time*100.;
+	      else
+		out << 0.;
 	      
 	      out << "|";
 	      out << std::endl;

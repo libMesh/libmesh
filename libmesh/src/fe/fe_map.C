@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.8 2003-02-06 23:02:55 benkirk Exp $
+// $Id: fe_map.C,v 1.9 2003-02-06 23:28:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -502,14 +502,6 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
    */
   //Point p = elem->centroid(); // A reasonable guess.  Requires computation
   Point p; // the zero point.  No computation required
-
-  /**
-   * The XYZ locations of the point of interest.
-   */
-  const Real
-    X = physical_point(0), 
-    Y = physical_point(1), 
-    Z = physical_point(2);
 
   /**
    * The number of iterations in the map inversion process.
