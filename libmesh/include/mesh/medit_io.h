@@ -51,19 +51,26 @@ class MEDITIO : public MeshIO<MeshBase>
    * This constructor will only allow us to write the mesh.
    */
   MEDITIO (const MeshBase&);
+
+  /**
+   * Constructor.  Takes a reference to a constant mesh object.
+   * and the desired scalar index for mesh colouring.
+   * MEdit seems to understand only one scalar value.
+   */
+  MEDITIO (const MeshBase&, unsigned int c);
   
   /**
    * This method implements writing a mesh to a specified ".mesh" file.
    */
   virtual void write (const std::string& );
-  
-  //  /**
-  //   * This method implements writing a mesh with nodal data to a
-  //   * specified file where the nodal data and variable names are provided.
-  //   */
-  //  virtual void write_nodal_data (const std::string&,
-  //				 const std::vector<Number>&,
-  //				 const std::vector<std::string>&);
+
+  /**
+   * This method implements writing a mesh with nodal data to a
+   * specified file where the nodal data and variable names are provided.
+   */
+  virtual void write_nodal_data (const std::string&,
+				 const std::vector<Number>&,
+				 const std::vector<std::string>&);
 
   /**
    * Flag indicating whether or not to write a binary file
@@ -85,7 +92,8 @@ private:
    * Flag to write binary data.
    */
   bool _binary;
- 
+
+  unsigned int scalar_idx;  
 };
 
 
@@ -99,6 +107,13 @@ MEDITIO::MEDITIO (const MeshBase& mesh) :
 {
 }
 
+inline
+MEDITIO::MEDITIO (const MeshBase& mesh, unsigned int c) :
+  MeshIO<MeshBase>  (mesh),
+  _binary        (false),
+  scalar_idx     (c)
+{
+}
 
 
 inline

@@ -41,25 +41,26 @@ void MEDITIO::write (const std::string& fname)
 
 
 
-// void MEDITIO::write_nodal_data (const std::string& fname,
-// 			      const std::vector<Number>& soln,
-// 			      const std::vector<std::string>& names)
-// {
-//   if (libMesh::processor_id() == 0)
-//     if (!this->binary())
-//       this->write_ascii  (fname, &soln, &names);
-// }
+void MEDITIO::write_nodal_data (const std::string& fname,
+			      const std::vector<Number>& soln,
+			      const std::vector<std::string>& names)
+{
+  if (libMesh::processor_id() == 0)
+    if (!this->binary())
+      this->write_ascii  (fname, &soln, &names);
+}
 
 
 
 void MEDITIO::write_ascii (const std::string& fname,
-			   const std::vector<Number>* ,
-			   const std::vector<std::string>* )
+			   const std::vector<Number>* vec,
+			   const std::vector<std::string>* solution_names)
 {
   // Current lacks in implementation:
   //  (i)   only 3D meshes.
   //  (ii)  only QUAD4, TRI3, TET4 elements, others are omitted !
   //  (iii) no distinction between materials.
+  //  (iv)  no vector output, just first scalar as output
 
   // assert three dimensions (should be extended later)
   assert (this->cmesh().mesh_dimension() == 3);
@@ -103,6 +104,7 @@ void MEDITIO::write_ascii (const std::string& fname,
     for ( ; it != end; ++it) {
       if ((*it)->type() == TRI3)  n_tri3++;
       if ((*it)->type() == QUAD4) n_quad4++;
+      if ((*it)->type() == QUAD9) n_quad4+=4; // (QUAD9 is written as 4 QUAD4.)
       if ((*it)->type() == TET4)  n_tet4++;
     } // for
       
@@ -126,6 +128,24 @@ void MEDITIO::write_ascii (const std::string& fname,
 	    << (*it)->node(2)+1  << " " 
 	    << (*it)->node(3)+1  <<" 0\n";
       } // if
+      else if ((*it)->type() == QUAD9) {
+	out << (*it)->node(0)+1  << " " 
+	    << (*it)->node(4)+1  << " " 
+	    << (*it)->node(8)+1  << " " 
+	    << (*it)->node(7)+1  <<" 0\n";
+	out << (*it)->node(7)+1  << " " 
+	    << (*it)->node(8)+1  << " " 
+	    << (*it)->node(6)+1  << " " 
+	    << (*it)->node(3)+1  <<" 0\n";
+	out << (*it)->node(4)+1  << " " 
+	    << (*it)->node(1)+1  << " " 
+	    << (*it)->node(5)+1  << " " 
+	    << (*it)->node(8)+1  <<" 0\n";
+	out << (*it)->node(8)+1  << " " 
+	    << (*it)->node(5)+1  << " " 
+	    << (*it)->node(2)+1  << " " 
+	    << (*it)->node(6)+1  <<" 0\n";
+      } // if
 
     // Third: write out TET4 elements:
     out << "Tetrahedra\n";
@@ -139,9 +159,27 @@ void MEDITIO::write_ascii (const std::string& fname,
 	    << (*it)->node(3)+1  <<" 0\n";
       } // if
   }  
-
-  // end of the file
+  // end of the out file
   out << std::endl << "# end of file" << std::endl;
+
+  // optionally write the data
+  if ((solution_names != NULL) &&
+      (vec != NULL))
+    {
+      // Open the ".bb" file stream
+      int idx = fname.find_last_of(".");
+      string bbname = fname.substr(0,idx) + ".bb";
+      
+      std::ofstream bbout (bbname.c_str());
+      assert (bbout.good());      
+
+      // Header: 3: 3D mesh, 1: scalar output, 2: node-indexed 
+      const unsigned int n_vars = solution_names->size();
+      bbout << "3 1 " << mesh.n_nodes() << " 2\n";
+      for (unsigned int n=0; n<mesh.n_nodes(); n++)
+	bbout << std::setprecision(10) << (*vec)[n*n_vars + scalar_idx] << " ";
+      bbout << "\n";
+    } // endif
 }
 
 
