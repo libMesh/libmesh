@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.29 2003-04-18 14:11:12 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.30 2003-05-28 03:30:41 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -54,6 +54,14 @@ AC_DEFUN(DETERMINE_CXX_BRAND, dnl
       *3.2*)
   	AC_MSG_RESULT(<<< C++ compiler is gcc-3.2 >>>)
   	GXX_VERSION=gcc3.2
+  	;;
+      *3.3*)
+  	AC_MSG_RESULT(<<< C++ compiler is gcc-3.3 >>>)
+  	GXX_VERSION=gcc3.3
+  	;;
+      *3.4*)
+  	AC_MSG_RESULT(<<< C++ compiler is gcc-3.4 >>>)
+  	GXX_VERSION=gcc3.4
   	;;
       *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
   	dnl These compilers are too old to support a useful subset
