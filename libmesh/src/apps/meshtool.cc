@@ -60,6 +60,11 @@ void usage(char *progName)
     "    -B                            Like -b, but with activated MeshData\n"
     "                                  (allows to write .unv file of the\n"
     "                                  boundary with the correct node ids)\n"
+    "    -2                            Converts a mesh of linear elements\n"
+    "                                  to their second-order counterparts:\n"
+    "                                  Quad4 -> Quad8, Tet4 -> Tet10 etc\n"
+    "    -3                            Same, but to the highest possible:\n"
+    "                                  Quad4 -> Quad9, Hex8 -> Hex27 etc\n"
 #ifdef ENABLE_INFINITE_ELEMENTS
   "\n    -a                            Add infinite elements\n"
     "    -x <coord>                    Specify infinite element origin\n"
@@ -150,6 +155,7 @@ void process_cmd_line(int argc, char **argv,
 		      double& dist_fact,
 		      bool& verbose,
 		      BoundaryMeshWriteMode& write_bndry,
+		      unsigned int& convert_second_order,
 		      bool& addinfelems,
 
 #ifdef ENABLE_INFINITE_ELEMENTS
@@ -174,12 +180,12 @@ void process_cmd_line(int argc, char **argv,
   x_sym           = y_sym           = z_sym           = false;
 
   char optionStr[] =
-    "i:o:s:d:D:r:p:bBvlLm?h";
+    "i:o:s:d:D:r:p:bB23vlLm?h";
 
 #else
 
   char optionStr[] =
-    "i:o:s:d:D:r:p:bBa::x:y:z:XYZvlLm?h";
+    "i:o:s:d:D:r:p:bB23a::x:y:z:XYZvlLm?h";
 
 #endif
 
@@ -327,6 +333,27 @@ void process_cmd_line(int argc, char **argv,
 	  }
 	  
 
+	  /**
+	   * Convert elements to second-order
+	   * counterparts
+	   */
+	case '2':
+	  {
+	    convert_second_order = 2;
+	    break;
+	  }
+
+	  /**
+	   * Convert elements to second-order
+	   * counterparts, highest order possible
+	   */
+	case '3':
+	  {
+	    convert_second_order = 22;
+	    break;
+	  }
+
+
 #ifdef ENABLE_INFINITE_ELEMENTS
 
 	  /**
@@ -411,8 +438,8 @@ int main (int argc, char** argv)
     double dist_fact = 0.;
     bool verbose = false;
     BoundaryMeshWriteMode write_bndry = BM_DISABLED;
+    unsigned int convert_second_order = 0;
     bool addinfelems = false;
-
 
 #ifdef ENABLE_INFINITE_ELEMENTS
     MeshBase::InfElemOriginValue origin_x(false, 0.);
@@ -432,6 +459,7 @@ int main (int argc, char** argv)
     process_cmd_line(argc, argv, names,
 		     n_subdomains, n_rsteps,
 		     dim, dist_fact, verbose, write_bndry, 
+		     convert_second_order,
 
 		     addinfelems, 
 
@@ -636,6 +664,40 @@ int main (int argc, char** argv)
 	    
 	  }
       }
+
+
+    /**
+     * Possibly convert all linear
+     * elements to second-order counterparts
+     */
+    if (convert_second_order > 0)
+      {
+	bool second_order_mode = true;
+	std:: string message = "Converting elements to second order counterparts";
+	if (convert_second_order == 2)
+	  {
+	    second_order_mode = false;
+	    message += ", lower version: Quad4 -> Quad8, not Quad9";
+	  }
+
+	else if (convert_second_order == 22)
+	  {
+	    second_order_mode = true;
+	    message += ", highest version: Quad4 -> Quad9";
+	  }
+
+	else
+	    error();
+
+	if (verbose)
+	  std::cout << message << std::endl;
+	
+	mesh.all_second_order(second_order_mode);
+	
+	if (verbose)
+	  mesh.print_info();
+      }
+
     
 #ifdef ENABLE_AMR
     
@@ -653,7 +715,7 @@ int main (int argc, char** argv)
 	
 	if (verbose)
 	  mesh.print_info();
-      };
+      }
 
     
     /**
