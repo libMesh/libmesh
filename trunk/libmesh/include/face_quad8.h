@@ -1,4 +1,4 @@
-// $Id: face_quad8.h,v 1.12 2003-05-24 22:49:46 benkirk Exp $
+// $Id: face_quad8.h,v 1.13 2003-08-07 19:25:31 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -114,6 +114,20 @@ public:
 			std::vector<unsigned int> *conn = NULL) const;
 
   unsigned int vtk_element_type (const unsigned int sc) const;
+
+  /**
+   * @returns 2 for all \p n
+   */
+  unsigned int n_second_order_adjacent_vertices (const unsigned int) const
+      { return 2; }
+
+  /**
+   * @returns the element-local number of the  \f$ v^{th} \f$ vertex
+   * that defines the \f$ n^{th} \f$ second-order node.
+   * Note that \p n is counted as depicted above, \f$ 4 \le n < 8 \f$.
+   */
+  unsigned int second_order_adjacent_vertex (const unsigned int n,
+					     const unsigned int v) const;
   
   
 protected:
@@ -136,6 +150,15 @@ protected:
   static const float _embedding_matrix[4][8][8];
   
 #endif
+
+
+private:
+  
+  /**
+   * Matrix that tells which vertices define the location
+   * of mid-side (or second-order) nodes
+   */
+  static const unsigned int _second_order_adjacent_vertices[4][2];
     
 };
 

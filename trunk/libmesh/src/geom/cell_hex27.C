@@ -1,4 +1,4 @@
-// $Id: cell_hex27.C,v 1.14 2003-05-24 22:49:47 benkirk Exp $
+// $Id: cell_hex27.C,v 1.15 2003-08-07 19:25:31 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -432,6 +432,97 @@ void Hex27::vtk_connectivity(const unsigned int sc,
   
   return;
 }
+
+
+
+
+
+unsigned int Hex27::n_second_order_adjacent_vertices (const unsigned int n) const
+{
+  switch (n)
+    {
+      case 8:
+      case 9:
+      case 10:
+      case 11:
+      case 12:
+      case 13:
+      case 14:
+      case 15:
+      case 16:
+      case 17:
+      case 18:
+      case 19:
+	return 2;
+
+      case 20:
+      case 21:
+      case 22:
+      case 23:
+      case 24:
+      case 25:
+	return 4;
+
+      case 26:
+	return 8;
+
+      default:
+	error();
+    }
+}
+
+
+
+unsigned int Hex27::second_order_adjacent_vertex (const unsigned int n,
+						  const unsigned int v) const
+{ 
+  assert (n >= this->n_vertices());
+  assert (n <  this->n_nodes());
+
+  if (n == 26)
+      /*
+       * for the bubble node the return value is simply v.
+       * Why? -- the user asks for the v-th adjacent vertex,
+       * from \p n_second_order_adjacent_vertices() there
+       * are 8 adjacent vertices, and these happen to be
+       * 0..7
+       */
+      return v;
+  else
+      // all others are stored in the vertices matrix
+      return _second_order_adjacent_vertices[n-this->n_vertices()][v]; 
+}
+
+
+
+const unsigned int Hex27::_second_order_adjacent_vertices[18][4] = 
+{
+  { 0,  1, 42, 42}, // vertices adjacent to node 8    edge nodes
+  { 1,  2, 42, 42}, // vertices adjacent to node 9 
+  { 2,  3, 42, 42}, // vertices adjacent to node 10 
+  { 0,  3, 42, 42}, // vertices adjacent to node 11
+
+  { 0,  4, 42, 42}, // vertices adjacent to node 12
+  { 1,  5, 42, 42}, // vertices adjacent to node 13
+  { 2,  6, 42, 42}, // vertices adjacent to node 14
+  { 3,  7, 42, 42}, // vertices adjacent to node 15
+
+  { 4,  5, 42, 42}, // vertices adjacent to node 16
+  { 5,  6, 42, 42}, // vertices adjacent to node 17
+  { 6,  7, 42, 42}, // vertices adjacent to node 18
+  { 4,  7, 42, 42}, // vertices adjacent to node 19
+
+  { 0,  1,  2,  3}, // vertices adjacent to node 20   face nodes
+  { 0,  1,  4,  5}, // vertices adjacent to node 21
+  { 1,  2,  5,  6}, // vertices adjacent to node 22
+  { 2,  3,  6,  7}, // vertices adjacent to node 23
+  { 0,  3,  4,  7}, // vertices adjacent to node 24
+  { 4,  5,  6,  7}, // vertices adjacent to node 25
+};
+
+
+
+
 
 
 

@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex18.C,v 1.17 2003-07-12 16:33:18 ddreyer Exp $
+// $Id: cell_inf_hex18.C,v 1.18 2003-08-07 19:25:31 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -250,6 +250,68 @@ const std::vector<unsigned int> InfHex18::tecplot_connectivity(const unsigned in
   
   return conn;
 }
+
+
+
+
+unsigned int InfHex18::n_second_order_adjacent_vertices (const unsigned int n) const
+{
+  switch (n)
+    {
+      case 8:
+      case 9:
+      case 10:
+      case 11:
+      case 12:
+      case 13:
+      case 14:
+      case 15:
+	return 2;
+
+      case 16:
+      case 17:
+	return 4;
+
+      default:
+	error();
+    }
+}
+
+
+
+unsigned int InfHex18::second_order_adjacent_vertex (const unsigned int n,
+						     const unsigned int v) const
+{ 
+  assert (n >= this->n_vertices());
+  assert (n <  this->n_nodes());
+
+  if (n == 16)
+      /*
+       * for the bubble node in the base the return value is 
+       * simply v.  Why? -- the user asks for the v-th 
+       * adjacent vertex, from \p n_second_order_adjacent_vertices() 
+       * there are 4 adjacent vertices, and these happen to be
+       * 0..3
+       */
+      return v;
+  else if (n == 17)
+      /*
+       * for the bubble node further out similar reasoning works,
+       * but v must be shifted to the further-out nodes: 
+       * simply add 4
+       */
+      return v+4;
+
+  else
+      /*
+       * all others are stored in the vertices matrix -- note
+       * that this matrix is kept in \p InfHex to foster
+       * code-reuse
+       */
+      return _second_order_adjacent_vertices[n-this->n_vertices()][v]; 
+}
+
+
 
 
 

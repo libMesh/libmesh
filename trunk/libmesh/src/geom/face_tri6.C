@@ -1,4 +1,4 @@
-// $Id: face_tri6.C,v 1.13 2003-05-24 22:49:47 benkirk Exp $
+// $Id: face_tri6.C,v 1.14 2003-08-07 19:25:31 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -269,6 +269,27 @@ void Tri6::vtk_connectivity(const unsigned int sf,
   
   return;
 }
+
+
+
+
+
+unsigned int Tri6::second_order_adjacent_vertex (const unsigned int n,
+						 const unsigned int v) const
+{ 
+  assert (n >= this->n_vertices());
+  assert (n <  this->n_nodes());
+  return _second_order_adjacent_vertices[n-this->n_vertices()][v]; 
+}
+
+
+
+const unsigned int Tri6::_second_order_adjacent_vertices[3][2] = 
+{
+  {0, 1}, // vertices adjacent to node 3 
+  {1, 2}, // vertices adjacent to node 4 
+  {0, 2}  // vertices adjacent to node 5  
+};
 
 
 

@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.28 2003-07-15 12:40:12 benkirk Exp $
+// $Id: elem.h,v 1.29 2003-08-07 19:25:31 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -71,6 +71,8 @@ class Elem;
  * type with three 3 nodes, all located at the vertices.  A \p Tri6 is
  * another triangular element with 6 nodes, 3 of which are located at
  * vertices and another 3 that live on the edges.
+ * In all that follows, nodes that live either on edges, faces or the 
+ * interior are named @e second-order nodes.
  *
  * \author Benjamin S. Kirk, 2002-2003
  */
@@ -389,7 +391,35 @@ class Elem : public ReferenceCountedObject<Elem>,
    */
   Real length (const unsigned int n1, 
 	       const unsigned int n2) const;
-  
+
+  /**
+   * @returns the number of adjacent vertices, that uniquely define
+   * the location of the \f$ n^{th} \f$ @e second-order node.  For linear 
+   * elements ( \p default_order()==FIRST ), this returns 0.
+   * This method is useful when converting linear elements to quadratic 
+   * elements.  Note that \p n has to be greater or equal 
+   * \p this->n_vertices().
+   */
+  virtual unsigned int n_second_order_adjacent_vertices (const unsigned int n) const;
+
+  /**
+   * @returns the element-local number of the  \f$ v^{th} \f$ vertex
+   * that defines the \f$ n^{th} \f$ second-order node.  Note that
+   * the return value is always less \p this->n_vertices(), while
+   * \p n has to be greater or equal \p this->n_vertices().  For
+   * linear elements this returns 0.
+   */
+  virtual unsigned int second_order_adjacent_vertex (const unsigned int n,
+						     const unsigned int v) const;
+
+  /**
+   * @returns the element type of the associated second-order element,
+   * e.g. when \p this is a \p TET4, then \p TET10 is returned.  Returns
+   * \p INVALID_ELEM for second order or other elements that should not
+   * or cannot be converted into higher order equivalents.
+   */
+  virtual ElemType second_order_equivalent_type () const;
+
   /**
    * @returns the refinement level of the current element.  If the
    * element's parent is \p NULL then by convention it is at

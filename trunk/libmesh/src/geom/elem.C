@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.27 2003-07-15 12:40:12 benkirk Exp $
+// $Id: elem.C,v 1.28 2003-08-07 19:25:31 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -523,4 +523,34 @@ void Elem::nullify_neighbors ()
       }
 }
 
+
+
+
+unsigned int Elem::n_second_order_adjacent_vertices (const unsigned int) const
+{
+  // for linear elements, always return 0
+  return 0;
+}
+
+
+
+unsigned int Elem::second_order_adjacent_vertex (const unsigned int,
+						 const unsigned int) const
+{
+  // for linear elements, always return 0
+  return 0;
+}
+
+
+
+ElemType Elem::second_order_equivalent_type () const
+{ 
+  /* for second-order elements, always return \p INVALID_ELEM
+   * since second-order elements should not be converted
+   * into something else...
+   *
+   * linear elements better overload this
+   */
+  return INVALID_ELEM; 
+}
 

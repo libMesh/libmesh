@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex16.C,v 1.16 2003-07-12 16:33:18 ddreyer Exp $
+// $Id: cell_inf_hex16.C,v 1.17 2003-08-07 19:25:31 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -156,6 +156,19 @@ const std::vector<unsigned int> InfHex16::tecplot_connectivity(const unsigned in
     }
   
   return conn;
+}
+
+
+
+
+unsigned int InfHex16::second_order_adjacent_vertex (const unsigned int n,
+						     const unsigned int v) const
+{ 
+  assert (n >= this->n_vertices());
+  assert (n <  this->n_nodes());
+  // note that the _second_order_adjacent_vertices matrix is
+  // stored in \p InfHex
+  return _second_order_adjacent_vertices[n-this->n_vertices()][v]; 
 }
 
 

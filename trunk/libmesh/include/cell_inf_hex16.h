@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex16.h,v 1.14 2003-05-22 21:18:01 benkirk Exp $
+// $Id: cell_inf_hex16.h,v 1.15 2003-08-07 19:25:30 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -113,6 +113,20 @@ public:
   
   unsigned int vtk_element_type (const unsigned int) const
   { return 12; }
+
+  /**
+   * @returns 2 for all \p n
+   */
+  unsigned int n_second_order_adjacent_vertices (const unsigned int) const
+      { return 2; }
+
+  /**
+   * @returns the element-local number of the  \f$ v^{th} \f$ vertex
+   * that defines the \f$ n^{th} \f$ second-order node.
+   * Note that \p n is counted as depicted above, \f$ 8 \le n < 16 \f$.
+   */
+  unsigned int second_order_adjacent_vertex (const unsigned int n,
+					     const unsigned int v) const;
   
   
 

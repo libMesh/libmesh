@@ -1,4 +1,4 @@
-// $Id: edge_edge2.h,v 1.12 2003-05-22 21:18:02 benkirk Exp $
+// $Id: edge_edge2.h,v 1.13 2003-08-07 19:25:31 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -73,6 +73,11 @@ class Edge2 : public Edge
   
   unsigned int vtk_element_type (const unsigned int) const
   { return 3; }
+
+  /**
+   * @returns \p EDGE3
+   */
+  ElemType second_order_equivalent_type () const { return EDGE3; }
 
 
 #ifdef ENABLE_INFINITE_ELEMENTS
