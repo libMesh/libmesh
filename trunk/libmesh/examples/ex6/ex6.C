@@ -1,4 +1,4 @@
-// $Id: ex6.C,v 1.18 2003-03-26 13:55:24 benkirk Exp $
+// $Id: ex6.C,v 1.19 2003-03-29 12:45:30 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -43,16 +43,6 @@
  */
 #include "fe.h"
 #include "inf_fe.h"
-
-/**
- * Inside the library, all access to the finite element
- * objects are handled through the FEInterface class,
- * to enable run-time access to non-virtual functions
- * of multiple FE classes.
- * In case of infinite elements enabled, this class also 
- * offers some helpful static member functions to the exterior.
- */
-#include "fe_interface.h"
 
 /**
  * Define Gauss quadrature rules.
@@ -437,16 +427,15 @@ void assemble_wave(EquationSystems<GeneralSystem>& es,
 
       /**
        *----------------------------------------------------------
-       * Up to now, we do not know what kind of element we
-       * have.  Use the following method to determine who
-       * should handle this element.
-       *
        * This here is almost the only place where we need to
        * distinguish between finite and infinite elements.
        * For faster computation, however, different approaches
        * may be feasible.
+       *
+       * Up to now, we do not know what kind of element we
+       * have.  Aske the element of what type it is:
         */
-      if (FEInterface::is_InfFE_elem(elem->type()))
+      if (elem->infinite())
         {
 	  /** 
 	   * We have an infinite element.  Let \p cfe point
@@ -554,7 +543,7 @@ void assemble_wave(EquationSystems<GeneralSystem>& es,
 
 	    } // end boundary condition section	     
 
-	} // else ( if (FEInterface::is_InfFE_elem(elem->type())) )
+	} // else ( if (elem->infinite())) )
 
 
 
