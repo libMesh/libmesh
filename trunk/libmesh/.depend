@@ -52,6 +52,7 @@ src/base/equation_systems.$(obj-suffix):\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
+    include/sparse_matrix.h\
     include/sphere.h\
     include/surface.h\
     include/system_data.h\
@@ -85,6 +86,7 @@ src/base/equation_systems_io.$(obj-suffix):\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
+    include/sparse_matrix.h\
     include/sphere.h\
     include/surface.h\
     include/system_data.h\
@@ -135,6 +137,7 @@ src/base/system_data.$(obj-suffix):\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
+    include/sparse_matrix.h\
     include/sphere.h\
     include/surface.h\
     include/system_data.h\
@@ -1484,6 +1487,7 @@ src/mesh/mesh_base.$(obj-suffix):\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
+    include/sparse_matrix.h\
     include/sphere.h\
     include/surface.h
 src/mesh/mesh_diva_support.$(obj-suffix):\
@@ -1594,6 +1598,7 @@ src/mesh/mesh_gmv_support.$(obj-suffix):\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
+    include/sparse_matrix.h\
     include/sphere.h\
     include/surface.h\
     include/system_data.h\
@@ -1687,6 +1692,7 @@ src/mesh/mesh_tecplot_support.$(obj-suffix):\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
+    include/sparse_matrix.h\
     include/sphere.h\
     include/surface.h\
     include/system_data.h\
@@ -1786,6 +1792,20 @@ src/numerics/dense_matrix.$(obj-suffix):\
     include/dense_matrix.h\
     include/mesh_common.h\
     include/mesh_config.h
+src/numerics/laspack_matrix.$(obj-suffix):\
+    src/numerics/laspack_matrix.C\
+    include/coupling_matrix.h\
+    include/dense_matrix.h\
+    include/dof_map.h\
+    include/enum_fe_family.h\
+    include/enum_inf_map_type.h\
+    include/enum_order.h\
+    include/fe_type.h\
+    include/laspack_matrix.h\
+    include/mesh_common.h\
+    include/mesh_config.h\
+    include/perf_log.h\
+    include/sparse_matrix.h
 src/numerics/petsc_interface.$(obj-suffix):\
     src/numerics/petsc_interface.C\
     include/coupling_matrix.h\
@@ -1800,7 +1820,8 @@ src/numerics/petsc_interface.$(obj-suffix):\
     include/perf_log.h\
     include/petsc_interface.h\
     include/petsc_matrix.h\
-    include/petsc_vector.h
+    include/petsc_vector.h\
+    include/sparse_matrix.h
 src/numerics/petsc_matrix.$(obj-suffix):\
     src/numerics/petsc_matrix.C\
     include/coupling_matrix.h\
@@ -1814,7 +1835,8 @@ src/numerics/petsc_matrix.$(obj-suffix):\
     include/mesh_config.h\
     include/perf_log.h\
     include/petsc_matrix.h\
-    include/petsc_vector.h
+    include/petsc_vector.h\
+    include/sparse_matrix.h
 src/numerics/petsc_vector.$(obj-suffix):\
     src/numerics/petsc_vector.C\
     include/mesh_common.h\
