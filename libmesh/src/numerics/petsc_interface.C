@@ -1,4 +1,4 @@
-// $Id: petsc_interface.C,v 1.26 2004-09-27 14:54:26 jwpeterson Exp $
+// $Id: petsc_interface.C,v 1.27 2004-09-29 13:27:13 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -215,8 +215,8 @@ PetscInterface<T>::solve (SparseMatrix<T>&  matrix_in,
   ierr = KSPGetResidualNorm (_ksp, &final_resid);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
-// 2.2.0 & newer style
-#else
+// 2.2.0
+#elif (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)
       
   // Set operators. The input matrix works as the preconditioning matrix
   ierr = KSPSetOperators(_ksp, matrix->mat, precond->mat,
@@ -241,6 +241,32 @@ PetscInterface<T>::solve (SparseMatrix<T>&  matrix_in,
    
   // Solve the linear system
   ierr = KSPSolve (_ksp);
+         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+	 
+  // Get the number of iterations required for convergence
+  ierr = KSPGetIterationNumber (_ksp, &its);
+         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+	 
+  // Get the norm of the final residual to return to the user.
+  ierr = KSPGetResidualNorm (_ksp, &final_resid);
+         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+	 
+// 2.2.1 & newer style
+#else
+      
+  // Set operators. The input matrix works as the preconditioning matrix
+  ierr = KSPSetOperators(_ksp, matrix->mat, precond->mat,
+			 SAME_NONZERO_PATTERN);
+         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+
+  // Set the tolerances for the iterative solver.  Use the user-supplied
+  // tolerance for the relative residual & leave the others at default values.
+  ierr = KSPSetTolerances (_ksp, tol, PETSC_DEFAULT,
+ 			   PETSC_DEFAULT, max_its);
+         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+
+  // Solve the linear system
+  ierr = KSPSolve (_ksp, rhs->vec, solution->vec);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 	 
   // Get the number of iterations required for convergence
