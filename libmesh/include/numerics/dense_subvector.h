@@ -1,4 +1,4 @@
-// $Id: dense_subvector.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: dense_subvector.h,v 1.3 2004-08-09 17:34:57 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -23,6 +23,7 @@
 #define __dense_subvector_h__
 
 // C++ includes
+#include <assert.h>
 
 // Local Includes
 #include "libmesh_common.h"

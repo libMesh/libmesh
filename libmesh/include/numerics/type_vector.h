@@ -1,4 +1,4 @@
-// $Id: type_vector.h,v 1.3 2004-04-18 00:51:50 jwpeterson Exp $
+// $Id: type_vector.h,v 1.4 2004-08-09 17:34:57 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -23,6 +23,7 @@
 #define __type_vector_h__
 
 // C++ includes
+#include <assert.h>
 #include <math.h>
 
 // Local includes
