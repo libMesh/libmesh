@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.29 2003-11-10 13:10:28 benkirk Exp $
+# $Id: Makefile,v 1.30 2003-11-11 16:21:15 benkirk Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -53,7 +53,7 @@ endif
 #
 # 
 #
-.PHONY: clean clobber distclean doc doc_upload log cvsweb TODO
+.PHONY: clean clobber distclean doc upload doc_upload log cvsweb TODO
 
 #
 # static library
@@ -138,11 +138,17 @@ doc:
 	$(doxygen) ./doc/Doxyfile
 
 #
-# Upload the documentation to sourceforge
+# Upload the web page to sourceforge
+#
+upload:
+	rsync -rltzve ssh ./doc/html/ $(shell cat CVS/Root | cut -d"@" -f1 | cut -d":" -f3)@libmesh.sourceforge.net:/home/groups/l/li/libmesh/htdocs
+
+#
+# Build and upload the documentation to sourceforge
 #
 doc_upload:
-	$(MAKE) doc
-	rsync -rltzve ssh ./doc/html/ $(shell cat CVS/Root | cut -d"@" -f1 | cut -d":" -f3)@libmesh.sourceforge.net:/home/groups/l/li/libmesh/htdocs
+	@$(MAKE) doc
+	@$(MAKE) upload
 
 
 log: $(loggedfiles)
