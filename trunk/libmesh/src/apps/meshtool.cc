@@ -35,8 +35,8 @@
 
 void usage(char *progName)
 {
-  char	*baseName;
-  static char *helpList =
+  std::string baseName;
+  static std::string helpList =
     "usage:\n"
     "	%s [options] ...\n"
     "\n"
@@ -121,7 +121,7 @@ void usage(char *progName)
     baseName = progName;
 
   
-  fprintf(stderr, helpList, baseName);
+  fprintf(stderr, helpList.c_str(), baseName.c_str());
   fflush(stderr);
 
   abort();

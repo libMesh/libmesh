@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.13 2003-02-26 01:08:13 benkirk Exp $
+// $Id: boundary_info.C,v 1.14 2003-02-27 17:20:03 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -118,7 +118,7 @@ void BoundaryInfo::sync()
 	if (elem->neighbor(s) == NULL) // on the boundary
 	  {
 	    // Build the side
-	    AutoPtr<Elem> side = elem->build_side(s);
+	    AutoPtr<Elem> side (elem->build_side(s));
 	    
 	    // The side lives on the same processor as the parent
 	    //side->processor_id() = elem->processor_id();
