@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.13 2003-02-17 01:23:01 benkirk Exp $
+// $Id: dof_map.h,v 1.14 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -35,7 +35,7 @@
 // Forward Declarations
 class Elem;
 class MeshBase;
-class SparseMatrix;
+template <typename Tp> class SparseMatrix;
 
 
 
@@ -71,7 +71,7 @@ class DofMap
   /**
    * Attach the matrix that is used with this \p DofMap.
    */
-  void attach_matrix (SparseMatrix& matrix);
+  void attach_matrix (SparseMatrix<Number>& matrix);
 
 #ifdef ENABLE_AMR
 
@@ -336,7 +336,7 @@ class DofMap
   /**
    * Pointer to the matrix used with this object.
    */
-  SparseMatrix* _matrix;
+  SparseMatrix<Number>* _matrix;
   
   /**
    * The number of nodes that _were_ in the mesh

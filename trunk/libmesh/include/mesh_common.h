@@ -1,4 +1,4 @@
-// $Id: mesh_common.h,v 1.7 2003-02-04 00:49:09 benkirk Exp $
+// $Id: mesh_common.h,v 1.8 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -25,6 +25,7 @@
 
 // C++ includes everyone should know about
 #include <iostream>
+#include <complex>
 #include <assert.h>
 #include <stdlib.h>
 
@@ -32,7 +33,8 @@
 #include "mesh_config.h"
 
 
-  
+
+// Undefine any existing macros
 #ifdef Real
 #  undef Real
 #endif
@@ -50,35 +52,39 @@
 #endif
 
 
+// Define the type to use for real numbers
 #ifndef SINGLE_PRECISION
   typedef double Real;
   typedef double REAL;
-#  ifdef USE_COMPLEX_NUMBERS
-#    include <complex>
-     typedef std::complex<double> Complex;
-     typedef std::complex<double> COMPLEX;
-#  else
-     typedef double Complex;
-     typedef double COMPLEX;
-#  endif
 #else
   typedef float Real;
   typedef float REAL;
-#  ifdef USE_COMPLEX_NUMBERS
-     // this is _not_ supported by PETSc!
-     CHOKE_THIS!
-#  else
-     typedef float Complex;
-     typedef float COMPLEX;
-#  endif
 #endif
+
+// Define the type to use for complex numbers
+// Always use std::complex<double>, as required by Petsc
+typedef std::complex<double> Complex;
+typedef std::complex<double> COMPLEX;
+
+
+// Define the value type for unknowns in simulations.
+// This is either Real or Complex, depending on how
+// the library was configures
+#if   defined (USE_REAL_NUMBERS)
+  typedef Real Number;
+#elif defined (USE_COMPLEX_NUMBERS)
+  typedef Complex Number;
+#else
+  DIE A HORRIBLE DEATH HERE...
+#endif
+
 
 
 #undef here
 #undef error
 #define here()     { std::cout << __FILE__ << ", line " << __LINE__ << std::endl; }
 #define error()    { here(); abort(); }
-#define untested() { std::cout << "*** Using untested code: " << __FILE__ << ", line " << __LINE__ << std::endl; }
+#define untested() { std::cout << "*** Using untested code: " << __FILE__ << ", line " << __LINE__ << " ***" << std::endl; }
 
 
 // 3D spatial dimension unless otherwise specified

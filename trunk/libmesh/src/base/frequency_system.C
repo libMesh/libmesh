@@ -1,4 +1,4 @@
-// $Id: frequency_system.C,v 1.3 2003-02-14 22:37:11 benkirk Exp $
+// $Id: frequency_system.C,v 1.4 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -41,9 +41,9 @@ FrequencySystem::FrequencySystem (EquationSystems&    es,
   SystemBase       (es.get_mesh(), name, number, solver_package),
   init_system_fptr (NULL),
   assemble_fptr    (NULL),
-  mass             (SparseMatrix::build (solver_package)),
-  damping          (SparseMatrix::build (solver_package)),
-  stiffness        (SparseMatrix::build (solver_package)),
+  mass             (SparseMatrix<Number>::build (solver_package)),
+  damping          (SparseMatrix<Number>::build (solver_package)),
+  stiffness        (SparseMatrix<Number>::build (solver_package)),
   equation_systems (es),
   /* set_frequency() initializes the _solutions vectors */
   _is_assembled    (false),
@@ -179,7 +179,7 @@ void FrequencySystem::set_frequencies (const Real base_freq,
   // set frequencies, build solution storage
   for (unsigned int n=0; n<n_steps; n++)
     {
-      AutoPtr<NumericVector> ap (NumericVector::build(equation_systems.get_solver_package()));
+      AutoPtr<NumericVector<Number> > ap (NumericVector<Number>::build(equation_systems.get_solver_package()));
       _solutions.insert(_solutions.end(), ap.release() );
 
       _frequencies[n] = base_freq + n * freq_step;

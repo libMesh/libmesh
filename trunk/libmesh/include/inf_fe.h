@@ -1,4 +1,4 @@
-// $Id: inf_fe.h,v 1.15 2003-02-13 22:56:07 benkirk Exp $
+// $Id: inf_fe.h,v 1.16 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -95,7 +95,7 @@ class Elem;
  *
  * \author Daniel Dreyer
  * \date 2003
- * \version $Revision: 1.15 $
+ * \version $Revision: 1.16 $
  */
 
 //-------------------------------------------------------------
@@ -118,7 +118,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.15 $
+   * \version $Revision: 1.16 $
    */
   //-------------------------------------------------------------
   // InfFE::Radial class definition
@@ -247,7 +247,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.15 $
+   * \version $Revision: 1.16 $
    */
   //-------------------------------------------------------------
   // InfFE::Base class definition
@@ -396,8 +396,8 @@ public:
    */
   static void nodal_soln(const FEType& fet,
 			 const Elem* elem, 
-			 const std::vector<Complex>& elem_soln,
-			 std::vector<Complex>& nodal_soln);
+			 const std::vector<Number>& elem_soln,
+			 std::vector<Number>& nodal_soln);
 
   /**
    * @returns the location (on the reference element) of the

@@ -1,4 +1,4 @@
-// $Id: ex6.C,v 1.10 2003-02-17 01:23:01 benkirk Exp $
+// $Id: ex6.C,v 1.11 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -369,11 +369,11 @@ void assemble_wave(EquationSystems& es,
    * of the projectors.  The final overall system, however, 
    * resembles the conventional notation, again.
    */
-  RealDenseMatrix   Ke;
-  RealDenseMatrix   Ce;
-  RealDenseMatrix   Me;
+  DenseMatrix<Number>   Ke;
+  DenseMatrix<Number>   Ce;
+  DenseMatrix<Number>   Me;
 
-  std::vector<Real> Fe;
+  std::vector<Number> Fe;
 
   /**
    * This vector will hold the degree of freedom indices for

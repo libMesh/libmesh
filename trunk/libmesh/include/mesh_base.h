@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.16 2003-02-14 15:22:41 benkirk Exp $
+// $Id: mesh_base.h,v 1.17 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -33,7 +33,7 @@
 // forward declarations
 class Elem;
 class EquationSystems;
-class PetscMatrix;
+template <typename Tp> class PetscMatrix;
 
 
 // Local Includes -----------------------------------
@@ -59,7 +59,7 @@ class PetscMatrix;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.16 $
+ * \version $Revision: 1.17 $
  */
 
 
@@ -355,14 +355,14 @@ public:
    * valence of each node is on the diagonal and there is a -1 for each
    * node connected to the node.
    */
-  void build_L_graph (PetscMatrix& conn) const;
+  void build_L_graph (PetscMatrix<Number>& conn) const;
   
   /**
    * Builds the connectivity graph. The matrix \p conn is such that the
    * valence of each node is on the diagonal and there is a -1 for each
    * node connected to the node.
    */
-  void build_script_L_graph (PetscMatrix& conn) const;
+  void build_script_L_graph (PetscMatrix<Number>& conn) const;
   
   /**
    * Returns the number of subdomains in the global mesh. Note that it is
@@ -443,7 +443,7 @@ public:
    * proper method by the file extension. Also writes data.
    */
   virtual void write(const std::string& name,
-		     std::vector<Complex>& values,
+		     std::vector<Number>& values,
 		     std::vector<std::string>& variable_names);
   
   /**
@@ -459,7 +459,7 @@ public:
    * in addition to the mesh.
    */
   void write_tecplot(const std::string& name,
-		     const std::vector<Complex>* v=NULL,
+		     const std::vector<Number>* v=NULL,
 		     const std::vector<std::string>* solution_names=NULL);
   
   /**
@@ -479,7 +479,7 @@ public:
    * is not present this function will simply call the ASCII output version.
    */
   void write_tecplot_binary(const std::string& name,
-			    const std::vector<Complex>* v=NULL,
+			    const std::vector<Number>* v=NULL,
 			    const std::vector<std::string>* solution_names=NULL);
 
   /**
@@ -507,7 +507,7 @@ public:
    * write the partitioning information.
    */
   void write_gmv(const std::string& name,
-		 const std::vector<Complex>* v=NULL,
+		 const std::vector<Number>* v=NULL,
 		 const std::vector<std::string>* solution_names=NULL,
 		 const bool write_partitioning=false);
   
@@ -530,7 +530,7 @@ public:
    * write the partitioning information.
    */
   void write_gmv_binary(const std::string& name,
-			const std::vector<Complex>* v=NULL,
+			const std::vector<Number>* v=NULL,
 			const std::vector<std::string>* solution_names=NULL,
 			const bool write_partitioning=false);
 
@@ -554,13 +554,13 @@ public:
    * of complex data, and for  \p r_o_c = 1 the filename for the imaginary 
    * part.
    */
-  char* complex_filename(const std::string& _n,
-			 unsigned int r_o_c=0) const;
+  const char* complex_filename(const std::string& _n,
+			       unsigned int r_o_c=0) const;
 
   /**
    * Prepare complex data for writing.
    */
-  void prepare_complex_data(const std::vector<Complex>* source,
+  void prepare_complex_data(const std::vector<Number>* source,
 			    std::vector<Real>* real_part,
 			    std::vector<Real>* imag_part) const;
 
@@ -734,7 +734,7 @@ protected:
    * Actual implementation of writing a mesh in the GMV ASCII format.
    */
   void write_gmv(std::ostream& out,
-		 const std::vector<Complex>* v=NULL,
+		 const std::vector<Number>* v=NULL,
 		 const std::vector<std::string>* solution_names=NULL,
 		 const bool write_partitioning=false);
 
@@ -751,7 +751,7 @@ protected:
    * Actual implementation of writing a mesh in the GMV binary format.
    */
   void write_gmv_binary(std::ostream& out,
-			const std::vector<Complex>* v=NULL,
+			const std::vector<Number>* v=NULL,
 			const std::vector<std::string>* solution_names=NULL,
 			const bool write_partitioning=false);
 

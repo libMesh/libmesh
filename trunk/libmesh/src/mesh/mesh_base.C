@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.14 2003-02-14 15:22:49 benkirk Exp $
+// $Id: mesh_base.C,v 1.15 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -1322,7 +1322,7 @@ Sphere MeshBase::subdomain_bounding_sphere (const unsigned int sid) const
 
 
 
-void MeshBase::build_L_graph (PetscMatrix& conn) const
+void MeshBase::build_L_graph (PetscMatrix<Number>& conn) const
 {
 #ifndef HAVE_PETSC
 
@@ -1440,7 +1440,7 @@ void MeshBase::build_L_graph (PetscMatrix& conn) const
 
 
 
-void MeshBase::build_script_L_graph (PetscMatrix& conn) const
+void MeshBase::build_script_L_graph (PetscMatrix<Number>& conn) const
 {
 #ifndef HAVE_PETSC
 
@@ -1452,7 +1452,7 @@ void MeshBase::build_script_L_graph (PetscMatrix& conn) const
 
   // Inefficient at the moment.  We build an L
   // matrix and use it to create the script L matrix
-  PetscMatrix l_conn;
+  PetscMatrix<Number> l_conn;
 
   build_L_graph (l_conn);
 
@@ -1602,7 +1602,7 @@ void MeshBase::write(const std::string& name)
 
 
 void MeshBase::write(const std::string& name,
-		     std::vector<Complex>& v,
+		     std::vector<Number>& v,
 		     std::vector<std::string>& vn)
 {
   libMesh::log.start_event("write()");
@@ -1631,8 +1631,8 @@ void MeshBase::write(const std::string& name,
 
 #ifdef USE_COMPLEX_NUMBERS
 
-char* MeshBase::complex_filename(const std::string& _n,
-				 unsigned int r_o_c) const
+const char* MeshBase::complex_filename(const std::string& _n,
+				       unsigned int r_o_c) const
 {
   std::string loc=_n;
   if (r_o_c == 0)
@@ -1643,7 +1643,7 @@ char* MeshBase::complex_filename(const std::string& _n,
 }
 
 
-void MeshBase::prepare_complex_data(const std::vector<Complex>* source,
+void MeshBase::prepare_complex_data(const std::vector<Number>* source,
 				    std::vector<Real>* real_part,
 				    std::vector<Real>* imag_part) const
 {

@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.18 2003-02-17 05:33:09 jwpeterson Exp $
+// $Id: equation_systems.C,v 1.19 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -22,12 +22,8 @@
 #include <sstream>
 
 // Local Includes
-//#include "enum_solver_package.h"
 #include "libmesh.h"
 #include "fe_interface.h"
-//#include "petsc_vector.h"
-//#include "petsc_matrix.h"
-//#include "petsc_interface.h"
 #include "linear_solver_interface.h"
 #include "equation_systems.h"
 #include "general_system.h"
@@ -445,7 +441,7 @@ void EquationSystems::build_variable_names (std::vector<std::string>& var_names)
 
 
 
-void EquationSystems::build_solution_vector (std::vector<Complex>& soln)
+void EquationSystems::build_solution_vector (std::vector<Number>& soln)
 {
   assert (n_systems());
 
@@ -456,7 +452,7 @@ void EquationSystems::build_solution_vector (std::vector<Complex>& soln)
   if (_mesh.processor_id() == 0)
     soln.resize(nn*nv);
 
-  std::vector<Complex> sys_soln; 
+  std::vector<Number> sys_soln; 
   
   unsigned int var_num=0;
 
@@ -469,8 +465,8 @@ void EquationSystems::build_solution_vector (std::vector<Complex>& soln)
 
       if (_mesh.processor_id() == 0)
 	{
-	  std::vector<Complex>      elem_soln;   // The finite element solution
-	  std::vector<Complex>      nodal_soln;  // The finite elemnt solution interpolated to the nodes
+	  std::vector<Number>      elem_soln;   // The finite element solution
+	  std::vector<Number>      nodal_soln;  // The finite elemnt solution interpolated to the nodes
 	  std::vector<unsigned int> dof_indices; // The DOF indices for the finite element 
 	      
 	  for (unsigned int var=0; var<nv_sys; var++)

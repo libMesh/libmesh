@@ -1,4 +1,4 @@
-// $Id: inf_fe_static.C,v 1.9 2003-02-13 22:56:10 benkirk Exp $
+// $Id: inf_fe_static.C,v 1.10 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -252,8 +252,8 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_per_elem(const FEType& fet,
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 void InfFE<Dim,T_radial,T_map>::nodal_soln(const FEType&,
 					   const Elem*,
-					   const std::vector<Complex>&,
-					   std::vector<Complex>&)
+					   const std::vector<Number>&,
+					   std::vector<Number>&)
 {
   std::cerr << "ERROR: The concept of a nodal solution is not "
 	    << "applicable to infinite elements!" << std::endl;

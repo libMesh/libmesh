@@ -1,4 +1,4 @@
-// $Id: laspack_interface.h,v 1.3 2003-02-13 22:56:07 benkirk Exp $
+// $Id: laspack_interface.h,v 1.4 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -47,11 +47,13 @@ namespace Laspack {
 /**
  * This class provides a deal.II interface to the Laspack
  * iterative solver library.
- *
+ * Currently Laspack only supports real datatypes, so
+ * this class is a full specialization of \p NumericVector<>
+ * with \p Tp = \p Real*
  * @author Benjamin Kirk, 2002
  */
 
-class LaspackInterface : public LinearSolverInterface
+class LaspackInterface : public LinearSolverInterface<Real>
 {
  public:
   /**
@@ -80,9 +82,9 @@ class LaspackInterface : public LinearSolverInterface
    */
     
   std::pair<unsigned int, Real> 
-    solve (SparseMatrix &matrix,
-	   NumericVector &solution,
-	   NumericVector &rhs,
+    solve (SparseMatrix<Real> &matrix,
+	   NumericVector<Real> &solution,
+	   NumericVector<Real> &rhs,
 	   const double tol,
 	   const unsigned int m_its);
    

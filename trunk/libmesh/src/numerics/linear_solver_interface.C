@@ -1,4 +1,4 @@
-// $Id: linear_solver_interface.C,v 1.3 2003-02-13 22:56:12 benkirk Exp $
+// $Id: linear_solver_interface.C,v 1.4 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,27 +31,30 @@
 
 //------------------------------------------------------------------
 //
-AutoPtr<LinearSolverInterface>
-LinearSolverInterface::build(const SolverPackage solver_package)
+
+// Full specialization for Real data types
+template <>
+AutoPtr<LinearSolverInterface<Real> >
+LinearSolverInterface<Real>::build(const SolverPackage solver_package)
 {
 
   switch (solver_package)
     {
 
 
-#ifdef HAVE_LASPACK
+#if defined(HAVE_LASPACK)
     case LASPACK_SOLVERS:
       {
-	AutoPtr<LinearSolverInterface> ap(new LaspackInterface);
+	AutoPtr<LinearSolverInterface<Real> > ap(new LaspackInterface);
 	return ap;
       }
 #endif
 
 
-#ifdef HAVE_PETSC
+#if defined(HAVE_PETSC) && defined(USE_REAL_NUMBERS)
     case PETSC_SOLVERS:
       {
-	AutoPtr<LinearSolverInterface> ap(new PetscInterface);
+	AutoPtr<LinearSolverInterface<Real> > ap(new PetscInterface<Real>);
 	return ap;
       }
 #endif
@@ -63,6 +66,46 @@ LinearSolverInterface::build(const SolverPackage solver_package)
       error();
     }
     
-  AutoPtr<LinearSolverInterface> ap(NULL);
+  AutoPtr<LinearSolverInterface<Real> > ap(NULL);
   return ap;    
 }
+
+
+// Full specialization for Complex data types
+template <>
+AutoPtr<LinearSolverInterface<Complex> >
+LinearSolverInterface<Complex>::build(const SolverPackage solver_package)
+{
+
+  switch (solver_package)
+    {
+      
+#if defined(HAVE_PETSC) && defined(USE_COMPLEX_NUMBERS)
+    case PETSC_SOLVERS:
+      {
+	AutoPtr<LinearSolverInterface<Complex> > ap(new PetscInterface<Complex>);
+	return ap;
+      }
+#endif
+
+    default:
+      std::cerr << "ERROR:  Unrecognized solver package: "
+		<< solver_package
+		<< std::endl;
+      error();
+    }
+    
+  AutoPtr<LinearSolverInterface<Complex> > ap(NULL);
+  return ap;    
+}
+
+
+
+
+
+//------------------------------------------------------------------
+// Explicit instantiations
+template class LinearSolverInterface<Number>;
+
+
+

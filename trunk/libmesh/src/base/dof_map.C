@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.19 2003-02-18 13:38:20 benkirk Exp $
+// $Id: dof_map.C,v 1.20 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -38,14 +38,8 @@
 
 
 // ------------------------------------------------------------
-// DofMap static member initializations
-//const unsigned int DofMap::invalid_number = static_cast<unsigned int>(-1);
-
-
-
-// ------------------------------------------------------------
 // DofMap member functions
-void DofMap::attach_matrix (SparseMatrix& matrix)
+void DofMap::attach_matrix (SparseMatrix<Number>& matrix)
 {
   _matrix = &matrix;
   

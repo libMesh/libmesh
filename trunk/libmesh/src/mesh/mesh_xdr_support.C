@@ -1,4 +1,4 @@
-// $Id: mesh_xdr_support.C,v 1.8 2003-02-13 22:56:12 benkirk Exp $
+// $Id: mesh_xdr_support.C,v 1.9 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -494,7 +494,7 @@ void XdrInterface::mesh_interface(const std::string& name,
 
 void XdrInterface::soln_interface(const std::string& name,
 				  const XdrIO::XdrIO_TYPE access,
-				  std::vector<Complex>& soln,
+				  std::vector<Number>& soln,
 				  std::vector<std::string>& var_names,
 				  Mesh& mesh)
 {
@@ -781,7 +781,7 @@ void Mesh::read_xdr_binary(const std::string& name)
 
 
 void Mesh::read_xdr_soln(const std::string& name,
-			 std::vector<Complex>& soln,
+			 std::vector<Number>& soln,
 			 std::vector<std::string>& var_names)
 {
   /**
@@ -804,7 +804,7 @@ void Mesh::read_xdr_soln(const std::string& name,
 
 
 void Mesh::read_xdr_soln_binary(const std::string& name,
-				std::vector<Complex>& soln,
+				std::vector<Number>& soln,
 				std::vector<std::string>& var_names)
 {
 #ifndef HAVE_RPC_RPC_H
@@ -897,7 +897,7 @@ void Mesh::write_xdr_binary(const std::string& name)
 
 
 void Mesh::write_xdr_soln(const std::string& name,
-			  std::vector<Complex>& soln,
+			  std::vector<Number>& soln,
 			  std::vector<std::string>& var_names)
 {
   /**
@@ -920,7 +920,7 @@ void Mesh::write_xdr_soln(const std::string& name,
 
 
 void Mesh::write_xdr_soln_binary(const std::string& name,
-				 std::vector<Complex>& soln,
+				 std::vector<Number>& soln,
 				 std::vector<std::string>& var_names)
 
 {

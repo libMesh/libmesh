@@ -1,4 +1,4 @@
-// $Id: laspack_vector.h,v 1.6 2003-02-13 22:56:07 benkirk Exp $
+// $Id: laspack_vector.h,v 1.7 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -27,7 +27,9 @@
 
 #include "mesh_common.h"
 
-#if  defined(HAVE_LASPACK) && !defined(USE_COMPLEX_NUMBERS)
+#ifdef HAVE_LASPACK
+
+
 
 
 // C++ includes
@@ -53,11 +55,14 @@ class LaspackInterface;
 /**
  * Laspack vector. Provides a nice interface to the
  * Laspack C-based data structures for parallel vectors.
+ * Currently Laspack only supports real datatypes, so
+ * this class is a full specialization of \p NumericVector<>
+ * with \p Tp = \p Real
  *
  * @author Benjamin S. Kirk, 2002
  */
 
-class LaspackVector : public NumericVector
+class LaspackVector : public NumericVector<Real>
 {
  public:
 
@@ -132,18 +137,18 @@ class LaspackVector : public NumericVector
 //    * this function is the same as calling
 //    * \p init(V.size(),fast).
 //    */
-//   void init (const NumericVector& V,
+//   void init (const NumericVector<Real>& V,
 // 	     const bool fast=false);
 
   /**
    * $U(0-N) = s$: fill all components.
    */
-  NumericVector & operator= (const Complex s);
+  NumericVector<Real> & operator= (const Real s);
     
   /**
    *  $U = V$: copy all components.
    */
-  NumericVector & operator= (const NumericVector &V);
+  NumericVector<Real> & operator= (const NumericVector<Real> &V);
   
   /**
    *  $U = V$: copy all components.
@@ -153,7 +158,7 @@ class LaspackVector : public NumericVector
   /**
    *  $U = V$: copy all components.
    */
-  NumericVector & operator= (const std::vector<Complex> &v);
+  NumericVector<Real> & operator= (const std::vector<Real> &v);
 
   /**
    * @returns the minimum element in the vector.
@@ -219,92 +224,92 @@ class LaspackVector : public NumericVector
   /**
    * Access components, returns \p U(i).
    */
-  Complex operator() (const unsigned int i) const;
+  Real operator() (const unsigned int i) const;
     
   /**
    * Addition operator.
    * Fast equivalent to \p U.add(1, V).
    */
-  NumericVector & operator += (const NumericVector &V);
+  NumericVector<Real> & operator += (const NumericVector<Real> &V);
 
   /**
    * Subtraction operator.
    * Fast equivalent to \p U.add(-1, V).
    */
-  NumericVector & operator -= (const NumericVector &V);
+  NumericVector<Real> & operator -= (const NumericVector<Real> &V);
     
   /**
    * v(i) = value
    */
-  void set (const unsigned int i, const Complex value);
+  void set (const unsigned int i, const Real value);
     
   /**
    * v(i) += value
    */
-  void add (const unsigned int i, const Complex value);
+  void add (const unsigned int i, const Real value);
     
   /**
    * $U(0-DIM)+=s$.
    * Addition of \p s to all components. Note
    * that \p s is a scalar and not a vector.
    */
-  void add (const Complex s);
+  void add (const Real s);
     
   /**
    * U+=V.
    * Simple vector addition, equal to the
    * \p operator +=.
    */
-  void add (const NumericVector& V);
+  void add (const NumericVector<Real>& V);
 
   /**
    * U+=a*V.
    * Simple vector addition, equal to the
    * \p operator +=.
    */
-  void add (const Complex a, const NumericVector& v);
+  void add (const Real a, const NumericVector<Real>& v);
   
   /**
-   * U+=v where v is a std::vector<Complex> 
+   * U+=v where v is a std::vector<Real> 
    * and you
    * want to specify WHERE to add it
    */
-  void add_vector (const std::vector<Complex>& v,
+  void add_vector (const std::vector<Real>& v,
 		   const std::vector<unsigned int>& dof_indices);
 
   /**
    * U+=V where U and V are type 
-   * NumericVector and you
+   * NumericVector<Real> and you
    * want to specify WHERE to add
-   * the NumericVector V 
+   * the NumericVector<Real> V 
    */
-  void add_vector (const NumericVector& V,
+  void add_vector (const NumericVector<Real>& V,
 		   const std::vector<unsigned int>& dof_indices);
   
   /**
    * Scale each element of the
    * vector by the given factor.
    */
-  void scale (const Complex factor);
+  void scale (const Real factor);
     
   /**
    * Creates a copy of the global vector in the
    * local vector \p v_local.
    */
-  void localize (std::vector<Complex>& v_local) const;
+  void localize (std::vector<Real>& v_local) const;
 
   /**
-   * Same, but fills a \p NumericVector instead of
+   * Same, but fills a \p NumericVector<Real> instead of
    * a \p std::vector.
    */
-  void localize (NumericVector& v_local) const;
+  void localize (NumericVector<Real>& v_local) const;
 
   /**
    * Creates a local vector \p v_local containing
    * only information relevant to this processor, as
    * defined by the \p send_list.
    */
-  void localize (NumericVector& v_local,
+  void localize (NumericVector<Real>& v_local,
 		 const std::vector<unsigned int>& send_list) const;
   
   /**
@@ -313,7 +318,7 @@ class LaspackVector : public NumericVector
    * default the data is sent to processor 0.  This method
    * is useful for outputting data from one processor.
    */
-  void localize_to_one (std::vector<Complex>& v_local,
+  void localize_to_one (std::vector<Real>& v_local,
 			const unsigned int proc_id=0) const;
     
  private:
@@ -487,7 +492,7 @@ unsigned int LaspackVector::last_local_index () const
 
 
 inline
-void LaspackVector::set (const unsigned int i, const Complex value)
+void LaspackVector::set (const unsigned int i, const Real value)
 {
   assert(initialized());
   assert(i<size());
@@ -498,7 +503,7 @@ void LaspackVector::set (const unsigned int i, const Complex value)
 
 
 inline
-void LaspackVector::add (const unsigned int i, const Complex value)
+void LaspackVector::add (const unsigned int i, const Real value)
 {
   assert(initialized());
   assert(i<size());
@@ -509,20 +514,20 @@ void LaspackVector::add (const unsigned int i, const Complex value)
 
 
 inline
-Complex LaspackVector::operator() (const unsigned int i) const
+Real LaspackVector::operator() (const unsigned int i) const
 {
   assert (initialized());
   assert ( ((i >= first_local_index()) &&
 	    (i <  last_local_index())) );
 
   
-  return static_cast<Complex>(Laspack::V_GetCmp(const_cast<Laspack::QVector*>(&_vec), i+1));
+  return static_cast<Real>(Laspack::V_GetCmp(const_cast<Laspack::QVector*>(&_vec), i+1));
 }
 
 
 
 inline
-void LaspackVector::add_vector (const std::vector<Complex>& v,
+void LaspackVector::add_vector (const std::vector<Real>& v,
 				const std::vector<unsigned int>& dof_indices)
 {
   assert (!v.empty());
@@ -534,7 +539,7 @@ void LaspackVector::add_vector (const std::vector<Complex>& v,
 
 
 inline
-void LaspackVector::add_vector (const NumericVector& V,
+void LaspackVector::add_vector (const NumericVector<Real>& V,
 				const std::vector<unsigned int>& dof_indices)
 {
   assert (V.size() == dof_indices.size());

@@ -1,4 +1,4 @@
-// $Id: mesh.h,v 1.8 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: mesh.h,v 1.9 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -141,14 +141,14 @@ class Mesh : public MeshBase
    * an ASCII file.
    */
   void read_xdr_soln(const std::string& name,
-		     std::vector<Complex>& soln,
+		     std::vector<Number>& soln,
 		     std::vector<std::string>& var_names);
 
   /**
    * Same, but expects a true XDR-Encoded binary file.
    */
   void read_xdr_soln_binary(const std::string& name,
-			    std::vector<Complex>& soln,
+			    std::vector<Number>& soln,
 			    std::vector<std::string>& var_names);
   
   /** 
@@ -167,7 +167,7 @@ class Mesh : public MeshBase
    * proper method by the file extension. Also writes data.
    */
   void write(const std::string& name,
-	     std::vector<Complex>& values,
+	     std::vector<Number>& values,
 	     std::vector<std::string>& variable_names);
   
   /**
@@ -198,14 +198,14 @@ class Mesh : public MeshBase
    * solution file format.  Writes an ASCII file.
    */
   void write_xdr_soln(const std::string& name,
-		      std::vector<Complex>& soln,
+		      std::vector<Number>& soln,
 		      std::vector<std::string>& var_names);
 
   /**
    * Same, but writes an XDR-Encoded binary file.
    */
   void write_xdr_soln_binary(const std::string& name,
-			     std::vector<Complex>& soln,
+			     std::vector<Number>& soln,
 			     std::vector<std::string>& var_names);
 
   /**

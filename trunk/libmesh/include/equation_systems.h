@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.12 2003-02-13 22:56:07 benkirk Exp $
+// $Id: equation_systems.h,v 1.13 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -191,7 +191,7 @@ public:
    * entries will be in variable-major format (corresponding to
    * the names from \p build_variable_names())
    */
-  void build_solution_vector (std::vector<Complex>& soln);
+  void build_solution_vector (std::vector<Number>& soln);
 
   /**
    * @returns a constant reference to the mesh

@@ -1,5 +1,4 @@
-// $Id: ex7.C,v 1.10 2003-02-17 01:23:01 benkirk Exp $
-
+// $Id: ex7.C,v 1.11 2003-02-20 04:59:58 benkirk Exp $
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
   
@@ -106,15 +105,7 @@ const Real libmesh_pi = acos(-1.);
  * Define the imaginary unit
  * I = 0. + i*1.
  */ 
-#ifdef USE_COMPLEX_NUMBERS
 Complex I(0.0, 1.0);
-#else
-/**
- * Do this for compatibility, so that main() can catch
- * the error of compiling this example without complex support.
- */
-Complex I(0.);
-#endif
 
 
 
@@ -299,6 +290,8 @@ int main (int argc, char** argv)
 void assemble_helmholtz(EquationSystems& es,
 			const std::string& system_name)
 {
+#ifdef USE_COMPLEX_NUMBERS
+  
   /**
    * It is a good idea to make sure we are assembling
    * the proper system.
@@ -374,9 +367,9 @@ void assemble_helmholtz(EquationSystems& es,
    * to add a real matrix to a complex matrix, we can safely
    * define element stiffness Ke and mass matrix Me as real. 
    */
-  ComplexDenseMatrix   Ae;
-  RealDenseMatrix      Ke, Ce, Me;
-  std::vector<Complex> Fe;
+  DenseMatrix<Number>   Ae;
+  DenseMatrix<Number>   Ke, Ce, Me;
+  std::vector<Number>   Fe;
 
   /**
    * Calculate the circular frequency omega and define the fluid
@@ -599,5 +592,7 @@ void assemble_helmholtz(EquationSystems& es,
    * All done!
    */
   return;
+
+#endif
 };
 

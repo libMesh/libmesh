@@ -1,4 +1,4 @@
-//    $Id: sparse_matrix.h,v 1.4 2003-02-13 22:56:08 benkirk Exp $
+// $Id: sparse_matrix.h,v 1.5 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -36,9 +36,7 @@
 
 
 // forward declarations
-class SparseMatrix;
-
-
+//template <typename Tp> class SparseMatrix;
 
 
 /**
@@ -52,9 +50,10 @@ class SparseMatrix;
  * @author Benjamin S. Kirk, 2003
  */
 
-class SparseMatrix : public ReferenceCountedObject<SparseMatrix>
+template <typename Tp>
+class SparseMatrix : public ReferenceCountedObject<SparseMatrix<Tp> >
 {
- public:
+public:
   /**
    * Constructor; initializes the matrix to
    * be empty, without any structure, i.e.
@@ -80,10 +79,10 @@ class SparseMatrix : public ReferenceCountedObject<SparseMatrix>
   virtual ~SparseMatrix ();
 
   /**
-   * Builds a \p SparseMatrix using the linear solver package specified by
+   * Builds a \p SparseMatrix<Tp> using the linear solver package specified by
    * \p solver_package
    */
-  static AutoPtr<SparseMatrix> build(const SolverPackage solver_package);
+  static AutoPtr<SparseMatrix<Tp> > build(const SolverPackage solver_package);
   
   /**
    * @returns true if the matrix has been initialized,
@@ -101,7 +100,7 @@ class SparseMatrix : public ReferenceCountedObject<SparseMatrix>
   /**
    * Updates the matrix sparsity pattern.  This method is
    * included because some sparse matrix storage schemes
-   * (e.g. LASPACK) need it.  If your \p SparseMatrix
+   * (e.g. LASPACK) need it.  If your \p SparseMatrix<Tp>
    * implementation does not need this data simply do
    * not overload this method.
    */
@@ -180,7 +179,7 @@ class SparseMatrix : public ReferenceCountedObject<SparseMatrix>
    */
   virtual void set (const unsigned int i,
 		    const unsigned int j,
-		    const Complex value) = 0;
+		    const Tp value) = 0;
     
   /**
    * Add \p value to the element
@@ -192,7 +191,7 @@ class SparseMatrix : public ReferenceCountedObject<SparseMatrix>
    */
   virtual void add (const unsigned int i,
 		    const unsigned int j,
-		    const Complex value) = 0;
+		    const Tp value) = 0;
 
   /**
    * Add the full matrix to the
@@ -201,7 +200,7 @@ class SparseMatrix : public ReferenceCountedObject<SparseMatrix>
    * at assembly time
    */
     
-  virtual void add_matrix (const ComplexDenseMatrix &dm,
+  virtual void add_matrix (const DenseMatrix<Tp> &dm,
 			   const std::vector<unsigned int> &rows,
 			   const std::vector<unsigned int> &cols) = 0;
   
@@ -209,7 +208,7 @@ class SparseMatrix : public ReferenceCountedObject<SparseMatrix>
    * Same, but assumes the row and column maps are the same.
    * Thus the matrix \p dm must be square.
    */
-  virtual void add_matrix (const ComplexDenseMatrix &dm,
+  virtual void add_matrix (const DenseMatrix<Tp> &dm,
 			   const std::vector<unsigned int> &dof_indices) = 0;
       
   /**
@@ -230,8 +229,8 @@ class SparseMatrix : public ReferenceCountedObject<SparseMatrix>
    * matrix), use the \p el
    * function.
    */
-  virtual Complex operator () (const unsigned int i,
-			       const unsigned int j) const = 0;
+  virtual Tp operator () (const unsigned int i,
+			  const unsigned int j) const = 0;
 
   /**
    * Return the l1-norm of the matrix, that is
@@ -276,11 +275,11 @@ class SparseMatrix : public ReferenceCountedObject<SparseMatrix>
    * is not specified it is dumped to the screen.
    */
   virtual void print_matlab(const std::string name="NULL") const
-    {
-      std::cerr << "ERROR: Not Implemented in base class yet!" << std::endl;
-      std::cerr << "ERROR writing MATLAB file " << name << std::endl;
-      error();
-    }
+  {
+    std::cerr << "ERROR: Not Implemented in base class yet!" << std::endl;
+    std::cerr << "ERROR writing MATLAB file " << name << std::endl;
+    error();
+  }
   
 protected:
   
@@ -300,26 +299,27 @@ protected:
 
 //-----------------------------------------------------------------------
 // SparseMatrix inline members
+template <typename Tp>
 inline
-SparseMatrix::SparseMatrix () :
+SparseMatrix<Tp>::SparseMatrix () :
   _dof_map(NULL),
   _is_initialized(false)
 {}
 
 
 
+template <typename Tp>
 inline
-SparseMatrix::~SparseMatrix ()
+SparseMatrix<Tp>::~SparseMatrix ()
 {}
 
 
 
+template <typename Tp>
 inline
-void SparseMatrix::print() const
+void SparseMatrix<Tp>::print() const
 {
   assert (initialized());
-
-#ifndef USE_COMPLEX_NUMBERS
 
   for (unsigned int i=0; i<m(); i++)
     {
@@ -327,8 +327,15 @@ void SparseMatrix::print() const
 	std::cout << std::setw(8) << (*this)(i,j) << " ";
       std::cout << std::endl;
     }
+}
 
-#else
+
+
+// Full specialization for Complex datatypes
+template <>
+inline
+void SparseMatrix<Complex>::print() const
+{
   // std::complex<>::operator<<() is defined, but use this form
 
   std::cout << "Real part:" << std::endl;
@@ -346,11 +353,8 @@ void SparseMatrix::print() const
 	std::cout << std::setw(8) << (*this)(i,j).imag() << " ";
       std::cout << std::endl;
     }
-
-#endif
-
 }
 
 
 
-#endif
+#endif // #ifndef __sparse_matrix_h__

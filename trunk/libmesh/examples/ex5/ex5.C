@@ -1,4 +1,4 @@
-// $Id: ex5.C,v 1.10 2003-02-17 01:23:01 benkirk Exp $
+// $Id: ex5.C,v 1.11 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -108,18 +108,6 @@ int main (int argc, char** argv)
    */
   libMesh::init (argc, argv);
   
-  /**
-   * This example is designed for real numbers only.
-   */
-#ifdef USE_COMPLEX_NUMBERS
-
-  std::cerr << "ERROR: This example is not intended for " << std::endl
-	    << " use with complex numbers." << std::endl;
-  error();
-
-#endif
-
-
   /**
    * Braces are used to force object scope, like in example 2
    */   
@@ -288,8 +276,8 @@ void assemble_poisson(EquationSystems& es,
 
   const DofMap& dof_map = es("Poisson").get_dof_map();
 
-  RealDenseMatrix   Ke;
-  std::vector<Real> Fe;
+  DenseMatrix<Number> Ke;
+  std::vector<Number> Fe;
 
   std::vector<unsigned int> dof_indices;
 
@@ -464,16 +452,14 @@ void assemble_poisson(EquationSystems& es,
       
       /**
        *----------------------------------------------------------------
-       * This preprocessor test helps in letting
-       * main() catch the error of using this
-       * example with complex numbers.
+       * The element matrix and right-hand-side are now built
+       * for this element.  Add them to the global matrix and
+       * right-hand-side vector.  The \p PetscMatrix::add_matrix()
+       * and \p PetscVector::add_vector() members do this for us.
        */
-#ifndef USE_COMPLEX_NUMBERS
-
+      
       es("Poisson").matrix->add_matrix (Ke, dof_indices);
       es("Poisson").rhs->add_vector    (Fe, dof_indices);
-
-#endif
       
     }; // end of element loop
 

@@ -1,4 +1,4 @@
-// $Id: distributed_vector.h,v 1.2 2003-02-19 13:28:41 benkirk Exp $
+// $Id: distributed_vector.h,v 1.3 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -59,7 +59,7 @@ namespace Mpi
  */
 
 template <typename Tp>
-class DistributedVector : public NumericVector
+class DistributedVector : public NumericVector<Tp>
 {
  public:
 
@@ -127,12 +127,12 @@ class DistributedVector : public NumericVector
   /**
    * $U(0-N) = s$: fill all components.
    */
-  NumericVector & operator= (const Tp s);
+  NumericVector<Tp> & operator= (const Tp s);
     
   /**
    *  $U = V$: copy all components.
    */
-  NumericVector & operator= (const NumericVector &V);
+  NumericVector<Tp> & operator= (const NumericVector<Tp> &V);
 
   /**
    *  $U = V$: copy all components.
@@ -142,7 +142,7 @@ class DistributedVector : public NumericVector
   /**
    *  $U = V$: copy all components.
    */
-  NumericVector & operator= (const std::vector<Tp> &v);
+  NumericVector<Tp> & operator= (const std::vector<Tp> &v);
   
   /**
    * @returns the minimum element in the vector.
@@ -208,19 +208,19 @@ class DistributedVector : public NumericVector
   /**
    * Access components, returns \p U(i).
    */
-  Complex operator() (const unsigned int i) const;
+  Tp operator() (const unsigned int i) const;
     
   /**
    * Addition operator.
    * Fast equivalent to \p U.add(1, V).
    */
-  NumericVector & operator += (const NumericVector &V);
+  NumericVector<Tp> & operator += (const NumericVector<Tp> &V);
 
   /**
    * Subtraction operator.
    * Fast equivalent to \p U.add(-1, V).
    */
-  NumericVector & operator -= (const NumericVector &V);
+  NumericVector<Tp> & operator -= (const NumericVector<Tp> &V);
     
   /**
    * v(i) = value
@@ -244,14 +244,14 @@ class DistributedVector : public NumericVector
    * Simple vector addition, equal to the
    * \p operator +=.
    */
-  void add (const NumericVector& V);
+  void add (const NumericVector<Tp>& V);
 
   /**
    * U+=a*V.
    * Simple vector addition, equal to the
    * \p operator +=.
    */
-  void add (const Tp a, const NumericVector& v);
+  void add (const Tp a, const NumericVector<Tp>& v);
   
   /**
    * U+=v where v is a std::vector<Tp> 
@@ -263,11 +263,11 @@ class DistributedVector : public NumericVector
 
   /**
    * U+=V where U and V are type 
-   * NumericVector and you
+   * NumericVector<Tp> and you
    * want to specify WHERE to add
-   * the NumericVector V 
+   * the NumericVector<Tp> V 
    */
-  void add_vector (const NumericVector& V,
+  void add_vector (const NumericVector<Tp>& V,
 		   const std::vector<unsigned int>& dof_indices);
   
   /**
@@ -283,17 +283,17 @@ class DistributedVector : public NumericVector
   void localize (std::vector<Tp>& v_local) const;
 
   /**
-   * Same, but fills a \p NumericVector instead of
+   * Same, but fills a \p NumericVector<Tp> instead of
    * a \p std::vector.
    */
-  void localize (NumericVector& v_local) const;
+  void localize (NumericVector<Tp>& v_local) const;
 
   /**
    * Creates a local vector \p v_local containing
    * only information relevant to this processor, as
    * defined by the \p send_list.
    */
-  void localize (NumericVector& v_local,
+  void localize (NumericVector<Tp>& v_local,
 		 const std::vector<unsigned int>& send_list) const;
 
   /**
@@ -563,7 +563,7 @@ unsigned int DistributedVector<Tp>::last_local_index () const
 
 template <typename Tp>
 inline
-Complex DistributedVector<Tp>::operator() (const unsigned int i) const
+Tp DistributedVector<Tp>::operator() (const unsigned int i) const
 {
   assert (initialized());
   assert (_values.size() == _local_size);

@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.11 2003-02-13 22:56:07 benkirk Exp $
+// $Id: fe.h,v 1.12 2003-02-20 04:59:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -47,7 +47,7 @@
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.11 $
+ * \version $Revision: 1.12 $
  */
 
 //-------------------------------------------------------------
@@ -110,8 +110,8 @@ public:
    * This is the solution that will be plotted.
    */
   static void nodal_soln(const Elem* elem, const Order o,
-			 const std::vector<Complex>& elem_soln,
-			 std::vector<Complex>& nodal_soln);
+			 const std::vector<Number>& elem_soln,
+			 std::vector<Number>& nodal_soln);
 
   /**
    * @returns the number of shape functions associated with
@@ -268,7 +268,7 @@ private:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.11 $
+ * \version $Revision: 1.12 $
  */
 
 //-------------------------------------------------------------
@@ -293,7 +293,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.11 $
+ * \version $Revision: 1.12 $
  */
 
 //-------------------------------------------------------------
@@ -318,7 +318,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.11 $
+ * \version $Revision: 1.12 $
  */
 
 //-------------------------------------------------------------
