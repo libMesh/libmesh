@@ -1,4 +1,4 @@
-// $Id: factory.h,v 1.6 2003-02-13 22:56:07 benkirk Exp $
+// $Id: factory.h,v 1.7 2003-03-25 21:06:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -99,9 +99,9 @@ private:
   /**
    * @returns a new object of type Derived. 
    */
-  AutoPtr<Base> create() { return AutoPtr<Base>(new Derived); }
-};
+  AutoPtr<Base> create();
 
+};
 
 
 
@@ -132,12 +132,30 @@ AutoPtr<Base> Factory<Base>::build(const std::string& name)
       for (typename std::map<std::string,Factory<Base>*>::const_iterator
 	     it = factory_map.begin(); it != factory_map.end(); ++it)
         std::cerr << "  " << it->first << std::endl;
+
+      // Do this the stoopid way for IBM xlC
+      AutoPtr<Base> ret_val(NULL);
       
-      return AutoPtr<Base>(NULL);
+      return ret_val;
     }
-  return AutoPtr<Base>(factory_map[name]->create());  
+  
+  // Do this the stoopid way for IBM xlC
+  AutoPtr<Base> ret_val (factory_map[name]->create());
+  
+  return ret_val;
 }
 
+
+
+template<class Derived, class Base>
+inline
+AutoPtr<Base> FactoryImp<Derived,Base>::create ()
+{  
+  // Do this the stoopid way for IBM xlC
+  AutoPtr<Base> ret_val(new Derived);
+
+  return ret_val;
+}
 
 
 #endif
