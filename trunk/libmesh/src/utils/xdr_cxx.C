@@ -1,4 +1,4 @@
-// "$Id: xdr_cxx.C,v 1.8 2003-03-12 20:21:03 ddreyer Exp $\n"
+// "$Id: xdr_cxx.C,v 1.9 2003-03-22 21:04:31 ddreyer Exp $\n"
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -1129,17 +1129,20 @@ void Xdr::data (std::vector<float>& v, const char* comment)
 
 	data(length, "# vector length");
 
-	for (unsigned int i=0; i<v.size(); i++)
-	  {
-	    assert(out.good());
-#ifndef BROKEN_IOSTREAM
-	    out << std::setw(12) 
-		<< std::scientific 
-		<<v[i] << " ";
-#else
-	    out << v[i] << " ";
-#endif
-	  }
+	out.scientific (12, v, " ");
+
+// OLD CODE
+// 	for (unsigned int i=0; i<v.size(); i++)
+// 	  {
+// 	    assert(out.good());
+// #ifndef BROKEN_IOSTREAM
+// 	    out << std::setw(12) 
+// 		<< std::scientific 
+// 		<<v[i] << " ";
+// #else
+// 	    out << v[i] << " ";
+// #endif
+// 	  }
 
 	out << "\t " << comment << std::endl;
 
@@ -1248,17 +1251,20 @@ void Xdr::data (std::vector<double>& v, const char* comment)
 
 	data(length, "# vector length");
 
-	for (unsigned int i=0; i<v.size(); i++)
-	  {
-	    assert(out.good());
-#ifndef BROKEN_IOSTREAM
-	    out << std::setw(12) 
-		<< std::scientific 
-		<<v[i] << " ";
-#else
-	    out << v[i] << " ";
-#endif
-	  }
+	out.scientific (12, v, " ");
+
+// OLD CODE
+// 	for (unsigned int i=0; i<v.size(); i++)
+// 	  {
+// 	    assert(out.good());
+// #ifndef BROKEN_IOSTREAM
+// 	    out << std::setw(12) 
+// 		<< std::scientific 
+// 		<<v[i] << " ";
+// #else
+// 	    out << v[i] << " ";
+// #endif
+// 	  }
 
 	out << "\t " << comment << std::endl;
 
@@ -1452,17 +1458,20 @@ void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
 
 	data(length, "# vector length x 2 (complex)");
 
-	for (unsigned int i=0; i<v.size(); i++)
-	  {
-	    assert (out.good());
-#ifndef BROKEN_IOSTREAM
-	    out << std::setw(12) << std::scientific << v[i].real() << " "
-		<< std::setw(12) << std::scientific << v[i].imag() << " ";
-#else
-	    out << v[i].real() << " " 
-		<< v[i].imag() << " ";
-#endif
-	  }
+	out.scientific (12, v, " ");
+
+// OLD CODE
+// 	for (unsigned int i=0; i<v.size(); i++)
+// 	  {
+// 	    assert (out.good());
+// #ifndef BROKEN_IOSTREAM
+// 	    out << std::setw(12) << std::scientific << v[i].real() << " "
+// 		<< std::setw(12) << std::scientific << v[i].imag() << " ";
+// #else
+// 	    out << v[i].real() << " " 
+// 		<< v[i].imag() << " ";
+// #endif
+// 	  }
 
 	out << "\t " << comment << std::endl;
 

@@ -1,4 +1,4 @@
-// "$Id: xdrIO.C,v 1.6 2003-02-13 22:56:14 benkirk Exp $\n"
+// "$Id: xdrIO.C,v 1.7 2003-03-22 21:04:31 ddreyer Exp $\n"
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -318,19 +318,23 @@ int XdrIO::dataBlk(REAL* array, int numvar, int size)
 
 	for (int i=0; i<size; i++)
 	  {
-#ifndef BROKEN_IOSTREAM
 	    for (int j=0; j<numvar; j++)
-	      mp_out << std::setw(12)
-		     << std::scientific
-		     << array[i*numvar + j]
-		     << " \t";
+	       (mp_out.scientific(12, array[i*numvar + j])) << " \t";
+
+// OLD CODE
+// #ifndef BROKEN_IOSTREAM
+// 	    for (int j=0; j<numvar; j++)
+// 	      mp_out << std::setw(12)
+// 		     << std::scientific
+// 		     << array[i*numvar + j]
+// 		     << " \t";
 	    
-#else
-	    for (int j=0; j<numvar; j++)
-	      mp_out << std::setw(12)
-		     << array[i*numvar + j]
-		     << " \t";     
-#endif
+// #else
+// 	    for (int j=0; j<numvar; j++)
+// 	      mp_out << std::setw(12)
+// 		     << array[i*numvar + j]
+// 		     << " \t";     
+// #endif
 	    
 	    mp_out << std::endl;
 	  }

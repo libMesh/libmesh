@@ -1,4 +1,4 @@
-// $Id: xdrIO.h,v 1.8 2003-02-13 22:56:08 benkirk Exp $
+// $Id: xdrIO.h,v 1.9 2003-03-22 21:04:30 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,7 @@
 
 // C++ includes
 #include <stdio.h>
-#include <fstream>
+//#include <fstream>
 #include <iomanip>
 #include <vector>
 #include <string>
@@ -32,6 +32,7 @@
 // Local includes
 #include "mesh_common.h"
 #include "enum_elem_type.h"
+#include "o_f_stream.h"
 
 #ifndef SINGLE_PRECISION
 #define xdr_REAL xdr_double
@@ -206,9 +207,12 @@ class XdrIO
   std::ifstream mp_in;
 
   /**
-   * An output file stream object
+   * An output file stream object.
+   * Use the customized class to enable
+   * features also for compilers with broken
+   * iostream
    */
-  std::ofstream mp_out;
+  OFStream mp_out;
   
  private:
   FILE* mp_fp;
