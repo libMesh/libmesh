@@ -27,6 +27,9 @@
    support */
 #undef ENABLE_REFERENCE_COUNTING
 
+/* Flag indicating if the library should be built with second derivatives */
+#undef ENABLE_SECOND_DERIVATIVES
+
 /* Flag indicating whether the library shall be compiled to use the Exodus
    interface */
 #undef HAVE_EXODUS_API
