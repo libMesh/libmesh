@@ -1,4 +1,4 @@
-// $Id: inf_fe_instantiate_1D.h,v 1.1 2003-01-24 17:24:38 jwpeterson Exp $
+// $Id: inf_fe_instantiate_1D.h,v 1.2 2003-01-26 18:20:14 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -40,11 +40,11 @@
 /** 
  * Collect all 1D explicit instantiations for class InfFE
  */
-SAY_THAT_INF_FE_IS(template,1,CARTESIAN) 
+INSTANTIATE_INF_FE(1,CARTESIAN) 
 
-/* SAY_THAT_INF_FE_IS(template,1,SPHERICAL) */
+/* INSTANTIATE_INF_FE(1,SPHERICAL) */
 
-/* SAY_THAT_INF_FE_IS(template,1,ELLIPSOIDAL) */
+/* INSTANTIATE_INF_FE(1,ELLIPSOIDAL) */
 
 
 
