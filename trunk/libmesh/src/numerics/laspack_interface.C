@@ -1,4 +1,4 @@
-// $Id: laspack_interface.C,v 1.15 2004-03-14 01:31:48 jwpeterson Exp $
+// $Id: laspack_interface.C,v 1.16 2004-03-24 05:49:12 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,6 @@
 
 
 // C++ includes
-#include <math.h>
 
 // Local Includes
 #include "laspack_interface.h"

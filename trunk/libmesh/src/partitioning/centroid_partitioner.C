@@ -1,4 +1,4 @@
-// $Id: centroid_partitioner.C,v 1.7 2004-03-24 04:32:59 jwpeterson Exp $
+// $Id: centroid_partitioner.C,v 1.8 2004-03-24 05:49:12 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // C++ includes
-#include <algorithm>
+#include <algorithm> // for std::sort
 
 // Local includes
 #include "centroid_partitioner.h"

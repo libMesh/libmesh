@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.25 2004-03-22 22:41:46 benkirk Exp $
+// $Id: fe_map.C,v 1.26 2004-03-24 05:49:11 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -20,7 +20,7 @@
 
 
 // C++ includes
-#include <math.h>
+#include <math.h> // for sqrt, fabs
 
 
 // Local includes

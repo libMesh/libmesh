@@ -1,4 +1,4 @@
-// $Id: dof_map_constraints.C,v 1.4 2004-01-03 15:37:42 benkirk Exp $
+// $Id: dof_map_constraints.C,v 1.5 2004-03-24 05:49:11 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -21,9 +21,7 @@
 
 // C++ Includes -------------------------------------
 #include <set>
-#include <algorithm>
-#include <math.h>
-
+#include <algorithm> // for std::count
 
 // Local Includes -----------------------------------
 #include "dof_map.h"

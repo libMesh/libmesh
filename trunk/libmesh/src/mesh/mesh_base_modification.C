@@ -1,4 +1,4 @@
-// $Id: mesh_base_modification.C,v 1.14 2004-01-03 15:37:43 benkirk Exp $
+// $Id: mesh_base_modification.C,v 1.15 2004-03-24 05:49:12 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -20,9 +20,9 @@
 
 
 // C++ includes
-#include <algorithm>
+#include <algorithm> // for std::count
 #include <map>
-
+#include <math.h>    // for fabs
 
 // Local includes
 #include "mesh_base.h"

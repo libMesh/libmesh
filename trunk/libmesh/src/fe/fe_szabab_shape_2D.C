@@ -1,4 +1,4 @@
-// $Id: fe_szabab_shape_2D.C,v 1.7 2004-02-25 03:44:44 benkirk Exp $
+// $Id: fe_szabab_shape_2D.C,v 1.8 2004-03-24 05:49:11 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -20,7 +20,7 @@
 
 
 // C++ includes
-#include <math.h>
+#include <math.h> // for sqrt
 
 
 // Local includes

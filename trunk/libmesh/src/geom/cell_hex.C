@@ -1,4 +1,4 @@
-// $Id: cell_hex.C,v 1.14 2004-01-03 15:37:43 benkirk Exp $
+// $Id: cell_hex.C,v 1.15 2004-03-24 05:49:12 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -19,7 +19,7 @@
 
 
 // C++ includes
-#include <algorithm>
+#include <algorithm> // for std::min, std::max
 
 // Local includes
 #include "cell_hex.h"

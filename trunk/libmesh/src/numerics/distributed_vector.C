@@ -1,4 +1,4 @@
-// $Id: distributed_vector.C,v 1.20 2004-03-14 01:31:48 jwpeterson Exp $
+// $Id: distributed_vector.C,v 1.21 2004-03-24 05:49:12 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -22,7 +22,7 @@
 #include "libmesh_common.h"
 
 // C++ includes
-#include <math.h>
+#include <math.h> // for fabs
 
 // Local Includes
 #include "distributed_vector.h"
