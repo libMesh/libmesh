@@ -1,4 +1,4 @@
-// $Id: equation_systems_io.C,v 1.10 2003-02-11 14:20:25 benkirk Exp $
+// $Id: equation_systems_io.C,v 1.11 2003-02-12 02:03:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,8 +31,8 @@
 // Local Includes
 #include "fe_type.h"
 #include "petsc_interface.h"
-#include "system_data.h"
 #include "equation_systems.h"
+#include "general_system.h"
 
 // Forward Declarations
 
@@ -118,7 +118,7 @@ void EquationSystems::read(const std::string& name,
       
       if (read_header) add_system (sys_name);
 	  
-      SystemData& new_system = (*this)(sys_name);
+      GeneralSystem& new_system = (*this)(sys_name);
 	  
       /**
        * 3.) 
@@ -219,8 +219,8 @@ void EquationSystems::read(const std::string& name,
   if (read_data)
     for (unsigned int sys=0; sys<n_systems(); sys++)
       {
-	SystemData& system  = (*this)(sys);
-	DofMap&     dof_map = system.dof_map; 
+	GeneralSystem& system = (*this)(sys);
+	DofMap&     dof_map   = system.get_dof_map(); 
 	std::vector<Complex> global_soln;
 	std::vector<Complex> reordered_soln;
 	
@@ -329,7 +329,7 @@ void EquationSystems::write(const std::string& name,
   const unsigned int proc_id = _mesh.processor_id();
   unsigned int n_sys         = n_systems();
 
-  std::map<std::string, SystemData*>::iterator
+  std::map<std::string, GeneralSystem*>::iterator
     pos = _systems.begin();
   
   unsigned int sys_num=0;
@@ -353,8 +353,8 @@ void EquationSystems::write(const std::string& name,
         
       while (pos != _systems.end())
 	{
-	  std::string sys_name = pos->first;
-	  SystemData& system   = *pos->second;
+	  std::string sys_name  = pos->first;
+	  GeneralSystem& system = *pos->second;
 	  
 
 
@@ -438,7 +438,7 @@ void EquationSystems::write(const std::string& name,
 		comment += ", approximation order";
 	      }
 	      
-	      int order = static_cast<int>(system.variable_order(var));
+	      int order = static_cast<int>(system.variable_type(var).order);
 	      
 	      io.data (order, comment.c_str());
 	   
@@ -508,9 +508,9 @@ void EquationSystems::write(const std::string& name,
     while (pos != _systems.end())
       {
 	// Convenient references
-	std::string sys_name   = pos->first;
-	SystemData& system     = *pos->second;
-	DofMap&     dof_map    = system.dof_map;
+	std::string sys_name  = pos->first;
+	GeneralSystem& system = *pos->second;
+	DofMap&     dof_map   = system.get_dof_map();
 
 	std::vector<Complex> global_soln;
 	

@@ -1,4 +1,4 @@
-// $Id: ex2.C,v 1.3 2003-02-10 03:55:49 benkirk Exp $
+// $Id: ex2.C,v 1.4 2003-02-12 02:03:45 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -34,7 +34,7 @@
 /**
  * Include file that defines a system
  */
-#include "system_data.h"
+#include "general_system.h"
 
 /**
  * Include file that defines (possibly multiple) systems of equations.

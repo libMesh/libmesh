@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.10 2003-02-10 22:03:25 benkirk Exp $
+// $Id: equation_systems.C,v 1.11 2003-02-12 02:03:48 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -22,13 +22,14 @@
 #include <sstream>
 
 // Local Includes
-#include "enum_solver_package.h"
+//#include "enum_solver_package.h"
 #include "fe_interface.h"
-#include "petsc_vector.h"
-#include "petsc_matrix.h"
-#include "petsc_interface.h"
-#include "system_data.h"
+//#include "petsc_vector.h"
+//#include "petsc_matrix.h"
+//#include "petsc_interface.h"
+#include "linear_solver_interface.h"
 #include "equation_systems.h"
+#include "general_system.h"
 
 // Forward Declarations
 
@@ -58,7 +59,7 @@ EquationSystems::~EquationSystems ()
 
 void EquationSystems::clear ()
 {
-  for (std::map<std::string, SystemData*>::iterator
+  for (std::map<std::string, GeneralSystem*>::iterator
 	 pos = _systems.begin(); pos != _systems.end();
        ++pos)
     delete pos->second;
@@ -77,7 +78,7 @@ void EquationSystems::init ()
   assert (!_systems.empty());
 
 
-  for (std::map<std::string, SystemData*>::iterator
+  for (std::map<std::string, GeneralSystem*>::iterator
 	 sys = _systems.begin(); sys != _systems.end();
        ++sys)
     {
@@ -96,21 +97,21 @@ void EquationSystems::add_system (const std::string& name)
     {
       // Requires a number of temporaries
       
-//       SystemData sd(*this, name);
+//       GeneralSystem sd(*this, name);
       
-//       std::pair<std::string, SystemData>
+//       std::pair<std::string, GeneralSystem>
 // 	kv(name, sd);
       
 //       systems.insert (kv);
       
       // Requires no unnecessary temporaries
       _systems.insert (std::pair<std::string,
-	 	                 SystemData*>(name,
-					      new SystemData(*this,
-							     name,
-							     _solver_package)
-					      )
-		       );
+	 	                 GeneralSystem*>(name,
+						 new GeneralSystem(*this,
+								   name,
+								   _solver_package)
+					        )
+		      );
     }
   else
     {
@@ -146,7 +147,7 @@ unsigned int EquationSystems::n_vars () const
 
   unsigned int tot=0;
   
-  for (std::map<std::string, SystemData*>::const_iterator
+  for (std::map<std::string, GeneralSystem*>::const_iterator
 	 pos = _systems.begin(); pos != _systems.end(); ++pos)
     tot += pos->second->n_vars();
 
@@ -162,7 +163,7 @@ unsigned int EquationSystems::n_dofs () const
 
   unsigned int tot=0;
   
-  for (std::map<std::string, SystemData*>::const_iterator
+  for (std::map<std::string, GeneralSystem*>::const_iterator
 	 pos = _systems.begin(); pos != _systems.end(); ++pos)
     tot += pos->second->n_dofs();
 
@@ -171,9 +172,9 @@ unsigned int EquationSystems::n_dofs () const
 
 
 
-SystemData & EquationSystems::operator () (const std::string& name)
+GeneralSystem & EquationSystems::operator () (const std::string& name)
 {
-  std::map<std::string, SystemData*>::iterator
+  std::map<std::string, GeneralSystem*>::iterator
     pos = _systems.find(name);
   
   if (pos == _systems.end())
@@ -191,9 +192,9 @@ SystemData & EquationSystems::operator () (const std::string& name)
 
 
 
-const SystemData & EquationSystems::operator () (const std::string& name) const
+const GeneralSystem & EquationSystems::operator () (const std::string& name) const
 {
-  std::map<std::string, SystemData*>::const_iterator
+  std::map<std::string, GeneralSystem*>::const_iterator
     pos = _systems.find(name);
   
   if (pos == _systems.end())
@@ -216,11 +217,15 @@ const std::string & EquationSystems::name (const unsigned int num) const
 {
   assert (num < n_systems());
 
-  std::map<std::string, SystemData*>::const_iterator
+  std::map<std::string, GeneralSystem*>::const_iterator
     pos = _systems.begin();
 
   // New code
+#if (__GNUC__ == 2)
+  std::advance (pos, static_cast<int>(num));
+#else
   std::advance (pos, num);
+#endif
 
   // Old code
 //  for (unsigned int i=0; i<num; i++)
@@ -232,15 +237,19 @@ const std::string & EquationSystems::name (const unsigned int num) const
 
 
 
-SystemData & EquationSystems::operator () (const unsigned int num)
+GeneralSystem & EquationSystems::operator () (const unsigned int num)
 {
   assert (num < n_systems());
 
-  std::map<std::string, SystemData*>::iterator
+  std::map<std::string, GeneralSystem*>::iterator
     pos = _systems.begin();
   
   // New code
+#if (__GNUC__ == 2)
+  std::advance (pos, static_cast<int>(num));
+#else
   std::advance (pos, num);
+#endif
 
   // Old code
 //  for (unsigned int i=0; i<num; i++)
@@ -251,15 +260,19 @@ SystemData & EquationSystems::operator () (const unsigned int num)
 
 
 
-const SystemData & EquationSystems::operator ()  (const unsigned int num) const
+const GeneralSystem & EquationSystems::operator ()  (const unsigned int num) const
 {
   assert (num < n_systems());
 
-  std::map<std::string, SystemData*>::const_iterator
+  std::map<std::string, GeneralSystem*>::const_iterator
     pos = _systems.begin();
   
     // New code
+#if (__GNUC__ == 2)
+  std::advance (pos, static_cast<int>(num));
+#else
   std::advance (pos, num);
+#endif
   
   // Old code
   //  for (unsigned int i=0; i<num; i++)
@@ -409,8 +422,8 @@ void EquationSystems::build_solution_vector (std::vector<Complex>& soln)
 
   for (unsigned int sys=0; sys<n_systems(); sys++)
     {
-      const SystemData& system  = (*this)(sys);	      
-      const unsigned int nv_sys = system.n_vars();
+      const GeneralSystem& system  = (*this)(sys);	      
+      const unsigned int nv_sys    = system.n_vars();
       
       system.update_global_solution (sys_soln);
 
@@ -428,7 +441,7 @@ void EquationSystems::build_solution_vector (std::vector<Complex>& soln)
 		if (_mesh.elem(e)->active())
 		  {
 		    const Elem* elem = _mesh.elem(e);
-		    system.dof_map.dof_indices (e, dof_indices, var);
+		    system.get_dof_map().dof_indices (e, dof_indices, var);
 		    
 		    elem_soln.resize(dof_indices.size());
 
@@ -460,11 +473,11 @@ std::string EquationSystems::get_info () const
   out << " EquationSystems:" << std::endl
       << "  n_systems()=" << n_systems() << std::endl;
   
-  for (std::map<std::string, SystemData*>::const_iterator it=_systems.begin();
+  for (std::map<std::string, GeneralSystem*>::const_iterator it=_systems.begin();
        it != _systems.end(); ++it)
     {
-      const std::string& sys_name = it->first;
-      const SystemData&  system   = *it->second;
+      const std::string& sys_name    = it->first;
+      const GeneralSystem&  system   = *it->second;
       
       out << "   System \"" << sys_name << "\"" << std::endl
 	  << "    Variables=";
@@ -477,20 +490,20 @@ std::string EquationSystems::get_info () const
       out << "    Finite Element Types=";
       for (unsigned int vn=0; vn<system.n_vars(); vn++)
       {
-	out << "\"" << system.dof_map.component_type(vn).family << "\" ";
+	out << "\"" << system.get_dof_map().component_type(vn).family << "\" ";
       };
 #else
       out << "    Finite Element Types=";
       for (unsigned int vn=0; vn<system.n_vars(); vn++)
       {
-	out << "\"" << system.dof_map.component_type(vn).family << "\", ";
-	out << "\"" << system.dof_map.component_type(vn).radial_family << "\" ";
+	out << "\"" << system.get_dof_map().component_type(vn).family << "\", ";
+	out << "\"" << system.get_dof_map().component_type(vn).radial_family << "\" ";
       };
 
       out << std::endl << "    Infinite Element Mapping=";
       for (unsigned int vn=0; vn<system.n_vars(); vn++)
       {
-	out << "\"" << system.dof_map.component_type(vn).inf_map << "\" ";
+	out << "\"" << system.get_dof_map().component_type(vn).inf_map << "\" ";
       };
 #endif      
 
@@ -500,10 +513,10 @@ std::string EquationSystems::get_info () const
       for (unsigned int vn=0; vn<system.n_vars(); vn++)
       {
 #ifndef ENABLE_INFINITE_ELEMENTS
-	out << "\"" << system.dof_map.component_type(vn).order << "\" ";
+	out << "\"" << system.get_dof_map().component_type(vn).order << "\" ";
 #else
-	out << "\"" << system.dof_map.component_type(vn).order << "\", ";
-	out << "\"" << system.dof_map.component_type(vn).radial_order << "\" ";
+	out << "\"" << system.get_dof_map().component_type(vn).order << "\", ";
+	out << "\"" << system.get_dof_map().component_type(vn).radial_order << "\" ";
 #endif
       };
 

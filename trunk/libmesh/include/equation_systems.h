@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.9 2003-02-10 22:03:22 benkirk Exp $
+// $Id: equation_systems.h,v 1.10 2003-02-12 02:03:47 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -33,8 +33,7 @@
 
 
 // Forward Declarations
-#define SystemData GeneralSystem
-class SystemData;
+class GeneralSystem;
 class Mesh;
 
 
@@ -124,22 +123,22 @@ public:
   /**
    * @returns a reference to the system named \p name.
    */
-  SystemData & operator () (const std::string& name);
+  GeneralSystem & operator () (const std::string& name);
 
   /**
    * @returns a constant reference to the system name
    */
-  const SystemData & operator () (const std::string& name) const;
+  const GeneralSystem & operator () (const std::string& name) const;
 
   /**
    * @returns a reference to system number \p num.
    */
-  SystemData & operator () (const unsigned int num);
+  GeneralSystem & operator () (const unsigned int num);
 
   /**
    * @returns a constant reference to system number \p num.
    */
-  const SystemData & operator () (const unsigned int num) const;
+  const GeneralSystem & operator () (const unsigned int num) const;
 
   /**
    * @returns the name of the system number num.
@@ -198,7 +197,13 @@ public:
    * @returns a constant reference to the mesh
    */
   const Mesh & get_mesh() const;
-  
+
+  /**
+   * @returns the solver package type currently in use
+   */
+  const SolverPackage get_solver_package() const 
+  { return _solver_package; };
+
   /**
    * Read & initialize the systems from disk using the XDR data format. 
    * This format allows for machine-independent binary output.
@@ -251,7 +256,7 @@ public:
   /**     
    * Data structure that holds the systems.
    */
-  std::map<std::string, SystemData*> _systems;
+  std::map<std::string, GeneralSystem*> _systems;
   
   /**
    * Data structure to hold user-specified flags.
