@@ -1,0 +1,263 @@
+// $Id: tetgen_io.C,v 1.6 2004-10-19 12:44:10 benkirk Exp $
+
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
+  
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+  
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+  
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+// C++ includes
+#include <fstream>
+
+// Local includes
+#include "tetgen_io.h"
+#include "cell_tet4.h"
+
+
+
+// ------------------------------------------------------------
+// TetgenIO class members
+void TetGenIO::read (const std::string& name)
+{
+  std::string name_node, name_ele, dummy;
+
+  // get a reference to the mesh
+  Mesh& mesh = this->mesh();
+  
+  // tetgen only works in 3D
+  assert (mesh.mesh_dimension() == 3);
+
+  // Check name for *.node or *.ele extension.
+  // Set std::istream for node_stream and ele_stream.
+  //
+  if (name.rfind(".node") < name.size()) 
+    {
+      name_node = name;
+      dummy     = name;
+      int position = dummy.rfind(".node");
+      name_ele     = dummy.replace(position, 5, ".ele");
+    }
+  else if (name.rfind(".ele") < name.size()) 
+    {
+      name_ele = name;
+      dummy    = name;
+      int position = dummy.rfind(".ele");
+      name_node    = dummy.replace(position, 4, ".node");
+    }
+  else
+    {
+      std::cerr << "ERROR: Unrecognized file name: "
+		<< name << std::endl;
+      error();
+    }
+
+
+  
+  // Set the streams from which to read in
+  std::ifstream node_stream (name_node.c_str());
+  std::ifstream ele_stream  (name_ele.c_str());
+
+  if ( !node_stream.good() || !ele_stream.good() )
+    {
+      std::cerr << "ERROR: One or both Input file(s) not good." << std::endl
+		<< "Error checking files "
+		<< name_node << " and "
+		<< name_ele  << std::endl;
+      error();
+    }
+
+  // Skip the comment lines at the beginning
+  this->skip_comment_lines (node_stream, '#');
+  this->skip_comment_lines (ele_stream, '#');
+
+  // Read the nodes and elements from the streams
+  this->read_nodes_and_elem (node_stream, ele_stream);
+}
+
+
+
+void TetGenIO::read_nodes_and_elem (std::istream& node_stream,
+				    std::istream& ele_stream)
+{
+  _num_nodes    = 0;
+  _num_elements = 0;
+
+  // Read all the datasets.
+  this->node_in    (node_stream);
+  this->element_in (ele_stream);
+
+  // Tell the MeshData object that we are finished 
+  // reading data.
+  this->mesh().data.close_foreign_id_maps ();
+
+  // some more clean-up
+  _assign_nodes.clear();
+}
+
+
+
+//----------------------------------------------------------------------
+// Function to read in the node table.
+void TetGenIO::node_in (std::istream& node_stream)
+{
+  // Check input buffer
+  assert (node_stream.good());
+
+  // Get a reference to the mesh
+  Mesh& mesh = this->mesh();
+  
+  unsigned int dimension=0, nAttributes=0, BoundaryMarkers=0;
+
+  node_stream >> _num_nodes       // Read the number of nodes from the stream
+	      >> dimension        // Read the dimension from the stream
+	      >> nAttributes      // Read the number of attributes from stream
+	      >> BoundaryMarkers; // Read if or not boundary markers are included in *.node (0 or 1)
+
+  // Read the nodal coordinates from the node_stream (*.node file).
+  unsigned int node_lab=0;
+  Point xyz;
+  Real dummy;
+
+  for (unsigned int i=0; i<_num_nodes; i++)
+    {
+      node_stream >> node_lab  // node number
+		  >> xyz(0)    // x-coordinate value
+		  >> xyz(1)    // y-coordinate value
+		  >> xyz(2);   // z-coordinate value
+
+      // For the number of attributes read all into dummy.
+      for (unsigned int j=0; j<nAttributes; j++)
+	node_stream >> dummy;
+      
+      // Read boundary marker if BoundaryMarker=1.
+      if (BoundaryMarkers == 1)
+	node_stream >> dummy;
+
+      // Store the new position of the node under its label.
+      _assign_nodes.insert (std::make_pair(node_lab,i));
+
+      // Add node to the nodes vector &
+      // tell the MeshData object the foreign node id.
+      mesh.data.add_foreign_node_id (mesh.add_point(xyz), node_lab);
+    }
+}
+
+
+
+//----------------------------------------------------------------------
+// Function to read in the element table.
+void TetGenIO::element_in (std::istream& ele_stream)
+{
+  // Check input buffer
+  assert (ele_stream.good());
+
+  // Get a reference to the mesh
+  Mesh& mesh = this->mesh();
+  
+  // Read the elements from the ele_stream (*.ele file). 
+  unsigned int element_lab, n_nodes, nAttri=0;
+  Real dummy=0.0;
+  unsigned long int node_labels[4]; // Vector that temporarily holds the node labels defining element.
+		
+  ele_stream >> _num_elements // Read the number of tetrahedrons from the stream.
+	     >> n_nodes       // Read the number of nodes per tetrahedron from the stream (defaults to 4).
+	     >> nAttri;       // Read the number of attributes from stream.
+    
+  // Vector that assigns element nodes to their correct position.
+  // TetGen is normaly 0-based
+  // (right now this is strictly not necessary since it is the identity map,
+  //  but in the future TetGen could change their numbering scheme.)
+  static const unsigned int assign_elm_nodes[] = { 0, 1, 2, 3};
+			
+  for (unsigned int i=0; i<_num_elements; i++)
+    {
+      ele_stream >> element_lab;
+			
+      // TetGen only supports Tet4 elements.
+      Elem* elem = new Tet4;
+      
+      // Read node labels
+      for (unsigned int j=0; j<n_nodes; j++)
+	ele_stream >> node_labels[j];
+			
+      // Read attributes from the stream.
+      for (unsigned int j=0; j<nAttri; j++)
+	ele_stream >> dummy;
+			
+      // nodes are being stored in element
+      for (unsigned int j=0; j<n_nodes; j++)
+	elem->set_node(assign_elm_nodes[j]) =
+	  mesh.node_ptr(_assign_nodes[node_labels[j]]);
+
+      // Add the element to the mesh &
+      // tell the MeshData object the foreign element id
+      mesh.data.add_foreign_elem_id (mesh.add_elem(elem), element_lab);
+    }
+}
+
+
+/**
+ * This method implements writing a mesh to a specified ".poly" file.
+ * ".poly" files defines so called Piecewise Linear Complex (PLC).
+ */
+void TetGenIO::write (const std::string& fname)
+{
+  // assert three dimensions (should be extended later)
+  assert (this->mesh().mesh_dimension() == 3);
+
+  if (!(fname.rfind(".poly") < fname.size())) 
+    {
+      std::cerr << "ERROR: Unrecognized file name: "
+                << fname << std::endl;
+      error();
+    }
+
+  // Open the output file stream
+  std::ofstream out (fname.c_str());
+  
+  assert (out.good());
+
+  // Get a reference to the mesh
+  const Mesh& mesh = this->cmesh();
+  
+  // Begin interfacing with the .poly file
+  {
+    // header:
+    out << "# poly file output generated by libmesh\n";
+    out << mesh.n_nodes() << " 3 0 0\n";
+
+    // write the nodes:
+    for (unsigned int v=0; v<mesh.n_nodes(); v++)
+      out << v << " " << mesh.point(v)(0) << " " << mesh.point(v)(1) << " " << mesh.point(v)(2) << "\n";
+  }
+
+  {
+    // write the connectivity:
+    out << "# Facets:\n";
+    out << mesh.n_elem() << " 0\n";
+    
+    const_active_elem_iterator       it (mesh.elements_begin());
+    const const_active_elem_iterator end(mesh.elements_end());
+      
+    for (it=mesh.elements_begin() ; it != end; ++it) {
+      out << "1\n";   // no. of facet polygons
+      out << (*it)->n_nodes() << " " << (*it)->node(0)  << " " << (*it)->node(1)  << " " << (*it)->node(2)  << "\n";
+    } // for
+  }  
+
+  // end of the file
+  out << "0\n"; // no holes output!
+  out << "\n\n# end of file\n";
+}
