@@ -1,4 +1,4 @@
-// $Id: petsc_vector.C,v 1.30 2004-03-14 01:31:48 jwpeterson Exp $
+// $Id: petsc_vector.C,v 1.31 2004-08-20 14:08:42 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -321,8 +321,8 @@ PetscVector<T>::operator = (const PetscVector<T>& v)
       if (v.size() != 0)
 	{
 	  int ierr = 0;
-	  
-	  ierr = VecCopy (v.vec, vec);
+
+	  ierr = VecCopy (v.vec, this->vec);
        	         CHKERRABORT(PETSC_COMM_WORLD,ierr);
 	}
     }
@@ -821,6 +821,143 @@ void PetscVector<Complex>::localize_to_one (std::vector<Complex>& v_local,
 }
 
 #endif
+
+
+
+template <typename T>
+void PetscVector<T>::print_matlab (const std::string name) const
+{
+  assert (this->initialized());
+  assert (this->closed());
+  
+  int ierr=0; 
+  PetscViewer petsc_viewer;
+
+
+  ierr = PetscViewerCreate (PETSC_COMM_WORLD,
+			    &petsc_viewer);
+         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+
+  /**
+   * Create an ASCII file containing the matrix
+   * if a filename was provided.  
+   */
+  if (name != "NULL")
+    {
+      ierr = PetscViewerASCIIOpen( PETSC_COMM_WORLD,
+				   name.c_str(),
+				   &petsc_viewer);
+             CHKERRABORT(PETSC_COMM_WORLD,ierr);
+      
+      ierr = PetscViewerSetFormat (petsc_viewer,
+				   PETSC_VIEWER_ASCII_MATLAB);
+             CHKERRABORT(PETSC_COMM_WORLD,ierr);
+  
+      ierr = VecView (vec, petsc_viewer);
+             CHKERRABORT(PETSC_COMM_WORLD,ierr);
+    }
+
+  /**
+   * Otherwise the matrix will be dumped to the screen.
+   */
+  else
+    {
+      ierr = PetscViewerSetFormat (PETSC_VIEWER_STDOUT_WORLD,
+				   PETSC_VIEWER_ASCII_MATLAB);
+             CHKERRABORT(PETSC_COMM_WORLD,ierr);
+  
+      ierr = VecView (vec, PETSC_VIEWER_STDOUT_WORLD);
+             CHKERRABORT(PETSC_COMM_WORLD,ierr);
+    }
+
+
+  /**
+   * Destroy the viewer.
+   */
+  ierr = PetscViewerDestroy (petsc_viewer);
+         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+}
+
+
+
+
+
+template <typename T>
+void PetscVector<T>::create_subvector(NumericVector<T>& subvector,
+				      const std::vector<unsigned int>& rows) const
+{
+  // PETSc data structures
+  IS parent_is, subvector_is;
+  VecScatter scatter;
+  int ierr = 0;
+  
+  // Make sure the passed int subvector is really a PetscVector
+  PetscVector<T>* petsc_subvector = dynamic_cast<PetscVector<T>*>(&subvector);
+  assert(petsc_subvector != NULL);
+  
+  // If the petsc_subvector is already initialized, we assume that the
+  // user has already allocated the *correct* amount of space for it.
+  // If not, we use the appropriate PETSc routines to initialize it.
+  if (!petsc_subvector->initialized())
+    {
+      // Initialize the petsc_subvector to have enough space to hold
+      // the entries which will be scattered into it.  Note: such an
+      // init() function (where we let PETSc decide the number of local
+      // entries) is not currently offered by the PetscVector
+      // class.  Should we differentiate here between sequential and
+      // parallel vector creation based on libMesh::n_processors() ?
+      ierr = VecCreateMPI(PETSC_COMM_WORLD,
+			  PETSC_DECIDE,          // n_local
+			  rows.size(),           // n_global
+			  &(petsc_subvector->vec)); CHKERRABORT(PETSC_COMM_WORLD,ierr);
+
+      ierr = VecSetFromOptions (petsc_subvector->vec); CHKERRABORT(PETSC_COMM_WORLD,ierr);
+
+      // Mark the subvector as initialized
+      petsc_subvector->_is_initialized = true;
+    }
+  
+  // Use iota to fill an array with entries [0,1,2,3,4,...rows.size()]
+  std::vector<int> idx(rows.size());
+  Utility::iota (idx.begin(), idx.end(), 0);
+
+  // Construct index sets
+  ierr = ISCreateGeneral(PETSC_COMM_WORLD,
+			 rows.size(),
+			 (int*) &rows[0],
+			 &parent_is); CHKERRABORT(PETSC_COMM_WORLD,ierr);
+
+  ierr = ISCreateGeneral(PETSC_COMM_WORLD,
+			 rows.size(),
+			 (int*) &idx[0],
+			 &subvector_is); CHKERRABORT(PETSC_COMM_WORLD,ierr);
+
+  // Construct the scatter object
+  ierr = VecScatterCreate(this->vec,
+			  parent_is,
+			  petsc_subvector->vec,
+			  subvector_is,
+			  &scatter); CHKERRABORT(PETSC_COMM_WORLD,ierr);
+
+  // Actually perform the scatter
+  ierr = VecScatterBegin(this->vec,
+			 petsc_subvector->vec,
+			 INSERT_VALUES,
+			 SCATTER_FORWARD,
+			 scatter); CHKERRABORT(PETSC_COMM_WORLD,ierr);
+
+  ierr = VecScatterEnd(this->vec,
+		       petsc_subvector->vec,
+		       INSERT_VALUES,
+		       SCATTER_FORWARD,
+		       scatter); CHKERRABORT(PETSC_COMM_WORLD,ierr);
+  
+  // Clean up 
+  ierr = ISDestroy(parent_is);       CHKERRABORT(PETSC_COMM_WORLD,ierr);
+  ierr = ISDestroy(subvector_is);    CHKERRABORT(PETSC_COMM_WORLD,ierr);
+  ierr = VecScatterDestroy(scatter); CHKERRABORT(PETSC_COMM_WORLD,ierr); 
+
+}
 
 
 
