@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.h,v 1.12 2003-05-22 21:18:03 benkirk Exp $
+// $Id: mesh_refinement.h,v 1.13 2003-05-26 23:29:50 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -95,6 +95,19 @@ public:
 				       const Real refine_fraction  = 0.3,
 				       const Real coarsen_fraction = 0.0,
 				       const unsigned int max_level = static_cast<unsigned int>(-1));
+
+  /**
+   * Flags elements for coarsening and refinement based on
+   * the computed error passed in \p error_per_cell.  This method picks
+   * the top \p refine_fraction * \p stddev + \p mean elements for refinement
+   * and the bottom \p mean - \p coarsen_fraction * \p stddev elements for
+   * coarsening. The two fractions \p refine_fraction and \p coarsen_fraction
+   * must be in \f$ [0,1] \f$.
+   */
+  void flag_elements_by_mean_stddev (const ErrorVector& error_per_cell,
+				     const Real refine_fraction  = 1.0,
+				     const Real coarsen_fraction = 0.0,
+				     const unsigned int max_level = static_cast<unsigned int>(-1));
 		      
   /**
    * Refines and coarsens user-requested elements. Will also

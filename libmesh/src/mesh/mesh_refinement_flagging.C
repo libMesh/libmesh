@@ -1,4 +1,4 @@
-// $Id: mesh_refinement_flagging.C,v 1.1 2003-05-21 22:17:59 benkirk Exp $
+// $Id: mesh_refinement_flagging.C,v 1.2 2003-05-26 23:30:04 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -200,6 +200,60 @@ void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector& error_pe
   // Call the other refinement scheme
   this->flag_elements_by_error_fraction  (error_per_cell, top_frac,
 					  bottom_frac, max_level);
+}
+
+
+
+void MeshRefinement::flag_elements_by_mean_stddev (const ErrorVector& error_per_cell,
+						   const Real refine_fraction,
+						   const Real coarsen_fraction,
+						   const unsigned int max_level)
+{
+  // Get the mean value from the error vector
+  const Real mean = error_per_cell.mean();
+
+  // Get the standard deviation.  This equals the
+  // square-root of the variance
+  const Real stddev = sqrt (error_per_cell.variance());
+
+  // Check for valid fractions
+  assert (refine_fraction  >= 0.);
+  assert (coarsen_fraction >= 0.);
+
+  // The refine and coarsen cutoff
+  const Real refine_cutoff  =  mean + refine_fraction * stddev;
+  const Real coarsen_cutoff = ((coarsen_fraction == 0.) ? 0. :
+			       mean - coarsen_fraction * stddev);
+
+  
+
+  // Loop over the elements and flag them for coarsening or
+  // refinement based on the element error
+  active_elem_iterator       elem_it (mesh.elements_begin());
+  const active_elem_iterator elem_end(mesh.elements_end());
+
+  for (; elem_it != elem_end; ++elem_it)
+    {
+      Elem* elem             = *elem_it;
+      const unsigned int id  = elem->id();
+
+      assert (id < error_per_cell.size());
+      
+      const float elem_error = error_per_cell[id];
+
+      // Flag the element for coarsening if its error
+      // is <= coarsen_fraction*delta + error_min
+      if (elem_error <= coarsen_cutoff)
+	{
+	  elem->set_refinement_flag(Elem::COARSEN);
+	}
+      
+      // Flag the element for refinement if its error
+      // is >= refinement_cutoff.
+      if (elem_error >= refine_cutoff)
+	if (elem->level() < max_level)
+	  elem->set_refinement_flag(Elem::REFINE);
+    }
 }
 
 
