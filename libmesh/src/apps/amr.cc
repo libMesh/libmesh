@@ -44,9 +44,6 @@ int main (int argc, char** argv)
     
     mesh.print_info();
 
-
-
-
     
     // Set up the equation system(s)
     EquationSystems es(mesh);
@@ -65,13 +62,12 @@ int main (int argc, char** argv)
     
     es.print_info();
     es("primary").get_dof_map().print_dof_constraints();
-    
+
     // call the solver.
     es("primary").solve ();
-    
 
     
-    mesh.write_gmv           ("out.gmv", es);
+    mesh.write_gmv_binary    ("out.gmv", es);
     mesh.write_tecplot_binary("out.plt", es);
   };
   

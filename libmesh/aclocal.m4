@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.18 2003-03-03 19:55:53 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.19 2003-03-05 17:01:08 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -501,6 +501,7 @@ AC_DEFUN(CONFIGURE_PETSC,
   if (test -r $PETSC_DIR/include/petsc.h) ; then
     AC_PROG_F77            dnl Petsc requires linking with FORTRAN libraries 
     AC_F77_LIBRARY_LDFLAGS
+    AC_SUBST(PETSC_ARCH)
     AC_SUBST(PETSC_DIR)
     AC_DEFINE(HAVE_PETSC, 1,
 	      [Flag indicating whether or not Petsc is available])
