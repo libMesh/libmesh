@@ -1,4 +1,4 @@
-// $Id: mesh_refinement_flagging.C,v 1.12 2004-11-08 00:11:05 jwpeterson Exp $
+// $Id: mesh_refinement_flagging.C,v 1.13 2004-12-06 00:48:01 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -292,17 +292,11 @@ void MeshRefinement::flag_elements_by_mean_stddev (const ErrorVector& error_per_
   assert (coarsen_fraction >= 0.);
 
   // The refine and coarsen cutoff
-  const Real refine_cutoff  =  mean + refine_fraction * stddev;
-  const Real coarsen_cutoff = ((coarsen_fraction == 0.) ? 0. :
-			       mean - coarsen_fraction * stddev);
-
-  
-
+  const Real refine_cutoff  =  mean + refine_fraction  * stddev;
+  const Real coarsen_cutoff =  std::max(mean - coarsen_fraction * stddev, 0.);
+      
   // Loop over the elements and flag them for coarsening or
   // refinement based on the element error
-//   active_elem_iterator       elem_it (_mesh.elements_begin());
-//   const active_elem_iterator elem_end(_mesh.elements_end());
-
   MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
   const MeshBase::element_iterator elem_end = _mesh.active_elements_end(); 
 
@@ -315,18 +309,13 @@ void MeshRefinement::flag_elements_by_mean_stddev (const ErrorVector& error_per_
       
       const float elem_error = error_per_cell[id];
 
-      // Flag the element for coarsening if its error
-      // is <= coarsen_fraction*delta + error_min
+      // Possibly flag the element for coarsening ...
       if (elem_error <= coarsen_cutoff)
-	{
-	  elem->set_refinement_flag(Elem::COARSEN);
-	}
+	elem->set_refinement_flag(Elem::COARSEN);
       
-      // Flag the element for refinement if its error
-      // is >= refinement_cutoff.
-      if (elem_error >= refine_cutoff)
-	if (elem->level() < max_level)
-	  elem->set_refinement_flag(Elem::REFINE);
+      // ... or refinement
+      if ((elem_error >= refine_cutoff) && (elem->level() < max_level))
+	elem->set_refinement_flag(Elem::REFINE);
     }
 }
 
