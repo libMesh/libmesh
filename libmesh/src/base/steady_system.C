@@ -1,4 +1,4 @@
-// $Id: steady_system.C,v 1.3 2003-05-16 14:37:49 benkirk Exp $
+// $Id: steady_system.C,v 1.4 2003-05-28 03:17:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -93,9 +93,6 @@ void SteadySystem::reinit ()
 	solution->set(i+first_local_dof,
 		      (*current_local_solution)(i+first_local_dof));
     }
-    
-    // Update the local solution to reflect the new values
-    //this->update ();
   }
 }
 

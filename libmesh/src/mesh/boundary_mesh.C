@@ -1,4 +1,4 @@
-// $Id: boundary_mesh.C,v 1.8 2003-03-04 12:59:48 benkirk Exp $
+// $Id: boundary_mesh.C,v 1.9 2003-05-28 03:17:50 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -28,9 +28,8 @@
 
 // ------------------------------------------------------------
 // BoundaryMesh class member functions
-BoundaryMesh::BoundaryMesh(unsigned int d,
-			   unsigned int pid) :
-  MeshBase(d, pid)
+BoundaryMesh::BoundaryMesh(unsigned int d) :
+  MeshBase(d)
 {
 }
 
@@ -45,10 +44,8 @@ BoundaryMesh::~BoundaryMesh()
 
 void BoundaryMesh::clear()
 {
-  // Reset the number of subdomains and the
-  // number of processors
+  // Reset the number of subdomains
   _n_sbd  = 1;
-  _n_proc = 1;
 
   // Clear the elements data structure
   {

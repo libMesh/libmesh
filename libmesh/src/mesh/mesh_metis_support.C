@@ -1,4 +1,4 @@
-// $Id: mesh_metis_support.C,v 1.13 2003-05-27 17:18:17 benkirk Exp $
+// $Id: mesh_metis_support.C,v 1.14 2003-05-28 03:17:50 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,40 +24,31 @@
 
 // Local includes
 #include "mesh_base.h"
-#include "libmesh.h"
-#include "elem.h"
-#include "mesh_logging.h"
 
 
 #ifdef HAVE_METIS
-namespace Metis {
-extern "C" {
-# include "metis.h"
-}
-}
+
+# include "libmesh.h"
+# include "elem.h"
+# include "mesh_logging.h"
+
+  namespace Metis {
+    extern "C" {
+#     include "metis.h"
+    }
+  }
+
 #endif
 
 
 void MeshBase::metis_partition(const unsigned int n_sbdmns,
 			       const std::string& type)
 {
-#ifndef HAVE_METIS
-  
-  std::cerr << "ERROR:  Metis not detected during configuration!" << std::endl
-	    << "        Using space-filling curves instead." << std::endl;
-
-  sfc_partition(n_sbdmns);
-  
-  return;
-  
-#else
-
   const unsigned int n_active_elem = this->n_active_elem();
   
   assert (n_sbdmns <= n_active_elem);
   
   this->set_n_subdomains() = n_sbdmns;
-  this->set_n_processors() = n_sbdmns;
 
   // check for easy return
   if (n_sbdmns == 1)
@@ -68,16 +59,34 @@ void MeshBase::metis_partition(const unsigned int n_sbdmns,
       
       return;
     }
+
+  
+#ifndef HAVE_METIS
+
   
   
-  assert (_dim != 1);
+  std::cerr << "ERROR:  Metis not detected during configuration!" << std::endl
+	    << "        Using space-filling curves instead."      << std::endl;
+
+  here();
+  
+  this->sfc_partition(n_sbdmns);
+
+
+  
+#else
+
+  
+
+  assert (this->mesh_dimension() != 1);
 
   START_LOG("metis_partition()", "MeshBase");
 
   // build the graph
   // the forward_map maps the active element id
   // into a contiguous block of indices for Metis
-  std::vector<unsigned int> forward_map (this->n_elem());
+  std::vector<unsigned int> forward_map (this->n_elem(),
+					 static_cast<unsigned int>(-1));
   
   std::vector<int>          xadj;
   std::vector<int>          adjncy;
@@ -86,14 +95,15 @@ void MeshBase::metis_partition(const unsigned int n_sbdmns,
   std::vector<int>          part(n_active_elem);
   
   int
-    n = static_cast<int>(n_active_elem), // number of "nodes" (elements)
-                                         //   in the graph
-    wgtflag = 2,                         // weights on vertices only
-    numflag = 0,                         // C-style 0-based numbering
-    nparts = static_cast<int>(n_sbdmns), // number of subdomains to create
-    edgecut = 0;                         // the numbers of edges cut by the
-                                         //   partition
+    n = static_cast<int>(n_active_elem),  // number of "nodes" (elements)
+                                          //   in the graph
+    wgtflag = 2,                          // weights on vertices only
+    numflag = 0,                          // C-style 0-based numbering
+    nparts  = static_cast<int>(n_sbdmns), // number of subdomains to create
+    edgecut = 0;                          // the numbers of edges cut by the
+                                          //   partition
 
+  // Set the options
   options[0] = 0; // use default options
 
 
@@ -108,6 +118,8 @@ void MeshBase::metis_partition(const unsigned int n_sbdmns,
 
     for (; elem_it != elem_end; ++elem_it)
       {
+	assert ((*elem_it)->id() < forward_map.size());
+	
 	forward_map[(*elem_it)->id()] = el_num;
 	el_num++;
       }
@@ -127,6 +139,10 @@ void MeshBase::metis_partition(const unsigned int n_sbdmns,
       {
 	const Elem* elem = *elem_it;
 
+	assert (elem->id() < forward_map.size());
+	assert (forward_map[elem->id()] !=
+		static_cast<unsigned int>(-1));
+	
 	// maybe there is a better weight?
 	vwgt[forward_map[elem->id()]]
 	     = elem->n_nodes(); 
@@ -145,7 +161,14 @@ void MeshBase::metis_partition(const unsigned int n_sbdmns,
 		// If the neighbor is active treat it
 		// as a connection
 		if (neighbor->active())
-		  adjncy.push_back (forward_map[neighbor->id()]);
+		  {
+		    assert (neighbor->id() < forward_map.size());
+		    assert (forward_map[neighbor->id()] !=
+			    static_cast<unsigned int>(-1));
+
+		    adjncy.push_back (forward_map[neighbor->id()]);
+
+		  }
 		
 		// Otherwise we need to find all of the
 		// neighbor's children that are connected to
@@ -168,6 +191,9 @@ void MeshBase::metis_partition(const unsigned int n_sbdmns,
 			
 			// This assumes a level-1 mesh
 			assert (child->active());
+			assert (child->id() < forward_map.size());
+			assert (forward_map[child->id()] !=
+				static_cast<unsigned int>(-1));
 			
 			adjncy.push_back (forward_map[child->id()]);
 		      }
@@ -222,10 +248,14 @@ void MeshBase::metis_partition(const unsigned int n_sbdmns,
       {
 	Elem* elem = *elem_it;
 
+	assert (elem->id() < forward_map.size());
+	assert (forward_map[elem->id()] !=
+		static_cast<unsigned int>(-1));
+	
 	elem->set_subdomain_id() =
 	  elem->set_processor_id() =
-
 	  static_cast<short int>(part[forward_map[elem->id()]]);
+	
       }
   }
 

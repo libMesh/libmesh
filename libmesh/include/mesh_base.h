@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.30 2003-05-22 17:06:21 jwpeterson Exp $
+// $Id: mesh_base.h,v 1.31 2003-05-28 03:17:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -64,7 +64,7 @@ template <typename T> class PetscMatrix;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.30 $
+ * \version $Revision: 1.31 $
  */
 
 
@@ -77,9 +77,8 @@ public:
   /**
    * Constructor.
    */
-  MeshBase (unsigned int d,
-	    unsigned int proc_id=libMeshBase::processor_id());
-
+  MeshBase (unsigned int d);
+  
   /**
    * Copy-constructor.
    */
@@ -438,13 +437,13 @@ public:
    * @returns the number of processors used in the
    * current simulation.
    */
-  unsigned int n_processors () const { return _n_proc; }
+  unsigned int n_processors () const { return libMeshBase::n_processors(); }
 
 
   /**
    * @returns the subdomain id for this processor.
    */
-  unsigned int processor_id () const { return _proc_id; }
+  unsigned int processor_id () const { return libMeshBase::processor_id(); }
   
   /**
    * Reads the file specified by \p name.  Attempts to figure out the
@@ -791,10 +790,10 @@ protected:
 			 const bool write_partitioning=false);
 
   /**
-   * Fills the vector "on_boundary" with 0's and 1's which tells whether each node
-   * is not on (0) or on (1) the boundary.
+   * Fills the vector "on_boundary" with flags that tell whether each node
+   * is on the domain boundary (true)) or not (false).
    */
-  void find_boundary_nodes(std::vector<short int>& on_boundary);
+  void find_boundary_nodes(std::vector<bool>& on_boundary);
   
   
 #ifdef ENABLE_AMR
@@ -818,16 +817,10 @@ protected:
   { return _n_sbd; }
 
   /**
-   * Returns a writeable reference to the number of processors.
-   */
-  unsigned int& set_n_processors ()
-  { return _n_proc; }
-
-  /**
    * Reads input from \p in, skipping all the lines
    * that start with the character \p comment_start.
    */
-  void skip_comment_lines (std::istream &in,
+  void skip_comment_lines (std::istream& in,
 			   const char comment_start);
 
   /**
@@ -846,19 +839,9 @@ protected:
   unsigned int _n_sbd;
 
   /**
-   * The number of processors the mesh has been partitioned for.
-   */
-  unsigned int _n_proc;
-
-  /**
    * The logical dimension of the mesh.
    */     
   const unsigned int _dim;
-
-  /**
-   * The processor id.
-   */
-  const unsigned int _proc_id;
 
   /**
    * Flag indicating if the mesh has been prepared for use.
@@ -941,25 +924,6 @@ Node& MeshBase::node (const unsigned int i)
   assert (_nodes[i] != NULL);
 
   return (*_nodes[i]);
-}
-
-
-
-inline
-void MeshBase::prepare_for_use ()
-{
-  // Let all the elements find their neighbors
-  this->find_neighbors();
-  
-  // Partition the mesh.
-  this->partition();
-
-  // Renumber the nodes and elements so that they in
-  // contiguous blocks per processor.
-  this->renumber_nodes_and_elements();
-
-  // The mesh is now prepared for use.
-  _is_prepared = true;
 }
 
 

@@ -1,4 +1,4 @@
-// $Id: mesh_common.h,v 1.15 2003-05-22 12:48:08 benkirk Exp $
+// $Id: mesh_common.h,v 1.16 2003-05-28 03:17:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -98,13 +98,13 @@ typedef std::complex<double> COMPLEX;
 // If you want to make sure you are accessing a section of code just
 // stick a here(); in it, for example
 #undef here
-#define here()     { std::cout << "[" << libMeshBase::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled on " << __DATE__ << " at " << __TIME__ << std::endl; }
+#define here()     { std::cout << "[" << libMeshBase::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; }
 
 #undef error
-#define error()    { std::cerr << "[" << libMeshBase::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled on " << __DATE__ << " at " << __TIME__ << std::endl; abort(); }
+#define error()    { std::cerr << "[" << libMeshBase::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; abort(); }
 
 #undef untested
-#define untested() { std::cout << "*** Using untested code: " << __FILE__ << ", line " << __LINE__ << ", compiled on " << __DATE__ << " at " << __TIME__ << " ***" << std::endl; }
+#define untested() { std::cout << "*** Using untested code: " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl; }
 
 
 
