@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.33 2003-11-30 05:00:36 benkirk Exp $
+# $Id: Makefile,v 1.34 2004-02-08 20:25:23 benkirk Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -53,7 +53,9 @@ endif
 #
 # 
 #
-.PHONY: clean clobber distclean doc upload doc_upload log cvsweb TODO
+.PHONY: echo echo_cxxflags echo_include echo_ldflags \
+	clean clobber distclean \
+	doc upload doc_upload log cvsweb TODO
 
 #
 # static library
@@ -100,6 +102,24 @@ echo:
 	@echo -e "LIBS:\n$(LIBS)\n"
 	@echo -e "LDFLAGS:\n$(LDFLAGS)\n"
 	@echo -e "DLFLAGS:\n$(DLFLAGS)\n"
+
+#
+# Print the flags used for C++ compilation, padded with whitespace
+#
+echo_cxxflags:
+	@echo -n " " $(CXXFLAGS) " "
+
+#
+# Print C++ compiler include path, padded with whitespace
+#
+echo_include:
+	@echo -n " " $(INCLUDE) " "
+
+#
+# Print the flags used to link, padded with whitespace
+#
+echo_ldflags:
+	@echo -n " " $(LIBS) $(LDFLAGS) $(DLFLAGS) " "
 
 #	
 # Remove project object files for the current mode

@@ -45,3 +45,4 @@ it_test*
 ii_files
 so_locations
 libmesh-devel-mailing-list
+config.status
