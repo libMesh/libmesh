@@ -1,4 +1,4 @@
-// $Id: distributed_vector.h,v 1.1 2003-02-18 19:43:36 benkirk Exp $
+// $Id: distributed_vector.h,v 1.2 2003-02-19 13:28:41 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -45,7 +45,6 @@ namespace Mpi
 
 // Local includes
 #include "numeric_vector.h"
-#include "libmesh.h"
 
 
 
@@ -396,27 +395,57 @@ void DistributedVector<Tp>::init (const unsigned int n,
   _local_size  = n_local;
   _global_size = n;
 
+  _first_local_index = 0;
   
 #ifdef HAVE_MPI
 
+  using namespace Mpi;
+  
+  int n_proc=0, proc_id=0;
+  
+  MPI_Comm_rank (MPI_COMM_WORLD, &proc_id);
+  MPI_Comm_size (MPI_COMM_WORLD, &n_proc);
+  
+  std::vector<int> local_sizes(n_proc, 0);
+
+  local_sizes[proc_id] = n_local;
+
+  MPI_Allreduce (&local_sizes[0], &local_sizes[0], local_sizes.size(),
+		 MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+  
   // _first_local_index is the sum of _local_size
   // for all processor ids less than ours
+  for (int p=0; p<proc_id; p++)
+    _first_local_index += local_sizes[p];
+
+
+#  ifdef DEBUG
+  // Make sure all the local sizes sum up to the global
+  // size, otherwise there is big trouble!
+  int sum=0;
+
+  for (int p=0; p<n_proc; p++)
+    sum += local_sizes[p];
+
+  assert (sum == static_cast<int>(n));
+  assert (sum == static_cast<int>(size()));
+  
+#  endif
   
 #else
   
+  // No other options without MPI!
   if (n != n_local)
     {
       std::cerr << "ERROR:  MPI is required for n != n_local!"
 		<< std::endl;
       error();
     }
-
-  // No other options without MPI!
-  _first_local_index = 0;
-  _last_local_index  = n;
   
 #endif
 
+  _last_local_index = _first_local_index + n_local;
+  
   // Set the initialized flag
   _is_initialized = true;
 
