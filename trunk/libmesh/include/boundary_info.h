@@ -1,4 +1,4 @@
-// $Id: boundary_info.h,v 1.13 2003-03-04 12:59:47 benkirk Exp $
+// $Id: boundary_info.h,v 1.14 2003-05-14 11:54:36 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -28,12 +28,12 @@
 
 // Local includes
 #include "elem.h"
+#include "boundary_data.h"
 
 
 // Forward declarations
 class MeshBase;
 class BoundaryMesh;
-
 
 
 
@@ -153,26 +153,32 @@ class BoundaryInfo
   const std::set<short int>& get_boundary_ids () const
   { return boundary_ids; }
 
-  /**
-   * Add boundary values for \p Node \p node with id \p id to the boundary
-   * information data structures.
-   */
-  void add_boundary_values (const Node* node,
-			    const std::vector<Real> values,
-			    const short int id);
 
   /**
-   * Add boundary values for node number \p node with id \p id to the boundary
-   * information data structures.
+   * Attach a \p BoundaryData object to this \p BoundaryInfo.
+   * Do this @e prior to reading the mesh that this \p BoundaryInfo
+   * belongs to!  Note that this object does @e not own the
+   * \p bd and therefore does not delete \p bd when itself
+   * goes out of scope.
    */
-  void add_boundary_values (const unsigned int node,
-			    const std::vector<Real> values,
-			    const short int id);
+  void attach_boundary_data (BoundaryData* bd);
 
   /**
-   * @returns the boundary values specified for \p Node \p node.
+   * @returns true when this object has a \p BoundaryData attached.
    */
-  std::vector<Real> get_boundary_values (const Node* node) const;
+  bool has_boundary_data () const;
+
+  /**
+   * @returns a const reference to the \p BoundaryData
+   * object that this object owns.
+   */
+  const BoundaryData& get_boundary_data () const;
+
+  /**
+   * @returns a writable reference to the \p BoundaryData
+   * object that this object owns.
+   */
+  BoundaryData& get_boundary_data ();
 
   /**
    * Print the boundary information data structure.
@@ -215,11 +221,12 @@ class BoundaryInfo
   std::set<short int> boundary_ids;
 
   /**
-   * A vector for boundary values
+   * The boundary data object that holds values
+   * associated with nodes & elements
    */
-  std::vector<std::pair<const Node*,
-              std::vector<Real> > >   boundary_values;
-  
+  BoundaryData* _boundary_data;
+
+
 
   /**
    * Functor class for printing a single node's info
@@ -292,6 +299,31 @@ class BoundaryInfo
   };
   
 };
+
+
+// ------------------------------------------------------------
+// BoundaryData inline methods
+inline  
+bool BoundaryInfo::has_boundary_data () const
+{
+  return (_boundary_data != NULL);
+}
+
+
+
+inline
+const BoundaryData& BoundaryInfo::get_boundary_data () const
+{
+  return *_boundary_data;
+}
+
+
+
+inline
+BoundaryData& BoundaryInfo::get_boundary_data ()
+{
+  return *_boundary_data;
+}
 
 
 #endif

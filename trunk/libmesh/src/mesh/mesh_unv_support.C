@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.C,v 1.9 2003-03-27 18:30:04 spetersen Exp $
+// $Id: mesh_unv_support.C,v 1.10 2003-05-14 11:54:37 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,6 +24,7 @@
 
 // Local includes
 #include "mesh_unv_support.h"
+#include "boundary_data.h"
 #include "face_quad4.h"
 #include "face_tri3.h"
 #include "face_tri6.h"
@@ -54,78 +55,55 @@ void Mesh::read_unv(std::istream& in){
 //-----------------------------------------------------------------------------
 // UnvInterface Methods
 
-UnvInterface::UnvInterface(std::istream& _in,
-			   std::vector<Node*>& _nodes,
-			   std::vector<Elem*>& _elements,
+UnvInterface::UnvInterface(std::istream& in,
+			   std::vector<Node*>& nodes,
+			   std::vector<Elem*>& elements,
 			   BoundaryInfo& boundary_info):
-  phys_file(_in),
-  nodes(_nodes),
-  elements(_elements)
+  _phys_file     (in),
+  _nodes         (nodes),
+  _elements      (elements),
+  _boundary_info (boundary_info)
 {
-  if ( !phys_file.good() )
+  if ( !_phys_file.good() )
   {
     std::cout << "Input file not good!" << std::endl;
     error();
   }
 
-  label_dataset_nodes = "2411";
-  label_dataset_elms  = "2412";
-  label_dataset_bcs   = "2414";
-  num_nodes = 0;
-  num_elements = 0;
-  num_bcs = 0;
-  need_D_to_e = true;
+  _label_dataset_nodes = "2411";
+  _label_dataset_elms  = "2412";
+  _num_nodes = 0;
+  _num_elements = 0;
+  _need_D_to_e = true;
 
 
   // use temporary file name as buffer
-  temporary_file_name = tmpnam (NULL);
-  std::cout << "Using temporary file: " << temporary_file_name << std::endl;
+  _temporary_file_name = tmpnam (NULL);
+  std::cout << "Using temporary file: " << _temporary_file_name << std::endl;
 
-  temporary_file.open(temporary_file_name, std::fstream::out);
-  if  ( !temporary_file.good() )
+  _temporary_file.open(_temporary_file_name, std::fstream::out);
+  if  ( !_temporary_file.good() )
   {
     std::cout << "Error opening temporary file." << std::endl;
     error();
   }
    
-
   init();
 
 
-  // writing operations in temporary_file are finished, now we close the file
+  // writing operations in _temporary_file are finished, now we close the file
   // and open it for reading
-  temporary_file.close();
-  temporary_file.open(temporary_file_name, std::fstream::in);
+  _temporary_file.close();
+  _temporary_file.open(_temporary_file_name, std::fstream::in);
 
-  if  ( !temporary_file.good() )
+  if  ( !_temporary_file.good() )
   {
     std::cout << "Error re-opening temporary file for reading." << std::endl;
     error();
   }
    
-
   node_in();
   element_in();
-  bcs_in(boundary_info);
-
-  // added for testing bcs import only
-
-  // const vector<std::pair<unsigned int,
-  //    std::vector<Real> > >&  testvalues = boundary_info.get_boundary_values();
-
-  // std::cout << "List of Boundary Values:" << std::endl;
-
-  // for(unsigned int bc_cnt=0; bc_cnt < num_bcs; bc_cnt++){
-  // std::cout <<  "Node " << testvalues[bc_cnt].first << ":" << std::endl;
-  // std::cout << testvalues[bc_cnt].second[0] << " "
-  //      << testvalues[bc_cnt].second[1] << " "
-  //      << testvalues[bc_cnt].second[2] << " "
-  //      << testvalues[bc_cnt].second[3] << " "
-  //      << testvalues[bc_cnt].second[4] << " "
-  //      << testvalues[bc_cnt].second[5] << " "
-  //      << std::endl;}
-
-
 }
 
 
@@ -133,9 +111,9 @@ UnvInterface::UnvInterface(std::istream& _in,
 UnvInterface::~UnvInterface()
 {
 
-  temporary_file.close();
+  _temporary_file.close();
 
-  if ( remove(temporary_file_name) == -1 )
+  if ( remove(_temporary_file_name) == -1 )
   {
     std::cout << "Error deleting temporary file." << std::endl;
     error();
@@ -152,19 +130,19 @@ void UnvInterface::init()
 
   while (true)            // work through the file until break (caused by eof)
     {
-      phys_file >> olds >> news; // read two arguments from the stream
+      _phys_file >> olds >> news; // read two arguments from the stream
 
       // a "-1" followed by a number means the beginning of a dataset
       // stop combing at the end of the file
       while( ((olds != "-1") || (news == "-1") )
 	     &&
-	     !phys_file.eof() )
+	     !_phys_file.eof() )
 	{
 	  olds = news;    // go on reading
-	  phys_file >> news;
+	  _phys_file >> news;
 	}
 
-      if(phys_file.eof()) // end of file is reached
+      if(_phys_file.eof()) // end of file is reached
 	{ break; }
 
       scan_dataset(news); // scan the dataset for important information
@@ -179,17 +157,17 @@ void UnvInterface::scan_dataset(std::string ds_num){
   // some datasets need special treatment
 
   // dataset containing the nodes
-  if (ds_num == label_dataset_nodes)
+  if (ds_num == _label_dataset_nodes)
     {
       //Write beginning of dataset to virtual file
-      temporary_file << "    -1\n"
+      _temporary_file << "    -1\n"
 		     << "  " << ds_num << "\n";
 
       // store the position of the dataset in the virtual file
-      ds_position[ds_num]=temporary_file.tellp();
+      _ds_position[ds_num]=_temporary_file.tellp();
 
-      // if num_nodes is not 0 the dataset has already been scanned
-      if (num_nodes != 0)
+      // if _num_nodes is not 0 the dataset has already been scanned
+      if (_num_nodes != 0)
 	{
 	  std::cerr << "Error: UnvInterface::scan_dataset():\n"
 		    << "Trying to scan nodes twice!" << std::endl;
@@ -204,61 +182,61 @@ void UnvInterface::scan_dataset(std::string ds_num){
       int i;                             // used for counting
       while (true)                       // read data until break
 	{
-	  phys_file >> data;             // read the node label
+	  _phys_file >> data;             // read the node label
 	   	
 	  if (data == "-1")
 	  {     
 	    // end of dataset is reached
-	    temporary_file << "    -1\n";
+	    _temporary_file << "    -1\n";
 	    break;
 	  }
 
-	  temporary_file << "\t" << data;
+	  _temporary_file << "\t" << data;
 
 	  for(i=0;i<3;i++)
 	  {
-	    phys_file >> data;
-	    temporary_file << "\t" << data;
+	    _phys_file >> data;
+	    _temporary_file << "\t" << data;
 	  }
 	
-	  temporary_file << "\n"
+	  _temporary_file << "\n"
 		   << "  ";
 
-	  if(need_D_to_e == true)
+	  if(_need_D_to_e == true)
 	    {
 	      for(i=0;i<3;i++)
 	      {
-		phys_file >> data;
-		temporary_file << D_to_e(data) << "\t";
+		_phys_file >> data;
+		_temporary_file << D_to_e(data) << "\t";
 	      }
 	    }
 	  else
 	    {
 	      for(i=0;i<3;i++)
 	      {
-		phys_file >> data;
-		temporary_file << data << "\t";
+		_phys_file >> data;
+		_temporary_file << data << "\t";
 	      }
 	    }
 
-	  temporary_file << "\n";
+	  _temporary_file << "\n";
 
-	  num_nodes++;                   // count nodes
+	  _num_nodes++;                   // count nodes
 	}
     }
 
   // dataset containing the elements
-  else if (ds_num == label_dataset_elms)
+  else if (ds_num == _label_dataset_elms)
     {
       //Write beginning of dataset to virtual file
-      temporary_file << "    -1\n"
+      _temporary_file << "    -1\n"
 		     << "  " << ds_num << "\n";
 
       // store the position of the dataset in the virtual file
-      ds_position[ds_num]=temporary_file.tellp();
+      _ds_position[ds_num]=_temporary_file.tellp();
 
-      // if num_elements is not 0 the dataset has already been scanned
-      if (num_elements != 0)
+      // if _num_elements is not 0 the dataset has already been scanned
+      if (_num_elements != 0)
 	{
 	  std::cerr << "Error: UnvInterface::scan_dataset():\n"
 		    << "Trying to scan elements twice!" << std::endl;
@@ -271,147 +249,46 @@ void UnvInterface::scan_dataset(std::string ds_num){
 
       while (true)                       // scan data until break
 	{
-	  phys_file >> data;             // read element label
+	  _phys_file >> data;             // read element label
 	  if (data == "-1") 
 	  { 
 	    // end of dataset is reached
-	    temporary_file << "    -1\n";
+	    _temporary_file << "    -1\n";
 	    break;
 	  }
 
-	  temporary_file << "\t" << data;
+	  _temporary_file << "\t" << data;
 	
 	  // Data of the node, including the number of nodes, which come next
 	  // For further information read comments of element_in()
 	  for(i=0;i<4;i++)
 	  {
-	    phys_file >> data;
-	    temporary_file << "\t" << data;
+	    _phys_file >> data;
+	    _temporary_file << "\t" << data;
 	  }
 
-	  phys_file >> i;                 // number of nodes
-	  temporary_file << "\t" << i << "\n";
+	  _phys_file >> i;                 // number of nodes
+	  _temporary_file << "\t" << i << "\n";
 	  while (i > 0)                   // ignore the nodes
 	    {
-	      phys_file >> data;
-	      temporary_file << "\t" << data;
+	      _phys_file >> data;
+	      _temporary_file << "\t" << data;
 	      i--;
 	    }
 
-	  temporary_file << "\n";
-	  num_elements++;                 // count elements
+	  _temporary_file << "\n";
+	  _num_elements++;                 // count elements
 	}
     }
 
-  // dataset containing the boundary conditions
-  else if (ds_num == label_dataset_bcs)
-    {
-      //Write beginning of dataset to virtual file
-      temporary_file << "    -1\n"
-		     << "  " << ds_num << "\n";
-
-      // store the position of the dataset in the virtual file
-      ds_position[ds_num]=temporary_file.tellp();
-
-      // if num_elements is not 0 the dataset has already been scanned
-      if (num_bcs != 0)
-	{
-	  std::cerr << "Error: UnvInterface::scan_dataset():\n"
-		    << "Trying to scan boundary conditions twice!" << std::endl;
-	  error();
-	  return;
-	}
-      
-      phys_file.ignore(256,'\n');
-
-      // ignore analysis dataset label
-      phys_file.ignore(256,'\n');
-      temporary_file << "NONE" << "\n";
-
-      // ignore analysis dataset name
-      phys_file.ignore(256,'\n');
-      temporary_file << "NONE" << "\n";
-
-      // location of data
-      phys_file >> bcs_dataset_location;
-      temporary_file << bcs_dataset_location << "\n";
-      if (bcs_dataset_location != 1){
-	std::cerr << "Error: UnvInterface::scan_dataset():\n"
-		  << "Currently ONLY boundary data at nodes supported!"
-		  << std::endl;}
-
-      // ignore the ID lines
-      for(char i=0;i<6;i++){
-	phys_file.ignore(256,'\n');
-	temporary_file << "NONE" << "\n";}
-
-      std::string data;                  // Sets of data to be read from file
-
-      // for further information on ignored data 
-      // read comments in UnvInterface::bcs_in
-
-      // ignore Record 9 
-      for(char i=0;i<6;i++){
-	phys_file >> data;
-	temporary_file << "\t" << data;}
-
-      temporary_file << "\n";
-
-      // ignore Record 10
-      for(char i=0;i<8;i++){
-	phys_file >> data;
-	temporary_file << "\t" << data;}
-
-      temporary_file << "\n";
-
-      // ignore Record 11
-      for(char i=0;i<2;i++){
-	phys_file >> data;
-	temporary_file << "\t" << data;}
-
-      temporary_file << "\n";
-
-      // ignore record 12
-      for(char i=0;i<6;i++){
-	phys_file >> data;
-	temporary_file << data << "\t";}
-
-      temporary_file << "\n";
-
-      // ignore record 13
-      for(char i=0;i<6;i++){
-	phys_file >> data;
-	temporary_file << data << "\t";}
-
-      temporary_file << "\n";
-
-      if (bcs_dataset_location == 1){
-      while (true)                       // scan data until break
-	{
-	  phys_file >> data;             // read node number
-	  if (data == "-1") {            // end of dataset is reached
-	    temporary_file << "    -1\n";
-	    break;}
-
-	  temporary_file << "\t" << data << "\n"; // write node number
-
-	  for(char i=0;i<6;i++){
-	    phys_file >> data;
-	    temporary_file << data << "\t";}
-	  temporary_file << "\n";
-
-	  num_bcs++;                 // count boundary conditions
-	}
-      }
-    }
 
   // datasets that are not of special interest are ignored
   else
     {
       std::string data;
       do {
-	phys_file >> data;                // read the beginning of every line
-	phys_file.ignore(256,'\n');}      // ignore the rest
+	_phys_file >> data;                // read the beginning of every line
+	_phys_file.ignore(256,'\n');}      // ignore the rest
       while (data != "-1");               // look for delimiter
     }
 }
@@ -422,37 +299,23 @@ void UnvInterface::set_stream_pointer(std::string ds_num)
 {
   // An error message is displayed if the specified
   // dataset does not exist
-  if (static_cast<int>(ds_position[ds_num]) == 0)
+  if (static_cast<int>(_ds_position[ds_num]) == 0)
     {
-      if (ds_num == "2414")
-	{
-	  std::cout
-	    << "UnvInterface::set_stream_pointer(std::string ds_num):\n"
-	    << "Dataset #" << ds_num << " not found in file.\n"
-	    << "No boundary conditions specified.\n" << std::endl;
-	  return;
-	}
-      else
-	{
-	  std::cerr
-	    << "Error: UnvInterface::set_stream_pointer(std::string ds_num):\n"
-	    << "Dataset #" << ds_num << " not found in file." << std::endl;
-	  error();
-	  return;
-	 }
+      std::cerr << "Error: UnvInterface::set_stream_pointer(std::string ds_num):\n"
+		<< "Dataset #" << ds_num 
+		<< " not found in file." << std::endl;
+      error();
+      return;
     }
 
   // Move file pointer
-  temporary_file.seekg(ds_position[ds_num],std::ios::beg);
+  _temporary_file.seekg(_ds_position[ds_num],std::ios::beg);
 }
 
 
 
-// Method reads nodes from the virtual file and stores them in
-// vector<Node> nodes in the order they come in.
-// The original node labels are being stored in the
-// map assign_nodes in order to assign the elements to
-// the right nodes later.
+
+
 void UnvInterface::node_in()
 {
   // Variables needed for reading
@@ -464,15 +327,15 @@ void UnvInterface::node_in()
 
   // allocate the correct amount of memory for the vector
   // that holds the nodes
-  nodes.resize(num_nodes);
+  _nodes.resize(_num_nodes);
 
   // put the file-pointer at the beginning of the dataset
-  set_stream_pointer(label_dataset_nodes);
+  set_stream_pointer(_label_dataset_nodes);
 
   // read from virtual file
-  for(unsigned int i=0;i<num_nodes;i++)
+  for(unsigned int i=0;i<_num_nodes;i++)
     {
-      temporary_file >> node_lab                // read the node label
+      _temporary_file >> node_lab                // read the node label
 		     >> exp_coord_sys_num       // (not supported yet)
 		     >> disp_coord_sys_num      // (not supported yet)
 		     >> color                   // (not supported yet)
@@ -481,19 +344,26 @@ void UnvInterface::node_in()
 		     >> z;                      // read z-coordinate
 
       // store the new position of the node under its label
-      assign_nodes[node_lab]=i;
+      _assign_nodes[node_lab]=i;
 
       // add node to the nodes vector.
-      nodes[i] = Node::build(x,y,z,i);
+      _nodes[i] = Node::build(x,y,z,i);
+
+      // when there is a BoundaryData object, add the foreign id
+      if (_boundary_info.has_boundary_data())
+	  _boundary_info.get_boundary_data().add_foreign_node_id(_nodes[i],
+								 node_lab);
+
     }
+
+
+  // when there is a BoundaryData object, tell it we are finished with nodes
+  if (_boundary_info.has_boundary_data())
+      _boundary_info.get_boundary_data().close_node_map();
 }
 
 
 
-// Method reads elements and stores them in
-// vector<Elem*> elements in the same order as they
-// come in. That means labels are ignored!
-// Changes in node numbers are taken into account.
 void UnvInterface::element_in()
 {
   // Variables needed for reading from the file
@@ -526,15 +396,15 @@ void UnvInterface::element_in()
 
   // allocate the correct amount of memory for the vector
   // that holds the elements
-  elements.resize(num_elements);
+  _elements.resize(_num_elements);
 
   // put the file-pointer at the beginning of the dataset
-  set_stream_pointer(label_dataset_elms);
+  set_stream_pointer(_label_dataset_elms);
 
   // read from the virtual file
-  for (unsigned int i=0;i<num_elements;i++)
+  for (unsigned int i=0;i<_num_elements;i++)
     {
-      temporary_file >> element_lab             // read element label
+      _temporary_file >> element_lab             // read element label
 		     >> fe_descriptor_id        // read FE descriptor id
 		     >> phys_prop_tab_num       // (not supported yet)
 		     >> mat_prop_tab_num        // (not supported yet)
@@ -542,7 +412,7 @@ void UnvInterface::element_in()
 		     >> n_nodes;                // read number of nodes on element
 
       for (unsigned int j=1;j<=n_nodes;j++)
-	temporary_file >> node_labels[j];             // read node labels
+	_temporary_file >> node_labels[j];             // read node labels
 
       // UNV-FE descriptor id has to be recognized and translated to mesh
       switch (fe_descriptor_id)
@@ -550,7 +420,7 @@ void UnvInterface::element_in()
 	
 	case 41: // Plane Stress Linear Triangle
 	case 91: // Thin Shell   Linear Triangle
-	  elements[i]=new Tri3;  // add new element
+	  _elements[i]=new Tri3;  // add new element
 	  assign_elm_nodes[1]=0;
 	  assign_elm_nodes[2]=2;
 	  assign_elm_nodes[3]=1;
@@ -558,7 +428,7 @@ void UnvInterface::element_in()
 	
 	case 42: // Plane Stress Quadratic Triangle
 	case 92: // Thin Shell   Quadratic Triangle
-	  elements[i]=new Tri6;  // add new element
+	  _elements[i]=new Tri6;  // add new element
 	  assign_elm_nodes[1]=0;
 	  assign_elm_nodes[2]=5;
 	  assign_elm_nodes[3]=2;
@@ -577,7 +447,7 @@ void UnvInterface::element_in()
 	
 	case 44: // Plane Stress Linear Quadrilateral
 	case 94: // Thin Shell   Linear Quadrilateral
-	  elements[i]=new Quad4; // add new element
+	  _elements[i]=new Quad4; // add new element
 	  assign_elm_nodes[1]=0;
 	  assign_elm_nodes[2]=3;
 	  assign_elm_nodes[3]=2;
@@ -586,7 +456,7 @@ void UnvInterface::element_in()
 	
 	case 45: // Plane Stress Quadratic Quadrilateral
 	case 95: // Thin Shell   Quadratic Quadrilateral
-	  elements[i]=new Quad8; // add new element
+	  _elements[i]=new Quad8; // add new element
 	  assign_elm_nodes[1]=0;
 	  assign_elm_nodes[2]=7;
 	  assign_elm_nodes[3]=3;
@@ -606,7 +476,7 @@ void UnvInterface::element_in()
 	
 	
 	case 111: // Solid Linear Tetrahedron
-	  elements[i]=new Tet4;  // add new element
+	  _elements[i]=new Tet4;  // add new element
 	  assign_elm_nodes[1]=0;
 	  assign_elm_nodes[2]=1;
 	  assign_elm_nodes[3]=2;
@@ -615,7 +485,7 @@ void UnvInterface::element_in()
 
 
 	case 112: // Solid Linear Prism
-	  elements[i]=new Prism6;  // add new element
+	  _elements[i]=new Prism6;  // add new element
 	  assign_elm_nodes[1]=0;
 	  assign_elm_nodes[2]=1;
 	  assign_elm_nodes[3]=2;
@@ -625,7 +495,7 @@ void UnvInterface::element_in()
 	  break;
 	
 	case 115: // Solid Linear Brick
-	  elements[i]=new Hex8;  // add new element
+	  _elements[i]=new Hex8;  // add new element
 	  assign_elm_nodes[1]=0;
 	  assign_elm_nodes[2]=4;
 	  assign_elm_nodes[3]=5;
@@ -638,7 +508,7 @@ void UnvInterface::element_in()
 	
 	
 	case 116: // Solid Quadratic Brick
-	  elements[i]=new Hex20; // add new element
+	  _elements[i]=new Hex20; // add new element
 	  assign_elm_nodes[1]=0;
 	  assign_elm_nodes[2]=12;
 	  assign_elm_nodes[3]=4;
@@ -672,7 +542,7 @@ void UnvInterface::element_in()
 
 	
 	case 118: // Solid Parabolic Tetrahedron
-	  elements[i]=new Tet10; // add new element
+	  _elements[i]=new Tet10; // add new element
 	  assign_elm_nodes[1]=0;
 	  assign_elm_nodes[2]=4;
 	  assign_elm_nodes[3]=1;
@@ -697,73 +567,20 @@ void UnvInterface::element_in()
 
       // nodes are being stored in element
       for (unsigned int j=1;j<=n_nodes;j++)
-	elements[i]->set_node(assign_elm_nodes[j]) = nodes[assign_nodes[node_labels[j]]];
+	_elements[i]->set_node(assign_elm_nodes[j]) = _nodes[_assign_nodes[node_labels[j]]];
+
+
+      // when there is a BoundaryData object, add the foreign elem id
+      if (_boundary_info.has_boundary_data())
+	  _boundary_info.get_boundary_data().add_foreign_elem_id(_elements[i],
+								 element_lab);
+
 
     }
-}
 
-void UnvInterface::bcs_in(BoundaryInfo& boundary_info)
-{
-  // put the file-pointer at the beginning of the dataset
-  set_stream_pointer(label_dataset_bcs);
-
-  // ignore header
-  for(char i=0;i<9;i++){
-    temporary_file.ignore(256,'\n');}
-
-  unsigned int Model_type,          
-               Analysis_type,
-               Data_characteristic,
-               Result_type,
-               Data_type,
-               NVALDC,
-               dummy_u_int;
-
-  Real dummy_Real;
-
-  temporary_file >> Model_type           // not supported yet
-		 >> Analysis_type        // not supported yet
-		 >> Data_characteristic  // not supported yet
-		 >> Result_type          // not supported yet
-		 >> Data_type            // not supported yet
-		 >> NVALDC;              // not supported yet
-
-  // Record 10 and 11: Integer analysis type specific data
-  // (not supported yet)
-  for (char i=0;i<10;i++){
-    temporary_file >> dummy_u_int;}
-
-  // Record 12 and 13: Real analysis type specific data
-  // (not supported yet)
-  for(char i=0;i<12;i++){
-    temporary_file >> dummy_Real;}
-
-  // boundary_values.resize(num_bcs);
-
-  unsigned int       bc_node;
-  std::vector<Real>  boundary_data;
-  // complex data in 3 directions, should be generalized to
-  // other formats later (using record 9) 
-  boundary_data.resize(6);
-
-
-  // Reading Real data
-  for(unsigned int i=0;i<num_bcs;i++){
-    temporary_file >> dummy_u_int;
-
-    bc_node = assign_nodes[dummy_u_int];
-    temporary_file >> boundary_data[0]
-		   >> boundary_data[1]
-		   >> boundary_data[2]
-		   >> boundary_data[3]
-		   >> boundary_data[4]
-		   >> boundary_data[5];
-
-    // add boundary data to the boundary info data structure
-    boundary_info.add_boundary_values(bc_node, boundary_data, 1);
-
-  }
-
+  // when there is a BoundaryData object, tell it we are finished with nodes
+  if (_boundary_info.has_boundary_data())
+      _boundary_info.get_boundary_data().close_elem_map();
 }
 
 
@@ -789,7 +606,7 @@ std::string& UnvInterface::D_to_e(std::string& number)
   else
   {
     // we assume that if this one number is written correctly, all numbers are
-    need_D_to_e = false;
+    _need_D_to_e = false;
   }
 
   return number;

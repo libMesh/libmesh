@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.18 2003-03-04 12:59:48 benkirk Exp $
+// $Id: boundary_info.C,v 1.19 2003-05-14 11:54:37 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -40,7 +40,8 @@ const short int BoundaryInfo::invalid_id = -1234;
 //------------------------------------------------------
 // BoundaryInfo functions
 BoundaryInfo::BoundaryInfo(const MeshBase& m) :
-  mesh(m)
+  mesh           (m),
+  _boundary_data (NULL)
 {
 }
 
@@ -58,7 +59,7 @@ void BoundaryInfo::clear()
   boundary_node_id.clear();
   boundary_side_id.clear();
   boundary_ids.clear();
-  boundary_values.clear();
+  _boundary_data = NULL;
 }
 
 
@@ -278,48 +279,6 @@ short int BoundaryInfo::boundary_id(const Elem* elem,
 
 
 
-void BoundaryInfo::add_boundary_values(const unsigned int node,
-				       const std::vector<Real> values,
-				       const short int id)
-{
-  add_boundary_values (mesh.node_ptr(node), values, id);
-}
-
-
-
-void BoundaryInfo::add_boundary_values(const Node* node,
-				       const std::vector<Real> values,
-				       const short int id)
-{
-  add_node(node, id);
-  boundary_values.push_back(std::make_pair(node, values));
-}
-
-
-
-std::vector<Real> BoundaryInfo::get_boundary_values(const Node* node) const
-{
-  std::vector<std::pair<const Node*,
-              std::vector<Real> > >::const_iterator pos;
-  
-  for (pos=boundary_values.begin(); pos!=boundary_values.end(); ++pos)
-    {
-      if (pos->first == node)
-	{
-	  return pos->second;
-	}
-    }
-
-  std::cerr << "ERROR: No boundary values are specified for Node: "
-	    << node->id() << std::endl;
-
-  error();
-  std::vector<Real> v;
-  return v;
-}
-
-
-
 void BoundaryInfo::build_node_list (std::vector<unsigned int>& nl,
 				    std::vector<short int>&    il) const
 {
@@ -392,3 +351,14 @@ void BoundaryInfo::print_info() const
 
 
 
+void BoundaryInfo::attach_boundary_data (BoundaryData* bd)
+{
+  assert (bd != NULL);
+  if (has_boundary_data())
+    {
+      std::cerr << "ERROR: BoundaryData already attached!" << std::endl;
+      error();
+    }
+
+  _boundary_data = bd;
+}
