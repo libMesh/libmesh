@@ -1,4 +1,4 @@
-// $Id: mesh_data.C,v 1.18 2004-03-21 04:19:30 benkirk Exp $
+// $Id: mesh_data.C,v 1.19 2004-03-21 16:14:10 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -163,55 +163,39 @@ void MeshData::translate (const MeshBase& out_mesh,
 
   const unsigned int n_comp = this->n_val_per_node();
 
-  /*
-   * transfer our nodal data to a vector
-   * that may be written concurrently
-   * with the \p out_mesh.
-   */
+  // transfer our nodal data to a vector
+  // that may be written concurrently
+  // with the \p out_mesh.
   {
     // reserve memory for the nodal data
     values.reserve(n_comp*out_mesh.n_nodes());
-
-    std::vector<Number>::iterator values_it = values.begin();
-
+    
     // iterate over the mesh's nodes
-    const std::vector<Node*>& mesh_nodes = out_mesh.get_nodes();
+    const_node_iterator       nodes_it  (out_mesh.nodes_begin());
+    const const_node_iterator nodes_end (out_mesh.nodes_end());
 
-    std::vector<Node*>::const_iterator nodes_it = mesh_nodes.begin();
-    const std::vector<Node*>::const_iterator nodes_end = mesh_nodes.end();
-
-    /*
-     * Do not use the \p get_data() method, but the operator()
-     * method, since this returns by default a zero value,
-     * when there is no nodal data.
-     */
+    // Do not use the \p get_data() method, but the operator()
+    // method, since this returns by default a zero value,
+    // when there is no nodal data.
     for (; nodes_it != nodes_end; ++nodes_it)
       {
 	const Node* node = *nodes_it;
-
+	
 	for (unsigned int c= 0; c<n_comp; c++)
-	  {
-	    // store the data, then advance
-	    *values_it = this->operator()(node, c);
-	    ++values_it;
-	  }
+	  values.push_back(this->operator()(node, c));
       }
   }
 
 
-
-  /*
-   * Now we have the data, nicely stored in \p values.
-   * It remains to give names to the data, then write to
-   * file.
-   */
+  
+  // Now we have the data, nicely stored in \p values.
+  // It remains to give names to the data, then write to
+  // file.
   {
     names.reserve(n_comp);
-
-    /*
-     * this naming scheme only works up to n_comp=100
-     * (at least for gmv-accepted variable names)
-     */
+    
+    // this naming scheme only works up to n_comp=100
+    // (at least for gmv-accepted variable names)
     assert(n_comp < 100);
 
     for (unsigned int n=0; n<n_comp; n++)
@@ -428,12 +412,10 @@ unsigned int MeshData::node_to_foreign_id (const Node* n) const
       // when active, use our _node_id map
       assert (_node_id_map_closed);
 
-      /*
-       * look it up in the map
-       */
+      // look it up in the map
       std::map<const Node*,
-	  unsigned int>::const_iterator pos = _node_id.find(n);
-
+	       unsigned int>::const_iterator pos = _node_id.find(n);
+      
       if (pos == _node_id.end())
         {
 	  std::cerr << "ERROR: No foreign id stored for the node "
@@ -447,9 +429,9 @@ unsigned int MeshData::node_to_foreign_id (const Node* n) const
 	  return pos->second;
     }
   else if (_compatibility_mode)
-      // when only in compatibility mode, 
-      // return libMesh's node id
-      return n->id();
+    // when only in compatibility mode, 
+    // return libMesh's node id
+    return n->id();
 
   // should never get here
   error();
@@ -469,10 +451,10 @@ const Elem* MeshData::foreign_id_to_elem (const unsigned int fid) const
     {
       // when active, use our _id_elem map
       assert (_elem_id_map_closed);
-
+      
       std::map<unsigned int,
 	       const Elem*>::const_iterator pos = _id_elem.find(fid);
-
+      
       if (pos == _id_elem.end())
         {
 	  std::cerr << "ERROR: Have no Elem* associated with the foreign id = "
@@ -485,9 +467,9 @@ const Elem* MeshData::foreign_id_to_elem (const unsigned int fid) const
 	  return pos->second;
     }
   else if (_compatibility_mode)
-      // when only in compatibility mode, 
-      // return element using the libMesh id
-      return this->_mesh.elem(fid);
+    // when only in compatibility mode, 
+    // return element using the libMesh id
+    return this->_mesh.elem(fid);
 
   // should never get here
   error();
@@ -507,10 +489,8 @@ unsigned int MeshData::elem_to_foreign_id (const Elem* e) const
       // when active, use our _id_elem map
       assert (_elem_id_map_closed);
 
-      /*
-       * look it up in the map
-       */
-      std::map<const Elem*,
+             // look it up in the map
+             std::map<const Elem*,
 	       unsigned int>::const_iterator pos = _elem_id.find(e);
 
       if (pos == _elem_id.end())
@@ -526,9 +506,9 @@ unsigned int MeshData::elem_to_foreign_id (const Elem* e) const
 	  return pos->second;
     }
   else if (_compatibility_mode)
-      // when only in compatibility mode, 
-      // return libMesh's element id
-      return e->id();
+    // when only in compatibility mode, 
+    // return libMesh's element id
+    return e->id();
 
   // should never get here
   error();
@@ -564,13 +544,11 @@ void MeshData::insert_node_data (std::map<const Node*,
   std::map<const Node*, 
            std::vector<Number> >::const_iterator nd_end = nd.end();
 
-  /*
-   * Compare entity-by-entity that the
-   * sizes of the std::vector's are identical.
-   * For this, simply take the length of the 0th
-   * entry as reference length, and compare this
-   * with the length of the 1st, 2nd...
-   */
+  // Compare entity-by-entity that the
+  // sizes of the std::vector's are identical.
+  // For this, simply take the length of the 0th
+  // entry as reference length, and compare this
+  // with the length of the 1st, 2nd...
   assert (nd_pos != nd_end);
   const unsigned int reference_length = (*nd_pos).second.size();
 
@@ -578,14 +556,12 @@ void MeshData::insert_node_data (std::map<const Node*,
   ++nd_pos;
 
   for (; nd_pos != nd_end; ++nd_pos)
-  {
-      if ( (*nd_pos).second.size() != reference_length) 
-        {
-	  std::cerr << "ERROR: Size mismatch."
-		    << std::endl;
-	  error();
-	}
-  }
+    if ( (*nd_pos).second.size() != reference_length) 
+      {
+	std::cerr << "ERROR: Size mismatch."
+		  << std::endl;
+	error();
+      }
 #endif
 
   // copy over
@@ -632,22 +608,18 @@ void MeshData::insert_elem_data (std::map<const Elem*,
   std::map<const Elem*, 
            std::vector<Number> >::const_iterator ed_end = ed.end();
 
-  /*
-   * Compare entity-by-entity that the
-   * sizes of the std::vector's are identical.
-   */
+  // Compare entity-by-entity that the
+  // sizes of the std::vector's are identical.
   const unsigned int reference_length = (*ed_pos).second.size();
   ++ed_pos;
 
   for (; ed_pos != ed_end; ++ed_pos)
-  {
-      if ( (*ed_pos).second.size() != reference_length) 
-        {
-	  std::cerr << "ERROR: Size mismatch."
-		    << std::endl;
-	  error();
-	}
-  }
+    if ( (*ed_pos).second.size() != reference_length) 
+      {
+	std::cerr << "ERROR: Size mismatch."
+		  << std::endl;
+	error();
+      }
 #endif
 
   // copy over
@@ -744,31 +716,26 @@ void MeshData::assign (const MeshData& omd)
   this->_active             = omd._active;
   this->_compatibility_mode = omd._compatibility_mode;
 
-  /*
-   * this is ok because we do not manage the UnvHeader
-   * in terms of memory, but only hold a pointer to it...
-   */
+  // this is ok because we do not manage the UnvHeader
+  // in terms of memory, but only hold a pointer to it...
   this->_unv_header         = omd._unv_header;
 
-  /*
-   * Now copy the foreign id maps -- but only for the 
-   * nodes.  The nodes of the boundary mesh are actually
-   * nodes of the volume mesh.
-   */
+  // Now copy the foreign id maps -- but only for the 
+  // nodes.  The nodes of the boundary mesh are actually
+  // nodes of the volume mesh.
   this->_node_id = omd._node_id;
   this->_id_node = omd._id_node;
 
-  /*
-   * The element vector of the boundary mesh contains elements
-   * that are new, and there _cannot_ be any associated
-   * foreign id in the maps.  Therefore, fill the maps with
-   * the libMesh id's.  But only when the other MeshData
-   * has element ids.
-   */
+  // The element vector of the boundary mesh contains elements
+  // that are new, and there _cannot_ be any associated
+  // foreign id in the maps.  Therefore, fill the maps with
+  // the libMesh id's.  But only when the other MeshData
+  // has element ids.
   if ((this->_active) && (omd._elem_id.size() != 0))
     {
-      std::vector<const Elem*>::const_iterator elem_it        = this->_mesh.elements_begin().first;
-      const std::vector<const Elem*>::const_iterator elem_end = this->_mesh.elements_end().first;
+      const_elem_iterator       elem_it (_mesh.elements_begin());
+      const const_elem_iterator elem_end(_mesh.elements_end());
+      
       for (; elem_it != elem_end; ++elem_it)
         {
 	  const Elem* elem = *elem_it;  
@@ -780,9 +747,7 @@ void MeshData::assign (const MeshData& omd)
   this->_elem_id_map_closed   = omd._elem_id_map_closed;
   
 
-  /*
-   * and finally the node- and element-associated data
-   */
+  // and finally the node- and element-associated data
   this->_node_data = omd._node_data;
   this->_elem_data = omd._elem_data;
 }

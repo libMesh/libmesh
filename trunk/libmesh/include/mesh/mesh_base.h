@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.12 2004-03-21 03:54:19 benkirk Exp $
+// $Id: mesh_base.h,v 1.13 2004-03-21 16:14:09 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -34,7 +34,6 @@
 // forward declarations
 class Elem;
 class EquationSystems;
-//template <typename T> class PetscMatrix;
 
 
 // Local Includes -----------------------------------
@@ -62,7 +61,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.12 $
+ * \version $Revision: 1.13 $
  */
 
 
@@ -533,6 +532,14 @@ public:
   std::pair<std::vector<const Elem*>::const_iterator,
 	    std::vector<const Elem*>::const_iterator>
   elements_begin () const;
+
+  /**
+   * Returns a pair of std::vector<Elem*>::const_iterators which point
+   * to the beginning and end of the _elements vector.
+   */
+  std::pair<std::vector<const Elem*>::const_iterator,
+	    std::vector<const Elem*>::const_iterator>
+  const_elements_begin () const;
   
   /**
    * Returns a pair of std::vector<Elem*>::iterators which point
@@ -553,6 +560,15 @@ public:
   elements_end () const;
   
   /**
+   * Returns a pair of std::vector<Elem*>::const_iterators which point
+   * to the end of the _elements vector.  This simulates a normal
+   * end() const_iterator.
+   */
+  std::pair<std::vector<const Elem*>::const_iterator,
+	    std::vector<const Elem*>::const_iterator>
+  const_elements_end () const;
+  
+  /**
    * Returns a pair of std::vector<Node*>::iterators which point
    * to the beginning and end of the _nodes vector.
    */
@@ -567,6 +583,14 @@ public:
   std::pair<std::vector<const Node*>::const_iterator,
 	    std::vector<const Node*>::const_iterator>
   nodes_begin () const;
+  
+  /**
+   * Returns a pair of std::vector<Node*>::const_iterators which point
+   * to the beginning and end of the _nodes vector.
+   */
+  std::pair<std::vector<const Node*>::const_iterator,
+	    std::vector<const Node*>::const_iterator>
+  const_nodes_begin () const;
 
   /**
    * Returns a pair of std::vector<Node*>::iterators which point
@@ -585,6 +609,15 @@ public:
   std::pair<std::vector<const Node*>::const_iterator,
 	    std::vector<const Node*>::const_iterator>
   nodes_end () const;
+  
+  /**
+   * Returns a pair of std::vector<Node*>::const_iterators which point
+   * to the end of the _nodes vector.  This simulates a normal
+   * end() const_iterator.
+   */
+  std::pair<std::vector<const Node*>::const_iterator,
+	    std::vector<const Node*>::const_iterator>
+  const_nodes_end () const;
   
   /**
    * Fills the vector "on_boundary" with flags that tell whether each node
@@ -852,6 +885,16 @@ MeshBase::elements_begin () const
   return std::make_pair(((std::vector<const Elem*>*) &_elements)->begin(),
 			((std::vector<const Elem*>*) &_elements)->end());      
 }
+  
+
+
+inline
+std::pair<std::vector<const Elem*>::const_iterator,
+	  std::vector<const Elem*>::const_iterator>
+MeshBase::const_elements_begin () const
+{
+  return this->elements_begin();
+}
 
 
 
@@ -875,6 +918,16 @@ MeshBase::elements_end () const
   // but truly constant iterators are worth it...
   return std::make_pair(((std::vector<const Elem*>*) &_elements)->end(),
 			((std::vector<const Elem*>*) &_elements)->end());
+}
+
+
+
+inline
+std::pair<std::vector<const Elem*>::const_iterator,
+	  std::vector<const Elem*>::const_iterator>
+MeshBase::const_elements_end () const
+{
+  return this->elements_end();
 }
   
 
@@ -904,6 +957,16 @@ MeshBase::nodes_begin () const
 
 
 inline
+std::pair<std::vector<const Node*>::const_iterator,
+	  std::vector<const Node*>::const_iterator>
+MeshBase::const_nodes_begin () const
+{
+  return this->nodes_begin();
+}
+
+
+
+inline
 std::pair<std::vector<Node*>::iterator,
 	  std::vector<Node*>::iterator>
 MeshBase::nodes_end ()
@@ -923,6 +986,16 @@ MeshBase::nodes_end () const
   // but truly constant iterators are worth it...
   return std::make_pair(((std::vector<const Node*>*) &_nodes)->end(),
 			((std::vector<const Node*>*) &_nodes)->end());
+}
+
+
+
+inline
+std::pair<std::vector<const Node*>::const_iterator,
+	  std::vector<const Node*>::const_iterator>
+MeshBase::const_nodes_end () const
+{
+  return this->nodes_end();
 }
 
 
