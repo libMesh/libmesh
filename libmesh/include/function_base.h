@@ -1,4 +1,4 @@
-// $Id: function_base.h,v 1.2 2003-05-15 23:34:33 benkirk Exp $
+// $Id: function_base.h,v 1.3 2003-05-15 23:56:45 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -154,7 +154,7 @@ void FunctionBase::operator() (const Point& p,
 			       DenseVector<Number>& output)
 {
   // Call the time-dependent function with t=0.
-  return this->operator()(p, 0., output);
+  this->operator()(p, 0., output);
 }
 
 #endif
