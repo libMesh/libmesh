@@ -308,7 +308,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT CC CFLAGS ac_ct_CC enableshared GXX_VERSION CXXFLAGSG CXXFLAGSO CXXFLAGSP CXXFLAGSS CFLAGSG CFLAGSO CFLAGSP CFLAGSS CXXDEPFLAG CXXSHAREDFLAG RPATHFLAG CXXCPP EGREP MPCXX PWD enablexdr enablecomplex NETCDF_LIB NETCDF_INCLUDE EXODUS_LIB EXODUS_INCLUDE enableoptional F77 FFLAGS ac_ct_F77 FLIBS PETSC_ARCH PETSC_DIR petscversion MPI_IMPL MPI MPI_LIBS MPI_LIBS_PATH MPI_LIBS_PATHS MPI_INCLUDES_PATH MPI_INCLUDES_PATHS enablepetsc LASPACK_INCLUDE LASPACK_LIB enablelaspack SFC_INCLUDE SFC_LIB enablesfc GZSTREAM_INCLUDE GZSTREAM_LIB enablegz TECPLOT_LIBRARY TECPLOT_INCLUDE METIS_INCLUDE METIS_LIB PARMETIS_INCLUDE PARMETIS_LIB enablemetis enableparmetis DOXYGEN DOT DOTPATH HAVE_DOT PERL LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT CC CFLAGS ac_ct_CC enableshared GXX_VERSION CXXFLAGSG CXXFLAGSO CXXFLAGSP CXXFLAGSS CFLAGSG CFLAGSO CFLAGSP CFLAGSS CXXDEPFLAG CXXSHAREDFLAG RPATHFLAG CXXCPP EGREP MPCXX PWD enablexdr enablecomplex NETCDF_LIB NETCDF_INCLUDE EXODUS_LIB EXODUS_INCLUDE enableoptional F77 FFLAGS ac_ct_F77 FLIBS PETSC_ARCH PETSC_DIR petscversion petscmajorminor MPI_IMPL MPI MPI_LIBS MPI_LIBS_PATH MPI_LIBS_PATHS MPI_INCLUDES_PATH MPI_INCLUDES_PATHS enablepetsc LASPACK_INCLUDE LASPACK_LIB enablelaspack SFC_INCLUDE SFC_LIB enablesfc GZSTREAM_INCLUDE GZSTREAM_LIB enablegz TECPLOT_LIBRARY TECPLOT_INCLUDE METIS_INCLUDE METIS_LIB PARMETIS_INCLUDE PARMETIS_LIB enablemetis enableparmetis DOXYGEN DOT DOTPATH HAVE_DOT PERL LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -7959,8 +7959,10 @@ _ACEOF
       petscminor=`grep "define PETSC_VERSION_MINOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_MINOR[ ]*//g"`
       petscsubminor=`grep "define PETSC_VERSION_SUBMINOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_SUBMINOR[ ]*//g"`
       petscversion=$petscmajor.$petscminor.$petscsubminor
+      petscmajorminor=$petscmajor.$petscminor.x
       echo "$as_me:$LINENO: result: <<< Configuring library with PETSc version $petscversion support >>>" >&5
 echo "${ECHO_T}<<< Configuring library with PETSc version $petscversion support >>>" >&6
+
 
 
 
@@ -10703,6 +10705,7 @@ s,@FLIBS@,$FLIBS,;t t
 s,@PETSC_ARCH@,$PETSC_ARCH,;t t
 s,@PETSC_DIR@,$PETSC_DIR,;t t
 s,@petscversion@,$petscversion,;t t
+s,@petscmajorminor@,$petscmajorminor,;t t
 s,@MPI_IMPL@,$MPI_IMPL,;t t
 s,@MPI@,$MPI,;t t
 s,@MPI_LIBS@,$MPI_LIBS,;t t

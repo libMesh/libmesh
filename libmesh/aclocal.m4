@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.60 2004-04-14 17:32:47 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.61 2004-04-20 11:22:29 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -552,8 +552,10 @@ AC_DEFUN(CONFIGURE_PETSC,
       petscminor=`grep "define PETSC_VERSION_MINOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_MINOR[ ]*//g"`
       petscsubminor=`grep "define PETSC_VERSION_SUBMINOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_SUBMINOR[ ]*//g"`
       petscversion=$petscmajor.$petscminor.$petscsubminor
+      petscmajorminor=$petscmajor.$petscminor.x
       AC_MSG_RESULT(<<< Configuring library with PETSc version $petscversion support >>>)
       AC_SUBST(petscversion)
+      AC_SUBST(petscmajorminor)
       AC_SUBST(MPI_IMPL)
   
       else
