@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.53 2004-01-20 13:36:03 benkirk Exp $
+// $Id: dof_map.C,v 1.54 2004-02-03 01:39:57 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -688,7 +688,6 @@ void DofMap::dof_indices (const Elem* elem,
 	      assert (elem->dof_number(sys_num,v,i) !=
 		      DofObject::invalid_id);
 
-	      here();
 	      di.push_back(elem->dof_number(sys_num,v,i));
 	    }
 	}
