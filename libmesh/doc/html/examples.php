@@ -78,7 +78,14 @@ run-time selection of quadrature rules.
 <br>
 <br>
 
-
+<h2><a href="ex10.php">Example 10</a> -- Solving a Transient System with Adaptive Mesh Refinement</h2>
+This example shows how a simple, linear transient
+system can be solved in parallel.  The system is simple
+scalar convection-diffusion with a specified external
+velocity.  The initial condition is given, and the
+solution is advanced in time with a standard Crank-Nicholson
+time-stepping strategy.
+ 
 
 
 </div>
