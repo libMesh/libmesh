@@ -1,0 +1,1730 @@
+// $Id: fe_clough_shape_2D.C,v 1.1 2005-01-13 22:21:04 roystgnr Exp $
+
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
+  
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+  
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+  
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+// C++ inlcludes
+
+// Local includes
+#include "fe.h"
+#include "elem.h"
+//#include "utility.h"
+
+
+// Anonymous namespace for persistant variables.
+// This allows us to cache the global-to-local mapping transformation
+// This should also screw up multithreading royally
+namespace
+{
+  static unsigned int old_elem_id = libMesh::invalid_uint;
+  // Coefficient naming: d(1)d(2n) is the coefficient of the
+  // global shape function corresponding to value 1 in terms of the
+  // local shape function corresponding to normal derivative 2
+  static Real d1d2n, d1d3n, d2d3n, d2d1n, d3d1n, d3d2n;
+  static Real d1xd1x, d1xd1y, d1xd2n, d1xd3n;
+  static Real d1yd1x, d1yd1y, d1yd2n, d1yd3n;
+  static Real d2xd2x, d2xd2y, d2xd3n, d2xd1n;
+  static Real d2yd2x, d2yd2y, d2yd3n, d2yd1n;
+  static Real d3xd3x, d3xd3y, d3xd1n, d3xd2n;
+  static Real d3yd3x, d3yd3y, d3yd1n, d3yd2n;
+  static Real d1nd1n, d2nd2n, d3nd3n;
+
+Real clough_raw_shape_second_deriv(const unsigned int basis_num,
+                                   const unsigned int deriv_type,
+                                   const Point& p);
+Real clough_raw_shape_deriv(const unsigned int basis_num,
+                            const unsigned int deriv_type,
+                            const Point& p);
+Real clough_raw_shape(const unsigned int basis_num,
+                      const Point& p);
+unsigned char subtriangle_lookup(const Point& p);
+
+
+// Compute the static coefficients for an element
+void clough_compute_coefs(const Elem* elem)
+{
+  // Coefficients are cached from old elements
+  if (elem->id() == old_elem_id)
+    return;
+
+  old_elem_id = elem->id();
+
+  const Order mapping_order        (elem->default_order());
+  const ElemType mapping_elem_type (elem->type());
+  const int n_mapping_shape_functions =
+    FE<2,LAGRANGE>::n_shape_functions(mapping_elem_type,
+				      mapping_order);
+
+  // Degrees of freedom are at vertices and edge midpoints
+  std::vector<Point> dofpt;
+  dofpt.push_back(Point(0,0));
+  dofpt.push_back(Point(1,0));
+  dofpt.push_back(Point(0,1));
+  dofpt.push_back(Point(1/2.,1/2.));
+  dofpt.push_back(Point(0,1/2.));
+  dofpt.push_back(Point(1/2.,0));
+
+  // Mapping functions - first derivatives at each dofpt
+  std::vector<Real> dxdxi(6), dxdeta(6), dydxi(6), dydeta(6);
+  std::vector<Real> dxidx(6), detadx(6), dxidy(6), detady(6);
+
+  for (int p = 0; p != 6; ++p)
+    {
+//      std::cerr << p << ' ' << dofpt[p];
+      for (int i = 0; i != n_mapping_shape_functions; ++i)
+        {
+          const Real ddxi = FE<2,LAGRANGE>::shape_deriv 
+            (mapping_elem_type, mapping_order, i, 0, dofpt[p]);
+          const Real ddeta = FE<2,LAGRANGE>::shape_deriv 
+            (mapping_elem_type, mapping_order, i, 1, dofpt[p]);
+
+//      std::cerr << ddxi << ' ';
+//      std::cerr << ddeta << std::endl;
+
+          dxdxi[p] += elem->point(i)(0) * ddxi;
+          dydxi[p] += elem->point(i)(1) * ddxi;
+          dxdeta[p] += elem->point(i)(0) * ddeta;
+          dydeta[p] += elem->point(i)(1) * ddeta;
+        }
+
+//      for (int i = 0; i != 12; ++i)
+//          std::cerr << i << ' ' << clough_raw_shape(i, dofpt[p]) << std::endl;
+
+//      std::cerr << elem->point(p)(0) << ' ';
+//      std::cerr << elem->point(p)(1) << ' ';
+//      std::cerr << dxdxi[p] << ' ';
+//      std::cerr << dydxi[p] << ' ';
+//      std::cerr << dxdeta[p] << ' ';
+//      std::cerr << dydeta[p] << std::endl << std::endl;
+
+      const Real inv_jac = 1. / (dxdxi[p]*dydeta[p] - 
+        dxdeta[p]*dydxi[p]);
+      dxidx[p] = dydeta[p] * inv_jac;
+      dxidy[p] = - dxdeta[p] * inv_jac;
+      detadx[p] = - dydxi[p] * inv_jac;
+      detady[p] = dxdxi[p] * inv_jac;
+    }
+
+  // Calculate midpoint normal vectors
+  Real N1x = dydeta[3] - dydxi[3];
+  Real N1y = dxdxi[3] - dxdeta[3];
+  Real Nlength = sqrt(N1x*N1x + N1y*N1y);
+  N1x /= Nlength; N1y /= Nlength;
+
+  Real N2x = - dydeta[4];
+  Real N2y = dxdeta[4];
+  Nlength = sqrt(N2x*N2x + N2y*N2y);
+  N2x /= Nlength; N2y /= Nlength;
+
+  Real N3x = dydxi[5];
+  Real N3y = - dxdxi[5];
+  Nlength = sqrt(N3x*N3x + N3y*N3y);
+  N3x /= Nlength; N3y /= Nlength;
+
+//  for (int i=0; i != 6; ++i) {
+//    std::cerr << elem->node(i) << ' ';
+//  }
+//  std::cerr << std::endl;
+
+//  for (int i=0; i != 6; ++i) {
+//    std::cerr << elem->point(i)(0) << ' ';
+//    std::cerr << elem->point(i)(1) << ' ';
+//  }
+//  std::cerr << std::endl;
+
+
+  // give normal vectors a globally unique orientation
+
+  if (elem->node(2) < elem->node(1))
+    {
+//      std::cerr << "Flipping nodes " << elem->node(2);
+//      std::cerr << " and " << elem->node(1);
+//      std::cerr << " around node " << elem->node(4);
+//      std::cerr << std::endl;
+      N1x = -N1x;
+      N1y = -N1y;
+    }
+  else
+    {
+//      std::cerr << "Not flipping nodes " << elem->node(2);
+//      std::cerr << " and " << elem->node(1);
+//      std::cerr << " around node " << elem->node(4);
+//      std::cerr << std::endl;
+    }
+  if (elem->node(0) < elem->node(2))
+    {
+//      std::cerr << "Flipping nodes " << elem->node(0);
+//      std::cerr << " and " << elem->node(2);
+//      std::cerr << " around node " << elem->node(5);
+//      std::cerr << std::endl;
+//      std::cerr << N2x << ' ' << N2y << std::endl;
+      N2x = -N2x;
+      N2y = -N2y;
+//      std::cerr << N2x << ' ' << N2y << std::endl;
+    }
+  else
+    {
+//      std::cerr << "Not flipping nodes " << elem->node(0);
+//      std::cerr << " and " << elem->node(2);
+//      std::cerr << " around node " << elem->node(5);
+//      std::cerr << std::endl;
+    }
+  if (elem->node(1) < elem->node(0))
+    {
+//      std::cerr << "Flipping nodes " << elem->node(1);
+//      std::cerr << " and " << elem->node(0);
+//      std::cerr << " around node " << elem->node(3);
+//      std::cerr << std::endl;
+      N3x = -N3x;
+      N3y = -N3y;
+    }
+  else
+    {
+//      std::cerr << "Not flipping nodes " << elem->node(1);
+//      std::cerr << " and " << elem->node(0);
+//      std::cerr << " around node " << elem->node(3);
+//      std::cerr << std::endl;
+    }
+
+//  std::cerr << N2x << ' ' << N2y << std::endl;
+
+  // Cache basis function gradients
+  // FIXME: the raw_shape calls shouldn't be done on every element!
+  // FIXME: I should probably be looping, too...
+  // Gradient naming: d(1)d(2n)d(xi) is the xi component of the
+  // gradient of the 
+  // local basis function corresponding to value 1 at the node
+  // corresponding to normal vector 2
+
+  Real d1d2ndxi   = clough_raw_shape_deriv(0, 0, dofpt[4]);
+  Real d1d2ndeta  = clough_raw_shape_deriv(0, 1, dofpt[4]);
+  Real d1d2ndx = d1d2ndxi * dxidx[4] + d1d2ndeta * detadx[4];
+  Real d1d2ndy = d1d2ndxi * dxidy[4] + d1d2ndeta * detady[4];
+  Real d1d3ndxi   = clough_raw_shape_deriv(0, 0, dofpt[5]);
+  Real d1d3ndeta  = clough_raw_shape_deriv(0, 1, dofpt[5]);
+  Real d1d3ndx = d1d3ndxi * dxidx[5] + d1d3ndeta * detadx[5];
+  Real d1d3ndy = d1d3ndxi * dxidy[5] + d1d3ndeta * detady[5];
+  Real d2d3ndxi   = clough_raw_shape_deriv(1, 0, dofpt[5]);
+  Real d2d3ndeta  = clough_raw_shape_deriv(1, 1, dofpt[5]);
+  Real d2d3ndx = d2d3ndxi * dxidx[5] + d2d3ndeta * detadx[5];
+  Real d2d3ndy = d2d3ndxi * dxidy[5] + d2d3ndeta * detady[5];
+  Real d2d1ndxi   = clough_raw_shape_deriv(1, 0, dofpt[3]);
+  Real d2d1ndeta  = clough_raw_shape_deriv(1, 1, dofpt[3]);
+  Real d2d1ndx = d2d1ndxi * dxidx[3] + d2d1ndeta * detadx[3];
+  Real d2d1ndy = d2d1ndxi * dxidy[3] + d2d1ndeta * detady[3];
+  Real d3d1ndxi   = clough_raw_shape_deriv(2, 0, dofpt[3]);
+  Real d3d1ndeta  = clough_raw_shape_deriv(2, 1, dofpt[3]);
+  Real d3d1ndx = d3d1ndxi * dxidx[3] + d3d1ndeta * detadx[3];
+  Real d3d1ndy = d3d1ndxi * dxidy[3] + d3d1ndeta * detady[3];
+  Real d3d2ndxi   = clough_raw_shape_deriv(2, 0, dofpt[4]);
+  Real d3d2ndeta  = clough_raw_shape_deriv(2, 1, dofpt[4]);
+  Real d3d2ndx = d3d2ndxi * dxidx[4] + d3d2ndeta * detadx[4];
+  Real d3d2ndy = d3d2ndxi * dxidy[4] + d3d2ndeta * detady[4];
+  Real d1xd2ndxi  = clough_raw_shape_deriv(3, 0, dofpt[4]);
+  Real d1xd2ndeta = clough_raw_shape_deriv(3, 1, dofpt[4]);
+  Real d1xd2ndx = d1xd2ndxi * dxidx[4] + d1xd2ndeta * detadx[4];
+  Real d1xd2ndy = d1xd2ndxi * dxidy[4] + d1xd2ndeta * detady[4];
+  Real d1xd3ndxi  = clough_raw_shape_deriv(3, 0, dofpt[5]);
+  Real d1xd3ndeta = clough_raw_shape_deriv(3, 1, dofpt[5]);
+  Real d1xd3ndx = d1xd3ndxi * dxidx[5] + d1xd3ndeta * detadx[5];
+  Real d1xd3ndy = d1xd3ndxi * dxidy[5] + d1xd3ndeta * detady[5];
+  Real d1yd2ndxi  = clough_raw_shape_deriv(4, 0, dofpt[4]);
+  Real d1yd2ndeta = clough_raw_shape_deriv(4, 1, dofpt[4]);
+  Real d1yd2ndx = d1yd2ndxi * dxidx[4] + d1yd2ndeta * detadx[4];
+  Real d1yd2ndy = d1yd2ndxi * dxidy[4] + d1yd2ndeta * detady[4];
+  Real d1yd3ndxi  = clough_raw_shape_deriv(4, 0, dofpt[5]);
+  Real d1yd3ndeta = clough_raw_shape_deriv(4, 1, dofpt[5]);
+  Real d1yd3ndx = d1yd3ndxi * dxidx[5] + d1yd3ndeta * detadx[5];
+  Real d1yd3ndy = d1yd3ndxi * dxidy[5] + d1yd3ndeta * detady[5];
+  Real d2xd3ndxi  = clough_raw_shape_deriv(5, 0, dofpt[5]);
+  Real d2xd3ndeta = clough_raw_shape_deriv(5, 1, dofpt[5]);
+  Real d2xd3ndx = d2xd3ndxi * dxidx[5] + d2xd3ndeta * detadx[5];
+  Real d2xd3ndy = d2xd3ndxi * dxidy[5] + d2xd3ndeta * detady[5];
+  Real d2xd1ndxi  = clough_raw_shape_deriv(5, 0, dofpt[3]);
+  Real d2xd1ndeta = clough_raw_shape_deriv(5, 1, dofpt[3]);
+  Real d2xd1ndx = d2xd1ndxi * dxidx[3] + d2xd1ndeta * detadx[3];
+  Real d2xd1ndy = d2xd1ndxi * dxidy[3] + d2xd1ndeta * detady[3];
+  Real d2yd3ndxi  = clough_raw_shape_deriv(6, 0, dofpt[5]);
+  Real d2yd3ndeta = clough_raw_shape_deriv(6, 1, dofpt[5]);
+  Real d2yd3ndx = d2yd3ndxi * dxidx[5] + d2yd3ndeta * detadx[5];
+  Real d2yd3ndy = d2yd3ndxi * dxidy[5] + d2yd3ndeta * detady[5];
+  Real d2yd1ndxi  = clough_raw_shape_deriv(6, 0, dofpt[3]);
+  Real d2yd1ndeta = clough_raw_shape_deriv(6, 1, dofpt[3]);
+  Real d2yd1ndx = d2yd1ndxi * dxidx[3] + d2yd1ndeta * detadx[3];
+  Real d2yd1ndy = d2yd1ndxi * dxidy[3] + d2yd1ndeta * detady[3];
+  Real d3xd1ndxi  = clough_raw_shape_deriv(7, 0, dofpt[3]);
+  Real d3xd1ndeta = clough_raw_shape_deriv(7, 1, dofpt[3]);
+  Real d3xd1ndx = d3xd1ndxi * dxidx[3] + d3xd1ndeta * detadx[3];
+  Real d3xd1ndy = d3xd1ndxi * dxidy[3] + d3xd1ndeta * detady[3];
+  Real d3xd2ndxi  = clough_raw_shape_deriv(7, 0, dofpt[4]);
+  Real d3xd2ndeta = clough_raw_shape_deriv(7, 1, dofpt[4]);
+  Real d3xd2ndx = d3xd2ndxi * dxidx[4] + d3xd2ndeta * detadx[4];
+  Real d3xd2ndy = d3xd2ndxi * dxidy[4] + d3xd2ndeta * detady[4];
+  Real d3yd1ndxi  = clough_raw_shape_deriv(8, 0, dofpt[3]);
+  Real d3yd1ndeta = clough_raw_shape_deriv(8, 1, dofpt[3]);
+  Real d3yd1ndx = d3yd1ndxi * dxidx[3] + d3yd1ndeta * detadx[3];
+  Real d3yd1ndy = d3yd1ndxi * dxidy[3] + d3yd1ndeta * detady[3];
+  Real d3yd2ndxi  = clough_raw_shape_deriv(8, 0, dofpt[4]);
+  Real d3yd2ndeta = clough_raw_shape_deriv(8, 1, dofpt[4]);
+  Real d3yd2ndx = d3yd2ndxi * dxidx[4] + d3yd2ndeta * detadx[4];
+  Real d3yd2ndy = d3yd2ndxi * dxidy[4] + d3yd2ndeta * detady[4];
+  Real d1nd1ndxi  = clough_raw_shape_deriv(9, 0, dofpt[3]);
+  Real d1nd1ndeta = clough_raw_shape_deriv(9, 1, dofpt[3]);
+  Real d1nd1ndx = d1nd1ndxi * dxidx[3] + d1nd1ndeta * detadx[3];
+  Real d1nd1ndy = d1nd1ndxi * dxidy[3] + d1nd1ndeta * detady[3];
+  Real d2nd2ndxi  = clough_raw_shape_deriv(10, 0, dofpt[4]);
+  Real d2nd2ndeta = clough_raw_shape_deriv(10, 1, dofpt[4]);
+  Real d2nd2ndx = d2nd2ndxi * dxidx[4] + d2nd2ndeta * detadx[4];
+  Real d2nd2ndy = d2nd2ndxi * dxidy[4] + d2nd2ndeta * detady[4];
+  Real d3nd3ndxi  = clough_raw_shape_deriv(11, 0, dofpt[5]);
+  Real d3nd3ndeta = clough_raw_shape_deriv(11, 1, dofpt[5]);
+  Real d3nd3ndx = d3nd3ndxi * dxidx[3] + d3nd3ndeta * detadx[3];
+  Real d3nd3ndy = d3nd3ndxi * dxidy[3] + d3nd3ndeta * detady[3];
+
+  Real d1xd1dxi   = clough_raw_shape_deriv(3, 0, dofpt[0]);
+  Real d1xd1deta  = clough_raw_shape_deriv(3, 1, dofpt[0]);
+  Real d1xd1dx    = d1xd1dxi * dxidx[0] + d1xd1deta * detadx[0];
+  Real d1xd1dy    = d1xd1dxi * dxidy[0] + d1xd1deta * detady[0];
+  Real d1yd1dxi   = clough_raw_shape_deriv(4, 0, dofpt[0]);
+  Real d1yd1deta  = clough_raw_shape_deriv(4, 1, dofpt[0]);
+  Real d1yd1dx    = d1yd1dxi * dxidx[0] + d1yd1deta * detadx[0];
+  Real d1yd1dy    = d1yd1dxi * dxidy[0] + d1yd1deta * detady[0];
+  Real d2xd2dxi   = clough_raw_shape_deriv(5, 0, dofpt[1]);
+  Real d2xd2deta  = clough_raw_shape_deriv(5, 1, dofpt[1]);
+  Real d2xd2dx    = d2xd2dxi * dxidx[1] + d2xd2deta * detadx[1];
+  Real d2xd2dy    = d2xd2dxi * dxidy[1] + d2xd2deta * detady[1];
+
+//  std::cerr << dofpt[4](0) << ' ';
+//  std::cerr << dofpt[4](1) << ' ';
+//  std::cerr << (int)subtriangle_lookup(dofpt[5]) << ' ';
+//  std::cerr << dxdxi[4] << ' ';
+//  std::cerr << dxdeta[4] << ' ';
+//  std::cerr << dydxi[4] << ' ';
+//  std::cerr << dydeta[4] << ' ';
+//  std::cerr << dxidx[4] << ' ';
+//  std::cerr << dxidy[4] << ' ';
+//  std::cerr << detadx[4] << ' ';
+//  std::cerr << detady[4] << ' ';
+//  std::cerr << N1x << ' ';
+//  std::cerr << N1y << ' ';
+//  std::cerr << d2yd1ndxi << ' ';
+//  std::cerr << d2yd1ndeta << ' ';
+//  std::cerr << d2yd1ndx << ' ';
+//  std::cerr << d2yd1ndy << std::endl;
+
+  Real d2yd2dxi   = clough_raw_shape_deriv(6, 0, dofpt[1]);
+  Real d2yd2deta  = clough_raw_shape_deriv(6, 1, dofpt[1]);
+  Real d2yd2dx    = d2yd2dxi * dxidx[1] + d2yd2deta * detadx[1];
+  Real d2yd2dy    = d2yd2dxi * dxidy[1] + d2yd2deta * detady[1];
+  Real d3xd3dxi   = clough_raw_shape_deriv(7, 0, dofpt[2]);
+  Real d3xd3deta  = clough_raw_shape_deriv(7, 1, dofpt[2]);
+  Real d3xd3dx    = d3xd3dxi * dxidx[1] + d3xd3deta * detadx[1];
+  Real d3xd3dy    = d3xd3dxi * dxidy[1] + d3xd3deta * detady[1];
+  Real d3yd3dxi   = clough_raw_shape_deriv(8, 0, dofpt[2]);
+  Real d3yd3deta  = clough_raw_shape_deriv(8, 1, dofpt[2]);
+  Real d3yd3dx    = d3yd3dxi * dxidx[1] + d3yd3deta * detadx[1];
+  Real d3yd3dy    = d3yd3dxi * dxidy[1] + d3yd3deta * detady[1];
+
+  // Calculate normal derivatives
+
+  Real d1nd1ndn = d1nd1ndx * N1x + d1nd1ndy * N1y;
+  Real d1xd2ndn = d1xd2ndx * N2x + d1xd2ndy * N2y;
+  Real d1xd3ndn = d1xd3ndx * N3x + d1xd3ndy * N3y;
+  Real d1yd2ndn = d1yd2ndx * N2x + d1yd2ndy * N2y;
+  Real d1yd3ndn = d1yd3ndx * N3x + d1yd3ndy * N3y;
+
+  Real d2nd2ndn = d2nd2ndx * N2x + d2nd2ndy * N2y;
+  Real d2xd3ndn = d2xd3ndx * N3x + d2xd3ndy * N3y;
+  Real d2xd1ndn = d2xd1ndx * N1x + d2xd1ndy * N1y;
+  Real d2yd3ndn = d2yd3ndx * N3x + d2yd3ndy * N3y;
+  Real d2yd1ndn = d2yd1ndx * N1x + d2yd1ndy * N1y;
+
+  Real d3nd3ndn = d3nd3ndx * N3x + d3nd3ndy * N3y;
+  Real d3xd1ndn = d3xd1ndx * N1x + d3xd1ndy * N1y;
+  Real d3xd2ndn = d3xd2ndx * N2x + d3xd2ndy * N2y;
+  Real d3yd1ndn = d3yd1ndx * N1x + d3yd1ndy * N1y;
+  Real d3yd2ndn = d3yd2ndx * N2x + d3yd2ndy * N2y;
+
+  // Calculate midpoint scaling factors
+  
+  d1nd1n = 1. / d1nd1ndn;
+  d2nd2n = 1. / d2nd2ndn;
+  d3nd3n = 1. / d3nd3ndn;
+
+  // Calculate midpoint derivative adjustments to nodal value
+  // interpolant functions
+
+  d1d2n = -(d1d2ndx * N2x + d1d2ndy * N2y) / d2nd2ndn;
+  d1d3n = -(d1d3ndx * N3x + d1d3ndy * N3y) / d3nd3ndn;
+  d2d3n = -(d2d3ndx * N3x + d2d3ndy * N3y) / d3nd3ndn;
+  d2d1n = -(d2d1ndx * N1x + d2d1ndy * N1y) / d1nd1ndn;
+  d3d1n = -(d3d1ndx * N1x + d3d1ndy * N1y) / d1nd1ndn;
+  d3d2n = -(d3d2ndx * N2x + d3d2ndy * N2y) / d2nd2ndn;
+
+  // Calculate nodal derivative scaling factors
+
+  d1xd1x = 1. / (d1xd1dx - d1xd1dy * d1yd1dx / d1yd1dy);
+  d1xd1y = 1. / (d1yd1dx - d1xd1dx * d1yd1dy / d1xd1dy);
+//  d1xd1y = - d1xd1x * (d1xd1dy / d1yd1dy);
+  d1yd1y = 1. / (d1yd1dy - d1yd1dx * d1xd1dy / d1xd1dx);
+  d1yd1x = 1. / (d1xd1dy - d1yd1dy * d1xd1dx / d1yd1dx);
+//  d1yd1x = - d1yd1y * (d1yd1dx / d1xd1dx);
+  d2xd2x = 1. / (d2xd2dx - d2xd2dy * d2yd2dx / d2yd2dy);
+  d2xd2y = 1. / (d2yd2dx - d2xd2dx * d2yd2dy / d2xd2dy);
+//  d2xd2y = - d2xd2x * (d2xd2dy / d2yd2dy);
+  d2yd2y = 1. / (d2yd2dy - d2yd2dx * d2xd2dy / d2xd2dx);
+  d2yd2x = 1. / (d2xd2dy - d2yd2dy * d2xd2dx / d2yd2dx);
+//  d2yd2x = - d2yd2y * (d2yd2dx / d2xd2dx);
+  d3xd3x = 1. / (d3xd3dx - d3xd3dy * d3yd3dx / d3yd3dy);
+  d3xd3y = 1. / (d3yd3dx - d3xd3dx * d3yd3dy / d3xd3dy);
+//  d3xd3y = - d3xd3x * (d3xd3dy / d3yd3dy);
+  d3yd3y = 1. / (d3yd3dy - d3yd3dx * d3xd3dy / d3xd3dx);
+  d3yd3x = 1. / (d3xd3dy - d3yd3dy * d3xd3dx / d3yd3dx);
+//  d3yd3x = - d3yd3y * (d3yd3dx / d3xd3dx);
+
+//  std::cerr << d1xd1dx << ' ';
+//  std::cerr << d1xd1dy << ' ';
+//  std::cerr << d1yd1dx << ' ';
+//  std::cerr << d1yd1dy << ' ';
+//  std::cerr << d2xd2dx << ' ';
+//  std::cerr << d2xd2dy << ' ';
+//  std::cerr << d2yd2dx << ' ';
+//  std::cerr << d2yd2dy << ' ';
+//  std::cerr << d3xd3dx << ' ';
+//  std::cerr << d3xd3dy << ' ';
+//  std::cerr << d3yd3dx << ' ';
+//  std::cerr << d3yd3dy << std::endl;
+
+  // Calculate midpoint derivative adjustments to nodal derivative
+  // interpolant functions
+  
+  d1xd2n = -(d1xd1x * d1xd2ndn + d1xd1y * d1yd2ndn) / d2nd2ndn;
+  d1yd2n = -(d1yd1y * d1yd2ndn + d1yd1x * d1xd2ndn) / d2nd2ndn;
+  d1xd3n = -(d1xd1x * d1xd3ndn + d1xd1y * d1yd3ndn) / d3nd3ndn;
+  d1yd3n = -(d1yd1y * d1yd3ndn + d1yd1x * d1xd3ndn) / d3nd3ndn;
+  d2xd3n = -(d2xd2x * d2xd3ndn + d2xd2y * d2yd3ndn) / d3nd3ndn;
+  d2yd3n = -(d2yd2y * d2yd3ndn + d2yd2x * d2xd3ndn) / d3nd3ndn;
+  d2xd1n = -(d2xd2x * d2xd1ndn + d2xd2y * d2yd1ndn) / d1nd1ndn;
+  d2yd1n = -(d2yd2y * d2yd1ndn + d2yd2x * d2xd1ndn) / d1nd1ndn;
+  d3xd1n = -(d3xd3x * d3xd1ndn + d3xd3y * d3yd1ndn) / d1nd1ndn;
+  d3yd1n = -(d3yd3y * d3yd1ndn + d3yd3x * d3xd1ndn) / d1nd1ndn;
+  d3xd2n = -(d3xd3x * d3xd2ndn + d3xd3y * d3yd2ndn) / d2nd2ndn;
+  d3yd2n = -(d3yd3y * d3yd2ndn + d3yd3x * d3xd2ndn) / d2nd2ndn;
+
+  // Cross your fingers
+//  std::cerr << d1nd1ndn << ' ';
+//  std::cerr << d2xd1ndn << ' ';
+//  std::cerr << d2yd1ndn << ' ';
+//  std::cerr << std::endl;
+
+//  std::cerr << "Transform variables: ";
+//  std::cerr << d1nd1n << ' ';
+//  std::cerr << d2nd2n << ' ';
+//  std::cerr << d3nd3n << ' ';
+//  std::cerr << d1d2n << ' ';
+//  std::cerr << d1d3n << ' ';
+//  std::cerr << d2d3n << ' ';
+//  std::cerr << d2d1n << ' ';
+//  std::cerr << d3d1n << ' ';
+//  std::cerr << d3d2n << std::endl;
+//  std::cerr << d1xd1x << ' ';
+//  std::cerr << d1xd1y << ' ';
+//  std::cerr << d1yd1x << ' ';
+//  std::cerr << d1yd1y << ' ';
+//  std::cerr << d2xd2x << ' ';
+//  std::cerr << d2xd2y << ' ';
+//  std::cerr << d2yd2x << ' ';
+//  std::cerr << d2yd2y << ' ';
+//  std::cerr << d3xd3x << ' ';
+//  std::cerr << d3xd3y << ' ';
+//  std::cerr << d3yd3x << ' ';
+//  std::cerr << d3yd3y << std::endl;
+//  std::cerr << d1xd2n << ' ';
+//  std::cerr << d1yd2n << ' ';
+//  std::cerr << d1xd3n << ' ';
+//  std::cerr << d1yd3n << ' ';
+//  std::cerr << d2xd3n << ' ';
+//  std::cerr << d2yd3n << ' ';
+//  std::cerr << d2xd1n << ' ';
+//  std::cerr << d2yd1n << ' ';
+//  std::cerr << d3xd1n << ' ';
+//  std::cerr << d3yd1n << ' ';
+//  std::cerr << d3xd2n << ' ';
+//  std::cerr << d3yd2n << ' ';
+//  std::cerr << std::endl;
+//  std::cerr << std::endl;
+}
+
+
+unsigned char subtriangle_lookup(const Point& p)
+{
+  if ((p(0) >= p(1)) && (p(0) + 2 * p(1) <= 1))
+    return 0;
+  if ((p(0) <= p(1)) && (p(1) + 2 * p(0) <= 1))
+    return 2;
+  return 1;
+}
+
+  // Return shape function second derivatives on the unit right
+  // triangle
+Real clough_raw_shape_second_deriv(const unsigned int basis_num,
+                            const unsigned int deriv_type,
+                            const Point& p)
+{
+  Real xi = p(0), eta = p(1);
+
+  switch (deriv_type)
+  {
+
+  // second derivative in xi-xi direction
+  case 0:
+  switch (basis_num)
+    {
+      case 0:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return -6 + 12*xi;
+            case 1:
+              return -30 + 42*xi + 42*eta;
+            case 2:
+              return -6 + 18*xi - 6*eta;
+          }
+      case 1:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return 6 - 12*xi;
+            case 1:
+              return 18 - 27*xi - 21*eta;
+            case 2:
+              return 6 - 15*xi + 3*eta;
+          }
+      case 2:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return 0;
+            case 1:
+              return 12 - 15*xi - 21*eta;
+            case 2:
+              return -3*xi + 3*eta;
+          }
+      case 3:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return -4 + 6*xi;
+            case 1:
+              return -9 + 13*xi + 8*eta;
+            case 2:
+              return -1 - 7*xi + 4*eta;
+          }
+      case 4:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return 4*eta;
+            case 1:
+              return 1 - 2*xi + 3*eta;
+            case 2:
+              return -3 + 14*xi - eta;
+          }
+      case 5:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return -2 + 6*xi;
+            case 1:
+              return -4 + 17./2.*xi + 7./2.*eta;
+            case 2:
+              return -2 + 13./2.*xi - 1./2.*eta;
+          }
+      case 6:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return 4*eta;
+            case 1:
+              return 9 - 23./2.*xi - 23./2.*eta;
+            case 2:
+              return -1 + 5./2.*xi + 9./2.*eta;
+          }
+      case 7:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return 0;
+            case 1:
+              return 7 - 17./2.*xi - 25./2.*eta;
+            case 2:
+              return 1 - 13./2.*xi + 7./2.*eta;
+          }
+      case 8:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return 0;
+            case 1:
+              return -2 + 5./2.*xi + 7./2.*eta;
+            case 2:
+              return 1./2.*xi - 1./2.*eta;
+          }
+      case 9:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return 0;
+            case 1:
+              return sqrt(2.) * (8 - 10*xi - 14*eta);
+            case 2:
+              return sqrt(2.) * (-2*xi + 2*eta);
+          }
+      case 10:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return 0;
+            case 1:
+              return -4 + 4*xi + 8*eta;
+            case 2:
+              return -4 + 20*xi - 8*eta;
+          }
+      case 11:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return -8*eta;
+            case 1:
+              return -12 + 16*xi + 12*eta;
+            case 2:
+              return 4 - 16*xi - 4*eta;
+          }
+    }
+
+  // second derivative in xi-eta direction
+  case 1:
+  switch (basis_num)
+    {
+      case 0:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return -6*eta;
+            case 1:
+              return -30 +42*xi
+                + 42*eta;
+            case 2:
+              return -6*xi;
+          }
+      case 1:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return + 3*eta;
+            case 1:
+              return 15 - 21*xi - 21*eta;
+            case 2:
+              return 3*xi;
+          }
+      case 2:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return 3*eta;
+            case 1:
+              return 15 - 21*xi - 21*eta;
+            case 2:
+              return 3*xi;
+          }
+      case 3:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return -eta;
+            case 1:
+              return -4 + 8*xi + 3*eta;
+            case 2:
+              return -3 + 4*xi + 4*eta;
+          }
+      case 4:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return -3 + 4*xi + 4*eta;
+            case 1:
+              return - 4 + 3*xi + 8*eta;
+            case 2:
+              return -xi;
+          }
+      case 5:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return - 1./2.*eta;
+            case 1:
+              return -5./2. + 7./2.*xi + 7./2.*eta;
+            case 2:
+              return - 1./2.*xi;
+          }
+      case 6:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return -1 + 4*xi + 7./2.*eta;
+            case 1:
+              return 19./2. - 23./2.*xi - 25./2.*eta;
+            case 2:
+              return 9./2.*xi;
+          }
+      case 7:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return 9./2.*eta;
+            case 1:
+              return 19./2. - 25./2.*xi - 23./2.*eta;
+            case 2:
+              return -1 + 7./2.*xi + 4*eta;
+          }
+      case 8:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return -1./2.*eta;
+            case 1:
+              return -5./2. + 7./2.*xi + 7./2.*eta;
+            case 2:
+              return -1./2.*xi;
+          }
+      case 9:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return sqrt(2.) * (2*eta);
+            case 1:
+              return sqrt(2.) * (10 - 14*xi - 14*eta);
+            case 2:
+              return sqrt(2.) * (2*xi);
+          }
+      case 10:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return -4*eta;
+            case 1:
+              return - 8 + 8*xi + 12*eta;
+            case 2:
+              return 4 - 8*xi - 8*eta;
+          }
+      case 11:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return 4 - 8*xi - 8*eta;
+            case 1:
+              return -8 + 12*xi + 8*eta;
+            case 2:
+              return -4*xi;
+          }
+    }
+
+  // second derivative in eta-eta direction
+  case 2:
+  switch (basis_num)
+    {
+      case 0:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return -6 - 6*xi + 18*eta;
+            case 1:
+              return -30 + 42*xi + 42*eta;
+            case 2:
+              return -6 + 12*eta;
+          }
+      case 1:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return 3*xi - 3*eta;
+            case 1:
+              return 12 - 21*xi - 15*eta;
+            case 2:
+              return 0;
+          }
+      case 2:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return 6 + 3*xi - 15*eta;
+            case 1:
+              return 18 - 21.*xi - 27*eta;
+            case 2:
+              return 6 - 12*eta;
+          }
+      case 3:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return -3 - xi + 14*eta;
+            case 1:
+              return 1 + 3*xi - 2*eta;
+            case 2:
+              return 4*xi;
+          }
+      case 4:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return -1 + 4*xi - 7*eta;
+            case 1:
+              return -9 + 8*xi + 13*eta;
+            case 2:
+              return -4 + 6*eta;
+          }
+      case 5:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return - 1./2.*xi + 1./2.*eta;
+            case 1:
+              return -2 + 7./2.*xi + 5./2.*eta;
+            case 2:
+              return 0;
+          }
+      case 6:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return 1 + 7./2.*xi - 13./2.*eta;
+            case 1:
+              return 7 - 25./2.*xi - 17./2.*eta;
+            case 2:
+              return 0;
+          }
+      case 7:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return -1 + 9./2.*xi + 5./2.*eta;
+            case 1:
+              return 9 - 23./2.*xi - 23./2.*eta;
+            case 2:
+              return 4*xi;
+          }
+      case 8:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return -2 - 1./2.*xi + 13./2.*eta;
+            case 1:
+              return -4 + 7./2.*xi + 17./2.*eta;
+            case 2:
+              return -2 + 6*eta;
+          }
+      case 9:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return sqrt(2.) * (2*xi - 2*eta);
+            case 1:
+              return sqrt(2.) * (8 - 14*xi - 10*eta);
+            case 2:
+              return 0;
+          }
+      case 10:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return 4 - 4*xi - 16*eta;
+            case 1:
+              return -12 + 12*xi + 16*eta;
+            case 2:
+              return -8*xi;
+          }
+      case 11:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return -4 - 8*xi + 20*eta;
+            case 1:
+              return -4 + 8*xi + 4*eta;
+            case 2:
+              return 0;
+          }
+    }
+  }
+
+  error();
+  return 0.;
+}
+
+
+
+Real clough_raw_shape_deriv(const unsigned int basis_num,
+                            const unsigned int deriv_type,
+                            const Point& p)
+{
+  Real xi = p(0), eta = p(1);
+
+  switch (deriv_type)
+  {
+  // derivative in xi direction
+  case 0:
+  switch (basis_num)
+    {
+      case 0:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return -6*xi + 6*xi*xi
+                - 3*eta*eta;
+            case 1:
+              return 9 - 30*xi + 21*xi*xi
+                - 30*eta + 42*xi*eta
+                + 21*eta*eta;
+            case 2:
+              return -6*xi + 9*xi*xi
+                - 6*xi*eta;
+          }
+      case 1:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return 6*xi - 6*xi*xi
+                + 3./2.*eta*eta;
+            case 1:
+              return - 9./2. + 18*xi - 27./2.*xi*xi
+                + 15*eta - 21*xi*eta
+                - 21./2.*eta*eta;
+            case 2:
+              return 6*xi - 15./2.*xi*xi
+                + 3*xi*eta;
+          }
+      case 2:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return 3./2.*eta*eta;
+            case 1:
+              return - 9./2. + 12*xi - 15./2.*xi*xi
+                + 15*eta - 21*xi*eta
+                - 21./2.*eta*eta;
+            case 2:
+              return -3./2.*xi*xi
+                + 3*xi*eta;
+          }
+      case 3:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return 1 - 4*xi + 3*xi*xi
+                - 1./2.*eta*eta;
+            case 1:
+              return 5./2. - 9*xi + 13./2.*xi*xi
+                - 4*eta + 8*xi*eta
+                + 3./2.*eta*eta;
+            case 2:
+              return 1 - xi - 7./2.*xi*xi
+                - 3*eta + 4*xi*eta
+                + 2*eta*eta;
+          }
+      case 4:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return - 3*eta + 4*xi*eta
+                + 2*eta*eta;
+            case 1:
+              return xi - xi*xi
+                - 4*eta + 3*xi*eta
+                + 4*eta*eta;
+            case 2:
+              return -3*xi + 7*xi*xi
+                - xi*eta;
+          }
+      case 5:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return -2*xi + 3*xi*xi
+                - 1./4.*eta*eta;
+            case 1:
+              return 3./4. - 4*xi + 17./4.*xi*xi
+                - 5./2.*eta + 7./2.*xi*eta
+                + 7./4.*eta*eta;
+            case 2:
+              return -2*xi + 13./4.*xi*xi
+                - 1./2.*xi*eta;
+          }
+      case 6:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return -eta + 4*xi*eta
+                + 7./4.*eta*eta;
+            case 1:
+              return -13./4. + 9*xi - 23./4.*xi*xi
+                + 19./2.*eta - 23./2.*xi*eta
+                - 25./4.*eta*eta;
+            case 2:
+              return -xi + 5./4.*xi*xi
+                + 9./2.*xi*eta;
+          }
+      case 7:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return 9./4.*eta*eta;
+            case 1:
+              return - 11./4. + 7*xi - 17./4.*xi*xi
+                + 19./2.*eta - 25./2.*xi*eta
+                - 23./4.*eta*eta;
+            case 2:
+              return xi - 13./4.*xi*xi
+                - eta + 7./2.*xi*eta + 2*eta*eta;
+          }
+      case 8:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return - 1./4.*eta*eta;
+            case 1:
+              return 3./4. - 2*xi + 5./4.*xi*xi
+                - 5./2.*eta + 7./2.*xi*eta
+                + 7./4.*eta*eta;
+            case 2:
+              return 1./4.*xi*xi
+                - 1./2.*xi*eta;
+          }
+      case 9:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return sqrt(2.) * eta*eta;
+            case 1:
+              return sqrt(2.) * (-3 + 8*xi - 5*xi*xi
+                + 10*eta - 14*xi*eta
+                - 7*eta*eta);
+            case 2:
+              return sqrt(2.) * (-xi*xi + 2*xi*eta);
+          }
+      case 10:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return -2*eta*eta;
+            case 1:
+              return 2 - 4*xi + 2*xi*xi
+                - 8*eta + 8*xi*eta
+                + 6*eta*eta;
+            case 2:
+              return -4*xi + 10*xi*xi
+                + 4*eta - 8*xi*eta
+                - 4*eta*eta;
+          }
+      case 11:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return 4*eta - 8*xi*eta
+                - 4*eta*eta;
+            case 1:
+              return 4 - 12*xi + 8*xi*xi
+                - 8*eta + 12*xi*eta
+                + 4*eta*eta;
+            case 2:
+              return 4*xi - 8*xi*xi
+                - 4*xi*eta;
+          }
+    }
+
+  // derivative in eta direction
+  case 1:
+  switch (basis_num)
+    {
+      case 0:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return - 6*eta - 6*xi*eta + 9*eta*eta;
+            case 1:
+              return 9 - 30*xi + 21*xi*xi
+                - 30*eta + 42*xi*eta + 21*eta*eta;
+            case 2:
+              return - 3*xi*xi
+                - 6*eta + 6*eta*eta;
+          }
+      case 1:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return + 3*xi*eta
+                - 3./2.*eta*eta;
+            case 1:
+              return - 9./2. + 15*xi - 21./2.*xi*xi
+                + 12*eta - 21*xi*eta - 15./2.*eta*eta;
+            case 2:
+              return + 3./2.*xi*xi;
+          }
+      case 2:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return 6*eta + 3*xi*eta - 15./2.*eta*eta;
+            case 1:
+              return - 9./2. + 15*xi - 21./2.*xi*xi
+                + 18*eta - 21.*xi*eta - 27./2.*eta*eta;
+            case 2:
+              return 3./2.*xi*xi
+                + 6*eta - 6*eta*eta;
+          }
+      case 3:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return - 3*eta - xi*eta + 7*eta*eta;
+            case 1:
+              return - 4*xi + 4*xi*xi
+                + eta + 3*xi*eta - eta*eta;
+            case 2:
+              return - 3*xi + 2*xi*xi
+                + 4*xi*eta;
+          }
+      case 4:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return 1 - 3*xi + 2*xi*xi
+                - eta + 4*xi*eta - 7./2.*eta*eta;
+            case 1:
+              return 5./2. - 4*xi + 3./2.*xi*xi
+                - 9.*eta + 8*xi*eta + 13./2.*eta*eta;
+            case 2:
+              return 1 - 1./2.*xi*xi - 4*eta + 3*eta*eta;
+          }
+      case 5:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return - 1./2.*xi*eta + 1./4.*eta*eta;
+            case 1:
+              return 3./4. - 5./2.*xi + 7./4.*xi*xi
+                - 2*eta + 7./2.*xi*eta + 5./4.*eta*eta;
+            case 2:
+              return - 1./4.*xi*xi;
+          }
+      case 6:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return -xi + 2*xi*xi
+                + eta + 7./2.*xi*eta - 13./4.*eta*eta;
+            case 1:
+              return - 11./4. + 19./2.*xi - 23./4.*xi*xi
+                + 7*eta - 25./2.*xi*eta - 17./4.*eta*eta;
+            case 2:
+              return 9./4.*xi*xi;
+          }
+      case 7:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return -eta + 9./2.*xi*eta + 5./4.*eta*eta;
+            case 1:
+              return - 13./4. + 19./2.*xi - 25./4.*xi*xi
+                + 9*eta - 23./2.*xi*eta - 23./4.*eta*eta;
+            case 2:
+              return - xi + 7./4.*xi*xi + 4*xi*eta;
+          }
+      case 8:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return -2*eta - 1./2.*xi*eta + 13./4.*eta*eta;
+            case 1:
+              return 3./4. - 5./2.*xi + 7./4.*xi*xi
+                - 4*eta + 7./2.*xi*eta + 17./4.*eta*eta;
+            case 2:
+              return - 1./4.*xi*xi
+                - 2*eta + 3*eta*eta;
+          }
+      case 9:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return sqrt(2.) * (2*xi*eta - eta*eta);
+            case 1:
+              return sqrt(2.) * (- 3 + 10*xi - 7*xi*xi
+                + 8*eta - 14*xi*eta - 5*eta*eta);
+            case 2:
+              return sqrt(2.) * (xi*xi);
+          }
+      case 10:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return 4*eta - 4*xi*eta - 8*eta*eta;
+            case 1:
+              return 4 - 8*xi + 4*xi*xi
+                - 12*eta + 12*xi*eta + 8*eta*eta;
+            case 2:
+              return 4*xi - 4*xi*xi
+                - 8*xi*eta;
+          }
+      case 11:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return 4*xi - 4*xi*xi
+                - 4*eta - 8*xi*eta + 10.*eta*eta;
+            case 1:
+              return 2 - 8*xi + 6*xi*xi
+                - 4*eta + 8*xi*eta + 2*eta*eta;
+            case 2:
+              return - 2*xi*xi;
+          }
+    }
+  }
+
+  error();
+  return 0.;
+}
+
+Real clough_raw_shape(const unsigned int basis_num,
+                      const Point& p)
+{
+  Real xi = p(0), eta = p(1);
+
+  switch (basis_num)
+    {
+      case 0:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return 1 - 3*xi*xi + 2*xi*xi*xi 
+                - 3*eta*eta - 3*xi*eta*eta + 3*eta*eta*eta;
+            case 1:
+              return -1 + 9*xi - 15*xi*xi + 7*xi*xi*xi
+                + 9*eta - 30*xi*eta +21*xi*xi*eta
+                - 15*eta*eta + 21*xi*eta*eta + 7*eta*eta*eta;
+            case 2:
+              return 1 - 3*xi*xi + 3*xi*xi*xi
+                - 3*xi*xi*eta
+                - 3*eta*eta + 2*eta*eta*eta;
+          }
+      case 1:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return 3*xi*xi - 2*xi*xi*xi
+                + 3./2.*xi*eta*eta
+                - 1./2.*eta*eta*eta;
+            case 1:
+              return 1 - 9./2.*xi + 9*xi*xi - 9./2.*xi*xi*xi
+                - 9./2.*eta + 15*xi*eta - 21./2.*xi*xi*eta
+                + 6*eta*eta - 21./2.*xi*eta*eta - 5./2.*eta*eta*eta;
+            case 2:
+              return 3*xi*xi - 5./2.*xi*xi*xi
+                + 3./2.*xi*xi*eta;
+          }
+      case 2:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return 3*eta*eta + 3./2.*xi*eta*eta - 5./2.*eta*eta*eta;
+            case 1:
+              return 1 - 9./2.*xi + 6*xi*xi - 5./2.*xi*xi*xi
+                - 9./2.*eta + 15*xi*eta - 21./2.*xi*xi*eta
+                + 9*eta*eta - 21./2.*xi*eta*eta - 9./2.*eta*eta*eta;
+            case 2:
+              return -1./2.*xi*xi*xi
+                + 3./2.*xi*xi*eta
+                + 3*eta*eta - 2*eta*eta*eta;
+          }
+      case 3:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return xi - 2*xi*xi + xi*xi*xi
+                - 3./2.*eta*eta - 1./2.*xi*eta*eta + 7./3.*eta*eta*eta;
+            case 1:
+              return -1./6. + 5./2.*xi - 9./2.*xi*xi + 13./6.*xi*xi*xi
+                - 4*xi*eta + 4*xi*xi*eta
+                + 1./2.*eta*eta + 3./2.*xi*eta*eta - 1./3.*eta*eta*eta;
+            case 2:
+              return xi - 1./2.*xi*xi - 7./6.*xi*xi*xi
+                - 3*xi*eta + 2*xi*xi*eta
+                + 2*xi*eta*eta;
+          }
+      case 4:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return eta - 3*xi*eta + 2*xi*xi*eta
+                - 1./2.*eta*eta + 2*xi*eta*eta - 7./6.*eta*eta*eta;
+            case 1:
+              return -1./6. + 1./2.*xi*xi - 1./3.*xi*xi*xi
+                + 5./2.*eta - 4*xi*eta + 3./2.*xi*xi*eta
+                - 9./2.*eta*eta + 4*xi*eta*eta + 13./6.*eta*eta*eta;
+            case 2:
+              return -3./2.*xi*xi + 7./3.*xi*xi*xi
+                + eta - 1./2.*xi*xi*eta - 2*eta*eta + eta*eta*eta;
+          }
+      case 5:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return -xi*xi + xi*xi*xi
+                - 1./4.*xi*eta*eta + 1./12.*eta*eta*eta;
+            case 1:
+              return -1./6. + 3./4.*xi - 2*xi*xi + 17./12.*xi*xi*xi
+                + 3./4.*eta - 5./2.*xi*eta + 7./4.*xi*xi*eta
+                - eta*eta + 7./4.*xi*eta*eta + 5./12.*eta*eta*eta;
+            case 2:
+              return -xi*xi + 13./12.*xi*xi*xi
+                - 1./4.*xi*xi*eta;
+          }
+      case 6:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return -xi*eta + 2*xi*xi*eta
+                + 1./2.*eta*eta + 7./4.*xi*eta*eta - 13./12.*eta*eta*eta;
+            case 1:
+              return 2./3. - 13./4.*xi + 9./2.*xi*xi - 23./12.*xi*xi*xi
+                - 11./4.*eta + 19./2.*xi*eta - 23./4.*xi*xi*eta
+                + 7./2.*eta*eta - 25./4.*xi*eta*eta - 17./12.*eta*eta*eta;
+            case 2:
+              return -1./2.*xi*xi + 5./12.*xi*xi*xi
+                + 9./4.*xi*xi*eta;
+          }
+      case 7:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return -1./2.*eta*eta + 9./4.*xi*eta*eta + 5./12.*eta*eta*eta;
+            case 1:
+              return 2./3. - 11./4.*xi + 7./2.*xi*xi - 17./12.*xi*xi*xi
+                - 13./4.*eta + 19./2.*xi*eta - 25./4.*xi*xi*eta
+                + 9./2.*eta*eta - 23./4.*xi*eta*eta - 23./12.*eta*eta*eta;
+            case 2:
+              return 1./2.*xi*xi - 13./12.*xi*xi*xi
+                - xi*eta + 7./4.*xi*xi*eta + 2*xi*eta*eta;
+          }
+      case 8:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return -eta*eta - 1./4.*xi*eta*eta + 13./12.*eta*eta*eta;
+            case 1:
+              return -1./6. + 3./4.*xi - xi*xi + 5./12.*xi*xi*xi
+                + 3./4.*eta - 5./2.*xi*eta + 7./4.*xi*xi*eta
+                - 2*eta*eta + 7./4.*xi*eta*eta + 17./12.*eta*eta*eta;
+            case 2:
+              return 1./12.*xi*xi*xi
+                - 1./4.*xi*xi*eta
+                - eta*eta + eta*eta*eta;
+          }
+      case 9:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return sqrt(2) * (xi*eta*eta - 1./3.*eta*eta*eta);
+            case 1:
+              return sqrt(2) * (2./3. - 3*xi + 4*xi*xi - 5./3.*xi*xi*xi
+                - 3*eta + 10*xi*eta - 7*xi*xi*eta
+                + 4*eta*eta - 7*xi*eta*eta - 5./3.*eta*eta*eta);
+            case 2:
+              return sqrt(2) * (-1./3.*xi*xi*xi + xi*xi*eta);
+          }
+      case 10:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return 2*eta*eta - 2*xi*eta*eta - 8./3.*eta*eta*eta;
+            case 1:
+              return -2./3. + 2*xi - 2*xi*xi + 2./3.*xi*xi*xi
+                + 4*eta - 8*xi*eta + 4*xi*xi*eta
+                - 6*eta*eta + 6*xi*eta*eta + 8./3.*eta*eta*eta;
+            case 2:
+              return -2*xi*xi + 10./3.*xi*xi*xi
+                + 4*xi*eta - 4*xi*xi*eta
+                - 4*xi*eta*eta;
+          }
+      case 11:
+        switch (subtriangle_lookup(p))
+          {
+            case 0:
+              return 4*xi*eta - 4*xi*xi*eta
+                - 2*eta*eta - 4*xi*eta*eta + 10./3.*eta*eta*eta;
+            case 1:
+              return -2./3. + 4*xi - 6*xi*xi + 8./3.*xi*xi*xi
+                + 2*eta - 8*xi*eta + 6*xi*xi*eta
+                - 2*eta*eta + 4*xi*eta*eta + 2./3.*eta*eta*eta;
+            case 2:
+              return 2*xi*xi - 8./3.*xi*xi*xi
+                - 2*xi*xi*eta;
+          }
+    }
+
+  error();
+  return 0.;
+}
+
+  
+} // end anonymous namespace
+
+
+
+template <>
+Real FE<2,CLOUGH>::shape(const ElemType,
+			     const Order,
+			     const unsigned int,
+			     const Point&)
+{
+  std::cerr << "Clough-Tocher elements require the real element\n"
+	    << "to construct gradient-based degrees of freedom."
+	    << std::endl;
+  
+  error();
+  return 0.;
+}
+
+
+
+template <>
+Real FE<2,CLOUGH>::shape(const Elem* elem,
+			     const Order order,
+			     const unsigned int i,
+			     const Point& p)
+{
+  assert (elem != NULL);
+
+  clough_compute_coefs(elem);
+
+  const ElemType type = elem->type();
+  
+  switch (order)
+    {      
+      // 3rd-order Clough-Tocher element
+    case THIRD:
+      {
+	switch (type)
+	  {
+	    // C1 functions on the Clough-Tocher triangle.
+	  case TRI6:
+	    {
+	      assert (i<12);
+
+            // FIXME: it would be nice to calculate (and cache)
+            // clough_raw_shape(j,p) only once per triangle, not 1-7
+            // times
+	      switch (i)
+		{
+	    // Note: these DoF numbers are "scrambled" because my
+	    // initial numbering conventions didn't match libMesh
+		case 0:
+		  return clough_raw_shape(0, p)
+                    + d1d2n * clough_raw_shape(10, p)
+                    + d1d3n * clough_raw_shape(11, p);
+		case 3:
+		  return clough_raw_shape(1, p)
+                    + d2d3n * clough_raw_shape(11, p)
+                    + d2d1n * clough_raw_shape(9, p);
+		case 6:
+		  return clough_raw_shape(2, p)
+                    + d3d1n * clough_raw_shape(9, p)
+                    + d3d2n * clough_raw_shape(10, p);
+		case 1:
+                  return d1xd1x * clough_raw_shape(3, p)
+                    + d1xd1y * clough_raw_shape(4, p)
+                    + d1xd2n * clough_raw_shape(10, p)
+                    + d1xd3n * clough_raw_shape(11, p);
+		case 2:
+                  return d1yd1y * clough_raw_shape(4, p)
+                    + d1yd1x * clough_raw_shape(3, p)
+                    + d1yd2n * clough_raw_shape(10, p)
+                    + d1yd3n * clough_raw_shape(11, p);
+		case 4:
+                  return d2xd2x * clough_raw_shape(5, p)
+                    + d2xd2y * clough_raw_shape(6, p)
+                    + d2xd3n * clough_raw_shape(11, p)
+                    + d2xd1n * clough_raw_shape(9, p);
+		case 5:
+                  return d2yd2y * clough_raw_shape(6, p)
+                    + d2yd2x * clough_raw_shape(5, p)
+                    + d2yd3n * clough_raw_shape(11, p)
+                    + d2yd1n * clough_raw_shape(9, p);
+		case 7:
+                  return d3xd3x * clough_raw_shape(7, p)
+                    + d3xd3y * clough_raw_shape(8, p)
+                    + d3xd1n * clough_raw_shape(9, p)
+                    + d3xd2n * clough_raw_shape(10, p);
+		case 8:
+                  return d3yd3y * clough_raw_shape(8, p)
+                    + d3yd3x * clough_raw_shape(7, p)
+                    + d3yd1n * clough_raw_shape(9, p)
+                    + d3yd2n * clough_raw_shape(10, p);
+		case 10:
+                  return d1nd1n * clough_raw_shape(9, p);
+		case 11:
+                  return d2nd2n * clough_raw_shape(10, p);
+		case 9:
+                  return d3nd3n * clough_raw_shape(11, p);
+		  
+		default:
+		  error();
+		}
+	    }
+	  default:
+            std::cerr << "ERROR: Unsupported element type!" << std::endl;
+	    error();
+	  }
+      }
+      // by default throw an error
+    default:
+      std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
+      error();
+    }
+  
+  error();
+  return 0.;
+}
+
+
+
+template <>
+Real FE<2,CLOUGH>::shape_deriv(const ElemType,
+				   const Order,			    
+				   const unsigned int,
+				   const unsigned int,
+				   const Point&)
+{
+  std::cerr << "Clough-Tocher elements require the real element\n"
+	    << "to construct gradient-based degrees of freedom."
+	    << std::endl;
+
+  error();
+  return 0.;
+}
+
+
+
+template <>
+Real FE<2,CLOUGH>::shape_deriv(const Elem* elem,
+				   const Order order,
+				   const unsigned int i,
+				   const unsigned int j,
+				   const Point& p)
+{
+  assert (elem != NULL);
+
+  clough_compute_coefs(elem);
+
+  const ElemType type = elem->type();
+  
+  switch (order)
+    {      
+      // 3rd-order Clough-Tocher element
+    case THIRD:
+      {
+	switch (type)
+	  {
+	    // C1 functions on the Clough-Tocher triangle.
+	  case TRI6:
+	    {
+	      assert (i<12);
+
+            // FIXME: it would be nice to calculate (and cache)
+            // clough_raw_shape(j,p) only once per triangle, not 1-7
+            // times
+	      switch (i)
+		{
+	    // Note: these DoF numbers are "scrambled" because my
+	    // initial numbering conventions didn't match libMesh
+		case 0:
+		  return clough_raw_shape_deriv(0, j, p)
+                    + d1d2n * clough_raw_shape_deriv(10, j, p)
+                    + d1d3n * clough_raw_shape_deriv(11, j, p);
+		case 3:
+		  return clough_raw_shape_deriv(1, j, p)
+                    + d2d3n * clough_raw_shape_deriv(11, j, p)
+                    + d2d1n * clough_raw_shape_deriv(9, j, p);
+		case 6:
+		  return clough_raw_shape_deriv(2, j, p)
+                    + d3d1n * clough_raw_shape_deriv(9, j, p)
+                    + d3d2n * clough_raw_shape_deriv(10, j, p);
+		case 1:
+                  return d1xd1x * clough_raw_shape_deriv(3, j, p)
+                    + d1xd1y * clough_raw_shape_deriv(4, j, p)
+                    + d1xd2n * clough_raw_shape_deriv(10, j, p)
+                    + d1xd3n * clough_raw_shape_deriv(11, j, p);
+		case 2:
+                  return d1yd1y * clough_raw_shape_deriv(4, j, p)
+                    + d1yd1x * clough_raw_shape_deriv(3, j, p)
+                    + d1yd2n * clough_raw_shape_deriv(10, j, p)
+                    + d1yd3n * clough_raw_shape_deriv(11, j, p);
+		case 4:
+                  return d2xd2x * clough_raw_shape_deriv(5, j, p)
+                    + d2xd2y * clough_raw_shape_deriv(6, j, p)
+                    + d2xd3n * clough_raw_shape_deriv(11, j, p)
+                    + d2xd1n * clough_raw_shape_deriv(9, j, p);
+		case 5:
+                  return d2yd2y * clough_raw_shape_deriv(6, j, p)
+                    + d2yd2x * clough_raw_shape_deriv(5, j, p)
+                    + d2yd3n * clough_raw_shape_deriv(11, j, p)
+                    + d2yd1n * clough_raw_shape_deriv(9, j, p);
+		case 7:
+                  return d3xd3x * clough_raw_shape_deriv(7, j, p)
+                    + d3xd3y * clough_raw_shape_deriv(8, j, p)
+                    + d3xd1n * clough_raw_shape_deriv(9, j, p)
+                    + d3xd2n * clough_raw_shape_deriv(10, j, p);
+		case 8:
+                  return d3yd3y * clough_raw_shape_deriv(8, j, p)
+                    + d3yd3x * clough_raw_shape_deriv(7, j, p)
+                    + d3yd1n * clough_raw_shape_deriv(9, j, p)
+                    + d3yd2n * clough_raw_shape_deriv(10, j, p);
+		case 10:
+                  return d1nd1n * clough_raw_shape_deriv(9, j, p);
+		case 11:
+                  return d2nd2n * clough_raw_shape_deriv(10, j, p);
+		case 9:
+                  return d3nd3n * clough_raw_shape_deriv(11, j, p);
+		  
+		default:
+		  error();
+		}
+	    }
+	  default:
+            std::cerr << "ERROR: Unsupported element type!" << std::endl;
+	    error();
+	  }
+      }
+      // by default throw an error
+    default:
+      std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
+      error();
+    }
+  
+  error();
+  return 0.;
+}
+
+
+
+template <>
+Real FE<2,CLOUGH>::shape_second_deriv(const Elem* elem,
+                                      const Order order,
+                                      const unsigned int i,
+                                      const unsigned int j,
+                                      const Point& p)
+{
+  assert (elem != NULL);
+
+  clough_compute_coefs(elem);
+
+  const ElemType type = elem->type();
+  
+  switch (order)
+    {      
+      // 3rd-order Clough-Tocher element
+    case THIRD:
+      {
+	switch (type)
+	  {
+	    // C1 functions on the Clough-Tocher triangle.
+	  case TRI6:
+	    {
+	      assert (i<12);
+
+            // FIXME: it would be nice to calculate (and cache)
+            // clough_raw_shape(j,p) only once per triangle, not 1-7
+            // times
+	      switch (i)
+		{
+	    // Note: these DoF numbers are "scrambled" because my
+	    // initial numbering conventions didn't match libMesh
+		case 0:
+		  return clough_raw_shape_second_deriv(0, j, p)
+                    + d1d2n * clough_raw_shape_second_deriv(10, j, p)
+                    + d1d3n * clough_raw_shape_second_deriv(11, j, p);
+		case 3:
+		  return clough_raw_shape_second_deriv(1, j, p)
+                    + d2d3n * clough_raw_shape_second_deriv(11, j, p)
+                    + d2d1n * clough_raw_shape_second_deriv(9, j, p);
+		case 6:
+		  return clough_raw_shape_second_deriv(2, j, p)
+                    + d3d1n * clough_raw_shape_second_deriv(9, j, p)
+                    + d3d2n * clough_raw_shape_second_deriv(10, j, p);
+		case 1:
+                  return d1xd1x * clough_raw_shape_second_deriv(3, j, p)
+                    + d1xd1y * clough_raw_shape_second_deriv(4, j, p)
+                    + d1xd2n * clough_raw_shape_second_deriv(10, j, p)
+                    + d1xd3n * clough_raw_shape_second_deriv(11, j, p);
+		case 2:
+                  return d1yd1y * clough_raw_shape_second_deriv(4, j, p)
+                    + d1yd1x * clough_raw_shape_second_deriv(3, j, p)
+                    + d1yd2n * clough_raw_shape_second_deriv(10, j, p)
+                    + d1yd3n * clough_raw_shape_second_deriv(11, j, p);
+		case 4:
+                  return d2xd2x * clough_raw_shape_second_deriv(5, j, p)
+                    + d2xd2y * clough_raw_shape_second_deriv(6, j, p)
+                    + d2xd3n * clough_raw_shape_second_deriv(11, j, p)
+                    + d2xd1n * clough_raw_shape_second_deriv(9, j, p);
+		case 5:
+                  return d2yd2y * clough_raw_shape_second_deriv(6, j, p)
+                    + d2yd2x * clough_raw_shape_second_deriv(5, j, p)
+                    + d2yd3n * clough_raw_shape_second_deriv(11, j, p)
+                    + d2yd1n * clough_raw_shape_second_deriv(9, j, p);
+		case 7:
+                  return d3xd3x * clough_raw_shape_second_deriv(7, j, p)
+                    + d3xd3y * clough_raw_shape_second_deriv(8, j, p)
+                    + d3xd1n * clough_raw_shape_second_deriv(9, j, p)
+                    + d3xd2n * clough_raw_shape_second_deriv(10, j, p);
+		case 8:
+                  return d3yd3y * clough_raw_shape_second_deriv(8, j, p)
+                    + d3yd3x * clough_raw_shape_second_deriv(7, j, p)
+                    + d3yd1n * clough_raw_shape_second_deriv(9, j, p)
+                    + d3yd2n * clough_raw_shape_second_deriv(10, j, p);
+		case 10:
+                  return d1nd1n * clough_raw_shape_second_deriv(9, j, p);
+		case 11:
+                  return d2nd2n * clough_raw_shape_second_deriv(10, j, p);
+		case 9:
+                  return d3nd3n * clough_raw_shape_second_deriv(11, j, p);
+		  
+		default:
+		  error();
+		}
+	    }
+	  default:
+            std::cerr << "ERROR: Unsupported element type!" << std::endl;
+	    error();
+	  }
+      }
+      // by default throw an error
+    default:
+      std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
+      error();
+    }
+  
+  error();
+  return 0.;
+}

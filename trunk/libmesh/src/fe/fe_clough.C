@@ -1,0 +1,241 @@
+// $Id: fe_clough.C,v 1.1 2005-01-13 22:20:57 roystgnr Exp $
+
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
+  
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+  
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+  
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+
+// Local includes
+#include "fe.h"
+#include "elem.h"
+
+
+
+
+// ------------------------------------------------------------
+// Hierarchic-specific implementations
+template <unsigned int Dim, FEFamily T>
+void FE<Dim,T>::nodal_soln(const Elem* elem,
+			   const Order order,
+			   const std::vector<Number>& elem_soln,
+			   std::vector<Number>&       nodal_soln)
+{
+  const unsigned int n_nodes = elem->n_nodes();
+  
+  const ElemType type = elem->type();
+
+  nodal_soln.resize(n_nodes);
+
+
+  
+  switch (order)
+    {
+      // Piecewise cubic shape functions only
+    case THIRD:
+      {
+
+	const unsigned int n_sf =
+	  FE<Dim,T>::n_shape_functions(type, order);
+	
+	for (unsigned int n=0; n<n_nodes; n++)
+	  {
+	    const Point mapped_point = FE<Dim,T>::inverse_map(elem,
+							      elem->point(n));
+
+	    assert (elem_soln.size() == n_sf);
+
+	    // Zero before summation
+	    nodal_soln[n] = 0;
+
+	    // u_i = Sum (alpha_i phi_i)
+	    for (unsigned int i=0; i<n_sf; i++)
+	      nodal_soln[n] += elem_soln[i]*FE<Dim,T>::shape(elem,
+							     order,
+							     i,
+							     mapped_point);	    
+	  }
+
+	return;
+      }
+      
+    default:
+      {
+	error();
+      }
+    }
+}
+
+
+
+template <unsigned int Dim, FEFamily T>
+unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
+{
+  switch (o)
+    {
+      // Piecewise cubic Clough-Tocher element
+    case THIRD:
+      {
+	switch (t)
+	  {
+	  case TRI6:
+	    return 12;
+	    
+	  default:
+	    {
+#ifdef DEBUG
+	      std::cerr << "ERROR: Bad ElemType = " << t
+			<< " for " << o << "th order approximation!" 
+			<< std::endl;
+#endif
+	      error();	    
+	    }
+	  }
+      }
+      
+    default:
+      {
+	error();
+      }
+    }
+  
+  error();  
+  return 0;
+}
+
+
+
+template <unsigned int Dim, FEFamily T>
+unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
+				       const Order o,
+				       const unsigned int n)
+{
+  switch (o)
+    {
+      // The third-order hierarchic shape functions
+    case THIRD:
+      {
+	switch (t)
+	  {
+	    // The 2D Clough-Tocher defined on a 6-noded triangle
+	  case TRI6:
+	    {
+	      switch (n)
+		{
+		case 0:
+		case 1:
+		case 2:
+		  return 3;
+
+		case 3:
+		case 4:
+		case 5:
+		  return 1;
+
+		default:
+		  error();
+		}
+	    }
+
+	  default:
+	    {
+#ifdef DEBUG
+	      std::cerr << "ERROR: Bad ElemType = " << t
+			<< " for " << o << "th order approximation!" 
+			<< std::endl;
+#endif
+	      error();	    
+	    }
+	    
+	  }
+      }
+    default:
+      {
+	error();
+      }
+    }
+  
+  error();
+  
+  return 0;
+}
+
+
+
+template <unsigned int Dim, FEFamily T>
+unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
+					const Order o)
+{
+  switch (o)
+    {
+      // The third-order Clough-Tocher shape functions
+    case THIRD:
+      {
+	switch (t)
+	  {
+	    // The 2D hierarchic defined on a 6-noded triangle
+	  case TRI6:
+	    return 0;
+
+	  default:
+	    {
+#ifdef DEBUG
+	      std::cerr << "ERROR: Bad ElemType = " << t
+			<< " for " << o << "th order approximation!" 
+			<< std::endl;
+#endif
+	      error();	    
+	    }
+	    
+	  }
+      }
+      // Otherwise no DOFS per element
+    default:
+      error();	    
+      return 0;
+    }
+}
+
+
+
+template <unsigned int Dim, FEFamily T>
+void FE<Dim,T>::compute_constraints (std::map<unsigned int,
+				            std::map<unsigned int,
+				                     float> > &,
+				     const unsigned int,
+				     const unsigned int,
+				     const FEType&,
+				     const Elem*)
+{
+  std::cerr << "ERROR:  Not yet implemented for Clough-Tocher!"
+	    << std::endl;
+  error();
+}
+
+
+
+template <unsigned int Dim, FEFamily T>
+bool FE<Dim,T>::shapes_need_reinit() const
+{
+  return true;
+}
+
+
+//--------------------------------------------------------------
+// Explicit instantiations
+template class FE<1,CLOUGH>;  // FIXME: 1D Not yet functional!
+template class FE<2,CLOUGH>;
+template class FE<3,CLOUGH>;  // FIXME: 2D Not yet functional!
