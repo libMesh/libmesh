@@ -1,4 +1,4 @@
-// $Id: point.h,v 1.11 2003-02-24 14:35:49 benkirk Exp $
+// $Id: point.h,v 1.12 2003-03-28 20:38:05 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -271,8 +271,12 @@ Real Point::operator () (const unsigned int i) const
 {
   assert (i<3);
 
+#if DIM < 3
+  
   if (i > (DIM-1))
     return 0.;
+  
+#endif
   
   return _coords[i];
 }
@@ -325,8 +329,21 @@ const Point & Point::operator += (const Point &p)
 inline
 void Point::add (const Point &p)
 {
-  for (unsigned int i=0; i<DIM; i++)
-    _coords[i] += p._coords[i];
+#if DIM == 1
+  _coords[0] += p._coords[0];
+#endif
+  
+#if DIM == 2
+  _coords[0] += p._coords[0];
+  _coords[1] += p._coords[1];
+#endif
+  
+#if DIM == 3
+  _coords[0] += p._coords[0];
+  _coords[1] += p._coords[1];
+  _coords[2] += p._coords[2];
+#endif
+
 }
 
 
@@ -334,8 +351,21 @@ void Point::add (const Point &p)
 inline
 void Point::add_scaled (const Point &p, const Real factor)
 {
-  for (unsigned int i=0; i<DIM; i++)
-    _coords[i] += factor*p._coords[i];
+#if DIM == 1
+  _coords[0] += factor*p._coords[0];
+#endif
+  
+#if DIM == 2
+  _coords[0] += factor*p._coords[0];
+  _coords[1] += factor*p._coords[1];
+#endif
+  
+#if DIM == 3
+  _coords[0] += factor*p._coords[0];
+  _coords[1] += factor*p._coords[1];
+  _coords[2] += factor*p._coords[2];
+#endif
+
 }
 
 
@@ -441,8 +471,20 @@ Point Point::operator * (const Real factor) const
 inline
 const Point & Point::operator *= (const Real factor)
 {
-  for (unsigned int i=0; i<DIM; i++)
-    _coords[i] *= factor;
+#if DIM == 1
+  _coords[0] *= factor;
+#endif
+  
+#if DIM == 2
+  _coords[0] *= factor;
+  _coords[1] *= factor;
+#endif
+  
+#if DIM == 3
+  _coords[0] *= factor;
+  _coords[1] *= factor;
+  _coords[2] *= factor;
+#endif
 
   return *this;
 }
@@ -530,12 +572,21 @@ void Point::zero()
 inline
 Real Point::size_sq() const
 {
-  Real val = 0.;
+#if DIM == 1
+  return _coords[0]*_coords[0];
+#endif
+  
+#if DIM == 2
+  return (_coords[0]*_coords[0] +
+	  _coords[1]*_coords[1]);
+#endif
+  
+#if DIM == 3
+  return (_coords[0]*_coords[0] +
+	  _coords[1]*_coords[1] +
+	  _coords[2]*_coords[2]);
+#endif
 
-  for (unsigned int i=0; i<DIM; i++)
-    val += _coords[i]*_coords[i];
-
-  return val;  
 }
 
 
@@ -544,12 +595,26 @@ Real Point::size_sq() const
 inline
 bool Point::operator == (const Point& rhs) const
 {
-  Point res((*this) - rhs);
-
-  if (res.size_sq() < TOLERANCE*TOLERANCE)
-    return true;
+  static Real tol_sq = TOLERANCE*TOLERANCE;
   
-  return false;
+#if DIM == 1
+  return ((_coords[0] - rhs._coords[0])*(_coords[0] - rhs._coords[0])
+	  < tol_sq);
+#endif
+  
+#if DIM == 2
+  return (((_coords[0] - rhs._coords[0])*(_coords[0] - rhs._coords[0]) +
+	   (_coords[1] - rhs._coords[1])*(_coords[1] - rhs._coords[1]))
+	  < tol_sq);
+#endif
+  
+#if DIM == 3
+  return (((_coords[0] - rhs._coords[0])*(_coords[0] - rhs._coords[0]) +
+	   (_coords[1] - rhs._coords[1])*(_coords[1] - rhs._coords[1]) +
+	   (_coords[2] - rhs._coords[2])*(_coords[2] - rhs._coords[2]))
+	  < tol_sq);
+#endif
+  
 }
 
 

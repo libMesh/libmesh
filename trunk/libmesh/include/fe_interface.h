@@ -1,4 +1,4 @@
-// $Id: fe_interface.h,v 1.11 2003-02-20 04:59:58 benkirk Exp $
+// $Id: fe_interface.h,v 1.12 2003-03-28 20:38:04 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -126,7 +126,7 @@ public:
 			    const FEType& fe_t,
 			    const Elem* elem,
 			    const Point& p,
-			    const Real tolerance = 1.e-6);
+			    const Real tolerance = 1.e-4);
 
   /**
    * @returns true if the point p is located on the reference element

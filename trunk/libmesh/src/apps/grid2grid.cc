@@ -82,7 +82,7 @@ int main (int argc, char** argv)
 
     // Declare an Octree.
     perf_log.start_event("octree build");
-    Trees::OctTree octree_coarse(mesh_coarse,200);
+    Trees::OctTree octree_coarse(mesh_coarse,100);
     perf_log.stop_event("octree build");
   
     std::cout << "n_active_bins() = " << octree_coarse.n_active_bins() << std::endl;

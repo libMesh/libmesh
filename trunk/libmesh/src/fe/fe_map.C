@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.15 2003-03-04 15:31:22 benkirk Exp $
+// $Id: fe_map.C,v 1.16 2003-03-28 20:38:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -497,7 +497,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
    * element change by in this Newton step?
    */
   Real error = 0.;
-
+  
   /**
    * The point on the reference element.  This is
    * the "initial guess" for Newton's method.  The
@@ -508,7 +508,6 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
    * Convergence should be insensitive of this choice
    * for "good" elements.
    */
-  //Point p = elem->centroid(); // A reasonable guess.  Requires computation
   Point p; // the zero point.  No computation required
 
   /**
@@ -673,13 +672,14 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 	    /**
 	     * Newton's method in this case looks like
 	     *
-	     * {X} - {X_n} = [J]*{dp}
+	     * {X} = {X_n} + [J]*{dp}
 	     *
 	     * Where {X}, {X_n} are 3x1 vectors, [J] is a 3x3 matrix
-	     * d(x,y,z)/dxi, and we seek {dp}, a 3x1 vector. Since the above
-	     * system is nonsingular for invertable maps we will solve 
+	     * d(x,y,z)/d(xi,eta,zeta), and we seek {dp}, a 3x1 vector.
+	     * Since the above system is nonsingular for invertable maps
+	     * we will solve 
 	     *
-	     * ({X} - {X_n}) = [J] {dp}
+	     * {dp} = [J]^-1 ({X} - {X_n})
 	     *
 	     * which involves the inversion of the 3x3 matrix [J]
 	     */	    
@@ -709,7 +709,6 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 	      Jinv31 =  (J21*J32 - J22*J31)*inv_det,
 	      Jinv32 = -(J11*J32 - J12*J31)*inv_det,
 	      Jinv33 =  (J11*J22 - J12*J21)*inv_det;
-	    
 	    
 	    dp(0) = (Jinv11*delta(0) +
 		     Jinv12*delta(1) +
@@ -758,15 +757,33 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
       if (cnt > 10)
 	{
 	  here();
-	  std::cerr << "WARNING: Newton scheme has not converged in "
-		    << cnt << " iterations!"
-		    << std::endl;
+	  {
+	    std::cerr << "WARNING: Newton scheme has not converged in "
+		      << cnt << " iterations:" << std::endl
+		      << "   physical_point=";
+	    
+	    physical_point.print();
+	    
+	    std::cerr << "   physical_guess=";
+	    
+	    physical_guess.print();
+	    
+	    std::cerr << "   dp=";
+	    
+	    dp.print();
+	    
+	    std::cerr << "   p=";
+	    
+	    p.print();
+	    
+	    std::cerr << "   error=" << error
+		      << std::endl;
+	  }
 	  
 	  if (cnt > 20)
 	    {
 	      std::cerr << "ERROR: Newton scheme FAILED to converge in "
-			<< cnt << " iterations!" << std::endl
-			<< "p="; 
+			<< cnt << " iterations!" << std::endl;
 	      error();
 	    }
 	}
