@@ -46,6 +46,7 @@ Basic include file needed for the mesh functionality.
 <pre>
         #include "libmesh.h"
         #include "mesh.h"
+        #include "gmv_io.h"
         #include "newmark_system.h"
         #include "equation_systems.h"
         
@@ -167,24 +168,6 @@ Initialize Petsc, like in example 2.
 </pre>
 </div>
 <div class = "comment">
-This example is not designed for complex numbers.
-</div>
-
-<div class ="fragment">
-<pre>
-        #ifdef USE_COMPLEX_NUMBERS
-        
-          std::cerr << "ERROR: Not intended for use with complex numbers."
-        	    << std::endl;
-          here();
-        
-          return 0;
-        
-        #endif
-        
-</pre>
-</div>
-<div class = "comment">
 Braces are used to force object scope.
 </div>
 
@@ -204,17 +187,7 @@ Check for proper usage.
         	std::cerr << "Usage: " << argv[0] << " [meshfile]"
         		  << std::endl;
         	
-</pre>
-</div>
-<div class = "comment">
-This handy function will print the file name, line number,
-and then abort.  Currrently the library does not use C++
-exception handling.
-</div>
-
-<div class ="fragment">
-<pre>
-                error();
+        	error();
               }
             
 </pre>
@@ -615,7 +588,8 @@ Do only for a few time steps.
         	  {
         	    char buf[14];
         	    sprintf (buf, "out.%03d.gmv", time_step);
-        	    mesh.write_gmv (buf, equation_systems);
+        	    GMVIO(mesh).write_equation_systems (buf,
+        						equation_systems);
         	  }
         
 </pre>
@@ -1409,6 +1383,7 @@ if desired.
   
   #include <FONT COLOR="#BC8F8F"><B>&quot;libmesh.h&quot;</FONT></B>
   #include <FONT COLOR="#BC8F8F"><B>&quot;mesh.h&quot;</FONT></B>
+  #include <FONT COLOR="#BC8F8F"><B>&quot;gmv_io.h&quot;</FONT></B>
   #include <FONT COLOR="#BC8F8F"><B>&quot;newmark_system.h&quot;</FONT></B>
   #include <FONT COLOR="#BC8F8F"><B>&quot;equation_systems.h&quot;</FONT></B>
   
@@ -1437,16 +1412,6 @@ if desired.
   <FONT COLOR="#228B22"><B>int</FONT></B> main (<FONT COLOR="#228B22"><B>int</FONT></B> argc, <FONT COLOR="#228B22"><B>char</FONT></B>** argv)
   {
     libMesh::init (argc, argv);
-  
-  #ifdef USE_COMPLEX_NUMBERS
-  
-    std::cerr &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;ERROR: Not intended for use with complex numbers.&quot;</FONT></B>
-  	    &lt;&lt; std::endl;
-    here();
-  
-    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
-  
-  #endif
   
     {
       <B><FONT COLOR="#A020F0">if</FONT></B> (argc &lt; 2)
@@ -1552,7 +1517,8 @@ if desired.
   	  {
   	    <FONT COLOR="#228B22"><B>char</FONT></B> buf[14];
   	    sprintf (buf, <FONT COLOR="#BC8F8F"><B>&quot;out.%03d.gmv&quot;</FONT></B>, time_step);
-  	    mesh.write_gmv (buf, equation_systems);
+  	    GMVIO(mesh).write_equation_systems (buf,
+  						equation_systems);
   	  }
   
   	t_system.update_u_v_a();
@@ -1749,6 +1715,10 @@ if desired.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+Compiling C++ (in debug mode) ex8.C...
+Linking ex8...
+/home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
+: the use of `mktemp' is dangerous, better use `mkstemp'
 ***************************************************************
 * Running Example  ./ex8
 ***************************************************************
@@ -1756,8 +1726,6 @@ if desired.
 Running ./ex8 pipe-mesh.unv
 
 Mesh file is: pipe-mesh.unv
-
- Universal file Interface:
   Counting nodes and elements
   Convert from "D" to "e"
   Nodes   : 3977
@@ -1782,14 +1750,12 @@ Mesh file is: pipe-mesh.unv
    System "Wave"
     Type "Newmark"
     Variables="p" 
-    Finite Element Types="0", "12" 
-    Infinite Element Mapping="0" 
-    Approximation Orders="1", "3" 
+    Finite Element Types="0" 
+    Approximation Orders="1" 
     n_dofs()=3977
     n_local_dofs()=3977
     n_constrained_dofs()=0
-    n_additional_vectors()=8
-    n_additional_matrices()=3
+    n_vectors()=9
   n_parameters()=8
    Parameters:
     "Newmark alpha"=0.25
@@ -1805,21 +1771,18 @@ Mesh file is: pipe-mesh.unv
  ---------------------------------------------------------------------------- 
 | Reference count information                                                |
  ---------------------------------------------------------------------------- 
-| 10SystemBase reference count information:
-| Creations:    1
-| Destructions: 1
 | 12SparseMatrixIdE reference count information:
 | Creations:    4
 | Destructions: 4
 | 13NumericVectorIdE reference count information:
-| Creations:    13
-| Destructions: 13
+| Creations:    11
+| Destructions: 11
 | 21LinearSolverInterfaceIdE reference count information:
 | Creations:    1
 | Destructions: 1
 | 4Elem reference count information:
-| Creations:    24984
-| Destructions: 24984
+| Creations:    24951
+| Destructions: 24951
 | 4Node reference count information:
 | Creations:    3977
 | Destructions: 3977
@@ -1832,56 +1795,10 @@ Mesh file is: pipe-mesh.unv
 | 6FEBase reference count information:
 | Creations:    1
 | Destructions: 1
+| 6System reference count information:
+| Creations:    1
+| Destructions: 1
  ---------------------------------------------------------------------------- 
-
- ----------------------------------------------------------------------------
-| Time:           Mon Nov 10 22:55:38 2003
-| OS:             Linux
-| HostName:       ariel
-| OS Release      2.4.20-19.9smp
-| OS Version:     #1 SMP Tue Jul 15 17:04:18 EDT 2003
-| Machine:        i686
-| Username:       benkirk
- ----------------------------------------------------------------------------
- ----------------------------------------------------------------------------
-| libMesh Performance: Alive time=50.8255, Active time=49.2282
- ----------------------------------------------------------------------------
-| Event                         nCalls  Total       Avg         Percent of   |
-|                                       Time        Time        Active Time  |
-|----------------------------------------------------------------------------|
-|                                                                            |
-|                                                                            |
-| DofMap                                                                     |
-|   compute_sparsity()          1       0.1266      0.126586    0.26         |
-|   create_dof_constraints()    1       0.0032      0.003225    0.01         |
-|   distribute_dofs()           1       0.0158      0.015805    0.03         |
-|   dof_indices()               21120   0.1711      0.000008    0.35         |
-|   reinit()                    1       0.0413      0.041273    0.08         |
-|                                                                            |
-| FE                                                                         |
-|   compute_map()               3520    0.0580      0.000016    0.12         |
-|   compute_shape_functions()   3520    0.0542      0.000015    0.11         |
-|   init_shape_functions()      8       0.0013      0.000165    0.00         |
-|                                                                            |
-| Mesh                                                                       |
-|   read()                      1       0.5000      0.499951    1.02         |
-|                                                                            |
-| MeshBase                                                                   |
-|   find_neighbors()            1       0.1382      0.138173    0.28         |
-|   renumber_nodes_and_elem()   1       0.0046      0.004616    0.01         |
-|                                                                            |
-| NewmarkSystem                                                              |
-|   initial_conditions ()       1       0.0002      0.000233    0.00         |
-|   update_rhs ()               300     3.1685      0.010562    6.44         |
-|   update_u_v_a ()             300     0.4552      0.001517    0.92         |
-|                                                                            |
-| SystemBase                                                                 |
-|   assemble()                  1       0.6913      0.691321    1.40         |
-|   solve()                     300     43.7988     0.145996    88.97        |
- ----------------------------------------------------------------------------
-| Totals:                       29077   49.2282                 100.00       |
- ----------------------------------------------------------------------------
-
  
 ***************************************************************
 * Done Running Example  ./ex8

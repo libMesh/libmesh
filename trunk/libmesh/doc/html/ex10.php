@@ -42,6 +42,7 @@ Basic include file needed for the mesh functionality.
         #include "libmesh.h"
         #include "mesh.h"
         #include "mesh_refinement.h"
+        #include "gmv_io.h"
         #include "equation_systems.h"
         #include "fe.h"
         #include "quadrature_gauss.h"
@@ -67,7 +68,7 @@ Check example 9 for details.
 </div>
 <div class = "comment">
 This example will solve a linear transient system,
-so we need to include the \p TransientSystem definition.
+so we need to include the \p TransientImplicitSystem definition.
 </div>
 
 <div class ="fragment">
@@ -148,18 +149,6 @@ numbers.
 <pre>
         int main (int argc, char** argv)
         {
-          
-        #ifdef USE_COMPLEX_NUMBERS
-          
-          std::cerr << "ERROR: Not intended for use with complex numbers."
-        	    << std::endl;
-          here();
-        
-          return 0;
-          
-        #else
-          
-          
 </pre>
 </div>
 <div class = "comment">
@@ -242,8 +231,8 @@ named "Convection-Diffusion".
 
 <div class ="fragment">
 <pre>
-            TransientSystem&amp; system = 
-              equation_systems.add_system<TransientSystem> ("Convection-Diffusion");
+            TransientImplicitSystem &amp; system = 
+              equation_systems.add_system<TransientImplicitSystem> ("Convection-Diffusion");
               
 </pre>
 </div>
@@ -296,8 +285,8 @@ Write out the initial conditions.
 
 <div class ="fragment">
 <pre>
-            mesh.write_gmv ("out_000.gmv",
-        		    equation_systems);
+            GMVIO(mesh).write_equation_systems ("out_000.gmv",
+        					equation_systems);
             
 </pre>
 </div>
@@ -382,15 +371,15 @@ solution vector.  The old solution vector
 will be the current solution vector from the
 previous time step.  We will do this by extracting the
 system from the \p EquationSystems object and using
-vector assignment.  Since only \p TransientSystems
+vector assignment.  Since only \p TransientImplicitSystems
 (and systems derived from them) contain old solutions
 we need to specify the system type when we ask for it.
 </div>
 
 <div class ="fragment">
 <pre>
-                TransientSystem&amp;  system =
-        	  equation_systems.get_system<TransientSystem>("Convection-Diffusion");
+                TransientImplicitSystem &amp;  system =
+        	  equation_systems.get_system<TransientImplicitSystem>("Convection-Diffusion");
         
         	*system.old_local_solution = *system.current_local_solution;
         	
@@ -537,8 +526,8 @@ Output evey 10 timesteps to file.
         	    OSSRealzeroright(file_name,3,0,t_step+1);
         	    file_name << ".gmv";
         
-        	    mesh.write_gmv (file_name.str(),
-        			    equation_systems);
+        	    GMVIO(mesh).write_equation_systems (file_name.str(),
+        						equation_systems);
         	  }
               }
           }
@@ -552,7 +541,6 @@ All done.
 <div class ="fragment">
 <pre>
           return libMesh::close ();
-        #endif
         }
         
 </pre>
@@ -569,8 +557,6 @@ the system.
         void init_cd (EquationSystems&amp; es,
         	      const std::string& system_name)
         {
-        #ifndef USE_COMPLEX_NUMBERS
-          
 </pre>
 </div>
 <div class = "comment">
@@ -600,8 +586,8 @@ Get a reference to the Convection-Diffusion system object.
 
 <div class ="fragment">
 <pre>
-          TransientSystem&amp; system =
-            es.get_system<TransientSystem> ("Convection-Diffusion");
+          TransientImplicitSystem &amp; system =
+            es.get_system<TransientImplicitSystem> ("Convection-Diffusion");
           
 </pre>
 </div>
@@ -621,7 +607,7 @@ Get a reference to the solution vector.
 
 <div class ="fragment">
 <pre>
-          NumericVector&lt;Real&gt;&amp; solution = *system.solution;
+          NumericVector&lt;Number&gt;&amp; solution = *system.solution;
           
 </pre>
 </div>
@@ -704,8 +690,6 @@ for us.
 <div class ="fragment">
 <pre>
           system.update ();
-        
-        #endif 
         }
         
         
@@ -724,8 +708,6 @@ element stiffness matrices and right-hand sides.
         void assemble_cd (EquationSystems&amp; es,
         		  const std::string& system_name)
         {
-        #ifndef USE_COMPLEX_NUMBERS
-          
 </pre>
 </div>
 <div class = "comment">
@@ -765,8 +747,21 @@ Get a reference to the Convection-Diffusion system object.
 
 <div class ="fragment">
 <pre>
-          TransientSystem&amp; system =
-            es.get_system<TransientSystem> ("Convection-Diffusion");
+          TransientImplicitSystem &amp; system =
+            es.get_system<TransientImplicitSystem> ("Convection-Diffusion");
+          
+</pre>
+</div>
+<div class = "comment">
+A reference to the \p DofMap object for this system.  The \p DofMap
+object handles the index translation from node and element numbers
+to degree of freedom numbers.  We will talk more about the \p DofMap
+in future examples.
+</div>
+
+<div class ="fragment">
+<pre>
+          const DofMap&amp; dof_map = system.get_dof_map();
           
 </pre>
 </div>
@@ -849,19 +844,6 @@ points.
 </pre>
 </div>
 <div class = "comment">
-A reference to the \p DofMap object for this system.  The \p DofMap
-object handles the index translation from node and element numbers
-to degree of freedom numbers.  We will talk more about the \p DofMap
-in future examples.
-</div>
-
-<div class ="fragment">
-<pre>
-          const DofMap&amp; dof_map = system.get_dof_map();
-          
-</pre>
-</div>
-<div class = "comment">
 Define data structures to contain the element matrix
 and right-hand-side vector contribution.  Following
 basic finite element terminology we will denote these
@@ -870,8 +852,8 @@ basic finite element terminology we will denote these
 
 <div class ="fragment">
 <pre>
-          DenseMatrix&lt;Real&gt; Ke;
-          DenseVector<Real> Fe;
+          DenseMatrix&lt;Number&gt; Ke;
+          DenseVector<Number> Fe;
           
 </pre>
 </div>
@@ -995,8 +977,8 @@ Values to hold the old solution & its gradient.
 
 <div class ="fragment">
 <pre>
-                  Real         u_old = 0.;
-        	  RealGradient grad_u_old;
+                  Number   u_old = 0.;
+        	  Gradient grad_u_old;
         	  
 </pre>
 </div>
@@ -1056,11 +1038,14 @@ Mass matrix term
 </div>
 <div class = "comment">
 Convection term
+(grad_u_old may be complex, so the
+order here is important!)
 </div>
 
 <div class ="fragment">
 <pre>
-                                                (velocity*grad_u_old)*phi[i][qp] +
+                                                (grad_u_old*velocity)*phi[i][qp] +
+        					
 </pre>
 </div>
 <div class = "comment">
@@ -1215,7 +1200,6 @@ Right-hand-side contribution.
 <pre>
                               Fe(n) += penalty*value;
         		    }
-        		  
         	      }
         	  } 
               
@@ -1247,8 +1231,8 @@ and \p PetscVector::add_vector() members do this for us.
 
 <div class ="fragment">
 <pre>
-              es("Convection-Diffusion").matrix-&gt;add_matrix (Ke, dof_indices);
-              es("Convection-Diffusion").rhs->add_vector    (Fe, dof_indices);
+              system.matrix-&gt;add_matrix (Ke, dof_indices);
+              system.rhs->add_vector    (Fe, dof_indices);
               
             }
 </pre>
@@ -1259,7 +1243,6 @@ Finished computing the sytem matrix and right-hand side.
 
 <div class ="fragment">
 <pre>
-        #endif
         }
 </pre>
 </div>
@@ -1275,6 +1258,7 @@ Finished computing the sytem matrix and right-hand side.
   #include <FONT COLOR="#BC8F8F"><B>&quot;libmesh.h&quot;</FONT></B>
   #include <FONT COLOR="#BC8F8F"><B>&quot;mesh.h&quot;</FONT></B>
   #include <FONT COLOR="#BC8F8F"><B>&quot;mesh_refinement.h&quot;</FONT></B>
+  #include <FONT COLOR="#BC8F8F"><B>&quot;gmv_io.h&quot;</FONT></B>
   #include <FONT COLOR="#BC8F8F"><B>&quot;equation_systems.h&quot;</FONT></B>
   #include <FONT COLOR="#BC8F8F"><B>&quot;fe.h&quot;</FONT></B>
   #include <FONT COLOR="#BC8F8F"><B>&quot;quadrature_gauss.h&quot;</FONT></B>
@@ -1304,18 +1288,6 @@ Finished computing the sytem matrix and right-hand side.
   
   <FONT COLOR="#228B22"><B>int</FONT></B> main (<FONT COLOR="#228B22"><B>int</FONT></B> argc, <FONT COLOR="#228B22"><B>char</FONT></B>** argv)
   {
-    
-  #ifdef USE_COMPLEX_NUMBERS
-    
-    std::cerr &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;ERROR: Not intended for use with complex numbers.&quot;</FONT></B>
-  	    &lt;&lt; std::endl;
-    here();
-  
-    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
-    
-  #<B><FONT COLOR="#A020F0">else</FONT></B>
-    
-    
     libMesh::init (argc, argv);
   
     {    
@@ -1332,8 +1304,8 @@ Finished computing the sytem matrix and right-hand side.
       
       EquationSystems equation_systems (mesh);
       
-      TransientSystem&amp; system = 
-        equation_systems.add_system&lt;TransientSystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Convection-Diffusion&quot;</FONT></B>);
+      TransientImplicitSystem &amp; system = 
+        equation_systems.add_system&lt;TransientImplicitSystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Convection-Diffusion&quot;</FONT></B>);
         
       system.add_variable (<FONT COLOR="#BC8F8F"><B>&quot;u&quot;</FONT></B>, FIRST);
         
@@ -1344,8 +1316,8 @@ Finished computing the sytem matrix and right-hand side.
       
       equation_systems.print_info();
         
-      mesh.write_gmv (<FONT COLOR="#BC8F8F"><B>&quot;out_000.gmv&quot;</FONT></B>,
-  		    equation_systems);
+      GMVIO(mesh).write_equation_systems (<FONT COLOR="#BC8F8F"><B>&quot;out_000.gmv&quot;</FONT></B>,
+  					equation_systems);
       
       RealVectorValue velocity (0.8, 0.8);
   
@@ -1373,8 +1345,8 @@ Finished computing the sytem matrix and right-hand side.
   	  std::cout &lt;&lt; out.str();
   	}
   	
-  	TransientSystem&amp;  system =
-  	  equation_systems.get_system&lt;TransientSystem&gt;(<FONT COLOR="#BC8F8F"><B>&quot;Convection-Diffusion&quot;</FONT></B>);
+  	TransientImplicitSystem &amp;  system =
+  	  equation_systems.get_system&lt;TransientImplicitSystem&gt;(<FONT COLOR="#BC8F8F"><B>&quot;Convection-Diffusion&quot;</FONT></B>);
   
   	*system.old_local_solution = *system.current_local_solution;
   	
@@ -1415,31 +1387,28 @@ Finished computing the sytem matrix and right-hand side.
   	    OSSRealzeroright(file_name,3,0,t_step+1);
   	    file_name &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;.gmv&quot;</FONT></B>;
   
-  	    mesh.write_gmv (file_name.str(),
-  			    equation_systems);
+  	    GMVIO(mesh).write_equation_systems (file_name.str(),
+  						equation_systems);
   	  }
         }
     }
     
     <B><FONT COLOR="#A020F0">return</FONT></B> libMesh::close ();
-  #endif
   }
   
   <FONT COLOR="#228B22"><B>void</FONT></B> init_cd (EquationSystems&amp; es,
   	      <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp; system_name)
   {
-  #ifndef USE_COMPLEX_NUMBERS
-    
     assert (system_name == <FONT COLOR="#BC8F8F"><B>&quot;Convection-Diffusion&quot;</FONT></B>);
     
     <FONT COLOR="#228B22"><B>const</FONT></B> Mesh&amp; mesh = es.get_mesh();
     
-    TransientSystem&amp; system =
-      es.get_system&lt;TransientSystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Convection-Diffusion&quot;</FONT></B>);
+    TransientImplicitSystem &amp; system =
+      es.get_system&lt;TransientImplicitSystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Convection-Diffusion&quot;</FONT></B>);
     
     <FONT COLOR="#228B22"><B>const</FONT></B> DofMap&amp; dof_map = system.get_dof_map();
     
-    NumericVector&lt;Real&gt;&amp; solution = *system.solution;
+    NumericVector&lt;Number&gt;&amp; solution = *system.solution;
     
     std::vector&lt;<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B>&gt; dof_indices;
   
@@ -1469,8 +1438,6 @@ Finished computing the sytem matrix and right-hand side.
       }
     
     system.update ();
-  
-  #endif 
   }
   
   
@@ -1478,16 +1445,16 @@ Finished computing the sytem matrix and right-hand side.
   <FONT COLOR="#228B22"><B>void</FONT></B> assemble_cd (EquationSystems&amp; es,
   		  <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp; system_name)
   {
-  #ifndef USE_COMPLEX_NUMBERS
-    
     assert (system_name == <FONT COLOR="#BC8F8F"><B>&quot;Convection-Diffusion&quot;</FONT></B>);
     
     <FONT COLOR="#228B22"><B>const</FONT></B> Mesh&amp; mesh = es.get_mesh();
     
     <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> dim = mesh.mesh_dimension();
     
-    TransientSystem&amp; system =
-      es.get_system&lt;TransientSystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Convection-Diffusion&quot;</FONT></B>);
+    TransientImplicitSystem &amp; system =
+      es.get_system&lt;TransientImplicitSystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Convection-Diffusion&quot;</FONT></B>);
+    
+    <FONT COLOR="#228B22"><B>const</FONT></B> DofMap&amp; dof_map = system.get_dof_map();
     
     FEType fe_type = system.variable_type(0);
     
@@ -1503,10 +1470,8 @@ Finished computing the sytem matrix and right-hand side.
     
     <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = fe-&gt;get_dphi();
     
-    <FONT COLOR="#228B22"><B>const</FONT></B> DofMap&amp; dof_map = system.get_dof_map();
-    
-    DenseMatrix&lt;Real&gt; Ke;
-    DenseVector&lt;Real&gt; Fe;
+    DenseMatrix&lt;Number&gt; Ke;
+    DenseVector&lt;Number&gt; Fe;
     
     std::vector&lt;<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B>&gt; dof_indices;
   
@@ -1534,8 +1499,8 @@ Finished computing the sytem matrix and right-hand side.
         
         <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> qp=0; qp&lt;qrule.n_points(); qp++)
   	{
-  	  Real         u_old = 0.;
-  	  RealGradient grad_u_old;
+  	  Number   u_old = 0.;
+  	  Gradient grad_u_old;
   	  
   	  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> l=0; l&lt;phi.size(); l++)
   	    {
@@ -1549,7 +1514,8 @@ Finished computing the sytem matrix and right-hand side.
   	      Fe(i) += JxW[qp]*(
   				u_old*phi[i][qp] + 
   				-.5*dt*(
-  					(velocity*grad_u_old)*phi[i][qp] +
+  					(grad_u_old*velocity)*phi[i][qp] +
+  					
   					0.01*(grad_u_old*dphi[i][qp]))     
   				);
   	      
@@ -1586,22 +1552,24 @@ Finished computing the sytem matrix and right-hand side.
   			
   		      Fe(n) += penalty*value;
   		    }
-  		  
   	      }
   	  } 
         
         dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
         
-        es(<FONT COLOR="#BC8F8F"><B>&quot;Convection-Diffusion&quot;</FONT></B>).matrix-&gt;add_matrix (Ke, dof_indices);
-        es(<FONT COLOR="#BC8F8F"><B>&quot;Convection-Diffusion&quot;</FONT></B>).rhs-&gt;add_vector    (Fe, dof_indices);
+        system.matrix-&gt;add_matrix (Ke, dof_indices);
+        system.rhs-&gt;add_vector    (Fe, dof_indices);
         
       }
-  #endif
   }
 </pre> 
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+Compiling C++ (in debug mode) ex10.C...
+Linking ex10...
+/home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
+: the use of `mktemp' is dangerous, better use `mkstemp'
 ***************************************************************
 * Running Example  ./ex10
 ***************************************************************
@@ -1620,16 +1588,14 @@ Finished computing the sytem matrix and right-hand side.
  EquationSystems
   n_systems()=1
    System "Convection-Diffusion"
-    Type "Transient"
+    Type "TransientImplicit"
     Variables="u" 
-    Finite Element Types="0", "12" 
-    Infinite Element Mapping="0" 
-    Approximation Orders="1", "3" 
+    Finite Element Types="0" 
+    Approximation Orders="1" 
     n_dofs()=6273
     n_local_dofs()=6273
     n_constrained_dofs()=0
-    n_additional_vectors()=0
-    n_additional_matrices()=0
+    n_vectors()=1
   n_parameters()=2
    Parameters:
     "linear solver maximum iterations"=5000
@@ -1739,9 +1705,6 @@ Finished computing the sytem matrix and right-hand side.
  ---------------------------------------------------------------------------- 
 | Reference count information                                                |
  ---------------------------------------------------------------------------- 
-| 10SystemBase reference count information:
-| Creations:    1
-| Destructions: 1
 | 12SparseMatrixIdE reference count information:
 | Creations:    1
 | Destructions: 1
@@ -1752,8 +1715,8 @@ Finished computing the sytem matrix and right-hand side.
 | Creations:    1
 | Destructions: 1
 | 4Elem reference count information:
-| Creations:    562053
-| Destructions: 562053
+| Creations:    561467
+| Destructions: 561467
 | 4Node reference count information:
 | Creations:    8397
 | Destructions: 8397
@@ -1766,74 +1729,10 @@ Finished computing the sytem matrix and right-hand side.
 | 6FEBase reference count information:
 | Creations:    200
 | Destructions: 200
+| 6System reference count information:
+| Creations:    1
+| Destructions: 1
  ---------------------------------------------------------------------------- 
-
- ----------------------------------------------------------------------------
-| Time:           Mon Nov 10 22:57:35 2003
-| OS:             Linux
-| HostName:       ariel
-| OS Release      2.4.20-19.9smp
-| OS Version:     #1 SMP Tue Jul 15 17:04:18 EDT 2003
-| Machine:        i686
-| Username:       benkirk
- ----------------------------------------------------------------------------
- ----------------------------------------------------------------------------
-| libMesh Performance: Alive time=55.5748, Active time=74.3555
- ----------------------------------------------------------------------------
-| Event                         nCalls  Total       Avg         Percent of   |
-|                                       Time        Time        Active Time  |
-|----------------------------------------------------------------------------|
-|                                                                            |
-|                                                                            |
-| DofMap                                                                     |
-|   build_constraint_matrix()   173863  1.2675      0.000007    1.70         |
-|   cnstrn_elem_mat_vec()       122755  0.9031      0.000007    1.21         |
-|   compute_sparsity()          51      1.2931      0.025356    1.74         |
-|   create_dof_constraints()    51      0.5374      0.010536    0.72         |
-|   distribute_dofs()           51      0.1888      0.003703    0.25         |
-|   dof_indices()               613650  4.0703      0.000007    5.47         |
-|   old_dof_indices()           171690  1.2086      0.000007    1.63         |
-|   reinit()                    51      0.8167      0.016014    1.10         |
-|                                                                            |
-| ErrorEstimator                                                             |
-|   flux_jump()                 50      24.4493     0.488985    32.88        |
-|                                                                            |
-| ErrorVector                                                                |
-|   minimum()                   50      0.0014      0.000029    0.00         |
-|                                                                            |
-| FE                                                                         |
-|   compute_face_map()          112490  0.8112      0.000007    1.09         |
-|   compute_map()               347735  2.2055      0.000006    2.97         |
-|   compute_shape_functions()   347735  1.6995      0.000005    2.29         |
-|   init_face_shape_functions() 105868  0.6393      0.000006    0.86         |
-|   init_shape_functions()      229747  3.2211      0.000014    4.33         |
-|   inverse_map()               484268  4.5244      0.000009    6.08         |
-|                                                                            |
-| Mesh                                                                       |
-|   read()                      1       0.0023      0.002278    0.00         |
-|                                                                            |
-| MeshBase                                                                   |
-|   find_neighbors()            52      1.7325      0.033317    2.33         |
-|   renumber_nodes_and_elem()   52      0.0917      0.001763    0.12         |
-|                                                                            |
-| MeshRefinement                                                             |
-|   coarsen_elements()          50      0.0939      0.001878    0.13         |
-|   make_coarsening_compatible()78      0.2439      0.003127    0.33         |
-|   make_refinement_compatible()78      0.0173      0.000222    0.02         |
-|   refine_elements()           55      0.1954      0.003553    0.26         |
-|   update_nodes_map()          55      0.0445      0.000809    0.06         |
-|                                                                            |
-| StatisticsVector                                                           |
-|   maximum()                   50      0.0011      0.000022    0.00         |
-|                                                                            |
-| SystemBase                                                                 |
-|   assemble()                  100     17.3683     0.173683    23.36        |
-|   project_vector()            150     5.0571      0.033714    6.80         |
-|   solve()                     100     1.6705      0.016705    2.25         |
- ----------------------------------------------------------------------------
-| Totals:                       2710926 74.3555                 100.00       |
- ----------------------------------------------------------------------------
-
  
 ***************************************************************
 * Done Running Example  ./ex10
