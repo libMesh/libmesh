@@ -5,5 +5,6 @@
 *.syo
 ex6
 *.gmv
+*.dat
 ii_files
 so_locations
