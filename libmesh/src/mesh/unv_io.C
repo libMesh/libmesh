@@ -1,4 +1,4 @@
-// $Id: unv_io.C,v 1.9 2004-10-19 12:44:10 benkirk Exp $
+// $Id: unv_io.C,v 1.10 2004-10-19 22:31:05 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -140,14 +140,13 @@ void UNVIO::read_implementation (std::istream& in_stream)
       std::cout << "  Counting nodes and elements" << std::endl;
     
 
-    bool reached_eof = false;
+//    bool reached_eof = false;
     bool found_node  = false;
     bool found_elem  = false;
 
 
     std::string olds, news;
 
-    //while (true)
     while (in_stream.good())
       {
 	in_stream >> olds >> news;
@@ -160,11 +159,11 @@ void UNVIO::read_implementation (std::istream& in_stream)
 	    in_stream >> news;
 	  }
 
-	if (in_stream.eof())
-	  {
-	    reached_eof = true;
-	    break;
-	  }
+//  	if (in_stream.eof())
+//  	  {
+//  	    reached_eof = true;
+//  	    break;
+//  	  }
 
 	
 	// if beginning of dataset, buffer it in

@@ -69,13 +69,13 @@ The library is known to work with the following compilers:
     </ul>
   <li>SGI Altix</li>
     <ul>
-      <li><code>ecc/efc</code> 7.1 tested</li>
+      <li><code>icc/ifort</code> 8.x</li>
+      <li><code>ecc/efc</code> 7.1</li>
       <li><code>MPT MPI</code> 1.9.1</li>
     </ul>
   <li>SGI IRIX 6.5 with MIPSPro Compilers</li>
     <ul>
-      <li>Version 7.30 <code>(CXXFLAGS=-LANG:std CXX=CC ./configure [...])</code></li>
-      <li>Not tested (but will likely work) with others</li>
+      <li><code>CC/cc</code> version 7.4</li>
     </ul>
   <li>Sun ONE Studio Compilers</li>
     <ul>

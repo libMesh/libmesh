@@ -1,4 +1,4 @@
-// $Id: sparse_matrix.h,v 1.6 2004-10-19 16:58:04 jwpeterson Exp $
+// $Id: sparse_matrix.h,v 1.7 2004-10-19 22:31:05 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -278,11 +278,7 @@ public:
    * Same as the print method above, but allows you
    * to print to a stream in the standard syntax.
    */
-  friend std::ostream& operator << (std::ostream& os, const SparseMatrix<T>& m)
-  {
-    m.print(os);
-    return os;
-  }
+  friend std::ostream& operator << (std::ostream& os, const SparseMatrix<T>& m);
   
   /**
    * Print the contents of the matrix to the screen
@@ -421,6 +417,18 @@ void SparseMatrix<Complex>::print(std::ostream& os) const
 	os << std::setw(8) << (*this)(i,j).imag() << " ";
       os << std::endl;
     }
+}
+
+
+
+// For SGI MIPSpro this implementation must occur after
+// the partial specialization of the print() member.
+template <typename T>
+inline
+std::ostream& operator << (std::ostream& os, const SparseMatrix<T>& m)
+{
+  m.print(os);
+  return os;
 }
 
 
