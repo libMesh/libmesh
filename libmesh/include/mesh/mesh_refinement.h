@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.h,v 1.7 2005-03-10 22:05:11 jwpeterson Exp $
+// $Id: mesh_refinement.h,v 1.8 2005-03-21 18:05:40 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -121,19 +121,31 @@ public:
   /**
    * Refines and coarsens user-requested elements. Will also
    * refine/coarsen additional elements to satisy level-one rule.
+   * It is possible that for a given set of refinement flags there
+   * is actually no change upon calling this member function.  Consequently,
+   * this function returns \p true if the mesh actually changed (hence
+   * data needs to be projected) and \p false otherwise.
    */
-  void refine_and_coarsen_elements (const bool maintain_level_one=true);
+  bool refine_and_coarsen_elements (const bool maintain_level_one=true);
 
   /**
    * Only coarsens the user-requested elements. Some elements
    * will not be coarsened to satisfy the level one rule.
+   * It is possible that for a given set of refinement flags there
+   * is actually no change upon calling this member function.  Consequently,
+   * this function returns \p true if the mesh actually changed (hence
+   * data needs to be projected) and \p false otherwise.
    */
-  void coarsen_elements (const bool maintain_level_one=true);
+  bool coarsen_elements (const bool maintain_level_one=true);
 
   /**
    * Only refines the user-requested elements. 
+   * It is possible that for a given set of refinement flags there
+   * is actually no change upon calling this member function.  Consequently,
+   * this function returns \p true if the mesh actually changed (hence
+   * data needs to be projected) and \p false otherwise.
    */
-  void refine_elements (const bool maintain_level_one=true);
+  bool refine_elements (const bool maintain_level_one=true);
   
   /**
    * Uniformly refines the mesh \p n times.
@@ -176,13 +188,23 @@ private:
    * at least coarsen_elements() did not work alone.  By making them
    * private, we signal to the user that they are not part of the
    * interface.
+   *
+   * It is possible that for a given set of refinement flags there
+   * is actually no change upon calling this member function.  Consequently,
+   * this function returns \p true if the mesh actually changed (hence
+   * data needs to be projected) and \p false otherwise.
    */
-  void _coarsen_elements ();
+  bool _coarsen_elements ();
   
   /**
    * Refines user-requested elements.
+   *
+   * It is possible that for a given set of refinement flags there
+   * is actually no change upon calling this member function.  Consequently,
+   * this function returns \p true if the mesh actually changed (hence
+   * data needs to be projected) and \p false otherwise.
    */
-  void _refine_elements ();
+  bool _refine_elements ();
 
 
 
