@@ -1,4 +1,4 @@
-// $Id: distributed_vector.h,v 1.7 2003-02-28 23:37:41 benkirk Exp $
+// $Id: distributed_vector.h,v 1.8 2003-03-23 02:47:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -269,6 +269,15 @@ public:
    */
   void add_vector (const NumericVector<T>& V,
 		   const std::vector<unsigned int>& dof_indices);
+  
+  /**
+   * U+=U+A*V.
+   * Add the product of a Sparse matrix \p A
+   * and a Numeric vector \p V to this Numeric vector.
+   */
+  void add_vector (const NumericVector<T> &,
+		   SparseMatrix<T> &)
+  { error(); }
   
   /**
    * U+=V where U and V are type 
