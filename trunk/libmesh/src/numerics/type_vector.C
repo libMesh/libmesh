@@ -1,4 +1,4 @@
-// $Id: type_vector.C,v 1.7 2004-10-19 12:44:10 benkirk Exp $
+// $Id: type_vector.C,v 1.8 2004-10-19 16:26:21 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -76,28 +76,28 @@ TypeVector<T> TypeVector<T>::unit() const
 
 
 template <typename T>
-void TypeVector<T>::print() const
+void TypeVector<T>::print(std::ostream& os) const
 {
 #if DIM == 1
   
-  std::cout << "x=" << (*this)(0) << std::endl;
+  os << "x=" << (*this)(0) << std::endl;
   
 #endif
 #if DIM == 2
   
-  std::cout << "(x,y)=("
-	    << std::setw(8) << (*this)(0) << ", "
-	    << std::setw(8) << (*this)(1) << ")"
-	    << std::endl;
+  os << "(x,y)=("
+     << std::setw(8) << (*this)(0) << ", "
+     << std::setw(8) << (*this)(1) << ")"
+     << std::endl;
 
 #endif
 #if DIM == 3
   
-  std::cout <<  "(x,y,z)=("
-	    << std::setw(8) << (*this)(0) << ", "
-	    << std::setw(8) << (*this)(1) << ", "
-	    << std::setw(8) << (*this)(2) << ")"
-	    << std::endl;
+  os <<  "(x,y,z)=("
+     << std::setw(8) << (*this)(0) << ", "
+     << std::setw(8) << (*this)(1) << ", "
+     << std::setw(8) << (*this)(2) << ")"
+     << std::endl;
 #endif
 }
 
