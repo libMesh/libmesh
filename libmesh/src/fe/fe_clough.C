@@ -1,4 +1,4 @@
-// $Id: fe_clough.C,v 1.3 2005-02-23 03:42:16 roystgnr Exp $
+// $Id: fe_clough.C,v 1.4 2005-02-23 03:53:17 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson, 
@@ -219,10 +219,10 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::compute_constraints (std::map<unsigned int,
-				     std::map<unsigned int, float> > &
-				     constraints,
-				     DofMap &dof_map,
-				     const unsigned int variable_number,
+				     std::map<unsigned int, float> > &,
+				     const unsigned int,
+				     const unsigned int,
+				     const FEType& fe_type,
 				     const Elem* elem)
 {
   // Only constrain elements in 2,3D.
@@ -231,7 +231,7 @@ void FE<Dim,T>::compute_constraints (std::map<unsigned int,
 
   assert (elem != NULL);
 
-  const FEType& fe_type = dof_map.variable_type(variable_number);
+//  const FEType& fe_type = dof_map.variable_type(variable_number);
 
   AutoPtr<FEBase> my_fe (FEBase::build(Dim, fe_type));
   AutoPtr<FEBase> parent_fe (FEBase::build(Dim, fe_type));
