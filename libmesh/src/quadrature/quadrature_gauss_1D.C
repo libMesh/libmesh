@@ -1,4 +1,4 @@
-// $Id: quadrature_gauss_1D.C,v 1.5 2003-02-06 06:02:42 jwpeterson Exp $
+// $Id: quadrature_gauss_1D.C,v 1.6 2003-02-07 04:00:42 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -42,7 +42,7 @@ void QGauss::init_1D(const ElemType)
 	
 	_weights[0]    = 2.;
 	
-	break;
+	return;
       };
     case SECOND:
     case THIRD:
@@ -56,7 +56,7 @@ void QGauss::init_1D(const ElemType)
 	_weights[0]   = 1.;
 	_weights[1]   = _weights[0];
 
-	break;
+	return;
       };
     case FOURTH:
     case FIFTH:
@@ -72,7 +72,7 @@ void QGauss::init_1D(const ElemType)
 	_weights[1]   = 0.888888888888888888888888888889;
 	_weights[2]   = _weights[0];
 
-	break;
+	return;
       };
     case SIXTH:
     case SEVENTH:
@@ -90,7 +90,7 @@ void QGauss::init_1D(const ElemType)
 	_weights[2]   = _weights[1];
 	_weights[3]   = _weights[0];
 
-	break;
+	return;
       };
     case EIGHTH:
     case NINTH:
@@ -110,7 +110,7 @@ void QGauss::init_1D(const ElemType)
 	_weights[3]   = _weights[1];
 	_weights[4]   = _weights[0];
 
-	break;
+	return;
       };
     case TENTH:
     case ELEVENTH:
@@ -132,7 +132,7 @@ void QGauss::init_1D(const ElemType)
 	_weights[4]   = _weights[1];
 	_weights[5]   = _weights[0];
 
-	break;
+	return;
       };
     case TWELFTH:
     case THIRTEENTH:
@@ -156,7 +156,7 @@ void QGauss::init_1D(const ElemType)
 	_weights[5]   = _weights[1];
 	_weights[6]   = _weights[0];
 
-	break;
+	return;
       };
     case FOURTEENTH:
     case FIFTEENTH:
@@ -182,7 +182,7 @@ void QGauss::init_1D(const ElemType)
 	_weights[6]   = _weights[1];
 	_weights[7]   = _weights[0];
 
-	break;
+	return;
       };
     case SIXTEENTH:
     case SEVENTEENTH:
@@ -210,7 +210,7 @@ void QGauss::init_1D(const ElemType)
 	_weights[7]   = _weights[1];
 	_weights[8]   = _weights[0];
 
-	break;
+	return;
       };
     case EIGHTTEENTH:
     case NINTEENTH:
@@ -240,7 +240,7 @@ void QGauss::init_1D(const ElemType)
 	_weights[8]   = _weights[1];
 	_weights[9]   = _weights[0];
 
-	break;
+	return;
       };      
     case TWENTIETH:
     case TWENTYFIRST:
@@ -276,7 +276,7 @@ void QGauss::init_1D(const ElemType)
 	_weights[10]  = _weights[1];
 	_weights[11]  = _weights[0];
 
-	break;
+	return;
       };      
     default:
       {
