@@ -1,4 +1,4 @@
-// $Id: inf_fe.h,v 1.8 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: inf_fe.h,v 1.9 2003-02-05 20:51:36 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -52,7 +52,7 @@
  * Having different shape approximation families in radial direction 
  * introduces the requirement for an additional \p Order in this
  * class. Therefore, the \p FEType internals change when infinite
- * elements are used. 
+ * elements are enabled. 
  * When the specific infinite element type is not known at compile
  * time, use the \p FEBase::build() member to create abstract 
  * (but still optimized) infinite elements at run time.
@@ -96,7 +96,7 @@
  *
  * \author Daniel Dreyer
  * \date 2003
- * \version $Revision: 1.8 $
+ * \version $Revision: 1.9 $
  */
 
 //-------------------------------------------------------------
@@ -119,7 +119,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.8 $
+   * \version $Revision: 1.9 $
    */
   //-------------------------------------------------------------
   // InfFE::Radial class definition
@@ -169,11 +169,11 @@ protected:
 
     /**
      * @returns the index (0 for the base, 1,2,... for the outer shells) 
-     * in @e radial direction for the infinite element with the @e base \p FEType
-     * \p base_fe_type and the @e base element \p base_elem_type.  Used by the 
+     * in @e radial direction for the infinite element with the \p FEType
+     * \p fe_type and the @e base element \p base_elem_type.  Used by the 
      * public static members of \p InfFE.
      */
-    static unsigned int index(const FEType& base_fe_type,
+    static unsigned int index(const FEType& fe_type,
 			      const ElemType base_elem_type,
 			      const unsigned int i);
 
@@ -244,7 +244,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.8 $
+   * \version $Revision: 1.9 $
    */
   //-------------------------------------------------------------
   // InfFE::Base class definition
@@ -264,12 +264,6 @@ protected:
      */
     static Elem* build_elem (const Elem* inf_elem)
 	{ AutoPtr<Elem> ape = inf_elem->build_side(0); return ape.release(); };
-
-    /**
-     * Build the \p FEType for the base element of an infinite element,
-     * where \p inf_fe_type is the \p FEType of the whole infinite element.
-     */
-    static FEType build_fe_type (const FEType& inf_fe_type);
  
     /**
      * @returns the index in the @e base element. \p i
@@ -283,11 +277,11 @@ protected:
 
     /**
      * @returns the index in the @e base element. \p i is the index in the 
-     * whole infinite element, \p base_fe_type is the  @e base \p FEType
-     * and \p base_elem_type is the the @e base element.  Used by the 
+     * whole infinite element, \p fe_type is the current \p FEType
+     * and \p base_elem_type is the @e base element.  Used by the 
      * public static members of \p InfFE.
      */
-    static unsigned int index(const FEType& base_fe_type,
+    static unsigned int index(const FEType& fe_type,
 			      const ElemType base_elem_type,
 			      const unsigned int i);
 
@@ -408,15 +402,6 @@ public:
    */
   static Point inverse_map (const Elem* elem,
 			    const Point& p);
-
-  /**
-   * @returns true if \p et is an element to be processed by
-   * class \p InfFE.  Otherwise, it returns false, and
-   * this element should be processed using \p FE.
-   * This method is particularly helpful during the actual
-   * matrix assembly process.
-   */
-  static bool is_InfFE_elem(const ElemType et);
 
 
 
@@ -796,36 +781,6 @@ private:
 // InfFE class inline members
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
 inline
-bool InfFE<Dim,T_radial,T_base>::is_InfFE_elem(const ElemType et)
-{
-
-  switch (et)
-  {
-    case INFEDGE2:
-    case INFQUAD4:
-    case INFQUAD6:
-    case INFHEX8:
-    case INFHEX16:
-    case INFHEX18:
-    case INFPRISM6:
-    case INFPRISM12:
-      {
-        return true;
-      };
-
-    default:
-      { 
-	return false;
-      };
-
-  };
-
-};
-
-
-
-template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
-inline
 void InfFE<Dim,T_radial,T_base>::update_base_elem (const Elem* inf_elem)
 {
   if (base_elem != NULL)
@@ -886,19 +841,6 @@ unsigned int InfFE<Dim,T_radial,T_map>::Radial::n_dofs_at_node(const ElemType,
 
 // ------------------------------------------------------------
 // InfFE::Base class inline members
-template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-inline
-FEType InfFE<Dim,T_radial,T_map>::Base::build_fe_type (const FEType& inf_fe_type)
-{
-  FEType tmp(INVALID_ORDER, 
-	     INVALID_FE, 
-	     inf_fe_type.base_order, 
-	     inf_fe_type.base_family, 
-	     INVALID_INF_MAP );
-  return tmp; 
-};
-
-
 
 
 

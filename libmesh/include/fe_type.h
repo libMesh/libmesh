@@ -1,4 +1,4 @@
-// $Id: fe_type.h,v 1.6 2003-01-27 13:13:48 benkirk Exp $
+// $Id: fe_type.h,v 1.7 2003-02-05 20:51:36 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -72,33 +72,19 @@ public:
    * so, otherwise what we switch on would change when infinite
    * elements are not compiled in.
    */
-  FEType(const Order    o = FIRST,
-	 const FEFamily f = LAGRANGE) :
+  FEType(const Order      o  = FIRST,
+	 const FEFamily   f  = LAGRANGE,
+	 const Order      ro = THIRD,
+	 const FEFamily   rf = JACOBI_20_00,
+	 const InfMapType im = CARTESIAN) :
     order(o),
-    base_order(o),
+    radial_order(ro),
     family(f),
-    base_family(f),
-    inf_map(INVALID_INF_MAP)
-  {};
-
-  
-  /**
-   * Constructor.  Takes the approximation \p Order
-   * and the finite element family \p FEFamily, and provides
-   * a uniform interface for non-infinite elements.
-   */
-  FEType(const Order      bo,
-	 const FEFamily   bf,
-	 const Order      o,
-	 const FEFamily   f,
-	 const InfMapType im ) :
-    order(o),
-    base_order(bo),
-    family(f),
-    base_family(bf),
+    radial_family(rf),
     inf_map(im)
   {};
 
+  
   /**
    * The approximation order in radial direction of the infinite element.  
    */
@@ -107,7 +93,7 @@ public:
   /**
    * The approximation order in the base of the infinite element.
    */
-  Order base_order;
+  Order radial_order;
 
   /**
    * The type of approximation in radial direction.  Valid types are 
@@ -120,7 +106,7 @@ public:
    * \p base_family contains the approximation type in circumferential
    * direction.  Valid types are \p LAGRANGE, \p HIERARCHIC, etc...
    */
-  FEFamily base_family;
+  FEFamily radial_family;
 
   /**
    * The coordinate mapping type of the infinite element.
@@ -130,7 +116,7 @@ public:
    */
   InfMapType inf_map;
   
-#endif
+#endif // ifndef ENABLE_INFINITE_ELEMENTS
 
 private:  
   

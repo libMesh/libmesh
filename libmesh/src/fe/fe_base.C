@@ -1,4 +1,4 @@
-// $Id: fe_base.C,v 1.3 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: fe_base.C,v 1.4 2003-02-05 20:51:43 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -116,82 +116,6 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	      AutoPtr<FEBase> ap(new FE<3,MONOMIAL>(fet));
 	      return ap;
 	    };
-
-
-#ifdef ENABLE_INFINITE_ELEMENTS
-
-	  case INFINITE_MAP:
-	    {
-	      std::cout << "ERROR: Don't build an infinite element " << std::endl
-			<< " with FEFamily = " << fet.family << std::endl;
-	      error();
-	    };
-
-	  case JACOBI_20_00:
-	    {
-  	      switch (fet.inf_map)
-	        {
-		  case CARTESIAN:
-		    {
-		      AutoPtr<FEBase> ap(new InfFE<3,JACOBI_20_00,CARTESIAN>(fet));
-		      return ap;
-		    };
-		  default:
-		    std::cout << "ERROR: Don't build an infinite element " << std::endl
-			      << " with FEFamily = " << fet.family << std::endl;
-		    error();
-		};
-	    };
-
-	  case JACOBI_30_00:
-	    {
-  	      switch (fet.inf_map)
-	        {
-		  case CARTESIAN:
-		    {
-		      AutoPtr<FEBase> ap(new InfFE<3,JACOBI_30_00,CARTESIAN>(fet));
-		      return ap;
-		    };
-		  default:
-		    std::cout << "ERROR: Don't build an infinite element " << std::endl
-			      << " with FEFamily = " << fet.family << std::endl;
-		    error();
-		};
-	    };
-
-	  case LEGENDRE:
-	    {
-  	      switch (fet.inf_map)
-	        {
-		  case CARTESIAN:
-		    {
-		      AutoPtr<FEBase> ap(new InfFE<3,LEGENDRE,CARTESIAN>(fet));
-		      return ap;
-		    };
-		  default:
-		    std::cout << "ERROR: Don't build an infinite element " << std::endl
-			      << " with FEFamily = " << fet.family << std::endl;
-		    error();
-		};
-	    };
-
-	  case INF_LAGRANGE:
-	    {
-  	      switch (fet.inf_map)
-	        {
-		  case CARTESIAN:
-		    {
-		      AutoPtr<FEBase> ap(new InfFE<3,INF_LAGRANGE,CARTESIAN>(fet));
-		      return ap;
-		    };
-		  default:
-		    std::cout << "ERROR: Don't build an infinite element " << std::endl
-			      << " with FEFamily = " << fet.family << std::endl;
-		    error();
-		};
-	    };
-
-#endif
 	    
 	  default:
 	    std::cout << "ERROR: Bad FEType.family= " << fet.family << std::endl;
@@ -207,6 +131,303 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
   AutoPtr<FEBase> ap(NULL);
   return ap;
 };
+
+
+
+
+
+
+
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+
+AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
+				     const FEType& fet)
+{
+  // The stupid AutoPtr<FEBase> ap(); return ap;
+  // construct is required to satisfy IBM's xlC
+
+  switch (dim)
+    {
+
+      // 1D
+    case 1:
+      {
+	switch (fet.radial_family)
+	  {
+	  case INFINITE_MAP:
+	    {
+	      std::cout << "ERROR: Don't build an infinite element " << std::endl
+			<< " with FEFamily = " << fet.radial_family << std::endl;
+	      error();
+	    };
+
+	  case JACOBI_20_00:
+	    {
+  	      switch (fet.inf_map)
+	        {
+		  case CARTESIAN:
+		    {
+		      AutoPtr<FEBase> ap(new InfFE<1,JACOBI_20_00,CARTESIAN>(fet));
+		      return ap;
+		    };
+		  default:
+		    std::cout << "ERROR: Don't build an infinite element " << std::endl
+			      << " with InfMapType = " << fet.inf_map << std::endl;
+		    error();
+		};
+	    };
+
+	  case JACOBI_30_00:
+	    {
+  	      switch (fet.inf_map)
+	        {
+		  case CARTESIAN:
+		    {
+		      AutoPtr<FEBase> ap(new InfFE<1,JACOBI_30_00,CARTESIAN>(fet));
+		      return ap;
+		    };
+		  default:
+		    std::cout << "ERROR: Don't build an infinite element " << std::endl
+			      << " with InfMapType = " << fet.inf_map << std::endl;
+		    error();
+		};
+	    };
+
+	  case LEGENDRE:
+	    {
+  	      switch (fet.inf_map)
+	        {
+		  case CARTESIAN:
+		    {
+		      AutoPtr<FEBase> ap(new InfFE<1,LEGENDRE,CARTESIAN>(fet));
+		      return ap;
+		    };
+		  default:
+		    std::cout << "ERROR: Don't build an infinite element " << std::endl
+			      << " with InfMapType = " << fet.inf_map << std::endl;
+		    error();
+		};
+	    };
+
+	  case LAGRANGE:
+	    {
+  	      switch (fet.inf_map)
+	        {
+		  case CARTESIAN:
+		    {
+		      AutoPtr<FEBase> ap(new InfFE<1,LAGRANGE,CARTESIAN>(fet));
+		      return ap;
+		    };
+		  default:
+		    std::cout << "ERROR: Don't build an infinite element " << std::endl
+			      << " with InfMapType = " << fet.inf_map << std::endl;
+		    error();
+		};
+	    };
+
+
+	    
+	  default:
+	    std::cout << "ERROR: Bad FEType.radial_family= " << fet.radial_family << std::endl;
+	    error();
+	  };
+
+      };
+
+      
+
+
+      // 2D
+    case 2:
+      {
+	switch (fet.radial_family)
+	  {
+	  case INFINITE_MAP:
+	    {
+	      std::cout << "ERROR: Don't build an infinite element " << std::endl
+			<< " with FEFamily = " << fet.radial_family << std::endl;
+	      error();
+	    };
+
+	  case JACOBI_20_00:
+	    {
+  	      switch (fet.inf_map)
+	        {
+		  case CARTESIAN:
+		    {
+		      AutoPtr<FEBase> ap(new InfFE<2,JACOBI_20_00,CARTESIAN>(fet));
+		      return ap;
+		    };
+		  default:
+		    std::cout << "ERROR: Don't build an infinite element " << std::endl
+			      << " with InfMapType = " << fet.inf_map << std::endl;
+		    error();
+		};
+	    };
+
+	  case JACOBI_30_00:
+	    {
+  	      switch (fet.inf_map)
+	        {
+		  case CARTESIAN:
+		    {
+		      AutoPtr<FEBase> ap(new InfFE<2,JACOBI_30_00,CARTESIAN>(fet));
+		      return ap;
+		    };
+		  default:
+		    std::cout << "ERROR: Don't build an infinite element " << std::endl
+			      << " with InfMapType = " << fet.inf_map << std::endl;
+		    error();
+		};
+	    };
+
+	  case LEGENDRE:
+	    {
+  	      switch (fet.inf_map)
+	        {
+		  case CARTESIAN:
+		    {
+		      AutoPtr<FEBase> ap(new InfFE<2,LEGENDRE,CARTESIAN>(fet));
+		      return ap;
+		    };
+		  default:
+		    std::cout << "ERROR: Don't build an infinite element " << std::endl
+			      << " with InfMapType = " << fet.inf_map << std::endl;
+		    error();
+		};
+	    };
+
+	  case LAGRANGE:
+	    {
+  	      switch (fet.inf_map)
+	        {
+		  case CARTESIAN:
+		    {
+		      AutoPtr<FEBase> ap(new InfFE<2,LAGRANGE,CARTESIAN>(fet));
+		      return ap;
+		    };
+		  default:
+		    std::cout << "ERROR: Don't build an infinite element " << std::endl
+			      << " with InfMapType = " << fet.inf_map << std::endl;
+		    error();
+		};
+	    };
+
+
+	    
+	  default:
+	    std::cout << "ERROR: Bad FEType.radial_family= " << fet.radial_family << std::endl;
+	    error();
+	  };
+
+      };
+
+      
+
+
+      // 3D
+    case 3:
+      {
+	switch (fet.radial_family)
+	  {
+	  case INFINITE_MAP:
+	    {
+	      std::cout << "ERROR: Don't build an infinite element " << std::endl
+			<< " with FEFamily = " << fet.radial_family << std::endl;
+	      error();
+	    };
+
+	  case JACOBI_20_00:
+	    {
+  	      switch (fet.inf_map)
+	        {
+		  case CARTESIAN:
+		    {
+		      AutoPtr<FEBase> ap(new InfFE<3,JACOBI_20_00,CARTESIAN>(fet));
+		      return ap;
+		    };
+		  default:
+		    std::cout << "ERROR: Don't build an infinite element " << std::endl
+			      << " with InfMapType = " << fet.inf_map << std::endl;
+		    error();
+		};
+	    };
+
+	  case JACOBI_30_00:
+	    {
+  	      switch (fet.inf_map)
+	        {
+		  case CARTESIAN:
+		    {
+		      AutoPtr<FEBase> ap(new InfFE<3,JACOBI_30_00,CARTESIAN>(fet));
+		      return ap;
+		    };
+		  default:
+		    std::cout << "ERROR: Don't build an infinite element " << std::endl
+			      << " with InfMapType = " << fet.inf_map << std::endl;
+		    error();
+		};
+	    };
+
+	  case LEGENDRE:
+	    {
+  	      switch (fet.inf_map)
+	        {
+		  case CARTESIAN:
+		    {
+		      AutoPtr<FEBase> ap(new InfFE<3,LEGENDRE,CARTESIAN>(fet));
+		      return ap;
+		    };
+		  default:
+		    std::cout << "ERROR: Don't build an infinite element " << std::endl
+			      << " with InfMapType = " << fet.inf_map << std::endl;
+		    error();
+		};
+	    };
+
+	  case LAGRANGE:
+	    {
+  	      switch (fet.inf_map)
+	        {
+		  case CARTESIAN:
+		    {
+		      AutoPtr<FEBase> ap(new InfFE<3,LAGRANGE,CARTESIAN>(fet));
+		      return ap;
+		    };
+		  default:
+		    std::cout << "ERROR: Don't build an infinite element " << std::endl
+			      << " with InfMapType = " << fet.inf_map << std::endl;
+		    error();
+		};
+	    };
+
+
+	    
+	  default:
+	    std::cout << "ERROR: Bad FEType.radial_family= " << fet.radial_family << std::endl;
+	    error();
+	  };
+      };
+
+    default:
+      error();
+    };
+
+  error();
+  AutoPtr<FEBase> ap(NULL);
+  return ap;
+};
+
+
+
+
+#endif // ifdef ENABLE_INFINITE_ELEMENTS
+
+
+
+
+
 
 
 

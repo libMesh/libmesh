@@ -1,4 +1,4 @@
-// $Id: fe_interface.h,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: fe_interface.h,v 1.7 2003-02-05 20:51:36 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -165,7 +165,89 @@ public:
 		    const Elem* elem,
 		    const unsigned int i,
 		    const Point& p);
+
+
   
+#ifdef ENABLE_INFINITE_ELEMENTS 
+  /**
+   * @returns true if \p et is an element to be processed by
+   * class \p InfFE.  Otherwise, it returns false, and
+   * this element should be processed using \p FE.
+   * This method is particularly helpful during the actual
+   * matrix assembly process.
+   */
+#else
+  /**
+   * @returns always false.  For compatibility with disabled 
+   * infinite elements.
+   */
+#endif
+  static bool is_InfFE_elem(const ElemType et);
+
+
+
+
+
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+
+private:
+
+  // ------------------------------------------------------------
+  /*
+   * All these private members do the same as their public
+   * counterparts, but for infinite elements. This dis-entangles
+   * the calls to \p FE and \p InfFE.
+   */
+
+  static unsigned int ifem_n_shape_functions(const unsigned int dim,
+					     const FEType& fe_t,
+					     const ElemType t);
+
+  static unsigned int ifem_n_dofs(const unsigned int dim,
+				  const FEType& fe_t,
+				  const ElemType t);
+
+  static unsigned int ifem_n_dofs_at_node(const unsigned int dim,
+					  const FEType& fe_t,
+					  const ElemType t,
+					  const unsigned int n);
+
+  static unsigned int ifem_n_dofs_per_elem(const unsigned int dim,
+					   const FEType& fe_t,
+					   const ElemType t);
+  
+  static void ifem_nodal_soln(const unsigned int dim,
+			      const FEType& fe_t,
+			      const Elem* elem,
+			      const std::vector<Complex>& elem_soln,
+			      std::vector<Complex>& nodal_soln);
+
+  static Point ifem_inverse_map (const unsigned int dim,
+				 const FEType& fe_t,
+				 const Elem* elem,
+				 const Point& p);
+
+  static bool ifem_on_reference_element(const Point& p,
+					const ElemType t,
+					const Real eps=1.e-6);
+
+  static Real ifem_shape(const unsigned int dim,
+			 const FEType& fe_t,
+			 const ElemType t,
+			 const unsigned int i,
+			 const Point& p);
+
+  static Real ifem_shape(const unsigned int dim,
+			 const FEType& fe_t,
+			 const Elem* elem,
+			 const unsigned int i,
+			 const Point& p);
+
+
+#endif
+
+
 };
 
 
@@ -174,7 +256,46 @@ public:
 
 // ------------------------------------------------------------
 // FEInterface class inline members
+#ifndef ENABLE_INFINITE_ELEMENTS 
+
+inline bool FEInterface::is_InfFE_elem(const ElemType)
+{
+  return false; 
+};
+
+#else
+
+inline bool FEInterface::is_InfFE_elem(const ElemType et)
+{
+
+  switch (et)
+  {
+    case INFEDGE2:
+    case INFQUAD4:
+    case INFQUAD6:
+    case INFHEX8:
+    case INFHEX16:
+    case INFHEX18:
+    case INFPRISM6:
+    case INFPRISM12:
+      {
+        return true;
+      };
+
+    default:
+      { 
+	return false;
+      };
+
+  };
+
+}; 
+
+#endif //ifndef ENABLE_INFINITE_ELEMENTS 
 
 
 
-#endif
+
+
+
+#endif // ifndef __fe_interface_h__

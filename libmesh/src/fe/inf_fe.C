@@ -1,4 +1,4 @@
-// $Id: inf_fe.C,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: inf_fe.C,v 1.7 2003-02-05 20:51:43 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,6 +26,7 @@
 #include "quadrature_gauss.h"
 #include "elem.h"
 #include "fe.h"
+#include "fe_interface.h"
 
 
 
@@ -56,36 +57,32 @@ InfFE<Dim,T_radial,T_map>::InfFE (const FEType& fet) :
    * the data structures like \p phi etc are not initialized 
    * through the constructor, but throught reinit()
    */
-  current_fe_type ( FEType(fet.base_order, 
-			   fet.base_family, 
+  current_fe_type ( FEType(fet.order, 
+			   fet.family, 
 			   INVALID_ORDER, 
-			   fet.family,      
+			   fet.radial_family,      
 			   fet.inf_map) )
 
 {
   // Sanity check.  Make sure the family and
   // map specified in the template instantiation
   // matches the one in the FEType object
-  assert (T_radial == fe_type.family);
+  assert (T_radial == fe_type.radial_family);
   assert (T_map    == fe_type.inf_map);
 
-  // set the base_fe_type.order
-  // and base_fe_type.family appropriately
-  FEType base_fe_type = Base::build_fe_type(fet);
-
   // build the base_fe object, handle the AutoPtr
-  AutoPtr<FEBase> ap_fb = FEBase::build(Dim-1, base_fe_type);
+  AutoPtr<FEBase> ap_fb = FEBase::build(Dim-1, fet);
   base_fe = ap_fb.release();
 };
 
 
 
 
-// Desctrutor
+// Desctructor
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 InfFE<Dim,T_radial,T_map>::~InfFE ()
 {
-  // delete pointers, if necessary (quite likely!)
+  // delete pointers, if necessary
   if (base_qrule != NULL)
     delete base_qrule;
 
@@ -110,7 +107,7 @@ void InfFE<Dim,T_radial,T_map>:: attach_quadrature_rule (QBase* q)
 
   Order base_int_order   = q->get_order();
   Order radial_int_order = static_cast<Order>(
-      static_cast<unsigned int>(fe_type.order) + 2 );
+      static_cast<unsigned int>(fe_type.radial_order) + 2 );
   // radial order rather conservative, may also work with m+1...?
 
   if (Dim != 1)
@@ -120,6 +117,10 @@ void InfFE<Dim,T_radial,T_map>:: attach_quadrature_rule (QBase* q)
   };
 
   radial_qrule = new QGauss(1, radial_int_order);
+
+  /* currently not used. But maybe helpful to store the QBase*
+   * with which we initialized our own quadrature rules */
+  qrule = q;
 
   _n_total_qp  = base_qrule->n_points() * radial_qrule->n_points();
 };
@@ -137,6 +138,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem)
   // check InfFE quadrature rule and the new Elem* pointer
   assert (base_fe        != NULL);
   assert (base_fe->qrule != NULL);
+  assert (base_fe->qrule == base_qrule);
   assert (radial_qrule   != NULL);
   assert (inf_elem       != NULL);
 
@@ -156,7 +158,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem)
   //  so the following if statement is safe)
   if (  ( Dim != 1) &&
 	(  (get_type() != inf_elem->type())  ||  
-	   (fe_type.base_family == HIERARCHIC)  )  )
+	   (fe_type.family == HIERARCHIC)  )  )
     {
       // store the new element type
       elem_type = inf_elem->type();
@@ -165,7 +167,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem)
       update_base_elem(inf_elem);
 
       // initialize the base quadrature rule for the new element
-      base_fe->qrule->init( base_elem->type() );
+      base_qrule->init( base_elem->type() );
 
       // initialize the shape functions in the base
       base_fe->init_base_shape_functions( base_fe->qrule, base_elem );
@@ -176,10 +178,10 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem)
   // -----------------------------------------------------------------
   // the radial part only needs to be re-initialized with
   // init_shape_functions() when the radial order changed
-  if (current_fe_type.order != fe_type.order)
+  if (current_fe_type.radial_order != fe_type.radial_order)
     {
       // update to the new radial order
-      current_fe_type.order = fe_type.order;
+      current_fe_type.radial_order = fe_type.radial_order;
 
       // the new element type has already been stored.
       // proceed with quadrature rule
@@ -264,11 +266,8 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
   // -----------------------------------------------------------------
   // initialize most of the things related to physical approximation
   
-  // The order to use in base approximation
-/* NOT USED  const Order    base_approx_order   ( fe_type.base_order );    */
-
   // The order to use in radial approximation
-  const Order    radial_approx_order ( fe_type.order      );
+  const Order    radial_approx_order ( fe_type.radial_order );
 
   unsigned int n_base_approx_shape_functions;
   if (Dim > 1)
@@ -563,7 +562,7 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial()
 	const unsigned int n_base_mapping_sf   = dist.size();
 /* NOT USED	const unsigned int n_radial_mapping_sf = Radial::n_mapping_shape_functions(INVALID_ELEM);  */
 	const unsigned int n_base_approx_sf   = base_fe->n_shape_functions();
-	const unsigned int n_radial_approx_sf = Radial::n_dofs(elem_type, fe_type.order);
+	const unsigned int n_radial_approx_sf = Radial::n_dofs(elem_type, fe_type.radial_order);
 
 
 	// compute the phase term derivatives

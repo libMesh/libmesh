@@ -1,4 +1,4 @@
-// $Id: inf_fe_lagrange_eval.C,v 1.2 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: inf_fe_lagrange_eval.C,v 1.3 2003-02-05 20:51:44 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -1061,17 +1061,17 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
 
 //-----------------------------------------------------------------
 // Explicit instantiations
-template class InfFE<1,INF_LAGRANGE,CARTESIAN>;
-template class InfFE<2,INF_LAGRANGE,CARTESIAN>;
-template class InfFE<3,INF_LAGRANGE,CARTESIAN>;
+template class InfFE<1,LAGRANGE,CARTESIAN>;
+template class InfFE<2,LAGRANGE,CARTESIAN>;
+template class InfFE<3,LAGRANGE,CARTESIAN>;
 
-// template class InfFE<1,INF_LAGRANGE,SPHERICAL>;
-// template class InfFE<2,INF_LAGRANGE,SPHERICAL>;
-// template class InfFE<3,INF_LAGRANGE,SPHERICAL>;
+// template class InfFE<1,LAGRANGE,SPHERICAL>;
+// template class InfFE<2,LAGRANGE,SPHERICAL>;
+// template class InfFE<3,LAGRANGE,SPHERICAL>;
 
-// template class InfFE<1,INF_LAGRANGE,ELLIPSOIDAL>;
-// template class InfFE<2,INF_LAGRANGE,ELLIPSOIDAL>;
-// template class InfFE<3,INF_LAGRANGE,ELLIPSOIDAL>;
+// template class InfFE<1,LAGRANGE,ELLIPSOIDAL>;
+// template class InfFE<2,LAGRANGE,ELLIPSOIDAL>;
+// template class InfFE<3,LAGRANGE,ELLIPSOIDAL>;
 
 
 
