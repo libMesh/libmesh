@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.2 2003-12-20 19:55:33 benkirk Exp $
+// $Id: equation_systems.h,v 1.3 2003-12-22 13:40:56 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -205,24 +205,20 @@ public:
    * method is only applicable to outputting plot files from processor 0.
    */
   void build_solution_vector (std::vector<Number>& soln,
-                              std::string& system_name,
-                              std::string& variable_name) const;
+                              const std::string& system_name,
+                              const std::string& variable_name = "all_vars") const;
   
   /**
    * Fill the input vector \p soln with solution values.  The
    * entries will be in variable-major format (corresponding to
-   * the names from \p build_variable_names()).  Note that the input
-   * vector \p soln will only be assembled on processor 0, so this
-   * method is only applicable to outputting plot files from processor 0.
+   * the names from \p build_variable_names()).
    */
   void build_solution_vector (std::vector<Number>& soln) const;
   
   /**
    * Fill the input vector \p soln with solution values.  The
    * entries will be in variable-major format (corresponding to
-   * the names from \p build_variable_names()).  Note that the input
-   * vector \p soln will only be assembled on processor 0, so this
-   * method is only applicable to outputting plot files from processor 0.
+   * the names from \p build_variable_names()).
    */
   void build_discontinuous_solution_vector (std::vector<Number>& soln) const;
   
