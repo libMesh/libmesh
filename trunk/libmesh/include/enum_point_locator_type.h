@@ -1,4 +1,4 @@
-// $Id: enum_point_locator_type.h,v 1.2 2003-05-15 23:34:33 benkirk Exp $
+// $Id: enum_point_locator_type.h,v 1.3 2003-07-05 14:58:56 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -38,6 +38,7 @@ namespace MeshEnums {
    * locate the corresponding element in space) available in libMesh.
    */
   enum PointLocatorType {TREE = 0,
+			 LIST,
 			 INVALID_LOCATOR};
 }
 

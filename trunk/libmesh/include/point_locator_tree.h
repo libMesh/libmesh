@@ -1,4 +1,4 @@
-// $Id: point_locator.h,v 1.2 2003-05-15 23:34:34 benkirk Exp $
+// $Id: point_locator_tree.h,v 1.1 2003-07-05 14:58:56 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -19,8 +19,8 @@
 
 
 
-#ifndef __point_locator_h__
-#define __point_locator_h__
+#ifndef __point_locator_tree_h__
+#define __point_locator_tree_h__
 
 // C++ includes
 
@@ -28,7 +28,6 @@
 
 // Local Includes
 #include "point_locator_base.h"
-#include "enum_point_locator_type.h"
 
 
 
@@ -37,24 +36,21 @@ class Mesh;
 class Point;
 class TreeBase;
 class Elem;
-template <PointLocatorType T> class PointLocator;
 
 
 /**
- * This is a point locator class.  it locates
- * points in space: given a mesh they return the element
+ * This is a point locator.  It locates points in space
+ * using a tree: given a mesh they return the element
  * and local coordinates for a given point in global coordinates.
- * Currently, only the \p TREE version of a point locator is
- * available.  Use \p PointLocatorBase::build() to
- * create objects of this type at run time.
+ * Use \p PointLocatorBase::build() to create objects of this 
+ * type at run time.
  *
  * @author Daniel Dreyer, 2003
  */
 
 // ------------------------------------------------------------
-// PointLocator class definition
-template <PointLocatorType T>
-class PointLocator : public PointLocatorBase
+// PointLocatorTree class definition
+class PointLocatorTree : public PointLocatorBase
 {
 public:
 
@@ -66,8 +62,8 @@ public:
    * master locator holds a  tree, the others simply 
    * use the master's tree.
    */
-  PointLocator (const Mesh& mesh,
-		const PointLocatorBase* master = NULL);
+  PointLocatorTree (const Mesh& mesh,
+		    const PointLocatorBase* master = NULL);
 
 
 public:
@@ -75,7 +71,7 @@ public:
   /**
    * Destructor.
    */
-  ~PointLocator ();
+  ~PointLocatorTree ();
 
   /**
    * Clears the locator.
@@ -93,7 +89,7 @@ public:
    * \p p is located.  This cannot be a const method, because the
    * resulting element is remembered for the next request.
    */
-  virtual const Elem* operator() (const Point& p);
+  const Elem* operator() (const Point& p);
 
 protected:
 
@@ -111,18 +107,11 @@ protected:
    */
   Elem* _element;
 
-private:
-
-  /**
-   * Make all \p PointLocator<TREE> friend so that
-   * the servants can access the master's tree.
-   */
-//  friend class PointLocator<TREE>;
 };
 
 
 // ------------------------------------------------------------
-// PointLocator inline methods
+// PointLocatorTree inline methods
 
 
 #endif

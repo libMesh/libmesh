@@ -1,4 +1,4 @@
-// $Id: point_locator.C,v 1.2 2003-05-15 23:34:36 benkirk Exp $
+// $Id: point_locator_tree.C,v 1.1 2003-07-05 14:58:59 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,7 +23,7 @@
 
 
 // Local Includes
-#include "point_locator.h"
+#include "point_locator_tree.h"
 #include "mesh.h"
 #include "point.h"
 #include "tree_base.h"
@@ -34,9 +34,8 @@
 
 //------------------------------------------------------------------
 // PointLocator methods
-template <PointLocatorType T>
-PointLocator<T>::PointLocator (const Mesh& mesh,
-			       const PointLocatorBase* master) :
+PointLocatorTree::PointLocatorTree (const Mesh& mesh,
+				    const PointLocatorBase* master) :
   PointLocatorBase (mesh, 
 		    master),
   _tree            (NULL),
@@ -47,8 +46,7 @@ PointLocator<T>::PointLocator (const Mesh& mesh,
 
 
 
-template <PointLocatorType T>
-PointLocator<T>::~PointLocator ()
+PointLocatorTree::~PointLocatorTree ()
 {
   this->clear ();
 }
@@ -56,8 +54,7 @@ PointLocator<T>::~PointLocator ()
 
 
 
-template <PointLocatorType T>
-void PointLocator<T>::clear ()
+void PointLocatorTree::clear ()
 {
   // only delete the tree when we are the master
   if (this->_tree != NULL)
@@ -75,8 +72,7 @@ void PointLocator<T>::clear ()
 
 
 
-template <PointLocatorType T>
-void PointLocator<T>::init ()
+void PointLocatorTree::init ()
 {
   assert (this->_tree == NULL); 
 
@@ -134,12 +130,20 @@ void PointLocator<T>::init ()
 	  /*
 	   * We are _not_ the master.  Let our Tree point to
 	   * the master's tree.  But for this we first transform
-	   * the master in a state for which we are friends
+	   * the master in a state for which we are friends.
+	   * And make sure the master @e has a tree!
 	   */
-	  const PointLocator<T>* my_master =
-	    dynamic_cast<const PointLocator<T>*>(this->_master);
+	  const PointLocatorTree* my_master =
+	    dynamic_cast<const PointLocatorTree*>(this->_master);
 
-	  this->_tree = my_master->_tree;
+	  if (my_master->initialized())
+	    this->_tree = my_master->_tree;
+	  else
+	    {
+	      std::cerr << "ERROR: Initialize master first, then servants!"
+			<< std::endl;
+	      error();
+	    }
         }
 
 
@@ -164,8 +168,7 @@ void PointLocator<T>::init ()
 
 
 
-template <PointLocatorType T>
-const Elem* PointLocator<T>::operator() (const Point& p)
+const Elem* PointLocatorTree::operator() (const Point& p)
 {
   assert (this->_initialized);
 
@@ -195,14 +198,4 @@ const Elem* PointLocator<T>::operator() (const Point& p)
 
   return this->_element;
 }
-
-
-
-// ------------------------------------------------------------
-// Explicit Instantiations
-template class PointLocator<TREE>;
-
-
-
-
 
