@@ -1,4 +1,4 @@
-// $Id: reference_counter.C,v 1.12 2004-10-19 12:44:10 benkirk Exp $
+// $Id: reference_counter.C,v 1.13 2004-10-27 21:14:20 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -32,7 +32,6 @@
 #if defined(ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
 
 ReferenceCounter::Counts ReferenceCounter::_counts;
-bool                     ReferenceCounter::_have_printed_info=false;
 
 #endif
 
@@ -63,9 +62,6 @@ std::string ReferenceCounter::get_info ()
       out << "| " << name << " reference count information:\n"
 	  << "| Creations:    " << creations    << '\n'
 	  << "| Destructions: " << destructions << '\n';
-
-      if (creations != destructions)
-	out << "| WARNING: " << name << " " << creations - destructions << " items leaked!\n";      
     }
   
   out << " ---------------------------------------------------------------------------- \n";

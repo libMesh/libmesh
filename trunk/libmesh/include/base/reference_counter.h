@@ -1,4 +1,4 @@
- // $Id: reference_counter.h,v 1.2 2004-01-03 15:37:41 benkirk Exp $
+ // $Id: reference_counter.h,v 1.3 2004-10-27 21:14:20 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -109,11 +109,6 @@ protected:
    * Actually holds the data.
    */
   static Counts _counts;
-  
-  /**
-   * A flag indicating if \p print_info() has been called.
-   */
-  static bool _have_printed_info;
 
 #endif
   
@@ -138,13 +133,6 @@ inline ReferenceCounter::ReferenceCounter()
 inline ReferenceCounter::~ReferenceCounter()
 {
   _n_objects--;
-  
-#if defined(ENABLE_REFERENCE_COUNTING) && defined(DEBUG)  
-
-  if (_n_objects == 0)
-    print_info();
-
-#endif
 }
 
 
@@ -153,14 +141,8 @@ inline
 void ReferenceCounter::print_info ()
 {
 #if defined(ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
-
-  // Don't print multiple times.
-  if (!_have_printed_info)
-    {
-      std::cout << get_info();
-
-      _have_printed_info = true;
-    }
+  
+  std::cout << ReferenceCounter::get_info();
   
 #endif
 }
