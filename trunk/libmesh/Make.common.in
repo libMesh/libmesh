@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.3 2003-01-20 17:05:58 jwpeterson Exp $
+# $Id: Make.common.in,v 1.4 2003-01-20 19:47:48 jwpeterson Exp $
 
 
 ###############################################################################
@@ -102,7 +102,7 @@ HDF4_LIBS            = @HDF4_LIB_NAMES@
 
 enable-exodus        = @enableexodus@
 EXODUS_INCLUDE       = @EXODUS_INCLUDE_PATH@
-EXODUS_LIBRARY       = @EXODUS_EXOII@
+EXODUS_LIBRARY       = @LIBEXOII@
 
 enable-metis         = @enablemetis@
 METIS_INCLUDE	     = @METIS_INCLUDE_PATH@
@@ -118,7 +118,7 @@ SFC_INCLUDE	     = @SFC_INCLUDE_PATH@
 
 enable-tecplot       = @enabletecplot@
 TECIO_INCLUDE        = @TECPLOT_INCLUDE_PATH@
-TECIO_LIBRARY        = @TECPLOT_LIBRARY_PATH@
+TECIO_LIBRARY        = @TECPLOT_LIBRARY@
 
 doxygen		     = @DOXYGEN@
 perl                 = @PERL@

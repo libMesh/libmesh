@@ -1,5 +1,6 @@
+
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.3 2003-01-20 17:05:59 jwpeterson Exp $
+dnl $Id: aclocal.m4,v 1.4 2003-01-20 19:47:48 jwpeterson Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -500,13 +501,26 @@ dnl Tecplot
 dnl -------------------------------------------------------------
 AC_DEFUN(CONFIGURE_TECPLOT,
 [
-  AC_CHECK_FILE(./contrib/tecplot/lib/$host/tecio.a,
-		TECPLOT_LIBRARY_PATH=$PWD/contrib/tecplot/lib/$host/tecio.a)
-  AC_CHECK_FILE(./contrib/tecplot/include/TECIO.h,
- 		TECPLOT_INCLUDE_PATH=$PWD/contrib/tecplot/include)
+  AC_ARG_WITH(tecplot,
+      [  --with-tecplot=[PATH] Specify the path where the Tecplot is installed],
+      withtecplot=$withval,
+      withtecplot=no)
 
-  if (test -r $TECPLOT_LIBRARY_PATH -a -r $TECPLOT_INCLUDE_PATH/TECIO.h) ; then
-    AC_SUBST(TECPLOT_LIBRARY_PATH)
+  if test "$withtecplot" = no ; then
+    AC_CHECK_FILE(./contrib/tecplot/lib/$host/tecio.a,
+	  	  TECPLOT_LIBRARY_PATH=$PWD/contrib/tecplot/lib/$host)
+    AC_CHECK_FILE(./contrib/tecplot/include/TECIO.h,
+ 	  	  TECPLOT_INCLUDE_PATH=$PWD/contrib/tecplot/include)
+  else
+    AC_CHECK_FILE($withtecplot/lib/tecio.a,
+	  	  TECPLOT_LIBRARY_PATH=$withtecplot/lib)
+    AC_CHECK_FILE($withtecplot/include/TECIO.h,
+ 	  	  TECPLOT_INCLUDE_PATH=$withtecplot/include)
+  fi
+
+  if (test -r $TECPLOT_LIBRARY_PATH/tecio.a -a -r $TECPLOT_INCLUDE_PATH/TECIO.h) ; then
+    TECPLOT_LIBRARY=$TECPLOT_LIBRARY_PATH/tecio.a
+    AC_SUBST(TECPLOT_LIBRARY)
     AC_SUBST(TECPLOT_INCLUDE_PATH)
     AC_DEFINE(HAVE_TECPLOT_API, 1,
               [Flag indicating whether the library shall be compiled to use the Tecplot interface])
@@ -527,13 +541,13 @@ dnl -------------------------------------------------------------
 AC_DEFUN(CONFIGURE_NETCDF,
 [
   AC_CHECK_FILE(./contrib/netcdf/lib/$host/libnetcdf.a,
-		LIBNETCDF=$PWD/contrib/netcdf/lib/$host/libnetcdf.a)
+		LIBNETCDF_PATH=$PWD/contrib/netcdf/lib/$host)
   AC_CHECK_FILE(./contrib/netcdf/include/netcdf.h,
 		NETCDF_INCLUDE_PATH=$PWD/contrib/netcdf/include)
 
-  if (test -r $LIBNETCDF -a -r $NETCDF_INCLUDE_PATH/netcdf.h) ; then
+  if (test -r $LIBNETCDF_PATH/libnetcdf.a -a -r $NETCDF_INCLUDE_PATH/netcdf.h) ; then
+    LIBNETCDF=$LIBNETCDF_PATH/libnetcdf.a
     AC_SUBST(LIBNETCDF)
-    AC_SUBST(LIBNETCDF_CXX)
     AC_SUBST(NETCDF_INCLUDE_PATH)
     AC_DEFINE(HAVE_NETCDF, 1,
               [Flag indicating whether the library shall be compiled to support netcdf files])
@@ -588,12 +602,13 @@ dnl -------------------------------------------------------------
 AC_DEFUN(CONFIGURE_EXODUS,
 [
   AC_CHECK_FILE(./contrib/exodus/lib/$host/libexoIIv2c.a,
-		EXODUS_EXOII=$PWD/contrib/exodus/lib/$host/libexoIIv2c.a)
+		EXODUS_EXOII_PATH=$PWD/contrib/exodus/lib/$host)
   AC_CHECK_FILE(./contrib/exodus/include/exodusII.h,
 		EXODUS_INCLUDE_PATH=$PWD/contrib/exodus/include)
 
-  if (test -r $EXODUS_EXOII -a -r $EXODUS_INCLUDE_PATH/exodusII.h) ; then
-    AC_SUBST(EXODUS_EXOII)
+  if (test -r $EXODUS_EXOII_PATH/libexoIIv2c.a -a -r $EXODUS_INCLUDE_PATH/exodusII.h) ; then
+    LIBEXOII=$EXODUS_EXOII_PATH/libexoIIv2c.a
+    AC_SUBST(LIBEXOII)
     AC_SUBST(EXODUS_INCLUDE_PATH)
     AC_DEFINE(HAVE_EXODUS_API, 1,
 	      [Flag indicating whether the library shall be compiled to use the Exodus interface])
