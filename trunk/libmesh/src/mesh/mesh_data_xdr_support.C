@@ -1,4 +1,4 @@
-// $Id: mesh_data_xdr_support.C,v 1.3 2003-05-22 09:39:58 spetersen Exp $
+// $Id: mesh_data_xdr_support.C,v 1.4 2003-05-22 19:10:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -13,7 +13,7 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
   
-// You should have receied a copy of the GNU Lesser General Public
+// You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
@@ -32,7 +32,7 @@
 //------------------------------------------------------
 // MeshData functions
 void MeshData::read_xdr (const std::string& name,
-			 const bool ascii)
+			 const XdrMODE mode)
 {
   /**
    * This code implements the output of the MeshData
@@ -83,19 +83,16 @@ void MeshData::read_xdr (const std::string& name,
   this->clear();
 
 
-  libMeshEnums::XdrMODE mode;
-
-  if (ascii)
-      mode = libMeshEnums::READ;
-  else
-      mode = libMeshEnums::DECODE;
-
-
   Xdr io(name, mode);
 
 
-  // all processors read the data in the same format
-  //const unsigned int proc_id = _mesh.processor_id();
+  /*
+   * all processors read the data in the same format,
+   * but only the processor that owns the element stores
+   * element-associated data.  For nodes, i haven't come
+   * up with such asmart idea, yet... :-P
+   */
+  const unsigned int proc_id = _mesh.processor_id();
 
 
 
@@ -218,9 +215,11 @@ void MeshData::read_xdr (const std::string& name,
 	io.data (values);
 
 	/**
-	 * insert this elem and the values in the _elem_data 
+	 * insert this elem and the values in our _elem_data 
+	 * @e only when we own this element!
 	 */
-	_elem_data.insert (std::make_pair(elem, values));
+	if (elem->processor_id() == proc_id)
+	  _elem_data.insert (std::make_pair(elem, values));
       }
     }
 
@@ -238,7 +237,7 @@ void MeshData::read_xdr (const std::string& name,
 
 
 void MeshData::write_xdr (const std::string& name,
-			  const bool ascii)
+			  const XdrMODE mode)
 {
   /**
    * This code implements the output of the MeshData
@@ -288,14 +287,6 @@ void MeshData::write_xdr (const std::string& name,
   assert (_node_data_closed);
   assert (_elem_data_closed);
   
-
-
-  libMeshEnums::XdrMODE mode;
-
-  if (ascii)
-      mode = libMeshEnums::WRITE;
-  else
-      mode = libMeshEnums::ENCODE;
 
   Xdr io(name, mode);
 
