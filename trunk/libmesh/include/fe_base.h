@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.4 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: fe_base.h,v 1.5 2003-02-05 20:51:36 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -90,12 +90,24 @@ public:
   virtual ~FEBase();
 
   /**
-   * Builds a specific finite element type.  A \p AutoPtr<Elem> is
+   * Builds a specific finite element type.  A \p AutoPtr<FEBase> is
    * returned to prevent a memory leak. This way the user need not
    * remember to delete the object.
    */
   static AutoPtr<FEBase> build (const unsigned int dim,
 				const FEType& type); 
+  
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+  /**
+   * Builds a specific infinite element type.  A \p AutoPtr<FEBase> is
+   * returned to prevent a memory leak. This way the user need not
+   * remember to delete the object.
+   */
+  static AutoPtr<FEBase> build_InfFE (const unsigned int dim,
+				      const FEType& type); 
+
+#endif
 
   /**
    * This is at the core of this class. Use this for each

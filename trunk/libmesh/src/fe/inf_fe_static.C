@@ -1,4 +1,4 @@
-// $Id: inf_fe_static.C,v 1.3 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: inf_fe_static.C,v 1.4 2003-02-05 20:51:44 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -42,12 +42,12 @@ InfFE<Dim,T_radial,T_base>::Radial::Radial ()
 
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-unsigned int InfFE<Dim,T_radial,T_map>::Radial::index(const FEType& base_fe_type,
+unsigned int InfFE<Dim,T_radial,T_map>::Radial::index(const FEType& fe_type,
 						      const ElemType base_elem_type,
 						      const unsigned int i)
 {
   if (Dim > 1)
-    return Radial::index( FEInterface::n_dofs(Dim-1, base_fe_type, base_elem_type), i);
+    return Radial::index( FEInterface::n_dofs(Dim-1, fe_type, base_elem_type), i);
   else
     return Radial::index(1, i);
 };
@@ -84,12 +84,12 @@ InfFE<Dim,T_radial,T_base>::Base::Base ()
 
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-unsigned int InfFE<Dim,T_radial,T_map>::Base::index(const FEType& base_fe_type,
+unsigned int InfFE<Dim,T_radial,T_map>::Base::index(const FEType& fe_type,
 						    const ElemType base_elem_type,
 						    const unsigned int i)
 {
   if (Dim > 1)
-    return Base::index(FEInterface::n_dofs(Dim-1, base_fe_type, base_elem_type), i);
+    return Base::index(FEInterface::n_dofs(Dim-1, fe_type, base_elem_type), i);
   else
     return Base::index(1, i);
 };
@@ -174,12 +174,11 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs(const FEType& fet,
 					       const ElemType inf_elem_type)
 {
   const ElemType     base_et  ( Base::get_elem_type(inf_elem_type) );
-  const FEType       base_fet ( Base::build_fe_type(fet) );
     
   if (Dim > 1)
-    return FEInterface::n_dofs(Dim-1, base_fet, base_et) * Radial::n_dofs(inf_elem_type, fet.order);
+    return FEInterface::n_dofs(Dim-1, fet, base_et) * Radial::n_dofs(inf_elem_type, fet.radial_order);
   else
-    return Radial::n_dofs(inf_elem_type, fet.order);
+    return Radial::n_dofs(inf_elem_type, fet.radial_order);
 };
 		
 
@@ -192,16 +191,15 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_at_node(const FEType& fet,
 						       const unsigned int n)
 {
   const ElemType     base_et  ( Base::get_elem_type(inf_elem_type) );
-  const FEType       base_fet ( Base::build_fe_type(fet) );
 
-  const unsigned int n_base   ( Base::index  (base_fet, base_et, n) );
-  const unsigned int n_radial ( Radial::index(base_fet, base_et, n) );
+  const unsigned int n_base   ( Base::index  (fet, base_et, n) );
+  const unsigned int n_radial ( Radial::index(fet, base_et, n) );
 
   if (Dim > 1)
-    return FEInterface::n_dofs_at_node(Dim-1, base_fet, base_et, n_base) 
-        * Radial::n_dofs_at_node(inf_elem_type, fet.order, n_radial);
+    return FEInterface::n_dofs_at_node(Dim-1, fet, base_et, n_base) 
+        * Radial::n_dofs_at_node(inf_elem_type, fet.radial_order, n_radial);
   else
-    return Radial::n_dofs_at_node(inf_elem_type, fet.order, n_radial);
+    return Radial::n_dofs_at_node(inf_elem_type, fet.radial_order, n_radial);
 }
 
 
@@ -212,13 +210,12 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_per_elem(const FEType& fet,
 							const ElemType inf_elem_type)
 {
   const ElemType     base_et  ( Base::get_elem_type(inf_elem_type) );
-  const FEType       base_fet ( Base::build_fe_type(fet) );
 
   if (Dim > 1)
-    return FEInterface::n_dofs_per_elem(Dim-1, base_fet, base_et) 
-        * Radial::n_dofs_per_elem(inf_elem_type, fet.order);
+    return FEInterface::n_dofs_per_elem(Dim-1, fet, base_et) 
+        * Radial::n_dofs_per_elem(inf_elem_type, fet.radial_order);
   else
-    return Radial::n_dofs_per_elem(inf_elem_type, fet.order);
+    return Radial::n_dofs_per_elem(inf_elem_type, fet.radial_order);
 };
 
 
@@ -245,7 +242,7 @@ template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem*,
 					      const Point& physical_point)
 {
-//TODO:[DD] fix inverse_map() for all three dimensions, specialize for each Dim, so that this gets more effective (for field point processing...)
+//To do: fix inverse_map() for all three dimensions, specialize for each Dim, so that this gets more effective (for field point processing...)
 
 /*
 determine origin by simply back-computing...
@@ -265,7 +262,7 @@ For sure:
 
 
 
-//TODO:[DD] Probably have to fix on_reference_element() also for InfFE
+//To do: Probably have to fix on_reference_element() also for InfFE
 /*
 bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real eps)
 */
@@ -284,16 +281,15 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
   assert (Dim != 0);
 
   const ElemType     base_et  ( Base::get_elem_type(type) );
-  const FEType       base_fet ( Base::build_fe_type(fet) );
-  const unsigned int i_base   ( Base::index  (base_fet, base_et, i) );
+  const unsigned int i_base   ( Base::index  (fet, base_et, i) );
 
-  const Order        o_radial ( fet.order );
-  const unsigned int i_radial ( Radial::index(base_fet, base_et, i) );
+  const Order        o_radial ( fet.radial_order );
+  const unsigned int i_radial ( Radial::index(fet, base_et, i) );
   const Real         v        ( p(Dim-1) );  // holds for all Dim, except for 0, but we don't inst Dim=0 ;-)
 
 
   if (Dim > 1)
-    return FEInterface::shape (Dim-1, base_fet, base_et, i_base, p)
+    return FEInterface::shape (Dim-1, fet, base_et, i_base, p)
         * InfFE<Dim,T_radial,T_map>::eval (v, o_radial, i_radial)
         * InfFE<Dim,T_radial,T_map>::Radial::decay(v);
   else
@@ -316,17 +312,16 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
   assert (Dim != 0);
 
   const ElemType     base_et  ( Base::get_elem_type(elem->type()) );
-  const FEType       base_fet ( Base::build_fe_type(fet) );
-  const unsigned int i_base   ( Base::index  (base_fet, base_et, i) );
+  const unsigned int i_base   ( Base::index  (fet, base_et, i) );
 
-  const Order        o_radial ( fet.order );
-  const unsigned int i_radial ( Radial::index(base_fet, base_et, i) );
+  const Order        o_radial ( fet.radial_order );
+  const unsigned int i_radial ( Radial::index(fet, base_et, i) );
   const Real         v        ( p(Dim-1) );  // holds for all Dim, except for 0, but we don't inst Dim=0 ;-)
 
   AutoPtr<Elem>      base_el  = elem->build_side(0);
 
   if (Dim > 1)
-    return FEInterface::shape (Dim-1, base_fet, base_el.get(), i_base, p)
+    return FEInterface::shape (Dim-1, fet, base_el.get(), i_base, p)
         * InfFE<Dim,T_radial,T_map>::eval (v, o_radial, i_radial)
         * InfFE<Dim,T_radial,T_map>::Radial::decay(v);
   else

@@ -1,4 +1,4 @@
-// $Id: inf_fe_macro.h,v 1.2 2003-01-26 18:20:14 ddreyer Exp $
+// $Id: inf_fe_macro.h,v 1.3 2003-02-05 20:51:37 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -40,7 +40,7 @@
                                            template  class InfFE< _dim, JACOBI_20_00, _map_type >; \
                                            template  class InfFE< _dim, JACOBI_30_00, _map_type >; \
                                            template  class InfFE< _dim, LEGENDRE,     _map_type >; \
-                                           template  class InfFE< _dim, INF_LAGRANGE, _map_type >; 
+                                           template  class InfFE< _dim, LAGRANGE,     _map_type >; 
 
 
 

@@ -1,4 +1,4 @@
-// $Id: equation_systems_io.C,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: equation_systems_io.C,v 1.7 2003-02-05 20:51:43 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -71,8 +71,9 @@ void EquationSystems::read(const std::string& name,
    *   for each variable in the system
    *     
    *     4.) The name of the variable (string)
-   *     5.) The approximation order of the variable (Order Enum, cast to int)
-   *     6.) The finite element family/ies of the variable (FEType struct, cast to int/s)
+   *     5. & 6.) Combined in an FEType:
+   *              - The approximation order of the variable (Order Enum, cast to int)
+   *              - The finite element family/ies of the variable (FEType struct, cast to int/s)
    *
    *   end variable loop
    * end system loop
@@ -151,12 +152,22 @@ void EquationSystems::read(const std::string& name,
 	  /**
 	   * 5.)
 	   *
-	   * Read the approximation order of the jth variable 
+	   * Read the approximation order(s) of the jth variable 
 	   * in the ith system
 	   */
 	  int order=0;
 	  
 	  io.data (order);
+
+#ifdef ENABLE_INFINITE_ELEMENTS
+	  /**
+	   * do the same for radial_order
+	   */
+	  int rad_order=0;
+	  
+	  io.data(rad_order);
+#endif
+
 	      
 	  /**
 	   * 6.)
@@ -164,38 +175,39 @@ void EquationSystems::read(const std::string& name,
 	   * Read the finite element type of the jth variable 
 	   * in the ith system
 	   */
-#ifndef ENABLE_INFINITE_ELEMENTS
-
 	  int fam=0;
 	  
 	  io.data (fam);
 
 	  FEType type;
+
+#ifndef ENABLE_INFINITE_ELEMENTS
+
 	  type.order  = static_cast<Order>(order);
 	  type.family = static_cast<FEFamily>(fam);
-	  
-	  if (read_header) new_system.add_variable (var_name,
-						    type);
 
 #else
 
-
 //TODO:[DD] flag the use of infinite elements, somewhere in the outfile?
-	  int fam=0;
-	  int base_fam=0;
+	  int radial_fam=0;
+	  int i_map=0;
 	  
-	  io.data (fam);
-	  io.data (base_fam);
+	  io.data (radial_fam);
+	  io.data (i_map);
 
-	  FEType type;
-	  type.order       = static_cast<Order>(order);
-	  type.family      = static_cast<FEFamily>(fam);
-	  type.base_family = static_cast<FEFamily>(base_fam);
-	  
+	  type.order         = static_cast<Order>(order);
+	  type.radial_order  = static_cast<Order>(rad_order);
+	  type.family        = static_cast<FEFamily>(fam);
+	  type.radial_family = static_cast<FEFamily>(radial_fam);
+	  type.inf_map       = static_cast<InfMapType>(i_map);	  
+#endif
+
+
 	  if (read_header) new_system.add_variable (var_name,
 						    type);
 
-#endif
+
+
 	};
     };
       
@@ -308,8 +320,9 @@ void EquationSystems::write(const std::string& name,
    *   for each variable in the system
    *     
    *     4.) The name of the variable (string)
-   *     5.) The approximation order of the variable (Order Enum, cast to int)
-   *     6.) The finite element family/ies of the variable (FEType struct, cast to int)
+   *     5. & 6.) Combined in an FEType:
+   *              - The approximation order(s) of the variable (Order Enum, cast to int/s)
+   *              - The finite element family/ies of the variable (FEType struct, cast to int/s)
    *
    *   end variable loop
    * end system loop
@@ -448,8 +461,18 @@ void EquationSystems::write(const std::string& name,
 	      int order = static_cast<int>(system.variable_order(var));
 	      
 	      io.data (order, comment.c_str());
+	   
+
+#ifdef ENABLE_INFINITE_ELEMENTS
+	      /**
+	       * do the same for radial_order
+	       */
+	      int rad_order = static_cast<int>(system.variable_type(var).radial_order);
 	      
-	      
+	      io.data (rad_order);
+
+#endif
+   
 
 
 	      /**
@@ -471,23 +494,23 @@ void EquationSystems::write(const std::string& name,
 	      }
 
 	      FEType type = system.variable_type(var);
-
-#ifndef ENABLE_INFINITE_ELEMENTS
 	      
 	      int fam = static_cast<int>(type.family);
 	      
 	      io.data (fam, comment.c_str());
 
-#else
 
-	      int fam = static_cast<int>(type.family);
-	      int base_fam = static_cast<int>(type.base_family);
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+	      int radial_fam = static_cast<int>(type.radial_family);
+	      int i_map = static_cast<int>(type.inf_map);
 	      
-	      io.data (fam, comment.c_str());
-	      io.data (base_fam);
-
+	      io.data (radial_fam);
+	      io.data (i_map);
 
 #endif
+
+
 	    };
 
 	  ++pos;

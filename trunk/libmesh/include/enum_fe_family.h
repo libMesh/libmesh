@@ -1,4 +1,4 @@
-// $Id: enum_fe_family.h,v 1.4 2003-01-24 17:24:38 jwpeterson Exp $
+// $Id: enum_fe_family.h,v 1.5 2003-02-05 20:51:36 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -45,7 +45,6 @@ namespace MeshEnums {
 		 JACOBI_20_00,     //   i_max = 19
                  JACOBI_30_00,     //   i_max = 19
 		 LEGENDRE,         //   i_max = 19
-		 INF_LAGRANGE,     //   i_max = 14
 #endif
 		 
 		 INVALID_FE};
