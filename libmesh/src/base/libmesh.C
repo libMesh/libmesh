@@ -1,4 +1,4 @@
-// $Id: libmesh.C,v 1.20 2004-01-03 15:37:42 benkirk Exp $
+// $Id: libmesh.C,v 1.21 2004-02-27 22:43:40 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -59,13 +59,13 @@ namespace {
 
 // ------------------------------------------------------------
 // libMesh data initialization
-PerfLog            libMesh::log ("libMesh",
+PerfLog            libMesh::perflog ("libMesh",
 #ifdef ENABLE_PERFORMANCE_LOGGING
-				 true
+				     true
 #else
-				 false
+				     false
 #endif
-				 );
+				     );
 
 #ifdef USE_COMPLEX_NUMBERS
 const Number       libMesh::imaginary (0., 1.);
