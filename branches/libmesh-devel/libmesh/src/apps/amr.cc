@@ -40,20 +40,20 @@ int main (int argc, char** argv)
     // Read a mesh
     mesh.read(meshname);
 
-    mesh.elem(0)->set_refinement_flag(Elem::REFINE);
-    mesh.mesh_refinement.refine_and_coarsen_elements();    
-    mesh.mesh_refinement.uniformly_refine(3);
+    mesh.elem(0)->set_refinement_flag (Elem::REFINE);
+    mesh.mesh_refinement.refine_and_coarsen_elements ();    
+    mesh.mesh_refinement.uniformly_refine (2);
     
     mesh.print_info();
 
     
     // Set up the equation system(s)
-    EquationSystems es(mesh);
+    EquationSystems es (mesh);
 
     es.add_system<SteadySystem>("primary");
 
-    es("primary").add_variable("U", FIRST);
-    es("primary").add_variable("V", FIRST);
+    es("primary").add_variable ("U", FIRST);
+    es("primary").add_variable ("V", FIRST);
 
     es("primary").get_dof_map()._dof_coupling.resize(2);      
     es("primary").get_dof_map()._dof_coupling(0,0) = 1;
@@ -61,17 +61,28 @@ int main (int argc, char** argv)
     
     es("primary").attach_assemble_function(assemble);
     
-    es.init();
+    es.init ();
     
-    es.print_info();
-    es("primary").get_dof_map().print_dof_constraints();
+    es.print_info ();
+    es("primary").get_dof_map().print_dof_constraints ();
 
     // call the solver.
     es("primary").solve ();
-
     
-    mesh.write_gmv_binary    ("out.gmv", es);
-    mesh.write_tecplot_binary("out.plt", es);
+    mesh.write_gmv_binary ("out_1.gmv", es);
+
+
+
+    // Refine uniformly
+    mesh.mesh_refinement.uniformly_refine (1);
+    es.reinit ();
+
+    // Write out the projected solution
+    mesh.write_gmv_binary ("out_2.gmv", es);
+
+    // Solve again. Output the refined solution
+    es("primary").solve ();
+    mesh.write_gmv_binary ("out_3.gmv", es);
   };
   
   return libMesh::close();

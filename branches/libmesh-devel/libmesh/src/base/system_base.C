@@ -1,4 +1,4 @@
-// $Id: system_base.C,v 1.14.2.4 2003-05-07 20:47:15 benkirk Exp $
+// $Id: system_base.C,v 1.14.2.5 2003-05-13 04:25:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -195,6 +195,9 @@ void SystemBase::reinit ()
        pos != _other_matrices.end(); ++pos)
     pos->second->clear();
 
+  
+  // Clear the linear solver interface
+  linear_solver_interface->clear();
 
   // Call the SystemBase::assemble() member to
   // construct the system matrices

@@ -1,4 +1,4 @@
-// $Id: fe_type.h,v 1.8 2003-02-13 22:56:07 benkirk Exp $
+// $Id: fe_type.h,v 1.8.2.1 2003-05-13 04:25:34 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -51,6 +51,8 @@ public:
     family(f)
   {}
 
+
+  //TODO:[BSK] Could these data types all be const?  
   /**
    * The approximation order of the element.  
    */

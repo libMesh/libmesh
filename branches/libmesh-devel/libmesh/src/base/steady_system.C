@@ -1,4 +1,4 @@
-// $Id: steady_system.C,v 1.1.2.4 2003-05-07 20:47:15 benkirk Exp $
+// $Id: steady_system.C,v 1.1.2.5 2003-05-13 04:25:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -77,32 +77,31 @@ void SteadySystem::reinit ()
    
   // Project the solution to the new mesh
   {
-    AutoPtr<NumericVector<Number> >
-      old_solution (current_local_solution->clone());
+//     AutoPtr<NumericVector<Number> >
+//       old_solution (current_local_solution->clone());
     
-    // Form the L2 projectiom
-    this->project_vector (old_solution.get(),
-			  solution.get());
-    
-    
-    // Initialize the current local solution to
-    // be the right size
-    current_local_solution->init (this->n_dofs ());
+    // Project the solution vector
+    this->project_vector (*solution);
+
+    // Project the current local solution
+    this->project_vector (*current_local_solution);
     
     
-    // Clear the linear solver interface
-    linear_solver_interface->clear();
+//     // Initialize the current local solution to
+//     // be the right size
+//     current_local_solution->init (this->n_dofs ());
     
-    // Get the user-specifiied linear solver tolerance
-    const Real tol =
-      _equation_systems.parameter("linear solver tolerance");
     
-    // Get the user-specified maximum # of linear solver iterations
-    const unsigned int maxits =
-      static_cast<unsigned int>(_equation_systems.parameter("linear solver maximum iterations"));
+//     // Get the user-specifiied linear solver tolerance
+//     const Real tol =
+//       _equation_systems.parameter("linear solver tolerance");
     
-    // Solve the linear system
-    linear_solver_interface->solve (*matrix, *solution, *rhs, tol, maxits);
+//     // Get the user-specified maximum # of linear solver iterations
+//     const unsigned int maxits =
+//       static_cast<unsigned int>(_equation_systems.parameter("linear solver maximum iterations"));
+    
+//     // Solve the linear system
+//     linear_solver_interface->solve (*matrix, *solution, *rhs, tol, maxits);
     
     // Update the local solution to reflect the new values
     this->update ();

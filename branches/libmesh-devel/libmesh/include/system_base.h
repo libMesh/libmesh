@@ -1,4 +1,4 @@
-// $Id: system_base.h,v 1.14.2.5 2003-05-07 20:47:15 benkirk Exp $
+// $Id: system_base.h,v 1.14.2.6 2003-05-13 04:25:34 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -143,11 +143,18 @@ public:
   virtual std::string system_type () const = 0;
 
   /**
-   * Projects the solution vector to the new mesh.  The input indices
-   * give the old DOF numbers in terms of the new DOF numbers.
+   * Projects the vector defined on the old mesh onto the
+   * new mesh. 
    */
-  void project_vector (const NumericVector<Number>*,
-		       NumericVector<Number>*) const;
+  void project_vector (NumericVector<Number>&) const;
+
+  /**
+   * Projects the vector defined on the old mesh onto the
+   * new mesh. The original vector is unchanged and the new vector
+   * is passed through the second argument.
+   */
+  void project_vector (const NumericVector<Number>&,
+		       NumericVector<Number>&) const;
   
   /**
    * @returns the system number.   
