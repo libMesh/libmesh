@@ -1,4 +1,4 @@
-// $Id: fe_interface.h,v 1.18 2003-04-18 15:46:32 spetersen Exp $
+// $Id: fe_interface.h,v 1.19 2003-05-16 14:37:47 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -133,6 +133,20 @@ public:
 			    const Point& p,
 			    const Real tolerance = 1.e-4,
 			    const bool secure = true);
+
+  /**
+   * @returns the location (on the reference element) of the
+   * points \p physical_points located in physical space.
+   * This function requires
+   * inverting the (probably nonlinear) transformation map, so
+   * it is not trivial. The location of each point on the reference
+   * element is returned in the vector \p reference_points.
+   */
+  static void  inverse_map (const unsigned int dim,
+			    const FEType& fe_t,
+			    const Elem* elem,
+			    const std::vector<Point>& physical_points,
+			    std::vector<Point>&       reference_points);
 
   /**
    * @returns true if the point p is located on the reference element

@@ -1,4 +1,4 @@
-// $Id: error_estimator.h,v 1.2 2003-05-15 23:34:33 benkirk Exp $
+// $Id: error_estimator.h,v 1.3 2003-05-16 14:37:47 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -37,7 +37,9 @@ class EquationSystems;
  * This namespace holds functions that will estimate the error
  * in a finite element solution on a given mesh.  These error
  * estimates can be useful in their own right, or may be used
- * to guide adaptive mesh refinement.  
+ * to guide adaptive mesh refinement.  Note that in general
+ * the computed errors are stored as floats rather than doubles
+ * since the required precision is low.
  *
  * @author Benjamin S. Kirk, 2003.
  */
@@ -52,7 +54,7 @@ namespace ErrorEstimator
    */
   void flux_jump (const EquationSystems& es,
 		  const std::string& name,
-		  std::vector<Real>& error_per_cell);
+		  std::vector<float>& error_per_cell);
 };
 
 

@@ -1,4 +1,4 @@
-// $Id: steady_system.C,v 1.2 2003-05-15 23:34:34 benkirk Exp $
+// $Id: steady_system.C,v 1.3 2003-05-16 14:37:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,6 +26,7 @@
 #include "equation_systems.h"
 #include "sparse_matrix.h"
 #include "linear_solver_interface.h"
+#include "numeric_vector.h"
 
 
 
@@ -77,34 +78,24 @@ void SteadySystem::reinit ()
    
   // Project the solution to the new mesh
   {
-//     AutoPtr<NumericVector<Number> >
-//       old_solution (current_local_solution->clone());
-    
-    // Project the solution vector
-    this->project_vector (*solution);
-
     // Project the current local solution
     this->project_vector (*current_local_solution);
-    
-    
-//     // Initialize the current local solution to
-//     // be the right size
-//     current_local_solution->init (this->n_dofs ());
-    
-    
-//     // Get the user-specifiied linear solver tolerance
-//     const Real tol =
-//       _equation_systems.parameter("linear solver tolerance");
-    
-//     // Get the user-specified maximum # of linear solver iterations
-//     const unsigned int maxits =
-//       static_cast<unsigned int>(_equation_systems.parameter("linear solver maximum iterations"));
-    
-//     // Solve the linear system
-//     linear_solver_interface->solve (*matrix, *solution, *rhs, tol, maxits);
+
+    // Update the solution based on the projected
+    // current_local_solution.
+    {
+      solution->init (this->n_dofs(), this->n_local_dofs());
+
+      const unsigned int first_local_dof = solution->first_local_index();
+      const unsigned int local_size      = solution->local_size();
+      
+      for (unsigned int i=0; i<local_size; i++)
+	solution->set(i+first_local_dof,
+		      (*current_local_solution)(i+first_local_dof));
+    }
     
     // Update the local solution to reflect the new values
-    this->update ();
+    //this->update ();
   }
 }
 
