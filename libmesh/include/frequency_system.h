@@ -1,4 +1,4 @@
-// $Id: frequency_system.h,v 1.1 2003-02-12 02:03:47 ddreyer Exp $
+// $Id: frequency_system.h,v 1.2 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -106,7 +106,7 @@ public:
    * @returns the number of frequencies to solve
    */
   unsigned int n_frequencies () const 
-    { assert (_have_freq); return _n_freq; };
+    { assert (_have_freq); return _n_freq; }
 
   /**
    * Solve the linear system.  Prior to solving
@@ -119,7 +119,7 @@ public:
    * @returns a const reference to the frequencies to solve
    */
   const std::vector<Real>& get_frequencies () const
-    { assert (_have_freq); return _frequencies; };
+    { assert (_have_freq); return _frequencies; }
 
   /**
    * Register a user function to use in initializing the system.

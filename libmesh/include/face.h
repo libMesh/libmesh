@@ -1,4 +1,4 @@
-// $Id: face.h,v 1.5 2003-01-24 17:24:38 jwpeterson Exp $
+// $Id: face.h,v 1.6 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -52,18 +52,18 @@ public:
 	const unsigned int ns,
 	Face* p) :
     Elem (nn, ns, p)
-  {};
+  {}
 
   /**
    * @returns 2, the dimensionality of the object.
    */
-  unsigned int dim () const { return 2; };
+  unsigned int dim () const { return 2; }
 
   /**
    * @returns 0.  All 2D elements have no faces, just
    * edges.
    */
-  unsigned int n_faces() const { return 0; };
+  unsigned int n_faces() const { return 0; }
 };
 
 #endif

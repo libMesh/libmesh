@@ -1,4 +1,4 @@
-// $Id: xdrIO.h,v 1.7 2003-02-10 14:31:16 ddreyer Exp $
+// $Id: xdrIO.h,v 1.8 2003-02-13 22:56:08 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -323,7 +323,7 @@ class XdrMESH: public XdrIO
    * Constructor.  Initializes
    * \p m_dim to -1.
    */
-  XdrMESH() : m_dim(-1) {};
+  XdrMESH() : m_dim(-1) {}
 
   /**
    * Calls the \p init method

@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.11 2003-02-11 22:59:25 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.12 2003-02-13 22:56:04 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -317,8 +317,6 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           dnl #236 and
           dnl #237: `controlling expression is constant' (in while(true), or
           dnl       switch(dim))
-          dnl #381: `extra ";" ignored' (at function or namespace closing
-          dnl       brace)
           dnl #487: `Inline function ... cannot be explicitly instantiated'
           dnl       (also reported when we instantiate the entire class)
           dnl #1136:`conversion to integral type of smaller size could lose data'
@@ -351,7 +349,7 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           CFLAGSG="-w1 -msg_display_number -timplicit_local -DDEBUG"
           CFLAGSO="-w2 -msg_display_number -timplicit_local -DNDEBUG -O2 -fast"
   
-          for i in 175 236 237 381 487 1136 1156 111 1182 265 ; do
+          for i in 175 236 237 487 1136 1156 111 1182 265 ; do
             CXXFLAGSG="$CXXFLAGSG -msg_disable $i"
             CXXFLAGSO="$CXXFLAGSO -msg_disable $i"
             dnl CFLAGSG="$CXXFLAGSG -msg_disable $i"

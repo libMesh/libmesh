@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.12 2003-02-12 05:41:29 jwpeterson Exp $
+// $Id: mesh_base.C,v 1.13 2003-02-13 22:56:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -67,7 +67,7 @@ MeshBase::MeshBase (unsigned int d,
 {
   assert (DIM <= 3);
   assert (DIM >= _dim);
-};
+}
 
 
 
@@ -82,13 +82,13 @@ MeshBase::MeshBase (const MeshBase& other_mesh) :
   _nodes = other_mesh._nodes;
   _elements = other_mesh._elements;
   
-};
+}
 
 
 MeshBase::~MeshBase()
 {
   clear();
-};
+}
 
 
 
@@ -124,7 +124,7 @@ Node* MeshBase::add_point(const Point& p,
   // We'll never get here...
   error();
   return NULL;
-};
+}
 
 
 
@@ -143,7 +143,7 @@ void MeshBase::add_elem(Elem* e, const unsigned int n)
     }
 
   _perf_log.stop_event("add_elem()");
-};
+}
 
 
 
@@ -158,7 +158,7 @@ unsigned int MeshBase::n_active_elem() const
     num++;
 
   return num;
-};
+}
 
 
 
@@ -176,7 +176,7 @@ void MeshBase::clear()
 	delete elem(e);
     
     _elements.clear();
-  };
+  }
 
   // clear the nodes data structure
   {
@@ -185,8 +185,8 @@ void MeshBase::clear()
 	delete node_ptr(n);
     
     _nodes.clear();
-  };  
-};
+  }  
+}
 
 
 
@@ -198,7 +198,7 @@ unsigned int MeshBase::n_sub_elem() const
     ne += elem(i)->n_sub_elem();
 
   return ne;
-};
+}
 
 
 
@@ -212,7 +212,7 @@ unsigned int MeshBase::n_active_sub_elem() const
     ne += (*it)->n_sub_elem(); 
 
   return ne;
-};
+}
 
 
 
@@ -241,7 +241,7 @@ std::vector<ElemType> MeshBase::elem_types() const
     }
   
   return et;
-};
+}
 
 
 
@@ -256,7 +256,7 @@ unsigned int MeshBase::n_elem_of_type(const ElemType type) const
     cnt++;
   
   return cnt;
-};
+}
 
 
 
@@ -270,7 +270,7 @@ unsigned int MeshBase::n_active_elem_of_type(const ElemType type) const
     cnt++;
     
   return cnt;
-};
+}
 
 
 
@@ -282,7 +282,7 @@ unsigned int MeshBase::total_weight() const
     weight += elem(e)->n_nodes();
   
   return weight;
-};
+}
 
 
 
@@ -303,14 +303,14 @@ std::string MeshBase::get_info() const
       << "  processor_id()=" << processor_id() << std::endl;
 
   return out.str();
-};
+}
 
 
 void MeshBase::print_info() const
 {
   std::cout << get_info()
 	    << std::endl;
-};
+}
 
 
 
@@ -323,12 +323,12 @@ void MeshBase::skip_comment_lines (std::istream &in,
       char line[256];
       in.get (line, 255, '\n'); // ignore rest of line, at most 256 chars
       in.get (c);               // ignore '\n' at end of line.
-    };
+    }
   
   // put back first character of
   // first non-comment line
   in.putback (c);
-};
+}
 
 
 
@@ -416,17 +416,17 @@ void MeshBase::find_neighbors()
 				
 				// get out of this nested crap
 				goto next_side; 
-			      };
-			  };
-		      };
+			      }
+			  }
+		      }
 		  
 		  // didn't find a match...
 		  side_to_elem.insert (bounds.first,
 				       key_val_pair(key, element));
-		};
-	    };
-	};
-    };
+		}
+	    }
+	}
+    }
   
   side_to_elem.clear();
 
@@ -465,7 +465,7 @@ void MeshBase::find_neighbors()
 #endif
 
   _perf_log.stop_event("find_neighbors()");
-};
+}
 
 
 
@@ -505,7 +505,7 @@ void MeshBase::build_inf_elem(const Point& origin,
     {
       std::cout << " Building Infinite Elements:" << std::endl;
       std::cout << "  updating element neighbor tables..." << std::endl;
-    };
+    }
 
   find_neighbors();	// update elem->neighbor() tables
 
@@ -769,7 +769,7 @@ void MeshBase::build_nodes_to_elem_map (std::vector<std::vector<unsigned int> >&
   for (unsigned int e=0; e<n_elem(); e++)
     for (unsigned int n=0; n<elem(e)->n_nodes(); n++)
       nodes_to_elem_map[elem(e)->node(n)].push_back(e);
-};
+}
 
 
 
@@ -927,7 +927,7 @@ void MeshBase::all_tri ()
   _elements = new_elements;
 
   find_neighbors();
-};
+}
 
 
 
@@ -954,7 +954,7 @@ void MeshBase::sfc_partition(const unsigned int n_sbdmns,
 	    elem(e)->processor_id() = 0;
 	
 	return;
-      };
+      }
 
     
     const unsigned int blksize = n_elem()/n_sbdmns; 
@@ -985,7 +985,7 @@ void MeshBase::sfc_partition(const unsigned int n_sbdmns,
 	  elem(e)->processor_id() = 0;
       
       return;
-    };
+    }
   
   _perf_log.start_event("sfc_partition()");
     
@@ -1007,7 +1007,7 @@ void MeshBase::sfc_partition(const unsigned int n_sbdmns,
 
       if (_dim == 3)
 	z[e] = p(2);
-    };
+    }
 
   int size = static_cast<int>(n_elem());
   table.resize(size);
@@ -1029,14 +1029,14 @@ void MeshBase::sfc_partition(const unsigned int n_sbdmns,
 	wgt/wgt_per_proc;
 
       wgt += elem(table[e]-1)->n_nodes();
-    };
+    }
   
   _perf_log.stop_event("sfc_partiton()");
 
   return;
   
 #endif
-};
+}
 
 
 
@@ -1068,8 +1068,8 @@ void MeshBase::distort(const Real factor,
 	      
 	      for (unsigned int n=0; n<side->n_nodes(); n++)
 		on_boundary[side->node(n)] = 1;
-	    };
-    };
+	    }
+    }
 
 
   // Now calculate the minimum distance to
@@ -1121,14 +1121,14 @@ void MeshBase::distort(const Real factor,
 		node(n)(2) += dir(2)*factor*hmin[n];
 	    }
 	}
-  };
+  }
 
 
   // All done  
   _perf_log.stop_event("distort()");
 
   return;
-};
+}
 
 
 
@@ -1140,7 +1140,7 @@ void MeshBase::translate (const Real xt,
 
   for (unsigned int n=0; n<n_nodes(); n++)
     node(n) += p;
-};
+}
 
 
 
@@ -1149,7 +1149,7 @@ void MeshBase::rotate (const Real,
 		       const Real)
 {
   error();
-};
+}
 
 
 
@@ -1166,7 +1166,7 @@ void MeshBase::scale (const Real xs,
       assert (zs == 0.);
 
       y_scale = z_scale = x_scale;
-    };
+    }
 
   // Scale the x coordinate in all dimensions
   for (unsigned int n=0; n<n_nodes(); n++)
@@ -1185,9 +1185,9 @@ void MeshBase::scale (const Real xs,
 	{
 	  for (unsigned int n=0; n<n_nodes(); n++)
 	    node(n)(2) = node(n)(2)*z_scale;
-	};
-    };
-};
+	}
+    }
+}
 
 
 
@@ -1197,7 +1197,7 @@ MeshBase::bounding_box() const
   // processor bounding box with no arguments
   // computes the global bounding box
   return processor_bounding_box();
-};
+}
 
 
 
@@ -1212,7 +1212,7 @@ MeshBase::bounding_sphere() const
   Sphere sphere (cent, .5*diag);
 
   return sphere;
-};
+}
 
 
 
@@ -1233,7 +1233,7 @@ MeshBase::processor_bounding_box (const unsigned int pid) const
 	  {
 	    min(i) = std::min(min(i), point(n)(i));
 	    max(i) = std::max(max(i), point(n)(i));
-	  };      
+	  }      
     }
   // if a specific processor id is specified then we need
   // to only consider those elements living on that processor
@@ -1246,13 +1246,13 @@ MeshBase::processor_bounding_box (const unsigned int pid) const
 	      {
 		min(i) = std::min(min(i), point(elem(e)->node(n))(i));
 		max(i) = std::max(max(i), point(elem(e)->node(n))(i));
-	      };      
-    };
+	      }      
+    }
 
   const std::pair<Point, Point> ret_val(min, max);
 
   return ret_val;  
-};
+}
 
 
 
@@ -1267,7 +1267,7 @@ MeshBase::processor_bounding_sphere (const unsigned int pid) const
   Sphere sphere (cent, .5*diag);
 
   return sphere;
-};
+}
 
 
 
@@ -1288,7 +1288,7 @@ MeshBase::subdomain_bounding_box (const unsigned int sid) const
 	  {
 	    min(i) = std::min(min(i), point(n)(i));
 	    max(i) = std::max(max(i), point(n)(i));
-	  };      
+	  }      
     }
 
   // if a specific subdomain id is specified then we need
@@ -1302,13 +1302,13 @@ MeshBase::subdomain_bounding_box (const unsigned int sid) const
 	      {
 		min(i) = std::min(min(i), point(elem(e)->node(n))(i));
 		max(i) = std::max(max(i), point(elem(e)->node(n))(i));
-	      };      
-    };
+	      }      
+    }
 
   const std::pair<Point, Point> ret_val(min, max);
 
   return ret_val;  
-};
+}
 
 
 
@@ -1322,7 +1322,7 @@ Sphere MeshBase::subdomain_bounding_sphere (const unsigned int sid) const
   Sphere sphere (cent, .5*diag);
 
   return sphere;
-};
+}
 
 
 
@@ -1347,7 +1347,7 @@ void MeshBase::build_L_graph (PetscMatrix& conn) const
     for (unsigned int n=0; n<n_nodes(); n++)
       conn.set(n,n,0.);
 
-  };
+  }
   
   switch (mesh_dimension())
     {
@@ -1358,7 +1358,7 @@ void MeshBase::build_L_graph (PetscMatrix& conn) const
 		  << " in 1D!"
 		  << std::endl;
 	error();
-      };
+      }
 
       
       // Create the graph for a 2D mesh.  Do this by looking
@@ -1381,11 +1381,11 @@ void MeshBase::build_L_graph (PetscMatrix& conn) const
 
 		  conn.set(n1,n1, conn(n1,n1) + 1.);
 		  conn.set(n1,n0, -1.);
-		};
+		}
 
 	// All done.
 	break;
-      };
+      }
 
 
 
@@ -1418,19 +1418,19 @@ void MeshBase::build_L_graph (PetscMatrix& conn) const
 			  
 			  conn.set(n1,n1, conn(n1,n1) + 1.);
 			  conn.set(n1,n0, -1.);
-			};
-		    };
-		};
+			}
+		    }
+		}
 
 	// All done
 	break;
-      };
+      }
       
 
     default:
       // what?
       error();
-    };
+    }
 
 
   // OK, now the matrix is built.  Close it
@@ -1440,7 +1440,7 @@ void MeshBase::build_L_graph (PetscMatrix& conn) const
   return;
 
 #endif
-};
+}
 
 
 
@@ -1475,7 +1475,7 @@ void MeshBase::build_script_L_graph (PetscMatrix& conn) const
 		  << " in 1D!"
 		  << std::endl;
 	error();
-      };
+      }
 
       
       // Create the graph for a 2D mesh.  Do this by looking
@@ -1504,11 +1504,11 @@ void MeshBase::build_script_L_graph (PetscMatrix& conn) const
 		  
 		  conn.set(n0,n1, prod_term);
 		  conn.set(n1,n0, prod_term);
-		};
+		}
 
 	// All done.
 	break;
-      };
+      }
 
 
 
@@ -1542,18 +1542,18 @@ void MeshBase::build_script_L_graph (PetscMatrix& conn) const
 		      
 		      conn.set(n0,n1, prod_term);
 		      conn.set(n1,n0, prod_term);
-		    };
-		};
+		    }
+		}
 
 	// All done
 	break;
-      };
+      }
       
 
     default:
       // what?
       error();
-    };
+    }
 
 
   // OK, now the matrix is built.  Close it
@@ -1563,7 +1563,7 @@ void MeshBase::build_script_L_graph (PetscMatrix& conn) const
   return;  
 
 #endif
-};
+}
 
 
 
@@ -1572,7 +1572,7 @@ void MeshBase::read(const std::string&)
   std::cerr << "ERROR:  You shouldn't be calling this" << std::endl
 	    << " Use Mesh::read() instead." << std::endl;
   error();
-};
+}
 
 
 
@@ -1598,10 +1598,10 @@ void MeshBase::write(const std::string& name)
 	else
 	  write_gmv_binary(name);
       }
-  };
+  }
 
   _perf_log.stop_event("write()");
-};
+}
 
 
 
@@ -1626,10 +1626,10 @@ void MeshBase::write(const std::string& name,
 	else
 	  write_gmv_binary(name, &v, &vn);
       }
-  };
+  }
 
   _perf_log.stop_event("write()");
-};
+}
 
 
 
@@ -1644,7 +1644,7 @@ char* MeshBase::complex_filename(const std::string& _n,
   else
     loc.append(".imag");
   return loc.c_str();
-};
+}
 
 
 void MeshBase::prepare_complex_data(const std::vector<Complex>* source,
@@ -1659,8 +1659,8 @@ void MeshBase::prepare_complex_data(const std::vector<Complex>* source,
     {
       (*real_part)[i] = (*source)[i].real();
       (*imag_part)[i] = (*source)[i].imag();
-    };
-};
+    }
+}
 
 
 #endif

@@ -1,4 +1,4 @@
-// $Id: petsc_matrix.C,v 1.10 2003-02-10 22:03:28 benkirk Exp $
+// $Id: petsc_matrix.C,v 1.11 2003-02-13 22:56:13 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -52,7 +52,7 @@ void PetscMatrix::init (const unsigned int m,
       }
 
     _is_initialized = true;
-  };
+  }
 
   
   int ierr=0;
@@ -82,7 +82,7 @@ void PetscMatrix::init (const unsigned int m,
     }
 
   zero ();
-};
+}
 
 
 
@@ -101,7 +101,7 @@ void PetscMatrix::init ()
       }
 
     _is_initialized = true;
-  };
+  }
 
   
   int proc_id = 0;
@@ -152,7 +152,7 @@ void PetscMatrix::init ()
     }
 
   zero();
-};
+}
 
 
 
@@ -164,7 +164,7 @@ void PetscMatrix::zero ()
   int ierr=0;
 
   ierr = MatZeroEntries(mat); CHKERRQ(ierr);
-};
+}
 
 
 
@@ -177,8 +177,8 @@ void PetscMatrix::clear ()
       ierr = MatDestroy (mat); CHKERRQ(ierr);
       
       _is_initialized = false;
-    };
-};
+    }
+}
 
 
 
@@ -197,7 +197,7 @@ Real PetscMatrix::l1_norm () const
   value = static_cast<Real>(petsc_value);
 
   return value;
-};
+}
 
 
 
@@ -216,7 +216,7 @@ Real PetscMatrix::linfty_norm () const
   value = static_cast<Real>(petsc_value);
 
   return value;
-};
+}
 
 
 
@@ -264,7 +264,7 @@ void PetscMatrix::print_matlab (const std::string name) const
    * Destroy the viewer.
    */
   ierr = PetscViewerDestroy (petsc_viewer);                    CHKERRQ(ierr);
-};
+}
 
 
 #endif

@@ -1,4 +1,4 @@
-// $Id: laspack_interface.h,v 1.2 2003-02-10 22:03:23 benkirk Exp $
+// $Id: laspack_interface.h,v 1.3 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -106,7 +106,7 @@ inline
 LaspackInterface::LaspackInterface () :
   _precond_type (Laspack::ILUPrecond)
 {
-};
+}
 
 
 
@@ -114,7 +114,7 @@ inline
 LaspackInterface::~LaspackInterface ()
 {
   clear ();
-};
+}
 
 
 #endif // #ifdef HAVE_LASPACK

@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex16.h,v 1.7 2003-02-06 05:41:14 ddreyer Exp $
+// $Id: cell_inf_hex16.h,v 1.8 2003-02-13 22:56:06 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -81,22 +81,22 @@ public:
   /**
    * @returns \p INFHEX16
    */
-  ElemType     type ()   const { return INFHEX16; };
+  ElemType     type ()   const { return INFHEX16; }
 
   /**
    * @returns 16
    */
-  unsigned int n_nodes() const { return 16; };
+  unsigned int n_nodes() const { return 16; }
   
   /**
    * @returns 4
    */
-  unsigned int n_sub_elem() const { return 1; };
+  unsigned int n_sub_elem() const { return 1; }
   
   /**
    * @returns SECOND
    */
-  Order default_order() const { return SECOND; };
+  Order default_order() const { return SECOND; }
   
   /**
    * Returns a QUAD8 built coincident with face 0, an INFQUAD6 
@@ -110,10 +110,10 @@ public:
   
   void vtk_connectivity(const unsigned int,
 			std::vector<unsigned int>*) const
-  { error(); };
+  { error(); }
   
   unsigned int vtk_element_type (const unsigned int) const
-  { return 12; };
+  { return 12; }
   
   void write_tecplot_connectivity(std::ostream &out) const;
   
@@ -161,7 +161,7 @@ inline
 InfHex16::InfHex16(Cell* p) :
   Hex(InfHex16::n_nodes(), p) 
 {
-};
+}
 
 
 

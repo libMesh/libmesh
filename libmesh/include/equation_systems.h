@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.11 2003-02-13 01:49:48 benkirk Exp $
+// $Id: equation_systems.h,v 1.12 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -207,7 +207,7 @@ public:
    * @returns the solver package type currently in use
    */
   SolverPackage get_solver_package() const 
-  { return _solver_package; };
+  { return _solver_package; }
 
   /**
    * Read & initialize the systems from disk using the XDR data format. 
@@ -236,7 +236,7 @@ public:
   /**
    * Prints information about the equation systems.
    */
-  void print_info () const {std::cout << get_info() << std::endl; };
+  void print_info () const {std::cout << get_info() << std::endl; }
 
   /**
    * @returns a string containing information about the
@@ -282,7 +282,7 @@ inline
 unsigned int EquationSystems::n_systems () const
 {
   return _systems.size();
-};
+}
 
 
 
@@ -290,7 +290,7 @@ inline
 const Mesh & EquationSystems::get_mesh () const
 {
   return _mesh;
-};
+}
 
 
 
@@ -298,7 +298,7 @@ inline
 Mesh & EquationSystems::get_mesh ()
 {
   return _mesh;
-};
+}
 
 
 #endif

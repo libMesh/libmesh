@@ -1,4 +1,4 @@
-// $Id: edge_edge2.h,v 1.5 2003-01-24 17:24:37 jwpeterson Exp $
+// $Id: edge_edge2.h,v 1.6 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -54,17 +54,17 @@ class Edge2 : public Edge
   /**
    * @returns 1
    */
-  unsigned int n_sub_elem() const { return 1; };
+  unsigned int n_sub_elem() const { return 1; }
   
   /**
    * @returns \p EDGE2
    */
-  ElemType type()  const { return EDGE2; };
+  ElemType type()  const { return EDGE2; }
   
   /**
    * @returns FIRST
    */
-  Order default_order() const { return FIRST; };
+  Order default_order() const { return FIRST; }
   
   const std::vector<unsigned int> tecplot_connectivity(const unsigned int se=0) const;
   
@@ -72,7 +72,7 @@ class Edge2 : public Edge
 			std::vector<unsigned int> *conn = NULL) const;
   
   unsigned int vtk_element_type (const unsigned int) const
-  { return 3; };
+  { return 3; }
   
 #ifdef ENABLE_AMR
 
@@ -80,12 +80,12 @@ class Edge2 : public Edge
    * Refine the element.
    */
   void refine(Mesh&)
-    { error(); return; };
+    { error(); return; }
   
   /**
    * Refine the element.
    */
-  void coarsen() { error(); return; };
+  void coarsen() { error(); return; }
 
 #endif
   
@@ -99,7 +99,7 @@ inline
 Edge2::Edge2(Edge* p) :
   Edge(Edge2::n_nodes(), p) 
 {
-};
+}
 
 
 

@@ -1,4 +1,4 @@
-// "$Id: xdr_cxx.C,v 1.6 2003-02-03 03:51:50 ddreyer Exp $\n"
+// "$Id: xdr_cxx.C,v 1.7 2003-02-13 22:56:14 benkirk Exp $\n"
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -35,14 +35,14 @@ Xdr::Xdr (const std::string& name, const XdrMODE m) :
   comm_len(xdr_MAX_STRING_LENGTH)
 {
   open(name);
-};
+}
 
 
 
 Xdr::~Xdr()
 {
   close();
-};
+}
 
 
 
@@ -93,8 +93,8 @@ void Xdr::open (const std::string& name)
       
     default:
       error();
-    };  
-};
+    }  
+}
 
 
 
@@ -112,14 +112,14 @@ void Xdr::close ()
 	    xdr_destroy (xdrs);
 	    delete xdrs;
 	    xdrs = NULL;
-	  };
+	  }
 	
 	if (fp)
 	  {
 	    fflush(fp);
 	    fclose(fp);
 	    fp = NULL;
-	  };
+	  }
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
@@ -150,8 +150,8 @@ void Xdr::close ()
 
     default:
       error();
-    };
-};
+    }
+}
 
 
 
@@ -198,10 +198,10 @@ bool Xdr::is_open() const
 
     default:
       error();
-    };
+    }
 
   return false;
-};
+}
 
 
 
@@ -252,8 +252,8 @@ void Xdr::data (int& a, const char* comment)
 
     default:
       error();
-    };
-};
+    }
+}
 
 
 
@@ -304,8 +304,8 @@ void Xdr::data (unsigned int& a, const char* comment)
 
     default:
       error();
-    };
-};
+    }
+}
 
 
 
@@ -356,8 +356,8 @@ void Xdr::data (short int& a, const char* comment)
 
     default:
       error();
-    };
-};
+    }
+}
 
 
 
@@ -408,8 +408,8 @@ void Xdr::data (unsigned short int& a, const char* comment)
 
     default:
       error();
-    };
-};
+    }
+}
 
 
 
@@ -460,8 +460,8 @@ void Xdr::data (float& a, const char* comment)
 
     default:
       error();
-    };
-};
+    }
+}
 
 
 
@@ -512,8 +512,8 @@ void Xdr::data (double& a, const char* comment)
 
     default:
       error();
-    };
-};
+    }
+}
 
 
 
@@ -576,8 +576,8 @@ void Xdr::data (std::complex<float>& a, const char* comment)
 
     default:
       error();
-    };
-};
+    }
+}
 
 
 
@@ -637,8 +637,8 @@ void Xdr::data (std::complex<double>& a, const char* comment)
 
     default:
       error();
-    };
-};
+    }
+}
 
 
 #endif // USE_COMPLEX_NUMBERS
@@ -725,7 +725,7 @@ void Xdr::data (std::vector<int>& v, const char* comment)
 	  {
 	    assert(in.good());
 	    in >> v[i];
-	  };
+	  }
 
 	in.getline(comm, comm_len);
 
@@ -744,7 +744,7 @@ void Xdr::data (std::vector<int>& v, const char* comment)
 	  {
 	    assert(out.good());
 	    out << v[i] << " ";
-	  };
+	  }
 
 	out << "\t " << comment << std::endl;
 
@@ -753,8 +753,8 @@ void Xdr::data (std::vector<int>& v, const char* comment)
 
     default:
       error();
-    };
-};
+    }
+}
 
 
 
@@ -838,7 +838,7 @@ void Xdr::data (std::vector<unsigned int>& v, const char* comment)
 	  {
 	    assert(in.good());
 	    in >> v[i];
-	  };
+	  }
 
 	in.getline(comm, comm_len);
 
@@ -857,7 +857,7 @@ void Xdr::data (std::vector<unsigned int>& v, const char* comment)
 	  {
 	    assert(out.good());
 	    out << v[i] << " ";
-	  };
+	  }
 
 	out << "\t " << comment << std::endl;
 
@@ -866,8 +866,8 @@ void Xdr::data (std::vector<unsigned int>& v, const char* comment)
 
     default:
       error();
-    };
-};
+    }
+}
 
 
 
@@ -951,7 +951,7 @@ void Xdr::data (std::vector<short int>& v, const char* comment)
 	  {
 	    assert(in.good());
 	    in >> v[i];
-	  };
+	  }
 
 	in.getline(comm, comm_len);
 
@@ -970,7 +970,7 @@ void Xdr::data (std::vector<short int>& v, const char* comment)
 	  {
 	    assert(out.good());
 	    out << v[i] << " ";
-	  };
+	  }
 
 	out << "\t " << comment << std::endl;
 
@@ -979,8 +979,8 @@ void Xdr::data (std::vector<short int>& v, const char* comment)
 
     default:
       error();
-    };
-};
+    }
+}
 
 
 
@@ -1064,7 +1064,7 @@ void Xdr::data (std::vector<unsigned short int>& v, const char* comment)
 	  {
 	    assert(in.good());
 	    in >> v[i];
-	  };
+	  }
 
 	in.getline(comm, comm_len);
 
@@ -1083,7 +1083,7 @@ void Xdr::data (std::vector<unsigned short int>& v, const char* comment)
 	  {
 	    assert(out.good());
 	    out << v[i] << " ";
-	  };
+	  }
 
 	out << "\t " << comment << std::endl;
 
@@ -1092,8 +1092,8 @@ void Xdr::data (std::vector<unsigned short int>& v, const char* comment)
 
     default:
       error();
-    };
-};
+    }
+}
 
 
 
@@ -1177,7 +1177,7 @@ void Xdr::data (std::vector<float>& v, const char* comment)
 	  {
 	    assert(in.good());
 	    in >> v[i];
-	  };
+	  }
 
 	in.getline(comm, comm_len);
 
@@ -1202,7 +1202,7 @@ void Xdr::data (std::vector<float>& v, const char* comment)
 #else
 	    out << v[i] << " ";
 #endif
-	  };
+	  }
 
 	out << "\t " << comment << std::endl;
 
@@ -1211,8 +1211,8 @@ void Xdr::data (std::vector<float>& v, const char* comment)
 
     default:
       error();
-    };
-};
+    }
+}
 
 
 
@@ -1296,7 +1296,7 @@ void Xdr::data (std::vector<double>& v, const char* comment)
 	  {
 	    assert(in.good());
 	    in >> v[i];
-	  };
+	  }
 
 	in.getline(comm, comm_len);
 
@@ -1321,7 +1321,7 @@ void Xdr::data (std::vector<double>& v, const char* comment)
 #else
 	    out << v[i] << " ";
 #endif
-	  };
+	  }
 
 	out << "\t " << comment << std::endl;
 
@@ -1330,8 +1330,8 @@ void Xdr::data (std::vector<double>& v, const char* comment)
 
     default:
       error();
-    };
-};
+    }
+}
 
 
 
@@ -1341,14 +1341,14 @@ void Xdr::data (std::vector<double>& v, const char* comment)
 void Xdr::data (std::vector< std::complex<float> >&, const char*)
 {
   error();
-};
+}
 
 
 
 void Xdr::data (std::vector< std::complex<double> >&, const char*)
 {
   error();
-};
+}
 
 // endif for USE_COMPLEX_NUMBERS
 #endif
@@ -1379,7 +1379,7 @@ void Xdr::data (std::string& s, const char* comment)
 		     strlen(sptr));
 
 	  delete [] sptr;
-	};
+	}
 
 #else
 	
@@ -1414,7 +1414,7 @@ void Xdr::data (std::string& s, const char* comment)
 	    s[c] = sptr[c];
 	  
 	  delete [] sptr;  
-	};
+	}
 
 #else
 	
@@ -1448,7 +1448,7 @@ void Xdr::data (std::string& s, const char* comment)
 	      break;
 	    
 	    s.push_back(comm[c]);
-	  };
+	  }
 
 	return;	
       }
@@ -1464,8 +1464,8 @@ void Xdr::data (std::string& s, const char* comment)
 
     default:
       error();
-    };
-};
+    }
+}
 
 
 

@@ -1,4 +1,4 @@
-// $Id: fe_interface_inf_fe.C,v 1.2 2003-02-06 17:13:37 benkirk Exp $
+// $Id: fe_interface_inf_fe.C,v 1.3 2003-02-13 22:56:09 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -60,12 +60,12 @@ unsigned int FEInterface::ifem_n_shape_functions(const unsigned int dim,
 
     default:
       error();
-    };
+    }
 
   
   error();
   return 0;
-};
+}
 
 
 
@@ -96,12 +96,12 @@ unsigned int FEInterface::ifem_n_dofs(const unsigned int dim,
 
     default:
       error();
-    };
+    }
 
   
   error();
   return 0;
-};
+}
 
 		
 
@@ -132,12 +132,12 @@ unsigned int FEInterface::ifem_n_dofs_at_node(const unsigned int dim,
 
     default:
       error();
-    };
+    }
 
   
   error();
   return 0;
-};
+}
 
 
 
@@ -168,12 +168,12 @@ unsigned int FEInterface::ifem_n_dofs_per_elem(const unsigned int dim,
 
     default:
       error();
-    };
+    }
 
   
   error();
   return 0;
-};
+}
 
 
 
@@ -188,7 +188,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int,
 	    << "applicable to infinite elements!" << std::endl;	
   error();
   return;
-};
+}
 
 
 
@@ -215,7 +215,7 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
 	      std::cerr << "ERROR: Spherical and Ellipsoidal IFEMs not (yet) " << std::endl
 			<< "implemented." << std::endl;
 	      error();
-	    };
+	    }
 
 /*
 	  case SPHERICAL:
@@ -227,8 +227,8 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 
       
       // 2D
@@ -245,7 +245,7 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
 	      std::cerr << "ERROR: Spherical and Ellipsoidal IFEMs not (yet) " << std::endl
 			<< "implemented." << std::endl;
 	      error();
-	    };
+	    }
 
 /*
 	  case SPHERICAL:
@@ -257,9 +257,9 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
 
 	  default:
 	    error();
-	  };
+	  }
 
-      };
+      }
 
       
       // 3D
@@ -276,7 +276,7 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
 	      std::cerr << "ERROR: Spherical and Ellipsoidal IFEMs not (yet) " << std::endl
 			<< "implemented." << std::endl;
 	      error();
-	    };
+	    }
 
 /*
 	  case SPHERICAL:
@@ -288,20 +288,20 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
 
 	  default:
 	    error();
-	  };
+	  }
 
-      };
+      }
 
 
     default:
       error();
-    };
+    }
 
   
   error();
   Point pt;
   return pt;
-};
+}
 
 
 
@@ -310,7 +310,7 @@ bool FEInterface::ifem_on_reference_element(const Point& p,
 					    const Real eps)
 {
   return FEBase::on_reference_element(p,t,eps);
-};
+}
 
 
 
@@ -350,8 +350,8 @@ Real FEInterface::ifem_shape(const unsigned int dim,
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 
       
       // 2D
@@ -376,9 +376,9 @@ Real FEInterface::ifem_shape(const unsigned int dim,
 
 	  default:
 	    error();
-	  };
+	  }
 
-      };
+      }
 
       
       // 3D
@@ -403,19 +403,19 @@ Real FEInterface::ifem_shape(const unsigned int dim,
 
 	  default:
 	    error();
-	  };
+	  }
 
-      };
+      }
 
 
     default:
       error();
-    };
+    }
 
   
   error();
   return 0.;
-};
+}
 
 
 
@@ -455,8 +455,8 @@ Real FEInterface::ifem_shape(const unsigned int dim,
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 
 
       // 2D
@@ -481,9 +481,9 @@ Real FEInterface::ifem_shape(const unsigned int dim,
 
 	  default:
 	    error();
-	  };
+	  }
 
-      };
+      }
 
             
       // 3D
@@ -508,19 +508,19 @@ Real FEInterface::ifem_shape(const unsigned int dim,
 
 	  default:
 	    error();
-	  };
+	  }
 
-      };
+      }
 
 
     default:
       error();
-    };
+    }
 
   
   error();
   return 0.;
-};
+}
 
 
 

@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.11 2003-02-11 00:58:21 benkirk Exp $
+// $Id: boundary_info.C,v 1.12 2003-02-13 22:56:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -42,14 +42,14 @@ BoundaryInfo::BoundaryInfo(unsigned int d,
   dim(d),
   mesh(m)
 {
-};
+}
 
 
 
 BoundaryInfo::~BoundaryInfo()
 {
   clear();
-};
+}
 
 
 
@@ -67,7 +67,7 @@ void BoundaryInfo::clear()
   elem_id_list.clear();
 
   boundary_mesh.clear();
-};
+}
 
 
 
@@ -152,7 +152,7 @@ void BoundaryInfo::sync()
   // 		  elem->subdomain_id() = id_map[invalid_id];
   // 		}
   // 	    }
-  //   };
+  //   }
 
 
   
@@ -171,8 +171,8 @@ void BoundaryInfo::sync()
   // 	      next_node_number++;
 	    
   // 	    boundary_mesh.add_point(mesh.point(node_number));
-  // 	  };
-  //       };
+  // 	  }
+  //       }
 
   
 
@@ -183,8 +183,8 @@ void BoundaryInfo::sync()
   // 	const unsigned int old_number = boundary_mesh.elem(e)->node(n); 
 	    
   // 	boundary_mesh.elem(e)->node(n) = new_node_numbers[old_number];
-  //       };
-};
+  //       }
+}
 
 
 
@@ -207,7 +207,7 @@ void BoundaryInfo::add_node(const unsigned int node,
 
   node_list.push_back(node);
   node_id_list.push_back(id);
-};
+}
 
 
 
@@ -221,7 +221,7 @@ void BoundaryInfo::add_side(const unsigned int e,
   elem_id_list.push_back(id);
 
   add_side (mesh.elem(e), side, id);
-};
+}
 
 
 
@@ -260,10 +260,10 @@ void BoundaryInfo::add_side(const Elem* elem,
     for (unsigned int n=0; n<side_elem->n_nodes(); n++)
       if (boundary_id(side_elem->node(n)) == invalid_id)
  	add_node(side_elem->node(n), id);
-  };
+  }
 #endif
   
-};
+}
 
 
 
@@ -275,7 +275,7 @@ void BoundaryInfo::read_shanee_boundary (const std::string& name)
   read_shanee_boundary(in);
 
   return;
-};
+}
 
 
 
@@ -290,7 +290,7 @@ short int BoundaryInfo::boundary_id(const unsigned int node) const
     return invalid_id;
 
   return n->second;
-};
+}
 
 
 
@@ -298,7 +298,7 @@ short int BoundaryInfo::boundary_id(const unsigned int e,
 				    const unsigned short int side) const
 {
   return boundary_id(mesh.elem(e), side);
-};
+}
 
 
 
@@ -324,12 +324,12 @@ short int BoundaryInfo::boundary_id(const Elem* elem,
 	return e.first->second.second;
 
       ++e.first;
-    };
+    }
 
   // if we get here, we found elem in the data structure but not
   // the requested side, so return the default value
   return invalid_id;  
-};
+}
 
 
 
@@ -362,7 +362,7 @@ void BoundaryInfo::read_shanee_boundary(std::istream& in)
       
       add_node(n0, static_cast<short int>(id));      
     }    
-};
+}
 
 
 
@@ -372,7 +372,7 @@ void BoundaryInfo::add_boundary_values(const unsigned int node,
 {
   add_node(node, id);
   boundary_values.push_back(std::make_pair(node, values));
-};
+}
 
 
 std::vector<Real> BoundaryInfo::get_boundary_values(const unsigned int node) const
@@ -386,7 +386,7 @@ std::vector<Real> BoundaryInfo::get_boundary_values(const unsigned int node) con
 	{
 	  return pos->second;
 	}
-    };
+    }
 
   std::cerr << "ERROR: No boundary values are specified for Node: "
 	    << node << std::endl;
@@ -394,7 +394,7 @@ std::vector<Real> BoundaryInfo::get_boundary_values(const unsigned int node) con
   error();
   std::vector<Real> v;
   return v;
-};
+}
 
 
 void BoundaryInfo::print_info() const
@@ -419,7 +419,7 @@ void BoundaryInfo::print_info() const
       std::for_each(boundary_node_id.begin(),
 		    boundary_node_id.end(),
 		    PrintNodeInfo());
-    };
+    }
 
   // Print out the element BCs
   if (!boundary_side_id.empty())
@@ -450,9 +450,9 @@ void BoundaryInfo::print_info() const
   		    PrintSideInfo(elem_star_to_num));
 
       
-    };
+    }
   
-};
+}
 
 
 

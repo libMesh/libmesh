@@ -1,4 +1,4 @@
-// $Id: boundary_mesh.C,v 1.4 2003-01-24 17:24:43 jwpeterson Exp $
+// $Id: boundary_mesh.C,v 1.5 2003-02-13 22:56:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -32,14 +32,14 @@ BoundaryMesh::BoundaryMesh(unsigned int d,
 			   unsigned int pid) :
   MeshBase(d, pid)
 {
-};
+}
 
 
 
 BoundaryMesh::~BoundaryMesh()
 {
   MeshBase::clear();
-};
+}
 
 
 

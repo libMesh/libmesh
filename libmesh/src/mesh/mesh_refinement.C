@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.6 2003-02-06 23:02:56 benkirk Exp $
+// $Id: mesh_refinement.C,v 1.7 2003-02-13 22:56:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -35,14 +35,14 @@
 MeshRefinement::MeshRefinement (Mesh& m) :
   mesh(m)
 {
-};
+}
 
 
 
 MeshRefinement::~MeshRefinement ()
 {
   clear();  
-};
+}
 
 
 
@@ -50,7 +50,7 @@ void MeshRefinement::clear ()
 {
   new_nodes.clear();
   unused_elements.clear();
-};
+}
 
 
 
@@ -79,9 +79,9 @@ Node* MeshRefinement::add_point(const Point& p)
 	  n = pos.first->second;
 	  
 	  break;
-	};
+	}
       ++pos.first;
-    };
+    }
   
   if (pos.first == pos.second) // still not found
     {                          // so we better add it
@@ -89,12 +89,12 @@ Node* MeshRefinement::add_point(const Point& p)
       
       new_nodes.insert(pos.first,
 		       std::pair<unsigned int, unsigned int>(p.key(),n));
-    };
+    }
     
   
   // Return the address of the new node
   return mesh.add_point(p,n);
-};
+}
 
 
 
@@ -108,10 +108,10 @@ unsigned int MeshRefinement::new_element_number()
     {
       n = *unused_elements.begin();
       unused_elements.erase(unused_elements.begin());
-    };
+    }
 
   return n;
-};
+}
 
 
 
@@ -128,7 +128,7 @@ void MeshRefinement::update_unused_database()
   for (unsigned int e=0; e<mesh.n_elem(); e++)
     if (mesh.elem(e) == NULL)
       unused_elements.insert(e);
-};
+}
 
 
 
@@ -188,13 +188,13 @@ void MeshRefinement::refine_and_coarsen_elements ()
     {
       assert (mesh.elem(e) != NULL);
       mesh.elem(e)->set_refinement_flag() = Elem::DO_NOTHING;
-    };
+    }
   
   /**
    * Finally, the new elements need to find their neighbors
    */
   mesh.find_neighbors();  
-};
+}
 
 
 
@@ -226,7 +226,7 @@ bool MeshRefinement::make_coarsening_compatible()
 	  (mesh.elem(e)->level() == 0) &&
 	  (mesh.elem(e)->refinement_flag() == Elem::COARSEN))
 	mesh.elem(e)->set_refinement_flag() = Elem::DO_NOTHING;
-    };
+    }
   
   // if there are no refined elements then
   // there is no work for us to do
@@ -333,10 +333,10 @@ bool MeshRefinement::make_coarsening_compatible()
 	
 	if (all_children_flagged_for_coarsening)
 	  mesh.elem(e)->set_refinement_flag() = Elem::COARSEN;
-      };
+      }
 	
   return compatible_with_refinement;
-};
+}
 
 
 
@@ -438,7 +438,7 @@ bool MeshRefinement::make_refinement_compatible()
 
   
   return compatible_with_coarsening;
-};
+}
 
 
 
@@ -473,7 +473,7 @@ void MeshRefinement::coarsen_elements ()
 	    assert (mesh.elem(e)->active());
 	  }
       }
-};
+}
 
 
 
@@ -485,7 +485,7 @@ void MeshRefinement::refine_elements ()
     if (mesh.elem(e) != NULL) // could be if deleted
       if (mesh.elem(e)->refinement_flag() == Elem::REFINE)
 	mesh.elem(e)->refine(mesh);
-};
+}
 
 
 
@@ -500,8 +500,8 @@ void MeshRefinement::uniformly_refine (unsigned int n)
       refine_elements();
       
       mesh.find_neighbors();
-    };
-};
+    }
+}
 
 
 #endif

@@ -1,4 +1,4 @@
-// $Id: statistics.h,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: statistics.h,v 1.7 2003-02-13 22:56:08 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -78,7 +78,7 @@ class StatisticsVector : public std::vector<T>
   /**
    * Call the std::vector constructor.
    */
-  StatisticsVector(unsigned int i=0) { this->resize(i); };
+  StatisticsVector(unsigned int i=0) { this->resize(i); }
   
   /**
    * Returns the mean value of the

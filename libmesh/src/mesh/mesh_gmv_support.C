@@ -1,4 +1,4 @@
-// $Id: mesh_gmv_support.C,v 1.7 2003-02-07 16:18:56 spetersen Exp $
+// $Id: mesh_gmv_support.C,v 1.8 2003-02-13 22:56:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -50,7 +50,7 @@ void MeshBase::write_gmv (const std::string& name,
   std::ofstream out(name.c_str());
 
   write_gmv (out, es, write_partitioning);
-};
+}
 
 
 
@@ -66,7 +66,7 @@ void MeshBase::write_gmv (std::ostream& out,
 
   if (processor_id() == 0)
     write_gmv (out, &soln, &names, write_partitioning);
-};
+}
 
 
 
@@ -78,7 +78,7 @@ void MeshBase::write_gmv (const std::string& name,
   std::ofstream out(name.c_str());
 
   write_gmv (out, v, solution_names, write_partitioning);
-};
+}
 
 
 
@@ -110,7 +110,7 @@ void MeshBase::write_gmv(std::ostream& out,
       out << point(v)(2) << " ";
      
     out << std::endl << std::endl;
-  };
+  }
 
 
   
@@ -133,10 +133,10 @@ void MeshBase::write_gmv(std::ostream& out,
 		    out << conn[i] << " ";
 		
 		  out << std::endl;
-		};
+		}
 	  
 	  break;
-	};
+	}
 	
       case 2:
 	{
@@ -172,10 +172,10 @@ void MeshBase::write_gmv(std::ostream& out,
 		    }
 			 
 		  out << std::endl;
-		};
+		}
 	
 	  break;
-	};
+	}
 	
 	
       case 3:
@@ -241,17 +241,17 @@ void MeshBase::write_gmv(std::ostream& out,
 		    }
 		  
 		  out << std::endl;
-		};
+		}
 
 	  break;
-	};
+	}
       
       default:
 	error();
-      };
+      }
     
     out << std::endl;
-  };
+  }
 
 
   
@@ -271,7 +271,7 @@ void MeshBase::write_gmv(std::ostream& out,
 	    out << elem(e)->subdomain_id()+1 << std::endl;
 
       out << std::endl;
-    };
+    }
 
 
   
@@ -330,15 +330,15 @@ void MeshBase::write_gmv(std::ostream& out,
 
 #endif
 
-	};
+	}
       
       out << "endvars" << std::endl;
-    };
+    }
 
   
   // end of the file
   out << std::endl << "endgmv" << std::endl;
-};
+}
 
 
 
@@ -350,7 +350,7 @@ void MeshBase::write_gmv_binary (const std::string& name,
   std::ofstream out(name.c_str());
 
   write_gmv_binary (out, es, write_partitioning);
-};
+}
 
 
 
@@ -366,7 +366,7 @@ void MeshBase::write_gmv_binary (std::ostream& out,
   
   if (processor_id() == 0)
     write_gmv_binary (out, &soln, &names, write_partitioning);
-};
+}
 
 
 
@@ -378,7 +378,7 @@ void MeshBase::write_gmv_binary (const std::string& name,
   std::ofstream out (name.c_str(), std::ios::out|std::ios::binary);
   
   write_gmv_binary (out, v, solution_names, write_partitioning);
-};
+}
 
 
 
@@ -401,7 +401,7 @@ void MeshBase::write_gmv_binary(std::ostream& out,
     strcpy(buf, "ieeei4r4");
     out.write(buf, strlen(buf));
 
-  };
+  }
 
 
   
@@ -431,7 +431,7 @@ void MeshBase::write_gmv_binary(std::ostream& out,
     out.write(reinterpret_cast<char *>(temp), sizeof(float)*n_nodes());
 
     delete [] temp;
-  };
+  }
 
 
   
@@ -465,7 +465,7 @@ void MeshBase::write_gmv_binary(std::ostream& out,
 		std::vector<unsigned int> conn = elem(e)->tecplot_connectivity(se);
 		
 		out.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
-	      };
+	      }
 	
 	break;
 	
@@ -485,7 +485,7 @@ void MeshBase::write_gmv_binary(std::ostream& out,
 		std::vector<unsigned int> conn = elem(e)->tecplot_connectivity(se);
 		
 		out.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
-	      };
+	      }
 	
 	break;
 	
@@ -505,15 +505,15 @@ void MeshBase::write_gmv_binary(std::ostream& out,
 		std::vector<unsigned int> conn = elem(e)->tecplot_connectivity(se);
 		
 		out.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
-	      };
+	      }
 	
 	break;
 	
       default:
 	error();
 	
-      };
-  };
+      }
+  }
   
   
   
@@ -536,7 +536,7 @@ void MeshBase::write_gmv_binary(std::ostream& out,
 	{
 	  sprintf(buf, "sbd_%d", sbd);
 	  out.write(buf, 8);
-	};
+	}
 
       unsigned int* sbd_id = new unsigned int[n_active_sub_elem()];
       
@@ -551,7 +551,7 @@ void MeshBase::write_gmv_binary(std::ostream& out,
       out.write(reinterpret_cast<char *>(sbd_id), sizeof(unsigned int)*n_active_sub_elem());
 
       delete [] sbd_id;
-    };
+    }
 
 
   
@@ -623,19 +623,19 @@ void MeshBase::write_gmv_binary(std::ostream& out,
 #endif
 
 	  
-	};
+	}
     
       delete [] temp;
       
       strcpy(buf, "endvars ");
       out.write(buf, strlen(buf));
 
-    };
+    }
 
   // end the file
   strcpy(buf, "endgmv  ");
   out.write(buf, strlen(buf));
-};
+}
 
 
 

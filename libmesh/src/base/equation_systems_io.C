@@ -1,4 +1,4 @@
-// $Id: equation_systems_io.C,v 1.12 2003-02-13 01:49:49 benkirk Exp $
+// $Id: equation_systems_io.C,v 1.13 2003-02-13 22:56:08 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -199,8 +199,8 @@ void EquationSystems::read(const std::string& name,
 
 
 
-	};
-    };
+	}
+    }
       
   /**
    * Now we are ready to initialize the underlying data
@@ -254,7 +254,7 @@ void EquationSystems::read(const std::string& name,
 		  
 		  reordered_soln[_mesh.node(node).dof_number(var, index)] =
 		    global_soln[cnt++]; 
-		};
+		}
 
 	    // Then reorder the element DOF values
 	    for (unsigned int elem=0; elem<n_elem; elem++)
@@ -268,12 +268,12 @@ void EquationSystems::read(const std::string& name,
 		  
 		  reordered_soln[_mesh.elem(elem)->dof_number(var, index)] =
 		    global_soln[cnt++]; 
-		};
-	  };
+		}
+	  }
 	    
 	*(system.solution) = reordered_soln;
-      };
-};
+      }
+}
 
 
 
@@ -488,12 +488,12 @@ void EquationSystems::write(const std::string& name,
 #endif
 
 
-	    };
+	    }
 
 	  ++pos;
 	  ++sys_num;
-	};      
-    };
+	}      
+    }
 
   pos     = _systems.begin();
   sys_num = 0;
@@ -554,7 +554,7 @@ void EquationSystems::write(const std::string& name,
 		      
 		      reordered_soln[cnt++] = 
 			global_soln[_mesh.node(node).dof_number(var, index)];
-		    };
+		    }
 
 		// Then write the element DOF values
 		for (unsigned int elem=0; elem<n_elem; elem++)
@@ -568,8 +568,8 @@ void EquationSystems::write(const std::string& name,
 			
 			reordered_soln[cnt++] = 
 			  global_soln[_mesh.elem(elem)->dof_number(var, index)];
-		      };
-	      };
+		      }
+	      }
 	    
 	    /**
 	     * 7.)
@@ -587,9 +587,9 @@ void EquationSystems::write(const std::string& name,
 	    }
 
 	    io.data (reordered_soln, comment.c_str());	  
-	  };
+	  }
 
 	++pos;
 	++sys_num;
-      };
-};
+      }
+}

@@ -1,4 +1,4 @@
-// $Id: laspack_matrix.C,v 1.4 2003-02-11 00:08:48 benkirk Exp $
+// $Id: laspack_matrix.C,v 1.5 2003-02-13 22:56:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -62,7 +62,7 @@ void LaspackMatrix::update_sparsity_pattern (std::vector<std::set<unsigned int> 
       }
     
     _csr.resize(size);
-  };
+  }
 
 
   // Initize the _csr data structure.
@@ -86,11 +86,11 @@ void LaspackMatrix::update_sparsity_pattern (std::vector<std::set<unsigned int> 
 	for (std::set<unsigned int>::const_iterator it =
 	       sparsity_row.begin(); it != it_end; ++it)
 	  _csr[pos++] = *it;
-      };
+      }
     
     // make sure that _row_start is set up properly
     assert (pos == _row_start[n_rows]);
-  };
+  }
 
 
   // Initialize the matrix
@@ -126,12 +126,12 @@ void LaspackMatrix::update_sparsity_pattern (std::vector<std::set<unsigned int> 
 	  //          << std::endl;	  
 	  assert (pos(i,j) == l);
 	  Laspack::Q_SetEntry (&_QMat, i+1, l, j+1, 0.);
-	};
-    };
+	}
+    }
   
   // That's it!
   //here();
-};
+}
 
 
 
@@ -154,7 +154,7 @@ void LaspackMatrix::init (const unsigned int m,
   error();
 
   _is_initialized = true;
-};
+}
 
 
 
@@ -196,7 +196,7 @@ void LaspackMatrix::init ()
   _is_initialized = true;
   
   assert (m == this->m());
-};
+}
 
 
 

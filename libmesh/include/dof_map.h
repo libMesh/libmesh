@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.9 2003-02-13 01:49:48 benkirk Exp $
+// $Id: dof_map.h,v 1.10 2003-02-13 22:56:06 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -109,7 +109,7 @@ class DofMap
    * information can be used for gathers at each solution step to retrieve
    * solution values needed for computation.
    */
-  const std::vector<unsigned int>& get_send_list() const { return _send_list; };
+  const std::vector<unsigned int>& get_send_list() const { return _send_list; }
   
   /**
    * Returns a constant reference to the \p _n_nz list for this processor.
@@ -117,7 +117,7 @@ class DofMap
    * row of the global matrix that the current processor owns.  This
    * information can be used to preallocate space for a parallel sparse matrix.
    */
-  const std::vector<unsigned int>& get_n_nz() const { return _n_nz; };
+  const std::vector<unsigned int>& get_n_nz() const { return _n_nz; }
   
   /**
    * Returns a constant reference to the \p _n_oz list for this processor.
@@ -125,26 +125,26 @@ class DofMap
    * row of the global matrix that the current processor owns.  This
    * information can be used to preallocate space for a parallel sparse matrix.
    */
-  const std::vector<unsigned int>& get_n_oz() const { return _n_oz; };
+  const std::vector<unsigned int>& get_n_oz() const { return _n_oz; }
 
   /**
    * Add an unknown of order \p order and finite element type
    * \p type to the system of equations.
    */
   void add_component (const FEType& type)
-  { _component_types.push_back (type); };
+  { _component_types.push_back (type); }
   
   /**
    * @returns the approximation order for component \p c.
    */
   Order component_order (const unsigned int c) const
-  { return _component_types[c].order; };
+  { return _component_types[c].order; }
   
   /**
    * @returns the finite element type for component \p c.
    */
   const FEType& component_type (const unsigned int c) const
-  { return _component_types[c]; };
+  { return _component_types[c]; }
   
   /**
    * Returns the number of components in the global solution vector. Defaults
@@ -152,30 +152,30 @@ class DofMap
    * Stokes (u,v,p), etc...
    */  
   unsigned int n_components() const
-  { return _component_types.size(); };
+  { return _component_types.size(); }
 
   /**
    * @returns the total number of degrees of freedom in the problem.
    */
-  unsigned int n_dofs() const { return _n_dfs; };
+  unsigned int n_dofs() const { return _n_dfs; }
   
   /**
    * Returns the number of degrees of freedom on subdomain \p proc.
    */
   unsigned int n_dofs_on_processor(const unsigned int proc) const
-  { assert(proc < _first_df.size()); return (_last_df[proc] - _first_df[proc]+1); };
+  { assert(proc < _first_df.size()); return (_last_df[proc] - _first_df[proc]+1); }
 
   /**
    * Returns the first dof index that is local to subdomain \p proc.
    */
   unsigned int first_dof(unsigned int proc) const
-  { assert(proc < _first_df.size()); return _first_df[proc]; };
+  { assert(proc < _first_df.size()); return _first_df[proc]; }
   
   /**
    * Returns the last dof index that is local to subdomain \p proc.
    */
   unsigned int last_dof(unsigned int proc) const
-  { assert(proc < _last_df.size()); return _last_df[proc]; };  
+  { assert(proc < _last_df.size()); return _last_df[proc]; }  
 
 
 #ifdef ENABLE_AMR
@@ -184,7 +184,7 @@ class DofMap
    * @returns the total number of constrained degrees of freedom
    * in the problem.
    */
-  unsigned int n_constrained_dofs() const { return _dof_constraints.size(); };
+  unsigned int n_constrained_dofs() const { return _dof_constraints.size(); }
 
 #endif
 
@@ -402,7 +402,7 @@ bool DofMap::is_constrained_dof (const unsigned int dof) const
     return true;
 
   return false;
-};
+}
 
 #endif
 

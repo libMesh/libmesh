@@ -1,4 +1,4 @@
-// $Id: edge.h,v 1.5 2003-01-24 17:24:37 jwpeterson Exp $
+// $Id: edge.h,v 1.6 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -53,49 +53,49 @@ class Edge : public Elem
   /**
    * @returns 1, the dimensionality of the object.
    */
-  unsigned int dim () const { return 1; };
+  unsigned int dim () const { return 1; }
   
   /**
    * @returns 2. Every edge is guaranteed to have at least 2 nodes.
    */
-  unsigned int n_nodes() const { return 2; };
+  unsigned int n_nodes() const { return 2; }
 
   /**
    * @returns 2
    */
-  unsigned int n_sides() const { return 2; };
+  unsigned int n_sides() const { return 2; }
 
   /**
    * @returns 2.  Every edge has exactly two vertices.
    */
-  unsigned int n_vertices() const { return 2; };
+  unsigned int n_vertices() const { return 2; }
   
   /**
    * @returns 0.  All 1D elements have no edges.
    */  
-  unsigned int n_edges() const { return 0; };
+  unsigned int n_edges() const { return 0; }
   
   /**
    * @returns 0.  All 1D elements have no faces.
    */  
-  unsigned int n_faces() const { return 0; };
+  unsigned int n_faces() const { return 0; }
   
   /**
    * @returns 2
    */
-  unsigned int n_children() const { return 2; };
+  unsigned int n_children() const { return 2; }
 
   /**
    * The \p Elem::side() member makes no sense for edges.
    */
   AutoPtr<Elem> side (const unsigned int) const
-  { error(); AutoPtr<Elem> ap(NULL); return ap; };
+  { error(); AutoPtr<Elem> ap(NULL); return ap; }
 
   /**
    * The \p Elem::build_side() member makes no sense for edges.
    */
   AutoPtr<Elem> build_side (const unsigned int) const
-  { error(); AutoPtr<Elem> ap(NULL); return ap; };
+  { error(); AutoPtr<Elem> ap(NULL); return ap; }
   
  private:
   
@@ -111,7 +111,7 @@ inline
 Edge::Edge(const unsigned int nn, Edge* p) :
   Elem(nn, Edge::n_sides(), p) 
 {
-};
+}
 
 
 

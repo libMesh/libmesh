@@ -1,4 +1,4 @@
-// "$Id: xdrIO.C,v 1.5 2003-01-24 17:24:46 jwpeterson Exp $\n"
+// "$Id: xdrIO.C,v 1.6 2003-02-13 22:56:14 benkirk Exp $\n"
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -37,7 +37,7 @@
 XdrIO::~XdrIO()
 {
   fini();
-};
+}
 
 
 
@@ -67,7 +67,7 @@ void XdrIO::fini()
     }
 
   mp_fp = 0;
-};
+}
 
 
 
@@ -75,7 +75,7 @@ const Originator XdrIO::get_originator()
 {
   const Originator orig("DEAL", 3, 3);
   return orig;
-};
+}
 
 
 
@@ -223,7 +223,7 @@ void XdrIO::init(XdrIO::XdrIO_TYPE t, const char* fn, const char*, int)
 
 
   
-};
+}
 
 
 
@@ -282,7 +282,7 @@ int XdrIO::dataBlk(int* array, int numvar, int size)
     }
 
   return totalSize;
-};
+}
 
 
 
@@ -358,7 +358,7 @@ int XdrIO::dataBlk(REAL* array, int numvar, int size)
     }
       
   return totalSize;
-};
+}
 
 
 
@@ -612,7 +612,7 @@ int XdrMESH::header(XdrMHEAD *hd)
     }
   
   return 1;
-};
+}
 
 
 
@@ -699,7 +699,7 @@ int XdrSOLN::header(XdrSHEAD *hd)
 	delete [] tempTitle;
 
 	return 0;
-      };
+      }
 #endif
 
 
@@ -742,11 +742,11 @@ int XdrSOLN::header(XdrSHEAD *hd)
 	  hd->setVarTitle(titles, c);
 
 	  delete [] titles;
-	};
+	}
 
 	
 	return 0;
-      };
+      }
 
       
     case (XdrIO::W_ASCII):
@@ -774,7 +774,7 @@ int XdrSOLN::header(XdrSHEAD *hd)
 	m_wrtVar = hd->m_wrtVar;
 
 	return 0;
-      };
+      }
 
 
       
@@ -782,10 +782,10 @@ int XdrSOLN::header(XdrSHEAD *hd)
       // Unknown access type
       error();
 
-    };
+    }
   
   return 1;
-};
+}
 
 
 
@@ -808,7 +808,7 @@ XdrHEAD::XdrHEAD()
   mp_varTitle = 0;
   
   m_time = 0;
-};
+}
 
 
 
@@ -818,7 +818,7 @@ XdrHEAD::~XdrHEAD()
   delete [] mp_title;
   delete [] mp_userTitle;
   delete [] mp_varTitle; 
-};
+}
 
 
 
@@ -828,6 +828,6 @@ char* XdrHEAD::cpyString(const char* src, int len)
     len = strlen(src)+1;
   char* temp = new char[len];
   return (char *) memcpy(temp, (char *) src, (len)*sizeof(char));
-};
+}
 
 #undef xdr_REAL

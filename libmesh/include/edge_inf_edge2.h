@@ -1,4 +1,4 @@
-// $Id: edge_inf_edge2.h,v 1.5 2003-01-24 17:24:38 jwpeterson Exp $
+// $Id: edge_inf_edge2.h,v 1.6 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -54,26 +54,26 @@ class InfEdge2 : public Edge
   /**
    * @returns 1
    */
-  unsigned int n_sub_elem() const { return 1; };
+  unsigned int n_sub_elem() const { return 1; }
   
   /**
    * @returns \p INFEDGE2
    */
-  ElemType type()  const { return INFEDGE2; };
+  ElemType type()  const { return INFEDGE2; }
   
   /**
    * @returns FIRST
    */
-  Order default_order() const { return FIRST; };
+  Order default_order() const { return FIRST; }
   
   const std::vector<unsigned int> tecplot_connectivity(const unsigned int se=0) const;
   
   void vtk_connectivity(const unsigned int,
 			std::vector<unsigned int>*) const
-  { error(); };
+  { error(); }
   
   unsigned int vtk_element_type (const unsigned int) const
-  { return 3; };
+  { return 3; }
   
 #ifdef ENABLE_AMR
 
@@ -81,12 +81,12 @@ class InfEdge2 : public Edge
    * Refine the element.
    */
   void refine(Mesh&)
-    { error(); return; };
+    { error(); return; }
   
   /**
    * Refine the element.
    */
-  void coarsen() { error(); return; };
+  void coarsen() { error(); return; }
 
 #endif
   
@@ -103,7 +103,7 @@ inline
 InfEdge2::InfEdge2(Edge* p) :
   Edge(InfEdge2::n_nodes(), p) 
 {
-};
+}
 
 #endif
 

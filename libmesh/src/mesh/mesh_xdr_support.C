@@ -1,4 +1,4 @@
-// $Id: mesh_xdr_support.C,v 1.7 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: mesh_xdr_support.C,v 1.8 2003-02-13 22:56:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -142,11 +142,11 @@ void XdrInterface::mesh_interface(const std::string& name,
 
 	    neeb.resize(n_blocks);
 	    neeb     = mh->get_num_elem_each_block();
-	  };
+	  }
 	  
 	
 	break;
-      };
+      }
       
     case (XdrIO::W_ASCII):
     case (XdrIO::ENCODE):
@@ -186,14 +186,14 @@ void XdrInterface::mesh_interface(const std::string& name,
 	 */
 	m.header(mh); // Needs to work for both types of file
 	break;
-      };
+      }
       
     default:
       {
 	// Shouldn't have gotten here.
 	error();
-      };
-    };
+      }
+    }
 
   
   /**
@@ -213,7 +213,7 @@ void XdrInterface::mesh_interface(const std::string& name,
     {
       nodes.resize(numNodes);
       elements.resize(numElem);
-    };
+    }
 
   
   
@@ -263,10 +263,10 @@ void XdrInterface::mesh_interface(const std::string& name,
 	  {
 	    // I don't know what type of mesh it is.
 	    error();
-	  };
+	  }
 	
 	break;
-      };
+      }
 
     case (XdrIO::ENCODE):
     case (XdrIO::W_ASCII):
@@ -289,22 +289,22 @@ void XdrInterface::mesh_interface(const std::string& name,
 		    conn[lastConnIndex + n] = mesh.elem(e)->node(n);
 		  
 		  lastConnIndex += nn;
-		};
+		}
 	    
 	    // Send conn to the XDR file
 	    m.Icon(&conn[0], nn, lastConnIndex/nn);
-	  };
+	  }
 	
 	break;
-      };
+      }
 
     default:
       {
 	// How'd we get here? We have to be either
 	// reading or writing.
 	error();
-      };
-    };
+      }
+    }
     
   /**
    * If we are reading,
@@ -336,7 +336,7 @@ void XdrInterface::mesh_interface(const std::string& name,
 				      innd);
 	  
 	  break;
-	};
+	}
 	
       case (XdrIO::W_ASCII):
       case (XdrIO::ENCODE):
@@ -352,27 +352,27 @@ void XdrInterface::mesh_interface(const std::string& name,
 	      coords[lastIndex+2] = p(2);
 	      
 	      lastIndex += 3;
-	    };
+	    }
 	  
 	  // Put the nodes in the XDR file
 	  m.coord(&coords[0], mesh.spatial_dimension(), mesh.n_nodes()); 
 	  break;
-	};
+	}
 	
       default:
 	{
 	  // How'd we get here? We have to be either
 	  // reading or writing.
 	  error();
-	};
-      };
+	}
+      }
     
     /**
      * Free memory used in
      * the coords vector.
      */
     coords.clear();
-  };
+  }
 
   
   /**
@@ -408,9 +408,9 @@ void XdrInterface::mesh_interface(const std::string& name,
 		      elements[e]->set_node(innd) = nodes[conn[innd+lastConnIndex]];
 		    
 		    lastConnIndex += mesh.elem(e)->n_nodes();
-		  };
+		  }
 		lastFaceIndex += neeb[idx];
-	      };
+	      }
 	  }
   
 	else if (orig_type == 1) // MGF-style (1) Hex27 mesh
@@ -420,9 +420,9 @@ void XdrInterface::mesh_interface(const std::string& name,
 		elements[ielm] = new Hex27;
 		for (int innd=0; innd < 27; ++innd)
 		  elements[ielm]->set_node(innd) = nodes[conn[innd+2+(27+2)*ielm]];	
-	      };
-	  };
-      };
+	      }
+	  }
+      }
   
     /**
      * Free memory used in
@@ -430,7 +430,7 @@ void XdrInterface::mesh_interface(const std::string& name,
      * vector.
      */
     conn.clear();
-  };
+  }
 
 
   /**
@@ -456,7 +456,7 @@ void XdrInterface::mesh_interface(const std::string& name,
 	  boundary_info.add_side(bcs[0+ibc*3], bcs[1+ibc*3], bcs[2+ibc*3]);
 	  
 	break;
-      };
+      }
 
     case (XdrIO::W_ASCII):
     case (XdrIO::ENCODE):
@@ -473,12 +473,12 @@ void XdrInterface::mesh_interface(const std::string& name,
 	    bcs[0+ibc*3] = elem_list[ibc];
 	    bcs[1+ibc*3] = side_list[ibc];
 	    bcs[2+ibc*3] = elem_id_list[ibc];
-	  };
+	  }
 	
 	m.BC(&bcs[0], numBCs);
 	
 	break;
-      };
+      }
       
 
     default:
@@ -486,9 +486,9 @@ void XdrInterface::mesh_interface(const std::string& name,
 	// How'd we get here? We have to be either
 	// reading or writing.
 	error();
-      };
-    };
-};
+      }
+    }
+}
 
 
 
@@ -525,7 +525,7 @@ void XdrInterface::soln_interface(const std::string& name,
 
 #endif
 
-};
+}
 
 
 
@@ -634,7 +634,7 @@ void XdrInterface::soln_interface_impl(const std::string& name,
 	  soln.resize(numVar*numNodes);
 
 	  s.values(&soln[0], numNodes);
-	};	
+	}	
 	
 	break;
       }
@@ -664,10 +664,10 @@ void XdrInterface::soln_interface_impl(const std::string& name,
 		var_title += var_names[var][c];
 
 	      var_title += '\0';
-	    };
+	    }
 
 	  sh->setVarTitle(var_title.c_str(), var_title.size());
-	};
+	}
 	
 	/**
 	 * Put the information
@@ -680,7 +680,7 @@ void XdrInterface::soln_interface_impl(const std::string& name,
 	  assert (soln.size() == var_names.size()*mesh.n_nodes());
 	  
 	  s.values(&soln[0], mesh.n_nodes());
-	};
+	}
 	
 	break;
       }
@@ -698,7 +698,7 @@ void XdrInterface::soln_interface_impl(const std::string& name,
    * filename and mesh_base.header.
    */
   delete sh;
-};
+}
 
 
 
@@ -733,7 +733,7 @@ void Mesh::read_xdr(const std::string& name)
 			   _elements,
 			   boundary_info,
 			   *this);
-};
+}
 
 
 
@@ -772,7 +772,7 @@ void Mesh::read_xdr_binary(const std::string& name)
 			   *this);
   
 #endif
-};
+}
 			       
   
 
@@ -798,7 +798,7 @@ void Mesh::read_xdr_soln(const std::string& name,
 			   soln,
 			   var_names,
 			   *this);
-};
+}
 
 
 
@@ -832,7 +832,7 @@ void Mesh::read_xdr_soln_binary(const std::string& name,
 			   *this);
   
 #endif
-};
+}
 
 
 
@@ -857,7 +857,7 @@ void Mesh::write_xdr(const std::string& name)
 			   _elements,
 			   boundary_info,
 			   *this);
-};
+}
 
 
 
@@ -891,7 +891,7 @@ void Mesh::write_xdr_binary(const std::string& name)
 			   *this);
 
 #endif
-};
+}
 
 
 
@@ -914,7 +914,7 @@ void Mesh::write_xdr_soln(const std::string& name,
 			   soln,
 			   var_names,
 			   *this);
-};
+}
 
 
 
@@ -949,7 +949,7 @@ void Mesh::write_xdr_soln_binary(const std::string& name,
 			   *this);
  
 #endif
-};
+}
 
 
 

@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.12 2003-02-13 01:49:49 benkirk Exp $
+// $Id: equation_systems.C,v 1.13 2003-02-13 22:56:08 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -46,14 +46,14 @@ EquationSystems::EquationSystems (Mesh& m,
   // Default parameters
   set_parameter("linear solver tolerance")          = 1.e-12;
   set_parameter("linear solver maximum iterations") = 5000;
-};
+}
 
 
 
 EquationSystems::~EquationSystems ()
 {
   clear();
-};
+}
 
 
 
@@ -69,7 +69,7 @@ void EquationSystems::clear ()
   _flags.clear ();
 
   _parameters.clear ();
-};
+}
 
 
 
@@ -86,8 +86,8 @@ void EquationSystems::init ()
        * Initialize the system.
        */
       sys->second->init();
-    };
-};
+    }
+}
 
 
 
@@ -119,7 +119,7 @@ void EquationSystems::add_system (const std::string& name)
 		<< " named " << name
 		<< std::endl;
     }
-};
+}
 
 
 
@@ -136,7 +136,7 @@ void EquationSystems::delete_system (const std::string& name)
   delete _systems[name];
   
   _systems.erase (name);
-};
+}
 
 
 
@@ -152,7 +152,7 @@ unsigned int EquationSystems::n_vars () const
     tot += pos->second->n_vars();
 
   return tot;      
-};
+}
 
 
 
@@ -168,7 +168,7 @@ unsigned int EquationSystems::n_dofs () const
     tot += pos->second->n_dofs();
 
   return tot;      
-};
+}
 
 
 
@@ -188,7 +188,7 @@ GeneralSystem & EquationSystems::operator () (const std::string& name)
     }
 
   return *pos->second;
-};
+}
 
 
 
@@ -208,7 +208,7 @@ const GeneralSystem & EquationSystems::operator () (const std::string& name) con
     }
 
   return *pos->second;
-};
+}
 
 
 
@@ -232,7 +232,7 @@ const std::string & EquationSystems::name (const unsigned int num) const
 //    ++pos;
 
   return pos->first;
-};
+}
 
 
 
@@ -256,7 +256,7 @@ GeneralSystem & EquationSystems::operator () (const unsigned int num)
 //    ++pos;
 
   return *pos->second;
-};
+}
 
 
 
@@ -279,7 +279,7 @@ const GeneralSystem & EquationSystems::operator ()  (const unsigned int num) con
 //    ++pos;
   
   return *pos->second;
-};
+}
 
 
 
@@ -287,7 +287,7 @@ const GeneralSystem & EquationSystems::operator ()  (const unsigned int num) con
 bool EquationSystems::flag (const std::string& fl) const
 {
   return (_flags.count(fl) != 0);
-};
+}
 
 
 
@@ -307,7 +307,7 @@ void EquationSystems::set_flag (const std::string& fl)
 #endif
 
   _flags.insert (fl);
-};
+}
 
 
 
@@ -324,7 +324,7 @@ void EquationSystems::unset_flag (const std::string& fl)
 
   // Remove the flag
   _flags.erase (fl);  
-};
+}
 
 
 
@@ -344,7 +344,7 @@ Real EquationSystems::parameter (const std::string& id) const
   
   // Return the parameter value if found
   return pos->second;
-};
+}
 
 
 
@@ -365,7 +365,7 @@ Real & EquationSystems::set_parameter (const std::string& id)
   
   // Insert the parameter/value pair into the database
   return _parameters[id];
-};
+}
 
 
 
@@ -386,7 +386,7 @@ void EquationSystems::unset_parameter (const std::string& id)
   
   // Erase the entry
   _parameters.erase(pos);
-};
+}
 
 
 
@@ -401,7 +401,7 @@ void EquationSystems::build_variable_names (std::vector<std::string>& var_names)
   for (unsigned int sys=0; sys<n_systems(); sys++)
     for (unsigned int vn=0; vn < (*this)(sys).n_vars(); vn++)
       var_names[var_num++] = (*this)(sys).variable_name(vn);	   
-};
+}
 
 
 
@@ -456,13 +456,13 @@ void EquationSystems::build_solution_vector (std::vector<Complex>& soln)
 		    for (unsigned int n=0; n<elem->n_nodes(); n++)
 		      soln[nv*(elem->node(n)) + (var + var_num)] =
 			nodal_soln[n];
-		  };
-	    };	 
-	};
+		  }
+	    }	 
+	}
 
       var_num += nv_sys;
-    };
-};
+    }
+}
 
 
 
@@ -491,20 +491,20 @@ std::string EquationSystems::get_info () const
       for (unsigned int vn=0; vn<system.n_vars(); vn++)
       {
 	out << "\"" << system.get_dof_map().component_type(vn).family << "\" ";
-      };
+      }
 #else
       out << "    Finite Element Types=";
       for (unsigned int vn=0; vn<system.n_vars(); vn++)
       {
 	out << "\"" << system.get_dof_map().component_type(vn).family << "\", ";
 	out << "\"" << system.get_dof_map().component_type(vn).radial_family << "\" ";
-      };
+      }
 
       out << std::endl << "    Infinite Element Mapping=";
       for (unsigned int vn=0; vn<system.n_vars(); vn++)
       {
 	out << "\"" << system.get_dof_map().component_type(vn).inf_map << "\" ";
-      };
+      }
 #endif      
 
       out << std::endl;
@@ -518,7 +518,7 @@ std::string EquationSystems::get_info () const
 	out << "\"" << system.get_dof_map().component_type(vn).order << "\", ";
 	out << "\"" << system.get_dof_map().component_type(vn).radial_order << "\" ";
 #endif
-      };
+      }
 
       out << std::endl;
       
@@ -527,7 +527,7 @@ std::string EquationSystems::get_info () const
 #ifdef ENABLE_AMR
       out << "    n_constrained_dofs()=" << system.n_constrained_dofs() << std::endl;
 #endif
-    };
+    }
   
   
   if (!_flags.empty())
@@ -541,7 +541,7 @@ std::string EquationSystems::get_info () const
 	    << *flag
 	    << "\""
 	    << std::endl;
-    };
+    }
   
   
   if (!_parameters.empty())
@@ -558,7 +558,7 @@ std::string EquationSystems::get_info () const
 	    << "="
 	    << param->second
 	    << std::endl;
-    };
+    }
   
   return out.str();
-};
+}

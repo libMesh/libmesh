@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.13 2003-02-13 01:49:48 benkirk Exp $
+// $Id: elem.h,v 1.14 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -128,28 +128,28 @@ class Elem : public ReferenceCountedObject<Elem>,
    * To conserve space this is stored as an unsigned char.
    */
   unsigned char subdomain_id () const
-  { return _sbd_id; };
+  { return _sbd_id; }
   
   /**
    * @returns the subdomain that this element belongs to as a
    * writeable reference.
    */
   unsigned char & subdomain_id ()
-  { return _sbd_id; };
+  { return _sbd_id; }
 
   /**
    * @returns the processor that this element belongs to.
    * To conserve space this is stored as a short integer.
    */
   unsigned short int processor_id () const
-  { return _proc_id; };
+  { return _proc_id; }
   
   /**
    * @returns the processor that this element belongs to as a
    * writeable reference.
    */
   unsigned short int & processor_id ()
-  { return _proc_id; };
+  { return _proc_id; }
 
   /**
    * @returns an id assocated with this element.  The id is not
@@ -175,13 +175,13 @@ class Elem : public ReferenceCountedObject<Elem>,
    * a boundary of the domain. 
    */
   Elem* neighbor(const unsigned int i) const
-  { assert (i < n_sides()); return _neighbors[i]; };
+  { assert (i < n_sides()); return _neighbors[i]; }
 
   /**
    * Assigns \p n as the \f$ i^{th} \f$ neighbor.
    */
   void set_neighbor(const unsigned int i, Elem* n)
-  { assert (i < n_sides()); _neighbors[i]=n; return; };
+  { assert (i < n_sides()); _neighbors[i]=n; return; }
 
   /**
    * This function tells you which neighbor you \p (e) are.
@@ -254,7 +254,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    * however it may be overloaded in a derived class
    */
   virtual unsigned int n_neighbors() const
-  { return n_sides(); };
+  { return n_sides(); }
 
   /**
    * @returns the number of vertices the element that has been derived
@@ -351,7 +351,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    * for an abstract Elem, it is an error.
    */
   virtual std::pair<Real,Real> qual_bounds (const ElemQuality) const
-  { error(); std::pair<Real,Real> p(0,0); return p; };
+  { error(); std::pair<Real,Real> p(0,0); return p; }
   
   /**
    * @returns true if the point p is contained in this element, 
@@ -371,7 +371,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    * the element was not created via refinement, i.e. was read from file.
    */
   const Elem* parent() const
-  { return _parent; };
+  { return _parent; }
   
   /**
    * @returns the magnitude of the distance between nodes n1 and n2.
@@ -408,20 +408,20 @@ class Elem : public ReferenceCountedObject<Elem>,
     assert (_children    != NULL);
     assert (_children[i] != NULL);
     return _children[i];
-  };
+  }
 
   /**
    * Returns the value of the refinement flag for the element.
    */
   RefinementState refinement_flag () const
-  { return _rflag; };
+  { return _rflag; }
 
   /**
    * Returns the value of the refinement flag for the element
    * as a writeable reference.
    */     
   RefinementState & set_refinement_flag ()
-  { return _rflag; };
+  { return _rflag; }
 
   /**
    * Refine the element.
@@ -547,8 +547,8 @@ Elem::Elem(const unsigned int nn,
 	
 	for (unsigned int n=0; n<nn; n++)
 	  _nodes[n] = NULL;
-      };
-  };
+      }
+  }
   
   // Initialize the neighbors data structure
   {
@@ -560,15 +560,15 @@ Elem::Elem(const unsigned int nn,
 	
 	for (unsigned int n=0; n<ns; n++)
 	  _neighbors[n] = NULL;
-      };
-  };
+      }
+  }
 
   // Optionally initialize data from the parent
   if (parent() != NULL)
     {
       subdomain_id() = parent()->subdomain_id();
       processor_id() = parent()->processor_id();
-    };  
+    }  
 
 #ifdef ENABLE_AMR
   
@@ -577,7 +577,7 @@ Elem::Elem(const unsigned int nn,
   set_refinement_flag() = Elem::DO_NOTHING;
 
 #endif  
-};
+}
 
 
 
@@ -599,7 +599,7 @@ Elem::~Elem()
   _children = NULL;
   
 #endif
-};
+}
 
 
 
@@ -611,7 +611,7 @@ const Point & Elem::point (const unsigned int i) const
   assert (_nodes[i]->id() != Node::invalid_id);
 
   return *_nodes[i];
-};
+}
 
 
 
@@ -621,7 +621,7 @@ Point & Elem::point (const unsigned int i)
   assert (i < n_nodes());
 
   return *_nodes[i];
-};
+}
 
 
 
@@ -633,7 +633,7 @@ unsigned int Elem::node (const unsigned int i) const
   assert (_nodes[i]->id() != Node::invalid_id);
 
   return _nodes[i]->id();
-};
+}
 
 
 
@@ -645,7 +645,7 @@ Node* Elem::get_node (const unsigned int i) const
   assert (_nodes[i]->id() != Node::invalid_id);
 
   return _nodes[i];
-};
+}
 
 
 
@@ -655,7 +655,7 @@ Node* & Elem::set_node (const unsigned int i)
   assert (i < n_nodes());
 
   return _nodes[i];
-};
+}
 
 
 
@@ -674,7 +674,7 @@ bool Elem::active() const
   return true;
   
 #endif
-};
+}
 
 
 #endif // end #ifndef __elem_h__

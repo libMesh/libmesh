@@ -1,4 +1,4 @@
-// $Id: petsc_vector.h,v 1.10 2003-02-10 23:42:57 benkirk Exp $
+// $Id: petsc_vector.h,v 1.11 2003-02-13 22:56:08 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -349,7 +349,7 @@ class PetscVector : public NumericVector
 
 inline
 PetscVector::PetscVector ()
-{};
+{}
 
 
 
@@ -357,7 +357,7 @@ inline
 PetscVector::PetscVector (const unsigned int n)
 {
   init(n, n, false);
-};
+}
 
 
 
@@ -366,7 +366,7 @@ PetscVector::PetscVector (const unsigned int n,
 			  const unsigned int n_local)
 {
   init(n, n_local, false);
-};
+}
 
 
 
@@ -374,7 +374,7 @@ inline
 PetscVector::~PetscVector ()
 {
   clear ();
-};
+}
 
 
 
@@ -424,7 +424,7 @@ void PetscVector::init (const unsigned int n,
   
   
   return;
-};
+}
 
 
 
@@ -433,7 +433,7 @@ void PetscVector::init (const unsigned int n,
 			const bool fast)
 {
   init(n,n,fast);
-};
+}
 
 
 
@@ -450,7 +450,7 @@ void PetscVector::close ()
   _is_closed = true;
   
   return;
-};
+}
 
 
 
@@ -462,10 +462,10 @@ void PetscVector::clear ()
       int ierr=0;
 
       ierr = VecDestroy(vec); CHKERRQ(ierr);
-    };
+    }
 
   _is_closed = _is_initialized = false;
-};
+}
 
 
 
@@ -479,7 +479,7 @@ void PetscVector::zero ()
   PetscScalar z=0.;
   
   ierr = VecSet (&z, vec); CHKERRQ(ierr);
-};
+}
 
 
 
@@ -496,7 +496,7 @@ unsigned int PetscVector::size () const
   ierr = VecGetSize(vec, &petsc_size); CHKERRQ(ierr);
 
   return static_cast<unsigned int>(petsc_size);
-};
+}
 
 
 
@@ -510,7 +510,7 @@ unsigned int PetscVector::local_size () const
   ierr = VecGetLocalSize(vec, &petsc_size); CHKERRQ(ierr);
   
   return static_cast<unsigned int>(petsc_size);
-};
+}
 
 
 
@@ -524,7 +524,7 @@ unsigned int PetscVector::first_local_index () const
   ierr = VecGetOwnershipRange (vec, &petsc_first, &petsc_last); CHKERRQ(ierr);
   
   return static_cast<unsigned int>(petsc_first);
-};
+}
 
 
 
@@ -538,7 +538,7 @@ unsigned int PetscVector::last_local_index () const
   ierr = VecGetOwnershipRange (vec, &petsc_first, &petsc_last); CHKERRQ(ierr);
   
   return static_cast<unsigned int>(petsc_last);
-};
+}
 
 
 
@@ -560,7 +560,7 @@ Complex PetscVector::operator() (const unsigned int i) const
   ierr = VecRestoreArray (vec, &values); CHKERRQ(ierr);
   
   return static_cast<Complex>(value);
-};
+}
 
 
 
@@ -576,7 +576,7 @@ Real PetscVector::min () const
 
   // this return value is correct: VecMin returns a PetscReal
   return static_cast<Real>(min);
-};
+}
 
 
 
@@ -592,7 +592,7 @@ Real PetscVector::max() const
 
   // this return value is correct: VecMax returns a PetscReal
   return static_cast<Real>(max);
-};
+}
 
 
 #endif

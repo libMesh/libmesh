@@ -1,4 +1,4 @@
-// $Id: edge_inf_edge2.C,v 1.5 2003-01-24 17:24:43 jwpeterson Exp $
+// $Id: edge_inf_edge2.C,v 1.6 2003-02-13 22:56:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -36,7 +36,7 @@ const std::vector<unsigned int> InfEdge2::tecplot_connectivity(const unsigned in
   conn[1] = node(1)+1;
 
   return conn;
-};
+}
 
 #endif
 

@@ -1,4 +1,4 @@
-// $Id: frequency_system.C,v 1.1 2003-02-12 02:03:49 ddreyer Exp $
+// $Id: frequency_system.C,v 1.2 2003-02-13 22:56:08 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -52,7 +52,7 @@ FrequencySystem::FrequencySystem (EquationSystems& es,
   std::cerr << "ERROR: Not working (yet)." << std::endl;
 
   error ();
-};
+}
 
 
 
@@ -67,7 +67,7 @@ FrequencySystem::~FrequencySystem ()
   stiffness->clear ();
 
   clear_frequencies ();
-};
+}
 
 
 
@@ -82,8 +82,8 @@ void  FrequencySystem::clear_frequencies ()
       _frequencies.clear ();
 
       _have_freq = false;
-    };
-};
+    }
+}
 
 
 
@@ -103,7 +103,7 @@ void FrequencySystem::clear ()
   _is_assembled = false;
 
   clear_frequencies ();
-};
+}
 
 
 
@@ -118,8 +118,8 @@ void FrequencySystem::init ()
   if (init_system_fptr != NULL)
     {
       init_system_fptr (equation_systems, name());
-    };
-};
+    }
+}
 
 
 
@@ -131,7 +131,7 @@ void FrequencySystem::assemble ()
     {
       std::cerr << "ERROR: Matrices already assembled." << std::endl;
       error (); 
-    };
+    }
 
   _is_assembled = true;
 
@@ -153,7 +153,7 @@ void FrequencySystem::assemble ()
 
   //matrix.print ();
   //rhs.print    ();
-};
+}
 
 
 
@@ -167,7 +167,7 @@ void FrequencySystem::set_frequencies (const Real base_freq,
 		<< " have to clear up first." << std::endl;
 
       clear_frequencies ();
-    };
+    }
 
   _have_freq = true;
 
@@ -182,9 +182,9 @@ void FrequencySystem::set_frequencies (const Real base_freq,
       _solutions.insert(_solutions.end(), ap.release() );
 
       _frequencies[n] = base_freq + n * freq_step;
-    };  
+    }  
 
-};
+}
 
 
 
@@ -198,7 +198,7 @@ FrequencySystem::solve ()
 		<< " have to assemble first." << std::endl;
 
       assemble (); 
-    };
+    }
 
   // Get the user-specifiied linear solver tolerance
   const Real tol            =
@@ -226,13 +226,13 @@ FrequencySystem::solve ()
 	linear_solver_interface->solve (*matrix, *solution, *rhs, tol, maxits);
 
       vec_rval.insert(vec_rval.end(), rval);
-   };  
+   }  
 
   // sanity
   assert (vec_rval.size() == _n_freq);
 
   return vec_rval; 
-};
+}
 
 
 
@@ -242,7 +242,7 @@ void FrequencySystem::attach_init_function(void fptr(EquationSystems& es,
   assert (fptr != NULL);
   
   init_system_fptr = fptr;
-};
+}
 
 
 
@@ -252,7 +252,7 @@ void FrequencySystem::attach_assemble_function(void fptr(EquationSystems& es,
   assert (fptr != NULL);
   
   assemble_fptr = fptr;  
-};
+}
 
 
 

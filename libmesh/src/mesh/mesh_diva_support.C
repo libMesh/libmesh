@@ -1,4 +1,4 @@
-// $Id: mesh_diva_support.C,v 1.5 2003-01-24 17:24:44 jwpeterson Exp $
+// $Id: mesh_diva_support.C,v 1.6 2003-02-13 22:56:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -34,7 +34,7 @@ void Mesh::write_diva (const std::string& name)
   std::ofstream out(name.c_str());
 
   write_diva (out);
-};
+}
 
 
 
@@ -105,7 +105,7 @@ void Mesh::write_diva (std::ostream& out)
 	    n_active_elem_of_type(HEX27)*8) << " "
       
 	<< std::endl;
-  };
+  }
   
 
   boundary_info.boundary_mesh.clear();
@@ -198,9 +198,9 @@ void Mesh::write_diva (std::ostream& out)
 		      << side->node(5)+1 << " "
 		      << side->node(2)+1 << " "
 		      << side->node(6)+1 << std::endl;
-		};
-	    };
-  };
+		}
+	    }
+  }
   
 	  
 
@@ -223,7 +223,7 @@ void Mesh::write_diva (std::ostream& out)
 
 		out << boundary_info.boundary_id(elem(e), s)
 		    << std::endl;
-	    };
+	    }
 
     
     /**
@@ -241,8 +241,8 @@ void Mesh::write_diva (std::ostream& out)
 		  (side->type() == QUAD9)  )
 		
 		out << boundary_info.boundary_id(elem(e), s);
-	    };
-  };
+	    }
+  }
 
 
   
@@ -315,7 +315,7 @@ void Mesh::write_diva (std::ostream& out)
 	      << elem(e)->node(2)+1 << " "
 	      << elem(e)->node(3)+1 << " "
 	      << elem(e)->node(4)+1 << std::endl;
-	};
+	}
 
 
 
@@ -362,6 +362,6 @@ void Mesh::write_diva (std::ostream& out)
 		  << conn[5] << " "
 		  << conn[6] << " "
 		  << conn[7] << std::endl;
-	    };
+	    }
 	}
-};
+}

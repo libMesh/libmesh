@@ -1,4 +1,4 @@
- // $Id: reference_counted_object.h,v 1.4 2003-01-24 17:24:39 jwpeterson Exp $
+ // $Id: reference_counted_object.h,v 1.5 2003-02-13 22:56:08 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -43,9 +43,9 @@
  * {
  *  public:
  *
- *    Foo  () {};
+ *    Foo  () {}
  *
- *    ~Foo () {};
+ *    ~Foo () {}
  *
  *    void bar ();
  * 
@@ -81,7 +81,7 @@ protected:
     increment_constructor_count(typeid(T).name());
 
 #endif
-  };
+  }
 
 public:
   
@@ -95,7 +95,7 @@ public:
     increment_destructor_count(typeid(T).name());
 
 #endif
-  };
+  }
   
 private:
 

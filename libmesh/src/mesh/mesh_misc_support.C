@@ -1,4 +1,4 @@
-// $Id: mesh_misc_support.C,v 1.7 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: mesh_misc_support.C,v 1.8 2003-02-13 22:56:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -40,7 +40,7 @@ void MeshBase::read_shanee(const std::string& name)
   read_shanee (in);
 
   return;
-};
+}
 
 
 
@@ -84,8 +84,8 @@ void MeshBase::read_shanee (std::istream &in)
                   // there is no z-coordinate
 	
 	node_ptr(i) = Node::build(x,y,z,i);
-      };
-  };
+      }
+  }
 
 
   
@@ -103,10 +103,10 @@ void MeshBase::read_shanee (std::istream &in)
 	    in >> node; // read the current node
 		  
 	    elem(i)->set_node(n) = node_ptr(node); // assign the node		                     
-	  };
-      };   
-  };
-};
+	  }
+      }   
+  }
+}
 
 
 
@@ -118,7 +118,7 @@ void MeshBase::read_matlab(const std::string& name)
   read_matlab(in);
 
   return;
-};
+}
 
 
 
@@ -201,8 +201,8 @@ void MeshBase::read_matlab(std::istream& in)
 	   >> y;  // y-coordinate value
 
 	node_ptr(i) = Node::build(x,y,z,i);
-      };
-  };
+      }
+  }
 
   // Read the elements (elements)
   {
@@ -218,15 +218,15 @@ void MeshBase::read_matlab(std::istream& in)
 	  {
 	    in >> node;
 	    elem(i)->set_node(n) = node_ptr(node-1);  // Assign the node number
-	  };
+	  }
 	
 	// There is an additional subdomain number here,
 	// so we read it and get rid of it!
 	in >> dummy;
-      };
-  };
+      }
+  }
   
-};
+}
 
 
 
@@ -238,7 +238,7 @@ void MeshBase::read_off(const std::string& name)
   read_off(in);
 
   return;
-};
+}
 
 
 
@@ -285,7 +285,7 @@ void MeshBase::read_off(std::istream& in)
 	 >> z;
       
       node_ptr(n) = Node::build(x,y,z,n);
-    };
+    }
 
   unsigned int dummy, n0, n1, n2;
   
@@ -308,5 +308,5 @@ void MeshBase::read_off(std::istream& in)
       _elements[e]->set_node(0) = node_ptr(n0);
       _elements[e]->set_node(1) = node_ptr(n1);
       _elements[e]->set_node(2) = node_ptr(n2);
-    };  
-};
+    }  
+}

@@ -1,4 +1,4 @@
-// $Id: numeric_vector.h,v 1.4 2003-02-10 23:42:57 benkirk Exp $
+// $Id: numeric_vector.h,v 1.5 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -84,13 +84,13 @@ public:
    * @returns true if the vector has been initialized,
    * false otherwise.
    */
-  virtual bool initialized() const { return _is_initialized; };
+  virtual bool initialized() const { return _is_initialized; }
 
   /**
    * @returns true if the vector is closed and ready for
    * computation, false otherwise.
    */
-  virtual bool closed() const { return _is_closed; };
+  virtual bool closed() const { return _is_closed; }
   
   /**
    * Call the assemble functions
@@ -123,13 +123,13 @@ public:
     
   virtual void init (const unsigned int,
 		     const unsigned int,
-		     const bool = false) {};
+		     const bool = false) {}
   
   /**
    * call init with n_local = N,
    */
   virtual void init (const unsigned int,
-		     const bool =false) {};
+		     const bool =false) {}
     
 //   /**
 //    * Change the dimension to that of the
@@ -141,7 +141,7 @@ public:
 //    * \p init(V.size(),fast).
 //    */
 //   virtual void init (const NumericVector&,
-// 		     const bool = false) {};
+// 		     const bool = false) {}
 
   /**
    * $U(0-N) = s$: fill all components.
@@ -348,7 +348,7 @@ inline
 NumericVector::NumericVector () :
   _is_closed(false),
   _is_initialized(false)
-{};
+{}
 
 
 
@@ -358,7 +358,7 @@ NumericVector::NumericVector (const unsigned int n) :
   _is_initialized(false)
 {
   init(n, n, false);
-};
+}
 
 
 
@@ -369,14 +369,14 @@ NumericVector::NumericVector (const unsigned int n,
   _is_initialized(false)
 {
   init(n, n_local, false);
-};
+}
 
 
 inline
 NumericVector::~NumericVector ()
 {
   clear ();
-};
+}
 
 
 
@@ -386,7 +386,7 @@ NumericVector & NumericVector::operator= (const Complex)
 //  error();
 
   return *this;
-};
+}
 
 
 
@@ -396,7 +396,7 @@ NumericVector & NumericVector::operator= (const NumericVector&)
 //  error();
 
   return *this;
-};
+}
 
 
 
@@ -406,7 +406,7 @@ NumericVector & NumericVector::operator= (const std::vector<Complex>&)
 //  error();
 
   return *this;
-};
+}
 
 
 
@@ -415,7 +415,7 @@ void NumericVector::clear ()
 {
   _is_closed      = false;
   _is_initialized = false;
-};
+}
 
 
 
@@ -444,7 +444,7 @@ void NumericVector::print() const
 #endif
   
   return;
-};
+}
 
 
 

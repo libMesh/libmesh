@@ -1,4 +1,4 @@
-// $Id: fe_lagrange_shape_2D.C,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: fe_lagrange_shape_2D.C,v 1.7 2003-02-13 22:56:10 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -60,7 +60,7 @@ Real FE<2,LAGRANGE>::shape(const ElemType type,
 	      
 	      return (FE<1,LAGRANGE>::shape(EDGE2, FIRST, i0[i], xi)*
 		      FE<1,LAGRANGE>::shape(EDGE2, FIRST, i1[i], eta));
-	    };
+	    }
 
 	  case TRI3:
 	  case TRI6:
@@ -85,17 +85,17 @@ Real FE<2,LAGRANGE>::shape(const ElemType type,
 		default:
 		  error();
 		  
-		};
-	    };
+		}
+	    }
 	    
 	  default:
 	    {
 	      std::cerr << "ERROR: Unsupported 2D element type!: " << type
 			<< std::endl;
 	      error();
-	    };
-	  };
-      };
+	    }
+	  }
+      }
       
 
       // quadratic Lagrange shape functions
@@ -138,8 +138,8 @@ Real FE<2,LAGRANGE>::shape(const ElemType type,
 
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 	    
 	  case QUAD9:
 	    {
@@ -155,7 +155,7 @@ Real FE<2,LAGRANGE>::shape(const ElemType type,
 		  
 	      return (FE<1,LAGRANGE>::shape(EDGE3, SECOND, i0[i], xi)*
 		      FE<1,LAGRANGE>::shape(EDGE3, SECOND, i1[i], eta));
-	    };
+	    }
 	    
 	  case TRI6:
 	    {
@@ -188,17 +188,17 @@ Real FE<2,LAGRANGE>::shape(const ElemType type,
 		default:
 		  error();
 	    
-		};
-	    };
+		}
+	    }
 	    
 	  default:
 	    {
 	      std::cerr << "ERROR: Unsupported 2D element type!: " << type
 			<< std::endl;
 	      error();
-	    };
-	  };
-      };
+	    }
+	  }
+      }
 
 
       
@@ -208,14 +208,14 @@ Real FE<2,LAGRANGE>::shape(const ElemType type,
 	std::cerr << "ERROR: Unsupported 2D FE order!: " << order
 		  << std::endl;
 	error();
-      };
-    };
+      }
+    }
 
   error();
   return 0.;
 
 #endif
-};
+}
 
 
 
@@ -229,7 +229,7 @@ Real FE<2,LAGRANGE>::shape(const Elem* elem,
 
   // call the orientation-independent shape functions
   return FE<2,LAGRANGE>::shape(elem->type(), order, i, p);
-};
+}
 
 
 
@@ -280,8 +280,8 @@ Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
 		  
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 
 	  case TRI3:
 	  case TRI6:
@@ -314,7 +314,7 @@ Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
 			
 		      default:
 			error();
-		      };
+		      }
 		  }
 		  // d()/deta
 		case 1:
@@ -333,21 +333,21 @@ Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
 		      default:
 			error();
 			
-		      };
+		      }
 		  }
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 	    
 	  default:
 	    {
 	      std::cerr << "ERROR: Unsupported 2D element type!: " << type
 			<< std::endl;
 	      error();
-	    };
-	  };
-      };
+	    }
+	  }
+      }
       
 
       // quadratic Lagrange shape functions
@@ -398,7 +398,7 @@ Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
 		
 		    default:
 		      error();
-		    };
+		    }
 	    
 		  // d/deta
 		case 1:
@@ -434,11 +434,11 @@ Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
 		
 		    default:
 		      error();
-		    };
+		    }
 
 		default:
 		  error();
-		};
+		}
 	    }
 	    
 	  case QUAD9:
@@ -467,8 +467,8 @@ Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
 		  
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 	    
 	  case TRI6:
 	    {
@@ -512,7 +512,7 @@ Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
 		 
 		      default:
 			error();
-		      };
+		      }
 		  }
 		      
 		case 1:
@@ -539,21 +539,21 @@ Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
 		 
 		      default:
 			error();
-		      };
+		      }
 		  }
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 	    
 	  default:
 	    {
 	      std::cerr << "ERROR: Unsupported 2D element type!: " << type
 			<< std::endl;
 	      error();
-	    };
-	  };
-      };
+	    }
+	  }
+      }
 
       
       
@@ -564,14 +564,14 @@ Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
 		  << std::endl;
 	error();
       }
-    };
+    }
 
 
   error();
   return 0.;
 
 #endif
-};
+}
 
 
 
@@ -587,5 +587,5 @@ Real FE<2,LAGRANGE>::shape_deriv(const Elem* elem,
 
   // call the orientation-independent shape functions
   return FE<2,LAGRANGE>::shape_deriv(elem->type(), order, i, j, p);
-};
+}
 

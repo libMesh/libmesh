@@ -1,4 +1,4 @@
-// $Id: petsc_vector.C,v 1.8 2003-02-10 23:42:57 benkirk Exp $
+// $Id: petsc_vector.C,v 1.9 2003-02-13 22:56:13 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -41,7 +41,7 @@
 //   init (v.local_size(), v.size(), fast);
 
 //   vec = reinterpret_cast<const PetscVector&>(v).vec;
-// };
+// }
 
 
 
@@ -55,7 +55,7 @@ Real PetscVector::l1_norm () const
   ierr = VecNorm (vec, NORM_1, &value);
   
   return static_cast<Real>(value);
-};
+}
 
 
 
@@ -69,7 +69,7 @@ Real PetscVector::l2_norm () const
   ierr = VecNorm (vec, NORM_2, &value);
   
   return static_cast<Real>(value);
-};
+}
 
 
 
@@ -84,7 +84,7 @@ Real PetscVector::linfty_norm () const
   ierr = VecNorm (vec, NORM_INFINITY, &value);
   
   return static_cast<Real>(value);
-};
+}
 
 
 
@@ -96,7 +96,7 @@ NumericVector& PetscVector::operator += (const NumericVector& v)
   add(1., v);
   
   return *this;
-};
+}
 
 
 
@@ -108,7 +108,7 @@ NumericVector& PetscVector::operator -= (const NumericVector& v)
   add(-1., v);
   
   return *this;
-};
+}
 
 
 
@@ -124,7 +124,7 @@ void PetscVector::set (const unsigned int i, const Complex value)
   ierr = VecSetValues (vec, 1, &i_val, &petsc_value, INSERT_VALUES); CHKERRQ(ierr);
 
   return;
-};
+}
 
 
 
@@ -140,7 +140,7 @@ void PetscVector::add (const unsigned int i, const Complex value)
   ierr = VecSetValues (vec, 1, &i_val, &petsc_value, ADD_VALUES); CHKERRQ(ierr);
 
   return;
-};
+}
 
 
 
@@ -153,7 +153,7 @@ void PetscVector::add_vector (const std::vector<Complex>& v,
   
   for (unsigned int i=0; i<v.size(); i++)
     add (dof_indices[i], v[i]);
-};
+}
 
 
 
@@ -164,7 +164,7 @@ void PetscVector::add_vector (const NumericVector& V,
 
   for (unsigned int i=0; i<V.size(); i++)
     add (dof_indices[i], V(i));
-};
+}
 
 
 void PetscVector::add (const Complex v)
@@ -179,8 +179,8 @@ void PetscVector::add (const Complex v)
       PetscScalar value = (values[ig] + static_cast<PetscScalar>(v));
       ierr = VecRestoreArray (vec, &values); CHKERRQ(ierr);
       ierr = VecSetValues (vec, 1, &ig, &value, INSERT_VALUES); CHKERRQ(ierr); 
-    };
-};
+    }
+}
 
 
 
@@ -188,7 +188,7 @@ void PetscVector::add (const Complex v)
 void PetscVector::add (const NumericVector& v)
 {
   add (1., v);
-};
+}
 
 
 
@@ -202,7 +202,7 @@ void PetscVector::add (const Complex a, const NumericVector& v_in)
   assert(size() == v.size());
   
   ierr = VecAXPY(&petsc_a, v.vec, vec); CHKERRQ(ierr);
-};
+}
 
 
 
@@ -212,7 +212,7 @@ void PetscVector::scale (const Complex factor)
   PetscScalar petsc_factor = static_cast<PetscScalar>(factor);
   
   ierr = VecScale(&petsc_factor, vec); CHKERRQ(ierr);
-};
+}
 
 
 
@@ -228,7 +228,7 @@ PetscVector::operator = (const Complex s)
     }
   
   return *this;
-};
+}
 
 
 
@@ -247,7 +247,7 @@ PetscVector::operator = (const NumericVector& v_in)
     }
   
   return *this;
-};
+}
 
 
 
@@ -264,7 +264,7 @@ PetscVector::operator = (const PetscVector& v)
     }
   
   return *this;
-};
+}
 
 
 
@@ -307,7 +307,7 @@ PetscVector::operator = (const std::vector<Complex>& v)
     }
 
   return *this;
-};
+}
 
 
 
@@ -343,7 +343,7 @@ void PetscVector::localize (NumericVector& v_local_in) const
 
   ierr = ISDestroy (is);              CHKERRQ(ierr);
   ierr = VecScatterDestroy(scatter);  CHKERRQ(ierr);
-};
+}
 
 
 
@@ -382,7 +382,7 @@ void PetscVector::localize (NumericVector& v_local_in,
 
   ierr = ISDestroy (is);              CHKERRQ(ierr);
   ierr = VecScatterDestroy(scatter);  CHKERRQ(ierr);
-};
+}
 
 
 
@@ -451,7 +451,7 @@ void PetscVector::localize (std::vector<Complex>& v_local) const
       else
 	error();
     }  
-};
+}
 
 
 
@@ -472,7 +472,7 @@ ifdef USE_COMPLEX_NUMBERS
 	      v_local[i] =  static_cast<Complex>(pv(i));
 
 	  // note that the destructor of pv calls clear()
-	};
+	}
 else
 endif
 */
@@ -541,7 +541,7 @@ void PetscVector::localize_to_one (std::vector<Complex>& v_local,
 	{
 	  std::cout << "Error: complex<float> not supported by PETSc." << std::endl;
 	  error();
-	};
+	}
       }
 
       else
@@ -549,7 +549,7 @@ void PetscVector::localize_to_one (std::vector<Complex>& v_local,
 
     }
 
-};
+}
 
 
 /*
@@ -572,8 +572,8 @@ ifdef USE_COMPLEX_NUMBERS
 	      for (int i=0; i<n; i++)
 		  v_local[i] =  static_cast<Complex>(pv(i));
 
-	    };
-	};
+	    }
+	}
 else
         error();
 endif

@@ -1,4 +1,4 @@
-//    $Id: sparse_matrix.h,v 1.3 2003-02-10 22:03:24 benkirk Exp $
+//    $Id: sparse_matrix.h,v 1.4 2003-02-13 22:56:08 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -89,13 +89,13 @@ class SparseMatrix : public ReferenceCountedObject<SparseMatrix>
    * @returns true if the matrix has been initialized,
    * false otherwise.
    */
-  virtual bool initialized() const { return _is_initialized; };
+  virtual bool initialized() const { return _is_initialized; }
 
   /**
    * Get a pointer to the \p DofMap to use.
    */
   void attach_dof_map (const DofMap& dof_map)
-  { _dof_map = &dof_map; };
+  { _dof_map = &dof_map; }
   
 
   /**
@@ -105,7 +105,7 @@ class SparseMatrix : public ReferenceCountedObject<SparseMatrix>
    * implementation does not need this data simply do
    * not overload this method.
    */
-  virtual void update_sparsity_pattern (std::vector<std::set<unsigned int> >&) {};
+  virtual void update_sparsity_pattern (std::vector<std::set<unsigned int> >&) {}
 
   
   /**
@@ -280,7 +280,7 @@ class SparseMatrix : public ReferenceCountedObject<SparseMatrix>
       std::cerr << "ERROR: Not Implemented in base class yet!" << std::endl;
       std::cerr << "ERROR writing MATLAB file " << name << std::endl;
       error();
-    };
+    }
   
 protected:
   
@@ -304,13 +304,13 @@ inline
 SparseMatrix::SparseMatrix () :
   _dof_map(NULL),
   _is_initialized(false)
-{};
+{}
 
 
 
 inline
 SparseMatrix::~SparseMatrix ()
-{};
+{}
 
 
 
@@ -349,7 +349,7 @@ void SparseMatrix::print() const
 
 #endif
 
-};
+}
 
 
 

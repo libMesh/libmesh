@@ -1,4 +1,4 @@
-// $Id: enum_quadrature_type.h,v 1.1 2003-02-06 17:58:34 ddreyer Exp $
+// $Id: enum_quadrature_type.h,v 1.2 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -43,7 +43,7 @@ namespace MeshEnums {
 		       QTRAP       = 4,
 
 		       INVALID_Q_RULE};
-};
+}
 
 using namespace MeshEnums;
 

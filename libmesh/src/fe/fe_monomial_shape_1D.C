@@ -1,4 +1,4 @@
-// $Id: fe_monomial_shape_1D.C,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: fe_monomial_shape_1D.C,v 1.7 2003-02-13 22:56:10 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -68,19 +68,19 @@ Real FE<1,MONOMIAL>::shape(const ElemType,
 	  default:
 	    std::cerr << "Invalid shape function index!" << std::endl;
 	    error();
-	  };
-      };
+	  }
+      }
       
     default:
       {
 	std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
 	error();
-      };
-    };
+      }
+    }
 
   error();
   return 0.;
-};
+}
 
 
 
@@ -93,7 +93,7 @@ Real FE<1,MONOMIAL>::shape(const Elem* elem,
   assert (elem != NULL);
   
   return FE<1,MONOMIAL>::shape(elem->type(), order, i, p);
-};
+}
 
 
 
@@ -142,20 +142,20 @@ Real FE<1,MONOMIAL>::shape_deriv(const ElemType,
 	  default:
 	    std::cerr << "Invalid shape function index!" << std::endl;
 	    error();
-	  };
-      };
+	  }
+      }
 
       
     default:
       {
 	std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
 	error();
-      };
-    };
+      }
+    }
 
   error();
   return 0.;
-};
+}
 
 
 
@@ -170,4 +170,4 @@ Real FE<1,MONOMIAL>::shape_deriv(const Elem* elem,
   
   return FE<1,MONOMIAL>::shape_deriv(elem->type(),
 				     order, i, j, p);
-};
+}

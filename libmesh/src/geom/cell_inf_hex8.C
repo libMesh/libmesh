@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex8.C,v 1.9 2003-02-06 23:02:55 benkirk Exp $
+// $Id: cell_inf_hex8.C,v 1.10 2003-02-13 22:56:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -123,12 +123,12 @@ AutoPtr<Elem> InfHex8::build_side (const unsigned int i) const
 	error();
 	AutoPtr<Elem> ap(NULL);  return ap;
       }
-    };
+    }
 
   // We'll never get here.
   error();
   AutoPtr<Elem> ap(NULL);  return ap;
-};
+}
 
 
 
@@ -149,7 +149,7 @@ const std::vector<unsigned int> InfHex8::tecplot_connectivity(const unsigned int
   conn[7] = node(7)+1;
 
   return conn;
-};
+}
 
 
 
@@ -166,8 +166,8 @@ void InfHex8::write_tecplot_connectivity(std::ostream &out) const
 	out << conn[i] << " ";
 
       out << std::endl;
-    };
-};
+    }
+}
 
 
 
@@ -257,8 +257,8 @@ void InfHex8::refine(Mesh& mesh)
       {
 	_children[c] = new InfHex8(this);
 	_children[c]->set_refinement_flag() = Elem::JUST_REFINED;
-      };
-  };
+      }
+  }
 
 
   // Compute new nodal locations
@@ -285,8 +285,8 @@ void InfHex8::refine(Mesh& mesh)
 	  _children[c]->set_node(nc) = mesh.mesh_refinement.add_point(p[c][nc]);
 
 	mesh.add_elem(child(c), mesh.mesh_refinement.new_element_number());
-      };
-  };
+      }
+  }
 
 
   
@@ -302,13 +302,13 @@ void InfHex8::refine(Mesh& mesh)
 	    for (unsigned int sc=1; sc<=side_children_matrix[s][0]; sc++)
 	      mesh.boundary_info.add_side(child(side_children_matrix[s][sc]), s, id);
 
-	};
-  };
+	}
+  }
 
 
   // Un-set my refinement flag now
   set_refinement_flag() = Elem::DO_NOTHING;
-};
+}
 
 
 #endif

@@ -1,4 +1,4 @@
-// $Id: plane.C,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: plane.C,v 1.7 2003-02-13 22:56:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,7 +30,7 @@
 // Plane class member functions
 Plane::Plane ()
 {
-};
+}
 
 
 
@@ -38,7 +38,7 @@ Plane::Plane (const Point& p,
 	      const Point& n)
 {
   create_from_point_normal (p, n);
-};
+}
 
 
 
@@ -47,7 +47,7 @@ Plane::Plane (const Point& p0,
 	      const Point& p2)
 {
   create_from_three_points (p0, p1, p2);
-};
+}
 
 
 
@@ -56,13 +56,13 @@ Plane::Plane (const Plane& other_plane) :
 {
   create_from_point_normal(other_plane.point,
 			   other_plane.normal);
-};
+}
 
 
 
 Plane::~Plane ()
 {
-};
+}
 
 
 
@@ -70,7 +70,7 @@ void Plane::create_from_point_normal (const Point& p, const Point& n)
 {
   normal = n.unit();
   point  = p;
-};
+}
 
 
 
@@ -86,7 +86,7 @@ void Plane::create_from_three_points (const Point& p0,
   Point n  = e0.cross(e1);
 
   Point normal = n.unit(); 
-};
+}
 
 
 
@@ -97,7 +97,7 @@ void Plane::xy_plane (const Real zpos)
 
   point  = p;
   normal = n;
-};
+}
 
 
 
@@ -108,7 +108,7 @@ void Plane::xz_plane (const Real ypos)
 
   point  = p;
   normal = n;
-};
+}
 
 
 
@@ -119,7 +119,7 @@ void Plane::yz_plane (const Real xpos)
 
   point  = p;
   normal = n;
-};
+}
 
 
 
@@ -136,14 +136,14 @@ bool Plane::above_surface (const Point& p) const
     return true;
 
   return false;
-};
+}
 
 
 
 bool Plane::below_surface (const Point& p) const 
 {
   return ( !above_surface (p) );
-};
+}
 
 
 
@@ -159,7 +159,7 @@ bool Plane::on_surface (const Point& p) const
     return true;
 
   return false;
-};
+}
 
 
 
@@ -174,11 +174,11 @@ Point Plane::closest_point (const Point& p) const
   const Point cp = p - normal*(w*normal);
   
   return cp;
-};
+}
 
 
 
 Point Plane::unit_normal (const Point&) const
 {
   return normal;
-};
+}

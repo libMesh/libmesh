@@ -1,4 +1,4 @@
-// $Id: quadrature_rules.C,v 1.1 2003-02-06 17:58:35 ddreyer Exp $
+// $Id: quadrature_rules.C,v 1.2 2003-02-13 22:56:14 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -59,8 +59,8 @@ std::string QuadratureRules::name (const QuadratureType q)
       { 
 	std::cerr << "ERROR: Bad qt=" << q << std::endl;
 	error();
-      };
-    };
+      }
+    }
   
   return its_name;
 }

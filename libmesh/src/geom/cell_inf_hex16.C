@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex16.C,v 1.9 2003-02-06 23:02:55 benkirk Exp $
+// $Id: cell_inf_hex16.C,v 1.10 2003-02-13 22:56:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -66,7 +66,7 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i) const
 */
 
 	return face;
-      };
+      }
 
     case 1:  // the face at y = 0
       {
@@ -80,7 +80,7 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i) const
 	face->set_node(5) = get_node(12);
 
 	return face;
-      };
+      }
 
     case 2:  // the face at x=1
       {
@@ -94,7 +94,7 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i) const
 	face->set_node(5) = get_node(13);
 
 	return face;
-      };
+      }
     case 3: // the face at y=1
       {
 	AutoPtr<Elem> face(new InfQuad6);
@@ -107,7 +107,7 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i) const
 	face->set_node(5) = get_node(14);
 
 	return face;
-      };
+      }
     case 4: // the face at x=0
       {
 	AutoPtr<Elem> face(new InfQuad6);
@@ -120,7 +120,7 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i) const
 	face->set_node(5) = get_node(15);
 
 	return face;
-      };
+      }
     case 5: // the face at z=1
       // disable this face, since this is supposed to lie at infinity
       {
@@ -128,18 +128,18 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i) const
         error();
 	AutoPtr<Elem> ap(NULL);  return ap;
 
-      };
+      }
     default:
       {
 	error();
 	AutoPtr<Elem> ap(NULL);  return ap;
-      };
-    };
+      }
+    }
 
   // We'll never get here.
   error();
   AutoPtr<Elem> ap(NULL);  return ap;
-};
+}
 
 
 
@@ -170,10 +170,10 @@ const std::vector<unsigned int> InfHex16::tecplot_connectivity(const unsigned in
     default:
       error();
       
-    };
+    }
   
   return conn;
-};
+}
 
 
 
@@ -190,8 +190,8 @@ void InfHex16::write_tecplot_connectivity(std::ostream &out) const
 	out << conn[i] << " ";
 
       out << std::endl;
-    };
-};
+    }
+}
 
 
 
@@ -313,8 +313,8 @@ void InfHex16::refine(Mesh& mesh)
       {
 	_children[c] = new InfHex16(this);
 	_children[c]->set_refinement_flag() = Elem::JUST_REFINED;
-      };
-  };
+      }
+  }
 
 
   // Compute new nodal locations
@@ -341,8 +341,8 @@ void InfHex16::refine(Mesh& mesh)
 	  _children[c]->set_node(nc) = mesh.mesh_refinement.add_point(p[c][nc]);
 
 	mesh.add_elem(child(c), mesh.mesh_refinement.new_element_number());
-      };
-  };
+      }
+  }
 
 
   
@@ -357,13 +357,13 @@ void InfHex16::refine(Mesh& mesh)
 	    // the upper limit for sc is stored in the 0th column
 	    for (unsigned int sc=1; sc<=side_children_matrix[s][0]; sc++)
 	      mesh.boundary_info.add_side(child(side_children_matrix[s][sc]), s, id);
-	};
-  };
+	}
+  }
 
 
   // Un-set my refinement flag now
   set_refinement_flag() = Elem::DO_NOTHING;
-};
+}
 
 
 #endif

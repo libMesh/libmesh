@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.8 2003-02-09 22:47:17 ddreyer Exp $
+// $Id: fe_base.h,v 1.9 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -144,49 +144,49 @@ public:
    * points on the element.
    */    
   const std::vector<Point>& get_xyz() const
-  { return xyz; };
+  { return xyz; }
   
   /**
    * @returns the shape function values at the quadrature points
    * on the element.
    */    
   const std::vector<std::vector<Real> >& get_phi() const
-  { return phi; };
+  { return phi; }
   
   /**
    * @returns the element Jacobian times the quadrature weight for
    * each quadrature point.
    */    
   const std::vector<Real>& get_JxW() const
-  { return JxW; };
+  { return JxW; }
 
   /**
    * @returns the shape function derivatives at the quadrature
    * points.
    */
   const std::vector<std::vector<Point> >& get_dphi() const
-  { return dphi; };
+  { return dphi; }
   
   /**
    * @returns the shape function x-derivative at the quadrature
    * points.
    */
   const std::vector<std::vector<Real> >& get_dphidx() const
-  { return dphidx; };
+  { return dphidx; }
   
   /**
    * @returns the shape function y-derivative at the quadrature
    * points.
    */
   const std::vector<std::vector<Real> >& get_dphidy() const
-  { return dphidy; };
+  { return dphidy; }
   
   /**
    * @returns the shape function z-derivative at the quadrature
    * points.
    */
   const std::vector<std::vector<Real> >& get_dphidz() const
-  { return dphidz; };
+  { return dphidz; }
 
   
 #ifdef ENABLE_INFINITE_ELEMENTS
@@ -202,7 +202,7 @@ public:
    * matrices for a mesh using both finite and infinite elements.
    */
   const std::vector<Point>& get_dphase() const
-      { return dphase; };
+      { return dphase; }
 
 
   /**
@@ -218,7 +218,7 @@ public:
    * matrices for a mesh using both finite and infinite elements.
    */
   const std::vector<Real>& get_Sobolev_weight() const
-      { return weight; };
+      { return weight; }
 
   /**
    * @returns the first global derivative of the multiplicative 
@@ -226,7 +226,7 @@ public:
    * for details.  In case of \p FE initialized to all zero.
    */
   const std::vector<Point>& get_Sobolev_dweight() const
-      { return dweight; };
+      { return dweight; }
 
 #endif
 
@@ -235,13 +235,13 @@ public:
    * @returns the tangent vectors for face integration.
    */
   const std::vector<std::vector<Point> >& get_tangents() const
-  { return tangents; };
+  { return tangents; }
   
   /**
    * @returns the normal vectors for face integration.
    */
   const std::vector<Point>& get_normals() const
-  { return normals; };
+  { return normals; }
   
   /**
    * Provides the class with the quadrature rule.  Implement
@@ -267,17 +267,17 @@ public:
    * have been calculated for.  Useful in determining when shape
    * functions must be recomputed.
    */
-  ElemType get_type()  const { return elem_type; };
+  ElemType get_type()  const { return elem_type; }
 
   /**
    * @returns the approximation order of the finite element.
    */
-  Order get_order()  const { return fe_type.order; };
+  Order get_order()  const { return fe_type.order; }
 
   /**
    * @returns the finite element family of this element.
    */
-  FEFamily get_family()  const { return fe_type.family; };
+  FEFamily get_family()  const { return fe_type.family; }
 
   /**
    * Prints the Jacobian times the weight for each quadrature point.
@@ -356,63 +356,63 @@ protected:
    * be usable in derived classes, and therefore protected.
    * Returns the x value of the pth entry of the dxzydxi_map.
    */
-  Real dxdxi_map(const unsigned int p) const   { return dxyzdxi_map[p](0); };
+  Real dxdxi_map(const unsigned int p) const   { return dxyzdxi_map[p](0); }
 
   /**
    * Used in \p FEBase::compute_map(), which should be
    * be usable in derived classes, and therefore protected.
    * Returns the y value of the pth entry of the dxzydxi_map.
    */
-  Real dydxi_map(const unsigned int p) const   { return dxyzdxi_map[p](1); };
+  Real dydxi_map(const unsigned int p) const   { return dxyzdxi_map[p](1); }
 
   /**
    * Used in \p FEBase::compute_map(), which should be
    * be usable in derived classes, and therefore protected.
    * Returns the z value of the pth entry of the dxzydxi_map.
    */
-  Real dzdxi_map(const unsigned int p) const   { return dxyzdxi_map[p](2); };
+  Real dzdxi_map(const unsigned int p) const   { return dxyzdxi_map[p](2); }
 
   /**
    * Used in \p FEBase::compute_map(), which should be
    * be usable in derived classes, and therefore protected.
    * Returns the x value of the pth entry of the dxzydeta_map.
    */
-  Real dxdeta_map(const unsigned int p) const  { return dxyzdeta_map[p](0); };
+  Real dxdeta_map(const unsigned int p) const  { return dxyzdeta_map[p](0); }
 
   /**
    * Used in \p FEBase::compute_map(), which should be
    * be usable in derived classes, and therefore protected.
    * Returns the y value of the pth entry of the dxzydeta_map.
    */
-  Real dydeta_map(const unsigned int p) const  { return dxyzdeta_map[p](1); }; 
+  Real dydeta_map(const unsigned int p) const  { return dxyzdeta_map[p](1); } 
 
   /**
    * Used in \p FEBase::compute_map(), which should be
    * be usable in derived classes, and therefore protected.
    * Returns the z value of the pth entry of the dxzydeta_map.
    */
-  Real dzdeta_map(const unsigned int p) const  { return dxyzdeta_map[p](2); };
+  Real dzdeta_map(const unsigned int p) const  { return dxyzdeta_map[p](2); }
 
   /**
    * Used in \p FEBase::compute_map(), which should be
    * be usable in derived classes, and therefore protected.
    * Returns the x value of the pth entry of the dxzydzeta_map.
    */
-  Real dxdzeta_map(const unsigned int p) const { return dxyzdzeta_map[p](0); };
+  Real dxdzeta_map(const unsigned int p) const { return dxyzdzeta_map[p](0); }
 
   /**
    * Used in \p FEBase::compute_map(), which should be
    * be usable in derived classes, and therefore protected.
    * Returns the y value of the pth entry of the dxzydzeta_map.
    */
-  Real dydzeta_map(const unsigned int p) const { return dxyzdzeta_map[p](1); };
+  Real dydzeta_map(const unsigned int p) const { return dxyzdzeta_map[p](1); }
 
   /**
    * Used in \p FEBase::compute_map(), which should be
    * be usable in derived classes, and therefore protected.
    * Returns the z value of the pth entry of the dxzydzeta_map.
    */
-  Real dzdzeta_map(const unsigned int p) const { return dxyzdzeta_map[p](2); };
+  Real dzdzeta_map(const unsigned int p) const { return dxyzdzeta_map[p](2); }
 
 
 
@@ -699,14 +699,14 @@ FEBase::FEBase(const unsigned int d,
   elem_type(INVALID_ELEM),
   qrule(NULL)
 {
-};
+}
 
 
 
 inline
 FEBase::~FEBase()
 {
-};
+}
 
 
 
@@ -714,7 +714,7 @@ inline
 void FEBase::print_JxW() const
 {
   for (unsigned int i=0; i<JxW.size(); ++i) std::cout << JxW[i] << std::endl;
-};
+}
 
 
 
@@ -728,7 +728,7 @@ void FEBase::print_phi() const
 	  std::cout << " phi[" << i << "][" << j << "]=" << phi[i][j] << std::endl;
 	}
     }
-};
+}
 
 
 
@@ -743,7 +743,7 @@ void FEBase::print_dphi() const
 	  dphi[i][j].print();
 	}
     }
-};
+}
 
 
 
@@ -751,7 +751,7 @@ inline
 void FEBase::print_xyz() const
 {
   for (unsigned int i=0; i<xyz.size(); ++i) xyz[i].print();
-};
+}
 
 
 
@@ -766,7 +766,7 @@ void FEBase::print_info() const
   print_xyz();
   std::cout << "Values of JxW at the Gauss pts." << std::endl;
   print_JxW();
-};
+}
 
 
 

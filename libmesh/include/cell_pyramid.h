@@ -1,4 +1,4 @@
-// $Id: cell_pyramid.h,v 1.5 2003-01-24 17:24:37 jwpeterson Exp $
+// $Id: cell_pyramid.h,v 1.6 2003-02-13 22:56:06 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -51,32 +51,32 @@ public:
    * @returns 5.  All pyramid-derivatives are guaranteed to have at
    * least 5 nodes.
    */
-  unsigned int n_nodes() const { return 5; };
+  unsigned int n_nodes() const { return 5; }
 
   /**
    * @returns 5
    */
-  unsigned int n_sides() const { return 5; };
+  unsigned int n_sides() const { return 5; }
 
   /**
    * @returns 5.  All pyramids have 5 vertices.
    */
-  unsigned int n_vertices() const { return 5; };
+  unsigned int n_vertices() const { return 5; }
 
   /**
    * @returns 8.  All pyramids have 8 edges.
    */
-  unsigned int n_edges() const { return 8; };
+  unsigned int n_edges() const { return 8; }
 
   /**
    * @returns 5.  All pyramids have 5 faces.
    */
-  unsigned int n_faces() const { return 5; };
+  unsigned int n_faces() const { return 5; }
   
   /**
    * @returns 10
    */
-  unsigned int n_children() const { return 10; };
+  unsigned int n_children() const { return 10; }
 
   /**
    * @returns a primitive triangle or quad for 
@@ -96,7 +96,7 @@ inline
 Pyramid::Pyramid(const unsigned int nn, Cell* p) :
   Cell(nn, Pyramid::n_sides(), p) 
 {
-};
+}
 
 
 

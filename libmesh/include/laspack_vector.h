@@ -1,4 +1,4 @@
-// $Id: laspack_vector.h,v 1.5 2003-02-13 01:49:48 benkirk Exp $
+// $Id: laspack_vector.h,v 1.6 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -337,7 +337,7 @@ class LaspackVector : public NumericVector
 inline
 LaspackVector::LaspackVector ()
 {
-};
+}
 
 
 
@@ -345,7 +345,7 @@ inline
 LaspackVector::LaspackVector (const unsigned int n)
 {
   init(n, n, false);
-};
+}
 
 
 
@@ -354,7 +354,7 @@ LaspackVector::LaspackVector (const unsigned int n,
 			      const unsigned int n_local)
 {
   init(n, n_local, false);
-};
+}
 
 
 
@@ -362,7 +362,7 @@ inline
 LaspackVector::~LaspackVector ()
 {
   clear ();
-};
+}
 
 
 
@@ -380,7 +380,7 @@ void LaspackVector::init (const unsigned int n,
       std::cerr << "ERROR: Vector already initialized!"
 		<< std::endl;      
       error();
-    };
+    }
 
   // create a sequential vector
   using namespace Laspack;
@@ -398,7 +398,7 @@ void LaspackVector::init (const unsigned int n,
     zero ();
   
   return;
-};
+}
 
 
 
@@ -407,7 +407,7 @@ void LaspackVector::init (const unsigned int n,
 			  const bool fast)
 {
   init(n,n,fast);
-};
+}
 
 
 
@@ -419,7 +419,7 @@ void LaspackVector::close ()
   _is_closed = true;
   
   return;
-};
+}
 
 
 
@@ -429,10 +429,10 @@ void LaspackVector::clear ()
   if (initialized())
     {
       Laspack::V_Destr (&_vec);
-    };
+    }
 
   _is_closed = _is_initialized = false;
-};
+}
 
 
 
@@ -442,7 +442,7 @@ void LaspackVector::zero ()
   assert (initialized());
 
   Laspack::V_SetAllCmp (&_vec, 0.);
-};
+}
 
 
 
@@ -452,7 +452,7 @@ unsigned int LaspackVector::size () const
   assert (initialized());
 
   return static_cast<unsigned int>(Laspack::V_GetDim(const_cast<Laspack::QVector*>(&_vec)));
-};
+}
 
 
 
@@ -462,7 +462,7 @@ unsigned int LaspackVector::local_size () const
   assert (initialized());
   
   return size();
-};
+}
 
 
 
@@ -472,7 +472,7 @@ unsigned int LaspackVector::first_local_index () const
   assert (initialized());
   
   return 0;
-};
+}
 
 
 
@@ -482,7 +482,7 @@ unsigned int LaspackVector::last_local_index () const
   assert (initialized());
   
   return size();
-};
+}
 
 
 
@@ -493,7 +493,7 @@ void LaspackVector::set (const unsigned int i, const Complex value)
   assert(i<size());
   
   Laspack::V_SetCmp (&_vec, i+1, value);
-};
+}
 
 
 
@@ -504,7 +504,7 @@ void LaspackVector::add (const unsigned int i, const Complex value)
   assert(i<size());
   
   Laspack::V_AddCmp (&_vec, i+1, value);
-};
+}
 
 
 
@@ -517,7 +517,7 @@ Complex LaspackVector::operator() (const unsigned int i) const
 
   
   return static_cast<Complex>(Laspack::V_GetCmp(const_cast<Laspack::QVector*>(&_vec), i+1));
-};
+}
 
 
 
@@ -530,7 +530,7 @@ void LaspackVector::add_vector (const std::vector<Complex>& v,
   
   for (unsigned int i=0; i<v.size(); i++)
     add (dof_indices[i], v[i]);
-};
+}
 
 
 inline
@@ -541,7 +541,7 @@ void LaspackVector::add_vector (const NumericVector& V,
 
   for (unsigned int i=0; i<V.size(); i++)
     add (dof_indices[i], V(i));
-};
+}
 
 
 
@@ -556,7 +556,7 @@ Real LaspackVector::min () const
     min = std::min (min, (*this)(i));
 
   return min;
-};
+}
 
 
 
@@ -566,7 +566,7 @@ Real LaspackVector::max() const
   assert (initialized());
 
   return static_cast<Real>(Laspack::MaxNorm_V(const_cast<Laspack::QVector*>(&_vec)));
-};
+}
 
 
 

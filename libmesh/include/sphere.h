@@ -1,4 +1,4 @@
-// $Id: sphere.h,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: sphere.h,v 1.7 2003-02-13 22:56:08 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -105,12 +105,12 @@ public:
   /**
    * Returns the radius of the sphere.
    */
-  Real radius() const { return rad; };
+  Real radius() const { return rad; }
 
   /**
    * @returns the center of the sphere.
    */ 
-  const Point& center() const { return cent; };
+  const Point& center() const { return cent; }
 
   
 private:

@@ -1,4 +1,4 @@
-// $Id: fe_type.h,v 1.7 2003-02-05 20:51:36 ddreyer Exp $
+// $Id: fe_type.h,v 1.8 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -49,7 +49,7 @@ public:
 	 const FEFamily f = LAGRANGE) :
     order(o),
     family(f)
-  {};
+  {}
 
   /**
    * The approximation order of the element.  
@@ -82,7 +82,7 @@ public:
     family(f),
     radial_family(rf),
     inf_map(im)
-  {};
+  {}
 
   
   /**

@@ -1,4 +1,4 @@
-// $Id: tree.C,v 1.5 2003-01-24 17:24:45 jwpeterson Exp $
+// $Id: tree.C,v 1.6 2003-02-13 22:56:14 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -32,7 +32,7 @@ template <unsigned int N>
 Elem* Tree<N>::find_element(const Point& p) const
 {
   return root.find_element(p);
-};
+}
 
 
 // ------------------------------------------------------------

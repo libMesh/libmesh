@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.C,v 1.7 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: mesh_unv_support.C,v 1.8 2003-02-13 22:56:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -41,13 +41,13 @@ void Mesh::read_unv(const std::string& name){
   read_unv(file);
   file.close();
   return;
-};
+}
 
 
 
 void Mesh::read_unv(std::istream& in){
   UnvInterface i(in,_nodes,_elements,boundary_info);
-};
+}
 
 
 //-----------------------------------------------------------------------------
@@ -65,7 +65,7 @@ UnvInterface::UnvInterface(std::istream& _in,
   {
     std::cout << "Input file not good!" << std::endl;
     error();
-  };
+  }
 
   label_dataset_nodes = "2411";
   label_dataset_elms  = "2412";
@@ -85,7 +85,7 @@ UnvInterface::UnvInterface(std::istream& _in,
   {
     std::cout << "Error opening temporary file." << std::endl;
     error();
-  };
+  }
    
 
   init();
@@ -100,7 +100,7 @@ UnvInterface::UnvInterface(std::istream& _in,
   {
     std::cout << "Error re-opening temporary file for reading." << std::endl;
     error();
-  };
+  }
    
 
   node_in();
@@ -125,7 +125,7 @@ UnvInterface::UnvInterface(std::istream& _in,
   //      << std::endl;}
 
 
-};
+}
 
 
 
@@ -138,9 +138,9 @@ UnvInterface::~UnvInterface()
   {
     std::cout << "Error deleting temporary file." << std::endl;
     error();
-  };
+  }
 
-};
+}
 
 
 
@@ -161,15 +161,15 @@ void UnvInterface::init()
 	{
 	  olds = news;    // go on reading
 	  phys_file >> news;
-	};
+	}
 
       if(phys_file.eof()) // end of file is reached
 	{ break; }
 
       scan_dataset(news); // scan the dataset for important information
-    };
+    }
 
-};
+}
 
 
 
@@ -243,7 +243,7 @@ void UnvInterface::scan_dataset(std::string ds_num){
 	  temporary_file << "\n";
 
 	  num_nodes++;                   // count nodes
-	};
+	}
     }
 
   // dataset containing the elements
@@ -299,7 +299,7 @@ void UnvInterface::scan_dataset(std::string ds_num){
 
 	  temporary_file << "\n";
 	  num_elements++;                 // count elements
-	};
+	}
     }
 
   // dataset containing the boundary conditions
@@ -400,7 +400,7 @@ void UnvInterface::scan_dataset(std::string ds_num){
 	  temporary_file << "\n";
 
 	  num_bcs++;                 // count boundary conditions
-	};
+	}
       }
     }
 
@@ -413,7 +413,7 @@ void UnvInterface::scan_dataset(std::string ds_num){
 	phys_file.ignore(256,'\n');}      // ignore the rest
       while (data != "-1");               // look for delimiter
     }
-};
+}
 
 
 
@@ -443,7 +443,7 @@ void UnvInterface::set_stream_pointer(std::string ds_num)
 
   // Move file pointer
   temporary_file.seekg(ds_position[ds_num],std::ios::beg);
-};
+}
 
 
 
@@ -484,8 +484,8 @@ void UnvInterface::node_in()
 
       // add node to the nodes vector.
       nodes[i] = Node::build(x,y,z,i);
-    };
-};
+    }
+}
 
 
 
@@ -689,7 +689,7 @@ void UnvInterface::element_in()
 	elements[i]->set_node(assign_elm_nodes[j]) = nodes[assign_nodes[node_labels[j]]];
 
     }
-};
+}
 
 void UnvInterface::bcs_in(BoundaryInfo& boundary_info)
 {
@@ -753,7 +753,7 @@ void UnvInterface::bcs_in(BoundaryInfo& boundary_info)
 
   }
 
-};
+}
 
 
 
@@ -779,10 +779,10 @@ std::string& UnvInterface::D_to_e(std::string& number)
   {
     // we assume that if this one number is written correctly, all numbers are
     need_D_to_e = false;
-  };
+  }
 
   return number;
 
-};
+}
 
 

@@ -1,4 +1,4 @@
-// $Id: inf_fe_legendre_eval.C,v 1.2 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: inf_fe_legendre_eval.C,v 1.3 2003-02-13 22:56:10 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -90,11 +90,11 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
       std::cerr << "bad index i = " << i << std::endl;
       error();
 
-    };
+    }
 
   // we never end up here.
   return 0.;
-};
+}
 
 
 
@@ -163,11 +163,11 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
       std::cerr << "bad index i = " << i << std::endl;
       error();
 
-    };
+    }
 
   // we never end up here.
   return 0.;
-};
+}
 
 
 

@@ -1,4 +1,4 @@
-// $Id: point.C,v 1.8 2003-02-13 01:49:49 benkirk Exp $
+// $Id: point.C,v 1.9 2003-02-13 22:56:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -42,7 +42,7 @@ Point Point::cross(const Point& p) const
   return Point(  _coords[1]*p._coords[2] - _coords[2]*p._coords[1],
 	        -_coords[0]*p._coords[2] + _coords[2]*p._coords[0],
 	         _coords[0]*p._coords[1] - _coords[1]*p._coords[0]);
-};
+}
 
 
 
@@ -68,7 +68,7 @@ Point Point::unit() const
 	       _coords[2]/length);
 #endif
   
-};
+}
 
 
 
@@ -95,7 +95,7 @@ void Point::print() const
 	    << std::setw(8) << (*this)(2) << ")"
 	    << std::endl;
 #endif
-};
+}
 
 
 
@@ -108,7 +108,7 @@ void Point::write_unformatted (std::ostream &out) const
       << (*this)(0) << " "
       << (*this)(1) << " "
       << (*this)(2) << std::endl;
-};
+}
 
 
 
@@ -121,7 +121,7 @@ bool Point::operator == (const Point& rhs) const
     return true;
   
   return false;
-};
+}
 
 
 
@@ -162,7 +162,7 @@ bool Point::operator < (const Point& rhs) const
     }
 
   return false;
-};
+}
 
 
 
@@ -216,8 +216,8 @@ unsigned int Point::key() const
 	}
       else
 	cnt++;
-    };
+    }
 
   return index[2];
-};
+}
 

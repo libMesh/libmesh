@@ -1,4 +1,4 @@
-// $Id: general_system.h,v 1.2 2003-02-13 01:49:48 benkirk Exp $
+// $Id: general_system.h,v 1.3 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -299,7 +299,7 @@ protected:
 /* Order GeneralSystem::variable_order (const unsigned int i) const */
 /* { */
 /*   return variable_type(var_names[i]).order; */
-/* }; */
+/* } */
 
 
 
@@ -312,7 +312,7 @@ protected:
 /*   assert (pos != var_type.end()); */
   
 /*   return pos->second.order; */
-/* }; */
+/* } */
 
 
 
@@ -323,7 +323,7 @@ Complex GeneralSystem::current_solution (const unsigned int global_dof_number) c
   assert (global_dof_number < _dof_map.n_dofs());
   
   return (*current_local_solution)(global_dof_number);
-};
+}
 
 
 
@@ -333,7 +333,7 @@ Complex GeneralSystem::current_nodal_solution (const unsigned int node,
 					       const unsigned int index) const
 {
   return current_nodal_solution (node, variable_number(var), index);
-};
+}
 
 
 
@@ -343,7 +343,7 @@ Complex GeneralSystem::current_nodal_solution (const unsigned int node,
 					       const unsigned int index) const
 {
   return (*current_local_solution)(_mesh.node(node).dof_number(var, index));
-};
+}
 
 
 
@@ -354,7 +354,7 @@ Complex GeneralSystem::current_elem_solution (const unsigned int elem,
 					      const unsigned int index) const
 {
   return current_elem_solution(elem, variable_number(var), index);
-};
+}
 
 
 
@@ -364,7 +364,7 @@ Complex GeneralSystem::current_elem_solution (const unsigned int elem,
 					      const unsigned int index) const
 {
   return (*current_local_solution)(_mesh.elem(elem)->dof_number(var, index));
-};
+}
 
 
 
@@ -375,7 +375,7 @@ Complex GeneralSystem::old_solution (const unsigned int global_dof_number) const
   assert (global_dof_number < _dof_map.n_dofs());
   
   return (*old_local_solution)(global_dof_number);
-};
+}
 
 
 
@@ -385,7 +385,7 @@ Complex GeneralSystem::older_solution (const unsigned int global_dof_number) con
   assert (global_dof_number < _dof_map.n_dofs());
   
   return (*older_local_solution)(global_dof_number);
-};
+}
 
 
 
@@ -395,7 +395,7 @@ Complex GeneralSystem::old_nodal_solution (const unsigned int node,
 					   const unsigned int index) const
 {
   return old_nodal_solution (node, variable_number(var), index);
-};
+}
 
 
 
@@ -405,7 +405,7 @@ Complex GeneralSystem::old_nodal_solution (const unsigned int node,
 					   const unsigned int index) const
 {
   return (*old_local_solution)(_mesh.node(node).dof_number(var, index));
-};
+}
 
 
 
@@ -415,7 +415,7 @@ Complex GeneralSystem::older_nodal_solution (const unsigned int node,
 					     const unsigned int index) const
 {
   return older_nodal_solution(node, variable_number(var), index);
-};
+}
 
 
 
@@ -425,7 +425,7 @@ Complex GeneralSystem::older_nodal_solution (const unsigned int node,
 					     const unsigned int index) const
 {
   return (*older_local_solution)(_mesh.node(node).dof_number(var, index));
-};
+}
 
 
 
@@ -435,7 +435,7 @@ Complex GeneralSystem::old_elem_solution (const unsigned int elem,
 					  const unsigned int index) const
 {
   return old_elem_solution (elem, variable_number(var), index);
-};
+}
 
 
 
@@ -445,7 +445,7 @@ Complex GeneralSystem::old_elem_solution (const unsigned int elem,
 					  const unsigned int index) const
 {
   return (*old_local_solution)(_mesh.elem(elem)->dof_number(var, index));
-};
+}
 
 
 
@@ -455,7 +455,7 @@ Complex GeneralSystem::older_elem_solution (const unsigned int elem,
 					    const unsigned int index) const
 {
   return older_elem_solution (elem, variable_number(var), index);
-};
+}
 
 
 
@@ -465,7 +465,7 @@ Complex GeneralSystem::older_elem_solution (const unsigned int elem,
 					    const unsigned int index) const
 {
   return (*older_local_solution)(_mesh.elem(elem)->dof_number(var, index));
-};
+}
 
 
 

@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.8 2003-02-06 23:02:55 benkirk Exp $
+// $Id: elem.C,v 1.9 2003-02-13 22:56:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -183,8 +183,8 @@ Elem* Elem::build(const ElemType type)
       {
 	std::cerr << "ERROR: Undefined element type!." << std::endl;
 	error();
-      };
-    };
+      }
+    }
     
 
   // This will never happen...  Look at the case-structure above.
@@ -192,7 +192,7 @@ Elem* Elem::build(const ElemType type)
   error();
   
   return NULL;
-};
+}
 
 
 
@@ -210,7 +210,7 @@ unsigned int Elem::which_neighbor_am_i (const Elem* e) const
   error();
 
   return static_cast<unsigned int>(-1);
-};
+}
 
 
 
@@ -233,8 +233,8 @@ void Elem::write_tecplot_connectivity(std::ostream& out) const
  		std::ostream_iterator<unsigned int>(out, " "));
       
       out << std::endl;
-    };
-};
+    }
+}
 
 
 
@@ -260,7 +260,7 @@ unsigned int Elem::key() const
   
 
   return n + m*m;  
-}; 
+} 
 
 
 
@@ -272,7 +272,7 @@ Point Elem::centroid() const
     cp.add (point(n));
 
   return (cp /= static_cast<Real>(n_vertices()));    
-};
+}
 
 
 
@@ -287,10 +287,10 @@ Real Elem::hmin() const
 	  const Point diff = (point(n_outer) - point(n_inner));
 	  
 	  h_min = std::min(h_min,diff.size());
-	};
+	}
 
   return h_min;
-};
+}
 
 
 
@@ -305,10 +305,10 @@ Real Elem::hmax() const
 	  const Point diff = (point(n_outer) - point(n_inner));
 	  
 	  h_max = std::max(h_max,diff.size());
-	};
+	}
 
   return h_max;
-};
+}
 
 
 
@@ -343,20 +343,20 @@ bool Elem::operator == (const Elem& rhs) const
 	{
 	  nodes_set.insert(node(n));
 	  nodes_set.insert(rhs.node(n));
-	};
+	}
 
       // If this passes the elements are connected
       // to the same global nodes
       if (nodes_set.size() == n_nodes())
 	return true;
-    };
+    }
 
   // If we get here it is because the elements either
   // do not have the same number of nodes or they are
   // connected to different nodes.  Either way they
   // are not the same element
   return false;
-};
+}
 
 
 
@@ -370,7 +370,7 @@ void Elem::write_ucd_connectivity(std::ostream &out) const
     out << node(i)+1 << "\t";
 
   out << std::endl;
-};
+}
 
 
 
@@ -392,14 +392,14 @@ Real Elem::quality (const ElemQuality q) const
 		  << std::endl;
 
 	return 1.;
-      };
-    };
+      }
+    }
 
     
     // Will never get here...
     error();
     return 0.;
-};
+}
 
 
 
@@ -415,7 +415,7 @@ bool Elem::contains_point (const Point& p) const
 						      p);
 
   return FEInterface::on_reference_element(mapped_point, type());
-};
+}
 
 
 
@@ -440,7 +440,7 @@ unsigned int Elem::level() const
   // otherwise we are at a level one
   // higher than our parent
   return (parent()->level() + 1);
-};
+}
 
 
 
@@ -454,7 +454,7 @@ void Elem::coarsen()
   _children = NULL;
 
   set_refinement_flag() = Elem::DO_NOTHING;
-};
+}
 
 
 #endif

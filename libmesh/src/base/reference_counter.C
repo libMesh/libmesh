@@ -1,4 +1,4 @@
-// $Id: reference_counter.C,v 1.5 2003-02-10 03:55:51 benkirk Exp $
+// $Id: reference_counter.C,v 1.6 2003-02-13 22:56:09 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -74,11 +74,11 @@ std::string ReferenceCounter::get_info ()
 	    << " items leaked!"
 	    << std::endl;
       
-    };
+    }
   
   out << " ---------------------------------------------------------------------- "  << std::endl;
 
 #endif
 
   return out.str();
-};
+}

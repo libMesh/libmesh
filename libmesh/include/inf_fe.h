@@ -1,4 +1,4 @@
-// $Id: inf_fe.h,v 1.14 2003-02-12 02:03:47 ddreyer Exp $
+// $Id: inf_fe.h,v 1.15 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -95,7 +95,7 @@ class Elem;
  *
  * \author Daniel Dreyer
  * \date 2003
- * \version $Revision: 1.14 $
+ * \version $Revision: 1.15 $
  */
 
 //-------------------------------------------------------------
@@ -118,7 +118,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.14 $
+   * \version $Revision: 1.15 $
    */
   //-------------------------------------------------------------
   // InfFE::Radial class definition
@@ -141,18 +141,18 @@ protected:
      * @returns the first (local) derivative of the
      * decay in radial direction of the infinite element.
      */
-    static Real decay_deriv(const Real) { return .5; };
+    static Real decay_deriv(const Real) { return .5; }
 
     /**
      * @returns the radial weight D, used as an additional weight
      * for the test function, evaluated at local radial coordinate \p v.
      */
-    static Real D(const Real v) { return (1.-v)*(1.-v)/4.; };
+    static Real D(const Real v) { return (1.-v)*(1.-v)/4.; }
 
     /**
      * @returns the first (local) radial derivative of the radial weight D.
      */
-    static Real D_deriv(const Real v) { return (v-1.)/2.; };
+    static Real D_deriv(const Real v) { return (v-1.)/2.; }
 
     /**
      * @returns the index (0 for the base, 1,2,... for the outer shells) 
@@ -164,7 +164,7 @@ protected:
      */
     static unsigned int index(const unsigned int n_base_dofs,
 			      const unsigned int i)
-	{ return i / n_base_dofs; };
+	{ return i / n_base_dofs; }
 
     /**
      * @returns the index (0 for the base, 1,2,... for the outer shells) 
@@ -180,7 +180,7 @@ protected:
      * @returns the Order of the mapping functions
      * in radial direction. Currently, this is @e always \p FIRST.
      */
-    static Order mapping_order() { return FIRST; };
+    static Order mapping_order() { return FIRST; }
 
     /**
      * @returns the number of shape functions in radial direction
@@ -197,7 +197,7 @@ protected:
      */
     static unsigned int n_dofs(const ElemType /* t */,
 			       const Order o_radial)
-	{ return static_cast<unsigned int>(o_radial)+1; };
+	{ return static_cast<unsigned int>(o_radial)+1; }
 
     /**
      * @returns the number of dofs in radial direction on "onion slice" 
@@ -221,7 +221,7 @@ protected:
      */
     static unsigned int n_dofs_per_elem(const ElemType /* inf_elem */,
 					const Order    o_radial)
-	{ return static_cast<unsigned int>(o_radial)+1; };
+	{ return static_cast<unsigned int>(o_radial)+1; }
 				       
     /**
      * @returns the location in radial direction (on the reference axis) 
@@ -247,7 +247,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.14 $
+   * \version $Revision: 1.15 $
    */
   //-------------------------------------------------------------
   // InfFE::Base class definition
@@ -275,7 +275,7 @@ protected:
      */
     static unsigned int index(const unsigned int n_base_dofs,
 			      const unsigned int i)
-	{ return i % n_base_dofs; };
+	{ return i % n_base_dofs; }
 
     /**
      * @returns the index in the @e base element. \p i is the index in the 
@@ -453,13 +453,13 @@ public:
    * for matrix assembly of the current element.
    */
   unsigned int n_quadrature_points () const
-      { assert (radial_qrule != NULL); return _n_total_qp; };
+      { assert (radial_qrule != NULL); return _n_total_qp; }
 
   /**
    * @returns the number of shape functions associated with
    * this infinite element.
    */
-  unsigned int n_shape_functions () const { return _n_total_approx_sf; };
+  unsigned int n_shape_functions () const { return _n_total_approx_sf; }
 
 
 protected:
@@ -511,7 +511,7 @@ protected:
    * Do not use this derived member in \p InfFE<Dim,T_radial,T_map>.
    */
   void init_base_shape_functions(const QBase*, const Elem*)
-      { error(); };
+      { error(); }
 
 
 
@@ -759,8 +759,8 @@ Real InfFE<Dim,T_radial,T_map>::Radial::decay(const Real v)
     default:
       error();
       return 0.;
-  };
-};
+  }
+}
 
 
 
@@ -784,7 +784,7 @@ unsigned int InfFE<Dim,T_radial,T_map>::Radial::n_dofs_at_node(const ElemType,
      * have the (1-v)/2 mode, associated to the base
      */
     return static_cast<unsigned int>(o_radial);
-};
+}
 
 
 

@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic_shape_3D.C,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: fe_hierarchic_shape_3D.C,v 1.7 2003-02-13 22:56:09 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -41,7 +41,7 @@ Real FE<3,HIERARCHIC>::shape(const ElemType,
   
   error();
   return 0.;
-};
+}
 
 
 
@@ -88,14 +88,14 @@ Real FE<3,HIERARCHIC>::shape(const Elem* elem,
 	      return (FE<1,HIERARCHIC>::shape(EDGE3, order, i0[i], xi)*
 		      FE<1,HIERARCHIC>::shape(EDGE3, order, i1[i], eta)*
 		      FE<1,HIERARCHIC>::shape(EDGE3, order, i2[i], zeta));
-	    };
+	    }
 
 	    
 	  default:
 	    error();
-	  };
+	  }
 	
-      };
+      }
 
       
 
@@ -201,8 +201,8 @@ Real FE<3,HIERARCHIC>::shape(const Elem* elem,
 		  {
 		    if (elem->node(4) != std::min(elem->node(4), elem->node(7)))
 		      eta_mapped = -eta;
-		  };
-	      };
+		  }
+	      }
 
 
 	      // handle the face orientation
@@ -597,29 +597,29 @@ Real FE<3,HIERARCHIC>::shape(const Elem* elem,
 		  }
 
 		
-	      };
+	      }
 		  
 	      
 	      return (FE<1,HIERARCHIC>::shape(EDGE3, order, i0[i], xi_mapped)*
 		      FE<1,HIERARCHIC>::shape(EDGE3, order, i1[i], eta_mapped)*
 		      FE<1,HIERARCHIC>::shape(EDGE3, order, i2[i], zeta_mapped));
-	    };
+	    }
 
 	    
 	  default:
 	    error();
-	  };	
-      };
+	  }	
+      }
 
     default:
       error();
-    };
+    }
   
 #endif
       
   error();
   return 0.;
-};
+}
 
 
 
@@ -637,7 +637,7 @@ Real FE<3,HIERARCHIC>::shape_deriv(const ElemType,
   error();
   
   return 0.;
-};
+}
 
 
 
@@ -705,14 +705,14 @@ Real FE<3,HIERARCHIC>::shape_deriv(const Elem* elem,
 
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 
 
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 
       
 
@@ -818,8 +818,8 @@ Real FE<3,HIERARCHIC>::shape_deriv(const Elem* elem,
 		  {
 		    if (elem->node(4) != std::min(elem->node(4), elem->node(7)))
 		      eta_mapped = -eta;
-		  };
-	      };
+		  }
+	      }
 
 
 	      // handle the face orientation
@@ -1214,7 +1214,7 @@ Real FE<3,HIERARCHIC>::shape_deriv(const Elem* elem,
 		  }
 
 		
-	      };
+	      }
 		  
 	      
 
@@ -1242,21 +1242,21 @@ Real FE<3,HIERARCHIC>::shape_deriv(const Elem* elem,
 
 		default:
 		  error();
-		};
-	    };
+		}
+	    }
 
 	    
 	  default:
 	    error();
-	  };
-      };
+	  }
+      }
 
     default:
       error();
-    };
+    }
 
 #endif
   
   error();
   return 0.;
-};
+}

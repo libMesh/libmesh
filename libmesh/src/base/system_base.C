@@ -1,4 +1,4 @@
-// $Id: system_base.C,v 1.2 2003-02-13 01:49:49 benkirk Exp $
+// $Id: system_base.C,v 1.3 2003-02-13 22:56:09 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -43,14 +43,14 @@ SystemBase::SystemBase (Mesh& mesh,
 //  _dof_map                (mesh),
   _mesh                   (mesh)
 {
-};
+}
 
 
 
 SystemBase::~SystemBase ()
 {
   SystemBase::clear ();
-};
+}
 
 
 void SystemBase::clear ()
@@ -68,7 +68,7 @@ void SystemBase::clear ()
   rhs->clear ();
 
   matrix->clear ();
-};
+}
 
 
 
@@ -86,7 +86,7 @@ void SystemBase::init ()
   solution->init (n_dofs(), n_local_dofs());
 
   rhs->init      (n_dofs(), n_local_dofs());
-};
+}
 
 
 
@@ -112,14 +112,14 @@ void SystemBase::assemble ()
       // Initialize the matrix conformal to this
       // sparsity pattern
       matrix->init ();
-    };
+    }
 
   // Clear the matrix and right-hand side.
   matrix->zero ();
   rhs->zero    ();
 
   // Now everything is set up and ready for matrix assembly
-};
+}
 
 
 
@@ -130,7 +130,7 @@ void SystemBase::update_global_solution (std::vector<Complex>& global_soln) cons
   global_soln.resize (solution->size());
 
   solution->localize  (global_soln);
-};
+}
 
 
 
@@ -140,7 +140,7 @@ void SystemBase::update_global_solution (std::vector<Complex>& global_soln,
   global_soln.resize       (solution->size());
 
   solution->localize_to_one (global_soln, dest_proc);
-};
+}
 
 
 
@@ -165,7 +165,7 @@ void SystemBase::add_variable (const std::string& var,
 
   // Add the variable to the _dof_map
   _dof_map.add_component (type);
-};
+}
 
 
 
@@ -175,7 +175,7 @@ void SystemBase::add_variable (const std::string& var,
   FEType fe_type(order, LAGRANGE);
   
   add_variable(var, fe_type);
-};
+}
 
 
 
@@ -195,4 +195,4 @@ unsigned short int SystemBase::variable_number (const std::string& var) const
     }
   
   return pos->second;
-};
+}

@@ -1,4 +1,4 @@
-// $Id: perfmon.h,v 1.5 2003-01-24 17:24:39 jwpeterson Exp $
+// $Id: perfmon.h,v 1.6 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -77,7 +77,7 @@ PerfMon::reset ()
 #ifdef HAVE_PAPI_H
   Papi::PAPI_flops (&rtime, &ptime, &flpins, &mflops);
 #endif  
-};
+}
 
 
 
@@ -124,11 +124,11 @@ PerfMon::print (std::string msg)
       
 #endif
 
-	};
-    };
+	}
+    }
   
   return elapsed_time;
-};
+}
 
 
 inline
@@ -140,7 +140,7 @@ PerfMon::PerfMon (std::string id,
   proc_id(pid)
 {
   reset ();
-};
+}
 
 
 
@@ -148,7 +148,7 @@ inline
 PerfMon::~PerfMon ()
 {
   print ();
-};
+}
 
 
 

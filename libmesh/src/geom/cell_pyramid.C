@@ -1,4 +1,4 @@
-// $Id: cell_pyramid.C,v 1.6 2003-01-25 01:42:46 jwpeterson Exp $
+// $Id: cell_pyramid.C,v 1.7 2003-02-13 22:56:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -94,11 +94,11 @@ AutoPtr<Elem> Pyramid::side (const unsigned int i) const
 	AutoPtr<Elem> face(NULL);
 	return face;
       }
-    };
+    }
 
   // We'll never get here.
   error();
   AutoPtr<Elem> face(NULL);
 
   return face;
-};
+}

@@ -1,4 +1,4 @@
-// $Id: general_system.C,v 1.1 2003-02-12 02:03:49 ddreyer Exp $
+// $Id: general_system.C,v 1.2 2003-02-13 22:56:08 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -40,7 +40,7 @@ GeneralSystem::GeneralSystem (EquationSystems& es,
   assemble_fptr          (NULL),
   equation_systems       (es)
 {
-};
+}
 
 
 
@@ -53,7 +53,7 @@ GeneralSystem::~GeneralSystem ()
   old_local_solution->clear ();
   
   older_local_solution->clear ();
-};
+}
 
 
 
@@ -68,7 +68,7 @@ void GeneralSystem::clear ()
   old_local_solution->clear ();
   
   older_local_solution->clear ();
-};
+}
 
 
 
@@ -94,8 +94,8 @@ void GeneralSystem::init ()
 
       *old_local_solution   = *current_local_solution;
       *older_local_solution = *current_local_solution; 
-    };
-};
+    }
+}
 
 
 
@@ -110,7 +110,7 @@ void GeneralSystem::update ()
   assert (send_list.size() <= solution->size());
   
   solution->localize (*current_local_solution, send_list);
-};
+}
 
 
 
@@ -127,7 +127,7 @@ void GeneralSystem::assemble ()
 
   //matrix.print ();
   //rhs.print    ();
-};
+}
 
 
 
@@ -153,7 +153,7 @@ GeneralSystem::solve ()
   update ();
   
   return rval; 
-};
+}
 
 
 
@@ -163,7 +163,7 @@ void GeneralSystem::attach_init_function(void fptr(EquationSystems& es,
   assert (fptr != NULL);
   
   init_system_fptr = fptr;
-};
+}
 
 
 
@@ -173,4 +173,4 @@ void GeneralSystem::attach_assemble_function(void fptr(EquationSystems& es,
   assert (fptr != NULL);
   
   assemble_fptr = fptr;  
-};
+}

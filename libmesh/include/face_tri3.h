@@ -1,4 +1,4 @@
-// $Id: face_tri3.h,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: face_tri3.h,v 1.7 2003-02-13 22:56:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -63,17 +63,17 @@ public:
   /**
    * @returns \p TRI3
    */
-  ElemType type () const { return TRI3; };
+  ElemType type () const { return TRI3; }
 
   /**
    * @returns 1
    */
-  unsigned int n_sub_elem() const { return 1; };
+  unsigned int n_sub_elem() const { return 1; }
   
   /**
    * @returns FIRST
    */
-  Order default_order() const { return FIRST; };
+  Order default_order() const { return FIRST; }
 
   AutoPtr<Elem> build_side (const unsigned int i) const;
   
@@ -84,7 +84,7 @@ public:
 			std::vector<unsigned int> *conn = NULL) const;
 
   unsigned int vtk_element_type (const unsigned int) const
-  { return 5; };
+  { return 5; }
     
   
 #ifdef ENABLE_AMR
@@ -130,6 +130,6 @@ inline
 Tri3::Tri3(Face* p) :
   Tri(Tri3::n_nodes(), p) 
 {
-};
+}
 
 #endif
