@@ -152,18 +152,18 @@
     - \p gcc 2.96 (RedHat's compiler in the 7.x series)
  
   - Intel ICC/ECC
-    - \p icc/ifort 8.x <code>(CXXFLAGS=-no-gcc ./configure [...])</code>
+    - \p icc/ifort 8.x
     - \p icc/ifc 7.x
     - \p icc/ifc 6.0
     - Earlier versions (<= 5.0) not supported.
     
   - SGI Altix
-    - \p ecc/efc 7.1 tested
+    - \p icc/ifort 8.x
+    - \p ecc/efc 7.1
     - \p MPT \p MPI 1.9.1
  
   - SGI IRIX 6.5 with  MIPSPro Compilers
-    - Version 7.30 <code>(CXXFLAGS=-LANG:std CXX=CC ./configure [...])</code>
-    - Not tested (but will likely work) with others
+    - CC/cc version 7.4
 
   - Sun ONE Studio Compilers
     - Version 5.5 tested <code>(CXXFLAGS=-library=stlport4 CPPFLAGS=-library=stlport4 CXX=CC ./configure [...])</code>

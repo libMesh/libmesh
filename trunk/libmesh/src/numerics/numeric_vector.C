@@ -1,4 +1,4 @@
-// $Id: numeric_vector.C,v 1.13 2004-03-24 05:49:12 jwpeterson Exp $
+// $Id: numeric_vector.C,v 1.14 2004-10-19 22:31:06 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -152,7 +152,7 @@ int NumericVector<Complex>::compare (const NumericVector<Complex> &other_vector,
       else
 	i++;
     }
-  while (rvalue==-1 && i<last_local_index());
+  while (rvalue==-1 && i<this->last_local_index());
 
   return rvalue;
 }

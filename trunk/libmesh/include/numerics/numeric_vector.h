@@ -1,4 +1,4 @@
-// $Id: numeric_vector.h,v 1.8 2004-10-19 16:58:04 jwpeterson Exp $
+// $Id: numeric_vector.h,v 1.9 2004-10-19 22:31:05 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -517,7 +517,7 @@ template <>
 inline
 void NumericVector<Complex>::print(std::ostream& os) const
 {
-  assert (initialized());
+  assert (this->initialized());
   os << "Size\tglobal =  " << this->size()
      << "\t\tlocal =  " << this->local_size() << std::endl;
   
@@ -535,7 +535,7 @@ template <typename T>
 inline
 void NumericVector<T>::print(std::ostream& os) const
 {
-  assert (initialized());
+  assert (this->initialized());
   os << "Size\tglobal =  " << this->size()
      << "\t\tlocal =  " << this->local_size() << std::endl;
 
