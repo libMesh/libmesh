@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.C,v 1.19 2003-08-17 23:07:05 ddreyer Exp $
+// $Id: mesh_unv_support.C,v 1.20 2003-08-30 09:46:03 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -843,16 +843,17 @@ void UnvMeshInterface::element_out(std::ostream& out_file)
 
   unsigned int n_elem_written=0;
 
-  const_active_elem_iterator           elem_it  (std::make_pair(_elements.begin(), _elements.end()));
-  const const_active_elem_iterator     elem_end (std::make_pair(_elements.end(),   _elements.end()));
+// OLD CODE
+//   const_active_elem_iterator           elem_it  (std::make_pair(_elements.begin(), _elements.end()));
+//   const const_active_elem_iterator     elem_end (std::make_pair(_elements.end(),   _elements.end()));
+
+  const_elem_iterator           elem_it  (std::make_pair(_elements.begin(), _elements.end()));
+  const const_elem_iterator     elem_end (std::make_pair(_elements.end(),   _elements.end()));
+
+
   for (; elem_it != elem_end; ++elem_it)
     {
       const Elem* elem = *elem_it;
-
-// OLD CODE
-//   for (unsigned int el_cnt=0;el_cnt<_elements.size();el_cnt++)
-//     {
-//       const Elem* elem = _elements[el_cnt];
 
       elem_n_nodes = elem->n_nodes();
 
@@ -953,16 +954,6 @@ void UnvMeshInterface::element_out(std::ostream& out_file)
 		
 	case TET10:
 	  fe_descriptor_id = 118; // Solid Parabolic Tetrahedron
-// 	  assign_elm_nodes[0] = 1;
-// 	  assign_elm_nodes[4] = 2;
-// 	  assign_elm_nodes[1] = 3;
-// 	  assign_elm_nodes[5] = 4;
-// 	  assign_elm_nodes[2] = 5;
-// 	  assign_elm_nodes[6] = 6;
-// 	  assign_elm_nodes[7] = 7;
-// 	  assign_elm_nodes[8] = 8;
-// 	  assign_elm_nodes[9] = 9;
-// 	  assign_elm_nodes[3] = 10;
 
 	  assign_elm_nodes[0] = 1; //0
 	  assign_elm_nodes[1] = 5; //4
