@@ -159,6 +159,26 @@ src/fe/fe.$(obj-suffix):\
     include/quadrature.h\
     include/reference_counted_object.h\
     include/reference_counter.h
+src/fe/fe_base.$(obj-suffix):\
+    src/fe/fe_base.C\
+    include/auto_ptr.h\
+    include/elem.h\
+    include/enum_elem_quality.h\
+    include/enum_elem_type.h\
+    include/enum_fe_family.h\
+    include/enum_inf_map_type.h\
+    include/enum_order.h\
+    include/fe.h\
+    include/fe_base.h\
+    include/fe_type.h\
+    include/inf_fe.h\
+    include/mesh_common.h\
+    include/mesh_config.h\
+    include/node.h\
+    include/point.h\
+    include/quadrature.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h
 src/fe/fe_boundary.$(obj-suffix):\
     src/fe/fe_boundary.C\
     include/auto_ptr.h\
@@ -597,7 +617,21 @@ src/geom/cell.$(obj-suffix):\
     src/geom/cell.C
 src/geom/cell_hex.$(obj-suffix):\
     src/geom/cell_hex.C\
-    include/cell_hex.h
+    include/auto_ptr.h\
+    include/cell_hex.h\
+    include/elem.h\
+    include/enum_elem_quality.h\
+    include/enum_elem_type.h\
+    include/enum_order.h\
+    include/face.h\
+    include/face_quad.h\
+    include/face_quad4.h\
+    include/mesh_common.h\
+    include/mesh_config.h\
+    include/node.h\
+    include/point.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h
 src/geom/cell_hex20.$(obj-suffix):\
     src/geom/cell_hex20.C\
     include/auto_ptr.h\
@@ -609,6 +643,9 @@ src/geom/cell_hex20.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/face.h\
+    include/face_quad.h\
+    include/face_quad8.h\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
@@ -632,6 +669,9 @@ src/geom/cell_hex27.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/face.h\
+    include/face_quad.h\
+    include/face_quad9.h\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
@@ -655,6 +695,9 @@ src/geom/cell_hex8.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/face.h\
+    include/face_quad.h\
+    include/face_quad4.h\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
@@ -678,6 +721,10 @@ src/geom/cell_inf_hex16.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/face.h\
+    include/face_inf_quad6.h\
+    include/face_quad.h\
+    include/face_quad8.h\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
@@ -701,6 +748,10 @@ src/geom/cell_inf_hex18.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/face.h\
+    include/face_inf_quad6.h\
+    include/face_quad.h\
+    include/face_quad9.h\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
@@ -724,6 +775,10 @@ src/geom/cell_inf_hex8.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/face.h\
+    include/face_inf_quad4.h\
+    include/face_quad.h\
+    include/face_quad4.h\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
@@ -748,6 +803,11 @@ src/geom/cell_inf_prism12.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/face.h\
+    include/face_inf_quad6.h\
+    include/face_quad.h\
+    include/face_tri.h\
+    include/face_tri6.h\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
@@ -798,6 +858,11 @@ src/geom/cell_prism.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/face.h\
+    include/face_quad.h\
+    include/face_quad4.h\
+    include/face_tri.h\
+    include/face_tri3.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
@@ -816,6 +881,11 @@ src/geom/cell_prism6.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/face.h\
+    include/face_quad.h\
+    include/face_quad4.h\
+    include/face_tri.h\
+    include/face_tri3.h\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
@@ -839,6 +909,11 @@ src/geom/cell_pyramid.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/face.h\
+    include/face_quad.h\
+    include/face_quad4.h\
+    include/face_tri.h\
+    include/face_tri3.h\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
@@ -895,6 +970,9 @@ src/geom/cell_tet.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/face.h\
+    include/face_tri.h\
+    include/face_tri3.h\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
@@ -919,6 +997,9 @@ src/geom/cell_tet10.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/face.h\
+    include/face_tri.h\
+    include/face_tri6.h\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
@@ -943,6 +1024,9 @@ src/geom/cell_tet4.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/face.h\
+    include/face_tri.h\
+    include/face_tri3.h\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
@@ -1123,6 +1207,8 @@ src/geom/face_infinite.$(obj-suffix):\
 src/geom/face_quad.$(obj-suffix):\
     src/geom/face_quad.C\
     include/auto_ptr.h\
+    include/edge.h\
+    include/edge_edge2.h\
     include/elem.h\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
@@ -1216,6 +1302,8 @@ src/geom/face_quad9.$(obj-suffix):\
 src/geom/face_tri.$(obj-suffix):\
     src/geom/face_tri.C\
     include/auto_ptr.h\
+    include/edge.h\
+    include/edge_edge2.h\
     include/elem.h\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
@@ -1365,19 +1453,33 @@ src/mesh/mesh.$(obj-suffix):\
 src/mesh/mesh_base.$(obj-suffix):\
     src/mesh/mesh_base.C\
     include/auto_ptr.h\
+    include/cell_hex.h\
+    include/cell_inf_hex16.h\
+    include/cell_inf_hex18.h\
+    include/cell_inf_hex8.h\
+    include/cell_inf_prism12.h\
+    include/cell_inf_prism6.h\
+    include/cell_prism.h\
+    include/coupling_matrix.h\
+    include/dense_matrix.h\
+    include/dof_map.h\
     include/elem.h\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
+    include/enum_fe_family.h\
+    include/enum_inf_map_type.h\
     include/enum_order.h\
     include/face.h\
     include/face_tri.h\
     include/face_tri3.h\
     include/face_tri6.h\
+    include/fe_type.h\
     include/mesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
     include/node.h\
     include/perf_log.h\
+    include/petsc_matrix.h\
     include/point.h\
     include/reference_counted_object.h\
     include/reference_counter.h\
@@ -1519,6 +1621,11 @@ src/mesh/mesh_misc_support.$(obj-suffix):\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/face.h\
+    include/face_quad.h\
+    include/face_quad4.h\
+    include/face_tri.h\
+    include/face_tri3.h\
     include/mesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
@@ -1586,10 +1693,21 @@ src/mesh/mesh_tecplot_support.$(obj-suffix):\
 src/mesh/mesh_ucd_support.$(obj-suffix):\
     src/mesh/mesh_ucd_support.C\
     include/auto_ptr.h\
+    include/cell_hex.h\
+    include/cell_hex8.h\
+    include/cell_prism.h\
+    include/cell_prism6.h\
+    include/cell_tet.h\
+    include/cell_tet4.h\
     include/elem.h\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/face.h\
+    include/face_quad.h\
+    include/face_quad4.h\
+    include/face_tri.h\
+    include/face_tri3.h\
     include/mesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
@@ -1605,10 +1723,23 @@ src/mesh/mesh_unv_support.$(obj-suffix):\
     include/auto_ptr.h\
     include/boundary_info.h\
     include/boundary_mesh.h\
+    include/cell_hex.h\
+    include/cell_hex20.h\
+    include/cell_hex8.h\
+    include/cell_tet.h\
+    include/cell_tet10.h\
+    include/cell_tet4.h\
     include/elem.h\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_order.h\
+    include/face.h\
+    include/face_quad.h\
+    include/face_quad4.h\
+    include/face_quad8.h\
+    include/face_tri.h\
+    include/face_tri3.h\
+    include/face_tri6.h\
     include/mesh.h\
     include/mesh_base.h\
     include/mesh_common.h\
@@ -1627,6 +1758,8 @@ src/mesh/mesh_xdr_support.$(obj-suffix):\
     include/auto_ptr.h\
     include/boundary_info.h\
     include/boundary_mesh.h\
+    include/cell_hex.h\
+    include/cell_hex27.h\
     include/elem.h\
     include/enum_elem_quality.h\
     include/enum_elem_type.h\

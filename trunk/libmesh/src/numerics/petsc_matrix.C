@@ -1,4 +1,4 @@
-//    $Id: petsc_matrix.C,v 1.5 2003-01-24 17:24:44 jwpeterson Exp $
+//    $Id: petsc_matrix.C,v 1.6 2003-01-29 20:58:30 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -25,6 +25,7 @@
 
 #include "petsc_matrix.h"
 #include "petsc_vector.h"
+#include <petscviewer.h>
 
 
 
@@ -293,7 +294,6 @@ real PetscMatrix::l1_norm () const
 
 
 
-
 real PetscMatrix::linfty_norm () const
 {
   assert (initialized());
@@ -309,6 +309,54 @@ real PetscMatrix::linfty_norm () const
   value = static_cast<real>(petsc_value);
 
   return value;
+};
+
+
+
+void PetscMatrix::print_matlab (const std::string name) const
+{
+  assert (initialized());
+  assert (closed());
+  
+  int ierr=0; 
+  PetscViewer petsc_viewer;
+
+
+  ierr = PetscViewerCreate (PETSC_COMM_WORLD,
+			    &petsc_viewer);                    CHKERRQ(ierr);
+
+  /**
+   * Create an ASCII file containing the matrix
+   * if a filename was provided.  
+   */
+  if (name != "NULL")
+    {
+      ierr = PetscViewerASCIIOpen( PETSC_COMM_WORLD,
+				   name.c_str(),
+				   &petsc_viewer);             CHKERRQ(ierr);
+      
+      ierr = PetscViewerSetFormat (petsc_viewer,
+				   PETSC_VIEWER_ASCII_MATLAB); CHKERRQ(ierr);
+  
+      ierr = MatView (mat, petsc_viewer);                      CHKERRQ(ierr);
+    }
+
+  /**
+   * Otherwise the matrix will be dumped to the screen.
+   */
+  else
+    {
+      ierr = PetscViewerSetFormat (PETSC_VIEWER_STDOUT_WORLD,
+				   PETSC_VIEWER_ASCII_MATLAB); CHKERRQ(ierr);
+  
+      ierr = MatView (mat, PETSC_VIEWER_STDOUT_WORLD);         CHKERRQ(ierr);
+    }
+
+
+  /**
+   * Destroy the viewer.
+   */
+  ierr = PetscViewerDestroy (petsc_viewer);                    CHKERRQ(ierr);
 };
 
 

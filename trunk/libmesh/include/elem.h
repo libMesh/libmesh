@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.7 2003-01-25 01:42:45 jwpeterson Exp $
+// $Id: elem.h,v 1.8 2003-01-29 20:58:29 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -678,6 +678,11 @@ bool Elem::active() const
 inline
 std::vector<unsigned int> Elem::get_nodes() const
 {
+  // Print a warning message the first
+  // time we are called if compiled in
+  // DEBUB mode
+#ifdef DEBUG
+  
   static bool called = false;
 
   if (!called)
@@ -689,6 +694,10 @@ std::vector<unsigned int> Elem::get_nodes() const
 		<< std::endl;
     };
 
+#endif
+
+
+  
   std::vector<unsigned int> node_numbers (n_nodes(), 0);
 
   for (unsigned int i=0; i<n_nodes(); i++)

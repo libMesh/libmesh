@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.6 2003-01-25 01:42:46 jwpeterson Exp $
+// $Id: mesh_base.C,v 1.7 2003-01-29 20:58:30 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -34,6 +34,7 @@
 #include "cell_inf_hex8.h"
 #include "cell_inf_hex16.h"
 #include "cell_inf_hex18.h"
+#include "petsc_matrix.h"
 
 
 #ifdef HAVE_SFCURVES
@@ -1297,6 +1298,220 @@ Sphere MeshBase::subdomain_bounding_sphere (const unsigned int sid) const
   Sphere sphere (cent, .5*diag);
 
   return sphere;
+};
+
+
+
+void MeshBase::build_L_graph (PetscMatrix& conn) const
+{
+  // Initialize the connectivity matrix.
+  {
+    conn.init(n_nodes(),
+	      n_nodes(),
+	      n_nodes(),
+	      n_nodes());
+
+    // be sure the diagonals are all 0 so that ++ works.
+    for (unsigned int n=0; n<n_nodes(); n++)
+      conn.set(n,n,0.);
+
+  };
+  
+  switch (mesh_dimension())
+    {
+    case 1:
+      {
+	std::cerr << "ERROR:  The connectivity graph doesn't make much sense"
+		  << std::endl
+		  << " in 1D!"
+		  << std::endl;
+	error();
+      };
+
+      
+      // Create the graph for a 2D mesh.  Do this by looking
+      // at element edges.
+    case 2:
+      {
+	for (unsigned int e=0; e<n_elem(); e++)
+	  if (elem(e)->active())
+	    for (unsigned int s=0; s<elem(e)->n_sides(); s++)
+	      if ((elem(e)->neighbor(s) == NULL) ||
+		  (elem(e) > elem(e)->neighbor(s)))
+		{
+		  AutoPtr<Elem> side(elem(e)->build_side(s));
+
+		  const unsigned int n0 = side->node(0);
+		  const unsigned int n1 = side->node(1);
+
+		  conn.set(n0,n0, conn(n0,n0) + 1.);		  
+		  conn.set(n0,n1, -1.);
+
+		  conn.set(n1,n1, conn(n1,n1) + 1.);
+		  conn.set(n1,n0, -1.);
+		};
+
+	// All done.
+	break;
+      };
+
+
+
+      // Create the graph for a 3D mesh.  Do this by looking
+      // at element faces, then at the edges of the face.
+    case 3:
+      {
+	for (unsigned int e=0; e<n_elem(); e++)
+	  if (elem(e)->active())
+	    for (unsigned int f=0; f<elem(e)->n_sides(); f++) // Loop over faces
+	      if ((elem(e)->neighbor(f) == NULL) ||
+		  (elem(e) > elem(e)->neighbor(f)))
+		{
+		  AutoPtr<Elem> face(elem(e)->build_side(f));
+
+		  for (unsigned int s=0; s<face->n_sides(); s++) // Loop over face's edges
+		    {
+		      AutoPtr<Elem> side(face->build_side(s));
+
+		      const unsigned int n0 = side->node(0);
+		      const unsigned int n1 = side->node(1);
+
+		      // If this is the first time we've seen this edge
+		      if (conn(n0,n1) == 0.)
+			{
+			  assert (conn(n1,n0) == 0.);
+			  
+			  conn.set(n0,n0, conn(n0,n0) + 1.);		  
+			  conn.set(n0,n1, -1.);
+			  
+			  conn.set(n1,n1, conn(n1,n1) + 1.);
+			  conn.set(n1,n0, -1.);
+			};
+		    };
+		};
+
+	// All done
+	break;
+      };
+      
+
+    default:
+      // what?
+      error();
+    };
+
+
+  // OK, now the matrix is built.  Close it
+  // and return.
+  conn.close();
+  
+  return;
+};
+
+
+
+void MeshBase::build_script_L_graph (PetscMatrix& conn) const
+{
+
+  // Inefficient at the moment.  We build an L
+  // matrix and use it to create the script L matrix
+  PetscMatrix l_conn;
+
+  build_L_graph (l_conn);
+
+  conn.init(l_conn.m(),
+	    l_conn.n(),
+	    l_conn.m(),
+	    l_conn.n());
+
+  
+  switch (mesh_dimension())
+    {
+    case 1:
+      {
+	std::cerr << "ERROR:  The connectivity graph doesn't make much sense"
+		  << std::endl
+		  << " in 1D!"
+		  << std::endl;
+	error();
+      };
+
+      
+      // Create the graph for a 2D mesh.  Do this by looking
+      // at element edges.
+    case 2:
+      {
+	for (unsigned int e=0; e<n_elem(); e++)
+	  if (elem(e)->active())
+	    for (unsigned int s=0; s<elem(e)->n_sides(); s++)
+	      if ((elem(e)->neighbor(s) == NULL) ||
+		  (elem(e) > elem(e)->neighbor(s)))
+		{
+		  AutoPtr<Elem> side(elem(e)->build_side(s));
+
+		  const unsigned int n0 = side->node(0);
+		  const unsigned int n1 = side->node(1);
+
+		  conn.set(n0,n0, 1.);
+		  conn.set(n1,n1, 1.);
+
+		  const real prod_term = -1./sqrt(l_conn(n0,n0)*l_conn(n1,n1));
+		  
+		  conn.set(n0,n1, prod_term);
+		  conn.set(n1,n0, prod_term);
+		};
+
+	// All done.
+	break;
+      };
+
+
+
+      // Create the graph for a 3D mesh.  Do this by looking
+      // at element faces, then at the edges of the face.
+    case 3:
+      {
+	for (unsigned int e=0; e<n_elem(); e++)
+	  if (elem(e)->active())
+	    for (unsigned int f=0; f<elem(e)->n_sides(); f++) // Loop over faces
+	      if ((elem(e)->neighbor(f) == NULL) ||
+		  (elem(e) > elem(e)->neighbor(f)))
+		{
+		  AutoPtr<Elem> face(elem(e)->build_side(f));
+
+		  for (unsigned int s=0; s<face->n_sides(); s++) // Loop over face's edges
+		    {
+		      AutoPtr<Elem> side(face->build_side(s));
+
+		      const unsigned int n0 = side->node(0);
+		      const unsigned int n1 = side->node(1);
+
+		      conn.set(n0,n0, 1.);
+		      conn.set(n1,n1, 1.);
+		      
+		      const real prod_term = -1./sqrt(l_conn(n0,n0)*l_conn(n1,n1));
+		      
+		      conn.set(n0,n1, prod_term);
+		      conn.set(n1,n0, prod_term);
+		    };
+		};
+
+	// All done
+	break;
+      };
+      
+
+    default:
+      // what?
+      error();
+    };
+
+
+  // OK, now the matrix is built.  Close it
+  // and return.
+  conn.close();
+  
+  return;  
 };
 
 

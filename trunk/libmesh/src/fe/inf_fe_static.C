@@ -1,4 +1,4 @@
-// $Id: inf_fe_static.C,v 1.1 2003-01-24 17:24:42 jwpeterson Exp $
+// $Id: inf_fe_static.C,v 1.2 2003-01-29 20:58:30 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,7 +31,7 @@
 
 // ------------------------------------------------------------
 // InfFE::Radial class members
-template <unsigned int Dim, FEFamily T_radial, FEFamily T_base>
+template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
 InfFE<Dim,T_radial,T_base>::Radial::Radial () 
 { 
   std::cerr << "Do not define an object of this type." 
@@ -73,7 +73,7 @@ Point InfFE<Dim,T_radial,T_map>::Radial::inverse_map(const Elem*,
 
 // ------------------------------------------------------------
 // InfFE::Base class members
-template <unsigned int Dim, FEFamily T_radial, FEFamily T_base>
+template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
 InfFE<Dim,T_radial,T_base>::Base::Base () 
 { 
   std::cerr << "Do not define an object of this type." 
@@ -85,8 +85,8 @@ InfFE<Dim,T_radial,T_base>::Base::Base ()
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 unsigned int InfFE<Dim,T_radial,T_map>::Base::index(const FEType& base_fe_type,
-						      const ElemType base_elem_type,
-						      const unsigned int i)
+						    const ElemType base_elem_type,
+						    const unsigned int i)
 {
   if (Dim > 1)
     return Base::index(FEInterface::n_dofs(Dim-1, base_fe_type, base_elem_type), i);
@@ -97,7 +97,7 @@ unsigned int InfFE<Dim,T_radial,T_map>::Base::index(const FEType& base_fe_type,
 
 
 
-template <unsigned int Dim, FEFamily T_radial, FEFamily T_base>
+template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
 ElemType InfFE<Dim,T_radial,T_base>::Base::get_elem_type(const ElemType type)
 {
   switch (type)
