@@ -1,4 +1,4 @@
-// $Id: quadrature_jacobi_1D.C,v 1.3 2003-09-02 18:02:45 benkirk Exp $
+// $Id: quadrature_jacobi_1D.C,v 1.4 2003-11-30 07:10:18 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -39,7 +39,7 @@ void QJacobi::init_1D(const ElemType)
     {
       switch(_order)
 	{
-	case CONST:
+	case CONSTANT:
 	case FIRST:
 	  {
 	    _points.resize (1);
@@ -335,7 +335,7 @@ void QJacobi::init_1D(const ElemType)
       
       switch(_order)
 	{
-	case CONST:
+	case CONSTANT:
 	case FIRST:
 	  {
 	    _points.resize (1);
