@@ -57,24 +57,26 @@
  *
  * \section install Installation
  *
- * The installation of the library is straightforward. The GNU
- * autoconf package is used to determine site-specific configuration
- * parameters. A standard build will occur after typing
- * \verbatim
-     ./configure
-     make \endverbatim
- * in the top-level project directory.  To see all the configuration
- * options type  
- * \verbatim
-     ./configure --help \endverbatim     
  *
- * \subsection conf Configuration
  *
- * \subsection build Building the Library
+ * \subsection getsoftware Getting the Software
  *
- * To build the library you need GNU Make and a reasonably current
- * C++ compiler. Currently, the library is known to work with the
- * following compilers: 
+ * The \p libMesh source can be downloaded from the project's SourceForge
+ * homepage: http://sourceforge.net/projects/libmesh  Stable releases are
+ * located there as compressed tar archives. You may also access the CVS
+ * source tree for the latest code.  You can get read-only access to the
+ * CVS repository via:
+ * \veratim
+     cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/libmesh co libmesh \endverbatim
+ * If you would like to contribute to the project you will need a SourceForge developer
+ * account.
+ *
+ *
+ *
+ * \subsection compilers Compilers
+ *
+ * The library is known to work with the following compilers:
+ *
  *
  * - GNU GCC
  *   - gcc-3.2
@@ -94,6 +96,44 @@
  * - IBM xlC version 5.0
  * - Compaq CXX 6.3.9.6
  *
+ *
+ *
+ * \subsection conf Configuration
+ *
+ * Configuring the library is straightforward. The GNU
+ * autoconf package is used to determine site-specific configuration
+ * parameters. A standard build will occur after typing
+ * \verbatim
+     ./configure
+     make \endverbatim
+ * in the top-level project directory.  To see all the configuration
+ * options type  
+ * \verbatim
+     ./configure --help \endverbatim     
+ * The configure script will find your compilers and create the \p Make.common file
+ * with the configuration for your site. If you want to use different compilers than those
+ * found by configure you can specify them in environment variables.  For example, the
+ * following will build with the \p MIPS compilers on an SGI:
+ * \verbatim
+ *   CXX=CC CC=cc F77=f77 ./configure \endverbatim
+ * Note that the FORTRAN compiler is not actually used to compile any
+ * part of the library, but \p configure uses it to find out how to
+ * link FORTRAN libraries with C++ code.
+ *
+ *
+ *
+ * \subsection build Building the Library
+ *
+ * To build the library you need GNU Make and a supported compiler, as
+ * listed in section \ref conf.  After the library is configured
+ * simply type \p make to build the library.  Typing \p make \p
+ * meshtool will build a mesh translation tool using the library. 
+ *
+ * The Makefiles distributed with the library look at the shell environment variable
+ * \p METHOD to determine what mode the library should be built in.  Valid values for
+ * \p METHOD are \p opt (optimized mode, the default if \p METHOD is empty),
+ * \p debug (build with debug symbols), and \p pro (build with profiling support for
+ * use with \p gprof).
  *
  * \subsection link Linking
  */
