@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.h,v 1.5 2003-01-24 17:24:39 jwpeterson Exp $
+// $Id: mesh_unv_support.h,v 1.6 2003-02-10 14:31:15 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -134,7 +134,9 @@ protected:
                num_elements,
                num_bcs;
 
-  // location of boundary conditions
+  /**
+   * location of boundary conditions
+   */
   unsigned short int bcs_dataset_location;
 
 
@@ -148,12 +150,12 @@ private:
               label_dataset_bcs;        
     
   /**
-   * temporary fstream buffer
+   * temporary file, simplifies node & element conversion
    */
   std::fstream temporary_file;
 
   /**
-   * temporary character buffer
+   * Name of temporary file
    */
   char* temporary_file_name;
 

@@ -1,4 +1,4 @@
-// $Id: auto_ptr.h,v 1.4 2003-01-24 17:24:37 jwpeterson Exp $
+// $Id: auto_ptr.h,v 1.5 2003-02-10 14:31:13 ddreyer Exp $
 
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -191,7 +191,7 @@ public:
    *  specification here, but omitting it is standard conforming.  Its
    *  presence can be detected only if _Tp::~_Tp() throws, but this is
    *  prohibited.  [17.4.3.6]/2
-   *  @end maint
+   *  @endif maint
    */
   ~AutoPtr() { delete _ptr; };
     
@@ -282,7 +282,7 @@ public:
    * op= for AutoPtr.  Allows you to write:
    * @code
    * AutoPtr<Base> ptr = func_returning_AutoPtr(.....);
-   * @encode
+   * @endcode
    */
   AutoPtr&
   operator=(AutoPtrRef<element_type> ref) 

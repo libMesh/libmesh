@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.3 2003-02-10 03:55:11 benkirk Exp $
+# $Id: Makefile,v 1.4 2003-02-10 14:31:06 ddreyer Exp $
 
 
 # The location of the mesh library
@@ -62,7 +62,7 @@ run: $(target)
 	@echo "* Running Example " $(target)
 	@echo "***************************************************************"
 	@echo " "
-	@$(target) -d 2 -f 1
+	@$(target) -f .7
 	@echo " "
 	@echo "***************************************************************"
 	@echo "* Done Running Example " $(target)

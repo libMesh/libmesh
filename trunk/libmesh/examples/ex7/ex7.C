@@ -1,4 +1,4 @@
-// $Id: ex7.C,v 1.4 2003-02-10 03:55:11 benkirk Exp $
+// $Id: ex7.C,v 1.5 2003-02-10 14:31:12 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -90,10 +90,10 @@ Real frequency;
 /**
  * Define the fluid properties. Here (for simplicity) 
  * we define the density rho = 1. and the speed of sound
- * c = 1.
+ * speed = 1.
  */
-const Real c   = 1.;
-const Real rho = 1.;
+const Real speed = 1.;
+const Real rho   = 1.;
 
 
 /**
@@ -149,10 +149,9 @@ int main (int argc, char** argv)
     /**
      * Check for proper usage.
      */
-    if (argc != 5)
+    if (argc != 3)
       {
-	std::cerr << "Usage: " << argv[0] << " -d [dim]"
-		  << " -f [frequency]"
+	std::cerr << "Usage: " << argv[0] << " -f [frequency]"
 		  << std::endl;
 	
 	/**
@@ -174,35 +173,52 @@ int main (int argc, char** argv)
 	  std::cout << " " << argv[i];
 	
 	std::cout << std::endl << std::endl;
+
       };
     
 
     /**
-     * Get the dimensionality of the mesh from argv[2].
+     * For now, restrict to dim=2, though this
+     * may easily be changed, see example 4
      */
-    const unsigned int dim = atoi(argv[2]);     
+    const unsigned int dim = 2;
 
     /**
-     * Get the frequency from argv[4].
+     * Get the frequency from argv[2] as a @e float
      */
-    frequency = atoi(argv[4]);
+    frequency = atof(argv[2]);
+
+    /**
+     * mesh discretization depends on frequency (overestimated)
+     *
+     * @note  For cool picture (a_p in gmv), try: ./ex7 -f 3
+     */
+    const unsigned int n_el_per_dim = static_cast<unsigned int>(frequency*40.);
+
+    /**
+     * Tell the user the number of elements
+     */
+    std::cout << " Using " << n_el_per_dim << " x " 
+	      << n_el_per_dim << " = " 
+	      << n_el_per_dim*n_el_per_dim
+	      << " QUAD4 elements"
+	      << std::endl << std::endl;
+
 
     /**
      * Create a dim-dimensional mesh.
      */
     Mesh mesh (dim);
-    
+
     /**
      * Use the internal mesh generator to create a uniform
-     * grid on the square [-1,1]^D.  We instruct the mesh generator
-     * to build a mesh of 5x5 \p Quad4 elements in 2D, or \p Hex8
-     * elements in 3D.
+     * grid on the square [-1,1]^2.  We instruct the mesh generator
+     * to build a mesh of n x n \p Quad4 elements.
      */
-    mesh.build_cube (20, 20, 20,
-		     -1., 1.,
-		     -1., 1.,
-		     -1., 1.,
-		     (dim == 2) ? QUAD4 : HEX8);
+    mesh.build_square (n_el_per_dim, n_el_per_dim,
+		       -1., 1.,
+		       -1., 1.,
+		       QUAD4);
 
     /**
      * Let the elements find their neighbors.
@@ -560,14 +576,14 @@ void assemble_helmholtz(EquationSystems& es,
 
       /**
        * Compute the total, frequency-dependent element
-       * matrix  \f$  Ae = Ke - (\omega / c)^2 Me \f$.
+       * matrix  \f$  Ae = Ke - (\omega / speed)^2 Me \f$.
        * Note that real matrices are added to a complex
        * matrix (see above).  The class \p DenseMatrix<>
        * offers this feature.
        */
       Ae.add( 1., Ke);
       Ae.add(I*omega, Ce);
-      Ae.add(-omega*omega/(c*c), Me);      
+      Ae.add(-omega*omega/(speed*speed), Me);      
       
       /**
        *----------------------------------------------------------------
