@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.15 2003-03-04 15:31:20 benkirk Exp $
+// $Id: fe.C,v 1.16 2003-04-01 14:19:48 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -22,7 +22,6 @@
 // Local includes
 #include "fe.h"
 #include "libmesh.h"
-#include "inf_fe.h"
 #include "quadrature.h"
 #include "elem.h"
 

@@ -1,4 +1,4 @@
-// $Id: edge_inf_edge2.h,v 1.11 2003-03-26 01:08:15 ddreyer Exp $
+// $Id: edge_inf_edge2.h,v 1.12 2003-04-01 14:19:46 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -75,8 +75,8 @@ class InfEdge2 : public Edge
   
   const std::vector<unsigned int> tecplot_connectivity(const unsigned int se=0) const;
   
-  void vtk_connectivity(const unsigned int,
-			std::vector<unsigned int>*) const;
+  void vtk_connectivity(const unsigned int se,
+			std::vector<unsigned int>*conn = NULL) const;
   
   unsigned int vtk_element_type (const unsigned int) const
   { return 3; }
@@ -88,6 +88,11 @@ class InfEdge2 : public Edge
    * @returns \p true.  This is an infinite element. 
    */
   bool infinite () const { return true; }
+
+  /**
+   * @returns the origin of this infinite element.
+   */
+  Point origin () const;
 
 #endif
 
@@ -118,6 +123,14 @@ InfEdge2::InfEdge2(const Elem* p) :
   Edge(InfEdge2::n_nodes(), p) 
 {
 }
+
+
+inline
+Point InfEdge2::origin () const
+{
+  return ( this->point(0)*2. - this->point(1) );
+}
+
 
 #endif
 

@@ -1,4 +1,4 @@
-// $Id: face_inf_quad6.C,v 1.14 2003-03-11 00:47:47 ddreyer Exp $
+// $Id: face_inf_quad6.C,v 1.15 2003-04-01 14:19:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -43,10 +43,10 @@ const float InfQuad6::_embedding_matrix[2][6][6] =
     //     0       1       2       3       4       5th parent node
     {    1.0,    0.0,    0.0,    0.0,    0.0,    0.0 }, // 0th child node
     {    0.0,    0.0,    0.0,    0.0,    1.0,    0.0 }, // 1
-    {    0.0,    0.0,    0.0,    0.0,    0.0,    1.0 }, // 2
-    {    0.0,    0.0,    0.0,    1.0,    0.0,    0.0 }, // 3
+    {    0.0,    0.0,    1.0,    0.0,    0.0,    0.0 }, // 2
+    {    0.0,    0.0,    0.0,    0.0,    0.0,    1.0 }, // 3
     {  0.375, -0.125,    0.0,    0.0,   0.75,    0.0 }, // 4
-    {    0.0,    0.0, -0.125,  0.375,    0.0,   0.75 }  // 5
+    {    0.0,    0.0,  0.375, -0.125,    0.0,   0.75 }  // 5
   },
 
   // embedding matrix for child 1
@@ -54,10 +54,10 @@ const float InfQuad6::_embedding_matrix[2][6][6] =
     //     0       1       2       3       4       5th parent node
     {    0.0,    0.0,    0.0,    0.0,    1.0,    0.0 }, // 0th child node
     {    0.0,    1.0,    0.0,    0.0,    0.0,    0.0 }, // 1
-    {    0.0,    0.0,    1.0,    0.0,    0.0,    0.0 }, // 2
-    {    0.0,    0.0,    0.0,    0.0,    0.0,    1.0 }, // 3
+    {    0.0,    0.0,    0.0,    0.0,    0.0,    1.0 }, // 2
+    {    0.0,    0.0,    0.0,    1.0,    0.0,    0.0 }, // 3
     { -0.125,  0.375,    0.0,    0.0,   0.75,    0.0 }, // 4
-    {    0.0,    0.0,  0.375, -0.125,    0.0,   0.75 }  // 5
+    {    0.0,    0.0, -0.125,  0.375,    0.0,   0.75 }  // 5
   }
 };
 
@@ -90,7 +90,7 @@ AutoPtr<Elem> InfQuad6::build_side (const unsigned int i) const
 	InfEdge2* edge = new InfEdge2;
 
 	edge->set_node(0) = this->get_node(1);
-	edge->set_node(1) = this->get_node(2);
+	edge->set_node(1) = this->get_node(3);
 
 	AutoPtr<Elem> ap(edge);  return ap;
       }
@@ -101,7 +101,7 @@ AutoPtr<Elem> InfQuad6::build_side (const unsigned int i) const
 	InfEdge2* edge = new InfEdge2;
 
 	edge->set_node(0) = this->get_node(0); // be aware of swapped nodes,
-	edge->set_node(1) = this->get_node(3); // compared to conventional side numbering
+	edge->set_node(1) = this->get_node(2); // compared to conventional side numbering
 
 	AutoPtr<Elem> ap(edge);  return ap;
       }
@@ -134,7 +134,7 @@ const std::vector<unsigned int> InfQuad6::tecplot_connectivity(const unsigned in
       conn[0] = this->node(0)+1;
       conn[1] = this->node(4)+1;
       conn[2] = this->node(5)+1;
-      conn[3] = this->node(3)+1;
+      conn[3] = this->node(2)+1;
 
       return conn;
 
@@ -142,7 +142,7 @@ const std::vector<unsigned int> InfQuad6::tecplot_connectivity(const unsigned in
       // linear sub-quad 1
       conn[0] = this->node(4)+1;
       conn[1] = this->node(1)+1;
-      conn[2] = this->node(2)+1;
+      conn[2] = this->node(3)+1;
       conn[3] = this->node(5)+1;
 
       return conn;

@@ -1,4 +1,4 @@
-// $Id: fe_interface_inf_fe.C,v 1.4 2003-02-20 04:59:58 benkirk Exp $
+// $Id: fe_interface_inf_fe.C,v 1.5 2003-04-01 14:19:48 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -178,17 +178,268 @@ unsigned int FEInterface::ifem_n_dofs_per_elem(const unsigned int dim,
 
 
 
-void FEInterface::ifem_nodal_soln(const unsigned int,
-				  const FEType&,
-				  const Elem*,
-				  const std::vector<Number>& /* elem_soln */,
-				  std::vector<Number>&       /* nodal_soln */)
+void FEInterface::ifem_nodal_soln(const unsigned int dim,
+				  const FEType& fe_t,
+				  const Elem* elem,
+				  const std::vector<Number>& elem_soln,
+				  std::vector<Number>& nodal_soln)
 {
-  std::cerr << "ERROR: Concept of nodal solution not " << std::endl
-	    << "applicable to infinite elements!" << std::endl;	
-  error();
+  switch (dim)
+    {
+
+      // 1D
+    case 1:
+      {
+	switch (fe_t.radial_family)
+	  {
+	  case INFINITE_MAP:
+	    {
+	      std::cerr << "ERROR: INFINTE_MAP is not a valid shape family for radial approximation." << std::endl;
+	      error();
+	    }
+
+	  case JACOBI_20_00:
+	    {
+  	      switch (fe_t.inf_map)
+	        {
+		  case CARTESIAN:
+		    {
+		      InfFE<1,JACOBI_20_00,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
+		      break;
+		    }
+		  default:
+		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
+		    error();
+		}
+	    }
+
+	  case JACOBI_30_00:
+	    {
+  	      switch (fe_t.inf_map)
+	        {
+		  case CARTESIAN:
+		    {
+		      InfFE<1,JACOBI_30_00,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
+		      break;
+		    }
+		  default:
+		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
+		    error();
+		}
+	    }
+
+	  case LEGENDRE:
+	    {
+  	      switch (fe_t.inf_map)
+	        {
+		  case CARTESIAN:
+		    {
+		      InfFE<1,LEGENDRE,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
+		      break;
+		    }
+		  default:
+		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
+		    error();
+		}
+	    }
+
+	  case LAGRANGE:
+	    {
+  	      switch (fe_t.inf_map)
+	        {
+		  case CARTESIAN:
+		    {
+		      InfFE<1,LAGRANGE,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
+		      break;
+		    }
+		  default:
+		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
+		    error();
+		}
+	    }
+
+
+	    
+	  default:
+	    std::cerr << "ERROR: Bad FEType.radial_family= " << fe_t.radial_family << std::endl;
+	    error();
+	  }
+
+      }
+
+      
+
+
+      // 2D
+    case 2:
+      {
+	switch (fe_t.radial_family)
+	  {
+	  case INFINITE_MAP:
+	    {
+	      std::cerr << "ERROR: INFINTE_MAP is not a valid shape family for radial approximation." << std::endl;
+	      error();
+	    }
+
+	  case JACOBI_20_00:
+	    {
+  	      switch (fe_t.inf_map)
+	        {
+		  case CARTESIAN:
+		    {
+		      InfFE<2,JACOBI_20_00,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
+		      break;
+		    }
+		  default:
+		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;			      
+		    error();
+		}
+	    }
+
+	  case JACOBI_30_00:
+	    {
+  	      switch (fe_t.inf_map)
+	        {
+		  case CARTESIAN:
+		    {
+		      InfFE<2,JACOBI_30_00,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
+		      break;
+		    }
+		  default:
+		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;			      
+		    error();
+		}
+	    }
+
+	  case LEGENDRE:
+	    {
+  	      switch (fe_t.inf_map)
+	        {
+		  case CARTESIAN:
+		    {
+		      InfFE<2,LEGENDRE,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
+		      break;
+		    }
+		  default:
+		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;			      
+		    error();
+		}
+	    }
+
+	  case LAGRANGE:
+	    {
+  	      switch (fe_t.inf_map)
+	        {
+		  case CARTESIAN:
+		    {
+		      InfFE<2,LAGRANGE,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
+		      break;
+		    }
+		  default:
+		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;			      
+		    error();
+		}
+	    }
+
+
+	    
+	  default:
+	    std::cerr << "ERROR: Bad FEType.radial_family= " << fe_t.radial_family << std::endl;
+	    error();
+	  }
+
+      }
+
+      
+
+
+      // 3D
+    case 3:
+      {
+	switch (fe_t.radial_family)
+	  {
+	  case INFINITE_MAP:
+	    {
+	      std::cerr << "ERROR: INFINTE_MAP is not a valid shape family for radial approximation." << std::endl;
+	      error();
+	    }
+
+	  case JACOBI_20_00:
+	    {
+  	      switch (fe_t.inf_map)
+	        {
+		  case CARTESIAN:
+		    {
+		      InfFE<3,JACOBI_20_00,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
+		      break;
+		    }
+		  default:
+		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;			      
+		    error();
+		}
+	    }
+
+	  case JACOBI_30_00:
+	    {
+  	      switch (fe_t.inf_map)
+	        {
+		  case CARTESIAN:
+		    {
+		      InfFE<3,JACOBI_30_00,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
+		      break;
+		    }
+		  default:
+		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;			      
+		    error();
+		}
+	    }
+
+	  case LEGENDRE:
+	    {
+  	      switch (fe_t.inf_map)
+	        {
+		  case CARTESIAN:
+		    {
+		      InfFE<3,LEGENDRE,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
+		      break;
+		    }
+		  default:
+		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;		      
+		    error();
+		}
+	    }
+
+	  case LAGRANGE:
+	    {
+  	      switch (fe_t.inf_map)
+	        {
+		  case CARTESIAN:
+		    {
+		      InfFE<3,LAGRANGE,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
+		      break;
+		    }
+		  default:
+		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;			      
+		    error();
+		}
+	    }
+
+
+	    
+	  default:
+	    std::cerr << "ERROR: Bad FEType.radial_family= " << fe_t.radial_family << std::endl;
+	    error();
+	  }
+      }
+
+    default:
+      error();
+    }
   return;
 }
+
+
+
 
 
 

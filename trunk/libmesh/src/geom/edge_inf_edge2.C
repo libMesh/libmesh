@@ -1,4 +1,4 @@
-// $Id: edge_inf_edge2.C,v 1.8 2003-03-11 00:47:45 ddreyer Exp $
+// $Id: edge_inf_edge2.C,v 1.9 2003-04-01 14:19:49 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -41,10 +41,21 @@ const std::vector<unsigned int> InfEdge2::tecplot_connectivity(const unsigned in
 }
 
 
-void InfEdge2::vtk_connectivity(const unsigned int,
-				std::vector<unsigned int> *) const
+void InfEdge2::vtk_connectivity(const unsigned int se,
+				std::vector<unsigned int> *conn) const
 {
-  error();  // Not yet implemented
+  assert (_nodes != NULL);
+  assert (se < this->n_sub_elem());
+  
+  if (conn == NULL)
+    conn = new std::vector<unsigned int>;
+
+  conn->resize(2);
+
+  (*conn)[0] = this->node(0);
+  (*conn)[1] = this->node(1);
+
+  return;
 }
 
 

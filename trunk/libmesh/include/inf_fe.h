@@ -1,4 +1,4 @@
-// $Id: inf_fe.h,v 1.23 2003-03-04 18:09:34 spetersen Exp $
+// $Id: inf_fe.h,v 1.24 2003-04-01 14:19:47 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -56,46 +56,17 @@ class Elem;
  * time, use the \p FEBase::build() member to create abstract 
  * (but still optimized) infinite elements at run time.
  *
- * This is the numbering scheme, also applicable to the quadrature points:
-   \verbatim
-
-                      to infinity
-                           ^                                   
-                           |                                   
-
-    o 5         ( )             (o)           (o)           (o)
-    |            |               |                          / 2      
-    o 4          |               o            o            o        
-    |            |               |                        /         
-    o 3          |               o 9         o ...       o          
-    |            |               |                      /           
-    o 2          |               o 6        o 8        o 7          
-    |            |               |                    /             
-    o 1          |               o 3       o 5       o 4            
-    |            |               |                  /               
-    o 0         ( )            ({#})----({#})----({#})              
-                                  0        2        1                
-  radial       radial 
-  modes        mapping
-
-                                {X}------{X}------{X}              
-                                  0        2        1  
-
-
-                                        base
-                                      element
-
-
-  o        radial approximation dof
- ( )       radial mapping node
-  #        radial and base approximation dof
-  X        base approximation dof
- { }       base mapping node
-   \endverbatim
+ * The @e node numbering scheme is the one from the current
+ * infinite element.  Each node in the base holds exactly
+ * the same number of dofs as an adjacent conventional \p FE
+ * would contain.  The nodes further out hold the additional
+ * dof necessary for radial approximation.  The order of the outer nodes'
+ * components is such that the radial shapes have highest 
+ * priority, followed by the base shapes.
  *
  * \author Daniel Dreyer
  * \date 2003
- * \version $Revision: 1.23 $
+ * \version $Revision: 1.24 $
  */
 
 //-------------------------------------------------------------
@@ -118,65 +89,45 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.23 $
+   * \version $Revision: 1.24 $
    */
   //-------------------------------------------------------------
   // InfFE::Radial class definition
   class Radial
   {
-  public:
+  private:
 
     /**
-     * Constructor.  Don't use an object of this type.
+     * Never use an object of this type.
      */
-    Radial();
+    Radial() {}
+
+  public:
 
     /**
      * @returns the decay in radial direction of
      * the \p Dim dimensional infinite element.
      */
-    static Real decay(const Real v);
+    static Real decay (const Real v);
 
     /**
      * @returns the first (local) derivative of the
      * decay in radial direction of the infinite element.
      */
-    static Real decay_deriv(const Real) { return -.5; }
+    static Real decay_deriv (const Real) { return -.5; }
 
     /**
      * @returns the radial weight D, used as an additional weight
      * for the test function, evaluated at local radial coordinate \p v.
      */
-    static Real D(const Real v) { return (1.-v)*(1.-v)/4.; }
+    static Real D (const Real v) { return (1.-v)*(1.-v)/4.; }
 
     /**
      * @returns the first (local) radial derivative of the radial weight D.
      */
-    static Real D_deriv(const Real v) { return (v-1.)/2.; }
+    static Real D_deriv (const Real v) { return (v-1.)/2.; }
 
-    /**
-     * @returns the index (0 for the base, 1,2,... for the outer shells) 
-     * in @e radial direction of the infinite element.  \p i is the index in
-     * the whole infinite element, and \p n_base_dofs is the number of dofs
-     * in the base of the infinite element.
-     * Note that for  \p i<Elem::n_nodes(), i.e. a node, not a dof,
-     * either 0 (base) or 1 (outer node) is returned.
-     */
-    static unsigned int index(const unsigned int n_base_dofs,
-			      const unsigned int i)
-	{ return i / n_base_dofs; }
-
-    /**
-     * @returns the index (0 for the base, 1,2,... for the outer shells) 
-     * in @e radial direction for the infinite element with the \p FEType
-     * \p fe_type and the @e base element \p base_elem_type.  Used by the 
-     * public static members of \p InfFE.
-     */
-    static unsigned int index(const FEType& fe_type,
-			      const ElemType base_elem_type,
-			      const unsigned int i);
-
-    /**
+   /**
      * @returns the Order of the mapping functions
      * in radial direction. Currently, this is @e always \p FIRST.
      */
@@ -194,7 +145,7 @@ protected:
      * 1 mode, when \p o_radial=CONST.
      * Therefore, we have a total of \p o_radial+1 modes in radial direction.
      */
-    static unsigned int n_dofs(const Order o_radial)
+    static unsigned int n_dofs (const Order o_radial)
 	{ return static_cast<unsigned int>(o_radial)+1; }
 
     /**
@@ -206,8 +157,8 @@ protected:
      * the base.  All higher radial modes are associated with
      * the physically existing nodes further out.
      */
-    static unsigned int n_dofs_at_node(const Order o_radial,
-				       const unsigned int n_onion);
+    static unsigned int n_dofs_at_node (const Order o_radial,
+					const unsigned int n_onion);
 
     /**
      * @returns the number of modes in radial direction interior to the element,
@@ -216,21 +167,8 @@ protected:
      * we have no special formulation for coupling in the base, like in the 
      * case of associating (possibly) multiple dofs per (outer) node.
      */
-    static unsigned int n_dofs_per_elem(const Order o_radial)
+    static unsigned int n_dofs_per_elem (const Order o_radial)
 	{ return static_cast<unsigned int>(o_radial)+1; }
-				       
-    /**
-     * @returns the location in radial direction (on the reference axis) 
-     * of the point \p p located in physical space.  This function requires
-     * inverting the (possibly nonlinear) transformation map, so
-     * it is not trivial. The optional parameter \p tolerance defines
-     * how close is "good enough."  The map inversion iteration
-     * computes the sequence \f$ \{ p_n \} \f$, and the iteration is
-     * terminated when \f$ \|p - p_n\| < \mbox{\texttt{tolerance}} \f$
-     */
-    static Point inverse_map (const Elem* inf_elem,
-			      const Real dist_origin,
-			      const Real tolerance);
 
   };
 
@@ -243,18 +181,20 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.23 $
+   * \version $Revision: 1.24 $
    */
   //-------------------------------------------------------------
   // InfFE::Base class definition
   class Base
   {
-  public:
+  private:
 
     /**
-     * Constructor.  Don't use an object of this type.
+     * Never use an object of this type.
      */
-    Base();
+    Base() {}
+
+  public:
 
     /**
      * Build the base element of an infinite element.  Be careful,
@@ -262,34 +202,21 @@ protected:
      * new element afterwards.
      */
     static Elem* build_elem (const Elem* inf_elem);
- 
-    /**
-     * @returns the index in the @e base element. \p i
-     * is the index in the whole infinite element,
-     * \p n_base_dofs is the number of dofs in the @e base
-     * of the infinite element.
-     */
-    static unsigned int index(const unsigned int n_base_dofs,
-			      const unsigned int i)
-	{ return i % n_base_dofs; }
-
-    /**
-     * @returns the index in the @e base element. \p i is the index in the 
-     * whole infinite element, \p fe_type is the current \p FEType
-     * and \p base_elem_type is the @e base element.  Used by the 
-     * public static members of \p InfFE.
-     */
-    static unsigned int index(const FEType& fe_type,
-			      const ElemType base_elem_type,
-			      const unsigned int i);
 
     /**
      * @returns the base element associated to
      * \p type.  This is, for example, \p TRI3 for
      * \p INFPRISM6.
      */
-    static ElemType get_elem_type(const ElemType type);
+    static ElemType get_elem_type (const ElemType type);
 
+    /**
+     * @returns the number of shape functions used in the
+     * mapping in the @e base element of type \p base_elem_type
+     * mapped with order \p base_mapping_order
+     */
+    static unsigned int n_base_mapping_sf (const ElemType base_elem_type,
+					   const Order base_mapping_order);
 
   };
 
@@ -397,16 +324,19 @@ public:
 
   /**
    * @returns the location (on the reference element) of the
-   * point \p p located in physical space.  This function requires
-   * inverting the (possibly nonlinear) transformation map, so
-   * it is not trivial. The optional parameter \p tolerance defines
+   * point \p p located in physical space.  First, the location
+   * in the base face is computed. This requires inverting the 
+   * (possibly nonlinear) transformation map in the base, so it is 
+   * not trivial. The optional parameter \p tolerance defines
    * how close is "good enough."  The map inversion iteration
    * computes the sequence \f$ \{ p_n \} \f$, and the iteration is
-   * terminated when \f$ \|p - p_n\| < \mbox{\texttt{tolerance}} \f$
+   * terminated when \f$ \|p - p_n\| < \mbox{\texttt{tolerance}} \f$.
+   * Once the base face point is determined, the radial local
+   * coordinate is directly evaluated.
    */
   static Point inverse_map (const Elem* elem,
 			    const Point& p,
-			    const Real tolerance);
+			    const Real tolerance = TOLERANCE);
 
 
 
@@ -514,9 +444,6 @@ protected:
    */
   void init_radial_shape_functions(const Elem* inf_elem);
 
-
-  //-------------------------------------------------------------
-  // The bigger internal methods used during assembly  
   /** 
    * Initialize all the data fields like \p weight, \p mode, 
    * \p phi, \p dphidxi, \p dphideta, \p dphidzeta, etc.
@@ -558,39 +485,51 @@ protected:
 
 
 
-  //TODO:[DD] overload compute_map?
-  
-/*   NOT YET IMPLEMENTED */
-/*   /\** */
-/*    * @returns the location (in physical space) of the point */
-/*    * \p p located on the reference element. */
-/*    *\/ */
-/*   static Point map (const Elem* elem, */
-/* 		    const Point& reference_point); */
-  
-/*   /\** */
-/*    * @returns d(xyz)/dxi (in physical space) of the point */
-/*    * \p p located on the reference element. */
-/*    *\/ */
-/*   static Point map_xi (const Elem* elem, */
-/* 		       const Point& reference_point); */
-  
-/*   /\** */
-/*    * @returns d(xyz)/deta (in physical space) of the point */
-/*    * \p p located on the reference element. */
-/*    *\/ */
-/*   static Point map_eta (const Elem* elem, */
-/* 			const Point& reference_point); */
+  //-------------------------------------------------------------
+  // Miscellaneous static members
 
-/*   /\** */
-/*    * @returns d(xyz)/dzeta (in physical space) of the point */
-/*    * \p p located on the reference element. */
-/*    *\/ */
-/*   static Point map_zeta (const Elem* elem, */
-/* 			 const Point& reference_point); */
+  /**
+   * @returns the location (in physical space) of the point
+   * \p p located on the reference element.
+   */
+  static Point map (const Elem* inf_elem,
+		    const Point& reference_point);
 
+  /**
+   * Computes the indices in the base \p base_node and in radial 
+   * direction \p radial_node (either 0 or 1) associated to the 
+   * node \p outer_node_index of an infinite element of type
+   * \p inf_elem_type.
+   */
+  static void compute_node_indices (const ElemType inf_elem_type,
+				    const unsigned int outer_node_index,
+				    unsigned int& base_node,
+				    unsigned int& radial_node);
 
+  /**
+   * Does the same as \p compute_node_indices(), but stores
+   * the maps for the current element type.  Provided the
+   * infinite element type changes seldom, this is probably
+   * faster than using \p compute_node_indices () alone.
+   * This is possible since the number of @e nodes is not likely
+   * to change.
+   */
+  static void compute_node_indices_fast (const ElemType inf_elem_type,
+					 const unsigned int outer_node_index,
+					 unsigned int& base_node,
+					 unsigned int& radial_node);
 
+  /**
+   * Computes the indices of shape functions in the base \p base_shape and 
+   * in radial direction \p radial_shape (0 in the base, \f$ \ge 1 \f$ further 
+   * out) associated to the shape with global index \p i of an infinite element 
+   * of type \p inf_elem_type.
+   */
+  static void compute_shape_indices (const FEType& fet,
+				     const ElemType inf_elem_type,
+				     const unsigned int i,
+				     unsigned int& base_shape,
+				     unsigned int& radial_shape);
 
   //--------------------------------------------------------------
   // protected members, which are not to be accessed from outside
@@ -668,7 +607,53 @@ protected:
 
 
   //--------------------------------------------------------------
-  // some protected members
+  // numbering scheme maps
+
+  /**
+   * The internal structure of the \p InfFE
+   * -- tensor product of base element times radial
+   * nodes -- has to be determined from the node numbering
+   * of the current infinite element.  This vector
+   * maps the @e infinte \p Elem node number to the 
+   * @e radial node (either 0 or 1).
+   */
+  std::vector<unsigned int> _radial_node_index;
+
+  /**
+   * The internal structure of the \p InfFE
+   * -- tensor product of base element times radial
+   * nodes -- has to be determined from the node numbering
+   * of the current element.  This vector
+   * maps the @e infinte \p Elem node number to the 
+   * associated node in the @e base element.
+   */
+  std::vector<unsigned int> _base_node_index;
+
+  /**
+   * The internal structure of the \p InfFE
+   * -- tensor product of base element shapes times radial
+   * shapes -- has to be determined from the dof numbering
+   * scheme of the current infinite element.  This vector
+   * maps the infinite \p Elem dof index to the @e radial 
+   * \p InfFE shape index (\p 0..radial_order+1 ).
+   */
+  std::vector<unsigned int> _radial_shape_index;
+
+  /**
+   * The internal structure of the \p InfFE
+   * -- tensor product of base element shapes times radial
+   * shapes -- has to be determined from the dof numbering
+   * scheme of the current infinite element.  This vector
+   * maps the infinite \p Elem dof index to the associated
+   * dof in the @e base \p FE.
+   */
+  std::vector<unsigned int> _base_shape_index;
+
+
+
+
+  //--------------------------------------------------------------
+  // some more protected members
 
   /**
    * The number of total approximation shape functions for 
@@ -724,8 +709,17 @@ protected:
   FEType current_fe_type;
 
 
+
 private:
- 
+  /**
+   * When \p compute_node_indices_fast() is used, this static
+   * variable remembers the element type for which the
+   * static variables in  \p compute_node_indices_fast()
+   * are currently set.  Using a class member for the
+   * element type helps initializing it to a default value.
+   */
+  static ElemType _compute_node_indices_fast_current_elem_type;
+
   /**
    * Make all \p \InfFE<Dim,T_radial,T_map> classes
    * friends of each other, so that the protected
@@ -769,30 +763,6 @@ Real InfFE<Dim,T_radial,T_map>::Radial::decay(const Real v)
       return 0.;
   }
 }
-
-
-template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-inline
-unsigned int InfFE<Dim,T_radial,T_map>::Radial::n_dofs_at_node(const Order o_radial,
-							       const unsigned int n_onion)
-{
-  assert (n_onion < 2);
-
-  if (n_onion == 0)
-    /*
-     * in the base, no matter what, we have 1 node associated 
-     * with radial direction
-     */
-    return 1;
-  else
-    /*
-     * this works, since for Order o_radial=CONST=0, we still
-     * have the (1-v)/2 mode, associated to the base
-     */
-    return static_cast<unsigned int>(o_radial);
-}
-
-
 
 
 

@@ -1,4 +1,4 @@
-// $Id: inf_fe.C,v 1.17 2003-03-12 20:20:54 ddreyer Exp $
+// $Id: inf_fe.C,v 1.18 2003-04-01 14:19:48 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -69,8 +69,11 @@ InfFE<Dim,T_radial,T_map>::InfFE (const FEType& fet) :
   assert (T_map    == fe_type.inf_map);
 
   // build the base_fe object, handle the AutoPtr
-  AutoPtr<FEBase> ap_fb(FEBase::build(Dim-1, fet));
-  base_fe = ap_fb.release();
+  if (Dim != 1)
+    {
+      AutoPtr<FEBase> ap_fb(FEBase::build(Dim-1, fet));
+      base_fe = ap_fb.release();
+    }
 }
 
 
@@ -217,10 +220,10 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem)
 
   // when either the radial or base part change, we have to init the whole fields
   if (init_shape_functions_required)
-    init_shape_functions(inf_elem);
+    init_shape_functions (inf_elem);
 
 
-  // compute dist (depends on geometry, therefore has to be update for
+  // compute dist (depends on geometry, therefore has to be updated for
   // each and every new element), throw radial and base part together
   combine_base_radial (inf_elem);
 
@@ -348,19 +351,8 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 
   // the number of base shape functions used to construct the map
   // (Lagrange shape functions are used for mapping in the base)
-  unsigned int n_base_mapping_shape_functions;
-  if (Dim == 1)
-    n_base_mapping_shape_functions = 1;
-  
-  else if (Dim == 2)
-    n_base_mapping_shape_functions = FE<1,LAGRANGE>::n_shape_functions (base_mapping_elem_type,
+  unsigned int n_base_mapping_shape_functions = Base::n_base_mapping_sf(base_mapping_elem_type,
 									base_mapping_order);
-  else if (Dim == 3)
-    n_base_mapping_shape_functions = FE<2,LAGRANGE>::n_shape_functions (base_mapping_elem_type,
-									base_mapping_order);
-  else
-    error();
-
 
   const unsigned int n_total_mapping_shape_functions = 
     n_radial_mapping_sf * n_base_mapping_shape_functions;
@@ -393,6 +385,50 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
   
   // update class member field
   _n_total_qp = n_total_qp;
+
+
+
+  // -----------------------------------------------------------------
+  // initialize the node and shape numbering maps
+  {
+    // these vectors work as follows: the i-th entry stores
+    // the associated base/radial node number
+    _radial_node_index.resize    (n_total_mapping_shape_functions);
+    _base_node_index.resize      (n_total_mapping_shape_functions);
+
+    // similar for the shapes: the i-th entry stores
+    // the associated base/radial shape number
+    _radial_shape_index.resize   (n_total_approx_shape_functions);
+    _base_shape_index.resize     (n_total_approx_shape_functions);
+
+    const ElemType inf_elem_type (inf_elem->type());
+
+    // fill the node index map
+    for (unsigned int n=0; n<n_total_mapping_shape_functions; n++)
+      {
+        compute_node_indices (inf_elem_type, 
+			      n,
+			      _base_node_index[n], 
+			      _radial_node_index[n]);
+	assert (_base_node_index[n]   < n_base_mapping_shape_functions);
+	assert (_radial_node_index[n] < n_radial_mapping_sf);
+      }
+
+    // fill the shape index map
+    for (unsigned int n=0; n<n_total_approx_shape_functions; n++)
+      {
+	compute_shape_indices (this->fe_type,
+			       inf_elem_type, 
+			       n,
+			       _base_shape_index[n], 
+			       _radial_shape_index[n]);
+	assert (_base_shape_index[n]   < n_base_approx_shape_functions);
+	assert (_radial_shape_index[n] < n_radial_approx_sf);
+      }
+  }
+ 
+
+
 
 
   // -----------------------------------------------------------------
@@ -493,13 +529,9 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 
 
   // zero  the phase, since it is to be summed up
-  for (unsigned int p=0; p<n_total_qp; p++)
-    {
-      dphasedxi[p]   = 0.;
-      dphasedeta[p]  = 0.;
-      dphasedzeta[p] = 0.;
-    }
-
+  std::fill (dphasedxi.begin(),   dphasedxi.end(),   0.);
+  std::fill (dphasedeta.begin(),  dphasedeta.end(),  0.);
+  std::fill (dphasedzeta.begin(), dphasedzeta.end(), 0.);
 
 
   {
@@ -588,10 +620,12 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
 	const unsigned int n_radial_qp         = radial_qrule->n_points();
 	const unsigned int n_base_qp           = base_qrule->  n_points();
 
-	const unsigned int n_radial_mapping_sf = radial_map.size();
+//	const unsigned int n_radial_mapping_sf = radial_map.size();
+	const unsigned int n_total_mapping_sf  = radial_map.size() * n_base_mapping_sf;
 
-	const unsigned int n_base_approx_sf    = base_fe->n_shape_functions();
-	const unsigned int n_radial_approx_sf  = Radial::n_dofs(fe_type.radial_order);
+//	const unsigned int n_base_approx_sf    = base_fe->n_shape_functions();
+//	const unsigned int n_radial_approx_sf  = Radial::n_dofs(fe_type.radial_order);
+	const unsigned int n_total_approx_sf   = Radial::n_dofs(fe_type.radial_order) *  base_fe->n_shape_functions();
 
 
 	// compute the phase term derivatives
@@ -628,34 +662,84 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
 	}
 
 
-	// compute the overall approximation shape functions
+
+
+	assert (phi.size()       == n_total_approx_sf);
+	assert (dphidxi.size()   == n_total_approx_sf);
+	assert (dphideta.size()  == n_total_approx_sf);
+	assert (dphidzeta.size() == n_total_approx_sf);
+	/*
+	 * compute the overall approximation shape functions,
+	 * pick the appropriate radial and base shapes through using
+	 * _base_shape_index and _radial_shape_index
+	 */
 	for (unsigned int rp=0; rp<n_radial_qp; rp++)  // over radial qp's
 	  for (unsigned int bp=0; bp<n_base_qp; bp++)  // over base qp's
-	    for (unsigned int ri=0; ri<n_radial_approx_sf; ri++)  // over radial approx shapes
-	      for (unsigned int bi=0; bi<n_base_approx_sf; bi++)  // over base   approx shapes
-	        {
-		  // form the total shape function data fields
-		  phi      [ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = S [bi][bp] * mode[ri][rp] * som[rp];
-		  dphidxi  [ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = Ss[bi][bp] * mode[ri][rp] * som[rp];
-		  dphideta [ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = St[bi][bp] * mode[ri][rp] * som[rp];
-		  dphidzeta[ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = S [bi][bp] 
-		      * (dmodedv[ri][rp] * som[rp] + mode[ri][rp] * dsomdv[rp]);
+	    for (unsigned int ti=0; ti<n_total_approx_sf; ti++)  // over _all_ approx_sf
+	      {
+		// let the index vectors take care of selecting the appropriate base/radial shape
+		const unsigned int bi = _base_shape_index  [ti];
+		const unsigned int ri = _radial_shape_index[ti];
+		phi      [ti][bp+rp*n_base_qp] = S [bi][bp] * mode[ri][rp] * som[rp];
+		dphidxi  [ti][bp+rp*n_base_qp] = Ss[bi][bp] * mode[ri][rp] * som[rp];
+		dphideta [ti][bp+rp*n_base_qp] = St[bi][bp] * mode[ri][rp] * som[rp];
+		dphidzeta[ti][bp+rp*n_base_qp] = S [bi][bp] 
+		    * (dmodedv[ri][rp] * som[rp] + mode[ri][rp] * dsomdv[rp]);
+	      }
+// OLD CODE
+// 	for (unsigned int rp=0; rp<n_radial_qp; rp++)  // over radial qp's
+// 	  for (unsigned int bp=0; bp<n_base_qp; bp++)  // over base qp's
+// 	    for (unsigned int ri=0; ri<n_radial_approx_sf; ri++)  // over radial approx shapes
+// 	      for (unsigned int bi=0; bi<n_base_approx_sf; bi++)  // over base   approx shapes
+// 	        {
+// 		  // form the total shape function data fields
+//  		  phi      [ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = S [bi][bp] * mode[ri][rp] * som[rp];
+//  		  dphidxi  [ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = Ss[bi][bp] * mode[ri][rp] * som[rp];
+//  		  dphideta [ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = St[bi][bp] * mode[ri][rp] * som[rp];
+//  		  dphidzeta[ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = S [bi][bp] 
+//  		      * (dmodedv[ri][rp] * som[rp] + mode[ri][rp] * dsomdv[rp]);
+// 		}
 
-		}
+
 
 	
-	// compute the overall mapping functions
+	assert (phi_map.size()       == n_total_mapping_sf);
+	assert (dphidxi_map.size()   == n_total_mapping_sf);
+	assert (dphideta_map.size()  == n_total_mapping_sf);
+	assert (dphidzeta_map.size() == n_total_mapping_sf);
+	/*
+	 * compute the overall mapping functions,
+	 * pick the appropriate radial and base entries through using
+	 * _base_node_index and _radial_node_index
+	 */
 	for (unsigned int rp=0; rp<n_radial_qp; rp++)  // over radial qp's
 	  for (unsigned int bp=0; bp<n_base_qp; bp++)  // over base qp's
-	    for (unsigned int ri=0; ri<n_radial_mapping_sf; ri++)  // over radial mapping shapes
-	      for (unsigned int bi=0; bi<n_base_mapping_sf; bi++)  // over base   mapping shapes
-	        {
-		  // form the total shape function data fields
-		  phi_map      [ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = S_map [bi][bp] * radial_map   [ri][rp];
-		  dphidxi_map  [ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = Ss_map[bi][bp] * radial_map   [ri][rp];
-		  dphideta_map [ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = St_map[bi][bp] * radial_map   [ri][rp];
-		  dphidzeta_map[ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = S_map [bi][bp] * dradialdv_map[ri][rp];
-		}
+	    for (unsigned int ti=0; ti<n_total_mapping_sf; ti++)  // over all mapping shapes
+	      {
+		// let the index vectors take care of selecting the appropriate base/radial mapping shape
+		const unsigned int bi = _base_node_index  [ti];
+		const unsigned int ri = _radial_node_index[ti];
+		phi_map      [ti][bp+rp*n_base_qp] = S_map [bi][bp] * radial_map   [ri][rp];
+		dphidxi_map  [ti][bp+rp*n_base_qp] = Ss_map[bi][bp] * radial_map   [ri][rp];
+		dphideta_map [ti][bp+rp*n_base_qp] = St_map[bi][bp] * radial_map   [ri][rp];
+		dphidzeta_map[ti][bp+rp*n_base_qp] = S_map [bi][bp] * dradialdv_map[ri][rp];
+	      }
+// OLD CODE
+//
+// wrong: should not be n_base_approx_sf but n_base_mapping_sf
+//
+// 	for (unsigned int rp=0; rp<n_radial_qp; rp++)  // over radial qp's
+// 	  for (unsigned int bp=0; bp<n_base_qp; bp++)  // over base qp's
+// 	    for (unsigned int ri=0; ri<n_radial_mapping_sf; ri++)  // over radial mapping shapes
+// 	      for (unsigned int bi=0; bi<n_base_mapping_sf; bi++)  // over base   mapping shapes
+// 	        {
+// 		  // form the total map function data fields
+// 		  phi_map      [ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = S_map [bi][bp] * radial_map   [ri][rp];
+// 		  dphidxi_map  [ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = Ss_map[bi][bp] * radial_map   [ri][rp];
+// 		  dphideta_map [ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = St_map[bi][bp] * radial_map   [ri][rp];
+// 		  dphidzeta_map[ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = S_map [bi][bp] * dradialdv_map[ri][rp];
+// 		}
+
 			
 
 	return;

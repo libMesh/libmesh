@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.20 2003-03-26 01:08:15 ddreyer Exp $
+// $Id: elem.h,v 1.21 2003-04-01 14:19:46 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -453,6 +453,16 @@ class Elem : public ReferenceCountedObject<Elem>,
    * \p false  otherwise.  
    */
   virtual bool infinite () const = 0;
+
+  /**
+   * @returns the origin for an infinite element.  Currently,
+   * @e all infinite elements used in a mesh share the same
+   * origin.  Overload this in infinite element classes.
+   * By default, issues an error, because returning the
+   * all zero point would very likely lead to unexpected
+   * behavior.
+   */
+  virtual Point origin () const { error(); return Point(); }
 
 #endif
 

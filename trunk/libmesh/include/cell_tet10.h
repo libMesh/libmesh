@@ -1,4 +1,4 @@
-// $Id: cell_tet10.h,v 1.10 2003-03-11 00:47:40 ddreyer Exp $
+// $Id: cell_tet10.h,v 1.11 2003-04-01 14:19:46 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -43,7 +43,7 @@
          /    |8   \
         /     o     \
        /    6 |      \
-    0 o-----o-|-------o 2
+    0 o.....o.|.......o 2
        \      |      /
         \     |     /
          \    |    /

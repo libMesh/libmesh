@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex8.h,v 1.12 2003-03-11 00:47:40 ddreyer Exp $
+// $Id: cell_inf_hex8.h,v 1.13 2003-04-01 14:19:46 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -102,6 +102,12 @@ public:
   unsigned int vtk_element_type (const unsigned int) const
   { return 12; }
   
+  /**
+   * @returns \p true when this element contains the point
+   * \p p.  Customized for infinite elements, since knowledge
+   * about the envelope can be helpful.
+   */
+  bool contains_point (const Point& p) const;
 
   
 protected:

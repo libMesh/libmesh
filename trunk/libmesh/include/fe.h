@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.14 2003-02-24 14:35:50 benkirk Exp $
+// $Id: fe.h,v 1.15 2003-04-01 14:19:47 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -28,7 +28,12 @@
 #include "fe_base.h"
 
 // forward declarations
+#ifdef ENABLE_INFINITE_ELEMENTS
 
+template <unsigned int friend_Dim, FEFamily friend_T_radial, InfMapType friend_T_map>
+class InfFE;
+
+#endif
 
 
 
@@ -47,7 +52,7 @@
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.14 $
+ * \version $Revision: 1.15 $
  */
 
 //-------------------------------------------------------------
@@ -258,6 +263,15 @@ private:
   static Point map_zeta (const Elem* elem,
 			 const Point& reference_point);
 
+#ifdef ENABLE_INFINITE_ELEMENTS
+  /**
+   * make InfFE classes friends, so that these may access
+   * the private \p map, map_xyz methods
+   */
+  template <unsigned int friend_Dim, FEFamily friend_T_radial, InfMapType friend_T_map>
+  friend class InfFE;
+#endif
+
 };
 
 
@@ -268,7 +282,7 @@ private:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.14 $
+ * \version $Revision: 1.15 $
  */
 
 //-------------------------------------------------------------
@@ -293,7 +307,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.14 $
+ * \version $Revision: 1.15 $
  */
 
 //-------------------------------------------------------------
@@ -318,7 +332,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.14 $
+ * \version $Revision: 1.15 $
  */
 
 //-------------------------------------------------------------

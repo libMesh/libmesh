@@ -1,4 +1,4 @@
-// $Id: face_inf_quad.h,v 1.2 2003-03-26 01:08:15 ddreyer Exp $
+// $Id: face_inf_quad.h,v 1.3 2003-04-01 14:19:47 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -66,12 +66,6 @@ public:
    */
   InfQuad (const unsigned int nn, const Elem* p);
 
-/*   /\** */
-/*    * @returns 4.  All quad-derivatives are guaranteed to have at */
-/*    * least 4 nodes. */
-/*    *\/ */
-/*   unsigned int n_nodes() const { return 4; } */
-
   /**
    * @returns 2, the dimensionality of the object.
    */
@@ -130,16 +124,16 @@ public:
    */
   std::pair<Real, Real> qual_bounds (const ElemQuality q) const;
 
-
-#ifdef ENABLE_INFINITE_ELEMENTS
-
   /**
    * @returns \p true.  All classes derived from \p InfQuad
    * are infinite elements. 
    */
   bool infinite () const { return true; }
 
-#endif
+  /**
+   * @returns the origin of this infinite element.
+   */
+  Point origin () const;
 
 
 protected:
@@ -200,6 +194,15 @@ unsigned int InfQuad::n_children_per_side(const unsigned int s) const
       return 1;
   }
 }
+
+
+
+inline
+Point InfQuad::origin () const
+{
+  return ( this->point(0)*2. - this->point(this->n_vertices()/2) );
+}
+
 
 
 #endif // ifdef ENABLE_INFINITE_ELEMENTS

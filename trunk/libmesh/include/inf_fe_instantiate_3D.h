@@ -1,4 +1,4 @@
-// $Id: inf_fe_instantiate_3D.h,v 1.2 2003-01-26 18:20:14 ddreyer Exp $
+// $Id: inf_fe_instantiate_3D.h,v 1.3 2003-04-01 14:19:47 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -40,11 +40,11 @@
 /** 
  * Collect all 3D explicit instantiations for class InfFE
  */
-INSTANTIATE_INF_FE(3,CARTESIAN) 
+INSTANTIATE_INF_FE(3,CARTESIAN);
 
-/* INSTANTIATE_INF_FE(3,SPHERICAL) */
+/* INSTANTIATE_INF_FE(3,SPHERICAL); */
 
-/* INSTANTIATE_INF_FE(3,ELLIPSOIDAL) */
+/* INSTANTIATE_INF_FE(3,ELLIPSOIDAL); */
 
 
 
