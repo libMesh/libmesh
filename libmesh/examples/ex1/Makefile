@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.8 2003-02-21 18:31:24 benkirk Exp $
+# $Id: Makefile,v 1.9 2003-04-18 13:13:46 benkirk Exp $
 
 
 # The location of the mesh library
@@ -33,7 +33,7 @@ objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
 ###############################################################################
 # Target:
 #
-target 	   := ex1
+target 	   := ./ex1
 
 
 all:: $(target)

@@ -1,6 +1,6 @@
 i686-pc-linux-gnu*
 powerpc-ibm-aix5.1.0.0*
-alphaev56-unknown-linux-gnu*
+alphaev*-unknown-linux-gnu*
 mips-sgi-irix6.5*
 ii_files
 so_locations
