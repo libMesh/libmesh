@@ -638,6 +638,48 @@ _LPDouble Mul_VV(QVector *V1, QVector *V2)
     return(SRes);
 }
 
+_LPDouble InnerProd_VV(QVector *V1, QVector *V2)
+/* S = conjugate V1 * V2 */
+{
+
+/* S = V1 * V2 for real numbers*/
+#ifndef _LP_USE_COMPLEX_NUMBERS
+    return (Mul_VV(V1, V2));
+#else
+
+    _LPDouble SRes;
+
+    size_t Dim, Ind;
+    _LPNumber *V1Cmp, *V2Cmp;
+
+    V_Lock(V1);
+    V_Lock(V2);
+    
+    if (LASResult() == LASOK) {
+        if (V1->Dim == V2->Dim) {
+            Dim = V1->Dim;
+            V1Cmp = V1->Cmp;
+            V2Cmp = V2->Cmp;
+            SRes = 0.0;
+            for_AllCmp
+	        SRes += conj(V1Cmp[Ind]) * V2Cmp[Ind];
+	    SRes *= V1->Multipl * V2->Multipl;
+        } else {
+            LASError(LASDimErr, "InnerProd_VV", V_GetName(V1),  V_GetName(V2), NULL);
+            SRes = 1.0;
+        }
+    } else {
+        SRes = 1.0;
+    }
+
+    V_Unlock(V1);
+    V_Unlock(V2);
+
+    return(SRes);
+
+#endif /* ifdef _LP_USE_COMPLEX_NUMBERS */
+}
+
 QVector *Mul_MV(Matrix *M, QVector *V)
 /* VRes = M * V */
 {
