@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.23.2.4 2003-05-07 20:47:15 benkirk Exp $
+// $Id: equation_systems.h,v 1.23.2.5 2003-05-09 03:45:50 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -424,7 +424,9 @@ const T_sys& EquationSystems::get_system (const std::string& name) const
       error();
     }
 
-  return dynamic_cast<const T_sys&>(*(pos->second));
+  assert (pos->second != NULL);
+  
+  return *(dynamic_cast<T_sys*>(pos->second));
 }
 
 
@@ -433,7 +435,7 @@ template <typename T_sys>
 inline
 T_sys& EquationSystems::get_system (const std::string& name)
 {
-  std::map<std::string, SystemBase*>::const_iterator
+  std::map<std::string, SystemBase*>::iterator
     pos = _systems.find(name);
   
   if (pos == _systems.end())
@@ -443,7 +445,9 @@ T_sys& EquationSystems::get_system (const std::string& name)
       error();
     }
 
-  return dynamic_cast<T_sys&>(*(pos->second));
+  assert (pos->second != NULL);
+  
+  return *(dynamic_cast<T_sys*>(pos->second));
 }
 
 
@@ -468,7 +472,7 @@ const T_sys& EquationSystems::get_system (const unsigned int num) const
       error();
     }
 
-  return dynamic_cast<const T_sys&>(*(pos->second));
+  return *(dynamic_cast<T_sys*>(pos->second));
 }
 
 
@@ -493,7 +497,7 @@ T_sys& EquationSystems::get_system (const unsigned int num)
       error();
     }
 
-  return dynamic_cast<T_sys&>(*(pos->second));
+  return *(dynamic_cast<T_sys*>(pos->second));
 }
 
 
