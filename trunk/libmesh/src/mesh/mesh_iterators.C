@@ -1,4 +1,4 @@
-// $Id: mesh_iterators.C,v 1.1 2004-11-08 00:36:39 jwpeterson Exp $
+// $Id: mesh_iterators.C,v 1.2 2004-11-14 18:51:59 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -23,7 +23,7 @@
 
 // Local includes
 #include "mesh_base.h"
-
+#include "elem.h"
 
 // This file contains the implementation of all the different iterator
 // functions for the mesh class.  They were put here to save space in the

@@ -1,4 +1,4 @@
-// $Id: mesh_data_xdr_support.C,v 1.9 2004-01-03 15:37:43 benkirk Exp $
+// $Id: mesh_data_xdr_support.C,v 1.10 2004-11-14 18:51:59 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -26,7 +26,7 @@
 #include "mesh_data.h"
 #include "mesh_base.h"
 #include "xdr_cxx.h"
-
+#include "elem.h"
 
 
 //------------------------------------------------------

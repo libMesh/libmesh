@@ -1,4 +1,4 @@
-// $Id: mesh_communication.C,v 1.10 2004-11-08 00:11:05 jwpeterson Exp $
+// $Id: mesh_communication.C,v 1.11 2004-11-14 18:51:59 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -28,7 +28,7 @@
 #include "mesh_base.h"
 #include "boundary_info.h"
 #include "mesh_communication.h"
-
+#include "elem.h"
 
 
 // ------------------------------------------------------------

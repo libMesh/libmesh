@@ -1,4 +1,4 @@
-// $Id: metis_partitioner.C,v 1.16 2004-11-08 00:11:06 jwpeterson Exp $
+// $Id: metis_partitioner.C,v 1.17 2004-11-14 18:51:59 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -26,6 +26,7 @@
 #include "mesh_base.h"
 #include "metis_partitioner.h"
 #include "libmesh_logging.h"
+#include "elem.h"
 
 #ifdef HAVE_METIS
   namespace Metis {

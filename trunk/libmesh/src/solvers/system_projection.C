@@ -1,4 +1,4 @@
-// $Id: system_projection.C,v 1.6 2004-11-08 00:11:06 jwpeterson Exp $
+// $Id: system_projection.C,v 1.7 2004-11-14 18:52:11 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -25,6 +25,7 @@
 // Local includes
 #include "system.h"
 #include "mesh.h"
+#include "elem.h"
 #include "libmesh.h"
 #include "dof_map.h"
 #include "fe_type.h"

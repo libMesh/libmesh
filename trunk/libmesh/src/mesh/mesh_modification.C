@@ -1,4 +1,4 @@
-// $Id: mesh_modification.C,v 1.4 2004-10-28 20:06:14 benkirk Exp $
+// $Id: mesh_modification.C,v 1.5 2004-11-14 18:51:59 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -27,6 +27,7 @@
 // Local includes
 #include "mesh.h"
 #include "libmesh.h"
+#include "elem.h"
 #include "face_inf_quad4.h"
 #include "face_inf_quad6.h"
 #include "cell_inf_prism6.h"

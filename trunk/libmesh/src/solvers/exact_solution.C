@@ -1,4 +1,4 @@
-// $Id: exact_solution.C,v 1.6 2004-11-08 00:11:06 jwpeterson Exp $
+// $Id: exact_solution.C,v 1.7 2004-11-14 18:52:11 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -26,6 +26,7 @@
 #include "fe.h"
 #include "quadrature_gauss.h"
 #include "fe_interface.h"
+#include "elem.h"
 
 ExactSolution::ExactSolution(EquationSystems& es) :
   _exact_value (NULL),
