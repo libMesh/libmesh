@@ -1,4 +1,4 @@
-// $Id: petsc_nonlinear_solver.C,v 1.2 2005-01-03 22:10:10 benkirk Exp $
+// $Id: petsc_nonlinear_solver.C,v 1.3 2005-01-04 03:03:26 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -162,11 +162,6 @@ void PetscNonlinearSolver<T>::init ()
 
 
 
-
-
-
-
-
 template <typename T>
 std::pair<unsigned int, Real> 
 PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Matrix
@@ -194,6 +189,10 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
 
   ierr = SNESSetJacobian (_snes, jac->mat(), jac->mat(), __libmesh_petsc_snes_jacobian, this);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
+
+  ierr = SNESSolve (_snes, x->vec());
+         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+
 	 
   // return the # of its. and the final residual norm.
   return std::make_pair(0, 0.);
