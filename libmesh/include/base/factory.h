@@ -1,4 +1,4 @@
-// $Id: factory.h,v 1.4 2004-10-26 22:22:01 benkirk Exp $
+// $Id: factory.h,v 1.5 2004-10-28 20:38:54 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -134,18 +134,12 @@ AutoPtr<Base> Factory<Base>::build (const std::string& name)
 	     it = factory_map().begin(); it != factory_map().end(); ++it)
         std::cerr << "  " << it->first << std::endl;
 
-      // Do this the stoopid way for IBM xlC
-      AutoPtr<Base> ret_val (NULL);
-      
-      return ret_val;
+      return AutoPtr<Base> (NULL);
     }
   
-  // Do this the stoopid way for IBM xlC
   Factory<Base> *f = factory_map()[name];
   
-  AutoPtr<Base> ret_val (f->create());
-  
-  return ret_val;
+  return AutoPtr<Base> (f->create());
 }
 
 
@@ -165,10 +159,7 @@ template <class Derived, class Base>
 inline
 AutoPtr<Base> FactoryImp<Derived,Base>::create ()
 {  
-  // Do this the stoopid way for IBM xlC
-  AutoPtr<Base> ret_val (new Derived);
-
-  return ret_val;
+  return AutoPtr<Base> (new Derived);
 }
 
 

@@ -1,4 +1,4 @@
-// $Id: node.h,v 1.3 2004-10-28 20:06:11 benkirk Exp $
+// $Id: node.h,v 1.4 2004-10-28 20:38:54 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -45,7 +45,7 @@ class MeshRefinement;
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.3 $
+ * \version $Revision: 1.4 $
  */
 
 class Node : public Point,
@@ -213,8 +213,7 @@ Node & Node::operator= (const Point& p)
 inline
 AutoPtr<Node> Node::build(const Node& n)
 {
-  AutoPtr<Node> ap(new Node(n));  
-  return ap;
+  return AutoPtr<Node>(new Node(n));  
 }
 
 
@@ -223,8 +222,7 @@ inline
 AutoPtr<Node> Node::build(const Point& p,
 			  const unsigned int id)
 {
-  AutoPtr<Node> ap(new Node(p,id));
-  return ap;  
+  return AutoPtr<Node>(new Node(p,id));
 }
 
 
@@ -235,8 +233,7 @@ AutoPtr<Node> Node::build(const Real x,
 			  const Real z,
 			  const unsigned int id)
 {
-  AutoPtr<Node> ap(new Node(x,y,z,id));  
-  return ap;
+  return AutoPtr<Node>(new Node(x,y,z,id));  
 }
 
 
