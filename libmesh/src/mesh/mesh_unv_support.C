@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.C,v 1.14 2003-05-20 22:43:10 benkirk Exp $
+// $Id: mesh_unv_support.C,v 1.15 2003-06-12 15:24:23 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -276,7 +276,7 @@ void UnvMeshInterface::write (std::ostream& out_stream)
 {
   if ( !out_stream.good() )
     {
-      std::cerr << "ERROR: Input file not good." 
+      std::cerr << "ERROR: Output file not good." 
 		<< std::endl;
       error();
     }
