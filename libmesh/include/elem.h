@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.34 2003-09-02 18:02:37 benkirk Exp $
+// $Id: elem.h,v 1.35 2003-09-06 02:23:59 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -1020,6 +1020,20 @@ unsigned int Elem::compute_key (unsigned int n0,
   const unsigned int bp = 65449;
   
   // Order the two so that n0 < n1
+
+#ifdef __HP_aCC
+
+  // HP aCC cannot swap as shown below
+  if (n0 > n1)
+    {
+      // Swap n0 & n1
+      const unsigned int buf = n0;
+      n0                     = n1;
+      n1                     = buf;
+    }
+
+#else
+
   if (n1 < n0)
     {
       // Swap n0 & n1 without a temporary
@@ -1027,6 +1041,8 @@ unsigned int Elem::compute_key (unsigned int n0,
 
       assert ( n0 < n1 );
     }
+
+#endif
 
   return (n0%bp + (n1<<5)%bp);
   
@@ -1053,6 +1069,45 @@ unsigned int Elem::compute_key (unsigned int n0,
   //           |  /  |                  |
   //           | /  \|                  |
   //  gb min= min   max              gb max
+
+
+
+#ifdef __HP_aCC
+
+  // HP aCC cannot swap as shown below;
+  // the lower int gets zero'ed.
+  // In case anybody has a better suggestion,
+  // _please_ change!
+  unsigned int buf;
+
+  // Step 1
+  if (n0 > n1)
+    {
+      // Swap n0 & n1
+      buf = n0;
+      n0  = n1;
+      n1  = buf;
+    }
+
+  // Step 2
+  if (n1 > n2)
+    {
+      // Swap n1 & n2
+      buf = n1;
+      n1  = n2;
+      n2  = buf;
+    }
+
+  // Step 3
+  if (n0 > n1)
+    {
+      // Swap n0 & n1 
+      buf = n0;
+      n0  = n1;
+      n1  = buf;
+    }
+
+#else
   
   // Step 1
   if (n0 > n1)
@@ -1075,6 +1130,8 @@ unsigned int Elem::compute_key (unsigned int n0,
       n0^=n1^=n0^=n1;
     }
 
+#endif
+
   assert ((n0 < n1) && (n1 < n2));
 
   
@@ -1091,6 +1148,64 @@ unsigned int Elem::compute_key (unsigned int n0,
 {
   // big prime number
   const unsigned int bp = 65449;
+
+#ifdef __HP_aCC
+
+  // You love to work with bullshit?
+  // Use HP-UX!
+  //
+  // HP aCC cannot swap as shown below;
+  // the lower int gets zero'ed.
+  // In case anybody knows a better way to swap,
+  // feel free to change (but test on HP... ;-)
+  unsigned int buf;
+
+  // Step 1
+  if (n0 > n1)
+    {
+      // Swap n0 & n1
+      buf = n0;
+      n0  = n1;
+      n1  = buf;
+    }
+
+  // Step 2
+  if (n2 > n3)
+    {
+      // Swap n2 & n3
+      buf = n2;
+      n2  = n3;
+      n3  = buf;
+    }
+
+  // Step 3
+  if (n0 > n2)
+    {
+      // Swap n0 & n2 
+      buf = n0;
+      n0 = n2;
+      n2 = buf;
+    }
+
+  // Step 4
+  if (n1 > n3)
+    {
+      // Swap n1 & n3
+      buf = n1;
+      n1  = n3;
+      n3  = buf;
+    }
+
+  // Finally step 5
+  if (n1 > n2)
+    {
+      // Swap n1 & n2
+      buf = n1;
+      n1  = n2;
+      n2  = buf;
+    }
+
+#else
 
   // Order the numbers such that n0 < n1 < n2 < n3
   // We'll do it in 5 steps.
@@ -1130,8 +1245,9 @@ unsigned int Elem::compute_key (unsigned int n0,
       n1^=n2^=n1^=n2;
     }
 
-  assert ((n0 < n1) && (n1 < n2) && (n2 < n3));
+#endif
 
+  assert ((n0 < n1) && (n1 < n2) && (n2 < n3));
   
   return (n0%bp + (n1<<5)%bp + (n2<<10)%bp + (n3<<15)%bp);
 }

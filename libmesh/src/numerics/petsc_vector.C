@@ -1,4 +1,4 @@
-// $Id: petsc_vector.C,v 1.24 2003-09-02 18:02:44 benkirk Exp $
+// $Id: petsc_vector.C,v 1.25 2003-09-06 02:24:00 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -309,8 +309,8 @@ PetscVector<T>::operator = (const PetscVector<T>& v)
   if (v.initialized())
     {
       this->init (v.size(), v.local_size());
-      _is_closed      = v._is_closed;
-      _is_initialized = v._is_initialized;
+      this->_is_closed      = v._is_closed;
+      this->_is_initialized = v._is_initialized;
   
       if (v.size() != 0)
 	{
