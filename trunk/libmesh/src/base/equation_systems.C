@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.31 2003-04-09 19:26:57 ddreyer Exp $
+// $Id: equation_systems.C,v 1.32 2003-04-11 10:46:18 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -484,16 +484,17 @@ void EquationSystems<T_sys>::build_solution_vector (std::vector<Number>& soln)
 					   elem_soln,
 					   nodal_soln);
 
- 		  if (nodal_soln.size() == elem->n_nodes())
-		    for (unsigned int n=0; n<elem->n_nodes(); n++)
- 		      soln[nv*(elem->node(n)) + (var + var_num)] =
- 		        nodal_soln[n];
-// OLD CODE		  
-// 		  assert (nodal_soln.size() == elem->n_nodes());
-		  assert (nodal_soln.size() == elem->n_nodes());
+#ifdef ENABLE_INFINITE_ELEMENTS
+		  // infinite elements should be skipped...
+		  if (!elem->infinite())
+#endif
+		    { 
+		      assert (nodal_soln.size() == elem->n_nodes());
 		  
-		  for (unsigned int n=0; n<elem->n_nodes(); n++)
-		    soln[nv*(elem->node(n)) + (var + var_num)] = nodal_soln[n];
+		      for (unsigned int n=0; n<elem->n_nodes(); n++)
+			soln[nv*(elem->node(n)) + (var + var_num)] = nodal_soln[n];
+		    }
+
 		}
 	    }	 
 	}
