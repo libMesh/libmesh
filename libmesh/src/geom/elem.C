@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.16 2003-04-01 14:19:49 ddreyer Exp $
+// $Id: elem.C,v 1.17 2003-04-09 01:20:24 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -227,7 +227,7 @@ unsigned int Elem::which_neighbor_am_i (const Elem* e) const
 
 void Elem::write_tecplot_connectivity(std::ostream& out) const
 {
-  assert (out.good());
+  assert (!out.bad());
   assert (_nodes != NULL);
   
   for (unsigned int sc=0; sc <this->n_sub_elem(); sc++)

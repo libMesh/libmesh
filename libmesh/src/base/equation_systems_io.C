@@ -1,4 +1,4 @@
-// $Id: equation_systems_io.C,v 1.22 2003-04-06 16:59:00 benkirk Exp $
+// $Id: equation_systems_io.C,v 1.23 2003-04-09 01:20:21 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -567,7 +567,7 @@ void EquationSystems<T_sys>::write(const std::string& name,
 template class EquationSystems<GeneralSystem>;
 template class EquationSystems<ThinSystem>;
 
-#if defined(USE_COMPLEX_NUMBERS) && defined(HAVE_PETSC)
+#if defined(USE_COMPLEX_NUMBERS)
 template class EquationSystems<FrequencySystem>;
 #endif
 
