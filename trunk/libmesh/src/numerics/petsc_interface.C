@@ -1,4 +1,4 @@
-// $Id: petsc_interface.C,v 1.19 2004-01-03 15:37:43 benkirk Exp $
+// $Id: petsc_interface.C,v 1.20 2004-01-11 15:56:46 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -103,7 +103,7 @@ PetscInterface<T>::solve (SparseMatrix<T> &matrix_in,
 			  const double tol,
 			  const unsigned int m_its)
 {
-  init ();
+  this->init ();
   
   PetscMatrix<T>& matrix   = dynamic_cast<PetscMatrix<T>&>(matrix_in);
   PetscVector<T>& solution = dynamic_cast<PetscVector<T>&>(solution_in);

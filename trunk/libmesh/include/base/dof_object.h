@@ -1,4 +1,4 @@
-// $Id: dof_object.h,v 1.2 2004-01-03 15:37:41 benkirk Exp $
+// $Id: dof_object.h,v 1.3 2004-01-11 15:56:46 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -48,7 +48,7 @@
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.2 $
+ * \version $Revision: 1.3 $
  */
 
 class DofObject
@@ -335,16 +335,16 @@ DofObject::DofObject () :
 inline
 DofObject::DofObject (const DofObject& dof_obj) :
 #ifdef ENABLE_AMR
-  old_dof_object(NULL),
+  old_dof_object (NULL),
 #endif
-  _id (dof_obj._id),
-  _processor_id (dof_obj._processor_id),
-  _n_systems  (dof_obj._n_systems),
-  _n_vars (NULL),
+  _id            (dof_obj._id),
+  _processor_id  (dof_obj._processor_id),
+  _n_systems     (dof_obj._n_systems),
+  _n_vars        (NULL),
 #ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
-  _n_comp (NULL),
+  _n_comp        (NULL),
 #endif
-  _dof_ids (NULL)
+  _dof_ids       (NULL)
 {
 
 #ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
@@ -365,7 +365,7 @@ DofObject::DofObject (const DofObject& dof_obj) :
 	{
 	  _n_comp[s][v]  = dof_obj.n_comp(s,v);
 	  
-	  _dof_ids[s][v] = new unsigned int [dof_obj.n_comp(s,v)];
+	  _dof_ids[s][v] = new unsigned int [this->n_comp(s,v)];
 	  
 	  for (unsigned int c=0; c<this->n_comp(s,v); c++)
 	    _dof_ids[s][v][c] = dof_obj.dof_number(s,v,c);

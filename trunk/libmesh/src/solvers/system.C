@@ -1,4 +1,4 @@
-// $Id: system.C,v 1.1 2004-01-03 15:37:44 benkirk Exp $
+// $Id: system.C,v 1.2 2004-01-11 15:56:46 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -149,10 +149,10 @@ void System::init_data ()
 void System::reinit ()
 {
 #ifdef ENABLE_AMR
-  
-  // Augment the send_list for the old mesh to handle
-  // additional data dependencies introduced by refinement
-  _dof_map.augment_send_list_for_projection (_mesh);
+
+//   // Augment the send_list for the old mesh to handle
+//   // additional data dependencies introduced by refinement
+//   _dof_map.augment_send_list_for_projection (_mesh);
 
   // Re-update the data in this system using the
   // augmented send_list
@@ -180,6 +180,9 @@ void System::reinit ()
     // current_local_solution.
     {
       solution->init (this->n_dofs(), this->n_local_dofs());
+	
+      assert (solution->size() == current_local_solution->size());
+      assert (solution->size() == current_local_solution->local_size());
 
       const unsigned int first_local_dof = solution->first_local_index();
       const unsigned int local_size      = solution->local_size();
@@ -223,12 +226,13 @@ void System::re_update ()
   
   // Check sizes
   assert (current_local_solution->local_size() == solution->size());
+  assert (current_local_solution->size()       == solution->size());
   assert (!send_list.empty());
   assert (send_list.size() <= solution->size());
 
   // Create current_local_solution from solution.  This will
   // put a local copy of solution into current_local_solution.
-  solution->localize (*current_local_solution, send_list); 
+  solution->localize (*current_local_solution, send_list);
 }
 
 
@@ -389,7 +393,7 @@ void System::update_global_solution (std::vector<Number>& global_soln) const
 
 
 void System::update_global_solution (std::vector<Number>& global_soln,
-					 const unsigned int dest_proc) const
+				     const unsigned int   dest_proc) const
 {
   global_soln.resize       (solution->size());
 
