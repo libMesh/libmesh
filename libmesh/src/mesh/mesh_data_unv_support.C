@@ -1,4 +1,4 @@
-// $Id: mesh_data_unv_support.C,v 1.3 2003-05-22 09:39:58 spetersen Exp $
+// $Id: mesh_data_unv_support.C,v 1.4 2003-05-22 16:20:52 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -192,13 +192,21 @@ void MeshData::read_unv(const std::string& name)
 
 		  else if(Data_type == 5 || Data_type == 6)
 		    {
+#ifdef USE_COMPLEX_NUMBERS
+		      
 		      Real re_val, im_val;
 
 		      in_file >> re_val
 			      >> im_val;
 
 		      values[data_cnt] = Complex(re_val,im_val);
+#else
 
+		      std::cerr << "ERROR: Complex data only supported" << std::endl
+				<< "when libMesh is configured with --enable-complex!"
+				<< std::endl;
+		      error();
+#endif
 		    }
 
 		  else
@@ -340,7 +348,7 @@ void MeshData::write_unv (const std::string& name)
 		                       values[v_cnt].imag());
 	  out_file << buf;
 #else
-	  sprintf(buf, "%13.5E%13.5E", values[v_cnt]);
+	  sprintf(buf, "%13.5E", values[v_cnt]);
 	  out_file << buf;
 #endif
 	}
