@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.15 2003-02-27 00:55:28 benkirk Exp $
+// $Id: elem.h,v 1.16 2003-02-27 02:02:15 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -702,6 +702,8 @@ bool Elem::active() const
 
 
 
+#ifdef ENABLE_AMR
+
 inline
 unsigned int Elem::level() const
 {
@@ -717,5 +719,6 @@ unsigned int Elem::level() const
   return (parent()->level() + 1);
 }
 
+#endif // endf #ifdef ENABLE_AMR
 
 #endif // end #ifndef __elem_h__
