@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.11 2004-03-21 03:19:25 benkirk Exp $
+// $Id: mesh_base.h,v 1.12 2004-03-21 03:54:19 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -62,7 +62,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.11 $
+ * \version $Revision: 1.12 $
  */
 
 
@@ -530,8 +530,8 @@ public:
    * Returns a pair of std::vector<Elem*>::const_iterators which point
    * to the beginning and end of the _elements vector.
    */
-  std::pair<std::vector<Elem*>::const_iterator,
-	    std::vector<Elem*>::const_iterator>
+  std::pair<std::vector<const Elem*>::const_iterator,
+	    std::vector<const Elem*>::const_iterator>
   elements_begin () const;
   
   /**
@@ -548,8 +548,8 @@ public:
    * to the end of the _elements vector.  This simulates a normal
    * end() const_iterator.
    */
-  std::pair<std::vector<Elem*>::const_iterator,
-	    std::vector<Elem*>::const_iterator>
+  std::pair<std::vector<const Elem*>::const_iterator,
+	    std::vector<const Elem*>::const_iterator>
   elements_end () const;
   
   /**
@@ -564,8 +564,8 @@ public:
    * Returns a pair of std::vector<Node*>::const_iterators which point
    * to the beginning and end of the _nodes vector.
    */
-  std::pair<std::vector<Node*>::const_iterator,
-	    std::vector<Node*>::const_iterator>
+  std::pair<std::vector<const Node*>::const_iterator,
+	    std::vector<const Node*>::const_iterator>
   nodes_begin () const;
 
   /**
@@ -582,8 +582,8 @@ public:
    * to the end of the _nodes vector.  This simulates a normal
    * end() const_iterator.
    */
-  std::pair<std::vector<Node*>::const_iterator,
-	    std::vector<Node*>::const_iterator>
+  std::pair<std::vector<const Node*>::const_iterator,
+	    std::vector<const Node*>::const_iterator>
   nodes_end () const;
   
   /**
@@ -836,17 +836,21 @@ std::pair<std::vector<Elem*>::iterator,
 	  std::vector<Elem*>::iterator>
 MeshBase::elements_begin ()
 {
-  return std::make_pair(_elements.begin(), _elements.end());
+  return std::make_pair(_elements.begin(),
+			_elements.end());
 }
   
 
 
 inline
-std::pair<std::vector<Elem*>::const_iterator,
-	  std::vector<Elem*>::const_iterator>
+std::pair<std::vector<const Elem*>::const_iterator,
+	  std::vector<const Elem*>::const_iterator>
 MeshBase::elements_begin () const
 {
-  return std::make_pair(_elements.begin(), _elements.end());
+  // Can't figure out a way around this C-style cast,
+  // but truly constant iterators are worth it...
+  return std::make_pair(((std::vector<const Elem*>*) &_elements)->begin(),
+			((std::vector<const Elem*>*) &_elements)->end());      
 }
 
 
@@ -856,17 +860,21 @@ std::pair<std::vector<Elem*>::iterator,
 	  std::vector<Elem*>::iterator>
 MeshBase::elements_end ()
 {
-  return std::make_pair(_elements.end(), _elements.end());
+  return std::make_pair(_elements.end(),
+			_elements.end());
 }
 
 
 
 inline
-std::pair<std::vector<Elem*>::const_iterator,
-	  std::vector<Elem*>::const_iterator>
+std::pair<std::vector<const Elem*>::const_iterator,
+	  std::vector<const Elem*>::const_iterator>
 MeshBase::elements_end () const
 {
-  return std::make_pair(_elements.end(), _elements.end());
+  // Can't figure out a way around this C-style cast,
+  // but truly constant iterators are worth it...
+  return std::make_pair(((std::vector<const Elem*>*) &_elements)->end(),
+			((std::vector<const Elem*>*) &_elements)->end());
 }
   
 
@@ -876,18 +884,22 @@ std::pair<std::vector<Node*>::iterator,
 	  std::vector<Node*>::iterator>
 MeshBase::nodes_begin ()
 {
-  return std::make_pair(_nodes.begin(), _nodes.end());
+  return std::make_pair(_nodes.begin(),
+			_nodes.end());
 }
 
 
 
 inline
-std::pair<std::vector<Node*>::const_iterator,
-	  std::vector<Node*>::const_iterator>
+std::pair<std::vector<const Node*>::const_iterator,
+	  std::vector<const Node*>::const_iterator>
 MeshBase::nodes_begin () const
-  {
-    return std::make_pair(_nodes.begin(), _nodes.end());
-  }
+{
+  // Can't figure out a way around this C-style cast,
+  // but truly constant iterators are worth it...
+  return std::make_pair(((std::vector<const Node*>*) &_nodes)->begin(),
+			((std::vector<const Node*>*) &_nodes)->end());
+}
 
 
 
@@ -896,17 +908,21 @@ std::pair<std::vector<Node*>::iterator,
 	  std::vector<Node*>::iterator>
 MeshBase::nodes_end ()
 {
-  return std::make_pair(_nodes.end(), _nodes.end());
+  return std::make_pair(_nodes.end(),
+			_nodes.end());
 }
 
 
 
 inline
-std::pair<std::vector<Node*>::const_iterator,
-	  std::vector<Node*>::const_iterator>
+std::pair<std::vector<const Node*>::const_iterator,
+	  std::vector<const Node*>::const_iterator>
 MeshBase::nodes_end () const
 {
-  return std::make_pair(_nodes.end(), _nodes.end());
+  // Can't figure out a way around this C-style cast,
+  // but truly constant iterators are worth it...
+  return std::make_pair(((std::vector<const Node*>*) &_nodes)->end(),
+			((std::vector<const Node*>*) &_nodes)->end());
 }
 
 
