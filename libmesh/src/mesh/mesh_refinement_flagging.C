@@ -1,7 +1,7 @@
-// $Id: mesh_refinement_flagging.C,v 1.14 2005-01-28 21:29:50 benkirk Exp $
+// $Id: mesh_refinement_flagging.C,v 1.15 2005-02-22 22:17:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

@@ -1,7 +1,7 @@
-// $Id: inf_fe.h,v 1.4 2005-02-15 05:23:32 benkirk Exp $
+// $Id: inf_fe.h,v 1.5 2005-02-22 22:17:31 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -66,7 +66,7 @@ class FEComputeData;
  *
  * \author Daniel Dreyer
  * \date 2003
- * \version $Revision: 1.4 $
+ * \version $Revision: 1.5 $
  */
 
 //-------------------------------------------------------------
@@ -89,7 +89,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.4 $
+   * \version $Revision: 1.5 $
    */
   //-------------------------------------------------------------
   // InfFE::Radial class definition
@@ -181,7 +181,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.4 $
+   * \version $Revision: 1.5 $
    */
   //-------------------------------------------------------------
   // InfFE::Base class definition

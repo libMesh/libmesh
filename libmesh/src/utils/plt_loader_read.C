@@ -1,6 +1,6 @@
-// $Id: plt_loader_read.C,v 1.4 2005-01-28 21:29:52 benkirk Exp $
+// $Id: plt_loader_read.C,v 1.5 2005-02-22 22:17:43 jwpeterson Exp $
 
-// Copyright (C) 2002-2004  Benjamin S. Kirk
+// Copyright (C) 2002-2005  Benjamin S. Kirk
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

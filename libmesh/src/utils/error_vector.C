@@ -1,7 +1,7 @@
-// $Id: error_vector.C,v 1.8 2004-08-17 03:03:57 benkirk Exp $
+// $Id: error_vector.C,v 1.9 2005-02-22 22:17:43 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

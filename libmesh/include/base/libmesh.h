@@ -1,7 +1,7 @@
-// $Id: libmesh.h,v 1.4 2004-08-06 16:48:39 jwpeterson Exp $
+// $Id: libmesh.h,v 1.5 2005-02-22 22:17:30 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

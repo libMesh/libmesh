@@ -1,7 +1,7 @@
-// $Id: face_inf_quad4.h,v 1.5 2005-02-19 19:07:31 roystgnr Exp $
+// $Id: face_inf_quad4.h,v 1.6 2005-02-22 22:17:32 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
