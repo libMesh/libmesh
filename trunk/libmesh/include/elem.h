@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.31 2003-08-18 14:44:52 ddreyer Exp $
+// $Id: elem.h,v 1.32 2003-08-21 22:10:07 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -644,12 +644,16 @@ class Elem : public ReferenceCountedObject<Elem>,
    * the profile of what a "friend" should be, but
    * if we are going to protect the constructor and
    * the build method, there's no way around it.
+   *
+   * Do we *really* need to protect the build member?
+   * It would seem that we are just getting around it
+   * by using friends!
    */
-  friend class XdrInterface;
-  friend class MeshRefinement;
-  friend class MeshBase;
-  friend class Mesh;
-  friend class MetisPartitioner;
+  friend class XdrInterface;   // (Elem::build)
+  friend class MeshRefinement; // (Elem::nullify_neighbors)
+  friend class Mesh;           // (Elem::build in mesh_exodus_support)
+  friend class MeshBase;       // (Elem::build in mesh_base_modification)
+  //friend class MetisPartitioner;
 };
 
 
