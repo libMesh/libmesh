@@ -1,4 +1,4 @@
-// $Id: quadrature_simpson_3D.C,v 1.7 2003-02-26 01:08:11 benkirk Exp $
+// $Id: quadrature_simpson_3D.C,v 1.8 2003-05-22 17:06:24 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -45,7 +45,7 @@ void QSimpson::init_3D(const ElemType _type)
 	QSimpson q1D(1);
 	q1D.init(EDGE2);
 
-	tensor_product_hex( &q1D );
+	tensor_product_hex( q1D );
 	
 	return;
       }
@@ -127,7 +127,7 @@ void QSimpson::init_3D(const ElemType _type)
  	q1D.init(EDGE2);
  	q2D.init(TRI3);
 
-	tensor_product_prism(&q1D, &q2D);
+	tensor_product_prism(q1D, q2D);
 
 	return;
       }

@@ -1,4 +1,4 @@
-// $Id: quadrature.C,v 1.13 2003-03-05 17:01:21 benkirk Exp $
+// $Id: quadrature.C,v 1.14 2003-05-22 17:06:23 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -93,10 +93,10 @@ void QBase::scale(std::pair<Real, Real> old_range,
 
 
 
-void QBase::tensor_product_quad(QBase* q1D)
+void QBase::tensor_product_quad(QBase& q1D)
 {
   
-  const unsigned int n_points = q1D->n_points();
+  const unsigned int n_points = q1D.n_points();
   
   _points.resize(n_points * n_points);
   
@@ -107,10 +107,10 @@ void QBase::tensor_product_quad(QBase* q1D)
   for (unsigned int j=0; j<n_points; j++)
     for (unsigned int i=0; i<n_points; i++)
       {
-	_points[qp](0) = q1D->qp(i)(0);
-	_points[qp](1) = q1D->qp(j)(0);
+	_points[qp](0) = q1D.qp(i)(0);
+	_points[qp](1) = q1D.qp(j)(0);
 	
-	_weights[qp] = q1D->w(i)*q1D->w(j);
+	_weights[qp] = q1D.w(i)*q1D.w(j);
 	
 	qp++;
       }
@@ -119,18 +119,18 @@ void QBase::tensor_product_quad(QBase* q1D)
 
 
 
-void QBase::tensor_product_tri(QBase* gauss1D, QBase* jac1D)
+void QBase::tensor_product_tri(QBase& gauss1D, QBase& jac1D)
 {
   
   // Both rules should be of the same order
-  assert(gauss1D->n_points() == jac1D->n_points());
+  assert(gauss1D.n_points() == jac1D.n_points());
 
   // Save the number of points as a convenient variable
-  const unsigned int n_points = gauss1D->n_points();
+  const unsigned int n_points = gauss1D.n_points();
   
   // Both rules should be between x=0 and x=1
-  assert(gauss1D->qp(0)(0) >= 0.0); assert(gauss1D->qp(n_points-1)(0) <= 1.0);
-  assert(jac1D->qp(0)(0)   >= 0.0); assert(jac1D->qp(n_points-1)(0) <= 1.0);
+  assert(gauss1D.qp(0)(0) >= 0.0); assert(gauss1D.qp(n_points-1)(0) <= 1.0);
+  assert(jac1D.qp(0)(0)   >= 0.0); assert(jac1D.qp(n_points-1)(0) <= 1.0);
 
   // Resize the points and weights vectors
   _points.resize(n_points * n_points);
@@ -141,9 +141,9 @@ void QBase::tensor_product_tri(QBase* gauss1D, QBase* jac1D)
   for (unsigned int i=0; i<n_points; i++)
     for (unsigned int j=0; j<n_points; j++)
       {
-	_points[gp](0) = jac1D->qp(j)(0);                          //s[j];
-	_points[gp](1) = gauss1D->qp(i)(0) * (1.-jac1D->qp(j)(0)); //r[i]*(1.-s[j]);
-	_weights[gp]   = gauss1D->w(i) * jac1D->w(j);              //A[i]*B[j];
+	_points[gp](0) = jac1D.qp(j)(0);                          //s[j];
+	_points[gp](1) = gauss1D.qp(i)(0) * (1.-jac1D.qp(j)(0)); //r[i]*(1.-s[j]);
+	_weights[gp]   = gauss1D.w(i) * jac1D.w(j);              //A[i]*B[j];
 	gp++;
       }
 }
@@ -151,9 +151,9 @@ void QBase::tensor_product_tri(QBase* gauss1D, QBase* jac1D)
 
 
 
-void QBase::tensor_product_hex(QBase* q1D)
+void QBase::tensor_product_hex(QBase& q1D)
 {
-  const unsigned int n_points = q1D->n_points();
+  const unsigned int n_points = q1D.n_points();
   
   _points.resize(n_points * n_points * n_points);
   
@@ -165,11 +165,11 @@ void QBase::tensor_product_hex(QBase* q1D)
     for (unsigned int j=0; j<n_points; j++)
       for (unsigned int i=0; i<n_points; i++)
 	{
-	  _points[qp](0) = q1D->qp(i)(0);
-	  _points[qp](1) = q1D->qp(j)(0);
-	  _points[qp](2) = q1D->qp(k)(0);
+	  _points[qp](0) = q1D.qp(i)(0);
+	  _points[qp](1) = q1D.qp(j)(0);
+	  _points[qp](2) = q1D.qp(k)(0);
 	  
-	  _weights[qp] = q1D->w(i) * q1D->w(j) * q1D->w(k);
+	  _weights[qp] = q1D.w(i) * q1D.w(j) * q1D.w(k);
 	  
 	  qp++;
 	}
@@ -178,10 +178,10 @@ void QBase::tensor_product_hex(QBase* q1D)
 
 
 
-void QBase::tensor_product_prism(QBase* q1D, QBase* q2D)
+void QBase::tensor_product_prism(QBase& q1D, QBase& q2D)
 {
-  const unsigned int n_points1D = q1D->n_points();
-  const unsigned int n_points2D = q2D->n_points();
+  const unsigned int n_points1D = q1D.n_points();
+  const unsigned int n_points2D = q2D.n_points();
   
   _points.resize  (n_points1D * n_points2D);
   _weights.resize (n_points1D * n_points2D);
@@ -191,11 +191,11 @@ void QBase::tensor_product_prism(QBase* q1D, QBase* q2D)
   for (unsigned int j=0; j<n_points1D; j++)
     for (unsigned int i=0; i<n_points2D; i++)
       {
-	_points[qp](0) = q2D->qp(i)(0);
-	_points[qp](1) = q2D->qp(i)(1);
-	_points[qp](2) = q1D->qp(j)(0);
+	_points[qp](0) = q2D.qp(i)(0);
+	_points[qp](1) = q2D.qp(i)(1);
+	_points[qp](2) = q1D.qp(j)(0);
 
-	_weights[qp] = q2D->w(i) * q1D->w(j);
+	_weights[qp] = q2D.w(i) * q1D.w(j);
 
 	qp++;
       }
@@ -205,21 +205,21 @@ void QBase::tensor_product_prism(QBase* q1D, QBase* q2D)
 
 
 
-void QBase::tensor_product_tet(QBase* gauss1D, QBase* jacA1D, QBase* jacB1D)
+void QBase::tensor_product_tet(QBase& gauss1D, QBase& jacA1D, QBase& jacB1D)
 {
   here();
 
   // All rules should be of the same order
-  assert(gauss1D->n_points() == jacA1D->n_points());
-  assert(jacA1D->n_points()  == jacB1D->n_points());
+  assert(gauss1D.n_points() == jacA1D.n_points());
+  assert(jacA1D.n_points()  == jacB1D.n_points());
   
   // Save the number of points as a convenient variable
-  const unsigned int n_points = gauss1D->n_points();
+  const unsigned int n_points = gauss1D.n_points();
   
   // All rules should be between x=0 and x=1
-  assert(gauss1D->qp(0)(0) >= 0.0); assert(gauss1D->qp(n_points-1)(0) <= 1.0);
-  assert(jacA1D->qp(0)(0)  >= 0.0); assert(jacA1D->qp(n_points-1)(0)  <= 1.0);
-  assert(jacB1D->qp(0)(0)  >= 0.0); assert(jacB1D->qp(n_points-1)(0)  <= 1.0);
+  assert(gauss1D.qp(0)(0) >= 0.0); assert(gauss1D.qp(n_points-1)(0) <= 1.0);
+  assert(jacA1D.qp(0)(0)  >= 0.0); assert(jacA1D.qp(n_points-1)(0)  <= 1.0);
+  assert(jacB1D.qp(0)(0)  >= 0.0); assert(jacB1D.qp(n_points-1)(0)  <= 1.0);
 
   // Resize the points and weights vectors
   _points.resize(n_points * n_points * n_points);
@@ -231,10 +231,10 @@ void QBase::tensor_product_tet(QBase* gauss1D, QBase* jacA1D, QBase* jacB1D)
     for (unsigned int j=0; j<n_points; j++)
       for (unsigned int k=0; k<n_points; k++)
       {
-	_points[gp](0) = jacB1D->qp(k)(0);                                                  //t[k];
-	_points[gp](1) = jacA1D->qp(j)(0)  * (1.-jacB1D->qp(k)(0));                         //s[j]*(1.-t[k]);
-	_points[gp](2) = gauss1D->qp(i)(0) * (1.-jacA1D->qp(j)(0)) * (1.-jacB1D->qp(k)(0)); //r[i]*(1.-s[j])*(1.-t[k]);
-	_weights[gp]   = gauss1D->w(i)     * jacA1D->w(j)          * jacB1D->w(k);          //A[i]*B[j]*C[k];
+	_points[gp](0) = jacB1D.qp(k)(0);                                                  //t[k];
+	_points[gp](1) = jacA1D.qp(j)(0)  * (1.-jacB1D.qp(k)(0));                         //s[j]*(1.-t[k]);
+	_points[gp](2) = gauss1D.qp(i)(0) * (1.-jacA1D.qp(j)(0)) * (1.-jacB1D.qp(k)(0)); //r[i]*(1.-s[j])*(1.-t[k]);
+	_weights[gp]   = gauss1D.w(i)     * jacA1D.w(j)          * jacB1D.w(k);          //A[i]*B[j]*C[k];
 	gp++;
       }
 }

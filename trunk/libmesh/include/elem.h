@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.21 2003-04-01 14:19:46 ddreyer Exp $
+// $Id: elem.h,v 1.22 2003-05-22 17:06:21 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -423,24 +423,16 @@ class Elem : public ReferenceCountedObject<Elem>,
   void coarsen();
 
   /**
-   * Convenience typedefs for providing iterator access
-   * to the _neighbors array.  These make the accessor
-   * functions easier to read.
-   */
-  typedef std::pair<Elem**, Elem**>             ElemPair;
-  typedef std::pair<const Elem**, const Elem**> ConstElemPair;
-
-  /**
    * The non-const begin and end accessor functions.
    */
-  ElemPair neighbors_begin ();
-  ElemPair neighbors_end ();
+  std::pair<Elem**, Elem**> neighbors_begin ();
+  std::pair<Elem**, Elem**> neighbors_end ();
 
   /**
    * The const begin and end accessor functions. 
    */
-  ConstElemPair neighbors_begin () const;
-  ConstElemPair neighbors_end () const;
+  std::pair<const Elem**, const Elem**> neighbors_begin () const;
+  std::pair<const Elem**, const Elem**> neighbors_end () const;
   
 #endif
 
@@ -834,37 +826,37 @@ void Elem::set_refinement_flag(RefinementState rflag)
 
 
 inline
-Elem::ElemPair Elem::neighbors_begin ()
+std::pair<Elem**, Elem**> Elem::neighbors_begin ()
 {
-  return ElemPair (&_neighbors[0],
-		   &_neighbors[n_neighbors()]);
+  return std::make_pair (&_neighbors[0],
+			 &_neighbors[n_neighbors()]);
 }
 
 
 
 inline
-Elem::ElemPair Elem::neighbors_end ()
+std::pair<Elem**, Elem**> Elem::neighbors_end ()
 {
-  return ElemPair (&_neighbors[n_neighbors()],
-		   &_neighbors[n_neighbors()]);
+  return std::make_pair (&_neighbors[n_neighbors()],
+			 &_neighbors[n_neighbors()]);
 }
 
 
 
 inline
-Elem::ConstElemPair Elem::neighbors_begin () const
+std::pair<const Elem**, const Elem**> Elem::neighbors_begin () const
 {
-  return ConstElemPair (const_cast<const Elem**>(&_neighbors[0]),
-			const_cast<const Elem**>(&_neighbors[n_neighbors()]));
+  return std::make_pair (const_cast<const Elem**>(&_neighbors[0]),
+			 const_cast<const Elem**>(&_neighbors[n_neighbors()]));
 }
 
 
 
 inline
-Elem::ConstElemPair Elem::neighbors_end () const
+std::pair<const Elem**, const Elem**> Elem::neighbors_end () const
 {
-  return ConstElemPair (const_cast<const Elem**>(&_neighbors[n_neighbors()]),
-			const_cast<const Elem**>(&_neighbors[n_neighbors()]));
+  return std::make_pair (const_cast<const Elem**>(&_neighbors[n_neighbors()]),
+			 const_cast<const Elem**>(&_neighbors[n_neighbors()]));
 }
 
 

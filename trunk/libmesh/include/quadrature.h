@@ -1,4 +1,4 @@
-// $Id: quadrature.h,v 1.12 2003-05-05 15:30:36 benkirk Exp $
+// $Id: quadrature.h,v 1.13 2003-05-22 17:06:22 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -206,7 +206,7 @@ protected:
    * Used in the init_2D routines for
    * quadrilateral element types.
    */
-  void tensor_product_quad (QBase* q1D);
+  void tensor_product_quad (QBase& q1D);
 
   /**
    * Computes the conical product of
@@ -217,7 +217,7 @@ protected:
    * Method can be found in:
    * Approximate Calculation of Multiple Integrals, Stroud, A. H.
    */
-  void tensor_product_tri (QBase* gauss1D, QBase* jacA1D);
+  void tensor_product_tri (QBase& gauss1D, QBase& jacA1D);
   
   /**
    * Computes the tensor product of
@@ -225,7 +225,7 @@ protected:
    * Used in the init_3D routines for
    * hexahedral element types.
    */
-  void tensor_product_hex (QBase* q1D);
+  void tensor_product_hex (QBase& q1D);
   
   /**
    * Computes the tensor product of
@@ -233,7 +233,7 @@ protected:
    * Used in the init_3D routines for
    * hexahedral element types.
    */
-  void tensor_product_prism (QBase* q1D, QBase* q2D);
+  void tensor_product_prism (QBase& q1D, QBase& q2D);
 
   /**
    * Computes the conical product of
@@ -245,7 +245,7 @@ protected:
    * Method can be found in:
    * Approximate Calculation of Multiple Integrals, Stroud, A. H.
    */
-  void tensor_product_tet (QBase* gauss1D, QBase* jacA1D, QBase* jacB1D);
+  void tensor_product_tet (QBase& gauss1D, QBase& jacA1D, QBase& jacB1D);
 
   
   /**
