@@ -1,4 +1,4 @@
-// $Id: unv_io.C,v 1.4 2004-03-24 05:49:12 jwpeterson Exp $
+// $Id: unv_io.C,v 1.5 2004-04-23 13:24:00 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -471,22 +471,39 @@ void UNVIO::count_elements (std::istream& in_file)
   // purpose to count nodes!
   
   std::string data;
+  unsigned int fe_id;
 
   while (!in_file.eof())
     {
       // read element label
       in_file >> data;
       
-      
       // end of dataset?
       if (data == "-1") 
 	break;
 	
+      // read fe_id
+      in_file >> fe_id;
+
       // Skip related data,
       // and node number list
       in_file.ignore (256,'\n');
       in_file.ignore (256,'\n');
-      
+
+      // For some elements the node numbers
+      // are given more than one record
+
+      // TET10
+      if (fe_id == 118)
+	  in_file.ignore (256,'\n');
+
+      // HEX20
+      if (fe_id == 116)
+	{
+	  in_file.ignore (256,'\n');
+	  in_file.ignore (256,'\n');
+	}
+     
       this->_n_elements++;
     }
 
