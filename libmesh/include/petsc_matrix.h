@@ -1,4 +1,4 @@
-//    $Id: petsc_matrix.h,v 1.31 2003-10-01 17:48:25 benkirk Exp $
+//    $Id: petsc_matrix.h,v 1.32 2003-10-08 13:25:27 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -506,37 +506,42 @@ T PetscMatrix<T>::operator () (const unsigned int i,
   
   ierr = MatGetRow(mat, i_val, &ncols, &petsc_cols, &petsc_row); CHKERRQ(ierr);
 
-  //TODO:[BSK] A binary search on petsc_cols would be faster!
-  // Perform a linear search to find the contiguous index in
-  // petsc_cols (resp. petsc_row) corresponding to global index j_val
-  for (int entry=0; entry<ncols; entry++)
-    if (petsc_cols[entry] == j_val)
-      {
-        value = static_cast<T>(petsc_row[entry]);
-           
-        ierr = MatRestoreRow(mat, i_val,
-                             &ncols, &petsc_cols, &petsc_row); CHKERRQ(ierr);
-           
-        return value;
-      }
-  
-//   // Perform a binary search to find the contiguous index in
+//   // Perform a linear search to find the contiguous index in
 //   // petsc_cols (resp. petsc_row) corresponding to global index j_val
-//   std::pair<int*, int*> p =
-//     std::equal_range (&petsc_cols[0], &petsc_cols[0] + ncols, j_val);
+//   for (int entry=0; entry<ncols; entry++)
+//     if (petsc_cols[entry] == j_val)
+//       {
+//         value = static_cast<T>(petsc_row[entry]);
+           
+//         ierr = MatRestoreRow(mat, i_val,
+//                              &ncols, &petsc_cols, &petsc_row); CHKERRQ(ierr);
+           
+//         return value;
+//       }
 
-//   // Found an entry for j_val
-//   if (p.first != p.second)
-//     {
-//       assert (*(p.first) < ncols);
+  
+  // Perform a binary search to find the contiguous index in
+  // petsc_cols (resp. petsc_row) corresponding to global index j_val
+  std::pair<int*, int*> p =
+    std::equal_range (&petsc_cols[0], &petsc_cols[0] + ncols, j_val);
+
+  // Found an entry for j_val
+  if (p.first != p.second)
+    {
+      // The entry in the contiguous row corresponding
+      // to the j_val column of interest
+      const unsigned int j = std::distance (&petsc_cols[0], p.first);
       
-//       value = static_cast<T> (petsc_row[*(p.first)]);
+      assert (j < ncols);
+      assert (petsc_cols[j] == j_val);
       
-//       ierr  = MatRestoreRow(mat, i_val,
-// 			    &ncols, &petsc_cols, &petsc_row); CHKERRQ(ierr);
+      value = static_cast<T> (petsc_row[j]);
+      
+      ierr  = MatRestoreRow(mat, i_val,
+			    &ncols, &petsc_cols, &petsc_row); CHKERRQ(ierr);
 	  
-//       return value;
-//     }
+      return value;
+    }
   
   // Otherwise the entry is not in the sparse matrix,
   // i.e. it is 0.  
