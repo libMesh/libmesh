@@ -1,4 +1,4 @@
-// $Id: inf_fe.h,v 1.12 2003-02-06 17:58:34 ddreyer Exp $
+// $Id: inf_fe.h,v 1.13 2003-02-09 22:47:17 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -95,7 +95,7 @@ class Elem;
  *
  * \author Daniel Dreyer
  * \date 2003
- * \version $Revision: 1.12 $
+ * \version $Revision: 1.13 $
  */
 
 //-------------------------------------------------------------
@@ -118,7 +118,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.12 $
+   * \version $Revision: 1.13 $
    */
   //-------------------------------------------------------------
   // InfFE::Radial class definition
@@ -247,7 +247,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.12 $
+   * \version $Revision: 1.13 $
    */
   //-------------------------------------------------------------
   // InfFE::Base class definition
@@ -453,37 +453,10 @@ public:
       { assert (radial_qrule != NULL); return _n_total_qp; };
 
   /**
-   * @returns the global first derivative of the phase term in
-   * infinite elements, evaluated at the quadrature points.
-   */
-  const std::vector<Point>& get_dphase() const
-      { return dphase; };
-
-  /**
-   * @returns the multiplicative weight at each quadrature point.
-   * This weight is used for certain infinite element weak 
-   * formulations, so that @e weighted Sobolev spaces are
-   * used for the trial function space.  This renders the
-   * variational form easily computable.
-   */
-  const std::vector<Real>& get_Sobolev_weight() const
-      { return weight; };
-
-  /**
-   * @returns the first global derivative of the multiplicative 
-   * weight at each quadrature point. See \p get_Sobolev_weight()
-   * for details.
-   */
-  const std::vector<Point>& get_Sobolev_dweight() const
-      { return dweight; };
-
-  /**
    * @returns the number of shape functions associated with
    * this infinite element.
    */
   unsigned int n_shape_functions () const { return _n_total_approx_sf; };
-
-
 
 
 protected:
@@ -614,29 +587,6 @@ protected:
 /*   static Point map_zeta (const Elem* elem, */
 /* 			 const Point& reference_point); */
 
-
-
-
-
-  //--------------------------------------------------------------
-  // protected members, which may be accessed from the outside through some inline functions
-  /**
-   * the first derivatives of the phase term in global coordinates,
-   * over @e all quadrature points.
-   */
-  std::vector<Point> dphase;
-
-  /**
-   * the global derivative of the additional radial weight \f$ 1/{r^2} \f$,
-   * over @e all quadrature points.
-   */
-  std::vector<Point> dweight;
-
-  /**
-   * the additional radial weight \f$ 1/{r^2} \f$ in local coordinates,
-   * over @e all quadrature points.
-   */
-  std::vector<Real>  weight;
 
 
 

@@ -1,4 +1,4 @@
-//    $Id: petsc_vector.h,v 1.7 2003-02-03 03:51:49 ddreyer Exp $
+//    $Id: petsc_vector.h,v 1.8 2003-02-09 22:47:17 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -37,7 +37,7 @@
 
 
 
-/**
+/*
  * Petsc include files.  PETSc with complex numbers 
  * is actually C++.
  */

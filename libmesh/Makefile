@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.11 2003-02-06 17:13:31 benkirk Exp $
+# $Id: Makefile,v 1.12 2003-02-09 22:47:16 ddreyer Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -22,6 +22,10 @@ headerfiles 	:= $(wildcard include/*.h)
 #
 # source files
 srcfiles 	:= $(wildcard src/*/*.C)
+
+#
+# examples source files
+examplesrcfiles	:= $(wildcard examples/ex?/ex?.C)
 
 #
 # object files
@@ -74,7 +78,7 @@ $(mesh_library_dir)/libmesh.so: $(objects)
 #
 # Build the examples
 #
-examples: $(mesh_library)
+examples: $(mesh_library) $(examplesrcfiles)
 	@$(MAKE) -C examples
 
 
@@ -85,6 +89,7 @@ echo:
 	@echo -e "Source Files:\n$(srcfiles)\n"
 	@echo -e "Object Files:\n$(objects)\n"
 	@echo -e "Target:\n$(target)\n"
+	@echo -e "Examples Source Files:\n$(examplesrcfiles)\n"
 	@echo -e "CFLAGS:\n$(CXXFLAGS)\n"
 	@echo -e "CXXFLAGS:\n$(CXXFLAGS)\n"
 	@echo -e "INCLUDE:\n$(INCLUDE)\n"
