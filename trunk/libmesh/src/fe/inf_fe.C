@@ -1,4 +1,4 @@
-// $Id: inf_fe.C,v 1.21 2003-05-15 23:34:35 benkirk Exp $
+// $Id: inf_fe.C,v 1.22 2003-05-30 20:15:45 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,6 +26,7 @@
 #include "quadrature_gauss.h"
 #include "elem.h"
 #include "fe.h"
+#include "mesh_logging.h"
 
 
 
@@ -62,9 +63,7 @@ InfFE<Dim,T_radial,T_map>::InfFE (const FEType& fet) :
 			   fet.inf_map) )
 
 {
-  // Sanity check.  Make sure the family and
-  // map specified in the template instantiation
-  // matches the one in the FEType object
+  // Sanity checks
   assert (T_radial == fe_type.radial_family);
   assert (T_map    == fe_type.inf_map);
 
@@ -121,9 +120,8 @@ void InfFE<Dim,T_radial,T_map>:: attach_quadrature_rule (QBase* q)
 
   Order base_int_order   = q->get_order();
   //Order radial_int_order = static_cast<Order>( static_cast<unsigned int>(fe_type.radial_order) + 2 );
-
-  Order radial_int_order = static_cast<Order>( 2*(static_cast<unsigned int>(fe_type.radial_order) + 1) );
-  // radial order rather conservative, may also work with other values...? check this radial order again!!!!
+  //Order radial_int_order = static_cast<Order>( 2*(static_cast<unsigned int>(fe_type.radial_order) + 1) );
+  Order radial_int_order = static_cast<Order>( 2 * (3 + static_cast<unsigned int>(fe_type.radial_order)) - 1);
 
   if (Dim != 1)
     {
@@ -135,7 +133,6 @@ void InfFE<Dim,T_radial,T_map>:: attach_quadrature_rule (QBase* q)
   
   // in radial direction, always use Gauss quadrature
   radial_qrule = new QGauss(1, radial_int_order);
-
 
   /* currently not used. But maybe helpful to store the QBase*
    * with which we initialized our own quadrature rules */
@@ -171,15 +168,14 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem,
   assert (pts            == NULL);
   
 
-  // see below
   bool init_shape_functions_required = false;
 
-
-  // -----------------------------------------------------------------
-  // init the radial data fields only when the radial order changes
+  /*
+   * -----------------------------------------------------------------
+   * init the radial data fields only when the radial order changes
+   */
   if (current_fe_type.radial_order != fe_type.radial_order)
     {
-      // update to the new radial order
       current_fe_type.radial_order = fe_type.radial_order;
 
       // Watch out: this call to QBase->init() only works for 
@@ -194,21 +190,27 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem,
     }
 
 
-  // -----------------------------------------------------------------
-  // update the type in accordance to the current cell
-  // and reinit if the cell type has changed or (as in
-  // the case of the hierarchics) the shape functions
-  // depend on the particular element
-  //
-  // (note that FEBase::elem_type is initialized to INVALID_ELEM,
-  //  so the following if statement is safe)
+  bool update_base_elem_required=true;
+
+  /*
+   * -----------------------------------------------------------------
+   * update the type in accordance to the current cell
+   * and reinit if the cell type has changed or (as in
+   * the case of the hierarchics) the shape functions
+   * depend on the particular element and need a reinit
+  */
   if (  ( Dim != 1) &&
 	(  (get_type() != inf_elem->type())  ||  
-	   (fe_type.family == HIERARCHIC)  )  )
+	   (base_fe->shapes_need_reinit())  )  )
     {
-      // store the new element type, update base_elem
+      /*
+       * store the new element type, update base_elem
+       * here.  Through \p update_base_elem_required,
+       * remember whether it has to be updated (see below).
+       */
       elem_type = inf_elem->type();
       update_base_elem(inf_elem);
+      update_base_elem_required=false;
 
       // initialize the base quadrature rule for the new element
       base_qrule->init(base_elem->type());
@@ -221,20 +223,34 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem,
     }
 
 
-  // when either the radial or base part change, we have to init the whole fields
+  /* 
+   * when either the radial or base part change, 
+   * we have to init the whole fields
+   */
   if (init_shape_functions_required)
     init_shape_functions (inf_elem);
 
+  /*
+   * computing the distance only works when we have the current
+   * base_elem stored.  This happens when fe_type is const,
+   * the inf_elem->type remains the same.  Then we have to
+   * update the base elem _here_.
+   */
+  if (update_base_elem_required)
+      update_base_elem(inf_elem);
 
-  // compute dist (depends on geometry, therefore has to be updated for
-  // each and every new element), throw radial and base part together
+  /*
+   * compute dist (depends on geometry, therefore has to be updated for
+   * each and every new element), throw radial and base part together
+   */
   combine_base_radial (inf_elem);
 
-  // compute the jacobian etc
   compute_map (_total_qrule_weights, inf_elem);
 
-  // Compute the shape functions and the derivatives at all of the
-  // quadrature points.  This part is dimension-independent
+  /*
+   * Compute the shape functions and the derivatives 
+   * at all quadrature points.
+   */
   compute_shape_functions ();
 
 }
@@ -249,6 +265,11 @@ void InfFE<Dim,T_radial,T_map>::init_radial_shape_functions(const Elem* inf_elem
   assert (radial_qrule != NULL);
   assert (inf_elem     != NULL);
 
+ 
+  /**
+   * Start logging the radial shape function initialization
+   */
+  START_LOG("init_radial_shape_functions()", "InfFE");
 
 
   // -----------------------------------------------------------------
@@ -263,11 +284,9 @@ void InfFE<Dim,T_radial,T_map>::init_radial_shape_functions(const Elem* inf_elem
   // -----------------------------------------------------------------
   // initialize most of the things related to physical approximation
   
-  // The order to use in radial approximation
   const Order        radial_approx_order             (fe_type.radial_order);
   const unsigned int n_radial_approx_shape_functions (Radial::n_dofs(radial_approx_order));
 
-  // The number and location of the radial quadrature points.
   const unsigned int        n_radial_qp = radial_qrule->n_points();
   const std::vector<Point>&   radial_qp = radial_qrule->get_points();
 
@@ -325,7 +344,11 @@ void InfFE<Dim,T_radial,T_map>::init_radial_shape_functions(const Elem* inf_elem
 	dradialdv_map[i][p] = InfFE<Dim,INFINITE_MAP,T_map>::eval_deriv (radial_qp[p](0), radial_mapping_order, i);
       }
 
- 
+  /**
+   * Stop logging the radial shape function initialization
+   */
+  STOP_LOG("init_radial_shape_functions()", "InfFE");
+
 }
 
 
@@ -336,6 +359,11 @@ template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 {
   assert (inf_elem     != NULL);
+ 
+  /**
+   * Start logging the radial shape function initialization
+   */
+  START_LOG("init_shape_functions()", "InfFE");
 
   
   // -----------------------------------------------------------------
@@ -556,6 +584,11 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 	}
   }
 
+ 
+  /**
+   * Stop logging the radial shape function initialization
+   */
+  STOP_LOG("init_shape_functions()", "InfFE");
 
 }
 
@@ -571,6 +604,13 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
   // otherwise this version of computing dist would give problems
   assert (base_elem->type() == Base::get_elem_type(inf_elem->type()));
 
+
+  /**
+   * Start logging the combination of radial and base parts
+   */
+  START_LOG("combine_base_radial()", "InfFE");
+
+
   // zero  the phase, since it is to be summed up
   std::fill (dphasedxi.begin(),   dphasedxi.end(),   0.);
   std::fill (dphasedeta.begin(),  dphasedeta.end(),  0.);
@@ -583,9 +623,6 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
   // for each new infinite element, compute the radial distances
   for (unsigned int n=0; n<n_base_mapping_sf; n++)
       dist[n] =  Point(base_elem->point(n) - origin).size();
-// OLD CODE
-//       dist[i] = Point( inf_elem->point(i)
-//                   - inf_elem->point(i+n_base_mapping_sf) ).size();
 
 
   switch (Dim)
@@ -597,7 +634,7 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
       {
 	std::cout << "ERROR: Not implemented." << std::endl;
 	error();
-	return;
+	break;
       }
 
 
@@ -608,7 +645,7 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
       {
 	std::cout << "ERROR: Not implemented." << std::endl;
 	error();
-     	return;
+     	break;
       }
 
 
@@ -628,11 +665,8 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
 	const unsigned int n_radial_qp         = radial_qrule->n_points();
 	const unsigned int n_base_qp           = base_qrule->  n_points();
 
-//	const unsigned int n_radial_mapping_sf = radial_map.size();
 	const unsigned int n_total_mapping_sf  = radial_map.size() * n_base_mapping_sf;
 
-//	const unsigned int n_base_approx_sf    = base_fe->n_shape_functions();
-//	const unsigned int n_radial_approx_sf  = Radial::n_dofs(fe_type.radial_order);
 	const unsigned int n_total_approx_sf   = Radial::n_dofs(fe_type.radial_order) *  base_fe->n_shape_functions();
 
 
@@ -648,19 +682,6 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
 	            dphasedxi[tp]   += Ss_map[i][bp] * dist[i] * radial_map   [1][rp];
 		    dphasedeta[tp]  += St_map[i][bp] * dist[i] * radial_map   [1][rp];
 		    dphasedzeta[tp] += S_map [i][bp] * dist[i] * dradialdv_map[1][rp];
-
-#ifdef DEBUG
-		    if (tp != (bp+rp*n_base_qp) )
-		    {
-		      std::cout << "ERROR: cannot count..." << std::endl
-				<< " tp = " << tp 
-				<< " bp = " << bp
-				<< " rp = " << rp
-				<< std::endl;	      
-		      error();
-		    }
-#endif		    
-
 		  }
 
 		tp++;
@@ -694,21 +715,6 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
 		dphidzeta[ti][bp+rp*n_base_qp] = S [bi][bp] 
 		    * (dmodedv[ri][rp] * som[rp] + mode[ri][rp] * dsomdv[rp]);
 	      }
-// OLD CODE
-// 	for (unsigned int rp=0; rp<n_radial_qp; rp++)  // over radial qp's
-// 	  for (unsigned int bp=0; bp<n_base_qp; bp++)  // over base qp's
-// 	    for (unsigned int ri=0; ri<n_radial_approx_sf; ri++)  // over radial approx shapes
-// 	      for (unsigned int bi=0; bi<n_base_approx_sf; bi++)  // over base   approx shapes
-// 	        {
-// 		  // form the total shape function data fields
-//  		  phi      [ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = S [bi][bp] * mode[ri][rp] * som[rp];
-//  		  dphidxi  [ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = Ss[bi][bp] * mode[ri][rp] * som[rp];
-//  		  dphideta [ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = St[bi][bp] * mode[ri][rp] * som[rp];
-//  		  dphidzeta[ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = S [bi][bp] 
-//  		      * (dmodedv[ri][rp] * som[rp] + mode[ri][rp] * dsomdv[rp]);
-// 		}
-
-
 
 	
 	assert (phi_map.size()       == n_total_mapping_sf);
@@ -732,25 +738,9 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
 		dphideta_map [ti][bp+rp*n_base_qp] = St_map[bi][bp] * radial_map   [ri][rp];
 		dphidzeta_map[ti][bp+rp*n_base_qp] = S_map [bi][bp] * dradialdv_map[ri][rp];
 	      }
-// OLD CODE
-//
-// wrong: should not be n_base_approx_sf but n_base_mapping_sf
-//
-// 	for (unsigned int rp=0; rp<n_radial_qp; rp++)  // over radial qp's
-// 	  for (unsigned int bp=0; bp<n_base_qp; bp++)  // over base qp's
-// 	    for (unsigned int ri=0; ri<n_radial_mapping_sf; ri++)  // over radial mapping shapes
-// 	      for (unsigned int bi=0; bi<n_base_mapping_sf; bi++)  // over base   mapping shapes
-// 	        {
-// 		  // form the total map function data fields
-// 		  phi_map      [ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = S_map [bi][bp] * radial_map   [ri][rp];
-// 		  dphidxi_map  [ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = Ss_map[bi][bp] * radial_map   [ri][rp];
-// 		  dphideta_map [ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = St_map[bi][bp] * radial_map   [ri][rp];
-// 		  dphidzeta_map[ bi+ri*n_base_approx_sf ][ bp+rp*n_base_qp ] = S_map [bi][bp] * dradialdv_map[ri][rp];
-// 		}
-
 			
 
-	return;
+	break;
       }
 
 
@@ -758,8 +748,11 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
       error();
     }
 
-  error();
-  return;
+
+  /**
+   * Start logging the combination of radial and base parts
+   */
+  STOP_LOG("combine_base_radial()", "InfFE");
 
 }
 
@@ -772,6 +765,13 @@ template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 void InfFE<Dim,T_radial,T_map>::compute_shape_functions()
 {
   assert (radial_qrule != NULL);
+
+
+  /**
+   * Start logging the overall computation of shape functions
+   */
+  START_LOG("compute_shape_functions()", "InfFE");
+
 
   const unsigned int n_total_qp  = _n_total_qp;
 
@@ -861,10 +861,22 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions()
 	error();
       }
     }
+
+
+  /**
+   * Stop logging the overall computation of shape functions
+   */
+  STOP_LOG("compute_shape_functions()", "InfFE");
+
 }
 
 
 
+template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
+bool InfFE<Dim,T_radial,T_map>::shapes_need_reinit() const 
+{ 
+  return false; 
+}
 
 
 //--------------------------------------------------------------
