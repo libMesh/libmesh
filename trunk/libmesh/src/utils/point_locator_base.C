@@ -1,4 +1,4 @@
-// $Id: point_locator_base.C,v 1.5 2004-01-03 15:37:44 benkirk Exp $
+// $Id: point_locator_base.C,v 1.6 2004-03-24 03:48:52 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,6 @@
 
 // Local Includes
 #include "point_locator_base.h"
-#include "mesh.h"
 #include "point.h"
 #include "point_locator_tree.h"
 #include "point_locator_list.h"
