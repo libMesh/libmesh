@@ -1,4 +1,4 @@
-// $Id: libmesh.C,v 1.17 2003-09-25 21:46:55 benkirk Exp $
+// $Id: libmesh.C,v 1.18 2003-09-25 21:59:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -59,7 +59,13 @@ namespace {
 
 // ------------------------------------------------------------
 // libMesh data initialization
-PerfLog            libMesh::log ("libMesh", (ENABLE_PERFORMANCE_LOGGING == 1));
+PerfLog            libMesh::log ("libMesh",
+#ifdef ENABLE_PERFORMANCE_LOGGING
+				 true
+#else
+				 false
+#endif
+				 );
 
 #ifdef USE_COMPLEX_NUMBERS
 const Number       libMesh::imaginary (0., 1.);
