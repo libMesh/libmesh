@@ -1,4 +1,4 @@
-// $Id: distributed_vector.C,v 1.14 2003-07-23 21:49:05 ddreyer Exp $
+// $Id: distributed_vector.C,v 1.15 2003-08-28 19:50:54 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -505,7 +505,8 @@ void DistributedVector<float>::localize_to_one (std::vector<float>& v_local,
   
 #else
 
-  assert (local_size() == size());
+  assert (this->local_size() == this->size());
+  assert (pid == 0);
   
 #endif  
 }
@@ -538,7 +539,8 @@ void DistributedVector<double>::localize_to_one (std::vector<double>& v_local,
   
 #else
 
-  assert (local_size() == size());
+  assert (this->local_size() == this->size());
+  assert (pid == 0);
   
 #endif  
 }

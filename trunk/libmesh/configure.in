@@ -1,5 +1,5 @@
 dnl --------------------------------------------------------------
-dnl $Id: configure.in,v 1.31 2003-08-28 19:35:38 benkirk Exp $
+dnl $Id: configure.in,v 1.32 2003-08-28 19:50:53 benkirk Exp $
 dnl --------------------------------------------------------------
 dnl Process this file with autoconf to produce a configure script.
 
@@ -9,7 +9,7 @@ dnl you call ./configure subsequently on different systems without
 dnl clearing the cache 
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
-AC_REVISION($Revision: 1.31 $)
+AC_REVISION($Revision: 1.32 $)
 
 
 AC_INIT(Make.common.in)
@@ -57,9 +57,9 @@ AC_SUBST(RPATHFLAG)
 dnl --------------------------------------------------------------
 dnl Check for important type sizes
 dnl --------------------------------------------------------------
+AC_CHECK_SIZEOF(short int)
 AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(long int)
-AC_CHECK_SIZEOF(long long int)
 AC_CHECK_SIZEOF(float)
 AC_CHECK_SIZEOF(double)
 AC_CHECK_SIZEOF(void *)
