@@ -1,4 +1,4 @@
-// $Id: petsc_matrix.C,v 1.20 2004-01-03 15:37:43 benkirk Exp $
+// $Id: petsc_matrix.C,v 1.21 2004-02-15 15:35:30 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -66,17 +66,21 @@ void PetscMatrix<T>::init (const unsigned int m,
     {
       // Create matrix.  Revisit later to do preallocation and make more efficient
       ierr = MatCreateSeqAIJ (PETSC_COMM_WORLD, n_global, n_global,
-			      n_nz, PETSC_NULL, &mat);                 CHKERRQ(ierr);
+			      n_nz, PETSC_NULL, &mat);
+             CHKERRABORT(PETSC_COMM_WORLD,ierr);
   
-      ierr = MatSetFromOptions (mat);                                  CHKERRQ(ierr);
+      ierr = MatSetFromOptions (mat);
+             CHKERRABORT(PETSC_COMM_WORLD,ierr);
     }
 
   else
     {
       ierr = MatCreateMPIAIJ (PETSC_COMM_WORLD, m_local, n_local, m_global, n_global,
-			      n_nz, PETSC_NULL, n_oz, PETSC_NULL, &mat); CHKERRQ(ierr);
+			      n_nz, PETSC_NULL, n_oz, PETSC_NULL, &mat);
+             CHKERRABORT(PETSC_COMM_WORLD,ierr);
   
-      ierr = MatSetFromOptions (mat);                                  CHKERRQ(ierr);
+      ierr = MatSetFromOptions (mat);
+             CHKERRABORT(PETSC_COMM_WORLD,ierr);
     }
 
   this->zero ();
@@ -130,9 +134,11 @@ void PetscMatrix<T>::init ()
   if ((m_l == m) && (n_l == n))
     {
       ierr = MatCreateSeqAIJ (PETSC_COMM_WORLD, n_global, n_global,
-			      PETSC_NULL, (int*) &n_nz[0], &mat);      CHKERRQ(ierr);
+			      PETSC_NULL, (int*) &n_nz[0], &mat);
+             CHKERRABORT(PETSC_COMM_WORLD,ierr);
   
-      ierr = MatSetFromOptions (mat);                                  CHKERRQ(ierr);
+      ierr = MatSetFromOptions (mat);
+             CHKERRABORT(PETSC_COMM_WORLD,ierr);
     }
 
   else
@@ -141,9 +147,11 @@ void PetscMatrix<T>::init ()
 			      m_local, n_local,
 			      m_global, n_global,
 			      PETSC_NULL, (int*) &n_nz[0],
-			      PETSC_NULL, (int*) &n_oz[0], &mat);      CHKERRQ(ierr);
+			      PETSC_NULL, (int*) &n_oz[0], &mat);
+             CHKERRABORT(PETSC_COMM_WORLD,ierr);
   
-      ierr = MatSetFromOptions (mat);                                  CHKERRQ(ierr);
+      ierr = MatSetFromOptions (mat);
+             CHKERRABORT(PETSC_COMM_WORLD,ierr);
     }
 
   this->zero();
@@ -158,7 +166,8 @@ void PetscMatrix<T>::zero ()
   
   int ierr=0;
 
-  ierr = MatZeroEntries(mat); CHKERRQ(ierr);
+  ierr = MatZeroEntries(mat);
+         CHKERRABORT(PETSC_COMM_WORLD,ierr);
 }
 
 
@@ -170,7 +179,8 @@ void PetscMatrix<T>::clear ()
   
   if (this->initialized())
     {
-      ierr = MatDestroy (mat); CHKERRQ(ierr);
+      ierr = MatDestroy (mat);
+             CHKERRABORT(PETSC_COMM_WORLD,ierr);
       
       this->_is_initialized = false;
     }
@@ -189,7 +199,8 @@ Real PetscMatrix<T>::l1_norm () const
   
   assert (this->closed());
 
-  ierr = MatNorm(mat, NORM_1, &petsc_value); CHKERRQ(ierr);
+  ierr = MatNorm(mat, NORM_1, &petsc_value);
+         CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
   value = static_cast<Real>(petsc_value);
 
@@ -209,7 +220,8 @@ Real PetscMatrix<T>::linfty_norm () const
   
   assert (this->closed());
 
-  ierr = MatNorm(mat, NORM_INFINITY, &petsc_value); CHKERRQ(ierr);
+  ierr = MatNorm(mat, NORM_INFINITY, &petsc_value);
+         CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
   value = static_cast<Real>(petsc_value);
 
@@ -229,7 +241,8 @@ void PetscMatrix<T>::print_matlab (const std::string name) const
 
 
   ierr = PetscViewerCreate (PETSC_COMM_WORLD,
-			    &petsc_viewer);                    CHKERRQ(ierr);
+			    &petsc_viewer);
+         CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
   /**
    * Create an ASCII file containing the matrix
@@ -239,12 +252,15 @@ void PetscMatrix<T>::print_matlab (const std::string name) const
     {
       ierr = PetscViewerASCIIOpen( PETSC_COMM_WORLD,
 				   name.c_str(),
-				   &petsc_viewer);             CHKERRQ(ierr);
+				   &petsc_viewer);
+             CHKERRABORT(PETSC_COMM_WORLD,ierr);
       
       ierr = PetscViewerSetFormat (petsc_viewer,
-				   PETSC_VIEWER_ASCII_MATLAB); CHKERRQ(ierr);
+				   PETSC_VIEWER_ASCII_MATLAB);
+             CHKERRABORT(PETSC_COMM_WORLD,ierr);
   
-      ierr = MatView (mat, petsc_viewer);                      CHKERRQ(ierr);
+      ierr = MatView (mat, petsc_viewer);
+             CHKERRABORT(PETSC_COMM_WORLD,ierr);
     }
 
   /**
@@ -253,16 +269,19 @@ void PetscMatrix<T>::print_matlab (const std::string name) const
   else
     {
       ierr = PetscViewerSetFormat (PETSC_VIEWER_STDOUT_WORLD,
-				   PETSC_VIEWER_ASCII_MATLAB); CHKERRQ(ierr);
+				   PETSC_VIEWER_ASCII_MATLAB);
+             CHKERRABORT(PETSC_COMM_WORLD,ierr);
   
-      ierr = MatView (mat, PETSC_VIEWER_STDOUT_WORLD);         CHKERRQ(ierr);
+      ierr = MatView (mat, PETSC_VIEWER_STDOUT_WORLD);
+             CHKERRABORT(PETSC_COMM_WORLD,ierr);
     }
 
 
   /**
    * Destroy the viewer.
    */
-  ierr = PetscViewerDestroy (petsc_viewer);                    CHKERRQ(ierr);
+  ierr = PetscViewerDestroy (petsc_viewer);
+         CHKERRABORT(PETSC_COMM_WORLD,ierr);
 }
 
 

@@ -241,9 +241,16 @@
   we recommend including the \p Make.common file created in the
   top-level directory in the \p Makefile of any application you want to
   use with the library.  This will properly set the \p INCLUDE and
-  \p LIBS variables, which you can append to with your own stuff.  You
-  could of course figure out what these need to be yourself, but don't
-  complain that it is hard.
+  \p LIBS variables, which you can append to with your own stuff.
+
+  For testing simple programs you may want to use the \p libmesh-config script
+  included in the \p contrib/bin directory instead of creating a \p Makefile.
+  This script may be used to determine the relevant compilation and linking flags
+  used by \p libMesh. For example, you could build the application \p foo from
+  \p foo.C like this:
+  \verbatim
+     c++ -o foo foo.C `libmesh-config --cxxflags --include --ldflags` \endverbatim
+   
  */
 
 // Local Variables:
