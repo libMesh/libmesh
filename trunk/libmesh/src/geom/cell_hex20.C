@@ -1,4 +1,4 @@
-// $Id: cell_hex20.C,v 1.21 2005-02-22 22:17:38 jwpeterson Exp $
+// $Id: cell_hex20.C,v 1.22 2005-02-25 19:16:22 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -48,6 +48,17 @@ bool Hex20::is_face(const unsigned int) const
 {
   return false;
 }
+
+bool Hex20::is_node_on_side(const unsigned int n,
+			    const unsigned int s) const
+{
+  assert(s < n_sides());
+  for (unsigned int i = 0; i != 8; ++i)
+    if (side_nodes_map[s][i] == n)
+      return true;
+  return false;
+}
+
 
 const unsigned int Hex20::side_nodes_map[6][8] =
 {

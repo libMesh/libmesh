@@ -1,4 +1,4 @@
-// $Id: edge_edge3.C,v 1.12 2005-02-22 22:17:39 jwpeterson Exp $
+// $Id: edge_edge3.C,v 1.13 2005-02-25 19:16:38 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -40,6 +40,13 @@ bool Edge3::is_edge(const unsigned int i) const
 bool Edge3::is_face(const unsigned int) const
 {
   return false;
+}
+
+bool Edge3::is_node_on_side(const unsigned int n,
+			    const unsigned int s) const
+{
+  assert(s < 2);
+  return (s == n);
 }
 
 void Edge3::connectivity(const unsigned int sc,

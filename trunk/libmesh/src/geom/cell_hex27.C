@@ -1,4 +1,4 @@
-// $Id: cell_hex27.C,v 1.27 2005-02-24 17:49:02 benkirk Exp $
+// $Id: cell_hex27.C,v 1.28 2005-02-25 19:16:22 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -66,6 +66,16 @@ bool Hex27::is_face(const unsigned int i) const
     return false;
   if (i > 19)
     return true;
+  return false;
+}
+
+bool Hex27::is_node_on_side(const unsigned int n,
+			    const unsigned int s) const
+{
+  assert(s < n_sides());
+  for (unsigned int i = 0; i != 9; ++i)
+    if (side_nodes_map[s][i] == n)
+      return true;
   return false;
 }
 

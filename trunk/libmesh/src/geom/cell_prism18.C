@@ -1,4 +1,4 @@
-// $Id: cell_prism18.C,v 1.14 2005-02-22 22:17:39 jwpeterson Exp $
+// $Id: cell_prism18.C,v 1.15 2005-02-25 19:16:24 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -63,6 +63,16 @@ bool Prism18::is_face(const unsigned int i) const
 {
   if (i > 14)
     return true;
+  return false;
+}
+
+bool Prism18::is_node_on_side(const unsigned int n,
+			      const unsigned int s) const
+{
+  assert(s < n_sides());
+  for (unsigned int i = 0; i != 9; ++i)
+    if (side_nodes_map[s][i] == n)
+      return true;
   return false;
 }
 
