@@ -1,112 +1,80 @@
-// $Id: ex6.C,v 1.27 2003-06-04 14:59:24 ddreyer Exp $
+/* $Id: ex6.C,v 1.28 2003-11-10 16:55:31 benkirk Exp $ */
 
-// The Next Great Finite Element Library.
-// Copyright (C) 2003  Benjamin S. Kirk
-  
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-  
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
-  
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+/* The Next Great Finite Element Library. */
+/* Copyright (C) 2003  Benjamin S. Kirk */
+
+/* This library is free software; you can redistribute it and/or */
+/* modify it under the terms of the GNU Lesser General Public */
+/* License as published by the Free Software Foundation; either */
+/* version 2.1 of the License, or (at your option) any later version. */
+
+/* This library is distributed in the hope that it will be useful, */
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU */
+/* Lesser General Public License for more details. */
+
+/* You should have received a copy of the GNU Lesser General Public */
+/* License along with this library; if not, write to the Free Software */
+/* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
 
 
-/**
- * C++ include files that we need
- */
+
+ // Example 6 -- Infinite Elements for the Wave Equation
+ //
+ // This is the sixth example program.  It builds on
+ // the previous examples, and introduces the Infinite
+ // Element class.  Note that the library must be compiled
+ // with Infinite Elements enabled.  Otherwise, this
+ // example will abort.
+ // This example intends to demonstrate the similarities
+ // between the \p FE and the \p InfFE classes in libMesh.
+ // The matrices are assembled according to the wave equation.
+ // However, for practical applications a time integration
+ // scheme (as introduced in subsequent examples) should be
+ // used.
+
+// C++ include files that we need
 #include <iostream>
 #include <algorithm>
 #include <math.h>
 
-/**
- * Basic include file needed for the mesh functionality.
- */
+// Basic include file needed for the mesh functionality.
 #include "libmesh.h"
 #include "mesh.h"
 #include "steady_system.h"
 #include "equation_systems.h"
 
-/**
- * Define the Finite and Infinite Element object.
- */
+// Define the Finite and Infinite Element object.
 #include "fe.h"
 #include "inf_fe.h"
 
-/**
- * Define Gauss quadrature rules.
- */
+// Define Gauss quadrature rules.
 #include "quadrature_gauss.h"
 
-/**
- * Define useful datatypes for finite element
- * matrix and vector components.
- */
+// Define useful datatypes for finite element
+// matrix and vector components.
 #include "sparse_matrix.h"
 #include "numeric_vector.h"
 #include "dense_matrix.h"
 #include "dense_vector.h"
 
-/**
- * Define the DofMap, which handles degree of freedom
- * indexing.
- */
+// Define the DofMap, which handles degree of freedom
+// indexing.
 #include "dof_map.h"
 
-
-
-
-
-
-/**
- * \mainpage Example 6
- *
- * \section Introduction
- *
- * This is the sixth example program.  It builds on
- * the previous examples, and introduces the Infinite
- * Element class.  Note that the library must be compiled
- * with Infinite Elements enabled.  Otherwise, this
- * example will abort.
- * This example intends to demonstrate the similarities
- * between the \p FE and the \p InfFE classes in libMesh.
- * The matrices are assembled according to the wave equation.
- * However, for practical applications a time integration
- * scheme (as introduced in subsequent examples) should be
- * used.
- */
-
-
-
-/**
- * Function prototype.  This is similar to the Poisson
- * assemble function of example 4. 
- */
+// Function prototype.  This is similar to the Poisson
+// assemble function of example 4.  
 void assemble_wave(EquationSystems& es,
 		   const std::string& system_name);
 
-
-
-
+// Begin the main program.
 int main (int argc, char** argv)
 {
-
-  /**
-   * Initialize Petsc, like in example 2.
-   */
+  // Initialize libMesh, like in example 2.
   libMesh::init (argc, argv);
-
-
-  /**
-   * This example requires Infinite Elements
-   */
+  
+  // This example requires Infinite Elements   
 #ifndef ENABLE_INFINITE_ELEMENTS
 
   std::cerr << "ERROR: This example requires the library to be compiled with Infinite Element support!"
@@ -116,578 +84,409 @@ int main (int argc, char** argv)
   return 0;
 
 #else
-
-
-  /**
-   * This example is designed for real numbers only.
-   */
+  
+  // This example is designed for real numbers only.   
 #ifdef USE_COMPLEX_NUMBERS
-
+  
   std::cerr << "ERROR: Not intended for use with complex numbers."
 	    << std::endl;
   here();
-
+  
   return 0;
-
+  
 #endif
-
-
-  /**
-   * Braces are used to force object scope, like in example 2
-   */   
-  {    
-    /**
-     * For the moment, only allow 3D
-     */
+  
+  // Braces are used to force object scope, like in example 2      
+  {        
+    // For the moment, only allow 3D     
     const unsigned int dim = 3; 
-
-    /**
-     * Tell the user what we are doing.
-     */
+    
+    // Tell the user what we are doing.
     std::cout << "Running ex6 with dim = " << dim << std::endl << std::endl;        
     
-    /**
-     * Create a mesh with user-defined dimension 
-     */
+    // Create a mesh with user-defined dimension 
     Mesh mesh (dim);
 
-    /**
-     * Use the internal mesh generator to create elements
-     * on the square [-1,1]^3, of type Hex8.
-     */
+    // Use the internal mesh generator to create elements
+    // on the square [-1,1]^3, of type Hex8.
     mesh.build_cube (4, 4, 4,
 		     -1., 1.,
 		     -1., 1.,
 		     -1., 1.,
 		     HEX8);
-
-    /**
-     * Print information about the mesh to the screen.
-     */
+    
+    // Print information about the mesh to the screen.
     mesh.print_info();
-
-    /**
-     * Normally, when a mesh is imported or created in
-     * libMesh, only conventional elements exist.  The infinite
-     * elements used here, however, require prescribed
-     * nodal locations (with specified distances from an imaginary
-     * origin) and configurations that a conventional mesh creator 
-     * in general does not offer.  Therefore, an efficient method
-     * for building infinite elements is offered.  It can account
-     * for symmetry planes and creates infinite elements in a fully
-     * automatic way.  
-     * Right now, the simplified interface is used, automatically
-     * determining the origin.  Check \p MeshBase for a generalized
-     * method that can even return the element faces of interior
-     * vibrating surfaces.  The \p bool determines whether to be 
-     * verbose.
-     */
+    
+    // Normally, when a mesh is imported or created in
+    // libMesh, only conventional elements exist.  The infinite
+    // elements used here, however, require prescribed
+    // nodal locations (with specified distances from an imaginary
+    // origin) and configurations that a conventional mesh creator 
+    // in general does not offer.  Therefore, an efficient method
+    // for building infinite elements is offered.  It can account
+    // for symmetry planes and creates infinite elements in a fully
+    // automatic way.
+    //
+    // Right now, the simplified interface is used, automatically
+    // determining the origin.  Check \p MeshBase for a generalized
+    // method that can even return the element faces of interior
+    // vibrating surfaces.  The \p bool determines whether to be 
+    // verbose.
     mesh.build_inf_elem(true);
 
-    /**
-     * Print information about the mesh to the screen.
-     */
+    // Print information about the mesh to the screen.
     mesh.print_info();
 
-    /**
-     * Save only the mesh, with infinite elements added.
-     */
+    // Save only the mesh, with infinite elements added.
     mesh.write_gmv ("ifems_added.gmv");
-
-    /**
-     * After building infinite elements, we have to let 
-     * the elements find their neighbors again.
-     */
-    mesh.find_neighbors();
-
     
-    /**
-     * Create an equation systems object, where \p ThinSystem
-     * offers only the crucial functionality for solving a 
-     * system.  Use \p ThinSystem when you want the sleekest
-     * system possible.
-     */
+    // After building infinite elements, we have to let 
+    // the elements find their neighbors again.
+    mesh.find_neighbors();
+    
+    // Create an equation systems object, where \p ThinSystem
+    // offers only the crucial functionality for solving a 
+    // system.  Use \p ThinSystem when you want the sleekest
+    // system possible.
     EquationSystems equation_systems (mesh);
-
-    /**
-     * Declare the system and its variables.
-     */
+    
+    // Declare the system and its variables.
     {
-      /**
-       * Create a system named "Wave".  This can
-       * be a simple, steady system
-       */
+      // Create a system named "Wave".  This can
+      // be a simple, steady system
       equation_systems.add_system<SteadySystem> ("Wave");
-      
-      /**
-       * Create an FEType describing the approximation
-       * characteristics of the InfFE object.  Note that
-       * the constructor automatically defaults to some
-       * sensible values.  But use \p FIRST order 
-       * approximation.
-       */
+            
+      // Create an FEType describing the approximation
+      // characteristics of the InfFE object.  Note that
+      // the constructor automatically defaults to some
+      // sensible values.  But use \p FIRST order 
+      // approximation.
       FEType fe_type(FIRST);
-      // FEType fe_type(FIRST, LAGRANGE, THIRD, LAGRANGE);
-
-      /**
-       * Add the variable "p" to "Wave".  Note that there exist
-       * various approaches in adding variables.  In example 3, 
-       * \p add_variable took the order of approximation and used
-       * default values for the \p FEFamily, while here the \p FEType 
-       * is used.
-       */
+      
+      // Add the variable "p" to "Wave".  Note that there exist
+      // various approaches in adding variables.  In example 3, 
+      // \p add_variable took the order of approximation and used
+      // default values for the \p FEFamily, while here the \p FEType 
+      // is used.
       equation_systems("Wave").add_variable("p", fe_type);
-
-      /**
-       * Give the system a pointer to the matrix assembly
-       * function.
-       */
+      
+      // Give the system a pointer to the matrix assembly
+      // function.
       equation_systems("Wave").attach_assemble_function (assemble_wave);
-
-      /**
-       * Set the speed of sound and fluid density
-       * as \p EquationSystems parameter,
-       * so that \p assemble_wave() can access it.
-       */
+      
+      // Set the speed of sound and fluid density
+      // as \p EquationSystems parameter,
+      // so that \p assemble_wave() can access it.
       equation_systems.set_parameter("speed")          = 1.;
       equation_systems.set_parameter("fluid density")  = 1.;
       
-      /**
-       * Initialize the data structures for the equation system.
-       */
+      // Initialize the data structures for the equation system.
       equation_systems.init();
       
-      /**
-       * Prints information about the system to the screen.
-       */
+      // Prints information about the system to the screen.
       equation_systems.print_info();
     }
-
-
-    /**
-     * Solve the system "Wave".
-     */
+    
+    // Solve the system "Wave".
     equation_systems("Wave").solve();
-
-
-    /**
-     * Write the whole EquationSystems object to file.
-     * For infinite elements, the concept of nodal_soln()
-     * is not applicable. Therefore, writing the mesh in
-     * some format @e always gives all-zero results at
-     * the nodes of the infinite elements.  Instead,
-     * use the FEInterface::compute_data() methods to
-     * determine physically correct results within an
-     * infinite element.
-     */
+    
+    // Write the whole EquationSystems object to file.
+    // For infinite elements, the concept of nodal_soln()
+    // is not applicable. Therefore, writing the mesh in
+    // some format @e always gives all-zero results at
+    // the nodes of the infinite elements.  Instead,
+    // use the FEInterface::compute_data() methods to
+    // determine physically correct results within an
+    // infinite element.
     equation_systems.write ("eqn_sys.dat", libMeshEnums::WRITE);
   }
-
   
-  /**
-   * All done.  
-   */
+  // All done.  
   return libMesh::close ();
-
 
 #endif // else part of ifndef ENABLE_INFINITE_ELEMENTS
 }
 
-
-
-
+// This function assembles the system matrix and right-hand-side
+// for the discrete form of our wave equation.
 void assemble_wave(EquationSystems& es,
 		   const std::string& system_name)
 {
-
-  /**
-   * It is a good idea to make sure we are assembling
-   * the proper system.
-   */
+  // It is a good idea to make sure we are assembling
+  // the proper system.
   assert (system_name == "Wave");
 
 
 #ifdef ENABLE_INFINITE_ELEMENTS
-
-
-  /**
-   * Get a constant reference to the mesh object.
-   */
+  
+  // Get a constant reference to the mesh object.
   const Mesh& mesh = es.get_mesh();
 
-  /**
-   * A reference to the \p DofMap object for this system.  The \p DofMap
-   * object handles the index translation from node and element numbers
-   * to degree of freedom numbers.
-   */
+  // A reference to the \p DofMap object for this system.  The \p DofMap
+  // object handles the index translation from node and element numbers
+  // to degree of freedom numbers.
   const DofMap& dof_map = es("Wave").get_dof_map();
-
-  /**
-   * The dimension that we are running.
-   */
+  
+  // The dimension that we are running.
   const unsigned int dim = mesh.mesh_dimension();
-
-  /**
-   * Copy the speed of sound to a local variable.
-   */
+  
+  // Copy the speed of sound to a local variable.
   const Real speed = es.parameter("speed");
-
-  /**
-   * Get a constant reference to the Finite Element type
-   * for the first (and only) variable in the system.
-   */
+  
+  // Get a constant reference to the Finite Element type
+  // for the first (and only) variable in the system.
   const FEType& fe_type = dof_map.variable_type(0);
-
-  /**
-   * Build a Finite Element object of the specified type.  Since the
-   * \p FEBase::build() member dynamically creates memory we will
-   * store the object as an \p AutoPtr<FEBase>.  Check ex5 for details.
-   */
+  
+  // Build a Finite Element object of the specified type.  Since the
+  // \p FEBase::build() member dynamically creates memory we will
+  // store the object as an \p AutoPtr<FEBase>.  Check ex5 for details.
   AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
-
-  /**
-   * Do the same for an infinite element.
-   */
+  
+  // Do the same for an infinite element.
   AutoPtr<FEBase> inf_fe (FEBase::build_InfFE(dim, fe_type));
-
-
-  /**
-   * A 2nd order Gauss quadrature rule for numerical integration.
-   */
+  
+  // A 2nd order Gauss quadrature rule for numerical integration.
   QGauss qrule (dim, SECOND);
-
-
-  /**
-   * Tell the finite element object to use our quadrature rule.
-   */
+  
+  // Tell the finite element object to use our quadrature rule.   
   fe->attach_quadrature_rule (&qrule);
-
-
-  /**
-   * Due to its internal structure, the infinite element handles 
-   * quadrature rules differently.  It takes the quadrature
-   * rule which has been initialized for the FE object, but
-   * creates suitable quadrature rules by @e itself.  The user
-   * need not worry about this.
-   */
+  
+  // Due to its internal structure, the infinite element handles 
+  // quadrature rules differently.  It takes the quadrature
+  // rule which has been initialized for the FE object, but
+  // creates suitable quadrature rules by @e itself.  The user
+  // need not worry about this.   
   inf_fe->attach_quadrature_rule (&qrule);
-
   
-  
-  /**
-   * Define data structures to contain the element matrix
-   * and right-hand-side vector contribution.  Following
-   * basic finite element terminology we will denote these
-   * "Ke",  "Ce", "Me", and "Fe" for the stiffness, damping
-   * and mass matrices, and the load vector.  Note that in 
-   * Acoustics, these descriptors though do @e not match the 
-   * true physical meaning of the projectors.  The final 
-   * overall system, however, resembles the conventional 
-   * notation again.
-   */
+  // Define data structures to contain the element matrix
+  // and right-hand-side vector contribution.  Following
+  // basic finite element terminology we will denote these
+  // "Ke",  "Ce", "Me", and "Fe" for the stiffness, damping
+  // and mass matrices, and the load vector.  Note that in 
+  // Acoustics, these descriptors though do @e not match the 
+  // true physical meaning of the projectors.  The final 
+  // overall system, however, resembles the conventional 
+  // notation again.   
   DenseMatrix<Number> Ke;
   DenseMatrix<Number> Ce;
   DenseMatrix<Number> Me;
-
   DenseVector<Number> Fe;
-
-  /**
-   * This vector will hold the degree of freedom indices for
-   * the element.  These define where in the global system
-   * the element degrees of freedom get mapped.
-   */
-  std::vector<unsigned int> dof_indices;
-
-
-  /**
-   *--------------------------------------------------------------------
-   * Now we will loop over all the elements in the mesh.
-   * We will compute the element matrix and right-hand-side
-   * contribution.
-   */
   
-  const_elem_iterator           el (mesh.elements_begin());
-  const const_elem_iterator end_el (mesh.elements_end());
+  // This vector will hold the degree of freedom indices for
+  // the element.  These define where in the global system
+  // the element degrees of freedom get mapped.   
+  std::vector<unsigned int> dof_indices;
+  
+  // Now we will loop over all the elements in the mesh.
+  // We will compute the element matrix and right-hand-side
+  // contribution.
+  const_local_elem_iterator           el (mesh.elements_begin());
+  const const_local_elem_iterator end_el (mesh.elements_end());
   
   for ( ; el != end_el; ++el)
-    {
-      /**
-       * Store a pointer to the element we are currently
-       * working on.  This allows for nicer syntax later.
-       */
+    {      
+      // Store a pointer to the element we are currently
+      // working on.  This allows for nicer syntax later.       
       const Elem* elem = *el;
-
-      /**
-       * Get the degree of freedom indices for the
-       * current element.  These define where in the global
-       * matrix and right-hand-side this element will
-       * contribute to.
-       */
+      
+      // Get the degree of freedom indices for the
+      // current element.  These define where in the global
+      // matrix and right-hand-side this element will
+      // contribute to.       
       dof_map.dof_indices (elem, dof_indices);
 
-
-      /**
-       * The mesh contains both finite and infinite elements.  These
-       * elements are handled through different classes, namely
-       * \p FE and \p InfFE, respectively.  However, since both
-       * are derived from \p FEBase, they share the same interface,
-       * and overall burden of coding is @e greatly reduced through
-       * using a pointer, which is adjusted appropriately to the
-       * current element type.
-       */
+      
+      // The mesh contains both finite and infinite elements.  These
+      // elements are handled through different classes, namely
+      // \p FE and \p InfFE, respectively.  However, since both
+      // are derived from \p FEBase, they share the same interface,
+      // and overall burden of coding is @e greatly reduced through
+      // using a pointer, which is adjusted appropriately to the
+      // current element type.       
       FEBase* cfe=NULL;
-
-
-      /**
-       *----------------------------------------------------------
-       * This here is almost the only place where we need to
-       * distinguish between finite and infinite elements.
-       * For faster computation, however, different approaches
-       * may be feasible.
-       *
-       * Up to now, we do not know what kind of element we
-       * have.  Aske the element of what type it is:
-        */
+      
+      // This here is almost the only place where we need to
+      // distinguish between finite and infinite elements.
+      // For faster computation, however, different approaches
+      // may be feasible.
+      //
+      // Up to now, we do not know what kind of element we
+      // have.  Aske the element of what type it is:        
       if (elem->infinite())
-        {
-	  /** 
-	   * We have an infinite element.  Let \p cfe point
-	   * to our \p InfFE object.  This is handled through
-	   * an AutoPtr.  Through the \p AutoPtr::get() we "borrow"
-	   * the pointer, while the \p  AutoPtr \p inf_fe is
-	   * still in charge of memory management.
-	   */
+        {	   
+	  // We have an infinite element.  Let \p cfe point
+	  // to our \p InfFE object.  This is handled through
+	  // an AutoPtr.  Through the \p AutoPtr::get() we "borrow"
+	  // the pointer, while the \p  AutoPtr \p inf_fe is
+	  // still in charge of memory management.	   
 	  cfe = inf_fe.get(); 
 	}
       else
         {
-	  /** 
-	   * This is a conventional finite element.  Let \p fe handle it.
-	   */
+	  // This is a conventional finite element.  Let \p fe handle it.	   
   	  cfe = fe.get();
-
-
-	  /**
-	   *----------------------------------------------------------------
-	   * Boundary conditions.
-	   * Here we just zero the rhs-vector. For natural boundary 
-	   * conditions check e.g. previous examples.
-	   */
-	    {
-	      /**
-	       * Zero the RHS for this element. 
-	       */
-	      Fe.resize (dof_indices.size());
-
-	      es("Wave").rhs->add_vector (Fe, dof_indices);
-
-	    } // end boundary condition section	     
-
+	  
+	  // Boundary conditions.
+	  // Here we just zero the rhs-vector. For natural boundary 
+	  // conditions check e.g. previous examples.	   
+	  {	      
+	    // Zero the RHS for this element. 	       
+	    Fe.resize (dof_indices.size());
+	    
+	    es("Wave").rhs->add_vector (Fe, dof_indices);
+	  } // end boundary condition section	     
 	} // else ( if (elem->infinite())) )
 
-
-
-      /**
-       *----------------------------------------------------------
-       * Now this is all independent of whether we use an \p FE
-       * or an \p InfFE.  Nice, hm? ;-)
-       *
-       * Compute the element-specific data, as described
-       * in previous examples.
-       */
+      // Now this is all independent of whether we use an \p FE
+      // or an \p InfFE.  Nice, hm? ;-)
+      //
+      // Compute the element-specific data, as described
+      // in previous examples.       
       cfe->reinit (elem);
-
-      /**
-       * This is slightly different from the Poisson solver:
-       * Since the finite element object may change, we have to
-       * initialize the constant references to the data fields
-       * each time again, when a new element is processed.
-       *
-       * The element Jacobian * quadrature weight at each integration point.   
-       */
+      
+      // This is slightly different from the Poisson solver:
+      // Since the finite element object may change, we have to
+      // initialize the constant references to the data fields
+      // each time again, when a new element is processed.
+      //
+      // The element Jacobian * quadrature weight at each integration point.          
       const std::vector<Real>& JxW = cfe->get_JxW();
-
-      /**
-       * The element shape functions evaluated at the quadrature points.
-       */
+      
+      // The element shape functions evaluated at the quadrature points.       
       const std::vector<std::vector<Real> >& phi = cfe->get_phi();
-
-      /**
-       * The element shape function gradients evaluated at the quadrature
-       * points.
-       */
+      
+      // The element shape function gradients evaluated at the quadrature
+      // points.       
       const std::vector<std::vector<RealGradient> >& dphi = cfe->get_dphi();
 
-      /**
-       * The infinite elements need more data fields than conventional FE.  
-       * These are the gradients of the phase term \p dphase, an additional 
-       * radial weight for the test functions \p Sobolev_weight, and its
-       * gradient.
-       * 
-       * Note that these data fields are also initialized appropriately by
-       * the \p FE method, so that the weak form (below) is valid for @e both
-       * finite and infinite elements.
-       */
+      // The infinite elements need more data fields than conventional FE.  
+      // These are the gradients of the phase term \p dphase, an additional 
+      // radial weight for the test functions \p Sobolev_weight, and its
+      // gradient.
+      // 
+      // Note that these data fields are also initialized appropriately by
+      // the \p FE method, so that the weak form (below) is valid for @e both
+      // finite and infinite elements.       
       const std::vector<RealGradient>& dphase  = cfe->get_dphase();
       const std::vector<Real>&         weight  = cfe->get_Sobolev_weight();
       const std::vector<RealGradient>& dweight = cfe->get_Sobolev_dweight();
 
-
-      /**
-       * Zero the element matrices.  Boundary conditions were already
-       * processed in the \p FE-only section, see above.
-       */
+      // Zero the element matrices.  Boundary conditions were already
+      // processed in the \p FE-only section, see above.       
       Ke.resize (dof_indices.size(), dof_indices.size());
       Ce.resize (dof_indices.size(), dof_indices.size());
       Me.resize (dof_indices.size(), dof_indices.size());
-
-
-      /**
-       * The total number of quadrature points for infinite elements
-       * @e has to be determined in a different way, compared to
-       * conventional finite elements.  This type of access is also
-       * valid for finite elements, so this can safely be used
-       * anytime, instead of asking the quadrature rule, as
-       * seen in previous examples.
-       */
+      
+      // The total number of quadrature points for infinite elements
+      // @e has to be determined in a different way, compared to
+      // conventional finite elements.  This type of access is also
+      // valid for finite elements, so this can safely be used
+      // anytime, instead of asking the quadrature rule, as
+      // seen in previous examples.       
       unsigned int max_qp = cfe->n_quadrature_points();
-
-
-      /**
-       * Loop over the quadrature points. 
-       */
+      
+      // Loop over the quadrature points.        
       for (unsigned int qp=0; qp<max_qp; qp++)
-        {
-	  /**
-	   * Similar to the modified access to the number of quadrature 
-	   * points, the number of shape functions may also be obtained
-	   * in a different manner.  This offers the great advantage
-	   * of being valid for both finite and infinite elements.
-	   */
-	  unsigned int n_sf = cfe->n_shape_functions();
+        {	  
+	  // Similar to the modified access to the number of quadrature 
+	  // points, the number of shape functions may also be obtained
+	  // in a different manner.  This offers the great advantage
+	  // of being valid for both finite and infinite elements.	   
+	  const unsigned int n_sf = cfe->n_shape_functions();
 
-	  /**
-	   * Now we will build the element matrices.  Since the infinite
-	   * elements are based on a Petrov-Galerkin scheme, the
-	   * resulting system matrices are non-symmetric. The additional
-	   * weight, described before, is part of the trial space.
-	   *
-	   * For the finite elements, though, these matrices are symmetric
-	   * just as we know them, since the additional fields \p dphase,
-	   * \p weight, and \p dweight are initialized appropriately.
-	   *
-	   * test functions:    weight[qp]*phi[i][qp]
-	   * trial functions:   phi[j][qp]
-	   * phase term:        phase[qp]
-	   * 
-	   * derivatives are similar, but note that these are of type
-	   * Point, not of type Real.
-	   */
+	  // Now we will build the element matrices.  Since the infinite
+	  // elements are based on a Petrov-Galerkin scheme, the
+	  // resulting system matrices are non-symmetric. The additional
+	  // weight, described before, is part of the trial space.
+	  //
+	  // For the finite elements, though, these matrices are symmetric
+	  // just as we know them, since the additional fields \p dphase,
+	  // \p weight, and \p dweight are initialized appropriately.
+	  //
+	  // test functions:    weight[qp]*phi[i][qp]
+	  // trial functions:   phi[j][qp]
+	  // phase term:        phase[qp]
+	  // 
+	  // derivatives are similar, but note that these are of type
+	  // Point, not of type Real.	   
 	  for (unsigned int i=0; i<n_sf; i++)
 	    for (unsigned int j=0; j<n_sf; j++)
 	      {
 		//         (ndt*Ht + nHt*d) * nH 
 		Ke(i,j) +=
-		    (                                /*    (                         */
-			(                            /*      (                       */
-			  dweight[qp] * phi[i][qp]   /*        Point * Real  = Point */
-			  +                          /*        +                     */
-			  dphi[i][qp] * weight[qp]   /*        Point * Real  = Point */
-			) * dphi[j][qp]              /*      )       * Point = Real  */
-		    ) * JxW[qp];                     /*    )         * Real  = Real  */
-
+		  (                            //    (                         
+		   (                           //      (                       
+		    dweight[qp] * phi[i][qp]   //        Point * Real  = Point 
+		    +                          //        +                     
+		    dphi[i][qp] * weight[qp]   //        Point * Real  = Point 
+		    ) * dphi[j][qp]            //      )       * Point = Real  
+		   ) * JxW[qp];                //    )         * Real  = Real  
 
 		// (d*Ht*nmut*nH - ndt*nmu*Ht*H - d*nHt*nmu*H)
 		Ce(i,j) +=
-		    (                                /*    (                         */
-			(dphase[qp] * dphi[j][qp])   /*      (Point * Point) = Real  */
-			* weight[qp] * phi[i][qp]    /*      * Real * Real   = Real  */
-			-                            /*      -                       */
-			(dweight[qp] * dphase[qp])   /*      (Point * Point) = Real  */
-			* phi[i][qp] * phi[j][qp]    /*      * Real * Real   = Real  */
-			-                            /*      -                       */
-			(dphi[i][qp] * dphase[qp])   /*      (Point * Point) = Real  */
-			* weight[qp] * phi[j][qp]    /*      * Real * Real   = Real  */
-		    ) * JxW[qp];                     /*    )         * Real  = Real  */
-
-
+		  (                                //    (                         
+		   (dphase[qp] * dphi[j][qp])      //      (Point * Point) = Real  
+		   * weight[qp] * phi[i][qp]       //      * Real * Real   = Real  
+		   -                               //      -                       
+		   (dweight[qp] * dphase[qp])      //      (Point * Point) = Real  
+		   * phi[i][qp] * phi[j][qp]       //      * Real * Real   = Real  
+		   -                               //      -                       
+		   (dphi[i][qp] * dphase[qp])      //      (Point * Point) = Real  
+		   * weight[qp] * phi[j][qp]       //      * Real * Real   = Real  
+		   ) * JxW[qp];                    //    )         * Real  = Real  
+		
 		// (d*Ht*H * (1 - nmut*nmu))
 		Me(i,j) +=
-		    (                                          /*    (                                  */
-			(1. - (dphase[qp] * dphase[qp]))       /*      (Real  - (Point * Point)) = Real */
-			* phi[i][qp] * phi[j][qp] * weight[qp] /*      * Real *  Real  * Real    = Real */
-		    ) * JxW[qp];                               /*    ) * Real                    = Real */
-
+		  (                                       //    (                                  
+		   (1. - (dphase[qp] * dphase[qp]))       //      (Real  - (Point * Point)) = Real 
+		   * phi[i][qp] * phi[j][qp] * weight[qp] //      * Real *  Real  * Real    = Real 
+		   ) * JxW[qp];                           //    ) * Real                    = Real 
 
 	      } // end of the matrix summation loop
-
 	} // end of quadrature point loop
 
-          
-      /**
-       *----------------------------------------------------------------
-       * The element matrices are now built for this element.  
-       * Collect them in Ke, and then add them to the global matrix.  
-       * The \p SparseMatrix::add_matrix() member does this for us.
-       */
+      // The element matrices are now built for this element.  
+      // Collect them in Ke, and then add them to the global matrix.  
+      // The \p SparseMatrix::add_matrix() member does this for us.
       Ke.add(1./speed        , Ce);
       Ke.add(1./(speed*speed), Me);
 
       es("Wave").matrix->add_matrix (Ke, dof_indices);
-
-      
     } // end of element loop
 
-
-
-  /**
-   *----------------------------------------------------------------
-   * Note that we have not applied any boundary conditions so far.
-   * Here we apply a unit load at the node located at (0,0,0).
-   */
+  // Note that we have not applied any boundary conditions so far.
+  // Here we apply a unit load at the node located at (0,0,0).
   {
-    /**
-     * Number of nodes in the mesh.
-     */
-    unsigned int n_nodes = mesh.n_nodes();
+    // Number of nodes in the mesh.     
+    const unsigned int n_nodes = mesh.n_nodes();
     
     for (unsigned int n_cnt=0; n_cnt<n_nodes; n_cnt++)
-      {
-	/**
-	 * Get a reference to the current node.
-	 */
+      {	
+	// Get a reference to the current node.
 	const Node& curr_node = mesh.node(n_cnt);
-
-	/**
-	 * Check the location of the current node.
-	 */
+	
+	// Check the location of the current node.
 	if (fabs(curr_node(0)) < TOLERANCE &&
 	    fabs(curr_node(1)) < TOLERANCE &&
 	    fabs(curr_node(2)) < TOLERANCE)
 	  {
-	    /**
-	     * The global number of the respective degree of freedom.
-	     */ 
+	    // The global number of the respective degree of freedom.
 	    unsigned int dn = curr_node.dof_number(0,0,0);
 
 	    es("Wave").rhs->add (dn, 1.);
 	  }
-
       }
-
   }
 
 #else
 
-  /* dummy assert */
+  // dummy assert 
   assert(es.get_mesh().mesh_dimension() != 1);
 
 #endif //ifdef ENABLE_INFINITE_ELEMENTS
-
-
-  /**
-   * All done!
-   */
+  
+  // All done!   
   return;
 }
 

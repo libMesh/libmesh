@@ -78,6 +78,16 @@ run-time selection of quadrature rules.
 <br>
 <br>
 
+
+
+<h2><a href="ex6.php">Example 6</a> -- Infinite Elements for the Wave Equation</h2>
+This example introduces "infinite elements" which may be used for certain classes
+of applications.  The wave equation is solved in this example. <i>For this example to
+work you must have configured the library with the --enable-ifem option</i> 
+
+<br>
+<br>
+
 <h2><a href="ex10.php">Example 10</a> -- Solving a Transient System with Adaptive Mesh Refinement</h2>
 This example shows how a simple, linear transient
 system can be solved in parallel.  The system is simple
