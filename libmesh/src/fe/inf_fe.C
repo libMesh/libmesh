@@ -1,4 +1,4 @@
-// $Id: inf_fe.C,v 1.22 2003-05-30 20:15:45 ddreyer Exp $
+// $Id: inf_fe.C,v 1.23 2003-08-27 15:22:51 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -118,10 +118,8 @@ void InfFE<Dim,T_radial,T_map>:: attach_quadrature_rule (QBase* q)
   assert (q       != NULL);
   assert (base_fe != NULL);
 
-  Order base_int_order   = q->get_order();
-  //Order radial_int_order = static_cast<Order>( static_cast<unsigned int>(fe_type.radial_order) + 2 );
-  //Order radial_int_order = static_cast<Order>( 2*(static_cast<unsigned int>(fe_type.radial_order) + 1) );
-  Order radial_int_order = static_cast<Order>( 2 * (3 + static_cast<unsigned int>(fe_type.radial_order)) - 1);
+  const Order base_int_order   = q->get_order();
+  const Order radial_int_order = static_cast<Order>(2 * (static_cast<unsigned int>(fe_type.radial_order) + 1) +2);
 
   if (Dim != 1)
     {

@@ -1,4 +1,4 @@
-// $Id: enum_order.h,v 1.6 2003-05-15 23:34:33 benkirk Exp $
+// $Id: enum_order.h,v 1.7 2003-08-27 15:22:47 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -45,6 +45,7 @@ namespace libMeshEnums {
 	      EIGHTH       =  8,
 	      NINTH        =  9,
 	      TENTH        = 10,
+
 	      ELEVENTH     = 11,
 	      TWELFTH      = 12,
 	      THIRTEENTH   = 13,
@@ -55,9 +56,33 @@ namespace libMeshEnums {
 	      EIGHTTEENTH  = 18,
 	      NINTEENTH    = 19,
 	      TWENTIETH    = 20,
-	      TWENTYFIRST  = 21,
-	      TWENTYSECOND = 22,
-	      TWENTYTHIRD  = 23,	      
+
+	      TWENTYFIRST   = 21,
+	      TWENTYSECOND  = 22,
+	      TWENTYTHIRD   = 23,	      
+	      TWENTYFOURTH  = 24,
+	      TWENTYFIFTH   = 25,
+	      TWENTYSIXTH   = 26,
+	      TWENTYSEVENTH = 27,
+	      TWENTYEIGHTH  = 28,
+	      TWENTYNINTH   = 29,
+	      THIRTIETH     = 30,
+
+	      THIRTYFIRST   = 31,
+	      THIRTYSECOND  = 32,
+	      THIRTYTHIRD   = 33,
+	      THIRTYFOURTH  = 34,
+	      THIRTYFIFTH   = 35,
+	      THIRTYSIXTH   = 36,
+	      THIRTYSEVENTH = 37,
+	      THIRTYEIGHTH  = 38,
+	      THIRTYNINTH   = 39,
+	      FOURTIETH     = 40,
+
+	      FOURTYFIRST   = 41,
+	      FOURTYSECOND  = 42,
+	      FOURTYTHIRD   = 43,
+
 	      INVALID_ORDER};
 
 }
