@@ -1,4 +1,4 @@
-// $Id: boundary_info.h,v 1.14 2003-05-14 11:54:36 ddreyer Exp $
+// $Id: boundary_info.h,v 1.15 2003-05-15 19:43:33 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -28,7 +28,7 @@
 
 // Local includes
 #include "elem.h"
-#include "boundary_data.h"
+
 
 
 // Forward declarations
@@ -39,8 +39,11 @@ class BoundaryMesh;
 
 /**
  * The \p BoundaryInfo class contains information relevant
- * to boundary conditions.  It can also build a mesh that
- * just includes boundary elements/faces.
+ * to boundary conditions: it does not hold actual boundary 
+ * condition data (check \p MeshData for that), but can mark
+ * element faces and nodes with ids useful for identifying the 
+ * type of boundary condtion.  It can also build a mesh that
+ * just includes boundary elements/faces.  
  */
 
 //------------------------------------------------------
@@ -153,33 +156,6 @@ class BoundaryInfo
   const std::set<short int>& get_boundary_ids () const
   { return boundary_ids; }
 
-
-  /**
-   * Attach a \p BoundaryData object to this \p BoundaryInfo.
-   * Do this @e prior to reading the mesh that this \p BoundaryInfo
-   * belongs to!  Note that this object does @e not own the
-   * \p bd and therefore does not delete \p bd when itself
-   * goes out of scope.
-   */
-  void attach_boundary_data (BoundaryData* bd);
-
-  /**
-   * @returns true when this object has a \p BoundaryData attached.
-   */
-  bool has_boundary_data () const;
-
-  /**
-   * @returns a const reference to the \p BoundaryData
-   * object that this object owns.
-   */
-  const BoundaryData& get_boundary_data () const;
-
-  /**
-   * @returns a writable reference to the \p BoundaryData
-   * object that this object owns.
-   */
-  BoundaryData& get_boundary_data ();
-
   /**
    * Print the boundary information data structure.
    */
@@ -219,12 +195,6 @@ class BoundaryInfo
    * A collection of user-specified boundary ids.
    */
   std::set<short int> boundary_ids;
-
-  /**
-   * The boundary data object that holds values
-   * associated with nodes & elements
-   */
-  BoundaryData* _boundary_data;
 
 
 
@@ -303,27 +273,6 @@ class BoundaryInfo
 
 // ------------------------------------------------------------
 // BoundaryData inline methods
-inline  
-bool BoundaryInfo::has_boundary_data () const
-{
-  return (_boundary_data != NULL);
-}
-
-
-
-inline
-const BoundaryData& BoundaryInfo::get_boundary_data () const
-{
-  return *_boundary_data;
-}
-
-
-
-inline
-BoundaryData& BoundaryInfo::get_boundary_data ()
-{
-  return *_boundary_data;
-}
 
 
 #endif

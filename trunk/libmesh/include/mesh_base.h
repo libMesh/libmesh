@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.27 2003-05-14 09:02:46 ddreyer Exp $
+// $Id: mesh_base.h,v 1.28 2003-05-15 19:43:33 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -42,6 +42,7 @@ template <typename T> class PetscMatrix;
 #include "mesh_refinement.h"
 #include "mesh_communication.h"
 #include "boundary_info.h"
+#include "mesh_data.h"
 #include "node.h"
 #include "enum_elem_type.h"
 #include "sphere.h"
@@ -63,7 +64,7 @@ template <typename T> class PetscMatrix;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.27 $
+ * \version $Revision: 1.28 $
  */
 
 
@@ -109,6 +110,14 @@ public:
    * conditions.
    */
   BoundaryInfo boundary_info;
+  
+  /**
+   * This class holds arbitrary (floating point) data associated with 
+   * nodes or elements, commonly imported from files.  When this class
+   * should be used, it has to be activated @e prior to using any
+   * of \p MeshBase or \p Mesh \p read() methods.
+   */
+  MeshData data;
 
   /**
    * This class enables parallelization of the mesh.  All

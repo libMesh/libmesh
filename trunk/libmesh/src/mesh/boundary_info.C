@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.19 2003-05-14 11:54:37 ddreyer Exp $
+// $Id: boundary_info.C,v 1.20 2003-05-15 19:43:34 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -40,8 +40,7 @@ const short int BoundaryInfo::invalid_id = -1234;
 //------------------------------------------------------
 // BoundaryInfo functions
 BoundaryInfo::BoundaryInfo(const MeshBase& m) :
-  mesh           (m),
-  _boundary_data (NULL)
+  mesh           (m)
 {
 }
 
@@ -59,7 +58,6 @@ void BoundaryInfo::clear()
   boundary_node_id.clear();
   boundary_side_id.clear();
   boundary_ids.clear();
-  _boundary_data = NULL;
 }
 
 
@@ -349,16 +347,3 @@ void BoundaryInfo::print_info() const
     }
 }
 
-
-
-void BoundaryInfo::attach_boundary_data (BoundaryData* bd)
-{
-  assert (bd != NULL);
-  if (has_boundary_data())
-    {
-      std::cerr << "ERROR: BoundaryData already attached!" << std::endl;
-      error();
-    }
-
-  _boundary_data = bd;
-}

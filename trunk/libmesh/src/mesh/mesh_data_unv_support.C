@@ -1,4 +1,4 @@
-// $Id: boundary_data_xdr_support.C,v 1.1 2003-05-14 11:54:37 ddreyer Exp $
+// $Id: mesh_data_unv_support.C,v 1.1 2003-05-15 19:43:34 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,45 +23,55 @@
 #include <fstream>
 
 // Local includes
-#include "boundary_data.h"
+#include "mesh_data.h"
 #include "mesh_base.h"
 
 
 
 //------------------------------------------------------
-// BoundaryData functions
-void BoundaryData::read_xdr (const std::string& /* name */)
+// MeshData UNV support functions
+void MeshData::read_unv(const std::string& /* name */)
 {
+  /*
+   * When reading data, make sure the id maps are ok
+   */
+  assert (_node_id_map_closed);
+  assert (_elem_id_map_closed);
+
+
+
   std::cerr << "ERROR: not yet implemented." << std::endl;
   error();
+
+
+
+
+  /*
+   * finished reading.  Ready for use
+   */
+  this->_node_data_closed = true;
+  this->_elem_data_closed = true;
 }
 
 
 
 
-void BoundaryData::read_xdr_binary (const std::string& /* name */)
+void MeshData::write_unv (const std::string& /* name */)
 {
+  /*
+   * make sure the id maps are ready
+   * and that we have data to write
+   */
+  assert (_node_id_map_closed);
+  assert (_elem_id_map_closed);
+
+  assert (_node_data_closed);
+  assert (_elem_data_closed);
+  
+
+
+
   std::cerr << "ERROR: not yet implemented." << std::endl;
   error();
 }
-
-
-
-
-
-void BoundaryData::write_xdr (const std::string& /* name */)
-{
-  std::cerr << "ERROR: not yet implemented." << std::endl;
-  error();
-}
-
-
-
-
-void BoundaryData::write_xdr_binary (const std::string& /* name */)
-{
-  std::cerr << "ERROR: not yet implemented." << std::endl;
-  error();
-}
-
 

@@ -1,4 +1,4 @@
-// $Id: mesh_xdr_support.C,v 1.10 2003-03-04 12:59:48 benkirk Exp $
+// $Id: mesh_xdr_support.C,v 1.11 2003-05-15 19:43:34 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -327,14 +327,39 @@ void XdrInterface::mesh_interface(const std::string& name,
 	  
 	  /**
 	   * Form Nodes out of
-	   * the coordinates
+	   * the coordinates.  If the
+	   * MeshData object is active,
+	   * add the nodes and ids also
+	   * to its map.
 	   */	
-	  for (int innd=0; innd<numNodes; ++innd)
-	    nodes[innd] = Node::build(coords[0+innd*3],
-				      coords[1+innd*3],
-				      coords[2+innd*3],
-				      innd);
-	  
+	  if (mesh.data.active())
+	    {
+	      for (int innd=0; innd<numNodes; ++innd)
+	        {
+		  nodes[innd] = Node::build(coords[0+innd*3],
+					    coords[1+innd*3],
+					    coords[2+innd*3],
+					    innd);
+
+		  /*
+		   * add the id to the MeshData, so that
+		   * it knows the foreign id, even when
+		   * the underlying mesh got re-numbered,
+		   * refined, elements/nodes added...
+		   */
+		  mesh.data.add_foreign_node_id(nodes[innd],
+						innd);
+		}
+
+	    }
+	  else
+	    for (int innd=0; innd<numNodes; ++innd)
+	      nodes[innd] = Node::build(coords[0+innd*3],
+					coords[1+innd*3],
+					coords[2+innd*3],
+					innd);
+
+
 	  break;
 	}
 	
@@ -399,22 +424,65 @@ void XdrInterface::mesh_interface(const std::string& name,
 	  {
 	    unsigned int lastConnIndex = 0;
 	    unsigned int lastFaceIndex = 0;
-	    for (unsigned int idx=0; idx<etypes.size(); idx++)
+
+	    /*
+	     * ask once whether the data is active.
+	     * should help reducing effort when MeshData is inactive.
+	     */
+
+  	    if (mesh.data.active())
 	      {
-		for (unsigned int e=lastFaceIndex; e<lastFaceIndex+neeb[idx]; e++)
-		  {
-		    elements[e] = Elem::build(etypes[idx]);
-		    for (unsigned int innd=0; innd < elements[e]->n_nodes(); innd++)
-		      elements[e]->set_node(innd) = nodes[conn[innd+lastConnIndex]];
+	        for (unsigned int idx=0; idx<etypes.size(); idx++)
+	          {
+		    for (unsigned int e=lastFaceIndex; e<lastFaceIndex+neeb[idx]; e++)
+		      {
+		        elements[e] = Elem::build(etypes[idx]);
+			
+			/*
+			 * Add elements with the same id as in libMesh.
+			 * Provided the data files that MeshData reads
+			 * were only written with MeshData, then this 
+			 * should work properly
+			 */
+			mesh.data.add_foreign_elem_id (elements[e],
+						       e);
+
+		        for (unsigned int innd=0; innd < elements[e]->n_nodes(); innd++)
+		          elements[e]->set_node(innd) = nodes[conn[innd+lastConnIndex]];
 		    
-		    lastConnIndex += mesh.elem(e)->n_nodes();
+			lastConnIndex += mesh.elem(e)->n_nodes();
+		      }
+		    lastFaceIndex += neeb[idx];
 		  }
-		lastFaceIndex += neeb[idx];
 	      }
+	    else
+	      {
+	        for (unsigned int idx=0; idx<etypes.size(); idx++)
+	          {
+		    for (unsigned int e=lastFaceIndex; e<lastFaceIndex+neeb[idx]; e++)
+		      {
+		        elements[e] = Elem::build(etypes[idx]);
+		        for (unsigned int innd=0; innd < elements[e]->n_nodes(); innd++)
+		          elements[e]->set_node(innd) = nodes[conn[innd+lastConnIndex]];
+		    
+			lastConnIndex += mesh.elem(e)->n_nodes();
+		      }
+		    lastFaceIndex += neeb[idx];
+		  }
+	      }
+
 	  }
   
 	else if (orig_type == 1) // MGF-style (1) Hex27 mesh
 	  {
+#ifdef DEBUG
+	    if (mesh.data.active())
+	      {
+		  std::cerr << "ERROR: MeshData not implemented for MGF-style mesh."
+			    << std::endl;
+		  error();
+	      }
+#endif
 	    for (int ielm=0; ielm < numElem; ++ielm)
 	      {
 		elements[ielm] = new Hex27;

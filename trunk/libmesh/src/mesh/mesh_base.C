@@ -1,6 +1,6 @@
 
 
-// $Id: mesh_base.C,v 1.30 2003-05-14 09:03:05 ddreyer Exp $
+// $Id: mesh_base.C,v 1.31 2003-05-15 19:43:34 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -63,6 +63,7 @@ MeshBase::MeshBase (unsigned int d,
   mesh_refinement    (*this),
 #endif
   boundary_info      (*this),
+  data               (*this),
   mesh_communication (*this),
   _n_sbd             (1),
   _n_proc            (1),
@@ -82,6 +83,7 @@ MeshBase::MeshBase (const MeshBase& other_mesh) :
   mesh_refinement    (*this),
 #endif
   boundary_info      (*this),
+  data               (*this),
   mesh_communication (*this),
   _nodes             (other_mesh._nodes),
   _elements          (other_mesh._elements),
