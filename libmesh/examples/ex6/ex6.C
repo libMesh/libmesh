@@ -1,4 +1,4 @@
-// $Id: ex6.C,v 1.4 2003-02-10 03:55:50 benkirk Exp $
+// $Id: ex6.C,v 1.5 2003-02-10 12:21:08 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -99,6 +99,13 @@ void assemble_wave(EquationSystems& es,
 
 int main (int argc, char** argv)
 {
+
+  /**
+   * Initialize Petsc, like in example 2.
+   */
+  libMesh::init (argc, argv);
+
+
   /**
    * This short nice macro indicates the user
    * that the following code may be neither
@@ -128,13 +135,6 @@ int main (int argc, char** argv)
   error();
 
 # endif
-
-
-  /**
-   * Initialize Petsc, like in example 2.
-   */
-  libMesh::init (argc, argv);
-
 
 
   /**
