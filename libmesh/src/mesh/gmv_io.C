@@ -1,4 +1,4 @@
-// $Id: gmv_io.C,v 1.1 2004-03-20 15:16:56 benkirk Exp $
+// $Id: gmv_io.C,v 1.2 2004-03-21 16:14:10 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -298,6 +298,13 @@ void GMVIO::write_ascii (const std::string& fname,
       (v != NULL))
     {      
       const unsigned int n_vars = solution_names->size();
+
+      if (!(v->size() == mesh.n_nodes()*n_vars))
+	std::cerr << "ERROR: v->size()=" << v->size()
+		  << ", mesh.n_nodes()=" << mesh.n_nodes()
+		  << ", n_vars=" << n_vars
+		  << ", mesh.n_nodes()*n_vars=" << mesh.n_nodes()*n_vars
+		  << std::endl;
       
       assert (v->size() == mesh.n_nodes()*n_vars);
 
