@@ -50,3 +50,4 @@ gprof*
 CHANGELOG
 *.png
 *.rgb
+it_test*

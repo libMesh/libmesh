@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.10 2003-02-10 11:50:57 ddreyer Exp $
+// $Id: mesh_base.h,v 1.11 2003-02-12 05:41:29 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -43,8 +43,8 @@ class PetscMatrix;
 #include "sphere.h"
 #include "perf_log.h"
 #include "enum_order.h"
-
-
+#include "predicated_iterator.h"
+#include "elem_iterators.h"
 
 
 /**
@@ -60,7 +60,7 @@ class PetscMatrix;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.10 $
+ * \version $Revision: 1.11 $
  */
 
 
@@ -575,7 +575,48 @@ public:
 #endif
 
 
+  /**
+   * This typedef is for convenience.  It allows you to get
+   * a pair of std::vector<Elem*>::iterators without
+   * writing so much stuff.
+   */
+  typedef std::pair<std::vector<Elem*>::iterator,       std::vector<Elem*>::iterator>       ElemPair;
 
+  /**
+   * This typedef is for convenience.  It allows you to get
+   * a pair of std::vector<Elem*>::const_iterators without
+   * writing so much stuff.
+   */
+  typedef std::pair<std::vector<Elem*>::const_iterator, std::vector<Elem*>::const_iterator> ConstElemPair;
+  
+  /**
+   * Returns a pair of std::vector<Elem*>::iterators which point
+   * to the beginning and end of the _elements vector.
+   */
+  ElemPair elements_begin()  { return ElemPair (_elements.begin(), _elements.end());  }
+
+  /**
+   * Returns a pair of std::vector<Elem*>::const_iterators which point
+   * to the beginning and end of the _elements vector.
+   */
+  ConstElemPair elements_begin() const  { return ConstElemPair (_elements.begin(), _elements.end());  }
+
+  /**
+   * Returns a pair of std::vector<Elem*>::iterators which point
+   * to the end of the _elements vector.  This simulates a normal
+   * end() iterator.
+   */
+  ElemPair elements_end()  { return ElemPair (_elements.end(), _elements.end());  }
+  
+  /**
+   * Returns a pair of std::vector<Elem*>::const_iterators which point
+   * to the end of the _elements vector.  This simulates a normal
+   * end() const_iterator.
+   */
+  ConstElemPair elements_end() const  { return ConstElemPair (_elements.end(), _elements.end());  }
+  
+  
+  
 protected:
 
   /**

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.13 2003-02-10 03:55:49 benkirk Exp $
+# $Id: Makefile,v 1.14 2003-02-12 05:41:24 jwpeterson Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -178,6 +178,12 @@ grid2grid: $(mesh_library) src/apps/grid2grid.cc
 #
 testexodus: $(mesh_library) src/apps/testexodus.cc
 	$(CXX) $(CXXFLAGS) $(INCLUDE) src/apps/testexodus.cc -o bin/$@ $(LIBS) $(LDFLAGS)
+
+#
+# Test program -- Remove this!
+#
+it_test: $(mesh_library) it_test.cc
+	$(CXX) $(CXXFLAGS) $(INCLUDE) it_test.cc -o it_test $(LIBS) $(LDFLAGS)
 
 #
 # Make a TODO list
