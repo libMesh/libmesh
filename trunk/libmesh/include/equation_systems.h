@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.29 2003-09-02 18:02:37 benkirk Exp $
+// $Id: equation_systems.h,v 1.30 2003-09-25 21:46:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -29,7 +29,7 @@
 #include <string>
 
 // Local Includes
-#include "mesh_common.h"
+#include "libmesh_common.h"
 #include "mesh.h"
 #include "data_map.h"
 #include "enum_xdr_mode.h"

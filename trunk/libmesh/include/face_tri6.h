@@ -1,4 +1,4 @@
-// $Id: face_tri6.h,v 1.15 2003-09-02 18:02:38 benkirk Exp $
+// $Id: face_tri6.h,v 1.16 2003-09-25 21:46:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -26,7 +26,7 @@
 // C++ includes
 
 // Local includes
-#include "mesh_common.h"
+#include "libmesh_common.h"
 #include "face_tri.h"
 
 

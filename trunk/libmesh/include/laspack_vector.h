@@ -1,4 +1,4 @@
-// $Id: laspack_vector.h,v 1.23 2003-09-06 02:23:59 ddreyer Exp $
+// $Id: laspack_vector.h,v 1.24 2003-09-25 21:46:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,7 @@
 
 
 
-#include "mesh_common.h"
+#include "libmesh_common.h"
 
 #ifdef HAVE_LASPACK
 
@@ -77,7 +77,7 @@ class LaspackVector : public NumericVector<T>
    * Constructor. Set local dimension to \p n_local, the global dimension
    * to \p n, and initialize all elements with zero.
    */
-  LaspackVector (const unsigned n,
+  LaspackVector (const unsigned int n,
 		 const unsigned int n_local);
   
   /**

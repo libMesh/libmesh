@@ -1,4 +1,4 @@
-// $Id: distributed_vector.h,v 1.13 2003-09-02 18:02:37 benkirk Exp $
+// $Id: distributed_vector.h,v 1.14 2003-09-25 21:46:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -19,7 +19,7 @@
 
 
 
-#include "mesh_common.h"
+#include "libmesh_common.h"
 
 
 
@@ -32,15 +32,7 @@
 // C++ includes
 #include <vector>
 #include <algorithm>
-#ifdef HAVE_MPI
-namespace Mpi
-{
-  extern "C"{
 #include <mpi.h>
-  }
-}
-using namespace Mpi;
-#endif
 
 
 // Local includes
@@ -77,7 +69,7 @@ public:
    * Constructor. Set local dimension to \p n_local, the global dimension
    * to \p n, and initialize all elements with zero.
    */
-  DistributedVector (const unsigned n,
+  DistributedVector (const unsigned int n,
 		     const unsigned int n_local);
     
   /**
@@ -431,8 +423,6 @@ void DistributedVector<T>::init (const unsigned int n,
   
 #ifdef HAVE_MPI
 
-  using namespace Mpi;
-  
   int n_proc=0, proc_id=0;
   
   MPI_Comm_rank (MPI_COMM_WORLD, &proc_id);
@@ -667,8 +657,6 @@ Real DistributedVector<T>::min () const
 
 #ifdef HAVE_MPI
 
-  using namespace Mpi;
-  
   MPI_Allreduce (&local_min, &global_min, 1,
 		 MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD);
 
@@ -694,8 +682,6 @@ Real DistributedVector<T>::max() const
 
 
 #ifdef HAVE_MPI
-
-  using namespace Mpi;
 
   MPI_Allreduce (&local_max, &global_max, 1,
 		 MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);

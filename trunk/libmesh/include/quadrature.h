@@ -1,4 +1,4 @@
-// $Id: quadrature.h,v 1.14 2003-09-02 18:02:38 benkirk Exp $
+// $Id: quadrature.h,v 1.15 2003-09-25 21:46:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -27,7 +27,7 @@
 #include <utility>
 
 // Local includes
-#include "mesh_common.h"
+#include "libmesh_common.h"
 #include "reference_counted_object.h"
 #include "point.h"
 #include "enum_elem_type.h"

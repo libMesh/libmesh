@@ -1,4 +1,4 @@
-// "$Id: xdrIO.C,v 1.11 2003-09-06 22:57:12 ddreyer Exp $\n"
+// "$Id: xdrIO.C,v 1.12 2003-09-25 21:46:56 benkirk Exp $\n"
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include "mesh_common.h"
+#include "libmesh_common.h"
 
 // C++ includes
 #ifdef HAVE_RPC_RPC_H

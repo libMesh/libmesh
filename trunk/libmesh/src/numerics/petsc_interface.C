@@ -1,4 +1,4 @@
-// $Id: petsc_interface.C,v 1.17 2003-09-09 17:40:45 ddreyer Exp $
+// $Id: petsc_interface.C,v 1.18 2003-09-25 21:46:56 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -19,7 +19,7 @@
 
 
 
-#include "mesh_common.h"
+#include "libmesh_common.h"
 
 #ifdef HAVE_PETSC
 
@@ -46,7 +46,7 @@ void PetscInterface<T>::clear ()
       // Mimic PETSc default solver and preconditioner
       this->_solver_type           = GMRES;
 
-      if (libMeshBase::n_processors() == 1)
+      if (libMesh::n_processors() == 1)
 	this->_preconditioner_type = ILU_PRECOND;
       else
 	this->_preconditioner_type = BLOCK_JACOBI_PRECOND;

@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.26 2003-09-11 19:10:53 benkirk Exp $
+// $Id: boundary_info.C,v 1.27 2003-09-25 21:46:56 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,7 @@
 #include <fstream>
 
 // Local includes
-#include "mesh_config.h"
+#include "libmesh_config.h"
 #include "boundary_info.h"
 #include "mesh_base.h"
 #include "boundary_mesh.h"

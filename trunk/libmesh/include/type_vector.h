@@ -1,4 +1,4 @@
-// $Id: type_vector.h,v 1.2 2003-09-02 18:02:40 benkirk Exp $
+// $Id: type_vector.h,v 1.3 2003-09-25 21:46:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -26,7 +26,7 @@
 #include <math.h>
 
 // Local includes
-#include "mesh_common.h"
+#include "libmesh_common.h"
 
 
 

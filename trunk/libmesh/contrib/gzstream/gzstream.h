@@ -18,8 +18,8 @@
 // ============================================================================
 //
 // File          : gzstream.h
-// Revision      : $Revision: 1.1 $
-// Revision_date : $Date: 2003-09-16 00:41:29 $
+// Revision      : $Revision: 1.2 $
+// Revision_date : $Date: 2003-09-25 21:46:54 $
 // Author(s)     : Deepak Bandyopadhyay, Lutz Kettner
 // 
 // Standard streambuf implementation following Nicolai Josuttis, "The 
@@ -28,7 +28,7 @@
 
 
 
-#include "mesh_config.h"
+#include "libmesh_config.h"
 #ifdef HAVE_ZLIB_H
 
 #ifndef GZSTREAM_H

@@ -37,6 +37,7 @@
  
    - Partitioning Algorithms
       - Metis K-Way weighted graph partitioning
+      - Parmetis parallel graph partitioning
       - Hilbert and Morton-ordered space filling curves
  
    - Generic 2D Finite Elements
@@ -133,22 +134,20 @@
  
   \subsection compilers Compilers
  
-  \p libMesh makes extensive use of the standard C++ library, so you will need a
-  decent, standards-compliant compiler.  We have tried very hard to make the code
-  completely compiler-agnostic by avoiding questionable (but legal) constructs.
-  If you have a compiler that won't build the code please let us know.
+  \p libMesh makes extensive use of the standard C++ library, so you will need
+  a decent, standards-compliant compiler.  We have tried very hard to make
+  the code completely compiler-agnostic by avoiding questionable (but legal)
+  constructs. If you have a compiler that won't build the code please let us
+  know. 
  
-  You will also need a decent C compiler if you want to build the contributed
-  packages that add functionality to the library.  If you only have a C++ compiler,
-  you should shoot your system administrator.  Many of the contributed packages
-  use constructs that are invalid in C++, so forget compiling them with your C++
-  compiler.
+  You will also need a decent C compiler if you want to build some of the
+  contributed packages that add functionality to the library.
  
   The library is known to work with the following compilers:
  
  
   - GNU GCC
-    - \p gcc 3.2
+    - \p gcc 3.x
     - \p gcc 2.95.3
     - \p gcc 2.96 (RedHat's compiler in the 7.x series)
  

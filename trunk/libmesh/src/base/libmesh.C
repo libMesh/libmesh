@@ -1,4 +1,4 @@
-// $Id: libmesh.C,v 1.16 2003-09-02 18:02:40 benkirk Exp $
+// $Id: libmesh.C,v 1.17 2003-09-25 21:46:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -25,123 +25,111 @@
 
 // Local includes
 #include "libmesh.h"
+#include "auto_ptr.h"
 #include "getpot.h"
 #include "reference_counter.h"
 
 
 
 #if defined(HAVE_PETSC)
-#  if  !defined(USE_COMPLEX_NUMBERS)
-/**
- * Petsc include files.  PETSc with complex numbers 
- * is actually C++.
- */
-namespace Petsc
-{
-  extern "C"
-  {
-#   include <petsc.h>
-  }
+
+
+#ifndef USE_COMPLEX_NUMBERS
+extern "C" {
+# include <petsc.h>
 }
-using namespace Petsc;
-#  else
-#    include <petsc.h>
-#  endif
+#else
+# include <petsc.h>
+#endif
+
+
 #elif defined(HAVE_MPI)
-namespace Mpi
-{
-  extern "C"
-  {
-#    include <mpi.h>
-  }
+# include <mpi.h>
+#endif
+
+
+
+// ------------------------------------------------------------
+// Local anonymous namespace to hold a GetPot object
+namespace {
+  AutoPtr<GetPot> command_line (NULL);
 }
-using namespace Mpi;
-#endif
 
 
 
 // ------------------------------------------------------------
-// libMesh static member initializations
-//const Real       libMesh::pi        = 3.14159265358979323846264;
-const Real       libMesh::pi        (acos(-1.));
+// libMesh data initialization
+PerfLog            libMesh::log ("libMesh", (ENABLE_PERFORMANCE_LOGGING == 1));
 
-#if defined(USE_COMPLEX_NUMBERS)
-const Number     libMesh::imaginary (0., 1.);
+#ifdef USE_COMPLEX_NUMBERS
+const Number       libMesh::imaginary (0., 1.);
 #endif
 
+const Real         libMesh::pi = 3.1415926535897932384626433832795029L;
 
-#if defined(USE_COMPLEX_NUMBERS)
-const Number     libMesh::zero      (0., 0.);
+#ifdef USE_COMPLEX_NUMBERS
+const Number       libMesh::zero (0., 0.);
 #else
-const Number     libMesh::zero      (0.);
+const Number       libMesh::zero = 0.;
 #endif
 
-// Initialize the value for invalid unsigned ints by
-// statically casting -1 to an unsigned int.
-const unsigned int libMesh::invalid_uint (static_cast<unsigned int>(-1));
+const unsigned int libMesh::invalid_uint = static_cast<unsigned int>(-1);
 
 
-PerfLog      libMesh::log ("libMesh",
-#ifdef ENABLE_PERFORMANCE_LOGGING
-			   true
-#else
-			   false
-#endif
-			   );
 
-
-AutoPtr<GetPot>  libMesh::_command_line (NULL);
-bool             libMesh::_is_initialized = false;
-
-
+// ------------------------------------------------------------
+// libMesh::libMeshPrivateData data initialization
+int           libMesh::libMeshPrivateData::_n_processors = 1;
+int           libMesh::libMeshPrivateData::_processor_id = 0;
+bool          libMesh::libMeshPrivateData::_is_initialized = false;
+SolverPackage libMesh::libMeshPrivateData::_solver_package =
 #if   defined(HAVE_PETSC)
-SolverPackage    libMesh::_solver_package = PETSC_SOLVERS;
+                                                       PETSC_SOLVERS;
 #elif defined(HAVE_LASPACK)
-SolverPackage    libMesh::_solver_package = LASPACK_SOLVERS;
+                                                       LASPACK_SOLVERS;
 #else
-SolverPackage    libMesh::_solver_package = INVALID_SOLVER_PACKAGE;
+                                                       INVALID_SOLVER_PACKAGE;
 #endif
 
 
 
 // ------------------------------------------------------------
-// libMesh member functions
-void libMesh::init (int & argc, char** & argv)
+// libMesh functions
+void libMesh::init (int &argc, char** & argv)
 {
+  // should _not_ be initialized already.
+  assert (!libMesh::initialized());
+  
 #if defined(HAVE_PETSC)
 
   PetscInitialize (&argc, &argv, NULL, NULL);
  
   // Get the number of processors and our local processor id  
-  MPI_Comm_rank (PETSC_COMM_WORLD, &_processor_id);
-  MPI_Comm_size (PETSC_COMM_WORLD, &_n_processors);
+  MPI_Comm_rank (PETSC_COMM_WORLD, &libMeshPrivateData::_processor_id);
+  MPI_Comm_size (PETSC_COMM_WORLD, &libMeshPrivateData::_n_processors);
 
 #elif defined(HAVE_MPI)
 
   MPI_Init (&argc, &argv);
 
   // Get the number of processors and our local processor id  
-  MPI_Comm_rank (MPI_COMM_WORLD, &_processor_id);
-  MPI_Comm_size (MPI_COMM_WORLD, &_n_processors);
+  MPI_Comm_rank (MPI_COMM_WORLD, &libMeshPrivateData::_processor_id);
+  MPI_Comm_size (MPI_COMM_WORLD, &libMeshPrivateData::_n_processors);
 
 #else
 
   // No PETSC or MPI, can only be uniprocessor
-  assert (_n_processors == 1);
-  assert (_processor_id == 0);
+  assert (libMeshPrivateData::_n_processors == 1);
+  assert (libMeshPrivateData::_processor_id == 0);
 
 #endif
 
   // Could we have gotten bad values from the above calls?
-  assert (_n_processors >  0);
-  assert (_processor_id >= 0);
-
-
-  
+  assert (libMeshPrivateData::_n_processors >  0);
+  assert (libMeshPrivateData::_processor_id >= 0);
+    
   // Parse the command-line arguments
-  _command_line.reset(new GetPot (argc, argv));
-
-
+  command_line.reset(new GetPot (argc, argv));
   
   // redirect std::cout to nothing on all
   // other processors unless explicitly told
@@ -153,15 +141,15 @@ void libMesh::init (int & argc, char** & argv)
 
   
   // The library is now ready for use
-  _is_initialized = true;
+  libMeshPrivateData::_is_initialized = true;
 
 
   
   // Make sure these work.  Library methods
   // depend on these being implemented properly,
   // so this is a good time to test them!
-  assert (initialized());
-  assert (!closed());
+  assert (libMesh::initialized());
+  assert (!libMesh::closed());
 }
 
 
@@ -210,7 +198,7 @@ int libMesh::close ()
 
   
   // Set the initialized() flag to false
-  _is_initialized = false;
+  libMeshPrivateData::_is_initialized = false;
   
 
   // Return the number of outstanding objects.
@@ -224,15 +212,17 @@ int libMesh::close ()
 
 bool libMesh::on_command_line (const std::string& arg)
 {
-  assert (_command_line.get() != NULL);
-
-  return _command_line->search (arg);
+  assert (libMesh::initialized());
+  
+  return command_line->search (arg);
 }
 
 
 
 SolverPackage libMesh::default_solver_package ()
 {
+  assert (libMesh::initialized());
+  
   static bool called = false;
 
   // Check the command line.  Since the command line is
@@ -243,16 +233,16 @@ SolverPackage libMesh::default_solver_package ()
 
 #ifdef HAVE_PETSC
       if (libMesh::on_command_line ("--use-petsc"))
-	_solver_package = PETSC_SOLVERS;
+	libMeshPrivateData::_solver_package = PETSC_SOLVERS;
 #endif
 
 #ifdef HAVE_LASPACK
       if (libMesh::on_command_line ("--use-laspack"))
-	_solver_package = LASPACK_SOLVERS;
+	libMeshPrivateData::_solver_package = LASPACK_SOLVERS;
 #endif
       
     }
 
 
-  return _solver_package;  
+  return libMeshPrivateData::_solver_package;  
 }

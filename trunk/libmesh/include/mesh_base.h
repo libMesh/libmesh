@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.47 2003-09-16 15:59:31 benkirk Exp $
+// $Id: mesh_base.h,v 1.48 2003-09-25 21:46:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -38,7 +38,7 @@ class EquationSystems;
 
 
 // Local Includes -----------------------------------
-#include "mesh_common.h"
+#include "libmesh_common.h"
 #include "mesh_refinement.h"
 #include "boundary_info.h"
 #include "mesh_data.h"
@@ -63,7 +63,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.47 $
+ * \version $Revision: 1.48 $
  */
 
 
@@ -176,7 +176,7 @@ public:
    * Returns the number of elements on the local processor.
    */
   unsigned int n_local_elem () const
-  { return this->n_elem_on_proc (libMeshBase::processor_id()); }
+  { return this->n_elem_on_proc (libMesh::processor_id()); }
 
   /**
    * Returns the number of active elements on processor \p proc.
@@ -187,7 +187,7 @@ public:
    * Returns the number of active elements on the local processor.
    */
   unsigned int n_active_local_elem () const
-  { return this->n_active_elem_on_proc (libMeshBase::processor_id()); }
+  { return this->n_active_elem_on_proc (libMesh::processor_id()); }
   
   /**
    * This function returns the number of elements that will be written
@@ -471,13 +471,13 @@ public:
    * @returns the number of processors used in the
    * current simulation.
    */
-  unsigned int n_processors () const { return libMeshBase::n_processors(); }
+  unsigned int n_processors () const { return libMesh::n_processors(); }
 
 
   /**
    * @returns the subdomain id for this processor.
    */
-  unsigned int processor_id () const { return libMeshBase::processor_id(); }
+  unsigned int processor_id () const { return libMesh::processor_id(); }
   
   /**
    * Reads the file specified by \p name.  Attempts to figure out the

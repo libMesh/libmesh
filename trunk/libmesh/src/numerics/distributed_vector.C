@@ -1,4 +1,4 @@
-// $Id: distributed_vector.C,v 1.16 2003-09-02 18:02:44 benkirk Exp $
+// $Id: distributed_vector.C,v 1.17 2003-09-25 21:46:56 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -19,7 +19,7 @@
 
 
 
-#include "mesh_common.h"
+#include "libmesh_common.h"
 
 // C++ includes
 #include <math.h>
@@ -50,8 +50,6 @@ Real DistributedVector<T>::l1_norm () const
 
 #ifdef HAVE_MPI
 
-  using namespace Mpi;
-
   MPI_Allreduce (&local_l1, &global_l1, 1,
 		 MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
   
@@ -78,8 +76,6 @@ Real DistributedVector<T>::l2_norm () const
 
 
 #ifdef HAVE_MPI
-
-  using namespace Mpi;
 
   MPI_Allreduce (&local_l2, &global_l2, 1,
 		 MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
@@ -111,8 +107,6 @@ Real DistributedVector<T>::linfty_norm () const
 
 
 #ifdef HAVE_MPI
-
-  using namespace Mpi;
 
   MPI_Allreduce (&local_linfty, &global_linfty, 1,
 		 MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
@@ -432,8 +426,6 @@ void DistributedVector<float>::localize (std::vector<float>& v_local) const
 
 #ifdef HAVE_MPI
 
-  using namespace Mpi;
-
   MPI_Allreduce (&v_local[0], &v_local[0], v_local.size(),
 		 MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
   
@@ -464,8 +456,6 @@ void DistributedVector<double>::localize (std::vector<double>& v_local) const
     v_local[i+first_local_index()] = _values[i];
 
 #ifdef HAVE_MPI
-
-  using namespace Mpi;
 
   MPI_Allreduce (&v_local[0], &v_local[0], v_local.size(),
 		 MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
@@ -498,8 +488,6 @@ void DistributedVector<float>::localize_to_one (std::vector<float>& v_local,
 
 #ifdef HAVE_MPI
 
-  using namespace Mpi;
-
   MPI_Reduce (&v_local[0], &v_local[0], v_local.size(),
 	      MPI_FLOAT, MPI_SUM, pid, MPI_COMM_WORLD);
   
@@ -531,8 +519,6 @@ void DistributedVector<double>::localize_to_one (std::vector<double>& v_local,
     v_local[i+first_local_index()] = _values[i];
 
 #ifdef HAVE_MPI
-
-  using namespace Mpi;
 
   MPI_Reduce (&v_local[0], &v_local[0], v_local.size(),
 	      MPI_DOUBLE, MPI_SUM, pid, MPI_COMM_WORLD);

@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.32 2003-09-02 18:02:37 benkirk Exp $
+// $Id: dof_map.h,v 1.33 2003-09-25 21:46:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -28,7 +28,7 @@
 #include <string>
 
 // Local Includes -----------------------------------
-#include "mesh_common.h"
+#include "libmesh_common.h"
 #include "enum_order.h"
 #include "fe_type.h"
 #include "coupling_matrix.h"
@@ -194,7 +194,7 @@ public:
    * @returns the number of degrees of freedom on this processor.
    */
   unsigned int n_local_dofs () const
-  { return this->n_dofs_on_processor (libMeshBase::processor_id()); }
+  { return this->n_dofs_on_processor (libMesh::processor_id()); }
     
   /**
    * Returns the number of degrees of freedom on subdomain \p proc.
@@ -205,13 +205,13 @@ public:
   /**
    * Returns the first dof index that is local to subdomain \p proc.
    */
-  unsigned int first_dof(const unsigned int proc = libMeshBase::processor_id()) const
+  unsigned int first_dof(const unsigned int proc = libMesh::processor_id()) const
   { assert(proc < _first_df.size()); return _first_df[proc]; }
   
   /**
    * Returns the last dof index that is local to subdomain \p proc.
    */
-  unsigned int last_dof(const unsigned int proc = libMeshBase::processor_id()) const
+  unsigned int last_dof(const unsigned int proc = libMesh::processor_id()) const
   { assert(proc < _last_df.size()); return _last_df[proc]; }  
 
 

@@ -1,4 +1,4 @@
-// $Id: petsc_vector.h,v 1.28 2003-09-06 02:23:59 ddreyer Exp $
+// $Id: petsc_vector.h,v 1.29 2003-09-25 21:46:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,7 @@
 #define __petsc_vector_h__
 
 
-#include "mesh_common.h"
+#include "libmesh_common.h"
 
 
 #ifdef HAVE_PETSC
@@ -41,22 +41,15 @@
 // Local includes
 #include "numeric_vector.h"
 
-/*
- * Petsc include files.  PETSc with complex numbers 
- * is actually C++.
+/**
+ * Petsc include files.
  */
-# ifndef USE_COMPLEX_NUMBERS
-
+#ifndef USE_COMPLEX_NUMBERS
 extern "C" {
-#include <petscvec.h>
+# include <petscvec.h>
 }
-// for easy switching between Petsc 2.1.0/2.1.1
-// typedef Scalar PetscScalar;
-
 #else
-
-#include <petscvec.h>
-
+# include <petscvec.h>
 #endif
 
 
@@ -92,7 +85,7 @@ public:
    * Constructor. Set local dimension to \p n_local, the global dimension
    * to \p n, and initialize all elements with zero.
    */
-  PetscVector (const unsigned n,
+  PetscVector (const unsigned int n,
 	       const unsigned int n_local);
     
   /**
