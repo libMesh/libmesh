@@ -1,4 +1,4 @@
-// $Id: fe_boundary.C,v 1.18 2003-08-18 14:12:42 benkirk Exp $
+// $Id: fe_boundary.C,v 1.19 2003-08-27 02:51:33 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -91,7 +91,7 @@ void FE<Dim,T>::reinit(const Elem* elem,
   qrule->init(side->type());
 
   // The last side we computed the shape functions for
-  static unsigned int last_s = static_cast<unsigned int>(-1);
+  static unsigned int last_s = libMesh::invalid_uint;
 
   // We might not need to reinitialize the shape functions
   if ((this->get_type() != elem->type()) ||

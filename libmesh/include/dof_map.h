@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.30 2003-05-29 00:03:03 benkirk Exp $
+// $Id: dof_map.h,v 1.31 2003-08-27 02:51:32 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -33,6 +33,7 @@
 #include "fe_type.h"
 #include "coupling_matrix.h"
 #include "reference_counted_object.h"
+#include "libmesh.h" // libMesh::invalid_uint
 
 // Forward Declarations
 class DofMap;
@@ -232,7 +233,7 @@ public:
    */
   void dof_indices (const Elem* elem,
 		    std::vector<unsigned int>& di,
-		    const unsigned int vn = static_cast<unsigned int>(-1)) const;
+		    const unsigned int vn = libMesh::invalid_uint) const;
 
 
 
@@ -247,7 +248,7 @@ public:
    */
   void old_dof_indices (const Elem* elem,
 			std::vector<unsigned int>& di,
-			const unsigned int vn = static_cast<unsigned int>(-1)) const;
+			const unsigned int vn = libMesh::invalid_uint) const;
 
   /**
    * Rebuilds the degree of freedom constraints.

@@ -1,4 +1,4 @@
-// $Id: frequency_system.h,v 1.14 2003-08-07 08:55:29 ddreyer Exp $
+// $Id: frequency_system.h,v 1.15 2003-08-27 02:51:32 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -117,8 +117,8 @@ public:
    * see \p SystemBase. When calling this, the frequency range should better
    * be already set.
    */
-  std::vector< std::pair<unsigned int, Real> > solve (const unsigned int n_start_in = static_cast<unsigned int>(-1),
-						      const unsigned int n_stop_in  = static_cast<unsigned int>(-1));
+  std::vector< std::pair<unsigned int, Real> > solve (const unsigned int n_start_in = libMesh::invalid_uint,
+						      const unsigned int n_stop_in  = libMesh::invalid_uint);
   
   /**
    * @returns \p "Frequency".  Helps in identifying

@@ -1,4 +1,4 @@
-// $Id: frequency_system.C,v 1.18 2003-08-07 08:55:30 ddreyer Exp $
+// $Id: frequency_system.C,v 1.19 2003-08-27 02:51:33 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -336,13 +336,13 @@ FrequencySystem::solve (const unsigned int n_start_in,
   unsigned int n_start = 0;
   unsigned int n_stop  = this->n_frequencies()-1;
 
-  if ((n_start_in!=static_cast<unsigned int>(-1)) &&
-      (n_stop_in !=static_cast<unsigned int>(-1)))
+  if ((n_start_in!=libMesh::invalid_uint) &&
+      (n_stop_in !=libMesh::invalid_uint))
     {
       n_start = n_start_in;
       n_stop  = n_stop_in;
     }
-  else if (n_stop ==static_cast<unsigned int>(-1))
+  else if (n_stop ==libMesh::invalid_uint)
     {
       std::cerr << "ERROR: Forgot to set n_stop." << std::endl;
       error();

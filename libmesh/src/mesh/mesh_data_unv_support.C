@@ -1,4 +1,4 @@
-// $Id: mesh_data_unv_support.C,v 1.12 2003-08-23 17:12:46 ddreyer Exp $
+// $Id: mesh_data_unv_support.C,v 1.13 2003-08-27 02:51:33 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -536,7 +536,7 @@ MeshDataUnvHeader::MeshDataUnvHeader() :
   data_type              (2),  // default to single precision real
 #endif
   nvaldc                 (3),  // default to 3 (principle directions)
-  _desired_dataset_label (static_cast<unsigned int>(-1))
+  _desired_dataset_label (libMesh::invalid_uint)
 {
   id_lines_1_to_5.resize(5);
   std::fill (id_lines_1_to_5.begin(), id_lines_1_to_5.end(), "libMesh default");
@@ -578,7 +578,7 @@ bool MeshDataUnvHeader::read (std::ifstream& in_file)
    * or when there is no desired dataset label,
    * simply proceed.
    */
-  if ((this->_desired_dataset_label != static_cast<unsigned int>(-1)) &&
+  if ((this->_desired_dataset_label != libMesh::invalid_uint) &&
       (this->dataset_label != this->_desired_dataset_label))
       return false;
 

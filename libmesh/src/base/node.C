@@ -1,4 +1,4 @@
-// $Id: node.C,v 1.5 2003-02-13 01:49:49 benkirk Exp $
+// $Id: node.C,v 1.6 2003-08-27 02:51:33 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -28,7 +28,7 @@
 
 // ------------------------------------------------------------
 // Node class static member initialization
-//const unsigned int Node::invalid_id = static_cast<unsigned int>(-1);
+//const unsigned int Node::invalid_id = libMesh::invalid_uint;
 
 
 

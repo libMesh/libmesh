@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.32 2003-08-21 22:10:07 jwpeterson Exp $
+// $Id: elem.h,v 1.33 2003-08-27 02:51:32 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -869,7 +869,7 @@ unsigned int Elem::which_neighbor_am_i (const Elem* e) const
 
   error();
 
-  return static_cast<unsigned int>(-1);
+  return libMesh::invalid_uint;
 }
 
 

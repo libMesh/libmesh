@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.h,v 1.14 2003-06-03 16:45:50 benkirk Exp $
+// $Id: mesh_refinement.h,v 1.15 2003-08-27 02:51:32 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -42,6 +42,7 @@
 
 // Local Includes -----------------------------------
 #include "mesh_common.h"
+#include "libmesh.h" // libMesh::invalid_uint
 
 class MeshBase;
 class Point;
@@ -88,7 +89,7 @@ public:
   void flag_elements_by_error_fraction (const ErrorVector& error_per_cell,
 					const Real refine_fraction  = 0.3,
 					const Real coarsen_fraction = 0.0,
-					const unsigned int max_level = static_cast<unsigned int>(-1));
+					const unsigned int max_level = libMesh::invalid_uint);
 
   /**
    * Flags elements for coarsening and refinement based on
@@ -101,7 +102,7 @@ public:
   void flag_elements_by_elem_fraction (const ErrorVector& error_per_cell,
 				       const Real refine_fraction  = 0.3,
 				       const Real coarsen_fraction = 0.0,
-				       const unsigned int max_level = static_cast<unsigned int>(-1));
+				       const unsigned int max_level = libMesh::invalid_uint);
 
   /**
    * Flags elements for coarsening and refinement based on
@@ -114,7 +115,7 @@ public:
   void flag_elements_by_mean_stddev (const ErrorVector& error_per_cell,
 				     const Real refine_fraction  = 1.0,
 				     const Real coarsen_fraction = 0.0,
-				     const unsigned int max_level = static_cast<unsigned int>(-1));
+				     const unsigned int max_level = libMesh::invalid_uint);
 		      
   /**
    * Refines and coarsens user-requested elements. Will also

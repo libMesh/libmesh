@@ -1,4 +1,4 @@
-// $Id: tree_node.h,v 1.5 2003-02-13 22:56:08 benkirk Exp $
+// $Id: tree_node.h,v 1.6 2003-08-27 02:51:32 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -244,7 +244,7 @@ unsigned int TreeNode<N>::level () const
     return parent->level()+1;
 
   error();
-  return static_cast<unsigned int>(-1);
+  return libMesh::invalid_uint;
 }
 
 

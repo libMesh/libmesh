@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.47 2003-07-18 18:53:00 benkirk Exp $
+// $Id: dof_map.C,v 1.48 2003-08-27 02:51:32 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -659,7 +659,7 @@ void DofMap::dof_indices (const Elem* elem,
   
   // Get the dof numbers
   for (unsigned int v=0; v<n_vars; v++)
-    if ((v == vn) || (vn == static_cast<unsigned int>(-1)))
+    if ((v == vn) || (vn == libMesh::invalid_uint))
       { // Do this for all the variables if one was not specified
 	// or just for the specified variable
 
@@ -736,7 +736,7 @@ void DofMap::old_dof_indices (const Elem* elem,
   
   // Get the dof numbers
   for (unsigned int v=0; v<n_vars; v++)
-    if ((v == vn) || (vn == static_cast<unsigned int>(-1)))
+    if ((v == vn) || (vn == libMesh::invalid_uint))
       {
 	// Do this for all the variables if one was not specified
 	// or just for the specified variable

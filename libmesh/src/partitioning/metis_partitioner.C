@@ -1,4 +1,4 @@
-// $Id: metis_partitioner.C,v 1.6 2003-08-26 22:58:45 jwpeterson Exp $
+// $Id: metis_partitioner.C,v 1.7 2003-08-27 02:51:33 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -75,7 +75,7 @@ void MetisPartitioner::partition (const unsigned int n_pieces)
   // the forward_map maps the active element id
   // into a contiguous block of indices for Metis
   std::vector<unsigned int>
-    forward_map (n_elem, static_cast<unsigned int>(-1));
+    forward_map (n_elem, libMesh::invalid_uint);
   
   std::vector<int>          xadj;
   std::vector<int>          adjncy;
@@ -133,7 +133,7 @@ void MetisPartitioner::partition (const unsigned int n_pieces)
 
 	assert (elem->id() < forward_map.size());
 	assert (forward_map[elem->id()] !=
-		static_cast<unsigned int>(-1));
+		libMesh::invalid_uint);
 	
 	// maybe there is a better weight?
 	vwgt[forward_map[elem->id()]]
@@ -156,7 +156,7 @@ void MetisPartitioner::partition (const unsigned int n_pieces)
 		  {
 		    assert (neighbor->id() < forward_map.size());
 		    assert (forward_map[neighbor->id()] !=
-			    static_cast<unsigned int>(-1));
+			    libMesh::invalid_uint);
 
 		    adjncy.push_back (forward_map[neighbor->id()]);
 		  }
@@ -193,7 +193,7 @@ void MetisPartitioner::partition (const unsigned int n_pieces)
 			    assert (child->active());
 			    assert (child->id() < forward_map.size());
 			    assert (forward_map[child->id()] !=
-				    static_cast<unsigned int>(-1));
+				    libMesh::invalid_uint);
 			
 			    adjncy.push_back (forward_map[child->id()]);
 			  }
@@ -238,7 +238,7 @@ void MetisPartitioner::partition (const unsigned int n_pieces)
 
 	assert (elem->id() < forward_map.size());
 	assert (forward_map[elem->id()] !=
-		static_cast<unsigned int>(-1));
+		libMesh::invalid_uint);
 	
 	elem->set_processor_id() =
 	  static_cast<short int>(part[forward_map[elem->id()]]);

@@ -1,4 +1,4 @@
-// $Id: libmesh.C,v 1.14 2003-05-04 23:59:00 benkirk Exp $
+// $Id: libmesh.C,v 1.15 2003-08-27 02:51:33 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -76,6 +76,9 @@ const Number     libMesh::zero      (0., 0.);
 const Number     libMesh::zero      (0.);
 #endif
 
+// Initialize the value for invalid unsigned ints by
+// statically casting -1 to an unsigned int.
+const unsigned int libMesh::invalid_uint (static_cast<unsigned int>(-1));
 
 
 PerfLog      libMesh::log ("libMesh",

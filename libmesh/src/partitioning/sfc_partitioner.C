@@ -1,4 +1,4 @@
-// $Id: sfc_partitioner.C,v 1.3 2003-08-26 22:58:45 jwpeterson Exp $
+// $Id: sfc_partitioner.C,v 1.4 2003-08-27 02:51:33 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -75,7 +75,7 @@ void SFCPartitioner::partition (const unsigned int n)
   // the forward_map maps the active element id
   // into a contiguous block of indices
   std::vector<unsigned int>
-    forward_map (n_elem, static_cast<unsigned int>(-1));
+    forward_map (n_elem, libMesh::invalid_uint);
 
   // the reverse_map maps the contiguous ids back
   // to active elements

@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.42 2003-08-26 22:58:45 jwpeterson Exp $
+// $Id: mesh_base.h,v 1.43 2003-08-27 02:51:32 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -64,7 +64,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.42 $
+ * \version $Revision: 1.43 $
  */
 
 
@@ -248,7 +248,7 @@ public:
    * Add \p Node \p n to the vertex array, optionally at the specified position \p nn.
    */
   Node* add_point (const Point& n,
-		   const unsigned int nn=static_cast<unsigned int>(-1));
+		   const unsigned int nn=libMesh::invalid_uint);
 
   /**
    * Return a pointer to the \f$ i^{th} \f$ element.
@@ -264,7 +264,7 @@ public:
    * Add elem \p e to the elem array.
    */
   Elem* add_elem (Elem* e,
-		  const unsigned int n=static_cast<unsigned int>(-1));
+		  const unsigned int n=libMesh::invalid_uint);
 
 #ifdef ENABLE_INFINITE_ELEMENTS
 
@@ -456,13 +456,13 @@ public:
    * the bounding box for the whole mesh is returned.
    */
   std::pair<Point, Point> 
-  processor_bounding_box (const unsigned int pid = static_cast<unsigned int>(-1)) const;
+  processor_bounding_box (const unsigned int pid = libMesh::invalid_uint) const;
 
   /**
    * Same, but returns a sphere instead of a box.
    */
   Sphere 
-  processor_bounding_sphere (const unsigned int pid = static_cast<unsigned int>(-1)) const;
+  processor_bounding_sphere (const unsigned int pid = libMesh::invalid_uint) const;
 
   /**
    * @returns two points defining a Cartesian box that bounds the
@@ -470,13 +470,13 @@ public:
    * the bounding box for the whole mesh is returned.
    */
   std::pair<Point, Point> 
-  subdomain_bounding_box (const unsigned int sid = static_cast<unsigned int>(-1)) const;
+  subdomain_bounding_box (const unsigned int sid = libMesh::invalid_uint) const;
 
   /**
    * Same, but returns a sphere instead of a box.
    */
   Sphere 
-  subdomain_bounding_sphere (const unsigned int pid = static_cast<unsigned int>(-1)) const;
+  subdomain_bounding_sphere (const unsigned int pid = libMesh::invalid_uint) const;
 
 
 //   /**
