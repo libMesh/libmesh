@@ -1,4 +1,4 @@
-// $Id: laspack_matrix.h,v 1.3 2004-03-14 01:31:48 jwpeterson Exp $
+// $Id: laspack_matrix.h,v 1.4 2004-10-19 16:58:04 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2003-2003  Benjamin S. Kirk, John W. Peterson
@@ -264,7 +264,7 @@ public:
    * Print the contents of the matrix to the screen,
    * currently identical to \p print().
    */
-  void print_personal() const { this->print(); }
+  void print_personal(std::ostream& os=std::cout) const { this->print(os); }
 
   
 private:

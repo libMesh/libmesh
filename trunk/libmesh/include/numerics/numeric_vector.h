@@ -1,4 +1,4 @@
-// $Id: numeric_vector.h,v 1.7 2004-10-15 00:39:41 benkirk Exp $
+// $Id: numeric_vector.h,v 1.8 2004-10-19 16:58:04 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -369,14 +369,14 @@ public:
   /**
    * Prints the contents of the vector to the screen.
    */
-  virtual void print() const;
+  virtual void print(std::ostream& os=std::cout) const;
 
   /**
    * Same as above but allows you to use stream syntax.
    */
   friend std::ostream& operator << (std::ostream& os, const NumericVector<T>& v)
   {
-    v.print();
+    v.print(os);
     return os;
   }
   
@@ -515,33 +515,33 @@ void NumericVector<T>::clear ()
 // version, at least according to icc v7.1
 template <>
 inline
-void NumericVector<Complex>::print() const
+void NumericVector<Complex>::print(std::ostream& os) const
 {
   assert (initialized());
-  std::cout << "Size\tglobal =  " << size()
-	    << "\t\tlocal =  " << local_size() << std::endl;
+  os << "Size\tglobal =  " << this->size()
+     << "\t\tlocal =  " << this->local_size() << std::endl;
   
   // std::complex<>::operator<<() is defined, but use this form
-  std::cout << "#\tReal part\t\tImaginary part" << std::endl;
-  for (unsigned int i=first_local_index(); i<last_local_index(); i++)
-    std::cout << i << "\t" 
-	      << (*this)(i).real() << "\t\t" 
-	      << (*this)(i).imag() << std::endl;
+  os << "#\tReal part\t\tImaginary part" << std::endl;
+  for (unsigned int i=this->first_local_index(); i<this->last_local_index(); i++)
+    os << i << "\t" 
+       << (*this)(i).real() << "\t\t" 
+       << (*this)(i).imag() << std::endl;
 }
 
 
 
 template <typename T>
 inline
-void NumericVector<T>::print() const
+void NumericVector<T>::print(std::ostream& os) const
 {
   assert (initialized());
-  std::cout << "Size\tglobal =  " << size()
-	    << "\t\tlocal =  " << local_size() << std::endl;
+  os << "Size\tglobal =  " << this->size()
+     << "\t\tlocal =  " << this->local_size() << std::endl;
 
-  std::cout << "#\tValue" << std::endl;
-  for (unsigned int i=first_local_index(); i<last_local_index(); i++)
-    std::cout << i << "\t" << (*this)(i) << std::endl;
+  os << "#\tValue" << std::endl;
+  for (unsigned int i=this->first_local_index(); i<this->last_local_index(); i++)
+    os << i << "\t" << (*this)(i) << std::endl;
 }
 
 

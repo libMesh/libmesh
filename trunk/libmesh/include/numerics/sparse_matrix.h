@@ -1,4 +1,4 @@
-// $Id: sparse_matrix.h,v 1.5 2004-08-20 14:07:11 jwpeterson Exp $
+// $Id: sparse_matrix.h,v 1.6 2004-10-19 16:58:04 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -272,7 +272,7 @@ public:
    * in a uniform style, regardless of matrix/solver
    * package being used.
    */
-  void print() const;
+  void print(std::ostream& os=std::cout) const;
 
   /**
    * Same as the print method above, but allows you
@@ -280,7 +280,7 @@ public:
    */
   friend std::ostream& operator << (std::ostream& os, const SparseMatrix<T>& m)
   {
-    m.print();
+    m.print(os);
     return os;
   }
   
@@ -288,7 +288,7 @@ public:
    * Print the contents of the matrix to the screen
    * in a package-personalized style, if available.
    */
-  virtual void print_personal() const = 0;
+  virtual void print_personal(std::ostream& os=std::cout) const = 0;
   
   /**
    * Print the contents of the matrix in Matlab's
@@ -385,15 +385,15 @@ SparseMatrix<T>::~SparseMatrix ()
 
 template <typename T>
 inline
-void SparseMatrix<T>::print() const
+void SparseMatrix<T>::print(std::ostream& os) const
 {
   assert (this->initialized());
 
   for (unsigned int i=0; i<this->m(); i++)
     {
       for (unsigned int j=0; j<this->n(); j++)
-	std::cout << std::setw(8) << (*this)(i,j) << " ";
-      std::cout << std::endl;
+	os << std::setw(8) << (*this)(i,j) << " ";
+      os << std::endl;
     }
 }
 
@@ -402,7 +402,7 @@ void SparseMatrix<T>::print() const
 // Full specialization for Complex datatypes
 template <>
 inline
-void SparseMatrix<Complex>::print() const
+void SparseMatrix<Complex>::print(std::ostream& os) const
 {
   // std::complex<>::operator<<() is defined, but use this form
 
@@ -410,16 +410,16 @@ void SparseMatrix<Complex>::print() const
   for (unsigned int i=0; i<this->m(); i++)
     {
       for (unsigned int j=0; j<this->n(); j++)
-	std::cout << std::setw(8) << (*this)(i,j).real() << " ";
-      std::cout << std::endl;
+	os << std::setw(8) << (*this)(i,j).real() << " ";
+      os << std::endl;
     }
 
-  std::cout << std::endl << "Imaginary part:" << std::endl;
+  os << std::endl << "Imaginary part:" << std::endl;
   for (unsigned int i=0; i<this->m(); i++)
     {
       for (unsigned int j=0; j<this->n(); j++)
-	std::cout << std::setw(8) << (*this)(i,j).imag() << " ";
-      std::cout << std::endl;
+	os << std::setw(8) << (*this)(i,j).imag() << " ";
+      os << std::endl;
     }
 }
 

@@ -1,4 +1,4 @@
-// $Id: petsc_interface.C,v 1.28 2004-10-12 19:46:58 benkirk Exp $
+// $Id: petsc_interface.C,v 1.29 2004-10-19 16:58:08 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -134,11 +134,21 @@ void PetscInterface<T>::init ()
       //  routines.
       
       ierr = KSPSetFromOptions (_ksp);
-             CHKERRABORT(PETSC_COMM_WORLD,ierr);
+      CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
 	       
 #endif
-	       
+	     
+      // Notify PETSc of location to store residual history.
+      // This needs to be called before any solves, since
+      // it sets the residual history length to zero.  The default
+      // behavior is for PETSc to allocate (internally) an array
+      // of size 1000 to hold the residual norm history.
+      ierr = KSPSetResidualHistory(_ksp,
+				   PETSC_NULL,   // pointer to the array which holds the history
+				   PETSC_DECIDE, // size of the array holding the history
+				   PETSC_TRUE);  // Whether or not to reset the history for each solve. 
+      CHKERRABORT(PETSC_COMM_WORLD,ierr);
     }
 }
 
@@ -226,8 +236,16 @@ PetscInterface<T>::solve (SparseMatrix<T>&  matrix_in,
 
   // Set the tolerances for the iterative solver.  Use the user-supplied
   // tolerance for the relative residual & leave the others at default values.
-  ierr = KSPSetTolerances (_ksp, tol, PETSC_DEFAULT,
- 			   PETSC_DEFAULT, max_its);
+  // Convergence is detected at iteration k if
+  // ||r_k||_2 < max(rtol*||b||_2 , abstol)
+  // where r_k is the residual vector and b is the right-hand side.  Note that
+  // it is the *maximum* of the two values, the larger of which will almost
+  // always be rtol*||b||_2. 
+  ierr = KSPSetTolerances (_ksp,
+			   tol,           // rtol   = relative decrease in residual  (1.e-5)
+			   PETSC_DEFAULT, // abstol = absolute convergence tolerance (1.e-50)
+ 			   PETSC_DEFAULT, // dtol   = divergence tolerance           (1.e+5)
+			   max_its);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
 
@@ -286,6 +304,69 @@ PetscInterface<T>::solve (SparseMatrix<T>&  matrix_in,
 
 
 template <typename T>
+void PetscInterface<T>::get_residual_history(std::vector<double>& hist)
+{
+  int ierr = 0;
+  int its  = 0;
+
+  // Fill the residual history vector with the residual norms
+  // Note that GetResidualHistory() does not copy any values, it
+  // simply sets the pointer p.  Note that for some Krylov subspace
+  // methods, the number of residuals returned in the history
+  // vector may be different from what you are expecting.  For
+  // example, TFQMR returns two residual values per iteration step.
+  double* p;
+  ierr = KSPGetResidualHistory(_ksp, &p, &its);
+  CHKERRABORT(PETSC_COMM_WORLD,ierr);
+
+  // Check for early return
+  if (its == 0) return;
+  
+  // Create space to store the result
+  hist.resize(its);
+
+  // Copy history into the vector provided by the user.
+  for (int i=0; i<its; ++i)
+    {
+      hist[i] = *p;
+      p++;
+    }
+}
+
+
+
+
+template <typename T>
+Real PetscInterface<T>::get_initial_residual()
+{
+  int ierr = 0;
+  int its  = 0;
+
+  // Fill the residual history vector with the residual norms
+  // Note that GetResidualHistory() does not copy any values, it
+  // simply sets the pointer p.  Note that for some Krylov subspace
+  // methods, the number of residuals returned in the history
+  // vector may be different from what you are expecting.  For
+  // example, TFQMR returns two residual values per iteration step.
+  double* p;
+  ierr = KSPGetResidualHistory(_ksp, &p, &its);
+  CHKERRABORT(PETSC_COMM_WORLD,ierr);
+
+  // Check no residual history
+  if (its == 0)
+    {
+      std::cerr << "No iterations have been performed, returning 0." << std::endl;
+      return 0.;
+    }
+
+  // Otherwise, return the value pointed to by p.
+  return *p;
+}
+
+
+
+
+template <typename T>
 void PetscInterface<T>::set_petsc_solver_type()
 {
   int ierr = 0;
@@ -338,6 +419,11 @@ void PetscInterface<T>::set_petsc_solver_type()
 
 
 
+
+
+
+
+
 template <typename T>
 void PetscInterface<T>::set_petsc_preconditioner_type()
 {
@@ -379,7 +465,10 @@ void PetscInterface<T>::set_petsc_preconditioner_type()
     case USER_PRECOND:
       ierr = PCSetType (_pc, (char*) PCMAT);       CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
 #endif
-      
+
+    case SHELL_PRECOND:
+      ierr = PCSetType (_pc, (char*) PCSHELL);     CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
+
     default:
       std::cerr << "ERROR:  Unsupported PETSC Preconditioner: "
 		<< this->_preconditioner_type       << std::endl

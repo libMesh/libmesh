@@ -1,4 +1,4 @@
-// $Id: dense_vector_base.h,v 1.6 2004-08-06 16:48:40 jwpeterson Exp $
+// $Id: dense_vector_base.h,v 1.7 2004-10-19 16:58:04 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -82,7 +82,7 @@ public:
   /**
    * Pretty-print the vector to \p stdout.
    */
-  void print() const;
+  void print(std::ostream& os=std::cout) const;
 
   /**
    * Same as above, but allows you to print using the
@@ -90,7 +90,7 @@ public:
    */
   friend std::ostream& operator << (std::ostream& os, const DenseVectorBase<T>& v)
   {
-    v.print();
+    v.print(os);
     return os;
   }
   
@@ -98,7 +98,7 @@ public:
    * Prints the entries of the vector with additional
    * decimal places in scientific notation.
    */
-  void print_scientific() const;
+  void print_scientific(std::ostream& os=std::cout) const;
 
 };
 
@@ -111,31 +111,31 @@ public:
 
 template<typename T>
 inline
-void DenseVectorBase<T>::print_scientific () const
+void DenseVectorBase<T>::print_scientific (std::ostream& os) const
 {
 #ifndef BROKEN_IOSTREAM
   
   // save the initial format flags
-  std::ios_base::fmtflags cout_flags = std::cout.flags();
+  std::ios_base::fmtflags os_flags = os.flags();
   
   // Print the vector entries.
   for (unsigned int i=0; i<this->size(); i++)
-    std::cout << std::setw(10)
-	      << std::scientific
-	      << std::setprecision(8)
-	      << this->el(i)
-	      << std::endl;
+    os << std::setw(10)
+       << std::scientific
+       << std::setprecision(8)
+       << this->el(i)
+       << std::endl;
   
   // reset the original format flags
-  std::cout.flags(cout_flags);
+  os.flags(os_flags);
   
 #else
   
   // Print the matrix entries.
   for (unsigned int i=0; i<this->size(); i++)
-    std::cout << std::setprecision(8)
-	      << this->el(i)
-	      << std::endl;
+    os << std::setprecision(8)
+       << this->el(i)
+       << std::endl;
   
 #endif
 }
@@ -144,12 +144,12 @@ void DenseVectorBase<T>::print_scientific () const
 
 template<typename T>
 inline
-void DenseVectorBase<T>::print () const
+void DenseVectorBase<T>::print (std::ostream& os) const
 {  
   for (unsigned int i=0; i<this->size(); i++)
-    std::cout << std::setw(8)
-	      << this->el(i)
-	      << std::endl;
+    os << std::setw(8)
+       << this->el(i)
+       << std::endl;
 }
 
 
