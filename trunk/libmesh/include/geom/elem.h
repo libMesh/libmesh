@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.11 2004-11-15 22:14:14 benkirk Exp $
+// $Id: elem.h,v 1.12 2004-11-22 21:32:34 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -36,7 +36,8 @@
 #include "enum_order.h"
 #include "enum_io_package.h"
 #include "auto_ptr.h"
-
+#include "multi_predicates.h"
+#include "variant_filter_iterator.h"
 
 // Forward declarations
 class MeshRefinement;
@@ -491,22 +492,45 @@ class Elem : public ReferenceCountedObject<Elem>,
    */
   void coarsen ();
 
-//   /**
-//    * The non-const begin and end accessor functions.
-//    */
-//   std::pair<Elem**, Elem**> neighbors_begin ();
-//   std::pair<Elem**, Elem**> neighbors_end ();
-
-//   /**
-//    * The const begin and end accessor functions. 
-//    */
-//   std::pair<const Elem**, const Elem**> neighbors_begin () const;
-//   std::pair<const Elem**, const Elem**> neighbors_end () const;
-  
 #endif
 
 
+protected:
+  /**
+   * The protected nested SideIter class is used to iterate over the
+   * sides of this Elem.  It is a specially designed class since
+   * no sides are actually stored by the element.  This iterator-like
+   * class has to provide the following three operations
+   * 1) operator*
+   * 2) operator++
+   * 3) operator==
+   * The definition can be found at the end of this header file.
+   */
+  class SideIter;
+  
+public:
+  /**
+   * Useful iterator typedefs
+   */
+  typedef Predicates::multi_predicate Predicate;
+  typedef variant_filter_iterator<Elem*, Predicate> side_iterator;
 
+  /**
+   * Iterator accessor functions
+   */
+  side_iterator boundary_sides_begin();
+  side_iterator boundary_sides_end();
+
+private:
+  /**
+   * Side iterator helper functions.  Used to replace the begin()
+   * and end() functions of the STL containers.
+   */
+  SideIter _first_side(); 
+  SideIter _last_side();  
+  
+public:
+  
 #ifdef ENABLE_INFINITE_ELEMENTS
 
   /**
@@ -641,6 +665,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    * by using friends!
    */
   friend class MeshRefinement;    // (Elem::nullify_neighbors)
+
 };
 
 
@@ -965,39 +990,6 @@ void Elem::set_refinement_flag(RefinementState rflag)
 
 
 
-// inline
-// std::pair<Elem**, Elem**> Elem::neighbors_begin ()
-// {
-//   return std::make_pair (&_neighbors[0],
-// 			 &_neighbors[this->n_neighbors()]);
-// }
-
-
-
-// inline
-// std::pair<Elem**, Elem**> Elem::neighbors_end ()
-// {
-//   return std::make_pair (&_neighbors[this->n_neighbors()],
-// 			 &_neighbors[this->n_neighbors()]);
-// }
-
-
-
-// inline
-// std::pair<const Elem**, const Elem**> Elem::neighbors_begin () const
-// {
-//   return std::make_pair (const_cast<const Elem**>(&_neighbors[0]),
-// 			 const_cast<const Elem**>(&_neighbors[this->n_neighbors()]));
-// }
-
-
-
-// inline
-// std::pair<const Elem**, const Elem**> Elem::neighbors_end () const
-// {
-//   return std::make_pair (const_cast<const Elem**>(&_neighbors[this->n_neighbors()]),
-// 			 const_cast<const Elem**>(&_neighbors[this->n_neighbors()]));
-// }
 
 
 #endif /* ifdef ENABLE_AMR */
@@ -1094,6 +1086,142 @@ unsigned int Elem::compute_key (unsigned int n0,
   return (n0%bp + (n1<<5)%bp + (n2<<10)%bp + (n3<<15)%bp);
 }
 				
+
+
+
+
+
+
+
+
+/**
+ * The definition of the protected nested SideIter class.
+ */
+class Elem::SideIter
+{
+public:
+  // Constructor with arguments.
+  SideIter(const unsigned int side_number,
+	   const Elem* parent)
+    : _side_number(side_number),
+      _side_ptr(NULL),
+      _parent(parent)
+  {}
+
+    
+  // Empty constructor.
+  SideIter()
+    : _side_number(libMesh::invalid_uint),
+      _side_ptr(NULL),
+      _parent(NULL)
+  {}
+
+
+  // Copy constructor
+  SideIter(const SideIter& other)
+    : _side_number(other._side_number),
+      _parent(other._parent)
+  {}
+
+
+  // op=
+  SideIter& operator=(const SideIter& other)
+  {
+    this->_side_number = other._side_number;
+    this->_parent      = other._parent;
+    return *this;
+  }
+
+  // unary op*
+  Elem*& operator*() const
+  {
+    // Set the AutoPtr
+    this->_update_side_ptr();
+
+    // Return a reference to _side_ptr
+    return this->_side_ptr;
+  }
+
+  // op++
+  SideIter& operator++()
+  {
+    ++_side_number;
+    return *this;
+  }
+  
+  // op==  Two side iterators are equal if they have
+  // the same side number and the same parent element.
+  bool operator == (const SideIter& other) const
+  {
+    return (this->_side_number == other._side_number &&
+	    this->_parent      == other._parent);
+  }
+
+
+  // Consults the parent Elem to determine if the side
+  // is a boundary side.  Note: currently side N is a
+  // boundary side if nieghbor N is NULL.  Be careful,
+  // this could possibly change in the future?
+  bool side_on_boundary() const
+  {
+    return this->_parent->neighbor(_side_number) == NULL;
+  }
+    
+private:
+  // Update the _side pointer by building the correct side.
+  // This has to be called before dereferencing.
+  void _update_side_ptr() const
+  {
+    // Construct new side, store in AutoPtr
+    this->_side = this->_parent->build_side(this->_side_number);
+
+    // Also set our internal naked pointer.  Memory is still owned
+    // by the AutoPtr.
+    this->_side_ptr = _side.get();
+  }
+    
+  // A counter variable which keeps track of the side number
+  unsigned int _side_number;
+    
+  // AutoPtr to the actual side, handles memory management for
+  // the sides which are created during the course of iteration.
+  mutable AutoPtr<Elem> _side;
+
+  // Raw pointer needed to facilitate passing back to the user a
+  // reference to a non-temporary raw pointer in order to conform to
+  // the variant_filter_iterator interface.  It points to the same
+  // thing the AutoPtr "_side" above holds.  What happens if the user
+  // calls delete on the pointer passed back?  Well, this is an issue
+  // which is not addressed by the iterators in libMesh.  Basically it
+  // is a bad idea to ever call delete on an iterator from the library.
+  mutable Elem* _side_ptr;
+  
+  // Pointer to the parent Elem class which generated this iterator
+  const Elem* _parent;
+};
+
+
+
+
+
+
+// Private implementation functions in the Elem class for the side iterators.
+// They have to come after the definition of the SideIter class.
+inline
+Elem::SideIter Elem::_first_side()
+{
+  return SideIter(0, this);
+}
+
+
+
+inline
+Elem::SideIter Elem::_last_side()
+{
+  return SideIter(this->n_neighbors(), this);
+}
+
+
 
 
 #endif // end #ifndef __elem_h__

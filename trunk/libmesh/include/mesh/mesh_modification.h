@@ -1,4 +1,4 @@
-// $Id: mesh_modification.h,v 1.1 2004-11-15 22:09:12 benkirk Exp $
+// $Id: mesh_modification.h,v 1.2 2004-11-22 21:32:35 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -39,7 +39,7 @@ class MeshBase;
  *
  * \author Benjamin S. Kirk
  * \date 2004
- * \version $Revision: 1.1 $
+ * \version $Revision: 1.2 $
  */
 
 
@@ -83,6 +83,15 @@ namespace MeshTools
      */
     void scale (MeshBase& mesh,
 		const Real xs, const Real ys=0., const Real zs=0.);
+
+    /**
+     * Converts the 2D quadrilateral elements of a Mesh into
+     * triangular elements.
+     * Note: Only works for 2D elements!  3D elements are ignored.
+     * Note: Probably won't do the right thing for meshes which
+     * have been refined previously.
+     */
+    void all_tri (MeshBase& mesh);
     
   } // end namespace Meshtools::Modification
 } // end namespace MeshTools

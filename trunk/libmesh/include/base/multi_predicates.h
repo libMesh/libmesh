@@ -1,4 +1,4 @@
-// $Id: multi_predicates.h,v 1.2 2004-11-08 18:05:29 jwpeterson Exp $
+// $Id: multi_predicates.h,v 1.3 2004-11-22 21:32:34 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -139,6 +139,22 @@ namespace Predicates
 
 
 
+  // Instantiation for the NotActive abstract_multi_predicate
+  template <typename T>
+  struct NotActive : abstract_multi_predicate<T>
+  {
+    // Constructor, pushes back two single predicates
+    NotActive()
+    {
+      this->_predicates.push_back(new not_null<T>);
+      this->_predicates.push_back(new not_active<T>);
+    }
+  };
+
+
+
+
+  
   // Instantiation for the Local abstract_multi_predicate
   template <typename T>
   struct Local : abstract_multi_predicate<T>
@@ -234,6 +250,32 @@ namespace Predicates
     {
       this->_predicates.push_back(new not_null<T>);
       this->_predicates.push_back(new not_level<T>(level));
+    }
+  };
+
+
+
+  // Instantiation for the ActiveOnBoundary abstract_multi_predicate
+  template <typename T>
+  struct ActiveOnBoundary : abstract_multi_predicate<T>
+  {
+    ActiveOnBoundary()
+    {
+      this->_predicates.push_back(new not_null<T>);
+      this->_predicates.push_back(new active<T>);
+      this->_predicates.push_back(new null_neighbor<T>);
+    }
+  };
+
+
+  
+  // Instantiation for the BoundarySide abstract_multi_predicate
+  template <typename T>
+  struct BoundarySide : abstract_multi_predicate<T>
+  {
+    BoundarySide()
+    {
+      this->_predicates.push_back(new boundary_side<T>);
     }
   };
   

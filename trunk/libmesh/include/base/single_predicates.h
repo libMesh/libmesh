@@ -1,4 +1,4 @@
-// $Id: single_predicates.h,v 1.2 2004-11-08 18:05:30 jwpeterson Exp $
+// $Id: single_predicates.h,v 1.3 2004-11-22 21:32:34 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -185,6 +185,42 @@ namespace Predicates
 
   protected:
     virtual predicate<T>* clone() const { return new not_level<T>(*this); }
+  };
+
+
+  
+
+  // The null_neighbor predicate returns true if the pointer has any
+  // NULL neigbors.
+  template <typename T>
+  struct null_neighbor : predicate<T>
+  {
+    virtual ~null_neighbor() {}
+    virtual bool operator()(const T& it) const
+    {
+      return (*it)->on_boundary();
+    }
+    
+  protected:
+    virtual predicate<T>* clone() const { return new null_neighbor<T>(*this); }
+  };
+
+
+
+  // This predicate simply forwards the work of determining whether
+  // a particular side is on the boundary to the iterator itself, which
+  // has more information.
+  template <typename T>
+  struct boundary_side : predicate<T>
+  {
+    virtual ~boundary_side() {}
+    virtual bool operator()(const T& it) const
+    {
+      return it.side_on_boundary();
+    }
+
+  protected:
+    virtual predicate<T>* clone() const { return new boundary_side<T>(*this); }
   };
 }
 
