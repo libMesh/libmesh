@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.23 2003-04-09 02:30:14 jwpeterson Exp $
+// $Id: dof_map.h,v 1.24 2003-04-30 13:55:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -357,18 +357,6 @@ private:
   std::map<std::string, SparseMatrix<Number>* > _other_matrices;
   
   /**
-   * The number of nodes that _were_ in the mesh
-   * when this DofMap was initialized.
-   */
-  unsigned int _n_nodes;
-
-  /**
-   * The number of elements that _were_ in the mesh
-   * when this DofMap was initialized.
-   */
-  unsigned int _n_elem;
-
-  /**
    * Total number of degrees of freedom.
    */
   unsigned int _n_dfs;
@@ -421,8 +409,6 @@ inline
 DofMap::DofMap(const unsigned int number) :
   _sys_number(number),
   _matrix(NULL),
-  _n_nodes(0),
-  _n_elem(0),
   _n_dfs(0)  
 {
   _other_matrices.clear();

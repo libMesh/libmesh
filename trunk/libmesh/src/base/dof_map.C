@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.35 2003-04-18 19:02:22 benkirk Exp $
+// $Id: dof_map.C,v 1.36 2003-04-30 13:56:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -74,10 +74,7 @@ void DofMap::reinit(MeshBase& mesh)
   
   START_LOG("reinit()", "DofMap");
   
-  this->clear();
-
-  _n_nodes = mesh.n_nodes();
-  _n_elem  = mesh.n_elem();
+  //this->clear();
 
   const unsigned int n_var = this->n_variables();
   const unsigned int dim   = mesh.mesh_dimension();
@@ -101,7 +98,7 @@ void DofMap::reinit(MeshBase& mesh)
   }
   
 
-  
+  // Allocate space for the DOF indices
   for (unsigned int var=0; var<this->n_variables(); var++)
     {
       const FEType& fe_type = variable_type(var);
@@ -133,6 +130,25 @@ void DofMap::reinit(MeshBase& mesh)
 	    elem->set_n_comp(this->sys_number(), var, dofs_per_elem);
 	}
     }
+
+
+  // Finally, clear all the DOF indices
+  {
+    // All the nodes
+    node_iterator       node_it  (mesh.nodes_begin());
+    const node_iterator node_end (mesh.nodes_end());
+
+    for ( ; node_it != node_end; ++node_it)
+      (*node_it)->invalidate_dofs();
+    
+    // All the elements
+    elem_iterator       elem_it (mesh.elements_begin());
+    const elem_iterator elem_end(mesh.elements_end());
+
+    for ( ; elem_it != elem_end; ++elem_it)
+      (*elem_it)->invalidate_dofs();
+  }
+
   
   STOP_LOG("reinit()", "DofMap");
 }
@@ -163,10 +179,7 @@ void DofMap::clear()
 
   _other_matrices.clear();
 
-  _n_dfs =
-    _n_nodes =
-    _n_elem =
-    0;
+  _n_dfs = 0;
 }
 
 
@@ -184,9 +197,6 @@ void DofMap::distribute_dofs(MeshBase& mesh)
   
   // re-init in case the mesh has changed
   this->reinit(mesh);
-
-  assert (_n_nodes);
-  assert (_n_elem);
 
   // Log how long it takes to distribute the degrees of freedom
   START_LOG("distribute_dofs()", "DofMap");
@@ -329,43 +339,47 @@ void DofMap::compute_sparsity(MeshBase& mesh)
   if (_dof_coupling.empty())
     {
       std::vector<unsigned int> element_dofs;
-      
-      for (unsigned int e=0; e<_n_elem; e++)
-	if (mesh.elem(e)->active())
-	  {
-	    this->dof_indices (mesh.elem(e), element_dofs);
-	    this->find_connected_dofs (element_dofs);
+
+      active_elem_iterator       elem_it (mesh.elements_begin());
+      const active_elem_iterator elem_end(mesh.elements_end());
+
+      for ( ; elem_it != elem_end; ++elem_it)
+	{
+	  Elem* elem = *elem_it;
+	  
+	  this->dof_indices (elem, element_dofs);
+	  this->find_connected_dofs (element_dofs);
 	    
-	    const unsigned int n_dofs_on_element = element_dofs.size();
+	  const unsigned int n_dofs_on_element = element_dofs.size();
 	    
-	    for (unsigned int i=0; i<n_dofs_on_element; i++)
-	      {
-		const unsigned int ig = element_dofs[i];
-		
-		// Only bother if this matrix row will be stored
-		// on this processor.
-		if ((ig >= first_dof_on_proc) &&
-		    (ig <= last_dof_on_proc))
-		  {
-		    // This is what I mean
-		    // assert ((ig - first_dof_on_proc) >= 0);
-		    // but do the test like this because ig and
-		    // first_dof_on_proc are unsigned ints
-		    assert (ig >= first_dof_on_proc);
-		    assert ((ig - first_dof_on_proc) < sparsity_pattern.size());
-		    
-		    std::set<unsigned int>& row =
-		      sparsity_pattern[ig - first_dof_on_proc];
-		    
-		    for (unsigned int j=0; j<n_dofs_on_element; j++)
-		      {
-			const unsigned int jg = element_dofs[j];
-			
-			row.insert(jg);
-		      }
-		  }
-	      }
-	  }      
+	  for (unsigned int i=0; i<n_dofs_on_element; i++)
+	    {
+	      const unsigned int ig = element_dofs[i];
+	      
+	      // Only bother if this matrix row will be stored
+	      // on this processor.
+	      if ((ig >= first_dof_on_proc) &&
+		  (ig <= last_dof_on_proc))
+		{
+		  // This is what I mean
+		  // assert ((ig - first_dof_on_proc) >= 0);
+		  // but do the test like this because ig and
+		  // first_dof_on_proc are unsigned ints
+		  assert (ig >= first_dof_on_proc);
+		  assert ((ig - first_dof_on_proc) < sparsity_pattern.size());
+		  
+		  std::set<unsigned int>& row =
+		    sparsity_pattern[ig - first_dof_on_proc];
+		  
+		  for (unsigned int j=0; j<n_dofs_on_element; j++)
+		    {
+		      const unsigned int jg = element_dofs[j];
+		      
+		      row.insert(jg);
+		    }
+		}
+	    }
+	}      
     } 
 
 
@@ -385,58 +399,62 @@ void DofMap::compute_sparsity(MeshBase& mesh)
       std::vector<unsigned int> element_dofs_j;
       
       
-      for (unsigned int e=0; e<_n_elem; e++)
-	if (mesh.elem(e)->active())
-	  for (unsigned int vi=0; vi<n_var; vi++)
-	    {
-	      // Find element dofs for variable vi
-	      this->dof_indices (mesh.elem(e), element_dofs_i, vi);
-	      this->find_connected_dofs (element_dofs_i);
-	      
-	      const unsigned int n_dofs_on_element_i = element_dofs_i.size();
-
-	      for (unsigned int vj=0; vj<n_var; vj++)
-		if (_dof_coupling(vi,vj)) // If vi couples to vj
-		  {
-		    // Find element dofs for variable vj
-		    this->dof_indices (mesh.elem(e), element_dofs_j, vj);
-		    this->find_connected_dofs (element_dofs_j);	    
-		    
-		    const unsigned int n_dofs_on_element_j = element_dofs_j.size();
+      active_elem_iterator       elem_it (mesh.elements_begin());
+      const active_elem_iterator elem_end(mesh.elements_end());
+      
+      for ( ; elem_it != elem_end; ++elem_it)
+	for (unsigned int vi=0; vi<n_var; vi++)
+	  {
+	    Elem* elem = *elem_it;
 	    
-		    for (unsigned int i=0; i<n_dofs_on_element_i; i++)
-		      {
-			const unsigned int ig = element_dofs_i[i];
-
-			// Only bother if this matrix row will be stored
-			// on this processor.
-			if ((ig >= first_dof_on_proc) &&
-			    (ig <= last_dof_on_proc))
-			  {
-			    // This is what I mean
-			    //assert ((ig - first_dof_on_proc) >= 0);
-			    // but do the test like this because ig and
-			    // first_dof_on_proc are unsigned ints
-			    assert (ig >= first_dof_on_proc);
-			    assert (ig < (sparsity_pattern.size() + first_dof_on_proc));
-		    
-			    std::set<unsigned int>& row =
-			      sparsity_pattern[ig - first_dof_on_proc];
-		    
-			    for (unsigned int j=0; j<n_dofs_on_element_j; j++)
-			      {
-				const unsigned int jg = element_dofs_j[j];
-			
-				row.insert(jg);
-			      }
-			  }
-		      }
-		  }
-	    }
+	    // Find element dofs for variable vi
+	    this->dof_indices (elem, element_dofs_i, vi);
+	    this->find_connected_dofs (element_dofs_i);
+	    
+	    const unsigned int n_dofs_on_element_i = element_dofs_i.size();
+	    
+	    for (unsigned int vj=0; vj<n_var; vj++)
+	      if (_dof_coupling(vi,vj)) // If vi couples to vj
+		{
+		  // Find element dofs for variable vj
+		  this->dof_indices (elem, element_dofs_j, vj);
+		  this->find_connected_dofs (element_dofs_j);	    
+		  
+		  const unsigned int n_dofs_on_element_j = element_dofs_j.size();
+		  
+		  for (unsigned int i=0; i<n_dofs_on_element_i; i++)
+		    {
+		      const unsigned int ig = element_dofs_i[i];
+		      
+		      // Only bother if this matrix row will be stored
+		      // on this processor.
+		      if ((ig >= first_dof_on_proc) &&
+			  (ig <= last_dof_on_proc))
+			{
+			  // This is what I mean
+			  //assert ((ig - first_dof_on_proc) >= 0);
+			  // but do the test like this because ig and
+			  // first_dof_on_proc are unsigned ints
+			  assert (ig >= first_dof_on_proc);
+			  assert (ig < (sparsity_pattern.size() + first_dof_on_proc));
+			  
+			  std::set<unsigned int>& row =
+			    sparsity_pattern[ig - first_dof_on_proc];
+			  
+			  for (unsigned int j=0; j<n_dofs_on_element_j; j++)
+			    {
+			      const unsigned int jg = element_dofs_j[j];
+			      
+			      row.insert(jg);
+			    }
+			}
+		    }
+		}
+	  }
     }      
 
 
-
+  
   // Now the full sparsity structure is built for all of the
   // DOFs connected to our rows of the matrix.
   _n_nz.resize (n_dofs_on_proc);
@@ -600,13 +618,15 @@ void DofMap::create_dof_constraints(MeshBase& mesh)
     {
       const FEType& fe_type = this->variable_type(variable_number);
       
-      for (unsigned int e=0; e<_n_elem; e++)
-	if (mesh.elem(e)->active())
-	  FEInterface::compute_constraints (_dof_constraints,
-					    this->sys_number(),
-					    variable_number,
-					    fe_type,
-					    mesh.elem(e));
+      active_elem_iterator       elem_it (mesh.elements_begin());
+      const active_elem_iterator elem_end(mesh.elements_end());
+      
+      for ( ; elem_it != elem_end; ++elem_it)
+	FEInterface::compute_constraints (_dof_constraints,
+					  this->sys_number(),
+					  variable_number,
+					  fe_type,
+					  *elem_it);
     }
   
   STOP_LOG("create_dof_constraints()", "DofMap");
