@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex18.h,v 1.14 2003-05-22 21:18:01 benkirk Exp $
+// $Id: cell_inf_hex18.h,v 1.15 2003-05-24 22:49:46 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -104,6 +104,17 @@ public:
    * takes care of freeing memory.
    */
   AutoPtr<Elem> build_side (const unsigned int i) const;
+
+  /**
+   * @returns an id associated with the \p s side of this element.
+   * The id is not necessariy unique, but should be close.  This is
+   * particularly useful in the \p MeshBase::find_neighbors() routine.
+   *
+   * We reimplemenet this method here for the \p InfHex18 since we can
+   * use the center node of the bottom face to provide a perfect (unique)
+   * key.
+   */
+  unsigned int key (const unsigned int s) const;
 
   const std::vector<unsigned int> tecplot_connectivity(const unsigned int sc=0) const;
 

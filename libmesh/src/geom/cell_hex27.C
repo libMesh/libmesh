@@ -1,4 +1,4 @@
-// $Id: cell_hex27.C,v 1.13 2003-02-27 00:55:28 benkirk Exp $
+// $Id: cell_hex27.C,v 1.14 2003-05-24 22:49:47 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -28,6 +28,51 @@
 
 // ------------------------------------------------------------
 // Hex27 class member functions
+unsigned int Hex27::key (const unsigned int s) const
+{
+ assert (s < this->n_sides());
+
+  // Think of a unit cube: (-1,1) x (-1,1) x (1,1)
+  switch (s)
+    {
+    case 0:  // the face at z=0
+
+      return
+	this->compute_key (this->node(20));
+
+    case 1:  // the face at y = 0
+
+      return
+	this->compute_key (this->node(21));
+
+    case 2:  // the face at x=1
+
+      return
+	this->compute_key (this->node(22));
+
+    case 3: // the face at y=1
+
+      return
+	this->compute_key (this->node(23));
+
+    case 4: // the face at x=0
+
+      return
+	this->compute_key (this->node(24));
+
+    case 5: // the face at z=1
+
+      return
+	this->compute_key (this->node(25));
+    }
+
+  // We'll never get here.
+  error();
+  return 0;
+}
+
+
+
 AutoPtr<Elem> Hex27::build_side (const unsigned int i) const
 {
   assert (i < this->n_sides());
