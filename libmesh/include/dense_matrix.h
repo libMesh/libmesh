@@ -1,4 +1,4 @@
-// $Id: dense_matrix.h,v 1.18 2003-06-24 05:33:51 benkirk Exp $
+// $Id: dense_matrix.h,v 1.19 2003-08-28 19:35:41 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -75,14 +75,26 @@ public:
   /**
    * @returns the \p (i,j) element of the matrix.
    */
-  virtual T operator() (const unsigned int i,
-			const unsigned int j) const;
+  T operator() (const unsigned int i,
+		const unsigned int j) const;
 
   /**
    * @returns the \p (i,j) element of the matrix as a writeable reference.
    */
-  virtual T & operator() (const unsigned int i,
-			  const unsigned int j);
+  T & operator() (const unsigned int i,
+		  const unsigned int j);
+
+  /**
+   * @returns the \p (i,j) element of the matrix as a writeable reference.
+   */
+  virtual T el(const unsigned int i,
+	       const unsigned int j) const { return (*this)(i,j); }
+
+  /**
+   * @returns the \p (i,j) element of the matrix as a writeable reference.
+   */
+  virtual T & el(const unsigned int i,
+		 const unsigned int j)     { return (*this)(i,j); } 
 
   /**
    * Left multipliess by the matrix \p M2.
@@ -290,8 +302,7 @@ T & DenseMatrix<T>::operator () (const unsigned int i,
 }
 
 
-  
-    
+     
 
 
 template<typename T>

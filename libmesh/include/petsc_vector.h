@@ -1,4 +1,4 @@
-// $Id: petsc_vector.h,v 1.24 2003-08-04 12:43:06 ddreyer Exp $
+// $Id: petsc_vector.h,v 1.25 2003-08-28 19:35:42 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -394,7 +394,7 @@ template <typename T>
 inline
 PetscVector<T>::PetscVector (const unsigned int n)
 {
-  init(n, n, false);
+  this->init(n, n, false);
 }
 
 
@@ -404,7 +404,7 @@ inline
 PetscVector<T>::PetscVector (const unsigned int n,
 			     const unsigned int n_local)
 {
-  init(n, n_local, false);
+  this->init(n, n_local, false);
 }
 
 
@@ -413,7 +413,7 @@ template <typename T>
 inline
 PetscVector<T>::~PetscVector ()
 {
-  clear ();
+  this->clear ();
 }
 
 
@@ -437,8 +437,8 @@ void PetscVector<T>::init (const unsigned int n,
   // create a sequential vector if on only 1 processor 
   if (n_local == n)
     {
-      ierr = VecCreateSeq (PETSC_COMM_SELF, petsc_n, &vec);      CHKERRQ(ierr);
-      ierr = VecSetFromOptions (vec);                            CHKERRQ(ierr);
+      ierr = VecCreateSeq (PETSC_COMM_SELF, petsc_n, &vec); CHKERRQ(ierr);
+      ierr = VecSetFromOptions (vec);                       CHKERRQ(ierr);
     }
   // otherwise create an MPI-enabled vector
   else
@@ -451,15 +451,11 @@ void PetscVector<T>::init (const unsigned int n,
       ierr = VecSetFromOptions (vec);                   CHKERRQ(ierr);
     }  
   
-  this->_is_initialized = true;
-
+  _is_initialized = true;
+  
   
   if (fast == false)
-    zero ();
-
-  
-  
-  return;
+    this->zero ();
 }
 
 
@@ -469,7 +465,7 @@ inline
 void PetscVector<T>::init (const unsigned int n,
 			   const bool fast)
 {
-  init(n,n,fast);
+  this->init(n,n,fast);
 }
 
 
@@ -485,9 +481,7 @@ void PetscVector<T>::close ()
   ierr = VecAssemblyBegin(vec); CHKERRQ(ierr);
   ierr = VecAssemblyEnd(vec);   CHKERRQ(ierr);
 
-  this->_is_closed = true;
-  
-  return;
+  _is_closed = true;
 }
 
 
@@ -503,7 +497,7 @@ void PetscVector<T>::clear ()
       ierr = VecDestroy(vec); CHKERRQ(ierr);
     }
 
-  this->_is_closed = this->_is_initialized = false;
+  _is_closed = _is_initialized = false;
 }
 
 

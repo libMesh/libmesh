@@ -1,5 +1,5 @@
 dnl --------------------------------------------------------------
-dnl $Id: configure.in,v 1.30 2003-06-25 06:01:05 jwpeterson Exp $
+dnl $Id: configure.in,v 1.31 2003-08-28 19:35:38 benkirk Exp $
 dnl --------------------------------------------------------------
 dnl Process this file with autoconf to produce a configure script.
 
@@ -9,7 +9,7 @@ dnl you call ./configure subsequently on different systems without
 dnl clearing the cache 
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
-AC_REVISION($Revision: 1.30 $)
+AC_REVISION($Revision: 1.31 $)
 
 
 AC_INIT(Make.common.in)
@@ -404,6 +404,28 @@ AC_ARG_ENABLE(petsc,
 
 if test "$enablepetsc" != no ; then
   CONFIGURE_PETSC
+
+  dnl tried to configure petsc, didn't find it.
+  dnl look for MPI.
+  if test "$enablepetsc" = no ; then
+    dnl -------------------------------------------------------------
+    dnl MPI -- enabled by default
+    dnl 
+    dnl  If configured with Petsc support we will get our
+    dnl  Mpi configuration from it.  Otherwise we need to
+    dnl  explicitly look for Mpi
+    dnl -------------------------------------------------------------
+    AC_ARG_ENABLE(mpi,
+    [  --enable-mpi build with MPI message passing support],
+         enablempi=$enableval,
+         enablempi=yes)
+    
+    if test "$enablempi" != no ; then
+      CONFIGURE_MPI
+      dnl ACX_MPI
+    fi
+  dnl -------------------------------------------------------------
+  fi
 else
   dnl -------------------------------------------------------------
   dnl MPI -- enabled by default

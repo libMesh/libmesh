@@ -1,4 +1,4 @@
-// $Id: dense_vector_base.h,v 1.2 2003-03-07 05:07:55 jwpeterson Exp $
+// $Id: dense_vector_base.h,v 1.3 2003-08-28 19:35:42 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -69,12 +69,12 @@ public:
   /**
    * @returns the \p (i) element of the vector.
    */
-  virtual T operator() (const unsigned int i) const = 0;
+  virtual T el(const unsigned int i) const = 0;
 
   /**
-   * @returns the \p (i,j) element of the vector as a writeable reference.
+   * @returns the \p (i) element of the vector as a writeable reference.
    */
-  virtual T & operator() (const unsigned int i) = 0;
+  virtual T & el(const unsigned int i) = 0;
 
   /**
    * @returns the size of the vector.
@@ -99,7 +99,7 @@ inline
 void DenseVectorBase<T>::print () const
 {  
   for (unsigned int i=0; i<this->size(); i++)
-    std::cout << std::setw(8) << (*this)(i) << std::endl;
+    std::cout << std::setw(8) << this->el(i) << std::endl;
 }
 
 

@@ -1,4 +1,4 @@
-// $Id: petsc_vector.C,v 1.22 2003-07-23 21:49:05 ddreyer Exp $
+// $Id: petsc_vector.C,v 1.23 2003-08-28 19:35:42 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -134,8 +134,6 @@ void PetscVector<T>::set (const unsigned int i, const T value)
 
   ierr = VecSetValues (vec, 1, &i_val, &petsc_value, INSERT_VALUES);
          CHKERRQ(ierr);
-
-  return;
 }
 
 
@@ -151,8 +149,6 @@ void PetscVector<T>::add (const unsigned int i, const T value)
 
   ierr = VecSetValues (vec, 1, &i_val, &petsc_value, ADD_VALUES);
          CHKERRQ(ierr);
-
-  return;
 }
 
 
@@ -195,8 +191,6 @@ void PetscVector<T>::add_vector (const NumericVector<T>& V_in,
 
   ierr = MatMultAdd(A.mat, V.vec, vec, vec);
          CHKERRQ(ierr); 
-  
-  return;
 }
 
 
@@ -315,8 +309,8 @@ PetscVector<T>::operator = (const PetscVector<T>& v)
   if (v.initialized())
     {
       this->init (v.size(), v.local_size());
-      this->_is_closed      = v._is_closed;
-      this->_is_initialized = v._is_initialized;
+      _is_closed      = v._is_closed;
+      _is_initialized = v._is_initialized;
   
       if (v.size() != 0)
 	{
