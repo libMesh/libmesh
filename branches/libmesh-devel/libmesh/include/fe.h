@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.17.2.1 2003-05-14 22:29:35 benkirk Exp $
+// $Id: fe.h,v 1.17.2.2 2003-05-15 17:07:09 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -52,7 +52,7 @@ class InfFE;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.17.2.1 $
+ * \version $Revision: 1.17.2.2 $
  */
 
 //-------------------------------------------------------------
@@ -183,9 +183,14 @@ public:
    * This is at the core of this class. Use this for each
    * new element in the mesh.  Reinitializes all the physical 
    * element-dependent data based on the current element 
-   * \p elem.
+   * \p elem.  By default the shape functions and associated
+   * data are computed at the quadrature points specified
+   * by the quadrature rule \p qrule, but may be any points
+   * specified on the reference element specified in the optional
+   * argument \p pts.
    */
-  void reinit (const Elem* elem);
+  void reinit (const Elem* elem,
+	       const std::vector<Point>* const pts);
     
   /**
    * Reinitializes all the physical element-dependent data based on
@@ -305,7 +310,7 @@ private:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.17.2.1 $
+ * \version $Revision: 1.17.2.2 $
  */
 
 //-------------------------------------------------------------
@@ -330,7 +335,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.17.2.1 $
+ * \version $Revision: 1.17.2.2 $
  */
 
 //-------------------------------------------------------------
@@ -355,7 +360,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.17.2.1 $
+ * \version $Revision: 1.17.2.2 $
  */
 
 //-------------------------------------------------------------

@@ -1,4 +1,4 @@
-// $Id: error_estimator.C,v 1.1.2.1 2003-05-14 22:29:35 benkirk Exp $
+// $Id: error_estimator.C,v 1.1.2.2 2003-05-15 17:07:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -29,7 +29,7 @@
 #include "dof_map.h"
 #include "mesh.h"
 #include "fe.h"
-
+#include "quadrature_gauss.h"
 
 
 
@@ -97,6 +97,7 @@ void ErrorEstimator::flux_jump (const EquationSystems& es,
   // Loop over all the variables in the system
   for (unsigned int var=0; var<system.n_vars(); var++)
     {
+      // The type of finite element to use for this variable
       const FEType& fe_type = dof_map.variable_type (var);
 
       // Finite element objects for the same face from
@@ -104,11 +105,67 @@ void ErrorEstimator::flux_jump (const EquationSystems& es,
       AutoPtr<FEBase> fe_face_e (FEBase::build (dim, fe_type));
       AutoPtr<FEBase> fe_face_f (FEBase::build (dim, fe_type));
 
+      // Build an appropriate Gaussian quadrature rule
+      QGauss qrule (dim-1, fe_type.default_quadrature_order());
+
+      // Tell the finite element for element e about the quadrature
+      // rule.  The finite element for element f need not know about it
+      fe_face_e->attach_quadrature_rule (&qrule);
+      
       // By convention we will always do the integration
       // on the face of element e.  Get its Jacobian values, etc..
-      const std::vector<Real>&  JxW_face    = fe_face_e->get_JxW();
-      const std::vector<Point>& qface_point = fe_face_e->get_xyz();
+      const std::vector<Real>&  JxW_face     = fe_face_e->get_JxW();
+      const std::vector<Point>& qface_point  = fe_face_e->get_xyz();
+      const std::vector<Point>& face_normals = fe_face_e->get_normals();
       
+      // The global DOF indices for elements e & f
+      std::vector<unsigned int> dof_indices_e;
+      std::vector<unsigned int> dof_indices_f;
+
+
       
-    }
+      // Iterate over all the active elements in the mesh
+      // that live on this processor.
+      const_active_local_elem_iterator       elem_it (mesh.elements_begin());
+      const const_active_local_elem_iterator elem_end(mesh.elements_end());
+
+      for (; elem_it != elem_end; ++elem_it)
+	{
+	  // e is necessarily an active element on the local processor
+	  const Elem* e = *elem_it;
+	  const unsigned int e_id = e->id();
+	  
+	  // Loop over the neighbors of element e
+	  for (unsigned int s_e=0; s_e<e->n_neighbors(); s_e++)
+	    if (e->neighbor(s_e) != NULL) // e is not on the boundary
+	      {
+		const Elem* f           = e->neighbor(s_e);
+		const unsigned int f_id = f->id();
+		
+		if (
+		    ((f->active()) &&
+		     (f->level() == e->level()) &&
+		     (e_id < f_id))                 // Case 1.
+		    
+		    ||
+		    
+		    (f->level() < e->level())       // Case 2.
+		    
+		    )
+		  {
+		    // Update the shape functions on side s_e of
+		    // element e
+		    fe_face_e->reinit (e, s_e);
+		    
+		    // Get the DOF indices for the two elements
+		    dof_map.dof_indices (e, dof_indices_e, var);
+		    dof_map.dof_indices (f, dof_indices_f, var);
+		    
+		    
+		  }
+	      } // if (e->neigbor(s_e) != NULL)
+	  
+	} // End loop over active local elements
+      
+    } // End loop over variables
 }
