@@ -81,6 +81,23 @@ dev_table_entry("images/dreyer.jpg",
 		"<a href=\"http://www.tu-harburg.de\">Technical University Hamburg-Harburg</a>");
 ?>
 
+<?php
+dev_table_entry("images/hvdheijden.jpg",
+		"Hendrik van der Heijden",
+		"http://www.tu-harburg.de",
+		"PhD Student, libMesh Developer",
+		"<a href=\"http://www.tu-harburg.de\">Technical University Hamburg-Harburg</a>");
+?>
+
+<?php
+dev_table_entry("images/fprill.jpg",
+		"Florian Prill",
+		"http://www.tu-harburg.de",
+		"PhD Student, libMesh Developer",
+		"<a href=\"http://www.tu-harburg.de\">Technical University Hamburg-Harburg</a>");
+?>
+
+
 </div>
 
 
