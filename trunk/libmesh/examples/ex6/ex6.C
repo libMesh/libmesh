@@ -1,4 +1,4 @@
-// $Id: ex6.C,v 1.2 2003-02-07 18:07:44 ddreyer Exp $
+// $Id: ex6.C,v 1.3 2003-02-09 22:47:17 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -18,8 +18,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-//#define _p(arg)  std::cout << "Here: " << #arg << std::endl;
-#define _p(arg) 
+#define _p(arg)  std::cout << "Here: " << #arg << std::endl
+//#define _p(arg) 
 
 
 
@@ -266,6 +266,7 @@ int main (int argc, char** argv)
     equation_systems("Wave").solve();
 
 
+    _p(Write results);
     /**
      * After solving the system write the solution
      * to a GMV-formatted plot file.
@@ -296,7 +297,8 @@ int main (int argc, char** argv)
 void assemble_wave(EquationSystems& es,
 		   const std::string& system_name)
 {
-  _p(started assemble_wave)
+  _p(starting assemble_wave);
+
   /**
    * It is a good idea to make sure we are assembling
    * the proper system.
@@ -338,7 +340,6 @@ void assemble_wave(EquationSystems& es,
   
 
 
-  _p(init + attach qrule)
   /**
    * A 2nd order Gauss quadrature rule for numerical integration.
    */
@@ -348,9 +349,9 @@ void assemble_wave(EquationSystems& es,
    * Tell the finite element object to use our quadrature rule.
    */
   fe->attach_quadrature_rule (&qrule);
+  _p(fe->attach just finished.);
 
 
-  _p(fe->attach just finished.)
   /**
    * Due to its internal structure, the infinite element handles 
    * quadrature rules differently.  It takes the quadrature
@@ -359,49 +360,10 @@ void assemble_wave(EquationSystems& es,
    * need not worry about this.
    */
   inf_fe->attach_quadrature_rule (&qrule);
+  _p(inf_fe->attach just finished.);
 
 
 
-
-
-  _p(initialization of variables:)
-  /**
-   *--------------------------------------------------------------------
-   * Here we define some references to cell-specific data that
-   * will be used to assemble the linear system.  We have two
-   * objects to handle.  References to the conventional finite 
-   * element object are prepended by a "c", while references
-   * to the infinite element use an "i".
-   */
-
-  /**
-   * The element Jacobian * quadrature weight at each integration point.   
-   */
-  const std::vector<Real>& cJxW = fe->get_JxW();
-  const std::vector<Real>& iJxW = inf_fe->get_JxW();
-
-  /**
-   * The element shape functions evaluated at the quadrature points.
-   */
-  const std::vector<std::vector<Real> >& cphi = fe->get_phi();
-  const std::vector<std::vector<Real> >& iphi = inf_fe->get_phi();
-
-  /**
-   * The element shape function gradients evaluated at the quadrature
-   * points.
-   */
-  const std::vector<std::vector<Point> >& cdphi = fe->get_dphi();
-  const std::vector<std::vector<Point> >& idphi = inf_fe->get_dphi();
-
-  /**
-   * The infinite element offers some more publicly available variables.
-   * These are the gradients of the phase term \p dphase, an additional 
-   * radial weight for the test functions \p Sobolev_weight, and its
-   * gradient.
-   */
-  const std::vector<Point>& idphase = inf_fe->get_dphase();
-  const std::vector<Real>&  iweight = inf_fe->get_Sobolev_weight();
-  const std::vector<Point>& idweight = inf_fe->get_Sobolev_dweight();
 
 
   /**
@@ -437,10 +399,7 @@ void assemble_wave(EquationSystems& es,
 
 
 
-
-
-  _p(begin loop over elements:)
-
+  _p(Start element loop);
   /**
    *--------------------------------------------------------------------
    * Now we will loop over all the elements in the mesh.
@@ -465,224 +424,294 @@ void assemble_wave(EquationSystems& es,
 
 
       /**
+       * The mesh contains both finite and infinite elements.  These
+       * elements are handled through different classes, namely
+       * \p FE and \p InfFE, respectively.  However, since both
+       * are derived from \p FEBase, they share the same interface,
+       * and overall burden of coding is greatly reduced through
+       * using a pointer, which is adjusted appropriately to the
+       * current element type.
+       */
+      FEBase* cfe=NULL;
+
+
+      /**
+       *----------------------------------------------------------
        * Up to now, we do not know what kind of element we
        * have.  Use the following method to determine who
        * should handle this element.
-       */
+       *
+       * This here is almost the only place where we need to
+       * distinguish between finite and infinite elements.
+       * For faster computation, however, different approaches
+       * may be feasible.
+        */
       if (FEInterface::is_InfFE_elem(elem->type()))
-      {
+        {
+	  /** 
+	   * We have an infinite element.  Let \p cfe point
+	   * to our \p InfFE object.  This is handled through
+	   * an AutoPtr.  Through the \p AutoPtr::get() we "borrow"
+	   * the pointer, while the \p  AutoPtr \p inf_fe is
+	   * still in charge of memory management.
+	   */
+	  cfe = inf_fe.get(); 
+	  _p(InfFE);
+	}
+      else
+        {
+	  /** 
+	   * This is a conventional finite element.  Let \p fe handle it.
+	   */
+  	  cfe = fe.get();
+	  _p(FE);
 
-	/** 
-	 *----------------------------------------------------------------
-	 * We have an infinite element.
-	 */
-	_p(is infinite element)
 
- 
-	/**
-	 * Compute the element-specific data, as described
-	 * in previous examples.
-	 */
-	inf_fe->reinit (elem);
+	  /**
+	   *----------------------------------------------------------------
+	   * Boundary conditions.  Currently, only  natural boundary
+	   * conditions on faces of finite elements are supported (this
+	   * is likely to change in the future!).  Therefore, we do this 
+	   * only for finite elements. 
+	   */
+	    {
+	      /**
+	       * Zero the RHS for this element. 
+	       */
+	      Fe.resize (dof_indices.size());
+	      std::fill (Fe.begin(), Fe.end(), 0.);
 
-	_p(finished inf_fe->reinit)
+
+	      /**
+	       * See previous example(s) for details
+	       */
+	      for (unsigned int side=0; side<elem->n_sides(); side++)
+		  if (elem->neighbor(side) == NULL)
+		    {
+		      AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
+	      
+		      QGauss qface0(dim,   SECOND);
+		      QGauss qface1(dim-1, SECOND);
+	      
+		      fe_face->attach_quadrature_rule (&qface0);
+	      
+		      /**
+		       * The value of the shape functions at the quadrature
+		       * points.
+		       */
+		      const std::vector<std::vector<Real> >&  fphi = fe_face->get_phi();
+	      
+		      /**
+		       * The Jacobian * Quadrature Weight at the quadrature
+		       * points on the face.
+		       */
+		      const std::vector<Real>& fJxW = fe_face->get_JxW();
+	      
+		      /**
+		       * The XYZ locations (in physical space) of the
+		       * quadrature points on the face.  This is where
+		       * we will interpolate the boundary value function.
+		       */
+		      //const std::vector<Point >& qface_point = fe_face->get_xyz();
+	      
+		      /**
+		       * Compute the shape function values on the element
+		       * face.
+		       */
+		      fe_face->reinit(&qface1, elem, side);
+
+	      
+		      /**
+		       * Loop over the face quagrature points for integration.
+		       */
+		      for (unsigned int qp=0; qp<qface0.n_points(); qp++)
+		        {
+			  /**
+			   * The location on the boundary of the current
+			   * face quadrature point.
+			   */
+			  //const Real xf = qface_point[qp](0);
+			  //const Real yf = qface_point[qp](1);
+			  //const Real zf = qface_point[qp](2);
+		  
+			  /**
+			   * The boundary value.
+			   */
+			  const Real value = 1.;
+		  		  
+			  /**
+			   * Right-hand-side contribution.
+			   */
+			  for (unsigned int i=0; i<fphi.size(); i++)
+			    {
+			      Fe[i] += fJxW[qp]*value*fphi[i][qp];
+			    };
+		  
+			}; // end face quadrature point loop	  
 
 
-	/**
-	 * Zero the element matrices only.  Boundary conditions
-	 * on infinite elements are not supported.
-	 */
-	Ke.resize (dof_indices.size(), dof_indices.size());
-	Ce.resize (dof_indices.size(), dof_indices.size());
-	Me.resize (dof_indices.size(), dof_indices.size());
+		      es("Wave").rhs.add_vector    (Fe, dof_indices);
 
-	/**
-	 * The total number of quadrature points for infinite elements
-	 * has to be determined in a different way, compared to
-	 * conventional finite elements.
-	 */
-	unsigned int max_qp = inf_fe->n_quadrature_points();
+		    }; // end if (elem->neighbor(side) == NULL)
 
-	/**
-	 * Loop over the quadrature points. 
-	 */
-	for (unsigned int qp=0; qp<max_qp; qp++)
-	{
+	    }; // end boundary condition section	     
+
+	}; // else ( if (FEInterface::is_InfFE_elem(elem->type())) )
+
+
+
+      /**
+       *----------------------------------------------------------
+       * Now this is all independent of whether we use an \p FE
+       * or an \p InfFE.  Nice, hm? ;-)
+       *
+       * Compute the element-specific data, as described
+       * in previous examples.
+       */
+      cfe->reinit (elem);
+
+      /**
+       * This is slightly different from the Poisson solver:
+       * Since the finite element object may change, we have to
+       * initialize the constant references to the data fields
+       * each time again, when a new element is processed.
+       *
+       * The element Jacobian * quadrature weight at each integration point.   
+       */
+      const std::vector<Real>& JxW = cfe->get_JxW();
+
+      /**
+       * The element shape functions evaluated at the quadrature points.
+       */
+      const std::vector<std::vector<Real> >& phi = cfe->get_phi();
+
+      /**
+       * The element shape function gradients evaluated at the quadrature
+       * points.
+       */
+      const std::vector<std::vector<Point> >& dphi = cfe->get_dphi();
+
+      /**
+       * The infinite elements need more data fields than conventional FE.  
+       * These are the gradients of the phase term \p dphase, an additional 
+       * radial weight for the test functions \p Sobolev_weight, and its
+       * gradient.
+       * 
+       * Note that these data fields are also initialized appropriately by
+       * the \p FE method, so that the weak form (below) is valid for both
+       * finite and infinite elements.
+       */
+      const std::vector<Point>& dphase  = cfe->get_dphase();
+      const std::vector<Real>&  weight  = cfe->get_Sobolev_weight();
+      const std::vector<Point>& dweight = cfe->get_Sobolev_dweight();
+
+
+      /**
+       * Zero the element matrices.  Boundary conditions were already
+       * processed in the \p FE-only section, see above.
+       */
+      Ke.resize (dof_indices.size(), dof_indices.size());
+      Ce.resize (dof_indices.size(), dof_indices.size());
+      Me.resize (dof_indices.size(), dof_indices.size());
+
+      /**
+       * The total number of quadrature points for infinite elements
+       * @e has to be determined in a different way, compared to
+       * conventional finite elements.  This type of access is also
+       * valid for finite elements, so this can safely be used
+       * anytime, instead of asking the quadrature rule, as
+       * seen in previous examples.
+       */
+      unsigned int max_qp = cfe->n_quadrature_points();
+
+
+      /**
+       * Loop over the quadrature points. 
+       */
+      for (unsigned int qp=0; qp<max_qp; qp++)
+        {
 	  /**
 	   * Similar to the modified access to the number of quadrature 
 	   * points, the number of shape functions may also be obtained
-	   * in a different manner.  However, this is not required
-	   * for infinite elements.  Still, use it, for consistency.
+	   * in a different manner.  This offers the great advantage
+	   * of being valid for both finite and infinite elements.
 	   */
-	  unsigned int n_sf = inf_fe->n_shape_functions();
+	  unsigned int n_sf = cfe->n_shape_functions();
 
 	  /**
 	   * Now we will build the element matrices.  Since the infinite
 	   * elements are based on a Petrov-Galerkin scheme, the
 	   * resulting system matrices are non-symmetric. The additional
 	   * weight, described before, is part of the trial space.
+	   *
+	   * For the finite elements, though, these matrices are symmetric
+	   * just as we know them, since the additional fields \p dphase,
+	   * \p weight, and \p dweight are initialized appropriately.
+	   *
+	   * test functions:    weight[qp]*phi[i][qp]
+	   * trial functions:   phi[j][qp]
+	   * phase term:        phase[qp]
+	   * 
+	   * derivatives are similar, but note that these are of type
+	   * Point, not of type Real.
 	   */
 	  for (unsigned int i=0; i<n_sf; i++)
 	    for (unsigned int j=0; j<n_sf; j++)
 	      {
-		Ke(i,j) += iJxW[qp]*(idphi[i][qp]*idphi[j][qp])
-		                   *(idphase[qp]*idweight[qp]);
+		//         (ndt*Ht + nHt*d) * nH 
+		Ke(i,j) +=
+		    (                                /*    (                         */
+			(                            /*      (                       */
+			  dweight[qp] * phi[i][qp]   /*        Point * Real  = Point */
+			  +                          /*        +                     */
+			  dphi[i][qp] * weight[qp]   /*        Point * Real  = Point */
+			) * dphi[j][qp]              /*      )       * Point = Real  */
+		    ) * JxW[qp];                     /*    )         * Real  = Real  */
 
-		Ce(i,j) += iJxW[qp]*(iweight[qp]*(idphi[i][qp]*idphi[j][qp]));
 
-		Me(i,j) += iJxW[qp]*iphi[i][qp]*iphi[j][qp];
+		// (d*Ht*nmut*nH - ndt*nmu*Ht*H - d*nHt*nmu*H)
+		Ce(i,j) +=
+		    (                                /*    (                         */
+			(dphase[qp] * dphi[j][qp])   /*      (Point * Point) = Real  */
+			* weight[qp] * phi[i][qp]    /*      * Real * Real   = Real  */
+			-                            /*      -                       */
+			(dweight[qp] * dphase[qp])   /*      (Point * Point) = Real  */
+			* phi[i][qp] * phi[j][qp]    /*      * Real * Real   = Real  */
+			-                            /*      -                       */
+			(dphi[i][qp] * dphase[qp])   /*      (Point * Point) = Real  */
+			* weight[qp] * phi[j][qp]    /*      * Real * Real   = Real  */
+		    ) * JxW[qp];                     /*    )         * Real  = Real  */
+
+
+		// (d*Ht*H * (1 - nmut*nmu))
+		Me(i,j) +=
+		    (                                          /*    (                                  */
+			(1. - (dphase[qp] * dphase[qp]))       /*      (Real  - (Point * Point)) = Real */
+			* phi[i][qp] * phi[j][qp] * weight[qp] /*      * Real *  Real  * Real    = Real */
+		    ) * JxW[qp];                               /*    ) * Real                    = Real */
 
 	      }; // end of the matrix summation loop
 
 	}; // end of quadrature point loop
 
-      }
-
-
-      else // if(FEInterface::is_InfFE_elem(elem->type()))
-
-
-      {
-	/** 
-	 *----------------------------------------------------------------
-	 * This is a conventional finite element.  All of
-	 * the following concepts were already introduced
-	 * in previous examples.
-	 */
-	_p(is conventional finite element)
-
- 
-	fe->reinit (elem);
-
-	Ke.resize (dof_indices.size(), dof_indices.size());
-	Ce.resize (dof_indices.size(), dof_indices.size());
-	Me.resize (dof_indices.size(), dof_indices.size());
-
-	Fe.resize (dof_indices.size());
-	std::fill (Fe.begin(), Fe.end(), 0.);
-
-	/**
-	 * The class for conventional finite elements offers
-	 * similar interface methods, but does not require to use
-	 * them.  However, for consistency, proceed as above.
-	 */
-	unsigned int max_qp = fe->n_quadrature_points();
-
-	for (unsigned int qp=0; qp<max_qp; qp++)
-	{
-	  unsigned int  n_sf = fe->n_shape_functions();
-
-	  /**
-	   * The element matrices for conventional elements are much 
-	   * less involved than for infinite elements.
-	   */
-	  for (unsigned int i=0; i<n_sf; i++)
-	    for (unsigned int j=0; j<n_sf; j++)
-	      {
-		Ke(i,j) += cJxW[qp]*(cdphi[i][qp]*cdphi[j][qp]);
-		/* No volume-based damping */
-		Me(i,j) += cJxW[qp]*(cphi[i][qp]*cphi[j][qp]);
-	      };
-
-	}; // end of quadrature point loop
-
-
-      
-        /**
-	 *----------------------------------------------------------------
-	 * Boundary conditions.  Currently, only  natural boundary
-	 * conditions on faces of finite elements are supported.
-	 */
-        {
-
-	  /**
-	   * See previous example(s) for details
-	   */
-	  for (unsigned int side=0; side<elem->n_sides(); side++)
-	    if (elem->neighbor(side) == NULL)
-	      {
-		AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
-	      
-		QGauss qface0(dim,   SECOND);
-		QGauss qface1(dim-1, SECOND);
-	      
-		fe_face->attach_quadrature_rule (&qface0);
-	      
-		/**
-		 * The value of the shape functions at the quadrature
-		 * points.
-		 */
-		const std::vector<std::vector<Real> >&  fphi = fe_face->get_phi();
-	      
-		/**
-		 * The Jacobian * Quadrature Weight at the quadrature
-		 * points on the face.
-		 */
-		const std::vector<Real>& fJxW = fe_face->get_JxW();
-	      
-		/**
-		 * The XYZ locations (in physical space) of the
-		 * quadrature points on the face.  This is where
-		 * we will interpolate the boundary value function.
-		 */
-		//const std::vector<Point >& qface_point = fe_face->get_xyz();
-	      
-		/**
-		 * Compute the shape function values on the element
-		 * face.
-		 */
-		fe_face->reinit(&qface1, elem, side);
-	      
-		/**
-		 * Loop over the face quagrature points for integration.
-		 */
-		for (unsigned int qp=0; qp<qface0.n_points(); qp++)
-		  {
-		    /**
-		     * The location on the boundary of the current
-		     * face quadrature point.
-		     */
- 		    //const Real xf = qface_point[qp](0);
- 		    //const Real yf = qface_point[qp](1);
- 		    //const Real zf = qface_point[qp](2);
-		  
-		    /**
-		     * The boundary value.
-		     */
-		    const Real value = 1.;
-		  		  
-		    /**
-		     * Right-hand-side contribution.
-		     */
-		    for (unsigned int i=0; i<fphi.size(); i++)
-		      {
-		        Fe[i] += fJxW[qp]*value*fphi[i][qp];
-		      };
-		  
-		}; // end face quadrature point loop	  
-
-
-		es("Wave").rhs.add_vector    (Fe, dof_indices);
-
-	      }; // end if (elem->neighbor(side) == NULL)
-
-	}; // end boundary condition section	     
-
-      }; // end of if(FEInterface::is_InfFE_elem(elem->type()))
-
-
-
-      
+          
       /**
        *----------------------------------------------------------------
-       * The element matrix and right-hand-side are now built
-       * for this element.  Add them to the global matrix and
-       * right-hand-side vector.  The \p PetscMatrix::add_matrix()
-       * and \p PetscVector::add_vector() members do this for us.
+       * The element matrices are now built for this element.  
+       * Collect them in Ke, and then add them to the global matrix.  
+       * The \p PetscMatrix::add_matrix() member does this for us.
        */
+      //Ke.print();
+
+// Doesn't make sense!
+      Ke.add(1., Ce);
+      Ke.add(1., Me);
       es("Wave").matrix.add_matrix (Ke, dof_indices);
+
       
     }; // end of element loop
+
+  _p(Finished element loop);
 
   
 #else
@@ -697,8 +726,6 @@ void assemble_wave(EquationSystems& es,
    * All done!
    */
   return;
-
-  _p(assemble_wave finished)
 
 };
 

@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.7 2003-02-07 18:07:45 ddreyer Exp $
+// $Id: fe_base.h,v 1.8 2003-02-09 22:47:17 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -192,24 +192,41 @@ public:
 #ifdef ENABLE_INFINITE_ELEMENTS
 
   /**
-   * @returns the global first derivative of the phase term in
-   * infinite elements, evaluated at the quadrature points.
-   * To be implemented in derived classes.
+   * @returns the global first derivative of the phase term 
+   * which is used in infinite elements, evaluated at the 
+   * quadrature points.  
+   *
+   * In case of the general finite element class \p FE this 
+   * field is initialized to all zero, so that the variational 
+   * formulation for an @e infinite element returns correct element 
+   * matrices for a mesh using both finite and infinite elements.
    */
-  virtual const std::vector<Point>& get_dphase() const = 0;
+  const std::vector<Point>& get_dphase() const
+      { return dphase; };
+
 
   /**
    * @returns the multiplicative weight at each quadrature point.
-   * To be implemented in derived classes.
+   * This weight is used for certain infinite element weak 
+   * formulations, so that @e weighted Sobolev spaces are
+   * used for the trial function space.  This renders the
+   * variational form easily computable. 
+   *
+   * In case of the general finite element class \p FE this 
+   * field is initialized to all ones, so that the variational 
+   * formulation for an @e infinite element returns correct element 
+   * matrices for a mesh using both finite and infinite elements.
    */
-  virtual const std::vector<Real>& get_Sobolev_weight() const = 0;
+  const std::vector<Real>& get_Sobolev_weight() const
+      { return weight; };
 
   /**
    * @returns the first global derivative of the multiplicative 
-   * weight at each quadrature point.  To be implemented in 
-   * derived classes.
+   * weight at each quadrature point. See \p get_Sobolev_weight()
+   * for details.  In case of \p FE initialized to all zero.
    */
-  virtual const std::vector<Point>& get_Sobolev_dweight() const = 0;
+  const std::vector<Point>& get_Sobolev_dweight() const
+      { return dweight; };
 
 #endif
 
@@ -579,6 +596,40 @@ protected:
    * d(psi)/d(eta).
    */
   std::vector<std::vector<Real> >   dpsideta_map;
+
+
+
+
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+  //--------------------------------------------------------------
+  /* protected members for infinite elements, which are accessed 
+   * from the outside through some inline functions
+   */
+
+
+  /**
+   * Used for certain @e infinite element families:
+   * the first derivatives of the phase term in global coordinates,
+   * over @e all quadrature points.
+   */
+  std::vector<Point> dphase;
+
+  /**
+   * Used for certain @e infinite element families:
+   * the global derivative of the additional radial weight \f$ 1/{r^2} \f$,
+   * over @e all quadrature points.
+   */
+  std::vector<Point> dweight;
+
+  /**
+   * Used for certain @e infinite element families:
+   * the additional radial weight \f$ 1/{r^2} \f$ in local coordinates,
+   * over @e all quadrature points.
+   */
+  std::vector<Real>  weight;
+
+#endif
 
 
 

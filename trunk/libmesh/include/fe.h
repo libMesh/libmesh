@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.9 2003-02-06 17:13:33 benkirk Exp $
+// $Id: fe.h,v 1.10 2003-02-09 22:47:17 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -47,7 +47,7 @@
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.9 $
+ * \version $Revision: 1.10 $
  */
 
 //-------------------------------------------------------------
@@ -197,40 +197,6 @@ public:
     
 #ifdef ENABLE_INFINITE_ELEMENTS
 
-  /**
-   * Do not use this method for conventional finite elements!
-   * Check the infinite element class for details.
-   */
-  const std::vector<Point>& get_dphase() const
-  { std::cout << "ERROR: Do not use this with FE<Dim,T>!" 
-	      << std::endl;
-    error();
-    return xyz;
-  };
-
-  /**
-   * Do not use this method for conventional finite elements!
-   * Check the infinite element class for details.
-   */
-  const std::vector<Real>& get_Sobolev_weight() const
-  { std::cout << "ERROR: Do not use this with FE<Dim,T>!" 
-	      << std::endl;
-    error();
-    return JxW;
-  };
-
-  /**
-   * Do not use this method for conventional finite elements!
-   * Check the infinite element class for details.
-   */
-  const std::vector<Point>& get_Sobolev_dweight() const
-  { std::cout << "ERROR: Do not use this with FE<Dim,T>!" 
-	      << std::endl;
-    error();
-    return xyz;
-  };
-
-
 
 protected:
 
@@ -302,7 +268,7 @@ private:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.9 $
+ * \version $Revision: 1.10 $
  */
 
 //-------------------------------------------------------------
@@ -327,7 +293,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.9 $
+ * \version $Revision: 1.10 $
  */
 
 //-------------------------------------------------------------
@@ -352,7 +318,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.9 $
+ * \version $Revision: 1.10 $
  */
 
 //-------------------------------------------------------------

@@ -53,25 +53,31 @@ distclean:
 
 
 
-run_print_line:
+Example%:
 	@echo ""
-	@echo "********************************************************************************"
-	@echo "* FINISHED RUNNING EXAMPLE, PROCEED TO THE NEXT                                *"
-	@echo "********************************************************************************"
+	@echo "----------------------------------------------"
+	@echo "---- Finished running $(MAKECMDGOALS). Proceed  -----"
+	@echo "----------------------------------------------"
 	@echo ""
 
 
 #
 # Run the example programs to see if shared lib's get properly loaded
-run: examples
+run: $(wildcard examples/ex?/ex?.C)
 	@$(MAKE) -C ex1 $(MAKECMDGOALS)
-	@$(MAKE) run_print_line
+	@$(MAKE) Example1
 	@$(MAKE) -C ex2 $(MAKECMDGOALS)
-	@$(MAKE) run_print_line
+	@$(MAKE) Example2
 	@$(MAKE) -C ex3 $(MAKECMDGOALS)
-	@$(MAKE) run_print_line
+	@$(MAKE) Example3
 	@$(MAKE) -C ex4 $(MAKECMDGOALS)
-	@$(MAKE) run_print_line
+	@$(MAKE) Example4
 	@$(MAKE) -C ex5 $(MAKECMDGOALS)
-	@$(MAKE) run_print_line
+	@$(MAKE) Example5
 	@$(MAKE) -C ex7 $(MAKECMDGOALS)
+	@echo ""
+	@echo "----------------------------------------------"
+	@echo "--------- Finished running Example7. ---------
+	@echo "----------------------------------------------"
+	@echo ""
+

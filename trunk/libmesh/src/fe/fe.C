@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.8 2003-02-07 04:00:39 jwpeterson Exp $
+// $Id: fe.C,v 1.9 2003-02-09 22:47:17 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -156,7 +156,30 @@ void FE<Dim,T>::init_shape_functions(const QBase* qrule,
   };
 
 
-  
+      
+#ifdef ENABLE_INFINITE_ELEMENTS
+  //------------------------------------------------------------
+  // Initialize the data fields, which should only be used for infinite 
+  // elements, to some sensible values, so that using a FE with the
+  // variational formulation of an InfFE, correct element matrices are
+  // returned
+
+ {
+    weight.resize  (n_qp);
+    dweight.resize (n_qp);
+    dphase.resize  (n_qp);
+    
+    for (unsigned int p=0; p<n_qp; p++)
+      {
+        weight[p] = 1.;
+	dweight[p].clear();
+	dphase[p].clear();
+      };
+
+ }
+#endif // ifdef ENABLE_INFINITE_ELEMENTS
+
+
   
   switch (Dim)
     {
