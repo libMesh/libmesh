@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.4 2004-04-18 00:51:50 jwpeterson Exp $
+// $Id: equation_systems.h,v 1.5 2004-04-25 05:43:33 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -30,16 +30,13 @@
 
 // Local Includes
 #include "libmesh_common.h"
+#include "system.h"
 #include "mesh.h"
 #include "data_map.h"
 #include "enum_xdr_mode.h"
 
-// Forward Declarations
-class System;
-
 // HP aCC needs these for some reason
 #ifdef __HP_aCC
-# include "system.h"
 # include "frequency_system.h"
 # include "transient_system.h"
 # include "newmark_system.h"
