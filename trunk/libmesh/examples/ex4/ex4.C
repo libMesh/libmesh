@@ -1,4 +1,4 @@
-// $Id: ex4.C,v 1.3 2003-02-06 05:41:14 ddreyer Exp $
+// $Id: ex4.C,v 1.4 2003-02-06 17:13:32 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -127,7 +127,7 @@ int main (int argc, char** argv)
     /**
      * Check for proper usage.
      */
-    if (argc != 3)
+    if (argc < 3)
       {
 	std::cerr << "Usage: " << argv[0] << " -d 2"
 		  << std::endl;

@@ -1,4 +1,4 @@
-// $Id: inf_fe.C,v 1.8 2003-02-06 05:41:15 ddreyer Exp $
+// $Id: inf_fe.C,v 1.9 2003-02-06 17:13:37 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -287,12 +287,29 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
   // Number of base shape functions used to construct the map
   // (Lagrange shape functions are used for mapping in the base)
   unsigned int n_base_mapping_shape_functions;
-  if (Dim > 1)
-    n_base_mapping_shape_functions = FE<Dim-1,LAGRANGE>::n_shape_functions (base_mapping_elem_type,
-									    base_mapping_order);
-  else
-    n_base_mapping_shape_functions = 1;
 
+  // Note that the test used to be
+  //if (Dim > 1)
+  //  n_base_mapping_shape_functions = FE<1,LAGRANGE>::n_shape_functions (base_mapping_elem_type,
+  //									base_mapping_order);
+  //else
+  //  n_base_mapping_shape_functions = 1;
+  //
+  // But that causes some compilers (icc 7.0, in particular) to complain.  Specifically,
+  // it doesn't do the if-test at instantiation time, and there are undefined references
+  // to FE<0,0> at link time.  Instead use the following (more redundant :-( ) test.  
+  if (Dim == 1)
+    n_base_mapping_shape_functions = 1;
+  
+  else if (Dim == 2)
+    n_base_mapping_shape_functions = FE<1,LAGRANGE>::n_shape_functions (base_mapping_elem_type,
+									base_mapping_order);
+  else if (Dim == 3)
+    n_base_mapping_shape_functions = FE<2,LAGRANGE>::n_shape_functions (base_mapping_elem_type,
+									base_mapping_order);
+  else
+    error();
+  
 
   // Note that Radial::n_mapping_shape_functions() is independent of the
   // element type

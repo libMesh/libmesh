@@ -1,4 +1,4 @@
-// $Id: fe_boundary.C,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: fe_boundary.C,v 1.7 2003-02-06 17:13:36 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -97,7 +97,7 @@ void FE<Dim,T>::reinit(QBase* qside,
   assert (qrule->n_points() == qside->n_points());
   
   
-  // Compute the Jacobian on the face for integration
+  // Compute the Jacobian*Weight on the face for integration
   {
     elem_type = side->type();
     init_shape_functions (qside, elem, s);
@@ -251,7 +251,6 @@ void FEBase::compute_map(const QBase* qrule,
 	    xyz.resize(n_qp);
 	    dxyzdxi_map.resize(n_qp);
 	    
-	    jac.resize(n_qp);
 	    JxW.resize(n_qp);
 	  }
 	  
@@ -275,12 +274,12 @@ void FEBase::compute_map(const QBase* qrule,
 	  for (unsigned int p=0; p<n_qp; p++)
 	    {
 	      
-	      jac[p] = sqrt(dxdxi_map(p)*dxdxi_map(p) +
-			    dydxi_map(p)*dydxi_map(p));
+	      const Real jac = sqrt(dxdxi_map(p)*dxdxi_map(p) +
+				    dydxi_map(p)*dydxi_map(p));
 	      
-	      assert (jac[p] > 0.);
+	      assert (jac > 0.);
 	      
-	      JxW[p] = jac[p]*qw[p];
+	      JxW[p] = jac*qw[p];
 	    };
 	};
 	// done computing the map
@@ -308,7 +307,6 @@ void FEBase::compute_map(const QBase* qrule,
 	    dxyzdxi_map.resize(n_qp);
 	    dxyzdeta_map.resize(n_qp);
       
-	    jac.resize(n_qp);
 	    JxW.resize(n_qp);
 	  }
     
@@ -351,11 +349,11 @@ void FEBase::compute_map(const QBase* qrule,
 				dzdeta_map(p)*dzdeta_map(p));
 	
 	
-	      jac[p] = sqrt(g11*g22 - g12*g21);
+	      const Real jac = sqrt(g11*g22 - g12*g21);
 	
-	      assert (jac[p] > 0.);
+	      assert (jac > 0.);
 
-	      JxW[p] = jac[p]*qw[p];
+	      JxW[p] = jac*qw[p];
 	    };
 	};
 	// done computing the map

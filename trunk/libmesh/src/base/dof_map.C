@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.7 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: dof_map.C,v 1.8 2003-02-06 17:13:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -149,9 +149,6 @@ void DofMap::reinit()
 		  if (dofs_per_node > current_size)
 		    {
 		      _node_dofs[c][global_node].resize(dofs_per_node);
-		      
-// 		      for (unsigned int i=0; i<dofs_per_node; i++)
-// 			_node_dofs[c][global_node][i] = invalid_number;
 
 		      std::fill(_node_dofs[c][global_node].begin(),
 				_node_dofs[c][global_node].end(),
@@ -171,9 +168,6 @@ void DofMap::reinit()
 		if (dofs_per_elem > current_size)
 		  {
 		    _elem_dofs[c][e].resize(dofs_per_elem);
-		    
-// 		    for (unsigned int i=0; i<dofs_per_elem; i++)
-// 		      _elem_dofs[c][e][i] = invalid_number;
 
 		    std::fill(_elem_dofs[c][e].begin(),
 			      _elem_dofs[c][e].end(),
@@ -190,12 +184,6 @@ void DofMap::reinit()
   // invalid_number
   _node_id_map.resize(_n_nodes*n_components());
 
-  // Original Code
-  // for (unsigned int i=0; i<_node_id_map.size(); i++)
-  //     _node_id_map[i] = invalid_number;
-
-
-  // New code 
   std::fill(_node_id_map.begin(),
 	    _node_id_map.end(),
 	    invalid_number);
@@ -206,13 +194,7 @@ void DofMap::reinit()
   // initialize the _elem_id_map, each entry should get assigned
   // invalid_number
   _elem_id_map.resize(_n_elem*n_components());
-
-  // Original Code
-  // for (unsigned int i=0; i<_elem_id_map.size(); i++)
-  //     _elem_id_map[i] = invalid_number;
-
-
-  // New code 
+  
   std::fill(_elem_id_map.begin(),
 	    _elem_id_map.end(),
 	    invalid_number);
@@ -625,6 +607,9 @@ void DofMap::create_dof_constraints()
   perf_log.start_event("create_dof_constraints()");
 
 
+  // Constraints are not necessary in 1D
+  if (_dim == 1)
+    return;
   
   // Here we build the hanging node constraints.  This is done
   // by enforcing the condition u_a = u_b along hanging sides.
@@ -643,10 +628,17 @@ void DofMap::create_dof_constraints()
 	  if (_mesh.elem(e)->neighbor(s)->level() < _mesh.elem(e)->level()) // constrain dofs shared between
 	    {                                                               // this element and ones coarser
 	                                                                    // than this element.
-	      // Get pointers to the two elements of interest.  
-	      const AutoPtr<Elem> my_side(_mesh.elem(e)->build_side(s));
+	      // Get pointers to the elements of interest and its parent.
+	      const Elem* elem   = _mesh.elem(e);
+	      const Elem* parent = elem->parent();
+
+	      // This can't happen...  Only level-0 elements have NULL
+	      // parents, and no level-0 elements can be at a higher
+	      // level than their neighbors!
+	      assert (parent != NULL);
 	      
-	      const Elem* neighbor(_mesh.elem(e)->neighbor(s));
+	      const AutoPtr<Elem> my_side     (elem->build_side(s));
+	      const AutoPtr<Elem> parent_side (parent->build_side(s));
 
 	      // Look at all the components in the system
 	      for (unsigned int component=0; component<n_components();
@@ -664,32 +656,35 @@ void DofMap::create_dof_constraints()
 		      const unsigned int my_node_g = my_side->node(my_dof);
 		      const unsigned int my_dof_g  = node_dof_number(my_node_g, component);
 
-		      // Figure out where my node lies on their reference element.
-		      const Point mapped_point = FEInterface::inverse_map(_dim, fe_type,
-									  neighbor,
-									  _mesh.point(my_node_g));
+		      // The support point of the DOF
+		      const Point& support_point = my_side->point(my_dof);
 
-		      // Compute the neighbor shape function values.
+		      // Figure out where my node lies on their reference element.
+		      const Point mapped_point = FEInterface::inverse_map(_dim-1, fe_type,
+									  parent_side.get(),
+									  support_point);
+
+		      // Compute the parent's side shape function values.
 		      for (unsigned int their_dof=0;
-			   their_dof<FEInterface::n_dofs(_dim, fe_type, neighbor->type());
+			   their_dof<FEInterface::n_dofs(_dim-1, fe_type, parent_side->type());
 			   their_dof++)
 			{
-			  assert (their_dof < neighbor->n_nodes());
+			  assert (their_dof < parent_side->n_nodes());
 			  
 			  // Their global node and dof indices.
-			  const unsigned int their_node_g = neighbor->node(their_dof);
+			  const unsigned int their_node_g = parent_side->node(their_dof);
 			  const unsigned int their_dof_g  = node_dof_number(their_node_g, component);
 
-			  const Real their_dof_value = FEInterface::shape(_dim,
+			  const Real their_dof_value = FEInterface::shape(_dim-1,
 									  fe_type,
-									  neighbor->type(),
+									  parent_side->type(),
 									  their_dof,
 									  mapped_point);
 
 			  // Only add non-zero and non-identity values
 			  // for Lagrange basis functions.
 			  if ((fabs(their_dof_value) > 1.e-5) &&
-			      (fabs(their_dof_value) < .999))
+			      (fabs(their_dof_value) < .999)) 
 			    {
 			      // A reference to the constraint row.
 			      DofConstraintRow& constraint_row = _dof_constraints[my_dof_g];

@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.8 2003-02-06 05:41:14 ddreyer Exp $
+// $Id: fe.h,v 1.9 2003-02-06 17:13:33 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -47,7 +47,7 @@
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.8 $
+ * \version $Revision: 1.9 $
  */
 
 //-------------------------------------------------------------
@@ -154,10 +154,14 @@ public:
    * @returns the location (on the reference element) of the
    * point \p p located in physical space.  This function requires
    * inverting the (possibly nonlinear) transformation map, so
-   * it is not trivial.
+   * it is not trivial. The optional parameter \p tolerance defines
+   * how close is "good enough."  The map inversion iteration
+   * computes the sequence \f$ \{ p_n \} \f$, and the iteration is
+   * terminated when \f$ \|p - p_n\| < \mbox{\texttt{tolerance}} \f$
    */
   static Point inverse_map (const Elem* elem,
-			    const Point& p);
+			    const Point& p,
+			    const Real tolerance = 1.e-6);
   
   /**
    * This is at the core of this class. Use this for each
@@ -298,7 +302,7 @@ private:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.8 $
+ * \version $Revision: 1.9 $
  */
 
 //-------------------------------------------------------------
@@ -323,7 +327,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.8 $
+ * \version $Revision: 1.9 $
  */
 
 //-------------------------------------------------------------
@@ -348,7 +352,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.8 $
+ * \version $Revision: 1.9 $
  */
 
 //-------------------------------------------------------------

@@ -1,4 +1,4 @@
-// $Id: fe_interface.h,v 1.7 2003-02-05 20:51:36 ddreyer Exp $
+// $Id: fe_interface.h,v 1.8 2003-02-06 17:13:34 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -125,12 +125,16 @@ public:
    * @returns the location (on the reference element) of the
    * point \p p located in physical space.  This function requires
    * inverting the (probably nonlinear) transformation map, so
-   * it is not trivial.
+   * it is not trivial. The optional parameter \p tolerance defines
+   * how close is "good enough."  The map inversion iteration
+   * computes the sequence \f$ \{ p_n \} \f$, and the iteration is
+   * terminated when \f$ \|\|p - p_n\|\| < \mbox{\texttt{tolerance}} \f$
    */
   static Point inverse_map (const unsigned int dim,
 			    const FEType& fe_t,
 			    const Elem* elem,
-			    const Point& p);
+			    const Point& p,
+			    const Real tolerance = 1.e-6);
 
   /**
    * @returns true if the point p is located on the reference element
@@ -226,7 +230,8 @@ private:
   static Point ifem_inverse_map (const unsigned int dim,
 				 const FEType& fe_t,
 				 const Elem* elem,
-				 const Point& p);
+				 const Point& p,
+				 const Real tolerance = 1.e-6);
 
   static bool ifem_on_reference_element(const Point& p,
 					const ElemType t,

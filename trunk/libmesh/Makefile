@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.10 2003-02-04 16:29:49 benkirk Exp $
+# $Id: Makefile,v 1.11 2003-02-06 17:13:31 benkirk Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -150,10 +150,10 @@ read_dat: $(mesh_library) src/apps/read_dat.cc
 	$(CXX) $(CXXFLAGS) $(INCLUDE) src/apps/read_dat.cc -o bin/$@ $(LIBS) $(LDFLAGS)
 
 #
-# foo
+# test amr utility program
 #
-foo: $(mesh_library) src/apps/foo.cc
-	$(CXX) $(CXXFLAGS) $(INCLUDE) src/apps/foo.cc -o bin/$@ $(LIBS) $(LDFLAGS)
+amr: $(mesh_library) src/apps/amr.cc
+	$(CXX) $(CXXFLAGS) $(INCLUDE) src/apps/amr.cc -o bin/$@ $(LIBS) $(LDFLAGS)
 
 
 #
