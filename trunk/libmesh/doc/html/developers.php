@@ -85,7 +85,7 @@ dev_table_entry("images/dreyer.jpg",
 dev_table_entry("images/hvdheijden.jpg",
 		"Hendrik van der Heijden",
 		"http://www.tu-harburg.de",
-		"PhD Student, libMesh Developer",
+		"Student, libMesh Developer",
 		"<a href=\"http://www.tu-harburg.de\">Technical University Hamburg-Harburg</a>");
 ?>
 
@@ -93,7 +93,7 @@ dev_table_entry("images/hvdheijden.jpg",
 dev_table_entry("images/fprill.jpg",
 		"Florian Prill",
 		"http://www.tu-harburg.de",
-		"PhD Student, libMesh Developer",
+		"Student, libMesh Developer",
 		"<a href=\"http://www.tu-harburg.de\">Technical University Hamburg-Harburg</a>");
 ?>
 
