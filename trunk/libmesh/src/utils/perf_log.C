@@ -1,4 +1,4 @@
-// $Id: perf_log.C,v 1.13 2003-03-22 21:04:31 ddreyer Exp $
+// $Id: perf_log.C,v 1.14 2003-03-23 02:47:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -217,7 +217,7 @@ std::string PerfLog::get_perf_info() const
 		      
 		      out << "| ";
 		      out.left(75, pos->first.first);
-		      out.right(75, "|");
+		      out << "|";
 		      out << std::endl;
 		    }
 

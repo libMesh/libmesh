@@ -1223,7 +1223,7 @@ Matrix *Transp_M(Matrix *M)
     printf("ERROR: Transpose of a complex matrix not implemented.\n");
     abort();
 
-    Matrix *MRes;
+    Matrix *MRes = NULL;
     return(MRes);
 #else
     Matrix *MRes;
