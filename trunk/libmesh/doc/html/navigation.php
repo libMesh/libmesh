@@ -28,7 +28,12 @@
     <?php echo "<a class=\"L1\" href = \"", $root, "publications.php\">Publications</a><BR>"; ?>
     <?php echo "<a class=\"L1\" href = \"", $root, "developers.php\">Developers</a><BR>"; ?>
     <?php echo "<a class=\"L1\" href = \"", $root, "doxygen/index.html\">Class Docs</a><BR>"; ?>
-    <?php echo "<a class=\"L1\" href = \"", $root, "http://sourceforge.net/project/showfiles.php?group_id=71130\">Download</a><BR>" ?>
+    <?php echo "<a class=\"L1\" href = \"", $root, "download.php\">Download</a><BR>" ?>
+    <?php if ($mode=="download") { ?>
+    <?php echo "<a class=\"L2\" href = \"", $root, "http://sourceforge.net/project/showfiles.php?group_id=71130\" title=\"Source Files\">Source Files</a><BR>"; ?>
+    <?php echo "<a class=\"L2\" href = \"", $root, "installation.php\" title=\"Installation\">Installation</a><BR>"; ?>
+    <?php } ?>
+	
     <?php echo "<a class=\"L1\" href = \"", $root, "http://sourceforge.net/mail/?group_id=71130\">Mailing Lists</a><BR>" ?>
 </div>
 <?php } ?>
