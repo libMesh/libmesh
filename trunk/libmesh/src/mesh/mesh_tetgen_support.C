@@ -1,4 +1,4 @@
-// $Id: mesh_tetgen_support.C,v 1.10 2004-08-05 14:44:15 jwpeterson Exp $
+// $Id: mesh_tetgen_support.C,v 1.11 2004-10-28 19:09:27 benkirk Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -40,12 +40,12 @@
 
 //----------------------------------------------------------------------
 // TetGenMeshInterface class members
-TetGenMeshInterface::TetGenMeshInterface (Mesh& mesh) :
+TetGenMeshInterface::TetGenMeshInterface (Mesh& mesh, MeshData& data) :
   _nodes        (mesh._nodes),
   _elements     (mesh._elements),
   _num_nodes    (0),
   _num_elements (0),
-  _mesh_data    (mesh.data)
+  _mesh_data    (data)
 {
 }
 

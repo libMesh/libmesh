@@ -1,4 +1,4 @@
-// $Id: petsc_interface.h,v 1.7 2004-10-19 17:11:55 jwpeterson Exp $
+// $Id: petsc_interface.h,v 1.8 2004-10-28 19:09:22 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -129,8 +129,8 @@ public:
    * you to specify the PCShellSetApply() and PCShellSetSetUp() functions
    * if you desire.  Just don't do anything crazy like calling PCDestroy()!
    */
-  const PC pc() { this->init(); return _pc; }
-
+  PC pc() { this->init(); return _pc; }
+  
   /**
    * Fills the input vector with the sequence of residual norms
    * from the latest iterative solve.
