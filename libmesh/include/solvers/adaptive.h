@@ -1,4 +1,4 @@
-// $Id: adaptive.h,v 1.1 2004-01-03 15:37:42 benkirk Exp $
+// $Id: adaptive.h,v 1.2 2004-01-17 22:56:53 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -86,7 +86,17 @@ public:
    */
   unsigned int & n_refinement_steps () { return _n_refinement_steps; }  
 
+  /**
+   * @returns the maximum level for mesh refinement.
+   */
+  unsigned int max_refinement_level () const { return _max_refinement_level; }
 
+  /**
+   * Sets the maximum level for mesh refinement.
+   */
+  unsigned int & max_refinement_level () { return _max_refinement_level; }
+  
+  
 protected:
 
   
@@ -108,6 +118,11 @@ private:
    * The number of refinement steps to take.
    */
   unsigned int _n_refinement_steps;
+
+  /**
+   * The maximum allowable levels of refinement.
+   */
+  unsigned int _max_refinement_level;
 };
 
 
@@ -116,9 +131,10 @@ private:
 // Adaptive inline members
 template <class T>
 Adaptive<T>::Adaptive (EquationSystems& es) :
-  T                   (es), // Call the base class constructor
-  _refinement_step    (0),  // Solver parameters
-  _n_refinement_steps (1)     
+  T                    (es), // Call the base class constructor
+  _refinement_step     (0),  // Solver parameters
+  _n_refinement_steps  (1),
+  _max_refinement_level(100)
 {
 }
 
@@ -159,14 +175,14 @@ void Adaptive<T>::solve ()
 	
 	ErrorEstimator error_estimator;
 	
-	error_estimator.flux_jump (this->system(), "Poisson", error);
+	error_estimator.flux_jump (this->system(), "incomp_ns", error);
 	
 	MeshRefinement mesh_refinement (this->mesh());
 	
 	mesh_refinement.flag_elements_by_error_fraction (error,
-							 0.80,
-							 0.07,
-							 100);
+							 0.40,
+							 0.40,
+							 this->max_refinement_level());
 	
 	mesh_refinement.refine_and_coarsen_elements ();
 

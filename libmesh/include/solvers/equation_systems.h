@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.1 2004-01-03 15:37:42 benkirk Exp $
+// $Id: equation_systems.h,v 1.2 2004-01-17 22:56:53 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -167,7 +167,7 @@ public:
    * systems array.
    */
   System & add_system (const std::string& system_type,
-		      const std::string& name);
+		       const std::string& name);
   
   /**
    * Add the system named \p name to the systems array.

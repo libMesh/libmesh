@@ -1,4 +1,4 @@
-// $Id: linear.h,v 1.1 2004-01-03 15:37:42 benkirk Exp $
+// $Id: linear.h,v 1.2 2004-01-17 22:56:54 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -68,6 +68,7 @@ public:
 // ------------------------------------------------------------
 // Linear inline members
 template <class T>
+inline
 Linear<T>::Linear(EquationSystems& es) : 
   T (es)
 {
@@ -76,6 +77,7 @@ Linear<T>::Linear(EquationSystems& es) :
 
 
 template <class T>
+inline
 Linear<T>::Linear (EquationSystems& es,
 		   const std::string& name,
 		   const unsigned int number) :
@@ -86,6 +88,7 @@ Linear<T>::Linear (EquationSystems& es,
 
 
 template <class T>
+inline
 Linear<T>::~Linear ()
 {
 }
