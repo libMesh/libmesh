@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.16 2003-02-15 05:21:13 benkirk Exp $
+// $Id: equation_systems.C,v 1.17 2003-02-17 01:23:01 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -536,14 +536,14 @@ std::string EquationSystems::get_info () const
       out << "    Finite Element Types=";
       for (unsigned int vn=0; vn<system.n_vars(); vn++)
       {
-	out << "\"" << system.get_dof_map().component_type(vn).family << "\", ";
-	out << "\"" << system.get_dof_map().component_type(vn).radial_family << "\" ";
+	out << "\"" << system.get_dof_map().variable_type(vn).family << "\", ";
+	out << "\"" << system.get_dof_map().variable_type(vn).radial_family << "\" ";
       }
 
       out << std::endl << "    Infinite Element Mapping=";
       for (unsigned int vn=0; vn<system.n_vars(); vn++)
       {
-	out << "\"" << system.get_dof_map().component_type(vn).inf_map << "\" ";
+	out << "\"" << system.get_dof_map().variable_type(vn).inf_map << "\" ";
       }
 #endif      
 
@@ -553,10 +553,10 @@ std::string EquationSystems::get_info () const
       for (unsigned int vn=0; vn<system.n_vars(); vn++)
       {
 #ifndef ENABLE_INFINITE_ELEMENTS
-	out << "\"" << system.get_dof_map().component_type(vn).order << "\" ";
+	out << "\"" << system.get_dof_map().variable_type(vn).order << "\" ";
 #else
-	out << "\"" << system.get_dof_map().component_type(vn).order << "\", ";
-	out << "\"" << system.get_dof_map().component_type(vn).radial_order << "\" ";
+	out << "\"" << system.get_dof_map().variable_type(vn).order << "\", ";
+	out << "\"" << system.get_dof_map().variable_type(vn).radial_order << "\" ";
 #endif
       }
 

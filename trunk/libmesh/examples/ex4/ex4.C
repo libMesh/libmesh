@@ -1,4 +1,4 @@
-// $Id: ex4.C,v 1.10 2003-02-14 15:22:33 benkirk Exp $
+// $Id: ex4.C,v 1.11 2003-02-17 01:23:01 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -51,7 +51,12 @@
  */
 #include "dof_map.h"
 
-
+/**
+ * Define the PerfLog, a performance logging utility.
+ * It is useful for timing events in a code and giving
+ * you an idea where bottlenecks lie.
+ */
+#include "perf_log.h"
 
 
 
@@ -66,6 +71,11 @@
  * the code in a dimension-independent way.  Very minor
  * changes to the example will allow the problem to be
  * solved in two or three dimensions.
+ *
+ * This example will also introduce the \p PerfLog class
+ * as a way to monitor your code's performance.  We will
+ * use it to instrument the matrix assembly code and look
+ * for bottlenecks where we should focus optimization efforts.
  */
 
 
@@ -159,11 +169,11 @@ int main (int argc, char** argv)
     /**
      * Use the internal mesh generator to create a uniform
      * grid on the square [-1,1]^D.  We instruct the mesh generator
-     * to build a mesh of 5x5 \p Quad9 elements in 2D, or \p Hex27
+     * to build a mesh of 8x8 \p Quad9 elements in 2D, or \p Hex27
      * elements in 3D.  Building these higher-order elements allows
      * us to use higher-order approximation, as in example 3.
      */
-    mesh.build_cube (5, 5, 5,
+    mesh.build_cube (15, 15, 15,
 		     -1., 1.,
 		     -1., 1.,
 		     -1., 1.,
@@ -251,6 +261,14 @@ void assemble_poisson(EquationSystems& es,
   assert (system_name == "Poisson");
 
   /**
+   * Declare a performance log.  Give it a descriptive
+   * string to identify what part of the code we are
+   * logging, since there may be many PerfLogs in an
+   * application.
+   */
+  PerfLog perf_log ("Matrix Assembly");
+  
+  /**
    * Get a constant reference to the mesh object.
    */
   const Mesh& mesh = es.get_mesh();
@@ -264,7 +282,7 @@ void assemble_poisson(EquationSystems& es,
    * Get a constant reference to the Finite Element type
    * for the first (and only) variable in the system.
    */
-  FEType fe_type = es("Poisson").get_dof_map().component_type(0);
+  FEType fe_type = es("Poisson").get_dof_map().variable_type(0);
 
   /**
    * Build a Finite Element object of the specified type.  Since the
@@ -352,6 +370,13 @@ void assemble_poisson(EquationSystems& es,
   for (unsigned int e=0; e<mesh.n_elem(); e++)
     {
       /**
+       * Start logging the shape function initialization.
+       * This is done through a simple function call with
+       * the name of the event to log.
+       */
+      perf_log.start_event("elem init");      
+      
+      /**
        * Store a pointer to the element we are currently
        * working on.  This allows for nicer syntax later.
        */
@@ -393,68 +418,92 @@ void assemble_poisson(EquationSystems& es,
 
       std::fill (Fe.begin(), Fe.end(), 0.);
 
+      /**
+       * Stop logging the shape function initialization.
+       * If you forget to stop logging an event the PerfLog
+       * object will probably catch the error and abort.
+       */
+      perf_log.stop_event("elem init");      
 
+
+      
+      /**
+       * Now we will build the element matrix.  This involves
+       * a double loop to integrate the test funcions (i) against
+       * the trial functions (j).
+       *
+       * We have split the numeric integration into two loops
+       * so that we can log the matrix and right-hand-side
+       * computation seperately.
+       */
+      
+      /**
+       * Start logging the matrix computation
+       */
+      perf_log.start_event ("Ke");
+      
+      for (unsigned int qp=0; qp<qrule.n_points(); qp++)
+	for (unsigned int i=0; i<phi.size(); i++)
+	  for (unsigned int j=0; j<phi.size(); j++)
+	    {
+	      Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+	    }; // end of the matrix summation loop
 
       /**
-       *----------------------------------------------------------------
-       * Now loop over the quadrature points.  This handles
-       * the numeric integration.
+       * Stop logging the matrix computation
        */
-      for (unsigned int qp=0; qp<qrule.n_points(); qp++)
-	{
-
-	  /**
-	   * Now we will build the element matrix.  This involves
-	   * a double loop to integrate the test funcions (i) against
-	   * the trial functions (j).
-	   */
-	  for (unsigned int i=0; i<phi.size(); i++)
-	    for (unsigned int j=0; j<phi.size(); j++)
-	      {
-		Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-	      }; // end of the matrix summation loop
+      perf_log.stop_event ("Ke");
 
 
-	  /**
-	   * Now we build the element right-hand-side contribution.
-	   * This involves a single loop in which we integrate the
-	   * "forcing function" in the PDE against the test functions.
-	   */
-	  for (unsigned int i=0; i<phi.size(); i++)
-	    {
-	      const Real x = q_point[qp](0);
-	      const Real y = q_point[qp](1);
-	      const Real z = q_point[qp](2);
-	      const Real eps = 1.e-3;
-
-	      /**
-	       * fxy is the forcing function for the Poisson equation.
-	       * In this case we set fxy to be a finite difference
-	       * Laplacian approximation to the (known) exact solution.
-	       *
-	       * Note that in 2D the Laplacian of u = u_xx + u_yy,
-	       * but in 3D Laplacian of u = u_xx + u_yy + u_zz
-	       */
-	      const Real uxx = (exact_solution(x-eps,y,z) +
-				exact_solution(x+eps,y,z) +
-				-2.*exact_solution(x,y,z))/eps/eps;
-	      
-	      const Real uyy = (exact_solution(x,y-eps,z) +
-				exact_solution(x,y+eps,z) +
-				-2.*exact_solution(x,y,z))/eps/eps;
-	      
-	      const Real uzz = (exact_solution(x,y,z-eps) +
-				exact_solution(x,y,z+eps) +
-				-2.*exact_solution(x,y,z))/eps/eps;
-
-	      const Real fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
-	      
-	      Fe[i] += JxW[qp]*fxy*phi[i][qp];
-	    }; // end of the RHS summation loop
+      
+      /**
+       * Now we build the element right-hand-side contribution.
+       * This involves a single loop in which we integrate the
+       * "forcing function" in the PDE against the test functions.
+       */
 	  
-	}; // end of quadrature point loop
-
-
+      /**
+       * Start logging the right-hand-side computation
+       */
+      perf_log.start_event ("Fe");
+      
+      for (unsigned int qp=0; qp<qrule.n_points(); qp++)
+	for (unsigned int i=0; i<phi.size(); i++)
+	  {
+	    const Real x = q_point[qp](0);
+	    const Real y = q_point[qp](1);
+	    const Real z = q_point[qp](2);
+	    const Real eps = 1.e-3;
+	    
+	    /**
+	     * fxy is the forcing function for the Poisson equation.
+	     * In this case we set fxy to be a finite difference
+	     * Laplacian approximation to the (known) exact solution.
+	     *
+	     * Note that in 2D the Laplacian of u = u_xx + u_yy,
+	     * but in 3D Laplacian of u = u_xx + u_yy + u_zz
+	     */
+	    const Real uxx = (exact_solution(x-eps,y,z) +
+			      exact_solution(x+eps,y,z) +
+			      -2.*exact_solution(x,y,z))/eps/eps;
+	    
+	    const Real uyy = (exact_solution(x,y-eps,z) +
+			      exact_solution(x,y+eps,z) +
+			      -2.*exact_solution(x,y,z))/eps/eps;
+	    
+	    const Real uzz = (exact_solution(x,y,z-eps) +
+			      exact_solution(x,y,z+eps) +
+			      -2.*exact_solution(x,y,z))/eps/eps;
+	    
+	    const Real fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
+	    
+	    Fe[i] += JxW[qp]*fxy*phi[i][qp];
+	  }; // end of the RHS summation loop
+	  
+      /**
+       * Stop logging the right-hand-side computation
+       */
+      perf_log.stop_event ("Fe");
 
 
       
@@ -466,8 +515,13 @@ void assemble_poisson(EquationSystems& es,
        * consider simple Dirichlet boundary conditions imposed
        * via the penalty method. This is discussed at length in
        * example 3.
-       */
+       */      
       {
+	/**
+	 * Start logging the boundary condition computation
+	 */
+	perf_log.start_event ("BCs");
+	
 	/**
 	 * The following loops over the sides of the element.
 	 * If the element has no neighbor on a side then that
@@ -565,6 +619,12 @@ void assemble_poisson(EquationSystems& es,
 		  
 		}; // end face quadrature point loop	  
 	    }; // end if (elem->neighbor(side) == NULL)
+	
+	/**
+	 * Start logging the boundary condition computation
+	 */
+	perf_log.stop_event ("BCs");
+
       }; // end boundary condition section	  
 
 
@@ -581,18 +641,35 @@ void assemble_poisson(EquationSystems& es,
        * The preprocessor test for complex numbers is explained
        * in example 5.
        */
+      
 #ifndef USE_COMPLEX_NUMBERS
 
+      /**
+       * Start logging the insertion of the local (element)
+       * matrix and vector into the global matrix and vector
+       */
+      perf_log.start_event ("matrix insertion");
+      
       es("Poisson").matrix->add_matrix (Ke, dof_indices);
       es("Poisson").rhs->add_vector    (Fe, dof_indices);
+
+      /**
+       * Start logging the insertion of the local (element)
+       * matrix and vector into the global matrix and vector
+       */
+      perf_log.stop_event ("matrix insertion");
+      
 #endif
       
     }; // end of element loop
 
 
+
   
   /**
-   * All done!
+   * That's it.  We don't need to do anything else to the
+   * PerfLog.  When it goes out of scope (at this function return)
+   * it will print its log to the screen. Pretty easy, huh?
    */
   return;
 };

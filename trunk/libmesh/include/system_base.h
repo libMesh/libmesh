@@ -1,4 +1,4 @@
-// $Id: system_base.h,v 1.4 2003-02-14 22:37:11 benkirk Exp $
+// $Id: system_base.h,v 1.5 2003-02-17 01:23:01 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -105,7 +105,7 @@ public:
   /**
    * @returns the system name.
    */
-  std::string name () const;
+  const std::string & name () const;
 
   /**
    * @returns the system number.   
@@ -177,7 +177,7 @@ public:
   /**
    * @returns the name of variable \p i.
    */
-  std::string variable_name(const unsigned int i) const;
+  const std::string & variable_name(const unsigned int i) const;
   
   /**
    * @returns the variable number assoicated with
@@ -188,12 +188,12 @@ public:
   /**
    * @returns the finite element type variable number \p i.
    */
-  FEType variable_type (const unsigned int i) const;
+  const FEType & variable_type (const unsigned int i) const;
 
   /**
    * @returns the finite element type for variable \p var.
    */
-  FEType variable_type (const std::string& var) const;
+  const FEType & variable_type (const std::string& var) const;
   
   /**
    * Data structure to hold solution values.
@@ -264,7 +264,7 @@ protected:
 // ------------------------------------------------------------
 // SystemBase inline methods
 inline
-std::string SystemBase::name() const
+const std::string & SystemBase::name() const
 {
   return _sys_name;
 }
@@ -290,7 +290,7 @@ unsigned int SystemBase::n_vars() const
 
 
 inline
-std::string SystemBase::variable_name (const unsigned int i) const
+const std::string & SystemBase::variable_name (const unsigned int i) const
 {
   assert (i < n_vars());
 
@@ -300,7 +300,7 @@ std::string SystemBase::variable_name (const unsigned int i) const
 
 
 inline
-FEType SystemBase::variable_type (const unsigned int i) const
+const FEType & SystemBase::variable_type (const unsigned int i) const
 {
   return variable_type(_var_names[i]);
 }
@@ -308,7 +308,7 @@ FEType SystemBase::variable_type (const unsigned int i) const
 
 
 inline
-FEType SystemBase::variable_type (const std::string& var) const
+const FEType & SystemBase::variable_type (const std::string& var) const
 {
   std::map<std::string, FEType>::const_iterator
     pos = _var_type.find(var);

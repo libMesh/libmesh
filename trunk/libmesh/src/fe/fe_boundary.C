@@ -1,4 +1,4 @@
-// $Id: fe_boundary.C,v 1.10 2003-02-13 22:56:09 benkirk Exp $
+// $Id: fe_boundary.C,v 1.11 2003-02-17 01:23:02 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -190,7 +190,7 @@ void FE<Dim,T>::init_shape_functions(const QBase* qrule,
 	  Point dxyzdxi_map;
 
 	  for (unsigned int i=0; i<n_mapping_shape_functions; i++)
-	    dxyzdxi_map  += side->point(i)*dpsidxi_map [i][p];
+	    dxyzdxi_map.add_scaled(side->point(i), dpsidxi_map[i][p]);
 	  
 	  const Point n(dxyzdxi_map(1), -dxyzdxi_map(0), 0.);
 	  
@@ -208,8 +208,8 @@ void FE<Dim,T>::init_shape_functions(const QBase* qrule,
 
 	  for (unsigned int i=0; i<n_mapping_shape_functions; i++)
 	    {
-	      dxyzdxi_map  += side->point(i)*dpsidxi_map [i][p];
-	      dxyzdeta_map += side->point(i)*dpsideta_map[i][p];
+	      dxyzdxi_map.add_scaled (side->point(i), dpsidxi_map[i][p]);
+	      dxyzdeta_map.add_scaled(side->point(i), dpsideta_map[i][p]);
 	    }
 	  
 	  const Point n  = dxyzdxi_map.cross(dxyzdeta_map);
@@ -259,11 +259,15 @@ void FEBase::compute_map(const QBase* qrule,
 	  
 	  // compute x, dxdxi at the quadrature points    
 	  for (unsigned int i=0; i<psi_map.size(); i++) // sum over the nodes
-	    for (unsigned int p=0; p<n_qp; p++) // for each quadrature point...
-	      {	  
-		xyz[p]         += side->point(i)*psi_map[i][p];
-		dxyzdxi_map[p] += side->point(i)*dpsidxi_map[i][p];
-	      }
+	    {
+	      const Point& side_point = side->point(i);
+	      
+	      for (unsigned int p=0; p<n_qp; p++) // for each quadrature point...
+		{	  
+		  xyz[p].add_scaled        (side_point, psi_map[i][p]);
+		  dxyzdxi_map[p].add_scaled(side_point, dpsidxi_map[i][p]);
+		}
+	    }
 	  
 	  
 	  // compute the jacobian at the quadrature points
@@ -316,12 +320,16 @@ void FEBase::compute_map(const QBase* qrule,
     
 	  // compute x, dxdxi at the quadrature points    
 	  for (unsigned int i=0; i<psi_map.size(); i++) // sum over the nodes
-	    for (unsigned int p=0; p<n_qp; p++) // for each quadrature point...
-	      {
-		xyz[p]          += side->point(i)*psi_map[i][p];
-		dxyzdxi_map[p]  += side->point(i)*dpsidxi_map[i][p];
-		dxyzdeta_map[p] += side->point(i)*dpsideta_map[i][p];
-	      }
+	    {
+	      const Point& side_point = side->point(i);
+	      
+	      for (unsigned int p=0; p<n_qp; p++) // for each quadrature point...
+		{
+		  xyz[p].add_scaled         (side_point, psi_map[i][p]);
+		  dxyzdxi_map[p].add_scaled (side_point, dpsidxi_map[i][p]);
+		  dxyzdeta_map[p].add_scaled(side_point, dpsideta_map[i][p]);
+		}
+	    }
     
     
 

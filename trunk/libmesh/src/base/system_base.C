@@ -1,4 +1,4 @@
-// $Id: system_base.C,v 1.5 2003-02-14 22:37:11 benkirk Exp $
+// $Id: system_base.C,v 1.6 2003-02-17 01:23:01 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -170,7 +170,7 @@ void SystemBase::add_variable (const std::string& var,
   _var_num[var]   = (n_vars()-1);
 
   // Add the variable to the _dof_map
-  _dof_map.add_component (type);
+  _dof_map.add_variable (type);
 }
 
 

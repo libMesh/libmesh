@@ -203,15 +203,14 @@ void assemble_primary(EquationSystems& es,
 	
   // Also use a 3x3x3 quadrature rule (3D).  Then tell the FE
   // about the geometry of the problem and the quadrature rule
-  FEType fe_type (SECOND);
   
-  AutoPtr<FEBase> fe(FEBase::build(dim, fe_type));
+  AutoPtr<FEBase> fe(FEBase::build(dim, es("primary").get_dof_map().variable_type(0)));
   QGauss qrule(dim, SEVENTH);
   //QTrap qrule(dim);
   
   fe->attach_quadrature_rule (&qrule);
   
-  AutoPtr<FEBase> fe_face(FEBase::build(dim, fe_type));
+  AutoPtr<FEBase> fe_face(FEBase::build(dim, es("primary").get_dof_map().variable_type(0)));
   QGauss   qface0(dim, FIFTH);
   //QTrap   qface0(dim);
   //QSimpson   qface0(dim);
@@ -351,14 +350,10 @@ void assemble_secondary(EquationSystems& es,
   // In this section we assemble the matrix and rhs
   PerfMon pm("Matrix Assembly (secondary)");
 
-  // The Finite Element type.
-  FEType fe_type (es("secondary").get_dof_map().component_type(0));
-  
-  AutoPtr<FEBase> fe(FEBase::build(dim, fe_type));
+  AutoPtr<FEBase> fe(FEBase::build(dim, es("secondary").get_dof_map().variable_type(0)));
   QGauss qrule(dim, FIFTH);
   
   fe->attach_quadrature_rule (&qrule);
-    
   
   // These are references to cell-specific data
   const std::vector<Real>& JxW                 = fe->get_JxW();

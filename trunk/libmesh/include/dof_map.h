@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.12 2003-02-14 22:37:10 benkirk Exp $
+// $Id: dof_map.h,v 1.13 2003-02-17 01:23:01 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -42,7 +42,7 @@ class SparseMatrix;
 
 /**
  * This class handles the numbering of degrees of freedom on a mesh.
- * For systems of equations the class supports a fixed number of components.
+ * For systems of equations the class supports a fixed number of variables.
  * The degrees of freedom are numbered such that sequential, contiguous blocks
  * correspond to distinct subdomains.  This is so that the resulting data
  * structures will work well with parallel linear algebra packages.
@@ -105,7 +105,7 @@ class DofMap
 
   /**
    * Returns a constant reference to the \p _send_list for this processor.  The
-   * \p _send_list contains the global indices of all the components in the
+   * \p _send_list contains the global indices of all the variables in the
    * global solution vector that influence the current processor.  This
    * information can be used for gathers at each solution step to retrieve
    * solution values needed for computation.
@@ -132,28 +132,28 @@ class DofMap
    * Add an unknown of order \p order and finite element type
    * \p type to the system of equations.
    */
-  void add_component (const FEType& type)
-  { _component_types.push_back (type); }
+  void add_variable (const FEType& type)
+  { _variable_types.push_back (type); }
   
   /**
-   * @returns the approximation order for component \p c.
+   * @returns the approximation order for variable \p c.
    */
-  Order component_order (const unsigned int c) const
-  { return _component_types[c].order; }
+  Order variable_order (const unsigned int c) const
+  { return _variable_types[c].order; }
   
   /**
-   * @returns the finite element type for component \p c.
+   * @returns the finite element type for variable \p c.
    */
-  const FEType& component_type (const unsigned int c) const
-  { return _component_types[c]; }
+  const FEType& variable_type (const unsigned int c) const
+  { return _variable_types[c]; }
   
   /**
-   * Returns the number of components in the global solution vector. Defaults
+   * Returns the number of variables in the global solution vector. Defaults
    * to 1, should be 1 for a scalar equation, 3 for 2D incompressible Navier
    * Stokes (u,v,p), etc...
    */  
-  unsigned int n_components() const
-  { return _component_types.size(); }
+  unsigned int n_variables() const
+  { return _variable_types.size(); }
 
   /**
    * @returns the total number of degrees of freedom in the problem.
@@ -192,12 +192,12 @@ class DofMap
   
   /**
    * Fills the vector di with the global degree of freedom indices
-   * for the element. If no component number is specified then all
-   * components are returned.
+   * for the element. If no variable number is specified then all
+   * variables are returned.
    */
   void dof_indices (const Elem* elem,
 		    std::vector<unsigned int>& di,
-		    const unsigned int cn = static_cast<unsigned int>(-1)) const;
+		    const unsigned int vn = static_cast<unsigned int>(-1)) const;
 
 
 
@@ -324,9 +324,9 @@ class DofMap
   void find_connected_dofs (std::vector<unsigned int>& elem_dofs) const;
   
   /**
-   * The finite element type for each component.
+   * The finite element type for each variable.
    */
-  std::vector<FEType> _component_types;
+  std::vector<FEType> _variable_types;
 
   /**
    * The number of the system we manage DOFs for.
