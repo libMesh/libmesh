@@ -1,0 +1,231 @@
+// $Id: ex2.C,v 1.1 2003-01-30 19:15:23 benkirk Exp $
+
+// The Next Great Finite Element Library.
+// Copyright (C) 2003  Benjamin S. Kirk
+  
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+  
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+  
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+
+
+/**
+ * C++ include files that we need
+ */
+#include <iostream>
+
+/**
+ * Basic include file needed for the mesh functionality.
+ */
+#include "mesh.h"
+
+/**
+ * Include file that defines a system
+ */
+#include "system_data.h"
+
+/**
+ * Include file that defines (possibly multiple) systems of equations.
+ */
+#include "equation_systems.h"
+
+
+
+
+/**
+ * \mainpage Example 2
+ *
+ * \section Introduction
+ *
+ * This is the second example program.  It demonstrates how to
+ * create an equation system for a simple scalar system.  This
+ * example will also introduce some of the issues with using Petsc
+ * in your application.
+ */
+int main (int argc, char** argv)
+{
+
+  /**
+   * This is the first example program that indirectly
+   * uses the Petsc library.  By default equation data is stored
+   * in Petsc vectors, which may span multiple processors.  Before
+   * Petsc is used it must be initialized as follows.  Note that
+   * by passing \p argc and \p argv to Petsc you may specify
+   * command line arguments to Petsc.  For example, you might
+   * try running this example as
+   *
+   * ./ex2 -log_info
+   *
+   * to see what Petsc is doing behind the scenes or
+   *
+   * ./ex2 -log_summary
+   *
+   * to get a summary of what Petsc did.
+   *
+   * Among other things, PetscInitialize initializes the MPI
+   * communications library on your system if you haven't already
+   * done so.
+   */
+#ifdef HAVE_PETSC
+  
+  const bool have_petsc = true;
+  PetscInitialize (&argc, &argv, NULL, NULL);
+  
+#else
+  
+  const bool have_petsc = false;
+  
+#endif
+
+
+  /**
+   * This set of braces are used to force object scope.  This
+   * way we can guarantee all our objects are destroyed before calling
+   * PetscFinalize() at the end of the program.
+   */   
+  {
+    /**
+     * Tell the user what we are doing.
+     */
+    {
+      std::cout << "Running " << argv[0];
+      
+      for (int i=1; i<argc; i++)
+	std::cout << " " << argv[i];
+      
+      std::cout << std::endl << std::endl;
+    };
+    
+    
+    /**
+     * Create a 2D mesh.
+     */
+    Mesh mesh (2);
+    
+    /**
+     * Use the internal mesh generator to create a uniform
+     * grid on the unit square.  By default a mesh of \\p QUAD4
+     * elements will be created.  We instruct the mesh generator
+     * to build a mesh of 5x5 elements.
+     */
+    mesh.build_cube (5, 5);
+    
+    /**
+     * Print information about the mesh to the screen.
+     */
+    mesh.print_info();
+    
+    /**
+     * Create an equation systems object. This object can
+     * contain multiple systems for solving loosely coupled
+     * physics.  Each system can contain multiple variables
+     * of different approximation orders.  Here we will simply
+     * create a single system with one variable.
+     *
+     * The EquationSystems object needs a reference to the mesh
+     * object, so the order of construction here is important.
+     */
+    EquationSystems equation_systems (mesh, have_petsc);
+    
+    /**
+     * Declare the system and its variables.
+     */
+    {
+      /**
+       * Creates a system named "Simple System"
+       */
+      equation_systems.add_system("Simple System");
+      
+      /**
+       * Adds the variable "u" to "Simple System".  "u"
+       * will be approximated using first-order approximation.
+       */
+      equation_systems("Simple System").add_variable("u", FIRST);
+      
+      /**
+       * Initialize the data structures for the equation system.
+       */
+      equation_systems.init();
+      
+      /**
+       * Prints information about the system to the screen.
+       */
+      equation_systems.print_info();
+    };
+    
+    
+    /**
+     * Write the equation system if the user specified an
+     * output file name.  Note that there are two possible
+     * formats to write to.  Specifying \p Xdr::WRITE will create
+     * a formatted ASCII file.  Optionally, you can specify
+     * \p Xdr::ENCODE and get an XDR-encoded binary file.
+     *
+     * We will write the data, clear the object, and read the file
+     * we just wrote.  This is simply to demonstrate capability.
+     * Note that you might use this in an application to periodically
+     * dump the state of your simulation.  You can then restart from
+     * this data later.
+     */
+    if (argc == 2)
+      if (argv[1][0] != '-')
+	{
+	  std::cout << "Writing system to file " << argv[1]
+		    << std::endl;
+
+	  /**
+	   * Write the system.
+	   */
+	  equation_systems.write (argv[1], Xdr::WRITE);
+
+
+	  /**
+	   * Clear the equation systems data structure.
+	   */
+	  equation_systems.clear ();
+
+	  std::cout << "Reading system from file " << argv[1]
+		    << std::endl;
+	  /**
+	   * Read the file we just wrote.  This better
+	   * work!
+	   */
+	  equation_systems.read (argv[1], Xdr::READ);
+
+	  /**
+	   * Print the information again.
+	   */
+	  equation_systems.print_info();
+	};
+
+    /**
+     * All our objects will be destroyed at this closing brace.
+     * That way we can safely call PetscFinalize() and be sure we
+     * don't have any Petsc-dependent objects lurking around!
+     */
+  };
+
+
+#ifdef HAVE_PETSC
+
+  PetscFinalize();
+  
+#endif
+
+  
+  /**
+   * All done.  
+   */
+  return 0;
+};
