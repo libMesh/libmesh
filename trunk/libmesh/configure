@@ -8083,7 +8083,7 @@ fi
 
 
 	# Quadricss MPI requires the elan library to be included too
-	if (nm $MPI_LIBS_PATH/libmpi.a | grep elan > /dev/null); then
+	if (nm $MPI_LIBS_PATH/libmpi.* | grep elan > /dev/null); then
 	  echo "note: MPI found to use Quadrics switch, looking for elan library"
 		 echo "$as_me:$LINENO: checking for elan_init in -lelan" >&5
 echo $ECHO_N "checking for elan_init in -lelan... $ECHO_C" >&6
@@ -8245,7 +8245,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 	LIBS="-L$MPI_LIBS_PATH $LIBS"
 
 	# Myricomm MPICH requires the gm library to be included too
-	if (nm $MPI_LIBS_PATH/libmpich.a | grep gm_open > /dev/null); then
+	if (nm $MPI_LIBS_PATH/libmpich.* | grep gm_open > /dev/null); then
 	  echo "note: MPICH found to use Myricomm's Myrinet, looking for gm library"
 
           if (test "x$GMHOME" = x) ; then
@@ -8762,7 +8762,7 @@ fi
 
 
 	# Quadricss MPI requires the elan library to be included too
-	if (nm $MPI_LIBS_PATH/libmpi.a | grep elan > /dev/null); then
+	if (nm $MPI_LIBS_PATH/libmpi.* | grep elan > /dev/null); then
 	  echo "note: MPI found to use Quadrics switch, looking for elan library"
 		 echo "$as_me:$LINENO: checking for elan_init in -lelan" >&5
 echo $ECHO_N "checking for elan_init in -lelan... $ECHO_C" >&6
@@ -8924,7 +8924,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 	LIBS="-L$MPI_LIBS_PATH $LIBS"
 
 	# Myricomm MPICH requires the gm library to be included too
-	if (nm $MPI_LIBS_PATH/libmpich.a | grep gm_open > /dev/null); then
+	if (nm $MPI_LIBS_PATH/libmpich.* | grep gm_open > /dev/null); then
 	  echo "note: MPICH found to use Myricomm's Myrinet, looking for gm library"
 
           if (test "x$GMHOME" = x) ; then

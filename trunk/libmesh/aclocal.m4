@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.59 2004-04-08 21:58:54 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.60 2004-04-14 17:32:47 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -1258,7 +1258,7 @@ if (test -e $MPI_LIBS_PATH/libmpi.a || test -e $MPI_LIBS_PATH/libmpi.so) ; then
                      [])
 
 	# Quadricss MPI requires the elan library to be included too
-	if (nm $MPI_LIBS_PATH/libmpi.a | grep elan > /dev/null); then
+	if (nm $MPI_LIBS_PATH/libmpi.* | grep elan > /dev/null); then
 	  echo "note: MPI found to use Quadrics switch, looking for elan library"
 		 AC_CHECK_LIB([elan],
 	                      [elan_init],
@@ -1293,7 +1293,7 @@ if (test -e $MPI_LIBS_PATH/libmpich.a || test -e $MPI_LIBS_PATH/libmpich.so) ; t
 	LIBS="-L$MPI_LIBS_PATH $LIBS"
 
 	# Myricomm MPICH requires the gm library to be included too
-	if (nm $MPI_LIBS_PATH/libmpich.a | grep gm_open > /dev/null); then
+	if (nm $MPI_LIBS_PATH/libmpich.* | grep gm_open > /dev/null); then
 	  echo "note: MPICH found to use Myricomm's Myrinet, looking for gm library"
 
           if (test "x$GMHOME" = x) ; then
