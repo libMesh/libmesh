@@ -1,4 +1,4 @@
-// $Id: elem_quality.h,v 1.6 2003-09-02 18:02:37 benkirk Exp $
+// $Id: elem_quality.h,v 1.7 2003-10-02 03:39:25 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -24,10 +24,11 @@
 
 // C++ includes
 #include <vector>
+#include <string>
 
 // Local includes
 #include "enum_elem_type.h"
-
+#include "enum_elem_quality.h"
 
 
 /**

@@ -1,11 +1,17 @@
 #!/bin/sh
 
-for i in `ls ../../include/*.h`; do
-    header_name=`basename $i`
-    source_file=../../src/apps/TestHeader_$header_name.cc
-    app_file=bin/TestHeader_$header_name
+headers_to_test=`ls ../../include/*.h`
 
-    rm -f $source_file ../../$app_file
+if test $# -ge 1; then
+    headers_to_test=$*
+fi
+
+for i in $headers_to_test; do
+    header_name=`basename $i`
+    source_file=TestHeader_$header_name.cc
+    app_file=TestHeader_$header_name.o
+
+    rm -f $source_file $app_file
     
     echo "#include \"$header_name\"" >> $source_file
     echo "int main () { return 0; }" >> $source_file
@@ -16,6 +22,6 @@ for i in `ls ../../include/*.h`; do
     echo "-------------------------------------------------"
     echo "Testing Header File $header_name"
         
-    make -C ../.. $app_file > /dev/null
-    rm -f $source_file ../../$app_file
+    make -C ../.. contrib/bin/$app_file > /dev/null
+    rm -f $source_file $app_file
 done

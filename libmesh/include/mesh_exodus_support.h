@@ -1,4 +1,4 @@
-// $Id: mesh_exodus_support.h,v 1.8 2003-09-25 21:46:55 benkirk Exp $
+// $Id: mesh_exodus_support.h,v 1.9 2003-10-02 03:39:25 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -28,6 +28,19 @@
 #include "libmesh_common.h"
 
 #ifdef HAVE_EXODUS_API
+
+// C++ includes
+#include <vector>
+
+// local includes
+#include "enum_elem_type.h"
+
+namespace exII {
+extern "C" {
+#include "exodusII.h" // MAX_LINE_LENGTH and MAX_STR_LENGTH
+}
+}
+
 
   /**
    * This is the \p ExodusII class.

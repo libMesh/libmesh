@@ -1,4 +1,4 @@
-// $Id: parmetis_partitioner.h,v 1.5 2003-10-01 16:28:51 benkirk Exp $
+// $Id: parmetis_partitioner.h,v 1.6 2003-10-02 03:39:25 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -24,6 +24,7 @@
 
 // C++ Includes   -----------------------------------
 #include <string>
+#include <vector>
 
 // Local Includes -----------------------------------
 #include "partitioner.h"

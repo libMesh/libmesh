@@ -1,4 +1,4 @@
-// $Id: node_iterators.h,v 1.6 2003-09-02 18:02:38 benkirk Exp $
+// $Id: node_iterators.h,v 1.7 2003-10-02 03:39:25 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -21,6 +21,7 @@
 #define __node_iterators_h__
 
 // C++ includes
+#include <vector>
 
 // Local includes
 #include "predicated_iterator.h"

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.22 2003-03-21 15:28:56 ddreyer Exp $
+# $Id: Makefile,v 1.23 2003-10-02 03:39:24 jwpeterson Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -161,6 +161,13 @@ cvsweb:
 #
 bin/% : src/apps/%.cc $(mesh_library)
 	$(CXX) $(CXXFLAGS) $(INCLUDE) $< -o $@ $(LIBS) $(LDFLAGS) $(DLFLAGS)
+
+#
+# In the contrib/bin directory, we run the test_headers.sh shell
+# script.  This is a make rule for those tests.
+#
+contrib/bin/%.o : contrib/bin/%.cc
+	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
 
 #
 # Make a TODO list

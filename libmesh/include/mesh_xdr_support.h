@@ -1,4 +1,4 @@
-// $Id: mesh_xdr_support.h,v 1.9 2003-09-25 21:46:55 benkirk Exp $
+// $Id: mesh_xdr_support.h,v 1.10 2003-10-02 03:39:25 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -22,10 +22,17 @@
 #ifndef __mesh_xdr_support_h__
 #define __mesh_xdr_support_h__
 
+// Local includes
 #include "libmesh_common.h"
-
+#include "xdrIO.h" // for XdrIO::XdrIO_TYPE
 #include <string>
 #include <vector>
+
+// Forward declarations
+class Node;
+class Mesh;
+class Elem;
+class BoundaryInfo;
 
 /**
  * This class allows us to
