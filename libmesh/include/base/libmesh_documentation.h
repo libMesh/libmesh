@@ -152,16 +152,20 @@
     - \p gcc 2.96 (RedHat's compiler in the 7.x series)
  
   - Intel ICC/ECC
-    - \p icc/ifort 8.x (CXXFLAGS=-no-gcc ./configure [...])
+    - \p icc/ifort 8.x <code>(CXXFLAGS=-no-gcc ./configure [...])</code>
     - \p icc/ifc 7.x
     - \p icc/ifc 6.0
     - Earlier versions (<= 5.0) not supported.
  
   - SGI MIPSPro Compilers
-    - Version 7.30 (CXXFLAGS=-LANG:std ./configure [...])
+    - Version 7.30 <code>(CXXFLAGS=-LANG:std CXX=CC ./configure [...])</code>
     - Not tested (but will likely work) with others
+
+  - Sun ONE Studio Compilers
+    - Version 5.5 tested <code>(CXXFLAGS=-library=stlport4 CPPFLAGS=-library=stlport4 CXX=CC ./configure [...])</code>
+    - Must use the STLPort C++ standard library 
  
-  - HP, use \p CXX="aCC \p -AA" and \p CC="cc \p -Aa" to get full std support
+  - HP, use <code>CXX="aCC -AA" CC="cc -Aa"</code> to get full std support
     - \p aCC A.03.37
 
   - IBM \p xlC version 5.0, 6.0
