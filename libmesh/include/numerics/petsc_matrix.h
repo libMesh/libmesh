@@ -1,4 +1,4 @@
-//    $Id: petsc_matrix.h,v 1.5 2004-08-20 14:05:21 jwpeterson Exp $
+//    $Id: petsc_matrix.h,v 1.6 2004-10-18 12:17:04 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -549,9 +549,13 @@ T PetscMatrix<T>::operator () (const unsigned int i,
 {
   assert (this->initialized());
   
-  PetscScalar *petsc_row;
+  const PetscScalar *petsc_row;
+  
   T value=0.;
-  int ierr=0, ncols=0, *petsc_cols,
+  
+  const int* petsc_cols;
+  
+  int ierr=0, ncols=0,
     i_val=static_cast<int>(i),
     j_val=static_cast<int>(j);
   
@@ -561,24 +565,10 @@ T PetscMatrix<T>::operator () (const unsigned int i,
   
   ierr = MatGetRow(mat, i_val, &ncols, &petsc_cols, &petsc_row);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
-
-//   // Perform a linear search to find the contiguous index in
-//   // petsc_cols (resp. petsc_row) corresponding to global index j_val
-//   for (int entry=0; entry<ncols; entry++)
-//     if (petsc_cols[entry] == j_val)
-//       {
-//         value = static_cast<T>(petsc_row[entry]);
-           
-//         ierr = MatRestoreRow(mat, i_val,
-//                              &ncols, &petsc_cols, &petsc_row); CHKERRABORT(PETSC_COMM_WORLD,ierr);
-           
-//         return value;
-//       }
-
   
   // Perform a binary search to find the contiguous index in
   // petsc_cols (resp. petsc_row) corresponding to global index j_val
-  std::pair<int*, int*> p =
+  std::pair<const int*, const int*> p =
     std::equal_range (&petsc_cols[0], &petsc_cols[0] + ncols, j_val);
 
   // Found an entry for j_val
