@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.20 2003-02-24 14:35:49 benkirk Exp $
+// $Id: equation_systems.C,v 1.21 2003-02-26 04:43:12 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -41,15 +41,15 @@ EquationSystems::EquationSystems (Mesh& m,
   _solver_package(sp)
 {
   // Default parameters
-  set_parameter("linear solver tolerance")          = 1.e-12;
-  set_parameter("linear solver maximum iterations") = 5000;
+  this->set_parameter("linear solver tolerance")          = 1.e-12;
+  this->set_parameter("linear solver maximum iterations") = 5000;
 }
 
 
 
 EquationSystems::~EquationSystems ()
 {
-  clear();
+  this->clear();
 
   assert (!libMesh::closed());
 }
@@ -74,7 +74,7 @@ void EquationSystems::clear ()
 
 void EquationSystems::init ()
 {
-  const unsigned int n_sys = n_systems();
+  const unsigned int n_sys = this->n_systems();
   
   assert (n_sys != 0);
 
@@ -116,15 +116,15 @@ void EquationSystems::add_system (const std::string& name)
 {
   if (!_systems.count(name))
     {
-      const unsigned int num = n_systems();
+      const unsigned int num = this->n_systems();
       
       _systems.insert (std::pair<std::string,
-		                 GeneralSystem*>(name,
-						 new GeneralSystem(*this,
-								   name,
-								   num,
-								   _solver_package)
-						 )
+		       GeneralSystem*>(name,
+				       new GeneralSystem(*this,
+							 name,
+							 num,
+							 _solver_package)
+				       )
 		       );
     }
   else
@@ -251,7 +251,7 @@ const GeneralSystem & EquationSystems::operator () (const std::string& name) con
 
 const std::string & EquationSystems::name (const unsigned int num) const
 {
-  assert (num < n_systems());
+  assert (num < this->n_systems());
 
   std::map<std::string, GeneralSystem*>::const_iterator
     pos = _systems.begin();
@@ -275,7 +275,7 @@ const std::string & EquationSystems::name (const unsigned int num) const
 
 GeneralSystem & EquationSystems::operator () (const unsigned int num)
 {
-  assert (num < n_systems());
+  assert (num < this->n_systems());
 
   std::map<std::string, GeneralSystem*>::iterator
     pos = _systems.begin();
@@ -298,7 +298,7 @@ GeneralSystem & EquationSystems::operator () (const unsigned int num)
 
 const GeneralSystem & EquationSystems::operator ()  (const unsigned int num) const
 {
-  assert (num < n_systems());
+  assert (num < this->n_systems());
 
   std::map<std::string, GeneralSystem*>::const_iterator
     pos = _systems.begin();
@@ -434,7 +434,7 @@ void EquationSystems::build_variable_names (std::vector<std::string>& var_names)
 
   unsigned int var_num=0;
   
-  for (unsigned int sys=0; sys<n_systems(); sys++)
+  for (unsigned int sys=0; sys<this->n_systems(); sys++)
     for (unsigned int vn=0; vn < (*this)(sys).n_vars(); vn++)
       var_names[var_num++] = (*this)(sys).variable_name(vn);	   
 }
@@ -443,11 +443,11 @@ void EquationSystems::build_variable_names (std::vector<std::string>& var_names)
 
 void EquationSystems::build_solution_vector (std::vector<Number>& soln)
 {
-  assert (n_systems());
+  assert (this->n_systems());
 
   const unsigned int dim = _mesh.mesh_dimension();
   const unsigned int nn  = _mesh.n_nodes();
-  const unsigned int nv  = n_vars();
+  const unsigned int nv  = this->n_vars();
 
   if (_mesh.processor_id() == 0)
     soln.resize(nn*nv);
@@ -456,7 +456,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln)
   
   unsigned int var_num=0;
 
-  for (unsigned int sys=0; sys<n_systems(); sys++)
+  for (unsigned int sys=0; sys<this->n_systems(); sys++)
     {
       const GeneralSystem& system  = (*this)(sys);	      
       const unsigned int nv_sys    = system.n_vars();
@@ -509,7 +509,7 @@ std::string EquationSystems::get_info () const
   std::ostringstream out;
   
   out << " EquationSystems:" << std::endl
-      << "  n_systems()=" << n_systems() << std::endl;
+      << "  n_systems()=" << this->n_systems() << std::endl;
   
   for (std::map<std::string, GeneralSystem*>::const_iterator it=_systems.begin();
        it != _systems.end(); ++it)

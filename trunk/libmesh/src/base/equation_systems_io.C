@@ -1,4 +1,4 @@
-// $Id: equation_systems_io.C,v 1.15 2003-02-20 04:59:58 benkirk Exp $
+// $Id: equation_systems_io.C,v 1.16 2003-02-26 04:43:12 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -116,7 +116,8 @@ void EquationSystems::read(const std::string& name,
       
       io.data (sys_name);
       
-      if (read_header) add_system (sys_name);
+      if (read_header)
+	this->add_system (sys_name);
 	  
       GeneralSystem& new_system = (*this)(sys_name);
 	  
@@ -217,7 +218,7 @@ void EquationSystems::read(const std::string& name,
    * Read and set the numeric vector values
    */
   if (read_data)
-    for (unsigned int sys=0; sys<n_systems(); sys++)
+    for (unsigned int sys=0; sys<this->n_systems(); sys++)
       {
 	GeneralSystem& system = (*this)(sys);
 	std::vector<Number> global_soln;
@@ -324,7 +325,7 @@ void EquationSystems::write(const std::string& name,
   assert (io.writing());
 
   const unsigned int proc_id = _mesh.processor_id();
-  unsigned int n_sys         = n_systems();
+  unsigned int n_sys         = this->n_systems();
 
   std::map<std::string, GeneralSystem*>::iterator
     pos = _systems.begin();

@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.10 2003-02-25 18:34:51 benkirk Exp $
+// $Id: elem.C,v 1.11 2003-02-26 04:43:14 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -205,8 +205,8 @@ unsigned int Elem::which_neighbor_am_i (const Elem* e) const
 {
   assert (e != NULL);
 
-  for (unsigned int s=0; s<n_sides(); s++)
-    if (neighbor(s) == e)
+  for (unsigned int s=0; s<this->n_sides(); s++)
+    if (this->neighbor(s) == e)
       return s;
 
   std::cerr << "ERROR:  Elements are not neighbors!" 
@@ -224,7 +224,7 @@ void Elem::write_tecplot_connectivity(std::ostream& out) const
   assert (out.good());
   assert (_nodes != NULL);
   
-  for (unsigned int sc=0; sc<n_sub_elem(); sc++)
+  for (unsigned int sc=0; sc <this->n_sub_elem(); sc++)
     {
       std::vector<unsigned int> conn = tecplot_connectivity(sc);
       
@@ -252,7 +252,7 @@ unsigned int Elem::key() const
   std::vector<unsigned int> vec (nv, 0);
 
   for (unsigned int v=0; v<nv; v++)
-    vec[v] = node(v);
+    vec[v] = this->node(v);
 
   
   std::sort(vec.begin(), vec.end());
@@ -274,7 +274,7 @@ Point Elem::centroid() const
   Point cp;
 
   for (unsigned int n=0; n<n_vertices(); n++)
-    cp.add (point(n));
+    cp.add (this->point(n));
 
   return (cp /= static_cast<Real>(n_vertices()));    
 }
@@ -344,7 +344,7 @@ bool Elem::operator == (const Elem& rhs) const
       // be connected to the same nodes.     
       std::set<unsigned int> nodes_set;
 
-      for (unsigned int n=0; n<n_nodes(); n++)
+      for (unsigned int n=0; n<this->n_nodes(); n++)
 	{
 	  nodes_set.insert(node(n));
 	  nodes_set.insert(rhs.node(n));
@@ -419,7 +419,7 @@ bool Elem::contains_point (const Point& p) const
 						      this,
 						      p);
 
-  return FEInterface::on_reference_element(mapped_point, type());
+  return FEInterface::on_reference_element(mapped_point, this->type());
 }
 
 
@@ -451,14 +451,14 @@ unsigned int Elem::level() const
 
 void Elem::coarsen()
 {
-  assert (refinement_flag() == Elem::COARSEN);
-  assert (!active());
+  assert (this->refinement_flag() == Elem::COARSEN);
+  assert (!this->active());
   
   delete [] _children;
 
   _children = NULL;
 
-  set_refinement_flag() = Elem::DO_NOTHING;
+  this->set_refinement_flag() = Elem::DO_NOTHING;
 }
 
 

@@ -1,4 +1,4 @@
-// $Id: frequency_system.C,v 1.4 2003-02-20 04:59:58 benkirk Exp $
+// $Id: frequency_system.C,v 1.5 2003-02-26 04:43:12 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -67,7 +67,7 @@ FrequencySystem::~FrequencySystem ()
 
   stiffness->clear ();
 
-  clear_frequencies ();
+  this->clear_frequencies ();
 }
 
 
@@ -103,7 +103,7 @@ void FrequencySystem::clear ()
 
   _is_assembled = false;
 
-  clear_frequencies ();
+  this->clear_frequencies ();
 }
 
 
@@ -118,7 +118,7 @@ void FrequencySystem::init ()
   // method.
   if (init_system_fptr != NULL)
     {
-      init_system_fptr (equation_systems, name());
+      this->init_system_fptr (equation_systems, this->name());
     }
 }
 
@@ -150,7 +150,7 @@ void FrequencySystem::assemble ()
   // ...
 
   // Call the user-specified matrix assembly function
-  assemble_fptr (equation_systems, name());
+  this->assemble_fptr (equation_systems, this->name());
 
   //matrix.print ();
   //rhs.print    ();
@@ -167,7 +167,7 @@ void FrequencySystem::set_frequencies (const Real base_freq,
       std::cerr << "WARNING: frequencies already initialized, " << std::endl
 		<< " have to clear up first." << std::endl;
 
-      clear_frequencies ();
+      this->clear_frequencies ();
     }
 
   _have_freq = true;

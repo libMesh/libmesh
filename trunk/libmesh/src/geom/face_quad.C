@@ -1,4 +1,4 @@
-// $Id: face_quad.C,v 1.8 2003-02-13 22:56:12 benkirk Exp $
+// $Id: face_quad.C,v 1.9 2003-02-26 04:43:14 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,7 +30,7 @@
 // Quad class member functions
 AutoPtr<Elem> Quad::side (const unsigned int i) const
 {
-  assert (i < n_sides());
+  assert (i < this->n_sides());
 
   AutoPtr<Elem> edge(new Edge2);
 
@@ -38,29 +38,29 @@ AutoPtr<Elem> Quad::side (const unsigned int i) const
     {
     case 0:
       {
-	edge->set_node(0) = get_node(0);
-	edge->set_node(1) = get_node(1);
+	edge->set_node(0) = this->get_node(0);
+	edge->set_node(1) = this->get_node(1);
 	
 	return edge;
       }
     case 1:
       {
-	edge->set_node(0) = get_node(1);
-	edge->set_node(1) = get_node(2);
+	edge->set_node(0) = this->get_node(1);
+	edge->set_node(1) = this->get_node(2);
 	
 	return edge;
       }
     case 2:
       {
-	edge->set_node(0) = get_node(2);
-	edge->set_node(1) = get_node(3);
+	edge->set_node(0) = this->get_node(2);
+	edge->set_node(1) = this->get_node(3);
 	
 	return edge;
       }
     case 3:
       {
-	edge->set_node(0) = get_node(3);
-	edge->set_node(1) = get_node(0);
+	edge->set_node(0) = this->get_node(3);
+	edge->set_node(1) = this->get_node(0);
 	
 	return edge;
       }

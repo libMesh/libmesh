@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism6.C,v 1.10 2003-02-20 23:18:12 benkirk Exp $
+// $Id: cell_inf_prism6.C,v 1.11 2003-02-26 04:43:14 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -37,7 +37,7 @@
 // InfPrism6 class member functions
 AutoPtr<Elem> InfPrism6::build_side (const unsigned int i) const
 {
-  assert (i < n_sides());
+  assert (i < this->n_sides());
 
 
   
@@ -47,13 +47,13 @@ AutoPtr<Elem> InfPrism6::build_side (const unsigned int i) const
       {
 	Tri3*  face = new Tri3;
 
-	face->set_node(0) = get_node(0);
-	face->set_node(1) = get_node(1);
-	face->set_node(2) = get_node(2);
+	face->set_node(0) = this->get_node(0);
+	face->set_node(1) = this->get_node(1);
+	face->set_node(2) = this->get_node(2);
 /* old code
-	face->set_node(0) = get_node(0);
-	face->set_node(1) = get_node(2);
-	face->set_node(2) = get_node(1);
+	face->set_node(0) = this->get_node(0);
+	face->set_node(1) = this->get_node(2);
+	face->set_node(2) = this->get_node(1);
 */
 
 	AutoPtr<Elem> ap(face);  return ap;
@@ -62,10 +62,10 @@ AutoPtr<Elem> InfPrism6::build_side (const unsigned int i) const
       {
 	InfQuad4* face = new InfQuad4;
 	
-	face->set_node(0) = get_node(0);
-	face->set_node(1) = get_node(1);
-	face->set_node(2) = get_node(4);
-	face->set_node(3) = get_node(3);
+	face->set_node(0) = this->get_node(0);
+	face->set_node(1) = this->get_node(1);
+	face->set_node(2) = this->get_node(4);
+	face->set_node(3) = this->get_node(3);
 	
 	AutoPtr<Elem> ap(face);  return ap;
       }
@@ -73,10 +73,10 @@ AutoPtr<Elem> InfPrism6::build_side (const unsigned int i) const
       {
 	InfQuad4* face = new InfQuad4;
 
-	face->set_node(0) = get_node(1);
-	face->set_node(1) = get_node(2);
-	face->set_node(2) = get_node(5);
-	face->set_node(3) = get_node(4);
+	face->set_node(0) = this->get_node(1);
+	face->set_node(1) = this->get_node(2);
+	face->set_node(2) = this->get_node(5);
+	face->set_node(3) = this->get_node(4);
 
 	AutoPtr<Elem> ap(face);  return ap;
       }
@@ -84,10 +84,10 @@ AutoPtr<Elem> InfPrism6::build_side (const unsigned int i) const
       {
 	InfQuad4* face = new InfQuad4;
 
-	face->set_node(0) = get_node(2);
-	face->set_node(1) = get_node(0);
-	face->set_node(2) = get_node(3);
-	face->set_node(3) = get_node(5);
+	face->set_node(0) = this->get_node(2);
+	face->set_node(1) = this->get_node(0);
+	face->set_node(2) = this->get_node(3);
+	face->set_node(3) = this->get_node(5);
 	
 	AutoPtr<Elem> ap(face);  return ap;
       }
@@ -115,19 +115,19 @@ AutoPtr<Elem> InfPrism6::build_side (const unsigned int i) const
 const std::vector<unsigned int> InfPrism6::tecplot_connectivity(const unsigned int sc) const
 {
   assert (_nodes != NULL);
-  assert (sc < n_sub_elem());
+  assert (sc < this->n_sub_elem());
 
   std::vector<unsigned int> conn(8);
 
   // guess this is a collapsed hex8
-  conn[0] = node(0)+1;
-  conn[1] = node(1)+1;
-  conn[2] = node(2)+1;
-  conn[3] = node(2)+1;
-  conn[4] = node(3)+1;
-  conn[5] = node(4)+1;
-  conn[6] = node(5)+1;
-  conn[7] = node(5)+1;
+  conn[0] = this->node(0)+1;
+  conn[1] = this->node(1)+1;
+  conn[2] = this->node(2)+1;
+  conn[3] = this->node(2)+1;
+  conn[4] = this->node(3)+1;
+  conn[5] = this->node(4)+1;
+  conn[6] = this->node(5)+1;
+  conn[7] = this->node(5)+1;
 
   return conn;
 }
@@ -139,7 +139,7 @@ void InfPrism6::write_tecplot_connectivity(std::ostream &out) const
   assert (out);
   assert (_nodes != NULL);
 
-  for (unsigned int sc=0; sc<n_sub_elem(); sc++)
+  for (unsigned int sc=0; sc <this->n_sub_elem(); sc++)
     {
       std::vector<unsigned int> conn = tecplot_connectivity(sc);
 
@@ -216,15 +216,15 @@ const unsigned int InfPrism6::side_children_matrix[5][5] =
 
 void InfPrism6::refine(Mesh& mesh)
 {
-  assert (refinement_flag() == Elem::REFINE);
-  assert (active());
+  assert (this->refinement_flag() == Elem::REFINE);
+  assert (this->active());
   assert (_children == NULL);
 
   // Create my children
   {
-    _children = new Elem*[n_children()];
+    _children = new Elem*[this->n_children()];
 
-    for (unsigned int c=0; c<n_children(); c++)
+    for (unsigned int c=0; c<this->n_children(); c++)
       {
 	_children[c] = new InfPrism6(this);
 	_children[c]->set_refinement_flag() = Elem::JUST_REFINED;
@@ -235,27 +235,27 @@ void InfPrism6::refine(Mesh& mesh)
   // Compute new nodal locations
   // and asssign nodes to children
   {
-    std::vector<std::vector<Point> >  p(n_children());
+    std::vector<std::vector<Point> >  p(this->n_children());
     
-    for (unsigned int c=0; c<n_children(); c++)
-      p[c].resize(child(c)->n_nodes());
+    for (unsigned int c=0; c<this->n_children(); c++)
+      p[c].resize(this->child(c)->n_nodes());
     
 
     // compute new nodal locations
-    for (unsigned int c=0; c<n_children(); c++)
-      for (unsigned int nc=0; nc<child(c)->n_nodes(); nc++)
-	for (unsigned int n=0; n<n_nodes(); n++)
+    for (unsigned int c=0; c<this->n_children(); c++)
+      for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
+	for (unsigned int n=0; n<this->n_nodes(); n++)
 	  if (embedding_matrix[c][nc][n] != 0.)
-	    p[c][nc].add_scaled (point(n), static_cast<Real>(embedding_matrix[c][nc][n]));
+	    p[c][nc].add_scaled (this->point(n), static_cast<Real>(embedding_matrix[c][nc][n]));
     
     
     // assign nodes to children & add them to the mesh
-    for (unsigned int c=0; c<n_children(); c++)
+    for (unsigned int c=0; c<this->n_children(); c++)
       {
-	for (unsigned int nc=0; nc<child(c)->n_nodes(); nc++)
+	for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
 	  _children[c]->set_node(nc) = mesh.mesh_refinement.add_point(p[c][nc]);
 
-	mesh.add_elem(child(c), mesh.mesh_refinement.new_element_number());
+	mesh.add_elem(this->child(c), mesh.mesh_refinement.new_element_number());
       }
   }
 
@@ -263,22 +263,22 @@ void InfPrism6::refine(Mesh& mesh)
   
   // Possibly add boundary information
   {
-    for (unsigned int s=0; s<n_sides(); s++)
-      if (neighbor(s) == NULL)
+    for (unsigned int s=0; s<this->n_sides(); s++)
+      if (this->neighbor(s) == NULL)
 	{
 	  const short int id = mesh.boundary_info.boundary_id(this, s);
 
 	  if (id != mesh.boundary_info.invalid_id)
 	    // the upper limit for sc is stored in the 0th column
-	    for (unsigned int sc=1; sc<=side_children_matrix[s][0]; sc++)
-	      mesh.boundary_info.add_side(child(side_children_matrix[s][sc]), s, id);
+	    for (unsigned int sc=1; sc <=side_children_matrix[s][0]; sc++)
+	      mesh.boundary_info.add_side(this->child(side_children_matrix[s][sc]), s, id);
 	
 	}
   }
 
 
   // Un-set my refinement flag now
-  set_refinement_flag() = Elem::DO_NOTHING;
+  this->set_refinement_flag() = Elem::DO_NOTHING;
 }
 
 

@@ -1,4 +1,4 @@
-// $Id: cell_pyramid5.C,v 1.7 2003-02-13 22:56:11 benkirk Exp $
+// $Id: cell_pyramid5.C,v 1.8 2003-02-26 04:43:14 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -35,7 +35,7 @@
 // Pyramid5 class member functions
 AutoPtr<Elem> Pyramid5::build_side (const unsigned int i) const
 {
-  assert (i < n_sides());
+  assert (i < this->n_sides());
 
 
   
@@ -45,9 +45,9 @@ AutoPtr<Elem> Pyramid5::build_side (const unsigned int i) const
       {
 	Tri3* face = new Tri3;
 
-	face->set_node(0) = get_node(0);
-	face->set_node(1) = get_node(1);
-	face->set_node(2) = get_node(4);
+	face->set_node(0) = this->get_node(0);
+	face->set_node(1) = this->get_node(1);
+	face->set_node(2) = this->get_node(4);
 	
 	AutoPtr<Elem> ap(face);  return ap;
       }
@@ -55,9 +55,9 @@ AutoPtr<Elem> Pyramid5::build_side (const unsigned int i) const
       {
 	Tri3* face = new Tri3;
 
-	face->set_node(0) = get_node(1);
-	face->set_node(1) = get_node(2);
-	face->set_node(2) = get_node(4);
+	face->set_node(0) = this->get_node(1);
+	face->set_node(1) = this->get_node(2);
+	face->set_node(2) = this->get_node(4);
 	
 	AutoPtr<Elem> ap(face);  return ap;
       }
@@ -65,9 +65,9 @@ AutoPtr<Elem> Pyramid5::build_side (const unsigned int i) const
       {
 	Tri3* face = new Tri3;
 
-	face->set_node(0) = get_node(2);
-	face->set_node(1) = get_node(3);
-	face->set_node(2) = get_node(4);
+	face->set_node(0) = this->get_node(2);
+	face->set_node(1) = this->get_node(3);
+	face->set_node(2) = this->get_node(4);
 	
 	AutoPtr<Elem> ap(face);  return ap;
       }
@@ -75,9 +75,9 @@ AutoPtr<Elem> Pyramid5::build_side (const unsigned int i) const
       {
 	Tri3* face = new Tri3;
 
-	face->set_node(0) = get_node(3);
-	face->set_node(1) = get_node(0);
-	face->set_node(2) = get_node(4);
+	face->set_node(0) = this->get_node(3);
+	face->set_node(1) = this->get_node(0);
+	face->set_node(2) = this->get_node(4);
 	
 	AutoPtr<Elem> ap(face);  return ap;
       }
@@ -85,10 +85,10 @@ AutoPtr<Elem> Pyramid5::build_side (const unsigned int i) const
       {
 	Quad4* face = new Quad4;
 	
-	face->set_node(0) = get_node(0);
-	face->set_node(1) = get_node(3);
-	face->set_node(2) = get_node(2);
-	face->set_node(3) = get_node(1);
+	face->set_node(0) = this->get_node(0);
+	face->set_node(1) = this->get_node(3);
+	face->set_node(2) = this->get_node(2);
+	face->set_node(3) = this->get_node(1);
 
 	AutoPtr<Elem> ap(face);  return ap;
       }
@@ -109,18 +109,18 @@ AutoPtr<Elem> Pyramid5::build_side (const unsigned int i) const
 const std::vector<unsigned int> Pyramid5::tecplot_connectivity(const unsigned int sc) const
 {
   assert (_nodes != NULL);
-  assert (sc < n_sub_elem());
+  assert (sc < this->n_sub_elem());
 
   std::vector<unsigned int> conn(8);
   
-  conn[0] = node(0)+1;
-  conn[1] = node(1)+1;
-  conn[2] = node(2)+1;
-  conn[3] = node(3)+1;
-  conn[4] = node(4)+1;
-  conn[5] = node(4)+1;
-  conn[6] = node(4)+1;
-  conn[7] = node(4)+1;
+  conn[0] = this->node(0)+1;
+  conn[1] = this->node(1)+1;
+  conn[2] = this->node(2)+1;
+  conn[3] = this->node(3)+1;
+  conn[4] = this->node(4)+1;
+  conn[5] = this->node(4)+1;
+  conn[6] = this->node(4)+1;
+  conn[7] = this->node(4)+1;
 
   return conn;
 }
@@ -134,18 +134,18 @@ void Pyramid5::vtk_connectivity(const unsigned int sc,
 				std::vector<unsigned int> *conn) const
 {
   assert (_nodes != NULL);
-  assert (sc < n_sub_elem());
+  assert (sc < this->n_sub_elem());
   
   if (conn == NULL)
     conn = new std::vector<unsigned int>;
 
   conn->resize(5);
 
-  (*conn)[0] = node(0);
-  (*conn)[1] = node(1);
-  (*conn)[2] = node(2);
-  (*conn)[3] = node(3);
-  (*conn)[4] = node(4);
+  (*conn)[0] = this->node(0);
+  (*conn)[1] = this->node(1);
+  (*conn)[2] = this->node(2);
+  (*conn)[3] = this->node(3);
+  (*conn)[4] = this->node(4);
 
   return;
 }
@@ -158,20 +158,20 @@ void Pyramid5::refine(Mesh&)
 {
   error();
   
-  //   assert (refinement_flag() == Elem::REFINE);
-  //   assert (active());
+  //   assert (this->refinement_flag() == Elem::REFINE);
+  //   assert (this->active());
   //   assert (_children == NULL);
 
   //   // Create my children
   //   {
-  //     _children = new Elem*[n_children()];
+  //     _children = new Elem*[this->n_children()];
 
-  //     for (unsigned int c=0; c<6; c++)
+  //     for (unsigned int c=0; c <6; c++)
   //       {
   // 	_children[c] = new Pyramid5(this);
   //  	_children[c]->set_refinement_flag() = Elem::JUST_REFINED;
   //      }
-  //     for (unsigned int c=6; c<n_children(); c++)
+  //     for (unsigned int c=6; c<this->n_children(); c++)
   //       {
   // 	_children[c] = new Tet4(this);
   //       	_children[c]->set_refinement_flag() = Elem::JUST_REFINED;
@@ -188,8 +188,8 @@ void Pyramid5::refine(Mesh&)
 
   
   
-  //   edge.node(0) = node(0);
-  //   edge.node(1) = node(1);
+  //   edge.node(0) = this->node(0);
+  //   edge.node(1) = this->node(1);
   
   //   const Point p0_1 = (mesh.point(node(0))*.5 +
   // 		      mesh.point(node(1))*.5  );
@@ -197,8 +197,8 @@ void Pyramid5::refine(Mesh&)
   //   const unsigned int n0_1 = mesh.mesh_refinement.add_point(p0_1, edge.key());
   
 
-  //   edge.node(0) = node(1);
-  //   edge.node(1) = node(2);
+  //   edge.node(0) = this->node(1);
+  //   edge.node(1) = this->node(2);
   
   //   const Point p1_2 = (mesh.point(node(1))*.5 +
   // 		      mesh.point(node(2))*.5  );
@@ -206,8 +206,8 @@ void Pyramid5::refine(Mesh&)
   //   const unsigned int n1_2 = mesh.mesh_refinement.add_point(p1_2, edge.key());
   
 
-  //   edge.node(0) = node(2);
-  //   edge.node(1) = node(3);
+  //   edge.node(0) = this->node(2);
+  //   edge.node(1) = this->node(3);
   
   //   const Point p2_3 = (mesh.point(node(2))*.5 +
   // 		      mesh.point(node(3))*.5  );
@@ -215,8 +215,8 @@ void Pyramid5::refine(Mesh&)
   //   const unsigned int n2_3 = mesh.mesh_refinement.add_point(p2_3, edge.key());
   
 
-  //   edge.node(0) = node(0);
-  //   edge.node(1) = node(3);
+  //   edge.node(0) = this->node(0);
+  //   edge.node(1) = this->node(3);
   
   //   const Point p0_3 = (mesh.point(node(0))*.5 +
   // 		      mesh.point(node(3))*.5  );
@@ -224,8 +224,8 @@ void Pyramid5::refine(Mesh&)
   //   const unsigned int n0_3 = mesh.mesh_refinement.add_point(p0_3, edge.key());
   
 
-  //   edge.node(0) = node(0);
-  //   edge.node(1) = node(4);
+  //   edge.node(0) = this->node(0);
+  //   edge.node(1) = this->node(4);
   
   //   const Point p0_4 = (mesh.point(node(0))*.5 +
   // 		      mesh.point(node(4))*.5  );
@@ -233,8 +233,8 @@ void Pyramid5::refine(Mesh&)
   //   const unsigned int n0_4 = mesh.mesh_refinement.add_point(p0_4, edge.key());
   
 
-  //   edge.node(0) = node(1);
-  //   edge.node(1) = node(4);
+  //   edge.node(0) = this->node(1);
+  //   edge.node(1) = this->node(4);
   
   //   const Point p1_4 = (mesh.point(node(1))*.5 +
   // 		      mesh.point(node(4))*.5  );
@@ -242,8 +242,8 @@ void Pyramid5::refine(Mesh&)
   //   const unsigned int n1_4 = mesh.mesh_refinement.add_point(p1_4, edge.key());
   
 
-  //   edge.node(0) = node(2);
-  //   edge.node(1) = node(4);
+  //   edge.node(0) = this->node(2);
+  //   edge.node(1) = this->node(4);
   
   //   const Point p2_4 = (mesh.point(node(2))*.5 +
   // 		      mesh.point(node(4))*.5  );
@@ -251,8 +251,8 @@ void Pyramid5::refine(Mesh&)
   //   const unsigned int n2_4 = mesh.mesh_refinement.add_point(p2_4, edge.key());
   
 
-  //   edge.node(0) = node(3);
-  //   edge.node(1) = node(4);
+  //   edge.node(0) = this->node(3);
+  //   edge.node(1) = this->node(4);
   
   //   const Point p3_4 = (mesh.point(node(3))*.5 +
   // 		      mesh.point(node(4))*.5  );
@@ -260,10 +260,10 @@ void Pyramid5::refine(Mesh&)
   //   const unsigned int n3_4 = mesh.mesh_refinement.add_point(p3_4, edge.key());
   
 
-  //   face.node(0) = node(0);
-  //   face.node(1) = node(3);
-  //   face.node(2) = node(2);
-  //   face.node(3) = node(1);
+  //   face.node(0) = this->node(0);
+  //   face.node(1) = this->node(3);
+  //   face.node(2) = this->node(2);
+  //   face.node(3) = this->node(1);
   
   //   const Point p0 = (mesh.point(node(0)) +
   // 		    mesh.point(node(3)) +
@@ -279,7 +279,7 @@ void Pyramid5::refine(Mesh&)
   //   {
   //     // Child 0 (Pyramid)
   //     {
-  //       _children[0]->node(0) = node(0);
+  //       _children[0]->node(0) = this->node(0);
   //       _children[0]->node(1) = n0_1;
   //       _children[0]->node(2) = n0;
   //       _children[0]->node(3) = n0_3;
@@ -291,7 +291,7 @@ void Pyramid5::refine(Mesh&)
   //     // Child 1 (Pyramid)
   //     {
   //       _children[1]->node(0) = n0_1;
-  //       _children[1]->node(1) = node(1);
+  //       _children[1]->node(1) = this->node(1);
   //       _children[1]->node(2) = n1_2;
   //       _children[1]->node(3) = n0;
   //       _children[1]->node(4) = n1_4;
@@ -304,7 +304,7 @@ void Pyramid5::refine(Mesh&)
   //       _children[2]->node(0) = n0_3;
   //       _children[2]->node(1) = n0;
   //       _children[2]->node(2) = n2_3;
-  //       _children[2]->node(3) = node(3);
+  //       _children[2]->node(3) = this->node(3);
   //       _children[2]->node(4) = n3_4;
 
   //       mesh.add_elem(_children[2], mesh.mesh_refinement.new_element_number());
@@ -314,7 +314,7 @@ void Pyramid5::refine(Mesh&)
   //     {
   //       _children[3]->node(0) = n0;
   //       _children[3]->node(1) = n1_2;
-  //       _children[3]->node(2) = node(2);
+  //       _children[3]->node(2) = this->node(2);
   //       _children[3]->node(3) = n2_3;
   //       _children[3]->node(4) = n2_4;
  
@@ -327,7 +327,7 @@ void Pyramid5::refine(Mesh&)
   //       _children[4]->node(1) = n1_4;
   //       _children[4]->node(2) = n2_4;
   //       _children[4]->node(3) = n3_4;
-  //       _children[4]->node(4) = node(4);
+  //       _children[4]->node(4) = this->node(4);
 
   //       mesh.add_elem(_children[4], mesh.mesh_refinement.new_element_number());
   //     }
@@ -465,7 +465,7 @@ void Pyramid5::refine(Mesh&)
 
   
   //   // Un-set my refinement flag now
-  //   set_refinement_flag() = Elem::DO_NOTHING;
+  //   this->set_refinement_flag() = Elem::DO_NOTHING;
 }
 
 

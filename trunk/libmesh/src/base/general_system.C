@@ -1,4 +1,4 @@
-// $Id: general_system.C,v 1.5 2003-02-20 04:59:58 benkirk Exp $
+// $Id: general_system.C,v 1.6 2003-02-26 04:43:12 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -91,9 +91,9 @@ void GeneralSystem::init ()
   // method.
   if (init_system_fptr != NULL)
     {
-      init_system_fptr (equation_systems, name());
+      this->init_system_fptr (equation_systems, this->name());
 
-      update();
+      this->update();
 
       *old_local_solution   = *current_local_solution;
       *older_local_solution = *current_local_solution; 
@@ -129,7 +129,7 @@ void GeneralSystem::assemble ()
   libMesh::log.start_event("assemble()");
   
   // Call the user-specified matrix assembly function
-  assemble_fptr (equation_systems, name());
+  this->assemble_fptr (equation_systems, this->name());
 
   // Stop logging the user code
   libMesh::log.stop_event("assemble()");
@@ -141,7 +141,7 @@ std::pair<unsigned int, Real>
 GeneralSystem::solve ()
 {
   // Assemble the linear system
-  assemble (); 
+  this->assemble (); 
 
   // Log how long the linear solve takes.
   libMesh::log.start_event("solve()");
@@ -159,7 +159,7 @@ GeneralSystem::solve ()
     linear_solver_interface->solve (*matrix, *solution, *rhs, tol, maxits);
 
   // Update the local solution to reflect the new values
-  update ();
+  this->update ();
 
   // Stop logging the linear solve
   libMesh::log.stop_event("solve()");
