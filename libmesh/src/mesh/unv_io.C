@@ -1,4 +1,4 @@
-// $Id: unv_io.C,v 1.17 2005-03-19 00:45:05 spetersen Exp $
+// $Id: unv_io.C,v 1.18 2005-03-21 16:25:07 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -31,6 +31,7 @@
 #include "face_tri3.h"
 #include "face_tri6.h"
 #include "face_quad8.h"
+#include "face_quad9.h"
 #include "cell_tet4.h"
 #include "cell_hex8.h"
 #include "cell_hex20.h"
@@ -492,8 +493,8 @@ void UNVIO::count_elements (std::istream& in_file)
       // For some elements the node numbers
       // are given more than one record
 
-      // TET10
-      if (fe_id == 118)
+      // TET10 or QUAD9
+      if (fe_id == 118 || fe_id == 300)
 	  in_file.ignore (256,'\n');
 
       // HEX20
@@ -755,6 +756,22 @@ void UNVIO::element_in (std::istream& in_file)
 	    assign_elem_nodes[6]=5;
 	    assign_elem_nodes[7]=1;
 	    assign_elem_nodes[8]=4;
+	    break;
+	  }
+	
+	case 300: // Thin Shell   Quadratic Quadrilateral (nine nodes)
+	  {
+	    elem = new Quad9; // create new element
+	    
+	    assign_elem_nodes[1]=0;
+	    assign_elem_nodes[2]=7;
+	    assign_elem_nodes[3]=3;
+	    assign_elem_nodes[4]=6;
+	    assign_elem_nodes[5]=2;
+	    assign_elem_nodes[6]=5;
+	    assign_elem_nodes[7]=1;
+	    assign_elem_nodes[8]=4;
+	    assign_elem_nodes[9]=8;
 	    break;
 	  }
 	
@@ -1078,6 +1095,21 @@ void UNVIO::element_out(std::ostream& out_file)
 	    assign_elem_nodes[5] = 5;
 	    assign_elem_nodes[6] = 1;
 	    assign_elem_nodes[7] = 4;
+	    break;
+	  }
+	
+	case QUAD9:
+	  {
+	    fe_descriptor_id = 300; // Plane Stress Quadratic Quadrilateral
+	    assign_elem_nodes[0] = 0;
+	    assign_elem_nodes[1] = 7;
+	    assign_elem_nodes[2] = 3;
+	    assign_elem_nodes[3] = 6;
+	    assign_elem_nodes[4] = 2;
+	    assign_elem_nodes[5] = 5;
+	    assign_elem_nodes[6] = 1;
+	    assign_elem_nodes[7] = 4;
+	    assign_elem_nodes[8] = 8;
 	    break;
 	  }
 	
