@@ -1,4 +1,4 @@
-// $Id: libmesh.C,v 1.1 2003-02-14 15:22:47 benkirk Exp $
+// $Id: libmesh.C,v 1.2 2003-02-17 04:05:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -70,9 +70,8 @@ int          libMesh::_processor_id   = 0;
 
 // ------------------------------------------------------------
 // libMesh member functions
-void libMesh::init (int argc, char** argv)
+void libMesh::init (int & argc, char** & argv)
 {
-
 #if defined(HAVE_PETSC)
 
   PetscInitialize (&argc, &argv, NULL, NULL);
