@@ -1,4 +1,4 @@
-// $Id: o_string_stream.h,v 1.6 2003-06-04 15:00:16 ddreyer Exp $
+// $Id: o_string_stream.h,v 1.7 2003-06-04 22:47:45 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -80,7 +80,7 @@
   * precision \p p to stream \p o (padded with 
   * zeros).
   */
-# define OSSRealzeroleft(o,v,p,d)       (o).width(v);  (o).precision(p); (o).fill('0'); (o) << (d)
+# define OSSRealzeroleft(o,v,p,d)   (o).width(v); (o).precision(p); (o).fill('0'); (o) << std::showpoint << std::left << (d)
 
  /*
   * Outputs \p Real \p d with width \p v and

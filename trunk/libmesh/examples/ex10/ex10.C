@@ -1,4 +1,4 @@
-// $Id: ex10.C,v 1.3 2003-06-04 14:59:23 ddreyer Exp $
+// $Id: ex10.C,v 1.4 2003-06-04 22:47:44 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -259,16 +259,6 @@ int main (int argc, char** argv)
 	  out <<  "..." << std::endl;
 	  std::cout << out.str();
 	}
-
-// OLD CODE
-// 	std::cout.width(2);
-// 	std::cout.fill(' ');
-// 	std::cout << std::right << t_step;
-// 	std::cout << ", time=";
-// 	std::cout.width(6);
-// 	std::cout.fill('0');
-// 	std::cout << std::left << time;
-// 	std::cout << "..." << std::endl;
 	
 	/**
 	 * At this point we need to update the old
