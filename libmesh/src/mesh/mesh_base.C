@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.44 2003-07-15 12:40:12 benkirk Exp $
+// $Id: mesh_base.C,v 1.45 2003-07-26 00:17:04 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -986,6 +986,12 @@ void MeshBase::build_inf_elem(const Point& origin,
 
   STOP_LOG("build_inf_elem()", "MeshBase");
 
+  /*
+   * when finished with building the Ifems,
+   * it remains to prepare the mesh for use:
+   * find neighbors again, partition (if needed)...
+   */
+  this->prepare_for_use ();
 }
 
 
@@ -1850,7 +1856,8 @@ void MeshBase::build_script_L_graph (PetscMatrix<Number>& conn) const
 
 
 
-void MeshBase::read(const std::string&)
+void MeshBase::read(const std::string&,
+		    const bool)
 {
   std::cerr << "ERROR:  You shouldn't be calling this" << std::endl
 	    << " Use Mesh::read() instead." << std::endl;
