@@ -1,4 +1,4 @@
-// $Id: linear_solver_interface.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: linear_solver_interface.h,v 1.3 2004-08-20 13:58:02 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -112,17 +112,19 @@ public:
   { _preconditioner_type = pct; }
   
 
-  /**
-   * @returns A pair containing the number of iterations taken
-   * and the final residual.
-   * Call the Solver solver
-   */    
-  virtual std::pair<unsigned int, Real> solve (SparseMatrix<T>&,
-					       NumericVector<T>&,
-					       NumericVector<T>&,
-					       const double,
-					       const unsigned int) = 0;
 
+  /**
+   * This function calls the solver
+   * "_solver_type" preconditioned with the
+   * "_preconditioner_type" preconditioner.  Note that this method
+   * simply calls the one above and specifies the preconditioning
+   * matrix as the system matrix.
+   */
+  virtual std::pair<unsigned int, Real> solve (SparseMatrix<T>&,  // System Matrix
+					       NumericVector<T>&, // Solution vector
+					       NumericVector<T>&, // RHS vector
+					       const double,      // Stopping tolerance
+					       const unsigned int) = 0; // N. Iterations
   
 protected:
 
