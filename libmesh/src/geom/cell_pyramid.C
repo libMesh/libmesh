@@ -1,4 +1,4 @@
-// $Id: cell_pyramid.C,v 1.7 2003-02-13 22:56:11 benkirk Exp $
+// $Id: cell_pyramid.C,v 1.8 2003-02-26 04:43:14 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,7 +31,7 @@
 // Pyramid class member functions
 AutoPtr<Elem> Pyramid::side (const unsigned int i) const
 {
-  assert (i < n_sides());
+  assert (i < this->n_sides());
 
 
   
@@ -41,9 +41,9 @@ AutoPtr<Elem> Pyramid::side (const unsigned int i) const
       {
 	AutoPtr<Elem> face(new Tri3); 
 
-	face->set_node(0) = get_node(0);
-	face->set_node(1) = get_node(1);
-	face->set_node(2) = get_node(4);
+	face->set_node(0) = this->get_node(0);
+	face->set_node(1) = this->get_node(1);
+	face->set_node(2) = this->get_node(4);
 	
 	return face;
       }
@@ -51,9 +51,9 @@ AutoPtr<Elem> Pyramid::side (const unsigned int i) const
       {
 	AutoPtr<Elem> face(new Tri3);
 
-	face->set_node(0) = get_node(1);
-	face->set_node(1) = get_node(2);
-	face->set_node(2) = get_node(4);
+	face->set_node(0) = this->get_node(1);
+	face->set_node(1) = this->get_node(2);
+	face->set_node(2) = this->get_node(4);
 	
 	return face;
       }
@@ -61,9 +61,9 @@ AutoPtr<Elem> Pyramid::side (const unsigned int i) const
       {
 	AutoPtr<Elem> face(new Tri3);
 
-	face->set_node(0) = get_node(2);
-	face->set_node(1) = get_node(3);
-	face->set_node(2) = get_node(4);
+	face->set_node(0) = this->get_node(2);
+	face->set_node(1) = this->get_node(3);
+	face->set_node(2) = this->get_node(4);
 	
 	return face;
       }
@@ -71,9 +71,9 @@ AutoPtr<Elem> Pyramid::side (const unsigned int i) const
       {
 	AutoPtr<Elem> face(new Tri3);
 
-	face->set_node(0) = get_node(3);
-	face->set_node(1) = get_node(0);
-	face->set_node(2) = get_node(4);
+	face->set_node(0) = this->get_node(3);
+	face->set_node(1) = this->get_node(0);
+	face->set_node(2) = this->get_node(4);
 	
 	return face;
       }
@@ -81,10 +81,10 @@ AutoPtr<Elem> Pyramid::side (const unsigned int i) const
       {
 	AutoPtr<Elem> face(new Quad4);
 	
-	face->set_node(0) = get_node(0);
-	face->set_node(1) = get_node(3);
-	face->set_node(2) = get_node(2);
-	face->set_node(3) = get_node(1);
+	face->set_node(0) = this->get_node(0);
+	face->set_node(1) = this->get_node(3);
+	face->set_node(2) = this->get_node(2);
+	face->set_node(3) = this->get_node(1);
 
 	return face;
       }

@@ -1,4 +1,4 @@
-// $Id: cell_tet10.C,v 1.8 2003-02-20 23:18:12 benkirk Exp $
+// $Id: cell_tet10.C,v 1.9 2003-02-26 04:43:14 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,7 +31,7 @@
 // Tet10 class member functions
 AutoPtr<Elem> Tet10::build_side (const unsigned int i) const
 {
-  assert (i < n_sides());
+  assert (i < this->n_sides());
 
 
   
@@ -41,45 +41,45 @@ AutoPtr<Elem> Tet10::build_side (const unsigned int i) const
     {
     case 0:
       {
-	face->set_node(0) = get_node(0);
-	face->set_node(1) = get_node(2);
-	face->set_node(2) = get_node(1);
-	face->set_node(3) = get_node(6);
-	face->set_node(4) = get_node(5);
-	face->set_node(5) = get_node(4);
+	face->set_node(0) = this->get_node(0);
+	face->set_node(1) = this->get_node(2);
+	face->set_node(2) = this->get_node(1);
+	face->set_node(3) = this->get_node(6);
+	face->set_node(4) = this->get_node(5);
+	face->set_node(5) = this->get_node(4);
 
 	return face;
       }
     case 1:
       {
-	face->set_node(0) = get_node(0);
-	face->set_node(1) = get_node(1);
-	face->set_node(2) = get_node(3);
-	face->set_node(3) = get_node(4);
-	face->set_node(4) = get_node(8);
-	face->set_node(5) = get_node(7);
+	face->set_node(0) = this->get_node(0);
+	face->set_node(1) = this->get_node(1);
+	face->set_node(2) = this->get_node(3);
+	face->set_node(3) = this->get_node(4);
+	face->set_node(4) = this->get_node(8);
+	face->set_node(5) = this->get_node(7);
 
 	return face;
       }
     case 2:
       {
-	face->set_node(0) = get_node(1);
-	face->set_node(1) = get_node(2);
-	face->set_node(2) = get_node(3);
-	face->set_node(3) = get_node(5);
-	face->set_node(4) = get_node(9);
-	face->set_node(5) = get_node(8);
+	face->set_node(0) = this->get_node(1);
+	face->set_node(1) = this->get_node(2);
+	face->set_node(2) = this->get_node(3);
+	face->set_node(3) = this->get_node(5);
+	face->set_node(4) = this->get_node(9);
+	face->set_node(5) = this->get_node(8);
 
 	return face;
       }
     case 3:
       {
-	face->set_node(0) = get_node(2);
-	face->set_node(1) = get_node(0);
-	face->set_node(2) = get_node(3);
-	face->set_node(3) = get_node(6);
-	face->set_node(4) = get_node(7);
-	face->set_node(5) = get_node(9);
+	face->set_node(0) = this->get_node(2);
+	face->set_node(1) = this->get_node(0);
+	face->set_node(2) = this->get_node(3);
+	face->set_node(3) = this->get_node(6);
+	face->set_node(4) = this->get_node(7);
+	face->set_node(5) = this->get_node(9);
 
 	return face;
       }
@@ -99,7 +99,7 @@ AutoPtr<Elem> Tet10::build_side (const unsigned int i) const
 const std::vector<unsigned int> Tet10::tecplot_connectivity(const unsigned int sc) const
 {
   assert (_nodes != NULL);
-  assert (sc < n_sub_elem());
+  assert (sc < this->n_sub_elem());
 
   std::vector<unsigned int> conn(8);
 
@@ -110,112 +110,112 @@ const std::vector<unsigned int> Tet10::tecplot_connectivity(const unsigned int s
       // Linear sub-tet 0
     case 0:
       
-      conn[0] = node(0)+1;
-      conn[1] = node(4)+1;
-      conn[2] = node(6)+1;
-      conn[3] = node(6)+1;
-      conn[4] = node(7)+1;
-      conn[5] = node(7)+1;
-      conn[6] = node(7)+1;
-      conn[7] = node(7)+1;
+      conn[0] = this->node(0)+1;
+      conn[1] = this->node(4)+1;
+      conn[2] = this->node(6)+1;
+      conn[3] = this->node(6)+1;
+      conn[4] = this->node(7)+1;
+      conn[5] = this->node(7)+1;
+      conn[6] = this->node(7)+1;
+      conn[7] = this->node(7)+1;
 
       return conn;
 
       // Linear sub-tet 1
     case 1:
       
-      conn[0] = node(4)+1;
-      conn[1] = node(1)+1;
-      conn[2] = node(5)+1;
-      conn[3] = node(5)+1;
-      conn[4] = node(8)+1;
-      conn[5] = node(8)+1;
-      conn[6] = node(8)+1;
-      conn[7] = node(8)+1;
+      conn[0] = this->node(4)+1;
+      conn[1] = this->node(1)+1;
+      conn[2] = this->node(5)+1;
+      conn[3] = this->node(5)+1;
+      conn[4] = this->node(8)+1;
+      conn[5] = this->node(8)+1;
+      conn[6] = this->node(8)+1;
+      conn[7] = this->node(8)+1;
 
       return conn;
 
       // Linear sub-tet 2
     case 2:
       
-      conn[0] = node(5)+1;
-      conn[1] = node(2)+1;
-      conn[2] = node(6)+1;
-      conn[3] = node(6)+1;
-      conn[4] = node(9)+1;
-      conn[5] = node(9)+1;
-      conn[6] = node(9)+1;
-      conn[7] = node(9)+1;
+      conn[0] = this->node(5)+1;
+      conn[1] = this->node(2)+1;
+      conn[2] = this->node(6)+1;
+      conn[3] = this->node(6)+1;
+      conn[4] = this->node(9)+1;
+      conn[5] = this->node(9)+1;
+      conn[6] = this->node(9)+1;
+      conn[7] = this->node(9)+1;
 
       return conn;
 
       // Linear sub-tet 3
     case 3:
       
-      conn[0] = node(7)+1;
-      conn[1] = node(8)+1;
-      conn[2] = node(9)+1;
-      conn[3] = node(9)+1;
-      conn[4] = node(3)+1;
-      conn[5] = node(3)+1;
-      conn[6] = node(3)+1;
-      conn[7] = node(3)+1;
+      conn[0] = this->node(7)+1;
+      conn[1] = this->node(8)+1;
+      conn[2] = this->node(9)+1;
+      conn[3] = this->node(9)+1;
+      conn[4] = this->node(3)+1;
+      conn[5] = this->node(3)+1;
+      conn[6] = this->node(3)+1;
+      conn[7] = this->node(3)+1;
 
       return conn;
 
       // Linear sub-tet 4
     case 4:
       
-      conn[0] = node(4)+1;
-      conn[1] = node(8)+1;
-      conn[2] = node(6)+1;
-      conn[3] = node(6)+1;
-      conn[4] = node(7)+1;
-      conn[5] = node(7)+1;
-      conn[6] = node(7)+1;
-      conn[7] = node(7)+1;
+      conn[0] = this->node(4)+1;
+      conn[1] = this->node(8)+1;
+      conn[2] = this->node(6)+1;
+      conn[3] = this->node(6)+1;
+      conn[4] = this->node(7)+1;
+      conn[5] = this->node(7)+1;
+      conn[6] = this->node(7)+1;
+      conn[7] = this->node(7)+1;
 
       return conn;
 
       // Linear sub-tet 5
     case 5:
       
-      conn[0] = node(4)+1;
-      conn[1] = node(5)+1;
-      conn[2] = node(6)+1;
-      conn[3] = node(6)+1;
-      conn[4] = node(8)+1;
-      conn[5] = node(8)+1;
-      conn[6] = node(8)+1;
-      conn[7] = node(8)+1;
+      conn[0] = this->node(4)+1;
+      conn[1] = this->node(5)+1;
+      conn[2] = this->node(6)+1;
+      conn[3] = this->node(6)+1;
+      conn[4] = this->node(8)+1;
+      conn[5] = this->node(8)+1;
+      conn[6] = this->node(8)+1;
+      conn[7] = this->node(8)+1;
 
       return conn;
 
       // Linear sub-tet 6
     case 6:
       
-      conn[0] = node(5)+1;
-      conn[1] = node(9)+1;
-      conn[2] = node(6)+1;
-      conn[3] = node(6)+1;
-      conn[4] = node(8)+1;
-      conn[5] = node(8)+1;
-      conn[6] = node(8)+1;
-      conn[7] = node(8)+1;
+      conn[0] = this->node(5)+1;
+      conn[1] = this->node(9)+1;
+      conn[2] = this->node(6)+1;
+      conn[3] = this->node(6)+1;
+      conn[4] = this->node(8)+1;
+      conn[5] = this->node(8)+1;
+      conn[6] = this->node(8)+1;
+      conn[7] = this->node(8)+1;
 
       return conn;
 
       // Linear sub-tet 7
     case 7:
       
-      conn[0] = node(7)+1;
-      conn[1] = node(6)+1;
-      conn[2] = node(9)+1;
-      conn[3] = node(9)+1;
-      conn[4] = node(8)+1;
-      conn[5] = node(8)+1;
-      conn[6] = node(8)+1;
-      conn[7] = node(8)+1;
+      conn[0] = this->node(7)+1;
+      conn[1] = this->node(6)+1;
+      conn[2] = this->node(9)+1;
+      conn[3] = this->node(9)+1;
+      conn[4] = this->node(8)+1;
+      conn[5] = this->node(8)+1;
+      conn[6] = this->node(8)+1;
+      conn[7] = this->node(8)+1;
 
       return conn;
 
@@ -234,7 +234,7 @@ void Tet10::vtk_connectivity(const unsigned int sc,
 			     std::vector<unsigned int> *conn) const
 {
   assert (_nodes != NULL);
-  assert (sc < n_sub_elem());
+  assert (sc < this->n_sub_elem());
   
   if (conn == NULL)
     conn = new std::vector<unsigned int>;
@@ -247,80 +247,80 @@ void Tet10::vtk_connectivity(const unsigned int sc,
       // Linear sub-tet 0
     case 0:
       
-      (*conn)[0] = node(0);
-      (*conn)[1] = node(4);
-      (*conn)[2] = node(6);
-      (*conn)[3] = node(7);
+      (*conn)[0] = this->node(0);
+      (*conn)[1] = this->node(4);
+      (*conn)[2] = this->node(6);
+      (*conn)[3] = this->node(7);
 
       return;
 
       // Linear sub-tet 1
     case 1:
       
-      (*conn)[0] = node(4);
-      (*conn)[1] = node(1);
-      (*conn)[2] = node(5);
-      (*conn)[3] = node(8);
+      (*conn)[0] = this->node(4);
+      (*conn)[1] = this->node(1);
+      (*conn)[2] = this->node(5);
+      (*conn)[3] = this->node(8);
 
       return;
 
       // Linear sub-tet 2
     case 2:
       
-      (*conn)[0] = node(5);
-      (*conn)[1] = node(2);
-      (*conn)[2] = node(6);
-      (*conn)[3] = node(9);
+      (*conn)[0] = this->node(5);
+      (*conn)[1] = this->node(2);
+      (*conn)[2] = this->node(6);
+      (*conn)[3] = this->node(9);
 
       return;
 
       // Linear sub-tet 3
     case 3:
       
-      (*conn)[0] = node(7);
-      (*conn)[1] = node(8);
-      (*conn)[2] = node(9);
-      (*conn)[3] = node(3);
+      (*conn)[0] = this->node(7);
+      (*conn)[1] = this->node(8);
+      (*conn)[2] = this->node(9);
+      (*conn)[3] = this->node(3);
 
       return;
 
       // Linear sub-tet 4
     case 4:
       
-      (*conn)[0] = node(4);
-      (*conn)[1] = node(8);
-      (*conn)[2] = node(6);
-      (*conn)[3] = node(7);
+      (*conn)[0] = this->node(4);
+      (*conn)[1] = this->node(8);
+      (*conn)[2] = this->node(6);
+      (*conn)[3] = this->node(7);
 
       return;
 
       // Linear sub-tet 5
     case 5:
       
-      (*conn)[0] = node(4);
-      (*conn)[1] = node(5);
-      (*conn)[2] = node(6);
-      (*conn)[3] = node(8);
+      (*conn)[0] = this->node(4);
+      (*conn)[1] = this->node(5);
+      (*conn)[2] = this->node(6);
+      (*conn)[3] = this->node(8);
 
       return;
 
       // Linear sub-tet 6
     case 6:
       
-      (*conn)[0] = node(5);
-      (*conn)[1] = node(9);
-      (*conn)[2] = node(6);
-      (*conn)[3] = node(8);
+      (*conn)[0] = this->node(5);
+      (*conn)[1] = this->node(9);
+      (*conn)[2] = this->node(6);
+      (*conn)[3] = this->node(8);
 
       return;
 
       // Linear sub-tet 7
     case 7:
       
-      (*conn)[0] = node(7);
-      (*conn)[1] = node(6);
-      (*conn)[2] = node(9);
-      (*conn)[3] = node(8);
+      (*conn)[0] = this->node(7);
+      (*conn)[1] = this->node(6);
+      (*conn)[2] = this->node(9);
+      (*conn)[3] = this->node(8);
 
       return;
 
@@ -473,15 +473,15 @@ const unsigned int Tet10::side_children_matrix[4][4] =
 
 void Tet10::refine(Mesh& mesh)
 {
-  assert (refinement_flag() == Elem::REFINE);
-  assert (active());
+  assert (this->refinement_flag() == Elem::REFINE);
+  assert (this->active());
   assert (_children == NULL);
 
   // Create my children
   {
-    _children = new Elem*[n_children()];
+    _children = new Elem*[this->n_children()];
 
-    for (unsigned int c=0; c<n_children(); c++)
+    for (unsigned int c=0; c<this->n_children(); c++)
       {
 	_children[c] = new Tet10(this);
 	_children[c]->set_refinement_flag() = Elem::JUST_REFINED;
@@ -491,27 +491,27 @@ void Tet10::refine(Mesh& mesh)
   // Compute new nodal locations
   // and asssign nodes to children
   {
-    std::vector<std::vector<Point> >  p(n_children());
+    std::vector<std::vector<Point> >  p(this->n_children());
     
-    for (unsigned int c=0; c<n_children(); c++)
-      p[c].resize(child(c)->n_nodes());
+    for (unsigned int c=0; c<this->n_children(); c++)
+      p[c].resize(this->child(c)->n_nodes());
     
 
     // compute new nodal locations
-    for (unsigned int c=0; c<n_children(); c++)
-      for (unsigned int nc=0; nc<child(c)->n_nodes(); nc++)
-	for (unsigned int n=0; n<n_nodes(); n++)
+    for (unsigned int c=0; c<this->n_children(); c++)
+      for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
+	for (unsigned int n=0; n<this->n_nodes(); n++)
 	  if (embedding_matrix[c][nc][n] != 0.)
-	    p[c][nc].add_scaled (point(n), static_cast<Real>(embedding_matrix[c][nc][n]));
+	    p[c][nc].add_scaled (this->point(n), static_cast<Real>(embedding_matrix[c][nc][n]));
     
     
     // assign nodes to children & add them to the mesh
-    for (unsigned int c=0; c<n_children(); c++)
+    for (unsigned int c=0; c<this->n_children(); c++)
       {
-	for (unsigned int nc=0; nc<child(c)->n_nodes(); nc++)
+	for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
 	  _children[c]->set_node(nc) = mesh.mesh_refinement.add_point(p[c][nc]);
 
-	mesh.add_elem(child(c), mesh.mesh_refinement.new_element_number());
+	mesh.add_elem(this->child(c), mesh.mesh_refinement.new_element_number());
       }
   }
 
@@ -519,20 +519,20 @@ void Tet10::refine(Mesh& mesh)
   
   // Possibly add boundary information
   {
-    for (unsigned int s=0; s<n_sides(); s++)
-      if (neighbor(s) == NULL)
+    for (unsigned int s=0; s<this->n_sides(); s++)
+      if (this->neighbor(s) == NULL)
 	{
 	  const short int id = mesh.boundary_info.boundary_id(this, s);
 	
 	  if (id != mesh.boundary_info.invalid_id)
-	    for (unsigned int sc=0; sc<4; sc++)
-	      mesh.boundary_info.add_side(child(side_children_matrix[s][sc]), s, id);
+	    for (unsigned int sc=0; sc <4; sc++)
+	      mesh.boundary_info.add_side(this->child(side_children_matrix[s][sc]), s, id);
 	}
   }
 
   
   // Un-set my refinement flag now
-  set_refinement_flag() = Elem::DO_NOTHING;
+  this->set_refinement_flag() = Elem::DO_NOTHING;
 }
 
 

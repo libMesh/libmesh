@@ -1,4 +1,4 @@
-// $Id: cell_hex27.C,v 1.11 2003-02-20 23:18:09 benkirk Exp $
+// $Id: cell_hex27.C,v 1.12 2003-02-26 04:43:14 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,7 +31,7 @@
 // Hex27 class member functions
 AutoPtr<Elem> Hex27::build_side (const unsigned int i) const
 {
-  assert (i < n_sides());
+  assert (i < this->n_sides());
 
 
   
@@ -42,85 +42,85 @@ AutoPtr<Elem> Hex27::build_side (const unsigned int i) const
     {
     case 0:  // the face at z=0
       {
-	face->set_node(0) = get_node(0);
-	face->set_node(1) = get_node(3);
-	face->set_node(2) = get_node(2);
-	face->set_node(3) = get_node(1);
-	face->set_node(4) = get_node(11);
-	face->set_node(5) = get_node(10);
-	face->set_node(6) = get_node(9);
-	face->set_node(7) = get_node(8);
-	face->set_node(8) = get_node(20);
+	face->set_node(0) = this->get_node(0);
+	face->set_node(1) = this->get_node(3);
+	face->set_node(2) = this->get_node(2);
+	face->set_node(3) = this->get_node(1);
+	face->set_node(4) = this->get_node(11);
+	face->set_node(5) = this->get_node(10);
+	face->set_node(6) = this->get_node(9);
+	face->set_node(7) = this->get_node(8);
+	face->set_node(8) = this->get_node(20);
 
 	return face;
       }
     case 1:  // the face at y = 0
       {
-	face->set_node(0) = get_node(0);
-	face->set_node(1) = get_node(1);
-	face->set_node(2) = get_node(5);
-	face->set_node(3) = get_node(4);
-	face->set_node(4) = get_node(8);
-	face->set_node(5) = get_node(13);
-	face->set_node(6) = get_node(16);
-	face->set_node(7) = get_node(12);
-	face->set_node(8) = get_node(21);
+	face->set_node(0) = this->get_node(0);
+	face->set_node(1) = this->get_node(1);
+	face->set_node(2) = this->get_node(5);
+	face->set_node(3) = this->get_node(4);
+	face->set_node(4) = this->get_node(8);
+	face->set_node(5) = this->get_node(13);
+	face->set_node(6) = this->get_node(16);
+	face->set_node(7) = this->get_node(12);
+	face->set_node(8) = this->get_node(21);
 
 	return face;
       }
     case 2:  // the face at x=1
       {
-	face->set_node(0) = get_node(1);
-	face->set_node(1) = get_node(2);
-	face->set_node(2) = get_node(6);
-	face->set_node(3) = get_node(5);
-	face->set_node(4) = get_node(9);
-	face->set_node(5) = get_node(14);
-	face->set_node(6) = get_node(17);
-	face->set_node(7) = get_node(13);
-	face->set_node(8) = get_node(22);
+	face->set_node(0) = this->get_node(1);
+	face->set_node(1) = this->get_node(2);
+	face->set_node(2) = this->get_node(6);
+	face->set_node(3) = this->get_node(5);
+	face->set_node(4) = this->get_node(9);
+	face->set_node(5) = this->get_node(14);
+	face->set_node(6) = this->get_node(17);
+	face->set_node(7) = this->get_node(13);
+	face->set_node(8) = this->get_node(22);
 
 	return face;
       }
     case 3: // the face at y=1
       {
-	face->set_node(0) = get_node(2);
-	face->set_node(1) = get_node(3);
-	face->set_node(2) = get_node(7);
-	face->set_node(3) = get_node(6);
-	face->set_node(4) = get_node(10);
-	face->set_node(5) = get_node(15);
-	face->set_node(6) = get_node(18);
-	face->set_node(7) = get_node(14);
-	face->set_node(8) = get_node(23);
+	face->set_node(0) = this->get_node(2);
+	face->set_node(1) = this->get_node(3);
+	face->set_node(2) = this->get_node(7);
+	face->set_node(3) = this->get_node(6);
+	face->set_node(4) = this->get_node(10);
+	face->set_node(5) = this->get_node(15);
+	face->set_node(6) = this->get_node(18);
+	face->set_node(7) = this->get_node(14);
+	face->set_node(8) = this->get_node(23);
 
 	return face;
       }
     case 4: // the face at x=0
       {
-	face->set_node(0) = get_node(3);
-	face->set_node(1) = get_node(0);
-	face->set_node(2) = get_node(4);
-	face->set_node(3) = get_node(7);
-	face->set_node(4) = get_node(11);
-	face->set_node(5) = get_node(12);
-	face->set_node(6) = get_node(19);
-	face->set_node(7) = get_node(15);
-	face->set_node(8) = get_node(24);
+	face->set_node(0) = this->get_node(3);
+	face->set_node(1) = this->get_node(0);
+	face->set_node(2) = this->get_node(4);
+	face->set_node(3) = this->get_node(7);
+	face->set_node(4) = this->get_node(11);
+	face->set_node(5) = this->get_node(12);
+	face->set_node(6) = this->get_node(19);
+	face->set_node(7) = this->get_node(15);
+	face->set_node(8) = this->get_node(24);
 
 	return face;
       }
     case 5: // the face at z=1
       {
-	face->set_node(0) = get_node(4);
-	face->set_node(1) = get_node(5);
-	face->set_node(2) = get_node(6);
-	face->set_node(3) = get_node(7);
-	face->set_node(4) = get_node(16);
-	face->set_node(5) = get_node(17);
-	face->set_node(6) = get_node(18);
-	face->set_node(7) = get_node(19);
-	face->set_node(8) = get_node(25);
+	face->set_node(0) = this->get_node(4);
+	face->set_node(1) = this->get_node(5);
+	face->set_node(2) = this->get_node(6);
+	face->set_node(3) = this->get_node(7);
+	face->set_node(4) = this->get_node(16);
+	face->set_node(5) = this->get_node(17);
+	face->set_node(6) = this->get_node(18);
+	face->set_node(7) = this->get_node(19);
+	face->set_node(8) = this->get_node(25);
 
 	return face;
       }
@@ -141,7 +141,7 @@ AutoPtr<Elem> Hex27::build_side (const unsigned int i) const
 const std::vector<unsigned int> Hex27::tecplot_connectivity(const unsigned int sc) const
 {
   assert (_nodes != NULL);
-  assert (sc < n_sub_elem());
+  assert (sc < this->n_sub_elem());
 
   std::vector<unsigned int> conn(8);
 
@@ -150,105 +150,105 @@ const std::vector<unsigned int> Hex27::tecplot_connectivity(const unsigned int s
     {
     case 0:
 
-      conn[0] = node(0)+1;
-      conn[1] = node(8)+1;
-      conn[2] = node(20)+1;
-      conn[3] = node(11)+1;
-      conn[4] = node(12)+1;
-      conn[5] = node(21)+1;
-      conn[6] = node(26)+1;
-      conn[7] = node(24)+1;
+      conn[0] = this->node(0)+1;
+      conn[1] = this->node(8)+1;
+      conn[2] = this->node(20)+1;
+      conn[3] = this->node(11)+1;
+      conn[4] = this->node(12)+1;
+      conn[5] = this->node(21)+1;
+      conn[6] = this->node(26)+1;
+      conn[7] = this->node(24)+1;
 
       return conn;
       
     case 1:
 
-      conn[0] = node(8)+1;
-      conn[1] = node(1)+1;
-      conn[2] = node(9)+1;
-      conn[3] = node(20)+1;
-      conn[4] = node(21)+1;
-      conn[5] = node(13)+1;
-      conn[6] = node(22)+1;
-      conn[7] = node(26)+1;
+      conn[0] = this->node(8)+1;
+      conn[1] = this->node(1)+1;
+      conn[2] = this->node(9)+1;
+      conn[3] = this->node(20)+1;
+      conn[4] = this->node(21)+1;
+      conn[5] = this->node(13)+1;
+      conn[6] = this->node(22)+1;
+      conn[7] = this->node(26)+1;
 
       return conn;
       
     case 2:
 
-      conn[0] = node(11)+1;
-      conn[1] = node(20)+1;
-      conn[2] = node(10)+1;
-      conn[3] = node(3)+1; 
-      conn[4] = node(24)+1;
-      conn[5] = node(26)+1;
-      conn[6] = node(23)+1;
-      conn[7] = node(15)+1;
+      conn[0] = this->node(11)+1;
+      conn[1] = this->node(20)+1;
+      conn[2] = this->node(10)+1;
+      conn[3] = this->node(3)+1; 
+      conn[4] = this->node(24)+1;
+      conn[5] = this->node(26)+1;
+      conn[6] = this->node(23)+1;
+      conn[7] = this->node(15)+1;
 
       return conn;
       
     case 3:
 
-      conn[0] = node(20)+1;
-      conn[1] = node(9)+1;
-      conn[2] = node(2)+1;
-      conn[3] = node(10)+1;
-      conn[4] = node(26)+1;
-      conn[5] = node(22)+1;
-      conn[6] = node(14)+1;
-      conn[7] = node(23)+1;
+      conn[0] = this->node(20)+1;
+      conn[1] = this->node(9)+1;
+      conn[2] = this->node(2)+1;
+      conn[3] = this->node(10)+1;
+      conn[4] = this->node(26)+1;
+      conn[5] = this->node(22)+1;
+      conn[6] = this->node(14)+1;
+      conn[7] = this->node(23)+1;
 
       return conn;
       
     case 4:
 
-      conn[0] = node(12)+1;
-      conn[1] = node(21)+1;
-      conn[2] = node(26)+1;
-      conn[3] = node(24)+1;
-      conn[4] = node(4)+1;
-      conn[5] = node(16)+1;
-      conn[6] = node(25)+1;
-      conn[7] = node(19)+1;
+      conn[0] = this->node(12)+1;
+      conn[1] = this->node(21)+1;
+      conn[2] = this->node(26)+1;
+      conn[3] = this->node(24)+1;
+      conn[4] = this->node(4)+1;
+      conn[5] = this->node(16)+1;
+      conn[6] = this->node(25)+1;
+      conn[7] = this->node(19)+1;
 
       return conn;
       
     case 5:
 
-      conn[0] = node(21)+1;
-      conn[1] = node(13)+1;
-      conn[2] = node(22)+1;
-      conn[3] = node(26)+1;
-      conn[4] = node(16)+1;
-      conn[5] = node(5)+1;
-      conn[6] = node(17)+1;
-      conn[7] = node(25)+1;
+      conn[0] = this->node(21)+1;
+      conn[1] = this->node(13)+1;
+      conn[2] = this->node(22)+1;
+      conn[3] = this->node(26)+1;
+      conn[4] = this->node(16)+1;
+      conn[5] = this->node(5)+1;
+      conn[6] = this->node(17)+1;
+      conn[7] = this->node(25)+1;
 
       return conn;
       
     case 6:
 
-      conn[0] = node(24)+1;
-      conn[1] = node(26)+1;
-      conn[2] = node(23)+1;
-      conn[3] = node(15)+1;
-      conn[4] = node(19)+1;
-      conn[5] = node(25)+1;
-      conn[6] = node(18)+1;
-      conn[7] = node(7)+1; 
+      conn[0] = this->node(24)+1;
+      conn[1] = this->node(26)+1;
+      conn[2] = this->node(23)+1;
+      conn[3] = this->node(15)+1;
+      conn[4] = this->node(19)+1;
+      conn[5] = this->node(25)+1;
+      conn[6] = this->node(18)+1;
+      conn[7] = this->node(7)+1; 
 
       return conn;
       
     case 7:
       
-      conn[0] = node(26)+1;
-      conn[1] = node(22)+1;
-      conn[2] = node(14)+1;
-      conn[3] = node(23)+1;
-      conn[4] = node(25)+1;
-      conn[5] = node(17)+1;
-      conn[6] = node(6)+1;
-      conn[7] = node(18)+1;
+      conn[0] = this->node(26)+1;
+      conn[1] = this->node(22)+1;
+      conn[2] = this->node(14)+1;
+      conn[3] = this->node(23)+1;
+      conn[4] = this->node(25)+1;
+      conn[5] = this->node(17)+1;
+      conn[6] = this->node(6)+1;
+      conn[7] = this->node(18)+1;
 
       return conn;
 
@@ -269,7 +269,7 @@ void Hex27::vtk_connectivity(const unsigned int sc,
 			     std::vector<unsigned int> *conn) const
 {
   assert (_nodes != NULL);
-  assert (sc < n_sub_elem());
+  assert (sc < this->n_sub_elem());
   
   if (conn == NULL)
     conn = new std::vector<unsigned int>;
@@ -280,105 +280,105 @@ void Hex27::vtk_connectivity(const unsigned int sc,
     {
     case 0:
 
-      (*conn)[0] = node(0);
-      (*conn)[1] = node(8);
-      (*conn)[2] = node(20);
-      (*conn)[3] = node(11);
-      (*conn)[4] = node(12);
-      (*conn)[5] = node(21);
-      (*conn)[6] = node(26);
-      (*conn)[7] = node(24);
+      (*conn)[0] = this->node(0);
+      (*conn)[1] = this->node(8);
+      (*conn)[2] = this->node(20);
+      (*conn)[3] = this->node(11);
+      (*conn)[4] = this->node(12);
+      (*conn)[5] = this->node(21);
+      (*conn)[6] = this->node(26);
+      (*conn)[7] = this->node(24);
 
       return;
       
     case 1:
 
-      (*conn)[0] = node(8);
-      (*conn)[1] = node(1);
-      (*conn)[2] = node(9);
-      (*conn)[3] = node(20);
-      (*conn)[4] = node(21);
-      (*conn)[5] = node(13);
-      (*conn)[6] = node(22);
-      (*conn)[7] = node(26);
+      (*conn)[0] = this->node(8);
+      (*conn)[1] = this->node(1);
+      (*conn)[2] = this->node(9);
+      (*conn)[3] = this->node(20);
+      (*conn)[4] = this->node(21);
+      (*conn)[5] = this->node(13);
+      (*conn)[6] = this->node(22);
+      (*conn)[7] = this->node(26);
 
       return;
       
     case 2:
 
-      (*conn)[0] = node(11);
-      (*conn)[1] = node(20);
-      (*conn)[2] = node(10);
-      (*conn)[3] = node(3); 
-      (*conn)[4] = node(24);
-      (*conn)[5] = node(26);
-      (*conn)[6] = node(23);
-      (*conn)[7] = node(15);
+      (*conn)[0] = this->node(11);
+      (*conn)[1] = this->node(20);
+      (*conn)[2] = this->node(10);
+      (*conn)[3] = this->node(3); 
+      (*conn)[4] = this->node(24);
+      (*conn)[5] = this->node(26);
+      (*conn)[6] = this->node(23);
+      (*conn)[7] = this->node(15);
 
       return;
       
     case 3:
 
-      (*conn)[0] = node(20);
-      (*conn)[1] = node(9);
-      (*conn)[2] = node(2);
-      (*conn)[3] = node(10);
-      (*conn)[4] = node(26);
-      (*conn)[5] = node(22);
-      (*conn)[6] = node(14);
-      (*conn)[7] = node(23);
+      (*conn)[0] = this->node(20);
+      (*conn)[1] = this->node(9);
+      (*conn)[2] = this->node(2);
+      (*conn)[3] = this->node(10);
+      (*conn)[4] = this->node(26);
+      (*conn)[5] = this->node(22);
+      (*conn)[6] = this->node(14);
+      (*conn)[7] = this->node(23);
 
       return;
       
     case 4:
 
-      (*conn)[0] = node(12);
-      (*conn)[1] = node(21);
-      (*conn)[2] = node(26);
-      (*conn)[3] = node(24);
-      (*conn)[4] = node(4);
-      (*conn)[5] = node(16);
-      (*conn)[6] = node(25);
-      (*conn)[7] = node(19);
+      (*conn)[0] = this->node(12);
+      (*conn)[1] = this->node(21);
+      (*conn)[2] = this->node(26);
+      (*conn)[3] = this->node(24);
+      (*conn)[4] = this->node(4);
+      (*conn)[5] = this->node(16);
+      (*conn)[6] = this->node(25);
+      (*conn)[7] = this->node(19);
 
       return;
       
     case 5:
 
-      (*conn)[0] = node(21);
-      (*conn)[1] = node(13);
-      (*conn)[2] = node(22);
-      (*conn)[3] = node(26);
-      (*conn)[4] = node(16);
-      (*conn)[5] = node(5);
-      (*conn)[6] = node(17);
-      (*conn)[7] = node(25);
+      (*conn)[0] = this->node(21);
+      (*conn)[1] = this->node(13);
+      (*conn)[2] = this->node(22);
+      (*conn)[3] = this->node(26);
+      (*conn)[4] = this->node(16);
+      (*conn)[5] = this->node(5);
+      (*conn)[6] = this->node(17);
+      (*conn)[7] = this->node(25);
 
       return;
       
     case 6:
 
-      (*conn)[0] = node(24);
-      (*conn)[1] = node(26);
-      (*conn)[2] = node(23);
-      (*conn)[3] = node(15);
-      (*conn)[4] = node(19);
-      (*conn)[5] = node(25);
-      (*conn)[6] = node(18);
-      (*conn)[7] = node(7); 
+      (*conn)[0] = this->node(24);
+      (*conn)[1] = this->node(26);
+      (*conn)[2] = this->node(23);
+      (*conn)[3] = this->node(15);
+      (*conn)[4] = this->node(19);
+      (*conn)[5] = this->node(25);
+      (*conn)[6] = this->node(18);
+      (*conn)[7] = this->node(7); 
 
       return;
       
     case 7:
       
-      (*conn)[0] = node(26);
-      (*conn)[1] = node(22);
-      (*conn)[2] = node(14);
-      (*conn)[3] = node(23);
-      (*conn)[4] = node(25);
-      (*conn)[5] = node(17);
-      (*conn)[6] = node(6);
-      (*conn)[7] = node(18);
+      (*conn)[0] = this->node(26);
+      (*conn)[1] = this->node(22);
+      (*conn)[2] = this->node(14);
+      (*conn)[3] = this->node(23);
+      (*conn)[4] = this->node(25);
+      (*conn)[5] = this->node(17);
+      (*conn)[6] = this->node(6);
+      (*conn)[7] = this->node(18);
 
       return;
 
@@ -668,15 +668,15 @@ const unsigned int Hex27::side_children_matrix[6][4] =
 
 void Hex27::refine(Mesh& mesh)
 {
-  assert (refinement_flag() == Elem::REFINE);
-  assert (active());
+  assert (this->refinement_flag() == Elem::REFINE);
+  assert (this->active());
   assert (_children == NULL);
 
   // Create my children
   {
-    _children = new Elem*[n_children()];
+    _children = new Elem*[this->n_children()];
 
-    for (unsigned int c=0; c<n_children(); c++)
+    for (unsigned int c=0; c<this->n_children(); c++)
       {
 	_children[c] = new Hex27(this);
 	_children[c]->set_refinement_flag() = Elem::JUST_REFINED;
@@ -687,27 +687,27 @@ void Hex27::refine(Mesh& mesh)
   // Compute new nodal locations
   // and asssign nodes to children
   {
-    std::vector<std::vector<Point> >  p(n_children());
+    std::vector<std::vector<Point> >  p(this->n_children());
     
-    for (unsigned int c=0; c<n_children(); c++)
-      p[c].resize(child(c)->n_nodes());
+    for (unsigned int c=0; c<this->n_children(); c++)
+      p[c].resize(this->child(c)->n_nodes());
     
 
     // compute new nodal locations
-    for (unsigned int c=0; c<n_children(); c++)
-      for (unsigned int nc=0; nc<child(c)->n_nodes(); nc++)
-	for (unsigned int n=0; n<n_nodes(); n++)
+    for (unsigned int c=0; c<this->n_children(); c++)
+      for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
+	for (unsigned int n=0; n<this->n_nodes(); n++)
 	  if (embedding_matrix[c][nc][n] != 0.)
-	    p[c][nc].add_scaled (point(n), static_cast<Real>(embedding_matrix[c][nc][n]));
+	    p[c][nc].add_scaled (this->point(n), static_cast<Real>(embedding_matrix[c][nc][n]));
     
     
     // assign nodes to children & add them to the mesh
-    for (unsigned int c=0; c<n_children(); c++)
+    for (unsigned int c=0; c<this->n_children(); c++)
       {
-	for (unsigned int nc=0; nc<child(c)->n_nodes(); nc++)
+	for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
 	  _children[c]->set_node(nc) = mesh.mesh_refinement.add_point(p[c][nc]);
 
-	mesh.add_elem(child(c), mesh.mesh_refinement.new_element_number());
+	mesh.add_elem(this->child(c), mesh.mesh_refinement.new_element_number());
       }
   }
 
@@ -715,20 +715,20 @@ void Hex27::refine(Mesh& mesh)
   
   // Possibly add boundary information
   {
-    for (unsigned int s=0; s<n_sides(); s++)
-      if (neighbor(s) == NULL)
+    for (unsigned int s=0; s<this->n_sides(); s++)
+      if (this->neighbor(s) == NULL)
 	{
 	  const short int id = mesh.boundary_info.boundary_id(this, s);
 	
 	  if (id != mesh.boundary_info.invalid_id)
-	    for (unsigned int sc=0; sc<4; sc++)
-	      mesh.boundary_info.add_side(child(side_children_matrix[s][sc]), s, id);
+	    for (unsigned int sc=0; sc <4; sc++)
+	      mesh.boundary_info.add_side(this->child(side_children_matrix[s][sc]), s, id);
 	}
   }
 
 
   // Un-set my refinement flag now
-  set_refinement_flag() = Elem::DO_NOTHING;
+  this->set_refinement_flag() = Elem::DO_NOTHING;
 }
 
 

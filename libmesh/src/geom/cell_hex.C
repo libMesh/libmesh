@@ -1,4 +1,4 @@
-// $Id: cell_hex.C,v 1.8 2003-02-13 22:56:10 benkirk Exp $
+// $Id: cell_hex.C,v 1.9 2003-02-26 04:43:14 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -32,7 +32,7 @@
 // Hex class member functions
 AutoPtr<Elem> Hex::side (const unsigned int i) const
 {
-  assert (i < n_sides());
+  assert (i < this->n_sides());
 
 
   
@@ -43,55 +43,55 @@ AutoPtr<Elem> Hex::side (const unsigned int i) const
     {
     case 0:  // the face at z = -1
       {
-	face->set_node(0) = get_node(0);
-	face->set_node(1) = get_node(3);
-	face->set_node(2) = get_node(2);
-	face->set_node(3) = get_node(1);
+	face->set_node(0) = this->get_node(0);
+	face->set_node(1) = this->get_node(3);
+	face->set_node(2) = this->get_node(2);
+	face->set_node(3) = this->get_node(1);
 
 	return face;
       }
     case 1:  // the face at y = -1
       {
-	face->set_node(0) = get_node(0);
-	face->set_node(1) = get_node(1);
-	face->set_node(2) = get_node(5);
-	face->set_node(3) = get_node(4);
+	face->set_node(0) = this->get_node(0);
+	face->set_node(1) = this->get_node(1);
+	face->set_node(2) = this->get_node(5);
+	face->set_node(3) = this->get_node(4);
 	
 	return face;
       }
     case 2:  // the face at x = 1
       {
-	face->set_node(0) = get_node(1);
-	face->set_node(1) = get_node(2);
-	face->set_node(2) = get_node(6);
-	face->set_node(3) = get_node(5);
+	face->set_node(0) = this->get_node(1);
+	face->set_node(1) = this->get_node(2);
+	face->set_node(2) = this->get_node(6);
+	face->set_node(3) = this->get_node(5);
 
 	return face;
       }
     case 3: // the face at y = 1
       {
-	face->set_node(0) = get_node(2);
-	face->set_node(1) = get_node(3);
-	face->set_node(2) = get_node(7);
-	face->set_node(3) = get_node(6);
+	face->set_node(0) = this->get_node(2);
+	face->set_node(1) = this->get_node(3);
+	face->set_node(2) = this->get_node(7);
+	face->set_node(3) = this->get_node(6);
 	
 	return face;
       }
     case 4: // the face at x = -1
       {
-	face->set_node(0) = get_node(3);
-	face->set_node(1) = get_node(0);
-	face->set_node(2) = get_node(4);
-	face->set_node(3) = get_node(7);
+	face->set_node(0) = this->get_node(3);
+	face->set_node(1) = this->get_node(0);
+	face->set_node(2) = this->get_node(4);
+	face->set_node(3) = this->get_node(7);
 
 	return face;
       }
     case 5: // the face at z = 1
       {
-	face->set_node(0) = get_node(4);
-	face->set_node(1) = get_node(5);
-	face->set_node(2) = get_node(6);
-	face->set_node(3) = get_node(7);
+	face->set_node(0) = this->get_node(4);
+	face->set_node(1) = this->get_node(5);
+	face->set_node(2) = this->get_node(6);
+	face->set_node(3) = this->get_node(7);
 	
 	return face;
       }

@@ -1,4 +1,4 @@
-// $Id: cell_tet.C,v 1.8 2003-02-13 22:56:11 benkirk Exp $
+// $Id: cell_tet.C,v 1.9 2003-02-26 04:43:14 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,7 +31,7 @@
 // Tet class member functions
 AutoPtr<Elem> Tet::side (const unsigned int i) const
 {
-  assert (i < n_sides());
+  assert (i < this->n_sides());
 
 
   
@@ -41,33 +41,33 @@ AutoPtr<Elem> Tet::side (const unsigned int i) const
     {
     case 0:
       {
-	face->set_node(0) = get_node(0);
-	face->set_node(1) = get_node(2);
-	face->set_node(2) = get_node(1);
+	face->set_node(0) = this->get_node(0);
+	face->set_node(1) = this->get_node(2);
+	face->set_node(2) = this->get_node(1);
 
 	return face;
       }
     case 1:
       {
-	face->set_node(0) = get_node(0);
-	face->set_node(1) = get_node(1);
-	face->set_node(2) = get_node(3);
+	face->set_node(0) = this->get_node(0);
+	face->set_node(1) = this->get_node(1);
+	face->set_node(2) = this->get_node(3);
 
 	return face;
       }
     case 2:
       {
-	face->set_node(0) = get_node(1);
-	face->set_node(1) = get_node(2);
-	face->set_node(2) = get_node(3);
+	face->set_node(0) = this->get_node(1);
+	face->set_node(1) = this->get_node(2);
+	face->set_node(2) = this->get_node(3);
 
 	return face;
       }
     case 3:
       {
-	face->set_node(0) = get_node(2);
-	face->set_node(1) = get_node(0);
-	face->set_node(2) = get_node(3);
+	face->set_node(0) = this->get_node(2);
+	face->set_node(1) = this->get_node(0);
+	face->set_node(2) = this->get_node(3);
 	
 	return face;
       }
