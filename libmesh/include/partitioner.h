@@ -1,4 +1,4 @@
-// $Id: partitioner.h,v 1.1 2003-06-24 05:33:51 benkirk Exp $
+// $Id: partitioner.h,v 1.2 2003-07-25 20:58:24 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -72,6 +72,13 @@ class Partitioner
   
 protected:
 
+  /**
+   * Trivially "partitions" the mesh for one processor.
+   * Simply loops through the elements and assigns all of them
+   * to processor 0.  Is is provided as a separate function
+   * so that derived classes may use it without reimplementing it.
+   */
+  void single_partition ();
   
   /**
    * A reference to the \p MeshBase we will partition.

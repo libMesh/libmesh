@@ -1,4 +1,4 @@
-// $Id: point_locator_list.C,v 1.1 2003-07-05 14:58:59 ddreyer Exp $
+// $Id: point_locator_list.C,v 1.2 2003-07-25 20:58:24 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -169,23 +169,27 @@ const Elem* PointLocatorList::operator() (const Point& p)
    * bounding box, while the other bounding box'es
    * element is closer, but we simply don't consider
    * it!
+   *
+   * We _can_, however, use size_sq() instead of size()
+   * here to avoid repeated calls to sqrt(), which is
+   * pretty expensive.
    */
   {
     std::vector<Point>& my_list = *(this->_list);
 
-    Real               last_distance = Point(my_list[0] -p).size();
-    unsigned int       last_index    = 0;
-    const unsigned int max_index     = my_list.size();
+    Real               last_distance_sq = Point(my_list[0] -p).size_sq();
+    unsigned int       last_index       = 0;
+    const unsigned int max_index        = my_list.size();
 
 
     for (unsigned int n=1; n<max_index; n++)
       {
-	const Real current_distance = Point(my_list[n] -p).size();
+	const Real current_distance_sq = Point(my_list[n] -p).size_sq();
 
-	if (current_distance < last_distance)
+	if (current_distance_sq < last_distance_sq)
 	  {
-	    last_distance = current_distance;
-	    last_index    = n;
+	    last_distance_sq = current_distance_sq;
+	    last_index       = n;
 	  }
       }
 
