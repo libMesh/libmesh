@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.27 2005-02-22 22:17:36 jwpeterson Exp $
+// $Id: fe_interface.C,v 1.28 2005-02-22 23:12:32 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1275,6 +1275,13 @@ void FEInterface::compute_constraints (std::map<unsigned int,
 						 fe_t,
 						 elem); return;
 
+	  case CLOUGH:
+	    FE<2,CLOUGH>::compute_constraints (constraints,
+					       system_number,
+					       variable_number,
+					       fe_t,
+					       elem); return;
+
 	  default:
 	    return;
 	  }
@@ -1303,4 +1310,20 @@ void FEInterface::compute_constraints (std::map<unsigned int,
 }
   
 
-
+bool FEInterface::extra_hanging_dofs(const FEType& fe_t)
+{
+  switch (fe_t.family)
+    {
+      case HIERARCHIC:
+      case LAGRANGE:
+      case MONOMIAL:
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+      case SZABAB:
+#endif
+      case XYZ:
+	return false;
+      case CLOUGH:
+      default:
+	return true;
+    }
+}
