@@ -1,4 +1,4 @@
-// $Id: fe_boundary.C,v 1.17 2003-06-03 05:33:35 benkirk Exp $
+// $Id: fe_boundary.C,v 1.18 2003-08-18 14:12:42 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -148,8 +148,8 @@ void FE<Dim,T>::init_face_shape_functions(const std::vector<Point>& qp,
   const unsigned int n_qp = qp.size();
 	
   const unsigned int n_mapping_shape_functions =
-    this->n_shape_functions (mapping_elem_type,
-			     mapping_order);
+    FE<Dim,LAGRANGE>::n_shape_functions (mapping_elem_type,
+					 mapping_order);
   
   // resize the vectors to hold current data
   // Psi are the shape functions used for the FE mapping

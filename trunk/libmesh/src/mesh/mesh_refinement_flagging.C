@@ -1,4 +1,4 @@
-// $Id: mesh_refinement_flagging.C,v 1.2 2003-05-26 23:30:04 benkirk Exp $
+// $Id: mesh_refinement_flagging.C,v 1.3 2003-08-18 14:12:44 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -39,11 +39,14 @@
 
 //-----------------------------------------------------------------
 // Mesh refinement methods
-void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_per_cell,
+void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_per_cell_in,
 						      const Real refine_fraction,
 						      const Real coarsen_fraction,
 						      const unsigned int max_level)
 {
+  // Copy the input error_per_cell so that we can modify it
+  ErrorVector error_per_cell (error_per_cell_in);
+  
   // Check for valid fractions..
   // The fraction values must be in [0,1]
   assert (refine_fraction  >= 0.);  assert (refine_fraction  <= 1.);
@@ -54,6 +57,25 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_p
   this->clean_refinement_flags();
   
 
+  // Set the error_per_cell to zero for elements at the
+  // maximum allowable refinement level
+  {
+    active_elem_iterator       elem_it (mesh.elements_begin());
+    const active_elem_iterator elem_end(mesh.elements_end());
+
+    for (; elem_it != elem_end; ++elem_it)
+      {
+	Elem* elem               = *elem_it;
+	const unsigned int id    = elem->id();
+	const unsigned int level = elem->level();
+
+	assert (id < error_per_cell.size());
+      
+	if (level >= max_level)
+	  error_per_cell[id] = 0.;
+      }
+  }
+  
   // Get the minimum, maximum, and delta error values
   // for the elements
   const Real error_max   = error_per_cell.maximum();
@@ -107,11 +129,14 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_p
 
 
 
-void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector& error_per_cell,
+void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector& error_per_cell_in,
 						     const Real refine_fraction,
 						     const Real coarsen_fraction,
 						     const unsigned int max_level)
 {
+  // Copy the input error_per_cell so that we can modify it
+  ErrorVector error_per_cell (error_per_cell_in);
+  
   // Check for valid fractions..
   // The fraction values must be in [0,1]
   assert (refine_fraction  >= 0.);  assert (refine_fraction  <= 1.);
@@ -134,6 +159,25 @@ void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector& error_pe
 
 
 
+  // Set the error_per_cell to zero for elements at the
+  // maximum allowable refinement level
+  {
+    active_elem_iterator       elem_it (mesh.elements_begin());
+    const active_elem_iterator elem_end(mesh.elements_end());
+
+    for (; elem_it != elem_end; ++elem_it)
+      {
+	Elem* elem               = *elem_it;
+	const unsigned int id    = elem->id();
+	const unsigned int level = elem->level();
+
+	assert (id < error_per_cell.size());
+      
+	if (level >= max_level)
+	  error_per_cell[id] = 0.;
+      }
+  }
+  
   // This vector stores the error and element number for all the
   // active elements.  It will be sorted and the top & bottom
   // elements will then be flagged for coarsening & refinement
@@ -204,11 +248,33 @@ void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector& error_pe
 
 
 
-void MeshRefinement::flag_elements_by_mean_stddev (const ErrorVector& error_per_cell,
+void MeshRefinement::flag_elements_by_mean_stddev (const ErrorVector& error_per_cell_in,
 						   const Real refine_fraction,
 						   const Real coarsen_fraction,
 						   const unsigned int max_level)
 {
+  // Copy the input error_per_cell so that we can modify it
+  ErrorVector error_per_cell (error_per_cell_in);
+  
+  // Set the error_per_cell to zero for elements at the
+  // maximum allowable refinement level
+  {
+    active_elem_iterator       elem_it (mesh.elements_begin());
+    const active_elem_iterator elem_end(mesh.elements_end());
+
+    for (; elem_it != elem_end; ++elem_it)
+      {
+	Elem* elem               = *elem_it;
+	const unsigned int id    = elem->id();
+	const unsigned int level = elem->level();
+
+	assert (id < error_per_cell.size());
+      
+	if (level >= max_level)
+	  error_per_cell[id] = 0.;
+      }
+  }
+  
   // Get the mean value from the error vector
   const Real mean = error_per_cell.mean();
 

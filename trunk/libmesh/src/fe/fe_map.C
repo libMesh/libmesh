@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.19 2003-05-15 23:34:35 benkirk Exp $
+// $Id: fe_map.C,v 1.20 2003-08-18 14:12:43 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -636,7 +636,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 	    if (secure)
 	      {
 		assert (det > 0.);
-		assert (fabs(det) > 1.e-10);
+		assert (fabs(det) > 1.e-20);
 	      }
 
 	    const Real inv_det = 1./det;
