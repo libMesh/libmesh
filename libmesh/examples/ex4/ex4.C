@@ -1,4 +1,4 @@
-// $Id: ex4.C,v 1.23 2003-04-07 18:34:44 benkirk Exp $
+// $Id: ex4.C,v 1.24 2003-04-08 22:54:09 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -126,14 +126,12 @@ int main (int argc, char** argv)
    */   
   {
     /**
-     * Check for proper usage.  Here we use the libMesh::err()
-     * method instead of std::cerr.  The reason for this is so
-     * messages are not duplicated across processors.
+     * Check for proper usage.
      */
     if (argc < 3)
       {
-	libMesh::err() << "Usage: " << argv[0] << " -d 2"
-		       << std::endl;
+	std::cerr << "Usage: " << argv[0] << " -d 2"
+		  << std::endl;
 	
 	/**
 	 * This handy function will print the file name, line number,
@@ -150,12 +148,12 @@ int main (int argc, char** argv)
      */
     else 
       {
-	libMesh::msg() << "Running " << argv[0];
+	std::cout << "Running " << argv[0];
 	
 	for (int i=1; i<argc; i++)
-	  libMesh::msg() << " " << argv[i];
+	  std::cout << " " << argv[i];
 	
-	libMesh::msg() << std::endl << std::endl;
+	std::cout << std::endl << std::endl;
       }
     
 

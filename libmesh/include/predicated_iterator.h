@@ -1,4 +1,4 @@
-// $Id: predicated_iterator.h,v 1.7 2003-03-03 02:15:57 benkirk Exp $
+// $Id: predicated_iterator.h,v 1.8 2003-04-08 22:54:10 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -38,7 +38,7 @@
  * \author John W. Peterson, 2002-2003
  */
 template <class T>
-#ifdef BROKEN_IOSTREAM     // for gcc-2.95.3 using old stl version
+#if defined(__GNUC__) && (__GNUC__ < 3) // for gcc-2.95.3 using old stl version
 class PredicatedIterator : public std::forward_iterator<std::forward_iterator_tag, T>
 #else
 class PredicatedIterator : public std::iterator<std::forward_iterator_tag, T>

@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.26 2003-04-03 00:52:58 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.27 2003-04-08 22:54:07 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -94,7 +94,7 @@ AC_DEFUN(DETERMINE_CXX_BRAND, dnl
           GXX_VERSION=intel_icc	
         else	
   	
-          dnl Intel's ICC C++ compiler for Itanium?
+          dnl Intel's ECC C++ compiler for Itanium?
           is_intel_ecc="`($CXX -V 2>&1) | grep 'Intel(R) C++ Itanium(TM) Compiler'`"
           if test "x$is_intel_ecc" != "x" ; then
             AC_MSG_RESULT(<<< C++ compiler is Intel Itanium ECC >>>)
@@ -175,16 +175,12 @@ dnl CXXFLAGSS  : flags for syntax-checking mode
 dnl CXXFLAGSP  : flags for profiler mode (only tested with GCC 3.2.1 but
 dnl              should work with most versions.)  Note: the -a option
 dnl              has been removed as of this version of GCC.
-dnl CXXDEPFLAG : flag for creating dependency info
 dnl
 dnl Usage: SET_CXX_FLAGS
 dnl
 dnl -------------------------------------------------------------
 AC_DEFUN(SET_CXX_FLAGS, dnl
 [
-  dnl Flag for creating dependencies; can be modified at a later stage
-  CXXDEPFLAG="-MM"
-
   dnl Flag for creating shared objects; can be modified at a later stage
   CXXSHAREDFLAG="-shared"
 
@@ -281,7 +277,6 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           CFLAGSP="$CFLAGSO -g -pg"
 	  CXXSHAREDFLAG="-G -qmkshrobj -bnoerrmsg"
 	  CSHAREDFLAG="-G -qmkshrobj"
-	  CXXDEPFLAG="-qmakedep"
 	  RPATHFLAG="-Qoption,link,-rpath,"
           ;;
   
@@ -290,7 +285,6 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           CXXFLAGSO="-DNDEBUG -LANG:std -no_auto_include -ansi -O2 -w"
           CFLAGSG="-DDEBUG"
           CFLAGSO="-DNDEBUG -O2 -w"
-          CXXDEPFLAG="-M"
 
           dnl For some reason, CC forgets to add the math lib to the
           dnl linker line, so we do that ourselves
@@ -474,8 +468,6 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           dnl  -Ae turns on ANSI C with some HP extensions
           CXXFLAGSG="+DA2.0W -AA +z -ext -g"
           CXXFLAGSO="+DA2.0W -AA +z -ext -O +Onolimit"
-          dnl override value for make dep's
-          CXXDEPFLAG="-E +m"
 	  CFLAGSG="+DA2.0W -Aa +z -Ae -g"
           CFLAGSO="+DA2.0W -Aa +z -Ae -O +Onolimit"
           LDFLAGS="$LDFLAGS -I/usr/lib/pa20_64"
