@@ -1,4 +1,4 @@
-// $Id: ex8.C,v 1.5 2003-06-03 05:33:35 benkirk Exp $
+// $Id: ex8.C,v 1.6 2003-06-04 18:28:36 spetersen Exp $
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
   
@@ -75,13 +75,13 @@
  * \section Introduction
  *
  * This is the eighth example program. It builds on
- * the previous example programs. It introduces the
- * NewmarkSystem class. In this example the wave equation
+ * the previous example programs.  It introduces the
+ * NewmarkSystem class.  In this example the wave equation
  * is solved using the time integration scheme provided
  * by the NewmarkSystem class.
  *
  * This example comes with a cylindrical mesh given in the
- * universal file pipe-mesh.unv
+ * universal file pipe-mesh.unv.
  * The mesh contains HEX8 and PRISM6 elements.
  */
 
@@ -90,7 +90,7 @@
 /**
  * Function prototype.  This is the function that will assemble
  * the linear system for our problem, governed by the linear
- * wave equation
+ * wave equation.
  */
 void assemble_wave(EquationSystems& es,
 		   const std::string& system_name);
@@ -98,7 +98,7 @@ void assemble_wave(EquationSystems& es,
 
 
 /**
- * Function Prototype. This function will be used to apply the
+ * Function Prototype.  This function will be used to apply the
  * initial conditions.
  */
 void apply_initial(EquationSystems& es,
@@ -107,7 +107,7 @@ void apply_initial(EquationSystems& es,
 
 
 /**
- * Function Prototype. This function imposes
+ * Function Prototype.  This function imposes
  * Dirichlet Boundary conditions via the penalty
  * method after the system is assembled.
  */
@@ -200,10 +200,10 @@ int main (int argc, char** argv)
      */
     mesh.read(mesh_file);
     // mesh.build_cube (10, 10, 40,
-    //		     -1., 1.,
-    //		     -1., 1.,
-    //	             0., 4.,
-    //	             HEX8);
+    //		       -1., 1.,
+    //		       -1., 1.,
+    //	                0., 4.,
+    //	                HEX8);
 
     /**
      * Print information about the mesh to the screen.
@@ -254,7 +254,7 @@ int main (int argc, char** argv)
       NewmarkSystem & t_system = equation_systems.get_system<NewmarkSystem> ("Wave");
       
       /**
-       * Adds the variable "p" to "Wave".  "p"
+       * Adds the variable "p" to "Wave".   "p"
        * will be approximated using first-order approximation.
        */
       t_system.add_variable("p", FIRST);
@@ -270,7 +270,7 @@ int main (int argc, char** argv)
       /**
        * Set the time step size, and optionally the
        * Newmark parameters, so that \p NewmarkSystem can 
-       * compute integration constants. Here we simply use 
+       * compute integration constants.  Here we simply use 
        * pass only the time step and use default values 
        * for \p alpha=.25  and \p delta=.5.
        */
@@ -336,9 +336,9 @@ int main (int argc, char** argv)
      * For convenience, use a local buffer of the 
      * current time.  But once this time is updated,
      * also update the \p EquationSystems parameter
+     * Start with t_time = 0 and write a short header
+     * to the nodal result file
      */
-    // start with t_time = 0 and write a short header to the
-    // nodal result file
     Real t_time = 0.;
     res_out << "# pressure at node " << res_node_no << "\n"
 	    << "# time\tpressure\n"
@@ -364,7 +364,7 @@ int main (int argc, char** argv)
 	 * Impose essential boundary conditions.
 	 * Not that since the matrix is only assembled once,
 	 * the penalty parameter should be added to the matrix
-	 * only in the first time step. The applied
+	 * only in the first time step.  The applied
 	 * boundary conditions may be time-dependent and hence
 	 * the rhs vector is considered in each time step. 
 	 */
@@ -413,7 +413,7 @@ int main (int argc, char** argv)
 	t_system.update_u_v_a();
 
 	/**
-	 * Write nodal results to file. The results can then
+	 * Write nodal results to file.  The results can then
 	 * be viewed with e.g. gnuplot (run gnuplot and type
 	 * 'plot "pressure_node.res" with lines' in the command line)
 	 */
@@ -451,19 +451,19 @@ void assemble_wave(EquationSystems& es,
   const Mesh& mesh = es.get_mesh();
 
   /**
-   * The dimension that we are running
+   * The dimension that we are running.
    */
   const unsigned int dim = mesh.mesh_dimension();
 
   /**
    * Copy the speed of sound and fluid density
-   * to a local variable
+   * to a local variable.
    */
   const Real speed = es.parameter("speed");
   const Real rho   = es.parameter("fluid density");
 
   /**
-   * Get a reference to our system, as before
+   * Get a reference to our system, as before.
    */
   NewmarkSystem & t_system = es.get_system<NewmarkSystem> (system_name);
 
@@ -475,10 +475,10 @@ void assemble_wave(EquationSystems& es,
 
   /**
    * In here, we will add the element matrices to the
-   * @e additional matrices "stiffness_mass", "damping",
-   * and the additional vector "rhs", not to the members 
+   * @e additional matrices "stiffness_mass" and "damping"
+   * and the additional vector "force", not to the members 
    * "matrix" and "rhs".  Therefore, get writable
-   * references to them
+   * references to them.
    */
   SparseMatrix<Number>&   stiffness = t_system.get_matrix("stiffness");
   SparseMatrix<Number>&   damping   = t_system.get_matrix("damping");
@@ -496,7 +496,7 @@ void assemble_wave(EquationSystems& es,
    * encounter identical sparsity structures.
    */
   SparseMatrix<Number>&  matrix     = *t_system.matrix;
-
+  DenseMatrix<Number>    zero_matrix;
 
   /**
    * Build a Finite Element object of the specified type.  Since the
@@ -535,18 +535,14 @@ void assemble_wave(EquationSystems& es,
   /**
    * A reference to the \p DofMap object for this system.  The \p DofMap
    * object handles the index translation from node and element numbers
-   * to degree of freedom numbers.  We will talk more about the \p DofMap
-   * in future examples.
+   * to degree of freedom numbers.
    */
   const DofMap& dof_map = t_system.get_dof_map();
 
   /**
-   * The mass, damping and stiffness matrices, however, are inherently
-   * real.  And since \p DenseMatrix<> offers a method
-   * to add a real matrix to a complex matrix, we can safely
-   * define element stiffness Ke and mass matrix Me as real. 
+   * The element mass, damping and stiffness matrices
+   * and the element contribution to the rhs.
    */
-  DenseMatrix<Number>   Ae, zero_matrix;
   DenseMatrix<Number>   Ke, Ce, Me;
   DenseVector<Number>   Fe;
 
@@ -594,34 +590,22 @@ void assemble_wave(EquationSystems& es,
       fe->reinit (elem);
 
       /**
-       * Zero the element matrix and right-hand side before
+       * Zero the element matrices and rhs before
        * summing them.  We use the resize member here because
        * the number of degrees of freedom might have changed from
        * the last element.  Note that this will be the case if the
-       * element type is different (i.e. the last element was a
-       * triangle, now we are on a quadrilateral).
-       *
-       * The \p DenseMatrix::resize() member will automatically
-       * zero out the matrix.  Since we are using a \p std::vector
-       * for the right-hand-side we will use the \p std::fill algorithm
-       * to zero out Fe.
+       * element type is different (i.e. the last element was HEX8
+       * and now have a PRISM6).
        */
-      Ae.resize          (dof_indices.size(),
-			  dof_indices.size());
-      zero_matrix.resize (dof_indices.size(),
-			  dof_indices.size());
+      {
+        const unsigned int n_dof_indices = dof_indices.size();
 
-      Ke.resize (dof_indices.size(),
-		 dof_indices.size());
-
-      Ce.resize (dof_indices.size(),
-		 dof_indices.size());
-
-      Me.resize (dof_indices.size(),
-		 dof_indices.size());
-
-      Fe.resize (dof_indices.size());
-
+	Ke.resize          (n_dof_indices, n_dof_indices);
+	Ce.resize          (n_dof_indices, n_dof_indices);
+	Me.resize          (n_dof_indices, n_dof_indices);
+	zero_matrix.resize (n_dof_indices, n_dof_indices);
+	Fe.resize          (n_dof_indices);
+      }
 
       /**
        *----------------------------------------------------------------
@@ -655,16 +639,12 @@ void assemble_wave(EquationSystems& es,
        */
       {
 	/**
-	 * The following loops over the sides of the element.
-	 * If the element has no neighbor on a side then that
-	 * side MUST live on a boundary of the domain.
-	 *
 	 * In this example no natural boundary conditions will
-	 * be considered. The code is left here so it can easily
+	 * be considered.  The code is left here so it can easily
 	 * be extended.
 	 * 
 	 */
-	// don't do for any side
+	// don't do this for any side
 	for (unsigned int side=0; side<elem->n_sides(); side++)
 	  if (!true)
 	    // if (elem->neighbor(side) == NULL)
@@ -789,15 +769,13 @@ void apply_initial(EquationSystems& es,
 
   /**
    * Assume our fluid to be at rest, which would
-   * also be the default conditions in class NewmarkSystem.
+   * also be the default conditions in class NewmarkSystem,
+   * but let us do it explicetly here.
    */
   pres_vec.zero();
   vel_vec.zero();
   acc_vec.zero();
 
-  // the nodal acceleration values for t=t_0 could be computed
-  // in the matrix assembly.
-  // acc_vec.add (1., t_system.get_vector("force"));
 }
 
 
@@ -860,7 +838,8 @@ void fill_dirichlet_bc(EquationSystems& es,
        * Check if Dirichlet BCs should be applied to this node.
        * Use the \p TOLERANCE from \p mesh_common.h as tolerance.
        * Here a pressure value is applied if the z-coord.
-       * is equal to 4.
+       * is equal to 4, which corresponds to one end of the
+       * pipe-mesh in this directory.
        */
       const Real z_coo = 4.;
 
@@ -877,17 +856,6 @@ void fill_dirichlet_bc(EquationSystems& es,
 	  const Real penalty = 1.e10;
 
 	  /**
-	   * The boundary value that will be applied.
-	   */
-	  // const Real p_value = 1.;
-
-	  /**
-	   * Compute distance from point 0,0,4.
-	   */
-	  // const Real r_dist = pow(curr_node(0)*curr_node(0)+
-          //                        curr_node(1)*curr_node(1),.5);
-
-	  /**
 	   * Here we apply sinusoidal pressure values for 0<t<0.002
 	   * at one end of the pipe-mesh.
 	   */
@@ -897,23 +865,20 @@ void fill_dirichlet_bc(EquationSystems& es,
 	  else
 	    p_value = .0;
 
-	  // if (r_dist < .2+TOLERANCE && current_time < .002 )
-	  //   p_value = sin(2*pi*current_time/.002);
-	  // else
-	  //   p_value = .0;
-
 	  /**
 	   * Now add the contributions to the matrix and the rhs.
 	   */
 	  rhs.add(dn, p_value*penalty);
 
-
-
+	  /**
+	   * Add the panalty parameter to the global matrix
+	   * if desired.
+	   */
 	  if (do_for_matrix)
 	    matrix.add(dn, dn, penalty);
 
 	}
-    }
+    } // loop n_cnt
 
 }
 
