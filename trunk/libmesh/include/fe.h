@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: fe.h,v 1.2 2003-01-20 16:31:22 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,19 +23,21 @@
 #define __fe_h__
 
 // C++ includes
-#include <memory>
+#include <vector>
 
 // Local includes
-#include "mesh_config.h"
-#include "reference_counter.h"
-#include "mesh_base.h"
+#include "reference_counted_object.h"
 #include "point.h"
-#include "order.h"
+#include "enum_elem_type.h"
 #include "fe_type.h"
+#include "auto_ptr.h"
 
 
 // forward declarations
 class QBase;
+class MeshBase;
+class Elem;
+class FEBase;
 
 
 
@@ -73,8 +75,7 @@ class QBase;
 
 // ------------------------------------------------------------
 // FEBase class definition
-
-class FEBase : public ReferenceCounter
+class FEBase : public ReferenceCountedObject<FEBase>
 {
 protected:
 
@@ -83,8 +84,7 @@ protected:
    * structures.  Protected so that this base class
    * cannot be explicitly instantiated.
    */
-  FEBase (const MeshBase& m,
-	  const unsigned int dim,
+  FEBase (const unsigned int dim,
 	  const FEType& fet);
   
 public:
@@ -95,17 +95,12 @@ public:
   virtual ~FEBase();
 
   /**
-   * @returns "FEBase"
-   */
-  std::string class_name () const { return "FEBase"; };
-  
-  /**
-   * Builds a specific finite element type.  A \p std::auto_ptr<Elem> is
+   * Builds a specific finite element type.  A \p AutoPtr<Elem> is
    * returned to prevent a memory leak. This way the user need not
    * remember to delete the object.
    */
-  static std::auto_ptr<FEBase> build (const MeshBase& m,
-				      const FEType& type); 
+  static AutoPtr<FEBase> build (const unsigned int dim,
+				const FEType& type); 
 
   /**
    * This is at the core of this class. Use this for each
@@ -278,33 +273,73 @@ protected:
   void compute_shape_functions(const QBase* q);
   
 
-  // All these nice short-hand inline functions
-  // are used in \p FEBase::compute_map(), which should be
-  // be usable in derived classes, and therefore protected.
+  /**
+   * Used in \p FEBase::compute_map(), which should be
+   * be usable in derived classes, and therefore protected.
+   * Returns the x value of the pth entry of the dxzydxi_map.
+   */
   real dxdxi_map(const unsigned int p) const   { return dxyzdxi_map[p](0); };
 
+  /**
+   * Used in \p FEBase::compute_map(), which should be
+   * be usable in derived classes, and therefore protected.
+   * Returns the y value of the pth entry of the dxzydxi_map.
+   */
   real dydxi_map(const unsigned int p) const   { return dxyzdxi_map[p](1); };
 
+  /**
+   * Used in \p FEBase::compute_map(), which should be
+   * be usable in derived classes, and therefore protected.
+   * Returns the z value of the pth entry of the dxzydxi_map.
+   */
   real dzdxi_map(const unsigned int p) const   { return dxyzdxi_map[p](2); };
 
+  /**
+   * Used in \p FEBase::compute_map(), which should be
+   * be usable in derived classes, and therefore protected.
+   * Returns the x value of the pth entry of the dxzydeta_map.
+   */
   real dxdeta_map(const unsigned int p) const  { return dxyzdeta_map[p](0); };
 
+  /**
+   * Used in \p FEBase::compute_map(), which should be
+   * be usable in derived classes, and therefore protected.
+   * Returns the y value of the pth entry of the dxzydeta_map.
+   */
   real dydeta_map(const unsigned int p) const  { return dxyzdeta_map[p](1); }; 
 
+  /**
+   * Used in \p FEBase::compute_map(), which should be
+   * be usable in derived classes, and therefore protected.
+   * Returns the z value of the pth entry of the dxzydeta_map.
+   */
   real dzdeta_map(const unsigned int p) const  { return dxyzdeta_map[p](2); };
 
+  /**
+   * Used in \p FEBase::compute_map(), which should be
+   * be usable in derived classes, and therefore protected.
+   * Returns the x value of the pth entry of the dxzydzeta_map.
+   */
   real dxdzeta_map(const unsigned int p) const { return dxyzdzeta_map[p](0); };
 
+  /**
+   * Used in \p FEBase::compute_map(), which should be
+   * be usable in derived classes, and therefore protected.
+   * Returns the y value of the pth entry of the dxzydzeta_map.
+   */
   real dydzeta_map(const unsigned int p) const { return dxyzdzeta_map[p](1); };
 
+  /**
+   * Used in \p FEBase::compute_map(), which should be
+   * be usable in derived classes, and therefore protected.
+   * Returns the z value of the pth entry of the dxzydzeta_map.
+   */
   real dzdzeta_map(const unsigned int p) const { return dxyzdzeta_map[p](2); };
 
 
-  /**
-   * A reference to the mesh object
-   */
-  const MeshBase& mesh;
 
+
+  
   /**
    * The dimensionality of the object
    */
@@ -315,47 +350,186 @@ protected:
    */
   std::vector<Point> xyz;
 
-  // Vectors used to build the map from/to
-  // the reference element
+
+  
+  /**
+   * Vector of parital derivatives: 
+   * d(x)/d(xi), d(y)/d(xi), d(z)/d(xi) 
+   */
   std::vector<Point> dxyzdxi_map;
+
+  /**
+   * Vector of parital derivatives: 
+   * d(x)/d(eta), d(y)/d(eta), d(z)/d(eta)
+   */
   std::vector<Point> dxyzdeta_map;
+
+  /**
+   * Vector of parital derivatives: 
+   * d(x)/d(zeta), d(y)/d(zeta), d(z)/d(zeta)
+   */
   std::vector<Point> dxyzdzeta_map;
-  		     
+  
+
+  /**
+   * Map for partial derivatives:
+   * d(xi)/d(x). Needed for the Jacobian.
+   */
   std::vector<real>  dxidx_map;
+
+  /**
+   * Map for partial derivatives:
+   * d(xi)/d(y). Needed for the Jacobian.
+   */
   std::vector<real>  dxidy_map;
+
+  /**
+   * Map for partial derivatives:
+   * d(xi)/d(z). Needed for the Jacobian.
+   */
   std::vector<real>  dxidz_map;
-		     
+
+
+
+  
+  /**
+   * Map for partial derivatives:
+   * d(eta)/d(x). Needed for the Jacobian.
+   */
   std::vector<real>  detadx_map;
+
+  /**
+   * Map for partial derivatives:
+   * d(eta)/d(y). Needed for the Jacobian.
+   */
   std::vector<real>  detady_map;
+
+  /**
+   * Map for partial derivatives:
+   * d(eta)/d(z). Needed for the Jacobian.
+   */
   std::vector<real>  detadz_map;
-		     
+
+
+
+
+  
+  /**
+   * Map for partial derivatives:
+   * d(zeta)/d(x). Needed for the Jacobian.
+   */
   std::vector<real>  dzetadx_map;
+
+  /**
+   * Map for partial derivatives:
+   * d(zeta)/d(y). Needed for the Jacobian.
+   */
   std::vector<real>  dzetady_map;
+
+  /**
+   * Map for partial derivatives:
+   * d(zeta)/d(z). Needed for the Jacobian.
+   */
   std::vector<real>  dzetadz_map;
-				    
-  // FE Approximation shape functions    
+
+
+  
+  /**
+   * Shape function values.
+   */
   std::vector<std::vector<real> >   phi;
+
+  /**
+   * Shape function derivative values.
+   */
   std::vector<std::vector<Point> >  dphi;
+
+  /**
+   * Shape function derivatives in the xi direction.
+   */
   std::vector<std::vector<real> >   dphidxi;
+
+  /**
+   * Shape function derivatives in the eta direction.
+   */
   std::vector<std::vector<real> >   dphideta;
+  
+  /**
+   * Shape function derivatives in the zeta direction.
+   */
   std::vector<std::vector<real> >   dphidzeta;
+
+  /**
+   * Shape function derivatives in the x direction.
+   */
   std::vector<std::vector<real> >   dphidx;
+
+  /**
+   * Shape function derivatives in the y direction.
+   */
   std::vector<std::vector<real> >   dphidy;
+
+  /**
+   * Shape function derivatives in the z direction.
+   */
   std::vector<std::vector<real> >   dphidz;
 
-  // Mapping shape functions
+
+
+
+  
+  /**
+   * Map for the shape function phi.
+   */
   std::vector<std::vector<real> >   phi_map;
+
+  /**
+   * Map for the derivative, d(phi)/d(xi).
+   */
   std::vector<std::vector<real> >   dphidxi_map;
+
+  /**
+   * Map for the derivative, d(phi)/d(eta).
+   */
   std::vector<std::vector<real> >   dphideta_map;
+
+  /**
+   * Map for the derivative, d(phi)/d(zeta).
+   */
   std::vector<std::vector<real> >   dphidzeta_map;
 
-  // Shape functions for mapping side values
+
+
+
+  
+  /**
+   * Map for the side shape functions, psi. 
+   */
   std::vector<std::vector<real> >   psi_map;
+
+  /**
+   * Map for the derivative of the side functions,
+   * d(psi)/d(xi).
+   */
   std::vector<std::vector<real> >   dpsidxi_map;
+
+  /**
+   * Map for the derivative of the side function,
+   * d(psi)/d(eta).
+   */
   std::vector<std::vector<real> >   dpsideta_map;
 
-  // Normal vectors on boundary at quadrature points
+
+
+  
+  /**
+   * Tangent vectors on boundary at quadrature points.
+   */
   std::vector<std::vector<Point> >  tangents;
+
+  /**
+   * Normal vectors on boundary at quadrature points
+   */
   std::vector<Point>                normals;
 
   /**
@@ -413,7 +587,7 @@ private:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.1.1.1 $
+ * \version $Revision: 1.2 $
  */
 
 //-------------------------------------------------------------
@@ -426,8 +600,7 @@ public:
   /**
    * Constructor.
    */
-  FE(const MeshBase& m,
-     const FEType& fet);
+  FE(const FEType& fet);
   
   /**
    * @returns the value of the \f$ i^{th} \f$ shape function at
@@ -476,8 +649,7 @@ public:
    * Build the nodal soln from the element soln.
    * This is the solution that will be plotted.
    */
-  static void nodal_soln(const MeshBase& mesh,
-			 const Elem* elem, const Order o,
+  static void nodal_soln(const Elem* elem, const Order o,
 			 const std::vector<number>& elem_soln,
 			 std::vector<number>& nodal_soln);
 
@@ -524,8 +696,7 @@ public:
    * inverting the (possibly nonlinear) transformation map, so
    * it is not trivial.
    */
-  static Point inverse_map (const MeshBase& mesh,
-			    const Elem* elem,
+  static Point inverse_map (const Elem* elem,
 			    const Point& p);
   
   /**
@@ -569,32 +740,28 @@ private:
    * @returns the location (in physical space) of the point
    * \p p located on the reference element.
    */
-  static Point map (const MeshBase& mesh,
-		    const Elem* elem,
+  static Point map (const Elem* elem,
 		    const Point& reference_point);
   
   /**
    * @returns d(xyz)/dxi (in physical space) of the point
    * \p p located on the reference element.
    */
-  static Point map_xi (const MeshBase& mesh,
-		       const Elem* elem,
+  static Point map_xi (const Elem* elem,
 		       const Point& reference_point);
   
   /**
    * @returns d(xyz)/deta (in physical space) of the point
    * \p p located on the reference element.
    */
-  static Point map_eta (const MeshBase& mesh,
-			const Elem* elem,
+  static Point map_eta (const Elem* elem,
 			const Point& reference_point);
 
   /**
    * @returns d(xyz)/dzeta (in physical space) of the point
    * \p p located on the reference element.
    */
-  static Point map_zeta (const MeshBase& mesh,
-			 const Elem* elem,
+  static Point map_zeta (const Elem* elem,
 			 const Point& reference_point);
 
   /**
@@ -612,7 +779,7 @@ private:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.1.1.1 $
+ * \version $Revision: 1.2 $
  */
 
 //-------------------------------------------------------------
@@ -626,8 +793,7 @@ public:
    * Constructor. Creates a hierarchic finite element
    * to be used in dimension \p Dim.
    */
-  FEHierarchic(const MeshBase& m,
-	       const FEType&   fet);
+  FEHierarchic(const FEType& fet);
 };
 
 
@@ -638,7 +804,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.1.1.1 $
+ * \version $Revision: 1.2 $
  */
 
 //-------------------------------------------------------------
@@ -652,8 +818,7 @@ public:
    * Constructor. Creates a Lagrange finite element
    * to be used in dimension \p Dim.
    */
-  FELagrange(const MeshBase& m,
-	     const FEType&   fet);
+  FELagrange(const FEType& fet);
 };
 
 
@@ -664,7 +829,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.1.1.1 $
+ * \version $Revision: 1.2 $
  */
 
 //-------------------------------------------------------------
@@ -678,8 +843,7 @@ public:
    * Constructor. Creates a monomial finite element
    * to be used in dimension \p Dim.
    */
-  FEMonomial(const MeshBase& m,
-	     const FEType&   fet);
+  FEMonomial(const FEType& fet);
 };
 
 
@@ -753,16 +917,13 @@ namespace FiniteElements
 // ------------------------------------------------------------
 // FEBase class inline members
 inline
-FEBase::FEBase(const MeshBase& m,
-	       const unsigned int d,
+FEBase::FEBase(const unsigned int d,
 	       const FEType& fet) :
-  mesh(m),
   dim(d),
   fe_type(fet),
   elem_type(INVALID_ELEM),
   qrule(NULL)
 {
-  increment_constructor_count ();
 };
 
 
@@ -770,7 +931,6 @@ FEBase::FEBase(const MeshBase& m,
 inline
 FEBase::~FEBase()
 {
-  increment_destructor_count ();
 };
 
 
@@ -839,9 +999,8 @@ void FEBase::print_info() const
 // FE class inline members
 template <unsigned int Dim, FEFamily T>
 inline
-FE<Dim,T>::FE (const MeshBase& m,
-	       const FEType& fet) :
-  FEBase (m,Dim,fet)
+FE<Dim,T>::FE (const FEType& fet) :
+  FEBase (Dim,fet)
 {
   // Sanity check.  Make sure the
   // Family specified in the template instantiation
@@ -855,9 +1014,8 @@ FE<Dim,T>::FE (const MeshBase& m,
 // FEHierarchic class inline members
 template <unsigned int Dim>
 inline
-FEHierarchic<Dim>::FEHierarchic (const MeshBase& m,
-				 const FEType&   fet) :
-  FE<Dim,HIERARCHIC> (m,fet)
+FEHierarchic<Dim>::FEHierarchic (const FEType& fet) :
+  FE<Dim,HIERARCHIC> (fet)
 {
 };
 
@@ -867,9 +1025,8 @@ FEHierarchic<Dim>::FEHierarchic (const MeshBase& m,
 // FELagrange class inline members
 template <unsigned int Dim>
 inline
-FELagrange<Dim>::FELagrange (const MeshBase& m,
-			     const FEType&   fet) :
-  FE<Dim,LAGRANGE> (m,fet)
+FELagrange<Dim>::FELagrange (const FEType& fet) :
+  FE<Dim,LAGRANGE> (fet)
 {
 };
 
@@ -879,9 +1036,8 @@ FELagrange<Dim>::FELagrange (const MeshBase& m,
 // FEMonomial class inline members
 template <unsigned int Dim>
 inline
-FEMonomial<Dim>::FEMonomial (const MeshBase& m,
-			     const FEType&   fet) :
-  FE<Dim,MONOMIAL> (m,fet)
+FEMonomial<Dim>::FEMonomial (const FEType& fet) :
+  FE<Dim,MONOMIAL> (fet)
 {
 };
 

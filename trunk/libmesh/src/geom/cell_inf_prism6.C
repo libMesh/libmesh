@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism6.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: cell_inf_prism6.C,v 1.2 2003-01-20 16:31:35 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // Local includes
-#include "cell.h"
+#include "mesh_config.h"
 
 #ifdef ENABLE_INFINITE_ELEMENTS
 
@@ -26,8 +26,6 @@
 
 // Local includes cont'd
 #include "mesh.h"
-
-// Temporary includes
 #include "cell_inf_prism6.h"
 #include "face_tri3.h"
 #include "face_inf_quad4.h"
@@ -37,10 +35,9 @@
 
 // ------------------------------------------------------------
 // InfPrism6 class member functions
-std::auto_ptr<Elem> InfPrism6::build_side (const unsigned int i) const
+AutoPtr<Elem> InfPrism6::build_side (const unsigned int i) const
 {
   assert (i < n_sides());
-  assert (_nodes.size() == n_nodes());
 
 
   
@@ -50,69 +47,69 @@ std::auto_ptr<Elem> InfPrism6::build_side (const unsigned int i) const
       {
 	Tri3*  face = new Tri3;
 
-	face->node(0) = node(0);
-	face->node(1) = node(2);
-	face->node(2) = node(1);
+	face->set_node(0) = get_node(0);
+	face->set_node(1) = get_node(2);
+	face->set_node(2) = get_node(1);
 
-	std::auto_ptr<Elem> ap(face);  return ap;
+	AutoPtr<Elem> ap(face);  return ap;
       }
     case 1:  // the quad face at y=0
       {
 	InfQuad4* face = new InfQuad4;
 	
-	face->node(0) = node(0);
-	face->node(1) = node(1);
-	face->node(2) = node(4);
-	face->node(3) = node(3);
+	face->set_node(0) = get_node(0);
+	face->set_node(1) = get_node(1);
+	face->set_node(2) = get_node(4);
+	face->set_node(3) = get_node(3);
 	
-	std::auto_ptr<Elem> ap(face);  return ap;
+	AutoPtr<Elem> ap(face);  return ap;
       }
     case 2:  // the other quad face
       {
 	InfQuad4* face = new InfQuad4;
 
-	face->node(0) = node(1);
-	face->node(1) = node(2);
-	face->node(2) = node(5);
-	face->node(3) = node(4);
+	face->set_node(0) = get_node(1);
+	face->set_node(1) = get_node(2);
+	face->set_node(2) = get_node(5);
+	face->set_node(3) = get_node(4);
 
-	std::auto_ptr<Elem> ap(face);  return ap;
+	AutoPtr<Elem> ap(face);  return ap;
       }
     case 3: // the quad face at x=0
       {
 	InfQuad4* face = new InfQuad4;
 
-	face->node(0) = node(2);
-	face->node(1) = node(0);
-	face->node(2) = node(3);
-	face->node(3) = node(5);
+	face->set_node(0) = get_node(2);
+	face->set_node(1) = get_node(0);
+	face->set_node(2) = get_node(3);
+	face->set_node(3) = get_node(5);
 	
-	std::auto_ptr<Elem> ap(face);  return ap;
+	AutoPtr<Elem> ap(face);  return ap;
       }
     case 4: // the triangular face at z=1
       {
         std::cerr << "No face 4 in case of infinite elements!" << std::endl;
         error();
-	std::auto_ptr<Elem> ap(NULL);  return ap;
+	AutoPtr<Elem> ap(NULL);  return ap;
 
       }
     default:
       {
 	error(); 
-	std::auto_ptr<Elem> ap(NULL);  return ap;
+	AutoPtr<Elem> ap(NULL);  return ap;
       }
     };
 
   // We'll never get here.
   error();
-  std::auto_ptr<Elem> ap(NULL);  return ap;
+  AutoPtr<Elem> ap(NULL);  return ap;
 };
 
 
 
 const std::vector<unsigned int> InfPrism6::tecplot_connectivity(const unsigned int sc) const
 {
-  assert (!_nodes.empty());
+  assert (_nodes != NULL);
   assert (sc < n_sub_elem());
 
   std::vector<unsigned int> conn(8);
@@ -135,7 +132,7 @@ const std::vector<unsigned int> InfPrism6::tecplot_connectivity(const unsigned i
 void InfPrism6::write_tecplot_connectivity(std::ostream &out) const
 {
   assert (out);
-  assert (!_nodes.empty());
+  assert (_nodes != NULL);
 
   for (unsigned int sc=0; sc<n_sub_elem(); sc++)
     {
@@ -244,14 +241,14 @@ void InfPrism6::refine(Mesh& mesh)
       for (unsigned int nc=0; nc<child(c)->n_nodes(); nc++)
 	for (unsigned int n=0; n<n_nodes(); n++)
 	  if (embedding_matrix[c][nc][n] != 0.)
-	    p[c][nc] += mesh.vertex(node(n))*embedding_matrix[c][nc][n];
+	    p[c][nc] += point(n)*embedding_matrix[c][nc][n];
     
     
     // assign nodes to children & add them to the mesh
     for (unsigned int c=0; c<n_children(); c++)
       {
 	for (unsigned int nc=0; nc<child(c)->n_nodes(); nc++)
-	  _children[c]->node(nc) = mesh.mesh_refinement.add_node(p[c][nc]);
+	  _children[c]->set_node(nc) = mesh.mesh_refinement.add_point(p[c][nc]);
 
 	mesh.add_elem(child(c), mesh.mesh_refinement.new_element_number());
       };

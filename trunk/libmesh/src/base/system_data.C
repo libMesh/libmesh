@@ -1,4 +1,4 @@
-// $Id: system_data.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: system_data.C,v 1.2 2003-01-20 16:31:32 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -20,15 +20,10 @@
 
 
 // C++ includes
-#include <iostream>
 #include <algorithm>
 
 // Local includes
-#include "mesh.h"
-#include "petsc_vector.h"
-#include "petsc_matrix.h"
 #include "petsc_interface.h"
-#include "dof_map.h"
 #include "system_data.h"
 #include "equation_systems.h"
 
@@ -285,7 +280,7 @@ SystemData::solve ()
 
 
 void SystemData::attach_init_function(void fptr(EquationSystems& es,
-						const std::string name))
+						const std::string& name))
 {
   assert (fptr != NULL);
   
@@ -295,7 +290,7 @@ void SystemData::attach_init_function(void fptr(EquationSystems& es,
 
 
 void SystemData::attach_assemble_function(void fptr(EquationSystems& es,
-						    const std::string name))
+						    const std::string& name))
 {
   assert (fptr != NULL);
   

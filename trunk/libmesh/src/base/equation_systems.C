@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: equation_systems.C,v 1.2 2003-01-20 16:31:31 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -22,7 +22,6 @@
 #include <sstream>
 
 // Local Includes
-#include "mesh.h"
 #include "fe_interface.h"
 #include "petsc_vector.h"
 #include "petsc_matrix.h"
@@ -419,8 +418,7 @@ void EquationSystems::build_solution_vector (std::vector<number>& soln)
 		    for (unsigned int i=0; i<dof_indices.size(); i++)
 		      elem_soln[i] = sys_soln[dof_indices[i]];
 		    
-		    FEInterface::nodal_soln (dim, fe_type,
-					     mesh, elem,
+		    FEInterface::nodal_soln (dim, fe_type, elem,
 					     elem_soln, nodal_soln);
 
 		    assert (nodal_soln.size() == elem->n_nodes());
@@ -461,9 +459,11 @@ std::string EquationSystems::get_info () const
       out << "    Finite Element Types=";
       for (unsigned int vn=0; vn<system.n_vars(); vn++)
       {
+#ifndef ENABLE_INFINITE_ELEMENTS
 	out << "\"" << system.dof_map.component_type(vn).family << "\" ";
-#ifdef ENABLE_INFINITE_ELEMENTS
-	out << "\"" << system.dof_map.component_type(vn).base_family << "\" ";
+#else
+	out << "(" << system.dof_map.component_type(vn).family << ",";
+	out << system.dof_map.component_type(vn).base_family << ") ";
 #endif
       };      
 

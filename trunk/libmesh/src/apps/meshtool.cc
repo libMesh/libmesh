@@ -44,6 +44,15 @@ void usage(char *progName)
 #endif
     "    -p <count>                    Partition into <count> subdomains\n"
     "    -b                            Write the boundary conditions\n"
+#ifdef ENABLE_INFINITE_ELEMENTS
+    "    -a                            Add infinite elemens\n"
+    "    -x <coord>                    Specify infinite element origin,\n"
+    "    -y <coord>                    defaults to 0.,0.,0. if none given\n"
+    "    -z <coord>                    \n"
+    "    -X                            When building infinite elements \n"
+    "    -Y                            treats mesh as x/y/z-symmetric\n"
+    "    -Z                            \n"
+#endif
     "    -v                            Verbose\n"
     "    -h                            Print help menu\n"
     "\n"
@@ -65,6 +74,16 @@ void usage(char *progName)
     " will read a 3D MGF mesh from the file bench12.mesh.0000, read a\n"
     " solution from bench12.soln.0137, and write the output in GMV format\n"
     " to out.gmv\n"
+#ifdef ENABLE_INFINITE_ELEMENTS
+    "\n"
+    " and\n"
+    "\n"
+    "  ./meshtool -d 3 -i dry.unv -o packed.gmv -a -x 30.5 -y -10.5 -Z\n"
+    "\n"
+    " will read a 3D Universal file, build infinite elements with the\n"
+    " origin (30.5, -10.5, 0.0) on top of volume elements, while preserving\n"
+    " a symmetry plane through (0., 0., 0.) perpendicular to z.\n"
+#endif
     "\n"
     " Currently this program supports the following formats:\n"
     "\n"
@@ -107,12 +126,19 @@ void process_cmd_line(int argc, char **argv,
 		      unsigned int& n_rsteps,
 		      unsigned int& dim,
 		      bool& verbose,
-		      bool& write_bndry)
+		      bool& write_bndry,
+		      bool& addinfelems,
+		      double& origin_x,
+		      double& origin_y,
+		      double& origin_z,
+		      bool& x_sym,
+		      bool& y_sym,
+		      bool& z_sym
+		      )
 {
   char optionStr[] =
-    "i:o:s:d:r:p:bv?h";
+    "i:o:s:d:r:p:ba::x:y:z:XYZv?h";
   int opt;  
-
   
   if (argc < 3)
     usage(argv[0]);
@@ -217,6 +243,63 @@ void process_cmd_line(int argc, char **argv,
 	    break;
 	  }
 	  
+
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+	  /**
+	   * Add infinite elements
+	   */
+	case 'a':
+	  {
+	    addinfelems = true;
+	    break;
+	  }
+	  
+	  /**
+	   * Specify origin coordinates
+	   */
+	  
+	case 'x':
+	  {
+	    origin_x = atof(optarg);
+	    break;
+	  }
+	  
+	case 'y':
+	  {
+	    origin_y = atof(optarg);
+	    break;
+	  }
+	  
+	case 'z':
+	  {
+	    origin_z = atof(optarg);
+	    break;
+	  } 
+	  
+	  /**
+	   *  Symmetries
+	   */	  
+	  
+	case 'X':
+	  {
+	    x_sym = true;
+	    break;
+	  }
+  	case 'Y':
+	  {
+	    y_sym = true;
+	    break;
+	  }
+  	case 'Z':
+	  {
+	    z_sym = true;
+	    break;
+	  }
+
+#endif //ifdef ENABLE_INFINITE_ELEMENTS
+
+	  
 	default:
 	  usage(argv[0]);
 	};
@@ -235,6 +318,14 @@ int main (int argc, char** argv)
     unsigned int dim = static_cast<unsigned int>(-1); // invalid dimension
     bool verbose = false;
     bool write_bndry = false;
+    bool addinfelems = false;
+    double origin_x=0;
+    double origin_y=0;
+    double origin_z=0;
+    bool x_sym=false;
+    bool y_sym=false;
+    bool z_sym=false;
+    
       
     std::vector<std::string> names;
     std::vector<std::string> var_names;
@@ -242,7 +333,7 @@ int main (int argc, char** argv)
 
     process_cmd_line(argc, argv, names,
 		     n_subdomains, n_rsteps,
-		     dim, verbose, write_bndry);
+		     dim, verbose, write_bndry, addinfelems, origin_x, origin_y, origin_z, x_sym, y_sym, z_sym);
 
     if (dim == static_cast<unsigned int>(-1))
       {
@@ -272,7 +363,35 @@ int main (int argc, char** argv)
 	return 1;
       }
 
-    
+
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+	if(addinfelems)
+	{
+	    if (names.size() == 3)
+    	{
+			std::cout << "ERROR: Invalid combination: Building infinite elements " << std::endl
+			  << "not compatible with solution import." << std::endl;
+			exit(1);
+    	}
+
+    	if (write_bndry)
+      	{
+			std::cout << "ERROR: Invalid combination: Building infinite elements " << std::endl
+		      << "not compatible with writing boundary conditions." << std::endl;
+			exit(1);
+      	}
+
+      	mesh.build_inf_elem(Point(origin_x, origin_y, origin_z),
+			  x_sym, y_sym, z_sym, 
+			  verbose);
+
+	    if (verbose)
+      		mesh.print_info();
+	}
+
+#endif
+
 
     /**
      * Possibly partition the mesh
@@ -314,7 +433,7 @@ int main (int argc, char** argv)
 
 	for (unsigned int e=0; e<mesh.n_elem(); e++)
 	  {
-	    sv[e] = mesh.elem(e)->quality(mesh, q);
+	    sv[e] = mesh.elem(e)->quality(q);
 	  }
 
 	const unsigned int n_bins = 10;

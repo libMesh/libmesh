@@ -1,4 +1,4 @@
-// $Id: cell_hex.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: cell_hex.C,v 1.2 2003-01-20 16:31:34 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -22,80 +22,75 @@
 #include <algorithm>
 
 // Local includes
-#include "mesh.h"
-
-// Temporary includes
 #include "cell_hex.h"
-#include "face_quad4.h"
 
 
 
 
 // ------------------------------------------------------------
 // Hex class member functions
-Elem Hex::side (const unsigned int i) const
+AutoPtr<Elem> Hex::side (const unsigned int i) const
 {
   assert (i < n_sides());
-  assert (_nodes.size() == n_nodes());
 
 
   
-  Elem face(4);
+  AutoPtr<Elem> face(Elem::build(QUAD4));
 
   // Think of a unit cube: (-1,1) x (-1,1)x (-1,1)
   switch (i)
     {
     case 0:  // the face at z = -1
       {
-	face.node(0) = node(0);
-	face.node(1) = node(3);
-	face.node(2) = node(2);
-	face.node(3) = node(1);
+	face->set_node(0) = get_node(0);
+	face->set_node(1) = get_node(3);
+	face->set_node(2) = get_node(2);
+	face->set_node(3) = get_node(1);
 
 	return face;
       }
     case 1:  // the face at y = -1
       {
-	face.node(0) = node(0);
-	face.node(1) = node(1);
-	face.node(2) = node(5);
-	face.node(3) = node(4);
+	face->set_node(0) = get_node(0);
+	face->set_node(1) = get_node(1);
+	face->set_node(2) = get_node(5);
+	face->set_node(3) = get_node(4);
 	
 	return face;
       }
     case 2:  // the face at x = 1
       {
-	face.node(0) = node(1);
-	face.node(1) = node(2);
-	face.node(2) = node(6);
-	face.node(3) = node(5);
+	face->set_node(0) = get_node(1);
+	face->set_node(1) = get_node(2);
+	face->set_node(2) = get_node(6);
+	face->set_node(3) = get_node(5);
 
 	return face;
       }
     case 3: // the face at y = 1
       {
-	face.node(0) = node(2);
-	face.node(1) = node(3);
-	face.node(2) = node(7);
-	face.node(3) = node(6);
+	face->set_node(0) = get_node(2);
+	face->set_node(1) = get_node(3);
+	face->set_node(2) = get_node(7);
+	face->set_node(3) = get_node(6);
 	
 	return face;
       }
     case 4: // the face at x = -1
       {
-	face.node(0) = node(3);
-	face.node(1) = node(0);
-	face.node(2) = node(4);
-	face.node(3) = node(7);
+	face->set_node(0) = get_node(3);
+	face->set_node(1) = get_node(0);
+	face->set_node(2) = get_node(4);
+	face->set_node(3) = get_node(7);
 
 	return face;
       }
     case 5: // the face at z = 1
       {
-	face.node(0) = node(4);
-	face.node(1) = node(5);
-	face.node(2) = node(6);
-	face.node(3) = node(7);
+	face->set_node(0) = get_node(4);
+	face->set_node(1) = get_node(5);
+	face->set_node(2) = get_node(6);
+	face->set_node(3) = get_node(7);
 	
 	return face;
       }
@@ -108,14 +103,12 @@ Elem Hex::side (const unsigned int i) const
 
   // We'll never get here.
   error();
-
   return face;
 };
 
 
 
-real Hex::quality (const MeshBase& mesh, 
-		   const ElemQuality q) const
+real Hex::quality (const ElemQuality q) const
 {
   switch (q)
     {
@@ -127,16 +120,16 @@ real Hex::quality (const MeshBase& mesh,
     case DIAGONAL:
       {
 	// Diagonal between node 0 and node 6
-	const real d06 = this->length(mesh,0,6);
+	const real d06 = this->length(0,6);
 
 	// Diagonal between node 3 and node 5
-	const real d35 = this->length(mesh,3,5);
+	const real d35 = this->length(3,5);
 
 	// Diagonal between node 1 and node 7
-	const real d17 = this->length(mesh,1,7);
+	const real d17 = this->length(1,7);
 
 	// Diagonal between node 2 and node 4 
-	const real d24 = this->length(mesh,2,4);
+	const real d24 = this->length(2,4);
 
 	// Find the biggest and smallest diagonals
 	const real min = std::min(d06, std::min(d35, std::min(d17, d24)));
@@ -159,18 +152,18 @@ real Hex::quality (const MeshBase& mesh,
 	/**
 	 * Compute the side lengths.
 	 */
-	const real d01 = this->length(mesh,0,1);
-	const real d12 = this->length(mesh,1,2);
-	const real d23 = this->length(mesh,2,3);
-	const real d03 = this->length(mesh,0,3);
-	const real d45 = this->length(mesh,4,5);
-	const real d56 = this->length(mesh,5,6);
-	const real d67 = this->length(mesh,6,7);
-	const real d47 = this->length(mesh,4,7);
-	const real d04 = this->length(mesh,0,4);
-	const real d15 = this->length(mesh,1,5);
-	const real d37 = this->length(mesh,3,7);
-	const real d26 = this->length(mesh,2,6);
+	const real d01 = this->length(0,1);
+	const real d12 = this->length(1,2);
+	const real d23 = this->length(2,3);
+	const real d03 = this->length(0,3);
+	const real d45 = this->length(4,5);
+	const real d56 = this->length(5,6);
+	const real d67 = this->length(6,7);
+	const real d47 = this->length(4,7);
+	const real d04 = this->length(0,4);
+	const real d15 = this->length(1,5);
+	const real d37 = this->length(3,7);
+	const real d26 = this->length(2,6);
 
 	std::vector<real> edge_ratios(12);
 	// Front
@@ -214,10 +207,10 @@ real Hex::quality (const MeshBase& mesh,
 	/**
 	 * Compute the maximum diagonal.
 	 */
-	const real d06 = this->length(mesh,0,6);
-	const real d17 = this->length(mesh,1,7);
-	const real d35 = this->length(mesh,3,5);
-	const real d24 = this->length(mesh,2,4);
+	const real d06 = this->length(0,6);
+	const real d17 = this->length(1,7);
+	const real d35 = this->length(3,5);
+	const real d24 = this->length(2,4);
 	const real max_diag = std::max(d06, std::max(d17, std::max(d35, d24)));
 
 	assert ( max_diag != 0.0 );
@@ -226,18 +219,18 @@ real Hex::quality (const MeshBase& mesh,
 	 * Compute the minimum edge length.
 	 */
 	std::vector<real> edges(12);
-	edges[0]  = this->length(mesh,0,1);
-	edges[1]  = this->length(mesh,1,2);
-	edges[2]  = this->length(mesh,2,3);
-	edges[3]  = this->length(mesh,0,3);
-	edges[4]  = this->length(mesh,4,5);
-	edges[5]  = this->length(mesh,5,6);
-	edges[6]  = this->length(mesh,6,7);
-	edges[7]  = this->length(mesh,4,7);
-	edges[8]  = this->length(mesh,0,4);
-	edges[9]  = this->length(mesh,1,5);
-	edges[10] = this->length(mesh,2,6);
-	edges[11] = this->length(mesh,3,7);
+	edges[0]  = this->length(0,1);
+	edges[1]  = this->length(1,2);
+	edges[2]  = this->length(2,3);
+	edges[3]  = this->length(0,3);
+	edges[4]  = this->length(4,5);
+	edges[5]  = this->length(5,6);
+	edges[6]  = this->length(6,7);
+	edges[7]  = this->length(4,7);
+	edges[8]  = this->length(0,4);
+	edges[9]  = this->length(1,5);
+	edges[10] = this->length(2,6);
+	edges[11] = this->length(3,7);
 
 	const real min_edge = *(std::min_element(edges.begin(), edges.end()));
 	return sqrt3 * min_edge / max_diag ;
@@ -251,7 +244,7 @@ real Hex::quality (const MeshBase& mesh,
        */
     default:
       {
-	return Elem::quality(mesh, q);
+	return Elem::quality(q);
       }
     }
 

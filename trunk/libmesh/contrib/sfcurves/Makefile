@@ -9,28 +9,28 @@ OBJS = hilbert.o morton.o cmp.o
 	@$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
 
 
-target := ../lib/$(HOSTTYPE)/libsfcurves.a
+target := ../lib/$(hosttype)/libsfcurves.a
 
 ifeq ($(enable-shared),yes)
-  target := ../lib/$(HOSTTYPE)/libsfcurves.so
+  target := ../lib/$(hosttype)/libsfcurves.so
 endif
 
 
 all:: $(target)
 
-../lib/$(HOSTTYPE)/libsfcurves.a: $(OBJS)
+../lib/$(hosttype)/libsfcurves.a: $(OBJS)
 	@echo "Linking "$@
-	$(shell mkdir -p ../lib/$(HOSTTYPE))
+	$(shell mkdir -p ../lib/$(hosttype))
 	@$(AR) rv $@ $(OBJS)
 
-../lib/$(HOSTTYPE)/libsfcurves.so: $(OBJS)
+../lib/$(hosttype)/libsfcurves.so: $(OBJS)
 	@echo "Linking "$@
-	$(shell mkdir -p ../lib/$(HOSTTYPE))
+	$(shell mkdir -p ../lib/$(hosttype))
 	@$(CC) -shared -o $@ $(OBJS)
 
 clean:
-	rm -f *.o *~
+	@rm -f *.o *~
 
 clobber:
-	make clean
-	rm -f ../lib/$(HOSTTYPE)/libsfcurves.*
+	@$(MAKE) clean
+	@rm -f ../lib/$(hosttype)/libsfcurves.*

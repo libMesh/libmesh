@@ -1,4 +1,4 @@
-// $Id: mesh_xdr_support.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: mesh_xdr_support.C,v 1.2 2003-01-20 16:31:42 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -29,20 +29,16 @@
 #endif
 
 // Local includes
-#include "mesh_base.h"
-#include "boundary_mesh.h"
-#include "boundary_info.h"
 #include "mesh.h"
 #include "xdrIO.h"
 #include "mesh_xdr_support.h"
-#include "point.h"
 #include "elem.h"
 
 
 
-void XdrInterface::mesh_interface(const std::string name,
+void XdrInterface::mesh_interface(const std::string& name,
 				  const XdrIO::XdrIO_TYPE access,
-				  std::vector<Point>& vertices,
+				  std::vector<Node*>& nodes,
 				  std::vector<Elem*>& elements,
 				  BoundaryInfo& boundary_info,
 				  Mesh& mesh)
@@ -146,11 +142,11 @@ void XdrInterface::mesh_interface(const std::string name,
 
 	    neeb.resize(n_blocks);
 	    neeb     = mh->get_num_elem_each_block();
-	  }
+	  };
 	  
 	
 	break;
-      }
+      };
       
     case (XdrIO::W_ASCII):
     case (XdrIO::ENCODE):
@@ -190,14 +186,14 @@ void XdrInterface::mesh_interface(const std::string name,
 	 */
 	m.header(mh); // Needs to work for both types of file
 	break;
-      }
+      };
       
     default:
       {
 	// Shouldn't have gotten here.
 	error();
-      }
-    }
+      };
+    };
 
   
   /**
@@ -215,9 +211,9 @@ void XdrInterface::mesh_interface(const std::string name,
    */
   if ((access == XdrIO::DECODE) || (access == XdrIO::R_ASCII))
     {
-      vertices.resize(numNodes);
+      nodes.resize(numNodes);
       elements.resize(numElem);
-    }
+    };
 
   
   
@@ -267,10 +263,10 @@ void XdrInterface::mesh_interface(const std::string name,
 	  {
 	    // I don't know what type of mesh it is.
 	    error();
-	  }
+	  };
 	
 	break;
-      }
+      };
 
     case (XdrIO::ENCODE):
     case (XdrIO::W_ASCII):
@@ -293,22 +289,91 @@ void XdrInterface::mesh_interface(const std::string name,
 		    conn[lastConnIndex + n] = mesh.elem(e)->node(n);
 		  
 		  lastConnIndex += nn;
-		}
+		};
 	    
 	    // Send conn to the XDR file
 	    m.Icon(&conn[0], nn, lastConnIndex/nn);
-	  }
+	  };
 	
 	break;
-      }
+      };
 
     default:
       {
 	// How'd we get here? We have to be either
 	// reading or writing.
 	error();
-      }
-    }
+      };
+    };
+    
+  /**
+   * If we are reading,
+   * read in the nodal
+   * coordinates and form points.
+   * If we are writing, create
+   * the vector of coords and send
+   * it to the XDR file.
+   */
+  {
+    std::vector<real> coords;
+    
+    switch (access)
+      {
+      case (XdrIO::R_ASCII):
+      case (XdrIO::DECODE):
+	{
+	  coords.resize(numNodes*mesh.spatial_dimension()); // Always use three coords per node
+	  m.coord(&coords[0], mesh.spatial_dimension(), numNodes);
+	  
+	  /**
+	   * Form Nodes out of
+	   * the coordinates
+	   */	
+	  for (int innd=0; innd<numNodes; ++innd)
+	    nodes[innd] = Node::build(coords[0+innd*3],
+				      coords[1+innd*3],
+				      coords[2+innd*3],
+				      innd);
+	  
+	  break;
+	};
+	
+      case (XdrIO::W_ASCII):
+      case (XdrIO::ENCODE):
+	{
+	  coords.resize(mesh.spatial_dimension()*mesh.n_nodes()); 
+	  int lastIndex=0;
+	  for (unsigned int i=0; i<mesh.n_nodes(); i++)
+	    {
+	      const Point& p = *nodes[i];
+	      
+	      coords[lastIndex+0] = p(0);
+	      coords[lastIndex+1] = p(1);
+	      coords[lastIndex+2] = p(2);
+	      
+	      lastIndex += 3;
+	    };
+	  
+	  // Put the nodes in the XDR file
+	  m.coord(&coords[0], mesh.spatial_dimension(), mesh.n_nodes()); 
+	  break;
+	};
+	
+      default:
+	{
+	  // How'd we get here? We have to be either
+	  // reading or writing.
+	  error();
+	};
+      };
+    
+    /**
+     * Free memory used in
+     * the coords vector.
+     */
+    coords.clear();
+  };
+
   
   /**
    * If we are reading or encoding, build the elements.
@@ -319,114 +384,53 @@ void XdrInterface::mesh_interface(const std::string name,
    * this code, we have to loop over
    * et and neeb to read in all the
    * elements correctly.
+   *
+   * (This used to be before the coords block, but it
+   * had to change now that elements store pointers to
+   * nodes.  The nodes must exist before we assign them to
+   * the elements. BSK, 1/13/2003)
    */
-  if ((access == XdrIO::DECODE) || (access == XdrIO::R_ASCII))
-    {
-      int orig_type = m.get_orig_flag();
-      
-      if (orig_type == 0) // DEAL-style (0) hybrid mesh possible
-	{
-	  unsigned int lastConnIndex = 0;
-	  unsigned int lastFaceIndex = 0;
-	  for (unsigned int idx=0; idx<etypes.size(); idx++)
-	    {
-	      for (unsigned int e=lastFaceIndex; e<lastFaceIndex+neeb[idx]; e++)
-		{
-		  elements[e] = Elem::build(etypes[idx]);
-		  for (unsigned int innd=0; innd < mesh.elem(e)->n_nodes(); innd++)
-		    mesh.elem(e)->node(innd) = conn[innd+lastConnIndex];
-		   
-		  lastConnIndex += mesh.elem(e)->n_nodes();
-		}
-	      lastFaceIndex += neeb[idx];
-	    }
-	}
-  
-      else if (orig_type == 1) // MGF-style (1) Hex27 mesh
-	{
-	  for (int ielm=0; ielm < numElem; ++ielm)
-	    {
-	      elements[ielm] = Elem::build(HEX27);
-	      for (int innd=0; innd < 27; ++innd)
-		mesh.elem(ielm)->node(innd) = conn[innd+2+(27+2)*ielm];
-	
-	    }
-	}
-    }
-  
-  
-  
-  /**
-   * Free memory used in
-   * the connectivity
-   * vector.
-   */
-  conn.clear();
-  
-  /**
-   * If we are reading,
-   * read in the nodal
-   * coordinates and form points.
-   * If we are writing, create
-   * the vector of coords and send
-   * it to the XDR file.
-   */
-  std::vector<real> coords;
-
-  switch (access)
-    {
-    case (XdrIO::R_ASCII):
-    case (XdrIO::DECODE):
+  {
+    if ((access == XdrIO::DECODE) || (access == XdrIO::R_ASCII))
       {
-	coords.resize(numNodes*mesh.spatial_dimension()); // Always use three coords per node
-	m.coord(&coords[0], mesh.spatial_dimension(), numNodes);
-	  
-	/**
-	 * Form Points out of
-	 * the coordinates
-	 */
+	int orig_type = m.get_orig_flag();
 	
-	for (int innd=0; innd<numNodes; ++innd)
+	if (orig_type == 0) // DEAL-style (0) hybrid mesh possible
 	  {
-	    Point p(coords[0+innd*3],
-		    coords[1+innd*3],
-		    coords[2+innd*3]);
-	    vertices[innd] = p;
+	    unsigned int lastConnIndex = 0;
+	    unsigned int lastFaceIndex = 0;
+	    for (unsigned int idx=0; idx<etypes.size(); idx++)
+	      {
+		for (unsigned int e=lastFaceIndex; e<lastFaceIndex+neeb[idx]; e++)
+		  {
+		    elements[e] = Elem::build(etypes[idx]);
+		    for (unsigned int innd=0; innd < elements[e]->n_nodes(); innd++)
+		      elements[e]->set_node(innd) = nodes[conn[innd+lastConnIndex]];
+		    
+		    lastConnIndex += mesh.elem(e)->n_nodes();
+		  };
+		lastFaceIndex += neeb[idx];
+	      };
 	  }
-	break;
-      }
-
-    case (XdrIO::W_ASCII):
-    case (XdrIO::ENCODE):
-      {
-	coords.resize(mesh.spatial_dimension()*mesh.n_nodes()); 
-	int lastIndex=0;
-	for (unsigned int i=0; i<mesh.n_nodes(); i++)
-	  {
-	    const Point& p = vertices[i];
-	    
-	    coords[lastIndex+0] = p(0);
-	    coords[lastIndex+1] = p(1);
-	    coords[lastIndex+2] = p(2);
-	    
-	    lastIndex += 3;
-	  }
-	
-	// Put the nodes in the XDR file
-	m.coord(&coords[0], mesh.spatial_dimension(), mesh.n_nodes()); 
-	break;
-      }
-
-    default:
-      error();
-    }
-
   
-  /**
-   * Free memory used in
-   * the coords vector.
-   */
-  coords.clear();
+	else if (orig_type == 1) // MGF-style (1) Hex27 mesh
+	  {
+	    for (int ielm=0; ielm < numElem; ++ielm)
+	      {
+		elements[ielm] = Elem::build(HEX27);
+		for (int innd=0; innd < 27; ++innd)
+		  elements[ielm]->set_node(innd) = nodes[conn[innd+2+(27+2)*ielm]];	
+	      };
+	  };
+      };
+  
+    /**
+     * Free memory used in
+     * the connectivity
+     * vector.
+     */
+    conn.clear();
+  };
 
 
   /**
@@ -449,11 +453,10 @@ void XdrInterface::mesh_interface(const std::string name,
 	
 	// Create the boundary_info !!
 	for (int ibc=0; ibc < numBCs; ibc++)
-	  {
-	    boundary_info.add_side(bcs[0+ibc*3], bcs[1+ibc*3], bcs[2+ibc*3]);
-	  }
+	  boundary_info.add_side(bcs[0+ibc*3], bcs[1+ibc*3], bcs[2+ibc*3]);
+	  
 	break;
-      }
+      };
 
     case (XdrIO::W_ASCII):
     case (XdrIO::ENCODE):
@@ -470,20 +473,26 @@ void XdrInterface::mesh_interface(const std::string name,
 	    bcs[0+ibc*3] = elem_list[ibc];
 	    bcs[1+ibc*3] = side_list[ibc];
 	    bcs[2+ibc*3] = elem_id_list[ibc];
-	  }
+	  };
+	
 	m.BC(&bcs[0], numBCs);
 	
 	break;
-      }
+      };
       
+
     default:
-      error();
+      {
+	// How'd we get here? We have to be either
+	// reading or writing.
+	error();
+      };
     };
 };
 
 
 
-void XdrInterface::soln_interface(const std::string name,
+void XdrInterface::soln_interface(const std::string& name,
 				  const XdrIO::XdrIO_TYPE access,
 				  std::vector<number>& soln,
 				  std::vector<std::string>& var_names,
@@ -521,7 +530,7 @@ void XdrInterface::soln_interface(const std::string name,
 
 
 
-void XdrInterface::soln_interface_impl(const std::string name,
+void XdrInterface::soln_interface_impl(const std::string& name,
 				       const XdrIO::XdrIO_TYPE access,
 				       std::vector<real>& soln,
 				       std::vector<std::string>& var_names,
@@ -702,7 +711,7 @@ void XdrInterface::soln_interface_impl(const std::string name,
 // Read Methods
 // -------------------------------------------------- 
 
-void Mesh::read_xdr(const std::string name)
+void Mesh::read_xdr(const std::string& name)
 {
   /**
    * Clear any existing mesh data
@@ -720,7 +729,7 @@ void Mesh::read_xdr(const std::string name)
    */
   interface.mesh_interface(name,
 			   XdrIO::R_ASCII, // <-- ASCII Read flag
-			   _vertices,
+			   _nodes,
 			   _elements,
 			   boundary_info,
 			   *this);
@@ -730,7 +739,7 @@ void Mesh::read_xdr(const std::string name)
 
 
 
-void Mesh::read_xdr_binary(const std::string name)
+void Mesh::read_xdr_binary(const std::string& name)
 {
 #ifndef HAVE_RPC_RPC_H
 
@@ -757,7 +766,7 @@ void Mesh::read_xdr_binary(const std::string name)
    */
   interface.mesh_interface(name,
 			   XdrIO::DECODE, // <-- Binary Read flag
-			   _vertices,
+			   _nodes,
 			   _elements,
 			   boundary_info,
 			   *this);
@@ -771,7 +780,7 @@ void Mesh::read_xdr_binary(const std::string name)
 
 
 
-void Mesh::read_xdr_soln(const std::string name,
+void Mesh::read_xdr_soln(const std::string& name,
 			 std::vector<number>& soln,
 			 std::vector<std::string>& var_names)
 {
@@ -794,7 +803,7 @@ void Mesh::read_xdr_soln(const std::string name,
 
 
 
-void Mesh::read_xdr_soln_binary(const std::string name,
+void Mesh::read_xdr_soln_binary(const std::string& name,
 				std::vector<number>& soln,
 				std::vector<std::string>& var_names)
 {
@@ -831,7 +840,7 @@ void Mesh::read_xdr_soln_binary(const std::string name,
 // Write methods
 // -------------------------------------------------- 
 
-void Mesh::write_xdr(const std::string name)
+void Mesh::write_xdr(const std::string& name)
 {
   /**
    * Instantiate the proper
@@ -844,7 +853,7 @@ void Mesh::write_xdr(const std::string name)
    */
   interface.mesh_interface(name,
 			   XdrIO::W_ASCII, // <-- ASCII Write flag
-			   _vertices,
+			   _nodes,
 			   _elements,
 			   boundary_info,
 			   *this);
@@ -854,7 +863,7 @@ void Mesh::write_xdr(const std::string name)
 
 
 
-void Mesh::write_xdr_binary(const std::string name)
+void Mesh::write_xdr_binary(const std::string& name)
 {
 #ifndef HAVE_RPC_RPC_H
 
@@ -876,7 +885,7 @@ void Mesh::write_xdr_binary(const std::string name)
    */
   interface.mesh_interface(name,
 			   XdrIO::ENCODE, // <-- Binary Write flag
-			   _vertices,
+			   _nodes,
 			   _elements,
 			   boundary_info,
 			   *this);
@@ -887,7 +896,7 @@ void Mesh::write_xdr_binary(const std::string name)
 
 
 
-void Mesh::write_xdr_soln(const std::string name,
+void Mesh::write_xdr_soln(const std::string& name,
 			  std::vector<number>& soln,
 			  std::vector<std::string>& var_names)
 {
@@ -910,7 +919,7 @@ void Mesh::write_xdr_soln(const std::string name,
 
 
 
-void Mesh::write_xdr_soln_binary(const std::string name,
+void Mesh::write_xdr_soln_binary(const std::string& name,
 				 std::vector<number>& soln,
 				 std::vector<std::string>& var_names)
 

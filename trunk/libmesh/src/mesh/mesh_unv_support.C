@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: mesh_unv_support.C,v 1.2 2003-01-20 16:31:41 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,7 +30,7 @@
 //-----------------------------------------------------------------------------
 // Mesh methods
 
-void Mesh::read_unv(const std::string name){
+void Mesh::read_unv(const std::string& name){
   std::ifstream file (name.c_str());
   read_unv(file);
   file.close();
@@ -40,7 +40,7 @@ void Mesh::read_unv(const std::string name){
 
 
 void Mesh::read_unv(std::istream& in){
-  UnvInterface i(in,_vertices,_elements);
+  UnvInterface i(in,_nodes,_elements);
 };
 
 
@@ -48,11 +48,11 @@ void Mesh::read_unv(std::istream& in){
 // UnvInterface Methods
 
 UnvInterface::UnvInterface(std::istream& _in,
-			   std::vector<Point>& _vertices,
+			   std::vector<Node*>& _nodes,
 			   std::vector<Elem*>& _elements):
-                             phys_file(_in),
-			     vertices(_vertices),
-			     elements(_elements)
+  phys_file(_in),
+  nodes(_nodes),
+  elements(_elements)
 {
   if ( !phys_file.good() )
   {
@@ -306,7 +306,7 @@ void UnvInterface::set_stream_pointer(std::string ds_num)
 
 
 // Method reads nodes from the virtual file and stores them in
-// vector<Point> vertices in the order they come in.
+// vector<Node> nodes in the order they come in.
 // The original node labels are being stored in the
 // map assign_nodes in order to assign the elements to
 // the right nodes later.
@@ -321,7 +321,7 @@ void UnvInterface::node_in()
 
   // allocate the correct amount of memory for the vector
   // that holds the nodes
-  vertices.resize(num_nodes);
+  nodes.resize(num_nodes);
 
   // put the file-pointer at the beginning of the dataset
   set_stream_pointer(label_dataset_nodes);
@@ -340,11 +340,8 @@ void UnvInterface::node_in()
       // store the new position of the node under its label
       assign_nodes[node_lab]=i;
 
-      // add node to the vertices vector.  Do this directly
-      // to avoid copy--constructor calls
-      vertices[i](0) = x;
-      vertices[i](1) = y;
-      vertices[i](2) = z;
+      // add node to the nodes vector.
+      nodes[i] = Node::build(x,y,z,i);
     };
 };
 
@@ -357,16 +354,17 @@ void UnvInterface::node_in()
 void UnvInterface::element_in()
 {
   // Variables needed for reading from the file
-  unsigned int element_lab,        // element label (not supported yet)
-               n_nodes;            // number of nodes on element
-  unsigned long int fe_descriptor_id,   // FE descriptor id
-                    phys_prop_tab_num,  // physical property table number (not supported yet)
-                    mat_prop_tab_num,   // material property table number (not supported yet)
-                    color;              // color (not supported yet)
+  unsigned int element_lab,            // element label (not supported yet)
+               n_nodes;                // number of nodes on element
+  unsigned long int fe_descriptor_id,  // FE descriptor id
+                    phys_prop_tab_num, // physical property table number (not supported yet)
+                    mat_prop_tab_num,  // material property table number (not supported yet)
+                    color;             // color (not supported yet)
 
 
   // vector that temporarily holds the node labels defining element
-  unsigned long int nodes[21];
+  // (this was named "nodes" but that clashes with UnvInterface::nodes
+  unsigned long int node_labels[21];
 
 
   // vector that assigns element nodes to their correct position
@@ -401,7 +399,7 @@ void UnvInterface::element_in()
 		     >> n_nodes;                // read number of nodes on element
 
       for (unsigned int j=1;j<=n_nodes;j++)
-	temporary_file >> nodes[j];             // read node labels
+	temporary_file >> node_labels[j];             // read node labels
 
       // UNV-FE descriptor id has to be recognized and translated to mesh
       switch (fe_descriptor_id)
@@ -546,7 +544,7 @@ void UnvInterface::element_in()
 
       // nodes are being stored in element
       for (unsigned int j=1;j<=n_nodes;j++)
-	elements[i]->node(assign_elm_nodes[j])=assign_nodes[nodes[j]];
+	elements[i]->set_node(assign_elm_nodes[j]) = nodes[assign_nodes[node_labels[j]]];
 
     }
 };

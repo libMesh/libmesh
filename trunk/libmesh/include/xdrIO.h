@@ -1,4 +1,4 @@
-// $Id: xdrIO.h,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: xdrIO.h,v 1.2 2003-01-20 16:31:30 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -22,14 +22,16 @@
 #ifndef __xdrIO_h__
 #define __xdrIO_h__
 
-#include "mesh_common.h"
-
+// C++ includes
 #include <stdio.h>
 #include <fstream>
 #include <iomanip>
 #include <vector>
 #include <string>
-#include "elem_type.h"
+
+// Local includes
+#include "mesh_common.h"
+#include "enum_elem_type.h"
 
 #ifndef SINGLE_PRECISION
 #define xdr_REAL xdr_double
@@ -38,8 +40,8 @@
 #endif
 
 
-
-class Originator; // forward declaration
+// forward declarations
+class Originator; 
 
 /**
  * This class is taken directly from MGF.
@@ -380,6 +382,10 @@ class XdrMESH: public XdrIO
   int BC(int* array, int size)                { return dataBlk(array, 3, size);}
 
  private:
+
+  /**
+   * Dimension of the mesh
+   */
   int m_dim;
 };
 

@@ -1,4 +1,4 @@
-// $Id: inf_fe.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: inf_fe.C,v 1.2 2003-01-20 16:31:34 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -39,7 +39,8 @@ unsigned int InfFE::n_shape_functions() const
 
 
 
-unsigned int InfFE::n_shape_functions(const ElemType t, const Order o)
+unsigned int InfFE::n_shape_functions(const ElemType t,
+				      const Order o)
 {
   return n_dofs(t, o);
 };
@@ -47,7 +48,8 @@ unsigned int InfFE::n_shape_functions(const ElemType t, const Order o)
 
 
 
-unsigned int InfFE::n_dofs(const ElemType t, const Order o)
+unsigned int InfFE::n_dofs(const ElemType,
+			   const Order)
 {
   // this one needs different switch statements, since different
   // Order descriptors are used.
@@ -60,9 +62,9 @@ unsigned int InfFE::n_dofs(const ElemType t, const Order o)
 
 
 
-unsigned int InfFE::n_dofs_at_node(const ElemType t,
-				   const Order o,
-				   const unsigned int n)
+unsigned int InfFE::n_dofs_at_node(const ElemType,
+				   const Order,
+				   const unsigned int)
 {
   // see n_dofs, why we need this.
   error();
@@ -73,8 +75,8 @@ unsigned int InfFE::n_dofs_at_node(const ElemType t,
 
 
 
-unsigned int InfFE::n_dofs_per_elem(const ElemType t,
-				    const Order o)
+unsigned int InfFE::n_dofs_per_elem(const ElemType,
+				    const Order)
 {
   // see n_dofs, why we need this.
   error();
@@ -86,7 +88,7 @@ unsigned int InfFE::n_dofs_per_elem(const ElemType t,
 
 
 
-void InfFE::reinit(const Elem* elem)
+void InfFE::reinit(const Elem*)
 {
   // if we don't have this, we would call the wrong init_shape_functions,
   // compute_map() etc.
@@ -95,9 +97,9 @@ void InfFE::reinit(const Elem* elem)
 
 
 
-void InfFE::reinit(QBase* qside,
-		   const Elem* elem,
-		   const unsigned int side)
+void InfFE::reinit(QBase*,
+		   const Elem*,
+		   const unsigned int)
 {
   // if we don't have this, we would call the wrong init_shape_functions,
   // compute_map() etc.
@@ -109,8 +111,8 @@ void InfFE::reinit(QBase* qside,
 
 
 
-void InfFE::init_shape_functions(const QBase* qrule,
-				 const Elem* elem)
+void InfFE::init_shape_functions(const QBase*,
+				 const Elem*)
 {
   // if we don't re-define this here, we would call the
   // FEBase::shape(....), not the InfFE::shape(...).
@@ -121,9 +123,9 @@ void InfFE::init_shape_functions(const QBase* qrule,
 
 
 
-void InfFE::init_shape_functions(const QBase* qrule,
-				 const Elem* elem,
-				 const unsigned int s)
+void InfFE::init_shape_functions(const QBase*,
+				 const Elem*,
+				 const unsigned int)
 {
   // see above, why we need this.
   error();
@@ -147,9 +149,9 @@ void InfFE::init_shape_functions(const QBase* qrule,
 // Mapping issues
 
 
-bool InfFE::on_reference_element(const Point& p, 
-				 const ElemType t, 
-				 const real eps)
+bool InfFE::on_reference_element(const Point&, 
+				 const ElemType, 
+				 const real)
 {
   // due to infinite extend, we must only in 2D (note that the INFHEX
   // only extend to r=2*a!)
@@ -160,11 +162,10 @@ bool InfFE::on_reference_element(const Point& p,
 
 
 
-void InfFE::nodal_soln(const MeshBase& mesh,
-		       const Elem* elem,
-		       const Order order,
-		       const std::vector<number>& elem_soln,
-		       std::vector<number>&       nodal_soln)
+void InfFE::nodal_soln(const Elem*,
+		       const Order,
+		       const std::vector<number>&,
+		       std::vector<number>&)
 {
   // since we use different polynomials, the nodal_soln is also
   // quite different from the FEBase version.
@@ -175,8 +176,8 @@ void InfFE::nodal_soln(const MeshBase& mesh,
 
 
 
-void InfFE::compute_map(const QBase* q,
-			const Elem* e)
+void InfFE::compute_map(const QBase*,
+			const Elem*)
 {
   // for conventional mapping this would be sufficient,
   // and since compute_map() only uses _true_ FEBase members, which
@@ -185,9 +186,9 @@ void InfFE::compute_map(const QBase* q,
 };
 
   
-void InfFE::compute_map(const QBase* q,
-			const Elem* e,
-			const unsigned int s)
+void InfFE::compute_map(const QBase*,
+			const Elem*,
+			const unsigned int)
 {
   // see above
 };
@@ -200,11 +201,11 @@ void InfFE::compute_map(const QBase* q,
 
 
 
-real InfFE::shape(const unsigned int d,
-		  const ElemType t,
-		  const Order o,
-		  const unsigned int i,
-		  const Point& p)
+real InfFE::shape(const unsigned int,
+		  const ElemType,
+		  const Order,
+		  const unsigned int,
+		  const Point&)
 {
   // obviously, these are different from FEBase
   std::cout << "This is InfFE::shape()!" << std::endl;
@@ -215,11 +216,11 @@ real InfFE::shape(const unsigned int d,
 
 
 
-real InfFE::shape(const unsigned int d,
-		  const Elem* elem,
-		  const Order o,
-		  const unsigned int i,
-		  const Point& p)
+real InfFE::shape(const unsigned int,
+		  const Elem*,
+		  const Order,
+		  const unsigned int,
+		  const Point&)
 {
   // obviously, these are different from FEBase
   std::cout << "This is InfFE::shape()!" << std::endl;
@@ -230,12 +231,12 @@ real InfFE::shape(const unsigned int d,
 
 
 
-real InfFE::shape_deriv(const unsigned int d,
-			const ElemType t,
-			const Order o,
-			const unsigned int i,
-			const unsigned int j,
-			const Point& p)
+real InfFE::shape_deriv(const unsigned int,
+			const ElemType,
+			const Order,
+			const unsigned int,
+			const unsigned int,
+			const Point&)
 {
   // obviously, these are different from FEBase
   std::cout << "This is InfFE::shape_deriv()!" << std::endl;
@@ -246,12 +247,12 @@ real InfFE::shape_deriv(const unsigned int d,
 
 
 
-real InfFE::shape_deriv(const unsigned int d,
-			const Elem* elem,
-			const Order o,
-			const unsigned int i,
-			const unsigned int j,
-			const Point& p)
+real InfFE::shape_deriv(const unsigned int,
+			const Elem*,
+			const Order,
+			const unsigned int,
+			const unsigned int,
+			const Point&)
 {
   // obviously, these are different from FEBase
   std::cout << "This is InfFE::shape_deriv()!" << std::endl;

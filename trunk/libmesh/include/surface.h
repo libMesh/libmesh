@@ -1,4 +1,4 @@
-// $Id: surface.h,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: surface.h,v 1.2 2003-01-20 16:31:29 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,6 @@
 // C++ includes
 
 // Local includes
-#include "mesh_common.h"
 #include "point.h"
 
 
@@ -35,7 +34,7 @@
  * are planes, hollow spheres, hollow cylinders, etc...  This is 
  * a generic base class that describes the useful functionality
  * a surface will provide.  Specific derived classes actually implement
- * the functionality.
+ * the functionality, so this class has pure virtual members.
  *
  * @author Benjamin S. Kirk, 2002
  */
@@ -49,29 +48,29 @@ public:
   /**
    * Constructor.  Does nothing at the moment.
    */
-  Surface ();
+  Surface () {};
 
   /**
    * Copy-constructor.
    */
-  Surface (const Surface& other_surface);
+  Surface (const Surface&) {};
 
   /**
    * Destructor.
    */
-  virtual ~Surface ();
+  virtual ~Surface () {};
 
   /**
    * @returns true if the point p is above the surface,
    * false otherwise.
    */
-  virtual bool above_surface (const Point& p) const;
+  virtual bool above_surface (const Point& p) const = 0;
 
   /**
    * @returns true if the point p is below the surface,
    * false otherwise.
    */
-  virtual bool below_surface (const Point& p) const;
+  virtual bool below_surface (const Point& p) const = 0;
 
   /**
    * @returns true if the point p is on the surface,
@@ -79,18 +78,18 @@ public:
    * the surface really means "very close" to account 
    * for roundoff error.
    */
-  virtual bool on_surface (const Point& p) const;
+  virtual bool on_surface (const Point& p) const = 0;
 
   /**
    * @returns the closest point on the surface to point p.
    */
-  virtual Point closest_point (const Point& p) const;
+  virtual Point closest_point (const Point& p) const = 0;
 
   /**
    * @returns a unit vector normal to the surface at
    * point p.  
    */
-  virtual Point unit_normal (const Point& p) const;
+  virtual Point unit_normal (const Point& p) const = 0;
 
 protected:
 

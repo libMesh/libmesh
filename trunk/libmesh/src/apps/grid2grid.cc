@@ -6,7 +6,7 @@
 
 // Local Includes
 #include "mesh.h"
-#include "quadrature.h"
+#include "quadrature_gauss.h"
 #include "fe.h"
 #include "tree.h"
 #include "perf_log.h"
@@ -115,8 +115,8 @@ int main (int argc, char** argv)
     QGauss qrule (dim, FIFTH);
     
     // Declare second--order elements for our Hex27's
-    FiniteElements::FELagrange3D fe_coarse (mesh_coarse, SECOND);
-    FiniteElements::FELagrange3D fe_fine   (mesh_fine,   SECOND);
+    FiniteElements::FELagrange3D fe_coarse (SECOND);
+    FiniteElements::FELagrange3D fe_fine   (SECOND);
     
     fe_coarse.attach_quadrature_rule (&qrule);
     fe_fine.attach_quadrature_rule   (&qrule);
@@ -161,7 +161,7 @@ int main (int argc, char** argv)
 	    // Chances are this Gauss point is contained in the coarse-mesh element that contained
 	    // the last Gauss point, so let's look there first and only do the OctTree search
 	    // if necessary.
-	    if (!coarse_element->contains_point(mesh_coarse, q_point[gp]))
+	    if (!coarse_element->contains_point(q_point[gp]))
 	      {
 		perf_log.pause_event("gp_loop");
 		perf_log.start_event("element lookup");
@@ -180,7 +180,7 @@ int main (int argc, char** argv)
 
 	    // Find the point on the coarse reference element corresponding to the current Gauss
 	    // point
-	    const Point mapped_point = fe_coarse.inverse_map(mesh_coarse, coarse_element, q_point[gp]);
+	    const Point mapped_point = fe_coarse.inverse_map(coarse_element, q_point[gp]);
 
 	    // Interpolate the coarse grid solution.
 	    for (unsigned int i=0; i<fe_coarse.n_shape_functions(); i++)
@@ -226,9 +226,9 @@ int main (int argc, char** argv)
 	      {
 		already_done[gn] = 1;
 	      
-		const Point& p        = mesh_fine.vertex(gn);
+		const Point& p = mesh_fine.point(gn);
 		
-		if (!coarse_element->contains_point(mesh_coarse, p))
+		if (!coarse_element->contains_point(p))
 		  {
 		    perf_log.pause_event ("diff_soln_loop");
 		    perf_log.start_event ("element lookup 2");
@@ -244,7 +244,7 @@ int main (int argc, char** argv)
 		    perf_log.restart_event ("diff_soln_loop");
 		  }
 		
-		const Point mapped_point = fe_coarse.inverse_map(mesh_coarse, coarse_element, p);
+		const Point mapped_point = fe_coarse.inverse_map(coarse_element, p);
 		
 		for (unsigned int c=0; c<nv; c++)
 		  {

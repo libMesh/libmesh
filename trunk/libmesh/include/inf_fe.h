@@ -1,4 +1,4 @@
-// $Id: inf_fe.h,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: inf_fe.h,v 1.2 2003-01-20 16:31:22 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -62,8 +62,7 @@ public:
    * Constructor.  Optionally initializes required data
    * structures.
    */
-  InfFE(const MeshBase& m,
-	const unsigned int d,
+  InfFE(const unsigned int d,
 	const FEType& fet,
 	const ElemType t=INVALID_ELEM,
 	QBase* q=NULL);//,
@@ -115,8 +114,7 @@ public:
    * Build the nodal soln from the element soln.
    * This is the solution that will be plotted.
    */
-  static void nodal_soln(const MeshBase& mesh,
-			 const Elem* elem, const Order o,
+  static void nodal_soln(const Elem* elem, const Order o,
 			 const std::vector<number>& elem_soln,
 			 std::vector<number>& nodal_soln);
 
@@ -258,13 +256,12 @@ private:
 // ------------------------------------------------------------
 // InfFE class inline members
 inline
-InfFE::InfFE(const MeshBase& m,
-	     const unsigned int d,
+InfFE::InfFE(const unsigned int d,
 	     const FEType& fet,
 	     const ElemType t,
 	     QBase* q) : //,
 //	     PolynomialBase* p) :
-    FEBase(m,d,fet)//,
+    FEBase(d,fet)//,
 //    poly(p)
 {
 };

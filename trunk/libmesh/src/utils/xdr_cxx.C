@@ -1,4 +1,4 @@
-// "$Id: xdr_cxx.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $\n"
+// "$Id: xdr_cxx.C,v 1.2 2003-01-20 16:31:47 jwpeterson Exp $\n"
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,7 +26,7 @@
 
 //-------------------------------------------------------------
 // Xdr class implementation
-Xdr::Xdr (const std::string name, const XdrMODE m) :
+Xdr::Xdr (const std::string& name, const XdrMODE m) :
   mode(m),
 #ifdef HAVE_RPC_RPC_H
   xdrs(NULL),
@@ -34,7 +34,7 @@ Xdr::Xdr (const std::string name, const XdrMODE m) :
   fp(NULL),
   comm_len(xdr_MAX_STRING_LENGTH)
 {
-  open(name, m);
+  open(name);
 };
 
 
@@ -46,7 +46,7 @@ Xdr::~Xdr()
 
 
 
-void Xdr::open (const std::string name, const XdrMODE m)
+void Xdr::open (const std::string& name)
 {
   if (name == "")
     return;

@@ -1,4 +1,4 @@
-// $Id: reference_counter.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: boundary_mesh.C,v 1.1 2003-01-20 16:31:40 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -19,16 +19,31 @@
 
 
 
+// C++ includes
+
 // Local includes
-#include "reference_counter.h"
+#include "boundary_mesh.h"
 
 
 
 // ------------------------------------------------------------
-// ReferenceCounter class static member initializations
+// BoundaryMesh class member functions
+BoundaryMesh::BoundaryMesh(unsigned int d,
+			   unsigned int pid) :
+  MeshBase(d, pid)
+{
+};
 
-#ifdef ENABLE_REFERENCE_COUNTING
 
-ReferenceCounter::Counts ReferenceCounter::counts;
 
-#endif
+BoundaryMesh::~BoundaryMesh()
+{
+  MeshBase::clear();
+};
+
+
+
+
+
+
+

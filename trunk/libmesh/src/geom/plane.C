@@ -1,4 +1,4 @@
-// $Id: plane.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: plane.C,v 1.2 2003-01-20 16:31:39 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -20,8 +20,6 @@
 
 
 // C++ includes
-#include <iostream>
-
 
 // Local includes
 #include "plane.h"
@@ -53,10 +51,11 @@ Plane::Plane (const Point& p0,
 
 
 
-Plane::Plane (const Plane& other_plane)
+Plane::Plane (const Plane& other_plane) :
+  Surface()
 {
-  point  = other_plane.point;
-  normal = other_plane.normal;
+  create_from_point_normal(other_plane.point,
+			   other_plane.normal);
 };
 
 
@@ -179,7 +178,7 @@ Point Plane::closest_point (const Point& p) const
 
 
 
-Point Plane::unit_normal (const Point& p) const
+Point Plane::unit_normal (const Point&) const
 {
   return normal;
 };

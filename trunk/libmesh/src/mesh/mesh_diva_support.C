@@ -1,4 +1,4 @@
-// $Id: mesh_diva_support.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: mesh_diva_support.C,v 1.2 2003-01-20 16:31:41 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -20,23 +20,16 @@
 
 
 // C++ includes
-#include <iostream>
 #include <fstream>
 
 
 // Local includes
 #include "mesh_common.h"
-#include "mesh_base.h"
-#include "boundary_mesh.h"
-#include "boundary_info.h"
 #include "mesh.h"
-#include "dof_map.h"
-#include "point.h"
-#include "elem.h"
 
 
 
-void Mesh::write_diva (const std::string name)
+void Mesh::write_diva (const std::string& name)
 {
   std::ofstream out(name.c_str());
 
@@ -55,21 +48,21 @@ void Mesh::write_diva (std::ostream& out)
     #points #triangles #quads #tets #prisms #pyramids #hexs
     loop over all points (written out x y z x y z ...)
     loop over all triangles (written out i1 i2 i3) (These are indices into
-                                                    the points going from
-						    1 to #points) 
+    the points going from
+    1 to #points) 
     loop over all quads (written out i1 i2 i3 i4) (Same numbering scheme)
     loop over all triangles and quads (write out b1) (This is a boundary
-                                                      condition for each
-						      triangle and each
-						      hex. You can put
-						      anything you want
-						      here)
+    condition for each
+    triangle and each
+    hex. You can put
+    anything you want
+    here)
     loop over all tets (written out i1 i2 i3 i4) (Same)
     loop over all pyramids (written out i1 i2 i3 i4 i5) (Same)
     loop over all prisms (written out i1 i2 i3 i4 i5 i6) (Same)
     loop over all hexs (written out i1 i2 i3 i4 i5 i6 i7 i8) (Same)
     
-   */
+  */
   
   assert (out);
 
@@ -122,7 +115,7 @@ void Mesh::write_diva (std::ostream& out)
    * Write the nodes
    */ 
   for (unsigned int v=0; v<n_nodes(); v++)
-    vertex(v).write_unformatted(out);
+    point(v).write_unformatted(out);
   
   
   /**
@@ -137,11 +130,8 @@ void Mesh::write_diva (std::ostream& out)
 	for (unsigned int s=0; s<elem(e)->n_sides(); s++)
 	  if (elem(e)->neighbor(s) == NULL)
 	    {
-#ifndef __IBMCPP__
-	      const std::auto_ptr<Elem> side = elem(e)->build_side(s);
-#else
-	      const std::auto_ptr<Elem> side(elem(e)->build_side(s));
-#endif	      
+	      const AutoPtr<Elem> side(elem(e)->build_side(s));
+
 	      if (side->type() == TRI3)
 		{
 		  out << side->node(0)+1 << " "
@@ -177,11 +167,8 @@ void Mesh::write_diva (std::ostream& out)
 	for (unsigned int s=0; s<elem(e)->n_sides(); s++)
 	  if (elem(e)->neighbor(s) == NULL)
 	    {
-#ifndef __IBMCPP__
-	      const std::auto_ptr<Elem> side = elem(e)->build_side(s);
-#else
-	      const std::auto_ptr<Elem> side(elem(e)->build_side(s));
-#endif	      
+	      const AutoPtr<Elem> side(elem(e)->build_side(s));
+
 	      if ((side->type() == QUAD4) ||
 		  (side->type() == QUAD8)  )		
 		{
@@ -229,16 +216,13 @@ void Mesh::write_diva (std::ostream& out)
 	for (unsigned int s=0; s<elem(e)->n_sides(); s++)
 	  if (elem(e)->neighbor(s) == NULL)
 	    {
-#ifndef __IBMCPP__
-	      const std::auto_ptr<Elem> side = elem(e)->build_side(s);
-#else
-	      const std::auto_ptr<Elem> side(elem(e)->build_side(s));
-#endif	      
+	      const AutoPtr<Elem> side(elem(e)->build_side(s));
+	      
 	      if ((side->type() == TRI3) ||
 		  (side->type() == TRI6)  )
 
-	      out << boundary_info.boundary_id(elem(e), s)
-		  << std::endl;
+		out << boundary_info.boundary_id(elem(e), s)
+		    << std::endl;
 	    };
 
     
@@ -250,11 +234,8 @@ void Mesh::write_diva (std::ostream& out)
 	for (unsigned int s=0; s<elem(e)->n_sides(); s++)
 	  if (elem(e)->neighbor(s) == NULL)
 	    {
-#ifndef __IBMCPP__
-	      const std::auto_ptr<Elem> side = elem(e)->build_side(s);
-#else
-	      const std::auto_ptr<Elem> side(elem(e)->build_side(s));
-#endif	      
+	      const AutoPtr<Elem> side(elem(e)->build_side(s));
+	      
 	      if ((side->type() == QUAD4)  ||
 		  (side->type() == QUAD8) ||
 		  (side->type() == QUAD9)  )

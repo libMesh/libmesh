@@ -1,4 +1,4 @@
-// $Id: system_data.h,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: system_data.h,v 1.2 2003-01-20 16:31:29 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,23 +24,16 @@
 
 // C++ includes
 #include <set>
-#include <map>
-#include <vector>
-#include <string>
 
 // Local Includes
 #include "mesh_common.h"
+#include "mesh.h"
 #include "dof_map.h"
-#include "order.h"
 #include "fe_type.h"
-
+#include "petsc_interface.h"
+#include "equation_systems.h"
 
 // Forward Declarations
-class Mesh;
-class PetscVector;
-class PetscMatrix;
-class PetscInterface;
-class EquationSystems;
 
 
 
@@ -333,26 +326,26 @@ public:
    * Register a user function to use in initializing the system.
    */
   void attach_init_function(void fptr(EquationSystems& es,
-				      const std::string name));
+				      const std::string& name));
   
   /**
    * Register a user function to use in assembling the system
    * matrix and RHS.
    */
   void attach_assemble_function(void fptr(EquationSystems& es,
-					  const std::string name));
+					  const std::string& name));
   
   /**
    * Function that initializes the system.
    */
   void (* init_system) (EquationSystems& es,
-			const std::string name);
+			const std::string& name);
   
   /**
    * Function that assembles the system.
    */
   void (* assemble) (EquationSystems& es,
-		     const std::string name);
+		     const std::string& name);
   
 #ifdef HAVE_PETSC
 

@@ -1,4 +1,4 @@
-// $Id: face_quad8.h,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: face_quad8.h,v 1.2 2003-01-20 16:31:22 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,8 +24,6 @@
 
 
 // C++ includes
-//#include <iostream>
-//#include <vector>
 
 
 // Local includes
@@ -96,7 +94,7 @@ public:
    */
   Order default_order() const { return SECOND; };
   
-  std::auto_ptr<Elem> build_side (const unsigned int i) const;
+  AutoPtr<Elem> build_side (const unsigned int i) const;
 
   const std::vector<unsigned int> tecplot_connectivity(const unsigned int sf=0) const;
   

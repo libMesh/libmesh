@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: mesh_base.h,v 1.2 2003-01-20 16:31:22 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,6 @@
 
 
 // C++ Includes   -----------------------------------
-#include <iostream>
 #include <vector>
 #include <string>
 
@@ -33,18 +32,16 @@
 
 // forward declarations
 class Elem;
-class MeshRefinement;
 class EquationSystems;
-
 
 
 // Local Includes -----------------------------------
 #include "mesh_common.h"
-#include "point.h"
-#include "elem_type.h"
+#include "node.h"
+#include "enum_elem_type.h"
 #include "sphere.h"
 #include "perf_log.h"
-#include "order.h"
+#include "enum_order.h"
 
 
 
@@ -62,7 +59,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.1.1.1 $
+ * \version $Revision: 1.2 $
  */
 
 
@@ -70,7 +67,7 @@ class EquationSystems;
 // MeshBase class definition
 class MeshBase
 {
- public:
+public:
 
   /**
    * Constructor.
@@ -97,18 +94,18 @@ class MeshBase
    * Returns the logical dimension of the mesh.
    */
   unsigned int mesh_dimension() const
-    { return static_cast<unsigned int>(_dim); };
+  { return static_cast<unsigned int>(_dim); };
   
   /**
    * Returns the spatial dimension of the mesh.
    */
   unsigned int spatial_dimension() const
-    { return static_cast<unsigned int>(DIM); };
+  { return static_cast<unsigned int>(DIM); };
   
   /**
    * Returns the number of nodes in the mesh.
    */
-  unsigned int n_nodes() const { return _vertices.size(); };
+  unsigned int n_nodes() const { return _nodes.size(); };
 
   /**
    * Returns the number of elements in the mesh.
@@ -159,20 +156,26 @@ class MeshBase
   
   /**
    * Return a constant reference (for reading only) to the
-   * \f$ i^{th} \f$ vertex.
+   * \f$ i^{th} \f$ point.
    */  
-  const Point& vertex(const unsigned int i) const;
+  const Point& point(const unsigned int i) const;
+  
+  /**
+   * Return a constant reference (for reading only) to the
+   * \f$ i^{th} \f$ node.
+   */  
+  const Node& node(const unsigned int i) const;
 
   /**
-   * Return a constant reference to the \p vertices vector holding the nodes.
+   * Return a constant reference to the \p nodes vector holding the nodes.
    */
-  const std::vector<Point> & get_vertices () const { return _vertices; };
+  const std::vector<Node*> & get_nodes () const { return _nodes; };
 
   /**
-   * Add \p Point \p p to the vertex array.
+   * Add \p Node \p n to the vertex array, optionally at the specified position \p nn.
    */
-  void add_vertex(const Point& p,
-		  const unsigned int n=static_cast<unsigned int>(-1));
+  Node* add_point(const Point& n,
+		  const unsigned int nn=static_cast<unsigned int>(-1));
 
   /**
    * Return a pointer to the \f$ i^{th} \f$ element.
@@ -202,7 +205,35 @@ class MeshBase
    * useful for automatically determining the boundaries of the domain.
    */
   void find_neighbors();
+#ifdef ENABLE_INFINITE_ELEMENTS
 
+  /**
+   * Build infinite elements atop a volume-based mesh,
+   * determine origin automatically.  When symmetry planes                                
+   * are present, use the version with optional symmetry                                  
+   * switches.
+   */
+  void build_inf_elem();
+  
+  /**
+   * Build infinite elements atop a volume-based mesh.                                    
+   * Find all faces on the outer boundary and build infinite element                      
+   * on them, based on the origin.                                                        
+   * Faces which lie in at least one symmetry plane are skipped.                          
+   * The source of the infinite elements must be given to \p origin,                      
+   * the three optional booleans \p x_sym, \p y_sym,                                      
+   * \p z_sym indicate symmetry planes perpendicular to the \p x,                         
+   * \p y and \p z direction, respectively.                                               
+   * The flag \p be_verbose enables some diagnostic output.                               
+   */
+  void build_inf_elem(const Point& origin,
+		      const bool x_sym = false,
+		      const bool y_sym = false,
+		      const bool z_sym = false,
+		      const bool be_verbose = false);
+		      
+#endif
+		      
   /**
    * After calling this function the input vector \p nodes_to_elem_map
    * will contain the node to element connectivity.  That is to say
@@ -226,14 +257,14 @@ class MeshBase
    * and the default is a \p hilbert curve, but \p morton is also supported.
    */
   virtual void sfc_partition(const unsigned int n_sbdmns=1,
-			     const std::string type="hilbert");
+			     const std::string& type="hilbert");
 
   /**
    * Partition the mesh using the Metis library. Only works if \p ./configure
    * detected the library.
    */
   virtual void metis_partition(const unsigned int n_sbdmns=1,
-			       const std::string type="kway");
+			       const std::string& type="kway");
 
 
   /**
@@ -336,7 +367,7 @@ class MeshBase
    * Reads the file specified by \p name.  Attempts to figure out the
    * proper method by the file extension.
    */
-  virtual void read(const std::string name);
+  virtual void read(const std::string& name);
   
   /**
    * Reads an unstructured 2D triangular mesh from the file
@@ -344,13 +375,13 @@ class MeshBase
    * implementation.  This function facilitates reading meshes 
    * created by Matlab's PDE Toolkit.
    */
-  void read_matlab(const std::string name);
+  void read_matlab(const std::string& name);
 
   /**
    * Reads an unstructured, triangulated surface in the
    * standard OFF OOGL format from the file specified by \p name.
    */
-  void read_off(const std::string name);
+  void read_off(const std::string& name);
   
   /**
    * Read meshes in AVS's UCD format from the file specified by \p name.
@@ -358,7 +389,7 @@ class MeshBase
    * This is the format of choice for reading meshes
    * created by Gridgen, since that tool can output UCD files.
    */
-  void read_ucd(const std::string name);
+  void read_ucd(const std::string& name);
   
   /**
    * Read a 2D mesh in the shanee format from the file specified
@@ -368,7 +399,7 @@ class MeshBase
    * @sect2{Write Methods}
    *
    */
-  void read_shanee(const std::string name);
+  void read_shanee(const std::string& name);
 
   
 
@@ -379,13 +410,13 @@ class MeshBase
    * Write to the file specified by \p name.  Attempts to figure out the
    * proper method by the file extension.
    */
-  virtual void write(const std::string name);
+  virtual void write(const std::string& name);
   
   /**
    * Write to the file specified by \p name.  Attempts to figure out the
    * proper method by the file extension. Also writes data.
    */
-  virtual void write(const std::string name,
+  virtual void write(const std::string& name,
 		     std::vector<number>& values,
 		     std::vector<std::string>& variable_names);
   
@@ -393,7 +424,7 @@ class MeshBase
    * Write a Tecplot-formatted ASCII text file to the file specified by 
    * \p name.  Writes both the mesh and the solution from \p es. 
    */
-  void write_tecplot(const std::string name,
+  void write_tecplot(const std::string& name,
 		     EquationSystems& es);
   
   /**
@@ -401,7 +432,7 @@ class MeshBase
    * \p name.  The optional parameters can be used to write nodal data 
    * in addition to the mesh.
    */
-  void write_tecplot(const std::string name,
+  void write_tecplot(const std::string& name,
 		     const std::vector<number>* v=NULL,
 		     const std::vector<std::string>* solution_names=NULL);
   
@@ -411,7 +442,7 @@ class MeshBase
    * For this to work properly the Tecplot API must be available.  If the API 
    * is not present this function will simply call the ASCII output version.
    */
-  void write_tecplot_binary(const std::string name,
+  void write_tecplot_binary(const std::string& name,
 			    EquationSystems& es);
   
   /**
@@ -421,7 +452,7 @@ class MeshBase
    * For this to work properly the Tecplot API must be available.  If the API 
    * is not present this function will simply call the ASCII output version.
    */
-  void write_tecplot_binary(const std::string name,
+  void write_tecplot_binary(const std::string& name,
 			    const std::vector<number>* v=NULL,
 			    const std::vector<std::string>* solution_names=NULL);
 
@@ -429,7 +460,7 @@ class MeshBase
    * Write the mesh in AVS's UCD format to  the file specified by \p name.
    * May be expanded in the future to handle data as well.
    */
-  void write_ucd(const std::string name);  
+  void write_ucd(const std::string& name);  
 
   /**
    * Write the mesh in the GMV ASCII format to a file specified by \p name.
@@ -438,7 +469,7 @@ class MeshBase
    * since GMV understands cell-based data, this function can optionally
    * write the partitioning information.
    */
-  void write_gmv(const std::string name,
+  void write_gmv(const std::string& name,
 		 EquationSystems& es,
 		 const bool write_partitioning=false);
 
@@ -449,7 +480,7 @@ class MeshBase
    * since GMV understands cell-based data, this function can optionally
    * write the partitioning information.
    */
-  void write_gmv(const std::string name,
+  void write_gmv(const std::string& name,
 		 const std::vector<number>* v=NULL,
 		 const std::vector<std::string>* solution_names=NULL,
 		 const bool write_partitioning=false);
@@ -461,7 +492,7 @@ class MeshBase
    * since GMV understands cell-based data, this function can optionally
    * write the partitioning information.
    */
-  void write_gmv_binary(const std::string name,
+  void write_gmv_binary(const std::string& name,
 			EquationSystems& es,
 			const bool write_partitioning=false);
 
@@ -472,7 +503,7 @@ class MeshBase
    * since GMV understands cell-based data, this function can optionally
    * write the partitioning information.
    */
-  void write_gmv_binary(const std::string name,
+  void write_gmv_binary(const std::string& name,
 			const std::vector<number>* v=NULL,
 			const std::vector<std::string>* solution_names=NULL,
 			const bool write_partitioning=false);
@@ -523,8 +554,23 @@ class MeshBase
 
 
 
- protected:
+protected:
 
+  /**
+   * Return a read/write reference to the \f$ i^{th} \f$ node.
+   */  
+  Node& node(const unsigned int i);
+
+  /**
+   * Return a pointer to the \f$ i^{th} \f$ node.
+   */  
+  Node* node_ptr(const unsigned int i) const;
+
+  /**
+   * Return a pointer to the \f$ i^{th} \f$ node.
+   */  
+  Node* & node_ptr(const unsigned int i);
+  
   /**
    * Reads a matlab-format mesh from a stream.  
    * Implements the read process initiated by the associated public method.
@@ -573,7 +619,7 @@ class MeshBase
   /**
    * Actual implementation of writing a Tecplot-formatted binary file.
    */
-  void do_write_tecplot_binary(const std::string name,
+  void do_write_tecplot_binary(const std::string& name,
 			       const std::vector<real>* v=NULL,
 			       const std::vector<std::string>* solution_names=NULL);
 
@@ -639,7 +685,7 @@ class MeshBase
   /**
    * The verices (spatial coordinates) of the mesh.
    */
-  std::vector<Point> _vertices;
+  std::vector<Node*> _nodes;
 
   /**
    * The elements in the mesh.
@@ -686,6 +732,7 @@ inline
 Elem* MeshBase::elem(const unsigned int i) const
 {
   assert (i < n_elem());
+  assert (_elements[i] != NULL);
   
   return _elements[i];
 };
@@ -693,11 +740,66 @@ Elem* MeshBase::elem(const unsigned int i) const
 
 
 inline
-const Point& MeshBase::vertex(const unsigned int i) const
+const Point& MeshBase::point(const unsigned int i) const
+{
+  assert (i < n_nodes());
+  assert (_nodes[i] != NULL);
+  assert (_nodes[i]->id() != Node::invalid_id);  
+
+  return (*_nodes[i]);
+};
+
+
+
+inline
+const Node& MeshBase::node(const unsigned int i) const
+{
+  assert (i < n_nodes());
+  assert (_nodes[i] != NULL);
+  assert (_nodes[i]->id() != Node::invalid_id);  
+  
+  return (*_nodes[i]);
+};
+
+
+
+inline
+Node& MeshBase::node(const unsigned int i)
+{
+  if (i >= n_nodes())
+    {
+      std::cout << " i=" << i
+		<< ", n_nodes()=" << n_nodes()
+		<< std::endl;
+      error();
+    }
+  
+  assert (i < n_nodes());
+  assert (_nodes[i] != NULL);
+
+  return (*_nodes[i]);
+};
+
+
+
+inline
+Node* MeshBase::node_ptr(const unsigned int i) const
+{
+  assert (i < n_nodes());
+  assert (_nodes[i] != NULL);
+  assert (_nodes[i]->id() != Node::invalid_id);  
+  
+  return _nodes[i];
+};
+
+
+
+inline
+Node* & MeshBase::node_ptr(const unsigned int i)
 {
   assert (i < n_nodes());
 
-  return _vertices[i];
+  return _nodes[i];
 };
 
 

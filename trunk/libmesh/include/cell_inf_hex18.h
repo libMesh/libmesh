@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex18.h,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: cell_inf_hex18.h,v 1.2 2003-01-20 16:31:21 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -104,9 +104,16 @@ public:
    * This method allocates memory, so be sure to delete
    * the returned pointer when it is no longer needed.
    */
-  std::auto_ptr<Elem> build_side (const unsigned int i) const;
+  AutoPtr<Elem> build_side (const unsigned int i) const;
 
   const std::vector<unsigned int> tecplot_connectivity(const unsigned int sc=0) const;
+
+  void vtk_connectivity(const unsigned int,
+			std::vector<unsigned int>*) const
+  { error(); };
+  
+  unsigned int vtk_element_type (const unsigned int) const
+  { return 12; };
   
   void write_tecplot_connectivity(std::ostream &out) const;
   

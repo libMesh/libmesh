@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex16.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: cell_inf_hex16.C,v 1.2 2003-01-20 16:31:35 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // Local includes
-#include "cell.h"
+#include "mesh_config.h"
 
 #ifdef ENABLE_INFINITE_ELEMENTS
 
@@ -26,21 +26,16 @@
 
 // Local includes cont'd
 #include "mesh.h"
-
-// Temporary includes
 #include "cell_inf_hex16.h"
-#include "face_quad8.h"
-#include "face_inf_quad6.h"
 
 
 
 
 // ------------------------------------------------------------
 // InfHex16 class member functions
-std::auto_ptr<Elem> InfHex16::build_side (const unsigned int i) const
+AutoPtr<Elem> InfHex16::build_side (const unsigned int i) const
 {
   assert (i < n_sides());
-  assert (_nodes.size() == n_nodes());
 
 
 
@@ -49,98 +44,98 @@ std::auto_ptr<Elem> InfHex16::build_side (const unsigned int i) const
     {
     case 0:  // the face at z=0
       {
-	Quad8* face = new Quad8;
+	AutoPtr<Elem> face(Elem::build(QUAD8));
 
-	face->node(0) = node(0);
-	face->node(1) = node(3);
-	face->node(2) = node(2);
-	face->node(3) = node(1);
-	face->node(4) = node(11);
-	face->node(5) = node(10);
-	face->node(6) = node(9);
-	face->node(7) = node(8);
+	face->set_node(0) = get_node(0);
+	face->set_node(1) = get_node(3);
+	face->set_node(2) = get_node(2);
+	face->set_node(3) = get_node(1);
+	face->set_node(4) = get_node(11);
+	face->set_node(5) = get_node(10);
+	face->set_node(6) = get_node(9);
+	face->set_node(7) = get_node(8);
 
-	std::auto_ptr<Elem> ap(face);  return ap;
+	return face;
       };
 
     case 1:  // the face at y = 0
       {
-	InfQuad6* face = new InfQuad6;
+	AutoPtr<Elem> face(Elem::build(INFQUAD6));
 
-	face->node(0) = node(0);
-	face->node(1) = node(1);
-	face->node(2) = node(5);
-	face->node(3) = node(4);
-	face->node(4) = node(8);
-	face->node(5) = node(12);
+	face->set_node(0) = get_node(0);
+	face->set_node(1) = get_node(1);
+	face->set_node(2) = get_node(5);
+	face->set_node(3) = get_node(4);
+	face->set_node(4) = get_node(8);
+	face->set_node(5) = get_node(12);
 
-	std::auto_ptr<Elem> ap(face);  return ap;
+	return face;
       };
 
     case 2:  // the face at x=1
       {
-	InfQuad6* face = new InfQuad6;
+	AutoPtr<Elem> face(Elem::build(INFQUAD6));
 
-	face->node(0) = node(1);
-	face->node(1) = node(2);
-	face->node(2) = node(6);
-	face->node(3) = node(5);
-	face->node(4) = node(9);
-	face->node(5) = node(13);
+	face->set_node(0) = get_node(1);
+	face->set_node(1) = get_node(2);
+	face->set_node(2) = get_node(6);
+	face->set_node(3) = get_node(5);
+	face->set_node(4) = get_node(9);
+	face->set_node(5) = get_node(13);
 
-	std::auto_ptr<Elem> ap(face);  return ap;
+	return face;
       };
     case 3: // the face at y=1
       {
-	InfQuad6* face = new InfQuad6;
+	AutoPtr<Elem> face(Elem::build(INFQUAD6));
+	
+	face->set_node(0) = get_node(2);
+	face->set_node(1) = get_node(3);
+	face->set_node(2) = get_node(7);
+	face->set_node(3) = get_node(6);
+	face->set_node(4) = get_node(10);
+	face->set_node(5) = get_node(14);
 
-	face->node(0) = node(2);
-	face->node(1) = node(3);
-	face->node(2) = node(7);
-	face->node(3) = node(6);
-	face->node(4) = node(10);
-	face->node(5) = node(14);
-
-	std::auto_ptr<Elem> ap(face);  return ap;
+	return face;
       };
     case 4: // the face at x=0
       {
-	InfQuad6* face = new InfQuad6;
+	AutoPtr<Elem> face(Elem::build(INFQUAD6));
 
-	face->node(0) = node(3);
-	face->node(1) = node(0);
-	face->node(2) = node(4);
-	face->node(3) = node(7);
-	face->node(4) = node(11);
-	face->node(5) = node(15);
+	face->set_node(0) = get_node(3);
+	face->set_node(1) = get_node(0);
+	face->set_node(2) = get_node(4);
+	face->set_node(3) = get_node(7);
+	face->set_node(4) = get_node(11);
+	face->set_node(5) = get_node(15);
 
-	std::auto_ptr<Elem> ap(face);  return ap;
+	return face;
       };
     case 5: // the face at z=1
       // disable this face, since this is supposed to lie at infinity
       {
         std::cerr << "No face 5 in case of infinite elements!" << std::endl;
         error();
-	std::auto_ptr<Elem> ap(NULL);  return ap;
+	AutoPtr<Elem> ap(NULL);  return ap;
 
       };
     default:
       {
 	error();
-	std::auto_ptr<Elem> ap(NULL);  return ap;
+	AutoPtr<Elem> ap(NULL);  return ap;
       };
     };
 
   // We'll never get here.
   error();
-  std::auto_ptr<Elem> ap(NULL);  return ap;
+  AutoPtr<Elem> ap(NULL);  return ap;
 };
 
 
 
 const std::vector<unsigned int> InfHex16::tecplot_connectivity(const unsigned int sc) const
 {
-  assert (!_nodes.empty());
+  assert (_nodes != NULL);
   assert (sc < n_sub_elem());
 
   std::vector<unsigned int> conn(8);
@@ -175,7 +170,7 @@ const std::vector<unsigned int> InfHex16::tecplot_connectivity(const unsigned in
 void InfHex16::write_tecplot_connectivity(std::ostream &out) const
 {
   assert (out);
-  assert (!_nodes.empty());
+  assert (_nodes != NULL);
 
   for (unsigned int sc=0; sc<n_sub_elem(); sc++)
     {
@@ -326,14 +321,14 @@ void InfHex16::refine(Mesh& mesh)
       for (unsigned int nc=0; nc<child(c)->n_nodes(); nc++)
 	for (unsigned int n=0; n<n_nodes(); n++)
 	  if (embedding_matrix[c][nc][n] != 0.)
-	    p[c][nc] += mesh.vertex(node(n))*embedding_matrix[c][nc][n];
+	    p[c][nc] += point(n)*embedding_matrix[c][nc][n];
     
     
     // assign nodes to children & add them to the mesh
     for (unsigned int c=0; c<n_children(); c++)
       {
 	for (unsigned int nc=0; nc<child(c)->n_nodes(); nc++)
-	  _children[c]->node(nc) = mesh.mesh_refinement.add_node(p[c][nc]);
+	  _children[c]->set_node(nc) = mesh.mesh_refinement.add_point(p[c][nc]);
 
 	mesh.add_elem(child(c), mesh.mesh_refinement.new_element_number());
       };

@@ -1,4 +1,4 @@
-// $Id: order.h,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: enum_elem_quality.h,v 1.1 2003-01-20 16:31:22 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -19,58 +19,45 @@
 
 
 
-#ifndef __order_h__
-#define __order_h__
+#ifndef __enum_elem_quality_h__
+#define __enum_elem_quality_h__
+
+// C++ includes
 
 // Local includes
-#include "mesh_common.h"
+
 
 
 
 // ------------------------------------------------------------
-// enum Order definition
-namespace MeshEnums {
-
+// enum ElemType definition
+namespace MeshEnums
+{    
   /**
-   * \enum MeshEnums::Order defines an \p enum for polynomial orders.
+   * Defines an \p enum for element quality metrics.
    */
-  enum Order {CONST=0,
-	      FIRST,
-	      SECOND,
-	      THIRD,
-	      FOURTH,
-	      FIFTH,
-	      SIXTH,
-	      SEVENTH,
-	      EIGHTH,
-	      NINTH,
-	      TENTH,
-	      ELEVENTH,
-	      TWELFTH,
-	      THIRTEENTH,
-	      FOURTEENTH,
-	      FIFTEENTH,
-	      SIXTEENTH,
-	      SEVENTEENTH,
-	      EIGHTTEENTH,
-	      NINTEENTH,
-	      TWENTIETH,
-	      TWENTYFIRST,
-	      TWENTYSECOND,
-	      TWENTYTHIRD,
-	      
-	      INVALID_ORDER};
-
-
-#ifdef ENABLE_INFINITE_ELEMENTS
-
-  // enum ShiftPattern for infinite elements
-  enum IfemShiftPattern {DD_SHIFT, ERROR};
-
-#endif
-
+  enum ElemQuality {ASPECT_RATIO=0,
+		    SKEW,
+		    SHEAR,
+		    SHAPE,
+		    MAX_ANGLE,
+		    MIN_ANGLE,
+		    CONDITION,
+		    DISTORTION,
+		    TAPER,
+		    WARP,
+		    STRETCH,
+		    DIAGONAL,
+		    ASPECT_RATIO_BETA,
+		    ASPECT_RATIO_GAMMA,
+		    SIZE,
+		    JACOBIAN};
 };
 
+
 using namespace MeshEnums;
+
+
+
 
 #endif

@@ -1,4 +1,4 @@
-// $Id: point.h,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: point.h,v 1.2 2003-01-20 16:31:29 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,9 +23,13 @@
 #define __point_h__
 
 // C++ includes
+#include <math.h>
 
 // Local includes
 #include "mesh_common.h"
+
+
+
 
 /**
  * This class is based in no small part on the deal.II (http://www.dealii.org)
@@ -34,7 +38,6 @@
  * nodal values or solution gradients.  Accordingly, many of the operations
  * one would like to perform with spatial vectors are provided.
  */
-
 
 class Point
 {
@@ -158,9 +161,23 @@ class Point
    */ 
   void write_unformatted (std::ostream &out) const;
     
- private:
+ protected:
 
+  /**
+   * Reutrns the magnitude of the point squared, i.e. the square-root
+   * of the sum of the elements squared.
+   */
+  real size_sq() const;
+
+  /**
+   * The coordinates of the \p Point
+   */
   real coords[DIM];
+
+  /**
+   * Make the derived class a friend
+   */
+  friend class Node;
 };
 
 
@@ -180,7 +197,7 @@ Point::Point (const real x,
 
       if (DIM == 3)
 	coords[2] = z;
-    }
+    };
 };
 
 
@@ -350,7 +367,6 @@ Point Point::operator * (const real factor) const
 
 
 
-
 inline
 Point Point::operator / (const real factor) const
 {
@@ -375,21 +391,45 @@ Point Point::operator / (const real factor) const
 
 
 
-
 inline
 real Point::operator * (const Point &p) const
 {
-  real result=0.;
+#if DIM == 1
+  return coords[0]*p.coords[0];
+#endif
 
-  for (unsigned int i=0; i<DIM; i++)
-    result += coords[i]*p.coords[i];
+#if DIM == 2
+  return (coords[0]*p.coords[0] +
+	  coords[1]*p.coords[1]);
+#endif
 
-  return result;
+#if DIM == 3
+  return (coords[0]*p.coords[0] +
+	  coords[1]*p.coords[1] +
+	  coords[2]*p.coords[2]);
+#endif
 };
 
 
 
+inline
+real Point::size() const
+{
+  return sqrt(size_sq());  
+};
 
+
+
+inline
+real Point::size_sq() const
+{
+  real val = 0.;
+
+  for (unsigned int i=0; i<DIM; i++)
+    val += coords[i]*coords[i];
+
+  return val;  
+};
 
 
 

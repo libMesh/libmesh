@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+dnl $Id: aclocal.m4,v 1.2 2003-01-20 16:31:20 jwpeterson Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -172,6 +172,7 @@ dnl configuration
 dnl
 dnl CXXFLAGSO  : flags for optimized mode
 dnl CXXFLAGSG  : flags for debug mode
+dnl CXXFLAGSS  : flags for syntax-checking mode
 dnl CXXFLAGSP  : flags for profiler mode (only tested with GCC 3.2.1 but
 dnl              should work with most versions.)  Note: the -a option
 dnl              has been removed as of this version of GCC.
@@ -188,14 +189,21 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
 [
   dnl Flag for creating dependencies; can be modified at a later stage
   CXXDEPFLAG="-MM"
+
+  dnl Flag for creating shared objects; can be modified at a later stage
+  CXXSHAREDFLAG="-shared"
+
   dnl First the flags for gcc compilers
   if test "$GXX" = yes ; then
     CXXFLAGSO="-O2 -felide-constructors -DNDEBUG"
-    CXXFLAGSG="-g -ansi -pedantic -Wall -Wunused -Wpointer-arith -Wimplicit -Wformat -Wmain -Wparentheses -O -Wuninitialized -DDEBUG"
-    CXXFLAGSP="-g -DDEBUG -pg"
+    CXXFLAGSG="-g -ansi -pedantic -W -Wall -Wunused -Wpointer-arith -Wimplicit -Wformat -Wparentheses -O -Wuninitialized -DDEBUG"
+    CXXFLAGSP="-O2 -felide-constructors -DNDEBUG -g -pg"
+    CXXFLAGSS="-fsyntax-only"
+
     CFLAGSO="-O2 -DNDEBUG"
     CFLAGSG="-g -DDEBUG"
-    CFLAGSP="-g -DDEBUG -pg"
+    CFLAGSP="-O2 -DNDEBUG -g -pg"
+    CFLAGSS="-fsyntax-only"
 
     dnl set some flags that are specific to some versions of the
     dnl compiler:
@@ -217,7 +225,8 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
   
             *)
                 CXXFLAGSG = "$CXXFLAGSG -fno-vtable-thunks"
-                CXXFLAGSO = "$CFLAGSO -fno-vtable-thunks"
+                CXXFLAGSO = "$CXXFLAGSO -fno-vtable-thunks"
+                CXXFLAGSP = "$CXXFLAGSP -fno-vtable-thunks"
                 ;;
           esac
           ;;
@@ -226,6 +235,8 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
       *)
           CXXFLAGSO="$CXXFLAGSO -funroll-loops -fstrict-aliasing"
           CFLAGSO="$CFLAGSO -funroll-loops -fstrict-aliasing"
+          CXXFLAGSP="$CXXFLAGSP -funroll-loops -fstrict-aliasing"
+          CFLAGSP="$CFLAGSP -funroll-loops -fstrict-aliasing"
           ;;
     esac
   
@@ -235,8 +246,9 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
   
     case "$GXX_VERSION" in
       egcs1.1 | gcc2.95)
-          CXXFLAGSG="$CXXFLAGSG -Wmissing-declarations -Wbad-function-cast -Wtraditional -Wnested-externs"
           CXXFLAGSO="$CXXFLAGSO -fnonnull-objects"
+          CXXFLAGSG="$CXXFLAGSG -Wmissing-declarations -Wbad-function-cast -Wtraditional -Wnested-externs"
+          CXXFLAGSP="$CXXFLAGSP -fnonnull-objects"
           ;;
   
       *)
@@ -250,15 +262,18 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
     case "$GXX_VERSION" in
       ibm_xlc)
           CXXFLAGSG="-DDEBUG -check=bounds -info=all -qrtti=all"
-          CXXFLAGSO="-DNDEBUG -O2 -w -qansialias -qrtti=all"
-          CXXDEPFLAG="-qmakedep"
+          CXXFLAGSO="-DNDEBUG -O3 -qmaxmem=-1 -w -qansialias -qrtti=all -Q"
+          CXXFLAGSP="-DNDEBUG -O3 -qmaxmem=-1 -w -qansialias -qrtti=all -Q -g -pg"
           CFLAGSG="-DDEBUG -check=bounds -info=all -qrtti=all"
-          CFLAGSO="-DNDEBUG -O2 -w -qansialias -qrtti=all"
+          CFLAGSO="-DNDEBUG -O2 -w -qansialias"
+          CFLAGSP="-DNDEBUG -O2 -w -qansialias -g -pg"
+	  CXXSHAREDFLAG="-qmkshrobj"
+	  CXXDEPFLAG="-qmakedep"
           ;;
   
       MIPSpro)
-          CXXFLAGSG="-DDEBUG -LANG:std -no_auto_include"
-          CXXFLAGSO="-DNDEBUG -LANG:std -no_auto_include -w"
+          CXXFLAGSG="-DDEBUG -LANG:std -no_auto_include -ansi -g"
+          CXXFLAGSO="-DNDEBUG -LANG:std -no_auto_include -ansi -O2 -w"
           CFLAGSG="-DDEBUG"
           CFLAGSO="-DNDEBUG -w"
           CXXDEPFLAG="-M"
@@ -273,10 +288,12 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           dnl #266: 'function declared implicitly'
           dnl       Metis function "GKfree" caused this error
           dnl       in almost every file.
-          CXXFLAGSG="-Kc++eh -Krtti -w1 -DDEBUG -inline_debug_info -g"
-          CXXFLAGSO="-Kc++eh -Krtti -O2 -Ob1 -DNDEBUG -tpp6 -axiMK -unroll -w0 -vec_report0 -parallel -par_report0 "
+          CXXFLAGSG="-Kc++eh -Krtti -w1 -DDEBUG -inline_debug_info -g -wd504"
+          CXXFLAGSO="-Kc++eh -Krtti -O2 -Ob2 -DNDEBUG -tpp6 -axiMK -unroll -w0 -vec_report0 -parallel -par_report0"
+          CXXFLAGSP="-Kc++eh -Krtti -O2 -Ob2 -DNDEBUG -tpp6 -axiMK -unroll -w0 -vec_report0 -parallel -par_report0 -g -pg"
           CFLAGSG="-w1 -DDEBUG -inline_debug_info -wd266"
           CFLAGSO="-O2 -DNDEBUG -tpp6 -axiMK -unroll -w0"
+          CFLAGSP="-O2 -DNDEBUG -tpp6 -axiMK -unroll -w0 -g -pg"
           ;;
   
       intel_ecc)

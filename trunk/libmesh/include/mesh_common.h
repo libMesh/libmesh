@@ -1,4 +1,4 @@
-// $Id: mesh_common.h,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: mesh_common.h,v 1.2 2003-01-20 16:31:23 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,7 +31,13 @@
 
 #include "mesh_config.h"
 
-
+/**
+ * An anonymous namespace to hold \p typedefs and the like
+ * for the library
+ */
+namespace
+{
+  
 #ifdef REAL
 #  undef REAL
 #endif
@@ -45,7 +51,7 @@
   typedef double real;
   typedef double REAL;
 #  ifdef USE_COMPLEX_NUMBERS
-     // note that PETSc also uses <complex>, check petscmath.h
+  // note that PETSc also uses <complex>, check petscmath.h
 #    include <complex>
      typedef std::complex<double> number;
      typedef std::complex<double> NUMBER;
@@ -81,6 +87,6 @@
 #  define DIM 3
 #endif
 
-
+}; // end anonymous namespace
 
 #endif // #define __mesh_common_h__

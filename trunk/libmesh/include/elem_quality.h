@@ -1,4 +1,4 @@
-// $Id: elem_quality.h,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: elem_quality.h,v 1.2 2003-01-20 16:31:22 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -22,41 +22,11 @@
 #ifndef __elem_quality_h__
 #define __elem_quality_h__
 
-#include <string>
+// C++ includes
 #include <vector>
 
-#include "elem_type.h"
-
-
-
-
-// ------------------------------------------------------------
-// enum ElemType definition
-namespace MeshEnums
-{    
-  /**
-   * Defines an \p enum for element quality metrics.
-   */
-  enum ElemQuality {ASPECT_RATIO=0,
-		    SKEW,
-		    SHEAR,
-		    SHAPE,
-		    MAX_ANGLE,
-		    MIN_ANGLE,
-		    CONDITION,
-		    DISTORTION,
-		    TAPER,
-		    WARP,
-		    STRETCH,
-		    DIAGONAL,
-		    ASPECT_RATIO_BETA,
-		    ASPECT_RATIO_GAMMA,
-		    SIZE,
-		    JACOBIAN};
-};
-
-
-using namespace MeshEnums;
+// Local includes
+#include "enum_elem_type.h"
 
 
 

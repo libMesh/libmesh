@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.h,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: mesh_refinement.h,v 1.2 2003-01-20 16:31:23 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -51,7 +51,7 @@ class Point;
 // MeshRefinement class definition
 class MeshRefinement
 {
- public:
+public:
 
   /**
    * Constructor.
@@ -92,12 +92,10 @@ class MeshRefinement
   void uniformly_refine (unsigned int n=1);
   
   /**
-   * Add vertex \p p to the mesh.
-   *
-   * The function returns the global node number of
+   * Add point \p p to the mesh. The function returns a pointer to
    * the new node.
    */
-  unsigned int add_node(const Point& p, unsigned int key=0);
+  Node* add_point(const Point& p);
   
   /**
    * @returns The index of the next unused element number
@@ -109,11 +107,11 @@ class MeshRefinement
 
 
 
- private:
+private:
 
   /**
    * @returns The index of the next unused node number
-   * in the \p vertices vector.  If all the entries are
+   * in the \p nodes vector.  If all the entries are
    * full it returns the size of the vector.
    */
   unsigned int new_node_number();
@@ -163,5 +161,5 @@ class MeshRefinement
   Mesh& mesh;
 };
 
-#endif
-#endif
+#endif // end #ifdef ENABLE_ARM
+#endif // end #ifndef __mesh_refinement_h__ 

@@ -1,4 +1,4 @@
-// $Id: perf_log.h,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: perf_log.h,v 1.2 2003-01-20 16:31:23 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -22,11 +22,11 @@
 #ifndef __perflog_h__
 #define __perflog_h__
 
-#include "mesh_config.h"
 
+// Local includes
+#include "mesh_common.h"
 
 // C++ includes
-#include <iostream>
 #include <iomanip>
 #include <string>
 #include <map>
@@ -36,8 +36,6 @@
 #include <locale>
 #endif
 
-// Local includes
-#include "mesh_common.h"
 
 /**
  * The \p PerfData class simply contains the performance

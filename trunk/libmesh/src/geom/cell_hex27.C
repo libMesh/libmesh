@@ -1,4 +1,4 @@
-// $Id: cell_hex27.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: cell_hex27.C,v 1.2 2003-01-20 16:31:35 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -22,129 +22,125 @@
 
 // Local includes
 #include "mesh.h"
-
-// Temporary includes
 #include "cell_hex27.h"
-#include "face_quad9.h"
 
 
 
 
 // ------------------------------------------------------------
 // Hex27 class member functions
-std::auto_ptr<Elem> Hex27::build_side (const unsigned int i) const
+AutoPtr<Elem> Hex27::build_side (const unsigned int i) const
 {
   assert (i < n_sides());
-  assert (_nodes.size() == n_nodes());
 
 
   
-  Quad9* face = new Quad9;
+  AutoPtr<Elem> face(Elem::build(QUAD9));
 
   // Think of a unit cube: (-1,1) x (-1,1) x (1,1)
   switch (i)
     {
     case 0:  // the face at z=0
       {
-	face->node(0) = node(0);
-	face->node(1) = node(3);
-	face->node(2) = node(2);
-	face->node(3) = node(1);
-	face->node(4) = node(11);
-	face->node(5) = node(10);
-	face->node(6) = node(9);
-	face->node(7) = node(8);
-	face->node(8) = node(20);
+	face->set_node(0) = get_node(0);
+	face->set_node(1) = get_node(3);
+	face->set_node(2) = get_node(2);
+	face->set_node(3) = get_node(1);
+	face->set_node(4) = get_node(11);
+	face->set_node(5) = get_node(10);
+	face->set_node(6) = get_node(9);
+	face->set_node(7) = get_node(8);
+	face->set_node(8) = get_node(20);
 
-	std::auto_ptr<Elem> ap(face);  return ap;
+	return face;
       };
     case 1:  // the face at y = 0
       {
-	face->node(0) = node(0);
-	face->node(1) = node(1);
-	face->node(2) = node(5);
-	face->node(3) = node(4);
-	face->node(4) = node(8);
-	face->node(5) = node(13);
-	face->node(6) = node(16);
-	face->node(7) = node(12);
-	face->node(8) = node(21);
+	face->set_node(0) = get_node(0);
+	face->set_node(1) = get_node(1);
+	face->set_node(2) = get_node(5);
+	face->set_node(3) = get_node(4);
+	face->set_node(4) = get_node(8);
+	face->set_node(5) = get_node(13);
+	face->set_node(6) = get_node(16);
+	face->set_node(7) = get_node(12);
+	face->set_node(8) = get_node(21);
 
-	std::auto_ptr<Elem> ap(face);  return ap;
+	return face;
       };
     case 2:  // the face at x=1
       {
-	face->node(0) = node(1);
-	face->node(1) = node(2);
-	face->node(2) = node(6);
-	face->node(3) = node(5);
-	face->node(4) = node(9);
-	face->node(5) = node(14);
-	face->node(6) = node(17);
-	face->node(7) = node(13);
-	face->node(8) = node(22);
+	face->set_node(0) = get_node(1);
+	face->set_node(1) = get_node(2);
+	face->set_node(2) = get_node(6);
+	face->set_node(3) = get_node(5);
+	face->set_node(4) = get_node(9);
+	face->set_node(5) = get_node(14);
+	face->set_node(6) = get_node(17);
+	face->set_node(7) = get_node(13);
+	face->set_node(8) = get_node(22);
 
-	std::auto_ptr<Elem> ap(face);  return ap;
+	return face;
       };
     case 3: // the face at y=1
       {
-	face->node(0) = node(2);
-	face->node(1) = node(3);
-	face->node(2) = node(7);
-	face->node(3) = node(6);
-	face->node(4) = node(10);
-	face->node(5) = node(15);
-	face->node(6) = node(18);
-	face->node(7) = node(14);
-	face->node(8) = node(23);
+	face->set_node(0) = get_node(2);
+	face->set_node(1) = get_node(3);
+	face->set_node(2) = get_node(7);
+	face->set_node(3) = get_node(6);
+	face->set_node(4) = get_node(10);
+	face->set_node(5) = get_node(15);
+	face->set_node(6) = get_node(18);
+	face->set_node(7) = get_node(14);
+	face->set_node(8) = get_node(23);
 
-	std::auto_ptr<Elem> ap(face);  return ap;
+	return face;
       };
     case 4: // the face at x=0
       {
-	face->node(0) = node(3);
-	face->node(1) = node(0);
-	face->node(2) = node(4);
-	face->node(3) = node(7);
-	face->node(4) = node(11);
-	face->node(5) = node(12);
-	face->node(6) = node(19);
-	face->node(7) = node(15);
-	face->node(8) = node(24);
+	face->set_node(0) = get_node(3);
+	face->set_node(1) = get_node(0);
+	face->set_node(2) = get_node(4);
+	face->set_node(3) = get_node(7);
+	face->set_node(4) = get_node(11);
+	face->set_node(5) = get_node(12);
+	face->set_node(6) = get_node(19);
+	face->set_node(7) = get_node(15);
+	face->set_node(8) = get_node(24);
 
-	std::auto_ptr<Elem> ap(face);  return ap;
+	return face;
       };
     case 5: // the face at z=1
       {
-	face->node(0) = node(4);
-	face->node(1) = node(5);
-	face->node(2) = node(6);
-	face->node(3) = node(7);
-	face->node(4) = node(16);
-	face->node(5) = node(17);
-	face->node(6) = node(18);
-	face->node(7) = node(19);
-	face->node(8) = node(25);
+	face->set_node(0) = get_node(4);
+	face->set_node(1) = get_node(5);
+	face->set_node(2) = get_node(6);
+	face->set_node(3) = get_node(7);
+	face->set_node(4) = get_node(16);
+	face->set_node(5) = get_node(17);
+	face->set_node(6) = get_node(18);
+	face->set_node(7) = get_node(19);
+	face->set_node(8) = get_node(25);
 
-	std::auto_ptr<Elem> ap(face);  return ap;
+	return face;
       };
     default:
       {
 	error();
-	std::auto_ptr<Elem> ap(face);  return ap;
+	return face;
       }
     };
 
   // We'll never get here.
   error();
-  std::auto_ptr<Elem> ap(face);  return ap;
+  return face;
 };
 
 
 
 const std::vector<unsigned int> Hex27::tecplot_connectivity(const unsigned int sc) const
 {
-  assert (!_nodes.empty());
+  assert (_nodes != NULL);
   assert (sc < n_sub_elem());
 
   std::vector<unsigned int> conn(8);
@@ -272,7 +268,7 @@ const std::vector<unsigned int> Hex27::tecplot_connectivity(const unsigned int s
 void Hex27::vtk_connectivity(const unsigned int sc,
 			     std::vector<unsigned int> *conn) const
 {
-  assert (!_nodes.empty());
+  assert (_nodes != NULL);
   assert (sc < n_sub_elem());
   
   if (conn == NULL)
@@ -391,13 +387,6 @@ void Hex27::vtk_connectivity(const unsigned int sc,
     };
   
   return;
-};
-
-
-
-unsigned int Hex27::vtk_element_type (const unsigned int sc) const
-{
-  return 12;
 };
 
 
@@ -709,14 +698,14 @@ void Hex27::refine(Mesh& mesh)
       for (unsigned int nc=0; nc<child(c)->n_nodes(); nc++)
 	for (unsigned int n=0; n<n_nodes(); n++)
 	  if (embedding_matrix[c][nc][n] != 0.)
-	    p[c][nc] += mesh.vertex(node(n))*embedding_matrix[c][nc][n];
+	    p[c][nc] += point(n)*embedding_matrix[c][nc][n];
     
     
     // assign nodes to children & add them to the mesh
     for (unsigned int c=0; c<n_children(); c++)
       {
 	for (unsigned int nc=0; nc<child(c)->n_nodes(); nc++)
-	  _children[c]->node(nc) = mesh.mesh_refinement.add_node(p[c][nc]);
+	  _children[c]->set_node(nc) = mesh.mesh_refinement.add_point(p[c][nc]);
 
 	mesh.add_elem(child(c), mesh.mesh_refinement.new_element_number());
       };

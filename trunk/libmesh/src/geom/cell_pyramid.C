@@ -1,4 +1,4 @@
-// $Id: cell_pyramid.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: cell_pyramid.C,v 1.2 2003-01-20 16:31:36 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -22,21 +22,16 @@
 
 // Local includes
 #include "mesh.h"
-
-// Temporary includes
 #include "cell_pyramid.h"
-#include "face_tri3.h"
-#include "face_quad4.h"
 
 
 
 
 // ------------------------------------------------------------
 // Pyramid class member functions
-Elem Pyramid::side (const unsigned int i) const
+AutoPtr<Elem> Pyramid::side (const unsigned int i) const
 {
   assert (i < n_sides());
-  assert (_nodes.size() == n_nodes());
 
 
   
@@ -44,66 +39,66 @@ Elem Pyramid::side (const unsigned int i) const
     {
     case 0:  // triangular face 1
       {
-	Elem face(3);
+	AutoPtr<Elem> face(Elem::build(TRI3));
 
-	face.node(0) = node(0);
-	face.node(1) = node(1);
-	face.node(2) = node(4);
+	face->set_node(0) = get_node(0);
+	face->set_node(1) = get_node(1);
+	face->set_node(2) = get_node(4);
 	
 	return face;
       }
     case 1:  // triangular face 2
       {
-	Elem face(3);
+	AutoPtr<Elem> face(Elem::build(TRI3));
 
-	face.node(0) = node(1);
-	face.node(1) = node(2);
-	face.node(2) = node(4);
+	face->set_node(0) = get_node(1);
+	face->set_node(1) = get_node(2);
+	face->set_node(2) = get_node(4);
 	
 	return face;
       }
     case 2:  // triangular face 3
       {
-	Elem face(3);
+	AutoPtr<Elem> face(Elem::build(TRI3));
 
-	face.node(0) = node(2);
-	face.node(1) = node(3);
-	face.node(2) = node(4);
+	face->set_node(0) = get_node(2);
+	face->set_node(1) = get_node(3);
+	face->set_node(2) = get_node(4);
 	
 	return face;
       }
     case 3:  // triangular face 4
       {
-	Elem face(3);
+	AutoPtr<Elem> face(Elem::build(TRI3));
 
-	face.node(0) = node(3);
-	face.node(1) = node(0);
-	face.node(2) = node(4);
+	face->set_node(0) = get_node(3);
+	face->set_node(1) = get_node(0);
+	face->set_node(2) = get_node(4);
 	
 	return face;
       }
     case 4:  // the quad face at z=0
       {
-	Elem face(4);
+	AutoPtr<Elem> face(Elem::build(QUAD4));
 	
-	face.node(0) = node(0);
-	face.node(1) = node(3);
-	face.node(2) = node(2);
-	face.node(3) = node(1);
+	face->set_node(0) = get_node(0);
+	face->set_node(1) = get_node(3);
+	face->set_node(2) = get_node(2);
+	face->set_node(3) = get_node(1);
 
 	return face;
       }
     default:
       {
 	error();
-	Elem face(0);
+	AutoPtr<Elem> face(NULL);
 	return face;
       }
     };
 
   // We'll never get here.
   error();
-  Elem face(0);
+  AutoPtr<Elem> face(NULL);
 
   return face;
 };

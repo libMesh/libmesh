@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: elem.h,v 1.2 2003-01-20 16:31:21 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,43 +23,61 @@
 #define __elem_h__
 
 // C++ includes
-#include <memory>
 #include <vector>
 
 // Local includes
-#include "mesh_config.h"
 #include "mesh_common.h"
-#include "reference_counter.h"
-#include "mesh_base.h"
-#include "point.h"
-#include "elem_type.h"
-#include "elem_quality.h"
-#include "order.h"
+#include "reference_counted_object.h"
+#include "node.h"
+#include "enum_elem_type.h"
+#include "enum_elem_quality.h"
+#include "enum_order.h"
+#include "auto_ptr.h"
 
-// Forward declaration needed by Compaq cxx
-// and IBM xlC
+
+// Forward declarations
 class Mesh;
+class Elem;
+
 
 
 /**
  * This is the base class from which all geometric entities
  * (elements) are derived.  The \p Elem class contains information
  * that every entity might need, such as its number of nodes and
- * the global node numbers to which it is connected.  This class
+ * pointers to the nodes to which it is connected.  This class
  * also provides virtual functions that will be overloaded by
  * derived classes.  These functions provide information such as
  * the number of sides the element has, who its neighbors are,
  * how many children it might have, and who they are.
  *
- * @author Benjamin S. Kirk, 2002
+ * In an \p Elem becomes an \p Edge in 1D, a \p Face in 2D, and a \p
+ * Cell in 3D.  An \p Elem is composed of a number of sides, which you
+ * may access as \p Elem types in dimension \p D-1.  For example, a
+ * concrete element type in 3D is a \p Hex8, which is a hexahedral. A
+ * \p Hex8 has 6 sides, which are \p Faces.  You may access these
+ * sides.
+ * 
+ * An \p Elem is composed of a number of \p Node objects.  Some of
+ * these nodes live at the vertices of the element, and others may
+ * live on edges (and faces in 3D) or interior to the element.  The
+ * number of vertices an element contains \p n_vertices() is
+ * determined strictly by the type of geometric object it corresponds
+ * to.  For example, a \p Tri is a type of \p Face that always
+ * contains 3 vertices.  A \p Tri3 is a specific triangular element
+ * type with three 3 nodes, all located at the vertices.  A \p Tri6 is
+ * another triangular element with 6 nodes, 3 of which are located at
+ * vertices and another 3 that live on the edges.
+ *
+ * \author Benjamin S. Kirk, 2002-2003
  */
 
 // ------------------------------------------------------------
 // Elem class definition
-class Elem : public ReferenceCounter
+class Elem : public ReferenceCountedObject<Elem>
 {
- public:
-
+ protected:
+  
   /**
    * Constructor.  Creates an element with \p n_nodes nodes,
    * \p n_sides sides, \p n_children possible children, and
@@ -70,50 +88,66 @@ class Elem : public ReferenceCounter
 	const unsigned int n_sides=0,
 	Elem* _parent=NULL);
 
+ public:
+
   /**
    * Destructor.  Frees all the memory associated with the element.
    */
   virtual ~Elem();
 
   /**
-   * @returns "Elem"
+   * @returns the \p Point associated with local \p Node \p i.
    */
-  std::string class_name () const { return "Elem"; };
+  const Point & point (unsigned int i) const;
+
+  /**
+   * @returns the \p Point associated with local \p Node \p i
+   * as a writeable reference.
+   */
+  Point & point (unsigned int i);
+
+  /**
+   * @returns the global id number of local \p Node \p i.
+   */
+  unsigned int node (unsigned int i) const;
+
+  /**
+   * @returns the pointer to local \p Node \p i.
+   */
+  Node* get_node (unsigned int i) const;
+
+  /**
+   * @returns the pointer to local \p Node \p i as a writeable reference.
+   */
+  Node* & set_node (const unsigned int i);
   
-  /**
-   * @returns the global node number of local node \p i.
-   */
-  unsigned int node (const unsigned int i) const;
-
-  /**
-   * @returns the global node number of local node \p i as
-   * a writeable reference.
-   */
-  unsigned int & node (const unsigned int i);
-
   /**
    * @returns the subdomain that this element belongs to.
    * To conserve space this is stored as an unsigned char.
    */
-  unsigned char subdomain_id () const { return _sbd_id; };
+  unsigned char subdomain_id () const
+  { return _sbd_id; };
   
   /**
    * @returns the subdomain that this element belongs to as a
    * writeable reference.
    */
-  unsigned char & subdomain_id () { return _sbd_id; };
+  unsigned char & subdomain_id ()
+  { return _sbd_id; };
 
   /**
    * @returns the processor that this element belongs to.
    * To conserve space this is stored as a short integer.
    */
-  unsigned short int processor_id () const { return _proc_id; };
+  unsigned short int processor_id () const
+  { return _proc_id; };
   
   /**
    * @returns the processor that this element belongs to as a
    * writeable reference.
    */
-  unsigned short int & processor_id () { return _proc_id; };
+  unsigned short int & processor_id ()
+  { return _proc_id; };
 
   /**
    * @returns an id assocated with this element.  The id is not
@@ -149,7 +183,7 @@ class Elem : public ReferenceCounter
    * element.  This vector contains the global node numbers for the
    * nodes connected to this element.
    */
-  const std::vector<unsigned int> & get_nodes() const { return _nodes; };
+  std::vector<unsigned int> get_nodes() const;
 
   /**
    * @returns a pointer to the \f$ i^{th} \f$ neighbor of this element.
@@ -159,14 +193,13 @@ class Elem : public ReferenceCounter
    * a boundary of the domain. 
    */
   Elem* neighbor(const unsigned int i) const
-    { return _neighbors[i]; };
+  { assert (i < n_sides()); return _neighbors[i]; };
 
   /**
    * Assigns \p n as the \f$ i^{th} \f$ neighbor.
    */
   void set_neighbor(const unsigned int i, Elem* n)
-    { _neighbors[i]=n; return; };
-
+  { assert (i < n_sides()); _neighbors[i]=n; return; };
 
   /**
    * This function tells you which neighbor you \p (e) are.
@@ -181,22 +214,19 @@ class Elem : public ReferenceCounter
    * hexahedrals in 3D, which can be useful for writing hybrid meshes
    * for visualization. 
    */
-  virtual const std::vector<unsigned int> tecplot_connectivity(const unsigned int sc=0) const
-    { error(); std::vector<unsigned int> dummy; return dummy; };
+  virtual const std::vector<unsigned int> tecplot_connectivity(const unsigned int sc=0) const = 0;
 
   /**
    * @returns the connectivity of the \f$ sc^{th} \f$
    * sub-element in the VTK format.
    */
   virtual void vtk_connectivity(const unsigned int sc,
-				std::vector<unsigned int> *conn) const
-  { error(); return; };
+ 				std::vector<unsigned int>* conn) const = 0;
 
   /**
    * @returns the VTK element type of the sc-th sub-element.
    */
-  virtual unsigned int vtk_element_type (const unsigned int sc) const
-    { error(); return 0; };   
+  virtual unsigned int vtk_element_type (const unsigned int sc) const = 0;
   
   /**
    * Writes the \p Tecplot connectivity to the \p out stream.
@@ -216,23 +246,24 @@ class Elem : public ReferenceCounter
    * @returns the type of element that has been derived from this
    * base class.
    */
-  virtual ElemType type() const { error(); return INVALID_ELEM; };
+  virtual ElemType type() const = 0;
 
   /**
    * @returns the dimensionality of the object.
    */
-  virtual unsigned int dim () const { error(); return static_cast<unsigned int>(-1); };
+  virtual unsigned int dim () const = 0;
   
   /**
    * @returns the number of nodes this element contains. 
    */
-  virtual unsigned int n_nodes() const { return _nodes.size(); };
+  virtual unsigned int n_nodes() const = 0;
 
   /**
    * @returns the number of sides the element that has been derived
-   * from this class has.
+   * from this class has. In 2D the number of sides is the number
+   * of edges, in 3D the number of sides is the number of faces.
    */
-  virtual unsigned int n_sides() const { error(); return 0; };
+  virtual unsigned int n_sides() const = 0;
 
   /**
    * @returns the number of neighbors the element that has been derived
@@ -240,38 +271,39 @@ class Elem : public ReferenceCounter
    * neighbors are stored, so this method returns n_sides(),
    * however it may be overloaded in a derived class
    */
-  virtual unsigned int n_neighbors() const { return n_sides(); };
+  virtual unsigned int n_neighbors() const
+  { return n_sides(); };
 
   /**
    * @returns the number of vertices the element that has been derived
    * from this class has.
    */
-  virtual unsigned int n_vertices() const { error(); return 0; };
+  virtual unsigned int n_vertices() const = 0;
 
   /**
    * @returns the number of edges the element that has been derived
    * from this class has.
    */
-  virtual unsigned int n_edges() const { error(); return 0; };
+  virtual unsigned int n_edges() const = 0;
 
   /**
    * @returns the number of faces the element that has been derived
    * from this class has.
    */
-  virtual unsigned int n_faces() const { error(); return 0; };
+  virtual unsigned int n_faces() const = 0;
   
   /**
    * @returns the number of children the element that has been derived
    * from this class may have.
    */
-  virtual unsigned int n_children() const { error(); return 0; };
+  virtual unsigned int n_children() const = 0;
 
   /**
    * @returns the number of sub-elements this element may be broken
    * down into for visualization purposes.  For example, this returns
    * 1 for a linear triangle, 4 for a quadratic (6-noded) triangle, etc...
    */
-  virtual unsigned int n_sub_elem() const { error(); return 0; };
+  virtual unsigned int n_sub_elem() const = 0;
 
   /**
    * @returns an element coincident with side \p i.  This method returns
@@ -281,7 +313,7 @@ class Elem : public ReferenceCounter
    * you want the full-ordered face (i.e. a 9-noded quad face for a 27-noded
    * hexahedral) use the build_side method.
    */
-  virtual Elem side(const unsigned int i) const { error(); Elem elem; return elem; };
+  virtual AutoPtr<Elem> side(const unsigned int i) const = 0;
   
   /**
    * Creates an element coincident with side \p i. The element returned is
@@ -289,22 +321,17 @@ class Elem : public ReferenceCounter
    * build_side(0) on a 20-noded hex will build a 8-noded quadrilateral
    * coincident with face 0 and pass back the pointer.
    *
-   * A \p std::auto_ptr<Elem> is returned to prevent a memory leak.
+   * A \p AutoPtr<Elem> is returned to prevent a memory leak.
    * This way the user need not remember to delete the object.
    */
-  virtual std::auto_ptr<Elem> build_side(const unsigned int i) const
-#ifndef __IBMCPP__
-  { error(); return std::auto_ptr<Elem>(NULL); };
-#else
-  { error(); std::auto_ptr<Elem> ap(NULL); return ap; };
-#endif
+  virtual AutoPtr<Elem> build_side(const unsigned int i) const = 0;
 
   /**
    * @returns the default approximation order for this element type.
    * This is the order that will be used to compute the map to the
    * reference element.
    */
-  virtual Order default_order() const { error(); return INVALID_ORDER; };
+  virtual Order default_order() const = 0;
   
   /**
    * @returns the centriod of the element. The centroid is 
@@ -312,27 +339,27 @@ class Elem : public ReferenceCounter
    * This method is overloadable since some derived elements 
    * might want to use shortcuts to compute their centroid.
    */
-  virtual Point centroid(const MeshBase& mesh) const;
+  virtual Point centroid() const;
   
   /**
    * @returns the minimum vertex separation for the element.  
    * This method is overloadable since some derived elements 
    * might want to use shortcuts to compute their centroid.
    */
-  virtual real hmin(const MeshBase& mesh) const;
+  virtual real hmin() const;
   
   /**
    * @returns the maximum vertex separation for the element.
    * This method is overloadable since some derived elements 
    * might want to use shortcuts to compute their centroid.
    */
-  virtual real hmax(const MeshBase& mesh) const;
+  virtual real hmax() const;
   
   /**
    * Based on the quality metric q specified by the user,
    * returns a quantitative assessment of element quality.
    */
-  virtual real quality(const MeshBase& mesh, const ElemQuality q) const;  
+  virtual real quality(const ElemQuality q) const;  
 
   /**
    * Returns the suggested quality bounds for
@@ -341,15 +368,14 @@ class Elem : public ReferenceCounter
    * Since this function can have no possible meaning
    * for an abstract Elem, it is an error.
    */
-  virtual std::pair<real,real> qual_bounds (const ElemQuality q) const
-    { error(); std::pair<real, real> p; return p;  } 
+  virtual std::pair<real,real> qual_bounds (const ElemQuality) const
+  { error(); std::pair<real,real> p(0,0); return p; };
   
   /**
    * @returns true if the point p is contained in this element, 
    * false otherwise.
    */
-  virtual bool contains_point (const MeshBase& mesh,
-			       const Point& p) const;
+  virtual bool contains_point (const Point& p) const;
 
   /**
    * @returns \p true if the element is active (i.e. has no children),
@@ -362,14 +388,14 @@ class Elem : public ReferenceCounter
    * @returns a pointer to the element's parent.  Returns \p NULL if
    * the element was not created via refinement, i.e. was read from file.
    */
-  const Elem* parent() const { return _parent; };
+  const Elem* parent() const
+  { return _parent; };
   
   /**
    * @returns the magnitude of the distance between nodes n1 and n2.
    * Useful for computing the lengths of the sides of elements.
    */
-  real length (const MeshBase& mesh, 
-	       const unsigned int n1, 
+  real length (const unsigned int n1, 
 	       const unsigned int n2) const;
   
 #ifdef ENABLE_AMR
@@ -396,32 +422,34 @@ class Elem : public ReferenceCounter
    * Returns \p NULL  if this element has no children, i.e. is active.
    */
   Elem* child(const unsigned int i) const
-    { assert (_children    != NULL);
-      assert (_children[i] != NULL);
-      return _children[i];
-    };
+  {
+    assert (_children    != NULL);
+    assert (_children[i] != NULL);
+    return _children[i];
+  };
 
   /**
    * Returns the value of the refinement flag for the element.
    */
-  RefinementState refinement_flag () const { return _rflag; };
+  RefinementState refinement_flag () const
+  { return _rflag; };
 
   /**
    * Returns the value of the refinement flag for the element
    * as a writeable reference.
    */     
-  RefinementState & set_refinement_flag () { return _rflag; };
+  RefinementState & set_refinement_flag ()
+  { return _rflag; };
 
   /**
    * Refine the element.
    */
-  virtual void refine(Mesh& mesh)
-    { error(); return; };
+  virtual void refine(Mesh&) = 0;
   
   /**
    * Refine the element.
    */
-  virtual void coarsen() { error(); return; };
+  virtual void coarsen() = 0;
   
 #endif
 
@@ -436,11 +464,11 @@ class Elem : public ReferenceCounter
    * so it is protected.
    */
   static Elem* build (const ElemType type);
-
+  
   /**
-   * Data structure to hold the global node numbers.
+   * Pointers to the nodes we are conneted to.
    */
-  std::vector<unsigned int> _nodes;
+  Node** _nodes;
 
   /**
    * The subdomain to which this element belongs.
@@ -456,7 +484,7 @@ class Elem : public ReferenceCounter
    * Pointers to this element's neighbors.
    */
   Elem** _neighbors;
-
+ 
   /**
    * A pointer to this element's parent.  This is constant
    * since there is no way it should be able to change!.
@@ -500,32 +528,41 @@ Elem::Elem(const unsigned int nn,
 {
   assert (nn);
 
-  increment_constructor_count ();
-  
   subdomain_id() = 0;
   processor_id() = 0;
+
+  // Initialize the nodes data structure
+  {
+    _nodes = NULL;
+
+    if (nn != 0)
+      {
+	_nodes = new Node*[nn]; 
+	
+	for (unsigned int n=0; n<nn; n++)
+	  _nodes[n] = NULL;
+      };
+  };
   
-  _nodes.resize (nn);
+  // Initialize the neighbors data structure
+  {
+    _neighbors = NULL;
 
-  for (unsigned int n=0; n<nn; n++)
-    _nodes[n] = 0;
+    if (ns != 0)
+      {
+	_neighbors = new Elem*[ns]; 
+	
+	for (unsigned int n=0; n<ns; n++)
+	  _neighbors[n] = NULL;
+      };
+  };
 
-
-  _neighbors = NULL;
-
-  if (ns != 0)
-    {
-      _neighbors = new Elem*[ns]; 
-
-      for (unsigned int n=0; n<ns; n++)
-	_neighbors[n] = NULL;
-    }
-  
+  // Optionally initialize data from the parent
   if (parent() != NULL)
     {
       subdomain_id() = parent()->subdomain_id();
       processor_id() = parent()->processor_id();
-    }  
+    };  
 
 #ifdef ENABLE_AMR
   
@@ -533,8 +570,7 @@ Elem::Elem(const unsigned int nn,
 
   set_refinement_flag() = Elem::DO_NOTHING;
 
-#endif
-  
+#endif  
 };
 
 
@@ -542,21 +578,77 @@ Elem::Elem(const unsigned int nn,
 inline
 Elem::~Elem() 
 {
-  increment_destructor_count ();
+  if (_nodes != NULL)
+    delete [] _nodes;
+  _nodes = NULL;
   
+  if (_neighbors != NULL)
+    delete [] _neighbors;
+  _neighbors = NULL;
+
 #ifdef ENABLE_AMR
   
   if (_children != NULL)
     delete [] _children;
-
   _children = NULL;
   
 #endif
+};
 
-  if (_neighbors != NULL)
-    delete [] _neighbors;
 
-  _neighbors = NULL;
+
+inline
+const Point & Elem::point (const unsigned int i) const
+{
+  assert (i < n_nodes());
+  assert (_nodes[i] != NULL);
+  assert (_nodes[i]->id() != Node::invalid_id);
+
+  return *_nodes[i];
+};
+
+
+
+inline
+Point & Elem::point (const unsigned int i)
+{
+  assert (i < n_nodes());
+
+  return *_nodes[i];
+};
+
+
+
+inline
+unsigned int Elem::node (const unsigned int i) const
+{
+  assert (i < n_nodes());
+  assert (_nodes[i] != NULL);
+  assert (_nodes[i]->id() != Node::invalid_id);
+
+  return _nodes[i]->id();
+};
+
+
+
+inline
+Node* Elem::get_node (const unsigned int i) const
+{
+  assert (i < n_nodes());
+  assert (_nodes[i] != NULL);
+  assert (_nodes[i]->id() != Node::invalid_id);
+
+  return _nodes[i];
+};
+
+
+
+inline
+Node* & Elem::set_node (const unsigned int i)
+{
+  assert (i < n_nodes());
+
+  return _nodes[i];
 };
 
 
@@ -577,6 +669,31 @@ bool Elem::active() const
   
 #endif
 };
+
+
+
+inline
+std::vector<unsigned int> Elem::get_nodes() const
+{
+  static bool called = false;
+
+  if (!called)
+    {
+      called = true;
+      here();
+      std::cerr << "\nAvoid using this...  It is not as\n"
+		<< "efficient as it used to be!\n"
+		<< std::endl;
+    };
+
+  std::vector<unsigned int> node_numbers (n_nodes(), 0);
+
+  for (unsigned int i=0; i<n_nodes(); i++)
+    node_numbers[i] = node(i);
+
+  return node_numbers;  
+};
+
 
 
 #endif // end #ifndef __elem_h__

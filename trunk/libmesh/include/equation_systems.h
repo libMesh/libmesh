@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: equation_systems.h,v 1.2 2003-01-20 16:31:22 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,10 +23,8 @@
 #define __equation_systems_h__
 
 // C++ includes
-#include <string>
 #include <set>
 #include <map>
-#include <vector>
 
 // Local Includes
 #include "mesh_common.h"

@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: boundary_info.C,v 1.2 2003-01-20 16:31:40 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -25,10 +25,8 @@
 
 // Local includes
 #include "mesh_config.h"
-#include "boundary_mesh.h"
 #include "boundary_info.h"
 #include "mesh.h"
-#include "point.h"
 
 
 //------------------------------------------------------
@@ -76,115 +74,115 @@ void BoundaryInfo::sync()
 {
   error();
   
-//   boundary_mesh.clear();
+  //   boundary_mesh.clear();
   
-//   /**
-//    * At this point we have a list of elements stored in
-//    * boundary_mesh, but no nodes.  Furthermore, the connectivity
-//    * for the stored elements is in terms of the _global_ node
-//    * numbers.  In this routine we will renumber that connectivity
-//    * and create the necessary vertices in the boundary_mesh.
-//    */
+  //   /**
+  //    * At this point we have a list of elements stored in
+  //    * boundary_mesh, but no nodes.  Furthermore, the connectivity
+  //    * for the stored elements is in terms of the _global_ node
+  //    * numbers.  In this routine we will renumber that connectivity
+  //    * and create the necessary nodes in the boundary_mesh.
+  //    */
 
-//   std::map<unsigned int, unsigned int> new_node_numbers;
-//   unsigned int next_node_number=0;
+  //   std::map<unsigned int, unsigned int> new_node_numbers;
+  //   unsigned int next_node_number=0;
   
-//   boundary_mesh.set_n_subdomains() = n_boundary_ids();
+  //   boundary_mesh.set_n_subdomains() = n_boundary_ids();
 
 
-//   // Add sides to the structure.
-//   {
-//     std::map<short int, unsigned int> id_map;
+  //   // Add sides to the structure.
+  //   {
+  //     std::map<short int, unsigned int> id_map;
 
-//     // Original Code
-//     //     unsigned int cnt = 0;
-//     //     for (std::set<short int>::iterator pos = boundary_ids.begin();
-//     // 	 pos != boundary_ids.end(); ++pos)
-//     //       id_map[*pos] = cnt++;
+  //     // Original Code
+  //     //     unsigned int cnt = 0;
+  //     //     for (std::set<short int>::iterator pos = boundary_ids.begin();
+  //     // 	 pos != boundary_ids.end(); ++pos)
+  //     //       id_map[*pos] = cnt++;
     
-//     //     id_map[invalid_id] = cnt;
+  //     //     id_map[invalid_id] = cnt;
 
     
-//     // New code 
-//     std::for_each(boundary_ids.begin(),
-//      		  boundary_ids.end(),
-//      		  Fill(id_map));
+  //     // New code 
+  //     std::for_each(boundary_ids.begin(),
+  //      		  boundary_ids.end(),
+  //      		  Fill(id_map));
     
     
 
-//     boundary_mesh.set_n_subdomains() = id_map.size();
+  //     boundary_mesh.set_n_subdomains() = id_map.size();
 
-//     // Add additional sides that aren't flagged with boundary conditions
-//     for (unsigned int e=0; e<mesh.n_elem(); e++)
-//       if (mesh.elem(e)->active())
-// 	for (unsigned int s=0; s<mesh.elem(e)->n_sides(); s++)
-// 	  if (mesh.elem(e)->neighbor(s) == NULL) // on the boundary
-// 	    {
-// 	      // Add the side
-// 	      Elem* elem = &mesh.elem(e)->side(s);
-// 	      boundary_mesh.add_elem(&elem);
+  //     // Add additional sides that aren't flagged with boundary conditions
+  //     for (unsigned int e=0; e<mesh.n_elem(); e++)
+  //       if (mesh.elem(e)->active())
+  // 	for (unsigned int s=0; s<mesh.elem(e)->n_sides(); s++)
+  // 	  if (mesh.elem(e)->neighbor(s) == NULL) // on the boundary
+  // 	    {
+  // 	      // Add the side
+  // 	      Elem* elem = &mesh.elem(e)->side(s);
+  // 	      boundary_mesh.add_elem(&elem);
 
-// 	      // The side lives on the same processor as the parent
-// 	      elem->processor_id() = mesh.elem(e)->processor_id();
+  // 	      // The side lives on the same processor as the parent
+  // 	      elem->processor_id() = mesh.elem(e)->processor_id();
 
-// 	      // Find the right id number for that side
-// 	      std::pair<std::multimap<const Elem*,
-// 	                              std::pair<unsigned short int, short int> >::iterator,
-// 	                std::multimap<const Elem*,
-//                                       std::pair<unsigned short int, short int> >::iterator > 
-// 		pos = boundary_side_id.equal_range(mesh.elem(e));
+  // 	      // Find the right id number for that side
+  // 	      std::pair<std::multimap<const Elem*,
+  // 	                              std::pair<unsigned short int, short int> >::iterator,
+  // 	                std::multimap<const Elem*,
+  //                                       std::pair<unsigned short int, short int> >::iterator > 
+  // 		pos = boundary_side_id.equal_range(mesh.elem(e));
 
-// 	      while (pos.first != pos.second)
-// 		{
-// 		  if (pos.first->second.first == s) // already flagged with a boundary condition
-// 		    {
-// 		      elem->subdomain_id() =
-// 			id_map[pos.first->second.second];
-// 		      break;
-// 		    }
+  // 	      while (pos.first != pos.second)
+  // 		{
+  // 		  if (pos.first->second.first == s) // already flagged with a boundary condition
+  // 		    {
+  // 		      elem->subdomain_id() =
+  // 			id_map[pos.first->second.second];
+  // 		      break;
+  // 		    }
 		  
-// 		  ++pos.first;
-// 		}
+  // 		  ++pos.first;
+  // 		}
 
-// 	      // either the element wasn't found or side s
-// 	      // doesn't have a booundary condition
-// 	      if (pos.first == pos.second)
-// 		{
-// 		  elem->subdomain_id() = id_map[invalid_id];
-// 		}
-// 	    }
-//   };
+  // 	      // either the element wasn't found or side s
+  // 	      // doesn't have a booundary condition
+  // 	      if (pos.first == pos.second)
+  // 		{
+  // 		  elem->subdomain_id() = id_map[invalid_id];
+  // 		}
+  // 	    }
+  //   };
 
 
   
       
-//   for (unsigned int e=0; e<boundary_mesh.n_elem(); e++)
-//     for (unsigned int n=0; n<boundary_mesh.elem(e)->n_nodes(); n++)
-//       {
-// 	const unsigned int node_number = boundary_mesh.elem(e)->node(n);
+  //   for (unsigned int e=0; e<boundary_mesh.n_elem(); e++)
+  //     for (unsigned int n=0; n<boundary_mesh.elem(e)->n_nodes(); n++)
+  //       {
+  // 	const unsigned int node_number = boundary_mesh.elem(e)->node(n);
 	
-// 	std::map<unsigned int, unsigned int>::iterator
-// 	  pos = new_node_numbers.find(node_number);
+  // 	std::map<unsigned int, unsigned int>::iterator
+  // 	  pos = new_node_numbers.find(node_number);
 
-// 	if (pos == new_node_numbers.end())
-// 	  {
-// 	    new_node_numbers[node_number] =
-// 	      next_node_number++;
+  // 	if (pos == new_node_numbers.end())
+  // 	  {
+  // 	    new_node_numbers[node_number] =
+  // 	      next_node_number++;
 	    
-// 	    boundary_mesh.add_vertex(mesh.vertex(node_number));
-// 	  };
-//       };
+  // 	    boundary_mesh.add_point(mesh.point(node_number));
+  // 	  };
+  //       };
 
   
 
   
-//   for (unsigned int e=0; e<boundary_mesh.n_elem(); e++)
-//     for (unsigned int n=0; n<boundary_mesh.elem(e)->n_nodes(); n++)
-//       {
-// 	const unsigned int old_number = boundary_mesh.elem(e)->node(n); 
+  //   for (unsigned int e=0; e<boundary_mesh.n_elem(); e++)
+  //     for (unsigned int n=0; n<boundary_mesh.elem(e)->n_nodes(); n++)
+  //       {
+  // 	const unsigned int old_number = boundary_mesh.elem(e)->node(n); 
 	    
-// 	boundary_mesh.elem(e)->node(n) = new_node_numbers[old_number];
-//       };
+  // 	boundary_mesh.elem(e)->node(n) = new_node_numbers[old_number];
+  //       };
 };
 
 
@@ -254,11 +252,7 @@ void BoundaryInfo::add_side(const Elem* elem,
   // --enable-mgf-workaround
 #ifndef ENABLE_MGF_WORKAROUND 
   {
-#ifndef __IBMCPP__
-    std::auto_ptr<Elem> side_elem = elem->build_side(side);
-#else
-    std::auto_ptr<Elem> side_elem(elem->build_side(side));
-#endif
+    AutoPtr<Elem> side_elem(elem->build_side(side));
 
     for (unsigned int n=0; n<side_elem->n_nodes(); n++)
       if (boundary_id(side_elem->node(n)) == invalid_id)
@@ -271,7 +265,7 @@ void BoundaryInfo::add_side(const Elem* elem,
 
 
 
-void BoundaryInfo::read_shanee_boundary (const std::string name)
+void BoundaryInfo::read_shanee_boundary (const std::string& name)
 {
   std::ifstream in(name.c_str());
 
@@ -309,9 +303,9 @@ short int BoundaryInfo::boundary_id(const Elem* elem,
 				    const unsigned short int side) const
 { 
   std::pair<std::multimap<const Elem*,
-                          std::pair<unsigned short int, short int> >::const_iterator,
-            std::multimap<const Elem*,
-                          std::pair<unsigned short int, short int> >::const_iterator > 
+    std::pair<unsigned short int, short int> >::const_iterator,
+    std::multimap<const Elem*,
+    std::pair<unsigned short int, short int> >::const_iterator > 
     e=boundary_side_id.equal_range(elem);
 
   // elem not in the data structure
@@ -351,9 +345,9 @@ void BoundaryInfo::read_shanee_boundary(std::istream& in)
     {
       in >> n0 >> n1 >> id;
       
-//      Edge2 edge(n0,n1);
+      //      Edge2 edge(n0,n1);
 
-//      add_edge(edge, static_cast<short int>(id));
+      //      add_edge(edge, static_cast<short int>(id));
       add_node(n0, static_cast<short int>(id));
       add_node(n1, static_cast<short int>(id));
       
@@ -363,8 +357,7 @@ void BoundaryInfo::read_shanee_boundary(std::istream& in)
     {
       in >> n0 >> id;
       
-      add_node(n0, static_cast<short int>(id));
-      
+      add_node(n0, static_cast<short int>(id));      
     }    
 };
 

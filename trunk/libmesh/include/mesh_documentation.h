@@ -62,13 +62,11 @@
  * parameters. A standard build will occur after typing
  * \verbatim
      ./configure
-     make
-   \endverbatim
+     make \endverbatim
  * in the top-level project directory.  To see all the configuration
  * options type  
  * \verbatim
-     ./configure --help
-   \endverbatim     
+     ./configure --help \endverbatim     
  *
  * \subsection conf Configuration
  *

@@ -1,4 +1,4 @@
-// $Id: quadrature_1D.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: quadrature_gauss_1D.C,v 1.1 2003-01-20 16:31:44 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -20,12 +20,11 @@
 
 
 // Local includes
-#include "quadrature.h"
-#include "point.h"
+#include "quadrature_gauss.h"
  
 
 
-void QGauss::init_1D(const ElemType _type)
+void QGauss::init_1D(const ElemType)
 {
   //----------------------------------------------------------------------
   // 1D quadrature rules
@@ -298,19 +297,3 @@ void QGauss::init_1D(const ElemType _type)
 };
  
 
-
-void QTrap::init_1D(const ElemType _type)
-{
-  //----------------------------------------------------------------------
-  // 1D quadrature rules
-  _points.resize(2);
-  _weights.resize(2);
-	      
-  _points[0](0) = -1.;
-  _points[1](0) =  1.;
-  
-  _weights[0] = 1.;
-  _weights[1] = 1.;
-  
-  return;
-};

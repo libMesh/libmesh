@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: fe_interface.C,v 1.2 2003-01-20 16:31:33 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,7 +23,6 @@
 #include "fe_interface.h"
 #include "elem.h"
 #include "fe.h"
-#include "inf_fe.h"
 
 
 
@@ -44,7 +43,8 @@ FEInterface::FEInterface()
 #ifdef ENABLE_INFINITE_ELEMENTS
 
 // this one decides whether we have an infinite element or not
-inline bool FEInterface::is_InfFE_elem(const ElemType t)
+inline
+bool FEInterface::is_InfFE_elem(const ElemType t)
 {
 
   switch (t)
@@ -434,7 +434,6 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 
 void FEInterface::nodal_soln(const unsigned int dim,
 			     const FEType& fe_t,
-			     const MeshBase& mesh,
 			     const Elem* elem,
 			     const std::vector<number>& elem_soln,
 			     std::vector<number>&       nodal_soln)
@@ -458,17 +457,17 @@ void FEInterface::nodal_soln(const unsigned int dim,
 	switch (fe_t.family)
 	  {
 	  case HIERARCHIC:
-	    FE<1,HIERARCHIC>::nodal_soln(mesh, elem, order,
+	    FE<1,HIERARCHIC>::nodal_soln(elem, order,
 					 elem_soln, nodal_soln);
 	    return;
 
 	  case LAGRANGE:
-	    FE<1,LAGRANGE>::nodal_soln(mesh, elem, order,
+	    FE<1,LAGRANGE>::nodal_soln(elem, order,
 				       elem_soln, nodal_soln);
 	    return;
    
 	  case MONOMIAL:
-	    FE<1,MONOMIAL>::nodal_soln(mesh, elem, order,
+	    FE<1,MONOMIAL>::nodal_soln(elem, order,
 				       elem_soln, nodal_soln);
 	    return;
 
@@ -484,17 +483,17 @@ void FEInterface::nodal_soln(const unsigned int dim,
 	switch (fe_t.family)
 	  {
 	  case HIERARCHIC:
-	    FE<2,HIERARCHIC>::nodal_soln(mesh, elem, order,
+	    FE<2,HIERARCHIC>::nodal_soln(elem, order,
 					 elem_soln, nodal_soln);
 	    return;
 	    
 	  case LAGRANGE:
-	    FE<2,LAGRANGE>::nodal_soln(mesh, elem, order,
+	    FE<2,LAGRANGE>::nodal_soln(elem, order,
 				       elem_soln, nodal_soln);
 	    return;
    
 	  case MONOMIAL:
-	    FE<2,MONOMIAL>::nodal_soln(mesh, elem, order,
+	    FE<2,MONOMIAL>::nodal_soln(elem, order,
 				       elem_soln, nodal_soln);
 	    return;
 
@@ -510,17 +509,17 @@ void FEInterface::nodal_soln(const unsigned int dim,
 	switch (fe_t.family)
 	  {
 	  case HIERARCHIC:
-	    FE<3,HIERARCHIC>::nodal_soln(mesh, elem, order,
+	    FE<3,HIERARCHIC>::nodal_soln(elem, order,
 					 elem_soln, nodal_soln);
 	    return;
 	    
 	  case LAGRANGE:
-	    FE<3,LAGRANGE>::nodal_soln(mesh, elem, order,
+	    FE<3,LAGRANGE>::nodal_soln(elem, order,
 				       elem_soln, nodal_soln);
 	    return;
 	    
 	  case MONOMIAL:
-	    FE<3,MONOMIAL>::nodal_soln(mesh, elem, order,
+	    FE<3,MONOMIAL>::nodal_soln(elem, order,
 				       elem_soln, nodal_soln);
 	    return;
 
@@ -544,14 +543,13 @@ void FEInterface::nodal_soln(const unsigned int dim,
 
 Point FEInterface::inverse_map (const unsigned int dim,
 				const FEType& fe_t,
-				const MeshBase& mesh,
 				const Elem* elem,
 				const Point& p)
 {
   // #ifdef ENABLE_INFINITE_ELEMENTS
   //   if (FEInterface::is_InfFE_elem(elem->type()))
   //     {
-  //       return 0.;//InfFE::inverse_map(mesh, elem, p);
+  //       return 0.;//InfFE::inverse_map(elem, p);
   //     };
   // #endif
 
@@ -564,13 +562,13 @@ Point FEInterface::inverse_map (const unsigned int dim,
 	switch (fe_t.family)
 	  {
 	  case HIERARCHIC:
-	    return FE<1,HIERARCHIC>::inverse_map(mesh, elem, p);
+	    return FE<1,HIERARCHIC>::inverse_map(elem, p);
 	    
 	  case LAGRANGE:
-	    return FE<1,LAGRANGE>::inverse_map(mesh, elem, p);
+	    return FE<1,LAGRANGE>::inverse_map(elem, p);
 	    
 	  case MONOMIAL:
-	    return FE<1,MONOMIAL>::inverse_map(mesh, elem, p);
+	    return FE<1,MONOMIAL>::inverse_map(elem, p);
 
 	  default:
 	    error();
@@ -584,13 +582,13 @@ Point FEInterface::inverse_map (const unsigned int dim,
 	switch (fe_t.family)
 	  {
 	  case HIERARCHIC:
-	    return FE<2,HIERARCHIC>::inverse_map(mesh, elem, p);
+	    return FE<2,HIERARCHIC>::inverse_map(elem, p);
 	    
 	  case LAGRANGE:
-	    return FE<2,LAGRANGE>::inverse_map(mesh, elem, p);
+	    return FE<2,LAGRANGE>::inverse_map(elem, p);
 	    
 	  case MONOMIAL:
-	    return FE<2,MONOMIAL>::inverse_map(mesh, elem, p);
+	    return FE<2,MONOMIAL>::inverse_map(elem, p);
 
 	  default:
 	    error();
@@ -604,13 +602,13 @@ Point FEInterface::inverse_map (const unsigned int dim,
 	switch (fe_t.family)
 	  {
 	  case HIERARCHIC:
-	    return FE<3,HIERARCHIC>::inverse_map(mesh, elem, p);
+	    return FE<3,HIERARCHIC>::inverse_map(elem, p);
 	    
 	  case LAGRANGE:
-	    return FE<3,LAGRANGE>::inverse_map(mesh, elem, p);
+	    return FE<3,LAGRANGE>::inverse_map(elem, p);
 	    
 	  case MONOMIAL:
-	    return FE<3,MONOMIAL>::inverse_map(mesh, elem, p);
+	    return FE<3,MONOMIAL>::inverse_map(elem, p);
 
 	  default:
 	    error();
@@ -628,6 +626,14 @@ Point FEInterface::inverse_map (const unsigned int dim,
   return pt;
 };
 
+
+
+bool FEInterface::on_reference_element(const Point& p,
+				       const ElemType t,
+				       const real eps)
+{
+  return FEBase::on_reference_element(p,t,eps);
+};
 
 
 

@@ -1,4 +1,4 @@
-//    $Id: petsc_matrix.h,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+//    $Id: petsc_matrix.h,v 1.2 2003-01-20 16:31:28 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,15 +31,12 @@
 
 
 // C++ includes
-#include <iostream>
-#include <vector>
-
 
 // Local includes
-#include "petsc_vector.h"
-#include "dense_matrix.h"
 #include "dof_map.h"
 
+// Forward declarations
+class PetscVector;
 
 
 // Petsc include files

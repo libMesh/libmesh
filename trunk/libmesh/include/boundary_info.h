@@ -1,4 +1,4 @@
-// $Id: boundary_info.h,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: boundary_info.h,v 1.2 2003-01-20 16:31:21 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -25,17 +25,16 @@
 // C++ includes
 #include <map>
 #include <set>
-#include <iostream>
-
-
-
-class Mesh;
-class BoundaryMesh;
 
 // Local includes
-#include "edge.h"
-#include "face.h"
 #include "elem.h"
+#include "boundary_mesh.h"
+
+
+// Forward declarations
+class Mesh;
+
+
 
 
 
@@ -106,9 +105,19 @@ class BoundaryInfo
    * Returns the number of user-specified boundary ids.
    */
   unsigned int n_boundary_ids() const { return boundary_ids.size(); }
+
+  /**
+   * Read boundary data in the shanee format,
+   * taking a string for the name of the file.
+   * Probably deprecated.
+   */
+  void read_shanee_boundary(const std::string& name);
   
-  void read_shanee_boundary(const std::string name);
-  
+  /**
+   * Read boundary data in the shanee format,
+   * taking an istream which represents the file.
+   * Probably deprecated.
+   */
   void read_shanee_boundary(std::istream& in);
 
   /**

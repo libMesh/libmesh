@@ -1,4 +1,4 @@
-// $Id: mesh_exodus_support.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: mesh_exodus_support.C,v 1.2 2003-01-20 16:31:41 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -21,7 +21,6 @@
 
 // C++ includes
 #include <iomanip>
-#include <iostream>
 
 
 // Local includes
@@ -29,8 +28,6 @@
 #include "boundary_mesh.h"
 #include "boundary_info.h"
 #include "mesh.h"
-#include "point.h"
-#include "dof_map.h"
 
 
 #ifdef HAVE_EXODUS_API
@@ -441,7 +438,7 @@ const ExodusII::Conversion ExodusII::ElementMaps::assign_conversion(const ElemTy
 
 
 
-void Mesh::read_exd(const std::string name)
+void Mesh::read_exd(const std::string& name)
 {
   // Generate error if API is not defined
 
@@ -485,16 +482,14 @@ void Mesh::read_exd(const std::string name)
                                                      // dimensions in the mesh supplied.
 
     ex.read_nodes();                      // Read nodes from the exodus file
-    _vertices.resize(ex.get_num_nodes());  // Resize the vertices vector
+    _nodes.resize(ex.get_num_nodes());  // Resize the nodes vector
 
-    // Loop over the vertices, create Points.
+    // Loop over the nodes, create Nodes.
     for (int i=0; i<ex.get_num_nodes(); i++)
-      {
-	Point p(ex.get_x(i),
-		ex.get_y(i),
-		ex.get_z(i));
-	_vertices[i] = p;
-      }
+      node_ptr(i) = Node::build(ex.get_x(i),
+				ex.get_y(i),
+				ex.get_z(i),
+				i);
 
     
     // Get information about all the blocks
@@ -526,14 +521,14 @@ void Mesh::read_exd(const std::string name)
 	    for (int k=0; k<ex.get_num_nodes_per_elem(); k++)
 	      {
 		int gi = (j-nelem_last_block)*ex.get_num_nodes_per_elem() + conv.get_node_map(k); // global index 
-		int node_number = ex.get_connect(gi);                // Global node number
-		elem(j)->node(k) = (node_number-1);  // Set node number
+		int node_number      = ex.get_connect(gi);        // Global node number (1-based)
+		elem(j)->set_node(k) = node_ptr((node_number-1)); // Set node number
 		// Subtract 1 since
 		// exodus is internally 1-based
-	      }
-	  }
+	      };
+	  };
 	nelem_last_block += ex.get_num_elem_this_blk();
-      }
+      };
 
     
     // Read in sideset information -- this is useful for applying boundary conditions
@@ -544,7 +539,7 @@ void Mesh::read_exd(const std::string name)
 	{
 	  offset += (i > 0 ? ex.get_num_sides_per_set(i-1) : 0); // Compute new offset
 	  ex.read_sideset(i, offset);
-	}
+	};
       
       
       //ex.print_sideset_info();
@@ -561,12 +556,12 @@ void Mesh::read_exd(const std::string name)
 	  boundary_info.add_side(elem_list[e]-1,
 				 conv.get_side_map(side_list[e]-1),
 				 id_list[e]);
-	}
-    }
+	};
+    };
 
     
     ex.close();            // Close the exodus file, if possible
-  }
+  };
 
 #endif
-}
+};
