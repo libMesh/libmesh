@@ -11,8 +11,15 @@
 <?php make_navigation("presentations",$root)?>
 
 <div class="content">
-<h1>Presentations -- Stay Tuned ...</h1>
+<h1>Presentations</h1>
 <ul>
+  <h2>Ben's Presentations</h2>
+  <ul>
+    <li> <a href="http://cfdlab.ae.utexas.edu/~benkirk/adv_flows_project.pdf">Adavnced Flows Class Project</a> (natural convection, 2002)</li>
+    <li> <a href="http://cfdlab.ae.utexas.edu/~benkirk/siam_geo.pdf">SIAM Geosciences 2003</a></li>
+    <li> <a href="http://cfdlab.ae.utexas.edu/~benkirk/libmesh_uwa03.pdf">libMesh Presentation</a> (from the June 2003 UWA Shortcourse)</li>
+    <li> <a href="http://cfdlab.ae.utexas.edu/~benkirk/applications_uwa03.pdf">AMR Applications</a> (from the June 2003 UWA Shortcourse)</li>
+  </ul>
   <li> USNCCM VII </li>
   <li> ICIAM </li>
   <li> SAVIAC </li>
