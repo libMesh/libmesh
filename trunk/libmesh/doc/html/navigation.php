@@ -33,18 +33,13 @@ function load_style($root)
     
     <?php echo "<a class=\"L1\" href = \"", $root, "examples.php\">Examples</a><BR>"; ?>
 
-    <?php if (ereg("^ex[1-9]+|examples",$mode)) { ?>
-
-    <?php for ($i=1; $i<7; $i++)
-          {
-            make_example_subs($i, $root, $mode);
-          } ?>
-      
-
-    <?php make_example_subs(9, $root,$mode) ?>
-    <?php make_example_subs(10,$root,$mode) ?>
-    
-    <?php } ?>
+    <?php if (ereg("^ex[1-9]+|examples",$mode))
+            {
+              for ($i=1; $i<13; $i++)
+                {
+                  make_example_subs($i, $root, $mode);
+                }
+            } ?>
 
     <?php echo "<a class=\"L1\" href = \"", $root, "applications.php\">Applications</a><BR>"; ?>
     <?php if ($mode=="applications") { ?>

@@ -1,35 +1,34 @@
-// $Id: ex11.C,v 1.2 2003-06-10 19:04:45 benkirk Exp $
+/* $Id: ex11.C,v 1.3 2003-11-10 22:14:35 benkirk Exp $ */
 
-// The Next Great Finite Element Library.
-// Copyright (C) 2003  Benjamin S. Kirk
-  
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-  
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
-  
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+/* The Next Great Finite Element Library. */
+/* Copyright (C) 2003  Benjamin S. Kirk */
 
+/* This library is free software; you can redistribute it and/or */
+/* modify it under the terms of the GNU Lesser General Public */
+/* License as published by the Free Software Foundation; either */
+/* version 2.1 of the License, or (at your option) any later version. */
 
+/* This library is distributed in the hope that it will be useful, */
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU */
+/* Lesser General Public License for more details. */
 
+/* You should have received a copy of the GNU Lesser General Public */
+/* License along with this library; if not, write to the Free Software */
+/* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
-/**
- * C++ include files that we need
- */
+ // Example 11 -- Stokes Equations - Systems of Equations
+ //
+ // This example shows how a simple, linear system of equations
+ // can be solved in parallel.  The system of equations are the familiar
+ // Stokes equations for low-speed incompressible fluid flow.
+
+// C++ include files that we need
 #include <iostream>
 #include <algorithm>
 #include <math.h>
 
-/**
- * Basic include file needed for the mesh functionality.
- */
+// Basic include file needed for the mesh functionality.
 #include "libmesh.h"
 #include "mesh.h"
 #include "equation_systems.h"
@@ -44,247 +43,157 @@
 #include "error_vector.h"
 #include "error_estimator.h"
 
-/**
- * For systems of equations the \p DenseSubMatrix
- * and \p DenseSubVector provide convenient ways for
- * assembling the element matrix and vector on a
- * component-by-component basis.
- */
+// For systems of equations the \p DenseSubMatrix
+// and \p DenseSubVector provide convenient ways for
+// assembling the element matrix and vector on a
+// component-by-component basis.
 #include "dense_submatrix.h"
 #include "dense_subvector.h"
 
-/**
- * \mainpage Example 11
- *
- * \section Introduction
- *
- * This example shows how a simple, linear system of equations
- * can be solved in parallel.  The system of equations are the familiar
- * Stokes equations for low-speed incompressible fluid flow.
- */
-
-
-/**
- * Function prototype.  This function will assemble the system
- * matrix and right-hand-side.
- */
+// Function prototype.  This function will assemble the system
+// matrix and right-hand-side.
 void assemble_stokes (EquationSystems& es,
 		      const std::string& system_name);
 
-
-
-
-
+// The main program.
 int main (int argc, char** argv)
 {
-  /**
-   * Initialize libMesh.
-   */
+  // Initialize libMesh.
   libMesh::init (argc, argv);
-
   {    
-    /**
-     * Set the dimensionality of the mesh = 2
-     */
+    // Set the dimensionality of the mesh = 2
     const unsigned int dim = 2;     
     
-    /**
-     * Create a two-dimensional mesh.
-     */
+    // Create a two-dimensional mesh.
     Mesh mesh (dim);
     
-    /**
-     * Use the internal mesh generator to create a uniform
-     * grid on the square [-1,1]^D.  We instruct the mesh generator
-     * to build a mesh of 8x8 \p Quad9 elements in 2D, or \p Hex27
-     * elements in 3D.  Building these higher-order elements allows
-     * us to use higher-order approximation, as in example 3.
-     */
+    // Use the internal mesh generator to create a uniform
+    // grid on the square [-1,1]^D.  We instruct the mesh generator
+    // to build a mesh of 8x8 \p Quad9 elements in 2D, or \p Hex27
+    // elements in 3D.  Building these higher-order elements allows
+    // us to use higher-order approximation, as in example 3.
     mesh.build_square (15, 15,
 		       0., 1.,
 		       0., 1.,
 		       QUAD9);
     
-    /**
-     * Print information about the mesh to the screen.
-     */
+    // Print information about the mesh to the screen.
     mesh.print_info();
     
-    /**
-     * Create an equation systems object.
-     */
+    // Create an equation systems object.
     EquationSystems equation_systems (mesh);
     
-    /**
-     * Declare the system and its variables.
-     */
+    // Declare the system and its variables.
     {
-      /**
-       * Creates a transient system named "Convection-Diffusion"
-       */
+      // Creates a transient system named "Convection-Diffusion"
       SteadySystem& system = 
 	equation_systems.add_system<SteadySystem> ("Stokes");
       
-      /**
-       * Add the variables "u" & "v" to "Stokes".  They
-       * will be approximated using second-order approximation.
-       */
+      // Add the variables "u" & "v" to "Stokes".  They
+      // will be approximated using second-order approximation.
       system.add_variable ("u", SECOND);
       system.add_variable ("v", SECOND);
 
-      /**
-       * Add the variable "p" to "Stokes". This will
-       * be approximated with a first-order basis,
-       * providing an LBB-stable pressure-velocity pair.
-       */
+      // Add the variable "p" to "Stokes". This will
+      // be approximated with a first-order basis,
+      // providing an LBB-stable pressure-velocity pair.
       system.add_variable ("p", FIRST);
 
-      /**
-       * Give the system a pointer to the matrix assembly
-       * function.
-       */
+      // Give the system a pointer to the matrix assembly
+      // function.
       system.attach_assemble_function (assemble_stokes);
       
-      /**
-       * Initialize the data structures for the equation system.
-       */
+      // Initialize the data structures for the equation system.
       equation_systems.init ();
 
       equation_systems.set_parameter("linear solver maximum iterations") = 250;
       equation_systems.set_parameter("linear solver tolerance") = 1.e-6;
       
-      /**
-       * Prints information about the system to the screen.
-       */
+      // Prints information about the system to the screen.
       equation_systems.print_info();
     }
     
-    /**
-     * Assemble & solve the linear system,
-     * then write the solution.
-     */
+    // Assemble & solve the linear system,
+    // then write the solution.
     equation_systems("Stokes").solve();
 
     mesh.write_gmv ("out.gmv",
 		    equation_systems);
   }
   
-  
-  /**
-   * All done.  
-   */
+  // All done.  
   return libMesh::close ();
 }
-
-
-
 
 void assemble_stokes (EquationSystems& es,
 		      const std::string& system_name)
 {
-  /**
-   * It is a good idea to make sure we are assembling
-   * the proper system.
-   */
+  // It is a good idea to make sure we are assembling
+  // the proper system.
   assert (system_name == "Stokes");
   
-  /**
-   * Get a constant reference to the mesh object.
-   */
+  // Get a constant reference to the mesh object.
   const Mesh& mesh = es.get_mesh();
-
-  /**
-   * The dimension that we are running
-   */
+  
+  // The dimension that we are running
   const unsigned int dim = mesh.mesh_dimension();
-
-  /**
-   * Get a reference to the Convection-Diffusion system object.
-   */
+  
+  // Get a reference to the Convection-Diffusion system object.
   SteadySystem& system =
     es.get_system<SteadySystem> ("Stokes");
 
-  /**
-   * Numeric ids corresponding to each variable in the system
-   */
+  // Numeric ids corresponding to each variable in the system
   const unsigned int u_var = system.variable_number ("u");
   const unsigned int v_var = system.variable_number ("v");
   const unsigned int p_var = system.variable_number ("p");
   
-  /**
-   * Get the Finite Element type for "u".  Note this will be
-   * the same as the type for "v".
-   */
+  // Get the Finite Element type for "u".  Note this will be
+  // the same as the type for "v".
   FEType fe_vel_type = system.variable_type(u_var);
-
-  /**
-   * Get the Finite Element type for "p".
-   */
+  
+  // Get the Finite Element type for "p".
   FEType fe_pres_type = system.variable_type(p_var);
 
-  /**
-   * Build a Finite Element object of the specified type for
-   * the velocity variables.
-   */
+  // Build a Finite Element object of the specified type for
+  // the velocity variables.
   AutoPtr<FEBase> fe_vel  (FEBase::build(dim, fe_vel_type));
-
-  /**
-   * Build a Finite Element object of the specified type for
-   * the pressure variables.
-   */
+    
+  // Build a Finite Element object of the specified type for
+  // the pressure variables.
   AutoPtr<FEBase> fe_pres (FEBase::build(dim, fe_pres_type));
   
-  /**
-   * A Gauss quadrature rule for numerical integration.
-   * Let the \p FEType object decide what order rule is appropriate.
-   */
+  // A Gauss quadrature rule for numerical integration.
+  // Let the \p FEType object decide what order rule is appropriate.
   QGauss qrule (dim, fe_vel_type.default_quadrature_order());
 
-  /**
-   * Tell the finite element objects to use our quadrature rule.
-   */
+  // Tell the finite element objects to use our quadrature rule.
   fe_vel->attach_quadrature_rule (&qrule);
   fe_pres->attach_quadrature_rule (&qrule);
-
   
-
-  /**
-   *--------------------------------------------------------------------
-   * Here we define some references to cell-specific data that
-   * will be used to assemble the linear system.
-   */
-  
-  /**
-   * The element Jacobian * quadrature weight at each integration point.   
-   */
+  // Here we define some references to cell-specific data that
+  // will be used to assemble the linear system.
+  //
+  // The element Jacobian * quadrature weight at each integration point.   
   const std::vector<Real>& JxW = fe_vel->get_JxW();
-
-  /**
-   * The element shape function gradients for the velocity
-   * variables evaluated at the quadrature points.
-   */
+  
+  // The element shape function gradients for the velocity
+  // variables evaluated at the quadrature points.
   const std::vector<std::vector<RealGradient> >& dphi = fe_vel->get_dphi();
 
-  /**
-   * The element shape functions for the pressure variable
-   * evaluated at the quadrature points.
-   */
+  // The element shape functions for the pressure variable
+  // evaluated at the quadrature points.
   const std::vector<std::vector<Real> >& psi = fe_pres->get_phi();
   
-  /**
-   * A reference to the \p DofMap object for this system.  The \p DofMap
-   * object handles the index translation from node and element numbers
-   * to degree of freedom numbers.  We will talk more about the \p DofMap
-   * in future examples.
-   */
+  // A reference to the \p DofMap object for this system.  The \p DofMap
+  // object handles the index translation from node and element numbers
+  // to degree of freedom numbers.  We will talk more about the \p DofMap
+  // in future examples.
   const DofMap& dof_map = system.get_dof_map();
 
-  /**
-   * Define data structures to contain the element matrix
-   * and right-hand-side vector contribution.  Following
-   * basic finite element terminology we will denote these
-   * "Ke" and "Fe".
-   */
+  // Define data structures to contain the element matrix
+  // and right-hand-side vector contribution.  Following
+  // basic finite element terminology we will denote these
+  // "Ke" and "Fe".
   DenseMatrix<Number> Ke;
   DenseVector<Number> Fe;
 
@@ -298,44 +207,32 @@ void assemble_stokes (EquationSystems& es,
     Fv(Fe),
     Fp(Fe);
 
-  /**
-   * This vector will hold the degree of freedom indices for
-   * the element.  These define where in the global system
-   * the element degrees of freedom get mapped.
-   */
+  // This vector will hold the degree of freedom indices for
+  // the element.  These define where in the global system
+  // the element degrees of freedom get mapped.
   std::vector<unsigned int> dof_indices;
   std::vector<unsigned int> dof_indices_u;
   std::vector<unsigned int> dof_indices_v;
   std::vector<unsigned int> dof_indices_p;
-
-
-
-  /**
-   *--------------------------------------------------------------------
-   * Now we will loop over all the elements in the mesh that
-   * live on the local processor. We will compute the element
-   * matrix and right-hand-side contribution.  Since the mesh
-   * will be refined we want to only consider the ACTIVE elements,
-   * hence we use a variant of the \p active_elem_iterator.
-   */
-
+  
+  // Now we will loop over all the elements in the mesh that
+  // live on the local processor. We will compute the element
+  // matrix and right-hand-side contribution.  Since the mesh
+  // will be refined we want to only consider the ACTIVE elements,
+  // hence we use a variant of the \p active_elem_iterator.
   const_active_local_elem_iterator           el (mesh.elements_begin());
   const const_active_local_elem_iterator end_el (mesh.elements_end());
   
   for ( ; el != end_el; ++el)
     {    
-      /**
-       * Store a pointer to the element we are currently
-       * working on.  This allows for nicer syntax later.
-       */
+      // Store a pointer to the element we are currently
+      // working on.  This allows for nicer syntax later.
       const Elem* elem = *el;
-
-      /**
-       * Get the degree of freedom indices for the
-       * current element.  These define where in the global
-       * matrix and right-hand-side this element will
-       * contribute to.
-       */
+      
+      // Get the degree of freedom indices for the
+      // current element.  These define where in the global
+      // matrix and right-hand-side this element will
+      // contribute to.
       dof_map.dof_indices (elem, dof_indices);
       dof_map.dof_indices (elem, dof_indices_u, u_var);
       dof_map.dof_indices (elem, dof_indices_v, v_var);
@@ -346,42 +243,35 @@ void assemble_stokes (EquationSystems& es,
       const unsigned int n_v_dofs = dof_indices_v.size(); 
       const unsigned int n_p_dofs = dof_indices_p.size();
       
-      /**
-       * Compute the element-specific data for the current
-       * element.  This involves computing the location of the
-       * quadrature points (q_point) and the shape functions
-       * (phi, dphi) for the current element.
-       */
+      // Compute the element-specific data for the current
+      // element.  This involves computing the location of the
+      // quadrature points (q_point) and the shape functions
+      // (phi, dphi) for the current element.
       fe_vel->reinit  (elem);
       fe_pres->reinit (elem);
 
-      /**
-       * Zero the element matrix and right-hand side before
-       * summing them.  We use the resize member here because
-       * the number of degrees of freedom might have changed from
-       * the last element.  Note that this will be the case if the
-       * element type is different (i.e. the last element was a
-       * triangle, now we are on a quadrilateral).
-       */
+      // Zero the element matrix and right-hand side before
+      // summing them.  We use the resize member here because
+      // the number of degrees of freedom might have changed from
+      // the last element.  Note that this will be the case if the
+      // element type is different (i.e. the last element was a
+      // triangle, now we are on a quadrilateral).
       Ke.resize (n_dofs, n_dofs);
       Fe.resize (n_dofs);
 
-      /**
-       * Reposition the submatrices...  The idea is this:
-       *
-       *         -           -          -  -
-       *        | Kuu Kuv Kup |        | Fu |
-       *   Ke = | Kvu Kvv Kvp |;  Fe = | Fv |
-       *        | Kpu Kpv Kpp |        | Fv |
-       *         -           -          -  -
-       *
-       * The \p DenseSubMatrix.repostition () member takes the
-       * (row_offset, column_offset, row_size, column_size).
-       * 
-       * Similarly, the \p DenseSubVector.reposition () member
-       * takes the (row_offset, row_size)
-       */
-      
+      // Reposition the submatrices...  The idea is this:
+      //
+      //         -           -          -  -
+      //        | Kuu Kuv Kup |        | Fu |
+      //   Ke = | Kvu Kvv Kvp |;  Fe = | Fv |
+      //        | Kpu Kpv Kpp |        | Fv |
+      //         -           -          -  -
+      //
+      // The \p DenseSubMatrix.repostition () member takes the
+      // (row_offset, column_offset, row_size, column_size).
+      // 
+      // Similarly, the \p DenseSubVector.reposition () member
+      // takes the (row_offset, row_size)
       Kuu.reposition (u_var*n_u_dofs, u_var*n_u_dofs, n_u_dofs, n_u_dofs);
       Kuv.reposition (u_var*n_u_dofs, v_var*n_u_dofs, n_u_dofs, n_v_dofs);
       Kup.reposition (u_var*n_u_dofs, p_var*n_u_dofs, n_u_dofs, n_p_dofs);
@@ -397,12 +287,8 @@ void assemble_stokes (EquationSystems& es,
       Fu.reposition (u_var*n_u_dofs, n_u_dofs);
       Fv.reposition (v_var*n_u_dofs, n_v_dofs);
       Fp.reposition (p_var*n_u_dofs, n_p_dofs);
-
-
       
-      /**
-       * Now we will build the element matrix.
-       */
+      // Now we will build the element matrix.
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
 	{
 	  // Assemble the u-velocity row
@@ -442,116 +328,79 @@ void assemble_stokes (EquationSystems& es,
 	  
 	} // end of the quadrature point qp-loop
 
-
-      
-      
-
-
-      
-      /**
-       *----------------------------------------------------------------
-       * At this point the interior element integration has
-       * been completed.  However, we have not yet addressed
-       * boundary conditions.  For this example we will only
-       * consider simple Dirichlet boundary conditions imposed
-       * via the penalty method. The penalty method used here
-       * is equivalent (for Lagrange basis functions) to lumping
-       * the matrix resulting from the L2 projection penalty
-       * approach introduced in example 3.
-       */      
+      // At this point the interior element integration has
+      // been completed.  However, we have not yet addressed
+      // boundary conditions.  For this example we will only
+      // consider simple Dirichlet boundary conditions imposed
+      // via the penalty method. The penalty method used here
+      // is equivalent (for Lagrange basis functions) to lumping
+      // the matrix resulting from the L2 projection penalty
+      // approach introduced in example 3.
       {
-	
-	/**
-	 * The following loops over the sides of the element.
-	 * If the element has no neighbor on a side then that
-	 * side MUST live on a boundary of the domain.
-	 */
+	// The following loops over the sides of the element.
+	// If the element has no neighbor on a side then that
+	// side MUST live on a boundary of the domain.
 	for (unsigned int s=0; s<elem->n_sides(); s++)
 	  if (elem->neighbor(s) == NULL)
 	    {
 	      AutoPtr<Elem> side (elem->build_side(s));
-	      
-	      /**
-	       * Loop over the nodes on the side.
-	       */
+	      	      
+	      // Loop over the nodes on the side.
 	      for (unsigned int ns=0; ns<side->n_nodes(); ns++)
 		{
-		  /**
-		   * The location on the boundary of the current
-		   * node.
-		   */
+		  // The location on the boundary of the current
+		  // node.
+		   
 		  //const Real xf = side->point(ns)(0);
 		  const Real yf = side->point(ns)(1);
 		  
-		  /**
-		   * The penalty value.  \f$ \frac{1}{\epsilon \f$
-		   */
+		  // The penalty value.  \f$ \frac{1}{\epsilon \f$
 		  const Real penalty = 1.e10;
 		  
-		  /**
-		   * The boundary values.
-		   */
+		  // The boundary values.
+		   
 		  // Set u = 1 on the top boundary, 0 everywhere else
 		  const Real u_value = (yf > .99) ? 1. : 0.;
+		  
 		  // Set v = 0 everywhere
 		  const Real v_value = 0.;
-
-		  /**
-		   * Find the node on the element matching this node on
-		   * the side.  That defined where in the element matrix
-		   * the boundary condition will be applied.
-		   */
+		  
+		  // Find the node on the element matching this node on
+		  // the side.  That defined where in the element matrix
+		  // the boundary condition will be applied.
 		  for (unsigned int n=0; n<elem->n_nodes(); n++)
 		    if (elem->node(n) == side->node(ns))
 		      {
-			/**
-			 * Matrix contribution.
-			 */
+			// Matrix contribution.
 			Kuu(n,n) += penalty;
 			Kvv(n,n) += penalty;
 		  		  
-			/**
-			 * Right-hand-side contribution.
-			 */
+			// Right-hand-side contribution.
 			Fu(n) += penalty*u_value;
 			Fv(n) += penalty*v_value;
 		      }
-		  
 		} // end face node loop	  
 	    } // end if (elem->neighbor(side) == NULL)
-	
       } // end boundary condition section	  
-
-
       
-
-      /**
-       * We have now built the element matrix and RHS vector in terms
-       * of the element degrees of freedom.  However, it is possible
-       * that some of the element DOFs are constrained to enforce
-       * solution continuity, i.e. they are not really "free".  We need
-       * to constrain those DOFs in terms of non-constrained DOFs to
-       * ensure a continuous solution.  The
-       * \p DofMap::constrain_element_matrix_and_vector() method does
-       * just that.
-       */
+      // We have now built the element matrix and RHS vector in terms
+      // of the element degrees of freedom.  However, it is possible
+      // that some of the element DOFs are constrained to enforce
+      // solution continuity, i.e. they are not really "free".  We need
+      // to constrain those DOFs in terms of non-constrained DOFs to
+      // ensure a continuous solution.  The
+      // \p DofMap::constrain_element_matrix_and_vector() method does
+      // just that.
       dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
       
-      /**
-       *----------------------------------------------------------------
-       * The element matrix and right-hand-side are now built
-       * for this element.  Add them to the global matrix and
-       * right-hand-side vector.  The \p PetscMatrix::add_matrix()
-       * and \p PetscVector::add_vector() members do this for us.
-       */      
+      // The element matrix and right-hand-side are now built
+      // for this element.  Add them to the global matrix and
+      // right-hand-side vector.  The \p PetscMatrix::add_matrix()
+      // and \p PetscVector::add_vector() members do this for us.
       system.matrix->add_matrix (Ke, dof_indices);
       system.rhs->add_vector    (Fe, dof_indices);
-      
     } // end of element loop
-
-
-  /**
-   * That's it.
-   */
+  
+  // That's it.
   return;
 }

@@ -11,6 +11,7 @@
 <?php make_navigation("examples",$root)?>
 
 <div class="content">
+
 <h1>A Series of Example Programs</h1>
 The following series of example programs have been
 designed to get you started on the right foot.
@@ -18,6 +19,7 @@ For the most part they are arranged in order of
 increasing complexity, and could be attempted in
 that order.  Click the links below, or use the
 menu on the left to navigate the examples.
+
 
 
 
@@ -74,6 +76,16 @@ of applications.  The wave equation is solved in this example. <i>For this examp
 work you must have configured the library with the --enable-ifem option</i> 
 
 
+
+
+<h2><a href="ex8.php">Example 8</a> -- The Newmark System and the Wave Equation</h2>
+This example solves the wave equation in a hybrid-mesh pipe.  The mesh consists of
+<code>HEX8</code> and <code>PRISM6</code> element types.  The pressure at a point
+in the pipe is extracted and can be plotted as a function of time.
+
+
+
+
 <h2><a href="ex9.php">Example 9</a> -- Solving a Transient Linear System in Parallel</h2>
 This example shows how a simple, linear transient
 system can be solved in parallel.  The system is simple
@@ -81,6 +93,8 @@ scalar convection-diffusion with a specified external
 velocity.  The initial condition is given, and the
 solution is advanced in time with a standard Crank-Nicholson
 time-stepping strategy.
+
+
 
 
 <h2><a href="ex10.php">Example 10</a> -- Solving a Transient System with Adaptive Mesh Refinement</h2>
@@ -92,7 +106,22 @@ solution is advanced in time with a standard Crank-Nicholson
 time-stepping strategy.  This example differs from the previous
 example by employing adaptive mesh refinement (AMR) and the
 Kelly et. al. error indicator.
- 
+
+
+
+
+<h2><a href="ex11.php">Example 11</a> -- Solving a System of Equations</h2>
+This example shows how to solve a simple, linear system of equations.  The
+familiar Stokes equations for incompressible fluid flow are solved.  To satisfy
+the LBB criterion different approximation spaces are used for the velocity and
+pressure fields.
+
+
+
+
+<h2><a href="ex12.php">Example 12</a> -- Using the <code>MeshData</code> class</h2>
+This example describes the use of the <code>MeshData</code> class.  More on this
+later. 
 
 
 </div>

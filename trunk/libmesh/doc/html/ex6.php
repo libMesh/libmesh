@@ -1284,8 +1284,142 @@ All done!
 * Running Example  ./ex6
 ***************************************************************
  
-ERROR: This example requires the library to be compiled with Infinite Element support!
-[0] ex6.C, line 82, compiled Nov 10 2003 at 13:26:04
+Running ex6 with dim = 3
+
+ Mesh Information:
+  mesh_dimension()=3
+  spatial_dimension()=3
+  n_nodes()=125
+  n_elem()=64
+   n_local_elem()=64
+   n_active_elem()=64
+  n_subdomains()=1
+  n_processors()=1
+  processor_id()=0
+
+ Determined origin for Infinite Elements:
+  0.00000 0.00000 0.00000 
+
+ Building Infinite Elements:
+  updating element neighbor tables...
+  collecting boundary sides...
+  found 0 inner and 96 outer boundary faces
+  added 96 infinite elements and 98 nodes to the mesh
+
+ Mesh Information:
+  mesh_dimension()=3
+  spatial_dimension()=3
+  n_nodes()=223
+  n_elem()=160
+   n_local_elem()=160
+   n_active_elem()=160
+  n_subdomains()=1
+  n_processors()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System "Wave"
+    Type "Steady"
+    Variables="p" 
+    Finite Element Types="0", "12" 
+    Infinite Element Mapping="0" 
+    Approximation Orders="1", "3" 
+    n_dofs()=419
+    n_local_dofs()=419
+    n_constrained_dofs()=0
+    n_additional_vectors()=0
+    n_additional_matrices()=0
+  n_parameters()=4
+   Parameters:
+    "fluid density"=1
+    "linear solver maximum iterations"=5000
+    "linear solver tolerance"=1e-12
+    "speed"=1
+
+
+ ---------------------------------------------------------------------------- 
+| Reference count information                                                |
+ ---------------------------------------------------------------------------- 
+| 10SystemBase reference count information:
+| Creations:    1
+| Destructions: 1
+| 12SparseMatrixIdE reference count information:
+| Creations:    1
+| Destructions: 1
+| 13NumericVectorIdE reference count information:
+| Creations:    3
+| Destructions: 3
+| 21LinearSolverInterfaceIdE reference count information:
+| Creations:    1
+| Destructions: 1
+| 4Elem reference count information:
+| Creations:    3207
+| Destructions: 3207
+| 4Node reference count information:
+| Creations:    223
+| Destructions: 223
+| 5QBase reference count information:
+| Creations:    5
+| Destructions: 5
+| 6DofMap reference count information:
+| Creations:    1
+| Destructions: 1
+| 6FEBase reference count information:
+| Creations:    3
+| Destructions: 3
+ ---------------------------------------------------------------------------- 
+
+ ----------------------------------------------------------------------------
+| Time:           Mon Nov 10 15:43:00 2003
+| OS:             Linux
+| HostName:       hactar
+| OS Release      2.4.20-19.9smp
+| OS Version:     #1 SMP Tue Jul 15 17:04:18 EDT 2003
+| Machine:        i686
+| Username:       benkirk
+ ----------------------------------------------------------------------------
+ ----------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.337065, Active time=0.244409
+ ----------------------------------------------------------------------------
+| Event                         nCalls  Total       Avg         Percent of   |
+|                                       Time        Time        Active Time  |
+|----------------------------------------------------------------------------|
+|                                                                            |
+|                                                                            |
+| DofMap                                                                     |
+|   compute_sparsity()          1       0.0112      0.011171    4.57         |
+|   create_dof_constraints()    1       0.0001      0.000090    0.04         |
+|   distribute_dofs()           1       0.0004      0.000409    0.17         |
+|   dof_indices()               320     0.0028      0.000009    1.14         |
+|   reinit()                    1       0.0011      0.001140    0.47         |
+|                                                                            |
+| FE                                                                         |
+|   compute_map()               160     0.0031      0.000019    1.26         |
+|   compute_shape_functions()   64      0.0008      0.000012    0.32         |
+|   init_shape_functions()      2       0.0003      0.000163    0.13         |
+|                                                                            |
+| InfFE                                                                      |
+|   combine_base_radial()       96      0.0050      0.000052    2.05         |
+|   compute_shape_functions()   96      0.0039      0.000041    1.60         |
+|   init_radial_shape_functions()1       0.0001      0.000062    0.03         |
+|   init_shape_functions()      1       0.0002      0.000152    0.06         |
+|                                                                            |
+| Mesh                                                                       |
+|   build_cube()                1       0.0012      0.001225    0.50         |
+|                                                                            |
+| MeshBase                                                                   |
+|   build_inf_elem()            1       0.0032      0.003165    1.29         |
+|   find_neighbors()            4       0.0106      0.002643    4.33         |
+|   renumber_nodes_and_elem()   2       0.0001      0.000070    0.06         |
+|                                                                            |
+| SystemBase                                                                 |
+|   assemble()                  1       0.1247      0.124672    51.01        |
+|   solve()                     1       0.0757      0.075720    30.98        |
+ ----------------------------------------------------------------------------
+| Totals:                       754     0.2444                  100.00       |
+ ----------------------------------------------------------------------------
+
  
 ***************************************************************
 * Done Running Example  ./ex6
