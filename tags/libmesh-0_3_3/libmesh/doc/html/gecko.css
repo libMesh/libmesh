@@ -1,0 +1,36 @@
+@import url("common.css") screen;
+
+body
+{
+  background            : url(images/bg.png);
+  background-repeat     : no-repeat;
+  background-attachment : fixed;
+  background-position   : center;
+}
+
+
+
+div.main_style {
+    background-image: url(images/bg_muted.png);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+}
+
+
+
+div.fragment {
+    background-image: url(images/bg_more_muted.png);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+}
+
+
+
+tr {
+    background-image: url(images/bg_more_muted.png);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+}

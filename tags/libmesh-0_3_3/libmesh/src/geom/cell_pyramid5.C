@@ -1,0 +1,148 @@
+// $Id: cell_pyramid5.C,v 1.9 2003-02-27 00:55:30 benkirk Exp $
+
+// The Next Great Finite Element Library.
+// Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
+  
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+  
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+  
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+// C++ includes
+
+// Local includes
+#include "cell_pyramid5.h"
+#include "face_tri3.h"
+#include "face_quad4.h"
+
+
+
+
+// ------------------------------------------------------------
+// Pyramid5 class member functions
+AutoPtr<Elem> Pyramid5::build_side (const unsigned int i) const
+{
+  assert (i < this->n_sides());
+
+
+  
+  switch (i)
+    {
+    case 0:  // triangular face 1
+      {
+	Tri3* face = new Tri3;
+
+	face->set_node(0) = this->get_node(0);
+	face->set_node(1) = this->get_node(1);
+	face->set_node(2) = this->get_node(4);
+	
+	AutoPtr<Elem> ap(face);  return ap;
+      }
+    case 1:  // triangular face 2
+      {
+	Tri3* face = new Tri3;
+
+	face->set_node(0) = this->get_node(1);
+	face->set_node(1) = this->get_node(2);
+	face->set_node(2) = this->get_node(4);
+	
+	AutoPtr<Elem> ap(face);  return ap;
+      }
+    case 2:  // triangular face 3
+      {
+	Tri3* face = new Tri3;
+
+	face->set_node(0) = this->get_node(2);
+	face->set_node(1) = this->get_node(3);
+	face->set_node(2) = this->get_node(4);
+	
+	AutoPtr<Elem> ap(face);  return ap;
+      }
+    case 3:  // triangular face 4
+      {
+	Tri3* face = new Tri3;
+
+	face->set_node(0) = this->get_node(3);
+	face->set_node(1) = this->get_node(0);
+	face->set_node(2) = this->get_node(4);
+	
+	AutoPtr<Elem> ap(face);  return ap;
+      }
+    case 4:  // the quad face at z=0
+      {
+	Quad4* face = new Quad4;
+	
+	face->set_node(0) = this->get_node(0);
+	face->set_node(1) = this->get_node(3);
+	face->set_node(2) = this->get_node(2);
+	face->set_node(3) = this->get_node(1);
+
+	AutoPtr<Elem> ap(face);  return ap;
+      }
+    default:
+      {
+	error();
+      }
+    }
+
+  // We'll never get here.
+  error();
+
+  AutoPtr<Elem> ap(NULL);  return ap;
+}
+
+
+
+const std::vector<unsigned int> Pyramid5::tecplot_connectivity(const unsigned int sc) const
+{
+  assert (_nodes != NULL);
+  assert (sc < this->n_sub_elem());
+
+  std::vector<unsigned int> conn(8);
+  
+  conn[0] = this->node(0)+1;
+  conn[1] = this->node(1)+1;
+  conn[2] = this->node(2)+1;
+  conn[3] = this->node(3)+1;
+  conn[4] = this->node(4)+1;
+  conn[5] = this->node(4)+1;
+  conn[6] = this->node(4)+1;
+  conn[7] = this->node(4)+1;
+
+  return conn;
+}
+
+
+
+
+
+
+void Pyramid5::vtk_connectivity(const unsigned int sc,
+				std::vector<unsigned int> *conn) const
+{
+  assert (_nodes != NULL);
+  assert (sc < this->n_sub_elem());
+  
+  if (conn == NULL)
+    conn = new std::vector<unsigned int>;
+
+  conn->resize(5);
+
+  (*conn)[0] = this->node(0);
+  (*conn)[1] = this->node(1);
+  (*conn)[2] = this->node(2);
+  (*conn)[3] = this->node(3);
+  (*conn)[4] = this->node(4);
+
+  return;
+}
