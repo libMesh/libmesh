@@ -1,4 +1,4 @@
-// $Id: petsc_vector.C,v 1.11 2003-02-20 23:18:16 benkirk Exp $
+// $Id: petsc_vector.C,v 1.12 2003-02-24 14:35:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -325,7 +325,7 @@ PetscVector<T>::operator = (const std::vector<T>& v)
 template <typename T>
 void PetscVector<T>::localize (NumericVector<T>& v_local_in) const
 {
-  const PetscVector<T>& v_local = reinterpret_cast<const PetscVector<T>&>(v_local_in);
+  PetscVector<T>& v_local = reinterpret_cast<PetscVector<T>&>(v_local_in);
 
   assert (v_local.local_size() == size());
 
@@ -362,7 +362,7 @@ template <typename T>
 void PetscVector<T>::localize (NumericVector<T>& v_local_in,
 			       const std::vector<unsigned int>& send_list) const
 {
-  const PetscVector<T>& v_local = reinterpret_cast<const PetscVector<T>&>(v_local_in);
+  PetscVector<T>& v_local = reinterpret_cast<PetscVector<T>&>(v_local_in);
 
   assert (v_local.local_size() == size());
   assert (send_list.size() <= v_local.size());
@@ -441,12 +441,12 @@ void PetscVector<Real>::localize (std::vector<Real>& v_local) const
 	
 	ierr = VecRestoreArray (vec, &values); CHKERRQ(ierr);
       }
-      
-      if (sizeof(Real) == sizeof(double))     
+
+      if (sizeof(Real) == sizeof(double))
 	MPI_Allreduce (&local_values[0], &v_local[0], n, MPI_DOUBLE, MPI_SUM,
 		       PETSC_COMM_WORLD);
-
-      else if (sizeof(Real) == sizeof(float))     
+      
+      else if (sizeof(Real) == sizeof(float))
 	MPI_Allreduce (&local_values[0], &v_local[0], n, MPI_FLOAT, MPI_SUM,
 		       PETSC_COMM_WORLD);
 
@@ -472,7 +472,6 @@ void PetscVector<Complex>::localize (std::vector<Complex>& v_local) const
   const int nl = local_size();
   PetscScalar *values;
 
-  
   v_local.resize(n);
 
   
@@ -556,9 +555,6 @@ void PetscVector<Real>::localize_to_one (std::vector<Real>& v_local,
   v_local.resize(n);
 
   
-  for (int i=0; i<n; i++)
-    v_local[i] = 0.;
-  
   // only one processor
   if (n == nl)
     {      
@@ -574,8 +570,8 @@ void PetscVector<Real>::localize_to_one (std::vector<Real>& v_local,
   else
     {
       unsigned int ioff = first_local_index();
-      std::vector<Real> local_values(n, 0.);
-
+      std::vector<Real> local_values (n, 0.);
+      
       {
 	ierr = VecGetArray (vec, &values); CHKERRQ(ierr);
 	
@@ -585,17 +581,18 @@ void PetscVector<Real>::localize_to_one (std::vector<Real>& v_local,
 	ierr = VecRestoreArray (vec, &values); CHKERRQ(ierr);
       }
       
-      if (sizeof(Real) == sizeof(double))     
-	MPI_Reduce (&local_values[0], &v_local[0], n, MPI_DOUBLE, pid, MPI_SUM,
-		    PETSC_COMM_WORLD);
 
-      else if (sizeof(Real) == sizeof(float))     
-	MPI_Reduce (&local_values[0], &v_local[0], n, MPI_FLOAT, pid, MPI_SUM,
-		    PETSC_COMM_WORLD);
+      if (sizeof(Real) == sizeof(double))
+	MPI_Reduce (&local_values[0], &v_local[0], n, MPI_DOUBLE, MPI_SUM,
+		    pid, PETSC_COMM_WORLD);
+      
+      else if (sizeof(Real) == sizeof(float))
+	MPI_Reduce (&local_values[0], &v_local[0], n, MPI_FLOAT, MPI_SUM,
+		    pid, PETSC_COMM_WORLD);
 
       else
 	error();
-    }  
+    }
 }
 
 #endif
@@ -648,8 +645,8 @@ void PetscVector<Complex>::localize_to_one (std::vector<Complex>& v_local,
 	ierr = VecRestoreArray (vec, &values); CHKERRQ(ierr);
       }
       
-      MPI_Reduce (&local_values[0], &v_local[0], n, MPIU_SCALAR, pid, MPI_SUM,
-		  PETSC_COMM_WORLD);	
+      MPI_Reduce (&local_values[0], &v_local[0], n, MPIU_SCALAR, MPI_SUM,
+		  pid, PETSC_COMM_WORLD);	
     }  
 }
 

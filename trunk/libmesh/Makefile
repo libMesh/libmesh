@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.18 2003-02-22 16:01:08 benkirk Exp $
+# $Id: Makefile,v 1.19 2003-02-24 14:35:52 benkirk Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -73,7 +73,7 @@ $(mesh_library_dir)/libmesh.so: $(objects)
 	@$(shell mkdir -p $(mesh_library_dir))
 	@echo ""
 	@echo "Linking "$@
-	@$(CXX) $(CXXSHAREDFLAG) -o $(mesh_library) $(objects)
+	@$(CXX) $(CXXSHAREDFLAG) -o $(mesh_library) $(objects) $(LDFLAGS)
 
 #
 # Build the examples
@@ -100,6 +100,8 @@ echo:
 	@echo -e "CXXFLAGS:\n$(CXXFLAGS)\n"
 	@echo -e "INCLUDE:\n$(INCLUDE)\n"
 	@echo -e "LIBS:\n$(LIBS)\n"
+	@echo -e "LDFLAGS:\n$(LDFLAGS)\n"
+	@echo -e "DLFLAGS:\n$(DLFLAGS)\n"
 
 #
 # Remove project object files for the current mode
@@ -114,7 +116,7 @@ clobber:
 	@$(MAKE) clean
 	@$(MAKE) -C contrib $(MAKECMDGOALS)
 	@$(MAKE) -C examples $(MAKECMDGOALS)
-	@rm -rf $(targ_dir) bin/grid2grid bin/meshtool bin/testexodus
+	@rm -rf $(targ_dir) bin/grid2grid bin/meshtool bin/testexodus bin/amr
 
 #
 # Make clobber, remove documentation, removes all libraries
@@ -124,7 +126,7 @@ distclean:
 	@$(MAKE) clobber
 	@$(MAKE) -C contrib $(MAKECMDGOALS)
 	@$(MAKE) -C examples $(MAKECMDGOALS)
-	@rm -rf doc/html/*.html doc/html/*.png doc/latex doc/kdoc/*.html \
+	@rm -rf doc/html/*.html doc/html/*.png doc/html/*.gif doc/latex \
                 doc/man/man3 doc/cvshtml/*.html doc/cvshtml/diff \
 	        src/*/*.o src/*/*.g.o src/*/*.pg.o \
 	        lib/*_opt lib/*_dbg lib/*_pro
@@ -155,48 +157,12 @@ cvsweb:
 	./contrib/bin/cvs2html -f -p -o doc/cvshtml/index.html -v -a -b -n 3 -C crono.html
 
 #
-# Meshtool utility program
+# Standalone applications.  Anything in the ./src/apps directory that ends in .cc
+# can be compiled with this rule.  For example, if ./src/apps/foo.cc contains a main()
+# and is a standalone program, then make bin/foo will work.
 #
-meshtool: $(mesh_library) src/apps/meshtool.cc
-	$(CXX) $(CXXFLAGS) $(INCLUDE) src/apps/meshtool.cc -o bin/$@ $(LIBS) $(LDFLAGS)
-
-#
-# Read_Dat utility program
-#
-read_dat: $(mesh_library) src/apps/read_dat.cc
-	$(CXX) $(CXXFLAGS) $(INCLUDE) src/apps/read_dat.cc -o bin/$@ $(LIBS) $(LDFLAGS)
-
-#
-# test amr utility program
-#
-amr: $(mesh_library) src/apps/amr.cc
-	$(CXX) $(CXXFLAGS) $(INCLUDE) src/apps/amr.cc -o bin/$@ $(LIBS) $(LDFLAGS)
-
-
-#
-# test foo utility program
-#
-foo: $(mesh_library) src/apps/foo.cc
-	$(CXX) $(CXXFLAGS) $(INCLUDE) src/apps/foo.cc -o bin/$@ $(LIBS) $(LDFLAGS)
-
-
-#
-# grid2grid
-#
-grid2grid: $(mesh_library) src/apps/grid2grid.cc
-	$(CXX) $(CXXFLAGS) $(INCLUDE) src/apps/grid2grid.cc -o bin/$@ $(LIBS) $(LDFLAGS)
-
-#
-# Testexodus FE program
-#
-testexodus: $(mesh_library) src/apps/testexodus.cc
-	$(CXX) $(CXXFLAGS) $(INCLUDE) src/apps/testexodus.cc -o bin/$@ $(LIBS) $(LDFLAGS)
-
-#
-# Test program -- Remove this!
-#
-it_test: $(mesh_library) it_test.cc
-	$(CXX) $(CXXFLAGS) $(INCLUDE) it_test.cc -o it_test $(LIBS) $(LDFLAGS)
+bin/% : src/apps/%.cc $(mesh_library)
+	$(CXX) $(CXXFLAGS) $(INCLUDE) $< -o $@ $(LIBS) $(LDFLAGS) $(DLFLAGS)
 
 #
 # Make a TODO list

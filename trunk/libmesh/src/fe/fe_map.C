@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.12 2003-02-13 22:56:10 benkirk Exp $
+// $Id: fe_map.C,v 1.13 2003-02-24 14:35:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -25,26 +25,28 @@
 
 // Local includes
 #include "fe.h"
+#include "libmesh.h"
 #include "quadrature.h"
 #include "elem.h"
 
 
 
 
-void FEBase::compute_map(const QBase* qrule,
+void FEBase::compute_map(const std::vector<Real>& qw,
 			 const Elem* elem)
 {
-  assert (qrule != NULL);
   assert (elem  != NULL);
   
-  const unsigned int        n_qp = qrule->n_points();
-  const std::vector<Real> &   qw = qrule->get_weights();
+  /**
+   * Start logging the map computation.
+   */
+  libMesh::log.start_event("compute_map()");
+  
+  const unsigned int        n_qp = qw.size();
 
 
   switch (dim)
     {
-
-
       //--------------------------------------------------------------------
       // 1D
     case 1:
@@ -125,7 +127,7 @@ void FEBase::compute_map(const QBase* qrule,
 	  }
 
 	// done computing the map
-	return;
+	break;
       }
 
       
@@ -227,7 +229,7 @@ void FEBase::compute_map(const QBase* qrule,
 	  }
        
 	// done computing the map
-	return;
+	break;
       }
 
 
@@ -352,7 +354,7 @@ void FEBase::compute_map(const QBase* qrule,
 	  }
 	
 	// done computing the map
-	return;
+	break;
       }
 
 
@@ -360,6 +362,11 @@ void FEBase::compute_map(const QBase* qrule,
     default:
       error();
     }
+  
+  /**
+   * Stop logging the map computation.
+   */
+  libMesh::log.stop_event("compute_map()");  
 }
 
 
@@ -480,6 +487,11 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
   assert (elem != NULL);
   assert (tolerance >= 0.);
 
+  /**
+   * Start logging the map inversion.
+   */
+  libMesh::log.start_event("inverse_map()");
+  
   /**
    * How much did the point on the reference
    * element change by in this Newton step?
@@ -784,6 +796,11 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 #endif
 
 
+  
+  /**
+   * Stop logging the map inversion.
+   */
+  libMesh::log.stop_event("inverse_map()");
   
   return p;
 }

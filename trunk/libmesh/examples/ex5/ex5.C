@@ -1,4 +1,4 @@
-// $Id: ex5.C,v 1.11 2003-02-20 04:59:58 benkirk Exp $
+// $Id: ex5.C,v 1.12 2003-02-24 14:35:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -72,7 +72,7 @@
  *
  * This is the fifth example program.  It builds on
  * the previous two examples, and extends the use
- * of the \p AutoPtr<> and a convenient build method to
+ * of the \p AutoPtr<> as a convenient build method to
  * determine the quadrature rule at run time.
  */
 
@@ -170,7 +170,7 @@ int main (int argc, char** argv)
      */
     Mesh mesh (dim);
     
-    mesh.build_cube (8, 8, 8,
+    mesh.build_cube (16, 16, 16,
 		     -1., 1.,
 		     -1., 1.,
 		     -1., 1.,
@@ -365,9 +365,9 @@ void assemble_poisson(EquationSystems& es,
 	      
 	      /**
 	       * As already seen in example 3, boundary integration 
-	       * requires TWO quadraure rules.  Here, however,
-	       * we use the more convenient way of building these
-	       * rules.  Note that one could also have initialized
+	       * requires a quadraure rule.  Here, however,
+	       * we use the more convenient way of building this
+	       * rule.  Note that one could also have initialized
 	       * the face quadrature rules with the type directly
 	       * determined from \p qrule, namely through:
 	       * \verbatim
@@ -379,25 +379,21 @@ void assemble_poisson(EquationSystems& es,
 	       * the need to delete the object afterwards,
 	       * they clean up themselves.
 	       */
-	      AutoPtr<QBase>  qface0 (QBase::build(quad_type, 
-						   dim,   
-						   THIRD));
-	      AutoPtr<QBase>  qface1 (QBase::build(quad_type,
-						   dim-1, 
-						   THIRD));
+	      AutoPtr<QBase>  qface (QBase::build(quad_type,
+						  dim-1, 
+						  THIRD));
 	      
 	      /**
 	       * Tell the finte element object to use our
 	       * quadrature rule.  Note that a \p AutoPtr<QBase> returns
 	       * a \p QBase* pointer to the object it handles with \p get().  
-	       * However, using \p get(), the \p AutoPtr<QBase> \p qface0 is 
-	       * still in charge of this pointer. I.e., when \p qface0 goes 
+	       * However, using \p get(), the \p AutoPtr<QBase> \p qface is 
+	       * still in charge of this pointer. I.e., when \p qface goes 
 	       * out of scope, it will safely delete the \p QBase object it 
 	       * points to.  This behavior may be overridden using
-	       * \p AutoPtr<Xyz>::release(), but is currently not
-	       * recommended.
+	       * \p AutoPtr<Xyz>::release(), but is not recommended.
 	       */
-	      fe_face->attach_quadrature_rule (qface0.get());
+	      fe_face->attach_quadrature_rule (qface.get());
 	      
 	      const std::vector<std::vector<Real> >&  phi_face = fe_face->get_phi();
 
@@ -407,10 +403,9 @@ void assemble_poisson(EquationSystems& es,
 	      
 	      /**
 	       * Compute the shape function values on the element
-	       * face.  Again, note the slightly different access
-	       * to the qface1 pointer.
+	       * face.
 	       */
-	      fe_face->reinit(qface1.get(), elem, side);
+	      fe_face->reinit(elem, side);
 	      
 	      /**
 	       * Loop over the face quagrature points for integration.
@@ -422,7 +417,7 @@ void assemble_poisson(EquationSystems& es,
 	       * This allows almost no change in syntax when switching
 	       * to "safe pointers".
 	       */
-	      for (unsigned int qp=0; qp<qface0->n_points(); qp++)
+	      for (unsigned int qp=0; qp<qface->n_points(); qp++)
 		{
 		  const Real xf = qface_point[qp](0);
 		  const Real yf = qface_point[qp](1);

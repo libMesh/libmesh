@@ -1,4 +1,4 @@
-// $Id: quadrature_simpson_3D.C,v 1.5 2003-02-13 22:56:14 benkirk Exp $
+// $Id: quadrature_simpson_3D.C,v 1.6 2003-02-24 14:35:45 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -147,74 +147,3 @@ void QSimpson::init_3D(const ElemType _type)
   
 #endif
 }
-
-
-
-
-
-
-
-void QSimpson::init_3D(const ElemType _type,
-		       const unsigned int side)
-{
-#if DIM == 3
-  
-  //-----------------------------------------------------------------------
-  // 3D quadrature rules
-  switch (_type)
-    {
-      //---------------------------------------------
-      // Hex quadrature rules
-    case HEX8:
-    case HEX20:
-    case HEX27:
-      {
-	QSimpson q2D(2);
- 	q2D.init(QUAD4);
-	side_rule_hex(&q2D, side);
-	return;
-      }
-
-      
-	
-      //---------------------------------------------
-      // Tetrahedral quadrature rules
-    case TET4:
-    case TET10:
-      {
-	QSimpson q2D(2);
-	q2D.init(TRI3);
-	side_rule_tet(&q2D, side);
-	return;
-      }
-
-      
-	    
-      //---------------------------------------------
-      // Prism quadrature rules
-    case PRISM6:
-    case PRISM18:
-      {
-	QSimpson q2D(2);
-	side_rule_prism(&q2D, side);
-	return;
-      }
-
-
-      
-      //---------------------------------------------
-      // Unsupported type
-    default:
-      {
-	std::cerr << "ERROR: Unsupported type: " << _type << std::endl;
-	error();
-      }
-    }
-
-  error();
-  
-  return;
-  
-#endif
-}
-

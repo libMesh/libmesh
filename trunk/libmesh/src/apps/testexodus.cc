@@ -84,7 +84,7 @@ int main (int argc, char** argv)
     PerfMon perfmon("Code performance");
 
     // declare a mesh...
-    Mesh mesh(dim, libMesh::processor_id());
+    Mesh mesh(dim);
   
     // Read an Exodus mesh
     //
@@ -93,7 +93,7 @@ int main (int argc, char** argv)
     {
       {
 	PerfMon pm("Mesh Input performance");
-	mesh.read_exd(in_name);
+	mesh.read(in_name);
       }
       {
 	PerfMon pm("Find_neighbors performance");
@@ -101,7 +101,7 @@ int main (int argc, char** argv)
       }
       {
 	PerfMon pm("Partitioner performance");
-	mesh.metis_partition(libMesh::n_processors());
+	mesh.metis_partition();
       }
       mesh.print_info();
     }
@@ -153,13 +153,13 @@ int main (int argc, char** argv)
       es.print_info();
     };
     
-    // assemble & solve the primary 
+    // assemble & solve the primary
     {
       PerfMon pm ("Solver Performance");
       
       // call the solver.
       es("primary").solve ();
-
+      
       // clear the unneded matrix and
       // Petsc interface
       es("primary").matrix->clear ();
@@ -176,10 +176,8 @@ int main (int argc, char** argv)
     
 
     
-    mesh.write_gmv_binary(gmv_name,
-			  es,
-			  true);	
-       
+    mesh.write_gmv_binary(gmv_name, es);	
+    
 
     es.write("out.xdr", Xdr::ENCODE);
     es.write("out.xda", Xdr::WRITE);
@@ -213,15 +211,12 @@ void assemble_primary(EquationSystems& es,
   fe->attach_quadrature_rule (&qrule);
   
   AutoPtr<FEBase> fe_face(FEBase::build(dim, es("primary").get_dof_map().variable_type(0)));
-  QGauss   qface0(dim, FIFTH);
-  //QTrap   qface0(dim);
-  //QSimpson   qface0(dim);
   
-  QGauss   qface1(dim-1, FIFTH);
-  //QTrap   qface1(dim-1);
-  //QSimpson   qface1(dim-1);
+  QGauss   qface(dim-1, FIFTH);
+  //QTrap   qface(dim-1);
+  //QSimpson   qface(dim-1);
   
-  fe_face->attach_quadrature_rule(&qface0);
+  fe_face->attach_quadrature_rule(&qface);
   
   
   // These are references to cell-specific data
@@ -306,20 +301,19 @@ void assemble_primary(EquationSystems& es,
 	};
 
 
-      // You can't compute "area" (perimeter) if you are in 2D
-      if (dim == 3)
-	{
-	  for (unsigned int side=0; side<elem->n_sides(); side++)
-	    if (elem->neighbor(side) == NULL)
-	      {
-		fe_face->reinit (&qface1, elem, side);
-	    
-		//fe_face->print_info();
-	    
-		for (unsigned int gp=0; gp<JxW_face.size(); gp++)
-		  area += JxW_face[gp];
-	      }
-	}
+      // Compute surface area (perimiter in 2D)
+      {
+	for (unsigned int side=0; side<elem->n_sides(); side++)
+	  if (elem->neighbor(side) == NULL)
+	    {
+	      fe_face->reinit (elem, side);
+	      
+	      //fe_face->print_info();
+	      
+	      for (unsigned int gp=0; gp<JxW_face.size(); gp++)
+		area += JxW_face[gp];
+	    }
+      }
 
       es("primary").rhs->add_vector(Fu,
 				    dof_indices_U);
@@ -331,11 +325,17 @@ void assemble_primary(EquationSystems& es,
       es("primary").matrix->add_matrix(Kvv,
 				       dof_indices_V);
     };
-  
-  std::cout << "Vol="  << vol << std::endl;
 
-  if (dim == 3)
-    std::cout << "Area=" << area << std::endl;
+    if (dim == 3)
+      {
+      	std::cout << "Vol="  << vol << std::endl;	
+	std::cout << "Area=" << area << std::endl;
+      }
+    else if (dim == 2)
+      {
+      	std::cout << "Area="  << vol << std::endl;	
+	std::cout << "Perimeter=" << area << std::endl;
+      }
 };
   
 

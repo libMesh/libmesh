@@ -1,5 +1,5 @@
 dnl --------------------------------------------------------------
-dnl $Id: configure.in,v 1.13 2003-02-20 04:59:57 benkirk Exp $
+dnl $Id: configure.in,v 1.14 2003-02-24 14:35:52 benkirk Exp $
 dnl --------------------------------------------------------------
 dnl Process this file with autoconf to produce a configure script.
 
@@ -9,16 +9,31 @@ dnl you call ./configure subsequently on different systems without
 dnl clearing the cache 
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
-AC_REVISION($Revision: 1.13 $)
+AC_REVISION($Revision: 1.14 $)
 
 
 AC_INIT(Make.common.in)
 AC_CONFIG_HEADER(include/mesh_config.h:include/mesh_config.h.in)
 
+AC_MSG_RESULT(---------------------------------------------)
+AC_MSG_RESULT(----------- Configuring libMesh -------------)
+AC_MSG_RESULT(---------------------------------------------)
+
 AC_CANONICAL_TARGET
 AC_LANG_CPLUSPLUS
 AC_PROG_CXX
 AC_PROG_CC
+
+
+dnl --------------------------------------------------------------
+dnl Shared libraries - enabled by default
+dnl --------------------------------------------------------------
+AC_ARG_ENABLE(shared,
+[  --enable-shared Set compiler flags to enable shared libraries],
+     enableshared=$enableval,
+     enableshared=yes)
+AC_SUBST(enableshared)	
+dnl --------------------------------------------------------------
 
 DETERMINE_CXX_BRAND
 SET_CXX_FLAGS
@@ -51,18 +66,6 @@ dnl Get the source tree directory
 dnl --------------------------------------------------------------
 PWD=`pwd`
 AC_SUBST(PWD)
-
-
-
-dnl --------------------------------------------------------------
-dnl Shared libraries - enabled by default
-dnl --------------------------------------------------------------
-AC_ARG_ENABLE(shared,
-[  --enable-shared Set compiler flags to enable shared libraries],
-     enableshared=$enableval,
-     enableshared=yes)
-AC_SUBST(enableshared)	
-dnl --------------------------------------------------------------
 
 
 
@@ -420,6 +423,11 @@ dnl -------------------------------------------------------------
 AC_OUTPUT(Make.common:Make.common.in)
 AC_OUTPUT(doc/Doxyfile:doc/Doxyfile.in)
 rm -f conftest* config.cache config.status
+
+
+AC_MSG_RESULT(---------------------------------------------)
+AC_MSG_RESULT(--------- Done Configuring libMesh ----------)
+AC_MSG_RESULT(---------------------------------------------)
 
 
 dnl Local Variables:

@@ -1,4 +1,4 @@
-// $Id: quadrature.h,v 1.9 2003-02-13 22:56:08 benkirk Exp $
+// $Id: quadrature.h,v 1.10 2003-02-24 14:35:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -117,13 +117,6 @@ public:
    * for an object of type \p type.  
    */
   void init (const ElemType _type=INVALID_ELEM);
-  
-  /**
-   * Initializes the data structures to contain a quadrature rule
-   * for side \p side of object of type \p _type.
-   */
-  void init (const ElemType _type,
-	     const unsigned int side);
 
   /**
    * @returns the order of the quadrature rule.   
@@ -186,43 +179,6 @@ protected:
     error();
   }
 #endif
-
-  
-  /**
-   * Initialize the 1D quadrature rule for a side (edge).
-   * Should not be pure virtual since a derived quadrature rule
-   * may only be defined in 1D. If not redefined, gives an
-   * error (when \p DEBUG defined) when called.
-   */
-  virtual void init_2D (const ElemType, const unsigned int)
-#ifndef DEBUG
-  {}
-#else
-  {  
-    std::cerr << "ERROR: Seems as if this quadrature rule" << std::endl
-	      << " is not implemented for 2D side(line) integration." << std::endl;
-    error();
-  }
-#endif
-
-
-  /**
-   * Initialize the 2D quadrature rule for a side (face).
-   * Should not be pure virtual since a derived quadrature rule
-   * may only be defined in 1D. If not redefined, gives an
-   * error (when \p DEBUG defined) when called.
-   */
-  virtual void init_3D (const ElemType, const unsigned int)
-#ifndef DEBUG
-  {}
-#else
-  {  
-    std::cerr << "ERROR: Seems as if this quadrature rule" << std::endl
-	      << " is not implemented for 3D side(face) integration." << std::endl;
-    error();
-  }
-#endif
-
   
   /**
    * Maps the points of a 1D interval quadrature rule (typically [-1,1])
@@ -279,56 +235,7 @@ protected:
    * Approximate Calculation of Multiple Integrals, Stroud, A. H.
    */
   void tensor_product_tet (QBase* gauss1D, QBase* jacA1D, QBase* jacB1D);
-  
-  /**
-   * Computes the quadrature rule for side
-   * \p side of a quadrilateral element.
-   * Used by the init_2D routines when passed
-   * a side number.
-   */
-  void side_rule_quad (QBase* q1D, unsigned int side);
 
-  /**
-   * Computes the quadrature rule for side
-   * \p side of a triangular element.
-   * Used by the init_2D routines when passed
-   * a side number.
-   */
-  void side_rule_tri (QBase* q1D, unsigned int side);
-
-  /**
-   * Computes the quadrature rule for side \p side
-   * of a hexahedral element.  (The sides of hexes
-   * are of course quads.)  Used by the init_3D
-   * routines when passed a side number;
-   */
-  void side_rule_hex (QBase* q2D, unsigned int side);
-
-  /**
-   * Computes the quadrature rule for side \p side
-   * of a tetrahedral element. (The sides of tets
-   * are of course tris.)  Used by the init_3D routines
-   * when passed a side number.
-   */
-  void side_rule_tet (QBase* q2D, unsigned int side);
-
-  /**
-   * Computes a quadrature rule for side \p side
-   * of a prismatic element.  (The sides of prisms
-   * can be either tris or quads.)  There is no need
-   * to call init on q2D before calling this routine,
-   * although it shouldn't hurt.
-   */
-  void side_rule_prism (QBase* q2D, unsigned int side);
-
-  /**
-   * Computes a quadrature rule for side \p side of
-   * a pyramid.  (The sides of pyramids are either
-   * tris or quads.)  There is no need to call init
-   * on q2D before calling this routine, although
-   * it shouldn't hurt.
-   */
-  void side_rule_pyramid (QBase* q2D, unsigned int side);
   
   /**
    * The dimension

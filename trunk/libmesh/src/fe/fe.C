@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.12 2003-02-22 16:01:11 benkirk Exp $
+// $Id: fe.C,v 1.13 2003-02-24 14:35:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -21,6 +21,7 @@
 
 // Local includes
 #include "fe.h"
+#include "libmesh.h"
 #include "inf_fe.h"
 #include "quadrature.h"
 #include "elem.h"
@@ -54,12 +55,12 @@ void FE<Dim,T>::reinit(const Elem* elem)
       (T == HIERARCHIC))
     {
       elem_type = elem->type();
-      init_shape_functions (qrule, elem);
+      init_shape_functions (qrule->get_points(), elem);
     }
   
   // Compute the map for this element.  In the future we can specify
   // different types of maps
-  compute_map (qrule, elem);
+  compute_map (qrule->get_weights(), elem);
 
   // Compute the shape functions and the derivatives at all of the
   // quadrature points.
@@ -70,11 +71,20 @@ void FE<Dim,T>::reinit(const Elem* elem)
 
 
 template <unsigned int Dim, FEFamily T>
-void FE<Dim,T>::init_shape_functions(const QBase* qrule,
+void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
 				     const Elem* elem)
 {
-  assert (qrule != NULL);
   assert (elem  != NULL);
+
+  
+  /**
+   * Start logging the shape function initialization
+   */
+  libMesh::log.start_event("init_shape_functions()");
+
+  
+  // The number of quadrature points.
+  const unsigned int        n_qp = qp.size();
 
   // The element type and order to use in
   // the map
@@ -90,11 +100,6 @@ void FE<Dim,T>::init_shape_functions(const QBase* qrule,
   const unsigned int n_mapping_shape_functions =
     FE<Dim,LAGRANGE>::n_shape_functions (mapping_elem_type,
 					 mapping_order);
-
-  // The number and location of the quadrature points.
-  const unsigned int        n_qp = qrule->n_points();
-  const std::vector<Point>&   qp = qrule->get_points();
-
   
   // resize the vectors to hold current data
   // Phi are the shape functions used for the FE approximation
@@ -205,7 +210,7 @@ void FE<Dim,T>::init_shape_functions(const QBase* qrule,
 	      dphidxi_map[i][p]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
 	    }
 		
-	return;
+	break;
       }
 
 
@@ -233,7 +238,7 @@ void FE<Dim,T>::init_shape_functions(const QBase* qrule,
 	      dphideta_map[i][p] = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 1, qp[p]);
 	    }
 			
-       	return;
+       	break;
       }
 
 
@@ -263,13 +268,18 @@ void FE<Dim,T>::init_shape_functions(const QBase* qrule,
 	      dphidzeta_map[i][p] = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 2, qp[p]);
 	    }
 			
-	return;
+	break;
       }
 
 
     default:
       error();
     }
+  
+  /**
+   * Stop logging the shape function initialization
+   */
+  libMesh::log.stop_event("init_shape_functions()");
 }
 
 
@@ -279,11 +289,11 @@ void FE<Dim,T>::init_shape_functions(const QBase* qrule,
 #ifdef ENABLE_INFINITE_ELEMENTS
 
 template <unsigned int Dim, FEFamily T>
-void FE<Dim,T>::init_base_shape_functions(const QBase* q, 
+void FE<Dim,T>::init_base_shape_functions(const std::vector<Point>& qp,
 					  const Elem* e)
 { 
   elem_type = e->type(); 
-  init_shape_functions(q, e); 
+  init_shape_functions(qp, e); 
 }
 
 #endif

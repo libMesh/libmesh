@@ -1,4 +1,4 @@
-// $Id: mesh_gmv_support.C,v 1.10 2003-02-21 18:31:32 benkirk Exp $
+// $Id: mesh_gmv_support.C,v 1.11 2003-02-24 14:35:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -39,7 +39,6 @@
 #include "equation_systems.h"
 #include "mesh_base.h"
 #include "elem.h"
-
 
 
 
@@ -362,7 +361,7 @@ void MeshBase::write_gmv_binary (std::ostream& out,
 {
   std::vector<Number> soln;
   std::vector<std::string> names;
-  
+
   es.build_variable_names  (names);
   es.build_solution_vector (soln);
   

@@ -1,4 +1,4 @@
-// $Id: libmesh.C,v 1.4 2003-02-22 16:01:10 benkirk Exp $
+// $Id: libmesh.C,v 1.5 2003-02-24 14:35:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -54,6 +54,7 @@ using namespace Mpi;
 #endif
 
 
+
 // ------------------------------------------------------------
 // libMesh static member initializations
 PerfLog      libMesh::log ("libMesh",
@@ -65,8 +66,9 @@ PerfLog      libMesh::log ("libMesh",
 			   );
 
 bool         libMesh::_is_initialized = false;
-int          libMesh::_n_processors   = 1;
-int          libMesh::_processor_id   = 0;
+
+
+
 
 // ------------------------------------------------------------
 // libMesh member functions

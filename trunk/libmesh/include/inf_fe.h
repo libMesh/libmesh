@@ -1,4 +1,4 @@
-// $Id: inf_fe.h,v 1.18 2003-02-20 17:09:20 spetersen Exp $
+// $Id: inf_fe.h,v 1.19 2003-02-24 14:35:50 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -95,7 +95,7 @@ class Elem;
  *
  * \author Daniel Dreyer
  * \date 2003
- * \version $Revision: 1.18 $
+ * \version $Revision: 1.19 $
  */
 
 //-------------------------------------------------------------
@@ -118,7 +118,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.18 $
+   * \version $Revision: 1.19 $
    */
   //-------------------------------------------------------------
   // InfFE::Radial class definition
@@ -247,7 +247,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.18 $
+   * \version $Revision: 1.19 $
    */
   //-------------------------------------------------------------
   // InfFE::Base class definition
@@ -430,8 +430,7 @@ public:
    * element-dependent data based on the \p side of an infinite 
    * element.
    */
-  void reinit (QBase* qside,
-	       const Elem* elem,
+  void reinit (const Elem* elem,
 	       const unsigned int side);
 
   /**
@@ -510,8 +509,9 @@ protected:
   /**
    * Do not use this derived member in \p InfFE<Dim,T_radial,T_map>.
    */
-  void init_base_shape_functions(const QBase*, const Elem*)
-      { error(); }
+  void init_base_shape_functions(const std::vector<Point>&,
+				 const Elem*)
+  { error(); }
 
 
 
@@ -531,7 +531,7 @@ protected:
    * Not implemented yet.  Initialize all the data fields like \p weight, 
    * \p phi, etc for the side \p s.
    */  
-  void init_shape_functions(const QBase* q,
+  void init_shape_functions(const std::vector<Point>& qp,
 			    const Elem* e,
 			    const unsigned int s);
 
@@ -557,9 +557,7 @@ protected:
    * should barely be re-defined in derived classes, but
    * still should be usable for children. Therefore, keep
    * it protected.
-   * Do not give any values to this method, from this
-   * it is even more visible how we use the \p InfFE 
-   * and not the \p FEBase version.
+   * Overloaded method from the \p FEBase version.
    */
   void compute_shape_functions();
 

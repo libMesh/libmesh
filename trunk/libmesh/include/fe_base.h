@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.10 2003-02-22 16:01:09 benkirk Exp $
+// $Id: fe_base.h,v 1.11 2003-02-24 14:35:50 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -124,8 +124,7 @@ public:
    * Reinitializes all the physical element-dependent data based on
    * the \p side of \p face.
    */
-  virtual void reinit (QBase* qside,
-		       const Elem* elem,
+  virtual void reinit (const Elem* elem,
 		       const unsigned int side) = 0;
   
   /**
@@ -137,7 +136,7 @@ public:
    */
   static bool on_reference_element(const Point& p,
 				   const ElemType t,
-				   const Real eps=1.e-6);
+				   const Real eps = TOLERANCE);
   
   /**
    * @returns the \p xyz spatial locations of the quadrature
@@ -319,22 +318,23 @@ protected:
    * an infinite element.  Implement this in the derived 
    * class \p FE<Dim,T>.
    */
-  virtual void init_base_shape_functions(const QBase* q,
+  virtual void init_base_shape_functions(const std::vector<Point>& qp,
 					 const Elem* e) = 0;
 
 #endif
 
   /**
    * Compute the jacobian and some other additional
-   * data fields.
+   * data fields. Takes the integration weights
+   * as input, along with a pointer to the element.
    */
-  void compute_map(const QBase* q,
+  void compute_map(const std::vector<Real>& qw,
 		   const Elem* e);
   
   /** 
-   * Same as before, but for a side.
+   * Same as before, but for a side.  Useful for boundary integration.
    */  
-  void compute_map(const QBase* q,
+  void compute_map(const std::vector<Real>& qw,
 		   const Elem* e,
 		   const unsigned int s);
 
@@ -348,7 +348,7 @@ protected:
    * still should be usable for children. Therefore, keep
    * it protected.
    */
-  void compute_shape_functions();
+  virtual void compute_shape_functions();
   
 
   /**
