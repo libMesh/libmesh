@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.7 2005-03-01 15:50:21 roystgnr Exp $
+// $Id: dof_map.h,v 1.8 2005-03-07 12:41:41 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -64,7 +64,7 @@ template <typename T> class SparseMatrix;
  * to save space since the factors are simple rational
  * fractions.
  */
-typedef std::map<unsigned int, double> DofConstraintRow;
+typedef std::map<unsigned int, Number> DofConstraintRow;
 
 /** 
  * The constraint matrix storage format. 
