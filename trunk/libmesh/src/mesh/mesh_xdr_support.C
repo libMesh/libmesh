@@ -1,4 +1,4 @@
-// $Id: mesh_xdr_support.C,v 1.29 2004-11-05 02:19:46 bbarth Exp $
+// $Id: mesh_xdr_support.C,v 1.30 2004-11-07 18:26:44 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -171,6 +171,7 @@ void XdrInterface::mesh_interface(const std::string& name,
 	 * and minimize IO requirements
 	 * for these meshes.
          */
+
         
         int orig_type = m.get_orig_flag();
 	if (orig_type == 0)
@@ -337,8 +338,9 @@ void XdrInterface::mesh_interface(const std::string& name,
 		}
 	    
 	    // Send conn to the XDR file
-            std::cout << nn << " " << lastConnIndex/nn << std::endl;
-	    m.Icon(&conn[0], nn, totalWeight/nn);
+            // std::cout << nn << " " << lastConnIndex/nn << std::endl;
+	    // m.Icon(&conn[0], nn, totalWeight/nn);
+	    m.Icon(&conn[0], nn, lastConnIndex/nn);
 	  }
 	
 	break;
