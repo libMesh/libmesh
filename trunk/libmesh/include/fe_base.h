@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.9 2003-02-13 22:56:07 benkirk Exp $
+// $Id: fe_base.h,v 1.10 2003-02-22 16:01:09 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -344,11 +344,11 @@ protected:
    * the first derivatives of the shape functions are 
    * transformed to global coordinates, giving \p dphi,
    * \p dphidx, \p dphidy, and \p dphidz. This method
-   * should barely be re-defined in derived classes, but
+   * should rarely be re-defined in derived classes, but
    * still should be usable for children. Therefore, keep
    * it protected.
    */
-  void compute_shape_functions(const QBase* q);
+  void compute_shape_functions();
   
 
   /**

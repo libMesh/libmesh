@@ -1,4 +1,4 @@
- // $Id: reference_counter.h,v 1.8 2003-02-21 18:31:30 benkirk Exp $
+ // $Id: reference_counter.h,v 1.9 2003-02-22 16:01:10 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -111,20 +111,19 @@ protected:
    * Actually holds the data.
    */
   static Counts _counts;
-
-  /**
-   * The number of objects.  Print the reference count
-   * information when the number returns to 0.
-   */
-  static unsigned int _n_objects;
-
+  
   /**
    * A flag indicating if \p print_info() has been called.
    */
   static bool _have_printed_info;
 
-  
 #endif
+  
+  /**
+   * The number of objects.  Print the reference count
+   * information when the number returns to 0.
+   */
+  static unsigned int _n_objects;
 };
 
 
@@ -133,20 +132,16 @@ protected:
 // ReferenceCounter class inline methods
 inline ReferenceCounter::ReferenceCounter()
 {
-#if defined(ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
-  
   _n_objects++;
-
-#endif
 }
 
 
 
 inline ReferenceCounter::~ReferenceCounter()
 {
-#if defined(ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
-  
   _n_objects--;
+  
+#if defined(ENABLE_REFERENCE_COUNTING) && defined(DEBUG)  
 
   if (_n_objects == 0)
     print_info();

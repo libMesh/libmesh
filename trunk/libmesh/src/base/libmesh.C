@@ -1,4 +1,4 @@
-// $Id: libmesh.C,v 1.3 2003-02-21 18:31:30 benkirk Exp $
+// $Id: libmesh.C,v 1.4 2003-02-22 16:01:10 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -132,7 +132,7 @@ int libMesh::close ()
   // when the last created object has been destroyed.
   // That does not good if we are leaking memory!
   ReferenceCounter::print_info ();
-
+  
 
   _is_initialized = false;
   
@@ -140,5 +140,21 @@ int libMesh::close ()
   // This is equivalent to return 0 if all of
   // the reference counted objects have been
   // deleted.
+
+  if (ReferenceCounter::n_objects() != 0)
+    {
+      std::cerr << "Memory leak detected!"
+		<< std::endl;
+      
+#if !defined(ENABLE_REFERENCE_COUNTING) || defined(NDEBUG)
+
+      std::cerr << "Compile in DEBUG mode with --enable-reference-counting"
+		<< std::endl
+		<< "for more information"
+		<< std::endl;
+#endif
+  
+    }
+  
   return static_cast<int>(ReferenceCounter::n_objects());
 }

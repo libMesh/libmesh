@@ -1,4 +1,4 @@
-// $Id: fe_base.C,v 1.6 2003-02-13 22:56:09 benkirk Exp $
+// $Id: fe_base.C,v 1.7 2003-02-22 16:01:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -434,13 +434,8 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
 
 
 
-void FEBase::compute_shape_functions(const QBase* qrule)
+void FEBase::compute_shape_functions ()
 {
-  assert (qrule != NULL);
-  
-  const unsigned int n_qp = qrule->n_points();
-
-
   //-------------------------------------------------------------------------
   // Compute the shape function values (and derivatives)
   // at the Quadrature points.  Note that the actual values
@@ -453,7 +448,7 @@ void FEBase::compute_shape_functions(const QBase* qrule)
     case 1:
       {
 	for (unsigned int i=0; i<phi.size(); i++)
-	  for (unsigned int p=0; p<n_qp; p++)
+	  for (unsigned int p=0; p<phi[i].size(); p++)
 	    {
 	      // dphi/dx    = (dphi/dxi)*(dxi/dx)
 	      dphi[i][p](0) =
@@ -462,14 +457,15 @@ void FEBase::compute_shape_functions(const QBase* qrule)
 	      dphi[i][p](1) = dphidy[i][p] = 0.;
 	      dphi[i][p](2) = dphidz[i][p] = 0.;
 	    }
-	  
-	break;
+
+	// All done
+	return;
       }
 
     case 2:
       {
 	for (unsigned int i=0; i<phi.size(); i++)
-	  for (unsigned int p=0; p<n_qp; p++)
+	  for (unsigned int p=0; p<phi[i].size(); p++)
 	    {
 	      // dphi/dx    = (dphi/dxi)*(dxi/dx) + (dphi/deta)*(deta/dx)
 	      dphi[i][p](0) =
@@ -484,13 +480,14 @@ void FEBase::compute_shape_functions(const QBase* qrule)
 	      dphi[i][p](2) = dphidz[i][p] = 0.;
 	    }
 
-	break;
+	// All done
+	return;
       }
     
     case 3:
       {
 	for (unsigned int i=0; i<phi.size(); i++)
-	  for (unsigned int p=0; p<n_qp; p++)
+	  for (unsigned int p=0; p<phi[i].size(); p++)
 	    {
 	      // dphi/dx    = (dphi/dxi)*(dxi/dx) + (dphi/deta)*(deta/dx) + (dphi/dzeta)*(dzeta/dx);
 	      dphi[i][p](0) =
@@ -511,7 +508,8 @@ void FEBase::compute_shape_functions(const QBase* qrule)
 				dphidzeta[i][p]*dzetadz_map[p]);	      
 	    }
 
-	break;
+	// All done
+	return;
       }
 
     default:
@@ -543,7 +541,7 @@ bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real e
 	    (xi <=  1.+eps))
 	  return true;
 
-	break;
+	return false;
       }
 
       
@@ -557,7 +555,7 @@ bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real e
 	    ((xi + eta) <= 1.+eps))
 	  return true;
 
-	break;
+	return false;
       }
 
       
@@ -572,7 +570,7 @@ bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real e
 	    (eta <=  1.+eps))
 	  return true;
 		
-	break;
+	return false;
       }
 
 
@@ -588,7 +586,7 @@ bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real e
 	    ((xi + eta + zeta) <= 1.+eps))
 	  return true;
 		
-	break;
+	return false;
       }
 
       
@@ -619,7 +617,7 @@ bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real e
 	    return true;
 	  }
 
-	break;
+	return false;
       }
 
     case PRISM6:
@@ -633,7 +631,7 @@ bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real e
 	    ((xi + eta) <= 1.+eps))
 	  return true;
 
-	break;
+	return false;
       }
 
 
@@ -643,7 +641,7 @@ bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real e
 		  << std::endl;
 	error();
 
-	break;
+	return false;
       }
       
     default:
