@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex16.C,v 1.22 2004-07-14 19:23:18 jwpeterson Exp $
+// $Id: cell_inf_hex16.C,v 1.23 2005-02-19 19:07:00 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -32,6 +32,27 @@
 
 // ------------------------------------------------------------
 // InfHex16 class member functions
+
+bool InfHex16::is_vertex(const unsigned int i) const
+{
+  if (i < 8)
+    return true;
+  return false;
+}
+
+bool InfHex16::is_edge(const unsigned int i) const
+{
+  // FIXME: are nodes 12-15 edge, face, or "other" nodes?
+  if (i < 8)
+    return false;
+  return true;
+}
+
+bool InfHex16::is_face(const unsigned int) const
+{
+  return false;
+}
+
 AutoPtr<Elem> InfHex16::build_side (const unsigned int i) const
 {
   assert (i < this->n_sides());

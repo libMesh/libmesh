@@ -1,4 +1,4 @@
-// $Id: cell_hex8.C,v 1.17 2005-01-28 19:14:17 benkirk Exp $
+// $Id: cell_hex8.C,v 1.18 2005-02-19 19:07:00 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -43,6 +43,22 @@ const unsigned int Hex8::side_nodes_map[6][4] =
 
 // ------------------------------------------------------------
 // Hex8 class member functions
+
+bool Hex8::is_vertex(const unsigned int) const
+{
+  return true;
+}
+
+bool Hex8::is_edge(const unsigned int) const
+{
+  return false;
+}
+
+bool Hex8::is_face(const unsigned int) const
+{
+  return false;
+}
+
 AutoPtr<Elem> Hex8::build_side (const unsigned int i) const
 {
   assert (i < this->n_sides());

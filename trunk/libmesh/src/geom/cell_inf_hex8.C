@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex8.C,v 1.22 2004-07-14 19:23:18 jwpeterson Exp $
+// $Id: cell_inf_hex8.C,v 1.23 2005-02-19 19:07:00 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -32,6 +32,21 @@
 
 // ------------------------------------------------------------
 // InfHex8 class member functions
+
+bool InfHex8::is_vertex(const unsigned int) const
+{
+  return true;
+}
+
+bool InfHex8::is_edge(const unsigned int) const
+{
+  return false;
+}
+
+bool InfHex8::is_face(const unsigned int) const
+{
+  return false;
+}
 
 bool InfHex8::contains_point (const Point& p) const
 {

@@ -1,4 +1,4 @@
-// $Id: face_quad4.C,v 1.16 2005-01-28 19:14:18 benkirk Exp $
+// $Id: face_quad4.C,v 1.17 2005-02-19 19:07:01 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -87,6 +87,22 @@ const float Quad4::_embedding_matrix[4][4][4] =
 
 // ------------------------------------------------------------
 // Quad4 class member functions
+
+bool Quad4::is_vertex(const unsigned int) const
+{
+  return true;
+}
+
+bool Quad4::is_edge(const unsigned int) const
+{
+  return false;
+}
+
+bool Quad4::is_face(const unsigned int) const
+{
+  return false;
+}
+
 AutoPtr<Elem> Quad4::build_side (const unsigned int i) const
 {
   assert (i < this->n_sides());

@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism12.C,v 1.22 2004-07-14 19:23:18 jwpeterson Exp $
+// $Id: cell_inf_prism12.C,v 1.23 2005-02-19 19:07:00 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -32,6 +32,26 @@
 
 // ------------------------------------------------------------
 // InfPrism12 class member functions
+
+bool InfPrism12::is_vertex(const unsigned int i) const
+{
+  if (i < 6)
+    return true;
+  return false;
+}
+
+bool InfPrism12::is_edge(const unsigned int i) const
+{
+  if (i < 6)
+    return false;
+  return true;
+}
+
+bool InfPrism12::is_face(const unsigned int) const
+{
+  return false;
+}
+
 AutoPtr<Elem> InfPrism12::build_side (const unsigned int i) const
 {
   assert (i < this->n_sides());

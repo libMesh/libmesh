@@ -1,4 +1,4 @@
-// $Id: cell_hex27.C,v 1.24 2005-01-28 19:14:17 benkirk Exp $
+// $Id: cell_hex27.C,v 1.25 2005-02-19 19:06:59 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -43,6 +43,30 @@ const unsigned int Hex27::side_nodes_map[6][9] =
 
 // ------------------------------------------------------------
 // Hex27 class member functions
+
+bool Hex27::is_vertex(const unsigned int i) const
+{
+  if (i < 8)
+    return true;
+  return false;
+}
+
+bool Hex27::is_edge(const unsigned int i) const
+{
+  if (i < 8)
+    return false;
+  if (i > 19)
+    return false;
+  return true;
+}
+
+bool Hex27::is_face(const unsigned int i) const
+{
+  if (i > 19)
+    return true;
+  return false;
+}
+
 unsigned int Hex27::key (const unsigned int s) const
 {
  assert (s < this->n_sides());

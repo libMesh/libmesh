@@ -1,4 +1,4 @@
-// $Id: face_quad8.C,v 1.20 2005-01-28 19:14:18 benkirk Exp $
+// $Id: face_quad8.C,v 1.21 2005-02-19 19:07:01 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -101,6 +101,26 @@ const float Quad8::_embedding_matrix[4][8][8] =
 
 // ------------------------------------------------------------
 // Quad8 class member functions
+
+bool Quad8::is_vertex(const unsigned int i) const
+{
+  if (i < 4)
+    return true;
+  return false;
+}
+
+bool Quad8::is_edge(const unsigned int i) const
+{
+  if (i < 4)
+    return false;
+  return true;
+}
+
+bool Quad8::is_face(const unsigned int) const
+{
+  return false;
+}
+
 unsigned int Quad8::key (const unsigned int s) const
 {
   assert (s < this->n_sides());

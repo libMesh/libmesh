@@ -1,4 +1,4 @@
-// $Id: cell_hex20.C,v 1.19 2005-01-28 19:14:16 benkirk Exp $
+// $Id: cell_hex20.C,v 1.20 2005-02-19 19:06:59 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -29,6 +29,26 @@
 
 // ------------------------------------------------------------
 // Hex20 class static member initializations
+
+bool Hex20::is_vertex(const unsigned int i) const
+{
+  if (i < 8)
+    return true;
+  return false;
+}
+
+bool Hex20::is_edge(const unsigned int i) const
+{
+  if (i > 7)
+    return true;
+  return false;
+}
+
+bool Hex20::is_face(const unsigned int) const
+{
+  return false;
+}
+
 const unsigned int Hex20::side_nodes_map[6][8] =
 {
   {0, 3, 2, 1, 11, 10,  9,  8}, // Side 0

@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex18.C,v 1.24 2004-07-14 19:23:18 jwpeterson Exp $
+// $Id: cell_inf_hex18.C,v 1.25 2005-02-19 19:07:00 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -32,6 +32,30 @@
 
 // ------------------------------------------------------------
 // InfHex18 class member functions
+
+bool InfHex18::is_vertex(const unsigned int i) const
+{
+  if (i < 8)
+    return true;
+  return false;
+}
+
+bool InfHex18::is_edge(const unsigned int i) const
+{
+  if (i < 8)
+    return false;
+  if (i > 15)
+    return false;
+  return true;
+}
+
+bool InfHex18::is_face(const unsigned int i) const
+{
+  if (i > 15)
+    return true;
+  return false;
+}
+
 unsigned int InfHex18::key (const unsigned int s) const
 {
   assert (s < this->n_sides());
