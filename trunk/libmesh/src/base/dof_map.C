@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.45 2003-06-02 22:50:11 benkirk Exp $
+// $Id: dof_map.C,v 1.46 2003-06-03 05:33:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -484,12 +484,14 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
 		    {
 		      const unsigned int jg = element_dofs[j];
 
-		      // This will save memory, but is slower		      
-//		      if (!std::count (row.begin(), row.end(), jg))
-//			row.push_back(jg);
+		      // See if jg is in the sorted range
+		      std::pair<std::vector<unsigned int>::iterator,
+			        std::vector<unsigned int>::iterator>
+			pos = std::equal_range (row.begin(), row.end(), jg);
 
-		      // This will waste memory, but is faster
-		      row.push_back(jg);
+		      // Insert jg if it wasn't found
+		      if (pos.first == pos.second)
+			row.insert (pos.first, jg);
 		    }
 		}
 	    }
@@ -568,32 +570,22 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
 			  for (unsigned int j=0; j<n_dofs_on_element_j; j++)
 			    {
 			      const unsigned int jg = element_dofs_j[j];
-			      
-			      row.push_back(jg);
+
+			      // See if jg is in the sorted range
+			      std::pair<std::vector<unsigned int>::iterator,
+			                std::vector<unsigned int>::iterator>
+				pos = std::equal_range (row.begin(),
+							row.end(),
+							jg);
+
+			      // Insert jg if it wasn't found
+			      if (pos.first == pos.second)
+				row.insert (pos.first, jg);
 			    }
 			}
 		    }
 		}
 	  }
-    }
-
-  // Now the sparsity pattern has been initialized, but it
-  // contains duplicate entries.  We need to sort it & remove
-  // the duplicates.
-  for (unsigned int i=0; i<n_dofs_on_proc; i++)
-    {
-      std::vector<unsigned int>& row =
-	sparsity_pattern[i];
-
-      // Sort the row
-      std::sort (row.begin(), row.end());
-
-      // remove the duplicate entries
-      std::vector<unsigned int>::iterator new_end =
-	std::unique (row.begin(), row.end());
-
-      // use the "swap trick" to trim the extra fat from the row
-      std::vector<unsigned int> (row.begin(), new_end).swap (row);
     }
 
 
@@ -623,6 +615,7 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
   
   STOP_LOG("compute_sparsity()", "DofMap");
 
+  
   // We are done with the sparsity_pattern.  However, quite a
   // lot has gone into computing it.  It is possible that some
   // \p SparseMatrix implementations want to see it.  Let them
@@ -631,28 +624,15 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
   // When additional matrices are handled, let the major matrix
   // be the first to get to know the sparsity pattern, so that
   // it has the best chance to be allocated successfully...
-  if (_other_matrices.empty())
-    {
-      // NOTE:  The \p SparseMatrix::update_sparsity_pattern() is NOT
-      // const, so the \p SparseMatrix may freely trash the
-      // sparsity_pattern.  DO NOT expect to use it any more after
-      // this call.
-      if (_matrix != NULL)
-        _matrix->update_sparsity_pattern (sparsity_pattern);
-    }
-  else
-    {
-      // use the const version of the update_sparsity_pattern()
-      if (_matrix != NULL)
-	_matrix->const_update_sparsity_pattern (sparsity_pattern);
+  if (_matrix != NULL)
+    _matrix->update_sparsity_pattern (sparsity_pattern);
       
-      std::map<std::string, SparseMatrix<Number>* >::iterator
-	pos = _other_matrices.begin(),
-	end = _other_matrices.end();
+  std::map<std::string, SparseMatrix<Number>* >::iterator
+    pos = _other_matrices.begin(),
+    end = _other_matrices.end();
       
-      for (; pos != end; ++pos)
-	pos->second->const_update_sparsity_pattern (sparsity_pattern);
-    }     
+  for (; pos != end; ++pos)
+    pos->second->update_sparsity_pattern (sparsity_pattern);     
 }
 
 

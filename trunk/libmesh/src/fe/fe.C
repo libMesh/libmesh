@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.21 2003-05-20 09:28:44 ddreyer Exp $
+// $Id: fe.C,v 1.22 2003-06-03 05:33:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -44,10 +44,10 @@ template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::reinit(const Elem* elem,
 		       const std::vector<Point>* const pts)
 {
-  assert (elem    != NULL);
+  assert (elem != NULL);
 
   // Only need the quadrature rule if the user did not supply
-  // points
+  // the evaluation points
   if (pts == NULL)
     {
       assert (qrule   != NULL);
@@ -59,19 +59,25 @@ void FE<Dim,T>::reinit(const Elem* elem,
   // points
   if (pts != NULL)
     {
+      // Set the element type
       elem_type = elem->type();
-      init_shape_functions (*pts, elem);      
+
+      // Initialize the shape functions
+      this->init_shape_functions (*pts, elem);
     }
   
   // update the type in accordance to the current cell
   // and reinit if the cell type has changed or (as in
   // the case of the hierarchics) the shape functions need
   // reinit, since they depend on the particular element
-  else if ((get_type() != elem->type()) ||
-	   shapes_need_reinit())
+  else if ((this->get_type() != elem->type()) ||
+	   this->shapes_need_reinit())
     {
+      // Set the element type
       elem_type = elem->type();
-      init_shape_functions (qrule->get_points(), elem);
+      
+      // Initialize the shape functions
+      this->init_shape_functions (qrule->get_points(), elem);
     }
 
 
@@ -82,16 +88,16 @@ void FE<Dim,T>::reinit(const Elem* elem,
     {
       std::vector<Real> dummy_weights (pts->size(), 1.);
       
-      compute_map (dummy_weights, elem);
+      this->compute_map (dummy_weights, elem);
     }
   else
     {
-      compute_map (qrule->get_weights(), elem);
+      this->compute_map (qrule->get_weights(), elem);
     }
 
   // Compute the shape functions and the derivatives at all of the
   // quadrature points.
-  compute_shape_functions ();
+  this->compute_shape_functions ();
 }
 
 
@@ -110,7 +116,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
 
   
   // The number of quadrature points.
-  const unsigned int        n_qp = qp.size();
+  const unsigned int n_qp = qp.size();
 
   // The element type and order to use in
   // the map
@@ -119,7 +125,9 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
     
   // Number of shape functions in the finite element approximation
   // space.
-  const unsigned int n_approx_shape_functions = n_shape_functions();
+  const unsigned int n_approx_shape_functions =
+    this->n_shape_functions(this->get_type(),
+			    this->get_order());
 
   // Number of shape functions used to construt the map
   // (Lagrange shape functions are used for mapping)
@@ -223,8 +231,8 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
 	for (unsigned int i=0; i<n_approx_shape_functions; i++)
 	  for (unsigned int p=0; p<n_qp; p++)
 	    {
-	      phi[i][p]      = FE<Dim,T>::shape       (elem, get_order(), i,    qp[p]);
-	      dphidxi[i][p]  = FE<Dim,T>::shape_deriv (elem, get_order(), i, 0, qp[p]);
+	      phi[i][p]      = FE<Dim,T>::shape       (elem, this->get_order(), i,    qp[p]);
+	      dphidxi[i][p]  = FE<Dim,T>::shape_deriv (elem, this->get_order(), i, 0, qp[p]);
 	    }
 	
 	// Compute the value of the mapping shape function i at quadrature point p
@@ -249,9 +257,9 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
 	for (unsigned int i=0; i<n_approx_shape_functions; i++)
 	  for (unsigned int p=0; p<n_qp; p++)
 	    {
-	      phi[i][p]      = FE<Dim,T>::shape       (elem, get_order(), i,    qp[p]);
-	      dphidxi[i][p]  = FE<Dim,T>::shape_deriv (elem, get_order(), i, 0, qp[p]);
-	      dphideta[i][p] = FE<Dim,T>::shape_deriv (elem, get_order(), i, 1, qp[p]);
+	      phi[i][p]      = FE<Dim,T>::shape       (elem, this->get_order(), i,    qp[p]);
+	      dphidxi[i][p]  = FE<Dim,T>::shape_deriv (elem, this->get_order(), i, 0, qp[p]);
+	      dphideta[i][p] = FE<Dim,T>::shape_deriv (elem, this->get_order(), i, 1, qp[p]);
 	    }
 	
 	// Compute the value of the mapping shape function i at quadrature point p
@@ -277,10 +285,10 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
 	for (unsigned int i=0; i<n_approx_shape_functions; i++)
 	  for (unsigned int p=0; p<n_qp; p++)
 	    {
-	      phi[i][p]       = FE<Dim,T>::shape       (elem, get_order(), i,    qp[p]);
-	      dphidxi[i][p]   = FE<Dim,T>::shape_deriv (elem, get_order(), i, 0, qp[p]);
-	      dphideta[i][p]  = FE<Dim,T>::shape_deriv (elem, get_order(), i, 1, qp[p]);
-	      dphidzeta[i][p] = FE<Dim,T>::shape_deriv (elem, get_order(), i, 2, qp[p]);
+	      phi[i][p]       = FE<Dim,T>::shape       (elem, this->get_order(), i,    qp[p]);
+	      dphidxi[i][p]   = FE<Dim,T>::shape_deriv (elem, this->get_order(), i, 0, qp[p]);
+	      dphideta[i][p]  = FE<Dim,T>::shape_deriv (elem, this->get_order(), i, 1, qp[p]);
+	      dphidzeta[i][p] = FE<Dim,T>::shape_deriv (elem, this->get_order(), i, 2, qp[p]);
 	    }
 	
 	// Compute the value of the mapping shape function i at quadrature point p

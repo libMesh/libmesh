@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.24 2003-05-28 03:17:49 benkirk Exp $
+// $Id: elem.C,v 1.25 2003-06-03 05:33:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -22,7 +22,6 @@
 // C++ includes
 #include <algorithm>
 #include <iterator>
-#include <set>
 
 // Local includes
 #include "elem.h"
@@ -232,13 +231,9 @@ void Elem::write_tecplot_connectivity(std::ostream& out) const
   
   for (unsigned int sc=0; sc <this->n_sub_elem(); sc++)
     {
-      std::vector<unsigned int> conn = tecplot_connectivity(sc);
+      std::vector<unsigned int> conn =
+	this->tecplot_connectivity(sc);
       
-      // Orignial code
-      //for (unsigned int i=0; i<conn.size(); i++)
-      // 	out << conn[i] << " ";
-      
-      // New code
       std::copy(conn.begin(),
  		conn.end(),
  		std::ostream_iterator<unsigned int>(out, " "));
@@ -279,7 +274,7 @@ Point Elem::centroid() const
 {
   Point cp;
 
-  for (unsigned int n=0; n<n_vertices(); n++)
+  for (unsigned int n=0; n<this->n_vertices(); n++)
     cp.add (this->point(n));
 
   return (cp /= static_cast<Real>(n_vertices()));    
@@ -291,8 +286,8 @@ Real Elem::hmin() const
 {
   Real h_min=1.e30;
 
-  for (unsigned int n_outer=0; n_outer<n_vertices(); n_outer++)
-    for (unsigned int n_inner=0; n_inner<n_vertices(); n_inner++)
+  for (unsigned int n_outer=0; n_outer<this->n_vertices(); n_outer++)
+    for (unsigned int n_inner=0; n_inner<this->n_vertices(); n_inner++)
       if (n_outer != n_inner) // would create false 0
 	{
 	  const Point diff = (point(n_outer) - point(n_inner));
@@ -309,8 +304,8 @@ Real Elem::hmax() const
 {
   Real h_max=0;
 
-  for (unsigned int n_outer=0; n_outer<n_vertices(); n_outer++)
-    for (unsigned int n_inner=0; n_inner<n_vertices(); n_inner++)
+  for (unsigned int n_outer=0; n_outer<this->n_vertices(); n_outer++)
+    for (unsigned int n_inner=0; n_inner<this->n_vertices(); n_inner++)
       if (n_outer != n_inner) // will be 0, definately _not_ max
 	{
 	  const Point diff = (point(n_outer) - point(n_inner));
@@ -326,8 +321,8 @@ Real Elem::hmax() const
 Real Elem::length(const unsigned int n1, 
 		  const unsigned int n2) const
 {
-  assert ( n1 < n_vertices() );
-  assert ( n2 < n_vertices() );
+  assert ( n1 < this->n_vertices() );
+  assert ( n2 < this->n_vertices() );
 
   return (point(n1) - point(n2)).size();
 }
@@ -336,29 +331,48 @@ Real Elem::length(const unsigned int n1,
 
 bool Elem::operator == (const Elem& rhs) const
 {
-  assert (n_nodes());
-  assert (rhs.n_nodes());
+  // Useful typedefs
+  typedef std::vector<unsigned int>::iterator iterator;
+  typedef iterator::difference_type diff_type;
 
+  
   // Elements can only be equal if they
   // contain the same number of nodes.
-  if (n_nodes() == rhs.n_nodes())
+  // However, we will only test the vertices,
+  // which is sufficient & cheaper
+  if (this->n_nodes() == rhs.n_nodes())
     {
-      // Create a set that contains our global
+      // Create a vector that contains our global
       // node numbers and those of our neighbor.
-      // If the set is the same size as the number
-      // of nodes in both elements then they must
-      // be connected to the same nodes.     
-      std::set<unsigned int> nodes_set;
+      // If the sorted, unique vector is the same size
+      // as the number of nodes in both elements then
+      // they must be connected to the same nodes.
+      //
+      // The vector will be no larger than 2*n_vertices(),
+      // so we might as well reserve the space.
+      std::vector<unsigned int> common_nodes;
+      common_nodes.reserve (2*this->n_vertices());
 
-      for (unsigned int n=0; n<this->n_nodes(); n++)
+      // Add the global indices of the vertex nodes
+      for (unsigned int n=0; n<this->n_vertices(); n++)
 	{
-	  nodes_set.insert(node(n));
-	  nodes_set.insert(rhs.node(n));
+	  common_nodes.push_back (this->node(n));
+	  common_nodes.push_back (rhs.node(n));
 	}
 
+      // Sort the vector and find out how long
+      // the sorted vector is.
+      std::sort (common_nodes.begin(), common_nodes.end());
+      
+      iterator new_end = std::unique (common_nodes.begin(),
+				      common_nodes.end());
+      
+      const diff_type new_size = std::distance (common_nodes.begin(),
+						new_end);
+      
       // If this passes the elements are connected
-      // to the same global nodes
-      if (nodes_set.size() == n_nodes())
+      // to the same global vertex nodes
+      if (new_size == static_cast<diff_type>(this->n_vertices()))
 	return true;
     }
 

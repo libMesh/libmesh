@@ -1,4 +1,4 @@
-// $Id: inf_fe.h,v 1.28 2003-05-30 20:15:45 ddreyer Exp $
+// $Id: inf_fe.h,v 1.29 2003-06-03 05:33:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -66,7 +66,7 @@ class FEComputeData;
  *
  * \author Daniel Dreyer
  * \date 2003
- * \version $Revision: 1.28 $
+ * \version $Revision: 1.29 $
  */
 
 //-------------------------------------------------------------
@@ -89,7 +89,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.28 $
+   * \version $Revision: 1.29 $
    */
   //-------------------------------------------------------------
   // InfFE::Radial class definition
@@ -181,7 +181,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.28 $
+   * \version $Revision: 1.29 $
    */
   //-------------------------------------------------------------
   // InfFE::Base class definition
@@ -478,9 +478,8 @@ protected:
    * Not implemented yet.  Initialize all the data fields like \p weight, 
    * \p phi, etc for the side \p s.
    */  
-  void init_shape_functions(const std::vector<Point>& qp,
-			    const Elem* e,
-			    const unsigned int s);
+  void init_face_shape_functions (const std::vector<Point>& qp,
+				  const Elem* side);
 
   /** 
    * Combines the shape functions, which were formed in
