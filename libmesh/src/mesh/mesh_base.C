@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.82 2004-11-08 00:11:05 jwpeterson Exp $
+// $Id: mesh_base.C,v 1.83 2004-11-12 00:42:42 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -66,6 +66,7 @@ MeshBase::MeshBase (const MeshBase& other_mesh) :
   _nodes             (other_mesh._nodes),
   _elements          (other_mesh._elements),
   _n_sbd             (other_mesh._n_sbd),
+  _n_parts           (other_mesh._n_parts),
   _dim               (other_mesh._dim),
   _is_prepared       (other_mesh._is_prepared)
 
