@@ -1,4 +1,4 @@
-// $Id: libmesh.C,v 1.12 2003-04-09 01:20:22 benkirk Exp $
+// $Id: libmesh.C,v 1.13 2003-04-18 19:02:23 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -128,7 +128,7 @@ void libMesh::init (int & argc, char** & argv)
 
   
   // Parse the command-line arguments
-  _command_line.reset(new GetPot (argc, (const char**) argv));
+  _command_line.reset(new GetPot (argc, argv));
 
 
   

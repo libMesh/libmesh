@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.34 2003-04-02 21:58:42 benkirk Exp $
+// $Id: dof_map.C,v 1.35 2003-04-18 19:02:22 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -74,7 +74,7 @@ void DofMap::reinit(MeshBase& mesh)
   
   START_LOG("reinit()", "DofMap");
   
-  clear();
+  this->clear();
 
   _n_nodes = mesh.n_nodes();
   _n_elem  = mesh.n_elem();
@@ -176,11 +176,11 @@ void DofMap::distribute_dofs(MeshBase& mesh)
 {
   assert (mesh.is_prepared());
   
-  const unsigned int proc_id = mesh.processor_id();
-  const unsigned int n_proc  = mesh.n_processors();
+  const unsigned int proc_id = libMesh::processor_id();
+  const unsigned int n_proc  = libMesh::n_processors();
   
   assert (this->n_variables() != 0);
-  assert (proc_id < mesh.n_processors());
+  assert (proc_id < libMesh::n_processors());
   
   // re-init in case the mesh has changed
   this->reinit(mesh);
