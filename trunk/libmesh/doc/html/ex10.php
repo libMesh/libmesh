@@ -86,7 +86,7 @@ object to figure out which elements to refine.
 <div class ="fragment">
 <pre>
         #include "error_vector.h"
-        #include "kelley_error_estimator.h"
+        #include "kelly_error_estimator.h"
         
 </pre>
 </div>
@@ -359,8 +359,8 @@ Add a set of scope braces to enforce data locality.
         	  OSSInt(out,2,t_step);
         	  out &lt;&lt; ", time=";
         	  OSSRealzeroleft(out,6,3,time);
-        	  out &lt;&lt;  "..." &lt;&lt; std::endl;
-        	  std::cout &lt;&lt; out.str();
+        	  out &lt;&lt;  "...";
+        	  std::cout &lt;&lt; out.str() &lt;&lt; std::endl;
         	}
         	
 </pre>
@@ -443,12 +443,12 @@ The \p ErrorEstimator class interrogates a finite element
 solution and assigns to each element a positive error value.
 This value is used for deciding which elements to refine
 and which to coarsen.
-ErrorEstimator* error_estimator = new KelleyErrorEstimator;
+ErrorEstimator* error_estimator = new KellyErrorEstimator;
 </div>
 
 <div class ="fragment">
 <pre>
-                        KelleyErrorEstimator error_estimator;
+                        KellyErrorEstimator error_estimator;
         		
 </pre>
 </div>
@@ -461,8 +461,7 @@ application.
 
 <div class ="fragment">
 <pre>
-                        error_estimator.estimate_error (equation_systems,
-        						"Convection-Diffusion",
+                        error_estimator.estimate_error (system,
         						error);
         		
 </pre>
@@ -629,12 +628,16 @@ these initial values to the solution vector.  There is a small
 catch, however...  We only want to assign the components that
 live on the local processor, hence there will be an if-test
 in the loop.
-</div>
+const_active_local_elem_iterator       elem_it (mesh.elements_begin());
+const const_active_local_elem_iterator elem_end(mesh.elements_end());
+
+
+<br><br></div>
 
 <div class ="fragment">
 <pre>
-          const_active_local_elem_iterator       elem_it (mesh.elements_begin());
-          const const_active_local_elem_iterator elem_end(mesh.elements_end());
+          MeshBase::const_element_iterator       elem_it  = mesh.active_local_elements_begin();
+          const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end(); 
         
           for ( ; elem_it != elem_end; ++elem_it)
             {
@@ -891,12 +894,18 @@ live on the local processor. We will compute the element
 matrix and right-hand-side contribution.  Since the mesh
 will be refined we want to only consider the ACTIVE elements,
 hence we use a variant of the \p active_elem_iterator.
-</div>
+const_active_local_elem_iterator           el (mesh.elements_begin());
+const const_active_local_elem_iterator end_el (mesh.elements_end());
+
+
+<br><br></div>
 
 <div class ="fragment">
 <pre>
-          const_active_local_elem_iterator           el (mesh.elements_begin());
-          const const_active_local_elem_iterator end_el (mesh.elements_end());
+          MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+          const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end(); 
+        
+        
           
           for ( ; el != end_el; ++el)
             {    
@@ -1275,7 +1284,7 @@ Finished computing the sytem matrix and right-hand side.
   #include <FONT COLOR="#BC8F8F"><B>&quot;vector_value.h&quot;</FONT></B>
   
   #include <FONT COLOR="#BC8F8F"><B>&quot;error_vector.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;kelley_error_estimator.h&quot;</FONT></B>
+  #include <FONT COLOR="#BC8F8F"><B>&quot;kelly_error_estimator.h&quot;</FONT></B>
   
   <FONT COLOR="#228B22"><B>void</FONT></B> assemble_cd (EquationSystems&amp; es,
   		  <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp; system_name);
@@ -1342,8 +1351,8 @@ Finished computing the sytem matrix and right-hand side.
   	  OSSInt(out,2,t_step);
   	  out &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;, time=&quot;</FONT></B>;
   	  OSSRealzeroleft(out,6,3,time);
-  	  out &lt;&lt;  <FONT COLOR="#BC8F8F"><B>&quot;...&quot;</FONT></B> &lt;&lt; std::endl;
-  	  std::cout &lt;&lt; out.str();
+  	  out &lt;&lt;  <FONT COLOR="#BC8F8F"><B>&quot;...&quot;</FONT></B>;
+  	  std::cout &lt;&lt; out.str() &lt;&lt; std::endl;
   	}
   	
   	TransientImplicitSystem &amp;  system =
@@ -1363,10 +1372,9 @@ Finished computing the sytem matrix and right-hand side.
   
   		ErrorVector error;
   
-  		KelleyErrorEstimator error_estimator;
+  		KellyErrorEstimator error_estimator;
   		
-  		error_estimator.estimate_error (equation_systems,
-  						<FONT COLOR="#BC8F8F"><B>&quot;Convection-Diffusion&quot;</FONT></B>,
+  		error_estimator.estimate_error (system,
   						error);
   		
   		mesh_refinement.flag_elements_by_error_fraction (error,
@@ -1413,8 +1421,9 @@ Finished computing the sytem matrix and right-hand side.
     
     std::vector&lt;<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B>&gt; dof_indices;
   
-    const_active_local_elem_iterator       elem_it (mesh.elements_begin());
-    <FONT COLOR="#228B22"><B>const</FONT></B> const_active_local_elem_iterator elem_end(mesh.elements_end());
+  
+    MeshBase::const_element_iterator       elem_it  = mesh.active_local_elements_begin();
+    <FONT COLOR="#228B22"><B>const</FONT></B> MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end(); 
   
     <B><FONT COLOR="#A020F0">for</FONT></B> ( ; elem_it != elem_end; ++elem_it)
       {
@@ -1482,8 +1491,11 @@ Finished computing the sytem matrix and right-hand side.
     <FONT COLOR="#228B22"><B>const</FONT></B> Real dt = es.parameter   (<FONT COLOR="#BC8F8F"><B>&quot;dt&quot;</FONT></B>);
     <FONT COLOR="#228B22"><B>const</FONT></B> Real time = es.parameter (<FONT COLOR="#BC8F8F"><B>&quot;time&quot;</FONT></B>);
   
-    const_active_local_elem_iterator           el (mesh.elements_begin());
-    <FONT COLOR="#228B22"><B>const</FONT></B> const_active_local_elem_iterator end_el (mesh.elements_end());
+  
+    MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+    <FONT COLOR="#228B22"><B>const</FONT></B> MeshBase::const_element_iterator end_el = mesh.active_local_elements_end(); 
+  
+  
     
     <B><FONT COLOR="#A020F0">for</FONT></B> ( ; el != end_el; ++el)
       {    
@@ -1571,6 +1583,7 @@ Compiling C++ (in debug mode) ex10.C...
 Linking ex10...
 /home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
 : the use of `mktemp' is dangerous, better use `mkstemp'
+
 ***************************************************************
 * Running Example  ./ex10
 ***************************************************************
@@ -1591,8 +1604,9 @@ Linking ex10...
    System "Convection-Diffusion"
     Type "TransientImplicit"
     Variables="u" 
-    Finite Element Types="0" 
-    Approximation Orders="1" 
+    Finite Element Types="0", "12" 
+    Infinite Element Mapping="0" 
+    Approximation Orders="1", "3" 
     n_dofs()=6273
     n_local_dofs()=6273
     n_constrained_dofs()=0
@@ -1706,33 +1720,33 @@ Linking ex10...
  ---------------------------------------------------------------------------- 
 | Reference count information                                                |
  ---------------------------------------------------------------------------- 
-| 12SparseMatrixIdE reference count information:
-| Creations:    1
-| Destructions: 1
-| 13NumericVectorIdE reference count information:
-| Creations:    155
-| Destructions: 155
-| 21LinearSolverInterfaceIdE reference count information:
-| Creations:    1
-| Destructions: 1
+| 12SparseMatrixISt7complexIdEE reference count information:
+|  Creations:    1
+|  Destructions: 1
+| 13NumericVectorISt7complexIdEE reference count information:
+|  Creations:    155
+|  Destructions: 155
+| 21LinearSolverInterfaceISt7complexIdEE reference count information:
+|  Creations:    1
+|  Destructions: 1
 | 4Elem reference count information:
-| Creations:    562259
-| Destructions: 562259
+|  Creations:    561536
+|  Destructions: 561536
 | 4Node reference count information:
-| Creations:    8391
-| Destructions: 8391
+|  Creations:    8391
+|  Destructions: 8391
 | 5QBase reference count information:
-| Creations:    2519
-| Destructions: 2519
+|  Creations:    1529
+|  Destructions: 1529
 | 6DofMap reference count information:
-| Creations:    1
-| Destructions: 1
+|  Creations:    1
+|  Destructions: 1
 | 6FEBase reference count information:
-| Creations:    200
-| Destructions: 200
+|  Creations:    200
+|  Destructions: 200
 | 6System reference count information:
-| Creations:    1
-| Destructions: 1
+|  Creations:    1
+|  Destructions: 1
  ---------------------------------------------------------------------------- 
  
 ***************************************************************

@@ -241,7 +241,8 @@ Create a dim-dimensional mesh.
 <div class ="fragment">
 <pre>
             Mesh mesh (dim);
-        
+            MeshData mesh_data(mesh);
+            
 </pre>
 </div>
 <div class = "comment">
@@ -252,7 +253,7 @@ grid on an elongated cube.
 
 <div class ="fragment">
 <pre>
-            mesh.read(mesh_file);
+            mesh.read(mesh_file, &mesh_data);
              
 </pre>
 </div>
@@ -846,12 +847,16 @@ the element degrees of freedom get mapped.
 Now we will loop over all the elements in the mesh.
 We will compute the element matrix and right-hand-side
 contribution.
-</div>
+const_elem_iterator           el (mesh.elements_begin());
+const const_elem_iterator end_el (mesh.elements_end());
+
+
+<br><br></div>
 
 <div class ="fragment">
 <pre>
-          const_elem_iterator           el (mesh.elements_begin());
-          const const_elem_iterator end_el (mesh.elements_end());
+          MeshBase::const_element_iterator       el     = mesh.elements_begin();
+          const MeshBase::const_element_iterator end_el = mesh.elements_end();
           
           for ( ; el != end_el; ++el)
             {
@@ -1439,8 +1444,9 @@ if desired.
       <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> dim = 3;
   
       Mesh mesh (dim);
-  
-      mesh.read(mesh_file);
+      MeshData mesh_data(mesh);
+      
+      mesh.read(mesh_file, &amp;mesh_data);
        
   
       mesh.print_info();
@@ -1576,8 +1582,9 @@ if desired.
   
     std::vector&lt;<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B>&gt; dof_indices;
   
-    const_elem_iterator           el (mesh.elements_begin());
-    <FONT COLOR="#228B22"><B>const</FONT></B> const_elem_iterator end_el (mesh.elements_end());
+  
+    MeshBase::const_element_iterator       el     = mesh.elements_begin();
+    <FONT COLOR="#228B22"><B>const</FONT></B> MeshBase::const_element_iterator end_el = mesh.elements_end();
     
     <B><FONT COLOR="#A020F0">for</FONT></B> ( ; el != end_el; ++el)
       {
@@ -1715,9 +1722,11 @@ if desired.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+Compiling C++ (in debug mode) ex8.C...
 Linking ex8...
 /home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
 : the use of `mktemp' is dangerous, better use `mkstemp'
+
 ***************************************************************
 * Running Example  ./ex8
 ***************************************************************
@@ -1725,14 +1734,6 @@ Linking ex8...
 Running ./ex8 pipe-mesh.unv
 
 Mesh file is: pipe-mesh.unv
-  Counting nodes and elements
-  Convert from "D" to "e"
-  Nodes   : 3977
-  Elements: 3520
-  Reading nodes
-  Reading elements
-  Finished.
-
  Mesh Information:
   mesh_dimension()=3
   spatial_dimension()=3
@@ -1749,8 +1750,9 @@ Mesh file is: pipe-mesh.unv
    System "Wave"
     Type "Newmark"
     Variables="p" 
-    Finite Element Types="0" 
-    Approximation Orders="1" 
+    Finite Element Types="0", "12" 
+    Infinite Element Mapping="0" 
+    Approximation Orders="1", "3" 
     n_dofs()=3977
     n_local_dofs()=3977
     n_constrained_dofs()=0
@@ -1770,33 +1772,33 @@ Mesh file is: pipe-mesh.unv
  ---------------------------------------------------------------------------- 
 | Reference count information                                                |
  ---------------------------------------------------------------------------- 
-| 12SparseMatrixIdE reference count information:
-| Creations:    4
-| Destructions: 4
-| 13NumericVectorIdE reference count information:
-| Creations:    11
-| Destructions: 11
-| 21LinearSolverInterfaceIdE reference count information:
-| Creations:    1
-| Destructions: 1
+| 12SparseMatrixISt7complexIdEE reference count information:
+|  Creations:    4
+|  Destructions: 4
+| 13NumericVectorISt7complexIdEE reference count information:
+|  Creations:    11
+|  Destructions: 11
+| 21LinearSolverInterfaceISt7complexIdEE reference count information:
+|  Creations:    1
+|  Destructions: 1
 | 4Elem reference count information:
-| Creations:    24983
-| Destructions: 24983
+|  Creations:    24983
+|  Destructions: 24983
 | 4Node reference count information:
-| Creations:    3977
-| Destructions: 3977
+|  Creations:    3977
+|  Destructions: 3977
 | 5QBase reference count information:
-| Creations:    13
-| Destructions: 13
+|  Creations:    13
+|  Destructions: 13
 | 6DofMap reference count information:
-| Creations:    1
-| Destructions: 1
+|  Creations:    1
+|  Destructions: 1
 | 6FEBase reference count information:
-| Creations:    1
-| Destructions: 1
+|  Creations:    1
+|  Destructions: 1
 | 6System reference count information:
-| Creations:    1
-| Destructions: 1
+|  Creations:    1
+|  Destructions: 1
  ---------------------------------------------------------------------------- 
  
 ***************************************************************

@@ -88,6 +88,8 @@ Basic include files needed for the mesh and
 <div class ="fragment">
 <pre>
         #include "mesh.h"
+        #include "mesh_data.h"
+        #include "unv_io.h"
         #include "gmv_io.h"
         
         
@@ -276,7 +278,8 @@ it.
 <pre>
               assert (dim == 3);
               Mesh mesh(dim);
-        
+              MeshData mesh_data(mesh);
+              
 </pre>
 </div>
 <div class = "comment">
@@ -289,20 +292,20 @@ associated data.
 
 <div class ="fragment">
 <pre>
-              mesh.data.activate();
+              mesh_data.activate();
         
 </pre>
 </div>
 <div class = "comment">
 Now we can safely read the input mesh.  Note that
-this should be a .unv or .xdr/xda file, otherwise
+this should be an .xda/.xdr or .unv file only, otherwise
 we cannot load/save associated data.
 </div>
 
 <div class ="fragment">
 <pre>
-              mesh.read (mesh_file);
-            
+              mesh.read (mesh_file, &mesh_data);
+              
 </pre>
 </div>
 <div class = "comment">
@@ -318,7 +321,7 @@ to the screen.  Obviously, there is no data
         		&lt;&lt; "---------------------------------------------------------" &lt;&lt; std::endl;
               
               mesh.print_info();
-              mesh.data.print_info();
+              mesh_data.print_info();
             
 </pre>
 </div>
@@ -346,7 +349,7 @@ ready for use.
 
 <div class ="fragment">
 <pre>
-                mesh.data.insert_node_data(artificial_data);
+                mesh_data.insert_node_data(artificial_data);
         
 </pre>
 </div>
@@ -370,7 +373,7 @@ Print information about the data to the screen.
         		&lt;&lt; "After inserting artificial data into the MeshData:" &lt;&lt; std::endl
         		&lt;&lt; "--------------------------------------------------" &lt;&lt; std::endl;
               
-              mesh.data.print_info();
+              mesh_data.print_info();
         
 </pre>
 </div>
@@ -383,7 +386,7 @@ file.  Use a default header for this.
 <pre>
               std::string first_out_data="data_first_out_with_default_header.unv";
               std::cout &lt;&lt; "Writing MeshData to: " &lt;&lt; first_out_data &lt;&lt; std::endl;
-              mesh.data.write(first_out_data);
+              mesh_data.write(first_out_data);
         
 </pre>
 </div>
@@ -450,7 +453,7 @@ the same file again, but with the personalized header.
 
 <div class ="fragment">
 <pre>
-              mesh.data.set_unv_header(&my_header);
+              mesh_data.set_unv_header(&my_header);
         
 </pre>
 </div>
@@ -462,7 +465,7 @@ Write again to file.
 <pre>
               std::string second_out_data="data_second_with_header_out.unv";
               std::cout &lt;&lt; "Writing MeshData to: " &lt;&lt; second_out_data &lt;&lt; std::endl;
-              mesh.data.write(second_out_data);
+              mesh_data.write(second_out_data);
               
 </pre>
 </div>
@@ -475,7 +478,7 @@ Print information about the data to the screen.
               std::cout &lt;&lt; std::endl 
         		&lt;&lt; "Before clearing the MeshData:" &lt;&lt; std::endl
         		&lt;&lt; "-----------------------------" &lt;&lt; std::endl;
-              mesh.data.print_info();
+              mesh_data.print_info();
         
 </pre>
 </div>
@@ -487,7 +490,7 @@ clear also these ids, use MeshData::slim() (not used here).
 
 <div class ="fragment">
 <pre>
-              mesh.data.clear();
+              mesh_data.clear();
         
 </pre>
 </div>
@@ -500,7 +503,7 @@ Print information about the data to the screen.
               std::cout &lt;&lt; std::endl 
         		&lt;&lt; "After clearing the MeshData:" &lt;&lt; std::endl
         		&lt;&lt; "----------------------------" &lt;&lt; std::endl;
-              mesh.data.print_info();
+              mesh_data.print_info();
         
 </pre>
 </div>
@@ -511,12 +514,12 @@ file.  Read the file that we created first.
 
 <div class ="fragment">
 <pre>
-              mesh.data.read(first_out_data);
+              mesh_data.read(first_out_data);
               
               std::cout &lt;&lt; std::endl 
         		&lt;&lt; "After re-reading the first file:" &lt;&lt; std::endl
         		&lt;&lt; "--------------------------------" &lt;&lt; std::endl;
-              mesh.data.print_info();
+              mesh_data.print_info();
         
 </pre>
 </div>
@@ -529,6 +532,17 @@ do another example.
 <pre>
             }
         
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+            
             std::cout &lt;&lt; std::endl 
         	      &lt;&lt; "----------------------------------------------" &lt;&lt; std::endl
         	      &lt;&lt; "---------- next example with MeshData --------" &lt;&lt; std::endl
@@ -549,17 +563,20 @@ The libMesh-internal node and element ids are used.
 <pre>
             {
               Mesh mesh(dim);
-        
+              MeshData mesh_data(mesh);
+              
 </pre>
 </div>
 <div class = "comment">
 Read the input mesh, but with deactivated <code>MeshData</code>.
+UNVIO unvio (mesh, mesh_data);
+unvio.read (mesh_file);
 </div>
 
 <div class ="fragment">
 <pre>
-              mesh.read (mesh_file);
-            
+              mesh.read(mesh_file, &mesh_data);
+              
 </pre>
 </div>
 <div class = "comment">
@@ -573,7 +590,7 @@ to the screen.
         		&lt;&lt; "De-activated MeshData:" &lt;&lt; std::endl
         		&lt;&lt; "----------------------" &lt;&lt; std::endl;
               mesh.print_info();
-              mesh.data.print_info();
+              mesh_data.print_info();
          
 </pre>
 </div>
@@ -593,7 +610,7 @@ ids from libMesh.
         		&lt;&lt; "to see the differences in node numbers." &lt;&lt; std::endl
         		&lt;&lt; "---------------------------------------" &lt;&lt; std::endl
         		&lt;&lt; std::endl;
-              mesh.write(out_mesh);
+              mesh.write(out_mesh, &mesh_data);
         
 </pre>
 </div>
@@ -607,7 +624,7 @@ as before.
               {
         	std::map&lt;const Node*, std::vector&lt;Number&gt; &gt; artificial_data;
         	create_artificial_data (mesh, artificial_data);
-        	mesh.data.insert_node_data(artificial_data);
+        	mesh_data.insert_node_data(artificial_data);
               }
         
 </pre>
@@ -622,7 +639,7 @@ DEBUG mode.  And the user <i>has</i> to specify that the
 
 <div class ="fragment">
 <pre>
-              mesh.data.enable_compatibility_mode();
+              mesh_data.enable_compatibility_mode();
         
 </pre>
 </div>
@@ -640,14 +657,14 @@ statement).
         		&lt;&lt; "Writing MeshData to: " &lt;&lt; mesh_data_file &lt;&lt; std::endl
         		&lt;&lt; "----------------------------------------------------------" 
         		&lt;&lt; std::endl &lt;&lt; std::endl;
-              mesh.data.write (mesh_data_file);
+              mesh_data.write (mesh_data_file);
         
         #ifdef HAVE_ZLIB_H
         
 </pre>
 </div>
 <div class = "comment">
-As may already seen, UNV files are text-based, so the may
+As may already seen, UNV files are text-based, so they may
 become really big.  When <code>./configure</code> found <code>zlib.h</code>,
 then we may also <i>read</i> or <i>write</i> <code>.unv</code> files in gzip'ed 
 format! -- Pretty cool, and also pretty fast, due to zlib.h.
@@ -672,10 +689,16 @@ be gzip'ed or not.
         		&lt;&lt; "   diff packed_" &lt;&lt; mesh_data_file &lt;&lt; " " 
         		&lt;&lt; mesh_data_file &lt;&lt; std::endl &lt;&lt; std::endl;
               
-              mesh.data.write (packed_mesh_data_file);
+              mesh_data.write (packed_mesh_data_file);
               
         #endif
         
+        
+        
+        
+        
+        
+              
 </pre>
 </div>
 <div class = "comment">
@@ -721,7 +744,7 @@ Use the <code> mesh</code> itself.  Alternatively, use the
 
 <div class ="fragment">
 <pre>
-                mesh.data.translate (mesh,
+                mesh_data.translate (mesh,
         			     translated_data,
         			     data_names);
         
@@ -778,6 +801,13 @@ All done.
           return libMesh::close();
         }
         
+        
+        
+        
+        
+        
+        
+        
 </pre>
 </div>
 <div class = "comment">
@@ -808,8 +838,19 @@ get the bounding box to have some sensible data
           assert (fabs(x_max-x_min) &gt; TOLERANCE);
         
         
-          const_node_iterator node_it = mesh.nodes_begin();
-          const const_node_iterator node_end = mesh.nodes_end();
+</pre>
+</div>
+<div class = "comment">
+const_node_iterator node_it = mesh.nodes_begin();
+const const_node_iterator node_end = mesh.nodes_end();
+
+
+<br><br></div>
+
+<div class ="fragment">
+<pre>
+          MeshBase::const_node_iterator       node_it  = mesh.nodes_begin();
+          const MeshBase::const_node_iterator node_end = mesh.nodes_end();
         
           for (; node_it != node_end; ++node_it)
             {
@@ -867,6 +908,8 @@ the current node in the map.
   #include <FONT COLOR="#BC8F8F"><B>&quot;libmesh.h&quot;</FONT></B>
   
   #include <FONT COLOR="#BC8F8F"><B>&quot;mesh.h&quot;</FONT></B>
+  #include <FONT COLOR="#BC8F8F"><B>&quot;mesh_data.h&quot;</FONT></B>
+  #include <FONT COLOR="#BC8F8F"><B>&quot;unv_io.h&quot;</FONT></B>
   #include <FONT COLOR="#BC8F8F"><B>&quot;gmv_io.h&quot;</FONT></B>
   
   
@@ -902,24 +945,25 @@ the current node in the map.
       {
         assert (dim == 3);
         Mesh mesh(dim);
+        MeshData mesh_data(mesh);
+        
+        mesh_data.activate();
   
-        mesh.data.activate();
-  
-        mesh.read (mesh_file);
-      
+        mesh.read (mesh_file, &amp;mesh_data);
+        
         std::cout &lt;&lt; std::endl 
   		&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;Finished reading the mesh.  MeshData is active but empty:&quot;</FONT></B> &lt;&lt; std::endl
   		&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;---------------------------------------------------------&quot;</FONT></B> &lt;&lt; std::endl;
         
         mesh.print_info();
-        mesh.data.print_info();
+        mesh_data.print_info();
       
         {
   	std::map&lt;<FONT COLOR="#228B22"><B>const</FONT></B> Node*, std::vector&lt;Number&gt; &gt; artificial_data;
   	
   	create_artificial_data (mesh, artificial_data);
   	
-  	mesh.data.insert_node_data(artificial_data);
+  	mesh_data.insert_node_data(artificial_data);
   
         }
         
@@ -927,11 +971,11 @@ the current node in the map.
   		&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;After inserting artificial data into the MeshData:&quot;</FONT></B> &lt;&lt; std::endl
   		&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;--------------------------------------------------&quot;</FONT></B> &lt;&lt; std::endl;
         
-        mesh.data.print_info();
+        mesh_data.print_info();
   
         std::string first_out_data=<FONT COLOR="#BC8F8F"><B>&quot;data_first_out_with_default_header.unv&quot;</FONT></B>;
         std::cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;Writing MeshData to: &quot;</FONT></B> &lt;&lt; first_out_data &lt;&lt; std::endl;
-        mesh.data.write(first_out_data);
+        mesh_data.write(first_out_data);
   
         std::cout &lt;&lt; std::endl 
   		&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;Attach our own MeshDataUnvHeader to the MeshData:&quot;</FONT></B> &lt;&lt; std::endl
@@ -948,33 +992,44 @@ the current node in the map.
         
         my_header.record_12[0] = libMesh::pi;
         
-        mesh.data.set_unv_header(&amp;my_header);
+        mesh_data.set_unv_header(&amp;my_header);
   
         std::string second_out_data=<FONT COLOR="#BC8F8F"><B>&quot;data_second_with_header_out.unv&quot;</FONT></B>;
         std::cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;Writing MeshData to: &quot;</FONT></B> &lt;&lt; second_out_data &lt;&lt; std::endl;
-        mesh.data.write(second_out_data);
+        mesh_data.write(second_out_data);
         
         std::cout &lt;&lt; std::endl 
   		&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;Before clearing the MeshData:&quot;</FONT></B> &lt;&lt; std::endl
   		&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;-----------------------------&quot;</FONT></B> &lt;&lt; std::endl;
-        mesh.data.print_info();
+        mesh_data.print_info();
   
-        mesh.data.clear();
+        mesh_data.clear();
   
         std::cout &lt;&lt; std::endl 
   		&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;After clearing the MeshData:&quot;</FONT></B> &lt;&lt; std::endl
   		&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;----------------------------&quot;</FONT></B> &lt;&lt; std::endl;
-        mesh.data.print_info();
+        mesh_data.print_info();
   
-        mesh.data.read(first_out_data);
+        mesh_data.read(first_out_data);
         
         std::cout &lt;&lt; std::endl 
   		&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;After re-reading the first file:&quot;</FONT></B> &lt;&lt; std::endl
   		&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;--------------------------------&quot;</FONT></B> &lt;&lt; std::endl;
-        mesh.data.print_info();
+        mesh_data.print_info();
   
       }
   
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+      
       std::cout &lt;&lt; std::endl 
   	      &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;----------------------------------------------&quot;</FONT></B> &lt;&lt; std::endl
   	      &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;---------- next example with MeshData --------&quot;</FONT></B> &lt;&lt; std::endl
@@ -982,14 +1037,15 @@ the current node in the map.
   
       {
         Mesh mesh(dim);
-  
-        mesh.read (mesh_file);
-      
+        MeshData mesh_data(mesh);
+        
+        mesh.read(mesh_file, &amp;mesh_data);
+        
         std::cout &lt;&lt; std::endl 
   		&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;De-activated MeshData:&quot;</FONT></B> &lt;&lt; std::endl
   		&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;----------------------&quot;</FONT></B> &lt;&lt; std::endl;
         mesh.print_info();
-        mesh.data.print_info();
+        mesh_data.print_info();
    
         <FONT COLOR="#228B22"><B>const</FONT></B> std::string out_mesh = <FONT COLOR="#BC8F8F"><B>&quot;mesh_with_libmesh_ids.unv&quot;</FONT></B>;
         std::cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;Writing _Mesh_ to: &quot;</FONT></B> &lt;&lt; out_mesh &lt;&lt; std::endl
@@ -997,22 +1053,22 @@ the current node in the map.
   		&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;to see the differences in node numbers.&quot;</FONT></B> &lt;&lt; std::endl
   		&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;---------------------------------------&quot;</FONT></B> &lt;&lt; std::endl
   		&lt;&lt; std::endl;
-        mesh.write(out_mesh);
+        mesh.write(out_mesh, &amp;mesh_data);
   
         {
   	std::map&lt;<FONT COLOR="#228B22"><B>const</FONT></B> Node*, std::vector&lt;Number&gt; &gt; artificial_data;
   	create_artificial_data (mesh, artificial_data);
-  	mesh.data.insert_node_data(artificial_data);
+  	mesh_data.insert_node_data(artificial_data);
         }
   
-        mesh.data.enable_compatibility_mode();
+        mesh_data.enable_compatibility_mode();
   
         std::string mesh_data_file = <FONT COLOR="#BC8F8F"><B>&quot;data_third_with_libmesh_ids_out.unv&quot;</FONT></B>;
         std::cout &lt;&lt; std::endl 
   		&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;Writing MeshData to: &quot;</FONT></B> &lt;&lt; mesh_data_file &lt;&lt; std::endl
   		&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;----------------------------------------------------------&quot;</FONT></B> 
   		&lt;&lt; std::endl &lt;&lt; std::endl;
-        mesh.data.write (mesh_data_file);
+        mesh_data.write (mesh_data_file);
   
   #ifdef HAVE_ZLIB_H
   
@@ -1025,15 +1081,21 @@ the current node in the map.
   		&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;   diff packed_&quot;</FONT></B> &lt;&lt; mesh_data_file &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B> 
   		&lt;&lt; mesh_data_file &lt;&lt; std::endl &lt;&lt; std::endl;
         
-        mesh.data.write (packed_mesh_data_file);
+        mesh_data.write (packed_mesh_data_file);
         
   #endif
   
+  
+  
+  
+  
+  
+        
         {
   	std::vector&lt;Number&gt; translated_data;
   	std::vector&lt;std::string&gt; data_names;
   	
-  	mesh.data.translate (mesh,
+  	mesh_data.translate (mesh,
   			     translated_data,
   			     data_names);
   
@@ -1057,6 +1119,13 @@ the current node in the map.
     <B><FONT COLOR="#A020F0">return</FONT></B> libMesh::close();
   }
   
+  
+  
+  
+  
+  
+  
+  
   <FONT COLOR="#228B22"><B>void</FONT></B> create_artificial_data (<FONT COLOR="#228B22"><B>const</FONT></B> Mesh&amp; mesh,
   			     std::map&lt;<FONT COLOR="#228B22"><B>const</FONT></B> Node*, std::vector&lt;Number&gt; &gt;&amp; art_data)
   {
@@ -1071,8 +1140,9 @@ the current node in the map.
     assert (fabs(x_max-x_min) &gt; TOLERANCE);
   
   
-    const_node_iterator node_it = mesh.nodes_begin();
-    <FONT COLOR="#228B22"><B>const</FONT></B> const_node_iterator node_end = mesh.nodes_end();
+  
+    MeshBase::const_node_iterator       node_it  = mesh.nodes_begin();
+    <FONT COLOR="#228B22"><B>const</FONT></B> MeshBase::const_node_iterator node_end = mesh.nodes_end();
   
     <B><FONT COLOR="#A020F0">for</FONT></B> (; node_it != node_end; ++node_it)
       {
@@ -1094,21 +1164,15 @@ the current node in the map.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+Compiling C++ (in debug mode) ex12.C...
 Linking ex12...
 /home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
 : the use of `mktemp' is dangerous, better use `mkstemp'
+
 ***************************************************************
 * Running Example  ./ex12
 ***************************************************************
  
-  Counting nodes and elements
-  Convert from "D" to "e"
-  Nodes   : 3977
-  Elements: 3520
-  Reading nodes
-  Reading elements
-  Finished.
-
 
 Finished reading the mesh.  MeshData is active but empty:
 ---------------------------------------------------------
@@ -1179,28 +1243,9 @@ After re-reading the first file:
    n_node_data()=3977
 
 
- ---------------------------------------------------------------------------- 
-| Reference count information                                                |
- ---------------------------------------------------------------------------- 
-| 4Elem reference count information:
-| Creations:    24983
-| Destructions: 24983
-| 4Node reference count information:
-| Creations:    3977
-| Destructions: 3977
- ---------------------------------------------------------------------------- 
-
 ----------------------------------------------
 ---------- next example with MeshData --------
 ----------------------------------------------
-  Counting nodes and elements
-  Convert from "D" to "e"
-  Nodes   : 3977
-  Elements: 3520
-  Reading nodes
-  Reading elements
-  Finished.
-
 
 De-activated MeshData:
 ----------------------
@@ -1229,9 +1274,6 @@ to see the differences in node numbers.
 *          file with caution: libMesh node and element ids are used.    *
 *************************************************************************
 
-  Writing 3977 nodes
-  Writing elements
-  Finished writing 3520 elements
 
 Writing MeshData to: data_third_with_libmesh_ids_out.unv
 ----------------------------------------------------------
@@ -1253,9 +1295,17 @@ WARNING: MeshData in compatibility mode.  Node and element ids
 
 Writing the data from the MeshData to the GMV file data_and_mesh_out.gmv
 ------------------------------------------------------------------------
-WARNING! There are options you set that were not used!
-WARNING! could be spelling mistake, etc!
-Option left: name:-d value: 3
+
+ ---------------------------------------------------------------------------- 
+| Reference count information                                                |
+ ---------------------------------------------------------------------------- 
+| 4Elem reference count information:
+|  Creations:    49966
+|  Destructions: 49966
+| 4Node reference count information:
+|  Creations:    7954
+|  Destructions: 7954
+ ---------------------------------------------------------------------------- 
  
 ***************************************************************
 * Done Running Example  ./ex12

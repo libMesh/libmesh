@@ -789,12 +789,16 @@ live on the local processor. We will compute the element
 matrix and right-hand-side contribution.  Since the mesh
 will be refined we want to only consider the ACTIVE elements,
 hence we use a variant of the \p active_elem_iterator.
-</div>
+const_active_local_elem_iterator           el (mesh.elements_begin());
+const const_active_local_elem_iterator end_el (mesh.elements_end());
+
+
+<br><br></div>
 
 <div class ="fragment">
 <pre>
-          const_active_local_elem_iterator           el (mesh.elements_begin());
-          const const_active_local_elem_iterator end_el (mesh.elements_end());
+          MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+          const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end(); 
           
           for ( ; el != end_el; ++el)
             {    
@@ -1469,8 +1473,9 @@ That's it.
     <FONT COLOR="#228B22"><B>const</FONT></B> Real dt    = es.parameter(<FONT COLOR="#BC8F8F"><B>&quot;dt&quot;</FONT></B>);
     <FONT COLOR="#228B22"><B>const</FONT></B> Real theta = 1.;
       
-    const_active_local_elem_iterator           el (mesh.elements_begin());
-    <FONT COLOR="#228B22"><B>const</FONT></B> const_active_local_elem_iterator end_el (mesh.elements_end());
+  
+    MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+    <FONT COLOR="#228B22"><B>const</FONT></B> MeshBase::const_element_iterator end_el = mesh.active_local_elements_end(); 
     
     <B><FONT COLOR="#A020F0">for</FONT></B> ( ; el != end_el; ++el)
       {    
@@ -1636,9 +1641,11 @@ That's it.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+Compiling C++ (in debug mode) ex13.C...
 Linking ex13...
 /home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
 : the use of `mktemp' is dangerous, better use `mkstemp'
+
 ***************************************************************
 * Running Example  ./ex13
 ***************************************************************
@@ -1659,8 +1666,9 @@ Linking ex13...
    System "Navier-Stokes"
     Type "TransientImplicit"
     Variables="u" "v" "p" 
-    Finite Element Types="0" "0" "0" 
-    Approximation Orders="2" "2" "1" 
+    Finite Element Types="0", "12" "0", "12" "0", "12" 
+    Infinite Element Mapping="0" "0" "0" 
+    Approximation Orders="2", "3" "2", "3" "1", "3" 
     n_dofs()=3803
     n_local_dofs()=3803
     n_constrained_dofs()=0
@@ -1735,57 +1743,57 @@ Linear solver converged at step: 28, final residual: 1.17971e-08  Nonlinear conv
  Nonlinear solver converged at step 1
 
  ----------------------------------------------------------------------------
-| Time:           Thu May 20 17:41:20 2004
+| Time:           Fri Nov 12 12:16:40 2004
 | OS:             Linux
-| HostName:       arthur
+| HostName:       zaniwoop
 | OS Release      2.4.20-19.9smp
 | OS Version:     #1 SMP Tue Jul 15 17:04:18 EDT 2003
 | Machine:        i686
 | Username:       peterson
  ----------------------------------------------------------------------------
  ----------------------------------------------------------------------------
-| Example 13 Performance: Alive time=46.7428, Active time=45.282
+| Example 13 Performance: Alive time=22.0944, Active time=21.2389
  ----------------------------------------------------------------------------
 | Event                         nCalls  Total       Avg         Percent of   |
 |                                       Time        Time        Active Time  |
 |----------------------------------------------------------------------------|
 |                                                                            |
-| linear solve                  33      45.2820     1.372182    100.00       |
+| linear solve                  33      21.2389     0.643604    100.00       |
  ----------------------------------------------------------------------------
-| Totals:                       33      45.2820                 100.00       |
+| Totals:                       33      21.2389                 100.00       |
  ----------------------------------------------------------------------------
 
 
  ---------------------------------------------------------------------------- 
 | Reference count information                                                |
  ---------------------------------------------------------------------------- 
-| 12SparseMatrixIdE reference count information:
-| Creations:    1
-| Destructions: 1
-| 13NumericVectorIdE reference count information:
-| Creations:    6
-| Destructions: 6
-| 21LinearSolverInterfaceIdE reference count information:
-| Creations:    1
-| Destructions: 1
+| 12SparseMatrixISt7complexIdEE reference count information:
+|  Creations:    1
+|  Destructions: 1
+| 13NumericVectorISt7complexIdEE reference count information:
+|  Creations:    6
+|  Destructions: 6
+| 21LinearSolverInterfaceISt7complexIdEE reference count information:
+|  Creations:    1
+|  Destructions: 1
 | 4Elem reference count information:
-| Creations:    4640
-| Destructions: 4640
+|  Creations:    4640
+|  Destructions: 4640
 | 4Node reference count information:
-| Creations:    1681
-| Destructions: 1681
+|  Creations:    1681
+|  Destructions: 1681
 | 5QBase reference count information:
-| Creations:    66
-| Destructions: 66
+|  Creations:    66
+|  Destructions: 66
 | 6DofMap reference count information:
-| Creations:    1
-| Destructions: 1
+|  Creations:    1
+|  Destructions: 1
 | 6FEBase reference count information:
-| Creations:    66
-| Destructions: 66
+|  Creations:    66
+|  Destructions: 66
 | 6System reference count information:
-| Creations:    1
-| Destructions: 1
+|  Creations:    1
+|  Destructions: 1
  ---------------------------------------------------------------------------- 
  
 ***************************************************************

@@ -552,12 +552,16 @@ use the most basic type, the  const_elem_iterator.  The iterator
 el will iterate from the first to the last element.  The
 iterator  end_el tells us when to stop.  It is smart to make
 this one  const so that we don't accidentally mess it up!
-</div>
+const_elem_iterator           el (mesh.elements_begin());
+const const_elem_iterator end_el (mesh.elements_end());
+
+
+<br><br></div>
 
 <div class ="fragment">
 <pre>
-          const_elem_iterator           el (mesh.elements_begin());
-          const const_elem_iterator end_el (mesh.elements_end());
+          MeshBase::const_element_iterator       el     = mesh.elements_begin();
+          const MeshBase::const_element_iterator end_el = mesh.elements_end();
         
         
 </pre>
@@ -1029,8 +1033,9 @@ All done!
   
     std::vector&lt;<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B>&gt; dof_indices;
   
-    const_elem_iterator           el (mesh.elements_begin());
-    <FONT COLOR="#228B22"><B>const</FONT></B> const_elem_iterator end_el (mesh.elements_end());
+  
+    MeshBase::const_element_iterator       el     = mesh.elements_begin();
+    <FONT COLOR="#228B22"><B>const</FONT></B> MeshBase::const_element_iterator end_el = mesh.elements_end();
   
   
     <B><FONT COLOR="#A020F0">for</FONT></B> ( ; el != end_el ; ++el)
@@ -1116,10 +1121,11 @@ All done!
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-Compiling C++ (in debug mode) exact_solution.C...
+Compiling C++ (in debug mode) ex3.C...
 Linking ex3...
 /home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
 : the use of `mktemp' is dangerous, better use `mkstemp'
+
 ***************************************************************
 * Running Example  ./ex3
 ***************************************************************
@@ -1142,8 +1148,9 @@ Running ./ex3
    System "Poisson"
     Type "Implicit"
     Variables="u" 
-    Finite Element Types="0" 
-    Approximation Orders="2" 
+    Finite Element Types="0", "12" 
+    Infinite Element Mapping="0" 
+    Approximation Orders="2", "3" 
     n_dofs()=961
     n_local_dofs()=961
     n_constrained_dofs()=0
@@ -1157,33 +1164,33 @@ Running ./ex3
  ---------------------------------------------------------------------------- 
 | Reference count information                                                |
  ---------------------------------------------------------------------------- 
-| 12SparseMatrixIdE reference count information:
-| Creations:    1
-| Destructions: 1
-| 13NumericVectorIdE reference count information:
-| Creations:    3
-| Destructions: 3
-| 21LinearSolverInterfaceIdE reference count information:
-| Creations:    1
-| Destructions: 1
+| 12SparseMatrixISt7complexIdEE reference count information:
+|  Creations:    1
+|  Destructions: 1
+| 13NumericVectorISt7complexIdEE reference count information:
+|  Creations:    3
+|  Destructions: 3
+| 21LinearSolverInterfaceISt7complexIdEE reference count information:
+|  Creations:    1
+|  Destructions: 1
 | 4Elem reference count information:
-| Creations:    1185
-| Destructions: 1185
+|  Creations:    1185
+|  Destructions: 1185
 | 4Node reference count information:
-| Creations:    961
-| Destructions: 961
+|  Creations:    961
+|  Destructions: 961
 | 5QBase reference count information:
-| Creations:    3
-| Destructions: 3
+|  Creations:    3
+|  Destructions: 3
 | 6DofMap reference count information:
-| Creations:    1
-| Destructions: 1
+|  Creations:    1
+|  Destructions: 1
 | 6FEBase reference count information:
-| Creations:    2
-| Destructions: 2
+|  Creations:    2
+|  Destructions: 2
 | 6System reference count information:
-| Creations:    1
-| Destructions: 1
+|  Creations:    1
+|  Destructions: 1
  ---------------------------------------------------------------------------- 
  
 ***************************************************************

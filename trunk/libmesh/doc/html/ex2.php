@@ -391,9 +391,11 @@ MPI.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+Compiling C++ (in debug mode) ex2.C...
 Linking ex2...
 /home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
 : the use of `mktemp' is dangerous, better use `mkstemp'
+
 ***************************************************************
 * Running Example  ./ex2
 ***************************************************************
@@ -416,8 +418,9 @@ Running ./ex2
    System "Simple System"
     Type "TransientImplicit"
     Variables="u" 
-    Finite Element Types="0" 
-    Approximation Orders="1" 
+    Finite Element Types="0", "12" 
+    Infinite Element Mapping="0" 
+    Approximation Orders="1", "3" 
     n_dofs()=36
     n_local_dofs()=36
     n_constrained_dofs()=0
@@ -436,27 +439,27 @@ Running ./ex2
  ---------------------------------------------------------------------------- 
 | Reference count information                                                |
  ---------------------------------------------------------------------------- 
-| 12SparseMatrixIdE reference count information:
-| Creations:    1
-| Destructions: 1
-| 13NumericVectorIdE reference count information:
-| Creations:    5
-| Destructions: 5
-| 21LinearSolverInterfaceIdE reference count information:
-| Creations:    1
-| Destructions: 1
+| 12SparseMatrixISt7complexIdEE reference count information:
+|  Creations:    1
+|  Destructions: 1
+| 13NumericVectorISt7complexIdEE reference count information:
+|  Creations:    5
+|  Destructions: 5
+| 21LinearSolverInterfaceISt7complexIdEE reference count information:
+|  Creations:    1
+|  Destructions: 1
 | 4Elem reference count information:
-| Creations:    125
-| Destructions: 125
+|  Creations:    125
+|  Destructions: 125
 | 4Node reference count information:
-| Creations:    36
-| Destructions: 36
+|  Creations:    36
+|  Destructions: 36
 | 6DofMap reference count information:
-| Creations:    1
-| Destructions: 1
+|  Creations:    1
+|  Destructions: 1
 | 6System reference count information:
-| Creations:    1
-| Destructions: 1
+|  Creations:    1
+|  Destructions: 1
  ---------------------------------------------------------------------------- 
  
 Running ./ex2 eqn_sys.dat
@@ -477,8 +480,9 @@ Running ./ex2 eqn_sys.dat
    System "Simple System"
     Type "TransientImplicit"
     Variables="u" 
-    Finite Element Types="0" 
-    Approximation Orders="1" 
+    Finite Element Types="0", "12" 
+    Infinite Element Mapping="0" 
+    Approximation Orders="1", "3" 
     n_dofs()=36
     n_local_dofs()=36
     n_constrained_dofs()=0
@@ -496,13 +500,16 @@ Running ./ex2 eqn_sys.dat
 <<< Writing system to file eqn_sys.dat
 >>> Reading system from file eqn_sys.dat
 
+global_vector.size()=36
+this->n_dofs()=36
  EquationSystems
   n_systems()=1
    System "Simple System"
     Type "TransientImplicit"
     Variables="u" 
-    Finite Element Types="0" 
-    Approximation Orders="1" 
+    Finite Element Types="0", "12" 
+    Infinite Element Mapping="0" 
+    Approximation Orders="1", "3" 
     n_dofs()=36
     n_local_dofs()=36
     n_constrained_dofs()=0
@@ -521,27 +528,27 @@ Running ./ex2 eqn_sys.dat
  ---------------------------------------------------------------------------- 
 | Reference count information                                                |
  ---------------------------------------------------------------------------- 
-| 12SparseMatrixIdE reference count information:
-| Creations:    2
-| Destructions: 2
-| 13NumericVectorIdE reference count information:
-| Creations:    10
-| Destructions: 10
-| 21LinearSolverInterfaceIdE reference count information:
-| Creations:    2
-| Destructions: 2
+| 12SparseMatrixISt7complexIdEE reference count information:
+|  Creations:    2
+|  Destructions: 2
+| 13NumericVectorISt7complexIdEE reference count information:
+|  Creations:    10
+|  Destructions: 10
+| 21LinearSolverInterfaceISt7complexIdEE reference count information:
+|  Creations:    2
+|  Destructions: 2
 | 4Elem reference count information:
-| Creations:    125
-| Destructions: 125
+|  Creations:    125
+|  Destructions: 125
 | 4Node reference count information:
-| Creations:    36
-| Destructions: 36
+|  Creations:    36
+|  Destructions: 36
 | 6DofMap reference count information:
-| Creations:    2
-| Destructions: 2
+|  Creations:    2
+|  Destructions: 2
 | 6System reference count information:
-| Creations:    2
-| Destructions: 2
+|  Creations:    2
+|  Destructions: 2
  ---------------------------------------------------------------------------- 
  
 ***************************************************************

@@ -607,12 +607,16 @@ the element degrees of freedom get mapped.
 Now we will loop over all the elements in the mesh.
 We will compute the element matrix and right-hand-side
 contribution.
-</div>
+const_local_elem_iterator           el (mesh.elements_begin());
+const const_local_elem_iterator end_el (mesh.elements_end());
+
+
+<br><br></div>
 
 <div class ="fragment">
 <pre>
-          const_local_elem_iterator           el (mesh.elements_begin());
-          const const_local_elem_iterator end_el (mesh.elements_end());
+          MeshBase::const_element_iterator           el = mesh.local_elements_begin();
+          const MeshBase::const_element_iterator end_el = mesh.local_elements_end();
           
           for ( ; el != end_el; ++el)
             {      
@@ -1160,8 +1164,9 @@ All done!
     
     std::vector&lt;<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B>&gt; dof_indices;
     
-    const_local_elem_iterator           el (mesh.elements_begin());
-    <FONT COLOR="#228B22"><B>const</FONT></B> const_local_elem_iterator end_el (mesh.elements_end());
+  
+    MeshBase::const_element_iterator           el = mesh.local_elements_begin();
+    <FONT COLOR="#228B22"><B>const</FONT></B> MeshBase::const_element_iterator end_el = mesh.local_elements_end();
     
     <B><FONT COLOR="#A020F0">for</FONT></B> ( ; el != end_el; ++el)
       {      
@@ -1279,15 +1284,99 @@ All done!
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+Compiling C++ (in debug mode) ex6.C...
 Linking ex6...
 /home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
 : the use of `mktemp' is dangerous, better use `mkstemp'
+
 ***************************************************************
 * Running Example  ./ex6
 ***************************************************************
  
-ERROR: This example requires the library to be compiled with Infinite Element support!
-[0] ex6.C, line 83, compiled May 20 2004 at 15:19:42
+Running ex6 with dim = 3
+
+ Mesh Information:
+  mesh_dimension()=3
+  spatial_dimension()=3
+  n_nodes()=125
+  n_elem()=64
+   n_local_elem()=64
+   n_active_elem()=64
+  n_subdomains()=1
+  n_processors()=1
+  processor_id()=0
+
+ Determined origin for Infinite Elements:
+  0.00000 0.00000 0.00000 
+
+ Building Infinite Elements:
+  updating element neighbor tables...
+  collecting boundary sides...
+  found 0 inner and 96 outer boundary faces
+  added 96 infinite elements and 98 nodes to the mesh
+
+ Mesh Information:
+  mesh_dimension()=3
+  spatial_dimension()=3
+  n_nodes()=223
+  n_elem()=160
+   n_local_elem()=160
+   n_active_elem()=160
+  n_subdomains()=1
+  n_processors()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System "Wave"
+    Type "Implicit"
+    Variables="p" 
+    Finite Element Types="0", "12" 
+    Infinite Element Mapping="0" 
+    Approximation Orders="1", "3" 
+    n_dofs()=419
+    n_local_dofs()=419
+    n_constrained_dofs()=0
+    n_vectors()=1
+  n_parameters()=4
+   Parameters:
+    "fluid density"=1
+    "linear solver maximum iterations"=5000
+    "linear solver tolerance"=1e-12
+    "speed"=1
+
+
+ ---------------------------------------------------------------------------- 
+| Reference count information                                                |
+ ---------------------------------------------------------------------------- 
+| 12SparseMatrixISt7complexIdEE reference count information:
+|  Creations:    1
+|  Destructions: 1
+| 13NumericVectorISt7complexIdEE reference count information:
+|  Creations:    3
+|  Destructions: 3
+| 21LinearSolverInterfaceISt7complexIdEE reference count information:
+|  Creations:    1
+|  Destructions: 1
+| 4Elem reference count information:
+|  Creations:    3219
+|  Destructions: 3219
+| 4Node reference count information:
+|  Creations:    223
+|  Destructions: 223
+| 5QBase reference count information:
+|  Creations:    5
+|  Destructions: 5
+| 6DofMap reference count information:
+|  Creations:    1
+|  Destructions: 1
+| 6FEBase reference count information:
+|  Creations:    3
+|  Destructions: 3
+| 6System reference count information:
+|  Creations:    1
+|  Destructions: 1
+ ---------------------------------------------------------------------------- 
  
 ***************************************************************
 * Done Running Example  ./ex6

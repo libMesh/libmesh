@@ -476,12 +476,16 @@ live on the local processor. We will compute the element
 matrix and right-hand-side contribution.  Since the mesh
 will be refined we want to only consider the ACTIVE elements,
 hence we use a variant of the \p active_elem_iterator.
-</div>
+const_active_local_elem_iterator           el (mesh.elements_begin());
+const const_active_local_elem_iterator end_el (mesh.elements_end());
+
+
+<br><br></div>
 
 <div class ="fragment">
 <pre>
-          const_active_local_elem_iterator           el (mesh.elements_begin());
-          const const_active_local_elem_iterator end_el (mesh.elements_end());
+          MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+          const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end(); 
           
           for ( ; el != end_el; ++el)
             {    
@@ -973,8 +977,9 @@ That's it.
     std::vector&lt;<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B>&gt; dof_indices_v;
     std::vector&lt;<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B>&gt; dof_indices_p;
     
-    const_active_local_elem_iterator           el (mesh.elements_begin());
-    <FONT COLOR="#228B22"><B>const</FONT></B> const_active_local_elem_iterator end_el (mesh.elements_end());
+  
+    MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+    <FONT COLOR="#228B22"><B>const</FONT></B> MeshBase::const_element_iterator end_el = mesh.active_local_elements_end(); 
     
     <B><FONT COLOR="#A020F0">for</FONT></B> ( ; el != end_el; ++el)
       {    
@@ -1085,9 +1090,11 @@ That's it.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+Compiling C++ (in debug mode) ex11.C...
 Linking ex11...
 /home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
 : the use of `mktemp' is dangerous, better use `mkstemp'
+
 ***************************************************************
 * Running Example  ./ex11
 ***************************************************************
@@ -1108,8 +1115,9 @@ Linking ex11...
    System "Stokes"
     Type "Implicit"
     Variables="u" "v" "p" 
-    Finite Element Types="0" "0" "0" 
-    Approximation Orders="2" "2" "1" 
+    Finite Element Types="0", "12" "0", "12" "0", "12" 
+    Infinite Element Mapping="0" "0" "0" 
+    Approximation Orders="2", "3" "2", "3" "1", "3" 
     n_dofs()=2178
     n_local_dofs()=2178
     n_constrained_dofs()=0
@@ -1123,33 +1131,33 @@ Linking ex11...
  ---------------------------------------------------------------------------- 
 | Reference count information                                                |
  ---------------------------------------------------------------------------- 
-| 12SparseMatrixIdE reference count information:
-| Creations:    1
-| Destructions: 1
-| 13NumericVectorIdE reference count information:
-| Creations:    3
-| Destructions: 3
-| 21LinearSolverInterfaceIdE reference count information:
-| Creations:    1
-| Destructions: 1
+| 12SparseMatrixISt7complexIdEE reference count information:
+|  Creations:    1
+|  Destructions: 1
+| 13NumericVectorISt7complexIdEE reference count information:
+|  Creations:    3
+|  Destructions: 3
+| 21LinearSolverInterfaceISt7complexIdEE reference count information:
+|  Creations:    1
+|  Destructions: 1
 | 4Elem reference count information:
-| Creations:    1185
-| Destructions: 1185
+|  Creations:    1185
+|  Destructions: 1185
 | 4Node reference count information:
-| Creations:    961
-| Destructions: 961
+|  Creations:    961
+|  Destructions: 961
 | 5QBase reference count information:
-| Creations:    2
-| Destructions: 2
+|  Creations:    2
+|  Destructions: 2
 | 6DofMap reference count information:
-| Creations:    1
-| Destructions: 1
+|  Creations:    1
+|  Destructions: 1
 | 6FEBase reference count information:
-| Creations:    2
-| Destructions: 2
+|  Creations:    2
+|  Destructions: 2
 | 6System reference count information:
-| Creations:    1
-| Destructions: 1
+|  Creations:    1
+|  Destructions: 1
  ---------------------------------------------------------------------------- 
  
 ***************************************************************
