@@ -1,4 +1,4 @@
-// $Id: predicated_iterator.h,v 1.4 2003-02-20 12:55:08 spetersen Exp $
+// $Id: predicated_iterator.h,v 1.5 2003-02-21 22:40:59 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -88,12 +88,6 @@ public:
   typedef typename std::iterator_traits<T>::value_type value_type; 
 
   /**
-   * The predicate.  Must be redefined in classes
-   * derived from this class.
-   */
-  virtual bool predicate() const = 0;
-
-  /**
    * Used to simulate the index of a for loop.
    * Call this if you need explicit access to
    * the loop variable for any reason.
@@ -174,6 +168,14 @@ public:
   }
   
 protected:
+
+  /**
+   * The predicate.  Must be redefined in classes
+   * derived from this class.  This method is protected
+   * since users should never try to cheat and call it
+   * themselves.
+   */
+  virtual bool predicate() const = 0;
 
   /**
    * op=.  Protected since users should
