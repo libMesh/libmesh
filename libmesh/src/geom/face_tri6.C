@@ -1,4 +1,4 @@
-// $Id: face_tri6.C,v 1.19 2005-01-28 19:14:18 benkirk Exp $
+// $Id: face_tri6.C,v 1.20 2005-02-19 19:07:01 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -92,6 +92,26 @@ const float Tri6::_embedding_matrix[4][6][6] =
 
 // ------------------------------------------------------------
 // Tri6 class member functions
+
+bool Tri6::is_vertex(const unsigned int i) const
+{
+  if (i < 3)
+    return true;
+  return false;
+}
+
+bool Tri6::is_edge(const unsigned int i) const
+{
+  if (i < 3)
+    return false;
+  return true;
+}
+
+bool Tri6::is_face(const unsigned int) const
+{
+  return false;
+}
+
 unsigned int Tri6::key (const unsigned int s) const
 {
   assert (s < this->n_sides());

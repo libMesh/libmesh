@@ -1,4 +1,4 @@
-// $Id: face_inf_quad6.C,v 1.21 2004-07-14 19:23:18 jwpeterson Exp $
+// $Id: face_inf_quad6.C,v 1.22 2005-02-19 19:07:01 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -34,6 +34,26 @@
 
 // ------------------------------------------------------------
 // InfQuad6 class member functions
+
+bool InfQuad6::is_vertex(const unsigned int i) const
+{
+  if (i < 4)
+    return true;
+  return false;
+}
+
+bool InfQuad6::is_edge(const unsigned int i) const
+{
+  if (i < 4)
+    return false;
+  return true;
+}
+
+bool InfQuad6::is_face(const unsigned int) const
+{
+  return false;
+}
+
 #ifdef ENABLE_AMR
 
 const float InfQuad6::_embedding_matrix[2][6][6] =

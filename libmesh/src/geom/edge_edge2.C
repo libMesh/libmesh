@@ -1,4 +1,4 @@
-// $Id: edge_edge2.C,v 1.10 2004-07-14 19:23:18 jwpeterson Exp $
+// $Id: edge_edge2.C,v 1.11 2005-02-19 19:07:01 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -22,6 +22,21 @@
 // Local includes
 #include "edge_edge2.h"
 
+
+bool Edge2::is_vertex(const unsigned int) const
+{
+  return true;
+}
+
+bool Edge2::is_edge(const unsigned int) const
+{
+  return false;
+}
+
+bool Edge2::is_face(const unsigned int) const
+{
+  return false;
+}
 
 void Edge2::connectivity(const unsigned int sc,
 			 const IOPackage iop,

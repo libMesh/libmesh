@@ -1,4 +1,4 @@
-// $Id: cell_prism15.C,v 1.9 2005-01-28 19:14:17 benkirk Exp $
+// $Id: cell_prism15.C,v 1.10 2005-02-19 19:07:01 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -42,6 +42,26 @@ const unsigned int Prism15::side_nodes_map[5][8] =
 
 // ------------------------------------------------------------
 // Prism15 class member functions
+
+bool Prism15::is_vertex(const unsigned int i) const
+{
+  if (i < 6)
+    return true;
+  return false;
+}
+
+bool Prism15::is_edge(const unsigned int i) const
+{
+  if (i < 6)
+    return false;
+  return true;
+}
+
+bool Prism15::is_face(const unsigned int) const
+{
+  return false;
+}
+
 AutoPtr<Elem> Prism15::build_side (const unsigned int i) const
 {
   assert (i < this->n_sides());

@@ -1,4 +1,4 @@
-// $Id: face_inf_quad4.C,v 1.21 2004-07-14 19:23:18 jwpeterson Exp $
+// $Id: face_inf_quad4.C,v 1.22 2005-02-19 19:07:01 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -33,6 +33,22 @@
 
 // ------------------------------------------------------------
 // InfQuad4 class member functions
+
+bool InfQuad4::is_vertex(const unsigned int) const
+{
+  return true;
+}
+
+bool InfQuad4::is_edge(const unsigned int) const
+{
+  return false;
+}
+
+bool InfQuad4::is_face(const unsigned int) const
+{
+  return false;
+}
+
 bool InfQuad4::contains_point (const Point& p) const
 {
   /*

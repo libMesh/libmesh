@@ -1,4 +1,4 @@
-// $Id: cell_pyramid5.C,v 1.13 2005-01-28 19:14:18 benkirk Exp $
+// $Id: cell_pyramid5.C,v 1.14 2005-02-19 19:07:01 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -44,6 +44,22 @@ const unsigned int Pyramid5::side_nodes_map[5][4] =
 
 // ------------------------------------------------------------
 // Pyramid5 class member functions
+
+bool Pyramid5::is_vertex(const unsigned int) const
+{
+  return true;
+}
+
+bool Pyramid5::is_edge(const unsigned int) const
+{
+  return false;
+}
+
+bool Pyramid5::is_face(const unsigned int) const
+{
+  return false;
+}
+
 AutoPtr<Elem> Pyramid5::build_side (const unsigned int i) const
 {
   assert (i < this->n_sides());
