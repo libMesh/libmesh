@@ -1,4 +1,4 @@
-// $Id: mesh_function.C,v 1.2.2.2 2003-05-13 22:08:21 benkirk Exp $
+// $Id: mesh_function.C,v 1.2.2.3 2003-05-14 14:07:20 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -150,18 +150,20 @@ Number MeshFunction::operator() (const Point& p,
 				 const Real time)
 {
   assert (this->initialized());
-
+  // At the moment the function we call ignores the time
+  assert (time == 0.);
+  
   DenseVector<Number> buf (1);
-  this->operator() (buf, p, time);
+  this->operator() (p, time, buf);
   return buf(0);
 }
 
 
 
 
-void MeshFunction::operator() (DenseVector<Number>& output,
-			       const Point& p,
-			       const Real)
+void MeshFunction::operator() (const Point& p,
+			       const Real,
+			       DenseVector<Number>& output)
 {
   assert (this->initialized());
 
@@ -215,7 +217,7 @@ void MeshFunction::operator() (DenseVector<Number>& output,
 	    Number value = 0.;
 
 	    for (unsigned int i=0; i<dof_indices.size(); i++)
-		value += this->_vector(dof_indices[i]) * data.shape[i];
+	      value += this->_vector(dof_indices[i]) * data.shape[i];
 
 	    output(index) = value;
 	  }

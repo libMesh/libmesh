@@ -1,4 +1,4 @@
-// $Id: mesh_function.h,v 1.1.2.2 2003-05-13 22:08:21 benkirk Exp $
+// $Id: mesh_function.h,v 1.1.2.3 2003-05-14 14:07:20 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -100,9 +100,9 @@ public:
    * whether \p output has to have the correct length or should be
    * resized.
    */
-  void operator() (DenseVector<Number>& output,
-		   const Point& p,
-		   const Real time=0.);
+  void operator() (const Point& p,
+		   const Real time,
+		   DenseVector<Number>& output);
 
 protected:
 
