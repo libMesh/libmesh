@@ -3,5 +3,6 @@ powerpc-ibm-aix5.1.0.0*
 alphaev*-unknown-linux-gnu*
 mips-sgi-irix6.5*
 x86_64-unknown-linux-gnu*
+ia64-unknown-linux-gnu*
 ii_files
 so_locations
