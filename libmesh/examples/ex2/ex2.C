@@ -1,4 +1,4 @@
-/* $Id: ex2.C,v 1.15 2004-11-15 22:09:06 benkirk Exp $ */
+/* $Id: ex2.C,v 1.16 2004-12-07 22:47:42 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -94,14 +94,14 @@ int main (int argc, char** argv)
     
     // Add a flag "test" that is visible for all systems.  This
     // helps in inter-system communication.
-    equation_systems.set_flag ("test");
+    equation_systems.parameters.set<bool> ("test") = true;
       
     // Set a simulation-specific parameter visible for all systems.
     // This helps in inter-system-communication.
-    equation_systems.set_parameter ("dummy") = 42.;
+    equation_systems.parameters.set<Real> ("dummy") = 42.;
       
     // Set another simulation-specific parameter 
-    equation_systems.set_parameter ("nobody") = 0.;
+    equation_systems.parameters.set<Real> ("nobody") = 0.;
     
     // Now we declare the system and its variables.
     // We begin by adding a "SteadyStytem" to the

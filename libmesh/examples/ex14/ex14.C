@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.9 2004-11-12 22:36:09 jwpeterson Exp $ */
+/* $Id: ex14.C,v 1.10 2004-12-07 22:47:42 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -156,10 +156,10 @@ int main(int argc, char** argv)
       equation_systems.init();
 
       // Set linear solver max iterations
-      equation_systems.set_parameter("linear solver maximum iterations") = 100;
+      equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = 100;
 
       // Linear solver tolerance.
-      equation_systems.set_parameter("linear solver tolerance") = 1.e-12;
+      equation_systems.parameters.set<Real>("linear solver tolerance") = 1.e-12;
       
       // Prints information about the system to the screen.
       equation_systems.print_info();

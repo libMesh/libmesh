@@ -1,4 +1,4 @@
-/* $Id: ex11.C,v 1.8 2004-11-15 22:08:54 benkirk Exp $ */
+/* $Id: ex11.C,v 1.9 2004-12-07 22:47:42 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -109,8 +109,8 @@ int main (int argc, char** argv)
       // Initialize the data structures for the equation system.
       equation_systems.init ();
 
-      equation_systems.set_parameter("linear solver maximum iterations") = 250;
-      equation_systems.set_parameter("linear solver tolerance") = 1.e-6;
+      equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = 250;
+      equation_systems.parameters.set<Real>        ("linear solver tolerance") = 1.e-6;
       
       // Prints information about the system to the screen.
       equation_systems.print_info();

@@ -1,4 +1,4 @@
-// $Id: inf_fe_static.C,v 1.25 2004-01-03 15:37:43 benkirk Exp $
+// $Id: inf_fe_static.C,v 1.26 2004-12-07 22:47:45 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -310,8 +310,8 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType& fet,
   // get the simulation-specific data
   const EquationSystems& es (data.equation_systems);
   const Real wavenumber = 2. * libMesh::pi
-      * es.parameter("current frequency")
-      / es.parameter("speed");
+      * es.parameters.get<Real>("current frequency")
+      / es.parameters.get<Real>("speed");
 
   // the exponent for time-harmonic behavior
   const Real exponent = sign                                                            /* +1. or -1.                */
@@ -350,7 +350,7 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType& fet,
 #else
 
   const EquationSystems& es (data.equation_systems);
-  const Real speed = es.parameter("speed");
+  const Real speed = es.parameters.get<Real>("speed");
 
   /*
    * This is quite weird: the phase is actually 

@@ -1,4 +1,4 @@
-/* $Id: ex7.C,v 1.34 2004-11-15 22:09:09 benkirk Exp $ */
+/* $Id: ex7.C,v 1.35 2004-12-07 22:47:44 benkirk Exp $ */
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
 
@@ -210,8 +210,8 @@ int main (int argc, char** argv)
     // tell the frequency system about the wave velocity and fluid
     // density.  The frequency system provides default values, but
     // these may be overridden, as shown here.
-    equation_systems.set_parameter ("wave speed") = 1.;
-    equation_systems.set_parameter ("rho")        = 1.;
+    equation_systems.parameters.set<Real> ("wave speed") = 1.;
+    equation_systems.parameters.set<Real> ("rho")        = 1.;
     
     // Initialize the data structures for the equation system.  <i>Always</i>
     // prior to this, the frequencies have to be communicated to the system.
@@ -290,7 +290,7 @@ void assemble_helmholtz(EquationSystems& es,
 
   // For the admittance boundary condition,
   // get the fluid density
-  const Real rho = es.parameter("rho");
+  const Real rho = es.parameters.get<Real>("rho");
   
   // In here, we will add the element matrices to the
   // <i>additional</i> matrices "stiffness_mass", "damping",
@@ -524,9 +524,9 @@ void add_M_C_K_helmholtz(EquationSystems& es,
   
   // Get the frequency, fluid density, and speed of sound
   // for which we should currently solve
-  const Real frequency = es.parameter ("current frequency");
-  const Real rho       = es.parameter ("rho");
-  const Real speed     = es.parameter ("wave speed");
+  const Real frequency = es.parameters.get<Real> ("current frequency");
+  const Real rho       = es.parameters.get<Real> ("rho");
+  const Real speed     = es.parameters.get<Real> ("wave speed");
   
   // Compute angular frequency omega and wave number k
   const Real omega = 2.0*libMesh::pi*frequency;

@@ -1,4 +1,4 @@
-/* $Id: ex10.C,v 1.16 2004-11-08 00:10:59 jwpeterson Exp $ */
+/* $Id: ex10.C,v 1.17 2004-12-07 22:47:41 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -142,12 +142,11 @@ int main (int argc, char** argv)
 					equation_systems);
     
     // The Convection-Diffusion system requires that we specify
-    // the flow velocity.  We will specify it as a \p RealVectorValue
-    // data type.  Check example 9 for details on \p RealVectorValue
-    // and \p DataMap.
-    RealVectorValue velocity (0.8, 0.8);
-
-    equation_systems.data_map.add_data ("velocity", velocity);
+    // the flow velocity.  We will specify it as a RealVectorValue
+    // data type and then use the Parameters object to pass it to
+    // the assemble function.
+    equation_systems.parameters.set<RealVectorValue>("velocity") = 
+      RealVectorValue (0.8, 0.8);
     
     // Solve the system "Convection-Diffusion".  This will be done by
     // looping over the specified time interval and calling the
@@ -162,8 +161,8 @@ int main (int argc, char** argv)
 	// time step size as parameters in the EquationSystem.
 	time += dt;
 
-	equation_systems.set_parameter ("time") = time;
-	equation_systems.set_parameter ("dt")   = dt;
+	equation_systems.parameters.set<Real> ("time") = time;
+	equation_systems.parameters.set<Real> ("dt")   = dt;
 
 	// A pretty update message
 	std::cout << " Solving time step ";
@@ -418,10 +417,10 @@ void assemble_cd (EquationSystems& es,
   // Here we extract the velocity & parameters that we put in the
   // EquationSystems object.
   const RealVectorValue velocity =
-    es.data_map.get_data<RealVectorValue> ("velocity");
+    es.parameters.get<RealVectorValue> ("velocity");
 
-  const Real dt = es.parameter   ("dt");
-  const Real time = es.parameter ("time");
+  const Real dt = es.parameters.get<Real>   ("dt");
+  const Real time = es.parameters.get<Real> ("time");
 
   // Now we will loop over all the elements in the mesh that
   // live on the local processor. We will compute the element

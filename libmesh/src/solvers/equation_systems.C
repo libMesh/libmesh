@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.14 2004-11-14 20:16:10 jwpeterson Exp $
+// $Id: equation_systems.C,v 1.15 2004-12-07 22:47:46 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -46,8 +46,8 @@ EquationSystems::EquationSystems (Mesh& m, MeshData* mesh_data) :
   _mesh      (m)
 {
   // Set default parameters
-  this->set_parameter("linear solver tolerance")          = 1.e-12;
-  this->set_parameter("linear solver maximum iterations") = 5000;
+  this->parameters.set<Real>        ("linear solver tolerance")          = 1.e-12;
+  this->parameters.set<unsigned int>("linear solver maximum iterations") = 5000;
 }
 
 
@@ -61,14 +61,8 @@ EquationSystems::~EquationSystems ()
 
 void EquationSystems::clear ()
 {
-  // Clear any user-supplied additional data
-  data_map.clear ();
-
-  // Clear any flags
-  _flags.clear ();
-
-  // Clear any parameters
-  _parameters.clear ();
+  // Clear any additional parameters
+  parameters.clear ();
 
   // clear the systems.  We must delete them
   // since we newed them!
@@ -89,32 +83,23 @@ void EquationSystems::clear ()
 
 void EquationSystems::init ()
 {
-   const unsigned int n_sys = this->n_systems();
+  const unsigned int n_sys = this->n_systems();
 
- assert (n_sys != 0);
+  assert (n_sys != 0);
 
   /**
    * Tell all the \p DofObject entities how many systems
    * there are.
    */
   {
-    // All the nodes
-//     node_iterator       node_it  (_mesh.nodes_begin());
-//     const node_iterator node_end (_mesh.nodes_end());
-
     MeshBase::node_iterator       node_it  = _mesh.nodes_begin();
     const MeshBase::node_iterator node_end = _mesh.nodes_end();
 
     for ( ; node_it != node_end; ++node_it)
       (*node_it)->set_n_systems(n_sys);
     
-    // All the elements
-//     elem_iterator       elem_it (_mesh.elements_begin());
-//     const elem_iterator elem_end(_mesh.elements_end());
-
     MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
     const MeshBase::element_iterator elem_end = _mesh.elements_end();
-
     
     for ( ; elem_it != elem_end; ++elem_it)
       (*elem_it)->set_n_systems(n_sys);
@@ -799,41 +784,25 @@ std::string EquationSystems::get_info () const
 
   for (; it != _systems.end(); ++it)
     out << it->second->get_info();
-    
-  
-  // Possibly print the flags
-  if (!_flags.empty())
-    {  
-      out << "  n_flags()=" << this->n_flags() << '\n';
-      out << "   Flags:\n";
-      
-      for (std::set<std::string>::const_iterator flag = _flags.begin();
-	   flag != _flags.end(); ++flag)
-	out << "    "
-	    << "\""
-	    << *flag
-	    << "\""
-	    << '\n';
-    }
 
   
-  // Possibly print the parameters  
-  if (!_parameters.empty())
-    {  
-      out << "  n_parameters()=" << this->n_parameters() << '\n';
-      out << "   Parameters:\n";
+//   // Possibly print the parameters  
+//   if (!this->parameters.empty())
+//     {  
+//       out << "  n_parameters()=" << this->n_parameters() << '\n';
+//       out << "   Parameters:\n";
       
-      for (std::map<std::string, Real>::const_iterator
-	     param = _parameters.begin(); param != _parameters.end();
-	   ++param)
-	out << "    "
-	    << "\""
-	    << param->first
-	    << "\""
-	    << "="
-	    << param->second
-	    << '\n';
-    }
+//       for (std::map<std::string, Real>::const_iterator
+// 	     param = _parameters.begin(); param != _parameters.end();
+// 	   ++param)
+// 	out << "    "
+// 	    << "\""
+// 	    << param->first
+// 	    << "\""
+// 	    << "="
+// 	    << param->second
+// 	    << '\n';
+//     }
   
   return out.str();
 }
@@ -904,113 +873,4 @@ unsigned int EquationSystems::n_active_dofs () const
     tot += pos->second->n_active_dofs();
 
   return tot;      
-}
-
-
-
-
-// void* & EquationSystems::additional_data (const std::string& name)
-// {
-//   // Check for the entry already.  If it is there return the pointer,
-//   // but make sure it isn't NULL
-//   if (_additional_data.count(name) != 0)
-//     {
-//       assert (_additional_data[name] != NULL);
-
-//       return _additional_data[name];
-//     }
-
-//   return _additional_data[name];
-// }
-
-
-
-// void EquationSystems::unset_additional_data (const std::string& name)
-// {
-//   // Look for an entry matching name
-//   std::map<std::string, void*>::iterator
-//     pos = _additional_data.find(name);
-
-//   // Remove it if an entry was found
-//   if (pos != _additional_data.end())
-//     _additional_data.erase(pos);
-// }
-
-
-
-bool EquationSystems::flag (const std::string& fl) const
-{
-  return (_flags.count(fl) != 0);
-}
-
-
-
-void EquationSystems::set_flag (const std::string& fl)
-{
-  _flags.insert (fl);
-}
-
-
-
-void EquationSystems::unset_flag (const std::string& fl)
-{
-  // Look for the flag in the database
-  std::set<std::string>::iterator
-    pos = _flags.find(fl);
-
-  // If the flag was found remove it
-  if (pos != _flags.end())
-    _flags.erase(pos);
-}
-
-
-
-Real EquationSystems::parameter (const std::string& id) const
-{
-  return this->parameter<Real> (id);
-}
-
-
-
-Real & EquationSystems::set_parameter (const std::string& id)
-{
-#ifdef DEBUG
-  /*
-  // Make sure the parameter isn't already set
-  if (parameters.count(id))
-    std::cerr << "WARNING: parameter "
-	      << "\""
-	      << id
-	      << "\""
-	      << " is already set!"
-	      << std::endl;
-  */
-#endif
-  
-  // Insert the parameter/value pair into the database
-  return _parameters[id];
-}
-
-
-
-void EquationSystems::unset_parameter (const std::string& id)
-{
-  // Look for the id in the database
-  std::map<std::string, Real>::iterator
-    pos = _parameters.find(id);
-  
-  // If the parameter was found remove it
-  if (pos != _parameters.end())
-    _parameters.erase(pos);
-}
-
-
-
-bool EquationSystems::parameter_exists (const std::string& id) const
-{
-  // Look for the id in the database
-  std::map<std::string, Real>::const_iterator
-    pos = _parameters.find(id);
-
-  return (pos != _parameters.end());
 }

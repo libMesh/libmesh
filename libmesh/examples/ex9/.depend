@@ -54,9 +54,8 @@ ex9.$(obj-suffix):\
     ../../include/solvers/steady_system.h\
     ../../include/solvers/system.h\
     ../../include/solvers/transient_system.h\
-    ../../include/utils/data_map.h\
-    ../../include/utils/data_object.h\
     ../../include/utils/o_string_stream.h\
+    ../../include/utils/parameters.h\
     ../../include/utils/perf_log.h
 exact_solution.$(obj-suffix):\
     exact_solution.C\

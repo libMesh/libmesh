@@ -1,4 +1,4 @@
-// $Id: implicit_system.C,v 1.4 2004-10-12 19:46:58 benkirk Exp $
+// $Id: implicit_system.C,v 1.5 2004-12-07 22:47:46 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -184,11 +184,11 @@ void ImplicitSystem::solve ()
   
   // Get the user-specifiied linear solver tolerance
   const Real tol            =
-    _equation_systems.parameter("linear solver tolerance");
+    _equation_systems.parameters.get<Real>("linear solver tolerance");
 
   // Get the user-specified maximum # of linear solver iterations
   const unsigned int maxits =
-    static_cast<unsigned int>(_equation_systems.parameter("linear solver maximum iterations"));
+    _equation_systems.parameters.get<unsigned int>("linear solver maximum iterations");
 
   // Solve the linear system.  Two cases:
   const std::pair<unsigned int, Real> rval =
