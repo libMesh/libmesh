@@ -1,4 +1,4 @@
-// $Id: steady_system.h,v 1.1.2.1 2003-05-06 14:00:42 benkirk Exp $
+// $Id: steady_system.h,v 1.1.2.2 2003-05-06 17:53:29 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -100,31 +100,6 @@ public:
    * the system type in an equation system file.
    */
   const std::string system_type () const { return "Steady"; }
-
-  /**
-   * Register a user function to use in initializing the system.
-   */
-  void attach_init_function (void fptr(EquationSystems& es,
-				       const std::string& name));
-  
-  /**
-   * Register a user function to use in assembling the system
-   * matrix and RHS.
-   */
-  void attach_assemble_function (void fptr(EquationSystems& es,
-					   const std::string& name));
-  
-  /**
-   * Function that initializes the system.
-   */
-  void (* init_system) (EquationSystems& es,
-			const std::string& name);
-  
-  /**
-   * Function that assembles the system.
-   */
-  void (* assemble_system) (EquationSystems& es,
-			    const std::string& name);
 
 
   

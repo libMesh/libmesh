@@ -1,4 +1,4 @@
-// $Id: steady_system.C,v 1.1.2.1 2003-05-06 14:00:47 benkirk Exp $
+// $Id: steady_system.C,v 1.1.2.2 2003-05-06 17:53:29 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -38,8 +38,6 @@ SteadySystem::SteadySystem (EquationSystems& es,
 			    const unsigned int number) :
   
   SystemBase             (es, name, number),
-  init_system            (NULL),
-  assemble_system        (NULL),
   current_local_solution (NumericVector<Number>::build())
 {
 }
@@ -48,10 +46,6 @@ SteadySystem::SteadySystem (EquationSystems& es,
 
 SteadySystem::~SteadySystem ()
 {
-  // Null-out the function pointers.  Since this
-  // class is getting destructed it is pointless,
-  // but a good habit.
-  init_system = assemble_system = NULL;
 }
 
 
@@ -190,24 +184,4 @@ SteadySystem::solve ()
   STOP_LOG("solve()", "SteadySystem");
 
   return rval; 
-}
-
-
-
-void SteadySystem::attach_init_function (void fptr(EquationSystems& es,
-						   const std::string& name))
-{
-  assert (fptr != NULL);
-  
-  init_system = fptr;
-}
-
-
-
-void SteadySystem::attach_assemble_function (void fptr(EquationSystems& es,
-						       const std::string& name))
-{
-  assert (fptr != NULL);
-  
-  assemble_system = fptr;  
 }

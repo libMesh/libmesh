@@ -1,4 +1,4 @@
-// $Id: system_base.C,v 1.14.2.2 2003-05-06 14:00:47 benkirk Exp $
+// $Id: system_base.C,v 1.14.2.3 2003-05-06 17:53:29 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -48,6 +48,8 @@ SystemBase::SystemBase (EquationSystems& es,
 			const std::string& name,
 			const unsigned int number) :
   
+  init_system             (NULL),
+  assemble_system         (NULL),
   solution                (NumericVector<Number>::build()),
   rhs                     (NumericVector<Number>::build()),
   matrix                  (SparseMatrix<Number>::build()),
@@ -67,6 +69,12 @@ SystemBase::SystemBase (EquationSystems& es,
 
 SystemBase::~SystemBase ()
 {
+  // Null-out the function pointers.  Since this
+  // class is getting destructed it is pointless,
+  // but a good habit.
+  init_system = assemble_system = NULL;
+
+  // Clear data
   SystemBase::clear ();
 
   assert (!libMesh::closed());
@@ -709,4 +717,24 @@ std::string SystemBase::get_info() const
   out << "    " << "n_additional_matrices()=" << this->n_additional_matrices() << std::endl;
   
   return out.str();
+}
+
+
+
+void SystemBase::attach_init_function (void fptr(EquationSystems& es,
+						 const std::string& name))
+{
+  assert (fptr != NULL);
+  
+  init_system = fptr;
+}
+
+
+
+void SystemBase::attach_assemble_function (void fptr(EquationSystems& es,
+						     const std::string& name))
+{
+  assert (fptr != NULL);
+  
+  assemble_system = fptr;  
 }
