@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.8 2003-02-04 16:29:51 benkirk Exp $
+// $Id: mesh_generation.C,v 1.9 2003-02-06 05:41:15 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -398,6 +398,8 @@ void Mesh::build_cube(const unsigned int nx,
 
 	  }
 	
+
+//TODO: Hex20 and Hex27 cubes seem to give bad number of nodes....
 	else if ((type == HEX20) ||
 		 (type == HEX27))
 	  {

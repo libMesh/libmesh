@@ -1,4 +1,4 @@
-// $Id: fe_lagrange.C,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: fe_lagrange.C,v 1.7 2003-02-06 05:41:15 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -254,7 +254,14 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 	    return 5;
 
 	  default:
-	    error();	    
+	    {
+#ifdef DEBUG
+	      std::cerr << "ERROR: Bad ElemType = " << t
+			<< " for FIRST order approximation!" 
+			<< std::endl;
+#endif
+	      error();	    
+	    };
 	  };
       };
 
@@ -289,7 +296,14 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 	    return 18;
 
 	  default:
-	    error();	    
+	    {
+#ifdef DEBUG
+	      std::cerr << "ERROR: Bad ElemType = " << t
+			<< " for SECOND order approximation!" 
+			<< std::endl;
+#endif
+	      error();	    
+	    };
 	  };
       };
 
@@ -436,7 +450,14 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	    };
 
 	  default:
-	    error();	    
+	    {
+#ifdef DEBUG
+	      std::cerr << "ERROR: Bad ElemType = " << t
+			<< " for FIRST order approximation!" 
+			<< std::endl;
+#endif
+	      error();	    
+	    };
 	  };
       };
 
@@ -457,7 +478,14 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	    return 1;
 
 	  default:
-	    error();	    
+	    {
+#ifdef DEBUG
+	      std::cerr << "ERROR: Bad ElemType = " << t
+			<< " for SECOND order approximation!" 
+			<< std::endl;
+#endif
+	      error();	    
+	    };
 	  };
       };
 

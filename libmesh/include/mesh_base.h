@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.8 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: mesh_base.h,v 1.9 2003-02-06 05:41:14 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -60,7 +60,7 @@ class PetscMatrix;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.8 $
+ * \version $Revision: 1.9 $
  */
 
 
@@ -214,7 +214,7 @@ public:
    * are present, use the version with optional symmetry
    * switches.
    */
-  void build_inf_elem();
+  void build_inf_elem(const bool be_verbose = false);
   
   /**
    * Build infinite elements atop a volume-based mesh.

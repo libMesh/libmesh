@@ -1,4 +1,4 @@
-// $Id: inf_fe.h,v 1.9 2003-02-05 20:51:36 ddreyer Exp $
+// $Id: inf_fe.h,v 1.10 2003-02-06 05:41:14 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -25,17 +25,16 @@
 // C++ includes
 
 // Local includes
-#include "fe_base.h"
-#include "elem.h"
 #include "mesh_config.h"
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+#include "fe_base.h"
 
 
 // forward declarations
+class Elem;
 
 
-
-
-#ifdef ENABLE_INFINITE_ELEMENTS
 
 
 /**
@@ -96,7 +95,7 @@
  *
  * \author Daniel Dreyer
  * \date 2003
- * \version $Revision: 1.9 $
+ * \version $Revision: 1.10 $
  */
 
 //-------------------------------------------------------------
@@ -119,7 +118,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.9 $
+   * \version $Revision: 1.10 $
    */
   //-------------------------------------------------------------
   // InfFE::Radial class definition
@@ -244,7 +243,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.9 $
+   * \version $Revision: 1.10 $
    */
   //-------------------------------------------------------------
   // InfFE::Base class definition
@@ -262,8 +261,7 @@ protected:
      * this method allocates memory!  So be sure to delete the
      * new element afterwards.
      */
-    static Elem* build_elem (const Elem* inf_elem)
-	{ AutoPtr<Elem> ape = inf_elem->build_side(0); return ape.release(); };
+    static Elem* build_elem (const Elem* inf_elem);
  
     /**
      * @returns the index in the @e base element. \p i
@@ -779,14 +777,7 @@ private:
 
 // ------------------------------------------------------------
 // InfFE class inline members
-template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
-inline
-void InfFE<Dim,T_radial,T_base>::update_base_elem (const Elem* inf_elem)
-{
-  if (base_elem != NULL)
-    delete base_elem;
-  base_elem = Base::build_elem(inf_elem);
-};
+
 
 
 

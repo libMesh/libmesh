@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.6 2003-01-24 19:38:45 jwpeterson Exp $
+// $Id: fe.C,v 1.7 2003-02-06 05:41:14 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,6 +23,7 @@
 #include "fe.h"
 #include "inf_fe.h"
 #include "quadrature.h"
+#include "elem.h"
 
 
 // ------------------------------------------------------------
@@ -33,6 +34,7 @@ unsigned int FE<Dim,T>::n_quadrature_points () const
   assert (qrule != NULL);  
   return qrule->n_points(); 
 };
+
 
 
 
@@ -253,7 +255,18 @@ void FE<Dim,T>::init_shape_functions(const QBase* qrule,
 
 
 
+    
+#ifdef ENABLE_INFINITE_ELEMENTS
 
+template <unsigned int Dim, FEFamily T>
+void FE<Dim,T>::init_base_shape_functions(const QBase* q, 
+					  const Elem* e)
+{ 
+  elem_type = e->type(); 
+  init_shape_functions(q, e); 
+};
+
+#endif
 
 
 //--------------------------------------------------------------

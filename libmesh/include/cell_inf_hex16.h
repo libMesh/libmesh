@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex16.h,v 1.6 2003-02-03 03:51:48 ddreyer Exp $
+// $Id: cell_inf_hex16.h,v 1.7 2003-02-06 05:41:14 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -91,7 +91,7 @@ public:
   /**
    * @returns 4
    */
-  unsigned int n_sub_elem() const { return 4; };
+  unsigned int n_sub_elem() const { return 1; };
   
   /**
    * @returns SECOND
