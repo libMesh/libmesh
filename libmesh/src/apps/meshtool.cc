@@ -123,6 +123,7 @@ void usage(char *progName)
     "     .unv -- SDRC I-Deas Universal File ASCII format\n"
     "     .xdr -- Internal binary mesh format\n"
     "     .xda -- Same format, but ASCII and human-readable\n"
+    "     .mgf -- MGF binary mesh format\n"
     "\n"
     "OUTPUT:\n"
     "     .plt   -- Tecplot binary format\n"
@@ -131,6 +132,7 @@ void usage(char *progName)
     "     .ugrid -- Kelly's DIVA ASCII format (3D only)\n"
     "     .xdr   -- Internal binary mesh format\n"
     "     .xda   -- Same format, but ASCII and human-readable\n"
+    "     .mgf   -- MGF binary mesh format\n"
     "\n"
     " Direct questions to:\n"
     " benkirk@cfdlab.ae.utexas.edu\n";

@@ -1,4 +1,4 @@
-// $Id: mesh_xdr_support.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: mesh_xdr_support.h,v 1.3 2004-09-30 17:17:48 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -74,7 +74,8 @@ class XdrInterface
 		      std::vector<Node*>& nodes,
 		      std::vector<Elem*>& elements,
 		      BoundaryInfo& boundary_info,
-		      Mesh& mesh);
+		      Mesh& mesh,
+                      const unsigned int mgf_originator=0);
   
   /**
    * Read OR Write Soln files

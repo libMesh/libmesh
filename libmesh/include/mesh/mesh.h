@@ -1,4 +1,4 @@
-// $Id: mesh.h,v 1.6 2004-03-20 05:36:26 jwpeterson Exp $
+// $Id: mesh.h,v 1.7 2004-09-30 17:17:48 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -147,7 +147,7 @@ class Mesh : public MeshBase
    * meshes in general since they will be
    * hybrid meshes.
    */
-  void write_xdr_binary (const std::string& name);
+  void write_xdr_binary (const std::string& name, const unsigned int mgf_originator=0);
 
   /**
    * Write solutions in mgflo's XDR format.
@@ -221,7 +221,7 @@ class Mesh : public MeshBase
   /**
    * Same, but expects a true XDR-Encoded binary file.
    */
-  void read_xdr_binary (const std::string& name);
+  void read_xdr_binary (const std::string& name, const unsigned int mgf_originator = 0);
   
  private:
 };

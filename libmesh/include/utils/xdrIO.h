@@ -1,4 +1,4 @@
-// $Id: xdrIO.h,v 1.6 2004-08-05 15:58:43 jwpeterson Exp $
+// $Id: xdrIO.h,v 1.7 2004-09-30 17:17:49 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -161,6 +161,10 @@ class XdrIO
    */
   int get_orig_flag() const { return orig_flag; }
 
+  /**
+   * Set the originator flag.
+   */
+  void set_orig_flag(const unsigned int in_orig_flag) { orig_flag=in_orig_flag; }
   
  protected:
 

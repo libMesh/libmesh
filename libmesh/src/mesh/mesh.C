@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.41 2004-07-13 21:48:41 jwpeterson Exp $
+// $Id: mesh.C,v 1.42 2004-09-30 17:17:49 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -94,10 +94,13 @@ void Mesh::read (const std::string& name)
 	       (name.rfind(".oogl") < name.size()))
 	OFFIO (*this).read (name);
       
-      else if ((name.rfind(".xdr")  < name.size()) ||
-	       (name.rfind(".0000") < name.size()))
+      else if (name.rfind(".xdr")  < name.size())
 	this->read_xdr_binary (name);
       
+      else if ((name.rfind(".mgf")  < name.size()) ||
+	       (name.rfind(".0000") < name.size()))
+	this->read_xdr_binary (name,1);
+
       else if (name.rfind(".mesh") < name.size())
 	ShaneeIO (*this).read (name);
       
@@ -189,6 +192,9 @@ void Mesh::write (const std::string& name)
     
     else if (name.rfind(".xdr") < name.size())
       this->write_xdr_binary (name);
+
+    else if (name.rfind(".mgf")  < name.size())
+      this->write_xdr_binary (name,1);
 
     else if (name.rfind(".unv") < name.size())
       UNVIO (*this).write (name);
