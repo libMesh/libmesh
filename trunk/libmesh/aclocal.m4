@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.75 2004-11-19 13:57:50 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.76 2004-11-22 21:01:16 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -171,11 +171,11 @@ AC_DEFUN(DETERMINE_CXX_BRAND, dnl
                   GXX_VERSION=sun_forte
                 else
   	
-  	          dnl KAI C++?
-  	          is_kai_cc="`($CXX -V 2>&1) | grep 'KAI C++'`"
-  	          if test "x$is_kai_cc" != "x" ; then
-  	            AC_MSG_RESULT(<<< C++ compiler is KAI C++ >>>)
-  	            GXX_VERSION=kai_cc
+  	          dnl Cray C++?
+  	          is_cray_cc="`($CXX -V 2>&1) | grep 'Cray Standard'`"
+  	          if test "x$is_cray_cc" != "x" ; then
+  	            AC_MSG_RESULT(<<< C++ compiler is Cray C++ >>>)
+  	            GXX_VERSION=cray_cc
   	          else
   	
   	            dnl Portland Group C++?
@@ -632,6 +632,17 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           LIBS="$LIBS -lrpcsvc"
           FLIBS="$FLIBS -lF90 -lcl -I/opt/fortran90/lib/pa20_64"
           ;;
+
+      cray_cc)
+	  CXXFLAGSG="-h conform,noautoinstantiate,instantiate=all,noimplicitinclude -G n -DDEBUG"
+	  CXXFLAGSO="-h conform,noautoinstantiate,instantiate=all,noimplicitinclude -G n -DNDEBUG"
+	  CFLAGSG="-G n -DDEBUG"
+	  CFLAGSO="-G n -DNDEBUG"
+
+	  CXXSHAREDFLAG=""
+	  CSHAREDFLAG=""
+	  RPATHFLAG=""
+	  ;;
 
       *)
           AC_MSG_RESULT(No specific options for this C++ compiler known)
