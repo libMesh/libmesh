@@ -1,5 +1,5 @@
 dnl --------------------------------------------------------------
-dnl $Id: configure.in,v 1.44 2004-05-05 15:23:48 spetersen Exp $
+dnl $Id: configure.in,v 1.45 2004-08-05 14:44:14 jwpeterson Exp $
 dnl --------------------------------------------------------------
 dnl Process this file with autoconf to produce a configure script.
 
@@ -9,7 +9,7 @@ dnl you call ./configure subsequently on different systems without
 dnl clearing the cache 
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
-AC_REVISION($Revision: 1.44 $)
+AC_REVISION($Revision: 1.45 $)
 
 
 AC_INIT
@@ -537,7 +537,6 @@ AC_ARG_ENABLE(tetgen,
               enabletetgen=no)
 if test "$enabletetgen" != no ; then
   CONFIGURE_TETGEN
-  AC_MSG_RESULT(<<< Configuring library with TetGen support >>>)
 fi
 dnl -------------------------------------------------------------
 
