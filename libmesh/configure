@@ -862,14 +862,13 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-shared         build shared libraries
+  --enable-everything     treat all applicable options as enabled
   --enable-amr            build with adaptive mesh refinement (AMR) suppport
   --enable-2D-only        build with support for 1D and 2D meshes only
   --enable-expensive      build with expensive data structures
   --enable-pfem           build with support for higher order p-FEM shapes
   --enable-ifem           build with infinite elements
   --enable-xdr            enable XDR platform-independent binary I/O
-  --enable-mgf-workaround deprecated, use runtime --enable-mgf-workaround
-                          instead
   --enable-complex        build with complex number support
   --enable-reference-counting
                           build with reference counting suppport
@@ -2955,10 +2954,17 @@ echo "${ECHO_T}<<< C++ compiler is HP-UX C++ >>>" >&6
   	              else
 
 
-                                                { { echo "$as_me:$LINENO: error: Unrecognized compiler" >&5
-echo "$as_me: error: Unrecognized compiler" >&2;}
-   { (exit sorry); exit sorry; }; }
-                        exit 1
+                        						echo "$as_me:$LINENO: result: WARNING:" >&5
+echo "${ECHO_T}WARNING:" >&6
+                        echo "$as_me:$LINENO: result: >>> Unrecognized compiler: \"$CXX\" <<<" >&5
+echo "${ECHO_T}>>> Unrecognized compiler: \"$CXX\" <<<" >&6
+			echo "$as_me:$LINENO: result: You will likely need to modify" >&5
+echo "${ECHO_T}You will likely need to modify" >&6
+			echo "$as_me:$LINENO: result: Make.common directly to specify" >&5
+echo "${ECHO_T}Make.common directly to specify" >&6
+			echo "$as_me:$LINENO: result: proper compiler flags" >&5
+echo "${ECHO_T}proper compiler flags" >&6
+			GXX_VERSION=unknown
                       fi
                     fi
                   fi
@@ -3247,12 +3253,16 @@ echo "$as_me: error: Unrecognized compiler" >&2;}
           ;;
 
       *)
-          { { echo "$as_me:$LINENO: error: No compiler options for this C++ compiler
-                       specified at present" >&5
-echo "$as_me: error: No compiler options for this C++ compiler
-                       specified at present" >&2;}
-   { (exit 1); exit 1; }; }
-          ;;
+          echo "$as_me:$LINENO: result: No specific options for this C++ compiler known" >&5
+echo "${ECHO_T}No specific options for this C++ compiler known" >&6
+	  CXXFLAGSG="$CXXFLAGS -DDEBUG"
+	  CXXFLAGSO="$CXXFLAGS -DNDEBUG"
+	  CXXFLAGSP="$CXXFLAGS -DNDEBUG"
+
+	  CFLAGSG="$CFLAGS -DDEBUG"
+	  CFLAGSO="$CFLAGS -DNDEBUG"
+	  CFLAGSP="$CFLAGS -DNDEBUG"
+	  ;;
     esac
   fi
 
@@ -7421,6 +7431,14 @@ PWD=`pwd`
 
 
 
+# Check whether --enable-everything or --disable-everything was given.
+if test "${enable_everything+set}" = set; then
+  enableval="$enable_everything"
+  enableeverything=$enableval
+else
+  enableeverything=no
+fi;
+
 
 # Check whether --enable-amr or --disable-amr was given.
 if test "${enable_amr+set}" = set; then
@@ -7510,7 +7528,7 @@ if test "${enable_ifem+set}" = set; then
   enableval="$enable_ifem"
   enableifem=$enableval
 else
-  enableifem=no
+  enableifem=$enableeverything
 fi;
 
 if test "$enableifem" != no ; then
@@ -7790,27 +7808,7 @@ fi
 
 done
 
-
-               # Check whether --enable-mgf-workaround or --disable-mgf-workaround was given.
-if test "${enable_mgf_workaround+set}" = set; then
-  enableval="$enable_mgf_workaround"
-  enablemgfworkaround=$enableval
-else
-  enablemgfworkaround=no
-fi;
-
-   if test "$enablemgfworkaround" != no ; then
-     echo "$as_me:$LINENO: result: " >&5
-echo "${ECHO_T}" >&6
-     echo "$as_me:$LINENO: result: *** WARNING: ./configure option --enable-mgf-workaround is deprecated. ***" >&5
-echo "${ECHO_T}*** WARNING: ./configure option --enable-mgf-workaround is deprecated. ***" >&6
-     echo "$as_me:$LINENO: result: ********    Use runtime option --enable-mgf-workaround instead    ********" >&5
-echo "${ECHO_T}********    Use runtime option --enable-mgf-workaround instead    ********" >&6
-     echo "$as_me:$LINENO: result: " >&5
-echo "${ECHO_T}" >&6
-                  fi
-   fi
-
+fi
 
 
 
@@ -7871,7 +7869,7 @@ if test "${enable_perflog+set}" = set; then
   enableval="$enable_perflog"
   enableperflog=$enableval
 else
-  enableperflog=no
+  enableperflog=$enableeverything
 fi;
 
 if test "$enableperflog" != no ; then
@@ -8190,7 +8188,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:8193:" \
+echo "$as_me:8191:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -8384,7 +8382,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_verb"
-(eval echo $as_me:8387: \"$ac_link\") >&5
+(eval echo $as_me:8385: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -8462,7 +8460,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_cv_prog_f77_v"
-(eval echo $as_me:8465: \"$ac_link\") >&5
+(eval echo $as_me:8463: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -8662,8 +8660,6 @@ echo "${ECHO_T}<<< Configuring library with PETSc version $petscversion support 
       else
 
             enablepetsc=no
-
-            if (test "$enablempi" != no) ; then
 
 
 # if MPIHOME is empty, set it to /usr
@@ -9403,7 +9399,6 @@ fi
 
 
 
-      fi
 
     fi
   fi
