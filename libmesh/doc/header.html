@@ -5,9 +5,11 @@
 	  <script>
         if (is_gecko) 
 	  {
-	    document.write("<link rel='stylesheet'           title='Default' type='text/css' href='gecko.css' media='screen'>\n" +
-	                   "<link rel='alternate stylesheet' title='IE'      type='text/css' href='ie.css'    media='screen'>\n" +
-	                   "<link rel='alternate stylesheet' title='Nav4'    type='text/css' href='orig.css'  media='screen'>\n")
+	    // Use IE style for all CSS-enabled types
+	    //document.write("<link rel='stylesheet'           title='Default' type='text/css' href='gecko.css' media='screen'>\n" +
+	    //               "<link rel='alternate stylesheet' title='IE'      type='text/css' href='ie.css'    media='screen'>\n" +
+	    //               "<link rel='alternate stylesheet' title='Nav4'    type='text/css' href='orig.css'  media='screen'>\n")
+	    document.write("<link href='ie.css' type='text/css' rel='stylesheet' media='screen'>\n")
           }
         else if (is_ie5up) 
           {
