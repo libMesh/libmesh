@@ -216,9 +216,11 @@ can be useful for testing purposes.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+Compiling C++ (in debug mode) ex1.C...
 Linking ex1...
 /home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
 : the use of `mktemp' is dangerous, better use `mkstemp'
+
 ***************************************************************
 * Running Example  ./ex1
 ***************************************************************
@@ -239,15 +241,12 @@ Linking ex1...
 | Reference count information                                                |
  ---------------------------------------------------------------------------- 
 | 4Elem reference count information:
-| Creations:    7
-| Destructions: 7
+|  Creations:    7
+|  Destructions: 7
 | 4Node reference count information:
-| Creations:    27
-| Destructions: 27
+|  Creations:    27
+|  Destructions: 27
  ---------------------------------------------------------------------------- 
-WARNING! There are options you set that were not used!
-WARNING! could be spelling mistake, etc!
-Option left: name:-d value: 3
  
 ***************************************************************
 * Done Running Example  ./ex1

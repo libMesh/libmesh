@@ -727,12 +727,16 @@ the element degrees of freedom get mapped.
 Now we will loop over all the elements in the mesh.
 We will compute the element matrix and right-hand-side
 contribution.
-</div>
+const_local_elem_iterator           el (mesh.elements_begin());
+const const_local_elem_iterator end_el (mesh.elements_end());
+
+
+<br><br></div>
 
 <div class ="fragment">
 <pre>
-          const_local_elem_iterator           el (mesh.elements_begin());
-          const const_local_elem_iterator end_el (mesh.elements_end());
+          MeshBase::const_element_iterator           el = mesh.local_elements_begin();
+          const MeshBase::const_element_iterator end_el = mesh.local_elements_end();
           
           for ( ; el != end_el; ++el)
             {
@@ -1387,8 +1391,9 @@ The "matrix" and "rhs" are now ready for solution
     
     std::vector&lt;<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B>&gt; dof_indices;
   
-    const_local_elem_iterator           el (mesh.elements_begin());
-    <FONT COLOR="#228B22"><B>const</FONT></B> const_local_elem_iterator end_el (mesh.elements_end());
+  
+    MeshBase::const_element_iterator           el = mesh.local_elements_begin();
+    <FONT COLOR="#228B22"><B>const</FONT></B> MeshBase::const_element_iterator end_el = mesh.local_elements_end();
     
     <B><FONT COLOR="#A020F0">for</FONT></B> ( ; el != end_el; ++el)
       {
@@ -1531,11 +1536,89 @@ The "matrix" and "rhs" are now ready for solution
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+Compiling C++ (in debug mode) ex7.C...
 Linking ex7...
 /home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
 : the use of `mktemp' is dangerous, better use `mkstemp'
+
 ***************************************************************
-*** Skipping Example  ./ex7 , only good with --enable-complex
+* Running Example  ./ex7
+***************************************************************
+ 
+Running ./ex7 -f .7
+
+ Using 27 x 27 = 729 QUAD9 elements
+
+ Mesh Information:
+  mesh_dimension()=2
+  spatial_dimension()=3
+  n_nodes()=3025
+  n_elem()=729
+   n_local_elem()=729
+   n_active_elem()=729
+  n_subdomains()=1
+  n_processors()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System "Helmholtz"
+    Type "Frequency"
+    Variables="p" 
+    Finite Element Types="0", "12" 
+    Infinite Element Mapping="0" 
+    Approximation Orders="2", "3" 
+    n_dofs()=3025
+    n_local_dofs()=3025
+    n_constrained_dofs()=0
+    n_vectors()=5
+  n_parameters()=9
+   Parameters:
+    "current frequency"=0.233333
+    "frequency 0000"=0.233333
+    "frequency 0001"=0.933333
+    "frequency 0002"=1.63333
+    "linear solver maximum iterations"=5000
+    "linear solver tolerance"=1e-12
+    "n_frequencies"=3
+    "rho"=1
+    "wave speed"=1
+
+
+ ---------------------------------------------------------------------------- 
+| Reference count information                                                |
+ ---------------------------------------------------------------------------- 
+| 12SparseMatrixISt7complexIdEE reference count information:
+|  Creations:    4
+|  Destructions: 4
+| 13NumericVectorISt7complexIdEE reference count information:
+|  Creations:    7
+|  Destructions: 7
+| 21LinearSolverInterfaceISt7complexIdEE reference count information:
+|  Creations:    1
+|  Destructions: 1
+| 4Elem reference count information:
+|  Creations:    3753
+|  Destructions: 3753
+| 4Node reference count information:
+|  Creations:    3025
+|  Destructions: 3025
+| 5QBase reference count information:
+|  Creations:    110
+|  Destructions: 110
+| 6DofMap reference count information:
+|  Creations:    1
+|  Destructions: 1
+| 6FEBase reference count information:
+|  Creations:    109
+|  Destructions: 109
+| 6System reference count information:
+|  Creations:    1
+|  Destructions: 1
+ ---------------------------------------------------------------------------- 
+ 
+***************************************************************
+* Done Running Example  ./ex7
 ***************************************************************
 </pre>
 </div>

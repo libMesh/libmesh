@@ -161,11 +161,14 @@ Initialize libMesh and any dependent libaries, like in example 2.
 <pre>
           libMesh::init (argc, argv);
         
-          
 </pre>
 </div>
 <div class = "comment">
-Braces are used to force object scope, like in example 2
+Declare a performance log for the main program
+PerfLog perf_main("Main Program");
+  
+
+<br><br>Braces are used to force object scope, like in example 2
 </div>
 
 <div class ="fragment">
@@ -181,7 +184,7 @@ Check for proper calling arguments.
 <pre>
             if (argc &lt; 3)
               {
-        	std::cerr &lt;&lt; "Usage: " &lt;&lt; argv[0] &lt;&lt; " -d 2"
+        	std::cerr &lt;&lt; "Usage: " &lt;&lt; argv[0] &lt;&lt; " -d 2(3)" &lt;&lt; " -n 15"
         		  &lt;&lt; std::endl;
         
 </pre>
@@ -226,11 +229,22 @@ Get the dimensionality of the mesh from argv[2]
 <pre>
             const unsigned int dim = atoi(argv[2]);     
             
-            
 </pre>
 </div>
 <div class = "comment">
-Create a mesh with user-defined dimension.
+Get the problem size from argv[4]
+</div>
+
+<div class ="fragment">
+<pre>
+            const unsigned int ps = atoi(argv[4]);
+</pre>
+</div>
+<div class = "comment">
+std::cout << "problem_size=" << ps << std::endl;
+    
+
+<br><br>Create a mesh with user-defined dimension.
 </div>
 
 <div class ="fragment">
@@ -250,7 +264,7 @@ us to use higher-order approximation, as in example 3.
 
 <div class ="fragment">
 <pre>
-            mesh.build_cube (15, 15, 15,
+            mesh.build_cube (ps, ps, ps,
         		     -1., 1.,
         		     -1., 1.,
         		     -1., 1.,
@@ -625,13 +639,17 @@ to the local processor.  This allows each processor to compute
 its components of the global matrix.
 
 <br><br>"PARALLEL CHANGE"
-</div>
+const_local_elem_iterator           el (mesh.elements_begin());
+const const_local_elem_iterator end_el (mesh.elements_end());
+
+
+<br><br></div>
 
 <div class ="fragment">
 <pre>
-          const_local_elem_iterator           el (mesh.elements_begin());
-          const const_local_elem_iterator end_el (mesh.elements_end());
-          
+          MeshBase::const_element_iterator       el     = mesh.local_elements_begin();
+          const MeshBase::const_element_iterator end_el = mesh.local_elements_end();
+        
           for ( ; el != end_el; ++el)
             {
 </pre>
@@ -1078,7 +1096,7 @@ it will print its log to the screen. Pretty easy, huh?
     {
       <B><FONT COLOR="#A020F0">if</FONT></B> (argc &lt; 3)
         {
-  	std::cerr &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;Usage: &quot;</FONT></B> &lt;&lt; argv[0] &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; -d 2&quot;</FONT></B>
+  	std::cerr &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;Usage: &quot;</FONT></B> &lt;&lt; argv[0] &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; -d 2(3)&quot;</FONT></B> &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; -n 15&quot;</FONT></B>
   		  &lt;&lt; std::endl;
   
   	error();
@@ -1096,11 +1114,12 @@ it will print its log to the screen. Pretty easy, huh?
       
       <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> dim = atoi(argv[2]);     
       
+      <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> ps = atoi(argv[4]);
       
       Mesh mesh (dim);
       
   
-      mesh.build_cube (15, 15, 15,
+      mesh.build_cube (ps, ps, ps,
   		     -1., 1.,
   		     -1., 1.,
   		     -1., 1.,
@@ -1179,9 +1198,10 @@ it will print its log to the screen. Pretty easy, huh?
   
     std::vector&lt;<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B>&gt; dof_indices;
   
-    const_local_elem_iterator           el (mesh.elements_begin());
-    <FONT COLOR="#228B22"><B>const</FONT></B> const_local_elem_iterator end_el (mesh.elements_end());
-    
+  
+    MeshBase::const_element_iterator       el     = mesh.local_elements_begin();
+    <FONT COLOR="#228B22"><B>const</FONT></B> MeshBase::const_element_iterator end_el = mesh.local_elements_end();
+  
     <B><FONT COLOR="#A020F0">for</FONT></B> ( ; el != end_el; ++el)
       {
         perf_log.start_event(<FONT COLOR="#BC8F8F"><B>&quot;elem init&quot;</FONT></B>);      
@@ -1289,14 +1309,16 @@ it will print its log to the screen. Pretty easy, huh?
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+Compiling C++ (in debug mode) ex4.C...
 Linking ex4...
 /home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
 : the use of `mktemp' is dangerous, better use `mkstemp'
+
 ***************************************************************
 * Running Example  ./ex4
 ***************************************************************
  
-Running ./ex4 -d 2
+Running ./ex4 -d 2 -n 15
 
  Mesh Information:
   mesh_dimension()=2
@@ -1314,8 +1336,9 @@ Running ./ex4 -d 2
    System "Poisson"
     Type "Implicit"
     Variables="u" 
-    Finite Element Types="0" 
-    Approximation Orders="2" 
+    Finite Element Types="0", "12" 
+    Infinite Element Mapping="0" 
+    Approximation Orders="2", "3" 
     n_dofs()=961
     n_local_dofs()=961
     n_constrained_dofs()=0
@@ -1327,74 +1350,71 @@ Running ./ex4 -d 2
 
 
  ----------------------------------------------------------------------------
-| Time:           Thu May 20 17:37:22 2004
+| Time:           Fri Nov 12 12:11:37 2004
 | OS:             Linux
-| HostName:       arthur
+| HostName:       zaniwoop
 | OS Release      2.4.20-19.9smp
 | OS Version:     #1 SMP Tue Jul 15 17:04:18 EDT 2003
 | Machine:        i686
 | Username:       peterson
  ----------------------------------------------------------------------------
  ----------------------------------------------------------------------------
-| Matrix Assembly Performance: Alive time=0.041472, Active time=0.036937
+| Matrix Assembly Performance: Alive time=0.055975, Active time=0.052056
  ----------------------------------------------------------------------------
 | Event                         nCalls  Total       Avg         Percent of   |
 |                                       Time        Time        Active Time  |
 |----------------------------------------------------------------------------|
 |                                                                            |
-| BCs                           225     0.0074      0.000033    20.02        |
-| Fe                            225     0.0076      0.000034    20.69        |
-| Ke                            225     0.0086      0.000038    23.20        |
-| elem init                     225     0.0067      0.000030    18.16        |
-| matrix insertion              225     0.0066      0.000029    17.93        |
+| BCs                           225     0.0102      0.000045    19.66        |
+| Fe                            225     0.0080      0.000035    15.28        |
+| Ke                            225     0.0150      0.000067    28.91        |
+| elem init                     225     0.0165      0.000073    31.67        |
+| matrix insertion              225     0.0023      0.000010    4.48         |
  ----------------------------------------------------------------------------
-| Totals:                       1125    0.0369                  100.00       |
+| Totals:                       1125    0.0521                  100.00       |
  ----------------------------------------------------------------------------
 
 
  ---------------------------------------------------------------------------- 
 | Reference count information                                                |
  ---------------------------------------------------------------------------- 
-| 12SparseMatrixIdE reference count information:
-| Creations:    1
-| Destructions: 1
-| 13NumericVectorIdE reference count information:
-| Creations:    3
-| Destructions: 3
-| 21LinearSolverInterfaceIdE reference count information:
-| Creations:    1
-| Destructions: 1
+| 12SparseMatrixISt7complexIdEE reference count information:
+|  Creations:    1
+|  Destructions: 1
+| 13NumericVectorISt7complexIdEE reference count information:
+|  Creations:    3
+|  Destructions: 3
+| 21LinearSolverInterfaceISt7complexIdEE reference count information:
+|  Creations:    1
+|  Destructions: 1
 | 4Elem reference count information:
-| Creations:    1185
-| Destructions: 1185
+|  Creations:    1185
+|  Destructions: 1185
 | 4Node reference count information:
-| Creations:    961
-| Destructions: 961
+|  Creations:    961
+|  Destructions: 961
 | 5QBase reference count information:
-| Creations:    3
-| Destructions: 3
+|  Creations:    3
+|  Destructions: 3
 | 6DofMap reference count information:
-| Creations:    1
-| Destructions: 1
+|  Creations:    1
+|  Destructions: 1
 | 6FEBase reference count information:
-| Creations:    2
-| Destructions: 2
+|  Creations:    2
+|  Destructions: 2
 | 6System reference count information:
-| Creations:    1
-| Destructions: 1
+|  Creations:    1
+|  Destructions: 1
  ---------------------------------------------------------------------------- 
-WARNING! There are options you set that were not used!
-WARNING! could be spelling mistake, etc!
-Option left: name:-d value: 2
-Running ./ex4 -d 3
+Running ./ex4 -d 3 -n 6
 
  Mesh Information:
   mesh_dimension()=3
   spatial_dimension()=3
-  n_nodes()=29791
-  n_elem()=3375
-   n_local_elem()=3375
-   n_active_elem()=3375
+  n_nodes()=2197
+  n_elem()=216
+   n_local_elem()=216
+   n_active_elem()=216
   n_subdomains()=1
   n_processors()=1
   processor_id()=0
@@ -1404,10 +1424,11 @@ Running ./ex4 -d 3
    System "Poisson"
     Type "Implicit"
     Variables="u" 
-    Finite Element Types="0" 
-    Approximation Orders="2" 
-    n_dofs()=29791
-    n_local_dofs()=29791
+    Finite Element Types="0", "12" 
+    Infinite Element Mapping="0" 
+    Approximation Orders="2", "3" 
+    n_dofs()=2197
+    n_local_dofs()=2197
     n_constrained_dofs()=0
     n_vectors()=1
   n_parameters()=2
@@ -1417,65 +1438,62 @@ Running ./ex4 -d 3
 
 
  ----------------------------------------------------------------------------
-| Time:           Thu May 20 17:37:31 2004
+| Time:           Fri Nov 12 12:11:42 2004
 | OS:             Linux
-| HostName:       arthur
+| HostName:       zaniwoop
 | OS Release      2.4.20-19.9smp
 | OS Version:     #1 SMP Tue Jul 15 17:04:18 EDT 2003
 | Machine:        i686
 | Username:       peterson
  ----------------------------------------------------------------------------
  ----------------------------------------------------------------------------
-| Matrix Assembly Performance: Alive time=7.19831, Active time=7.13111
+| Matrix Assembly Performance: Alive time=0.842618, Active time=0.83894
  ----------------------------------------------------------------------------
 | Event                         nCalls  Total       Avg         Percent of   |
 |                                       Time        Time        Active Time  |
 |----------------------------------------------------------------------------|
 |                                                                            |
-| BCs                           3375    1.8539      0.000549    26.00        |
-| Fe                            3375    0.4151      0.000123    5.82         |
-| Ke                            3375    3.0754      0.000911    43.13        |
-| elem init                     3375    0.8353      0.000247    11.71        |
-| matrix insertion              3375    0.9514      0.000282    13.34        |
+| BCs                           216     0.2950      0.001366    35.16        |
+| Fe                            216     0.0247      0.000115    2.95         |
+| Ke                            216     0.3649      0.001689    43.50        |
+| elem init                     216     0.1383      0.000640    16.49        |
+| matrix insertion              216     0.0159      0.000074    1.90         |
  ----------------------------------------------------------------------------
-| Totals:                       16875   7.1311                  100.00       |
+| Totals:                       1080    0.8389                  100.00       |
  ----------------------------------------------------------------------------
 
 
  ---------------------------------------------------------------------------- 
 | Reference count information                                                |
  ---------------------------------------------------------------------------- 
-| 12SparseMatrixIdE reference count information:
-| Creations:    1
-| Destructions: 1
-| 13NumericVectorIdE reference count information:
-| Creations:    3
-| Destructions: 3
-| 21LinearSolverInterfaceIdE reference count information:
-| Creations:    1
-| Destructions: 1
+| 12SparseMatrixISt7complexIdEE reference count information:
+|  Creations:    1
+|  Destructions: 1
+| 13NumericVectorISt7complexIdEE reference count information:
+|  Creations:    3
+|  Destructions: 3
+| 21LinearSolverInterfaceISt7complexIdEE reference count information:
+|  Creations:    1
+|  Destructions: 1
 | 4Elem reference count information:
-| Creations:    24975
-| Destructions: 24975
+|  Creations:    1728
+|  Destructions: 1728
 | 4Node reference count information:
-| Creations:    29791
-| Destructions: 29791
+|  Creations:    2197
+|  Destructions: 2197
 | 5QBase reference count information:
-| Creations:    4
-| Destructions: 4
+|  Creations:    4
+|  Destructions: 4
 | 6DofMap reference count information:
-| Creations:    1
-| Destructions: 1
+|  Creations:    1
+|  Destructions: 1
 | 6FEBase reference count information:
-| Creations:    2
-| Destructions: 2
+|  Creations:    2
+|  Destructions: 2
 | 6System reference count information:
-| Creations:    1
-| Destructions: 1
+|  Creations:    1
+|  Destructions: 1
  ---------------------------------------------------------------------------- 
-WARNING! There are options you set that were not used!
-WARNING! could be spelling mistake, etc!
-Option left: name:-d value: 3
  
 ***************************************************************
 * Done Running Example  ./ex4

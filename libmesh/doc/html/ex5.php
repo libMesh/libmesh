@@ -489,12 +489,16 @@ This is again identical to example 4, and not commented.
 <div class = "comment">
 Now we will loop over all the elements in the mesh.
 See example 3 for details.
-</div>
+const_elem_iterator           el (mesh.elements_begin());
+const const_elem_iterator end_el (mesh.elements_end());
+
+
+<br><br></div>
 
 <div class ="fragment">
 <pre>
-          const_elem_iterator           el (mesh.elements_begin());
-          const const_elem_iterator end_el (mesh.elements_end());
+          MeshBase::const_element_iterator       el     = mesh.elements_begin();
+          const MeshBase::const_element_iterator end_el = mesh.elements_end();
           
           for ( ; el != end_el; ++el)
             {
@@ -884,8 +888,9 @@ All done!
     
     
     
-    const_elem_iterator           el (mesh.elements_begin());
-    <FONT COLOR="#228B22"><B>const</FONT></B> const_elem_iterator end_el (mesh.elements_end());
+  
+    MeshBase::const_element_iterator       el     = mesh.elements_begin();
+    <FONT COLOR="#228B22"><B>const</FONT></B> MeshBase::const_element_iterator end_el = mesh.elements_end();
     
     <B><FONT COLOR="#A020F0">for</FONT></B> ( ; el != end_el; ++el)
       {
@@ -991,9 +996,11 @@ All done!
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+Compiling C++ (in debug mode) ex5.C...
 Linking ex5...
 /home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
 : the use of `mktemp' is dangerous, better use `mkstemp'
+
 ***************************************************************
 * Running Example  ./ex5
 ***************************************************************
@@ -1016,8 +1023,9 @@ Running ./ex5 -q 0
    System "Poisson"
     Type "Implicit"
     Variables="u" 
-    Finite Element Types="0" 
-    Approximation Orders="1" 
+    Finite Element Types="0", "12" 
+    Infinite Element Mapping="0" 
+    Approximation Orders="1", "3" 
     n_dofs()=4913
     n_local_dofs()=4913
     n_constrained_dofs()=0
@@ -1031,37 +1039,34 @@ Running ./ex5 -q 0
  ---------------------------------------------------------------------------- 
 | Reference count information                                                |
  ---------------------------------------------------------------------------- 
-| 12SparseMatrixIdE reference count information:
-| Creations:    1
-| Destructions: 1
-| 13NumericVectorIdE reference count information:
-| Creations:    3
-| Destructions: 3
-| 21LinearSolverInterfaceIdE reference count information:
-| Creations:    1
-| Destructions: 1
+| 12SparseMatrixISt7complexIdEE reference count information:
+|  Creations:    1
+|  Destructions: 1
+| 13NumericVectorISt7complexIdEE reference count information:
+|  Creations:    3
+|  Destructions: 3
+| 21LinearSolverInterfaceISt7complexIdEE reference count information:
+|  Creations:    1
+|  Destructions: 1
 | 4Elem reference count information:
-| Creations:    30208
-| Destructions: 30208
+|  Creations:    30208
+|  Destructions: 30208
 | 4Node reference count information:
-| Creations:    4913
-| Destructions: 4913
+|  Creations:    4913
+|  Destructions: 4913
 | 5QBase reference count information:
-| Creations:    4
-| Destructions: 4
+|  Creations:    4
+|  Destructions: 4
 | 6DofMap reference count information:
-| Creations:    1
-| Destructions: 1
+|  Creations:    1
+|  Destructions: 1
 | 6FEBase reference count information:
-| Creations:    2
-| Destructions: 2
+|  Creations:    2
+|  Destructions: 2
 | 6System reference count information:
-| Creations:    1
-| Destructions: 1
+|  Creations:    1
+|  Destructions: 1
  ---------------------------------------------------------------------------- 
-WARNING! There are options you set that were not used!
-WARNING! could be spelling mistake, etc!
-Option left: name:-q value: 0
  
 ***************************************************************
 * Done Running Example  ./ex5

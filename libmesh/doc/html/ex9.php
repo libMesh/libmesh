@@ -353,8 +353,8 @@ locality.
         	  OSSInt(out,2,t_step);
         	  out &lt;&lt; ", time=";
         	  OSSRealzeroleft(out,6,3,time);
-        	  out &lt;&lt;  "..." &lt;&lt; std::endl;
-        	  std::cout &lt;&lt; out.str();
+        	  out &lt;&lt;  "...";
+        	  std::cout &lt;&lt; out.str() &lt;&lt; std::endl;
         	}
         	
 </pre>
@@ -505,12 +505,16 @@ these initial values to the solution vector.  There is a small
 catch, however...  We only want to assign the components that
 live on the local processor, hence there will be an if-test
 in the loop.
-</div>
+const_active_local_elem_iterator       elem_it (mesh.elements_begin());
+const const_active_local_elem_iterator elem_end(mesh.elements_end());
+
+
+<br><br></div>
 
 <div class ="fragment">
 <pre>
-          const_active_local_elem_iterator       elem_it (mesh.elements_begin());
-          const const_active_local_elem_iterator elem_end(mesh.elements_end());
+          MeshBase::const_element_iterator       elem_it  = mesh.active_local_elements_begin();
+          const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end(); 
         
           for ( ; elem_it != elem_end; ++elem_it)
             {
@@ -766,13 +770,17 @@ live on the local processor. We will compute the element
 matrix and right-hand-side contribution.  Since the mesh
 will be refined we want to only consider the ACTIVE elements,
 hence we use a variant of the \p active_elem_iterator.
-</div>
+const_active_local_elem_iterator           el (mesh.elements_begin());
+const const_active_local_elem_iterator end_el (mesh.elements_end());
+
+
+<br><br></div>
 
 <div class ="fragment">
 <pre>
-          const_active_local_elem_iterator           el (mesh.elements_begin());
-          const const_active_local_elem_iterator end_el (mesh.elements_end());
-          
+          MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+          const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end(); 
+        
           for ( ; el != end_el; ++el)
             {    
 </pre>
@@ -1199,8 +1207,8 @@ That concludes the system matrix assembly routine.
   	  OSSInt(out,2,t_step);
   	  out &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;, time=&quot;</FONT></B>;
   	  OSSRealzeroleft(out,6,3,time);
-  	  out &lt;&lt;  <FONT COLOR="#BC8F8F"><B>&quot;...&quot;</FONT></B> &lt;&lt; std::endl;
-  	  std::cout &lt;&lt; out.str();
+  	  out &lt;&lt;  <FONT COLOR="#BC8F8F"><B>&quot;...&quot;</FONT></B>;
+  	  std::cout &lt;&lt; out.str() &lt;&lt; std::endl;
   	}
   	
   	TransientImplicitSystem&amp;  system =
@@ -1243,8 +1251,9 @@ That concludes the system matrix assembly routine.
     
     std::vector&lt;<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B>&gt; dof_indices;
   
-    const_active_local_elem_iterator       elem_it (mesh.elements_begin());
-    <FONT COLOR="#228B22"><B>const</FONT></B> const_active_local_elem_iterator elem_end(mesh.elements_end());
+  
+    MeshBase::const_element_iterator       elem_it  = mesh.active_local_elements_begin();
+    <FONT COLOR="#228B22"><B>const</FONT></B> MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end(); 
   
     <B><FONT COLOR="#A020F0">for</FONT></B> ( ; elem_it != elem_end; ++elem_it)
       {
@@ -1312,9 +1321,10 @@ That concludes the system matrix assembly routine.
     <FONT COLOR="#228B22"><B>const</FONT></B> Real dt = es.parameter   (<FONT COLOR="#BC8F8F"><B>&quot;dt&quot;</FONT></B>);
     <FONT COLOR="#228B22"><B>const</FONT></B> Real time = es.parameter (<FONT COLOR="#BC8F8F"><B>&quot;time&quot;</FONT></B>);
   
-    const_active_local_elem_iterator           el (mesh.elements_begin());
-    <FONT COLOR="#228B22"><B>const</FONT></B> const_active_local_elem_iterator end_el (mesh.elements_end());
-    
+  
+    MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+    <FONT COLOR="#228B22"><B>const</FONT></B> MeshBase::const_element_iterator end_el = mesh.active_local_elements_end(); 
+  
     <B><FONT COLOR="#A020F0">for</FONT></B> ( ; el != end_el; ++el)
       {    
         <FONT COLOR="#228B22"><B>const</FONT></B> Elem* elem = *el;
@@ -1398,10 +1408,11 @@ That concludes the system matrix assembly routine.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-Compiling C++ (in debug mode) exact_solution.C...
+Compiling C++ (in debug mode) ex9.C...
 Linking ex9...
 /home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
 : the use of `mktemp' is dangerous, better use `mkstemp'
+
 ***************************************************************
 * Running Example  ./ex9
 ***************************************************************
@@ -1422,8 +1433,9 @@ Linking ex9...
    System "Convection-Diffusion"
     Type "TransientImplicit"
     Variables="u" 
-    Finite Element Types="0" 
-    Approximation Orders="1" 
+    Finite Element Types="0", "12" 
+    Infinite Element Mapping="0" 
+    Approximation Orders="1", "3" 
     n_dofs()=6273
     n_local_dofs()=6273
     n_constrained_dofs()=0
@@ -1487,33 +1499,33 @@ Linking ex9...
  ---------------------------------------------------------------------------- 
 | Reference count information                                                |
  ---------------------------------------------------------------------------- 
-| 12SparseMatrixIdE reference count information:
-| Creations:    1
-| Destructions: 1
-| 13NumericVectorIdE reference count information:
-| Creations:    5
-| Destructions: 5
-| 21LinearSolverInterfaceIdE reference count information:
-| Creations:    1
-| Destructions: 1
+| 12SparseMatrixISt7complexIdEE reference count information:
+|  Creations:    1
+|  Destructions: 1
+| 13NumericVectorISt7complexIdEE reference count information:
+|  Creations:    5
+|  Destructions: 5
+| 21LinearSolverInterfaceISt7complexIdEE reference count information:
+|  Creations:    1
+|  Destructions: 1
 | 4Elem reference count information:
-| Creations:    70112
-| Destructions: 70112
+|  Creations:    70112
+|  Destructions: 70112
 | 4Node reference count information:
-| Creations:    6273
-| Destructions: 6273
+|  Creations:    6273
+|  Destructions: 6273
 | 5QBase reference count information:
-| Creations:    100
-| Destructions: 100
+|  Creations:    100
+|  Destructions: 100
 | 6DofMap reference count information:
-| Creations:    1
-| Destructions: 1
+|  Creations:    1
+|  Destructions: 1
 | 6FEBase reference count information:
-| Creations:    50
-| Destructions: 50
+|  Creations:    50
+|  Destructions: 50
 | 6System reference count information:
-| Creations:    1
-| Destructions: 1
+|  Creations:    1
+|  Destructions: 1
  ---------------------------------------------------------------------------- 
  
 ***************************************************************
