@@ -1,4 +1,4 @@
-// $Id: utility.C,v 1.15 2004-10-19 12:44:11 benkirk Exp $
+// $Id: utility.C,v 1.16 2004-11-12 22:36:09 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -92,7 +92,7 @@ std::string Utility::system_info()
 
 #ifdef USE_COMPLEX_NUMBERS
 
-const char* Utility::complex_filename(std::string name,
+const char* Utility::complex_filename(std::string& name,
 				      const unsigned int r_o_c)
 {
   if (r_o_c == 0)
