@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.64 2004-01-14 22:34:24 benkirk Exp $
+// $Id: mesh_base.C,v 1.65 2004-02-12 17:31:38 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -586,6 +586,13 @@ void MeshBase::partition (const unsigned int n_parts)
 
 void MeshBase::renumber_nodes_and_elements ()
 {
+  // Only renumber the nodes & trim the element vector
+  // if we have performed some local coarsening.  This
+  // will be the case if the element vector is not the
+  // same size as the number of active elements
+  if (_elements.size() == this->n_active_elem())
+    return;
+  
   START_LOG("renumber_nodes_and_elem()", "MeshBase");
   
   // node and element id counters
