@@ -30,10 +30,7 @@ a:hover {
 
 body
 {
-  background            : white url(images/bg.png);
-  background-repeat     : no-repeat;
-  background-attachment : fixed;
-  background-position   : center;
+  background            : white;
   color                 : black;
 }
 
@@ -41,10 +38,6 @@ body
 
 div.main_style {
     background: #eeeeee;
-    background-image: url(images/bg_muted.png);
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-position: center;
     padding-left         : 1em;
     margin-left          : 3em;
     margin-right         : 1em;
@@ -77,10 +70,6 @@ dl.el {
 
 div.fragment {
     background: #999999;
-    background-image: url(images/bg_more_muted.png);
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-position: center;
     margin-left          : 0em;
     margin-right         : 1em;
     padding-left         : 1em;
