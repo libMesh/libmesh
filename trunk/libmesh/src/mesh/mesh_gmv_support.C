@@ -1,4 +1,4 @@
-// $Id: mesh_gmv_support.C,v 1.12 2003-02-25 16:26:47 ddreyer Exp $
+// $Id: mesh_gmv_support.C,v 1.13 2003-02-26 16:05:46 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -302,10 +302,10 @@ void MeshBase::write_gmv(std::ostream& out,
 	  out << std::endl << std::endl;
 
 	  // this is the magnitude
-	  out << "abs_" << (*solution_names)[c] << " 1" << std::endl;
+	  out << "a_" << (*solution_names)[c] << " 1" << std::endl;
 	  for (unsigned int n=0; n<n_nodes(); n++)
 	    out << std::setprecision(10)
-		<< abs((*v)[n*n_vars + c]) << " ";
+		<< std::abs((*v)[n*n_vars + c]) << " ";
 
 	  out << std::endl << std::endl;
 
