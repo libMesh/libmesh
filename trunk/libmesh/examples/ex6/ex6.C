@@ -1,4 +1,4 @@
-// $Id: ex6.C,v 1.12 2003-02-24 22:03:49 benkirk Exp $
+// $Id: ex6.C,v 1.13 2003-02-27 00:15:10 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -120,7 +120,9 @@ int main (int argc, char** argv)
 
   std::cerr << "ERROR: This example requires the library to be " << std::endl
 	    << " compiled with Infinite Element support!" << std::endl;
-  error();  argc++;  argv++;
+  here();
+
+  return 0;
 
 #else
 
@@ -132,7 +134,9 @@ int main (int argc, char** argv)
 
   std::cerr << "ERROR: This example is not intended for " << std::endl
 	    << " use with complex numbers." << std::endl;
-  error();
+  here();
+
+  return 0;
 
 # endif
 
@@ -480,22 +484,21 @@ void assemble_wave(EquationSystems& es,
 		    {
 		      AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
 	      
-		      QGauss qface0(dim,   SECOND);
-		      QGauss qface1(dim-1, SECOND);
+		      QGauss qface (dim, SECOND);
 	      
-		      fe_face->attach_quadrature_rule (&qface0);
+		      fe_face->attach_quadrature_rule (&qface);
 	      
 		      /**
 		       * The value of the shape functions at the quadrature
 		       * points.
 		       */
-		      const std::vector<std::vector<Real> >&  fphi = fe_face->get_phi();
+		      const std::vector<std::vector<Real> >&  phi_face = fe_face->get_phi();
 	      
 		      /**
 		       * The Jacobian * Quadrature Weight at the quadrature
 		       * points on the face.
 		       */
-		      const std::vector<Real>& fJxW = fe_face->get_JxW();
+		      const std::vector<Real>& JxW_face = fe_face->get_JxW();
 	      
 		      /**
 		       * The XYZ locations (in physical space) of the
@@ -508,13 +511,13 @@ void assemble_wave(EquationSystems& es,
 		       * Compute the shape function values on the element
 		       * face.
 		       */
-		      fe_face->reinit(&qface1, elem, side);
+		      fe_face->reinit(elem, side);
 
 	      
 		      /**
 		       * Loop over the face quagrature points for integration.
 		       */
-		      for (unsigned int qp=0; qp<qface0.n_points(); qp++)
+		      for (unsigned int qp=0; qp<fe_face->n_quadrature_points(); qp++)
 		        {
 			  /**
 			   * The location on the boundary of the current
@@ -532,9 +535,9 @@ void assemble_wave(EquationSystems& es,
 			  /**
 			   * Right-hand-side contribution.
 			   */
-			  for (unsigned int i=0; i<fphi.size(); i++)
+			  for (unsigned int i=0; i<fe_face->n_shape_functions(); i++)
 			    {
-			      Fe[i] += fJxW[qp]*value*fphi[i][qp];
+			      Fe[i] += JxW_face[qp]*value*phi_face[i][qp];
 			    };
 		  
 			}; // end face quadrature point loop	  
@@ -544,7 +547,7 @@ void assemble_wave(EquationSystems& es,
 
 		    }; // end if (elem->neighbor(side) == NULL)
 
-	    }; // end boundary condition section	     
+	    } // end boundary condition section	     
 
 	}; // else ( if (FEInterface::is_InfFE_elem(elem->type())) )
 
