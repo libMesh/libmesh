@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.C,v 1.16 2003-07-10 07:38:06 ddreyer Exp $
+// $Id: mesh_unv_support.C,v 1.17 2003-07-12 16:56:39 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -37,8 +37,8 @@
 #include "cell_prism6.h"
 
 //-----------------------------------------------------------------------------
-// Mesh methods
-void Mesh::read_unv(const std::string& name)
+// MeshBase methods
+void MeshBase::read_unv(const std::string& name)
 {
   std::ifstream file (name.c_str());
 
@@ -53,7 +53,7 @@ void Mesh::read_unv(const std::string& name)
 
 
 
-void Mesh::write_unv(const std::string& name)
+void MeshBase::write_unv(const std::string& name)
 {
   std::ofstream file (name.c_str());
 

@@ -1,4 +1,4 @@
-// $Id: mesh.h,v 1.15 2003-05-28 03:17:47 benkirk Exp $
+// $Id: mesh.h,v 1.16 2003-07-12 16:56:39 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -199,16 +199,6 @@ class Mesh : public MeshBase
    * Same, but expects a true XDR-Encoded binary file.
    */
   void read_xdr_binary (const std::string& name);
-
-  /** 
-   * Read mesh from the file specified by \p name in Universal (unv) format.  
-   */
-  void read_unv (const std::string& name);
-
-  /** 
-   * Write mesh to file specified by \p name in Universal (unv) format.
-   */
-  void write_unv (const std::string& name);
 
   /**
    * Actual implementation of writing  meshes in DIVA's ASCII
