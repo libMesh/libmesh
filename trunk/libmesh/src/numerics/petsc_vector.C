@@ -1,4 +1,4 @@
-// $Id: petsc_vector.C,v 1.16 2003-03-12 20:21:03 ddreyer Exp $
+// $Id: petsc_vector.C,v 1.17 2003-03-21 17:15:22 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,6 +23,7 @@
 
 // Local Includes
 #include "petsc_vector.h"
+#include "petsc_matrix.h"
 
 #ifdef HAVE_PETSC
 
@@ -167,6 +168,22 @@ void PetscVector<T>::add_vector (const NumericVector<T>& V,
 
   for (unsigned int i=0; i<V.size(); i++)
     add (dof_indices[i], V(i));
+}
+
+
+template <typename T>
+inline
+void PetscVector<T>::add_vector (const NumericVector<T>& V,
+				 SparseMatrix<T>& A)
+{
+  const PetscVector<T>& Vpetsc = dynamic_cast<const PetscVector<T>&>(V);
+  PetscMatrix<T>& Apetsc = dynamic_cast<PetscMatrix<T>&>(A);
+  int ierr=0;
+
+  Apetsc.close();
+
+  ierr = MatMultAdd(Apetsc.mat, Vpetsc.vec, vec, vec);   CHKERRQ(ierr);
+  return;
 }
 
 

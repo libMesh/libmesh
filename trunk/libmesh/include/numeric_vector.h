@@ -1,4 +1,4 @@
-// $Id: numeric_vector.h,v 1.10 2003-03-21 15:29:09 ddreyer Exp $
+// $Id: numeric_vector.h,v 1.11 2003-03-21 17:15:04 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -36,7 +36,7 @@
 // forward declarations
 template <typename T> class NumericVector;
 template <typename T> class DenseVector;
-
+template <typename T> class SparseMatrix;
 
 
 /**
@@ -270,7 +270,7 @@ public:
    * \p operator +=.
    */
   virtual void add (const T a, const NumericVector<T>& v) = 0;
-  
+
   /**
    * U+=v where v is a std::vector<T> 
    * and you
@@ -287,7 +287,15 @@ public:
    */
   virtual void add_vector (const NumericVector<T>& V,
 			   const std::vector<unsigned int>& dof_indices) = 0;
-    
+
+  /**
+   * U+=U+A*V.
+   * Add the product of a Sparse matrix \p A
+   * and a Numeric vector \p V to this Numeric vector.
+   */
+  virtual void add_vector (const NumericVector<T> &,
+			   SparseMatrix<T> &) = 0;
+      
   /**
    * U+=V where U and V are type 
    * DenseVector<T> and you

@@ -1,4 +1,4 @@
-// $Id: laspack_vector.h,v 1.10 2003-03-14 09:56:40 ddreyer Exp $
+// $Id: laspack_vector.h,v 1.11 2003-03-21 17:15:04 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -48,7 +48,7 @@
 
 // Forward declarations
 template <typename T> class LaspackInterface;
-
+template <typename T> class SparseMatrix;
 
 
 /**
@@ -282,7 +282,15 @@ class LaspackVector : public NumericVector<T>
    */
   void add_vector (const NumericVector<T>& V,
 		   const std::vector<unsigned int>& dof_indices);
-  
+ 
+  /**
+   * U+=U+A*V.
+   * Add the product of a Sparse matrix \p A
+   * and a Numeric vector \p V to this Numeric vector.
+   */
+  void add_vector (const NumericVector<T> &,
+		   SparseMatrix<T> &);
+      
   /**
    * U+=V where U and V are type 
    * DenseVector<T> and you
@@ -569,6 +577,17 @@ void LaspackVector<T>::add_vector (const NumericVector<T>& V,
 
   for (unsigned int i=0; i<V.size(); i++)
     add (dof_indices[i], V(i));
+}
+
+
+
+template <typename T> 
+inline
+void LaspackVector<T>::add_vector (const NumericVector<T> &,
+				   SparseMatrix<T> &)
+{
+  std::cerr << "Not implemented yet!" << std::endl;
+  error();
 }
 
 
