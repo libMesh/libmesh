@@ -122,10 +122,10 @@ void assemble(EquationSystems& es,
   std::vector<unsigned int> dof_indices_V;
   const DofMap& dof_map = es(system_name).get_dof_map();
   
-  RealDenseMatrix   Kuu;
-  RealDenseMatrix   Kvv;
-  std::vector<Real> Fu;
-  std::vector<Real> Fv;
+  DenseMatrix<Number> Kuu;
+  DenseMatrix<Number> Kvv;
+  std::vector<Number> Fu;
+  std::vector<Number> Fv;
   
   Real vol=0., area=0.;
 

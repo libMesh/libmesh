@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.21 2003-02-21 21:03:53 benkirk Exp $
+// $Id: dof_map.C,v 1.22 2003-02-22 16:38:21 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -670,14 +670,14 @@ void DofMap::print_dof_constraints() const
 
 
 
-void DofMap::constrain_element_matrix (RealDenseMatrix& matrix,
+void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
 				       std::vector<unsigned int>& elem_dofs) const
 {
   assert (elem_dofs.size() == matrix.m());
   assert (elem_dofs.size() == matrix.n());
   
   // The constrained matrix is built up as C^T K C.    
-  RealDenseMatrix C;
+  DenseMatrix<Number> C;
 
   
   build_constraint_matrix (C, elem_dofs);
@@ -727,8 +727,8 @@ void DofMap::constrain_element_matrix (RealDenseMatrix& matrix,
 
 
 
-void DofMap::constrain_element_matrix_and_vector (RealDenseMatrix& matrix,
-						  std::vector<Real>& rhs,
+void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
+						  std::vector<Number>& rhs,
 						  std::vector<unsigned int>& elem_dofs) const
 {
   assert (elem_dofs.size() == matrix.m());
@@ -737,7 +737,7 @@ void DofMap::constrain_element_matrix_and_vector (RealDenseMatrix& matrix,
   
   // The constrained matrix is built up as C^T K C.
   // The constrained RHS is built up as C^T F
-  RealDenseMatrix C;
+  DenseMatrix<Number> C;
   
   build_constraint_matrix (C, elem_dofs);
 
@@ -784,7 +784,7 @@ void DofMap::constrain_element_matrix_and_vector (RealDenseMatrix& matrix,
 
       
       // Compute the matrix-vector product C^T F
-      std::vector<Real> old_rhs(rhs);
+      std::vector<Number> old_rhs(rhs);
       
       rhs.resize(elem_dofs.size());
       
@@ -812,7 +812,7 @@ void DofMap::constrain_element_matrix_and_vector (RealDenseMatrix& matrix,
 
 
 
-void DofMap::constrain_element_matrix (RealDenseMatrix& matrix,
+void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
 				       std::vector<unsigned int>& row_dofs,
 				       std::vector<unsigned int>& col_dofs) const
 {
@@ -824,8 +824,8 @@ void DofMap::constrain_element_matrix (RealDenseMatrix& matrix,
 
   
   
-  RealDenseMatrix R;
-  RealDenseMatrix C;
+  DenseMatrix<Number> R;
+  DenseMatrix<Number> C;
 
   // Safeguard against the user passing us the same
   // object for row_dofs and col_dofs.  If that is done
@@ -886,14 +886,14 @@ void DofMap::constrain_element_matrix (RealDenseMatrix& matrix,
 
 
 
-void DofMap::constrain_element_vector (std::vector<Real>&         rhs,
+void DofMap::constrain_element_vector (std::vector<Number>&       rhs,
 				       std::vector<unsigned int>& row_dofs) const
 {
   assert (rhs.size() == row_dofs.size());
 
   
   // The constrained RHS is built up as R^T F.  
-  RealDenseMatrix R;
+  DenseMatrix<Number> R;
 
   build_constraint_matrix (R, row_dofs);
 
@@ -903,7 +903,7 @@ void DofMap::constrain_element_vector (std::vector<Real>&         rhs,
       (R.n() == row_dofs.size())) // if the RHS is constrained
     {
       // Compute the matrix-vector product
-      std::vector<Real> old_rhs(rhs);
+      std::vector<Number> old_rhs(rhs);
       
       rhs.resize(row_dofs.size());
       
@@ -931,7 +931,7 @@ void DofMap::constrain_element_vector (std::vector<Real>&         rhs,
 
 
 
-void DofMap::build_constraint_matrix (RealDenseMatrix& C,
+void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
 				      std::vector<unsigned int>& elem_dofs) const
 {
   typedef std::set<unsigned int> RCSet;
@@ -998,7 +998,7 @@ void DofMap::build_constraint_matrix (RealDenseMatrix& C,
       }
       
       // Now we can build the constraint matrix.
-      // Note that resize also zeros for a RealDenseMatrix.
+      // Note that resize also zeros for a DenseMatrix<Number>.
       C.resize (elem_dofs.size(), new_elem_dofs.size());
       
       // Create the C constraint matrix.
@@ -1037,7 +1037,7 @@ void DofMap::build_constraint_matrix (RealDenseMatrix& C,
       // constrained DOF.
       elem_dofs = new_elem_dofs;
       
-      RealDenseMatrix Cnew;
+      DenseMatrix<Number> Cnew;
       
       build_constraint_matrix (Cnew, elem_dofs);
 
