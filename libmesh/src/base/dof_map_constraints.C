@@ -1,4 +1,4 @@
-// $Id: dof_map_constraints.C,v 1.7 2004-08-17 03:03:51 benkirk Exp $
+// $Id: dof_map_constraints.C,v 1.8 2004-11-03 21:30:19 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -21,7 +21,7 @@
 
 // C++ Includes -------------------------------------
 #include <set>
-#include <algorithm> // for std::count
+#include <algorithm> // for std::count, std::fill
 
 // Local Includes -----------------------------------
 #include "dof_map.h"
@@ -141,12 +141,8 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
   if ((C.m() == matrix.m()) &&
       (C.n() == elem_dofs.size())) // It the matrix is constrained
     {
-      //here();
-    
-      //matrix.left_multiply  (C, true);
+      // Compute the matrix-matrix-matrix product C^T K C
       matrix.left_multiply_transpose  (C);
-      
-      //matrix.right_multiply (C, false);
       matrix.right_multiply (C);
       
       
@@ -208,10 +204,7 @@ void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
       (C.n() == elem_dofs.size())) // It the matrix is constrained
     {
       // Compute the matrix-matrix-matrix product C^T K C
-      //matrix.left_multiply  (C, true);
       matrix.left_multiply_transpose  (C);
-
-      //matrix.right_multiply (C, false);
       matrix.right_multiply (C);
       
       
@@ -219,7 +212,10 @@ void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
       assert (matrix.m() == elem_dofs.size());
       assert (matrix.n() == elem_dofs.size());
       
-      
+
+      // This will put a nonsymmetric entry in the constraint
+      // row to ensure that the linear system produces the
+      // correct value for the constrained DOF.
       for (unsigned int i=0; i<elem_dofs.size(); i++)
 	if (this->is_constrained_dof(elem_dofs[i]))
 	  {
@@ -249,19 +245,16 @@ void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
       
       // Compute the matrix-vector product C^T F
       DenseVector<Number> old_rhs(rhs);
-      
-      rhs.resize(elem_dofs.size());
-      
-      
-      for (unsigned int i=0; i<elem_dofs.size(); i++)
-	{
-	  // zero before summation
-	  rhs(i) = 0.;
-	  
-	  for (unsigned int j=0; j<old_rhs.size(); j++)
-	    rhs(i) += C.transpose(i,j)*old_rhs(j);
-	}
 
+      // resize the RHS vector & 0 before summation
+      rhs.resize(elem_dofs.size());
+      rhs.zero();
+      
+      // compute matrix/vector product
+      for (unsigned int i=0; i<elem_dofs.size(); i++)
+	for (unsigned int j=0; j<old_rhs.size(); j++)
+	  rhs(i) += C.transpose(i,j)*old_rhs(j);
+	
 
       assert (elem_dofs.size() == rhs.size());
 
@@ -308,14 +301,10 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
   if ((R.m() == matrix.m()) &&
       (R.n() == row_dofs.size()) &&
       (C.m() == matrix.n()) &&
-      (C.n() == col_dofs.size())) // It the matrix is constrained
+      (C.n() == col_dofs.size())) // If the matrix is constrained
     {
-      //here();
-    
-      //matrix.left_multiply  (R, true);
+      // K_constrained = R^T K C
       matrix.left_multiply_transpose  (R);
-      
-      //matrix.right_multiply (C, false);
       matrix.right_multiply (C);
       
       
@@ -373,20 +362,16 @@ void DofMap::constrain_element_vector (DenseVector<Number>&       rhs,
     {
       // Compute the matrix-vector product
       DenseVector<Number> old_rhs(rhs);
-      
+
+      // resize RHS & zero before summation
       rhs.resize(row_dofs.size());
-      
-      
+      rhs.zero();
+
+      // compute matrix/vector product
       for (unsigned int i=0; i<row_dofs.size(); i++)
-	{
-	  // zero before summation
-	  rhs(i) = 0.;
-	  
-	  for (unsigned int j=0; j<old_rhs.size(); j++)
-	    rhs(i) += R.transpose(i,j)*old_rhs(j);
-	}
-
-
+	for (unsigned int j=0; j<old_rhs.size(); j++)
+	  rhs(i) += R.transpose(i,j)*old_rhs(j);
+      
       assert (row_dofs.size() == rhs.size());
 
       for (unsigned int i=0; i<row_dofs.size(); i++)
@@ -406,69 +391,45 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
 				      std::vector<unsigned int>& elem_dofs) const
 {
   START_LOG("build_constraint_matrix()", "DofMap");
-  
+
+  // Create a set containing the DOFs we already depend on
   typedef std::set<unsigned int> RCSet;
-  RCSet dof_set;
-
-  bool done = true;
-
-  // First insert the DOFS we already depend on into the sets.
-  {
-    for (unsigned int i=0; i<elem_dofs.size(); i++)
-      dof_set.insert(elem_dofs[i]);
-  }
-  
+  RCSet dof_set (elem_dofs.begin(),
+		 elem_dofs.end());
 
   // Next insert any dofs those might be constrained in terms
   // of.  Note that in this case we may not be done:  Those may
   // in turn depend on others.  So, we need to repeat this process
   // in that case until the system depends only on unconstrained
   // degrees of freedom.
-  {
-    const unsigned int orig_dof_set_size = dof_set.size();
-    
-    for (unsigned int i=0; i<elem_dofs.size(); i++)
-      if (this->is_constrained_dof(elem_dofs[i]))
-	{
-	  // If the DOF is constrained
-	  DofConstraints::const_iterator
-	    pos = _dof_constraints.find(elem_dofs[i]);
-	  
-	  assert (pos != _dof_constraints.end());
-	  
-	  const DofConstraintRow& constraint_row = pos->second;
-	  
-	  assert (!constraint_row.empty());
-	  
-	  for (DofConstraintRow::const_iterator
-		 it=constraint_row.begin(); it != constraint_row.end();
-	       ++it)
-	    dof_set.insert (it->first);
-	}
-
-    // If we added any DOFS then we need to do this recursively.
-    // It is possible that we just added a DOF that is also
-    // constrained!
-    if (dof_set.size() != orig_dof_set_size)
-      done = false;
-  }
-
-
-  // If not done then we need to do more work
-  // (obviously :-) )!
-  if (!done)
-    {
-      std::vector<unsigned int> new_elem_dofs(dof_set.size());
-      
+  for (unsigned int i=0; i<elem_dofs.size(); i++)
+    if (this->is_constrained_dof(elem_dofs[i]))
       {
-	RCSet::const_iterator end_it = dof_set.end(); 
+	// If the DOF is constrained
+	DofConstraints::const_iterator
+	  pos = _dof_constraints.find(elem_dofs[i]);
 	
-	unsigned int i=0;
+	assert (pos != _dof_constraints.end());
 	
-	for (RCSet::const_iterator it=dof_set.begin();
-	     it != end_it; ++it)
-	  new_elem_dofs[i++] = *it;
+	const DofConstraintRow& constraint_row = pos->second;
+	
+	assert (!constraint_row.empty());
+	
+	for (DofConstraintRow::const_iterator
+	       it=constraint_row.begin(); it != constraint_row.end();
+	     ++it)
+	  dof_set.insert (it->first);
       }
+
+  // If we added any DOFS then we need to do this recursively.
+  // It is possible that we just added a DOF that is also
+  // constrained!
+  if (dof_set.size() != elem_dofs.size())
+    {
+      // Create a new list of element DOFs containing the
+      // contents of the current dof_set.
+      std::vector<unsigned int> new_elem_dofs (dof_set.begin(),
+					       dof_set.end());
       
       // Now we can build the constraint matrix.
       // Note that resize also zeros for a DenseMatrix<Number>.
