@@ -1,4 +1,4 @@
-// $Id: enum_fe_family.h,v 1.6 2003-02-13 22:56:07 benkirk Exp $
+// $Id: enum_fe_family.h,v 1.7 2003-04-11 23:57:04 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -35,19 +35,21 @@ namespace MeshEnums {
   
   /**
    * \enum MeshEnums::FEFamily defines an \p enum for finite element families.
+   * Explicity assign numbers so that one can differentiate between enabled
+   * and disabled infinite elements even when these are disabled.
    */
-  enum FEFamily {LAGRANGE=0,
-		 HIERARCHIC,
-		 MONOMIAL,
+  enum FEFamily {LAGRANGE     = 0,
+		 HIERARCHIC   = 1,
+		 MONOMIAL     = 2,
 		 
 #ifdef ENABLE_INFINITE_ELEMENTS
-		 INFINITE_MAP,     //   for 1/r-map
-		 JACOBI_20_00,     //   i_max = 19
-                 JACOBI_30_00,     //   i_max = 19
-		 LEGENDRE,         //   i_max = 19
+		 INFINITE_MAP = 11,     //   for 1/r-map
+		 JACOBI_20_00 = 12,     //   i_max = 19
+                 JACOBI_30_00 = 13,     //   i_max = 19
+		 LEGENDRE     = 14,     //   i_max = 19
 #endif
 		 
-		 INVALID_FE};
+		 INVALID_FE   = 42};
 }
 
 using namespace MeshEnums;
