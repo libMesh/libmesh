@@ -1,4 +1,4 @@
-// $Id: dense_vector_base.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: dense_vector_base.h,v 1.3 2004-02-22 21:47:58 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -85,6 +85,13 @@ public:
    * Pretty-print the vector to \p stdout.
    */
   void print() const;
+
+  /**
+   * Prints the entries of the vector with additional
+   * decimal places in scientific notation.
+   */
+  void print_scientific() const;
+
 };
 
 
@@ -96,10 +103,33 @@ public:
 
 template<typename T>
 inline
+void DenseVectorBase<T>::print_scientific () const
+{
+    // save the initial format flags
+  std::ios_base::fmtflags cout_flags = std::cout.flags();
+
+  // Print the vector entries.
+  for (unsigned int i=0; i<this->size(); i++)
+    std::cout << std::setw(10)
+	      << std::scientific
+	      << std::setprecision(8)
+	      << this->el(i)
+	      << std::endl;
+  
+  // reset the original format flags
+  std::cout.flags(cout_flags);
+}
+
+
+
+template<typename T>
+inline
 void DenseVectorBase<T>::print () const
 {  
   for (unsigned int i=0; i<this->size(); i++)
-    std::cout << std::setw(8) << this->el(i) << std::endl;
+    std::cout << std::setw(8)
+	      << this->el(i)
+	      << std::endl;
 }
 
 

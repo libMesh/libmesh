@@ -1,4 +1,4 @@
-// $Id: dense_matrix_base.h,v 1.3 2004-01-03 15:37:42 benkirk Exp $
+// $Id: dense_matrix_base.h,v 1.4 2004-02-22 21:47:58 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -107,6 +107,12 @@ public:
   void print() const;
 
   /**
+   * Prints the matrix entries with more decimal places in
+   * scientific notation.
+   */
+  void print_scientific() const;
+  
+  /**
    * Adds \p factor to every element in the matrix.
    */
   void add (const T factor,
@@ -152,12 +158,38 @@ protected:
 
 template<typename T>
 inline
+void DenseMatrixBase<T>::print_scientific () const
+{
+  // save the initial format flags
+  std::ios_base::fmtflags cout_flags = std::cout.flags();
+
+  // Print the matrix entries.
+  for (unsigned int i=0; i<_m; i++)
+    {
+      for (unsigned int j=0; j<_n; j++)
+	std::cout << std::setw(15)
+		  << std::scientific
+		  << std::setprecision(8)
+		  << this->el(i,j) << " ";
+
+      std::cout << std::endl;
+    }
+
+  // reset the original format flags
+  std::cout.flags(cout_flags);
+}
+
+
+
+template<typename T>
+inline
 void DenseMatrixBase<T>::print () const
 {  
   for (unsigned int i=0; i<_m; i++)
     {
       for (unsigned int j=0; j<_n; j++)
-	std::cout << std::setw(8) << this->el(i,j) << " ";
+	std::cout << std::setw(8)
+		  << this->el(i,j) << " ";
 
       std::cout << std::endl;
     }
