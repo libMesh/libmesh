@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.21 2004-05-09 15:40:22 fprill Exp $
+// $Id: mesh_base.h,v 1.22 2004-05-11 20:29:00 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -46,7 +46,7 @@ class EquationSystems;
 #include "enum_order.h"
 #include "elem_iterators.h"
 #include "node_iterators.h"
-
+#include "partitioner.h"
 
 /**
  * This is the \p MeshBase class. This class provides all the data necessary
@@ -61,7 +61,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.21 $
+ * \version $Revision: 1.22 $
  */
 
 
@@ -468,6 +468,14 @@ public:
   unsigned int n_subdomains () const { return _n_sbd; }
 
   /**
+   * Returns the number of partitions which have been defined via
+   * a call to either mesh.partition() or by building a Partitioner
+   * object and calling partition.  Note that the partitioner objects
+   * are responsible for setting this value.
+   */
+  unsigned int n_partitions () const { return _n_parts; }
+  
+  /**
    * @returns the number of processors used in the
    * current simulation.
    */
@@ -737,6 +745,11 @@ protected:
   unsigned int& set_n_subdomains () { return _n_sbd; }
 
   /**
+   * Returns a writeable reference to the number of partitions.
+   */
+  unsigned int& set_n_partitions () { return _n_parts; }
+  
+  /**
    * Reads input from \p in, skipping all the lines
    * that start with the character \p comment_start.
    */
@@ -754,10 +767,26 @@ protected:
   std::vector<Elem*> _elements;
 
   /**
-   * The number of subdomains the mesh has been partitioned into.
+   * The number of subdomains the mesh has.
+   * **NOTE** Not to be confused with the number of paritions!
+   * The definition of subdomain can be anything the user wants,
+   * e.g. a solid region bounded by a liquid region could be
+   * referred to as subdomains 1 and 2, but those subdomains
+   * could be partitioned over many processors.
    */
   unsigned int _n_sbd;
 
+  /**
+   * The number of partitions the mesh has.  This is set by
+   * the partitioners, and may not be changed directly by
+   * the user.
+   * **NOTE** The number of partitions *need not* equal
+   * libMesh::n_processors(), consider for example the case
+   * where you simply want to partition a mesh on one
+   * processor and view the result in GMV.
+   */
+  unsigned int _n_parts;
+  
   /**
    * The logical dimension of the mesh.
    */     
@@ -778,6 +807,12 @@ protected:
    * The \p MeshCommunication class needs to be a friend.
    */
   friend class MeshCommunication;
+
+  /**
+   * The partitioner class is a friend so that it can set
+   * the number of subdomains.
+   */
+  friend class Partitioner;
   
 #ifdef ENABLE_AMR
   

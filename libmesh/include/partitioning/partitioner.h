@@ -1,4 +1,4 @@
-// $Id: partitioner.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: partitioner.h,v 1.3 2004-05-11 20:29:06 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -65,8 +65,8 @@ class Partitioner
    * of each element.  This number is reserved for things like
    * material properties, etc.
    */
-  virtual void partition (MeshBase& mesh,
-			  const unsigned int n=libMesh::n_processors()) = 0;
+  void partition (MeshBase& mesh,
+		  const unsigned int n=libMesh::n_processors());
 
   /**
    * Repartitions the \p MeshBase into \p n parts.  This
@@ -74,8 +74,8 @@ class Partitioner
    * more efficiently than computing a new partitioning from scratch.
    * The default behavior is to simply call this->partition(n)
   */
-  virtual void repartition (MeshBase& mesh,
-			    const unsigned int n=libMesh::n_processors()) { this->partition (mesh, n); }
+  void repartition (MeshBase& mesh,
+		    const unsigned int n=libMesh::n_processors());
 
   
 protected:
@@ -87,6 +87,22 @@ protected:
    * so that derived classes may use it without reimplementing it.
    */
   void single_partition (MeshBase& mesh);
+
+  /**
+   * This is the actual partitioning method which must be overloaded
+   * in derived classes.  It is called via the public partition()
+   * method above by the user.
+   */
+  virtual void _do_partition(MeshBase& mesh,
+			     const unsigned int n) = 0;
+
+  /**
+   * This is the actual re-partitioning method which can be overloaded
+   * in derived classes.  Note that the default behavior is to simply
+   * call the partition function.
+   */
+  virtual void _do_repartition (MeshBase& mesh,
+				const unsigned int n) { this->_do_partition (mesh, n); }
 };
 
 

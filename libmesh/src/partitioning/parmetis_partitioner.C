@@ -1,4 +1,4 @@
-// $Id: parmetis_partitioner.C,v 1.12 2004-01-03 15:37:44 benkirk Exp $
+// $Id: parmetis_partitioner.C,v 1.13 2004-05-11 20:29:07 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -49,8 +49,8 @@ namespace Parmetis {
 
 // ------------------------------------------------------------
 // ParmetisPartitioner implementation
-void ParmetisPartitioner::partition (MeshBase& mesh,
-				     const unsigned int n_sbdmns)
+void ParmetisPartitioner::_do_partition (MeshBase& mesh,
+					 const unsigned int n_sbdmns)
 {
   assert (n_sbdmns > 0);
 
@@ -113,8 +113,8 @@ void ParmetisPartitioner::partition (MeshBase& mesh,
 
 
 
-void ParmetisPartitioner::repartition (MeshBase& mesh,
-				       const unsigned int n_sbdmns)
+void ParmetisPartitioner::_do_repartition (MeshBase& mesh,
+					   const unsigned int n_sbdmns)
 {
   assert (n_sbdmns > 0);
 

@@ -1,4 +1,4 @@
-// $Id: gmv_io.C,v 1.6 2004-04-19 17:12:26 benkirk Exp $
+// $Id: gmv_io.C,v 1.7 2004-05-11 20:29:06 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -273,10 +273,10 @@ void GMVIO::write_ascii (const std::string& fname,
   if (this->partitioning())
     {
       out << "material "
-	  << mesh.n_processors()
+	  << mesh.n_partitions()
 	  << " 0"<< std::endl;
 
-      for (unsigned int proc=0; proc<mesh.n_processors(); proc++)
+      for (unsigned int proc=0; proc<mesh.n_partitions(); proc++)
 	out << "proc_" << proc << std::endl;
       
       const_active_elem_iterator       it (mesh.elements_begin());

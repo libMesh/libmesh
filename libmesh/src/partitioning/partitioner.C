@@ -1,4 +1,4 @@
-// $Id: partitioner.C,v 1.5 2004-01-03 15:37:44 benkirk Exp $
+// $Id: partitioner.C,v 1.6 2004-05-11 20:29:07 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -29,6 +29,36 @@
 
 // ------------------------------------------------------------
 // Partitioner implementation
+
+
+void Partitioner::partition (MeshBase& mesh,
+			     const unsigned int n)
+{
+  // Set the number of partitions in the mesh
+  mesh.set_n_partitions()=n;
+
+  // Call the partitioning function
+  this->_do_partition(mesh,n);
+}
+
+
+
+
+
+void Partitioner::repartition (MeshBase& mesh,
+			       const unsigned int n)
+{
+  // Set the number of partitions in the mesh
+  mesh.set_n_partitions()=n;
+  
+  // Call the partitioning function
+  this->_do_repartition(mesh,n);
+}
+
+
+
+
+
 void Partitioner::single_partition (MeshBase& mesh)
 {
   // Loop over all the elements and assign them to processor 0.

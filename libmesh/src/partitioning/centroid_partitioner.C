@@ -1,4 +1,4 @@
-// $Id: centroid_partitioner.C,v 1.8 2004-03-24 05:49:12 jwpeterson Exp $
+// $Id: centroid_partitioner.C,v 1.9 2004-05-11 20:29:07 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -28,8 +28,8 @@
 
 //---------------------------------------------------------
 // CentroidPartitioner methods
-void CentroidPartitioner::partition (MeshBase& mesh,
-				     const unsigned int n)
+void CentroidPartitioner::_do_partition (MeshBase& mesh,
+					 const unsigned int n)
 {
   // Check for an easy return
   if (n == 1)
@@ -115,10 +115,6 @@ void CentroidPartitioner::partition (MeshBase& mesh,
 
 
 
-// void CentroidPartitioner::repartition (const unsigned int n)
-// {
-//   this->partition (n);
-// }
 
 
 

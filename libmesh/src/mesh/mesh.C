@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.39 2004-05-05 15:23:50 spetersen Exp $
+// $Id: mesh.C,v 1.40 2004-05-11 20:29:07 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -167,7 +167,7 @@ void Mesh::write (const std::string& name)
 
     else if (name.rfind(".gmv") < name.size())
       {
-	if (this->n_subdomains() > 1)
+	if (this->n_partitions() > 1)
 	  GMVIO(*this).write (name);
 	else
 	  {

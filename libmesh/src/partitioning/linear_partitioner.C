@@ -1,4 +1,4 @@
-// $Id: linear_partitioner.C,v 1.7 2004-01-03 15:37:44 benkirk Exp $
+// $Id: linear_partitioner.C,v 1.8 2004-05-11 20:29:07 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -30,8 +30,8 @@
 
 // ------------------------------------------------------------
 // LinearPartitioner implementation
-void LinearPartitioner::partition (MeshBase& mesh,
-				   const unsigned int n)
+void LinearPartitioner::_do_partition (MeshBase& mesh,
+				       const unsigned int n)
 {
   assert (n > 0);
 
