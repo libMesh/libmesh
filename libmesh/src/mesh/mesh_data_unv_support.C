@@ -1,4 +1,4 @@
-// $Id: mesh_data_unv_support.C,v 1.10 2003-08-12 17:49:18 ddreyer Exp $
+// $Id: mesh_data_unv_support.C,v 1.11 2003-08-16 21:19:30 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -44,7 +44,7 @@ void MeshData::read_unv(const std::string& name)
   assert (_node_id_map_closed);
   assert (_elem_id_map_closed);
 
-  /**
+  /*
    * clear the data, but keep the id maps
    */
   this->clear();
@@ -60,7 +60,7 @@ void MeshData::read_unv(const std::string& name)
 
   const std::string _label_dataset_mesh_data = "2414";
 
-  /**
+  /*
    * locate the beginning of data set
    * and read it.
    */
@@ -70,6 +70,14 @@ void MeshData::read_unv(const std::string& name)
     while (true)
     {
       in_file >> olds >> news;
+
+      /*
+       * Yes, really dirty:
+       *
+       * When we found a dataset, and the user does
+       * not want this dataset, we jump back here
+       */
+    go_and_find_the_next_dataset:
 
       /*
        * a "-1" followed by a number means the beginning of a dataset
@@ -90,35 +98,40 @@ void MeshData::read_unv(const std::string& name)
       if (news == _label_dataset_mesh_data)
         {
 
-	  /**
+	  /*
 	   * Now read the data of interest.
-	   * Start with the header.
+	   * Start with the header.  For 
+	   * explanation of the variable
+	   * Dataset_location, see below.
 	   */
-
 	  unsigned int Dataset_location;
 	      
-	  unsigned int Model_type,          
-	    Analysis_type,
-	    Data_characteristic,
-	    Result_type,
-	    Data_type,
-	    NVALDC;
+	  /*
+	   * the type of data (complex, real,
+	   * float, double etc, see below)
+	   */
+	  unsigned int Data_type;
+
+	  /*
+	   * the number of floating-point values per entity
+	   */
+	  unsigned int NVALDC;
 
 
-	  /**
+	  /*
 	   * If there is no MeshDataUnvHeader object
 	   * attached
 	   */
 	  if (_unv_header==NULL)
 	    {
-	      /**
+	      /*
 	       * Ignore the first lines that stand for
 	       * analysis dataset label and name.
 	       */ 
 	      for(unsigned int i=0; i<3; i++)
 		in_file.ignore(256,'\n');	      
 	      
-	      /**
+	      /*
 	       * Read the dataset location, where
 	       * 1: Data at nodes
 	       * 2: Data on elements
@@ -126,13 +139,21 @@ void MeshData::read_unv(const std::string& name)
 	       */
 	      in_file >> Dataset_location;
 
-	      /**
+	      /*
 	       * Ignore five ID lines.
 	       */ 
 	      for(unsigned int i=0; i<6; i++)
 		in_file.ignore(256,'\n');
 	      
-	      /**
+	      /*
+	       * These data are all of no interest to us...
+	       */
+	      unsigned int Model_type,          
+		  Analysis_type,
+		  Data_characteristic,
+		  Result_type;
+
+	      /*
 	       * Read record 9.
 	       */
 	      in_file >> Model_type           // not used here
@@ -143,14 +164,14 @@ void MeshData::read_unv(const std::string& name)
 		      >> NVALDC;
 	      
 	      
-	      /**
+	      /*
 	       * Ignore record 10 and 11
 	       * (Integer analysis type specific data).
 	       */ 
 	      for (unsigned int i=0; i<3; i++)
 		in_file.ignore(256,'\n');
 	      
-	      /**
+	      /*
 	       * Ignore record 12 and record 13.  Since there
 	       * exist UNV files with 'D' instead of 'e' as 
 	       * 10th-power char, it is safer to use a string
@@ -165,14 +186,40 @@ void MeshData::read_unv(const std::string& name)
 	    }
 	  else
 	    {
-	      _unv_header->read (in_file);
 
-	      Dataset_location = _unv_header->dataset_location;
-	      NVALDC = _unv_header->nvaldc;
-	      Data_type = _unv_header->data_type;
+	      /*
+	       * the read() method returns false when
+	       * the user wanted a special header, and
+	       * when the current header is _not_ the correct
+	       * header
+	       */
+	      if (_unv_header->read(in_file))
+	        {
+		  Dataset_location = _unv_header->dataset_location;
+		  NVALDC = _unv_header->nvaldc;
+		  Data_type = _unv_header->data_type;
+		}
+	      else
+	        {
+		  /*
+		   * This is not the correct header.  Go
+		   * and find the next.  For this to
+		   * work correctly, shift to the 
+		   * next line, so that the "-1"
+		   * disappears from olds 
+		   */
+		  olds = news;
+		  in_file >> news;
+
+		  /*
+		   * No good style, i know...
+		   */
+		  goto go_and_find_the_next_dataset;
+		}
+
 	    }
 
-	  /**
+	  /*
 	   * Check the location of the dataset.
 	   */
 	  if (Dataset_location != 1)
@@ -183,7 +230,7 @@ void MeshData::read_unv(const std::string& name)
 	    }
 
 
-	  /**
+	  /*
 	   * Now get the foreign node id number and the respective nodal data.
 	   */
 	  int f_n_id;
@@ -193,24 +240,24 @@ void MeshData::read_unv(const std::string& name)
 	    {
 	      in_file >> f_n_id;
 	  
-	      /**
+	      /*
 	       * if node_nr = -1 then we have reached the end of the dataset.
 	       */
 	      if (f_n_id==-1)
 		  break;
 
-	      /**
+	      /*
 	       * Resize the values vector (usually data in three
 	       * principal directions, i.e. NVALDC = 3).
 	       */
 	      values.resize(NVALDC);
 	  
-	      /**
+	      /*
 	       * Read the meshdata for the respective node.
 	       */	       
 	      for (unsigned int data_cnt=0; data_cnt<NVALDC; data_cnt++)
 		{
-		  /**
+		  /*
 		   * Check what data type we are reading.
 		   * 2,4: Real
 		   * 5,6: Complex
@@ -265,7 +312,7 @@ void MeshData::read_unv(const std::string& name)
 
 		} // end loop data_cnt
 
-	      /**
+	      /*
 	       * Add the values vector to the MeshData data structure.
 	       */
 	      const Node* node = foreign_id_to_node(f_n_id);
@@ -277,7 +324,7 @@ void MeshData::read_unv(const std::string& name)
 
       else
         {
-	  /**
+	  /*
 	   * all other datasets are ignored
 	   */
         }
@@ -320,7 +367,7 @@ void MeshData::write_unv (const std::string& name)
 
   const std::string  _label_dataset_mesh_data    = "2414";
 
-  /**
+  /*
    * Currently this function handles only nodal data.
    */
   assert (!_node_data.empty());
@@ -332,7 +379,7 @@ void MeshData::write_unv (const std::string& name)
 		<< std::endl;
 
 
-  /**
+  /*
    * Write the beginning of the dataset.
    */
   out_file << "    -1\n"
@@ -340,7 +387,7 @@ void MeshData::write_unv (const std::string& name)
 	   << _label_dataset_mesh_data
 	   << "\n";
 
-  /**
+  /*
    * Write the header
    */
   if (_unv_header==NULL)
@@ -372,7 +419,7 @@ void MeshData::write_unv (const std::string& name)
       _unv_header->write (out_file);
 
 
-  /**
+  /*
    * Write the foreign node number and the respective data.
    */
   std::map<const Node*, 
@@ -412,7 +459,7 @@ void MeshData::write_unv (const std::string& name)
 
     }
 
-  /**
+  /*
    * Write end of the dataset.
    */
   out_file << "    -1\n";
@@ -426,32 +473,33 @@ void MeshData::write_unv (const std::string& name)
 //------------------------------------------------------
 // MeshDataUnvHeader functions
 MeshDataUnvHeader::MeshDataUnvHeader() :
-  dataset_label        (0),
-  dataset_name         ("libMesh mesh data"),
-  dataset_location     (1),  // default to nodal data
-  id_line_1            ("libMesh default"),
-  id_line_2            ("libMesh default"),
-  id_line_3            ("libMesh default"),
-  id_line_4            ("libMesh default"),
-  id_line_5            ("libMesh default"),
-  model_type           (0),          
-  analysis_type        (0),
-  data_characteristic  (0),
-  result_type          (0),
+  dataset_label          (0),
+  dataset_name           ("libMesh mesh data"),
+  dataset_location       (1),  // default to nodal data
+  id_line_1              ("libMesh default"),
+  id_line_2              ("libMesh default"),
+  id_line_3              ("libMesh default"),
+  id_line_4              ("libMesh default"),
+  id_line_5              ("libMesh default"),
+  model_type             (0),          
+  analysis_type          (0),
+  data_characteristic    (0),
+  result_type            (0),
 #ifdef USE_COMPLEX_NUMBERS
-  data_type            (5),  // default to single precision complex
+  data_type              (5),  // default to single precision complex
 #else
-  data_type            (2),  // default to single precision real
+  data_type              (2),  // default to single precision real
 #endif
-  nvaldc               (3)   // default to 3 (principal directions)
+  nvaldc                 (3),  // default to 3 (principle directions)
+  _desired_dataset_label (static_cast<unsigned int>(-1))
 {
-  /**
+  /*
    * resize analysis specific data.
    */
   record_10.resize(8);
   record_11.resize(2);
   record_12.resize(6);
-  record_13.resize(8);
+  record_13.resize(6);
 }
 
 
@@ -465,9 +513,28 @@ MeshDataUnvHeader::~MeshDataUnvHeader()
 
 
 
-void MeshDataUnvHeader::read (std::ifstream& in_file)
+bool MeshDataUnvHeader::read (std::ifstream& in_file)
 {
   in_file >> this->dataset_label;
+
+  /*
+   * currently, we compare only the 
+   * dataset_label with the _desired_dataset_label,
+   * but it may be easy to also compare the 
+   * dataset_name.
+   *
+   * When the user provided a dataset label, and
+   * the current label does _not_ match, then just
+   * return false.
+   *
+   * Otherwise: when the current label matches,
+   * or when there is no desired dataset label,
+   * simply proceed.
+   */
+  if ((this->_desired_dataset_label != static_cast<unsigned int>(-1)) &&
+      (this->dataset_label != this->_desired_dataset_label))
+      return false;
+
 
   in_file.ignore(256,'\n');
   std::getline(in_file, dataset_name, '\n');
@@ -531,6 +598,13 @@ void MeshDataUnvHeader::read (std::ifstream& in_file)
       for (unsigned int i=0; i<6; i++)
 	  in_file >> this->record_13[i];
     }
+
+  /*
+   * no matter whether the user provided a desired
+   * dataset label or not: return true, b/c the
+   * non-match was already caught before.
+   */
+  return true;
 }
 
 
@@ -605,5 +679,9 @@ bool MeshDataUnvHeader::need_D_to_e (std::string& number)
 
 
 
+void MeshDataUnvHeader::which_dataset (const unsigned int ds_label)
+{
+  this->_desired_dataset_label = ds_label;
+}
 
 
