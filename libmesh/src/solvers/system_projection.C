@@ -1,4 +1,4 @@
-// $Id: system_projection.C,v 1.8 2005-01-13 20:49:28 roystgnr Exp $
+// $Id: system_projection.C,v 1.9 2005-01-17 02:21:12 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -314,11 +314,13 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 
           }  // end fe_type if()
 
-	  for (unsigned int i = 0; i < new_n_dofs; i++)
+	  for (unsigned int i = 0; i < new_n_dofs; i++) 
+	    if (Ue(i) != 0.)
               new_vector.set(new_dof_indices[i], Ue(i));
-
         }  // end elem loop
     } // end variables loop
+
+  new_vector.close();
 
 #else
 
