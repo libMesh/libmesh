@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.15 2003-03-11 04:35:18 ddreyer Exp $
+// $Id: equation_systems.h,v 1.16 2003-03-12 00:33:17 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -44,7 +44,8 @@ class SystemBase;
 
 // ------------------------------------------------------------
 // EquationSystems<T_sys> class definition
-template <class T_sys>
+//template <class T_sys>
+template <typename T_sys>
 class EquationSystems : public EquationSystemsBase
 {
 public:
@@ -199,7 +200,8 @@ public:
   /**
    * Data structure that holds the systems.
    */
-  std::map<std::string, SystemBase*> _systems;
+  //std::map<std::string, SystemBase*> _systems;
+  std::map<std::string, T_sys*> _systems;
 
 };
 

@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.23 2003-03-11 04:35:18 ddreyer Exp $
+// $Id: equation_systems.C,v 1.24 2003-03-12 00:33:19 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -36,7 +36,7 @@
 
 // ------------------------------------------------------------
 // EquationSystems<T_sys> class implementation
-template <class T_sys>
+template <typename T_sys>
 EquationSystems<T_sys>::EquationSystems (Mesh& m,
 					 const SolverPackage sp) :
   EquationSystemsBase(m, sp)
@@ -48,7 +48,7 @@ EquationSystems<T_sys>::EquationSystems (Mesh& m,
 
 
 
-template <class T_sys>
+template <typename T_sys>
 EquationSystems<T_sys>::~EquationSystems ()
 {
   this->clear();
@@ -58,12 +58,12 @@ EquationSystems<T_sys>::~EquationSystems ()
 
 
 
-template <class T_sys>
+template <typename T_sys>
 void EquationSystems<T_sys>::clear ()
 {
-  for (std::map<std::string, SystemBase*>::iterator
-	 pos = _systems.begin(); pos != _systems.end();
-       ++pos)
+  typename std::map<std::string, T_sys*>::iterator pos = _systems.begin();
+  
+  for (; pos != _systems.end(); ++pos)
     delete pos->second;
   
  _systems.clear ();
@@ -73,7 +73,7 @@ void EquationSystems<T_sys>::clear ()
 
 
 
-template <class T_sys>
+template <typename T_sys>
 void EquationSystems<T_sys>::init ()
 {
  const unsigned int n_sys = this->n_systems();
@@ -102,36 +102,34 @@ void EquationSystems<T_sys>::init ()
       (*elem_it)->set_n_systems(n_sys);
   }
 
-
-  for (std::map<std::string, SystemBase*>::iterator
-	 sys = _systems.begin(); sys != _systems.end();
-       ++sys)
+  typename std::map<std::string, T_sys*>::iterator sys = _systems.begin();
+  
+  for (; sys != _systems.end();  ++sys)
     {
       /**
        * Initialize the system.
        */
-      (static_cast<T_sys*>(sys->second))->init();
+      sys->second->init();
     }
 }
 
 
 
-template <class T_sys>
+template <typename T_sys>
 void EquationSystems<T_sys>::add_system (const std::string& name)
 {
   if (!_systems.count(name))
     {
       const unsigned int num = this->n_systems();
+
+      _systems.insert (std::pair<std::string, T_sys*>(name,
+						      new T_sys(*this,
+								name,
+								num,
+								_solver_package)
+						      )
+		       );
       
-      _systems.insert (std::pair<std::string,
-		       SystemBase*>(name,
-				    static_cast<SystemBase*>( new T_sys(*this,
-									name,
-									num,
-									_solver_package)
-					                     )
-			            )
-	               );
     }
   else
     {
@@ -165,7 +163,7 @@ void EquationSystems<T_sys>::add_system (const std::string& name)
 
 
 
-template <class T_sys>
+template <typename T_sys>
 void EquationSystems<T_sys>::delete_system (const std::string& name)
 {
   if (!_systems.count(name))
@@ -183,16 +181,17 @@ void EquationSystems<T_sys>::delete_system (const std::string& name)
 
 
 
-template <class T_sys>
+template <typename T_sys>
 unsigned int EquationSystems<T_sys>::n_vars () const
 {
   if (_systems.empty())
     return 0;
 
   unsigned int tot=0;
+
+  typename std::map<std::string, T_sys*>::const_iterator pos = _systems.begin();
   
-  for (std::map<std::string, SystemBase*>::const_iterator
-	 pos = _systems.begin(); pos != _systems.end(); ++pos)
+  for (; pos != _systems.end(); ++pos)
     tot += pos->second->n_vars();
 
   return tot;
@@ -200,16 +199,17 @@ unsigned int EquationSystems<T_sys>::n_vars () const
 
 
 
-template <class T_sys>
+template <typename T_sys>
 unsigned int EquationSystems<T_sys>::n_dofs () const
 {
   if (_systems.empty())
     return 0;
 
   unsigned int tot=0;
+
+  typename std::map<std::string, T_sys*>::const_iterator pos = _systems.begin();
   
-  for (std::map<std::string, SystemBase*>::const_iterator
-	 pos = _systems.begin(); pos != _systems.end(); ++pos)
+  for (; pos != _systems.end(); ++pos)
     tot += pos->second->n_dofs();
 
   return tot;      
@@ -218,11 +218,10 @@ unsigned int EquationSystems<T_sys>::n_dofs () const
 
 
 
-template <class T_sys>
+template <typename T_sys>
 T_sys & EquationSystems<T_sys>::operator () (const std::string& name)
 {
-  std::map<std::string, SystemBase*>::iterator
-    pos = _systems.find(name);
+  typename std::map<std::string, T_sys*>::iterator pos = _systems.find(name);
   
   if (pos == _systems.end())
     {
@@ -234,17 +233,16 @@ T_sys & EquationSystems<T_sys>::operator () (const std::string& name)
       error();
     }
 
-  return static_cast<T_sys &>(*pos->second);
+  return *(pos->second);
 }
 
 
 
 
-template <class T_sys>
+template <typename T_sys>
 const T_sys & EquationSystems<T_sys>::operator () (const std::string& name) const
 {
-  std::map<std::string, SystemBase*>::const_iterator
-    pos = _systems.find(name);
+  typename std::map<std::string, T_sys*>::const_iterator pos = _systems.find(name);
   
   if (pos == _systems.end())
     {
@@ -256,18 +254,17 @@ const T_sys & EquationSystems<T_sys>::operator () (const std::string& name) cons
       error();
     }
 
-  return static_cast<T_sys &>(*pos->second);
+  return *(pos->second);
 }
 
 
 
-template <class T_sys>
+template <typename T_sys>
 const std::string & EquationSystems<T_sys>::name (const unsigned int num) const
 {
   assert (num < this->n_systems());
 
-  std::map<std::string, SystemBase*>::const_iterator
-    pos = _systems.begin();
+  typename std::map<std::string, T_sys*>::const_iterator pos = _systems.begin();
 
   // New code
 #if (__GNUC__ == 2)
@@ -275,23 +272,18 @@ const std::string & EquationSystems<T_sys>::name (const unsigned int num) const
 #else
   std::advance (pos, num);
 #endif
-
-  // Old code
-//  for (unsigned int i=0; i<num; i++)
-//    ++pos;
 
   return pos->first;
 }
 
 
 
-template <class T_sys>
+template <typename T_sys>
 T_sys & EquationSystems<T_sys>::operator () (const unsigned int num)
 {
   assert (num < this->n_systems());
 
-  std::map<std::string, SystemBase*>::iterator
-    pos = _systems.begin();
+  typename std::map<std::string, T_sys*>::iterator pos = _systems.begin();
   
   // New code
 #if (__GNUC__ == 2)
@@ -300,22 +292,17 @@ T_sys & EquationSystems<T_sys>::operator () (const unsigned int num)
   std::advance (pos, num);
 #endif
 
-  // Old code
-//  for (unsigned int i=0; i<num; i++)
-//    ++pos;
-
-  return static_cast<T_sys &>(*pos->second);
+  return *(pos->second);
 }
 
 
 
-template <class T_sys>
+template <typename T_sys>
 const T_sys & EquationSystems<T_sys>::operator ()  (const unsigned int num) const
 {
   assert (num < this->n_systems());
 
-  std::map<std::string, SystemBase*>::const_iterator
-    pos = _systems.begin();
+  typename std::map<std::string, T_sys*>::const_iterator pos = _systems.begin();
   
     // New code
 #if (__GNUC__ == 2)
@@ -324,17 +311,13 @@ const T_sys & EquationSystems<T_sys>::operator ()  (const unsigned int num) cons
   std::advance (pos, num);
 #endif
   
-  // Old code
-  //  for (unsigned int i=0; i<num; i++)
-//    ++pos;
-  
-  return static_cast<T_sys &>(*pos->second);
+  return *(pos->second);
 }
 
 
 
 
-template <class T_sys>
+template <typename T_sys>
 void EquationSystems<T_sys>::build_variable_names (std::vector<std::string>& var_names)
 {
   assert (n_systems());
@@ -350,7 +333,7 @@ void EquationSystems<T_sys>::build_variable_names (std::vector<std::string>& var
 
 
 
-template <class T_sys>
+template <typename T_sys>
 void EquationSystems<T_sys>::build_solution_vector (std::vector<Number>& soln)
 {
   assert (this->n_systems());
@@ -414,19 +397,20 @@ void EquationSystems<T_sys>::build_solution_vector (std::vector<Number>& soln)
 
 
 
-template <class T_sys>
+template <typename T_sys>
 std::string EquationSystems<T_sys>::get_info () const
 {
   std::ostringstream out;
   
   out << " EquationSystems:" << std::endl
       << "  n_systems()=" << this->n_systems() << std::endl;
-  
-  for (std::map<std::string, SystemBase*>::const_iterator it=_systems.begin();
-       it != _systems.end(); ++it)
+
+  typename std::map<std::string, T_sys*>::const_iterator it=_systems.begin();
+
+  for (; it != _systems.end(); ++it)
     {
       const std::string& sys_name = it->first;
-      const T_sys&  system        = static_cast<T_sys &>(*it->second);
+      const T_sys&  system        = *(it->second);
       
       out << "   System \"" << sys_name << "\"" << std::endl
 	  << "    Variables=";
