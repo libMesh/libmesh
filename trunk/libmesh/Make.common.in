@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.24 2003-08-09 21:34:42 ddreyer Exp $
+# $Id: Make.common.in,v 1.25 2003-08-11 13:26:36 ddreyer Exp $
 
 
 ###############################################################################
@@ -313,13 +313,15 @@ ifeq ($(enable-optional),yes)
     INCLUDE += -I$(PETSC_DIR)/include -I$(PETSC_DIR)/bmake/$(PETSC_ARCH) \
                 $(MPI_INCLUDE) $(BLOCKSOLVE_INCLUDE) $(HYPRE_INCLUDE)
 
+    PETSC_LIB = $(PETSC_DIR)/lib/lib$(BOPT)/$(PETSC_ARCH)
+
     ifeq ($(enable-shared),yes)
       CXXFLAGS     += -DPETSC_USE_DYNAMIC_LIBRARIES
       CFLAGS       += -DPETSC_USE_DYNAMIC_LIBRARIES 
       DLFLAGS      += $(RPATHFLAG)$(PETSC_LIB)
     endif
 
-    libs-PETSC = -L$(PETSC_DIR)/lib/lib$(BOPT)/$(PETSC_ARCH) \
+    libs-PETSC = -L$(PETSC_LIB) \
 	         -lpetscsles \
 		 -lpetscdm \
 		 -lpetscmat \
