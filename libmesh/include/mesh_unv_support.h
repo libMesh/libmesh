@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.h,v 1.9 2003-05-15 23:34:34 benkirk Exp $
+// $Id: mesh_unv_support.h,v 1.10 2003-05-20 09:28:44 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,6 +24,7 @@
 // C++ includes
 #include <fstream>
 #include <vector>
+#include <set>
 
 
 
@@ -37,120 +38,161 @@ class MeshData;
 
 
 /**
- * Class \p UnvInterface provides an Interface to
- * a stream object that contains a mesh in
- * I-deas UNV format.
+ * Class \p UnvMeshInterface provides an interface
+ * for reading a mesh (datasets 2411 and 2412)
+ * from a file in I-deas Universal file format.
  *
  * @author: Tammo Kaschner
  */
-class UnvInterface
+class UnvMeshInterface
 {
 public:
 
   /**
-   * Constructor.
-   * When you create an interface the file will be
-   * read and the nodes and elements will be stored
-   * in the vectors specified in the arguments
+   * Constructor.  Takes the data relevant 
+   * for reading/writing mesh or reading data.
+   * Note that for simplicity, the node and element
+   * vectors have to be readable even when only
+   * read access is needed.
    */
-  UnvInterface(std::istream& in,
-	       std::vector<Node*>& nodes,
-	       std::vector<Elem*>& elements,
-	       MeshData& md);
+  UnvMeshInterface(std::vector<Node*>& nodes,
+		   std::vector<Elem*>& elements,
+		   MeshData& md);
+
+  /**
+   * Reads a mesh (nodes & elements) from the file
+   * provided through \p in_stream, gives progress 
+   * reports if desired using \p verbose.
+   */
+  void read (std::istream& in_stream,
+	     bool verbose = false);
+
+  /**
+   * Writes a mesh (nodes & elements) to the file
+   * provided through \p out_stream.
+   */
+  void write (std::ostream& out_stream);
   
   /**
    * Destructor.
    */
-  virtual ~UnvInterface();
+  ~UnvMeshInterface();
 
 protected:
+
+
+  //-------------------------------------------------------------
+  // read support methods
+  /**
+   * When reading, the node related data is
+   * buffered in a temporary file prior to the actual
+   * read process.  This helps e.g. in counting nodes
+   * beforehand for pre-allocation.
+   */
+  void buffer_nodes (std::istream& physical_file,
+		     std::fstream& temp_file);
   
   /**
-   * Scans the file, locates datasets and stores
-   * their positions.
-   */
-  void init();
-
-  /**
-   * Scans a dataset and extracts important
-   * information needed for further processing.
-   * Currently recognizes nodes and elements.
-   */
-  void scan_dataset(std::string ds_num);
-
-  /**
-   * Method for setting the stream pointer
-   * to the position of a dataset in temporary_file.
-   * Argument is the dataset number, which must
-   * be written as a string such as "2411".
-   */
-  void set_stream_pointer(std::string ds_num);
-  
-  /**
-   * Method reads nodes from the virtual file and stores them in
-   * vector<Node> nodes in the order they come in.
+   * Method reads nodes from \p tempfile and stores them in
+   * vector<Node*> \p nodes in the order they come in.
    * The original node labels are being stored in the
-   * map _assign_nodes in order to assign the elements to
-   * the right nodes later.  In addition, if there is
-   * a \p BoundaryData, this \p BoundaryData gets to know 
-   * the node id in the Universal file, too.
+   * map \p _assign_nodes in order to assign the elements to
+   * the right nodes later.  In addition, provided it is 
+   * active, the \p MeshData gets to know the node id from
+   * the Universal file, too.
    */
-  void node_in();
+  void node_in(std::fstream& temp_file);
+
+  /**
+   * When reading, the element related data is
+   * buffered in a temporary file prior to the actual
+   * read process.  This helps e.g. in counting elements
+   * beforehand for pre-allocation.
+   */
+  void buffer_elements (std::istream& physical_file,
+			std::fstream& temp_file);
 
   /**
    * Method reads elements and stores them in
-   * vector<Elem*> elements in the same order as they
-   * come in. Within UnvInterface, element labels are
-   * ignored, but \p BoundaryData takes care of such things.
-   *
-   * Obviously, nodes are re-numbered.
+   * vector<Elem*> \p elements in the same order as they
+   * come in. Within \p UnvMeshInterface, element labels are
+   * ignored, but \p MeshData takes care of such things
+   * (if active).
    */
-  void element_in();
+  void element_in(std::fstream& temp_file);
+
+
+  //-------------------------------------------------------------
+  // write support methods
+  /**
+   * Outputs nodes to the file \p out_file.
+   * For this to work, the \p MeshData of the current
+   * \p Mesh has to be active.  Do not use this directly,
+   * but through the proper write method.
+   */
+  void node_out(std::ostream& out_file);
+
+  /**
+   * Outputs the element data to the file \p out_file.
+   * For this to work, the \p MeshData of the current
+   * \p Mesh has to be active. Do not use this directly,
+   * but through the proper write method.
+   */
+  void element_out(std::ostream& out_file);
+
+
+  //-------------------------------------------------------------
+  // misc helpers
+  /**
+   * Method for setting the stream pointer
+   * to the position of the dataset with label
+   * \p ds_num in the temporary_file \p temp_file.
+   */
+  void set_stream_pointer(std::fstream& temp_file,
+			  const std::string& ds_num);
 
   /**
    * Method for converting exponential notation
-   * from "D" to "e".
+   * from "D" to "e", for example
+   * \p 3.141592654D+00 \p --> \p 3.141592654e+00
+   * in order to make it readable for C++.
    */
   std::string& D_to_e(std::string& number);
 
 
+  //-------------------------------------------------------------
+  // local data
   /**
-   * input stream, physical file
-   */
-  std::istream& _phys_file;     
-
-  /**
-   * vector holding the nodes
+   * vector holding the nodes.  Either used during writing
+   * or reading.
    */
   std::vector<Node*>& _nodes;    
 
   /**
-   * vector holding the elements
+   * vector holding the elements.  Either used during writing
+   * or reading.
    */
   std::vector<Elem*>& _elements; 
 
   /**
-   * stores new positions of nodes
+   * stores new positions of nodes.  Used when reading.
    */
   std::map<unsigned int,unsigned int> _assign_nodes; 
 
   /**
-   * stores positions of datasets in the stream
+   * stores positions of datasets in the stream.  Used when reading.
    */
   std::map<std::string,std::streampos> _ds_position;
 
   /**
-   * total number of nodes
+   * total number of nodes.  Primarily used when reading.
    */
   unsigned int _num_nodes;
 
   /**
-   * total number of elements
+   * total number of elements.  Primarily used when reading.
    */
   unsigned int _num_elements;
-
-
-private:
 
   /**
    * writable reference to the class that
@@ -161,25 +203,16 @@ private:
   /**
    * labels for the node dataset
    */
-  std::string _label_dataset_nodes;
+  static const std::string _label_dataset_nodes;
 
   /**
    * labels for the element dataset
    */
-  std::string _label_dataset_elms;
-    
-  /**
-   * temporary file, simplifies node & element conversion
-   */
-  std::fstream _temporary_file;
+  static const std::string _label_dataset_elements;
 
   /**
-   * Name of temporary file
-   */
-  char* _temporary_file_name;
-
-  /**
-   * whether we need to convert notation of exponentials
+   * whether we need to convert notation of exponentials.
+   * Used when reading.
    */
   bool _need_D_to_e;
 

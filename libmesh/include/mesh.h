@@ -1,4 +1,4 @@
-// $Id: mesh.h,v 1.13 2003-05-15 23:34:33 benkirk Exp $
+// $Id: mesh.h,v 1.14 2003-05-20 09:28:44 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -207,10 +207,9 @@ class Mesh : public MeshBase
   void read_unv (const std::string& name);
 
   /** 
-   * Actual implementation of reading a mesh in Universal (unv) format from
-   * a stream.
+   * Write mesh to file specified by \p name in Universal (unv) format.
    */
-  void read_unv(std::istream& in);
+  void write_unv (const std::string& name);
 
   /**
    * Actual implementation of writing  meshes in DIVA's ASCII
