@@ -1,4 +1,4 @@
-// $Id: newmark_system.C,v 1.5 2003-05-15 23:34:34 benkirk Exp $
+// $Id: newmark_system.C,v 1.6 2003-05-29 21:31:36 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -76,9 +76,7 @@ NewmarkSystem::NewmarkSystem (EquationSystems& es,
 
 NewmarkSystem::~NewmarkSystem ()
 {
-  // clear the parameters and integration constants
-  _equation_systems.unset_parameter("Newmark alpha");
-  _equation_systems.unset_parameter("Newmark delta");
+  this->clear();
 }
 
 

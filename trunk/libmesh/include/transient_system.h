@@ -1,4 +1,4 @@
-// $Id: transient_system.h,v 1.3 2003-05-28 22:03:01 benkirk Exp $
+// $Id: transient_system.h,v 1.4 2003-05-29 21:31:33 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -71,11 +71,11 @@ public:
    */
   void reinit ();
    
-//   /**
-//    * Update the local values to reflect the solution
-//    * on neighboring processors.
-//    */
-//   void update ();
+  /**
+   * Update the local values to reflect the solution
+   * on neighboring processors.
+   */
+  void update ();
 
 //   /**
 //    * Assemble the linear system.  Does not
@@ -154,7 +154,7 @@ public:
 
 
 protected:
-
+  
 
   /**
    * Initializes the member data fields associated with
@@ -168,7 +168,6 @@ protected:
    * makes it up-to-date on the current mesh.
    */
   void re_update ();
-
 };
 
 

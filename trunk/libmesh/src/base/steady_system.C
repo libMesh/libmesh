@@ -1,4 +1,4 @@
-// $Id: steady_system.C,v 1.6 2003-05-29 00:03:05 benkirk Exp $
+// $Id: steady_system.C,v 1.7 2003-05-29 21:31:36 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -27,6 +27,7 @@
 #include "sparse_matrix.h"
 #include "linear_solver_interface.h"
 #include "numeric_vector.h"
+#include "utility.h"
 
 
 
@@ -45,6 +46,7 @@ SteadySystem::SteadySystem (EquationSystems& es,
 
 SteadySystem::~SteadySystem ()
 {
+  this->clear();
 }
 
 
@@ -93,7 +95,7 @@ void SteadySystem::reinit ()
       for (unsigned int i=0; i<local_size; i++)
 	solution->set(i+first_local_dof,
 		      (*current_local_solution)(i+first_local_dof));
-    }
+    } 
   }
 }
 
@@ -119,7 +121,21 @@ void SteadySystem::update ()
 
 void SteadySystem::re_update ()
 {
-  // For this system there is no difference
-  // between re_update & update.
-  SteadySystem::update ();
+  //const std::vector<unsigned int>& send_list = _dof_map.get_send_list ();
+
+  // Explicitly build a send_list
+  std::vector<unsigned int> send_list(solution->size());
+  Utility::iota (send_list.begin(), send_list.end(), 0);
+  
+  // Check sizes
+  assert (current_local_solution->local_size() == solution->size());
+  assert (!send_list.empty());
+  assert (send_list.size() <= solution->size());
+
+  // Create current_local_solution from solution.  This will
+  // put a local copy of solution into current_local_solution.
+  // Only the necessary values (specified by the send_list)
+  // are copied to minimize communication
+  solution->localize (*current_local_solution, send_list); 
 }
+ 
