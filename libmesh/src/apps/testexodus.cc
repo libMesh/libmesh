@@ -200,7 +200,7 @@ void assemble_primary(EquationSystems& es,
   FEType fe_type (SECOND);
   
   AutoPtr<FEBase> fe(FEBase::build(dim, fe_type));
-  QGauss qrule(dim, FIFTH);
+  QGauss qrule(dim, SEVENTH);
   //QTrap qrule(dim);
   
   fe->attach_quadrature_rule (&qrule);
