@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.14 2003-02-12 05:41:24 jwpeterson Exp $
+# $Id: Makefile,v 1.15 2003-02-14 15:22:32 benkirk Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -132,7 +132,7 @@ distclean:
 
 
 #
-# kdoc and doxygen documentation
+# doxygen documentation
 #
 doc:
 	$(doxygen) ./doc/Doxyfile

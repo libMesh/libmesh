@@ -1,4 +1,4 @@
- // $Id: reference_counter.h,v 1.6 2003-02-13 22:56:08 benkirk Exp $
+ // $Id: reference_counter.h,v 1.7 2003-02-14 15:22:42 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -110,6 +110,13 @@ protected:
    * information when the number returns to 0.
    */
   static unsigned int _n_objects;
+
+  /**
+   * A flag indicating if \p print_info() has been called.
+   */
+  static bool _have_printed_info;
+
+  
 #endif
 };
 
@@ -147,8 +154,14 @@ void ReferenceCounter::print_info ()
 {
 #if defined(ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
 
-  std::cout << get_info();
+  // Don't print multiple times.
+  if (!_have_printed_info)
+    {
+      std::cout << get_info();
 
+      _have_printed_info = true;
+    }
+  
 #endif
 }
 

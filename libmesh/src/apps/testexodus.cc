@@ -6,7 +6,7 @@
 
 // Local Includes
 #include "mesh_config.h"
-#include "mesh_init.h"
+#include "libmesh.h"
 #include "mesh.h"
 #include "quadrature_gauss.h"
 #include "quadrature_trap.h"
@@ -43,7 +43,6 @@ void assemble_secondary(EquationSystems& es,
 
 int main (int argc, char** argv)
 {
-
   libMesh::init (argc, argv);
 
   {
@@ -183,10 +182,9 @@ int main (int argc, char** argv)
     es.write("out.xdr", Xdr::ENCODE);
     es.write("out.xda", Xdr::WRITE);
   };
-  
-  libMesh::close();
 
-  return 0;
+  
+  return libMesh::close();
 };
   
 
@@ -257,8 +255,8 @@ void assemble_primary(EquationSystems& es,
       
       //fe->print_info();
 
-      dof_map.dof_indices(e, dof_indices_U, 0);
-      dof_map.dof_indices(e, dof_indices_V, 1);
+      dof_map.dof_indices(elem, dof_indices_U, 0);
+      dof_map.dof_indices(elem, dof_indices_V, 1);
       
       // zero the element matrix and vector
       Kuu.resize (phi.size(),
@@ -323,9 +321,9 @@ void assemble_primary(EquationSystems& es,
 	}
 
       es("primary").rhs->add_vector(Fu,
-				   dof_indices_U);
+				    dof_indices_U);
       es("primary").rhs->add_vector(Fv,
-				   dof_indices_V);
+				    dof_indices_V);
 
       es("primary").matrix->add_matrix(Kuu,
 				       dof_indices_U);
@@ -383,7 +381,7 @@ void assemble_secondary(EquationSystems& es,
       if (elem->processor_id() != proc_id) continue;
       if (!elem->active())                 continue;
 	    
-      dof_map.dof_indices(e, dof_indices);
+      dof_map.dof_indices(elem, dof_indices);
       
       // recompute the element-specific data for the current element
       fe->reinit (elem);

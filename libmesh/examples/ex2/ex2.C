@@ -1,4 +1,4 @@
-// $Id: ex2.C,v 1.4 2003-02-12 02:03:45 ddreyer Exp $
+// $Id: ex2.C,v 1.5 2003-02-14 15:22:33 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -28,7 +28,7 @@
 /**
  * Basic include file needed for the mesh functionality.
  */
-#include "mesh_init.h"
+#include "libmesh.h"
 #include "mesh.h"
 
 /**
@@ -214,10 +214,5 @@ int main (int argc, char** argv)
    * Call PetscFinalize() to allow Petsc to clean up after
    * itself.
    */  
-  libMesh::close();
-  
-  /**
-   * All done.  
-   */
-  return 0;
+  return libMesh::close();
 };

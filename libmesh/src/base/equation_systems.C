@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.13 2003-02-13 22:56:08 benkirk Exp $
+// $Id: equation_systems.C,v 1.14 2003-02-14 15:22:43 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,6 +23,7 @@
 
 // Local Includes
 //#include "enum_solver_package.h"
+#include "libmesh.h"
 #include "fe_interface.h"
 //#include "petsc_vector.h"
 //#include "petsc_matrix.h"
@@ -53,6 +54,8 @@ EquationSystems::EquationSystems (Mesh& m,
 EquationSystems::~EquationSystems ()
 {
   clear();
+
+  assert (!libMesh::closed());
 }
 
 

@@ -1,4 +1,4 @@
-// $Id: ex6.C,v 1.8 2003-02-13 01:49:48 benkirk Exp $
+// $Id: ex6.C,v 1.9 2003-02-14 15:22:35 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -33,7 +33,7 @@
 /**
  * Basic include file needed for the mesh functionality.
  */
-#include "mesh_init.h"
+#include "libmesh.h"
 #include "mesh.h"
 #include "general_system.h"
 #include "equation_systems.h"
@@ -266,13 +266,11 @@ int main (int argc, char** argv)
     mesh.write_gmv ("out.gmv", equation_systems);
   };
 
-
-  libMesh::close ();
   
   /**
    * All done.  
    */
-  return 0;
+  return libMesh::close ();
 
 
 #endif // else part of ifndef ENABLE_INFINITE_ELEMENTS

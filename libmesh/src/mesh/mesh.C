@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.7 2003-02-13 22:56:12 benkirk Exp $
+// $Id: mesh.C,v 1.8 2003-02-14 15:22:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,6 +23,7 @@
 
 // Local includes
 #include "mesh.h"
+#include "libmesh.h"
 
 
 #ifdef HAVE_SFCURVES
@@ -48,6 +49,7 @@ Mesh::Mesh(unsigned int d,
   boundary_info(d,*this)
 #endif
 {
+  assert (libMesh::initialized());
 }
 
 
@@ -55,7 +57,10 @@ Mesh::Mesh(unsigned int d,
 Mesh::~Mesh()
 {
   boundary_info.clear();
+  
   MeshBase::clear();
+  
+  assert (!libMesh::closed());
 }
 
 
@@ -77,7 +82,7 @@ void Mesh::clear()
 
 void Mesh::read(const std::string& name)
 {
-  _perf_log.start_event("read()");
+  libMesh::log.start_event("read()");
 
   
   // Read the file based on extension
@@ -127,14 +132,14 @@ void Mesh::read(const std::string& name)
 
       }    
   }
-  _perf_log.stop_event("read()");
+  libMesh::log.stop_event("read()");
 }
 
 
 
 void Mesh::write(const std::string& name)
 {
-  _perf_log.start_event("write()");
+  libMesh::log.start_event("write()");
   
   // Write the file based on extension
   {
@@ -182,7 +187,7 @@ void Mesh::write(const std::string& name)
       }    
   }
   
-  _perf_log.stop_event("write()");
+  libMesh::log.stop_event("write()");
 }
 
 
@@ -191,7 +196,7 @@ void Mesh::write(const std::string& name,
 		 std::vector<Complex>& v,
 		 std::vector<std::string>& vn)
 {
-  _perf_log.start_event("write()");
+  libMesh::log.start_event("write()");
 
   // Write the file based on extension
   {
@@ -219,7 +224,7 @@ void Mesh::write(const std::string& name,
       }
   }
 
-  _perf_log.stop_event("write()");
+  libMesh::log.stop_event("write()");
 }
 
 

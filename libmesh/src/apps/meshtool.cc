@@ -18,6 +18,7 @@
 #include <algorithm>
 
 // Local Includes
+#include "libmesh.h"
 #include "mesh.h"
 #include "dof_map.h"
 #include "perfmon.h"
@@ -361,15 +362,11 @@ void process_cmd_line(int argc, char **argv,
 
 int main (int argc, char** argv)
 {
-  PerfMon perfmon(argv[0]);
-
-#ifdef HAVE_PETSC
-  
-  PetscInitialize (&argc, &argv, (char *)0, NULL);
-  
-#endif
+  libMesh::init (argc, argv);
   
   {
+    PerfMon perfmon(argv[0]);
+    
     unsigned int n_subdomains = 1;
     unsigned int n_rsteps = 0;
     unsigned int dim = static_cast<unsigned int>(-1); // invalid dimension
@@ -719,14 +716,7 @@ int main (int argc, char** argv)
     */
   };
 
-
-#ifdef HAVE_PETSC
-
-  PetscFinalize();
-   
-#endif
-
   
-  return 0;
+  return libMesh::close();
 };
   

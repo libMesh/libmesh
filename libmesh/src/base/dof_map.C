@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.14 2003-02-13 22:56:08 benkirk Exp $
+// $Id: dof_map.C,v 1.15 2003-02-14 15:22:43 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,6 +31,7 @@
 #include "mesh_base.h"
 #include "fe_interface.h"
 #include "sparse_matrix.h"
+#include "libmesh.h"
 
 
 
@@ -48,13 +49,7 @@ DofMap::DofMap() :
   _matrix(NULL),
   _n_nodes(0),
   _n_elem(0),
-  _n_dfs(0),
-#ifdef ENABLE_PERFORMANCE_LOGGING
-  perf_log("DofMap", true)
-#else
-  perf_log("DofMap", false)
-#endif
-  
+  _n_dfs(0)  
 {
 }
 
@@ -77,7 +72,7 @@ void DofMap::attach_matrix (SparseMatrix& matrix)
 
 void DofMap::reinit(MeshBase& mesh)
 {
-  perf_log.start_event("reinit()");
+  libMesh::log.start_event("reinit()");
   
   clear();
 
@@ -139,7 +134,7 @@ void DofMap::reinit(MeshBase& mesh)
 	}
     }
   
-  perf_log.stop_event("reinit()");
+  libMesh::log.stop_event("reinit()");
 }
 
 
@@ -189,7 +184,8 @@ void DofMap::distribute_dofs(MeshBase& mesh)
   assert (_n_nodes);
   assert (_n_elem);
 
-  perf_log.start_event("distribute_dofs()");
+  // Log how long it takes to distribute the degrees of freedom
+  libMesh::log.start_event("distribute_dofs()");
 
   unsigned int next_free_dof=0;
 
@@ -286,9 +282,9 @@ void DofMap::distribute_dofs(MeshBase& mesh)
 
     _send_list = new_send_list;
   }
-  
-  perf_log.stop_event("distribute_dofs()");
-    
+
+  // All done. Stop logging.
+  libMesh::log.stop_event("distribute_dofs()");    
 }
 
 
@@ -297,7 +293,7 @@ void DofMap::compute_sparsity(MeshBase& mesh)
 {
   assert (n_components());
 
-  perf_log.start_event("compute_sparsity()");
+  libMesh::log.start_event("compute_sparsity()");
 
 
   
@@ -459,6 +455,8 @@ void DofMap::compute_sparsity(MeshBase& mesh)
 	  _n_oz[i]++;
     }
 
+  
+  libMesh::log.stop_event("compute_sparsity()");
 
   // We are done with the sparsity_pattern.  However, quite a
   // lot has gone into computing it.  It is possible that some
@@ -543,7 +541,7 @@ void DofMap::dof_indices (const Elem* elem,
 
 void DofMap::create_dof_constraints(MeshBase& mesh)
 {
-  perf_log.start_event("create_dof_constraints()");
+  libMesh::log.start_event("create_dof_constraints()");
 
   const unsigned int dim = mesh.mesh_dimension();
 
@@ -639,7 +637,7 @@ void DofMap::create_dof_constraints(MeshBase& mesh)
 		}
 	    }
   
-  perf_log.stop_event("create_dof_constraints()");
+  libMesh::log.stop_event("create_dof_constraints()");
 }
 
 

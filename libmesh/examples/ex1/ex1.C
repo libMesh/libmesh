@@ -1,4 +1,4 @@
-// $Id: ex1.C,v 1.1 2003-01-30 19:15:23 benkirk Exp $
+// $Id: ex1.C,v 1.2 2003-02-14 15:22:33 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -26,6 +26,11 @@
 #include <iostream>
 
 /**
+ * Functions to initialize the library.
+ */
+#include "libmesh.h"
+
+/**
  * Basic include files needed for the mesh functionality.
  */
 #include "mesh.h"
@@ -45,50 +50,81 @@
 int main (int argc, char** argv)
 {
   /**
-   * Check for proper usage.
+   * Initialize the library.  This is necessary because the library
+   * may depend on a number of other libraries (i.e. MPI  and Petsc)
+   * that require initialization before use.
    */
-  if (argc < 4)
-    {
-      std::cerr << "Usage: " << argv[0] << " -d 2 in.mesh [out.mesh]"
-		<< std::endl;
-
-      /**
-       * This handy function will print the file name, line number,
-       * and then abort.  Currrently the library does not use C++
-       * exception handling.
-       */
-      error();
-    };
+  libMesh::init (argc, argv);
 
   /**
-   * Get the dimensionality of the mesh from argv[2]
-   */
-  const unsigned int dim = atoi(argv[2]);
+   * Force all our objects to have local scope.  By declaring
+   * libMesh objects in the next pair of braces we can assert
+   * that they will go out of scope (and should have been deleted)
+   * before we return from main.  This allows the library to do
+   * internal reference counting and assure memory is not leaked.
+   */  
+  {    
+    /**
+     * Check for proper usage. The program is designed to be run
+     * as follows:
+     *
+     * ./ex1 -d DIM input_mesh_name [output_mesh_name]
+     *
+     * where [output_mesh_name] is an optional parameter giving
+     * a filename to write the mesh into.
+     */
+    if (argc < 4)
+      {
+	std::cerr << "Usage: " << argv[0] << " -d 2 in.mesh [out.mesh]"
+		  << std::endl;
+	
+	/**
+	 * This handy function will print the file name, line number,
+	 * and then abort.  Currrently the library does not use C++
+	 * exception handling.
+	 */
+	error();
+      }
+    
+    /**
+     * Get the dimensionality of the mesh from argv[2]
+     */
+    const unsigned int dim = atoi(argv[2]);
+    
+    /**
+     * Create a mesh with the requested dimension.
+     */
+    Mesh mesh(dim);
+    
+    /**
+     * Read the input mesh.
+     */
+    mesh.read (argv[3]);
+    
+    /**
+     * Print information about the mesh to the screen.
+     */
+    mesh.print_info();
+    
+    /**
+     * Write the output mesh if the user specified an
+     * output file name.
+     */
+    if (argc == 5)
+      mesh.write (argv[4]);
+
+    /**
+     * At this closing brace all of our objects will be forced
+     * out of scope and will get deconstructed.
+     */
+  }
 
   /**
-   * Create a mesh with the requested dimension.
+   * All done.  Call the libMesh::close() function to close any
+   * external libraries and check for leaked memory.  To be absolutey
+   * certain this is called last we will return its value.  This
+   * also allows main to return nonzero if memory is leaked, which
+   * can be useful for testing purposes.
    */
-  Mesh mesh(dim);
-
-  /**
-   * Read the input mesh.
-   */
-  mesh.read (argv[3]);
-
-  /**
-   * Print information about the mesh to the screen.
-   */
-  mesh.print_info();
-  
-  /**
-   * Write the output mesh if the user specified an
-   * output file name.
-   */
-  if (argc == 5)
-    mesh.write (argv[4]);
-
-  /**
-   * All done.  
-   */
-  return 0;
+  return libMesh::close();
 };

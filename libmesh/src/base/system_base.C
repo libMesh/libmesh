@@ -1,4 +1,4 @@
-// $Id: system_base.C,v 1.3 2003-02-13 22:56:09 benkirk Exp $
+// $Id: system_base.C,v 1.4 2003-02-14 15:22:48 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,6 +26,7 @@
 // Local includes
 #include "mesh_config.h"  /*  doxygen needs this for #ifdef ENABLE_AMR ??? */
 #include "mesh.h"
+#include "libmesh.h"
 #include "system_base.h"
 
 
@@ -35,12 +36,12 @@
 SystemBase::SystemBase (Mesh& mesh,
 			const std::string& name,
 			const SolverPackage solver_package) :
+  
   solution                (NumericVector::build(solver_package)),
   rhs                     (NumericVector::build(solver_package)),
   matrix                  (SparseMatrix::build (solver_package)),
   linear_solver_interface (LinearSolverInterface::build(solver_package)),
   _sys_name               (name),
-//  _dof_map                (mesh),
   _mesh                   (mesh)
 {
 }
@@ -50,6 +51,8 @@ SystemBase::SystemBase (Mesh& mesh,
 SystemBase::~SystemBase ()
 {
   SystemBase::clear ();
+
+  assert (!libMesh::closed());
 }
 
 
