@@ -1,4 +1,4 @@
-// $Id: ex7.C,v 1.6 2003-02-10 22:03:21 benkirk Exp $
+// $Id: ex7.C,v 1.7 2003-02-12 02:03:47 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -32,7 +32,7 @@
  */
 #include "mesh_init.h"
 #include "mesh.h"
-#include "system_data.h"
+#include "general_system.h"
 #include "equation_systems.h"
 
 /**
@@ -321,7 +321,7 @@ void assemble_helmholtz(EquationSystems& es,
    * Get a constant reference to the Finite Element type
    * for the first (and only) variable in the system.
    */
-  FEType fe_type = es("Helmholtz").dof_map.component_type(0);
+  FEType fe_type = es("Helmholtz").get_dof_map().component_type(0);
 
   /**
    * Build a Finite Element object of the specified type.  Since the

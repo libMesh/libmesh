@@ -1,4 +1,4 @@
-// $Id: inf_fe.h,v 1.13 2003-02-09 22:47:17 ddreyer Exp $
+// $Id: inf_fe.h,v 1.14 2003-02-12 02:03:47 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -95,7 +95,7 @@ class Elem;
  *
  * \author Daniel Dreyer
  * \date 2003
- * \version $Revision: 1.13 $
+ * \version $Revision: 1.14 $
  */
 
 //-------------------------------------------------------------
@@ -118,7 +118,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.13 $
+   * \version $Revision: 1.14 $
    */
   //-------------------------------------------------------------
   // InfFE::Radial class definition
@@ -247,7 +247,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.13 $
+   * \version $Revision: 1.14 $
    */
   //-------------------------------------------------------------
   // InfFE::Base class definition
@@ -310,13 +310,16 @@ public:
 
   /**
    * Constructor.
-   * Initializes some data structures, and builds \p base_fe with 
-   * \p fet.base_order as \p order, and \p fet.base_family as 
-   * \p family.  Through this we get the appropriate \p base_fe* 
-   * for handling approximation in the base, avoiding to template
-   * InfFE also with respect to the base approximation \p FEFamily.
-   * This is only possible through the \p FEBase::build() method
-   * and some protected additional virtual members in \p FEBase.
+   * Initializes some data structures.  Builds a \p FE<Dim-1,T_base>
+   * object to handle  approximation in the base, so that
+   * there is no need to template \p InfFE<Dim,T_radial,T_map> also with 
+   * respect to the base approximation \p T_base.
+   * 
+   * The same remarks concerning compile-time optimization for 
+   * \p FE also hold for \p InfFE.  Use the 
+   * \p FEBase::build_InfFE(const unsigned int, const FEType&) 
+   * method to build specific instantiations of \p InfFE at
+   * run time.
    */
   InfFE(const FEType& fet);
 

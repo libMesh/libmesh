@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.9 2003-02-07 04:00:41 jwpeterson Exp $
+// $Id: fe_interface.C,v 1.10 2003-02-12 02:03:50 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -44,7 +44,7 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 
 #ifdef ENABLE_INFINITE_ELEMENTS
   /*
-   * Since the FEType, stored in DofMap/SystemData, has to
+   * Since the FEType, stored in DofMap/(some SystemBase child), has to
    * be the _same_ for InfFE and FE, we have to catch calls
    * to infinite elements through the element type.
    */
