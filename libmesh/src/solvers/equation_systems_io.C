@@ -1,4 +1,4 @@
-// $Id: equation_systems_io.C,v 1.1 2004-01-03 15:37:44 benkirk Exp $
+// $Id: equation_systems_io.C,v 1.2 2004-03-08 02:10:05 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -21,9 +21,8 @@
 #include "libmesh_common.h"
 
 
-// System Includes
-
-
+// C++ Includes
+#include <stdio.h>
 
 // Local Includes
 #include "equation_systems.h"

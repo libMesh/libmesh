@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.55 2004-03-07 22:44:23 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.56 2004-03-08 02:09:49 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -120,11 +120,11 @@ AC_DEFUN(DETERMINE_CXX_BRAND, dnl
               GXX_VERSION=compaq_cxx
             else
   
-  	      dnl Sun Workshop?
-              is_sun_cc="`($CXX -V 2>&1) | grep 'Sun WorkShop'`"
+  	      dnl Sun ONE Studio?
+              is_sun_cc="`($CXX -V 2>&1) | grep 'Sun C++'`"
               if test "x$is_sun_cc" != "x" ; then
-                AC_MSG_RESULT(<<< C++ compiler is Sun Workshop compiler >>>)
-                GXX_VERSION=sun_workshop
+                AC_MSG_RESULT(<<< C++ compiler is Sun ONE Studio compiler >>>)
+                GXX_VERSION=sun_studio
               else
   
   	        dnl Sun Forte?
@@ -453,14 +453,17 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           fi
           ;;
   
-      sun_workshop | sun_forte)
-          CXXFLAGSG="-DDEBUG -w"
-          CXXFLAGSO="-DNDEBUG -w"
+      sun_studio | sun_forte)
+          CXXFLAGSG="-DDEBUG -w -library=stlport4"
+          CXXFLAGSO="-DNDEBUG -w -library=stlport4"
           CFLAGSG="-DDEBUG -w"
           CFLAGSO="-DNDEBUG -w"
 
+          CXXSHAREDFLAG="-G"
+          CSHAREDFLAG="-G"
+
           dnl Linker flags & librpcsvc for XDR
-          RPATHFLAG="-Wl,-R,"
+          RPATHFLAG="-R"
           LIBS="-lrpcsvc $LIBS"
 
           dnl Position-independent code for shared libraries

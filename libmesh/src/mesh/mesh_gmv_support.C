@@ -1,4 +1,4 @@
-// $Id: mesh_gmv_support.C,v 1.27 2004-01-03 15:37:43 benkirk Exp $
+// $Id: mesh_gmv_support.C,v 1.28 2004-03-08 02:10:04 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -19,10 +19,11 @@
 
 
 
-// C++ includes
+// C/C++ includes
 #include <iomanip>
 #include <fstream>
 #include <stdio.h>
+#include <string.h>
 
 // Local includes
 #include "equation_systems.h"

@@ -1,4 +1,4 @@
-// "$Id: xdr_cxx.C,v 1.15 2004-03-07 23:11:34 benkirk Exp $\n"
+// "$Id: xdr_cxx.C,v 1.16 2004-03-08 02:10:05 benkirk Exp $\n"
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -18,6 +18,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
+// C/C++ includes
+#include <string.h>
 
 // Local includes
 #include "xdr_cxx.h"
@@ -30,8 +32,8 @@ Xdr::Xdr (const std::string& name, const XdrMODE m) :
   mode(m),
 #ifdef HAVE_XDR
   xdrs(NULL),
-#endif
   fp(NULL),
+#endif
   comm_len(xdr_MAX_STRING_LENGTH)
 {
   this->open(name);

@@ -1,4 +1,4 @@
-// $Id: xdr_cxx.h,v 1.3 2004-03-07 23:11:33 benkirk Exp $
+// $Id: xdr_cxx.h,v 1.4 2004-03-08 02:10:04 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -365,13 +365,13 @@ private:
    * for more information.
    */
   XDR* xdrs;
-  
-#endif
 
   /**
    * File pointer.
    */
   FILE* fp;
+  
+#endif
 
   /**
    * The output file stream.
