@@ -1,4 +1,4 @@
-// $Id: mesh_modification.h,v 1.2 2004-11-22 21:32:35 jwpeterson Exp $
+// $Id: mesh_modification.h,v 1.3 2004-12-02 18:18:56 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -34,19 +34,17 @@ class MeshBase;
 
 
 
-/**
- * Tools for \p Mesh modification.
- *
- * \author Benjamin S. Kirk
- * \date 2004
- * \version $Revision: 1.2 $
- */
-
-
 // ------------------------------------------------------------
 // MeshTools::Modification namespace
 namespace MeshTools
 {
+  /**
+   * Tools for \p Mesh modification.
+   *
+   * \author Benjamin S. Kirk
+   * \date 2004
+   * \version $Revision: 1.3 $
+   */  
   namespace Modification
   {
     /**
