@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.39 2003-07-22 19:14:45 jwpeterson Exp $
+// $Id: equation_systems.C,v 1.40 2003-07-24 22:14:56 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -760,16 +760,3 @@ bool EquationSystems::parameter_exists (const std::string& id) const
 
   return (pos != _parameters.end());
 }
-
-
-//--------------------------------------------------------------------------
-// Instantiations of templated functions
-
-// Some systems only work with complex numbers
-#ifdef USE_COMPLEX_NUMBERS
-template FrequencySystem &  EquationSystems::add_system<FrequencySystem> (const std::string&);
-#endif
-
-template NewmarkSystem &    EquationSystems::add_system<NewmarkSystem>   (const std::string&);
-template SteadySystem  &    EquationSystems::add_system<SteadySystem>    (const std::string&);
-template TransientSystem &  EquationSystems::add_system<TransientSystem> (const std::string&);
