@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.30 2004-11-15 22:09:14 benkirk Exp $
+// $Id: mesh_generation.C,v 1.31 2004-11-16 15:58:05 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -613,10 +613,10 @@ void MeshTools::Generation::build_square (Mesh& mesh,
 
 
 
-void MeshTools::Generation::build_sphere (Mesh& mesh,
-					  const Real rad,
-					  const unsigned int nr,
-					  const ElemType type)
+void MeshTools::Generation::build_sphere (Mesh& /*mesh*/,
+					  const Real /*rad*/,
+					  const unsigned int /*nr*/,
+					  const ElemType /*type*/)
 {
   error();
 //   assert (mesh.mesh_dimension() != 1);

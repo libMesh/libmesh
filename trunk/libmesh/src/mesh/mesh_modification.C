@@ -1,4 +1,4 @@
-// $Id: mesh_modification.C,v 1.6 2004-11-15 22:09:14 benkirk Exp $
+// $Id: mesh_modification.C,v 1.7 2004-11-16 15:58:05 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -137,7 +137,7 @@ void MeshTools::Modification::translate (MeshBase& mesh,
 
 
 
-void MeshTools::Modification::rotate (MeshBase& mesh,
+void MeshTools::Modification::rotate (MeshBase& ,
 				      const Real,
 				      const Real,
 				      const Real)
