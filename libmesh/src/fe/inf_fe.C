@@ -1,4 +1,4 @@
-// $Id: inf_fe.C,v 1.18 2003-04-01 14:19:48 ddreyer Exp $
+// $Id: inf_fe.C,v 1.19 2003-04-03 14:17:24 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -568,16 +568,20 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
 {
+  assert (inf_elem != NULL);
+  // at least check whether the base element type is correct.
+  // otherwise this version of computing dist would give problems
+  assert (base_elem->type() == Base::get_elem_type(inf_elem->type()));
+
   const unsigned int n_base_mapping_sf   = dist.size();
+  const Point origin                     = inf_elem->origin();
 
   // for each new infinite element, compute the radial distances
-  for (unsigned int i=0; i<n_base_mapping_sf; i++)
-    {
-      // this works, since the _base_ nodes are numbered in the 
-      // same manner for the base element as for the infinite element
-      dist[i] = Point( inf_elem->point(i) 
-		       - inf_elem->point(i+n_base_mapping_sf) ).size();
-    }
+  for (unsigned int n=0; n<n_base_mapping_sf; n++)
+      dist[n] =  Point(base_elem->point(n) - origin).size();
+// OLD CODE
+//       dist[i] = Point( inf_elem->point(i)
+//                   - inf_elem->point(i+n_base_mapping_sf) ).size();
 
 
   switch (Dim)

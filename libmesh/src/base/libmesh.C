@@ -1,4 +1,4 @@
-// $Id: libmesh.C,v 1.8 2003-03-20 11:51:25 ddreyer Exp $
+// $Id: libmesh.C,v 1.9 2003-04-03 14:17:23 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -60,11 +60,18 @@ using namespace Mpi;
 
 // ------------------------------------------------------------
 // libMesh static member initializations
-//const Real       libMesh::PI        = 3.14159265358979323846264;
-const Real       libMesh::PI        = acos(-1.);
+//const Real       libMesh::pi        = 3.14159265358979323846264;
+const Real       libMesh::pi        (acos(-1.));
 
 #if defined(USE_COMPLEX_NUMBERS)
-const Number     libMesh::Imaginary (0.,1.);
+const Number     libMesh::imaginary (0., 1.);
+#endif
+
+
+#if defined(USE_COMPLEX_NUMBERS)
+const Number     libMesh::zero      (0., 0.);
+#else
+const Number     libMesh::zero      (0.);
 #endif
 
 

@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.14 2003-04-02 22:37:17 benkirk Exp $
+// $Id: fe_interface.C,v 1.15 2003-04-03 14:17:24 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,6 +23,7 @@
 #include "fe_interface.h"
 #include "elem.h"
 #include "fe.h"
+#include "fe_compute_data.h"
 
 
 //------------------------------------------------------------
@@ -776,6 +777,38 @@ Real FEInterface::shape(const unsigned int dim,
 
 
 
+
+void FEInterface::compute_data(const unsigned int dim,
+			       const FEType& fe_t,
+			       const Elem* elem,
+			       FEComputeData& data)
+{
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+  if ( is_InfFE_elem(elem->type()) )
+    {
+      ifem_compute_data(dim, fe_t, elem, data);
+      return;
+    }
+
+#endif
+
+  const unsigned int n_dof = n_dofs (dim, fe_t, elem->type());
+  const Point&       p     (data.p);
+  data.shape.resize(n_dof);
+
+  // set default values for all the output fields
+  data.init();
+
+  for (unsigned int n=0; n<n_dof; n++)
+      data.shape[n] = shape(dim, fe_t, elem, n, p);
+
+   return;
+}
+
+
+
+
 void FEInterface::compute_constraints (std::map<unsigned int,
 				            std::map<unsigned int,
 				                     float> > & constraints,
@@ -833,6 +866,5 @@ void FEInterface::compute_constraints (std::map<unsigned int,
     }
 }
   
-
 
 

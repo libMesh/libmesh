@@ -1,4 +1,4 @@
-// $Id: fe_interface.h,v 1.16 2003-04-02 15:18:05 benkirk Exp $
+// $Id: fe_interface.h,v 1.17 2003-04-03 14:17:20 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -34,6 +34,7 @@
 // forward declarations
 class Elem;
 class FEType;
+class FEComputeData;
 
 
 /**
@@ -42,7 +43,7 @@ class FEType;
  * Using this class, one need not worry about the correct
  * finite element class.
  *
- * @author Daniel Dreyer, 2002
+ * @author Daniel Dreyer, 2002-2003
  */
 
 // ------------------------------------------------------------
@@ -106,7 +107,10 @@ public:
    * Build the nodal soln from the element soln.
    * This is the solution that will be plotted.
    * Automatically passes the request to the appropriate
-   * finite element class member.
+   * finite element class member.  To indicate that
+   * results from this specific implementation of
+   * \p nodal_soln should not be used, the vector 
+   * \p nodal_soln is returned empty.
    */
   static void nodal_soln(const unsigned int dim,
 			 const FEType& fe_t,
@@ -162,6 +166,18 @@ public:
 		    const Elem* elem,
 		    const unsigned int i,
 		    const Point& p);
+
+  /**
+   * Lets the appropriate child of \p FEBase compute the requested 
+   * data for the input specified in \p data, and returns the values
+   * also through \p data.  See this as a generalization of \p shape().
+   * Currently, with disabled infinite elements, returns a vector of
+   * all shape functions of \p elem evaluated ap \p p.
+   */
+  static void compute_data(const unsigned int dim,
+			   const FEType& fe_t,
+			   const Elem* elem,
+			   FEComputeData& data);
 
 
   /**
@@ -242,6 +258,10 @@ private:
 			 const unsigned int i,
 			 const Point& p);
 
+  static void ifem_compute_data(const unsigned int dim,
+				const FEType& fe_t,
+				const Elem* elem,
+				FEComputeData& data);
 
 #endif
 

@@ -1,4 +1,4 @@
-// $Id: fe_interface_inf_fe.C,v 1.5 2003-04-01 14:19:48 ddreyer Exp $
+// $Id: fe_interface_inf_fe.C,v 1.6 2003-04-03 14:17:24 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,6 +26,7 @@
 #include "elem.h"
 #include "fe.h"
 #include "inf_fe.h"
+#include "fe_compute_data.h"
 
 
 
@@ -196,6 +197,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 	    {
 	      std::cerr << "ERROR: INFINTE_MAP is not a valid shape family for radial approximation." << std::endl;
 	      error();
+	      break;
 	    }
 
 	  case JACOBI_20_00:
@@ -211,6 +213,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
 		    error();
 		}
+	      break;
 	    }
 
 	  case JACOBI_30_00:
@@ -226,6 +229,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
 		    error();
 		}
+	      break;
 	    }
 
 	  case LEGENDRE:
@@ -241,6 +245,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
 		    error();
 		}
+	      break;
 	    }
 
 	  case LAGRANGE:
@@ -256,6 +261,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
 		    error();
 		}
+	      break;
 	    }
 
 
@@ -263,8 +269,10 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 	  default:
 	    std::cerr << "ERROR: Bad FEType.radial_family= " << fe_t.radial_family << std::endl;
 	    error();
+	    break;
 	  }
 
+	break;
       }
 
       
@@ -279,6 +287,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 	    {
 	      std::cerr << "ERROR: INFINTE_MAP is not a valid shape family for radial approximation." << std::endl;
 	      error();
+	      break;
 	    }
 
 	  case JACOBI_20_00:
@@ -294,6 +303,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;			      
 		    error();
 		}
+	      break;
 	    }
 
 	  case JACOBI_30_00:
@@ -309,6 +319,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;			      
 		    error();
 		}
+	      break;
 	    }
 
 	  case LEGENDRE:
@@ -324,6 +335,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;			      
 		    error();
 		}
+	      break;
 	    }
 
 	  case LAGRANGE:
@@ -339,6 +351,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;			      
 		    error();
 		}
+	      break;
 	    }
 
 
@@ -346,8 +359,10 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 	  default:
 	    std::cerr << "ERROR: Bad FEType.radial_family= " << fe_t.radial_family << std::endl;
 	    error();
+	    break;
 	  }
 
+	break;
       }
 
       
@@ -362,6 +377,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 	    {
 	      std::cerr << "ERROR: INFINTE_MAP is not a valid shape family for radial approximation." << std::endl;
 	      error();
+	      break;
 	    }
 
 	  case JACOBI_20_00:
@@ -377,6 +393,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;			      
 		    error();
 		}
+	      break;
 	    }
 
 	  case JACOBI_30_00:
@@ -392,6 +409,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;			      
 		    error();
 		}
+	      break;
 	    }
 
 	  case LEGENDRE:
@@ -407,6 +425,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;		      
 		    error();
 		}
+	      break;
 	    }
 
 	  case LAGRANGE:
@@ -422,6 +441,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;			      
 		    error();
 		}
+	      break;
 	    }
 
 
@@ -429,7 +449,10 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 	  default:
 	    std::cerr << "ERROR: Bad FEType.radial_family= " << fe_t.radial_family << std::endl;
 	    error();
+	    break;
 	  }
+
+	break;
       }
 
     default:
@@ -581,7 +604,7 @@ Real FEInterface::ifem_shape(const unsigned int dim,
 	  {
 	    /*
 	     * For no derivatives (and local coordinates, as
-	     * given in \p p, the infinite element shapes
+	     * given in \p p) the infinite element shapes
 	     * are independent of mapping type
 	     */
 	  case INFINITE_MAP:
@@ -686,7 +709,7 @@ Real FEInterface::ifem_shape(const unsigned int dim,
 	  {
 	    /*
 	     * For no derivatives (and local coordinates, as
-	     * given in \p p, the infinite element shapes
+	     * given in \p p) the infinite element shapes
 	     * are independent of mapping type
 	     */
 	  case INFINITE_MAP:
@@ -775,6 +798,125 @@ Real FEInterface::ifem_shape(const unsigned int dim,
 
 
 
+
+void FEInterface::ifem_compute_data(const unsigned int dim,
+				    const FEType& fe_t,
+				    const Elem* elem,
+				    FEComputeData& data)
+{
+  switch (dim)
+    {
+      // 1D
+    case 1:
+      {
+	switch (fe_t.radial_family)
+	  {
+	    /*
+	     * For no derivatives (and local coordinates, as
+	     * given in \p p) the infinite element shapes
+	     * are independent of mapping type
+	     */
+	  case INFINITE_MAP:
+	    InfFE<1,INFINITE_MAP,CARTESIAN>::compute_data(fe_t, elem, data);
+	    break;
+
+	  case JACOBI_20_00:
+	    InfFE<1,JACOBI_20_00,CARTESIAN>::compute_data(fe_t, elem, data);
+	    break;
+
+	  case JACOBI_30_00:
+	    InfFE<1,JACOBI_30_00,CARTESIAN>::compute_data(fe_t, elem, data);
+	    break;
+
+	  case LEGENDRE:   
+	    InfFE<1,LEGENDRE,CARTESIAN>::compute_data(fe_t, elem, data);
+	    break;
+
+	  case LAGRANGE:
+	    InfFE<1,LAGRANGE,CARTESIAN>::compute_data(fe_t, elem, data);
+	    break;
+
+	  default:
+	    error();
+	  }
+
+	break;
+      }
+
+
+      // 2D
+    case 2:
+      {
+	switch (fe_t.radial_family)
+	  {
+	  case INFINITE_MAP:
+	    InfFE<2,INFINITE_MAP,CARTESIAN>::compute_data(fe_t, elem, data);
+	    break;
+
+	  case JACOBI_20_00:
+	    InfFE<2,JACOBI_20_00,CARTESIAN>::compute_data(fe_t, elem, data);
+	    break;
+
+	  case JACOBI_30_00:
+	    InfFE<2,JACOBI_30_00,CARTESIAN>::compute_data(fe_t, elem, data);
+	    break;
+
+	  case LEGENDRE:   
+	    InfFE<2,LEGENDRE,CARTESIAN>::compute_data(fe_t, elem, data);
+	    break;
+
+	  case LAGRANGE:
+	    InfFE<2,LAGRANGE,CARTESIAN>::compute_data(fe_t, elem, data);
+	    break;
+
+	  default:
+	    error();
+	  }
+
+	break;
+      }
+
+            
+      // 3D
+    case 3:
+      {
+	switch (fe_t.radial_family)
+	  {
+	  case INFINITE_MAP:
+	    InfFE<3,INFINITE_MAP,CARTESIAN>::compute_data(fe_t, elem, data);
+	    break;
+
+	  case JACOBI_20_00:
+	    InfFE<3,JACOBI_20_00,CARTESIAN>::compute_data(fe_t, elem, data);
+	    break;
+
+	  case JACOBI_30_00:
+	    InfFE<3,JACOBI_30_00,CARTESIAN>::compute_data(fe_t, elem, data);
+	    break;
+
+	  case LEGENDRE:   
+	    InfFE<3,LEGENDRE,CARTESIAN>::compute_data(fe_t, elem, data);
+	    break;
+
+	  case LAGRANGE:
+	    InfFE<3,LAGRANGE,CARTESIAN>::compute_data(fe_t, elem, data);
+	    break;
+
+	  default:
+	    error();
+	  }
+
+	break;
+      }
+
+
+    default:
+      error();
+      break;
+    }
+
+  return;
+}
 
 #endif // ifdef ENABLE_INFINITE_ELEMENTS
 

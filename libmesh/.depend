@@ -552,6 +552,7 @@ src/fe/fe_interface.$(obj-suffix):\
     include/enum_order.h\
     include/fe.h\
     include/fe_base.h\
+    include/fe_compute_data.h\
     include/fe_interface.h\
     include/fe_type.h\
     include/libmesh.h\
@@ -575,6 +576,7 @@ src/fe/fe_interface_inf_fe.$(obj-suffix):\
     include/enum_order.h\
     include/fe.h\
     include/fe_base.h\
+    include/fe_compute_data.h\
     include/fe_interface.h\
     include/fe_type.h\
     include/inf_fe.h\
@@ -599,6 +601,7 @@ src/fe/fe_lagrange.$(obj-suffix):\
     include/enum_order.h\
     include/fe.h\
     include/fe_base.h\
+    include/fe_interface.h\
     include/fe_type.h\
     include/libmesh.h\
     include/libmesh_base.h\
@@ -991,8 +994,11 @@ src/fe/inf_fe_static.$(obj-suffix):\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
     include/enum_order.h\
+    include/enum_solver_package.h\
+    include/equation_systems_base.h\
     include/fe.h\
     include/fe_base.h\
+    include/fe_compute_data.h\
     include/fe_interface.h\
     include/fe_type.h\
     include/inf_fe.h\
@@ -1992,6 +1998,9 @@ src/mesh/mesh_base.$(obj-suffix):\
     include/enum_order.h\
     include/enum_solver_package.h\
     include/face.h\
+    include/face_inf_quad.h\
+    include/face_inf_quad4.h\
+    include/face_inf_quad6.h\
     include/face_tri.h\
     include/face_tri3.h\
     include/face_tri6.h\

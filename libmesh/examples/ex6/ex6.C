@@ -1,4 +1,4 @@
-// $Id: ex6.C,v 1.20 2003-04-01 14:19:44 ddreyer Exp $
+// $Id: ex6.C,v 1.21 2003-04-03 14:17:18 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -18,8 +18,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#define _p(arg)  std::cout << "Here: " << #arg << std::endl
-//#define _p(arg) 
+//#define _p(arg)  std::cout << "Here: " << #arg << std::endl
+#define _p(arg) 
 
 
 

@@ -1,4 +1,4 @@
-// $Id: frequency_system.h,v 1.7 2003-03-21 15:29:06 ddreyer Exp $
+// $Id: frequency_system.h,v 1.8 2003-04-03 14:17:21 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -63,7 +63,7 @@ template <class T_sys> class EquationSystems;
  *   contributions in memory, the user need only provide a function
  *   \p _solve_fptr which assembles the overall, frequency-dependent
  *   matrix for the current frequency given in the parameter section
- *   of \p EquationSystems<FrequencySystem> named \p current_frequency.
+ *   of \p EquationSystems<FrequencySystem> named \p current \p frequency.
  *
  * \author Daniel Dreyer, 2003
  */
