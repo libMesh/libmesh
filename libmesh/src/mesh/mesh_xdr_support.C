@@ -1,4 +1,4 @@
-// $Id: mesh_xdr_support.C,v 1.18 2004-01-03 15:37:43 benkirk Exp $
+// $Id: mesh_xdr_support.C,v 1.19 2004-03-07 23:11:33 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,7 @@
 // C++ includes
 #include <string.h>
 #include <stdio.h>
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
 #include <rpc/rpc.h>
 #endif
 
@@ -49,7 +49,7 @@ void XdrInterface::mesh_interface(const std::string& name,
    */
   switch (access)
     {      
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
       
     case (XdrIO::ENCODE):
       break;
@@ -601,7 +601,7 @@ void XdrInterface::soln_interface_impl(const std::string& name,
    */
   switch (access)
     {      
-#ifdef HAVE_RPC_RPC_H      
+#ifdef HAVE_XDR      
     case (XdrIO::ENCODE):
       break;
     case (XdrIO::DECODE):
@@ -800,7 +800,7 @@ void Mesh::read_xdr(const std::string& name)
 
 void Mesh::read_xdr_binary(const std::string& name)
 {
-#ifndef HAVE_RPC_RPC_H
+#ifndef HAVE_XDR
 
   std::cerr << "WARNING: Compiled without XDR binary support." << std::endl
 	    << "Will try ASCII instead" << std::endl << std::endl;
@@ -866,7 +866,7 @@ void Mesh::read_xdr_soln_binary(const std::string& name,
 				std::vector<Number>& soln,
 				std::vector<std::string>& var_names)
 {
-#ifndef HAVE_RPC_RPC_H
+#ifndef HAVE_XDR
 
   std::cerr << "WARNING: Compiled without XDR binary support." << std::endl
 	    << "Will try ASCII instead" << std::endl << std::endl;
@@ -924,7 +924,7 @@ void Mesh::write_xdr(const std::string& name)
 
 void Mesh::write_xdr_binary(const std::string& name)
 {
-#ifndef HAVE_RPC_RPC_H
+#ifndef HAVE_XDR
 
   std::cerr << "WARNING: Compiled without XDR binary support." << std::endl
 	    << "Will try ASCII instead" << std::endl << std::endl;
@@ -983,7 +983,7 @@ void Mesh::write_xdr_soln_binary(const std::string& name,
 				 std::vector<std::string>& var_names)
 
 {
-#ifndef HAVE_RPC_RPC_H
+#ifndef HAVE_XDR
 
   std::cerr << "WARNING: Compiled without XDR binary support." << std::endl
 	    << "Will try ASCII instead" << std::endl << std::endl;

@@ -1,4 +1,4 @@
-// "$Id: xdrIO.C,v 1.16 2004-03-02 12:59:44 benkirk Exp $\n"
+// "$Id: xdrIO.C,v 1.17 2004-03-07 23:11:34 benkirk Exp $\n"
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -38,7 +38,7 @@ XdrIO::~XdrIO()
 void XdrIO::fini()
 {
   
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
   
   if (mp_xdr_handle)
     {
@@ -85,7 +85,7 @@ void XdrIO::init (XdrIO::XdrIO_TYPE t, const char* fn, const char*, int)
   switch (m_type)
     {
       
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
       
     case (XdrIO::ENCODE):
     case (XdrIO::DECODE):
@@ -165,7 +165,7 @@ void XdrIO::init (XdrIO::XdrIO_TYPE t, const char* fn, const char*, int)
   switch (m_type)
     {
       
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
       
     case (XdrIO::ENCODE):
       {
@@ -272,7 +272,7 @@ int XdrIO::dataBlk(int* array, int numvar, int size)
   switch (m_type)
     {
 
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
       
     case (XdrIO::DECODE):
     case (XdrIO::ENCODE):
@@ -339,7 +339,7 @@ int XdrIO::dataBlk(REAL* array, int numvar, int size)
   switch (m_type)
     {
       
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
       
     case (XdrIO::DECODE):
     case (XdrIO::ENCODE):
@@ -404,7 +404,7 @@ int XdrMESH::header(XdrMHEAD *hd)
   switch (m_type)
     {
       
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
       
     case (XdrIO::DECODE):
     case (XdrIO::ENCODE): 
@@ -459,7 +459,7 @@ int XdrMESH::header(XdrMHEAD *hd)
       switch (m_type)
 	{
 	  
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
 	  
 	case (XdrIO::ENCODE):
 	case (XdrIO::DECODE):
@@ -498,7 +498,7 @@ int XdrMESH::header(XdrMHEAD *hd)
       switch (m_type)
 	{
 	  
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
 	  
 	case (XdrIO::ENCODE):
 	case (XdrIO::DECODE):
@@ -559,7 +559,7 @@ int XdrMESH::header(XdrMHEAD *hd)
       switch (m_type)
 	{
 	  
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
 	  
 	case (XdrIO::ENCODE):
 	case (XdrIO::DECODE):
@@ -615,7 +615,7 @@ int XdrMESH::header(XdrMHEAD *hd)
   switch (m_type)
     {
 
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
       
     case (XdrIO::ENCODE):
     case (XdrIO::DECODE):
@@ -675,7 +675,7 @@ int XdrSOLN::header(XdrSHEAD *hd)
   switch (m_type)
     {
       
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
       
     case (XdrIO::ENCODE):
     case (XdrIO::DECODE):

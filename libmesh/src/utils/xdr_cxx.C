@@ -1,4 +1,4 @@
-// "$Id: xdr_cxx.C,v 1.14 2004-01-03 15:37:44 benkirk Exp $\n"
+// "$Id: xdr_cxx.C,v 1.15 2004-03-07 23:11:34 benkirk Exp $\n"
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -28,7 +28,7 @@
 // Xdr class implementation
 Xdr::Xdr (const std::string& name, const XdrMODE m) :
   mode(m),
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
   xdrs(NULL),
 #endif
   fp(NULL),
@@ -56,7 +56,7 @@ void Xdr::open (const std::string& name)
     case ENCODE:
     case DECODE:
       {
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
 
 	fp = fopen(name.c_str(), (mode == ENCODE) ? "w" : "r");
 	assert (fp);
@@ -65,7 +65,7 @@ void Xdr::open (const std::string& name)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_RPC_RPC_H is defined at build time" 
+		  << "Make sure HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -105,7 +105,7 @@ void Xdr::close ()
     case ENCODE:
     case DECODE:
       {
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
 
 	if (xdrs)
 	  {
@@ -123,7 +123,7 @@ void Xdr::close ()
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_RPC_RPC_H is defined at build time" 
+		  << "Make sure HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -162,7 +162,7 @@ bool Xdr::is_open() const
     case ENCODE:
     case DECODE:
       {
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
 
 	if (fp)
 	  if (xdrs)
@@ -173,7 +173,7 @@ bool Xdr::is_open() const
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_RPC_RPC_H is defined at build time" 
+		  << "Make sure HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -212,7 +212,7 @@ void Xdr::data (int& a, const char* comment)
     case ENCODE:
     case DECODE:
       {
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
 
 	assert (is_open());
 
@@ -221,7 +221,7 @@ void Xdr::data (int& a, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_RPC_RPC_H is defined at build time" 
+		  << "Make sure HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -264,7 +264,7 @@ void Xdr::data (unsigned int& a, const char* comment)
     case ENCODE:
     case DECODE:
       {
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
 
 	assert (is_open());
 
@@ -273,7 +273,7 @@ void Xdr::data (unsigned int& a, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_RPC_RPC_H is defined at build time" 
+		  << "Make sure HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -316,7 +316,7 @@ void Xdr::data (short int& a, const char* comment)
     case ENCODE:
     case DECODE:
       {
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
 
 	assert (is_open());
 
@@ -325,7 +325,7 @@ void Xdr::data (short int& a, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_RPC_RPC_H is defined at build time" 
+		  << "Make sure HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -368,7 +368,7 @@ void Xdr::data (unsigned short int& a, const char* comment)
     case ENCODE:
     case DECODE:
       {
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
 
 	assert (is_open());
 
@@ -377,7 +377,7 @@ void Xdr::data (unsigned short int& a, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_RPC_RPC_H is defined at build time" 
+		  << "Make sure HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -420,7 +420,7 @@ void Xdr::data (float& a, const char* comment)
     case ENCODE:
     case DECODE:
       {
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
 
 	assert (is_open());
 
@@ -429,7 +429,7 @@ void Xdr::data (float& a, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_RPC_RPC_H is defined at build time" 
+		  << "Make sure HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -472,7 +472,7 @@ void Xdr::data (double& a, const char* comment)
     case ENCODE:
     case DECODE:
       {
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
 
 	assert (is_open());
 
@@ -481,7 +481,7 @@ void Xdr::data (double& a, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_RPC_RPC_H is defined at build time" 
+		  << "Make sure HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -526,7 +526,7 @@ void Xdr::data (std::complex<double>& a, const char* comment)
     case ENCODE:
     case DECODE:
       {
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
 
 	assert (is_open());
 	double buf;
@@ -538,7 +538,7 @@ void Xdr::data (std::complex<double>& a, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_RPC_RPC_H is defined at build time" 
+		  << "Make sure HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -588,7 +588,7 @@ void Xdr::data (std::vector<int>& v, const char* comment)
     {
     case ENCODE:
       {
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
 
 	assert (is_open());
 
@@ -605,7 +605,7 @@ void Xdr::data (std::vector<int>& v, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_RPC_RPC_H is defined at build time" 
+		  << "Make sure HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -618,7 +618,7 @@ void Xdr::data (std::vector<int>& v, const char* comment)
 
     case DECODE:
       {
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
 
 	assert (is_open());
 
@@ -637,7 +637,7 @@ void Xdr::data (std::vector<int>& v, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_RPC_RPC_H is defined at build time" 
+		  << "Make sure HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -701,7 +701,7 @@ void Xdr::data (std::vector<unsigned int>& v, const char* comment)
     {
     case ENCODE:
       {
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
 
 	assert (is_open());
 
@@ -718,7 +718,7 @@ void Xdr::data (std::vector<unsigned int>& v, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_RPC_RPC_H is defined at build time" 
+		  << "Make sure HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -731,7 +731,7 @@ void Xdr::data (std::vector<unsigned int>& v, const char* comment)
 
     case DECODE:
       {
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
 
 	assert (is_open());
 
@@ -750,7 +750,7 @@ void Xdr::data (std::vector<unsigned int>& v, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_RPC_RPC_H is defined at build time" 
+		  << "Make sure HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -814,7 +814,7 @@ void Xdr::data (std::vector<short int>& v, const char* comment)
     {
     case ENCODE:
       {
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
 
 	assert (is_open());
 
@@ -831,7 +831,7 @@ void Xdr::data (std::vector<short int>& v, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_RPC_RPC_H is defined at build time" 
+		  << "Make sure HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -844,7 +844,7 @@ void Xdr::data (std::vector<short int>& v, const char* comment)
 
     case DECODE:
       {
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
 
 	assert (is_open());
 
@@ -863,7 +863,7 @@ void Xdr::data (std::vector<short int>& v, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_RPC_RPC_H is defined at build time" 
+		  << "Make sure HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -927,7 +927,7 @@ void Xdr::data (std::vector<unsigned short int>& v, const char* comment)
     {
     case ENCODE:
       {
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
 
 	assert (is_open());
 
@@ -944,7 +944,7 @@ void Xdr::data (std::vector<unsigned short int>& v, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_RPC_RPC_H is defined at build time" 
+		  << "Make sure HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -957,7 +957,7 @@ void Xdr::data (std::vector<unsigned short int>& v, const char* comment)
 
     case DECODE:
       {
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
 
 	assert (is_open());
 
@@ -976,7 +976,7 @@ void Xdr::data (std::vector<unsigned short int>& v, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_RPC_RPC_H is defined at build time" 
+		  << "Make sure HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -1040,7 +1040,7 @@ void Xdr::data (std::vector<float>& v, const char* comment)
     {
     case ENCODE:
       {
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
 
 	assert (is_open());
 
@@ -1057,7 +1057,7 @@ void Xdr::data (std::vector<float>& v, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_RPC_RPC_H is defined at build time" 
+		  << "Make sure HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -1070,7 +1070,7 @@ void Xdr::data (std::vector<float>& v, const char* comment)
 
     case DECODE:
       {
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
 
 	assert (is_open());
 
@@ -1089,7 +1089,7 @@ void Xdr::data (std::vector<float>& v, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_RPC_RPC_H is defined at build time" 
+		  << "Make sure HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -1153,7 +1153,7 @@ void Xdr::data (std::vector<double>& v, const char* comment)
     {
     case ENCODE:
       {
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
 
 	assert (is_open());
 
@@ -1170,7 +1170,7 @@ void Xdr::data (std::vector<double>& v, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_RPC_RPC_H is defined at build time" 
+		  << "Make sure HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -1183,7 +1183,7 @@ void Xdr::data (std::vector<double>& v, const char* comment)
 
     case DECODE:
       {
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
 
 	assert (is_open());
 
@@ -1202,7 +1202,7 @@ void Xdr::data (std::vector<double>& v, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_RPC_RPC_H is defined at build time" 
+		  << "Make sure HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -1271,7 +1271,7 @@ void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
     {
     case ENCODE:
       {
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
 
 	assert (is_open());
 
@@ -1327,7 +1327,7 @@ void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_RPC_RPC_H is defined at build time" 
+		  << "Make sure HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -1340,7 +1340,7 @@ void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
 
     case DECODE:
       {
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
 
 	assert (is_open());
 
@@ -1398,7 +1398,7 @@ void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_RPC_RPC_H is defined at build time" 
+		  << "Make sure HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -1469,7 +1469,7 @@ void Xdr::data (std::string& s, const char* comment)
     {
     case ENCODE:
       {
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
 
 	assert (is_open());
 
@@ -1491,7 +1491,7 @@ void Xdr::data (std::string& s, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_RPC_RPC_H is defined at build time" 
+		  << "Make sure HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -1504,7 +1504,7 @@ void Xdr::data (std::string& s, const char* comment)
 
     case DECODE:
       {
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
 
 	assert (is_open());
 
@@ -1526,7 +1526,7 @@ void Xdr::data (std::string& s, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_RPC_RPC_H is defined at build time" 
+		  << "Make sure HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;

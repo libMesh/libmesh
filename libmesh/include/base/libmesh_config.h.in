@@ -124,6 +124,9 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
+/* Flag indicating headers and libraries for XDR IO are available */
+#undef HAVE_XDR
+
 /* Define to 1 if you have the <zlib.h> header file. */
 #undef HAVE_ZLIB_H
 
