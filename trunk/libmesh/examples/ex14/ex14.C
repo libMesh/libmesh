@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.3 2004-05-24 19:58:36 jwpeterson Exp $ */
+/* $Id: ex14.C,v 1.4 2004-05-27 04:35:09 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -58,6 +58,7 @@
 #include "error_vector.h"
 #include "kelly_error_estimator.h"
 #include "getpot.h"
+#include "exact_solution.h"
 
 // Function prototype.  This is the function that will assemble
 // the linear system for our Laplace problem.  Note that the
@@ -71,9 +72,17 @@ void assemble_laplace(EquationSystems& es,
 
 // Prototype for calculation of the exact solution.  Useful
 // for setting boundary conditions.
-Real exact_solution(const Real x,
-		    const Real y);
-  
+Real exact_solution(const Point& p,
+		    const Real,          // time, not needed
+		    const std::string&,  // sys_name, not needed
+		    const std::string&); // unk_name, not needed);
+
+// Prototype for calculation of the gradient of the exact solution.  
+RealGradient exact_derivative(const Point& p,
+			      const Real,          // time, not needed
+			      const std::string&,  // sys_name, not needed
+			      const std::string&); // unk_name, not needed);
+
 
 
 
@@ -89,7 +98,7 @@ int main(int argc, char** argv)
 
     // Create a two-dimensional mesh.
     Mesh mesh (dim);
-
+    
     // Parse the input file
     GetPot input_file("ex14.in");
 
@@ -98,6 +107,14 @@ int main(int argc, char** argv)
     const unsigned int max_r_level = input_file("max_r_level", 3);
     const Real refine_percentage   = input_file("refine_percentage", 0.5);
     const Real coarsen_percentage  = input_file("coarsen_percentage", 0.5);
+
+    // Output file for plotting the error as a function of
+    // the number of degrees of freedom.
+    std::ofstream out ("ex14.m");
+    out << "clear all" << std::endl;
+    out << "clf" << std::endl;
+    out << "% dofs     L2-error     H1-error" << std::endl;
+    out << "e = [" << std::endl;
     
     // Read in the mesh
     mesh.read("lshaped.xda");
@@ -134,10 +151,16 @@ int main(int argc, char** argv)
       equation_systems.print_info();
     }
 
+    // Construct ExactSolution object and attach function to compute exact solution
+    ExactSolution exact_sol(equation_systems);
+    exact_sol.attach_exact_value(exact_solution);
+    exact_sol.attach_exact_deriv(exact_derivative);
 
     // Convenient reference to the system
     ImplicitSystem& system = equation_systems.get_system<ImplicitSystem>("Laplace");
 
+    std::cout << "variable_number(\"u\")=" << system.variable_number("u") << std::endl;
+    
     // A refinement loop.
     for (unsigned int r_step=0; r_step<max_r_steps; r_step++)
       {
@@ -156,6 +179,22 @@ int main(int argc, char** argv)
 		  << system.final_linear_residual()
 		  << std::endl;
 	
+	// Compute the error.
+	exact_sol.compute_error("Laplace", "u");
+
+	// Print out the error values
+	std::cout << "L2-Error is: "
+		  << exact_sol.l2_error("Laplace", "u")
+		  << std::endl;
+	std::cout << "H1-Error is: "
+		  << exact_sol.h1_error("Laplace", "u")
+		  << std::endl;
+
+	// Print to output file
+	out << equation_systems.n_dofs() << " "
+	    << exact_sol.l2_error("Laplace", "u") << " "
+	    << exact_sol.h1_error("Laplace", "u") << std::endl;
+
 	// Possibly refine the mesh
 	if (r_step+1 != max_r_steps)
 	  {
@@ -204,16 +243,28 @@ int main(int argc, char** argv)
 
 	    // equation_systems.print_info();
 	  }
+	
       }	    
+    
+    
 
-
-
-
+    
     // Write out the solution
     // After solving the system write the solution
     // to a GMV-formatted plot file.
     GMVIO (mesh).write_equation_systems ("lshaped.gmv",
     					 equation_systems);
+
+    // Close up the output file.
+    out << "];" << std::endl;
+    out << "hold on" << std::endl;
+    out << "plot(e(:,1), e(:,2), 'bo-');" << std::endl;
+    out << "plot(e(:,1), e(:,3), 'ro-');" << std::endl;
+    out << "set(gca,'XScale', 'Log');" << std::endl;
+    out << "set(gca,'YScale', 'Log');" << std::endl;
+    out << "xlabel('dofs');" << std::endl;
+    out << "legend('L2-error', 'H1-error');" << std::endl;
+
   }
 
   
@@ -227,9 +278,14 @@ int main(int argc, char** argv)
 // We now define the exact solution, being careful
 // to obtain an angle from atan2 in the correct
 // quadrant.
-Real exact_solution(const Real x,
-		    const Real y)
+Real exact_solution(const Point& p,
+		    const Real,         // time, not needed
+		    const std::string&, // sys_name, not needed
+		    const std::string&) // unk_name, not needed
 {
+  const Real x = p(0);
+  const Real y = p(1);
+  
   // The boundary value, given by the exact solution,
   // u_exact = r^(2/3)*sin(2*theta/3).
   Real theta = atan2(y,x);
@@ -239,6 +295,52 @@ Real exact_solution(const Real x,
     theta += 2. * libMesh::pi;
 		  
   return pow(x*x + y*y, 1./3.)*sin(2./3.*theta);
+}
+
+
+
+
+
+// We now define the gradient of the exact solution, again being careful
+// to obtain an angle from atan2 in the correct
+// quadrant.
+RealGradient exact_derivative(const Point& p,
+			      const Real,         // time, not needed
+			      const std::string&, // sys_name, not needed
+			      const std::string&) // unk_name, not needed
+{
+  // Gradient value to be returned.
+  RealGradient gradu;
+  
+  // x and y coordinates in space
+  const Real x = p(0);
+  const Real y = p(1);
+
+  // We can't compute the gradient at x=0, it is not defined.
+  assert (x != 0.);
+
+  // For convenience...
+  const Real tt = 2./3.;
+  const Real ot = 1./3.;
+  
+  // The value of the radius, squared
+  const Real r2 = x*x + y*y;
+
+  // The boundary value, given by the exact solution,
+  // u_exact = r^(2/3)*sin(2*theta/3).
+  Real theta = atan2(y,x);
+  
+  // Make sure 0 <= theta <= 2*pi
+  if (theta < 0)
+    theta += 2. * libMesh::pi;
+
+  // du/dx
+  gradu(0) = tt*x*pow(r2,-tt)*sin(tt*theta) - pow(r2,ot)*cos(tt*theta)*tt/(1.+y*y/x/x)*y/x/x;
+
+  // du/dy
+  gradu(1) = tt*y*pow(r2,-tt)*sin(tt*theta) + pow(r2,ot)*cos(tt*theta)*tt/(1.+y*y/x/x)*1./x;
+    
+  return gradu;
 }
 
 
@@ -432,9 +534,12 @@ void assemble_laplace(EquationSystems& es,
 	      // Loop over the nodes on the side with NULL neighbor.
 	      for (unsigned int ns=0; ns<side->n_nodes(); ns++)
 		{
-		  const Real x = side->point(ns)(0);
-		  const Real y = side->point(ns)(1);
-		  const Real value = exact_solution(x,y);
+		  //const Real x = side->point(ns)(0);
+		  //const Real y = side->point(ns)(1);
+		  const Real value = exact_solution(side->point(ns),
+						    0.,
+						    "null",
+						    "void");
 		  
 // 		  std::cout << "(x,y,bc)=("
 // 			    << x << ","

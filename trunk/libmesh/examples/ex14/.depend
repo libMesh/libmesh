@@ -52,6 +52,7 @@ ex14.$(obj-suffix):\
     ../../include/quadrature/quadrature.h\
     ../../include/quadrature/quadrature_gauss.h\
     ../../include/solvers/equation_systems.h\
+    ../../include/solvers/exact_solution.h\
     ../../include/solvers/explicit_system.h\
     ../../include/solvers/frequency_system.h\
     ../../include/solvers/implicit_system.h\
