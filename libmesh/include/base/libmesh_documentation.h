@@ -148,16 +148,17 @@
  
   - GNU GCC
     - \p gcc 3.x
-    - \p gcc 2.95.3
+    - \p gcc 2.95.x
     - \p gcc 2.96 (RedHat's compiler in the 7.x series)
  
   - Intel ICC/ECC
+    - \p icc/ifort 8.x (CXXFLAGS=-no-gcc ./configure [...])
     - \p icc/ifc 7.x
     - \p icc/ifc 6.0
     - Earlier versions (<= 5.0) not supported.
  
   - SGI MIPSPro Compilers
-    - Version 7.30
+    - Version 7.30 (CXXFLAGS=-LANG:std ./configure [...])
     - Not tested (but will likely work) with others
  
   - HP, use \p CXX="aCC \p -AA" and \p CC="cc \p -Aa" to get full std support

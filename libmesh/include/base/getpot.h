@@ -1,4 +1,4 @@
-// $Id: getpot.h,v 1.1 2003-11-05 22:26:42 benkirk Exp $
+// $Id: getpot.h,v 1.2 2004-02-25 03:44:44 benkirk Exp $
 //
 // (with patches from Michael Anderson for more general variable types)
 
@@ -1527,8 +1527,8 @@ GetPot::__DBE_expand(const std::string& expr)
   // ${<-> expr expr expr} text replacement
   else if( expr.length() >= 3 && expr.substr(0, 3) == "<->" ) {
     std::vector<std::string> A = __DBE_get_expr_list(expr.substr(3), 3);
-    unsigned tmp = 0;
-    const unsigned L = A[1].length();
+    std::string::size_type tmp = 0;
+    const std::string::size_type L = A[1].length();
     while( (tmp = A[0].find(A[1])) != std::string::npos ) {
       A[0].replace(tmp, L, A[2]);
     }

@@ -62,13 +62,15 @@ The library is known to work with the following compilers:
     </ul>
   <li>Intel ICC/ECC</li>
     <ul>
+      <li><code>icc/ifort</code> 8.x (CXXFLAGS=-no-gcc ./configure [...])</li>
       <li><code>icc/ifc</code> 7.x</li>
       <li><code>icc/ifc</code> 6.0</li>
       <li>Earlier versions (&lt;= 5.0) not supported</li>
     </ul>
   <li>SGI MIPSPro Compilers</li>
     <ul>
-      <li>Version 7.30<li>Not tested (but will likely work) with others</li>
+      <li>Version 7.30(CXXFLAGS=-LANG:std ./configure [...])</li>
+      <li>Not tested (but will likely work) with others</li>
     </ul>
   <li>HP, use <code>CXX="aCC</code> <code>-AA</code>"
       and <code>CC="cc</code> <code>-Aa</code>" to get full std support</li>
