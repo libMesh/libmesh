@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.35 2003-09-06 02:23:59 ddreyer Exp $
+// $Id: elem.h,v 1.36 2003-09-16 15:59:31 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -39,6 +39,7 @@
 // Forward declarations
 class MeshBase;
 class MeshRefinement;
+class MeshCommunication;
 class MetisPartitioner;
 class Elem;
 
@@ -649,11 +650,11 @@ class Elem : public ReferenceCountedObject<Elem>,
    * It would seem that we are just getting around it
    * by using friends!
    */
-  friend class XdrInterface;   // (Elem::build)
-  friend class MeshRefinement; // (Elem::nullify_neighbors)
-  friend class Mesh;           // (Elem::build in mesh_exodus_support)
-  friend class MeshBase;       // (Elem::build in mesh_base_modification)
-  //friend class MetisPartitioner;
+  friend class XdrInterface;      // (Elem::build)
+  friend class MeshRefinement;    // (Elem::nullify_neighbors)
+  friend class Mesh;              // (Elem::build in mesh_exodus_support)
+  friend class MeshBase;          // (Elem::build in mesh_base_modification)
+  friend class MeshCommunication; // (Elem::build in mesh_communication)
 };
 
 

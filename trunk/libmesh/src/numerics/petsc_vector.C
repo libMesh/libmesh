@@ -1,4 +1,4 @@
-// $Id: petsc_vector.C,v 1.25 2003-09-06 02:24:00 ddreyer Exp $
+// $Id: petsc_vector.C,v 1.26 2003-09-16 15:59:31 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -585,16 +585,8 @@ void PetscVector<Real>::localize (std::vector<Real>& v_local) const
 	       CHKERRQ(ierr);
       }
 
-      if (sizeof(Real) == sizeof(double))
-	MPI_Allreduce (&local_values[0], &v_local[0], n, MPI_DOUBLE, MPI_SUM,
-		       PETSC_COMM_WORLD);
-      
-      else if (sizeof(Real) == sizeof(float))
-	MPI_Allreduce (&local_values[0], &v_local[0], n, MPI_FLOAT, MPI_SUM,
-		       PETSC_COMM_WORLD);
-
-      else
-	error();
+      MPI_Allreduce (&local_values[0], &v_local[0], n, MPI_REAL, MPI_SUM,
+		     PETSC_COMM_WORLD);
     }  
 }
 
@@ -731,16 +723,8 @@ void PetscVector<Real>::localize_to_one (std::vector<Real>& v_local,
       }
       
 
-      if (sizeof(Real) == sizeof(double))
-	MPI_Reduce (&local_values[0], &v_local[0], n, MPI_DOUBLE, MPI_SUM,
-		    pid, PETSC_COMM_WORLD);
-      
-      else if (sizeof(Real) == sizeof(float))
-	MPI_Reduce (&local_values[0], &v_local[0], n, MPI_FLOAT, MPI_SUM,
-		    pid, PETSC_COMM_WORLD);
-
-      else
-	error();
+      MPI_Reduce (&local_values[0], &v_local[0], n, MPI_REAL, MPI_SUM,
+		  pid, PETSC_COMM_WORLD);
     }
 }
 

@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.46 2003-09-11 19:10:52 benkirk Exp $
+// $Id: mesh_base.h,v 1.47 2003-09-16 15:59:31 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -40,7 +40,6 @@ class EquationSystems;
 // Local Includes -----------------------------------
 #include "mesh_common.h"
 #include "mesh_refinement.h"
-#include "mesh_communication.h"
 #include "boundary_info.h"
 #include "mesh_data.h"
 #include "node.h"
@@ -64,7 +63,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.46 $
+ * \version $Revision: 1.47 $
  */
 
 
@@ -118,12 +117,6 @@ public:
    */
   MeshData data;
 
-  /**
-   * This class enables parallelization of the mesh.  All
-   * required inter-processor communication is done via this class.
-   */
-  MeshCommunication mesh_communication;
-  
   /**
    * @returns \p true if the mesh has been prepared via a call
    * to \p prepare_for_use, \p false otherwise.
@@ -600,11 +593,6 @@ public:
    */
   void write_unv (const std::string& name);
 
-  /** 
-   * Read mesh from the file specified by \p name in Universal (unv) format.  
-   */
-  void read_unv (const std::string& name);
-
   /**
    * @returns a string containing relevant information
    * about the mesh.
@@ -771,6 +759,11 @@ protected:
    */
   void read_ucd (std::istream& in);
   
+  /** 
+   * Read mesh from the file specified by \p name in Universal (unv) format.  
+   */
+  void read_unv (const std::string& name);
+
   /**
    * Read a 2D mesh in the shanee format from the file specified
    * by \p name.  This is for compatibility with

@@ -1,4 +1,4 @@
-// $Id: dof_object.h,v 1.17 2003-09-02 18:02:37 benkirk Exp $
+// $Id: dof_object.h,v 1.18 2003-09-16 15:59:30 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -48,7 +48,7 @@
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.17 $
+ * \version $Revision: 1.18 $
  */
 
 class DofObject
@@ -550,6 +550,7 @@ unsigned int DofObject::n_dofs (const unsigned int s,
 inline
 unsigned int DofObject::id () const
 {
+  assert (_id != this->invalid_id);
   return _id;
 }
 
@@ -566,6 +567,7 @@ unsigned int & DofObject::set_id ()
 inline
 unsigned short int DofObject::processor_id () const
 {
+  assert (_processor_id != this->invalid_processor_id);
   return _processor_id;
 }
 

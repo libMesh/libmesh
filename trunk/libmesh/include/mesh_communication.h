@@ -1,4 +1,4 @@
-// $Id: mesh_communication.h,v 1.3 2003-09-02 18:02:38 benkirk Exp $
+// $Id: mesh_communication.h,v 1.4 2003-09-16 15:59:31 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -32,7 +32,8 @@
 
 // Forward declarations
 class MeshBase;
-
+class Mesh;
+class BoundaryInfo;
 
 
 
@@ -54,7 +55,7 @@ public:
   /**
    * Constructor.
    */
-  MeshCommunication (MeshBase& mesh);
+  MeshCommunication () {}
 
   /**
    * Destructor.
@@ -65,7 +66,15 @@ public:
    * Clears all data structures and returns to a pristine state.
    */
   void clear ();
-  
+
+  /**
+   * This method takes a mesh (which is assumed to reside on
+   * processor 0) and distributes it to all the other processors.
+   * It also distributes any boundary information the mesh has
+   * associated with it.
+   */
+  void distribute (Mesh& );
+
   /**
    * Finds all the processors that may contain
    * elements that neighbor my elements.  This list
@@ -79,29 +88,21 @@ public:
   
 private:
 
+  /**
+   *
+   */
+  void distribute_mesh (MeshBase& );
 
   /**
-   * Reference to the mesh.
+   *
    */
-  MeshBase& _mesh;
+  void distribute_bcs (MeshBase&, BoundaryInfo&);
 };
 
 
 
 //--------------------------------------------------------------
 // MeshCommunication inline members
-inline
-MeshCommunication::MeshCommunication (MeshBase& mesh) :
-  _mesh (mesh)
-{
-}
-
-
-
-inline
-void MeshCommunication::clear ()
-{
-}
 
 
 #endif // end #ifndef __mesh_communication_h__ 

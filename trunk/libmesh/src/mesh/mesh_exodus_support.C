@@ -1,4 +1,4 @@
-// $Id: mesh_exodus_support.C,v 1.8 2003-09-02 18:02:43 benkirk Exp $
+// $Id: mesh_exodus_support.C,v 1.9 2003-09-16 15:59:31 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -514,7 +514,8 @@ void Mesh::read_exd(const std::string& name)
 	int jmax = nelem_last_block+ex.get_num_elem_this_blk();
 	for (int j=nelem_last_block; j<jmax; j++)
 	  {
-	    _elements[j] = Elem::build(conv.get_canonical_type()); 
+	    _elements[j] = Elem::build(conv.get_canonical_type());
+	    _elements[j]->set_id (j);
 	    
 	    // Set all the nodes for this element
 	    for (int k=0; k<ex.get_num_nodes_per_elem(); k++)

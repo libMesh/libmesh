@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.53 2003-09-11 19:10:53 benkirk Exp $
+// $Id: mesh_base.C,v 1.54 2003-09-16 15:59:31 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -61,7 +61,6 @@ MeshBase::MeshBase (unsigned int d) :
 #endif
   boundary_info      (*this),
   data               (*this),
-  mesh_communication (*this),
   _n_sbd             (1),
   _dim               (d),
   _is_prepared       (false)
@@ -79,7 +78,6 @@ MeshBase::MeshBase (const MeshBase& other_mesh) :
 #endif
   boundary_info      (*this),
   data               (*this),
-  mesh_communication (*this),
   _nodes             (other_mesh._nodes),
   _elements          (other_mesh._elements),
   _n_sbd             (other_mesh._n_sbd),
@@ -204,13 +202,11 @@ void MeshBase::clear ()
   // Clear other data structures
 #ifdef ENABLE_AMR
   
-  mesh_refinement.clear();
+  this->mesh_refinement.clear();
   
 #endif
 
-  boundary_info.clear();
-
-  mesh_communication.clear();
+  this->boundary_info.clear();
 
   
   // Reset the number of subdomains and the
@@ -651,13 +647,7 @@ void MeshBase::renumber_nodes_and_elements ()
 {
   START_LOG("renumber_nodes_and_elem()", "MeshBase");
 
-  std::vector<Elem*> new_elem;
-  std::vector<Node*> new_nodes;
 
-  // Reserve space in the new containers.
-  new_elem.reserve  (_elements.size());
-  new_nodes.reserve (_nodes.size());
-  
   // Begin by setting all node and element ids
   // to an invalid value.
   {
@@ -674,89 +664,59 @@ void MeshBase::renumber_nodes_and_elements ()
   }
 
 
-  // Renumber the elements and the nodes.
+  // Renumber the elements
   { 
+    std::vector<Elem*> new_elem;
+    new_elem.reserve (_elements.size());
+    
     unsigned int next_free_elem = 0;
-    unsigned int next_free_node = 0;
-
+      
+    // Loop over the elements
+    elem_iterator       el    (this->elements_begin());
+    const elem_iterator end_el(this->elements_end());
     
-    // Loop over the elements, set their IDs so that they lie in
-    // contiguous blocks on each processor.  Then loop over the nodes
-    // and set their IDs based on where they lie in their vectors.
-    {
-//       for (unsigned int proc_id=0; proc_id<this->n_processors(); proc_id++)
-// 	{
-// 	  // Loop over the elements on the processor proc_id
-// 	  pid_elem_iterator       el    (this->elements_begin(), proc_id);
-// 	  const pid_elem_iterator end_el(this->elements_end(),   proc_id);
-	  
-// 	  for (; el != end_el; ++el)
-// 	    {
-// 	      // this element should _not_ have been numbered already
-// 	      assert ((*el)->id() == Elem::invalid_id);
-	      
-// 	      (*el)->set_id(next_free_elem++);
+    for (; el != end_el; ++el)
+      {
+	(*el)->set_id(next_free_elem++);
+	
+	// Add the element to the new list
+	new_elem.push_back(*el);
+      }
 
-// 	      // Add the element to the new list
-// 	      new_elem.push_back(*el);
-// 	    }
-// 	}
-      
-      // Loop over the elements
-      elem_iterator       el    (this->elements_begin());
-      const elem_iterator end_el(this->elements_end());
-      
-      for (; el != end_el; ++el)
-	{
-	  // this element should _not_ have been numbered already
-	  assert ((*el)->id() == Elem::invalid_id);
-	  
-	  (*el)->set_id(next_free_elem++);
-	  
-	  // Add the element to the new list
-	  new_elem.push_back(*el);
-	}
-
-
-      node_iterator       nd    (this->nodes_begin());
-      const node_iterator end_nd(this->nodes_end());
-      
-      //TODO:[BSK] This will not produce any inactive nodes to be deleted
-      // in the last step.  Might want to change this later.
-      for (; nd != end_nd; ++nd)
-	{
-	  // this node should _not_ have been numbered already
-	  assert ((*nd)->id() == Node::invalid_id);
-	  
-	  (*nd)->set_id(next_free_node++);
-	  
-	  //assert (this->processor_id() == 0);
-	  
-	  (*nd)->set_processor_id(0);
-	  
-	  // Add the node to the new list
-	  new_nodes.push_back(*nd);
-	}	       
-    }
-
+    // Assign the _elements vector
+    _elements = new_elem;
+    
     // This could only fail if we did something seriously WRONG!
-    assert (new_elem.size()  == next_free_elem);
-    assert (new_nodes.size() == next_free_node);
+    assert (_elements.size()  == next_free_elem);
   }
-
-
-//   // Delete the inactive nodes
-//   for (unsigned int n=0; n<_nodes.size(); n++)
-//     if (_nodes[n] != NULL)
-//       if (!_nodes[n]->active())
-// 	{
-// 	  delete _nodes[n];
-// 	  _nodes[n] = NULL;
-// 	}
+  
+  // Renumber the nodes
+  {
+    std::vector<Node*> new_nodes;
+    new_nodes.reserve (_nodes.size());
     
-  // Finally, reassign the _nodes and _elem vectors
-  _elements = new_elem;
-  _nodes    = new_nodes;
+    unsigned int next_free_node = 0;
+    
+    node_iterator       nd    (this->nodes_begin());
+    const node_iterator end_nd(this->nodes_end());
+    
+    //TODO:[BSK] This will not produce any inactive nodes to be deleted
+    // in the last step.  Might want to change this later.
+    for (; nd != end_nd; ++nd)
+      {
+	(*nd)->set_id(next_free_node++);
+	
+	(*nd)->set_processor_id(0);
+	
+	// Add the node to the new list
+	new_nodes.push_back(*nd);
+      }	       
+
+    _nodes = new_nodes;
+    
+    // This could only fail if we did something seriously WRONG!
+    assert (_nodes.size() == next_free_node);
+  }
   
   STOP_LOG("renumber_nodes_and_elem()", "MeshBase");
 }

@@ -1,4 +1,4 @@
-// $Id: mesh.h,v 1.22 2003-09-11 19:10:52 benkirk Exp $
+// $Id: mesh.h,v 1.23 2003-09-16 15:59:31 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -233,10 +233,10 @@ class Mesh : public MeshBase
   void read_xdr_binary (const std::string& name);
 
   /**
-   * Actual implementation of writing  meshes in DIVA's ASCII
+   * Actual implementation of writing meshes in DIVA's ASCII
    * format.
    */
-  void write_diva(std::ostream& out);
+  void write_diva (std::ostream& out);
 
   
  private:
