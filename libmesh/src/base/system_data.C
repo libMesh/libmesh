@@ -1,4 +1,4 @@
-// $Id: system_data.C,v 1.5 2003-01-24 17:24:41 jwpeterson Exp $
+// $Id: system_data.C,v 1.6 2003-01-30 19:13:10 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -34,8 +34,8 @@
 SystemData::SystemData (EquationSystems& es,
 			const std::string& name) :
   dof_map(es.get_mesh()),
-  init_system(NULL),
-  assemble(NULL),
+  init_system_fptr(NULL),
+  assemble_fptr(NULL),
   sys_name(name),
   equation_systems(es),
   mesh(es.get_mesh())
@@ -60,7 +60,7 @@ void SystemData::clear ()
   
   dof_map.clear ();
 
-  //init_system = assemble = NULL;
+  //init_system_fptr = assemble_fptr = NULL;
   
 #ifdef HAVE_PETSC
 
@@ -169,9 +169,9 @@ void SystemData::init ()
   
 #endif
 
-  if (init_system != NULL)
+  if (init_system_fptr != NULL)
     {
-      init_system (equation_systems, name());
+      init_system_fptr (equation_systems, name());
 
       update();
 
@@ -241,10 +241,9 @@ unsigned short int SystemData::variable_number (const std::string& var) const
 
 #ifdef HAVE_PETSC
 
-std::pair<unsigned int, real>
-SystemData::solve ()
+void SystemData::assemble ()
 {
-  assert (assemble != NULL);
+  assert (assemble_fptr != NULL);
 
   // initialize the matrix if not 
   // already initialized
@@ -258,7 +257,18 @@ SystemData::solve ()
   matrix.zero ();
   rhs.zero    ();
   
-  assemble (equation_systems, name()); 
+  assemble_fptr (equation_systems, name());
+
+  return;
+};
+
+
+
+std::pair<unsigned int, real>
+SystemData::solve ()
+{
+  
+  assemble (); 
   
   const real tol            =
     equation_systems.parameter("linear solver tolerance");
@@ -284,7 +294,7 @@ void SystemData::attach_init_function(void fptr(EquationSystems& es,
 {
   assert (fptr != NULL);
   
-  init_system = fptr;
+  init_system_fptr = fptr;
 };
 
 
@@ -294,5 +304,5 @@ void SystemData::attach_assemble_function(void fptr(EquationSystems& es,
 {
   assert (fptr != NULL);
   
-  assemble = fptr;  
+  assemble_fptr = fptr;  
 };
