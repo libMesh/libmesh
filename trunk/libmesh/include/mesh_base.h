@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.18 2003-02-20 23:18:06 benkirk Exp $
+// $Id: mesh_base.h,v 1.19 2003-02-21 18:31:29 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -59,7 +59,7 @@ template <typename T> class PetscMatrix;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.18 $
+ * \version $Revision: 1.19 $
  */
 
 
@@ -707,15 +707,8 @@ protected:
    * ASCII text file to a stream.
    */
   void write_tecplot(std::ostream& out,
-		     const std::vector<Real>* v=NULL,
+		     const std::vector<Number>* v=NULL,
 		     const std::vector<std::string>* solution_names=NULL);
-
-  /**
-   * Actual implementation of writing a Tecplot-formatted binary file.
-   */
-  void do_write_tecplot_binary(const std::string& name,
-			       const std::vector<Real>* v=NULL,
-			       const std::vector<std::string>* solution_names=NULL);
 
   /**
    * Actual implementation of writing a mesh in AVS's UCD format.
