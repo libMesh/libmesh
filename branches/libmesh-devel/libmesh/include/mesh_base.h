@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.25.2.3 2003-05-15 17:53:26 benkirk Exp $
+// $Id: mesh_base.h,v 1.25.2.4 2003-05-15 20:52:27 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -34,7 +34,6 @@
 // forward declarations
 class Elem;
 class EquationSystems;
-class MeshBase;
 template <typename T> class PetscMatrix;
 
 
@@ -43,14 +42,13 @@ template <typename T> class PetscMatrix;
 #include "mesh_refinement.h"
 #include "mesh_communication.h"
 #include "boundary_info.h"
+#include "mesh_data.h"
 #include "node.h"
 #include "enum_elem_type.h"
 #include "sphere.h"
 #include "enum_order.h"
 #include "elem_iterators.h"
 #include "node_iterators.h"
-#include "reference_counted_object.h"
-
 
 
 /**
@@ -66,13 +64,13 @@ template <typename T> class PetscMatrix;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.25.2.3 $
+ * \version $Revision: 1.25.2.4 $
  */
 
 
 // ------------------------------------------------------------
 // MeshBase class definition
-class MeshBase : public ReferenceCountedObject<MeshBase>
+class MeshBase
 {
 public:
 
@@ -112,6 +110,14 @@ public:
    * conditions.
    */
   BoundaryInfo boundary_info;
+  
+  /**
+   * This class holds arbitrary (floating point) data associated with 
+   * nodes or elements, commonly imported from files.  When this class
+   * should be used, it has to be activated @e prior to using any
+   * of \p MeshBase or \p Mesh \p read() methods.
+   */
+  MeshData data;
 
   /**
    * This class enables parallelization of the mesh.  All

@@ -1,4 +1,6 @@
-// $Id: mesh_base.C,v 1.28.2.2 2003-05-15 17:53:27 benkirk Exp $
+
+
+// $Id: mesh_base.C,v 1.28.2.3 2003-05-15 20:52:28 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -40,7 +42,6 @@
 #include "petsc_matrix.h"
 #include "mesh_logging.h"
 
-
 #ifdef HAVE_SFCURVES
 // prototype for SFC code
 namespace sfc {
@@ -62,6 +63,7 @@ MeshBase::MeshBase (unsigned int d,
   mesh_refinement    (*this),
 #endif
   boundary_info      (*this),
+  data               (*this),
   mesh_communication (*this),
   _n_sbd             (1),
   _n_proc            (1),
@@ -81,6 +83,7 @@ MeshBase::MeshBase (const MeshBase& other_mesh) :
   mesh_refinement    (*this),
 #endif
   boundary_info      (*this),
+  data               (*this),
   mesh_communication (*this),
   _nodes             (other_mesh._nodes),
   _elements          (other_mesh._elements),

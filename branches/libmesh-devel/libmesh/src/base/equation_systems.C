@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.34.2.7 2003-05-10 15:46:43 benkirk Exp $
+// $Id: equation_systems.C,v 1.34.2.8 2003-05-15 20:52:28 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -22,7 +22,6 @@
 #include <sstream>
 
 // Local Includes
-#include "equation_systems.h"
 #include "fe_interface.h"
 #include "libmesh.h"
 #include "mesh.h"
@@ -31,6 +30,10 @@
 #include "newmark_system.h"
 #include "steady_system.h"
 #include "transient_system.h"
+// Include the systems before this one to avoid
+// overlapping forward declarations.
+#include "equation_systems.h"
+
 
 // Forward Declarations
 
