@@ -18,8 +18,8 @@
 # ============================================================================
 # 
 # File          : Makefile
-# Revision      : $Revision: 1.1 $
-# Revision_date : $Date: 2003-09-16 00:41:29 $
+# Revision      : $Revision: 1.2 $
+# Revision_date : $Date: 2003-10-01 19:47:07 $
 # Author(s)     : Deepak Bandyopadhyay, Lutz Kettner
 # 
 # ============================================================================
@@ -58,6 +58,13 @@ ifeq ($(enable-shared),yes)
   target := ../lib/$(hosttype)_$(METHOD)/$(library_name).so
 endif
 
+ifeq ($(enable-gzstreams),no)
+  # Do nothing
+  all::
+	@echo "<<< libgzstream is disabled, not building >>>"
+
+else
+
 all:: $(target)
 
 ../lib/$(hosttype)_$(METHOD)/$(library_name).a: $(OBJS)
@@ -69,6 +76,8 @@ all:: $(target)
 	@echo "Linking "$@
 	@$(shell mkdir -p ../lib/$(hosttype)_$(METHOD))
 	@$(CC) $(CSHAREDFLAG) -o $@ $(OBJS) $(LDFLAGS)
+
+endif
 
 .PHONY: clean clobber distclean
 
