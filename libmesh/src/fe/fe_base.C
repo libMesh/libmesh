@@ -1,4 +1,4 @@
-// $Id: fe_base.C,v 1.22 2004-02-10 22:50:22 benkirk Exp $
+// $Id: fe_base.C,v 1.23 2004-02-18 23:04:08 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -69,6 +69,12 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	    }
 #endif
 
+	  case XYZ:
+	    {
+	      AutoPtr<FEBase> ap(new FEXYZ<1>(fet));
+	      return ap;
+	    }
+
 	  default:
 	    std::cout << "ERROR: Bad FEType.family= " << fet.family << std::endl;
 	    error();
@@ -107,6 +113,12 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	    }
 #endif
 
+	  case XYZ:
+	    {
+	      AutoPtr<FEBase> ap(new FEXYZ<2>(fet));
+	      return ap;
+	    }
+
 	  default:
 	    std::cout << "ERROR: Bad FEType.family= " << fet.family << std::endl;
 	    error();
@@ -144,6 +156,12 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	      return ap;
 	    }
 #endif
+
+	  case XYZ:
+	    {
+	      AutoPtr<FEBase> ap(new FEXYZ<3>(fet));
+	      return ap;
+	    }
 
 	  default:
 	    std::cout << "ERROR: Bad FEType.family= " << fet.family << std::endl;
@@ -462,7 +480,7 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
 
 
 
-void FEBase::compute_shape_functions ()
+void FEBase::compute_shape_functions (const Elem*)
 {
   //-------------------------------------------------------------------------
   // Compute the shape function values (and derivatives)
