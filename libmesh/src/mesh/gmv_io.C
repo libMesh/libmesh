@@ -1,4 +1,4 @@
-// $Id: gmv_io.C,v 1.20 2005-03-02 20:52:29 benkirk Exp $
+// $Id: gmv_io.C,v 1.21 2005-03-08 15:06:13 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -211,7 +211,7 @@ void GMVIO::write (const std::string& fname)
     if (this->binary())
       this->write_binary (fname);
     else
-      this->write_ascii_new_impl  (fname);
+      this->write_ascii_old_impl  (fname);
 }
 
 
@@ -224,7 +224,7 @@ void GMVIO::write_nodal_data (const std::string& fname,
     if (this->binary())
       this->write_binary (fname, &soln, &names);
     else
-      this->write_ascii_new_impl  (fname, &soln, &names);
+      this->write_ascii_old_impl  (fname, &soln, &names);
 }
 
 
@@ -233,6 +233,16 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
 				  const std::vector<Number>* v,
 				  const std::vector<std::string>* solution_names)
 {
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+  std::cerr << "WARNING:  GMVIO::write_ascii_new_impl() not infinite-element aware!"
+	    << std::endl;
+  here();
+
+  this->write_ascii_old_impl (fname, v, solution_names);
+
+#else
+  
   // Open the output file stream
   std::ofstream out (fname.c_str());
   
@@ -377,6 +387,8 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
   
   // end of the file
   out << "\nendgmv\n";
+
+#endif
 }
 
 
