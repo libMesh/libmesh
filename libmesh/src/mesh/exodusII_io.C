@@ -1,4 +1,4 @@
-// $Id: exodusII_io.C,v 1.1 2004-11-12 20:55:20 benkirk Exp $
+// $Id: exodusII_io.C,v 1.2 2004-11-14 18:51:58 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -24,6 +24,7 @@
 // Local includes
 #include "exodusII_io.h"
 #include "enum_elem_type.h"
+#include "elem.h"
 
 // Wrap all the helper classes in an #ifdef to avoid excessive compilation
 // time in the case of no ExodusII support

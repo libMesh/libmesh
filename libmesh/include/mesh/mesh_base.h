@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.35 2004-11-12 22:36:09 jwpeterson Exp $
+// $Id: mesh_base.h,v 1.36 2004-11-14 18:51:58 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -46,7 +46,10 @@ class EquationSystems;
 #include "partitioner.h"
 #include "variant_filter_iterator.h"
 #include "multi_predicates.h"
-#include "elem.h"
+
+
+
+
 
 /**
  * This is the \p MeshBase class. This class provides all the data necessary
@@ -61,7 +64,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.35 $
+ * \version $Revision: 1.36 $
  */
 
 
@@ -735,27 +738,6 @@ Node* & MeshBase::node_ptr (const unsigned int i)
 }
 
 
-inline
-void MeshBase::delete_elem(Elem* e)
-{
-  assert (e != NULL);
-
-  std::vector<Elem*>::iterator pos = std::find (_elements.begin(),
-						_elements.end(),
-						e);
-
-  // Huh? Element not in the vector?
-  assert (pos != _elements.end());
-
-  // delete the element
-  delete e;
-  
-  // explicitly NULL the pointer
-  e    = NULL;
-  *pos = NULL;
-  
-  //_elements.erase(pos);
-}
 
 
 

@@ -1,4 +1,4 @@
-// $Id: mesh_smoother_laplace.C,v 1.11 2004-11-08 00:11:05 jwpeterson Exp $
+// $Id: mesh_smoother_laplace.C,v 1.12 2004-11-14 18:51:59 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -20,12 +20,12 @@
 
 
 // C++ includes
+#include <algorithm> // for std::copy, std::sort
 
 
 // Local includes
 #include "mesh_smoother_laplace.h"
-#include <algorithm> // for std::copy, std::sort
-
+#include "elem.h"
 
 
 // Member functions for the Laplace smoother

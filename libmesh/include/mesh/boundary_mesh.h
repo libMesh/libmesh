@@ -1,4 +1,4 @@
-// $Id: boundary_mesh.h,v 1.3 2004-04-05 20:07:03 jwpeterson Exp $
+// $Id: boundary_mesh.h,v 1.4 2004-11-14 18:51:58 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,6 @@
 // C++ Includes   -----------------------------------
 
 // Local Includes -----------------------------------
-//#include "mesh_base.h"
 #include "mesh.h"
 
 

@@ -1,4 +1,4 @@
-// $Id: mesh_base_modification.C,v 1.18 2004-11-12 22:36:09 jwpeterson Exp $
+// $Id: mesh_base_modification.C,v 1.19 2004-11-14 18:51:58 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -28,7 +28,6 @@
 #include "mesh_base.h"
 #include "face_tri3.h"
 #include "face_tri6.h"
-
 
 // ------------------------------------------------------------
 // MeshBase class member functions for mesh modification

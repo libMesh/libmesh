@@ -1,4 +1,4 @@
-// $Id: patch_recovery_error_estimator.C,v 1.4 2004-11-08 00:11:06 jwpeterson Exp $
+// $Id: patch_recovery_error_estimator.C,v 1.5 2004-11-14 18:51:59 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -32,7 +32,7 @@
 #include "dense_vector.h"
 #include "quadrature_gauss.h"
 #include "libmesh_logging.h"
-
+#include "elem.h"
 
 
 

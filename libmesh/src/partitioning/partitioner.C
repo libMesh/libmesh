@@ -1,4 +1,4 @@
-// $Id: partitioner.C,v 1.7 2004-11-08 00:11:06 jwpeterson Exp $
+// $Id: partitioner.C,v 1.8 2004-11-14 18:51:59 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,7 @@
 // Local Includes -----------------------------------
 #include "partitioner.h"
 #include "mesh_base.h"
-
+#include "elem.h"
 
 
 // ------------------------------------------------------------

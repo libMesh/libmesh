@@ -22,10 +22,10 @@
 #include <fstream>
 
 // Local includes
-#include "mesh.h"
 #include "libmesh_config.h"
+#include "mesh.h"
 #include "medit_io.h"
-
+#include "elem.h"
 
 
 // ------------------------------------------------------------

@@ -1,4 +1,4 @@
-// $Id: diva_io.C,v 1.4 2004-10-19 12:44:10 benkirk Exp $
+// $Id: diva_io.C,v 1.5 2004-11-14 18:51:58 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -24,6 +24,7 @@
 // Local includes
 #include "diva_io.h"
 #include "boundary_mesh.h"
+#include "elem.h"
 
 // ------------------------------------------------------------
 // DivaIO class members

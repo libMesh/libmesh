@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.85 2004-11-14 05:40:52 jwpeterson Exp $
+// $Id: mesh_base.C,v 1.86 2004-11-14 18:51:58 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -1080,4 +1080,28 @@ Sphere MeshBase::subdomain_bounding_sphere (const unsigned int sid) const
   const Point cent = (bbox.second + bbox.first)/2.;
 
   return Sphere (cent, .5*diag);
+}
+
+
+
+//inline
+void MeshBase::delete_elem(Elem* e)
+{
+  assert (e != NULL);
+
+  std::vector<Elem*>::iterator pos = std::find (_elements.begin(),
+						_elements.end(),
+						e);
+
+  // Huh? Element not in the vector?
+  assert (pos != _elements.end());
+
+  // delete the element
+  delete e;
+  
+  // explicitly NULL the pointer
+  e    = NULL;
+  *pos = NULL;
+  
+  //_elements.erase(pos);
 }
