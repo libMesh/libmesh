@@ -1,4 +1,4 @@
-// $Id: face_quad8.C,v 1.23 2005-02-25 19:16:39 roystgnr Exp $
+// $Id: face_quad8.C,v 1.24 2005-03-01 14:21:58 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -229,8 +229,8 @@ void Quad8::connectivity(const unsigned int sf,
 			 const IOPackage iop,
 			 std::vector<unsigned int>& conn) const
 {
-  assert (_nodes != NULL);
   assert (sf < this->n_sub_elem());
+  assert (iop != INVALID_IO_PACKAGE);
 
   switch (iop)
     {
@@ -359,150 +359,6 @@ void Quad8::connectivity(const unsigned int sf,
 
     error();
 }
-
-
-
-
-
-// void Quad8::tecplot_connectivity(const unsigned int sf,
-// 				 std::vector<unsigned int>& conn) const
-// {
-//   assert (_nodes != NULL);
-//   assert (sf < this->n_sub_elem());
-
-//   // std::vector<unsigned int> conn(4);
-//   conn.resize(4);
-
-//   switch(sf)
-//     {
-//     case 0:
-//       // linear sub-tri 0
-//       conn[0] = this->node(0)+1;
-//       conn[1] = this->node(4)+1;
-//       conn[2] = this->node(7)+1;
-//       conn[3] = this->node(7)+1;
-
-//       return;
-
-//     case 1:
-//       // linear sub-tri 1
-//       conn[0] = this->node(4)+1;
-//       conn[1] = this->node(1)+1;
-//       conn[2] = this->node(5)+1;
-//       conn[3] = this->node(5)+1;
-
-//       return;
-
-//     case 2:
-//       // linear sub-tri 2
-//       conn[0] = this->node(5)+1;
-//       conn[1] = this->node(2)+1;
-//       conn[2] = this->node(6)+1;
-//       conn[3] = this->node(6)+1;
-
-//       return;
-
-//     case 3:
-//       // linear sub-tri 3
-//       conn[0] = this->node(7)+1;
-//       conn[1] = this->node(6)+1;
-//       conn[2] = this->node(3)+1;
-//       conn[3] = this->node(3)+1;
-
-//       return;
-
-//     case 4:
-//       // linear sub-quad
-//       conn[0] = this->node(4)+1;
-//       conn[1] = this->node(5)+1;
-//       conn[2] = this->node(6)+1;
-//       conn[3] = this->node(7)+1;
-
-//       return;
-
-//     default:
-//       error();
-//     }
-
-//   error();
-// }
-
-
-
-// void Quad8::vtk_connectivity(const unsigned int sf,
-// 			     std::vector<unsigned int> *conn) const
-// {
-//   assert (_nodes != NULL);
-//   assert (sf < this->n_sub_elem());
-  
-//   if (conn == NULL)
-//     conn = new std::vector<unsigned int>;
-
-//   conn->resize(3);
-
-//   switch (sf)
-//     {
-//     case 0:
-//       // linear sub-tri 0
-//       (*conn)[0] = this->node(0);
-//       (*conn)[1] = this->node(4);
-//       (*conn)[2] = this->node(7);
-
-//       return;
-
-//     case 1:
-//       // linear sub-tri 1
-//       (*conn)[0] = this->node(4);
-//       (*conn)[1] = this->node(1);
-//       (*conn)[2] = this->node(5);
-
-//       return;
-
-//     case 2:
-//       // linear sub-tri 2
-//       (*conn)[0] = this->node(5);
-//       (*conn)[1] = this->node(2);
-//       (*conn)[2] = this->node(6);
-
-//       return;
-
-//     case 3:
-//       // linear sub-tri 3
-//       (*conn)[0] = this->node(7);
-//       (*conn)[1] = this->node(6);
-//       (*conn)[2] = this->node(3);
-
-//       return;
-
-//     case 4:
-//       conn->resize(4);
-      
-//       // linear sub-quad
-//       (*conn)[0] = this->node(4);
-//       (*conn)[1] = this->node(5);
-//       (*conn)[2] = this->node(6);
-//       (*conn)[3] = this->node(7);
-
-//       return;
-
-//     default:
-//       error();
-//     }
-
-//   error();
-
-//   return;
-// }
-
-
-
-// unsigned int Quad8::vtk_element_type (const unsigned int sf) const
-// {
-//   if (sf == 4)
-//     return 9;
-
-//   return 5;
-// }
 
 
 
