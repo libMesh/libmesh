@@ -1,4 +1,4 @@
-// $Id: laspack_vector.h,v 1.2 2003-02-10 22:03:23 benkirk Exp $
+// $Id: laspack_vector.h,v 1.3 2003-02-10 22:12:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -75,7 +75,7 @@ class LaspackVector : public NumericVector
    * to \p n, and initialize all elements with zero.
    */
   LaspackVector (const unsigned n,
-	       const unsigned int n_local);
+		 const unsigned int n_local);
     
   /**
    * Destructor, deallocates memory. Made virtual to allow
