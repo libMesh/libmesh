@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.76 2004-11-22 21:01:16 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.77 2004-11-22 21:18:39 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -634,8 +634,8 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           ;;
 
       cray_cc)
-	  CXXFLAGSG="-h conform,noautoinstantiate,instantiate=all,noimplicitinclude -G n -DDEBUG"
-	  CXXFLAGSO="-h conform,noautoinstantiate,instantiate=all,noimplicitinclude -G n -DNDEBUG"
+	  CXXFLAGSG="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n -DDEBUG"
+	  CXXFLAGSO="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n -DNDEBUG"
 	  CFLAGSG="-G n -DDEBUG"
 	  CFLAGSO="-G n -DNDEBUG"
 

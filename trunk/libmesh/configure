@@ -3253,8 +3253,8 @@ echo "${ECHO_T}proper compiler flags" >&6
           ;;
 
       cray_cc)
-	  CXXFLAGSG="-h conform,noautoinstantiate,instantiate=all,noimplicitinclude -G n -DDEBUG"
-	  CXXFLAGSO="-h conform,noautoinstantiate,instantiate=all,noimplicitinclude -G n -DNDEBUG"
+	  CXXFLAGSG="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n -DDEBUG"
+	  CXXFLAGSO="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n -DNDEBUG"
 	  CFLAGSG="-G n -DDEBUG"
 	  CFLAGSO="-G n -DNDEBUG"
 
