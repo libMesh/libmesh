@@ -1,4 +1,4 @@
-// $Id: fe_lagrange_shape_1D.C,v 1.2 2003-01-20 16:31:33 jwpeterson Exp $
+// $Id: fe_lagrange_shape_1D.C,v 1.3 2003-01-20 17:06:23 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson

@@ -1,4 +1,4 @@
-// $Id: auto_ptr.h,v 1.1 2003-01-20 16:31:21 jwpeterson Exp $
+// $Id: auto_ptr.h,v 1.2 2003-01-20 17:06:00 jwpeterson Exp $
 
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
