@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex.C,v 1.4 2003-08-07 19:25:31 ddreyer Exp $
+// $Id: cell_inf_hex.C,v 1.5 2003-08-18 14:44:52 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -386,7 +386,7 @@ std::pair<Real, Real> InfHex::qual_bounds (const ElemQuality) const
 
 
 
-const unsigned int InfHex::_second_order_adjacent_vertices[8][2] = 
+const unsigned short int InfHex::_second_order_adjacent_vertices[8][2] = 
 {
   { 0,  1}, // vertices adjacent to node 8 
   { 1,  2}, // vertices adjacent to node 9 

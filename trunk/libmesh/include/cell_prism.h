@@ -1,4 +1,4 @@
-// $Id: cell_prism.h,v 1.9 2003-05-23 23:17:47 benkirk Exp $
+// $Id: cell_prism.h,v 1.10 2003-08-18 14:44:51 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -107,6 +107,14 @@ protected:
 
 #endif  
 
+  
+  /**
+   * Matrix that tells which vertices define the location
+   * of mid-side (or second-order) nodes.  for the first
+   * 9 second-order nodes, this matrix is identical for
+   * \p Prism15 and \p Prism18, therefore store it here.
+   */
+  static const unsigned short int _second_order_adjacent_vertices[9][2];
 
 
 private:
@@ -122,6 +130,8 @@ private:
   static const unsigned int _side_children_matrix[5][4];
   
 #endif  
+
+
 };
 
 

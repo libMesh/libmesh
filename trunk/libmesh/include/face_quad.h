@@ -1,4 +1,4 @@
-// $Id: face_quad.h,v 1.10 2003-05-23 23:17:47 benkirk Exp $
+// $Id: face_quad.h,v 1.11 2003-08-18 14:44:52 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -128,6 +128,14 @@ protected:
   { return _side_children_matrix[i][j]; }
 
 #endif  
+  
+  /**
+   * Matrix that tells which vertices define the location
+   * of mid-side (or second-order) nodes.  Since most 
+   * second-order nodes are identical for \p Quad8 and \p Quad9,
+   * we keep this matrix here in \p Quad
+   */
+  static const unsigned short int _second_order_adjacent_vertices[4][2];
 
   
 private:
@@ -143,6 +151,7 @@ private:
   static const unsigned int _side_children_matrix[4][2];
   
 #endif    
+
 };
 
 

@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.28 2003-08-07 19:25:31 ddreyer Exp $
+// $Id: elem.C,v 1.29 2003-08-18 14:44:52 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -534,8 +534,8 @@ unsigned int Elem::n_second_order_adjacent_vertices (const unsigned int) const
 
 
 
-unsigned int Elem::second_order_adjacent_vertex (const unsigned int,
-						 const unsigned int) const
+unsigned short int Elem::second_order_adjacent_vertex (const unsigned int,
+						       const unsigned int) const
 {
   // for linear elements, always return 0
   return 0;
@@ -543,14 +543,113 @@ unsigned int Elem::second_order_adjacent_vertex (const unsigned int,
 
 
 
-ElemType Elem::second_order_equivalent_type () const
+
+ElemType Elem::second_order_equivalent_type (const ElemType et,
+					     const bool full_ordered)
 { 
   /* for second-order elements, always return \p INVALID_ELEM
    * since second-order elements should not be converted
-   * into something else...
-   *
-   * linear elements better overload this
+   * into something else.  Only linear elements should 
+   * return something sensible here
    */
-  return INVALID_ELEM; 
+  switch (et)
+    {
+    case EDGE2:
+      {
+	// full_ordered not relevant
+	return EDGE3;
+      }
+
+    case TRI3:
+      {
+	// full_ordered not relevant
+	return TRI6;
+      }
+
+    case QUAD4:
+      {
+	if (full_ordered)
+	  return QUAD9;
+	else 
+	  return QUAD8;
+      }
+
+    case TET4:
+      {
+	// full_ordered not relevant
+	return TET10;
+      }
+
+    case HEX8:
+      {
+	// see below how this correlates with INFHEX8
+	if (full_ordered)
+	  return HEX27;
+	else 
+	  return HEX20;
+      }
+
+    case PRISM6:
+      {
+	if (full_ordered)
+	  return PRISM18;
+	else 
+	  return PRISM15;
+      }
+
+    case PYRAMID5:
+      {
+	// error(); 
+	return INVALID_ELEM;
+      }
+
+
+
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+    // infinite elements
+    case INFEDGE2:
+      {
+	// error(); 
+	return INVALID_ELEM;
+      }
+
+    case INFQUAD4:
+      {
+	// full_ordered not relevant
+	return INFQUAD6;
+      }
+
+    case INFHEX8:
+      {
+	/*
+	 * Note that this matches with \p Hex8:
+	 * For full-ordered, \p InfHex18 and \p Hex27
+	 * belong together, and for not full-ordered,
+	 * \p InfHex16 and \p Hex20 belong together.
+	 */
+	if (full_ordered)
+	  return INFHEX18;
+	else 
+	  return INFHEX16;
+      }
+
+    case INFPRISM6:
+      {
+	// full_ordered not relevant
+	return INFPRISM12;
+      }
+
+#endif
+
+
+    default:
+      {
+	// second-order element
+	return INVALID_ELEM;
+      }
+    }
 }
+
+
 

@@ -1,4 +1,4 @@
-// $Id: face_inf_quad6.C,v 1.16 2003-08-07 19:25:31 ddreyer Exp $
+// $Id: face_inf_quad6.C,v 1.17 2003-08-18 14:44:52 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -169,17 +169,18 @@ void InfQuad6::vtk_connectivity(const unsigned int,
 
 
 
-unsigned int InfQuad6::second_order_adjacent_vertex (const unsigned int n,
-						     const unsigned int v) const
+unsigned short int InfQuad6::second_order_adjacent_vertex (const unsigned int n,
+							   const unsigned int v) const
 { 
   assert (n >= this->n_vertices());
   assert (n <  this->n_nodes());
+  assert (v < 2);
   return _second_order_adjacent_vertices[n-this->n_vertices()][v]; 
 }
 
 
 
-const unsigned int InfQuad6::_second_order_adjacent_vertices[2][2] = 
+const unsigned short int InfQuad6::_second_order_adjacent_vertices[2][2] = 
 {
   {0, 1}, // vertices adjacent to node 4
   {2, 3}  // vertices adjacent to node 5  

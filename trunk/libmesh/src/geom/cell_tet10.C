@@ -1,4 +1,4 @@
-// $Id: cell_tet10.C,v 1.11 2003-08-07 19:25:31 ddreyer Exp $
+// $Id: cell_tet10.C,v 1.12 2003-08-18 14:44:52 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -335,17 +335,18 @@ void Tet10::vtk_connectivity(const unsigned int sc,
 
 
 
-unsigned int Tet10::second_order_adjacent_vertex (const unsigned int n,
-						  const unsigned int v) const
+unsigned short int Tet10::second_order_adjacent_vertex (const unsigned int n,
+							const unsigned int v) const
 { 
   assert (n >= this->n_vertices());
   assert (n <  this->n_nodes());
+  assert (v < 2);
   return _second_order_adjacent_vertices[n-this->n_vertices()][v]; 
 }
 
 
 
-const unsigned int Tet10::_second_order_adjacent_vertices[6][2] = 
+const unsigned short int Tet10::_second_order_adjacent_vertices[6][2] = 
 {
   {0, 1}, // vertices adjacent to node 4 
   {1, 2}, // vertices adjacent to node 5 

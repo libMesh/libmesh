@@ -1,4 +1,4 @@
-// $Id: cell_hex27.C,v 1.17 2003-08-17 19:07:42 ddreyer Exp $
+// $Id: cell_hex27.C,v 1.18 2003-08-18 14:44:52 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -473,13 +473,29 @@ unsigned int Hex27::n_second_order_adjacent_vertices (const unsigned int n) cons
 
 
 
-unsigned int Hex27::second_order_adjacent_vertex (const unsigned int n,
-						  const unsigned int v) const
+unsigned short int Hex27::second_order_adjacent_vertex (const unsigned int n,
+							const unsigned int v) const
 { 
   assert (n >= this->n_vertices());
   assert (n <  this->n_nodes());
 
-  if (n == 26)
+  switch (n)
+    {
+      /*
+       * these are all nodes that are unique to Hex27,
+       * use our _remaining.... matrix
+       */
+      case 20:
+      case 21:
+      case 22:
+      case 23:
+      case 24:
+      case 25:
+      {
+	assert (v < 4);
+        return _remaining_second_order_adjacent_vertices[n-20][v]; 
+      }
+
       /*
        * for the bubble node the return value is simply v.
        * Why? -- the user asks for the v-th adjacent vertex,
@@ -487,31 +503,30 @@ unsigned int Hex27::second_order_adjacent_vertex (const unsigned int n,
        * are 8 adjacent vertices, and these happen to be
        * 0..7
        */
-      return v;
-  else
-      // all others are stored in the vertices matrix
-      return _second_order_adjacent_vertices[n-this->n_vertices()][v]; 
+      case 26:
+      {
+	assert (v < 8);
+	return static_cast<unsigned short int>(v);
+      }
+
+      /*
+       * nodes 8..19:
+       * these are all nodes that are identical for
+       * Hex20 and Hex27.  Therefore use the 
+       * matrix stored in cell_hex.C
+       */
+      default:
+      {
+	assert (v < 2);
+        return _second_order_adjacent_vertices[n-this->n_vertices()][v]; 
+      }
+    }
 }
 
 
 
-const unsigned int Hex27::_second_order_adjacent_vertices[18][4] = 
+const unsigned short int Hex27::_remaining_second_order_adjacent_vertices[6][4] = 
 {
-  { 0,  1, 42, 42}, // vertices adjacent to node 8    edge nodes
-  { 1,  2, 42, 42}, // vertices adjacent to node 9 
-  { 2,  3, 42, 42}, // vertices adjacent to node 10 
-  { 0,  3, 42, 42}, // vertices adjacent to node 11
-
-  { 0,  4, 42, 42}, // vertices adjacent to node 12
-  { 1,  5, 42, 42}, // vertices adjacent to node 13
-  { 2,  6, 42, 42}, // vertices adjacent to node 14
-  { 3,  7, 42, 42}, // vertices adjacent to node 15
-
-  { 4,  5, 42, 42}, // vertices adjacent to node 16
-  { 5,  6, 42, 42}, // vertices adjacent to node 17
-  { 6,  7, 42, 42}, // vertices adjacent to node 18
-  { 4,  7, 42, 42}, // vertices adjacent to node 19
-
   { 0,  1,  2,  3}, // vertices adjacent to node 20   face nodes
   { 0,  1,  4,  5}, // vertices adjacent to node 21
   { 1,  2,  5,  6}, // vertices adjacent to node 22

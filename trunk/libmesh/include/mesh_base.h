@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.40 2003-08-17 11:39:10 ddreyer Exp $
+// $Id: mesh_base.h,v 1.41 2003-08-18 14:44:52 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -64,7 +64,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.40 $
+ * \version $Revision: 1.41 $
  */
 
 
@@ -371,9 +371,14 @@ public:
    * Converts a (conforming, non-refined) mesh with linear 
    * elements into a mesh with second-order elements.  For 
    * example, a mesh consisting of \p Tet4 will be converted
-   * to a mesh with \p Tet10 etc.
+   * to a mesh with \p Tet10 etc.  Note that for some elements
+   * like \p Hex8 there exist @e two higher order equivalents,
+   * \p Hex20 and \p Hex27.  When \p full_ordered is \p true
+   * (default), then \p Hex27 is built.  Otherwise, \p Hex20
+   * is built.  The same holds obviously for \p Quad4, \p Prism6
+   * ...
    */
-  void all_second_order ();
+  void all_second_order (const bool full_ordered=true);
   
 //   /**
 //    * Partition the mesh into \p n_sbdmns subdomians. Currently this routine

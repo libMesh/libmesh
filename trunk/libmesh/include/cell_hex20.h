@@ -1,4 +1,4 @@
-// $Id: cell_hex20.h,v 1.14 2003-08-07 19:25:30 ddreyer Exp $
+// $Id: cell_hex20.h,v 1.15 2003-08-18 14:44:51 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -121,8 +121,8 @@ public:
    * that defines the \f$ n^{th} \f$ second-order node.
    * Note that \p n is counted as depicted above, \f$ 8 \le n < 20 \f$.
    */
-  unsigned int second_order_adjacent_vertex (const unsigned int n,
-					     const unsigned int v) const;
+  unsigned short int second_order_adjacent_vertex (const unsigned int n,
+						   const unsigned int v) const;
   
 
 protected:
@@ -145,15 +145,6 @@ protected:
   static const float _embedding_matrix[8][20][20];
   
 #endif
-
-
-private:
-  
-  /**
-   * Matrix that tells which vertices define the location
-   * of mid-side (or second-order) nodes
-   */
-  static const unsigned int _second_order_adjacent_vertices[12][2];
 
 };
 

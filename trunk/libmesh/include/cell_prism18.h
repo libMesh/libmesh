@@ -1,4 +1,4 @@
-// $Id: cell_prism18.h,v 1.8 2003-08-07 19:25:31 ddreyer Exp $
+// $Id: cell_prism18.h,v 1.9 2003-08-18 14:44:51 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -89,7 +89,7 @@ public:
   unsigned int n_nodes() const { return 18; }
 
   /**
-   * @returns 2
+   * @returns 8
    */
   unsigned int n_sub_elem() const { return 8; }
   
@@ -123,8 +123,8 @@ public:
    * that defines the \f$ n^{th} \f$ second-order node.
    * Note that \p n is counted as depicted above, \f$ 6 \le n < 18 \f$.
    */
-  unsigned int second_order_adjacent_vertex (const unsigned int n,
-					     const unsigned int v) const;
+  unsigned short int second_order_adjacent_vertex (const unsigned int n,
+						   const unsigned int v) const;
     
   
 protected:
@@ -150,9 +150,13 @@ protected:
   
   /**
    * Matrix that tells which vertices define the location
-   * of mid-side (or second-order) nodes
+   * of mid-side (or second-order) nodes.  This matrix
+   * handles only the second-order nodes that are unique
+   * to \p Prism18.  All other second-order nodes are identical
+   * with \p Prism15, and are therefore handled through a 
+   * matrix contained in \p cell_prism.C
    */
-  static const unsigned int _second_order_adjacent_vertices[12][4];
+  static const unsigned short int _remaining_second_order_adjacent_vertices[3][4];
   
 };
 
