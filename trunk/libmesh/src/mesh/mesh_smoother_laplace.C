@@ -1,4 +1,4 @@
-// $Id: mesh_smoother_laplace.C,v 1.7 2004-01-03 15:37:43 benkirk Exp $
+// $Id: mesh_smoother_laplace.C,v 1.8 2004-03-18 16:41:00 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -189,7 +189,7 @@ void LaplaceMeshSmoother::init()
 
 
 
-void LaplaceMeshSmoother::print_graph()
+void LaplaceMeshSmoother::print_graph() const
 {
   for (unsigned int i=0; i<_graph.size(); ++i)
     {

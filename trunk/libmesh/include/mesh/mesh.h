@@ -1,4 +1,4 @@
-// $Id: mesh.h,v 1.4 2004-03-18 15:43:37 jwpeterson Exp $
+// $Id: mesh.h,v 1.5 2004-03-18 16:40:59 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -137,7 +137,7 @@ class Mesh : public MeshBase
    * Write meshes in DIVA's ASCII
    * format for visualization.
    */
-  void write_diva (const std::string& name) const;
+  void write_diva (const std::string& name);
     
   /**
    * Write meshes in mgflo's XDR format.
@@ -233,7 +233,7 @@ class Mesh : public MeshBase
    * Actual implementation of writing meshes in DIVA's ASCII
    * format.
    */
-  void write_diva (std::ostream& out) const;
+  void write_diva (std::ostream& out);
 
   
  private:

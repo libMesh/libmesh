@@ -1,4 +1,4 @@
-/* $Id: ex13.C,v 1.2 2004-03-05 21:06:59 jwpeterson Exp $ */
+/* $Id: ex13.C,v 1.3 2004-03-18 16:40:51 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -356,7 +356,7 @@ void assemble_stokes (EquationSystems& es,
   // timesteps.  If you monitor the initial nonlinear residual for this
   // simulation, you should see that it is monotonically decreasing in time.
   const Real dt    = es.parameter("dt");
-  const Real time  = es.parameter("time");
+  // const Real time  = es.parameter("time");
   const Real theta = 1.;
     
   // Now we will loop over all the elements in the mesh that

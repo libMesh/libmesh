@@ -1,4 +1,4 @@
-// $Id: dof_object.h,v 1.3 2004-01-11 15:56:46 benkirk Exp $
+// $Id: dof_object.h,v 1.4 2004-03-18 16:40:59 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -48,7 +48,7 @@
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.3 $
+ * \version $Revision: 1.4 $
  */
 
 class DofObject
@@ -174,7 +174,7 @@ public:
   bool valid_processor_id () const;
   
   /**
-   * @returns the number of systes associated with this
+   * @returns the number of systems associated with this
    * \p DofObject
    */
   unsigned int n_systems() const;
@@ -207,7 +207,7 @@ public:
    * of system \p s associated with this \p DofObject. 
    * For example, the \p HIERARCHIC shape functions may
    * have @e multiple dof's associated with @e one node.  Another
-   * examples are the \p MONOMIALs, where only the elements
+   * example is the \p MONOMIALs, where only the elements
    * hold the dof's, but for the different spatial directions,
    * and orders, see \p FE.
    */
