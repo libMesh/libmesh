@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.39 2003-08-11 19:48:23 benkirk Exp $
+// $Id: mesh_base.h,v 1.40 2003-08-17 11:39:10 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -64,7 +64,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.39 $
+ * \version $Revision: 1.40 $
  */
 
 
@@ -269,6 +269,13 @@ public:
 #ifdef ENABLE_INFINITE_ELEMENTS
 
   /**
+   * convenient typedef for origin coordinates; so that the
+   * \p build_inf_elem() methods know whether the respective
+   * coordinate was given or not
+   */
+  typedef std::pair<bool, double> InfElemOriginValue;
+
+  /**
    * Build infinite elements atop a volume-based mesh,
    * determine origin automatically.  Also returns the
    * origin as a \p const \p Point to make it more obvious that
@@ -280,22 +287,41 @@ public:
   const Point build_inf_elem (const bool be_verbose = false);
 
   /**
-   * Build infinite elements atop a volume-based mesh.
-   * Find all faces on the outer boundary and build infinite elements
-   * on them, based on the \p origin.  During the search for faces
-   * on which infinite elements are built, @e interior faces that 
-   * are not on symmetry planes are found, too.  When an (optional)
-   * pointer to \p inner_faces is provided, a set of pairs (first:
-   * element number, second: side number) of inner faces is returned
-   * that may be used for identifying interior boundaries.
+   * @returns the origin of the infinite elements.
+   * Builds infinite elements atop a volume-based mesh.
+   * Finds all faces on the outer boundary and build infinite elements
+   * on them.  Using the \p InfElemOriginValue the user can
+   * prescribe only selected origin coordinates.  The remaining
+   * coordinates are computed from the center of the bounding box
+   * of the mesh.
+   *
+   * During the search for faces on which infinite elements are built, 
+   * @e interior faces that are not on symmetry planes are found, too.  
+   * When an (optional) pointer to \p inner_boundary_nodes is provided, 
+   * then this vector will be filled with the nodes that lie on the
+   * inner boundary.
    *
    * Faces which lie in at least one symmetry plane are skipped.
-   * The source of the infinite elements must be given to \p origin,
-   * the three optional booleans \p x_sym, \p y_sym,
+   * The three optional booleans \p x_sym, \p y_sym,
    * \p z_sym indicate symmetry planes (through the origin, obviously)
    * perpendicular to the \p x, \p y and \p z direction, 
    * respectively.  
    * The flag \p be_verbose enables some diagnostic output.
+   */
+  const Point build_inf_elem (const InfElemOriginValue& origin_x,
+			      const InfElemOriginValue& origin_y,
+			      const InfElemOriginValue& origin_z,
+			      const bool x_sym = false,
+			      const bool y_sym = false,
+			      const bool z_sym = false,
+			      const bool be_verbose = false,
+			      std::vector<const Node*>* inner_boundary_nodes = NULL);
+
+protected:
+
+  /**
+   * Build infinite elements atop a volume-based mesh.
+   * Actual implementation.
    */
   void build_inf_elem (const Point& origin,
 		       const bool x_sym = false,
@@ -304,8 +330,12 @@ public:
 		       const bool be_verbose = false,
 		       std::set<std::pair<unsigned int,
 		                          unsigned int> >* inner_faces = NULL);
+
+public:
+
 		      
 #endif
+
 		      
   /**
    * Locate element face (edge in 2D) neighbors.  This is done with the help

@@ -1364,12 +1364,8 @@ src/geom/cell_inf_hex18.$(obj-suffix):\
     include/type_vector.h
 src/geom/cell_inf_hex8.$(obj-suffix):\
     src/geom/cell_inf_hex8.C\
-    include/auto_ptr.h\
     include/cell_inf_hex.h\
     include/cell_inf_hex8.h\
-    include/dof_object.h\
-    include/elem.h\
-    include/enum_elem_quality.h\
     include/enum_elem_type.h\
     include/enum_fe_family.h\
     include/enum_inf_map_type.h\
@@ -1379,10 +1375,7 @@ src/geom/cell_inf_hex8.$(obj-suffix):\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
-    include/node.h\
     include/point.h\
-    include/reference_counted_object.h\
-    include/reference_counter.h\
     include/type_vector.h
 src/geom/cell_inf_prism.$(obj-suffix):\
     src/geom/cell_inf_prism.C\
@@ -2173,13 +2166,6 @@ src/mesh/mesh_base.$(obj-suffix):\
     src/mesh/mesh_base.C\
     include/auto_ptr.h\
     include/boundary_info.h\
-    include/cell_inf_hex.h\
-    include/cell_inf_hex16.h\
-    include/cell_inf_hex18.h\
-    include/cell_inf_hex8.h\
-    include/cell_inf_prism.h\
-    include/cell_inf_prism12.h\
-    include/cell_inf_prism6.h\
     include/dof_object.h\
     include/elem.h\
     include/elem_iterators.h\
@@ -2189,9 +2175,6 @@ src/mesh/mesh_base.$(obj-suffix):\
     include/enum_solver_package.h\
     include/enum_xdr_mode.h\
     include/face.h\
-    include/face_inf_quad.h\
-    include/face_inf_quad4.h\
-    include/face_inf_quad6.h\
     include/face_tri.h\
     include/face_tri3.h\
     include/face_tri6.h\
@@ -2221,6 +2204,13 @@ src/mesh/mesh_base_modification.$(obj-suffix):\
     src/mesh/mesh_base_modification.C\
     include/auto_ptr.h\
     include/boundary_info.h\
+    include/cell_inf_hex.h\
+    include/cell_inf_hex16.h\
+    include/cell_inf_hex18.h\
+    include/cell_inf_hex8.h\
+    include/cell_inf_prism.h\
+    include/cell_inf_prism12.h\
+    include/cell_inf_prism6.h\
     include/dof_object.h\
     include/elem.h\
     include/elem_iterators.h\
@@ -2229,6 +2219,9 @@ src/mesh/mesh_base_modification.$(obj-suffix):\
     include/enum_order.h\
     include/enum_solver_package.h\
     include/enum_xdr_mode.h\
+    include/face_inf_quad.h\
+    include/face_inf_quad4.h\
+    include/face_inf_quad6.h\
     include/libmesh.h\
     include/libmesh_base.h\
     include/mesh_base.h\
