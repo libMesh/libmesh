@@ -1,4 +1,4 @@
-// $Id: variant_filter_iterator.h,v 1.5 2004-11-09 22:40:03 benkirk Exp $
+// $Id: variant_filter_iterator.h,v 1.6 2004-11-09 22:51:35 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -47,7 +47,11 @@ class variant_filter_iterator : public std::forward_iterator<std::forward_iterat
 class variant_filter_iterator : public std::iterator<std::forward_iterator_tag,  Type>
 #endif
 {
-private:
+#ifdef __SUNPRO_CC // make these public in this case
+ public:           // otherwise we'll need *lots* of friends
+#else
+ private:
+#endif
 
   /**
    * Abstract base class for the iterator type.
