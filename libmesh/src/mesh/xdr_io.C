@@ -1,4 +1,4 @@
-// $Id: xdr_io.C,v 1.1 2004-11-12 20:55:20 benkirk Exp $
+// $Id: xdr_io.C,v 1.2 2004-11-12 22:36:09 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -1842,7 +1842,7 @@ void XdrIO::read_mgf_soln (const std::string& name,
   std::vector<Real> imag_soln;
   
   Utility::prepare_complex_data (soln, real_soln, imag_soln);
-  
+
   this->read_soln (Utility::complex_filename(name, 0), 
 		   real_soln, 
 		   var_names);

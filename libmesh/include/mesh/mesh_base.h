@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.34 2004-11-12 20:55:19 benkirk Exp $
+// $Id: mesh_base.h,v 1.35 2004-11-12 22:36:09 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -44,7 +44,6 @@ class EquationSystems;
 #include "sphere.h"
 #include "enum_order.h"
 #include "partitioner.h"
-
 #include "variant_filter_iterator.h"
 #include "multi_predicates.h"
 #include "elem.h"
@@ -62,7 +61,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.34 $
+ * \version $Revision: 1.35 $
  */
 
 
@@ -239,11 +238,6 @@ public:
   Node* & node_ptr (const unsigned int i);
 
   /**
-   * Return a constant reference to the \p nodes vector holding the nodes.
-   */
-  // const std::vector<Node*> & get_nodes () const { return _nodes; }
-
-  /**
    * Add \p Node \p n to the vertex array.  The node will be appended to the
    * end of the vertex array. 
    */
@@ -253,11 +247,6 @@ public:
    * Return a pointer to the \f$ i^{th} \f$ element.
    */
   Elem* elem (const unsigned int i) const;
-
-  /**
-   * Return a reference to the \p cells vector holding the elements.
-   */
-  // const std::vector<Elem*> & get_elem () const { return _elements; }
 
   /**
    * Add elem \p e to the end of the element array.
@@ -270,78 +259,6 @@ public:
    * to any element.
    */
   void delete_elem (Elem* e);
-    
-
-#ifdef ENABLE_INFINITE_ELEMENTS
-
-  /**
-   * convenient typedef for origin coordinates; so that the
-   * \p build_inf_elem() methods know whether the respective
-   * coordinate was given or not
-   */
-  typedef std::pair<bool, double> InfElemOriginValue;
-
-  /**
-   * Build infinite elements atop a volume-based mesh,
-   * determine origin automatically.  Also returns the
-   * origin as a \p const \p Point to make it more obvious that
-   * the origin should not change after the infinite elements 
-   * have been built.  When symmetry planes are present, use 
-   * the version with optional symmetry switches.  
-   * The flag \p be_verbose enables some diagnostic output.
-   */
-  const Point build_inf_elem (const bool be_verbose = false);
-
-  /**
-   * @returns the origin of the infinite elements.
-   * Builds infinite elements atop a volume-based mesh.
-   * Finds all faces on the outer boundary and build infinite elements
-   * on them.  Using the \p InfElemOriginValue the user can
-   * prescribe only selected origin coordinates.  The remaining
-   * coordinates are computed from the center of the bounding box
-   * of the mesh.
-   *
-   * During the search for faces on which infinite elements are built, 
-   * @e interior faces that are not on symmetry planes are found, too.  
-   * When an (optional) pointer to \p inner_boundary_nodes is provided, 
-   * then this vector will be filled with the nodes that lie on the
-   * inner boundary.
-   *
-   * Faces which lie in at least one symmetry plane are skipped.
-   * The three optional booleans \p x_sym, \p y_sym,
-   * \p z_sym indicate symmetry planes (through the origin, obviously)
-   * perpendicular to the \p x, \p y and \p z direction, 
-   * respectively.  
-   * The flag \p be_verbose enables some diagnostic output.
-   */
-  const Point build_inf_elem (const InfElemOriginValue& origin_x,
-			      const InfElemOriginValue& origin_y,
-			      const InfElemOriginValue& origin_z,
-			      const bool x_sym = false,
-			      const bool y_sym = false,
-			      const bool z_sym = false,
-			      const bool be_verbose = false,
-			      std::vector<const Node*>* inner_boundary_nodes = NULL);
-
-protected:
-
-  /**
-   * Build infinite elements atop a volume-based mesh.
-   * Actual implementation.
-   */
-  void build_inf_elem (const Point& origin,
-		       const bool x_sym = false,
-		       const bool y_sym = false,
-		       const bool z_sym = false,
-		       const bool be_verbose = false,
-		       std::set<std::pair<unsigned int,
-		                          unsigned int> >* inner_faces = NULL);
-
-public:
-
-		      
-#endif
-
 		      
   /**
    * Locate element face (edge in 2D) neighbors.  This is done with the help
@@ -349,7 +266,6 @@ public:
    * called only elements with \p NULL neighbor pointers are considered, so
    * the first call should take the longest.  Subsequent calls will only
    * consider new elements and the elements that lie on the boundary.
-
    * After this routine is called all the elements with a \p NULL neighbor
    * pointer are guaranteed to be on the boundary.  Thus this routine is
    * useful for automatically determining the boundaries of the domain.
@@ -482,7 +398,6 @@ public:
    * convenient to have one subdomain on each processor on parallel machines,
    * however this is not required. Multiple subdomains can exist on the same
    * processor.
-   *
    */
   unsigned int n_subdomains () const { return _n_sbd; }
 
@@ -840,8 +755,6 @@ void MeshBase::delete_elem(Elem* e)
   *pos = NULL;
   
   //_elements.erase(pos);
-
-  return;
 }
 
 

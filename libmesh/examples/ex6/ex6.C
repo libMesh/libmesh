@@ -1,4 +1,4 @@
-/* $Id: ex6.C,v 1.34 2004-11-08 00:11:01 jwpeterson Exp $ */
+/* $Id: ex6.C,v 1.35 2004-11-12 22:36:09 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -49,6 +49,7 @@
 // Define the Finite and Infinite Element object.
 #include "fe.h"
 #include "inf_fe.h"
+#include "inf_elem_builder.h"
 
 // Define Gauss quadrature rules.
 #include "quadrature_gauss.h"
@@ -126,7 +127,8 @@ int main (int argc, char** argv)
     // method that can even return the element faces of interior
     // vibrating surfaces.  The \p bool determines whether to be 
     // verbose.
-    mesh.build_inf_elem(true);
+    InfElemBuilder builder(mesh);
+    builder.build_inf_elem(true);
 
     // Print information about the mesh to the screen.
     mesh.print_info();

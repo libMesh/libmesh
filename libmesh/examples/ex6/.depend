@@ -32,6 +32,7 @@ ex6.$(obj-suffix):\
     ../../include/geom/surface.h\
     ../../include/mesh/boundary_info.h\
     ../../include/mesh/gmv_io.h\
+    ../../include/mesh/inf_elem_builder.h\
     ../../include/mesh/mesh.h\
     ../../include/mesh/mesh_base.h\
     ../../include/mesh/mesh_data.h\

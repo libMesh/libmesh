@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.8 2004-11-08 00:11:00 jwpeterson Exp $ */
+/* $Id: ex14.C,v 1.9 2004-11-12 22:36:09 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -91,15 +91,6 @@ int main(int argc, char** argv)
 {
   // Initialize libMesh.
   libMesh::init (argc, argv);
-
-  // Only for real numbers
-#ifdef USE_COMPLEX_NUMBERS
-  std::cout << "This example is not intended for use with complex numbers!\n"
-	    << "No simulations are performed."
-	    << std::endl;
-  here();
-  return libMesh::close();
-#endif
 
   {
     // Set the dimensionality of the mesh = 2
