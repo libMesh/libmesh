@@ -51,28 +51,13 @@ distclean:
 	@$(MAKE) -C ex5 $(MAKECMDGOALS)
 	@$(MAKE) -C ex7 $(MAKECMDGOALS)
 
-
-
-Example%:
-	@echo ""
-	@echo "----------------------------------------------"
-	@echo "---- Finished running $(MAKECMDGOALS). Proceed  -----"
-	@echo "----------------------------------------------"
-	@echo ""
-
 #
 # Run the example programs to see if shared lib's get properly loaded
 run: $(wildcard examples/ex?/ex?.C)
 	@$(MAKE) -C ex1 $(MAKECMDGOALS)
-	@$(MAKE) Example1
 	@$(MAKE) -C ex2 $(MAKECMDGOALS)
-	@$(MAKE) Example2
 	@$(MAKE) -C ex3 $(MAKECMDGOALS)
-	@$(MAKE) Example3
 	@$(MAKE) -C ex4 $(MAKECMDGOALS)
-	@$(MAKE) Example4
 	@$(MAKE) -C ex5 $(MAKECMDGOALS)
-	@$(MAKE) Example5
 	@$(MAKE) -C ex7 $(MAKECMDGOALS)
-	@$(MAKE) Example7
 

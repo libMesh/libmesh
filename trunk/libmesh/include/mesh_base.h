@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.9 2003-02-06 05:41:14 ddreyer Exp $
+// $Id: mesh_base.h,v 1.10 2003-02-10 11:50:57 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -60,7 +60,7 @@ class PetscMatrix;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.9 $
+ * \version $Revision: 1.10 $
  */
 
 
@@ -210,11 +210,15 @@ public:
 
   /**
    * Build infinite elements atop a volume-based mesh,
-   * determine origin automatically.  When symmetry planes
-   * are present, use the version with optional symmetry
-   * switches.
+   * determine origin automatically.  Also returns the
+   * origin as a \p const \p Point to make it more obvious that
+   * the origin should not change after the infinite elements 
+   * have been built.  When symmetry planes are present, use 
+   * the version with optional symmetry switches.
+   *   
+   * The flag \p be_verbose enables some diagnostic output.
    */
-  void build_inf_elem(const bool be_verbose = false);
+  const Point build_inf_elem(const bool be_verbose = false);
   
   /**
    * Build infinite elements atop a volume-based mesh.
@@ -558,15 +562,15 @@ public:
    * of complex data, and for  \p r_o_c = 1 the filename for the imaginary 
    * part.
    */
-  const char* complex_filename(const std::string& _n,
-			       unsigned int r_o_c=0);
+  char* complex_filename(const std::string& _n,
+			 unsigned int r_o_c=0) const;
 
   /**
    * Prepare complex data for writing.
    */
   void prepare_complex_data(const std::vector<Complex>* source,
 			    std::vector<Real>* real_part,
-			    std::vector<Real>* imag_part);
+			    std::vector<Real>* imag_part) const;
 
 #endif
 
