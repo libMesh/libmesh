@@ -1,4 +1,4 @@
-// $Id: quadrature_gauss_2D.C,v 1.15 2004-11-23 03:34:17 roystgnr Exp $
+// $Id: quadrature_gauss_2D.C,v 1.16 2004-11-30 23:00:21 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -173,9 +173,9 @@ void QGauss::init_2D(const ElemType _type)
 	      // Flaherty
 	      _points.resize(12);
 	      _weights.resize(12);
-	      const Real w1 = 0.050844906370207;
-	      const Real w2 = 0.116786275726379;
-	      const Real w3 = 0.082851075618374;
+	      const Real w1 = 0.050844906370207 / 2;
+	      const Real w2 = 0.116786275726379 / 2;
+	      const Real w3 = 0.082851075618374 / 2;
 	      const Real a1 = 0.873821971016996;
 	      const Real a2 = 0.063089014491502;
 	      const Real b1 = 0.501426509658179;
