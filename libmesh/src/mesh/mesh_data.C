@@ -1,4 +1,4 @@
-// $Id: mesh_data.C,v 1.4 2003-05-22 19:10:49 ddreyer Exp $
+// $Id: mesh_data.C,v 1.5 2003-07-09 10:10:16 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -39,7 +39,8 @@ MeshData::MeshData(const MeshBase& m) :
   _node_data_closed   (false),
   _elem_id_map_closed (false),
   _elem_data_closed   (false),
-  _active             (false)
+  _active             (false),
+  _unv_header         (NULL)
 {
 }
 

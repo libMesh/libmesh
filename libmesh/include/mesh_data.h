@@ -1,4 +1,4 @@
-// $Id: mesh_data.h,v 1.7 2003-07-07 21:01:30 ddreyer Exp $
+// $Id: mesh_data.h,v 1.8 2003-07-09 10:10:13 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,7 +26,7 @@
 #include <map>
 #include <vector>
 #include <string>
-
+#include <fstream>
 
 
 // Local Includes
@@ -41,6 +41,7 @@
 class MeshBase;
 class UnvMeshInterface;
 class XdrInterface;
+class MeshDataUnvHeader;
 
 
 
@@ -195,6 +196,21 @@ public:
    * @returns the foreign id this \p Elem* maps to.
    */
   unsigned int elem_to_foreign_id (const Elem* n) const;
+
+  //----------------------------------------------------------
+  // Methods for the header information in universal formated
+  // datasets.
+
+  /**
+   * Read access to the MeshDataUnvHeader data structure.
+   */
+  const MeshDataUnvHeader & get_unv_header() const;
+
+  /**
+   * Set the MeshDataUnvHeader data structure that will be
+   * used for output.
+   */
+  void set_unv_header(MeshDataUnvHeader& unv_header);
 
 
 protected:
@@ -369,6 +385,11 @@ protected:
   bool _active;
 
   /**
+   * A pointer to the header information of universal files.
+   */
+  MeshDataUnvHeader* _unv_header;
+
+  /**
    * Make the mesh importer class \p UnvInterface friend, so
    * that it can communicate foreign node ids to this class.
    */
@@ -380,7 +401,125 @@ protected:
    */
   friend class XdrInterface;
 
+  /**
+   * Make the MeshDataUnvHeader class a friend.
+   */
+  friend class MeshDataUnvHeader;
+
+
+private:
+
+
 };
+
+
+
+//-----------------------------------------------------------
+// MeshDataUnvHeader class definition
+
+/**
+ * Class \p MeshDataUnvHeader handles the data specified at
+ * the @e beginning of a dataset 2414 in a universal file.
+ * This header is structured in records 1 to 13.  For more
+ * details we refer to the general description of the I-DEAS
+ * universal file format.
+ */
+class MeshDataUnvHeader
+{
+public:
+
+  /**
+   * Default Constructor.  Initializes the respective
+   * data.
+   */
+  MeshDataUnvHeader ();
+
+  /**
+   * Destructor.
+   */
+  ~MeshDataUnvHeader ();
+
+  /**
+   * Read the header information from the stream \p in_file.
+   */
+  void read (std::ifstream& in_file);
+
+  /**
+   * Write the header information to the stream \p out_file.
+   */
+  void write (std::ofstream& out_file);
+
+
+  /**
+   * Record 1.  User specified analysis dataset label.
+   */
+  unsigned int dataset_label;
+
+  /**
+   * Record 2. User specified analysis dataset name.
+   */
+  std::string dataset_name;
+
+  /**
+   * Record 3. The dataset location (e.g. data at nodes,
+   * data on elements, etc.). 
+   */
+  unsigned int dataset_location;
+
+  /**
+   * Record 4 trough 8 are ID lines.
+   */
+  std::string id_line_1,
+              id_line_2,
+              id_line_3,
+              id_line_4,
+              id_line_5;
+
+  /**
+   * Record 9. This record contains data specifying
+   * the model type (e.g. unknown, structural, etc.),
+   * the analysis type (e.g. unknown, static, transient,
+   * normal mode, etc.),
+   * the data characteristics (such as scalar, 3 dof global
+   * translation vector, etc.),
+   * the result type (e.g. stress, strain, velocity, etc.),
+   * the data type (e.g. integer, single precision floating
+   * point, double precision floating point, etc.),
+   * and the number of data values for the mesh data.
+   */
+  unsigned int model_type,          
+               analysis_type,
+               data_characteristic,
+               result_type,
+               data_type,
+               nvaldc;
+
+  /**
+   * Record 10 and 11 are analysis specific data of
+   * type integer.
+   */
+  std::vector<int> record_10,
+                   record_11;
+
+  /**
+   * Record 12 and 13 are analysis specific data of
+   * type Real.
+   */
+  std::vector<Real> record_12,
+                    record_13;
+
+  /**
+   * Make the MeshDataUnvHeader class a friend.
+   */
+  friend class MeshData;
+
+protected:
+
+private:
+
+
+};
+
 
 
 // ------------------------------------------------------------
@@ -573,6 +712,22 @@ void MeshData::add_foreign_elem_id (const Elem* elem,
 }
 
 
+inline
+const MeshDataUnvHeader & MeshData::get_unv_header () const
+{
+  return *_unv_header;
+}
+
+
+inline
+void MeshData::set_unv_header (MeshDataUnvHeader& unv_header)
+{
+  this->_unv_header = & unv_header;
+}
+
+
+//-----------------------------------------------------------
+// MeshDataUnvHeader inline methods
 
 
 #endif
