@@ -1,4 +1,4 @@
-// $Id: distributed_vector.C,v 1.3 2003-02-20 04:59:58 benkirk Exp $
+// $Id: distributed_vector.C,v 1.4 2003-02-20 05:13:42 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -100,7 +100,11 @@ Real DistributedVector<Tp>::linfty_norm () const
   double local_linfty = 0.;
   
   for (unsigned int i=0; i<local_size(); i++)
-    local_linfty  = std::max(local_linfty, fabs(_values[i]));
+    local_linfty  = std::max(local_linfty,
+			     static_cast<double>(fabs(_values[i]))
+			     ); // Note we static_cast so that both
+                                // types are the same, as required
+                                // by std::max
   
   double global_linfty = local_linfty;
 
