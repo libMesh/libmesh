@@ -1,4 +1,4 @@
-// $Id: fe_szabab_shape_2D.C,v 1.2 2004-02-08 20:52:45 benkirk Exp $
+// $Id: fe_szabab_shape_2D.C,v 1.3 2004-02-08 22:07:46 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -41,14 +41,41 @@ namespace
   static const Real sqrt14 = sqrt(14.);
   static const Real sqrt22 = sqrt(22.);
   static const Real sqrt26 = sqrt(26.);
+
+  inline
+  Real pow2 (const Real x)
+  {
+    return x*x;
+  }
+
+  inline
+  Real pow3 (const Real x)
+  {
+    return x*x*x;
+  }
+    
+  inline
+  Real pow4 (const Real x)
+  {
+    const Real x2 = x*x; 
+    return x2*x2;
+  }
+
+  inline
+  Real pow5 (const Real x)
+  {
+    const Real x2 = x*x;
+    const Real x4 = x2*x2;
+    return x*x4;
+  }  
 }
 
 
 template <>
 Real FE<2,SZABAB>::shape(const ElemType,
-			     const Order,
-			     const unsigned int,
-			     const Point&)
+			 const Order,
+			 const unsigned int,
+			 const Point&)
 {
   std::cerr << "Szabo-Babuska polynomials require the element type\n"
 	    << "because edge orientation is needed."
@@ -148,9 +175,9 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      assert (i<10);
 
 
-	      if (i==4 && elem->node(0) != std::min(elem->node(0), elem->node(1)))f=-1;
-	      if (i==6 && elem->node(1) != std::min(elem->node(1), elem->node(2)))f=-1;     
-	      if (i==8 && elem->node(2) != std::min(elem->node(2), elem->node(0)))f=-1;
+	      if (i==4 && (elem->node(0) > elem->node(1)))f=-1;
+	      if (i==6 && (elem->node(1) > elem->node(2)))f=-1;     
+	      if (i==8 && (elem->node(2) > elem->node(0)))f=-1;
 
 
 	      switch (i)
@@ -202,16 +229,16 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      switch(i)
 		{
 		case  5: // edge 0 nodes    			
-		  if (elem->node(0) != std::min(elem->node(0), elem->node(1)))f = -1.;
+		  if (elem->node(0) > elem->node(1))f = -1.;
 		  break;
 	      	case  7: // edge 1 nodes
-		  if (elem->node(1) != std::min(elem->node(1), elem->node(2)))f = -1.;
+		  if (elem->node(1) > elem->node(2))f = -1.;
 		  break;
 	        case  9: // edge 2 nodes
-		  if (elem->node(3) != std::min(elem->node(3), elem->node(2)))f = -1.;
+		  if (elem->node(3) > elem->node(2))f = -1.;
 		  break;
 	        case 11: // edge 3 nodes
-		  if (elem->node(0) != std::min(elem->node(0), elem->node(3)))f = -1.;
+		  if (elem->node(0) > elem->node(3))f = -1.;
 		  break;
 		}	      
 	      
@@ -244,9 +271,9 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      assert (i<15);
 	      
 	      
-	      if (i== 4 && elem->node(0) != std::min(elem->node(0), elem->node(1)))f=-1;
-	      if (i== 7 && elem->node(1) != std::min(elem->node(1), elem->node(2)))f=-1;     
-	      if (i==10 && elem->node(2) != std::min(elem->node(2), elem->node(0)))f=-1;
+	      if (i== 4 && (elem->node(0) > elem->node(1)))f=-1;
+	      if (i== 7 && (elem->node(1) > elem->node(2)))f=-1;     
+	      if (i==10 && (elem->node(2) > elem->node(0)))f=-1;
 	      
 
 	      switch (i)
@@ -259,15 +286,15 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 		  //side modes
 		case  3: return   l1*l2*(-4.*sqrt6);			  
 		case  4: return f*l1*l2*(-4.*sqrt10)*(l2-l1);
-		case  5: return   l1*l2*(-sqrt14)*(5.*pow(l2-l1,2)-1);		  
+		case  5: return   l1*l2*(-sqrt14)*(5.*pow2(l2-l1)-1);		  
 		  
 		case  6: return   l2*l3*(-4.*sqrt6);	
 		case  7: return f*l2*l3*(-4.*sqrt10)*(l3-l2);	  
-		case  8: return   l2*l3*(-sqrt14)*(5.*pow(l3-l2,2)-1);	  
+		case  8: return   l2*l3*(-sqrt14)*(5.*pow2(l3-l2)-1);	  
 		  
 		case  9: return   l3*l1*(-4.*sqrt6);		  
 		case 10: return f*l3*l1*(-4.*sqrt10)*(l1-l3);		
-		case 11: return   l3*l1*(-sqrt14)*(5.*pow(l1-l3,2)-1);
+		case 11: return   l3*l1*(-sqrt14)*(5.*pow2(l1-l3)-1);
 		  
 		  //internal modes
 		case 12: return l1*l2*l3;
@@ -300,16 +327,16 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      switch(i)
 		{
 		case  5: // edge 0 nodes    			
-		  if (elem->node(0) != std::min(elem->node(0), elem->node(1)))f = -1.;
+		  if (elem->node(0) > elem->node(1))f = -1.;
 		  break;
 	      	case  8: // edge 1 nodes
-		  if (elem->node(1) != std::min(elem->node(1), elem->node(2)))f = -1.;
+		  if (elem->node(1) > elem->node(2))f = -1.;
 		  break;
 	        case 11: // edge 2 nodes
-		  if (elem->node(3) != std::min(elem->node(3), elem->node(2)))f = -1.;
+		  if (elem->node(3) > elem->node(2))f = -1.;
 		  break;
 	        case 14: // edge 3 nodes
-		  if (elem->node(0) != std::min(elem->node(0), elem->node(3)))f = -1.;
+		  if (elem->node(0) > elem->node(3))f = -1.;
 		  break;
 		}	      
    	      
@@ -345,9 +372,9 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      assert (i<21);      	      
 	      
 
-	      if ((i== 4||i== 6) && elem->node(0) != std::min(elem->node(0), elem->node(1)))f=-1;
-	      if ((i== 8||i==10) && elem->node(1) != std::min(elem->node(1), elem->node(2)))f=-1;     
-	      if ((i==12||i==14) && elem->node(2) != std::min(elem->node(2), elem->node(0)))f=-1;
+	      if ((i== 4||i== 6) && (elem->node(0) > elem->node(1)))f=-1;
+	      if ((i== 8||i==10) && (elem->node(1) > elem->node(2)))f=-1;     
+	      if ((i==12||i==14) && (elem->node(2) > elem->node(0)))f=-1;
 	      
 
 	      switch (i)
@@ -360,18 +387,18 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 		  //side modes
 		case  3: return   l1*l2*(-4.*sqrt6);			  
 		case  4: return f*l1*l2*(-4.*sqrt10)*(l2-l1);	
-		case  5: return   l1*l2*(-sqrt14)*(5.*pow(l2-l1,2)-1.);		  
-		case  6: return f*l1*l2*(-sqrt2)*(21.*pow(l2-l1,3)-9.*(l2-l1));		  
+		case  5: return   l1*l2*(-sqrt14)*(5.*pow2(l2-l1)-1.);		  
+		case  6: return f*l1*l2*(-sqrt2)*(21.*pow3(l2-l1)-9.*(l2-l1));		  
 	  
 		case  7: return   l2*l3*(-4.*sqrt6);
 		case  8: return f*l2*l3*(-4.*sqrt10)*(l3-l2);	  
-		case  9: return   l2*l3*(-sqrt14)*(5.*pow(l3-l2,2)-1.);	  
-		case 10: return f*l2*l3*(-sqrt2)*(21.*pow(l3-l2,3)-9.*(l3-l2));	  
+		case  9: return   l2*l3*(-sqrt14)*(5.*pow2(l3-l2)-1.);	  
+		case 10: return f*l2*l3*(-sqrt2)*(21.*pow3(l3-l2)-9.*(l3-l2));	  
 		  
 		case 11: return   l3*l1*(-4.*sqrt6);		  
 		case 12: return f*l3*l1*(-4.*sqrt10)*(l1-l3);  
-		case 13: return   l3*l1*(-sqrt14)*(5.*pow(l1-l3,2)-1.);		  
-		case 14: return f*l3*l1*(-sqrt2)*(21.*pow(l1-l3,3)-9.*(l1-l3));
+		case 13: return   l3*l1*(-sqrt14)*(5.*pow2(l1-l3)-1.);		  
+		case 14: return f*l3*l1*(-sqrt2)*(21.*pow3(l1-l3)-9.*(l1-l3));
 		  
 		  //internal modes
 		case 15: return l1*l2*l3;
@@ -379,9 +406,9 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 		case 16: return l1*l2*l3*x;	
 		case 17: return l1*l2*l3*y;
 		  
-		case 18: return l1*l2*l3*(1.5*pow(x,2)-0.5);
+		case 18: return l1*l2*l3*(1.5*pow2(x)-0.5);
 		case 19: return l1*l2*l3*x*y;	
-		case 20: return l1*l2*l3*(1.5*pow(y,2)-0.5);	
+		case 20: return l1*l2*l3*(1.5*pow2(y)-0.5);	
 		  
 		  
 		default:
@@ -409,19 +436,19 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 		{
 		case  5: // edge 0 nodes
 		case  7:    			
-		  if (elem->node(0) != std::min(elem->node(0), elem->node(1)))f = -1.;
+		  if (elem->node(0) > elem->node(1))f = -1.;
 		  break;
 		case  9: // edge 1 nodes
 	      	case 11:	      	
-		  if (elem->node(1) != std::min(elem->node(1), elem->node(2)))f = -1.;
+		  if (elem->node(1) > elem->node(2))f = -1.;
 		  break;
 	        case 13: // edge 2 nodes
 	        case 15:
-		  if (elem->node(3) != std::min(elem->node(3), elem->node(2)))f = -1.;
+		  if (elem->node(3) > elem->node(2))f = -1.;
 		  break;
 	        case 14: // edge 3 nodes
 	        case 19:
-		  if (elem->node(0) != std::min(elem->node(0), elem->node(3)))f = -1.;
+		  if (elem->node(0) > elem->node(3))f = -1.;
 		  break;
 		}	     
 	      
@@ -457,9 +484,9 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      assert (i<28);
 	      
 	      
-	      if ((i== 4||i== 6) && elem->node(0) != std::min(elem->node(0), elem->node(1)))f=-1;
-	      if ((i== 9||i==11) && elem->node(1) != std::min(elem->node(1), elem->node(2)))f=-1;     
-	      if ((i==14||i==16) && elem->node(2) != std::min(elem->node(2), elem->node(0)))f=-1;
+	      if ((i== 4||i== 6) && (elem->node(0) > elem->node(1)))f=-1;
+	      if ((i== 9||i==11) && (elem->node(1) > elem->node(2)))f=-1;     
+	      if ((i==14||i==16) && (elem->node(2) > elem->node(0)))f=-1;
 
 	      
 	      switch (i)
@@ -472,21 +499,21 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 		  //side modes
 		case  3: return   l1*l2*(-4.*sqrt6);
 		case  4: return f*l1*l2*(-4.*sqrt10)*(l2-l1);		  
-		case  5: return   l1*l2*(-sqrt14)*(5.*pow(l2-l1,2)-1.);		  
-		case  6: return f*l1*l2*(-sqrt2)*(21.*pow(l2-l1,3)-9.*(l2-l1));		  
-		case  7: return   l1*l2*(-sqrt22)*(10.5*pow(l2-l1,4)-7.*pow(l2-l1,2)+0.5);
+		case  5: return   l1*l2*(-sqrt14)*(5.*pow2(l2-l1)-1.);		  
+		case  6: return f*l1*l2*(-sqrt2)*(21.*pow3(l2-l1)-9.*(l2-l1));		  
+		case  7: return   l1*l2*(-sqrt22)*(10.5*pow4(l2-l1)-7.*pow2(l2-l1)+0.5);
 			  
 		case  8: return   l2*l3*(-4.*sqrt6);
 		case  9: return f*l2*l3*(-4.*sqrt10)*(l3-l2);	  
-		case 10: return   l2*l3*(-sqrt14)*(5.*pow(l3-l2,2)-1.);	  
-		case 11: return f*l2*l3*(-sqrt2)*(21.*pow(l3-l2,3)-9.*(l3-l2));	  
-		case 12: return   l2*l3*(-sqrt22)*(10.5*pow(l3-l2,4)-7.*pow(l3-l2,2)+0.5);
+		case 10: return   l2*l3*(-sqrt14)*(5.*pow2(l3-l2)-1.);	  
+		case 11: return f*l2*l3*(-sqrt2)*(21.*pow3(l3-l2)-9.*(l3-l2));	  
+		case 12: return   l2*l3*(-sqrt22)*(10.5*pow4(l3-l2)-7.*pow2(l3-l2)+0.5);
 		  
 		case 13: return   l3*l1*(-4.*sqrt6);
 		case 14: return f*l3*l1*(-4.*sqrt10)*(l1-l3);
-		case 15: return   l3*l1*(-sqrt14)*(5.*pow(l1-l3,2)-1.);		  
-		case 16: return f*l3*l1*(-sqrt2)*(21.*pow(l1-l3,3)-9.*(l1-l3));		  
-		case 17: return   l3*l1*(-sqrt22)*(10.5*pow(l1-l3,4)-7.*pow(l1-l3,2)+0.5);
+		case 15: return   l3*l1*(-sqrt14)*(5.*pow2(l1-l3)-1.);		  
+		case 16: return f*l3*l1*(-sqrt2)*(21.*pow3(l1-l3)-9.*(l1-l3));		  
+		case 17: return   l3*l1*(-sqrt22)*(10.5*pow4(l1-l3)-7.*pow2(l1-l3)+0.5);
 		  
 		  
 		  //internal modes
@@ -495,14 +522,14 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 		case 19: return l1*l2*l3*x;	
 		case 20: return l1*l2*l3*y;
 		  
-		case 21: return l1*l2*l3*0.5*(3.*pow(x,2)-1);
+		case 21: return l1*l2*l3*0.5*(3.*pow2(x)-1);
 		case 22: return l1*l2*l3*x*y;	
-		case 23: return l1*l2*l3*0.5*(3.*pow(y,2)-1);
+		case 23: return l1*l2*l3*0.5*(3.*pow2(y)-1);
 		  
-		case 24: return l1*l2*l3*0.5*(5.*pow(x,3)-3.*x);
-		case 25: return l1*l2*l3*0.5*(3.*pow(x,2)-1.)*y;
-		case 26: return l1*l2*l3*0.5*(3.*pow(y,2)-1.)*x;
-		case 27: return l1*l2*l3*0.5*(5.*pow(y,3)-3.*y);
+		case 24: return l1*l2*l3*0.5*(5.*pow3(x)-3.*x);
+		case 25: return l1*l2*l3*0.5*(3.*pow2(x)-1.)*y;
+		case 26: return l1*l2*l3*0.5*(3.*pow2(y)-1.)*x;
+		case 27: return l1*l2*l3*0.5*(5.*pow3(y)-3.*y);
 		  
 		  
 		default:
@@ -530,19 +557,19 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 		{
 		case  5: // edge 0 nodes
 		case  7:    			
-		  if (elem->node(0) != std::min(elem->node(0), elem->node(1)))f = -1.;
+		  if (elem->node(0) > elem->node(1))f = -1.;
 		  break;
 	      	case 10: // edge 1 nodes
 	      	case 12:	      	
-		  if (elem->node(1) != std::min(elem->node(1), elem->node(2)))f = -1.;
+		  if (elem->node(1) > elem->node(2))f = -1.;
 		  break;
 	        case 15: // edge 2 nodes
 	        case 17:
-		  if (elem->node(3) != std::min(elem->node(3), elem->node(2)))f = -1.;
+		  if (elem->node(3) > elem->node(2))f = -1.;
 		  break;
 	        case 20: // edge 3 nodes
 	        case 22:
-		  if (elem->node(0) != std::min(elem->node(0), elem->node(3)))f = -1.;
+		  if (elem->node(0) > elem->node(3))f = -1.;
 		  break;
 		}	     
 	      
@@ -579,9 +606,9 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      assert (i<36);
 	      
 	      
-	      if ((i>= 4&&i<= 8) && elem->node(0) != std::min(elem->node(0), elem->node(1)))f=-1;
-	      if ((i>=10&&i<=14) && elem->node(1) != std::min(elem->node(1), elem->node(2)))f=-1;     
-	      if ((i>=16&&i<=20) && elem->node(2) != std::min(elem->node(2), elem->node(0)))f=-1;
+	      if ((i>= 4&&i<= 8) && (elem->node(0) > elem->node(1)))f=-1;
+	      if ((i>=10&&i<=14) && (elem->node(1) > elem->node(2)))f=-1;     
+	      if ((i>=16&&i<=20) && (elem->node(2) > elem->node(0)))f=-1;
 
 	      
 	      switch (i)
@@ -594,24 +621,24 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 		  //side modes
 		case  3: return   l1*l2*(-4.*sqrt6);
 		case  4: return f*l1*l2*(-4.*sqrt10)*(l2-l1);		  
-		case  5: return   l1*l2*(-sqrt14)*(5.*pow(l2-l1,2)-1.);		  
-		case  6: return f*l1*l2*(-sqrt2)*(21.*pow(l2-l1,3)-9.*(l2-l1));		  
-		case  7: return   l1*l2*(-sqrt22)*(10.5*pow(l2-l1,4)-7.*pow(l2-l1,2)+0.5);
-		case  8: return f*l1*l2*(-sqrt26)*(16.5*pow(l2-l1,5)-15.*pow(l2-l1,3)+2.5*(l2-l1));
+		case  5: return   l1*l2*(-sqrt14)*(5.*pow2(l2-l1)-1.);		  
+		case  6: return f*l1*l2*(-sqrt2)*(21.*pow3(l2-l1)-9.*(l2-l1));		  
+		case  7: return   l1*l2*(-sqrt22)*(10.5*pow4(l2-l1)-7.*pow2(l2-l1)+0.5);
+		case  8: return f*l1*l2*(-sqrt26)*(16.5*pow5(l2-l1)-15.*pow3(l2-l1)+2.5*(l2-l1));
 			  
 		case  9: return   l2*l3*(-4.*sqrt6);
 		case 10: return f*l2*l3*(-4.*sqrt10)*(l3-l2);	  
-		case 11: return   l2*l3*(-sqrt14)*(5.*pow(l3-l2,2)-1.);	  
-		case 12: return f*l2*l3*(-sqrt2)*(21.*pow(l3-l2,3)-9.*(l3-l2));	  
-		case 13: return   l2*l3*(-sqrt22)*(10.5*pow(l3-l2,4)-7.*pow(l3-l2,2)+0.5);
-		case 14: return f*l2*l3*(-sqrt26)*(16.5*pow(l3-l2,5)-15.*pow(l3-l2,3)+2.5*(l3-l2));
+		case 11: return   l2*l3*(-sqrt14)*(5.*pow2(l3-l2)-1.);	  
+		case 12: return f*l2*l3*(-sqrt2)*(21.*pow3(l3-l2)-9.*(l3-l2));	  
+		case 13: return   l2*l3*(-sqrt22)*(10.5*pow4(l3-l2)-7.*pow2(l3-l2)+0.5);
+		case 14: return f*l2*l3*(-sqrt26)*(16.5*pow5(l3-l2)-15.*pow3(l3-l2)+2.5*(l3-l2));
 		  
 		case 15: return   l3*l1*(-4.*sqrt6);
 		case 16: return f*l3*l1*(-4.*sqrt10)*(l1-l3);
-		case 17: return   l3*l1*(-sqrt14)*(5.*pow(l1-l3,2)-1.);		  
-		case 18: return f*l3*l1*(-sqrt2)*(21.*pow(l1-l3,3)-9.*(l1-l3));		  
-		case 19: return   l3*l1*(-sqrt22)*(10.5*pow(l1-l3,4)-7.*pow(l1-l3,2)+0.5);
-		case 20: return f*l3*l1*(-sqrt26)*(16.5*pow(l1-l3,5)-15.*pow(l1-l3,3)+2.5*(l1-l3));
+		case 17: return   l3*l1*(-sqrt14)*(5.*pow2(l1-l3)-1.);		  
+		case 18: return f*l3*l1*(-sqrt2)*(21.*pow3(l1-l3)-9.*(l1-l3));		  
+		case 19: return   l3*l1*(-sqrt22)*(10.5*pow4(l1-l3)-7.*pow2(l1-l3)+0.5);
+		case 20: return f*l3*l1*(-sqrt26)*(16.5*pow5(l1-l3)-15.*pow3(l1-l3)+2.5*(l1-l3));
 		  
 		  //internal modes
 		case 21: return l1*l2*l3;
@@ -619,20 +646,20 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 		case 22: return l1*l2*l3*x;	
 		case 23: return l1*l2*l3*y;
 		  
-		case 24: return l1*l2*l3*0.5*(3.*pow(x,2)-1.);
+		case 24: return l1*l2*l3*0.5*(3.*pow2(x)-1.);
 		case 25: return l1*l2*l3*x*y;	
-		case 26: return l1*l2*l3*0.5*(3.*pow(y,2)-1.);
+		case 26: return l1*l2*l3*0.5*(3.*pow2(y)-1.);
 		  
-		case 27: return l1*l2*l3*0.5*(5.*pow(x,3)-3.*x);	
-		case 28: return l1*l2*l3*0.5*(3.*pow(x,2)-1.)*y;
-		case 29: return l1*l2*l3*0.5*(3.*pow(y,2)-1.)*x;
-		case 30: return l1*l2*l3*0.5*(5.*pow(y,3)-3.*y);
+		case 27: return l1*l2*l3*0.5*(5.*pow3(x)-3.*x);	
+		case 28: return l1*l2*l3*0.5*(3.*pow2(x)-1.)*y;
+		case 29: return l1*l2*l3*0.5*(3.*pow2(y)-1.)*x;
+		case 30: return l1*l2*l3*0.5*(5.*pow3(y)-3.*y);
 		  
-		case 31: return l1*l2*l3*0.125*(63.*pow(x,5)-70.*pow(x,3)+15.*x);
-		case 32: return l1*l2*l3*0.5*(5.*pow(x,3)-3*x)*y;
-		case 33: return l1*l2*l3*0.25*(3.*pow(x,2)-1)*(3*pow(y,2)-1);
-		case 34: return l1*l2*l3*0.5*(5.*pow(y,3)-3*y)*x;
-		case 35: return l1*l2*l3*0.125*(63.*pow(y,5)-70.*pow(y,3)+15.*y);
+		case 31: return l1*l2*l3*0.125*(63.*pow5(x)-70.*pow3(x)+15.*x);
+		case 32: return l1*l2*l3*0.5*(5.*pow3(x)-3*x)*y;
+		case 33: return l1*l2*l3*0.25*(3.*pow2(x)-1)*(3*pow2(y)-1);
+		case 34: return l1*l2*l3*0.5*(5.*pow3(y)-3*y)*x;
+		case 35: return l1*l2*l3*0.125*(63.*pow5(y)-70.*pow3(y)+15.*y);
 		  
 		default:
 		  error();
@@ -660,22 +687,22 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 		case  5: // edge 0 nodes
 		case  7:
 		case  9:    			
-		  if (elem->node(0) != std::min(elem->node(0), elem->node(1)))f = -1.;
+		  if (elem->node(0) > elem->node(1))f = -1.;
 		  break;
 	      	case 11: // edge 1 nodes
 	      	case 13:	      	
 		case 15:
-		  if (elem->node(1) != std::min(elem->node(1), elem->node(2)))f = -1.;
+		  if (elem->node(1) > elem->node(2))f = -1.;
 		  break;
 	        case 17: // edge 2 nodes
 	        case 19:
 		case 21:
-		  if (elem->node(3) != std::min(elem->node(3), elem->node(2)))f = -1.;
+		  if (elem->node(3) > elem->node(2))f = -1.;
 		  break;
 	        case 23: // edge 3 nodes
 	        case 25:
 		case 27:
-		  if (elem->node(0) != std::min(elem->node(0), elem->node(3)))f = -1.;
+		  if (elem->node(0) > elem->node(3))f = -1.;
 		  break;
 		}	     
 	      
@@ -723,10 +750,10 @@ Real FE<2,SZABAB>::shape_deriv(const ElemType,
 
 template <>
 Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
-				   const Order order,
-				   const unsigned int i,
-				   const unsigned int j,
-				   const Point& p)
+			       const Order order,
+			       const unsigned int i,
+			       const unsigned int j,
+			       const Point& p)
 {
   assert (elem != NULL);
 
@@ -881,16 +908,16 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	      switch(i)
 		{
 	      	case  5: // edge 0 nodes    			
-		  if (elem->node(0) != std::min(elem->node(0), elem->node(1)))f = -1.;
+		  if (elem->node(0) > elem->node(1))f = -1.;
 		  break;
 	      	case  7: // edge 1 nodes
-		  if (elem->node(1) != std::min(elem->node(1), elem->node(2)))f = -1.;
+		  if (elem->node(1) > elem->node(2))f = -1.;
 		  break;
 	        case  9: // edge 2 nodes
-		  if (elem->node(3) != std::min(elem->node(3), elem->node(2)))f = -1.;
+		  if (elem->node(3) > elem->node(2))f = -1.;
 		  break;
 	        case 11: // edge 3 nodes
-		  if (elem->node(0) != std::min(elem->node(0), elem->node(3)))f = -1.;
+		  if (elem->node(0) > elem->node(3))f = -1.;
 		  break;
 		}	      
 
@@ -984,16 +1011,16 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	      switch(i)
 		{
 	      	case  5: // edge 0 nodes    			
-		  if (elem->node(0) != std::min(elem->node(0), elem->node(1)))f = -1.;
+		  if (elem->node(0) > elem->node(1))f = -1.;
 		  break;
 	      	case  8: // edge 1 nodes
-		  if (elem->node(1) != std::min(elem->node(1), elem->node(2)))f = -1.;
+		  if (elem->node(1) > elem->node(2))f = -1.;
 		  break;
 	        case 11: // edge 2 nodes
-		  if (elem->node(3) != std::min(elem->node(3), elem->node(2)))f = -1.;
+		  if (elem->node(3) > elem->node(2))f = -1.;
 		  break;
 	        case 14: // edge 3 nodes
-		  if (elem->node(0) != std::min(elem->node(0), elem->node(3)))f = -1.;
+		  if (elem->node(0) > elem->node(3))f = -1.;
 		  break;
 		}	      
 
@@ -1088,19 +1115,19 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 		{
 		case  5: // edge 0 nodes
 	      	case  7:    			
-		  if (elem->node(0) != std::min(elem->node(0), elem->node(1)))f = -1.;
+		  if (elem->node(0) > elem->node(1))f = -1.;
 		  break;
 	      	case  9: // edge 1 nodes
 	      	case 11:	      	
-		  if (elem->node(1) != std::min(elem->node(1), elem->node(2)))f = -1.;
+		  if (elem->node(1) > elem->node(2))f = -1.;
 		  break;
 	        case 13: // edge 2 nodes
 	        case 15:
-		  if (elem->node(3) != std::min(elem->node(3), elem->node(2)))f = -1.;
+		  if (elem->node(3) > elem->node(2))f = -1.;
 		  break;
 	        case 14: // edge 3 nodes
 	        case 19:
-		  if (elem->node(0) != std::min(elem->node(0), elem->node(3)))f = -1.;
+		  if (elem->node(0) > elem->node(3))f = -1.;
 		  break;
 		}	     
 	      
@@ -1193,19 +1220,19 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 		{
 	      	case  5: // edge 0 nodes
 	      	case  7:    			
-		  if (elem->node(0) != std::min(elem->node(0), elem->node(1)))f = -1.;
+		  if (elem->node(0) > elem->node(1))f = -1.;
 		  break;
 	      	case 10: // edge 1 nodes
 	      	case 12:	      	
-		  if (elem->node(1) != std::min(elem->node(1), elem->node(2)))f = -1.;
+		  if (elem->node(1) > elem->node(2))f = -1.;
 		  break;
 	        case 15: // edge 2 nodes
 	        case 17:
-		  if (elem->node(3) != std::min(elem->node(3), elem->node(2)))f = -1.;
+		  if (elem->node(3) > elem->node(2))f = -1.;
 		  break;
 	        case 20: // edge 3 nodes
 	        case 22:
-		  if (elem->node(0) != std::min(elem->node(0), elem->node(3)))f = -1.;
+		  if (elem->node(0) > elem->node(3))f = -1.;
 		  break;
 		}	       
 
@@ -1299,22 +1326,22 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	      	case  5: // edge 0 nodes
 	      	case  7:
 		case  9:    			
-		  if (elem->node(0) != std::min(elem->node(0), elem->node(1)))f = -1.;
+		  if (elem->node(0) > elem->node(1))f = -1.;
 		  break;
 	      	case 11: // edge 1 nodes
 	      	case 13:	      	
 		case 15:
-		  if (elem->node(1) != std::min(elem->node(1), elem->node(2)))f = -1.;
+		  if (elem->node(1) > elem->node(2))f = -1.;
 		  break;
 	        case 17: // edge 2 nodes
 	        case 19:
 		case 21:
-		  if (elem->node(3) != std::min(elem->node(3), elem->node(2)))f = -1.;
+		  if (elem->node(3) > elem->node(2))f = -1.;
 		  break;
 	        case 23: // edge 3 nodes
 	        case 25:
 		case 27:
-		  if (elem->node(0) != std::min(elem->node(0), elem->node(3)))f = -1.;
+		  if (elem->node(0) > elem->node(3))f = -1.;
 		  break;
 		}	     	       
 	      
