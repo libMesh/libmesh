@@ -1,4 +1,4 @@
-// $Id: error_estimator.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: error_estimator.h,v 1.3 2004-05-20 19:48:46 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -46,28 +46,34 @@ class ErrorEstimator
 public:
 
   /**
-   * Destructor.  Virtual, so feel free to derive your
-   * own error estimator from this if you want.
+   * Constructor. Empty.
+   */
+  ErrorEstimator() {}
+  
+  /**
+   * Destructor.  
    */
   virtual ~ErrorEstimator() {}
 
 
   /**
-   * 
+   * This pure virtual function must be redefined
+   * in derived classes to compute the error for each
+   * cell and place it in the "error_per_cell" vector.
    */
-  void flux_jump (const EquationSystems& es,
-		  const std::string& name,
-		  std::vector<float>& error_per_cell)
-  { this->flux_jump (es.get_system<SteadySystem>(name), error_per_cell); }
+  virtual void estimate_error (const SteadySystem& system,
+			       std::vector<float>& error_per_cell) = 0;
 
   /**
-   * This function uses the Kelley Flux Jump error
-   * estimate to estimate the error on each cell.
-   * The estimated error is output in the vector
-   * \p error_per_cell
+   * When passed an EquationSystems reference, this function
+   * first extracts the System named "name" and then calls the
+   * function above.
    */
-  virtual void flux_jump (const SteadySystem& system,
-			  std::vector<float>& error_per_cell);
+  virtual void estimate_error (const EquationSystems& es,
+			       const std::string& name,
+			       std::vector<float>& error_per_cell)
+  { this->estimate_error (es.get_system<SteadySystem>(name), error_per_cell); }
+
 
   
 
