@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.59 2003-10-01 19:49:46 benkirk Exp $
+// $Id: mesh_base.C,v 1.60 2003-11-05 22:26:45 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -41,7 +41,7 @@
 #include "face_tri3.h"
 #include "face_tri6.h"
 //#include "petsc_matrix.h"
-#include "mesh_logging.h"
+#include "libmesh_logging.h"
 #include "partitioner.h"
 #include "factory.h"
 

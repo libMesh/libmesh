@@ -1,4 +1,4 @@
-// $Id: system_base.C,v 1.23 2003-09-02 18:02:40 benkirk Exp $
+// $Id: system_base.C,v 1.24 2003-11-05 22:26:44 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -33,7 +33,7 @@
 #include "sparse_matrix.h"
 #include "numeric_vector.h"
 #include "linear_solver_interface.h"
-#include "mesh_logging.h"
+#include "libmesh_logging.h"
 
 // typedefs
 typedef std::map<std::string, SparseMatrix<Number>* >::iterator        other_matrices_iterator;

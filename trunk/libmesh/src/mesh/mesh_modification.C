@@ -1,4 +1,4 @@
-// $Id: mesh_modification.C,v 1.1 2003-09-11 19:10:53 benkirk Exp $
+// $Id: mesh_modification.C,v 1.2 2003-11-05 22:26:45 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -34,7 +34,7 @@
 #include "cell_inf_hex8.h"
 #include "cell_inf_hex16.h"
 #include "cell_inf_hex18.h"
-#include "mesh_logging.h"
+#include "libmesh_logging.h"
 
 
 // ------------------------------------------------------------

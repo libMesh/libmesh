@@ -1,4 +1,4 @@
-// $Id: mesh_data.C,v 1.14 2003-09-30 18:22:18 benkirk Exp $
+// $Id: mesh_data.C,v 1.15 2003-11-05 22:26:45 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -26,7 +26,7 @@
 // Local includes
 #include "mesh_data.h"
 #include "mesh_base.h"
-#include "mesh_logging.h"
+#include "libmesh_logging.h"
 
 
 

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.24 2003-11-05 21:22:40 jwpeterson Exp $
+# $Id: Makefile,v 1.25 2003-11-05 22:26:31 benkirk Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -105,7 +105,7 @@ echo:
 # Remove project object files for the current mode
 #
 clean:
-	@rm -f *~ include/*~ src/*/*~ src/*/*.$(obj-suffix)
+	@rm -f *~ include/*~ include/*/*~ src/*/*~ src/*/*.$(obj-suffix)
 
 #
 # Make clean, remove contributed objects, and remove binaries
@@ -185,7 +185,7 @@ TODO:
 # Dependencies
 #
 .depend:
-	@$(perl) ./contrib/bin/make_dependencies.pl -I./include "-S\$$(obj-suffix)" $(srcfiles) > .depend
+	@$(perl) ./contrib/bin/make_dependencies.pl $(LIBMESH_INCLUDES) "-S\$$(obj-suffix)" $(srcfiles) > .depend
 	@echo "Updated .depend"
 
 

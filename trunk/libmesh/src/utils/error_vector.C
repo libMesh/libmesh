@@ -1,4 +1,4 @@
-// $Id: error_vector.C,v 1.3 2003-09-02 18:02:45 benkirk Exp $
+// $Id: error_vector.C,v 1.4 2003-11-05 22:26:45 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -22,7 +22,7 @@
 
 // Local includes
 #include "error_vector.h"
-#include "mesh_logging.h"
+#include "libmesh_logging.h"
 
 
 

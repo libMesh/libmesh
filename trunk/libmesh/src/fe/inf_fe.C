@@ -1,4 +1,4 @@
-// $Id: inf_fe.C,v 1.25 2003-09-25 21:46:56 benkirk Exp $
+// $Id: inf_fe.C,v 1.26 2003-11-05 22:26:45 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -26,7 +26,7 @@
 #include "quadrature_gauss.h"
 #include "elem.h"
 #include "fe.h"
-#include "mesh_logging.h"
+#include "libmesh_logging.h"
 
 
 

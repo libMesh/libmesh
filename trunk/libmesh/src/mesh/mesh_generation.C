@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.23 2003-09-30 18:22:18 benkirk Exp $
+// $Id: mesh_generation.C,v 1.24 2003-11-05 22:26:45 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -40,7 +40,7 @@
 #include "cell_prism6.h"
 #include "cell_prism15.h"
 #include "cell_prism18.h"
-#include "mesh_logging.h"
+#include "libmesh_logging.h"
 
 
 // ------------------------------------------------------------

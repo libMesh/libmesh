@@ -1,4 +1,4 @@
-// $Id: metis_partitioner.C,v 1.10 2003-10-01 16:28:51 benkirk Exp $
+// $Id: metis_partitioner.C,v 1.11 2003-11-05 22:26:45 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,7 @@
 #include "libmesh_config.h"
 #include "mesh_base.h"
 #include "metis_partitioner.h"
-#include "mesh_logging.h"
+#include "libmesh_logging.h"
 
 #ifdef HAVE_METIS
   namespace Metis {

@@ -304,7 +304,7 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = ./src/base ./src/fe ./src/geom ./src/mesh ./src/numerics ./src/quadrature ./src/utils ./include
+INPUT                  = ./src/base ./src/fe ./src/geom ./src/mesh ./src/numerics ./src/quadrature ./src/utils ./include/base ./include/enums ./include/fe ./include/geom ./include/mesh ./include/numerics ./include/partitioning ./include/quadrature ./include/utils
 
 # If the value of the INPUT tag contains directories, you can use the 
 # FILE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp 
