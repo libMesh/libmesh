@@ -1,4 +1,4 @@
-// $Id: reference_counter.C,v 1.13 2004-10-27 21:14:20 benkirk Exp $
+// $Id: reference_counter.C,v 1.14 2004-11-04 13:31:59 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -60,8 +60,8 @@ std::string ReferenceCounter::get_info ()
       const unsigned int destructions = it->second.second;
 
       out << "| " << name << " reference count information:\n"
-	  << "| Creations:    " << creations    << '\n'
-	  << "| Destructions: " << destructions << '\n';
+	  << "|  Creations:    " << creations    << '\n'
+	  << "|  Destructions: " << destructions << '\n';
     }
   
   out << " ---------------------------------------------------------------------------- \n";
