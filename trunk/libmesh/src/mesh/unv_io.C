@@ -1,4 +1,4 @@
-// $Id: unv_io.C,v 1.16 2005-02-22 22:17:41 jwpeterson Exp $
+// $Id: unv_io.C,v 1.17 2005-03-19 00:45:05 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1010,10 +1010,10 @@ void UNVIO::element_out(std::ostream& out_file)
   // position in libMesh | UNV numbering
   // (note: 0-based)     | (note: 1-based)
   //     
-  // assign_elem_node[0]  = 1
-  // assign_elem_node[3]  = 2
-  // assign_elem_node[2]  = 3
-  // assign_elem_node[1]  = 4
+  // assign_elem_node[0]  = 0
+  // assign_elem_node[1]  = 3
+  // assign_elem_node[2]  = 2
+  // assign_elem_node[3]  = 1
   unsigned int assign_elem_nodes[20];
 
   unsigned int n_elem_written=0;
@@ -1039,126 +1039,127 @@ void UNVIO::element_out(std::ostream& out_file)
 	case TRI3:
 	  {
 	    fe_descriptor_id = 41; // Plane Stress Linear Triangle
-	    assign_elem_nodes[0] = 1;
-	    assign_elem_nodes[2] = 2;
-	    assign_elem_nodes[1] = 3;
+	    assign_elem_nodes[0] = 0;
+	    assign_elem_nodes[1] = 2;
+	    assign_elem_nodes[2] = 1;
 	    break;
 	  }
 
 	case TRI6:
 	  {
 	    fe_descriptor_id = 42; // Plane Stress Quadratic Triangle
-	    assign_elem_nodes[0] = 1;
-	    assign_elem_nodes[5] = 2;
-	    assign_elem_nodes[2] = 3;
-	    assign_elem_nodes[4] = 4;
+	    assign_elem_nodes[0] = 0;
 	    assign_elem_nodes[1] = 5;
-	    assign_elem_nodes[3] = 6;
+	    assign_elem_nodes[2] = 2;
+	    assign_elem_nodes[3] = 4;
+	    assign_elem_nodes[4] = 1;
+	    assign_elem_nodes[5] = 3;
 	    break;
 	  }
 	  
 	case QUAD4:
 	  {
 	    fe_descriptor_id = 44; // Plane Stress Linear Quadrilateral
-	    assign_elem_nodes[0] = 1;
-	    assign_elem_nodes[3] = 2;
-	    assign_elem_nodes[2] = 3;
-	    assign_elem_nodes[1] = 4;
+	    assign_elem_nodes[0] = 0;
+	    assign_elem_nodes[1] = 3;
+	    assign_elem_nodes[2] = 2;
+	    assign_elem_nodes[3] = 1;
 	    break;
 	  }
 	
 	case QUAD8:
 	  {
 	    fe_descriptor_id = 45; // Plane Stress Quadratic Quadrilateral
-	    assign_elem_nodes[0] = 1;
-	    assign_elem_nodes[7] = 2;
-	    assign_elem_nodes[3] = 3;
-	    assign_elem_nodes[6] = 4;
-	    assign_elem_nodes[2] = 5;
-	    assign_elem_nodes[5] = 6;
+	    assign_elem_nodes[0] = 0;
 	    assign_elem_nodes[1] = 7;
-	    assign_elem_nodes[4] = 8;
+	    assign_elem_nodes[2] = 3;
+	    assign_elem_nodes[3] = 6;
+	    assign_elem_nodes[4] = 2;
+	    assign_elem_nodes[5] = 5;
+	    assign_elem_nodes[6] = 1;
+	    assign_elem_nodes[7] = 4;
 	    break;
 	  }
 	
 	case TET4:
 	  {
 	    fe_descriptor_id = 111; // Solid Linear Tetrahedron
-	    assign_elem_nodes[0] = 1;
-	    assign_elem_nodes[1] = 2;
-	    assign_elem_nodes[2] = 3;
-	    assign_elem_nodes[3] = 4;
+	    assign_elem_nodes[0] = 0;
+	    assign_elem_nodes[1] = 1;
+	    assign_elem_nodes[2] = 2;
+	    assign_elem_nodes[3] = 3;
 	    break;
 	  }
 
 	case PRISM6:
 	  {
 	    fe_descriptor_id = 112; // Solid Linear Prism
-	    assign_elem_nodes[0] = 1;
-	    assign_elem_nodes[1] = 2;
-	    assign_elem_nodes[2] = 3;
-	    assign_elem_nodes[3] = 4;
-	    assign_elem_nodes[4] = 5;
-	    assign_elem_nodes[5] = 6;
+	    assign_elem_nodes[0] = 0;
+	    assign_elem_nodes[1] = 1;
+	    assign_elem_nodes[2] = 2;
+	    assign_elem_nodes[3] = 3;
+	    assign_elem_nodes[4] = 4;
+	    assign_elem_nodes[5] = 5;
 	    break;
 	  }
 
 	case HEX8:
 	  {
 	    fe_descriptor_id = 115; // Solid Linear Brick
-	    assign_elem_nodes[0] = 1;
-	    assign_elem_nodes[4] = 2;
-	    assign_elem_nodes[5] = 3;
+	    assign_elem_nodes[0] = 0;
 	    assign_elem_nodes[1] = 4;
-	    assign_elem_nodes[3] = 5;
-	    assign_elem_nodes[7] = 6;
-	    assign_elem_nodes[6] = 7;
-	    assign_elem_nodes[2] = 8;
+	    assign_elem_nodes[2] = 5;
+	    assign_elem_nodes[3] = 1;
+	    assign_elem_nodes[4] = 3;
+	    assign_elem_nodes[5] = 7;
+	    assign_elem_nodes[6] = 6;
+	    assign_elem_nodes[7] = 2;
 	    break;
 	  }
 	
 	case HEX20:
 	  {
 	    fe_descriptor_id = 116; // Solid Quadratic Brick
-	    assign_elem_nodes[ 0] = 1;
-	    assign_elem_nodes[ 1] = 13;
-	    assign_elem_nodes[ 2] = 5;
-	    assign_elem_nodes[ 3] = 17;
-	    assign_elem_nodes[ 4] = 6;
-	    assign_elem_nodes[ 5] = 14;
-	    assign_elem_nodes[ 6] = 2;
-	    assign_elem_nodes[ 7] = 9;
-	    
-	    assign_elem_nodes[ 8] = 12;
-	    assign_elem_nodes[ 9] = 20;
-	    assign_elem_nodes[10] = 18;
-	    assign_elem_nodes[11] = 10;
-	    
-	    assign_elem_nodes[12] = 4;
-	    assign_elem_nodes[13] = 16;
-	    assign_elem_nodes[14] = 8;
-	    assign_elem_nodes[15] = 19;
-	    assign_elem_nodes[16] = 7;
-	    assign_elem_nodes[17] = 15;
-	    assign_elem_nodes[18] = 3;
-	    assign_elem_nodes[19] = 11;
+	    assign_elem_nodes[ 0] = 0;
+	    assign_elem_nodes[ 1] = 12;
+	    assign_elem_nodes[ 2] = 4;
+	    assign_elem_nodes[ 3] = 16;
+	    assign_elem_nodes[ 4] = 5;
+	    assign_elem_nodes[ 5] = 13;
+	    assign_elem_nodes[ 6] = 1;
+	    assign_elem_nodes[ 7] = 8;
+
+	    assign_elem_nodes[ 8] = 11;
+	    assign_elem_nodes[ 9] = 19;
+	    assign_elem_nodes[10] = 17;
+	    assign_elem_nodes[11] = 9;
+
+	    assign_elem_nodes[12] = 3;
+	    assign_elem_nodes[13] = 15;
+	    assign_elem_nodes[14] = 7;
+	    assign_elem_nodes[15] = 18;
+	    assign_elem_nodes[16] = 6;
+	    assign_elem_nodes[17] = 14;
+	    assign_elem_nodes[18] = 2;
+	    assign_elem_nodes[19] = 10;
+
+
 	    break;
 	  }
 		
 	case TET10:
 	  {
 	    fe_descriptor_id = 118; // Solid Quadratic Tetrahedron
-
-	    assign_elem_nodes[0] = 1; //0
-	    assign_elem_nodes[1] = 5; //4
-	    assign_elem_nodes[2] = 2; //1
-	    assign_elem_nodes[3] = 6; //5
-	    assign_elem_nodes[4] = 3; //2
-	    assign_elem_nodes[5] = 7; //6
-	    assign_elem_nodes[6] = 8; //7
-	    assign_elem_nodes[7] = 9; //8
-	    assign_elem_nodes[8] = 10; //9
-	    assign_elem_nodes[9] = 4; //3
+	    assign_elem_nodes[0] = 0;
+	    assign_elem_nodes[1] = 4;
+	    assign_elem_nodes[2] = 1;
+	    assign_elem_nodes[3] = 5;
+	    assign_elem_nodes[4] = 2;
+	    assign_elem_nodes[5] = 6;
+	    assign_elem_nodes[6] = 7;
+	    assign_elem_nodes[7] = 8;
+	    assign_elem_nodes[8] = 9;
+	    assign_elem_nodes[9] = 3;
 	    break;
 	  }
 		
@@ -1188,10 +1189,16 @@ void UNVIO::element_out(std::ostream& out_file)
 	  // assign_elem_nodes[j]-th node: i.e., j loops over the
 	  // libMesh numbering, and assign_elem_nodes[j] over the
 	  // UNV numbering.
-	  const Node* node_in_unv_order = elem->get_node(assign_elem_nodes[j]-1);
+	  const Node* node_in_unv_order = elem->get_node(assign_elem_nodes[j]);
+
+	  // new record after 8 id entries
+	  if (j==8 || j==16)
+	    out_file << '\n';
 
 	  // write foreign label for this node
 	  out_file << std::setw(10) << this->_mesh_data.node_to_foreign_id(node_in_unv_order);
+
+
 	}
 
       out_file << '\n';
