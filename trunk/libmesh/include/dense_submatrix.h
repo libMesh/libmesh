@@ -1,4 +1,4 @@
-// $Id: dense_submatrix.h,v 1.1 2003-02-28 23:37:40 benkirk Exp $
+// $Id: dense_submatrix.h,v 1.2 2003-03-07 04:44:38 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,6 +26,7 @@
 
 // Local Includes
 #include "mesh_common.h"
+#include "dense_matrix_base.h"
 #include "dense_matrix.h"
 
 
@@ -42,7 +43,7 @@
 // ------------------------------------------------------------
 // DenseSubMatrix class definition
 template<typename T>
-class DenseSubMatrix
+class DenseSubMatrix : public DenseMatrixBase<T>
 {
 public:
 
@@ -59,10 +60,43 @@ public:
 		 const unsigned int n=0);
 
   /**
-   * Destructor.  Frees all associated memory.
+   * Copy Constructor.
+   */
+  DenseSubMatrix (const DenseSubMatrix<T>& other_matrix);
+  
+  /**
+   * Destructor.  Empty.
    */     
-  ~DenseSubMatrix();
+  virtual ~DenseSubMatrix() {};
 
+  
+  /**
+   * Set every element in the submatrix to 0.
+   */
+  virtual void zero();
+
+  /**
+   * @returns the \p (i,j) element of the submatrix.
+   */
+  virtual T operator() (const unsigned int i,
+			const unsigned int j) const;
+
+  /**
+   * @returns the \p (i,j) element of the submatrix as a writeable reference.
+   */
+  virtual T & operator() (const unsigned int i,
+			  const unsigned int j);
+  
+  /**
+   * Performs the operation: (*this) <- M2 * (*this) 
+   */
+  virtual void left_multiply (const DenseMatrixBase<T>& M2);
+
+  /**
+   * Performs the operation: (*this) <- (*this) * M3
+   */
+  virtual void right_multiply (const DenseMatrixBase<T>& M3);
+  
   /**
    * Changes the location of the submatrix in the parent matrix. 
    */
@@ -70,33 +104,6 @@ public:
 		  const unsigned int joff,
 		  const unsigned int m,
 		  const unsigned int n);
-
-  /**
-   * Set every element in the submatrix to 0.
-   */
-  void zero();
-
-  /**
-   * @returns the \p (i,j) element of the submatrix.
-   */
-  T operator() (const unsigned int i,
-		const unsigned int j) const;
-
-  /**
-   * @returns the \p (i,j) element of the submatrix as a writeable reference.
-   */
-  T & operator() (const unsigned int i,
-		  const unsigned int j);
-
-  /**
-   * @returns the row-dimension of the submatrix.
-   */
-  unsigned int m() const { return _m_dim; }
-  
-  /**
-   * @returns the column-dimension of the submatrix.
-   */
-  unsigned int n() const { return _n_dim; }
 
   /**
    * @returns the row offset into the parent matrix.
@@ -108,30 +115,12 @@ public:
    */
   unsigned int j_off() const { return _j_off; }
 
-  /**
-   * Pretty-print the submatrix to \p stdout.
-   */
-  void print() const;
-
-  
 private:
-
-
   /**
    * The parent matrix that contains this submatrix.
    */
   DenseMatrix<T>& _parent_matrix;
   
-  /**
-   * The row dimension.
-   */
-  unsigned int _m_dim;
-
-  /**
-   * The column dimension.
-   */
-  unsigned int _n_dim;
-
   /**
    * The row offset into the parent matrix.
    */
@@ -144,29 +133,32 @@ private:
 };
 
 
-
-// ------------------------------------------------------------
-// Dense Matrix member functions
+// -------------------------------------------------- 
+// Constructor
 template<typename T>
 inline
 DenseSubMatrix<T>::DenseSubMatrix(DenseMatrix<T>& parent,
 				  const unsigned int ioff,
 				  const unsigned int joff,
 				  const unsigned int m,
-				  const unsigned int n) :
-  _parent_matrix(parent)
+				  const unsigned int n) 
+  : DenseMatrixBase<T>(m,n),
+    _parent_matrix(parent)
 {
-  reposition (ioff, joff, m, n);
+  this->reposition (ioff, joff, m, n);
 }
 
 
-
+// Copy Constructor
 template<typename T>
 inline
-DenseSubMatrix<T>::~DenseSubMatrix()
+DenseSubMatrix<T>::DenseSubMatrix(const DenseSubMatrix<T>& other_matrix)
+  : DenseMatrixBase<T>(other_matrix._m, other_matrix._n),
+    _parent_matrix(other_matrix._parent_matrix)
 {
+  _i_off = other_matrix._i_off; 
+  _j_off = other_matrix._j_off; 
 }
-
 
 
 template<typename T>
@@ -178,8 +170,8 @@ void DenseSubMatrix<T>::reposition(const unsigned int ioff,
 {				   
   _i_off = ioff;
   _j_off = joff;
-  _m_dim = m;
-  _n_dim = n;
+  _m = m;
+  _n = n;
 
   // Make sure we still fit in the parent matrix.
   assert ((this->i_off() + this->m()) <= _parent_matrix.m());
@@ -227,23 +219,6 @@ T & DenseSubMatrix<T>::operator () (const unsigned int i,
   
   return _parent_matrix (i + this->i_off(),
 			 j + this->j_off());
-}
-
-
-
-template<typename T>
-inline
-void DenseSubMatrix<T>::print () const
-{  
-  for (unsigned int i=0; i<this->m(); i++)
-    {
-      for (unsigned int j=0; j<this->n(); j++)
-	std::cout << std::setw(8) << (*this)(i,j) << " ";
-
-      std::cout << std::endl;
-    }
-
-  return;
 }
 
 

@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.28 2003-03-04 15:31:10 benkirk Exp $
+// $Id: dof_map.C,v 1.29 2003-03-07 04:44:38 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -697,8 +697,11 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
     {
       //here();
     
-      matrix.left_multiply  (C, true);
-      matrix.right_multiply (C, false);
+      //matrix.left_multiply  (C, true);
+      matrix.left_multiply_transpose  (C);
+      
+      //matrix.right_multiply (C, false);
+      matrix.right_multiply (C);
       
       
       assert (matrix.m() == matrix.n());
@@ -756,8 +759,11 @@ void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
       (C.n() == elem_dofs.size())) // It the matrix is constrained
     {
       // Compute the matrix-matrix-matrix product C^T K C
-      matrix.left_multiply  (C, true);
-      matrix.right_multiply (C, false);
+      //matrix.left_multiply  (C, true);
+      matrix.left_multiply_transpose  (C);
+
+      //matrix.right_multiply (C, false);
+      matrix.right_multiply (C);
       
       
       assert (matrix.m() == matrix.n());
@@ -857,8 +863,11 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
     {
       //here();
     
-      matrix.left_multiply  (R, true);
-      matrix.right_multiply (C, false);
+      //matrix.left_multiply  (R, true);
+      matrix.left_multiply_transpose  (R);
+      
+      //matrix.right_multiply (C, false);
+      matrix.right_multiply (C);
       
       
       assert (matrix.m() == row_dofs.size());
@@ -1054,7 +1063,8 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
 	  (Cnew.n() == elem_dofs.size())) // If the constraint matrix
 	{                                 // is constrained...
 	  //here();
-	  C.right_multiply(Cnew, false);
+	  //C.right_multiply(Cnew, false);
+	  C.right_multiply(Cnew);
 	}
       
       assert (C.n() == elem_dofs.size());

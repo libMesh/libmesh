@@ -1,4 +1,4 @@
-// $Id: dense_subvector.h,v 1.1 2003-02-28 23:37:40 benkirk Exp $
+// $Id: dense_subvector.h,v 1.2 2003-03-07 04:44:38 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,8 +26,8 @@
 
 // Local Includes
 #include "mesh_common.h"
+#include "dense_vector_base.h"
 #include "dense_vector.h"
-
 
 
 
@@ -42,7 +42,7 @@
 // ------------------------------------------------------------
 // DenseSubVector class definition
 template<typename T>
-class DenseSubVector
+class DenseSubVector : public DenseVectorBase<T>
 {
 public:
 
@@ -57,40 +57,30 @@ public:
 		 const unsigned int n=0);
 
   /**
-   * Destructor.  Frees all associated memory.
+   * Destructor.  Does nothing.
    */     
-  ~DenseSubVector();
+  ~DenseSubVector() {}
 
-  /**
-   * Changes the location of the subvector in the parent vector. 
-   */
-  void reposition(const unsigned int ioff,
-		  const unsigned int n);
 
   /**
    * Set every element in the subvector to 0.
    */
-  void zero();
+  virtual void zero();
 
   /**
    * @returns the \p (i,j) element of the subvector.
    */
-  T operator() (const unsigned int i) const;
+  virtual T operator() (const unsigned int i) const;
 
   /**
    * @returns the \p (i,j) element of the subvector as a writeable reference.
    */
-  T & operator() (const unsigned int i);
+  virtual T & operator() (const unsigned int i);
 
   /**
    * @returns the size of the subvector.
    */
-  unsigned int size() const { return _n_dim; }
-
-  /**
-   * @returns the dimension of the subvector.
-   */
-  unsigned int n() const { return _n_dim; }
+  virtual unsigned int size() const { return _n; }
 
   /**
    * @returns the row offset into the parent vector.
@@ -98,10 +88,10 @@ public:
   unsigned int i_off() const { return _i_off; }
 
   /**
-   * Pretty-print the subvector to \p stdout.
+   * Changes the location of the subvector in the parent vector. 
    */
-  void print() const;
-
+  void reposition(const unsigned int ioff,
+		  const unsigned int n);
   
 private:
 
@@ -112,9 +102,9 @@ private:
   DenseVector<T>& _parent_vector;
   
   /**
-   * The dimension.
+   * The length of this subvector.
    */
-  unsigned int _n_dim;
+  unsigned int _n;
 
   /**
    * The offset into the parent vector.
@@ -140,19 +130,11 @@ DenseSubVector<T>::DenseSubVector(DenseVector<T>& parent,
 
 template<typename T>
 inline
-DenseSubVector<T>::~DenseSubVector()
-{
-}
-
-
-
-template<typename T>
-inline
 void DenseSubVector<T>::reposition(const unsigned int ioff,
 				   const unsigned int n)
 {				   
   _i_off = ioff;
-  _n_dim = n;
+  _n = n;
 
   // Make sure we still fit in the parent vector.
   assert ((this->i_off() + this->size()) <= _parent_vector.size());
@@ -189,16 +171,6 @@ T & DenseSubVector<T>::operator () (const unsigned int i)
   assert (i + this->i_off() < _parent_vector.size());
   
   return _parent_vector (i + this->i_off());
-}
-
-
-
-template<typename T>
-inline
-void DenseSubVector<T>::print () const
-{  
-  for (unsigned int i=0; i<this->size(); i++)
-    std::cout << std::setw(8) << (*this)(i) << std::endl;
 }
 
 
