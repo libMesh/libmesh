@@ -1,4 +1,4 @@
-// $Id: inf_fe_map_eval.C,v 1.6 2004-01-03 15:37:43 benkirk Exp $
+// $Id: inf_fe_map_eval.C,v 1.7 2004-04-16 17:08:17 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -30,7 +30,7 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
 				     const Order, /* not used */
 				     const unsigned int i)
 {
-  assert (-1. <= v && v <= 1.);
+  assert (-1.-1.e-5 <= v && v < 1.);
 
   switch (i)
     {
@@ -57,7 +57,7 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
 					   const Order, /* not used */
 					   const unsigned int i)
 {
-  assert (-1. <= v && v <= 1.);
+  assert (-1.-1.e-5 <= v && v < 1.);
 
   switch (i)
     {

@@ -1,4 +1,4 @@
-// $Id: tree_node.h,v 1.5 2004-03-24 04:32:59 jwpeterson Exp $
+// $Id: tree_node.h,v 1.6 2004-04-16 17:08:10 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -196,6 +196,11 @@ private:
    */
   std::vector<const Node*> nodes;
 
+  /**
+   * Does this node contain any infinite elements.
+   */
+  bool contains_ifems;
+
 };
 
 
@@ -209,9 +214,10 @@ inline
 TreeNode<N>::TreeNode (const MeshBase& m, 
 		       const unsigned int tbs,
 		       const TreeNode<N>* p) :
-  mesh         (m),
-  tgt_bin_size (tbs),
-  parent       (p)
+  mesh           (m),
+  tgt_bin_size   (tbs),
+  parent         (p),
+  contains_ifems (false)
 {
   // Assert our children are empty, thus we are active.
   assert (children.empty());
