@@ -1,4 +1,4 @@
-//    $Id: petsc_matrix.h,v 1.4 2004-03-14 01:31:48 jwpeterson Exp $
+//    $Id: petsc_matrix.h,v 1.5 2004-08-20 14:05:21 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -87,6 +87,15 @@ public:
    */
   PetscMatrix ();
 
+  /**
+   * Constructor.  Creates a PetscMatrix assuming you already
+   * have a valid Mat object.  In this case, m is NOT destroyed
+   * by the PetscMatrix destructor when this object goes out of scope.
+   * This allows ownership of m to remain with the original creator,
+   * and to simply provide additional functionality with the PetscMatrix.
+   */
+  PetscMatrix (Mat m);
+  
   /**
    * Destructor. Free all memory, but do not
    * release the memory of the sparsity
@@ -281,13 +290,34 @@ public:
   void print_matlab(const std::string name="NULL") const;
 
   
-private:
+protected:
 
+  /**
+   * This function either creates or re-initializes
+   * a matrix called "submatrix" which is defined
+   * by the row and column indices given in the "rows" and "cols" entries.
+   * This function is implemented in terms of the MatGetSubMatrix()
+   * routine of PETSc.  The boolean reuse_submatrix parameter determines
+   * whether or not PETSc will treat "submatrix" as one which has already
+   * been used (had memory allocated) or as a new matrix.
+   */
+  virtual void _get_submatrix(SparseMatrix<T>& submatrix,
+			      const std::vector<unsigned int>& rows,
+			      const std::vector<unsigned int>& cols,
+			      const bool reuse_submatrix) const;
+
+private:
   
   /**
    * Petsc matrix datatype to store values
    */				      
   Mat mat;
+
+  /**
+   * This boolean value should only be set to false
+   * for the constructor which takes a PETSc Mat object. 
+   */
+  const bool _destroy_mat_on_exit;
 
   /**
    * Make other Petsc datatypes friends
@@ -304,7 +334,21 @@ private:
 template <typename T>
 inline
 PetscMatrix<T>::PetscMatrix()
+  : _destroy_mat_on_exit(true)
 {}
+
+
+
+
+template <typename T>
+inline
+PetscMatrix<T>::PetscMatrix(Mat m)
+  : _destroy_mat_on_exit(false)
+{
+  this->mat = m;
+  this->_is_initialized = true;
+}
+
 
 
 
