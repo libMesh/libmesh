@@ -1,4 +1,4 @@
-// $Id: equation_systems_io.C,v 1.21 2003-04-05 02:25:42 ddreyer Exp $
+// $Id: equation_systems_io.C,v 1.22 2003-04-06 16:59:00 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -443,7 +443,7 @@ void EquationSystems<T_sys>::write(const std::string& name,
        * Write the flags
        */
       {
-        std::set<std::string>::iterator flag_pos       = _flags.begin();
+        std::set<std::string>::const_iterator flag_pos = _flags.begin();
 	std::set<std::string>::const_iterator flag_end = _flags.end();
 	unsigned int cnt=0;
 	for (; flag_pos!= flag_end; ++flag_pos)
@@ -476,7 +476,7 @@ void EquationSystems<T_sys>::write(const std::string& name,
        * Write the parameter names and values
        */
       {
-        std::map<std::string, Real>::iterator param_pos       = _parameters.begin();
+        std::map<std::string, Real>::const_iterator param_pos = _parameters.begin();
 	std::map<std::string, Real>::const_iterator param_end = _parameters.end();
 	unsigned int cnt=0;
 	for (; param_pos!= param_end; ++param_pos)
