@@ -1,4 +1,4 @@
-// $Id: fe_boundary.C,v 1.25 2004-01-09 19:25:35 spetersen Exp $
+// $Id: fe_boundary.C,v 1.26 2004-02-18 23:04:08 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -72,6 +72,8 @@ void FE<1,MONOMIAL>::reinit(const Elem*,
 }
 
 
+//-------------------------------------------------------
+// Full specialization for 1D when this is a useless method
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
 template <>
 void FE<1,SZABAB>::reinit(const Elem*,
@@ -82,6 +84,19 @@ void FE<1,SZABAB>::reinit(const Elem*,
   error();
 }
 #endif
+
+
+
+//-------------------------------------------------------
+// Full specialization for 1D when this is a useless method
+template <>
+void FE<1,XYZ>::reinit(const Elem*,
+		       const unsigned int)
+{
+  std::cerr << "ERROR: This method only makes sense for 2D elements!"
+	    << std::endl;
+  error();
+}
 
 
 //-------------------------------------------------------

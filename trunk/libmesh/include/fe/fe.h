@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.3 2004-01-03 15:37:42 benkirk Exp $
+// $Id: fe.h,v 1.4 2004-02-18 23:04:08 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -52,7 +52,7 @@ class InfFE;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.3 $
+ * \version $Revision: 1.4 $
  */
 
 //-------------------------------------------------------------
@@ -288,8 +288,8 @@ private:
    * at the points \p qp, which are generally (but need not be)
    * the quadrature points.
    */
-  void init_shape_functions(const std::vector<Point>& qp,
-			    const Elem* e);
+  virtual void init_shape_functions(const std::vector<Point>& qp,
+				    const Elem* e);
 
   /** 
    * Same as before, but for a side. This is used for boundary
@@ -345,7 +345,7 @@ private:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.3 $
+ * \version $Revision: 1.4 $
  */
 
 //-------------------------------------------------------------
@@ -370,7 +370,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.3 $
+ * \version $Revision: 1.4 $
  */
 
 //-------------------------------------------------------------
@@ -395,7 +395,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.3 $
+ * \version $Revision: 1.4 $
  */
 
 //-------------------------------------------------------------
@@ -410,6 +410,57 @@ public:
    * to be used in dimension \p Dim.
    */
   FEMonomial(const FEType& fet);
+};
+
+
+
+/**
+ * XYZ finite elements.  These require specialization
+ * because the shape functions are defined in terms of
+ * physical XYZ coordinates rather than local coordinates.
+ *
+ * \author Benjamin S. Kirk
+ * \date 2002-2003
+ * \version $Revision: 1.4 $
+ */
+
+//-------------------------------------------------------------
+// FEXYZ class definition
+template <unsigned int Dim>
+class FEXYZ : public FE<Dim,XYZ>
+{
+public:
+  
+  /**
+   * Constructor. Creates a monomial finite element
+   * to be used in dimension \p Dim.
+   */
+  FEXYZ(const FEType& fet);
+
+  
+private:
+    
+  /** 
+   * Update the various member data fields \p phi,
+   * \p dphidxi, \p dphideta, \p dphidzeta, etc.
+   * for the current element.  These data will be computed
+   * at the points \p qp, which are generally (but need not be)
+   * the quadrature points.
+   */
+  virtual void init_shape_functions(const std::vector<Point>& qp,
+				    const Elem* e);
+
+  /** 
+   * After having updated the jacobian and the transformation
+   * from local to global coordinates in \p FEBase::compute_map(),
+   * the first derivatives of the shape functions are 
+   * transformed to global coordinates, giving \p dphi,
+   * \p dphidx, \p dphidy, and \p dphidz. This method
+   * should rarely be re-defined in derived classes, but
+   * still should be usable for children. Therefore, keep
+   * it protected.
+   */
+  virtual void compute_shape_functions(const Elem*);
 };
 
 
@@ -526,5 +577,18 @@ FEMonomial<Dim>::FEMonomial (const FEType& fet) :
   FE<Dim,MONOMIAL> (fet)
 {
 }
+
+
+
+
+// ------------------------------------------------------------
+// FELagrange class inline members
+template <unsigned int Dim>
+inline
+FEXYZ<Dim>::FEXYZ (const FEType& fet) :
+  FE<Dim,XYZ> (fet)
+{
+}
+
 
 #endif

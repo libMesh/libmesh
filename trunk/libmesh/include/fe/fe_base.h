@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.3 2004-01-03 15:37:42 benkirk Exp $
+// $Id: fe_base.h,v 1.4 2004-02-18 23:04:08 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -359,7 +359,7 @@ protected:
    * still should be usable for children. Therefore, keep
    * it protected.
    */
-  virtual void compute_shape_functions();
+  virtual void compute_shape_functions(const Elem*);
   
 
   /**

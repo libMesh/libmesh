@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.22 2004-01-09 19:25:35 spetersen Exp $
+// $Id: fe_interface.C,v 1.23 2004-02-18 23:04:08 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -79,6 +79,10 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 	    return FE<1,SZABAB>::n_shape_functions(t, o);
 
 #endif
+	    
+	  case XYZ:
+	    return FEXYZ<1>::n_shape_functions(t, o);
+
 
 	  default:
 	    error();
@@ -106,6 +110,9 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 	    return FE<2,SZABAB>::n_shape_functions(t, o);
 
 #endif
+	    
+	  case XYZ:
+	    return FEXYZ<2>::n_shape_functions(t, o);
 
 	  default:
 	    error();
@@ -133,6 +140,9 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 	    return FE<3,SZABAB>::n_shape_functions(t, o);
 
 #endif
+	    
+	  case XYZ:
+	    return FEXYZ<1>::n_shape_functions(t, o);
 
 	  default:
 	    error();
@@ -188,6 +198,9 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 	    return FE<1,SZABAB>::n_dofs(t, o);
 
 #endif
+	    
+	  case XYZ:
+	    return FEXYZ<1>::n_dofs(t, o);
 
 	  default:
 	    error();
@@ -215,6 +228,9 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 	    return FE<2,SZABAB>::n_dofs(t, o);
 
 #endif
+	    
+	  case XYZ:
+	    return FEXYZ<2>::n_dofs(t, o);
 
 	  default:
 	    error();
@@ -242,6 +258,9 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 	    return FE<3,SZABAB>::n_dofs(t, o);
 
 #endif
+	    
+	  case XYZ:
+	    return FEXYZ<3>::n_dofs(t, o);
 
 	  default:
 	    error();
@@ -297,6 +316,9 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 	    return FE<1,SZABAB>::n_dofs_at_node(t, o, n);
 
 #endif
+	    
+	  case XYZ:
+	    return FEXYZ<1>::n_dofs_at_node(t, o, n);
 
 	  default:
 	    error();
@@ -324,6 +346,9 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 	    return FE<2,SZABAB>::n_dofs_at_node(t, o, n);
 
 #endif
+	    
+	  case XYZ:
+	    return FEXYZ<2>::n_dofs_at_node(t, o, n);
 
 	  default:
 	    error();
@@ -351,6 +376,9 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 	    return FE<3,SZABAB>::n_dofs_at_node(t, o, n);
 
 #endif
+	    
+	  case XYZ:
+	    return FEXYZ<3>::n_dofs_at_node(t, o, n);
 
 	  default:
 	    error();
@@ -406,6 +434,9 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 	    return FE<1,SZABAB>::n_dofs_per_elem(t, o);
 
 #endif
+	    
+	  case XYZ:
+	    return FEXYZ<1>::n_dofs_per_elem(t, o);
 
 	  default:
 	    error();
@@ -433,6 +464,9 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 	    return FE<2,SZABAB>::n_dofs_per_elem(t, o);
 
 #endif
+	    
+	  case XYZ:
+	    return FEXYZ<2>::n_dofs_per_elem(t, o);
 
 	  default:
 	    error();
@@ -460,6 +494,9 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 	    return FE<3,SZABAB>::n_dofs_per_elem(t, o);
 
 #endif
+	    
+	  case XYZ:
+	    return FEXYZ<3>::n_dofs_per_elem(t, o);
 
 	  default:
 	    error();
@@ -530,6 +567,11 @@ void FEInterface::nodal_soln(const unsigned int dim,
 
 #endif
 
+	  case XYZ:
+	    FEXYZ<1>::nodal_soln(elem, order,
+				 elem_soln, nodal_soln);
+	    return;
+
 	  default:
 	    error();
 	  }
@@ -565,6 +607,11 @@ void FEInterface::nodal_soln(const unsigned int dim,
 
 #endif
 
+	  case XYZ:
+	    FEXYZ<2>::nodal_soln(elem, order,
+				 elem_soln, nodal_soln);
+	    return;
+
 	  default:
 	    error();
 	  }
@@ -599,6 +646,11 @@ void FEInterface::nodal_soln(const unsigned int dim,
 	    return;
 
 #endif
+
+	  case XYZ:
+	    FEXYZ<3>::nodal_soln(elem, order,
+				 elem_soln, nodal_soln);
+	    return;
 
 	  default:
 	    error();
@@ -650,6 +702,9 @@ Point FEInterface::inverse_map (const unsigned int dim,
 	    return FE<1,SZABAB>::inverse_map(elem, p, tolerance, secure);
 
 #endif
+	  case XYZ:
+	    return FEXYZ<1>::inverse_map(elem, p, tolerance, secure);
+
 
 	  default:
 	    error();
@@ -677,6 +732,8 @@ Point FEInterface::inverse_map (const unsigned int dim,
 	    return FE<2,SZABAB>::inverse_map(elem, p, tolerance, secure);
 
 #endif
+	  case XYZ:
+	    return FEXYZ<2>::inverse_map(elem, p, tolerance, secure);
 
 	  default:
 	    error();
@@ -704,6 +761,8 @@ Point FEInterface::inverse_map (const unsigned int dim,
 	    return FE<3,SZABAB>::inverse_map(elem, p, tolerance, secure);
 
 #endif
+	  case XYZ:
+	    return FEXYZ<3>::inverse_map(elem, p, tolerance, secure);
 
 	  default:
 	    error();
@@ -784,6 +843,9 @@ void FEInterface::inverse_map (const unsigned int dim,
 	    return;
 
 #endif
+	    
+	  case XYZ:
+	    return FEXYZ<1>::inverse_map(elem, physical_points, reference_points);
 
 	  default:
 	    error();
@@ -815,6 +877,9 @@ void FEInterface::inverse_map (const unsigned int dim,
 	    return;
 
 #endif
+	    
+	  case XYZ:
+	    return FEXYZ<2>::inverse_map(elem, physical_points, reference_points);
 
 	  default:
 	    error();
@@ -846,6 +911,10 @@ void FEInterface::inverse_map (const unsigned int dim,
 	    return;
 
 #endif
+	    
+	  case XYZ:
+	    return FEXYZ<3>::inverse_map(elem, physical_points, reference_points);
+	    
 	  default:
 	    error();
 	  }
@@ -910,6 +979,9 @@ Real FEInterface::shape(const unsigned int dim,
 	    return FE<1,SZABAB>::shape(t,o,i,p);
 
 #endif
+	    
+	  case XYZ:
+	    return FEXYZ<1>::shape(t,o,i,p);
 
 	  default:
 	    error();
@@ -937,6 +1009,9 @@ Real FEInterface::shape(const unsigned int dim,
 	    return FE<2,SZABAB>::shape(t,o,i,p);
 
 #endif
+	    
+	  case XYZ:
+	    return FEXYZ<2>::shape(t,o,i,p);
 
 	  default:
 	    error();
@@ -964,6 +1039,9 @@ Real FEInterface::shape(const unsigned int dim,
 	    return FE<3,SZABAB>::shape(t,o,i,p);
 
 #endif
+	    
+	  case XYZ:
+	    return FEXYZ<3>::shape(t,o,i,p);
 
 	  default:
 	    error();
@@ -1020,6 +1098,9 @@ Real FEInterface::shape(const unsigned int dim,
 	    return FE<1,SZABAB>::shape(elem,o,i,p);
 
 #endif
+	    
+	  case XYZ:
+	    return FEXYZ<1>::shape(elem,o,i,p);
 
 	  default:
 	    error();
@@ -1047,6 +1128,9 @@ Real FEInterface::shape(const unsigned int dim,
 	    return FE<2,SZABAB>::shape(elem,o,i,p);
 
 #endif
+	    
+	  case XYZ:
+	    return FEXYZ<2>::shape(elem,o,i,p);
 
 	  default:
 	    error();
@@ -1074,6 +1158,9 @@ Real FEInterface::shape(const unsigned int dim,
 	    return FE<3,SZABAB>::shape(elem,o,i,p);
 
 #endif
+	    
+	  case XYZ:
+	    return FEXYZ<3>::shape(elem,o,i,p);
 
 	  default:
 	    error();

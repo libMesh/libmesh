@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.26 2004-02-10 22:48:53 benkirk Exp $
+// $Id: fe.C,v 1.27 2004-02-18 23:04:08 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -97,7 +97,7 @@ void FE<Dim,T>::reinit(const Elem* elem,
 
   // Compute the shape functions and the derivatives at all of the
   // quadrature points.
-  this->compute_shape_functions ();
+  this->compute_shape_functions (elem);
 }
 
 
@@ -311,7 +311,6 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
   // Stop logging the shape function initialization
   STOP_LOG("init_shape_functions()", "FE");
 }
-
 
 
 
