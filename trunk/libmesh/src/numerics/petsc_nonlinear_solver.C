@@ -1,4 +1,4 @@
-// $Id: petsc_nonlinear_solver.C,v 1.4 2005-01-04 16:40:28 jwpeterson Exp $
+// $Id: petsc_nonlinear_solver.C,v 1.5 2005-01-19 21:59:53 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -59,7 +59,7 @@ extern "C"
     
     std::cout << "  NL conv: step " << its
 	      << std::scientific
-	      << ", |u|_oo = "      << 0
+	      //<< ", |u|_oo = "      << 0
 	      << ", |resid|_2 = "   << fnorm
               << std::endl;
 
@@ -75,7 +75,9 @@ extern "C"
   __libmesh_petsc_snes_residual (SNES, Vec x, Vec r, void *ctx)
   {
     int ierr=0;
-    
+
+    assert (x   != NULL);
+    assert (r   != NULL);
     assert (ctx != NULL);
     
     PetscNonlinearSolver<Number>* solver =
@@ -87,10 +89,14 @@ extern "C"
     PetscVector<Number> X_local(X_global.size());
 
     X_global.localize (X_local);
-    
+  
     solver->residual (X_local, R);
 
     R.close();
+        
+//     std::cout << "X.size()=" << X_global.size()
+// 	      << ", R.size()=" << R.size()
+// 	      << std::endl;
     
     return ierr;
   }
@@ -100,7 +106,7 @@ extern "C"
   //---------------------------------------------------------------
   // this function is called by PETSc to evaluate the Jacobian at X
   PetscErrorCode
-  __libmesh_petsc_snes_jacobian (SNES, Vec x, Mat *jac, Mat *, MatStructure*, void *ctx)
+  __libmesh_petsc_snes_jacobian (SNES, Vec x, Mat *jac, Mat *pc, MatStructure *msflag, void *ctx)
   {
     int ierr=0;
     
@@ -111,15 +117,24 @@ extern "C"
     
     assert (solver->jacobian != NULL);
 
+    PetscMatrix<Number> PC(*pc);
     PetscMatrix<Number> Jac(*jac);
     PetscVector<Number> X_global(x);
     PetscVector<Number> X_local (X_global.size());
 
     X_global.localize (X_local);
     
-    solver->jacobian (X_local, Jac);
-
+    solver->jacobian (X_local, PC);
+    
+    PC.close();
     Jac.close();
+    
+    *msflag = SAME_NONZERO_PATTERN;
+    
+//     here();
+        
+//     std::cout << "X.size()=" << X_global.size()
+// 	      << std::endl;
     
     return ierr;
   }
@@ -179,7 +194,11 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
 				const double,              // Stopping tolerance
 				const unsigned int) 
 {
-  this->init ();
+  //this->init ();
+
+//   std::cout << "x.size()=" << x_in.size()
+// 	    << ", r.size()=" << r_in.size()
+// 	    << std::endl;
   
   PetscMatrix<T>* jac = dynamic_cast<PetscMatrix<T>*>(&jac_in);
   PetscVector<T>* x   = dynamic_cast<PetscVector<T>*>(&x_in);
@@ -187,28 +206,47 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
 
   // We cast to pointers so we can be sure that they succeeded
   // by comparing the result against NULL.
-  assert(jac != NULL);
-  assert(x   != NULL);
-  assert(r   != NULL);
-
+  assert(jac != NULL); assert(jac->mat() != NULL);
+  assert(x   != NULL); assert(x->vec()   != NULL);
+  assert(r   != NULL); assert(r->vec()   != NULL);
+  
   int ierr=0;
   int n_iterations =0;
+
+  //Mat A = jac->mat();
+
+  ierr = SNESCreate(PETSC_COMM_WORLD,&_snes);
+         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+	 
+  ierr = SNESSetMonitor (_snes, __libmesh_petsc_snes_monitor,
+			 this, PETSC_NULL);
+         CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
   ierr = SNESSetFunction (_snes, r->vec(), __libmesh_petsc_snes_residual, this);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
   ierr = SNESSetJacobian (_snes, jac->mat(), jac->mat(), __libmesh_petsc_snes_jacobian, this);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
+	     
+  ierr = SNESSetFromOptions(_snes);
+         CHKERRABORT(PETSC_COMM_WORLD,ierr);
 
   // Older versions (at least up to 2.1.5) of SNESSolve took 3 arguments,
   // the last one being a pointer to an int to hold the number of iterations required.
 # if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 1)
  ierr = SNESSolve (_snes, x->vec(), &n_iterations);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+        CHKERRABORT(PETSC_COMM_WORLD,ierr);
 #else 	 
  ierr = SNESSolve (_snes, x->vec());
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+        CHKERRABORT(PETSC_COMM_WORLD,ierr);
 #endif
+
+//   if (A != jac->mat())
+//     {
+//       ierr = MatDestroy(A);
+//              CHKERRABORT(PETSC_COMM_WORLD,ierr);
+//     }
+	 
 	 
   // return the # of its. and the final residual norm.  Note that
   // n_iterations may be zero for PETSc versions 2.2.x and greater.

@@ -1,4 +1,4 @@
-// $Id: linear_implicit_system.h,v 1.2 2005-01-19 21:59:53 benkirk Exp $
+// $Id: nonlinear_implicit_system.h,v 1.1 2005-01-19 21:59:53 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -19,14 +19,14 @@
 
 
 
-#ifndef __linear_implicit_system_h__
-#define __linear_implicit_system_h__
+#ifndef __nonlinear_implicit_system_h__
+#define __nonlinear_implicit_system_h__
 
 // C++ includes
 
 // Local Includes
 #include "implicit_system.h"
-#include "linear_solver.h"
+#include "nonlinear_solver.h"
 
 
 
@@ -39,9 +39,9 @@
  */
 
 // ------------------------------------------------------------
-// LinearImplicitSystem class definition
+// NonlinearImplicitSystem class definition
 
-class LinearImplicitSystem : public ImplicitSystem
+class NonlinearImplicitSystem : public ImplicitSystem
 {
 public:
 
@@ -49,19 +49,19 @@ public:
    * Constructor.  Optionally initializes required
    * data structures.
    */
-  LinearImplicitSystem (EquationSystems& es,
-			const std::string& name,
-			const unsigned int number);
+  NonlinearImplicitSystem (EquationSystems& es,
+			   const std::string& name,
+			   const unsigned int number);
 
   /**
    * Destructor.
    */
-  virtual ~LinearImplicitSystem ();
+  virtual ~NonlinearImplicitSystem ();
 
   /**
    * The type of system.
    */
-  typedef LinearImplicitSystem sys_type;
+  typedef NonlinearImplicitSystem sys_type;
 
   /**
    * The type of the parent.
@@ -94,53 +94,53 @@ public:
 //   virtual void assemble () { ImplicitSystem::assemble(); }
  
   /**
-   * Assembles & solves the linear system Ax=b. 
+   * Assembles & solves the nonlinear system R(x) = 0.
    */
   virtual void solve ();
  
   /**
-   * @returns \p "LinearImplicit".  Helps in identifying
+   * @returns \p "NonlinearImplicit".  Helps in identifying
    * the system type in an equation system file.
    */
-  virtual std::string system_type () const { return "LinearImplicit"; }
+  virtual std::string system_type () const { return "NonlinearImplicit"; }
 
   /**
-   * The \p LinearSolver defines the interface used to
-   * solve the linear_implicit system.  This class handles all the
-   * details of interfacing with various linear algebra packages
+   * The \p NonlinearSolver defines the interface used to
+   * solve the nonlinear_implicit system.  This class handles all the
+   * details of interfacing with various nonlinear algebra packages
    * like PETSc or LASPACK.
    */
-  AutoPtr<LinearSolver<Number> > linear_solver;
+  AutoPtr<NonlinearSolver<Number> > nonlinear_solver;
   
   /**
    * Returns  the number of iterations 
-   * taken for the most recent linear solve.
+   * taken for the most recent nonlinear solve.
    */
-  unsigned int n_linear_iterations() const { return _n_linear_iterations; }
+  unsigned int n_nonlinear_iterations() const { return _n_nonlinear_iterations; }
 
   /**
-   * Returns the final residual for the linear system solve.
+   * Returns the final residual for the nonlinear system solve.
    */
-  Real final_linear_residual() const { return _final_linear_residual; }
+  Real final_nonlinear_residual() const { return _final_nonlinear_residual; }
   
 protected:
   
   /**
-   * The number of linear iterations required to solve the linear
-   * system Ax=b.
+   * The number of nonlinear iterations required to solve the nonlinear
+   * system R(x)=0.
    */
-  unsigned int _n_linear_iterations;
+  unsigned int _n_nonlinear_iterations;
 
   /**
-   * The final residual for the linear system Ax=b.
+   * The final residual for the nonlinear system R(x)
    */
-  Real _final_linear_residual;
+  Real _final_nonlinear_residual;
 };
 
 
 
 // ------------------------------------------------------------
-// LinearImplicitSystem inline methods
+// NonlinearImplicitSystem inline methods
 
 
 #endif
