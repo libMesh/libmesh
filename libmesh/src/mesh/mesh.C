@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.28 2003-10-09 21:03:02 benkirk Exp $
+// $Id: mesh.C,v 1.29 2003-11-05 22:26:45 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,7 @@
 #include "mesh.h"
 #include "libmesh.h"
 #include "mesh_communication.h"
-#include "mesh_logging.h"
+#include "libmesh_logging.h"
 
 
 #ifdef HAVE_SFCURVES

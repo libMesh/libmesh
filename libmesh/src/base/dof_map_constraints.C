@@ -1,4 +1,4 @@
-// $Id: dof_map_constraints.C,v 1.2 2003-09-02 18:02:40 benkirk Exp $
+// $Id: dof_map_constraints.C,v 1.3 2003-11-05 22:26:44 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -33,7 +33,7 @@
 #include "dense_matrix.h"
 #include "dense_vector.h"
 #include "libmesh.h"
-#include "mesh_logging.h"
+#include "libmesh_logging.h"
 
 
 

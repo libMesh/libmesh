@@ -1,4 +1,4 @@
-// $Id: statistics.C,v 1.11 2003-09-02 18:02:45 benkirk Exp $
+// $Id: statistics.C,v 1.12 2003-11-05 22:26:45 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,7 @@
 
 // Local includes
 #include "statistics.h"
-#include "mesh_logging.h"
+#include "libmesh_logging.h"
 
 
 

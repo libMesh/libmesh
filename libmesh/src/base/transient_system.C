@@ -1,4 +1,4 @@
-// $Id: transient_system.C,v 1.6 2003-09-02 18:02:40 benkirk Exp $
+// $Id: transient_system.C,v 1.7 2003-11-05 22:26:44 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -23,7 +23,7 @@
 
 // Local includes
 #include "transient_system.h"
-#include "mesh_logging.h"
+#include "libmesh_logging.h"
 #include "utility.h"
 
 

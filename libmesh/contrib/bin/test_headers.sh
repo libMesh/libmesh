@@ -1,6 +1,6 @@
 #!/bin/sh
 
-headers_to_test=`ls ../../include/*.h`
+headers_to_test=`ls ../../include/*/*.h`
 
 if test $# -ge 1; then
     headers_to_test=$*

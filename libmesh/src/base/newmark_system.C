@@ -1,4 +1,4 @@
-// $Id: newmark_system.C,v 1.8 2003-09-02 18:02:40 benkirk Exp $
+// $Id: newmark_system.C,v 1.9 2003-11-05 22:26:44 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,7 @@
 #include "newmark_system.h"
 #include "equation_systems.h"
 #include "sparse_matrix.h"
-#include "mesh_logging.h"
+#include "libmesh_logging.h"
 
 
 
