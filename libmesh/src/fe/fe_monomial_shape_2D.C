@@ -1,4 +1,4 @@
-// $Id: fe_monomial_shape_2D.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: fe_monomial_shape_2D.C,v 1.2 2003-01-20 16:31:33 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,17 +24,16 @@
 
 // Local includes
 #include "fe.h"
-#include "point.h"
 #include "elem.h"
 
 
 
 
 template <>
-real FE<2,MONOMIAL>::shape(const ElemType type,
-			    const Order order,
-			    const unsigned int i,
-			    const Point& p)
+real FE<2,MONOMIAL>::shape(const ElemType,
+			   const Order order,
+			   const unsigned int i,
+			   const Point& p)
 {
 #if DIM > 1
   
@@ -130,9 +129,9 @@ real FE<2,MONOMIAL>::shape(const ElemType type,
 
 template <>
 real FE<2,MONOMIAL>::shape(const Elem* elem,
-			    const Order order,
-			    const unsigned int i,
-			    const Point& p)
+			   const Order order,
+			   const unsigned int i,
+			   const Point& p)
 {
   assert (elem != NULL);
   
@@ -143,11 +142,11 @@ real FE<2,MONOMIAL>::shape(const Elem* elem,
 
 
 template <>
-real FE<2,MONOMIAL>::shape_deriv(const ElemType type,
-				  const Order order,
-				  const unsigned int i,
-				  const unsigned int j,
-				  const Point& p)
+real FE<2,MONOMIAL>::shape_deriv(const ElemType,
+				 const Order order,
+				 const unsigned int i,
+				 const unsigned int j,
+				 const Point& p)
 {
 #if DIM > 1
 
@@ -320,10 +319,10 @@ real FE<2,MONOMIAL>::shape_deriv(const ElemType type,
 
 template <>
 real FE<2,MONOMIAL>::shape_deriv(const Elem* elem,
-				  const Order order,
-				  const unsigned int i,
-				  const unsigned int j,
-				  const Point& p)
+				 const Order order,
+				 const unsigned int i,
+				 const unsigned int j,
+				 const Point& p)
 {
   assert (elem != NULL);
 

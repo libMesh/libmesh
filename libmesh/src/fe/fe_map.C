@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: fe_map.C,v 1.2 2003-01-20 16:31:33 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,7 +26,6 @@
 // Local includes
 #include "fe.h"
 #include "quadrature.h"
-#include "point.h"
 #include "elem.h"
 
 
@@ -76,9 +75,9 @@ void FEBase::compute_map(const QBase* qrule,
 	for (unsigned int i=0; i<phi_map.size(); i++) // sum over the nodes
 	  for (unsigned int p=0; p<n_qp; p++) // for each quadrature point...
 	    {	  
-	      xyz[p]         += mesh.vertex(elem->node(i))*phi_map[i][p];
+	      xyz[p]         += elem->point(i)*phi_map[i][p];
 	      
-	      dxyzdxi_map[p] += mesh.vertex(elem->node(i))*dphidxi_map[i][p];
+	      dxyzdxi_map[p] += elem->point(i)*dphidxi_map[i][p];
 	    };
 
 	/*
@@ -155,11 +154,11 @@ void FEBase::compute_map(const QBase* qrule,
 	for (unsigned int i=0; i<phi_map.size(); i++) // sum over the nodes
 	  for (unsigned int p=0; p<n_qp; p++) // for each quadrature point...
 	    {	  
-	      xyz[p]          += mesh.vertex(elem->node(i))*phi_map[i][p];
+	      xyz[p]          += elem->point(i)*phi_map[i][p];
 	      
-	      dxyzdxi_map[p]  += mesh.vertex(elem->node(i))*dphidxi_map[i][p];
+	      dxyzdxi_map[p]  += elem->point(i)*dphidxi_map[i][p];
 	      
-	      dxyzdeta_map[p] += mesh.vertex(elem->node(i))*dphideta_map[i][p];
+	      dxyzdeta_map[p] += elem->point(i)*dphideta_map[i][p];
 	    };
 	
 	/*
@@ -250,13 +249,13 @@ void FEBase::compute_map(const QBase* qrule,
 	for (unsigned int i=0; i<phi_map.size(); i++) // sum over the nodes
 	  for (unsigned int p=0; p<n_qp; p++) // for each quadrature point...
 	    {	  
-	      xyz[p]           += mesh.vertex(elem->node(i))*phi_map[i][p];
+	      xyz[p]           += elem->point(i)*phi_map[i][p];
 	      
-	      dxyzdxi_map[p]   += mesh.vertex(elem->node(i))*dphidxi_map[i][p];
+	      dxyzdxi_map[p]   += elem->point(i)*dphidxi_map[i][p];
 	      
-	      dxyzdeta_map[p]  += mesh.vertex(elem->node(i))*dphideta_map[i][p];
+	      dxyzdeta_map[p]  += elem->point(i)*dphideta_map[i][p];
 	      
-	      dxyzdzeta_map[p] += mesh.vertex(elem->node(i))*dphidzeta_map[i][p];
+	      dxyzdzeta_map[p] += elem->point(i)*dphidzeta_map[i][p];
 	    };
 	
 	/*
@@ -331,8 +330,7 @@ void FEBase::compute_map(const QBase* qrule,
 
 
 template <unsigned int Dim, FEFamily T>
-Point FE<Dim,T>::map (const MeshBase& mesh,
-		      const Elem* elem,
+Point FE<Dim,T>::map (const Elem* elem,
 		      const Point& reference_point)
 {
   assert (elem != NULL);
@@ -343,14 +341,14 @@ Point FE<Dim,T>::map (const MeshBase& mesh,
 
   const ElemType type     = elem->type();
   const Order order       = elem->default_order();
-  const unsigned int n_sf = n_shape_functions(type, order);
+  const unsigned int n_sf = FE<Dim,LAGRANGE>::n_shape_functions(type, order);
 
   // Lagrange basis functions are used for mapping
   for (unsigned int i=0; i<n_sf; i++)
-    p += mesh.vertex(elem->node(i))*FE<Dim,LAGRANGE>::shape(type,
-							    order,
-							    i,
-							    reference_point);
+    p += elem->point(i)*FE<Dim,LAGRANGE>::shape(type,
+						order,
+						i,
+						reference_point);
 
   return p;
 };
@@ -358,8 +356,7 @@ Point FE<Dim,T>::map (const MeshBase& mesh,
 
 
 template <unsigned int Dim, FEFamily T>
-Point FE<Dim,T>::map_xi (const MeshBase& mesh,
-			 const Elem* elem,
+Point FE<Dim,T>::map_xi (const Elem* elem,
 			 const Point& reference_point)
 {
   assert (elem != NULL);
@@ -370,15 +367,15 @@ Point FE<Dim,T>::map_xi (const MeshBase& mesh,
 
   const ElemType type     = elem->type();
   const Order order       = elem->default_order();
-  const unsigned int n_sf = n_shape_functions(type, order);
+  const unsigned int n_sf = FE<Dim,LAGRANGE>::n_shape_functions(type, order);
 
   // Lagrange basis functions are used for mapping    
   for (unsigned int i=0; i<n_sf; i++)
-    p += mesh.vertex(elem->node(i))*FE<Dim,LAGRANGE>::shape_deriv(type,
-								  order,
-								  i,
-								  0,
-								  reference_point);
+    p += elem->point(i)*FE<Dim,LAGRANGE>::shape_deriv(type,
+						      order,
+						      i,
+						      0,
+						      reference_point);
     
   return p;
 };
@@ -386,8 +383,7 @@ Point FE<Dim,T>::map_xi (const MeshBase& mesh,
 
 
 template <unsigned int Dim, FEFamily T>
-Point FE<Dim,T>::map_eta (const MeshBase& mesh,
-			  const Elem* elem,
+Point FE<Dim,T>::map_eta (const Elem* elem,
 			  const Point& reference_point)
 {
   assert (elem != NULL);
@@ -398,15 +394,15 @@ Point FE<Dim,T>::map_eta (const MeshBase& mesh,
 
   const ElemType type     = elem->type();
   const Order order       = elem->default_order();
-  const unsigned int n_sf = n_shape_functions(type, order);
+  const unsigned int n_sf = FE<Dim,LAGRANGE>::n_shape_functions(type, order);
   
   // Lagrange basis functions are used for mapping
   for (unsigned int i=0; i<n_sf; i++)
-    p += mesh.vertex(elem->node(i))*FE<Dim,LAGRANGE>::shape_deriv(type,
-								  order,
-								  i,
-								  1,
-								  reference_point);
+    p += elem->point(i)*FE<Dim,LAGRANGE>::shape_deriv(type,
+						  order,
+						  i,
+						  1,
+						  reference_point);
     
   return p;
 };
@@ -414,8 +410,7 @@ Point FE<Dim,T>::map_eta (const MeshBase& mesh,
 
 
 template <unsigned int Dim, FEFamily T>
-Point FE<Dim,T>::map_zeta (const MeshBase& mesh,
-			   const Elem* elem,
+Point FE<Dim,T>::map_zeta (const Elem* elem,
 			   const Point& reference_point)
 {
   assert (elem != NULL);
@@ -426,15 +421,15 @@ Point FE<Dim,T>::map_zeta (const MeshBase& mesh,
 
   const ElemType type     = elem->type();
   const Order order       = elem->default_order();
-  const unsigned int n_sf = n_shape_functions(type, order);
+  const unsigned int n_sf = FE<Dim,LAGRANGE>::n_shape_functions(type, order);
 
   // Lagrange basis functions are used for mapping
   for (unsigned int i=0; i<n_sf; i++)
-    p += mesh.vertex(elem->node(i))*FE<Dim,LAGRANGE>::shape_deriv(type,
-								  order,
-								  i,
-								  2,
-								  reference_point);
+    p += elem->point(i)*FE<Dim,LAGRANGE>::shape_deriv(type,
+						      order,
+						      i,
+						      2,
+						      reference_point);
     
   return p;
 };
@@ -442,8 +437,7 @@ Point FE<Dim,T>::map_zeta (const MeshBase& mesh,
 
 
 template <unsigned int Dim, FEFamily T>
-Point FE<Dim,T>::inverse_map (const MeshBase& mesh,
-			      const Elem* elem,
+Point FE<Dim,T>::inverse_map (const Elem* elem,
 			      const Point& physical_point)
 {
   assert (elem != NULL);
@@ -468,9 +462,9 @@ Point FE<Dim,T>::inverse_map (const MeshBase& mesh,
 	  {
 	    // The actual update step
 	    {
-	      const Point physical_guess = FE<Dim,T>::map    (mesh, elem, p);
+	      const Point physical_guess = FE<Dim,T>::map    (elem, p);
 	      
-	      const Point dxi            = FE<Dim,T>::map_xi (mesh, elem, p);
+	      const Point dxi            = FE<Dim,T>::map_xi (elem, p);
 	      
 	      const real
 		J = dxi(0);
@@ -512,7 +506,7 @@ Point FE<Dim,T>::inverse_map (const MeshBase& mesh,
 
 #ifdef DEBUG
 	
-	const Point check = FE<Dim,T>::map (mesh, elem, p);
+	const Point check = FE<Dim,T>::map (elem, p);
 	const Point diff  = physical_point - check;
 
 	if (diff.size() > 1.e-6)
@@ -555,10 +549,10 @@ Point FE<Dim,T>::inverse_map (const MeshBase& mesh,
 	  {
 	    // The actual update step
 	    {
-	      const Point physical_guess = FE<Dim,T>::map (mesh, elem, p);
+	      const Point physical_guess = FE<Dim,T>::map (elem, p);
 	      
-	      const Point dxi   = FE<Dim,T>::map_xi   (mesh, elem, p);
-	      const Point deta  = FE<Dim,T>::map_eta  (mesh, elem, p);
+	      const Point dxi   = FE<Dim,T>::map_xi   (elem, p);
+	      const Point deta  = FE<Dim,T>::map_eta  (elem, p);
 	      
 	      const real
 		J11 = dxi(0), J12 = deta(0),
@@ -614,7 +608,7 @@ Point FE<Dim,T>::inverse_map (const MeshBase& mesh,
 	
 #ifdef DEBUG
 	
-	const Point check = FE<Dim,T>::map (mesh, elem, p);
+	const Point check = FE<Dim,T>::map (elem, p);
 	const Point diff  = physical_point - check;
 
 	if (diff.size() > 1.e-6)
@@ -658,11 +652,11 @@ Point FE<Dim,T>::inverse_map (const MeshBase& mesh,
 	  {
 	    // The actual update step
 	    {
-	      const Point physical_guess = FE<Dim,T>::map (mesh, elem, p);
+	      const Point physical_guess = FE<Dim,T>::map (elem, p);
 	      
-	      const Point dxi   = FE<Dim,T>::map_xi   (mesh, elem, p);
-	      const Point deta  = FE<Dim,T>::map_eta  (mesh, elem, p);
-	      const Point dzeta = FE<Dim,T>::map_zeta (mesh, elem, p);
+	      const Point dxi   = FE<Dim,T>::map_xi   (elem, p);
+	      const Point deta  = FE<Dim,T>::map_eta  (elem, p);
+	      const Point dzeta = FE<Dim,T>::map_zeta (elem, p);
 	      
 	      const real
 		J11 = dxi(0), J12 = deta(0), J13 = dzeta(0),
@@ -733,7 +727,7 @@ Point FE<Dim,T>::inverse_map (const MeshBase& mesh,
 
 #ifdef DEBUG
 	
-	const Point check = FE<Dim,T>::map (mesh, elem, p);
+	const Point check = FE<Dim,T>::map (elem, p);
 	const Point diff  = physical_point - check;
 
 	if (diff.size() > 1.e-6)

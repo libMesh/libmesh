@@ -1,4 +1,4 @@
-// $Id: point.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: point.C,v 1.2 2003-01-20 16:31:39 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -22,17 +22,13 @@
 
 // Local includes
 #include "point.h"
-#include <iostream>
 #include <iomanip>
-#include <math.h>
 
 
 
 
 // ------------------------------------------------------------
 // Point class member funcions
-
-
 Point Point::cross(const Point& p) const
 {
   assert(DIM == 3);
@@ -76,19 +72,6 @@ Point Point::unit() const
 	       coords[1]/length, 
 	       coords[2]/length);
 #endif
-  
-};
-
-
-
-real Point::size() const
-{
-  real val = 0.;
-
-  for (unsigned int i=0; i<DIM; i++)
-    val += coords[i]*coords[i];
-
-  return sqrt(val);
   
 };
 
@@ -147,7 +130,7 @@ bool Point::operator == (const Point& rhs) const
 {
   Point res = (*this) - rhs;
 
-  if (res.size() < 1.e-12)
+  if (res.size_sq() < 1.e-12)
     return true;
   
   return false;

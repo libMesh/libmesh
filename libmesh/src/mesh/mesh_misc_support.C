@@ -1,4 +1,4 @@
-// $Id: mesh_misc_support.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: mesh_misc_support.C,v 1.2 2003-01-20 16:31:41 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -21,22 +21,19 @@
 
 // C++ includes
 #include <iomanip>
-#include <iostream>
 #include <fstream>
 
 
 // Local includes
 #include "mesh_base.h"
-#include "dof_map.h"
 #include "elem.h"
-#include "point.h"
 
 
 
 
 
 
-void MeshBase::read_shanee(const std::string name)
+void MeshBase::read_shanee(const std::string& name)
 {
   std::ifstream in (name.c_str());
 
@@ -73,21 +70,20 @@ void MeshBase::read_shanee (std::istream &in)
   // however.  So, we read in x,y,z for each node and make a point
   // in the proper way based on what dimension we're in
   {
-    real x=0., y=0.;
+    real x=0., y=0., z=0.;
 
     // Reserve space in the nNodes vector to avoid unnecessary
     // allocations
-    _vertices.resize (nNodes);
+    _nodes.resize (nNodes);
     
     
     for (unsigned int i=0; i<nNodes; i++)
       {
 	in >> x   // x-coordinate value
 	   >> y;  // y-coordinate value
-
-
-	Point p(x,y);
-	_vertices[i] = p;
+                  // there is no z-coordinate
+	
+	node_ptr(i) = Node::build(x,y,z,i);
       };
   };
 
@@ -106,7 +102,7 @@ void MeshBase::read_shanee (std::istream &in)
 	  {
 	    in >> node; // read the current node
 		  
-	    elem(i)->node(n) = (node); // assign the node		                     
+	    elem(i)->set_node(n) = node_ptr(node); // assign the node		                     
 	  };
       };   
   };
@@ -115,7 +111,7 @@ void MeshBase::read_shanee (std::istream &in)
 
 
 
-void MeshBase::read_matlab(const std::string name)
+void MeshBase::read_matlab(const std::string& name)
 {
   std::ifstream in (name.c_str());
 
@@ -194,21 +190,19 @@ void MeshBase::read_matlab(std::istream& in)
 
   // Read the nodal coordinates
   {
-    real x=0., y=0.;
+    real x=0., y=0., z=0.;
 
-    // Resize the vertices vector
-    _vertices.resize(nNodes);
+    // Resize the nodes vector
+    _nodes.resize(nNodes);
 
     for (unsigned int i=0; i<nNodes; i++)
       {
 	in >> x   // x-coordinate value
 	   >> y;  // y-coordinate value
 
-	// Only 2D meshes are allowed, no need to switch on dim
-	Point p(x,y);
-	_vertices[i] = p;
-      }
-  }
+	node_ptr(i) = Node::build(x,y,z,i);
+      };
+  };
 
   // Read the elements (elements)
   {
@@ -219,25 +213,25 @@ void MeshBase::read_matlab(std::istream& in)
 
     for (unsigned int i=0; i<nElem; i++)
       {
-	_elements[i] = Elem::build(TRI3);     // Always build a triangle
-	for (unsigned int n=0; n<3; n++) // Always read three 3 nodes
+	_elements[i] = Elem::build(TRI3); // Always build a triangle
+	for (unsigned int n=0; n<3; n++)  // Always read three 3 nodes
 	  {
 	    in >> node;
-	    elem(i)->node(n) = (node-1);  // Assign the node number
-	  }
+	    elem(i)->set_node(n) = node_ptr(node-1);  // Assign the node number
+	  };
 	
 	// There is an additional subdomain number here,
 	// so we read it and get rid of it!
 	in >> dummy;
-      }
-  }
+      };
+  };
   
 };
 
 
 
 
-void MeshBase::read_off(const std::string name)
+void MeshBase::read_off(const std::string& name)
 {
   std::ifstream in (name.c_str());
 
@@ -275,20 +269,25 @@ void MeshBase::read_off(std::istream& in)
   in >> nn >> nf >> ne;
 
   // resize local vectors.
-  _vertices.resize(nn);
+  _nodes.resize(nn);
   _elements.resize(nf);
 
+  
+  real x=0., y=0., z=0.;
+  
   // Read the nodes
   for (unsigned int n=0; n<nn; n++)
     {
       assert (in.good());
 
-      in >> _vertices[n](0)
-	 >> _vertices[n](1)
-	 >> _vertices[n](2);
+      in >> x
+	 >> y
+	 >> z;
+      
+      node_ptr(n) = Node::build(x,y,z,n);
     };
 
-  unsigned int dummy;
+  unsigned int dummy, n0, n1, n2;
   
   // Read the triangles
   for (unsigned int e=0; e<nf; e++)
@@ -301,9 +300,13 @@ void MeshBase::read_off(std::istream& in)
       in >> dummy;
 
       assert (dummy == 3);
+
+      in >> n0
+	 >> n1
+	 >> n2;
       
-      in >> _elements[e]->node(0)
-	 >> _elements[e]->node(1)
-	 >> _elements[e]->node(2);
+      _elements[e]->set_node(0) = node_ptr(n0);
+      _elements[e]->set_node(1) = node_ptr(n1);
+      _elements[e]->set_node(2) = node_ptr(n2);
     };  
 };

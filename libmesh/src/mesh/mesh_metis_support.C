@@ -1,4 +1,4 @@
-// $Id: mesh_metis_support.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: mesh_metis_support.C,v 1.2 2003-01-20 16:31:41 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -20,13 +20,10 @@
 
 
 // C++ includes
-#include <map>
 #include <math.h>
 
 // Local includes
 #include "mesh_base.h"
-#include "point.h"
-#include "dof_map.h"
 #include "elem.h"
 
 
@@ -40,7 +37,7 @@ extern "C" {
 
 
 void MeshBase::metis_partition(const unsigned int n_sbdmns,
-			       const std::string type)
+			       const std::string& type)
 {
 #ifndef HAVE_METIS
   std::cerr << "ERROR:  Metis not detected during configuration!" << std::endl

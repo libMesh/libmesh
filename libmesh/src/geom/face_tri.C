@@ -1,4 +1,4 @@
-// $Id: face_tri.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: face_tri.C,v 1.2 2003-01-20 16:31:39 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,9 +23,6 @@
 
 // Local includes
 #include "face_tri.h"
-#include "mesh_base.h"
-#include "mesh_refinement.h"
-#include "fe.h"
 
 
 
@@ -34,32 +31,32 @@
 
 // ------------------------------------------------------------
 // Tri class member functions
-Elem Tri::side (const unsigned int i) const
+AutoPtr<Elem> Tri::side (const unsigned int i) const
 {
   assert (i < n_sides());
 
-  Elem edge(2);
+  AutoPtr<Elem> edge(Elem::build(EDGE2));
 
   switch (i)
     {
     case 0:
       {
-	edge.node(0) = node(0);
-	edge.node(1) = node(1);
+	edge->set_node(0) = get_node(0);
+	edge->set_node(1) = get_node(1);
 	
 	return edge;
       }
     case 1:
       {
-	edge.node(0) = node(1);
-	edge.node(1) = node(2);
+	edge->set_node(0) = get_node(1);
+	edge->set_node(1) = get_node(2);
 	
 	return edge;
       }
     case 2:
       {
-	edge.node(0) = node(2);
-	edge.node(1) = node(0);
+	edge->set_node(0) = get_node(2);
+	edge->set_node(1) = get_node(0);
 	
 	return edge;
       }
@@ -71,6 +68,7 @@ Elem Tri::side (const unsigned int i) const
 
   
   // We will never get here...  Look at the code above.
+  error();
   return edge;
 };
 
@@ -79,7 +77,7 @@ Elem Tri::side (const unsigned int i) const
 
 
 
-real Tri::quality (const MeshBase& mesh, const ElemQuality q) const
+real Tri::quality (const ElemQuality) const
 {
   return 0.; // not implemented
 }

@@ -1,5 +1,5 @@
 dnl --------------------------------------------------------------
-dnl $Id: configure.in,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+dnl $Id: configure.in,v 1.2 2003-01-20 16:31:20 jwpeterson Exp $
 dnl --------------------------------------------------------------
 dnl Process this file with autoconf to produce a configure script.
 
@@ -9,7 +9,7 @@ dnl you call ./configure subsequently on different systems without
 dnl clearing the cache 
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
-AC_REVISION($Revision: 1.1.1.1 $)
+AC_REVISION($Revision: 1.2 $)
 
 
 AC_INIT(Make.common.in)
@@ -28,11 +28,14 @@ AC_SUBST(GXX_VERSION)
 AC_SUBST(CXXFLAGSG)
 AC_SUBST(CXXFLAGSO)
 AC_SUBST(CXXFLAGSP)
+AC_SUBST(CXXFLAGSS)
 AC_SUBST(CFLAGSG)
 AC_SUBST(CFLAGSO)
 AC_SUBST(CFLAGSP)
+AC_SUBST(CFLAGSS)
 AC_SUBST(LDFLAGS)
 AC_SUBST(CXXDEPFLAG)
+AC_SUBST(CXXSHAREDFLAG)
 
 
 dnl --------------------------------------------------------------
@@ -344,7 +347,7 @@ if test "$enableperflog" != no ; then
            [Flag indicating if the library should be built with performance logging support])
   AC_MSG_RESULT(<<< Configuring library with performance logging support >>>)
 fi
-dnl -------------------------------------------------------------
+dnl ------------------------------------------------------------
  
 
 
@@ -353,6 +356,19 @@ dnl Doxygen - look for doxygen (a documentation tool)
 dnl -------------------------------------------------------------
 AC_PATH_PROG(DOXYGEN, doxygen)
 AC_SUBST(DOXYGEN)
+if test x$DOXYGEN != x ; then
+  dnl -------------------------------------------------------------
+  dnl Dot -- lets doxygen generate pretty class diagrams
+  dnl -------------------------------------------------------------
+  AC_PATH_PROG(DOT, dot)
+  HAVE_DOT=NO
+  if test x$DOT != x ; then
+    HAVE_DOT=YES
+    DOTPATH=`dirname $DOT`
+    AC_SUBST(DOTPATH)
+  fi
+  AC_SUBST(HAVE_DOT)
+fi
 dnl -------------------------------------------------------------
 
 
@@ -361,9 +377,19 @@ dnl end of --disable-optional test
    AC_MSG_RESULT(--- Done configuring for optional packages ---)
    AC_MSG_RESULT(----------------------------------------------)
 fi
+ 
+
+
+dnl -------------------------------------------------------------
+dnl Perl - look for perl.  Perl is used to generate dependencies
+dnl -------------------------------------------------------------
+AC_PATH_PROG(PERL, perl)
+AC_SUBST(PERL)
+dnl -------------------------------------------------------------
 
 
 AC_OUTPUT(Make.common:Make.common.in)
+AC_OUTPUT(doc/Doxyfile:doc/Doxyfile.in)
 rm -f conftest* config.cache config.status
 
 

@@ -1,4 +1,4 @@
-// $Id: sphere.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: sphere.C,v 1.2 2003-01-20 16:31:39 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -20,7 +20,6 @@
 
 
 // C++ includes
-#include <iostream>
 #include <math.h>
 
 
@@ -48,10 +47,11 @@ Sphere::Sphere (const Point& c,
 
 
 
-Sphere::Sphere (const Sphere& other_sphere)
+Sphere::Sphere (const Sphere& other_sphere) :
+  Surface()
 {
-  cent = other_sphere.cent;
-  rad = other_sphere.rad;
+  create_from_center_radius (other_sphere.cent,
+			     other_sphere.rad);
 };
 
 

@@ -1,4 +1,4 @@
-// $Id: mesh.h,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: mesh.h,v 1.2 2003-01-20 16:31:22 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -25,25 +25,18 @@
 
 
 // C++ Includes   -----------------------------------
-#include <iostream>
-#include <vector>
-#include <string>
-#include <map>
-#include <set>
-
 
 
 // Local Includes -----------------------------------
 #include "mesh_base.h"
-#include "boundary_mesh.h"
-#include "boundary_info.h"
 #include "mesh_refinement.h"
-
+#include "boundary_info.h"
 
 
 /**
  * The \p Mesh class is identical to the \p MeshBase class except
- * it contains information about the boundary of the domain.
+ * it contains information about the boundary of the domain and
+ * can be refined since it contains a \p MeshRefinement object.
  */
 
 // ------------------------------------------------------------
@@ -107,7 +100,7 @@ class Mesh : public MeshBase
    * Reads the file specified by \p name.  Attempts to figure out the
    * proper method by the file extension.
    */
-  void read(const std::string name);
+  void read(const std::string& name);
 
   
   /**
@@ -118,7 +111,7 @@ class Mesh : public MeshBase
    * works for \p Mesh since it needs access to the \p boundary_info
    * structure.
    */
-  void read_exd(const std::string name);
+  void read_exd(const std::string& name);
 
   /**
    * Read meshes in mgflo's XDR format.
@@ -126,12 +119,12 @@ class Mesh : public MeshBase
    * mesh file formats.  This method actualy
    * expects an ASCII-file.
    */
-  void read_xdr(const std::string name);
+  void read_xdr(const std::string& name);
 
   /**
    * Same, but expects a true XDR-Encoded binary file.
    */
-  void read_xdr_binary(const std::string name);
+  void read_xdr_binary(const std::string& name);
 
   /**
    * Read solutions in mgflo's XDR format.
@@ -139,33 +132,33 @@ class Mesh : public MeshBase
    * solution file format. This method expects
    * an ASCII file.
    */
-  void read_xdr_soln(const std::string name,
+  void read_xdr_soln(const std::string& name,
 		     std::vector<number>& soln,
 		     std::vector<std::string>& var_names);
 
   /**
    * Same, but expects a true XDR-Encoded binary file.
    */
-  void read_xdr_soln_binary(const std::string name,
+  void read_xdr_soln_binary(const std::string& name,
 			    std::vector<number>& soln,
 			    std::vector<std::string>& var_names);
   
   /** 
    * Read mesh from the file specified by \p name in Universal (unv) format.  
    */
-  void read_unv(const std::string name);
+  void read_unv(const std::string& name);
 
   /**
    * Write the file specified by \p name.  Attempts to figure out the
    * proper method by the file extension.
    */
-  void write(const std::string name);
+  void write(const std::string& name);
   
   /**
    * Write to the file specified by \p name.  Attempts to figure out the
    * proper method by the file extension. Also writes data.
    */
-  void write(const std::string name,
+  void write(const std::string& name,
 	     std::vector<number>& values,
 	     std::vector<std::string>& variable_names);
   
@@ -173,7 +166,7 @@ class Mesh : public MeshBase
    * Write meshes in DIVA's ASCII
    * format for visualization.
    */
-  void write_diva(const std::string name);
+  void write_diva(const std::string& name);
     
   /**
    * Write meshes in mgflo's XDR format.
@@ -181,7 +174,7 @@ class Mesh : public MeshBase
    * meshes in general since they will be
    * hybrid meshes.
    */
-  void write_xdr(const std::string name);
+  void write_xdr(const std::string& name);
 
   /**
    * Write meshes in mgflo's binary XDR format.
@@ -189,21 +182,21 @@ class Mesh : public MeshBase
    * meshes in general since they will be
    * hybrid meshes.
    */
-  void write_xdr_binary(const std::string name);
+  void write_xdr_binary(const std::string& name);
 
   /**
    * Write solutions in mgflo's XDR format.
    * Should be compatible with the mgf
    * solution file format.  Writes an ASCII file.
    */
-  void write_xdr_soln(const std::string name,
+  void write_xdr_soln(const std::string& name,
 		      std::vector<number>& soln,
 		      std::vector<std::string>& var_names);
 
   /**
    * Same, but writes an XDR-Encoded binary file.
    */
-  void write_xdr_soln_binary(const std::string name,
+  void write_xdr_soln_binary(const std::string& name,
 			     std::vector<number>& soln,
 			     std::vector<std::string>& var_names);
 
@@ -235,7 +228,7 @@ class Mesh : public MeshBase
 
   /**
    * After coarsening a mesh it is possible that
-   * there are some voids in the \p vertices and
+   * there are some voids in the \p nodes and
    * \p elements vectors that need to be cleaned
    * up.  This functions does that.  The indices
    * of the entities to be removed are contained

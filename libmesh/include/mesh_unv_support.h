@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.h,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: mesh_unv_support.h,v 1.2 2003-01-20 16:31:23 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -22,17 +22,13 @@
 #define __mesh_unv_support_h__
 
 // C++ includes
-#include <string>
-#include <vector>
-#include <map>
-#include <iostream>
 #include <fstream>
-
+#include <vector>
 
 // Local includes
 #include "mesh.h"
-#include "elem.h"
-#include "point.h"
+
+
 
 /**
  * Class UnvInterface provides an Interface to
@@ -48,11 +44,11 @@ public:
   /**
    * Constructor.
    * When you create an interface the file will be
-   * read and the vertices and elements will be stored
+   * read and the nodes and elements will be stored
    * in the vectors specified in the arguments
    */
   UnvInterface(std::istream& _in,
-	       std::vector<Point>& _vertices,
+	       std::vector<Node*>&  _nodes,
 	       std::vector<Elem*>& _elements);
   
   /**
@@ -101,35 +97,61 @@ protected:
   std::string& D_to_e(std::string& number);
 
 
-  // References
-  std::istream& phys_file;                // input stream, physical file
-  std::vector<Point>& vertices;           // vector holding the nodes
-  std::vector<Elem*>& elements;           // vector holding the elements
+  /**
+   * input stream, physical file
+   */
+  std::istream& phys_file;     
 
-  // stores new positions of nodes
+  /**
+   * vector holding the nodes
+   */
+  std::vector<Node*>& nodes;    
+
+  /**
+   * vector holding the elements
+   */
+  std::vector<Elem*>& elements; 
+
+  /**
+   * stores new positions of nodes
+   */
   std::map<unsigned int,unsigned int> assign_nodes; 
 
-  // stores positions of datasets in the stream
+  /**
+   * stores positions of datasets in the stream
+   */
   std::map<std::string,std::streampos> ds_position;
 
-  // store the total number of nodes and elements
+  /**
+   * store the total number of nodes and elements
+   */
   unsigned int num_nodes,
                num_elements;
 
 
 private:
 
-  // labels of important datasets
-  std::string label_dataset_nodes,                  // Nodes
-              label_dataset_elms;                   // Elements
+  /**
+   * labels for the node and element datasets
+   */
+  std::string label_dataset_nodes,                  
+              label_dataset_elms;                   
 
     
-  // temporary buffer
+  /**
+   * temporary fstream buffer
+   */
   std::fstream temporary_file;
+
+  /**
+   * temporary character buffer
+   */
   char* temporary_file_name;
 
 
-  // whether we need to convert notation of exponentials
+  /**
+   * whether we need to convert notation of exponentials
+   */
   bool need_D_to_e;
 };
 

@@ -1,4 +1,4 @@
-// $Id: fe_monomial.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: fe_monomial.C,v 1.2 2003-01-20 16:31:33 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -21,8 +21,6 @@
 
 // Local includes
 #include "fe.h"
-#include "quadrature.h"
-#include "point.h"
 #include "elem.h"
 
 
@@ -31,8 +29,7 @@
 // ------------------------------------------------------------
 // Monomials-specific implementations
 template <unsigned int Dim, FEFamily T>
-void FE<Dim,T>::nodal_soln(const MeshBase& mesh,
-			   const Elem* elem,
+void FE<Dim,T>::nodal_soln(const Elem* elem,
 			   const Order order,
 			   const std::vector<number>& elem_soln,
 			   std::vector<number>&       nodal_soln)
@@ -74,9 +71,8 @@ void FE<Dim,T>::nodal_soln(const MeshBase& mesh,
 	
 	for (unsigned int n=0; n<n_nodes; n++)
 	  {
-	    const Point mapped_point = FE<Dim,T>::inverse_map(mesh,
-							      elem,
-							      mesh.vertex(elem->node(n)));
+	    const Point mapped_point = FE<Dim,T>::inverse_map(elem,
+							      elem->point(n));
 
 	    assert (elem_soln.size() == n_sf);
 
@@ -270,9 +266,9 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 
 
 template <unsigned int Dim, FEFamily T>
-unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
-				       const Order o,
-				       const unsigned int n)
+unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType,
+				       const Order,
+				       const unsigned int)
 {
   // Monomials elements have no dofs at nodes
   // (just on the element)
@@ -313,7 +309,7 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 	    return 3;
 
 	    // 3D linears have 4 DOFs per element
-	  case TET4:
+ 	  case TET4:
 	  case TET10:
 	  case HEX8:
 	  case HEX20:

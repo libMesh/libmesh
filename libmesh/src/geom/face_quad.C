@@ -1,4 +1,4 @@
-// $Id: face_quad.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: face_quad.C,v 1.2 2003-01-20 16:31:38 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,47 +23,44 @@
 
 // Local includes
 #include "face_quad.h"
-#include "mesh_base.h"
-#include "mesh_refinement.h"
-#include "fe.h"
 
 
 
 // ------------------------------------------------------------
 // Quad class member functions
-Elem Quad::side (const unsigned int i) const
+AutoPtr<Elem> Quad::side (const unsigned int i) const
 {
   assert (i < n_sides());
 
-  Elem edge(2);
+  AutoPtr<Elem> edge(Elem::build(EDGE2));
 
   switch (i)
     {
     case 0:
       {
-	edge.node(0) = node(0);
-	edge.node(1) = node(1);
+	edge->set_node(0) = get_node(0);
+	edge->set_node(1) = get_node(1);
 	
 	return edge;
       }
     case 1:
       {
-	edge.node(0) = node(1);
-	edge.node(1) = node(2);
+	edge->set_node(0) = get_node(1);
+	edge->set_node(1) = get_node(2);
 	
 	return edge;
       }
     case 2:
       {
-	edge.node(0) = node(2);
-	edge.node(1) = node(3);
+	edge->set_node(0) = get_node(2);
+	edge->set_node(1) = get_node(3);
 	
 	return edge;
       }
     case 3:
       {
-	edge.node(0) = node(3);
-	edge.node(1) = node(0);
+	edge->set_node(0) = get_node(3);
+	edge->set_node(1) = get_node(0);
 	
 	return edge;
       }
@@ -75,8 +72,7 @@ Elem Quad::side (const unsigned int i) const
 
 
   // We will never get here...  Look at the code above.
-  error();
-  
+  error();  
   return edge;
 };
 
@@ -84,7 +80,7 @@ Elem Quad::side (const unsigned int i) const
 
 
 
-real Quad::quality (const MeshBase& mesh, const ElemQuality q) const
+real Quad::quality (const ElemQuality) const
 {
   return 0.0; // Not implemented
 }

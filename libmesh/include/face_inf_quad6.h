@@ -1,4 +1,4 @@
-// $Id: face_inf_quad6.h,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: face_inf_quad6.h,v 1.2 2003-01-20 16:31:22 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -29,8 +29,6 @@
 
 
 // C++ includes
-//#include <iostream>
-//#include <vector>
 
 
 // Local includes
@@ -39,7 +37,6 @@
 
 
 // Forward declarations
-//class Mesh;
 
 
 
@@ -106,12 +103,19 @@ public:
    * @returns an EDGE3 for the base (0) side, an INFEDGE2 for
    * the sides 1, 3. Side 2 no supported.
    */
-  std::auto_ptr<Elem> build_side (const unsigned int i) const;
+  AutoPtr<Elem> build_side (const unsigned int i) const;
 
   const std::vector<unsigned int> tecplot_connectivity(const unsigned int sf=0) const;
   
-  //void write_tecplot_connectivity(std::ostream &out) const;
+  void vtk_connectivity(const unsigned int,
+			std::vector<unsigned int>*) const
+  { error(); };
   
+  unsigned int vtk_element_type (const unsigned int) const
+  { return 9; };
+  
+  void write_tecplot_connectivity(std::ostream&) const
+  { error(); };
   
 #ifdef ENABLE_AMR
 

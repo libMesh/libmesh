@@ -1,4 +1,4 @@
-// $Id: cell_tet.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: cell_tet.C,v 1.2 2003-01-20 16:31:36 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -22,54 +22,52 @@
 
 // Local includes
 #include "mesh.h"
-
-// Temporary includes
 #include "cell_tet.h"
-#include "face_tri3.h"
 
 
 
 
 // ------------------------------------------------------------
 // Tet class member functions
-Elem Tet::side (const unsigned int i) const
+AutoPtr<Elem> Tet::side (const unsigned int i) const
 {
   assert (i < n_sides());
-  assert (_nodes.size() == n_nodes());
 
-  Elem face(3);
+
+  
+  AutoPtr<Elem> face(Elem::build(TRI3));
   
   switch (i)
     {
     case 0:
       {
-	face.node(0) = node(0);
-	face.node(1) = node(2);
-	face.node(2) = node(1);
+	face->set_node(0) = get_node(0);
+	face->set_node(1) = get_node(2);
+	face->set_node(2) = get_node(1);
 
 	return face;
       }
     case 1:
       {
-	face.node(0) = node(0);
-	face.node(1) = node(1);
-	face.node(2) = node(3);
+	face->set_node(0) = get_node(0);
+	face->set_node(1) = get_node(1);
+	face->set_node(2) = get_node(3);
 
 	return face;
       }
     case 2:
       {
-	face.node(0) = node(1);
-	face.node(1) = node(2);
-	face.node(2) = node(3);
+	face->set_node(0) = get_node(1);
+	face->set_node(1) = get_node(2);
+	face->set_node(2) = get_node(3);
 
 	return face;
       }
     case 3:
       {
-	face.node(0) = node(2);
-	face.node(1) = node(0);
-	face.node(2) = node(3);
+	face->set_node(0) = get_node(2);
+	face->set_node(1) = get_node(0);
+	face->set_node(2) = get_node(3);
 	
 	return face;
       }
@@ -81,13 +79,12 @@ Elem Tet::side (const unsigned int i) const
 
   // We'll never get here.
   error();
-
   return face;
 };
 
 
 
-real Tet::quality(const MeshBase& mesh, const ElemQuality q) const
+real Tet::quality(const ElemQuality) const
 {
   return -1.0; // Not implemented
 }

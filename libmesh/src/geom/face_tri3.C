@@ -1,4 +1,4 @@
-// $Id: face_tri3.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: face_tri3.C,v 1.2 2003-01-20 16:31:39 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -82,7 +82,7 @@ const unsigned int Tri3::side_children_matrix[3][2] =
 
 // ------------------------------------------------------------
 // Tri3 class member functions
-std::auto_ptr<Elem> Tri3::build_side (const unsigned int i) const
+AutoPtr<Elem> Tri3::build_side (const unsigned int i) const
 {
   assert (i < n_sides());
 
@@ -93,24 +93,24 @@ std::auto_ptr<Elem> Tri3::build_side (const unsigned int i) const
     {
     case 0:
       {
-	edge->node(0) = node(0);
-	edge->node(1) = node(1);
+	edge->set_node(0) = get_node(0);
+	edge->set_node(1) = get_node(1);
 	
-	std::auto_ptr<Elem> ap(edge);  return ap;
+	AutoPtr<Elem> ap(edge);  return ap;
       }
     case 1:
       {
-	edge->node(0) = node(1);
-	edge->node(1) = node(2);
+	edge->set_node(0) = get_node(1);
+	edge->set_node(1) = get_node(2);
 	
-	std::auto_ptr<Elem> ap(edge);  return ap;
+	AutoPtr<Elem> ap(edge);  return ap;
       }
     case 2:
       {
-	edge->node(0) = node(2);
-	edge->node(1) = node(0);
+	edge->set_node(0) = get_node(2);
+	edge->set_node(1) = get_node(0);
 	
-	std::auto_ptr<Elem> ap(edge);  return ap;
+	AutoPtr<Elem> ap(edge);  return ap;
       }
     default:
       {
@@ -121,7 +121,7 @@ std::auto_ptr<Elem> Tri3::build_side (const unsigned int i) const
   
   // We will never get here...  Look at the code above.
   error();
-  std::auto_ptr<Elem> ap(NULL);  return ap;
+  AutoPtr<Elem> ap(NULL);  return ap;
 };
 
 
@@ -144,12 +144,10 @@ const std::vector<unsigned int> Tri3::tecplot_connectivity(const unsigned int sf
 
 
 
-
-
 void Tri3::vtk_connectivity(const unsigned int sf,
 			    std::vector<unsigned int> *conn) const
 {
-  assert (!_nodes.empty());
+  assert (_nodes != NULL);
   assert (sf < n_sub_elem());
   
   if (conn == NULL)
@@ -162,15 +160,6 @@ void Tri3::vtk_connectivity(const unsigned int sf,
   (*conn)[2] = node(2);
 
   return;
-};
-
-
-
-
-
-unsigned int Tri3::vtk_element_type (const unsigned int sc) const
-{
-  return 5;
 };
 
 
@@ -208,14 +197,14 @@ void Tri3::refine(Mesh& mesh)
       for (unsigned int nc=0; nc<child(c)->n_nodes(); nc++)
 	for (unsigned int n=0; n<n_nodes(); n++)
 	  if (embedding_matrix[c][nc][n] != 0.)
-	    p[c][nc] += mesh.vertex(node(n))*embedding_matrix[c][nc][n];
+	    p[c][nc] += point(n)*embedding_matrix[c][nc][n];
     
     
     // assign nodes to children & add them to the mesh
     for (unsigned int c=0; c<n_children(); c++)
       {
 	for (unsigned int nc=0; nc<child(c)->n_nodes(); nc++)
-	  _children[c]->node(nc) = mesh.mesh_refinement.add_node(p[c][nc]);
+	  _children[c]->set_node(nc) = mesh.mesh_refinement.add_point(p[c][nc]);
 
 	mesh.add_elem(child(c), mesh.mesh_refinement.new_element_number());
       };

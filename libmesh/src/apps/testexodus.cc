@@ -6,9 +6,9 @@
 
 // Local Includes
 #include "mesh_config.h"
-#include "reference_counter.h"
 #include "mesh.h"
-#include "quadrature.h"
+#include "quadrature_gauss.h"
+#include "quadrature_trap.h"
 #include "fe.h"
 #include "dof_map.h"
 #include "boundary_info.h"
@@ -29,10 +29,10 @@
 
 
 void assemble_primary(EquationSystems& es,
-		      const std::string system_name);
+		      const std::string& system_name);
 
 void assemble_secondary(EquationSystems& es,
-			const std::string system_name);
+			const std::string& system_name);
 
 
 
@@ -127,7 +127,8 @@ int main (int argc, char** argv)
       // Set up the secondary system
       {  
 	es.add_system("secondary");
-	es("secondary").add_variable("w", SECOND);
+	FEType fe_type(SECOND, MONOMIAL);
+	es("secondary").add_variable("w", fe_type);
 	
 	es("secondary").attach_assemble_function(assemble_secondary);
       };
@@ -173,15 +174,13 @@ int main (int argc, char** argv)
   
   PetscFinalize();
 
-  ReferenceCounter::print_info();
-  
   return 0;
 };
   
 
 
 void assemble_primary(EquationSystems& es,
-		      const std::string system_name)
+		      const std::string& system_name)
 {
   assert (system_name == "primary");
   
@@ -196,14 +195,18 @@ void assemble_primary(EquationSystems& es,
   // about the geometry of the problem and the quadrature rule
   FEType fe_type (SECOND);
   
-  std::auto_ptr<FEBase> fe(FEBase::build(mesh, fe_type));
+  AutoPtr<FEBase> fe(FEBase::build(3, fe_type));
   QGauss qrule(dim, FIFTH);
+  //QTrap qrule(dim);
   
   fe->attach_quadrature_rule (&qrule);
   
-  std::auto_ptr<FEBase> fe_face(FEBase::build(mesh, fe_type));
+  AutoPtr<FEBase> fe_face(FEBase::build(3, fe_type));
   QGauss   qface0(dim, FIFTH);
+  //QTrap   qface0(dim);
+  
   QGauss   qface1(dim-1, FIFTH);
+  //QTrap   qface1(dim-1);
   
   fe_face->attach_quadrature_rule(&qface0);
   
@@ -317,7 +320,7 @@ void assemble_primary(EquationSystems& es,
 
 
 void assemble_secondary(EquationSystems& es,
-			const std::string system_name)
+			const std::string& system_name)
 {
   assert (system_name == "secondary");
   
@@ -329,9 +332,9 @@ void assemble_secondary(EquationSystems& es,
   PerfMon pm("Matrix Assembly (secondary)");
 
   // The Finite Element type.
-  FEType fe_type (SECOND);
+  FEType fe_type (es("secondary").dof_map.component_type(0));
   
-  std::auto_ptr<FEBase> fe(FEBase::build(mesh, fe_type));
+  AutoPtr<FEBase> fe(FEBase::build(3, fe_type));
   QGauss qrule(dim, FIFTH);
   
   fe->attach_quadrature_rule (&qrule);

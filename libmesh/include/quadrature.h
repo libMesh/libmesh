@@ -1,4 +1,4 @@
-// $Id: quadrature.h,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: quadrature.h,v 1.2 2003-01-20 16:31:29 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -28,8 +28,8 @@
 // Local includes
 #include "mesh_common.h"
 #include "point.h"
-#include "elem_type.h"
-#include "order.h"
+#include "enum_elem_type.h"
+#include "enum_order.h"
 
 
 
@@ -94,16 +94,16 @@ public:
 
   /**
    * Initializes the data structures to contain a quadrature rule
-   * for an object of type \p type.
+   * for an object of type \p type.  
    */
-  virtual void init (const ElemType _type=INVALID_ELEM) = 0;
+  void init (const ElemType _type=INVALID_ELEM);
   
   /**
    * Initializes the data structures to contain a quadrature rule
    * for side \p side of object of type \p _type.
    */
-  virtual void init (const ElemType _type,
-		     const unsigned int side) = 0;
+  void init (const ElemType _type,
+	     const unsigned int side);
 
   /**
    * @returns the order of the quadrature rule.   
@@ -119,6 +119,114 @@ public:
 
 protected:
 
+  
+  /**
+   * Initializes the 1D quadrature rule by filling the points and
+   * weights vectors with the appropriate values.  The order of
+   * the rule will be defined by the implementing class. 
+   */
+  virtual void init_1D (const ElemType _type=INVALID_ELEM) = 0;
+
+  /**
+   * Initializes the 2D quadrature rule by filling the points and
+   * weights vectors with the appropriate values.  The order of
+   * the rule will be defined by the implementing class.
+   */
+  virtual void init_2D (const ElemType _type=INVALID_ELEM) = 0;
+
+  /**
+   * Initializes the 3D quadrature rule by filling the points and
+   * weights vectors with the appropriate values.  The order of
+   * the rule will be defined by the implementing class.
+   */
+  virtual void init_3D (const ElemType _type=INVALID_ELEM) = 0;
+
+
+  
+  /**
+   * Initialize the 1D quadrature rule for a side (edge).
+   */
+  virtual void init_2D (const ElemType _type,
+			const unsigned int side) = 0;
+  /**
+   * Initialize the 2D quadrature rule for a side (face).
+   */
+  virtual void init_3D (const ElemType _type,
+			const unsigned int side) = 0;
+  
+  /**
+   * Computes the tensor product of
+   * two 1D rules and returns a 2D rule.
+   * Used in the init_2D routines for
+   * quadrilateral element types.
+   */
+  void tensor_product_quad (QBase* q1D);
+
+  /**
+   * Computes the tensor product of
+   * three 1D rules and returns a 3D rule.
+   * Used in the init_3D routines for
+   * hexahedral element types.
+   */
+  void tensor_product_hex (QBase* q1D);
+  
+  /**
+   * Computes the tensor product of
+   * three 1D rules and returns a 3D rule.
+   * Used in the init_3D routines for
+   * hexahedral element types.
+   */
+  void tensor_product_prism (QBase* q1D, QBase* q2D);
+
+  /**
+   * Computes the quadrature rule for side
+   * \p side of a quadrilateral element.
+   * Used by the init_2D routines when passed
+   * a side number.
+   */
+  void side_rule_quad (QBase* q1D, unsigned int side);
+
+  /**
+   * Computes the quadrature rule for side
+   * \p side of a triangular element.
+   * Used by the init_2D routines when passed
+   * a side number.
+   */
+  void side_rule_tri (QBase* q1D, unsigned int side);
+
+  /**
+   * Computes the quadrature rule for side \p side
+   * of a hexahedral element.  (The sides of hexes
+   * are of course quads.)  Used by the init_3D
+   * routines when passed a side number;
+   */
+  void side_rule_hex (QBase* q2D, unsigned int side);
+
+  /**
+   * Computes the quadrature rule for side \p side
+   * of a tetrahedral element. (The sides of tets
+   * are of course tris.)  Used by the init_3D routines
+   * when passed a side number.
+   */
+  void side_rule_tet (QBase* q2D, unsigned int side);
+
+  /**
+   * Computes a quadrature rule for side \p side
+   * of a prismatic element.  (The sides of prisms
+   * can be either tris or quads.)  There is no need
+   * to call init on q2D before calling this routine,
+   * although it shouldn't hurt.
+   */
+  void side_rule_prism (QBase* q2D, unsigned int side);
+
+  /**
+   * Computes a quadrature rule for side \p side of
+   * a pyramid.  (The sides of pyramids are either
+   * tris or quads.)  There is no need to call init
+   * on q2D before calling this routine, although
+   * it shouldn't hurt.
+   */
+  void side_rule_pyramid (QBase* q2D, unsigned int side);
   
   /**
    * The dimension
@@ -149,104 +257,6 @@ protected:
 };
 
 
-
-/**
- * This class implemenets specific orders of Gauss quadrature.
- * Gauss quadrature rules of order \p p have the property of
- * integrating polynomials of degree \p 2p-1 exactly.
- */
-
-// ------------------------------------------------------------
-// QGauss class definition
-
-class QGauss : public QBase
-{
- public:
-
-  /**
-   * Constructor.  Declares the order of the quadrature rule.
-   */
-  QGauss (const unsigned int _dim,
-	  const Order _order=INVALID_ORDER);
-
-  /**
-   * Destructor.
-   */
-  ~QGauss();
-
-  /**
-   * Initializes the data structures to contain a quadrature rule
-   * for an object of type \p _type.
-   */
-  void init(const ElemType _type=INVALID_ELEM);
-  
-  /**
-   * Initializes the data structures to contain a quadrature rule
-   * for side \p side of object of type \p _type.
-   */
-  void init (const ElemType _type,
-	     const unsigned int side);
- private:
-
-  void init_1D (const ElemType _type=INVALID_ELEM);
-  void init_2D (const ElemType _type=INVALID_ELEM);
-  void init_3D (const ElemType _type=INVALID_ELEM);
-  
-  void init_2D (const ElemType _type,
-		const unsigned int side);
-  void init_3D (const ElemType _type,
-		const unsigned int side);
-
-};
-
-
-
-/**
- * This class implemenets trapezoidal quadratue.  These rules
- * sample at the corners and will integrate linears exactly.
- */
-
-// ------------------------------------------------------------
-// QTrap class definition
-
-class QTrap : public QBase
-{
- public:
-
-  /**
-   * Constructor.  Declares the order of the quadrature rule.
-   */
-  QTrap (const unsigned int _dim);
-
-  /**
-   * Destructor.
-   */
-  ~QTrap();
-
-  /**
-   * Initializes the data structures to contain a quadrature rule
-   * for an object of type \p type.
-   */
-  void init(const ElemType _type=INVALID_ELEM);
-  
-  /**
-   * Initializes the data structures to contain a quadrature rule
-   * for side \p side of object of type \p _type.
-   */
-  void init (const ElemType _type,
-	     const unsigned int side);
- private:
-
-  void init_1D (const ElemType _type=INVALID_ELEM);
-  void init_2D (const ElemType _type=INVALID_ELEM);
-  void init_3D (const ElemType _type=INVALID_ELEM);
-  
-  void init_2D (const ElemType _type,
-		const unsigned int side);
-  void init_3D (const ElemType _type,
-		const unsigned int side);
-
-};
 
 
 
@@ -280,56 +290,5 @@ void QBase::print_info() const
       std::cout << "  w=" << _weights[qp] << std::endl << std::endl;
     };
 };
-
-
-// ------------------------------------------------------------
-// QGauss class members
-inline
-QGauss::QGauss(const unsigned int d,
-	       const Order o) : QBase(d,o)
-{
-  // explicitly call the init function in 1D since the
-  // other tensor-product rules require this one.
-  // note that EDGE will not be used internally, however
-  // if we called the function with INVALID_ELEM it would try to
-  // be smart and return, thinking it had already done the work.
-  if (_dim == 1)
-    init(EDGE2);
-};
-
-
-
-
-inline
-QGauss::~QGauss()
-{
-};
-
-
-
-
-// ------------------------------------------------------------
-// QTrap class members
-inline
-QTrap::QTrap(const unsigned int d) : QBase(d,FIRST)
-{
-  // explicitly call the init function in 1D since the
-  // other tensor-product rules require this one.
-  // note that EDGE will not be used internally, however
-  // if we called the function with INVALID_ELEM it would try to
-  // be smart and return, thinking it had already done the work.
-  if (_dim == 1)
-    init(EDGE2);
-};
-
-
-
-
-inline
-QTrap::~QTrap()
-{
-};
-
-
 
 #endif

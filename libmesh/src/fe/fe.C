@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: fe.C,v 1.2 2003-01-20 16:31:32 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -22,7 +22,6 @@
 // Local includes
 #include "fe.h"
 #include "quadrature.h"
-#include "point.h"
 #include "elem.h"
 
 
@@ -30,15 +29,12 @@
 
 // ------------------------------------------------------------
 // FEBase class members
-std::auto_ptr<FEBase> FEBase::build (const MeshBase& m,
-				     const FEType& fet)
+AutoPtr<FEBase> FEBase::build (const unsigned int dim,
+			       const FEType& fet)
 {
-  // The stupid std::auto_ptr<FEBase> ap(); return ap;
+  // The stupid AutoPtr<FEBase> ap(); return ap;
   // construct is required to satisfy IBM's xlC
-
   
-  const unsigned int dim = m.mesh_dimension();
-
   switch (dim)
     {
       // 1D
@@ -48,19 +44,19 @@ std::auto_ptr<FEBase> FEBase::build (const MeshBase& m,
 	  {
 	  case LAGRANGE:
 	    {
-	      std::auto_ptr<FEBase> ap(new FE<1,LAGRANGE>(m,fet));
+	      AutoPtr<FEBase> ap(new FE<1,LAGRANGE>(fet));
 	      return ap;
 	    };
 		   
 	  case HIERARCHIC:
 	    {
-	      std::auto_ptr<FEBase> ap(new FE<1,HIERARCHIC>(m,fet));
+	      AutoPtr<FEBase> ap(new FE<1,HIERARCHIC>(fet));
 	      return ap;
 	    };
 	    
 	  case MONOMIAL:
 	    {
-	      std::auto_ptr<FEBase> ap(new FE<1,MONOMIAL>(m,fet));
+	      AutoPtr<FEBase> ap(new FE<1,MONOMIAL>(fet));
 	      return ap;
 	    };
 	    
@@ -77,19 +73,19 @@ std::auto_ptr<FEBase> FEBase::build (const MeshBase& m,
 	  {
 	  case LAGRANGE:
 	    {
-	      std::auto_ptr<FEBase> ap(new FE<2,LAGRANGE>(m,fet));
+	      AutoPtr<FEBase> ap(new FE<2,LAGRANGE>(fet));
 	      return ap;
 	    };
 	    
 	  case HIERARCHIC:
 	    {
-	      std::auto_ptr<FEBase> ap(new FE<2,HIERARCHIC>(m,fet));
+	      AutoPtr<FEBase> ap(new FE<2,HIERARCHIC>(fet));
 	      return ap;
 	    };
 	    
 	  case MONOMIAL:
 	    {
-	      std::auto_ptr<FEBase> ap(new FE<2,MONOMIAL>(m,fet));
+	      AutoPtr<FEBase> ap(new FE<2,MONOMIAL>(fet));
 	      return ap;
 	    };
 	    
@@ -106,19 +102,19 @@ std::auto_ptr<FEBase> FEBase::build (const MeshBase& m,
 	  {
 	  case LAGRANGE:
 	    {
-	      std::auto_ptr<FEBase> ap(new FE<3,LAGRANGE>(m,fet));
+	      AutoPtr<FEBase> ap(new FE<3,LAGRANGE>(fet));
 	      return ap;
 	    };
 	    
 	  case HIERARCHIC:
 	    {
-	      std::auto_ptr<FEBase> ap(new FE<3,HIERARCHIC>(m,fet));
+	      AutoPtr<FEBase> ap(new FE<3,HIERARCHIC>(fet));
 	      return ap;
 	    };
 	    
 	  case MONOMIAL:
 	    {
-	      std::auto_ptr<FEBase> ap(new FE<3,MONOMIAL>(m,fet));
+	      AutoPtr<FEBase> ap(new FE<3,MONOMIAL>(fet));
 	      return ap;
 	    };
 	    
@@ -132,7 +128,7 @@ std::auto_ptr<FEBase> FEBase::build (const MeshBase& m,
     };
 
   error();
-  std::auto_ptr<FEBase> ap(NULL);
+  AutoPtr<FEBase> ap(NULL);
   return ap;
 };
 
@@ -186,9 +182,10 @@ void FE<Dim,T>::init_shape_functions(const QBase* qrule,
   const unsigned int n_approx_shape_functions = n_shape_functions();
 
   // Number of shape functions used to construt the map
+  // (Lagrange shape functions are used for mapping)
   const unsigned int n_mapping_shape_functions =
-    n_shape_functions (mapping_elem_type,
-		       mapping_order);
+    FE<Dim,LAGRANGE>::n_shape_functions (mapping_elem_type,
+					 mapping_order);
 
   // The number and location of the quadrature points.
   const unsigned int        n_qp = qrule->n_points();

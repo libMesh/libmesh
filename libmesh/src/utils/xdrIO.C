@@ -1,4 +1,4 @@
-// "$Id: xdrIO.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $\n"
+// "$Id: xdrIO.C,v 1.2 2003-01-20 16:31:47 jwpeterson Exp $\n"
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -18,11 +18,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-
 #include "mesh_common.h"
 
-#include <iostream>
-#include <string>
+// C++ includes
 #ifdef HAVE_RPC_RPC_H
 # include <rpc/rpc.h>
 #endif
@@ -81,7 +79,7 @@ const Originator XdrIO::get_originator()
 
 
 
-void XdrIO::init(XdrIO::XdrIO_TYPE t, const char* fn, const char* fileType, int icnt)
+void XdrIO::init(XdrIO::XdrIO_TYPE t, const char* fn, const char*, int)
 {
   m_type=t;
   if (mp_fp) fini(); // Close old file if necessary

@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: elem.C,v 1.2 2003-01-20 16:31:37 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -22,19 +22,15 @@
 // C++ includes
 #include <algorithm>
 #include <iterator>
+#include <set>
 
 // Local includes
 #include "elem.h"
-#include "mesh.h"
-#include "cell.h"
+#include "fe_type.h"
 #include "fe_interface.h"
-
-// Temporary 1D element includes
 #include "edge_edge2.h"
 #include "edge_edge3.h"
 #include "edge_inf_edge2.h"
-
-// Temporary 2D element includes
 #include "face_tri3.h"
 #include "face_tri6.h"
 #include "face_quad4.h"
@@ -42,8 +38,6 @@
 #include "face_quad9.h"
 #include "face_inf_quad4.h"
 #include "face_inf_quad6.h"
-
-// Temporary 3D element includes
 #include "cell_tet.h"
 #include "cell_tet4.h"
 #include "cell_tet10.h"
@@ -223,7 +217,7 @@ unsigned int Elem::which_neighbor_am_i (const Elem* e) const
 void Elem::write_tecplot_connectivity(std::ostream& out) const
 {
   assert (out.good());
-  assert (!_nodes.empty());
+  assert (_nodes != NULL);
   
   for (unsigned int sc=0; sc<n_sub_elem(); sc++)
     {
@@ -244,29 +238,11 @@ void Elem::write_tecplot_connectivity(std::ostream& out) const
 
 
 
-unsigned int Elem::node (const unsigned int i) const
-{
-  assert (i < n_nodes());
-
-  return _nodes[i];
-};
-
-
-
-unsigned int & Elem::node (const unsigned int i)
-{
-  assert (i < n_nodes());
-
-  return _nodes[i];
-};
-
-
-
 unsigned int Elem::key() const
 {
   assert (n_nodes());
-
-  return key(_nodes);
+  
+  return key (get_nodes());
 };
 
 
@@ -290,29 +266,27 @@ unsigned int Elem::key(std::vector<unsigned int> vec) const
 
 
 
-Point Elem::centroid(const MeshBase& mesh) const
+Point Elem::centroid() const
 {
   Point cp;
 
   for (unsigned int n=0; n<n_vertices(); n++)
-    cp += mesh.vertex(node(n));
+    cp += point(n);
 
   return cp/((real) n_vertices());    
 };
 
 
 
-real Elem::hmin(const MeshBase& mesh) const
+real Elem::hmin() const
 {
   real h_min=1.e30;
 
   for (unsigned int n_outer=0; n_outer<n_vertices(); n_outer++)
     for (unsigned int n_inner=0; n_inner<n_vertices(); n_inner++)
-      if (n_outer != n_inner)
+      if (n_outer != n_inner) // would create false 0
 	{
-	  const Point diff = (mesh.vertex(node(n_outer)) -
-			      mesh.vertex(node(n_inner))
-			      );
+	  const Point diff = (point(n_outer) - point(n_inner));
 	  
 	  h_min = std::min(h_min,diff.size());
 	};
@@ -322,17 +296,15 @@ real Elem::hmin(const MeshBase& mesh) const
 
 
 
-real Elem::hmax(const MeshBase& mesh) const
+real Elem::hmax() const
 {
   real h_max=0;
 
   for (unsigned int n_outer=0; n_outer<n_vertices(); n_outer++)
     for (unsigned int n_inner=0; n_inner<n_vertices(); n_inner++)
-      if (n_outer != n_inner)
+      if (n_outer != n_inner) // will be 0, definately _not_ max
 	{
-	  const Point diff = (mesh.vertex(node(n_outer)) -
-			      mesh.vertex(node(n_inner))
-			      );
+	  const Point diff = (point(n_outer) - point(n_inner));
 	  
 	  h_max = std::max(h_max,diff.size());
 	};
@@ -342,14 +314,13 @@ real Elem::hmax(const MeshBase& mesh) const
 
 
 
-real Elem::length(const MeshBase& mesh,
-		  const unsigned int n1, 
+real Elem::length(const unsigned int n1, 
 		  const unsigned int n2) const
 {
   assert ( n1 < n_vertices() );
   assert ( n2 < n_vertices() );
 
-  return (mesh.vertex(node(n1)) - mesh.vertex(node(n2))).size();
+  return (point(n1) - point(n2)).size();
 }
 
 
@@ -357,17 +328,35 @@ real Elem::length(const MeshBase& mesh,
 bool Elem::operator == (const Elem& rhs) const
 {
   assert (n_nodes());
-  
-  std::vector<unsigned int> rnodes = rhs.get_nodes();
-  std::vector<unsigned int> lnodes = get_nodes();
+  assert (rhs.n_nodes());
 
-  // order the vectors
-  std::sort(rnodes.begin(),rnodes.end());
-  std::sort(lnodes.begin(),lnodes.end());
+  // Elements can only be equal if they
+  // contain the same number of nodes.
+  if (n_nodes() == rhs.n_nodes())
+    {
+      // Create a set that contains our global
+      // node numbers and those of our neighbor.
+      // If the set is the same size as the number
+      // of nodes in both elements then they must
+      // be connected to the same nodes.     
+      std::set<unsigned int> nodes_set;
 
-  if (rnodes == lnodes)
-    return true;
- 
+      for (unsigned int n=0; n<n_nodes(); n++)
+	{
+	  nodes_set.insert(node(n));
+	  nodes_set.insert(rhs.node(n));
+	};
+
+      // If this passes the elements are connected
+      // to the same global nodes
+      if (nodes_set.size() == n_nodes())
+	return true;
+    };
+
+  // If we get here it is because the elements either
+  // do not have the same number of nodes or they are
+  // connected to different nodes.  Either way they
+  // are not the same element
   return false;
 };
 
@@ -375,19 +364,31 @@ bool Elem::operator == (const Elem& rhs) const
 
 bool Elem::operator < (const Elem& rhs) const
 {
+  //TODO: [BSK] Is this used anywhere?  If not then it should be deprecated... I am not sure it is right.
+  error();
+  
   assert (n_nodes());
+  assert (rhs.n_nodes());
 
+  // lhs < rhs if lhs has fewer nodes than rhs
   if (n_nodes() < rhs.n_nodes())
     return true;
-  
+
+  // lhs > rhs if lhs has more nodes than rhs
   else if (n_nodes() > rhs.n_nodes())
     return false;
+
+  // Make sure we return false for (a < a)
+  else if (*this == rhs)
+    return false;
   
-  else // n_nodes() == rhs.n_nodes()
-    for (unsigned int n=0; n<n_nodes(); n++)
-      if ((node(n)) < (rhs.node(n)))
-	return true;
-    
+  // n_nodes() == rhs.n_nodes()
+  // lhs < rhs if lhs.node(0) < rhs.node(0),
+  // otherwise lhs >= rhs.
+  else 
+    if (node(0) < rhs.node(0))
+      return true;
+
   return false;
 };    
 
@@ -396,24 +397,24 @@ bool Elem::operator < (const Elem& rhs) const
 void Elem::write_ucd_connectivity(std::ostream &out) const
 {
   assert (out);
-  assert (!_nodes.empty());
+  assert (_nodes != NULL);
 
   // Original Code
-  // for (unsigned int i=0; i<nodes.size(); i++)
-  //     out << node(i)+1 << "\t";
+  for (unsigned int i=0; i<n_nodes(); i++)
+    out << node(i)+1 << "\t";
 
-  // New code
-  std::transform(_nodes.begin(),
-		 _nodes.end(),
-		 std::ostream_iterator<unsigned int>(out, "\t"),
-		 std::bind2nd(std::plus<unsigned int>(), 1));
+  // New code (incompatible with ptr to node data structure
+//   std::transform(_nodes.begin(),
+// 		 _nodes.end(),
+// 		 std::ostream_iterator<unsigned int>(out, "\t"),
+// 		 std::bind2nd(std::plus<unsigned int>(), 1));
 
   out << std::endl;
 };
 
 
 
-real Elem::quality (const MeshBase& mesh, const ElemQuality q) const
+real Elem::quality (const ElemQuality q) const
 {
   switch (q)
     {    
@@ -431,8 +432,8 @@ real Elem::quality (const MeshBase& mesh, const ElemQuality q) const
 		  << std::endl;
 
 	return 1.;
-      }
-    }
+      };
+    };
 
     
     // Will never get here...
@@ -442,8 +443,7 @@ real Elem::quality (const MeshBase& mesh, const ElemQuality q) const
 
 
 
-bool Elem::contains_point (const MeshBase& mesh,
-			   const Point& p) const
+bool Elem::contains_point (const Point& p) const
 {
   // Declare a basic FEType.  Will ue a Lagrange
   // element by default.
@@ -451,11 +451,10 @@ bool Elem::contains_point (const MeshBase& mesh,
   
   const Point mapped_point = FEInterface::inverse_map(dim(),
 						      fe_type,
-						      mesh,
 						      this,
 						      p);
 
-  return FEBase::on_reference_element(mapped_point, type());
+  return FEInterface::on_reference_element(mapped_point, type());
 };
 
 

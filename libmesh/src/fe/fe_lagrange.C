@@ -1,4 +1,4 @@
-// $Id: fe_lagrange.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: fe_lagrange.C,v 1.2 2003-01-20 16:31:33 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -21,8 +21,6 @@
 
 // Local includes
 #include "fe.h"
-#include "quadrature.h"
-#include "point.h"
 #include "elem.h"
 
 
@@ -31,8 +29,7 @@
 // ------------------------------------------------------------
 // Lagrange-specific implementations
 template <unsigned int Dim, FEFamily T>
-void FE<Dim,T>::nodal_soln(const MeshBase& mesh,
-			   const Elem* elem,
+void FE<Dim,T>::nodal_soln(const Elem* elem,
 			   const Order order,
 			   const std::vector<number>& elem_soln,
 			   std::vector<number>&       nodal_soln)
@@ -476,11 +473,12 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 
 
 template <unsigned int Dim, FEFamily T>
-unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
-					const Order o)
+unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType,
+					const Order)
 {
   // Lagrange elements have no dofs per element
   // (just at the nodes)
+  
   return 0;
 };
 

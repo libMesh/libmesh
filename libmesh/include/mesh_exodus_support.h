@@ -1,4 +1,4 @@
-// $Id: mesh_exodus_support.h,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: mesh_exodus_support.h,v 1.2 2003-01-20 16:31:23 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -322,19 +322,53 @@ class ExodusII
   class Conversion
     {
     public:
+
+      /**
+       * Constructor.  Initializes the const private member
+       * variables.
+       */
       Conversion(const int* nm, const int* sm, const ElemType ct) 
 	: node_map(nm),       // Node map for this element
 	side_map(sm),
 	canonical_type(ct)    // Element type name in this code
 	{}
 
+      /**
+       * Returns the ith component of the node map for this
+       * element.  The node map maps the exodusII node numbering
+       * format to this library's format.
+       */
       int get_node_map(int i)          const { return node_map[i]; }
+
+      /**
+       * Returns the ith component of the side map for this
+       * element.  The side map maps the exodusII side numbering
+       * format to this library's format.
+       */
       int get_side_map(int i)          const { return side_map[i]; }
+
+      /**
+       * Returns the canonical element type for this
+       * element.  The canonical element type is the standard
+       * element type understood by this library.
+       */
       ElemType get_canonical_type()    const { return canonical_type; }
 
     private:
+      /**
+       * Pointer to the node map for this element.
+       */
       const int* node_map;
+      
+      /**
+       * Pointer to the side map for this element.
+       */
       const int* side_map;
+
+      /**
+       * The canonical (i.e. standard for this library)
+       * element type.
+       */
       const ElemType canonical_type;
     };
 

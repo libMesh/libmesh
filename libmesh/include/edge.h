@@ -1,4 +1,4 @@
-// $Id: edge.h,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: edge.h,v 1.2 2003-01-20 16:31:21 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,6 @@
 // C++ includes
 
 // Local includes
-#include "mesh_common.h"
 #include "elem.h"
 
 
@@ -35,7 +34,8 @@ class Mesh;
 
 
 /**
- * The \p Edge is an element in 1D.
+ * The \p Edge is an element in 1D. It can be thought of as a
+ * line segment.
  */
 
 // ------------------------------------------------------------
@@ -71,10 +71,31 @@ class Edge : public Elem
   unsigned int n_vertices() const { return 2; };
   
   /**
+   * @returns 0.  All 1D elements have no edges.
+   */  
+  unsigned int n_edges() const { return 0; };
+  
+  /**
+   * @returns 0.  All 1D elements have no faces.
+   */  
+  unsigned int n_faces() const { return 0; };
+  
+  /**
    * @returns 2
    */
   unsigned int n_children() const { return 2; };
 
+  /**
+   * The \p Elem::side() member makes no sense for edges.
+   */
+  AutoPtr<Elem> side (const unsigned int) const
+  { error(); AutoPtr<Elem> ap(NULL); return ap; };
+
+  /**
+   * The \p Elem::build_side() member makes no sense for edges.
+   */
+  AutoPtr<Elem> build_side (const unsigned int) const
+  { error(); AutoPtr<Elem> ap(NULL); return ap; };
   
  private:
   

@@ -1,4 +1,4 @@
-// $Id: cell_tet4.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: cell_tet4.C,v 1.2 2003-01-20 16:31:36 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -22,57 +22,54 @@
 
 // Local includes
 #include "mesh.h"
-
-// Temporary includes
 #include "cell_tet4.h"
-#include "face_tri3.h"
 
 
 
 
 // ------------------------------------------------------------
 // Tet4 class member functions
-std::auto_ptr<Elem> Tet4::build_side (const unsigned int i) const
+AutoPtr<Elem> Tet4::build_side (const unsigned int i) const
 {
   assert (i < n_sides());
-  assert (_nodes.size() == n_nodes());
 
   
-  Tri3* face = new Tri3;
   
+  AutoPtr<Elem> face(Elem::build(TRI3));
+
   switch (i)
     {
     case 0:
       {
-	face->node(0) = node(0);
-	face->node(1) = node(2);
-	face->node(2) = node(1);
+	face->set_node(0) = get_node(0);
+	face->set_node(1) = get_node(2);
+	face->set_node(2) = get_node(1);
 
-	std::auto_ptr<Elem> ap(face);  return ap;
+	return face;
       }
     case 1:
       {
-	face->node(0) = node(0);
-	face->node(1) = node(1);
-	face->node(2) = node(3);
+	face->set_node(0) = get_node(0);
+	face->set_node(1) = get_node(1);
+	face->set_node(2) = get_node(3);
 
-	std::auto_ptr<Elem> ap(face);  return ap;
+	return face;
       }
     case 2:
       {
-	face->node(0) = node(1);
-	face->node(1) = node(2);
-	face->node(2) = node(3);
+	face->set_node(0) = get_node(1);
+	face->set_node(1) = get_node(2);
+	face->set_node(2) = get_node(3);
 
-	std::auto_ptr<Elem> ap(face);  return ap;
+	return face;
       }
     case 3:
       {
-	face->node(0) = node(2);
-	face->node(1) = node(0);
-	face->node(2) = node(3);
+	face->set_node(0) = get_node(2);
+	face->set_node(1) = get_node(0);
+	face->set_node(2) = get_node(3);
 	
-	std::auto_ptr<Elem> ap(face);  return ap;
+	return face;
       }
     default:
       {
@@ -80,17 +77,16 @@ std::auto_ptr<Elem> Tet4::build_side (const unsigned int i) const
       }
     };
 
-  error();
-  
   // We'll never get here.
-  std::auto_ptr<Elem> ap(NULL);  return ap;
+  error();  
+  return face;
 };
 
 
 
 const std::vector<unsigned int> Tet4::tecplot_connectivity(const unsigned int sc) const
 {
-  assert (!_nodes.empty());
+  assert (_nodes != NULL);
   assert (sc < n_sub_elem());
 
   std::vector<unsigned int> conn(8);
@@ -112,7 +108,7 @@ const std::vector<unsigned int> Tet4::tecplot_connectivity(const unsigned int sc
 void Tet4::vtk_connectivity(const unsigned int sc,
 			    std::vector<unsigned int> *conn) const
 {
-  assert (!_nodes.empty());
+  assert (_nodes != NULL);
   assert (sc < n_sub_elem());
   
   if (conn == NULL)
@@ -126,13 +122,6 @@ void Tet4::vtk_connectivity(const unsigned int sc,
   (*conn)[3] = node(3);
 
   return;
-};
-
-
-
-unsigned int Tet4::vtk_element_type (const unsigned int sc) const
-{
-  return 10;
 };
 
 
@@ -256,14 +245,14 @@ void Tet4::refine(Mesh& mesh)
       for (unsigned int nc=0; nc<child(c)->n_nodes(); nc++)
 	for (unsigned int n=0; n<n_nodes(); n++)
 	  if (embedding_matrix[c][nc][n] != 0.)
-	    p[c][nc] += mesh.vertex(node(n))*embedding_matrix[c][nc][n];
+	    p[c][nc] += point(n)*embedding_matrix[c][nc][n];
     
     
     // assign nodes to children & add them to the mesh
     for (unsigned int c=0; c<n_children(); c++)
       {
 	for (unsigned int nc=0; nc<child(c)->n_nodes(); nc++)
-	  _children[c]->node(nc) = mesh.mesh_refinement.add_node(p[c][nc]);
+	  _children[c]->set_node(nc) = mesh.mesh_refinement.add_point(p[c][nc]);
 
 	mesh.add_elem(child(c), mesh.mesh_refinement.new_element_number());
       };

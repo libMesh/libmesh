@@ -1,4 +1,4 @@
-// $Id: face.h,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: face.h,v 1.2 2003-01-20 16:31:22 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,6 @@
 // C++ includes
 
 // Local includes
-#include "mesh_common.h"
 #include "elem.h"
 
 
@@ -59,6 +58,12 @@ public:
    * @returns 2, the dimensionality of the object.
    */
   unsigned int dim () const { return 2; };
+
+  /**
+   * @returns 0.  All 2D elements have no faces, just
+   * edges.
+   */
+  unsigned int n_faces() const { return 0; };
 };
 
 #endif

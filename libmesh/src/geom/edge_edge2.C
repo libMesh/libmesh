@@ -1,4 +1,4 @@
-// $Id: edge_edge2.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: edge_edge2.C,v 1.2 2003-01-20 16:31:37 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -41,7 +41,7 @@ const std::vector<unsigned int> Edge2::tecplot_connectivity(const unsigned int s
 void Edge2::vtk_connectivity(const unsigned int se,
 			     std::vector<unsigned int> *conn) const
 {
-  assert (!_nodes.empty());
+  assert (_nodes != NULL);
   assert (se < n_sub_elem());
   
   if (conn == NULL)
@@ -53,13 +53,6 @@ void Edge2::vtk_connectivity(const unsigned int se,
   (*conn)[1] = node(1);
 
   return;
-};
-
-
-
-unsigned int Edge2::vtk_element_type (const unsigned int sc) const
-{
-  return 3;
 };
 
 

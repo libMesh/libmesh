@@ -1,4 +1,4 @@
-// $Id: factory.h,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: factory.h,v 1.2 2003-01-20 16:31:22 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,12 +24,12 @@
 
 
 // System & C++ includes
-#include <memory>
 #include <string>
 #include <map>
 
 // Local includes
 #include "mesh_common.h"
+#include "auto_ptr.h"
 
 
 
@@ -58,13 +58,13 @@ public:
   /**
    * Builds an object of type Base identified by name.
    */
-  static std::auto_ptr<Base> build(const std::string& name);
+  static AutoPtr<Base> build(const std::string& name);
 
   /**
    * Create a Base class.  Force this to be implemented
    * later.
    */
-  virtual std::auto_ptr<Base> create() = 0;
+  virtual AutoPtr<Base> create() = 0;
 
 private:
 
@@ -99,7 +99,7 @@ private:
   /**
    * @returns a new object of type Derived. 
    */
-  std::auto_ptr<Base> create() { return std::auto_ptr<Base>(new Derived); };
+  AutoPtr<Base> create() { return AutoPtr<Base>(new Derived); };
 };
 
 
@@ -121,7 +121,7 @@ Factory<Base>::Factory(const std::string& name)
 
 template<class Base>
 inline
-std::auto_ptr<Base> Factory<Base>::build(const std::string& name)
+AutoPtr<Base> Factory<Base>::build(const std::string& name)
 {  
   if(!factory_map.count(name))
     {
@@ -133,9 +133,9 @@ std::auto_ptr<Base> Factory<Base>::build(const std::string& name)
 	     it = factory_map.begin(); it != factory_map.end(); ++it)
         std::cerr << "  " << it->first << std::endl;
       
-      return std::auto_ptr<Base>(NULL);
+      return AutoPtr<Base>(NULL);
     }
-  return std::auto_ptr<Base>(factory_map[name]->create());  
+  return AutoPtr<Base>(factory_map[name]->create());  
 };
 
 

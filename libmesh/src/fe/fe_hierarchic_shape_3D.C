@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic_shape_3D.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: fe_hierarchic_shape_3D.C,v 1.2 2003-01-20 16:31:33 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,20 +24,21 @@
 
 // Local includes
 #include "fe.h"
-#include "point.h"
 #include "elem.h"
 
 
 
 
 template <>
-real FE<3,HIERARCHIC>::shape(const ElemType type,
-			     const Order order,
-			     const unsigned int i,
-			     const Point& p)
+real FE<3,HIERARCHIC>::shape(const ElemType,
+			     const Order,
+			     const unsigned int,
+			     const Point&)
 {
-  // Hierarchic polynomials require the element type
-  // because edge and face orientation is needed.
+  std::cerr << "Hierarchic polynomials require the element type\n"
+	    << "because edge and face orientation is needed."
+	    << std::endl;
+  
   error();
   return 0.;
 };
@@ -624,15 +625,17 @@ real FE<3,HIERARCHIC>::shape(const Elem* elem,
 
 
 template <>
-real FE<3,HIERARCHIC>::shape_deriv(const ElemType type,
-				   const Order order,
-				   const unsigned int i,
-				   const unsigned int j,
-				   const Point& p)
+real FE<3,HIERARCHIC>::shape_deriv(const ElemType,
+				   const Order,
+				   const unsigned int,
+				   const unsigned int,
+				   const Point& )
 {
-  // Hierarchic polynomials require the element type
-  // because edge and face orientation is needed.
+  std::cerr << "Hierarchic polynomials require the element type\n"
+	    << "because edge and face orientation is needed."
+	    << std::endl;
   error();
+  
   return 0.;
 };
 

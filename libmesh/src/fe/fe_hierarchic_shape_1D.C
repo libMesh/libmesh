@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic_shape_1D.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: fe_hierarchic_shape_1D.C,v 1.2 2003-01-20 16:31:32 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,14 +24,13 @@
 
 // Local includes
 #include "fe.h"
-#include "point.h"
 #include "elem.h"
 
 
 
 
 template <>
-real FE<1,HIERARCHIC>::shape(const ElemType type,
+real FE<1,HIERARCHIC>::shape(const ElemType,
 			     const Order order,
 			     const unsigned int i,
 			     const Point& p)
@@ -114,7 +113,7 @@ real FE<1,HIERARCHIC>::shape(const Elem* elem,
 
 
 template <>
-real FE<1,HIERARCHIC>::shape_deriv(const ElemType type,
+real FE<1,HIERARCHIC>::shape_deriv(const ElemType,
 				   const Order order,
 				   const unsigned int i,
 				   const unsigned int j,

@@ -1,4 +1,4 @@
-// $Id: fe_type.h,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: fe_type.h,v 1.2 2003-01-20 16:31:22 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,57 +26,8 @@
 
 // Local includes
 #include "mesh_config.h"
-#include "order.h"
-
-
-
-// ------------------------------------------------------------
-// enum ElemType definition
-namespace MeshEnums {
-  
-  /**
-   * \enum MeshEnums::FEFamily defines an \p enum for finite element families.
-   */
-  enum FEFamily {LAGRANGE=0,
-		 HIERARCHIC,
-		 MONOMIAL,
-		 
-#ifdef ENABLE_INFINITE_ELEMENTS
-		 
-                 JACOBI_15_n05,    //   i_max = 17
-                 JACOBI_15_00,     //   i_max = 19
-                 JACOBI_15_05,     //   i_max = 17
-                 JACOBI_20_n05,    //   i_max = 19
-                 JACOBI_20_00,     //   i_max = 19
-                 JACOBI_20_05,     //   i_max = 19
-                 JACOBI_25_n05,    //   i_max = 17
-                 JACOBI_25_00,     //   i_max = 17
-                 JACOBI_25_05,     //   i_max = 17
-                 JACOBI_30_n05,    //   i_max = 19
-                 JACOBI_30_00,     //   i_max = 19
-                 JACOBI_30_05,     //   i_max = 19
-		 LEGENDRE,         //   i_max = 19
-	         LAGRANGE_CONST,
-	         LAGRANGE_FIRST,
-	         LAGRANGE_SECOND,
-	         LAGRANGE_THIRD,
-	         LAGRANGE_FOURTH,
-	         LAGRANGE_FIFTH,
-	         LAGRANGE_SIXTH,
-	         LAGRANGE_SEVENTH,
-	         LAGRANGE_EIGHTH,
-	         LAGRANGE_NINTH,
-	         LAGRANGE_TENTH,
-	         LAGRANGE_ELEVENTH,
-	         LAGRANGE_TWELFTH,
-	         LAGRANGE_THIRTEENTH,
-	         LAGRANGE_FOURTEENTH,
-		 
-#endif
-		 INVALID_FE};
-};
-
-using namespace MeshEnums;
+#include "enum_order.h"
+#include "enum_fe_family.h"
 
 
 
@@ -99,39 +50,66 @@ public:
     order(o),
     family(f)
   {};
-    
-#else
-  
-  /**
-   * Constructor.  Optionally takes the approximation \p Order
-   * and the finite element family \p FEFamily
-   */
-  FEType(const Order    o  = FIRST,
-	 const FEFamily f  = LAGRANGE,
-	 const FEFamily bf = INVALID_FE) :
-    order(o),
-    family(f),
-    base_family(bf)
-  {};
-        
-#endif
-
 
   /**
    * The approximation order of the element.  
    */
   Order order;
-  
+
   /**
    * The type of finite element.  Valid types are \p LAGRANGE,
-   * HIERARCHIC, etc...
+   * \p HIERARCHIC, etc...
+   */
+  FEFamily family;
+    
+#else
+  
+  /**
+   * Constructor.  Provides a uniform interface for non-infinite
+   * elements.
+   */
+  FEType(const Order    o = FIRST,
+	 const FEFamily f = LAGRANGE) :
+    order(o),
+    base_order(o),
+    family(f),
+    base_family(f)
+  {};
+
+  /**
+   * Constructor.  Optionally takes the approximation \p Order
+   * and the finite element family \p FEFamily
+   */
+  FEType(const Order    o,
+	 const Order    bo,
+	 const FEFamily f,
+	 const FEFamily bf) :
+    order(o),
+    base_order(bo),
+    family(f),
+    base_family(bf)
+  {};
+
+  /**
+   * The approximation order in radial direction of the infinite element.  
+   */
+  Order order;
+
+  /**
+   * The approximation order in the base of the infinite element.
+   */
+  Order base_order;
+
+  /**
+   * The type of radial approximation in radial direction.  Valid types are 
+   * \p JACOBI_20_00, \p JACOBI_30_00, \p LEGENDRE, and \p LAGRANGE.
    */
   FEFamily family;
 
-#ifdef ENABLE_INFINITE_ELEMENTS
   /**
-   * For InfFE, \p family contains the radial shape family, while 
-   * \p base_family contains the base shape.
+   * For InfFE, \p family contains the radial shape family, while
+   * \p base_family contains the approximation type in circumferential
+   * direction.  Valid types are \p LAGRANGE, \p HIERARCHIC, etc...
    */
   FEFamily base_family;
   

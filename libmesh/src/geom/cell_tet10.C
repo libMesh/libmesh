@@ -1,4 +1,4 @@
-// $Id: cell_tet10.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: cell_tet10.C,v 1.2 2003-01-20 16:31:36 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -22,68 +22,66 @@
 
 // Local includes
 #include "mesh.h"
-
-// Temporary includes
 #include "cell_tet10.h"
-#include "face_tri6.h"
 
 
 
 
 // ------------------------------------------------------------
 // Tet10 class member functions
-std::auto_ptr<Elem> Tet10::build_side (const unsigned int i) const
+AutoPtr<Elem> Tet10::build_side (const unsigned int i) const
 {
   assert (i < n_sides());
-  assert (_nodes.size() == n_nodes());
 
-  Tri6* face = new Tri6;
+
+  
+  AutoPtr<Elem> face(Elem::build(TRI6));
   
   switch (i)
     {
     case 0:
       {
-	face->node(0) = node(0);
-	face->node(1) = node(2);
-	face->node(2) = node(1);
-	face->node(3) = node(6);
-	face->node(4) = node(5);
-	face->node(5) = node(4);
+	face->set_node(0) = get_node(0);
+	face->set_node(1) = get_node(2);
+	face->set_node(2) = get_node(1);
+	face->set_node(3) = get_node(6);
+	face->set_node(4) = get_node(5);
+	face->set_node(5) = get_node(4);
 
-	std::auto_ptr<Elem> ap(face);  return ap;
+	return face;
       }
     case 1:
       {
-	face->node(0) = node(0);
-	face->node(1) = node(1);
-	face->node(2) = node(3);
-	face->node(3) = node(4);
-	face->node(4) = node(8);
-	face->node(5) = node(7);
+	face->set_node(0) = get_node(0);
+	face->set_node(1) = get_node(1);
+	face->set_node(2) = get_node(3);
+	face->set_node(3) = get_node(4);
+	face->set_node(4) = get_node(8);
+	face->set_node(5) = get_node(7);
 
-	std::auto_ptr<Elem> ap(face);  return ap;
+	return face;
       }
     case 2:
       {
-	face->node(0) = node(1);
-	face->node(1) = node(2);
-	face->node(2) = node(3);
-	face->node(3) = node(5);
-	face->node(4) = node(9);
-	face->node(5) = node(8);
+	face->set_node(0) = get_node(1);
+	face->set_node(1) = get_node(2);
+	face->set_node(2) = get_node(3);
+	face->set_node(3) = get_node(5);
+	face->set_node(4) = get_node(9);
+	face->set_node(5) = get_node(8);
 
-	std::auto_ptr<Elem> ap(face);  return ap;
+	return face;
       }
     case 3:
       {
-	face->node(0) = node(2);
-	face->node(1) = node(0);
-	face->node(2) = node(3);
-	face->node(3) = node(6);
-	face->node(4) = node(7);
-	face->node(5) = node(9);
+	face->set_node(0) = get_node(2);
+	face->set_node(1) = get_node(0);
+	face->set_node(2) = get_node(3);
+	face->set_node(3) = get_node(6);
+	face->set_node(4) = get_node(7);
+	face->set_node(5) = get_node(9);
 
-	std::auto_ptr<Elem> ap(face);  return ap;
+	return face;
       }
     default:
       {
@@ -93,15 +91,14 @@ std::auto_ptr<Elem> Tet10::build_side (const unsigned int i) const
 
   // We'll never get here.
   error();
-
-  std::auto_ptr<Elem> ap(NULL);  return ap;
+  return face;
 };
 
 
 
 const std::vector<unsigned int> Tet10::tecplot_connectivity(const unsigned int sc) const
 {
-  assert (!_nodes.empty());
+  assert (_nodes != NULL);
   assert (sc < n_sub_elem());
 
   std::vector<unsigned int> conn(8);
@@ -236,7 +233,7 @@ const std::vector<unsigned int> Tet10::tecplot_connectivity(const unsigned int s
 void Tet10::vtk_connectivity(const unsigned int sc,
 			     std::vector<unsigned int> *conn) const
 {
-  assert (!_nodes.empty());
+  assert (_nodes != NULL);
   assert (sc < n_sub_elem());
   
   if (conn == NULL)
@@ -334,13 +331,6 @@ void Tet10::vtk_connectivity(const unsigned int sc,
     };
   
   return;
-};
-
-
-
-unsigned int Tet10::vtk_element_type (const unsigned int sc) const
-{
-  return 10;
 };
 
 

@@ -1,4 +1,4 @@
-// $Id: fe_boundary.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: fe_boundary.C,v 1.2 2003-01-20 16:31:32 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -27,7 +27,6 @@
 #include "mesh_common.h"
 #include "fe.h"
 #include "quadrature.h"
-#include "point.h"
 #include "elem.h"
 
 
@@ -35,9 +34,9 @@
 //-------------------------------------------------------
 // Full specialization for 1D when this is a useless method
 template <>
-void FE<1,HIERARCHIC>::reinit(QBase* qside,
-			      const Elem* elem,
-			      const unsigned int s)
+void FE<1,HIERARCHIC>::reinit(QBase*,
+			      const Elem*,
+			      const unsigned int)
 {
   std::cerr << "ERROR: This method only makes sense for 2D, 3D elements!"
 	    << std::endl;
@@ -49,9 +48,9 @@ void FE<1,HIERARCHIC>::reinit(QBase* qside,
 //-------------------------------------------------------
 // Full specialization for 1D when this is a useless method
 template <>
-void FE<1,LAGRANGE>::reinit(QBase* qside,
-			    const Elem* elem,
-			    const unsigned int s)
+void FE<1,LAGRANGE>::reinit(QBase*,
+			    const Elem*,
+			    const unsigned int)
 {
   std::cerr << "ERROR: This method only makes sense for 2D, 3D elements!"
 	    << std::endl;
@@ -63,9 +62,9 @@ void FE<1,LAGRANGE>::reinit(QBase* qside,
 //-------------------------------------------------------
 // Full specialization for 1D when this is a useless method
 template <>
-void FE<1,MONOMIAL>::reinit(QBase* qside,
-			    const Elem* elem,
-			    const unsigned int s)
+void FE<1,MONOMIAL>::reinit(QBase*,
+			    const Elem*,
+			    const unsigned int)
 {
   std::cerr << "ERROR: This method only makes sense for 2D, 3D elements!"
 	    << std::endl;
@@ -86,11 +85,7 @@ void FE<Dim,T>::reinit(QBase* qside,
   // We don't do this for 1D elements!
   assert (Dim != 1);
   
-#ifndef __IBMCPP__
-  const std::auto_ptr<Elem> side = elem->build_side(s);
-#else
-  const std::auto_ptr<Elem> side(elem->build_side(s));
-#endif
+  const AutoPtr<Elem> side(elem->build_side(s));
   
   assert (qside   != NULL);
   assert (qrule   != NULL);
@@ -98,7 +93,7 @@ void FE<Dim,T>::reinit(QBase* qside,
   
   qrule->init(elem->type(), s);
   qside->init(side->type());
-  
+
   assert (qrule->n_points() == qside->n_points());
   
   
@@ -140,11 +135,7 @@ void FE<Dim,T>::init_shape_functions(const QBase* qrule,
   assert (qrule != NULL);
   assert (elem  != NULL);
   
-#ifndef __IBMCPP__
-  const std::auto_ptr<Elem> side = elem->build_side(s);
-#else
-  const std::auto_ptr<Elem> side(elem->build_side(s));
-#endif
+  const AutoPtr<Elem> side(elem->build_side(s));
   
   // The element type and order to use in
   // the map
@@ -201,7 +192,7 @@ void FE<Dim,T>::init_shape_functions(const QBase* qrule,
 	  Point dxyzdxi_map;
 
 	  for (unsigned int i=0; i<n_mapping_shape_functions; i++)
-	    dxyzdxi_map  += mesh.vertex(side->node(i))*dpsidxi_map [i][p];
+	    dxyzdxi_map  += side->point(i)*dpsidxi_map [i][p];
 	  
 	  const Point n(dxyzdxi_map(1), -dxyzdxi_map(0), 0.);
 	  
@@ -219,8 +210,8 @@ void FE<Dim,T>::init_shape_functions(const QBase* qrule,
 
 	  for (unsigned int i=0; i<n_mapping_shape_functions; i++)
 	    {
-	      dxyzdxi_map  += mesh.vertex(side->node(i))*dpsidxi_map [i][p];
-	      dxyzdeta_map += mesh.vertex(side->node(i))*dpsideta_map[i][p];
+	      dxyzdxi_map  += side->point(i)*dpsidxi_map [i][p];
+	      dxyzdeta_map += side->point(i)*dpsideta_map[i][p];
 	    };
 	  
 	  const Point n  = dxyzdxi_map.cross(dxyzdeta_map);
@@ -247,11 +238,7 @@ void FEBase::compute_map(const QBase* qrule,
 	assert (qrule != NULL);
 	assert (elem  != NULL);
 
-#ifndef __IBMCPP__
-	const std::auto_ptr<Elem> side = elem->build_side(s);
-#else
-	const std::auto_ptr<Elem> side(elem->build_side(s));
-#endif
+	const AutoPtr<Elem> side(elem->build_side(s));
 	
 	const unsigned int      n_qp = qrule->n_points();
 	const std::vector<real> & qw = qrule->get_weights();
@@ -279,8 +266,8 @@ void FEBase::compute_map(const QBase* qrule,
 	  for (unsigned int i=0; i<psi_map.size(); i++) // sum over the nodes
 	    for (unsigned int p=0; p<n_qp; p++) // for each quadrature point...
 	      {	  
-		xyz[p]         += mesh.vertex(side->node(i))*psi_map[i][p];
-		dxyzdxi_map[p] += mesh.vertex(side->node(i))*dpsidxi_map[i][p];
+		xyz[p]         += side->point(i)*psi_map[i][p];
+		dxyzdxi_map[p] += side->point(i)*dpsidxi_map[i][p];
 	      };
 	  
 	  
@@ -307,11 +294,7 @@ void FEBase::compute_map(const QBase* qrule,
 	assert (qrule != NULL);
 	assert (elem  != NULL);
 
-#ifndef __IBMCPP__
-	const std::auto_ptr<Elem> side = elem->build_side(s);
-#else
-	const std::auto_ptr<Elem> side(elem->build_side(s));
-#endif
+	const AutoPtr<Elem> side(elem->build_side(s));
   
 	const unsigned int      n_qp = qrule->n_points();
 	const std::vector<real> & qw = qrule->get_weights();
@@ -341,9 +324,9 @@ void FEBase::compute_map(const QBase* qrule,
 	  for (unsigned int i=0; i<psi_map.size(); i++) // sum over the nodes
 	    for (unsigned int p=0; p<n_qp; p++) // for each quadrature point...
 	      {
-		xyz[p]          += mesh.vertex(side->node(i))*psi_map[i][p];
-		dxyzdxi_map[p]  += mesh.vertex(side->node(i))*dpsidxi_map[i][p];
-		dxyzdeta_map[p] += mesh.vertex(side->node(i))*dpsideta_map[i][p];
+		xyz[p]          += side->point(i)*psi_map[i][p];
+		dxyzdxi_map[p]  += side->point(i)*dpsidxi_map[i][p];
+		dxyzdeta_map[p] += side->point(i)*dpsideta_map[i][p];
 	      }
     
     

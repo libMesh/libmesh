@@ -1,4 +1,4 @@
- // $Id: reference_counter.h,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+ // $Id: reference_counter.h,v 1.2 2003-01-20 16:31:29 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -22,34 +22,24 @@
 #ifndef __reference_counter_h__
 #define __reference_counter_h__
 
+// Local includes
+#include "mesh_config.h"
+
+
 // C++ includes
+#ifdef ENABLE_REFERENCE_COUNTING
 #include <iostream>
 #include <string>
 #include <map>
-
-// Local includes
-#include "mesh_config.h"
-#include "mesh_common.h"
-
+#endif
 
 
 
 /**
- * This class implements reference counting. Any class that
- * is derived from this class that properly implements the
- * \p class_name() member will get reference counted, provided
- * that the library is configured with \p --enable-reference-counting.
- * The derived class must call \p increment_constructor_count()
- * in its constructor and \p increment_destructor_count()
- * in its destructor.
- * \par
- * If the library is configured with \p --disable-reference-counting
- * then this class does nothing.  All members are inlined and empty,
- * so they should effectively disappear.
+ * This is the base class for enabling reference counting.  It
+ * should not be used by the user, thus it has a private constructor.
  *
- * \author Benjamin S. Kirk
- * \date 2002-2003
- * \version $Revision: 1.1.1.1 $
+ * \author Benjamin S. Kirk, 2002-2003
  */
 
 // ------------------------------------------------------------
@@ -63,34 +53,19 @@ protected:
    * instantiate a \p ReferenceCounter, only derive
    * from it.
    */
-  ReferenceCounter () {};
+  ReferenceCounter ();
 
 public:
   
   /**
    * Destructor.
    */
-  virtual ~ReferenceCounter () {};
+  virtual ~ReferenceCounter ();
 
   /**
-   * @returns the class name as a \p std::string.  This method
-   * must be implemented in the derived class.
+   * Gets a string containing the reference information.
    */
-  virtual std::string class_name () const = 0;
-
-  /**
-   * Increments the construction counter. Should be called in
-   * the constructor of any derived class that will be
-   * reference counted.
-   */
-  void increment_constructor_count ();
-  
-  /**
-   * Increments the destruction counter. Should be called in
-   * the destructor of any derived class that will be
-   * reference counted.
-   */ 
-  void increment_destructor_count  ();
+  static std::string get_info ();
   
   /**
    * Prints the reference information to \p std::cout.
@@ -98,10 +73,25 @@ public:
   static void print_info ();
 
   
-private:
+protected:
 
   
-#ifdef ENABLE_REFERENCE_COUNTING
+  /**
+   * Increments the construction counter. Should be called in
+   * the constructor of any derived class that will be
+   * reference counted.
+   */
+  void increment_constructor_count (const std::string& name);
+  
+  /**
+   * Increments the destruction counter. Should be called in
+   * the destructor of any derived class that will be
+   * reference counted.
+   */ 
+  void increment_destructor_count (const std::string& name);
+
+
+#if defined(ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
   
   /**
    * Data structure to log the information.  The log is
@@ -113,38 +103,39 @@ private:
   /**
    * Actually holds the data.
    */
-  static Counts counts;
-  
+  static Counts _counts;
+
+  /**
+   * The number of objects.  Print the reference count
+   * information when the number returns to 0.
+   */
+  static unsigned int _n_objects;
 #endif
-  
 };
 
 
 
 // ------------------------------------------------------------
 // ReferenceCounter class inline methods
-inline
-void ReferenceCounter::increment_constructor_count ()
+inline ReferenceCounter::ReferenceCounter()
 {
-#ifdef ENABLE_REFERENCE_COUNTING
-
-  std::pair<unsigned int, unsigned int>& p = counts[class_name()];
-
-  p.first++;
+#if defined(ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
+  
+  _n_objects++;
 
 #endif
 };
 
 
 
-inline
-void ReferenceCounter::increment_destructor_count ()
+inline ReferenceCounter::~ReferenceCounter()
 {
-#ifdef ENABLE_REFERENCE_COUNTING
+#if defined(ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
+  
+  _n_objects--;
 
-  std::pair<unsigned int, unsigned int>& p = counts[class_name()];
-
-  p.second++;
+  if (_n_objects == 0)
+    print_info();
 
 #endif
 };
@@ -154,36 +145,44 @@ void ReferenceCounter::increment_destructor_count ()
 inline
 void ReferenceCounter::print_info ()
 {
-#ifdef ENABLE_REFERENCE_COUNTING
-  
-  for (Counts::iterator it = counts.begin();
-       it != counts.end(); ++it)
-    {
-      const std::string& name         = it->first;
-      const unsigned int creations    = it->second.first;
-      const unsigned int destructions = it->second.second;
+#if defined(ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
 
-      std::cout << name
-		<< " class reference count information:"
-		<< std::endl
-		<< " Creations:    " << creations
-		<< std::endl
-		<< " Destructions: " << destructions
-		<< std::endl;
-
-      if (creations != destructions)
-	std::cout << " WARNING: class "
-		  << name << " "
-		  << creations - destructions
-		  << " items leaked!"
-		  << std::endl;
-      
-    };
+  std::cout << get_info();
 
 #endif
 };
 
+
+
+inline
+void ReferenceCounter::increment_constructor_count (const std::string& name)
+{
+#if defined(ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
+
+  std::pair<unsigned int, unsigned int>& p = _counts[name];
+
+  p.first++;
+
 #endif
+};
+
+
+
+inline
+void ReferenceCounter::increment_destructor_count (const std::string& name)
+{
+#if defined(ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
+
+  std::pair<unsigned int, unsigned int>& p = _counts[name];
+
+  p.second++;
+
+#endif
+};
+
+
+
+#endif // end #ifndef __reference_counter_h__
 
 
 

@@ -1,4 +1,4 @@
-// $Id: mesh_xdr_support.h,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: mesh_xdr_support.h,v 1.2 2003-01-20 16:31:23 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -62,9 +62,9 @@ class XdrInterface
   /**
    * Read OR Write Mesh files
    */
-  void mesh_interface(const std::string name,
+  void mesh_interface(const std::string& name,
 		      const XdrIO::XdrIO_TYPE access,
-		      std::vector<Point>& vertices,
+		      std::vector<Node*>& nodes,
 		      std::vector<Elem*>& elements,
 		      BoundaryInfo& boundary_info,
 		      Mesh& mesh);
@@ -72,14 +72,14 @@ class XdrInterface
   /**
    * Read OR Write Soln files
    */
-  void soln_interface(const std::string name,
+  void soln_interface(const std::string& name,
 		      const XdrIO::XdrIO_TYPE access,
 		      std::vector<number>& soln,
 		      std::vector<std::string>& var_names,
 		      Mesh& mesh);
   
   /*
-  void soln_interface(const std::string name,
+  void soln_interface(const std::string& name,
 		      const XdrIO::XdrIO_TYPE access);
   */
 
@@ -88,7 +88,7 @@ class XdrInterface
   /**
    * Actual implementation of reading OR writing Soln files.
    */
-  void soln_interface_impl(const std::string name,
+  void soln_interface_impl(const std::string& name,
 			   const XdrIO::XdrIO_TYPE access,
 			   std::vector<real>& soln,
 			   std::vector<std::string>& var_names,

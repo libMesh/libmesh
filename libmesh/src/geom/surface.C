@@ -1,4 +1,4 @@
-// $Id: surface.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: surface.C,v 1.2 2003-01-20 16:31:40 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -20,8 +20,6 @@
 
 
 // C++ includes
-#include <iostream>
-
 
 // Local includes
 #include "surface.h"
@@ -30,82 +28,5 @@
 
 // ------------------------------------------------------------
 // Surface class member functions
-Surface::Surface ()
-{
-};
 
-
-
-Surface::Surface (const Surface& other_surface)
-{
-};
-
-
-
-Surface::~Surface ()
-{
-};
-
-
-
-bool Surface::above_surface (const Point& p) const 
-{
-  std::cerr << "ERROR: This method must be implemented in the derived class!"
-	    << std::endl;
-		       
-  error();
-
-  return false;
-};
-
-
-
-bool Surface::below_surface (const Point& p) const 
-{
-  std::cerr << "ERROR: This method must be implemented in the derived class!"
-	    << std::endl;
-		       
-  error();
-
-  return false;
-};
-
-
-
-bool Surface::on_surface (const Point& p) const 
-{
-  std::cerr << "ERROR: This method must be implemented in the derived class!"
-	    << std::endl;
-		       
-  error();
-
-  return false;
-};
-
-
-
-Point Surface::closest_point (const Point& p) const
-{
-  std::cerr << "ERROR: This method must be implemented in the derived class!"
-	    << std::endl;
-		       
-  error();
-
-  Point cp;
-
-  return cp;
-};
-
-
-
-Point Surface::unit_normal (const Point& p) const
-{
-  std::cerr << "ERROR: This method must be implemented in the derived class!"
-	    << std::endl;
-		       
-  error();
-
-  Point n;
-
-  return n;
-};
+// nothing now

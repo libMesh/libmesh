@@ -1,4 +1,4 @@
-// $Id: edge_edge3.h,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: edge_edge3.h,v 1.2 2003-01-20 16:31:21 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -75,14 +75,15 @@ class Edge3 : public Edge
   void vtk_connectivity(const unsigned int sc,
 			std::vector<unsigned int> *conn = NULL) const;
   
-  unsigned int vtk_element_type (const unsigned int sc) const;
+  unsigned int vtk_element_type (const unsigned int) const
+  { return 3; };
   
 #ifdef ENABLE_AMR
 
   /**
    * Refine the element.
    */
-  void refine(Mesh& mesh)
+  void refine(Mesh&)
     { error(); return; };
   
   /**

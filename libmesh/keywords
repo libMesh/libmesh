@@ -25,9 +25,13 @@ class_list=`/usr/bin/ebrowse --very-verbose --output-file=/dev/null ../s3/includ
 counter=0
 declare -a class_array
 
+# Get the enum list and declare an array of enum names
+enum_list=`grep enum include/*.h -h | grep "[ABCDEFGHIJKLMNOPQRSTUVWXYZ]" | grep "{" | cut -d" " -f 4`
+declare -a enum_array
+
 # Throw the classes (only the entries beginning with a capital letter)
 # into the class_array.
-for i in $class_list;
+for i in $class_list $enum_list;
   do
     name=`echo $i | grep "^[ABCDEFGHIJKLMNOPQRSTUVWXYZ]"`
 

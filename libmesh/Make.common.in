@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+# $Id: Make.common.in,v 1.2 2003-01-20 16:31:20 jwpeterson Exp $
 
 
 ###############################################################################
@@ -18,37 +18,49 @@
 #
 ###############################################################################
 
-
 #
 # Figure out the compilation mode based on the
 # environment variable METHOD.
 opt-mode   := off
 debug-mode := off
 prof-mode  := off
+syn-mode   := off
+obj-suffix := @host@.o
 
 #
 # If the user has no environment variable
 # called METHOD, he gets optimized mode.
 ifeq (x$(METHOD),x)
-  opt-mode := on
+  opt-mode   := on
+  obj-suffix := @host@.o
 endif
 
 #
 # If METHOD=opt, compile in optimized mode.
 ifeq ($(METHOD),opt)
-  opt-mode := on
+  opt-mode   := on
+  obj-suffix := @host@.o
 endif
 
 #
 # If METHOD=dbg, compile in debug mode.
 ifeq ($(METHOD),dbg)
   debug-mode := on
+  obj-suffix := @host@.go
 endif
 
 #
 # If METHOD=pro, compile in profiler mode
 ifeq ($(METHOD),pro)
-  prof-mode := on
+  prof-mode  := on
+  obj-suffix := @host@.pgo
+endif
+
+#
+# If METHOD=syn, compile in syntax-checking mode
+ifeq ($(METHOD),syn)
+  syn-mode  := on
+  obj-suffix := @host@.syo
 endif
 
 #
@@ -65,15 +77,10 @@ endif
 
 
 
-
-#
-# Set the current directory.
-pwd := @PWD@
-
 ###############################################################################
 # the following lines will be replaced by the output 
 # of ./configure
-HOSTTYPE             = @host@
+hosttype             = @host@
 
 CXX                  = @CXX@
 CC		     = @CC@
@@ -82,6 +89,7 @@ LIBS                 = @LIBS@
 FLIBS		     = @FLIBS@
 GXX-VERSION          = @GXX_VERSION@
 CXXDEPFLAG           = @CXXDEPFLAG@
+CXXSHAREDFLAG        = @CXXSHAREDFLAG@
 
 enable-netcdf 	     = @enablenetcdf@
 NETCDF_INCLUDE	     = @NETCDF_INCLUDE_PATH@
@@ -113,8 +121,19 @@ TECIO_INCLUDE        = @TECPLOT_INCLUDE_PATH@
 TECIO_LIBRARY        = @TECPLOT_LIBRARY_PATH@
 
 doxygen		     = @DOXYGEN@
+perl                 = @PERL@
 
 enable-optional      = @enableoptional@
+
+
+
+#
+# Set the current directory.
+pwd := @PWD@
+
+#
+# Set the object output directory
+object-dir-prefix  	:= $(hosttype)-$(obj-suffix)
 
 
 
@@ -135,6 +154,12 @@ endif
 ifeq ($(prof-mode),on)
   CXXFLAGS += @CXXFLAGSP@ 
   CFLAGS   += @CFLAGSP@ 
+endif
+
+
+ifeq ($(syn-mode),on)
+  CXXFLAGS += @CXXFLAGSS@ 
+  CFLAGS   += @CFLAGSS@ 
 endif
 
 LIBS += $(LDFLAGS)
@@ -160,9 +185,9 @@ ifeq ($(enable-optional),yes)
   # and the lib
   ifeq ($(enable-metis),yes)
     ifeq ($(enable-shared),yes)
-      LIBS += $(pwd)/contrib/lib/$(HOSTTYPE)/libmetis.so
+      LIBS += $(pwd)/contrib/lib/$(hosttype)/libmetis.so
     else
-      LIBS += $(pwd)/contrib/lib/$(HOSTTYPE)/libmetis.a
+      LIBS += $(pwd)/contrib/lib/$(hosttype)/libmetis.a
     endif
     INCLUDE += -I$(METIS_INCLUDE)
   endif
@@ -171,9 +196,9 @@ ifeq ($(enable-optional),yes)
   # header path and the lib
   ifeq ($(enable-sfc),yes)
     ifeq ($(enable-shared),yes)
-      LIBS += $(pwd)/contrib/lib/$(HOSTTYPE)/libsfcurves.so
+      LIBS += $(pwd)/contrib/lib/$(hosttype)/libsfcurves.so
     else
-      LIBS += $(pwd)/contrib/lib/$(HOSTTYPE)/libsfcurves.a
+      LIBS += $(pwd)/contrib/lib/$(hosttype)/libsfcurves.a
     endif
     INCLUDE += -I$(SFC_INCLUDE)
   endif
@@ -267,23 +292,32 @@ endif
 #
 # How to compile optimized C++
 #
-%.$(HOSTTYPE).o : %.C
+%.@host@.o : %.C
 	@echo "Compiling (in optimized mode) "$<"..."
 	@$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
 
 #
 # How to compile C++ with debugging flags
 #
-%.$(HOSTTYPE).go : %.C
+%.@host@.go : %.C
 	@echo "Compiling (in debug mode) "$<"..."
 	@$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
 
 #
 # How to compile C++ with profiling flags
 #
-%.$(HOSTTYPE).pgo : %.C
+%.@host@.pgo : %.C
 	@echo "Compiling (in profiler mode) "$<"..."
 	@$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
+
+#
+# How to compile C++ with syntax-checking flags
+#
+%.@host@.syo : %.C
+	@echo "Compiling (in syntax-checker mode) "$<"..."
+	@$(CXX) $(CXXFLAGS) $(INCLUDE) -c $<
+	$(shell touch $@)
+
 ###############################################################################
 
 

@@ -1,4 +1,4 @@
-// $Id: fe_interface.h,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: fe_interface.h,v 1.2 2003-01-20 16:31:22 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,15 +23,16 @@
 #define __fe_interface_h__
 
 // C++ includes
+#include <vector>
+
+// Local includes
+#include "point.h"
+#include "enum_elem_type.h"
 
 
 // forward declarations
-
-
-
-// Local includes
-#include "fe.h"
-#include "inf_fe.h"
+class Elem;
+class FEType;
 
 
 /**
@@ -56,13 +57,15 @@
 
 class FEInterface
 {
-public:
+private:
 
   /**
    * Empty constructor. Do not create an object of this type.
    */
   FEInterface();
 
+public:
+  
   /**
    * Destructor.
    */
@@ -70,7 +73,7 @@ public:
 
   /**
    * @returns the number of shape functions associated with this
-   * finite element of type t, order o. 
+   * finite element of type \p fe_t. 
    * Automatically decides which finite element class to use.
    */
   static unsigned int n_shape_functions(const unsigned int dim,
@@ -88,7 +91,7 @@ public:
 
   /**
    * @returns the number of dofs at node n for a finite element
-   * of type t and order o.
+   * of type \p fe_t.
    * Automatically decides which finite element class to use.
    */
   static unsigned int n_dofs_at_node(const unsigned int dim,
@@ -114,7 +117,6 @@ public:
    */
   static void nodal_soln(const unsigned int dim,
 			 const FEType& fe_t,
-			 const MeshBase& mesh,
 			 const Elem* elem,
 			 const std::vector<number>& elem_soln,
 			 std::vector<number>& nodal_soln);
@@ -122,15 +124,24 @@ public:
   /**
    * @returns the location (on the reference element) of the
    * point \p p located in physical space.  This function requires
-   * inverting the (possibly nonlinear) transformation map, so
+   * inverting the (probably nonlinear) transformation map, so
    * it is not trivial.
    */
   static Point inverse_map (const unsigned int dim,
 			    const FEType& fe_t,
-			    const MeshBase& mesh,
 			    const Elem* elem,
 			    const Point& p);
 
+  /**
+   * @returns true if the point p is located on the reference element
+   * for element type t, false otherwise.  Since we are doing floating
+   * point comparisons here the parameter \p eps can be specified to
+   * indicate a tolerance.  For example, \f$ x \le 1 \f$  becomes
+   * \f$ x \le 1 + \epsilon \f$. 
+   */
+  static bool on_reference_element(const Point& p,
+				   const ElemType t,
+				   const real eps=1.e-6);
   /**
    * @returns the value of the \f$ i^{th} \f$ shape function at
    * point \p p. This method allows you to specify the dimension,

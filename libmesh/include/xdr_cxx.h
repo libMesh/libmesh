@@ -1,4 +1,4 @@
-// $Id: xdr_cxx.h,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: xdr_cxx.h,v 1.2 2003-01-20 16:31:30 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -22,8 +22,10 @@
 #ifndef __xdr_cxx_h__
 #define __xdr_cxx_h__
 
+// Local includes
 #include "mesh_common.h"
 
+// C++ includes
 #ifdef HAVE_RPC_RPC_H
 #  include <rpc/rpc.h>
 #endif
@@ -71,7 +73,7 @@ public:
    * Constructor.  Takes the filename and the mode.
    * Valid modes are ENCODE, DECODE, READ, and WRITE.
    */
-  Xdr (const std::string name="", const XdrMODE m=UNKNOWN);
+  Xdr (const std::string& name="", const XdrMODE m=UNKNOWN);
 
   /**
    * Destructor.  Closes the file if it is open.
@@ -81,7 +83,7 @@ public:
   /**
    * Opens the file.
    */ 
-  void open (const std::string name, const XdrMODE m);
+  void open (const std::string& name);
 
   /**
    * Closes the file if it is open.

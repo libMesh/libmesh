@@ -1,4 +1,4 @@
-// $Id: cell_hex.h,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: cell_hex.h,v 1.2 2003-01-20 16:31:21 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -81,13 +81,13 @@ public:
    * @returns a primitive (4-noded) quad for 
    * face i.
    */
-  Elem side (const unsigned int i) const;
+  AutoPtr<Elem> side (const unsigned int i) const;
 
   /**
    * Based on the quality metric q specified by the user,
    * returns a quantitative assessment of element quality.
    */
-  real quality (const MeshBase& mesh, const ElemQuality q) const;
+  real quality (const ElemQuality q) const;
 
   /**
    * Returns the suggested quality bounds for

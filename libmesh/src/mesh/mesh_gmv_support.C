@@ -1,4 +1,4 @@
-// $Id: mesh_gmv_support.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: mesh_gmv_support.C,v 1.2 2003-01-20 16:31:41 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -20,11 +20,8 @@
 
 
 // C++ includes
-#include <iostream>
 #include <iomanip>
 #include <fstream>
-#include <string>
-#include <vector>
 #include <stdio.h>
 
 #ifdef __HP_aCC
@@ -41,13 +38,12 @@
 // Local includes
 #include "equation_systems.h"
 #include "mesh_base.h"
-#include "point.h"
 #include "elem.h"
 
 
 
 
-void MeshBase::write_gmv (const std::string name,
+void MeshBase::write_gmv (const std::string& name,
 			  EquationSystems& es,
 			  const bool write_partitioning)
 {
@@ -74,7 +70,7 @@ void MeshBase::write_gmv (std::ostream& out,
 
 
 
-void MeshBase::write_gmv (const std::string name,
+void MeshBase::write_gmv (const std::string& name,
 			  const std::vector<number>* v,
 			  const std::vector<std::string>* solution_names,
 			  const bool write_partitioning)
@@ -101,17 +97,17 @@ void MeshBase::write_gmv(std::ostream& out,
     out << "gmvinput ascii" << std::endl << std::endl;
     out << "nodes " << n_nodes() << std::endl;
     for (unsigned int v=0; v<n_nodes(); v++)
-      out << vertex(v)(0) << " ";
+      out << point(v)(0) << " ";
          
     out << std::endl;
     
     for (unsigned int v=0; v<n_nodes(); v++)
-      out << vertex(v)(1) << " ";
+      out << point(v)(1) << " ";
     
     out << std::endl;
     
     for (unsigned int v=0; v<n_nodes(); v++)
-      out << vertex(v)(2) << " ";
+      out << point(v)(2) << " ";
      
     out << std::endl << std::endl;
   };
@@ -147,36 +143,36 @@ void MeshBase::write_gmv(std::ostream& out,
 	  for (unsigned int e=0; e<n_elem(); e++)
 	    if (elem(e)->active())
 	      for (unsigned int se=0; se<elem(e)->n_sub_elem(); se++)
-	      {
-		if ((elem(e)->type() == QUAD4) ||
-		    (elem(e)->type() == QUAD8) ||
-		    (elem(e)->type() == QUAD9)
+		{
+		  if ((elem(e)->type() == QUAD4) ||
+		      (elem(e)->type() == QUAD8) ||
+		      (elem(e)->type() == QUAD9)
 #ifdef ENABLE_INFINITE_ELEMENTS
 		      || (elem(e)->type() == INFQUAD4)
 		      || (elem(e)->type() == INFQUAD6)
 #endif
-		    )
-		  {
-		    out << "quad 4" << std::endl;
-		    std::vector<unsigned int> conn = elem(e)->tecplot_connectivity(se);
-		    for (unsigned int i=0; i<conn.size(); i++)
-		      out << conn[i] << " ";
-		  }
-		else if ((elem(e)->type() == TRI3) ||
-			 (elem(e)->type() == TRI6))
-		  {
-		    out << "tri 3" << std::endl;
-		    std::vector<unsigned int> conn = elem(e)->tecplot_connectivity(se);
-		    for (unsigned int i=0; i<3; i++)
-		      out << conn[i] << " ";
-		  }
-		else
-		  {
-		    error();
-		  }
+		      )
+		    {
+		      out << "quad 4" << std::endl;
+		      std::vector<unsigned int> conn = elem(e)->tecplot_connectivity(se);
+		      for (unsigned int i=0; i<conn.size(); i++)
+			out << conn[i] << " ";
+		    }
+		  else if ((elem(e)->type() == TRI3) ||
+			   (elem(e)->type() == TRI6))
+		    {
+		      out << "tri 3" << std::endl;
+		      std::vector<unsigned int> conn = elem(e)->tecplot_connectivity(se);
+		      for (unsigned int i=0; i<3; i++)
+			out << conn[i] << " ";
+		    }
+		  else
+		    {
+		      error();
+		    }
 			 
-		out << std::endl;
-	      };
+		  out << std::endl;
+		};
 	
 	  break;
 	};
@@ -339,7 +335,7 @@ void MeshBase::write_gmv(std::ostream& out,
 
 
 
-void MeshBase::write_gmv_binary (const std::string name,
+void MeshBase::write_gmv_binary (const std::string& name,
 				 EquationSystems& es,
 				 const bool write_partitioning)
 {
@@ -366,10 +362,10 @@ void MeshBase::write_gmv_binary (std::ostream& out,
 
 
 
-void MeshBase::write_gmv_binary (const std::string name,
-					       const std::vector<number>* v,
-					       const std::vector<std::string>* solution_names,
-					       const bool write_partitioning)
+void MeshBase::write_gmv_binary (const std::string& name,
+				 const std::vector<number>* v,
+				 const std::vector<std::string>* solution_names,
+				 const bool write_partitioning)
 {
   std::ofstream out (name.c_str(), std::ios::out|std::ios::binary);
   
@@ -380,9 +376,9 @@ void MeshBase::write_gmv_binary (const std::string name,
 
 
 void MeshBase::write_gmv_binary(std::ostream& out,
-					      const std::vector<number>* v,
-					      const std::vector<std::string>* solution_names,
-					      const bool write_partitioning)
+				const std::vector<number>* v,
+				const std::vector<std::string>* solution_names,
+				const bool write_partitioning)
 {
   assert (out);
 
@@ -415,15 +411,15 @@ void MeshBase::write_gmv_binary(std::ostream& out,
     // write the x coordinate
     float *temp = new float[n_nodes()];
     for (unsigned int v=0; v<n_nodes(); v++)
-      temp[v] = static_cast<float>(vertex(v)(0));
+      temp[v] = static_cast<float>(point(v)(0));
     out.write(reinterpret_cast<char *>(temp), sizeof(float)*n_nodes());
 
     for (unsigned int v=0; v<n_nodes(); v++)
-      temp[v] = static_cast<float>(vertex(v)(1));
+      temp[v] = static_cast<float>(point(v)(1));
     out.write(reinterpret_cast<char *>(temp), sizeof(float)*n_nodes());
 
     for (unsigned int v=0; v<n_nodes(); v++)
-      temp[v] = static_cast<float>(vertex(v)(2));
+      temp[v] = static_cast<float>(point(v)(2));
     out.write(reinterpret_cast<char *>(temp), sizeof(float)*n_nodes());
 
     delete [] temp;
@@ -513,7 +509,7 @@ void MeshBase::write_gmv_binary(std::ostream& out,
   
   
   
-    // optionally write the partition information
+  // optionally write the partition information
   if (write_partitioning)
     {
       strcpy(buf, "material");

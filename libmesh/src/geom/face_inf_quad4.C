@@ -1,4 +1,4 @@
-// $Id: face_inf_quad4.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: face_inf_quad4.C,v 1.2 2003-01-20 16:31:37 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -76,7 +76,7 @@ const unsigned int InfQuad4::side_children_matrix[4][3] =
 
 // ------------------------------------------------------------
 // InfQuad4 class member functions
-std::auto_ptr<Elem> InfQuad4::build_side (const unsigned int i) const
+AutoPtr<Elem> InfQuad4::build_side (const unsigned int i) const
 {
   assert (i < n_sides());
 
@@ -87,20 +87,20 @@ std::auto_ptr<Elem> InfQuad4::build_side (const unsigned int i) const
 	// base face
 	Edge2* edge = new Edge2;
 
-	edge->node(0) = node(0);
-	edge->node(1) = node(1);
+	edge->set_node(0) = get_node(0);
+	edge->set_node(1) = get_node(1);
 	
-	std::auto_ptr<Elem> ap(edge);  return ap;
+	AutoPtr<Elem> ap(edge);  return ap;
       }
     case 1:
       {
 	// adjacent to another infinite element
         InfEdge2* edge = new InfEdge2;
 
-	edge->node(0) = node(1);
-	edge->node(1) = node(2);	
+	edge->set_node(0) = get_node(1);
+	edge->set_node(1) = get_node(2);	
 
-	std::auto_ptr<Elem> ap(edge);  return ap;
+	AutoPtr<Elem> ap(edge);  return ap;
       }
     case 2:
       {
@@ -113,10 +113,10 @@ std::auto_ptr<Elem> InfQuad4::build_side (const unsigned int i) const
 	// adjacent to another infinite element	
 	InfEdge2* edge = new InfEdge2;
 
-	edge->node(0) = node(0); // be aware of swapped nodes,
-	edge->node(1) = node(3); // compared to conventional side numbering
+	edge->set_node(0) = get_node(0); // be aware of swapped nodes,
+	edge->set_node(1) = get_node(3); // compared to conventional side numbering
 
-	std::auto_ptr<Elem> ap(edge);  return ap;
+	AutoPtr<Elem> ap(edge);  return ap;
       }
     default:
       {
@@ -127,7 +127,7 @@ std::auto_ptr<Elem> InfQuad4::build_side (const unsigned int i) const
 
   // We will never get here...  Look at the code above.
   error();
-  std::auto_ptr<Elem> ap(NULL);  return ap;
+  AutoPtr<Elem> ap(NULL);  return ap;
 };
 
 
@@ -185,14 +185,14 @@ void InfQuad4::refine(Mesh& mesh)
       for (unsigned int nc=0; nc<child(c)->n_nodes(); nc++)
 	for (unsigned int n=0; n<n_nodes(); n++)
 	  if (embedding_matrix[c][nc][n] != 0.)
-	    p[c][nc] += mesh.vertex(node(n))*embedding_matrix[c][nc][n];
+	    p[c][nc] += point(n)*embedding_matrix[c][nc][n];
     
     
     // assign nodes to children & add them to the mesh
     for (unsigned int c=0; c<n_children(); c++)
       {
 	for (unsigned int nc=0; nc<child(c)->n_nodes(); nc++)
-	  _children[c]->node(nc) = mesh.mesh_refinement.add_node(p[c][nc]);
+	  _children[c]->set_node(nc) = mesh.mesh_refinement.add_point(p[c][nc]);
 
 	mesh.add_elem(child(c), mesh.mesh_refinement.new_element_number());
       };

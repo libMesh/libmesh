@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+// $Id: mesh_refinement.C,v 1.2 2003-01-20 16:31:41 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -20,15 +20,11 @@
 
 
 // Local includes
-#include "mesh_common.h"
+#include "mesh_config.h"
 
 // only compile these functions if the user requests AMR support
 #ifdef ENABLE_AMR
 
-#include "point.h"
-#include "boundary_mesh.h"
-#include "mesh_refinement.h"
-#include "boundary_info.h"
 #include "mesh.h"
 #include "elem.h"
 
@@ -60,57 +56,44 @@ void MeshRefinement::clear ()
 
 
 
-unsigned int MeshRefinement::add_node(const Point& p, unsigned int key)
+Node* MeshRefinement::add_point(const Point& p)
 {
   // if the new_nodes data structure is empty we need to fill it.
   if (new_nodes.empty())
     for (unsigned int n=0; n<mesh.n_nodes(); n++)
       new_nodes.insert(std::pair<unsigned int,
-		                 unsigned int>(mesh.vertex(n).key(),n));
+		       unsigned int>(mesh.point(n).key(),n));
 
   
   unsigned int n;
-
-  static bool called=false;
-
-  // function should only take the point as input in the future.
-  if (!called)
-    {
-      called = true;
-      here();
-      std::cerr << "FIX DEPRECATED INTERFACE"
-		<< std::endl;
-    };
-
-  
   
   std::pair<std::multimap<unsigned int, unsigned int>::iterator,
-            std::multimap<unsigned int, unsigned int>::iterator>
+    std::multimap<unsigned int, unsigned int>::iterator>
     pos = new_nodes.equal_range(p.key());
   
       
   while (pos.first != pos.second) 
     {                              
-      if (mesh.vertex(pos.first->second) == p)
+      if (mesh.point(pos.first->second) == p)
 	{
 	  n = pos.first->second;
 	  
 	  break;
-	}
+	};
       ++pos.first;
-    }
+    };
   
   if (pos.first == pos.second) // still not found
     {                          // so we better add it
       n = mesh.n_nodes();
       
-      new_nodes.insert(std::pair<unsigned int, unsigned int>(p.key(),n));
-    }
+      new_nodes.insert(pos.first,
+		       std::pair<unsigned int, unsigned int>(p.key(),n));
+    };
+    
   
-  
-  mesh.add_vertex(p,n);
-
-  return n;
+  // Return the address of the new node
+  return mesh.add_point(p,n);
 };
 
 
@@ -125,7 +108,7 @@ unsigned int MeshRefinement::new_element_number()
     {
       n = *unused_elements.begin();
       unused_elements.erase(unused_elements.begin());
-    }
+    };
 
   return n;
 };
@@ -137,15 +120,14 @@ void MeshRefinement::update_unused_database()
   /**
    * Update the unused_elements data structure
    */
-  {
-    // clear and start from scratch
-    unused_elements.clear();
-
-    // find NULL elements and add the index to the database
-    for (unsigned int e=0; e<mesh.n_elem(); e++)
-      if (mesh.elem(e) == NULL)
-	unused_elements.insert(e);
-  };
+  
+  // clear and start from scratch
+  unused_elements.clear();
+  
+  // find NULL elements and add the index to the database
+  for (unsigned int e=0; e<mesh.n_elem(); e++)
+    if (mesh.elem(e) == NULL)
+      unused_elements.insert(e);
 };
 
 
@@ -205,7 +187,7 @@ void MeshRefinement::refine_and_coarsen_elements ()
     {
       assert (mesh.elem(e) != NULL);
       mesh.elem(e)->set_refinement_flag() = Elem::DO_NOTHING;
-    }
+    };
   
   /**
    * Finally, the new elements need to find their neighbors
@@ -243,7 +225,7 @@ bool MeshRefinement::make_coarsening_compatible()
 	  (mesh.elem(e)->level() == 0) &&
 	  (mesh.elem(e)->refinement_flag() == Elem::COARSEN))
 	mesh.elem(e)->set_refinement_flag() = Elem::DO_NOTHING;
-    }
+    };
   
   // if there are no refined elements then
   // there is no work for us to do
