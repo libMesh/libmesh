@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.58 2003-10-01 16:28:51 benkirk Exp $
+// $Id: mesh_base.C,v 1.59 2003-10-01 19:49:46 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -557,8 +557,7 @@ void MeshBase::build_nodes_to_elem_map (std::vector<std::vector<unsigned int> >&
 
 void MeshBase::partition (const unsigned int n_parts)
 {
-  AutoPtr<Partitioner> partitioner = 
-    Factory<Partitioner>::build ("Metis");
+  AutoPtr<Partitioner> partitioner (Factory<Partitioner>::build ("Metis"));
   
   partitioner->partition (*this, n_parts); 
 }
