@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.10 2003-02-04 16:29:49 benkirk Exp $
+# $Id: Make.common.in,v 1.11 2003-02-07 18:05:39 benkirk Exp $
 
 
 ###############################################################################
@@ -91,6 +91,7 @@ FLIBS		     = @FLIBS@
 GXX-VERSION          = @GXX_VERSION@
 CXXDEPFLAG           = @CXXDEPFLAG@
 CXXSHAREDFLAG        = @CXXSHAREDFLAG@
+CSHAREDFLAG          = @CXXSHAREDFLAG@
 
 enable-netcdf 	     = @enablenetcdf@
 NETCDF_INCLUDE	     = @NETCDF_INCLUDE_PATH@
@@ -107,6 +108,9 @@ EXODUS_LIBRARY       = @LIBEXOII@
 
 enable-metis         = @enablemetis@
 METIS_INCLUDE	     = @METIS_INCLUDE_PATH@
+
+enable-laspack       = @enablelaspack@
+LASPACK_INCLUDE	     = @LASPACK_INCLUDE_PATH@
 
 enable-petsc         = @enablepetsc@
 petsc-version        = @petscversion@
@@ -141,7 +145,6 @@ pwd := @PWD@
 mesh_library_dir := $(pwd)/lib/$(hosttype)_$(METHOD)
 
 mesh_library     := $(mesh_library_dir)/libmesh.a
-
 ifeq ($(enable-shared),yes) 
   mesh_library   := $(mesh_library_dir)/libmesh.so
 endif
@@ -189,44 +192,43 @@ endif
 
 INCLUDE += -I$(pwd)/include
 
+EXTERNAL_LIBDIR := $(pwd)/contrib/lib/$(hosttype)_$(METHOD)
+EXTERNAL_LIBEXT := .a
+ifeq ($(enable-shared),yes) 
+  EXTERNAL_LIBEXT := .so
+endif
+
 
 #
 # Optional packages
 ifeq ($(enable-optional),yes)
 
+  # if Laspack is used we need the header path
+  # and the lib
+  ifeq ($(enable-laspack),yes)
+    LIBS    += $(EXTERNAL_LIBDIR)/liblaspack.$(EXTERNAL_LIBEXT)
+    INCLUDE += -I$(LASPACK_INCLUDE)
+  endif
+
   # if Metis is used we need the header path
   # and the lib
   ifeq ($(enable-metis),yes)
-    ifeq ($(enable-shared),yes)
-      LIBS += $(pwd)/contrib/lib/$(hosttype)_$(METHOD)/libmetis.so
-    else
-      LIBS += $(pwd)/contrib/lib/$(hosttype)_$(METHOD)/libmetis.a
-    endif
+    LIBS    += $(EXTERNAL_LIBDIR)/libmetis.$(EXTERNAL_LIBEXT)
     INCLUDE += -I$(METIS_INCLUDE)
   endif
 
   # if Space filling curves are used we need the
   # header path and the lib
   ifeq ($(enable-sfc),yes)
-    ifeq ($(enable-shared),yes)
-      LIBS += $(pwd)/contrib/lib/$(hosttype)_$(METHOD)/libsfcurves.so
-    else
-      LIBS += $(pwd)/contrib/lib/$(hosttype)_$(METHOD)/libsfcurves.a
-    endif
+    LIBS    += $(EXTERNAL_LIBDIR)/libsfcurves.$(EXTERNAL_LIBEXT)
     INCLUDE += -I$(SFC_INCLUDE)
   endif
 
   #if Tecplot is used, link against tecio.a
   ifeq ($(enable-tecplot),yes)
-    LIBS += $(TECIO_LIBRARY)
+    LIBS    += $(TECIO_LIBRARY)
     INCLUDE += -I$(TECIO_INCLUDE)
   endif	
-
-  #if Exodus is used, link against libexoIIv2c.a
-  ifeq ($(enable-exodus),yes)
-    LIBS += $(EXODUS_LIBRARY)
-    INCLUDE += -I$(EXODUS_INCLUDE)
-  endif
 
   #############################################################################
   # Petsc
@@ -287,9 +289,15 @@ ifeq ($(enable-optional),yes)
 	    $(X11_LIB) $(MATLAB_LIB) $(FLIBS)
   endif
 
-endif # End of disable-all test
+endif # End of disable-optional test
 
 
+
+#if Exodus is used, link against libexoIIv2c.a
+ifeq ($(enable-exodus),yes)
+  LIBS += $(EXODUS_LIBRARY)
+  INCLUDE += -I$(EXODUS_INCLUDE)
+endif
 
 #if netCDF is used, link against libnetcdf.a
 # (note that netCDF is required by exodus if available,

@@ -39,6 +39,9 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
+/* Flag indicating whether or not LASPACK iterative solvers are available */
+#undef HAVE_LASPACK
+
 /* Define to 1 if you have the `papi' library (-lpapi). */
 #undef HAVE_LIBPAPI
 

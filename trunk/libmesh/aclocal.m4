@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.8 2003-01-24 17:24:35 jwpeterson Exp $
+dnl $Id: aclocal.m4,v 1.9 2003-02-07 18:05:40 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -468,6 +468,31 @@ AC_DEFUN(CONFIGURE_SFC,
   fi
 
   AC_SUBST(enablesfc)
+])
+dnl -------------------------------------------------------------
+
+
+
+dnl -------------------------------------------------------------
+dnl LASPACK Iterative Solvers
+dnl -------------------------------------------------------------
+AC_DEFUN(CONFIGURE_LASPACK, 
+[
+  AC_CHECK_FILE(./contrib/laspack/lastypes.h,
+                LASPACK_INCLUDE_PATH=$PWD/contrib/laspack)
+
+  if (test -r $LASPACK_INCLUDE_PATH/lastypes.h) ; then
+    AC_SUBST(LASPACK_INCLUDE_PATH)
+    AC_DEFINE(HAVE_LASPACK, 1,
+              [Flag indicating whether or not LASPACK iterative solvers are available])
+    dnl [[ == [, m4 eats brackets.
+    laspack_version=`grep "define LASPACK_VERSION " $LASPACK_INCLUDE_PATH/version.h | sed -e "s/[[^0-9.]]*//g"`
+    AC_MSG_RESULT(<<< Configuring library with LASPACK version $laspack_version support >>>)
+  else
+    enablelaspack=no
+  fi
+
+  AC_SUBST(enablelaspack)
 ])
 dnl -------------------------------------------------------------
 
