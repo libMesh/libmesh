@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.38 2004-03-23 05:16:22 jwpeterson Exp $
+// $Id: mesh.C,v 1.39 2004-05-05 15:23:50 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -37,6 +37,7 @@
 #include "matlab_io.h"
 #include "off_io.h"
 #include "shanee_io.h"
+#include "medit_io.h"
 
 // ------------------------------------------------------------
 // Mesh class member functions
@@ -188,6 +189,12 @@ void Mesh::write (const std::string& name)
     else if (name.rfind(".unv") < name.size())
       UNVIO (*this).write (name);
 
+    else if (name.rfind(".mesh") < name.size())
+      MEDITIO (*this).write (name);
+
+    else if (name.rfind(".poly") < name.size())
+      TetGenIO (*this).write (name);
+
     else
       {
 	std::cerr << " ERROR: Unrecognized file extension: " << name
@@ -201,6 +208,8 @@ void Mesh::write (const std::string& name)
 		  << "     *.xdr   -- Internal binary format,\n"
 		  << "                compatible with XdrMGF\n"
 		  << "     *.unv   -- I-deas Universal format\n"
+	          << "     *.mesh  -- MEdit mesh format\n"
+	          << "     *.poly  -- TetGen ASCII file\n"
 		  << std::endl
 		  << "\n Exiting without writing output\n";
       }    

@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.36 2004-04-20 11:22:19 benkirk Exp $
+# $Id: Make.common.in,v 1.37 2004-05-05 15:23:47 spetersen Exp $
 
 
 ###############################################################################
@@ -49,6 +49,9 @@ petsc-version        = @petscversion@
 petsc-major-minor    = @petscmajorminor@
 PETSC_ARCH           = @PETSC_ARCH@
 PETSC_DIR            = @PETSC_DIR@
+
+# TetGen tetrahedrization library
+enable-tetgen        = @enabletetgen@
 
 # MPI configuration
 # (only explicitly defined when PETSc is absent, otherwise snooped from PETSc)
@@ -255,6 +258,14 @@ ifeq ($(enable-optional),yes)
   #if Tecplot is used, link against tecio.a
   LIBS    += @TECPLOT_LIBRARY@
   INCLUDE += @TECPLOT_INCLUDE@
+
+  #if TetGen is used:
+  ifeq ($(enable-tetgen),yes)
+    CXXFLAGS += -DHAVE_TETGEN	
+    CXXFLAGS += @TETGEN_VERSION@
+    LIBS     += @TETGEN_LIBRARY@
+    INCLUDE  += @TETGEN_INCLUDE@
+  endif
 
   #############################################################################
   # Petsc

@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.19 2004-04-19 17:34:36 benkirk Exp $
+// $Id: mesh_base.h,v 1.20 2004-05-05 15:23:50 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -61,7 +61,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.19 $
+ * \version $Revision: 1.20 $
  */
 
 
@@ -485,6 +485,39 @@ public:
   void write_discontinuous_gmv (const std::string& name, 
 				const EquationSystems& es,
 				const bool write_partitioning) const;
+
+#ifdef HAVE_TETGEN
+
+  /** Method invokes TetGen library to compute a Delaunay tetrahedrization
+      from the point set \p nodes. 
+      See http://tetgen.berlios.de/ for details.
+   */
+  void tetgen_triangulate_pointset();
+
+  /** Method invokes TetGen library to compute a Delaunay tetrahedrization
+      from the point set \p nodes; fills mesh structure with 2D surface elements. 
+      See http://tetgen.berlios.de/ for details.
+   */
+  void tetgen_pointset_convexhull();
+  
+  /** Methods invoke TetGen library to compute a Delaunay tetrahedrization
+      with volume and/or quality boundary constraints.
+      See http://tetgen.berlios.de/ for details.
+   */
+  void tetgen_triangulate();
+  void tetgen_triangulate_qconstraint(double quality_constraint);
+  void tetgen_triangulate_vconstraint(double volume_constraint);
+  void tetgen_triangulate(double quality_constraint, double volume_constraint);
+
+  /** Method invokes TetGen library to compute a Delaunay tetrahedrization
+      with volume and quality boundary constraints; takes another mesh structure as input which
+      is carved out from the main mesh. 
+      See http://tetgen.berlios.de/ for details.
+   */
+  void tetgen_triangulate_carvehole(std::vector< Node *>& holes,
+          double quality_constraint, double volume_constraint);
+
+#endif
 
   /**
    * @returns a string containing relevant information

@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.62 2004-04-20 11:57:55 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.63 2004-05-05 15:23:47 spetersen Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -783,6 +783,34 @@ AC_DEFUN(CONFIGURE_TECPLOT,
               [Flag indicating whether the library shall be compiled to use the Tecplot interface])
     AC_MSG_RESULT(<<< Configuring library with Tecplot API support >>>)
   fi
+])
+dnl -------------------------------------------------------------
+
+
+
+dnl -------------------------------------------------------------
+dnl TetGen tetrahedrization library
+dnl -------------------------------------------------------------
+AC_DEFUN(CONFIGURE_TETGEN, 
+[
+dnl if TetGen is used we need the header path and the lib
+dnl all necessary files are believed to be in environment 
+dnl variable $TETGEN_DIR
+  if test $TETGEN_DIR; then
+     TETGEN_VERSION="-DTETGEN_13"
+     TETGEN_INCLUDE="-I$TETGEN_DIR"
+     TETGEN_LIBRARY="$TETGEN_DIR/libtet.a"
+  else
+     TETGEN_VERSION=""
+     TETGEN_INCLUDE=""
+     TETGEN_LIBRARY=""
+     enabletetgen=no
+  fi
+dnl TetGen version 1.3:
+	AC_SUBST(TETGEN_VERSION)
+	AC_SUBST(TETGEN_INCLUDE)
+	AC_SUBST(TETGEN_LIBRARY)	
+	AC_SUBST(enabletetgen)
 ])
 dnl -------------------------------------------------------------
 
