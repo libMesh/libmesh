@@ -1,4 +1,4 @@
-// $Id: type_vector.h,v 1.5 2004-08-17 03:03:49 benkirk Exp $
+// $Id: type_vector.h,v 1.6 2004-10-19 16:26:17 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -201,7 +201,7 @@ public:
   /**
    * Formatted print to \p std::cout.
    */
-  void print() const;
+  void print(std::ostream& os=std::cout) const;
 
   /**
    * Formatted print as above but allows you to do
@@ -210,7 +210,7 @@ public:
    */
   friend std::ostream& operator << (std::ostream& os, const TypeVector<T>& t)
   {
-    t.print();
+    t.print(os);
     return os;
   }
   
