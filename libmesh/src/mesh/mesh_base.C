@@ -1,6 +1,4 @@
-
-
-// $Id: mesh_base.C,v 1.38 2003-05-28 03:17:50 benkirk Exp $
+// $Id: mesh_base.C,v 1.39 2003-05-29 04:29:15 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -41,15 +39,6 @@
 #include "cell_inf_hex18.h"
 #include "petsc_matrix.h"
 #include "mesh_logging.h"
-
-#ifdef HAVE_SFCURVES
-// prototype for SFC code
-namespace Sfc {
-  extern "C" {
-#   include "sfcurves.h"
-  }
-}
-#endif
 
 
 
@@ -1112,98 +1101,6 @@ void MeshBase::all_tri ()
   _elements = new_elements;
 
   this->prepare_for_use();
-}
-
-
-
-void MeshBase::sfc_partition(const unsigned int n_sbdmns,
-			     const std::string& type)
-{
-  assert (this->n_nodes() != 0);
-  assert (n_sbdmns > 0);
-  assert (n_sbdmns <= this->n_elem());
-
-  // Set the number of subdomains
-  this->set_n_subdomains() = n_sbdmns;
-  
-  // check for easy return
-  if (n_sbdmns == 1)
-    {
-      for (unsigned int e=0; e<this->n_elem(); e++)
-	this->elem(e)->set_subdomain_id() = 
-	  this->elem(e)->set_processor_id() = 0;
-      
-      return;
-    }
-
-  
-  
-  // won't work without Bill's library!
-#ifndef HAVE_SFCURVES
-  
-  std::cerr << "ERROR:  Not compiled with space-filling curve" << std::endl
-	    << " support.  Using linear partitioning instead"  << std::endl
-	    << " This partitioning could be arbitrarily bad!"  << std::endl
-	    << std::endl;
-
-  here();
-  
-  const unsigned int blksize = this->n_elem()/n_sbdmns; 
-  
-  for (unsigned int e=0; e<this->n_elem(); e++)
-    this->elem(e)->set_subdomain_id() = 
-      this->elem(e)->set_processor_id() = 
-      (e/blksize);
-
-
-  
-#else
-
-  
-  START_LOG("sfc_partition()", "MeshBase");
-    
-  int size = static_cast<int>(this->n_elem());
-  std::vector<double> x     (size);
-  std::vector<double> y     (size);
-  std::vector<double> z     (size);
-  std::vector<int>    table (size);
-  
-  for (unsigned int e=0; e<this->n_elem(); e++)
-    {
-      const Point p =
-	this->elem(e)->centroid();      
-      
-      x[e] = p(0);
-      y[e] = p(1);
-      z[e] = p(2);
-    }
-  
-  if (type == "hilbert")
-    Sfc::hilbert(&x[0], &y[0], &z[0], &size, &table[0]);
-  
-  else if (type == "morton")
-    Sfc::morton(&x[0], &y[0], &z[0], &size, &table[0]);
-  
-  else
-    error();
-
-  const unsigned int wgt_per_proc =
-    this->total_weight()/this->n_subdomains();
-  
-  unsigned int wgt = 0;
-	
-  for (unsigned int e=0; e<this->n_elem(); e++)
-    {
-      this->elem(table[e]-1)->set_subdomain_id() = 
-	this->elem(table[e]-1)->set_processor_id() = 
-	wgt/wgt_per_proc;
-
-      wgt += this->elem(table[e]-1)->n_nodes();
-    }
-  
-  STOP_LOG("sfc_partition()", "MeshBase");
-  
-#endif
 }
 
 

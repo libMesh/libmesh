@@ -1,4 +1,4 @@
-// $Id: mesh_metis_support.C,v 1.14 2003-05-28 03:17:50 benkirk Exp $
+// $Id: mesh_metis_support.C,v 1.15 2003-05-29 04:29:16 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -41,21 +41,23 @@
 #endif
 
 
-void MeshBase::metis_partition(const unsigned int n_sbdmns,
+void MeshBase::metis_partition(const unsigned int n_sbdmns_in,
 			       const std::string& type)
 {
   const unsigned int n_active_elem = this->n_active_elem();
-  
-  assert (n_sbdmns <= n_active_elem);
+  const unsigned int n_sbdmns      = std::min (n_sbdmns_in, n_active_elem);
   
   this->set_n_subdomains() = n_sbdmns;
 
   // check for easy return
   if (n_sbdmns == 1)
     {
-      for (unsigned int e=0; e<n_elem(); e++)
-	elem(e)->set_subdomain_id() = 
-	  elem(e)->set_processor_id() = 0;
+      elem_iterator       elem_it (this->elements_begin());
+      const elem_iterator elem_end(this->elements_end());
+
+      for ( ; elem_it != elem_end; ++elem_it)
+	(*elem_it)->set_subdomain_id() = 
+	  (*elem_it)->set_processor_id() = 0;
       
       return;
     }
@@ -109,7 +111,7 @@ void MeshBase::metis_partition(const unsigned int n_sbdmns,
 
   // Metis will only consider the active elements.
   // We need to map the active element ids into a
-  // contiguous range for Metis
+  // contiguous range.
   {
     active_elem_iterator       elem_it (this->elements_begin());
     const active_elem_iterator elem_end(this->elements_end());
