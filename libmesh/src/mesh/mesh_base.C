@@ -1,6 +1,6 @@
 
 
-// $Id: mesh_base.C,v 1.28 2003-04-30 21:09:30 benkirk Exp $
+// $Id: mesh_base.C,v 1.29 2003-05-14 01:28:39 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -1320,6 +1320,33 @@ void MeshBase::renumber_nodes_and_elements ()
 
 
 
+
+void MeshBase::find_boundary_nodes(std::vector<short int>& on_boundary)
+{
+  // Resize the vector which holds boundary nodes and fill with zeros.
+  on_boundary.resize(this->n_nodes());
+  std::fill(on_boundary.begin(),
+	    on_boundary.end(),
+	    0);
+
+  // Loop over elements, find those on boundary, and
+  // mark them as 1 in on_boundary.
+  active_elem_iterator       el (this->elements_begin());
+  const active_elem_iterator end(this->elements_end());
+  for (; el != end; ++el)
+    for (unsigned int s=0; s<(*el)->n_neighbors(); s++)
+      if ((*el)->neighbor(s) == NULL) // on the boundary
+	{
+	  const AutoPtr<Elem> side((*el)->build_side(s));
+	  
+	  for (unsigned int n=0; n<side->n_nodes(); n++)
+	    on_boundary[side->node(n)] = 1;
+	}
+}
+
+
+
+
 void MeshBase::distort (const Real factor,
 			const bool perturb_boundary)
 {
@@ -1330,30 +1357,21 @@ void MeshBase::distort (const Real factor,
 
   START_LOG("distort()", "MeshBase");
 
-  std::vector<Real>      hmin(n_nodes(), 1.e20);
-  std::vector<short int> on_boundary(n_nodes(), 0);
 
 
   // First find nodes on the boundary and flag them
   // so that we don't move them
+  // on_boundary holds 0's (not on boundary) and 1's (on boundary)
+  std::vector<short int> on_boundary(this->n_nodes(), 0);
+  
   if (!perturb_boundary)
-    {
-      active_elem_iterator       el (this->elements_begin());
-      const active_elem_iterator end(this->elements_end());
-      for (; el != end; ++el)
-	for (unsigned int s=0; s<(*el)->n_neighbors(); s++)
-	  if ((*el)->neighbor(s) == NULL) // on the boundary
-	    {
-	      const AutoPtr<Elem> side((*el)->build_side(s));
-	      
-	      for (unsigned int n=0; n<side->n_nodes(); n++)
-		on_boundary[side->node(n)] = 1;
-	    }
-    }
-
+    this->find_boundary_nodes(on_boundary);
 
   // Now calculate the minimum distance to
-  // neighboring nodes for each node
+  // neighboring nodes for each node.
+  // hmin holds these distances.
+  std::vector<Real>          hmin(n_nodes(), 1.e20);
+  
   active_elem_iterator       el (this->elements_begin());
   const active_elem_iterator end(this->elements_end());
   for (; el!=end; ++el)
@@ -1406,8 +1424,6 @@ void MeshBase::distort (const Real factor,
 
   // All done  
   STOP_LOG("distort()", "MeshBase");
-
-  return;
 }
 
 

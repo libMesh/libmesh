@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.25 2003-03-11 04:35:18 ddreyer Exp $
+// $Id: mesh_base.h,v 1.26 2003-05-14 01:28:39 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -63,7 +63,7 @@ template <typename T> class PetscMatrix;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.25 $
+ * \version $Revision: 1.26 $
  */
 
 
@@ -799,6 +799,13 @@ protected:
 			 const std::vector<std::string>* solution_names=NULL,
 			 const bool write_partitioning=false);
 
+  /**
+   * Fills the vector "on_boundary" with 0's and 1's which tells whether each node
+   * is not on (0) or on (1) the boundary.
+   */
+  void find_boundary_nodes(std::vector<short int>& on_boundary);
+  
+  
 #ifdef ENABLE_AMR
 
   /**
