@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.9 2003-02-06 05:41:15 ddreyer Exp $
+// $Id: mesh_generation.C,v 1.10 2003-02-07 15:22:09 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -48,6 +48,10 @@ void Mesh::build_cube(const unsigned int nx,
 		      const Real zmin, const Real zmax,
 		      const ElemType type)
 {
+  _perf_log.start_event("build_cube()");
+
+
+  
   switch (mesh_dimension())
     {
 
@@ -63,7 +67,7 @@ void Mesh::build_cube(const unsigned int nx,
 
 	for (unsigned int i=0; i<=nx; i++)
 	  {
-	    node_ptr(i) = Node::build((Real) ((Real) i)/((Real) nx), 0, 0, i);
+	    node_ptr(i) = Node::build(static_cast<Real>(i)/static_cast<Real>(nx), 0, 0, i);
 	  };
 	
 	for (unsigned int i=0; i<nx; i++)
@@ -112,8 +116,8 @@ void Mesh::build_cube(const unsigned int nx,
 	    for (unsigned int j=0; j<=ny; j++)
 	      for (unsigned int i=0; i<=nx; i++)
 		{
-		  node_ptr(p) = Node::build((Real) ((Real) i)/((Real) nx),
-					    (Real) ((Real) j)/((Real) ny),
+		  node_ptr(p) = Node::build(static_cast<Real>(i)/static_cast<Real>(nx),
+					    static_cast<Real>(j)/static_cast<Real>(ny),
 					    0,
 					    p);
 		  p++;
@@ -165,8 +169,8 @@ void Mesh::build_cube(const unsigned int nx,
 	    for (unsigned int j=0; j<=ny; j++)
 	      for (unsigned int i=0; i<=nx; i++)
 		{
-		  node_ptr(p) = Node::build((Real) ((Real) i)/((Real) nx),
-					    (Real) ((Real) j)/((Real) ny),
+		  node_ptr(p) = Node::build(static_cast<Real>(i)/static_cast<Real>(nx),
+					    static_cast<Real>(j)/static_cast<Real>(ny),
 					    0,
 					    p);
 		  p++;
@@ -214,8 +218,8 @@ void Mesh::build_cube(const unsigned int nx,
 	    for (unsigned int j=0; j<=(2*ny); j++)
 	      for (unsigned int i=0; i<=(2*nx); i++)
 		{
-		  node_ptr(p) = Node::build((Real) ((Real) i)/((Real) (2*nx)),
-					    (Real) ((Real) j)/((Real) (2*ny)),
+		  node_ptr(p) = Node::build(static_cast<Real>(i)/static_cast<Real>(2*nx),
+					    static_cast<Real>(j)/static_cast<Real>(2*ny),
 					    0,
 					    p);
 		  p++;
@@ -276,8 +280,8 @@ void Mesh::build_cube(const unsigned int nx,
 	    for (unsigned int j=0; j<=(2*ny); j++)
 	      for (unsigned int i=0; i<=(2*nx); i++)
 		{
-		  node_ptr(p) = Node::build((Real) ((Real) i)/((Real) (2*nx)),
-					    (Real) ((Real) j)/((Real) (2*ny)),
+		  node_ptr(p) = Node::build(static_cast<Real>(i)/static_cast<Real>(2*nx),
+					    static_cast<Real>(j)/static_cast<Real>(2*ny),
 					    0,
 					    p);
 		  p++;
@@ -366,9 +370,9 @@ void Mesh::build_cube(const unsigned int nx,
 	      for (unsigned int j=0; j<=ny; j++)
 		for (unsigned int i=0; i<=nx; i++)
 		  {
-		    node_ptr(p) = Node::build((Real) ((Real) i)/((Real) nx),
-					      (Real) ((Real) j)/((Real) ny),
-					      (Real) ((Real) k)/((Real) nz),
+		    node_ptr(p) = Node::build(static_cast<Real>(i)/static_cast<Real>(nx),
+					      static_cast<Real>(j)/static_cast<Real>(ny),
+					      static_cast<Real>(k)/static_cast<Real>(nz),
 					      p);
 		    p++;
 		  };
@@ -413,9 +417,9 @@ void Mesh::build_cube(const unsigned int nx,
 	      for (unsigned int j=0; j<=(2*ny); j++)
 		for (unsigned int i=0; i<=(2*nx); i++)
 		  {
-		    node_ptr(p) = Node::build((Real) ((Real) i)/((Real) (2*nx)),
-					      (Real) ((Real) j)/((Real) (2*ny)),
-					      (Real) ((Real) k)/((Real) (2*nz)),
+		    node_ptr(p) = Node::build(static_cast<Real>(i)/static_cast<Real>(2*nx),
+					      static_cast<Real>(j)/static_cast<Real>(2*ny),
+					      static_cast<Real>(k)/static_cast<Real>(2*nz),
 					      p);
 		    p++;
 		  };
@@ -487,19 +491,13 @@ void Mesh::build_cube(const unsigned int nx,
 	break;
       }
 
-
-
-
-
-
-
-
-      
     default:
       {
 	error();
       }
     };  
+
+  _perf_log.stop_event("build_cube()");
 };
 
 
@@ -531,6 +529,8 @@ void Mesh::build_sphere (const Real rad,
 
   assert (rad > 0.);
 
+  _perf_log.start_event("build_sphere()");
+  
   const Point cent;
 
   const Sphere sphere (cent, rad);
@@ -850,7 +850,7 @@ void Mesh::build_sphere (const Real rad,
 #endif
 
 	
-	return;
+	break;
       };
 
 
@@ -931,13 +931,13 @@ void Mesh::build_sphere (const Real rad,
 		    const Real zmax = point(G(i, j,nz))(2);
 
 		    node(G(i,j,k))(0) = xmin +
-		      (xmax - xmin)*((Real) ((Real) i)/((Real) nx));
+		      (xmax - xmin)*static_cast<Real>(i)/static_cast<Real>(nx);
 		  
 		    node(G(i,j,k))(1) = ymin +
-		      (ymax - ymin)*((Real) ((Real) j)/((Real) ny));
+		      (ymax - ymin)*static_cast<Real>(j)/static_cast<Real>(ny);
 		  
 		    node(G(i,j,k))(2) = zmin +
-		      (zmax - zmin)*((Real) ((Real) k)/((Real) nz));
+		      (zmax - zmin)*static_cast<Real>(k)/static_cast<Real>(nz);
 		  };
 
 	    // Do some smoothing steps.
@@ -1019,13 +1019,13 @@ void Mesh::build_sphere (const Real rad,
 		    const Real zmax = point(G(i, j,2*nz))(2);
 
 		    node(G(i,j,k))(0) = xmin +
-		      (xmax - xmin)*((Real) ((Real) i)/((Real) 2*nx));
+		      (xmax - xmin)*static_cast<Real>(i)/static_cast<Real>(2*nx);
 		  
 		    node(G(i,j,k))(1) = ymin +
-		      (ymax - ymin)*((Real) ((Real) j)/((Real) 2*ny));
+		      (ymax - ymin)*static_cast<Real>(j)/static_cast<Real>(2*ny);
 		  
 		    node(G(i,j,k))(2) = zmin +
-		      (zmax - zmin)*((Real) ((Real) k)/((Real) 2*nz));
+		      (zmax - zmin)*static_cast<Real>(k)/static_cast<Real>(2*nz);
 		  };
 
 	    // Do some smoothing steps.
@@ -1056,4 +1056,7 @@ void Mesh::build_sphere (const Real rad,
     default:
       error();
     };
+
+  
+  _perf_log.stop_event("build_sphere()");
 };

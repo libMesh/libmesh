@@ -1,4 +1,4 @@
-// $Id: perf_log.C,v 1.7 2003-02-07 04:34:16 benkirk Exp $
+// $Id: perf_log.C,v 1.8 2003-02-07 15:22:17 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -40,7 +40,7 @@
 bool PerfLog::called = false;
 
 
-PerfLog::PerfLog(std::string cn,
+PerfLog::PerfLog(const std::string cn,
 		 const bool le) :
   class_name(cn),
   log_events(le),
@@ -139,14 +139,14 @@ std::string PerfLog::get_perf_info() const
 
 #ifndef BROKEN_IOSTREAM
   
-  if ((log_events) && (!log.empty()))
+  if (log_events && !log.empty())
     {
       struct timeval tstop;
       
       gettimeofday (&tstop, NULL);
 	  
-      const double elapsed_time = ((double) (tstop.tv_sec  - tstart.tv_sec)) +
-	((double) (tstop.tv_usec - tstart.tv_usec))/1000000.;      
+      const double elapsed_time = (static_cast<double>(tstop.tv_sec  - tstart.tv_sec) +
+				   static_cast<double>(tstop.tv_usec - tstart.tv_usec)*1.e-6);      
       
       out << " ----------------------------------------------------------------------"  << std::endl;
       out << "| " << class_name << " Performance: Alive time=" << elapsed_time
@@ -245,17 +245,17 @@ std::string PerfLog::get_log() const
   
   if (log_events)
     {
-      // Possibly print machine info      
-      if (!called)
-	{
-	  called = true;
-	  out << get_info_header();
-	}
-
-     
-      // Print the log
+      // Only print the log
+      // if it isn't empty
       if (!log.empty())
 	{
+	  // Possibly print machine info,
+	  // but only do this once
+	  if (!called)
+	    {
+	      called = true;
+	      out << get_info_header();
+	    }	  
 	  out << get_perf_info();
 	}
     }

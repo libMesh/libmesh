@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.9 2003-02-07 04:00:35 jwpeterson Exp $
+// $Id: dof_map.C,v 1.10 2003-02-07 15:21:55 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -83,7 +83,7 @@ void DofMap::reinit()
   // memory at all...
   for (unsigned int c=0; c<n_components(); c++)
     {
-      const FEType fe_type = component_type(c);
+      const FEType& fe_type = component_type(c);
        
       for (unsigned int e=0; e<_n_elem; e++)
 	if (_mesh.elem(e)->active())
@@ -279,7 +279,7 @@ void DofMap::distribute_dofs(const unsigned int proc_id)
       
       for (unsigned comp=0; comp<n_components(); comp++)
 	{
-	  const FEType fe_type = component_type(comp);
+	  const FEType& fe_type = component_type(comp);
 	  
 	  for (unsigned int e=0; e<_n_elem; ++e)
 	    if (_mesh.elem(e)->active())  
@@ -325,8 +325,7 @@ void DofMap::distribute_dofs(const unsigned int proc_id)
 
 		  for (unsigned int index=0;
 		       index<FEInterface::n_dofs_per_elem(_dim, fe_type, type); index++)
-		    {
-		  
+		    {		  
 		      // No way we could have already numbered this DOF!
 		      assert (elem_dof_number(ig,comp,index) ==
 			      invalid_number);
@@ -353,6 +352,15 @@ void DofMap::distribute_dofs(const unsigned int proc_id)
     std::sort(_send_list.begin(), _send_list.end());
     std::vector<unsigned int> new_send_list;
 
+    // The new send list will be <= the size of the
+    // current _send_list.  Let's reserve memory
+    // assuming it will be the same size.  This will
+    // allow us to efficiently use the push_back()
+    // member (and probably will actually _save_
+    // space since vector reallocations generally
+    // occur in powers of 2).
+    new_send_list.reserve (_send_list.size());
+    
     new_send_list.push_back(_send_list[0]);
     
     for (unsigned int i=1; i<_send_list.size(); i++)
@@ -390,7 +398,7 @@ void DofMap::compute_sparsity(const unsigned int proc_id)
   /**
    * If the user did not explicitly specify the DOF coupling
    * then all the DOFS are coupled to each other.  Furthermore,
-   * we can take a shortcut and to this more quickly here.  So
+   * we can take a shortcut and do this more quickly here.  So
    * we use an if-test.
    */  
   if (dof_coupling.empty())
@@ -415,7 +423,7 @@ void DofMap::compute_sparsity(const unsigned int proc_id)
 		    (ig <= last_dof_on_proc))
 		  {
 		    // This is what I mean
-		    //assert ((ig - first_dof_on_proc) >= 0);
+		    // assert ((ig - first_dof_on_proc) >= 0);
 		    // but do the test like this because ig and
 		    // first_dof_on_proc are unsigned ints
 		    assert (ig >= first_dof_on_proc);
@@ -485,7 +493,7 @@ void DofMap::compute_sparsity(const unsigned int proc_id)
 			    // but do the test like this because ig and
 			    // first_dof_on_proc are unsigned ints
 			    assert (ig >= first_dof_on_proc);
-			    assert ((ig - first_dof_on_proc) < sparsity_pattern.size());
+			    assert (ig < (sparsity_pattern.size() + first_dof_on_proc));
 		    
 			    std::set<unsigned int>& row =
 			      sparsity_pattern[ig - first_dof_on_proc];
@@ -508,13 +516,14 @@ void DofMap::compute_sparsity(const unsigned int proc_id)
   // DOFs connected to our rows of the matrix.
   _n_nz.resize (n_dofs_on_proc);
   _n_oz.resize (n_dofs_on_proc);
+
+  // First zero the counters.
+  std::fill(_n_nz.begin(), _n_nz.end(), 0);
+  std::fill(_n_oz.begin(), _n_oz.end(), 0);
   
   for (unsigned int i=0; i<n_dofs_on_proc; i++)
     {
-      // First zero the counters.
-      _n_nz[i] = _n_oz[i] = 0;
-      
-      // Then get the row of the sparsity pattern
+      // Get the row of the sparsity pattern
       const std::set<unsigned int>& row = sparsity_pattern[i];
       
       // Now loop over the row and increment the appropriate
@@ -563,7 +572,11 @@ void DofMap::dof_indices (const unsigned int e,
     if ((c == cn) || (cn == invalid_number))
       { // Do this for all the components if one was not specified
 	// or just for the specified component
-	const FEType fe_type = component_type(c);
+	const FEType& fe_type = component_type(c);
+
+	// Reserve space in the di vector
+	// so we can use push_back effectively
+	di.reserve (FEInterface::n_dofs(_dim, fe_type, type));
 	
 	// Get the node-based DOF numbers
 	for (unsigned int n=0; n<n_nodes; n++)
