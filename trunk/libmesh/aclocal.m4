@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.54 2004-03-07 22:39:04 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.55 2004-03-07 22:44:23 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -284,7 +284,7 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
       dnl dynamic library search path and add -lrpcsvc to use XDR
       *solaris*)
           RPATHFLAG="-Wl,-R,"
-          LIBS="$LIBS -lrpcsvc"
+          LIBS="-lrpcsvc $LIBS"
           ;;
   
       *)
@@ -461,7 +461,7 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
 
           dnl Linker flags & librpcsvc for XDR
           RPATHFLAG="-Wl,-R,"
-          LIBS="$LIBS -lrpcsvc"
+          LIBS="-lrpcsvc $LIBS"
 
           dnl Position-independent code for shared libraries
           if test "$enableshared" = yes ; then

@@ -2860,7 +2860,7 @@ echo "$as_me: error: Unrecognized compiler" >&2;}
 
                   *solaris*)
           RPATHFLAG="-Wl,-R,"
-          LIBS="$LIBS -lrpcsvc"
+          LIBS="-lrpcsvc $LIBS"
           ;;
 
       *)
@@ -2982,7 +2982,7 @@ echo "$as_me: error: Unrecognized compiler" >&2;}
           CFLAGSO="-DNDEBUG -w"
 
                     RPATHFLAG="-Wl,-R,"
-          LIBS="$LIBS -lrpcsvc"
+          LIBS="-lrpcsvc $LIBS"
 
                     if test "$enableshared" = yes ; then
             CXXFLAGSO="$CXXFLAGSO -KPIC"
