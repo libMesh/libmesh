@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.28 2003-11-10 04:24:54 jwpeterson Exp $
+# $Id: Makefile,v 1.29 2003-11-10 13:10:28 benkirk Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -105,7 +105,7 @@ echo:
 # Remove project object files for the current mode
 #
 clean:
-	@rm -f *~ include/*~ include/*/*~ src/*/*~ src/*/*.$(obj-suffix)
+	@rm -f *~ include/*~ include/*/*~ src/*/*~ src/*/*.$(obj-suffix) doc/html/*~
 
 #
 # Make clean, remove contributed objects, and remove binaries
