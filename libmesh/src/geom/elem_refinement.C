@@ -1,4 +1,4 @@
-// $Id: elem_refinement.C,v 1.3 2003-05-29 16:58:49 benkirk Exp $
+// $Id: elem_refinement.C,v 1.4 2003-08-29 14:13:09 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -115,18 +115,18 @@ void Elem::refine (MeshBase& mesh)
 		      const unsigned int n_id =
 			reinterpret_cast<unsigned int>(this->get_node(n));
 		      
-#elif SIZEOF_LONG_LONG_INT == SIZEOF_VOID_P
+#elif SIZEOF_LONG_INT == SIZEOF_VOID_P
 
 		      // 64-bit machines 
 		      // Another big prime number less than max_unsigned_int
 		      // for key creation on 64-bit machines
 		      const unsigned int bp3 = 4294967291;
 		      const unsigned int n_id =			
-		        reinterpret_cast<long long unsigned int>(this->get_node(n))%bp3;
+		        reinterpret_cast<long unsigned int>(this->get_node(n))%bp3;
 			
 #else
 		      // Huh?
-		      DIE HERE...  CANNOT COMPILE
+		      WHAT KIND OF CRAZY MACHINE IS THIS? CANNOT COMPILE
 			
 #endif
 		      // Compute the key for this new node nc.  This will
