@@ -1,4 +1,4 @@
-//    $Id: petsc_matrix.h,v 1.18 2003-03-03 02:15:57 benkirk Exp $
+//    $Id: petsc_matrix.h,v 1.19 2003-03-07 04:44:38 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -454,7 +454,7 @@ void PetscMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
   ierr = MatSetValues(mat,
 		      m, (int*) &rows[0],
 		      n, (int*) &cols[0],
-		      (PetscScalar*) &dm.val[0],
+		      (PetscScalar*) &dm.get_values()[0], // (PetscScalar*) &dm._val[0],  // if friends
 		      ADD_VALUES);   CHKERRQ(ierr);
 
   return;

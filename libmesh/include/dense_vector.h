@@ -1,4 +1,4 @@
-// $Id: dense_vector.h,v 1.2 2003-03-03 02:15:57 benkirk Exp $
+// $Id: dense_vector.h,v 1.3 2003-03-07 04:44:38 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -28,10 +28,10 @@
 
 // Local Includes
 #include "mesh_common.h"
-
+#include "dense_vector_base.h"
 
 // Forward Declarations
-template <typename T> class DenseSubVector;
+template <typename T> class DenseSubVector; // for friends
 
 
 
@@ -47,7 +47,7 @@ template <typename T> class DenseSubVector;
 // ------------------------------------------------------------
 // DenseVector class definition
 template<typename T>
-class DenseVector
+class DenseVector : public DenseVectorBase<T>
 {
 public:
 
@@ -67,10 +67,30 @@ public:
   DenseVector (const std::vector<T>& other_vector);
   
   /**
-   * Destructor.  Frees all associated memory.
+   * Destructor.  Does nothing.
    */     
-  ~DenseVector();
+  ~DenseVector() {}
 
+  /**
+   * @returns the size of the vector.
+   */
+  virtual unsigned int size() const { return _val.size(); }
+
+  /**
+   * Set every element in the vector to 0.
+   */
+  virtual void zero();
+  
+  /**
+   * @returns the \p (i) element of the vector.
+   */
+  virtual T operator() (const unsigned int i) const;
+
+  /**
+   * @returns the \p (i,j) element of the vector as a writeable reference.
+   */
+  virtual T & operator() (const unsigned int i);
+  
   /**
    * Assignment operator.
    */
@@ -80,21 +100,6 @@ public:
    * Resize the vector. Sets all elements to 0.
    */
   void resize (const unsigned int n);
-
-  /**
-   * Set every element in the vector to 0.
-   */
-  void zero();
-
-  /**
-   * @returns the \p (i) element of the vector.
-   */
-  T operator() (const unsigned int i) const;
-
-  /**
-   * @returns the \p (i,j) element of the vector as a writeable reference.
-   */
-  T & operator() (const unsigned int i);
 
   /**
    * Multiplies every element in the vector by \p factor.
@@ -122,22 +127,12 @@ public:
 
 
   /**
-   * @returns the size of the vector.
-   */
-  unsigned int size() const { return _val.size(); }
-
-  /**
    * Access to the values array. This should be used with
    * caution but can  be used to speed up code compilation
    * significantly.
    */
   std::vector<T>& get_values() { return _val; }
 
-  /**
-   * Pretty-print the vector to \p stdout.
-   */
-  void print() const;
-  
 private:
 
   /**
@@ -183,12 +178,6 @@ DenseVector<T>::DenseVector (const std::vector<T>& other_vector) :
 }
 
 
-
-template<typename T>
-inline
-DenseVector<T>::~DenseVector()
-{
-}
 
 
 
@@ -278,7 +267,6 @@ void DenseVector<T>::add (const T factor,
  * to add a real-valued vector to a complex-
  * valued vector (but not the other way around)!
  */
-
 template<>
 inline
 void DenseVector<Complex>::add (const Complex factor,
@@ -293,14 +281,6 @@ void DenseVector<Complex>::add (const Complex factor,
 #endif
 
 
-
-template<typename T>
-inline
-void DenseVector<T>::print () const
-{  
-  for (unsigned int i=0; i<this->size(); i++)
-    std::cout << std::setw(8) << (*this)(i) << std::endl;
-}
 
 
 

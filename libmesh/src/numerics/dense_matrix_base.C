@@ -1,0 +1,67 @@
+// $Id: dense_matrix_base.C,v 1.1 2003-03-07 04:44:38 jwpeterson Exp $
+
+// The Next Great Finite Element Library.
+// Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
+  
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+  
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+  
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+// Local Includes
+#include "dense_matrix_base.h"
+
+
+
+template<typename T>
+void DenseMatrixBase<T>::multiply (DenseMatrixBase<T>& M1,
+				   const DenseMatrixBase<T>& M2,
+				   const DenseMatrixBase<T>& M3)
+{
+  // Assertions to make sure we have been
+  // passed matrices of the correct dimension.
+  assert (M1._m == M2._m);
+  assert (M1._n == M3._n);
+  assert (M2._n == M3._m);
+	  
+  const unsigned int m_s = M2._m;
+  const unsigned int p_s = M2._n; 
+  const unsigned int n_s = M1._n;
+  
+  // Do it this way because there is a
+  // decent chance (at least for constraint matrices)
+  // that A(i,k) = 0.
+  for (unsigned int i=0; i<m_s; i++)
+    for (unsigned int k=0; k<p_s; k++)
+      if (M2(i,k) != 0.)
+	for (unsigned int j=0; j<n_s; j++)
+	  M1(i,j) += M2(i,k) * M3(k,j);	          
+}
+
+
+
+
+
+
+
+
+
+
+
+//--------------------------------------------------------------
+// Explicit instantiations
+template class DenseMatrixBase<Real>;
+
+#ifdef USE_COMPLEX_NUMBERS
+template class DenseMatrixBase<Complex>;
+#endif
