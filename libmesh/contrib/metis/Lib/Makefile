@@ -16,8 +16,12 @@ ifeq ($(enable-shared),yes)
   target := ../../lib/$(hosttype)_$(METHOD)/libmetis.so
 endif
 
-
-all:: $(target)
+ifeq ($(enable-metis),no)
+  all::
+	@echo "<<< metis is disabled, not building >>>"
+else
+  all:: $(target)
+endif
 
 ../../lib/$(hosttype)_$(METHOD)/libmetis.a: $(OBJS)
 	@echo "Linking "$@
