@@ -1,4 +1,4 @@
-// $Id: type_tensor.h,v 1.1 2005-01-13 21:22:43 roystgnr Exp $
+// $Id: type_tensor.h,v 1.2 2005-01-19 15:18:35 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -166,6 +166,13 @@ public:
    */
   template <typename T2>
   TypeTensor<T> operator * (const TypeTensor<T2> &) const;
+
+  /**
+   * Multiply 2 tensors together, i.e. sum Aij*Bij.
+   * The tensors may be of different types.
+   */
+  template <typename T2>
+  T contract (const TypeTensor<T2> &) const;
 
   /**
    * Multiply a tensor and vector together, i.e. matrix-vector product.
@@ -541,6 +548,15 @@ TypeTensor<T> TypeTensor<T>::operator * (const T factor) const
 
 
 
+template <typename T>
+inline
+const TypeTensor<T> operator * (const T factor,
+				const TypeTensor<T> &t)
+{
+  return t * factor;
+}
+
+
 
 template <typename T>
 inline
@@ -660,6 +676,23 @@ TypeTensor<T> TypeTensor<T>::operator * (const TypeTensor<T2> &p) const
         returnval(i,j) += (*this)(i,k)*p(k,j);
 
   return returnval;
+}
+
+
+
+  /**
+   * Multiply 2 tensors together, i.e. sum Aij*Bij.
+   * The tensors may be of different types.
+   */
+template <typename T>
+template <typename T2>
+inline
+T TypeTensor<T>::contract (const TypeTensor<T2> &t) const
+{
+  T sum = 0.;
+  for (unsigned int i=0; i<DIM*DIM; i++)
+    sum += _coords[i]*t._coords[i];
+  return sum;
 }
 
 
