@@ -1,4 +1,4 @@
-// $Id: dense_vector.h,v 1.3 2003-03-07 04:44:38 jwpeterson Exp $
+// $Id: dense_vector.h,v 1.4 2003-03-07 05:07:55 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -23,7 +23,6 @@
 #define __dense_vector_h__
 
 // C++ includes
-#include <iomanip>
 #include <vector>
 
 // Local Includes
@@ -31,7 +30,6 @@
 #include "dense_vector_base.h"
 
 // Forward Declarations
-template <typename T> class DenseSubVector; // for friends
 
 
 
@@ -140,12 +138,6 @@ private:
    */
   std::vector<T> _val;
 
-  /**
-   * Make the DenseSubVector<T> class a friend
-   * so that they can access values directly
-   * from our vector.
-   */
-  friend class DenseSubVector<T>;
 };
 
 
@@ -164,6 +156,7 @@ DenseVector<T>::DenseVector(const unsigned int n) :
 template<typename T>
 inline
 DenseVector<T>::DenseVector (const DenseVector<T>& other_vector) :
+  DenseVectorBase<T>(),
   _val(other_vector._val)
 {  
 }
@@ -185,7 +178,7 @@ template<typename T>
 inline
 DenseVector<T>& DenseVector<T>::operator = (const DenseVector<T>& other_vector)
 {
-  _val = _other_vector.val;
+  _val = other_vector._val;
   
   return *this;
 }
@@ -250,7 +243,7 @@ void DenseVector<T>::scale (const T factor)
 template<typename T>
 inline
 void DenseVector<T>::add (const T factor,
-			  const DenseVector<T>& mat)
+			  const DenseVector<T>& vec)
 {
   assert (this->size() == vec.size());
 

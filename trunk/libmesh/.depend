@@ -2090,6 +2090,27 @@ src/numerics/dense_submatrix.$(obj-suffix):\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h
+src/numerics/dense_subvector.$(obj-suffix):\
+    src/numerics/dense_subvector.C\
+    include/dense_subvector.h\
+    include/dense_vector.h\
+    include/dense_vector_base.h\
+    include/libmesh_base.h\
+    include/mesh_common.h\
+    include/mesh_config.h
+src/numerics/dense_vector.$(obj-suffix):\
+    src/numerics/dense_vector.C\
+    include/dense_vector.h\
+    include/dense_vector_base.h\
+    include/libmesh_base.h\
+    include/mesh_common.h\
+    include/mesh_config.h
+src/numerics/dense_vector_base.$(obj-suffix):\
+    src/numerics/dense_vector_base.C\
+    include/dense_vector_base.h\
+    include/libmesh_base.h\
+    include/mesh_common.h\
+    include/mesh_config.h
 src/numerics/distributed_vector.$(obj-suffix):\
     src/numerics/distributed_vector.C\
     include/auto_ptr.h\
