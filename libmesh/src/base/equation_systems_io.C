@@ -1,4 +1,4 @@
-// $Id: equation_systems_io.C,v 1.17 2003-03-11 04:35:18 ddreyer Exp $
+// $Id: equation_systems_io.C,v 1.18 2003-03-12 00:33:20 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -42,7 +42,7 @@
 
 // ------------------------------------------------------------
 // EquationSystem class implementation
-template <class T_sys>
+template <typename T_sys>
 void EquationSystems<T_sys>::read(const std::string& name,
 				  const Xdr::XdrMODE mode,
 				  const bool read_header,
@@ -280,7 +280,7 @@ void EquationSystems<T_sys>::read(const std::string& name,
 
 
 
-template <class T_sys>
+template <typename T_sys>
 void EquationSystems<T_sys>::write(const std::string& name,
 				   const Xdr::XdrMODE mode,
 				   const bool write_data)
@@ -330,8 +330,7 @@ void EquationSystems<T_sys>::write(const std::string& name,
   const unsigned int proc_id = _mesh.processor_id();
   unsigned int n_sys         = this->n_systems();
 
-  std::map<std::string, SystemBase*>::iterator
-    pos = _systems.begin();
+  typename std::map<std::string, T_sys*>::iterator pos = _systems.begin();
   
   std::string comment;
   char buf[80];
