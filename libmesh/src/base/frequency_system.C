@@ -1,4 +1,4 @@
-// $Id: frequency_system.C,v 1.11 2003-04-11 23:57:05 ddreyer Exp $
+// $Id: frequency_system.C,v 1.12 2003-05-12 14:16:48 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -37,9 +37,8 @@
 // FrequencySystem implementation
 FrequencySystem::FrequencySystem (EquationSystems<FrequencySystem>& es,
 				  const std::string&  name,
-				  const unsigned int  number,
-				  const SolverPackage solver_package) :
-  SystemBase                (es.get_mesh(), name, number, solver_package),
+				  const unsigned int  number) :
+  SystemBase                (es.get_mesh(), name, number),
   _assemble_fptr            (NULL),
   _solve_fptr               (NULL),
   _equation_systems         (es),
@@ -126,6 +125,31 @@ void FrequencySystem::init ()
 
   // Stop logging init()
   STOP_LOG("init()", "FrequencySystem");
+}
+
+
+
+void FrequencySystem::reinit ()
+{
+  //just do the same as in init(), but for the PerfLog, repeat the code
+
+  // Log how long initializing the system takes
+  START_LOG("reinit()", "FrequencySystem");
+
+  // make sure we have frequencies to solve for
+  if (!_finished_set_frequencies)
+    {
+      std::cerr << "ERROR: Need to set frequencies before calling reinit(). " << std::endl;
+      error();
+    }
+
+  // initialize parent data and additional solution vectors
+  SystemBase::init();
+
+  _finished_init = true;
+
+  // Stop logging init()
+  STOP_LOG("reinit()", "FrequencySystem");
 }
 
 

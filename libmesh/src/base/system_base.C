@@ -1,4 +1,4 @@
-// $Id: system_base.C,v 1.14 2003-05-04 23:59:00 benkirk Exp $
+// $Id: system_base.C,v 1.15 2003-05-12 14:16:48 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -155,12 +155,20 @@ void SystemBase::reinit ()
   _dof_map.distribute_dofs (_mesh);
   
 #ifdef ENABLE_AMR
-
+  
   _dof_map.create_dof_constraints(_mesh);
   
 #endif
 
   rhs->init      (n_dofs(), n_local_dofs());
+
+  // initialize & zero other vectors, if necessary
+  for(other_vectors_iterator pos = _other_vectors.begin();
+      pos != _other_vectors.end(); ++pos)
+    {
+      pos->second->init (n_dofs(), n_local_dofs());
+      pos->second->zero ();
+    }
 
   // Clear the matrices
   matrix->clear();

@@ -1,4 +1,4 @@
-// $Id: frequency_system.h,v 1.8 2003-04-03 14:17:21 ddreyer Exp $
+// $Id: frequency_system.h,v 1.9 2003-05-12 14:16:48 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -81,8 +81,7 @@ public:
    */
   FrequencySystem (EquationSystems<FrequencySystem>& es,
 		   const std::string&                name,
-		   const unsigned int                number, 
-		   const SolverPackage               solver_package);
+		   const unsigned int                number);
 
   /**
    * Destructor.
@@ -102,6 +101,16 @@ public:
    * \p init().
    */
   void init ();
+
+  /**
+   * Re-initializes the member data fields associated with
+   * the system.  The \p DofMap re-computes the dof, the
+   * additional vectors and the \p rhs are re-initialized
+   * (while the \p solution is not?).  However, the frequencies 
+   * already registered with this system have to remain 
+   * untouched.  Useful for refined meshes?
+   */
+  void reinit ();
  
   /**
    * Assemble the linear system.  Does not
