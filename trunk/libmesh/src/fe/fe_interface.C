@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.18 2003-05-15 23:34:35 benkirk Exp $
+// $Id: fe_interface.C,v 1.19 2003-05-16 14:37:49 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -513,7 +513,7 @@ Point FEInterface::inverse_map (const unsigned int dim,
 #ifdef ENABLE_INFINITE_ELEMENTS
 
   if ( is_InfFE_elem(elem->type()) )
-    return ifem_inverse_map(dim, fe_t, elem, p, tolerance, secure);
+    return ifem_inverse_map(dim, fe_t, elem, p,tolerance, secure);
 
 #endif
 
@@ -587,6 +587,123 @@ Point FEInterface::inverse_map (const unsigned int dim,
   error();
   Point pt;
   return pt;
+}
+
+
+
+
+void FEInterface::inverse_map (const unsigned int dim,
+			       const FEType& fe_t,
+			       const Elem* elem,
+			       const std::vector<Point>& physical_points,
+			       std::vector<Point>&       reference_points)
+{
+  const unsigned int n_pts = physical_points.size();
+
+  // Resize the vector
+  reference_points.resize(n_pts);
+  
+  if (n_pts == 0)
+    {
+      std::cerr << "WARNING: empty vector physical_points!"
+		<< std::endl;
+      here();
+      return;
+    }
+  
+
+
+
+  
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+  if ( is_InfFE_elem(elem->type()) )
+    {
+      std::cerr << "ERROR: Not implemented!"
+		<< std::endl;
+      error();
+    }
+  
+#endif
+
+  switch (dim)
+    {
+      // 1D
+    case 1:
+      {
+	switch (fe_t.family)
+	  {
+	  case HIERARCHIC:
+	    FE<1,HIERARCHIC>::inverse_map(elem, physical_points, reference_points);
+	    return;
+	    
+	  case LAGRANGE:
+	    FE<1,LAGRANGE>::inverse_map(elem, physical_points, reference_points);
+	    return;
+	    
+	  case MONOMIAL:
+	    FE<1,MONOMIAL>::inverse_map(elem, physical_points, reference_points);
+	    return;
+	    
+	  default:
+	    error();
+	  }
+      }
+
+      
+      // 2D
+    case 2:
+      {
+	switch (fe_t.family)
+	  {
+	  case HIERARCHIC:
+	    FE<2,HIERARCHIC>::inverse_map(elem, physical_points, reference_points);
+	    return;
+	    
+	  case LAGRANGE:
+	    FE<2,LAGRANGE>::inverse_map(elem, physical_points, reference_points);
+	    return;
+	    
+	  case MONOMIAL:
+	    FE<2,MONOMIAL>::inverse_map(elem, physical_points, reference_points);
+	    return;
+	    
+	  default:
+	    error();
+	  }
+      }
+
+      
+      // 3D
+    case 3:
+      {
+	switch (fe_t.family)
+	  {
+	  case HIERARCHIC:
+	    FE<3,HIERARCHIC>::inverse_map(elem, physical_points, reference_points);
+	    return;
+	    
+	  case LAGRANGE:
+	    FE<3,LAGRANGE>::inverse_map(elem, physical_points, reference_points);
+	    return;
+	    
+	  case MONOMIAL:
+	    FE<3,MONOMIAL>::inverse_map(elem, physical_points, reference_points);
+	    return;
+	    
+	  default:
+	    error();
+	  }
+      }
+
+
+    default:
+      error();
+    }
+
+  
+  error();
+  return;
 }
 
 
