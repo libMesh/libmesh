@@ -13,6 +13,7 @@
     <?php echo "<a class=\"L2\" href = \"", $root, "ex1.php\" title=\"Example 1\">Example 1</a><BR>"; ?>
     <?php echo "<a class=\"L2\" href = \"", $root, "ex2.php\" title=\"Example 2\">Example 2</a><BR>"; ?>
     <?php echo "<a class=\"L2\" href = \"", $root, "ex3.php\" title=\"Example 3\">Example 3</a><BR>"; ?>
+    <?php echo "<a class=\"L2\" href = \"", $root, "ex4.php\" title=\"Example 4\">Example 4</a><BR>"; ?>
     <?php } ?>
 
     <?php echo "<a class=\"L1\" href = \"", $root, "applications.php\">Applications</a><BR>"; ?>
