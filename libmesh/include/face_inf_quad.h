@@ -1,4 +1,4 @@
-// $Id: face_inf_quad.h,v 1.3 2003-04-01 14:19:47 ddreyer Exp $
+// $Id: face_inf_quad.h,v 1.4 2003-05-23 23:17:47 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -92,7 +92,7 @@ public:
    * @returns 3.  All infinite quads have 1 edge in the
    * base, and 2 perpendicular to the base.
    */
-  unsigned int n_edges() const { return 6; }
+  unsigned int n_edges() const { return 3; }
 
   /**
    * @returns 0.  All 2D elements have no faces, just
@@ -104,6 +104,13 @@ public:
    * @returns 2
    */
   unsigned int n_children() const { return 2; }
+  
+  /**
+   * @returns an id associated with the \p s side of this element.
+   * The id is not necessariy unique, but should be close.  This is
+   * particularly useful in the \p MeshBase::find_neighbors() routine.
+   */
+  unsigned int key (const unsigned int s) const;
 
   /**
    * @returns a primitive (2-noded) edge or infedge for 

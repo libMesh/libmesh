@@ -1,4 +1,4 @@
-// $Id: face_inf_quad.C,v 1.2 2003-04-01 14:19:49 ddreyer Exp $
+// $Id: face_inf_quad.C,v 1.3 2003-05-23 23:17:56 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -32,6 +32,39 @@
 
 // ------------------------------------------------------------
 // InfQuad class member functions
+unsigned int InfQuad::key (const unsigned int s) const
+{
+  assert (s < this->n_sides());
+
+
+  switch (s)
+    {
+    case 0:
+
+      return
+	this->compute_key (this->node(0),
+			   this->node(1));
+      
+    case 1:
+
+      return
+	this->compute_key (this->node(1),
+			   this->node(3));	
+
+    case 2:
+
+      return
+	this->compute_key (this->node(0),
+			   this->node(2));
+    }
+
+  // We will never get here...  Look at the code above.
+  error();
+  return 0;
+}
+
+
+
 AutoPtr<Elem> InfQuad::side (const unsigned int i) const
 {
   assert (i < this->n_sides());

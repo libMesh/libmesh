@@ -1,4 +1,4 @@
-// $Id: cell_hex.C,v 1.10 2003-02-27 00:55:28 benkirk Exp $
+// $Id: cell_hex.C,v 1.11 2003-05-23 23:17:56 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,6 +30,69 @@
 
 // ------------------------------------------------------------
 // Hex class member functions
+unsigned int Hex::key (const unsigned int s) const
+{
+  assert (s < this->n_sides());
+
+  // Think of a unit cube: (-1,1) x (-1,1)x (-1,1)
+  switch (s)
+    {
+    case 0:  // the face at z = -1
+
+      return
+	this->compute_key (this->node(0),
+			   this->node(3),
+			   this->node(2),
+			   this->node(1));
+      
+    case 1:  // the face at y = -1
+
+      return
+	this->compute_key (this->node(0),
+			   this->node(1),
+			   this->node(5),
+			   this->node(4));
+      
+    case 2:  // the face at x = 1
+
+      return
+	this->compute_key (this->node(1),
+			   this->node(2),
+			   this->node(6),
+			   this->node(5));
+
+    case 3: // the face at y = 1
+
+      return
+	this->compute_key (this->node(2),
+			   this->node(3),
+			   this->node(7),
+			   this->node(6));
+      
+    case 4: // the face at x = -1
+      
+      return
+	this->compute_key (this->node(3),
+			   this->node(0),
+			   this->node(4),
+			   this->node(7));
+
+    case 5: // the face at z = 1
+
+      return
+	this->compute_key (this->node(4),
+			   this->node(5),
+			   this->node(6),
+			   this->node(7));	
+    }
+
+  // We'll never get here.
+  error();
+  return 0;
+}
+
+
+
 AutoPtr<Elem> Hex::side (const unsigned int i) const
 {
   assert (i < this->n_sides());
