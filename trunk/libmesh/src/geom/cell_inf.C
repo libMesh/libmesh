@@ -1,4 +1,4 @@
-// $Id: edge_inf_edge2.C,v 1.8 2003-03-11 00:47:45 ddreyer Exp $
+// $Id: cell_inf.C,v 1.1 2003-03-11 00:47:41 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -18,36 +18,4 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-
-// Local includes
-#include "mesh_config.h"
-#ifdef ENABLE_INFINITE_ELEMENTS
-
-#include "edge_inf_edge2.h"
-
-
-// ------------------------------------------------------------
-// InfEdge2 class member functions
-const std::vector<unsigned int> InfEdge2::tecplot_connectivity(const unsigned int se) const
-{
-  assert (se == 0);
-
-  std::vector<unsigned int> conn(2);
-
-  conn[0] = this->node(0)+1;
-  conn[1] = this->node(1)+1;
-
-  return conn;
-}
-
-
-void InfEdge2::vtk_connectivity(const unsigned int,
-				std::vector<unsigned int> *) const
-{
-  error();  // Not yet implemented
-}
-
-
-#endif
-
-
+// The InfCell class does not implement any functions.

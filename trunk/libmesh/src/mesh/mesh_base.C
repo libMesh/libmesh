@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.22 2003-03-04 15:31:23 benkirk Exp $
+// $Id: mesh_base.C,v 1.23 2003-03-11 00:47:47 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -521,10 +521,13 @@ const Point MeshBase::build_inf_elem(bool be_verbose)
     
   if (be_verbose)
     {
-      std::cout << " Determined origin for Infinite Elements:" << std::endl
+#ifdef DEBUG
+      std::cout << " Determined origin for Infinite Elements:" 
+		<< std::endl
 		<< "  ";
       origin.write_unformatted(std::cout);
       std::cout << std::endl;
+#endif
     }
 
   build_inf_elem(origin, false, false, false, be_verbose);
@@ -540,14 +543,19 @@ void MeshBase::build_inf_elem(const Point& origin,
 			      const bool z_sym,
 			      const bool be_verbose)
 {
-		
+
   if (be_verbose)
     {
+#ifdef DEBUG
       std::cout << " Building Infinite Elements:" << std::endl;
       std::cout << "  updating element neighbor tables..." << std::endl;
+#else
+      std::cout << " Verbose mode disabled in non-debug mode." << std::endl;
+#endif
     }
 
-  find_neighbors();	// update elem->neighbor() tables
+
+  this->find_neighbors();	// update elem->neighbor() tables
 
 
   START_LOG("build_inf_elem()", "MeshBase");
@@ -561,6 +569,7 @@ void MeshBase::build_inf_elem(const Point& origin,
   Real max_r=0.;
   unsigned int max_r_node;
 
+#ifdef DEBUG
   if (be_verbose)
     {
       std::cout << "  collecting boundary sides";
@@ -569,6 +578,7 @@ void MeshBase::build_inf_elem(const Point& origin,
       else
 	std::cout << "..." << std::endl;
     }
+#endif
 
   /**
    * Iterate through all elements and sides, collect indices of all active
@@ -577,19 +587,21 @@ void MeshBase::build_inf_elem(const Point& origin,
    * Can't use iterators here since the element
    * index (e) is explicitly used later...
    */
-  for(unsigned int e=0;e<n_elem();e++)
+  for(unsigned int e=0;e<this->n_elem();e++)
     {
-      if (!(elem(e)->active()))
+      if (!(this->elem(e)->active()))
    	continue;
       
-      for (unsigned int s=0; s<elem(e)->n_neighbors(); s++)
+      for (unsigned int s=0; s<this->elem(e)->n_neighbors(); s++)
 	{
-	  if (elem(e)->neighbor(s) != NULL)
+	  if (this->elem(e)->neighbor(s) != NULL)
 	    continue;	 // check if elem(e) is on the boundary
 	  
-	  /* note that it is safe to use the Elem::side() method, 
-	     which gives a non-full-ordered element */
-	  AutoPtr<Elem> side(elem(e)->side(s));			
+	  /* 
+	   * note that it is safe to use the Elem::side() method, 
+	   * which gives a non-full-ordered element 
+	   */
+	  AutoPtr<Elem> side(this->elem(e)->side(s));
 		
 	  bool sym_side=false;		
 			
@@ -600,10 +612,14 @@ void MeshBase::build_inf_elem(const Point& origin,
 	  // TODO:[HVDH] Find a better criterion based on mesh properties
 
 		
+	  /*
+	   * check whether the nodes are on the symmetry planes;
+	   * therefore sufficient to use a non-full-ordered side element
+	   */
 	  for(unsigned int n=0;n<side->n_nodes();n++)
 	    {
 	
-	      Point dist_from_origin=point(side->node(n))-origin;
+	      Point dist_from_origin=this->point(side->node(n))-origin;
 
 	      if(x_sym)
 		if( fabs(dist_from_origin(0)) > 1.e-6 )
@@ -662,19 +678,23 @@ void MeshBase::build_inf_elem(const Point& origin,
     std::pair<unsigned int,unsigned int> p;
     p=*face_it;
 
-    AutoPtr<Elem> side(elem(p.first)->side(p.second));
+    /*
+     * This has to be a full-ordered side element,
+     * since we need the correct n_nodes,
+     */
+    AutoPtr<Elem> side(elem(p.first)->build_side(p.second));
 		
     bool found=false;
-    for(unsigned int node=0;node<side->n_nodes();node++)
-      if(onodes.count(side->node(node))){found=true;break;}
+    for(unsigned int sn=0; sn<side->n_nodes(); sn++)
+      if(onodes.count(side->node(sn))) {found=true;break;}
     	
     	
     /* If a new oface is found, include it's nodes in onodes */		
     	
     if(found)		
       {
-	for(unsigned int n=0;n<side->n_nodes();n++)
-	  onodes.insert(side->node(n));
+	for(unsigned int sn=0;sn<side->n_nodes();sn++)
+	  onodes.insert(side->node(sn));
     				
 	ofaces.insert(p);
 	face_it++;			// iteration is done here
@@ -696,10 +716,15 @@ void MeshBase::build_inf_elem(const Point& origin,
   while(face_it!=faces.end());
 	
 	
+#ifdef DEBUG
   if (be_verbose)
-    std::cout << "  found " << faces.size() << " inner and " 
-	      << ofaces.size() << " outer boundary faces" << std::endl;
-	
+    std::cout << "  found " 
+	      << faces.size() 
+	      << " inner and " 
+	      << ofaces.size() 
+	      << " outer boundary faces" 
+	      << std::endl;
+#endif	
 	
   faces.clear();		//free memory
 
@@ -714,81 +739,134 @@ void MeshBase::build_inf_elem(const Point& origin,
    * double distance from origin.
    */
 
-  for(on_it=onodes.begin();on_it!=onodes.end();on_it++)
+
+  for(on_it=onodes.begin();on_it!=onodes.end();++on_it)
     {
-      Point p=Point(point(*on_it))*2-origin;
-      outer_nodes[*on_it]=add_point(p);
+      Point p=Point(this->point(*on_it))*2.-origin;
+      outer_nodes[*on_it]=this->add_point(p);
     }
 
 
+#ifdef DEBUG
   // for verbose, remember n_elem
-  unsigned int n_conventional_elem = n_elem();
+  unsigned int _n_conventional_elem = this->n_elem();
+#endif
 
 
   /**
    * build Elems based on boundary side type
    */
-
-  for(face_it=ofaces.begin();face_it!=ofaces.end();face_it++)
+  for(face_it=ofaces.begin();face_it!=ofaces.end();++face_it)
     {
 	
       std::pair<unsigned int,unsigned int> p=*face_it;
 	
-	
-      AutoPtr<Elem> side(elem(p.first)->build_side(p.second));							
-				
-      // create cell depending on side type
-				
-      Elem* el;
-      switch(side->n_nodes())
+      // build a full-ordered side element to get the base nodes
+      AutoPtr<Elem> side(elem(p.first)->build_side(p.second)); 
+
+      bool is_higher_order_elem=false;
+
+
+      /*
+       * create cell depending on side type, assign nodes,
+       * use braces to force scope
+       */
+      {
+        Elem* el;
+	switch(side->type())
 	{
 	  // TRIs					
-	case 3:	
-	  el=new InfPrism6;
-	  break;
+	  case TRI3:	
+	    el=new InfPrism6;
+	    break;
 					 		
-	case 6: 
-	  el=new InfPrism12; 
-	  break;
+	  case TRI6: 
+	    el=new InfPrism12; 
+	    is_higher_order_elem=true;
+	    break;
 							
 	  // QUADs					
-	case 4: 
-	  el=new InfHex8;
-	  break;
+	  case QUAD4: 
+	    el=new InfHex8;
+	    break;
 							
-	case 8: 
-	  el=new InfHex16;
-	  break;
+	  case QUAD8: 
+	    el=new InfHex16;
+	    is_higher_order_elem=true;
+	    break;
 							
-	case 9: 
-	  el=new InfHex18;
-	  break;
+	  case QUAD9: 
+	    el=new InfHex18;
+	    /*
+	     * the method of assigning nodes (which follows below)
+	     * omits in the case of QUAD9 the bubble node; therefore
+	     * we assign these by hand here
+	     */
+	    el->set_node(16) = side->get_node(8);
+	    el->set_node(17) = outer_nodes[side->node(8)];
+	    is_higher_order_elem=true;
+	    break;
 
-	default: 
-	  std::cout << "MeshBase::build_inf_elem(Point, bool, bool, bool, bool): invalid face element" 
-		    << std::endl;
-	  continue;
+	  default: 
+	    std::cout << "MeshBase::build_inf_elem(Point, bool, bool, bool, bool): invalid face element" 
+		      << std::endl;
+	    continue;
 	}
+
+
+	/*
+	 * assign vertices to the new infinite element
+	 */
+	const unsigned int n_base_vertices = side->n_vertices();
+	for(unsigned int i=0; i<n_base_vertices; i++)
+	  {
+	    el->set_node(i                ) = side->get_node(i);
+	    el->set_node(i+n_base_vertices) = outer_nodes[side->node(i)];
+	  }
+
+
+	/*
+	 * when this is a higher order element, 
+	 * assign also the nodes in between
+	 */
+	if (is_higher_order_elem)
+          {
+	    /* 
+	     * n_safe_base_nodes is the number of nodes in \p side
+	     * that may be safely assigned using below for loop.
+	     * Actually, n_safe_base_nodes is _identical_ with el->n_vertices(),
+	     * since for QUAD9, the 9th node was already assigned above
+	     */
+	    const unsigned int n_safe_base_nodes   = el->n_vertices();
+
+	    for(unsigned int i=n_base_vertices; i<n_safe_base_nodes; i++)
+	      {
+	        el->set_node(i+n_base_vertices)   = side->get_node(i);
+	        el->set_node(i+n_safe_base_nodes) = outer_nodes[side->node(i)];
+	      }
+	  }
 			
-      // assign nodes to cell
-						
-      for(unsigned int i=0;i<side->n_nodes();i++)
-	{
-	  el->set_node(i  )=side->get_node(i);
-	  el->set_node(i+side->n_nodes())=outer_nodes[side->node(i)];
-	}
-			
-      // add infinite element to mesh			
-      add_elem(el);	
+
+ 	/*
+	 * add infinite element to mesh
+	 */
+	this->add_elem(el);
+
+      }
+
     }
 
 
+#ifdef DEBUG
   if (be_verbose)
     std::cout << "  added "
-	      << n_elem()-n_conventional_elem
-	      << " infinite elements to mesh"
+	      << this->n_elem()-_n_conventional_elem
+	      << " infinite elements and "
+	      << onodes.size() 
+	      << " nodes to the mesh"
 	      << std::endl
 	      << std::endl;
+#endif
 
 
   STOP_LOG("build_inf_elem()", "MeshBase");

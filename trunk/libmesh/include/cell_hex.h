@@ -1,4 +1,4 @@
-// $Id: cell_hex.h,v 1.9 2003-02-28 23:37:36 benkirk Exp $
+// $Id: cell_hex.h,v 1.10 2003-03-11 00:47:40 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -45,12 +45,6 @@ public:
    * parent. Derived classes implement 'true' elements.
    */
   Hex(const unsigned int nn, const Elem* p);
-  
-  /**
-   * @returns 8.  All hex-derivatives are guaranteed to have at
-   * least 8 nodes.
-   */
-  unsigned int n_nodes() const { return 8; }
 
   /**
    * @returns 6

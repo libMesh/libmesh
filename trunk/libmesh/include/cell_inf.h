@@ -1,4 +1,4 @@
-// $Id: edge_inf_edge2.C,v 1.8 2003-03-11 00:47:45 ddreyer Exp $
+// $Id: cell_inf.h,v 1.1 2003-03-11 00:47:40 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -19,35 +19,48 @@
 
 
 
+#ifndef __cell_inf_h__
+#define __cell_inf_h__
+
+// C++ includes
+
 // Local includes
 #include "mesh_config.h"
 #ifdef ENABLE_INFINITE_ELEMENTS
+#include "elem.h"
 
-#include "edge_inf_edge2.h"
 
+
+
+/**
+ * The \p InfCell is an abstract element type that lives in
+ * three dimensions.  An infinite cell could be an infinite hexahedron,
+ * or an infinite prism.
+ */
 
 // ------------------------------------------------------------
-// InfEdge2 class member functions
-const std::vector<unsigned int> InfEdge2::tecplot_connectivity(const unsigned int se) const
+// InfCell class definition
+class InfCell : public Elem
 {
-  assert (se == 0);
+public:
 
-  std::vector<unsigned int> conn(2);
+  /**
+   * Constructor.
+   */
+  InfCell (const unsigned int nn,
+	   const unsigned int ns,
+	   const Elem* p) :
+    Elem (nn, ns, p)
+  {}
 
-  conn[0] = this->node(0)+1;
-  conn[1] = this->node(1)+1;
+  /**
+   * @returns 3, the dimensionality of the object.
+   */
+  unsigned int dim () const { return 3; }
+  
+};
 
-  return conn;
-}
 
-
-void InfEdge2::vtk_connectivity(const unsigned int,
-				std::vector<unsigned int> *) const
-{
-  error();  // Not yet implemented
-}
-
+#endif // ifdef ENABLE_INFINITE_ELEMENTS
 
 #endif
-
-

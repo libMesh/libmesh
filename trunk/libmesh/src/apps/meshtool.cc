@@ -32,6 +32,12 @@
 #include "petsc_matrix.h"
 #endif
 
+/* 
+ * convenient typedef for origin coordinates; so that meshtool
+ * knows whether the value was given or not
+ */
+typedef std::pair<bool, double> IfemOriginValue;
+
 
 void usage(char *progName)
 {
@@ -45,22 +51,23 @@ void usage(char *progName)
     "    -o <string>                   Output file name\n"
     "    -s <string>                   Solution file name\n"
     "    -d <dim>                      <dim>-dimensional mesh\n"
-    "    -D <factor>                   Randomly move interior nodes by D*hmin\n"
+  "\n    -D <factor>                   Randomly move interior nodes by D*hmin\n"
 #ifdef ENABLE_AMR
     "    -r <count>                    Globally refine <count> times\n"
 #endif
     "    -p <count>                    Partition into <count> subdomains\n"
     "    -b                            Write the boundary conditions\n"
 #ifdef ENABLE_INFINITE_ELEMENTS
-    "    -a                            Add infinite elemens\n"
-    "    -x <coord>                    Specify infinite element origin,\n"
-    "    -y <coord>                    defaults to 0.,0.,0. if none given\n"
-    "    -z <coord>                    \n"
+  "\n    -a                            Add infinite elements\n"
+    "    -x <coord>                    Specify infinite element origin\n"
+    "    -y <coord>                    coordinates. If none given, origin\n"
+    "    -z <coord>                    is determined automatically.\n"
     "    -X                            When building infinite elements \n"
-    "    -Y                            treats mesh as x/y/z-symmetric\n"
-    "    -Z                            \n"
+    "    -Y                            treat mesh as x/y/z-symmetric.\n"
+    "    -Z                            When -X is given, -x <coord> also\n"
+    "                                  has to be given.  Similar for y,z.\n"
 #endif
-    "    -l                            Build the L connectivity matrix \n"
+  "\n    -l                            Build the L connectivity matrix \n"
     "    -L                            Build the script L connectivity matrix \n"
     "    -v                            Verbose\n"
     "    -h                            Print help menu\n"
@@ -87,11 +94,14 @@ void usage(char *progName)
     "\n"
     " and\n"
     "\n"
-    "  ./meshtool -d 3 -i dry.unv -o packed.gmv -a -x 30.5 -y -10.5 -Z\n"
+    "  ./meshtool -d 3 -i dry.unv -o packed.gmv -a -x 30.5 -y -10.5 -X\n"
     "\n"
-    " will read a 3D Universal file, build infinite elements with the\n"
-    " origin (30.5, -10.5, 0.0) on top of volume elements, while preserving\n"
-    " a symmetry plane through (30.5, -10.5, 0.0) perpendicular to z.\n"
+    " will read a 3D Universal file, determine the z-coordinate of the origin\n"
+    " automatically, e.g. z_origin = 3., build infinite elements with the\n"
+    " origin (30.5, -10.5, 3.) on top of volume elements, while preserving\n"
+    " a symmetry plane through (30.5, -10.5, 3.) perpendicular to x.\n"
+    " It is imperative that the origin lies _inside_ the given volume mesh.\n"
+    " If not, infinite elements are not correctly built!\n"
 #endif
     "\n"
     " Currently this program supports the following formats:\n"
@@ -138,9 +148,9 @@ void process_cmd_line(int argc, char **argv,
 		      bool& verbose,
 		      bool& write_bndry,
 		      bool& addinfelems,
-		      double& origin_x,
-		      double& origin_y,
-		      double& origin_z,
+		      IfemOriginValue& origin_x,
+		      IfemOriginValue& origin_y,
+		      IfemOriginValue& origin_z,
 		      bool& x_sym,
 		      bool& y_sym,
 		      bool& z_sym,
@@ -151,9 +161,14 @@ void process_cmd_line(int argc, char **argv,
 
 #ifndef ENABLE_INFINITE_ELEMENTS
 
-  addinfelems = false;
-  origin_x = origin_y = origin_z = 0.;
-  x_sym    = y_sym    = z_sym    = false;
+  /*
+   * initialize these to some values,
+   * so that the compiler does not complain
+   */
+  addinfelems     = false;
+  origin_x.first  = origin_y.first  = origin_z.first  = false;
+  origin_x.second = origin_y.second = origin_z.second = 0.;
+  x_sym           = y_sym           = z_sym           = false;
 
   char optionStr[] =
     "i:o:s:d:D:r:p:bvlLm?h";
@@ -293,30 +308,31 @@ void process_cmd_line(int argc, char **argv,
 	  
 	  /**
 	   * Specify origin coordinates
-	   */
-	  
+	   */	  
 	case 'x':
 	  {
-	    origin_x = atof(optarg);
+	    origin_x.first  = true;
+	    origin_x.second = atof(optarg);
 	    break;
 	  }
 	  
 	case 'y':
 	  {
-	    origin_y = atof(optarg);
+	    origin_y.first  = true;
+	    origin_y.second = atof(optarg);
 	    break;
 	  }
 	  
 	case 'z':
 	  {
-	    origin_z = atof(optarg);
+	    origin_z.first  = true;
+	    origin_z.second = atof(optarg);
 	    break;
 	  } 
 	  
 	  /**
 	   *  Symmetries
-	   */	  
-	  
+	   */	  	  
 	case 'X':
 	  {
 	    x_sym = true;
@@ -374,9 +390,9 @@ int main (int argc, char** argv)
     bool verbose = false;
     bool write_bndry = false;
     bool addinfelems = false;
-    double origin_x=0.;
-    double origin_y=0.;
-    double origin_z=0.;
+    IfemOriginValue origin_x(false, 0.);
+    IfemOriginValue origin_y(false, 0.);
+    IfemOriginValue origin_z(false, 0.);
     bool x_sym=false;
     bool y_sym=false;
     bool z_sym=false;
@@ -391,9 +407,14 @@ int main (int argc, char** argv)
     process_cmd_line(argc, argv, names,
 		     n_subdomains, n_rsteps,
 		     dim, dist_fact, verbose, write_bndry, 
-		     addinfelems, origin_x, origin_y, origin_z, x_sym, y_sym, z_sym,
+
+		     addinfelems, 
+		     origin_x, origin_y, origin_z, 
+		     x_sym, y_sym, z_sym,
+
 		     build_l,
 		     build_script_l);
+
 
     if (dim == static_cast<unsigned int>(-1))
       {
@@ -441,13 +462,86 @@ int main (int argc, char** argv)
 		      << "not compatible with writing boundary conditions." << std::endl;
 	    exit(1);
 	  }
-	
-	mesh.build_inf_elem(Point(origin_x, origin_y, origin_z),
-			    x_sym, y_sym, z_sym, 
-			    verbose);
+
+	/*
+	 * Sanity checks: -X/Y/Z can only be used, when the
+	 * corresponding coordinate is also given (using -x/y/z)
+	 */
+	if ((x_sym && !origin_x.first) ||     // claim x-symmetry, but x-coordinate of origin not given!
+	    (y_sym && !origin_y.first) ||     // the same for y
+	    (z_sym && !origin_z.first))       // the same for z
+	  {
+	    std::cout << "ERROR: When x-symmetry is requested using -X, then" << std::endl
+		      << "the option -x <coord> also has to be given." << std::endl
+		      << "This holds obviously for y and z, too." << std::endl;
+	    exit(1);
+	  }
+
+
+	// origin defaults to the given values
+	Point origin(origin_x.second, origin_y.second, origin_z.second);
+
+	/*
+	 * when only _one_ of the origin coordinates is _not_
+	 * given, we have to determine it on our own
+	 */
+	if ( !origin_x.first || !origin_y.first || !origin_z.first)
+	  {
+	    // determine origin
+	    std::pair<Point, Point> b_box = mesh.bounding_box();
+	    const Point auto_origin = (b_box.first+b_box.second)/2.;
+
+	    // override default values, if necessary
+	    if (!origin_x.first)
+	      origin(0) = auto_origin(0);
+	    if (!origin_y.first)
+	      origin(1) = auto_origin(1);
+	    if (!origin_z.first)
+	      origin(2) = auto_origin(2);
+
+	    if (verbose)
+	      {
+		std::cout << " Origin for Infinite Elements:" << std::endl;
+
+		if (!origin_x.first)
+		    std::cout << "  determined x-coordinate" << std::endl;
+		if (!origin_y.first)
+		    std::cout << "  determined y-coordinate" << std::endl;
+		if (!origin_z.first)
+		    std::cout << "  determined z-coordinate" << std::endl;
+
+		std::cout << "  coordinates: ";
+		origin.write_unformatted(std::cout);
+		std::cout << std::endl;
+	      }
+	  }
+
+	else if (verbose)
+	  {
+	    std::cout << " Origin for Infinite Elements:" << std::endl;
+	    std::cout << "  coordinates: ";
+	    origin.write_unformatted(std::cout);
+	    std::cout << std::endl;
+	  }
+
+
+	// build infinite elements
+	mesh.build_inf_elem(origin, x_sym, y_sym, z_sym, verbose);
+
 	
 	if (verbose)
 	  mesh.print_info();
+
+
+      }
+
+    // sanity check
+    else if((origin_x.first ||  origin_y.first || origin_z.first) ||
+	    (x_sym          ||  y_sym          || z_sym))
+      {
+	std::cout << "ERROR:  -x/-y/-z/-X/-Y/-Z is only to be used when" << std::endl
+		  << "the option -a is also specified!" << std::endl;
+	exit(1);
       }
     
 #endif

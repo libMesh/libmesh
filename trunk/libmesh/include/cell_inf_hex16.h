@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex16.h,v 1.12 2003-03-03 02:15:57 benkirk Exp $
+// $Id: cell_inf_hex16.h,v 1.13 2003-03-11 00:47:40 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,42 +26,42 @@
 
 // Local includes
 #include "mesh_config.h"
-#include "cell_hex.h"
-
-
-
-
 #ifdef ENABLE_INFINITE_ELEMENTS
+
+#include "cell_inf_hex.h"
+
+
+
 
 /**
  * The \p InfHex16 is an infinite element in 3D composed of 16 nodes.
  * It is numbered like this:
    \verbatim
-   INFHEX16:   7              14             6     			      
-               o--------------o--------------o     			      
-              /|                            /|     			      
-             / |                           / |     			      
-            /  |                          /  |     			      
-         15/   |                       13/   |     			      
-          o    |                        o    |     			      
-         /     |                       /     |     			      
-        /      |                      /      |
-       /       |                     /       |     
-     4/        |    12             5/        |     
-     o--------------o--------------o         |     			      
-     |         |                   |         |     
-     |         |                   |         |     
-     |         |              10   |         |                                
-     |        3o--------------o----|---------o     
-     |        /                    |        / 2      
-     |       /                     |       /        
-     |      /                      |      /         
-     |     /                       |     /          
-     |  11o                        |    o           
-     |   /                         |   / 9          
-     |  /                          |  /             
-     | /                           | /              
-     |/                            |/               
+   INFHEX16:   7              14             6     		     
+               o              o              o      closer to infinity
+               :              :              |     		    
+               :              :              |     		     
+               :              :              |     		     
+         15    :              :        13    |     		      
+          o    :              :         o    |     		      
+          :    :              :         |    |     		      
+          :    :              :         |    |
+          :    :              :         |    |     
+     4    :    :    12        :    5    |    |     
+     o    :    :    o         :    o    |    |     		      
+     |    :    :    |         :    |    |    |     
+     |    :    :    |         :    |    |    |     
+     |    :    :    |         :10  |    |    |                       
+     |    :   3o....|.........o....|....|....o     
+     |    :   .     |              |    |   / 2      
+     |    :  .      |              |    |  /        
+     |    : .       |              |    | /         
+     |    :.        |              |    |/          
+     |  11o         |              |    o           base face
+     |   .          |              |   / 9          
+     |  .           |              |  /             
+     | .            |              | /              
+     |.             |              |/               
      o--------------o--------------o                
      0              8              1                
    \endverbatim
@@ -69,7 +69,7 @@
 
 // ------------------------------------------------------------
 // InfHex16 class definition
-class InfHex16 : public Hex
+class InfHex16 : public InfHex
 {
 public:
 
@@ -77,16 +77,16 @@ public:
    * Constructor.  By default this element has no parent.
    */
   InfHex16  (const Elem* p=NULL);
+    
+  /**
+   * @returns 16.  The \p InfHex16 has 16 nodes.
+   */
+  unsigned int n_nodes() const { return 16; }
   
   /**
    * @returns \p INFHEX16
    */
   ElemType     type ()   const { return INFHEX16; }
-
-  /**
-   * @returns 16
-   */
-  unsigned int n_nodes() const { return 16; }
   
   /**
    * @returns 4
@@ -99,10 +99,9 @@ public:
   Order default_order() const { return SECOND; }
   
   /**
-   * Returns a QUAD8 built coincident with face 0, an INFQUAD6 
-   * built coincident with faces 1 to 4.  Face 5 not supported. 
-   * This method allocates memory, so be sure to delete
-   * the returned pointer when it is no longer needed.
+   * Returns a \p QUAD8 built coincident with face 0, an \p INFQUAD6 
+   * built coincident with faces 1 to 4. Note that the \p AutoPtr<Elem>
+   * takes care of freeing memory.
    */
   AutoPtr<Elem> build_side (const unsigned int i) const;
 
@@ -115,19 +114,10 @@ public:
   unsigned int vtk_element_type (const unsigned int) const
   { return 12; }
   
-  void write_tecplot_connectivity(std::ostream &out) const;
   
-#ifdef ENABLE_AMR
 
-  /**
-   * Refine the element.
-   */
-  void refine (MeshBase& mesh);
+protected:  
 
-#endif
-  
-private:
-  
   
 #ifdef ENABLE_AMR
 
@@ -145,13 +135,6 @@ private:
    */
   static const float _embedding_matrix[4][16][16];
   
-  /**
-   * Matrix that tells which children share which of
-   * my sides. Note that infinite elements use different
-   * storage scheme than conventional elements.
-   */
-  static const unsigned int _side_children_matrix[6][5];
-  
 #endif
 
 };
@@ -162,12 +145,13 @@ private:
 // InfHex16 class member functions
 inline
 InfHex16::InfHex16(const Elem* p) :
-  Hex(InfHex16::n_nodes(), p) 
+  InfHex(InfHex16::n_nodes(), p) 
 {
 }
 
 
 
-#endif
+#endif  // ifdef ENABLE_INFINITE_ELEMENTS
+
 
 #endif

@@ -1,4 +1,4 @@
-// $Id: edge_inf_edge2.h,v 1.9 2003-02-28 23:37:42 benkirk Exp $
+// $Id: edge_inf_edge2.h,v 1.10 2003-03-11 00:47:40 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -19,8 +19,8 @@
 
 
 
-#ifndef __inf_edge2_h__
-#define __inf_edge2_h__
+#ifndef __edge_inf_edge2_h__
+#define __edge_inf_edge2_h__
 
 
 // Local includes
@@ -35,10 +35,17 @@
  * The \p InfEdge2 is an infinte element in 1D composed of 2 nodes. 
  * It is numbered like this:
  *
- * \verbatim
- *  INFEDGE2: o--------o
- *            0        1
- * \endverbatim
+   \verbatim
+    INFEDGE2:
+
+        o         closer to infinity
+        | 1
+        |
+        |
+        |
+        o         base node
+          0       
+   \endverbatim
  */
 // ------------------------------------------------------------
 // InfEdge2 class definition
@@ -69,8 +76,7 @@ class InfEdge2 : public Edge
   const std::vector<unsigned int> tecplot_connectivity(const unsigned int se=0) const;
   
   void vtk_connectivity(const unsigned int,
-			std::vector<unsigned int>*) const
-  { error(); }
+			std::vector<unsigned int>*) const;
   
   unsigned int vtk_element_type (const unsigned int) const
   { return 3; }

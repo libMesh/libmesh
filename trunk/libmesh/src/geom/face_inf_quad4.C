@@ -1,4 +1,4 @@
-// $Id: face_inf_quad4.C,v 1.13 2003-03-03 02:15:58 benkirk Exp $
+// $Id: face_inf_quad4.C,v 1.14 2003-03-11 00:47:45 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -20,22 +20,18 @@
 
 
 // Local includes
-#include "mesh_common.h"
-
+#include "mesh_config.h"
 #ifdef ENABLE_INFINITE_ELEMENTS
 
 
 // Local includes cont'd
-#include "mesh_base.h"
 #include "face_inf_quad4.h"
-#include "edge_edge2.h"
-#include "edge_inf_edge2.h"
 
 
 
 
 // ------------------------------------------------------------
-// InfQuad4 class static member initialization
+// InfQuad4 class member functions
 #ifdef ENABLE_AMR
 
 const float InfQuad4::_embedding_matrix[2][4][4] =
@@ -59,80 +55,7 @@ const float InfQuad4::_embedding_matrix[2][4][4] =
   }
 };
 
-
-
-const unsigned int InfQuad4::_side_children_matrix[4][3] =
-{
-  // note different storage scheme
-  {2,   0, 1}, // 2 side-0 children
-  {1,   1,42}, // 1 side-1 children
-  {2,   0, 1}, // 2 side-2 children
-  {1,   0,42}  // 1 side-3 children
-};
-
 #endif
-
-
-
-// ------------------------------------------------------------
-// InfQuad4 class member functions
-AutoPtr<Elem> InfQuad4::build_side (const unsigned int i) const
-{
-  assert (i < this->n_sides());
-
-  switch (i)
-    {
-    case 0:
-      {
-	// base face
-	Edge2* edge = new Edge2;
-
-	edge->set_node(0) = this->get_node(0);
-	edge->set_node(1) = this->get_node(1);
-	
-	AutoPtr<Elem> ap(edge);  return ap;
-      }
-    case 1:
-      {
-	// adjacent to another infinite element
-        InfEdge2* edge = new InfEdge2;
-
-	edge->set_node(0) = this->get_node(1);
-	edge->set_node(1) = this->get_node(2);	
-
-	AutoPtr<Elem> ap(edge);  return ap;
-      }
-    case 2:
-      {
-	// supposed to lie at infinity
-	std::cerr << "Side represents the exterior. No face." << std::endl;
-	error(); 
-     }
-    case 3:
-      {
-	// adjacent to another infinite element	
-	InfEdge2* edge = new InfEdge2;
-
-	edge->set_node(0) = this->get_node(0); // be aware of swapped nodes,
-	edge->set_node(1) = this->get_node(3); // compared to conventional side numbering
-
-	AutoPtr<Elem> ap(edge);  return ap;
-      }
-    default:
-      {
-	error();
-      }
-    }
-
-
-  // We will never get here...  Look at the code above.
-  error();
-  AutoPtr<Elem> ap(NULL);  return ap;
-}
-
-
-
-
 
 
 
@@ -152,78 +75,11 @@ const std::vector<unsigned int> InfQuad4::tecplot_connectivity(const unsigned in
 
 
 
-#ifdef ENABLE_AMR
-
-void InfQuad4::refine (MeshBase& mesh)
+void InfQuad4::vtk_connectivity(const unsigned int,
+				std::vector<unsigned int> *) const
 {
-  assert (this->refinement_flag() == Elem::REFINE);
-  assert (this->active());
-  assert (_children == NULL);
-
-  // Create my children
-  {
-    _children = new Elem*[this->n_children()];
-
-    for (unsigned int c=0; c<this->n_children(); c++)
-      {
-	_children[c] = new InfQuad4(this);
-	_children[c]->set_refinement_flag(Elem::JUST_REFINED);
-      }
-  }
-
-  // Compute new nodal locations
-  // and asssign nodes to children
-  {
-    std::vector<std::vector<Point> >  p(this->n_children());
-    
-    for (unsigned int c=0; c<this->n_children(); c++)
-      p[c].resize(this->child(c)->n_nodes());
-    
-
-    // compute new nodal locations
-    for (unsigned int c=0; c<this->n_children(); c++)
-      for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
-	for (unsigned int n=0; n<this->n_nodes(); n++)
-	  if (_embedding_matrix[c][nc][n] != 0.)
-	    p[c][nc].add_scaled (this->point(n), static_cast<Real>(_embedding_matrix[c][nc][n]));
-    
-    
-    // assign nodes to children & add them to the mesh
-    for (unsigned int c=0; c<this->n_children(); c++)
-      {
-	for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
-	  _children[c]->set_node(nc) = mesh.mesh_refinement.add_point(p[c][nc]);
-
-	mesh.add_elem(this->child(c), mesh.mesh_refinement.new_element_number());
-      }
-  }
-
-
-  
-  // Possibly add boundary information
-  {
-    for (unsigned int s=0; s<this->n_sides(); s++)
-      if (this->neighbor(s) == NULL)
-	{
-	  const short int id = mesh.boundary_info.boundary_id(this, s);
-	
-	  if (id != mesh.boundary_info.invalid_id)
-	    // the upper limit for sc is stored in the 0th column
-	    for (unsigned int sc=1; sc <= _side_children_matrix[s][0]; sc++)
-	      mesh.boundary_info.add_side(this->child(_side_children_matrix[s][sc]), s, id);
-
-
-	}
-  }
-
-  
-  // Un-set my refinement flag now
-  this->set_refinement_flag(Elem::DO_NOTHING);
+  error();  // Not yet implemented
 }
 
 
-
-#endif // #ifdef ENABLE_AMR
-
-
-#endif // #ifdef ENABLE_INFINITE_ELEMENTS
+#endif // ifdef ENABLE_INFINITE_ELEMENTS

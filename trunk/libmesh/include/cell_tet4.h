@@ -1,4 +1,4 @@
-// $Id: cell_tet4.h,v 1.10 2003-02-28 23:37:39 benkirk Exp $
+// $Id: cell_tet4.h,v 1.11 2003-03-11 00:47:40 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -64,6 +64,11 @@ public:
    * @returns \p TET4
    */
   ElemType type () const { return TET4; }
+  
+  /**
+   * @returns 4
+   */
+  unsigned int n_nodes() const { return 4; }
 
   /**
    * @returns 1
@@ -76,9 +81,8 @@ public:
   Order default_order() const { return FIRST; }
   
   /**
-   * Builds a TRI3 built coincident with face i.  This
-   * method allocates memory, so be sure to delete
-   * the returned pointer when it is no longer needed.
+   * Builds a \p TRI3 built coincident with face i.  
+   * The \p AutoPtr<Elem> handles the memory aspect.
    */
   AutoPtr<Elem> build_side (const unsigned int i) const;
 
