@@ -85,8 +85,8 @@ a filename to write the mesh into.
 <pre>
             if (argc &lt; 4)
               {
-        	std::cerr << "Usage: " << argv[0] << " -d 2 in.mesh [out.mesh]"
-        		  << std::endl;
+        	std::cerr &lt;&lt; "Usage: " &lt;&lt; argv[0] &lt;&lt; " -d 2 in.mesh [out.mesh]"
+        		  &lt;&lt; std::endl;
         	
 </pre>
 </div>

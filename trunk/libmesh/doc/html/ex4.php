@@ -38,8 +38,8 @@ differences are marked with "PARALLEL CHANGE".
 <div class ="fragment">
 <pre>
         #include &lt;iostream&gt;
-        #include <algorithm>
-        #include <math.h>
+        #include &lt;algorithm&gt;
+        #include &lt;math.h&gt;
         
 </pre>
 </div>
@@ -126,7 +126,7 @@ other objects we might need.
 
 <div class ="fragment">
 <pre>
-        void assemble_poisson(EquationSystems&amp; es,
+        void assemble_poisson(EquationSystems& es,
                               const std::string& system_name);
         
 </pre>
@@ -181,8 +181,8 @@ Check for proper calling arguments.
 <pre>
             if (argc &lt; 3)
               {
-        	std::cerr << "Usage: " << argv[0] << " -d 2"
-        		  << std::endl;
+        	std::cerr &lt;&lt; "Usage: " &lt;&lt; argv[0] &lt;&lt; " -d 2"
+        		  &lt;&lt; std::endl;
         
 </pre>
 </div>
@@ -208,12 +208,12 @@ and command line arguments.
 <pre>
             else 
               {
-        	std::cout << "Running " << argv[0];
+        	std::cout &lt;&lt; "Running " &lt;&lt; argv[0];
         	
-        	for (int i=1; i<argc; i++)
-        	  std::cout << " " << argv[i];
+        	for (int i=1; i&lt;argc; i++)
+        	  std::cout &lt;&lt; " " &lt;&lt; argv[i];
         	
-        	std::cout << std::endl << std::endl;
+        	std::cout &lt;&lt; std::endl &lt;&lt; std::endl;
               }
             
 </pre>
@@ -392,7 +392,7 @@ via a penalty method.
 
 <div class ="fragment">
 <pre>
-        void assemble_poisson(EquationSystems&amp; es,
+        void assemble_poisson(EquationSystems& es,
                               const std::string& system_name)
         {
 </pre>
@@ -428,7 +428,7 @@ Get a constant reference to the mesh object.
 
 <div class ="fragment">
 <pre>
-          const Mesh&amp; mesh = es.get_mesh();
+          const Mesh& mesh = es.get_mesh();
         
 </pre>
 </div>
@@ -448,7 +448,7 @@ Get a reference to the ImplicitSystem we are solving
 
 <div class ="fragment">
 <pre>
-          ImplicitSystem&amp; system = es.get_system&lt;ImplicitSystem&gt;("Poisson");
+          ImplicitSystem& system = es.get_system&lt;ImplicitSystem&gt;("Poisson");
           
 </pre>
 </div>
@@ -461,7 +461,7 @@ in future examples.
 
 <div class ="fragment">
 <pre>
-          const DofMap&amp; dof_map = system.get_dof_map();
+          const DofMap& dof_map = system.get_dof_map();
         
 </pre>
 </div>
@@ -505,7 +505,7 @@ Tell the finite element object to use our quadrature rule.
 
 <div class ="fragment">
 <pre>
-          fe-&gt;attach_quadrature_rule (&amp;qrule);
+          fe-&gt;attach_quadrature_rule (&qrule);
         
 </pre>
 </div>
@@ -539,7 +539,7 @@ quadrature rule.
 
 <div class ="fragment">
 <pre>
-          fe_face-&gt;attach_quadrature_rule (&amp;qface);
+          fe_face-&gt;attach_quadrature_rule (&qface);
         
 </pre>
 </div>
@@ -552,7 +552,7 @@ integration point.
 
 <div class ="fragment">
 <pre>
-          const std::vector&lt;Real&gt;&amp; JxW = fe-&gt;get_JxW();
+          const std::vector&lt;Real&gt;& JxW = fe-&gt;get_JxW();
         
 </pre>
 </div>
@@ -564,7 +564,7 @@ properties at the quadrature points.
 
 <div class ="fragment">
 <pre>
-          const std::vector&lt;Point&gt;&amp; q_point = fe-&gt;get_xyz();
+          const std::vector&lt;Point&gt;& q_point = fe-&gt;get_xyz();
         
 </pre>
 </div>
@@ -574,7 +574,7 @@ The element shape functions evaluated at the quadrature points.
 
 <div class ="fragment">
 <pre>
-          const std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi = fe-&gt;get_phi();
+          const std::vector&lt;std::vector&lt;Real&gt; &gt;& phi = fe-&gt;get_phi();
         
 </pre>
 </div>
@@ -585,7 +585,7 @@ points.
 
 <div class ="fragment">
 <pre>
-          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = fe-&gt;get_dphi();
+          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;& dphi = fe-&gt;get_dphi();
         
 </pre>
 </div>
@@ -599,7 +599,7 @@ basic finite element terminology we will denote these
 <div class ="fragment">
 <pre>
           DenseMatrix&lt;Number&gt; Ke;
-          DenseVector<Number> Fe;
+          DenseVector&lt;Number&gt; Fe;
         
 </pre>
 </div>
@@ -731,9 +731,9 @@ computation seperately.
 <pre>
               perf_log.start_event ("Ke");
         
-              for (unsigned int qp=0; qp<qrule.n_points(); qp++)
-        	for (unsigned int i=0; i<phi.size(); i++)
-        	  for (unsigned int j=0; j<phi.size(); j++)
+              for (unsigned int qp=0; qp&lt;qrule.n_points(); qp++)
+        	for (unsigned int i=0; i&lt;phi.size(); i++)
+        	  for (unsigned int j=0; j&lt;phi.size(); j++)
         	    Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
         	    
         
@@ -761,7 +761,7 @@ This involves a single loop in which we integrate the
 <pre>
               perf_log.start_event ("Fe");
               
-              for (unsigned int qp=0; qp<qrule.n_points(); qp++)
+              for (unsigned int qp=0; qp&lt;qrule.n_points(); qp++)
         	{
 </pre>
 </div>
@@ -861,7 +861,7 @@ side MUST live on a boundary of the domain.
 <div class ="fragment">
 <pre>
                 for (unsigned int side=0; side&lt;elem-&gt;n_sides(); side++)
-        	  if (elem->neighbor(side) == NULL)
+        	  if (elem-&gt;neighbor(side) == NULL)
         	    {
 </pre>
 </div>
@@ -872,7 +872,7 @@ points.
 
 <div class ="fragment">
 <pre>
-                      const std::vector&lt;std::vector&lt;Real&gt; &gt;&amp;  phi_face = fe_face-&gt;get_phi();
+                      const std::vector&lt;std::vector&lt;Real&gt; &gt;&  phi_face = fe_face-&gt;get_phi();
         
 </pre>
 </div>
@@ -883,7 +883,7 @@ points on the face.
 
 <div class ="fragment">
 <pre>
-                      const std::vector&lt;Real&gt;&amp; JxW_face = fe_face-&gt;get_JxW();
+                      const std::vector&lt;Real&gt;& JxW_face = fe_face-&gt;get_JxW();
         	      
 </pre>
 </div>
@@ -895,7 +895,7 @@ we will interpolate the boundary value function.
 
 <div class ="fragment">
 <pre>
-                      const std::vector&lt;Point &gt;&amp; qface_point = fe_face-&gt;get_xyz();
+                      const std::vector&lt;Point &gt;& qface_point = fe_face-&gt;get_xyz();
         
 </pre>
 </div>
@@ -961,7 +961,7 @@ Matrix contribution of the L2 projection.
 <div class ="fragment">
 <pre>
                           for (unsigned int i=0; i&lt;phi_face.size(); i++)
-        		    for (unsigned int j=0; j<phi_face.size(); j++)
+        		    for (unsigned int j=0; j&lt;phi_face.size(); j++)
         		      Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
         		  
 </pre>
@@ -1005,8 +1005,8 @@ matrix and vector into the global matrix and vector
 <pre>
               perf_log.start_event ("matrix insertion");
               
-              system.matrix->add_matrix (Ke, dof_indices);
-              system.rhs->add_vector    (Fe, dof_indices);
+              system.matrix-&gt;add_matrix (Ke, dof_indices);
+              system.rhs-&gt;add_vector    (Fe, dof_indices);
         
 </pre>
 </div>
@@ -1289,10 +1289,6 @@ it will print its log to the screen. Pretty easy, huh?
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-Compiling C++ (in debug mode) ex4.C...
-Linking ex4...
-/home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
-: the use of `mktemp' is dangerous, better use `mkstemp'
 ***************************************************************
 * Running Example  ./ex4
 ***************************************************************
@@ -1328,7 +1324,7 @@ Running ./ex4 -d 2
 
 
  ----------------------------------------------------------------------------
-| Time:           Mon Apr 19 11:21:57 2004
+| Time:           Mon Apr 19 12:02:03 2004
 | OS:             Linux
 | HostName:       arthur
 | OS Release      2.4.20-19.9smp
@@ -1337,19 +1333,19 @@ Running ./ex4 -d 2
 | Username:       peterson
  ----------------------------------------------------------------------------
  ----------------------------------------------------------------------------
-| Matrix Assembly Performance: Alive time=0.046898, Active time=0.042308
+| Matrix Assembly Performance: Alive time=0.045901, Active time=0.041302
  ----------------------------------------------------------------------------
 | Event                         nCalls  Total       Avg         Percent of   |
 |                                       Time        Time        Active Time  |
 |----------------------------------------------------------------------------|
 |                                                                            |
-| BCs                           225     0.0087      0.000039    20.49        |
-| Fe                            225     0.0062      0.000028    14.71        |
-| Ke                            225     0.0120      0.000053    28.29        |
-| elem init                     225     0.0071      0.000032    16.76        |
-| matrix insertion              225     0.0084      0.000037    19.75        |
+| BCs                           225     0.0080      0.000036    19.37        |
+| Fe                            225     0.0062      0.000028    15.09        |
+| Ke                            225     0.0126      0.000056    30.54        |
+| elem init                     225     0.0074      0.000033    17.89        |
+| matrix insertion              225     0.0071      0.000031    17.11        |
  ----------------------------------------------------------------------------
-| Totals:                       1125    0.0423                  100.00       |
+| Totals:                       1125    0.0413                  100.00       |
  ----------------------------------------------------------------------------
 
 
@@ -1418,7 +1414,7 @@ Running ./ex4 -d 3
 
 
  ----------------------------------------------------------------------------
-| Time:           Mon Apr 19 11:22:11 2004
+| Time:           Mon Apr 19 12:02:15 2004
 | OS:             Linux
 | HostName:       arthur
 | OS Release      2.4.20-19.9smp
@@ -1427,19 +1423,19 @@ Running ./ex4 -d 3
 | Username:       peterson
  ----------------------------------------------------------------------------
  ----------------------------------------------------------------------------
-| Matrix Assembly Performance: Alive time=10.7224, Active time=10.5392
+| Matrix Assembly Performance: Alive time=10.3179, Active time=10.2468
  ----------------------------------------------------------------------------
 | Event                         nCalls  Total       Avg         Percent of   |
 |                                       Time        Time        Active Time  |
 |----------------------------------------------------------------------------|
 |                                                                            |
-| BCs                           3375    2.7029      0.000801    25.65        |
-| Fe                            3375    0.4151      0.000123    3.94         |
-| Ke                            3375    5.1232      0.001518    48.61        |
-| elem init                     3375    1.1762      0.000349    11.16        |
-| matrix insertion              3375    1.1218      0.000332    10.64        |
+| BCs                           3375    2.5320      0.000750    24.71        |
+| Fe                            3375    0.3974      0.000118    3.88         |
+| Ke                            3375    4.9185      0.001457    48.00        |
+| elem init                     3375    1.1599      0.000344    11.32        |
+| matrix insertion              3375    1.2390      0.000367    12.09        |
  ----------------------------------------------------------------------------
-| Totals:                       16875   10.5392                 100.00       |
+| Totals:                       16875   10.2468                 100.00       |
  ----------------------------------------------------------------------------
 
 

@@ -25,8 +25,8 @@ Stokes equations for low-speed incompressible fluid flow.
 <div class ="fragment">
 <pre>
         #include &lt;iostream&gt;
-        #include <algorithm>
-        #include <math.h>
+        #include &lt;algorithm&gt;
+        #include &lt;math.h&gt;
         
 </pre>
 </div>
@@ -74,7 +74,7 @@ matrix and right-hand-side.
 
 <div class ="fragment">
 <pre>
-        void assemble_stokes (EquationSystems&amp; es,
+        void assemble_stokes (EquationSystems& es,
         		      const std::string& system_name);
         
 </pre>
@@ -171,8 +171,8 @@ Creates a transient system named "Convection-Diffusion"
 
 <div class ="fragment">
 <pre>
-              ImplicitSystem &amp; system = 
-        	equation_systems.add_system<ImplicitSystem> ("Stokes");
+              ImplicitSystem & system = 
+        	equation_systems.add_system&lt;ImplicitSystem&gt; ("Stokes");
               
 </pre>
 </div>
@@ -281,7 +281,7 @@ Get a constant reference to the mesh object.
 
 <div class ="fragment">
 <pre>
-          const Mesh&amp; mesh = es.get_mesh();
+          const Mesh& mesh = es.get_mesh();
           
 </pre>
 </div>
@@ -301,8 +301,8 @@ Get a reference to the Convection-Diffusion system object.
 
 <div class ="fragment">
 <pre>
-          ImplicitSystem &amp; system =
-            es.get_system<ImplicitSystem> ("Stokes");
+          ImplicitSystem & system =
+            es.get_system&lt;ImplicitSystem&gt; ("Stokes");
         
 </pre>
 </div>
@@ -378,8 +378,8 @@ Tell the finite element objects to use our quadrature rule.
 
 <div class ="fragment">
 <pre>
-          fe_vel-&gt;attach_quadrature_rule (&amp;qrule);
-          fe_pres->attach_quadrature_rule (&qrule);
+          fe_vel-&gt;attach_quadrature_rule (&qrule);
+          fe_pres-&gt;attach_quadrature_rule (&qrule);
           
 </pre>
 </div>
@@ -392,7 +392,7 @@ will be used to assemble the linear system.
 
 <div class ="fragment">
 <pre>
-          const std::vector&lt;Real&gt;&amp; JxW = fe_vel-&gt;get_JxW();
+          const std::vector&lt;Real&gt;& JxW = fe_vel-&gt;get_JxW();
           
 </pre>
 </div>
@@ -403,7 +403,7 @@ variables evaluated at the quadrature points.
 
 <div class ="fragment">
 <pre>
-          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = fe_vel-&gt;get_dphi();
+          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;& dphi = fe_vel-&gt;get_dphi();
         
 </pre>
 </div>
@@ -414,7 +414,7 @@ evaluated at the quadrature points.
 
 <div class ="fragment">
 <pre>
-          const std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; psi = fe_pres-&gt;get_phi();
+          const std::vector&lt;std::vector&lt;Real&gt; &gt;& psi = fe_pres-&gt;get_phi();
           
 </pre>
 </div>
@@ -427,7 +427,7 @@ in future examples.
 
 <div class ="fragment">
 <pre>
-          const DofMap &amp; dof_map = system.get_dof_map();
+          const DofMap & dof_map = system.get_dof_map();
         
 </pre>
 </div>
@@ -441,14 +441,14 @@ basic finite element terminology we will denote these
 <div class ="fragment">
 <pre>
           DenseMatrix&lt;Number&gt; Ke;
-          DenseVector<Number> Fe;
+          DenseVector&lt;Number&gt; Fe;
         
-          DenseSubMatrix<Number>
+          DenseSubMatrix&lt;Number&gt;
             Kuu(Ke), Kuv(Ke), Kup(Ke),
             Kvu(Ke), Kvv(Ke), Kvp(Ke),
             Kpu(Ke), Kpv(Ke), Kpp(Ke);
         
-          DenseSubVector<Number>
+          DenseSubVector&lt;Number&gt;
             Fu(Fe),
             Fv(Fe),
             Fp(Fe);
@@ -464,9 +464,9 @@ the element degrees of freedom get mapped.
 <div class ="fragment">
 <pre>
           std::vector&lt;unsigned int&gt; dof_indices;
-          std::vector<unsigned int> dof_indices_u;
-          std::vector<unsigned int> dof_indices_v;
-          std::vector<unsigned int> dof_indices_p;
+          std::vector&lt;unsigned int&gt; dof_indices_u;
+          std::vector&lt;unsigned int&gt; dof_indices_v;
+          std::vector&lt;unsigned int&gt; dof_indices_p;
           
 </pre>
 </div>
@@ -529,7 +529,7 @@ quadrature points (q_point) and the shape functions
 <div class ="fragment">
 <pre>
               fe_vel-&gt;reinit  (elem);
-              fe_pres->reinit (elem);
+              fe_pres-&gt;reinit (elem);
         
 </pre>
 </div>
@@ -603,7 +603,7 @@ uu coupling
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;n_u_dofs; i++)
-        	    for (unsigned int j=0; j<n_u_dofs; j++)
+        	    for (unsigned int j=0; j&lt;n_u_dofs; j++)
         	      Kuu(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
         
 </pre>
@@ -615,7 +615,7 @@ up coupling
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;n_u_dofs; i++)
-        	    for (unsigned int j=0; j<n_p_dofs; j++)
+        	    for (unsigned int j=0; j&lt;n_p_dofs; j++)
         	      Kup(i,j) += -JxW[qp]*psi[j][qp]*dphi[i][qp](0);
         
         
@@ -629,7 +629,7 @@ vv coupling
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;n_v_dofs; i++)
-        	    for (unsigned int j=0; j<n_v_dofs; j++)
+        	    for (unsigned int j=0; j&lt;n_v_dofs; j++)
         	      Kvv(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
         
 </pre>
@@ -641,7 +641,7 @@ vp coupling
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;n_v_dofs; i++)
-        	    for (unsigned int j=0; j<n_p_dofs; j++)
+        	    for (unsigned int j=0; j&lt;n_p_dofs; j++)
         	      Kvp(i,j) += -JxW[qp]*psi[j][qp]*dphi[i][qp](1);
         
         	  
@@ -655,7 +655,7 @@ pu coupling
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;n_p_dofs; i++)
-        	    for (unsigned int j=0; j<n_u_dofs; j++)
+        	    for (unsigned int j=0; j&lt;n_u_dofs; j++)
         	      Kpu(i,j) += -JxW[qp]*psi[i][qp]*dphi[j][qp](0);
         
 </pre>
@@ -667,7 +667,7 @@ pv coupling
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;n_p_dofs; i++)
-        	    for (unsigned int j=0; j<n_v_dofs; j++)
+        	    for (unsigned int j=0; j&lt;n_v_dofs; j++)
         	      Kpv(i,j) += -JxW[qp]*psi[i][qp]*dphi[j][qp](1);
         	  
         	} // end of the quadrature point qp-loop
@@ -699,9 +699,9 @@ side MUST live on a boundary of the domain.
 <div class ="fragment">
 <pre>
                 for (unsigned int s=0; s&lt;elem-&gt;n_sides(); s++)
-        	  if (elem->neighbor(s) == NULL)
+        	  if (elem-&gt;neighbor(s) == NULL)
         	    {
-        	      AutoPtr<Elem> side (elem->build_side(s));
+        	      AutoPtr&lt;Elem&gt; side (elem-&gt;build_side(s));
         	      	      
 </pre>
 </div>
@@ -771,7 +771,7 @@ the boundary condition will be applied.
 <div class ="fragment">
 <pre>
                           for (unsigned int n=0; n&lt;elem-&gt;n_nodes(); n++)
-        		    if (elem->node(n) == side->node(ns))
+        		    if (elem-&gt;node(n) == side-&gt;node(ns))
         		      {
 </pre>
 </div>
@@ -796,7 +796,7 @@ Right-hand-side contribution.
         			Fv(n) += penalty*v_value;
         		      }
         		} // end face node loop	  
-        	    } // end if (elem->neighbor(side) == NULL)
+        	    } // end if (elem-&gt;neighbor(side) == NULL)
               } // end boundary condition section	  
               
 </pre>
@@ -828,7 +828,7 @@ and \p PetscVector::add_vector() members do this for us.
 <div class ="fragment">
 <pre>
               system.matrix-&gt;add_matrix (Ke, dof_indices);
-              system.rhs->add_vector    (Fe, dof_indices);
+              system.rhs-&gt;add_vector    (Fe, dof_indices);
             } // end of element loop
           
 </pre>
@@ -1085,10 +1085,6 @@ That's it.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-Compiling C++ (in debug mode) ex11.C...
-Linking ex11...
-/home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
-: the use of `mktemp' is dangerous, better use `mkstemp'
 ***************************************************************
 * Running Example  ./ex11
 ***************************************************************

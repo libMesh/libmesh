@@ -31,10 +31,10 @@ The mesh contains HEX8 and PRISM6 elements.
 <div class ="fragment">
 <pre>
         #include &lt;iostream&gt;
-        #include <fstream>
-        #include <algorithm>
-        #include <stdio.h>
-        #include <math.h>
+        #include &lt;fstream&gt;
+        #include &lt;algorithm&gt;
+        #include &lt;stdio.h&gt;
+        #include &lt;math.h&gt;
         
 </pre>
 </div>
@@ -116,7 +116,7 @@ wave equation.
 
 <div class ="fragment">
 <pre>
-        void assemble_wave(EquationSystems&amp; es,
+        void assemble_wave(EquationSystems& es,
         		   const std::string& system_name);
         
         
@@ -129,7 +129,7 @@ initial conditions.
 
 <div class ="fragment">
 <pre>
-        void apply_initial(EquationSystems&amp; es,
+        void apply_initial(EquationSystems& es,
         		   const std::string& system_name);
         
 </pre>
@@ -142,7 +142,7 @@ method after the system is assembled.
 
 <div class ="fragment">
 <pre>
-        void fill_dirichlet_bc(EquationSystems&amp; es,
+        void fill_dirichlet_bc(EquationSystems& es,
         		       const std::string& system_name);
         
 </pre>
@@ -184,8 +184,8 @@ Check for proper usage.
 <pre>
             if (argc &lt; 2)
               {
-        	std::cerr << "Usage: " << argv[0] << " [meshfile]"
-        		  << std::endl;
+        	std::cerr &lt;&lt; "Usage: " &lt;&lt; argv[0] &lt;&lt; " [meshfile]"
+        		  &lt;&lt; std::endl;
         	
         	error();
               }
@@ -200,12 +200,12 @@ Tell the user what we are doing.
 <pre>
             else 
               {
-        	std::cout << "Running " << argv[0];
+        	std::cout &lt;&lt; "Running " &lt;&lt; argv[0];
         	
-        	for (int i=1; i<argc; i++)
-        	  std::cout << " " << argv[i];
+        	for (int i=1; i&lt;argc; i++)
+        	  std::cout &lt;&lt; " " &lt;&lt; argv[i];
         	
-        	std::cout << std::endl << std::endl;
+        	std::cout &lt;&lt; std::endl &lt;&lt; std::endl;
         
               }
         
@@ -219,7 +219,7 @@ from the command line.
 <div class ="fragment">
 <pre>
             std::string mesh_file = argv[1];
-            std::cout << "Mesh file is: " << mesh_file << std::endl;
+            std::cout &lt;&lt; "Mesh file is: " &lt;&lt; mesh_file &lt;&lt; std::endl;
         
 </pre>
 </div>
@@ -344,7 +344,7 @@ Use a handy reference to this system
 
 <div class ="fragment">
 <pre>
-              NewmarkSystem &amp; t_system = equation_systems.get_system&lt;NewmarkSystem&gt; ("Wave");
+              NewmarkSystem & t_system = equation_systems.get_system&lt;NewmarkSystem&gt; ("Wave");
               
 </pre>
 </div>
@@ -461,7 +461,7 @@ Use a handy reference to this system
 
 <div class ="fragment">
 <pre>
-            NewmarkSystem&amp; t_system = equation_systems.get_system&lt;NewmarkSystem&gt; ("Wave");
+            NewmarkSystem& t_system = equation_systems.get_system&lt;NewmarkSystem&gt; ("Wave");
                
 </pre>
 </div>
@@ -490,12 +490,12 @@ to the nodal result file
 <div class ="fragment">
 <pre>
             Real t_time = 0.;
-            res_out << "# pressure at node " << res_node_no << "\n"
-        	    << "# time\tpressure\n"
-        	    << t_time << "\t" << 0 << std::endl;
+            res_out &lt;&lt; "# pressure at node " &lt;&lt; res_node_no &lt;&lt; "\n"
+        	    &lt;&lt; "# time\tpressure\n"
+        	    &lt;&lt; t_time &lt;&lt; "\t" &lt;&lt; 0 &lt;&lt; std::endl;
         
         
-            for (unsigned int time_step=0; time_step<n_time_steps; time_step++)
+            for (unsigned int time_step=0; time_step&lt;n_time_steps; time_step++)
               {
 </pre>
 </div>
@@ -613,8 +613,8 @@ be viewed with e.g. gnuplot (run gnuplot and type
 <div class ="fragment">
 <pre>
                 res_out &lt;&lt; t_time &lt;&lt; "\t"
-        		<< t_system.get_vector("displacement")(dof_no)
-        		<< std::endl;
+        		&lt;&lt; t_system.get_vector("displacement")(dof_no)
+        		&lt;&lt; std::endl;
               }
           }
           
@@ -638,7 +638,7 @@ for our wave equation.
 
 <div class ="fragment">
 <pre>
-        void assemble_wave(EquationSystems&amp; es,
+        void assemble_wave(EquationSystems& es,
         		   const std::string& system_name)
         {  
 </pre>
@@ -660,7 +660,7 @@ Get a constant reference to the mesh object.
 
 <div class ="fragment">
 <pre>
-          const Mesh&amp; mesh = es.get_mesh();
+          const Mesh& mesh = es.get_mesh();
         
 </pre>
 </div>
@@ -692,7 +692,7 @@ Get a reference to our system, as before.
 
 <div class ="fragment">
 <pre>
-          NewmarkSystem &amp; t_system = es.get_system&lt;NewmarkSystem&gt; (system_name);
+          NewmarkSystem & t_system = es.get_system&lt;NewmarkSystem&gt; (system_name);
         
 </pre>
 </div>
@@ -717,11 +717,11 @@ references to them.
 
 <div class ="fragment">
 <pre>
-          SparseMatrix&lt;Number&gt;&amp;   stiffness = t_system.get_matrix("stiffness");
-          SparseMatrix<Number>&   damping   = t_system.get_matrix("damping");
-          SparseMatrix<Number>&   mass      = t_system.get_matrix("mass");
+          SparseMatrix&lt;Number&gt;&   stiffness = t_system.get_matrix("stiffness");
+          SparseMatrix&lt;Number&gt;&   damping   = t_system.get_matrix("damping");
+          SparseMatrix&lt;Number&gt;&   mass      = t_system.get_matrix("mass");
         
-          NumericVector<Number>&  force     = t_system.get_vector("force");
+          NumericVector&lt;Number&gt;&  force     = t_system.get_vector("force");
         
 </pre>
 </div>
@@ -737,8 +737,8 @@ encounter identical sparsity structures.
 
 <div class ="fragment">
 <pre>
-          SparseMatrix&lt;Number&gt;&amp;  matrix     = *t_system.matrix;
-          DenseMatrix<Number>    zero_matrix;
+          SparseMatrix&lt;Number&gt;&  matrix     = *t_system.matrix;
+          DenseMatrix&lt;Number&gt;    zero_matrix;
         
 </pre>
 </div>
@@ -771,7 +771,7 @@ Tell the finite element object to use our quadrature rule.
 
 <div class ="fragment">
 <pre>
-          fe-&gt;attach_quadrature_rule (&amp;qrule);
+          fe-&gt;attach_quadrature_rule (&qrule);
         
 </pre>
 </div>
@@ -781,7 +781,7 @@ The element Jacobian * quadrature weight at each integration point.
 
 <div class ="fragment">
 <pre>
-          const std::vector&lt;Real&gt;&amp; JxW = fe-&gt;get_JxW();
+          const std::vector&lt;Real&gt;& JxW = fe-&gt;get_JxW();
         
 </pre>
 </div>
@@ -791,7 +791,7 @@ The element shape functions evaluated at the quadrature points.
 
 <div class ="fragment">
 <pre>
-          const std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi = fe-&gt;get_phi();
+          const std::vector&lt;std::vector&lt;Real&gt; &gt;& phi = fe-&gt;get_phi();
         
 </pre>
 </div>
@@ -802,7 +802,7 @@ points.
 
 <div class ="fragment">
 <pre>
-          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = fe-&gt;get_dphi();
+          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;& dphi = fe-&gt;get_dphi();
         
 </pre>
 </div>
@@ -814,7 +814,7 @@ to degree of freedom numbers.
 
 <div class ="fragment">
 <pre>
-          const DofMap&amp; dof_map = t_system.get_dof_map();
+          const DofMap& dof_map = t_system.get_dof_map();
         
 </pre>
 </div>
@@ -826,7 +826,7 @@ and the element contribution to the rhs.
 <div class ="fragment">
 <pre>
           DenseMatrix&lt;Number&gt;   Ke, Ce, Me;
-          DenseVector<Number>   Fe;
+          DenseVector&lt;Number&gt;   Fe;
         
 </pre>
 </div>
@@ -937,7 +937,7 @@ the trial functions (j).
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;phi.size(); i++)
-        	    for (unsigned int j=0; j<phi.size(); j++)
+        	    for (unsigned int j=0; j&lt;phi.size(); j++)
         	      {
         		Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
         		Me(i,j) += JxW[qp]*phi[i][qp]*phi[j][qp]
@@ -1011,7 +1011,7 @@ quadrature rule.
 
 <div class ="fragment">
 <pre>
-                      fe_face-&gt;attach_quadrature_rule (&amp;qface);
+                      fe_face-&gt;attach_quadrature_rule (&qface);
         	      
 </pre>
 </div>
@@ -1022,7 +1022,7 @@ points.
 
 <div class ="fragment">
 <pre>
-                      const std::vector&lt;std::vector&lt;Real&gt; &gt;&amp;  phi_face = fe_face-&gt;get_phi();
+                      const std::vector&lt;std::vector&lt;Real&gt; &gt;&  phi_face = fe_face-&gt;get_phi();
         	      
 </pre>
 </div>
@@ -1033,7 +1033,7 @@ points on the face.
 
 <div class ="fragment">
 <pre>
-                      const std::vector&lt;Real&gt;&amp; JxW_face = fe_face-&gt;get_JxW();
+                      const std::vector&lt;Real&gt;& JxW_face = fe_face-&gt;get_JxW();
         	      
 </pre>
 </div>
@@ -1082,7 +1082,7 @@ normal acceleration.
         			*phi_face[i][qp]*JxW_face[qp];
         		    }
         		} // end face quadrature point loop	  
-        	    } // end if (elem->neighbor(side) == NULL)
+        	    } // end if (elem-&gt;neighbor(side) == NULL)
         	
 </pre>
 </div>
@@ -1146,7 +1146,7 @@ This function applies the initial conditions
 
 <div class ="fragment">
 <pre>
-        void apply_initial(EquationSystems&amp; es,
+        void apply_initial(EquationSystems& es,
         		   const std::string& system_name)
         {
 </pre>
@@ -1157,7 +1157,7 @@ Get a reference to our system, as before
 
 <div class ="fragment">
 <pre>
-          NewmarkSystem &amp; t_system = es.get_system&lt;NewmarkSystem&gt; (system_name);
+          NewmarkSystem & t_system = es.get_system&lt;NewmarkSystem&gt; (system_name);
           
 </pre>
 </div>
@@ -1168,9 +1168,9 @@ values.
 
 <div class ="fragment">
 <pre>
-          NumericVector&lt;Number&gt;&amp;  pres_vec       = t_system.get_vector("displacement");
-          NumericVector<Number>&  vel_vec        = t_system.get_vector("velocity");
-          NumericVector<Number>&  acc_vec        = t_system.get_vector("acceleration");
+          NumericVector&lt;Number&gt;&  pres_vec       = t_system.get_vector("displacement");
+          NumericVector&lt;Number&gt;&  vel_vec        = t_system.get_vector("velocity");
+          NumericVector&lt;Number&gt;&  acc_vec        = t_system.get_vector("acceleration");
         
 </pre>
 </div>
@@ -1195,7 +1195,7 @@ This function applies the Dirichlet boundary conditions
 
 <div class ="fragment">
 <pre>
-        void fill_dirichlet_bc(EquationSystems&amp; es,
+        void fill_dirichlet_bc(EquationSystems& es,
         		       const std::string& system_name)
         {
 </pre>
@@ -1217,7 +1217,7 @@ Get a reference to our system, as before.
 
 <div class ="fragment">
 <pre>
-          NewmarkSystem &amp; t_system = es.get_system&lt;NewmarkSystem&gt; (system_name);
+          NewmarkSystem & t_system = es.get_system&lt;NewmarkSystem&gt; (system_name);
         
 </pre>
 </div>
@@ -1227,8 +1227,8 @@ Get writable references to the overall matrix and vector.
 
 <div class ="fragment">
 <pre>
-          SparseMatrix&lt;Number&gt;&amp;  matrix = *t_system.matrix;
-          NumericVector<Number>& rhs    = *t_system.rhs;
+          SparseMatrix&lt;Number&gt;&  matrix = *t_system.matrix;
+          NumericVector&lt;Number&gt;& rhs    = *t_system.rhs;
         
 </pre>
 </div>
@@ -1238,7 +1238,7 @@ Get a constant reference to the mesh object.
 
 <div class ="fragment">
 <pre>
-          const Mesh&amp; mesh = es.get_mesh();
+          const Mesh& mesh = es.get_mesh();
         
 </pre>
 </div>
@@ -1281,7 +1281,7 @@ Number of nodes in the mesh.
 <pre>
           unsigned int n_nodes = mesh.n_nodes();
         
-          for (unsigned int n_cnt=0; n_cnt<n_nodes; n_cnt++)
+          for (unsigned int n_cnt=0; n_cnt&lt;n_nodes; n_cnt++)
             {
 </pre>
 </div>
@@ -1291,7 +1291,7 @@ Get a reference to the current node.
 
 <div class ="fragment">
 <pre>
-              const Node&amp; curr_node = mesh.node(n_cnt);
+              const Node& curr_node = mesh.node(n_cnt);
         
 </pre>
 </div>
@@ -1307,7 +1307,7 @@ pipe-mesh in this directory.
 <pre>
               const Real z_coo = 4.;
         
-              if (fabs(curr_node(2)-z_coo) < TOLERANCE)
+              if (fabs(curr_node(2)-z_coo) &lt; TOLERANCE)
         	{
 </pre>
 </div>
@@ -1339,7 +1339,7 @@ at one end of the pipe-mesh.
 <div class ="fragment">
 <pre>
                   Real p_value;
-        	  if (current_time < .002 )
+        	  if (current_time &lt; .002 )
         	    p_value = sin(2*pi*current_time/.002);
         	  else
         	    p_value = .0;
@@ -1715,10 +1715,6 @@ if desired.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-Compiling C++ (in debug mode) ex8.C...
-Linking ex8...
-/home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
-: the use of `mktemp' is dangerous, better use `mkstemp'
 ***************************************************************
 * Running Example  ./ex8
 ***************************************************************

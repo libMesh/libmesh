@@ -98,9 +98,9 @@ exact name of the program being run, and its command line.
 <div class ="fragment">
 <pre>
             std::cout &lt;&lt; "Running " &lt;&lt; argv[0];
-            for (int i=1; i<argc; i++)
-              std::cout << " " << argv[i];
-            std::cout << std::endl << std::endl;
+            for (int i=1; i&lt;argc; i++)
+              std::cout &lt;&lt; " " &lt;&lt; argv[i];
+            std::cout &lt;&lt; std::endl &lt;&lt; std::endl;
             
 </pre>
 </div>
@@ -250,8 +250,8 @@ this data later.
             if (argc == 2)
               if (argv[1][0] != '-')
         	{
-        	  std::cout << "<<< Writing system to file " << argv[1]
-        		    << std::endl;
+        	  std::cout &lt;&lt; "&lt;&lt;&lt; Writing system to file " &lt;&lt; argv[1]
+        		    &lt;&lt; std::endl;
         	  
 </pre>
 </div>
@@ -273,8 +273,8 @@ Clear the equation systems data structure.
 <pre>
                   equation_systems.clear ();
         
-        	  std::cout << ">>> Reading system from file " << argv[1]
-        		    << std::endl << std::endl;
+        	  std::cout &lt;&lt; "&gt;&gt;&gt; Reading system from file " &lt;&lt; argv[1]
+        		    &lt;&lt; std::endl &lt;&lt; std::endl;
         	  
 </pre>
 </div>
@@ -391,10 +391,6 @@ MPI.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-Compiling C++ (in debug mode) ex2.C...
-Linking ex2...
-/home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
-: the use of `mktemp' is dangerous, better use `mkstemp'
 ***************************************************************
 * Running Example  ./ex2
 ***************************************************************
