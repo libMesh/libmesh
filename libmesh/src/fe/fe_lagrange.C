@@ -1,4 +1,4 @@
-// $Id: fe_lagrange.C,v 1.21 2005-02-28 16:35:26 roystgnr Exp $
+// $Id: fe_lagrange.C,v 1.22 2005-02-28 18:16:39 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -581,8 +581,10 @@ void FE<Dim,T>::compute_constraints (std::map<unsigned int,
 	  const AutoPtr<Elem> my_side     (elem->build_side(s));
 	  const AutoPtr<Elem> parent_side (parent->build_side(s));
 
-	  dof_map.dof_indices (my_side.get(), my_dof_indices);
-	  dof_map.dof_indices (parent_side.get(), parent_dof_indices);
+	  dof_map.dof_indices (my_side.get(), my_dof_indices,
+			       variable_number);
+	  dof_map.dof_indices (parent_side.get(), parent_dof_indices,
+			       variable_number);
   
 	  for (unsigned int my_dof=0;
 	       my_dof<FEInterface::n_dofs(Dim-1, fe_type, my_side->type());
