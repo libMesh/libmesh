@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.19 2003-05-20 09:28:44 ddreyer Exp $
+// $Id: fe.h,v 1.20 2003-05-27 17:18:14 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -52,7 +52,7 @@ class InfFE;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.19 $
+ * \version $Revision: 1.20 $
  */
 
 //-------------------------------------------------------------
@@ -190,7 +190,7 @@ public:
    * argument \p pts.
    */
   void reinit (const Elem* elem,
-	       const std::vector<Point>* const pts);
+	       const std::vector<Point>* const pts = NULL);
     
   /**
    * Reinitializes all the physical element-dependent data based on
@@ -316,7 +316,7 @@ private:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.19 $
+ * \version $Revision: 1.20 $
  */
 
 //-------------------------------------------------------------
@@ -341,7 +341,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.19 $
+ * \version $Revision: 1.20 $
  */
 
 //-------------------------------------------------------------
@@ -366,7 +366,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.19 $
+ * \version $Revision: 1.20 $
  */
 
 //-------------------------------------------------------------
