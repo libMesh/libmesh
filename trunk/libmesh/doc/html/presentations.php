@@ -22,8 +22,10 @@
     <li> <a href="http://cfdlab.ae.utexas.edu/~benkirk/seminar/talk.pdf">Finite Elements - Introduction and Applications</a> (April 2003 NASA/JSC technical seminar)</li>
   </ul>
   <li> <a href="http://usnccm.sandia.gov/mslist/upload/IncomprssblCFD/2230_Final_abstract.pdf">USNCCM VII</a> conference abstract. </li>
+    <li>  <a href="http://www.cfdlab.ae.utexas.edu/~peterson/usnccm.pdf">USNCCM VII</a> Presentation.</li>
   <li> ICIAM </li>
   <li>  <a href="http://www.saviac.org/74th_Symposium/abstracts/U040.htm">SAVIAC</a> conference abstract.</li>
+
 </ul>
 </div>
 
