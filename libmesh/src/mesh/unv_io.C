@@ -1,4 +1,4 @@
-// $Id: unv_io.C,v 1.5 2004-04-23 13:24:00 spetersen Exp $
+// $Id: unv_io.C,v 1.6 2004-08-05 15:58:44 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -19,7 +19,7 @@
 
 
 // C++ includes
-#include <stdio.h>
+#include <stdio.h>   // for sprintf
 #include <algorithm> // for std::sort
 
 

@@ -1,4 +1,4 @@
-// $Id: mesh_data_unv_support.C,v 1.20 2004-07-26 16:27:48 jwpeterson Exp $
+// $Id: mesh_data_unv_support.C,v 1.21 2004-08-05 15:58:44 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -20,7 +20,7 @@
 
 
 // C++ includes
-#include <stdio.h>
+#include <stdio.h> // for sprintf
 
 // Local includes
 #include "libmesh_config.h"

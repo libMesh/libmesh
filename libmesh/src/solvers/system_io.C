@@ -1,4 +1,4 @@
-// $Id: system_io.C,v 1.2 2004-03-08 02:10:05 benkirk Exp $
+// $Id: system_io.C,v 1.3 2004-08-05 15:58:44 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -22,7 +22,7 @@
 
 
 // C++ Includes
-#include <stdio.h> 
+#include <stdio.h> // for sprintf
 
 // Local Includes
 #include "system.h"

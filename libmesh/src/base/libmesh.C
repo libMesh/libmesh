@@ -1,4 +1,4 @@
-// $Id: libmesh.C,v 1.22 2004-03-24 05:49:11 jwpeterson Exp $
+// $Id: libmesh.C,v 1.23 2004-08-05 15:58:44 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -103,6 +103,13 @@ void libMesh::init (int &argc, char** & argv)
 {
   // should _not_ be initialized already.
   assert (!libMesh::initialized());
+
+  // The following line is an optimization when simultaneous
+  // C and C++ style access to output streams is not required.
+  // The amount of benefit which occurs is probably implementation
+  // defined, and may be nothing.  On the other hand, I have seen
+  // some IO tests where IO peformance improves by a factor of two.
+  std::ios_base::sync_with_stdio(false);
   
   // Build a command-line parser.
   command_line.reset(new GetPot (argc, argv));

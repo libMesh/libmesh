@@ -1,4 +1,4 @@
-// $Id: gmsh_io.C,v 1.2 2004-07-14 19:23:18 jwpeterson Exp $
+// $Id: gmsh_io.C,v 1.3 2004-08-05 15:58:44 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -21,8 +21,6 @@
 
 // C++ includes
 #include <fstream>
-//#include <string.h> // for strcpy, memcpy
-//#include <stdio.h>  // for sprintf
 
 // Local includes
 #include "libmesh_config.h"
