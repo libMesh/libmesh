@@ -1,4 +1,4 @@
-// $Id: fe_xyz_shape_2D.C,v 1.2 2004-03-24 05:49:11 jwpeterson Exp $
+// $Id: fe_xyz_shape_2D.C,v 1.3 2004-11-30 21:45:26 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -32,7 +32,7 @@
 // to be recalculated.
 namespace
 {
-  static const Elem* old_elem = NULL;
+  static unsigned int old_elem_id = libMesh::invalid_uint;
   static Point centroid;
 }
 
@@ -68,10 +68,10 @@ Real FE<2,XYZ>::shape(const Elem* elem,
   // has changed from the last one we computed.
   // This avoids repeated centroid calculations
   // when called in succession with the same element.
-  if (elem != old_elem)
+  if (elem->id() != old_elem_id)
     {
       centroid = elem->centroid();
-      old_elem = elem;
+      old_elem_id = elem->id();
     }  
   
   const Real x  = p(0);
@@ -203,10 +203,10 @@ Real FE<2,XYZ>::shape_deriv(const Elem* elem,
   // has changed from the last one we computed.
   // This avoids repeated centroid calculations
   // when called in succession with the same element.
-  if (elem != old_elem)
+  if (elem->id() != old_elem_id)
     {
       centroid = elem->centroid();
-      old_elem = elem;
+      old_elem_id = elem->id();
     }  
   
   const Real x  = p(0);
