@@ -1,4 +1,4 @@
-// $Id: mesh_common.h,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: mesh_common.h,v 1.7 2003-02-04 00:49:09 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -28,22 +28,21 @@
 #include <assert.h>
 #include <stdlib.h>
 
-
+// The library configuration options
 #include "mesh_config.h"
 
-/**
- * An anonymous namespace to hold \p typedefs and the like
- * for the library.  Really couldn't get this to work together 
- * with std::complex and PETSc.
- */
-#ifndef USE_COMPLEX_NUMBERS
-namespace
-{
-#endif
 
   
+#ifdef Real
+#  undef Real
+#endif
+
 #ifdef REAL
 #  undef REAL
+#endif
+
+#ifdef Complex
+#  undef Complex
 #endif
 
 #ifdef COMPLEX
@@ -85,10 +84,6 @@ namespace
 // 3D spatial dimension unless otherwise specified
 #ifndef DIM
 #  define DIM 3
-#endif
-
-#ifndef USE_COMPLEX_NUMBERS
-}; // end anonymous namespace
 #endif
 
 #endif // #define __mesh_common_h__

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.8 2003-02-03 03:51:48 ddreyer Exp $
+# $Id: Makefile,v 1.9 2003-02-04 00:49:08 benkirk Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -37,14 +37,7 @@ loggedfiles     := $(srcfiles) $(filter-out include/mesh_config.h, $(headerfiles
 ###############################################################################
 # Target:
 #
-targ_dir   := lib/$(hosttype)_$(METHOD)
-
-targ 	   := $(pwd)/$(targ_dir)
-target 	   := $(targ)/libmesh.a
-
-ifeq ($(enable-shared),yes) 
-  target   := $(targ)/libmesh.so
-endif
+target := $(mesh_library)
 
 ifeq ($(syn-mode),on)
   all:: $(objects)
@@ -61,27 +54,27 @@ endif
 #
 # static library
 #
-$(targ)/libmesh.a: $(objects)
+$(mesh_library_dir)/libmesh.a: $(objects)
 	@$(MAKE) -C contrib
-	@$(shell mkdir -p $(targ_dir))
+	@$(shell mkdir -p $(mesh_library_dir))
 	@echo ""
 	@echo "Linking "$@
-	@$(AR) rv $(target) $(objects)
+	@$(AR) rv $(mesh_library) $(objects)
 
 #
 # shared library
 #
-$(targ)/libmesh.so: $(objects)
+$(mesh_library_dir)/libmesh.so: $(objects)
 	@$(MAKE) -C contrib
-	@$(shell mkdir -p $(targ_dir))
+	@$(shell mkdir -p $(mesh_library_dir))
 	@echo ""
 	@echo "Linking "$@
-	@$(CXX) $(CXXSHAREDFLAG) -o $(target) $(objects)
+	@$(CXX) $(CXXSHAREDFLAG) -o $(mesh_library) $(objects)
 
 #
 # Build the examples
 #
-examples: $(target)
+examples: $(mesh_library)
 	@$(MAKE) -C examples
 
 
@@ -121,9 +114,9 @@ distclean:
 	@$(MAKE) -C contrib $(MAKECMDGOALS)
 	@$(MAKE) -C examples $(MAKECMDGOALS)
 	@rm -rf doc/html doc/latex doc/kdoc/*.html \
-               doc/man/man3 doc/cvshtml/*.html doc/cvshtml/diff \
-	       src/*/*.o src/*/*.go src/*/*.pgo \
-	       lib/*_opt lib/*_dbg lib/*_pro
+                doc/man/man3 doc/cvshtml/*.html doc/cvshtml/diff \
+	        src/*/*.o src/*/*.go src/*/*.pgo \
+	        lib/*_opt lib/*_dbg lib/*_pro
 
 
 
@@ -147,33 +140,33 @@ cvsweb:
 #
 # Meshtool utility program
 #
-meshtool: $(target) src/apps/meshtool.cc
-	$(CXX) $(CXXFLAGS) $(INCLUDE) src/apps/meshtool.cc $< -o bin/$@ $(LIBS) $(LDFLAGS)
+meshtool: $(mesh_library) src/apps/meshtool.cc
+	$(CXX) $(CXXFLAGS) $(INCLUDE) src/apps/meshtool.cc -o bin/$@ $(LIBS) $(LDFLAGS)
 
 #
 # Read_Dat utility program
 #
-read_dat: $(target) src/apps/read_dat.cc
-	$(CXX) $(CXXFLAGS) $(INCLUDE) src/apps/read_dat.cc $< -o bin/$@ $(LIBS) $(LDFLAGS)
+read_dat: $(mesh_library) src/apps/read_dat.cc
+	$(CXX) $(CXXFLAGS) $(INCLUDE) src/apps/read_dat.cc -o bin/$@ $(LIBS) $(LDFLAGS)
 
 #
 # foo
 #
-foo: $(target) src/apps/foo.cc
-	$(CXX) $(CXXFLAGS) $(INCLUDE) src/apps/foo.cc $< -o bin/$@ $(LIBS) $(LDFLAGS)
+foo: $(mesh_library) src/apps/foo.cc
+	$(CXX) $(CXXFLAGS) $(INCLUDE) src/apps/foo.cc -o bin/$@ $(LIBS) $(LDFLAGS)
 
 
 #
 # grid2grid
 #
-grid2grid: $(target) src/apps/grid2grid.cc
-	$(CXX) $(CXXFLAGS) $(INCLUDE) src/apps/grid2grid.cc $< -o bin/$@ $(LIBS) $(LDFLAGS)
+grid2grid: $(mesh_library) src/apps/grid2grid.cc
+	$(CXX) $(CXXFLAGS) $(INCLUDE) src/apps/grid2grid.cc -o bin/$@ $(LIBS) $(LDFLAGS)
 
 #
 # Testexodus FE program
 #
-testexodus: $(target) src/apps/testexodus.cc
-	$(CXX) $(CXXFLAGS) $(INCLUDE) src/apps/testexodus.cc $< -o bin/$@ $(LIBS) $(LDFLAGS)
+testexodus: $(mesh_library) src/apps/testexodus.cc
+	$(CXX) $(CXXFLAGS) $(INCLUDE) src/apps/testexodus.cc -o bin/$@ $(LIBS) $(LDFLAGS)
 
 #
 # Make a TODO list
