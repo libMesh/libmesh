@@ -1,4 +1,4 @@
-// $Id: xdr_cxx.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: xdr_cxx.h,v 1.3 2004-03-07 23:11:33 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -28,7 +28,7 @@
 #include "o_f_stream.h"
 
 // C++ includes
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
 #  include <rpc/rpc.h>
 #endif
 
@@ -356,7 +356,7 @@ private:
    */ 
   const XdrMODE mode;
 
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
   
   /**
    * Pointer to the standard @p xdr

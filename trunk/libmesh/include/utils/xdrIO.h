@@ -1,4 +1,4 @@
-// $Id: xdrIO.h,v 1.3 2004-01-03 15:37:42 benkirk Exp $
+// $Id: xdrIO.h,v 1.4 2004-03-07 23:11:33 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -30,7 +30,7 @@
 #include <vector>
 #include <string>
 
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
 # include <rpc/rpc.h>
 #endif
 
@@ -92,7 +92,7 @@ class XdrIO
    * is a struct defined in the
    * standard C header \p rpc/rpc.h.
    */
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
   XdrIO() : m_type(UNKNOWN), mp_xdr_handle(0), orig_flag(0), mp_fp(0) {}
 #else
   XdrIO() : m_type(UNKNOWN), orig_flag(0), mp_fp(0) {}
@@ -178,7 +178,7 @@ class XdrIO
    */
   XdrIO_TYPE m_type;
 
-#ifdef HAVE_RPC_RPC_H
+#ifdef HAVE_XDR
   
   /**
    * Pointer to the standard \p{xdr}
