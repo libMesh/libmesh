@@ -21,7 +21,7 @@ endif
 ifeq ($(enable-mpi),no)
   # Do nothing
   all::
-	@echo "<<< Cannot build Parmetis without mpi >>>"
+	@echo "<<< Cannot build Parmetis without MPI >>>"
 
 else
 
