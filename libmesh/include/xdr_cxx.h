@@ -1,4 +1,4 @@
-// $Id: xdr_cxx.h,v 1.7 2003-03-12 20:15:10 ddreyer Exp $
+// $Id: xdr_cxx.h,v 1.8 2003-03-22 21:04:30 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,14 +24,15 @@
 
 // Local includes
 #include "mesh_common.h"
+#include "o_f_stream.h"
 
 // C++ includes
 #ifdef HAVE_RPC_RPC_H
 #  include <rpc/rpc.h>
 #endif
 
-#include <fstream>
-#include <iomanip>
+//#include <fstream>
+//#include <iomanip>
 #include <vector>
 #include <string>
 #ifdef USE_COMPLEX_NUMBERS
@@ -380,8 +381,11 @@ private:
 
   /**
    * The output file stream.
+   * Use the customized class to enable
+   * features also for compilers with broken
+   * iostream
    */
-  std::ofstream out;
+  OFStream out;
 
   /**
    * The input file stream.

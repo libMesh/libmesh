@@ -1,4 +1,4 @@
-// $Id: utility.C,v 1.5 2003-01-24 17:24:46 jwpeterson Exp $
+// $Id: utility.C,v 1.6 2003-03-22 21:04:31 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -20,7 +20,6 @@
 
 
 // System includes
-#include <sstream>
 #include <iostream>
 #include <sys/time.h>
 #include <pwd.h>
@@ -29,8 +28,8 @@
 
 
 // Local includes
+#include "o_string_stream.h"
 #include "utility.h"
-
 
 
 // The system_info function duplicates some of the
@@ -39,13 +38,12 @@
 // system without creating a perf_log object.
 std::string Utility::system_info()
 {
-  std::ostringstream out;
+  OStringStream out;
   
 #ifdef HAVE_LOCALE
-#ifndef BROKEN_IOSTREAM
     
   std::locale loc;
-  std::ostringstream  dateStr;
+  OStringStream dateStr;
   std::ostreambuf_iterator<char, std::char_traits<char> > begin(dateStr);
   time_t tm                  = time(NULL);
   struct tm* tmb             = localtime(&tm);
@@ -73,7 +71,6 @@ std::string Utility::system_info()
       << "| Username:       " << p->pw_name       << std::endl 
       << " ---------------------------------------------------------------------" << std::endl;
 
-#endif
 #endif
   
   return out.str();

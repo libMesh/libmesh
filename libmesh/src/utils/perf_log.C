@@ -1,4 +1,4 @@
-// $Id: perf_log.C,v 1.12 2003-03-03 18:03:39 benkirk Exp $
+// $Id: perf_log.C,v 1.13 2003-03-22 21:04:31 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -26,10 +26,10 @@
 #include <sys/utsname.h>
 #include <sys/types.h>
 #include <pwd.h>
-#include <sstream>
 
 // Local includes
 #include "perf_log.h"
+#include "o_string_stream.h"
 
 
 
@@ -88,13 +88,13 @@ void PerfLog::clear()
 
 std::string PerfLog::get_info_header() const
 {
-  std::ostringstream out;
+  OStringStream out;
   
   if (log_events)
     {
 
 #ifdef HAVE_LOCALE
-      std::ostringstream  dateStr;
+      OStringStream     dateStr;
       time_t tm         = time(NULL);
       struct tm* tmb    = localtime(&tm);
       std::locale loc;
@@ -138,13 +138,11 @@ std::string PerfLog::get_info_header() const
 }
 
 
-
+ 
 
 std::string PerfLog::get_perf_info() const
 {
-  std::ostringstream out;
-
-#ifndef BROKEN_IOSTREAM
+  OStringStream out;
   
   if (log_events && !log.empty())
     {
@@ -160,38 +158,18 @@ std::string PerfLog::get_perf_info() const
 	  << ", Active time=" << total_time << std::endl;
       out << " ----------------------------------------------------------------------------"  << std::endl;
       out << "| ";
-      out.width(30);
-      out << std::left << "Event";
-      
-      out.width(8);
-      out << std::left << "nCalls";
-      
-      out.width(12);
-      out << std::left << "Total";
-      
-      out.width(12);
-      out << std::left << "Avg";
-      
-      out.width(13);
-      out << std::left << "Percent of";
-      
-      out << "|" << std::endl;
-      
+      out.left(30, "Event");      
+      out.left(8, "nCalls");      
+      out.left(12, "Total");      
+      out.left(12, "Avg");      
+      out.left(13, "Percent of");      
+      out << "|" << std::endl;      
       out << "| ";
-      out.width(30);
-      out << std::left << "";
-      
-      out.width(8);
-      out << std::left << "";
-      
-      out.width(12);
-      out << std::left << "Time";
-      
-      out.width(12);
-      out << std::left << "Time";
-      
-      out.width(13);
-      out << std::left << "Active Time";
+      out.left(30, "");
+      out.left(8, "");
+      out.left(12, "Time");
+      out.left(12, "Time");
+      out.left(13, "Active Time");
       
       out << "|" << std::endl;
       out << "|----------------------------------------------------------------------------|" << std::endl
@@ -225,8 +203,7 @@ std::string PerfLog::get_perf_info() const
 	      if (pos->first.first == "")
 		{
 		  out << "| ";
-		  out.width(30);
-		  out << std::left << pos->first.second;
+		  out.left(30, pos->first.second);
 		}
 	      else
 		{
@@ -235,40 +212,32 @@ std::string PerfLog::get_perf_info() const
 		      last_header = pos->first.first;
 
 		      out << "| ";
-		      out.width(76);
-		      out << std::right << "|" << std::endl;
+		      out.right(76, "|");
+		      out << std::endl;
 		      
 		      out << "| ";
-		      out.width(75);
-		      out << std::left << pos->first.first;
-		      out << std::right << "|" << std::endl;
+		      out.left(75, pos->first.first);
+		      out.right(75, "|");
+		      out << std::endl;
 		    }
 
 		  out << "|   ";
-		  out.width(28);
-		  out << std::left << pos->first.second;
+		  out.left(28, pos->first.second);
 		}
 	      
 
 	      // Print the number of calls to the event
-	      out.width(8);
-	      out << perf_count;
+	      out.left(8, perf_count);
 
 	      // Print the total time spent in the event
 	      out.setf(std::ios::fixed);
-	      out.width(12);
-	      out.precision(4);
-	      out << perf_time;
+	      out.left(12, 4, perf_time);
 
 	      // Print the average time per function call
-	      out.width(12);
-	      out.precision(6);
-	      out << perf_avg_time;
+	      out.left(12, 6, perf_avg_time);
 
 	      // Print the percentage of the time spent in the event
-	      out.width(13);
-	      out.precision(2);
-	      out << perf_percent;
+	      out.left(13, 2, perf_percent);
 	      
 	      out << "|";
 	      out << std::endl;
@@ -277,27 +246,21 @@ std::string PerfLog::get_perf_info() const
       
       out << " ----------------------------------------------------------------------------" << std::endl;
       out << "| ";
-      out.width(30);
-      out << std::left << "Totals:";
+      out.left(30, "Totals:");
 
       // Print the total number of logged function calls
-      out.width(8);
-      out << summed_function_calls;
+      out.left(8, summed_function_calls);
 
       // Print the total time spent in logged function calls
       out.setf(std::ios::fixed);
-      out.width(12);
-      out.precision(4);
-      out << summed_total_time;
+      out.left(12, 4, summed_total_time);
 
       // Null, the average time doesn't make sense as a total
       out.width(12);
       out << "";
 
       // Print the total percentage
-      out.width(13);
-      out.precision(2);
-      out << summed_percentage;
+      out.left(13, 2, summed_percentage);
       
       out << "|";
       out << std::endl;
@@ -305,8 +268,6 @@ std::string PerfLog::get_perf_info() const
       out << " ----------------------------------------------------------------------------" << std::endl;
     }
 
-#endif
-  
   return out.str();
 }
 
@@ -314,9 +275,7 @@ std::string PerfLog::get_perf_info() const
 
 std::string PerfLog::get_log() const
 {
-  std::ostringstream out;
-  
-#ifndef BROKEN_IOSTREAM
+  OStringStream out;
   
   if (log_events)
     {
@@ -334,8 +293,6 @@ std::string PerfLog::get_log() const
 	  out << get_perf_info();
 	}
     }
-
-#endif
   
   return out.str();
 }
