@@ -1,4 +1,4 @@
-// $Id: distributed_vector.h,v 1.5 2004-08-17 03:03:49 benkirk Exp $
+// $Id: distributed_vector.h,v 1.6 2004-10-14 21:54:06 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -276,7 +276,7 @@ public:
    * @e Not @e implemented.
    */
   void add_vector (const NumericVector<T> &,
-		   SparseMatrix<T> &)
+		   const SparseMatrix<T> &)
   { error(); }
   
   /**
