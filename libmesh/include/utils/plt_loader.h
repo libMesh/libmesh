@@ -1,4 +1,4 @@
-// $Id: plt_loader.h,v 1.1 2004-09-30 21:21:49 benkirk Exp $
+// $Id: plt_loader.h,v 1.2 2004-10-04 13:53:22 benkirk Exp $
 
 // Copyright (C) 2002-2004  Benjamin S. Kirk
   
@@ -236,6 +236,11 @@ public:
    * @returns the element type for the \p zth zone (for unstructured meshes).
    */
   FEType elem_type (const unsigned int z) const;
+
+  /**
+   * @returns a reference to the data read from the file
+   */
+  const std::vector<std::vector<std::vector<float> > > & get_data () const;
   
   /**
    * Enum defining the number of nodes for each element type.
@@ -690,6 +695,15 @@ PltLoader::FEType PltLoader::elem_type (const unsigned int z) const
   
   return static_cast<FEType>(this->kmax(z));
 }
+
+
+inline
+const std::vector<std::vector<std::vector<float> > > &
+PltLoader::get_data () const
+{
+  return _data;
+}
+
 
 
 
