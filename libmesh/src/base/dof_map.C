@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.15 2003-02-14 15:22:43 benkirk Exp $
+// $Id: dof_map.C,v 1.16 2003-02-14 17:02:45 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -492,6 +492,8 @@ void DofMap::dof_indices (const Elem* elem,
   
   // Clear the DOF indices vector.
   di.clear();
+
+  unsigned int tot_size = 0;
   
   // Get the dof numbers
   for (unsigned int c=0; c<n_components(); c++)
@@ -500,9 +502,11 @@ void DofMap::dof_indices (const Elem* elem,
 	// or just for the specified component
 	const FEType& fe_type = component_type(c);
 
+	const unsigned int size = FEInterface::n_dofs(elem->dim(), fe_type, type);
+	tot_size += size;
 	// Reserve space in the di vector
 	// so we can use push_back effectively
-	di.reserve (FEInterface::n_dofs(elem->dim(), fe_type, type));
+	//di.reserve (size);
 	
 	// Get the node-based DOF numbers
 	for (unsigned int n=0; n<n_nodes; n++)
@@ -527,6 +531,8 @@ void DofMap::dof_indices (const Elem* elem,
 	    di.push_back(elem->dof_number(c, i));
 	  }
       }
+
+  assert (tot_size = di.size());
 }
 
 
