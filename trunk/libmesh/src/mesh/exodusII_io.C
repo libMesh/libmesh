@@ -1,4 +1,4 @@
-// $Id: exodusII_io.C,v 1.3 2004-11-15 00:20:52 benkirk Exp $
+// $Id: exodusII_io.C,v 1.4 2004-11-15 09:30:54 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -974,21 +974,23 @@ namespace
 	  const Conversion conv(tet10_node_map, tet_face_map, TET10);
 	  return conv;
 	}
-      
+	
       default:
 	error();
       }
-
+    
     error();
-  
+    
     const Conversion conv(tri3_node_map, tri_edge_map, TRI3); // dummy
     return conv;  
   }
+  
+    
+} // end anonymous namespace
 
 #endif // #ifdef HAVE_EXODUS_API
-  
-  
-} // end anonymous namespace
+
+
 
 
 // ------------------------------------------------------------
