@@ -32,12 +32,6 @@
 // #include "petsc_matrix.h"
 // #endif
 
-/* 
- * convenient typedef for origin coordinates; so that meshtool
- * knows whether the value was given or not
- */
-typedef std::pair<bool, double> IfemOriginValue;
-
 /*
  * convenient enum for the mode in which the boundary mesh
  * should be written
@@ -157,9 +151,13 @@ void process_cmd_line(int argc, char **argv,
 		      bool& verbose,
 		      BoundaryMeshWriteMode& write_bndry,
 		      bool& addinfelems,
-		      IfemOriginValue& origin_x,
-		      IfemOriginValue& origin_y,
-		      IfemOriginValue& origin_z,
+
+#ifdef ENABLE_INFINITE_ELEMENTS
+		      MeshBase::InfElemOriginValue& origin_x,
+		      MeshBase::InfElemOriginValue& origin_y,
+		      MeshBase::InfElemOriginValue& origin_z,
+#endif
+
 		      bool& x_sym,
 		      bool& y_sym,
 		      bool& z_sym,
@@ -175,12 +173,7 @@ void process_cmd_line(int argc, char **argv,
    * so that the compiler does not complain
    */
   addinfelems     = false;
-  origin_x.first  = origin_y.first  = origin_z.first  = false;
-  origin_x.second = origin_y.second = origin_z.second = 0.;
   x_sym           = y_sym           = z_sym           = false;
-
-  bool b_mesh_b_given = false;
-  bool b_mesh_B_given = false;
 
   char optionStr[] =
     "i:o:s:d:D:r:p:bBvlLm?h";
@@ -191,6 +184,9 @@ void process_cmd_line(int argc, char **argv,
     "i:o:s:d:D:r:p:bBa::x:y:z:XYZvlLm?h";
 
 #endif
+
+  bool b_mesh_b_given = false;
+  bool b_mesh_B_given = false;
 
   int opt;  
   
@@ -428,9 +424,14 @@ int main (int argc, char** argv)
     bool verbose = false;
     BoundaryMeshWriteMode write_bndry = BM_DISABLED;
     bool addinfelems = false;
-    IfemOriginValue origin_x(false, 0.);
-    IfemOriginValue origin_y(false, 0.);
-    IfemOriginValue origin_z(false, 0.);
+
+
+#ifdef ENABLE_INFINITE_ELEMENTS
+    MeshBase::InfElemOriginValue origin_x(false, 0.);
+    MeshBase::InfElemOriginValue origin_y(false, 0.);
+    MeshBase::InfElemOriginValue origin_z(false, 0.);
+#endif
+
     bool x_sym=false;
     bool y_sym=false;
     bool z_sym=false;
@@ -447,7 +448,11 @@ int main (int argc, char** argv)
 		     dim, dist_fact, verbose, write_bndry, 
 
 		     addinfelems, 
+
+#ifdef ENABLE_INFINITE_ELEMENTS
 		     origin_x, origin_y, origin_z, 
+#endif
+
 		     x_sym, y_sym, z_sym,
 
 		     build_l,
@@ -530,60 +535,14 @@ int main (int argc, char** argv)
 	  }
 
 
-	// origin defaults to the given values
-	Point origin(origin_x.second, origin_y.second, origin_z.second);
-
-	/*
-	 * when only _one_ of the origin coordinates is _not_
-	 * given, we have to determine it on our own
-	 */
-	if ( !origin_x.first || !origin_y.first || !origin_z.first)
-	  {
-	    // determine origin
-	    std::pair<Point, Point> b_box = mesh.bounding_box();
-	    const Point auto_origin = (b_box.first+b_box.second)/2.;
-
-	    // override default values, if necessary
-	    if (!origin_x.first)
-	      origin(0) = auto_origin(0);
-	    if (!origin_y.first)
-	      origin(1) = auto_origin(1);
-	    if (!origin_z.first)
-	      origin(2) = auto_origin(2);
-
-	    if (verbose)
-	      {
-		std::cout << " Origin for Infinite Elements:" << std::endl;
-
-		if (!origin_x.first)
-		    std::cout << "  determined x-coordinate" << std::endl;
-		if (!origin_y.first)
-		    std::cout << "  determined y-coordinate" << std::endl;
-		if (!origin_z.first)
-		    std::cout << "  determined z-coordinate" << std::endl;
-
-		std::cout << "  coordinates: ";
-		origin.write_unformatted(std::cout);
-		std::cout << std::endl;
-	      }
-	  }
-
-	else if (verbose)
-	  {
-	    std::cout << " Origin for Infinite Elements:" << std::endl;
-	    std::cout << "  coordinates: ";
-	    origin.write_unformatted(std::cout);
-	    std::cout << std::endl;
-	  }
-
-
 	// build infinite elements
-	mesh.build_inf_elem(origin, x_sym, y_sym, z_sym, verbose);
+	mesh.build_inf_elem(origin_x, origin_y, origin_z,
+			    x_sym, y_sym, z_sym, 
+			    verbose);
 
 	
 	if (verbose)
 	  mesh.print_info();
-
 
       }
 
