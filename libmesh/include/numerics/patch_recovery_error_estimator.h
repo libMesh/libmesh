@@ -1,4 +1,4 @@
-// $Id: patch_recovery_error_estimator.h,v 1.2 2004-11-08 00:11:03 jwpeterson Exp $
+// $Id: patch_recovery_error_estimator.h,v 1.3 2005-01-06 21:55:03 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -63,7 +63,7 @@ public:
    * The estimated error is output in the vector
    * \p error_per_cell
    */
-  virtual void estimate_error (const SteadySystem& system,
+  virtual void estimate_error (const System& system,
 			       std::vector<float>& error_per_cell);
 
 

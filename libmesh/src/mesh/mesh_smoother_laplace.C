@@ -1,4 +1,4 @@
-// $Id: mesh_smoother_laplace.C,v 1.13 2004-11-15 22:09:14 benkirk Exp $
+// $Id: mesh_smoother_laplace.C,v 1.14 2005-01-06 21:55:03 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -41,54 +41,77 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
   std::vector<bool> on_boundary;
   MeshTools::find_boundary_nodes(_mesh, on_boundary);
 
+  // We can only update the nodes after all new positions were
+  // determined. We store the new positions here
+  std::vector<Point> new_positions;
+
   for (unsigned int n=0; n<n_iterations; n++)
     {
+      new_positions.resize(_mesh.n_nodes());
       for (unsigned int i=0; i<_mesh.n_nodes(); ++i)
 	{
-	  if (!on_boundary[i])
+          // leave the boundary intact
+          // Only relocate the nodes which are vertices of an element
+          // All other entries of _graph (the secondary nodes) are empty
+	  if (!on_boundary[i] && (_graph[i].size() > 0) )
 	    {
-	      // Smooth!
-	      Real avg_x = 0.;
-	      Real avg_y = 0.;
-	      Real avg_z = 0.;
+              Point avg_position(0.,0.,0.);
 	      for (unsigned int j=0; j<_graph[i].size(); ++j)
-		{
-		  // Get a reference to the current node in
-		  // the graph
-		  const Node& node = _mesh.node(_graph[i][j]);
-
-		  avg_x += node(0);
-		  avg_y += node(1);
-		  avg_z += node(2);
-		}
-
-	      assert (_graph[i].size() != 0);
-	      avg_x /= _graph[i].size();
-	      avg_y /= _graph[i].size();
-	      avg_z /= _graph[i].size();
-
-	      // Update the location of node(i)
-	      Node& node = _mesh.node(i);
-	      node(0) = avg_x;
-	      node(1) = avg_y;
-	      node(2) = avg_z;
+                avg_position.add(_mesh.node(_graph[i][j]));
+              new_positions[i] = avg_position /
+                static_cast<Real>(_graph[i].size());
 	    }
 	}
+      // now update the node positions
+      for (unsigned int i=0; i<_mesh.n_nodes(); ++i)
+        if (!on_boundary[i] && (_graph[i].size() > 0) )
+          _mesh.node(i) = new_positions[i];
+    }
+  
+  // finally adjust the second order nodes (those located between vertices)
+  // these nodes will be located between their adjacent nodes
+  // do this element-wise
+  MeshBase::element_iterator       el  = _mesh.active_elements_begin();
+  const MeshBase::element_iterator end = _mesh.active_elements_end(); 
+	
+  for (; el != end; ++el)
+    {
+      // Constant handle for the element
+      const Elem* elem = *el;
+
+      // get the second order nodes (son)
+      // their element indices start at n_vertices and go to n_nodes
+      const unsigned int son_begin = elem->n_vertices();
+      const unsigned int son_end   = elem->n_nodes();
+      
+      // loop over all second order nodes (son)
+      for (unsigned int son=son_begin; son<son_end; son++)
+        {
+	  const unsigned int n_adjacent_vertices =
+	    elem->n_second_order_adjacent_vertices(son);
+
+          // calculate the new position which is the average of the
+          // position of the adjacent vertices
+          Point avg_position(0,0,0);
+          for (unsigned int v=0; v<n_adjacent_vertices; v++)
+              avg_position +=
+                _mesh.point( elem->node( elem->second_order_adjacent_vertex(son,v) ) );
+
+          _mesh.node(elem->node(son)) = avg_position / n_adjacent_vertices;
+
+        }
     }
 }
 
 
-
-
-
 void LaplaceMeshSmoother::init()
 {
+
+
   switch (_mesh.mesh_dimension())
     {
       
-
-
-      //TODO:[BSK] Fix this to work for refined meshes...  I think
+      // TODO:[BSK] Fix this to work for refined meshes...  I think
       // the implementation was done quickly for Damien, who did not have
       // refined grids.  Fix it here and in the original Mesh member.
       
@@ -98,30 +121,27 @@ void LaplaceMeshSmoother::init()
 	// long and each node is assumed to be connected to
 	// approximately 4 neighbors.
 	_graph.resize(_mesh.n_nodes());
-	for (unsigned int i=0; i<_mesh.n_nodes(); ++i)
-	  _graph[i].reserve(4);
+// 	for (unsigned int i=0; i<_mesh.n_nodes(); ++i)
+// 	  _graph[i].reserve(4);
 	
-// 	const_active_elem_iterator       el (_mesh.const_elements_begin());
-// 	const const_active_elem_iterator end(_mesh.const_elements_end());
-
 	MeshBase::element_iterator       el  = _mesh.active_elements_begin();
 	const MeshBase::element_iterator end = _mesh.active_elements_end(); 
 	
 	for (; el != end; ++el)
 	  {
-	    // Shortcut notation for simplicity
+	    // Constant handle for the element
 	    const Elem* elem = *el;
 	    
 	    for (unsigned int s=0; s<elem->n_neighbors(); s++)
 	      {
 		// Only operate on sides which are on the
 		// boundary or for which the current element's
-		// id is greater than its neighbor's. 
+		// id is greater than its neighbor's.
+                // Sides get only built once.
 		if ((elem->neighbor(s) == NULL) ||
 		    (elem->id() > elem->neighbor(s)->id()))
 		  {
 		    AutoPtr<Elem> side(elem->build_side(s));
-		  
 		    _graph[side->node(0)].push_back(side->node(1));
 		    _graph[side->node(1)].push_back(side->node(0));
 		}
@@ -136,12 +156,9 @@ void LaplaceMeshSmoother::init()
 	// Initialize space in the graph.  In 3D, I've assumed
 	// that each node was connected to approximately 3 neighbors.
 	_graph.resize(_mesh.n_nodes());
-	for (unsigned int i=0; i<_mesh.n_nodes(); ++i)
-	  _graph[i].reserve(8);
+// 	for (unsigned int i=0; i<_mesh.n_nodes(); ++i)
+// 	  _graph[i].reserve(8);
 	
-// 	const_active_elem_iterator       el (_mesh.const_elements_begin());
-// 	const const_active_elem_iterator end(_mesh.const_elements_end());
-
 	MeshBase::element_iterator       el  = _mesh.active_elements_begin();
 	const MeshBase::element_iterator end = _mesh.active_elements_end(); 
 

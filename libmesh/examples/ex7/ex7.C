@@ -1,4 +1,4 @@
-/* $Id: ex7.C,v 1.36 2004-12-17 20:55:06 benkirk Exp $ */
+/* $Id: ex7.C,v 1.37 2005-01-06 21:54:59 benkirk Exp $ */
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
 
@@ -497,8 +497,8 @@ void assemble_helmholtz(EquationSystems& es,
       // we added values in the other ones, so that we have 
       // identical sparsity footprints.
       matrix.add_matrix(zero_matrix, dof_indices);
-    } 
-    
+    }
+  
   // All done!
 #endif
 }
@@ -554,8 +554,8 @@ void add_M_C_K_helmholtz(EquationSystems& es,
   
   // Now simply add the matrices together, store the result
   // in matrix and rhs.  Clear them first.
-  matrix.zero ();
-  rhs.zero    ();
+  matrix.close(); matrix.zero ();
+  rhs.close();    rhs.zero    ();
   
   // The matrices from which values are added to another matrix
   // have to be closed.  The add() method does take care of 

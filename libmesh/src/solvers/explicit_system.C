@@ -1,4 +1,4 @@
-// $Id: explicit_system.C,v 1.3 2004-03-01 14:40:24 benkirk Exp $
+// $Id: explicit_system.C,v 1.4 2005-01-06 21:55:04 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -30,7 +30,7 @@
 ExplicitSystem::ExplicitSystem (EquationSystems& es,
 				const std::string& name,
 				const unsigned int number) :
-  System (es, name, number),
+  Parent (es, name, number),
   rhs(NULL)
 
 {
@@ -50,7 +50,7 @@ ExplicitSystem::~ExplicitSystem ()
 void ExplicitSystem::clear ()
 {
   // Clear the parent data
-  System::clear();
+  Parent::clear();
 
   // NULL-out the matrix.  Note that
   // System::clear() actually deleted it.
@@ -67,7 +67,7 @@ void ExplicitSystem::init_data ()
   this->add_system_rhs ();
   
   // initialize parent data
-  System::init_data();
+  Parent::init_data();
 }
 
 
@@ -75,7 +75,7 @@ void ExplicitSystem::init_data ()
 void ExplicitSystem::reinit ()
 {
   // initialize parent data
-  System::reinit();  
+  Parent::reinit();  
   
   // Resize the RHS conformal to the current mesh
   rhs->init (this->n_dofs(), this->n_local_dofs());

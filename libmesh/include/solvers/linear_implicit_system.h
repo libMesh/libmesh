@@ -1,4 +1,4 @@
-// $Id: explicit_system.h,v 1.4 2005-01-06 21:55:03 benkirk Exp $
+// $Id: linear_implicit_system.h,v 1.1 2005-01-06 21:55:03 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -19,30 +19,31 @@
 
 
 
-#ifndef __explicit_system_h__
-#define __explicit_system_h__
+#ifndef __linear_implicit_system_h__
+#define __linear_implicit_system_h__
 
 // C++ includes
 
 // Local Includes
-#include "system.h"
+#include "implicit_system.h"
+#include "linear_solver.h"
+#include "numeric_vector.h"
 
 
 // Forward Declarations
 
-
 /**
  * This class provides a specific system class.  It aims
- * at explicit systems, offering nothing more than just
+ * at implicit systems, offering nothing more than just
  * the essentials needed to solve a system.  Note
  * that still additional vectors/matrices may be added,
- * as offered in the parent class \p System.
+ * as offered in the parent class \p ExplicitSystem.
  */
 
 // ------------------------------------------------------------
-// ExplicitSystem class definition
+// LinearImplicitSystem class definition
 
-class ExplicitSystem : public System
+class LinearImplicitSystem : public ImplicitSystem
 {
 public:
 
@@ -50,24 +51,24 @@ public:
    * Constructor.  Optionally initializes required
    * data structures.
    */
-  ExplicitSystem (EquationSystems& es,
-		  const std::string& name,
-		  const unsigned int number);
+  LinearImplicitSystem (EquationSystems& es,
+			const std::string& name,
+			const unsigned int number);
 
   /**
    * Destructor.
    */
-  ~ExplicitSystem ();
- 
+  virtual ~LinearImplicitSystem ();
+
   /**
    * The type of system.
    */
-  typedef ExplicitSystem sys_type;
+  typedef LinearImplicitSystem sys_type;
 
   /**
-   * The type of the parent
+   * The type of the parent.
    */
-  typedef System Parent;
+  typedef ImplicitSystem Parent;
   
   /**
    * @returns a clever pointer to the system.
@@ -85,50 +86,63 @@ public:
    * the system, so that, e.g., \p assemble() may be used.
    */
   virtual void reinit ();
-  
+   
+//   /**
+//    * Prepares \p matrix and \p _dof_map for matrix assembly.
+//    * Does not actually assemble anything.  For matrix assembly,
+//    * use the \p assemble() in derived classes.
+//    * @e Should be overloaded in derived classes.
+//    */
+//   virtual void assemble () { ImplicitSystem::assemble(); }
+ 
   /**
    * Assembles & solves the linear system Ax=b. 
    */
   virtual void solve ();
  
   /**
-   * @returns \p "Explicit".  Helps in identifying
+   * @returns \p "LinearImplicit".  Helps in identifying
    * the system type in an equation system file.
    */
-  virtual std::string system_type () const { return "Explicit"; }
+  virtual std::string system_type () const { return "LinearImplicit"; }
 
   /**
-   * The system matrix.  Implicit systems are characterized by
-   * the need to solve the linear system Ax=b.  This is the
-   * right-hand-side vector b.
+   * The \p LinearSolver defines the interface used to
+   * solve the linear_implicit system.  This class handles all the
+   * details of interfacing with various linear algebra packages
+   * like PETSc or LASPACK.
    */
-  NumericVector<Number> * rhs;
+  AutoPtr<LinearSolver<Number> > linear_solver;
   
+  /**
+   * Returns  the number of iterations 
+   * taken for the most recent linear solve.
+   */
+  unsigned int n_linear_iterations() const { return _n_linear_iterations; }
 
+  /**
+   * Returns the final residual for the linear system solve.
+   */
+  Real final_linear_residual() const { return _final_linear_residual; }
+  
 protected:
-
   
   /**
-   * Initializes the member data fields associated with
-   * the system, so that, e.g., \p assemble() may be used.
+   * The number of linear iterations required to solve the linear
+   * system Ax=b.
    */
-  virtual void init_data ();
+  unsigned int _n_linear_iterations;
 
-  
-private:
-
-  
   /**
-   * Add the system right-hand-side vector to the \p _vectors data structure.
-   * Useful in initialization.
+   * The final residual for the linear system Ax=b.
    */
-  void add_system_rhs ();
+  Real _final_linear_residual;
 };
 
 
 
 // ------------------------------------------------------------
-// ExplicitSystem inline methods
+// LinearImplicitSystem inline methods
 
 
 #endif

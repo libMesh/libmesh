@@ -1,4 +1,4 @@
-// $Id: kelly_error_estimator.C,v 1.4 2004-11-14 18:51:59 jwpeterson Exp $
+// $Id: kelly_error_estimator.C,v 1.5 2005-01-06 21:55:04 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -37,8 +37,8 @@
 
 //-----------------------------------------------------------------
 // ErrorEstimator implementations
-void KellyErrorEstimator::estimate_error (const SteadySystem& system,
-					   std::vector<float>& error_per_cell)
+void KellyErrorEstimator::estimate_error (const System& system,
+					  std::vector<float>& error_per_cell)
 {
   START_LOG("flux_jump()", "KellyErrorEstimator");
   

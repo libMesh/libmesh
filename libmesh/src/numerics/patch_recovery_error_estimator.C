@@ -1,4 +1,4 @@
-// $Id: patch_recovery_error_estimator.C,v 1.5 2004-11-14 18:51:59 jwpeterson Exp $
+// $Id: patch_recovery_error_estimator.C,v 1.6 2005-01-06 21:55:04 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -38,7 +38,7 @@
 
 //-----------------------------------------------------------------
 // ErrorEstimator implementations
-void PatchRecoveryErrorEstimator::estimate_error (const SteadySystem& system,
+void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 						  std::vector<float>& error_per_cell)
 {
   START_LOG("estimate_error()", "PatchRecoveryErrorEstimator");

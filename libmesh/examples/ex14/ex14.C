@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.11 2004-12-10 13:54:26 benkirk Exp $ */
+/* $Id: ex14.C,v 1.12 2005-01-06 21:54:58 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -46,7 +46,7 @@
 // LibMesh include files.
 #include "mesh.h"
 #include "equation_systems.h"
-#include "implicit_system.h"
+#include "linear_implicit_system.h"
 #include "gmv_io.h"
 #include "tecplot_io.h"
 #include "fe.h"
@@ -139,7 +139,7 @@ int main(int argc, char** argv)
     // Declare the system and its variables.
     {
       // Creates a system named "Laplace"
-      equation_systems.add_system<ImplicitSystem> ("Laplace");
+      equation_systems.add_system<LinearImplicitSystem> ("Laplace");
 
       // Adds the variable "u" to "Laplace".  "u"
       // will be approximated using second-order approximation.
@@ -171,7 +171,8 @@ int main(int argc, char** argv)
     exact_sol.attach_exact_deriv(exact_derivative);
 
     // Convenient reference to the system
-    ImplicitSystem& system = equation_systems.get_system<ImplicitSystem>("Laplace");
+    LinearImplicitSystem& system =
+      equation_systems.get_system<LinearImplicitSystem>("Laplace");
 
     // A refinement loop.
     for (unsigned int r_step=0; r_step<max_r_steps; r_step++)

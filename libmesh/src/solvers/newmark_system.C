@@ -1,4 +1,4 @@
-// $Id: newmark_system.C,v 1.3 2004-12-07 22:47:46 benkirk Exp $
+// $Id: newmark_system.C,v 1.4 2005-01-06 21:55:04 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -43,16 +43,16 @@ const Real NewmarkSystem::_default_timestep = 1.;
 NewmarkSystem::NewmarkSystem (EquationSystems& es,
 			      const std::string& name,
 			      const unsigned int number) :  
-  ImplicitSystem    (es, name, number),
-  _a_0               (1./(_default_alpha*_default_timestep*_default_timestep)),
-  _a_1               (_default_delta/(_default_alpha*_default_timestep)),
-  _a_2               (1./(_default_alpha*_default_timestep)),
-  _a_3               (1./(2.*_default_alpha)-1.),
-  _a_4               (_default_delta/_default_alpha -1.),
-  _a_5               (_default_timestep/2.*(_default_delta/_default_alpha-2.)),
-  _a_6               (_default_timestep*(1.-_default_delta)),
-  _a_7               (_default_delta*_default_timestep),
-  _finished_assemble (false)
+  LinearImplicitSystem (es, name, number),
+  _a_0                 (1./(_default_alpha*_default_timestep*_default_timestep)),
+  _a_1                 (_default_delta/(_default_alpha*_default_timestep)),
+  _a_2                 (1./(_default_alpha*_default_timestep)),
+  _a_3                 (1./(2.*_default_alpha)-1.),
+  _a_4                 (_default_delta/_default_alpha -1.),
+  _a_5                 (_default_timestep/2.*(_default_delta/_default_alpha-2.)),
+  _a_6                 (_default_timestep*(1.-_default_delta)),
+  _a_7                 (_default_delta*_default_timestep),
+  _finished_assemble   (false)
   
 {
   // default values of the newmark parameters
@@ -64,7 +64,7 @@ NewmarkSystem::NewmarkSystem (EquationSystems& es,
 
   // add additional matrices and vectors that will be used in the
   // newmark algorithm to the data structure
-  // functions ImplicitSystem::add_matrix and ImplicitSystem::add_vector
+  // functions LinearImplicitSystem::add_matrix and LinearImplicitSystem::add_vector
   // are used so we do not have to bother about initialization and
   // dof mapping
 
@@ -103,7 +103,7 @@ void NewmarkSystem::clear ()
 {
   // use parent clear this will also clear the
   // matrices and vectors added in the constructor
-  ImplicitSystem::clear();
+  LinearImplicitSystem::clear();
 
   // default values of the newmark parameters
   _equation_systems.parameters.set<Real>("Newmark alpha") = _default_alpha;
@@ -123,7 +123,7 @@ void NewmarkSystem::reinit ()
   error();
   
   // initialize parent data
-  ImplicitSystem::reinit();
+  LinearImplicitSystem::reinit();
 }
 
 
@@ -136,7 +136,7 @@ void NewmarkSystem::assemble ()
     {
       // prepare matrix with the help of the _dof_map, 
       // fill with sparsity pattern
-      ImplicitSystem::assemble();
+      LinearImplicitSystem::assemble();
 
       // compute the effective system matrix
       this->compute_matrix();

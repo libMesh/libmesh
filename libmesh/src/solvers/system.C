@@ -1,4 +1,4 @@
-// $Id: system.C,v 1.9 2004-10-19 12:44:11 benkirk Exp $
+// $Id: system.C,v 1.10 2005-01-06 21:55:04 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -31,9 +31,6 @@
 #include "libmesh_logging.h"
 #include "utility.h"
 
-// typedefs
-typedef std::map<std::string, NumericVector<Number>* >::iterator       vectors_iterator;
-typedef std::map<std::string, NumericVector<Number>* >::const_iterator vectors_const_iterator;
 
 
 // ------------------------------------------------------------
@@ -317,7 +314,7 @@ bool System::compare (const System& other_system,
   else
     {
       // compare other vectors
-      for (vectors_const_iterator pos = _vectors.begin();
+      for (const_vectors_iterator pos = _vectors.begin();
 	   pos != _vectors.end(); ++pos)
         {
 	  if (verbose)
@@ -431,7 +428,7 @@ NumericVector<Number> & System::add_vector (const std::string& vec_name)
 const NumericVector<Number> & System::get_vector (const std::string& vec_name) const
 {
   // Make sure the vector exists
-  vectors_const_iterator pos = _vectors.find(vec_name);
+  const_vectors_iterator pos = _vectors.find(vec_name);
   
   if (pos == _vectors.end())
     {
