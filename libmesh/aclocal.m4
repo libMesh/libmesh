@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.65 2004-08-05 14:44:13 jwpeterson Exp $
+dnl $Id: aclocal.m4,v 1.66 2004-09-21 22:38:58 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -15,7 +15,11 @@ dnl
 dnl -------------------------------------------------------------
 AC_DEFUN(DETERMINE_CXX_BRAND, dnl
 [
-  if test "$GXX" = yes ; then
+  dnl First check for gcc version, avoids intel's icc from
+  dnl pretending to be gcc
+  REAL_GXX=`($CXX -v 2>&1) | grep "gcc version"`
+
+  if (test "$GXX" = yes -a "x$REAL_GXX" != "x" ) ; then
     dnl find out the right version
     GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
     case "$GXX_VERSION_STRING" in
@@ -202,7 +206,7 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
 
 
   dnl First the flags for gcc compilers
-  if test "$GXX" = yes ; then
+  if (test "$GXX" = yes -a "x$REAL_GXX" != "x" ) ; then
     CXXFLAGSO="-O2 -felide-constructors -DNDEBUG"
     CXXFLAGSG=" -O2 -felide-constructors -g -ansi -pedantic -W -Wall -Wunused -Wpointer-arith -Wimplicit -Wformat -Wparentheses -Wuninitialized -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -DDEBUG"
     CXXFLAGSP="$CXXFLAGSO -g -pg"
