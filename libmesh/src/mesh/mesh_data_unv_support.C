@@ -1,4 +1,4 @@
-// $Id: mesh_data_unv_support.C,v 1.11 2003-08-16 21:19:30 ddreyer Exp $
+// $Id: mesh_data_unv_support.C,v 1.12 2003-08-23 17:12:46 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -248,7 +248,7 @@ void MeshData::read_unv(const std::string& name)
 
 	      /*
 	       * Resize the values vector (usually data in three
-	       * principal directions, i.e. NVALDC = 3).
+	       * principle directions, i.e. NVALDC = 3).
 	       */
 	      values.resize(NVALDC);
 	  
@@ -270,9 +270,15 @@ void MeshData::read_unv(const std::string& name)
 		      std::string buf;
 		      in_file >> buf;
 		      MeshDataUnvHeader::need_D_to_e(buf);
+#ifdef USE_COMPLEX_NUMBERS
+		      values[data_cnt] = Complex(atof(buf.c_str()), 0.);
+#else
 		      values[data_cnt] = atof(buf.c_str());
+#endif
 		    }
+
 		  else if(Data_type == 5 || Data_type == 6)
+
 		    {
 #ifdef USE_COMPLEX_NUMBERS
 		      Real re_val, im_val;
@@ -404,9 +410,19 @@ void MeshData::write_unv (const std::string& name)
       AutoPtr<MeshDataUnvHeader> my_header(new MeshDataUnvHeader);
 
       /*
-       * It remains to set the correct nvaldc
+       * It remains to set the correct nvaldc...
        */
       my_header->nvaldc = this->n_val_per_node();
+
+      /*
+       * and the correct data type.  By default
+       * only distinguish complex or real data.
+       */
+#ifdef USE_COMPLEX_NUMBERS
+      my_header->data_type = 5;
+#else
+      my_header->data_type = 2;
+#endif
 
       /*
        * write this default header, then let
@@ -416,8 +432,42 @@ void MeshData::write_unv (const std::string& name)
       my_header->write (out_file);
     }
   else
-      _unv_header->write (out_file);
+    {
+      /*
+       * make sure our nvaldc coincide.
+       */
+      if (this->n_val_per_node() != _unv_header->nvaldc)
+        {
+	  std::cerr << "WARNING: nvaldc=" << _unv_header->nvaldc 
+		    << " of attached MeshDataUnvHeader object not valid!" << std::endl
+		    << "         re-set nvaldc to " << this->n_val_per_node() << std::endl;
+	  _unv_header->nvaldc = this->n_val_per_node();
+	}
 
+
+      /*
+       * only issue a warning when data_type does
+       * not coincide.  Perhaps user provided some
+       * other header in order to convert complex
+       * to real...
+       */
+#ifdef USE_COMPLEX_NUMBERS
+      const unsigned int my_data_type = 5;
+#else
+      const unsigned int my_data_type = 2;
+#endif
+      if (my_data_type != _unv_header->data_type)
+        {
+	  std::cerr << "WARNING: data_type=" << _unv_header->data_type 
+		    << " of attached MeshDataUnvHeader differs from" << std::endl
+		    << "         default value=" << my_data_type
+		    << " Perhaps the user wanted this," << std::endl
+		    << "         so I use the value from the MeshDataUnvHeader."
+		    << std::endl;
+	}
+
+      _unv_header->write (out_file);
+    }
 
   /*
    * Write the foreign node number and the respective data.
@@ -476,11 +526,6 @@ MeshDataUnvHeader::MeshDataUnvHeader() :
   dataset_label          (0),
   dataset_name           ("libMesh mesh data"),
   dataset_location       (1),  // default to nodal data
-  id_line_1              ("libMesh default"),
-  id_line_2              ("libMesh default"),
-  id_line_3              ("libMesh default"),
-  id_line_4              ("libMesh default"),
-  id_line_5              ("libMesh default"),
   model_type             (0),          
   analysis_type          (0),
   data_characteristic    (0),
@@ -493,6 +538,8 @@ MeshDataUnvHeader::MeshDataUnvHeader() :
   nvaldc                 (3),  // default to 3 (principle directions)
   _desired_dataset_label (static_cast<unsigned int>(-1))
 {
+  id_lines_1_to_5.resize(5);
+  std::fill (id_lines_1_to_5.begin(), id_lines_1_to_5.end(), "libMesh default");
   /*
    * resize analysis specific data.
    */
@@ -540,10 +587,15 @@ bool MeshDataUnvHeader::read (std::ifstream& in_file)
   std::getline(in_file, dataset_name, '\n');
 
   in_file >> this->dataset_location;
+  in_file.ignore(256,'\n');
 
-  // ID lines are ignored when reading
-  for(unsigned int i=0; i<6; i++)
-    in_file.ignore(256,'\n');
+
+  for (unsigned int n=0; n<5; n++)
+      std::getline(in_file, this->id_lines_1_to_5[n], '\n');
+
+//   // ID lines are ignored when reading
+//   for(unsigned int i=0; i<6; i++)
+//     in_file.ignore(256,'\n');
 
   in_file >> this->model_type     
 	  >> this->analysis_type
@@ -622,11 +674,8 @@ void MeshDataUnvHeader::write (std::ofstream& out_file)
   sprintf(buf, "%6i\n",this->dataset_location);
   out_file << buf;
 
-  out_file << this->id_line_1 << "\n";
-  out_file << this->id_line_2 << "\n";
-  out_file << this->id_line_3 << "\n";
-  out_file << this->id_line_4 << "\n";
-  out_file << this->id_line_5 << "\n";
+  for (unsigned int n=0; n<5; n++)
+    out_file << this->id_lines_1_to_5[n] << "\n";
 
   sprintf(buf, "%10i%10i%10i%10i%10i%10i\n",
 	  model_type,  analysis_type, data_characteristic,
@@ -683,5 +732,97 @@ void MeshDataUnvHeader::which_dataset (const unsigned int ds_label)
 {
   this->_desired_dataset_label = ds_label;
 }
+
+
+
+void MeshDataUnvHeader::operator = (const MeshDataUnvHeader& omduh)
+{
+  this->dataset_label          = omduh.dataset_label;
+  this->dataset_name           = omduh.dataset_name;
+  this->dataset_location       = omduh.dataset_location;
+  this->id_lines_1_to_5        = omduh.id_lines_1_to_5;
+
+  this->model_type             = omduh.model_type;
+  this->analysis_type          = omduh.analysis_type;
+  this->data_characteristic    = omduh.data_characteristic;
+  this->result_type            = omduh.result_type;
+
+#ifdef USE_COMPLEX_NUMBERS
+  /*
+   * in complex mode allow only
+   * values 5 or 6 (complex) for data_type
+   */
+  if ((omduh.data_type == 5) ||
+      (omduh.data_type == 6))
+      this->data_type          = omduh.data_type;
+  else
+    {
+#  ifdef DEBUG
+      std::cerr << "WARNING: MeshDataUnvHeader::operator=(): Other object has data_type for" << std::endl
+		<< "         real values.  Will use default data_type=5 during assignment." << std::endl
+		<< std::endl;
+#  endif
+      this->data_type          = 5;
+    }
+
+#else
+
+  /*
+   * in real mode allow only
+   * values 2 or 4 (real) for data_type
+   */
+  if ((omduh.data_type == 2) ||
+      (omduh.data_type == 4))
+      this->data_type          = omduh.data_type;
+  else
+    {
+#  ifdef DEBUG
+      std::cerr << "WARNING: Other MeshDataUnvHeader has data_type for complex values." << std::endl
+		<< "         Data import will likely _not_ work and result in infinite loop," << std::endl
+		<< "         provided the user forgot to re-size nvaldc to 2*nvaldc_old!" << std::endl
+		<< std::endl;
+#  endif
+      this->data_type          = 2;
+    }
+
+#endif
+
+  this->nvaldc                 = omduh.nvaldc;
+
+  this->record_10              = omduh.record_10;
+  this->record_11              = omduh.record_11;
+  this->record_12              = omduh.record_12;
+  this->record_13              = omduh.record_13;
+
+  this->_desired_dataset_label = omduh._desired_dataset_label;
+}
+
+
+
+
+bool MeshDataUnvHeader::operator == (const MeshDataUnvHeader& omduh) const
+{
+  return (this->dataset_label          == omduh.dataset_label       &&
+	  this->dataset_name           == omduh.dataset_name        &&
+	  this->dataset_location       == omduh.dataset_location    &&
+	  this->id_lines_1_to_5        == omduh.id_lines_1_to_5     &&
+
+	  this->model_type             == omduh.model_type          &&
+	  this->analysis_type          == omduh.analysis_type       &&
+	  this->data_characteristic    == omduh.data_characteristic &&
+	  this->result_type            == omduh.result_type         &&
+
+	  this->data_type              == omduh.data_type           &&
+	  this->nvaldc                 == omduh.nvaldc              &&
+
+	  this->record_10              == omduh.record_10           &&
+	  this->record_11              == omduh.record_11           &&
+	  this->record_12              == omduh.record_12           &&
+	  this->record_13              == omduh.record_13           &&
+
+	  this->_desired_dataset_label == omduh._desired_dataset_label);
+}
+
+
 
 

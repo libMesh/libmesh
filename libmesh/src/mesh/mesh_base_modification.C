@@ -1,4 +1,4 @@
-// $Id: mesh_base_modification.C,v 1.6 2003-08-18 14:44:52 ddreyer Exp $
+// $Id: mesh_base_modification.C,v 1.7 2003-08-23 17:12:46 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -285,6 +285,8 @@ void MeshBase::all_second_order (const bool full_ordered)
 
 const Point MeshBase::build_inf_elem(bool be_verbose)
 {
+  START_LOG("build_inf_elem()", "MeshBase");
+
   // determine origin automatically,
   // works only if the mesh has no symmetry planes.
   std::pair<Point, Point> b_box = bounding_box();
@@ -302,6 +304,8 @@ const Point MeshBase::build_inf_elem(bool be_verbose)
     }
 
   build_inf_elem(origin, false, false, false, be_verbose);
+
+  STOP_LOG("build_inf_elem()", "MeshBase");
 
   /*
    * when finished with building the Ifems,
@@ -328,6 +332,8 @@ const Point MeshBase::build_inf_elem (const InfElemOriginValue& origin_x,
 				      const bool be_verbose,
 				      std::vector<const Node*>* inner_boundary_nodes)
 {
+  START_LOG("build_inf_elem()", "MeshBase");
+
   /*
    * first determine the origin of the 
    * infinite elements.  For this, the
@@ -510,6 +516,8 @@ const Point MeshBase::build_inf_elem (const InfElemOriginValue& origin_x,
     }
 
 
+  STOP_LOG("build_inf_elem()", "MeshBase");
+
   /*
    * when finished with building the Ifems,
    * it remains to prepare the mesh for use:
@@ -546,10 +554,11 @@ void MeshBase::build_inf_elem(const Point& origin,
     }
 
 
+  PAUSE_LOG("build_inf_elem()", "MeshBase");
+
   this->find_neighbors();	// update elem->neighbor() tables
 
-
-  START_LOG("build_inf_elem()", "MeshBase");
+  RESTART_LOG("build_inf_elem()", "MeshBase");
 
   // pairs: (first: element number, second: side number)
   std::set< std::pair<unsigned int,unsigned int> > faces,ofaces;
@@ -881,9 +890,6 @@ void MeshBase::build_inf_elem(const Point& origin,
 	      << std::endl
 	      << std::endl;
 #endif
-
-
-  STOP_LOG("build_inf_elem()", "MeshBase");
 
 }
 

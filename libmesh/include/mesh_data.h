@@ -1,4 +1,4 @@
-// $Id: mesh_data.h,v 1.16 2003-08-16 21:19:27 ddreyer Exp $
+// $Id: mesh_data.h,v 1.17 2003-08-23 17:12:43 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -568,8 +568,34 @@ protected:
 /**
  * Class \p MeshDataUnvHeader handles the data specified at
  * the @e beginning of a dataset 2414 in a universal file.
- * This header is structured in records 1 to 13.  For more
- * details we refer to the general description of the I-DEAS
+ * This header is structured in records 1 to 13.  A typical
+ * header is described here.  The text after the # are comments
+ * and are @e not part of such a dataset.  The text in brackets
+ * after the # are the corresponding class members names.  If
+ * brackets left empty, then this feature is not (yet) supported.
+ *
+ \verbatim                
+      -1                                                                              # beginning of dataset
+    2414                                                                              # type of dataset: data at mesh entities
+           1                                                                          # R.  1: unique number of dataset (dataset_label)
+  STRUCTURAL MODE     1                                                               # R.  2: text describing content (dataset_name)
+           1                                                                          # R.  3: data belongs to: nodes, elements,... 
+                                                                                      #        (dataset_location)
+  Default Model                                                                       # R.  4: user-specified text (id_lines_1_to_5[0])
+  I-DEAS Master Series                                                                # R.  5: user-specified text (id_lines_1_to_5[1])
+  18-AUG-2003 20:00:12    HPUX11_64     MAR2003                                       # R.  6: user-specified text (id_lines_1_to_5[2])
+  MODE   1 FREQUENCY       501.25 Hz                                                  # R.  7: user-specified text (id_lines_1_to_5[3])
+  STRUCTURAL MODE     1                                                               # R.  8: user-specified text (id_lines_1_to_5[4])
+           0         2         3         8         2         6                        # R.  9: (model_type) (analysis_type) 
+                                                                                      #        (data_characteristic) (result_type)
+                                                                                      #        (data_type) (nvaldc)
+           0         0         0         0         0         1         0         0    # R. 10: analysis-specific data (record_10)
+           0         0                                                                # R. 11: analysis-specific data (record_11)
+    0.00000E+00  0.50125E+03  0.99192E+07  0.10000E+01  0.00000E+00  0.00000E+00      # R. 12: analysis-specific data (record_12)
+    0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00      # R. 13: analysis-specific data (record_13)
+ \endverbatim
+ *
+ * For more details we refer to the general description of the I-DEAS
  * universal file format.
  *
  * An instance of this class may be attached to the \p MeshData 
@@ -615,6 +641,18 @@ public:
   void which_dataset (const unsigned int ds_label);
 
   /**
+   * Assignment operator.  Simply assigns all values from
+   \p omduh to \p this.
+  */
+  void operator = (const MeshDataUnvHeader& omduh);
+
+  /**
+   * @returns \p true when \p this and \omduh are equal,
+   * \p false otherwise.
+  */
+  bool operator == (const MeshDataUnvHeader& omduh) const;
+
+  /**
    * Record 1.  User specified analysis dataset label.
    */
   unsigned int dataset_label;
@@ -633,30 +671,34 @@ public:
   /**
    * Record 4 trough 8 are ID lines.
    */
-  std::string id_line_1,
-              id_line_2,
-              id_line_3,
-              id_line_4,
-              id_line_5;
+  std::vector<std::string> id_lines_1_to_5;
 
   /**
-   * Record 9. This record contains data specifying
+   * Record 9, first part. This record contains data specifying
    * the model type (e.g. unknown, structural, etc.),
    * the analysis type (e.g. unknown, static, transient,
    * normal mode, etc.),
    * the data characteristics (such as scalar, 3 dof global
    * translation vector, etc.),
-   * the result type (e.g. stress, strain, velocity, etc.),
-   * the data type (e.g. integer, single precision floating
-   * point, double precision floating point, etc.),
-   * and the number of data values for the mesh data.
+   * the result type (e.g. stress, strain, velocity, etc.).
    */
-  unsigned int model_type,          
+  unsigned int model_type,
                analysis_type,
                data_characteristic,
-               result_type,
-               data_type,
-               nvaldc;
+               result_type;
+
+  /**
+   * Record 9, second part. See first part, then we have:
+   * the data type (currently supported: 2,4 for \p Real, 
+   * and 5,6 for \p Complex. other possibilities: e.g. integer),
+   */
+  unsigned int data_type;
+
+  /**
+   * Record 9, third and last part. See first and second part, 
+   * then we have: the number of data values for the mesh data.
+   */
+  unsigned int nvaldc;
 
   /**
    * Record 10 and 11 are analysis specific data of
