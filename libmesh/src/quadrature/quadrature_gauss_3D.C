@@ -1,4 +1,4 @@
-// $Id: quadrature_gauss_3D.C,v 1.9 2003-02-24 14:35:45 benkirk Exp $
+// $Id: quadrature_gauss_3D.C,v 1.10 2003-02-26 01:08:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -407,6 +407,7 @@ void QGauss::init_3D(const ElemType _type)
       //---------------------------------------------
       // Prism quadrature rules
     case PRISM6:
+    case PRISM15:
     case PRISM18:
       {
 	// We compute the 3D quadrature rule as a tensor

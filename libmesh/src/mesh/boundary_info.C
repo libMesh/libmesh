@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.12 2003-02-13 22:56:12 benkirk Exp $
+// $Id: boundary_info.C,v 1.13 2003-02-26 01:08:13 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -73,119 +73,96 @@ void BoundaryInfo::clear()
 
 void BoundaryInfo::sync()
 {
-  error();
+  boundary_mesh.clear();
+
+  /**
+   * Re-create the boundary mesh.
+   */
   
-  //   boundary_mesh.clear();
+  std::map<unsigned int, unsigned int> new_node_numbers;
   
-  //   /**
-  //    * At this point we have a list of elements stored in
-  //    * boundary_mesh, but no nodes.  Furthermore, the connectivity
-  //    * for the stored elements is in terms of the _global_ node
-  //    * numbers.  In this routine we will renumber that connectivity
-  //    * and create the necessary nodes in the boundary_mesh.
-  //    */
+  boundary_mesh.set_n_subdomains() = n_boundary_ids();
 
-  //   std::map<unsigned int, unsigned int> new_node_numbers;
-  //   unsigned int next_node_number=0;
+
+  // Add sides to the structure.
+  std::map<short int, unsigned int> id_map;
+
+  // Original Code
+  //     unsigned int cnt = 0;
+  //     for (std::set<short int>::iterator pos = boundary_ids.begin();
+  // 	 pos != boundary_ids.end(); ++pos)
+  //       id_map[*pos] = cnt++;
   
-  //   boundary_mesh.set_n_subdomains() = n_boundary_ids();
-
-
-  //   // Add sides to the structure.
-  //   {
-  //     std::map<short int, unsigned int> id_map;
-
-  //     // Original Code
-  //     //     unsigned int cnt = 0;
-  //     //     for (std::set<short int>::iterator pos = boundary_ids.begin();
-  //     // 	 pos != boundary_ids.end(); ++pos)
-  //     //       id_map[*pos] = cnt++;
-    
-  //     //     id_map[invalid_id] = cnt;
+  //     id_map[invalid_id] = cnt;
 
     
-  //     // New code 
-  //     std::for_each(boundary_ids.begin(),
-  //      		  boundary_ids.end(),
-  //      		  Fill(id_map));
+  // New code 
+  std::for_each(boundary_ids.begin(),
+		boundary_ids.end(),
+		Fill(id_map));
     
     
 
-  //     boundary_mesh.set_n_subdomains() = id_map.size();
+  boundary_mesh.set_n_subdomains() = id_map.size();
+  boundary_mesh.set_n_processors() = id_map.size();
 
-  //     // Add additional sides that aren't flagged with boundary conditions
-  //     for (unsigned int e=0; e<mesh.n_elem(); e++)
-  //       if (mesh.elem(e)->active())
-  // 	for (unsigned int s=0; s<mesh.elem(e)->n_sides(); s++)
-  // 	  if (mesh.elem(e)->neighbor(s) == NULL) // on the boundary
-  // 	    {
-  // 	      // Add the side
-  // 	      Elem* elem = &mesh.elem(e)->side(s);
-  // 	      boundary_mesh.add_elem(&elem);
-
-  // 	      // The side lives on the same processor as the parent
-  // 	      elem->processor_id() = mesh.elem(e)->processor_id();
-
-  // 	      // Find the right id number for that side
-  // 	      std::pair<std::multimap<const Elem*,
-  // 	                              std::pair<unsigned short int, short int> >::iterator,
-  // 	                std::multimap<const Elem*,
-  //                                       std::pair<unsigned short int, short int> >::iterator > 
-  // 		pos = boundary_side_id.equal_range(mesh.elem(e));
-
-  // 	      while (pos.first != pos.second)
-  // 		{
-  // 		  if (pos.first->second.first == s) // already flagged with a boundary condition
-  // 		    {
-  // 		      elem->subdomain_id() =
-  // 			id_map[pos.first->second.second];
-  // 		      break;
-  // 		    }
-		  
-  // 		  ++pos.first;
-  // 		}
-
-  // 	      // either the element wasn't found or side s
-  // 	      // doesn't have a booundary condition
-  // 	      if (pos.first == pos.second)
-  // 		{
-  // 		  elem->subdomain_id() = id_map[invalid_id];
-  // 		}
-  // 	    }
-  //   }
-
-
+  // Add additional sides that aren't flagged with boundary conditions
+  const_active_elem_iterator       el     (mesh.elements_begin());
+  const const_active_elem_iterator end_el (mesh.elements_end());
   
+  for ( ; el != end_el; ++el)
+    {
+      const Elem* elem = *el;
       
-  //   for (unsigned int e=0; e<boundary_mesh.n_elem(); e++)
-  //     for (unsigned int n=0; n<boundary_mesh.elem(e)->n_nodes(); n++)
-  //       {
-  // 	const unsigned int node_number = boundary_mesh.elem(e)->node(n);
-	
-  // 	std::map<unsigned int, unsigned int>::iterator
-  // 	  pos = new_node_numbers.find(node_number);
-
-  // 	if (pos == new_node_numbers.end())
-  // 	  {
-  // 	    new_node_numbers[node_number] =
-  // 	      next_node_number++;
+      for (unsigned int s=0; s<elem->n_sides(); s++)
+	if (elem->neighbor(s) == NULL) // on the boundary
+	  {
+	    // Build the side
+	    AutoPtr<Elem> side = elem->build_side(s);
 	    
-  // 	    boundary_mesh.add_point(mesh.point(node_number));
-  // 	  }
-  //       }
-
-  
-
-  
-  //   for (unsigned int e=0; e<boundary_mesh.n_elem(); e++)
-  //     for (unsigned int n=0; n<boundary_mesh.elem(e)->n_nodes(); n++)
-  //       {
-  // 	const unsigned int old_number = boundary_mesh.elem(e)->node(n); 
+	    // The side lives on the same processor as the parent
+	    //side->processor_id() = elem->processor_id();
 	    
-  // 	boundary_mesh.elem(e)->node(n) = new_node_numbers[old_number];
-  //       }
+	    // Find the right id number for that side
+	    std::pair<std::multimap<const Elem*,
+		      std::pair<unsigned short int, short int> >::iterator,
+		      std::multimap<const Elem*,
+		      std::pair<unsigned short int, short int> >::iterator > 
+	      pos = boundary_side_id.equal_range(elem);
+
+	    while (pos.first != pos.second)
+	      {
+		if (pos.first->second.first == s) // already flagged with a boundary condition
+		  {
+		    side->subdomain_id() =
+		      id_map[pos.first->second.second];
+		    
+		    side->processor_id() =
+		      side->subdomain_id();
+		    break;
+		  }
+		
+		++pos.first;
+	      }
+
+	    // either the element wasn't found or side s
+	    // doesn't have a booundary condition
+	    if (pos.first == pos.second)
+	      {
+		side->subdomain_id() = id_map[invalid_id];
+	      }
+	    
+	    // Add the side
+	    boundary_mesh.add_elem(side.release());
+	  }
+    }
+
+  // Copy over the nodes
+  boundary_mesh._nodes.resize(mesh.n_nodes());
+  
+  for (unsigned int n=0; n<mesh.n_nodes(); n++)
+    boundary_mesh.node_ptr(n) = mesh.node_ptr(n);
 }
-
 
 
 

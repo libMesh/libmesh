@@ -1,4 +1,4 @@
-// $Id: cell_prism18.h,v 1.1 2003-02-25 18:34:41 benkirk Exp $
+// $Id: cell_prism18.h,v 1.2 2003-02-26 01:08:14 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -133,7 +133,7 @@ private:
    * Matrix that computes new nodal locations/solution values
    * from current nodes/solution.
    */
-//  static const float embedding_matrix[8][18][18];
+  static const float embedding_matrix[8][18][18];
   
   /**
    * Matrix that tells which children share which of
