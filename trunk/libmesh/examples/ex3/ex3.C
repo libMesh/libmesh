@@ -1,4 +1,4 @@
-// $Id: ex3.C,v 1.23 2003-06-03 05:33:34 benkirk Exp $
+// $Id: ex3.C,v 1.24 2003-06-10 19:04:45 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -436,34 +436,38 @@ void assemble_poisson(EquationSystems& es,
 	   * This involves a single loop in which we integrate the
 	   * "forcing function" in the PDE against the test functions.
 	   */
-	  for (unsigned int i=0; i<phi.size(); i++)
-	    {
-	      const Real x = q_point[qp](0);
-	      const Real y = q_point[qp](1);
-	      const Real eps = 1.e-3;
-
-	      /**
-	       * fxy is the forcing function for the Poisson equation.
-	       * In this case we set fxy to be a finite difference
-	       * Laplacian approximation to the (known) exact solution.
-	       *
-	       * We will use the second-order accurate FD Laplacian
-	       * approximation, which in 2D is
-	       *
-	       * u_xx + u_yy = (u(i,j-1) + u(i,j+1) +
-	       *                u(i-1,j) + u(i+1,j) +
-	       *                -4*u(i,j))/h^2
-	       */
-	      const Real fxy = -(exact_solution(x,y-eps) +
-				 exact_solution(x,y+eps) +
-				 exact_solution(x-eps,y) +
-				 exact_solution(x+eps,y) -
-				 4.*exact_solution(x,y))/eps/eps;
-	      
+	  {
+	    const Real x = q_point[qp](0);
+	    const Real y = q_point[qp](1);
+	    const Real eps = 1.e-3;
+	    
+	    /**
+	     * fxy is the forcing function for the Poisson equation.
+	     * In this case we set fxy to be a finite difference
+	     * Laplacian approximation to the (known) exact solution.
+	     *
+	     * We will use the second-order accurate FD Laplacian
+	     * approximation, which in 2D is
+	     *
+	     * u_xx + u_yy = (u(i,j-1) + u(i,j+1) +
+	     *                u(i-1,j) + u(i+1,j) +
+	     *                -4*u(i,j))/h^2
+	     *
+	     * Since the value of the forcing function depends only
+	     * on the location of the quadrature point (q_point[qp])
+	     * we will compute it here, outside of the i-loop
+	     */
+	    const Real fxy = -(exact_solution(x,y-eps) +
+			       exact_solution(x,y+eps) +
+			       exact_solution(x-eps,y) +
+			       exact_solution(x+eps,y) -
+			       4.*exact_solution(x,y))/eps/eps;
+	    
+	    for (unsigned int i=0; i<phi.size(); i++)
 	      Fe(i) += JxW[qp]*fxy*phi[i][qp];
-	    }; // end of the RHS summation loop
+	  } // end of the RHS summation
 	  
-	}; // end of quadrature point loop
+	} // end of quadrature point loop
 
 
 
@@ -559,18 +563,16 @@ void assemble_poisson(EquationSystems& es,
 		   */
 		  for (unsigned int i=0; i<phi_face.size(); i++)
 		    for (unsigned int j=0; j<phi_face.size(); j++)
-		      {
-			Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
-		      };
+		      Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
+		      
 		  
 		  /**
 		   * Right-hand-side contribution of the L2
 		   * projection.
 		   */
 		  for (unsigned int i=0; i<phi_face.size(); i++)
-		    {
-		      Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
-		    }		  
+		    Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
+		    		  
 		} // end face quadrature point loop	  
 	    } // end if (elem->neighbor(side) == NULL)
       } // end boundary condition section	  

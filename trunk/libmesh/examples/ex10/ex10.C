@@ -1,4 +1,4 @@
-// $Id: ex10.C,v 1.4 2003-06-04 22:47:44 benkirk Exp $
+// $Id: ex10.C,v 1.5 2003-06-10 19:04:44 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -156,9 +156,7 @@ int main (int argc, char** argv)
     mesh.read ("mesh.xda");
 
     /**
-     * Uniformly refine the mesh 5 times.  This is the
-     * first time we use the mesh refinement capabilities
-     * of the library.
+     * Uniformly refine the mesh 5 times.
      */
     mesh.mesh_refinement.uniformly_refine (5);
     
@@ -364,15 +362,6 @@ int main (int argc, char** argv)
 	    OSSRealzeroright(file_name,3,0,t_step+1);
 	    file_name << ".gmv";
 
-// OLD CODE
-// 	    std::stringstream file_name;
-
-// 	    file_name << "out_";
-// 	    file_name.fill('0');
-// 	    file_name.width(3);
-// 	    file_name << std::right << t_step+1;
-// 	    file_name << ".gmv";
-
 	    mesh.write_gmv (file_name.str(),
 			    equation_systems);
 	  }
@@ -433,7 +422,7 @@ void init_cd (EquationSystems& es,
 
   /**
    *---------------------------------------------------------------
-   * Loop over the local elements and compute the initial value
+   * Loop over the active local elements and compute the initial value
    * of the solution at the element degrees of freedom.  Assign
    * these initial values to the solution vector.  There is a small
    * catch, however...  We only want to assign the components that
@@ -732,8 +721,9 @@ void assemble_cd (EquationSystems& es,
        * boundary conditions.  For this example we will only
        * consider simple Dirichlet boundary conditions imposed
        * via the penalty method. The penalty method used here
-       * is equivalent to lumping the matrix resulting from the
-       * L2 projection penalty approach introduced in example 3.
+       * is equivalent (for Lagrange basis functions) to lumping
+       * the matrix resulting from the L2 projection penalty
+       * approach introduced in example 3.
        */      
       {
 	

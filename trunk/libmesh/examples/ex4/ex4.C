@@ -1,4 +1,4 @@
-// $Id: ex4.C,v 1.27 2003-06-03 05:33:34 benkirk Exp $
+// $Id: ex4.C,v 1.28 2003-06-10 19:04:46 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -484,38 +484,38 @@ void assemble_poisson(EquationSystems& es,
       perf_log.start_event ("Fe");
       
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
-	for (unsigned int i=0; i<phi.size(); i++)
-	  {
-	    const Real x = q_point[qp](0);
-	    const Real y = q_point[qp](1);
-	    const Real z = q_point[qp](2);
-	    const Real eps = 1.e-3;
-	    
-	    /**
-	     * fxy is the forcing function for the Poisson equation.
-	     * In this case we set fxy to be a finite difference
-	     * Laplacian approximation to the (known) exact solution.
-	     *
-	     * Note that in 2D the Laplacian of u = u_xx + u_yy,
-	     * but in 3D Laplacian of u = u_xx + u_yy + u_zz
-	     */
-	    const Real uxx = (exact_solution(x-eps,y,z) +
-			      exact_solution(x+eps,y,z) +
-			      -2.*exact_solution(x,y,z))/eps/eps;
-	    
-	    const Real uyy = (exact_solution(x,y-eps,z) +
-			      exact_solution(x,y+eps,z) +
-			      -2.*exact_solution(x,y,z))/eps/eps;
-	    
-	    const Real uzz = (exact_solution(x,y,z-eps) +
-			      exact_solution(x,y,z+eps) +
-			      -2.*exact_solution(x,y,z))/eps/eps;
-	    
-	    const Real fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
-	    
-	    Fe(i) += JxW[qp]*fxy*phi[i][qp];
-	  } // end of the RHS summation loop
+	{
+	  const Real x = q_point[qp](0);
+	  const Real y = q_point[qp](1);
+	  const Real eps = 1.e-3;
 	  
+	  /**
+	   * fxy is the forcing function for the Poisson equation.
+	   * In this case we set fxy to be a finite difference
+	   * Laplacian approximation to the (known) exact solution.
+	   *
+	   * We will use the second-order accurate FD Laplacian
+	   * approximation, which in 2D is
+	   *
+	   * u_xx + u_yy = (u(i,j-1) + u(i,j+1) +
+	   *                u(i-1,j) + u(i+1,j) +
+	   *                -4*u(i,j))/h^2
+	   *
+	   * Since the value of the forcing function depends only
+	   * on the location of the quadrature point (q_point[qp])
+	   * we will compute it here, outside of the i-loop
+	   */
+	  const Real fxy = -(exact_solution(x,y-eps) +
+			     exact_solution(x,y+eps) +
+			     exact_solution(x-eps,y) +
+			     exact_solution(x+eps,y) -
+			     4.*exact_solution(x,y))/eps/eps;
+	  
+	  for (unsigned int i=0; i<phi.size(); i++)
+	    Fe(i) += JxW[qp]*fxy*phi[i][qp];
+	  
+	} // end of the RHS summation loop
+      
       /**
        * Stop logging the right-hand-side computation
        */

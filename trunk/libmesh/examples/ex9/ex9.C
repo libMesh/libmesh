@@ -1,4 +1,4 @@
-// $Id: ex9.C,v 1.6 2003-06-04 22:47:45 benkirk Exp $
+// $Id: ex9.C,v 1.7 2003-06-10 19:04:47 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -133,14 +133,20 @@ int main (int argc, char** argv)
     Mesh mesh (2);
     
     /**
-     * Use the internal mesh generator to create a uniform
-     * grid on the square [0,2]^D.  We instruct the mesh generator
-     * to build a mesh of 80x80 elements.
+     * Read the mesh from file.  This is the coarse mesh that will be used
+     * in example 10 to demonstrate adaptive mesh refinement.  Here we will
+     * simply read it in and uniformly refine it 5 times before we compute
+     * with it.
      */
-    mesh.build_square (80, 80,
-		       0., 2.,
-		       0., 2.);
+    mesh.read ("../ex10/mesh.xda");
 
+    /**
+     * Uniformly refine the mesh 5 times.  This is the
+     * first time we use the mesh refinement capabilities
+     * of the library.
+     */
+    mesh.mesh_refinement.uniformly_refine (5);
+    
     /**
      * Print information about the mesh to the screen.
      */
@@ -276,14 +282,6 @@ int main (int argc, char** argv)
 	    OSSRealzeroright(file_name,3,0,t_step+1);
 	    file_name << ".gmv";
 
-// OLD CODE
-// 	    std::stringstream file_name;
-// 	    file_name << "out_";
-// 	    file_name.fill('0');
-// 	    file_name.width(3);
-// 	    file_name << std::right << t_step+1;
-// 	    file_name << ".gmv";
-
 	    mesh.write_gmv (file_name.str(),
 			    equation_systems);
 	  }
@@ -343,7 +341,7 @@ void init_cd (EquationSystems& es,
 
   /**
    *---------------------------------------------------------------
-   * Loop over the local elements and compute the initial value
+   * Loop over the active local elements and compute the initial value
    * of the solution at the element degrees of freedom.  Assign
    * these initial values to the solution vector.  There is a small
    * catch, however...  We only want to assign the components that
@@ -351,8 +349,8 @@ void init_cd (EquationSystems& es,
    * in the loop.
    */
 
-  const_local_elem_iterator       elem_it (mesh.elements_begin());
-  const const_local_elem_iterator elem_end(mesh.elements_end());
+  const_active_local_elem_iterator       elem_it (mesh.elements_begin());
+  const const_active_local_elem_iterator elem_end(mesh.elements_end());
 
   for ( ; elem_it != elem_end; ++elem_it)
     {
@@ -521,11 +519,13 @@ void assemble_cd (EquationSystems& es,
    *--------------------------------------------------------------------
    * Now we will loop over all the elements in the mesh that
    * live on the local processor. We will compute the element
-   * matrix and right-hand-side contribution.
+   * matrix and right-hand-side contribution.  Since the mesh
+   * will be refined we want to only consider the ACTIVE elements,
+   * hence we use a variant of the \p active_elem_iterator.
    */
 
-  const_local_elem_iterator           el (mesh.elements_begin());
-  const const_local_elem_iterator end_el (mesh.elements_end());
+  const_active_local_elem_iterator           el (mesh.elements_begin());
+  const const_active_local_elem_iterator end_el (mesh.elements_end());
   
   for ( ; el != end_el; ++el)
     {    
@@ -639,8 +639,9 @@ void assemble_cd (EquationSystems& es,
        * boundary conditions.  For this example we will only
        * consider simple Dirichlet boundary conditions imposed
        * via the penalty method. The penalty method used here
-       * is equivalent to lumping the matrix resulting from the
-       * L2 projection penalty approach introduced in example 3.
+       * is equivalent (for Lagrange basis functions) to lumping
+       * the matrix resulting from the L2 projection penalty
+       * approach introduced in example 3.
        */      
       {
 	
