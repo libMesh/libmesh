@@ -1,4 +1,4 @@
-// $Id: system.h,v 1.3 2004-06-02 15:08:41 jwpeterson Exp $
+// $Id: system.h,v 1.4 2004-09-27 13:41:46 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -326,7 +326,8 @@ public:
   /**
    * Writes the basic data for this System.
    */
-  void write (Xdr& io) const;
+  void write (Xdr& io,
+	      const bool write_additional_data) const;
 
   /**
    * Writes additional data, namely vectors, for this System.

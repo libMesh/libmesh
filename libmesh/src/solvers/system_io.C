@@ -1,4 +1,4 @@
-// $Id: system_io.C,v 1.4 2004-08-05 20:21:09 jwpeterson Exp $
+// $Id: system_io.C,v 1.5 2004-09-27 13:41:48 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -169,35 +169,33 @@ void System::read (Xdr& io,
   /**
    * 4.)  
    *
-   * Read the number of additional vectors
+   * Read the number of additional vectors.  
    */
-  {
-    unsigned int n_vectors=0;
+  unsigned int n_vectors=0;
   
-    io.data (n_vectors);
+  io.data (n_vectors);
 
-    for (unsigned int vec=0; vec<n_vectors; vec++)
-      {
- 	/**
-	 * 5.)
-	 *
-	 * Read the name of the vec-th additional vector
-	 */
-	std::string vec_name;
+  for (unsigned int vec=0; vec<n_vectors; vec++)
+    {
+      /**
+       * 5.)
+       *
+       * Read the name of the vec-th additional vector
+       */
+      std::string vec_name;
       
-	io.data (vec_name);
+      io.data (vec_name);
 
 	
-	if (read_additional_data)
-	  {
-	    // sanity checks
-	    assert(this->_can_add_vectors);
-	    assert(this->_vectors.count(vec_name) == 0);
+      if (read_additional_data)
+	{
+	  // sanity checks
+	  assert(this->_can_add_vectors);
+	  assert(this->_vectors.count(vec_name) == 0);
 
-	    this->add_vector(vec_name);
-	  }
-      }
-  }
+	  this->add_vector(vec_name);
+	}
+    }
 }
 
 
@@ -253,7 +251,10 @@ void System::read_data (Xdr& io,
      * ordering we may have using the dof_map.
      */
     reordered_vector.resize(global_vector.size());
-	
+
+    std::cout << "global_vector.size()=" << global_vector.size() << std::endl;
+    std::cout << "this->n_dofs()=" << this->n_dofs() << std::endl;
+    
     assert (global_vector.size() == this->n_dofs());
 	
     unsigned int cnt=0;
@@ -300,82 +301,85 @@ void System::read_data (Xdr& io,
 
 
   /**
-   * for each additional vector,
-   * simply go through the list
+   * For each additional vector, simply go through the list.
    */
 
-  std::map<std::string, NumericVector<Number>* >::iterator
-    pos = this->_vectors.begin();
-  
-  for (; pos != this->_vectors.end(); ++pos)
+  if (read_additional_data)
     {
-      /**
-       * 15.)
-       *
-       * Read the values of the vec-th additional vector.
-       * Prior do _not_ clear, but fill with zero, since the
-       * additional vectors _have_ to have the same size
-       * as the solution vector
-       */
-      std::fill (global_vector.begin(), global_vector.end(), libMesh::zero);
-
-      io.data (global_vector);	  
-
-
-      if (read_additional_data)
-        {
+      std::map<std::string, NumericVector<Number>* >::iterator
+	pos = this->_vectors.begin();
+  
+      for (; pos != this->_vectors.end(); ++pos)
+	{
 	  /**
-	   * Remember that the stored vector is node-major.
-	   * We need to put it into whatever application-specific
-	   * ordering we may have using the dof_map.
+	   * 15.)
+	   *
+	   * Read the values of the vec-th additional vector.
+	   * Prior do _not_ clear, but fill with zero, since the
+	   * additional vectors _have_ to have the same size
+	   * as the solution vector
 	   */
-	  std::fill (reordered_vector.begin(),
-		     reordered_vector.end(),
-		     libMesh::zero);
-	
-	  reordered_vector.resize(global_vector.size());
-	
+	  std::fill (global_vector.begin(), global_vector.end(), libMesh::zero);
 
-	  assert (global_vector.size() == this->n_dofs());
-	
-	  unsigned int cnt=0;
 
-	  const unsigned int sys     = this->number();
-	  const unsigned int n_vars  = this->n_vars();
-	  const unsigned int n_nodes = _mesh.n_nodes();
-	  const unsigned int n_elem  = _mesh.n_elem();
-	
-	  for (unsigned int var=0; var<n_vars; var++)
+	  io.data (global_vector);	  
+
+
+	  if (read_additional_data)
 	    {
-	      // First reorder the nodal DOF values
-	      for (unsigned int node=0; node<n_nodes; node++)
-		for (unsigned int index=0; index<_mesh.node(node).n_comp(sys,var); index++)
-		  {
-		    assert (_mesh.node(node).dof_number(sys, var, index) !=
-			    DofObject::invalid_id);
+	      /**
+	       * Remember that the stored vector is node-major.
+	       * We need to put it into whatever application-specific
+	       * ordering we may have using the dof_map.
+	       */
+	      std::fill (reordered_vector.begin(),
+			 reordered_vector.end(),
+			 libMesh::zero);
+	
+	      reordered_vector.resize(global_vector.size());
+	
 
-		    assert (cnt < global_vector.size());
-		  
-		    reordered_vector[_mesh.node(node).dof_number(sys, var, index)] =
-			global_vector[cnt++]; 
-		  }
+	      assert (global_vector.size() == this->n_dofs());
+	
+	      unsigned int cnt=0;
 
-	      // Then reorder the element DOF values
-	      for (unsigned int elem=0; elem<n_elem; elem++)
-		for (unsigned int index=0; index<_mesh.elem(elem)->n_comp(sys,var); index++)
-		  {  
-		    assert (_mesh.elem(elem)->dof_number(sys, var, index) !=
-			    DofObject::invalid_id);
+	      const unsigned int sys     = this->number();
+	      const unsigned int n_vars  = this->n_vars();
+	      const unsigned int n_nodes = _mesh.n_nodes();
+	      const unsigned int n_elem  = _mesh.n_elem();
+	
+	      for (unsigned int var=0; var<n_vars; var++)
+		{
+		  // First reorder the nodal DOF values
+		  for (unsigned int node=0; node<n_nodes; node++)
+		    for (unsigned int index=0; index<_mesh.node(node).n_comp(sys,var); index++)
+		      {
+			assert (_mesh.node(node).dof_number(sys, var, index) !=
+				DofObject::invalid_id);
+
+			assert (cnt < global_vector.size());
 		  
-		    assert (cnt < global_vector.size());
+			reordered_vector[_mesh.node(node).dof_number(sys, var, index)] =
+			  global_vector[cnt++]; 
+		      }
+
+		  // Then reorder the element DOF values
+		  for (unsigned int elem=0; elem<n_elem; elem++)
+		    for (unsigned int index=0; index<_mesh.elem(elem)->n_comp(sys,var); index++)
+		      {  
+			assert (_mesh.elem(elem)->dof_number(sys, var, index) !=
+				DofObject::invalid_id);
 		  
-		    reordered_vector[_mesh.elem(elem)->dof_number(sys, var, index)] =
-			global_vector[cnt++]; 
-		  }
-	    }
+			assert (cnt < global_vector.size());
+		  
+			reordered_vector[_mesh.elem(elem)->dof_number(sys, var, index)] =
+			  global_vector[cnt++]; 
+		      }
+		}
 	    
-	  // use the overloaded operator=(std::vector) to assign the values
-	  *(pos->second) = reordered_vector;
+	      // use the overloaded operator=(std::vector) to assign the values
+	      *(pos->second) = reordered_vector;
+	    }
 	}
     }
 }
@@ -388,7 +392,8 @@ void System::read_data (Xdr& io,
 
 
 
-void System::write(Xdr& io) const
+void System::write(Xdr& io,
+		   const bool write_additional_data) const
 {
   /**
    * This program implements the output of a
@@ -588,7 +593,9 @@ void System::write(Xdr& io) const
   /**
    * 4.) 
    *
-   * Write the number of additional vectors in the System
+   * Write the number of additional vectors in the System.
+   * If write_additional_data==false, then write zero for
+   * the number of additional vectors.
    */
   {	  
     // set up the comment
@@ -597,35 +604,41 @@ void System::write(Xdr& io) const
       comment += this->name();
       comment += "\"";
     }
-	  
+    
     unsigned int n_vectors = this->n_vectors ();
+
+    if (write_additional_data == false)
+      n_vectors = 0;
+    
     io.data (n_vectors, comment.c_str());
   }
-
-
-
-  {
-    std::map<std::string, NumericVector<Number>* >::const_iterator
-      vec_pos = this->_vectors.begin();
-    
-    unsigned int cnt=0;
-
-    for(;  vec_pos != this->_vectors.end(); ++vec_pos)
+  
+      
+  if (write_additional_data)
+    {
       {
-	/**
-	 * 5.)
-	 *
-	 * write the name of the cnt-th additional vector
-	 */
-	comment =  "# Name of ";
-	sprintf(buf, "%d", cnt++);
-	comment += buf;
-	comment += "th vector";
-	std::string vec_name = vec_pos->first;
-
-	io.data (vec_name, comment.c_str());
+	std::map<std::string, NumericVector<Number>* >::const_iterator
+	  vec_pos = this->_vectors.begin();
+	
+	unsigned int cnt=0;
+	
+	for(;  vec_pos != this->_vectors.end(); ++vec_pos)
+	  {
+	    /**
+	     * 5.)
+	     *
+	     * write the name of the cnt-th additional vector
+	     */
+	    comment =  "# Name of ";
+	    sprintf(buf, "%d", cnt++);
+	    comment += buf;
+	    comment += "th vector";
+	    std::string vec_name = vec_pos->first;
+	    
+	    io.data (vec_name, comment.c_str());
+	  }
       }
-  }
+    }
 
 }
 
