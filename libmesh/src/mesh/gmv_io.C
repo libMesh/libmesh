@@ -1,4 +1,4 @@
-// $Id: gmv_io.C,v 1.13 2004-11-08 00:11:05 jwpeterson Exp $
+// $Id: gmv_io.C,v 1.14 2004-11-10 20:34:54 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -265,6 +265,10 @@ void GMVIO::write_ascii (const std::string& fname,
 		
 		else
 		  {
+		    std::cout << "Encountered an unrecognized element "
+			      << "type.  Possibly a dim-1 dimensional "
+			      << "element?  Aborting..."
+			      << std::endl;
 		    error();
 		  }
 		
