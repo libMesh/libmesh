@@ -1,4 +1,4 @@
-// $Id: laspack_vector.C,v 1.12 2003-04-29 21:39:36 benkirk Exp $
+// $Id: laspack_vector.C,v 1.13 2003-05-28 22:03:15 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -236,6 +236,19 @@ void LaspackVector<T>::localize (NumericVector<T>& v_local_in,
   assert (send_list.size() == v_local.size());
 
   v_local = *this;
+}
+
+
+
+template <typename T>
+void LaspackVector<T>::localize (const unsigned int first_local_idx,
+				 const unsigned int last_local_idx,
+				 const std::vector<unsigned int>& send_list)
+{
+  assert (first_local_idx  == 0);
+  assert (last_local_idx+1 == this->size());
+  
+  assert (send_list.size() == this->size());
 }
 
 

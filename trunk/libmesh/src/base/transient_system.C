@@ -1,4 +1,4 @@
-// $Id: transient_system.C,v 1.2 2003-05-15 23:34:35 benkirk Exp $
+// $Id: transient_system.C,v 1.3 2003-05-28 22:03:15 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -54,6 +54,7 @@ TransientSystem::~TransientSystem ()
 
 void TransientSystem::clear ()
 {
+  // clear the parent data
   SteadySystem::clear();
 
   // clear the old & older local solutions
@@ -84,4 +85,11 @@ void TransientSystem::reinit ()
   // Project the old & older vectors to the new mesh
   this->project_vector (*older_local_solution);
   this->project_vector (*old_local_solution);  
+}
+
+
+
+void TransientSystem::re_update ()
+{
+  error();
 }

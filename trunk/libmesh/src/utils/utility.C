@@ -1,4 +1,4 @@
-// $Id: utility.C,v 1.8 2003-04-02 21:58:46 benkirk Exp $
+// $Id: utility.C,v 1.9 2003-05-28 22:03:15 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -30,6 +30,11 @@
 // Local includes
 #include "o_string_stream.h"
 #include "utility.h"
+
+
+
+//-----------------------------------------------------------------------
+// Utility members
 
 
 // The system_info function duplicates some of the

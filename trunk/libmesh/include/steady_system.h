@@ -1,4 +1,4 @@
-// $Id: steady_system.h,v 1.2 2003-05-15 23:34:34 benkirk Exp $
+// $Id: steady_system.h,v 1.3 2003-05-28 22:03:01 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -123,6 +123,13 @@ protected:
    * the system, so that, e.g., \p assemble() may be used.
    */
   void init_data ();
+
+  /**
+   * Re-update the local values when the mesh has changed.
+   * This method takes the data updated by \p update() and
+   * makes it up-to-date on the current mesh.
+   */
+  void re_update ();
 
 };
 

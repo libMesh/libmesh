@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.28 2003-05-21 13:50:19 benkirk Exp $
+// $Id: dof_map.h,v 1.29 2003-05-28 22:03:00 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -124,6 +124,22 @@ public:
    * solution values needed for computation.
    */
   const std::vector<unsigned int>& get_send_list() const { return _send_list; }
+
+
+#ifdef ENABLE_AMR
+  
+  /**
+   * After a mesh is refined and repartitioned it is possible that the
+   * \p _send_list will need to be augmented.  This is the case when an
+   * element is refined and its children end up on different processors
+   * than the parent.  These children will need values from the parent
+   * when projecting the solution onto the refined mesh, hence the parent's
+   * DOF indices need to be included in the \p _send_list.
+   */
+  void augment_send_list_for_projection(const MeshBase &);
+  
+#endif
+
   
   /**
    * Returns a constant reference to the \p _n_nz list for this processor.
@@ -182,13 +198,13 @@ public:
   /**
    * Returns the first dof index that is local to subdomain \p proc.
    */
-  unsigned int first_dof(unsigned int proc) const
+  unsigned int first_dof(const unsigned int proc = libMeshBase::processor_id()) const
   { assert(proc < _first_df.size()); return _first_df[proc]; }
   
   /**
    * Returns the last dof index that is local to subdomain \p proc.
    */
-  unsigned int last_dof(unsigned int proc) const
+  unsigned int last_dof(const unsigned int proc = libMeshBase::processor_id()) const
   { assert(proc < _last_df.size()); return _last_df[proc]; }  
 
 
@@ -328,6 +344,13 @@ private:
    */
   unsigned int sys_number() const;
     
+  /**
+   * Takes the \p _send_list vector (which may have duplicate entries)
+   * and sorts it.  The duplicate entries are then removed, resulting in
+   * a sorted \p _send_list with unique entries.
+   */
+  void sort_send_list ();
+
   
 #ifdef ENABLE_AMR
 
