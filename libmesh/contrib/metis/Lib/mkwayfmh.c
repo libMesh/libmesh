@@ -6,7 +6,7 @@
  * Started 7/28/97
  * George
  *
- * $Id: mkwayfmh.c,v 1.3 2003-01-24 17:24:37 jwpeterson Exp $
+ * $Id: mkwayfmh.c,v 1.4 2003-06-24 05:33:50 benkirk Exp $
  *
  */
 

@@ -9,7 +9,7 @@
  * Started 7/23/97
  * George
  *
- * $Id: minitpart2.c,v 1.3 2003-01-24 17:24:37 jwpeterson Exp $
+ * $Id: minitpart2.c,v 1.4 2003-06-24 05:33:50 benkirk Exp $
  *
  */
 
@@ -199,7 +199,7 @@ void MocInit2WayBalance2(CtrlType *ctrl, GraphType *graph, float *tpwgts, float 
 
   ASSERT(ComputeCut(graph, where) == graph->mincut);
   ASSERT(CheckBnd(graph));
-  /* ASSERT(CheckGraph(graph)); */
+  ASSERT(CheckGraph(graph));
 
   /* Compute the queues in which each vertex will be assigned to */
   for (i=0; i<nvtxs; i++)

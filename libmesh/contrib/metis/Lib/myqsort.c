@@ -9,7 +9,7 @@
  * Started 10/18/96
  * George
  * 
- * $Id: myqsort.c,v 1.3 2003-01-24 17:24:37 jwpeterson Exp $
+ * $Id: myqsort.c,v 1.4 2003-06-24 05:33:50 benkirk Exp $
  */
 
 #include <metis.h>			/* only for type declarations */

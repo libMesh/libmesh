@@ -1,6 +1,6 @@
 include ../../../Make.common
 
-INCLUDE = -I.
+INCLUDE = -I. 
 
 SRC     := $(wildcard *.c)
 OBJS   	:= $(patsubst %.c, %.$(obj-suffix), $(SRC))

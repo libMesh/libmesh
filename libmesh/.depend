@@ -2180,8 +2180,10 @@ src/mesh/mesh_base.$(obj-suffix):\
     include/mesh_data.h\
     include/mesh_logging.h\
     include/mesh_refinement.h\
+    include/metis_partitioner.h\
     include/node.h\
     include/node_iterators.h\
+    include/partitioner.h\
     include/perf_log.h\
     include/petsc_matrix.h\
     include/point.h\
@@ -2481,37 +2483,6 @@ src/mesh/mesh_gmv_support.$(obj-suffix):\
     include/system_base.h\
     include/transient_system.h\
     include/type_vector.h
-src/mesh/mesh_metis_support.$(obj-suffix):\
-    src/mesh/mesh_metis_support.C\
-    include/auto_ptr.h\
-    include/boundary_info.h\
-    include/dof_object.h\
-    include/elem.h\
-    include/elem_iterators.h\
-    include/enum_elem_quality.h\
-    include/enum_elem_type.h\
-    include/enum_order.h\
-    include/enum_solver_package.h\
-    include/enum_xdr_mode.h\
-    include/libmesh.h\
-    include/libmesh_base.h\
-    include/mesh_base.h\
-    include/mesh_common.h\
-    include/mesh_communication.h\
-    include/mesh_config.h\
-    include/mesh_data.h\
-    include/mesh_logging.h\
-    include/mesh_refinement.h\
-    include/node.h\
-    include/node_iterators.h\
-    include/perf_log.h\
-    include/point.h\
-    include/predicated_iterator.h\
-    include/reference_counted_object.h\
-    include/reference_counter.h\
-    include/sphere.h\
-    include/surface.h\
-    include/type_vector.h
 src/mesh/mesh_misc_support.$(obj-suffix):\
     src/mesh/mesh_misc_support.C\
     include/auto_ptr.h\
@@ -2629,37 +2600,6 @@ src/mesh/mesh_refinement_smoothing.$(obj-suffix):\
     include/mesh_communication.h\
     include/mesh_config.h\
     include/mesh_data.h\
-    include/mesh_refinement.h\
-    include/node.h\
-    include/node_iterators.h\
-    include/perf_log.h\
-    include/point.h\
-    include/predicated_iterator.h\
-    include/reference_counted_object.h\
-    include/reference_counter.h\
-    include/sphere.h\
-    include/surface.h\
-    include/type_vector.h
-src/mesh/mesh_sfc_support.$(obj-suffix):\
-    src/mesh/mesh_sfc_support.C\
-    include/auto_ptr.h\
-    include/boundary_info.h\
-    include/dof_object.h\
-    include/elem.h\
-    include/elem_iterators.h\
-    include/enum_elem_quality.h\
-    include/enum_elem_type.h\
-    include/enum_order.h\
-    include/enum_solver_package.h\
-    include/enum_xdr_mode.h\
-    include/libmesh.h\
-    include/libmesh_base.h\
-    include/mesh_base.h\
-    include/mesh_common.h\
-    include/mesh_communication.h\
-    include/mesh_config.h\
-    include/mesh_data.h\
-    include/mesh_logging.h\
     include/mesh_refinement.h\
     include/node.h\
     include/node_iterators.h\
@@ -3304,6 +3244,149 @@ src/numerics/type_vector.$(obj-suffix):\
     include/libmesh_base.h\
     include/mesh_common.h\
     include/mesh_config.h\
+    include/type_vector.h
+src/partitioning/linear_partitioner.$(obj-suffix):\
+    src/partitioning/linear_partitioner.C\
+    include/auto_ptr.h\
+    include/boundary_info.h\
+    include/boundary_mesh.h\
+    include/dof_object.h\
+    include/elem.h\
+    include/elem_iterators.h\
+    include/enum_elem_quality.h\
+    include/enum_elem_type.h\
+    include/enum_order.h\
+    include/enum_solver_package.h\
+    include/enum_xdr_mode.h\
+    include/libmesh.h\
+    include/libmesh_base.h\
+    include/linear_partitioner.h\
+    include/mesh.h\
+    include/mesh_base.h\
+    include/mesh_common.h\
+    include/mesh_communication.h\
+    include/mesh_config.h\
+    include/mesh_data.h\
+    include/mesh_logging.h\
+    include/mesh_refinement.h\
+    include/node.h\
+    include/node_iterators.h\
+    include/partitioner.h\
+    include/perf_log.h\
+    include/point.h\
+    include/predicated_iterator.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h\
+    include/sphere.h\
+    include/surface.h\
+    include/type_vector.h
+src/partitioning/metis_partitioner.$(obj-suffix):\
+    src/partitioning/metis_partitioner.C\
+    include/auto_ptr.h\
+    include/boundary_info.h\
+    include/boundary_mesh.h\
+    include/dof_object.h\
+    include/elem.h\
+    include/elem_iterators.h\
+    include/enum_elem_quality.h\
+    include/enum_elem_type.h\
+    include/enum_order.h\
+    include/enum_solver_package.h\
+    include/enum_xdr_mode.h\
+    include/libmesh.h\
+    include/libmesh_base.h\
+    include/mesh.h\
+    include/mesh_base.h\
+    include/mesh_common.h\
+    include/mesh_communication.h\
+    include/mesh_config.h\
+    include/mesh_data.h\
+    include/mesh_logging.h\
+    include/mesh_refinement.h\
+    include/metis_partitioner.h\
+    include/node.h\
+    include/node_iterators.h\
+    include/partitioner.h\
+    include/perf_log.h\
+    include/point.h\
+    include/predicated_iterator.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h\
+    include/sfc_partitioner.h\
+    include/sphere.h\
+    include/surface.h\
+    include/type_vector.h
+src/partitioning/parmetis_partitioner.$(obj-suffix):\
+    src/partitioning/parmetis_partitioner.C\
+    include/auto_ptr.h\
+    include/boundary_info.h\
+    include/boundary_mesh.h\
+    include/dof_object.h\
+    include/elem.h\
+    include/elem_iterators.h\
+    include/enum_elem_quality.h\
+    include/enum_elem_type.h\
+    include/enum_order.h\
+    include/enum_solver_package.h\
+    include/enum_xdr_mode.h\
+    include/libmesh.h\
+    include/libmesh_base.h\
+    include/mesh.h\
+    include/mesh_base.h\
+    include/mesh_common.h\
+    include/mesh_communication.h\
+    include/mesh_config.h\
+    include/mesh_data.h\
+    include/mesh_logging.h\
+    include/mesh_refinement.h\
+    include/metis_partitioner.h\
+    include/node.h\
+    include/node_iterators.h\
+    include/parmetis_partitioner.h\
+    include/partitioner.h\
+    include/perf_log.h\
+    include/point.h\
+    include/predicated_iterator.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h\
+    include/sphere.h\
+    include/surface.h\
+    include/type_vector.h
+src/partitioning/sfc_partitioner.$(obj-suffix):\
+    src/partitioning/sfc_partitioner.C\
+    include/auto_ptr.h\
+    include/boundary_info.h\
+    include/boundary_mesh.h\
+    include/dof_object.h\
+    include/elem.h\
+    include/elem_iterators.h\
+    include/enum_elem_quality.h\
+    include/enum_elem_type.h\
+    include/enum_order.h\
+    include/enum_solver_package.h\
+    include/enum_xdr_mode.h\
+    include/libmesh.h\
+    include/libmesh_base.h\
+    include/linear_partitioner.h\
+    include/mesh.h\
+    include/mesh_base.h\
+    include/mesh_common.h\
+    include/mesh_communication.h\
+    include/mesh_config.h\
+    include/mesh_data.h\
+    include/mesh_logging.h\
+    include/mesh_refinement.h\
+    include/node.h\
+    include/node_iterators.h\
+    include/partitioner.h\
+    include/perf_log.h\
+    include/point.h\
+    include/predicated_iterator.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h\
+    include/sfc_partitioner.h\
+    include/sphere.h\
+    include/surface.h\
     include/type_vector.h
 src/quadrature/quadrature_build.$(obj-suffix):\
     src/quadrature/quadrature_build.C\

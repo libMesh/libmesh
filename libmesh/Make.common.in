@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.20 2003-04-08 22:54:06 benkirk Exp $
+# $Id: Make.common.in,v 1.21 2003-06-24 05:33:50 benkirk Exp $
 
 
 ###############################################################################
@@ -60,6 +60,10 @@ EXODUS_LIBRARY       = @LIBEXOII@
 # Metis graph partitiong software for domain decomposition
 enable-metis         = @enablemetis@
 METIS_INCLUDE	     = @METIS_INCLUDE_PATH@
+
+# Parmetis graph partitiong software for domain decomposition
+enable-parmetis      = @enableparmetis@
+PARMETIS_INCLUDE     = @PARMETIS_INCLUDE_PATH@
 
 # Laspack iterative solvers for uniprocessor applications
 enable-laspack       = @enablelaspack@
@@ -254,6 +258,13 @@ ifeq ($(enable-optional),yes)
   ifeq ($(enable-metis),yes)
     LIBS    += $(EXTERNAL_LIBDIR)/libmetis$(EXTERNAL_LIBEXT)
     INCLUDE += -I$(METIS_INCLUDE)
+
+    # if Paretis is used we need the header path
+    # and the lib
+    ifeq ($(enable-parmetis),yes)
+      LIBS    += $(EXTERNAL_LIBDIR)/libparmetis$(EXTERNAL_LIBEXT)
+      INCLUDE += -I$(PARMETIS_INCLUDE)
+    endif
   endif
 
   # if Space filling curves are used we need the

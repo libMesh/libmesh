@@ -8,7 +8,7 @@
  * Started 10/19/95
  * George
  *
- * $Id: proto.h,v 1.3 2003-01-24 17:24:37 jwpeterson Exp $
+ * $Id: proto.h,v 1.4 2003-06-24 05:33:50 benkirk Exp $
  *
  */
 
@@ -455,11 +455,11 @@ float snorm2(int, float *);
 float sdot(int n, float *, float *);
 void saxpy(int, float, float *, int, float *, int);
 void RandomPermute(int, idxtype *, int);
-/* double drand48(); */
-/* void srand48(long); */
+double drand48();
+void srand48(long);
 int ispow2(int);
 void InitRandom(int);
-int log2int(int);
+int log2Int(int);
 
 
 

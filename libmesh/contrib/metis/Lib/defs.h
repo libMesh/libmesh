@@ -8,11 +8,11 @@
  * Started 8/27/94
  * George
  *
- * $Id: defs.h,v 1.3 2003-01-24 17:24:36 jwpeterson Exp $
+ * $Id: defs.h,v 1.4 2003-06-24 05:33:50 benkirk Exp $
  *
  */
 
-#define METISTITLE              "  METIS 4.0.1 Copyright 1998, Regents of the University of Minnesota\n\n"
+#define METISTITLE              "  METIS 4.0   Copyright 1998, Regents of the University of Minnesota\n\n"
 #define MAXLINE			1280000
 
 #define LTERM			(void **) 0	/* List terminator for GKfree() */

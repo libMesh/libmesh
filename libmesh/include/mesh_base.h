@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.31 2003-05-28 03:17:48 benkirk Exp $
+// $Id: mesh_base.h,v 1.32 2003-06-24 05:33:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -64,7 +64,7 @@ template <typename T> class PetscMatrix;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.31 $
+ * \version $Revision: 1.32 $
  */
 
 
@@ -310,26 +310,25 @@ public:
    */
   void all_tri ();
   
-  /**
-   * Partition the mesh into \p n_sbdmns subdomians. Currently this routine
-   * uses Bill Barth's space-filling curve library to do the partitioning,
-   * and the default is a \p hilbert curve, but \p morton is also supported.
-   */
-  virtual void sfc_partition (const unsigned int n_sbdmns=libMeshBase::n_processors(),
-			      const std::string& type="hilbert");
+//   /**
+//    * Partition the mesh into \p n_sbdmns subdomians. Currently this routine
+//    * uses Bill Barth's space-filling curve library to do the partitioning,
+//    * and the default is a \p hilbert curve, but \p morton is also supported.
+//    */
+//   virtual void sfc_partition (const unsigned int n_sbdmns=libMeshBase::n_processors(),
+// 			      const std::string& type="hilbert");
 
-  /**
-   * Partition the mesh using the Metis library. Only works if \p ./configure
-   * detected the library.
-   */
-  virtual void metis_partition (const unsigned int n_sbdmns=libMeshBase::n_processors(),
-				const std::string& type="kway");
+//   /**
+//    * Partition the mesh using the Metis library. Only works if \p ./configure
+//    * detected the library.
+//    */
+//   virtual void metis_partition (const unsigned int n_sbdmns=libMeshBase::n_processors(),
+// 				const std::string& type="kway");
 
   /**
    * Call the default partitioner (currently \p metis_partition()).
    */
-  virtual void partition (const unsigned int n_sbdmns=libMeshBase::n_processors())
-  { this->metis_partition(n_sbdmns); }
+  virtual void partition (const unsigned int n_sbdmns=libMeshBase::n_processors());
 
   /**
    * After partitoning a mesh it is useful to renumber the nodes and elements

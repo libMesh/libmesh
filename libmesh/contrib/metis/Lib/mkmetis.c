@@ -9,7 +9,7 @@
  * Started 7/28/97
  * George
  *
- * $Id: mkmetis.c,v 1.3 2003-01-24 17:24:37 jwpeterson Exp $
+ * $Id: mkmetis.c,v 1.4 2003-06-24 05:33:50 benkirk Exp $
  *
  */
 
@@ -47,7 +47,7 @@ void METIS_mCPartGraphKway(int *nvtxs, int *ncon, idxtype *xadj, idxtype *adjncy
     ctrl.dbglvl = options[OPTION_DBGLVL];
   }
   ctrl.optype = OP_KMETIS;
-  ctrl.CoarsenTo = amax((*nvtxs)/(20*log2int(*nparts)), 30*(*nparts));
+  ctrl.CoarsenTo = amax((*nvtxs)/(20*log2Int(*nparts)), 30*(*nparts));
 
   ctrl.nmaxvwgt = 1.5/(1.0*ctrl.CoarsenTo);
 
@@ -58,6 +58,7 @@ void METIS_mCPartGraphKway(int *nvtxs, int *ncon, idxtype *xadj, idxtype *adjncy
   IFSET(ctrl.dbglvl, DBG_TIME, InitTimers(&ctrl));
   IFSET(ctrl.dbglvl, DBG_TIME, starttimer(ctrl.TotalTmr));
 
+  ASSERT(CheckGraph(&graph));
   *edgecut = MCMlevelKWayPartitioning(&ctrl, &graph, *nparts, part, rubvec);
 
   IFSET(ctrl.dbglvl, DBG_TIME, stoptimer(ctrl.TotalTmr));
@@ -115,7 +116,7 @@ int MCMlevelKWayPartitioning(CtrlType *ctrl, GraphType *graph, int nparts, idxty
 
   idxcopy(graph->nvtxs, graph->where, part);
 
-  GKfree(&graph->nvwgt, &graph->npwgts, &graph->gdata, &graph->rdata, LTERM);
+  GKfree(&graph->nvwgt, &graph->gdata, &graph->rdata, LTERM);
 
   return graph->mincut;
 

@@ -1,4 +1,4 @@
-// $Id: mesh_metis_support.C,v 1.15 2003-05-29 04:29:16 benkirk Exp $
+// $Id: metis_partitioner.C,v 1.1 2003-06-24 05:33:51 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -19,76 +19,70 @@
 
 
 
-// C++ includes
-#include <math.h>
+// C++ Includes   -----------------------------------
 
-// Local includes
-#include "mesh_base.h"
-
+// Local Includes -----------------------------------
+#include "mesh_config.h"
+#include "mesh.h"
+#include "metis_partitioner.h"
+#include "mesh_logging.h"
 
 #ifdef HAVE_METIS
-
-# include "libmesh.h"
-# include "elem.h"
-# include "mesh_logging.h"
-
   namespace Metis {
     extern "C" {
 #     include "metis.h"
     }
   }
-
+#else
+#  include "sfc_partitioner.h"
 #endif
 
 
-void MeshBase::metis_partition(const unsigned int n_sbdmns_in,
-			       const std::string& type)
+// ------------------------------------------------------------
+// MetisPartitioner implementation
+void MetisPartitioner::partition (const unsigned int n_sbdmns)
 {
-  const unsigned int n_active_elem = this->n_active_elem();
-  const unsigned int n_sbdmns      = std::min (n_sbdmns_in, n_active_elem);
-  
-  this->set_n_subdomains() = n_sbdmns;
+  assert (n_sbdmns > 0);
 
-  // check for easy return
+  // Check for an easy return
   if (n_sbdmns == 1)
     {
-      elem_iterator       elem_it (this->elements_begin());
-      const elem_iterator elem_end(this->elements_end());
-
+      elem_iterator       elem_it (_mesh.elements_begin());
+      const elem_iterator elem_end(_mesh.elements_end());
+      
       for ( ; elem_it != elem_end; ++elem_it)
 	(*elem_it)->set_subdomain_id() = 
-	  (*elem_it)->set_processor_id() = 0;
+	  (*elem_it)->set_processor_id() =
+	  0;
       
       return;
     }
 
-  
+// What to do if the Metis library IS NOT present
 #ifndef HAVE_METIS
 
-  
-  
-  std::cerr << "ERROR:  Metis not detected during configuration!" << std::endl
-	    << "        Using space-filling curves instead."      << std::endl;
-
   here();
-  
-  this->sfc_partition(n_sbdmns);
+  std::cerr << "ERROR: The library has been built without"    << std::endl
+	    << "Metis support.  Using a space-filling curve"  << std::endl
+	    << "partitioner instead!"                         << std::endl;
 
+  SFCPartitioner sfcp(_mesh);
 
+  sfcp.partition (n_sbdmns);
   
+// What to do if the Metis library IS present
 #else
 
+  START_LOG("partition()", "MetisPartitioner");
+
+  const unsigned int n_active_elem = _mesh.n_active_elem();
+  const unsigned int n_elem        = _mesh.n_elem();
   
-
-  assert (this->mesh_dimension() != 1);
-
-  START_LOG("metis_partition()", "MeshBase");
-
   // build the graph
   // the forward_map maps the active element id
   // into a contiguous block of indices for Metis
-  std::vector<unsigned int> forward_map (this->n_elem(),
-					 static_cast<unsigned int>(-1));
+  std::vector<unsigned int>
+    forward_map (n_elem, static_cast<unsigned int>(-1));
   
   std::vector<int>          xadj;
   std::vector<int>          adjncy;
@@ -113,8 +107,8 @@ void MeshBase::metis_partition(const unsigned int n_sbdmns_in,
   // We need to map the active element ids into a
   // contiguous range.
   {
-    active_elem_iterator       elem_it (this->elements_begin());
-    const active_elem_iterator elem_end(this->elements_end());
+    active_elem_iterator       elem_it (_mesh.elements_begin());
+    const active_elem_iterator elem_end(_mesh.elements_end());
 
     unsigned int el_num = 0;
 
@@ -134,8 +128,8 @@ void MeshBase::metis_partition(const unsigned int n_sbdmns_in,
   // the edges in the graph will correspond to
   // face neighbors
   {
-    active_elem_iterator       elem_it (this->elements_begin());
-    const active_elem_iterator elem_end(this->elements_end());
+    active_elem_iterator       elem_it (_mesh.elements_begin());
+    const active_elem_iterator elem_end(_mesh.elements_end());
     
     for (; elem_it != elem_end; ++elem_it)
       {
@@ -169,7 +163,6 @@ void MeshBase::metis_partition(const unsigned int n_sbdmns_in,
 			    static_cast<unsigned int>(-1));
 
 		    adjncy.push_back (forward_map[neighbor->id()]);
-
 		  }
 		
 		// Otherwise we need to find all of the
@@ -212,39 +205,23 @@ void MeshBase::metis_partition(const unsigned int n_sbdmns_in,
 
   // Select which type of partitioning to create
 
-  // Use recursive if specified or if the number of partitions is
-  // less than or equal to 8
-  if ((type == "recursive") ||
-      (n_sbdmns <= 8))
+  // Use recursive if the number of partitions is less than or equal to 8
+  if (n_sbdmns <= 8)
     Metis::METIS_PartGraphRecursive(&n, &xadj[0], &adjncy[0], &vwgt[0], NULL,
 				    &wgtflag, &numflag, &nparts, &options[0],
 				    &edgecut, &part[0]);
 
-  // Maybe use kway if specified
-  else if (type == "kway")
+  // Otherwise  use kway
+  else
     Metis::METIS_PartGraphKway(&n, &xadj[0], &adjncy[0], &vwgt[0], NULL,
 			       &wgtflag, &numflag, &nparts, &options[0],
 			       &edgecut, &part[0]);
   
-
-  // Otherwise throw an error message.
-  else
-    {
-      std::cerr << " ERROR:  valid options:" << std::endl
-		<< "   \"recursive\" " << std::endl
-		<< "   \"kway\"  "     << std::endl
-		<< " Using space-filling curves instead." << std::endl;
-
-      STOP_LOG("metis_partition()", "MeshBase");
-      sfc_partition(n_sbdmns);
-      return;
-    }
-
   
   // Assign the returned processor ids
   {
-    active_elem_iterator       elem_it (this->elements_begin());
-    const active_elem_iterator elem_end(this->elements_end());
+    active_elem_iterator       elem_it (_mesh.elements_begin());
+    const active_elem_iterator elem_end(_mesh.elements_end());
 
     for (; elem_it != elem_end; ++elem_it)
       {
@@ -261,7 +238,8 @@ void MeshBase::metis_partition(const unsigned int n_sbdmns_in,
       }
   }
 
-  STOP_LOG("metis_partition()", "MeshBase");
-
+  STOP_LOG("partition()", "MetisPartitioner");
+  
 #endif
+  
 }

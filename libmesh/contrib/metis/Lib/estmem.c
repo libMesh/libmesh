@@ -9,7 +9,7 @@
  * Started 11/4/97
  * George
  *
- * $Id: estmem.c,v 1.3 2003-01-24 17:24:36 jwpeterson Exp $
+ * $Id: estmem.c,v 1.4 2003-06-24 05:33:50 benkirk Exp $
  *
  */
 

@@ -8,7 +8,7 @@
  * Started 9/25/94
  * George
  *
- * $Id: macros.h,v 1.3 2003-01-24 17:24:36 jwpeterson Exp $
+ * $Id: macros.h,v 1.4 2003-06-24 05:33:50 benkirk Exp $
  *
  */
 
@@ -73,12 +73,15 @@
 #endif
 
 #ifdef DMALLOC
+#   define MALLOC_CHECK(ptr);
+/*
 #   define MALLOC_CHECK(ptr)                                          \
     if (malloc_verify((ptr)) == DMALLOC_VERIFY_ERROR) {  \
         printf("***MALLOC_CHECK failed on line %d of file %s: " #ptr "\n", \
               __LINE__, __FILE__);                               \
         abort();                                                \
     }
+*/
 #else
 #   define MALLOC_CHECK(ptr) ;
 #endif 
