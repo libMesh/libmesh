@@ -1,4 +1,4 @@
-// $Id: fe_lagrange_shape_2D.C,v 1.11 2004-03-24 05:49:11 jwpeterson Exp $
+// $Id: fe_lagrange_shape_2D.C,v 1.12 2005-01-13 22:10:15 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -975,4 +975,19 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
   error();
   return 0.;
 #endif // DIM > 1
+}
+
+
+
+template <>
+Real FE<2,LAGRANGE>::shape_second_deriv(const Elem* elem,
+				        const Order order,
+				        const unsigned int i,
+				        const unsigned int j,
+				        const Point& p)
+{
+  assert (elem != NULL);
+
+  // call the orientation-independent shape functions
+  return FE<2,LAGRANGE>::shape_second_deriv(elem->type(), order, i, j, p);
 }

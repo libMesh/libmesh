@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.25 2005-01-07 16:02:59 spetersen Exp $
+// $Id: fe_interface.C,v 1.26 2005-01-13 22:10:15 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -95,6 +95,9 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
       {
 	switch (fe_t.family)
 	  {
+	  case CLOUGH:
+	    return FE<2,CLOUGH>::n_shape_functions(t, o);
+	    
 	  case HIERARCHIC:
 	    return FE<2,HIERARCHIC>::n_shape_functions(t, o);
 	    
@@ -213,6 +216,9 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
       {
 	switch (fe_t.family)
 	  {
+	  case CLOUGH:
+	    return FE<2,CLOUGH>::n_dofs(t, o);
+	    
 	  case HIERARCHIC:
 	    return FE<2,HIERARCHIC>::n_dofs(t, o);
 	    
@@ -331,6 +337,9 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
       {
 	switch (fe_t.family)
 	  {
+	  case CLOUGH:
+	    return FE<2,CLOUGH>::n_dofs_at_node(t, o, n);
+	    
 	  case HIERARCHIC:
 	    return FE<2,HIERARCHIC>::n_dofs_at_node(t, o, n);
 	    
@@ -449,6 +458,9 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
       {
 	switch (fe_t.family)
 	  {
+	  case CLOUGH:
+	    return FE<2,CLOUGH>::n_dofs_per_elem(t, o);
+	    
 	  case HIERARCHIC:
 	    return FE<2,HIERARCHIC>::n_dofs_per_elem(t, o);
 	    
@@ -583,6 +595,11 @@ void FEInterface::nodal_soln(const unsigned int dim,
       {
 	switch (fe_t.family)
 	  {
+	  case CLOUGH:
+	    FE<2,CLOUGH>::nodal_soln(elem, order,
+				     elem_soln, nodal_soln);
+	    return;
+	    
 	  case HIERARCHIC:
 	    FE<2,HIERARCHIC>::nodal_soln(elem, order,
 					 elem_soln, nodal_soln);
@@ -717,6 +734,9 @@ Point FEInterface::inverse_map (const unsigned int dim,
       {
 	switch (fe_t.family)
 	  {
+	  case CLOUGH:
+	    return FE<2,CLOUGH>::inverse_map(elem, p, tolerance, secure);
+	    
 	  case HIERARCHIC:
 	    return FE<2,HIERARCHIC>::inverse_map(elem, p, tolerance, secure);
 	    
@@ -859,6 +879,10 @@ void FEInterface::inverse_map (const unsigned int dim,
       {
 	switch (fe_t.family)
 	  {
+	  case CLOUGH:
+	    FE<2,CLOUGH>::inverse_map(elem, physical_points, reference_points);
+	    return;
+	    
 	  case HIERARCHIC:
 	    FE<2,HIERARCHIC>::inverse_map(elem, physical_points, reference_points);
 	    return;
@@ -997,6 +1021,9 @@ Real FEInterface::shape(const unsigned int dim,
       {
 	switch (fe_t.family)
 	  {
+	  case CLOUGH:
+	    return FE<2,CLOUGH>::shape(t,o,i,p);
+	    
 	  case HIERARCHIC:
 	    return FE<2,HIERARCHIC>::shape(t,o,i,p);
 	    
@@ -1116,6 +1143,9 @@ Real FEInterface::shape(const unsigned int dim,
       {
 	switch (fe_t.family)
 	  {
+	  case CLOUGH:
+	    return FE<2,CLOUGH>::shape(elem,o,i,p);
+	    
 	  case HIERARCHIC:
 	    return FE<2,HIERARCHIC>::shape(elem,o,i,p);
 	    

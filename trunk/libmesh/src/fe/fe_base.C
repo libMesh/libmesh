@@ -1,4 +1,4 @@
-// $Id: fe_base.C,v 1.26 2004-10-28 21:37:24 benkirk Exp $
+// $Id: fe_base.C,v 1.27 2005-01-13 22:10:14 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -43,6 +43,13 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
       {
 	switch (fet.family)
 	  {
+	  case CLOUGH:
+	    {
+	      std::cout << "ERROR: Clough-Tocher elements only support 2D" <<
+		      std::endl;
+	      error();
+	    }
+	    
 	  case LAGRANGE:
 	    {
 	      AutoPtr<FEBase> ap(new FE<1,LAGRANGE>(fet));
@@ -87,6 +94,12 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
       {
 	switch (fet.family)
 	  {
+	  case CLOUGH:
+	    {
+	      AutoPtr<FEBase> ap(new FE<2,CLOUGH>(fet));
+	      return ap;
+	    }
+	    
 	  case LAGRANGE:
 	    {
 	      AutoPtr<FEBase> ap(new FE<2,LAGRANGE>(fet));
@@ -131,6 +144,13 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
       {
 	switch (fet.family)
 	  {
+	  case CLOUGH:
+	    {
+	      std::cout << "ERROR: Clough-Tocher elements only support 2D" <<
+		      std::endl;
+	      error();
+	    }
+	    
 	  case LAGRANGE:
 	    {
 	      AutoPtr<FEBase> ap(new FE<3,LAGRANGE>(fet));
@@ -505,6 +525,22 @@ void FEBase::compute_shape_functions (const Elem*)
 	      
 	      dphi[i][p](1) = dphidy[i][p] = 0.;
 	      dphi[i][p](2) = dphidz[i][p] = 0.;
+#ifdef ENABLE_SECOND_DERIVATIVES
+	      d2phi[i][p](0,0) = d2phidx2[i][p] = 
+		d2phidxi2[i][p]*dxidx_map[p]*dxidx_map[p];
+#if DIM>1
+	      d2phi[i][p](0,1) = d2phidxdy[i][p] = 
+		d2phi[i][p](1,0) = 0.;
+	      d2phi[i][p](1,1) = d2phidy2[i][p] = 0.;
+#if DIM>2
+	      d2phi[i][p](0,2) = d2phidxdz[i][p] =
+		d2phi[i][p](2,0) = 0.;
+	      d2phi[i][p](1,2) = d2phidydz[i][p] = 
+		d2phi[i][p](2,1) = 0.;
+	      d2phi[i][p](2,2) = d2phidz2[i][p] = 0.;
+#endif
+#endif
+#endif
 	    }
 
 	// All done
@@ -533,6 +569,40 @@ void FEBase::compute_shape_functions (const Elem*)
 		dphidz[i][p] = (dphidxi[i][p]*dxidz_map[p] +
 				dphideta[i][p]*detadz_map[p]);
 
+#ifdef ENABLE_SECOND_DERIVATIVES
+	      d2phi[i][p](0,0) = d2phidx2[i][p] = 
+		d2phidxi2[i][p]*dxidx_map[p]*dxidx_map[p] +
+		2*d2phidxideta[i][p]*dxidx_map[p]*detadx_map[p] +
+		d2phideta2[i][p]*detadx_map[p]*detadx_map[p];
+	      d2phi[i][p](0,1) = d2phidxdy[i][p] =
+		d2phi[i][p](1,0) = 
+		d2phidxi2[i][p]*dxidx_map[p]*dxidy_map[p] +
+		d2phidxideta[i][p]*dxidx_map[p]*detady_map[p] +
+		d2phideta2[i][p]*detadx_map[p]*detady_map[p] +
+		d2phidxideta[i][p]*detadx_map[p]*dxidy_map[p];
+	      d2phi[i][p](1,1) = d2phidy2[i][p] =
+		d2phidxi2[i][p]*dxidy_map[p]*dxidy_map[p] +
+		2*d2phidxideta[i][p]*dxidy_map[p]*detady_map[p] +
+		d2phideta2[i][p]*detady_map[p]*detady_map[p];
+#if DIM == 3  
+	      d2phi[i][p](0,2) = d2phidxdz[i][p] = 
+		d2phi[i][p](2,0) = 
+		d2phidxi2[i][p]*dxidx_map[p]*dxidz_map[p] +
+		d2phidxideta[i][p]*dxidx_map[p]*detadz_map[p] +
+		d2phideta2[i][p]*detadx_map[p]*detadz_map[p] +
+		d2phidxideta[i][p]*detadx_map[p]*dxidz_map[p];
+	      d2phi[i][p](1,2) = d2phidydz[i][p] = 
+		d2phi[i][p](2,1) =
+		d2phidxi2[i][p]*dxidy_map[p]*dxidz_map[p] +
+		d2phidxideta[i][p]*dxidy_map[p]*detadz_map[p] +
+		d2phideta2[i][p]*detady_map[p]*detadz_map[p] +
+		d2phidxideta[i][p]*detady_map[p]*dxidz_map[p];
+	      d2phi[i][p](2,2) = d2phidz2[i][p] =
+		d2phidxi2[i][p]*dxidz_map[p]*dxidz_map[p] +
+		2*d2phidxideta[i][p]*dxidz_map[p]*detadz_map[p] +
+		d2phideta2[i][p]*detadz_map[p]*detadz_map[p];
+#endif
+#endif
 	    }
 
 	// All done
@@ -561,6 +631,65 @@ void FEBase::compute_shape_functions (const Elem*)
 		dphidz[i][p] = (dphidxi[i][p]*dxidz_map[p] +
 				dphideta[i][p]*detadz_map[p] +
 				dphidzeta[i][p]*dzetadz_map[p]);	      
+
+#ifdef ENABLE_SECOND_DERIVATIVES
+	      d2phi[i][p](0,0) = d2phidx2[i][p] = 
+		d2phidxi2[i][p]*dxidx_map[p]*dxidx_map[p] +
+		2*d2phidxideta[i][p]*dxidx_map[p]*detadx_map[p] +
+		2*d2phidxidzeta[i][p]*dxidx_map[p]*dzetadx_map[p] +
+		2*d2phidetadzeta[i][p]*detadx_map[p]*dzetadx_map[p] +
+		d2phideta2[i][p]*detadx_map[p]*detadx_map[p] +
+		d2phidzeta2[i][p]*dzetadx_map[p]*dzetadx_map[p];
+	      d2phi[i][p](0,1) = d2phidxdy[i][p] =
+		d2phi[i][p](1,0) = 
+		d2phidxi2[i][p]*dxidx_map[p]*dxidy_map[p] +
+		d2phidxideta[i][p]*dxidx_map[p]*detady_map[p] +
+		d2phidxidzeta[i][p]*dxidx_map[p]*dzetady_map[p] +
+		d2phideta2[i][p]*detadx_map[p]*detady_map[p] +
+		d2phidxideta[i][p]*detadx_map[p]*dxidy_map[p] +
+		d2phidetadzeta[i][p]*detadx_map[p]*dzetady_map[p] +
+		d2phidzeta2[i][p]*dzetadx_map[p]*dzetady_map[p] +
+		d2phidxidzeta[i][p]*dzetadx_map[p]*dxidy_map[p] +
+		d2phidetadzeta[i][p]*dzetadx_map[p]*detady_map[p];
+	      d2phi[i][p](0,2) = d2phidxdz[i][p] = 
+		d2phi[i][p](2,0) = 
+		d2phidxi2[i][p]*dxidx_map[p]*dxidz_map[p] +
+		d2phidxideta[i][p]*dxidx_map[p]*detadz_map[p] +
+		d2phidxidzeta[i][p]*dxidx_map[p]*dzetadz_map[p] +
+		d2phideta2[i][p]*detadx_map[p]*detadz_map[p] +
+		d2phidxideta[i][p]*detadx_map[p]*dxidz_map[p] +
+		d2phidetadzeta[i][p]*detadx_map[p]*dzetadz_map[p] +
+		d2phidzeta2[i][p]*dzetadx_map[p]*dzetadz_map[p] +
+		d2phidxidzeta[i][p]*dzetadx_map[p]*dxidz_map[p] +
+		d2phidetadzeta[i][p]*dzetadx_map[p]*detadz_map[p];
+	      d2phi[i][p](1,1) = d2phidy2[i][p] =
+		d2phidxi2[i][p]*dxidy_map[p]*dxidy_map[p] +
+		2*d2phidxideta[i][p]*dxidy_map[p]*detady_map[p] +
+		2*d2phidxidzeta[i][p]*dxidy_map[p]*dzetady_map[p] +
+		2*d2phidetadzeta[i][p]*detady_map[p]*dzetady_map[p] +
+		d2phideta2[i][p]*detady_map[p]*detady_map[p] +
+		d2phidzeta2[i][p]*dzetady_map[p]*dzetady_map[p];
+	      d2phi[i][p](1,2) = d2phidydz[i][p] = 
+		d2phi[i][p](2,1) =
+		d2phidxi2[i][p]*dxidy_map[p]*dxidz_map[p] +
+		d2phidxideta[i][p]*dxidy_map[p]*detadz_map[p] +
+		d2phidxidzeta[i][p]*dxidy_map[p]*dzetadz_map[p] +
+		d2phideta2[i][p]*detady_map[p]*detadz_map[p] +
+		d2phidxideta[i][p]*detady_map[p]*dxidz_map[p] +
+		d2phidetadzeta[i][p]*detady_map[p]*dzetadz_map[p] +
+		d2phidzeta2[i][p]*dzetady_map[p]*dzetadz_map[p] +
+		d2phidxidzeta[i][p]*dzetady_map[p]*dxidz_map[p] +
+		d2phidetadzeta[i][p]*dzetady_map[p]*detadz_map[p];
+	      d2phi[i][p](2,2) = d2phidz2[i][p] =
+		d2phidxi2[i][p]*dxidz_map[p]*dxidz_map[p] +
+		2*d2phidxideta[i][p]*dxidz_map[p]*detadz_map[p] +
+		2*d2phidxidzeta[i][p]*dxidz_map[p]*dzetadz_map[p] +
+		2*d2phidetadzeta[i][p]*detadz_map[p]*dzetadz_map[p] +
+		d2phideta2[i][p]*detadz_map[p]*detadz_map[p] +
+		d2phidzeta2[i][p]*dzetadz_map[p]*dzetadz_map[p];
+#endif
+
+
 	    }
 
 	// All done

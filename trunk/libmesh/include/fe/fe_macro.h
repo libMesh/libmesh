@@ -1,4 +1,4 @@
-// $Id: fe_macro.h,v 1.5 2004-05-11 21:18:33 benkirk Exp $
+// $Id: fe_macro.h,v 1.6 2005-01-13 22:10:04 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -33,14 +33,16 @@
 
 #ifndef ENABLE_HIGHER_ORDER_SHAPES
 
-#define INSTANTIATE_FE(_dim)   template class FE< (_dim), HIERARCHIC>; \
+#define INSTANTIATE_FE(_dim)   template class FE< (_dim), CLOUGH>; \
+                               template class FE< (_dim), HIERARCHIC>;   \
                                template class FE< (_dim), LAGRANGE>;   \
                                template class FE< (_dim), MONOMIAL>;   \
                                template class FE< (_dim), XYZ>
 
 #else //ENABLE_HIGHER_ORDER_SHAPES
 
-#define INSTANTIATE_FE(_dim)   template class FE< (_dim), HIERARCHIC>; \
+#define INSTANTIATE_FE(_dim)   template class FE< (_dim), CLOUGH>; \
+                               template class FE< (_dim), HIERARCHIC>;   \
                                template class FE< (_dim), LAGRANGE>;   \
                                template class FE< (_dim), MONOMIAL>;   \
                                template class FE< (_dim), SZABAB>;     \

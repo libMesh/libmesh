@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic_shape_1D.C,v 1.13 2004-03-24 05:49:11 jwpeterson Exp $
+// $Id: fe_hierarchic_shape_1D.C,v 1.14 2005-01-13 22:10:14 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -205,4 +205,95 @@ Real FE<1,HIERARCHIC>::shape_deriv(const Elem* elem,
   
   return FE<1,HIERARCHIC>::shape_deriv(elem->type(),
 				       order, i, j, p);
+}
+
+
+
+template <>
+Real FE<1,HIERARCHIC>::shape_second_deriv(const ElemType,
+				          const Order order,
+				          const unsigned int i,
+				          const unsigned int j,
+				          const Point& p)
+{
+  // only d2()/d2xi in 1D!
+  
+  assert (j == 0);
+
+  // Declare that we are using our own special power function
+  // from the Utility namespace.  This saves typing later.
+  using Utility::pow;
+
+  const Real xi = p(0);
+
+	
+  switch (order)
+    {      
+    case FIRST:
+    case SECOND:
+    case THIRD:
+    case FOURTH:
+    case FIFTH:
+    case SIXTH:
+      {
+	assert (i < 6);
+	
+	switch (i)
+	  {
+	  case 0:
+	  case 1:
+	    return  0;
+
+	    // All terms have the same form.
+	    // xi^(p-2)/(p-2)!
+	  case 2:
+	    return 1;
+	    
+	  case 3:
+	    return xi;
+
+	  case 4:
+	    return pow<2>(xi)/2.;
+	    
+	  case 5:
+	    return pow<3>(xi)/6.;
+
+	  case 6:
+	    return pow<4>(xi)/24.;
+
+	  case 7:
+	    return pow<5>(xi)/120.;	    
+	    
+	  default:
+	    std::cerr << "Invalid shape function index!" << std::endl;
+	    error();	    
+	  }
+      }
+
+
+      
+    default:
+      {
+	std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
+	error();
+      }
+    }
+
+  error();
+  return 0.;
+}
+
+
+
+template <>
+Real FE<1,HIERARCHIC>::shape_second_deriv(const Elem* elem,
+				          const Order order,
+				          const unsigned int i,
+				          const unsigned int j,
+				          const Point& p)
+{
+  assert (elem != NULL);
+  
+  return FE<1,HIERARCHIC>::shape_second_deriv(elem->type(),
+				              order, i, j, p);
 }

@@ -1,4 +1,4 @@
-// $Id: fe_xyz_shape_1D.C,v 1.3 2004-11-30 21:45:26 roystgnr Exp $
+// $Id: fe_xyz_shape_1D.C,v 1.4 2005-01-13 22:10:16 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -212,5 +212,42 @@ Real FE<1,XYZ>::shape_deriv(const Elem* elem,
     }
 
   error();
+  return 0.;
+}
+
+
+
+template <>
+Real FE<1,XYZ>::shape_second_deriv(const ElemType,
+			           const Order,
+			           const unsigned int,
+			           const unsigned int,
+			           const Point&)
+{
+  std::cerr << "XYZ polynomials require the element\n"
+            << "because the centroid is needed."
+            << std::endl;
+  
+  error();
+  return 0.;
+}
+
+
+
+template <>
+Real FE<1,XYZ>::shape_second_deriv(const Elem*,
+			           const Order,
+			           const unsigned int,
+			           const unsigned int,
+			           const Point&)
+{
+  static bool warning_given = false;
+
+  if (!warning_given)
+  std::cerr << "Second derivatives for XYZ elements "
+            << " are not yet implemented!"
+            << std::endl;
+
+  warning_given = true;
   return 0.;
 }

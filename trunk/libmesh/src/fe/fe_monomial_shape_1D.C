@@ -1,4 +1,4 @@
-// $Id: fe_monomial_shape_1D.C,v 1.11 2004-03-24 05:49:11 jwpeterson Exp $
+// $Id: fe_monomial_shape_1D.C,v 1.12 2005-01-13 22:10:15 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -168,4 +168,79 @@ Real FE<1,MONOMIAL>::shape_deriv(const Elem* elem,
   
   return FE<1,MONOMIAL>::shape_deriv(elem->type(),
 				     order, i, j, p);
+}
+
+
+
+template <>
+Real FE<1,MONOMIAL>::shape_second_deriv(const ElemType,
+				        const Order order,
+				        const unsigned int i,
+				        const unsigned int j,
+				        const Point& p)
+{
+  // only d()/dxi in 1D!
+  
+  assert (j == 0);
+	
+  const Real xi = p(0);
+
+	
+  switch (order)
+    {      
+      // monomials. since they are heirarchic we only need one case block.
+    case CONSTANT:
+    case FIRST:
+    case SECOND:
+    case THIRD:
+    case FOURTH:
+      {
+	assert (i < 5);
+
+	switch (i)
+	  {
+	  case 0:
+	  case 1:
+	    return 0.;
+	    
+	  case 2:
+	    return 2.;
+	    
+	  case 3:
+	    return 6.*xi;
+	    
+	  case 4:
+	    return 12.*xi*xi;
+	    
+	  default:
+	    std::cerr << "Invalid shape function index!" << std::endl;
+	    error();
+	  }
+      }
+
+      
+    default:
+      {
+	std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
+	error();
+      }
+    }
+
+  error();
+  return 0.;
+}
+
+
+
+template <>
+Real FE<1,MONOMIAL>::shape_second_deriv(const Elem* elem,
+				        const Order order,
+				        const unsigned int i,
+				        const unsigned int j,
+				        const Point& p)
+{
+  assert (elem != NULL);
+  
+  return FE<1,MONOMIAL>::shape_second_deriv(elem->type(),
+				            order, i, j, p);
 }

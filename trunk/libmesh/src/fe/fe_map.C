@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.29 2004-10-26 15:31:17 jwpeterson Exp $
+// $Id: fe_map.C,v 1.30 2005-01-13 22:10:15 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -60,6 +60,9 @@ void FEBase::compute_map(const std::vector<Real>& qw,
 	  xyz.resize(n_qp);
 	  dxyzdxi_map.resize(n_qp);
 	  dxidx_map.resize(n_qp);
+#ifdef ENABLE_SECOND_DERIVATIVES
+	  d2xyzdxi2_map.resize(n_qp);
+#endif
 	  
 	  JxW.resize(n_qp);
 	}
@@ -69,6 +72,9 @@ void FEBase::compute_map(const std::vector<Real>& qw,
 	  {
 	    xyz[p].zero();
 	    dxyzdxi_map[p].zero();
+#ifdef ENABLE_SECOND_DERIVATIVES
+	    d2xyzdxi2_map[p].zero();
+#endif
 	  }
 	
 	
@@ -83,6 +89,10 @@ void FEBase::compute_map(const std::vector<Real>& qw,
 	      {	  
 		xyz[p].add_scaled        (elem_point, phi_map[i][p]    );
 		dxyzdxi_map[p].add_scaled(elem_point, dphidxi_map[i][p]);
+#ifdef ENABLE_SECOND_DERIVATIVES
+		d2xyzdxi2_map[p].add_scaled(elem_point,
+					    d2phidxi2_map[i][p]);
+#endif
 	      }
 	  }
 
@@ -150,6 +160,11 @@ void FEBase::compute_map(const std::vector<Real>& qw,
 	  detadx_map.resize(n_qp);
 	  detady_map.resize(n_qp);
 	  detadz_map.resize(n_qp);
+#ifdef ENABLE_SECOND_DERIVATIVES
+	  d2xyzdxi2_map.resize(n_qp);
+	  d2xyzdxideta_map.resize(n_qp);
+	  d2xyzdeta2_map.resize(n_qp);
+#endif
 	  
 	  JxW.resize(n_qp);
 	}
@@ -160,6 +175,11 @@ void FEBase::compute_map(const std::vector<Real>& qw,
 	    xyz[p].zero();
 	    dxyzdxi_map[p].zero();
 	    dxyzdeta_map[p].zero();
+#ifdef ENABLE_SECOND_DERIVATIVES
+	    d2xyzdxi2_map[p].zero();
+	    d2xyzdxideta_map[p].zero();
+	    d2xyzdeta2_map[p].zero();
+#endif
 	  }
 	
 	
@@ -175,6 +195,14 @@ void FEBase::compute_map(const std::vector<Real>& qw,
 		xyz[p].add_scaled          (elem_point, phi_map[i][p]     );
 		dxyzdxi_map[p].add_scaled  (elem_point, dphidxi_map[i][p] );
 		dxyzdeta_map[p].add_scaled (elem_point, dphideta_map[i][p]);
+#ifdef ENABLE_SECOND_DERIVATIVES
+		d2xyzdxi2_map[p].add_scaled    (elem_point,
+						d2phidxi2_map[i][p]);
+		d2xyzdxideta_map[p].add_scaled (elem_point,
+						d2phidxideta_map[i][p]);
+		d2xyzdeta2_map[p].add_scaled   (elem_point,
+						d2phideta2_map[i][p]);
+#endif
 	      }
 	  }
 	
@@ -198,7 +226,6 @@ void FEBase::compute_map(const std::vector<Real>& qw,
 	      dx_dxi = dxdxi_map(p), dx_deta = dxdeta_map(p),
 	      dy_dxi = dydxi_map(p), dy_deta = dydeta_map(p),
 	      dz_dxi = dzdxi_map(p), dz_deta = dzdeta_map(p);
-	    
 
 #if DIM == 2
 	    // Compute the Jacobian.  This assumes the 2D face
@@ -329,6 +356,14 @@ void FEBase::compute_map(const std::vector<Real>& qw,
 	  dzetadx_map.resize   (n_qp);
 	  dzetady_map.resize   (n_qp);
 	  dzetadz_map.resize   (n_qp);
+#ifdef ENABLE_SECOND_DERIVATIVES
+	  d2xyzdxi2_map.resize(n_qp);
+	  d2xyzdxideta_map.resize(n_qp);
+	  d2xyzdxidzeta_map.resize(n_qp);
+	  d2xyzdeta2_map.resize(n_qp);
+	  d2xyzdetadzeta_map.resize(n_qp);
+	  d2xyzdzeta2_map.resize(n_qp);
+#endif
 	  
 	  JxW.resize (n_qp);
 	}
@@ -340,6 +375,14 @@ void FEBase::compute_map(const std::vector<Real>& qw,
 	    dxyzdxi_map[p].zero   ();
 	    dxyzdeta_map[p].zero  ();
 	    dxyzdzeta_map[p].zero ();
+#ifdef ENABLE_SECOND_DERIVATIVES
+	    d2xyzdxi2_map[p].zero();
+	    d2xyzdxideta_map[p].zero();
+	    d2xyzdxidzeta_map[p].zero();
+	    d2xyzdeta2_map[p].zero();
+	    d2xyzdetadzeta_map[p].zero();
+	    d2xyzdzeta2_map[p].zero();
+#endif
 	  }
 	
 	
@@ -359,6 +402,20 @@ void FEBase::compute_map(const std::vector<Real>& qw,
 		dxyzdxi_map[p].add_scaled   (elem_point, dphidxi_map[i][p]  );
 		dxyzdeta_map[p].add_scaled  (elem_point, dphideta_map[i][p] );
 		dxyzdzeta_map[p].add_scaled (elem_point, dphidzeta_map[i][p]);
+#ifdef ENABLE_SECOND_DERIVATIVES
+	        d2xyzdxi2_map[p].add_scaled      (elem_point,
+					       d2phidxi2_map[i][p]);
+	        d2xyzdxideta_map[p].add_scaled   (elem_point,
+					       d2phidxideta_map[i][p]);
+	        d2xyzdxidzeta_map[p].add_scaled  (elem_point,
+					       d2phidxidzeta_map[i][p]);
+	        d2xyzdeta2_map[p].add_scaled     (elem_point,
+					       d2phideta2_map[i][p]);
+	        d2xyzdetadzeta_map[p].add_scaled (elem_point,
+					       d2phidetadzeta_map[i][p]);
+	        d2xyzdzeta2_map[p].add_scaled    (elem_point,
+					       d2phidzeta2_map[i][p]);
+#endif
 	      }
 	  }
 	

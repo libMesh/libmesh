@@ -1,4 +1,4 @@
-// $Id: inf_fe.C,v 1.28 2004-03-21 03:19:25 benkirk Exp $
+// $Id: inf_fe.C,v 1.29 2005-01-13 22:10:16 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -486,6 +486,35 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
     dphidy.resize  (n_total_approx_shape_functions);
     dphidz.resize  (n_total_approx_shape_functions);
     dphidxi.resize (n_total_approx_shape_functions);
+#ifdef ENABLE_SECOND_DERIVATIVES
+    static bool warning_given = false;
+    if (!warning_given)
+      std::cerr << "Second derivatives for Infinite elements"
+		<< " are not yet implemented!"
+		<< std::endl;
+
+    d2phi.resize     (n_total_approx_shape_functions);
+    d2phidx2.resize  (n_total_approx_shape_functions);
+    d2phidxdy.resize (n_total_approx_shape_functions);
+    d2phidxdz.resize (n_total_approx_shape_functions);
+    d2phidy2.resize  (n_total_approx_shape_functions);
+    d2phidydz.resize (n_total_approx_shape_functions);
+    d2phidz2.resize  (n_total_approx_shape_functions);
+    d2phidxi2.resize (n_total_approx_shape_functions);
+
+    if (Dim > 1)
+      {
+        d2phidxideta.resize   (n_total_approx_shape_functions);
+        d2phideta2.resize     (n_total_approx_shape_functions);
+      }
+
+    if (Dim > 2)
+      {
+        d2phidetadzeta.resize (n_total_approx_shape_functions);
+        d2phidxidzeta.resize  (n_total_approx_shape_functions);
+        d2phidzeta2.resize    (n_total_approx_shape_functions);
+      }
+#endif // ifdef ENABLE_SECOND_DERIVATIVES
     
     if (Dim > 1)
       dphideta.resize      (n_total_approx_shape_functions);
@@ -496,6 +525,22 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
     
     phi_map.resize         (n_total_mapping_shape_functions);
     dphidxi_map.resize     (n_total_mapping_shape_functions);
+#ifdef ENABLE_SECOND_DERIVATIVES
+    d2phidxi2_map.resize   (n_total_mapping_shape_functions);
+
+    if (Dim > 1)
+      {
+        d2phidxideta_map.resize   (n_total_mapping_shape_functions);
+        d2phideta2_map.resize     (n_total_mapping_shape_functions);
+      }
+
+    if (Dim == 3)
+      {
+        d2phidxidzeta_map.resize  (n_total_mapping_shape_functions);
+        d2phidetadzeta_map.resize (n_total_mapping_shape_functions);
+        d2phidzeta2_map.resize    (n_total_mapping_shape_functions);
+      }
+#endif // ifdef ENABLE_SECOND_DERIVATIVES
     
     if (Dim > 1)
       dphideta_map.resize  (n_total_mapping_shape_functions);
@@ -518,10 +563,31 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 	dphidy[i].resize      (n_total_qp);
 	dphidz[i].resize      (n_total_qp);
 	dphidxi[i].resize     (n_total_qp);
+#ifdef ENABLE_SECOND_DERIVATIVES
+	d2phi[i].resize       (n_total_qp);
+	d2phidx2[i].resize    (n_total_qp);
+	d2phidxdy[i].resize   (n_total_qp);
+	d2phidxdz[i].resize   (n_total_qp);
+	d2phidy2[i].resize    (n_total_qp);
+	d2phidydz[i].resize   (n_total_qp);
+	d2phidy2[i].resize    (n_total_qp);
+	d2phidxi2[i].resize   (n_total_qp);
+
+	if (Dim > 1)
+	  {
+	    d2phidxideta[i].resize   (n_total_qp);
+	    d2phideta2[i].resize     (n_total_qp);
+	  }
+	if (Dim > 2)	     
+	  {
+	    d2phidxidzeta[i].resize  (n_total_qp);
+	    d2phidetadzeta[i].resize (n_total_qp);
+	    d2phidzeta2[i].resize    (n_total_qp);
+	  }
+#endif // ifdef ENABLE_SECOND_DERIVATIVES
 	   
 	if (Dim > 1)
 	  dphideta[i].resize  (n_total_qp);
-	    
 	   
 	if (Dim == 3)	     
 	  dphidzeta[i].resize (n_total_qp);
@@ -532,6 +598,21 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
       {
 	phi_map[i].resize         (n_total_qp);
 	dphidxi_map[i].resize     (n_total_qp);
+#ifdef ENABLE_SECOND_DERIVATIVES
+	d2phidxi2_map[i].resize   (n_total_qp);
+	if (Dim > 1)
+	  {
+	    d2phidxideta_map[i].resize   (n_total_qp);
+	    d2phideta2_map[i].resize     (n_total_qp);
+	  }
+
+	if (Dim > 2)
+	  {
+	    d2phidxidzeta_map[i].resize  (n_total_qp);
+	    d2phidetadzeta_map[i].resize (n_total_qp);
+	    d2phidzeta2_map[i].resize    (n_total_qp);
+	  }
+#endif // ifdef ENABLE_SECOND_DERIVATIVES
 	   
 	if (Dim > 1)
 	  dphideta_map[i].resize  (n_total_qp);

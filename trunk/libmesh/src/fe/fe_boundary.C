@@ -1,4 +1,4 @@
-// $Id: fe_boundary.C,v 1.28 2004-05-11 21:18:33 benkirk Exp $
+// $Id: fe_boundary.C,v 1.29 2005-01-13 22:10:14 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -31,6 +31,19 @@
 #include "fe_macro.h"
 #include "libmesh_logging.h"
 
+
+
+
+//-------------------------------------------------------
+// Full specialization for 1D when this is a useless method
+template <>
+void FE<1,CLOUGH>::reinit(const Elem*,
+			      const unsigned int)
+{
+  std::cerr << "ERROR: This method only makes sense for 2D elements!"
+	    << std::endl;
+  error();
+}
 
 
 
