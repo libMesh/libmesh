@@ -1,4 +1,4 @@
-// $Id: distributed_vector.C,v 1.9 2003-04-29 21:39:35 benkirk Exp $
+// $Id: distributed_vector.C,v 1.10 2003-05-05 22:23:09 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -283,8 +283,8 @@ template <typename T>
 DistributedVector<T>&
 DistributedVector<T>::operator = (const DistributedVector<T>& v)
 {
-  _is_initialized = v._is_initialized;
-  _is_closed      = v._is_closed;
+  _is_initialized    = v._is_initialized;
+  _is_closed         = v._is_closed;
 
   _global_size       = v._global_size;
   _local_size        = v._local_size;

@@ -1,4 +1,4 @@
-// $Id: petsc_vector.h,v 1.20 2003-04-29 21:37:35 benkirk Exp $
+// $Id: petsc_vector.h,v 1.21 2003-05-05 22:23:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -117,6 +117,11 @@ public:
    */
   void zero ();    
 
+  /**
+   * Creates a copy of this vector and returns it in an \p AutoPtr.
+   */
+  AutoPtr<NumericVector<T> > clone () const;
+  
   /**
    * Change the dimension of the vector to \p N. The reserved memory for
    * this vector remains unchanged if possible, to make things faster, but
@@ -507,6 +512,19 @@ void PetscVector<T>::zero ()
   PetscScalar z=0.;
   
   ierr = VecSet (&z, vec); CHKERRQ(ierr);
+}
+
+
+
+template <typename T>
+inline
+AutoPtr<NumericVector<T> > PetscVector<T>::clone () const
+{
+  AutoPtr<NumericVector<T> > cloned_vector (new PetscVector<T>);
+
+  *cloned_vector = *this;
+
+  return cloned_vector;
 }
 
 

@@ -1,4 +1,4 @@
-// $Id: laspack_vector.h,v 1.14 2003-04-29 21:37:34 benkirk Exp $
+// $Id: laspack_vector.h,v 1.15 2003-05-05 22:23:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -102,6 +102,11 @@ class LaspackVector : public NumericVector<T>
    */
   void zero ();    
 
+  /**
+   * Creates a copy of this vector and returns it in an \p AutoPtr.
+   */
+  AutoPtr<NumericVector<T> > clone () const;
+  
   /**
    * Change the dimension of the vector to \p N. The reserved memory for
    * this vector remains unchanged if possible, to make things faster, but
@@ -464,6 +469,19 @@ void LaspackVector<T>::zero ()
   assert (this->initialized());
 
   V_SetAllCmp (&_vec, 0.);
+}
+
+
+
+template <typename T>
+inline
+AutoPtr<NumericVector<T> > LaspackVector<T>::clone () const
+{
+  AutoPtr<NumericVector<T> > cloned_vector (new LaspackVector<T>);
+
+  *cloned_vector = *this;
+
+  return cloned_vector;
 }
 
 
