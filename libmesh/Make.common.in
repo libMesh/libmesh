@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.12 2003-02-07 19:25:36 benkirk Exp $
+# $Id: Make.common.in,v 1.13 2003-02-11 22:59:25 benkirk Exp $
 
 
 ###############################################################################
@@ -93,41 +93,62 @@ CXXDEPFLAG           = @CXXDEPFLAG@
 CXXSHAREDFLAG        = @CXXSHAREDFLAG@
 CSHAREDFLAG          = @CXXSHAREDFLAG@
 
+# NetCDF platform-independent binary file support.
+# Needed for ExodusII support
 enable-netcdf 	     = @enablenetcdf@
 NETCDF_INCLUDE	     = @NETCDF_INCLUDE_PATH@
 NETCDF_LIBRARY	     = @LIBNETCDF@ 
 
+# HDF Version 4 support for platform-independent
+# binary files.  Precludes (because it includes) NetCDF
 enable-hdf4          = @enablehdf4@
 HDF4_INCLUDE	     = @HDF4_INCLUDE_PATH@
 HDF4_LIB_DIR	     = @HDF4_LIB_PATH@ 
 HDF4_LIBS            = @HDF4_LIB_NAMES@
 
+# ExodusII binary file support for reading meshes in 
+# Sandia National Lab's ExodusII format
 enable-exodus        = @enableexodus@
 EXODUS_INCLUDE       = @EXODUS_INCLUDE_PATH@
 EXODUS_LIBRARY       = @LIBEXOII@
 
+# Metis graph partitiong software for domain decomposition
 enable-metis         = @enablemetis@
 METIS_INCLUDE	     = @METIS_INCLUDE_PATH@
 
+# Laspack iterative solvers for uniprocessor applications
 enable-laspack       = @enablelaspack@
 LASPACK_INCLUDE	     = @LASPACK_INCLUDE_PATH@
 
+# Petsc iterative solvers for parallel and uniprocessor
+# applications
 enable-petsc         = @enablepetsc@
 petsc-version        = @petscversion@
 PETSC_DIR            = @PETSC_DIR@
 
-enable-complex       = @enablecomplex@
+# MPI message passing interface for parallel communication.
+# Only configured explicitly if Petsc is absent, otherwise
+# just snoop Petsc's MPI configuration
+enable-mpi           = @enablempi@
+MPI_INCLUDE          = @MPI_INCLUDE_PATH@
+MPI_LIBRARY          = @MPI_LIBRARY_PATH@
 
+# Hilbert and Morton space filling curves for domain decomposition
 enable-sfc	     = @enablesfc@
 SFC_INCLUDE	     = @SFC_INCLUDE_PATH@
 
+# Tecplot binary API support
 enable-tecplot       = @enabletecplot@
 TECIO_INCLUDE        = @TECPLOT_INCLUDE_PATH@
 TECIO_LIBRARY        = @TECPLOT_LIBRARY@
 
+# Doxygen for generating documentation
 doxygen		     = @DOXYGEN@
+
+# Perl for making .depend
 perl                 = @PERL@
 
+# Flag to disable all optional packages
 enable-optional      = @enableoptional@
 
 
@@ -287,7 +308,15 @@ ifeq ($(enable-optional),yes)
     LIBS += $(libs-PETSC) $(BLOCKSOLVE_LIB) $(SPOOLES_LIB) \
 	    $(HYPRE_LIB) $(BLASLAPACK_LIB) $(MPI_LIB) \
 	    $(X11_LIB) $(MATLAB_LIB) $(FLIBS)
-  endif
+  else
+
+    # MPI configuration when Petsc is absent
+    ifeq ($(enable-mpi),yes)
+      LIBS    += $(MPI_LIBRARY)
+      INCLUDE += -I$(MPI_INCLUDE)
+    endif
+
+  endif #end ifeq ($(enable-petsc),yes)
 
 endif # End of disable-optional test
 
