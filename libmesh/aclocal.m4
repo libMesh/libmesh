@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.40 2003-11-30 05:37:47 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.41 2003-11-30 05:43:43 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -745,7 +745,7 @@ AC_DEFUN(CONFIGURE_NETCDF,
   AC_CHECK_FILE(./contrib/netcdf/include/netcdf.h,
 		NETCDF_INCLUDE_PATH=$PWD/contrib/netcdf/include)
 
-  if (test -r $NETCDF_INCLUDE_PATH/netcdf.h -a -r $NETCDF_LIB) ; then
+  if (test -r $NETCDF_INCLUDE_PATH/netcdf.h -a "x$NETCDF_LIB" != x) ; then
     NETCDF_INCLUDE=-I$NETCDF_INCLUDE_PATH
     AC_SUBST(NETCDF_LIB)
     AC_SUBST(NETCDF_INCLUDE)
@@ -769,7 +769,7 @@ AC_DEFUN(CONFIGURE_EXODUS,
   AC_CHECK_FILE(./contrib/exodus/include/exodusII.h,
 		EXODUS_INCLUDE_PATH=$PWD/contrib/exodus/include)
 
-  if (test -r $EXODUS_INCLUDE_PATH/exodusII.h -a -r $EXODUS_LIB) ; then
+  if (test -r $EXODUS_INCLUDE_PATH/exodusII.h -a "x$EXODUS_LIB" != x) ; then
     EXODUS_INCLUDE=-I$EXODUS_INCLUDE_PATH
     AC_SUBST(EXODUS_LIB)
     AC_SUBST(EXODUS_INCLUDE)
