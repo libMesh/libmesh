@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.9 2005-02-22 22:17:30 jwpeterson Exp $
+// $Id: fe.h,v 1.10 2005-02-28 16:35:19 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -28,6 +28,7 @@
 #include "fe_base.h"
 
 // forward declarations
+class DofMap;
 #ifdef ENABLE_INFINITE_ELEMENTS
 
 template <unsigned int friend_Dim, FEFamily friend_T_radial, InfMapType friend_T_map>
@@ -52,7 +53,7 @@ class InfFE;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.9 $
+ * \version $Revision: 1.10 $
  */
 
 //-------------------------------------------------------------
@@ -222,6 +223,15 @@ public:
 				      const Order o);
 				       
   /**
+   * Fills the vector di with the local degree of freedom indices
+   * associated with side \p s of element \p elem
+   */
+  static void dofs_on_side(const Elem* const elem,
+		           const Order o,
+		           unsigned int s,
+		           std::vector<unsigned int>& di);
+
+  /**
    * @returns the location (on the reference element) of the
    * point \p p located in physical space.  This function requires
    * inverting the (possibly nonlinear) transformation map, so
@@ -288,9 +298,8 @@ public:
   static void compute_constraints (std::map<unsigned int,
 				            std::map<unsigned int,
 				                     float> > & constraints,
-				   const unsigned int system_number,
+				   DofMap &dof_map,
 				   const unsigned int variable_number,
-				   const FEType& fe_t,
 				   const Elem* elem);
   
 #ifdef ENABLE_INFINITE_ELEMENTS
@@ -378,7 +387,7 @@ protected:
  *
  * \author Roy Stogner
  * \date 2004
- * \version $Revision: 1.9 $
+ * \version $Revision: 1.10 $
  */
 
 //-------------------------------------------------------------
@@ -403,7 +412,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.9 $
+ * \version $Revision: 1.10 $
  */
 
 //-------------------------------------------------------------
@@ -428,7 +437,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.9 $
+ * \version $Revision: 1.10 $
  */
 
 //-------------------------------------------------------------
@@ -453,7 +462,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.9 $
+ * \version $Revision: 1.10 $
  */
 
 //-------------------------------------------------------------
@@ -479,7 +488,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.9 $
+ * \version $Revision: 1.10 $
  */
 
 //-------------------------------------------------------------

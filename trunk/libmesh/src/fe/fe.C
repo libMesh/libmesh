@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.30 2005-02-22 22:17:36 jwpeterson Exp $
+// $Id: fe.C,v 1.31 2005-02-28 16:35:25 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -38,6 +38,30 @@ unsigned int FE<Dim,T>::n_quadrature_points () const
   return qrule->n_points(); 
 }
 
+
+template <unsigned int Dim, FEFamily T>
+void FE<Dim,T>::dofs_on_side(const Elem* const elem,
+			     const Order o,
+			     unsigned int s,
+			     std::vector<unsigned int>& di)
+{
+  assert(elem != NULL);
+  assert(s < elem->n_sides());
+
+  di.clear();
+  unsigned int nodenum = 0;
+  const unsigned int n_nodes = elem->n_nodes();
+  for (unsigned int n = 0; n != n_nodes; ++n)
+    {
+      const unsigned int n_dofs = n_dofs_at_node(elem->type(),
+						 o, n);
+      if (elem->is_node_on_side(n, s))
+	for (unsigned int i = 0; i != n_dofs; ++i)
+	  di.push_back(nodenum++);
+      else
+	nodenum += n_dofs;
+    }
+}
 
 
 template <unsigned int Dim, FEFamily T>

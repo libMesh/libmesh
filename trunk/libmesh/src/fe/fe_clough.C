@@ -1,8 +1,7 @@
-// $Id: fe_clough.C,v 1.4 2005-02-23 03:53:17 roystgnr Exp $
+// $Id: fe_clough.C,v 1.5 2005-02-28 16:35:25 roystgnr Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson, 
-// Roy H. Stogner
+// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -219,19 +218,20 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::compute_constraints (std::map<unsigned int,
-				     std::map<unsigned int, float> > &,
-				     const unsigned int,
-				     const unsigned int,
-				     const FEType& fe_type,
+				     std::map<unsigned int, float> > &
+				     constraints,
+				     DofMap &dof_map,
+				     const unsigned int variable_number,
 				     const Elem* elem)
 {
+#ifdef ENABLE_AMR
   // Only constrain elements in 2,3D.
   if (Dim == 1)
     return;
 
   assert (elem != NULL);
 
-//  const FEType& fe_type = dof_map.variable_type(variable_number);
+  const FEType& fe_type = dof_map.variable_type(variable_number);
 
   AutoPtr<FEBase> my_fe (FEBase::build(Dim, fe_type));
   AutoPtr<FEBase> parent_fe (FEBase::build(Dim, fe_type));
@@ -250,8 +250,8 @@ void FE<Dim,T>::compute_constraints (std::map<unsigned int,
 		  my_fe->get_dphi();
   const std::vector<std::vector<RealGradient> >& parent_dphi =
 		  parent_fe->get_dphi();
-  const std::vector<unsigned int> child_dof_indices;
-  const std::vector<unsigned int> parent_dof_indices;
+  std::vector<unsigned int> child_dof_indices, parent_dof_indices;
+  std::vector<unsigned int> my_side_dofs, parent_side_dofs;
 
   DenseMatrix<Number> Ke;
   DenseVector<Number> Fe;
@@ -266,13 +266,9 @@ void FE<Dim,T>::compute_constraints (std::map<unsigned int,
       // than this element.
       if (elem->neighbor(s)->level() < elem->level()) 
         {
-          // FIXME: hanging nodes aren't working yet!
-	  std::cerr << "Error: hanging nodes not yet implemented for "
-			  << "Clough-Tocher elements!" << std::endl;
-	  error();
-
           // Get pointers to the elements of interest and its parent.
           const Elem* parent = elem->parent();
+	  unsigned int s_parent = s;
 
           // This can't happen...  Only level-0 elements have NULL
           // parents, and no level-0 elements can be at a higher
@@ -281,14 +277,9 @@ void FE<Dim,T>::compute_constraints (std::map<unsigned int,
 
 	  my_fe->reinit(elem, s);
 
-          const AutoPtr<Elem> my_side     (elem->build_side(s));
-          const AutoPtr<Elem> parent_side (parent->build_side(s));
+	  dof_map.dof_indices (elem, child_dof_indices);
+	  dof_map.dof_indices (parent, parent_dof_indices);
 
-	  const unsigned int n_dofs = FEInterface::n_dofs(Dim-1,
-							  fe_type,
-							  my_side->type());
-	  assert(n_dofs == FEInterface::n_dofs(Dim-1, fe_type,
-					       parent_side->type()));
 	  const unsigned int n_qp = my_qface.n_points();
 
 	  FEInterface::inverse_map (Dim, fe_type, parent, q_point,
@@ -296,32 +287,80 @@ void FE<Dim,T>::compute_constraints (std::map<unsigned int,
 
 	  parent_fe->reinit(parent, &parent_qface);
 
-	  Ke.resize (n_dofs, n_dofs);
-	  Ue.resize(n_dofs);
+	  // We're only concerned with DOFs whose values and/or first
+	  // derivatives are supported on side nodes
+	  dofs_on_side(elem, fe_type.order, s, my_side_dofs);
+	  dofs_on_side(parent, fe_type.order, s_parent, parent_side_dofs);
+	  const unsigned int n_side_dofs = my_side_dofs.size();
+	  assert(n_side_dofs == parent_side_dofs.size());
 
-	  for (unsigned int i = 0; i != n_dofs; ++i)
-	    for (unsigned int j = 0; j != n_dofs; ++j)
-	      for (unsigned int qp = 0; qp != n_qp; ++qp)
-		Ke(i,j) += JxW[qp] * (phi[i][qp] * phi[j][qp] +
-				      (dphi[i][qp] *
-				       face_normals[qp]) *
-				      (dphi[j][qp] *
-				       face_normals[qp]));
+	  Ke.resize (n_side_dofs, n_side_dofs);
+	  Ue.resize(n_side_dofs);
 
-	  for (unsigned int i = 0; i != n_dofs; ++i)
+	  // Form the projection matrix, (inner product of fine basis
+	  // functions against fine test functions)
+	  for (unsigned int is = 0; is != n_side_dofs; ++is)
 	    {
-	      Fe.resize (n_dofs);
-	      for (unsigned int j = 0; j != n_dofs; ++j)
-	        for (unsigned int qp = 0; qp != n_qp; ++qp)
-		  Fe(j) += JxW[qp] * (parent_phi[i][qp] * phi[j][qp] +
-				      (parent_dphi[i][qp] *
-				       face_normals[qp]) *
-				      (dphi[j][qp] *
-				       face_normals[qp]));
-	      Ke.cholesky_solve(Fe, Ue[i]);
+	      const unsigned int i = my_side_dofs[is];
+	      for (unsigned int js = 0; js != n_side_dofs; ++js)
+	        {
+	          const unsigned int j = my_side_dofs[js];
+		  for (unsigned int qp = 0; qp != n_qp; ++qp)
+		    Ke(is,js) += JxW[qp] * (phi[i][qp] * phi[j][qp] +
+					    (dphi[i][qp] *
+					     face_normals[qp]) *
+					    (dphi[j][qp] *
+					     face_normals[qp]));
+		}
+	    }
 
+	  // Form the right hand sides, (inner product of coarse basis
+	  // functions against fine test functions)
+	  for (unsigned int is = 0; is != n_side_dofs; ++is)
+	    {
+	      const unsigned int i = parent_side_dofs[is];
+	      Fe.resize (n_side_dofs);
+	      for (unsigned int js = 0; js != n_side_dofs; ++js)
+		{
+	          const unsigned int j = my_side_dofs[js];
+	          for (unsigned int qp = 0; qp != n_qp; ++qp)
+		    Fe(js) += JxW[qp] * (parent_phi[i][qp] *
+					 phi[j][qp] +
+					 (parent_dphi[i][qp] *
+					  face_normals[qp]) *
+					 (dphi[j][qp] *
+					  face_normals[qp]));
+		}
+	      Ke.cholesky_solve(Fe, Ue[is]);
+	    }
+	  for (unsigned int is = 0; is != n_side_dofs; ++is)
+	    {
+	      const unsigned int i = parent_side_dofs[is];
+	      const unsigned int their_dof_g = parent_dof_indices[i];
+	      for (unsigned int js = 0; js != n_side_dofs; ++js)
+	        {
+	          const unsigned int j = my_side_dofs[js];
+	          const unsigned int my_dof_g = child_dof_indices[j];
+		  const Real their_dof_value = Ue[is](js);
+		  if (their_dof_g == my_dof_g)
+		    {
+		      assert(std::abs(their_dof_value-1.) < 1.e-5);
+		      for (unsigned int k = 0; k != n_side_dofs; ++k)
+		        assert(k == is || std::abs(Ue[k](is)) < 1.e-5);
+		      continue;
+		    }
+		  if (std::abs(their_dof_value) < 1.e-5)
+		    continue;
+
+		  DofMap::DofConstraintRow& constraint_row =
+				  constraints[my_dof_g];
+
+		  constraint_row.insert(std::make_pair(their_dof_g,
+						       static_cast<float>(their_dof_value)));
+	        }
 	    }
 	}
+#endif
 }
 
 
