@@ -47,6 +47,16 @@ of customized matrix assembly functions, working with an
 exact solution, and using element iterators.
 We will not comment on things that
 were already explained in the second example.
+
+
+<br><br>
+
+<h2><a href="ex4.php">Example 4</a> -- Solving the Poisson Problem in Parallel</h2>
+This is the fourth example program.  It builds on
+the third example program by showing how to formulate
+the code in a dimension-independent way.  Very minor
+changes to the example will allow the problem to be
+solved in two or three dimensions.
 </div>
 
 <!--
