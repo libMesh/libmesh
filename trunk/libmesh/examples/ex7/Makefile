@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.7 2003-04-05 02:25:42 ddreyer Exp $
+# $Id: Makefile,v 1.8 2003-04-08 22:54:09 benkirk Exp $
 
 
 # The location of the mesh library
@@ -60,6 +60,7 @@ distclean:
 	@$(MAKE) clobber
 	@rm -f *.o *.g.o *.pg.o
 
+ifeq ($(enable-complex),yes)
 run: $(target)
 	@echo "***************************************************************"
 	@echo "* Running Example " $(target)
@@ -70,6 +71,12 @@ run: $(target)
 	@echo "***************************************************************"
 	@echo "* Done Running Example " $(target)
 	@echo "***************************************************************"
+else
+run: $(target)
+	@echo "***************************************************************"
+	@echo "*** Skipping Example " $(target) ", only good with --enable-complex"
+	@echo "***************************************************************"
+endif
 #
 # Dependencies
 #

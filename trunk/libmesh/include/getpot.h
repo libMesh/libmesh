@@ -1,4 +1,4 @@
-// $Id: getpot.h,v 1.4 2003-04-08 03:21:35 benkirk Exp $
+// $Id: getpot.h,v 1.5 2003-04-08 22:54:10 benkirk Exp $
 //
 // (with patches from Michael Anderson for more general variable types)
 
@@ -1717,8 +1717,12 @@ GetPot::__DBE_expand(const std::string& expr)
 
   // make a copy of the string if an error occured
   // (since the error variable is a static variable inside get_variable())
-  if( B->name == "" ) return std::string(B->original);
-  else                return B->original;
+  if( B->name == "" )
+    return std::string(B->original);
+  
+  //else
+
+  return B->original;
 }
 
 

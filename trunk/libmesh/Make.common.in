@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.19 2003-03-25 15:19:01 benkirk Exp $
+# $Id: Make.common.in,v 1.20 2003-04-08 22:54:06 benkirk Exp $
 
 
 ###############################################################################
@@ -18,65 +18,6 @@
 #
 ###############################################################################
 
-#
-# Figure out the compilation mode based on the
-# environment variable METHOD.
-opt-mode   := off
-debug-mode := off
-prof-mode  := off
-syn-mode   := off
-obj-suffix := @host@.o
-
-#
-# If the user has no environment variable
-# called METHOD, he gets optimized mode.
-ifeq (x$(METHOD),x)
-  METHOD     := opt
-  opt-mode   := on
-  obj-suffix := @host@.o
-endif
-
-#
-# If METHOD=opt, compile in optimized mode.
-ifeq ($(METHOD),opt)
-  opt-mode   := on
-  obj-suffix := @host@.o
-endif
-
-#
-# If METHOD=dbg, compile in debug mode.
-ifeq ($(METHOD),dbg)
-  debug-mode := on
-  obj-suffix := @host@.g.o
-endif
-
-#
-# If METHOD=pro, compile in profiler mode
-ifeq ($(METHOD),pro)
-  prof-mode  := on
-  obj-suffix := @host@.pg.o
-endif
-
-#
-# If METHOD=syn, compile in syntax-checking mode
-ifeq ($(METHOD),syn)
-  syn-mode  := on
-  obj-suffix := @host@.sy.o
-endif
-
-#
-# Set the option to determine what type of
-# library (.so or .a) will be built.
-enable-shared        := @enableshared@
-
-#
-# If we are profiling, we CANNOT use shared
-# libs.  At least I don't think we can ;)
-ifeq ($(prof-mode),on)
-  enable-shared := no
-endif
-
-
 
 ###############################################################################
 # the following lines will be replaced by the output 
@@ -90,7 +31,6 @@ DLFLAGS              =
 LIBS                 = @LIBS@
 FLIBS		     = @FLIBS@
 GXX-VERSION          = @GXX_VERSION@
-CXXDEPFLAG           = @CXXDEPFLAG@
 CXXSHAREDFLAG        = @CXXSHAREDFLAG@
 CSHAREDFLAG          = @CXXSHAREDFLAG@
 RPATHFLAG            = @RPATHFLAG@
@@ -162,22 +102,72 @@ enable-optional      = @enableoptional@
 #
 # Set the current directory.
 pwd := @PWD@
+###############################################################################
 
 
 
 
 ###############################################################################
-# The mesh library
 #
-mesh_library_dir := $(pwd)/lib/$(hosttype)_$(METHOD)
+# Figure out the compilation mode based on the
+# environment variable METHOD.
+opt-mode   := off
+debug-mode := off
+prof-mode  := off
+syn-mode   := off
+obj-suffix := @host@.o
 
-mesh_library     := $(mesh_library_dir)/libmesh.a
-ifeq ($(enable-shared),yes) 
-  mesh_library   := $(mesh_library_dir)/libmesh.so
-  DLFLAGS += $(RPATHFLAG)$(mesh_library_dir)
+#
+# If the user has no environment variable
+# called METHOD, he gets optimized mode.
+ifeq (x$(METHOD),x)
+  METHOD     := opt
+  opt-mode   := on
+  obj-suffix := @host@.o
 endif
 
-LIBS += $(mesh_library)
+#
+# If METHOD=opt, compile in optimized mode.
+ifeq ($(METHOD),opt)
+  opt-mode   := on
+  obj-suffix := @host@.o
+endif
+
+#
+# If METHOD=dbg, compile in debug mode.
+ifeq ($(METHOD),dbg)
+  debug-mode := on
+  obj-suffix := @host@.g.o
+endif
+
+#
+# If METHOD=pro, compile in profiler mode
+ifeq ($(METHOD),pro)
+  prof-mode  := on
+  obj-suffix := @host@.pg.o
+endif
+
+#
+# If METHOD=syn, compile in syntax-checking mode
+ifeq ($(METHOD),syn)
+  syn-mode  := on
+  obj-suffix := @host@.sy.o
+endif
+
+#
+# Set the option to determine what type of
+# library (.so or .a) will be built.
+enable-shared        := @enableshared@
+
+#
+# If we are profiling, we CANNOT use shared
+# libs.  At least I don't think we can ;)
+ifeq ($(prof-mode),on)
+  enable-shared := no
+endif
+###############################################################################
+
+
 
 ###############################################################################
 # Compiler flags, different for optimized, debug, and profiler modes.
@@ -207,6 +197,24 @@ endif
 ifeq ($(prof-mode),on)
   LIBS += -pg
 endif
+###############################################################################
+
+
+
+###############################################################################
+# The mesh library
+#
+mesh_library_dir := $(pwd)/lib/$(hosttype)_$(METHOD)
+
+mesh_library     := $(mesh_library_dir)/libmesh.a
+ifeq ($(enable-shared),yes) 
+  mesh_library   := $(mesh_library_dir)/libmesh.so
+  DLFLAGS += $(RPATHFLAG)$(mesh_library_dir)
+endif
+
+LIBS += $(mesh_library)
+###############################################################################
+
 
 
 ###############################################################################
@@ -346,6 +354,7 @@ endif
 #
 # Finally, Append the linker flags to the libraries
 LIBS += $(DLFLAGS) $(LDFLAGS)
+###############################################################################
 
 
 

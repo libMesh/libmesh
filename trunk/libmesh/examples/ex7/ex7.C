@@ -1,4 +1,4 @@
-// $Id: ex7.C,v 1.22 2003-04-05 02:25:42 ddreyer Exp $
+// $Id: ex7.C,v 1.23 2003-04-08 22:54:09 benkirk Exp $
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
   
@@ -227,10 +227,8 @@ int main (int argc, char** argv)
     /**
      * Create an equation systems object, which now handles
      * a frequency system, as opposed to previous examples.
-     * Currently, you can either use \p PETSC_SOLVERS or
-     * \p LASPACK_SOLVERS, if available.
      */
-    EquationSystems<FrequencySystem> equation_systems (mesh, PETSC_SOLVERS);
+    EquationSystems<FrequencySystem> equation_systems (mesh);
     
 
     /**

@@ -1,4 +1,4 @@
-// $Id: libmesh.h,v 1.9 2003-04-08 12:46:07 benkirk Exp $
+// $Id: libmesh.h,v 1.10 2003-04-08 22:54:10 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -25,6 +25,7 @@
 
 // C++ includes
 #include <iostream>
+#include <string>
 
 // Local includes
 #include "mesh_common.h"
@@ -66,8 +67,10 @@ private:
    * instantiated nor derived from, so it has a private default constructor.
    */
   libMesh () {}
+
   
 public:
+
   
   /**
    * Initialize the library for use.  This will call
@@ -111,19 +114,9 @@ public:
    * @returns true if the argument \p arg was specified on the command line,
    * \p false otherwise.
    */
-  static bool on_command_line (const std::string& arg);
-  
-  /**
-   * @returns an \p std::ostream to print messages with.
-   */
-  static std::ostream & msg ();
-  
-  /**
-   * @returns an \p std::ostream to print messages with.
-   */
-  static std::ostream & err ();
-  
+  static bool on_command_line (const std::string& arg);  
 
+  
 #if defined(USE_COMPLEX_NUMBERS)
   /**
    * The imaginary unit, \f$ \sqrt{-1} \f$.
@@ -155,19 +148,6 @@ private:
    * not need to actually include the heavyweight \p GetPot header. 
    */
   static AutoPtr<GetPot> _command_line;
-
-  /**
-   * A \p std::ostream to print messages into.  This is useful
-   * since it allows messages to be printed just from processor 0.
-   */
-  static std::ostream *_out;
-  
-  /**
-   * A \p std::ostream to print messages into.  This is useful
-   * since it allows messages to be printed just from processor 0.
-   */
-  static std::ostream *_err;
-
   
   /**
    * Flag that tells if \p init() has been called.
@@ -212,26 +192,6 @@ bool libMesh::closed()
 
   // Note we can only get here if the library is initialized
   return false;
-}
-
-
-
-inline
-std::ostream & libMesh::msg ()
-{
-  assert (_out != NULL);
-
-  return *_out;
-}
-
-
-
-inline
-std::ostream & libMesh::err ()
-{
-  assert (_err != NULL);
-
-  return *_err;
 }
 
 
