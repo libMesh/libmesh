@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.40 2004-10-14 20:24:07 jwpeterson Exp $
+# $Id: Makefile,v 1.41 2005-01-28 19:14:09 benkirk Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -216,7 +216,7 @@ contrib/bin/%.o : contrib/bin/%.cc
 # Make a TODO list
 #
 TODO:
-	@egrep -i '// *todo' $(srcfiles) $(includes) \
+	@egrep -i '// *todo' $(srcfiles) $(headerfiles) \
 	| perl -pi -e 's#(.*)(TODO:?)(\[.+\])#\3 \1\2\3#i;' \
 	| perl -pi -e 's#\s*//\s*TODO:\s*(\[.+\])\s*#\n\1     #i;'
 

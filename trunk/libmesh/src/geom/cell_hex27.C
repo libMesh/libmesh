@@ -1,4 +1,4 @@
-// $Id: cell_hex27.C,v 1.23 2004-10-22 21:03:50 jwpeterson Exp $
+// $Id: cell_hex27.C,v 1.24 2005-01-28 19:14:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -21,8 +21,23 @@
 // C++ includes
 
 // Local includes
+#include "side.h"
 #include "cell_hex27.h"
 #include "face_quad9.h"
+
+
+
+// ------------------------------------------------------------
+// Hex27 class static member initializations
+const unsigned int Hex27::side_nodes_map[6][9] =
+{
+  {0, 3, 2, 1, 11, 10,  9,  8, 20}, // Side 0
+  {0, 1, 5, 4,  8, 13, 16, 12, 21}, // Side 1
+  {1, 2, 6, 5,  9, 14, 17, 13, 22}, // Side 2
+  {2, 3, 7, 6, 10, 15, 18, 14, 23}, // Side 3
+  {3, 0, 4, 7, 11, 12, 19, 15, 24}, // Side 4
+  {4, 5, 6, 7, 16, 17, 18, 19, 25}  // Side 5
+};
 
 
 
@@ -77,107 +92,108 @@ AutoPtr<Elem> Hex27::build_side (const unsigned int i) const
 {
   assert (i < this->n_sides());
 
-
+  AutoPtr<Elem> ap(new Side<Quad9,Hex27>(this,i));
+  return ap;
   
-  AutoPtr<Elem> face(new Quad9);
+//   AutoPtr<Elem> face(new Quad9);
 
-  // Think of a unit cube: (-1,1) x (-1,1) x (1,1)
-  switch (i)
-    {
-    case 0:  // the face at z=0
-      {
-	face->set_node(0) = this->get_node(0);
-	face->set_node(1) = this->get_node(3);
-	face->set_node(2) = this->get_node(2);
-	face->set_node(3) = this->get_node(1);
-	face->set_node(4) = this->get_node(11);
-	face->set_node(5) = this->get_node(10);
-	face->set_node(6) = this->get_node(9);
-	face->set_node(7) = this->get_node(8);
-	face->set_node(8) = this->get_node(20);
+//   // Think of a unit cube: (-1,1) x (-1,1) x (1,1)
+//   switch (i)
+//     {
+//     case 0:  // the face at z=0
+//       {
+// 	face->set_node(0) = this->get_node(0);
+// 	face->set_node(1) = this->get_node(3);
+// 	face->set_node(2) = this->get_node(2);
+// 	face->set_node(3) = this->get_node(1);
+// 	face->set_node(4) = this->get_node(11);
+// 	face->set_node(5) = this->get_node(10);
+// 	face->set_node(6) = this->get_node(9);
+// 	face->set_node(7) = this->get_node(8);
+// 	face->set_node(8) = this->get_node(20);
 
-	return face;
-      }
-    case 1:  // the face at y = 0
-      {
-	face->set_node(0) = this->get_node(0);
-	face->set_node(1) = this->get_node(1);
-	face->set_node(2) = this->get_node(5);
-	face->set_node(3) = this->get_node(4);
-	face->set_node(4) = this->get_node(8);
-	face->set_node(5) = this->get_node(13);
-	face->set_node(6) = this->get_node(16);
-	face->set_node(7) = this->get_node(12);
-	face->set_node(8) = this->get_node(21);
+// 	return face;
+//       }
+//     case 1:  // the face at y = 0
+//       {
+// 	face->set_node(0) = this->get_node(0);
+// 	face->set_node(1) = this->get_node(1);
+// 	face->set_node(2) = this->get_node(5);
+// 	face->set_node(3) = this->get_node(4);
+// 	face->set_node(4) = this->get_node(8);
+// 	face->set_node(5) = this->get_node(13);
+// 	face->set_node(6) = this->get_node(16);
+// 	face->set_node(7) = this->get_node(12);
+// 	face->set_node(8) = this->get_node(21);
 
-	return face;
-      }
-    case 2:  // the face at x=1
-      {
-	face->set_node(0) = this->get_node(1);
-	face->set_node(1) = this->get_node(2);
-	face->set_node(2) = this->get_node(6);
-	face->set_node(3) = this->get_node(5);
-	face->set_node(4) = this->get_node(9);
-	face->set_node(5) = this->get_node(14);
-	face->set_node(6) = this->get_node(17);
-	face->set_node(7) = this->get_node(13);
-	face->set_node(8) = this->get_node(22);
+// 	return face;
+//       }
+//     case 2:  // the face at x=1
+//       {
+// 	face->set_node(0) = this->get_node(1);
+// 	face->set_node(1) = this->get_node(2);
+// 	face->set_node(2) = this->get_node(6);
+// 	face->set_node(3) = this->get_node(5);
+// 	face->set_node(4) = this->get_node(9);
+// 	face->set_node(5) = this->get_node(14);
+// 	face->set_node(6) = this->get_node(17);
+// 	face->set_node(7) = this->get_node(13);
+// 	face->set_node(8) = this->get_node(22);
 
-	return face;
-      }
-    case 3: // the face at y=1
-      {
-	face->set_node(0) = this->get_node(2);
-	face->set_node(1) = this->get_node(3);
-	face->set_node(2) = this->get_node(7);
-	face->set_node(3) = this->get_node(6);
-	face->set_node(4) = this->get_node(10);
-	face->set_node(5) = this->get_node(15);
-	face->set_node(6) = this->get_node(18);
-	face->set_node(7) = this->get_node(14);
-	face->set_node(8) = this->get_node(23);
+// 	return face;
+//       }
+//     case 3: // the face at y=1
+//       {
+// 	face->set_node(0) = this->get_node(2);
+// 	face->set_node(1) = this->get_node(3);
+// 	face->set_node(2) = this->get_node(7);
+// 	face->set_node(3) = this->get_node(6);
+// 	face->set_node(4) = this->get_node(10);
+// 	face->set_node(5) = this->get_node(15);
+// 	face->set_node(6) = this->get_node(18);
+// 	face->set_node(7) = this->get_node(14);
+// 	face->set_node(8) = this->get_node(23);
 
-	return face;
-      }
-    case 4: // the face at x=0
-      {
-	face->set_node(0) = this->get_node(3);
-	face->set_node(1) = this->get_node(0);
-	face->set_node(2) = this->get_node(4);
-	face->set_node(3) = this->get_node(7);
-	face->set_node(4) = this->get_node(11);
-	face->set_node(5) = this->get_node(12);
-	face->set_node(6) = this->get_node(19);
-	face->set_node(7) = this->get_node(15);
-	face->set_node(8) = this->get_node(24);
+// 	return face;
+//       }
+//     case 4: // the face at x=0
+//       {
+// 	face->set_node(0) = this->get_node(3);
+// 	face->set_node(1) = this->get_node(0);
+// 	face->set_node(2) = this->get_node(4);
+// 	face->set_node(3) = this->get_node(7);
+// 	face->set_node(4) = this->get_node(11);
+// 	face->set_node(5) = this->get_node(12);
+// 	face->set_node(6) = this->get_node(19);
+// 	face->set_node(7) = this->get_node(15);
+// 	face->set_node(8) = this->get_node(24);
 
-	return face;
-      }
-    case 5: // the face at z=1
-      {
-	face->set_node(0) = this->get_node(4);
-	face->set_node(1) = this->get_node(5);
-	face->set_node(2) = this->get_node(6);
-	face->set_node(3) = this->get_node(7);
-	face->set_node(4) = this->get_node(16);
-	face->set_node(5) = this->get_node(17);
-	face->set_node(6) = this->get_node(18);
-	face->set_node(7) = this->get_node(19);
-	face->set_node(8) = this->get_node(25);
+// 	return face;
+//       }
+//     case 5: // the face at z=1
+//       {
+// 	face->set_node(0) = this->get_node(4);
+// 	face->set_node(1) = this->get_node(5);
+// 	face->set_node(2) = this->get_node(6);
+// 	face->set_node(3) = this->get_node(7);
+// 	face->set_node(4) = this->get_node(16);
+// 	face->set_node(5) = this->get_node(17);
+// 	face->set_node(6) = this->get_node(18);
+// 	face->set_node(7) = this->get_node(19);
+// 	face->set_node(8) = this->get_node(25);
 
-	return face;
-      }
-    default:
-      {
-	error();
-	return face;
-      }
-    }
+// 	return face;
+//       }
+//     default:
+//       {
+// 	error();
+// 	return face;
+//       }
+//     }
 
-  // We'll never get here.
-  error();
-  return face;
+//   // We'll never get here.
+//   error();
+//   return face;
 }
 
 

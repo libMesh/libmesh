@@ -1,4 +1,4 @@
-// $Id: cell_pyramid5.h,v 1.4 2004-11-15 22:09:11 benkirk Exp $
+// $Id: cell_pyramid5.h,v 1.5 2005-01-28 19:14:16 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -84,15 +84,11 @@ public:
 			    const IOPackage iop,
 			    std::vector<unsigned int>& conn) const;
   
-//   void tecplot_connectivity(const unsigned int sc,
-// 			    std::vector<unsigned int>& conn) const;
-  
-  
-//   void vtk_connectivity(const unsigned int sc,
-// 			std::vector<unsigned int> *conn = NULL) const;
-  
-//   unsigned int vtk_element_type (const unsigned int) const
-//   { return 14; }
+  /**
+   * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
+   * element node numbers.
+   */
+  static const unsigned int side_nodes_map[5][4];
 
   
 protected:

@@ -1,4 +1,4 @@
-// $Id: face_tri3.C,v 1.15 2004-07-14 19:23:18 jwpeterson Exp $
+// $Id: face_tri3.C,v 1.16 2005-01-28 19:14:18 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -20,6 +20,7 @@
 // C++ includes
 
 // Local includes
+#include "side.h"
 #include "edge_edge2.h"
 #include "face_tri3.h"
 
@@ -28,6 +29,14 @@
 
 // ------------------------------------------------------------
 // Tri3 class static member initializations
+const unsigned int Tri3::side_nodes_map[3][2] =
+{
+  {0, 1}, // Side 0
+  {1, 2}, // Side 1
+  {2, 0}  // Side 2
+};
+
+
 #ifdef ENABLE_AMR
 
 const float Tri3::_embedding_matrix[4][3][3] =
@@ -75,42 +84,44 @@ AutoPtr<Elem> Tri3::build_side (const unsigned int i) const
 {
   assert (i < this->n_sides());
 
+  AutoPtr<Elem> ap(new Side<Edge2,Tri3>(this,i));
+  return ap;
   
-  Edge2* edge = new Edge2;
+//   Edge2* edge = new Edge2;
 
-  switch (i)
-    {
-    case 0:
-      {
-	edge->set_node(0) = this->get_node(0);
-	edge->set_node(1) = this->get_node(1);
+//   switch (i)
+//     {
+//     case 0:
+//       {
+// 	edge->set_node(0) = this->get_node(0);
+// 	edge->set_node(1) = this->get_node(1);
 	
-	AutoPtr<Elem> ap(edge);  return ap;
-      }
-    case 1:
-      {
-	edge->set_node(0) = this->get_node(1);
-	edge->set_node(1) = this->get_node(2);
+// 	AutoPtr<Elem> ap(edge);  return ap;
+//       }
+//     case 1:
+//       {
+// 	edge->set_node(0) = this->get_node(1);
+// 	edge->set_node(1) = this->get_node(2);
 	
-	AutoPtr<Elem> ap(edge);  return ap;
-      }
-    case 2:
-      {
-	edge->set_node(0) = this->get_node(2);
-	edge->set_node(1) = this->get_node(0);
+// 	AutoPtr<Elem> ap(edge);  return ap;
+//       }
+//     case 2:
+//       {
+// 	edge->set_node(0) = this->get_node(2);
+// 	edge->set_node(1) = this->get_node(0);
 	
-	AutoPtr<Elem> ap(edge);  return ap;
-      }
-    default:
-      {
-	error();
-      }
-    }
+// 	AutoPtr<Elem> ap(edge);  return ap;
+//       }
+//     default:
+//       {
+// 	error();
+//       }
+//     }
 
   
-  // We will never get here...  Look at the code above.
-  error();
-  AutoPtr<Elem> ap(NULL);  return ap;
+//   // We will never get here...  Look at the code above.
+//   error();
+//   AutoPtr<Elem> ap(NULL);  return ap;
 }
 
 

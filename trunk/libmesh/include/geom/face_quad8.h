@@ -1,4 +1,4 @@
-// $Id: face_quad8.h,v 1.4 2004-11-15 22:09:12 benkirk Exp $
+// $Id: face_quad8.h,v 1.5 2005-01-28 19:14:16 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -121,20 +121,11 @@ public:
 			    const IOPackage iop,
 			    std::vector<unsigned int>& conn) const;
 
-//   void tecplot_connectivity(const unsigned int sf,
-// 			    std::vector<unsigned int>& conn) const;
-  
-  
-//   void vtk_connectivity(const unsigned int sc,
-// 			std::vector<unsigned int> *conn = NULL) const;
-
-//   unsigned int vtk_element_type (const unsigned int sc) const;
-
   /**
    * @returns 2 for all \p n
    */
   unsigned int n_second_order_adjacent_vertices (const unsigned int) const
-      { return 2; }
+  { return 2; }
 
   /**
    * @returns the element-local number of the  \f$ v^{th} \f$ vertex
@@ -143,6 +134,12 @@ public:
    */
   unsigned short int second_order_adjacent_vertex (const unsigned int n,
 						   const unsigned int v) const;
+
+  /**
+   * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
+   * element node numbers.
+   */
+  static const unsigned int side_nodes_map[4][3];
   
   
 protected:

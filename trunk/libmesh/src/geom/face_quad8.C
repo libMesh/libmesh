@@ -1,4 +1,4 @@
-// $Id: face_quad8.C,v 1.19 2004-11-15 22:09:13 benkirk Exp $
+// $Id: face_quad8.C,v 1.20 2005-01-28 19:14:18 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -20,6 +20,7 @@
 // C++ includes
 
 // Local includes
+#include "side.h"
 #include "edge_edge3.h"
 #include "face_quad8.h"
 
@@ -28,6 +29,15 @@
 
 // ------------------------------------------------------------
 // Quad8 class static member initializations
+const unsigned int Quad8::side_nodes_map[4][3] =
+{
+  {0, 1, 4}, // Side 0
+  {1, 2, 5}, // Side 1
+  {2, 3, 6}, // Side 2
+  {3, 0, 7}  // Side 3
+};
+
+
 #ifdef ENABLE_AMR
 
 const float Quad8::_embedding_matrix[4][8][8] =
@@ -130,52 +140,54 @@ AutoPtr<Elem> Quad8::build_side (const unsigned int i) const
 {
   assert (i < this->n_sides());
 
+  AutoPtr<Elem> ap(new Side<Edge3,Quad8>(this,i));
+  return ap;
   
-  Edge3* edge = new Edge3;
+//   Edge3* edge = new Edge3;
 
-  switch (i)
-    {
-    case 0:
-      {
-	edge->set_node(0) = this->get_node(0);
-	edge->set_node(1) = this->get_node(1);
-	edge->set_node(2) = this->get_node(4);
+//   switch (i)
+//     {
+//     case 0:
+//       {
+// 	edge->set_node(0) = this->get_node(0);
+// 	edge->set_node(1) = this->get_node(1);
+// 	edge->set_node(2) = this->get_node(4);
 	
-	AutoPtr<Elem> ap(edge);  return ap;
-      }
-    case 1:
-      {
-	edge->set_node(0) = this->get_node(1);
-	edge->set_node(1) = this->get_node(2);
-	edge->set_node(2) = this->get_node(5);
+// 	AutoPtr<Elem> ap(edge);  return ap;
+//       }
+//     case 1:
+//       {
+// 	edge->set_node(0) = this->get_node(1);
+// 	edge->set_node(1) = this->get_node(2);
+// 	edge->set_node(2) = this->get_node(5);
 	
-	AutoPtr<Elem> ap(edge);  return ap;
-      }
-    case 2:
-      {
-	edge->set_node(0) = this->get_node(2);
-	edge->set_node(1) = this->get_node(3);
-	edge->set_node(2) = this->get_node(6);
+// 	AutoPtr<Elem> ap(edge);  return ap;
+//       }
+//     case 2:
+//       {
+// 	edge->set_node(0) = this->get_node(2);
+// 	edge->set_node(1) = this->get_node(3);
+// 	edge->set_node(2) = this->get_node(6);
 	
-	AutoPtr<Elem> ap(edge);  return ap;
-      }
-    case 3:
-      {
-	edge->set_node(0) = this->get_node(3);
-	edge->set_node(1) = this->get_node(0);
-	edge->set_node(2) = this->get_node(7);
+// 	AutoPtr<Elem> ap(edge);  return ap;
+//       }
+//     case 3:
+//       {
+// 	edge->set_node(0) = this->get_node(3);
+// 	edge->set_node(1) = this->get_node(0);
+// 	edge->set_node(2) = this->get_node(7);
 	
-	AutoPtr<Elem> ap(edge);  return ap;
-      }
-    default:
-      {
-	error();
-      }
-    }
+// 	AutoPtr<Elem> ap(edge);  return ap;
+//       }
+//     default:
+//       {
+// 	error();
+//       }
+//     }
 
 
-  // We will never get here...  Look at the code above.
-  AutoPtr<Elem> ap(NULL);  return ap;
+//   // We will never get here...  Look at the code above.
+//   AutoPtr<Elem> ap(NULL);  return ap;
 }
 
 

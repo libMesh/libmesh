@@ -1473,6 +1473,7 @@ src/geom/cell_hex20.$(obj-suffix):\
     include/geom/face_quad.h\
     include/geom/face_quad8.h\
     include/geom/point.h\
+    include/geom/side.h\
     include/numerics/type_vector.h\
     include/utils/perf_log.h
 src/geom/cell_hex27.$(obj-suffix):\
@@ -1501,6 +1502,7 @@ src/geom/cell_hex27.$(obj-suffix):\
     include/geom/face_quad.h\
     include/geom/face_quad9.h\
     include/geom/point.h\
+    include/geom/side.h\
     include/numerics/type_vector.h\
     include/utils/perf_log.h
 src/geom/cell_hex8.$(obj-suffix):\
@@ -1529,6 +1531,7 @@ src/geom/cell_hex8.$(obj-suffix):\
     include/geom/face_quad.h\
     include/geom/face_quad4.h\
     include/geom/point.h\
+    include/geom/side.h\
     include/numerics/type_vector.h\
     include/utils/perf_log.h
 src/geom/cell_hex.$(obj-suffix):\
@@ -1784,6 +1787,7 @@ src/geom/cell_prism15.$(obj-suffix):\
     include/geom/face_tri.h\
     include/geom/face_tri6.h\
     include/geom/point.h\
+    include/geom/side.h\
     include/numerics/type_vector.h\
     include/utils/perf_log.h
 src/geom/cell_prism18.$(obj-suffix):\
@@ -1815,6 +1819,7 @@ src/geom/cell_prism18.$(obj-suffix):\
     include/geom/face_tri.h\
     include/geom/face_tri6.h\
     include/geom/point.h\
+    include/geom/side.h\
     include/numerics/type_vector.h\
     include/utils/perf_log.h
 src/geom/cell_prism6.$(obj-suffix):\
@@ -1846,6 +1851,7 @@ src/geom/cell_prism6.$(obj-suffix):\
     include/geom/face_tri.h\
     include/geom/face_tri3.h\
     include/geom/point.h\
+    include/geom/side.h\
     include/numerics/type_vector.h\
     include/utils/perf_log.h
 src/geom/cell_prism.$(obj-suffix):\
@@ -1907,6 +1913,7 @@ src/geom/cell_pyramid5.$(obj-suffix):\
     include/geom/face_tri.h\
     include/geom/face_tri3.h\
     include/geom/point.h\
+    include/geom/side.h\
     include/numerics/type_vector.h\
     include/utils/perf_log.h
 src/geom/cell_pyramid.$(obj-suffix):\
@@ -1966,6 +1973,7 @@ src/geom/cell_tet10.$(obj-suffix):\
     include/geom/face_tri.h\
     include/geom/face_tri6.h\
     include/geom/point.h\
+    include/geom/side.h\
     include/numerics/type_vector.h\
     include/utils/perf_log.h
 src/geom/cell_tet4.$(obj-suffix):\
@@ -1995,6 +2003,7 @@ src/geom/cell_tet4.$(obj-suffix):\
     include/geom/face_tri.h\
     include/geom/face_tri3.h\
     include/geom/point.h\
+    include/geom/side.h\
     include/numerics/type_vector.h\
     include/utils/perf_log.h
 src/geom/cell_tet.$(obj-suffix):\
@@ -2315,6 +2324,7 @@ src/geom/face_quad4.$(obj-suffix):\
     include/geom/face_quad.h\
     include/geom/face_quad4.h\
     include/geom/point.h\
+    include/geom/side.h\
     include/numerics/type_vector.h\
     include/utils/perf_log.h
 src/geom/face_quad8.$(obj-suffix):\
@@ -2343,6 +2353,7 @@ src/geom/face_quad8.$(obj-suffix):\
     include/geom/face_quad.h\
     include/geom/face_quad8.h\
     include/geom/point.h\
+    include/geom/side.h\
     include/numerics/type_vector.h\
     include/utils/perf_log.h
 src/geom/face_quad9.$(obj-suffix):\
@@ -2371,6 +2382,7 @@ src/geom/face_quad9.$(obj-suffix):\
     include/geom/face_quad.h\
     include/geom/face_quad9.h\
     include/geom/point.h\
+    include/geom/side.h\
     include/numerics/type_vector.h\
     include/utils/perf_log.h
 src/geom/face_quad.$(obj-suffix):\
@@ -2426,6 +2438,7 @@ src/geom/face_tri3.$(obj-suffix):\
     include/geom/face_tri.h\
     include/geom/face_tri3.h\
     include/geom/point.h\
+    include/geom/side.h\
     include/numerics/type_vector.h\
     include/utils/perf_log.h
 src/geom/face_tri6.$(obj-suffix):\
@@ -2454,6 +2467,7 @@ src/geom/face_tri6.$(obj-suffix):\
     include/geom/face_tri.h\
     include/geom/face_tri6.h\
     include/geom/point.h\
+    include/geom/side.h\
     include/numerics/type_vector.h\
     include/utils/perf_log.h
 src/geom/face_tri.$(obj-suffix):\

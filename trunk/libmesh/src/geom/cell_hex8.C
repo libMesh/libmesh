@@ -1,4 +1,4 @@
-// $Id: cell_hex8.C,v 1.16 2004-07-14 19:23:18 jwpeterson Exp $
+// $Id: cell_hex8.C,v 1.17 2005-01-28 19:14:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -21,10 +21,24 @@
 // C++ includes
 
 // Local includes
+#include "side.h"
 #include "cell_hex8.h"
 #include "face_quad4.h"
 
 
+
+
+// ------------------------------------------------------------
+// Hex8 class static member initializations
+const unsigned int Hex8::side_nodes_map[6][4] =
+{
+  {0, 3, 2, 1}, // Side 0
+  {0, 1, 5, 4}, // Side 1
+  {1, 2, 6, 5}, // Side 2
+  {2, 3, 7, 6}, // Side 3
+  {3, 0, 4, 7}, // Side 4
+  {4, 5, 6, 7}  // Side 5
+};
 
 
 // ------------------------------------------------------------
@@ -33,77 +47,78 @@ AutoPtr<Elem> Hex8::build_side (const unsigned int i) const
 {
   assert (i < this->n_sides());
 
-
+  AutoPtr<Elem> ap(new Side<Quad4,Hex8>(this,i));
+  return ap;
   
-  AutoPtr<Elem> face(new Quad4);
+//   AutoPtr<Elem> face(new Quad4);
 
-  // Think of a unit cube: (-1,1) x (-1,1)x (-1,1)
-  switch (i)
-    {
-    case 0:  // the face at z = -1
-      {
-	face->set_node(0) = this->get_node(0);
-	face->set_node(1) = this->get_node(3);
-	face->set_node(2) = this->get_node(2);
-	face->set_node(3) = this->get_node(1);
+//   // Think of a unit cube: (-1,1) x (-1,1)x (-1,1)
+//   switch (i)
+//     {
+//     case 0:  // the face at z = -1
+//       {
+// 	face->set_node(0) = this->get_node(0);
+// 	face->set_node(1) = this->get_node(3);
+// 	face->set_node(2) = this->get_node(2);
+// 	face->set_node(3) = this->get_node(1);
 
-	return face;
-      }
-    case 1:  // the face at y = -1
-      {
-	face->set_node(0) = this->get_node(0);
-	face->set_node(1) = this->get_node(1);
-	face->set_node(2) = this->get_node(5);
-	face->set_node(3) = this->get_node(4);
+// 	return face;
+//       }
+//     case 1:  // the face at y = -1
+//       {
+// 	face->set_node(0) = this->get_node(0);
+// 	face->set_node(1) = this->get_node(1);
+// 	face->set_node(2) = this->get_node(5);
+// 	face->set_node(3) = this->get_node(4);
 	
-	return face;
-      }
-    case 2:  // the face at x = 1
-      {
-	face->set_node(0) = this->get_node(1);
-	face->set_node(1) = this->get_node(2);
-	face->set_node(2) = this->get_node(6);
-	face->set_node(3) = this->get_node(5);
+// 	return face;
+//       }
+//     case 2:  // the face at x = 1
+//       {
+// 	face->set_node(0) = this->get_node(1);
+// 	face->set_node(1) = this->get_node(2);
+// 	face->set_node(2) = this->get_node(6);
+// 	face->set_node(3) = this->get_node(5);
 
-	return face;
-      }
-    case 3: // the face at y = 1
-      {
-	face->set_node(0) = this->get_node(2);
-	face->set_node(1) = this->get_node(3);
-	face->set_node(2) = this->get_node(7);
-	face->set_node(3) = this->get_node(6);
+// 	return face;
+//       }
+//     case 3: // the face at y = 1
+//       {
+// 	face->set_node(0) = this->get_node(2);
+// 	face->set_node(1) = this->get_node(3);
+// 	face->set_node(2) = this->get_node(7);
+// 	face->set_node(3) = this->get_node(6);
 	
-	return face;
-      }
-    case 4: // the face at x = -1
-      {
-	face->set_node(0) = this->get_node(3);
-	face->set_node(1) = this->get_node(0);
-	face->set_node(2) = this->get_node(4);
-	face->set_node(3) = this->get_node(7);
+// 	return face;
+//       }
+//     case 4: // the face at x = -1
+//       {
+// 	face->set_node(0) = this->get_node(3);
+// 	face->set_node(1) = this->get_node(0);
+// 	face->set_node(2) = this->get_node(4);
+// 	face->set_node(3) = this->get_node(7);
 
-	return face;
-      }
-    case 5: // the face at z = 1
-      {
-	face->set_node(0) = this->get_node(4);
-	face->set_node(1) = this->get_node(5);
-	face->set_node(2) = this->get_node(6);
-	face->set_node(3) = this->get_node(7);
+// 	return face;
+//       }
+//     case 5: // the face at z = 1
+//       {
+// 	face->set_node(0) = this->get_node(4);
+// 	face->set_node(1) = this->get_node(5);
+// 	face->set_node(2) = this->get_node(6);
+// 	face->set_node(3) = this->get_node(7);
 	
-	return face;
-      }
-    default:
-      {
-	error();
-	return face;
-      }
-    }
+// 	return face;
+//       }
+//     default:
+//       {
+// 	error();
+// 	return face;
+//       }
+//     }
 
-  // We'll never get here.
-  error();
-  return face;
+//   // We'll never get here.
+//   error();
+//   return face;
 }
 
 

@@ -1,4 +1,4 @@
-// $Id: edge_edge3.h,v 1.4 2004-11-15 22:09:11 benkirk Exp $
+// $Id: edge_edge3.h,v 1.5 2005-01-28 19:14:16 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -48,7 +48,18 @@ class Edge3 : public Edge
   /**
    * Constructor.  By default this element has no parent.
    */
-  Edge3 (const Elem* p=NULL);
+  Edge3 (const Elem* p=NULL) :
+    Edge(Edge3::n_nodes(), p) {}
+  
+  /**
+   * Constructor.  Explicitly specifies the number of
+   * nodes and neighbors for which storage will be allocated.
+   */
+  Edge3 (const unsigned int nn,
+	 const unsigned int ns,
+	 const Elem* p) :
+    Edge(nn, p) { assert (ns == 0); }
+
   
   /**
    * @returns 3
@@ -73,15 +84,6 @@ class Edge3 : public Edge
   virtual void connectivity(const unsigned int sc,
 			    const IOPackage iop,
 			    std::vector<unsigned int>& conn) const;
-
-//   void tecplot_connectivity(const unsigned int se,
-// 			    std::vector<unsigned int>& conn) const;
-
-//   void vtk_connectivity(const unsigned int sc,
-// 			std::vector<unsigned int> *conn = NULL) const;
-  
-//   unsigned int vtk_element_type (const unsigned int) const
-//   { return 3; }
 
   /**
    * @returns 2 for all \p n
@@ -123,20 +125,6 @@ protected:
   
 #endif
 };
-
-
-
-
-// ------------------------------------------------------------
-// Edge3 class member functions
-inline
-Edge3::Edge3(const Elem* p) :
-  Edge(Edge3::n_nodes(), p) 
-{
-}
-
-
-
 
 
 

@@ -1,4 +1,4 @@
-// $Id: cell_prism18.C,v 1.11 2004-07-14 19:23:18 jwpeterson Exp $
+// $Id: cell_prism18.C,v 1.12 2005-01-28 19:14:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -21,9 +21,23 @@
 // C++ includes
 
 // Local includes
+#include "side.h"
 #include "cell_prism18.h"
 #include "face_quad9.h"
 #include "face_tri6.h"
+
+
+
+// ------------------------------------------------------------
+// Prism18 class static member initializations
+const unsigned int Prism18::side_nodes_map[5][9] =
+{
+  {0, 2, 1,  8,  7,  6, 99, 99, 99}, // Side 0
+  {0, 1, 4,  3,  6, 10, 12,  9, 15}, // Side 1
+  {1, 2, 5,  4,  7, 11, 13, 10, 16}, // Side 2
+  {2, 0, 3,  5,  8,  9, 14, 11, 17}, // Side 3
+  {3, 4, 5, 12, 13, 14, 99, 99, 99}  // Side 4
+};
 
 
 // ------------------------------------------------------------
@@ -38,75 +52,75 @@ AutoPtr<Elem> Prism18::build_side (const unsigned int i) const
     {
     case 0:  // the triangular face at z=-1
       {
-	AutoPtr<Elem> face(new Tri6);
+	AutoPtr<Elem> face(new Side<Tri6,Prism18>(this,i));
 
-	face->set_node(0) = this->get_node(0);
-	face->set_node(1) = this->get_node(2);
-	face->set_node(2) = this->get_node(1);
-	face->set_node(3) = this->get_node(8);
-	face->set_node(4) = this->get_node(7);
-	face->set_node(5) = this->get_node(6);
+// 	face->set_node(0) = this->get_node(0);
+// 	face->set_node(1) = this->get_node(2);
+// 	face->set_node(2) = this->get_node(1);
+// 	face->set_node(3) = this->get_node(8);
+// 	face->set_node(4) = this->get_node(7);
+// 	face->set_node(5) = this->get_node(6);
 
 	return face;
       }
     case 1:  // the quad face at y=0
       {
-	AutoPtr<Elem> face(new Quad9);
+	AutoPtr<Elem> face(new Side<Quad9,Prism18>(this,i));
 	
-	face->set_node(0) = this->get_node(0);
-	face->set_node(1) = this->get_node(1);
-	face->set_node(2) = this->get_node(4);
-	face->set_node(3) = this->get_node(3);
-	face->set_node(4) = this->get_node(6);
-	face->set_node(5) = this->get_node(10);
-	face->set_node(6) = this->get_node(12);
-	face->set_node(7) = this->get_node(9);
-	face->set_node(8) = this->get_node(15);
+// 	face->set_node(0) = this->get_node(0);
+// 	face->set_node(1) = this->get_node(1);
+// 	face->set_node(2) = this->get_node(4);
+// 	face->set_node(3) = this->get_node(3);
+// 	face->set_node(4) = this->get_node(6);
+// 	face->set_node(5) = this->get_node(10);
+// 	face->set_node(6) = this->get_node(12);
+// 	face->set_node(7) = this->get_node(9);
+// 	face->set_node(8) = this->get_node(15);
 	
 	return face;
       }
     case 2:  // the other quad face
       {
-	AutoPtr<Elem> face(new Quad9);
+	AutoPtr<Elem> face(new Side<Quad9,Prism18>(this,i));
 
-	face->set_node(0) = this->get_node(1);
-	face->set_node(1) = this->get_node(2);
-	face->set_node(2) = this->get_node(5);
-	face->set_node(3) = this->get_node(4);
-	face->set_node(4) = this->get_node(7);
-	face->set_node(5) = this->get_node(11);
-	face->set_node(6) = this->get_node(13);
-	face->set_node(7) = this->get_node(10);
-	face->set_node(8) = this->get_node(16);
+// 	face->set_node(0) = this->get_node(1);
+// 	face->set_node(1) = this->get_node(2);
+// 	face->set_node(2) = this->get_node(5);
+// 	face->set_node(3) = this->get_node(4);
+// 	face->set_node(4) = this->get_node(7);
+// 	face->set_node(5) = this->get_node(11);
+// 	face->set_node(6) = this->get_node(13);
+// 	face->set_node(7) = this->get_node(10);
+// 	face->set_node(8) = this->get_node(16);
 
 	return face;
       }
     case 3: // the quad face at x=0
       {
-	AutoPtr<Elem> face(new Quad9);
+	AutoPtr<Elem> face(new Side<Quad9,Prism18>(this,i));
 
-	face->set_node(0) = this->get_node(2);
-	face->set_node(1) = this->get_node(0);
-	face->set_node(2) = this->get_node(3);
-	face->set_node(3) = this->get_node(5);
-	face->set_node(4) = this->get_node(8);
-	face->set_node(5) = this->get_node(9);
-	face->set_node(6) = this->get_node(14);
-	face->set_node(7) = this->get_node(11);
-	face->set_node(8) = this->get_node(17);
+// 	face->set_node(0) = this->get_node(2);
+// 	face->set_node(1) = this->get_node(0);
+// 	face->set_node(2) = this->get_node(3);
+// 	face->set_node(3) = this->get_node(5);
+// 	face->set_node(4) = this->get_node(8);
+// 	face->set_node(5) = this->get_node(9);
+// 	face->set_node(6) = this->get_node(14);
+// 	face->set_node(7) = this->get_node(11);
+// 	face->set_node(8) = this->get_node(17);
 	
 	return face;
       }
     case 4: // the triangular face at z=1
       {
-	AutoPtr<Elem> face(new Tri6);
+	AutoPtr<Elem> face(new Side<Tri6,Prism18>(this,i));
 
-	face->set_node(0) = this->get_node(3);
-	face->set_node(1) = this->get_node(4);
-	face->set_node(2) = this->get_node(5);
-	face->set_node(3) = this->get_node(12);
-	face->set_node(4) = this->get_node(13);
-	face->set_node(5) = this->get_node(14);
+// 	face->set_node(0) = this->get_node(3);
+// 	face->set_node(1) = this->get_node(4);
+// 	face->set_node(2) = this->get_node(5);
+// 	face->set_node(3) = this->get_node(12);
+// 	face->set_node(4) = this->get_node(13);
+// 	face->set_node(5) = this->get_node(14);
 
 	return face;
       }
