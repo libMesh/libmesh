@@ -1,4 +1,4 @@
-// $Id: inf_fe.h,v 1.5 2003-01-24 17:24:38 jwpeterson Exp $
+// $Id: inf_fe.h,v 1.6 2003-01-25 05:33:10 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -96,7 +96,7 @@
  *
  * \author Daniel Dreyer
  * \date 2003
- * \version $Revision: 1.5 $
+ * \version $Revision: 1.6 $
  */
 
 //-------------------------------------------------------------
@@ -119,7 +119,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.5 $
+   * \version $Revision: 1.6 $
    */
   //-------------------------------------------------------------
   // InfFE::Radial class definition
@@ -244,7 +244,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.5 $
+   * \version $Revision: 1.6 $
    */
   //-------------------------------------------------------------
   // InfFE::Base class definition
@@ -779,12 +779,6 @@ protected:
 
 private:
  
-  /**
-   * Make the \p FEBase class a friend so that its
-   * \p FEBase::build() member will work.
-   */
-  friend class FEBase;
-
   /**
    * Make all \p \InfFE<Dim,T_radial,T_map> classes
    * friends of each other, so that the protected

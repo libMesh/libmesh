@@ -1,4 +1,4 @@
-//    $Id: petsc_matrix.h,v 1.5 2003-01-24 17:24:39 jwpeterson Exp $
+//    $Id: petsc_matrix.h,v 1.6 2003-01-25 05:33:10 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -293,7 +293,6 @@ class PetscMatrix
   /**
    * Make other Petsc datatypes friends
    */
-  friend class PetscVector;
   friend class PetscInterface;
 };
 
