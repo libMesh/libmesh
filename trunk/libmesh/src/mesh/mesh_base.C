@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.67 2004-02-27 19:06:24 benkirk Exp $
+// $Id: mesh_base.C,v 1.68 2004-03-18 15:10:32 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -42,8 +42,8 @@
 #include "face_tri6.h"
 //#include "petsc_matrix.h"
 #include "libmesh_logging.h"
-#include "partitioner.h"
-#include "factory.h"
+#include "metis_partitioner.h" // for default partitioning
+
 
 
 
@@ -354,7 +354,7 @@ void MeshBase::print_info() const
 
 
 void MeshBase::skip_comment_lines (std::istream &in,
-				   const char comment_start)
+				   const char comment_start) const
 {    
   char c;
   while (in.get(c), c==comment_start) 
@@ -581,9 +581,8 @@ void MeshBase::build_nodes_to_elem_map (std::vector<std::vector<Elem*> >&
 
 void MeshBase::partition (const unsigned int n_parts)
 {
-  AutoPtr<Partitioner> partitioner (Factory<Partitioner>::build ("Metis"));
-  
-  partitioner->partition (*this, n_parts); 
+  MetisPartitioner partitioner;
+  partitioner.partition (*this, n_parts); 
 }
 
 
@@ -740,7 +739,7 @@ void MeshBase::renumber_nodes_and_elements ()
 
 
 
-void MeshBase::find_boundary_nodes (std::vector<bool>& on_boundary)
+void MeshBase::find_boundary_nodes (std::vector<bool>& on_boundary) const
 {
   // Resize the vector which holds boundary nodes and fill with false.
   on_boundary.resize(this->n_nodes());
@@ -750,8 +749,8 @@ void MeshBase::find_boundary_nodes (std::vector<bool>& on_boundary)
 
   // Loop over elements, find those on boundary, and
   // mark them as true in on_boundary.
-  active_elem_iterator       el (this->elements_begin());
-  const active_elem_iterator end(this->elements_end());
+  const_active_elem_iterator       el (this->elements_begin());
+  const const_active_elem_iterator end(this->elements_end());
   
   for (; el != end; ++el)
     for (unsigned int s=0; s<(*el)->n_neighbors(); s++)
@@ -1081,8 +1080,8 @@ void MeshBase::write(const std::string& name)
 
 
 void MeshBase::write(const std::string& name,
-		     std::vector<Number>& v,
-		     std::vector<std::string>& vn)
+		     const std::vector<Number>& v,
+		     const std::vector<std::string>& vn)
 {
   START_LOG("write()", "MeshBase");
   

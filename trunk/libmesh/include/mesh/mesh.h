@@ -1,4 +1,4 @@
-// $Id: mesh.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: mesh.h,v 1.3 2004-03-18 15:10:31 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -130,8 +130,8 @@ class Mesh : public MeshBase
    * proper method by the file extension. Also writes data.
    */
   void write (const std::string& name,
-	      std::vector<Number>& values,
-	      std::vector<std::string>& variable_names);
+	      const std::vector<Number>& values,
+	      const std::vector<std::string>& variable_names);
   
   /**
    * Write meshes in DIVA's ASCII

@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.7 2004-02-13 21:36:49 benkirk Exp $
+// $Id: mesh_base.h,v 1.8 2004-03-18 15:10:32 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -62,7 +62,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.7 $
+ * \version $Revision: 1.8 $
  */
 
 
@@ -497,15 +497,15 @@ public:
    * proper method by the file extension. Also writes data.
    */
   virtual void write (const std::string& name,
-		      std::vector<Number>& values,
-		      std::vector<std::string>& variable_names);
+		      const std::vector<Number>& values,
+		      const std::vector<std::string>& variable_names);
   
   /**
    * Write a Tecplot-formatted ASCII text file to the file specified by 
    * \p name.  Writes both the mesh and the solution from \p es. 
    */
   void write_tecplot (const std::string& name,
-		      EquationSystems& es);
+		      const EquationSystems& es) const;
   
   /**
    * Write a Tecplot-formatted ASCII text file to the file specified by 
@@ -514,7 +514,7 @@ public:
    */
   void write_tecplot (const std::string& name,
 		      const std::vector<Number>* v=NULL,
-		      const std::vector<std::string>* solution_names=NULL);
+		      const std::vector<std::string>* solution_names=NULL) const;
   
   /**
    * Write a Tecplot-formatted binary file to the file specified by \p name.
@@ -523,7 +523,7 @@ public:
    * is not present this function will simply call the ASCII output version.
    */
   void write_tecplot_binary (const std::string& name,
-			     EquationSystems& es);
+			     const EquationSystems& es) const;
   
   /**
    * Write a Tecplot-formatted binary file to the file specified by \p name.
@@ -534,13 +534,13 @@ public:
    */
   void write_tecplot_binary (const std::string& name,
 			     const std::vector<Number>* v=NULL,
-			     const std::vector<std::string>* solution_names=NULL);
+			     const std::vector<std::string>* solution_names=NULL) const;
 
   /**
    * Write the mesh in AVS's UCD format to  the file specified by \p name.
    * May be expanded in the future to handle data as well.
    */
-  void write_ucd (const std::string& name);  
+  void write_ucd (const std::string& name) const;  
   
   /**
    * Write the mesh in the GMV ASCII format to a file specified by \p name.
@@ -550,8 +550,8 @@ public:
    * write the partitioning information.
    */
   void write_gmv (const std::string& name,
-		  EquationSystems& es,
-		  const bool write_partitioning=true);
+		  const EquationSystems& es,
+		  const bool write_partitioning=true) const;
 
   /**
    * Write the mesh in the GMV ASCII format to a file specified by \p name.
@@ -563,14 +563,14 @@ public:
   void write_gmv (const std::string& name,
 		  const std::vector<Number>* v=NULL,
 		  const std::vector<std::string>* solution_names=NULL,
-		  const bool write_partitioning=true);
+		  const bool write_partitioning=true) const;
 
   /**
    * Writes a GMV file with discontinuous data
    */ 
   void write_discontinuous_gmv (const std::string& name, 
-				EquationSystems& es,
-				const bool write_partitioning);
+				const EquationSystems& es,
+				const bool write_partitioning) const;
   
   /**
    * Write the mesh in the GMV binary format to  a file specified by \p name.
@@ -580,8 +580,8 @@ public:
    * write the partitioning information.
    */
   void write_gmv_binary (const std::string& name,
-			 EquationSystems& es,
-			 const bool write_partitioning=true);
+			 const EquationSystems& es,
+			 const bool write_partitioning=true) const;
 
   /**
    * Write the mesh in the GMV binary format to  a file specified by \p name.
@@ -593,7 +593,7 @@ public:
   void write_gmv_binary (const std::string& name,
 			 const std::vector<Number>* v=NULL,
 			 const std::vector<std::string>* solution_names=NULL,
-			 const bool write_partitioning=true);
+			 const bool write_partitioning=true) const;
 
   /** 
    * Write mesh to file specified by \p name in Universal (unv) format.
@@ -704,7 +704,7 @@ public:
    * Fills the vector "on_boundary" with flags that tell whether each node
    * is on the domain boundary (true)) or not (false).
    */
-  void find_boundary_nodes(std::vector<bool>& on_boundary);
+  void find_boundary_nodes(std::vector<bool>& on_boundary) const;
   
   
 protected:
@@ -804,7 +804,7 @@ protected:
    * nodal data from \p es.
    */
   void write_tecplot (std::ostream& out,
-		      EquationSystems& es);
+		      const EquationSystems& es) const;
   
   /**
    * Actual Implementation of writing a Tecplot-formatted 
@@ -812,20 +812,20 @@ protected:
    */
   void write_tecplot (std::ostream& out,
 		      const std::vector<Number>* v=NULL,
-		      const std::vector<std::string>* solution_names=NULL);
+		      const std::vector<std::string>* solution_names=NULL) const;
 
   /**
    * Actual implementation of writing a mesh in AVS's UCD format.
    */
-  void write_ucd (std::ostream& out);
+  void write_ucd (std::ostream& out) const;
   
   /**
    * Write the mesh and solution from \p es in the GMV ASCII 
    * format to a stream.
    */
   void write_gmv (std::ostream& out,
-		  EquationSystems& es,
-		  const bool write_partitioning=false);
+		  const EquationSystems& es,
+		  const bool write_partitioning=false) const;
 
   /**
    * Actual implementation of writing a mesh in the GMV ASCII format.
@@ -833,7 +833,7 @@ protected:
   void write_gmv (std::ostream& out,
 		  const std::vector<Number>* v=NULL,
 		  const std::vector<std::string>* solution_names=NULL,
-		  const bool write_partitioning=false);
+		  const bool write_partitioning=false) const;
 
 
   /**
@@ -841,8 +841,8 @@ protected:
    * format to a stream.
    */
   void write_gmv_binary (std::ostream& out,
-			 EquationSystems& es,
-			 const bool write_partitioning=false);
+			 const EquationSystems& es,
+			 const bool write_partitioning=false) const;
   
   /**
    * Actual implementation of writing a mesh in the GMV binary format.
@@ -850,21 +850,20 @@ protected:
   void write_gmv_binary (std::ostream& out,
 			 const std::vector<Number>* v=NULL,
 			 const std::vector<std::string>* solution_names=NULL,
-			 const bool write_partitioning=false);
+			 const bool write_partitioning=false) const;
 
   /**
    * Returns a writeable reference to the number of subdomains.
    */
-  unsigned int& set_n_subdomains ()
-  { return _n_sbd; }
+  unsigned int& set_n_subdomains () { return _n_sbd; }
 
   /**
    * Reads input from \p in, skipping all the lines
    * that start with the character \p comment_start.
    */
   void skip_comment_lines (std::istream& in,
-			   const char comment_start);
-
+			   const char comment_start) const;
+  
   /**
    * The verices (spatial coordinates) of the mesh.
    */

@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.31 2004-01-03 15:37:43 benkirk Exp $
+// $Id: mesh.C,v 1.32 2004-03-18 15:10:32 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -202,8 +202,8 @@ void Mesh::write (const std::string& name)
 
 
 void Mesh::write (const std::string& name,
-		  std::vector<Number>& v,
-		  std::vector<std::string>& vn)
+		  const std::vector<Number>& v,
+		  const std::vector<std::string>& vn)
 {
   START_LOG("write()", "Mesh");
 

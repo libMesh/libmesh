@@ -1,4 +1,4 @@
-// $Id: mesh_gmv_support.C,v 1.28 2004-03-08 02:10:04 benkirk Exp $
+// $Id: mesh_gmv_support.C,v 1.29 2004-03-18 15:10:32 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -33,8 +33,8 @@
 
 
 void MeshBase::write_gmv (const std::string& name,
-			  EquationSystems& es,
-			  const bool write_partitioning)
+			  const EquationSystems& es,
+			  const bool write_partitioning) const
 {
   std::ofstream out(name.c_str());
 
@@ -44,8 +44,8 @@ void MeshBase::write_gmv (const std::string& name,
 
 
 void MeshBase::write_gmv (std::ostream& out,
-			  EquationSystems& es,
-			  const bool write_partitioning)
+			  const EquationSystems& es,
+			  const bool write_partitioning) const
 {
   std::vector<Number> soln;
   std::vector<std::string> names;
@@ -62,7 +62,7 @@ void MeshBase::write_gmv (std::ostream& out,
 void MeshBase::write_gmv (const std::string& name,
 			  const std::vector<Number>* v,
 			  const std::vector<std::string>* solution_names,
-			  const bool write_partitioning)
+			  const bool write_partitioning) const
 {
   std::ofstream out(name.c_str());
 
@@ -72,8 +72,8 @@ void MeshBase::write_gmv (const std::string& name,
 
 
 void MeshBase::write_discontinuous_gmv (const std::string& name,
-					EquationSystems& es,
-					const bool write_partitioning)
+					const EquationSystems& es,
+					const bool write_partitioning) const
 {
   std::vector<std::string> solution_names;
   std::vector<Number>      v;
@@ -330,7 +330,7 @@ void MeshBase::write_discontinuous_gmv (const std::string& name,
 void MeshBase::write_gmv(std::ostream& out,
 			 const std::vector<Number>*  v,
 			 const std::vector<std::string>* solution_names,
-			 const bool write_partitioning)
+			 const bool write_partitioning) const
 {
   assert (out);
 
@@ -626,8 +626,8 @@ void MeshBase::write_gmv(std::ostream& out,
 
 
 void MeshBase::write_gmv_binary (const std::string& name,
-				 EquationSystems& es,
-				 const bool write_partitioning)
+				 const EquationSystems& es,
+				 const bool write_partitioning) const
 {
   std::ofstream out(name.c_str());
 
@@ -637,8 +637,8 @@ void MeshBase::write_gmv_binary (const std::string& name,
 
 
 void MeshBase::write_gmv_binary (std::ostream& out,
-				 EquationSystems& es,
-				 const bool write_partitioning)
+				 const EquationSystems& es,
+				 const bool write_partitioning) const
 {
   std::vector<Number> soln;
   std::vector<std::string> names;
@@ -655,7 +655,7 @@ void MeshBase::write_gmv_binary (std::ostream& out,
 void MeshBase::write_gmv_binary (const std::string& name,
 				 const std::vector<Number>* v,
 				 const std::vector<std::string>* solution_names,
-				 const bool write_partitioning)
+				 const bool write_partitioning) const
 {
   std::ofstream out (name.c_str(), std::ios::out|std::ios::binary);
   
@@ -668,7 +668,7 @@ void MeshBase::write_gmv_binary (const std::string& name,
 void MeshBase::write_gmv_binary(std::ostream& out,
 				const std::vector<Number>* v,
 				const std::vector<std::string>* solution_names,
-				const bool write_partitioning)
+				const bool write_partitioning) const
 {
   assert (out);
 
