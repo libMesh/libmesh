@@ -1,4 +1,4 @@
-// $Id: laspack_matrix.h,v 1.3 2003-02-10 22:03:23 benkirk Exp $
+// $Id: laspack_matrix.h,v 1.4 2003-02-10 23:42:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk, John W. Peterson
@@ -81,12 +81,6 @@ class LaspackMatrix : public SparseMatrix
    * structure.
    */
   ~LaspackMatrix ();
-
-//   /**
-//    * @returns true if the matrix has been initialized,
-//    * false otherwise.
-//    */
-//   bool initialized() const { return (_QMat != NULL); };
 
   /**
    * Updates the matrix sparsity pattern. This will

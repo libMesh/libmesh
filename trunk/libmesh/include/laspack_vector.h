@@ -1,4 +1,4 @@
-// $Id: laspack_vector.h,v 1.3 2003-02-10 22:12:11 benkirk Exp $
+// $Id: laspack_vector.h,v 1.4 2003-02-10 23:42:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -76,19 +76,13 @@ class LaspackVector : public NumericVector
    */
   LaspackVector (const unsigned n,
 		 const unsigned int n_local);
-    
+  
   /**
    * Destructor, deallocates memory. Made virtual to allow
    * for derived classes to behave properly.
    */
   ~LaspackVector ();
 
-//   /**
-//    * @returns true if the vector has been initialized,
-//    * false otherwise.
-//    */
-//   bool initialized() const { return (_vec != NULL); };
-  
   /**
    * Call the assemble functions
    */
@@ -149,6 +143,11 @@ class LaspackVector : public NumericVector
    *  $U = V$: copy all components.
    */
   NumericVector & operator= (const NumericVector &V);
+  
+  /**
+   *  $U = V$: copy all components.
+   */
+  LaspackVector & operator= (const LaspackVector &V);
 
   /**
    *  $U = V$: copy all components.
@@ -336,7 +335,8 @@ class LaspackVector : public NumericVector
 // LaspackVector inline methods
 inline
 LaspackVector::LaspackVector ()
-{};
+{
+};
 
 
 

@@ -1,4 +1,4 @@
-// $Id: petsc_vector.C,v 1.7 2003-02-10 03:55:51 benkirk Exp $
+// $Id: petsc_vector.C,v 1.8 2003-02-10 23:42:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -238,6 +238,23 @@ PetscVector::operator = (const NumericVector& v_in)
   int ierr=0;
   
   const PetscVector& v = reinterpret_cast<const PetscVector&>(v_in);
+
+  assert (size() == v.size());
+
+  if (size() != 0)
+    {
+      ierr = VecCopy (v.vec, vec); CHKERRQ(ierr);
+    }
+  
+  return *this;
+};
+
+
+
+PetscVector&
+PetscVector::operator = (const PetscVector& v)
+{
+  int ierr=0;
 
   assert (size() == v.size());
 

@@ -1,4 +1,4 @@
-// $Id: numeric_vector.h,v 1.3 2003-02-10 22:03:24 benkirk Exp $
+// $Id: numeric_vector.h,v 1.4 2003-02-10 23:42:57 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -66,6 +66,8 @@ class NumericVector : public ReferenceCountedObject<NumericVector>
   NumericVector (const unsigned n,
 		 const unsigned int n_local);
     
+public:
+
   /**
    * Destructor, deallocates memory. Made virtual to allow
    * for derived classes to behave properly.
