@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.11 2003-02-12 05:41:29 jwpeterson Exp $
+// $Id: mesh_base.h,v 1.12 2003-02-13 00:16:48 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -43,7 +43,6 @@ class PetscMatrix;
 #include "sphere.h"
 #include "perf_log.h"
 #include "enum_order.h"
-#include "predicated_iterator.h"
 #include "elem_iterators.h"
 
 
@@ -60,7 +59,7 @@ class PetscMatrix;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.11 $
+ * \version $Revision: 1.12 $
  */
 
 

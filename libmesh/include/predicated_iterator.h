@@ -1,4 +1,4 @@
-// $Id: predicated_iterator.h,v 1.1 2003-02-12 05:41:29 jwpeterson Exp $
+// $Id: predicated_iterator.h,v 1.2 2003-02-13 00:16:48 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -41,7 +41,10 @@ template <class T>
 class PredicatedIterator : public std::iterator<std::forward_iterator_tag, T>
 {
   /**
-   * 
+   * The default constructor is declared private as a clue that
+   * one should not attempt to instantiate this base class, and
+   * derived classes should not attempt to create unitialized
+   * PredicatedIterators.
    */
 private:
   PredicatedIterator() {}
@@ -57,34 +60,42 @@ protected:
    * is protected to prevent accidental attempts at instantiating
    * this abstract base class.
    */
-  PredicatedIterator(T const &c, T const &e) : _current(c), _end(e) {}
+  PredicatedIterator(T const &c, T const &e) : _current(c), _end(e), _index(0) {}
 
 public:
 
   /**
-   * Copy constructor.
+   * Copy constructor. Do we need it ?
    */
-  PredicatedIterator(const PredicatedIterator& p) :
-    _current(p._current),
-    _end(p._end)
-  {
-    std::cout << "In PredicatedIterator(const PredicatedIterator& p)"
-	      << std::endl;
-  };
+  // PredicatedIterator(const PredicatedIterator& p) :
+  //     _current(p._current),
+  //     _end(p._end),
+  //     _index(p._index)
+  //   {
+  //     std::cout << "In PredicatedIterator(const PredicatedIterator& p)"
+  // 	      << std::endl;
+  //   };
 
   
   /**
    * We need a typedef which defines the type of values
    * that we're iterating over.
    */
-  typedef typename std::iterator_traits<T>::value_type value_type; // =Elem* for example?
+  typedef typename std::iterator_traits<T>::value_type value_type; 
 
   /**
    * The predicate.  Must be redefined in classes
    * derived from this class.
    */
   virtual bool predicate() const = 0;
-    
+
+  /**
+   * Used to simulate the index of a for loop.
+   * Call this if you need explicit access to
+   * the loop variable for any reason.
+   */
+  unsigned int index() const { return _index; }
+  
   /**
    * Prefix op++, i.e. ++i.
    */
@@ -93,6 +104,7 @@ public:
     if (_current != _end)
       {
 	++_current;
+	++_index;
 	advance();
       }
     
@@ -140,15 +152,7 @@ public:
   //const value_type* operator-> () const { return &(this->operator*()); } // Deal II
   
   
-  /**
-   * Assignment operator.
-   */
-  PredicatedIterator& operator= (const PredicatedIterator& p)
-  {
-    _current = p._current;
-    _end     = p._end;
-    return *this;
-  }
+  
   /**
    * The equivalency operator.
    */
@@ -168,6 +172,18 @@ public:
 protected:
 
   /**
+   * op=.  Protected since users should
+   * not try to say iterator b = begin().
+   */
+  PredicatedIterator& operator= (const PredicatedIterator& p)
+  {
+    _current = p._current;
+    _end     = p._end;
+    _index   = p._index;
+    return *this;
+  }
+  
+  /**
    * This function automatically advances _current using
    * prefix op++ to the next element which satisfies the
    * predicate.  It's not callable by the user, but maybe
@@ -181,6 +197,7 @@ protected:
 	  return true;
 	
 	++_current;
+	++_index;
       }
     
     return false;
@@ -196,6 +213,15 @@ protected:
    * we don't iterate past it while using op++.
    */
   T _end;
+
+private:
+  /**
+   * This private variable, which is inaccesible to
+   * derived classes, can be used to simulate the
+   * index of a for loop.  The member function index()
+   * simply returns its value.
+   */
+  unsigned int _index;
 };
 
 
