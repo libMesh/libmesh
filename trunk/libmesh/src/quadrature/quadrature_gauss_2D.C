@@ -1,4 +1,4 @@
-// $Id: quadrature_gauss_2D.C,v 1.14 2004-01-03 15:37:44 benkirk Exp $
+// $Id: quadrature_gauss_2D.C,v 1.15 2004-11-23 03:34:17 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -122,18 +122,18 @@ void QGauss::init_2D(const ElemType _type)
 	  case FIFTH:
 	    {
 	      // Exact for quintics
-	      // Taken from pg. 222 of "The finite element method," vol. 1
-	      // ed. 5 by Zienkiewicz & Taylor
+	      // Taken from "Quadrature on Simplices of Arbitrary
+	      // Dimension" by Walkington
 	      _points.resize(7);
 	      _weights.resize(7);
 		  
-	      const Real a1 = .0597158717;
-	      const Real b1 = .4701420641;
-	      const Real a2 = .7974269853;
-	      const Real b2 = .1012865073;
+	      const Real b1 = 2./7. + sqrt(15.)/21.;
+	      const Real a1 = 1. - 2.*b1;
+	      const Real b2 = 2./7. - sqrt(15.)/21.;
+	      const Real a2 = 1. - 2.*b2;
 		  
-	      _points[0](0) = .33333333333333333333333333333333;
-	      _points[0](1) = .33333333333333333333333333333333;
+	      _points[0](0) = 1./3.;
+	      _points[0](1) = 1./3.;
 
 	      _points[1](0) = a1;
 	      _points[1](1) = b1;
@@ -154,11 +154,11 @@ void QGauss::init_2D(const ElemType _type)
 	      _points[6](1) = b2;
 
 
-	      _weights[0] = .1125;
-	      _weights[1] = .06619707635;
+	      _weights[0] = 9./80.;
+	      _weights[1] = 31./480. + sqrt(15.)/2400.;
 	      _weights[2] = _weights[1];
 	      _weights[3] = _weights[1];
-	      _weights[4] = .06296959025;
+	      _weights[4] = 31./480. - sqrt(15.)/2400.;
 	      _weights[5] = _weights[4];
 	      _weights[6] = _weights[4];
 
@@ -167,6 +167,74 @@ void QGauss::init_2D(const ElemType _type)
 
 	  case SIXTH:
 	  case SEVENTH:
+	    {
+	      // Exact for seventh degree polynomials
+	      // Taken from http://www.rpi.edu/~gilade/fem6.ps by
+	      // Flaherty
+	      _points.resize(12);
+	      _weights.resize(12);
+	      const Real w1 = 0.050844906370207;
+	      const Real w2 = 0.116786275726379;
+	      const Real w3 = 0.082851075618374;
+	      const Real a1 = 0.873821971016996;
+	      const Real a2 = 0.063089014491502;
+	      const Real b1 = 0.501426509658179;
+	      const Real b2 = 0.249286745170910;
+	      const Real c1 = 0.636502499121399;
+	      const Real c2 = 0.310352451033785;
+	      const Real c3 = 0.053145049844816;
+
+	      _points[0](0) = a1;
+	      _points[0](1) = a2;
+
+	      _points[1](0) = a2;
+	      _points[1](1) = a1;
+
+	      _points[2](0) = a2;
+	      _points[2](1) = a2;
+
+	      _points[3](0) = b1;
+	      _points[3](1) = b2;
+
+	      _points[4](0) = b2;
+	      _points[4](1) = b1;
+
+	      _points[5](0) = b2;
+	      _points[5](1) = b2;
+
+	      _points[6](0) = c1;
+	      _points[6](1) = c2;
+
+	      _points[7](0) = c1;
+	      _points[7](1) = c3;
+
+	      _points[8](0) = c2;
+	      _points[8](1) = c1;
+
+	      _points[9](0) = c2;
+	      _points[9](1) = c3;
+
+	      _points[10](0) = c3;
+	      _points[10](1) = c1;
+
+	      _points[11](0) = c3;
+	      _points[11](1) = c2;
+
+	      _weights[0] = w1;
+	      _weights[1] = w1;
+	      _weights[2] = w1;
+	      _weights[3] = w2;
+	      _weights[4] = w2;
+	      _weights[5] = w2;
+	      _weights[6] = w3;
+	      _weights[7] = w3;
+	      _weights[8] = w3;
+	      _weights[9] = w3;
+	      _weights[10] = w3;
+	      _weights[11] = w3;
+
+	      return;
+	    }
 	  case EIGHTH:
 	  case NINTH:     
 	  case TENTH:        
