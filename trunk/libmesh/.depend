@@ -2478,6 +2478,39 @@ src/mesh/mesh_refinement.$(obj-suffix):\
     include/reference_counter.h\
     include/sphere.h\
     include/surface.h
+src/mesh/mesh_smoother.$(obj-suffix):\
+    src/mesh/mesh_smoother.C
+src/mesh/mesh_smoother_laplace.$(obj-suffix):\
+    src/mesh/mesh_smoother_laplace.C\
+    include/auto_ptr.h\
+    include/boundary_info.h\
+    include/boundary_mesh.h\
+    include/dof_object.h\
+    include/elem.h\
+    include/elem_iterators.h\
+    include/enum_elem_quality.h\
+    include/enum_elem_type.h\
+    include/enum_order.h\
+    include/enum_solver_package.h\
+    include/libmesh.h\
+    include/libmesh_base.h\
+    include/mesh.h\
+    include/mesh_base.h\
+    include/mesh_common.h\
+    include/mesh_communication.h\
+    include/mesh_config.h\
+    include/mesh_refinement.h\
+    include/mesh_smoother.h\
+    include/mesh_smoother_laplace.h\
+    include/node.h\
+    include/node_iterators.h\
+    include/perf_log.h\
+    include/point.h\
+    include/predicated_iterator.h\
+    include/reference_counted_object.h\
+    include/reference_counter.h\
+    include/sphere.h\
+    include/surface.h
 src/mesh/mesh_tecplot_support.$(obj-suffix):\
     src/mesh/mesh_tecplot_support.C\
     include/auto_ptr.h\
