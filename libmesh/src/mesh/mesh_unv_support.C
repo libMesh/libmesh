@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.C,v 1.15 2003-06-12 15:24:23 ddreyer Exp $
+// $Id: mesh_unv_support.C,v 1.16 2003-07-10 07:38:06 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -119,7 +119,7 @@ UnvMeshInterface::~UnvMeshInterface()
 
 
 void UnvMeshInterface::read (std::istream& in_stream,
-			     bool verbose)
+			     const bool verbose)
 {
   if ( !in_stream.good() )
     {

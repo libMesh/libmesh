@@ -1,4 +1,4 @@
-// $Id: mesh_data.C,v 1.5 2003-07-09 10:10:16 spetersen Exp $
+// $Id: mesh_data.C,v 1.6 2003-07-10 07:38:06 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -20,6 +20,7 @@
 
 
 // C++ includes
+#include <map>
 
 // Local includes
 #include "mesh_data.h"
@@ -33,8 +34,6 @@
 MeshData::MeshData(const MeshBase& m) :
   _mesh               (m),
   _data_descriptor    (""),
-  _n_val_per_node     (0),
-  _n_val_per_elem     (0),
   _node_id_map_closed (false),
   _node_data_closed   (false),
   _elem_id_map_closed (false),
@@ -315,4 +314,129 @@ unsigned int MeshData::elem_to_foreign_id (const Elem* e) const
   else
     return (*pos).second;
 }
+
+
+
+
+
+
+
+void MeshData::insert_node_data (std::map<const Node*,
+				 std::vector<Number> >& nd,
+				 const bool close_elem_data)
+{
+  assert (this->_active);
+  assert (this->_node_id_map_closed);
+
+  if (this->_node_data_closed)
+    {
+      std::cerr << "ERROR: Nodal data already closed!  Use clear() first!"
+		<< std::endl;
+      error();
+    }
+
+  assert (this->_node_data.empty());
+
+#ifdef DEBUG
+  std::map<const Node*, 
+           std::vector<Number> >::const_iterator nd_pos = nd.begin();
+  std::map<const Node*, 
+           std::vector<Number> >::const_iterator nd_end = nd.end();
+
+  /*
+   * Compare entity-by-entity that the
+   * sizes of the std::vector's are identical.
+   */
+  const unsigned int reference_length = (*nd_pos).second.size();
+  ++nd_pos;
+
+  for (; nd_pos != nd_end; ++nd_pos)
+  {
+      if ( (*nd_pos).second.size() != reference_length) 
+        {
+	  std::cerr << "ERROR: Size mismatch."
+		    << std::endl;
+	  error();
+	}
+  }
+#endif
+
+  // copy over
+  _node_data = nd;
+
+  // we may freely trash the nd
+  nd.clear();
+
+  // close node data
+  this->_node_data_closed = true;
+
+  // if user wants to, then close elem data, too
+  if (close_elem_data)
+    {
+      assert((this->_elem_id_map_closed));
+      this->_elem_data_closed = true;
+    }
+}
+
+
+
+
+
+void MeshData::insert_elem_data (std::map<const Elem*,
+				 std::vector<Number> >& ed,
+				 const bool close_node_data)
+{
+  assert (this->_active);
+  assert (this->_elem_id_map_closed);
+
+  if (this->_elem_data_closed)
+    {
+      std::cerr << "ERROR: Element data already closed!  Use clear() first!"
+		<< std::endl;
+      error();
+    }
+
+  assert (this->_elem_data.empty());
+
+#ifdef DEBUG
+  std::map<const Elem*, 
+           std::vector<Number> >::const_iterator ed_pos = ed.begin();
+  std::map<const Elem*, 
+           std::vector<Number> >::const_iterator ed_end = ed.end();
+
+  /*
+   * Compare entity-by-entity that the
+   * sizes of the std::vector's are identical.
+   */
+  const unsigned int reference_length = (*ed_pos).second.size();
+  ++ed_pos;
+
+  for (; ed_pos != ed_end; ++ed_pos)
+  {
+      if ( (*ed_pos).second.size() != reference_length) 
+        {
+	  std::cerr << "ERROR: Size mismatch."
+		    << std::endl;
+	  error();
+	}
+  }
+#endif
+
+  // copy over
+  _elem_data = ed;
+
+  // we may freely trash the ed
+  ed.clear();
+
+  // close elem data
+  this->_elem_data_closed = true;
+
+  // if user wants to, then close node data, too
+  if (close_node_data)
+    {
+      assert((this->_node_id_map_closed));
+      this->_node_data_closed = true;
+    }
+}
+
 
