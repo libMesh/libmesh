@@ -1,4 +1,4 @@
-/* $Id: ex12.C,v 1.4 2003-11-10 22:14:35 benkirk Exp $ */
+/* $Id: ex12.C,v 1.5 2003-11-10 23:06:04 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -17,7 +17,7 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
- // Example 12 -- The \p MeshData class
+ // <h1>Example 12 -- The <code>MeshData</code> class</h1>
  //
  // The previous examples covered the certainly involved
  // aspects of simulating multiple equation systems, and prior 
@@ -25,31 +25,39 @@
  //
  // This example now reduces brain effort significantly,
  // and presents some supplements concerning data I/O,
- // especially how to handle the \p MeshData object.
- // The \p MeshData class may be used for handling input
+ // especially how to handle the <code> MeshData </code> object.
+ // The <code> MeshData </code> class may be used for handling input
  // data for a simulation, like actual material properties, 
- // (not indicators, like in the \p BoundaryInfo class),
+ // (not indicators, like in the <code> BoundaryInfo </code> class),
  // or mode shapes that serve as input for acoustic radiation
- // simulations.  The use of the \p MeshData during simulation
+ // simulations.  The use of the <code> MeshData </code> during simulation
  // is straightforward:  the 
- //
- // - \p Number               \p MeshData::operator()(const Node*, int),
+ // <ul>
+ // <li>
+ //  <code>Number MeshData::operator()(const Node*, int)</code>,
  //   get the i-th floating-point value associated with the node
- // - \p bool                 \p MeshData::has_data(const Node*),
+ // </li>
+ // <li>
+ // <code> bool MeshData::has_data(const Node*)</code>,
  //   verify whether a certain node has data associated
- // - \p std::vector<Number>& \p MeshData::get_data (const Node* node)
+ // </li>
+ // <li>
+ // <code>std::vector<Number>& MeshData::get_data (const Node* node)</code>
  //   to get read-access to the data associated with this node (better
- //   make sure first that this node @e has data, see \p has_data() )
- // - iterator for nodal data \p MeshData::const_node_data_iterator
+ //   make sure first that this node <i>has</i> data, see <code> has_data() )
+ // </li>
+ // <li>
+ // iterator for nodal data <code>MeshData::const_node_data_iterator</code>
  //   to directly iterate over the set of nodes that hold data, 
- //   instead of asking through \p has_data() each time again.
- //
- // (and corresponding methods for const Elem*) provide access to
+ //   instead of asking through <code>has_data()</code> each time again.
+ // </li>
+ // </ul>
+ // (and corresponding methods for <code> const Elem*</code>) provide access to
  // the floating-point data associated with nodes/elements.
- // This example does @e not show how to use these aforementioned
+ // This example does <i>not</i> show how to use these aforementioned
  // methods, this is straightforward.  Simply check if the current 
- // Elem* has a node with data. If so, add this contribution to the 
- // RHS, or whatever. Or ask the \p MeshData for each Elem* for its 
+ // <code>Elem*</code> has a node with data. If so, add this contribution to the 
+ // RHS, or whatever. Or ask the <code> MeshData </code> for each <code>Elem*</code> for its 
  // material properties...
  //
  // Here, only the actual file I/O necessary to handle such 
@@ -60,15 +68,15 @@
 
 // Functions to initialize the library
 // and provide some further features (e.g. 
-// our own \p pi)
+// our own pi)
 #include "libmesh.h"
 
 // Basic include files needed for the mesh and 
-// \p MeshData functionality.
+// <code> MeshData </code> functionality.
 #include "mesh.h"
 
 // Function prototype for creating artificial nodal data
-// that can be inserted into a \p MeshData object.
+// that can be inserted into a <code>MeshData</code> object.
 void create_artificial_data (const Mesh& mesh,
 			     std::map<const Node*, std::vector<Number> >& art_data);
 
@@ -82,10 +90,10 @@ int main (int argc, char** argv)
   {    
     // Check for proper usage. The program is designed to be run
     //  as follows:
-    //
-    // ./ex12 -d 3 in_mesh.unv
-    //
-    // where in_mesh.unv should better be a Universal file.
+    // <pre>
+    //  $ ./ex12 -d 3 in_mesh.unv
+    // </pre>
+    // where in_mesh.unv should be a Universal file.
     if (argc < 4)
       {
 	std::cerr << "Usage: " << argv[0] << " -d <dim> in_mesh.unv"
@@ -104,68 +112,77 @@ int main (int argc, char** argv)
     // only with a Universal file
     if (mesh_file.rfind(".unv") >= mesh_file.size())
       {
-
 	std::cerr << "ERROR:  This example works only properly with a Universal mesh file!"
 		  << std::endl;
 	
 	error();
       }
   
-     // Some notes on \p MeshData:
-     //
-     // - The \p MeshData is @e not a mesh!  Consult the \p Mesh,
-     //   \p MeshBase, and \p BoundaryMesh classes for details on
-     //   handling meshes!
-     //
-     // - The \p MeshData is an object handling arbitrary floating-point 
-     //   data associated with mesh entities (nodes, elements), currently
-     //   most features only available for nodal data.  However,
-     //   extending to element-data (does @e anybody need this?)
-     //   is straightforward.
-     //
-     // - Currently std::vector<Number> is the data (associated
-     //   with nodes/elements) that can be handled by \p MeshData,
-     //
-     // - In order to provide @e full functionality, the \p MeshData
-     //   @e has to be activated prior to reading in a mesh.  However,
-     //   there is a so-called compatibility mode available when you 
-     //   (intentionally) forgot to "turn on" the \p MeshData.
-     //
-     // - It is possible to provide user-defined nodal data that
-     //   may subsequently be used or written to file.
-     //
-     // - Translate the nodal-/element-associated data to formats
-     //   suitable for visual inspection, e.g. GMV files.
-     //   
-     // - Two I/O file formats are currently supported: the Universal 
-     //   file format with dataset 2414, and an extension of 
-     //   the libMesh-own xda/xdr format, named xtr, xta.
-     //   Some details on this:
-     //
-     //   - The xtr/xta format is simply an extension of the
-     //     xdr/xda format to read/write also nodal/element-associated
-     //     floating-point data.  The xtr interface of the \p MeshData
-     //     creates stand-alone files that may be binary or ASCII.
-     //     You cannot append files created by the \p MeshData I/O methods
-     //     to a mesh file (xdr/xda).
-     //     The xtr files may be seen as a "backdrop", especially when
-     //     binary files are preferred.  Note that unv files are @e always
-     //     ASCII and may become pretty big!
-     //
-     //   - The unv format is an extremely versatile text-based file format
-     //     for arbitrary data.  Its functionality is @e large, and \p libMesh
-     //     supports only a small share: namely the I/O for nodes, elements and
-     //     arbitrary node-/element-associated data, stored in the 
-     //     so-called datasets "2411", "2412", and "2414", respectively.
-     //     Here, only the last dataset is covered.  The two first datasets are
-     //     implemented in the Universal support for I/O of meshes.  A single
-     //     unv file may hold @e multiple datasets of type "2414".  To
-     //     distinguish data, each dataset has a header.  The \p libMesh pendant
-     //     to this header is the \p MeshDataUnvHeader class.  When you
-     //     read/write unv files using the \p MeshData, you @always
-     //     automatically also read/write such headers.
-     //
-     // Enough babble for now.  Examples. 
+    // Some notes on <code>MeshData</code>:
+    // <ul>
+    //  <li>
+    // The <code>MeshData</code> is <i>not</i> a mesh!  Consult the <code>Mesh</code>,
+    //   <code>MeshBase</code>, and <code>BoundaryMesh</code> classes for details on
+    //   handling meshes!
+    // </li>
+    //  <li>
+    // The <code>MeshData</code> is an object handling arbitrary floating-point 
+    //   data associated with mesh entities (nodes, elements), currently
+    //   most features only available for nodal data.  However,
+    //   extending to element-data (does <i>anybody</i> need this?)
+    //   is straightforward.
+    // </li>
+    // <li>
+    // Currently std::vector<Number> is the data (associated
+    //   with nodes/elements) that can be handled by <code>MeshData</code>,
+    // </li>
+    // <li>
+    // In order to provide <i>full</i> functionality, the <code>MeshData</code>
+    //   <i>has</i> to be activated prior to reading in a mesh.  However,
+    //   there is a so-called compatibility mode available when you 
+    //   (intentionally) forgot to "turn on" the <code>MeshData</code>.
+    // </li>
+    // <li>
+    // It is possible to provide user-defined nodal data that
+    //   may subsequently be used or written to file.
+    // </li>
+    // <li>
+    // Translate the nodal-/element-associated data to formats
+    //   suitable for visual inspection, e.g. GMV files.
+    // </li>
+    // <li>
+    // Two I/O file formats are currently supported: the Universal 
+    //   file format with dataset 2414, and an extension of 
+    //   the libMesh-own xda/xdr format, named xtr, xta.
+    //   Some details on this:
+    // </li>
+    // <li>
+    //    The xtr/xta format is simply an extension of the
+    //     xdr/xda format to read/write also nodal/element-associated
+    //     floating-point data.  The xtr interface of the <code>MeshData</code>
+    //     creates stand-alone files that may be binary or ASCII.
+    //     You cannot append files created by the <code>MeshData</code> I/O methods
+    //     to a mesh file (xdr/xda).
+    //     The xtr files may be seen as a "backdrop", especially when
+    //     binary files are preferred.  Note that unv files are <i>always</i>
+    //     ASCII and may become pretty big!
+    //</li>
+    // <li>
+    //    The unv format is an extremely versatile text-based file format
+    //     for arbitrary data.  Its functionality is <i>large</i>, and <code>libMesh</code>
+    //     supports only a small share: namely the I/O for nodes, elements and
+    //     arbitrary node-/element-associated data, stored in the 
+    //     so-called datasets "2411", "2412", and "2414", respectively.
+    //     Here, only the last dataset is covered.  The two first datasets are
+    //     implemented in the Universal support for I/O of meshes.  A single
+    //     unv file may hold <i>multiple</i> datasets of type "2414".  To
+    //     distinguish data, each dataset has a header.  The <code>libMesh</code> pendant
+    //     to this header is the <code>MeshDataUnvHeader</code> class.  When you
+    //     read/write unv files using the <code>MeshData</code>, you <i>always</i>
+    //     automatically also read/write such headers.
+    // </li>
+    // </ul>
+    // Enough babble for now.  Examples. 
     {
       // Create a mesh with the requested dimension.
       // Below we require a 3-dim mesh, therefore assert
@@ -173,15 +190,15 @@ int main (int argc, char** argv)
       assert (dim == 3);
       Mesh mesh(dim);
 
-      // Activate the \p MeshData of the mesh, so that
+      // Activate the <code>MeshData</code> of the mesh, so that
       // we can remember the node and element ids used
-      // in the file.  When we do not activate the \p MeshData,
+      // in the file.  When we do not activate the <code>MeshData</code>,
       // then there is no chance to import node- or element-
       // associated data.
       mesh.data.activate();
 
       // Now we can safely read the input mesh.  Note that
-      // this should better be a .unv or .xdr/xda file, otherwise
+      // this should be a .unv or .xdr/xda file, otherwise
       // we cannot load/save associated data.
       mesh.read (mesh_file);
     
@@ -196,20 +213,20 @@ int main (int argc, char** argv)
       mesh.data.print_info();
     
       // Create some artificial node-associated data and store
-      // it in the mesh's \p MeshData.  Use a \p std::map for this. 
-      // Let the function create_artificial_data do the work.
+      // it in the mesh's <code>MeshData</code>.  Use a <code>std::map</code> for this. 
+      // Let the function <code>create_artificial_data()</code> do the work.
       {
 	std::map<const Node*, std::vector<Number> > artificial_data;
 	
 	create_artificial_data (mesh, artificial_data);
 	
 	// Before we let the map go out of scope, insert it into
-	// the \p MeshData.  Note that by default the element-associated
-	// data containers are closed, so that the \p MeshData is
+	// the <code>MeshData</code>.  Note that by default the element-associated
+	// data containers are closed, so that the <code>MeshData</code> is
 	// ready for use.
 	mesh.data.insert_node_data(artificial_data);
 
-	// Let \p artificial_data go out of scope
+	// Let <code>artificial_data()</code> go out of scope
       }
       
        // Print information about the data to the screen.
@@ -241,8 +258,8 @@ int main (int argc, char** argv)
       // which is not covered here.
       my_header.dataset_label = 3;
 
-      // Specify some text that helps the @e user 
-      // identify the data.  This text is @e not used for
+      // Specify some text that helps the <i>user</i> 
+      // identify the data.  This text is <i>not</i> used for
       // finding a specific dataset.  Leave default for
       // the remaining 2 lines.
       my_header.id_lines_1_to_5[0] = "Artificial data";
@@ -253,7 +270,7 @@ int main (int argc, char** argv)
       // can be stored in the header.
       my_header.record_12[0] = libMesh::pi;
       
-      // Now attach this header to the \p MeshData, and write
+      // Now attach this header to the <code>MeshData</code>, and write
       // the same file again, but with the personalized header.
       mesh.data.set_unv_header(&my_header);
 
@@ -279,7 +296,7 @@ int main (int argc, char** argv)
 		<< "----------------------------" << std::endl;
       mesh.data.print_info();
 
-      // Now the \p MeshData is open again to read data from
+      // Now the <code>MeshData</code> is open again to read data from
       // file.  Read the file that we created first.
       mesh.data.read(first_out_data);
       
@@ -298,15 +315,15 @@ int main (int argc, char** argv)
 	      << "----------------------------------------------" << std::endl;
 
     // Create a new mesh, read it again -- but this time
-    // with de-activated \p MeshData.  Then we are
+    // with de-activated <code>MeshData</code>.  Then we are
     // able to use the compatibility mode not only for
-    // handling \p MeshData dat, but also to @e write 
+    // handling <code>MeshData</code> dat, but also to <i>write</i> 
     // a mesh in unv format.
     // The libMesh-internal node and element ids are used.
     {
       Mesh mesh(dim);
 
-      // Read the input mesh, but with deactivated \p MeshData.
+      // Read the input mesh, but with deactivated <code>MeshData</code>.
       mesh.read (mesh_file);
     
       // Print information about the mesh and the data
@@ -317,9 +334,9 @@ int main (int argc, char** argv)
       mesh.print_info();
       mesh.data.print_info();
  
-      // Write the @e mesh (not the MeshData!) as .unv file.
-      // In general, the \p MeshBase interface for .unv I/O
-      // needs an active \p MeshData.  However, use compatibility
+      // Write the <i>mesh</i> (not the MeshData!) as .unv file.
+      // In general, the <code>MeshBase</code> interface for .unv I/O
+      // needs an active <code>MeshData</code>.  However, use compatibility
       // mode to at least write a .unv file, but with the 
       // ids from libMesh.
       const std::string out_mesh = "mesh_with_libmesh_ids.unv";
@@ -341,8 +358,8 @@ int main (int argc, char** argv)
       // Note that even with (only) compatibility mode MeshData
       // data can be written.  But again, the ids from libMesh
       // are used.  Consult the warning messages issued in
-      // DEBUG mode.  And the user @e has to specify that the
-      // \p MeshData should change to compatibility mode.
+      // DEBUG mode.  And the user <i>has</i> to specify that the
+      // <code>MeshData</code> should change to compatibility mode.
       mesh.data.enable_compatibility_mode();
 
       // Now that compatibility mode is used, data can be written.
@@ -359,8 +376,8 @@ int main (int argc, char** argv)
 #ifdef HAVE_ZLIB_H
 
       // As may already seen, UNV files are text-based, so the may
-      // become really big.  When \p ./configure found \p zlib.h,
-      // then we may also @e read or @e write \p .unv files in gzip'ed 
+      // become really big.  When <code>./configure</code> found <code>zlib.h</code>,
+      // then we may also <i>read</i> or <i>write</i> <code>.unv</code> files in gzip'ed 
       // format! -- Pretty cool, and also pretty fast, due to zlib.h.
       //
       // Note that this works also for mesh files, not only for 
@@ -383,20 +400,20 @@ int main (int argc, char** argv)
       
 #endif
 
-      // And now a last gimmick: The \p MeshData::translate()
+      // And now a last gimmick: The <code>MeshData::translate()</code>
       // conveniently converts the nodal- or element-associated
       // data (currently only nodal) to vectors that may be used 
       // for writing a mesh with "solution" vectors, where the solution 
-      // vector contains the data from the \p MeshData.  Particularly
-      // useful for @e inspecting the data contained in \p MeshData.
+      // vector contains the data from the <code>MeshData</code>.  Particularly
+      // useful for <i>inspecting</i> the data contained in <code> MeshData</code>.
       //
       // And even better: the user can choose the mesh for which
-      // to export the data.  E.g. not only use the \p mesh
-      // itself, but alternatively use the \p BoundaryMesh 
-      // (any mesh that uses the @e same nodes, i.e. the \p Node* 
+      // to export the data.  E.g. not only use the <code> mesh</code>
+      // itself, but alternatively use the <code> BoundaryMesh </code>
+      // (any mesh that uses the <i>same nodes</i>, i.e. the <code> Node*</code> 
       // have to be the same.  Only exception that will not work:
-      // A mesh created using Mesh::create_submesh()
-      // actually will @e not work with \p MeshData::translate() ).
+      // A mesh created using <code> Mesh::create_submesh() </code>
+      // actually will <i>not</i> work with <code> MeshData::translate() </code>).
       //
       // All in all not bad, hm?
       {
@@ -405,8 +422,8 @@ int main (int argc, char** argv)
 	std::vector<Number> translated_data;
 	std::vector<std::string> data_names;
 	
-	// Use the \p mesh itself.  Alternatively, use the 
-	// \p BoundaryMesh of \p mesh.
+	// Use the <code> mesh</code> itself.  Alternatively, use the 
+	// <code> BoundaryMesh</code> of <code> mesh</code>.
 	mesh.data.translate (mesh,
 			     translated_data,
 			     data_names);
@@ -436,7 +453,7 @@ int main (int argc, char** argv)
   return libMesh::close();
 }
 
-// This function creates the data to populate the \p MeshData object
+// This function creates the data to populate the <code> MeshData</code> object
 void create_artificial_data (const Mesh& mesh,
 			     std::map<const Node*, std::vector<Number> >& art_data)
 {
@@ -457,7 +474,7 @@ void create_artificial_data (const Mesh& mesh,
 
   for (; node_it != node_end; ++node_it)
     {
-      // All the vectors in \p artificial_data @e have to have the
+      // All the vectors in <code> artificial</code>_data <i>have</i> to have the
       // same size.  Here we use only two entries per node,
       // but theoretically arbitrary size is possible.
       std::vector<Number> node_data;

@@ -21,10 +21,10 @@ print "<div class = \"comment\">\n";
 
 do {
     # substitute special characters
-    s/&/&amp;/g;
-    s/</&lt;/g;
-    s/>/&gt;/g;
-    s/\t/        /g;
+    # s/&/&amp;/g;
+#     s/</&lt;/g;
+#     s/>/&gt;/g;
+#     s/\t/        /g;
 
     if (($state == $program_mode) && m!^\s*//!)
     {     
@@ -50,6 +50,12 @@ do {
 
 	# Also start a <pre> block
 	print "<pre>\n";
+
+	# substitute special characters
+	s/&/&amp;/g;
+	s/</&lt;/g;
+	s/>/&gt;/g;
+	s/\t/        /g;
     }
     
     if ($state == $comment_mode) 
