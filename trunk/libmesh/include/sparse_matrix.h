@@ -1,4 +1,4 @@
-// $Id: sparse_matrix.h,v 1.14 2003-09-25 21:46:55 benkirk Exp $
+// $Id: sparse_matrix.h,v 1.15 2003-10-01 17:48:25 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -330,11 +330,11 @@ template <typename T>
 inline
 void SparseMatrix<T>::print() const
 {
-  assert (initialized());
+  assert (this->initialized());
 
-  for (unsigned int i=0; i<m(); i++)
+  for (unsigned int i=0; i<this->m(); i++)
     {
-      for (unsigned int j=0; j<n(); j++)
+      for (unsigned int j=0; j<this->n(); j++)
 	std::cout << std::setw(8) << (*this)(i,j) << " ";
       std::cout << std::endl;
     }
@@ -350,17 +350,17 @@ void SparseMatrix<Complex>::print() const
   // std::complex<>::operator<<() is defined, but use this form
 
   std::cout << "Real part:" << std::endl;
-  for (unsigned int i=0; i<m(); i++)
+  for (unsigned int i=0; i<this->m(); i++)
     {
-      for (unsigned int j=0; j<n(); j++)
+      for (unsigned int j=0; j<this->n(); j++)
 	std::cout << std::setw(8) << (*this)(i,j).real() << " ";
       std::cout << std::endl;
     }
 
   std::cout << std::endl << "Imaginary part:" << std::endl;
-  for (unsigned int i=0; i<m(); i++)
+  for (unsigned int i=0; i<this->m(); i++)
     {
-      for (unsigned int j=0; j<n(); j++)
+      for (unsigned int j=0; j<this->n(); j++)
 	std::cout << std::setw(8) << (*this)(i,j).imag() << " ";
       std::cout << std::endl;
     }

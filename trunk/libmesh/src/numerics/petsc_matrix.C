@@ -1,4 +1,4 @@
-// $Id: petsc_matrix.C,v 1.18 2003-09-06 02:24:00 ddreyer Exp $
+// $Id: petsc_matrix.C,v 1.19 2003-10-01 17:48:26 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -53,18 +53,18 @@ void PetscMatrix<T>::init (const unsigned int m,
   }
 
   
-  int ierr=0;
-  int m_global=static_cast<int>(m);
-  int n_global=static_cast<int>(n);
-  int m_local=static_cast<int>(m_l);
-  int n_local=static_cast<int>(n_l);
-  int n_nz=static_cast<int>(nnz);
-  int n_oz=static_cast<int>(noz);
+  int ierr     = 0;
+  int m_global = static_cast<int>(m);
+  int n_global = static_cast<int>(n);
+  int m_local  = static_cast<int>(m_l);
+  int n_local  = static_cast<int>(n_l);
+  int n_nz     = static_cast<int>(nnz);
+  int n_oz     = static_cast<int>(noz);
   
   // create a sequential matrix on one processor
   if ((m_l == m) && (n_l == n))
     {
-      // Create matrix.  Revisit later to do pReallocation and make more efficient
+      // Create matrix.  Revisit later to do preallocation and make more efficient
       ierr = MatCreateSeqAIJ (PETSC_COMM_WORLD, n_global, n_global,
 			      n_nz, PETSC_NULL, &mat);                 CHKERRQ(ierr);
   
@@ -79,7 +79,7 @@ void PetscMatrix<T>::init (const unsigned int m,
       ierr = MatSetFromOptions (mat);                                  CHKERRQ(ierr);
     }
 
-  zero ();
+  this->zero ();
 }
 
 
@@ -119,11 +119,11 @@ void PetscMatrix<T>::init ()
   if (m==0)
     return;
   
-  int ierr=0;
-  int m_global=static_cast<int>(m);
-  int n_global=static_cast<int>(n);
-  int m_local=static_cast<int>(m_l);
-  int n_local=static_cast<int>(n_l);
+  int ierr     = 0;
+  int m_global = static_cast<int>(m);
+  int n_global = static_cast<int>(n);
+  int m_local  = static_cast<int>(m_l);
+  int n_local  = static_cast<int>(n_l);
 
 
   // create a sequential matrix on one processor
@@ -146,7 +146,7 @@ void PetscMatrix<T>::init ()
       ierr = MatSetFromOptions (mat);                                  CHKERRQ(ierr);
     }
 
-  zero();
+  this->zero();
 }
 
 
@@ -187,7 +187,7 @@ Real PetscMatrix<T>::l1_norm () const
   double petsc_value;
   Real value;
   
-  assert (closed());
+  assert (this->closed());
 
   ierr = MatNorm(mat, NORM_1, &petsc_value); CHKERRQ(ierr);
 
@@ -207,7 +207,7 @@ Real PetscMatrix<T>::linfty_norm () const
   double petsc_value;
   Real value;
   
-  assert (closed());
+  assert (this->closed());
 
   ierr = MatNorm(mat, NORM_INFINITY, &petsc_value); CHKERRQ(ierr);
 
@@ -222,7 +222,7 @@ template <typename T>
 void PetscMatrix<T>::print_matlab (const std::string name) const
 {
   assert (this->initialized());
-  assert (closed());
+  assert (this->closed());
   
   int ierr=0; 
   PetscViewer petsc_viewer;
