@@ -1,4 +1,4 @@
-// $Id: equation_systems_io.C,v 1.3 2004-08-05 15:58:44 jwpeterson Exp $
+// $Id: equation_systems_io.C,v 1.4 2004-09-27 13:41:48 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -515,7 +515,7 @@ void EquationSystems::write(const std::string& name,
 	   *
 	   * Let System::write() do the job
 	   */
-	  pos->second->write (io);
+	  pos->second->write (io, write_additional_data);
 
 	  ++pos;
 	}
