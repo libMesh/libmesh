@@ -1,4 +1,4 @@
-// $Id: ex6.C,v 1.26 2003-06-03 05:33:35 benkirk Exp $
+// $Id: ex6.C,v 1.27 2003-06-04 14:59:24 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -79,7 +79,7 @@
  * between the \p FE and the \p InfFE classes in libMesh.
  * The matrices are assembled according to the wave equation.
  * However, for practical applications a time integration
- * scheme (as introduced in a subsequent example) should be
+ * scheme (as introduced in subsequent examples) should be
  * used.
  */
 
@@ -103,13 +103,6 @@ int main (int argc, char** argv)
    */
   libMesh::init (argc, argv);
 
-
-  /**
-   * This short nice macro indicates the user
-   * that the following code may be neither
-   *  stable nor correct.
-   */
-  untested();
 
   /**
    * This example requires Infinite Elements
@@ -166,7 +159,7 @@ int main (int argc, char** argv)
 		     -1., 1.,
 		     -1., 1.,
 		     -1., 1.,
-		     HEX8); //HEX20); //HEX27);
+		     HEX8);
 
     /**
      * Print information about the mesh to the screen.
@@ -203,7 +196,7 @@ int main (int argc, char** argv)
 
     /**
      * After building infinite elements, we have to let 
-     * the elements find their neighbors.
+     * the elements find their neighbors again.
      */
     mesh.find_neighbors();
 
@@ -325,8 +318,7 @@ void assemble_wave(EquationSystems& es,
   /**
    * A reference to the \p DofMap object for this system.  The \p DofMap
    * object handles the index translation from node and element numbers
-   * to degree of freedom numbers.  We will talk more about the \p DofMap
-   * in future examples.
+   * to degree of freedom numbers.
    */
   const DofMap& dof_map = es("Wave").get_dof_map();
 
@@ -336,8 +328,7 @@ void assemble_wave(EquationSystems& es,
   const unsigned int dim = mesh.mesh_dimension();
 
   /**
-   * Copy the speed of sound
-   * to a local variable.
+   * Copy the speed of sound to a local variable.
    */
   const Real speed = es.parameter("speed");
 
@@ -350,8 +341,7 @@ void assemble_wave(EquationSystems& es,
   /**
    * Build a Finite Element object of the specified type.  Since the
    * \p FEBase::build() member dynamically creates memory we will
-   * store the object as an \p AutoPtr<FEBase>.  This can be thought
-   * of as a pointer that will clean up after itself.
+   * store the object as an \p AutoPtr<FEBase>.  Check ex5 for details.
    */
   AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
 
@@ -359,13 +349,13 @@ void assemble_wave(EquationSystems& es,
    * Do the same for an infinite element.
    */
   AutoPtr<FEBase> inf_fe (FEBase::build_InfFE(dim, fe_type));
-  
 
 
   /**
    * A 2nd order Gauss quadrature rule for numerical integration.
    */
   QGauss qrule (dim, SECOND);
+
 
   /**
    * Tell the finite element object to use our quadrature rule.
@@ -377,7 +367,7 @@ void assemble_wave(EquationSystems& es,
    * Due to its internal structure, the infinite element handles 
    * quadrature rules differently.  It takes the quadrature
    * rule which has been initialized for the FE object, but
-   * creates suitable quadrature rules by itself.  The user
+   * creates suitable quadrature rules by @e itself.  The user
    * need not worry about this.
    */
   inf_fe->attach_quadrature_rule (&qrule);
@@ -389,10 +379,11 @@ void assemble_wave(EquationSystems& es,
    * and right-hand-side vector contribution.  Following
    * basic finite element terminology we will denote these
    * "Ke",  "Ce", "Me", and "Fe" for the stiffness, damping
-   * and mass matrices, and the load vector.  Note that in Acoustics,
-   * these descriptors do not match the true physical meaning
-   * of the projectors.  The final overall system, however, 
-   * resembles the conventional notation, again.
+   * and mass matrices, and the load vector.  Note that in 
+   * Acoustics, these descriptors though do @e not match the 
+   * true physical meaning of the projectors.  The final 
+   * overall system, however, resembles the conventional 
+   * notation again.
    */
   DenseMatrix<Number> Ke;
   DenseMatrix<Number> Ce;
@@ -440,7 +431,7 @@ void assemble_wave(EquationSystems& es,
        * elements are handled through different classes, namely
        * \p FE and \p InfFE, respectively.  However, since both
        * are derived from \p FEBase, they share the same interface,
-       * and overall burden of coding is greatly reduced through
+       * and overall burden of coding is @e greatly reduced through
        * using a pointer, which is adjusted appropriately to the
        * current element type.
        */
@@ -479,8 +470,8 @@ void assemble_wave(EquationSystems& es,
 	  /**
 	   *----------------------------------------------------------------
 	   * Boundary conditions.
-	   * Here we just zero the rhs-vector. For consideration of
-	   * natural boundary conditions we refer to the prvious examples.
+	   * Here we just zero the rhs-vector. For natural boundary 
+	   * conditions check e.g. previous examples.
 	   */
 	    {
 	      /**
@@ -534,7 +525,7 @@ void assemble_wave(EquationSystems& es,
        * gradient.
        * 
        * Note that these data fields are also initialized appropriately by
-       * the \p FE method, so that the weak form (below) is valid for both
+       * the \p FE method, so that the weak form (below) is valid for @e both
        * finite and infinite elements.
        */
       const std::vector<RealGradient>& dphase  = cfe->get_dphase();
@@ -549,6 +540,7 @@ void assemble_wave(EquationSystems& es,
       Ke.resize (dof_indices.size(), dof_indices.size());
       Ce.resize (dof_indices.size(), dof_indices.size());
       Me.resize (dof_indices.size(), dof_indices.size());
+
 
       /**
        * The total number of quadrature points for infinite elements
@@ -636,7 +628,7 @@ void assemble_wave(EquationSystems& es,
        *----------------------------------------------------------------
        * The element matrices are now built for this element.  
        * Collect them in Ke, and then add them to the global matrix.  
-       * The \p PetscMatrix::add_matrix() member does this for us.
+       * The \p SparseMatrix::add_matrix() member does this for us.
        */
       Ke.add(1./speed        , Ce);
       Ke.add(1./(speed*speed), Me);
@@ -645,6 +637,8 @@ void assemble_wave(EquationSystems& es,
 
       
     } // end of element loop
+
+
 
   /**
    *----------------------------------------------------------------

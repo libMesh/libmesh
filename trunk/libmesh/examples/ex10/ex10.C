@@ -1,4 +1,4 @@
-// $Id: ex10.C,v 1.2 2003-06-04 01:30:07 benkirk Exp $
+// $Id: ex10.C,v 1.3 2003-06-04 14:59:23 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -40,6 +40,13 @@
 #include "numeric_vector.h"
 #include "dense_matrix.h"
 #include "dense_vector.h"
+
+/**
+ * Some (older) compilers do not offer full stream 
+ * functionality, \p OStringStream works around this.
+ * Check example 9 for details.
+ */
+#include "o_string_stream.h"
 
 /**
  * This example will solve a linear transient system,
@@ -149,8 +156,8 @@ int main (int argc, char** argv)
     mesh.read ("mesh.xda");
 
     /**
-     * Uniformly refine the mesh 4 times.  This is the
-     * first time we have used the mesh refinement capabilities
+     * Uniformly refine the mesh 5 times.  This is the
+     * first time we use the mesh refinement capabilities
      * of the library.
      */
     mesh.mesh_refinement.uniformly_refine (5);
@@ -170,7 +177,7 @@ int main (int argc, char** argv)
      */
     {
       /**
-       * Creates a transient system named "ConvectionDiffusion"
+       * Creates a transient system named "Convection-Diffusion"
        */
       TransientSystem& system = 
 	equation_systems.add_system<TransientSystem> ("Convection-Diffusion");
@@ -209,10 +216,9 @@ int main (int argc, char** argv)
 
     /**
      * The Convection-Diffusion system requires that we specify
-     * the flow velocity.  We will specify it as a RealVectorValue
-     * data type and then use the \p DataMap object to pass it to
-     * the assemble function.  The \p DataMap is a convenient way
-     * to encapsulate various data types.
+     * the flow velocity.  We will specify it as a \p RealVectorValue
+     * data type.  Check example 9 for details on \p RealVectorValue
+     * and \p DataMap.
      */
     RealVectorValue velocity (0.8, 0.8);
 
@@ -230,7 +236,7 @@ int main (int argc, char** argv)
     for (unsigned int t_step = 0; t_step < 50; t_step++)
       {
 	/**
-	 * Incremenet the time counter, set the time and the
+	 * Increment the time counter, set the time and the
 	 * time step size as parameters in the EquationSystem.
 	 */
 	time += dt;
@@ -240,14 +246,29 @@ int main (int argc, char** argv)
 
 	// A pretty update message
 	std::cout << " Solving time step ";
-	std::cout.width(2);
-	std::cout.fill(' ');
-	std::cout << std::right << t_step;
-	std::cout << ", time=";
-	std::cout.width(6);
-	std::cout.fill('0');
-	std::cout << std::left << time;
-	std::cout << "..." << std::endl;
+	/**
+	 * As already seen in example 9, use a work-around
+	 * for missing stream functionality (of older compilers).
+	 */
+	{
+	  OStringStream out;
+
+	  OSSInt(out,2,t_step);
+	  out << ", time=";
+	  OSSRealzeroleft(out,6,3,time);
+	  out <<  "..." << std::endl;
+	  std::cout << out.str();
+	}
+
+// OLD CODE
+// 	std::cout.width(2);
+// 	std::cout.fill(' ');
+// 	std::cout << std::right << t_step;
+// 	std::cout << ", time=";
+// 	std::cout.width(6);
+// 	std::cout.fill('0');
+// 	std::cout << std::left << time;
+// 	std::cout << "..." << std::endl;
 	
 	/**
 	 * At this point we need to update the old
@@ -347,14 +368,20 @@ int main (int argc, char** argv)
 	 */
 	if ( (t_step+1)%10 == 0)
 	  {
-	    std::stringstream file_name;
+	    OStringStream file_name;
 
 	    file_name << "out_";
-	    file_name.fill('0');
-	    file_name.width(3);
-	    file_name << std::right << t_step+1;
+	    OSSRealzeroright(file_name,3,0,t_step+1);
 	    file_name << ".gmv";
 
+// OLD CODE
+// 	    std::stringstream file_name;
+
+// 	    file_name << "out_";
+// 	    file_name.fill('0');
+// 	    file_name.width(3);
+// 	    file_name << std::right << t_step+1;
+// 	    file_name << ".gmv";
 
 	    mesh.write_gmv (file_name.str(),
 			    equation_systems);
@@ -502,16 +529,16 @@ void assemble_cd (EquationSystems& es,
     es.get_system<TransientSystem> ("Convection-Diffusion");
   
   /**
-   * Get a constant reference to the Finite Element type
-   * for the first (and only) variable in the system.
+   * Get the Finite Element type for the first (and only) 
+   * variable in the system.
    */
   FEType fe_type = system.variable_type(0);
 
   /**
    * Build a Finite Element object of the specified type.  Since the
    * \p FEBase::build() member dynamically creates memory we will
-   * store the object as an \p AutoPtr<FEBase>.  This can be thought
-   * of as a pointer that will clean up after itself.
+   * store the object as an \p AutoPtr<FEBase>.  The \p AutoPtr's
+   * are covered in more detail in example 5.
    */
   AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
   

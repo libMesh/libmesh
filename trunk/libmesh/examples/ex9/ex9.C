@@ -1,4 +1,4 @@
-// $Id: ex9.C,v 1.4 2003-06-04 01:30:07 benkirk Exp $
+// $Id: ex9.C,v 1.5 2003-06-04 14:59:24 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -40,6 +40,12 @@
 #include "numeric_vector.h"
 #include "dense_matrix.h"
 #include "dense_vector.h"
+
+/**
+ * Some (older) compilers do not offer full stream 
+ * functionality, \p OStringStream works around this.
+ */
+#include "o_string_stream.h"
 
 /**
  * This example will solve a linear transient system,
@@ -189,7 +195,7 @@ int main (int argc, char** argv)
 
     /**
      * The Convection-Diffusion system requires that we specify
-     * the flow velocity.  We will specify it as a RealVectorValue
+     * the flow velocity.  We will specify it as a \p RealVectorValue
      * data type and then use the \p DataMap object to pass it to
      * the assemble function.  The \p DataMap is a convenient way
      * to encapsulate various data types.
@@ -220,15 +226,36 @@ int main (int argc, char** argv)
 
 	// A pretty update message
 	std::cout << " Solving time step ";
-	std::cout.width(2);
-	std::cout.fill(' ');
-	std::cout << std::right << t_step;
-	std::cout << ", time=";
-	std::cout.width(6);
-	std::cout.fill('0');
-	std::cout << std::left << time;
-	std::cout << "..." << std::endl;
+
+	/**
+	 * Since some compilers fail to offer full stream
+	 * functionality, libMesh offers a string stream
+	 * to work around this.  Note that for other compilers,
+	 * this is just a set of preprocessor macros and therefore
+	 * should cost nothing (compared a hand-coded string stream).
+	 */
+	{
+	  OStringStream out;
+
+	  OSSInt(out,2,t_step);
+	  out << ", time=";
+	  OSSRealzeroleft(out,6,3,time);
+	  out <<  "..." << std::endl;
+	  std::cout << out.str();
+	}
+
+// OLD CODE
+// 	std::cout.width(2);
+// 	std::cout.fill(' ');
+// 	std::cout << std::right << t_step;
+//	std::cout << ", time=";
+// 	std::cout.width(6);
+// 	std::cout.fill('0');
+// 	std::cout << std::left << time;
+//	std::cout << "..." << std::endl;
+
 	
+
 	/**
 	 * At this point we need to update the old
 	 * solution vector.  The old solution vector
@@ -254,14 +281,19 @@ int main (int argc, char** argv)
 	 */
 	if ( (t_step+1)%10 == 0)
 	  {
-	    std::stringstream file_name;
+	    OStringStream file_name;
 
 	    file_name << "out_";
-	    file_name.fill('0');
-	    file_name.width(3);
-	    file_name << std::right << t_step+1;
+	    OSSRealzeroright(file_name,3,0,t_step+1);
 	    file_name << ".gmv";
 
+// OLD CODE
+// 	    std::stringstream file_name;
+// 	    file_name << "out_";
+// 	    file_name.fill('0');
+// 	    file_name.width(3);
+// 	    file_name << std::right << t_step+1;
+// 	    file_name << ".gmv";
 
 	    mesh.write_gmv (file_name.str(),
 			    equation_systems);
@@ -646,7 +678,7 @@ void assemble_cd (EquationSystems& es,
 		  const Real yf = side->point(ns)(1);
 		  
 		  /**
-		   * The penalty value.  \f$ \frac{1}{\epsilon \f$
+		   * The penalty value.  \f$ \frac{1}{\epsilon} \f$
 		   */
 		  const Real penalty = 1.e10;
 		  

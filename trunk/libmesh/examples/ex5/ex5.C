@@ -1,4 +1,4 @@
-// $Id: ex5.C,v 1.21 2003-06-03 05:33:34 benkirk Exp $
+// $Id: ex5.C,v 1.22 2003-06-04 14:59:24 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -45,7 +45,7 @@
  * Define the base quadrature class, with which
  * specialized quadrature rules will be built.
  */
-#include "quadrature_gauss.h"
+#include "quadrature.h"
 
 /**
  * Include the namespace \p QuadratureRules for
@@ -255,8 +255,8 @@ void assemble_poisson(EquationSystems& es,
    * Tell the finte element object to use our
    * quadrature rule.  Note that a \p AutoPtr<QBase> returns
    * a \p QBase* pointer to the object it handles with \p get().  
-   * However, using \p get(), the \p AutoPtr<QBase> \p qface0 is 
-   * still in charge of this pointer. I.e., when \p qface0 goes 
+   * However, using \p get(), the \p AutoPtr<QBase> \p qrule is 
+   * still in charge of this pointer. I.e., when \p qrule goes 
    * out of scope, it will safely delete the \p QBase object it 
    * points to.  This behavior may be overridden using
    * \p AutoPtr<Xyz>::release(), but is currently not
@@ -272,13 +272,14 @@ void assemble_poisson(EquationSystems& es,
 	      
   /**
    * As already seen in example 3, boundary integration 
-   * requires a quadraure rule.  Here, however,
+   * requires a quadrature rule.  Here, however,
    * we use the more convenient way of building this
-   * rule.  Note that one could also have initialized
-   * the face quadrature rules with the type directly
-   * determined from \p qrule, namely through:
+   * rule at run-time using \p quad_type.  Note that one 
+   * could also have initialized the face quadrature rules 
+   * with the type directly determined from \p qrule, namely 
+   * through:
    * \verbatim
-   AutoPtr<QBase>  qface1 (QBase::build(qrule->type(),
+   AutoPtr<QBase>  qface (QBase::build(qrule->type(),
    dim-1, 
    THIRD));
    \endverbatim

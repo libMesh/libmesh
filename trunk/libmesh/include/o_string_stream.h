@@ -1,4 +1,4 @@
-// $Id: o_string_stream.h,v 1.5 2003-04-02 21:58:39 benkirk Exp $
+// $Id: o_string_stream.h,v 1.6 2003-06-04 15:00:16 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -70,9 +70,31 @@
 
  /*
   * Outputs \p Real \p d with width \p v and
-  * precision \p p to stream \p o.
+  * precision \p p to stream \p o (padded with
+  * whitespaces).
   */
-# define OSSRealleft(o,v,p,d)       (o).width(v);  (o).precision(p); (o) << (d)
+# define OSSRealleft(o,v,p,d)       (o).width(v);  (o).precision(p); (o).fill(' '); (o) << (d)
+
+ /*
+  * Outputs \p Real \p d with width \p v and
+  * precision \p p to stream \p o (padded with 
+  * zeros).
+  */
+# define OSSRealzeroleft(o,v,p,d)       (o).width(v);  (o).precision(p); (o).fill('0'); (o) << (d)
+
+ /*
+  * Outputs \p Real \p d with width \p v and
+  * precision \p p to stream \p o (padded with
+  * whitespaces).
+  */
+# define OSSRealright(o,v,p,d)       (o).width(v);  (o).precision(p); (o).fill(' '); (o) << std::right << (d)
+
+ /*
+  * Outputs \p Real \p d with width \p v and
+  * precision \p p to stream \p o (padded with
+  * zeros).
+  */
+# define OSSRealzeroright(o,v,p,d)   (o).width(v);  (o).precision(p); (o).fill('0'); (o) << std::right << (d) 
 
  /*
   * Outputs \p Real \p d with width \p v
@@ -117,9 +139,31 @@
 
  /*
   * Outputs \p Real \p d with width \p v and
-  * precision \p p to stream \p o.
+  * precision \p p to stream \p o (padded with
+  * whitespaces).
   */
-# define OSSRealleft(o,v,p,d)       (o).left( (v), (p), (d) )
+# define OSSRealleft(o,v,p,d)       (o).left( (v), (p), (d) , ' ')
+
+ /*
+  * Outputs \p Real \p d with width \p v and
+  * precision \p p to stream \p o (padded with
+  * zeros).
+  */
+# define OSSRealzeroleft(o,v,p,d)       (o).left( (v), (p), (d) , '0')
+
+ /*
+  * Outputs \p Real \p d with width \p v and
+  * precision \p p to stream \p o (padded with
+  * whitespaces).
+  */
+# define OSSRealright(o,v,p,d)      (o).right( (v), (p), (d) ,' ') 
+
+ /*
+  * Outputs \p Real \p d with width \p v and
+  * precision \p p to stream \p o (padded with
+  * zeros).
+  */
+# define OSSRealzeroright(o,v,p,d)      (o).right( (v), (p), (d) ,'0') 
 
  /*
   * Outputs \p Real \p d with width \p v
@@ -182,12 +226,14 @@
    */
   void left (const sizetype w,
 	     const sizetype prec,
-	     const Real r);
+	     const Real r,
+	     const char c = ' ');
 
   /**
    * Outputs in a \p OStringStream, where \p r
    * was directed in ragged left style with
-   * size \p w.
+   * size \p w, padded with chars \p c, defaults
+   * to whitespace.
    */
   void left (const sizetype w,
 	     const int n);
@@ -203,6 +249,17 @@
 
   /**
    * Outputs in a \p OStringStream, where \p r
+   * was directed in ragged right style with
+   * size \p w and precision \p prec.  The leading
+   * characters are \p c, defaults to whitespaces.
+   */
+  void right (const sizetype w,
+	      const sizetype prec,
+	      const Real r,
+	      const char c = ' ');
+
+  /**
+   * Outputs in a \p OStringStream, where \p r
    * was directed in scientific style with
    * size \p w.
    */
@@ -211,9 +268,11 @@
 
  protected:
   /**
-   * Appends \p n whitespaces to the string \p s.
+   * Appends \p n chars (defaults to whitespaces) 
+   * to the string \p s.
    */
-  void print_ws (const sizetype n);
+  void print_ws (const sizetype n,
+		 const char c = ' ');
 
  };
 
@@ -234,7 +293,8 @@
  inline
  void OStringStream::left (const sizetype w,
 			   const sizetype prec,
-			   const Real r)
+			   const Real r,
+			   const char c)
  {
    assert (w < 30);
    char buf[30];  
@@ -246,7 +306,7 @@
    sprintf (buf, format, r);
    *this << buf;
    // pad with whitespaces afterwards
-   print_ws (w-std::string(buf).size());
+   print_ws (w-std::string(buf).size(), c);
    // ALTERNATIVE: print_ws (w-int((w-prec)/2));
  }
 
@@ -276,6 +336,26 @@
 
 
  inline
+ void OStringStream::right (const sizetype w,
+			    const sizetype prec,
+			    const Real r,
+			    const char c)
+ {
+   assert (w < 30);
+   char buf[30];  
+   char format[8];
+   // form the format for r
+   sprintf (format, "%%.%df", prec);
+   // form string as desired
+   sprintf (buf, format, r);
+   // first pad with the user-defined char
+   print_ws (w-std::string(buf).size(), c);
+   // then print the float
+   *this << buf;
+ }
+
+
+ inline
  void OStringStream::scientific (const sizetype w,
 				 const Real r)
  {
@@ -291,10 +371,11 @@
 
 
  inline
- void OStringStream::print_ws (const sizetype n)
+ void OStringStream::print_ws (const sizetype n,
+			       const char c)
  {
    for (sizetype i = 0; i < n; i++)
-     *this << ' ';
+     *this << c;
  }
 
 

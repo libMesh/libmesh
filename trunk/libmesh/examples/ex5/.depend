@@ -44,7 +44,6 @@ ex5.$(obj-suffix):\
     ../../include/point.h\
     ../../include/predicated_iterator.h\
     ../../include/quadrature.h\
-    ../../include/quadrature_gauss.h\
     ../../include/quadrature_rules.h\
     ../../include/reference_counted_object.h\
     ../../include/reference_counter.h\
@@ -53,7 +52,9 @@ ex5.$(obj-suffix):\
     ../../include/steady_system.h\
     ../../include/surface.h\
     ../../include/system_base.h\
-    ../../include/transient_system.h
+    ../../include/transient_system.h\
+    ../../include/type_vector.h\
+    ../../include/vector_value.h
 ../ex3/exact_solution.$(obj-suffix):\
     ../ex3/exact_solution.C\
     ../../include/libmesh_base.h\
