@@ -1,4 +1,4 @@
-// $Id: libmesh.h,v 1.4 2003-03-16 19:10:23 benkirk Exp $
+// $Id: libmesh.h,v 1.5 2003-03-20 11:51:24 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -99,6 +99,18 @@ public:
    * with \p --enable-perflog then it will log key functions.
    */
   static PerfLog log;
+
+#if defined(USE_COMPLEX_NUMBERS)
+  /**
+   * The imaginary unit, \f$ \sqrt{-1} \f$.
+   */
+  static const Number Imaginary;
+#endif
+
+  /**
+   * \f$ \pi=3.14159... \f$.
+   */
+  static const Real PI;
 
 private:
 

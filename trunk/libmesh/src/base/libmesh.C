@@ -1,4 +1,4 @@
-// $Id: libmesh.C,v 1.7 2003-03-16 19:10:23 benkirk Exp $
+// $Id: libmesh.C,v 1.8 2003-03-20 11:51:25 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -17,7 +17,10 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+ 
 
+// C++ includes
+#include <math.h>
 
 
 // Local includes
@@ -57,6 +60,15 @@ using namespace Mpi;
 
 // ------------------------------------------------------------
 // libMesh static member initializations
+//const Real       libMesh::PI        = 3.14159265358979323846264;
+const Real       libMesh::PI        = acos(-1.);
+
+#if defined(USE_COMPLEX_NUMBERS)
+const Number     libMesh::Imaginary (0.,1.);
+#endif
+
+
+
 PerfLog      libMesh::log ("libMesh",
 #ifdef ENABLE_PERFORMANCE_LOGGING
 			   true

@@ -1,4 +1,4 @@
-// $Id: laspack_matrix.h,v 1.11 2003-03-17 11:34:54 ddreyer Exp $
+// $Id: laspack_matrix.h,v 1.12 2003-03-20 11:51:24 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk, John W. Peterson
@@ -207,6 +207,18 @@ public:
 		   const std::vector<unsigned int> &dof_indices);
       
   /**
+   * Add a Sparse matrix \p _X, scaled with \p _a, to \p this,
+   * stores the result in \p this: 
+   * \f$\texttt{this} = \_a*\_X + \texttt{this} \f$.
+   * Since LASPACK does not provide a true \p axpy for matrices,
+   * @e two operations have to be performed consecutively,
+   * the multiplication and the addition.  For a non-scaled
+   * version of adding a sparse matrix, this method is probably 
+   * not the most efficient way of doing so.
+   */
+  void add (const T _a, SparseMatrix<T> &_X);
+      
+  /**
    * Return the value of the entry
    * \p (i,j).  This may be an
    * expensive operation and you
@@ -257,6 +269,12 @@ public:
    * and fully assembled yet
    */
   bool closed() const { return _closed; }
+  
+  /**
+   * Print the contents of the matrix to the screen,
+   * currently identical to \p print().
+   */
+  void print_personal() const { this->print(); }
 
   
 private:
@@ -339,7 +357,7 @@ inline
 void LaspackMatrix<T>::zero ()
 {
   const unsigned int n_rows = m();
-  
+
   for (unsigned int row=0; row<n_rows; row++)
     {
       const unsigned int r_start = _row_start[row];
@@ -475,6 +493,47 @@ void LaspackMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
     for (unsigned int j=0; j<cols.size(); j++)
       add(rows[i],cols[j],dm(i,j));
 }
+
+
+
+template <typename T>
+void LaspackMatrix<T>::add (const T _a, SparseMatrix<T> &_X)
+{
+  assert (initialized());
+  assert (this->m() == _X.m());
+  assert (this->n() == _X.n());
+
+  LaspackMatrix<T>& X = dynamic_cast<LaspackMatrix<T>&> (_X);
+  _LPNumber         a = static_cast<_LPNumber>          (_a);
+
+  // loops taken from LaspackMatrix<T>::zero ()
+
+  const unsigned int n_rows = m();
+
+  for (unsigned int row=0; row<n_rows; row++)
+    {
+      const unsigned int r_start = _row_start[row];
+      const unsigned int len     = Q_GetLen(&_QMat, row+1);
+
+      // compare matrix sparsity structures
+      assert (len == Q_GetLen(&(X._QMat), row+1));
+	
+      // Make sure we agree on the row length
+      assert (len == (_row_start[row+1]-_row_start[row]));
+      
+      for (unsigned int l=0; l<len; l++)
+	{
+	  const unsigned int j = _csr[r_start + l];
+
+	  // Make sure the data structures are working
+	  assert ((j+1) == Q_GetPos (&_QMat, row+1, l));
+
+	  const _LPNumber value = a * Q_GetEl(const_cast<QMatrix*>(&(X._QMat)), row+1, j+1);
+	  Q_AddVal   (&_QMat, row+1, l, value);
+	}
+    }    
+}
+
 
 
 

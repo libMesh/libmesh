@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.24 2003-03-12 00:33:19 jwpeterson Exp $
+// $Id: equation_systems.C,v 1.25 2003-03-20 11:51:24 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -41,6 +41,8 @@ EquationSystems<T_sys>::EquationSystems (Mesh& m,
 					 const SolverPackage sp) :
   EquationSystemsBase(m, sp)
 {
+  // remember the type of system as flag, useful when writing equation systems
+  this->set_flag(T_sys::system_type());
   // Default parameters
   this->set_parameter("linear solver tolerance")          = 1.e-12;
   this->set_parameter("linear solver maximum iterations") = 5000;
@@ -402,7 +404,7 @@ std::string EquationSystems<T_sys>::get_info () const
 {
   std::ostringstream out;
   
-  out << " EquationSystems:" << std::endl
+  out << " EquationSystems<" << T_sys::system_type() << ">:" << std::endl
       << "  n_systems()=" << this->n_systems() << std::endl;
 
   typename std::map<std::string, T_sys*>::const_iterator it=_systems.begin();
@@ -474,6 +476,6 @@ std::string EquationSystems<T_sys>::get_info () const
 // Explicit instantiations
 template class EquationSystems<GeneralSystem>;
 
-#if defined(USE_COMPLEX_NUMBERS) && defined(HAVE_PETSC)
+#if defined(USE_COMPLEX_NUMBERS) 
 template class EquationSystems<FrequencySystem>;
 #endif
