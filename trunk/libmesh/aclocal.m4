@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.70 2004-10-25 16:03:10 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.71 2004-10-28 19:01:38 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -808,7 +808,7 @@ dnl all necessary files are believed to be in environment
 dnl variable $TETGEN_DIR or the directory specified by
 dnl --with-tetgen=PATH
   AC_ARG_WITH(tetgen,
-              AC_HELP_STRING([--with-tetgen=PATH],[Specify the path where Tetgen is installed]),
+              AC_HELP_STRING([--with-tetgen=PATH],[Specify the full to the Tetgen installation]),
               TETGEN_DIR=$withval)
 
   if (test $TETGEN_DIR) ; then
