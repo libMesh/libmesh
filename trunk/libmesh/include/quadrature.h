@@ -1,4 +1,4 @@
-// $Id: quadrature.h,v 1.15 2003-09-25 21:46:55 benkirk Exp $
+// $Id: quadrature.h,v 1.16 2003-11-03 03:56:52 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -74,7 +74,7 @@ public:
 
   /**
    * Builds a specific quadrature rule, identified through the
-   * \p QuadratureType.  An \p AutoPtr<FEBase> is returned
+   * \p QuadratureType.  An \p AutoPtr<QBase> is returned
    * to prevent a memory leak. This way the user need not
    * remember to delete the object.  Enables run-time decision of
    * the quadrature rule.
@@ -220,8 +220,8 @@ protected:
   void tensor_product_tri (QBase& gauss1D, QBase& jacA1D);
   
   /**
-   * Computes the tensor product of
-   * three 1D rules and returns a 3D rule.
+   * Computes the tensor product quadrature rule
+   * [q1D x q1D x q1D] from the 1D rule q1D.
    * Used in the init_3D routines for
    * hexahedral element types.
    */
@@ -229,9 +229,10 @@ protected:
   
   /**
    * Computes the tensor product of
-   * three 1D rules and returns a 3D rule.
+   * a 1D quadrature rule and a 2D
+   * quadrature rule.
    * Used in the init_3D routines for
-   * hexahedral element types.
+   * prismatic element types.
    */
   void tensor_product_prism (QBase& q1D, QBase& q2D);
 
