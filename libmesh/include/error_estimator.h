@@ -1,4 +1,4 @@
-// $Id: error_estimator.h,v 1.3 2003-05-16 14:37:47 benkirk Exp $
+// $Id: error_estimator.h,v 1.4 2003-05-20 20:55:01 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -34,7 +34,7 @@
 class EquationSystems;
 
 /**
- * This namespace holds functions that will estimate the error
+ * This class holds functions that will estimate the error
  * in a finite element solution on a given mesh.  These error
  * estimates can be useful in their own right, or may be used
  * to guide adaptive mesh refinement.  Note that in general
@@ -43,18 +43,30 @@ class EquationSystems;
  *
  * @author Benjamin S. Kirk, 2003.
  */
-namespace ErrorEstimator
+class ErrorEstimator
 {
-
+public:
+  
   /**
    * This function uses the Kelley Flux Jump error
    * estimate to estimate the error on each cell.
    * The estimated error is output in the vector
    * \p error_per_cell
    */
-  void flux_jump (const EquationSystems& es,
-		  const std::string& name,
-		  std::vector<float>& error_per_cell);
+  static void flux_jump (const EquationSystems& es,
+			 const std::string& name,
+			 std::vector<float>& error_per_cell);
+
+
+  /**
+   * This vector can be used to "mask" certain
+   * variables in a system.  If the mask is empty then the error
+   * will be calculated for all variables in the system.  If
+   * the mask is not empty the error will be calculated only
+   * for those components for which \p component_mask[c] is
+   * nonzero.
+   */
+  static std::vector<unsigned char> component_mask;
 };
 
 

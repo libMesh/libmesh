@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.14 2003-05-19 21:21:13 benkirk Exp $
+// $Id: mesh_refinement.C,v 1.15 2003-05-20 20:55:03 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -141,7 +141,8 @@ void MeshRefinement::update_unused_elements()
 
 void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_per_cell,
 						      const Real refine_fraction,
-						      const Real coarsen_fraction)
+						      const Real coarsen_fraction,
+						      const unsigned int max_level)
 {
   // Check for valid fractions..
   // The fraction values must be in [0,1]
@@ -160,17 +161,20 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_p
   const Real error_delta = (error_max - error_min);
 
 
-  std::cout << " Error Information:"       << std::endl
-	    << " ------------------"       << std::endl
-	    << "   min:   " << error_min   << std::endl
-	    << "   max:   " << error_max   << std::endl
-	    << "   delta: " << error_delta << std::endl;
-  
-  
   // Compute the cutoff values for coarsening and refinement
   const Real refine_cutoff  = (1.- refine_fraction)*error_max;
   const Real coarsen_cutoff = coarsen_fraction*error_delta + error_min;
 
+  // Print information about the error
+  std::cout << " Error Information:"                     << std::endl
+	    << " ------------------"                     << std::endl
+	    << "   min:              " << error_min      << std::endl
+	    << "   max:              " << error_max      << std::endl
+	    << "   delta:            " << error_delta    << std::endl
+	    << "     refine_cutoff:  " << refine_cutoff  << std::endl
+	    << "     coarsen_cutoff: " << coarsen_cutoff << std::endl;
+  
+  
 
   // Loop over the elements and flag them for coarsening or
   // refinement based on the element error
@@ -189,7 +193,8 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_p
       // Flag the element for refinement if its error
       // is >= refinement_cutoff.
       if (elem_error >= refine_cutoff)
-	elem->set_refinement_flag(Elem::REFINE);
+	if (elem->level() < max_level)
+	  elem->set_refinement_flag(Elem::REFINE);
 
       // Flag the element for coarsening if its error
       // is <= coarsen_fraction*delta + error_min
