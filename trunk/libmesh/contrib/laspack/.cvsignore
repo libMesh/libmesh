@@ -1,3 +1,5 @@
 *.o
 *.g.o
 *.pg.o
+ii_files
+so_locations

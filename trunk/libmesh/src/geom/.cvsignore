@@ -3,3 +3,5 @@
 *.o
 *.pg.o
 *.sy.o
+ii_files
+so_locations
