@@ -1,4 +1,4 @@
-// "$Id: xdr_cxx.C,v 1.16 2004-03-08 02:10:05 benkirk Exp $\n"
+// "$Id: xdr_cxx.C,v 1.17 2004-08-05 20:21:10 jwpeterson Exp $\n"
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -1195,11 +1195,14 @@ void Xdr::data (std::vector<double>& v, const char* comment)
 
 	v.resize(length);
 
-	xdr_vector(xdrs, 
-		   (char*) &v[0],
-		   length,
-		   sizeof(double),
-		   (xdrproc_t) xdr_double);
+	// Note: GCC 3.4.1 will crash in debug mode here if length
+	// is zero and you attempt to access the zeroth index of v.
+	if (length > 0)
+	  xdr_vector(xdrs, 
+		     (char*) &v[0],
+		     length,
+		     sizeof(double),
+		     (xdrproc_t) xdr_double);
 	
 #else
 	

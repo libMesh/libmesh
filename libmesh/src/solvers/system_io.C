@@ -1,4 +1,4 @@
-// $Id: system_io.C,v 1.3 2004-08-05 15:58:44 jwpeterson Exp $
+// $Id: system_io.C,v 1.4 2004-08-05 20:21:09 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -318,7 +318,7 @@ void System::read_data (Xdr& io,
        * as the solution vector
        */
       std::fill (global_vector.begin(), global_vector.end(), libMesh::zero);
-	
+
       io.data (global_vector);	  
 
 
