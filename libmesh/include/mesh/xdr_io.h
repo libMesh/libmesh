@@ -1,4 +1,4 @@
-// $Id: xdr_io.h,v 1.1 2004-11-12 20:55:20 benkirk Exp $
+// $Id: xdr_io.h,v 1.2 2004-11-13 02:10:14 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -181,14 +181,14 @@ class XdrIO : public MeshIO<Mesh>
    * Implements reading either a binary or ASCII MGF solution.
    */
   void read_soln  (const std::string&,
-		   std::vector<Number>&,
+		   std::vector<Real>&,
 		   std::vector<std::string>&) const;
   
   /**
    * Implements writing either a binary or ASCII MGF solution.
    */
   void write_soln (const std::string& name,
-		   std::vector<Number>& soln,
+		   std::vector<Real>& soln,
 		   std::vector<std::string>&) const;
 
   //-------------------------------------------------------------
