@@ -1,4 +1,4 @@
-// $Id: laspack_matrix.h,v 1.14 2003-04-21 15:22:18 benkirk Exp $
+// $Id: laspack_matrix.h,v 1.15 2003-06-02 22:50:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk, John W. Peterson
@@ -94,14 +94,14 @@ public:
    * tell the underlying matrix storage scheme how
    * to map the \f$ (i,j) \f$ elements.
    */
-  void const_update_sparsity_pattern (const std::vector<std::set<unsigned int> >&);
+  void const_update_sparsity_pattern (const std::vector<std::vector<unsigned int> >&);
 
   /**
    * Updates the matrix sparsity pattern just like the
    * const version, but may trash the \p sparsity_pattern
    * passed to it.
    */
-  void update_sparsity_pattern (std::vector<std::set<unsigned int> >&);
+  void update_sparsity_pattern (std::vector<std::vector<unsigned int> >&);
   
   /**
    * Initialize a Laspack matrix that is of global

@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.44 2003-05-29 00:03:05 benkirk Exp $
+// $Id: dof_map.C,v 1.45 2003-06-02 22:50:11 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -405,33 +405,13 @@ void DofMap::sort_send_list ()
   // vector
   std::sort(_send_list.begin(), _send_list.end());
 
-  // A temporary vector to hold the sorted, unique
-  // _send_list
-  std::vector<unsigned int> new_send_list;
-  
-  // The new send list will be <= the size of the
-  // current _send_list.  Let's reserve memory
-  // assuming it will be the same size.  This will
-  // allow us to efficiently use the push_back()
-  // member (and probably will actually _save_
-  // space since vector reallocations generally
-  // occur in powers of 2).
-  new_send_list.reserve (_send_list.size());
+  // Now use std::unique to remove duplicate entries  
+  std::vector<unsigned int>::iterator new_end =
+    std::unique (_send_list.begin(), _send_list.end());
 
-  // Add the first entry explicitly so that our
-  // recursive algorithm will work.
-  new_send_list.push_back(_send_list.front());
-
-  // For all the other entries in the _send_list,
-  // add them to the new_send_list if we haven't
-  // already encountered them
-  for (unsigned int i=1; i<_send_list.size(); i++)
-    if (_send_list[i] != new_send_list.back())
-      new_send_list.push_back(_send_list[i]);
-
-  // Finally copy the new_send_list back to
-  // the _send_list
-  _send_list = new_send_list;
+  // Remove the end of the send_list.  Use the "swap trick"
+  // from Effective STL
+  std::vector<unsigned int> (_send_list.begin(), new_end).swap (_send_list);
 }
 
 
@@ -456,7 +436,7 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
   const unsigned int first_dof_on_proc = this->first_dof(proc_id);
   const unsigned int last_dof_on_proc  = this->last_dof(proc_id);
   
-  std::vector<std::set<unsigned int> > sparsity_pattern (n_dofs_on_proc);
+  std::vector<std::vector<unsigned int> > sparsity_pattern (n_dofs_on_proc);
 
 
   /**
@@ -497,14 +477,19 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
 		  assert (ig >= first_dof_on_proc);
 		  assert ((ig - first_dof_on_proc) < sparsity_pattern.size());
 		  
-		  std::set<unsigned int>& row =
+		  std::vector<unsigned int>& row =
 		    sparsity_pattern[ig - first_dof_on_proc];
 		  
 		  for (unsigned int j=0; j<n_dofs_on_element; j++)
 		    {
 		      const unsigned int jg = element_dofs[j];
-		      
-		      row.insert(jg);
+
+		      // This will save memory, but is slower		      
+//		      if (!std::count (row.begin(), row.end(), jg))
+//			row.push_back(jg);
+
+		      // This will waste memory, but is faster
+		      row.push_back(jg);
 		    }
 		}
 	    }
@@ -545,9 +530,17 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
 	    for (unsigned int vj=0; vj<n_var; vj++)
 	      if (_dof_coupling(vi,vj)) // If vi couples to vj
 		{
-		  // Find element dofs for variable vj
-		  this->dof_indices (elem, element_dofs_j, vj);
-		  this->find_connected_dofs (element_dofs_j);	    
+		  // Find element dofs for variable vj, note that
+		  // if vi==vj we already have the dofs.
+		  if (vi != vj)
+		    {
+		      this->dof_indices (elem, element_dofs_j, vj);
+		      this->find_connected_dofs (element_dofs_j);
+		    }
+		  else
+		    {
+		      element_dofs_j = element_dofs_i;
+		    }
 		  
 		  const unsigned int n_dofs_on_element_j =
 		    element_dofs_j.size();
@@ -562,27 +555,46 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
 			  (ig <= last_dof_on_proc))
 			{
 			  // This is what I mean
-			  //assert ((ig - first_dof_on_proc) >= 0);
+			  // assert ((ig - first_dof_on_proc) >= 0);
 			  // but do the test like this because ig and
 			  // first_dof_on_proc are unsigned ints
 			  assert (ig >= first_dof_on_proc);
 			  assert (ig < (sparsity_pattern.size() +
 					first_dof_on_proc));
 			  
-			  std::set<unsigned int>& row =
+			  std::vector<unsigned int>& row =
 			    sparsity_pattern[ig - first_dof_on_proc];
 			  
 			  for (unsigned int j=0; j<n_dofs_on_element_j; j++)
 			    {
 			      const unsigned int jg = element_dofs_j[j];
 			      
-			      row.insert(jg);
+			      row.push_back(jg);
 			    }
 			}
 		    }
 		}
 	  }
-    }      
+    }
+
+  // Now the sparsity pattern has been initialized, but it
+  // contains duplicate entries.  We need to sort it & remove
+  // the duplicates.
+  for (unsigned int i=0; i<n_dofs_on_proc; i++)
+    {
+      std::vector<unsigned int>& row =
+	sparsity_pattern[i];
+
+      // Sort the row
+      std::sort (row.begin(), row.end());
+
+      // remove the duplicate entries
+      std::vector<unsigned int>::iterator new_end =
+	std::unique (row.begin(), row.end());
+
+      // use the "swap trick" to trim the extra fat from the row
+      std::vector<unsigned int> (row.begin(), new_end).swap (row);
+    }
 
 
   
@@ -598,16 +610,11 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
   for (unsigned int i=0; i<n_dofs_on_proc; i++)
     {
       // Get the row of the sparsity pattern
-      const std::set<unsigned int>& row = sparsity_pattern[i];
-      
-      // Now loop over the row and increment the appropriate
-      // counters.
-      std::set<unsigned int>::const_iterator it_end = row.end();
-      
-      for (std::set<unsigned int>::const_iterator it=row.begin();
-	   it != it_end; ++it)
-	if ((*it >= first_dof_on_proc) &&
-	    (*it <= last_dof_on_proc))
+      const std::vector<unsigned int>& row = sparsity_pattern[i];
+
+      for (unsigned int j=0; j<row.size(); j++)
+	if ((row[j] >= first_dof_on_proc) &&
+	    (row[j] <= last_dof_on_proc))
 	  _n_nz[i]++;
 	else
 	  _n_oz[i]++;
@@ -621,37 +628,249 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
   // \p SparseMatrix implementations want to see it.  Let them
   // see it before we throw it away.
   //
-  // When additional matrices are handled, let the mayor matrix
+  // When additional matrices are handled, let the major matrix
   // be the first to get to know the sparsity pattern, so that
   // it has the best chance to be allocated successfully...
-  {
-    if (_other_matrices.empty())
-      {
+  if (_other_matrices.empty())
+    {
       // NOTE:  The \p SparseMatrix::update_sparsity_pattern() is NOT
       // const, so the \p SparseMatrix may freely trash the
       // sparsity_pattern.  DO NOT expect to use it any more after
       // this call.
       if (_matrix != NULL)
         _matrix->update_sparsity_pattern (sparsity_pattern);
-      }
-    else
-      {
-        // use the const version of the update_sparsity_pattern()
-        if (_matrix != NULL)
-          _matrix->const_update_sparsity_pattern (sparsity_pattern);
-
-	std::map<std::string, SparseMatrix<Number>* >::iterator pos = _other_matrices.begin();
-	for (; pos != _other_matrices.end(); ++pos)
-	  pos->second->const_update_sparsity_pattern (sparsity_pattern);
-      }     
-
-
-    // Explicity clear the sparsity pattern now.
-    // it is about to go out of scope, but maybe this
-    // will expedite freeing up its memory?
-    sparsity_pattern.clear();
-  }
+    }
+  else
+    {
+      // use the const version of the update_sparsity_pattern()
+      if (_matrix != NULL)
+	_matrix->const_update_sparsity_pattern (sparsity_pattern);
+      
+      std::map<std::string, SparseMatrix<Number>* >::iterator
+	pos = _other_matrices.begin(),
+	end = _other_matrices.end();
+      
+      for (; pos != end; ++pos)
+	pos->second->const_update_sparsity_pattern (sparsity_pattern);
+    }     
 }
+
+
+
+//
+// This is the old implementation in which the sparsity_pattern was
+// created as a vector of sets.  It should be more memory-efficient
+// than the vector of vectors approach, but it takes roughly twice as long
+// void DofMap::compute_sparsity(const MeshBase& mesh)
+// {
+//   assert (mesh.is_prepared());
+//   assert (this->n_variables());
+
+//   START_LOG("compute_sparsity()", "DofMap");
+
+
+  
+//   /**
+//    * Compute the sparsity structure of the global matrix.  This can be
+//    * fed into a PetscMatrix to allocate exacly the number of nonzeros
+//    * necessary to store the matrix.  This algorithm should be linear
+//    * in the (# of elements)*(# nodes per element)
+//    */
+//   const unsigned int proc_id           = mesh.processor_id();
+//   const unsigned int n_dofs_on_proc    = this->n_dofs_on_processor(proc_id);
+//   const unsigned int first_dof_on_proc = this->first_dof(proc_id);
+//   const unsigned int last_dof_on_proc  = this->last_dof(proc_id);
+  
+//   std::vector<std::set<unsigned int> > sparsity_pattern (n_dofs_on_proc);
+
+
+//   /**
+//    * If the user did not explicitly specify the DOF coupling
+//    * then all the DOFS are coupled to each other.  Furthermore,
+//    * we can take a shortcut and do this more quickly here.  So
+//    * we use an if-test.
+//    */  
+//   if (_dof_coupling.empty())
+//     {
+//       std::vector<unsigned int> element_dofs;
+
+//       const_active_elem_iterator       elem_it (mesh.elements_begin());
+//       const const_active_elem_iterator elem_end(mesh.elements_end());
+
+//       for ( ; elem_it != elem_end; ++elem_it)
+// 	{
+// 	  Elem* elem = *elem_it;
+	  
+// 	  this->dof_indices (elem, element_dofs);
+// 	  this->find_connected_dofs (element_dofs);
+	    
+// 	  const unsigned int n_dofs_on_element = element_dofs.size();
+	    
+// 	  for (unsigned int i=0; i<n_dofs_on_element; i++)
+// 	    {
+// 	      const unsigned int ig = element_dofs[i];
+	      
+// 	      // Only bother if this matrix row will be stored
+// 	      // on this processor.
+// 	      if ((ig >= first_dof_on_proc) &&
+// 		  (ig <= last_dof_on_proc))
+// 		{
+// 		  // This is what I mean
+// 		  // assert ((ig - first_dof_on_proc) >= 0);
+// 		  // but do the test like this because ig and
+// 		  // first_dof_on_proc are unsigned ints
+// 		  assert (ig >= first_dof_on_proc);
+// 		  assert ((ig - first_dof_on_proc) < sparsity_pattern.size());
+		  
+// 		  std::set<unsigned int>& row =
+// 		    sparsity_pattern[ig - first_dof_on_proc];
+		  
+// 		  for (unsigned int j=0; j<n_dofs_on_element; j++)
+// 		    {
+// 		      const unsigned int jg = element_dofs[j];
+		      
+// 		      row.insert(jg);
+// 		    }
+// 		}
+// 	    }
+// 	}      
+//     } 
+
+
+  
+//   /**
+//    * This is what we do in the case that the user has specified
+//    * explicit DOF coupling.
+//    */  
+//   else
+//     {
+//       assert (_dof_coupling.size() ==
+// 	      this->n_variables());
+      
+//       const unsigned int n_var = this->n_variables();
+      
+//       std::vector<unsigned int> element_dofs_i;
+//       std::vector<unsigned int> element_dofs_j;
+      
+      
+//       const_active_elem_iterator       elem_it (mesh.elements_begin());
+//       const const_active_elem_iterator elem_end(mesh.elements_end());
+      
+//       for ( ; elem_it != elem_end; ++elem_it)
+// 	for (unsigned int vi=0; vi<n_var; vi++)
+// 	  {
+// 	    Elem* elem = *elem_it;
+	    
+// 	    // Find element dofs for variable vi
+// 	    this->dof_indices (elem, element_dofs_i, vi);
+// 	    this->find_connected_dofs (element_dofs_i);
+	    
+// 	    const unsigned int n_dofs_on_element_i = element_dofs_i.size();
+	    
+// 	    for (unsigned int vj=0; vj<n_var; vj++)
+// 	      if (_dof_coupling(vi,vj)) // If vi couples to vj
+// 		{
+// 		  // Find element dofs for variable vj
+// 		  this->dof_indices (elem, element_dofs_j, vj);
+// 		  this->find_connected_dofs (element_dofs_j);	    
+		  
+// 		  const unsigned int n_dofs_on_element_j =
+// 		    element_dofs_j.size();
+		  
+// 		  for (unsigned int i=0; i<n_dofs_on_element_i; i++)
+// 		    {
+// 		      const unsigned int ig = element_dofs_i[i];
+		      
+// 		      // Only bother if this matrix row will be stored
+// 		      // on this processor.
+// 		      if ((ig >= first_dof_on_proc) &&
+// 			  (ig <= last_dof_on_proc))
+// 			{
+// 			  // This is what I mean
+// 			  // assert ((ig - first_dof_on_proc) >= 0);
+// 			  // but do the test like this because ig and
+// 			  // first_dof_on_proc are unsigned ints
+// 			  assert (ig >= first_dof_on_proc);
+// 			  assert (ig < (sparsity_pattern.size() +
+// 					first_dof_on_proc));
+			  
+// 			  std::set<unsigned int>& row =
+// 			    sparsity_pattern[ig - first_dof_on_proc];
+			  
+// 			  for (unsigned int j=0; j<n_dofs_on_element_j; j++)
+// 			    {
+// 			      const unsigned int jg = element_dofs_j[j];
+			      
+// 			      row.insert(jg);
+// 			    }
+// 			}
+// 		    }
+// 		}
+// 	  }
+//     }      
+
+
+  
+//   // Now the full sparsity structure is built for all of the
+//   // DOFs connected to our rows of the matrix.
+//   _n_nz.resize (n_dofs_on_proc);
+//   _n_oz.resize (n_dofs_on_proc);
+
+//   // First zero the counters.
+//   std::fill(_n_nz.begin(), _n_nz.end(), 0);
+//   std::fill(_n_oz.begin(), _n_oz.end(), 0);
+  
+//   for (unsigned int i=0; i<n_dofs_on_proc; i++)
+//     {
+//       // Get the row of the sparsity pattern
+//       const std::set<unsigned int>& row = sparsity_pattern[i];
+      
+//       // Now loop over the row and increment the appropriate
+//       // counters.
+//       std::set<unsigned int>::const_iterator it_end = row.end();
+      
+//       for (std::set<unsigned int>::const_iterator it=row.begin();
+// 	   it != it_end; ++it)
+// 	if ((*it >= first_dof_on_proc) &&
+// 	    (*it <= last_dof_on_proc))
+// 	  _n_nz[i]++;
+// 	else
+// 	  _n_oz[i]++;
+//     }
+
+  
+//   STOP_LOG("compute_sparsity()", "DofMap");
+
+//   // We are done with the sparsity_pattern.  However, quite a
+//   // lot has gone into computing it.  It is possible that some
+//   // \p SparseMatrix implementations want to see it.  Let them
+//   // see it before we throw it away.
+//   //
+//   // When additional matrices are handled, let the mayor matrix
+//   // be the first to get to know the sparsity pattern, so that
+//   // it has the best chance to be allocated successfully...
+//   {
+//     if (_other_matrices.empty())
+//       {
+//       // NOTE:  The \p SparseMatrix::update_sparsity_pattern() is NOT
+//       // const, so the \p SparseMatrix may freely trash the
+//       // sparsity_pattern.  DO NOT expect to use it any more after
+//       // this call.
+//       if (_matrix != NULL)
+//         _matrix->update_sparsity_pattern (sparsity_pattern);
+//       }
+//     else
+//       {
+//         // use the const version of the update_sparsity_pattern()
+//         if (_matrix != NULL)
+//           _matrix->const_update_sparsity_pattern (sparsity_pattern);
+
+// 	std::map<std::string, SparseMatrix<Number>* >::iterator pos = _other_matrices.begin();
+// 	for (; pos != _other_matrices.end(); ++pos)
+// 	  pos->second->const_update_sparsity_pattern (sparsity_pattern);
+//       }     
+//   }
+// }
  
 
 
@@ -876,65 +1095,54 @@ void DofMap::find_connected_dofs (std::vector<unsigned int>& elem_dofs) const
 #ifdef ENABLE_AMR
 
   typedef std::set<unsigned int> RCSet;
-  RCSet dof_set;
+
+  // First insert the DOFS we already depend on into the set.  
+  RCSet dof_set (elem_dofs.begin(), elem_dofs.end());
 
   bool done = true;
-
-  // First insert the DOFS we already depend on into the sets.
-  for (unsigned int i=0; i<elem_dofs.size(); i++)
-    dof_set.insert(elem_dofs[i]);
-  
-  
+    
   // Next insert any dofs those might be constrained in terms
   // of.  Note that in this case we may not be done:  Those may
   // in turn depend on others.  So, we need to repeat this process
   // in that case until the system depends only on unconstrained
   // degrees of freedom.
-  {
-    const unsigned int orig_dof_set_size = dof_set.size();
-    
-    for (unsigned int i=0; i<elem_dofs.size(); i++)
-      if (this->is_constrained_dof(elem_dofs[i]))
-	{
-	  // If the DOF is constrained
-	  DofConstraints::const_iterator
-	    pos = _dof_constraints.find(elem_dofs[i]);
-	  
-	  assert (pos != _dof_constraints.end());
-	  
-	  const DofConstraintRow& constraint_row = pos->second;
-	  
-	  assert (!constraint_row.empty());
-	  
-	  for (DofConstraintRow::const_iterator
-		 it=constraint_row.begin(); it != constraint_row.end();
-	       ++it)
-	    dof_set.insert (it->first);
+  for (unsigned int i=0; i<elem_dofs.size(); i++)
+    if (this->is_constrained_dof(elem_dofs[i]))
+      {
+	// If the DOF is constrained
+	DofConstraints::const_iterator
+	  pos = _dof_constraints.find(elem_dofs[i]);
+	
+	assert (pos != _dof_constraints.end());
+	
+	const DofConstraintRow& constraint_row = pos->second;
+	
+	assert (!constraint_row.empty());
+	
+	DofConstraintRow::const_iterator it     = constraint_row.begin();
+	DofConstraintRow::const_iterator it_end = constraint_row.begin();
+	
+	
+	// Add the DOFs this dof is constrained in terms of.
+	// note that these dofs might also be constrained, so
+	// we will need to call this function recursively.
+	for ( ; it != it_end; ++it)
+	  if (!dof_set.count (it->first))
+	    {
+	      dof_set.insert (it->first);
+	      done = false;
+	    }
 	}
-
-    // If we added any DOFS then we need to do this recursively.
-    // It is possible that we just added a DOF that is also
-    // constrained!
-    if (dof_set.size() != orig_dof_set_size)
-      done = false;
-  }
-
-
+  
+  
   // If not done then we need to do more work
   // (obviously :-) )!
   if (!done)
     {
-      elem_dofs.resize(dof_set.size());
-      
-      {
-	RCSet::const_iterator end_it = dof_set.end(); 
-	
-	unsigned int i=0;
-	
-	for (RCSet::const_iterator it=dof_set.begin();
-	     it != end_it; ++it)
-	  elem_dofs[i++] = *it;
-      }
+      // Fill the vector with the contents of the set
+      elem_dofs.clear();      
+      elem_dofs.insert (elem_dofs.end(),
+			dof_set.begin(), dof_set.end());
       
 
       // May need to do this recursively.  It is possible
