@@ -1,4 +1,4 @@
-// $Id: ex10.C,v 1.5 2003-06-10 19:04:44 benkirk Exp $
+// $Id: ex10.C,v 1.6 2003-08-29 16:47:26 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -118,16 +118,6 @@ Real exact_solution (const Real x,
 
 int main (int argc, char** argv)
 {
-#ifndef HAVE_PETSC
-
-  std::cerr << "ERROR: AMR only good with PETSc for some strange reason..."
-	    << "       Bug Ben about this."
-	    << std::endl;
-  here();
-
-  return 0;
-  
-#endif
   
 #ifdef USE_COMPLEX_NUMBERS
   
