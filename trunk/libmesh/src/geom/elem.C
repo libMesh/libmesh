@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.26 2003-06-03 16:45:53 benkirk Exp $
+// $Id: elem.C,v 1.27 2003-07-15 12:40:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -202,25 +202,6 @@ Elem* Elem::build(const ElemType type,
   error();
   
   return NULL;
-}
-
-
-
-unsigned int Elem::which_neighbor_am_i (const Elem* e) const
-{
-  assert (e != NULL);
-  
-  for (unsigned int s=0; s<this->n_neighbors(); s++)
-    if (this->neighbor(s) == e)
-      return s;
-    
-
-  std::cerr << "ERROR:  Elements are not neighbors!" 
-	    << std::endl;
-
-  error();
-
-  return static_cast<unsigned int>(-1);
 }
 
 
@@ -457,6 +438,49 @@ Real Elem::quality (const ElemQuality q) const
     error();
     return 0.;
 }
+
+
+#ifdef ENABLE_AMR
+
+void Elem::family_tree (std::vector<const Elem*>& family,
+			const bool reset) const
+{
+  // Clear the vector if the flag reset tells us to.
+  if (reset)
+    family.clear();
+
+  // Add this element to the family tree.
+  family.push_back(this);
+
+  // Recurse into the elements children, if it has them.
+  // Do not clear the vector any more.
+  if (!this->active())
+    for (unsigned int c=0; c<this->n_children(); c++)
+      this->child(c)->family_tree (family, false);
+}
+
+
+
+void Elem::active_family_tree (std::vector<const Elem*>& active_family,
+			       const bool reset) const
+{
+  // Clear the vector if the flag reset tells us to.
+  if (reset)
+    active_family.clear();
+
+  // Add this element to the family tree if it is active
+  if (this->active())
+    active_family.push_back(this);
+
+  // Otherwise recurse into the element's children.
+  // Do not clear the vector any more.
+  else 
+    for (unsigned int c=0; c<this->n_children(); c++)
+      this->child(c)->active_family_tree (active_family, false);
+
+}
+
+#endif // #ifdef ENABLE_AMR
 
 
 

@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.43 2003-07-12 19:37:17 ddreyer Exp $
+// $Id: mesh_base.C,v 1.44 2003-07-15 12:40:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -49,7 +49,9 @@
 #include "cell_inf_hex18.h"
 #include "petsc_matrix.h"
 #include "mesh_logging.h"
+
 #include "metis_partitioner.h"
+#include "parmetis_partitioner.h"
 
 
 
@@ -246,6 +248,40 @@ void MeshBase::clear ()
 
 
 
+unsigned int MeshBase::n_elem_on_proc (const unsigned int proc_id) const
+{
+  assert (proc_id < libMeshBase::n_processors());
+
+  unsigned int ne=0;
+  
+  const_pid_elem_iterator       el (this->elements_begin(), proc_id);
+  const const_pid_elem_iterator end(this->elements_end(),   proc_id);
+
+  for (; el!=end; ++el)
+    ne++;
+
+  return ne;
+}
+
+
+
+unsigned int MeshBase::n_active_elem_on_proc (const unsigned int proc_id) const
+{
+  assert (proc_id < libMeshBase::n_processors());
+
+  unsigned int ne=0;
+  
+  const_active_pid_elem_iterator       el (this->elements_begin(), proc_id);
+  const const_active_pid_elem_iterator end(this->elements_end(),   proc_id);
+
+  for (; el!=end; ++el)
+    ne++;
+
+  return ne;
+}
+  
+
+
 unsigned int MeshBase::n_sub_elem () const
 {
   unsigned int ne=0;
@@ -362,6 +398,7 @@ std::string MeshBase::get_info() const
       << "  spatial_dimension()=" << this->spatial_dimension() << std::endl
       << "  n_nodes()="           << this->n_nodes()           << std::endl
       << "  n_elem()="            << this->n_elem()            << std::endl
+      << "   n_local_elem()="     << this->n_local_elem()      << std::endl
 #ifdef ENABLE_AMR
       << "   n_active_elem()="    << this->n_active_elem()     << std::endl
 #endif
@@ -1139,9 +1176,11 @@ void MeshBase::partition (const unsigned int n_sbdmns)
 {
   assert (n_sbdmns > 0);
 
-  MetisPartitioner mp (*this);
-
+   MetisPartitioner mp     (*this);
+//   ParmetisPartitioner pmp (*this);
+  
   mp.partition(n_sbdmns);
+//  pmp.partition(n_sbdmns);
 }
 
 
@@ -1179,89 +1218,64 @@ void MeshBase::renumber_nodes_and_elements ()
     unsigned int next_free_node = 0;
 
     
-    // If there is only one processor, loop over the nodes and elements
-    // and set their ids based on where they lie in their vectors.
-    //if (this->n_processors() == 1)
-    if (true)
-      {
-	elem_iterator       el    (this->elements_begin());
-	const elem_iterator end_el(this->elements_end());
-	
-	for (; el != end_el; ++el)
-	  {
-	    // this element should _not_ have been numbered already
-	    assert ((*el)->id() == Elem::invalid_id);
-	    
-	    (*el)->set_id(next_free_elem++);
-
-	    // Add the element to the new list
-	    new_elem.push_back(*el);
-	  }
-
-
-	node_iterator       nd    (this->nodes_begin());
-	const node_iterator end_nd(this->nodes_end());
-
-	//TODO:[BSK] This will not produce any inactive nodes to be deleted in the last step.  Might want to change this later.
-	for (; nd != end_nd; ++nd)
-	  {
-	    // this node should _not_ have been numbered already
-	    assert ((*nd)->id() == Node::invalid_id);
-	    
-	    (*nd)->set_id(next_free_node++);
-
-	    //assert (this->processor_id() == 0);
-	    
-	    (*nd)->set_processor_id(0);
-	     
-	    // Add the node to the new list
-	    new_nodes.push_back(*nd);
-	  }	       
-      }
+    // Loop over the elements, set their IDs so that they lie in
+    // contiguous blocks on each processor.  Then loop over the nodes
+    // and set their IDs based on where they lie in their vectors.
+    {
+//       for (unsigned int proc_id=0; proc_id<this->n_processors(); proc_id++)
+// 	{
+// 	  // Loop over the elements on the processor proc_id
+// 	  pid_elem_iterator       el    (this->elements_begin(), proc_id);
+// 	  const pid_elem_iterator end_el(this->elements_end(),   proc_id);
 	  
+// 	  for (; el != end_el; ++el)
+// 	    {
+// 	      // this element should _not_ have been numbered already
+// 	      assert ((*el)->id() == Elem::invalid_id);
+	      
+// 	      (*el)->set_id(next_free_elem++);
 
-  
-//     // Otherwise renumber the elements to be in contiguous blocks
-//     // on the processors.  The nodes are numbered in the order they
-//     // are encountered on the element.
-//     else
-//       {    
-// 	for (unsigned int proc_id=0;
-// 	     proc_id<this->n_processors(); proc_id++)
-// 	  {
-// 	    // Loop over the elements on the processor proc_id
-// 	    pid_elem_iterator       el    (this->elements_begin(), proc_id);
-// 	    const pid_elem_iterator end_el(this->elements_end(),   proc_id);
-	    
-// 	    for (; el != end_el; ++el)
-// 	      {
-// 		// this element should _not_ have been numbered already
-// 		assert ((*el)->id() == Elem::invalid_id);
-		
-// 		(*el)->set_id(next_free_elem++);
-		
-// 		// Add the element to the new list
-// 		new_elem.push_back(*el);
-		
-// 		// Number the nodes on the element that
-// 		// have not been numbered already.
-// 		for (unsigned int n=0; n<(*el)->n_nodes(); n++)
-// 		  if ((*el)->get_node(n)->id() == Node::invalid_id)
-// 		    {
-// 		      (*el)->get_node(n)->set_id(next_free_node++);
-		      
-// 		      // Add the node to the new list
-// 		      new_nodes.push_back((*el)->get_node(n));
-		      
-// 		      // How could this fail?  Only if something is WRONG!
-// 		      assert ((*el)->get_node(n)->processor_id() ==
-// 			      Node::invalid_processor_id);
-		      
-// 		      (*el)->get_node(n)->set_processor_id((*el)->processor_id());
-// 		    }
-// 	      }
-// 	  }
-//       }
+// 	      // Add the element to the new list
+// 	      new_elem.push_back(*el);
+// 	    }
+// 	}
+      
+      // Loop over the elements
+      elem_iterator       el    (this->elements_begin());
+      const elem_iterator end_el(this->elements_end());
+      
+      for (; el != end_el; ++el)
+	{
+	  // this element should _not_ have been numbered already
+	  assert ((*el)->id() == Elem::invalid_id);
+	  
+	  (*el)->set_id(next_free_elem++);
+	  
+	  // Add the element to the new list
+	  new_elem.push_back(*el);
+	}
+
+
+      node_iterator       nd    (this->nodes_begin());
+      const node_iterator end_nd(this->nodes_end());
+      
+      //TODO:[BSK] This will not produce any inactive nodes to be deleted
+      // in the last step.  Might want to change this later.
+      for (; nd != end_nd; ++nd)
+	{
+	  // this node should _not_ have been numbered already
+	  assert ((*nd)->id() == Node::invalid_id);
+	  
+	  (*nd)->set_id(next_free_node++);
+	  
+	  //assert (this->processor_id() == 0);
+	  
+	  (*nd)->set_processor_id(0);
+	  
+	  // Add the node to the new list
+	  new_nodes.push_back(*nd);
+	}	       
+    }
 
     // This could only fail if we did something seriously WRONG!
     assert (new_elem.size()  == next_free_elem);

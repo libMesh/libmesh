@@ -1,4 +1,4 @@
-// $Id: metis_partitioner.C,v 1.1 2003-06-24 05:33:51 benkirk Exp $
+// $Id: metis_partitioner.C,v 1.2 2003-07-15 12:40:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -128,8 +128,11 @@ void MetisPartitioner::partition (const unsigned int n_sbdmns)
   // the edges in the graph will correspond to
   // face neighbors
   {
+    std::vector<const Elem*> neighbors_offspring;
+    
     active_elem_iterator       elem_it (_mesh.elements_begin());
     const active_elem_iterator elem_end(_mesh.elements_end());
+    
     
     for (; elem_it != elem_end; ++elem_it)
       {
@@ -175,22 +178,50 @@ void MetisPartitioner::partition (const unsigned int n_sbdmns)
 		    const unsigned int ns =
 		      neighbor->which_neighbor_am_i (elem);
 		    
+		    // Old Code
+// 		    // Get all the neighbor's children that
+// 		    // live on that side and are thus connected
+// 		    // to us
+// 		    for (unsigned int nc=0;
+// 			 nc<neighbor->n_children_per_side(ns); nc++)
+// 		      {
+// 			const Elem* child =
+// 			  neighbor->child (neighbor->side_children_matrix(ns,nc));
+			
+// 			// This assumes a level-1 mesh
+// 			assert (child->active());
+// 			assert (child->id() < forward_map.size());
+// 			assert (forward_map[child->id()] !=
+// 				static_cast<unsigned int>(-1));
+			
+// 			adjncy.push_back (forward_map[child->id()]);
+
+		    
+		    // New Code
+		    // Get all the active children (& grandchildren, etc...)
+		    // of the neighbor.
+		    neighbor->active_family_tree (neighbors_offspring);
+		    
 		    // Get all the neighbor's children that
 		    // live on that side and are thus connected
 		    // to us
-		    for (unsigned int nc=0;
-			 nc<neighbor->n_children_per_side(ns); nc++)
+		    for (unsigned int nc=0; nc<neighbors_offspring.size(); nc++)
 		      {
 			const Elem* child =
-			  neighbor->child (neighbor->side_children_matrix(ns,nc));
+			  neighbors_offspring[nc];
 			
-			// This assumes a level-1 mesh
-			assert (child->active());
-			assert (child->id() < forward_map.size());
-			assert (forward_map[child->id()] !=
-				static_cast<unsigned int>(-1));
+			// This does not assume a level-1 mesh.
+			// Note that since children have sides numbered
+			// coincident with the parent then this is a sufficient test.
+			if (child->neighbor(ns) == elem)
+			  {
+			    assert (child->active());
+			    assert (child->id() < forward_map.size());
+			    assert (forward_map[child->id()] !=
+				    static_cast<unsigned int>(-1));
 			
-			adjncy.push_back (forward_map[child->id()]);
+			    adjncy.push_back (forward_map[child->id()]);
+			  }
 		      }
 		  }
 	      }
