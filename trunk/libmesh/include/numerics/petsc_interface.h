@@ -1,4 +1,4 @@
-// $Id: petsc_interface.h,v 1.6 2004-10-12 19:46:57 benkirk Exp $
+// $Id: petsc_interface.h,v 1.7 2004-10-19 17:11:55 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -124,7 +124,26 @@ public:
 	 const double tol,
 	 const unsigned int m_its);
 
+  /**
+   * Returns the raw PETSc preconditioner context pointer.  This allows
+   * you to specify the PCShellSetApply() and PCShellSetSetUp() functions
+   * if you desire.  Just don't do anything crazy like calling PCDestroy()!
+   */
+  const PC pc() { this->init(); return _pc; }
 
+  /**
+   * Fills the input vector with the sequence of residual norms
+   * from the latest iterative solve.
+   */
+  void get_residual_history(std::vector<double>& hist);
+
+  /**
+   * Returns just the initial residual for the solve just
+   * completed with this interface.  Use this method instead
+   * of the one above if you just want the starting residual
+   * and not the entire history.
+   */
+  Real get_initial_residual();
   
 private:
 
