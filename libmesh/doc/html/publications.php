@@ -13,7 +13,7 @@
 <div class="content">
 <h1>Publications -- Stay Tuned ...</h1>
 <ul>
-  <li> John's Masters </li>
+  <li> <a href="http://www.cfdlab.ae.utexas.edu/~peterson/masters.pdf">John's Masters</a> </li>
 </ul>
 </div>
 
