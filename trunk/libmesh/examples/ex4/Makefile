@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.4 2003-02-07 18:07:43 ddreyer Exp $
+# $Id: Makefile,v 1.5 2003-02-07 19:25:46 benkirk Exp $
 
 
 # The location of the mesh library
@@ -55,4 +55,5 @@ distclean:
 
 run:
 	@$(target) -d 2
+	@$(target) -d 3
 ###############################################################################
