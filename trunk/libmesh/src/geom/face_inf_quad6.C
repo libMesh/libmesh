@@ -1,4 +1,4 @@
-// $Id: face_inf_quad6.C,v 1.20 2004-01-03 15:37:43 benkirk Exp $
+// $Id: face_inf_quad6.C,v 1.21 2004-07-14 19:23:18 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -120,51 +120,99 @@ AutoPtr<Elem> InfQuad6::build_side (const unsigned int i) const
 
 
 
-const std::vector<unsigned int> InfQuad6::tecplot_connectivity(const unsigned int sf) const
+
+void InfQuad6::connectivity(const unsigned int sf,
+			    const IOPackage iop,
+			    std::vector<unsigned int>& conn) const
 {
   assert (_nodes != NULL);
   assert (sf < this->n_sub_elem());
+  assert (iop != INVALID_IO_PACKAGE);
 
-  std::vector<unsigned int> conn(4);
+  conn.resize(4);
 
-  switch(sf)
+  switch (iop)
     {
-    case 0:
-      // linear sub-quad 0
-      conn[0] = this->node(0)+1;
-      conn[1] = this->node(4)+1;
-      conn[2] = this->node(5)+1;
-      conn[3] = this->node(2)+1;
+    case TECPLOT:
+      {
+	switch(sf)
+	  {
+	  case 0:
+	    // linear sub-quad 0
+	    conn[0] = this->node(0)+1;
+	    conn[1] = this->node(4)+1;
+	    conn[2] = this->node(5)+1;
+	    conn[3] = this->node(2)+1;
 
-      return conn;
+	    return;
 
-    case 1:
-      // linear sub-quad 1
-      conn[0] = this->node(4)+1;
-      conn[1] = this->node(1)+1;
-      conn[2] = this->node(3)+1;
-      conn[3] = this->node(5)+1;
+	  case 1:
+	    // linear sub-quad 1
+	    conn[0] = this->node(4)+1;
+	    conn[1] = this->node(1)+1;
+	    conn[2] = this->node(3)+1;
+	    conn[3] = this->node(5)+1;
 
-      return conn;
-
+	    return;
+	    
+	  default:
+	    error();
+	  }
+      }
+      
     default:
       error();
-
     }
-
-  error();
   
-  return conn;
+  error();
 }
 
 
+// void InfQuad6::tecplot_connectivity(const unsigned int sf,
+// 				    std::vector<unsigned int>& conn) const
+// {
+//   assert (_nodes != NULL);
+//   assert (sf < this->n_sub_elem());
+
+//   // std::vector<unsigned int> conn(4);
+//   conn.resize(4);
+
+//   switch(sf)
+//     {
+//     case 0:
+//       // linear sub-quad 0
+//       conn[0] = this->node(0)+1;
+//       conn[1] = this->node(4)+1;
+//       conn[2] = this->node(5)+1;
+//       conn[3] = this->node(2)+1;
+
+//       return;
+
+//     case 1:
+//       // linear sub-quad 1
+//       conn[0] = this->node(4)+1;
+//       conn[1] = this->node(1)+1;
+//       conn[2] = this->node(3)+1;
+//       conn[3] = this->node(5)+1;
+
+//       return;
+
+//     default:
+//       error();
+
+//     }
+
+//   error();
+// }
 
 
-void InfQuad6::vtk_connectivity(const unsigned int,
-				std::vector<unsigned int> *) const
-{
-  error();  // Not yet implemented
-}
+
+
+// void InfQuad6::vtk_connectivity(const unsigned int,
+// 				std::vector<unsigned int> *) const
+// {
+//   error();  // Not yet implemented
+// }
 
 
 

@@ -1,4 +1,4 @@
-// $Id: edge_edge2.C,v 1.9 2004-01-03 15:37:43 benkirk Exp $
+// $Id: edge_edge2.C,v 1.10 2004-07-14 19:23:18 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -23,36 +23,75 @@
 #include "edge_edge2.h"
 
 
-
-const std::vector<unsigned int> Edge2::tecplot_connectivity(const unsigned int se) const
+void Edge2::connectivity(const unsigned int sc,
+			 const IOPackage iop,
+			 std::vector<unsigned int>& conn) const
 {
-  assert (se == 0);
-
-  std::vector<unsigned int> conn(2);
-
-  conn[0] = this->node(0)+1;
-  conn[1] = this->node(1)+1;
-
-  return conn;
-}
-
-
-
-void Edge2::vtk_connectivity(const unsigned int se,
-			     std::vector<unsigned int> *conn) const
-{
+  assert (sc == 0);
   assert (_nodes != NULL);
-  assert (se < this->n_sub_elem());
+  assert (sc < this->n_sub_elem());
+  assert (iop != INVALID_IO_PACKAGE);
   
-  if (conn == NULL)
-    conn = new std::vector<unsigned int>;
+  // Create storage
+  conn.resize(2);
 
-  conn->resize(2);
+  switch (iop)
+    {
+    case TECPLOT:
+      {
+	conn[0] = this->node(0)+1;
+	conn[1] = this->node(1)+1;
+	return;
+      }
 
-  (*conn)[0] = this->node(0);
-  (*conn)[1] = this->node(1);
+    case VTK:
+      {
+	conn[0] = this->node(0);
+	conn[1] = this->node(1);
+	return;
+      }
 
-  return;
+    default:
+      {
+	error();
+      }
+    }
+
+  error();
 }
+
+
+
+
+// void Edge2::tecplot_connectivity(const unsigned int se,
+// 				 std::vector<unsigned int>& conn) const
+// {
+//   assert (se == 0);
+
+//   //std::vector<unsigned int> conn(2);
+//   conn.resize(2);
+
+//   conn[0] = this->node(0)+1;
+//   conn[1] = this->node(1)+1;
+// }
+
+
+
+// void Edge2::vtk_connectivity(const unsigned int se,
+// 			     std::vector<unsigned int> *conn) const
+// {
+//   assert (_nodes != NULL);
+//   assert (se < this->n_sub_elem());
+  
+//   if (conn == NULL)
+//     conn = new std::vector<unsigned int>;
+
+//   conn->resize(2);
+
+//   (*conn)[0] = this->node(0);
+//   (*conn)[1] = this->node(1);
+
+//   return;
+// }
 
 

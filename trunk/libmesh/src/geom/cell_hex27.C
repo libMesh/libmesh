@@ -1,4 +1,4 @@
-// $Id: cell_hex27.C,v 1.21 2004-01-03 15:37:43 benkirk Exp $
+// $Id: cell_hex27.C,v 1.22 2004-07-14 19:23:18 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -182,256 +182,504 @@ AutoPtr<Elem> Hex27::build_side (const unsigned int i) const
 
 
 
-const std::vector<unsigned int> Hex27::tecplot_connectivity(const unsigned int sc) const
+void Hex27::connectivity(const unsigned int sc,
+			 const IOPackage iop,
+			 std::vector<unsigned int>& conn) const
 {
   assert (_nodes != NULL);
   assert (sc < this->n_sub_elem());
+  assert (iop != INVALID_IO_PACKAGE);
 
-  std::vector<unsigned int> conn(8);
+  conn.resize(8);
 
-
-  switch (sc)
+  switch (iop)
     {
-    case 0:
+    case TECPLOT:
+      {
+	switch (sc)
+	  {
+	  case 0:
 
-      conn[0] = this->node(0)+1;
-      conn[1] = this->node(8)+1;
-      conn[2] = this->node(20)+1;
-      conn[3] = this->node(11)+1;
-      conn[4] = this->node(12)+1;
-      conn[5] = this->node(21)+1;
-      conn[6] = this->node(26)+1;
-      conn[7] = this->node(24)+1;
+	    conn[0] = this->node(0)+1;
+	    conn[1] = this->node(8)+1;
+	    conn[2] = this->node(20)+1;
+	    conn[3] = this->node(11)+1;
+	    conn[4] = this->node(12)+1;
+	    conn[5] = this->node(21)+1;
+	    conn[6] = this->node(26)+1;
+	    conn[7] = this->node(24)+1;
 
-      return conn;
+	    return;
       
-    case 1:
+	  case 1:
 
-      conn[0] = this->node(8)+1;
-      conn[1] = this->node(1)+1;
-      conn[2] = this->node(9)+1;
-      conn[3] = this->node(20)+1;
-      conn[4] = this->node(21)+1;
-      conn[5] = this->node(13)+1;
-      conn[6] = this->node(22)+1;
-      conn[7] = this->node(26)+1;
+	    conn[0] = this->node(8)+1;
+	    conn[1] = this->node(1)+1;
+	    conn[2] = this->node(9)+1;
+	    conn[3] = this->node(20)+1;
+	    conn[4] = this->node(21)+1;
+	    conn[5] = this->node(13)+1;
+	    conn[6] = this->node(22)+1;
+	    conn[7] = this->node(26)+1;
 
-      return conn;
+	    return;
       
-    case 2:
+	  case 2:
 
-      conn[0] = this->node(11)+1;
-      conn[1] = this->node(20)+1;
-      conn[2] = this->node(10)+1;
-      conn[3] = this->node(3)+1; 
-      conn[4] = this->node(24)+1;
-      conn[5] = this->node(26)+1;
-      conn[6] = this->node(23)+1;
-      conn[7] = this->node(15)+1;
+	    conn[0] = this->node(11)+1;
+	    conn[1] = this->node(20)+1;
+	    conn[2] = this->node(10)+1;
+	    conn[3] = this->node(3)+1; 
+	    conn[4] = this->node(24)+1;
+	    conn[5] = this->node(26)+1;
+	    conn[6] = this->node(23)+1;
+	    conn[7] = this->node(15)+1;
 
-      return conn;
+	    return;
       
-    case 3:
+	  case 3:
 
-      conn[0] = this->node(20)+1;
-      conn[1] = this->node(9)+1;
-      conn[2] = this->node(2)+1;
-      conn[3] = this->node(10)+1;
-      conn[4] = this->node(26)+1;
-      conn[5] = this->node(22)+1;
-      conn[6] = this->node(14)+1;
-      conn[7] = this->node(23)+1;
+	    conn[0] = this->node(20)+1;
+	    conn[1] = this->node(9)+1;
+	    conn[2] = this->node(2)+1;
+	    conn[3] = this->node(10)+1;
+	    conn[4] = this->node(26)+1;
+	    conn[5] = this->node(22)+1;
+	    conn[6] = this->node(14)+1;
+	    conn[7] = this->node(23)+1;
 
-      return conn;
+	    return;
       
-    case 4:
+	  case 4:
 
-      conn[0] = this->node(12)+1;
-      conn[1] = this->node(21)+1;
-      conn[2] = this->node(26)+1;
-      conn[3] = this->node(24)+1;
-      conn[4] = this->node(4)+1;
-      conn[5] = this->node(16)+1;
-      conn[6] = this->node(25)+1;
-      conn[7] = this->node(19)+1;
+	    conn[0] = this->node(12)+1;
+	    conn[1] = this->node(21)+1;
+	    conn[2] = this->node(26)+1;
+	    conn[3] = this->node(24)+1;
+	    conn[4] = this->node(4)+1;
+	    conn[5] = this->node(16)+1;
+	    conn[6] = this->node(25)+1;
+	    conn[7] = this->node(19)+1;
 
-      return conn;
+	    return;
       
-    case 5:
+	  case 5:
 
-      conn[0] = this->node(21)+1;
-      conn[1] = this->node(13)+1;
-      conn[2] = this->node(22)+1;
-      conn[3] = this->node(26)+1;
-      conn[4] = this->node(16)+1;
-      conn[5] = this->node(5)+1;
-      conn[6] = this->node(17)+1;
-      conn[7] = this->node(25)+1;
+	    conn[0] = this->node(21)+1;
+	    conn[1] = this->node(13)+1;
+	    conn[2] = this->node(22)+1;
+	    conn[3] = this->node(26)+1;
+	    conn[4] = this->node(16)+1;
+	    conn[5] = this->node(5)+1;
+	    conn[6] = this->node(17)+1;
+	    conn[7] = this->node(25)+1;
 
-      return conn;
+	    return;
       
-    case 6:
+	  case 6:
 
-      conn[0] = this->node(24)+1;
-      conn[1] = this->node(26)+1;
-      conn[2] = this->node(23)+1;
-      conn[3] = this->node(15)+1;
-      conn[4] = this->node(19)+1;
-      conn[5] = this->node(25)+1;
-      conn[6] = this->node(18)+1;
-      conn[7] = this->node(7)+1; 
+	    conn[0] = this->node(24)+1;
+	    conn[1] = this->node(26)+1;
+	    conn[2] = this->node(23)+1;
+	    conn[3] = this->node(15)+1;
+	    conn[4] = this->node(19)+1;
+	    conn[5] = this->node(25)+1;
+	    conn[6] = this->node(18)+1;
+	    conn[7] = this->node(7)+1; 
 
-      return conn;
+	    return;
       
-    case 7:
+	  case 7:
       
-      conn[0] = this->node(26)+1;
-      conn[1] = this->node(22)+1;
-      conn[2] = this->node(14)+1;
-      conn[3] = this->node(23)+1;
-      conn[4] = this->node(25)+1;
-      conn[5] = this->node(17)+1;
-      conn[6] = this->node(6)+1;
-      conn[7] = this->node(18)+1;
+	    conn[0] = this->node(26)+1;
+	    conn[1] = this->node(22)+1;
+	    conn[2] = this->node(14)+1;
+	    conn[3] = this->node(23)+1;
+	    conn[4] = this->node(25)+1;
+	    conn[5] = this->node(17)+1;
+	    conn[6] = this->node(6)+1;
+	    conn[7] = this->node(18)+1;
 
-      return conn;
+	    return;
+
+	  default:
+	    error();
+	  }
+      }
+      
+    case VTK:
+      {
+	switch (sc)
+	  {
+	  case 0:
+
+	    conn[0] = this->node(0);
+	    conn[1] = this->node(8);
+	    conn[2] = this->node(20);
+	    conn[3] = this->node(11);
+	    conn[4] = this->node(12);
+	    conn[5] = this->node(21);
+	    conn[6] = this->node(26);
+	    conn[7] = this->node(24);
+
+	    return;
+      
+	  case 1:
+
+	    conn[0] = this->node(8);
+	    conn[1] = this->node(1);
+	    conn[2] = this->node(9);
+	    conn[3] = this->node(20);
+	    conn[4] = this->node(21);
+	    conn[5] = this->node(13);
+	    conn[6] = this->node(22);
+	    conn[7] = this->node(26);
+
+	    return;
+      
+	  case 2:
+
+	    conn[0] = this->node(11);
+	    conn[1] = this->node(20);
+	    conn[2] = this->node(10);
+	    conn[3] = this->node(3); 
+	    conn[4] = this->node(24);
+	    conn[5] = this->node(26);
+	    conn[6] = this->node(23);
+	    conn[7] = this->node(15);
+
+	    return;
+      
+	  case 3:
+
+	    conn[0] = this->node(20);
+	    conn[1] = this->node(9);
+	    conn[2] = this->node(2);
+	    conn[3] = this->node(10);
+	    conn[4] = this->node(26);
+	    conn[5] = this->node(22);
+	    conn[6] = this->node(14);
+	    conn[7] = this->node(23);
+
+	    return;
+      
+	  case 4:
+
+	    conn[0] = this->node(12);
+	    conn[1] = this->node(21);
+	    conn[2] = this->node(26);
+	    conn[3] = this->node(24);
+	    conn[4] = this->node(4);
+	    conn[5] = this->node(16);
+	    conn[6] = this->node(25);
+	    conn[7] = this->node(19);
+
+	    return;
+      
+	  case 5:
+
+	    conn[0] = this->node(21);
+	    conn[1] = this->node(13);
+	    conn[2] = this->node(22);
+	    conn[3] = this->node(26);
+	    conn[4] = this->node(16);
+	    conn[5] = this->node(5);
+	    conn[6] = this->node(17);
+	    conn[7] = this->node(25);
+
+	    return;
+      
+	  case 6:
+
+	    conn[0] = this->node(24);
+	    conn[1] = this->node(26);
+	    conn[2] = this->node(23);
+	    conn[3] = this->node(15);
+	    conn[4] = this->node(19);
+	    conn[5] = this->node(25);
+	    conn[6] = this->node(18);
+	    conn[7] = this->node(7); 
+
+	    return;
+      
+	  case 7:
+      
+	    conn[0] = this->node(26);
+	    conn[1] = this->node(22);
+	    conn[2] = this->node(14);
+	    conn[3] = this->node(23);
+	    conn[4] = this->node(25);
+	    conn[5] = this->node(17);
+	    conn[6] = this->node(6);
+	    conn[7] = this->node(18);
+
+	    return;
+
+	  default:
+	    error();      
+	  }
+      }
 
     default:
       error();
-      
     }
-  
-  return conn;
+
+  error();
 }
 
 
 
+// void Hex27::tecplot_connectivity(const unsigned int sc,
+// 				 std::vector<unsigned int>& conn) const
+// {
+//   assert (_nodes != NULL);
+//   assert (sc < this->n_sub_elem());
 
+//   // std::vector<unsigned int> conn(8);
+//   conn.resize(8);
 
+//   switch (sc)
+//     {
+//     case 0:
 
-void Hex27::vtk_connectivity(const unsigned int sc,
-			     std::vector<unsigned int> *conn) const
-{
-  assert (_nodes != NULL);
-  assert (sc < this->n_sub_elem());
+//       conn[0] = this->node(0)+1;
+//       conn[1] = this->node(8)+1;
+//       conn[2] = this->node(20)+1;
+//       conn[3] = this->node(11)+1;
+//       conn[4] = this->node(12)+1;
+//       conn[5] = this->node(21)+1;
+//       conn[6] = this->node(26)+1;
+//       conn[7] = this->node(24)+1;
+
+//       return;
+      
+//     case 1:
+
+//       conn[0] = this->node(8)+1;
+//       conn[1] = this->node(1)+1;
+//       conn[2] = this->node(9)+1;
+//       conn[3] = this->node(20)+1;
+//       conn[4] = this->node(21)+1;
+//       conn[5] = this->node(13)+1;
+//       conn[6] = this->node(22)+1;
+//       conn[7] = this->node(26)+1;
+
+//       return;
+      
+//     case 2:
+
+//       conn[0] = this->node(11)+1;
+//       conn[1] = this->node(20)+1;
+//       conn[2] = this->node(10)+1;
+//       conn[3] = this->node(3)+1; 
+//       conn[4] = this->node(24)+1;
+//       conn[5] = this->node(26)+1;
+//       conn[6] = this->node(23)+1;
+//       conn[7] = this->node(15)+1;
+
+//       return;
+      
+//     case 3:
+
+//       conn[0] = this->node(20)+1;
+//       conn[1] = this->node(9)+1;
+//       conn[2] = this->node(2)+1;
+//       conn[3] = this->node(10)+1;
+//       conn[4] = this->node(26)+1;
+//       conn[5] = this->node(22)+1;
+//       conn[6] = this->node(14)+1;
+//       conn[7] = this->node(23)+1;
+
+//       return;
+      
+//     case 4:
+
+//       conn[0] = this->node(12)+1;
+//       conn[1] = this->node(21)+1;
+//       conn[2] = this->node(26)+1;
+//       conn[3] = this->node(24)+1;
+//       conn[4] = this->node(4)+1;
+//       conn[5] = this->node(16)+1;
+//       conn[6] = this->node(25)+1;
+//       conn[7] = this->node(19)+1;
+
+//       return;
+      
+//     case 5:
+
+//       conn[0] = this->node(21)+1;
+//       conn[1] = this->node(13)+1;
+//       conn[2] = this->node(22)+1;
+//       conn[3] = this->node(26)+1;
+//       conn[4] = this->node(16)+1;
+//       conn[5] = this->node(5)+1;
+//       conn[6] = this->node(17)+1;
+//       conn[7] = this->node(25)+1;
+
+//       return;
+      
+//     case 6:
+
+//       conn[0] = this->node(24)+1;
+//       conn[1] = this->node(26)+1;
+//       conn[2] = this->node(23)+1;
+//       conn[3] = this->node(15)+1;
+//       conn[4] = this->node(19)+1;
+//       conn[5] = this->node(25)+1;
+//       conn[6] = this->node(18)+1;
+//       conn[7] = this->node(7)+1; 
+
+//       return;
+      
+//     case 7:
+      
+//       conn[0] = this->node(26)+1;
+//       conn[1] = this->node(22)+1;
+//       conn[2] = this->node(14)+1;
+//       conn[3] = this->node(23)+1;
+//       conn[4] = this->node(25)+1;
+//       conn[5] = this->node(17)+1;
+//       conn[6] = this->node(6)+1;
+//       conn[7] = this->node(18)+1;
+
+//       return;
+
+//     default:
+//       error();
+      
+//     }
   
-  if (conn == NULL)
-    conn = new std::vector<unsigned int>;
+//   error();
+// }
 
-  conn->resize(8);
 
-  switch (sc)
-    {
-    case 0:
 
-      (*conn)[0] = this->node(0);
-      (*conn)[1] = this->node(8);
-      (*conn)[2] = this->node(20);
-      (*conn)[3] = this->node(11);
-      (*conn)[4] = this->node(12);
-      (*conn)[5] = this->node(21);
-      (*conn)[6] = this->node(26);
-      (*conn)[7] = this->node(24);
 
-      return;
-      
-    case 1:
 
-      (*conn)[0] = this->node(8);
-      (*conn)[1] = this->node(1);
-      (*conn)[2] = this->node(9);
-      (*conn)[3] = this->node(20);
-      (*conn)[4] = this->node(21);
-      (*conn)[5] = this->node(13);
-      (*conn)[6] = this->node(22);
-      (*conn)[7] = this->node(26);
 
-      return;
-      
-    case 2:
-
-      (*conn)[0] = this->node(11);
-      (*conn)[1] = this->node(20);
-      (*conn)[2] = this->node(10);
-      (*conn)[3] = this->node(3); 
-      (*conn)[4] = this->node(24);
-      (*conn)[5] = this->node(26);
-      (*conn)[6] = this->node(23);
-      (*conn)[7] = this->node(15);
-
-      return;
-      
-    case 3:
-
-      (*conn)[0] = this->node(20);
-      (*conn)[1] = this->node(9);
-      (*conn)[2] = this->node(2);
-      (*conn)[3] = this->node(10);
-      (*conn)[4] = this->node(26);
-      (*conn)[5] = this->node(22);
-      (*conn)[6] = this->node(14);
-      (*conn)[7] = this->node(23);
-
-      return;
-      
-    case 4:
-
-      (*conn)[0] = this->node(12);
-      (*conn)[1] = this->node(21);
-      (*conn)[2] = this->node(26);
-      (*conn)[3] = this->node(24);
-      (*conn)[4] = this->node(4);
-      (*conn)[5] = this->node(16);
-      (*conn)[6] = this->node(25);
-      (*conn)[7] = this->node(19);
-
-      return;
-      
-    case 5:
-
-      (*conn)[0] = this->node(21);
-      (*conn)[1] = this->node(13);
-      (*conn)[2] = this->node(22);
-      (*conn)[3] = this->node(26);
-      (*conn)[4] = this->node(16);
-      (*conn)[5] = this->node(5);
-      (*conn)[6] = this->node(17);
-      (*conn)[7] = this->node(25);
-
-      return;
-      
-    case 6:
-
-      (*conn)[0] = this->node(24);
-      (*conn)[1] = this->node(26);
-      (*conn)[2] = this->node(23);
-      (*conn)[3] = this->node(15);
-      (*conn)[4] = this->node(19);
-      (*conn)[5] = this->node(25);
-      (*conn)[6] = this->node(18);
-      (*conn)[7] = this->node(7); 
-
-      return;
-      
-    case 7:
-      
-      (*conn)[0] = this->node(26);
-      (*conn)[1] = this->node(22);
-      (*conn)[2] = this->node(14);
-      (*conn)[3] = this->node(23);
-      (*conn)[4] = this->node(25);
-      (*conn)[5] = this->node(17);
-      (*conn)[6] = this->node(6);
-      (*conn)[7] = this->node(18);
-
-      return;
-
-    default:
-      error();      
-    }
+// void Hex27::vtk_connectivity(const unsigned int sc,
+// 			     std::vector<unsigned int> *conn) const
+// {
+//   assert (_nodes != NULL);
+//   assert (sc < this->n_sub_elem());
   
-  return;
-}
+//   if (conn == NULL)
+//     conn = new std::vector<unsigned int>;
+
+//   conn->resize(8);
+
+//   switch (sc)
+//     {
+//     case 0:
+
+//       (*conn)[0] = this->node(0);
+//       (*conn)[1] = this->node(8);
+//       (*conn)[2] = this->node(20);
+//       (*conn)[3] = this->node(11);
+//       (*conn)[4] = this->node(12);
+//       (*conn)[5] = this->node(21);
+//       (*conn)[6] = this->node(26);
+//       (*conn)[7] = this->node(24);
+
+//       return;
+      
+//     case 1:
+
+//       (*conn)[0] = this->node(8);
+//       (*conn)[1] = this->node(1);
+//       (*conn)[2] = this->node(9);
+//       (*conn)[3] = this->node(20);
+//       (*conn)[4] = this->node(21);
+//       (*conn)[5] = this->node(13);
+//       (*conn)[6] = this->node(22);
+//       (*conn)[7] = this->node(26);
+
+//       return;
+      
+//     case 2:
+
+//       (*conn)[0] = this->node(11);
+//       (*conn)[1] = this->node(20);
+//       (*conn)[2] = this->node(10);
+//       (*conn)[3] = this->node(3); 
+//       (*conn)[4] = this->node(24);
+//       (*conn)[5] = this->node(26);
+//       (*conn)[6] = this->node(23);
+//       (*conn)[7] = this->node(15);
+
+//       return;
+      
+//     case 3:
+
+//       (*conn)[0] = this->node(20);
+//       (*conn)[1] = this->node(9);
+//       (*conn)[2] = this->node(2);
+//       (*conn)[3] = this->node(10);
+//       (*conn)[4] = this->node(26);
+//       (*conn)[5] = this->node(22);
+//       (*conn)[6] = this->node(14);
+//       (*conn)[7] = this->node(23);
+
+//       return;
+      
+//     case 4:
+
+//       (*conn)[0] = this->node(12);
+//       (*conn)[1] = this->node(21);
+//       (*conn)[2] = this->node(26);
+//       (*conn)[3] = this->node(24);
+//       (*conn)[4] = this->node(4);
+//       (*conn)[5] = this->node(16);
+//       (*conn)[6] = this->node(25);
+//       (*conn)[7] = this->node(19);
+
+//       return;
+      
+//     case 5:
+
+//       (*conn)[0] = this->node(21);
+//       (*conn)[1] = this->node(13);
+//       (*conn)[2] = this->node(22);
+//       (*conn)[3] = this->node(26);
+//       (*conn)[4] = this->node(16);
+//       (*conn)[5] = this->node(5);
+//       (*conn)[6] = this->node(17);
+//       (*conn)[7] = this->node(25);
+
+//       return;
+      
+//     case 6:
+
+//       (*conn)[0] = this->node(24);
+//       (*conn)[1] = this->node(26);
+//       (*conn)[2] = this->node(23);
+//       (*conn)[3] = this->node(15);
+//       (*conn)[4] = this->node(19);
+//       (*conn)[5] = this->node(25);
+//       (*conn)[6] = this->node(18);
+//       (*conn)[7] = this->node(7); 
+
+//       return;
+      
+//     case 7:
+      
+//       (*conn)[0] = this->node(26);
+//       (*conn)[1] = this->node(22);
+//       (*conn)[2] = this->node(14);
+//       (*conn)[3] = this->node(23);
+//       (*conn)[4] = this->node(25);
+//       (*conn)[5] = this->node(17);
+//       (*conn)[6] = this->node(6);
+//       (*conn)[7] = this->node(18);
+
+//       return;
+
+//     default:
+//       error();      
+//     }
+  
+//   return;
+// }
 
 
 

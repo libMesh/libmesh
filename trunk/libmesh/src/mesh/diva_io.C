@@ -1,4 +1,4 @@
-// $Id: diva_io.C,v 1.1 2004-03-20 05:36:27 jwpeterson Exp $
+// $Id: diva_io.C,v 1.2 2004-07-14 19:23:18 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -351,10 +351,10 @@ void DivaIO::write_stream (std::ostream& out)
 	  (mesh.elem(e)->type() == HEX20) ||
 	  (mesh.elem(e)->type() == HEX27)   )
 	{
+	  std::vector<unsigned int> conn;
 	  for (unsigned int se=0; se<mesh.elem(e)->n_sub_elem(); se++)
 	    {
-	      std::vector<unsigned int> conn =
-		mesh.elem(e)->tecplot_connectivity(se);
+	      mesh.elem(e)->connectivity(se, TECPLOT, conn);
 
 	      out << conn[0] << " "
 		  << conn[1] << " "

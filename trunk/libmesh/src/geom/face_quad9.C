@@ -1,4 +1,4 @@
-// $Id: face_quad9.C,v 1.18 2004-01-03 15:37:43 benkirk Exp $
+// $Id: face_quad9.C,v 1.19 2004-07-14 19:23:18 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -185,122 +185,232 @@ AutoPtr<Elem> Quad9::build_side (const unsigned int i) const
 
 
 
-const std::vector<unsigned int> Quad9::tecplot_connectivity(const unsigned int sf) const
+
+
+
+
+void Quad9::connectivity(const unsigned int sf,
+			 const IOPackage iop,
+			 std::vector<unsigned int>& conn) const
 {
   assert (_nodes != NULL);
   assert (sf < this->n_sub_elem());
+  assert (iop != INVALID_IO_PACKAGE);
 
-  std::vector<unsigned int> conn(4);
+  conn.resize(4);
 
-  switch(sf)
+  switch (iop)
     {
-    case 0:
-      // linear sub-quad 0
-      conn[0] = this->node(0)+1;
-      conn[1] = this->node(4)+1;
-      conn[2] = this->node(8)+1;
-      conn[3] = this->node(7)+1;
+    case TECPLOT:
+      {
+	switch(sf)
+	  {
+	  case 0:
+	    // linear sub-quad 0
+	    conn[0] = this->node(0)+1;
+	    conn[1] = this->node(4)+1;
+	    conn[2] = this->node(8)+1;
+	    conn[3] = this->node(7)+1;
+	    return;
 
-      return conn;
+	  case 1:
+	    // linear sub-quad 1
+	    conn[0] = this->node(4)+1;
+	    conn[1] = this->node(1)+1;
+	    conn[2] = this->node(5)+1;
+	    conn[3] = this->node(8)+1;
+	    return;
 
-    case 1:
-      // linear sub-quad 1
-      conn[0] = this->node(4)+1;
-      conn[1] = this->node(1)+1;
-      conn[2] = this->node(5)+1;
-      conn[3] = this->node(8)+1;
+	  case 2:
+	    // linear sub-quad 2
+	    conn[0] = this->node(7)+1;
+	    conn[1] = this->node(8)+1;
+	    conn[2] = this->node(6)+1;
+	    conn[3] = this->node(3)+1;
+	    return;
 
-      return conn;
+	  case 3:
+	    // linear sub-quad 3
+	    conn[0] = this->node(8)+1;
+	    conn[1] = this->node(5)+1;
+	    conn[2] = this->node(2)+1;
+	    conn[3] = this->node(6)+1;
+	    return;
 
-    case 2:
-      // linear sub-quad 2
-      conn[0] = this->node(7)+1;
-      conn[1] = this->node(8)+1;
-      conn[2] = this->node(6)+1;
-      conn[3] = this->node(3)+1;
+	  default:
+	    error();
+	  }
+      }
 
-      return conn;
+    case VTK:
+      {
+	switch(sf)
+	  {
+	  case 0:
+	    // linear sub-quad 0
+	    conn[0] = this->node(0);
+	    conn[1] = this->node(4);
+	    conn[2] = this->node(8);
+	    conn[3] = this->node(7);
 
-    case 3:
-      // linear sub-quad 3
-      conn[0] = this->node(8)+1;
-      conn[1] = this->node(5)+1;
-      conn[2] = this->node(2)+1;
-      conn[3] = this->node(6)+1;
+	    return;
 
-      return conn;
+	  case 1:
+	    // linear sub-quad 1
+	    conn[0] = this->node(4);
+	    conn[1] = this->node(1);
+	    conn[2] = this->node(5);
+	    conn[3] = this->node(8);
+
+	    return;
+
+	  case 2:
+	    // linear sub-quad 2
+	    conn[0] = this->node(7);
+	    conn[1] = this->node(8);
+	    conn[2] = this->node(6);
+	    conn[3] = this->node(3);
+
+	    return;
+
+	  case 3:
+	    // linear sub-quad 3
+	    conn[0] = this->node(8);
+	    conn[1] = this->node(5);
+	    conn[2] = this->node(2);
+	    conn[3] = this->node(6);
+
+	    return;
+
+	  default:
+	    error();
+	  }
+      }
 
     default:
-      error();
+      {
+	error();
+      }
     }
 
   error();
-  
-  return conn;
 }
 
 
+// void Quad9::tecplot_connectivity(const unsigned int sf,
+// 				 std::vector<unsigned int>& conn) const
+// {
+//   assert (_nodes != NULL);
+//   assert (sf < this->n_sub_elem());
 
-
-
-
-void Quad9::vtk_connectivity(const unsigned int sf,
-			     std::vector<unsigned int> *conn) const
-{
-  assert (_nodes != NULL);
-  assert (sf < this->n_sub_elem());
+//   //std::vector<unsigned int> conn(4);
+//   conn.resize(4);
   
-  if (conn == NULL)
-    conn = new std::vector<unsigned int>;
+//   switch(sf)
+//     {
+//     case 0:
+//       // linear sub-quad 0
+//       conn[0] = this->node(0)+1;
+//       conn[1] = this->node(4)+1;
+//       conn[2] = this->node(8)+1;
+//       conn[3] = this->node(7)+1;
+//       return;
 
-  conn->resize(4);
+//     case 1:
+//       // linear sub-quad 1
+//       conn[0] = this->node(4)+1;
+//       conn[1] = this->node(1)+1;
+//       conn[2] = this->node(5)+1;
+//       conn[3] = this->node(8)+1;
+//       return;
 
-  switch(sf)
-    {
-    case 0:
-      // linear sub-quad 0
-      (*conn)[0] = this->node(0);
-      (*conn)[1] = this->node(4);
-      (*conn)[2] = this->node(8);
-      (*conn)[3] = this->node(7);
+//     case 2:
+//       // linear sub-quad 2
+//       conn[0] = this->node(7)+1;
+//       conn[1] = this->node(8)+1;
+//       conn[2] = this->node(6)+1;
+//       conn[3] = this->node(3)+1;
+//       return;
 
-      return;
+//     case 3:
+//       // linear sub-quad 3
+//       conn[0] = this->node(8)+1;
+//       conn[1] = this->node(5)+1;
+//       conn[2] = this->node(2)+1;
+//       conn[3] = this->node(6)+1;
+//       return;
 
-    case 1:
-      // linear sub-quad 1
-      (*conn)[0] = this->node(4);
-      (*conn)[1] = this->node(1);
-      (*conn)[2] = this->node(5);
-      (*conn)[3] = this->node(8);
+//     default:
+//       error();
+//     }
 
-      return;
-
-    case 2:
-      // linear sub-quad 2
-      (*conn)[0] = this->node(7);
-      (*conn)[1] = this->node(8);
-      (*conn)[2] = this->node(6);
-      (*conn)[3] = this->node(3);
-
-      return;
-
-    case 3:
-      // linear sub-quad 3
-      (*conn)[0] = this->node(8);
-      (*conn)[1] = this->node(5);
-      (*conn)[2] = this->node(2);
-      (*conn)[3] = this->node(6);
-
-      return;
-
-    default:
-      error();
-    }
-
-  error();
+//   error();
   
-  return;
-}
+//   // return conn;
+// }
+
+
+
+
+
+
+// void Quad9::vtk_connectivity(const unsigned int sf,
+// 			     std::vector<unsigned int> *conn) const
+// {
+//   assert (_nodes != NULL);
+//   assert (sf < this->n_sub_elem());
+  
+//   if (conn == NULL)
+//     conn = new std::vector<unsigned int>;
+
+//   conn->resize(4);
+
+//   switch(sf)
+//     {
+//     case 0:
+//       // linear sub-quad 0
+//       (*conn)[0] = this->node(0);
+//       (*conn)[1] = this->node(4);
+//       (*conn)[2] = this->node(8);
+//       (*conn)[3] = this->node(7);
+
+//       return;
+
+//     case 1:
+//       // linear sub-quad 1
+//       (*conn)[0] = this->node(4);
+//       (*conn)[1] = this->node(1);
+//       (*conn)[2] = this->node(5);
+//       (*conn)[3] = this->node(8);
+
+//       return;
+
+//     case 2:
+//       // linear sub-quad 2
+//       (*conn)[0] = this->node(7);
+//       (*conn)[1] = this->node(8);
+//       (*conn)[2] = this->node(6);
+//       (*conn)[3] = this->node(3);
+
+//       return;
+
+//     case 3:
+//       // linear sub-quad 3
+//       (*conn)[0] = this->node(8);
+//       (*conn)[1] = this->node(5);
+//       (*conn)[2] = this->node(2);
+//       (*conn)[3] = this->node(6);
+
+//       return;
+
+//     default:
+//       error();
+//     }
+
+//   error();
+  
+//   // return;
+// }
 
 
 

@@ -1,4 +1,4 @@
-// $Id: face_quad8.C,v 1.17 2004-01-03 15:37:43 benkirk Exp $
+// $Id: face_quad8.C,v 1.18 2004-07-14 19:23:18 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -180,135 +180,277 @@ AutoPtr<Elem> Quad8::build_side (const unsigned int i) const
 
 
 
-const std::vector<unsigned int> Quad8::tecplot_connectivity(const unsigned int sf) const
+
+
+
+void Quad8::connectivity(const unsigned int sf,
+			 const IOPackage iop,
+			 std::vector<unsigned int>& conn) const
 {
   assert (_nodes != NULL);
   assert (sf < this->n_sub_elem());
 
-  std::vector<unsigned int> conn(4);
-
-  switch(sf)
+  switch (iop)
     {
-    case 0:
-      // linear sub-tri 0
-      conn[0] = this->node(0)+1;
-      conn[1] = this->node(4)+1;
-      conn[2] = this->node(7)+1;
-      conn[3] = this->node(7)+1;
+      // Note: TECPLOT connectivity is output as four triangles with
+      // a central quadrilateral.  Therefore, the first four connectivity
+      // arrays are degenerate quads (triangles in Tecplot).
+    case TECPLOT:
+      {
+	// Create storage
+	conn.resize(4);
 
-      return conn;
+	switch(sf)
+	  {
+	  case 0:
+	    // linear sub-tri 0
+	    conn[0] = this->node(0)+1;
+	    conn[1] = this->node(4)+1;
+	    conn[2] = this->node(7)+1;
+	    conn[3] = this->node(7)+1;
 
-    case 1:
-      // linear sub-tri 1
-      conn[0] = this->node(4)+1;
-      conn[1] = this->node(1)+1;
-      conn[2] = this->node(5)+1;
-      conn[3] = this->node(5)+1;
+	    return;
 
-      return conn;
+	  case 1:
+	    // linear sub-tri 1
+	    conn[0] = this->node(4)+1;
+	    conn[1] = this->node(1)+1;
+	    conn[2] = this->node(5)+1;
+	    conn[3] = this->node(5)+1;
 
-    case 2:
-      // linear sub-tri 2
-      conn[0] = this->node(5)+1;
-      conn[1] = this->node(2)+1;
-      conn[2] = this->node(6)+1;
-      conn[3] = this->node(6)+1;
+	    return;
 
-      return conn;
+	  case 2:
+	    // linear sub-tri 2
+	    conn[0] = this->node(5)+1;
+	    conn[1] = this->node(2)+1;
+	    conn[2] = this->node(6)+1;
+	    conn[3] = this->node(6)+1;
 
-    case 3:
-      // linear sub-tri 3
-      conn[0] = this->node(7)+1;
-      conn[1] = this->node(6)+1;
-      conn[2] = this->node(3)+1;
-      conn[3] = this->node(3)+1;
+	    return;
 
-      return conn;
+	  case 3:
+	    // linear sub-tri 3
+	    conn[0] = this->node(7)+1;
+	    conn[1] = this->node(6)+1;
+	    conn[2] = this->node(3)+1;
+	    conn[3] = this->node(3)+1;
 
-    case 4:
-      // linear sub-quad
-      conn[0] = this->node(4)+1;
-      conn[1] = this->node(5)+1;
-      conn[2] = this->node(6)+1;
-      conn[3] = this->node(7)+1;
+	    return;
 
-      return conn;
+	  case 4:
+	    // linear sub-quad
+	    conn[0] = this->node(4)+1;
+	    conn[1] = this->node(5)+1;
+	    conn[2] = this->node(6)+1;
+	    conn[3] = this->node(7)+1;
 
-    default:
-      error();
-    }
+	    return;
 
-  error();
-  
-  return conn;
-}
+	  default:
+	    error();
+	  }
+      }
 
-
-
-void Quad8::vtk_connectivity(const unsigned int sf,
-			     std::vector<unsigned int> *conn) const
-{
-  assert (_nodes != NULL);
-  assert (sf < this->n_sub_elem());
-  
-  if (conn == NULL)
-    conn = new std::vector<unsigned int>;
-
-  conn->resize(3);
-
-  switch (sf)
-    {
-    case 0:
-      // linear sub-tri 0
-      (*conn)[0] = this->node(0);
-      (*conn)[1] = this->node(4);
-      (*conn)[2] = this->node(7);
-
-      return;
-
-    case 1:
-      // linear sub-tri 1
-      (*conn)[0] = this->node(4);
-      (*conn)[1] = this->node(1);
-      (*conn)[2] = this->node(5);
-
-      return;
-
-    case 2:
-      // linear sub-tri 2
-      (*conn)[0] = this->node(5);
-      (*conn)[1] = this->node(2);
-      (*conn)[2] = this->node(6);
-
-      return;
-
-    case 3:
-      // linear sub-tri 3
-      (*conn)[0] = this->node(7);
-      (*conn)[1] = this->node(6);
-      (*conn)[2] = this->node(3);
-
-      return;
-
-    case 4:
-      conn->resize(4);
       
-      // linear sub-quad
-      (*conn)[0] = this->node(4);
-      (*conn)[1] = this->node(5);
-      (*conn)[2] = this->node(6);
-      (*conn)[3] = this->node(7);
+      // Note: VTK connectivity is output as four triangles with
+      // a central quadrilateral.  Therefore most of the connectivity
+      // arrays have length three.
+    case VTK:
+      {
+	// Create storage
+	conn.resize(3);
 
-      return;
+	switch (sf)
+	  {
+	  case 0:
+	    // linear sub-tri 0
+	    conn[0] = this->node(0);
+	    conn[1] = this->node(4);
+	    conn[2] = this->node(7);
+
+	    return;
+
+	  case 1:
+	    // linear sub-tri 1
+	    conn[0] = this->node(4);
+	    conn[1] = this->node(1);
+	    conn[2] = this->node(5);
+
+	    return;
+
+	  case 2:
+	    // linear sub-tri 2
+	    conn[0] = this->node(5);
+	    conn[1] = this->node(2);
+	    conn[2] = this->node(6);
+
+	    return;
+
+	  case 3:
+	    // linear sub-tri 3
+	    conn[0] = this->node(7);
+	    conn[1] = this->node(6);
+	    conn[2] = this->node(3);
+
+	    return;
+
+	  case 4:
+	    conn.resize(4);
+      
+	    // linear sub-quad
+	    conn[0] = this->node(4);
+	    conn[1] = this->node(5);
+	    conn[2] = this->node(6);
+	    conn[3] = this->node(7);
+
+	    return;
+
+	  default:
+	    error();
+	  }
+      }
 
     default:
       error();
     }
 
-  error();
-
-  return;
+    error();
 }
+
+
+
+
+
+// void Quad8::tecplot_connectivity(const unsigned int sf,
+// 				 std::vector<unsigned int>& conn) const
+// {
+//   assert (_nodes != NULL);
+//   assert (sf < this->n_sub_elem());
+
+//   // std::vector<unsigned int> conn(4);
+//   conn.resize(4);
+
+//   switch(sf)
+//     {
+//     case 0:
+//       // linear sub-tri 0
+//       conn[0] = this->node(0)+1;
+//       conn[1] = this->node(4)+1;
+//       conn[2] = this->node(7)+1;
+//       conn[3] = this->node(7)+1;
+
+//       return;
+
+//     case 1:
+//       // linear sub-tri 1
+//       conn[0] = this->node(4)+1;
+//       conn[1] = this->node(1)+1;
+//       conn[2] = this->node(5)+1;
+//       conn[3] = this->node(5)+1;
+
+//       return;
+
+//     case 2:
+//       // linear sub-tri 2
+//       conn[0] = this->node(5)+1;
+//       conn[1] = this->node(2)+1;
+//       conn[2] = this->node(6)+1;
+//       conn[3] = this->node(6)+1;
+
+//       return;
+
+//     case 3:
+//       // linear sub-tri 3
+//       conn[0] = this->node(7)+1;
+//       conn[1] = this->node(6)+1;
+//       conn[2] = this->node(3)+1;
+//       conn[3] = this->node(3)+1;
+
+//       return;
+
+//     case 4:
+//       // linear sub-quad
+//       conn[0] = this->node(4)+1;
+//       conn[1] = this->node(5)+1;
+//       conn[2] = this->node(6)+1;
+//       conn[3] = this->node(7)+1;
+
+//       return;
+
+//     default:
+//       error();
+//     }
+
+//   error();
+// }
+
+
+
+// void Quad8::vtk_connectivity(const unsigned int sf,
+// 			     std::vector<unsigned int> *conn) const
+// {
+//   assert (_nodes != NULL);
+//   assert (sf < this->n_sub_elem());
+  
+//   if (conn == NULL)
+//     conn = new std::vector<unsigned int>;
+
+//   conn->resize(3);
+
+//   switch (sf)
+//     {
+//     case 0:
+//       // linear sub-tri 0
+//       (*conn)[0] = this->node(0);
+//       (*conn)[1] = this->node(4);
+//       (*conn)[2] = this->node(7);
+
+//       return;
+
+//     case 1:
+//       // linear sub-tri 1
+//       (*conn)[0] = this->node(4);
+//       (*conn)[1] = this->node(1);
+//       (*conn)[2] = this->node(5);
+
+//       return;
+
+//     case 2:
+//       // linear sub-tri 2
+//       (*conn)[0] = this->node(5);
+//       (*conn)[1] = this->node(2);
+//       (*conn)[2] = this->node(6);
+
+//       return;
+
+//     case 3:
+//       // linear sub-tri 3
+//       (*conn)[0] = this->node(7);
+//       (*conn)[1] = this->node(6);
+//       (*conn)[2] = this->node(3);
+
+//       return;
+
+//     case 4:
+//       conn->resize(4);
+      
+//       // linear sub-quad
+//       (*conn)[0] = this->node(4);
+//       (*conn)[1] = this->node(5);
+//       (*conn)[2] = this->node(6);
+//       (*conn)[3] = this->node(7);
+
+//       return;
+
+//     default:
+//       error();
+//     }
+
+//   error();
+
+//   return;
+// }
 
 
 

@@ -1,4 +1,4 @@
-// $Id: cell_tet4.C,v 1.15 2004-01-03 15:37:43 benkirk Exp $
+// $Id: cell_tet4.C,v 1.16 2004-07-14 19:23:18 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -82,46 +82,91 @@ AutoPtr<Elem> Tet4::build_side (const unsigned int i) const
 }
 
 
-
-const std::vector<unsigned int> Tet4::tecplot_connectivity(const unsigned int sc) const
+void Tet4::connectivity(const unsigned int sc,
+			const IOPackage iop,
+			std::vector<unsigned int>& conn) const
 {
   assert (_nodes != NULL);
   assert (sc < this->n_sub_elem());
+  assert (iop != INVALID_IO_PACKAGE);
 
-  std::vector<unsigned int> conn(8);
-  
-  conn[0] = this->node(0)+1;
-  conn[1] = this->node(1)+1;
-  conn[2] = this->node(2)+1;
-  conn[3] = this->node(2)+1;
-  conn[4] = this->node(3)+1;
-  conn[5] = this->node(3)+1;
-  conn[6] = this->node(3)+1;
-  conn[7] = this->node(3)+1;
 
-  return conn;
+  switch (iop)
+    {
+    case TECPLOT:
+      {
+	conn.resize(8);
+	conn[0] = this->node(0)+1;
+	conn[1] = this->node(1)+1;
+	conn[2] = this->node(2)+1;
+	conn[3] = this->node(2)+1;
+	conn[4] = this->node(3)+1;
+	conn[5] = this->node(3)+1;
+	conn[6] = this->node(3)+1;
+	conn[7] = this->node(3)+1;
+	return;
+      }
+
+    case VTK:
+      {
+	conn.resize(4);
+	conn[0] = this->node(0);
+	conn[1] = this->node(1);
+	conn[2] = this->node(2);
+	conn[3] = this->node(3);
+	return;
+      }
+
+    default:
+      error();
+    }
+
+  error();
 }
 
 
 
-void Tet4::vtk_connectivity(const unsigned int sc,
-			    std::vector<unsigned int> *conn) const
-{
-  assert (_nodes != NULL);
-  assert (sc < this->n_sub_elem());
+
+
+// void Tet4::tecplot_connectivity(const unsigned int sc,
+// 				std::vector<unsigned int>& conn) const
+// {
+//   assert (_nodes != NULL);
+//   assert (sc < this->n_sub_elem());
+
+//   // std::vector<unsigned int> conn(8);
+//   conn.resize(8);
   
-  if (conn == NULL)
-    conn = new std::vector<unsigned int>;
+//   conn[0] = this->node(0)+1;
+//   conn[1] = this->node(1)+1;
+//   conn[2] = this->node(2)+1;
+//   conn[3] = this->node(2)+1;
+//   conn[4] = this->node(3)+1;
+//   conn[5] = this->node(3)+1;
+//   conn[6] = this->node(3)+1;
+//   conn[7] = this->node(3)+1;
+// }
 
-  conn->resize(4);
 
-  (*conn)[0] = this->node(0);
-  (*conn)[1] = this->node(1);
-  (*conn)[2] = this->node(2);
-  (*conn)[3] = this->node(3);
 
-  return;
-}
+// void Tet4::vtk_connectivity(const unsigned int sc,
+// 			    std::vector<unsigned int> *conn) const
+// {
+//   assert (_nodes != NULL);
+//   assert (sc < this->n_sub_elem());
+  
+//   if (conn == NULL)
+//     conn = new std::vector<unsigned int>;
+
+//   conn->resize(4);
+
+//   (*conn)[0] = this->node(0);
+//   (*conn)[1] = this->node(1);
+//   (*conn)[2] = this->node(2);
+//   (*conn)[3] = this->node(3);
+
+//   return;
+// }
 
 
 
