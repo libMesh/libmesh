@@ -1,0 +1,10 @@
+*~
+*.go
+*.o
+*.pgo
+*.syo
+ex11
+out*.gmv
+ii_files
+so_locations
+*.log
