@@ -1,5 +1,5 @@
 dnl --------------------------------------------------------------
-dnl $Id: configure.in,v 1.38 2004-01-09 19:25:31 spetersen Exp $
+dnl $Id: configure.in,v 1.39 2004-02-08 20:25:23 benkirk Exp $
 dnl --------------------------------------------------------------
 dnl Process this file with autoconf to produce a configure script.
 
@@ -9,10 +9,13 @@ dnl you call ./configure subsequently on different systems without
 dnl clearing the cache 
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
-AC_REVISION($Revision: 1.38 $)
+AC_REVISION($Revision: 1.39 $)
 
 
-AC_INIT(Make.common.in)
+AC_INIT
+AC_CONFIG_FILES(Make.common)
+AC_CONFIG_FILES(doc/Doxyfile)
+AC_CONFIG_FILES(contrib/bin/libmesh-config, [chmod +x contrib/bin/libmesh-config])
 AC_CONFIG_HEADER(include/base/libmesh_config.h:include/base/libmesh_config.h.in)
 
 AC_MSG_RESULT(---------------------------------------------)
@@ -520,14 +523,13 @@ AC_SUBST(PERL)
 dnl -------------------------------------------------------------
 
 
-AC_OUTPUT(Make.common:Make.common.in)
-AC_OUTPUT(doc/Doxyfile:doc/Doxyfile.in)
-rm -f conftest* config.cache config.status
+AC_OUTPUT
 
 
 AC_MSG_RESULT(---------------------------------------------)
 AC_MSG_RESULT(--------- Done Configuring libMesh ----------)
 AC_MSG_RESULT(---------------------------------------------)
+rm -f conftest* config.cache
 
 
 dnl Local Variables:
