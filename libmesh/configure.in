@@ -1,5 +1,5 @@
 dnl --------------------------------------------------------------
-dnl $Id: configure.in,v 1.35 2003-11-05 22:26:32 benkirk Exp $
+dnl $Id: configure.in,v 1.36 2003-11-30 05:00:37 benkirk Exp $
 dnl --------------------------------------------------------------
 dnl Process this file with autoconf to produce a configure script.
 
@@ -9,7 +9,7 @@ dnl you call ./configure subsequently on different systems without
 dnl clearing the cache 
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
-AC_REVISION($Revision: 1.35 $)
+AC_REVISION($Revision: 1.36 $)
 
 
 AC_INIT(Make.common.in)
@@ -20,16 +20,16 @@ AC_MSG_RESULT(----------- Configuring libMesh -------------)
 AC_MSG_RESULT(---------------------------------------------)
 
 AC_CANONICAL_TARGET
+AC_LANG_CPLUSPLUS
 AC_PROG_CXX
 AC_PROG_CC
-AC_LANG_CPLUSPLUS
 
 
 dnl --------------------------------------------------------------
 dnl Shared libraries - enabled by default
 dnl --------------------------------------------------------------
 AC_ARG_ENABLE(shared,
-[  --enable-shared Set compiler flags to enable shared libraries],
+[  --enable-shared 		Set compiler flags to enable shared libraries],
      enableshared=$enableval,
      enableshared=yes)
 AC_SUBST(enableshared)	
@@ -74,7 +74,6 @@ AC_CXX_HAVE_LOCALE
 AC_CXX_HAVE_SSTREAM
 AC_CHECK_HEADERS(hash_map,[],[AC_CHECK_HEADERS(ext/hash_map)])
 AC_CHECK_HEADERS(hash_set,[],[AC_CHECK_HEADERS(ext/hash_set)])
-AC_CHECK_HEADERS(zlib.h)
 
 
 dnl --------------------------------------------------------------
@@ -116,7 +115,7 @@ dnl -------------------------------------------------------------
 dnl AMR -- enabled by default
 dnl -------------------------------------------------------------
 AC_ARG_ENABLE(amr,
-[  --enable-amr build with adaptive mesh refinement (AMR) suppport],
+[  --enable-amr 		build with adaptive mesh refinement (AMR) suppport],
      enableamr=$enableval,
      enableamr=yes)
 
@@ -133,7 +132,7 @@ dnl -------------------------------------------------------------
 dnl 2D only -- disabled by default
 dnl -------------------------------------------------------------
 AC_ARG_ENABLE(2D-only,
-[  --enable-2D-only build with support for 1D and 2D meshes only],
+[  --enable-2D-only 		build with support for 1D and 2D meshes only],
      enable2D=$enableval,
      enable2D=no)
 
@@ -150,7 +149,7 @@ dnl -------------------------------------------------------------
 dnl Expensive Data Structures -- enabled by default
 dnl -------------------------------------------------------------
 AC_ARG_ENABLE(expensive,
-[  --enable-expensive build with expensive data structures turned on],
+[  --enable-expensive 		build with expensive data structures turned on],
      enableexpensive=$enableval,
      enableexpensive=yes)
 
@@ -169,7 +168,7 @@ dnl -------------------------------------------------------------
 dnl Infinite Elements  -- disabled by default
 dnl -------------------------------------------------------------
 AC_ARG_ENABLE(ifem,
-[  --enable-ifem build with infinite elements],
+[  --enable-ifem 		build with infinite elements],
      enableifem=$enableval,
      enableifem=no)
 
@@ -186,7 +185,7 @@ dnl --------------------------------------------------------------
 dnl XDR binary IO support - enabled by default
 dnl --------------------------------------------------------------
 AC_ARG_ENABLE(xdr,
-[  --enable-xdr Set compiler flags to enable xdr binary I/O],
+[  --enable-xdr 		Set compiler flags to enable xdr binary I/O],
      enablexdr=$enableval,
      enablexdr=yes)
 AC_SUBST(enablexdr)	
@@ -199,7 +198,7 @@ if test "$enablexdr" != no ; then
    dnl only do this if XDR is enabled
    dnl --------------------------------------------------------------
    AC_ARG_ENABLE(mgf-workaround,
-   [  --enable-mgf-workaround Set compiler flags to work around MGF bc problem],
+   [  --enable-mgf-workaround 	Set compiler flags to work around MGF bc problem],
         enablemgfworkaround=$enableval,
         enablemgfworkaround=no)
 
@@ -218,7 +217,7 @@ dnl -------------------------------------------------------------
 dnl complex numbers -- disabled by default
 dnl -------------------------------------------------------------
 AC_ARG_ENABLE(complex,
-[  --enable-complex Set compiler flags to build with complex number support],
+[  --enable-complex 		Set compiler flags to build with complex number support],
      enablecomplex=$enableval,
      enablecomplex=no)
 
@@ -242,7 +241,7 @@ dnl -------------------------------------------------------------
 dnl Reference Counting -- enabled by default
 dnl -------------------------------------------------------------
 AC_ARG_ENABLE(reference-counting,
-[  --enable-reference-counting build with reference counting suppport],
+[  --enable-reference-counting 	build with reference counting suppport],
      enablerefct=$enableval,
      enablerefct=yes)
 
@@ -259,7 +258,7 @@ dnl -------------------------------------------------------------
 dnl Performance Logging -- disabled by default
 dnl -------------------------------------------------------------
 AC_ARG_ENABLE(perflog,
-[  --enable-perflog build with performance logging turned on],
+[  --enable-perflog 		build with performance logging turned on],
      enableperflog=$enableval,
      enableperflog=no)
 
@@ -273,68 +272,39 @@ dnl ------------------------------------------------------------
 
 
 
-
-dnl --------------------------------------------------------------
-dnl HDF4 IO support - disabled by default
-dnl 
-dnl Will we use HDF version of netcdf?
-dnl If so, we cannot also link with the
-dnl standard netcdf libs...they will
-dnl step on each other's toes.  This
-dnl means that the ExodusII functionality
-dnl cannot be used either...
-dnl --------------------------------------------------------------
-AC_ARG_ENABLE(hdf4,
-[  --enable-hdf4 Set compiler flags to enable HDF4 binary I/O],
-     enablehdf4=$enableval,
-     enablehdf4=no)
-
-if test "$enablehdf4" != no ; then
-   CONFIGURE_HDF4
-else
-
 dnl --------------------------------------------------------------
 dnl netCDF binary IO support - enabled by default
 dnl --------------------------------------------------------------
 AC_ARG_ENABLE(netcdf,
-[  --enable-netcdf Set compiler flags to enable netCDF binary I/O],
+[  --enable-netcdf 		Set compiler flags to enable netCDF binary I/O],
      enablenetcdf=$enableval,
      enablenetcdf=yes)
 
-if test "$enablenetcdf" != no ; then
+if (test "$enablenetcdf" != no) ; then
    CONFIGURE_NETCDF
+
+   dnl -------------------------------------------------------------
+   dnl ExodusII -- enabled by default - Reads in cubit meshes
+   dnl (note that ExodusII requires netCDF
+   dnl -------------------------------------------------------------
+   AC_ARG_ENABLE(exodus,
+   [  --enable-exodus 		build with ExodusII binary support],
+        enableexodus=$enableval,
+        enableexodus=yes)
+   
+   if (test "$enableexodus" != no -a "$have_netcdf" = yes) ; then
+     CONFIGURE_EXODUS
+   fi
+   dnl -------------------------------------------------------------
 fi
 dnl -------------------------------------------------------------
-
-
-
-dnl -------------------------------------------------------------
-dnl ExodusII -- enabled by default - Reads in cubit meshes
-dnl (note that ExodusII requires netCDF
-dnl -------------------------------------------------------------
-AC_ARG_ENABLE(exodus,
-[  --enable-exodus build with ExodusII binary support],
-     enableexodus=$enableval,
-     enableexodus=yes)
-
-if test "$enableexodus" != no ; then
-  if test "$enablenetcdf" != no ; then
-    CONFIGURE_EXODUS
-  else
-    enableexodus=no
-  fi
-fi
-dnl -------------------------------------------------------------
-
-fi
-
 
 
 dnl --------------------------------------------------------------
 dnl Allow for disable-optional
 dnl --------------------------------------------------------------
 AC_ARG_ENABLE(optional,
-[  --enable-optional Set compiler flags to disable optional external libraries],
+[  --enable-optional		Set compiler flags to disable optional external libraries],
      enableoptional=$enableval,
      enableoptional=yes)
 AC_SUBST(enableoptional)	
@@ -347,13 +317,61 @@ if test "$enableoptional" != no ; then
 
 
 
+dnl -------------------------------------------------------------
+dnl MPI -- enabled by default
+dnl -------------------------------------------------------------
+AC_ARG_ENABLE(mpi,
+[  --enable-mpi			build with MPI message passing support],
+     enablempi=$enableval,
+     enablempi=yes)
+
+
+dnl -------------------------------------------------------------
+dnl Petsc -- enabled by default
+dnl -------------------------------------------------------------
+AC_ARG_ENABLE(petsc,
+[  --enable-petsc		Set compiler flags to build with Petsc suppport],
+     enablepetsc=$enableval,
+     enablepetsc=yes)
+
+dnl -------------------------------------------------------------
+dnl configure MPI only if PETSc fails
+if (test "$enablempi" != no) ; then
+  if (test "$enablepetsc" !=  no) ; then
+    CONFIGURE_PETSC
+  else
+    ACX_MPI
+  fi
+else
+  dnl no PETSc without MPI!
+  enablepetsc=no
+fi
+dnl -------------------------------------------------------------
+
+
+
+
+dnl -------------------------------------------------------------
+dnl LASPACK iterative solvers -- enabled by default
+dnl -------------------------------------------------------------
+AC_ARG_ENABLE(laspack,
+[  --enable-laspack		Set compiler flags to build with LASPACK suppport],
+     enablelaspack=$enableval,
+     enablelaspack=yes)
+
+if test "$enablelaspack" != no ; then
+   CONFIGURE_LASPACK
+fi
+dnl -------------------------------------------------------------
+
+
 
 
 dnl -------------------------------------------------------------
 dnl Space filling curves -- enabled by default
 dnl -------------------------------------------------------------
 AC_ARG_ENABLE(sfc,
-[  --enable-sfc Set compiler flags to build with Sfc suppport],
+[  --enable-sfc 		Set compiler flags to build with Sfc suppport],
      enablesfc=$enableval,
      enablesfc=yes)
 
@@ -368,7 +386,7 @@ dnl -------------------------------------------------------------
 dnl Compressed Streams with gzstream -- enabled by default
 dnl -------------------------------------------------------------
 AC_ARG_ENABLE(gzstreams,
-[  --enable-gzstreams Set compiler flags to build with gzstreams suppport],
+[  --enable-gzstreams		Set compiler flags to build with gzstreams suppport],
      enablegz=$enableval,
      enablegz=yes)
 
@@ -383,7 +401,7 @@ dnl -------------------------------------------------------------
 dnl Tecplot -- enabled by default
 dnl -------------------------------------------------------------
 AC_ARG_ENABLE(tecplot,
-[  --enable-tecplot build with Tecplot binary support],
+[  --enable-tecplot		build with Tecplot binary support],
      enabletecplot=$enableval,
      enabletecplot=yes)
 
@@ -395,109 +413,30 @@ dnl -------------------------------------------------------------
 
 
 dnl -------------------------------------------------------------
-dnl LASPACK iterative solvers -- enabled by default
-dnl -------------------------------------------------------------
-AC_ARG_ENABLE(laspack,
-[  --enable-laspack Set compiler flags to build with LASPACK suppport],
-     enablelaspack=$enableval,
-     enablelaspack=yes)
-
-if test "$enablelaspack" != no ; then
-   CONFIGURE_LASPACK
-fi
-dnl -------------------------------------------------------------
-
-
-
-dnl -------------------------------------------------------------
-dnl Petsc -- enabled by default
-dnl -------------------------------------------------------------
-AC_ARG_ENABLE(petsc,
-[  --enable-petsc Set compiler flags to build with Petsc suppport],
-     enablepetsc=$enableval,
-     enablepetsc=yes)
-
-if test "$enablepetsc" != no ; then
-  CONFIGURE_PETSC
-
-  dnl tried to configure petsc, didn't find it.
-  dnl look for MPI.
-  if test "$enablepetsc" = no ; then
-    dnl -------------------------------------------------------------
-    dnl MPI -- enabled by default
-    dnl 
-    dnl  If configured with Petsc support we will get our
-    dnl  Mpi configuration from it.  Otherwise we need to
-    dnl  explicitly look for Mpi
-    dnl -------------------------------------------------------------
-    AC_ARG_ENABLE(mpi,
-    [  --enable-mpi build with MPI message passing support],
-         enablempi=$enableval,
-         enablempi=yes)
-    
-    if test "$enablempi" != no ; then
-      CONFIGURE_MPI
-      dnl ACX_MPI
-    fi
-  dnl -------------------------------------------------------------
-  fi
-else
-  dnl -------------------------------------------------------------
-  dnl MPI -- enabled by default
-  dnl 
-  dnl  If configured with Petsc support we will get our
-  dnl  Mpi configuration from it.  Otherwise we need to
-  dnl  explicitly look for Mpi
-  dnl -------------------------------------------------------------
-  AC_ARG_ENABLE(mpi,
-  [  --enable-mpi build with MPI message passing support],
-       enablempi=$enableval,
-       enablempi=yes)
-  
-  if test "$enablempi" != no ; then
-    CONFIGURE_MPI
-    dnl ACX_MPI
-  fi
-  dnl -------------------------------------------------------------
-fi
-dnl -------------------------------------------------------------
-
-
-
-
-
-
-dnl -------------------------------------------------------------
 dnl Metis Partitioning -- enabled by default
-dnl We do this after checking for petsc and mpi since
-dnl if both of those are disabled, parmetis should be
-dnl disabled.
 dnl -------------------------------------------------------------
 AC_ARG_ENABLE(metis,
-[  --enable-metis Set compiler flags to build with Metis suppport],
+[  --enable-metis		Set compiler flags to build with Metis suppport],
      enablemetis=$enableval,
      enablemetis=yes)
 
-if test "$enablemetis" != no ; then
+if (test "$enablemetis" != no) ; then
    CONFIGURE_METIS
 
-  dnl -------------------------------------------------------------
-  dnl Parmetis Partitioning -- enabled by default
-  dnl Here we first test to see if parmetis should be disabled
-  dnl becuase mpi and petsc were disabled.
-  dnl -------------------------------------------------------------
-  if (test "$enablepetsc" != yes -a "$enablempi" != yes) ; then
-    enableparmetis=no
-  else
-    AC_ARG_ENABLE(parmetis,
-    [  --enable-parmetis Set compiler flags to build with Parmetis suppport],
-         enableparmetis=$enableval,
-         enableparmetis=yes)
-  
-    if test "$enableparmetis" != no ; then
-       CONFIGURE_PARMETIS
-    fi
-  fi
+   dnl -------------------------------------------------------------
+   dnl Parmetis Partitioning -- enabled by default
+   dnl -------------------------------------------------------------
+   AC_ARG_ENABLE(parmetis,
+   [  --enable-parmetis		Set compiler flags to build with Parmetis suppport],
+        enableparmetis=$enableval,
+        enableparmetis=yes)
+   
+   if (test "$enableparmetis" != no \
+         -a "$enablemetis"    != no \
+         -a "$enablempi"      != no) ; then
+      CONFIGURE_PARMETIS
+   fi
+   dnl -------------------------------------------------------------
 fi
 dnl -------------------------------------------------------------
 

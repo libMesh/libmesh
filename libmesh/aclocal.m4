@@ -1,6 +1,6 @@
 
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.38 2003-09-25 21:46:51 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.39 2003-11-30 05:00:37 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -524,7 +524,14 @@ AC_DEFUN(CONFIGURE_PETSC,
     AC_MSG_RESULT(<<< Configuring library with PETSc version $petscversion support >>>)
     AC_SUBST(petscversion)
   else
-    enablepetsc=no  
+    enablepetsc=no
+
+    dnl -------------------------------------------------------------
+    if (test "$enablempi" != no) ; then
+      ACX_MPI
+    fi
+    dnl -------------------------------------------------------------
+
   fi
 
   AC_SUBST(enablepetsc)
@@ -576,18 +583,16 @@ dnl -------------------------------------------------------------
 AC_DEFUN(CONFIGURE_SFC, 
 [
   AC_CHECK_FILE(./contrib/sfcurves/sfcurves.h,
-                SFC_INCLUDE_PATH=$PWD/contrib/sfcurves)
-
-  if (test -r $SFC_INCLUDE_PATH/sfcurves.h) ; then
-    AC_SUBST(SFC_INCLUDE_PATH)
-    AC_DEFINE(HAVE_SFCURVES, 1,
-              [Flag indicating whether or not Space filling curves are available])
-    AC_MSG_RESULT(<<< Configuring library with SFC support >>>)
-  else
-    enablesfc=no
-  fi
-
-  AC_SUBST(enablesfc)
+                [
+                  SFC_INCLUDE=-I$PWD/contrib/sfcurves
+                  SFC_LIB="\$(EXTERNAL_LIBDIR)/libsfcurves\$(EXTERNAL_LIBEXT)"
+                  AC_SUBST(SFC_INCLUDE)
+                  AC_SUBST(SFC_LIB)
+                  AC_DEFINE(HAVE_SFCURVES, 1,
+                             [Flag indicating whether or not Space filling curves are available])
+                  AC_MSG_RESULT(<<< Configuring library with SFC support >>>)
+                ],
+                [])
 ])
 dnl -------------------------------------------------------------
 
@@ -599,19 +604,23 @@ dnl Read/Write Compressed Streams with gzstream
 dnl -------------------------------------------------------------
 AC_DEFUN(CONFIGURE_GZ, 
 [
-  AC_CHECK_FILE(./contrib/gzstream/gzstream.h,
-                GZ_INCLUDE_PATH=$PWD/contrib/gzstream)
-
-  if (test -r $GZ_INCLUDE_PATH/gzstream.h) ; then
-    AC_SUBST(GZ_INCLUDE_PATH)
-    AC_DEFINE(HAVE_GZSTREAM, 1,
-              [Flag indicating whether or not gzstreams are available])
-    AC_MSG_RESULT(<<< Configuring library with gzstreams support >>>)
-  else
-    enablegz=no
+  AC_CHECK_HEADERS(zlib.h, have_zlib_h=yes)
+  AC_CHECK_LIB(z, gzopen, have_libz=yes)
+  if (test "$have_zlib_h" = yes \
+        -a "$have_libz"   = yes) ; then
+     AC_CHECK_FILE(./contrib/gzstream/gzstream.h,
+                   [
+                     GZSTREAM_INCLUDE=-I$PWD/contrib/gzstream
+                     GZSTREAM_LIB="\$(EXTERNAL_LIBDIR)/libgzstream\$(EXTERNAL_LIBEXT) -lz"
+                     AC_SUBST(GZSTREAM_INCLUDE)
+                     AC_SUBST(GZSTREAM_LIB)
+                     AC_DEFINE(HAVE_GZSTREAM, 1,
+                                [Flag indicating whether or not gzstreams are available])
+                     AC_MSG_RESULT(<<< Configuring library with gzstreams support >>>)
+                     
+                   ],
+                   [])
   fi
-
-  AC_SUBST(enablegz)
 ])
 dnl -------------------------------------------------------------
 
@@ -624,19 +633,18 @@ dnl -------------------------------------------------------------
 AC_DEFUN(CONFIGURE_LASPACK, 
 [
   AC_CHECK_FILE(./contrib/laspack/lastypes.h,
-                LASPACK_INCLUDE_PATH=$PWD/contrib/laspack)
-
-  if (test -r $LASPACK_INCLUDE_PATH/lastypes.h) ; then
-    AC_SUBST(LASPACK_INCLUDE_PATH)
-    AC_DEFINE(HAVE_LASPACK, 1,
-              [Flag indicating whether or not LASPACK iterative solvers are available])
-    laspack_version=`grep "define LASPACK_VERSION " $LASPACK_INCLUDE_PATH/version.h | sed -e "s/[[^0-9.]]*//g"`
-    AC_MSG_RESULT(<<< Configuring library with LASPACK version $laspack_version support >>>)
-  else
-    enablelaspack=no
-  fi
-
-  AC_SUBST(enablelaspack)
+		[
+                  LASPACK_INCLUDE_PATH=$PWD/contrib/laspack
+                  LASPACK_INCLUDE=-I$LASPACK_INCLUDE_PATH
+                  LASPACK_LIB="\$(EXTERNAL_LIBDIR)/liblaspack\$(EXTERNAL_LIBEXT)"
+                  AC_SUBST(LASPACK_INCLUDE)
+                  AC_SUBST(LASPACK_LIB)
+                  AC_DEFINE(HAVE_LASPACK, 1,
+                            [Flag indicating whether or not LASPACK iterative solvers are available])
+                  laspack_version=`grep "define LASPACK_VERSION " $LASPACK_INCLUDE_PATH/version.h | sed -e "s/[[^0-9.]]*//g"`
+                  AC_MSG_RESULT(<<< Configuring library with LASPACK version $laspack_version support >>>)
+                ],
+                [])
 ])
 dnl -------------------------------------------------------------
 
@@ -648,18 +656,17 @@ dnl -------------------------------------------------------------
 AC_DEFUN(CONFIGURE_METIS, 
 [
   AC_CHECK_FILE(./contrib/metis/Lib/metis.h,
-                METIS_INCLUDE_PATH=$PWD/contrib/metis/Lib)
-
-  if (test -r $METIS_INCLUDE_PATH/metis.h) ; then
-    AC_SUBST(METIS_INCLUDE_PATH)
-    AC_DEFINE(HAVE_METIS, 1,
-	      [Flag indicating whether or not Metis is available])
-    AC_MSG_RESULT(<<< Configuring library with Metis support >>>)
-  else
-    enablemetis=no
-  fi
-
-  AC_SUBST(enablemetis)	
+	        [ 
+	          METIS_INCLUDE_PATH=$PWD/contrib/metis/Lib
+                  METIS_INCLUDE=-I$METIS_INCLUDE_PATH
+                  METIS_LIB="\$(EXTERNAL_LIBDIR)/libmetis\$(EXTERNAL_LIBEXT)"
+		  AC_SUBST(METIS_INCLUDE)
+                  AC_SUBST(METIS_LIB)
+                  AC_DEFINE(HAVE_METIS, 1,
+	                     [Flag indicating whether or not Metis is available])
+                  AC_MSG_RESULT(<<< Configuring library with Metis support >>>)
+                ],
+                [enablemetis=no])
 ])
 dnl -------------------------------------------------------------
 
@@ -670,19 +677,23 @@ dnl Parmetis
 dnl -------------------------------------------------------------
 AC_DEFUN(CONFIGURE_PARMETIS, 
 [
+  AC_REQUIRE([ACX_MPI])
+  AC_REQUIRE([CONFIGURE_METIS])
+
   AC_CHECK_FILE(./contrib/parmetis/Lib/parmetis.h,
-                PARMETIS_INCLUDE_PATH=$PWD/contrib/parmetis/Lib)
-
-  if (test -r $PARMETIS_INCLUDE_PATH/parmetis.h) ; then
-    AC_SUBST(PARMETIS_INCLUDE_PATH)
-    AC_DEFINE(HAVE_PARMETIS, 1,
-	      [Flag indicating whether or not Parmetis is available])
-    AC_MSG_RESULT(<<< Configuring library with Parmetis support >>>)
-  else
-    enableparmetis=no
-  fi
-
-  AC_SUBST(enableparmetis)	
+  	        [
+  		  AC_REQUIRE([CONFIGURE_METIS])
+  		  AC_REQUIRE([ACX_MPI])
+  	          PARMETIS_INCLUDE_PATH=$PWD/contrib/parmetis/Lib
+                  PARMETIS_INCLUDE=-I$PARMETIS_INCLUDE_PATH
+                  PARMETIS_LIB="\$(EXTERNAL_LIBDIR)/libparmetis\$(EXTERNAL_LIBEXT)"
+  		  AC_SUBST(PARMETIS_INCLUDE)
+                  AC_SUBST(PARMETIS_LIB)
+                  AC_DEFINE(HAVE_PARMETIS, 1,
+  	                     [Flag indicating whether or not ParMetis is available])
+                  AC_MSG_RESULT(<<< Configuring library with ParMetis support >>>)
+                ],
+                [])
 ])
 dnl -------------------------------------------------------------
 
@@ -712,16 +723,13 @@ AC_DEFUN(CONFIGURE_TECPLOT,
 
   if (test -r $TECPLOT_LIBRARY_PATH/tecio.a -a -r $TECPLOT_INCLUDE_PATH/TECIO.h) ; then
     TECPLOT_LIBRARY=$TECPLOT_LIBRARY_PATH/tecio.a
+    TECPLOT_INCLUDE=-I$TECPLOT_INCLUDE_PATH
     AC_SUBST(TECPLOT_LIBRARY)
-    AC_SUBST(TECPLOT_INCLUDE_PATH)
+    AC_SUBST(TECPLOT_INCLUDE)
     AC_DEFINE(HAVE_TECPLOT_API, 1,
               [Flag indicating whether the library shall be compiled to use the Tecplot interface])
     AC_MSG_RESULT(<<< Configuring library with Tecplot API support >>>)
-  else
-    enabletecplot=no
   fi
-
-  AC_SUBST(enabletecplot)
 ])
 dnl -------------------------------------------------------------
 
@@ -733,56 +741,19 @@ dnl -------------------------------------------------------------
 AC_DEFUN(CONFIGURE_NETCDF,
 [
   AC_CHECK_FILE(./contrib/netcdf/lib/$host/libnetcdf.a,
-		LIBNETCDF_PATH=$PWD/contrib/netcdf/lib/$host)
+		NETCDF_LIB=$PWD/contrib/netcdf/lib/$host/libnetcdf.a)
   AC_CHECK_FILE(./contrib/netcdf/include/netcdf.h,
 		NETCDF_INCLUDE_PATH=$PWD/contrib/netcdf/include)
 
-  if (test -r $LIBNETCDF_PATH/libnetcdf.a -a -r $NETCDF_INCLUDE_PATH/netcdf.h) ; then
-    LIBNETCDF=$LIBNETCDF_PATH/libnetcdf.a
-    AC_SUBST(LIBNETCDF)
-    AC_SUBST(NETCDF_INCLUDE_PATH)
+  if (test -r $NETCDF_LIB -a -d $NETCDF_INCLUDE_PATH) ; then
+    NETCDF_INCLUDE=-I$NETCDF_INCLUDE_PATH
+    AC_SUBST(NETCDF_LIB)
+    AC_SUBST(NETCDF_INCLUDE)
     AC_DEFINE(HAVE_NETCDF, 1,
               [Flag indicating whether the library shall be compiled to support netcdf files])
     AC_MSG_RESULT(<<< Configuring library with netCDF support >>>)
-  else
-    enablenetcdf=no
+    have_netcdf=yes
   fi
-
-  AC_SUBST(enablenetcdf)
-])
-dnl -------------------------------------------------------------
-
-
-
-
-
-dnl -------------------------------------------------------------
-dnl HDF4
-dnl -------------------------------------------------------------
-AC_DEFUN(CONFIGURE_HDF4,
-[
-  AC_CHECK_FILE(./contrib/hdf4/include/mfhdf.h,
-		HDF4_INCLUDE_PATH=$PWD/contrib/hdf4/include)
-
-  dnl This isn't the world's best test, it
-  dnl assumes that if the mfhdf library is there,
-  dnl they are all there...
-  AC_CHECK_FILE(./contrib/hdf4/lib/$host/libmfhdf.a,
-		HDF4_LIB_PATH=$PWD/contrib/hdf4/lib/$host)
-  HDF4_LIB_NAMES="-lmfhdf -ldf -ljpeg -lz"
-
-  if (test -r $HDF4_LIB_PATH/libmfhdf.a -a -r $HDF4_INCLUDE_PATH/mfhdf.h) ; then
-    AC_SUBST(HDF4_INCLUDE_PATH)
-    AC_SUBST(HDF4_LIB_PATH)
-    AC_SUBST(HDF4_LIB_NAMES)
-    AC_DEFINE(HAVE_HDF4, 1,
-	      [Flag indicating whether the library shall be compiled to support hdf4 files])
-    AC_MSG_RESULT(<<< Configuring library with HDF support >>>)
-  else
-    enablehdf4=no
-  fi
-
-  AC_SUBST(enablehdf4)
 ])
 dnl -------------------------------------------------------------
 
@@ -794,22 +765,18 @@ dnl -------------------------------------------------------------
 AC_DEFUN(CONFIGURE_EXODUS,
 [
   AC_CHECK_FILE(./contrib/exodus/lib/$host/libexoIIv2c.a,
-		EXODUS_EXOII_PATH=$PWD/contrib/exodus/lib/$host)
+		EXODUS_LIB=$PWD/contrib/exodus/lib/$host/libexoIIv2c.a)
   AC_CHECK_FILE(./contrib/exodus/include/exodusII.h,
 		EXODUS_INCLUDE_PATH=$PWD/contrib/exodus/include)
 
-  if (test -r $EXODUS_EXOII_PATH/libexoIIv2c.a -a -r $EXODUS_INCLUDE_PATH/exodusII.h) ; then
-    LIBEXOII=$EXODUS_EXOII_PATH/libexoIIv2c.a
-    AC_SUBST(LIBEXOII)
-    AC_SUBST(EXODUS_INCLUDE_PATH)
+  if (test -d $EXODUS_INCLUDE_PATH -a -r $EXODUS_LIB) ; then
+    EXODUS_INCLUDE=-I$EXODUS_INCLUDE_PATH
+    AC_SUBST(EXODUS_LIB)
+    AC_SUBST(EXODUS_INCLUDE)
     AC_DEFINE(HAVE_EXODUS_API, 1,
 	      [Flag indicating whether the library shall be compiled to use the Exodus interface])
     AC_MSG_RESULT(<<< Configuring library with Exodus API support >>>)
-  else
-    enableexodus=no
   fi
-
-  AC_SUBST(enableexodus)
 ])
 dnl -------------------------------------------------------------
 
@@ -926,76 +893,641 @@ dnl -------------------------------------------------------------
 
 
 
-dnl -------------------------------------------------------------
-dnl MPI
-dnl -------------------------------------------------------------
-AC_DEFUN([ACX_MPI], [
-AC_PREREQ(2.50) dnl for AC_LANG_CASE
+# dnl -------------------------------------------------------------
+# dnl MPI
+# dnl -------------------------------------------------------------
+# AC_DEFUN([ACX_MPI], [
+# AC_PREREQ(2.50) dnl for AC_LANG_CASE
 
-AC_LANG_CASE([C], [
-        AC_REQUIRE([AC_PROG_CC])
-        AC_CHECK_PROGS(MPICC, mpicc hcc mpcc mpcc_r mpxlc, $CC)
-        acx_mpi_save_CC="$CC"
-        CC="$MPICC"
-        AC_SUBST(MPICC)
-],
-[C++], [
-        AC_REQUIRE([AC_PROG_CXX])
-        AC_CHECK_PROGS(MPICXX, mpiCC mpCC, $CXX)
-        acx_mpi_save_CXX="$CXX"
-        CXX="$MPICXX"
-        AC_SUBST(MPICXX)
-],
-[Fortran 77], [
-        AC_REQUIRE([AC_PROG_F77])
-        AC_CHECK_PROGS(MPIF77, mpif77 hf77 mpxlf mpf77 mpif90 mpf90 mpxlf90 mpxlf95 mpxlf_r, $F77)
-        acx_mpi_save_F77="$F77"
-        F77="$MPIF77"
-        AC_SUBST(MPIF77)
-])
+# AC_LANG_CASE([C], [
+#         AC_REQUIRE([AC_PROG_CC])
+#         AC_CHECK_PROGS(MPICC, mpicc hcc mpcc mpcc_r mpxlc, $CC)
+#         acx_mpi_save_CC="$CC"
+#         CC="$MPICC"
+#         AC_SUBST(MPICC)
+# ],
+# [C++], [
+#         AC_REQUIRE([AC_PROG_CXX])
+#         AC_CHECK_PROGS(MPICXX, mpiCC mpCC, $CXX)
+#         acx_mpi_save_CXX="$CXX"
+#         CXX="$MPICXX"
+#         AC_SUBST(MPICXX)
+# ],
+# [Fortran 77], [
+#         AC_REQUIRE([AC_PROG_F77])
+#         AC_CHECK_PROGS(MPIF77, mpif77 hf77 mpxlf mpf77 mpif90 mpf90 mpxlf90 mpxlf95 mpxlf_r, $F77)
+#         acx_mpi_save_F77="$F77"
+#         F77="$MPIF77"
+#         AC_SUBST(MPIF77)
+# ])
 
-if test x = x"$MPILIBS"; then
-        AC_LANG_CASE([C], [AC_CHECK_FUNC(MPI_Init, [MPILIBS=" "])],
-                [C++], [AC_CHECK_FUNC(MPI_Init, [MPILIBS=" "])],
-                [Fortran 77], [AC_MSG_CHECKING([for MPI_Init])
-                        AC_TRY_LINK([],[      call MPI_Init], [MPILIBS=" "
-                                AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no)])])
+# if test x = x"$MPILIBS"; then
+#         AC_LANG_CASE([C], [AC_CHECK_FUNC(MPI_Init, [MPILIBS=" "])],
+#                 [C++], [AC_CHECK_FUNC(MPI_Init, [MPILIBS=" "])],
+#                 [Fortran 77], [AC_MSG_CHECKING([for MPI_Init])
+#                         AC_TRY_LINK([],[      call MPI_Init], [MPILIBS=" "
+#                                 AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no)])])
+# fi
+# if test x = x"$MPILIBS"; then
+#         AC_CHECK_LIB(mpi, MPI_Init, [MPILIBS="-lmpi"])
+# fi
+# if test x = x"$MPILIBS"; then
+#         AC_CHECK_LIB(mpich, MPI_Init, [MPILIBS="-lmpich"])
+# fi
+
+# dnl We have to use AC_TRY_COMPILE and not AC_CHECK_HEADER because the
+# dnl latter uses $CPP, not $CC (which may be mpicc).
+# AC_LANG_CASE([C], [if test x != x"$MPILIBS"; then
+#         AC_MSG_CHECKING([for mpi.h])
+#         AC_TRY_COMPILE([#include <mpi.h>],[],[AC_MSG_RESULT(yes)], [MPILIBS=""
+#                 AC_MSG_RESULT(no)])
+# fi],
+# [C++], [if test x != x"$MPILIBS"; then
+#         AC_MSG_CHECKING([for mpi.h])
+#         AC_TRY_COMPILE([#include <mpi.h>],[],[AC_MSG_RESULT(yes)], [MPILIBS=""
+#                 AC_MSG_RESULT(no)])
+# fi])
+
+# AC_LANG_CASE([C], [CC="$acx_mpi_save_CC"],
+#         [C++], [CXX="$acx_mpi_save_CXX"],
+#         [Fortran 77], [F77="$acx_mpi_save_F77"])
+
+# AC_SUBST(MPILIBS)
+
+# # Finally, execute ACTION-IF-FOUND/ACTION-IF-NOT-FOUND:
+# if test x = x"$MPILIBS"; then
+#         $2
+#         :
+# else
+#         ifelse([$1],,[AC_DEFINE(HAVE_MPI,1,[Define if you have the MPI library.])],[$1])
+#         :
+# fi
+# ])dnl ACX_MPI
+# dnl -------------------------------------------------------------
+
+
+dnl ----------------------------------------------------------------------------
+dnl @synopsis ACX_BLAS([ACTION-IF-FOUND[, ACTION-IF-NOT-FOUND]])
+dnl
+dnl This macro looks for a library that implements the BLAS
+dnl linear-algebra interface (see http://www.netlib.org/blas/).
+dnl On success, it sets the BLAS_LIBS output variable to
+dnl hold the requisite library linkages.
+dnl
+dnl To link with BLAS, you should link with:
+dnl
+dnl 	$BLAS_LIBS $LIBS $FLIBS
+dnl
+dnl in that order.  FLIBS is the output variable of the
+dnl AC_F77_LIBRARY_LDFLAGS macro (called if necessary by ACX_BLAS),
+dnl and is sometimes necessary in order to link with F77 libraries.
+dnl Users will also need to use AC_F77_DUMMY_MAIN (see the autoconf
+dnl manual), for the same reason.
+dnl
+dnl Many libraries are searched for, from ATLAS to CXML to ESSL.
+dnl The user may also use --with-blas=<lib> in order to use some
+dnl specific BLAS library <lib>.  In order to link successfully,
+dnl however, be aware that you will probably need to use the same
+dnl Fortran compiler (which can be set via the F77 env. var.) as
+dnl was used to compile the BLAS library.
+dnl
+dnl ACTION-IF-FOUND is a list of shell commands to run if a BLAS
+dnl library is found, and ACTION-IF-NOT-FOUND is a list of commands
+dnl to run it if it is not found.  If ACTION-IF-FOUND is not specified,
+dnl the default action will define HAVE_BLAS.
+dnl
+dnl This macro requires autoconf 2.50 or later.
+dnl
+dnl @version acsite.m4,v 1.3 2002/08/02 09:28:12 steve Exp
+dnl @author Steven G. Johnson <stevenj@alum.mit.edu>
+dnl
+AC_DEFUN([ACX_BLAS], [
+AC_PREREQ(2.50)
+AC_REQUIRE([AC_F77_LIBRARY_LDFLAGS])
+acx_blas_ok=no
+acx_blas_save_LIBS="$LIBS"
+
+AC_ARG_WITH(blas,
+	[AC_HELP_STRING([--with-blas=<lib>], [use BLAS library <lib>])])
+case $with_blas in
+	yes | "") ;;
+	no) acx_blas_ok=disable ;;
+	-* | *.a | *.so | *.so.* | *.o) BLAS_LIBS="$with_blas" ;;
+        -* | */*) LIBS = "$with_blas $LIBS";;
+	*) BLAS_LIBS="-l$with_blas" ;;
+esac
+
+# Get fortran linker names of BLAS functions to check for.
+AC_F77_FUNC(sgemm)
+AC_F77_FUNC(dgemm)
+
+LIBS="$LIBS $FLIBS"
+
+# First, check BLAS_LIBS environment variable
+if test $acx_blas_ok = no; then
+if test "x$BLAS_LIBS" != x; then
+	save_LIBS="$LIBS"; LIBS="$BLAS_LIBS $LIBS"
+	AC_MSG_CHECKING([for $sgemm in $BLAS_LIBS])
+	AC_TRY_LINK_FUNC($sgemm, [acx_blas_ok=yes], [BLAS_LIBS=""])
+	AC_MSG_RESULT($acx_blas_ok)
+	LIBS="$save_LIBS"
 fi
-if test x = x"$MPILIBS"; then
-        AC_CHECK_LIB(mpi, MPI_Init, [MPILIBS="-lmpi"])
-fi
-if test x = x"$MPILIBS"; then
-        AC_CHECK_LIB(mpich, MPI_Init, [MPILIBS="-lmpich"])
 fi
 
-dnl We have to use AC_TRY_COMPILE and not AC_CHECK_HEADER because the
-dnl latter uses $CPP, not $CC (which may be mpicc).
-AC_LANG_CASE([C], [if test x != x"$MPILIBS"; then
-        AC_MSG_CHECKING([for mpi.h])
-        AC_TRY_COMPILE([#include <mpi.h>],[],[AC_MSG_RESULT(yes)], [MPILIBS=""
-                AC_MSG_RESULT(no)])
-fi],
-[C++], [if test x != x"$MPILIBS"; then
-        AC_MSG_CHECKING([for mpi.h])
-        AC_TRY_COMPILE([#include <mpi.h>],[],[AC_MSG_RESULT(yes)], [MPILIBS=""
-                AC_MSG_RESULT(no)])
-fi])
+# BLAS linked to by default?  (happens on some supercomputers)
+if test $acx_blas_ok = no; then
+	save_LIBS="$LIBS"; LIBS="$LIBS"
+	AC_CHECK_FUNC($sgemm, [acx_blas_ok=yes])
+	LIBS="$save_LIBS"
+fi
 
-AC_LANG_CASE([C], [CC="$acx_mpi_save_CC"],
-        [C++], [CXX="$acx_mpi_save_CXX"],
-        [Fortran 77], [F77="$acx_mpi_save_F77"])
+# BLAS in Intel MKL libraries?
+if test $acx_blas_ok = no; then
+	AC_CHECK_LIB(mkl, $sgemm, [acx_blas_ok=yes; BLAS_LIBS="-lmkl -lguide -lpthread"])
+fi
 
-AC_SUBST(MPILIBS)
+# BLAS in ATLAS library? (http://math-atlas.sourceforge.net/)
+if test $acx_blas_ok = no; then
+	AC_CHECK_LIB(atlas, ATL_xerbla,
+		[AC_CHECK_LIB(f77blas, $sgemm,
+		[AC_CHECK_LIB(cblas, cblas_dgemm,
+			[acx_blas_ok=yes
+			 BLAS_LIBS="-lcblas -lf77blas -latlas"],
+			[], [-lf77blas -latlas])],
+			[], [-latlas])])
+fi
+
+# BLAS in PhiPACK libraries? (requires generic BLAS lib, too)
+if test $acx_blas_ok = no; then
+	AC_CHECK_LIB(blas, $sgemm,
+		[AC_CHECK_LIB(dgemm, $dgemm,
+		[AC_CHECK_LIB(sgemm, $sgemm,
+			[acx_blas_ok=yes; BLAS_LIBS="-lsgemm -ldgemm -lblas"],
+			[], [-lblas])],
+			[], [-lblas])])
+fi
+
+# BLAS in Alpha CXML library?
+if test $acx_blas_ok = no; then
+	AC_CHECK_LIB(cxml, $sgemm, [acx_blas_ok=yes;BLAS_LIBS="-lcxml"])
+fi
+
+# BLAS in Alpha DXML library? (now called CXML, see above)
+if test $acx_blas_ok = no; then
+	AC_CHECK_LIB(dxml, $sgemm, [acx_blas_ok=yes;BLAS_LIBS="-ldxml"])
+fi
+
+# BLAS in Sun Performance library?
+if test $acx_blas_ok = no; then
+	if test "x$GCC" != xyes; then # only works with Sun CC
+		AC_CHECK_LIB(sunmath, acosp,
+			[AC_CHECK_LIB(sunperf, $sgemm,
+        			[BLAS_LIBS="-xlic_lib=sunperf -lsunmath"
+                                 acx_blas_ok=yes],[],[-lsunmath])])
+	fi
+fi
+
+# BLAS in SCSL library?  (SGI/Cray Scientific Library)
+if test $acx_blas_ok = no; then
+	AC_CHECK_LIB(scs, $sgemm, [acx_blas_ok=yes; BLAS_LIBS="-lscs"])
+fi
+
+# BLAS in SGIMATH library?
+if test $acx_blas_ok = no; then
+	AC_CHECK_LIB(complib.sgimath, $sgemm,
+		     [acx_blas_ok=yes; BLAS_LIBS="-lcomplib.sgimath"])
+fi
+
+# BLAS in IBM ESSL library? (requires generic BLAS lib, too)
+if test $acx_blas_ok = no; then
+	AC_CHECK_LIB(blas, $sgemm,
+		[AC_CHECK_LIB(essl, $sgemm,
+			[acx_blas_ok=yes; BLAS_LIBS="-lessl -lblas"],
+			[], [-lblas $FLIBS])])
+fi
+
+# Generic BLAS library?
+if test $acx_blas_ok = no; then
+	AC_CHECK_LIB(blas, $sgemm, [acx_blas_ok=yes; BLAS_LIBS="-lblas"])
+fi
+
+AC_SUBST(BLAS_LIBS)
+
+LIBS="$acx_blas_save_LIBS"
 
 # Finally, execute ACTION-IF-FOUND/ACTION-IF-NOT-FOUND:
-if test x = x"$MPILIBS"; then
-        $2
+if test x"$acx_blas_ok" = xyes; then
+        ifelse([$1],,AC_DEFINE(HAVE_BLAS,1,[Define if you have a BLAS library.]),[$1])
         :
 else
-        ifelse([$1],,[AC_DEFINE(HAVE_MPI,1,[Define if you have the MPI library.])],[$1])
-        :
+        acx_blas_ok=no
+        $2
 fi
+])dnl ACX_BLAS
+
+
+
+
+
+dnl ----------------------------------------------------------------------------
+dnl @synopsis ACX_LAPACK([ACTION-IF-FOUND[, ACTION-IF-NOT-FOUND]])
+dnl
+dnl This macro looks for a library that implements the LAPACK
+dnl linear-algebra interface (see http://www.netlib.org/lapack/).
+dnl On success, it sets the LAPACK_LIBS output variable to
+dnl hold the requisite library linkages.
+dnl
+dnl To link with LAPACK, you should link with:
+dnl
+dnl     $LAPACK_LIBS $BLAS_LIBS $LIBS $FLIBS
+dnl
+dnl in that order.  BLAS_LIBS is the output variable of the ACX_BLAS
+dnl macro, called automatically.  FLIBS is the output variable of the
+dnl AC_F77_LIBRARY_LDFLAGS macro (called if necessary by ACX_BLAS),
+dnl and is sometimes necessary in order to link with F77 libraries.
+dnl Users will also need to use AC_F77_DUMMY_MAIN (see the autoconf
+dnl manual), for the same reason.
+dnl
+dnl The user may also use --with-lapack=<lib> in order to use some
+dnl specific LAPACK library <lib>.  In order to link successfully,
+dnl however, be aware that you will probably need to use the same
+dnl Fortran compiler (which can be set via the F77 env. var.) as
+dnl was used to compile the LAPACK and BLAS libraries.
+dnl
+dnl ACTION-IF-FOUND is a list of shell commands to run if a LAPACK
+dnl library is found, and ACTION-IF-NOT-FOUND is a list of commands
+dnl to run it if it is not found.  If ACTION-IF-FOUND is not specified,
+dnl the default action will define HAVE_LAPACK.
+dnl
+dnl @version acsite.m4,v 1.3 2002/08/02 09:28:12 steve Exp
+dnl @author Steven G. Johnson <stevenj@alum.mit.edu>
+
+AC_DEFUN([ACX_LAPACK], [
+AC_REQUIRE([ACX_BLAS])
+acx_lapack_ok=no
+
+AC_ARG_WITH(lapack,
+        [AC_HELP_STRING([--with-lapack=<lib>], [use LAPACK library <lib>])])
+case $with_lapack in
+        yes | "") ;;
+        no) acx_lapack_ok=disable ;;
+        -* | */* | *.a | *.so | *.so.* | *.o) LAPACK_LIBS="$with_lapack" ;;
+        *) LAPACK_LIBS="-l$with_lapack" ;;
+esac
+
+# Get fortran linker name of LAPACK function to check for.
+AC_F77_FUNC(cheev)
+
+# We cannot use LAPACK if BLAS is not found
+if test "x$acx_blas_ok" != xyes; then
+        acx_lapack_ok=noblas
+fi
+
+# First, check LAPACK_LIBS environment variable
+if test "x$LAPACK_LIBS" != x; then
+        save_LIBS="$LIBS"; LIBS="$LAPACK_LIBS $BLAS_LIBS $LIBS $FLIBS"
+        AC_MSG_CHECKING([for $cheev in $LAPACK_LIBS])
+        AC_TRY_LINK_FUNC($cheev, [acx_lapack_ok=yes], [LAPACK_LIBS=""])
+        AC_MSG_RESULT($acx_lapack_ok)
+        LIBS="$save_LIBS"
+        if test acx_lapack_ok = no; then
+                LAPACK_LIBS=""
+        fi
+fi
+
+# LAPACK linked to by default?  (is sometimes included in BLAS lib)
+if test $acx_lapack_ok = no; then
+        save_LIBS="$LIBS"; LIBS="$LIBS $BLAS_LIBS $FLIBS"
+        AC_CHECK_FUNC($cheev, [acx_lapack_ok=yes])
+        LIBS="$save_LIBS"
+fi
+
+# Generic LAPACK library?
+for lapack in lapack lapack_rs6k; do
+        if test $acx_lapack_ok = no; then
+                save_LIBS="$LIBS"; LIBS="$BLAS_LIBS $LIBS"
+                AC_CHECK_LIB($lapack, $cheev,
+                    [acx_lapack_ok=yes; LAPACK_LIBS="-l$lapack"], [], [$FLIBS])
+                LIBS="$save_LIBS"
+        fi
+done
+
+AC_SUBST(LAPACK_LIBS)
+
+# Finally, execute ACTION-IF-FOUND/ACTION-IF-NOT-FOUND:
+if test x"$acx_lapack_ok" = xyes; then
+        ifelse([$1],,AC_DEFINE(HAVE_LAPACK,1,[Define if you have LAPACK library.]),[$1])
+        :
+else
+        acx_lapack_ok=no
+        $2
+fi
+])dnl ACX_LAPACK
+
+
+
+
+
+dnl ---------------------------------------------------------------------------
+dnl check for the required MPI library
+dnl ---------------------------------------------------------------------------
+AC_DEFUN([ACX_MPI], [
+
+# if MPIHOME is empty, set it to /usr
+if (test -z $MPIHOME) ; then
+  MPIHOME="/usr"
+fi
+
+AC_ARG_WITH(
+	[mpi],
+	[  --with-mpi=PATH	Prefix where MPI is installed (MPIHOME)],
+	[MPI="$withval"],
+	[echo "note: MPI library path not given... trying prefix=$MPIHOME"
+	MPI=$MPIHOME])
+
+if test -z "$MPI"; then
+	MPI="/usr"
+fi
+
+
+
+MPI_LIBS_PATH="$MPI/lib"
+MPI_INCLUDES_PATH="$MPI/include"
+
+# no recognized MPI implementation
+MPI_IMPL="none"
+
+# Check that the compiler uses the library we specified...
+
+# look for LAM or other MPI implementation
+if (test -e $MPI_LIBS_PATH/libmpi.a || test -e $MPI_LIBS_PATH/libmpi.so) ; then
+	echo "note: using $MPI_LIBS_PATH/libmpi (.a/.so)"
+
+	MPI_IMPL="mpi"
+
+	# Ensure the comiler finds the library...
+	tmpLIBS=$LIBS
+	AC_LANG_SAVE
+	AC_LANG_CPLUSPLUS
+
+	LIBS="-L$MPI_LIBS_PATH $LIBS"
+
+	# look for lam_version_show in liblam.(a/so)
+	# (this is needed in addition to libmpi.(a/so) for
+        # LAM MPI
+	AC_CHECK_LIB([lam],
+                     [lam_show_version],
+                     [
+                       LIBS="$LIBS -llam"
+                       MPI_LIBS="-llam $MPI_LIBS"
+                       MPI_IMPL="lam"
+                     ],	
+                     [])
+
+	AC_CHECK_LIB([mpi],
+                     [MPI_Init],                     
+                     [
+		       MPI_LIBS="-lmpi $MPI_LIBS"
+	               MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
+                       AC_MSG_RESULT([Found valid MPI installlaion...])
+
+		       # AlphaServer SCs MPI requires the elan library to be included too
+	 	       if nm $MPI_LIBS_PATH/libmpi.a | grep elan > /dev/null; then
+		         echo "note: MPI found to use Quadrics switch, looking for elan library"
+			 AC_CHECK_LIB([elan],
+		                      [elan_init],
+		                      [MPI_LIBS="$MPI_LIBS -lelan"],
+		                      [AC_MSG_ERROR( [Could not find elan library... exiting] )] )
+	               fi
+                     ],
+                     [AC_MSG_RESULT([Could not link in the MPI library...]); enablempi=no] )
+
+	AC_LANG_RESTORE
+	LIBS=$tmpLIBS
+fi
+
+if (test -e $MPI_LIBS_PATH/libmpich.a || test -e $MPI_LIBS_PATH/libmpich.so) ; then
+	echo "note: using $MPI_LIBS_PATH/libmpich (.a/.so)"
+
+	MPI_IMPL="mpich"
+
+	# Ensure the comiler finds the library...
+	tmpLIBS=$LIBS
+	AC_LANG_SAVE
+	AC_LANG_CPLUSPLUS
+	LIBS="-L$MPI_LIBS_PATH $LIBS"
+
+	# look for MPI_Init in libmpich.(a/so)
+	AC_CHECK_LIB([mpich],
+		     [MPI_Init],
+		     [
+		       MPI_LIBS="-lmpich"
+		       MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
+                       AC_MSG_RESULT([Found valid MPICH installlaion...])
+                     ],
+		     [AC_MSG_RESULT([Could not link in the MPI library...]); enablempi=no] )
+
+	AC_LANG_RESTORE
+	LIBS=$tmpLIBS
+fi
+
+if (test "$MPI_IMPL" != none) ; then
+
+	# Ensure the comiler finds the header file...
+	if test -e $MPI_INCLUDES_PATH/mpi.h; then
+		echo "note: using $MPI_INCLUDES_PATH/mpi.h"
+		tmpCPPFLAGS=$CPPFLAGS
+		AC_LANG_SAVE
+		AC_LANG_CPLUSPLUS
+		CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
+		AC_CHECK_HEADER([mpi.h],
+			        [AC_DEFINE(HAVE_MPI, 1, [Flag indicating whether or not MPI is available])],
+			        [AC_MSG_RESULT([Could not compile in the MPI headers...]); enablempi=no] )
+		MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
+		AC_LANG_RESTORE
+		CPPFLAGS=$tmpCPPFLAGS
+	else
+		AC_MSG_RESULT([Could not find MPI header <mpi.h>...])
+                enablempi=no
+	fi
+else
+   
+	# no MPI install found, see if the compiler supports it
+	MPI_IMPL="built-in"
+
+      	AC_TRY_COMPILE([#include <mpi.h>],
+	  	       [int np; MPI_Comm_size (MPI_COMM_WORLD, &np);],
+                       [
+                         AC_MSG_RESULT( [$CXX Compiler Supports MPI] )
+                         AC_DEFINE(HAVE_MPI, 1, [Flag indicating whether or not MPI is available])
+                       ],
+                       [AC_MSG_RESULT([$CXX Compiler Does NOT Support MPI...]); enablempi=no] )                     	
+fi 
+
+# Save variables...
+AC_SUBST(MPI)
+AC_SUBST(MPI_IMPL)
+AC_SUBST(MPI_LIBS)
+AC_SUBST(MPI_LIBS_PATH)
+AC_SUBST(MPI_LIBS_PATHS)
+AC_SUBST(MPI_INCLUDES_PATH)
+AC_SUBST(MPI_INCLUDES_PATHS)
 ])dnl ACX_MPI
-dnl -------------------------------------------------------------
 
 
+
+
+
+dnl ----------------------------------------------------------------------------
+dnl check for the required PETSc library
+dnl ----------------------------------------------------------------------------
+AC_DEFUN([ACX_PETSc], [
+AC_REQUIRE([ACX_MPI])
+AC_REQUIRE([ACX_LAPACK])
+BLAS_LIBS="$BLAS_LIBS $FLIBS"
+LAPACK_LIBS="$LAPACK_LIBS $BLAS_LIBS"
+AC_PATH_XTRA
+X_LIBS="$X_PRE_LIBS $X_LIBS -lX11 $X_EXTRA_LIBS"
+
+# Set variables...
+AC_ARG_WITH(
+	[PETSc],
+	[  --with-PETSc=PFX        Prefix where PETSc is installed (PETSC_DIR)],
+	[PETSc="$withval"],
+	[if test $PETSC_DIR; then
+		PETSc="$PETSC_DIR"
+		echo "note: assuming PETSc library is in $PETSc (/lib,/include) as specified by environment variable PETSC_DIR"
+	else
+		PETSc="/usr/local"
+		echo "note: assuming PETSc library is in /usr/local (/lib,/include)"
+	fi])
+AC_ARG_WITH(
+	[BOPT],
+	[  --with-BOPT=VAL         BOPT setting for PETSc (BOPT)],
+	[BOPT="$withval"],
+	[echo "note: assuming BOPT to O"
+	BOPT="O"])
+AC_ARG_WITH(
+	[PETSc_ARCH],
+	[  --with-PETSc_ARCH=VAL   PETSc hardware architecture (PETSC_ARCH)],
+	[PETSc_ARCH="$withval"],
+	[if test $PETSC_ARCH; then
+		PETSc_ARCH="$PETSC_ARCH"
+		echo "note: assuming PETSc hardware architecture to be $PETSc_ARCH as specified by environment variable PETSC_ARCH"
+	else
+		PETSc_ARCH=`uname -p`
+		echo "note: assuming PETSc hardware architecture to be $PETSc_ARCH"
+	fi])
+PETSc_LIBS_PATH="$PETSc/lib/lib$BOPT/$PETSc_ARCH"
+PETSc_INCLUDES_PATH="$PETSc/include"
+
+# Check that the compiler uses the library we specified...
+if test -e $PETSc_LIBS_PATH/libpetsc.a || test -e $PETSc_LIBS_PATH/libpetsc.so; then
+	echo "note: using $PETSc_LIBS_PATH/libpetsc (.a/.so)"
+else
+	AC_MSG_ERROR( [Could not physically find PETSc library... exiting] )
+fi 
+if test -e $PETSc_INCLUDES_PATH/petsc.h; then
+	echo "note: using $PETSc_INCLUDES_PATH/petsc.h"
+else
+	AC_MSG_ERROR( [Could not physically find PETSc header file... exiting] )
+fi 
+
+# Ensure the comiler finds the library...
+tmpLIBS=$LIBS
+tmpCPPFLAGS=$CPPFLAGS
+AC_LANG_SAVE
+AC_LANG_CPLUSPLUS
+AC_CHECK_LIB(
+	[dl],
+	[dlopen],
+	[DL_LIBS="-ldl"],
+	[DL_LIBS=""; echo "libdl not found, assuming not needed for this architecture"] )
+LIBS="-L$PETSc_LIBS_PATH $MPI_LIBS_PATHS $MPI_LIBS $LAPACK_LIBS $X_LIBS $LIBS -lm $DL_LIBS"
+CPPFLAGS="$MPI_INCLUDES_PATHS -I$PETSc_INCLUDES_PATH -I$PETSc/bmake/$PETSc_ARCH $CPPFLAGS"
+echo "cppflags=$CPPFLAGS"
+
+AC_CHECK_LIB(
+	[petsc],
+	[PetscError],
+	[],
+	[AC_MSG_ERROR( [Could not link in the PETSc library... exiting] )] )
+AC_CHECK_LIB(
+	[petscvec],
+	[ISCreateGeneral],
+	[],
+	[AC_MSG_ERROR( [Could not link in the PETSc petscvec library... exiting] )] )
+AC_CHECK_LIB(
+	[petscmat],
+	[MAT_Copy],
+	[],
+	[AC_MSG_ERROR( [Could not link in the PETSc petscmat library... exiting] )] )
+AC_CHECK_LIB(
+	[petscdm],
+	[DMInitializePackage],
+	[],
+	[AC_MSG_ERROR( [Could not link in the PETSc petscdm library... exiting] )] )
+AC_CHECK_LIB(
+	[petscsles],
+	[SLESCreate],
+	[],
+	[AC_MSG_ERROR( [Could not link in the PETSc petscsles library... exiting] )] )
+AC_CHECK_LIB(
+	[petscsnes],
+	[SNESCreate],
+	[],
+	[AC_MSG_ERROR( [Could not link in the PETSc petscsnes library... exiting] )] )
+AC_CHECK_LIB(
+	[petscts],
+	[TSCreate],
+	[],
+	[AC_MSG_ERROR( [Could not link in the PETSc petscts library... exiting] )] )
+AC_CHECK_LIB(
+	[petscmesh],
+	[MESH_CreateFullCSR],
+	[],
+	[AC_MSG_ERROR( [Could not link in the PETSc petscmesh library... exiting] )] )
+AC_CHECK_LIB(
+	[petscgrid],
+	[GridCreate],
+	[],
+	[AC_MSG_ERROR( [Could not link in the PETSc petscgrid library... exiting] )] )
+AC_CHECK_LIB(
+	[petscgsolver],
+	[GSolverInitializePackage],
+	[],
+	[AC_MSG_ERROR( [Could not link in the PETSc petscgsolver library... exiting] )] )
+AC_CHECK_LIB(
+	[petscfortran],
+	[meshcreate_],
+	[],
+	[AC_MSG_ERROR( [Could not link in the PETSc library... exiting] )] )
+	AC_CHECK_LIB(
+	[petsccontrib],
+	[SDACreate1d],
+	[],
+	[AC_MSG_ERROR( [Could not link in the PETSc petsccontrib library... exiting] )] )
+AC_CHECK_HEADER(
+	[petsc.h],
+	[AC_DEFINE( 
+		[HAVE_PETSC],,
+		[Define to 1 if you have the <petsc.h> header file.])],
+	[AC_MSG_ERROR( [Could not compile in the PETSc headers... exiting] )] )
+PETSc_LIBS="-lpetsc -lpetscvec -lpetscmat -lpetscdm -lpetscsles -lpetscsnes \
+	-lpetscts -lpetscmesh -lpetscgrid -lpetscgsolver -lpetscfortran -lpetsccontrib \
+	$PETSc_ARCH_LIBS"
+PETSc_LIBS_PATHS="-L$PETSc_LIBS_PATH"
+PETSc_INCLUDES_PATHS="-I$PETSc_INCLUDES_PATH -I$PETSc/bmake/$PETSc_ARCH"
+
+# Save variables...
+AC_LANG_RESTORE
+LIBS=$tmpLIBS
+CPPFLAGS=$tmpCPPFLAGS
+AC_SUBST( PETSc )
+AC_SUBST( PETSc_IMPL )
+AC_SUBST( PETSc_LIBS )
+AC_SUBST( PETSc_LIBS_PATH )
+AC_SUBST( PETSc_LIBS_PATHS )
+AC_SUBST( PETSc_INCLUDES_PATH )
+AC_SUBST( PETSc_INCLUDES_PATHS )
+])dnl ACX_PETSc ------------------------------------------------------------

@@ -50,10 +50,6 @@
 /* Define to 1 if you have the <hash_set> header file. */
 #undef HAVE_HASH_SET
 
-/* Flag indicating whether the library shall be compiled to support hdf4 files
-   */
-#undef HAVE_HDF4
-
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
@@ -79,7 +75,7 @@
    files */
 #undef HAVE_NETCDF
 
-/* Flag indicating whether or not Parmetis is available */
+/* Flag indicating whether or not ParMetis is available */
 #undef HAVE_PARMETIS
 
 /* Flag indicating whether or not Petsc is available */
