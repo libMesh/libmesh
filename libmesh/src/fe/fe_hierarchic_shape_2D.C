@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic_shape_2D.C,v 1.10 2004-01-03 15:37:42 benkirk Exp $
+// $Id: fe_hierarchic_shape_2D.C,v 1.11 2004-02-08 22:17:31 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -146,13 +146,13 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
 	      Real f1 = 1;
 	      Real f2 = 1;
 
-	      if (elem->node(0) != std::min(elem->node(0), elem->node(1)))
+	      if (elem->node(0) > elem->node(1))
 		f0 = -1.;
 	      
-	      if (elem->node(1) != std::min(elem->node(1), elem->node(2)))
+	      if (elem->node(1) > elem->node(2))
 		f1 = -1.;
 	      
-	      if (elem->node(2) != std::min(elem->node(2), elem->node(0)))
+	      if (elem->node(2) > elem->node(0))
 		f2 = -1.;
 
 
@@ -226,16 +226,16 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
 	      Real f2 = 1.;
 	      Real f3 = 1.;
 
-	      if (elem->node(0) != std::min(elem->node(0), elem->node(1)))
+	      if (elem->node(0) > elem->node(1))
 		f0 = -1.;
 	      
-	      if (elem->node(1) != std::min(elem->node(1), elem->node(2)))
+	      if (elem->node(1) > elem->node(2))
 		f1 = -1.;
 	      
-	      if (elem->node(3) != std::min(elem->node(3), elem->node(2)))
+	      if (elem->node(3) > elem->node(2))
 		f2 = -1.;
 	      
-	      if (elem->node(0) != std::min(elem->node(0), elem->node(3)))
+	      if (elem->node(0) > elem->node(3))
 		f3 = -1.;
 	      
 
@@ -288,13 +288,13 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
 	      Real f1 = 1;
 	      Real f2 = 1;
 
-	      if (elem->node(0) != std::min(elem->node(0), elem->node(1)))
+	      if (elem->node(0) > elem->node(1))
 		f0 = -1.;
 	      
-	      if (elem->node(1) != std::min(elem->node(1), elem->node(2)))
+	      if (elem->node(1) > elem->node(2))
 		f1 = -1.;
 	      
-	      if (elem->node(2) != std::min(elem->node(2), elem->node(0)))
+	      if (elem->node(2) > elem->node(0))
 		f2 = -1.;
 
 
@@ -386,16 +386,16 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
 	      Real f2 = 1.;
 	      Real f3 = 1.;
 
-	      if (elem->node(0) != std::min(elem->node(0), elem->node(1)))
+	      if (elem->node(0) > elem->node(1))
 		f0 = -1.;
 	      
-	      if (elem->node(1) != std::min(elem->node(1), elem->node(2)))
+	      if (elem->node(1) > elem->node(2))
 		f1 = -1.;
 	      
-	      if (elem->node(3) != std::min(elem->node(3), elem->node(2)))
+	      if (elem->node(3) > elem->node(2))
 		f2 = -1.;
 	      
-	      if (elem->node(0) != std::min(elem->node(0), elem->node(3)))
+	      if (elem->node(0) > elem->node(3))
 		f3 = -1.;
 	      
 
@@ -448,13 +448,13 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
 	      Real f1 = 1;
 	      Real f2 = 1;
 
-	      if (elem->node(0) != std::min(elem->node(0), elem->node(1)))
+	      if (elem->node(0) > elem->node(1))
 		f0 = -1.;
 	      
-	      if (elem->node(1) != std::min(elem->node(1), elem->node(2)))
+	      if (elem->node(1) > elem->node(2))
 		f1 = -1.;
 	      
-	      if (elem->node(2) != std::min(elem->node(2), elem->node(0)))
+	      if (elem->node(2) > elem->node(0))
 		f2 = -1.;
 
 
@@ -567,16 +567,16 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
 	      Real f2 = 1.;
 	      Real f3 = 1.;
 
-	      if (elem->node(0) != std::min(elem->node(0), elem->node(1)))
+	      if (elem->node(0) > elem->node(1))
 		f0 = -1.;
 	      
-	      if (elem->node(1) != std::min(elem->node(1), elem->node(2)))
+	      if (elem->node(1) > elem->node(2))
 		f1 = -1.;
 	      
-	      if (elem->node(3) != std::min(elem->node(3), elem->node(2)))
+	      if (elem->node(3) > elem->node(2))
 		f2 = -1.;
 	      
-	      if (elem->node(0) != std::min(elem->node(0), elem->node(3)))
+	      if (elem->node(0) > elem->node(3))
 		f3 = -1.;
 	      
 
@@ -805,16 +805,16 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 	      Real f2 = 1.;
 	      Real f3 = 1.;
 
-	      if (elem->node(0) != std::min(elem->node(0), elem->node(1)))
+	      if (elem->node(0) > elem->node(1))
 		f0 = -1.;
 	      
-	      if (elem->node(1) != std::min(elem->node(1), elem->node(2)))
+	      if (elem->node(1) > elem->node(2))
 		f1 = -1.;
 	      
-	      if (elem->node(3) != std::min(elem->node(3), elem->node(2)))
+	      if (elem->node(3) > elem->node(2))
 		f2 = -1.;
 	      
-	      if (elem->node(0) != std::min(elem->node(0), elem->node(3)))
+	      if (elem->node(0) > elem->node(3))
 		f3 = -1.;
 	      
 
@@ -927,16 +927,16 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 	      Real f2 = 1.;
 	      Real f3 = 1.;
 
-	      if (elem->node(0) != std::min(elem->node(0), elem->node(1)))
+	      if (elem->node(0) > elem->node(1))
 		f0 = -1.;
 	      
-	      if (elem->node(1) != std::min(elem->node(1), elem->node(2)))
+	      if (elem->node(1) > elem->node(2))
 		f1 = -1.;
 	      
-	      if (elem->node(3) != std::min(elem->node(3), elem->node(2)))
+	      if (elem->node(3) > elem->node(2))
 		f2 = -1.;
 	      
-	      if (elem->node(0) != std::min(elem->node(0), elem->node(3)))
+	      if (elem->node(0) > elem->node(3))
 		f3 = -1.;
 	      
 
@@ -1049,16 +1049,16 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 	      Real f2 = 1.;
 	      Real f3 = 1.;
 
-	      if (elem->node(0) != std::min(elem->node(0), elem->node(1)))
+	      if (elem->node(0) > elem->node(1))
 		f0 = -1.;
 	      
-	      if (elem->node(1) != std::min(elem->node(1), elem->node(2)))
+	      if (elem->node(1) > elem->node(2))
 		f1 = -1.;
 	      
-	      if (elem->node(3) != std::min(elem->node(3), elem->node(2)))
+	      if (elem->node(3) > elem->node(2))
 		f2 = -1.;
 	      
-	      if (elem->node(0) != std::min(elem->node(0), elem->node(3)))
+	      if (elem->node(0) > elem->node(3))
 		f3 = -1.;
 	      
 
