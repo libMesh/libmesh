@@ -1,4 +1,4 @@
-// $Id: petsc_matrix.C,v 1.21 2004-02-15 15:35:30 benkirk Exp $
+// $Id: petsc_matrix.C,v 1.22 2004-08-20 14:05:21 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -177,7 +177,7 @@ void PetscMatrix<T>::clear ()
 {
   int ierr=0;
   
-  if (this->initialized())
+  if ((this->initialized()) && (this->_destroy_mat_on_exit))
     {
       ierr = MatDestroy (mat);
              CHKERRABORT(PETSC_COMM_WORLD,ierr);
@@ -283,6 +283,53 @@ void PetscMatrix<T>::print_matlab (const std::string name) const
   ierr = PetscViewerDestroy (petsc_viewer);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 }
+
+
+
+template <typename T>
+void PetscMatrix<T>::_get_submatrix(SparseMatrix<T>& submatrix,
+				    const std::vector<unsigned int> &rows,
+				    const std::vector<unsigned int> &cols,
+				    const bool reuse_submatrix) const
+{
+  // Can only extract submatrices from closed matrices
+  this->close();
+  
+  // Attempt to cast the input matrix to a PetscMatrix*
+  PetscMatrix<T>* petsc_submatrix = dynamic_cast<PetscMatrix<T>*>(&submatrix);
+  assert(petsc_submatrix != NULL);
+
+  // Construct row and column index sets.
+  int ierr=0;
+  IS isrow, iscol;
+
+  ierr = ISCreateGeneral(PETSC_COMM_WORLD,
+			 rows.size(),
+			 (int*) &rows[0],
+			 &isrow); CHKERRABORT(PETSC_COMM_WORLD,ierr);
+
+  ierr = ISCreateGeneral(PETSC_COMM_WORLD,
+			 cols.size(),
+			 (int*) &cols[0],
+			 &iscol); CHKERRABORT(PETSC_COMM_WORLD,ierr);
+
+  // Extract submatrix
+  ierr = MatGetSubMatrix(mat,
+			 isrow,
+			 iscol,
+			 PETSC_DECIDE,
+			 (reuse_submatrix ? MAT_REUSE_MATRIX : MAT_INITIAL_MATRIX),
+			 &(petsc_submatrix->mat));  CHKERRABORT(PETSC_COMM_WORLD,ierr);
+
+  // Specify that the new submatrix is initialized and close it.
+  petsc_submatrix->_is_initialized = true;
+  petsc_submatrix->close();
+
+  // Clean up PETSc data structures
+  ierr = ISDestroy(isrow); CHKERRABORT(PETSC_COMM_WORLD,ierr);
+  ierr = ISDestroy(iscol); CHKERRABORT(PETSC_COMM_WORLD,ierr);
+}
+
 
 
 
