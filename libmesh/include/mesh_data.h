@@ -1,4 +1,4 @@
-// $Id: mesh_data.h,v 1.21 2003-09-09 14:11:56 ddreyer Exp $
+// $Id: mesh_data.h,v 1.22 2003-09-16 16:44:04 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -443,14 +443,35 @@ protected:
   //----------------------------------------------------------
   // read/write Methods
   /**
-   * Read nodal/element oriented data in UNV format.
+   * Read nodal/element oriented data in UNV format,
+   * either from an ASCII file or from a gzip'ed ASCII 
+   * file, using the C++ wrapper \p gzstream to \p zlib.h.
    */
-  void read_unv (const std::string& name);
+  void read_unv (const std::string& file_name);
 
   /**
-   * Write nodal/element oriented data in UNV format.
+   * Actual implementation of reading nodal/element 
+   * oriented data in UNV format.  This has to be
+   * decoupled from \p read_unv() in order to allow
+   * reading both \p .unv and \p .unv.gz files.
    */
-  void write_unv (const std::string& name);
+  void read_unv_implementation (std::istream& in_file);
+
+  /**
+   * Write nodal/element oriented data in UNV format,
+   * either to an ASCII file or to a gzip'ed ASCII 
+   * file, using the C++ wrapper \p gzstream to \p zlib.h.
+   */
+  void write_unv (const std::string& file_name);
+
+  /**
+   * Actual implementation of writing nodal/element 
+   * oriented data in UNV format.  This has to be
+   * decoupled from \p write_unv() in order to allow
+   * writing both \p .unv and \p .unv.gz files.
+   */
+  void write_unv_implementation (std::ostream& out_file);
+
 
   /**
    * Read nodal/element oriented data using the
@@ -777,12 +798,12 @@ protected:
    * also reads the header information from the 
    * stream \p in_file.
    */
-  bool read (std::ifstream& in_file);
+  bool read (std::istream& in_file);
 
   /**
    * Write the header information to the stream \p out_file.
    */
-  void write (std::ofstream& out_file);
+  void write (std::ostream& out_file);
 
 
 private:

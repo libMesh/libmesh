@@ -1,4 +1,4 @@
-// $Id: mesh_data_unv_support.C,v 1.15 2003-09-06 22:57:11 ddreyer Exp $
+// $Id: mesh_data_unv_support.C,v 1.16 2003-09-16 16:44:04 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -26,31 +26,71 @@
 #include "mesh_data.h"
 #include "mesh_base.h"
 #include "auto_ptr.h"
+#include "gzstream.h" // For reading/writing compressed streams
 
 
 
 //------------------------------------------------------
 // MeshData UNV support functions
-void MeshData::read_unv(const std::string& name)
+void MeshData::read_unv (const std::string& file_name)
 {
   /*
    * we should better be active or in compatibility mode
    */
-  assert (_active || _compatibility_mode);
+  assert (this->_active || this->_compatibility_mode);
 
   /*
    * When reading data, make sure the id maps are ok
    */
-  assert (_node_id_map_closed);
-  assert (_elem_id_map_closed);
+  assert (this->_node_id_map_closed);
+  assert (this->_elem_id_map_closed);
 
   /*
    * clear the data, but keep the id maps
    */
   this->clear();
 
-  std::ifstream in_file (name.c_str());
+  /*
+   * We can read either ".unv", or ".unv.gz"
+   * files, provided zlib.h is there
+   */
+  if (file_name.rfind(".gz") < file_name.size())
+    {
+#ifdef HAVE_ZLIB_H
+      igzstream in_stream(file_name.c_str());
+      this->read_unv_implementation (in_stream);
+#else
+      std::cerr << "ERROR:  You must have the zlib.h header "
+		<< "files and libraries to read and write "
+		<< "compressed streams."
+		<< std::endl;
+      error();
+#endif
+      return;
+    }
+  
+  else
+    {
+      std::ifstream in_stream(file_name.c_str());
+      this->read_unv_implementation (in_stream);
+      return;
+    }
+}
 
+
+
+
+
+
+void MeshData::read_unv_implementation (std::istream& in_file)
+{
+  /*
+   * This is the actual implementation of
+   * reading in UNV format.  This enables
+   * to read either through the conventional
+   * C++ stream, or through a stream that
+   * allows to read .gz'ed files.
+   */
   if ( !in_file.good() )
     {
       std::cerr << "ERROR: Input file not good." 
@@ -102,15 +142,15 @@ void MeshData::read_unv(const std::string& name)
 	   * Now read the data of interest.
 	   * Start with the header.  For 
 	   * explanation of the variable
-	   * Dataset_location, see below.
+	   * dataset_location, see below.
 	   */
-	  unsigned int Dataset_location;
+	  unsigned int dataset_location;
 	      
 	  /*
 	   * the type of data (complex, real,
 	   * float, double etc, see below)
 	   */
-	  unsigned int Data_type;
+	  unsigned int data_type;
 
 	  /*
 	   * the number of floating-point values per entity
@@ -137,7 +177,7 @@ void MeshData::read_unv(const std::string& name)
 	       * 2: Data on elements
 	       * other sets are currently not supported.
 	       */
-	      in_file >> Dataset_location;
+	      in_file >> dataset_location;
 
 	      /*
 	       * Ignore five ID lines.
@@ -148,19 +188,19 @@ void MeshData::read_unv(const std::string& name)
 	      /*
 	       * These data are all of no interest to us...
 	       */
-	      unsigned int Model_type,          
-		  Analysis_type,
-		  Data_characteristic,
-		  Result_type;
+	      unsigned int model_type,          
+		  analysis_type,
+		  data_characteristic,
+		  result_type;
 
 	      /*
 	       * Read record 9.
 	       */
-	      in_file >> Model_type           // not used here
-		      >> Analysis_type        // not used here
-		      >> Data_characteristic  // not used here
-		      >> Result_type          // not used here
-		      >> Data_type
+	      in_file >> model_type           // not used here
+		      >> analysis_type        // not used here
+		      >> data_characteristic  // not used here
+		      >> result_type          // not used here
+		      >> data_type
 		      >> NVALDC;
 	      
 	      
@@ -195,9 +235,9 @@ void MeshData::read_unv(const std::string& name)
 	       */
 	      if (_unv_header->read(in_file))
 	        {
-		  Dataset_location = _unv_header->dataset_location;
+		  dataset_location = _unv_header->dataset_location;
 		  NVALDC = _unv_header->nvaldc;
-		  Data_type = _unv_header->data_type;
+		  data_type = _unv_header->data_type;
 		}
 	      else
 	        {
@@ -222,7 +262,7 @@ void MeshData::read_unv(const std::string& name)
 	  /*
 	   * Check the location of the dataset.
 	   */
-	  if (Dataset_location != 1)
+	  if (dataset_location != 1)
 	    {
 	      std::cerr << "ERROR: Currently only Data at nodes is supported." 
 			<< std::endl;
@@ -265,7 +305,7 @@ void MeshData::read_unv(const std::string& name)
 		   * As again, these floats may also be written
 		   * using a 'D' instead of an 'e'.
 		   */
-		  if (Data_type == 2 || Data_type == 4)
+		  if (data_type == 2 || data_type == 4)
 		    {
 		      std::string buf;
 		      in_file >> buf;
@@ -277,7 +317,7 @@ void MeshData::read_unv(const std::string& name)
 #endif
 		    }
 
-		  else if(Data_type == 5 || Data_type == 6)
+		  else if(data_type == 5 || data_type == 6)
 
 		    {
 #ifdef USE_COMPLEX_NUMBERS
@@ -352,25 +392,73 @@ void MeshData::read_unv(const std::string& name)
 
 
 
-void MeshData::write_unv (const std::string& name)
+
+
+void MeshData::write_unv (const std::string& file_name)
 {
   /*
    * we should better be active or in compatibility mode
    */
-  assert (_active || _compatibility_mode);
+  assert (this->_active || this->_compatibility_mode);
 
   /*
    * make sure the id maps are ready
    * and that we have data to write
    */
-  assert (_node_id_map_closed);
-  assert (_elem_id_map_closed);
+  assert (this->_node_id_map_closed);
+  assert (this->_elem_id_map_closed);
 
-  assert (_node_data_closed);
-  assert (_elem_data_closed);
+  assert (this->_node_data_closed);
+  assert (this->_elem_data_closed);
 
-  std::ofstream out_file (name.c_str());
+  if (file_name.rfind(".gz") < file_name.size())
+    {
+#ifdef HAVE_ZLIB_H
+      ogzstream out_stream(file_name.c_str());
+      this->write_unv_implementation (out_stream);
+#else
+      std::cerr << "ERROR:  You must have the zlib.h header "
+		<< "files and libraries to read and write "
+		<< "compressed streams."
+		<< std::endl;
+      error();
+#endif
+      return;
+      
+    }
+  
+  else
+    {
+      std::ofstream out_stream(file_name.c_str());
+      this->write_unv_implementation (out_stream);
+      return;
+    }
+}
 
+
+
+
+
+
+void MeshData::write_unv_implementation (std::ostream& out_file)
+{
+  /*
+   * This is the actual implementation of writing
+   * unv files, either as .unv or as .unv.gz file
+   */
+  if ( !out_file.good() )
+    {
+      std::cerr << "ERROR: Output file not good." 
+		<< std::endl;
+      error();
+    }
+
+
+  /*
+   * the beginning marker of the dataset block for
+   * nodal/element-associated data (not to be confused
+   * with _desired_dataset_label!)
+   */
   const std::string  _label_dataset_mesh_data    = "2414";
 
   /*
@@ -560,7 +648,7 @@ MeshDataUnvHeader::~MeshDataUnvHeader()
 
 
 
-bool MeshDataUnvHeader::read (std::ifstream& in_file)
+bool MeshDataUnvHeader::read (std::istream& in_file)
 {
   in_file >> this->dataset_label;
 
@@ -659,7 +747,7 @@ bool MeshDataUnvHeader::read (std::ifstream& in_file)
 
 
 
-void MeshDataUnvHeader::write (std::ofstream& out_file)
+void MeshDataUnvHeader::write (std::ostream& out_file)
 {
   char buf[81];
 

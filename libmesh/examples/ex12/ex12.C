@@ -1,4 +1,4 @@
-// $Id: ex12.C,v 1.2 2003-09-02 18:02:36 benkirk Exp $
+// $Id: ex12.C,v 1.3 2003-09-16 16:44:04 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -61,8 +61,15 @@
  * is straightforward:  the 
  *
  * - \p Number               \p MeshData::operator()(const Node*, int),
+ *   get the i-th floating-point value associated with the node
  * - \p bool                 \p MeshData::has_data(const Node*),
+ *   verify whether a certain node has data associated
  * - \p std::vector<Number>& \p MeshData::get_data (const Node* node)
+ *   to get read-access to the data associated with this node (better
+ *   make sure first that this node @e has data, see \p has_data() )
+ * - iterator for nodal data \p MeshData::const_node_data_iterator
+ *   to directly iterate over the set of nodes that hold data, 
+ *   instead of asking through \p has_data() each time again.
  *
  * (and corresponding methods for const Elem*) provide access to
  * the floating-point data associated with nodes/elements.
@@ -424,7 +431,8 @@ int main (int argc, char** argv)
       std::cout << "Writing _Mesh_ to: " << out_mesh << std::endl
 		<< "Try 'diff " << out_mesh << " " << mesh_file << "'" << std::endl
 		<< "to see the differences in node numbers." << std::endl
-		<< "---------------------------------------" << std::endl;
+		<< "---------------------------------------" << std::endl
+		<< std::endl;
       mesh.write(out_mesh);
 
 
@@ -459,9 +467,39 @@ int main (int argc, char** argv)
       std::string mesh_data_file = "data_third_with_libmesh_ids_out.unv";
       std::cout << std::endl 
 		<< "Writing MeshData to: " << mesh_data_file << std::endl
-		<< "----------------------------------------------------------" << std::endl;
+		<< "----------------------------------------------------------" 
+		<< std::endl << std::endl;
       mesh.data.write (mesh_data_file);
 
+
+#ifdef HAVE_ZLIB_H
+
+      /*
+       * As may already seen, UNV files are text-based, so the may
+       * become really big.  When \p ./configure found \p zlib.h,
+       * then we may also @e read or @e write \p .unv files in gzip'ed 
+       * format! -- Pretty cool, and also pretty fast, due to zlib.h.
+       *
+       * Note that this works also for mesh files, not only for 
+       * meshdata files.
+       *
+       * In order to write a ".unv.gz" file instead of a ".unv" file,
+       * simply provide the full name with ".gz" appended to the
+       * write method; it will then figure out whether this file should
+       * be gzip'ed or not.
+       */
+      std::string packed_mesh_data_file =  "packed_" + mesh_data_file + ".gz";
+      std::cout << std::endl 
+		<< "Writing gzip'ed MeshData to: " << packed_mesh_data_file << std::endl
+		<< "---------------------------------------------------------------------------" << std::endl
+		<< " To verify the integrity of the packed version, type:" << std::endl << std::endl
+		<< "   gunzip " << packed_mesh_data_file << "; " << std::endl
+		<< "   diff packed_" << mesh_data_file << " " 
+		<< mesh_data_file << std::endl << std::endl;
+
+      mesh.data.write (packed_mesh_data_file);
+
+#endif
 
 
 
