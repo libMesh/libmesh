@@ -1,4 +1,4 @@
-// $Id: quadrature_gauss_3D.C,v 1.6 2003-02-03 03:51:50 ddreyer Exp $
+// $Id: quadrature_gauss_3D.C,v 1.7 2003-02-06 06:02:42 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -21,7 +21,7 @@
 
 // Local includes
 #include "quadrature_gauss.h"
-
+#include "quadrature_jacobi.h"
 
 
 void QGauss::init_3D(const ElemType _type)
@@ -318,48 +318,79 @@ void QGauss::init_3D(const ElemType _type)
 
 	  case SIXTH:
 	  case SEVENTH:
+	  case EIGHTH:
+	  case NINTH:     
+	  case TENTH:        
+	  case ELEVENTH:     
+	  case TWELFTH:      
+	  case THIRTEENTH:   
+	  case FOURTEENTH:   
+	  case FIFTEENTH:    
+	  case SIXTEENTH:    
+	  case SEVENTEENTH:  
+	  case EIGHTTEENTH:  
+	  case NINTEENTH:    
+	  case TWENTIETH:    
+	  case TWENTYFIRST:  
+	  case TWENTYSECOND: 
+	  case TWENTYTHIRD:
 	    {
-	      // This is a conical product formula (probably
-	      // non-optimal) taken from Stroud, A.H. pg. 315
-	      // The rule is formed using the points and weights
-	      // of the 7th order quadrature rule for triangles.
-	      // There are 64 points in this rule.
+	      // The following quadrature rules are
+	      // generated as conical products.  These
+	      // tend to be non-optimal (use too many
+	      // points, cluster points in certain
+	      // regions of the domain) but they are
+	      // quite easy to automatically generate
+	      // using a 1D Gauss rule on [0,1] and two 
+	      // 1D Jacobi-Gauss rules on [0,1].
 
 	      // Points (1D)            // Weights
-	      std::vector<Real> r(4);   std::vector<Real> A(4);
-	      std::vector<Real> s(4);   std::vector<Real> B(4);
-	      std::vector<Real> t(4);   std::vector<Real> C(4);
+	      // std::vector<Real> r(4);   std::vector<Real> A(4);
+// 	      std::vector<Real> s(4);   std::vector<Real> B(4);
+// 	      std::vector<Real> t(4);   std::vector<Real> C(4);
 
-	      // Fill in the interval points
-	      r[0] = 0.0694318422; s[0] = 0.0571041961; t[0] = 0.0485005494;
-	      r[1] = 0.3300094782; s[1] = 0.2768430136; t[1] = 0.2386007376;
-	      r[2] = 0.6699905218; s[2] = 0.5835904324; t[2] = 0.5170472951;
-	      r[3] = 0.9305681558; s[3] = 0.8602401357; t[3] = 0.7958514179;
+// 	      // Fill in the interval points
+// 	      r[0] = 0.0694318422; s[0] = 0.0571041961; t[0] = 0.0485005494;
+// 	      r[1] = 0.3300094782; s[1] = 0.2768430136; t[1] = 0.2386007376;
+// 	      r[2] = 0.6699905218; s[2] = 0.5835904324; t[2] = 0.5170472951;
+// 	      r[3] = 0.9305681558; s[3] = 0.8602401357; t[3] = 0.7958514179;
 
-	      // Fill in the weights
-	      A[0] = 0.1739274226; B[0] = 0.1355069134; C[0] = 0.1108884156;
-	      A[1] = 0.3260725774; B[1] = 0.2034645680; C[1] = 0.1434587898;
-	      A[2] = 0.3260725774; B[2] = 0.1298475476; C[2] = 0.0686338872;
-	      A[3] = 0.1739274226; B[3] = 0.0311809709; C[3] = 0.0103522407;
+// 	      // Fill in the weights
+// 	      A[0] = 0.1739274226; B[0] = 0.1355069134; C[0] = 0.1108884156;
+// 	      A[1] = 0.3260725774; B[1] = 0.2034645680; C[1] = 0.1434587898;
+// 	      A[2] = 0.3260725774; B[2] = 0.1298475476; C[2] = 0.0686338872;
+// 	      A[3] = 0.1739274226; B[3] = 0.0311809709; C[3] = 0.0103522407;
 
-	      // Make room for the points and weights
-	      _points.resize(64);
-	      _weights.resize(64);
+// 	      // Make room for the points and weights
+// 	      _points.resize(64);
+// 	      _weights.resize(64);
 
-	      // Compute the conical products
-	      unsigned int gp = 0;
-	      for (unsigned int i=0; i<4; i++)
-		for (unsigned int j=0; j<4; j++)
-		  for (unsigned int k=0; k<4; k++)
-		    {
-		      _points[gp](0) = t[k];
-		      _points[gp](1) = s[j]*(1.-t[k]);
-		      _points[gp](2) = r[i]*(1.-s[j])*(1.-t[k]);
-		      _weights[gp]   = A[i]*B[j]*C[k];
-		      gp++;
-		    }
+// 	      // Compute the conical products
+// 	      unsigned int gp = 0;
+// 	      for (unsigned int i=0; i<4; i++)
+// 		for (unsigned int j=0; j<4; j++)
+// 		  for (unsigned int k=0; k<4; k++)
+// 		    {
+// 		      _points[gp](0) = t[k];
+// 		      _points[gp](1) = s[j]*(1.-t[k]);
+// 		      _points[gp](2) = r[i]*(1.-s[j])*(1.-t[k]);
+// 		      _weights[gp]   = A[i]*B[j]*C[k];
+// 		      gp++;
+// 		    }
 	      
-	      
+	      // Define the quadrature rules...
+	      QGauss  gauss1D(1,_order);
+	      QJacobi jacA1D(1,_order,1,0);
+	      QJacobi jacB1D(1,_order,2,0);
+
+	      // The Gauss rule needs to be scaled to [0,1]
+	      std::pair<Real, Real> old_range(-1,1);
+	      std::pair<Real, Real> new_range(0,1);
+	      gauss1D.scale(old_range,
+			    new_range);
+
+	      // Compute the tensor product
+	      tensor_product_tet(&gauss1D, &jacA1D, &jacB1D);
 	      return;
 	    }
 	  default:

@@ -1,4 +1,4 @@
-// $Id: quadrature.h,v 1.6 2003-02-03 03:51:49 ddreyer Exp $
+// $Id: quadrature.h,v 1.7 2003-02-06 06:02:41 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -24,6 +24,7 @@
 
 // C++ includes
 #include <vector>
+#include <utility>
 
 // Local includes
 #include "mesh_common.h"
@@ -91,7 +92,7 @@ public:
    */
   Real w(const unsigned int i) const
     { assert (i < _weights.size()); return _weights[i]; };
-
+  
   /**
    * Initializes the data structures to contain a quadrature rule
    * for an object of type \p type.  
@@ -123,7 +124,9 @@ protected:
   /**
    * Initializes the 1D quadrature rule by filling the points and
    * weights vectors with the appropriate values.  The order of
-   * the rule will be defined by the implementing class. 
+   * the rule will be defined by the implementing class.
+   * It is assumed that derived quadrature rules will at least
+   * define the init_1D function, therefore it is pure virtual.
    */
   virtual void init_1D (const ElemType _type=INVALID_ELEM) = 0;
 
@@ -131,28 +134,49 @@ protected:
    * Initializes the 2D quadrature rule by filling the points and
    * weights vectors with the appropriate values.  The order of
    * the rule will be defined by the implementing class.
+   * Should not be pure virtual since a derived quadrature rule
+   * may only be defined in 1D.  If not redefined, simply does
+   * nothing.
    */
-  virtual void init_2D (const ElemType _type=INVALID_ELEM) = 0;
+  virtual void init_2D (const ElemType) {};
 
   /**
    * Initializes the 3D quadrature rule by filling the points and
    * weights vectors with the appropriate values.  The order of
    * the rule will be defined by the implementing class.
+   * Should not be pure virtual since a derived quadrature rule
+   * may only be defined in 1D.  If not redefined, simply does
+   * nothing.
    */
-  virtual void init_3D (const ElemType _type=INVALID_ELEM) = 0;
+  virtual void init_3D (const ElemType) {};
 
 
   
   /**
    * Initialize the 1D quadrature rule for a side (edge).
+   * Should not be pure virtual since a derived quadrature rule
+   * may only be defined in 1D. If not redefined, simply does
+   * nothing. 
    */
-  virtual void init_2D (const ElemType _type,
-			const unsigned int side) = 0;
+  virtual void init_2D (const ElemType, const unsigned int) {};
+  
   /**
    * Initialize the 2D quadrature rule for a side (face).
+   * Should not be pure virtual since a derived quadrature rule
+   * may only be defined in 1D. If not redefined, simply does
+   * nothing. 
    */
-  virtual void init_3D (const ElemType _type,
-			const unsigned int side) = 0;
+  virtual void init_3D (const ElemType, const unsigned int) {};
+
+  
+  /**
+   * Maps the points of a 1D interval quadrature rule (typically [-1,1])
+   * to any other 1D interval (typically [0,1]) and scales the weights
+   * accordingly.  The quadrature rule will be mapped from the
+   * entries of old_range to the entries of new_range.
+   */
+  void scale(std::pair<Real, Real> old_range,
+	     std::pair<Real, Real> new_range);
   
   /**
    * Computes the tensor product of
@@ -162,6 +186,17 @@ protected:
    */
   void tensor_product_quad (QBase* q1D);
 
+  /**
+   * Computes the conical product of
+   * two 1D rules to generate a (sub-optimal)
+   * 2D rule for triangles.  Note that:
+   * gauss1D = 1D Gauss rule
+   * jacA1D  = 1D Jacobi-Gauss rule with (1-x) wt. funtion
+   * Method can be found in:
+   * Approximate Calculation of Multiple Integrals, Stroud, A. H.
+   */
+  void tensor_product_tri (QBase* gauss1D, QBase* jacA1D);
+  
   /**
    * Computes the tensor product of
    * three 1D rules and returns a 3D rule.
@@ -178,6 +213,18 @@ protected:
    */
   void tensor_product_prism (QBase* q1D, QBase* q2D);
 
+  /**
+   * Computes the conical product of
+   * three 1D rules to generate a (sub-optimal)
+   * 3D rule for tets.  Note that:
+   * gauss1D = 1D Gauss rule
+   * jacA1D  = 1D Jacobi-Gauss rule with (1-x) wt. funtion
+   * jacB1D  = 1D Jacobi-Gauss rule with (1-x)^2 wt. function 
+   * Method can be found in:
+   * Approximate Calculation of Multiple Integrals, Stroud, A. H.
+   */
+  void tensor_product_tet (QBase* gauss1D, QBase* jacA1D, QBase* jacB1D);
+  
   /**
    * Computes the quadrature rule for side
    * \p side of a quadrilateral element.
