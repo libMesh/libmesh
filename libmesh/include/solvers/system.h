@@ -1,4 +1,4 @@
-// $Id: system.h,v 1.9 2005-02-22 22:17:35 jwpeterson Exp $
+// $Id: system.h,v 1.10 2005-03-10 22:05:14 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -198,6 +198,11 @@ public:
    * @returns a writeable reference to this system's \p _dof_map.
    */
   DofMap & get_dof_map();
+
+  /**
+   * @returns a constant reference to this system's parent EquationSystems object.
+   */
+  const EquationSystems & get_equation_systems() const { return _equation_systems; }
 
   /**
    * @returns \p true if the system is active, \p false otherwise.

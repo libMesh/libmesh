@@ -1,4 +1,4 @@
-// $Id: kelly_error_estimator.C,v 1.7 2005-02-22 22:17:42 jwpeterson Exp $
+// $Id: kelly_error_estimator.C,v 1.8 2005-03-10 22:05:48 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -44,6 +44,8 @@ void KellyErrorEstimator::estimate_error (const System& system,
   
   /*
 
+  Conventions for assigning the direction of the normal:
+  
   - e & f are global element ids
   
   Case (1.) Elements are at the same level, e<f
@@ -75,7 +77,7 @@ void KellyErrorEstimator::estimate_error (const System& system,
 		  |     |     |          |
 		  |     |     |          |
                    ----------------------
-*/
+  */
    
   // The current mesh
   const Mesh& mesh = system.get_mesh();
@@ -116,10 +118,13 @@ void KellyErrorEstimator::estimate_error (const System& system,
       // Possibly skip this variable
       if (!component_mask.empty())
 	if (component_mask[var] == false) continue;
+
+      // The (string) name of this variable
+      const std::string& var_name = system.variable_name(var);
       
       // The type of finite element to use for this variable
       const FEType& fe_type = dof_map.variable_type (var);
-
+      
       // Finite element objects for the same face from
       // different sides
       AutoPtr<FEBase> fe_e (FEBase::build (dim, fe_type));
@@ -154,9 +159,6 @@ void KellyErrorEstimator::estimate_error (const System& system,
       
       // Iterate over all the active elements in the mesh
       // that live on this processor.
-//       const_active_local_elem_iterator       elem_it (mesh.elements_begin());
-//       const const_active_local_elem_iterator elem_end(mesh.elements_end());
-
       MeshBase::const_element_iterator       elem_it  = mesh.active_local_elements_begin();
       const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end(); 
 
@@ -168,98 +170,196 @@ void KellyErrorEstimator::estimate_error (const System& system,
 	  
 	  // Loop over the neighbors of element e
 	  for (unsigned int n_e=0; n_e<e->n_neighbors(); n_e++)
-	    if (e->neighbor(n_e) != NULL) // e is not on the boundary
-	      {
-		const Elem* f           = e->neighbor(n_e);
-		const unsigned int f_id = f->id();
+	    {
+	      if (e->neighbor(n_e) != NULL) // e is not on the boundary
+		{
+		  const Elem* f           = e->neighbor(n_e);
+		  const unsigned int f_id = f->id();
 		
-		if (   //-------------------------------------
-		    ((f->active()) &&
-		     (f->level() == e->level()) &&
-		     (e_id < f_id))                 // Case 1.
+		  if (   //-------------------------------------
+		      ((f->active()) &&
+		       (f->level() == e->level()) &&
+		       (e_id < f_id))                 // Case 1.
 		    
-		    || //-------------------------------------
+		      || //-------------------------------------
 		    
-		    (f->level() < e->level())       // Case 2.
+		      (f->level() < e->level())       // Case 2.
 		    
-		    )  //-------------------------------------
-		  {		    
-		    // Update the shape functions on side s_e of
-		    // element e
-		    fe_e->reinit (e, n_e);
+		      )  //-------------------------------------
+		    {		    
+		      // Update the shape functions on side s_e of
+		      // element e
+		      fe_e->reinit (e, n_e);
 
-		    // Build the side
-		    AutoPtr<Elem> side (e->side(n_e));
+		      // Build the side
+		      AutoPtr<Elem> side (e->side(n_e));
 
-		    // Get the maximum h for this side
-		    const Real h = side->hmax();
+		      // Get the maximum h for this side
+		      const Real h = side->hmax();
 		    
-		    // Get the DOF indices for the two elements
-		    dof_map.dof_indices (e, dof_indices_e, var);
-		    dof_map.dof_indices (f, dof_indices_f, var);
+		      // Get the DOF indices for the two elements
+		      dof_map.dof_indices (e, dof_indices_e, var);
+		      dof_map.dof_indices (f, dof_indices_f, var);
 
-		    // The number of DOFS on each element
-		    const unsigned int n_dofs_e = dof_indices_e.size();
-		    const unsigned int n_dofs_f = dof_indices_f.size();
+		      // The number of DOFS on each element
+		      const unsigned int n_dofs_e = dof_indices_e.size();
+		      const unsigned int n_dofs_f = dof_indices_f.size();
 
-		    // The number of quadrature points
-		    const unsigned int n_qp = qrule.n_points();
+		      // The number of quadrature points
+		      const unsigned int n_qp = qrule.n_points();
 
-		    // Find the location of the quadrature points
-		    // on element f
-		    FEInterface::inverse_map (dim, fe_type, f, qface_point, qp_f);
+		      // Find the location of the quadrature points
+		      // on element f
+		      FEInterface::inverse_map (dim, fe_type, f, qface_point, qp_f);
 
-		    // Compute the shape functions on element f
-		    // at the quadrature points of element e
-		    fe_f->reinit (f, &qp_f);
+		      // Compute the shape functions on element f
+		      // at the quadrature points of element e
+		      fe_f->reinit (f, &qp_f);
 
-		    // The error contribution from this face
-		    Real error = 1.e-10;
+		      // The error contribution from this face
+		      Real error = 1.e-10;
 
 		    
 		    
-		    // loop over the integration points on the face
-		    for (unsigned int qp=0; qp<n_qp; qp++)
-		      {
-			// The solution gradient from each element
-			Gradient grad_e, grad_f;
+		      // loop over the integration points on the face
+		      for (unsigned int qp=0; qp<n_qp; qp++)
+			{
+			  // The solution gradient from each element
+			  Gradient grad_e, grad_f;
 			
-			// Compute the solution gradient on element e
-			for (unsigned int i=0; i<n_dofs_e; i++)
-			  grad_e.add_scaled (dphi_e[i][qp],
-					     system.current_solution(dof_indices_e[i]));
+			  // Compute the solution gradient on element e
+			  for (unsigned int i=0; i<n_dofs_e; i++)
+			    grad_e.add_scaled (dphi_e[i][qp],
+					       system.current_solution(dof_indices_e[i]));
 			
-			// Compute the solution gradient on element f
-			for (unsigned int i=0; i<n_dofs_f; i++)
-			  grad_f.add_scaled (dphi_f[i][qp],
-					     system.current_solution(dof_indices_f[i]));
+			  // Compute the solution gradient on element f
+			  for (unsigned int i=0; i<n_dofs_f; i++)
+			    grad_f.add_scaled (dphi_f[i][qp],
+					       system.current_solution(dof_indices_f[i]));
 			
 
-			// The flux jump at the face 
-			const Number jump = (grad_e - grad_f)*face_normals[qp];
+			  // The flux jump at the face 
+			  const Number jump = (grad_e - grad_f)*face_normals[qp];
 
-			// The flux jump squared
+			  // The flux jump squared.  If using complex numbers,
+			  // std::norm(z) returns |z|^2, where |z| is the modulus of z.
 #ifndef USE_COMPLEX_NUMBERS
-			const Real jump2 = jump*jump;
+			  const Real jump2 = jump*jump;
 #else
-			const Real jump2 = std::norm(jump);
+			  const Real jump2 = std::norm(jump);
 #endif
 
-			// Integrate the error on the face
-			error += JxW_face[qp]*h*jump2;			
+			  // Integrate the error on the face.  The error is
+			  // scaled by an additional power of h, where h is
+			  // the maximum side length for the element.  This
+			  // arises in the definition of the indicator.
+			  error += JxW_face[qp]*h*jump2;			
 			
-		      } // End quadrature point loop
+			} // End quadrature point loop
 
-		    // Add the error contribution to elements e & f
-		    error_per_cell[e_id] += error;
-		    error_per_cell[f_id] += error;
+		      // Add the error contribution to elements e & f
+		      error_per_cell[e_id] += error;
+		      error_per_cell[f_id] += error;
+		    } // end if case 1 or case 2
+		} // if (e->neigbor(n_e) != NULL)
+
+	      // Otherwise, e is on the boundary.  If it happens to
+	      // be on a Dirichlet boundary, we need not do anything.
+	      // On the other hand, if e is on a Neumann (flux) boundary
+	      // with grad(u).n = g, we need to compute the additional residual
+	      // (h * \int |g - grad(u_h).n|^2 dS)^(1/2).
+	      // We can only do this with some knowledge of the boundary
+	      // conditions, i.e. the user must have attached an appropriate
+	      // BC function.
+	      else
+		{
+		  if (this->_bc_function != NULL)
+		    {
+		      // here();
+		  
+		      // Update the shape functions on side s_e of element e
+		      fe_e->reinit (e, n_e);
+
+		      // The reinitialization also recomputes the locations of
+		      // the quadrature points on the side.  By checking if the
+		      // first quadrature point on the side is on a flux boundary
+		      // for a particular variable, we will determine if the whole
+		      // element is on a flux boundary (assuming quadrature points
+		      // are strictly contained in the side).
+		      if (this->_bc_function(system, qface_point[0], var_name).first)
+			{
+			  // Build the side
+			  AutoPtr<Elem> side (e->side(n_e));
+
+			  // Get the maximum h for this side
+			  const Real h = side->hmax();
 		    
+			  // Get the DOF indices 
+			  dof_map.dof_indices (e, dof_indices_e, var);
+
+			  // The number of DOFS on each element
+			  const unsigned int n_dofs_e = dof_indices_e.size();
+
+			  // The number of quadrature points
+			  const unsigned int n_qp = qrule.n_points();
+
+			  // The error contribution from this face
+			  Real error = 1.e-10;
 		    
-		  }
-	      } // if (e->neigbor(n_e) != NULL)
-	  
+			  // loop over the integration points on the face.
+			  for (unsigned int qp=0; qp<n_qp; qp++)
+			    {
+			      // Value of the imposed flux BC at this quadrature point.
+			      const std::pair<bool,Real> flux_bc =
+				this->_bc_function(system, qface_point[qp], var_name);
+
+			      // Be sure the BC function still thinks we're on the 
+			      // flux boundary.
+			      assert (flux_bc.first == true);
+			      
+			      // The solution gradient from each element
+			      Gradient grad_e;
+			
+			      // Compute the solution gradient on element e
+			      for (unsigned int i=0; i<n_dofs_e; i++)
+				grad_e.add_scaled (dphi_e[i][qp],
+						   system.current_solution(dof_indices_e[i]));
+
+			      // The difference between the desired BC and the approximate solution. 
+			      const Number jump = flux_bc.second - grad_e*face_normals[qp];
+
+			      // The flux jump squared.  If using complex numbers,
+			      // std::norm(z) returns |z|^2, where |z| is the modulus of z.
+#ifndef USE_COMPLEX_NUMBERS
+			      const Real jump2 = jump*jump;
+#else
+			      const Real jump2 = std::norm(jump);
+#endif
+
+			      
+// 			      std::cout << "Error contribution from "
+// 					<< var_name
+// 					<< " flux BC: "
+// 					<< JxW_face[qp]*h*jump2
+// 					<< std::endl;
+
+			      
+			      // Integrate the error on the face.  The error is
+			      // scaled by an additional power of h, where h is
+			      // the maximum side length for the element.  This
+			      // arises in the definition of the indicator.
+			      error += JxW_face[qp]*h*jump2;			
+			
+			    } // End quadrature point loop
+
+			  // Add the error contribution to elements e & f
+			  error_per_cell[e_id] += error;
+			  
+			} // end if side on flux boundary
+		    } // end if _bc_function != NULL
+		} // end if (e->neighbor(n_e) == NULL)
+	    } // end loop over neighbors
 	} // End loop over active local elements
-      
     } // End loop over variables
 
 
@@ -280,4 +380,20 @@ void KellyErrorEstimator::estimate_error (const System& system,
       error_per_cell[i] = std::sqrt(error_per_cell[i]);
   
   STOP_LOG("flux_jump()", "KellyErrorEstimator");
+}
+
+
+
+
+
+
+
+void
+KellyErrorEstimator::attach_flux_bc_function (std::pair<bool,Real> fptr(const System& system,
+									const Point& p,
+									const std::string& var_name))
+{
+  assert (fptr != NULL);
+  
+  _bc_function = fptr;
 }

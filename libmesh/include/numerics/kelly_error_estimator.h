@@ -1,4 +1,4 @@
-// $Id: kelly_error_estimator.h,v 1.4 2005-02-22 22:17:34 jwpeterson Exp $
+// $Id: kelly_error_estimator.h,v 1.5 2005-03-10 22:05:14 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -39,6 +39,18 @@
  * This class implements the Kelly error indicator
  * which is based on the flux jumps between elements.
  *
+ * Full BibteX reference:
+ * 
+ * @Article{Kelly83error,
+ * author = {D.~W.~Kelly and J.~P.~Gago and O.~C.~Zienkiewicz and I.~Babuska},
+ * title  = {{A posteriori error analysis and adaptive
+ *            processes in the finite element method: Part I Error analysis}},
+ * journal = {Int. J. Num. Meth. Engng.},
+ * volume  = {19},
+ * pages   = {1593--1619},
+ * year    = {1983}
+ * }
+ *
  * @author Benjamin S. Kirk, 2003.
  */
 class KellyErrorEstimator : public ErrorEstimator
@@ -72,7 +84,21 @@ public:
   virtual void estimate_error (const System& system,
 			       std::vector<float>& error_per_cell);
 
+  /**
+   * Register a user function to use in computing the flux BCs.
+   * The return value is std::pair<bool, Real>
+   */
+  void attach_flux_bc_function (std::pair<bool,Real> fptr(const System& system,
+							  const Point& p,
+							  const std::string& var_name));
 
+private:
+  /**
+   * Pointer to function that returns BC information.
+   */
+  std::pair<bool,Real> (* _bc_function) (const System& system,
+					 const Point& p,
+					 const std::string& var_name);
 };
 
 
