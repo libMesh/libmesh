@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.30 2003-11-11 16:21:15 benkirk Exp $
+# $Id: Makefile,v 1.31 2003-11-11 17:54:09 jwpeterson Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -25,7 +25,7 @@ srcfiles 	:= $(wildcard src/*/*.C)
 
 #
 # examples source files
-examplesrcfiles	:= $(wildcard examples/ex?/ex?.C)
+examplesrcfiles	:= $(wildcard examples/ex*/ex*.C)
 
 #
 # object files
