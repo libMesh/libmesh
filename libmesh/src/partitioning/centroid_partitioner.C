@@ -1,4 +1,4 @@
-// $Id: centroid_partitioner.C,v 1.1 2003-08-22 19:59:50 jwpeterson Exp $
+// $Id: centroid_partitioner.C,v 1.2 2003-08-23 00:36:08 jwpeterson Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -83,7 +83,16 @@ void CentroidPartitioner::partition (const unsigned int n)
 	
 	break;
       }
+
       
+     case RADIAL:
+      {
+	std::sort(_elem_centroids.begin(),
+		  _elem_centroids.end(),
+		  CentroidPartitioner::sort_radial);
+	
+	break;
+      } 
     default:
       error();
     }
@@ -166,4 +175,12 @@ bool CentroidPartitioner::sort_z (const std::pair<Point, Elem*>& lhs,
 				  const std::pair<Point, Elem*>& rhs)
 {
   return (lhs.first(2) < rhs.first(2));
+}
+
+
+
+bool CentroidPartitioner::sort_radial (const std::pair<Point, Elem*>& lhs,
+				       const std::pair<Point, Elem*>& rhs)
+{
+  return (lhs.first.size() < rhs.first.size());
 }
