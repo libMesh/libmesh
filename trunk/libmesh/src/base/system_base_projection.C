@@ -1,4 +1,4 @@
-// $Id: system_base_projection.C,v 1.3 2003-05-21 13:50:23 benkirk Exp $
+// $Id: system_base_projection.C,v 1.4 2003-05-29 18:14:06 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -232,6 +232,9 @@ void SystemBase::project_vector (const NumericVector<Number>& old_vector,
 	    } // end new dof loop	  
 	} // end elem loop
     } // end variables loop
+
+  // Close the new vector so that it is ready for use.
+  new_vector.close();
   
   STOP_LOG ("project_vector()", "SystemBase");
 
