@@ -1,4 +1,4 @@
-// $Id: boundary_mesh.C,v 1.11 2004-01-03 15:37:43 benkirk Exp $
+// $Id: boundary_mesh.C,v 1.12 2004-04-05 20:07:04 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -29,7 +29,7 @@
 // ------------------------------------------------------------
 // BoundaryMesh class member functions
 BoundaryMesh::BoundaryMesh(unsigned int d) :
-  MeshBase(d)
+  Mesh(d)
 {
 }
 
