@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic_shape_2D.C,v 1.7 2003-02-13 22:56:09 benkirk Exp $
+// $Id: fe_hierarchic_shape_2D.C,v 1.8 2003-06-15 00:36:25 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -85,13 +85,13 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
 		  return zeta2;
 		  
 		case 3:
-		  return (pow(zeta1 - zeta0, 2) - pow(zeta0 + zeta1, 2))/2.;
+		  return (pow(zeta1 - zeta0, 2.) - pow(zeta0 + zeta1, 2.))/2.;
 		  
 		case 4:
-		  return (pow(zeta2 - zeta1, 2) - pow(zeta1 + zeta2, 2))/2.;
+		  return (pow(zeta2 - zeta1, 2.) - pow(zeta1 + zeta2, 2.))/2.;
 		  
 		case 5:
-		  return (pow(zeta0 - zeta2, 2) - pow(zeta2 + zeta0, 2))/2.;
+		  return (pow(zeta0 - zeta2, 2.) - pow(zeta2 + zeta0, 2.))/2.;
 
 		default:
 		  error();
@@ -170,30 +170,30 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
 		  
 		  // Shape functions for edge 0
 		case 3:
-		  return    (pow(zeta1 - zeta0, 2) -
-			     pow(zeta0 + zeta1, 2))/2.;
+		  return    (pow(zeta1 - zeta0, 2.) -
+			     pow(zeta0 + zeta1, 2.))/2.;
 
 		case 4:
-		  return f0*(pow(zeta1 - zeta0, 3) -
-			     (zeta1 - zeta0)*pow(zeta0 + zeta1, 2))/6.;
+		  return f0*(pow(zeta1 - zeta0, 3.) -
+			     (zeta1 - zeta0)*pow(zeta0 + zeta1, 2.))/6.;
 		  
 		  // Shape functions for edge 1
 		case 5:
-		  return    (pow(zeta2 - zeta1, 2) -
-			     pow(zeta1 + zeta2, 2))/2.;
+		  return    (pow(zeta2 - zeta1, 2.) -
+			     pow(zeta1 + zeta2, 2.))/2.;
 
 		case 6:
-		  return f1*(pow(zeta2 - zeta1, 3) -
-			     (zeta2 - zeta1)*pow(zeta1 + zeta2, 2))/6.;
+		  return f1*(pow(zeta2 - zeta1, 3.) -
+			     (zeta2 - zeta1)*pow(zeta1 + zeta2, 2.))/6.;
 		  
 		  // Shape functions for edge 2
 		case 7:
-		  return    (pow(zeta0 - zeta2, 2) -
-			     pow(zeta2 + zeta0, 2))/2.;
+		  return    (pow(zeta0 - zeta2, 2.) -
+			     pow(zeta2 + zeta0, 2.))/2.;
 
 		case 8:
-		  return f2*(pow(zeta0 - zeta2, 3) -
-			     (zeta0 - zeta2)*pow(zeta2 + zeta0, 2))/6.;
+		  return f2*(pow(zeta0 - zeta2, 3.) -
+			     (zeta0 - zeta2)*pow(zeta2 + zeta0, 2.))/6.;
 
 		  // interior shape functions
 		case 9:
@@ -312,42 +312,42 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
 
 		  // Shape functions for edge 0
 		case 3:
-		  return    (pow(zeta1 - zeta0, 2) -
-			     pow(zeta0 + zeta1, 2))/2.;
+		  return    (pow(zeta1 - zeta0, 2.) -
+			     pow(zeta0 + zeta1, 2.))/2.;
 		   
 		case 4:
-		  return f0*(pow(zeta1 - zeta0, 3) -
-			     (zeta1 - zeta0)*pow(zeta0 + zeta1, 2))/6.;
+		  return f0*(pow(zeta1 - zeta0, 3.) -
+			     (zeta1 - zeta0)*pow(zeta0 + zeta1, 2.))/6.;
 
 		case 5:
-		  return    (pow(zeta1 - zeta0, 4) -
-			     pow(zeta0 + zeta1, 4))/24.;
+		  return    (pow(zeta1 - zeta0, 4.) -
+			     pow(zeta0 + zeta1, 4.))/24.;
 		  
 		  // Shape functions for edge 1
 		case 6:
-		  return    (pow(zeta2 - zeta1, 2) -
-			     pow(zeta1 + zeta2, 2))/2.;
+		  return    (pow(zeta2 - zeta1, 2.) -
+			     pow(zeta1 + zeta2, 2.))/2.;
 
 		case 7:
-		  return f1*(pow(zeta2 - zeta1, 3) -
-			     (zeta2 - zeta1)*pow(zeta1 + zeta2, 2))/6.;
+		  return f1*(pow(zeta2 - zeta1, 3.) -
+			     (zeta2 - zeta1)*pow(zeta1 + zeta2, 2.))/6.;
 
 		case 8:
-		  return    (pow(zeta2 - zeta1, 4) -
-			     pow(zeta1 + zeta2, 4))/24.;
+		  return    (pow(zeta2 - zeta1, 4.) -
+			     pow(zeta1 + zeta2, 4.))/24.;
 		  
 		  // Shape functions for edge 2
 		case 9:
-		  return    (pow(zeta0 - zeta2, 2) -
-			     pow(zeta2 + zeta0, 2))/2.;
+		  return    (pow(zeta0 - zeta2, 2.) -
+			     pow(zeta2 + zeta0, 2.))/2.;
 
 		case 10:
-		  return f2*(pow(zeta0 - zeta2, 3) -
-			     (zeta0 - zeta2)*pow(zeta2 + zeta0, 2))/6.;
+		  return f2*(pow(zeta0 - zeta2, 3.) -
+			     (zeta0 - zeta2)*pow(zeta2 + zeta0, 2.))/6.;
 
 		case 11:
-		  return    (pow(zeta0 - zeta2, 4) -
-			     pow(zeta2 + zeta0, 4))/24.;
+		  return    (pow(zeta0 - zeta2, 4.) -
+			     pow(zeta2 + zeta0, 4.))/24.;
 
 		  // interior shape functions
 		case 12:
@@ -472,73 +472,73 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
 
 		  // Shape functions for edge 0
 		case 3:
-		  return    (pow(zeta1 - zeta0, 2) -
-			     pow(zeta0 + zeta1, 2))/2.;
+		  return    (pow(zeta1 - zeta0, 2.) -
+			     pow(zeta0 + zeta1, 2.))/2.;
 		   
 		case 4:
-		  return f0*(pow(zeta1 - zeta0, 3) -
-			     (zeta1 - zeta0)*pow(zeta0 + zeta1, 2))/6.;
+		  return f0*(pow(zeta1 - zeta0, 3.) -
+			     (zeta1 - zeta0)*pow(zeta0 + zeta1, 2.))/6.;
 
 		case 5:
-		  return    (pow(zeta1 - zeta0, 4) -
-			     pow(zeta0 + zeta1, 4))/24.;
+		  return    (pow(zeta1 - zeta0, 4.) -
+			     pow(zeta0 + zeta1, 4.))/24.;
 
 		case 6:
-		  return f0*(pow(zeta1 - zeta0, 5) -
-			     (zeta1 - zeta0)*pow(zeta0 + zeta1, 4))/120.;
+		  return f0*(pow(zeta1 - zeta0, 5.) -
+			     (zeta1 - zeta0)*pow(zeta0 + zeta1, 4.))/120.;
 		  		  
 		  // Shape functions for edge 1
 		case 7:
-		  return    (pow(zeta2 - zeta1, 2) -
-			     pow(zeta1 + zeta2, 2))/2.;
+		  return    (pow(zeta2 - zeta1, 2.) -
+			     pow(zeta1 + zeta2, 2.))/2.;
 
 		case 8:
-		  return f1*(pow(zeta2 - zeta1, 3) -
-			     (zeta2 - zeta1)*pow(zeta1 + zeta2, 2))/6.;
+		  return f1*(pow(zeta2 - zeta1, 3.) -
+			     (zeta2 - zeta1)*pow(zeta1 + zeta2, 2.))/6.;
 
 		case 9:
-		  return    (pow(zeta2 - zeta1, 4) -
-			     pow(zeta1 + zeta2, 4))/24.;
+		  return    (pow(zeta2 - zeta1, 4.) -
+			     pow(zeta1 + zeta2, 4.))/24.;
 
 		case 10:
-		  return f1*(pow(zeta2 - zeta1, 5) -
-			     (zeta2 - zeta1)*pow(zeta1 + zeta2, 4))/120.;
+		  return f1*(pow(zeta2 - zeta1, 5.) -
+			     (zeta2 - zeta1)*pow(zeta1 + zeta2, 4.))/120.;
 		  
 		  // Shape functions for edge 2
 		case 11:
-		  return    (pow(zeta0 - zeta2, 2) -
-			     pow(zeta2 + zeta0, 2))/2.;
+		  return    (pow(zeta0 - zeta2, 2.) -
+			     pow(zeta2 + zeta0, 2.))/2.;
 
 		case 12:
-		  return f2*(pow(zeta0 - zeta2, 3) -
-			     (zeta0 - zeta2)*pow(zeta2 + zeta0, 2))/6.;
+		  return f2*(pow(zeta0 - zeta2, 3.) -
+			     (zeta0 - zeta2)*pow(zeta2 + zeta0, 2.))/6.;
 
 		case 13:
-		  return    (pow(zeta0 - zeta2, 4) -
-			     pow(zeta2 + zeta0, 4))/24.;
+		  return    (pow(zeta0 - zeta2, 4.) -
+			     pow(zeta2 + zeta0, 4.))/24.;
 
 		case 14:
-		  return f2*(pow(zeta0 - zeta2, 5) -
-			     (zeta0 - zeta2)*pow(zeta2 + zeta0, 4))/120.;
+		  return f2*(pow(zeta0 - zeta2, 5.) -
+			     (zeta0 - zeta2)*pow(zeta2 + zeta0, 4.))/120.;
 		  
 		  // interior shape functions
 		case 15:
-		  return    pow(zeta0,3)*zeta1*zeta2;
+		  return    pow(zeta0,3.)*zeta1*zeta2;
 
 		case 16:
-		  return    zeta0*pow(zeta1,3)*zeta2;
+		  return    zeta0*pow(zeta1,3.)*zeta2;
 		  
 		case 17:
-		  return    zeta0*zeta1*pow(zeta2,3);
+		  return    zeta0*zeta1*pow(zeta2,3.);
 
 		case 18:
-		  return    pow(zeta0*zeta1,2)*zeta2;
+		  return    pow(zeta0*zeta1,2.)*zeta2;
 		  
 		case 19:
-		  return    zeta0*pow(zeta1*zeta2,2);
+		  return    zeta0*pow(zeta1*zeta2,2.);
 		  
 		case 20:
-		  return    zeta1*pow(zeta0*zeta2,2);
+		  return    zeta1*pow(zeta0*zeta2,2.);
 		  
 		default:
 		  error();
