@@ -1,4 +1,4 @@
-// $Id: system_data.h,v 1.5 2003-01-24 17:24:39 jwpeterson Exp $
+// $Id: system_data.h,v 1.6 2003-01-30 19:13:05 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -338,19 +338,25 @@ public:
   /**
    * Function that initializes the system.
    */
-  void (* init_system) (EquationSystems& es,
-			const std::string& name);
+  void (* init_system_fptr) (EquationSystems& es,
+			     const std::string& name);
   
   /**
    * Function that assembles the system.
    */
-  void (* assemble) (EquationSystems& es,
-		     const std::string& name);
+  void (* assemble_fptr) (EquationSystems& es,
+			  const std::string& name);
   
 #ifdef HAVE_PETSC
 
   /**
-   * Solve the linear system.
+   * Assemble the linear system.  Does not
+   * actually call the solver.
+   */
+  void assemble ();
+  
+  /**
+   * Assemble & solve the linear system.
    */
   std::pair<unsigned int, real> solve ();
   

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.4 2003-01-24 17:24:35 jwpeterson Exp $
+# $Id: Makefile,v 1.5 2003-01-30 19:12:56 benkirk Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -61,8 +61,9 @@ endif
 #
 # static library
 #
-$(targ)/libmesh.a: $(objects)
-	$(shell mkdir -p $(targ_dir))
+(targ)/libmesh.a: $(objects)
+	@$(MAKE) -C contrib
+	@$(shell mkdir -p $(targ_dir))
 	@echo ""
 	@echo "Linking "$@
 	@$(AR) rv $(target) $(objects)
@@ -71,7 +72,8 @@ $(targ)/libmesh.a: $(objects)
 # shared library
 #
 $(targ)/libmesh.so: $(objects)
-	$(shell mkdir -p $(targ_dir))
+	@$(MAKE) -C contrib
+	@$(shell mkdir -p $(targ_dir))
 	@echo ""
 	@echo "Linking "$@
 	@$(CXX) $(CXXSHAREDFLAG) -o $(target) $(objects)
@@ -109,6 +111,7 @@ clobber:
 distclean:
 	$(MAKE) clobber
 	@$(MAKE) -C contrib $(MAKECMDGOALS)
+	@$(MAKE) -C examples $(MAKECMDGOALS)
 	@rm -rf doc/html doc/latex doc/kdoc/*.html \
                doc/man/man3 doc/cvshtml/*.html doc/cvshtml/diff \
 	       src/*/*.o src/*/*.go src/*/*.pgo \
@@ -137,21 +140,18 @@ cvsweb:
 # Meshtool utility program
 #
 meshtool: $(target) src/apps/meshtool.cc
-	$(MAKE) -C contrib
 	$(CXX) $(CXXFLAGS) $(INCLUDE) src/apps/meshtool.cc $< -o bin/$@ $(LIBS) $(LDFLAGS)
 
 #
 # Read_Dat utility program
 #
 read_dat: $(target) src/apps/read_dat.cc
-	$(MAKE) -C contrib
 	$(CXX) $(CXXFLAGS) $(INCLUDE) src/apps/read_dat.cc $< -o bin/$@ $(LIBS) $(LDFLAGS)
 
 #
 # foo
 #
 foo: $(target) src/apps/foo.cc
-	$(MAKE) -C contrib
 	$(CXX) $(CXXFLAGS) $(INCLUDE) src/apps/foo.cc $< -o bin/$@ $(LIBS) $(LDFLAGS)
 
 
@@ -159,14 +159,12 @@ foo: $(target) src/apps/foo.cc
 # grid2grid
 #
 grid2grid: $(target) src/apps/grid2grid.cc
-	$(MAKE) -C contrib
 	$(CXX) $(CXXFLAGS) $(INCLUDE) src/apps/grid2grid.cc $< -o bin/$@ $(LIBS) $(LDFLAGS)
 
 #
 # Testexodus FE program
 #
 testexodus: $(target) src/apps/testexodus.cc
-	$(MAKE) -C contrib
 	$(CXX) $(CXXFLAGS) $(INCLUDE) src/apps/testexodus.cc $< -o bin/$@ $(LIBS) $(LDFLAGS)
 
 #
