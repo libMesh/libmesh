@@ -1,4 +1,4 @@
-// $Id: numeric_vector.h,v 1.8 2003-02-28 23:37:43 benkirk Exp $
+// $Id: numeric_vector.h,v 1.9 2003-03-12 20:15:10 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -211,13 +211,15 @@ public:
 
   /**
    * @returns the index of the first vector element
-   * actually stored on this processor
+   * actually stored on this processor.  Hint: the
+   * minimum for this index is \p 0.
    */
   virtual unsigned int first_local_index() const = 0;
 
   /**
-   * @returns the index of the last vector element
-   * actually stored on this processor
+   * @returns the index+1 of the last vector element
+   * actually stored on this processor.  Hint: the
+   * maximum for this index is \p size().
    */
   virtual unsigned int last_local_index() const = 0;
     
@@ -444,9 +446,12 @@ inline
 void NumericVector<T>::print() const
 {
   assert (initialized());
+  std::cout << "Size\tglobal =  " << size()
+	    << "\t\tlocal =  " << local_size() << std::endl;
 
-  for (unsigned int i=0; i<size(); i++)
-    std::cout << (*this)(i) << std::endl;
+  std::cout << "#\tValue" << std::endl;
+  for (unsigned int i=first_local_index(); i<last_local_index(); i++)
+    std::cout << i << "\t" << (*this)(i) << std::endl;
 }
 
 
@@ -458,16 +463,15 @@ inline
 void NumericVector<Complex>::print() const
 {
   assert (initialized());
+  std::cout << "Size\tglobal =  " << size()
+	    << "\t\tlocal =  " << local_size() << std::endl;
   
   // std::complex<>::operator<<() is defined, but use this form
-
-  std::cout << "Real part:" << std::endl;
-  for (unsigned int i=0; i<size(); i++)
-    std::cout << (*this)(i).real() << std::endl;
-  
-  std::cout << std::endl << "Imaginary part:" << std::endl;
-  for (unsigned int i=0; i<size(); i++)
-    std::cout << (*this)(i).imag() << std::endl;
+  std::cout << "#\tReal part\t\tImaginary part" << std::endl;
+  for (unsigned int i=first_local_index(); i<last_local_index(); i++)
+    std::cout << i << "\t" 
+	      << (*this)(i).real() << "\t\t" 
+	      << (*this)(i).imag() << std::endl;
 }
 
 
