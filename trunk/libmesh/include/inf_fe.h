@@ -1,4 +1,4 @@
-// $Id: inf_fe.h,v 1.11 2003-02-06 17:13:34 benkirk Exp $
+// $Id: inf_fe.h,v 1.12 2003-02-06 17:58:34 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -95,7 +95,7 @@ class Elem;
  *
  * \author Daniel Dreyer
  * \date 2003
- * \version $Revision: 1.11 $
+ * \version $Revision: 1.12 $
  */
 
 //-------------------------------------------------------------
@@ -118,7 +118,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.11 $
+   * \version $Revision: 1.12 $
    */
   //-------------------------------------------------------------
   // InfFE::Radial class definition
@@ -247,7 +247,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.11 $
+   * \version $Revision: 1.12 $
    */
   //-------------------------------------------------------------
   // InfFE::Base class definition
@@ -439,9 +439,8 @@ public:
    * the quadrature rule object of the current \p FE class.
    * From this \p QBase*, it determines the necessary data,
    * and @e builds two appropriate quadrature classes, one for radial,
-   * and another for base integration.  Currently, for both
-   * base and radial integration only Gaussian quadrature is 
-   * available, but may be changed easily.
+   * and another for base integration, using the convenient
+   * \p QBase::build() method.
    */
   void attach_quadrature_rule (QBase* q);
   

@@ -1,4 +1,4 @@
-// $Id: quadrature_trap.h,v 1.5 2003-02-06 06:02:42 jwpeterson Exp $
+// $Id: quadrature_trap.h,v 1.6 2003-02-06 17:58:34 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -51,6 +51,11 @@ class QTrap : public QBase
    */
   ~QTrap() {};
 
+  /**
+   * @returns \p QTRAP
+   */
+  QuadratureType type() const { return QTRAP; };
+
  private:
 
   void init_1D (const ElemType _type=INVALID_ELEM);
@@ -77,6 +82,7 @@ QTrap::QTrap(const unsigned int d) : QBase(d,FIRST)
   if (_dim == 1)
     init(EDGE2);
 };
+
 
 
 

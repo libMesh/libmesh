@@ -1,4 +1,4 @@
-// $Id: ex3.C,v 1.6 2003-02-04 02:02:23 benkirk Exp $
+// $Id: ex3.C,v 1.7 2003-02-06 17:58:33 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk
@@ -281,7 +281,9 @@ void assemble_poisson(EquationSystems& es,
    * Build a Finite Element object of the specified type.  Since the
    * \p FEBase::build() member dynamically creates memory we will
    * store the object as an \p AutoPtr<FEBase>.  This can be thought
-   * of as a pointer that will clean up after itself.
+   * of as a pointer that will clean up after itself.  Example 4
+   * describes some advantages of \p AutoPtr's in the context of
+   * quadrature rules.
    */
   AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
   
