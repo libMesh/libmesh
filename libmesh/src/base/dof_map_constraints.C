@@ -1,4 +1,4 @@
-// $Id: dof_map_constraints.C,v 1.8 2004-11-03 21:30:19 benkirk Exp $
+// $Id: dof_map_constraints.C,v 1.9 2004-11-04 13:31:59 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -388,24 +388,29 @@ void DofMap::constrain_element_vector (DenseVector<Number>&       rhs,
 
 
 void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
-				      std::vector<unsigned int>& elem_dofs) const
+				      std::vector<unsigned int>& elem_dofs,
+				      const bool called_recursively) const
 {
   START_LOG("build_constraint_matrix()", "DofMap");
 
   // Create a set containing the DOFs we already depend on
   typedef std::set<unsigned int> RCSet;
-  RCSet dof_set (elem_dofs.begin(),
-		 elem_dofs.end());
+  RCSet dof_set;
 
-  // Next insert any dofs those might be constrained in terms
-  // of.  Note that in this case we may not be done:  Those may
-  // in turn depend on others.  So, we need to repeat this process
+  // no constrained dofs by default
+  bool has_constrained_dofs = false;
+  
+  // Next insert any other dofs the current dofs might be constrained
+  // in terms of.  Note that in this case we may not be done: Those
+  // may in turn depend on others.  So, we need to repeat this process
   // in that case until the system depends only on unconstrained
   // degrees of freedom.
   for (unsigned int i=0; i<elem_dofs.size(); i++)
     if (this->is_constrained_dof(elem_dofs[i]))
       {
 	// If the DOF is constrained
+	has_constrained_dofs = true;
+	
 	DofConstraints::const_iterator
 	  pos = _dof_constraints.find(elem_dofs[i]);
 	
@@ -421,10 +426,22 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
 	  dof_set.insert (it->first);
       }
 
+  // May be safe to return at this point
+  if (!has_constrained_dofs) return;
+
+  // delay inserting elem_dofs for efficiency in the case of
+  // no constraints.  In that case we don't get here!
+  dof_set.insert (elem_dofs.begin(),
+		  elem_dofs.end());
+
   // If we added any DOFS then we need to do this recursively.
   // It is possible that we just added a DOF that is also
   // constrained!
-  if (dof_set.size() != elem_dofs.size())
+  //
+  // Also, we need to handle the special case of an element having DOFs
+  // constrained in terms of other, local DOFs
+  if ((dof_set.size() != elem_dofs.size()) || // case 1: constrained in terms of other DOFs
+      !called_recursively)                    // case 2: constrained in terms of our own DOFs
     {
       // Create a new list of element DOFs containing the
       // contents of the current dof_set.
@@ -436,35 +453,32 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
       C.resize (elem_dofs.size(), new_elem_dofs.size());
       
       // Create the C constraint matrix.
-      {
-	for (unsigned int i=0; i<elem_dofs.size(); i++)
-	  if (this->is_constrained_dof(elem_dofs[i]))
-	    {
-	      // If the DOF is constrained
-	      DofConstraints::const_iterator
-		pos = _dof_constraints.find(elem_dofs[i]);
-	      
-	      assert (pos != _dof_constraints.end());
-	      
-	      const DofConstraintRow& constraint_row = pos->second;
-	      
-	      assert (!constraint_row.empty());
-	      
-	      for (DofConstraintRow::const_iterator
-		     it=constraint_row.begin(); it != constraint_row.end();
-		   ++it)
-		for (unsigned int j=0; j<new_elem_dofs.size(); j++)
-		  if (new_elem_dofs[j] == it->first)
-		    C(i,j) = it->second;
-	    }
-	  else
-	    {
+      for (unsigned int i=0; i<elem_dofs.size(); i++)
+	if (this->is_constrained_dof(elem_dofs[i]))
+	  {
+	    // If the DOF is constrained
+	    DofConstraints::const_iterator
+	      pos = _dof_constraints.find(elem_dofs[i]);
+	    
+	    assert (pos != _dof_constraints.end());
+	    
+	    const DofConstraintRow& constraint_row = pos->second;
+	    
+	    assert (!constraint_row.empty());
+	    
+	    for (DofConstraintRow::const_iterator
+		   it=constraint_row.begin(); it != constraint_row.end();
+		 ++it)
 	      for (unsigned int j=0; j<new_elem_dofs.size(); j++)
-		if (new_elem_dofs[j] == elem_dofs[i])
-		  C(i,j) =  1.;
-	    }	
-	//C.print();
-      }
+		if (new_elem_dofs[j] == it->first)
+		  C(i,j) = it->second;
+	  }
+	else
+	  {
+	    for (unsigned int j=0; j<new_elem_dofs.size(); j++)
+	      if (new_elem_dofs[j] == elem_dofs[i])
+		C(i,j) =  1.;
+	  }	
 
       // May need to do this recursively.  It is possible
       // that we just replaced a constrained DOF with another
@@ -475,20 +489,16 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
       
       STOP_LOG("build_constraint_matrix()", "DofMap");
       
-      this->build_constraint_matrix (Cnew, elem_dofs);
+      this->build_constraint_matrix (Cnew, elem_dofs, true);
       
       START_LOG("build_constraint_matrix()", "DofMap");  
 
       if ((C.n() == Cnew.m()) &&
-	  (Cnew.n() == elem_dofs.size())) // If the constraint matrix
-	{                                 // is constrained...
-	  //here();
-	  //C.right_multiply(Cnew, false);
-	  C.right_multiply(Cnew);
-	}
+	  (Cnew.n() == elem_dofs.size())) // If the constraint matrix	                                 
+	C.right_multiply(Cnew);           // is constrained...
       
       assert (C.n() == elem_dofs.size());
-    } // end if (!done)
+    }
   
   STOP_LOG("build_constraint_matrix()", "DofMap");  
 }

@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.4 2004-11-02 00:37:59 benkirk Exp $
+// $Id: dof_map.h,v 1.5 2004-11-04 13:31:59 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -368,10 +368,17 @@ private:
 
   /**
    * Build the constraint matrix C associated with the element
-   * degree of freedom indices elem_dofs.
+   * degree of freedom indices elem_dofs. The optional parameter
+   * \p called_recursively should be left at the default value
+   * \p false.  This is used to handle the special case of
+   * an element's degrees of freedom being constrained in terms
+   * of other, local degrees of freedom.  The usual case is
+   * for an elements DOFs to be constrained by some other,
+   * external DOFs.   
    */
   void build_constraint_matrix (DenseMatrix<Number>& C,
-				std::vector<unsigned int>& elem_dofs) const;
+				std::vector<unsigned int>& elem_dofs,
+				const bool called_recursively=false) const;
 
 #endif
 
