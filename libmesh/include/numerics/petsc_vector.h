@@ -1,4 +1,4 @@
-// $Id: petsc_vector.h,v 1.4 2004-02-15 15:35:30 benkirk Exp $
+// $Id: petsc_vector.h,v 1.5 2004-08-20 14:08:42 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -87,7 +87,16 @@ public:
    */
   PetscVector (const unsigned int n,
 	       const unsigned int n_local);
-    
+
+  /**
+   * Constructor.  Creates a PetscVector assuming you already have a
+   * valid PETSc Vec object.  In this case, v is NOT destroyed by the
+   * PetscVector constructor when this object goes out of scope.
+   * This allows ownership of v to remain with the original creator,
+   * and to simply provide additional functionality with the PetscVector.
+   */
+  PetscVector(Vec v);
+  
   /**
    * Destructor, deallocates memory. Made virtual to allow
    * for derived classes to behave properly.
@@ -355,7 +364,22 @@ public:
    */
   void localize_to_one (std::vector<T>& v_local,
 			const unsigned int proc_id=0) const;
-    
+  
+  /**
+   * Print the contents of the vector in Matlab
+   * format. Optionally prints the
+   * matrix to the file named \p name.  If \p name
+   * is not specified it is dumped to the screen.
+   */
+  void print_matlab(const std::string name="NULL") const;
+
+  /**
+   * Creates a "subvector" from this vector using the rows indices
+   * of the "rows" array.
+   */
+  virtual void create_subvector(NumericVector<T>& subvector,
+				const std::vector<unsigned int>& rows) const;
+  
 private:
 
   /**
@@ -363,6 +387,12 @@ private:
    * to hold vector entries
    */
   Vec vec;
+
+  /**
+   * This boolean value should only be set to false
+   * for the constructor which takes a PETSc Vec object. 
+   */
+  const bool _destroy_vec_on_exit;
   
   /**
    * Make other Petsc datatypes friends
@@ -379,6 +409,7 @@ private:
 template <typename T>
 inline
 PetscVector<T>::PetscVector ()
+  : _destroy_vec_on_exit(true)
 {}
 
 
@@ -386,6 +417,7 @@ PetscVector<T>::PetscVector ()
 template <typename T>
 inline
 PetscVector<T>::PetscVector (const unsigned int n)
+  : _destroy_vec_on_exit(true)
 {
   this->init(n, n, false);
 }
@@ -396,9 +428,24 @@ template <typename T>
 inline
 PetscVector<T>::PetscVector (const unsigned int n,
 			     const unsigned int n_local)
+  : _destroy_vec_on_exit(true)
 {
   this->init(n, n_local, false);
 }
+
+
+
+
+
+template <typename T>
+inline
+PetscVector<T>::PetscVector (Vec v)
+  : _destroy_vec_on_exit(false)
+{
+  this->vec = v;
+  this->_is_initialized = true;
+}
+
 
 
 
@@ -490,7 +537,7 @@ template <typename T>
 inline
 void PetscVector<T>::clear ()
 {
-  if (this->initialized())
+  if ((this->initialized()) && (this->_destroy_vec_on_exit))
     {
       int ierr=0;
 
