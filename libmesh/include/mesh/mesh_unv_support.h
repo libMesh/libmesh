@@ -1,4 +1,4 @@
-// $Id: mesh_unv_support.h,v 1.2 2004-01-03 15:37:42 benkirk Exp $
+// $Id: mesh_unv_support.h,v 1.3 2004-03-18 15:10:32 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -55,7 +55,7 @@ public:
    * Constructor.  Takes the data relevant 
    * for reading/writing mesh or reading data.
    * Note that for simplicity, the node and element
-   * vectors have to be readable even when only
+   * vectors have to be writable even when only
    * read access is needed.  Optionally produces
    * some babble on \p std::cout with \p be_verbose.
    */
