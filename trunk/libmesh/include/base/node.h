@@ -1,4 +1,4 @@
-// $Id: node.h,v 1.2 2004-01-03 15:37:41 benkirk Exp $
+// $Id: node.h,v 1.3 2004-10-28 20:06:11 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -28,6 +28,7 @@
 #include "point.h"
 #include "dof_object.h"
 #include "reference_counted_object.h"
+#include "auto_ptr.h"
 
 
 // forward declarations
@@ -44,7 +45,7 @@ class MeshRefinement;
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.2 $
+ * \version $Revision: 1.3 $
  */
 
 class Node : public Point,
@@ -85,26 +86,26 @@ public:
   Node& operator= (const Point& p);
   
   /**
-   * Builds a \p Node and returns a \p Node* to the
+   * Builds a \p Node and returns an \p AutoPtr<Node> to the
    * newly-created object.  The \p id is copied from \p n.id()
    */
-  static Node* build (const Node& n);
+  static AutoPtr<Node> build (const Node& n);
 
   /**
-   * Builds a \p Node from \p Point p and returns a \p Node* to the
-   * newly-created object.  Optionally assignes the \p id.
+   * Builds a \p Node from \p Point p and returns an \p AutoPtr<Node>
+   * to the newly-created object.  Optionally assignes the \p id.
    */
-  static Node* build (const Point& p,
-		      const unsigned int id);
+  static AutoPtr<Node> build (const Point& p,
+			      const unsigned int id);
   
   /**
-   * Builds a \p Node from specified points and returns a \p Node* to the
-   * newly-created object.  Optionally assigned the \p id.
+   * Builds a \p Node from specified points and returns an \p AutoPtr<Node>
+   * to the newly-created object.  Optionally assigned the \p id.
    */
-  static Node* build (const Real x,
-		      const Real y,
-		      const Real z,
-		      const unsigned int id);
+  static AutoPtr<Node> build (const Real x,
+			      const Real y,
+			      const Real z,
+			      const unsigned int id);
 
   /**
    * @returns \p true if the node is active.  An active node is
@@ -210,29 +211,32 @@ Node & Node::operator= (const Point& p)
 
 
 inline
-Node* Node::build(const Node& n)
+AutoPtr<Node> Node::build(const Node& n)
 {
-  return new Node(n);  
+  AutoPtr<Node> ap(new Node(n));  
+  return ap;
 }
 
 
 
 inline
-Node* Node::build(const Point& p,
-		  const unsigned int id)
+AutoPtr<Node> Node::build(const Point& p,
+			  const unsigned int id)
 {
-  return new Node(p,id);  
+  AutoPtr<Node> ap(new Node(p,id));
+  return ap;  
 }
 
 
 
 inline
-Node* Node::build(const Real x,
-		  const Real y,
-		  const Real z,
-		  const unsigned int id)
+AutoPtr<Node> Node::build(const Real x,
+			  const Real y,
+			  const Real z,
+			  const unsigned int id)
 {
-  return new Node(x,y,z,id);  
+  AutoPtr<Node> ap(new Node(x,y,z,id));  
+  return ap;
 }
 
 

@@ -1,4 +1,4 @@
-// $Id: mesh_exodus_support.C,v 1.13 2004-03-24 05:49:12 jwpeterson Exp $
+// $Id: mesh_exodus_support.C,v 1.14 2004-10-28 20:06:14 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -483,7 +483,7 @@ void Mesh::read_exd(const std::string& name)
       node_ptr(i) = Node::build(ex.get_x(i),
 				ex.get_y(i),
 				ex.get_z(i),
-				i);
+				i).release();
 
     
     // Get information about all the blocks
@@ -509,7 +509,7 @@ void Mesh::read_exd(const std::string& name)
 	int jmax = nelem_last_block+ex.get_num_elem_this_blk();
 	for (int j=nelem_last_block; j<jmax; j++)
 	  {
-	    _elements[j] = Elem::build(conv.get_canonical_type());
+	    _elements[j] = Elem::build(conv.get_canonical_type()).release();
 	    _elements[j]->set_id (j);
 	    
 	    // Set all the nodes for this element

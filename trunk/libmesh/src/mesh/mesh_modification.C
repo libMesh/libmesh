@@ -1,4 +1,4 @@
-// $Id: mesh_modification.C,v 1.3 2004-01-03 15:37:43 benkirk Exp $
+// $Id: mesh_modification.C,v 1.4 2004-10-28 20:06:14 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -154,8 +154,10 @@ void Mesh::all_second_order (const bool full_ordered)
        * for either type of seconrd-order equivalent, e.g.
        * Hex20 or Hex27, as equivalents for Hex8
        */
-      Elem* so_elem = Elem::build ( Elem::second_order_equivalent_type(lo_elem->type(), 
-								       full_ordered) );
+      Elem* so_elem = 
+	Elem::build (Elem::second_order_equivalent_type(lo_elem->type(), 
+							full_ordered) ).release();
+
       assert (lo_elem->n_vertices() == so_elem->n_vertices());
 
 

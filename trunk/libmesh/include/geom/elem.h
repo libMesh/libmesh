@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.8 2004-10-26 15:31:16 jwpeterson Exp $
+// $Id: elem.h,v 1.9 2004-10-28 20:06:14 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -39,10 +39,7 @@
 
 
 // Forward declarations
-class MeshBase;
 class MeshRefinement;
-class MeshCommunication;
-class MetisPartitioner;
 class Elem;
 
 
@@ -534,13 +531,12 @@ class Elem : public ReferenceCountedObject<Elem>,
 
   
   /**
-   * Build an element of type \p type.  Be careful when using this
-   * function: it allocates memory, so you must remember to delete
-   * the pointer when you are done with it.  The user should not call this,
-   * so it is protected.
+   * Build an element of type \p type.  Since this method
+   * allocates memory the new \p Elem is returned in a 
+   * \p AutoPtr<>
    */
-  static Elem* build (const ElemType type,
-		      const Elem* p=NULL);
+  static AutoPtr<Elem> build (const ElemType type,
+			      const Elem* p=NULL);
 
  protected:
 
@@ -644,11 +640,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    * It would seem that we are just getting around it
    * by using friends!
    */
-  friend class XdrInterface;      // (Elem::build)
   friend class MeshRefinement;    // (Elem::nullify_neighbors)
-  friend class Mesh;              // (Elem::build in mesh_exodus_support)
-  friend class MeshBase;          // (Elem::build in mesh_base_modification)
-  friend class MeshCommunication; // (Elem::build in mesh_communication)
 };
 
 

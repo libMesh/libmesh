@@ -1,4 +1,4 @@
-// $Id: mesh_xdr_support.C,v 1.27 2004-10-26 22:00:45 jwpeterson Exp $
+// $Id: mesh_xdr_support.C,v 1.28 2004-10-28 20:06:14 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -347,7 +347,7 @@ void XdrInterface::mesh_interface(const std::string& name,
 	      nodes[innd] = Node::build(coords[0+innd*3],  
 					coords[1+innd*3],
 					coords[2+innd*3],
-					innd);
+					innd).release();
 	      if (mesh_data != NULL)
 		{     
 		  if (mesh_data->active())
@@ -432,7 +432,7 @@ void XdrInterface::mesh_interface(const std::string& name,
 	      {             
 		for (unsigned int e=lastFaceIndex; e<lastFaceIndex+neeb[idx]; e++)  
 		  {       
-		    elements[e] = Elem::build(etypes[idx]);
+		    elements[e] = Elem::build(etypes[idx]).release();
 		    elements[e]->set_id(e); 
                    
 		    /*             

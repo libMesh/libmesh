@@ -1,4 +1,4 @@
-// $Id: elem_refinement.C,v 1.11 2004-10-25 21:49:25 benkirk Exp $
+// $Id: elem_refinement.C,v 1.12 2004-10-28 20:06:14 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -54,7 +54,7 @@ void Elem::refine (MeshRefinement& mesh_refinement)
 
     for (unsigned int c=0; c<this->n_children(); c++)
       {
-	_children[c] = Elem::build(this->type(), this);
+	_children[c] = Elem::build(this->type(), this).release();
 	_children[c]->set_refinement_flag(Elem::JUST_REFINED);
       }
   }

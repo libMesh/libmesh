@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.43 2004-10-26 22:00:44 jwpeterson Exp $
+// $Id: mesh.C,v 1.44 2004-10-28 20:06:14 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -374,7 +374,8 @@ void Mesh::create_submesh (Mesh& new_mesh,
       const Elem* old_elem = *it;
 
       // Add an equivalent element type to the new_mesh
-      Elem* new_elem = new_mesh.add_elem (Elem::build (old_elem->type()));
+      Elem* new_elem = 
+	new_mesh.add_elem (Elem::build(old_elem->type()).release());
 
       assert (new_elem != NULL);
 	
