@@ -1,4 +1,4 @@
-// $Id: petsc_interface.h,v 1.10 2003-02-20 04:59:58 benkirk Exp $
+// $Id: petsc_interface.h,v 1.11 2003-02-20 23:18:07 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -59,10 +59,10 @@ extern "C" {
  * @author Benjamin Kirk, 2002
  */
 
-template <typename Tp>
-class PetscInterface : public LinearSolverInterface<Tp>
+template <typename T>
+class PetscInterface : public LinearSolverInterface<T>
 {
- public:
+public:
   /**
    *  Constructor. Initializes Petsc data structures
    */
@@ -87,13 +87,13 @@ class PetscInterface : public LinearSolverInterface<Tp>
    * Call the Petsc solver
    */    
   std::pair<unsigned int, Real> 
-    solve (SparseMatrix<Tp> &matrix,
-	   NumericVector<Tp> &solution,
-	   NumericVector<Tp> &rhs,
-	   const double tol,
-	   const unsigned int m_its);
+  solve (SparseMatrix<T> &matrix,
+	 NumericVector<T> &solution,
+	 NumericVector<T> &rhs,
+	 const double tol,
+	 const unsigned int m_its);
    
- private:
+private:
 
   /**
    * Tells PETSC to use the user-specified solver stored in
@@ -125,22 +125,22 @@ class PetscInterface : public LinearSolverInterface<Tp>
 
 
 /*----------------------- functions ----------------------------------*/
-template <typename Tp>
+template <typename T>
 inline
-PetscInterface<Tp>::PetscInterface ()
+PetscInterface<T>::PetscInterface ()
 {
 }
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-PetscInterface<Tp>::~PetscInterface ()
+PetscInterface<T>::~PetscInterface ()
 {
   clear ();
 }
 
 
 
-#endif
-#endif
+#endif // #ifdef HAVE_PETSC
+#endif // #ifdef __petsc_interface_h__

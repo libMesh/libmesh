@@ -1,4 +1,4 @@
-// $Id: dense_matrix.h,v 1.9 2003-02-20 04:59:58 benkirk Exp $
+// $Id: dense_matrix.h,v 1.10 2003-02-20 23:18:02 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -40,10 +40,10 @@
 
 // ------------------------------------------------------------
 // Dense Matrix class definition
-template<typename Tp>
+template<typename T>
 class DenseMatrix
 {
- public:
+public:
 
   /**
    * Constructor.  Creates a dense matrix of dimension \p m by \p n.
@@ -54,7 +54,7 @@ class DenseMatrix
   /**
    * Copy-constructor.
    */
-  DenseMatrix (const DenseMatrix<Tp>& other_matrix);
+  DenseMatrix (const DenseMatrix<T>& other_matrix);
   
   /**
    * Destructor.  Frees all associated memory.
@@ -76,35 +76,35 @@ class DenseMatrix
   /**
    * @returns the \p (i,j) element of the matrix.
    */
-  Tp operator() (const unsigned int i,
-		 const unsigned int j) const;
+  T operator() (const unsigned int i,
+		const unsigned int j) const;
 
   /**
    * Assignment operator.
    */
-  DenseMatrix<Tp>& operator = (const DenseMatrix<Tp>& other_matrix);
+  DenseMatrix<T>& operator = (const DenseMatrix<T>& other_matrix);
   
   /**
    * @returns the \p (i,j) element of the transposed matrix.
    */
-  Tp transpose (const unsigned int i, const unsigned int j) const;
+  T transpose (const unsigned int i, const unsigned int j) const;
   
   /**
    * @returns the \p (i,j) element of the matrix as a writeable reference.
    */
-  Tp & operator() (const unsigned int i,
-		   const unsigned int j);
+  T & operator() (const unsigned int i,
+		  const unsigned int j);
 
   /**
    * Multiplies every element in the matrix by \p factor.
    */
-  void scale (const Tp factor);
+  void scale (const T factor);
   
   /**
    * Adds \p factor to every element in the matrix.
    */
-  void add (const Tp factor,
-	    const DenseMatrix<Tp>& mat);
+  void add (const T factor,
+	    const DenseMatrix<T>& mat);
 
 
 #ifdef USE_COMPLEX_NUMBERS
@@ -124,13 +124,13 @@ class DenseMatrix
    * Left multipliess by the matrix \p M.
    * Optionally multiplies by the transpose.
    */
-  void left_multiply (const DenseMatrix<Tp>& A, const bool transpose=false); 
+  void left_multiply (const DenseMatrix<T>& A, const bool transpose=false); 
   
   /**
    * Right multiplies by the matrix \p M.
    * Optionally multiplies by the transpose.
    */
-  void right_multiply (const DenseMatrix<Tp>& A, const bool transpose=false); 
+  void right_multiply (const DenseMatrix<T>& A, const bool transpose=false); 
   
   /**
    * @returns the row-dimension of the matrix.
@@ -147,7 +147,7 @@ class DenseMatrix
    * caution but can  be used to speed up code compilation
    * significantly.
    */
-  std::vector<Tp>& get_values() { return val; }
+  std::vector<T>& get_values() { return val; }
 
   /**
    * Condense-out the \p (i,j) entry of the matrix, forcing
@@ -157,20 +157,20 @@ class DenseMatrix
    */
   void condense(const unsigned int i,
 		const unsigned int j,
-		const Tp val,
-		std::vector<Tp>& rhs);
+		const T val,
+		std::vector<T>& rhs);
   
   /**
    * Pretty-print the matrix to \p stdout.
    */
   void print() const;
   
- private:
+private:
 
   /**
    * The actual data values, stored as a 1D array.
    */
-  std::vector<Tp> val;
+  std::vector<T> val;
 
   /**
    * The row dimension.
@@ -206,7 +206,7 @@ namespace DenseMatrices
    * a real-only matrix, or a truly complex
    * matrix, depending on how \p Number
    * was defined in \p mesh_common.h.
-   * Be also aware of the fact that \p DenseMatrix<Tp>
+   * Be also aware of the fact that \p DenseMatrix<T>
    * is likely to be more efficient for
    * real than for complex data.
    */
@@ -224,10 +224,10 @@ using namespace DenseMatrices;
 
 // ------------------------------------------------------------
 // Dense Matrix member functions
-template<typename Tp>
+template<typename T>
 inline
-DenseMatrix<Tp>::DenseMatrix(const unsigned int m,
-			     const unsigned int n)
+DenseMatrix<T>::DenseMatrix(const unsigned int m,
+			    const unsigned int n)
 {
   resize(m,n);
 
@@ -236,9 +236,9 @@ DenseMatrix<Tp>::DenseMatrix(const unsigned int m,
 
 
 
-template<typename Tp>
+template<typename T>
 inline
-DenseMatrix<Tp>::DenseMatrix (const DenseMatrix& other_matrix)
+DenseMatrix<T>::DenseMatrix (const DenseMatrix& other_matrix)
 {
   m_dim = other_matrix.m_dim;
   n_dim = other_matrix.n_dim;
@@ -248,18 +248,18 @@ DenseMatrix<Tp>::DenseMatrix (const DenseMatrix& other_matrix)
 
 
 
-template<typename Tp>
+template<typename T>
 inline
-DenseMatrix<Tp>::~DenseMatrix()
+DenseMatrix<T>::~DenseMatrix()
 {
 }
 
 
 
-template<typename Tp>
+template<typename T>
 inline
-void DenseMatrix<Tp>::resize(const unsigned int m,
-			     const unsigned int n)
+void DenseMatrix<T>::resize(const unsigned int m,
+			    const unsigned int n)
 {
   if (m*n > val.size())
     val.resize(m*n);
@@ -274,9 +274,9 @@ void DenseMatrix<Tp>::resize(const unsigned int m,
 
 
 
-template<typename Tp>
+template<typename T>
 inline
-void DenseMatrix<Tp>::zero()
+void DenseMatrix<T>::zero()
 {
   for (unsigned int i=0; i<val.size(); i++)
     val[i] = 0.;
@@ -284,9 +284,9 @@ void DenseMatrix<Tp>::zero()
 
 
 
-template<typename Tp>
+template<typename T>
 inline
-DenseMatrix<Tp>& DenseMatrix<Tp>::operator = (const DenseMatrix<Tp>& other_matrix)
+DenseMatrix<T>& DenseMatrix<T>::operator = (const DenseMatrix<T>& other_matrix)
 {
   m_dim = other_matrix.m_dim;
   n_dim = other_matrix.n_dim;
@@ -298,10 +298,10 @@ DenseMatrix<Tp>& DenseMatrix<Tp>::operator = (const DenseMatrix<Tp>& other_matri
 
 
 
-template<typename Tp>
+template<typename T>
 inline
-Tp DenseMatrix<Tp>::operator () (const unsigned int i,
-				 const unsigned int j) const
+T DenseMatrix<T>::operator () (const unsigned int i,
+			       const unsigned int j) const
 {
   assert (i*j<val.size());
   
@@ -311,10 +311,10 @@ Tp DenseMatrix<Tp>::operator () (const unsigned int i,
 
 
 
-template<typename Tp>
+template<typename T>
 inline
-Tp & DenseMatrix<Tp>::operator () (const unsigned int i,
-				   const unsigned int j)
+T & DenseMatrix<T>::operator () (const unsigned int i,
+				 const unsigned int j)
 {
   assert (i*j<val.size());
   
@@ -324,10 +324,10 @@ Tp & DenseMatrix<Tp>::operator () (const unsigned int i,
 
 
 
-template<typename Tp>
+template<typename T>
 inline
-Tp DenseMatrix<Tp>::transpose (const unsigned int i,
-			       const unsigned int j) const
+T DenseMatrix<T>::transpose (const unsigned int i,
+			     const unsigned int j) const
 {
   assert (i*j<val.size());
   
@@ -338,9 +338,9 @@ Tp DenseMatrix<Tp>::transpose (const unsigned int i,
     
 
 
-template<typename Tp>
+template<typename T>
 inline
-void DenseMatrix<Tp>::scale (const Tp factor)
+void DenseMatrix<T>::scale (const T factor)
 {
   for (unsigned int i=0; i<val.size(); i++)
     val[i] *= factor;
@@ -349,23 +349,23 @@ void DenseMatrix<Tp>::scale (const Tp factor)
 
 
 
-// template<typename Tp>
+// template<typename T>
 // inline
-// void DenseMatrix<Tp>::vmult(std::vector<Tp> &w,
-// 			std::vector<Tp> &v,
+// void DenseMatrix<T>::vmult(std::vector<T> &w,
+// 			std::vector<T> &v,
 // 			const bool adding)
 // {
 //   assert (n() == v.size());
 //   assert (m() == w.size());
 
-//   Tp beta = 0.;
+//   T beta = 0.;
 
 //   if (adding)
 //     beta = 1.;
 //   /*
 //     for (unsigned int i=0; i<m(); i++)
 //     {
-//     Tp sum = 0.;
+//     T sum = 0.;
 
 //     for (unsigned int j=0; j<n(); j++)
 //     sum += val[i + m_dim*j]*v[j];
@@ -386,16 +386,16 @@ void DenseMatrix<Tp>::scale (const Tp factor)
     
     
 
-// template<typename Tp>
+// template<typename T>
 // inline
-// void DenseMatrix<Tp>::Tvmult(std::vector<Tp> &w,
-// 			 std::vector<Tp> &v,
+// void DenseMatrix<T>::Tvmult(std::vector<T> &w,
+// 			 std::vector<T> &v,
 // 			 const bool adding)
 // {
 //   assert (m() == v.size());
 //   assert (n() == w.size());
 
-//   Tp beta = 0.;
+//   T beta = 0.;
 
 //   if (adding)
 //     beta = 1.;
@@ -415,10 +415,10 @@ void DenseMatrix<Tp>::scale (const Tp factor)
 
 
 
-template<typename Tp>
+template<typename T>
 inline
-void DenseMatrix<Tp>::add (const Tp factor,
-			   const DenseMatrix<Tp>& mat)
+void DenseMatrix<T>::add (const T factor,
+			  const DenseMatrix<T>& mat)
 {
   assert (m() == mat.m());
   assert (n() == mat.n());
@@ -459,12 +459,12 @@ void DenseMatrix<Complex>::add (const Complex factor,
 #endif
 
 
-template<typename Tp>
+template<typename T>
 inline
-void DenseMatrix<Tp>::condense(const unsigned int iv,
-			       const unsigned int jv,
-			       const Tp val,
-			       std::vector<Tp>& rhs)
+void DenseMatrix<T>::condense(const unsigned int iv,
+			      const unsigned int jv,
+			      const T val,
+			      std::vector<T>& rhs)
 {
   assert (m() == rhs.size());
   assert (iv == jv);
@@ -490,9 +490,9 @@ void DenseMatrix<Tp>::condense(const unsigned int iv,
 
 
 
-template<typename Tp>
+template<typename T>
 inline
-void DenseMatrix<Tp>::print () const
+void DenseMatrix<T>::print () const
 {  
   for (unsigned int i=0; i<m(); i++)
     {
@@ -504,9 +504,6 @@ void DenseMatrix<Tp>::print () const
 
   return;
 }
-  
-
-
 
 
 

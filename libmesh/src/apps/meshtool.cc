@@ -386,7 +386,7 @@ int main (int argc, char** argv)
       
     std::vector<std::string> names;
     std::vector<std::string> var_names;
-    std::vector<Complex>     soln;
+    std::vector<Number>      soln;
 
     process_cmd_line(argc, argv, names,
 		     n_subdomains, n_rsteps,
@@ -649,7 +649,7 @@ int main (int argc, char** argv)
       if (build_l)
 	{
 #ifdef HAVE_PETSC	  
-	  PetscMatrix conn;
+	  PetscMatrix<Number> conn;
 	  mesh.build_L_graph (conn);
 	  conn.print_matlab();
 #else
@@ -663,7 +663,7 @@ int main (int argc, char** argv)
       if (build_script_l)
 	{
 #ifdef HAVE_PETSC	  
-	  PetscMatrix conn;
+	  PetscMatrix<Number> conn;
 	  mesh.build_script_L_graph (conn);
 	  conn.print_matlab();
 #else

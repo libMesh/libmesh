@@ -1,4 +1,4 @@
-//    $Id: petsc_matrix.h,v 1.14 2003-02-20 04:59:58 benkirk Exp $
+//    $Id: petsc_matrix.h,v 1.15 2003-02-20 23:18:08 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -56,8 +56,8 @@ extern "C" {
 
 
 // Forward declarations
-template <typename Tp> class PetscVector;
-template <typename Tp> class PetscInterface;
+template <typename T> class PetscVector;
+template <typename T> class PetscInterface;
 
 
 
@@ -69,10 +69,10 @@ template <typename Tp> class PetscInterface;
  * @author Benjamin S. Kirk, 2002
  */
 
-template <typename Tp>
-class PetscMatrix : public SparseMatrix<Tp>
+template <typename T>
+class PetscMatrix : public SparseMatrix<T>
 {
- public:
+public:
   /**
    * Constructor; initializes the matrix to
    * be empty, without any structure, i.e.
@@ -169,7 +169,7 @@ class PetscMatrix : public SparseMatrix<Tp>
    */
   void set (const unsigned int i,
 	    const unsigned int j,
-	    const Tp value);
+	    const T value);
     
   /**
    * Add \p value to the element
@@ -181,7 +181,7 @@ class PetscMatrix : public SparseMatrix<Tp>
    */
   void add (const unsigned int i,
 	    const unsigned int j,
-	    const Tp value);
+	    const T value);
 
   /**
    * Add the full matrix to the
@@ -190,7 +190,7 @@ class PetscMatrix : public SparseMatrix<Tp>
    * at assembly time
    */
     
-  void add_matrix (const DenseMatrix<Tp> &dm,
+  void add_matrix (const DenseMatrix<T> &dm,
 		   const std::vector<unsigned int> &rows,
 		   const std::vector<unsigned int> &cols);	     
 
@@ -198,7 +198,7 @@ class PetscMatrix : public SparseMatrix<Tp>
    * Same, but assumes the row and column maps are the same.
    * Thus the matrix \p dm must be square.
    */
-  void add_matrix (const DenseMatrix<Tp> &dm,
+  void add_matrix (const DenseMatrix<T> &dm,
 		   const std::vector<unsigned int> &dof_indices);	     
     
   /**
@@ -219,8 +219,8 @@ class PetscMatrix : public SparseMatrix<Tp>
    * matrix), use the \p el
    * function.
    */
-  Tp operator () (const unsigned int i,
-		       const unsigned int j) const;
+  T operator () (const unsigned int i,
+		 const unsigned int j) const;
 
   /**
    * Return the l1-norm of the matrix, that is
@@ -264,7 +264,7 @@ class PetscMatrix : public SparseMatrix<Tp>
   void print_matlab(const std::string name="NULL") const;
 
   
- private:
+private:
 
   
   /**
@@ -275,7 +275,7 @@ class PetscMatrix : public SparseMatrix<Tp>
   /**
    * Make other Petsc datatypes friends
    */
-  friend class PetscInterface<Tp>;
+  friend class PetscInterface<T>;
 };
 
 
@@ -283,25 +283,25 @@ class PetscMatrix : public SparseMatrix<Tp>
 
 //-----------------------------------------------------------------------
 // PetscMatrix inline members
-template <typename Tp>
+template <typename T>
 inline
-PetscMatrix<Tp>::PetscMatrix()
+PetscMatrix<T>::PetscMatrix()
 {}
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-PetscMatrix<Tp>::~PetscMatrix()
+PetscMatrix<T>::~PetscMatrix()
 {
   clear();
 }
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-void PetscMatrix<Tp>::close () const
+void PetscMatrix<T>::close () const
 {
   if (closed())
     return;
@@ -316,9 +316,9 @@ void PetscMatrix<Tp>::close () const
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-unsigned int PetscMatrix<Tp>::m () const
+unsigned int PetscMatrix<T>::m () const
 {
   assert (initialized());
   
@@ -331,9 +331,9 @@ unsigned int PetscMatrix<Tp>::m () const
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-unsigned int PetscMatrix<Tp>::n () const
+unsigned int PetscMatrix<T>::n () const
 {
   assert (initialized());
   
@@ -346,9 +346,9 @@ unsigned int PetscMatrix<Tp>::n () const
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-unsigned int PetscMatrix<Tp>::row_start () const
+unsigned int PetscMatrix<T>::row_start () const
 {
   assert (initialized());
   
@@ -361,9 +361,9 @@ unsigned int PetscMatrix<Tp>::row_start () const
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-unsigned int PetscMatrix<Tp>::row_stop () const
+unsigned int PetscMatrix<T>::row_stop () const
 {
   assert (initialized());
   
@@ -376,11 +376,11 @@ unsigned int PetscMatrix<Tp>::row_stop () const
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-void PetscMatrix<Tp>::set (const unsigned int i,
-			   const unsigned int j,
-			   const Tp value)
+void PetscMatrix<T>::set (const unsigned int i,
+			  const unsigned int j,
+			  const T value)
 {  
   assert (initialized());
   
@@ -395,11 +395,11 @@ void PetscMatrix<Tp>::set (const unsigned int i,
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-void PetscMatrix<Tp>::add (const unsigned int i,
-			   const unsigned int j,
-			   const Tp value)
+void PetscMatrix<T>::add (const unsigned int i,
+			  const unsigned int j,
+			  const T value)
 {
   assert (initialized());
   
@@ -414,20 +414,20 @@ void PetscMatrix<Tp>::add (const unsigned int i,
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-void PetscMatrix<Tp>::add_matrix(const DenseMatrix<Tp>& dm,
-			     const std::vector<unsigned int>& dof_indices)
+void PetscMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
+				const std::vector<unsigned int>& dof_indices)
 {
   add_matrix (dm, dof_indices, dof_indices);
 }
 
 
-template <typename Tp>
+template <typename T>
 inline
-void PetscMatrix<Tp>::add_matrix(const DenseMatrix<Tp>& dm,
-			     const std::vector<unsigned int>& rows,
-			     const std::vector<unsigned int>& cols)
+void PetscMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
+				const std::vector<unsigned int>& rows,
+				const std::vector<unsigned int>& cols)
 		    
 {
   assert (initialized());
@@ -461,15 +461,15 @@ void PetscMatrix<Tp>::add_matrix(const DenseMatrix<Tp>& dm,
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-Tp PetscMatrix<Tp>::operator () (const unsigned int i,
-				  const unsigned int j) const
+T PetscMatrix<T>::operator () (const unsigned int i,
+			       const unsigned int j) const
 {
   assert (initialized());
   
   PetscScalar *petsc_row;
-  Tp value=0.;
+  T value=0.;
   bool found=false;
   int ierr=0, ncols=0, *petsc_cols,
     i_val=static_cast<int>(i),
@@ -489,7 +489,7 @@ Tp PetscMatrix<Tp>::operator () (const unsigned int i,
       {
 	found = true;
 	  
-	value = static_cast<Tp>(petsc_row[entry]);
+	value = static_cast<T>(petsc_row[entry]);
 	  
 	ierr = MatRestoreRow(mat, i_val,
 			     &ncols, &petsc_cols, &petsc_row); CHKERRQ(ierr);
@@ -506,9 +506,9 @@ Tp PetscMatrix<Tp>::operator () (const unsigned int i,
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-bool PetscMatrix<Tp>::closed() const
+bool PetscMatrix<T>::closed() const
 {
   assert (initialized());
   
@@ -522,6 +522,5 @@ bool PetscMatrix<Tp>::closed() const
 
 
 
-#endif
-/*---------------------------   petsc_matrix.h     -------------------------*/
-#endif
+#endif // #ifdef HAVE_PETSC
+#endif // #ifdef __petsc_matrix_h__

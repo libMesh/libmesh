@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.17 2003-02-20 04:59:58 benkirk Exp $
+// $Id: mesh_base.h,v 1.18 2003-02-20 23:18:06 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -33,7 +33,7 @@
 // forward declarations
 class Elem;
 class EquationSystems;
-template <typename Tp> class PetscMatrix;
+template <typename T> class PetscMatrix;
 
 
 // Local Includes -----------------------------------
@@ -59,7 +59,7 @@ template <typename Tp> class PetscMatrix;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.17 $
+ * \version $Revision: 1.18 $
  */
 
 

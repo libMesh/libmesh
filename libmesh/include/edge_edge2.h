@@ -1,4 +1,4 @@
-// $Id: edge_edge2.h,v 1.6 2003-02-13 22:56:07 benkirk Exp $
+// $Id: edge_edge2.h,v 1.7 2003-02-20 23:18:04 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -80,12 +80,7 @@ class Edge2 : public Edge
    * Refine the element.
    */
   void refine(Mesh&)
-    { error(); return; }
-  
-  /**
-   * Refine the element.
-   */
-  void coarsen() { error(); return; }
+  { error(); return; }
 
 #endif
   

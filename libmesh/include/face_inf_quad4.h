@@ -1,4 +1,4 @@
-// $Id: face_inf_quad4.h,v 1.7 2003-02-13 22:56:07 benkirk Exp $
+// $Id: face_inf_quad4.h,v 1.8 2003-02-20 23:18:04 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -118,11 +118,6 @@ public:
    * Refine the element.
    */
   void refine(Mesh& mesh);
-  
-  /**
-   * Refine the element.
-   */
-  void coarsen();
 
 #endif
   
@@ -135,7 +130,7 @@ private:
    * Matrix that computes new nodal locations/solution values
    * from current nodes/solution.
    */
-  static const Real embedding_matrix[2][4][4];
+  static const float embedding_matrix[2][4][4];
   
   /**
    * Matrix that tells which children share which of

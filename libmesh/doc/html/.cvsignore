@@ -1,0 +1,5 @@
+*.html
+*.gif
+doxygen.css 
+formula.repository
+graph_legend.dot

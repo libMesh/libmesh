@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.15 2003-02-14 15:22:32 benkirk Exp $
+# $Id: Makefile,v 1.16 2003-02-20 23:17:55 benkirk Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -124,7 +124,7 @@ distclean:
 	@$(MAKE) clobber
 	@$(MAKE) -C contrib $(MAKECMDGOALS)
 	@$(MAKE) -C examples $(MAKECMDGOALS)
-	@rm -rf doc/html doc/latex doc/kdoc/*.html \
+	@rm -rf doc/html/*.html doc/html/*.gif doc/latex doc/kdoc/*.html \
                 doc/man/man3 doc/cvshtml/*.html doc/cvshtml/diff \
 	        src/*/*.o src/*/*.g.o src/*/*.pg.o \
 	        lib/*_opt lib/*_dbg lib/*_pro
@@ -165,6 +165,13 @@ read_dat: $(mesh_library) src/apps/read_dat.cc
 #
 amr: $(mesh_library) src/apps/amr.cc
 	$(CXX) $(CXXFLAGS) $(INCLUDE) src/apps/amr.cc -o bin/$@ $(LIBS) $(LDFLAGS)
+
+
+#
+# test foo utility program
+#
+foo: $(mesh_library) src/apps/foo.cc
+	$(CXX) $(CXXFLAGS) $(INCLUDE) src/apps/foo.cc -o bin/$@ $(LIBS) $(LDFLAGS)
 
 
 #

@@ -1,4 +1,4 @@
-// $Id: distributed_vector.h,v 1.4 2003-02-20 12:55:07 spetersen Exp $
+// $Id: distributed_vector.h,v 1.5 2003-02-20 23:18:03 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -35,9 +35,9 @@
 #ifdef HAVE_MPI
 namespace Mpi
 {
-extern "C"{
+  extern "C"{
 #include <mpi.h>
-}
+  }
 }
 using namespace Mpi;
 #endif
@@ -58,10 +58,10 @@ using namespace Mpi;
  * @author Benjamin S. Kirk, 2003
  */
 
-template <typename Tp>
-class DistributedVector : public NumericVector<Tp>
+template <typename T>
+class DistributedVector : public NumericVector<T>
 {
- public:
+public:
 
   /**
    *  Dummy-Constructor. Dimension=0
@@ -127,22 +127,22 @@ class DistributedVector : public NumericVector<Tp>
   /**
    * $U(0-N) = s$: fill all components.
    */
-  NumericVector<Tp> & operator= (const Tp s);
+  NumericVector<T> & operator= (const T s);
     
   /**
    *  $U = V$: copy all components.
    */
-  NumericVector<Tp> & operator= (const NumericVector<Tp> &V);
+  NumericVector<T> & operator= (const NumericVector<T> &V);
 
   /**
    *  $U = V$: copy all components.
    */
-  DistributedVector<Tp> & operator= (const DistributedVector<Tp> &V);
+  DistributedVector<T> & operator= (const DistributedVector<T> &V);
 
   /**
    *  $U = V$: copy all components.
    */
-  NumericVector<Tp> & operator= (const std::vector<Tp> &v);
+  NumericVector<T> & operator= (const std::vector<T> &v);
   
   /**
    * @returns the minimum element in the vector.
@@ -208,92 +208,92 @@ class DistributedVector : public NumericVector<Tp>
   /**
    * Access components, returns \p U(i).
    */
-  Tp operator() (const unsigned int i) const;
+  T operator() (const unsigned int i) const;
     
   /**
    * Addition operator.
    * Fast equivalent to \p U.add(1, V).
    */
-  NumericVector<Tp> & operator += (const NumericVector<Tp> &V);
+  NumericVector<T> & operator += (const NumericVector<T> &V);
 
   /**
    * Subtraction operator.
    * Fast equivalent to \p U.add(-1, V).
    */
-  NumericVector<Tp> & operator -= (const NumericVector<Tp> &V);
+  NumericVector<T> & operator -= (const NumericVector<T> &V);
     
   /**
    * v(i) = value
    */
-  void set (const unsigned int i, const Tp value);
+  void set (const unsigned int i, const T value);
     
   /**
    * v(i) += value
    */
-  void add (const unsigned int i, const Tp value);
+  void add (const unsigned int i, const T value);
     
   /**
    * $U(0-DIM)+=s$.
    * Addition of \p s to all components. Note
    * that \p s is a scalar and not a vector.
    */
-  void add (const Tp s);
+  void add (const T s);
     
   /**
    * U+=V.
    * Simple vector addition, equal to the
    * \p operator +=.
    */
-  void add (const NumericVector<Tp>& V);
+  void add (const NumericVector<T>& V);
 
   /**
    * U+=a*V.
    * Simple vector addition, equal to the
    * \p operator +=.
    */
-  void add (const Tp a, const NumericVector<Tp>& v);
+  void add (const T a, const NumericVector<T>& v);
   
   /**
-   * U+=v where v is a std::vector<Tp> 
+   * U+=v where v is a std::vector<T> 
    * and you
    * want to specify WHERE to add it
    */
-  void add_vector (const std::vector<Tp>& v,
+  void add_vector (const std::vector<T>& v,
 		   const std::vector<unsigned int>& dof_indices);
 
   /**
    * U+=V where U and V are type 
-   * NumericVector<Tp> and you
+   * NumericVector<T> and you
    * want to specify WHERE to add
-   * the NumericVector<Tp> V 
+   * the NumericVector<T> V 
    */
-  void add_vector (const NumericVector<Tp>& V,
+  void add_vector (const NumericVector<T>& V,
 		   const std::vector<unsigned int>& dof_indices);
   
   /**
    * Scale each element of the
    * vector by the given factor.
    */
-  void scale (const Tp factor);
+  void scale (const T factor);
     
   /**
    * Creates a copy of the global vector in the
    * local vector \p v_local.
    */
-  void localize (std::vector<Tp>& v_local) const;
+  void localize (std::vector<T>& v_local) const;
 
   /**
-   * Same, but fills a \p NumericVector<Tp> instead of
+   * Same, but fills a \p NumericVector<T> instead of
    * a \p std::vector.
    */
-  void localize (NumericVector<Tp>& v_local) const;
+  void localize (NumericVector<T>& v_local) const;
 
   /**
    * Creates a local vector \p v_local containing
    * only information relevant to this processor, as
    * defined by the \p send_list.
    */
-  void localize (NumericVector<Tp>& v_local,
+  void localize (NumericVector<T>& v_local,
 		 const std::vector<unsigned int>& send_list) const;
 
   /**
@@ -302,16 +302,16 @@ class DistributedVector : public NumericVector<Tp>
    * default the data is sent to processor 0.  This method
    * is useful for outputting data from one processor.
    */
-  void localize_to_one (std::vector<Tp>& v_local,
+  void localize_to_one (std::vector<T>& v_local,
 			const unsigned int proc_id=0) const;
     
- private:
+private:
 
   /**
    * Actual vector datatype
    * to hold vector entries
    */
-  std::vector<Tp> _values;
+  std::vector<T> _values;
 
   /**
    * The global vector size
@@ -338,9 +338,9 @@ class DistributedVector : public NumericVector<Tp>
 
 //--------------------------------------------------------------------------
 // DistributedVector inline methods
-template <typename Tp>
+template <typename T>
 inline
-DistributedVector<Tp>::DistributedVector () :
+DistributedVector<T>::DistributedVector () :
   _global_size      (0),
   _local_size       (0),
   _first_local_index(0),
@@ -350,39 +350,39 @@ DistributedVector<Tp>::DistributedVector () :
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-DistributedVector<Tp>::DistributedVector (const unsigned int n)
+DistributedVector<T>::DistributedVector (const unsigned int n)
 {
   init(n, n, false);
 }
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-DistributedVector<Tp>::DistributedVector (const unsigned int n,
-					  const unsigned int n_local)
+DistributedVector<T>::DistributedVector (const unsigned int n,
+					 const unsigned int n_local)
 {
   init(n, n_local, false);
 }
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-DistributedVector<Tp>::~DistributedVector ()
+DistributedVector<T>::~DistributedVector ()
 {
   clear ();
 }
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-void DistributedVector<Tp>::init (const unsigned int n,
-				  const unsigned int n_local,
-				  const bool fast)
+void DistributedVector<T>::init (const unsigned int n,
+				 const unsigned int n_local,
+				 const bool fast)
 {
   assert (n_local <= n);
 
@@ -456,19 +456,19 @@ void DistributedVector<Tp>::init (const unsigned int n,
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-void DistributedVector<Tp>::init (const unsigned int n,
-				  const bool fast)
+void DistributedVector<T>::init (const unsigned int n,
+				 const bool fast)
 {
   init(n,n,fast);
 }
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-void DistributedVector<Tp>::close ()
+void DistributedVector<T>::close ()
 {
   assert (initialized());
   
@@ -477,9 +477,9 @@ void DistributedVector<Tp>::close ()
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-void DistributedVector<Tp>::clear ()
+void DistributedVector<T>::clear ()
 {
   _values.clear();
   
@@ -494,9 +494,9 @@ void DistributedVector<Tp>::clear ()
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-void DistributedVector<Tp>::zero ()
+void DistributedVector<T>::zero ()
 {
   assert (initialized());
   assert (_values.size() == _local_size);
@@ -509,9 +509,9 @@ void DistributedVector<Tp>::zero ()
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-unsigned int DistributedVector<Tp>::size () const
+unsigned int DistributedVector<T>::size () const
 {
   assert (initialized());
   assert (_values.size() == _local_size);
@@ -522,9 +522,9 @@ unsigned int DistributedVector<Tp>::size () const
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-unsigned int DistributedVector<Tp>::local_size () const
+unsigned int DistributedVector<T>::local_size () const
 {
   assert (initialized());
   assert (_values.size() == _local_size);
@@ -535,9 +535,9 @@ unsigned int DistributedVector<Tp>::local_size () const
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-unsigned int DistributedVector<Tp>::first_local_index () const
+unsigned int DistributedVector<T>::first_local_index () const
 {
   assert (initialized());
   assert (_values.size() == _local_size);
@@ -548,9 +548,9 @@ unsigned int DistributedVector<Tp>::first_local_index () const
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-unsigned int DistributedVector<Tp>::last_local_index () const
+unsigned int DistributedVector<T>::last_local_index () const
 {
   assert (initialized());
   assert (_values.size() == _local_size);
@@ -561,9 +561,9 @@ unsigned int DistributedVector<Tp>::last_local_index () const
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-Tp DistributedVector<Tp>::operator() (const unsigned int i) const
+T DistributedVector<T>::operator() (const unsigned int i) const
 {
   assert (initialized());
   assert (_values.size() == _local_size);
@@ -576,9 +576,9 @@ Tp DistributedVector<Tp>::operator() (const unsigned int i) const
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-void DistributedVector<Tp>::set (const unsigned int i, const Tp value)
+void DistributedVector<T>::set (const unsigned int i, const T value)
 {
   assert (initialized());
   assert (_values.size() == _local_size);
@@ -591,9 +591,9 @@ void DistributedVector<Tp>::set (const unsigned int i, const Tp value)
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-void DistributedVector<Tp>::add (const unsigned int i, const Tp value)
+void DistributedVector<T>::add (const unsigned int i, const T value)
 {
   assert (initialized());
   assert (_values.size() == _local_size);
@@ -606,9 +606,9 @@ void DistributedVector<Tp>::add (const unsigned int i, const Tp value)
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-Real DistributedVector<Tp>::min () const
+Real DistributedVector<T>::min () const
 {
   assert (initialized());
   assert (_values.size() == _local_size);
@@ -634,9 +634,9 @@ Real DistributedVector<Tp>::min () const
 
 
 
-template <typename Tp>
+template <typename T>
 inline
-Real DistributedVector<Tp>::max() const
+Real DistributedVector<T>::max() const
 {
   assert (initialized());
   assert (_values.size() == _local_size);

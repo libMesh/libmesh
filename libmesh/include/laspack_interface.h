@@ -1,4 +1,4 @@
-// $Id: laspack_interface.h,v 1.4 2003-02-20 04:59:58 benkirk Exp $
+// $Id: laspack_interface.h,v 1.5 2003-02-20 23:18:05 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -49,7 +49,7 @@ namespace Laspack {
  * iterative solver library.
  * Currently Laspack only supports real datatypes, so
  * this class is a full specialization of \p NumericVector<>
- * with \p Tp = \p Real*
+ * with \p T = \p Real*
  * @author Benjamin Kirk, 2002
  */
 
