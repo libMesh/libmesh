@@ -12,7 +12,7 @@
 <div class="content">
 <a name="comments"></a> 
 <div class = "comment">
-Example 4 -- Solving a 2D or 3D Poisson Problem in Parallel
+<h1>Example 4 - Solving a 2D or 3D Poisson Problem in Parallel</h1>
 
 <br><br>This is the fourth example program.  It builds on
 the third example program by showing how to formulate
@@ -38,8 +38,8 @@ differences are marked with "PARALLEL CHANGE".
 <div class ="fragment">
 <pre>
         #include &lt;iostream&gt;
-        #include &lt;algorithm&gt;
-        #include &lt;math.h&gt;
+        #include <algorithm>
+        #include <math.h>
         
 </pre>
 </div>
@@ -126,7 +126,7 @@ other objects we might need.
 <div class ="fragment">
 <pre>
         void assemble_poisson(EquationSystems&amp; es,
-                              const std::string&amp; system_name);
+                              const std::string& system_name);
         
 </pre>
 </div>
@@ -137,8 +137,8 @@ Exact solution function prototype.
 <div class ="fragment">
 <pre>
         Real exact_solution (const Real x,
-                             const Real y,
-                             const Real z = 0.);
+        		     const Real y,
+        		     const Real z = 0.);
         
 </pre>
 </div>
@@ -180,8 +180,8 @@ Check for proper calling arguments.
 <pre>
             if (argc &lt; 3)
               {
-                std::cerr &lt;&lt; "Usage: " &lt;&lt; argv[0] &lt;&lt; " -d 2"
-                          &lt;&lt; std::endl;
+        	std::cerr << "Usage: " << argv[0] << " -d 2"
+        		  << std::endl;
         
 </pre>
 </div>
@@ -207,12 +207,12 @@ and command line arguments.
 <pre>
             else 
               {
-                std::cout &lt;&lt; "Running " &lt;&lt; argv[0];
-                
-                for (int i=1; i&lt;argc; i++)
-                  std::cout &lt;&lt; " " &lt;&lt; argv[i];
-                
-                std::cout &lt;&lt; std::endl &lt;&lt; std::endl;
+        	std::cout << "Running " << argv[0];
+        	
+        	for (int i=1; i<argc; i++)
+        	  std::cout << " " << argv[i];
+        	
+        	std::cout << std::endl << std::endl;
               }
             
 </pre>
@@ -250,10 +250,10 @@ us to use higher-order approximation, as in example 3.
 <div class ="fragment">
 <pre>
             mesh.build_cube (15, 15, 15,
-                             -1., 1.,
-                             -1., 1.,
-                             -1., 1.,
-                             (dim == 2) ? QUAD9 : HEX27);
+        		     -1., 1.,
+        		     -1., 1.,
+        		     -1., 1.,
+        		     (dim == 2) ? QUAD9 : HEX27);
         
 </pre>
 </div>
@@ -359,7 +359,7 @@ to a GMV-formatted plot file.
 <div class ="fragment">
 <pre>
             mesh.write_gmv ((dim == 3) ? "out_3.gmv" : "out_2.gmv",
-                            equation_systems);
+        		    equation_systems);
           }
           
 </pre>
@@ -392,7 +392,7 @@ via a penalty method.
 <div class ="fragment">
 <pre>
         void assemble_poisson(EquationSystems&amp; es,
-                              const std::string&amp; system_name)
+                              const std::string& system_name)
         {
 </pre>
 </div>
@@ -455,7 +455,7 @@ for the first (and only) variable in the system.
 <div class = "comment">
 Build a Finite Element object of the specified type.  Since the
 \p FEBase::build() member dynamically creates memory we will
-store the object as an \p AutoPtr&lt;FEBase&gt;.  This can be thought
+store the object as an \p AutoPtr<FEBase>.  This can be thought
 of as a pointer that will clean up after itself.
 </div>
 
@@ -493,7 +493,7 @@ boundary integration.
 <div class ="fragment">
 <pre>
           AutoPtr&lt;FEBase&gt; fe_face (FEBase::build(dim, fe_type));
-                      
+        	      
 </pre>
 </div>
 <div class = "comment">
@@ -588,7 +588,7 @@ basic finite element terminology we will denote these
 <div class ="fragment">
 <pre>
           DenseMatrix&lt;Number&gt; Ke;
-          DenseVector&lt;Number&gt; Fe;
+          DenseVector<Number> Fe;
         
 </pre>
 </div>
@@ -686,7 +686,7 @@ triangle, now we are on a quadrilateral).
 <div class ="fragment">
 <pre>
               Ke.resize (dof_indices.size(),
-                         dof_indices.size());
+        		 dof_indices.size());
         
               Fe.resize (dof_indices.size());
         
@@ -720,11 +720,11 @@ computation seperately.
 <pre>
               perf_log.start_event ("Ke");
         
-              for (unsigned int qp=0; qp&lt;qrule.n_points(); qp++)
-                for (unsigned int i=0; i&lt;phi.size(); i++)
-                  for (unsigned int j=0; j&lt;phi.size(); j++)
-                    Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-                    
+              for (unsigned int qp=0; qp<qrule.n_points(); qp++)
+        	for (unsigned int i=0; i<phi.size(); i++)
+        	  for (unsigned int j=0; j<phi.size(); j++)
+        	    Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+        	    
         
 </pre>
 </div>
@@ -750,8 +750,8 @@ This involves a single loop in which we integrate the
 <pre>
               perf_log.start_event ("Fe");
               
-              for (unsigned int qp=0; qp&lt;qrule.n_points(); qp++)
-                {
+              for (unsigned int qp=0; qp<qrule.n_points(); qp++)
+        	{
 </pre>
 </div>
 <div class = "comment">
@@ -768,29 +768,29 @@ u(i,j-1) + u(i,j+1) +
 
 <br><br>Since the value of the forcing function depends only
 on the location of the quadrature point (q_point[qp])
-we will compute it here, outside of the i-loop          
+we will compute it here, outside of the i-loop	  
 </div>
 
 <div class ="fragment">
 <pre>
                   const Real x = q_point[qp](0);
-                  const Real y = q_point[qp](1);
-                  const Real z = q_point[qp](2);
-                  const Real eps = 1.e-3;
+        	  const Real y = q_point[qp](1);
+        	  const Real z = q_point[qp](2);
+        	  const Real eps = 1.e-3;
         
-                  const Real uxx = (exact_solution(x-eps,y,z) +
-                                    exact_solution(x+eps,y,z) +
-                                    -2.*exact_solution(x,y,z))/eps/eps;
-                      
-                  const Real uyy = (exact_solution(x,y-eps,z) +
-                                    exact_solution(x,y+eps,z) +
-                                    -2.*exact_solution(x,y,z))/eps/eps;
-                  
-                  const Real uzz = (exact_solution(x,y,z-eps) +
-                                    exact_solution(x,y,z+eps) +
-                                    -2.*exact_solution(x,y,z))/eps/eps;
+        	  const Real uxx = (exact_solution(x-eps,y,z) +
+        			    exact_solution(x+eps,y,z) +
+        			    -2.*exact_solution(x,y,z))/eps/eps;
+        	      
+        	  const Real uyy = (exact_solution(x,y-eps,z) +
+        			    exact_solution(x,y+eps,z) +
+        			    -2.*exact_solution(x,y,z))/eps/eps;
+        	  
+        	  const Real uzz = (exact_solution(x,y,z-eps) +
+        			    exact_solution(x,y,z+eps) +
+        			    -2.*exact_solution(x,y,z))/eps/eps;
         
-                  const Real fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
+        	  const Real fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
         
 </pre>
 </div>
@@ -801,8 +801,8 @@ Add the RHS contribution
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;phi.size(); i++)
-                    Fe(i) += JxW[qp]*fxy*phi[i][qp];          
-                }
+        	    Fe(i) += JxW[qp]*fxy*phi[i][qp];	  
+        	}
               
 </pre>
 </div>
@@ -828,7 +828,7 @@ example 3.
 <div class ="fragment">
 <pre>
               {
-                
+        	
 </pre>
 </div>
 <div class = "comment">
@@ -850,8 +850,8 @@ side MUST live on a boundary of the domain.
 <div class ="fragment">
 <pre>
                 for (unsigned int side=0; side&lt;elem-&gt;n_sides(); side++)
-                  if (elem-&gt;neighbor(side) == NULL)
-                    {
+        	  if (elem->neighbor(side) == NULL)
+        	    {
 </pre>
 </div>
 <div class = "comment">
@@ -873,7 +873,7 @@ points on the face.
 <div class ="fragment">
 <pre>
                       const std::vector&lt;Real&gt;&amp; JxW_face = fe_face-&gt;get_JxW();
-                      
+        	      
 </pre>
 </div>
 <div class = "comment">
@@ -896,7 +896,7 @@ face.
 <div class ="fragment">
 <pre>
                       fe_face-&gt;reinit(elem, side);
-                      
+        	      
 </pre>
 </div>
 <div class = "comment">
@@ -906,7 +906,7 @@ Loop over the face quagrature points for integration.
 <div class ="fragment">
 <pre>
                       for (unsigned int qp=0; qp&lt;qface.n_points(); qp++)
-                        {
+        		{
 </pre>
 </div>
 <div class = "comment">
@@ -917,8 +917,8 @@ face quadrature point.
 <div class ="fragment">
 <pre>
                           const Real xf = qface_point[qp](0);
-                          const Real yf = qface_point[qp](1);
-                          const Real zf = qface_point[qp](2);
+        		  const Real yf = qface_point[qp](1);
+        		  const Real zf = qface_point[qp](2);
         
 </pre>
 </div>
@@ -930,7 +930,7 @@ in the discussion above.
 <div class ="fragment">
 <pre>
                           const Real penalty = 1.e10;
-                          
+        		  
 </pre>
 </div>
 <div class = "comment">
@@ -940,7 +940,7 @@ The boundary value.
 <div class ="fragment">
 <pre>
                           const Real value = exact_solution(xf, yf, zf);
-                          
+        		  
 </pre>
 </div>
 <div class = "comment">
@@ -950,10 +950,10 @@ Matrix contribution of the L2 projection.
 <div class ="fragment">
 <pre>
                           for (unsigned int i=0; i&lt;phi_face.size(); i++)
-                            for (unsigned int j=0; j&lt;phi_face.size(); j++)
-                              {
-                                Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
-                              }
+        		    for (unsigned int j=0; j<phi_face.size(); j++)
+        		      {
+        			Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
+        		      }
         
 </pre>
 </div>
@@ -965,12 +965,12 @@ projection.
 <div class ="fragment">
 <pre>
                           for (unsigned int i=0; i&lt;phi_face.size(); i++)
-                            {
-                              Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
-                            }
-                        } 
-                    } 
-                
+        		    {
+        		      Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
+        		    }
+        		} 
+        	    } 
+        	
 </pre>
 </div>
 <div class = "comment">
@@ -998,8 +998,8 @@ matrix and vector into the global matrix and vector
 <pre>
               perf_log.start_event ("matrix insertion");
               
-              es("Poisson").matrix-&gt;add_matrix (Ke, dof_indices);
-              es("Poisson").rhs-&gt;add_vector    (Fe, dof_indices);
+              es("Poisson").matrix->add_matrix (Ke, dof_indices);
+              es("Poisson").rhs->add_vector    (Fe, dof_indices);
         
 </pre>
 </div>
@@ -1305,8 +1305,9 @@ Running ./ex4 -d 2
    System "Poisson"
     Type "Steady"
     Variables="u" 
-    Finite Element Types="0" 
-    Approximation Orders="2" 
+    Finite Element Types="0", "12" 
+    Infinite Element Mapping="0" 
+    Approximation Orders="2", "3" 
     n_dofs()=961
     n_local_dofs()=961
     n_constrained_dofs()=0
@@ -1319,28 +1320,28 @@ Running ./ex4 -d 2
 
 
  ----------------------------------------------------------------------------
-| Time:           Mon Nov 10 14:12:36 2003
+| Time:           Mon Nov 10 22:54:16 2003
 | OS:             Linux
-| HostName:       arthur
+| HostName:       ariel
 | OS Release      2.4.20-19.9smp
 | OS Version:     #1 SMP Tue Jul 15 17:04:18 EDT 2003
 | Machine:        i686
-| Username:       peterson
+| Username:       benkirk
  ----------------------------------------------------------------------------
  ----------------------------------------------------------------------------
-| Matrix Assembly Performance: Alive time=0.04601, Active time=0.041468
+| Matrix Assembly Performance: Alive time=0.055012, Active time=0.050417
  ----------------------------------------------------------------------------
 | Event                         nCalls  Total       Avg         Percent of   |
 |                                       Time        Time        Active Time  |
 |----------------------------------------------------------------------------|
 |                                                                            |
-| BCs                           225     0.0077      0.000034    18.59        |
-| Fe                            225     0.0083      0.000037    20.00        |
-| Ke                            225     0.0110      0.000049    26.54        |
-| elem init                     225     0.0071      0.000031    17.07        |
-| matrix insertion              225     0.0074      0.000033    17.80        |
+| BCs                           225     0.0117      0.000052    23.23        |
+| Fe                            225     0.0075      0.000033    14.95        |
+| Ke                            225     0.0109      0.000049    21.66        |
+| elem init                     225     0.0130      0.000058    25.76        |
+| matrix insertion              225     0.0073      0.000032    14.41        |
  ----------------------------------------------------------------------------
-| Totals:                       1125    0.0415                  100.00       |
+| Totals:                       1125    0.0504                  100.00       |
  ----------------------------------------------------------------------------
 
 
@@ -1378,6 +1379,43 @@ Running ./ex4 -d 2
 WARNING! There are options you set that were not used!
 WARNING! could be spelling mistake, etc!
 Option left: name:-d value: 2
+ ----------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.43848, Active time=0.327616
+ ----------------------------------------------------------------------------
+| Event                         nCalls  Total       Avg         Percent of   |
+|                                       Time        Time        Active Time  |
+|----------------------------------------------------------------------------|
+|                                                                            |
+|                                                                            |
+| DofMap                                                                     |
+|   compute_sparsity()          1       0.0112      0.011246    3.43         |
+|   create_dof_constraints()    1       0.0001      0.000105    0.03         |
+|   distribute_dofs()           1       0.0011      0.001129    0.34         |
+|   dof_indices()               675     0.0067      0.000010    2.05         |
+|   reinit()                    1       0.0044      0.004379    1.34         |
+|                                                                            |
+| FE                                                                         |
+|   compute_face_map()          60      0.0006      0.000010    0.19         |
+|   compute_map()               285     0.0042      0.000015    1.27         |
+|   compute_shape_functions()   285     0.0031      0.000011    0.93         |
+|   init_face_shape_functions() 35      0.0003      0.000007    0.08         |
+|   init_shape_functions()      61      0.0025      0.000041    0.77         |
+|   inverse_map()               180     0.0034      0.000019    1.05         |
+|                                                                            |
+| Mesh                                                                       |
+|   build_cube()                1       0.0029      0.002908    0.89         |
+|                                                                            |
+| MeshBase                                                                   |
+|   find_neighbors()            1       0.0046      0.004590    1.40         |
+|   renumber_nodes_and_elem()   1       0.0002      0.000235    0.07         |
+|                                                                            |
+| SystemBase                                                                 |
+|   assemble()                  1       0.0562      0.056245    17.17        |
+|   solve()                     1       0.2260      0.225993    68.98        |
+ ----------------------------------------------------------------------------
+| Totals:                       1590    0.3276                  100.00       |
+ ----------------------------------------------------------------------------
+
 Running ./ex4 -d 3
 
  Mesh Information:
@@ -1396,8 +1434,9 @@ Running ./ex4 -d 3
    System "Poisson"
     Type "Steady"
     Variables="u" 
-    Finite Element Types="0" 
-    Approximation Orders="2" 
+    Finite Element Types="0", "12" 
+    Infinite Element Mapping="0" 
+    Approximation Orders="2", "3" 
     n_dofs()=29791
     n_local_dofs()=29791
     n_constrained_dofs()=0
@@ -1410,28 +1449,28 @@ Running ./ex4 -d 3
 
 
  ----------------------------------------------------------------------------
-| Time:           Mon Nov 10 14:12:47 2003
+| Time:           Mon Nov 10 22:54:26 2003
 | OS:             Linux
-| HostName:       arthur
+| HostName:       ariel
 | OS Release      2.4.20-19.9smp
 | OS Version:     #1 SMP Tue Jul 15 17:04:18 EDT 2003
 | Machine:        i686
-| Username:       peterson
+| Username:       benkirk
  ----------------------------------------------------------------------------
  ----------------------------------------------------------------------------
-| Matrix Assembly Performance: Alive time=8.52849, Active time=8.46075
+| Matrix Assembly Performance: Alive time=8.77018, Active time=8.70021
  ----------------------------------------------------------------------------
 | Event                         nCalls  Total       Avg         Percent of   |
 |                                       Time        Time        Active Time  |
 |----------------------------------------------------------------------------|
 |                                                                            |
-| BCs                           3375    1.9966      0.000592    23.60        |
-| Fe                            3375    0.4423      0.000131    5.23         |
-| Ke                            3375    4.0631      0.001204    48.02        |
-| elem init                     3375    0.9730      0.000288    11.50        |
-| matrix insertion              3375    0.9857      0.000292    11.65        |
+| BCs                           3375    2.1904      0.000649    25.18        |
+| Fe                            3375    0.4141      0.000123    4.76         |
+| Ke                            3375    3.9772      0.001178    45.71        |
+| elem init                     3375    1.1531      0.000342    13.25        |
+| matrix insertion              3375    0.9655      0.000286    11.10        |
  ----------------------------------------------------------------------------
-| Totals:                       16875   8.4608                  100.00       |
+| Totals:                       16875   8.7002                  100.00       |
  ----------------------------------------------------------------------------
 
 
@@ -1469,6 +1508,43 @@ Running ./ex4 -d 3
 WARNING! There are options you set that were not used!
 WARNING! could be spelling mistake, etc!
 Option left: name:-d value: 3
+ ----------------------------------------------------------------------------
+| libMesh Performance: Alive time=26.6934, Active time=27.6373
+ ----------------------------------------------------------------------------
+| Event                         nCalls  Total       Avg         Percent of   |
+|                                       Time        Time        Active Time  |
+|----------------------------------------------------------------------------|
+|                                                                            |
+|                                                                            |
+| DofMap                                                                     |
+|   compute_sparsity()          1       0.9591      0.959137    3.47         |
+|   create_dof_constraints()    1       0.0033      0.003260    0.01         |
+|   distribute_dofs()           1       0.0556      0.055556    0.20         |
+|   dof_indices()               10125   0.2296      0.000023    0.83         |
+|   reinit()                    1       0.1761      0.176052    0.64         |
+|                                                                            |
+| FE                                                                         |
+|   compute_face_map()          1350    0.0446      0.000033    0.16         |
+|   compute_map()               4725    0.5192      0.000110    1.88         |
+|   compute_shape_functions()   4725    0.5776      0.000122    2.09         |
+|   init_face_shape_functions() 687     0.0367      0.000053    0.13         |
+|   init_shape_functions()      1351    0.5946      0.000440    2.15         |
+|   inverse_map()               12150   0.8451      0.000070    3.06         |
+|                                                                            |
+| Mesh                                                                       |
+|   build_cube()                1       0.0952      0.095228    0.34         |
+|                                                                            |
+| MeshBase                                                                   |
+|   find_neighbors()            1       0.1160      0.116042    0.42         |
+|   renumber_nodes_and_elem()   1       0.0155      0.015537    0.06         |
+|                                                                            |
+| SystemBase                                                                 |
+|   assemble()                  1       8.7714      8.771411    31.74        |
+|   solve()                     1       14.5977     14.597655   52.82        |
+ ----------------------------------------------------------------------------
+| Totals:                       35122   27.6373                 100.00       |
+ ----------------------------------------------------------------------------
+
  
 ***************************************************************
 * Done Running Example  ./ex4

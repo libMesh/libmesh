@@ -1,4 +1,4 @@
-/* $Id: ex5.C,v 1.24 2003-11-07 17:41:08 benkirk Exp $ */
+/* $Id: ex5.C,v 1.25 2003-11-11 04:58:33 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -20,11 +20,11 @@
 
 
 
- // Example 5 -- Run-Time Quadrature Rule Selection
+ // <h1>Example 5 - Run-Time Quadrature Rule Selection</h1>
  //
  // This is the fifth example program.  It builds on
  // the previous two examples, and extends the use
- // of the \p AutoPtr<> as a convenient build method to
+ // of the \p AutoPtr as a convenient build method to
  // determine the quadrature rule at run time.
 
 

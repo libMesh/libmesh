@@ -12,7 +12,7 @@
 <div class="content">
 <a name="comments"></a> 
 <div class = "comment">
-Example 1 -- Creation of a Mesh Object
+<h1>Example 1 - Creation of a Mesh Object</h1>
 
 <br><br>This is the first example program.  It simply demonstrates
 how to create a mesh object.  A mesh is read from file,
@@ -85,9 +85,9 @@ a filename to write the mesh into.
 <pre>
             if (argc &lt; 4)
               {
-                std::cerr &lt;&lt; "Usage: " &lt;&lt; argv[0] &lt;&lt; " -d 2 in.mesh [out.mesh]"
-                          &lt;&lt; std::endl;
-                
+        	std::cerr << "Usage: " << argv[0] << " -d 2 in.mesh [out.mesh]"
+        		  << std::endl;
+        	
 </pre>
 </div>
 <div class = "comment">
@@ -245,6 +245,34 @@ can be useful for testing purposes.
 WARNING! There are options you set that were not used!
 WARNING! could be spelling mistake, etc!
 Option left: name:-d value: 3
+
+ ----------------------------------------------------------------------------
+| Time:           Mon Nov 10 22:54:14 2003
+| OS:             Linux
+| HostName:       ariel
+| OS Release      2.4.20-19.9smp
+| OS Version:     #1 SMP Tue Jul 15 17:04:18 EDT 2003
+| Machine:        i686
+| Username:       benkirk
+ ----------------------------------------------------------------------------
+ ----------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.079192, Active time=0.002877
+ ----------------------------------------------------------------------------
+| Event                         nCalls  Total       Avg         Percent of   |
+|                                       Time        Time        Active Time  |
+|----------------------------------------------------------------------------|
+|                                                                            |
+|                                                                            |
+| Mesh                                                                       |
+|   read()                      1       0.0028      0.002804    97.46        |
+|                                                                            |
+| MeshBase                                                                   |
+|   find_neighbors()            1       0.0001      0.000063    2.19         |
+|   renumber_nodes_and_elem()   1       0.0000      0.000010    0.35         |
+ ----------------------------------------------------------------------------
+| Totals:                       3       0.0029                  100.00       |
+ ----------------------------------------------------------------------------
+
  
 ***************************************************************
 * Done Running Example  ./ex1

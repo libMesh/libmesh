@@ -12,7 +12,7 @@
 <div class="content">
 <a name="comments"></a> 
 <div class = "comment">
-Example 10 -- Solving a Transient System with Adaptive Mesh Refinement
+<h1>Example 10 - Solving a Transient System with Adaptive Mesh Refinement</h1>
 
 <br><br>This example shows how a simple, linear transient
 system can be solved in parallel.  The system is simple
@@ -28,8 +28,8 @@ time-stepping strategy.
 <div class ="fragment">
 <pre>
         #include &lt;iostream&gt;
-        #include &lt;algorithm&gt;
-        #include &lt;math.h&gt;
+        #include <algorithm>
+        #include <math.h>
         
 </pre>
 </div>
@@ -102,7 +102,7 @@ system matrix.
 <div class ="fragment">
 <pre>
         void assemble_cd (EquationSystems&amp; es,
-                          const std::string&amp; system_name);
+        		  const std::string& system_name);
         
 </pre>
 </div>
@@ -117,7 +117,7 @@ solution is provided.
 <div class ="fragment">
 <pre>
         void init_cd (EquationSystems&amp; es,
-                      const std::string&amp; system_name);
+        	      const std::string& system_name);
         
 </pre>
 </div>
@@ -131,8 +131,8 @@ as will the Dirichlet boundary conditions at time t.
 <div class ="fragment">
 <pre>
         Real exact_solution (const Real x,
-                             const Real y,
-                             const Real t);
+        		     const Real y,
+        		     const Real t);
         
 </pre>
 </div>
@@ -151,8 +151,8 @@ numbers.
           
         #ifdef USE_COMPLEX_NUMBERS
           
-          std::cerr &lt;&lt; "ERROR: Not intended for use with complex numbers."
-                    &lt;&lt; std::endl;
+          std::cerr << "ERROR: Not intended for use with complex numbers."
+        	    << std::endl;
           here();
         
           return 0;
@@ -243,7 +243,7 @@ named "Convection-Diffusion".
 <div class ="fragment">
 <pre>
             TransientSystem&amp; system = 
-              equation_systems.add_system&lt;TransientSystem&gt; ("Convection-Diffusion");
+              equation_systems.add_system<TransientSystem> ("Convection-Diffusion");
               
 </pre>
 </div>
@@ -297,7 +297,7 @@ Write out the initial conditions.
 <div class ="fragment">
 <pre>
             mesh.write_gmv ("out_000.gmv",
-                            equation_systems);
+        		    equation_systems);
             
 </pre>
 </div>
@@ -328,7 +328,7 @@ system and call the linear solver.
             const Real dt = 0.025;
             Real time     = 0.;
             
-            for (unsigned int t_step = 0; t_step &lt; 50; t_step++)
+            for (unsigned int t_step = 0; t_step < 50; t_step++)
               {
 </pre>
 </div>
@@ -341,8 +341,8 @@ time step size as parameters in the EquationSystem.
 <pre>
                 time += dt;
         
-                equation_systems.set_parameter ("time") = time;
-                equation_systems.set_parameter ("dt")   = dt;
+        	equation_systems.set_parameter ("time") = time;
+        	equation_systems.set_parameter ("dt")   = dt;
         
 </pre>
 </div>
@@ -353,7 +353,7 @@ A pretty update message
 <div class ="fragment">
 <pre>
                 std::cout &lt;&lt; " Solving time step ";
-                
+        	
 </pre>
 </div>
 <div class = "comment">
@@ -365,15 +365,15 @@ Add a set of scope braces to enforce data locality.
 <div class ="fragment">
 <pre>
                 {
-                  OStringStream out;
+        	  OStringStream out;
         
-                  OSSInt(out,2,t_step);
-                  out &lt;&lt; ", time=";
-                  OSSRealzeroleft(out,6,3,time);
-                  out &lt;&lt;  "..." &lt;&lt; std::endl;
-                  std::cout &lt;&lt; out.str();
-                }
-                
+        	  OSSInt(out,2,t_step);
+        	  out << ", time=";
+        	  OSSRealzeroleft(out,6,3,time);
+        	  out <<  "..." << std::endl;
+        	  std::cout << out.str();
+        	}
+        	
 </pre>
 </div>
 <div class = "comment">
@@ -390,10 +390,10 @@ we need to specify the system type when we ask for it.
 <div class ="fragment">
 <pre>
                 TransientSystem&amp;  system =
-                  equation_systems.get_system&lt;TransientSystem&gt;("Convection-Diffusion");
+        	  equation_systems.get_system<TransientSystem>("Convection-Diffusion");
         
-                *system.old_local_solution = *system.current_local_solution;
-                
+        	*system.old_local_solution = *system.current_local_solution;
+        	
 </pre>
 </div>
 <div class = "comment">
@@ -403,7 +403,7 @@ The number of refinement steps per time step.
 <div class ="fragment">
 <pre>
                 const unsigned int max_r_steps = 2;
-                
+        	
 </pre>
 </div>
 <div class = "comment">
@@ -413,17 +413,17 @@ A refinement loop.
 <div class ="fragment">
 <pre>
                 for (unsigned int r_step=0; r_step&lt;max_r_steps; r_step++)
-                  {
+        	  {
 </pre>
 </div>
 <div class = "comment">
-Assemble &amp; solve the linear system
+Assemble & solve the linear system
 </div>
 
 <div class ="fragment">
 <pre>
                     system.solve();
-                    
+        	    
 </pre>
 </div>
 <div class = "comment">
@@ -433,8 +433,8 @@ Possibly refine the mesh
 <div class ="fragment">
 <pre>
                     if (r_step+1 != max_r_steps)
-                      {
-                        std::cout &lt;&lt; "  Refining the mesh..." &lt;&lt; std::endl;
+        	      {
+        		std::cout << "  Refining the mesh..." << std::endl;
         
 </pre>
 </div>
@@ -459,7 +459,7 @@ and which to coarsen.
 <div class ="fragment">
 <pre>
                         ErrorEstimator error_estimator;
-                        
+        		
 </pre>
 </div>
 <div class = "comment">
@@ -472,9 +472,9 @@ application.
 <div class ="fragment">
 <pre>
                         error_estimator.flux_jump (equation_systems,
-                                                   "Convection-Diffusion",
-                                                   error);
-                        
+        					   "Convection-Diffusion",
+        					   error);
+        		
 </pre>
 </div>
 <div class = "comment">
@@ -490,10 +490,10 @@ coarsened.
 <div class ="fragment">
 <pre>
                         mesh_refinement.flag_elements_by_error_fraction (error,
-                                                                         0.80,
-                                                                         0.07,
-                                                                         5);
-                        
+        								 0.80,
+        								 0.07,
+        								 5);
+        		
 </pre>
 </div>
 <div class = "comment">
@@ -504,7 +504,7 @@ elements.
 <div class ="fragment">
 <pre>
                         mesh_refinement.refine_and_coarsen_elements();
-                        
+        		
 </pre>
 </div>
 <div class = "comment">
@@ -518,9 +518,9 @@ the current one.
 <div class ="fragment">
 <pre>
                         equation_systems.reinit ();
-                      }            
-                  }
-                
+        	      }	    
+        	  }
+        	
 </pre>
 </div>
 <div class = "comment">
@@ -530,16 +530,16 @@ Output evey 10 timesteps to file.
 <div class ="fragment">
 <pre>
                 if ( (t_step+1)%10 == 0)
-                  {
-                    OStringStream file_name;
+        	  {
+        	    OStringStream file_name;
         
-                    file_name &lt;&lt; "out_";
-                    OSSRealzeroright(file_name,3,0,t_step+1);
-                    file_name &lt;&lt; ".gmv";
+        	    file_name << "out_";
+        	    OSSRealzeroright(file_name,3,0,t_step+1);
+        	    file_name << ".gmv";
         
-                    mesh.write_gmv (file_name.str(),
-                                    equation_systems);
-                  }
+        	    mesh.write_gmv (file_name.str(),
+        			    equation_systems);
+        	  }
               }
           }
           
@@ -567,7 +567,7 @@ the system.
 <div class ="fragment">
 <pre>
         void init_cd (EquationSystems&amp; es,
-                      const std::string&amp; system_name)
+        	      const std::string& system_name)
         {
         #ifndef USE_COMPLEX_NUMBERS
           
@@ -601,7 +601,7 @@ Get a reference to the Convection-Diffusion system object.
 <div class ="fragment">
 <pre>
           TransientSystem&amp; system =
-            es.get_system&lt;TransientSystem&gt; ("Convection-Diffusion");
+            es.get_system<TransientSystem> ("Convection-Diffusion");
           
 </pre>
 </div>
@@ -659,7 +659,7 @@ in the loop.
 </div>
 <div class = "comment">
 For these Lagrange-elements the number
-of degrees of freedom should be &lt;= the number
+of degrees of freedom should be <= the number
 of nodes.
 </div>
 
@@ -677,17 +677,17 @@ value if the DOF is local to the processor.
 <div class ="fragment">
 <pre>
               for (unsigned int i=0; i&lt;dof_indices.size(); i++)
-                if ((dof_indices[i] &gt;= solution.first_local_index()) &amp;&amp;
-                    (dof_indices[i] &lt;  solution.last_local_index()))
-                  {
-                    const Point&amp;  p = elem-&gt;point (i);
-                    const Real    x = p(0);
-                    const Real    y = p(1);
-                    const Real time = 0.;
-                    
-                    solution.set (dof_indices[i],
-                                  exact_solution (x,y,time));            
-                  }         
+        	if ((dof_indices[i] >= solution.first_local_index()) &&
+        	    (dof_indices[i] <  solution.last_local_index()))
+        	  {
+        	    const Point&  p = elem->point (i);
+        	    const Real    x = p(0);
+        	    const Real    y = p(1);
+        	    const Real time = 0.;
+        	    
+        	    solution.set (dof_indices[i],
+        			  exact_solution (x,y,time));	    
+        	  }	 
             }
           
 </pre>
@@ -722,7 +722,7 @@ element stiffness matrices and right-hand sides.
 <div class ="fragment">
 <pre>
         void assemble_cd (EquationSystems&amp; es,
-                          const std::string&amp; system_name)
+        		  const std::string& system_name)
         {
         #ifndef USE_COMPLEX_NUMBERS
           
@@ -766,7 +766,7 @@ Get a reference to the Convection-Diffusion system object.
 <div class ="fragment">
 <pre>
           TransientSystem&amp; system =
-            es.get_system&lt;TransientSystem&gt; ("Convection-Diffusion");
+            es.get_system<TransientSystem> ("Convection-Diffusion");
           
 </pre>
 </div>
@@ -784,7 +784,7 @@ variable in the system.
 <div class = "comment">
 Build a Finite Element object of the specified type.  Since the
 \p FEBase::build() member dynamically creates memory we will
-store the object as an \p AutoPtr&lt;FEBase&gt;.  The \p AutoPtr's
+store the object as an \p AutoPtr<FEBase>.  The \p AutoPtr's
 are covered in more detail in example 5.
 </div>
 
@@ -871,7 +871,7 @@ basic finite element terminology we will denote these
 <div class ="fragment">
 <pre>
           DenseMatrix&lt;Real&gt; Ke;
-          DenseVector&lt;Real&gt; Fe;
+          DenseVector<Real> Fe;
           
 </pre>
 </div>
@@ -888,14 +888,14 @@ the element degrees of freedom get mapped.
 </pre>
 </div>
 <div class = "comment">
-Here we extract the velocity &amp; parameters that we put in the
+Here we extract the velocity & parameters that we put in the
 EquationSystems object.
 </div>
 
 <div class ="fragment">
 <pre>
           const RealVectorValue velocity =
-            es.data_map.get_data&lt;RealVectorValue&gt; ("velocity");
+            es.data_map.get_data<RealVectorValue> ("velocity");
         
           const Real dt = es.parameter   ("dt");
           const Real time = es.parameter ("time");
@@ -968,7 +968,7 @@ triangle, now we are on a quadrilateral).
 <div class ="fragment">
 <pre>
               Ke.resize (dof_indices.size(),
-                         dof_indices.size());
+        		 dof_indices.size());
         
               Fe.resize (dof_indices.size());
               
@@ -986,30 +986,30 @@ weight functions.
 <div class ="fragment">
 <pre>
               for (unsigned int qp=0; qp&lt;qrule.n_points(); qp++)
-                {
+        	{
 </pre>
 </div>
 <div class = "comment">
-Values to hold the old solution &amp; its gradient.
+Values to hold the old solution & its gradient.
 </div>
 
 <div class ="fragment">
 <pre>
                   Real         u_old = 0.;
-                  RealGradient grad_u_old;
-                  
+        	  RealGradient grad_u_old;
+        	  
 </pre>
 </div>
 <div class = "comment">
-Compute the old solution &amp; its gradient.
+Compute the old solution & its gradient.
 </div>
 
 <div class ="fragment">
 <pre>
                   for (unsigned int l=0; l&lt;phi.size(); l++)
-                    {
-                      u_old      += phi[l][qp]*system.old_solution  (dof_indices[l]);
-                      
+        	    {
+        	      u_old      += phi[l][qp]*system.old_solution  (dof_indices[l]);
+        	      
 </pre>
 </div>
 <div class = "comment">
@@ -1021,8 +1021,8 @@ but we can do it without creating a temporary like this:
 <div class ="fragment">
 <pre>
                       grad_u_old.add_scaled (dphi[l][qp],system.old_solution (dof_indices[l]));
-                    }
-                  
+        	    }
+        	  
 </pre>
 </div>
 <div class = "comment">
@@ -1032,7 +1032,7 @@ Now compute the element matrix and RHS contributions.
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;phi.size(); i++)
-                    {
+        	    {
 </pre>
 </div>
 <div class = "comment">
@@ -1051,7 +1051,7 @@ Mass matrix term
 <div class ="fragment">
 <pre>
                                         u_old*phi[i][qp] + 
-                                        -.5*dt*(
+        				-.5*dt*(
 </pre>
 </div>
 <div class = "comment">
@@ -1070,10 +1070,10 @@ Diffusion term
 <div class ="fragment">
 <pre>
                                                 0.01*(grad_u_old*dphi[i][qp]))     
-                                        );
-                      
-                      for (unsigned int j=0; j&lt;phi.size(); j++)
-                        {
+        				);
+        	      
+        	      for (unsigned int j=0; j<phi.size(); j++)
+        		{
 </pre>
 </div>
 <div class = "comment">
@@ -1092,7 +1092,7 @@ Mass-matrix
 <div class ="fragment">
 <pre>
                                               phi[i][qp]*phi[j][qp] + 
-                                              .5*dt*(
+        				      .5*dt*(
 </pre>
 </div>
 <div class = "comment">
@@ -1111,10 +1111,10 @@ Diffusion term
 <div class ="fragment">
 <pre>
                                                      0.01*(dphi[i][qp]*dphi[j][qp]))      
-                                              );
-                        }
-                    } 
-                } 
+        				      );
+        		}
+        	    } 
+        	} 
         
 </pre>
 </div>
@@ -1136,10 +1136,10 @@ side MUST live on a boundary of the domain.
 <div class ="fragment">
 <pre>
               for (unsigned int s=0; s&lt;elem-&gt;n_sides(); s++)
-                if (elem-&gt;neighbor(s) == NULL)
-                  {
-                    AutoPtr&lt;Elem&gt; side (elem-&gt;build_side(s));
-                      
+        	if (elem->neighbor(s) == NULL)
+        	  {
+        	    AutoPtr<Elem> side (elem->build_side(s));
+        	      
 </pre>
 </div>
 <div class = "comment">
@@ -1149,7 +1149,7 @@ Loop over the nodes on the side.
 <div class ="fragment">
 <pre>
                     for (unsigned int ns=0; ns&lt;side-&gt;n_nodes(); ns++)
-                      {
+        	      {
 </pre>
 </div>
 <div class = "comment">
@@ -1160,8 +1160,8 @@ node.
 <div class ="fragment">
 <pre>
                         const Real xf = side-&gt;point(ns)(0);
-                        const Real yf = side-&gt;point(ns)(1);
-                          
+        		const Real yf = side->point(ns)(1);
+        		  
 </pre>
 </div>
 <div class = "comment">
@@ -1171,7 +1171,7 @@ The penalty value.  \f$ \frac{1}{\epsilon \f$
 <div class ="fragment">
 <pre>
                         const Real penalty = 1.e10;
-                          
+        		  
 </pre>
 </div>
 <div class = "comment">
@@ -1181,7 +1181,7 @@ The boundary value.
 <div class ="fragment">
 <pre>
                         const Real value = exact_solution(xf, yf, time);
-                          
+        		  
 </pre>
 </div>
 <div class = "comment">
@@ -1193,8 +1193,8 @@ the boundary condition will be applied.
 <div class ="fragment">
 <pre>
                         for (unsigned int n=0; n&lt;elem-&gt;n_nodes(); n++)
-                          if (elem-&gt;node(n) == side-&gt;node(ns))
-                            {
+        		  if (elem->node(n) == side->node(ns))
+        		    {
 </pre>
 </div>
 <div class = "comment">
@@ -1204,7 +1204,7 @@ Matrix contribution.
 <div class ="fragment">
 <pre>
                               Ke(n,n) += penalty;
-                                
+        			
 </pre>
 </div>
 <div class = "comment">
@@ -1214,10 +1214,10 @@ Right-hand-side contribution.
 <div class ="fragment">
 <pre>
                               Fe(n) += penalty*value;
-                            }
-                          
-                      }
-                  } 
+        		    }
+        		  
+        	      }
+        	  } 
               
 </pre>
 </div>
@@ -1248,7 +1248,7 @@ and \p PetscVector::add_vector() members do this for us.
 <div class ="fragment">
 <pre>
               es("Convection-Diffusion").matrix-&gt;add_matrix (Ke, dof_indices);
-              es("Convection-Diffusion").rhs-&gt;add_vector    (Fe, dof_indices);
+              es("Convection-Diffusion").rhs->add_vector    (Fe, dof_indices);
               
             }
 </pre>
@@ -1622,8 +1622,9 @@ Finished computing the sytem matrix and right-hand side.
    System "Convection-Diffusion"
     Type "Transient"
     Variables="u" 
-    Finite Element Types="0" 
-    Approximation Orders="1" 
+    Finite Element Types="0", "12" 
+    Infinite Element Mapping="0" 
+    Approximation Orders="1", "3" 
     n_dofs()=6273
     n_local_dofs()=6273
     n_constrained_dofs()=0
@@ -1766,6 +1767,73 @@ Finished computing the sytem matrix and right-hand side.
 | Creations:    200
 | Destructions: 200
  ---------------------------------------------------------------------------- 
+
+ ----------------------------------------------------------------------------
+| Time:           Mon Nov 10 22:57:35 2003
+| OS:             Linux
+| HostName:       ariel
+| OS Release      2.4.20-19.9smp
+| OS Version:     #1 SMP Tue Jul 15 17:04:18 EDT 2003
+| Machine:        i686
+| Username:       benkirk
+ ----------------------------------------------------------------------------
+ ----------------------------------------------------------------------------
+| libMesh Performance: Alive time=55.5748, Active time=74.3555
+ ----------------------------------------------------------------------------
+| Event                         nCalls  Total       Avg         Percent of   |
+|                                       Time        Time        Active Time  |
+|----------------------------------------------------------------------------|
+|                                                                            |
+|                                                                            |
+| DofMap                                                                     |
+|   build_constraint_matrix()   173863  1.2675      0.000007    1.70         |
+|   cnstrn_elem_mat_vec()       122755  0.9031      0.000007    1.21         |
+|   compute_sparsity()          51      1.2931      0.025356    1.74         |
+|   create_dof_constraints()    51      0.5374      0.010536    0.72         |
+|   distribute_dofs()           51      0.1888      0.003703    0.25         |
+|   dof_indices()               613650  4.0703      0.000007    5.47         |
+|   old_dof_indices()           171690  1.2086      0.000007    1.63         |
+|   reinit()                    51      0.8167      0.016014    1.10         |
+|                                                                            |
+| ErrorEstimator                                                             |
+|   flux_jump()                 50      24.4493     0.488985    32.88        |
+|                                                                            |
+| ErrorVector                                                                |
+|   minimum()                   50      0.0014      0.000029    0.00         |
+|                                                                            |
+| FE                                                                         |
+|   compute_face_map()          112490  0.8112      0.000007    1.09         |
+|   compute_map()               347735  2.2055      0.000006    2.97         |
+|   compute_shape_functions()   347735  1.6995      0.000005    2.29         |
+|   init_face_shape_functions() 105868  0.6393      0.000006    0.86         |
+|   init_shape_functions()      229747  3.2211      0.000014    4.33         |
+|   inverse_map()               484268  4.5244      0.000009    6.08         |
+|                                                                            |
+| Mesh                                                                       |
+|   read()                      1       0.0023      0.002278    0.00         |
+|                                                                            |
+| MeshBase                                                                   |
+|   find_neighbors()            52      1.7325      0.033317    2.33         |
+|   renumber_nodes_and_elem()   52      0.0917      0.001763    0.12         |
+|                                                                            |
+| MeshRefinement                                                             |
+|   coarsen_elements()          50      0.0939      0.001878    0.13         |
+|   make_coarsening_compatible()78      0.2439      0.003127    0.33         |
+|   make_refinement_compatible()78      0.0173      0.000222    0.02         |
+|   refine_elements()           55      0.1954      0.003553    0.26         |
+|   update_nodes_map()          55      0.0445      0.000809    0.06         |
+|                                                                            |
+| StatisticsVector                                                           |
+|   maximum()                   50      0.0011      0.000022    0.00         |
+|                                                                            |
+| SystemBase                                                                 |
+|   assemble()                  100     17.3683     0.173683    23.36        |
+|   project_vector()            150     5.0571      0.033714    6.80         |
+|   solve()                     100     1.6705      0.016705    2.25         |
+ ----------------------------------------------------------------------------
+| Totals:                       2710926 74.3555                 100.00       |
+ ----------------------------------------------------------------------------
+
  
 ***************************************************************
 * Done Running Example  ./ex10

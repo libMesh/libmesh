@@ -12,7 +12,7 @@
 <div class="content">
 <a name="comments"></a> 
 <div class = "comment">
-Example 11 -- Stokes Equations - Systems of Equations
+<h1>Example 11 - Stokes Equations - Systems of Equations</h1>
 
 <br><br>This example shows how a simple, linear system of equations
 can be solved in parallel.  The system of equations are the familiar
@@ -25,8 +25,8 @@ Stokes equations for low-speed incompressible fluid flow.
 <div class ="fragment">
 <pre>
         #include &lt;iostream&gt;
-        #include &lt;algorithm&gt;
-        #include &lt;math.h&gt;
+        #include <algorithm>
+        #include <math.h>
         
 </pre>
 </div>
@@ -74,7 +74,7 @@ matrix and right-hand-side.
 <div class ="fragment">
 <pre>
         void assemble_stokes (EquationSystems&amp; es,
-                              const std::string&amp; system_name);
+        		      const std::string& system_name);
         
 </pre>
 </div>
@@ -129,9 +129,9 @@ us to use higher-order approximation, as in example 3.
 <div class ="fragment">
 <pre>
             mesh.build_square (15, 15,
-                               0., 1.,
-                               0., 1.,
-                               QUAD9);
+        		       0., 1.,
+        		       0., 1.,
+        		       QUAD9);
             
 </pre>
 </div>
@@ -171,12 +171,12 @@ Creates a transient system named "Convection-Diffusion"
 <div class ="fragment">
 <pre>
               SteadySystem&amp; system = 
-                equation_systems.add_system&lt;SteadySystem&gt; ("Stokes");
+        	equation_systems.add_system<SteadySystem> ("Stokes");
               
 </pre>
 </div>
 <div class = "comment">
-Add the variables "u" &amp; "v" to "Stokes".  They
+Add the variables "u" & "v" to "Stokes".  They
 will be approximated using second-order approximation.
 </div>
 
@@ -235,7 +235,7 @@ Prints information about the system to the screen.
 </pre>
 </div>
 <div class = "comment">
-Assemble &amp; solve the linear system,
+Assemble & solve the linear system,
 then write the solution.
 </div>
 
@@ -244,7 +244,7 @@ then write the solution.
             equation_systems("Stokes").solve();
         
             mesh.write_gmv ("out.gmv",
-                            equation_systems);
+        		    equation_systems);
           }
           
 </pre>
@@ -258,8 +258,8 @@ All done.
           return libMesh::close ();
         }
         
-        void assemble_stokes (EquationSystems&amp; es,
-                              const std::string&amp; system_name)
+        void assemble_stokes (EquationSystems& es,
+        		      const std::string& system_name)
         {
 </pre>
 </div>
@@ -301,7 +301,7 @@ Get a reference to the Convection-Diffusion system object.
 <div class ="fragment">
 <pre>
           SteadySystem&amp; system =
-            es.get_system&lt;SteadySystem&gt; ("Stokes");
+            es.get_system<SteadySystem> ("Stokes");
         
 </pre>
 </div>
@@ -378,7 +378,7 @@ Tell the finite element objects to use our quadrature rule.
 <div class ="fragment">
 <pre>
           fe_vel-&gt;attach_quadrature_rule (&amp;qrule);
-          fe_pres-&gt;attach_quadrature_rule (&amp;qrule);
+          fe_pres->attach_quadrature_rule (&qrule);
           
 </pre>
 </div>
@@ -440,14 +440,14 @@ basic finite element terminology we will denote these
 <div class ="fragment">
 <pre>
           DenseMatrix&lt;Number&gt; Ke;
-          DenseVector&lt;Number&gt; Fe;
+          DenseVector<Number> Fe;
         
-          DenseSubMatrix&lt;Number&gt;
+          DenseSubMatrix<Number>
             Kuu(Ke), Kuv(Ke), Kup(Ke),
             Kvu(Ke), Kvv(Ke), Kvp(Ke),
             Kpu(Ke), Kpv(Ke), Kpp(Ke);
         
-          DenseSubVector&lt;Number&gt;
+          DenseSubVector<Number>
             Fu(Fe),
             Fv(Fe),
             Fp(Fe);
@@ -463,9 +463,9 @@ the element degrees of freedom get mapped.
 <div class ="fragment">
 <pre>
           std::vector&lt;unsigned int&gt; dof_indices;
-          std::vector&lt;unsigned int&gt; dof_indices_u;
-          std::vector&lt;unsigned int&gt; dof_indices_v;
-          std::vector&lt;unsigned int&gt; dof_indices_p;
+          std::vector<unsigned int> dof_indices_u;
+          std::vector<unsigned int> dof_indices_v;
+          std::vector<unsigned int> dof_indices_p;
           
 </pre>
 </div>
@@ -528,7 +528,7 @@ quadrature points (q_point) and the shape functions
 <div class ="fragment">
 <pre>
               fe_vel-&gt;reinit  (elem);
-              fe_pres-&gt;reinit (elem);
+              fe_pres->reinit (elem);
         
 </pre>
 </div>
@@ -591,7 +591,7 @@ Now we will build the element matrix.
 <div class ="fragment">
 <pre>
               for (unsigned int qp=0; qp&lt;qrule.n_points(); qp++)
-                {
+        	{
 </pre>
 </div>
 <div class = "comment">
@@ -602,8 +602,8 @@ uu coupling
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;n_u_dofs; i++)
-                    for (unsigned int j=0; j&lt;n_u_dofs; j++)
-                      Kuu(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+        	    for (unsigned int j=0; j<n_u_dofs; j++)
+        	      Kuu(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
         
 </pre>
 </div>
@@ -614,8 +614,8 @@ up coupling
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;n_u_dofs; i++)
-                    for (unsigned int j=0; j&lt;n_p_dofs; j++)
-                      Kup(i,j) += -JxW[qp]*psi[j][qp]*dphi[i][qp](0);
+        	    for (unsigned int j=0; j<n_p_dofs; j++)
+        	      Kup(i,j) += -JxW[qp]*psi[j][qp]*dphi[i][qp](0);
         
         
 </pre>
@@ -628,8 +628,8 @@ vv coupling
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;n_v_dofs; i++)
-                    for (unsigned int j=0; j&lt;n_v_dofs; j++)
-                      Kvv(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+        	    for (unsigned int j=0; j<n_v_dofs; j++)
+        	      Kvv(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
         
 </pre>
 </div>
@@ -640,10 +640,10 @@ vp coupling
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;n_v_dofs; i++)
-                    for (unsigned int j=0; j&lt;n_p_dofs; j++)
-                      Kvp(i,j) += -JxW[qp]*psi[j][qp]*dphi[i][qp](1);
+        	    for (unsigned int j=0; j<n_p_dofs; j++)
+        	      Kvp(i,j) += -JxW[qp]*psi[j][qp]*dphi[i][qp](1);
         
-                  
+        	  
 </pre>
 </div>
 <div class = "comment">
@@ -654,8 +654,8 @@ pu coupling
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;n_p_dofs; i++)
-                    for (unsigned int j=0; j&lt;n_u_dofs; j++)
-                      Kpu(i,j) += -JxW[qp]*psi[i][qp]*dphi[j][qp](0);
+        	    for (unsigned int j=0; j<n_u_dofs; j++)
+        	      Kpu(i,j) += -JxW[qp]*psi[i][qp]*dphi[j][qp](0);
         
 </pre>
 </div>
@@ -666,10 +666,10 @@ pv coupling
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;n_p_dofs; i++)
-                    for (unsigned int j=0; j&lt;n_v_dofs; j++)
-                      Kpv(i,j) += -JxW[qp]*psi[i][qp]*dphi[j][qp](1);
-                  
-                } // end of the quadrature point qp-loop
+        	    for (unsigned int j=0; j<n_v_dofs; j++)
+        	      Kpv(i,j) += -JxW[qp]*psi[i][qp]*dphi[j][qp](1);
+        	  
+        	} // end of the quadrature point qp-loop
         
 </pre>
 </div>
@@ -698,10 +698,10 @@ side MUST live on a boundary of the domain.
 <div class ="fragment">
 <pre>
                 for (unsigned int s=0; s&lt;elem-&gt;n_sides(); s++)
-                  if (elem-&gt;neighbor(s) == NULL)
-                    {
-                      AutoPtr&lt;Elem&gt; side (elem-&gt;build_side(s));
-                                    
+        	  if (elem->neighbor(s) == NULL)
+        	    {
+        	      AutoPtr<Elem> side (elem->build_side(s));
+        	      	      
 </pre>
 </div>
 <div class = "comment">
@@ -711,21 +711,21 @@ Loop over the nodes on the side.
 <div class ="fragment">
 <pre>
                       for (unsigned int ns=0; ns&lt;side-&gt;n_nodes(); ns++)
-                        {
+        		{
 </pre>
 </div>
 <div class = "comment">
 The location on the boundary of the current
 node.
-                   
+		   
 
-<br><br>const Real xf = side-&gt;point(ns)(0);
+<br><br>const Real xf = side->point(ns)(0);
 </div>
 
 <div class ="fragment">
 <pre>
                           const Real yf = side-&gt;point(ns)(1);
-                          
+        		  
 </pre>
 </div>
 <div class = "comment">
@@ -735,12 +735,12 @@ The penalty value.  \f$ \frac{1}{\epsilon \f$
 <div class ="fragment">
 <pre>
                           const Real penalty = 1.e10;
-                          
+        		  
 </pre>
 </div>
 <div class = "comment">
 The boundary values.
-                   
+		   
 
 <br><br>Set u = 1 on the top boundary, 0 everywhere else
 </div>
@@ -748,7 +748,7 @@ The boundary values.
 <div class ="fragment">
 <pre>
                           const Real u_value = (yf &gt; .99) ? 1. : 0.;
-                          
+        		  
 </pre>
 </div>
 <div class = "comment">
@@ -758,7 +758,7 @@ Set v = 0 everywhere
 <div class ="fragment">
 <pre>
                           const Real v_value = 0.;
-                          
+        		  
 </pre>
 </div>
 <div class = "comment">
@@ -770,8 +770,8 @@ the boundary condition will be applied.
 <div class ="fragment">
 <pre>
                           for (unsigned int n=0; n&lt;elem-&gt;n_nodes(); n++)
-                            if (elem-&gt;node(n) == side-&gt;node(ns))
-                              {
+        		    if (elem->node(n) == side->node(ns))
+        		      {
 </pre>
 </div>
 <div class = "comment">
@@ -781,8 +781,8 @@ Matrix contribution.
 <div class ="fragment">
 <pre>
                                 Kuu(n,n) += penalty;
-                                Kvv(n,n) += penalty;
-                                            
+        			Kvv(n,n) += penalty;
+        		  		  
 </pre>
 </div>
 <div class = "comment">
@@ -792,11 +792,11 @@ Right-hand-side contribution.
 <div class ="fragment">
 <pre>
                                 Fu(n) += penalty*u_value;
-                                Fv(n) += penalty*v_value;
-                              }
-                        } // end face node loop          
-                    } // end if (elem-&gt;neighbor(side) == NULL)
-              } // end boundary condition section          
+        			Fv(n) += penalty*v_value;
+        		      }
+        		} // end face node loop	  
+        	    } // end if (elem->neighbor(side) == NULL)
+              } // end boundary condition section	  
               
 </pre>
 </div>
@@ -827,7 +827,7 @@ and \p PetscVector::add_vector() members do this for us.
 <div class ="fragment">
 <pre>
               system.matrix-&gt;add_matrix (Ke, dof_indices);
-              system.rhs-&gt;add_vector    (Fe, dof_indices);
+              system.rhs->add_vector    (Fe, dof_indices);
             } // end of element loop
           
 </pre>
@@ -1083,10 +1083,6 @@ That's it.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-Compiling C++ (in debug mode) ex11.C...
-Linking ex11...
-/home/benkirk/phd/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
-: the use of `mktemp' is dangerous, better use `mkstemp'
 ***************************************************************
 * Running Example  ./ex11
 ***************************************************************
@@ -1154,16 +1150,16 @@ Linking ex11...
  ---------------------------------------------------------------------------- 
 
  ----------------------------------------------------------------------------
-| Time:           Mon Nov 10 15:27:56 2003
+| Time:           Mon Nov 10 22:57:37 2003
 | OS:             Linux
-| HostName:       hactar
+| HostName:       ariel
 | OS Release      2.4.20-19.9smp
 | OS Version:     #1 SMP Tue Jul 15 17:04:18 EDT 2003
 | Machine:        i686
 | Username:       benkirk
  ----------------------------------------------------------------------------
  ----------------------------------------------------------------------------
-| libMesh Performance: Alive time=0.660609, Active time=0.510641
+| libMesh Performance: Alive time=1.12511, Active time=0.997032
  ----------------------------------------------------------------------------
 | Event                         nCalls  Total       Avg         Percent of   |
 |                                       Time        Time        Active Time  |
@@ -1171,31 +1167,31 @@ Linking ex11...
 |                                                                            |
 |                                                                            |
 | DofMap                                                                     |
-|   build_constraint_matrix()   225     0.0035      0.000016    0.69         |
-|   cnstrn_elem_mat_vec()       225     0.0011      0.000005    0.22         |
-|   compute_sparsity()          1       0.0382      0.038243    7.49         |
-|   create_dof_constraints()    1       0.0002      0.000238    0.05         |
-|   distribute_dofs()           1       0.0013      0.001280    0.25         |
-|   dof_indices()               1800    0.0134      0.000007    2.62         |
-|   reinit()                    1       0.0043      0.004270    0.84         |
+|   build_constraint_matrix()   225     0.0035      0.000015    0.35         |
+|   cnstrn_elem_mat_vec()       225     0.0009      0.000004    0.09         |
+|   compute_sparsity()          1       0.0461      0.046054    4.62         |
+|   create_dof_constraints()    1       0.0003      0.000269    0.03         |
+|   distribute_dofs()           1       0.0024      0.002434    0.24         |
+|   dof_indices()               1800    0.0156      0.000009    1.57         |
+|   reinit()                    1       0.0062      0.006166    0.62         |
 |                                                                            |
 | FE                                                                         |
-|   compute_map()               450     0.0043      0.000010    0.84         |
-|   compute_shape_functions()   450     0.0041      0.000009    0.80         |
-|   init_shape_functions()      2       0.0003      0.000174    0.07         |
+|   compute_map()               450     0.0059      0.000013    0.59         |
+|   compute_shape_functions()   450     0.0042      0.000009    0.42         |
+|   init_shape_functions()      2       0.0004      0.000179    0.04         |
 |                                                                            |
 | Mesh                                                                       |
-|   build_cube()                1       0.0028      0.002825    0.55         |
+|   build_cube()                1       0.0027      0.002731    0.27         |
 |                                                                            |
 | MeshBase                                                                   |
-|   find_neighbors()            1       0.0034      0.003375    0.66         |
-|   renumber_nodes_and_elem()   1       0.0002      0.000172    0.03         |
+|   find_neighbors()            1       0.0047      0.004653    0.47         |
+|   renumber_nodes_and_elem()   1       0.0002      0.000243    0.02         |
 |                                                                            |
 | SystemBase                                                                 |
-|   assemble()                  1       0.0961      0.096103    18.82        |
-|   solve()                     1       0.3374      0.337357    66.07        |
+|   assemble()                  1       0.1161      0.116145    11.65        |
+|   solve()                     1       0.7879      0.787867    79.02        |
  ----------------------------------------------------------------------------
-| Totals:                       3161    0.5106                  100.00       |
+| Totals:                       3161    0.9970                  100.00       |
  ----------------------------------------------------------------------------
 
  

@@ -1,4 +1,4 @@
-/* $Id: ex9.C,v 1.9 2003-11-10 20:21:41 jwpeterson Exp $ */
+/* $Id: ex9.C,v 1.10 2003-11-11 04:58:33 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -19,7 +19,7 @@
 
 
 
- // Example 9 -- Solving a Transient Linear System in Parallel
+ // <h1>Example 9 - Solving a Transient Linear System in Parallel</h1>
  //
  // This example shows how a simple, linear transient
  // system can be solved in parallel.  The system is simple

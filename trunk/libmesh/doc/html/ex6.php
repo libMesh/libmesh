@@ -12,7 +12,7 @@
 <div class="content">
 <a name="comments"></a> 
 <div class = "comment">
-Example 6 -- Infinite Elements for the Wave Equation
+<h1>Example 6 - Infinite Elements for the Wave Equation</h1>
 
 <br><br>This is the sixth example program.  It builds on
 the previous examples, and introduces the Infinite
@@ -33,8 +33,8 @@ used.
 <div class ="fragment">
 <pre>
         #include &lt;iostream&gt;
-        #include &lt;algorithm&gt;
-        #include &lt;math.h&gt;
+        #include <algorithm>
+        #include <math.h>
         
 </pre>
 </div>
@@ -105,7 +105,7 @@ assemble function of example 4.
 <div class ="fragment">
 <pre>
         void assemble_wave(EquationSystems&amp; es,
-                           const std::string&amp; system_name);
+        		   const std::string& system_name);
         
 </pre>
 </div>
@@ -137,8 +137,8 @@ This example requires Infinite Elements
 <pre>
         #ifndef ENABLE_INFINITE_ELEMENTS
         
-          std::cerr &lt;&lt; "ERROR: This example requires the library to be compiled with Infinite Element support!"
-                    &lt;&lt; std::endl;
+          std::cerr << "ERROR: This example requires the library to be compiled with Infinite Element support!"
+        	    << std::endl;
           here();
         
           return 0;
@@ -155,8 +155,8 @@ This example is designed for real numbers only.
 <pre>
         #ifdef USE_COMPLEX_NUMBERS
           
-          std::cerr &lt;&lt; "ERROR: Not intended for use with complex numbers."
-                    &lt;&lt; std::endl;
+          std::cerr << "ERROR: Not intended for use with complex numbers."
+        	    << std::endl;
           here();
           
           return 0;
@@ -212,10 +212,10 @@ on the square [-1,1]^3, of type Hex8.
 <div class ="fragment">
 <pre>
             mesh.build_cube (4, 4, 4,
-                             -1., 1.,
-                             -1., 1.,
-                             -1., 1.,
-                             HEX8);
+        		     -1., 1.,
+        		     -1., 1.,
+        		     -1., 1.,
+        		     HEX8);
             
 </pre>
 </div>
@@ -439,7 +439,7 @@ for the discrete form of our wave equation.
 <div class ="fragment">
 <pre>
         void assemble_wave(EquationSystems&amp; es,
-                           const std::string&amp; system_name)
+        		   const std::string& system_name)
         {
 </pre>
 </div>
@@ -513,7 +513,7 @@ for the first (and only) variable in the system.
 <div class = "comment">
 Build a Finite Element object of the specified type.  Since the
 \p FEBase::build() member dynamically creates memory we will
-store the object as an \p AutoPtr&lt;FEBase&gt;.  Check ex5 for details.
+store the object as an \p AutoPtr<FEBase>.  Check ex5 for details.
 </div>
 
 <div class ="fragment">
@@ -581,9 +581,9 @@ notation again.
 <div class ="fragment">
 <pre>
           DenseMatrix&lt;Number&gt; Ke;
-          DenseMatrix&lt;Number&gt; Ce;
-          DenseMatrix&lt;Number&gt; Me;
-          DenseVector&lt;Number&gt; Fe;
+          DenseMatrix<Number> Ce;
+          DenseMatrix<Number> Me;
+          DenseVector<Number> Fe;
           
 </pre>
 </div>
@@ -668,7 +668,7 @@ have.  Aske the element of what type it is:
 <div class ="fragment">
 <pre>
               if (elem-&gt;infinite())
-                {           
+                {	   
 </pre>
 </div>
 <div class = "comment">
@@ -676,31 +676,31 @@ We have an infinite element.  Let \p cfe point
 to our \p InfFE object.  This is handled through
 an AutoPtr.  Through the \p AutoPtr::get() we "borrow"
 the pointer, while the \p  AutoPtr \p inf_fe is
-still in charge of memory management.           
+still in charge of memory management.	   
 </div>
 
 <div class ="fragment">
 <pre>
                   cfe = inf_fe.get(); 
-                }
+        	}
               else
                 {
 </pre>
 </div>
 <div class = "comment">
-This is a conventional finite element.  Let \p fe handle it.           
+This is a conventional finite element.  Let \p fe handle it.	   
 </div>
 
 <div class ="fragment">
 <pre>
                     cfe = fe.get();
-                  
+        	  
 </pre>
 </div>
 <div class = "comment">
 Boundary conditions.
 Here we just zero the rhs-vector. For natural boundary 
-conditions check e.g. previous examples.           
+conditions check e.g. previous examples.	   
 </div>
 
 <div class ="fragment">
@@ -709,16 +709,16 @@ conditions check e.g. previous examples.
 </pre>
 </div>
 <div class = "comment">
-Zero the RHS for this element.                
+Zero the RHS for this element. 	       
 </div>
 
 <div class ="fragment">
 <pre>
                     Fe.resize (dof_indices.size());
-                    
-                    es("Wave").rhs-&gt;add_vector (Fe, dof_indices);
-                  } // end boundary condition section             
-                } // else ( if (elem-&gt;infinite())) )
+        	    
+        	    es("Wave").rhs->add_vector (Fe, dof_indices);
+        	  } // end boundary condition section	     
+        	} // else ( if (elem->infinite())) )
         
 </pre>
 </div>
@@ -786,8 +786,8 @@ finite and infinite elements.
 <div class ="fragment">
 <pre>
               const std::vector&lt;RealGradient&gt;&amp; dphase  = cfe-&gt;get_dphase();
-              const std::vector&lt;Real&gt;&amp;         weight  = cfe-&gt;get_Sobolev_weight();
-              const std::vector&lt;RealGradient&gt;&amp; dweight = cfe-&gt;get_Sobolev_dweight();
+              const std::vector<Real>&         weight  = cfe->get_Sobolev_weight();
+              const std::vector<RealGradient>& dweight = cfe->get_Sobolev_dweight();
         
 </pre>
 </div>
@@ -826,14 +826,14 @@ Loop over the quadrature points.
 <div class ="fragment">
 <pre>
               for (unsigned int qp=0; qp&lt;max_qp; qp++)
-                {          
+                {	  
 </pre>
 </div>
 <div class = "comment">
 Similar to the modified access to the number of quadrature 
 points, the number of shape functions may also be obtained
 in a different manner.  This offers the great advantage
-of being valid for both finite and infinite elements.           
+of being valid for both finite and infinite elements.	   
 </div>
 
 <div class ="fragment">
@@ -857,14 +857,14 @@ trial functions:   phi[j][qp]
 phase term:        phase[qp]
 
 <br><br>derivatives are similar, but note that these are of type
-Point, not of type Real.           
+Point, not of type Real.	   
 </div>
 
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;n_sf; i++)
-                    for (unsigned int j=0; j&lt;n_sf; j++)
-                      {
+        	    for (unsigned int j=0; j<n_sf; j++)
+        	      {
 </pre>
 </div>
 <div class = "comment">
@@ -874,13 +874,13 @@ Point, not of type Real.
 <div class ="fragment">
 <pre>
                         Ke(i,j) +=
-                          (                            //    (                         
-                           (                           //      (                       
-                            dweight[qp] * phi[i][qp]   //        Point * Real  = Point 
-                            +                          //        +                     
-                            dphi[i][qp] * weight[qp]   //        Point * Real  = Point 
-                            ) * dphi[j][qp]            //      )       * Point = Real  
-                           ) * JxW[qp];                //    )         * Real  = Real  
+        		  (                            //    (                         
+        		   (                           //      (                       
+        		    dweight[qp] * phi[i][qp]   //        Point * Real  = Point 
+        		    +                          //        +                     
+        		    dphi[i][qp] * weight[qp]   //        Point * Real  = Point 
+        		    ) * dphi[j][qp]            //      )       * Point = Real  
+        		   ) * JxW[qp];                //    )         * Real  = Real  
         
 </pre>
 </div>
@@ -891,17 +891,17 @@ Point, not of type Real.
 <div class ="fragment">
 <pre>
                         Ce(i,j) +=
-                          (                                //    (                         
-                           (dphase[qp] * dphi[j][qp])      //      (Point * Point) = Real  
-                           * weight[qp] * phi[i][qp]       //      * Real * Real   = Real  
-                           -                               //      -                       
-                           (dweight[qp] * dphase[qp])      //      (Point * Point) = Real  
-                           * phi[i][qp] * phi[j][qp]       //      * Real * Real   = Real  
-                           -                               //      -                       
-                           (dphi[i][qp] * dphase[qp])      //      (Point * Point) = Real  
-                           * weight[qp] * phi[j][qp]       //      * Real * Real   = Real  
-                           ) * JxW[qp];                    //    )         * Real  = Real  
-                        
+        		  (                                //    (                         
+        		   (dphase[qp] * dphi[j][qp])      //      (Point * Point) = Real  
+        		   * weight[qp] * phi[i][qp]       //      * Real * Real   = Real  
+        		   -                               //      -                       
+        		   (dweight[qp] * dphase[qp])      //      (Point * Point) = Real  
+        		   * phi[i][qp] * phi[j][qp]       //      * Real * Real   = Real  
+        		   -                               //      -                       
+        		   (dphi[i][qp] * dphase[qp])      //      (Point * Point) = Real  
+        		   * weight[qp] * phi[j][qp]       //      * Real * Real   = Real  
+        		   ) * JxW[qp];                    //    )         * Real  = Real  
+        		
 </pre>
 </div>
 <div class = "comment">
@@ -911,13 +911,13 @@ Point, not of type Real.
 <div class ="fragment">
 <pre>
                         Me(i,j) +=
-                          (                                       //    (                                  
-                           (1. - (dphase[qp] * dphase[qp]))       //      (Real  - (Point * Point)) = Real 
-                           * phi[i][qp] * phi[j][qp] * weight[qp] //      * Real *  Real  * Real    = Real 
-                           ) * JxW[qp];                           //    ) * Real                    = Real 
+        		  (                                       //    (                                  
+        		   (1. - (dphase[qp] * dphase[qp]))       //      (Real  - (Point * Point)) = Real 
+        		   * phi[i][qp] * phi[j][qp] * weight[qp] //      * Real *  Real  * Real    = Real 
+        		   ) * JxW[qp];                           //    ) * Real                    = Real 
         
-                      } // end of the matrix summation loop
-                } // end of quadrature point loop
+        	      } // end of the matrix summation loop
+        	} // end of quadrature point loop
         
 </pre>
 </div>
@@ -932,7 +932,7 @@ The \p SparseMatrix::add_matrix() member does this for us.
               Ke.add(1./speed        , Ce);
               Ke.add(1./(speed*speed), Me);
         
-              es("Wave").matrix-&gt;add_matrix (Ke, dof_indices);
+              es("Wave").matrix->add_matrix (Ke, dof_indices);
             } // end of element loop
         
 </pre>
@@ -955,8 +955,8 @@ Number of nodes in the mesh.
 <pre>
             const unsigned int n_nodes = mesh.n_nodes();
             
-            for (unsigned int n_cnt=0; n_cnt&lt;n_nodes; n_cnt++)
-              {        
+            for (unsigned int n_cnt=0; n_cnt<n_nodes; n_cnt++)
+              {	
 </pre>
 </div>
 <div class = "comment">
@@ -966,7 +966,7 @@ Get a reference to the current node.
 <div class ="fragment">
 <pre>
                 const Node&amp; curr_node = mesh.node(n_cnt);
-                
+        	
 </pre>
 </div>
 <div class = "comment">
@@ -976,9 +976,9 @@ Check the location of the current node.
 <div class ="fragment">
 <pre>
                 if (fabs(curr_node(0)) &lt; TOLERANCE &amp;&amp;
-                    fabs(curr_node(1)) &lt; TOLERANCE &amp;&amp;
-                    fabs(curr_node(2)) &lt; TOLERANCE)
-                  {
+        	    fabs(curr_node(1)) < TOLERANCE &&
+        	    fabs(curr_node(2)) < TOLERANCE)
+        	  {
 </pre>
 </div>
 <div class = "comment">
@@ -989,8 +989,8 @@ The global number of the respective degree of freedom.
 <pre>
                     unsigned int dn = curr_node.dof_number(0,0,0);
         
-                    es("Wave").rhs-&gt;add (dn, 1.);
-                  }
+        	    es("Wave").rhs->add (dn, 1.);
+        	  }
               }
           }
         
@@ -1371,16 +1371,16 @@ Running ex6 with dim = 3
  ---------------------------------------------------------------------------- 
 
  ----------------------------------------------------------------------------
-| Time:           Mon Nov 10 15:43:00 2003
+| Time:           Mon Nov 10 22:54:46 2003
 | OS:             Linux
-| HostName:       hactar
+| HostName:       ariel
 | OS Release      2.4.20-19.9smp
 | OS Version:     #1 SMP Tue Jul 15 17:04:18 EDT 2003
 | Machine:        i686
 | Username:       benkirk
  ----------------------------------------------------------------------------
  ----------------------------------------------------------------------------
-| libMesh Performance: Alive time=0.337065, Active time=0.244409
+| libMesh Performance: Alive time=0.413004, Active time=0.336061
  ----------------------------------------------------------------------------
 | Event                         nCalls  Total       Avg         Percent of   |
 |                                       Time        Time        Active Time  |
@@ -1388,36 +1388,36 @@ Running ex6 with dim = 3
 |                                                                            |
 |                                                                            |
 | DofMap                                                                     |
-|   compute_sparsity()          1       0.0112      0.011171    4.57         |
-|   create_dof_constraints()    1       0.0001      0.000090    0.04         |
-|   distribute_dofs()           1       0.0004      0.000409    0.17         |
-|   dof_indices()               320     0.0028      0.000009    1.14         |
-|   reinit()                    1       0.0011      0.001140    0.47         |
+|   compute_sparsity()          1       0.0119      0.011876    3.53         |
+|   create_dof_constraints()    1       0.0001      0.000096    0.03         |
+|   distribute_dofs()           1       0.0006      0.000633    0.19         |
+|   dof_indices()               320     0.0031      0.000010    0.93         |
+|   reinit()                    1       0.0015      0.001529    0.45         |
 |                                                                            |
 | FE                                                                         |
-|   compute_map()               160     0.0031      0.000019    1.26         |
-|   compute_shape_functions()   64      0.0008      0.000012    0.32         |
-|   init_shape_functions()      2       0.0003      0.000163    0.13         |
+|   compute_map()               160     0.0042      0.000026    1.26         |
+|   compute_shape_functions()   64      0.0010      0.000015    0.29         |
+|   init_shape_functions()      2       0.0004      0.000189    0.11         |
 |                                                                            |
 | InfFE                                                                      |
-|   combine_base_radial()       96      0.0050      0.000052    2.05         |
-|   compute_shape_functions()   96      0.0039      0.000041    1.60         |
-|   init_radial_shape_functions()1       0.0001      0.000062    0.03         |
-|   init_shape_functions()      1       0.0002      0.000152    0.06         |
+|   combine_base_radial()       96      0.0082      0.000085    2.43         |
+|   compute_shape_functions()   96      0.0052      0.000054    1.56         |
+|   init_radial_shape_functions()1       0.0001      0.000067    0.02         |
+|   init_shape_functions()      1       0.0002      0.000208    0.06         |
 |                                                                            |
 | Mesh                                                                       |
-|   build_cube()                1       0.0012      0.001225    0.50         |
+|   build_cube()                1       0.0014      0.001363    0.41         |
 |                                                                            |
 | MeshBase                                                                   |
-|   build_inf_elem()            1       0.0032      0.003165    1.29         |
-|   find_neighbors()            4       0.0106      0.002643    4.33         |
-|   renumber_nodes_and_elem()   2       0.0001      0.000070    0.06         |
+|   build_inf_elem()            1       0.0040      0.003987    1.19         |
+|   find_neighbors()            4       0.0156      0.003906    4.65         |
+|   renumber_nodes_and_elem()   2       0.0002      0.000085    0.05         |
 |                                                                            |
 | SystemBase                                                                 |
-|   assemble()                  1       0.1247      0.124672    51.01        |
-|   solve()                     1       0.0757      0.075720    30.98        |
+|   assemble()                  1       0.1962      0.196217    58.39        |
+|   solve()                     1       0.0822      0.082198    24.46        |
  ----------------------------------------------------------------------------
-| Totals:                       754     0.2444                  100.00       |
+| Totals:                       754     0.3361                  100.00       |
  ----------------------------------------------------------------------------
 
  

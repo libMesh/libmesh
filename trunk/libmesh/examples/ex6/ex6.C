@@ -1,4 +1,4 @@
-/* $Id: ex6.C,v 1.28 2003-11-10 16:55:31 benkirk Exp $ */
+/* $Id: ex6.C,v 1.29 2003-11-11 04:58:33 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -20,7 +20,7 @@
 
 
 
- // Example 6 -- Infinite Elements for the Wave Equation
+ // <h1>Example 6 - Infinite Elements for the Wave Equation</h1>
  //
  // This is the sixth example program.  It builds on
  // the previous examples, and introduces the Infinite

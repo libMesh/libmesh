@@ -1,4 +1,4 @@
-/* $Id: ex4.C,v 1.34 2003-11-07 17:41:08 benkirk Exp $ */
+/* $Id: ex4.C,v 1.35 2003-11-11 04:58:33 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -19,7 +19,7 @@
 
 
 
- // Example 4 -- Solving a 2D or 3D Poisson Problem in Parallel
+ // <h1>Example 4 - Solving a 2D or 3D Poisson Problem in Parallel</h1>
  //
  // This is the fourth example program.  It builds on
  // the third example program by showing how to formulate

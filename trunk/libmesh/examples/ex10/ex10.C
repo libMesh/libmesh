@@ -1,4 +1,4 @@
-/* $Id: ex10.C,v 1.8 2003-11-07 18:50:46 jwpeterson Exp $ */
+/* $Id: ex10.C,v 1.9 2003-11-11 04:58:33 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -17,7 +17,7 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
-  // Example 10 -- Solving a Transient System with Adaptive Mesh Refinement
+  // <h1>Example 10 - Solving a Transient System with Adaptive Mesh Refinement</h1>
   // 
   // This example shows how a simple, linear transient
   // system can be solved in parallel.  The system is simple

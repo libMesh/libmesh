@@ -12,7 +12,7 @@
 <div class="content">
 <a name="comments"></a> 
 <div class = "comment">
-Example 2 -- Defining a Simple System
+<h1>Example 2 - Defining a Simple System</h1>
 
 <br><br>This is the second example program.  It demonstrates how to
 create an equation system for a simple scalar system.  This
@@ -98,9 +98,9 @@ exact name of the program being run, and its command line.
 <div class ="fragment">
 <pre>
             std::cout &lt;&lt; "Running " &lt;&lt; argv[0];
-            for (int i=1; i&lt;argc; i++)
-              std::cout &lt;&lt; " " &lt;&lt; argv[i];
-            std::cout &lt;&lt; std::endl &lt;&lt; std::endl;
+            for (int i=1; i<argc; i++)
+              std::cout << " " << argv[i];
+            std::cout << std::endl << std::endl;
             
 </pre>
 </div>
@@ -249,10 +249,10 @@ this data later.
 <pre>
             if (argc == 2)
               if (argv[1][0] != '-')
-                {
-                  std::cout &lt;&lt; "&lt;&lt;&lt; Writing system to file " &lt;&lt; argv[1]
-                            &lt;&lt; std::endl;
-                  
+        	{
+        	  std::cout << "<<< Writing system to file " << argv[1]
+        		    << std::endl;
+        	  
 </pre>
 </div>
 <div class = "comment">
@@ -262,7 +262,7 @@ Write the system.
 <div class ="fragment">
 <pre>
                   equation_systems.write (argv[1], libMeshEnums::WRITE);
-                  
+        	  
 </pre>
 </div>
 <div class = "comment">
@@ -273,9 +273,9 @@ Clear the equation systems data structure.
 <pre>
                   equation_systems.clear ();
         
-                  std::cout &lt;&lt; "&gt;&gt;&gt; Reading system from file " &lt;&lt; argv[1]
-                            &lt;&lt; std::endl &lt;&lt; std::endl;
-                  
+        	  std::cout << ">>> Reading system from file " << argv[1]
+        		    << std::endl << std::endl;
+        	  
 </pre>
 </div>
 <div class = "comment">
@@ -296,7 +296,7 @@ Print the information again.
 <div class ="fragment">
 <pre>
                   equation_systems.print_info();
-                }
+        	}
             
 </pre>
 </div>
@@ -413,8 +413,9 @@ Running ./ex2
    System "Simple System"
     Type "Steady"
     Variables="u" 
-    Finite Element Types="0" 
-    Approximation Orders="1" 
+    Finite Element Types="0", "12" 
+    Infinite Element Mapping="0" 
+    Approximation Orders="1", "3" 
     n_dofs()=36
     n_local_dofs()=36
     n_constrained_dofs()=0
@@ -456,6 +457,39 @@ Running ./ex2
 | Creations:    1
 | Destructions: 1
  ---------------------------------------------------------------------------- 
+
+ ----------------------------------------------------------------------------
+| Time:           Mon Nov 10 22:54:14 2003
+| OS:             Linux
+| HostName:       ariel
+| OS Release      2.4.20-19.9smp
+| OS Version:     #1 SMP Tue Jul 15 17:04:18 EDT 2003
+| Machine:        i686
+| Username:       benkirk
+ ----------------------------------------------------------------------------
+ ----------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.077615, Active time=0.001467
+ ----------------------------------------------------------------------------
+| Event                         nCalls  Total       Avg         Percent of   |
+|                                       Time        Time        Active Time  |
+|----------------------------------------------------------------------------|
+|                                                                            |
+|                                                                            |
+| DofMap                                                                     |
+|   create_dof_constraints()    1       0.0000      0.000028    1.91         |
+|   distribute_dofs()           1       0.0001      0.000106    7.23         |
+|   reinit()                    1       0.0002      0.000239    16.29        |
+|                                                                            |
+| Mesh                                                                       |
+|   build_cube()                1       0.0005      0.000537    36.61        |
+|                                                                            |
+| MeshBase                                                                   |
+|   find_neighbors()            1       0.0005      0.000534    36.40        |
+|   renumber_nodes_and_elem()   1       0.0000      0.000023    1.57         |
+ ----------------------------------------------------------------------------
+| Totals:                       6       0.0015                  100.00       |
+ ----------------------------------------------------------------------------
+
  
 Running ./ex2 eqn_sys.dat
 
@@ -475,8 +509,9 @@ Running ./ex2 eqn_sys.dat
    System "Simple System"
     Type "Steady"
     Variables="u" 
-    Finite Element Types="0" 
-    Approximation Orders="1" 
+    Finite Element Types="0", "12" 
+    Infinite Element Mapping="0" 
+    Approximation Orders="1", "3" 
     n_dofs()=36
     n_local_dofs()=36
     n_constrained_dofs()=0
@@ -500,8 +535,9 @@ Running ./ex2 eqn_sys.dat
    System "Simple System"
     Type "Steady"
     Variables="u" 
-    Finite Element Types="0" 
-    Approximation Orders="1" 
+    Finite Element Types="0", "12" 
+    Infinite Element Mapping="0" 
+    Approximation Orders="1", "3" 
     n_dofs()=36
     n_local_dofs()=36
     n_constrained_dofs()=0
@@ -543,6 +579,39 @@ Running ./ex2 eqn_sys.dat
 | Creations:    2
 | Destructions: 2
  ---------------------------------------------------------------------------- 
+
+ ----------------------------------------------------------------------------
+| Time:           Mon Nov 10 22:54:14 2003
+| OS:             Linux
+| HostName:       ariel
+| OS Release      2.4.20-19.9smp
+| OS Version:     #1 SMP Tue Jul 15 17:04:18 EDT 2003
+| Machine:        i686
+| Username:       benkirk
+ ----------------------------------------------------------------------------
+ ----------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.084812, Active time=0.001735
+ ----------------------------------------------------------------------------
+| Event                         nCalls  Total       Avg         Percent of   |
+|                                       Time        Time        Active Time  |
+|----------------------------------------------------------------------------|
+|                                                                            |
+|                                                                            |
+| DofMap                                                                     |
+|   create_dof_constraints()    2       0.0000      0.000023    2.65         |
+|   distribute_dofs()           2       0.0002      0.000089    10.26        |
+|   reinit()                    2       0.0005      0.000238    27.44        |
+|                                                                            |
+| Mesh                                                                       |
+|   build_cube()                1       0.0005      0.000477    27.49        |
+|                                                                            |
+| MeshBase                                                                   |
+|   find_neighbors()            1       0.0005      0.000536    30.89        |
+|   renumber_nodes_and_elem()   1       0.0000      0.000022    1.27         |
+ ----------------------------------------------------------------------------
+| Totals:                       9       0.0017                  100.00       |
+ ----------------------------------------------------------------------------
+
  
 ***************************************************************
 * Done Running Example  ./ex2
