@@ -1,4 +1,4 @@
-//    $Id: petsc_matrix.h,v 1.23 2003-03-21 17:15:04 spetersen Exp $
+//    $Id: petsc_matrix.h,v 1.24 2003-03-23 01:39:11 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -204,17 +204,17 @@ public:
 		   const std::vector<unsigned int> &dof_indices);	     
       
   /**
-   * Add a Sparse matrix \p _X, scaled with \p _a, to \p this,
+   * Add a Sparse matrix \p X, scaled with \p a, to \p this,
    * stores the result in \p this: 
-   * \f$\texttt{this} = \_a*\_X + \texttt{this} \f$.
+   * \f$\texttt{this} = a*X + \texttt{this} \f$.
    * Use this with caution, the sparse matrices need to have the
    * same nonzero pattern, otherwise \p PETSc will crash! 
    * It is advisable to not only allocate appropriate memory with 
    * \p init() , but also explicitly zero the terms of \p this
-   * whenever you add a non-zero value to \p _X.  Note: \p _X will 
+   * whenever you add a non-zero value to \p X.  Note: \p X will 
    * be closed, if not already done, before performing any work.
    */
-  void add (const T _a, SparseMatrix<T> &_X);
+  void add (const T a, SparseMatrix<T> &X);
     
   /**
    * Return the value of the entry
@@ -486,17 +486,17 @@ void PetscMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 
 template <typename T>
 inline
-void PetscMatrix<T>::add (const T _a, SparseMatrix<T> &_X)
+void PetscMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
 {
   assert (this->initialized());
 
   // sanity check. but this cannot avoid 
   // crash due to incompatible sparsity structure...
-  assert (this->m() == _X.m());
-  assert (this->n() == _X.n());
+  assert (this->m() == X_in.m());
+  assert (this->n() == X_in.n());
 
-  PetscScalar     a = static_cast<PetscScalar>      (_a);
-  PetscMatrix<T>& X = dynamic_cast<PetscMatrix<T>&> (_X);
+  PetscScalar     a = static_cast<PetscScalar>      (a_in);
+  PetscMatrix<T>& X = dynamic_cast<PetscMatrix<T>&> (X_in);
   int ierr=0;
 
   // the matrix from which we copy the values has to be assembled/closed

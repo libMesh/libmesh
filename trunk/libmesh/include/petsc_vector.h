@@ -1,4 +1,4 @@
-// $Id: petsc_vector.h,v 1.17 2003-03-21 17:15:05 spetersen Exp $
+// $Id: petsc_vector.h,v 1.18 2003-03-23 01:39:11 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -304,8 +304,8 @@ public:
    * Add the product of a Sparse matrix \p A
    * and a Numeric vector \p V to this Numeric vector.
    */
-  void add_vector (const NumericVector<T> &_V,
-		   SparseMatrix<T> &_A);
+  void add_vector (const NumericVector<T> &V,
+		   SparseMatrix<T> &A);
      
   /**
    * U+=V where U and V are type 

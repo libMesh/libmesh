@@ -1,4 +1,4 @@
-// $Id: laspack_matrix.h,v 1.12 2003-03-20 11:51:24 ddreyer Exp $
+// $Id: laspack_matrix.h,v 1.13 2003-03-23 01:39:10 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk, John W. Peterson
@@ -207,16 +207,13 @@ public:
 		   const std::vector<unsigned int> &dof_indices);
       
   /**
-   * Add a Sparse matrix \p _X, scaled with \p _a, to \p this,
-   * stores the result in \p this: 
-   * \f$\texttt{this} = \_a*\_X + \texttt{this} \f$.
-   * Since LASPACK does not provide a true \p axpy for matrices,
-   * @e two operations have to be performed consecutively,
-   * the multiplication and the addition.  For a non-scaled
-   * version of adding a sparse matrix, this method is probably 
-   * not the most efficient way of doing so.
+   * Add a Sparse matrix \p X, scaled with \p a, to \p this,
+   * stores the result in \p this: \f$\texttt{this} += a*X \f$.
+   * \p LASPACK does not provide a true \p axpy for matrices,
+   * so a hand-coded version with hopefully acceptable performance
+   * is provided.
    */
-  void add (const T _a, SparseMatrix<T> &_X);
+  void add (const T a, SparseMatrix<T> &X);
       
   /**
    * Return the value of the entry
@@ -339,7 +336,7 @@ template <typename T>
 inline
 void LaspackMatrix<T>::clear ()
 {
-  if (initialized())
+  if (this->initialized())
     {
       Q_Destr(&_QMat);
     }
@@ -347,7 +344,7 @@ void LaspackMatrix<T>::clear ()
   _csr.clear();
   _row_start.clear();
   _closed = false;
-  _is_initialized = false;
+  this->_is_initialized = false;
 }
 
 
@@ -390,7 +387,7 @@ template <typename T>
 inline
 unsigned int LaspackMatrix<T>::m () const
 {
-  assert (initialized());
+  assert (this->initialized());
 
   return static_cast<unsigned int>(Q_GetDim(const_cast<QMatrix*>(&_QMat)));
 }
@@ -401,7 +398,7 @@ template <typename T>
 inline
 unsigned int LaspackMatrix<T>::n () const
 {
-  assert (initialized());
+  assert (this->initialized());
   
   return static_cast<unsigned int>(Q_GetDim(const_cast<QMatrix*>(&_QMat)));
 }
@@ -432,7 +429,7 @@ void LaspackMatrix<T>::set (const unsigned int i,
 			    const unsigned int j,
 			    const T value)
 {
-  assert (initialized());
+  assert (this->initialized());
   assert (i < m());
   assert (j < n());
   
@@ -453,7 +450,7 @@ void LaspackMatrix<T>::add (const unsigned int i,
 			    const unsigned int j,
 			    const T value)
 {
-  assert (initialized());
+  assert (this->initialized());
   assert (i < m());
   assert (j < n());
   
@@ -484,7 +481,7 @@ void LaspackMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 			       const std::vector<unsigned int>& cols)
 		    
 {
-  assert (initialized());
+  assert (this->initialized());
   assert (dm.m() == rows.size());
   assert (dm.n() == cols.size());
 
@@ -497,14 +494,14 @@ void LaspackMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 
 
 template <typename T>
-void LaspackMatrix<T>::add (const T _a, SparseMatrix<T> &_X)
+void LaspackMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
 {
-  assert (initialized());
-  assert (this->m() == _X.m());
-  assert (this->n() == _X.n());
+  assert (this->initialized());
+  assert (this->m() == X_in.m());
+  assert (this->n() == X_in.n());
 
-  LaspackMatrix<T>& X = dynamic_cast<LaspackMatrix<T>&> (_X);
-  _LPNumber         a = static_cast<_LPNumber>          (_a);
+  LaspackMatrix<T>& X = dynamic_cast<LaspackMatrix<T>&> (X_in);
+  _LPNumber         a = static_cast<_LPNumber>          (a_in);
 
   // loops taken from LaspackMatrix<T>::zero ()
 
@@ -542,7 +539,7 @@ inline
 T LaspackMatrix<T>::operator () (const unsigned int i,
 				 const unsigned int j) const
 {
-  assert (initialized());
+  assert (this->initialized());
   assert (i < m());
   assert (j < n());
   

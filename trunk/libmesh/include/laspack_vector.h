@@ -1,4 +1,4 @@
-// $Id: laspack_vector.h,v 1.11 2003-03-21 17:15:04 spetersen Exp $
+// $Id: laspack_vector.h,v 1.12 2003-03-23 01:39:11 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -384,7 +384,7 @@ template <typename T>
 inline
 LaspackVector<T>::~LaspackVector ()
 {
-  clear ();
+  this->clear ();
 }
 
 
@@ -399,7 +399,7 @@ void LaspackVector<T>::init (const unsigned int n,
   assert (n == n_local);
 
   // Only for uninitialized vectors
-  if (initialized())
+  if (this->initialized())
     {
       std::cerr << "ERROR: Vector already initialized!"
 		<< std::endl;      
@@ -414,7 +414,7 @@ void LaspackVector<T>::init (const unsigned int n,
 
   V_Constr(&_vec, const_cast<char*>(foo), n, Normal, _LPTrue);
     
-  _is_initialized = true;
+  this->_is_initialized = true;
   
   // Optionally zero out all components
   if (fast == false)
@@ -439,9 +439,9 @@ template <typename T>
 inline
 void LaspackVector<T>::close ()
 {
-  assert (initialized());
+  assert (this->initialized());
   
-  _is_closed = true;
+  this->_is_closed = true;
   
   return;
 }
@@ -452,12 +452,12 @@ template <typename T>
 inline
 void LaspackVector<T>::clear ()
 {
-  if (initialized())
+  if (this->initialized())
     {
       V_Destr (&_vec);
     }
 
-  _is_closed = _is_initialized = false;
+  this->_is_closed = this->_is_initialized = false;
 }
 
 
@@ -465,7 +465,7 @@ void LaspackVector<T>::clear ()
 template <typename T> inline
 void LaspackVector<T>::zero ()
 {
-  assert (initialized());
+  assert (this->initialized());
 
   V_SetAllCmp (&_vec, 0.);
 }
@@ -476,7 +476,7 @@ template <typename T>
 inline
 unsigned int LaspackVector<T>::size () const
 {
-  assert (initialized());
+  assert (this->initialized());
 
   return static_cast<unsigned int>(V_GetDim(const_cast<QVector*>(&_vec)));
 }
@@ -487,7 +487,7 @@ template <typename T>
 inline
 unsigned int LaspackVector<T>::local_size () const
 {
-  assert (initialized());
+  assert (this->initialized());
   
   return size();
 }
@@ -498,7 +498,7 @@ template <typename T>
 inline
 unsigned int LaspackVector<T>::first_local_index () const
 {
-  assert (initialized());
+  assert (this->initialized());
   
   return 0;
 }
@@ -509,7 +509,7 @@ template <typename T>
 inline
 unsigned int LaspackVector<T>::last_local_index () const
 {
-  assert (initialized());
+  assert (this->initialized());
   
   return size();
 }
@@ -520,7 +520,7 @@ template <typename T>
 inline
 void LaspackVector<T>::set (const unsigned int i, const T value)
 {
-  assert(initialized());
+  assert(this->initialized());
   assert(i<size());
   
   V_SetCmp (&_vec, i+1, value);
@@ -532,7 +532,7 @@ template <typename T>
 inline
 void LaspackVector<T>::add (const unsigned int i, const T value)
 {
-  assert(initialized());
+  assert(this->initialized());
   assert(i<size());
   
   V_AddCmp (&_vec, i+1, value);
@@ -544,7 +544,7 @@ template <typename T>
 inline
 T LaspackVector<T>::operator() (const unsigned int i) const
 {
-  assert (initialized());
+  assert (this->initialized());
   assert ( ((i >= first_local_index()) &&
 	    (i <  last_local_index())) );
 
@@ -609,7 +609,7 @@ template <typename T>
 inline
 Real LaspackVector<T>::max() const
 {
-  assert (initialized());
+  assert (this->initialized());
 
   return static_cast<Real>(MaxNorm_V(const_cast<QVector*>(&_vec)));
 }

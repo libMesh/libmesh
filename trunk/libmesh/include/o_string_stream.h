@@ -1,4 +1,4 @@
-// $Id: o_string_stream.h,v 1.1 2003-03-22 21:04:30 ddreyer Exp $
+// $Id: o_string_stream.h,v 1.2 2003-03-23 01:39:11 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -60,7 +60,7 @@ public:
   /**
    * Default constructor.
    */
-  OStringStream () {};
+  OStringStream () : std::ostringstream() {};
 
   /**
    * Default destructor.
@@ -73,46 +73,46 @@ public:
   typedef std::string::size_type sizetype;
 
   /**
-   * @returns a \p OStringStream, where \p s
+   * Outputs in a \p OStringStream, where \p s
    * was directed in ragged left style with
    * size \p w.
    */
-  OStringStream& left (const sizetype w,
-		       const std::string& s);
+  void left (const sizetype w,
+	     const std::string& s);
 
   /**
-   * @returns a \p OStringStream, where \p r
+   * Outputs in a \p OStringStream, where \p r
    * was directed in ragged left style with
    * size \p w and precision \p prec.
    */
-  OStringStream& left (const sizetype w,
-		       const sizetype prec,
-		       const Real r);
+  void left (const sizetype w,
+	     const sizetype prec,
+	     const Real r);
 
   /**
-   * @returns a \p OStringStream, where \p r
+   * Outputs in a \p OStringStream, where \p r
    * was directed in ragged left style with
    * size \p w.
    */
-  OStringStream& left (const sizetype w,
-		       const int n);
+  void left (const sizetype w,
+	     const int n);
 
   /**
-   * @returns a \p OStringStream, where \p s
+   * Outputs in a \p OStringStream, where \p s
    * was directed in ragged right style with
    * size \p w.
    */
-  OStringStream& right (const sizetype w,
-			const std::string& s);
+  void right (const sizetype w,
+	      const std::string& s);
 
 
   /**
-   * @returns a \p OStringStream, where \p r
+   * Outputs in a \p OStringStream, where \p r
    * was directed in scientific style with
    * size \p w.
    */
-  OStringStream& scientific (const sizetype w,
-			     const Real r);
+  void scientific (const sizetype w,
+		   const Real r);
 
 protected:
 
@@ -130,8 +130,8 @@ protected:
 // ------------------------------------------------------------
 // OStringStream inline methods
 inline
-OStringStream& OStringStream::left (const sizetype w,
-				    const std::string& s)
+void OStringStream::left (const sizetype w,
+			  const std::string& s)
 {
 #ifndef BROKEN_IOSTREAM
   this->width(w);
@@ -141,15 +141,14 @@ OStringStream& OStringStream::left (const sizetype w,
   // pad with whitespaces afterwards
   print_ws ((w-s.size()));
 #endif
-  return *this;
 }
 
 
 
 inline
-OStringStream& OStringStream::left (const sizetype w,
-				    const sizetype prec,
-				    const Real r)
+void OStringStream::left (const sizetype w,
+			  const sizetype prec,
+			  const Real r)
 {
 #ifndef BROKEN_IOSTREAM
   this->width(w);
@@ -169,15 +168,14 @@ OStringStream& OStringStream::left (const sizetype w,
   print_ws (w-std::string(buf).size());
 //  print_ws (w-int((w-prec)/2));
 #endif
-  return *this;
 }
 
 
 
 
 inline
-OStringStream& OStringStream::left (const sizetype w,
-				    const int n)
+void OStringStream::left (const sizetype w,
+			  const int n)
 {
 #ifndef BROKEN_IOSTREAM
   this->width(w);
@@ -191,15 +189,13 @@ OStringStream& OStringStream::left (const sizetype w,
   // pad with whitespaces afterwards
   print_ws (w-std::string(buf).size());
 #endif
-  return *this;
-
 }
 
 
 
 inline
-OStringStream& OStringStream::right (const sizetype w,
-				     const std::string& s)
+void OStringStream::right (const sizetype w,
+			   const std::string& s)
 {
 #ifndef BROKEN_IOSTREAM
   this->width(w);
@@ -209,14 +205,13 @@ OStringStream& OStringStream::right (const sizetype w,
   print_ws ((w-s.size()));
   *this << s;
 #endif
-  return *this;
 }
 
 
 
 inline
-OStringStream& OStringStream::scientific (const sizetype w,
-					  const Real r)
+void OStringStream::scientific (const sizetype w,
+				const Real r)
 {
 #ifndef BROKEN_IOSTREAM
   *this << std::setw(w)
@@ -232,7 +227,6 @@ OStringStream& OStringStream::scientific (const sizetype w,
   sprintf (buf, format, r);
   *this << buf;
 #endif
-  return *this;
 }
 
 
