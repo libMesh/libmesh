@@ -1,4 +1,4 @@
-// $Id: point.C,v 1.11 2003-02-24 14:35:48 benkirk Exp $
+// $Id: point.C,v 1.12 2003-05-21 15:27:38 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -33,7 +33,7 @@
 // Point class member funcions
 Point Point::cross(const Point& p) const
 {
-  assert(DIM == 3);
+  assert (DIM == 3);
 
   // |     i          j          k    |
   // |(*this)(0) (*this)(1) (*this)(2)|
