@@ -1,4 +1,4 @@
-// $Id: gmv_io.h,v 1.4 2004-08-05 20:20:09 jwpeterson Exp $
+// $Id: gmv_io.h,v 1.5 2004-11-15 00:20:44 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -100,35 +100,37 @@ class GMVIO : public MeshIO<MeshBase>
 				const bool write_partitioning) const;
   
 
+  /**
+   * This method implements writing a mesh with nodal data to a
+   * specified file where the nodal data and variable names are optionally
+   * provided.  This will write an ASCII file.   This is the new implementation
+   * (without subcells).
+   */
+  void write_ascii_new_impl (const std::string&,
+			     const std::vector<Number>* = NULL,
+			     const std::vector<std::string>* = NULL);
+
 private:
 
   /**
    * This method implements writing a mesh with nodal data to a
    * specified file where the nodal data and variable names are optionally
-   * provided.  This will write an ASCII file.
+   * provided.  This will write an ASCII file.  This is the old implementation
+   * (using subcells) which was the default in libMesh-0.4.3-rc2.
    */
-  virtual void write_ascii (const std::string&,
-			    const std::vector<Number>* = NULL,
-			    const std::vector<std::string>* = NULL);
-
-//   /**
-//    * This method implements writing a mesh with nodal data to a
-//    * specified file where the nodal data and variable names are optionally
-//    * provided.  This will write an ASCII file as discontinuous patches
-//    */
-//   virtual void write_discontinuous_ascii (const std::string&,
-// 					  const std::vector<Number>* = NULL,
-// 					  const std::vector<std::string>* = NULL);
+  void write_ascii_old_impl (const std::string&,
+			     const std::vector<Number>* = NULL,
+			     const std::vector<std::string>* = NULL);
 
   /**
    * This method implements writing a mesh with nodal data to a
    * specified file where the nodal data and variable names are optionally
    * provided.  
    */
-  virtual void write_binary (const std::string&,
-			     const std::vector<Number>* = NULL,
-			     const std::vector<std::string>* = NULL);
-
+  void write_binary (const std::string&,
+		     const std::vector<Number>* = NULL,
+		     const std::vector<std::string>* = NULL);
+  
   /**
    * Helper function for writing unsigned ints to an ostream in binary format.
    * Implemented via memcpy as suggested in the standard.
