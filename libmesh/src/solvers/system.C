@@ -1,4 +1,4 @@
-// $Id: system.C,v 1.6 2004-03-24 05:49:12 jwpeterson Exp $
+// $Id: system.C,v 1.7 2004-09-27 15:56:49 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -42,17 +42,18 @@ System::System (EquationSystems& es,
 		const std::string& name,
 		const unsigned int number) :
   
-   init_system             (NULL),
-   assemble_system         (NULL),
-  solution                (NumericVector<Number>::build()),
-  current_local_solution  (NumericVector<Number>::build()),
-  _sys_name               (name),
-  _sys_number             (number),
-  _active                 (true),
-  _can_add_vectors        (true),
-  _dof_map                (number),
-  _equation_systems       (es),
-  _mesh                   (es.get_mesh())
+  init_system              (NULL),
+  assemble_system          (NULL),
+  solution                 (NumericVector<Number>::build()),
+  current_local_solution   (NumericVector<Number>::build()),
+  _sys_name                (name),
+  _sys_number              (number),
+  _active                  (true),
+  _can_add_vectors         (true),
+  _additional_data_written (false),
+  _dof_map                 (number),
+  _equation_systems        (es),
+  _mesh                    (es.get_mesh())
 {
 }
 

@@ -1,4 +1,4 @@
-// $Id: system_io.C,v 1.5 2004-09-27 13:41:48 jwpeterson Exp $
+// $Id: system_io.C,v 1.6 2004-09-27 15:56:49 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -175,6 +175,14 @@ void System::read (Xdr& io,
   
   io.data (n_vectors);
 
+  /**
+   * If n_vectors > 0, this means that write_additional_data
+   * was true when this file was written.  We will need to
+   * make use of this fact later.
+   */
+  if (n_vectors > 0)
+    this->_additional_data_written = true;  
+  
   for (unsigned int vec=0; vec<n_vectors; vec++)
     {
       /**
@@ -302,9 +310,11 @@ void System::read_data (Xdr& io,
 
   /**
    * For each additional vector, simply go through the list.
+   * ONLY attempt to do this IF additional data was actually
+   * written to the file for this system (controlled by the
+   * _additional_data_written flag).  
    */
-
-  if (read_additional_data)
+  if (this->_additional_data_written)
     {
       std::map<std::string, NumericVector<Number>* >::iterator
 	pos = this->_vectors.begin();
@@ -325,6 +335,8 @@ void System::read_data (Xdr& io,
 	  io.data (global_vector);	  
 
 
+	  // If read_additional_data==true, then we will keep this vector, otherwise
+	  // we are going to throw it away.
 	  if (read_additional_data)
 	    {
 	      /**
@@ -381,7 +393,7 @@ void System::read_data (Xdr& io,
 	      *(pos->second) = reordered_vector;
 	    }
 	}
-    }
+    } // end if (_additional_data_written)    
 }
 
 
