@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.34 2004-03-20 05:36:27 jwpeterson Exp $
+// $Id: mesh.C,v 1.35 2004-03-20 15:16:56 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -27,17 +27,19 @@
 #include "mesh_communication.h"
 #include "libmesh_logging.h"
 
-#include "ucd_io.h"
-#include "unv_io.h"
+
+#include "diva_io.h"
+#include "gmv_io.h"
 #include "tecplot_io.h"
 #include "tetgen_io.h"
-#include "diva_io.h"
+#include "ucd_io.h"
+#include "unv_io.h"
 
 
 // ------------------------------------------------------------
 // Mesh class member functions
 Mesh::Mesh (unsigned int d) :
-  MeshBase      (d)
+  MeshBase (d)
 {
   assert (libMesh::initialized());
 }
@@ -163,9 +165,13 @@ void Mesh::write (const std::string& name)
     else if (name.rfind(".gmv") < name.size())
       {
 	if (this->n_subdomains() > 1)
-	  this->write_gmv_binary(name, NULL, NULL, true);
+	  GMVIO(*this).write (name);
 	else
-	  this->write_gmv_binary(name);
+	  {
+	    GMVIO io(*this);
+	    io.partitioning() = false;
+	    io.write (name);
+	  }
       }
 
     else if (name.rfind(".ugrid") < name.size())
@@ -228,9 +234,13 @@ void Mesh::write (const std::string& name,
     else if (name.rfind(".gmv") < name.size())
       {
 	if (n_subdomains() > 1)
-	  this->write_gmv_binary(name, &v, &vn, true);
+	  GMVIO(*this).write_nodal_data (name, v, vn);
 	else
-	  this->write_gmv_binary(name, &v, &vn);
+	  {
+	    GMVIO io(*this);
+	    io.partitioning() = false;
+	    io.write_nodal_data (name, v, vn);
+	  }
       }    
     else
       {

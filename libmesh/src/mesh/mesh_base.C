@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.69 2004-03-19 19:16:53 benkirk Exp $
+// $Id: mesh_base.C,v 1.70 2004-03-20 15:16:57 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -41,6 +41,7 @@
 #include "face_tri3.h"
 #include "face_tri6.h"
 #include "libmesh_logging.h"
+#include "gmv_io.h"
 #include "metis_partitioner.h" // for default partitioning
 
 
@@ -523,7 +524,7 @@ void MeshBase::find_neighbors()
 	      if (!elem->neighbor(s)->active())
 		{
 		  std::cerr << "I'm confused..." << std::endl;
-		  this->write_gmv("bad_mesh.gmv");
+		  GMVIO(*dynamic_cast<Mesh*>(this)).write ("bad_mesh.gmv");
 		  error();
 		}
 #endif
@@ -1046,75 +1047,20 @@ void MeshBase::read (const std::string&)
 
 
 
-void MeshBase::write(const std::string& name)
+void MeshBase::write(const std::string&)
 {
-  START_LOG("write()", "MeshBase");
-  
-  // Write the file based on extension
-  if (name.rfind(".gmv") < name.size())
-    {
-      if (n_subdomains() > 1)
-	this->write_gmv_binary(name, NULL, NULL, true);
-      else
-	this->write_gmv_binary(name);
-    }
-
-  STOP_LOG("write()", "MeshBase");
+  std::cerr << "ERROR:  You shouldn't be calling this" << std::endl
+	    << " Use Mesh::write() instead." << std::endl;
+  error();
 }
 
 
 
-void MeshBase::write(const std::string& name,
-		     const std::vector<Number>& v,
-		     const std::vector<std::string>& vn)
+void MeshBase::write(const std::string&,
+		     const std::vector<Number>&,
+		     const std::vector<std::string>&)
 {
-  START_LOG("write()", "MeshBase");
-  
-  // Write the file based on extension
-  if (name.rfind(".gmv") < name.size())
-    {
-      if (this->n_subdomains() > 1)
-	this->write_gmv_binary(name, &v, &vn, true);
-      else
-	this->write_gmv_binary(name, &v, &vn);
-    }
-
-  STOP_LOG("write()", "MeshBase");
+  std::cerr << "ERROR:  You shouldn't be calling this" << std::endl
+	    << " Use Mesh::write() instead." << std::endl;
+  error();
 }
-
-
-
-#ifdef USE_COMPLEX_NUMBERS
-
-const char* MeshBase::complex_filename(const std::string& _n,
-				       unsigned int r_o_c) const
-{
-  std::string loc=_n;
-  
-  if (r_o_c == 0)
-    loc.append(".real");
-  
-  else
-    loc.append(".imag");
-  
-  return loc.c_str();
-}
-
-
-
-void MeshBase::prepare_complex_data(const std::vector<Number>* source,
-				    std::vector<Real>* real_part,
-				    std::vector<Real>* imag_part) const
-{
-  real_part->resize(source->size());
-  imag_part->resize(source->size());
-
-
-  for (unsigned int i=0; i<source->size(); i++)
-    {
-      (*real_part)[i] = (*source)[i].real();
-      (*imag_part)[i] = (*source)[i].imag();
-    }
-}
-
-#endif // #ifdef USE_COMPLEX_NUMBERS

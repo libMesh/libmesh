@@ -1,4 +1,4 @@
-/* $Id: ex8.C,v 1.9 2003-11-11 13:19:41 benkirk Exp $ */
+/* $Id: ex8.C,v 1.10 2004-03-20 15:16:56 benkirk Exp $ */
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
 
@@ -42,6 +42,7 @@
 // Basic include file needed for the mesh functionality.
 #include "libmesh.h"
 #include "mesh.h"
+#include "gmv_io.h"
 #include "newmark_system.h"
 #include "equation_systems.h"
 
@@ -274,7 +275,8 @@ int main (int argc, char** argv)
 	  {
 	    char buf[14];
 	    sprintf (buf, "out.%03d.gmv", time_step);
-	    mesh.write_gmv (buf, equation_systems);
+	    GMVIO(mesh).write_equation_systems (buf,
+						equation_systems);
 	  }
 
 	// Update the p, v and a.

@@ -1,4 +1,4 @@
-/* $Id: ex10.C,v 1.11 2004-01-03 15:37:41 benkirk Exp $ */
+/* $Id: ex10.C,v 1.12 2004-03-20 15:16:56 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -35,6 +35,7 @@
 #include "libmesh.h"
 #include "mesh.h"
 #include "mesh_refinement.h"
+#include "gmv_io.h"
 #include "equation_systems.h"
 #include "fe.h"
 #include "quadrature_gauss.h"
@@ -137,8 +138,8 @@ int main (int argc, char** argv)
     equation_systems.print_info();
       
     // Write out the initial conditions.
-    mesh.write_gmv ("out_000.gmv",
-		    equation_systems);
+    GMVIO(mesh).write_equation_systems ("out_000.gmv",
+					equation_systems);
     
     // The Convection-Diffusion system requires that we specify
     // the flow velocity.  We will specify it as a \p RealVectorValue
@@ -259,8 +260,8 @@ int main (int argc, char** argv)
 	    OSSRealzeroright(file_name,3,0,t_step+1);
 	    file_name << ".gmv";
 
-	    mesh.write_gmv (file_name.str(),
-			    equation_systems);
+	    GMVIO(mesh).write_equation_systems (file_name.str(),
+						equation_systems);
 	  }
       }
   }

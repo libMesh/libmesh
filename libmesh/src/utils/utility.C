@@ -1,4 +1,4 @@
-// $Id: utility.C,v 1.12 2004-01-03 15:37:44 benkirk Exp $
+// $Id: utility.C,v 1.13 2004-03-20 15:16:57 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -88,3 +88,39 @@ std::string Utility::system_info()
   
   return out.str();
 }
+
+
+
+#ifdef USE_COMPLEX_NUMBERS
+
+const char* Utility::complex_filename(std::string name,
+				      const unsigned int r_o_c)
+{
+  if (r_o_c == 0)
+    name.append(".real");
+  
+  else
+    name.append(".imag");
+  
+  return name.c_str();
+}
+
+
+
+void Utility::prepare_complex_data(const std::vector<Complex>& source,
+				   std::vector<Real>& real_part,
+				   std::vector<Real>& imag_part)
+{
+  const unsigned int len = source.size();
+  
+  real_part.resize(len);
+  imag_part.resize(len);
+
+  for (unsigned int i=0; i<len; i++)
+    {
+      real_part[i] = source[i].real();
+      imag_part[i] = source[i].imag();
+    }
+}
+
+#endif // #ifdef USE_COMPLEX_NUMBERS

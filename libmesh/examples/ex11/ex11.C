@@ -1,4 +1,4 @@
-/* $Id: ex11.C,v 1.5 2004-01-03 15:37:41 benkirk Exp $ */
+/* $Id: ex11.C,v 1.6 2004-03-20 15:16:56 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -31,6 +31,7 @@
 // Basic include file needed for the mesh functionality.
 #include "libmesh.h"
 #include "mesh.h"
+#include "gmv_io.h"
 #include "equation_systems.h"
 #include "fe.h"
 #include "quadrature_gauss.h"
@@ -117,8 +118,8 @@ int main (int argc, char** argv)
     // then write the solution.
     equation_systems("Stokes").solve();
 
-    mesh.write_gmv ("out.gmv",
-		    equation_systems);
+    GMVIO(mesh).write_equation_systems ("out.gmv",
+					equation_systems);
   }
   
   // All done.  

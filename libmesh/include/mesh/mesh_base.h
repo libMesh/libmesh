@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.9 2004-03-19 19:16:52 benkirk Exp $
+// $Id: mesh_base.h,v 1.10 2004-03-20 15:16:56 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -62,7 +62,7 @@ class EquationSystems;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.9 $
+ * \version $Revision: 1.10 $
  */
 
 
@@ -501,57 +501,11 @@ public:
 		      const std::vector<std::string>& variable_names);
 
   /**
-   * Write the mesh in the GMV ASCII format to a file specified by \p name.
-   * GMV is the General Mesh Viewer from
-   * LANL.  This function writes the solution from \p es as well.  Also,
-   * since GMV understands cell-based data, this function can optionally
-   * write the partitioning information.
-   */
-  void write_gmv (const std::string& name,
-		  const EquationSystems& es,
-		  const bool write_partitioning=true) const;
-
-  /**
-   * Write the mesh in the GMV ASCII format to a file specified by \p name.
-   * GMV is the General Mesh Viewer from
-   * LANL.  This function optionally writes nodal data as well.  Also,
-   * since GMV understands cell-based data, this function can optionally
-   * write the partitioning information.
-   */
-  void write_gmv (const std::string& name,
-		  const std::vector<Number>* v=NULL,
-		  const std::vector<std::string>* solution_names=NULL,
-		  const bool write_partitioning=true) const;
-
-  /**
    * Writes a GMV file with discontinuous data
    */ 
   void write_discontinuous_gmv (const std::string& name, 
 				const EquationSystems& es,
 				const bool write_partitioning) const;
-  
-  /**
-   * Write the mesh in the GMV binary format to  a file specified by \p name.
-   * GMV is the General Mesh Viewer from
-   * LANL.  This function writes the solution from \p es as well.  Also,
-   * since GMV understands cell-based data, this function can optionally
-   * write the partitioning information.
-   */
-  void write_gmv_binary (const std::string& name,
-			 const EquationSystems& es,
-			 const bool write_partitioning=true) const;
-
-  /**
-   * Write the mesh in the GMV binary format to  a file specified by \p name.
-   * GMV is the General Mesh Viewer from
-   * LANL.  This function optionally writes nodal data as well.  Also,
-   * since GMV understands cell-based data, this function can optionally
-   * write the partitioning information.
-   */
-  void write_gmv_binary (const std::string& name,
-			 const std::vector<Number>* v=NULL,
-			 const std::vector<std::string>* solution_names=NULL,
-			 const bool write_partitioning=true) const;
 
   /**
    * @returns a string containing relevant information
@@ -563,27 +517,6 @@ public:
    * Prints relevant information about the mesh.
    */
   void print_info () const;
-  
-
-#ifdef USE_COMPLEX_NUMBERS
-
-  /**
-   * @returns for \p r_o_c = 0 the filename for output of the real part
-   * of complex data, and for  \p r_o_c = 1 the filename for the imaginary 
-   * part.
-   */
-  const char* complex_filename (const std::string& _n,
-				unsigned int r_o_c=0) const;
-
-  /**
-   * Prepare complex data for writing.
-   */
-  void prepare_complex_data (const std::vector<Number>* source,
-			     std::vector<Real>* real_part,
-			     std::vector<Real>* imag_part) const;
-
-#endif
-
 
   /**
    * Returns a pair of std::vector<Elem*>::iterators which point

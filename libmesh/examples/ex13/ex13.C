@@ -1,4 +1,4 @@
-/* $Id: ex13.C,v 1.3 2004-03-18 16:40:51 jwpeterson Exp $ */
+/* $Id: ex13.C,v 1.4 2004-03-20 15:16:56 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -41,6 +41,7 @@
 // Basic include file needed for the mesh functionality.
 #include "libmesh.h"
 #include "mesh.h"
+#include "gmv_io.h"
 #include "equation_systems.h"
 #include "fe.h"
 #include "quadrature_gauss.h"
@@ -232,8 +233,8 @@ int main (int argc, char** argv)
 	    file_name << "out.gmv.";
 	    OSSRealzeroright(file_name,3,0, t_step + 1);
 	    
-	    mesh.write_gmv (file_name.str(),
-			    equation_systems);
+	    GMVIO(mesh).write_equation_systems (file_name.str(),
+						equation_systems);
 	  }
       } // end timestep loop.
   }
