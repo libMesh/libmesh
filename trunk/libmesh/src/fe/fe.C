@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.33 2005-03-01 15:50:25 roystgnr Exp $
+// $Id: fe.C,v 1.34 2005-03-07 12:41:36 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -559,7 +559,7 @@ void FE<Dim,T>::compute_C0_constraints (DofConstraints &constraints,
 	        {
 	          const unsigned int j = my_side_dofs[js];
 	          const unsigned int my_dof_g = child_dof_indices[j];
-		  const Real their_dof_value = Ue[is](js);
+		  const Number their_dof_value = Ue[is](js);
 		  if (their_dof_g == my_dof_g)
 		    {
 		      assert(std::abs(their_dof_value-1.) < 1.e-5);
@@ -708,7 +708,7 @@ void FE<Dim,T>::compute_C1_constraints (DofConstraints &constraints,
 	        {
 	          const unsigned int j = my_side_dofs[js];
 	          const unsigned int my_dof_g = child_dof_indices[j];
-		  const Real their_dof_value = Ue[is](js);
+		  const Number their_dof_value = Ue[is](js);
 		  if (their_dof_g == my_dof_g)
 		    {
 		      assert(std::abs(their_dof_value-1.) < 1.e-5);
