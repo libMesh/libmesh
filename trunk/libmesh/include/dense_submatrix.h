@@ -1,4 +1,4 @@
-// $Id: dense_submatrix.h,v 1.2 2003-03-07 04:44:38 jwpeterson Exp $
+// $Id: dense_submatrix.h,v 1.3 2003-03-11 23:36:42 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -170,8 +170,8 @@ void DenseSubMatrix<T>::reposition(const unsigned int ioff,
 {				   
   _i_off = ioff;
   _j_off = joff;
-  _m = m;
-  _n = n;
+  this->_m = m;
+  this->_n = n;
 
   // Make sure we still fit in the parent matrix.
   assert ((this->i_off() + this->m()) <= _parent_matrix.m());
