@@ -1,4 +1,4 @@
-// $Id: petsc_interface.h,v 1.3 2004-04-17 03:02:50 benkirk Exp $
+// $Id: petsc_interface.h,v 1.4 2004-08-20 14:01:39 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -87,15 +87,44 @@ public:
   void init ();
   
   /**
-   * Call the Petsc solver
+   * Call the Petsc solver.  It calls the method below, using the
+   * same matrix for the system and preconditioner matrices.
    */    
   std::pair<unsigned int, Real> 
+  solve (SparseMatrix<T> &matrix_in,
+	 NumericVector<T> &solution_in,
+	 NumericVector<T> &rhs_in,
+	 const double tol,
+	 const unsigned int m_its)
+  {
+    return this->solve(matrix_in, matrix_in, solution_in, rhs_in, tol, m_its);
+  }
+
+  /**
+   * This method allows you to call a linear solver while specifying
+   * the matrix to use as the (left) preconditioning matrix.  Note
+   * that the linear solver will not compute a preconditioner in this
+   * case, and will instead premultiply by the matrix you provide.
+   *
+   * In PETSc, this is accomplished by calling
+   *
+   * PCSetType(_pc, PCMAT);
+   *
+   * before invoking KSPSolve().  Note: this functionality is not implemented
+   * in the LinearSolverInterface class since there is not a built-in analog
+   * to this method for LasPack -- You could probably implement it by hand
+   * if you wanted.
+   */
+  std::pair<unsigned int, Real> 
   solve (SparseMatrix<T> &matrix,
+	 SparseMatrix<T> &preconditioner,
 	 NumericVector<T> &solution,
 	 NumericVector<T> &rhs,
 	 const double tol,
 	 const unsigned int m_its);
-   
+
+
+  
 private:
 
   /**
