@@ -1,4 +1,4 @@
-// $Id: mesh_iterators.C,v 1.4 2005-02-22 22:17:41 jwpeterson Exp $
+// $Id: mesh_iterators.C,v 1.5 2005-03-21 15:19:29 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -71,6 +71,15 @@ MeshBase::element_iterator
 MeshBase::active_local_elements_begin ()
 {
   Predicates::ActiveLocal<elem_iterator_imp> p;
+  return element_iterator(_elements.begin(), _elements.end(), p);
+}
+
+
+// level elements begin() accessor
+MeshBase::element_iterator
+MeshBase::level_elements_begin (const unsigned int level)
+{
+  Predicates::Level<elem_iterator_imp> p(level);
   return element_iterator(_elements.begin(), _elements.end(), p);
 }
 
@@ -174,6 +183,16 @@ MeshBase::const_element_iterator
 MeshBase::active_local_elements_begin () const
 {
   Predicates::ActiveLocal<const_elem_iterator_imp> p;
+  return const_element_iterator(_elements.begin(), _elements.end(), p);
+}
+
+
+
+// const level begin() accessor
+MeshBase::const_element_iterator
+MeshBase::level_elements_begin (const unsigned int level) const
+{
+  Predicates::Level<const_elem_iterator_imp> p(level);
   return const_element_iterator(_elements.begin(), _elements.end(), p);
 }
 
@@ -285,6 +304,16 @@ MeshBase::active_local_elements_end ()
 
 
 
+// level end() accessor
+MeshBase::element_iterator
+MeshBase::level_elements_end (const unsigned int level)
+{
+  Predicates::Level<elem_iterator_imp> p(level);
+  return element_iterator(_elements.end(), _elements.end(), p);
+}
+
+
+
 // not level end() accessor
 MeshBase::element_iterator
 MeshBase::not_level_elements_end (const unsigned int level)
@@ -390,6 +419,17 @@ MeshBase::const_element_iterator
 MeshBase::active_local_elements_end () const
 {
   Predicates::ActiveLocal<const_elem_iterator_imp> p;
+  return const_element_iterator(_elements.end(), _elements.end(), p);
+}
+
+
+
+
+// level const end() accessor
+MeshBase::const_element_iterator
+MeshBase::level_elements_end (const unsigned int level) const
+{
+  Predicates::Level<const_elem_iterator_imp> p(level);
   return const_element_iterator(_elements.end(), _elements.end(), p);
 }
 

@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.88 2005-02-22 22:17:40 jwpeterson Exp $
+// $Id: mesh_base.C,v 1.89 2005-03-21 15:19:29 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -474,9 +474,6 @@ void MeshBase::find_neighbors()
    * Furthermore, that neighbor better be active,
    * otherwise we missed a child somewhere.
    */
-//   not_level_elem_iterator el (this->elements_begin(), 0);
-//   not_level_elem_iterator end(this->elements_end(),   0);
-
   element_iterator el  = this->not_level_elements_begin(0);
   element_iterator end = this->not_level_elements_end(0);
 
