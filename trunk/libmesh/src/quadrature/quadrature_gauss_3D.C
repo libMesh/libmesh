@@ -1,4 +1,4 @@
-// $Id: quadrature_gauss_3D.C,v 1.12 2003-09-02 18:02:45 benkirk Exp $
+// $Id: quadrature_gauss_3D.C,v 1.13 2003-11-30 07:10:18 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -60,7 +60,7 @@ void QGauss::init_3D(const ElemType _type)
 	      
 	switch(_order)
 	  {
-	  case CONST:
+	  case CONSTANT:
 	  case FIRST:
 	    {
 	      // Exact for linears

@@ -1,4 +1,4 @@
-// $Id: fe_monomial_shape_1D.C,v 1.8 2003-09-02 18:02:41 benkirk Exp $
+// $Id: fe_monomial_shape_1D.C,v 1.9 2003-11-30 07:10:16 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -114,7 +114,7 @@ Real FE<1,MONOMIAL>::shape_deriv(const ElemType,
   switch (order)
     {      
       // monomials. since they are heirarchic we only need one case block.
-    case CONST:
+    case CONSTANT:
     case FIRST:
     case SECOND:
     case THIRD:

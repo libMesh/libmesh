@@ -1,4 +1,4 @@
-// $Id: fe_monomial.C,v 1.14 2003-09-02 18:02:41 benkirk Exp $
+// $Id: fe_monomial.C,v 1.15 2003-11-30 07:10:16 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -45,7 +45,7 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
   switch (order)
     {
       // Constant shape functions
-    case CONST:
+    case CONSTANT:
       {
 	assert (elem_soln.size() == 1);
 	
@@ -107,7 +107,7 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 
       // constant shape functions
       // no matter what shape there is only one DOF.
-    case CONST:
+    case CONSTANT:
       return 1;
 
 
@@ -310,7 +310,7 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
   switch (o)
     {
       // constant shape functions always have 1 DOF per element
-    case CONST:
+    case CONSTANT:
       return 1;
 
       

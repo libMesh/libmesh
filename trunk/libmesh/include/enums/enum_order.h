@@ -1,4 +1,4 @@
-// $Id: enum_order.h,v 1.1 2003-11-05 22:26:43 benkirk Exp $
+// $Id: enum_order.h,v 1.2 2003-11-30 07:10:12 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -34,7 +34,7 @@ namespace libMeshEnums {
    * Fixing each label to a specific int, since \p InfFE uses 
    * \p static_cast<unsigned int>.
    */
-  enum Order {CONST        =  0,
+  enum Order {CONSTANT     =  0,
 	      FIRST        =  1,
 	      SECOND       =  2,
 	      THIRD        =  3,

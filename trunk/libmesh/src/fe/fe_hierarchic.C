@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic.C,v 1.13 2003-09-02 18:02:40 benkirk Exp $
+// $Id: fe_hierarchic.C,v 1.14 2003-11-30 07:10:16 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -45,7 +45,7 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
   switch (order)
     {
       // Constant shape functions
-    case CONST:
+    case CONSTANT:
       {
 	assert (elem_soln.size() == 1);
 	

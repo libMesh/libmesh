@@ -1,4 +1,4 @@
-// $Id: inf_fe_lagrange_eval.C,v 1.6 2003-09-25 21:46:56 benkirk Exp $
+// $Id: inf_fe_lagrange_eval.C,v 1.7 2003-11-30 07:10:16 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -34,7 +34,7 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
 
   switch (o_radial)
     {
-    case CONST:
+    case CONSTANT:
       switch (i)
         {
         case 0:
@@ -551,7 +551,7 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
 
   switch (o_radial)
     {
-    case CONST:
+    case CONSTANT:
       switch (i)
         {
         case 0:

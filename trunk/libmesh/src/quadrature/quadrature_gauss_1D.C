@@ -1,4 +1,4 @@
-// $Id: quadrature_gauss_1D.C,v 1.9 2003-09-02 18:02:45 benkirk Exp $
+// $Id: quadrature_gauss_1D.C,v 1.10 2003-11-30 07:10:16 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
@@ -32,7 +32,7 @@ void QGauss::init_1D(const ElemType)
   // 1D quadrature rules
   switch(_order)
     {
-    case CONST:
+    case CONSTANT:
     case FIRST:
       {
 	_points.resize (1);
