@@ -1,4 +1,4 @@
-// $Id: fe_clough.C,v 1.5 2005-02-28 16:35:25 roystgnr Exp $
+// $Id: fe_clough.C,v 1.6 2005-02-28 19:05:58 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -277,8 +277,10 @@ void FE<Dim,T>::compute_constraints (std::map<unsigned int,
 
 	  my_fe->reinit(elem, s);
 
-	  dof_map.dof_indices (elem, child_dof_indices);
-	  dof_map.dof_indices (parent, parent_dof_indices);
+	  dof_map.dof_indices (elem, child_dof_indices,
+			       variable_number);
+	  dof_map.dof_indices (parent, parent_dof_indices,
+			       variable_number);
 
 	  const unsigned int n_qp = my_qface.n_points();
 
