@@ -18,8 +18,6 @@ For the most part they are arranged in order of
 increasing complexity, and could be attempted in
 that order.  Click the links below, or use the
 menu on the left to navigate the examples.
-<br>
-<br>
 
 
 
@@ -29,8 +27,6 @@ how to create a mesh object.  A mesh is read from file,
 information is printed to the screen, and the mesh is then
 written.
 
-<br>
-<br>
 
 
 
@@ -40,8 +36,6 @@ create an equation system for a simple scalar system.  This
 example will also introduce some of the issues involved with using Petsc
 in your application.
 
-<br>
-<br>
 
 
 
@@ -54,8 +48,6 @@ exact solution, and using element iterators.
 We will not comment on things that
 were already explained in the second example.
 
-<br>
-<br>
 
 
 
@@ -66,8 +58,6 @@ the code in a dimension-independent way.  Very minor
 changes allow rhe example will allow the problem to be
 solved in two or three dimensions and in parallel. 
 
-<br>
-<br>
 
 
 
@@ -75,8 +65,6 @@ solved in two or three dimensions and in parallel.
 This example changes the previous example by enabling
 run-time selection of quadrature rules. 
 
-<br>
-<br>
 
 
 
@@ -85,8 +73,15 @@ This example introduces "infinite elements" which may be used for certain classe
 of applications.  The wave equation is solved in this example. <i>For this example to
 work you must have configured the library with the --enable-ifem option</i> 
 
-<br>
-<br>
+
+<h2><a href="ex9.php">Example 9</a> -- Solving a Transient Linear System in Parallel</h2>
+This example shows how a simple, linear transient
+system can be solved in parallel.  The system is simple
+scalar convection-diffusion with a specified external
+velocity.  The initial condition is given, and the
+solution is advanced in time with a standard Crank-Nicholson
+time-stepping strategy.
+
 
 <h2><a href="ex10.php">Example 10</a> -- Solving a Transient System with Adaptive Mesh Refinement</h2>
 This example shows how a simple, linear transient
@@ -94,7 +89,9 @@ system can be solved in parallel.  The system is simple
 scalar convection-diffusion with a specified external
 velocity.  The initial condition is given, and the
 solution is advanced in time with a standard Crank-Nicholson
-time-stepping strategy.
+time-stepping strategy.  This example differs from the previous
+example by employing adaptive mesh refinement (AMR) and the
+Kelly et. al. error indicator.
  
 
 

@@ -13,9 +13,9 @@
 
 
 <div class="content">
-<!-- <h1>libMesh</h1> -->
-   <img src="images/libmesh_mesh_small.png"><br>
 
+<img class="title_image" src="images/libmesh_mesh_small.png">
+<br><br><br>
 The <code>libMesh</code> library is a C++ framework for the numerical
 simulation of partial differential equations on serial and parallel
 platforms. Development began in March 2002 with the intent of

@@ -7,9 +7,10 @@
  
 <body>
  
-<?php make_navigation("examples",$root)?>
+<?php make_navigation("ex3",$root)?>
  
 <div class="content">
+<a name="comments"></a> 
 <div class = "comment">
 Example 3 -- Solving a Poisson Problem
 
@@ -895,6 +896,7 @@ All done!
 </pre>
 </div>
 
+<a name="nocomments"></a> 
 <br><br><br> <h1> The program without comments: </h1> 
 <pre> 
   
@@ -1097,6 +1099,80 @@ All done!
     
   }
 </pre> 
+<a name="output"></a> 
+<br><br><br> <h1> The console output of the program: </h1> 
+<pre>
+***************************************************************
+* Running Example  ./ex3
+***************************************************************
+ 
+Running ./ex3
+
+ Mesh Information:
+  mesh_dimension()=2
+  spatial_dimension()=3
+  n_nodes()=961
+  n_elem()=225
+   n_local_elem()=225
+   n_active_elem()=225
+  n_subdomains()=1
+  n_processors()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System "Poisson"
+    Type "Steady"
+    Variables="u" 
+    Finite Element Types="0" 
+    Approximation Orders="2" 
+    n_dofs()=961
+    n_local_dofs()=961
+    n_constrained_dofs()=0
+    n_additional_vectors()=0
+    n_additional_matrices()=0
+  n_parameters()=2
+   Parameters:
+    "linear solver maximum iterations"=5000
+    "linear solver tolerance"=1e-12
+
+
+ ---------------------------------------------------------------------------- 
+| Reference count information                                                |
+ ---------------------------------------------------------------------------- 
+| 10SystemBase reference count information:
+| Creations:    1
+| Destructions: 1
+| 12SparseMatrixIdE reference count information:
+| Creations:    1
+| Destructions: 1
+| 13NumericVectorIdE reference count information:
+| Creations:    3
+| Destructions: 3
+| 21LinearSolverInterfaceIdE reference count information:
+| Creations:    1
+| Destructions: 1
+| 4Elem reference count information:
+| Creations:    1185
+| Destructions: 1185
+| 4Node reference count information:
+| Creations:    961
+| Destructions: 961
+| 5QBase reference count information:
+| Creations:    3
+| Destructions: 3
+| 6DofMap reference count information:
+| Creations:    1
+| Destructions: 1
+| 6FEBase reference count information:
+| Creations:    2
+| Destructions: 2
+ ---------------------------------------------------------------------------- 
+ 
+***************************************************************
+* Done Running Example  ./ex3
+***************************************************************
+</pre>
 </div>
 <?php make_footer() ?>
 </body>

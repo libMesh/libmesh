@@ -7,12 +7,12 @@
  
 <body>
  
-<?php make_navigation("ex10",$root)?>
+<?php make_navigation("ex9",$root)?>
  
 <div class="content">
 <a name="comments"></a> 
 <div class = "comment">
-Example 10 -- Solving a Transient System with Adaptive Mesh Refinement
+Example 9 -- Solving a Transient Linear System in Parallel
 
 <br><br>This example shows how a simple, linear transient
 system can be solved in parallel.  The system is simple
@@ -20,7 +20,7 @@ scalar convection-diffusion with a specified external
 velocity.  The initial condition is given, and the
 solution is advanced in time with a standard Crank-Nicholson
 time-stepping strategy.
- 
+
 
 <br><br>C++ include files that we need
 </div>
@@ -55,8 +55,7 @@ Basic include file needed for the mesh functionality.
 </div>
 <div class = "comment">
 Some (older) compilers do not offer full stream 
-functionality, \p OStringStream works around this.
-Check example 9 for details.
+functionality, OStringStream works around this.
 </div>
 
 <div class ="fragment">
@@ -74,18 +73,6 @@ so we need to include the \p TransientSystem definition.
 <pre>
         #include "transient_system.h"
         #include "vector_value.h"
-        
-</pre>
-</div>
-<div class = "comment">
-To refine the mesh we need an \p ErrorEstimator
-object to figure out which elements to refine.
-</div>
-
-<div class ="fragment">
-<pre>
-        #include "error_vector.h"
-        #include "error_estimator.h"
         
 </pre>
 </div>
@@ -137,18 +124,15 @@ as will the Dirichlet boundary conditions at time t.
 </pre>
 </div>
 <div class = "comment">
-Begin the main program.  Note that the first
-statement in the program throws an error if
-you are in complex number mode, since this
-example is only intended to work with real
-numbers.
+We can now begin the main program.  Note that this
+example will fail if you are using complex numbers
+since it was designed to be run only with real numbers.
 </div>
 
 <div class ="fragment">
 <pre>
         int main (int argc, char** argv)
         {
-          
         #ifdef USE_COMPLEX_NUMBERS
           
           std::cerr &lt;&lt; "ERROR: Not intended for use with complex numbers."
@@ -158,8 +142,7 @@ numbers.
           return 0;
           
         #else
-          
-          
+            
 </pre>
 </div>
 <div class = "comment">
@@ -171,7 +154,6 @@ Initialize libMesh.
           libMesh::init (argc, argv);
         
           {    
-            
 </pre>
 </div>
 <div class = "comment">
@@ -181,21 +163,25 @@ Create a two-dimensional mesh.
 <div class ="fragment">
 <pre>
             Mesh mesh (2);
-            
+                
 </pre>
 </div>
 <div class = "comment">
-Read the mesh from file.
+Read the mesh from file.  This is the coarse mesh that will be used
+in example 10 to demonstrate adaptive mesh refinement.  Here we will
+simply read it in and uniformly refine it 5 times before we compute
+with it.
 </div>
 
 <div class ="fragment">
 <pre>
-            mesh.read ("mesh.xda");
+            mesh.read ("../ex10/mesh.xda");
             
 </pre>
 </div>
 <div class = "comment">
-Create an object to handle mesh refinement.
+Create a MeshRefinement object to handle refinement of our mesh.
+This class handles all the details of mesh refinement and coarsening.
 </div>
 
 <div class ="fragment">
@@ -205,7 +191,9 @@ Create an object to handle mesh refinement.
 </pre>
 </div>
 <div class = "comment">
-Uniformly refine the mesh 5 times.
+Uniformly refine the mesh 5 times.  This is the
+first time we use the mesh refinement capabilities
+of the library.
 </div>
 
 <div class ="fragment">
@@ -235,9 +223,8 @@ Create an equation systems object.
 </pre>
 </div>
 <div class = "comment">
-Declare the system and its variables.
-Begin by creating a transient system
-named "Convection-Diffusion".
+Add a transient system to the EquationSystems
+object named "Convection-Diffusion".
 </div>
 
 <div class ="fragment">
@@ -267,7 +254,7 @@ and initialization functions.
 <pre>
             system.attach_assemble_function (assemble_cd);
             system.attach_init_function (init_cd);
-            
+              
 </pre>
 </div>
 <div class = "comment">
@@ -277,7 +264,7 @@ Initialize the data structures for the equation system.
 <div class ="fragment">
 <pre>
             equation_systems.init ();
-            
+              
 </pre>
 </div>
 <div class = "comment">
@@ -303,9 +290,10 @@ Write out the initial conditions.
 </div>
 <div class = "comment">
 The Convection-Diffusion system requires that we specify
-the flow velocity.  We will specify it as a \p RealVectorValue
-data type.  Check example 9 for details on \p RealVectorValue
-and \p DataMap.
+the flow velocity.  We will specify it as a RealVectorValue
+data type and then use the DataMap object to pass it to
+the assemble function.  The DataMap is a convenient way
+to encapsulate various data types.
 </div>
 
 <div class ="fragment">
@@ -319,7 +307,7 @@ and \p DataMap.
 <div class = "comment">
 Solve the system "Convection-Diffusion".  This will be done by
 looping over the specified time interval and calling the
-\p solve() member at each time step.  This will assemble the
+solve() member at each time step.  This will assemble the
 system and call the linear solver.
 </div>
 
@@ -333,7 +321,7 @@ system and call the linear solver.
 </pre>
 </div>
 <div class = "comment">
-Increment the time counter, set the time and the
+Incremenet the time counter, set the time and the
 time step size as parameters in the EquationSystem.
 </div>
 
@@ -357,9 +345,13 @@ A pretty update message
 </pre>
 </div>
 <div class = "comment">
-As already seen in example 9, use a work-around
-for missing stream functionality (of older compilers).
-Add a set of scope braces to enforce data locality.
+Since some compilers fail to offer full stream
+functionality, libMesh offers a string stream
+to work around this.  Note that for other compilers,
+this is just a set of preprocessor macros and therefore
+should cost nothing (compared to a hand-coded string stream).
+We use additional curly braces here simply to enforce data
+locality.
 </div>
 
 <div class ="fragment">
@@ -397,129 +389,12 @@ we need to specify the system type when we ask for it.
 </pre>
 </div>
 <div class = "comment">
-The number of refinement steps per time step.
-</div>
-
-<div class ="fragment">
-<pre>
-                const unsigned int max_r_steps = 2;
-                
-</pre>
-</div>
-<div class = "comment">
-A refinement loop.
-</div>
-
-<div class ="fragment">
-<pre>
-                for (unsigned int r_step=0; r_step&lt;max_r_steps; r_step++)
-                  {
-</pre>
-</div>
-<div class = "comment">
 Assemble &amp; solve the linear system
 </div>
 
 <div class ="fragment">
 <pre>
-                    system.solve();
-                    
-</pre>
-</div>
-<div class = "comment">
-Possibly refine the mesh
-</div>
-
-<div class ="fragment">
-<pre>
-                    if (r_step+1 != max_r_steps)
-                      {
-                        std::cout &lt;&lt; "  Refining the mesh..." &lt;&lt; std::endl;
-        
-</pre>
-</div>
-<div class = "comment">
-The \p ErrorVector is a particular \p StatisticsVector
-for computing error information on a finite element mesh.
-</div>
-
-<div class ="fragment">
-<pre>
-                        ErrorVector error;
-        
-</pre>
-</div>
-<div class = "comment">
-The \p ErrorEstimator class interrogates a finite element
-solution and assigns to each element a positive error value.
-This value is used for deciding which elements to refine
-and which to coarsen.
-</div>
-
-<div class ="fragment">
-<pre>
-                        ErrorEstimator error_estimator;
-                        
-</pre>
-</div>
-<div class = "comment">
-Compute the error for each active element using the provided
-\p flux_jump indicator.  Note in general you will need to
-provide an error estimator specifically designed for your
-application.
-</div>
-
-<div class ="fragment">
-<pre>
-                        error_estimator.flux_jump (equation_systems,
-                                                   "Convection-Diffusion",
-                                                   error);
-                        
-</pre>
-</div>
-<div class = "comment">
-This takes the error in \p error and decides which elements
-will be coarsened or refined.  Any element within 20% of the
-maximum error on any element will be refined, and any
-element within 10% of the minimum error on any element might
-be coarsened. Note that the elements flagged for refinement
-will be refined, but those flagged for coarsening _might_ be
-coarsened.
-</div>
-
-<div class ="fragment">
-<pre>
-                        mesh_refinement.flag_elements_by_error_fraction (error,
-                                                                         0.80,
-                                                                         0.07,
-                                                                         5);
-                        
-</pre>
-</div>
-<div class = "comment">
-This call actually refines and coarsens the flagged
-elements.
-</div>
-
-<div class ="fragment">
-<pre>
-                        mesh_refinement.refine_and_coarsen_elements();
-                        
-</pre>
-</div>
-<div class = "comment">
-This call reinitializes the \p EquationSystems object for
-the newly refined mesh.  One of the steps in the
-reinitialization is projecting the \p solution,
-\p old_solution, etc... vectors from the old mesh to
-the current one.
-</div>
-
-<div class ="fragment">
-<pre>
-                        equation_systems.reinit ();
-                      }            
-                  }
+                equation_systems("Convection-Diffusion").solve();
                 
 </pre>
 </div>
@@ -542,7 +417,7 @@ Output evey 10 timesteps to file.
                   }
               }
           }
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -552,16 +427,17 @@ All done.
 <div class ="fragment">
 <pre>
           return libMesh::close ();
+          
         #endif
         }
         
 </pre>
 </div>
 <div class = "comment">
-Here we define the initialization routine for the
-Convection-Diffusion system.  This routine is
-responsible for applying the initial conditions to
-the system.
+We now define the function which provides the
+initialization routines for the "Convection-Diffusion"
+system.  This handles things like setting initial
+conditions and boundary conditions.
 </div>
 
 <div class ="fragment">
@@ -581,7 +457,7 @@ the proper system.
 <div class ="fragment">
 <pre>
           assert (system_name == "Convection-Diffusion");
-          
+            
 </pre>
 </div>
 <div class = "comment">
@@ -600,8 +476,7 @@ Get a reference to the Convection-Diffusion system object.
 
 <div class ="fragment">
 <pre>
-          TransientSystem&amp; system =
-            es.get_system&lt;TransientSystem&gt; ("Convection-Diffusion");
+          TransientSystem&amp; system = es.get_system&lt;TransientSystem&gt; ("Convection-Diffusion");
           
 </pre>
 </div>
@@ -697,7 +572,7 @@ The initial solution has now been set for the local
 solution components.  However, the local matrix assembly
 will likely depend on solution components that live on
 other processors.  We need to get those components, and
-the \p TransientSystem::update() member will do that
+the TransientSystem::update() member will do that
 for us.
 </div>
 
@@ -713,10 +588,9 @@ for us.
 </pre>
 </div>
 <div class = "comment">
-This function defines the assembly routine which
-will be called at each time step.  It is responsible
-for computing the proper matrix entries for the
-element stiffness matrices and right-hand sides.
+Now we define the assemble function which will be used
+by the EquationSystems object at each timestep to assemble
+the linear system for solution.
 </div>
 
 <div class ="fragment">
@@ -765,14 +639,13 @@ Get a reference to the Convection-Diffusion system object.
 
 <div class ="fragment">
 <pre>
-          TransientSystem&amp; system =
-            es.get_system&lt;TransientSystem&gt; ("Convection-Diffusion");
+          TransientSystem&amp; system = es.get_system&lt;TransientSystem&gt; ("Convection-Diffusion");
           
 </pre>
 </div>
 <div class = "comment">
-Get the Finite Element type for the first (and only) 
-variable in the system.
+Get a constant reference to the Finite Element type
+for the first (and only) variable in the system.
 </div>
 
 <div class ="fragment">
@@ -784,8 +657,8 @@ variable in the system.
 <div class = "comment">
 Build a Finite Element object of the specified type.  Since the
 \p FEBase::build() member dynamically creates memory we will
-store the object as an \p AutoPtr&lt;FEBase&gt;.  The \p AutoPtr's
-are covered in more detail in example 5.
+store the object as an \p AutoPtr&lt;FEBase&gt;.  This can be thought
+of as a pointer that will clean up after itself.
 </div>
 
 <div class ="fragment">
@@ -812,13 +685,13 @@ Tell the finite element object to use our quadrature rule.
 <div class ="fragment">
 <pre>
           fe-&gt;attach_quadrature_rule (&amp;qrule);
-        
+          
 </pre>
 </div>
 <div class = "comment">
 Here we define some references to cell-specific data that
-will be used to assemble the linear system.
-First is the element Jacobian * quadrature weight at each integration point.   
+will be used to assemble the linear system.  We will start
+with the element Jacobian * quadrature weight at each integration point.   
 </div>
 
 <div class ="fragment">
@@ -858,7 +731,7 @@ in future examples.
 <div class ="fragment">
 <pre>
           const DofMap&amp; dof_map = system.get_dof_map();
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -940,7 +813,7 @@ contribute to.
 <div class ="fragment">
 <pre>
               dof_map.dof_indices (elem, dof_indices);
-        
+              
 </pre>
 </div>
 <div class = "comment">
@@ -1050,7 +923,7 @@ Mass matrix term
 
 <div class ="fragment">
 <pre>
-                                        u_old*phi[i][qp] + 
+                                        u_old*phi[i][qp] +
                                         -.5*dt*(
 </pre>
 </div>
@@ -1061,6 +934,7 @@ Convection term
 <div class ="fragment">
 <pre>
                                                 (velocity*grad_u_old)*phi[i][qp] +
+                                                
 </pre>
 </div>
 <div class = "comment">
@@ -1092,6 +966,7 @@ Mass-matrix
 <div class ="fragment">
 <pre>
                                               phi[i][qp]*phi[j][qp] + 
+        
                                               .5*dt*(
 </pre>
 </div>
@@ -1102,6 +977,7 @@ Convection term
 <div class ="fragment">
 <pre>
                                                      (velocity*dphi[j][qp])*phi[i][qp] +
+                                                     
 </pre>
 </div>
 <div class = "comment">
@@ -1112,7 +988,7 @@ Diffusion term
 <pre>
                                                      0.01*(dphi[i][qp]*dphi[j][qp]))      
                                               );
-                        }
+                        } 
                     } 
                 } 
         
@@ -1139,7 +1015,8 @@ side MUST live on a boundary of the domain.
                 if (elem-&gt;neighbor(s) == NULL)
                   {
                     AutoPtr&lt;Elem&gt; side (elem-&gt;build_side(s));
-                      
+                    
+                    
 </pre>
 </div>
 <div class = "comment">
@@ -1165,7 +1042,7 @@ node.
 </pre>
 </div>
 <div class = "comment">
-The penalty value.  \f$ \frac{1}{\epsilon \f$
+The penalty value.  \f$ \frac{1}{\epsilon} \f$
 </div>
 
 <div class ="fragment">
@@ -1181,7 +1058,7 @@ The boundary value.
 <div class ="fragment">
 <pre>
                         const Real value = exact_solution(xf, yf, time);
-                          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -1204,7 +1081,7 @@ Matrix contribution.
 <div class ="fragment">
 <pre>
                               Ke(n,n) += penalty;
-                                
+                                            
 </pre>
 </div>
 <div class = "comment">
@@ -1215,27 +1092,9 @@ Right-hand-side contribution.
 <pre>
                               Fe(n) += penalty*value;
                             }
-                          
-                      }
-                  } 
-              
-</pre>
-</div>
-<div class = "comment">
-We have now built the element matrix and RHS vector in terms
-of the element degrees of freedom.  However, it is possible
-that some of the element DOFs are constrained to enforce
-solution continuity, i.e. they are not really "free".  We need
-to constrain those DOFs in terms of non-constrained DOFs to
-ensure a continuous solution.  The
-\p DofMap::constrain_element_matrix_and_vector() method does
-just that.
-</div>
-
-<div class ="fragment">
-<pre>
-              dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
-              
+                      } 
+                  }
+        
 </pre>
 </div>
 <div class = "comment">
@@ -1249,13 +1108,15 @@ and \p PetscVector::add_vector() members do this for us.
 <pre>
               es("Convection-Diffusion").matrix-&gt;add_matrix (Ke, dof_indices);
               es("Convection-Diffusion").rhs-&gt;add_vector    (Fe, dof_indices);
-              
             }
+          
 </pre>
 </div>
 <div class = "comment">
-Finished computing the sytem matrix and right-hand side.
-</div>
+That concludes the system matrix assembly routine.
+
+
+<br><br></div>
 
 <div class ="fragment">
 <pre>
@@ -1267,7 +1128,7 @@ Finished computing the sytem matrix and right-hand side.
 <a name="nocomments"></a> 
 <br><br><br> <h1> The program without comments: </h1> 
 <pre> 
-   
+  
   #include &lt;iostream&gt;
   #include &lt;algorithm&gt;
   #include &lt;math.h&gt;
@@ -1289,9 +1150,6 @@ Finished computing the sytem matrix and right-hand side.
   #include <FONT COLOR="#BC8F8F"><B>&quot;transient_system.h&quot;</FONT></B>
   #include <FONT COLOR="#BC8F8F"><B>&quot;vector_value.h&quot;</FONT></B>
   
-  #include <FONT COLOR="#BC8F8F"><B>&quot;error_vector.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;error_estimator.h&quot;</FONT></B>
-  
   <FONT COLOR="#228B22"><B>void</FONT></B> assemble_cd (EquationSystems&amp; es,
   		  <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp; system_name);
   
@@ -1304,7 +1162,6 @@ Finished computing the sytem matrix and right-hand side.
   
   <FONT COLOR="#228B22"><B>int</FONT></B> main (<FONT COLOR="#228B22"><B>int</FONT></B> argc, <FONT COLOR="#228B22"><B>char</FONT></B>** argv)
   {
-    
   #ifdef USE_COMPLEX_NUMBERS
     
     std::cerr &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;ERROR: Not intended for use with complex numbers.&quot;</FONT></B>
@@ -1314,15 +1171,13 @@ Finished computing the sytem matrix and right-hand side.
     <B><FONT COLOR="#A020F0">return</FONT></B> 0;
     
   #<B><FONT COLOR="#A020F0">else</FONT></B>
-    
-    
+      
     libMesh::init (argc, argv);
   
     {    
-      
       Mesh mesh (2);
-      
-      mesh.read (<FONT COLOR="#BC8F8F"><B>&quot;mesh.xda&quot;</FONT></B>);
+          
+      mesh.read (<FONT COLOR="#BC8F8F"><B>&quot;../ex10/mesh.xda&quot;</FONT></B>);
       
       MeshRefinement mesh_refinement (mesh);
       
@@ -1339,9 +1194,9 @@ Finished computing the sytem matrix and right-hand side.
         
       system.attach_assemble_function (assemble_cd);
       system.attach_init_function (init_cd);
-      
+        
       equation_systems.init ();
-      
+        
       equation_systems.print_info();
         
       mesh.write_gmv (<FONT COLOR="#BC8F8F"><B>&quot;out_000.gmv&quot;</FONT></B>,
@@ -1378,34 +1233,7 @@ Finished computing the sytem matrix and right-hand side.
   
   	*system.old_local_solution = *system.current_local_solution;
   	
-  	<FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> max_r_steps = 2;
-  	
-  	<B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> r_step=0; r_step&lt;max_r_steps; r_step++)
-  	  {
-  	    system.solve();
-  	    
-  	    <B><FONT COLOR="#A020F0">if</FONT></B> (r_step+1 != max_r_steps)
-  	      {
-  		std::cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;  Refining the mesh...&quot;</FONT></B> &lt;&lt; std::endl;
-  
-  		ErrorVector error;
-  
-  		ErrorEstimator error_estimator;
-  		
-  		error_estimator.flux_jump (equation_systems,
-  					   <FONT COLOR="#BC8F8F"><B>&quot;Convection-Diffusion&quot;</FONT></B>,
-  					   error);
-  		
-  		mesh_refinement.flag_elements_by_error_fraction (error,
-  								 0.80,
-  								 0.07,
-  								 5);
-  		
-  		mesh_refinement.refine_and_coarsen_elements();
-  		
-  		equation_systems.reinit ();
-  	      }	    
-  	  }
+  	equation_systems(<FONT COLOR="#BC8F8F"><B>&quot;Convection-Diffusion&quot;</FONT></B>).solve();
   	
   	<B><FONT COLOR="#A020F0">if</FONT></B> ( (t_step+1)%10 == 0)
   	  {
@@ -1420,8 +1248,9 @@ Finished computing the sytem matrix and right-hand side.
   	  }
         }
     }
-    
+  
     <B><FONT COLOR="#A020F0">return</FONT></B> libMesh::close ();
+    
   #endif
   }
   
@@ -1431,11 +1260,10 @@ Finished computing the sytem matrix and right-hand side.
   #ifndef USE_COMPLEX_NUMBERS
     
     assert (system_name == <FONT COLOR="#BC8F8F"><B>&quot;Convection-Diffusion&quot;</FONT></B>);
-    
+      
     <FONT COLOR="#228B22"><B>const</FONT></B> Mesh&amp; mesh = es.get_mesh();
     
-    TransientSystem&amp; system =
-      es.get_system&lt;TransientSystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Convection-Diffusion&quot;</FONT></B>);
+    TransientSystem&amp; system = es.get_system&lt;TransientSystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Convection-Diffusion&quot;</FONT></B>);
     
     <FONT COLOR="#228B22"><B>const</FONT></B> DofMap&amp; dof_map = system.get_dof_map();
     
@@ -1486,8 +1314,7 @@ Finished computing the sytem matrix and right-hand side.
     
     <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> dim = mesh.mesh_dimension();
     
-    TransientSystem&amp; system =
-      es.get_system&lt;TransientSystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Convection-Diffusion&quot;</FONT></B>);
+    TransientSystem&amp; system = es.get_system&lt;TransientSystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Convection-Diffusion&quot;</FONT></B>);
     
     FEType fe_type = system.variable_type(0);
     
@@ -1496,7 +1323,7 @@ Finished computing the sytem matrix and right-hand side.
     QGauss qrule (dim, fe_type.default_quadrature_order());
   
     fe-&gt;attach_quadrature_rule (&amp;qrule);
-  
+    
     <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;Real&gt;&amp; JxW = fe-&gt;get_JxW();
     
     <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi = fe-&gt;get_phi();
@@ -1504,7 +1331,7 @@ Finished computing the sytem matrix and right-hand side.
     <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = fe-&gt;get_dphi();
     
     <FONT COLOR="#228B22"><B>const</FONT></B> DofMap&amp; dof_map = system.get_dof_map();
-    
+  
     DenseMatrix&lt;Real&gt; Ke;
     DenseVector&lt;Real&gt; Fe;
     
@@ -1524,7 +1351,7 @@ Finished computing the sytem matrix and right-hand side.
         <FONT COLOR="#228B22"><B>const</FONT></B> Elem* elem = *el;
         
         dof_map.dof_indices (elem, dof_indices);
-  
+        
         fe-&gt;reinit (elem);
         
         Ke.resize (dof_indices.size(),
@@ -1547,9 +1374,10 @@ Finished computing the sytem matrix and right-hand side.
   	  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i&lt;phi.size(); i++)
   	    {
   	      Fe(i) += JxW[qp]*(
-  				u_old*phi[i][qp] + 
+  				u_old*phi[i][qp] +
   				-.5*dt*(
   					(velocity*grad_u_old)*phi[i][qp] +
+  					
   					0.01*(grad_u_old*dphi[i][qp]))     
   				);
   	      
@@ -1557,11 +1385,13 @@ Finished computing the sytem matrix and right-hand side.
   		{
   		  Ke(i,j) += JxW[qp]*(
   				      phi[i][qp]*phi[j][qp] + 
+  
   				      .5*dt*(
   					     (velocity*dphi[j][qp])*phi[i][qp] +
+  					     
   					     0.01*(dphi[i][qp]*dphi[j][qp]))      
   				      );
-  		}
+  		} 
   	    } 
   	} 
   
@@ -1569,7 +1399,8 @@ Finished computing the sytem matrix and right-hand side.
   	<B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;neighbor(s) == NULL)
   	  {
   	    AutoPtr&lt;Elem&gt; side (elem-&gt;build_side(s));
-  	      
+  	    
+  	    
   	    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> ns=0; ns&lt;side-&gt;n_nodes(); ns++)
   	      {
   		<FONT COLOR="#228B22"><B>const</FONT></B> Real xf = side-&gt;point(ns)(0);
@@ -1578,24 +1409,22 @@ Finished computing the sytem matrix and right-hand side.
   		<FONT COLOR="#228B22"><B>const</FONT></B> Real penalty = 1.e10;
   		  
   		<FONT COLOR="#228B22"><B>const</FONT></B> Real value = exact_solution(xf, yf, time);
-  		  
+  
   		<B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n=0; n&lt;elem-&gt;n_nodes(); n++)
   		  <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;node(n) == side-&gt;node(ns))
   		    {
   		      Ke(n,n) += penalty;
-  			
+  		  		  
   		      Fe(n) += penalty*value;
   		    }
-  		  
-  	      }
-  	  } 
-        
-        dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
-        
+  	      } 
+  	  }
+  
         es(<FONT COLOR="#BC8F8F"><B>&quot;Convection-Diffusion&quot;</FONT></B>).matrix-&gt;add_matrix (Ke, dof_indices);
         es(<FONT COLOR="#BC8F8F"><B>&quot;Convection-Diffusion&quot;</FONT></B>).rhs-&gt;add_vector    (Fe, dof_indices);
-        
       }
+    
+  
   #endif
   }
 </pre> 
@@ -1603,7 +1432,7 @@ Finished computing the sytem matrix and right-hand side.
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
 ***************************************************************
-* Running Example  ./ex10
+* Running Example  ./ex9
 ***************************************************************
  
  Mesh Information:
@@ -1635,105 +1464,55 @@ Finished computing the sytem matrix and right-hand side.
     "linear solver tolerance"=1e-12
 
  Solving time step  0, time=0.0250...
-  Refining the mesh...
  Solving time step  1, time=0.0500...
-  Refining the mesh...
  Solving time step  2, time=0.0750...
-  Refining the mesh...
  Solving time step  3, time=0.1000...
-  Refining the mesh...
  Solving time step  4, time=0.1250...
-  Refining the mesh...
  Solving time step  5, time=0.1500...
-  Refining the mesh...
  Solving time step  6, time=0.1750...
-  Refining the mesh...
  Solving time step  7, time=0.2000...
-  Refining the mesh...
  Solving time step  8, time=0.2250...
-  Refining the mesh...
  Solving time step  9, time=0.2500...
-  Refining the mesh...
  Solving time step 10, time=0.2750...
-  Refining the mesh...
  Solving time step 11, time=0.3000...
-  Refining the mesh...
  Solving time step 12, time=0.3250...
-  Refining the mesh...
  Solving time step 13, time=0.3500...
-  Refining the mesh...
  Solving time step 14, time=0.3750...
-  Refining the mesh...
  Solving time step 15, time=0.4000...
-  Refining the mesh...
  Solving time step 16, time=0.4250...
-  Refining the mesh...
  Solving time step 17, time=0.4500...
-  Refining the mesh...
  Solving time step 18, time=0.4750...
-  Refining the mesh...
  Solving time step 19, time=0.5000...
-  Refining the mesh...
  Solving time step 20, time=0.5250...
-  Refining the mesh...
  Solving time step 21, time=0.5500...
-  Refining the mesh...
  Solving time step 22, time=0.5750...
-  Refining the mesh...
  Solving time step 23, time=0.6000...
-  Refining the mesh...
  Solving time step 24, time=0.6250...
-  Refining the mesh...
  Solving time step 25, time=0.6500...
-  Refining the mesh...
  Solving time step 26, time=0.6750...
-  Refining the mesh...
  Solving time step 27, time=0.7000...
-  Refining the mesh...
  Solving time step 28, time=0.7250...
-  Refining the mesh...
  Solving time step 29, time=0.7500...
-  Refining the mesh...
  Solving time step 30, time=0.7750...
-  Refining the mesh...
  Solving time step 31, time=0.8000...
-  Refining the mesh...
  Solving time step 32, time=0.8250...
-  Refining the mesh...
  Solving time step 33, time=0.8500...
-  Refining the mesh...
  Solving time step 34, time=0.8750...
-  Refining the mesh...
  Solving time step 35, time=0.9000...
-  Refining the mesh...
  Solving time step 36, time=0.9250...
-  Refining the mesh...
  Solving time step 37, time=0.9500...
-  Refining the mesh...
  Solving time step 38, time=0.9750...
-  Refining the mesh...
  Solving time step 39, time=1.0000...
-  Refining the mesh...
  Solving time step 40, time=1.0300...
-  Refining the mesh...
  Solving time step 41, time=1.0500...
-  Refining the mesh...
  Solving time step 42, time=1.0800...
-  Refining the mesh...
  Solving time step 43, time=1.1000...
-  Refining the mesh...
  Solving time step 44, time=1.1200...
-  Refining the mesh...
  Solving time step 45, time=1.1500...
-  Refining the mesh...
  Solving time step 46, time=1.1700...
-  Refining the mesh...
  Solving time step 47, time=1.2000...
-  Refining the mesh...
  Solving time step 48, time=1.2200...
-  Refining the mesh...
  Solving time step 49, time=1.2500...
-  Refining the mesh...
 
  ---------------------------------------------------------------------------- 
 | Reference count information                                                |
@@ -1745,30 +1524,30 @@ Finished computing the sytem matrix and right-hand side.
 | Creations:    1
 | Destructions: 1
 | 13NumericVectorIdE reference count information:
-| Creations:    155
-| Destructions: 155
+| Creations:    5
+| Destructions: 5
 | 21LinearSolverInterfaceIdE reference count information:
 | Creations:    1
 | Destructions: 1
 | 4Elem reference count information:
-| Creations:    562053
-| Destructions: 562053
+| Creations:    70112
+| Destructions: 70112
 | 4Node reference count information:
-| Creations:    8397
-| Destructions: 8397
+| Creations:    6273
+| Destructions: 6273
 | 5QBase reference count information:
-| Creations:    2538
-| Destructions: 2538
+| Creations:    100
+| Destructions: 100
 | 6DofMap reference count information:
 | Creations:    1
 | Destructions: 1
 | 6FEBase reference count information:
-| Creations:    200
-| Destructions: 200
+| Creations:    50
+| Destructions: 50
  ---------------------------------------------------------------------------- 
  
 ***************************************************************
-* Done Running Example  ./ex10
+* Done Running Example  ./ex9
 ***************************************************************
 </pre>
 </div>

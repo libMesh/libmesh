@@ -13,9 +13,9 @@
 <div class="content">
 <h1>Installation Instructions</h1>
 
-<br>
-<h2><a name="getsoftware">Getting the Software</a></h2>
-<br>
+
+<a name="getsoftware"></a><h2>Getting the Software</h2>
+
 The <code>libMesh</code> source can be 
 <a href="http://sourceforge.net/project/showfiles.php?group_id=71130">downloaded from the project's SourceForge homepage</a>.
 Stable releases are located there as compressed tar archives. You may also
@@ -38,10 +38,10 @@ modified CVS tree simply do:
 
 <br>
 in the top-level directory. You can then submit the file <code>patch</code>.
-<br>
 
-<h2><a name="compilers">Compilers</a></h2>
-<br>
+
+<a name="compilers"></a><h2>Compilers</h2>
+
 <code>libMesh</code> makes extensive use of the standard C++ library,
 so you will need a decent, standards-compliant compiler. We have tried
 very hard to make the code completely compiler-agnostic by avoiding
@@ -80,9 +80,8 @@ The library is known to work with the following compilers:
 </ul>
 
 
-<h2><a name="conf">Configuration</a></h2>
+<a name="conf"></a><h2>Configuration</h2>
 
-<br>
 Configuring the library is straightforward. The GNU autoconf package is used
 to determine site-specific configuration parameters. A standard build will
 occur after typing
@@ -115,11 +114,12 @@ the following will build with the <code>MIPS</code> compilers on an SGI:
 <br>
 Note that the FORTRAN compiler is not actually used to compile any part of the library,
 but <code>configure</code> uses it to find out how to link FORTRAN libraries with C++ code.
-<br>
-<h2><a name="build">Building the Library</a></h2>
-<br>
+
+
+<a name="build"></a><h2>Building the Library</h2>
+
 To build the library you need <code>GNU</code> <code>Make</code> and a supported compiler,
-as listed in the <a href="installation.php#conf">Configuration</a> section. After the library
+as listed in the <a href="installation.php#compilers">Compiler</a> section. After the library
 is configured simply type <code>make</code> to build the library. Typing
 <code>make bin/meshtool</code> will build a mesh translation tool using the library.
 
@@ -135,9 +135,9 @@ Once the library is configured you can build it simply by typing
 <pre>make</pre>
 </div>
 
-<br>
-<h2><a name="test">Testing the Library</a></h2>
-<br>
+
+<a name="test"></a><h2>Testing the Library</h2>
+
 <code>libMesh</code> includes a number of examples in the <code>examples</code>
 directory. From the top-level directory you can build and run the example programs 
 by typing
@@ -151,9 +151,10 @@ since you can <a href="http://laws.lanl.gov/XCM/gmv/GMVHome.html">download GMV</
 for free from Los Alamos National Lab. It is a simple matter to change the source
 in the example to write a different format, just replace the <code>write_gmv</code>
 function call with whatever you like.
-<br>
-<h2><a name="link">Linking With Your Application</a></h2>
-<br>
+
+
+<a name="link"></a><h2>Linking With Your Application</h2>
+
 Since <code>libMesh</code> can be configured with many additional packages we recommend
 including the <code>Make.common</code> file created in the top-level directory in the
 <code>Makefile</code> of any application you want to use with the library. This will
@@ -165,11 +166,6 @@ yourself, but don't complain that it is hard.
 
 
 </div>
-
-<!--
-<div id="navBeta">
-</div>
--->
 
 <?php make_footer() ?>
 

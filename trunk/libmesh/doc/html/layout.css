@@ -1,4 +1,12 @@
+img.title_image {
+  float:left;
+  margin-left: 0;
+  padding-right        : 1em;
+  margin-top           : 0em;
+  margin-bottom        : 0em;
+  padding-top          : 0em;
 
+}
 
 /* The fragment defines a background color for code chunks */
 div.fragment {
@@ -25,6 +33,7 @@ div.comment {
   padding-bottom: 1em;
 }
 
+
 body { 
   position: relative; 
   color:black;
@@ -47,7 +56,7 @@ color:#000;
 }
 h2 {
 font:bold 12px/14px verdana, arial, helvetica, sans-serif;
-margin:0px 0px 5px 0px;
+margin:3em 1em 5px 0px;
 padding:0px;
 }
 
@@ -60,12 +69,13 @@ padding:0px;
 .Content>p+p {text-indent:30px;}
 
 a {
-color:#eee;
+color: navy;
 font-size:11px;
 font-family:verdana, arial, helvetica, sans-serif;
 font-weight:600;
 text-decoration:none;
 }
+
 a:link {color:#09c;}
 a:visited {color:#07a;}
 a:hover {
@@ -79,6 +89,8 @@ font-family:verdana, arial, helvetica, sans-serif;
 font-weight:200;
 text-decoration:none;
 }
+
+
 a.L2 {
 color:black;
 font-size:11px;
@@ -87,6 +99,8 @@ font-weight:200;
 text-decoration:none;
 padding-left:10px
 }
+
+
 a.L3 {
 color:black;
 font-size:9px;
@@ -95,6 +109,9 @@ font-weight:100;
 text-decoration:none;
 padding-left:15px
 }
+
+
+
 /* All the content boxes belong to the content class. */
 .content {
 position:relative; /* Position is declared "relative" to gain control of stacking order (z-index). */
@@ -109,7 +126,7 @@ z-index:3; /* This allows the content to overlap the right menu in narrow window
 }
 
 #navAlpha {
-position:absolute;
+position:fixed;/*biatch*/
 width:150px;
 top:20px;
 left:20px;
@@ -129,6 +146,8 @@ voice-family: "\"}\"";
 voice-family:inherit;
 width:128px;
 }
+
+
 /* I've heard this called the "be nice to Opera 5" rule. Basically, it feeds correct 
 length values to user agents that exhibit the parsing error exploited above yet get 
 the CSS box model right and understand the CSS2 parent-child selector. ALWAYS include
