@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.35 2003-07-15 12:40:12 benkirk Exp $
+// $Id: mesh_base.h,v 1.36 2003-07-26 00:17:00 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -64,7 +64,7 @@ template <typename T> class PetscMatrix;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.35 $
+ * \version $Revision: 1.36 $
  */
 
 
@@ -470,7 +470,8 @@ public:
    * Reads the file specified by \p name.  Attempts to figure out the
    * proper method by the file extension.
    */
-  virtual void read (const std::string& name);
+  virtual void read (const std::string& name,
+		     const bool do_prepare_for_use = true);
   
   /**
    * Write to the file specified by \p name.  Attempts to figure out the

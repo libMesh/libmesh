@@ -1,4 +1,4 @@
-// $Id: mesh.h,v 1.17 2003-07-24 18:31:17 jwpeterson Exp $
+// $Id: mesh.h,v 1.18 2003-07-26 00:17:00 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -97,7 +97,8 @@ class Mesh : public MeshBase
    * after the mesh is read (particularly for for parallel data layout).
    * This simplifies life by centralizing this code.
    */
-  void read (const std::string& name);
+  void read (const std::string& name,
+	     const bool do_prepare_for_use = true);
 
   
   /**
