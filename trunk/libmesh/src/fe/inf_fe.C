@@ -1,4 +1,4 @@
-// $Id: inf_fe.C,v 1.11 2003-02-13 22:56:10 benkirk Exp $
+// $Id: inf_fe.C,v 1.12 2003-02-20 12:54:57 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -328,8 +328,11 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 
 
   // The number and location of the radial quadrature points.
-  const unsigned int        n_radial_qp = qrule->n_points();
-  const std::vector<Point>&   radial_qp = qrule->get_points();
+  // const unsigned int        n_radial_qp = qrule->n_points();
+  // const std::vector<Point>&   radial_qp = qrule->get_points();
+
+  const unsigned int        n_radial_qp = radial_qrule->n_points();
+  const std::vector<Point>&   radial_qp = radial_qrule->get_points();
 
   const unsigned int        n_base_qp =  base_qrule->n_points();
 
@@ -500,8 +503,12 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
     {
       // this works, since the _base_ nodes are numbered in the 
       // same manner for the base element as for the infinite element
-      dist[i] = Point( inf_elem->node(i) 
-		       - inf_elem->node(i+n_base_mapping_shape_functions) ).size();
+
+
+      dist[i] = Point( inf_elem->point(i) 
+		       - inf_elem->point(i+n_base_mapping_shape_functions) ).size();
+
+
     }
   
 
@@ -639,7 +646,7 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial()
 
 		tp++;
 
-	      }
+	      } // loop radial and base qp's
 
 	}
 
@@ -685,12 +692,6 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial()
   return;
 
 }
-
-
-
-
-
-
 
 
 
