@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.22 2003-06-25 08:32:32 benkirk Exp $
+# $Id: Make.common.in,v 1.23 2003-07-05 09:59:14 ddreyer Exp $
 
 
 ###############################################################################
@@ -63,7 +63,7 @@ METIS_INCLUDE	     = @METIS_INCLUDE_PATH@
 
 # Parmetis graph partitiong software for domain decomposition
 enable-parmetis      = @enableparmetis@
-PARMETIS_INCLUDE     = @PARMETIS_INCLUDE_PATH@
+OUR_PARMETIS_INCLUDE = @PARMETIS_INCLUDE_PATH@
 
 # Laspack iterative solvers for uniprocessor applications
 enable-laspack       = @enablelaspack@
@@ -263,7 +263,7 @@ ifeq ($(enable-optional),yes)
     # and the lib
     ifeq ($(enable-parmetis),yes)
       LIBS    += $(EXTERNAL_LIBDIR)/libparmetis$(EXTERNAL_LIBEXT)
-      INCLUDE += -I$(PARMETIS_INCLUDE)
+      INCLUDE += -I$(OUR_PARMETIS_INCLUDE)
     endif
   endif
 
