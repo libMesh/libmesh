@@ -308,7 +308,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT CC CFLAGS ac_ct_CC enableshared GXX_VERSION CXXFLAGSG CXXFLAGSO CXXFLAGSP CXXFLAGSS CFLAGSG CFLAGSO CFLAGSP CFLAGSS CXXDEPFLAG CXXSHAREDFLAG RPATHFLAG CXXCPP EGREP MPCXX PWD enablexdr enablecomplex NETCDF_LIB NETCDF_INCLUDE EXODUS_LIB EXODUS_INCLUDE enableoptional F77 FFLAGS ac_ct_F77 FLIBS PETSC_ARCH PETSC_DIR petscversion petscmajorminor MPI_IMPL MPI MPI_LIBS MPI_LIBS_PATH MPI_LIBS_PATHS MPI_INCLUDES_PATH MPI_INCLUDES_PATHS enablepetsc LASPACK_INCLUDE LASPACK_LIB enablelaspack SFC_INCLUDE SFC_LIB enablesfc GZSTREAM_INCLUDE GZSTREAM_LIB enablegz TECPLOT_LIBRARY TECPLOT_INCLUDE METIS_INCLUDE METIS_LIB PARMETIS_INCLUDE PARMETIS_LIB enablemetis enableparmetis DOXYGEN DOT DOTPATH HAVE_DOT PERL LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT CC CFLAGS ac_ct_CC enableshared GXX_VERSION CXXFLAGSG CXXFLAGSO CXXFLAGSP CXXFLAGSS CFLAGSG CFLAGSO CFLAGSP CFLAGSS CXXDEPFLAG CXXSHAREDFLAG RPATHFLAG CXXCPP EGREP MPCXX PWD enablexdr enablecomplex NETCDF_LIB NETCDF_INCLUDE EXODUS_LIB EXODUS_INCLUDE enableoptional F77 FFLAGS ac_ct_F77 FLIBS PETSC_ARCH PETSC_DIR petscversion petscmajorminor MPI_IMPL MPI MPI_LIBS MPI_LIBS_PATH MPI_LIBS_PATHS MPI_INCLUDES_PATH MPI_INCLUDES_PATHS enablepetsc LASPACK_INCLUDE LASPACK_LIB enablelaspack SFC_INCLUDE SFC_LIB enablesfc GZSTREAM_INCLUDE GZSTREAM_LIB enablegz TECPLOT_LIBRARY TECPLOT_INCLUDE METIS_INCLUDE METIS_LIB PARMETIS_INCLUDE PARMETIS_LIB enablemetis enableparmetis DOXYGEN DOT DOTPATH HAVE_DOT TETGEN_VERSION TETGEN_INCLUDE TETGEN_LIBRARY enabletetgen PERL LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -883,6 +883,7 @@ Optional Features:
   --enable-tecplot        build with Tecplot binary support
   --enable-metis          build with Metis graph partitioning suppport
   --enable-parmetis       build with Parmetis parallel partitioning suppport
+  --enable-tetgen         build with TetGen tetrahedrization library support
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -7527,7 +7528,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:7530:" \
+echo "$as_me:7531:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -7695,7 +7696,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_verb"
-(eval echo $as_me:7698: \"$ac_link\") >&5
+(eval echo $as_me:7699: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -7775,7 +7776,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_cv_prog_f77_v"
-(eval echo $as_me:7778: \"$ac_link\") >&5
+(eval echo $as_me:7779: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -10034,6 +10035,36 @@ fi
 
 
 
+
+# Check whether --enable-tetgen or --disable-tetgen was given.
+if test "${enable_tetgen+set}" = set; then
+  enableval="$enable_tetgen"
+  enabletetgen=$enableval
+else
+  enabletetgen=no
+fi;
+if test "$enabletetgen" != no ; then
+
+  if test $TETGEN_DIR; then
+     TETGEN_VERSION="-DTETGEN_13"
+     TETGEN_INCLUDE="-I$TETGEN_DIR"
+     TETGEN_LIBRARY="$TETGEN_DIR/libtet.a"
+  else
+     TETGEN_VERSION=""
+     TETGEN_INCLUDE=""
+     TETGEN_LIBRARY=""
+     enabletetgen=no
+  fi
+
+
+
+
+
+  echo "$as_me:$LINENO: result: <<< Configuring library with TetGen support >>>" >&5
+echo "${ECHO_T}<<< Configuring library with TetGen support >>>" >&6
+fi
+
+
    echo "$as_me:$LINENO: result: ----------------------------------------------" >&5
 echo "${ECHO_T}----------------------------------------------" >&6
    echo "$as_me:$LINENO: result: --- Done configuring for optional packages ---" >&5
@@ -10046,6 +10077,8 @@ else
    enableparmetis=no
    enablesfc=no
    enablegz=no
+   enabletetgen=no
+
 
 
 
@@ -10737,6 +10770,10 @@ s,@DOXYGEN@,$DOXYGEN,;t t
 s,@DOT@,$DOT,;t t
 s,@DOTPATH@,$DOTPATH,;t t
 s,@HAVE_DOT@,$HAVE_DOT,;t t
+s,@TETGEN_VERSION@,$TETGEN_VERSION,;t t
+s,@TETGEN_INCLUDE@,$TETGEN_INCLUDE,;t t
+s,@TETGEN_LIBRARY@,$TETGEN_LIBRARY,;t t
+s,@enabletetgen@,$enabletetgen,;t t
 s,@PERL@,$PERL,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t

@@ -1,4 +1,4 @@
-// $Id: tetgen_io.h,v 1.2 2004-04-07 21:42:31 benkirk Exp $
+// $Id: tetgen_io.h,v 1.3 2004-05-05 15:23:50 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -55,7 +55,11 @@ class TetGenIO : public MeshIO<Mesh>
    */
   virtual void read (const std::string& );
 
-  
+  /**
+   * This method implements writing a mesh to a specified file.
+   */
+  virtual void write (const std::string& );  
+
  private:
  
 
