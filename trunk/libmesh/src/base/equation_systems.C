@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.32 2003-04-11 10:46:18 ddreyer Exp $
+// $Id: equation_systems.C,v 1.33 2003-04-30 21:09:28 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -113,6 +113,48 @@ void EquationSystems<T_sys>::init ()
        * Initialize the system.
        */
       sys->second->init();
+    }
+}
+
+
+
+template <typename T_sys>
+void EquationSystems<T_sys>::reinit ()
+{
+ const unsigned int n_sys = this->n_systems();
+
+ assert (n_sys != 0);
+
+ EquationSystemsBase::reinit();
+
+  /**
+   * Tell all the \p DofObject entities how many systems
+   * there are.
+   */
+  {
+    // All the nodes
+    node_iterator       node_it  (_mesh.nodes_begin());
+    const node_iterator node_end (_mesh.nodes_end());
+    
+    for ( ; node_it != node_end; ++node_it)
+      (*node_it)->set_n_systems(n_sys);
+    
+    // All the elements
+    elem_iterator       elem_it (_mesh.elements_begin());
+    const elem_iterator elem_end(_mesh.elements_end());
+    
+    for ( ; elem_it != elem_end; ++elem_it)
+      (*elem_it)->set_n_systems(n_sys);
+  }
+
+  typename std::map<std::string, T_sys*>::iterator sys = _systems.begin();
+  
+  for (; sys != _systems.end();  ++sys)
+    {
+      /**
+       * Initialize the system.
+       */
+      sys->second->reinit();
     }
 }
 

@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.36 2003-04-30 13:56:11 benkirk Exp $
+// $Id: dof_map.C,v 1.37 2003-04-30 21:09:27 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -79,8 +79,65 @@ void DofMap::reinit(MeshBase& mesh)
   const unsigned int n_var = this->n_variables();
   const unsigned int dim   = mesh.mesh_dimension();
 
-  // First set the number of variables for each \p DofObject
-  // equal to n_variables() for this system.
+
+  //------------------------------------------------------------
+  // Clear the old_dof_objects for all the nodes
+  // and elements so that we can overwrite them
+  {
+    node_iterator       node_it (mesh.nodes_begin());
+    const node_iterator node_end(mesh.nodes_end());
+    
+    for ( ; node_it != node_end; ++node_it)
+      {
+	(*node_it)->clear_old_dof_object();
+	assert ((*node_it)->old_dof_object == NULL);
+      }
+    
+    elem_iterator       elem_it (mesh.elements_begin());
+    const elem_iterator elem_end(mesh.elements_end());
+    
+    for ( ; elem_it != elem_end; ++elem_it)
+      {
+	(*elem_it)->clear_old_dof_object();
+	assert ((*elem_it)->old_dof_object == NULL);
+      }
+  }
+
+  
+  //------------------------------------------------------------
+  // Set the old_dof_objects for the elements that
+  // weren't just created
+  {
+    elem_iterator       elem_it (mesh.elements_begin());
+    const elem_iterator elem_end(mesh.elements_end());
+    
+    for ( ; elem_it != elem_end; ++elem_it)
+      {
+	Elem* elem = *elem_it;
+
+        // Skip the elements that were just refined
+	if (elem->refinement_flag() == Elem::JUST_REFINED) continue;
+
+	//here();
+        
+	for (unsigned int n=0; n<elem->n_nodes(); n++)
+	  {
+	    Node* node = elem->get_node(n);
+
+	    if (node->old_dof_object == NULL)
+	      node->set_old_dof_object();
+	  }
+
+	assert (elem->old_dof_object == NULL);
+	elem->set_old_dof_object();
+      }
+  }
+
+  
+  //------------------------------------------------------------
+  // Then set the number of variables for each \p DofObject
+  // equal to n_variables() for this system.  This will
+  // handle new \p DofObjects that may have just been created
   {
     // All the nodes
     node_iterator       node_it  (mesh.nodes_begin());
@@ -88,7 +145,7 @@ void DofMap::reinit(MeshBase& mesh)
 
     for ( ; node_it != node_end; ++node_it)
       (*node_it)->set_n_vars(this->sys_number(),n_var);
-    
+
     // All the elements
     elem_iterator       elem_it (mesh.elements_begin());
     const elem_iterator elem_end(mesh.elements_end());
@@ -98,7 +155,8 @@ void DofMap::reinit(MeshBase& mesh)
   }
   
 
-  // Allocate space for the DOF indices
+  //------------------------------------------------------------
+  // Next allocate space for the DOF indices
   for (unsigned int var=0; var<this->n_variables(); var++)
     {
       const FEType& fe_type = variable_type(var);
@@ -118,21 +176,20 @@ void DofMap::reinit(MeshBase& mesh)
 	      const unsigned int dofs_at_node =
 		FEInterface::n_dofs_at_node(dim, fe_type, type, n);
 	      
-	      if (dofs_at_node > elem->get_node(n)->n_comp(this->sys_number(),var))
-		elem->get_node(n)->set_n_comp(this->sys_number(), var, dofs_at_node);
+	      elem->get_node(n)->set_n_comp(this->sys_number(), var, dofs_at_node);
 	    }
 	     
 	  // Allocate the element DOFs
 	  const unsigned int dofs_per_elem =
 	    FEInterface::n_dofs_per_elem(dim, fe_type, type);
 	  
-	  if (dofs_per_elem > elem->n_comp(this->sys_number(), var))
-	    elem->set_n_comp(this->sys_number(), var, dofs_per_elem);
+	  elem->set_n_comp(this->sys_number(), var, dofs_per_elem);
 	}
     }
 
 
-  // Finally, clear all the DOF indices
+  //------------------------------------------------------------
+  // Finally, clear all the current DOF indices
   {
     // All the nodes
     node_iterator       node_it  (mesh.nodes_begin());
@@ -142,8 +199,8 @@ void DofMap::reinit(MeshBase& mesh)
       (*node_it)->invalidate_dofs();
     
     // All the elements
-    elem_iterator       elem_it (mesh.elements_begin());
-    const elem_iterator elem_end(mesh.elements_end());
+    active_elem_iterator       elem_it (mesh.elements_begin());
+    const active_elem_iterator elem_end(mesh.elements_end());
 
     for ( ; elem_it != elem_end; ++elem_it)
       (*elem_it)->invalidate_dofs();
@@ -521,7 +578,7 @@ void DofMap::compute_sparsity(MeshBase& mesh)
     sparsity_pattern.clear();
   }
 }
-
+ 
 
 
 void DofMap::dof_indices (const Elem* elem,
@@ -580,6 +637,70 @@ void DofMap::dof_indices (const Elem* elem,
   assert (tot_size == di.size());
   
   STOP_LOG("dof_indices()", "DofMap");  
+}
+ 
+
+
+void DofMap::old_dof_indices (const Elem* elem,
+			      std::vector<unsigned int>& di,
+			      const unsigned int vn) const
+{
+  START_LOG("old_dof_indices()", "DofMap");
+  
+  assert (elem != NULL);
+  assert (elem->old_dof_object != NULL);
+	    
+
+  const unsigned int n_nodes = elem->n_nodes();
+  const ElemType type        = elem->type();
+  
+  // Clear the DOF indices vector.
+  di.clear();
+
+  unsigned int tot_size = 0;
+  
+  // Get the dof numbers
+  for (unsigned int v=0; v<this->n_variables(); v++)
+    if ((v == vn) || (vn == static_cast<unsigned int>(-1)))
+      { // Do this for all the variables if one was not specified
+	// or just for the specified variable
+	const FEType& fe_type = this->variable_type(v);
+
+	const unsigned int size = FEInterface::n_dofs(elem->dim(), fe_type, type);
+	tot_size += size;
+	// Reserve space in the di vector
+	// so we can use push_back effectively
+	//di.reserve (size);
+	
+	// Get the node-based DOF numbers
+	for (unsigned int n=0; n<n_nodes; n++)
+	  {
+	    const Node* node = elem->get_node(n);
+
+	    assert (node->old_dof_object != NULL);
+	    
+	    for (unsigned int i=0; i<node->old_dof_object->n_comp(this->sys_number(),v); i++)
+	      {
+		assert (node->old_dof_object->dof_number(this->sys_number(),v,i) !=
+			DofObject::invalid_id);
+		
+		di.push_back(node->old_dof_object->dof_number(this->sys_number(),v,i));
+	      }
+	  }
+	
+	// Get the element-based DOF numbers	  
+	for (unsigned int i=0; i<elem->old_dof_object->n_comp(this->sys_number(),v); i++)
+	  {
+	    assert (elem->old_dof_object->dof_number(this->sys_number(),v,i) !=
+		    DofObject::invalid_id);
+	    
+	    di.push_back(elem->old_dof_object->dof_number(this->sys_number(),v,i));
+	  }
+      }
+
+  assert (tot_size == di.size());
+  
+  STOP_LOG("old_dof_indices()", "DofMap");  
 }
 
 

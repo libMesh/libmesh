@@ -1,4 +1,4 @@
-// $Id: node.h,v 1.8 2003-03-03 02:15:57 benkirk Exp $
+// $Id: node.h,v 1.9 2003-04-30 21:09:24 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -44,7 +44,7 @@ class Node;
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.8 $
+ * \version $Revision: 1.9 $
  */
 
 class Node : public Point,
@@ -78,6 +78,11 @@ public:
    * Destructor.
    */ 
   ~Node ();
+
+  /**
+   * Assign to a node from a point
+   */
+  Node& operator= (const Point& p);
   
   /**
    * Builds a \p Node and returns a \p Node* to the
@@ -125,7 +130,7 @@ Node::Node (const Real x,
 	    const unsigned int id) :
   Point(x,y,z)
 {
-  set_id() = id;
+  this->set_id() = id;
 }
 
 
@@ -136,7 +141,6 @@ Node::Node (const Node& n) :
   DofObject(n),
   ReferenceCountedObject<Node>()
 {
-//  _id = n._id;
 }
 
 
@@ -151,8 +155,7 @@ Node::Node (const Point& p,
   // Node n = Point p would erase
   // the id!
   if (id != invalid_id)
-    set_id() = id;
-//    _id = id;
+    this->set_id() = id;
 }
 
 
@@ -160,6 +163,18 @@ Node::Node (const Point& p,
 inline
 Node::~Node ()
 {
+}
+
+
+
+inline
+Node & Node::operator= (const Point& p)
+{
+  (*this)(0) = p(0);
+  (*this)(1) = p(1);
+  (*this)(2) = p(2);
+
+  return *this;
 }
 
 

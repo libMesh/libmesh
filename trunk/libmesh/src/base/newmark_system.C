@@ -1,4 +1,4 @@
-// $Id: newmark_system.C,v 1.2 2003-04-09 19:26:59 ddreyer Exp $
+// $Id: newmark_system.C,v 1.3 2003-04-30 21:09:29 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -112,7 +112,18 @@ void NewmarkSystem::init ()
   
   // initialize parent data
   SystemBase::init();
+}
 
+
+
+void NewmarkSystem::reinit ()
+{
+  assert (_mesh.is_prepared());
+  
+  // initialize parent data
+  SystemBase::reinit();
+
+  error();
 }
 
 

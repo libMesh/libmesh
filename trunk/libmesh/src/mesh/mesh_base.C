@@ -1,6 +1,6 @@
 
 
-// $Id: mesh_base.C,v 1.27 2003-04-03 14:17:25 ddreyer Exp $
+// $Id: mesh_base.C,v 1.28 2003-04-30 21:09:30 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -124,8 +124,8 @@ Node* MeshBase::add_point (const Point& p,
       assert (node_ptr(num) != NULL);
       assert (node_ptr(num)->id() != Node::invalid_id);
       
-      node(num)          = p;
-      node(num).set_id() = num;
+      this->node(num)      = p;
+      assert (node(num).id() == num);
       
       STOP_LOG("add_point()", "MeshBase");
   

@@ -1,4 +1,4 @@
-// $Id: system_base.h,v 1.12 2003-04-05 02:25:42 ddreyer Exp $
+// $Id: system_base.h,v 1.13 2003-04-30 21:09:25 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -88,6 +88,15 @@ protected:
   void init ();
   
   /**
+   * Reinitializes degrees of freedom and other 
+   * required data on the current mesh.  Note that the matrix
+   * is not initialized at this time since it may not be required
+   * for all applications. @e Should be overloaded in derived classes.
+   * Protected so that only children can use it.
+   */
+  void reinit ();
+  
+  /**
    * Prepares \p matrix and \p _dof_map for matrix assembly.
    * Does not actually assemble anything.  For matrix assembly,
    * use the \p assemble() in derived classes.
@@ -126,6 +135,13 @@ public:
   static const std::string system_type () { error(); return ""; }
 
   /**
+   * Projects the solution vector to the new mesh.  The input indices
+   * give the old DOF numbers in terms of the new DOF numbers.
+   */
+  void project_vector(const NumericVector<Number>*,
+                      NumericVector<Number>*) const;
+  
+  /**
    * @returns the system number.   
    */
   unsigned int number () const;
@@ -144,6 +160,7 @@ public:
    */
   void update_global_solution (std::vector<Number>& global_soln,
 			       const unsigned int dest_proc) const;
+
 
   /**
    * @returns a constant reference to this systems's \p _mesh.

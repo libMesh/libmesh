@@ -1,4 +1,4 @@
-// $Id: thin_system.h,v 1.1 2003-03-21 15:29:10 ddreyer Exp $
+// $Id: thin_system.h,v 1.2 2003-04-30 21:09:25 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -73,6 +73,12 @@ public:
    * the system, so that, e.g., \p assemble() may be used.
    */
   void init ();
+
+  /**
+   * Reinitializes the member data fields associated with
+   * the system, so that, e.g., \p assemble() may be used.
+   */
+  void reinit ();
  
   /**
    * Assemble the linear system.  Does not
