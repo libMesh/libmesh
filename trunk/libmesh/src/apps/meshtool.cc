@@ -785,8 +785,8 @@ int main (int argc, char** argv)
 //     /**
 //      * Possibly partition the mesh
 //      */
-//     if (n_subdomains > 1)
-//       mesh.partition(n_subdomains);
+    if (n_subdomains > 1)
+      mesh.partition(n_subdomains);
     
     
     /**
