@@ -1,30 +1,29 @@
-<?php function load_style($root) { ?>
-   <script language="javascript" src="detect.js"></script>
-   <script>
-    if (is_gecko)
-      {
-        // Use special Gecko CSS style for all CSS-enabled types
-        document.write("<link href='gecko.css' type='text/css' rel='stylesheet' media='screen'>\n")
-      }
-    else if (is_ie5up)
-      {
-        document.write("<link href='layout.css' type='text/css' rel='stylesheet' media='screen'>\n")
-      }
-    else if (is_nav && (is_major <= 4))
-      {
-        document.write("<link href='orig.css' type='text/css' rel='stylesheet' media='screen'>\n")
-      }
-    else
-      {
-        // document.write() statements to create static HTML markup for earlier versions
-      }
-     </script>
+<?php
+function load_style($root)
+{ 
+  // Do it the php way
+  require($root."detect.php");
+  
+  // Call the detection script to set definitions
+  detect();
+  
+  // Now check for CSS compatibility
+  if (NW_IS_GECKO)
+    {
+      echo "<link href='gecko.css' type='text/css' rel='stylesheet' media='screen'>\n";
+    }
 
-<!-- <style type="text/css" media="screen"> -->
-<!-- <?php echo "@import \"".$root."layout.css\";"; ?> -->
-<!-- </style> -->
+  else if (NW_IS_IE > 5)
+    {
+      echo "<link href='layout.css' type='text/css' rel='stylesheet' media='screen'>\n";
+    }
 
-<?php } ?>
+  else if (NW_IS_NN <= 4)
+    {
+      echo "<link href='orig.css' type='text/css' rel='stylesheet' media='screen'>\n";
+    }
+}
+?>
 
 
 
