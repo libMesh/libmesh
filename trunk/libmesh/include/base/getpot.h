@@ -1,4 +1,4 @@
-// $Id: getpot.h,v 1.4 2004-10-15 04:27:37 benkirk Exp $
+// $Id: getpot.h,v 1.5 2004-11-23 02:11:12 benkirk Exp $
 //
 // (with patches from Michael Anderson for more general variable types)
 
@@ -492,7 +492,8 @@ GetPot::__read_in_stream(std::istream& istr)
   while(istr) {
     __skip_whitespace(istr);
     const std::string Token = __get_next_token(istr);
-    if( (Token.length() == 0) || (Token[0] == EOF) ) break;
+    if( Token.empty() ||
+	(Token[0] == static_cast<std::string::value_type>(EOF)) ) break;
     brute_tokens.push_back(Token);
   }
 
