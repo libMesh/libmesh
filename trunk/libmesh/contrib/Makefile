@@ -18,7 +18,7 @@ all:
 	@echo "--- Building sfcurves ------------------------"
 	@$(MAKE) -C sfcurves     $(MAKECMDGOALS)
 	@echo ""
-	@echo "--- Building sfcurves ------------------------"
+	@echo "--- Building libgzstream ---------------------"
 	@$(MAKE) -C gzstream     $(MAKECMDGOALS)
 	@echo ""
 	@echo "----------------------------------------------"
