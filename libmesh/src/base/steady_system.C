@@ -1,4 +1,4 @@
-// $Id: steady_system.C,v 1.4 2003-05-28 03:17:49 benkirk Exp $
+// $Id: steady_system.C,v 1.5 2003-05-28 22:03:15 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -51,6 +51,7 @@ SteadySystem::~SteadySystem ()
 
 void SteadySystem::clear ()
 {
+  // clear the parent data
   SystemBase::clear();
   
   // clear the current local solution  
@@ -112,4 +113,11 @@ void SteadySystem::update ()
   // Only the necessary values (specified by the send_list)
   // are copied to minimize communication
   solution->localize (*current_local_solution, send_list); 
+}
+
+
+
+void SteadySystem::re_update ()
+{
+  error();
 }

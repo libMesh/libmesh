@@ -1,4 +1,4 @@
-// $Id: numeric_vector.h,v 1.16 2003-05-16 19:29:09 benkirk Exp $
+// $Id: numeric_vector.h,v 1.17 2003-05-28 22:03:01 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -337,6 +337,14 @@ public:
    */
   virtual void localize (NumericVector<T>& v_local,
 			 const std::vector<unsigned int>& send_list) const = 0;
+  
+  /**
+   * Updates a local vector with selected values from neighboring
+   * processors, as defined by \p send_list.
+   */
+  virtual void localize (const unsigned int first_local_idx,
+			 const unsigned int last_local_idx,
+			 const std::vector<unsigned int>& send_list) = 0;
 
   /**
    * Creates a local copy of the global vector in

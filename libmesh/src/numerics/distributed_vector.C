@@ -1,4 +1,4 @@
-// $Id: distributed_vector.C,v 1.11 2003-05-15 23:34:36 benkirk Exp $
+// $Id: distributed_vector.C,v 1.12 2003-05-28 22:03:15 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -373,6 +373,19 @@ void DistributedVector<T>::localize (NumericVector<T>& v_local_in,
 
   // We don't support the send list.  Call the less efficient localize(v_local_in)
   localize (v_local_in);
+}
+
+
+
+template <typename T>
+void DistributedVector<T>::localize (const unsigned int first_local_idx,
+				     const unsigned int last_local_idx,
+				     const std::vector<unsigned int>& send_list)
+{
+  assert (first_local_idx  == 0);
+  assert (last_local_idx+1 == this->size());
+  
+  assert (send_list.size() == this->size());
 }
 
 

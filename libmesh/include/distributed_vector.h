@@ -1,4 +1,4 @@
-// $Id: distributed_vector.h,v 1.10 2003-05-15 23:34:33 benkirk Exp $
+// $Id: distributed_vector.h,v 1.11 2003-05-28 22:03:00 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -318,6 +318,14 @@ public:
    */
   void localize (NumericVector<T>& v_local,
 		 const std::vector<unsigned int>& send_list) const;
+  
+  /**
+   * Updates a local vector with selected values from neighboring
+   * processors, as defined by \p send_list.
+   */
+  void localize (const unsigned int first_local_idx,
+		 const unsigned int last_local_idx,
+		 const std::vector<unsigned int>& send_list);
 
   /**
    * Creates a local copy of the global vector in

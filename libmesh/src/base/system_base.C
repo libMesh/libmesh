@@ -1,4 +1,4 @@
-// $Id: system_base.C,v 1.18 2003-05-28 03:17:49 benkirk Exp $
+// $Id: system_base.C,v 1.19 2003-05-28 22:03:15 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -175,16 +175,22 @@ void SystemBase::init_data ()
 
 void SystemBase::reinit ()
 {
+#ifdef ENABLE_AMR
+  
+  // Augment the send_list for the old mesh to handle
+  // additional data dependencies introduced by refinement
+  _dof_map.augment_send_list_for_projection (_mesh);
+
+  // Re-update the data in this system using the
+  // augmented send_list
+  this->re_update ();
+  
   // Distribute the degrees of freedom on the mesh
   _dof_map.distribute_dofs (_mesh);
   
-#ifdef ENABLE_AMR
-
   // Recreate any hanging node constraints
   _dof_map.create_dof_constraints(_mesh);
   
-#endif
-
   // Resize the RHS conformal to the current mesh
   rhs->init (this->n_dofs(), this->n_local_dofs());
 
@@ -195,9 +201,10 @@ void SystemBase::reinit ()
        pos != _other_matrices.end(); ++pos)
     pos->second->clear();
 
-  
   // Clear the linear solver interface
   linear_solver_interface->clear();
+  
+#endif
 }
 
 
