@@ -1,4 +1,4 @@
-// $Id: mesh_modification.C,v 1.8 2004-11-22 21:32:36 jwpeterson Exp $
+// $Id: mesh_modification.C,v 1.9 2004-12-17 20:55:07 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -20,6 +20,7 @@
 
 
 // C++ includes
+#include <math.h> // for acos()
 #include <algorithm>
 #include <map>
 
@@ -138,15 +139,54 @@ void MeshTools::Modification::translate (MeshBase& mesh,
 }
 
 
+// void MeshTools::Modification::rotate2D (MeshBase& mesh,
+//                                         const Real alpha)
+// {
+//   assert (mesh.mesh_dimension() != 1);
 
-void MeshTools::Modification::rotate (MeshBase& ,
-				      const Real,
-				      const Real,
-				      const Real)
+//   const Real pi = acos(-1);
+//   const Real  a = alpha/180.*pi;
+//   for (unsigned int n=0; n<mesh.n_nodes(); n++)
+//     {
+//       const Point p = mesh.node(n);
+//       const Real  x = p(0);
+//       const Real  y = p(1);
+//       const Real  z = p(2);
+//       mesh.node(n) = Point(cos(a)*x - sin(a)*y,
+//                            sin(a)*x + cos(a)*y,
+//                            z);
+//     }
+
+// }
+
+
+
+void MeshTools::Modification::rotate (MeshBase& mesh,
+				      const Real phi,
+				      const Real theta,
+				      const Real psi)
 {
-  error();
-}
+  assert (mesh.mesh_dimension() != 1);
 
+  const Real pi = acos(-1.);
+  const Real  p = -phi/180.*pi;
+  const Real  t = -theta/180.*pi;
+  const Real  s = -psi/180.*pi;
+  const Real sp = sin(p), cp = cos(p);
+  const Real st = sin(t), ct = cos(t);
+  const Real ss = sin(s), cs = cos(s);
+
+  for (unsigned int n=0; n<mesh.n_nodes(); n++)
+    {
+      const Point p = mesh.node(n);
+      const Real  x = p(0);
+      const Real  y = p(1);
+      const Real  z = p(2);
+      mesh.node(n) = Point(( cp*cs-sp*ct*ss)*x + ( sp*cs+cp*ct*ss)*y + (st*ss)*z,
+                           (-cp*ss-sp*ct*cs)*x + (-sp*st+cp*ct*cs)*y + (st*cs)*z,
+                           ( sp*st)*x          + (-cp*st)*y          + (ct)*z   );
+    }
+}
 
 
 void MeshTools::Modification::scale (MeshBase& mesh,

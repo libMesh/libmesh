@@ -1,4 +1,4 @@
-/* $Id: ex4.C,v 1.40 2004-11-15 22:09:07 benkirk Exp $ */
+/* $Id: ex4.C,v 1.41 2004-12-17 20:54:57 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -442,7 +442,7 @@ void assemble_poisson(EquationSystems& es,
 	      // face.
 	      fe_face->reinit(elem, side);
 	      
-	      // Loop over the face quagrature points for integration.
+	      // Loop over the face quadrature points for integration.
 	      for (unsigned int qp=0; qp<qface.n_points(); qp++)
 		{
 		  // The location on the boundary of the current
