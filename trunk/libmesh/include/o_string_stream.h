@@ -1,4 +1,4 @@
-// $Id: o_string_stream.h,v 1.3 2003-03-23 15:09:00 ddreyer Exp $
+// $Id: o_string_stream.h,v 1.4 2003-03-23 15:23:30 ddreyer Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -134,8 +134,7 @@
  /**
   * This class provides a compatibility class for broken
   * features in the \p ostringstream of the older \p GCC
-  * versions.  For other compilers, this class is simply 
-  * a \p std::ostringstream.
+  * versions.  Other compilers do not see this class.
   */
 
  // ------------------------------------------------------------
