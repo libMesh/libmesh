@@ -1,4 +1,4 @@
-// $Id: gmsh_io.h,v 1.3 2005-02-22 22:17:33 jwpeterson Exp $
+// $Id: gmsh_io.h,v 1.4 2005-04-08 20:39:24 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -39,6 +39,7 @@ class MeshBase;
  * <a href="http://http://www.geuz.org/gmsh/">the Gmsh home page</a>
  *
  * @author John W. Peterson, 2004
+ * @author Martin Lüthi, 2005 (support for reading meshes and writing results)
  */
 
 // ------------------------------------------------------------
@@ -61,16 +62,37 @@ class GmshIO : public MeshInput<MeshBase>,
   GmshIO (const MeshBase& mesh);
 
   /**
-   * Reads in a Gmsh data file based on the string
-   * you pass it.
+   * Reads in a mesh in the Gmsh *.msh format
+   * from the ASCII file given by name.
    */
   virtual void read (const std::string& name);
 
   /**
-   * This method implements writing a mesh to a specified file.
+   * This method implements writing a mesh to a specified file
+   * in the Gmsh *.msh format.
    */
   virtual void write (const std::string& name);
   
+  /**
+   * This method implements writing a mesh with nodal data to a
+   * specified file where the nodal data and variable names are provided.
+   */
+  virtual void write_nodal_data (const std::string&,
+				 const std::vector<Number>&,
+				 const std::vector<std::string>&);
+
+  /**
+   * Flag indicating whether or not to write a binary file.  While binary
+   * files may end up being smaller than equivalent ASCII files, they will
+   * almost certainly take longer to write.  The reason for this is that
+   * the ostream::write() function which is used to write "binary" data to
+   * streams, only takes a pointer to char as its first argument.  This means
+   * if you want to write anything other than a buffer of chars, you first
+   * have to use a strange memcpy hack to get the data into the desired format.
+   * See the templated to_binary_stream() function below.
+   */
+  bool & binary ();
+
 
 private:
   /**
@@ -78,13 +100,29 @@ private:
    * is called by the public interface function and implements
    * reading the file.
    */
-  virtual void read_stream (std::istream& in);
+  virtual void read_mesh (std::istream& in);
 
   /**
    * This method implements writing a mesh to a
-   * specified file.  This will write an ASCII file.
+   * specified file.  This will write an ASCII *.msh file.
    */
-  virtual void write_stream (std::ostream& out);
+  virtual void write_mesh (std::ostream& out);
+
+  /**
+   * This method implements writing a mesh with nodal data to a specified file
+   * where the nodal data and variable names are optionally provided.  This
+   * will write an ASCII or binary *.pos file, depending on the binary flag.
+   */
+  void write_post (const std::string&,
+                   const std::vector<Number>* = NULL,
+                   const std::vector<std::string>* = NULL);
+
+  /**
+   * Flag to write binary data.
+   */
+  bool _binary;
+ 
+
 
 };
 
@@ -94,7 +132,8 @@ private:
 // GmshIO inline members
 inline
 GmshIO::GmshIO (const MeshBase& mesh) :
-  MeshOutput<MeshBase> (mesh)
+  MeshOutput<MeshBase> (mesh),
+  _binary        (false)
 {
 }
 
@@ -102,11 +141,15 @@ GmshIO::GmshIO (const MeshBase& mesh) :
 inline
 GmshIO::GmshIO (MeshBase& mesh) :
   MeshInput<MeshBase>  (mesh),
-  MeshOutput<MeshBase> (mesh)
+  MeshOutput<MeshBase> (mesh),
+  _binary (false)
 {}
 
-
-
+inline
+bool & GmshIO::binary ()
+{
+  return _binary;
+}
 
 
 #endif // #define __gmsh_io_h__
