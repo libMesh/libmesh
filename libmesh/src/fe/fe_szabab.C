@@ -1,4 +1,4 @@
-// $Id: fe_szabab.C,v 1.3 2005-02-22 22:17:37 jwpeterson Exp $
+// $Id: fe_szabab.C,v 1.4 2005-04-08 09:31:02 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1134,7 +1134,13 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 template <unsigned int Dim, FEFamily T>
 bool FE<Dim,T>::shapes_need_reinit() const
 {
-  return true;
+  // reinit is only necessary for
+  // approximation orders >= 3
+  if(this->fe_type.order == FIRST ||
+     this->fe_type.order == SECOND)
+    return false;
+  else
+    return true;
 }
 
 
