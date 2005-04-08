@@ -1,4 +1,4 @@
-// $Id: gmsh_io.C,v 1.10 2005-03-31 20:40:06 benkirk Exp $
+// $Id: gmsh_io.C,v 1.11 2005-04-08 20:39:33 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -262,6 +262,7 @@ namespace
 	  eletypes_exp[PYRAMID5] = eledef;
           eletypes_imp[7]        = eledef;
 	}
+
 	//==============================      
       }
   }
@@ -274,12 +275,11 @@ namespace
 void GmshIO::read (const std::string& name)
 {
   std::ifstream in (name.c_str());
-
-  this->read_stream (in);
+  this->read_mesh (in);
 }
 
 
-void GmshIO::read_stream(std::istream& in)
+void GmshIO::read_mesh(std::istream& in)
 {
 
   assert(in.good());
@@ -435,21 +435,28 @@ void GmshIO::write (const std::string& name)
   if (libMesh::processor_id() == 0)
     {
       std::ofstream out (name.c_str());
-      this->write_stream (out);
+      this->write_mesh (out);
     }
 }
 
 
+void GmshIO::write_nodal_data (const std::string& fname,
+                               const std::vector<Number>& soln,
+                               const std::vector<std::string>& names)
+{
+  //this->_binary = true;
+  if (libMesh::processor_id() == 0)
+    this->write_post  (fname, &soln, &names);
+}
 
 
-void GmshIO::write_stream (std::ostream& out)
+void GmshIO::write_mesh (std::ostream& out)
 {
   // Be sure that the stream is valid.
   assert (out.good());
   
   // initialize the map with element types
   init_eletypes();
-
 
   // Get a const reference to the mesh
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
@@ -504,7 +511,6 @@ void GmshIO::write_stream (std::ostream& out)
         out << elem->id()+1 << " ";
 
         // element type
-        std::cout << elem->type() << "\n";
         out << eletype.exptype;
 
         // write the number of tags and
@@ -521,15 +527,240 @@ void GmshIO::write_stream (std::ostream& out)
         // otherwise keep the same node order
         else
           for (unsigned int i=0; i < elem->n_nodes(); i++)
-            out << elem->node(i)+1 << " ";                 // gmsh is 1-based 
+            out << elem->node(i)+1 << " ";                  // gmsh is 1-based 
         out << "\n";
       } // element loop
     out << "$EndElements\n";
   }
-  // end of the file
-
 }
 
 
+void GmshIO::write_post (const std::string& fname,
+                         const std::vector<Number>* v,
+                         const std::vector<std::string>* solution_names)
+{
 
+  // Should only do this on processor 0!
+  assert (libMesh::processor_id() == 0);
+  
+  // Create an output stream
+  std::ofstream out(fname.c_str());
+
+  // initialize the map with element types
+  init_eletypes();
+
+  if (!out.good())
+    {
+      std::cerr << "ERROR: opening output file " << fname
+		<< std::endl;
+      error();
+    }
+
+  // create a character buffer
+  char buf[80];
+
+  // Get a constant reference to the mesh.
+  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+
+  //  write the data
+  if ((solution_names != NULL) && (v != NULL))
+    {      
+      const unsigned int n_vars = solution_names->size();
+    
+      if (!(v->size() == mesh.n_nodes()*n_vars))
+        std::cerr << "ERROR: v->size()=" << v->size()
+                  << ", mesh.n_nodes()=" << mesh.n_nodes()
+                  << ", n_vars=" << n_vars
+                  << ", mesh.n_nodes()*n_vars=" << mesh.n_nodes()*n_vars
+                  << "\n";
+      
+      assert (v->size() == mesh.n_nodes()*n_vars);
+
+      // write the header
+      out << "$PostFormat\n";
+      if (this->binary())
+        out << "1.2 1 " << sizeof(double) << "\n";
+      else
+        out << "1.2 0 " << sizeof(double) << "\n";
+      out << "$EndPostFormat\n";
+
+      // Loop over the elements to see how much of each type there are
+      unsigned int n_points=0, n_lines=0, n_triangles=0, n_quadrangles=0,
+        n_tetrahedra=0, n_hexahedra=0, n_prisms=0, n_pyramids=0;
+      unsigned int n_scalar=0, n_vector=0, n_tensor=0;
+      unsigned int nb_text2d=0, nb_text2d_chars=0, nb_text3d=0, nb_text3d_chars=0;
+
+      {
+        MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+        const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+
+
+        for ( ; it != end; ++it)
+          {
+            const ElemType elemtype = (*it)->type();
+            
+            switch (elemtype)
+              {
+              case EDGE2:
+              case EDGE3:
+              case EDGE4:
+                {
+                  n_lines += 1;
+                  break;
+                }
+              case TRI3:
+              case TRI6:
+                {
+                  n_triangles += 1;
+                  break;
+                }
+              case QUAD4:
+              case QUAD8:
+              case QUAD9:
+                {
+                  n_quadrangles += 1;
+                  break;
+                }
+              case TET4:
+              case TET10:
+                {
+                  n_tetrahedra += 1;
+                  break;
+                }
+              case HEX8:
+              case HEX20:
+              case HEX27:
+                {
+                  n_hexahedra += 1;
+                  break;
+                }
+              case PRISM6:
+              case PRISM15:
+              case PRISM18:
+                {
+                  n_prisms += 1;
+                  break;
+                }
+              case PYRAMID5:
+                {
+                  n_pyramids += 1;
+                  break;
+                }
+              default:
+                {
+                  std::cerr << "ERROR: Not existant element type "
+                            << (*it)->type() << std::endl;
+                  error();
+                }
+              }
+          }
+      }
+
+      // create a view for each variable
+      for (unsigned int ivar=0; ivar < n_vars; ivar++)
+        {
+          std::string varname = (*solution_names)[ivar];
+
+          // at the moment, we just write out scalar quantities
+          // later this should be made configurable through
+          // options to the writer class
+          n_scalar = 1;
+      
+          // write the variable as a view, and the number of time steps
+          out << "$View\n" << varname << " " << 1 << "\n";
+      
+          // write how many of each geometry type are written
+          out << n_points * n_scalar << " "
+              << n_points * n_vector << " "
+              << n_points * n_tensor << " "
+              << n_lines * n_scalar << " "
+              << n_lines * n_vector << " "
+              << n_lines * n_tensor << " "
+              << n_triangles * n_scalar << " "
+              << n_triangles * n_vector << " "
+              << n_triangles * n_tensor << " "
+              << n_quadrangles * n_scalar << " "
+              << n_quadrangles * n_vector << " "
+              << n_quadrangles * n_tensor << " "
+              << n_tetrahedra * n_scalar << " "
+              << n_tetrahedra * n_vector << " "
+              << n_tetrahedra * n_tensor << " "
+              << n_hexahedra * n_scalar << " "
+              << n_hexahedra * n_vector << " "
+              << n_hexahedra * n_tensor << " "
+              << n_prisms * n_scalar << " "
+              << n_prisms * n_vector << " "
+              << n_prisms * n_tensor << " "
+              << n_pyramids * n_scalar << " "
+              << n_pyramids * n_vector << " "
+              << n_pyramids * n_tensor << " "
+              << nb_text2d << " "
+              << nb_text2d_chars << " "
+              << nb_text3d << " "
+              << nb_text3d_chars << "\n";
+      
+          // if binary, write a marker to identify the endianness of the file
+          if (this->binary())
+            {
+              const int one = 1;
+              memcpy(buf, &one, sizeof(int));
+              out.write(buf, sizeof(int));
+            }
+
+          // the time steps (there is just 1 at the moment)
+          if (this->binary())
+            {
+              double one = 1;
+              memcpy(buf, &one, sizeof(double));
+              out.write(buf, sizeof(double));
+            }
+          else
+            out << "1\n";
+
+          // Loop over the elements and write out the data
+          MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+          const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+    
+          for ( ; it != end; ++it)
+            {
+              const Elem* elem = *it;
+	
+              // this is quite crappy, but I did not invent that file format!
+              for (unsigned int d=0; d<3; d++)  // loop over the dimensions 
+                {
+                  for (unsigned int n=0; n < elem->n_vertices(); n++)   // loop over vertices
+                    {
+                      const Point vertex = elem->point(n);
+                      if (this->binary())
+                        {
+                          double tmp = vertex(d);
+                          memcpy(buf, &tmp, sizeof(double));
+                          out.write(reinterpret_cast<char *>(buf), sizeof(double));
+                        }
+                      else
+                        out << vertex(d) << " ";
+                    }
+                  if (!this->binary())
+                    out << "\n";
+                }
+
+              // now finally write out the data
+              for (unsigned int i=0; i < elem->n_vertices(); i++)   // loop over vertices
+                if (this->binary())
+                  {
+                    double tmp = (*v)[elem->node(i)*n_vars + ivar];
+                    memcpy(buf, &tmp, sizeof(double));
+                    out.write(reinterpret_cast<char *>(buf), sizeof(double));
+                  }
+                else
+                  out << (*v)[elem->node(i)*n_vars + ivar] << "\n";
+            }
+          if (this->binary())
+            out << "\n";
+          out << "$EndView\n";
+
+        } // end variable loop (writing the views)
+    }
+
+}
 
