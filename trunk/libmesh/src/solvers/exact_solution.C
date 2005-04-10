@@ -1,4 +1,4 @@
-// $Id: exact_solution.C,v 1.9 2005-02-22 22:17:43 jwpeterson Exp $
+// $Id: exact_solution.C,v 1.10 2005-04-10 20:15:27 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -60,7 +60,7 @@ ExactSolution::ExactSolution(EquationSystems& es) :
 
 
 void ExactSolution::attach_exact_value (Number fptr(const Point& p,
-						    const Real time,
+						    const Parameters& parameters,
 						    const std::string& sys_name,
 						    const std::string& unknown_name))
 {
@@ -70,7 +70,7 @@ void ExactSolution::attach_exact_value (Number fptr(const Point& p,
 
 
 void ExactSolution::attach_exact_deriv (Gradient fptr(const Point& p,
-						      const Real time,
+						      const Parameters& parameters,
 						      const std::string& sys_name,
 						      const std::string& unknown_name))
 {
@@ -202,12 +202,15 @@ void ExactSolution::_compute_error(const std::string& sys_name,
   error_pair.first                  = 0.;
   error_pair.second                 = 0.;
 
+  // get the EquationSystems parameters
+  const Parameters& parameters = this->_equation_systems.parameters;
+
   // Get the current time, in case the exact solution depends on it.
   // Steady systems of equations do not have a time parameter, so this
   // routine needs to take that into account.
   // FIXME!!!
-  const Real time = 0.;//_equation_systems.parameter("time");
-  
+  // const Real time = 0.;//_equation_systems.parameter("time");  
+
   // Construct finite element object
   const unsigned int var = computed_system.variable_number(unknown_name);
   
@@ -310,7 +313,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 	  // Compute the value of the error at this quadrature point
 	  // const Real val_error = (u_h - _exact_value(q_point[qp],
 	  const Number val_error = (u_h - _exact_value(q_point[qp],
-						       time,
+						       parameters,
 						       sys_name,
 						       unknown_name));
 
@@ -321,7 +324,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 	  if (_exact_deriv != NULL)
 	    {
 	      grad_error = (grad_u_h - _exact_deriv(q_point[qp],
-						    time,
+						    parameters,
 						    sys_name,
 						    unknown_name));
 	    }

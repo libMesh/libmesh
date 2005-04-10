@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.13 2005-01-14 19:29:40 benkirk Exp $ */
+/* $Id: ex14.C,v 1.14 2005-04-10 20:15:53 spetersen Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -73,13 +73,13 @@ void assemble_laplace(EquationSystems& es,
 // Prototype for calculation of the exact solution.  Useful
 // for setting boundary conditions.
 Number exact_solution(const Point& p,
-		      const Real,          // time, not needed
+		      const Parameters&,   // EquationSystem parameters, not needed
 		      const std::string&,  // sys_name, not needed
 		      const std::string&); // unk_name, not needed);
 
 // Prototype for calculation of the gradient of the exact solution.  
 Gradient exact_derivative(const Point& p,
-			  const Real,          // time, not needed
+			  const Parameters&,   // EquationSystems parameters, not needed
 			  const std::string&,  // sys_name, not needed
 			  const std::string&); // unk_name, not needed);
 
@@ -302,9 +302,9 @@ int main(int argc, char** argv)
 // to obtain an angle from atan2 in the correct
 // quadrant.
 Number exact_solution(const Point& p,
-		    const Real,         // time, not needed
-		    const std::string&, // sys_name, not needed
-		    const std::string&) // unk_name, not needed
+		      const Parameters&,  // parameters, not needed
+		      const std::string&, // sys_name, not needed
+		      const std::string&) // unk_name, not needed
 {
   const Real x = p(0);
   const Real y = p(1);
@@ -328,7 +328,7 @@ Number exact_solution(const Point& p,
 // to obtain an angle from atan2 in the correct
 // quadrant.
 Gradient exact_derivative(const Point& p,
-			  const Real,         // time, not needed
+			  const Parameters&,  // parameters, not needed
 			  const std::string&, // sys_name, not needed
 			  const std::string&) // unk_name, not needed
 {
@@ -550,7 +550,7 @@ void assemble_laplace(EquationSystems& es,
 		  //const Real x = side->point(ns)(0);
 		  //const Real y = side->point(ns)(1);
 		  const Number value = exact_solution(side->point(ns),
-						      0.,
+						      es.parameters,
 						      "null",
 						      "void");
 		  
