@@ -1,4 +1,4 @@
-// $Id: gmsh_io.C,v 1.11 2005-04-08 20:39:33 benkirk Exp $
+// $Id: gmsh_io.C,v 1.12 2005-04-10 13:05:30 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -748,12 +748,30 @@ void GmshIO::write_post (const std::string& fname,
               for (unsigned int i=0; i < elem->n_vertices(); i++)   // loop over vertices
                 if (this->binary())
                   {
+#ifndef USE_COMPLEX_NUMBERS
                     double tmp = (*v)[elem->node(i)*n_vars + ivar];
+#else
+		    std::cout << "WARNING: Gmsh::write_post does not fully support "
+			      << "complex numbers. Will only write the real part of "
+			      << "variable " << varname << std::endl;
+
+		    double tmp = (*v)[elem->node(i)*n_vars + ivar].real();
+#endif
                     memcpy(buf, &tmp, sizeof(double));
                     out.write(reinterpret_cast<char *>(buf), sizeof(double));
                   }
                 else
-                  out << (*v)[elem->node(i)*n_vars + ivar] << "\n";
+		  {
+#ifndef USE_COMPLEX_NUMBERS
+		    out << (*v)[elem->node(i)*n_vars + ivar] << "\n";
+#else
+		    std::cout << "WARNING: Gmsh::write_post does not fully support "
+			      << "complex numbers. Will only write the real part of "
+			      << "variable " << varname << std::endl;
+
+		    out << (*v)[elem->node(i)*n_vars + ivar].real() << "\n";
+#endif
+		  }
             }
           if (this->binary())
             out << "\n";
