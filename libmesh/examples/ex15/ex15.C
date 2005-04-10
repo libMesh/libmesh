@@ -1,4 +1,4 @@
-/* $Id: ex15.C,v 1.2 2005-01-14 19:29:41 benkirk Exp $ */
+/* $Id: ex15.C,v 1.3 2005-04-10 20:15:53 spetersen Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -65,7 +65,7 @@ void assemble_biharmonic(EquationSystems& es,
 // Prototype for calculation of the exact solution.  Useful
 // for setting boundary conditions.
 Number exact_solution(const Point& p,
-		      const Real,          // time, not needed
+		      const Parameters&,   // parameters, not needed
 		      const std::string&,  // sys_name, not needed
 		      const std::string&); // unk_name, not needed);
 
@@ -73,7 +73,7 @@ Number exact_solution(const Point& p,
 // Necessary for setting boundary conditions in H^2_0 and testing
 // H^1 convergence of the solution
 Gradient exact_derivative(const Point& p,
-			  const Real,          // time, not needed
+			  const Parameters&,   // parameters, not needed
 			  const std::string&,  // sys_name, not needed
 			  const std::string&); // unk_name, not needed);
 
@@ -254,9 +254,9 @@ int main(int argc, char** argv)
 
 // We now define the exact solution
 Number exact_solution(const Point& p,
-		    const Real,         // time, not needed
-		    const std::string&, // sys_name, not needed
-		    const std::string&) // unk_name, not needed
+		      const Parameters&,  // parameters, not needed
+		      const std::string&, // sys_name, not needed
+		      const std::string&) // unk_name, not needed
 {
   const Real x = p(0);
   const Real y = p(1);
@@ -279,7 +279,7 @@ Number forcing_function(const Point& p)
 
 // We now define the gradient of the exact solution
 Gradient exact_derivative(const Point& p,
-			  const Real,         // time, not needed
+			  const Parameters&,  // parameters, not needed
 			  const std::string&, // sys_name, not needed
 			  const std::string&) // unk_name, not needed
 {
@@ -515,10 +515,10 @@ void assemble_biharmonic(EquationSystems& es,
                 {
                   // The boundary value.
 		  const Number value = exact_solution(qface_point[qp],
-						      0, "null",
+						      es.parameters, "null",
 						      "void");
 		  const Gradient flux =
-				  exact_derivative(qface_point[qp], 0,
+				  exact_derivative(qface_point[qp], es.parameters,
 						   "null", "void");
 
                   // Matrix contribution of the L2 projection.

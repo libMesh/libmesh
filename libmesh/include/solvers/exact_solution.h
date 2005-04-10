@@ -1,4 +1,4 @@
-// $Id: exact_solution.h,v 1.4 2005-02-22 22:17:35 jwpeterson Exp $
+// $Id: exact_solution.h,v 1.5 2005-04-10 20:15:53 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -67,10 +67,10 @@ public:
    * Attach function similar to system.h which
    * allows the user to attach an arbitrary function
    * which computes the exact value of the solution
-   * at any point, time.
+   * at any point. 
    */
   void attach_exact_value ( Number fptr(const Point& p,
-					const Real time,
+					const Parameters& Parameters,
 					const std::string& sys_name,
 					const std::string& unknown_name));
 
@@ -78,10 +78,10 @@ public:
    * Attach function similar to system.h which
    * allows the user to attach an arbitrary function
    * which computes the exact derivative of the solution
-   * at any point, time.
+   * at any point.
    */
   void attach_exact_deriv ( Gradient fptr(const Point& p,
-					  const Real time,
+					  const Parameters& parameters,
 					  const std::string& sys_name,
 					  const std::string& unknown_name));
 
@@ -135,7 +135,7 @@ private:
    * computes the exact value of the solution.
    */
   Number (* _exact_value) (const Point& p,
-			   const Real   time,
+			   const Parameters& parameters,
 			   const std::string& sys_name,
 			   const std::string& unknown_name);
 
@@ -144,7 +144,7 @@ private:
    * computes the exact derivative of the solution.
    */
   Gradient (* _exact_deriv) (const Point& p,
-			     const Real   time,
+			     const Parameters& parameters,
 			     const std::string& sys_name,
 			     const std::string& unknown_name);
 
