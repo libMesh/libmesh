@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.41 2005-03-22 22:01:55 jwpeterson Exp $
+// $Id: mesh_base.h,v 1.42 2005-04-10 10:07:21 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -62,8 +62,8 @@ class EquationSystems;
  * mesh to disk in various formats.
  *
  * \author  Benjamin S. Kirk
- * \date    $Date: 2005-03-22 22:01:55 $
- * \version $Revision: 1.41 $
+ * \date    $Date: 2005-04-10 10:07:21 $
+ * \version $Revision: 1.42 $
  */
 
 
@@ -706,7 +706,7 @@ variant_filter_iterator<MeshBase::Predicate,
 			    Elem* const&,
 			    Elem* const*>(rhs)
   {
-    std::cout << "Called element_iterator conversion-to-const ctor." << std::endl;
+    // std::cout << "Called element_iterator conversion-to-const ctor." << std::endl;
   }
 };
 
