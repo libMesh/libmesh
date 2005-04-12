@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.13 2005-02-22 22:17:35 jwpeterson Exp $
+// $Id: equation_systems.h,v 1.14 2005-04-12 09:01:01 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -33,6 +33,7 @@
 #include "parameters.h"
 #include "system.h"
 #include "mesh.h"
+#include "mesh_data.h"
 #include "enum_xdr_mode.h"
 #include "elem.h"
 
@@ -304,15 +305,20 @@ public:
   Mesh & get_mesh();
 
   /**
+   * @returns a constant reference to the mesh_data
+   */
+  const MeshData & get_mesh_data() const;
+
+  /**
+   * @returns a reference to the mesh_data
+   */
+  MeshData & get_mesh_data();
+
+
+  /**
    * Data structure holding arbitrary parameters.
    */
   Parameters parameters;
-
-  /**
-   * A pointer to the MeshData object you would like to use.
-   * Can be NULL.
-   */
-  MeshData* _mesh_data;
 
   
 protected:
@@ -322,6 +328,12 @@ protected:
    * The mesh data structure
    */
   Mesh& _mesh;
+
+  /**
+   * A pointer to the MeshData object you would like to use.
+   * Can be NULL.
+   */
+  MeshData* _mesh_data;
 
   /**
    * Data structure holding the systems.
@@ -356,6 +368,20 @@ inline
 Mesh & EquationSystems::get_mesh ()
 {
   return _mesh;
+}
+
+
+inline
+const MeshData & EquationSystems::get_mesh_data () const
+{
+  return *_mesh_data;
+}
+
+
+inline
+MeshData & EquationSystems::get_mesh_data ()
+{
+  return *_mesh_data;
 }
 
 
