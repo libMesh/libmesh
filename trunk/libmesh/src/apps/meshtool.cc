@@ -639,7 +639,8 @@ int main (int argc, char** argv)
 	*/
 	
 	// Compute the histogram for this distribution
-	std::vector<unsigned int> histogram = sv.histogram(n_bins);
+	std::vector<unsigned int> histogram;
+	sv.histogram(histogram, n_bins);
 	
 	/*
 	for (unsigned int i=0; i<n_bins; i++)
