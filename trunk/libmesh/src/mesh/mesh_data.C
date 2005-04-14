@@ -1,4 +1,4 @@
-// $Id: mesh_data.C,v 1.26 2005-02-22 22:17:41 jwpeterson Exp $
+// $Id: mesh_data.C,v 1.27 2005-04-14 17:11:38 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -170,9 +170,6 @@ void MeshData::translate (const MeshBase& out_mesh,
     values.reserve(n_comp*out_mesh.n_nodes());
     
     // iterate over the mesh's nodes
-//     const_node_iterator       nodes_it  (out_mesh.nodes_begin());
-//     const const_node_iterator nodes_end (out_mesh.nodes_end());
-
     MeshBase::const_node_iterator       nodes_it  = out_mesh.nodes_begin();
     const MeshBase::const_node_iterator nodes_end = out_mesh.nodes_end();
 
@@ -742,8 +739,6 @@ void MeshData::assign (const MeshData& omd)
   // has element ids.
   if ((this->_active) && (omd._elem_id.size() != 0))
     {
-//       const_elem_iterator       elem_it (_mesh.elements_begin());
-//       const const_elem_iterator elem_end(_mesh.elements_end());
 
       MeshBase::const_element_iterator       elem_it  = _mesh.elements_begin();
       const MeshBase::const_element_iterator elem_end = _mesh.elements_end();

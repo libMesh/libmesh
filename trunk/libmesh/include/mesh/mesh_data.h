@@ -1,4 +1,4 @@
-// $Id: mesh_data.h,v 1.12 2005-02-22 22:17:33 jwpeterson Exp $
+// $Id: mesh_data.h,v 1.13 2005-04-14 17:11:32 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -31,30 +31,21 @@
 #include "enum_xdr_mode.h"
 
 
-
 // Forward Declarations
 class Node;
 class Elem;
 class MeshBase;
-class UNVIO;
-class TetGenIO;
 class MeshDataUnvHeader;
-class MeshData;
-class BoundaryInfo;
-
-
-
 
 
 /**
- * Yet another Mesh-something class...  What's this good for: 
- * \p MeshData handles actual data and the corresponding I/O
- * on entities (nodes, elements) of meshes.  
- * \p MeshBase owns a \p MeshData for dealing with files
+ * The \p MeshData class handles actual data and the corresponding
+ * I/O on entities (nodes, elements) of meshes.
+ * The \p MeshData can be used when dealing with files
  * that contain nodal or element-oriented data, numbered in the same 
- * format as the corresponding mesh file (when activated) or with
- * the \p MeshBase element and node ids (when in compatibility mode).  
- * To use \p MeshData, it has to be activated or the compatibility 
+ * format as a corresponding mesh file (when activated) or with
+ * the \p libMesh element and node indices (when in compatibility mode).  
+ * To use \p MeshData, it has to be either activated or the compatibility 
  * mode has to be enabled.
  *
  * @author Daniel Dreyer, 2003
@@ -105,7 +96,10 @@ public:
   /**
    * When \p MeshData should be used, it has to be activated
    * first, @e prior to reading in a mesh with the \p Mesh::read()
-   * methods.  Optionally takes a string that should help the user
+   * methods. This will ensure that element and node ids
+   * given in the mesh file, i.e. the foreign node and element
+   * ids, are stored in the corresponding id maps.
+   * Optionally takes a string that should help the user
    * in identifying the data later on.
    */
   void activate (const std::string& descriptor="");
@@ -616,31 +610,12 @@ protected:
    * The header information of universal files.
    */
   MeshDataUnvHeader* _unv_header;
-
-  /**
-   * Make the mesh importer class \p UNVIO a friend, so
-   * that it can communicate foreign node ids to this class.
-   */
-  friend class UNVIO;
-
-  /**
-   * Make the mesh importer class \p TetGenIO friend, so
-   * that it can communicate foreign node ids to this class.
-   */
-  friend class TetGenIO;
   
   /**
    * Make the \p MeshDataUnvHeader class a friend.
    */
   friend class MeshDataUnvHeader;
   
-  /**
-   * Make the \p BoundaryInfo class a friend so that
-   * they can use the assignment operator when
-   * synchronizing the \p BoundaryMesh.
-   */
-  friend class BoundaryInfo;
-
 };
 
 
