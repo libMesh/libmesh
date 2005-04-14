@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.14 2005-04-12 09:01:01 spetersen Exp $
+// $Id: equation_systems.h,v 1.15 2005-04-14 17:11:39 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -374,6 +374,7 @@ Mesh & EquationSystems::get_mesh ()
 inline
 const MeshData & EquationSystems::get_mesh_data () const
 {
+  assert (_mesh_data != NULL);
   return *_mesh_data;
 }
 
@@ -381,6 +382,7 @@ const MeshData & EquationSystems::get_mesh_data () const
 inline
 MeshData & EquationSystems::get_mesh_data ()
 {
+  assert (_mesh_data != NULL);
   return *_mesh_data;
 }
 

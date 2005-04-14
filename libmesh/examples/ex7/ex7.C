@@ -1,4 +1,4 @@
-/* $Id: ex7.C,v 1.37 2005-01-06 21:54:59 benkirk Exp $ */
+/* $Id: ex7.C,v 1.38 2005-04-14 17:11:41 spetersen Exp $ */
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
 
@@ -31,6 +31,9 @@
  // namely to solve large systems, or to solve
  // moderately-sized systems fast, for multiple frequencies.
  // The latter approach is implemented here.
+ //
+ // This example uses an L--shaped mesh and nodal boundary data
+ // given in the files lshape.un and lshape_data.unv
  //
  // For this example the library has to be compiled with
  // complex numbers enabled. 
@@ -139,37 +142,38 @@ int main (int argc, char** argv)
     // Get the frequency from argv[2] as a <i>float</i>,
     // currently, solve for 1/3rd, 2/3rd and 1/1th of the given frequency
     const Real frequency_in = atof(argv[2]);
-    const unsigned int n_frequencies = 3;
-    
-    // mesh discretization depends on frequency (badly guessed estimate...?)
-    const unsigned int n_el_per_dim =
-      static_cast<unsigned int>(frequency_in*40.);
-    
-    // Tell the user the number of elements
-    std::cout << " Using " << n_el_per_dim << " x " 
-	      << n_el_per_dim << " = " 
-	      << n_el_per_dim*n_el_per_dim
-	      << " QUAD9 elements"
-	      << std::endl << std::endl;
+    const unsigned int n_frequencies = 3;        
     
     // Create a dim-dimensional mesh.
     Mesh mesh (dim);
-    
-    // Use the internal mesh generator to create a uniform
-    // grid on the square [-1,1]^2.  We instruct the mesh generator
-    // to build a mesh of n x n Quad9 elements.
-    MeshTools::Generation::build_square (mesh,
-					 n_el_per_dim, n_el_per_dim,
-					 -1., 1.,
-					 -1., 1.,
-					 QUAD9);
-    
+
+    // Create a corresponding MeshData
+    // and activate it. For more information on this object
+    // cf. example 12.
+    MeshData mesh_data(mesh);
+    mesh_data.activate();
+
+    // Read the mesh file. Here the file lshape.unv contains
+    // an L--shaped domain in .unv format.
+    mesh.read("lshape.unv", &mesh_data);
+
     // Print information about the mesh to the screen.
-    mesh.print_info();
-    
+    mesh.print_info();    
+
+    // The load on the boundary of the domain is stored in
+    // the .unv formated mesh data file lshape_data.unv.
+    // At this, the data is given as complex valued normal
+    // velocities.
+    mesh_data.read("lshape_data.unv");
+
+    // Print information about the mesh to the screen.
+    mesh_data.print_info();
+   
     // Create an equation systems object, which now handles
     // a frequency system, as opposed to previous examples.
-    EquationSystems equation_systems (mesh);
+    // Also pass a MeshData pointer so the data can be 
+    // accessed in the matrix and rhs assembly.
+    EquationSystems equation_systems (mesh, &mesh_data);
     
     // Create a FrequencySystem named "Helmholtz" & store a
     // reference to it.
@@ -335,7 +339,7 @@ void assemble_helmholtz(EquationSystems& es,
   // The element shape function gradients evaluated at the quadrature
   // points.
   const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
-  
+
   // Now this is slightly different from example 4.
   // We will not add directly to the overall (PETSc/LASPACK) matrix,
   // but to the additional matrices "stiffness_mass" and "damping".
@@ -357,8 +361,6 @@ void assemble_helmholtz(EquationSystems& es,
   // Now we will loop over all the elements in the mesh.
   // We will compute the element matrix and right-hand-side
   // contribution.
-  //const_local_elem_iterator           el (mesh.elements_begin());
-  //const const_local_elem_iterator end_el (mesh.elements_end());
 
   MeshBase::const_element_iterator           el = mesh.local_elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.local_elements_end();
@@ -421,9 +423,9 @@ void assemble_helmholtz(EquationSystems& es,
 
       STOP_LOG("stiffness & mass","assemble_helmholtz");
 
-      // Now compute the contribution to the element matrix and the
-      // right-hand-side vector if the current element lies on the
-      // boundary. 
+      // Now compute the contribution to the element matrix
+      // (due to mixed boundary conditions) if the current
+      // element lies on the boundary. 
       //
       // The following loops over the sides of the element.
       // If the element has no neighbor on a side then that
@@ -459,22 +461,14 @@ void assemble_helmholtz(EquationSystems& es,
 	    // Compute the shape function values on the element
 	    // face.
 	    fe_face->reinit(elem, side);
-
-	    // Here we consider a normal velocity vn=1 applied to
-	    // the whole boundary of our mesh.
-	    const Real vn_value = 1.;
 	      
-	    // Consider a normal admittance an=1
+	    // For the Robin BCs consider a normal admittance an=1
 	    // at some parts of the bounfdary
 	    const Real an_value = 1.;
 	      
 	    // Loop over the face quadrature points for integration.
 	    for (unsigned int qp=0; qp<qface.n_points(); qp++)
 	      {
-		// Right-hand-side contribution due to prescribed
-		// normal velocity.
-		for (unsigned int i=0; i<phi_face.size(); i++)
-		  Fe(i) += vn_value*phi_face[i][qp]*JxW_face[qp];
 		
 		// Element matrix contributrion due to precribed
 		// admittance boundary conditions.
@@ -483,22 +477,64 @@ void assemble_helmholtz(EquationSystems& es,
 		    Ce(i,j) += rho*an_value*JxW_face[qp]*phi_face[i][qp]*phi_face[j][qp];
 	      }
 
-	    STOP_LOG("damping & rhs","assemble_helmholtz");
+	    STOP_LOG("damping","assemble_helmholtz");
 	  }
-      
+
+     
       // Finally, simply add the contributions to the additional
       // matrices and vector.
       stiffness.add_matrix      (Ke, dof_indices);
       damping.add_matrix        (Ce, dof_indices);
       mass.add_matrix           (Me, dof_indices);
-      freq_indep_rhs.add_vector (Fe, dof_indices);
       
       // For the overall matrix, explicitly zero the entries where
       // we added values in the other ones, so that we have 
       // identical sparsity footprints.
       matrix.add_matrix(zero_matrix, dof_indices);
-    }
-  
+
+    } // loop el
+
+
+  // It now remains to compute the rhs. Here, we simply
+  // get the normal velocities values on the boundary from the
+  // mesh data.
+  {
+    START_LOG("rhs","assemble_helmholtz");
+    
+    // get a reference to the mesh data.
+    const MeshData& mesh_data = es.get_mesh_data();
+
+    // We will now loop over all nodes. In case nodal data 
+    // for a certain node is available in the MeshData, we simply
+    // adopt the corresponding value for the rhs vector.
+    // Note that normal data was given in the mesh data file,
+    // i.e. one value per node
+    assert(mesh_data.n_val_per_node() == 1);
+
+    MeshBase::const_node_iterator       node_it  = mesh.nodes_begin();
+    const MeshBase::const_node_iterator node_end = mesh.nodes_end();
+    
+    for ( ; node_it != node_end; ++node_it)
+      {
+	// the current node pointer
+	const Node* node = *node_it;
+
+	// check if the mesh data has data for the current node
+	// and do for all components
+	if (mesh_data.has_data(node))
+	  for (unsigned int comp=0; comp<node->n_comp(0,0); comp++)
+	    {
+	      // the dof number
+	      unsigned int dn = node->dof_number(0,0,comp);
+
+	      // set the nodal value
+	      freq_indep_rhs.set(dn, mesh_data.get_data(node)[0]);
+	    }
+      }
+    
+    STOP_LOG("rhs","assemble_helmholtz");
+  }
+
   // All done!
 #endif
 }
