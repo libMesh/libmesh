@@ -1,4 +1,4 @@
-// $Id: system_projection.C,v 1.10 2005-02-22 22:17:43 jwpeterson Exp $
+// $Id: system_projection.C,v 1.11 2005-04-18 19:18:35 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -184,76 +184,85 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 
           if (fe_type.family != LAGRANGE) {
 
-	    // Update the fe object based on the current child
-	    fe->reinit (elem);
-	  
-	    // The number of quadrature points on the child
-	    const unsigned int n_qp = qrule.n_points();
-
-	    // Reinitialize the element matrix and vector for
-	    // the current element.  Note that this will zero them
-	    // before they are summed.
-	    Ke.resize (new_n_dofs, new_n_dofs); Ke.zero();
-	    Fe.resize (new_n_dofs); Fe.zero();
-	  
-	  
-	    // Loop over the quadrature points
-	    for (unsigned int qp=0; qp<n_qp; qp++)
+	    // For refined elements, we do an L2 projection
+	    if (elem->refinement_flag() == Elem::JUST_REFINED)
 	      {
-	        // The solution value at the quadrature point	      
-	        Number val = libMesh::zero;
+	        // Update the fe object based on the current child
+	        fe->reinit (elem);
+	  
+	        // The number of quadrature points on the child
+	        const unsigned int n_qp = qrule.n_points();
 
-	        if (elem->refinement_flag() ==
-		    Elem::JUST_REFINED)
-		  {
-		    // The location of the quadrature point
-		    // on the parent element
-		    const Point q_point =
-		      FEInterface::inverse_map (dim, fe_type,
-					        parent, xyz_values[qp]);
+	        // Reinitialize the element matrix and vector for
+	        // the current element.  Note that this will zero them
+	        // before they are summed.
+	        Ke.resize (new_n_dofs, new_n_dofs); Ke.zero();
+	        Fe.resize (new_n_dofs); Fe.zero();
+	  
+	  
+	        // Loop over the quadrature points
+	        for (unsigned int qp=0; qp<n_qp; qp++)
+	          {
+	            // The solution value at the quadrature point	      
+	            Number val = libMesh::zero;
 
-		    // Sum the function values * the DOF values
-		    // at the point of interest to get the function value
-		    // (Note that the # of DOFs on the parent need not be the
-		    //  same as on the child!)
-		    for (unsigned int i=0; i<old_n_dofs; i++)
+	            if (elem->refinement_flag() ==
+		        Elem::JUST_REFINED)
 		      {
-		        val += (old_vector(old_dof_indices[i])*
-			        FEInterface::shape(dim, fe_type, parent,
-						   i, q_point));
+		        // The location of the quadrature point
+		        // on the parent element
+		        const Point q_point =
+		          FEInterface::inverse_map (dim, fe_type,
+					            parent, xyz_values[qp]);
+
+		        // Sum the function values * the DOF values
+		        // at the point of interest to get the function value
+		        // (Note that the # of DOFs on the parent need not be the
+		        //  same as on the child!)
+		        for (unsigned int i=0; i<old_n_dofs; i++)
+		          {
+		            val += (old_vector(old_dof_indices[i])*
+			            FEInterface::shape(dim, fe_type, parent,
+						       i, q_point));
+		          }
 		      }
-		  }
-	        else
-		  {
-		    // Sum all the function values * the DOF values
-		    // at the quadrature point on the child to get the
-		    // function value
-		    for (unsigned int i=0; i<new_n_dofs; i++)
+	            else
 		      {
-		        val += (old_vector(old_dof_indices[i])*
-			        phi_values[i][qp]);
+		        // Sum all the function values * the DOF values
+		        // at the quadrature point on the child to get the
+		        // function value
+		        for (unsigned int i=0; i<new_n_dofs; i++)
+		          {
+		            val += (old_vector(old_dof_indices[i])*
+			            phi_values[i][qp]);
+		          }
 		      }
-		  }
 
-	        // Now \p val contains the solution value of variable
-	        // \p var at the qp'th quadrature point on the child
-	        // element.  It has been interpolated from the parent
-	        // in case the child was just refined.  Next we will
-	        // construct the L2-projection matrix for the element.
+	            // Now \p val contains the solution value of variable
+	            // \p var at the qp'th quadrature point on the child
+	            // element.  It has been interpolated from the parent
+	            // in case the child was just refined.  Next we will
+	            // construct the L2-projection matrix for the element.
 
-	        // Construct the Mass Matrix
-	        for (unsigned int i=0; i<new_n_dofs; i++)
-		  for (unsigned int j=0; j<new_n_dofs; j++)
-		    Ke(i,j) += JxW[qp]*phi_values[i][qp]*phi_values[j][qp];
+	            // Construct the Mass Matrix
+	            for (unsigned int i=0; i<new_n_dofs; i++)
+		      for (unsigned int j=0; j<new_n_dofs; j++)
+		        Ke(i,j) += JxW[qp]*phi_values[i][qp]*phi_values[j][qp];
 
-	        // Construct the RHS
-	        for (unsigned int i=0; i<new_n_dofs; i++)
-		  Fe(i) += JxW[qp]*phi_values[i][qp]*val;
+	            // Construct the RHS
+	            for (unsigned int i=0; i<new_n_dofs; i++)
+		      Fe(i) += JxW[qp]*phi_values[i][qp]*val;
 	      
-	      
-	      } // end qp loop
+	          } // end qp loop
 
-            Ke.cholesky_solve(Fe, Ue);
+                Ke.cholesky_solve(Fe, Ue);
+	      }
+	    // For unrefined uncoarsened elements, we just copy DoFs
+	    else
+	      {
+		for (unsigned int i=0; i<new_n_dofs; i++)
+		  Ue(i) = old_vector(old_dof_indices[i]);
+	      }
           } else { // fe type is Lagrange
 	    // Loop over the DOFs on the element
 	    for (unsigned int new_local_dof=0;
