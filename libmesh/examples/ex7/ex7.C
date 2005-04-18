@@ -1,4 +1,4 @@
-/* $Id: ex7.C,v 1.38 2005-04-14 17:11:41 spetersen Exp $ */
+/* $Id: ex7.C,v 1.39 2005-04-18 13:55:15 spetersen Exp $ */
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
 
@@ -434,7 +434,7 @@ void assemble_helmholtz(EquationSystems& es,
       for (unsigned int side=0; side<elem->n_sides(); side++)
 	if (elem->neighbor(side) == NULL)
 	  {
-	    START_LOG("damping & rhs","assemble_helmholtz");
+	    START_LOG("damping","assemble_helmholtz");
 	      
 	    // Declare a special finite element object for
 	    // boundary integration.
