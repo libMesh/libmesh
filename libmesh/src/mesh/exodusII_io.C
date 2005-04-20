@@ -1,4 +1,4 @@
-// $Id: exodusII_io.C,v 1.7 2005-02-22 22:17:39 jwpeterson Exp $
+// $Id: exodusII_io.C,v 1.8 2005-04-20 13:34:41 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -497,13 +497,19 @@ namespace
        */
       static const int tet4_node_map[4]; 
 
-
       /**
        * The Tet10 node map.
        * Use this map for quadratic
        * tetrahedral elements in 3D.
        */
       static const int tet10_node_map[10]; 
+
+      /**
+       * The Prism6 node map.
+       * Use this map for quadratic
+       * tetrahedral elements in 3D.
+       */
+      static const int prism6_node_map[6]; 
 
 
       /**
@@ -527,6 +533,12 @@ namespace
        * Useful for reading sideset information.
        */
       static const int tet_face_map[4];
+      
+      /**
+       * Maps the Exodus face numbering for general prisms.
+       * Useful for reading sideset information.
+       */
+      static const int prism_face_map[5];
       
 
       /**
@@ -636,12 +648,14 @@ namespace
 							  18, 10, 12, 19, 15, 11, 24, 25, 22, 26, 21, 23, 20};  
   const int ExodusII::ElementMaps::tet4_node_map[4]   = {0, 1, 2, 3};
   const int ExodusII::ElementMaps::tet10_node_map[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+  const int ExodusII::ElementMaps::prism6_node_map[6] = {0, 1, 2, 3, 4, 5};
   
   // 3D face map definitions
   const int ExodusII::ElementMaps::tet_face_map[4] =   {1, 2, 3, 0};
   const int ExodusII::ElementMaps::hex_face_map[6] =   {1, 2, 3, 4, 0, 5};
   const int ExodusII::ElementMaps::hex27_face_map[6] = {1, 0, 3, 5, 4, 2};
-
+  const int ExodusII::ElementMaps::prism_face_map[5] = {-1,-1,-1,-1,-1}; // Not Implemented!
 
 
   // ------------------------------------------------------------
@@ -882,7 +896,7 @@ namespace
     else if (type == "TRI6")
       return assign_conversion(TRI6);
 
-    else if (type == "HEX8")
+    else if ((type == "HEX8") || (type == "HEX")) 
       return assign_conversion(HEX8);
 
     else if (type == "HEX20")
@@ -896,6 +910,9 @@ namespace
 
     else if (type == "TETRA10")
       return assign_conversion(TET10);
+
+    else if (type == "WEDGE")
+      return assign_conversion(PRISM6);
 
     else
       {
@@ -973,6 +990,12 @@ namespace
       case TET10:
 	{
 	  const Conversion conv(tet10_node_map, tet_face_map, TET10);
+	  return conv;
+	}
+
+      case PRISM6:
+	{
+	  const Conversion conv(prism6_node_map, prism_face_map, PRISM6);
 	  return conv;
 	}
 	
