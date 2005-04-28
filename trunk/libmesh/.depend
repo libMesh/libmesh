@@ -182,6 +182,7 @@ src/fe/fe_boundary.$(obj-suffix):\
 src/fe/fe.$(obj-suffix):\
     src/fe/fe.C\
     include/base/auto_ptr.h\
+    include/base/dof_map.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
@@ -204,19 +205,27 @@ src/fe/fe.$(obj-suffix):\
     include/enums/enum_solver_package.h\
     include/fe/fe.h\
     include/fe/fe_base.h\
+    include/fe/fe_interface.h\
     include/fe/fe_macro.h\
     include/fe/fe_type.h\
     include/geom/elem.h\
     include/geom/point.h\
+    include/numerics/coupling_matrix.h\
+    include/numerics/dense_matrix.h\
+    include/numerics/dense_matrix_base.h\
+    include/numerics/dense_vector.h\
+    include/numerics/dense_vector_base.h\
     include/numerics/tensor_value.h\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
     include/quadrature/quadrature.h\
+    include/quadrature/quadrature_gauss.h\
     include/utils/perf_log.h
 src/fe/fe_clough.$(obj-suffix):\
     src/fe/fe_clough.C\
     include/base/auto_ptr.h\
+    include/base/dof_map.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
@@ -234,16 +243,25 @@ src/fe/fe_clough.$(obj-suffix):\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
     include/enums/enum_order.h\
+    include/enums/enum_quadrature_type.h\
     include/enums/enum_solver_package.h\
     include/fe/fe.h\
     include/fe/fe_base.h\
+    include/fe/fe_interface.h\
     include/fe/fe_type.h\
     include/geom/elem.h\
     include/geom/point.h\
+    include/numerics/coupling_matrix.h\
+    include/numerics/dense_matrix.h\
+    include/numerics/dense_matrix_base.h\
+    include/numerics/dense_vector.h\
+    include/numerics/dense_vector_base.h\
     include/numerics/tensor_value.h\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/quadrature/quadrature.h\
+    include/quadrature/quadrature_clough.h\
     include/utils/perf_log.h
 src/fe/fe_clough_shape_1D.$(obj-suffix):\
     src/fe/fe_clough_shape_1D.C\
@@ -341,6 +359,7 @@ src/fe/fe_clough_shape_3D.$(obj-suffix):\
 src/fe/fe_hierarchic.$(obj-suffix):\
     src/fe/fe_hierarchic.C\
     include/base/auto_ptr.h\
+    include/base/dof_map.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
@@ -358,16 +377,25 @@ src/fe/fe_hierarchic.$(obj-suffix):\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
     include/enums/enum_order.h\
+    include/enums/enum_quadrature_type.h\
     include/enums/enum_solver_package.h\
     include/fe/fe.h\
     include/fe/fe_base.h\
+    include/fe/fe_interface.h\
     include/fe/fe_type.h\
     include/geom/elem.h\
     include/geom/point.h\
+    include/numerics/coupling_matrix.h\
+    include/numerics/dense_matrix.h\
+    include/numerics/dense_matrix_base.h\
+    include/numerics/dense_vector.h\
+    include/numerics/dense_vector_base.h\
     include/numerics/tensor_value.h\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/quadrature/quadrature.h\
+    include/quadrature/quadrature_gauss.h\
     include/utils/perf_log.h
 src/fe/fe_hierarchic_shape_1D.$(obj-suffix):\
     src/fe/fe_hierarchic_shape_1D.C\
@@ -582,6 +610,7 @@ src/fe/fe_interface_inf_fe.$(obj-suffix):\
 src/fe/fe_lagrange.$(obj-suffix):\
     src/fe/fe_lagrange.C\
     include/base/auto_ptr.h\
+    include/base/dof_map.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
@@ -606,6 +635,7 @@ src/fe/fe_lagrange.$(obj-suffix):\
     include/fe/fe_type.h\
     include/geom/elem.h\
     include/geom/point.h\
+    include/numerics/coupling_matrix.h\
     include/numerics/tensor_value.h\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
@@ -3455,6 +3485,10 @@ src/mesh/mesh_tools.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/utils/perf_log.h
+src/mesh/mesh_triangle_support.$(obj-suffix):\
+    src/mesh/mesh_triangle_support.C\
+    include/base/libmesh_config.h\
+    include/mesh/mesh_triangle_support.h
 src/mesh/off_io.$(obj-suffix):\
     src/mesh/off_io.C\
     include/base/auto_ptr.h\
@@ -3732,6 +3766,7 @@ src/mesh/unv_io.$(obj-suffix):\
     include/geom/face_quad.h\
     include/geom/face_quad4.h\
     include/geom/face_quad8.h\
+    include/geom/face_quad9.h\
     include/geom/face_tri.h\
     include/geom/face_tri3.h\
     include/geom/face_tri6.h\

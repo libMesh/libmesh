@@ -1,5 +1,5 @@
 dnl --------------------------------------------------------------
-dnl $Id: configure.in,v 1.52 2005-01-25 21:45:00 benkirk Exp $
+dnl $Id: configure.in,v 1.53 2005-04-28 20:26:44 jwpeterson Exp $
 dnl --------------------------------------------------------------
 dnl Process this file with autoconf to produce a configure script.
 
@@ -9,7 +9,7 @@ dnl you call ./configure subsequently on different systems without
 dnl clearing the cache 
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
-AC_REVISION($Revision: 1.52 $)
+AC_REVISION($Revision: 1.53 $)
 
 
 AC_INIT
@@ -558,6 +558,21 @@ AC_ARG_ENABLE(tetgen,
               enabletetgen=yes)
 if test "$enabletetgen" != no ; then
   CONFIGURE_TETGEN
+fi
+dnl -------------------------------------------------------------
+
+
+
+dnl -------------------------------------------------------------
+dnl Triangle -- enabled by default (it is distributed in contrib)
+dnl -------------------------------------------------------------
+AC_ARG_ENABLE(triangle,
+              AC_HELP_STRING([--enable-triangle],
+                             [build with Triangle Delaunay triangulation library support]),
+              enabletriangle=$enableval,
+              enabletriangle=yes)
+if test "$enabletriangle" != no ; then
+  CONFIGURE_TRIANGLE
 fi
 dnl -------------------------------------------------------------
 
