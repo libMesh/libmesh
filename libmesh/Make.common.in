@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.40 2005-01-04 16:40:26 jwpeterson Exp $
+# $Id: Make.common.in,v 1.41 2005-04-28 20:26:41 jwpeterson Exp $
 
 
 ###############################################################################
@@ -50,8 +50,6 @@ petsc-major-minor    = @petscmajorminor@
 PETSC_ARCH           = @PETSC_ARCH@
 PETSC_DIR            = @PETSC_DIR@
 
-# TetGen tetrahedrization library
-enable-tetgen        = @enabletetgen@
 
 # MPI configuration
 # (only explicitly defined when PETSc is absent, otherwise snooped from PETSc)
@@ -72,7 +70,8 @@ enable-metis	     = @enablemetis@
 enable-parmetis	     = @enableparmetis@
 enable-sfcurves	     = @enablesfc@
 enable-gzstream      = @enablegz@
-
+enable-tetgen        = @enabletetgen@
+enable-triangle      = @enabletriangle@
 
 #
 # Set the current directory.
@@ -264,6 +263,12 @@ ifeq ($(enable-optional),yes)
     CXXFLAGS += @TETGEN_VERSION@
     LIBS     += @TETGEN_LIBRARY@
     INCLUDE  += @TETGEN_INCLUDE@
+  endif
+
+  #if Triangle is used:
+  ifeq ($(enable-triangle),yes)
+    LIBS     += @TRIANGLE_LIBRARY@
+    INCLUDE  += @TRIANGLE_INCLUDE@
   endif
 
   #############################################################################

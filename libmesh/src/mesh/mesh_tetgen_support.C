@@ -1,4 +1,4 @@
-// $Id: mesh_tetgen_support.C,v 1.16 2004-11-12 01:57:27 jwpeterson Exp $
+// $Id: mesh_tetgen_support.C,v 1.17 2005-04-28 20:26:49 jwpeterson Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -344,7 +344,7 @@ void TetGenMeshInterface::pointset_convexhull ()
 
   
   // run TetGen triangulation method:
-  tetgen_wrapper.set_switches("-Q"); // TetGen switches: triangulation, Convex hull, Quiet mode
+  tetgen_wrapper.set_switches("Q"); // TetGen switches: triangulation, Convex hull, Quiet mode
   tetgen_wrapper.run_tetgen();
   unsigned int num_elements   = tetgen_wrapper.get_numberoftrifaces();
 
