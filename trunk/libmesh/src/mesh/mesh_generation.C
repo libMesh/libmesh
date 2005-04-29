@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.34 2005-02-22 22:17:41 jwpeterson Exp $
+// $Id: mesh_generation.C,v 1.35 2005-04-29 22:22:42 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -58,6 +58,12 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 {
   START_LOG("build_cube()", "MeshTools::Generation");
 
+  // Declare that we are using the indexing utility routine
+  // in the "Private" part of our current namespace.  If this doesn't
+  // work in GCC 2.95.3 we can either remove it or stop supporting
+  // 2.95.3 altogether.
+  using MeshTools::Generation::Private::idx;
+  
   // Clear the mesh and start from scratch
   mesh.clear();
   
