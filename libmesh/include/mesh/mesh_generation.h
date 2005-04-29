@@ -1,4 +1,4 @@
-// $Id: mesh_generation.h,v 1.4 2005-02-22 22:17:33 jwpeterson Exp $
+// $Id: mesh_generation.h,v 1.5 2005-04-29 22:22:42 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -45,7 +45,7 @@ namespace MeshTools
    *
    * \author Benjamin S. Kirk
    * \date 2004
-   * \version $Revision: 1.4 $
+   * \version $Revision: 1.5 $
    */
   namespace Generation
   {
@@ -85,85 +85,101 @@ namespace MeshTools
 		       const ElemType type=INVALID_ELEM);
 
     /**
-     * A useful inline function which replaces the #defines
-     * used previously.  Not private since this is a namespace,
-     * but would be if this were a class.  The first one returns
-     * the proper node number for 2D elements while the second
-     * one returns the node number for 3D elements.
+     * Meshes a square (2D) with a Delaunay triangulation.
+     * This function internally calls the triangle library
+     * written by J.R. Shewchuk.  Currently only works with
+     * linear (Tri3) elements but could be extened to Tri6
+     * as well.
      */
-    inline
-    unsigned int idx(const ElemType type,
-		     const unsigned int nx,
-		     const unsigned int i,
-		     const unsigned int j)
-    {
-      switch(type)
-	{
-	case INVALID_ELEM:
-	case QUAD4:
-	case TRI3:
-	  {
-	    return i + j*(nx+1);
-	    break;
-	  }
-
-	case QUAD8:
-	case QUAD9:
-	case TRI6:
-	  {
-	    return i + j*(2*nx+1);
-	    break;
-	  }
-	  
-	default:
-	  {
-	    std::cerr << "ERROR: Unrecognized 2D element type." << std::endl;
-	    error();
-	  }
-	}
-
-      return libMesh::invalid_uint;
-    }
-
-
-    // Same as the function above, but for 3D elements
-    inline
-    unsigned int idx(const ElemType type,
-		     const unsigned int nx,
-		     const unsigned int ny,
-		     const unsigned int i,
-		     const unsigned int j,
-		     const unsigned int k)
-    {
-      switch(type)
-	{
-	case INVALID_ELEM:
-	case HEX8:
-	case PRISM6:
-	  {
-	    return i + (nx+1)*(j + k*(ny+1));
-	    break;
-	  }
-
-	case HEX20:
-	case HEX27:
-	case PRISM15:
-	case PRISM18:
-	  {
-	    return i + (2*nx+1)*(j + k*(2*ny+1));
-	    break;
-	  }
-	  
-	default:
-	  {
-	    std::cerr << "ERROR: Unrecognized 2D element type." << std::endl;
-	    error();
-	  }
-	}
-      
-      return libMesh::invalid_uint;
-    }
+    void build_delaunay_square(Mesh& mesh,
+			       const unsigned int nx, // num. of nodes in x-dir
+			       const unsigned int ny, // num. of nodes in y-dir
+			       const Real xmin=0., const Real xmax=1.,
+			       const Real ymin=0., const Real ymax=1.);
     
+    namespace Private
+    {
+      /**
+       * A useful inline function which replaces the #defines
+       * used previously.  Not private since this is a namespace,
+       * but would be if this were a class.  The first one returns
+       * the proper node number for 2D elements while the second
+       * one returns the node number for 3D elements.
+       */
+      inline
+      unsigned int idx(const ElemType type,
+		       const unsigned int nx,
+		       const unsigned int i,
+		       const unsigned int j)
+      {
+	switch(type)
+	  {
+	  case INVALID_ELEM:
+	  case QUAD4:
+	  case TRI3:
+	    {
+	      return i + j*(nx+1);
+	      break;
+	    }
+
+	  case QUAD8:
+	  case QUAD9:
+	  case TRI6:
+	    {
+	      return i + j*(2*nx+1);
+	      break;
+	    }
+	  
+	  default:
+	    {
+	      std::cerr << "ERROR: Unrecognized 2D element type." << std::endl;
+	      error();
+	    }
+	  }
+
+	return libMesh::invalid_uint;
+      }
+
+
+    
+      // Same as the function above, but for 3D elements
+      inline
+      unsigned int idx(const ElemType type,
+		       const unsigned int nx,
+		       const unsigned int ny,
+		       const unsigned int i,
+		       const unsigned int j,
+		       const unsigned int k)
+      {
+	switch(type)
+	  {
+	  case INVALID_ELEM:
+	  case HEX8:
+	  case PRISM6:
+	    {
+	      return i + (nx+1)*(j + k*(ny+1));
+	      break;
+	    }
+
+	  case HEX20:
+	  case HEX27:
+	  case PRISM15:
+	  case PRISM18:
+	    {
+	      return i + (2*nx+1)*(j + k*(2*ny+1));
+	      break;
+	    }
+	  
+	  default:
+	    {
+	      std::cerr << "ERROR: Unrecognized 2D element type." << std::endl;
+	      error();
+	    }
+	  }
+      
+	return libMesh::invalid_uint;
+      }
+    } // end namespace Meshtools::Generation::Private
   } // end namespace Meshtools::Generation
 } // end namespace MeshTools
 

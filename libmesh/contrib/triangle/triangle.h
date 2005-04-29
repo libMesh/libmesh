@@ -274,9 +274,9 @@ struct triangulateio {
   int numberofedges;                                             /* Out only */
 };
 
-//#ifdef ANSI_DECLARATORS
+/* #ifdef ANSI_DECLARATORS */
 void triangulate(char *, struct triangulateio *, struct triangulateio *,
                  struct triangulateio *);
-// #else /* not ANSI_DECLARATORS */
-// void triangulate();
-// #endif /* not ANSI_DECLARATORS */
+/* #else  not ANSI_DECLARATORS  */   
+/* void triangulate();            */
+/* #endif  not ANSI_DECLARATORS */

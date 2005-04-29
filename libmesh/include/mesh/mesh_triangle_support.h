@@ -1,4 +1,4 @@
-// $Id: mesh_triangle_support.h,v 1.1 2005-04-28 20:38:21 jwpeterson Exp $
+// $Id: mesh_triangle_support.h,v 1.2 2005-04-29 22:22:42 jwpeterson Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -29,12 +29,52 @@
 // Therefore, we need to include it first.
 #include "libmesh_common.h"
 
+namespace Triangle {
 extern "C" {
 #include "triangle.h"
 }
+}
 
 
+// // Forward declarations
+// class Mesh;
 
+// /**
+//  * This class is used to hide the details of the interaction
+//  * with the C library Triangle, and to translate the results
+//  * of its triangulations into libMesh meshes.
+//  *
+//  * @author John W. Peterson, 2005
+//  */
+// class TriangleMeshInterface
+// {
+// public:
+//   /**
+//    * Constructor, obviously the mesh reference must be
+//    * non-const since we are going to construct it!
+//    */
+//   TriangleMeshInterface(Mesh& mesh);
+
+//   /**
+//    * Destructor.
+//    */
+//   ~TriangleMeshInterface() {}
+
+//   /**
+//    * Constructs a triangulation of the nodes in the current
+//    * mesh.  Any existing elements are ignored during
+//    * the triangulation and deleted to make room for the new
+//    * triangles upon completion.  Depending on the parameters
+//    * passed to the triangulate routine, nodes may be added as
+//    * well.  Therefore you should not rely on any previous
+//    * nodes or elements which were in your mesh after calling
+//    * this function.
+//    */
+//   void triangulate ();
+  
+// protected:
+//   Mesh& _mesh;
+// };
 
 
 
