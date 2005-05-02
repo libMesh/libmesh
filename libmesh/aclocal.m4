@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.79 2005-04-28 20:26:41 jwpeterson Exp $
+dnl $Id: aclocal.m4,v 1.80 2005-05-02 13:12:19 spetersen Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -711,6 +711,45 @@ AC_DEFUN(CONFIGURE_PETSC,
 ])
 dnl -------------------------------------------------------------
 
+
+
+dnl -------------------------------------------------------------
+dnl SLEPc
+dnl -------------------------------------------------------------
+AC_DEFUN(CONFIGURE_SLEPC,
+[
+  AC_CHECK_FILE($SLEPC_DIR/include/slepc.h,
+                SLEPC_H_PATH=$SLEPC_DIR/include/slepc.h)
+                                                                                       
+  if (test -r $SLEPC_DIR/include/slepc.h) ; then
+    AC_SUBST(SLEPC_DIR)
+
+    dnl Similar to petsc, we need the slepc version number for.
+    dnl Note slepc will most likely only work with the corresponding version of petsc
+    slepcmajor=`grep "define SLEPC_VERSION_MAJOR" $SLEPC_DIR/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_MAJOR[ ]*//g"`
+    slepcminor=`grep "define SLEPC_VERSION_MINOR" $SLEPC_DIR/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_MINOR[ ]*//g"`
+    slepcsubminor=`grep "define SLEPC_VERSION_SUBMINOR" $SLEPC_DIR/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_SUBMINOR[ ]*//g"`
+    slepcversion=$slepcmajor.$slepcminor.$slepcsubminor
+    AC_SUBST(slepcversion)
+
+    if (test $slepcversion != $petscversion) ; then
+      AC_MSG_RESULT(WARNING:)
+      AC_MSG_RESULT(>>> Different version numbers for SLEPc and PETSc <<<)
+      AC_MSG_RESULT(Will skip SLEPc support)
+      enableslepc=no
+    else	
+      AC_DEFINE(HAVE_SLEPC, 1,
+                [Flag indicating whether or not SLEPc is available])
+      AC_MSG_RESULT(<<< Configuring library with SLEPc version $slepcversion support >>>)
+    fi
+  else
+    enableslepc=no
+  fi
+                                                                                       
+  AC_SUBST(enableslepc)
+])
+dnl -------------------------------------------------------------
+                                                                                       
 
 
 dnl -------------------------------------------------------------

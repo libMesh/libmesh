@@ -1,6 +1,6 @@
-// $Id: enum_solver_package.h,v 1.4 2005-05-02 13:12:28 spetersen Exp $
+// $Id: enum_eigen_solver_type.h,v 1.1 2005-05-02 13:12:28 spetersen Exp $
 
-// The libMesh Finite Element Library.
+// The Next Great Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
@@ -19,14 +19,14 @@
 
 
 
-#ifndef __enum_solver_package_h__
-#define __enum_solver_package_h__
+#ifndef __enum_eigensolver_type_h__
+#define __enum_eigensolver_type_h__
 
 // C++ includes
 
 // Local includes
 #include "libmesh_config.h"
-
+#ifdef HAVE_SLEPC
 
 
 
@@ -40,28 +40,25 @@
 namespace libMeshEnums {
   
   /**
-   * Defines an \p enum for various linear solver packages.
-   * This allows for run-time switching between solver packages
-   * 
+   * Defines an \p enum for iterative eigenproblem solver types
    */
-  enum SolverPackage
-    { 
-#ifdef HAVE_PETSC
-      PETSC_SOLVERS,
-#endif
-#ifdef HAVE_LASPACK
-      LASPACK_SOLVERS,
-#endif
-#if defined(HAVE_SLEPC) && defined(HAVE_PETSC)
-      SLEPC_SOLVERS,
-#endif
-      
-      INVALID_SOLVER_PACKAGE
-    };
+  enum EigenSolverType {POWER=0,
+			LAPACK,
+			SUBSPACE,
+			ARNOLDI,
+			// SLEPc optional packages
+			// EPSARPACK,
+			// EPSLAPACK,
+			// EPSBLZPACK,
+			// EPSPLANSO,
+			// EPSTRLAN,
+		   
+			INVALID_EIGENSOLVER};
 }
 
 using namespace libMeshEnums;
 
+#endif // HAVE_SLEPC
 
 
 #endif

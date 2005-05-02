@@ -89,6 +89,9 @@
 /* Flag indicating whether or not Space filling curves are available */
 #undef HAVE_SFCURVES
 
+/* Flag indicating whether or not SLEPc is available */
+#undef HAVE_SLEPC
+
 /* define if the compiler has the sstream header */
 #undef HAVE_SSTREAM
 

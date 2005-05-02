@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.41 2005-04-28 20:26:41 jwpeterson Exp $
+# $Id: Make.common.in,v 1.42 2005-05-02 13:12:19 spetersen Exp $
 
 
 ###############################################################################
@@ -49,6 +49,10 @@ petsc-version        = @petscversion@
 petsc-major-minor    = @petscmajorminor@
 PETSC_ARCH           = @PETSC_ARCH@
 PETSC_DIR            = @PETSC_DIR@
+
+# Slepc for eigen value analysis
+enable-slepc         = @enableslepc@
+SLEPC_DIR            = @SLEPC_DIR@
 
 
 # MPI configuration
@@ -272,6 +276,26 @@ ifeq ($(enable-optional),yes)
   endif
 
   #############################################################################
+  # SLEPc
+  ifeq ($(enable-slepc),yes)
+
+    include $(SLEPC_DIR)/bmake/$(PETSC_ARCH)/packages
+
+    INCLUDE += -I$(SLEPC_DIR)/include
+
+    SLEPC_LIB = $(SLEPC_DIR)/lib/lib$(BOPT)/$(PETSC_ARCH)
+
+    libs-SLEPC = -L$(SLEPC_LIB) \
+                 -lslepc
+
+    LIBS += $(libs-SLEPC) $(ARPACK_LIB)
+
+    DLFLAGS += $(RPATHFLAG)$(SLEPC_LIB)
+
+  endif #end ifeq ($(enable-slepc),yes)
+
+
+  #############################################################################
   # Petsc
   ifeq ($(enable-petsc),yes)
 
@@ -338,6 +362,7 @@ ifeq ($(enable-optional),yes)
 	    $(X11_LIB) $(MATLAB_LIB) $(FLIBS)
 
   endif #end ifeq ($(enable-petsc),yes)
+
 
   # MPI configuration when Petsc is absent
   LIBS    += $(MPI_LIB)
