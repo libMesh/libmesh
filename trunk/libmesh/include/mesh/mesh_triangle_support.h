@@ -1,4 +1,4 @@
-// $Id: mesh_triangle_support.h,v 1.2 2005-04-29 22:22:42 jwpeterson Exp $
+// $Id: mesh_triangle_support.h,v 1.3 2005-05-02 14:54:54 jwpeterson Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -29,11 +29,40 @@
 // Therefore, we need to include it first.
 #include "libmesh_common.h"
 
+/**
+ * A special namespace for wrapping the standard Triangle API,
+ * as well as some helper functions for initializing/destroying
+ * the structs triangle uses to communicate.
+ */
 namespace Triangle {
 extern "C" {
 #include "triangle.h"
 }
+
+  /**
+   * Initializes the fields of t to NULL/0 as necessary.
+   * This is helpful for preventing the access of uninitialized
+   * memory when working with C, which has no constructors or
+   * destructors.
+   */
+  void init(triangulateio& t);
+    
+  /**
+   * Frees any memory which has been dynamically allocated by
+   * Triangle.  This is safe due to the fact that 1) Triangle does
+   * not free any memory itself, and 2) it is safe to call free
+   * on the NULL pointer.
+   */
+  void destroy(triangulateio& t);
 }
+
+
+
+
+
+
+
+
 
 
 // // Forward declarations
