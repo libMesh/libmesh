@@ -1,4 +1,4 @@
-// $Id: libmesh.C,v 1.30 2005-02-22 22:17:36 jwpeterson Exp $
+// $Id: libmesh.C,v 1.31 2005-05-02 13:12:28 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -46,6 +46,16 @@ extern "C" {
 # include <mpi.h>
 #endif
 
+#if defined(HAVE_SLEPC)
+# ifndef USE_COMPLEX_NUMBERS
+extern "C" 
+{
+#  include <slepc.h>
+}
+# else
+#  include <slepc.h>
+# endif
+#endif
 
 
 // ------------------------------------------------------------
@@ -107,8 +117,9 @@ void libMesh::init (int &argc, char** & argv)
   
   // Build a command-line parser.
   command_line.reset(new GetPot (argc, argv));
+
   
-#if defined(HAVE_PETSC)
+#if defined(HAVE_PETSC) && !defined(HAVE_SLEPC)
 
   // Allow the user to bypass PETSc initialization
   if (!libMesh::on_command_line ("--disable-petsc"))      
@@ -125,6 +136,14 @@ void libMesh::init (int &argc, char** & argv)
       MPI_Comm_size (PETSC_COMM_WORLD, &libMeshPrivateData::_n_processors);
     }
   
+#elif defined(HAVE_PETSC) && defined(HAVE_SLEPC)
+
+  // This will automaticly initialize SLEPc
+  SlepcInitialize (&argc, &argv, NULL, NULL);
+  
+  MPI_Comm_rank (PETSC_COMM_WORLD, &libMeshPrivateData::_processor_id);
+  MPI_Comm_size (PETSC_COMM_WORLD, &libMeshPrivateData::_n_processors);  
+
 #elif defined(HAVE_MPI)
 
   // Allow the user to bypass MPI initialization
@@ -187,7 +206,8 @@ void libMesh::init (int &argc, char** & argv)
 int libMesh::close ()
 {
 
-#if defined(HAVE_PETSC)
+
+#if defined(HAVE_PETSC) && !defined(HAVE_SLEPC)
 
   // Allow the user to bypass PETSc finalization
   if (!libMesh::on_command_line ("--disable-petsc"))      
@@ -195,6 +215,11 @@ int libMesh::close ()
   // Allow the user to bypass MPI finalization
   else if (!libMesh::on_command_line ("--disable-mpi"))
     MPI_Finalize ();
+
+#elif defined (HAVE_PETSC) && defined(HAVE_SLEPC)
+
+  // This also closes PETSc
+  SlepcFinalize();
 
 #elif defined(HAVE_MPI)
 

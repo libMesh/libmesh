@@ -21,6 +21,7 @@ examples:
 	@$(MAKE) -C ex13 $(MAKECMDGOALS)
 	@$(MAKE) -C ex14 $(MAKECMDGOALS)
 	@$(MAKE) -C ex15 $(MAKECMDGOALS)
+	@$(MAKE) -C ex16 $(MAKECMDGOALS)
 	@echo "----------------------------------------------"
 	@echo "------- Done Building Example Programs -------"
 	@echo "----------------------------------------------"
@@ -46,6 +47,7 @@ clean:
 	@$(MAKE) -C ex13 $(MAKECMDGOALS)
 	@$(MAKE) -C ex14 $(MAKECMDGOALS)
 	@$(MAKE) -C ex15 $(MAKECMDGOALS)
+	@$(MAKE) -C ex16 $(MAKECMDGOALS)
 
 #
 # Really clean up the example programs
@@ -65,6 +67,7 @@ clobber:
 	@$(MAKE) -C ex13 $(MAKECMDGOALS)
 	@$(MAKE) -C ex14 $(MAKECMDGOALS)
 	@$(MAKE) -C ex15 $(MAKECMDGOALS)
+	@$(MAKE) -C ex16 $(MAKECMDGOALS)
 #
 # Make the example program directories look
 # like a clean distribution
@@ -84,6 +87,7 @@ distclean:
 	@$(MAKE) -C ex13 $(MAKECMDGOALS)
 	@$(MAKE) -C ex14 $(MAKECMDGOALS)
 	@$(MAKE) -C ex15 $(MAKECMDGOALS)
+	@$(MAKE) -C ex16 $(MAKECMDGOALS)
 
 #
 # Link the example programs
@@ -103,6 +107,7 @@ link: $(wildcard examples/ex*/ex*.C)
 	@$(MAKE) -C ex13 ex13 
 	@$(MAKE) -C ex14 ex14 
 	@$(MAKE) -C ex15 ex15 
+	@$(MAKE) -C ex16 ex16 
 
 #
 # Run the example programs to see if shared lib's get properly loaded
@@ -122,3 +127,4 @@ run: $(wildcard examples/ex*/ex*.C)
 	@$(MAKE) -C ex13 $(MAKECMDGOALS)
 	@$(MAKE) -C ex14 $(MAKECMDGOALS)
 	@$(MAKE) -C ex15 $(MAKECMDGOALS)
+	@$(MAKE) -C ex16 $(MAKECMDGOALS)

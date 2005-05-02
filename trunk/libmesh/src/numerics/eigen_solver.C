@@ -1,4 +1,4 @@
-// $Id: linear_solver.C,v 1.3 2005-05-02 13:12:29 spetersen Exp $
+// $Id: eigen_solver.C,v 1.1 2005-05-02 13:12:29 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -18,54 +18,46 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
+#include "libmesh_config.h"
+#ifdef HAVE_SLEPC
 
 // C++ includes
 
 // Local Includes
-#include "linear_solver.h"
-#include "laspack_linear_solver.h"
-#include "petsc_linear_solver.h"
+#include "eigen_solver.h"
+#include "slepc_eigen_solver.h"
 #include "auto_ptr.h"
 
 
 //------------------------------------------------------------------
-// LinearSolver members
+// EigenSolver members
 template <typename T>
-AutoPtr<LinearSolver<T> >
-LinearSolver<T>::build(const SolverPackage solver_package)
+AutoPtr<EigenSolver<T> >
+EigenSolver<T>::build(const SolverPackage solver_package)
 {
   // Build the appropriate solver
   switch (solver_package)
     {
 
 
-#ifdef HAVE_LASPACK
-    case LASPACK_SOLVERS:
+
+#ifdef HAVE_SLEPC
+	case SLEPC_SOLVERS:
       {
-	AutoPtr<LinearSolver<T> > ap(new LaspackLinearSolver<T>);
+	AutoPtr<EigenSolver<T> > ap(new SlepcEigenSolver<T>);
 	return ap;
       }
 #endif
-
-
-#ifdef HAVE_PETSC
-    case PETSC_SOLVERS:
-      {
-	AutoPtr<LinearSolver<T> > ap(new PetscLinearSolver<T>);
-	return ap;
-      }
-#endif
-
 
 
     default:
-      std::cerr << "ERROR:  Unrecognized solver package: "
+      std::cerr << "ERROR:  Unrecognized eigen solver package: "
 		<< solver_package
 		<< std::endl;
       error();
     }
     
-  AutoPtr<LinearSolver<T> > ap(NULL);
+  AutoPtr<EigenSolver<T> > ap(NULL);
   return ap;    
 }
 
@@ -73,7 +65,7 @@ LinearSolver<T>::build(const SolverPackage solver_package)
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class LinearSolver<Number>;
+template class EigenSolver<Number>;
 
 
-
+#endif // HAVE_SLEPC
