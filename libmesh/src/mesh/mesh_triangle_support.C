@@ -5,6 +5,10 @@
 #include "mesh_generation.h"
 #include "mesh_smoother_laplace.h"
 
+
+
+
+
 // Definition of the function from the MeshTools::Generation namespace
 void MeshTools::Generation::build_delaunay_square (Mesh& mesh,
 						   const unsigned int nx,
@@ -18,74 +22,56 @@ void MeshTools::Generation::build_delaunay_square (Mesh& mesh,
   assert (ny >= 2);
   assert (xmin < xmax);
   assert (ymin < ymax);
+
+  // Declare and initialize the Triangle interface structs
+  Triangle::triangulateio input, intermediate, final;
+  Triangle::init(input);
+  Triangle::init(intermediate);
+  Triangle::init(final);
   
-  // The desired final area of the triangles.
+  // Compute the desired final area of the triangles, based on the
+  // area of the domain and the requested number of nodes.
   const Real desired_area = 0.5 * (xmax-xmin)*(ymax-ymin) / static_cast<Real>((nx-1)*(ny-1));
 
-  // Construct a vector of x,y point locations which define the
-  // points on the boundary of the square.
-  const unsigned int n_bndry_pts = 2*(nx+ny-2);
-  std::vector<Real> xy(2*n_bndry_pts);
+  // Allocate memory for the initial points.  Stick to malloc here
+  // so that all the accompanying 'destroy's work as well.
+  input.numberofpoints = 2*(nx+ny-2);
+  input.pointlist      = static_cast<REAL*>(malloc(input.numberofpoints * 2 * sizeof(REAL)));
 
   // The x and y spacing between boundary points
   const Real delta_x = (xmax-xmin) / static_cast<Real>(nx-1);
   const Real delta_y = (ymax-ymin) / static_cast<Real>(ny-1);  
 
-  // std::cout << "desired area = " << desired_area << std::endl;
-  
   // Top and Bottom Sides
   for (unsigned int i=0, n=0; n<nx; i+=4, ++n)
     {
       // Bottom
-      xy[i]   = xmin + n*delta_x; // x
-      xy[i+1] = ymin;             // y
+      input.pointlist[i]   = xmin + n*delta_x; // x
+      input.pointlist[i+1] = ymin;             // y
 
       // Top
-      xy[i+2] = xy[i]; // x
-      xy[i+3] = ymax;  // y
+      input.pointlist[i+2] = input.pointlist[i]; // x
+      input.pointlist[i+3] = ymax;  // y
     }
 
   // Left and Right Sides
   for (unsigned int i=4*nx, n=1; n<ny-1; i+=4, ++n)
     {
       // Left
-      xy[i]   = xmin;             // x
-      xy[i+1] = ymin + n*delta_y; // y
+      input.pointlist[i]   = xmin;             // x
+      input.pointlist[i+1] = ymin + n*delta_y; // y
 
       // Right
-      xy[i+2] = xmax;     // x
-      xy[i+3] = xy[i+1];  // y
+      input.pointlist[i+2] = xmax;     // x
+      input.pointlist[i+3] = input.pointlist[i+1];  // y
     }
 
 
+  // Note, if instead of putting a bunch of nodes on the boundary, you
+  // start with just 4 at the corners, this always results in a
+  // perfectly symmetric (boring) triangulation of the square, with
+  // all similar triangles.
 
-//   // Instead of putting a bunch of nodes on the boundary, start with
-//   // just 4.  This always results in a uniform triangulation of the square,
-//   // with all similar triangles.
-//   std::vector<Real> xy(8);
-//   xy[0] = xmin; xy[1] = ymin;
-//   xy[2] = xmax; xy[3] = ymin;
-//   xy[4] = xmin; xy[5] = ymax;
-//   xy[6] = xmax; xy[7] = ymax;
-
-  
-  //for (unsigned int i=0; i<xy.size(); i+=2)
-  //  std::cout << "(" << xy[i] << "," << xy[i+1] << ")" << std::endl;
-
-  // The Triangle input object.
-  Triangle::triangulateio input;
-  input.numberofpoints          = xy.size() / 2;
-  input.pointlist               = &xy[0];        // points to our local vector, no need to free later
-  input.numberofpointattributes = 0;
-
-  
-  // Intermediate Trinagle object.
-  Triangle::triangulateio intermediate;
-  intermediate.pointlist       = static_cast<Real*>(NULL);
-  intermediate.trianglelist    = static_cast<int* >(NULL);
-  intermediate.segmentlist     = static_cast<int* >(NULL);
-  intermediate.pointmarkerlist = static_cast<int* >(NULL);
-  
   // Perform initial triangulation.
   Triangle::triangulate("czBQ",
 			&input,
@@ -93,7 +79,6 @@ void MeshTools::Generation::build_delaunay_square (Mesh& mesh,
 			static_cast<Triangle::triangulateio*>(NULL));
 
   // Final refined Triangle object.
-  Triangle::triangulateio final;
   final.pointlist    = static_cast<Real*>(NULL);
   final.trianglelist = static_cast<int* >(NULL);
 
@@ -111,7 +96,7 @@ void MeshTools::Generation::build_delaunay_square (Mesh& mesh,
   // Node information
   for (int i=0, c=0; c<final.numberofpoints; i+=2, ++c)
     mesh.add_point( Point(final.pointlist[i],
-			   final.pointlist[i+1]) );
+			  final.pointlist[i+1]) );
   
   // Element information
   for (int i=0; i<final.numberoftriangles; ++i)
@@ -122,21 +107,82 @@ void MeshTools::Generation::build_delaunay_square (Mesh& mesh,
 	elem->set_node(n) = mesh.node_ptr(final.trianglelist[i*3 + n]);
     }
 
-  // Free vectors in the ouput struct
-  free (intermediate.pointlist             );
-  free (intermediate.trianglelist          );
-  free (intermediate.segmentlist           );
-  free (intermediate.pointmarkerlist       );
-  free (final.pointlist               );
-  free (final.trianglelist            );
+  // Clean up triangle data structures
+  Triangle::destroy(input);
+  Triangle::destroy(intermediate);
+  Triangle::destroy(final);
   
   // Prepare mesh for usage.
   mesh.prepare_for_use();
   
   // Run mesh through a few Laplace smoothing steps.
   LaplaceMeshSmoother s (mesh);
-  s.smooth(3);
+  s.smooth(2);
 }
+
+
+
+
+
+
+// Init helper routine defined in the Triangle namespace
+void Triangle::init(Triangle::triangulateio& t)
+{
+  t.pointlist                    = static_cast<REAL*>(NULL);
+  t.pointattributelist           = static_cast<REAL*>(NULL);
+  t.pointmarkerlist              = static_cast<int* >(NULL);
+  t.numberofpoints               = 0 ;
+  t.numberofpointattributes      = 0 ;                                   
+
+  t.trianglelist                 = static_cast<int* >(NULL);
+  t.triangleattributelist        = static_cast<REAL*>(NULL);
+  t.trianglearealist             = static_cast<REAL*>(NULL);
+  t.neighborlist                 = static_cast<int* >(NULL);
+  t.numberoftriangles            = 0;
+  t.numberofcorners              = 0;
+  t.numberoftriangleattributes   = 0;
+  
+  t.segmentlist                  = static_cast<int* >(NULL);
+  t.segmentmarkerlist            = static_cast<int* >(NULL);
+  t.numberofsegments             = 0;
+
+  t.holelist                     = static_cast<REAL*>(NULL);
+  t.numberofholes                = 0;
+
+  t.regionlist                   = static_cast<REAL*>(NULL);
+  t.numberofregions              = 0;
+  
+  t.edgelist                     = static_cast<int* >(NULL);
+  t.edgemarkerlist               = static_cast<int* >(NULL);
+  t.normlist                     = static_cast<REAL*>(NULL);
+  t.numberofedges                = 0;
+}
+
+
+
+
+
+
+// Destroy helper routine defined in the Triangle namespace
+void Triangle::destroy(Triangle::triangulateio& t)
+{
+  free (t.pointlist                    );
+  free (t.pointattributelist           );
+  free (t.pointmarkerlist              );
+  free (t.trianglelist                 );
+  free (t.triangleattributelist        );
+  free (t.trianglearealist             );
+  free (t.neighborlist                 );
+  free (t.segmentlist                  );
+  free (t.segmentmarkerlist            );
+  free (t.holelist                     );
+  free (t.regionlist                   );
+  free (t.edgelist                     );
+  free (t.edgemarkerlist               );
+  free (t.normlist                     );
+}
+
+
 
 
 
