@@ -1,4 +1,4 @@
-// $Id: ex16.C,v 1.1 2005-05-02 13:12:27 spetersen Exp $
+// $Id: ex16.C,v 1.2 2005-05-02 13:42:07 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -66,13 +66,12 @@ int main (int argc, char** argv)
   // This example is designed for the SLEPc eigen solver interface.
 #ifndef HAVE_SLEPC
 
-  std::cerr << "ERROR: This example requires libMesh to be "
+  std::cerr << "ERROR: This example requires libMesh to be\n"
 	    << "compiled with SLEPc eigen solvers support!"
 	    << std::endl;
 
   return 0;
-
-#endif
+#else
 
 
   // Braces are used to force object scope.  
@@ -185,6 +184,8 @@ int main (int argc, char** argv)
       }
   }
 
+#endif // HAVE_SLEPC
+
   // All done.  
   return libMesh::close ();
 }
@@ -199,6 +200,8 @@ void assemble_mass(EquationSystems& es,
   // It is a good idea to make sure we are assembling
   // the proper system.
   assert (system_name == "Eigensystem");
+
+#ifdef HAVE_SLEPC
 
   // Get a constant reference to the mesh object.
   const Mesh& mesh = es.get_mesh();
@@ -303,6 +306,8 @@ void assemble_mass(EquationSystems& es,
 
 
     } // end of element loop
+
+#endif // HAVE_SLEPC
 
   /**
    * All done!
