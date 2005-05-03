@@ -1,4 +1,4 @@
-/* $Id: ex10.C,v 1.18 2005-01-14 19:29:25 benkirk Exp $ */
+/* $Id: ex10.C,v 1.19 2005-05-03 23:03:04 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -138,7 +138,7 @@ int main (int argc, char** argv)
     equation_systems.print_info();
       
     // Write out the initial conditions.
-    GMVIO(mesh).write_equation_systems ("out_000.gmv",
+    GMVIO(mesh).write_equation_systems ("out.gmv.000",
 					equation_systems);
     
     // The Convection-Diffusion system requires that we specify
@@ -255,9 +255,8 @@ int main (int argc, char** argv)
 	  {
 	    OStringStream file_name;
 
-	    file_name << "out_";
+	    file_name << "out.gmv.";
 	    OSSRealzeroright(file_name,3,0,t_step+1);
-	    file_name << ".gmv";
 
 	    GMVIO(mesh).write_equation_systems (file_name.str(),
 						equation_systems);
