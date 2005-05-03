@@ -1,4 +1,4 @@
-// $Id: mesh_tetgen_support.C,v 1.17 2005-04-28 20:26:49 jwpeterson Exp $
+// $Id: mesh_tetgen_support.C,v 1.18 2005-05-03 15:25:59 spetersen Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -293,7 +293,7 @@ void TetGenMeshInterface::triangulate_pointset ()
   }
   
   // run TetGen triangulation method:
-  tetgen_wrapper.set_switches("-Q"); // TetGen switches: triangulation, Quiet mode
+  tetgen_wrapper.set_switches("Q"); // TetGen switches: triangulation, Quiet mode
   tetgen_wrapper.run_tetgen();
 
   // save elements to mesh structure, nodes will not be changed:
@@ -557,7 +557,7 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const s
   // >>> run TetGen triangulation method:
   // assemble switches:
   std::ostringstream oss; // string holding switches
-  oss << "-pQ";
+  oss << "pQ";
 
   if (quality_constraint != 0)
     oss << "q" << quality_constraint;
