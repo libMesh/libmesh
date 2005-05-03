@@ -1,4 +1,4 @@
-// $Id: mesh_refinement_flagging.C,v 1.15 2005-02-22 22:17:41 jwpeterson Exp $
+// $Id: mesh_refinement_flagging.C,v 1.16 2005-05-03 23:22:24 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -332,7 +332,12 @@ void MeshRefinement::clean_refinement_flags ()
   const MeshBase::element_iterator elem_end = _mesh.elements_end(); 
 
   for ( ; elem_it != elem_end; ++elem_it)
-    (*elem_it)->set_refinement_flag(Elem::DO_NOTHING);
+    {
+      if ((*elem_it)->active())
+        (*elem_it)->set_refinement_flag(Elem::DO_NOTHING);
+      else
+        (*elem_it)->set_refinement_flag(Elem::INACTIVE);
+    }
 }
 
 #endif

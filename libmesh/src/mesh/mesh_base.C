@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.89 2005-03-21 15:19:29 benkirk Exp $
+// $Id: mesh_base.C,v 1.90 2005-05-03 23:22:24 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -373,7 +373,7 @@ void MeshBase::find_neighbors()
 # elif (__GNUC__ >= 3)                          // gcc 3.1 & newer
     typedef __gnu_cxx::hash_multimap<key_type, val_type> map_type;
 # else
-    DIE A HORRIBLE DEATH
+# error     DIE A HORRIBLE DEATH
 # endif
 #else
     typedef std::multimap<key_type, val_type>  map_type;
@@ -425,9 +425,15 @@ void MeshBase::find_neighbors()
 			// If found a match wbounds.firsth my side
 			if (*my_side == *their_side) 
 			  {
-			    // So we are neighbors. Tell the other element 
-			    element->set_neighbor (ms,neighbor);
-			    neighbor->set_neighbor(ns,element);
+			    // So share a side.  Is either of us
+			    // the descendant of an active element?
+                            // If not, then we're neighbors.
+                            if (!element->subactive() &&
+                                !neighbor->subactive())
+                              {
+			        element->set_neighbor (ms,neighbor);
+			        neighbor->set_neighbor(ns,element);
+                              }
 			    
 			    side_to_elem_map.erase (bounds.first);
 			    
@@ -465,11 +471,11 @@ void MeshBase::find_neighbors()
 
   /**
    * Here we look at all of the child elements.
-   * If a child element has a NULL neighbor it
-   * is either because it is on the boundary
-   * or because its neighbor is at a different
-   * level.  In the latter case we must get the
-   * neighbor from the parent.
+   * If a non-subactive child element has a NULL 
+   * neighbor it is either because it is on the
+   * boundary or because its neighbor is at a
+   * different level.  In the latter case we must
+   * get the neighbor from the parent.
    *
    * Furthermore, that neighbor better be active,
    * otherwise we missed a child somewhere.
@@ -482,6 +488,9 @@ void MeshBase::find_neighbors()
       Elem* elem = *el;
       
       assert (elem->parent() != NULL);
+
+      if (elem->subactive()) 
+        continue;
       
       for (unsigned int s=0; s < elem->n_neighbors(); s++)
 	if (elem->neighbor(s) == NULL)
@@ -489,18 +498,25 @@ void MeshBase::find_neighbors()
 	    elem->set_neighbor(s, elem->parent()->neighbor(s));
 	    
 #ifdef DEBUG	    
-	    if (elem->neighbor(s) != NULL)
-	      if (!elem->neighbor(s)->active())
+            Elem *neigh = elem->neighbor(s);
+	    if (neigh != NULL)
+	      if (!neigh->active())
 		{
-		  std::cerr << "I'm confused..." << std::endl;
+		  std::cerr << "ERROR: " 
+                    << (elem->active()?"Active":"Ancestor")
+                    << "Element at level "
+                    << elem->level() << " found "
+		    << (neigh->subactive()?"subactive":"ancestor")
+                    << " neighbor at level " << neigh->level()
+                    << std::endl;
 		  GMVIO(*dynamic_cast<Mesh*>(this)).write ("bad_mesh.gmv");
 		  error();
 		}
-#endif
+#endif // DEBUG
 	  }
     }
   
-#endif
+#endif // AMR
 
   STOP_LOG("find_neighbors()", "MeshBase");
 }
@@ -695,3 +711,65 @@ void MeshBase::delete_elem(Elem* e)
   
   //_elements.erase(pos);
 }
+
+
+
+bool MeshBase::contract ()
+{
+  START_LOG ("contract()", "MeshRefinement");
+
+  // Flag indicating if this call actually changes the mesh
+  bool mesh_changed = false;
+
+  MeshBase::element_iterator       it  = elements_begin();
+  const MeshBase::element_iterator end = elements_end();
+
+#ifdef DEBUG
+  for ( ; it != end; ++it)
+    {
+      Elem* elem = *it;
+      assert(elem->active() || elem->subactive() || elem->ancestor());
+    }
+  it = elements_begin();
+#endif
+
+  // Loop over the elements.   
+  for ( ; it != end; ++it)
+    {
+      Elem* elem = *it;
+
+      // Compress all the active ones
+      if (elem->active())
+        {
+	  elem->contract();
+        }
+      // Delete all the subactive ones
+      else if (elem->subactive())
+        {
+	  // Huh?  no level-0 element should be subactive
+	  assert (elem->level() != 0);
+
+	  // Make sure we dealt with parents first
+	  if (elem->parent()->has_children())
+	    {
+	      std::cerr << "Element being deleted is still a child." << std::endl;
+	    }
+
+	  // Delete the element through the Mesh interface
+	  delete_elem(elem);
+
+	  // the mesh has certainly changed
+	  mesh_changed = true;
+        }
+      else
+        assert (elem->ancestor());
+    }
+  STOP_LOG ("contract()", "MeshRefinement");
+
+  return mesh_changed;
+}
+
+
+
+
+
