@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.34 2005-03-21 18:06:29 benkirk Exp $
+// $Id: mesh_refinement.C,v 1.35 2005-05-03 23:22:24 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -158,10 +158,10 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
 
   for ( ; elem_it != elem_end; ++elem_it)
     {
-      // Set refinement flag to DO_NOTHING if the
+      // Set refinement flag to INACTIVE if the
       // element isn't active
       if ( !(*elem_it)->active())
-	(*elem_it)->set_refinement_flag(Elem::DO_NOTHING);
+	(*elem_it)->set_refinement_flag(Elem::INACTIVE);
 
       // This might be left over from the last step
       if ((*elem_it)->refinement_flag() == Elem::JUST_REFINED)
@@ -189,10 +189,12 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
     }
   while (!satisfied);
 
-  // First coarsen the flagged elements.  This
-  // will free space.
+  // First coarsen the flagged elements.
   const bool coarsening_changed_mesh =
     this->_coarsen_elements ();
+
+  // Next contract the mesh.  This will free space.
+  _mesh.contract();
 
   // Now refine the flagged elements.  This will
   // take up some space, maybe more than what was freed.
@@ -234,10 +236,10 @@ bool MeshRefinement::coarsen_elements (const bool maintain_level_one)
       // Pointer to the element
       Elem* elem = *elem_it;
       
-      // Set refinement flag to DO_NOTHING if the
+      // Set refinement flag to INACTIVE if the
       // element isn't active
       if ( !elem->active())
-	elem->set_refinement_flag(Elem::DO_NOTHING);
+	elem->set_refinement_flag(Elem::INACTIVE);
 
       // This might be left over from the last step
       if (elem->refinement_flag() == Elem::JUST_REFINED)
@@ -266,6 +268,9 @@ bool MeshRefinement::coarsen_elements (const bool maintain_level_one)
   const bool mesh_changed = 
     this->_coarsen_elements ();
     
+  // Next contract the mesh.  This will free space.
+  _mesh.contract();
+
   // Finally, the new mesh may need to be prepared for use
   if (mesh_changed)
     _mesh.prepare_for_use ();
@@ -290,10 +295,10 @@ bool MeshRefinement::refine_elements (const bool maintain_level_one)
 
   for ( ; elem_it != elem_end; ++elem_it)
     {
-      // Set refinement flag to DO_NOTHING if the
+      // Set refinement flag to INACTIVE if the
       // element isn't active
       if ( !(*elem_it)->active())
-	(*elem_it)->set_refinement_flag(Elem::DO_NOTHING);
+	(*elem_it)->set_refinement_flag(Elem::INACTIVE);
 
       // This might be left over from the last step
       if ((*elem_it)->refinement_flag() == Elem::JUST_REFINED)
@@ -435,15 +440,15 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
     } // end if (maintian_level_one)
   
   
-  // Next we look at all of the inactive cells.
-  // If there is an inactive cell with all of its children
+  // Next we look at all of the ancestor cells.
+  // If there is a parent cell with all of its children
   // wanting to be unrefined then the element is a candidate
   // for unrefinement.  If all the children don't
   // all want to be unrefined then ALL of them need to have their
   // unrefinement flags cleared.    
   for (int level=(max_level); level >= 0; level--)
     for (unsigned int e=0; e<_mesh.n_elem(); e++)
-      if (!_mesh.elem(e)->active() &&
+      if (_mesh.elem(e)->ancestor() &&
 	  (_mesh.elem(e)->level() == static_cast<unsigned int>(level)))
 	{
 	  
@@ -458,7 +463,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 	      
 	  if (!is_a_candidate)
 	    {
-	      _mesh.elem(e)->set_refinement_flag(Elem::DO_NOTHING);
+	      _mesh.elem(e)->set_refinement_flag(Elem::INACTIVE);
 		  
 	      for (unsigned int c=0; c<_mesh.elem(e)->n_children(); c++)
 		if (_mesh.elem(e)->child(c)->refinement_flag() == Elem::COARSEN)
@@ -476,7 +481,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
   // If all the children of a parent are set to be coarsened
   // then flag the parent so that they can kill thier kids...   
   for (unsigned int e=0; e<_mesh.n_elem(); e++)
-    if (!_mesh.elem(e)->active())
+    if (_mesh.elem(e)->ancestor())
       {
 	
 	// Presume all the children are flagged for coarsening
@@ -488,7 +493,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 	    all_children_flagged_for_coarsening = false;
 	
 	if (all_children_flagged_for_coarsening)
-	  _mesh.elem(e)->set_refinement_flag(Elem::COARSEN);
+	  _mesh.elem(e)->set_refinement_flag(Elem::COARSEN_INACTIVE);
       }
 	
   STOP_LOG ("make_coarsening_compatible()", "MeshRefinement");
@@ -515,12 +520,12 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
   // with any selected coarsening flags
   bool compatible_with_coarsening = true;
 
-#ifdef DEBUG
+#if 0
   
-  // It only makes sense to refine active elements
+  // It used to only make sense to refine elements with no children
   for (unsigned int e=0; e<_mesh.n_elem(); e++)
     if (_mesh.elem(e)->refinement_flag() == Elem::REFINE)
-      assert (_mesh.elem(e)->active());
+      assert (!(_mesh.elem(e)->has_children()));
   
 #endif
   
@@ -612,9 +617,6 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 
 
 
-
-
-
 bool MeshRefinement::_coarsen_elements ()
 {
   START_LOG ("_coarsen_elements()", "MeshRefinement");
@@ -639,46 +641,47 @@ bool MeshRefinement::_coarsen_elements ()
       // Not necessary when using elem_iterator
       // assert (elem != NULL);
       
+      // active elements flagged for coarsening will
+      // no longer be deleted until MeshRefinement::contract()
       if (elem->refinement_flag() == Elem::COARSEN)
 	{
-	  // active elements flagged for coarsening will
-	  // truly be deleted
-	  if (elem->active()) 
+	  // Huh?  no level-0 element should be active
+	  // and flagged for coarsening.
+	  assert (elem->level() != 0);
+	  
+	  // Remove this element from any neighbor
+	  // lists that point to it.
+	  elem->nullify_neighbors();
+
+	  // Remove any boundary information associated
+	  // with this element
+	  _mesh.boundary_info.remove (elem);
+	      
+	  // Add this iterator to the _unused_elements
+	  // data structure so we might fill it.
+	  // The _unused_elements optimization is currently off.
+	  // _unused_elements.push_back (it);
+	      
+	  // Is this element's parent inactive??
+	  if (!elem->parent()->active())
 	    {
-	      // Huh?  no level-0 element should be active
-	      // and flagged for coarsening.
-	      assert (elem->level() != 0);
-	      
-	      // Remove this element from any neighbor
-	      // lists that point to it.
-	      elem->nullify_neighbors();
-
-	      // Remove any boundary information associated
-	      // with this element
-	      _mesh.boundary_info.remove (elem);
-	      
-	      // Add this iterator to the _unused_elements
-	      // data structure so we might fill it.
-	      // The _unused_elements optimization is currently off.
-	      // _unused_elements.push_back (it);
-	      
-	      // Is this element's parent active??
-	      if (!elem->parent()->active())
-		{
-		  std::cerr << "Element being deleted has inactive parent." << std::endl;
-		}
-
-	      // Use the mesh interface to delete the element
-	      _mesh.delete_elem(elem);
+	      std::cerr << "Element being deleted has inactive parent." << std::endl;
 	    }
+
+	  // Don't delete the element until
+	  // MeshRefinement::contract()
+	  // _mesh.delete_elem(elem);
+
+	  // the mesh has certainly changed
+	  mesh_changed = true;
+        }
       
-	  // inactive elements flagged for coarsening
-	  // will become active
-	  else
-	    {
-	      elem->coarsen();
-	      assert (elem->active());
-	    }
+      // inactive elements flagged for coarsening
+      // will become active
+      else if (elem->refinement_flag() == Elem::COARSEN_INACTIVE)
+	{
+	  elem->coarsen();
+	  assert (elem->active());
 
 	  // the mesh has certainly changed
 	  mesh_changed = true;
@@ -728,7 +731,7 @@ bool MeshRefinement::_refine_elements ()
 	local_copy_of_elements.push_back(elem);
     }
 
-  // The mesh will change if there are elements to delete
+  // The mesh will change if there are elements to refine
   mesh_changed = !(local_copy_of_elements.empty());
   
   // Now iterate over the local copy and refine each one.
@@ -768,6 +771,40 @@ void MeshRefinement::uniformly_refine (unsigned int n)
 
       // Refine all the elements we just flagged.
       this->_refine_elements();
+    }
+  
+  // Finally, the new mesh needs to be prepared for use
+  _mesh.prepare_for_use ();
+}
+
+
+
+void MeshRefinement::uniformly_coarsen (unsigned int n,
+					const bool maintain_level_one)
+{
+  // Coarsen n times
+  for (unsigned int rstep=0; rstep<n; rstep++)
+    {
+      // Clean up the refinement flags
+      this->clean_refinement_flags();
+      
+      // Flag all the active elements for coarsening
+      MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
+      const MeshBase::element_iterator elem_end = _mesh.active_elements_end(); 
+
+      for ( ; elem_it != elem_end; ++elem_it)
+	(*elem_it)->set_refinement_flag(Elem::COARSEN);
+
+      bool coarsening_satisfied = false;
+      do
+        {
+	  coarsening_satisfied =
+	    this->make_coarsening_compatible(maintain_level_one);
+        }
+      while (!coarsening_satisfied);
+
+      // Coarsen all the elements we just flagged.
+      this->coarsen_elements();
     }
   
   // Finally, the new mesh needs to be prepared for use

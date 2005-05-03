@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.16 2005-03-22 22:01:54 jwpeterson Exp $
+// $Id: elem.h,v 1.17 2005-05-03 23:22:14 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -386,12 +386,32 @@ class Elem : public ReferenceCountedObject<Elem>,
   virtual bool contains_point (const Point& p) const;
 
   /**
-   * @returns \p true if the element is active (i.e. has no children),
-   * \p false  otherwise. Note that it suffices to check the first
-   * child only. Always returns \p true if AMR is disabled. 
+   * @returns \p true if the element is active (i.e. has no active
+   * descendants), \p false  otherwise. Note that it suffices to check the
+   * first child only. Always returns \p true if AMR is disabled. 
    */
   bool active () const;
   
+  /**
+   * @returns \p true if the element is an ancestor (i.e. has an
+   * active child or ancestor child), \p false otherwise. Always
+   * returns \p false if AMR is disabled. 
+   */
+  bool ancestor () const;
+  
+  /**
+   * @returns \p true if the element is subactive (i.e. has no active
+   * ancestors), \p false otherwise. Always returns \p false if AMR is
+   * disabled. 
+   */
+  bool subactive () const;
+  
+  /**
+   * @returns \p true if the element has any children (active or not),
+   * \p false  otherwise. Always returns \p false if AMR is disabled. 
+   */
+  bool has_children () const;
+
   /**
    * @returns a pointer to the element's parent.  Returns \p NULL if
    * the element was not created via refinement, i.e. was read from file.
@@ -464,11 +484,14 @@ class Elem : public ReferenceCountedObject<Elem>,
   enum RefinementState { COARSEN = 0,
 			 DO_NOTHING,
 			 REFINE,
-			 JUST_REFINED };
+			 JUST_REFINED,
+			 JUST_COARSENED,
+                         INACTIVE,
+                         COARSEN_INACTIVE };
   
   /**
    * @returns a pointer to the \f$ i^{th} \f$ child for this element.
-   * Returns \p NULL  if this element has no children, i.e. is active.
+   * Do not call if this element has no children, i.e. is active.
    */
   Elem* child (const unsigned int i) const;
 
@@ -513,6 +536,14 @@ class Elem : public ReferenceCountedObject<Elem>,
    * element types.
    */
   void coarsen ();
+
+  /**
+   * Contract an active element, i.e. remove pointers to any
+   * subactive children.  This should only be called via 
+   * MeshRefinement::contract, which will also remove subactive
+   * children from the mesh
+   */
+  void contract ();
 
 #endif
 
@@ -912,19 +943,63 @@ inline
 bool Elem::active() const
 {
 #ifdef ENABLE_AMR
-  
-  if (_children == NULL)
-    return true;
-  else
+  if (refinement_flag() == INACTIVE || refinement_flag() == COARSEN_INACTIVE)
     return false;
-  
+  else
+    return true;
 #else
-  
   return true;
-  
 #endif
 }
 
+
+
+inline
+bool Elem::ancestor() const
+{
+#ifdef ENABLE_AMR
+  if (this->active())
+    return false;
+  if (!this->has_children())
+    return false;
+  if (this->child(0)->active())
+    return true;
+  return this->child(0)->ancestor();
+#else
+  return false;
+#endif
+}
+
+
+
+inline
+bool Elem::subactive() const
+{
+#ifdef ENABLE_AMR
+  if (this->active())
+    return false;
+  if (!this->has_children())
+    return true;
+  return this->child(0)->subactive();
+#else
+  return false;
+#endif
+}
+
+
+
+inline
+bool Elem::has_children() const
+{
+#ifdef ENABLE_AMR
+  if (_children == NULL)
+    return false;
+  else
+    return true;
+#else
+  return false;
+#endif
+}
 
 
 
