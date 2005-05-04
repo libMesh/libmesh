@@ -1,4 +1,4 @@
-// $Id: system_projection.C,v 1.11 2005-04-18 19:18:35 roystgnr Exp $
+// $Id: system_projection.C,v 1.12 2005-05-04 21:24:42 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -56,7 +56,8 @@ void System::project_vector (NumericVector<Number>& vector) const
 
 /**
  * This method projects the vector
- * via L2 projections on each element.
+ * via L2 projections or nodal
+ * interpolations on each element.
  */
 void System::project_vector (const NumericVector<Number>& old_vector,
 				 NumericVector<Number>& new_vector) const
@@ -158,20 +159,26 @@ void System::project_vector (const NumericVector<Number>& old_vector,
           Ue.resize (new_n_dofs); Ue.zero();
 
 	  // Update the DOF indices based on the old mesh.
-	  // This is done in one of two ways:
+	  // This is done in one of three ways:
 	  // 1.) If the child was just refined then it was not
 	  //     active in the previous mesh & hence has no solution
 	  //     values on it.  In this case simply project or
 	  //     interpolate the solution from the parent, who was
           //     active in the previous mesh
-	  // 2.) Otherwise the child was active in the previous
-	  //     mesh, and we can just interpolate directly
+	  // 2.) If the child was just coarsened, obtaining a
+	  //     well-defined solution may require doing independent
+	  //     projections on nodes, edges, faces, and interiors
+	  // 3.) If the child was active in the previous
+	  //     mesh, we can just copy coefficients directly
 	  if (elem->refinement_flag() == Elem::JUST_REFINED)
 	    {
-	  // Sanity check
 	      assert (parent != NULL);
 	 
 	      dof_map.old_dof_indices (parent, old_dof_indices, var);
+            }
+	  else if (elem->refinement_flag() == Elem::JUST_COARSENED)
+	    {
+	      assert (elem->has_children());
             }
 	  else
 	    {
@@ -206,36 +213,21 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 	            // The solution value at the quadrature point	      
 	            Number val = libMesh::zero;
 
-	            if (elem->refinement_flag() ==
-		        Elem::JUST_REFINED)
-		      {
-		        // The location of the quadrature point
-		        // on the parent element
-		        const Point q_point =
-		          FEInterface::inverse_map (dim, fe_type,
-					            parent, xyz_values[qp]);
+		    // The location of the quadrature point
+		    // on the parent element
+		    const Point q_point =
+		    FEInterface::inverse_map (dim, fe_type,
+					      parent, xyz_values[qp]);
 
-		        // Sum the function values * the DOF values
-		        // at the point of interest to get the function value
-		        // (Note that the # of DOFs on the parent need not be the
-		        //  same as on the child!)
-		        for (unsigned int i=0; i<old_n_dofs; i++)
-		          {
-		            val += (old_vector(old_dof_indices[i])*
-			            FEInterface::shape(dim, fe_type, parent,
-						       i, q_point));
-		          }
-		      }
-	            else
+		    // Sum the function values * the DOF values
+		    // at the point of interest to get the function value
+		    // (Note that the # of DOFs on the parent need not be the
+		    //  same as on the child!)
+		    for (unsigned int i=0; i<old_n_dofs; i++)
 		      {
-		        // Sum all the function values * the DOF values
-		        // at the quadrature point on the child to get the
-		        // function value
-		        for (unsigned int i=0; i<new_n_dofs; i++)
-		          {
-		            val += (old_vector(old_dof_indices[i])*
-			            phi_values[i][qp]);
-		          }
+		        val += (old_vector(old_dof_indices[i])*
+			        FEInterface::shape(dim, fe_type, parent,
+						   i, q_point));
 		      }
 
 	            // Now \p val contains the solution value of variable
@@ -257,6 +249,12 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 
                 Ke.cholesky_solve(Fe, Ue);
 	      }
+            else if (elem->refinement_flag() == Elem::JUST_COARSENED)
+	      {
+		// FIXME: proper non-Lagrange coarsening will take
+                // some work
+                error();
+              }
 	    // For unrefined uncoarsened elements, we just copy DoFs
 	    else
 	      {
