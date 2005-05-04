@@ -1,4 +1,4 @@
-// $Id: elem_refinement.C,v 1.14 2005-05-03 23:22:24 roystgnr Exp $
+// $Id: elem_refinement.C,v 1.15 2005-05-04 19:26:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -207,6 +207,8 @@ void Elem::contract()
       delete [] _children;
       _children = NULL;
     }
+  if (this->refinement_flag() == Elem::JUST_COARSENED)
+    this->set_refinement_flag(Elem::DO_NOTHING);
 }
 
 #endif // #ifdef ENABLE_AMR
