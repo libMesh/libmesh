@@ -1,4 +1,4 @@
-// $Id: inf_fe.h,v 1.5 2005-02-22 22:17:31 jwpeterson Exp $
+// $Id: inf_fe.h,v 1.6 2005-05-04 21:27:58 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -66,7 +66,7 @@ class FEComputeData;
  *
  * \author Daniel Dreyer
  * \date 2003
- * \version $Revision: 1.5 $
+ * \version $Revision: 1.6 $
  */
 
 //-------------------------------------------------------------
@@ -89,7 +89,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.5 $
+   * \version $Revision: 1.6 $
    */
   //-------------------------------------------------------------
   // InfFE::Radial class definition
@@ -181,7 +181,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.5 $
+   * \version $Revision: 1.6 $
    */
   //-------------------------------------------------------------
   // InfFE::Base class definition
@@ -332,6 +332,12 @@ public:
    */
   static unsigned int n_dofs_per_elem(const FEType& fet,
 				      const ElemType inf_elem_type);
+
+  /**
+   * @returns the continuity of the element.
+   */
+  virtual FEContinuity get_continuity() const
+    { return C_ZERO; }  // FIXME - is this true??
 
   /**
    * Usually, this method would build the nodal soln from the 

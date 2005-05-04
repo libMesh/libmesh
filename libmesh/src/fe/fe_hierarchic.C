@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic.C,v 1.19 2005-03-01 15:50:26 roystgnr Exp $
+// $Id: fe_hierarchic.C,v 1.20 2005-05-04 21:27:58 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1217,12 +1217,20 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 
 
 template <unsigned int Dim, FEFamily T>
+FEContinuity FE<Dim,T>::get_continuity() const
+{
+  return C_ZERO;
+}
+
+
+
+template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::compute_constraints (DofConstraints &constraints,
 				     DofMap &dof_map,
 				     const unsigned int variable_number,
 				     const Elem* elem)
 {
-  compute_C0_constraints(constraints, dof_map, variable_number, elem);
+  compute_proj_constraints(constraints, dof_map, variable_number, elem);
 }
 
 

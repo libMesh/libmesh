@@ -1,4 +1,4 @@
-// $Id: enum_fe_family.h,v 1.6 2005-02-22 22:17:30 jwpeterson Exp $
+// $Id: enum_fe_family.h,v 1.7 2005-05-04 21:27:58 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -56,6 +56,14 @@ namespace libMeshEnums {
 		 CLOUGH       = 21,
 		 
 		 INVALID_FE   = 42};
+
+  /**
+   * \enum libMeshEnums::FEContinuity defines an \p enum for finite element
+   * types to assert a certain level (or type? Hcurl?) of continuity.  
+   */
+  enum FEContinuity {DISCONTINUOUS,
+                     C_ZERO,
+		     C_ONE};
 }
 
 using namespace libMeshEnums;
