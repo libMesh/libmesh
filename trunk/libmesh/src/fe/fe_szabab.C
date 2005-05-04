@@ -1,4 +1,4 @@
-// $Id: fe_szabab.C,v 1.4 2005-04-08 09:31:02 spetersen Exp $
+// $Id: fe_szabab.C,v 1.5 2005-05-04 21:27:58 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1127,6 +1127,14 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
     default:
       return 0;
     }
+}
+
+
+
+template <unsigned int Dim, FEFamily T>
+FEContinuity FE<Dim,T>::get_continuity() const
+{
+  return C_ZERO;
 }
 
 

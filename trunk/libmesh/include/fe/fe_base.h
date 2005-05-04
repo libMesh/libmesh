@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.10 2005-02-22 22:17:30 jwpeterson Exp $
+// $Id: fe_base.h,v 1.11 2005-05-04 21:27:58 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -435,6 +435,11 @@ public:
    * @returns the approximation order of the finite element.
    */
   Order get_order()  const { return fe_type.order; }
+
+  /**
+   * @returns the continuity level of the finite element.
+   */
+  virtual FEContinuity get_continuity() const = 0;
 
   /**
    * @returns the finite element family of this element.

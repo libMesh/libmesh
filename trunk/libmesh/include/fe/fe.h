@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.12 2005-03-01 15:50:25 roystgnr Exp $
+// $Id: fe.h,v 1.13 2005-05-04 21:27:58 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -54,7 +54,7 @@ class InfFE;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.12 $
+ * \version $Revision: 1.13 $
  */
 
 //-------------------------------------------------------------
@@ -222,6 +222,11 @@ public:
    */
   static unsigned int n_dofs_per_elem(const ElemType t,
 				      const Order o);
+
+  /**
+   * @returns the continuity level of the finite element.
+   */
+  virtual FEContinuity get_continuity() const;
 				       
   /**
    * Fills the vector di with the local degree of freedom indices
@@ -305,24 +310,13 @@ public:
   /**
    * Computes the constraint matrix contributions (for
    * non-conforming adapted meshes) corresponding to 
-   * variable number \p var_number, for any C^0 continuous finite
-   * element space.
+   * variable number \p var_number, using generic
+   * projections.
    */
-  static void compute_C0_constraints (DofConstraints &constraints,
-				      DofMap &dof_map,
-				      const unsigned int variable_number,
-				      const Elem* elem);
-  
-  /**
-   * Computes the constraint matrix contributions (for
-   * non-conforming adapted meshes) corresponding to 
-   * variable number \p var_number, for any C^1 continuous finite
-   * element space.
-   */
-  static void compute_C1_constraints (DofConstraints &constraints,
-				      DofMap &dof_map,
-				      const unsigned int variable_number,
-				      const Elem* elem);
+  static void compute_proj_constraints (DofConstraints &constraints,
+				        DofMap &dof_map,
+				        const unsigned int variable_number,
+				        const Elem* elem);
   
 #ifdef ENABLE_INFINITE_ELEMENTS
 
@@ -409,7 +403,7 @@ protected:
  *
  * \author Roy Stogner
  * \date 2004
- * \version $Revision: 1.12 $
+ * \version $Revision: 1.13 $
  */
 
 //-------------------------------------------------------------
@@ -434,7 +428,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.12 $
+ * \version $Revision: 1.13 $
  */
 
 //-------------------------------------------------------------
@@ -459,7 +453,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.12 $
+ * \version $Revision: 1.13 $
  */
 
 //-------------------------------------------------------------
@@ -484,7 +478,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.12 $
+ * \version $Revision: 1.13 $
  */
 
 //-------------------------------------------------------------
@@ -510,7 +504,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.12 $
+ * \version $Revision: 1.13 $
  */
 
 //-------------------------------------------------------------
