@@ -7,6 +7,7 @@
 
 
 
+#ifdef HAVE_TRIANGLE
 
 
 // Definition of the function from the MeshTools::Generation namespace
@@ -118,8 +119,8 @@ void MeshTools::Generation::build_delaunay_square (Mesh& mesh,
   // Run mesh through a few Laplace smoothing steps.
   LaplaceMeshSmoother s (mesh);
   s.smooth(2);
-}
 
+}
 
 
 
@@ -181,7 +182,7 @@ void Triangle::destroy(Triangle::triangulateio& t)
   free (t.edgemarkerlist               );
   free (t.normlist                     );
 }
-
+#endif // HAVE_TRIANGLE
 
 
 
