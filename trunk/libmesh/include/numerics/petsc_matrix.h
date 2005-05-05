@@ -1,4 +1,4 @@
-// $Id: petsc_matrix.h,v 1.12 2005-02-22 22:17:34 jwpeterson Exp $
+// $Id: petsc_matrix.h,v 1.13 2005-05-05 20:20:48 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -537,8 +537,19 @@ void PetscMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
   // the matrix from which we copy the values has to be assembled/closed
   X->close ();
 
+// 2.2.x & earlier style
+#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 2)
+  
   ierr = MatAXPY(&a,  X->_mat, _mat, SAME_NONZERO_PATTERN);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
+	 
+// 2.3.x & newer
+#else
+  
+  ierr = MatAXPY(_mat, a, X->_mat, SAME_NONZERO_PATTERN);
+         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+	 
+#endif
 }
 
 
@@ -551,10 +562,11 @@ T PetscMatrix<T>::operator () (const unsigned int i,
 {
   assert (this->initialized());
   
-#if ((PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR >= 2) && (PETSC_VERSION_SUBMINOR >= 1))
+#if (((PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR >= 2) && (PETSC_VERSION_SUBMINOR >= 1)) || \
+     ((PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR >= 3)))
   // PETSc 2.2.1 & newer
   const PetscScalar *petsc_row;
-  const int* petsc_cols;
+  const PetscInt    *petsc_cols;
   
 #else
   // PETSc 2.2.0 & older
@@ -563,10 +575,11 @@ T PetscMatrix<T>::operator () (const unsigned int i,
   
 #endif
   
-  T value=0.;
+  T value=0.;  
   
-  
-  int ierr=0, ncols=0,
+  int
+    ierr=0,
+    ncols=0,
     i_val=static_cast<int>(i),
     j_val=static_cast<int>(j);
   
@@ -575,8 +588,8 @@ T PetscMatrix<T>::operator () (const unsigned int i,
   this->close();
 
   ierr = MatGetRow(_mat, i_val, &ncols, &petsc_cols, &petsc_row);
-  CHKERRABORT(PETSC_COMM_WORLD,ierr);
-
+         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+	 
   // Perform a binary search to find the contiguous index in
   // petsc_cols (resp. petsc_row) corresponding to global index j_val
   std::pair<const int*, const int*> p =

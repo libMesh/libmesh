@@ -1,4 +1,4 @@
-// $Id: petsc_vector.h,v 1.10 2005-02-22 22:17:34 jwpeterson Exp $
+// $Id: petsc_vector.h,v 1.11 2005-05-05 20:20:48 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -586,9 +586,20 @@ void PetscVector<T>::zero ()
   int ierr=0;
 
   PetscScalar z=0.;
+
+// 2.2.x & earlier style
+#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 2)
   
   ierr = VecSet (&z, _vec);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
+
+// 2.3.x & newer
+#else
+  
+  ierr = VecSet (_vec, z);
+         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+
+#endif
 }
 
 

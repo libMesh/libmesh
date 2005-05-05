@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.80 2005-05-02 13:12:19 spetersen Exp $
+dnl $Id: aclocal.m4,v 1.81 2005-05-05 20:20:42 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -247,8 +247,8 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
 
   dnl First the flags for gcc compilers
   if (test "$GXX" = yes -a "x$REAL_GXX" != "x" ) ; then
-    CXXFLAGSO="-O2 -felide-constructors -DNDEBUG"
-    CXXFLAGSG="-O2 -felide-constructors -g -ansi -pedantic -W -Wall -Wunused -Wpointer-arith -Wimplicit -Wformat -Wparentheses -Wuninitialized -DDEBUG"
+    CXXFLAGSO="-O2 -felide-constructors -DNDEBUG -Wuninitialized"
+    CXXFLAGSG="-O0 -felide-constructors -g -ansi -pedantic -W -Wall -Wunused -Wpointer-arith -Wimplicit -Wformat -Wparentheses -DDEBUG"
     CXXFLAGSP="$CXXFLAGSO -g -pg"
     CXXFLAGSS="-fsyntax-only"
 
@@ -695,6 +695,7 @@ AC_DEFUN(CONFIGURE_PETSC,
       petscversion=$petscmajor.$petscminor.$petscsubminor
       petscmajorminor=$petscmajor.$petscminor.x
       AC_MSG_RESULT(<<< Configuring library with PETSc version $petscversion support >>>)
+
       AC_SUBST(petscversion)
       AC_SUBST(petscmajorminor)
       AC_SUBST(MPI_IMPL)

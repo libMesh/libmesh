@@ -1,4 +1,4 @@
-// $Id: petsc_vector.C,v 1.35 2005-02-22 22:17:42 jwpeterson Exp $
+// $Id: petsc_vector.C,v 1.36 2005-05-05 20:20:49 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -258,8 +258,19 @@ void PetscVector<T>::add (const T a_in, const NumericVector<T>& v_in)
   assert (v != NULL);
   assert(this->size() == v->size());
   
+// 2.2.x & earlier style
+#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 2)
+  
   ierr = VecAXPY(&a, v->_vec, _vec);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
+	 
+// 2.3.x & later style
+#else
+  
+  ierr = VecAXPY(_vec, a, v->_vec);
+         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+	 
+#endif
 }
 
 
@@ -306,8 +317,19 @@ void PetscVector<T>::scale (const T factor_in)
   int ierr = 0;
   PetscScalar factor = static_cast<PetscScalar>(factor_in);
   
+// 2.2.x & earlier style
+#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 2)
+  
   ierr = VecScale(&factor, _vec);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
+
+// 2.3.x & later style	 
+#else
+  
+  ierr = VecScale(_vec, factor);
+         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+
+#endif
 }
 
 
@@ -321,8 +343,19 @@ PetscVector<T>::operator = (const T s_in)
 
   if (this->size() != 0)
     {
+// 2.2.x & earlier style
+#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 2)
+  
       ierr = VecSet(&s, _vec);
              CHKERRABORT(PETSC_COMM_WORLD,ierr);
+	     
+// 2.3.x & later style	 
+#else
+
+      ierr = VecSet(_vec, s);
+             CHKERRABORT(PETSC_COMM_WORLD,ierr);
+	     
+#endif
     }
   
   return *this;

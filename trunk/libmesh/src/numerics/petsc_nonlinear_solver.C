@@ -1,4 +1,4 @@
-// $Id: petsc_nonlinear_solver.C,v 1.11 2005-03-17 19:23:37 benkirk Exp $
+// $Id: petsc_nonlinear_solver.C,v 1.12 2005-05-05 20:20:49 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -204,14 +204,25 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
   ierr = SNESSetJacobian (_snes, jac->mat(), jac->mat(), __libmesh_petsc_snes_jacobian, this);
          CHKERRABORT(PETSC_COMM_WORLD,ierr);
 	 
-  // Older versions (at least up to 2.1.5) of SNESSolve took 3 arguments,
-  // the last one being a pointer to an int to hold the number of iterations required.
+// Older versions (at least up to 2.1.5) of SNESSolve took 3 arguments,
+// the last one being a pointer to an int to hold the number of iterations required.
 # if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 1)
+
  ierr = SNESSolve (_snes, x->vec(), &n_iterations);
         CHKERRABORT(PETSC_COMM_WORLD,ierr);
-#else 	 
+
+// 2.2.x style	
+#elif (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 2)
+	
  ierr = SNESSolve (_snes, x->vec());
         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+
+// 2.3.x & newer style	
+#else
+	
+ ierr = SNESSolve (_snes, PETSC_NULL, x->vec());
+        CHKERRABORT(PETSC_COMM_WORLD,ierr);
+	  	
 #endif
 
   this->clear();

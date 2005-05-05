@@ -1,4 +1,4 @@
-// $Id: face_quad.C,v 1.17 2005-02-22 22:17:39 jwpeterson Exp $
+// $Id: face_quad.C,v 1.18 2005-05-05 20:20:48 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -110,12 +110,44 @@ AutoPtr<Elem> Quad::side (const unsigned int i) const
 }
 
 
-
-
-
-Real Quad::quality (const ElemQuality) const
+Real Quad::quality (const ElemQuality q) const
 {
-  return 0.0; // Not implemented
+  switch (q)
+    {
+      
+      /**
+       * Compue the min/max diagonal ratio.
+       * This is modeled after the Hex element
+       */
+    case DISTORTION:
+    case DIAGONAL:
+    case STRETCH:
+      {
+	// Diagonal between node 0 and node 2
+	const Real d02 = this->length(0,2);
+
+	// Diagonal between node 1 and node 3
+	const Real d13 = this->length(1,3);
+
+	// Find the biggest and smallest diagonals
+        if ( (d02 > 0.) && (d13 >0.) )
+          if (d02 < d13) return d02 / d13;
+          else return d13 / d02;
+        else
+          return 0.;
+	break;
+      }
+
+      
+      /**
+       * I don't know what to do for this metric. 
+       * Maybe the base class knows...
+       */
+    default:
+      {
+	return Elem::quality(q);
+      }
+    }
 }
 
 
