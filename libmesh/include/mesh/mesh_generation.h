@@ -1,4 +1,4 @@
-// $Id: mesh_generation.h,v 1.5 2005-04-29 22:22:42 jwpeterson Exp $
+// $Id: mesh_generation.h,v 1.6 2005-05-05 21:13:30 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -45,7 +45,7 @@ namespace MeshTools
    *
    * \author Benjamin S. Kirk
    * \date 2004
-   * \version $Revision: 1.5 $
+   * \version $Revision: 1.6 $
    */
   namespace Generation
   {
@@ -84,6 +84,8 @@ namespace MeshTools
 		       const unsigned int nr=2,
 		       const ElemType type=INVALID_ELEM);
 
+#ifdef HAVE_TRIANGLE
+
     /**
      * Meshes a square (2D) with a Delaunay triangulation.
      * This function internally calls the triangle library
@@ -96,6 +98,8 @@ namespace MeshTools
 			       const unsigned int ny, // num. of nodes in y-dir
 			       const Real xmin=0., const Real xmax=1.,
 			       const Real ymin=0., const Real ymax=1.);
+
+#endif // HAVE_TRIANGLE
     
     namespace Private
     {
