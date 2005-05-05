@@ -1,4 +1,4 @@
-// $Id: face_quad.C,v 1.19 2005-05-05 20:42:16 benkirk Exp $
+// $Id: face_quad.C,v 1.20 2005-05-05 21:17:19 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -137,11 +137,15 @@ Real Quad::quality (const ElemQuality q) const
           return 0.;
 	break;
       }
+
+    default:
+      return Elem::quality(q);
     }
       
   /**
    * I don't know what to do for this metric. 
-   * Maybe the base class knows...
+   * Maybe the base class knows.  We won't get
+   * here because of the default case above.
    */
   return Elem::quality(q);
 }

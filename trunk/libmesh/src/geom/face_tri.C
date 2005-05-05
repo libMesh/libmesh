@@ -1,4 +1,4 @@
-// $Id: face_tri.C,v 1.18 2005-05-05 20:42:16 benkirk Exp $
+// $Id: face_tri.C,v 1.19 2005-05-05 21:17:19 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -134,13 +134,17 @@ Real Tri::quality (const ElemQuality q) const
         return 8. * s1 * s2 * s3;
         
       }
+    default:
+      return Elem::quality(q);
     }
   
   /**
    * I don't know what to do for this metric. 
-   * Maybe the base class knows...
+   * Maybe the base class knows.  We won't get
+   * here because of the defualt case above.
    */
   return Elem::quality(q);
+  
 }
 
 
