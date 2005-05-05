@@ -1,4 +1,4 @@
-// $Id: face_tri.C,v 1.17 2005-05-05 20:20:48 benkirk Exp $
+// $Id: face_tri.C,v 1.18 2005-05-05 20:42:16 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -102,7 +102,7 @@ AutoPtr<Elem> Tri::side (const unsigned int i) const
 
 Real Tri::quality (const ElemQuality q) const
 {
-    switch (q)
+  switch (q)
     {
       
       /**
@@ -134,21 +134,13 @@ Real Tri::quality (const ElemQuality q) const
         return 8. * s1 * s2 * s3;
         
       }
-      
-      /**
-       * I don't know what to do for this metric. 
-       * Maybe the base class knows...
-       */
-
-    default:
-      {
-	return Elem::quality(q);
-      }
-
-    // Will never get here...
-    error();
-    return 0.;
     }
+  
+  /**
+   * I don't know what to do for this metric. 
+   * Maybe the base class knows...
+   */
+  return Elem::quality(q);
 }
 
 
