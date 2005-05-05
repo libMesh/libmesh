@@ -1,4 +1,4 @@
-// $Id: exact_solution.C,v 1.10 2005-04-10 20:15:27 spetersen Exp $
+// $Id: exact_solution.C,v 1.11 2005-05-05 22:19:51 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -244,9 +244,6 @@ void ExactSolution::_compute_error(const std::string& sys_name,
   //
   // Begin the loop over the elements
   //
-//   const_active_local_elem_iterator           el (_mesh.elements_begin());
-//   const const_active_local_elem_iterator end_el (_mesh.elements_end());
-
   MeshBase::const_element_iterator       el     = _mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end_el = _mesh.active_local_elements_end(); 
 
