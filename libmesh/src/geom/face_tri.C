@@ -1,4 +1,4 @@
-// $Id: face_tri.C,v 1.16 2005-02-22 22:17:39 jwpeterson Exp $
+// $Id: face_tri.C,v 1.17 2005-05-05 20:20:48 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -100,13 +100,55 @@ AutoPtr<Elem> Tri::side (const unsigned int i) const
 }
 
 
-
-
-
-
-Real Tri::quality (const ElemQuality) const
+Real Tri::quality (const ElemQuality q) const
 {
-  return 0.; // not implemented
+    switch (q)
+    {
+      
+      /**
+       * Source: Netgen, meshtool.cpp, TriangleQualityInst
+       */
+    case DISTORTION:
+    case STRETCH:
+      {
+        const Node* p1 = this->get_node(0);
+        const Node* p2 = this->get_node(1);
+        const Node* p3 = this->get_node(2);
+
+        Point v1 = (*p2) - (*p1);
+        Point v2 = (*p3) - (*p1);
+        Point v3 = (*p3) - (*p2);
+        const Real l1 = v1.size();
+        const Real l2 = v2.size();
+        const Real l3 = v3.size();
+
+        // if one length is 0, quality is quite bad!
+        if ((l1 <=0.) || (l2 <= 0.) || (l3 <= 0.))
+          return 0.;
+
+        const Real s1 = sin(acos(v1*v2/l1/l2)/2.);
+        v1 *= -1;
+        const Real s2 = sin(acos(v1*v3/l1/l3)/2.);
+        const Real s3 = sin(acos(v2*v3/l2/l3)/2.);
+        
+        return 8. * s1 * s2 * s3;
+        
+      }
+      
+      /**
+       * I don't know what to do for this metric. 
+       * Maybe the base class knows...
+       */
+
+    default:
+      {
+	return Elem::quality(q);
+      }
+
+    // Will never get here...
+    error();
+    return 0.;
+    }
 }
 
 

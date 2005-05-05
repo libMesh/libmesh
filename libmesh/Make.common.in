@@ -1,12 +1,12 @@
-# $Id: Make.common.in,v 1.42 2005-05-02 13:12:19 spetersen Exp $
+# $Id: Make.common.in,v 1.43 2005-05-05 20:20:42 benkirk Exp $
 
 
 ###############################################################################
 ## Please note:
 ##   The ./configure script generates Make.common from 
 ##   Make.common.in, so if you want to change something,
-##   then do it in the latter file (here!)and re-run ./configure in the
-##   top level directory
+##   then do it in the latter file (here!) and re-run
+##   ./configure in the top level directory
 ###############################################################################
 
 ###############################################################################
@@ -54,12 +54,11 @@ PETSC_DIR            = @PETSC_DIR@
 enable-slepc         = @enableslepc@
 SLEPC_DIR            = @SLEPC_DIR@
 
-
 # MPI configuration
 # (only explicitly defined when PETSc is absent, otherwise snooped from PETSc)
-MPI_IMPL    = @MPI_IMPL@
-MPI_INCLUDE = @MPI_INCLUDES_PATHS@
-MPI_LIB     = @MPI_LIBS_PATHS@ @MPI_LIBS@
+MPI_IMPL             = @MPI_IMPL@
+MPI_INCLUDE          = @MPI_INCLUDES_PATHS@
+MPI_LIB              = @MPI_LIBS_PATHS@ @MPI_LIBS@
 
 # Doxygen for generating documentation
 doxygen		     = @DOXYGEN@
@@ -100,8 +99,6 @@ obj-suffix := @host@.o
 # called METHOD, he gets optimized mode.
 ifeq (x$(METHOD),x)
   METHOD     := opt
-  opt-mode   := on
-  obj-suffix := @host@.o
 endif
 
 #
@@ -258,18 +255,18 @@ ifeq ($(enable-optional),yes)
   LIBS    += @GZSTREAM_LIB@
   INCLUDE += @GZSTREAM_INCLUDE@
 
-  #if Tecplot is used, link against tecio.a
+  # if Tecplot is used, link against tecio.a
   LIBS    += @TECPLOT_LIBRARY@
   INCLUDE += @TECPLOT_INCLUDE@
 
-  #if TetGen is used:
+  # if TetGen is used:
   ifeq ($(enable-tetgen),yes)
     CXXFLAGS += @TETGEN_VERSION@
     LIBS     += @TETGEN_LIBRARY@
     INCLUDE  += @TETGEN_INCLUDE@
   endif
 
-  #if Triangle is used:
+  # if Triangle is used:
   ifeq ($(enable-triangle),yes)
     LIBS     += @TRIANGLE_LIBRARY@
     INCLUDE  += @TRIANGLE_INCLUDE@
@@ -320,15 +317,29 @@ ifeq ($(enable-optional),yes)
     ifeq ($(petsc-version),2.1.0)
       include $(PETSC_DIR)/bmake/$(PETSC_ARCH)/base.site # 2.1.0 style
     else
-      C_CLINKER_SLFLAG = $(RPATHFLAG)# necessary for PETSc 2.1.6
-      include $(PETSC_DIR)/bmake/$(PETSC_ARCH)/packages  # 2.1.1 or later style
+      C_CLINKER_SLFLAG = $(RPATHFLAG)# necessary for PETSc >= 2.1.6
+      ifeq ($(petsc-major-minor),2.3.x)  # 2.3.x & newer style
+        include $(PETSC_DIR)/bmake/$(PETSC_ARCH)/petscconf # 2.3.0 or later style
+      else
+        include $(PETSC_DIR)/bmake/$(PETSC_ARCH)/packages  # 2.1.1 or later style
+      endif      
     endif
+
+#     # As of PETSc 2.1.x we can extract the libraries and include paths
+#     # from the PETSc make file
+#     LIBS    += `$(MAKE) -C $(PETSC_DIR) BOPT=$(BOPT) getlinklibs`
+#     INCLUDE += `$(MAKE) -C $(PETSC_DIR) BOPT=$(BOPT) getincludedirs`
 
 
     INCLUDE += -I$(PETSC_DIR)/include -I$(PETSC_DIR)/bmake/$(PETSC_ARCH) \
-                $(MPI_INCLUDE) $(BLOCKSOLVE_INCLUDE) $(HYPRE_INCLUDE)
+                $(BLOCKSOLVE_INCLUDE) $(HYPRE_INCLUDE)
 
-    PETSC_LIB = $(PETSC_DIR)/lib/lib$(BOPT)/$(PETSC_ARCH)
+    # Depending on petsc version, libs live in different locations
+    ifneq (,$(findstring 2.3.x, $(petsc-major-minor))) # 2.3.x & newer does not use BOPT
+      PETSC_LIB = $(PETSC_DIR)/lib/$(PETSC_ARCH)
+    else
+      PETSC_LIB = $(PETSC_DIR)/lib/lib$(BOPT)/$(PETSC_ARCH)
+    endif
 
     ifeq ($(enable-shared),yes)
       CXXFLAGS     += -DPETSC_USE_DYNAMIC_LIBRARIES
@@ -337,7 +348,16 @@ ifeq ($(enable-optional),yes)
     endif
 
     # Depending on petsc version, we link with different libs :-(
-    ifeq ($(petsc-major-minor),2.2.x)  # 2.2.x & newer style
+    ifeq ($(petsc-major-minor),2.1.x)  # 2.1.x & older style
+      libs-PETSC = -L$(PETSC_LIB) \
+                   -lpetscsnes \
+	           -lpetscsles \
+		   -lpetscdm \
+		   -lpetscmat \
+		   -lpetscvec \
+                   -lpetscsnes \
+                   -lpetsc
+    else                               # 2.2.x & newer style
       libs-PETSC = -L$(PETSC_LIB) \
                    -lpetscsnes \
 	           -lpetscksp \
@@ -346,20 +366,11 @@ ifeq ($(enable-optional),yes)
 		   -lpetscvec \
                    -lpetscsnes \
 		   -lpetsc
-    else                           # 2.1.6 & older style
-      libs-PETSC = -L$(PETSC_LIB) \
-                   -lpetscsnes \
-	           -lpetscsles \
-		   -lpetscdm \
-		   -lpetscmat \
-		   -lpetscvec \
-                   -lpetscsnes \
-		   -lpetsc
     endif
 
     LIBS += $(libs-PETSC) $(BLOCKSOLVE_LIB) $(SPOOLES_LIB) \
-	    $(HYPRE_LIB) $(BLASLAPACK_LIB) $(MPI_LIB) \
-	    $(X11_LIB) $(MATLAB_LIB) $(FLIBS)
+	    $(HYPRE_LIB) $(BLASLAPACK_LIB) $(X11_LIB) $(MATLAB_LIB) \
+            $(FLIBS)
 
   endif #end ifeq ($(enable-petsc),yes)
 
@@ -373,11 +384,11 @@ endif # End of disable-optional test
 
 
 
-#if Exodus is used, link against libexoIIv2c.a
+# if Exodus is used, link against libexoIIv2c.a
 LIBS    += @EXODUS_LIB@
 INCLUDE += @EXODUS_INCLUDE@
 
-#if netCDF is used, link against libnetcdf.a
+# if netCDF is used, link against libnetcdf.a
 # (note that netCDF is required by exodus if available,
 # so we need to link to this _after_ exodus.
 LIBS    += @NETCDF_LIB@

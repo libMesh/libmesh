@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.90 2005-05-03 23:22:24 roystgnr Exp $
+// $Id: mesh_base.C,v 1.91 2005-05-05 20:20:48 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -721,8 +721,8 @@ bool MeshBase::contract ()
   // Flag indicating if this call actually changes the mesh
   bool mesh_changed = false;
 
-  MeshBase::element_iterator       it  = elements_begin();
-  const MeshBase::element_iterator end = elements_end();
+  MeshBase::element_iterator       it  = this->elements_begin();
+  const MeshBase::element_iterator end = this->elements_end();
 
 #ifdef DEBUG
   for ( ; it != end; ++it)
@@ -730,7 +730,7 @@ bool MeshBase::contract ()
       Elem* elem = *it;
       assert(elem->active() || elem->subactive() || elem->ancestor());
     }
-  it = elements_begin();
+  it = this->elements_begin();
 #endif
 
   // Loop over the elements.   
@@ -756,7 +756,7 @@ bool MeshBase::contract ()
 	    }
 
 	  // Delete the element through the Mesh interface
-	  delete_elem(elem);
+	  this->delete_elem(elem);
 
 	  // the mesh has certainly changed
 	  mesh_changed = true;
