@@ -1,4 +1,4 @@
-// $Id: inf_fe_legendre_eval.C,v 1.9 2005-02-22 22:17:38 jwpeterson Exp $
+// $Id: inf_fe_legendre_eval.C,v 1.10 2005-05-06 17:44:06 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -22,6 +22,7 @@
 #include "libmesh_config.h"
 #ifdef ENABLE_INFINITE_ELEMENTS
 #include "inf_fe.h"
+#include "inf_fe_macro.h"
 
 
 
@@ -185,9 +186,9 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
 
 //-----------------------------------------------------------------
 // Explicit instantiations
-template class InfFE<1,LEGENDRE,CARTESIAN>;
-template class InfFE<2,LEGENDRE,CARTESIAN>;
-template class InfFE<3,LEGENDRE,CARTESIAN>;
+// template class InfFE<1,LEGENDRE,CARTESIAN>;
+// template class InfFE<2,LEGENDRE,CARTESIAN>;
+// template class InfFE<3,LEGENDRE,CARTESIAN>;
 
 // template class InfFE<1,LEGENDRE,SPHERICAL>;
 // template class InfFE<2,LEGENDRE,SPHERICAL>;
@@ -197,6 +198,12 @@ template class InfFE<3,LEGENDRE,CARTESIAN>;
 // template class InfFE<2,LEGENDRE,ELLIPSOIDAL>;
 // template class InfFE<3,LEGENDRE,ELLIPSOIDAL>;
 
+template Real InfFE<1,LEGENDRE,CARTESIAN>::eval(const Real,const Order,const unsigned int);
+template Real InfFE<1,LEGENDRE,CARTESIAN>::eval_deriv(const Real,const Order,const unsigned int);
+template Real InfFE<2,LEGENDRE,CARTESIAN>::eval(const Real,const Order,const unsigned int);
+template Real InfFE<2,LEGENDRE,CARTESIAN>::eval_deriv(const Real,const Order,const unsigned int);
+template Real InfFE<3,LEGENDRE,CARTESIAN>::eval(const Real,const Order,const unsigned int);
+template Real InfFE<3,LEGENDRE,CARTESIAN>::eval_deriv(const Real,const Order,const unsigned int);
 
 
 #endif //ifdef ENABLE_INFINITE_ELEMENTS

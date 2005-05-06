@@ -1,4 +1,4 @@
-// $Id: fe_lagrange.C,v 1.24 2005-05-04 21:27:58 roystgnr Exp $
+// $Id: fe_lagrange.C,v 1.25 2005-05-06 17:43:44 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -22,6 +22,7 @@
 // Local includes
 #include "dof_map.h"
 #include "fe.h"
+#include "fe_macro.h"
 #include "fe_interface.h"
 #include "elem.h"
 
@@ -660,7 +661,16 @@ bool FE<Dim,T>::shapes_need_reinit() const
 
 
 //--------------------------------------------------------------
-// Explicit instantiations
-template class FE<1,LAGRANGE>;
-template class FE<2,LAGRANGE>;
-template class FE<3,LAGRANGE>;
+// Explicit instantiation of member functions
+INSTANTIATE_MBRF(1,LAGRANGE);
+INSTANTIATE_MBRF(2,LAGRANGE);
+INSTANTIATE_MBRF(3,LAGRANGE);
+template void FE<2,LAGRANGE>::compute_constraints(DofConstraints&, DofMap&, 
+						  const unsigned int,
+						  const Elem*);
+template void FE<3,LAGRANGE>::compute_constraints(DofConstraints&, DofMap&, 
+						  const unsigned int,
+						  const Elem*);
+
+
+

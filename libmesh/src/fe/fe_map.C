@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.32 2005-02-22 22:17:37 jwpeterson Exp $
+// $Id: fe_map.C,v 1.33 2005-05-06 17:44:05 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -942,13 +942,8 @@ void FE<Dim,T>::inverse_map (const Elem* elem,
 
 
 
-
 //--------------------------------------------------------------
 // Explicit instantiations using the macro from fe_macro.h
-
-INSTANTIATE_FE(1);
-
-INSTANTIATE_FE(2);
-
-INSTANTIATE_FE(3);
-
+INSTANTIATE_IMAP(1);
+INSTANTIATE_IMAP(2);
+INSTANTIATE_IMAP(3);

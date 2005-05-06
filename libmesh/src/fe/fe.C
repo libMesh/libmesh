@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.36 2005-05-04 21:27:58 roystgnr Exp $
+// $Id: fe.C,v 1.37 2005-05-06 17:43:43 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -36,6 +36,22 @@
 
 // ------------------------------------------------------------
 // FE class members
+template <unsigned int Dim, FEFamily T>
+unsigned int FE<Dim,T>::n_shape_functions () const
+{
+  return FE<Dim,T>::n_dofs (elem_type, fe_type.order);
+}
+
+
+template <unsigned int Dim, FEFamily T>
+void FE<Dim,T>::attach_quadrature_rule (QBase* q)
+{
+  assert (q != NULL); 
+  qrule = q;
+  return;
+}
+
+
 template <unsigned int Dim, FEFamily T>
 unsigned int FE<Dim,T>::n_quadrature_points () const
 { 

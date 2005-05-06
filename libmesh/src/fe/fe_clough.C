@@ -1,4 +1,4 @@
-// $Id: fe_clough.C,v 1.9 2005-05-04 21:27:58 roystgnr Exp $
+// $Id: fe_clough.C,v 1.10 2005-05-06 17:43:44 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -25,6 +25,7 @@
 #include "dof_map.h"
 #include "elem.h"
 #include "fe.h"
+#include "fe_macro.h"
 #include "fe_interface.h"
 #include "quadrature_clough.h"
 
@@ -243,7 +244,14 @@ bool FE<Dim,T>::shapes_need_reinit() const
 
 
 //--------------------------------------------------------------
-// Explicit instantiations
-template class FE<1,CLOUGH>;  // FIXME: 1D Not yet functional!
-template class FE<2,CLOUGH>;
-template class FE<3,CLOUGH>;  // FIXME: 3D Not yet functional!
+// Explicit instantiation of member functions
+INSTANTIATE_MBRF(1,CLOUGH);
+INSTANTIATE_MBRF(2,CLOUGH);
+INSTANTIATE_MBRF(3,CLOUGH);
+template void FE<2,CLOUGH>::compute_constraints(DofConstraints&, DofMap&,
+                                                const unsigned int,
+                                                const Elem*);
+template void FE<3,CLOUGH>::compute_constraints(DofConstraints&, DofMap&,
+                                                const unsigned int,
+                                                const Elem*);
+

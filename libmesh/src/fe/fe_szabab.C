@@ -1,4 +1,4 @@
-// $Id: fe_szabab.C,v 1.5 2005-05-04 21:27:58 roystgnr Exp $
+// $Id: fe_szabab.C,v 1.6 2005-05-06 17:44:05 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -25,6 +25,7 @@
 
 // Local includes
 #include "fe.h"
+#include "fe_macro.h"
 #include "elem.h"
 
 
@@ -1153,12 +1154,10 @@ bool FE<Dim,T>::shapes_need_reinit() const
 
 
 
-
 //--------------------------------------------------------------
-// Explicit instantiations
-template class FE<1,SZABAB>;
-template class FE<2,SZABAB>;
-template class FE<3,SZABAB>;
-
+// Explicit instantiation of member functions
+INSTANTIATE_MBRF(1,SZABAB);
+INSTANTIATE_MBRF(2,SZABAB);
+INSTANTIATE_MBRF(3,SZABAB);
 
 #endif //ENABLE_HIGHER_ORDER_SHAPES

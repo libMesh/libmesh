@@ -1,4 +1,4 @@
-// $Id: fe_xyz.C,v 1.9 2005-05-04 21:27:58 roystgnr Exp $
+// $Id: fe_xyz.C,v 1.10 2005-05-06 17:44:05 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -22,6 +22,7 @@
 // Local includes
 #include "libmesh_logging.h"
 #include "fe.h"
+#include "fe_macro.h"
 #include "elem.h"
 
 
@@ -785,10 +786,23 @@ bool FE<Dim,T>::shapes_need_reinit() const
 
 
 //--------------------------------------------------------------
-// Explicit instantiations
-template class FE<1,XYZ>;
-template class FE<2,XYZ>;
-template class FE<3,XYZ>;
-template class FEXYZ<1>;
-template class FEXYZ<2>;
-template class FEXYZ<3>;
+// Explicit instantiation of member functions
+INSTANTIATE_MBRF(1,XYZ);
+INSTANTIATE_MBRF(2,XYZ);
+INSTANTIATE_MBRF(3,XYZ);
+template void  FEXYZ<1>::init_shape_functions(const std::vector<Point>&,
+					    const Elem*);
+template void  FEXYZ<2>::init_shape_functions(const std::vector<Point>&,
+					    const Elem*);
+template void  FEXYZ<3>::init_shape_functions(const std::vector<Point>&,
+					    const Elem*);
+template void  FEXYZ<1>::compute_shape_functions(const Elem*);
+template void  FEXYZ<2>::compute_shape_functions(const Elem*);
+template void  FEXYZ<3>::compute_shape_functions(const Elem*);
+template void FE<2,XYZ>::compute_constraints(DofConstraints&, DofMap&, 
+					     const unsigned int, const Elem*);
+template void FE<3,XYZ>::compute_constraints(DofConstraints&, DofMap&, 
+					     const unsigned int, const Elem*);
+
+
+

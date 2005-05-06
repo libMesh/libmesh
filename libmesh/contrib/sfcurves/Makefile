@@ -7,10 +7,10 @@ OBJS   	:= $(patsubst %.c, %.$(obj-suffix), $(SRC))
 
 
 
-target := ../lib/$(hosttype)_$(METHOD)/libsfcurves.a
+target := $(EXTERNAL_LIBDIR)/libsfcurves.a
 
 ifeq ($(enable-shared),yes)
-  target := ../lib/$(hosttype)_$(METHOD)/libsfcurves.so
+  target := $(EXTERNAL_LIBDIR)/libsfcurves$(SHARED_LIBEXT)
 endif
 
 
@@ -21,14 +21,21 @@ else
   all:: $(target)
 endif
 
-../lib/$(hosttype)_$(METHOD)/libsfcurves.a: $(OBJS)
+ifeq ($(findstring darwin,$(hostos)),darwin)
+$(EXTERNAL_LIBDIR)/libsfcurves.a: $(OBJS)
 	@echo "Linking "$@
-	@$(shell mkdir -p ../lib/$(hosttype)_$(METHOD))
+	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
+	@libtool -static -o $@ $(OBJS)
+else
+$(EXTERNAL_LIBDIR)/libsfcurves.a: $(OBJS)
+	@echo "Linking "$@
+	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
 	@$(AR) rv $@ $(OBJS)
+endif
 
-../lib/$(hosttype)_$(METHOD)/libsfcurves.so: $(OBJS)
+$(EXTERNAL_LIBDIR)/libsfcurves$(SHARED_LIBEXT): $(OBJS)
 	@echo "Linking "$@
-	@$(shell mkdir -p ../lib/$(hosttype)_$(METHOD))
+	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
 	@$(CC) $(CSHAREDFLAG) -o $@ $(OBJS) $(LDFLAGS)
 
 
@@ -42,7 +49,7 @@ clean:
 clobber:
 	@$(MAKE) clean
 	@rm -f *.o *.g.o *.pg.o *.sy.o
-	@rm -f ../lib/$(hosttype)_$(METHOD)/libsfcurves.*
+	@rm -f $(EXTERNAL_LIBDIR)/libsfcurves.*
 
 distclean:
 	@$(MAKE) clobber

@@ -8,12 +8,14 @@
  * Started 8/27/94
  * George
  *
- * $Id: stdheaders.h,v 1.2 2004-03-08 04:58:28 benkirk Exp $
+ * $Id: stdheaders.h,v 1.3 2005-05-06 17:43:43 roystgnr Exp $
  */
 
 
 #include <stdio.h>
 #ifdef __STDC__
+#include <stdlib.h>
+#elif defined(__APPLE__)
 #include <stdlib.h>
 #else
 #include <malloc.h>

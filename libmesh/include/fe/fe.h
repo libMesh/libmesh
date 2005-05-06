@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.13 2005-05-04 21:27:58 roystgnr Exp $
+// $Id: fe.h,v 1.14 2005-05-06 17:43:43 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -54,7 +54,7 @@ class InfFE;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.13 $
+ * \version $Revision: 1.14 $
  */
 
 //-------------------------------------------------------------
@@ -190,8 +190,7 @@ public:
    * @returns the number of shape functions associated with
    * this finite element.
    */
-  virtual unsigned int n_shape_functions () const
-  { return FE<Dim,T>::n_dofs (elem_type, fe_type.order); }
+  virtual unsigned int n_shape_functions () const;
 
   /**
    * @returns the number of shape functions associated with
@@ -286,8 +285,7 @@ public:
    * locations (on a reference element) where the shape functions are
    * to be calculated.
    */
-  virtual void attach_quadrature_rule (QBase* q)
-  { assert (q != NULL); qrule = q; return; }
+  virtual void attach_quadrature_rule (QBase* q);
   
   /**
    * @returns the total number of quadrature points.  Call this
@@ -403,7 +401,7 @@ protected:
  *
  * \author Roy Stogner
  * \date 2004
- * \version $Revision: 1.13 $
+ * \version $Revision: 1.14 $
  */
 
 //-------------------------------------------------------------
@@ -428,7 +426,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.13 $
+ * \version $Revision: 1.14 $
  */
 
 //-------------------------------------------------------------
@@ -453,7 +451,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.13 $
+ * \version $Revision: 1.14 $
  */
 
 //-------------------------------------------------------------
@@ -478,7 +476,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.13 $
+ * \version $Revision: 1.14 $
  */
 
 //-------------------------------------------------------------
@@ -504,7 +502,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.13 $
+ * \version $Revision: 1.14 $
  */
 
 //-------------------------------------------------------------

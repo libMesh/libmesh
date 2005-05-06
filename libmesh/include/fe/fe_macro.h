@@ -1,4 +1,4 @@
-// $Id: fe_macro.h,v 1.7 2005-02-22 22:17:30 jwpeterson Exp $
+// $Id: fe_macro.h,v 1.8 2005-05-06 17:43:43 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -39,6 +39,13 @@
                                template class FE< (_dim), MONOMIAL>;   \
                                template class FE< (_dim), XYZ>
 
+#define INSTANTIATE_IMAP(_dim) \
+  template void FE<_dim,CLOUGH>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&); \
+  template void FE<_dim,HIERARCHIC>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&);\
+  template void FE<_dim,LAGRANGE>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&);\
+  template void FE<_dim,MONOMIAL>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&);\
+  template void FE<_dim,XYZ>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&)
+ 
 #else //ENABLE_HIGHER_ORDER_SHAPES
 
 #define INSTANTIATE_FE(_dim)   template class FE< (_dim), CLOUGH>; \
@@ -48,7 +55,22 @@
                                template class FE< (_dim), SZABAB>;     \
                                template class FE< (_dim), XYZ>
 
+#define INSTANTIATE_IMAP(_dim) \
+  template void FE<_dim,CLOUGH>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&); \
+  template void FE<_dim,HIERARCHIC>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&);\
+  template void FE<_dim,LAGRANGE>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&);\
+  template void FE<_dim,MONOMIAL>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&);\
+  template void FE<_dim,SZABAB>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&);\
+  template void FE<_dim,XYZ>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&)
+
 #endif //ENABLE_HIGHER_ORDER_SHAPES
-							   
+
+#define INSTANTIATE_MBRF(_dim,_t) \
+  template unsigned int FE<_dim,_t>::n_dofs_at_node(ElemType,Order,unsigned int); \
+  template unsigned int FE<_dim,_t>::n_dofs(ElemType,Order);\
+  template bool         FE<_dim,_t>::shapes_need_reinit() const;\
+  template unsigned int FE<_dim,_t>::n_dofs_per_elem(ElemType,Order);\
+  template void         FE<_dim,_t>::nodal_soln(const Elem*,const Order,const std::vector<Number>&,std::vector<Number>&)
+
 
 #endif

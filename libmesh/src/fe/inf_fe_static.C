@@ -1,4 +1,4 @@
-// $Id: inf_fe_static.C,v 1.28 2005-02-22 22:17:38 jwpeterson Exp $
+// $Id: inf_fe_static.C,v 1.29 2005-05-06 17:44:06 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -22,6 +22,7 @@
 #include "libmesh_config.h"
 #ifdef ENABLE_INFINITE_ELEMENTS
 #include "inf_fe.h"
+#include "inf_fe_macro.h"
 #include "fe.h"
 #include "fe_interface.h"
 #include "fe_compute_data.h"
@@ -959,11 +960,37 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_indices (const FEType& fet,
 
 //--------------------------------------------------------------
 // Explicit instantiations
-#include "inf_fe_instantiate_1D.h"
-#include "inf_fe_instantiate_2D.h"
-#include "inf_fe_instantiate_3D.h"
+//#include "inf_fe_instantiate_1D.h"
+//#include "inf_fe_instantiate_2D.h"
+//#include "inf_fe_instantiate_3D.h"
 
-
-
+INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,unsigned int,n_dofs(const FEType&,const ElemType));
+INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,unsigned int,n_dofs(const FEType&,const ElemType));
+INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,unsigned int,n_dofs(const FEType&,const ElemType));
+INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,unsigned int,n_dofs_per_elem(const FEType&,const ElemType));
+INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,unsigned int,n_dofs_per_elem(const FEType&,const ElemType));
+INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,unsigned int,n_dofs_per_elem(const FEType&,const ElemType));
+INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,unsigned int,n_dofs_at_node(const FEType&,const ElemType,const unsigned int));
+INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,unsigned int,n_dofs_at_node(const FEType&,const ElemType,const unsigned int));
+INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,unsigned int,n_dofs_at_node(const FEType&,const ElemType,const unsigned int));
+INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,void,compute_shape_indices(const FEType&,const ElemType,const unsigned int,unsigned int&,unsigned int&));
+INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,void,compute_shape_indices(const FEType&,const ElemType,const unsigned int,unsigned int&,unsigned int&));
+INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,compute_shape_indices(const FEType&,const ElemType,const unsigned int,unsigned int&,unsigned int&));
+INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,void,compute_node_indices(const ElemType,const unsigned int,unsigned int&,unsigned int&));
+INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,void,compute_node_indices(const ElemType,const unsigned int,unsigned int&,unsigned int&));
+INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,compute_node_indices(const ElemType,const unsigned int,unsigned int&,unsigned int&));
+INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,Real,shape(const FEType&,const Elem*,const unsigned int,const Point& p));
+INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,Real,shape(const FEType&,const Elem*,const unsigned int,const Point& p));
+INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,Real,shape(const FEType&,const Elem*,const unsigned int,const Point& p));
+INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,Real,shape(const FEType&,const ElemType,const unsigned int,const Point&));
+INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,Real,shape(const FEType&,const ElemType,const unsigned int,const Point&));
+INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,Real,shape(const FEType&,const ElemType,const unsigned int,const Point&));
+INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,void,compute_data(const FEType&,const Elem*,FEComputeData&));
+INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,void,compute_data(const FEType&,const Elem*,FEComputeData&));
+INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,compute_data(const FEType&,const Elem*,FEComputeData&));
+INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,void,nodal_soln(const FEType&,const Elem*,const std::vector<Number>&,std::vector<Number>&));
+INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,void,nodal_soln(const FEType&,const Elem*,const std::vector<Number>&,std::vector<Number>&));
+INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,nodal_soln(const FEType&,const Elem*,const std::vector<Number>&,std::vector<Number>&));
+					   
 #endif //ifdef ENABLE_INFINITE_ELEMENTS
 
