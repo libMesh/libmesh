@@ -1,4 +1,4 @@
-// $Id: cell_tet4.C,v 1.21 2005-03-01 14:21:40 benkirk Exp $
+// $Id: cell_tet4.C,v 1.22 2005-05-06 17:06:58 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -37,6 +37,16 @@ const unsigned int Tet4::side_nodes_map[4][3] =
   {2, 0, 3}  // Side 3
 };
 
+const unsigned int Tet4::edge_nodes_map[6][2] =
+{
+  {0, 1}, // Side 0
+  {1, 2}, // Side 1
+  {0, 2}, // Side 2
+  {0, 3}, // Side 3
+  {1, 3}, // Side 4
+  {2, 3}  // Side 5
+};
+
 
 // ------------------------------------------------------------
 // Tet4 class member functions
@@ -53,6 +63,16 @@ bool Tet4::is_edge(const unsigned int) const
 
 bool Tet4::is_face(const unsigned int) const
 {
+  return false;
+}
+
+bool Tet4::is_node_on_edge(const unsigned int n,
+			   const unsigned int e) const
+{
+  assert(e < n_edges());
+  for (unsigned int i = 0; i != 2; ++i)
+    if (edge_nodes_map[e][i] == n)
+      return true;
   return false;
 }
 

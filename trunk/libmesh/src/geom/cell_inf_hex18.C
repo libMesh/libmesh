@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex18.C,v 1.29 2005-03-01 14:21:40 benkirk Exp $
+// $Id: cell_inf_hex18.C,v 1.30 2005-05-06 17:06:57 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -41,6 +41,18 @@ const unsigned int InfHex18::side_nodes_map[5][9] =
   { 3, 0, 7, 4, 11, 15, 99, 99, 99}  // Side 4
 };
 
+const unsigned int InfHex18::edge_nodes_map[8][3] =
+{
+  { 0, 1, 8},  // Side 0
+  { 1, 2, 9},  // Side 1
+  { 2, 3, 10}, // Side 2
+  { 0, 3, 11}, // Side 3
+  { 0, 4, 99}, // Side 4
+  { 1, 5, 99}, // Side 5
+  { 2, 6, 99}, // Side 6
+  { 3, 7, 99}  // Side 7
+};
+
 // ------------------------------------------------------------
 // InfHex18 class member functions
 
@@ -73,6 +85,16 @@ bool InfHex18::is_node_on_side(const unsigned int n,
   assert(s < n_sides());
   for (unsigned int i = 0; i != 9; ++i)
     if (side_nodes_map[s][i] == n)
+      return true;
+  return false;
+}
+
+bool InfHex18::is_node_on_edge(const unsigned int n,
+			       const unsigned int e) const
+{
+  assert(e < n_edges());
+  for (unsigned int i = 0; i != 3; ++i)
+    if (edge_nodes_map[e][i] == n)
       return true;
   return false;
 }

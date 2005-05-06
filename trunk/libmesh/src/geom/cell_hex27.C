@@ -1,4 +1,4 @@
-// $Id: cell_hex27.C,v 1.29 2005-03-01 14:21:40 benkirk Exp $
+// $Id: cell_hex27.C,v 1.30 2005-05-06 17:06:57 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -39,6 +39,22 @@ const unsigned int Hex27::side_nodes_map[6][9] =
   {4, 5, 6, 7, 16, 17, 18, 19, 25}  // Side 5
 };
 
+const unsigned int Hex27::edge_nodes_map[12][3] =
+{
+  {0, 1, 8},  // Side 0
+  {1, 2, 9},  // Side 1
+  {2, 3, 10}, // Side 2
+  {0, 3, 11}, // Side 3
+  {0, 4, 12}, // Side 4
+  {1, 5, 13}, // Side 5
+  {2, 6, 14}, // Side 6
+  {3, 7, 15}, // Side 7
+  {4, 5, 16}, // Side 8
+  {5, 6, 17}, // Side 9
+  {6, 7, 18}, // Side 10
+  {4, 7, 19}  // Side 11
+};
+
 
 
 // ------------------------------------------------------------
@@ -75,6 +91,16 @@ bool Hex27::is_node_on_side(const unsigned int n,
   assert(s < n_sides());
   for (unsigned int i = 0; i != 9; ++i)
     if (side_nodes_map[s][i] == n)
+      return true;
+  return false;
+}
+
+bool Hex27::is_node_on_edge(const unsigned int n,
+			    const unsigned int e) const
+{
+  assert(e < n_edges());
+  for (unsigned int i = 0; i != 3; ++i)
+    if (edge_nodes_map[e][i] == n)
       return true;
   return false;
 }

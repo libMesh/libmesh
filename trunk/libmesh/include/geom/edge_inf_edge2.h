@@ -1,4 +1,4 @@
-// $Id: edge_inf_edge2.h,v 1.7 2005-02-25 19:15:41 roystgnr Exp $
+// $Id: edge_inf_edge2.h,v 1.8 2005-05-06 17:07:00 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -94,6 +94,13 @@ class InfEdge2 : public Edge
    */
   virtual bool is_node_on_side(const unsigned int n,
 			       const unsigned int s) const;
+  
+  /*
+   * @returns true iff the specified (local) node number is on the
+   * specified edge (i.e. "returns true" in 1D)
+   */
+  virtual bool is_node_on_edge(const unsigned int n,
+			       const unsigned int e) const;
   
   /**
    * @returns \p INFEDGE2
