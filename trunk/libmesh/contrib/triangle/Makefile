@@ -18,10 +18,10 @@ OBJS   	:= $(patsubst %.c, %.$(obj-suffix), $(SRC))
 
 
 
-target := $(libpath)/$(hosttype)_$(METHOD)/lib$(pkgname).a
+target := $(EXTERNAL_LIBDIR)/lib$(pkgname).a
 
 ifeq ($(enable-shared),yes)
-  target := $(libpath)/$(hosttype)_$(METHOD)/lib$(pkgname).so
+  target := $(EXTERNAL_LIBDIR)/lib$(pkgname)$(SHARED_LIBEXT)
 endif
 
 ifeq ($(enable-triangle),no)
@@ -31,15 +31,25 @@ else
   all:: $(target)
 endif
 
-$(libpath)/$(hosttype)_$(METHOD)/lib$(pkgname).a: $(OBJS)
+# Build static library
+ifeq ($(findstring darwin,$(hostos)),darwin)
+$(EXTERNAL_LIBDIR)/lib$(pkgname).a: $(OBJS)
 	@echo "Linking "$@
-	@$(shell mkdir -p $(libpath)/$(hosttype)_$(METHOD))
+	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
+	@libtool -static -o $@ $(OBJS)
+else
+$(EXTERNAL_LIBDIR)/lib$(pkgname).a: $(OBJS)
+	@echo "Linking "$@
+	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
 	@$(AR) rv $@ $(OBJS)
+endif
 
-$(libpath)/$(hosttype)_$(METHOD)/lib$(pkgname).so: $(OBJS)
+# Build dynamic library
+$(EXTERNAL_LIBDIR)/lib$(pkgname)$(SHARED_LIBEXT): $(OBJS)
 	@echo "Linking "$@
-	@$(shell mkdir -p $(libpath)/$(hosttype)_$(METHOD))
+	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
 	@$(CC) $(CSHAREDFLAG) -o $@ $(OBJS) $(LDFLAGS)
+
 
 clean:
 	@rm -f $(OBJS) showme triangle tricall *~
@@ -47,7 +57,7 @@ clean:
 clobber:
 	@$(MAKE) clean
 	@rm -f *.o *.g.o *.pg.o *.sy.o
-	@rm -f $(libpath)/$(hosttype)_$(METHOD)/lib$(pkgname).*
+	@rm -f $(EXTERNAL_LIBDIR)/lib$(pkgname).*
 
 distclean:
 	@$(MAKE) clobber

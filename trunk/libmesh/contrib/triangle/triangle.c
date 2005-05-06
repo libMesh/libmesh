@@ -654,16 +654,16 @@ struct memorypool {
 
 /* Global constants.                                                         */
 
-REAL splitter;       /* Used to split REAL factors for exact multiplication. */
-REAL epsilon;                             /* Floating-point machine epsilon. */
-REAL resulterrbound;
-REAL ccwerrboundA, ccwerrboundB, ccwerrboundC;
-REAL iccerrboundA, iccerrboundB, iccerrboundC;
-REAL o3derrboundA, o3derrboundB, o3derrboundC;
+REAL splitter=0.;       /* Used to split REAL factors for exact multiplication. */
+REAL epsilon=0.;                             /* Floating-point machine epsilon. */
+REAL resulterrbound=0.;
+REAL ccwerrboundA=0., ccwerrboundB=0., ccwerrboundC=0.;
+REAL iccerrboundA=0., iccerrboundB=0., iccerrboundC=0.;
+REAL o3derrboundA=0., o3derrboundB=0., o3derrboundC=0.;
 
 /* Random number seed is not constant, but I've made it global anyway.       */
 
-unsigned long randomseed;                     /* Current random number seed. */
+unsigned long randomseed=0;                     /* Current random number seed. */
 
 
 /* Mesh data structure.  Triangle operates on only one mesh, but the mesh    */
