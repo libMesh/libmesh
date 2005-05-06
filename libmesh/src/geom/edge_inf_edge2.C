@@ -1,4 +1,4 @@
-// $Id: edge_inf_edge2.C,v 1.19 2005-03-01 14:21:41 benkirk Exp $
+// $Id: edge_inf_edge2.C,v 1.20 2005-05-06 17:06:58 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -53,6 +53,13 @@ bool InfEdge2::is_node_on_side(const unsigned int n,
 {
   assert(s < 1);
   return (s == n);
+}
+
+bool InfEdge2::is_node_on_edge(const unsigned int,
+			       const unsigned int e) const
+{
+  assert(e == 0);
+  return true;
 }
 
 void InfEdge2::connectivity(const unsigned int se,

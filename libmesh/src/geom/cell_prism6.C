@@ -1,4 +1,4 @@
-// $Id: cell_prism6.C,v 1.21 2005-03-01 14:21:40 benkirk Exp $
+// $Id: cell_prism6.C,v 1.22 2005-05-06 17:06:58 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -39,6 +39,18 @@ const unsigned int Prism6::side_nodes_map[5][4] =
   {3, 4, 5, 99}  // Side 4
 };
 
+const unsigned int Prism6::edge_nodes_map[9][2] =
+{
+  {0, 1}, // Side 0
+  {1, 2}, // Side 1
+  {0, 2}, // Side 2
+  {0, 3}, // Side 3
+  {1, 4}, // Side 4
+  {2, 5}, // Side 5
+  {3, 4}, // Side 6
+  {4, 5}, // Side 7
+  {3, 5}  // Side 8
+};
 
 
 // ------------------------------------------------------------
@@ -65,6 +77,16 @@ bool Prism6::is_node_on_side(const unsigned int n,
   assert(s < n_sides());
   for (unsigned int i = 0; i != 4; ++i)
     if (side_nodes_map[s][i] == n)
+      return true;
+  return false;
+}
+
+bool Prism6::is_node_on_edge(const unsigned int n,
+			     const unsigned int e) const
+{
+  assert(e < n_edges());
+  for (unsigned int i = 0; i != 2; ++i)
+    if (edge_nodes_map[e][i] == n)
       return true;
   return false;
 }

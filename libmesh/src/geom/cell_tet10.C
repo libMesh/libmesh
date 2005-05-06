@@ -1,4 +1,4 @@
-// $Id: cell_tet10.C,v 1.20 2005-03-01 14:21:40 benkirk Exp $
+// $Id: cell_tet10.C,v 1.21 2005-05-06 17:06:58 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -37,6 +37,16 @@ const unsigned int Tet10::side_nodes_map[4][6] =
   {2, 0, 3, 6, 7, 9}  // Side 3
 };
 
+const unsigned int Tet10::edge_nodes_map[6][3] =
+{
+  {0, 1, 4}, // Side 0
+  {1, 2, 5}, // Side 1
+  {0, 2, 6}, // Side 2
+  {0, 3, 7}, // Side 3
+  {1, 3, 8}, // Side 4
+  {2, 3, 9}  // Side 5
+};
+
 
 
 // ------------------------------------------------------------
@@ -67,6 +77,16 @@ bool Tet10::is_node_on_side(const unsigned int n,
   assert(s < n_sides());
   for (unsigned int i = 0; i != 6; ++i)
     if (side_nodes_map[s][i] == n)
+      return true;
+  return false;
+}
+
+bool Tet10::is_node_on_edge(const unsigned int n,
+			    const unsigned int e) const
+{
+  assert(e < n_edges());
+  for (unsigned int i = 0; i != 3; ++i)
+    if (edge_nodes_map[e][i] == n)
       return true;
   return false;
 }

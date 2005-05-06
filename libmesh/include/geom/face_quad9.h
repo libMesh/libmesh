@@ -1,4 +1,4 @@
-// $Id: face_quad9.h,v 1.8 2005-02-25 19:15:41 roystgnr Exp $
+// $Id: face_quad9.h,v 1.9 2005-05-06 17:07:01 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -108,6 +108,14 @@ public:
    */
   virtual bool is_node_on_side(const unsigned int n,
 			       const unsigned int s) const;
+  
+  /*
+   * @returns true iff the specified (local) node number is on the
+   * specified edge (== is_node_on_side in 2D)
+   */
+  virtual bool is_node_on_edge(const unsigned int n,
+			       const unsigned int e) const
+  { return this->is_node_on_side(n,e); }
   
   /**
    * @returns SECOND

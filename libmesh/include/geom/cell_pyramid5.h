@@ -1,4 +1,4 @@
-// $Id: cell_pyramid5.h,v 1.8 2005-02-25 19:15:41 roystgnr Exp $
+// $Id: cell_pyramid5.h,v 1.9 2005-05-06 17:07:00 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -91,6 +91,13 @@ public:
   virtual bool is_node_on_side(const unsigned int n,
 			       const unsigned int s) const;
   
+  /*
+   * @returns true iff the specified (local) node number is on the
+   * specified edge
+   */
+  virtual bool is_node_on_edge(const unsigned int n,
+			       const unsigned int e) const;
+  
   /**
    * @returns FIRST
    */
@@ -111,6 +118,12 @@ public:
    * element node numbers.
    */
   static const unsigned int side_nodes_map[5][4];
+  
+  /**
+   * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ edge to
+   * element node numbers.
+   */
+  static const unsigned int edge_nodes_map[8][2];
 
   
 protected:
