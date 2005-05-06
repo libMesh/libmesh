@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.43 2005-05-05 20:20:42 benkirk Exp $
+# $Id: Make.common.in,v 1.44 2005-05-06 17:43:27 roystgnr Exp $
 
 
 ###############################################################################
@@ -23,6 +23,7 @@
 # the following lines will be replaced by the output 
 # of ./configure
 hosttype             = @host@
+hostos               = @host_os@
 
 CXX                  = @CXX@
 CC		     = @CC@
@@ -79,6 +80,7 @@ enable-triangle      = @enabletriangle@
 #
 # Set the current directory.
 libmesh_dir := @PWD@
+export libmesh_dir
 ###############################################################################
 
 
@@ -140,6 +142,14 @@ enable-shared        := @enableshared@
 ifeq ($(prof-mode),on)
   enable-shared := no
 endif
+
+#
+# Define the right lib-extension for shared libraries
+ifeq ($(findstring darwin,$(hostos)),darwin)
+  SHARED_LIBEXT := .dylib
+else
+  SHARED_LIBEXT := .so
+endif
 ###############################################################################
 
 
@@ -183,7 +193,7 @@ mesh_library_dir := $(libmesh_dir)/lib/$(hosttype)_$(METHOD)
 
 mesh_library     := $(mesh_library_dir)/libmesh.a
 ifeq ($(enable-shared),yes) 
-  mesh_library   := $(mesh_library_dir)/libmesh.so
+  mesh_library   := $(mesh_library_dir)/libmesh$(SHARED_LIBEXT)
   DLFLAGS += $(RPATHFLAG)$(mesh_library_dir)
 endif
 
@@ -220,7 +230,7 @@ INCLUDE += $(LIBMESH_INCLUDES)
 EXTERNAL_LIBDIR := $(libmesh_dir)/contrib/lib/$(hosttype)_$(METHOD)
 EXTERNAL_LIBEXT := .a
 ifeq ($(enable-shared),yes) 
-  EXTERNAL_LIBEXT := .so
+  EXTERNAL_LIBEXT := $(SHARED_LIBEXT)
   DLFLAGS += $(RPATHFLAG)$(EXTERNAL_LIBDIR)
 endif
 
@@ -372,6 +382,9 @@ ifeq ($(enable-optional),yes)
 	    $(HYPRE_LIB) $(BLASLAPACK_LIB) $(X11_LIB) $(MATLAB_LIB) \
             $(FLIBS)
 
+    EXTERNAL_FLAGS += $(libs-PETSC) $(MPI_LIB) $(BLASLAPACK_LIB) \
+                      $(X11_LIB) $(MATLAB_LIB) -lz
+
   endif #end ifeq ($(enable-petsc),yes)
 
 
@@ -379,9 +392,34 @@ ifeq ($(enable-optional),yes)
   LIBS    += $(MPI_LIB)
   INCLUDE += $(MPI_INCLUDE)
 
+  libs_EXTERNAL = -L$(EXTERNAL_LIBDIR)
+  ifeq ($(enable-gzstream),yes)
+    libs_EXTERNAL += -lgzstream
+  endif
+  ifeq ($(enable-laspack),yes)
+    libs_EXTERNAL += -llaspack
+  endif
+  ifeq ($(enable-metis),yes)
+    libs_EXTERNAL += -lmetis
+  endif
+  ifeq ($(enable-parmetis),yes)
+    libs_EXTERNAL += -lparmetis
+  endif
+  ifeq ($(enable-sfcurves),yes)
+    libs_EXTERNAL += -lsfcurves
+  endif
+
+  EXTERNAL_FLAGS += $(libs_EXTERNAL)
 
 endif # End of disable-optional test
 
+# Finally, Append the linker flags to the libraries
+ifeq ($(findstring darwin,$(hostos)),darwin)
+  LIBS = $(mesh_library)
+else
+  LIBS += $(DLFLAGS) $(LDFLAGS)
+  EXTERNAL_FLAGS =
+endif
 
 
 # if Exodus is used, link against libexoIIv2c.a
@@ -395,9 +433,6 @@ LIBS    += @NETCDF_LIB@
 INCLUDE += @NETCDF_INCLUDE@
 
 
-#
-# Finally, Append the linker flags to the libraries
-LIBS += $(DLFLAGS) $(LDFLAGS)
 ###############################################################################
 
 

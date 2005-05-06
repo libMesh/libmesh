@@ -1,4 +1,4 @@
-// $Id: fe_boundary.C,v 1.31 2005-02-22 22:17:36 jwpeterson Exp $
+// $Id: fe_boundary.C,v 1.32 2005-05-06 17:43:44 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -460,6 +460,19 @@ void FEBase::compute_face_map(const std::vector<Real>& qw,
 
 //--------------------------------------------------------------
 // Explicit instantiations (doesn't make sense in 1D!) using fe_macro.h's macro
-
-INSTANTIATE_FE(2);
-INSTANTIATE_FE(3);
+template void FE<2,LAGRANGE>::reinit(Elem const*, unsigned int);
+template void FE<2,HIERARCHIC>::reinit(Elem const*, unsigned int);
+template void FE<2,CLOUGH>::reinit(Elem const*, unsigned int);
+template void FE<2,MONOMIAL>::reinit(Elem const*, unsigned int);
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+template void FE<2,SZABAB>::reinit(Elem const*, unsigned int);
+#endif
+template void FE<2,XYZ>::reinit(Elem const*, unsigned int);
+template void FE<3,LAGRANGE>::reinit(Elem const*, unsigned int);
+template void FE<3,HIERARCHIC>::reinit(Elem const*, unsigned int);
+template void FE<3,CLOUGH>::reinit(Elem const*, unsigned int);
+template void FE<3,MONOMIAL>::reinit(Elem const*, unsigned int);
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+template void FE<3,SZABAB>::reinit(Elem const*, unsigned int);
+#endif
+template void FE<3,XYZ>::reinit(Elem const*, unsigned int);

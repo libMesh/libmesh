@@ -1,4 +1,4 @@
-// $Id: inf_fe_macro.h,v 1.3 2005-02-22 22:17:31 jwpeterson Exp $
+// $Id: inf_fe_macro.h,v 1.4 2005-05-06 17:43:43 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -42,7 +42,12 @@
                                            template  class InfFE< _dim, LEGENDRE,     _map_type >; \
                                            template  class InfFE< _dim, LAGRANGE,     _map_type >
 
-
+#define INSTANTIATE_INF_FE_MBRF(_dim,_map_type,_return,_function) \
+								template _return InfFE< _dim,INFINITE_MAP,_map_type>::_function; \
+								template _return InfFE< _dim,JACOBI_20_00,_map_type>::_function; \
+								template _return InfFE< _dim,JACOBI_30_00,_map_type>::_function; \
+								template _return InfFE< _dim,LEGENDRE,_map_type>::_function; \
+								template _return InfFE< _dim,LAGRANGE,_map_type>::_function
 
 #else
 

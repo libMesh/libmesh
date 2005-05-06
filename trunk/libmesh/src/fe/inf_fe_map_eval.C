@@ -1,4 +1,4 @@
-// $Id: inf_fe_map_eval.C,v 1.8 2005-02-22 22:17:38 jwpeterson Exp $
+// $Id: inf_fe_map_eval.C,v 1.9 2005-05-06 17:44:06 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -81,9 +81,9 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
 
 //--------------------------------------------------------------
 // Explicit instantiations
-template class InfFE<1,INFINITE_MAP,CARTESIAN>;
-template class InfFE<2,INFINITE_MAP,CARTESIAN>;
-template class InfFE<3,INFINITE_MAP,CARTESIAN>;
+// template class InfFE<1,INFINITE_MAP,CARTESIAN>;
+// template class InfFE<2,INFINITE_MAP,CARTESIAN>;
+// template class InfFE<3,INFINITE_MAP,CARTESIAN>;
 
 // template class InfFE<1,INFINITE_MAP,SPHERICAL>;
 // template class InfFE<2,INFINITE_MAP,SPHERICAL>;
@@ -93,6 +93,12 @@ template class InfFE<3,INFINITE_MAP,CARTESIAN>;
 // template class InfFE<2,INFINITE_MAP,ELLIPSOIDAL>;
 // template class InfFE<3,INFINITE_MAP,ELLIPSOIDAL>;
 
+template Real InfFE<1,INFINITE_MAP,CARTESIAN>::eval(const Real,const Order,const unsigned int);
+template Real InfFE<1,INFINITE_MAP,CARTESIAN>::eval_deriv(const Real,const Order,const unsigned int);
+template Real InfFE<2,INFINITE_MAP,CARTESIAN>::eval(const Real,const Order,const unsigned int);
+template Real InfFE<2,INFINITE_MAP,CARTESIAN>::eval_deriv(const Real,const Order,const unsigned int);
+template Real InfFE<3,INFINITE_MAP,CARTESIAN>::eval(const Real,const Order,const unsigned int);
+template Real InfFE<3,INFINITE_MAP,CARTESIAN>::eval_deriv(const Real,const Order,const unsigned int);
 
 #endif //ifdef ENABLE_INFINITE_ELEMENTS
 

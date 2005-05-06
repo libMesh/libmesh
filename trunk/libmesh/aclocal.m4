@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.81 2005-05-05 20:20:42 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.82 2005-05-06 17:43:27 roystgnr Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -238,17 +238,24 @@ dnl -------------------------------------------------------------
 AC_DEFUN(SET_CXX_FLAGS, dnl
 [
   dnl Flag for creating shared objects; can be modified at a later stage
-  CXXSHAREDFLAG="-shared"
-
-  dnl Flag to add directories to the dynamic library search path; can
-  dnl be changed at a later stage
-  RPATHFLAG="-Wl,-rpath,"
+  if test $HOSTTYPE = "powerpc" ; then
+    CXXFLAGSO="-fno-common"
+    CXXFLAGSG="-fno-common"
+    CXXSHAREDFLAG="-dynamiclib"
+    CSHAREDFLAG="-dynamiclib"
+    RPATHFLAG="-L"
+  else
+    CXXSHAREDFLAG="-shared"
+    dnl Flag to add directories to the dynamic library search path; can
+    dnl be changed at a later stage
+    RPATHFLAG="-Wl,-rpath,"
+  fi
 
 
   dnl First the flags for gcc compilers
   if (test "$GXX" = yes -a "x$REAL_GXX" != "x" ) ; then
-    CXXFLAGSO="-O2 -felide-constructors -DNDEBUG -Wuninitialized"
-    CXXFLAGSG="-O0 -felide-constructors -g -ansi -pedantic -W -Wall -Wunused -Wpointer-arith -Wimplicit -Wformat -Wparentheses -DDEBUG"
+    CXXFLAGSO="$CXXFLAGSO -O2 -felide-constructors -DNDEBUG"
+    CXXFLAGSG="$CXXFLAGSG -O2 -felide-constructors -g -ansi -pedantic -W -Wall -Wunused -Wpointer-arith -Wimplicit -Wformat -Wparentheses -Wuninitialized -DDEBUG"
     CXXFLAGSP="$CXXFLAGSO -g -pg"
     CXXFLAGSS="-fsyntax-only"
 

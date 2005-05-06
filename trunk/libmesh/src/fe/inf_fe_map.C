@@ -1,4 +1,4 @@
-// $Id: inf_fe_map.C,v 1.12 2005-02-22 22:17:38 jwpeterson Exp $
+// $Id: inf_fe_map.C,v 1.13 2005-05-06 17:44:06 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -592,12 +592,15 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 
 //--------------------------------------------------------------
 // Explicit instantiations using the macro from inf_fe_macro.h
-INSTANTIATE_INF_FE(1,CARTESIAN);
+//INSTANTIATE_INF_FE(1,CARTESIAN);
 
-INSTANTIATE_INF_FE(2,CARTESIAN);
+//INSTANTIATE_INF_FE(2,CARTESIAN);
 
-INSTANTIATE_INF_FE(3,CARTESIAN);
+//INSTANTIATE_INF_FE(3,CARTESIAN);
 
+INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,Point,inverse_map(const Elem*,const Point&,const Real,const bool));					  
+INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,Point,inverse_map(const Elem*,const Point&,const Real,const bool));					  
+INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,Point,inverse_map(const Elem*,const Point&,const Real,const bool));					  
 
 #endif //ifdef ENABLE_INFINITE_ELEMENTS
 

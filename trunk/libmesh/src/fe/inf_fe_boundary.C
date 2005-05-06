@@ -1,4 +1,4 @@
-// $Id: inf_fe_boundary.C,v 1.9 2005-02-22 22:17:38 jwpeterson Exp $
+// $Id: inf_fe_boundary.C,v 1.10 2005-05-06 17:44:05 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -26,6 +26,7 @@
 #include "libmesh_config.h"
 #ifdef ENABLE_INFINITE_ELEMENTS
 #include "inf_fe.h"
+#include "inf_fe_macro.h"
 
 
 
@@ -65,11 +66,15 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
 //--------------------------------------------------------------
 // Explicit instantiations - doesn't make sense in 1D, but as 
 // long as we only return errors, we are fine... ;-) 
-#include "inf_fe_instantiate_1D.h"
-#include "inf_fe_instantiate_2D.h"
-#include "inf_fe_instantiate_3D.h"
-
-
+//#include "inf_fe_instantiate_1D.h"
+//#include "inf_fe_instantiate_2D.h"
+//#include "inf_fe_instantiate_3D.h"
+INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,void,reinit(const Elem*,const unsigned int));
+INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,void,reinit(const Elem*,const unsigned int));
+INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,reinit(const Elem*,const unsigned int));
+INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,void,init_face_shape_functions(const std::vector<Point>&,const Elem*));
+INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,void,init_face_shape_functions(const std::vector<Point>&,const Elem*));
+INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,init_face_shape_functions(const std::vector<Point>&,const Elem*));
 
 #endif //ifdef ENABLE_INFINITE_ELEMENTS
 

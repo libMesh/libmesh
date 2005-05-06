@@ -1,4 +1,4 @@
-// $Id: inf_fe_base_radial.C,v 1.5 2005-02-22 22:17:38 jwpeterson Exp $
+// $Id: inf_fe_base_radial.C,v 1.6 2005-05-06 17:44:05 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -23,6 +23,7 @@
 #include "libmesh_config.h"
 #ifdef ENABLE_INFINITE_ELEMENTS
 #include "inf_fe.h"
+#include "inf_fe_macro.h"
 #include "fe.h"
 #include "fe_interface.h"
 #include "elem.h"
@@ -149,11 +150,18 @@ unsigned int InfFE<Dim,T_radial,T_map>::Radial::n_dofs_at_node (const Order o_ra
 
 //--------------------------------------------------------------
 // Explicit instantiations
-#include "inf_fe_instantiate_1D.h"
-#include "inf_fe_instantiate_2D.h"
-#include "inf_fe_instantiate_3D.h"
-
-
-
+INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,Elem*,Base::build_elem(const Elem*));
+INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,Elem*,Base::build_elem(const Elem*));
+INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,Elem*,Base::build_elem(const Elem*));
+INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,ElemType,Base::get_elem_type(const ElemType type));
+INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,ElemType,Base::get_elem_type(const ElemType type));
+INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,ElemType,Base::get_elem_type(const ElemType type));
+INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,unsigned int,Base::n_base_mapping_sf(const ElemType,const Order));
+INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,unsigned int,Base::n_base_mapping_sf(const ElemType,const Order));
+INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,unsigned int,Base::n_base_mapping_sf(const ElemType,const Order));
+INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,unsigned int,Radial::n_dofs_at_node (const Order,const unsigned int));
+INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,unsigned int,Radial::n_dofs_at_node (const Order,const unsigned int));
+INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,unsigned int,Radial::n_dofs_at_node (const Order,const unsigned int));
+								
 #endif //ifdef ENABLE_INFINITE_ELEMENTS
 

@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic.C,v 1.20 2005-05-04 21:27:58 roystgnr Exp $
+// $Id: fe_hierarchic.C,v 1.21 2005-05-06 17:43:44 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -25,6 +25,7 @@
 #include "dof_map.h"
 #include "elem.h"
 #include "fe.h"
+#include "fe_macro.h"
 #include "fe_interface.h"
 #include "quadrature_gauss.h"
 
@@ -1243,7 +1244,14 @@ bool FE<Dim,T>::shapes_need_reinit() const
 
 
 //--------------------------------------------------------------
-// Explicit instantiations
-template class FE<1,HIERARCHIC>;
-template class FE<2,HIERARCHIC>;
-template class FE<3,HIERARCHIC>;
+// Explicit instantiation of member functions
+INSTANTIATE_MBRF(1,HIERARCHIC);
+INSTANTIATE_MBRF(2,HIERARCHIC);
+INSTANTIATE_MBRF(3,HIERARCHIC);
+template void FE<2,HIERARCHIC>::compute_constraints(DofConstraints&, DofMap&, 
+						    const unsigned int,
+						    const Elem*);
+template void FE<3,HIERARCHIC>::compute_constraints(DofConstraints&, DofMap&, 
+						    const unsigned int,
+						    const Elem*);
+

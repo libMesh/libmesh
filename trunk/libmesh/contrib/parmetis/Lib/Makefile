@@ -11,10 +11,10 @@ OBJS   	:= $(patsubst %.c, %.$(obj-suffix), $(SRC))
 
 
 
-target := ../../lib/$(hosttype)_$(METHOD)/libparmetis.a
+target := $(EXTERNAL_LIBDIR)/libparmetis.a
 
 ifeq ($(enable-shared),yes)
-  target := ../../lib/$(hosttype)_$(METHOD)/libparmetis.so
+  target := $(EXTERNAL_LIBDIR)/libparmetis$(SHARED_LIBEXT)
 endif
 
 
@@ -30,14 +30,21 @@ else
     endif
 endif
 
-../../lib/$(hosttype)_$(METHOD)/libparmetis.a: $(OBJS)
+ifeq ($(findstring darwin,$(hostos)),darwin)
+$(EXTERNAL_LIBDIR)/libparmetis.a: $(OBJS)
 	@echo "Linking "$@
-	@$(shell mkdir -p ../../lib/$(hosttype)_$(METHOD))
+	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
+	@libtool -static -o $@ $(OBJS)
+else
+$(EXTERNAL_LIBDIR)/libparmetis.a: $(OBJS)
+	@echo "Linking "$@
+	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
 	@$(AR) rv $@ $(OBJS)
+endif
 
-../../lib/$(hosttype)_$(METHOD)/libparmetis.so: $(OBJS)
+$(EXTERNAL_LIBDIR)/libparmetis$(SHARED_LIBEXT): $(OBJS)
 	@echo "Linking "$@
-	@$(shell mkdir -p ../../lib/$(hosttype)_$(METHOD))
+	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
 	@$(CC) $(CSHAREDFLAG) -o $@ $(OBJS) $(LDFLAGS)
 
 clean:
@@ -46,7 +53,7 @@ clean:
 clobber:
 	@$(MAKE) clean
 	@rm -f *.o *.g.o *.pg.o *.sy.o
-	@rm -f ../../lib/$(hosttype)_$(METHOD)/libparmetis.*
+	@rm -f $(EXTERNAL_LIBDIR)/libparmetis.*
 
 distclean:
 	@$(MAKE) clobber

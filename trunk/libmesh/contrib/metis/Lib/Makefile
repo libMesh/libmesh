@@ -10,10 +10,10 @@ OBJS   	:= $(patsubst %.c, %.$(obj-suffix), $(SRC))
 
 
 
-target := ../../lib/$(hosttype)_$(METHOD)/libmetis.a
+target := $(EXTERNAL_LIBDIR)/libmetis.a
 
 ifeq ($(enable-shared),yes)
-  target := ../../lib/$(hosttype)_$(METHOD)/libmetis.so
+  target := $(EXTERNAL_LIBDIR)/libmetis$(SHARED_LIBEXT)
 endif
 
 ifeq ($(enable-metis),no)
@@ -23,14 +23,21 @@ else
   all:: $(target)
 endif
 
-../../lib/$(hosttype)_$(METHOD)/libmetis.a: $(OBJS)
+ifeq ($(findstring darwin,$(hostos)),darwin)
+$(EXTERNAL_LIBDIR)/libmetis.a: $(OBJS)
 	@echo "Linking "$@
-	@$(shell mkdir -p ../../lib/$(hosttype)_$(METHOD))
+	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
+	@libtool -static -o $@ $(OBJS)
+else
+$(EXTERNAL_LIBDIR)/libmetis.a: $(OBJS)
+	@echo "Linking "$@
+	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
 	@$(AR) rv $@ $(OBJS)
+endif
 
-../../lib/$(hosttype)_$(METHOD)/libmetis.so: $(OBJS)
+$(EXTERNAL_LIBDIR)/libmetis$(SHARED_LIBEXT): $(OBJS)
 	@echo "Linking "$@
-	@$(shell mkdir -p ../../lib/$(hosttype)_$(METHOD))
+	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
 	@$(CC) $(CSHAREDFLAG) -o $@ $(OBJS) $(LDFLAGS)
 
 clean:
@@ -39,7 +46,7 @@ clean:
 clobber:
 	@$(MAKE) clean
 	@rm -f *.o *.g.o *.pg.o *.sy.o
-	@rm -f ../../lib/$(hosttype)_$(METHOD)/libmetis.*
+	@rm -f $(EXTERNAL_LIBDIR)/libmetis.*
 
 distclean:
 	@$(MAKE) clobber

@@ -14,10 +14,10 @@ OBJS   	:= $(patsubst %.c, %.$(obj-suffix), $(SRC))
 
 
 
-target := ../lib/$(hosttype)_$(METHOD)/liblaspack.a
+target := $(EXTERNAL_LIBDIR)/liblaspack.a
 
 ifeq ($(enable-shared),yes)
-  target := ../lib/$(hosttype)_$(METHOD)/liblaspack.so
+  target := $(EXTERNAL_LIBDIR)/liblaspack$(SHARED_LIBEXT)
 endif
 
 
@@ -28,27 +28,34 @@ else
   all:: $(target)
 endif
 
-../lib/$(hosttype)_$(METHOD)/liblaspack.a: $(OBJS)
+ifeq ($(findstring darwin,$(hostos)),darwin)
+$(EXTERNAL_LIBDIR)/liblaspack.a: $(OBJS)
 	@echo "Linking "$@
-	@$(shell mkdir -p ../lib/$(hosttype)_$(METHOD))
+	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
+	@libtool -static -o $@ $(OBJS)
+else
+$(EXTERNAL_LIBDIR)/liblaspack.a: $(OBJS)
+	@echo "Linking "$@
+	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
 	@$(AR) rv $@ $(OBJS)
+endif
 
 ifeq ($(enable-complex),yes)
 #
 # Complex arithmetic: use C++ 
 #
-../lib/$(hosttype)_$(METHOD)/liblaspack.so: $(OBJS)
+$(EXTERNAL_LIBDIR)/liblaspack$(SHARED_LIBEXT): $(OBJS)
 	@echo "Linking "$@
-	@$(shell mkdir -p ../lib/$(hosttype)_$(METHOD))
+	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
 	@$(CXX) $(CXXSHAREDFLAG) -o $@ $(OBJS) $(LDFLAGS)
 
 else
 #
 # Real arithmetic: use C
 #
-../lib/$(hosttype)_$(METHOD)/liblaspack.so: $(OBJS)
+$(EXTERNAL_LIBDIR)/liblaspack$(SHARED_LIBEXT): $(OBJS)
 	@echo "Linking "$@
-	@$(shell mkdir -p ../lib/$(hosttype)_$(METHOD))
+	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
 	@$(CC) $(CSHAREDFLAG) -o $@ $(OBJS) $(LDFLAGS)
 
 endif
@@ -64,7 +71,7 @@ clean:
 clobber:
 	@$(MAKE) clean
 	@rm -f *.o *.g.o *.pg.o *.sy.o
-	@rm -f ../lib/$(hosttype)_$(METHOD)/liblaspack.*
+	@rm -f $(EXTERNAL_LIBDIR)/liblaspack.*
 
 distclean:
 	@$(MAKE) clobber
