@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.18 2005-05-06 17:07:00 roystgnr Exp $
+// $Id: elem.h,v 1.19 2005-05-07 00:22:29 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -950,7 +950,8 @@ inline
 bool Elem::active() const
 {
 #ifdef ENABLE_AMR
-  if (refinement_flag() == INACTIVE || refinement_flag() == COARSEN_INACTIVE)
+  if ((this->refinement_flag() == INACTIVE) ||
+      (this->refinement_flag() == COARSEN_INACTIVE))
     return false;
   else
     return true;

@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.82 2005-05-06 17:43:27 roystgnr Exp $
+dnl $Id: aclocal.m4,v 1.83 2005-05-07 00:22:14 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -254,8 +254,8 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
 
   dnl First the flags for gcc compilers
   if (test "$GXX" = yes -a "x$REAL_GXX" != "x" ) ; then
-    CXXFLAGSO="$CXXFLAGSO -O2 -felide-constructors -DNDEBUG"
-    CXXFLAGSG="$CXXFLAGSG -O2 -felide-constructors -g -ansi -pedantic -W -Wall -Wunused -Wpointer-arith -Wimplicit -Wformat -Wparentheses -Wuninitialized -DDEBUG"
+    CXXFLAGSO="$CXXFLAGSO -O2 -felide-constructors -Wuninitialized -DNDEBUG"
+    CXXFLAGSG="$CXXFLAGSG -O0 -felide-constructors -g -ansi -pedantic -W -Wall -Wunused -Wpointer-arith -Wimplicit -Wformat -Wparentheses -DDEBUG"
     CXXFLAGSP="$CXXFLAGSO -g -pg"
     CXXFLAGSS="-fsyntax-only"
 
