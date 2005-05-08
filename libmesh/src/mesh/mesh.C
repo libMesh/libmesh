@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.48 2005-02-22 22:17:39 jwpeterson Exp $
+// $Id: mesh.C,v 1.49 2005-05-08 14:11:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -399,3 +399,81 @@ void Mesh::create_submesh (Mesh& new_mesh,
   new_mesh.prepare_for_use();
   
 }
+
+
+
+
+bool Mesh::contract ()
+{
+  START_LOG ("contract()", "MeshRefinement");
+
+  // Flag indicating if this call actually changes the mesh
+  bool mesh_changed = false;
+
+  std::vector<Elem*>::iterator in        = _elements.begin();
+  std::vector<Elem*>::iterator out       = _elements.begin();
+  const std::vector<Elem*>::iterator end = _elements.end();
+
+#ifdef DEBUG
+  for ( ; in != end; ++in)
+    if (*in != NULL)
+      {
+	Elem* elem = *in;
+	assert(elem->active() || elem->subactive() || elem->ancestor());
+      }
+  in = _elements.begin();
+#endif
+
+  // Loop over the elements.   
+  for ( ; in != end; ++in)
+    if (*in != NULL)
+      {
+	Elem* elem = *in;
+
+	// Delete all the subactive ones
+	if (elem->subactive())
+	  {
+	    // Huh?  no level-0 element should be subactive
+	    assert (elem->level() != 0);
+
+	    // Make sure we dealt with parents first
+	    if (elem->parent()->has_children())
+	      {
+		std::cerr << "Element being deleted is still a child." << std::endl;
+	      }
+
+	    // Delete the element
+	    delete elem;
+	    *in = NULL;
+	    
+	    // the mesh has certainly changed
+	    mesh_changed = true;
+	  }
+	else
+	  {
+	    // Compress all the active ones
+	    if (elem->active())
+	      elem->contract();
+	    else
+	      assert (elem->ancestor());
+
+	    // These elements are kept, pack them
+	    // contiguously in the _elements vector
+	    *out = *in;
+	    ++out;
+	  }
+      }
+
+  // Erase any additional storage. These elements have been
+  // copied into NULL voids by the procedure above, and are
+  // thus repeated and unnecessary.
+  _elements.erase (out, end);
+
+  STOP_LOG ("contract()", "MeshRefinement");
+
+  return mesh_changed;
+}
+
+
+
+
