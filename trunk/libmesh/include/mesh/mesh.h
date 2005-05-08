@@ -1,4 +1,4 @@
-// $Id: mesh.h,v 1.12 2005-02-22 22:17:33 jwpeterson Exp $
+// $Id: mesh.h,v 1.13 2005-05-08 14:11:06 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -26,7 +26,6 @@
 
 // Local Includes -----------------------------------
 #include "mesh_base.h"
-//#include "elem_iterators.h"
 
 
 
@@ -59,36 +58,6 @@ class Mesh : public MeshBase
    * Destructor.
    */
   ~Mesh();
-
-//   /**
-//    * Builds a \f$ nx \times ny \times nz \f$ (elements) cube.
-//    * Defaults to a unit cube (or line in 1D, square in 2D),
-//    * but the dimensions can be specified through the optional
-//    * arguments.
-//    */  
-//   void build_cube (const unsigned int nx=0,
-// 		   const unsigned int ny=0,
-// 		   const unsigned int nz=0,
-// 		   const Real xmin=0., const Real xmax=1.,
-// 		   const Real ymin=0., const Real ymax=1.,
-// 		   const Real zmin=0., const Real zmax=1.,
-// 		   const ElemType type=INVALID_ELEM);
-
-//   /**
-//    * A specialized \p build_cube() for 2D meshes.
-//    */
-//   void build_square (const unsigned int nx,
-// 		     const unsigned int ny,
-// 		     const Real xmin=0., const Real xmax=1.,
-// 		     const Real ymin=0., const Real ymax=1.,
-// 		     const ElemType type=INVALID_ELEM);
-
-//   /**
-//    * Meshes a spherical or mapped-spherical domain.
-//    */
-//   void build_sphere (const Real rad=1,
-// 		     const unsigned int nr=2,
-// 		     const ElemType type=INVALID_ELEM);
 
   /**
    * Reads the file specified by \p name.  Attempts to figure out the
@@ -156,7 +125,13 @@ class Mesh : public MeshBase
   void create_submesh (Mesh& new_mesh,
 		       const_element_iterator& it,
 		       const const_element_iterator& it_end) const;
-
+  
+  /**
+   * Delete subactive (i.e. children of coarsened) elements.
+   * This removes all elements descended from currently active
+   * elements in the mesh.
+   */
+  virtual bool contract ();
 
   
  private:

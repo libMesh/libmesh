@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.91 2005-05-05 20:20:48 benkirk Exp $
+// $Id: mesh_base.C,v 1.92 2005-05-08 14:11:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -546,9 +546,6 @@ void MeshBase::renumber_nodes_and_elements ()
       
       // Number the elements
       {
-// 	elem_iterator       it(this->elements_begin());
-// 	const elem_iterator end(this->elements_end());
-
 	element_iterator       it  = this->elements_begin();
 	const element_iterator end = this->elements_end();
 	
@@ -560,12 +557,8 @@ void MeshBase::renumber_nodes_and_elements ()
 
       // Number the nodes
       {
-// 	node_iterator       it(this->nodes_begin());
-// 	const node_iterator end(this->nodes_end());
-
 	node_iterator       it  = this->nodes_begin();
 	const node_iterator end = this->nodes_end();
-
 	
 	unsigned int id=0;
 
@@ -716,57 +709,11 @@ void MeshBase::delete_elem(Elem* e)
 
 bool MeshBase::contract ()
 {
-  START_LOG ("contract()", "MeshRefinement");
+  std::cerr << "ERROR:  This method must be re-implemented in derived classes!"
+	    << std::endl;
+  error();
 
-  // Flag indicating if this call actually changes the mesh
-  bool mesh_changed = false;
-
-  MeshBase::element_iterator       it  = this->elements_begin();
-  const MeshBase::element_iterator end = this->elements_end();
-
-#ifdef DEBUG
-  for ( ; it != end; ++it)
-    {
-      Elem* elem = *it;
-      assert(elem->active() || elem->subactive() || elem->ancestor());
-    }
-  it = this->elements_begin();
-#endif
-
-  // Loop over the elements.   
-  for ( ; it != end; ++it)
-    {
-      Elem* elem = *it;
-
-      // Compress all the active ones
-      if (elem->active())
-        {
-	  elem->contract();
-        }
-      // Delete all the subactive ones
-      else if (elem->subactive())
-        {
-	  // Huh?  no level-0 element should be subactive
-	  assert (elem->level() != 0);
-
-	  // Make sure we dealt with parents first
-	  if (elem->parent()->has_children())
-	    {
-	      std::cerr << "Element being deleted is still a child." << std::endl;
-	    }
-
-	  // Delete the element through the Mesh interface
-	  this->delete_elem(elem);
-
-	  // the mesh has certainly changed
-	  mesh_changed = true;
-        }
-      else
-        assert (elem->ancestor());
-    }
-  STOP_LOG ("contract()", "MeshRefinement");
-
-  return mesh_changed;
+  return false;
 }
 
 

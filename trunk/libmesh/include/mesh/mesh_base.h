@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.43 2005-05-03 23:22:23 roystgnr Exp $
+// $Id: mesh_base.h,v 1.44 2005-05-08 14:11:07 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -62,8 +62,8 @@ class EquationSystems;
  * mesh to disk in various formats.
  *
  * \author  Benjamin S. Kirk
- * \date    $Date: 2005-05-03 23:22:23 $
- * \version $Revision: 1.43 $
+ * \date    $Date: 2005-05-08 14:11:07 $
+ * \version $Revision: 1.44 $
  */
 
 
@@ -278,20 +278,6 @@ public:
    * does just that.
    */
   void renumber_nodes_and_elements ();    
-
-//   /**
-//    * Builds the connectivity graph. The matrix \p conn is such that the
-//    * valence of each node is on the diagonal and there is a -1 for each
-//    * node connected to the node.
-//    */
-//   void build_L_graph (PetscMatrix<Number>& conn) const;
-  
-//   /**
-//    * Builds the connectivity graph. The matrix \p conn is such that the
-//    * valence of each node is on the diagonal and there is a -1 for each
-//    * node connected to the node.
-//    */
-//   void build_script_L_graph (PetscMatrix<Number>& conn) const;
   
   /**
    * Returns the number of subdomains in the global mesh. Note that it is
@@ -352,8 +338,6 @@ public:
    */
   struct element_iterator;
   struct const_element_iterator;
-  //typedef variant_filter_iterator<Elem*      , Predicate>       element_iterator;
-  //typedef variant_filter_iterator<Elem* const, Predicate> const_element_iterator;
 
   /**
    * structs for the node_iterator's.
@@ -363,8 +347,6 @@ public:
    */
   struct node_iterator;
   struct const_node_iterator;
-  //typedef variant_filter_iterator<Node*      , Predicate>       node_iterator;
-  //typedef variant_filter_iterator<Node* const, Predicate> const_node_iterator;
 
 private:
   /**
@@ -504,7 +486,7 @@ public:
    * This removes all elements descended from currently active
    * elements in the mesh.
    */
-  bool contract();
+  virtual bool contract ();
   
   
 protected:
