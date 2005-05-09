@@ -1,5 +1,5 @@
 dnl --------------------------------------------------------------
-dnl $Id: configure.in,v 1.54 2005-05-02 13:12:23 spetersen Exp $
+dnl $Id: configure.in,v 1.55 2005-05-09 20:38:38 jwpeterson Exp $
 dnl --------------------------------------------------------------
 dnl Process this file with autoconf to produce a configure script.
 
@@ -9,7 +9,7 @@ dnl you call ./configure subsequently on different systems without
 dnl clearing the cache 
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
-AC_REVISION($Revision: 1.54 $)
+AC_REVISION($Revision: 1.55 $)
 
 
 AC_INIT
@@ -18,15 +18,27 @@ AC_CONFIG_FILES(doc/Doxyfile)
 AC_CONFIG_FILES(contrib/bin/libmesh-config,         [chmod +x contrib/bin/libmesh-config])
 AC_CONFIG_FILES(contrib/bin/xda2mgf,                [chmod +x contrib/bin/xda2mgf])
 AC_CONFIG_FILES(contrib/bin/create_libmesh_release, [chmod +x contrib/bin/create_libmesh_release])
+AC_CONFIG_FILES(include/base/libmesh_contrib_config.h)
 AC_CONFIG_HEADER(include/base/libmesh_config.h:include/base/libmesh_config.h.in)
 
 AC_MSG_RESULT(---------------------------------------------)
 AC_MSG_RESULT(----------- Configuring libMesh -------------)
 AC_MSG_RESULT(---------------------------------------------)
 
+dnl Compute the canonical target system type variable "target", and its
+dnl three individual parts: "target_cpu", "target_vendor", and "target_os"
 AC_CANONICAL_TARGET
+
+dnl Do compilation tests using the compiler, preprocessor, and file extensions
+dnl of C++.  This uses the .C extension for test programs.
 AC_LANG_CPLUSPLUS
+
+dnl Determines a C++ compiler to use.  First checks if the variable CXX is
+dnl already set.  If not, then searches under g++, c++, and other names.
 AC_PROG_CXX
+
+dnl Determine a C compiler to use.  If CC is not already set, checks for
+dnl gcc, cc, and other C compilers.  Then sets the CC variable to the result.
 AC_PROG_CC
 
 
@@ -41,9 +53,20 @@ AC_ARG_ENABLE(shared,
 AC_SUBST(enableshared)	
 dnl --------------------------------------------------------------
 
+dnl See aclocal.m4 for the definition of this function.  It can
+dnl figure out which version of a particular compiler, e.g. GCC 4.0,
+dnl you are using.
 DETERMINE_CXX_BRAND
+
+dnl See aclocal.m4 for the definition of this as well.  It uses the
+dnl output of DETERMINE_CXX_BRAND to set special flags for idiosyncratic
+dnl compilers.  For example, newer versions of GCC have additional C++ debugging
+dnl flags like _GLIBCXX_DEBUG_PEDANTIC which were not present in older versions.
 SET_CXX_FLAGS
 
+dnl The AC_SUBST(foo) command creates an output variable from a shell variable.
+dnl This command also causes AC_OUTPUT to replace all instances of @VAR@ with
+dnl the value of the shell variable VAR in the output files (e.g. one or more Makefiles).
 AC_SUBST(host)
 AC_SUBST(GXX_VERSION)
 AC_SUBST(CXXFLAGSG)
@@ -83,6 +106,7 @@ AC_CHECK_HEADERS(hash_set,[],[AC_CHECK_HEADERS(ext/hash_set)])
 
 
 dnl --------------------------------------------------------------
+dnl This is a special test for the mpCC (IBM) compiler.
 dnl mpCC fails the AC_LANG tests. Set the compiler to 
 dnl mpCC if it is there instead of xlC, but only do this
 dnl _after_ configure is finished using CXX!
@@ -587,9 +611,9 @@ AC_ARG_ENABLE(triangle,
                              [build with Triangle Delaunay triangulation library support]),
               enabletriangle=$enableval,
               enabletriangle=yes)
-if test "$enabletriangle" != no ; then
+dnl if test "$enabletriangle" != no ; then
   CONFIGURE_TRIANGLE
-fi
+dnl fi
 dnl -------------------------------------------------------------
 
 

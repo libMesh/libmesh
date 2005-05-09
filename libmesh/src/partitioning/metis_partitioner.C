@@ -1,4 +1,4 @@
-// $Id: metis_partitioner.C,v 1.19 2005-02-22 22:17:42 jwpeterson Exp $
+// $Id: metis_partitioner.C,v 1.20 2005-05-09 20:38:42 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -105,8 +105,6 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
   // We need to map the active element ids into a
   // contiguous range.
   {
-//     active_elem_iterator       elem_it (mesh.elements_begin());
-//     const active_elem_iterator elem_end(mesh.elements_end());
 
     MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
     const MeshBase::element_iterator elem_end = mesh.active_elements_end(); 
@@ -130,8 +128,6 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
   {
     std::vector<const Elem*> neighbors_offspring;
     
-//     const_active_elem_iterator       elem_it (mesh.const_elements_begin());
-//     const const_active_elem_iterator elem_end(mesh.const_elements_end());
 
     MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
     const MeshBase::element_iterator elem_end = mesh.active_elements_end(); 

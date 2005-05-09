@@ -1,4 +1,4 @@
-// $Id: mesh_generation.h,v 1.6 2005-05-05 21:13:30 jwpeterson Exp $
+// $Id: mesh_generation.h,v 1.7 2005-05-09 20:38:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -27,9 +27,9 @@
 // C++ Includes   -----------------------------------
 
 // Local Includes -----------------------------------
-#include "libmesh_common.h"
-#include "enum_elem_type.h"
-#include "libmesh.h"
+// #include "libmesh_common.h" // needed for Real
+#include "enum_elem_type.h" // needed for ElemType enum
+#include "libmesh.h"        // needed for libMesh::invalid_uint
 
 // forward declarations
 class Mesh;
@@ -45,7 +45,7 @@ namespace MeshTools
    *
    * \author Benjamin S. Kirk
    * \date 2004
-   * \version $Revision: 1.6 $
+   * \version $Revision: 1.7 $
    */
   namespace Generation
   {

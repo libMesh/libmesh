@@ -1,4 +1,4 @@
-// $Id: xdr_io.C,v 1.8 2005-02-22 22:17:41 jwpeterson Exp $
+// $Id: xdr_io.C,v 1.9 2005-05-09 20:38:42 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -2221,10 +2221,11 @@ void XdrIO::write_mesh (const std::string& name,
   // header variables that may
   // be read OR written.
   std::vector<unsigned int> neeb;
-
+  std::vector<ElemType> etypes;
+  
   const int                   numElem = mesh.n_elem();       
   const int                   numBCs  = mesh.boundary_info.n_boundary_conds();
-  const std::vector<ElemType> etypes  = mesh.elem_types();
+  mesh.elem_types(etypes);
   neeb.resize(etypes.size());
 	
   for (unsigned int i=0; i<etypes.size(); i++)

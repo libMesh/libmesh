@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.44 2005-05-08 14:11:07 benkirk Exp $
+// $Id: mesh_base.h,v 1.45 2005-05-09 20:38:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -27,19 +27,18 @@
 // C++ Includes   -----------------------------------
 #include <algorithm>
 #include <vector>
-#include <set>
 #include <string>
 
 
 // forward declarations
 class Elem;
 class EquationSystems;
-
+class Node;
+class Point;
 
 // Local Includes -----------------------------------
 #include "libmesh_common.h"
 #include "boundary_info.h"
-#include "node.h"
 #include "enum_elem_type.h"
 #include "enum_order.h"
 #include "partitioner.h"
@@ -62,8 +61,8 @@ class EquationSystems;
  * mesh to disk in various formats.
  *
  * \author  Benjamin S. Kirk
- * \date    $Date: 2005-05-08 14:11:07 $
- * \version $Revision: 1.44 $
+ * \date    $Date: 2005-05-09 20:38:41 $
+ * \version $Revision: 1.45 $
  */
 
 
@@ -89,11 +88,6 @@ public:
   virtual ~MeshBase ();
 
   /**
-   * Deletes all the data that are currently stored.
-   */
-  virtual void clear ();
-  
-  /**
    * This class holds the boundary information.  It can store nodes, edges,
    * and faces with a corresponding id that facilitates setting boundary
    * conditions.
@@ -101,11 +95,15 @@ public:
   BoundaryInfo boundary_info;
   
   /**
+   * Deletes all the data that are currently stored.
+   */
+  virtual void clear ();
+  
+  /**
    * @returns \p true if the mesh has been prepared via a call
    * to \p prepare_for_use, \p false otherwise.
    */
-  bool is_prepared () const
-  { return _is_prepared; }
+  bool is_prepared () const  { return _is_prepared; }
   
   /**
    * Returns the logical dimension of the mesh.
@@ -121,9 +119,11 @@ public:
   { return static_cast<unsigned int>(DIM); }
   
   /**
-   * Returns the number of nodes in the mesh.
+   * Returns the number of nodes in the mesh. This function and others must
+   * be defined in derived classes since the MeshBase class has no specific
+   * storage for nodes or elements.
    */
-  unsigned int n_nodes () const { return _nodes.size(); }
+  virtual unsigned int n_nodes () const = 0; 
 
   /**
    * Reserves space for a known number of nodes.
@@ -132,12 +132,12 @@ public:
    * of nodes you will add and call this method before repeatedly
    * calling \p add_point() the implementation will be more efficient.
    */
-  void reserve_nodes (const unsigned int nn) { _nodes.reserve (nn); }
+  virtual void reserve_nodes (const unsigned int nn) =0; 
   
   /**
    * Returns the number of elements in the mesh.
    */
-  unsigned int n_elem ()  const { return _elements.size(); }
+  virtual unsigned int n_elem ()  const = 0; 
 
   /**
    * Reserves space for a known number of elements.
@@ -146,26 +146,29 @@ public:
    * of elements you will add and call this method before repeatedly
    * calling \p add_point() the implementation will be more efficient.
    */
-  void reserve_elem (const unsigned int ne) { _elements.reserve (ne); }
+  virtual void reserve_elem (const unsigned int ne) =0; 
 
   /**
-   * Returns the number of active elements in the mesh.
+   * Returns the number of active elements in the mesh.  Implemented
+   * in terms of active_element_iterators.
    */
   unsigned int n_active_elem () const;
 
   /**
-   * Return a vector of all
-   * element types for the mesh.
+   * Return a vector of all element types for the mesh.  Implemented
+   * in terms of element_iterators.
    */
-  std::vector<ElemType> elem_types () const;
+  void elem_types (std::vector<ElemType>& et) const;
   
   /**
-   * Return the number of elements of type \p type.
+   * Return the number of elements of type \p type.  Implemented
+   * in terms of type_element_iterators.
    */
   unsigned int n_elem_of_type (const ElemType type) const;
 
   /**
    * Return the number of active elements of type \p type.
+   * Implemented in terms of active_type_element_iterators.
    */
   unsigned int n_active_elem_of_type (const ElemType type) const;
 
@@ -196,6 +199,7 @@ public:
    * out in the Tecplot format.  For example, a 9-noded quadrilateral will
    * be broken into 4 linear sub-elements for plotting purposes.  Thus, for
    * a mesh of 2 \p QUAD9 elements  \p n_tecplot_elem() will return 8.
+   * Implemented in terms of element_iterators.
    */
   unsigned int n_sub_elem () const;
 
@@ -208,51 +212,56 @@ public:
    * Return a constant reference (for reading only) to the
    * \f$ i^{th} \f$ point.
    */  
-  const Point& point (const unsigned int i) const;
+  virtual const Point& point (const unsigned int i) const = 0;
 
   /**
    * Return a constant reference (for reading only) to the
    * \f$ i^{th} \f$ node.
    */  
-  const Node& node (const unsigned int i) const;
+  virtual const Node& node (const unsigned int i) const = 0;
   
   /**
    * Return a reference to the \f$ i^{th} \f$ node.
    */  
-  Node& node (const unsigned int i);
+  virtual Node& node (const unsigned int i) = 0;
   
   /**
    * Return a pointer to the \f$ i^{th} \f$ node.
    */  
-  const Node* node_ptr (const unsigned int i) const;
+  virtual const Node* node_ptr (const unsigned int i) const = 0;
 
   /**
    * Return a pointer to the \f$ i^{th} \f$ node.
    */  
-  Node* & node_ptr (const unsigned int i);
+  virtual Node* & node_ptr (const unsigned int i) = 0;
+
+  /**
+   * Return a pointer to the \f$ i^{th} \f$ element.
+   */
+  virtual Elem* elem (const unsigned int i) const = 0;
 
   /**
    * Add \p Node \p n to the vertex array.  The node will be appended to the
    * end of the vertex array. 
    */
-  Node* add_point (const Point& n);
+  virtual Node* add_point (const Point& n) = 0;
 
   /**
-   * Return a pointer to the \f$ i^{th} \f$ element.
+   * Removes the Node n from the mesh.
    */
-  Elem* elem (const unsigned int i) const;
-
+  virtual void delete_node (Node* n) = 0;
+  
   /**
    * Add elem \p e to the end of the element array.
    */
-  Elem* add_elem (Elem* e);
+  virtual Elem* add_elem (Elem* e) = 0;
 
   /**
    * Removes element \p e from the mesh. Note that calling this
    * method may produce isolated nodes, i.e. nodes not connected
    * to any element.
    */
-  void delete_elem (Elem* e);
+  virtual void delete_elem (Elem* e) = 0;
 		      
   /**
    * Locate element face (edge in 2D) neighbors.  This is done with the help
@@ -264,20 +273,35 @@ public:
    * pointer are guaranteed to be on the boundary.  Thus this routine is
    * useful for automatically determining the boundaries of the domain.
    */
-  void find_neighbors ();
+  virtual void find_neighbors () = 0;
   
-    
-  /**
-   * Call the default partitioner (currently \p metis_partition()).
-   */
-  virtual void partition (const unsigned int n_parts=libMesh::n_processors());
-
   /**
    * After partitoning a mesh it is useful to renumber the nodes and elements
    * so that they lie in contiguous blocks on the processors.  This method
    * does just that.
    */
-  void renumber_nodes_and_elements ();    
+  virtual void renumber_nodes_and_elements () = 0;    
+
+  /**
+   * Delete subactive (i.e. children of coarsened) elements.
+   * This removes all elements descended from currently active
+   * elements in the mesh.
+   */
+  virtual bool contract () = 0;
+
+  /**
+   * Prepare a newly created (or read) mesh for use.
+   * This involves 3 steps:
+   *  1.) call \p find_neighbors()
+   *  2.) call \p partition()
+   *  3.) call \p renumber_nodes_and_elements() 
+   */
+  void prepare_for_use ();
+  
+  /**
+   * Call the default partitioner (currently \p metis_partition()).
+   */
+  void partition (const unsigned int n_parts=libMesh::n_processors());
   
   /**
    * Returns the number of subdomains in the global mesh. Note that it is
@@ -348,20 +372,7 @@ public:
   struct node_iterator;
   struct const_node_iterator;
 
-private:
-  /**
-   * Typedefs for the container implementation.  In this case,
-   * it's just a std::vector<Elem*>.
-   */
-  typedef std::vector<Elem*>::iterator             elem_iterator_imp;
-  typedef std::vector<Elem*>::const_iterator const_elem_iterator_imp;
 
-  /**
-   * Typedefs for the container implementation.  In this case,
-   * it's just a std::vector<Node*>.
-   */
-  typedef std::vector<Node*>::iterator             node_iterator_imp;
-  typedef std::vector<Node*>::const_iterator const_node_iterator_imp;
 
 
 public:
@@ -369,124 +380,84 @@ public:
 
   
   /**
-   * Elem iterator accessor functions.
+   * Elem iterator accessor functions.  These must be defined in
+   * Concrete base classes.
    */
-  element_iterator elements_begin ();
-  element_iterator elements_end   ();
-
-  element_iterator active_elements_begin ();
-  element_iterator active_elements_end   ();
-
-  element_iterator not_active_elements_begin ();
-  element_iterator not_active_elements_end   ();
-
-  element_iterator local_elements_begin ();
-  element_iterator local_elements_end   ();
-
-  element_iterator active_local_elements_begin ();
-  element_iterator active_local_elements_end   ();
-
-  element_iterator level_elements_begin (const unsigned int level);
-  element_iterator level_elements_end   (const unsigned int level);
-
-  element_iterator not_level_elements_begin (const unsigned int level);
-  element_iterator not_level_elements_end   (const unsigned int level);
-
-  element_iterator pid_elements_begin (const unsigned int proc_id);
-  element_iterator pid_elements_end   (const unsigned int proc_id);
-
-  element_iterator type_elements_begin (const ElemType type);
-  element_iterator type_elements_end   (const ElemType type);
-
-  element_iterator active_type_elements_begin (const ElemType type);
-  element_iterator active_type_elements_end   (const ElemType type);
-
-  element_iterator active_pid_elements_begin (const unsigned int proc_id);
-  element_iterator active_pid_elements_end   (const unsigned int proc_id);
+  virtual element_iterator elements_begin              () = 0;
+  virtual element_iterator elements_end                () = 0;
+  virtual element_iterator active_elements_begin       () = 0;
+  virtual element_iterator active_elements_end         () = 0;
+  virtual element_iterator not_active_elements_begin   () = 0;
+  virtual element_iterator not_active_elements_end     () = 0;
+  virtual element_iterator local_elements_begin        () = 0;
+  virtual element_iterator local_elements_end          () = 0;
+  virtual element_iterator active_local_elements_begin () = 0;
+  virtual element_iterator active_local_elements_end   () = 0;
+  virtual element_iterator level_elements_begin        (const unsigned int level  ) = 0;
+  virtual element_iterator level_elements_end          (const unsigned int level  ) = 0;
+  virtual element_iterator not_level_elements_begin    (const unsigned int level  ) = 0;
+  virtual element_iterator not_level_elements_end      (const unsigned int level  ) = 0;
+  virtual element_iterator pid_elements_begin          (const unsigned int proc_id) = 0;
+  virtual element_iterator pid_elements_end            (const unsigned int proc_id) = 0;
+  virtual element_iterator type_elements_begin         (const ElemType type       ) = 0;
+  virtual element_iterator type_elements_end           (const ElemType type       ) = 0;
+  virtual element_iterator active_type_elements_begin  (const ElemType type       ) = 0;
+  virtual element_iterator active_type_elements_end    (const ElemType type       ) = 0;
+  virtual element_iterator active_pid_elements_begin   (const unsigned int proc_id) = 0;
+  virtual element_iterator active_pid_elements_end     (const unsigned int proc_id) = 0;
 
   
   
   /**
    * const Elem iterator accessor functions.
    */
-  const_element_iterator elements_begin() const;
-  const_element_iterator elements_end()   const;
+  virtual const_element_iterator elements_begin              () const = 0;
+  virtual const_element_iterator elements_end                () const = 0;
+  virtual const_element_iterator active_elements_begin       () const = 0;
+  virtual const_element_iterator active_elements_end         () const = 0;
+  virtual const_element_iterator not_active_elements_begin   () const = 0;
+  virtual const_element_iterator not_active_elements_end     () const = 0;
+  virtual const_element_iterator local_elements_begin        () const = 0;
+  virtual const_element_iterator local_elements_end          () const = 0;
+  virtual const_element_iterator active_local_elements_begin () const = 0;
+  virtual const_element_iterator active_local_elements_end   () const = 0;
+  virtual const_element_iterator level_elements_begin        (const unsigned int level)   const = 0;
+  virtual const_element_iterator level_elements_end          (const unsigned int level)   const = 0;
+  virtual const_element_iterator not_level_elements_begin    (const unsigned int level)   const = 0;
+  virtual const_element_iterator not_level_elements_end      (const unsigned int level)   const = 0;
+  virtual const_element_iterator pid_elements_begin          (const unsigned int proc_id) const = 0;
+  virtual const_element_iterator pid_elements_end            (const unsigned int proc_id) const = 0;
+  virtual const_element_iterator type_elements_begin         (const ElemType type)        const = 0;
+  virtual const_element_iterator type_elements_end           (const ElemType type)        const = 0;
+  virtual const_element_iterator active_type_elements_begin  (const ElemType type)        const = 0;
+  virtual const_element_iterator active_type_elements_end    (const ElemType type)        const = 0;
+  virtual const_element_iterator active_pid_elements_begin   (const unsigned int proc_id) const = 0;
+  virtual const_element_iterator active_pid_elements_end     (const unsigned int proc_id) const = 0;
 
-  const_element_iterator active_elements_begin() const;
-  const_element_iterator active_elements_end()   const;
-
-  const_element_iterator not_active_elements_begin() const;
-  const_element_iterator not_active_elements_end()   const;
-
-  const_element_iterator local_elements_begin () const;
-  const_element_iterator local_elements_end   () const;
-
-  const_element_iterator active_local_elements_begin () const;
-  const_element_iterator active_local_elements_end   () const;
-
-  const_element_iterator level_elements_begin (const unsigned int level) const;
-  const_element_iterator level_elements_end   (const unsigned int level) const;
-
-  const_element_iterator not_level_elements_begin (const unsigned int level) const;
-  const_element_iterator not_level_elements_end   (const unsigned int level) const;
-
-  const_element_iterator pid_elements_begin (const unsigned int proc_id) const;
-  const_element_iterator pid_elements_end   (const unsigned int proc_id) const;
-
-  const_element_iterator type_elements_begin (const ElemType type) const;
-  const_element_iterator type_elements_end   (const ElemType type) const;
-
-  const_element_iterator active_type_elements_begin (const ElemType type) const;
-  const_element_iterator active_type_elements_end   (const ElemType type) const;
-
-  const_element_iterator active_pid_elements_begin (const unsigned int proc_id) const;
-  const_element_iterator active_pid_elements_end   (const unsigned int proc_id) const;
-
-
-
-
-
-
-
+  
   /**
    * non-const Node iterator accessor functions.
    */
-  node_iterator nodes_begin();
-  node_iterator nodes_end();
-
-  node_iterator active_nodes_begin();
-  node_iterator active_nodes_end();
+  virtual node_iterator nodes_begin        () = 0;
+  virtual node_iterator nodes_end          () = 0;
+  virtual node_iterator active_nodes_begin () = 0;
+  virtual node_iterator active_nodes_end   () = 0;
 
 
   /**
    * const Node iterator accessor functions.
    */
-  const_node_iterator nodes_begin() const;
-  const_node_iterator nodes_end()   const;
+  virtual const_node_iterator nodes_begin        () const = 0;
+  virtual const_node_iterator nodes_end          () const = 0;
+  virtual const_node_iterator active_nodes_begin () const = 0;
+  virtual const_node_iterator active_nodes_end   () const = 0;
 
-  const_node_iterator active_nodes_begin() const;
-  const_node_iterator active_nodes_end()   const;
-
-
-  
 
   
-  /**
-   * Prepare a newly created (or read) mesh for use.
-   * This involves 3 steps:
-   *  1.) call \p find_neighbors()
-   *  2.) call \p partition()
-   *  3.) call \p renumber_nodes_and_elements() 
-   */
-  virtual void prepare_for_use ();
+
+  
   
 
-  /**
-   * Delete subactive (i.e. children of coarsened) elements.
-   * This removes all elements descended from currently active
-   * elements in the mesh.
-   */
-  virtual bool contract ();
   
   
 protected:
@@ -505,16 +476,6 @@ protected:
    */
   unsigned int& set_n_partitions () { return _n_parts; }
   
-  /**
-   * The verices (spatial coordinates) of the mesh.
-   */
-  std::vector<Node*> _nodes;
-
-  /**
-   * The elements in the mesh.
-   */
-  std::vector<Elem*> _elements;
-
   /**
    * The number of subdomains the mesh has.
    * **NOTE** Not to be confused with the number of paritions!
@@ -546,17 +507,18 @@ protected:
    */
   bool _is_prepared;
   
-  /**
-   * Make the \p BoundaryInfo class a friend so that
-   * it can create and interact with \p BoundaryMesh.
-   */
-  friend class BoundaryInfo;
 
   /**
    * The partitioner class is a friend so that it can set
    * the number of partitions.
    */
   friend class Partitioner;
+
+  /**
+   * Make the \p BoundaryInfo class a friend so that
+   * it can create and interact with \p BoundaryMesh.
+   */
+  friend class BoundaryInfo;
 
 };
 
@@ -566,82 +528,6 @@ protected:
 
 
 
-
-// ------------------------------------------------------------
-// MeshBase inline methods
-inline
-Elem* MeshBase::elem (const unsigned int i) const
-{
-  assert (i < this->n_elem());
-  assert (_elements[i] != NULL);
-  
-  return _elements[i];
-}
-
-
-
-inline
-const Point& MeshBase::point (const unsigned int i) const
-{
-  assert (i < this->n_nodes());
-  assert (_nodes[i] != NULL);
-  assert (_nodes[i]->id() != Node::invalid_id);  
-
-  return (*_nodes[i]);
-}
-
-
-
-inline
-const Node& MeshBase::node (const unsigned int i) const
-{
-  assert (i < this->n_nodes());
-  assert (_nodes[i] != NULL);
-  assert (_nodes[i]->id() != Node::invalid_id);  
-  
-  return (*_nodes[i]);
-}
-
-
-
-inline
-Node& MeshBase::node (const unsigned int i)
-{
-  if (i >= this->n_nodes())
-    {
-      std::cout << " i=" << i
-		<< ", n_nodes()=" << this->n_nodes()
-		<< std::endl;
-      error();
-    }
-  
-  assert (i < this->n_nodes());
-  assert (_nodes[i] != NULL);
-
-  return (*_nodes[i]);
-}
-
-
-
-inline
-const Node* MeshBase::node_ptr (const unsigned int i) const
-{
-  assert (i < this->n_nodes());
-  assert (_nodes[i] != NULL);
-  assert (_nodes[i]->id() != Node::invalid_id);  
-  
-  return _nodes[i];
-}
-
-
-
-inline
-Node* & MeshBase::node_ptr (const unsigned int i)
-{
-  assert (i < this->n_nodes());
-
-  return _nodes[i];
-}
 
 
 
