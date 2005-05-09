@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.44 2005-05-06 17:43:27 roystgnr Exp $
+# $Id: Make.common.in,v 1.45 2005-05-09 12:35:23 spetersen Exp $
 
 
 ###############################################################################
@@ -407,6 +407,9 @@ ifeq ($(enable-optional),yes)
   endif
   ifeq ($(enable-sfcurves),yes)
     libs_EXTERNAL += -lsfcurves
+  endif
+  ifeq ($(enable-triangle),yes)
+    libs_EXTERNAL += -ltriangle
   endif
 
   EXTERNAL_FLAGS += $(libs_EXTERNAL)
