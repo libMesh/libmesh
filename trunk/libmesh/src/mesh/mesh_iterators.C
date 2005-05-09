@@ -1,4 +1,4 @@
-// $Id: mesh_iterators.C,v 1.5 2005-03-21 15:19:29 benkirk Exp $
+// $Id: mesh_iterators.C,v 1.6 2005-05-09 20:38:42 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -22,7 +22,8 @@
 // C++ includes
 
 // Local includes
-#include "mesh_base.h"
+// #include "mesh_base.h"
+#include "mesh.h"
 #include "elem.h"
 
 // This file contains the implementation of all the different iterator
@@ -31,8 +32,8 @@
 
 
 // default begin() accessor
-MeshBase::element_iterator
-MeshBase::elements_begin ()
+Mesh::element_iterator
+Mesh::elements_begin ()
 {
   Predicates::NotNull<elem_iterator_imp> p;
   return element_iterator(_elements.begin(), _elements.end(), p);
@@ -40,8 +41,8 @@ MeshBase::elements_begin ()
 
 
 // active elements begin() accessor
-MeshBase::element_iterator
-MeshBase::active_elements_begin ()
+Mesh::element_iterator
+Mesh::active_elements_begin ()
 {
   Predicates::Active<elem_iterator_imp> p;
   return element_iterator(_elements.begin(), _elements.end(), p);
@@ -49,8 +50,8 @@ MeshBase::active_elements_begin ()
 
 
 // not active elements begin() accessor
-MeshBase::element_iterator
-MeshBase::not_active_elements_begin ()
+Mesh::element_iterator
+Mesh::not_active_elements_begin ()
 {
   Predicates::NotActive<elem_iterator_imp> p;
   return element_iterator(_elements.begin(), _elements.end(), p);
@@ -58,8 +59,8 @@ MeshBase::not_active_elements_begin ()
 
 
 // local elements begin() accessor
-MeshBase::element_iterator
-MeshBase::local_elements_begin ()
+Mesh::element_iterator
+Mesh::local_elements_begin ()
 {
   Predicates::Local<elem_iterator_imp> p;
   return element_iterator(_elements.begin(), _elements.end(), p);
@@ -67,8 +68,8 @@ MeshBase::local_elements_begin ()
 
 
 // active local elements begin() accessor
-MeshBase::element_iterator
-MeshBase::active_local_elements_begin ()
+Mesh::element_iterator
+Mesh::active_local_elements_begin ()
 {
   Predicates::ActiveLocal<elem_iterator_imp> p;
   return element_iterator(_elements.begin(), _elements.end(), p);
@@ -76,8 +77,8 @@ MeshBase::active_local_elements_begin ()
 
 
 // level elements begin() accessor
-MeshBase::element_iterator
-MeshBase::level_elements_begin (const unsigned int level)
+Mesh::element_iterator
+Mesh::level_elements_begin (const unsigned int level)
 {
   Predicates::Level<elem_iterator_imp> p(level);
   return element_iterator(_elements.begin(), _elements.end(), p);
@@ -85,8 +86,8 @@ MeshBase::level_elements_begin (const unsigned int level)
 
 
 // not level elements begin() accessor
-MeshBase::element_iterator
-MeshBase::not_level_elements_begin (const unsigned int level)
+Mesh::element_iterator
+Mesh::not_level_elements_begin (const unsigned int level)
 {
   Predicates::NotLevel<elem_iterator_imp> p(level);
   return element_iterator(_elements.begin(), _elements.end(), p);
@@ -95,8 +96,8 @@ MeshBase::not_level_elements_begin (const unsigned int level)
 
 
 // pid elements begin() accessor
-MeshBase::element_iterator
-MeshBase::pid_elements_begin (const unsigned int proc_id)
+Mesh::element_iterator
+Mesh::pid_elements_begin (const unsigned int proc_id)
 {
   Predicates::PID<elem_iterator_imp> p(proc_id);
   return element_iterator(_elements.begin(), _elements.end(), p);
@@ -104,8 +105,8 @@ MeshBase::pid_elements_begin (const unsigned int proc_id)
 
 
 // type elements begin() accessor
-MeshBase::element_iterator
-MeshBase::type_elements_begin (const ElemType type)
+Mesh::element_iterator
+Mesh::type_elements_begin (const ElemType type)
 {
   Predicates::Type<elem_iterator_imp> p(type);
   return element_iterator(_elements.begin(), _elements.end(), p);
@@ -114,8 +115,8 @@ MeshBase::type_elements_begin (const ElemType type)
 
 
 // active type elements begin() accessor
-MeshBase::element_iterator
-MeshBase::active_type_elements_begin (const ElemType type)
+Mesh::element_iterator
+Mesh::active_type_elements_begin (const ElemType type)
 {
   Predicates::ActiveType<elem_iterator_imp> p(type);
   return element_iterator(_elements.begin(), _elements.end(), p);
@@ -124,8 +125,8 @@ MeshBase::active_type_elements_begin (const ElemType type)
 
 
 // active pid elements begin() accessor
-MeshBase::element_iterator
-MeshBase::active_pid_elements_begin (const unsigned int proc_id)
+Mesh::element_iterator
+Mesh::active_pid_elements_begin (const unsigned int proc_id)
 {
   Predicates::ActivePID<elem_iterator_imp> p(proc_id);
   return element_iterator(_elements.begin(), _elements.end(), p);
@@ -141,8 +142,8 @@ MeshBase::active_pid_elements_begin (const unsigned int proc_id)
 
 
 // default const begin() accessor
-MeshBase::const_element_iterator
-MeshBase::elements_begin () const
+Mesh::const_element_iterator
+Mesh::elements_begin () const
 {
   Predicates::NotNull<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.begin(), _elements.end(), p);
@@ -151,8 +152,8 @@ MeshBase::elements_begin () const
 
 
 // const active begin() accessor
-MeshBase::const_element_iterator
-MeshBase::active_elements_begin () const
+Mesh::const_element_iterator
+Mesh::active_elements_begin () const
 {
   Predicates::Active<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.begin(), _elements.end(), p);
@@ -160,8 +161,8 @@ MeshBase::active_elements_begin () const
 
 
 // const not active begin() accessor
-MeshBase::const_element_iterator
-MeshBase::not_active_elements_begin () const
+Mesh::const_element_iterator
+Mesh::not_active_elements_begin () const
 {
   Predicates::NotActive<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.begin(), _elements.end(), p);
@@ -170,8 +171,8 @@ MeshBase::not_active_elements_begin () const
 
 // const local begin() accessor
 
-MeshBase::const_element_iterator
-MeshBase::local_elements_begin () const
+Mesh::const_element_iterator
+Mesh::local_elements_begin () const
 {
   Predicates::Local<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.begin(), _elements.end(), p);
@@ -179,8 +180,8 @@ MeshBase::local_elements_begin () const
 
 
 // const active local begin() accessor
-MeshBase::const_element_iterator
-MeshBase::active_local_elements_begin () const
+Mesh::const_element_iterator
+Mesh::active_local_elements_begin () const
 {
   Predicates::ActiveLocal<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.begin(), _elements.end(), p);
@@ -189,8 +190,8 @@ MeshBase::active_local_elements_begin () const
 
 
 // const level begin() accessor
-MeshBase::const_element_iterator
-MeshBase::level_elements_begin (const unsigned int level) const
+Mesh::const_element_iterator
+Mesh::level_elements_begin (const unsigned int level) const
 {
   Predicates::Level<const_elem_iterator_imp> p(level);
   return const_element_iterator(_elements.begin(), _elements.end(), p);
@@ -199,8 +200,8 @@ MeshBase::level_elements_begin (const unsigned int level) const
 
 
 // const not level begin() accessor
-MeshBase::const_element_iterator
-MeshBase::not_level_elements_begin (const unsigned int level) const
+Mesh::const_element_iterator
+Mesh::not_level_elements_begin (const unsigned int level) const
 {
   Predicates::NotLevel<const_elem_iterator_imp> p(level);
   return const_element_iterator(_elements.begin(), _elements.end(), p);
@@ -209,8 +210,8 @@ MeshBase::not_level_elements_begin (const unsigned int level) const
 
 
 // const pid begin() accessor
-MeshBase::const_element_iterator
-MeshBase::pid_elements_begin (const unsigned int proc_id) const
+Mesh::const_element_iterator
+Mesh::pid_elements_begin (const unsigned int proc_id) const
 {
   Predicates::PID<const_elem_iterator_imp> p(proc_id);
   return const_element_iterator(_elements.begin(), _elements.end(), p);
@@ -218,8 +219,8 @@ MeshBase::pid_elements_begin (const unsigned int proc_id) const
 
 
 // const type begin() accessor
-MeshBase::const_element_iterator
-MeshBase::type_elements_begin (const ElemType type) const
+Mesh::const_element_iterator
+Mesh::type_elements_begin (const ElemType type) const
 {
   Predicates::Type<const_elem_iterator_imp> p(type);
   return const_element_iterator(_elements.begin(), _elements.end(), p);
@@ -229,8 +230,8 @@ MeshBase::type_elements_begin (const ElemType type) const
 
 // const active type begin() accessor
 
-MeshBase::const_element_iterator
-MeshBase::active_type_elements_begin (const ElemType type) const
+Mesh::const_element_iterator
+Mesh::active_type_elements_begin (const ElemType type) const
 {
   Predicates::ActiveType<const_elem_iterator_imp> p(type);
   return const_element_iterator(_elements.begin(), _elements.end(), p);
@@ -240,8 +241,8 @@ MeshBase::active_type_elements_begin (const ElemType type) const
 
 
 // const active pid elements begin() accessor
-MeshBase::const_element_iterator
-MeshBase::active_pid_elements_begin (const unsigned int proc_id) const
+Mesh::const_element_iterator
+Mesh::active_pid_elements_begin (const unsigned int proc_id) const
 {
   Predicates::ActivePID<const_elem_iterator_imp> p(proc_id);
   return const_element_iterator(_elements.begin(), _elements.end(), p);
@@ -256,8 +257,8 @@ MeshBase::active_pid_elements_begin (const unsigned int proc_id) const
 
 
 // default end() accessor
-MeshBase::element_iterator
-MeshBase::elements_end ()
+Mesh::element_iterator
+Mesh::elements_end ()
 {
   Predicates::NotNull<elem_iterator_imp> p;
   return element_iterator(_elements.end(), _elements.end(), p);
@@ -266,8 +267,8 @@ MeshBase::elements_end ()
 
 
 // active end() accessor
-MeshBase::element_iterator
-MeshBase::active_elements_end ()
+Mesh::element_iterator
+Mesh::active_elements_end ()
 {
   Predicates::Active<elem_iterator_imp> p;
   return element_iterator(_elements.end(), _elements.end(), p);
@@ -276,8 +277,8 @@ MeshBase::active_elements_end ()
 
 
 // active end() accessor
-MeshBase::element_iterator
-MeshBase::not_active_elements_end ()
+Mesh::element_iterator
+Mesh::not_active_elements_end ()
 {
   Predicates::NotActive<elem_iterator_imp> p;
   return element_iterator(_elements.end(), _elements.end(), p);
@@ -286,8 +287,8 @@ MeshBase::not_active_elements_end ()
 
 
 // local end() accessor
-MeshBase::element_iterator
-MeshBase::local_elements_end ()
+Mesh::element_iterator
+Mesh::local_elements_end ()
 {
   Predicates::Local<elem_iterator_imp> p;
   return element_iterator(_elements.end(), _elements.end(), p);
@@ -295,8 +296,8 @@ MeshBase::local_elements_end ()
 
 
 // active local end() accessor
-MeshBase::element_iterator
-MeshBase::active_local_elements_end ()
+Mesh::element_iterator
+Mesh::active_local_elements_end ()
 {
   Predicates::ActiveLocal<elem_iterator_imp> p;
   return element_iterator(_elements.end(), _elements.end(), p);
@@ -305,8 +306,8 @@ MeshBase::active_local_elements_end ()
 
 
 // level end() accessor
-MeshBase::element_iterator
-MeshBase::level_elements_end (const unsigned int level)
+Mesh::element_iterator
+Mesh::level_elements_end (const unsigned int level)
 {
   Predicates::Level<elem_iterator_imp> p(level);
   return element_iterator(_elements.end(), _elements.end(), p);
@@ -315,8 +316,8 @@ MeshBase::level_elements_end (const unsigned int level)
 
 
 // not level end() accessor
-MeshBase::element_iterator
-MeshBase::not_level_elements_end (const unsigned int level)
+Mesh::element_iterator
+Mesh::not_level_elements_end (const unsigned int level)
 {
   Predicates::NotLevel<elem_iterator_imp> p(level);
   return element_iterator(_elements.end(), _elements.end(), p);
@@ -326,8 +327,8 @@ MeshBase::not_level_elements_end (const unsigned int level)
 
 
 // pid end() accessor
-MeshBase::element_iterator
-MeshBase::pid_elements_end (const unsigned int proc_id)
+Mesh::element_iterator
+Mesh::pid_elements_end (const unsigned int proc_id)
 {
   Predicates::PID<elem_iterator_imp> p(proc_id);
   return element_iterator(_elements.end(), _elements.end(), p);
@@ -336,8 +337,8 @@ MeshBase::pid_elements_end (const unsigned int proc_id)
 
 
 // type end() accessor
-MeshBase::element_iterator
-MeshBase::type_elements_end (const ElemType type)
+Mesh::element_iterator
+Mesh::type_elements_end (const ElemType type)
 {
   Predicates::Type<elem_iterator_imp> p(type);
   return element_iterator(_elements.end(), _elements.end(), p);
@@ -346,8 +347,8 @@ MeshBase::type_elements_end (const ElemType type)
 
 
 // active type end() accessor
-MeshBase::element_iterator
-MeshBase::active_type_elements_end (const ElemType type)
+Mesh::element_iterator
+Mesh::active_type_elements_end (const ElemType type)
 {
   Predicates::ActiveType<elem_iterator_imp> p(type);
   return element_iterator(_elements.end(), _elements.end(), p);
@@ -355,8 +356,8 @@ MeshBase::active_type_elements_end (const ElemType type)
 
 
 // active PID end() accessor
-MeshBase::element_iterator
-MeshBase::active_pid_elements_end (const unsigned int proc_id)
+Mesh::element_iterator
+Mesh::active_pid_elements_end (const unsigned int proc_id)
 {
   Predicates::ActivePID<elem_iterator_imp> p(proc_id);
   return element_iterator(_elements.end(), _elements.end(), p);
@@ -374,8 +375,8 @@ MeshBase::active_pid_elements_end (const unsigned int proc_id)
 
 
 // default const end() accessor
-MeshBase::const_element_iterator
-MeshBase::elements_end () const
+Mesh::const_element_iterator
+Mesh::elements_end () const
 {
   Predicates::NotNull<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.end(), _elements.end(), p);
@@ -385,8 +386,8 @@ MeshBase::elements_end () const
 
 
 // active const end() accessor
-MeshBase::const_element_iterator
-MeshBase::active_elements_end () const
+Mesh::const_element_iterator
+Mesh::active_elements_end () const
 {
   Predicates::Active<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.end(), _elements.end(), p);
@@ -395,8 +396,8 @@ MeshBase::active_elements_end () const
 
 
 // not active const end() accessor
-MeshBase::const_element_iterator
-MeshBase::not_active_elements_end () const
+Mesh::const_element_iterator
+Mesh::not_active_elements_end () const
 {
   Predicates::NotActive<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.end(), _elements.end(), p);
@@ -406,8 +407,8 @@ MeshBase::not_active_elements_end () const
 
 
 // local const end() accessor
-MeshBase::const_element_iterator
-MeshBase::local_elements_end () const
+Mesh::const_element_iterator
+Mesh::local_elements_end () const
 {
   Predicates::Local<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.end(), _elements.end(), p);
@@ -415,8 +416,8 @@ MeshBase::local_elements_end () const
 
 
 // local active const end() accessor
-MeshBase::const_element_iterator
-MeshBase::active_local_elements_end () const
+Mesh::const_element_iterator
+Mesh::active_local_elements_end () const
 {
   Predicates::ActiveLocal<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.end(), _elements.end(), p);
@@ -426,8 +427,8 @@ MeshBase::active_local_elements_end () const
 
 
 // level const end() accessor
-MeshBase::const_element_iterator
-MeshBase::level_elements_end (const unsigned int level) const
+Mesh::const_element_iterator
+Mesh::level_elements_end (const unsigned int level) const
 {
   Predicates::Level<const_elem_iterator_imp> p(level);
   return const_element_iterator(_elements.end(), _elements.end(), p);
@@ -437,8 +438,8 @@ MeshBase::level_elements_end (const unsigned int level) const
 
 
 // not level const end() accessor
-MeshBase::const_element_iterator
-MeshBase::not_level_elements_end (const unsigned int level) const
+Mesh::const_element_iterator
+Mesh::not_level_elements_end (const unsigned int level) const
 {
   Predicates::NotLevel<const_elem_iterator_imp> p(level);
   return const_element_iterator(_elements.end(), _elements.end(), p);
@@ -449,8 +450,8 @@ MeshBase::not_level_elements_end (const unsigned int level) const
 
 
 // pid const end() accessor
-MeshBase::const_element_iterator
-MeshBase::pid_elements_end (const unsigned int proc_id) const
+Mesh::const_element_iterator
+Mesh::pid_elements_end (const unsigned int proc_id) const
 {
   Predicates::PID<const_elem_iterator_imp> p(proc_id);
   return const_element_iterator(_elements.end(), _elements.end(), p);
@@ -459,8 +460,8 @@ MeshBase::pid_elements_end (const unsigned int proc_id) const
 
 
 // type const end() accessor
-MeshBase::const_element_iterator
-MeshBase::type_elements_end (const ElemType type) const
+Mesh::const_element_iterator
+Mesh::type_elements_end (const ElemType type) const
 {
   Predicates::Type<const_elem_iterator_imp> p(type);
   return const_element_iterator(_elements.end(), _elements.end(), p);
@@ -469,8 +470,8 @@ MeshBase::type_elements_end (const ElemType type) const
 
 
 // active type const end() accessor
-MeshBase::const_element_iterator
-MeshBase::active_type_elements_end (const ElemType type) const
+Mesh::const_element_iterator
+Mesh::active_type_elements_end (const ElemType type) const
 {
   Predicates::ActiveType<const_elem_iterator_imp> p(type);
   return const_element_iterator(_elements.end(), _elements.end(), p);
@@ -478,8 +479,8 @@ MeshBase::active_type_elements_end (const ElemType type) const
 
 
 // active PID end() accessor
-MeshBase::const_element_iterator
-MeshBase::active_pid_elements_end (const unsigned int proc_id) const
+Mesh::const_element_iterator
+Mesh::active_pid_elements_end (const unsigned int proc_id) const
 {
   Predicates::ActivePID<const_elem_iterator_imp> p(proc_id);
   return const_element_iterator(_elements.end(), _elements.end(), p);
@@ -494,8 +495,8 @@ MeshBase::active_pid_elements_end (const unsigned int proc_id) const
 
 
 // default nodes begin() accessor
-MeshBase::node_iterator
-MeshBase::nodes_begin ()
+Mesh::node_iterator
+Mesh::nodes_begin ()
 {
   Predicates::NotNull<node_iterator_imp> p;
   return node_iterator(_nodes.begin(), _nodes.end(), p);
@@ -505,8 +506,8 @@ MeshBase::nodes_begin ()
 
 
 // active nodes begin() accessor
-MeshBase::node_iterator
-MeshBase::active_nodes_begin ()
+Mesh::node_iterator
+Mesh::active_nodes_begin ()
 {
   Predicates::Active<node_iterator_imp> p;
   return node_iterator(_nodes.begin(), _nodes.end(), p);
@@ -515,8 +516,8 @@ MeshBase::active_nodes_begin ()
 
 
 // default const nodes begin() accessor
-MeshBase::const_node_iterator
-MeshBase::nodes_begin () const
+Mesh::const_node_iterator
+Mesh::nodes_begin () const
 {
   Predicates::NotNull<const_node_iterator_imp> p;
   return const_node_iterator(_nodes.begin(), _nodes.end(), p);
@@ -525,8 +526,8 @@ MeshBase::nodes_begin () const
 
 
 // active const nodes begin() accessor
-MeshBase::const_node_iterator
-MeshBase::active_nodes_begin () const
+Mesh::const_node_iterator
+Mesh::active_nodes_begin () const
 {
   Predicates::Active<const_node_iterator_imp> p;
   return const_node_iterator(_nodes.begin(), _nodes.end(), p);
@@ -540,8 +541,8 @@ MeshBase::active_nodes_begin () const
 
 
 // default nodes end() accessor
-MeshBase::node_iterator
-MeshBase::nodes_end ()
+Mesh::node_iterator
+Mesh::nodes_end ()
 {
   Predicates::NotNull<node_iterator_imp> p;
   return node_iterator(_nodes.end(), _nodes.end(), p);
@@ -551,8 +552,8 @@ MeshBase::nodes_end ()
 
 
 // active nodes end() accessor
-MeshBase::node_iterator
-MeshBase::active_nodes_end ()
+Mesh::node_iterator
+Mesh::active_nodes_end ()
 {
   Predicates::Active<node_iterator_imp> p;
   return node_iterator(_nodes.end(), _nodes.end(), p);
@@ -561,8 +562,8 @@ MeshBase::active_nodes_end ()
 
 
 // default const nodes end() accessor
-MeshBase::const_node_iterator
-MeshBase::nodes_end () const
+Mesh::const_node_iterator
+Mesh::nodes_end () const
 {
   Predicates::NotNull<const_node_iterator_imp> p;
   return const_node_iterator(_nodes.end(), _nodes.end(), p);
@@ -570,8 +571,8 @@ MeshBase::nodes_end () const
 
 
 // const active nodes end() accessor
-MeshBase::const_node_iterator
-MeshBase::active_nodes_end () const
+Mesh::const_node_iterator
+Mesh::active_nodes_end () const
 {
   Predicates::Active<const_node_iterator_imp> p;
   return const_node_iterator(_nodes.end(), _nodes.end(), p);

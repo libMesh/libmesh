@@ -1,0 +1,19 @@
+/**
+ * The entries in this file will be substitued by configure.
+ * This file decouples the configuration of the contributed software
+ * from the rest of the library so you can config off/on the contrib
+ * stuff and not recompile everything.
+ */
+
+
+
+#ifndef __libmesh_contrib_config_h__
+#define __libmesh_contrib_config_h__
+
+/**
+ * The configuration result for the triangle library.
+ */
+@CONTRIB_HAVE_TRIANGLE@
+
+
+#endif

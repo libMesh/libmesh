@@ -1,4 +1,4 @@
-// $Id: boundary_info.h,v 1.12 2005-02-22 22:17:33 jwpeterson Exp $
+// $Id: boundary_info.h,v 1.13 2005-05-09 20:38:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -46,7 +46,9 @@ class BoundaryMesh;
  * condition data (check \p MeshData for that), but can mark
  * element faces and nodes with ids useful for identifying the 
  * type of boundary condtion.  It can also build a mesh that
- * just includes boundary elements/faces.  
+ * just includes boundary elements/faces.
+ *
+ * TODO[JWP]: Generalize this to work with MeshBase again.
  */
 
 //------------------------------------------------------
@@ -59,7 +61,7 @@ protected:
   /**
    * Constructor.  Takes a reference to the mesh.
    * The BoundaryInfo class is only used internally
-   * by the MeshBase class.  A user should never instantiate
+   * by the Mesh class.  A user should never instantiate
    * this class.  Therefore the constructor is protected.
    */ 
   BoundaryInfo (const MeshBase& m);

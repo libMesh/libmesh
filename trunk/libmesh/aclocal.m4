@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.83 2005-05-07 00:22:14 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.84 2005-05-09 20:38:36 jwpeterson Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -981,12 +981,15 @@ dnl where it might be installed...
      TRIANGLE_LIBRARY="\$(EXTERNAL_LIBDIR)/libtriangle\$(EXTERNAL_LIBEXT)"
      AC_DEFINE(HAVE_TRIANGLE, 1, [Flag indicating whether the library will be compiled with Triangle support])
      AC_MSG_RESULT(<<< Configuring library with Triangle support >>>)
+     CONTRIB_HAVE_TRIANGLE="#define HAVE_TRIANGLE 1"
   else
      TRIANGLE_INCLUDE=""
      TRIANGLE_LIBRARY=""
      enabletriangle=no
+     CONTRIB_HAVE_TRIANGLE="/* #undef HAVE_TRIANGLE */"
   fi
 
+  AC_SUBST(CONTRIB_HAVE_TRIANGLE)	
   AC_SUBST(TRIANGLE_INCLUDE)
   AC_SUBST(TRIANGLE_LIBRARY)	
   AC_SUBST(enabletriangle)

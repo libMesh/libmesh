@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.39 2005-02-22 22:17:39 jwpeterson Exp $
+// $Id: boundary_info.C,v 1.40 2005-05-09 20:38:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -98,9 +98,6 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
   boundary_mesh.set_n_subdomains() = id_map.size();
 
   // Add additional sides that aren't flagged with boundary conditions
-//   const_active_elem_iterator       el     (_mesh.elements_begin());
-//   const const_active_elem_iterator end_el (_mesh.elements_end());
-
   MeshBase::const_element_iterator       el     = _mesh.active_elements_begin();
   const MeshBase::const_element_iterator end_el = _mesh.active_elements_end(); 
 
@@ -153,14 +150,43 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
 	  }
     }
 
-  // Copy over the nodes
-  boundary_mesh._nodes = _mesh._nodes;
+  // Copy over the nodes VIOLATION OF ENCAPSULATION!!!!
+  // boundary_mesh._nodes = _mesh._nodes;
 
+  // The correct (but possibly slower) way to do this is
+  // 1.) Delete all the nodes in the boundary mesh using node iterators
+  // 2.) Make individual copies of all the nodes in the current mesh
+  //     and add them to the boundary mesh.
+  {
+    MeshBase::node_iterator it  = boundary_mesh.nodes_begin();
+    MeshBase::node_iterator end = boundary_mesh.nodes_end();
+    for(; it != end; ++it)
+      {
+	Node* node = *it;
+	boundary_mesh.delete_node(node);
+      }
+  }
+
+  {
+    MeshBase::const_node_iterator it  = _mesh.nodes_begin();
+    MeshBase::const_node_iterator end = _mesh.nodes_end();
+    for(; it != end; ++it)
+      {
+	const Node* node = *it;
+	boundary_mesh.add_point( Point((*node)(0), (*node)(1), (*node)(2)) );
+      }
+  }
+
+  
+  
   // When desired, copy the MeshData
   // to the boundary_mesh
   if ((boundary_mesh_data != NULL) && (this_mesh_data != NULL))
     boundary_mesh_data->assign(*this_mesh_data);
 }
+
+
+
 
 
 
