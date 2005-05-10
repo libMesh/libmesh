@@ -1,4 +1,4 @@
-// $Id: diva_io.C,v 1.7 2005-02-22 22:17:39 jwpeterson Exp $
+// $Id: diva_io.C,v 1.8 2005-05-10 21:37:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -24,6 +24,7 @@
 // Local includes
 #include "diva_io.h"
 #include "boundary_mesh.h"
+#include "mesh_tools.h"
 #include "elem.h"
 
 // ------------------------------------------------------------
@@ -92,24 +93,24 @@ void DivaIO::write_stream (std::ostream& out)
    */ 
   out << mesh.n_nodes() << " "
     
-      << (boundary_mesh.n_active_elem_of_type(TRI3) +
-	  boundary_mesh.n_active_elem_of_type(TRI6)*4) << " "
+      << (MeshTools::n_active_elem_of_type(boundary_mesh,TRI3) +
+	  MeshTools::n_active_elem_of_type(boundary_mesh,TRI6)*4) << " "
     
-      << (boundary_mesh.n_active_elem_of_type(QUAD4) +
-	  boundary_mesh.n_active_elem_of_type(QUAD8) +
-	  boundary_mesh.n_active_elem_of_type(QUAD9)*4) << " "
+      << (MeshTools::n_active_elem_of_type(boundary_mesh, QUAD4) +
+	  MeshTools::n_active_elem_of_type(boundary_mesh, QUAD8) +
+	  MeshTools::n_active_elem_of_type(boundary_mesh, QUAD9)*4) << " "
     
-      << (mesh.n_active_elem_of_type(TET4) +
-	  mesh.n_active_elem_of_type(TET10)*8) << " "
+      << (MeshTools::n_active_elem_of_type(mesh, TET4) +
+	  MeshTools::n_active_elem_of_type(mesh, TET10)*8) << " "
     
-      << mesh.n_active_elem_of_type(PYRAMID5) << " "
+      << MeshTools::n_active_elem_of_type(mesh, PYRAMID5) << " "
     
-      << (mesh.n_active_elem_of_type(PRISM6) +
-	  mesh.n_active_elem_of_type(PRISM18)*8) << " "
+      << (MeshTools::n_active_elem_of_type(mesh, PRISM6) +
+	  MeshTools::n_active_elem_of_type(mesh, PRISM18)*8) << " "
 
-      << (mesh.n_active_elem_of_type(HEX8)   +
-	  mesh.n_active_elem_of_type(HEX20) +
-	  mesh.n_active_elem_of_type(HEX27)*8) << " "
+      << (MeshTools::n_active_elem_of_type(mesh, HEX8)   +
+	  MeshTools::n_active_elem_of_type(mesh, HEX20) +
+	  MeshTools::n_active_elem_of_type(mesh, HEX27)*8) << " "
     
       << '\n';
   

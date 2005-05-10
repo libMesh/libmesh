@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.45 2005-05-09 20:38:41 jwpeterson Exp $
+// $Id: mesh_base.h,v 1.46 2005-05-10 21:37:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -61,8 +61,8 @@ class Point;
  * mesh to disk in various formats.
  *
  * \author  Benjamin S. Kirk
- * \date    $Date: 2005-05-09 20:38:41 $
- * \version $Revision: 1.45 $
+ * \date    $Date: 2005-05-10 21:37:17 $
+ * \version $Revision: 1.46 $
  */
 
 
@@ -103,7 +103,8 @@ public:
    * @returns \p true if the mesh has been prepared via a call
    * to \p prepare_for_use, \p false otherwise.
    */
-  bool is_prepared () const  { return _is_prepared; }
+  bool is_prepared () const
+  { return _is_prepared; }
   
   /**
    * Returns the logical dimension of the mesh.
@@ -132,12 +133,12 @@ public:
    * of nodes you will add and call this method before repeatedly
    * calling \p add_point() the implementation will be more efficient.
    */
-  virtual void reserve_nodes (const unsigned int nn) =0; 
+  virtual void reserve_nodes (const unsigned int nn) = 0; 
   
   /**
    * Returns the number of elements in the mesh.
    */
-  virtual unsigned int n_elem ()  const = 0; 
+  virtual unsigned int n_elem () const = 0; 
 
   /**
    * Reserves space for a known number of elements.
@@ -146,31 +147,13 @@ public:
    * of elements you will add and call this method before repeatedly
    * calling \p add_point() the implementation will be more efficient.
    */
-  virtual void reserve_elem (const unsigned int ne) =0; 
+  virtual void reserve_elem (const unsigned int ne) = 0; 
 
   /**
    * Returns the number of active elements in the mesh.  Implemented
    * in terms of active_element_iterators.
    */
   unsigned int n_active_elem () const;
-
-  /**
-   * Return a vector of all element types for the mesh.  Implemented
-   * in terms of element_iterators.
-   */
-  void elem_types (std::vector<ElemType>& et) const;
-  
-  /**
-   * Return the number of elements of type \p type.  Implemented
-   * in terms of type_element_iterators.
-   */
-  unsigned int n_elem_of_type (const ElemType type) const;
-
-  /**
-   * Return the number of active elements of type \p type.
-   * Implemented in terms of active_type_element_iterators.
-   */
-  unsigned int n_active_elem_of_type (const ElemType type) const;
 
   /**
    * Returns the number of elements on processor \p proc.
@@ -309,7 +292,8 @@ public:
    * however this is not required. Multiple subdomains can exist on the same
    * processor.
    */
-  unsigned int n_subdomains () const { return _n_sbd; }
+  unsigned int n_subdomains () const
+  { return _n_sbd; }
 
   /**
    * Returns the number of partitions which have been defined via
@@ -317,18 +301,21 @@ public:
    * object and calling partition.  Note that the partitioner objects
    * are responsible for setting this value.
    */
-  unsigned int n_partitions () const { return _n_parts; }
+  unsigned int n_partitions () const
+  { return _n_parts; }
   
   /**
    * @returns the number of processors used in the
    * current simulation.
    */
-  unsigned int n_processors () const { return libMesh::n_processors(); }
+  unsigned int n_processors () const
+  { return libMesh::n_processors(); }
 
   /**
    * @returns the subdomain id for this processor.
    */
-  unsigned int processor_id () const { return libMesh::processor_id(); }
+  unsigned int processor_id () const
+  { return libMesh::processor_id(); }
 
   /**
    * @returns a string containing relevant information
@@ -469,12 +456,14 @@ protected:
   /**
    * Returns a writeable reference to the number of subdomains.
    */
-  unsigned int& set_n_subdomains () { return _n_sbd; }
+  unsigned int& set_n_subdomains ()
+  { return _n_sbd; }
 
   /**
    * Returns a writeable reference to the number of partitions.
    */
-  unsigned int& set_n_partitions () { return _n_parts; }
+  unsigned int& set_n_partitions ()
+  { return _n_parts; }
   
   /**
    * The number of subdomains the mesh has.

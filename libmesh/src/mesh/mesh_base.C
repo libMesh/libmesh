@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.93 2005-05-09 20:38:42 jwpeterson Exp $
+// $Id: mesh_base.C,v 1.94 2005-05-10 21:37:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -91,23 +91,19 @@ void MeshBase::prepare_for_use ()
 
 
 
-
-
-
-
-
-
 unsigned int MeshBase::n_active_elem () const
 {
-  unsigned int num=0;
+    return static_cast<unsigned int>(std::distance (this->active_elements_begin(),
+						    this->active_elements_end()));
+//   unsigned int num=0;
 
-  const_element_iterator       el  = this->active_elements_begin();
-  const const_element_iterator end = this->active_elements_end(); 
+//   const_element_iterator       el  = this->active_elements_begin();
+//   const const_element_iterator end = this->active_elements_end(); 
   
-  for (; el!=end; ++el)
-    num++;
+//   for (; el!=end; ++el)
+//     num++;
 
-  return num;
+//   return num;
 }
 
  
@@ -132,35 +128,41 @@ void MeshBase::clear ()
 
 unsigned int MeshBase::n_elem_on_proc (const unsigned int proc_id) const
 {
-  assert (proc_id < libMesh::n_processors());
+    assert (proc_id < libMesh::n_processors());
+    return static_cast<unsigned int>(std::distance (this->pid_elements_begin(proc_id),
+						    this->pid_elements_end  (proc_id)));
+//   assert (proc_id < libMesh::n_processors());
 
-  unsigned int ne=0;
+//   unsigned int ne=0;
 
-  const_element_iterator       el  = this->pid_elements_begin(proc_id);
-  const const_element_iterator end = this->pid_elements_end(proc_id);
+//   const_element_iterator       el  = this->pid_elements_begin(proc_id);
+//   const const_element_iterator end = this->pid_elements_end(proc_id);
 
-  for (; el!=end; ++el)
-    ne++;
+//   for (; el!=end; ++el)
+//     ne++;
 
-  return ne;
+//   return ne;
 }
 
 
 
 unsigned int MeshBase::n_active_elem_on_proc (const unsigned int proc_id) const
 {
-  assert (proc_id < libMesh::n_processors());
+    assert (proc_id < libMesh::n_processors());
+    return static_cast<unsigned int>(std::distance (this->active_pid_elements_begin(proc_id),
+						    this->active_pid_elements_end  (proc_id)));
+//   assert (proc_id < libMesh::n_processors());
 
-  unsigned int ne=0;
+//   unsigned int ne=0;
 
-  const_element_iterator       el  = this->active_pid_elements_begin(proc_id);
-  const const_element_iterator end = this->active_pid_elements_end(proc_id);
+//   const_element_iterator       el  = this->active_pid_elements_begin(proc_id);
+//   const const_element_iterator end = this->active_pid_elements_end(proc_id);
 
   
-  for (; el!=end; ++el)
-    ne++;
+//   for (; el!=end; ++el)
+//     ne++;
 
-  return ne;
+//   return ne;
 }
   
 
@@ -191,57 +193,6 @@ unsigned int MeshBase::n_active_sub_elem () const
     ne += (*el)->n_sub_elem(); 
 
   return ne;
-}
-
-
-
-void MeshBase::elem_types(std::vector<ElemType>& et) const
-{
-
-  assert (n_elem());
-
-  const_element_iterator       el  = this->elements_begin();
-  const const_element_iterator end = this->elements_end(); 
-
-  // Automatically get the first type
-  et.push_back((*el)->type());  ++el;
-
-  // Loop over the rest of the elements.
-  // If the current element type isn't in the
-  // vector, insert it.
-  for (; el != end; ++el)
-    if (!std::count(et.begin(), et.end(), (*el)->type()))
-      et.push_back((*el)->type());
-}
-
-
-
-unsigned int MeshBase::n_elem_of_type(const ElemType type) const
-{
-  unsigned int cnt=0;
-
-  const_element_iterator       el  = this->type_elements_begin(type);
-  const const_element_iterator end = this->type_elements_end(type);
-
-  for (; el!=end; ++el)
-    cnt++;
-  
-  return cnt;
-}
-
-
-
-unsigned int MeshBase::n_active_elem_of_type(const ElemType type) const
-{
-  unsigned int cnt=0;
-
-  const_element_iterator       el  = this->active_type_elements_begin(type);
-  const const_element_iterator end = this->active_type_elements_end(type);
-  
-  for (; el!=end; ++el)
-    cnt++;
-    
-  return cnt;
 }
 
 

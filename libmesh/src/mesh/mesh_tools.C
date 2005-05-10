@@ -1,4 +1,4 @@
-// $Id: mesh_tools.C,v 1.2 2005-02-22 22:17:41 jwpeterson Exp $
+// $Id: mesh_tools.C,v 1.3 2005-05-10 21:37:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -244,4 +244,59 @@ MeshTools::subdomain_bounding_sphere (const MeshBase& mesh,
   const Point cent = (bbox.second + bbox.first)/2.;
 
   return Sphere (cent, .5*diag);
+}
+
+
+
+void MeshTools::elem_types (const MeshBase& mesh,
+			    std::vector<ElemType>& et)
+{
+  MeshBase::const_element_iterator       el  = mesh.elements_begin();
+  const MeshBase::const_element_iterator end = mesh.elements_end(); 
+
+  // Automatically get the first type
+  et.push_back((*el)->type());  ++el;
+
+  // Loop over the rest of the elements.
+  // If the current element type isn't in the
+  // vector, insert it.
+  for (; el != end; ++el)
+    if (!std::count(et.begin(), et.end(), (*el)->type()))
+      et.push_back((*el)->type());
+}
+
+
+
+unsigned int MeshTools::n_elem_of_type (const MeshBase& mesh,
+					const ElemType type)
+{
+  return static_cast<unsigned int>(std::distance(mesh.type_elements_begin(type),
+						 mesh.type_elements_end  (type)));
+//   unsigned int cnt=0;
+
+//   MeshBase::const_element_iterator       el  = mesh.type_elements_begin(type);
+//   const MeshBase::const_element_iterator end = mesh.type_elements_end(type);
+
+//   for (; el!=end; ++el)
+//     cnt++;
+  
+//   return cnt;
+}
+
+
+
+unsigned int MeshTools::n_active_elem_of_type (const MeshBase& mesh,
+					       const ElemType type)
+{
+  return static_cast<unsigned int>(std::distance(mesh.active_type_elements_begin(type),
+						 mesh.active_type_elements_end  (type)));
+//   unsigned int cnt=0;
+
+//   MeshBase::const_element_iterator       el  = mesh.active_type_elements_begin(type);
+//   const MeshBase::const_element_iterator end = mesh.active_type_elements_end(type);
+  
+//   for (; el!=end; ++el)
+//     cnt++;
+    
+//   return cnt;
 }

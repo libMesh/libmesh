@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.50 2005-05-09 20:38:41 jwpeterson Exp $
+// $Id: mesh.C,v 1.51 2005-05-10 21:37:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -36,7 +36,6 @@
 #include "unv_io.h"
 #include "matlab_io.h"
 #include "off_io.h"
-#include "shanee_io.h"
 #include "medit_io.h"
 #include "gmsh_io.h"
 #include "xdr_io.h"
@@ -643,9 +642,6 @@ void Mesh::read (const std::string& name,
       else if ((name.rfind(".mgf")  < name.size()) ||
 	       (name.rfind(".0000") < name.size()))
 	XdrIO(*this,true).read_mgf (name);
-      
-      else if (name.rfind(".mesh") < name.size())
-	ShaneeIO(*this).read (name);
       
       else if (name.rfind(".unv") < name.size())
 	{
