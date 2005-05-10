@@ -47,6 +47,14 @@ dev_table_entry("images/jwpeterson.jpg",
 ?>
 
 <?php
+dev_table_entry("images/roystgnr.jpg",
+                "Roy Stogner",
+                "http://www.cfdlab.ae.utexas.edu/~roystgnr",
+		"PhD Student, libMesh Developer",
+		"<a href=\"http://www.utexas.edu\">University of Texas at Austin</a>");
+?>
+
+<?php
 dev_table_entry("images/mikeando.jpg",
                 "Michael L. Anderson",
                 "http://www.cfdlab.ae.utexas.edu/~michaela",
