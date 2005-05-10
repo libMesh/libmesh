@@ -1,4 +1,4 @@
-// $Id: ex16.C,v 1.3 2005-05-10 17:47:59 spetersen Exp $
+// $Id: ex16.C,v 1.4 2005-05-10 17:53:05 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -111,7 +111,7 @@ int main (int argc, char** argv)
 					 20, 20,
 					 -1., 1.,
 					 -1., 1.,
-					 QUAD9);
+					 QUAD4);
 
     // Print information about the mesh to the screen.
     mesh.print_info();
@@ -126,10 +126,9 @@ int main (int argc, char** argv)
 
     // Declare the system variables.
     {
-      const FEType fe_type (SECOND, SZABAB);
       // Adds the variable "p" to "Eigensystem".   "p"
       // will be approximated using second-order approximation.
-      eigen_system.add_variable("p", fe_type);
+      eigen_system.add_variable("p", FIRST);
 
       // Give the system a pointer to the matrix assembly
       // function defined below.
@@ -164,18 +163,15 @@ int main (int argc, char** argv)
     eigen_system.solve();
 
     // Get the number of converged eigen pairs.
-    const unsigned int n_conv = eigen_system.get_n_converged();
-    const unsigned int n_its  = eigen_system.get_n_iterations();
+    unsigned int nconv = eigen_system.get_n_converged();
 
-    std::cout << "Number of converged eigenpairs: " << n_conv
-	      << "\n";
-    std::cout << "Number of iterations: " << n_its
+    std::cout << "Number of converged eigenpairs: " << nconv
 	      << "\n" << std::endl;
 
     // Get the last converged eigenpair
-    if (n_conv != 0)
+    if (nconv != 0)
       {
-	eigen_system.get_eigenpair(n_conv-1);
+	eigen_system.get_eigenpair(nconv-1);
 	
 	// Write the eigen vector to file.
 	char buf[14];
@@ -184,7 +180,7 @@ int main (int argc, char** argv)
       }
     else
       {
-	std::cout << "WARNING: Solver did not converge!\n" << n_conv << std::endl;
+	std::cout << "WARNING: Solver did not converge!\n" << nconv << std::endl;
       }
   }
 
@@ -218,8 +214,7 @@ void assemble_mass(EquationSystems& es,
 
   // Get a constant reference to the Finite Element type
   // for the first (and only) variable in the system.
-  const FEType& fe_type = eigen_system.variable_type("p");
-  // FEType fe_type = eigen_system.get_dof_map().variable_type(0);
+  FEType fe_type = eigen_system.get_dof_map().variable_type(0);
 
   // A reference to the system matrix
   SparseMatrix<Number>&  matrix_A = *eigen_system.matrix;
