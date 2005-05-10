@@ -71,9 +71,10 @@ run-time selection of quadrature rules.
 
 
 <h2><a href="ex6.php">Example 6</a> - Infinite Elements for the Wave Equation</h2>
-This example introduces "infinite elements" which may be used for certain classes
-of applications.  The wave equation is solved in this example. <i>For this example to
-work you must have configured the library with the --enable-ifem option</i> 
+This example introduces "infinite elements" which may be used for
+certain classes of applications.  The wave equation is solved in this
+example. <i>For this example to work you must have configured the
+library with the --enable-ifem option</i>
 
 
 
@@ -95,9 +96,10 @@ complex numbers enabled.
 
 
 <h2><a href="ex8.php">Example 8</a> - The Newmark System and the Wave Equation</h2>
-This example solves the wave equation in a hybrid-mesh pipe.  The mesh consists of
-<code>HEX8</code> and <code>PRISM6</code> element types.  The pressure at a point
-in the pipe is extracted and can be plotted as a function of time.
+This example solves the wave equation in a hybrid-mesh pipe.  The mesh
+consists of <code>HEX8</code> and <code>PRISM6</code> element types.
+The pressure at a point in the pipe is extracted and can be plotted as
+a function of time.
 
 
 
@@ -136,8 +138,8 @@ pressure fields.
 
 
 <h2><a href="ex12.php">Example 12</a> - Using the <code>MeshData</code> class</h2>
-This example describes the use of the <code>MeshData</code> class.  More on this
-later. 
+This example describes the use of the <code>MeshData</code> class.
+More on this later.
 
 
 
@@ -195,6 +197,17 @@ the new grid In the final loop iteration, there is no additional
 refinement after the solve.  In the input file "ex15.in", the variable
 "max_r_steps" controls the number of refinement steps, and
 "max_r_level" controls the maximum element refinement level.
+
+<h2><a href="ex16.php">Example 16</a> - Solving an Eigen Problem</h2>
+This example introduces the EigenSystem and shows how libMesh can be
+used for eigenvalue analysis.  For solving eigen problems, libMesh
+interfaces SLEPc
+(<a href="http://www.grycap.upv.es/slepc/">www.grycap.upv.es/slepc/</a>)
+which again is based on PETSc.  Hence, this example will only work if
+the library is compiled with SLEPc support enabled.  In this example
+some eigenvalues for a standard symmetric eigenvalue problem
+A*x=lambda*x are computed, where the matrix A is assembled according
+to a mass matrix.
 
 
 </div>

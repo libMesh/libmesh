@@ -1,4 +1,4 @@
-// $Id: mesh_tetgen_support.h,v 1.14 2004-11-12 01:57:26 jwpeterson Exp $
+// $Id: mesh_tetgen_support.h,v 1.15 2005-05-10 14:35:18 benkirk Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -51,6 +51,12 @@
 class TetGenWrapper
 {
  public:
+
+  /**
+   * Destructor.  Empty.
+   */
+  virtual ~TetGenWrapper () {};
+  
   /**
    * Method set TetGen commandline switches
    */
@@ -246,7 +252,7 @@ class TetGen13_wrapper : public TetGen1_wrapper
   /**
    * Destructor.
    */
-  ~TetGen13_wrapper();
+  virtual ~TetGen13_wrapper();
 
   void set_switches(const std::string& s);
   void run_tetgen();
