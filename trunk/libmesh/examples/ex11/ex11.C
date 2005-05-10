@@ -1,4 +1,4 @@
-/* $Id: ex11.C,v 1.10 2005-01-14 19:29:25 benkirk Exp $ */
+/* $Id: ex11.C,v 1.11 2005-05-10 21:37:17 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -42,8 +42,6 @@
 #include "dense_matrix.h"
 #include "dense_vector.h"
 #include "linear_implicit_system.h"
-#include "error_vector.h"
-#include "error_estimator.h"
 
 // For systems of equations the \p DenseSubMatrix
 // and \p DenseSubVector provide convenient ways for
@@ -388,16 +386,6 @@ void assemble_stokes (EquationSystems& es,
 		} // end face node loop	  
 	    } // end if (elem->neighbor(side) == NULL)
       } // end boundary condition section	  
-      
-      // We have now built the element matrix and RHS vector in terms
-      // of the element degrees of freedom.  However, it is possible
-      // that some of the element DOFs are constrained to enforce
-      // solution continuity, i.e. they are not really "free".  We need
-      // to constrain those DOFs in terms of non-constrained DOFs to
-      // ensure a continuous solution.  The
-      // \p DofMap::constrain_element_matrix_and_vector() method does
-      // just that.
-      dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
       
       // The element matrix and right-hand-side are now built
       // for this element.  Add them to the global matrix and

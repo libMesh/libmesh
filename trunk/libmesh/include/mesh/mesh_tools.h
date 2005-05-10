@@ -1,4 +1,4 @@
-// $Id: mesh_tools.h,v 1.2 2005-02-22 22:17:33 jwpeterson Exp $
+// $Id: mesh_tools.h,v 1.3 2005-05-10 21:37:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -29,13 +29,14 @@
 
 // Local Includes -----------------------------------
 #include "libmesh.h"
+#include "enum_elem_type.h"
+
 
 // forward declarations
 class MeshBase;
 class Sphere;
 class Point;
 class Elem;
-
 
 
 /**
@@ -46,7 +47,7 @@ class Elem;
  *
  * \author Benjamin S. Kirk
  * \date 2004
- * \version $Revision: 1.2 $
+ * \version $Revision: 1.3 $
  */
 
 
@@ -145,6 +146,28 @@ namespace MeshTools
 			     const unsigned int pid = libMesh::invalid_uint);
 
 
+  /**
+   * Return a vector of all element types for the mesh.  Implemented
+   * in terms of element_iterators.
+   */
+  void elem_types (const MeshBase& mesh,
+		   std::vector<ElemType>& et);
+  
+  /**
+   * Return the number of elements of type \p type.  Implemented
+   * in terms of type_element_iterators.
+   */
+  unsigned int n_elem_of_type (const MeshBase& mesh,
+			       const ElemType type);
+
+  /**
+   * Return the number of active elements of type \p type.
+   * Implemented in terms of active_type_element_iterators.
+   */
+  unsigned int n_active_elem_of_type (const MeshBase& mesh,
+				      const ElemType type);
+
+  
 } // end namespace MeshTools
 
 

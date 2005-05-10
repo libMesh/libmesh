@@ -1,4 +1,4 @@
-// $Id: xdr_io.C,v 1.9 2005-05-09 20:38:42 jwpeterson Exp $
+// $Id: xdr_io.C,v 1.10 2005-05-10 21:37:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -2225,11 +2225,11 @@ void XdrIO::write_mesh (const std::string& name,
   
   const int                   numElem = mesh.n_elem();       
   const int                   numBCs  = mesh.boundary_info.n_boundary_conds();
-  mesh.elem_types(etypes);
+  MeshTools::elem_types(mesh, etypes);
   neeb.resize(etypes.size());
 	
   for (unsigned int i=0; i<etypes.size(); i++)
-    neeb[i] = mesh.n_elem_of_type(etypes[i]);
+    neeb[i] = MeshTools::n_elem_of_type(mesh, etypes[i]);
 
   // Now we check to see if we're doing
   // MGF-style headers or libMesh-style
