@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.37 2005-05-06 17:43:43 roystgnr Exp $
+// $Id: fe.C,v 1.38 2005-05-10 19:53:28 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -83,6 +83,33 @@ void FE<Dim,T>::dofs_on_side(const Elem* const elem,
 	nodenum += n_dofs;
     }
 }
+
+
+
+template <unsigned int Dim, FEFamily T>
+void FE<Dim,T>::dofs_on_edge(const Elem* const elem,
+			     const Order o,
+			     unsigned int e,
+			     std::vector<unsigned int>& di)
+{
+  assert(elem != NULL);
+  assert(e < elem->n_edges());
+
+  di.clear();
+  unsigned int nodenum = 0;
+  const unsigned int n_nodes = elem->n_nodes();
+  for (unsigned int n = 0; n != n_nodes; ++n)
+    {
+      const unsigned int n_dofs = n_dofs_at_node(elem->type(),
+						 o, n);
+      if (elem->is_node_on_edge(n, e))
+	for (unsigned int i = 0; i != n_dofs; ++i)
+	  di.push_back(nodenum++);
+      else
+	nodenum += n_dofs;
+    }
+}
+
 
 
 template <unsigned int Dim, FEFamily T>
