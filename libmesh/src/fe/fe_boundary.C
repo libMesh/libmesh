@@ -1,4 +1,4 @@
-// $Id: fe_boundary.C,v 1.33 2005-05-10 17:48:41 spetersen Exp $
+// $Id: fe_boundary.C,v 1.34 2005-05-10 20:22:08 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -31,93 +31,26 @@
 #include "fe_macro.h"
 #include "libmesh_logging.h"
 
-
-
-
 //-------------------------------------------------------
-// Full specialization for 1D when this is a useless method
-template <>
-void FE<1,CLOUGH>::reinit(const Elem*,
-			      const unsigned int)
-{
-  std::cerr << "ERROR: This method only makes sense for 2D elements!"
-	    << std::endl;
-  error();
+// Full specializations for 1D when this is a useless method
+#define SIDE_REINIT_1D_ERROR(_type)              \
+template <>                                  \
+void FE<1,_type>::reinit(const Elem*,        \
+			 const unsigned int) \
+{                                            \
+  std::cerr << "ERROR: This method makes no sense for 1D elements!" \
+	    << std::endl;                    \
+  error();                                   \
 }
 
-
-
-//-------------------------------------------------------
-// Full specialization for 1D when this is a useless method
-template <>
-void FE<1,HIERARCHIC>::reinit(const Elem*,
-			      const unsigned int)
-{
-  std::cerr << "ERROR: This method only makes sense for 2D, 3D elements!"
-	    << std::endl;
-  error();
-}
-
-
-
-//-------------------------------------------------------
-// Full specialization for 1D when this is a useless method
-template <>
-void FE<1,LAGRANGE>::reinit(const Elem*,
-			    const unsigned int)
-{
-  std::cerr << "ERROR: This method only makes sense for 2D, 3D elements!"
-	    << std::endl;
-  error();
-}
-
-
-
-//-------------------------------------------------------
-// Full specialization for 1D when this is a useless method
-template <>
-void FE<1,XYZ>::reinit(const Elem*,
-		       const unsigned int)
-{
-  std::cerr << "ERROR: This method only makes sense for 2D, 3D elements!"
-	    << std::endl;
-  error();
-}
-
-
-
-//-------------------------------------------------------
-// Full specialization for 1D when this is a useless method
-template <>
-void FE<1,MONOMIAL>::reinit(const Elem*,
-			    const unsigned int)
-{
-  std::cerr << "ERROR: This method only makes sense for 2D, 3D elements!"
-	    << std::endl;
-  error();
-}
-
-
-//-------------------------------------------------------
-// Full specialization for 1D when this is a useless method
+SIDE_REINIT_1D_ERROR(CLOUGH)
+SIDE_REINIT_1D_ERROR(HIERARCHIC)
+SIDE_REINIT_1D_ERROR(LAGRANGE)
+SIDE_REINIT_1D_ERROR(XYZ)
+SIDE_REINIT_1D_ERROR(MONOMIAL)
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
-template <>
-void FE<1,BERNSTEIN>::reinit(const Elem*,
-			    const unsigned int)
-{
-  std::cerr << "ERROR: This method only makes sense for 2D elements!"
-	    << std::endl;
-  error();
-}
-
-template <>
-void FE<1,SZABAB>::reinit(const Elem*,
-			    const unsigned int)
-{
-  std::cerr << "ERROR: This method only makes sense for 2D elements!"
-	    << std::endl;
-  error();
-}
+SIDE_REINIT_1D_ERROR(BERNSTEIN)
+SIDE_REINIT_1D_ERROR(SZABAB)
 #endif
 
 
@@ -468,7 +401,7 @@ void FEBase::compute_face_map(const std::vector<Real>& qw,
 
 
 //--------------------------------------------------------------
-// Explicit instantiations (doesn't make sense in 1D!) using fe_macro.h's macro
+// Explicit instantiations
 template void FE<2,LAGRANGE>::reinit(Elem const*, unsigned int);
 template void FE<2,HIERARCHIC>::reinit(Elem const*, unsigned int);
 template void FE<2,CLOUGH>::reinit(Elem const*, unsigned int);
