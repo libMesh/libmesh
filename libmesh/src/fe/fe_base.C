@@ -1,4 +1,4 @@
-// $Id: fe_base.C,v 1.28 2005-02-22 22:17:36 jwpeterson Exp $
+// $Id: fe_base.C,v 1.29 2005-05-10 17:48:40 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -74,6 +74,12 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	      AutoPtr<FEBase> ap(new FE<1,SZABAB>(fet));
 	      return ap;
 	    }
+
+	  case BERNSTEIN:
+	    {
+	      AutoPtr<FEBase> ap(new FE<1,BERNSTEIN>(fet));
+	      return ap;
+	    }
 #endif
 
 	  case XYZ:
@@ -122,6 +128,12 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	  case SZABAB:
 	    {
 	      AutoPtr<FEBase> ap(new FE<2,SZABAB>(fet));
+	      return ap;
+	    }
+
+	  case BERNSTEIN:
+	    {
+	      AutoPtr<FEBase> ap(new FE<2,BERNSTEIN>(fet));
 	      return ap;
 	    }
 #endif
@@ -173,6 +185,12 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	  case SZABAB:
 	    {
 	      AutoPtr<FEBase> ap(new FE<3,SZABAB>(fet));
+	      return ap;
+	    }
+
+	  case BERNSTEIN:
+	    {
+	      AutoPtr<FEBase> ap(new FE<3,BERNSTEIN>(fet));
 	      return ap;
 	    }
 #endif

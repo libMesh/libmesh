@@ -1,4 +1,4 @@
-// $Id: fe_boundary.C,v 1.32 2005-05-06 17:43:44 roystgnr Exp $
+// $Id: fe_boundary.C,v 1.33 2005-05-10 17:48:41 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -101,6 +101,15 @@ void FE<1,MONOMIAL>::reinit(const Elem*,
 //-------------------------------------------------------
 // Full specialization for 1D when this is a useless method
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
+template <>
+void FE<1,BERNSTEIN>::reinit(const Elem*,
+			    const unsigned int)
+{
+  std::cerr << "ERROR: This method only makes sense for 2D elements!"
+	    << std::endl;
+  error();
+}
+
 template <>
 void FE<1,SZABAB>::reinit(const Elem*,
 			    const unsigned int)
@@ -465,6 +474,7 @@ template void FE<2,HIERARCHIC>::reinit(Elem const*, unsigned int);
 template void FE<2,CLOUGH>::reinit(Elem const*, unsigned int);
 template void FE<2,MONOMIAL>::reinit(Elem const*, unsigned int);
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
+template void FE<2,BERNSTEIN>::reinit(Elem const*, unsigned int);
 template void FE<2,SZABAB>::reinit(Elem const*, unsigned int);
 #endif
 template void FE<2,XYZ>::reinit(Elem const*, unsigned int);
@@ -473,6 +483,7 @@ template void FE<3,HIERARCHIC>::reinit(Elem const*, unsigned int);
 template void FE<3,CLOUGH>::reinit(Elem const*, unsigned int);
 template void FE<3,MONOMIAL>::reinit(Elem const*, unsigned int);
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
+template void FE<3,BERNSTEIN>::reinit(Elem const*, unsigned int);
 template void FE<3,SZABAB>::reinit(Elem const*, unsigned int);
 #endif
 template void FE<3,XYZ>::reinit(Elem const*, unsigned int);

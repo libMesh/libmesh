@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.31 2005-03-01 15:50:26 roystgnr Exp $
+// $Id: fe_interface.C,v 1.32 2005-05-10 17:48:41 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -75,6 +75,9 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
 
+	  case BERNSTEIN:
+	    return FE<1,BERNSTEIN>::n_shape_functions(t, o);
+
 	  case SZABAB:
 	    return FE<1,SZABAB>::n_shape_functions(t, o);
 
@@ -109,6 +112,9 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
 
+	  case BERNSTEIN:
+	    return FE<2,BERNSTEIN>::n_shape_functions(t, o);
+
 	  case SZABAB:
 	    return FE<2,SZABAB>::n_shape_functions(t, o);
 
@@ -138,6 +144,9 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 	    return FE<3,MONOMIAL>::n_shape_functions(t, o);
 
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case BERNSTEIN:
+	    return FE<3,BERNSTEIN>::n_shape_functions(t, o);
 
 	  case SZABAB:
 	    return FE<3,SZABAB>::n_shape_functions(t, o);
@@ -197,6 +206,9 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
 
+	  case BERNSTEIN:
+	    return FE<1,BERNSTEIN>::n_dofs(t, o);
+
 	  case SZABAB:
 	    return FE<1,SZABAB>::n_dofs(t, o);
 
@@ -230,6 +242,9 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
 
+	  case BERNSTEIN:
+	    return FE<2,BERNSTEIN>::n_dofs(t, o);
+
 	  case SZABAB:
 	    return FE<2,SZABAB>::n_dofs(t, o);
 
@@ -259,6 +274,9 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 	    return FE<3,MONOMIAL>::n_dofs(t, o);
 
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case BERNSTEIN:
+	    return FE<3,BERNSTEIN>::n_dofs(t, o);
 
 	  case SZABAB:
 	    return FE<3,SZABAB>::n_dofs(t, o);
@@ -318,6 +336,9 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
 
+	  case BERNSTEIN:
+	    return FE<1,BERNSTEIN>::n_dofs_at_node(t, o, n);
+
 	  case SZABAB:
 	    return FE<1,SZABAB>::n_dofs_at_node(t, o, n);
 
@@ -351,6 +372,9 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
 
+	  case BERNSTEIN:
+	    return FE<2,BERNSTEIN>::n_dofs_at_node(t, o, n);
+
 	  case SZABAB:
 	    return FE<2,SZABAB>::n_dofs_at_node(t, o, n);
 
@@ -380,6 +404,9 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 	    return FE<3,MONOMIAL>::n_dofs_at_node(t, o, n);
 
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case BERNSTEIN:
+	    return FE<3,BERNSTEIN>::n_dofs_at_node(t, o, n);
 
 	  case SZABAB:
 	    return FE<3,SZABAB>::n_dofs_at_node(t, o, n);
@@ -439,6 +466,9 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
 
+	  case BERNSTEIN:
+	    return FE<1,BERNSTEIN>::n_dofs_per_elem(t, o);
+
 	  case SZABAB:
 	    return FE<1,SZABAB>::n_dofs_per_elem(t, o);
 
@@ -472,6 +502,9 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
 
+	  case BERNSTEIN:
+	    return FE<2,BERNSTEIN>::n_dofs_per_elem(t, o);
+
 	  case SZABAB:
 	    return FE<2,SZABAB>::n_dofs_per_elem(t, o);
 
@@ -501,6 +534,9 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 	    return FE<3,MONOMIAL>::n_dofs_per_elem(t, o);
 
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case BERNSTEIN:
+	    return FE<3,BERNSTEIN>::n_dofs_per_elem(t, o);
 
 	  case SZABAB:
 	    return FE<3,SZABAB>::n_dofs_per_elem(t, o);
@@ -572,6 +608,11 @@ void FEInterface::nodal_soln(const unsigned int dim,
 
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
 
+	  case BERNSTEIN:
+	    FE<1,BERNSTEIN>::nodal_soln(elem, order,
+				     elem_soln, nodal_soln);
+	    return;
+
 	  case SZABAB:
 	    FE<1,SZABAB>::nodal_soln(elem, order,
 				     elem_soln, nodal_soln);
@@ -617,6 +658,11 @@ void FEInterface::nodal_soln(const unsigned int dim,
 
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
 
+	  case BERNSTEIN:
+	    FE<2,BERNSTEIN>::nodal_soln(elem, order,
+				     elem_soln, nodal_soln);
+	    return;
+
 	  case SZABAB:
 	    FE<2,SZABAB>::nodal_soln(elem, order,
 				     elem_soln, nodal_soln);
@@ -656,6 +702,11 @@ void FEInterface::nodal_soln(const unsigned int dim,
 	    return;
 
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case BERNSTEIN:
+	    FE<3,BERNSTEIN>::nodal_soln(elem, order,
+				     elem_soln, nodal_soln);
+	    return;
 
 	  case SZABAB:
 	    FE<3,SZABAB>::nodal_soln(elem, order,
@@ -715,6 +766,9 @@ Point FEInterface::inverse_map (const unsigned int dim,
 
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
 
+	  case BERNSTEIN:
+	    return FE<1,BERNSTEIN>::inverse_map(elem, p, tolerance, secure);
+
 	  case SZABAB:
 	    return FE<1,SZABAB>::inverse_map(elem, p, tolerance, secure);
 
@@ -748,6 +802,9 @@ Point FEInterface::inverse_map (const unsigned int dim,
 
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
 
+	  case BERNSTEIN:
+	    return FE<2,BERNSTEIN>::inverse_map(elem, p, tolerance, secure);
+
 	  case SZABAB:
 	    return FE<2,SZABAB>::inverse_map(elem, p, tolerance, secure);
 
@@ -776,6 +833,9 @@ Point FEInterface::inverse_map (const unsigned int dim,
 	    return FE<3,MONOMIAL>::inverse_map(elem, p, tolerance, secure);
 
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case BERNSTEIN:
+	    return FE<3,BERNSTEIN>::inverse_map(elem, p, tolerance, secure);
 
 	  case SZABAB:
 	    return FE<3,SZABAB>::inverse_map(elem, p, tolerance, secure);
@@ -858,6 +918,10 @@ void FEInterface::inverse_map (const unsigned int dim,
 	    
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
 
+	  case BERNSTEIN:
+	    FE<1,BERNSTEIN>::inverse_map(elem, physical_points, reference_points);
+	    return;
+
 	  case SZABAB:
 	    FE<1,SZABAB>::inverse_map(elem, physical_points, reference_points);
 	    return;
@@ -897,6 +961,10 @@ void FEInterface::inverse_map (const unsigned int dim,
 	    
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
 
+	  case BERNSTEIN:
+	    FE<2,BERNSTEIN>::inverse_map(elem, physical_points, reference_points);
+	    return;
+
 	  case SZABAB:
 	    FE<2,SZABAB>::inverse_map(elem, physical_points, reference_points);
 	    return;
@@ -931,6 +999,10 @@ void FEInterface::inverse_map (const unsigned int dim,
 	    return;
 	    
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case BERNSTEIN:
+	    FE<3,BERNSTEIN>::inverse_map(elem, physical_points, reference_points);
+	    return;
 
 	  case SZABAB:
 	    FE<3,SZABAB>::inverse_map(elem, physical_points, reference_points);
@@ -1002,6 +1074,9 @@ Real FEInterface::shape(const unsigned int dim,
 
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
 
+	  case BERNSTEIN:
+	    return FE<1,BERNSTEIN>::shape(t,o,i,p);
+
 	  case SZABAB:
 	    return FE<1,SZABAB>::shape(t,o,i,p);
 
@@ -1035,6 +1110,9 @@ Real FEInterface::shape(const unsigned int dim,
 
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
 
+	  case BERNSTEIN:
+	    return FE<2,BERNSTEIN>::shape(t,o,i,p);
+
 	  case SZABAB:
 	    return FE<2,SZABAB>::shape(t,o,i,p);
 
@@ -1064,6 +1142,9 @@ Real FEInterface::shape(const unsigned int dim,
 	    return FE<3,MONOMIAL>::shape(t,o,i,p);
 
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case BERNSTEIN:
+	    return FE<3,BERNSTEIN>::shape(t,o,i,p);
 
 	  case SZABAB:
 	    return FE<3,SZABAB>::shape(t,o,i,p);
@@ -1124,6 +1205,9 @@ Real FEInterface::shape(const unsigned int dim,
 
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
 
+	  case BERNSTEIN:
+	    return FE<1,BERNSTEIN>::shape(elem,o,i,p);
+
 	  case SZABAB:
 	    return FE<1,SZABAB>::shape(elem,o,i,p);
 
@@ -1157,6 +1241,9 @@ Real FEInterface::shape(const unsigned int dim,
 
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
 
+	  case BERNSTEIN:
+	    return FE<2,BERNSTEIN>::shape(elem,o,i,p);
+
 	  case SZABAB:
 	    return FE<2,SZABAB>::shape(elem,o,i,p);
 
@@ -1186,6 +1273,9 @@ Real FEInterface::shape(const unsigned int dim,
 	    return FE<3,MONOMIAL>::shape(elem,o,i,p);
 
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case BERNSTEIN:
+	    return FE<3,BERNSTEIN>::shape(elem,o,i,p);
 
 	  case SZABAB:
 	    return FE<3,SZABAB>::shape(elem,o,i,p);
@@ -1325,6 +1415,7 @@ bool FEInterface::extra_hanging_dofs(const FEType& fe_t)
       case LAGRANGE:
       case MONOMIAL:
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
+      case BERNSTEIN:
       case SZABAB:
 #endif
       case XYZ:
