@@ -1,4 +1,4 @@
-// $Id: enum_fe_family.h,v 1.7 2005-05-04 21:27:58 roystgnr Exp $
+// $Id: enum_fe_family.h,v 1.8 2005-05-10 17:48:40 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -43,9 +43,10 @@ namespace libMeshEnums {
 		 MONOMIAL     = 2,
 
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
-		 SZABAB       = 3,
+		 BERNSTEIN    = 3,
+		 SZABAB       = 4,
 #endif
-		 XYZ          = 4,
+		 XYZ          = 5,
 		 
 #ifdef ENABLE_INFINITE_ELEMENTS
 		 INFINITE_MAP = 11,     //   for 1/r-map

@@ -1,6 +1,6 @@
-// $Id: fe_szabab.C,v 1.7 2005-05-10 17:48:41 spetersen Exp $
+// $Id: fe_bernstein.C,v 1.1 2005-05-10 17:48:41 spetersen Exp $
 
-// The libMesh Finite Element Library.
+// The Next Great Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
@@ -29,9 +29,10 @@
 
 
 
+
 // ------------------------------------------------------------
-// Szabo-Babuska-specific implementations
-// Steffen Petersen 2004
+// Bernstein-specific implementations
+// Steffen Petersen 2005
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::nodal_soln(const Elem* elem,
 			   const Order order,
@@ -60,8 +61,8 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 	
 	return;
       }
-      
-      
+
+
       // For other bases do interpolation at the nodes
       // explicitly.
     case FIRST:
@@ -70,9 +71,8 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
     case FOURTH:
     case FIFTH:
     case SIXTH:
-    case SEVENTH:
       {
-	
+
 	const unsigned int n_sf =
 	  FE<Dim,T>::n_shape_functions(type, order);
 	
@@ -80,12 +80,12 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 	  {
 	    const Point mapped_point = FE<Dim,T>::inverse_map(elem,
 							      elem->point(n));
-	    
+
 	    assert (elem_soln.size() == n_sf);
-	    
+
 	    // Zero before summation
 	    nodal_soln[n] = 0;
-	    
+
 	    // u_i = Sum (alpha_i phi_i)
 	    for (unsigned int i=0; i<n_sf; i++)
 	      nodal_soln[n] += elem_soln[i]*FE<Dim,T>::shape(elem,
@@ -105,7 +105,7 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
     }
 
   
-  // We should never get here?
+  // How did we get here?
   error();  
   return;
 }
@@ -117,7 +117,7 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 {
   switch (o)
     {
-      // Szabo-Babuska 1st-order polynomials.
+      // Bernstein 1st-order polynomials.
     case FIRST:
       {
 	switch (t)
@@ -133,13 +133,21 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 	  case QUAD9:
 	    return 4;
 
+	  case TET4:
+	  case TET10:
+	    return 4;
+
+	  case HEX20:
+	  case HEX27:
+	    return 8;
+
 	  default:
 	    error();
 	  }
       }
 
 
-      // Szabo-Babuska 2nd-order polynomials.
+      // Bernstein 2nd-order polynomials.
     case SECOND:
       {
 	switch (t)
@@ -152,16 +160,27 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 	    return 6;
 
 	  case QUAD8:
+	    return 8;
+
 	  case QUAD9:
 	    return 9;
+
+	  case TET10:
+	    return 10;
 	    
+	  case HEX20:
+	    return 20;
+
+	  case HEX27:
+	    return 27;
+
 	  default:
 	    error();
 	  }
       }
 
 
-      // Szabo-Babuska 3rd-order polynomials.
+      // Bernstein 3rd-order polynomials.
     case THIRD:
       {
 	switch (t)
@@ -177,13 +196,19 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 	  case QUAD9:
 	    return 16;
 
+	  case TET10:
+	    return 20;
+
+	  case HEX27:
+	    return 64;
+
 	  default:
 	    error();
 	  }
       }
 
 
-      // Szabo-Babuska 4th-order polynomials.
+      // Bernstein 4th-order polynomials.
     case FOURTH:
       {
 	switch (t)
@@ -199,13 +224,19 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 	  case QUAD9:
 	    return 25;
 
+	  case TET10:
+	    return 35;
+
+	  case HEX27:
+	    return 125;
+
 	  default:
 	    error();
 	  }
       }
 
 
-      // Szabo-Babuska 5th-order polynomials.
+      // Bernstein 5th-order polynomials.
     case FIFTH:
       {
 	switch (t)
@@ -221,13 +252,16 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 	  case QUAD9:
 	    return 36;
 
+	  case HEX27:
+	    return 216;
+
 	  default:
 	    error();
 	  }
       }
 
-      
-      // Szabo-Babuska 6th-order polynomials.
+     
+      // Bernstein 6th-order polynomials.
     case SIXTH:
       {
 	switch (t)
@@ -243,33 +277,14 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 	  case QUAD9:
 	    return 49;
 
-	  default:
-	    error();
-	  }
-      }
-
-      // Szabo-Babuska 7th-order polynomials.
-    case SEVENTH:
-      {
-	switch (t)
-	  {
-	  case EDGE2:
-	  case EDGE3:
-	    return 8;
-
-	  case TRI6:
-	    return 36;
-	      
-	  case QUAD8:
-	  case QUAD9:
-	    return 64;
+	  case HEX27:
+	    return 343;
 
 	  default:
 	    error();
 	  }
       }
-
-        
+      
     default:
       {
 	error();
@@ -289,12 +304,12 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 {
   switch (o)
     {
-      // The first-order Szabo-Babuska shape functions
+      // The first-order Bernstein shape functions
     case FIRST:
       {
 	switch (t)
 	  {
-	    // The 1D Szabo-Babuska defined on a three-noded edge
+	    // The 1D Bernstein defined on a three-noded edge
 	  case EDGE2:
 	  case EDGE3:
 	    {
@@ -313,7 +328,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	    }
 
 	    
-	    // The 2D Szabo-Babuska defined on a 6-noded triangle
+	    // The 2D Bernstein defined on a 6-noded triangle
 	  case TRI6:
 	    {
 	      switch (n)
@@ -326,6 +341,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 		case 3:
 		case 4:
 		case 5:
+		case 6:
 		  return 0;
 
 		default:
@@ -334,7 +350,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	    }
 	    
 
-	    // The 2D tensor-product Szabo-Babuska defined on a
+	    // The 2D tensor-product Bernsteins defined on a
 	    // nine-noded quadrilateral.
 	  case QUAD8:
 	  case QUAD9:
@@ -362,6 +378,75 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	    }
 
 
+	    // The 3D Bernsteins defined on a ten-noded tetrahedral.
+	  case TET4:
+	  case TET10:
+	    {
+	      switch (n)
+		{
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+		  return 1;
+
+		case 4:
+		case 5:
+		case 6:
+		case 7:		 
+		case 8:
+		case 9:
+		  return 0;
+		  
+		default:
+		  error();
+		}
+	    }
+
+
+	    // The 3D Bernsteins defined on a hexahedral.
+	  case HEX20:
+	  case HEX27:
+	    {
+	      switch (n)
+		{
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+		case 6:
+		case 7:
+		  return 1;
+
+		case 8:
+		case 9:
+		case 10:
+		case 11:
+		case 12:
+		case 13:
+		case 14:
+		case 15:
+		case 16:
+		case 17:
+		case 18:
+		case 19:
+		  return 0;
+		  
+		case 20:
+		case 21:
+		case 22:
+		case 23:
+		case 24:
+		case 25:
+		  return 0;
+		  
+		case 26:
+		  return 0;
+		}
+	    }
+	    
 	  default:
 	    error();
 	    
@@ -370,78 +455,64 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 
 
 
-      // The second-order Szabo-Babuska shape functions
+      // The second-order Bernstein shape functions
     case SECOND:
       {
 	switch (t)
 	  {
-	    // The 1D Szabo-Babuska defined on a three-noded edge
+	    // The 1D Bernstein defined on a three-noded edge
 	  case EDGE2:
 	  case EDGE3:
 	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		  return 1;
-
-		case 2:
-		  return 1;
-		  
-		default:
-		  error();		  
-		}
+	      assert (n<3);
+	      return 1;
 	    }
 
 	    
-	    // The 2D Szabo-Babuska defined on a 6-noded triangle
+	    // The 2D Bernstein defined on a 6-noded triangle
 	  case TRI6:
 	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		  return 1;
-
-		case 3:
-		case 4:
-		case 5:
-		  return 1;
-
-		default:
-		  error();
-		}
+	      assert (n<6);
+	      return 1;
 	    }
 
-
-	    // The 2D tensor-product Szabo-Babuska defined on a
-	    // nine-noded quadrilateral.
+	    // The 8-noded quadrilateral
 	  case QUAD8:
+	    {
+	      assert (n<8);
+	      return 1;
+	    }
+	    // The 2D tensor-product Bernsteins defined on a
+	    // nine-noded quadrilateral.
 	  case QUAD9:
 	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		  return 1;
-
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		  return 1;
-		  
-		case 8:
-		  return 1;
-		  
-		default:
-		  error();
-		}
+	      assert (n<9);
+	      return 1;
 	    }
 
+
+	    // The 3D Bernsteins defined on a ten-noded tetrahedral.
+	  case TET10:
+	    {
+	      assert(n<10);
+	      return 1;
+	    }
+
+	    // The 3D Bernsteins defined on a
+	    // 20-noded hexahedral.
+	  case HEX20:
+	    {
+	      assert(n<20);
+	      return 1;
+	    }
+
+	    // The 3D tensor-product Bernsteins defined on a
+	    // twenty-seven noded hexahedral.
+	  case HEX27:
+	    {
+	      assert(n<27);
+	      return 1;
+	    }
 	    
 	  default:
 	    error();
@@ -451,12 +522,12 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 
 
 
-      // The third-order Szabo-Babuska shape functions
+      // The third-order Bernstein shape functions
     case THIRD:
       {
 	switch (t)
 	  {
-	    // The 1D Szabo-Babuska defined on a three-noded edge
+	    // The 1D Bernstein defined on a three-noded edge
 	  case EDGE2:
 	  case EDGE3:
 	    {
@@ -475,7 +546,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	    }
 
 	    
-	    // The 2D Szabo-Babuska defined on a 6-noded triangle
+	    // The 2D Bernstein defined on a 6-noded triangle
 	  case TRI6:
 	    {
 	      switch (n)
@@ -490,13 +561,16 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 		case 5:
 		  return 2;
 
+		case 6:
+	      return 1;
+
 		default:
 		  error();
 		}
 	    }
 
 
-	    // The 2D tensor-product Szabo-Babuska defined on a
+	    // The 2D tensor-product Bernsteins defined on a
 	    // nine-noded quadrilateral.
 	  case QUAD8:
 	  case QUAD9:
@@ -524,6 +598,73 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	    }
 
 
+	    // The 3D Bernsteins defined on a ten-noded tetrahedral.
+	  case TET10:
+	    {
+	      switch (n)
+		{
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+		  return 1;
+
+		case 4:
+		case 5:
+		case 6:
+		case 7:
+		case 8:
+		case 9:
+		  return 2;
+		  
+		default:
+		  error();
+		}
+	    }
+
+	    // The 3D tensor-product Bernsteins defined on a
+	    // twenty-seven noded hexahedral.
+	  case HEX27:
+	    {
+	      switch (n)
+		{
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+		case 6:
+		case 7:
+		  return 1;
+
+		case 8:
+		case 9:
+		case 10:
+		case 11:
+		case 12:
+		case 13:
+		case 14:
+		case 15:
+		case 16:
+		case 17:
+		case 18:
+		case 19:
+		  return 2;
+		  
+		case 20:
+		case 21:
+		case 22:
+		case 23:
+		case 24:
+		case 25:
+		  return 4;
+		  
+		case 26:
+		  return 8;
+		}
+	    }
+	    
 	  default:
 	    error();
 	    
@@ -532,12 +673,12 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 
 
 
-      // The fourth-order Szabo-Babuska shape functions
+      // The fourth-order Bernstein shape functions
     case FOURTH:
       {
 	switch (t)
 	  {
-	    // The 1D Szabo-Babuska defined on a three-noded edge
+	    // The 1D Bernstein defined on a three-noded edge
 	  case EDGE2:
 	  case EDGE3:
 	    {
@@ -556,7 +697,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	    }
 
 	    
-	    // The 2D Szabo-Babuska defined on a 6-noded triangle
+	    // The 2D Bernstein defined on a 6-noded triangle
 	  case TRI6:
 	    {
 	      switch (n)
@@ -571,13 +712,16 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 		case 5:
 		  return 3;
 
+		case 6:
+		  return 3;
+
 		default:
 		  error();
 		}
 	    }
 
 
-	    // The 2D tensor-product Szabo-Babuska defined on a
+	    // The 2D tensor-product Bernsteins defined on a
 	    // nine-noded quadrilateral.
 	  case QUAD8:
 	  case QUAD9:
@@ -604,7 +748,73 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 		}
 	    }
 
+	    // The 3D Bernsteins defined on a ten-noded tetrahedral.
+	  case TET10:
+	    {
+	      switch (n)
+		{
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+		  return 1;
 
+		case 4:
+		case 5:
+		case 6:
+		case 7:
+		case 8:
+        case 9:
+		  return 3;
+		  
+		default:
+		  error();
+		}
+	    }
+
+	    // The 3D tensor-product Bernsteins defined on a
+	    // twenty-seven noded hexahedral.
+	  case HEX27:
+	    {
+	      switch (n)
+		{
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+		case 6:
+		case 7:
+		  return 1;
+
+		case 8:
+		case 9:
+		case 10:
+		case 11:
+		case 12:
+		case 13:
+		case 14:
+		case 15:
+		case 16:
+		case 17:
+		case 18:
+		case 19:
+		  return 3;
+		  
+		case 20:
+		case 21:
+		case 22:
+		case 23:
+		case 24:
+		case 25:
+		  return 9;
+		  
+		case 26:
+		  return 27;
+		}
+	    }
+	    
 	  default:
 	    error();
 	    
@@ -613,12 +823,12 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 
 
 
-      // The fifth-order Szabo-Babuska shape functions
+      // The fifth-order Bernstein shape functions
     case FIFTH:
       {
 	switch (t)
 	  {
-	    // The 1D Szabo-Babuska defined on a three-noded edge
+	    // The 1D  Bernstein defined on a three-noded edge
 	  case EDGE2:
 	  case EDGE3:
 	    {
@@ -637,7 +847,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	    }
 
 	    
-	    // The 2D Szabo-Babuska defined on a 6-noded triangle
+	    // The 2D Bernstein defined on a 6-noded triangle
 	  case TRI6:
 	    {
 	      switch (n)
@@ -652,13 +862,16 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 		case 5:
 		  return 4;
 
+		case 6:
+		  return 6;
+
 		default:
 		  error();
 		}
 	    }
 
 
-	    // The 2D tensor-product Szabo-Babuska defined on a
+	    // The 2D tensor-product Bernsteins defined on a
 	    // nine-noded quadrilateral.
 	  case QUAD8:
 	  case QUAD9:
@@ -685,21 +898,62 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 		}
 	    }
 
+	    // The 3D tensor-product Bernsteins defined on a
+	    // twenty-seven noded hexahedral.
+	  case HEX27:
+	    {
+	      switch (n)
+		{
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+		case 6:
+		case 7:
+		  return 1;
 
+		case 8:
+		case 9:
+		case 10:
+		case 11:
+		case 12:
+		case 13:
+		case 14:
+		case 15:
+		case 16:
+		case 17:
+		case 18:
+		case 19:
+		  return 4;
+		  
+		case 20:
+		case 21:
+		case 22:
+		case 23:
+		case 24:
+		case 25:
+		  return 16;
+		  
+		case 26:
+		  return 64;
+		}
+	    }
+	    
 	  default:
 	    error();
 	    
-	  }
-      }
+	  } // switch ElemType
+      } // case FIFTH
 
 
-
-      // The sixth-order Szabo-Babuska shape functions
+      // The sixth-order Bernstein shape functions
     case SIXTH:
       {
 	switch (t)
 	  {
-	    // The 1D Szabo-Babuska defined on a three-noded edge
+	    // The 1D Bernstein defined on a three-noded edge
 	  case EDGE2:
 	  case EDGE3:
 	    {
@@ -718,7 +972,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	    }
 
 	    
-	    // The 2D Szabo-Babuska defined on a 6-noded triangle
+	    // The 2D Bernstein defined on a 6-noded triangle
 	  case TRI6:
 	    {
 	      switch (n)
@@ -733,13 +987,16 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 		case 5:
 		  return 5;
 
+		case 6:
+		  return 10;
+
 		default:
 		  error();
 		}
 	    }
 
 
-	    // The 2D tensor-product Szabo-Babuska defined on a
+	    // The 2D tensor-product Bernsteins defined on a
 	    // nine-noded quadrilateral.
 	  case QUAD8:
 	  case QUAD9:
@@ -766,63 +1023,9 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 		}
 	    }
 
-
-	  default:
-	    error();
-	    
-	  }
-      }
-
-
-      // The seventh-order Szabo-Babuska shape functions
-    case SEVENTH:
-      {
-	switch (t)
-	  {
-	    // The 1D Szabo-Babuska defined on a three-noded edge
-	  case EDGE2:
-	  case EDGE3:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		  return 1;
-
-		case 2:
-		  return 6;
-		  
-		default:
-		  error();		  
-		}
-	    }
-
-	    
-	    // The 2D Szabo-Babuska defined on a 6-noded triangle
-	  case TRI6:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		  return 1;
-
-		case 3:
-		case 4:
-		case 5:
-		  return 6;
-
-		default:
-		  error();
-		}
-	    }
-
-
-	    // The 2D tensor-product Szabo-Babuska defined on a
-	    // nine-noded quadrilateral.
-	  case QUAD8:
-	  case QUAD9:
+	    // The 3D tensor-product Bernsteins defined on a
+	    // twenty-seven noded hexahedral.
+	  case HEX27:
 	    {
 	      switch (n)
 		{
@@ -830,28 +1033,44 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 		case 1:
 		case 2:
 		case 3:
-		  return 1;
-
 		case 4:
 		case 5:
 		case 6:
 		case 7:
-		  return 6;
-		  
+		  return 1;
+
 		case 8:
-		  return 36;
+		case 9:
+		case 10:
+		case 11:
+		case 12:
+		case 13:
+		case 14:
+		case 15:
+		case 16:
+		case 17:
+		case 18:
+		case 19:
+		  return 5;
 		  
-		default:
-		  error();
+		case 20:
+		case 21:
+		case 22:
+		case 23:
+		case 24:
+		case 25:
+		  return 25;
+		  
+		case 26:
+		  return 125;
 		}
 	    }
-
-
+	    
 	  default:
 	    error();
 	    
-	  }
-      }
+	  } // switch ElemType
+      } // case SIXTH
 
       
     default:
@@ -873,32 +1092,48 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 {
   switch (o)
     {
-      // The first-order Szabo-Babuska shape functions
+      // The first-order Bernstein shape functions
     case FIRST:
       {
 	switch (t)
 	  {
-	    // The 1D Szabo-Babuska defined on a two-noded edge
+	    // The 1D Bernstein defined on a two-noded edge
 	  case EDGE2:
 	    return 0;
 	    
-	    // The 1D Szabo-Babuska defined on a three-noded edge
+	    // The 1D Bernstein defined on a three-noded edge
 	  case EDGE3:
 	    return 0;
 	    
-	    // The 2D Szabo-Babuska defined on a 6-noded triangle
+	    // The 2D Bernstein defined on a 6-noded triangle
 	  case TRI6:
 	    return 0;
 
-	    // The 2D tensor-product Szabo-Babuska defined on a
+	    // The 2D tensor-product Bernsteins defined on a
 	    // nine-noded quadrilateral.
 	  case QUAD8:
 	    return 0;
 	    
-	    // The 2D tensor-product Szabo-Babuska defined on a
+	    // The 2D tensor-product Bernsteins defined on a
 	    // nine-noded quadrilateral.
-	    
 	  case QUAD9:
+	    return 0;
+	    
+	    // The 3D Bernsteins defined on a four-noded hexahedral.
+	  case TET4:
+	    return 0;
+	    
+	    // The 3D Bernsteins defined on a ten-noded hexahedral.
+	  case TET10:
+	    return 0;
+	    
+	    // The 3D Bernsteins defined on a 20-noded hexahedral.
+	  case HEX20:
+	    return 0;
+
+	    // The 3D tensor-product Bernsteins defined on a
+	    // twenty-seven noded hexahedral.
+	  case HEX27:
 	    return 0;
 	    
 	    
@@ -910,32 +1145,46 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 
 
 
-      // The second-order Szabo-Babuska shape functions
+      // The second-order Bernstein shape functions
     case SECOND:
       {
 	switch (t)
 	  {
-	    // The 1D Szabo-Babuska defined on a two-noded edge
+	    // The 1D Bernstein defined on a two-noded edge
 	  case EDGE2:
 	    return 1;
 	    
-	    // The 1D Szabo-Babuska defined on a three-noded edge
+	    // The 1D Bernstein defined on a three-noded edge
 	  case EDGE3:
 	    return 0;
 	    
-	    // The 2D Szabo-Babuska defined on a 6-noded triangle
+	    // The 2D Bernstein defined on a 6-noded triangle
 	  case TRI6:
 	    return 0;
 
-	    // The 2D tensor-product Szabo-Babuska defined on a
+	    // The 2D tensor-product Bernsteins defined on a
 	    // eight-noded quadrilateral.
 	  case QUAD8:
-	    return 1;
+	    return 0;
 
-	    // The 2D tensor-product Szabo-Babuska defined on a
+	    // The 2D tensor-product Bernsteins defined on a
 	    // nine-noded quadrilateral.
 	  case QUAD9:
 	    return 0;
+	    	    
+	    // The 3D Bernsteins defined on a ten-noded hexahedral.
+	  case TET10:
+	    return 0;
+	    	    
+	    // The 3D Bernsteins defined on a 20-noded hexahedral.
+	  case HEX20:
+	    return 0;
+
+	    // The 3D tensor-product Bernsteins defined on a
+	    // twenty-seven noded hexahedral.
+	  case HEX27:
+	    return 0;
+
 
 	    
 	  default:
@@ -946,32 +1195,42 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 
 
 
-      // The third-order Szabo-Babuska shape functions
+      // The third-order Bernstein shape functions
     case THIRD:
       {
 	switch (t)
 	  {
-	    // The 1D Szabo-Babuska defined on a two-noded edge
+	    // The 1D Bernstein defined on a two-noded edge
 	  case EDGE2:
 	    return 2;
 	    
-	    // The 1D Szabo-Babuska defined on a three-noded edge
+	    // The 1D Bernstein defined on a three-noded edge
 	  case EDGE3:
 	    return 0;
 	    
-	    // The 2D Szabo-Babuska defined on a 6-noded triangle
+	    // The 2D Bernstein defined on a 6-noded triangle
 	  case TRI6:
 	    return 1;
-
-	    // The 2D tensor-product Szabo-Babuska defined on a
+	    
+	    // The 2D tensor-product Bernsteins defined on a
 	    // eight-noded quadrilateral.
 	  case QUAD8:
 	    return 4;
 
-	    // The 2D tensor-product Szabo-Babuska defined on a
+	    // The 2D tensor-product Bernsteins defined on a
 	    // nine-noded quadrilateral.
 	  case QUAD9:
 	    return 0;
+	    	    
+	    // The 3D Bernsteins defined on a ten-noded hexahedral.
+	  case TET10:
+	    return 4;
+	    
+	    // The 3D tensor-product Bernsteins defined on a
+	    // twenty-seven noded hexahedral.
+	  case HEX27:
+	    return 0;
+
 
 	    
 	  default:
@@ -982,32 +1241,42 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 
 
 
-      // The fourth-order Szabo-Babuska shape functions
+      // The fourth-order Bernstein shape functions
     case FOURTH:
       {
 	switch (t)
 	  {
-	    // The 1D Szabo-Babuska defined on a two-noded edge
+	    // The 1D Bernstein defined on a two-noded edge
 	  case EDGE2:
 	    return 3;
 	    
-	    // The 1D Szabo-Babuska defined on a three-noded edge
+	    // The 1D Bernstein defined on a three-noded edge
 	  case EDGE3:
 	    return 0;
 	    
-	    // The 2D Szabo-Babuska defined on a 6-noded triangle
+	    // The 2D Bernstein defined on a 6-noded triangle
 	  case TRI6:
 	    return 3;
-
-	    // The 2D tensor-product Szabo-Babuska defined on a
+	    
+	    // The 2D tensor-product Bernsteins defined on a
 	    // eight-noded quadrilateral.
 	  case QUAD8:
 	    return 9;
 
-	    // The 2D tensor-product Szabo-Babuska defined on a
+	    // The 2D tensor-product Bernsteins defined on a
 	    // nine-noded quadrilateral.
 	  case QUAD9:
 	    return 0;
+	    
+	    // The 3D Bernsteins defined on a ten-noded hexahedral.
+	  case TET10:
+	    return 13;
+	               	    
+	    // The 3D tensor-product Bernsteins defined on a
+	    // twenty-seven noded hexahedral.
+	  case HEX27:
+	    return 0;
+
 
 	    
 	  default:
@@ -1018,32 +1287,38 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 
 
 
-      // The fifth-order Szabo-Babuska shape functions
+      // The fifth-order Bernstein shape functions
     case FIFTH:
       {
 	switch (t)
 	  {
-	    // The 1D Szabo-Babuska defined on a two-noded edge
+	    // The 1D Bernstein defined on a two-noded edge
 	  case EDGE2:
 	    return 4;
 	    
-	    // The 1D Szabo-Babuska defined on a three-noded edge
+	    // The 1D Bernstein defined on a three-noded edge
 	  case EDGE3:
 	    return 0;
 	    
-	    // The 2D Szabo-Babuska defined on a 6-noded triangle
+	    // The 2D Bernstein defined on a 6-noded triangle
 	  case TRI6:
 	    return 6;
-
-	    // The 2D tensor-product Szabo-Babuska defined on a
+	    
+	    // The 2D tensor-product Bernsteins defined on a
 	    // eight-noded quadrilateral.
 	  case QUAD8:
 	    return 16;
 
-	    // The 2D tensor-product Szabo-Babuska defined on a
+	    // The 2D tensor-product Bernsteins defined on a
 	    // nine-noded quadrilateral.
 	  case QUAD9:
 	    return 0;
+	    
+	    // The 3D tensor-product Bernsteins defined on a
+	    // twenty-seven noded hexahedral.
+	  case HEX27:
+	    return 0;
+
 
 	    
 	  default:
@@ -1053,32 +1328,39 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
       }
 
 
-  // The sixth-order Szabo-Babuska shape functions
+
+      // The sixth-order Bernstein shape functions
     case SIXTH:
       {
 	switch (t)
 	  {
-	    // The 1D Szabo-Babuska defined on a two-noded edge
+	    // The 1D Bernstein defined on a two-noded edge
 	  case EDGE2:
 	    return 5;
 	    
-	    // The 1D Szabo-Babuska defined on a three-noded edge
+	    // The 1D Bernstein defined on a three-noded edge
 	  case EDGE3:
 	    return 0;
 	    
-	    // The 2D Szabo-Babuska defined on a 6-noded triangle
+	    // The 2D Bernstein defined on a 6-noded triangle
 	  case TRI6:
 	    return 10;
-
-	    // The 2D tensor-product Szabo-Babuska defined on a
+	    
+	    // The 2D tensor-product Bernsteins defined on a
 	    // eight-noded quadrilateral.
 	  case QUAD8:
 	    return 25;
 
-	    // The 2D tensor-product Szabo-Babuska defined on a
+	    // The 2D tensor-product Bernsteins defined on a
 	    // nine-noded quadrilateral.
 	  case QUAD9:
 	    return 0;
+	    
+	    // The 3D tensor-product Bernsteins defined on a
+	    // twenty-seven noded hexahedral.
+	  case HEX27:
+	    return 0;
+
 
 	    
 	  default:
@@ -1087,40 +1369,6 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 	  }
       }
 
-
-  // The seventh-order Szabo-Babuska shape functions
-    case SEVENTH:
-      {
-	switch (t)
-	  {
-	    // The 1D Szabo-Babuska defined on a two-noded edge
-	  case EDGE2:
-	    return 6;
-	    
-	    // The 1D Szabo-Babuska defined on a three-noded edge
-	  case EDGE3:
-	    return 0;
-	    
-	    // The 2D Szabo-Babuska defined on a 6-noded triangle
-	  case TRI6:
-	    return 15;
-
-	    // The 2D tensor-product Szabo-Babuska defined on a
-	    // eight-noded quadrilateral.
-	  case QUAD8:
-	    return 36;
-
-	    // The 2D tensor-product Szabo-Babuska defined on a
-	    // nine-noded quadrilateral.
-	  case QUAD9:
-	    return 0;
-
-	    
-	  default:
-	    error();
-	    
-	  }
-      }
 
       
       // Otherwise no DOFS per element
@@ -1129,14 +1377,11 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
     }
 }
 
-
-
 template <unsigned int Dim, FEFamily T>
 FEContinuity FE<Dim,T>::get_continuity() const
 {
   return C_ZERO;
 }
-
 
 
 template <unsigned int Dim, FEFamily T>
@@ -1153,10 +1398,11 @@ bool FE<Dim,T>::shapes_need_reinit() const
 
 
 
+
 //--------------------------------------------------------------
-// Explicit instantiation of member functions
-INSTANTIATE_MBRF(1,SZABAB);
-INSTANTIATE_MBRF(2,SZABAB);
-INSTANTIATE_MBRF(3,SZABAB);
+// Explicit instantiations for member functions
+INSTANTIATE_MBRF(1,BERNSTEIN);
+INSTANTIATE_MBRF(2,BERNSTEIN);
+INSTANTIATE_MBRF(3,BERNSTEIN);
 
 #endif //ENABLE_HIGHER_ORDER_SHAPES

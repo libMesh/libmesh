@@ -1,5 +1,5 @@
-ex_eigen.$(obj-suffix):\
-    ex_eigen.C\
+ex16.$(obj-suffix):\
+    ex16.C\
     ../../include/base/auto_ptr.h\
     ../../include/base/dof_map.h\
     ../../include/base/dof_object.h\

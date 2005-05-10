@@ -1,4 +1,4 @@
-// $Id: fe_macro.h,v 1.9 2005-05-07 00:22:29 benkirk Exp $
+// $Id: fe_macro.h,v 1.10 2005-05-10 17:48:40 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -52,6 +52,7 @@
                                template class FE< (_dim), HIERARCHIC>;   \
                                template class FE< (_dim), LAGRANGE>;   \
                                template class FE< (_dim), MONOMIAL>;   \
+                               template class FE< (_dim), BERNSTEIN>;     \
                                template class FE< (_dim), SZABAB>;     \
                                template class FE< (_dim), XYZ>
 
@@ -60,6 +61,7 @@
   template void FE<_dim,HIERARCHIC>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&);\
   template void FE<_dim,LAGRANGE>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&);\
   template void FE<_dim,MONOMIAL>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&);\
+  template void FE<_dim,BERNSTEIN>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&);\
   template void FE<_dim,SZABAB>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&);\
   template void FE<_dim,XYZ>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&)
 
