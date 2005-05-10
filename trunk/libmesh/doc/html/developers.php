@@ -3,7 +3,7 @@
 
 <html>
 <head>
-  <title>libMesh Developers</title>
+  <title>Active LibMesh Developers</title>
   <?php load_style($root); ?>
 </head>
 
@@ -26,7 +26,7 @@
 <?php } ?>
 
 <div class="content">
-<h1>libMesh Developers</h1>
+<h1>Active LibMesh Developers</h1>
 
 <?php
 dev_table_entry("images/benkirk.jpg",
@@ -55,21 +55,21 @@ dev_table_entry("images/roystgnr.jpg",
 ?>
 
 <?php
-dev_table_entry("images/mikeando.jpg",
-                "Michael L. Anderson",
-                "http://www.cfdlab.ae.utexas.edu/~michaela",
-		"Post-doctoral Fellow, libMesh Developer",
-		"<a href=\"http://www.utexas.edu\">University of Texas at Austin</a>,
-		<br><a href=\"http://www.uwa.edu.au\">University of Western Australia</a>");
+// dev_table_entry("images/mikeando.jpg",
+//                 "Michael L. Anderson",
+//                 "http://www.cfdlab.ae.utexas.edu/~michaela",
+// 		"Post-doctoral Fellow, libMesh Developer",
+// 		"<a href=\"http://www.utexas.edu\">University of Texas at Austin</a>,
+// 		<br><a href=\"http://www.uwa.edu.au\">University of Western Australia</a>");
 ?>
 
 
 <?php
-dev_table_entry("images/bbarth2.jpg",
-                "William L. Barth",
-                "http://www.cfdlab.ae.utexas.edu/~bbarth",
-		"PhD Student, libMesh Developer",
-		"<a href=\"http://www.utexas.edu\">University of Texas at Austin</a>");
+// dev_table_entry("images/bbarth2.jpg",
+//                 "William L. Barth",
+//                 "http://www.cfdlab.ae.utexas.edu/~bbarth",
+// 		"PhD Student, libMesh Developer",
+// 		"<a href=\"http://www.utexas.edu\">University of Texas at Austin</a>");
 ?>
 
 
@@ -82,28 +82,28 @@ dev_table_entry("images/spetersen.jpg",
 ?>
 
 <?php
-dev_table_entry("images/dreyer.jpg",
-		"Daniel Dreyer",
-		"http://www.audi.com",
-		"PhD Student, libMesh Developer",
-		"<a href=\"http://www.audi.com\">Audi AG</a>,
-		<br><a href=\"http://www.tu-harburg.de\">Technical University Hamburg-Harburg</a>");
+// dev_table_entry("images/dreyer.jpg",
+// 		"Daniel Dreyer",
+// 		"http://www.audi.com",
+// 		"PhD Student, libMesh Developer",
+// 		"<a href=\"http://www.audi.com\">Audi AG</a>,
+// 		<br><a href=\"http://www.tu-harburg.de\">Technical University Hamburg-Harburg</a>");
 ?>
 
 <?php
-dev_table_entry("images/hvdheijden.jpg",
-		"Hendrik van der Heijden",
-		"http://www.tu-harburg.de",
-		"Student, libMesh Developer",
-		"<a href=\"http://www.tu-harburg.de\">Technical University Hamburg-Harburg</a>");
+// dev_table_entry("images/hvdheijden.jpg",
+// 		"Hendrik van der Heijden",
+// 		"http://www.tu-harburg.de",
+// 		"Student, libMesh Developer",
+// 		"<a href=\"http://www.tu-harburg.de\">Technical University Hamburg-Harburg</a>");
 ?>
 
 <?php
-dev_table_entry("images/fprill.jpg",
-		"Florian Prill",
-		"http://www.tu-harburg.de",
-		"Student, libMesh Developer",
-		"<a href=\"http://www.tu-harburg.de\">Technical University Hamburg-Harburg</a>");
+// dev_table_entry("images/fprill.jpg",
+// 		"Florian Prill",
+// 		"http://www.tu-harburg.de",
+// 		"Student, libMesh Developer",
+// 		"<a href=\"http://www.tu-harburg.de\">Technical University Hamburg-Harburg</a>");
 ?>
 
 
