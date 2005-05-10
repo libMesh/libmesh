@@ -1,4 +1,4 @@
-// $Id: fe_interface.h,v 1.6 2005-03-01 15:50:25 roystgnr Exp $
+// $Id: fe_interface.h,v 1.7 2005-05-10 19:53:24 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -103,7 +103,28 @@ public:
   static unsigned int n_dofs_per_elem(const unsigned int dim,
 				      const FEType& fe_t,
 				      const ElemType t);
-				     
+
+  /**
+   * Fills the vector di with the local degree of freedom indices
+   * associated with side \p s of element \p elem
+   * Automatically decides which finite element class to use.
+   */
+  static void dofs_on_side(const Elem* const elem,
+                           const unsigned int dim,
+                           const FEType& fe_t,
+                           unsigned int s,
+                           std::vector<unsigned int>& di);
+
+  /**
+   * Fills the vector di with the local degree of freedom indices
+   * associated with edge \p e of element \p elem
+   * Automatically decides which finite element class to use.
+   */
+  static void dofs_on_edge(const Elem* const elem,
+                           const unsigned int dim,
+                           const FEType& fe_t,
+                           unsigned int e,
+                           std::vector<unsigned int>& di);
   
   /**
    * Build the nodal soln from the element soln.

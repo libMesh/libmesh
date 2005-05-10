@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.32 2005-05-10 17:48:41 spetersen Exp $
+// $Id: fe_interface.C,v 1.33 2005-05-10 19:53:28 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -562,6 +562,285 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 }
 
 
+
+
+void FEInterface::dofs_on_side(const Elem* const elem,
+			       const unsigned int dim,
+			       const FEType& fe_t,
+			       unsigned int s,
+			       std::vector<unsigned int>& di)
+{
+  const Order o = fe_t.order;
+
+  switch (dim)
+    {
+      // 1D
+    case 1:
+      {
+	switch (fe_t.family)
+	  {
+	  case HIERARCHIC:
+	    FE<1,HIERARCHIC>::dofs_on_side(elem, o, s, di);
+            return;
+	    
+	  case LAGRANGE:
+	    FE<1,LAGRANGE>::dofs_on_side(elem, o, s, di);
+            return;
+	    
+	  case MONOMIAL:
+	    FE<1,MONOMIAL>::dofs_on_side(elem, o, s, di);
+            return;
+
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case BERNSTEIN:
+	    FE<1,BERNSTEIN>::dofs_on_side(elem, o, s, di);
+            return;
+
+	  case SZABAB:
+	    FE<1,SZABAB>::dofs_on_side(elem, o, s, di);
+            return;
+
+#endif
+	    
+	  case XYZ:
+	    FEXYZ<1>::dofs_on_side(elem, o, s, di);
+            return;
+
+	  default:
+	    error();
+	  }
+      }
+
+      
+      // 2D
+    case 2:
+      {
+	switch (fe_t.family)
+	  {
+	  case CLOUGH:
+	    FE<2,CLOUGH>::dofs_on_side(elem, o, s, di);
+            return;
+	    
+	  case HIERARCHIC:
+	    FE<2,HIERARCHIC>::dofs_on_side(elem, o, s, di);
+            return;
+	    
+	  case LAGRANGE:
+	    FE<2,LAGRANGE>::dofs_on_side(elem, o, s, di);
+            return;
+	    
+	  case MONOMIAL:
+	    FE<2,MONOMIAL>::dofs_on_side(elem, o, s, di);
+            return;
+
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case BERNSTEIN:
+	    FE<2,BERNSTEIN>::dofs_on_side(elem, o, s, di);
+            return;
+
+	  case SZABAB:
+	    FE<2,SZABAB>::dofs_on_side(elem, o, s, di);
+            return;
+
+#endif
+	    
+	  case XYZ:
+	    FEXYZ<2>::dofs_on_side(elem, o, s, di);
+            return;
+
+	  default:
+	    error();
+	  }
+      }
+
+      
+      // 3D
+    case 3:
+      {
+	switch (fe_t.family)
+	  {
+	  case HIERARCHIC:
+	    FE<3,HIERARCHIC>::dofs_on_side(elem, o, s, di);
+            return;
+	    
+	  case LAGRANGE:
+	    FE<3,LAGRANGE>::dofs_on_side(elem, o, s, di);
+            return;
+	    
+	  case MONOMIAL:
+	    FE<3,MONOMIAL>::dofs_on_side(elem, o, s, di);
+            return;
+
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case BERNSTEIN:
+	    FE<3,BERNSTEIN>::dofs_on_side(elem, o, s, di);
+            return;
+
+	  case SZABAB:
+	    FE<3,SZABAB>::dofs_on_side(elem, o, s, di);
+            return;
+
+#endif
+	    
+	  case XYZ:
+	    FEXYZ<3>::dofs_on_side(elem, o, s, di);
+            return;
+
+	  default:
+	    error();
+	  }
+      }
+
+
+    default:
+      error();
+    }
+
+  error();
+}
+
+
+
+void FEInterface::dofs_on_edge(const Elem* const elem,
+			       const unsigned int dim,
+			       const FEType& fe_t,
+			       unsigned int e,
+			       std::vector<unsigned int>& di)
+{
+  const Order o = fe_t.order;
+
+  switch (dim)
+    {
+      // 1D
+    case 1:
+      {
+	switch (fe_t.family)
+	  {
+	  case HIERARCHIC:
+	    FE<1,HIERARCHIC>::dofs_on_edge(elem, o, e, di);
+            return;
+	    
+	  case LAGRANGE:
+	    FE<1,LAGRANGE>::dofs_on_edge(elem, o, e, di);
+            return;
+	    
+	  case MONOMIAL:
+	    FE<1,MONOMIAL>::dofs_on_edge(elem, o, e, di);
+            return;
+
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case BERNSTEIN:
+	    FE<1,BERNSTEIN>::dofs_on_edge(elem, o, e, di);
+            return;
+
+	  case SZABAB:
+	    FE<1,SZABAB>::dofs_on_edge(elem, o, e, di);
+            return;
+
+#endif
+	    
+	  case XYZ:
+	    FEXYZ<1>::dofs_on_edge(elem, o, e, di);
+            return;
+
+	  default:
+	    error();
+	  }
+      }
+
+      
+      // 2D
+    case 2:
+      {
+	switch (fe_t.family)
+	  {
+	  case CLOUGH:
+	    FE<2,CLOUGH>::dofs_on_edge(elem, o, e, di);
+            return;
+	    
+	  case HIERARCHIC:
+	    FE<2,HIERARCHIC>::dofs_on_edge(elem, o, e, di);
+            return;
+	    
+	  case LAGRANGE:
+	    FE<2,LAGRANGE>::dofs_on_edge(elem, o, e, di);
+            return;
+	    
+	  case MONOMIAL:
+	    FE<2,MONOMIAL>::dofs_on_edge(elem, o, e, di);
+            return;
+
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case BERNSTEIN:
+	    FE<2,BERNSTEIN>::dofs_on_edge(elem, o, e, di);
+            return;
+
+	  case SZABAB:
+	    FE<2,SZABAB>::dofs_on_edge(elem, o, e, di);
+            return;
+
+#endif
+	    
+	  case XYZ:
+	    FEXYZ<2>::dofs_on_edge(elem, o, e, di);
+            return;
+
+	  default:
+	    error();
+	  }
+      }
+
+      
+      // 3D
+    case 3:
+      {
+	switch (fe_t.family)
+	  {
+	  case HIERARCHIC:
+	    FE<3,HIERARCHIC>::dofs_on_edge(elem, o, e, di);
+            return;
+	    
+	  case LAGRANGE:
+	    FE<3,LAGRANGE>::dofs_on_edge(elem, o, e, di);
+            return;
+	    
+	  case MONOMIAL:
+	    FE<3,MONOMIAL>::dofs_on_edge(elem, o, e, di);
+            return;
+
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+	  case BERNSTEIN:
+	    FE<3,BERNSTEIN>::dofs_on_edge(elem, o, e, di);
+            return;
+
+	  case SZABAB:
+	    FE<3,SZABAB>::dofs_on_edge(elem, o, e, di);
+            return;
+
+#endif
+	    
+	  case XYZ:
+	    FEXYZ<3>::dofs_on_edge(elem, o, e, di);
+            return;
+
+	  default:
+	    error();
+	  }
+      }
+
+
+    default:
+      error();
+    }
+
+  error();
+}
 
 
 

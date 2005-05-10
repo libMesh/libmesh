@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.14 2005-05-06 17:43:43 roystgnr Exp $
+// $Id: fe.h,v 1.15 2005-05-10 19:53:24 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -54,7 +54,7 @@ class InfFE;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.14 $
+ * \version $Revision: 1.15 $
  */
 
 //-------------------------------------------------------------
@@ -235,6 +235,14 @@ public:
 		           const Order o,
 		           unsigned int s,
 		           std::vector<unsigned int>& di);
+  /**
+   * Fills the vector di with the local degree of freedom indices
+   * associated with edge \p e of element \p elem
+   */
+  static void dofs_on_edge(const Elem* const elem,
+		           const Order o,
+		           unsigned int e,
+		           std::vector<unsigned int>& di);
 
   /**
    * @returns the location (on the reference element) of the
@@ -401,7 +409,7 @@ protected:
  *
  * \author Roy Stogner
  * \date 2004
- * \version $Revision: 1.14 $
+ * \version $Revision: 1.15 $
  */
 
 //-------------------------------------------------------------
@@ -426,7 +434,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.14 $
+ * \version $Revision: 1.15 $
  */
 
 //-------------------------------------------------------------
@@ -451,7 +459,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.14 $
+ * \version $Revision: 1.15 $
  */
 
 //-------------------------------------------------------------
@@ -476,7 +484,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.14 $
+ * \version $Revision: 1.15 $
  */
 
 //-------------------------------------------------------------
@@ -502,7 +510,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.14 $
+ * \version $Revision: 1.15 $
  */
 
 //-------------------------------------------------------------
