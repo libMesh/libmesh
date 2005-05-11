@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.11 2005-05-04 21:27:58 roystgnr Exp $
+// $Id: fe_base.h,v 1.12 2005-05-11 20:11:34 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -136,6 +136,13 @@ public:
    */
   virtual void reinit (const Elem* elem,
 		       const unsigned int side) = 0;
+  
+  /**
+   * Reinitializes all the physical element-dependent data based on
+   * the \p edge of the element \p elem.
+   */
+  virtual void edge_reinit (const Elem* elem,
+		            const unsigned int edge) = 0;
   
   /**
    * @returns true if the point p is located on the reference element
@@ -517,6 +524,12 @@ protected:
    * Same as before, but for a side.  Useful for boundary integration.
    */  
   void compute_face_map(const std::vector<Real>& qw,
+			const Elem* side);
+
+  /** 
+   * Same as before, but for an edge.  Useful for some projections.
+   */  
+  void compute_edge_map(const std::vector<Real>& qw,
 			const Elem* side);
 
   /** 

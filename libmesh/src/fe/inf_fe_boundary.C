@@ -1,4 +1,4 @@
-// $Id: inf_fe_boundary.C,v 1.10 2005-05-06 17:44:05 roystgnr Exp $
+// $Id: inf_fe_boundary.C,v 1.11 2005-05-11 20:11:37 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -47,6 +47,22 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem*,
 
 
 
+//-------------------------------------------------------
+// Method for 2D, 3D -- see inf_fe_1D.C for a 1D version of this
+template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
+void InfFE<Dim,T_radial,T_base>::edge_reinit(const Elem*,
+					     const unsigned int)
+{
+  // We don't do this for 1D elements!
+  //assert (Dim != 1);
+
+  std::cerr << "ERROR: Edge conditions for infinite elements "
+	    << "not implemented!" << std::endl;
+  error();
+}
+
+
+
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
 void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Point>&,
@@ -72,6 +88,9 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
 INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,void,reinit(const Elem*,const unsigned int));
 INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,void,reinit(const Elem*,const unsigned int));
 INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,reinit(const Elem*,const unsigned int));
+INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,void,edge_reinit(const Elem*,const unsigned int));
+INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,void,edge_reinit(const Elem*,const unsigned int));
+INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,edge_reinit(const Elem*,const unsigned int));
 INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,void,init_face_shape_functions(const std::vector<Point>&,const Elem*));
 INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,void,init_face_shape_functions(const std::vector<Point>&,const Elem*));
 INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,init_face_shape_functions(const std::vector<Point>&,const Elem*));
