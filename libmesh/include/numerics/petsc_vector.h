@@ -1,4 +1,4 @@
-// $Id: petsc_vector.h,v 1.11 2005-05-05 20:20:48 benkirk Exp $
+// $Id: petsc_vector.h,v 1.12 2005-05-11 23:11:58 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -505,22 +505,22 @@ void PetscVector<T>::init (const unsigned int n,
   if (n_local == n)
     {
       ierr = VecCreateSeq (PETSC_COMM_SELF, petsc_n, &_vec);
-             CHKERRABORT(PETSC_COMM_WORLD,ierr);
+             CHKERRABORT(PETSC_COMM_SELF,ierr);
       
       ierr = VecSetFromOptions (_vec);
-             CHKERRABORT(PETSC_COMM_WORLD,ierr);
+             CHKERRABORT(PETSC_COMM_SELF,ierr);
     }
   // otherwise create an MPI-enabled vector
   else
     {
       assert (n_local < n);
       
-      ierr = VecCreateMPI (PETSC_COMM_WORLD, petsc_n_local, petsc_n,
+      ierr = VecCreateMPI (libMesh::COMM_WORLD, petsc_n_local, petsc_n,
 			   &_vec);
-             CHKERRABORT(PETSC_COMM_WORLD,ierr);
+             CHKERRABORT(libMesh::COMM_WORLD,ierr);
       
       ierr = VecSetFromOptions (_vec);
-             CHKERRABORT(PETSC_COMM_WORLD,ierr);
+             CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }  
   
   this->_is_initialized = true;
@@ -551,9 +551,9 @@ void PetscVector<T>::close ()
   int ierr=0;
   
   ierr = VecAssemblyBegin(_vec);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
   ierr = VecAssemblyEnd(_vec);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   this->_is_closed = true;
 }
@@ -569,7 +569,7 @@ void PetscVector<T>::clear ()
       int ierr=0;
 
       ierr = VecDestroy(_vec);
-             CHKERRABORT(PETSC_COMM_WORLD,ierr);
+             CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
 
   this->_is_closed = this->_is_initialized = false;
@@ -591,13 +591,13 @@ void PetscVector<T>::zero ()
 #if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 2)
   
   ierr = VecSet (&z, _vec);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
 // 2.3.x & newer
 #else
   
   ierr = VecSet (_vec, z);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
 #endif
 }
@@ -629,7 +629,7 @@ unsigned int PetscVector<T>::size () const
     return 0;
   
   ierr = VecGetSize(_vec, &petsc_size);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   return static_cast<unsigned int>(petsc_size);
 }
@@ -645,7 +645,7 @@ unsigned int PetscVector<T>::local_size () const
   int ierr=0, petsc_size=0;
   
   ierr = VecGetLocalSize(_vec, &petsc_size);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
   
   return static_cast<unsigned int>(petsc_size);
 }
@@ -661,7 +661,7 @@ unsigned int PetscVector<T>::first_local_index () const
   int ierr=0, petsc_first=0, petsc_last=0;
   
   ierr = VecGetOwnershipRange (_vec, &petsc_first, &petsc_last);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
   
   return static_cast<unsigned int>(petsc_first);
 }
@@ -677,7 +677,7 @@ unsigned int PetscVector<T>::last_local_index () const
   int ierr=0, petsc_first=0, petsc_last=0;
   
   ierr = VecGetOwnershipRange (_vec, &petsc_first, &petsc_last);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
   
   return static_cast<unsigned int>(petsc_last);
 }
@@ -697,12 +697,12 @@ T PetscVector<T>::operator() (const unsigned int i) const
   
 
   ierr = VecGetArray(_vec, &values);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
   
   value = values[i - this->first_local_index()];
   
   ierr = VecRestoreArray (_vec, &values);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
   
   return static_cast<T>(value);
 }
@@ -719,7 +719,7 @@ Real PetscVector<T>::min () const
   PetscReal min=0.;
 
   ierr = VecMin (_vec, &index, &min);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   // this return value is correct: VecMin returns a PetscReal
   return static_cast<Real>(min);
@@ -737,7 +737,7 @@ Real PetscVector<T>::max() const
   PetscReal max=0.;
 
   ierr = VecMax (_vec, &index, &max);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   // this return value is correct: VecMax returns a PetscReal
   return static_cast<Real>(max);

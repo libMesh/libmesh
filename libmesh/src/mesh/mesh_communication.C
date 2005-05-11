@@ -1,4 +1,4 @@
-// $Id: mesh_communication.C,v 1.14 2005-02-23 03:31:06 roystgnr Exp $
+// $Id: mesh_communication.C,v 1.15 2005-05-11 23:11:58 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -75,15 +75,24 @@ void MeshCommunication::distribute_mesh (MeshBase&) const
   unsigned int n_elem       = mesh.n_elem();
   unsigned int total_weight = MeshTools::total_weight(mesh);
 
-  // Broadcast the number of nodes
-  MPI_Bcast (&n_nodes,      1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
+  // Broadcast the sizes
+  {
+    std::vector<unsigned int> buf (3);
+    
+    buf[0] = n_nodes;
+    buf[1] = n_elem;
+    buf[2] = total_weight;
+    
+    // Broadcast
+    MPI_Bcast (&buf[0], buf.size(), MPI_UNSIGNED, 0, libMesh::COMM_WORLD);
 
-  // Send the number of elements
-  MPI_Bcast (&n_elem,       1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
-  
-  // Send the total_weight
-  MPI_Bcast (&total_weight, 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);  
-  
+    if (libMesh::processor_id() != 0)
+      {
+	n_nodes      = buf[0];
+	n_elem       = buf[1];
+	total_weight = buf[2];
+      }	
+  }  
 
   // First build up the pts vector which contains
   // the spatial locations of all the nodes      
@@ -95,9 +104,6 @@ void MeshCommunication::distribute_mesh (MeshBase&) const
     if (libMesh::processor_id() == 0)
       {
 	pts.reserve (3*n_nodes);
-	
-// 	node_iterator       it     (mesh.nodes_begin());
-// 	const node_iterator it_end (mesh.nodes_end());
 
 	MeshBase::node_iterator       it     = mesh.nodes_begin();
 	const MeshBase::node_iterator it_end = mesh.nodes_end();
@@ -120,7 +126,7 @@ void MeshCommunication::distribute_mesh (MeshBase&) const
     assert (pts.size() == (3*n_nodes));
     
     // Broadcast the pts vector
-    MPI_Bcast (&pts[0], pts.size(), MPI_REAL, 0, MPI_COMM_WORLD);
+    MPI_Bcast (&pts[0], pts.size(), MPI_REAL, 0, libMesh::COMM_WORLD);
 
     // Add the nodes we just received if we are not
     // processor 0.
@@ -149,9 +155,6 @@ void MeshCommunication::distribute_mesh (MeshBase&) const
     if (libMesh::processor_id() == 0)
       {
 	conn.reserve (n_elem + total_weight);
-	
-	// 	elem_iterator       it     (mesh.elements_begin());
-	// 	const elem_iterator it_end (mesh.elements_end());
 
 	MeshBase::element_iterator       it     = mesh.elements_begin();
 	const MeshBase::element_iterator it_end = mesh.elements_end();
@@ -175,7 +178,7 @@ void MeshCommunication::distribute_mesh (MeshBase&) const
     assert (conn.size() == (n_elem + total_weight));
     
     // Broadcast the element connectivity
-    MPI_Bcast (&conn[0], conn.size(), MPI_UNSIGNED, 0, MPI_COMM_WORLD);
+    MPI_Bcast (&conn[0], conn.size(), MPI_UNSIGNED, 0, libMesh::COMM_WORLD);
 
     // Build the elements we just received if we are not
     // processor 0.
@@ -201,9 +204,6 @@ void MeshCommunication::distribute_mesh (MeshBase&) const
     
     assert (mesh.n_elem() == n_elem);
   } // Done distributing the elements
-
-  // Print the information in the mesh for sanity.
-  // mesh.print_info();
   
 #else
 
@@ -251,35 +251,38 @@ void MeshCommunication::distribute_bcs (MeshBase&,
     unsigned int n_bcs = el_id.size();
 
     // Broadcast the number of bcs to expect from processor 0.
-    MPI_Bcast (&n_bcs, 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
+    if (n_bcs > 0)
+      {
+	MPI_Bcast (&n_bcs, 1, MPI_UNSIGNED, 0, libMesh::COMM_WORLD);
     
-    // Allocate space.
-    el_id.resize   (n_bcs);
-    side_id.resize (n_bcs);
-    bc_id.resize   (n_bcs);
+	// Allocate space.
+	el_id.resize   (n_bcs);
+	side_id.resize (n_bcs);
+	bc_id.resize   (n_bcs);
 
-    // Broadcast the element identities
-    MPI_Bcast (&el_id[0],   n_bcs, MPI_UNSIGNED,       0, MPI_COMM_WORLD);
+	// Broadcast the element identities
+	MPI_Bcast (&el_id[0],   n_bcs, MPI_UNSIGNED,       0, libMesh::COMM_WORLD);
 
-    // Broadcast the side ids for those elements
-    MPI_Bcast (&side_id[0], n_bcs, MPI_UNSIGNED_SHORT, 0, MPI_COMM_WORLD);
+	// Broadcast the side ids for those elements
+	MPI_Bcast (&side_id[0], n_bcs, MPI_UNSIGNED_SHORT, 0, libMesh::COMM_WORLD);
 
-    // Broadcast the bc ids for each side
-    MPI_Bcast (&bc_id[0],   n_bcs, MPI_SHORT,          0, MPI_COMM_WORLD);
+	// Broadcast the bc ids for each side
+	MPI_Bcast (&bc_id[0],   n_bcs, MPI_SHORT,          0, libMesh::COMM_WORLD);
 
-    // Build the boundary_info structure if we aren't processor 0
-    if (libMesh::processor_id() != 0)
-      for (unsigned int e=0; e<n_bcs; e++)
-	{
-	  assert (el_id[e] < mesh.n_elem());
+	// Build the boundary_info structure if we aren't processor 0
+	if (libMesh::processor_id() != 0)
+	  for (unsigned int e=0; e<n_bcs; e++)
+	    {
+	      assert (el_id[e] < mesh.n_elem());
+	      
+	      const Elem* elem = mesh.elem(el_id[e]);
+
+	      assert (elem != NULL);
+	      assert (side_id[e] < elem->n_sides());
 	    
-	  const Elem* elem = mesh.elem(el_id[e]);
-
-	  assert (elem != NULL);
-	  assert (side_id[e] < elem->n_sides());
-	    
-	  boundary_info.add_side (elem, side_id[e], bc_id[e]);
-	}
+	      boundary_info.add_side (elem, side_id[e], bc_id[e]);
+	    }
+      }
   }
 
 
@@ -297,30 +300,33 @@ void MeshCommunication::distribute_bcs (MeshBase&,
     unsigned int n_bcs = node_id.size();
 
     // Broadcast the number of bcs to expect from processor 0.
-    MPI_Bcast (&n_bcs, 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
+    if (n_bcs > 0)
+      {      
+	MPI_Bcast (&n_bcs, 1, MPI_UNSIGNED, 0, libMesh::COMM_WORLD);
 
-    // Allocate space.
-    node_id.resize (n_bcs);
-    bc_id.resize   (n_bcs);
+	// Allocate space.
+	node_id.resize (n_bcs);
+	bc_id.resize   (n_bcs);
+	
+	// Broadcast the node ids
+	MPI_Bcast (&node_id[0], n_bcs, MPI_UNSIGNED,       0, libMesh::COMM_WORLD);
+	
+	// Broadcast the bc ids for each side
+	MPI_Bcast (&bc_id[0],   n_bcs, MPI_SHORT,          0, libMesh::COMM_WORLD);
 
-    // Broadcast the node ids
-    MPI_Bcast (&node_id[0], n_bcs, MPI_UNSIGNED,       0, MPI_COMM_WORLD);
-
-    // Broadcast the bc ids for each side
-    MPI_Bcast (&bc_id[0],   n_bcs, MPI_SHORT,          0, MPI_COMM_WORLD);
-
-    // Build the boundary_info structure if we aren't processor 0
-    if (libMesh::processor_id() != 0)
-      for (unsigned int n=0; n<n_bcs; n++)
-	{
-	  assert (node_id[n] < mesh.n_nodes());
+	// Build the boundary_info structure if we aren't processor 0
+	if (libMesh::processor_id() != 0)
+	  for (unsigned int n=0; n<n_bcs; n++)
+	    {
+	      assert (node_id[n] < mesh.n_nodes());
+	      
+	      const Node* node = mesh.node_ptr (node_id[n]);
+	      
+	      assert (node != NULL);
 	    
-	  const Node* node = mesh.node_ptr (node_id[n]);
-
-	  assert (node != NULL);
-	    
-	  boundary_info.add_node (node, bc_id[n]);
-	}
+	      boundary_info.add_node (node, bc_id[n]);
+	    }
+      }
   }
     
       

@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.21 2005-04-12 09:00:19 spetersen Exp $
+// $Id: equation_systems.C,v 1.22 2005-05-11 23:12:10 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -378,7 +378,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
     // standard does not require that MPI_SUM, MPI_PROD etc... be
     // implemented for char data types. 12/23/2003 - BSK)  
     MPI_Allreduce (&node_conn_local[0], &node_conn[0], node_conn.size(),
-		   MPI_UNSIGNED_SHORT, MPI_SUM, MPI_COMM_WORLD);
+		   MPI_UNSIGNED_SHORT, MPI_SUM, libMesh::COMM_WORLD);
     
 #else
     // Without MPI the node_conn_local and the node_conn arrays
@@ -461,7 +461,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
   // Now each processor has computed contriburions to the
   // soln vector.  Gather them all up.
   MPI_Allreduce (&soln_local[0], &soln[0], soln.size(),
-		 MPI_REAL, MPI_SUM, MPI_COMM_WORLD);
+		 MPI_REAL, MPI_SUM, libMesh::COMM_WORLD);
 # else
   
   // In the case of complex numbers we must reduce the
@@ -479,10 +479,10 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
 
   // Now reduce the two vectors
   MPI_Allreduce (&real_part_local[0], &real_part[0], real_part.size(),
-		 MPI_REAL, MPI_SUM, MPI_COMM_WORLD);
+		 MPI_REAL, MPI_SUM, libMesh::COMM_WORLD);
   
   MPI_Allreduce (&imag_part_local[0], &imag_part[0], imag_part.size(),
-		 MPI_REAL, MPI_SUM, MPI_COMM_WORLD);
+		 MPI_REAL, MPI_SUM, libMesh::COMM_WORLD);
 
   // Now construct the soln vector from the two pieces
   for (unsigned int i=0; i<soln.size(); i++)

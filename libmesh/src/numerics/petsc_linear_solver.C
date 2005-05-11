@@ -1,4 +1,4 @@
-// $Id: petsc_linear_solver.C,v 1.4 2005-02-22 22:17:42 jwpeterson Exp $
+// $Id: petsc_linear_solver.C,v 1.5 2005-05-11 23:12:00 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -45,13 +45,13 @@ void PetscLinearSolver<T>::clear ()
 #if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 1)
       
       ierr = SLESDestroy(_sles);
-             CHKERRABORT(PETSC_COMM_WORLD,ierr);
+             CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
 // 2.2.0 & newer style
 #else
       
       ierr = KSPDestroy(_ksp);
-             CHKERRABORT(PETSC_COMM_WORLD,ierr);
+             CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #endif
 	     
       // Mimic PETSc default solver and preconditioner
@@ -80,18 +80,18 @@ void PetscLinearSolver<T>::init ()
 #if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 1)
       
       // Create the linear solver context
-      ierr = SLESCreate (PETSC_COMM_WORLD, &_sles);
-             CHKERRABORT(PETSC_COMM_WORLD,ierr);
+      ierr = SLESCreate (libMesh::COMM_WORLD, &_sles);
+             CHKERRABORT(libMesh::COMM_WORLD,ierr);
       
       // Create the Krylov subspace & preconditioner contexts
       ierr = SLESGetKSP       (_sles, &_ksp);
-             CHKERRABORT(PETSC_COMM_WORLD,ierr);
+             CHKERRABORT(libMesh::COMM_WORLD,ierr);
       ierr = SLESGetPC        (_sles, &_pc);
-             CHKERRABORT(PETSC_COMM_WORLD,ierr);
+             CHKERRABORT(libMesh::COMM_WORLD,ierr);
       
       // Have the Krylov subspace method use our good initial guess rather than 0
       ierr = KSPSetInitialGuessNonzero (_ksp, PETSC_TRUE);
-             CHKERRABORT(PETSC_COMM_WORLD,ierr);
+             CHKERRABORT(libMesh::COMM_WORLD,ierr);
       
       // Set user-specified  solver and preconditioner types
       this->set_petsc_solver_type();
@@ -105,22 +105,22 @@ void PetscLinearSolver<T>::init ()
       //  routines.
       
       ierr = SLESSetFromOptions (_sles);
-             CHKERRABORT(PETSC_COMM_WORLD,ierr);
+             CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
 // 2.2.0 & newer style
 #else
       
       // Create the linear solver context
-      ierr = KSPCreate (PETSC_COMM_WORLD, &_ksp);
-             CHKERRABORT(PETSC_COMM_WORLD,ierr);
+      ierr = KSPCreate (libMesh::COMM_WORLD, &_ksp);
+             CHKERRABORT(libMesh::COMM_WORLD,ierr);
       
       // Create the preconditioner context
       ierr = KSPGetPC        (_ksp, &_pc);
-             CHKERRABORT(PETSC_COMM_WORLD,ierr);
+             CHKERRABORT(libMesh::COMM_WORLD,ierr);
       
       // Have the Krylov subspace method use our good initial guess rather than 0
       ierr = KSPSetInitialGuessNonzero (_ksp, PETSC_TRUE);
-             CHKERRABORT(PETSC_COMM_WORLD,ierr);
+             CHKERRABORT(libMesh::COMM_WORLD,ierr);
       
       // Set user-specified  solver and preconditioner types
       this->set_petsc_solver_type();
@@ -134,7 +134,7 @@ void PetscLinearSolver<T>::init ()
       //  routines.
       
       ierr = KSPSetFromOptions (_ksp);
-      CHKERRABORT(PETSC_COMM_WORLD,ierr);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
 	       
 #endif
@@ -148,7 +148,7 @@ void PetscLinearSolver<T>::init ()
 				   PETSC_NULL,   // pointer to the array which holds the history
 				   PETSC_DECIDE, // size of the array holding the history
 				   PETSC_TRUE);  // Whether or not to reset the history for each solve. 
-      CHKERRABORT(PETSC_COMM_WORLD,ierr);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
 }
 
@@ -206,24 +206,24 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
   // Set operators. The input matrix works as the preconditioning matrix
   ierr = SLESSetOperators(_sles, matrix->mat(), precond->mat(),
 			  SAME_NONZERO_PATTERN);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
 
   // Set the tolerances for the iterative solver.  Use the user-supplied
   // tolerance for the relative residual & leave the others at default values.
   ierr = KSPSetTolerances (_ksp, tol, PETSC_DEFAULT,
  			   PETSC_DEFAULT, max_its);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
 
   // Solve the linear system
   ierr = SLESSolve (_sles, rhs->vec(), solution->vec(), &its);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
 
   // Get the norm of the final residual to return to the user.
   ierr = KSPGetResidualNorm (_ksp, &final_resid);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
 // 2.2.0
 #elif (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)
@@ -231,7 +231,7 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
   // Set operators. The input matrix works as the preconditioning matrix
   ierr = KSPSetOperators(_ksp, matrix->mat(), precond->mat(),
 			 SAME_NONZERO_PATTERN);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
 
   // Set the tolerances for the iterative solver.  Use the user-supplied
@@ -246,28 +246,28 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
 			   PETSC_DEFAULT, // abstol = absolute convergence tolerance (1.e-50)
  			   PETSC_DEFAULT, // dtol   = divergence tolerance           (1.e+5)
 			   max_its);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
 
   // Set the solution vector to use
   ierr = KSPSetSolution (_ksp, solution->vec());
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	 
   // Set the RHS vector to use
   ierr = KSPSetRhs (_ksp, rhs->vec());
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
    
   // Solve the linear system
   ierr = KSPSolve (_ksp);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	 
   // Get the number of iterations required for convergence
   ierr = KSPGetIterationNumber (_ksp, &its);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	 
   // Get the norm of the final residual to return to the user.
   ierr = KSPGetResidualNorm (_ksp, &final_resid);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	 
 // 2.2.1 & newer style
 #else
@@ -275,25 +275,25 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
   // Set operators. The input matrix works as the preconditioning matrix
   ierr = KSPSetOperators(_ksp, matrix->mat(), precond->mat(),
 			 SAME_NONZERO_PATTERN);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   // Set the tolerances for the iterative solver.  Use the user-supplied
   // tolerance for the relative residual & leave the others at default values.
   ierr = KSPSetTolerances (_ksp, tol, PETSC_DEFAULT,
  			   PETSC_DEFAULT, max_its);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   // Solve the linear system
   ierr = KSPSolve (_ksp, rhs->vec(), solution->vec());
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	 
   // Get the number of iterations required for convergence
   ierr = KSPGetIterationNumber (_ksp, &its);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	 
   // Get the norm of the final residual to return to the user.
   ierr = KSPGetResidualNorm (_ksp, &final_resid);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	 
 #endif
 
@@ -317,7 +317,7 @@ void PetscLinearSolver<T>::get_residual_history(std::vector<double>& hist)
   // example, TFQMR returns two residual values per iteration step.
   double* p;
   ierr = KSPGetResidualHistory(_ksp, &p, &its);
-  CHKERRABORT(PETSC_COMM_WORLD,ierr);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   // Check for early return
   if (its == 0) return;
@@ -350,7 +350,7 @@ Real PetscLinearSolver<T>::get_initial_residual()
   // example, TFQMR returns two residual values per iteration step.
   double* p;
   ierr = KSPGetResidualHistory(_ksp, &p, &its);
-  CHKERRABORT(PETSC_COMM_WORLD,ierr);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   // Check no residual history
   if (its == 0)
@@ -375,40 +375,40 @@ void PetscLinearSolver<T>::set_petsc_solver_type()
     {
 
     case CG:
-      ierr = KSPSetType (_ksp, (char*) KSPCG);         CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
+      ierr = KSPSetType (_ksp, (char*) KSPCG);         CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
 
     case CR:
-      ierr = KSPSetType (_ksp, (char*) KSPCR);         CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
+      ierr = KSPSetType (_ksp, (char*) KSPCR);         CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
 
     case CGS:
-      ierr = KSPSetType (_ksp, (char*) KSPCGS);        CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
+      ierr = KSPSetType (_ksp, (char*) KSPCGS);        CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
 
     case BICG:
-      ierr = KSPSetType (_ksp, (char*) KSPBICG);       CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
+      ierr = KSPSetType (_ksp, (char*) KSPBICG);       CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
 
     case TCQMR:
-      ierr = KSPSetType (_ksp, (char*) KSPTCQMR);      CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
+      ierr = KSPSetType (_ksp, (char*) KSPTCQMR);      CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
  
     case TFQMR:
-      ierr = KSPSetType (_ksp, (char*) KSPTFQMR);      CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
+      ierr = KSPSetType (_ksp, (char*) KSPTFQMR);      CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
 
     case LSQR:
-      ierr = KSPSetType (_ksp, (char*) KSPLSQR);       CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
+      ierr = KSPSetType (_ksp, (char*) KSPLSQR);       CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
 
     case BICGSTAB:
-      ierr = KSPSetType (_ksp, (char*) KSPBCGS);       CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
+      ierr = KSPSetType (_ksp, (char*) KSPBCGS);       CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
 
     case MINRES:
-      ierr = KSPSetType (_ksp, (char*) KSPMINRES);     CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
+      ierr = KSPSetType (_ksp, (char*) KSPMINRES);     CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
 
     case GMRES:
-      ierr = KSPSetType (_ksp, (char*) KSPGMRES);      CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
+      ierr = KSPSetType (_ksp, (char*) KSPGMRES);      CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
 
     case RICHARDSON:
-      ierr = KSPSetType (_ksp, (char*) KSPRICHARDSON); CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
+      ierr = KSPSetType (_ksp, (char*) KSPRICHARDSON); CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
 
     case CHEBYSHEV: 
-      ierr = KSPSetType (_ksp, (char*) KSPCHEBYCHEV);  CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
+      ierr = KSPSetType (_ksp, (char*) KSPCHEBYCHEV);  CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
 
     default:
       std::cerr << "ERROR:  Unsupported PETSC Solver: "
@@ -432,42 +432,42 @@ void PetscLinearSolver<T>::set_petsc_preconditioner_type()
   switch (this->_preconditioner_type)
     {
     case IDENTITY_PRECOND:
-      ierr = PCSetType (_pc, (char*) PCNONE);      CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
+      ierr = PCSetType (_pc, (char*) PCNONE);      CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
 	
     case CHOLESKY_PRECOND:
-      ierr = PCSetType (_pc, (char*) PCCHOLESKY);  CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
+      ierr = PCSetType (_pc, (char*) PCCHOLESKY);  CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
 
     case ICC_PRECOND:
-      ierr = PCSetType (_pc, (char*) PCICC);       CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
+      ierr = PCSetType (_pc, (char*) PCICC);       CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
 
     case ILU_PRECOND:
-      ierr = PCSetType (_pc, (char*) PCILU);       CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
+      ierr = PCSetType (_pc, (char*) PCILU);       CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
 
     case LU_PRECOND:
-      ierr = PCSetType (_pc, (char*) PCLU);        CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
+      ierr = PCSetType (_pc, (char*) PCLU);        CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
       
     case ASM_PRECOND:
-      ierr = PCSetType (_pc, (char*) PCASM);       CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
+      ierr = PCSetType (_pc, (char*) PCASM);       CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
 
     case JACOBI_PRECOND:
-      ierr = PCSetType (_pc, (char*) PCJACOBI);    CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
+      ierr = PCSetType (_pc, (char*) PCJACOBI);    CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
 
     case BLOCK_JACOBI_PRECOND:
-      ierr = PCSetType (_pc, (char*) PCBJACOBI);   CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
+      ierr = PCSetType (_pc, (char*) PCBJACOBI);   CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
 
     case SOR_PRECOND:
-      ierr = PCSetType (_pc, (char*) PCSOR);       CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
+      ierr = PCSetType (_pc, (char*) PCSOR);       CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
 
     case EISENSTAT_PRECOND:
-      ierr = PCSetType (_pc, (char*) PCEISENSTAT); CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
+      ierr = PCSetType (_pc, (char*) PCEISENSTAT); CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
 
 #if !((PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 1) && (PETSC_VERSION_SUBMINOR <= 1))
     case USER_PRECOND:
-      ierr = PCSetType (_pc, (char*) PCMAT);       CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
+      ierr = PCSetType (_pc, (char*) PCMAT);       CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
 #endif
 
     case SHELL_PRECOND:
-      ierr = PCSetType (_pc, (char*) PCSHELL);     CHKERRABORT(PETSC_COMM_WORLD,ierr); return;
+      ierr = PCSetType (_pc, (char*) PCSHELL);     CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
 
     default:
       std::cerr << "ERROR:  Unsupported PETSC Preconditioner: "

@@ -1,4 +1,4 @@
-// $Id: libmesh_base.h,v 1.3 2005-02-22 22:17:30 jwpeterson Exp $
+// $Id: libmesh_base.h,v 1.4 2005-05-11 23:11:57 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,8 @@
 
 
 
-namespace libMesh {  
+namespace libMesh {
+  
   /**
    * @returns the number of processors used in the current simulation.
    */

@@ -1,4 +1,4 @@
-// $Id: error_estimator.C,v 1.18 2005-02-22 22:17:42 jwpeterson Exp $
+// $Id: error_estimator.C,v 1.19 2005-05-11 23:11:59 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -41,7 +41,7 @@ void ErrorEstimator::reduce_error (std::vector<float>& error_per_cell) const
       
       MPI_Allreduce (&epc[0], &error_per_cell[0],
 		     error_per_cell.size(),
-		     MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
+		     MPI_FLOAT, MPI_SUM, libMesh::COMM_WORLD);
     }  
 #endif
 }

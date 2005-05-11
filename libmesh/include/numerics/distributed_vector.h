@@ -1,4 +1,4 @@
-// $Id: distributed_vector.h,v 1.8 2005-02-22 22:17:34 jwpeterson Exp $
+// $Id: distributed_vector.h,v 1.9 2005-05-11 23:11:57 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -452,8 +452,8 @@ void DistributedVector<T>::init (const unsigned int n,
 
   int n_proc=0, proc_id=0;
   
-  MPI_Comm_rank (MPI_COMM_WORLD, &proc_id);
-  MPI_Comm_size (MPI_COMM_WORLD, &n_proc);
+  MPI_Comm_rank (libMesh::COMM_WORLD, &proc_id);
+  MPI_Comm_size (libMesh::COMM_WORLD, &n_proc);
   
   std::vector<int> local_sizes     (n_proc, 0);
   std::vector<int> local_sizes_send(n_proc, 0);
@@ -461,7 +461,7 @@ void DistributedVector<T>::init (const unsigned int n,
   local_sizes_send[proc_id] = n_local;
 
   MPI_Allreduce (&local_sizes_send[0], &local_sizes[0], local_sizes.size(),
-		 MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+		 MPI_INT, MPI_SUM, libMesh::COMM_WORLD);
   
   // _first_local_index is the sum of _local_size
   // for all processor ids less than ours
@@ -685,7 +685,7 @@ Real DistributedVector<T>::min () const
 #ifdef HAVE_MPI
 
   MPI_Allreduce (&local_min, &global_min, 1,
-		 MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD);
+		 MPI_DOUBLE, MPI_MIN, libMesh::COMM_WORLD);
 
 #endif
 
@@ -711,7 +711,7 @@ Real DistributedVector<T>::max() const
 #ifdef HAVE_MPI
 
   MPI_Allreduce (&local_max, &global_max, 1,
-		 MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+		 MPI_DOUBLE, MPI_MAX, libMesh::COMM_WORLD);
   
 #endif
 

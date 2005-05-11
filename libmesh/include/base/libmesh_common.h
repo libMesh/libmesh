@@ -1,4 +1,4 @@
-// $Id: libmesh_common.h,v 1.11 2005-03-17 19:21:15 benkirk Exp $
+// $Id: libmesh_common.h,v 1.12 2005-05-11 23:11:57 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -104,8 +104,16 @@ typedef std::complex<double> COMPLEX;
   DIE A HORRIBLE DEATH HERE...
 #endif
 
-  
 
+#ifdef HAVE_MPI
+namespace libMesh
+{
+  /**
+   * MPI Communicator to be used in the library.
+   */
+  extern MPI_Comm COMM_WORLD;
+}
+#endif
 
 // These are useful macros that behave like functions in the code.
 // If you want to make sure you are accessing a section of code just
@@ -115,7 +123,7 @@ typedef std::complex<double> COMPLEX;
 
 #undef error
 #ifdef HAVE_MPI
-#  define error()    { std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; if (libMesh::n_processors() > 1) MPI_Abort(MPI_COMM_WORLD,1); std::abort(); }
+#  define error()    { std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; if (libMesh::n_processors() > 1) MPI_Abort(libMesh::COMM_WORLD,1); std::abort(); }
 #else
 #  define error()    { std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; std::abort(); }
 #endif

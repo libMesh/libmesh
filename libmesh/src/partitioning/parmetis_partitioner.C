@@ -1,4 +1,4 @@
-// $Id: parmetis_partitioner.C,v 1.17 2005-02-22 22:17:42 jwpeterson Exp $
+// $Id: parmetis_partitioner.C,v 1.18 2005-05-11 23:12:10 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -88,7 +88,7 @@ void ParmetisPartitioner::_do_partition (MeshBase& mesh,
 
   // Partition the graph
   std::vector<int>  local_part(_part);
-  MPI_Comm mpi_comm = MPI_COMM_WORLD;
+  MPI_Comm mpi_comm = libMesh::COMM_WORLD;
   
   // Call the ParMETIS k-way partitioning algorithm.
   Parmetis::ParMETIS_V3_PartKway(&_vtxdist[0], &_xadj[0], &_adjncy[0], &_vwgt[0], NULL,
@@ -100,7 +100,7 @@ void ParmetisPartitioner::_do_partition (MeshBase& mesh,
   // Collect the partioning information from all the processors.
   assert (_part.size() == local_part.size());
   MPI_Allreduce (&local_part[0], &_part[0], _part.size(), MPI_INT, MPI_SUM,
-		 MPI_COMM_WORLD);
+		 libMesh::COMM_WORLD);
   
   // Assign the returned processor ids
   this->assign_partitioning (mesh);
@@ -164,7 +164,7 @@ void ParmetisPartitioner::_do_repartition (MeshBase& mesh,
   std::vector<int> local_part(_part);
   std::vector<int> vsize(_vwgt.size(), 1);
   float itr = 1000.0;
-  MPI_Comm mpi_comm = MPI_COMM_WORLD;
+  MPI_Comm mpi_comm = libMesh::COMM_WORLD;
 
   // Call the ParMETIS adaptive repartitioning method.  This respects the
   // original partitioning when computing the new partitioning so as to
@@ -180,7 +180,7 @@ void ParmetisPartitioner::_do_repartition (MeshBase& mesh,
   // Collect the partioning information from all the processors.
   assert (_part.size() == local_part.size());
   MPI_Allreduce (&local_part[0], &_part[0], _part.size(), MPI_INT, MPI_SUM,
-		 MPI_COMM_WORLD);
+		 libMesh::COMM_WORLD);
   
   // Assign the returned processor ids
   this->assign_partitioning (mesh);

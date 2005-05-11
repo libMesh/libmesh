@@ -1,4 +1,4 @@
-// $Id: petsc_matrix.h,v 1.13 2005-05-05 20:20:48 benkirk Exp $
+// $Id: petsc_matrix.h,v 1.14 2005-05-11 23:11:57 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -373,9 +373,9 @@ void PetscMatrix<T>::close () const
   int ierr=0;
  
   ierr = MatAssemblyBegin (_mat, MAT_FINAL_ASSEMBLY);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
   ierr = MatAssemblyEnd   (_mat, MAT_FINAL_ASSEMBLY);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 }
 
 
@@ -419,7 +419,7 @@ unsigned int PetscMatrix<T>::row_start () const
   int start=0, stop=0, ierr=0;
 
   ierr = MatGetOwnershipRange(_mat, &start, &stop);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   return static_cast<unsigned int>(start);
 }
@@ -435,7 +435,7 @@ unsigned int PetscMatrix<T>::row_stop () const
   int start=0, stop=0, ierr=0;
 
   ierr = MatGetOwnershipRange(_mat, &start, &stop);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   return static_cast<unsigned int>(stop);
 }
@@ -455,7 +455,7 @@ void PetscMatrix<T>::set (const unsigned int i,
   PetscScalar petsc_value = static_cast<PetscScalar>(value);
   ierr = MatSetValues(_mat, 1, &i_val, 1, &j_val,
 		      &petsc_value, INSERT_VALUES);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 }
 
 
@@ -473,7 +473,7 @@ void PetscMatrix<T>::add (const unsigned int i,
   PetscScalar petsc_value = static_cast<PetscScalar>(value);
   ierr = MatSetValues(_mat, 1, &i_val, 1, &j_val,
 		      &petsc_value, ADD_VALUES);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 }
 
 
@@ -510,7 +510,7 @@ void PetscMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 		      n, (int*) &cols[0],
 		      (PetscScalar*) &dm.get_values()[0],
 		      ADD_VALUES);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 }
 
 
@@ -541,13 +541,13 @@ void PetscMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
 #if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 2)
   
   ierr = MatAXPY(&a,  X->_mat, _mat, SAME_NONZERO_PATTERN);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	 
 // 2.3.x & newer
 #else
   
   ierr = MatAXPY(_mat, a, X->_mat, SAME_NONZERO_PATTERN);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	 
 #endif
 }
@@ -588,7 +588,7 @@ T PetscMatrix<T>::operator () (const unsigned int i,
   this->close();
 
   ierr = MatGetRow(_mat, i_val, &ncols, &petsc_cols, &petsc_row);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	 
   // Perform a binary search to find the contiguous index in
   // petsc_cols (resp. petsc_row) corresponding to global index j_val
@@ -610,7 +610,7 @@ T PetscMatrix<T>::operator () (const unsigned int i,
       
       ierr  = MatRestoreRow(_mat, i_val,
 			    &ncols, &petsc_cols, &petsc_row);
-              CHKERRABORT(PETSC_COMM_WORLD,ierr);
+              CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	  
       return value;
     }
@@ -633,7 +633,7 @@ bool PetscMatrix<T>::closed() const
   PetscTruth assembled;
 
   ierr = MatAssembled(_mat, &assembled);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   return (assembled == PETSC_TRUE);
 }
@@ -655,7 +655,7 @@ void PetscMatrix<T>::print_personal(std::ostream& os) const
   int ierr=0;
 
   ierr = MatView(_mat, PETSC_VIEWER_STDOUT_SELF);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 }
 
 #endif // #ifdef HAVE_PETSC
