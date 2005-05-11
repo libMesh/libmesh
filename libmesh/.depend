@@ -1623,6 +1623,8 @@ src/geom/cell_hex20.$(obj-suffix):\
     include/enums/enum_solver_package.h\
     include/geom/cell_hex.h\
     include/geom/cell_hex20.h\
+    include/geom/edge.h\
+    include/geom/edge_edge3.h\
     include/geom/elem.h\
     include/geom/face.h\
     include/geom/face_quad.h\
@@ -1652,6 +1654,8 @@ src/geom/cell_hex27.$(obj-suffix):\
     include/enums/enum_solver_package.h\
     include/geom/cell_hex.h\
     include/geom/cell_hex27.h\
+    include/geom/edge.h\
+    include/geom/edge_edge3.h\
     include/geom/elem.h\
     include/geom/face.h\
     include/geom/face_quad.h\
@@ -1681,6 +1685,8 @@ src/geom/cell_hex8.$(obj-suffix):\
     include/enums/enum_solver_package.h\
     include/geom/cell_hex.h\
     include/geom/cell_hex8.h\
+    include/geom/edge.h\
+    include/geom/edge_edge2.h\
     include/geom/elem.h\
     include/geom/face.h\
     include/geom/face_quad.h\
@@ -1739,6 +1745,9 @@ src/geom/cell_inf_hex16.$(obj-suffix):\
     include/enums/enum_solver_package.h\
     include/geom/cell_inf_hex.h\
     include/geom/cell_inf_hex16.h\
+    include/geom/edge.h\
+    include/geom/edge_edge3.h\
+    include/geom/edge_inf_edge2.h\
     include/geom/elem.h\
     include/geom/face.h\
     include/geom/face_inf_quad.h\
@@ -1746,6 +1755,7 @@ src/geom/cell_inf_hex16.$(obj-suffix):\
     include/geom/face_quad.h\
     include/geom/face_quad8.h\
     include/geom/point.h\
+    include/geom/side.h\
     include/numerics/type_vector.h\
     include/utils/perf_log.h
 src/geom/cell_inf_hex18.$(obj-suffix):\
@@ -1769,6 +1779,9 @@ src/geom/cell_inf_hex18.$(obj-suffix):\
     include/enums/enum_solver_package.h\
     include/geom/cell_inf_hex.h\
     include/geom/cell_inf_hex18.h\
+    include/geom/edge.h\
+    include/geom/edge_edge3.h\
+    include/geom/edge_inf_edge2.h\
     include/geom/elem.h\
     include/geom/face.h\
     include/geom/face_inf_quad.h\
@@ -1776,23 +1789,42 @@ src/geom/cell_inf_hex18.$(obj-suffix):\
     include/geom/face_quad.h\
     include/geom/face_quad9.h\
     include/geom/point.h\
+    include/geom/side.h\
     include/numerics/type_vector.h\
     include/utils/perf_log.h
 src/geom/cell_inf_hex8.$(obj-suffix):\
     src/geom/cell_inf_hex8.C\
+    include/base/auto_ptr.h\
+    include/base/dof_object.h\
+    include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
+    include/base/node.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
+    include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
+    include/enums/enum_io_package.h\
     include/enums/enum_order.h\
+    include/enums/enum_solver_package.h\
     include/fe/fe_interface.h\
     include/fe/fe_type.h\
     include/geom/cell_inf_hex.h\
     include/geom/cell_inf_hex8.h\
+    include/geom/edge.h\
+    include/geom/edge_edge2.h\
+    include/geom/edge_inf_edge2.h\
+    include/geom/elem.h\
     include/geom/point.h\
-    include/numerics/type_vector.h
+    include/geom/side.h\
+    include/numerics/type_vector.h\
+    include/utils/perf_log.h
 src/geom/cell_inf_hex.$(obj-suffix):\
     src/geom/cell_inf_hex.C\
     include/base/auto_ptr.h\
@@ -1844,6 +1876,9 @@ src/geom/cell_inf_prism12.$(obj-suffix):\
     include/geom/cell_inf.h\
     include/geom/cell_inf_prism.h\
     include/geom/cell_inf_prism12.h\
+    include/geom/edge.h\
+    include/geom/edge_edge3.h\
+    include/geom/edge_inf_edge2.h\
     include/geom/elem.h\
     include/geom/face.h\
     include/geom/face_inf_quad.h\
@@ -1851,6 +1886,7 @@ src/geom/cell_inf_prism12.$(obj-suffix):\
     include/geom/face_tri.h\
     include/geom/face_tri6.h\
     include/geom/point.h\
+    include/geom/side.h\
     include/numerics/type_vector.h\
     include/utils/perf_log.h
 src/geom/cell_inf_prism6.$(obj-suffix):\
@@ -1879,8 +1915,12 @@ src/geom/cell_inf_prism6.$(obj-suffix):\
     include/geom/cell_inf.h\
     include/geom/cell_inf_prism.h\
     include/geom/cell_inf_prism6.h\
+    include/geom/edge.h\
+    include/geom/edge_edge2.h\
+    include/geom/edge_inf_edge2.h\
     include/geom/elem.h\
     include/geom/point.h\
+    include/geom/side.h\
     include/numerics/type_vector.h\
     include/utils/perf_log.h
 src/geom/cell_inf_prism.$(obj-suffix):\
@@ -1935,6 +1975,8 @@ src/geom/cell_prism15.$(obj-suffix):\
     include/geom/cell.h\
     include/geom/cell_prism.h\
     include/geom/cell_prism15.h\
+    include/geom/edge.h\
+    include/geom/edge_edge3.h\
     include/geom/elem.h\
     include/geom/face.h\
     include/geom/face_quad.h\
@@ -1967,6 +2009,8 @@ src/geom/cell_prism18.$(obj-suffix):\
     include/geom/cell.h\
     include/geom/cell_prism.h\
     include/geom/cell_prism18.h\
+    include/geom/edge.h\
+    include/geom/edge_edge3.h\
     include/geom/elem.h\
     include/geom/face.h\
     include/geom/face_quad.h\
@@ -1999,6 +2043,8 @@ src/geom/cell_prism6.$(obj-suffix):\
     include/geom/cell.h\
     include/geom/cell_prism.h\
     include/geom/cell_prism6.h\
+    include/geom/edge.h\
+    include/geom/edge_edge2.h\
     include/geom/elem.h\
     include/geom/face.h\
     include/geom/face_quad.h\
@@ -2061,6 +2107,8 @@ src/geom/cell_pyramid5.$(obj-suffix):\
     include/geom/cell.h\
     include/geom/cell_pyramid.h\
     include/geom/cell_pyramid5.h\
+    include/geom/edge.h\
+    include/geom/edge_edge2.h\
     include/geom/elem.h\
     include/geom/face.h\
     include/geom/face_quad.h\
@@ -2123,6 +2171,8 @@ src/geom/cell_tet10.$(obj-suffix):\
     include/geom/cell.h\
     include/geom/cell_tet.h\
     include/geom/cell_tet10.h\
+    include/geom/edge.h\
+    include/geom/edge_edge3.h\
     include/geom/elem.h\
     include/geom/face.h\
     include/geom/face_tri.h\
@@ -2153,6 +2203,8 @@ src/geom/cell_tet4.$(obj-suffix):\
     include/geom/cell.h\
     include/geom/cell_tet.h\
     include/geom/cell_tet4.h\
+    include/geom/edge.h\
+    include/geom/edge_edge2.h\
     include/geom/elem.h\
     include/geom/face.h\
     include/geom/face_tri.h\
@@ -5719,6 +5771,7 @@ src/solvers/system_projection.$(obj-suffix):\
     include/enums/enum_quadrature_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
+    include/fe/fe.h\
     include/fe/fe_base.h\
     include/fe/fe_interface.h\
     include/fe/fe_type.h\

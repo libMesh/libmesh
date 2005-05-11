@@ -1,4 +1,4 @@
-// $Id: cell_hex8.C,v 1.22 2005-05-06 17:06:57 roystgnr Exp $
+// $Id: cell_hex8.C,v 1.23 2005-05-11 18:31:16 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -23,6 +23,7 @@
 // Local includes
 #include "side.h"
 #include "cell_hex8.h"
+#include "edge_edge2.h"
 #include "face_quad4.h"
 
 
@@ -174,6 +175,15 @@ AutoPtr<Elem> Hex8::build_side (const unsigned int i) const
 }
 
 
+
+AutoPtr<Elem> Hex8::build_edge (const unsigned int i) const
+{
+  assert (i < this->n_edges());
+
+  AutoPtr<Elem> ap(new SideEdge<Edge2,Hex8>(this,i));
+  return ap;
+}
+  
 
 
 void Hex8::connectivity(const unsigned int sc,

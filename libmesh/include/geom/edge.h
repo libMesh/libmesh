@@ -1,4 +1,4 @@
-// $Id: edge.h,v 1.4 2005-02-22 22:17:32 jwpeterson Exp $
+// $Id: edge.h,v 1.5 2005-05-11 18:31:17 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -119,6 +119,12 @@ class Edge : public Elem
    * The \p Elem::build_side() member makes no sense for edges.
    */
   AutoPtr<Elem> build_side (const unsigned int) const
+  { error(); AutoPtr<Elem> ap(NULL); return ap; }
+
+  /**
+   * The \p Elem::build_edge() member makes little sense for edges.
+   */
+  AutoPtr<Elem> build_edge (const unsigned int) const
   { error(); AutoPtr<Elem> ap(NULL); return ap; }
 
   

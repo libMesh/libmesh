@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism6.C,v 1.28 2005-05-06 17:06:57 roystgnr Exp $
+// $Id: cell_inf_prism6.C,v 1.29 2005-05-11 18:31:16 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -26,8 +26,11 @@
 
 // Local includes cont'd
 #include "cell_inf_prism6.h"
+#include "edge_edge2.h"
+#include "edge_inf_edge2.h"
 #include "fe_interface.h"
 #include "fe_type.h"
+#include "side.h"
 
 
 
@@ -93,6 +96,16 @@ bool InfPrism6::is_node_on_edge(const unsigned int n,
       return true;
   return false;
 }
+
+AutoPtr<Elem> InfPrism6::build_edge (const unsigned int i) const
+{
+  assert(i < n_edges());
+
+  if (i < 3)
+    return AutoPtr<Elem>(new SideEdge<Edge2,InfPrism6>(this,i));
+  return AutoPtr<Elem>(new SideEdge<InfEdge2,InfPrism6>(this,i));
+}
+
 
 bool InfPrism6::contains_point (const Point& p) const
 {

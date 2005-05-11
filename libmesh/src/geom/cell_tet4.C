@@ -1,4 +1,4 @@
-// $Id: cell_tet4.C,v 1.22 2005-05-06 17:06:58 roystgnr Exp $
+// $Id: cell_tet4.C,v 1.23 2005-05-11 18:31:16 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -23,6 +23,7 @@
 // Local includes
 #include "side.h"
 #include "cell_tet4.h"
+#include "edge_edge2.h"
 #include "face_tri3.h"
 
 
@@ -138,6 +139,14 @@ AutoPtr<Elem> Tet4::build_side (const unsigned int i) const
 //   // We'll never get here.
 //   error();  
 //   return face;
+}
+
+
+AutoPtr<Elem> Tet4::build_edge (const unsigned int i) const
+{
+  assert (i < this->n_edges());
+
+  return AutoPtr<Elem>(new SideEdge<Edge2,Tet4>(this,i));
 }
 
 

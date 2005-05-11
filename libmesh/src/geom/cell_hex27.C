@@ -1,4 +1,4 @@
-// $Id: cell_hex27.C,v 1.30 2005-05-06 17:06:57 roystgnr Exp $
+// $Id: cell_hex27.C,v 1.31 2005-05-11 18:31:00 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -23,6 +23,7 @@
 // Local includes
 #include "side.h"
 #include "cell_hex27.h"
+#include "edge_edge3.h"
 #include "face_quad9.h"
 
 
@@ -258,6 +259,15 @@ AutoPtr<Elem> Hex27::build_side (const unsigned int i) const
 //   return face;
 }
 
+
+
+AutoPtr<Elem> Hex27::build_edge (const unsigned int i) const
+{
+  assert (i < this->n_edges());
+
+  return AutoPtr<Elem>(new SideEdge<Edge3,Hex27>(this,i));
+}
+  
 
 
 void Hex27::connectivity(const unsigned int sc,

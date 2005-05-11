@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex8.h,v 1.7 2005-05-06 17:07:00 roystgnr Exp $
+// $Id: cell_inf_hex8.h,v 1.8 2005-05-11 18:31:17 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -121,6 +121,13 @@ public:
    */
   AutoPtr<Elem> build_side (const unsigned int i) const
   { AutoPtr<Elem> ap(this->side(i)); return ap; }
+
+  /**
+   * Returns an \p EDGE2 built coincident with edges 0 to 3, an \p INFEDGE2
+   * built coincident with edges 4 to 7. Note that the \p AutoPtr<Elem>
+   * takes care of freeing memory.
+   */
+  AutoPtr<Elem> build_edge (const unsigned int i) const;
 
   virtual void connectivity(const unsigned int sc,
 			    const IOPackage iop,
