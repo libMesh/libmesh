@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.15 2005-05-10 19:53:24 roystgnr Exp $
+// $Id: fe.h,v 1.16 2005-05-11 20:11:34 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -54,7 +54,7 @@ class InfFE;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.15 $
+ * \version $Revision: 1.16 $
  */
 
 //-------------------------------------------------------------
@@ -289,6 +289,13 @@ public:
 		       const unsigned int side);
 
   /**
+   * Reinitializes all the physical element-dependent data based on
+   * the \p edge
+   */
+  virtual void edge_reinit (const Elem* elem,
+		            const unsigned int edge);
+
+  /**
    * Provides the class with the quadrature rule, which provides the
    * locations (on a reference element) where the shape functions are
    * to be calculated.
@@ -362,6 +369,13 @@ protected:
   void init_face_shape_functions(const std::vector<Point>& qp,
 				 const Elem* side);
 
+  /** 
+   * Same as before, but for an edge. This is used for some projection
+   * operators.
+   */  
+  void init_edge_shape_functions(const std::vector<Point>& qp,
+				 const Elem* edge);
+
   /**
    * @returns the location (in physical space) of the point
    * \p p located on the reference element.
@@ -409,7 +423,7 @@ protected:
  *
  * \author Roy Stogner
  * \date 2004
- * \version $Revision: 1.15 $
+ * \version $Revision: 1.16 $
  */
 
 //-------------------------------------------------------------
@@ -434,7 +448,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.15 $
+ * \version $Revision: 1.16 $
  */
 
 //-------------------------------------------------------------
@@ -459,7 +473,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.15 $
+ * \version $Revision: 1.16 $
  */
 
 //-------------------------------------------------------------
@@ -484,7 +498,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.15 $
+ * \version $Revision: 1.16 $
  */
 
 //-------------------------------------------------------------
@@ -510,7 +524,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.15 $
+ * \version $Revision: 1.16 $
  */
 
 //-------------------------------------------------------------

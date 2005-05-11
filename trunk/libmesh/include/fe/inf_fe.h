@@ -1,4 +1,4 @@
-// $Id: inf_fe.h,v 1.6 2005-05-04 21:27:58 roystgnr Exp $
+// $Id: inf_fe.h,v 1.7 2005-05-11 20:11:34 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -66,7 +66,7 @@ class FEComputeData;
  *
  * \author Daniel Dreyer
  * \date 2003
- * \version $Revision: 1.6 $
+ * \version $Revision: 1.7 $
  */
 
 //-------------------------------------------------------------
@@ -89,7 +89,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.6 $
+   * \version $Revision: 1.7 $
    */
   //-------------------------------------------------------------
   // InfFE::Radial class definition
@@ -181,7 +181,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.6 $
+   * \version $Revision: 1.7 $
    */
   //-------------------------------------------------------------
   // InfFE::Base class definition
@@ -389,6 +389,14 @@ public:
    */
   virtual void reinit (const Elem* elem,
 		       const unsigned int side);
+
+  /**
+   * Not implemented yet.  Reinitializes all the physical 
+   * element-dependent data based on the \p edge of an infinite 
+   * element.
+   */
+  virtual void edge_reinit (const Elem* elem,
+		            const unsigned int edge);
 
   /**
    * The use of quadrature rules with the \p InfFE class is somewhat
