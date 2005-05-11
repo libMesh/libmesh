@@ -1,4 +1,4 @@
-// $Id: cell_hex8.h,v 1.9 2005-05-06 17:07:00 roystgnr Exp $
+// $Id: cell_hex8.h,v 1.10 2005-05-11 18:31:16 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -115,6 +115,12 @@ public:
    * The \p AutoPtr<Elem> handles the memory aspect.
    */
   AutoPtr<Elem> build_side (const unsigned int i) const;
+
+  /**
+   * Builds a EDGE2 built coincident with edge i.  
+   * The \p AutoPtr<Elem> handles the memory aspect.
+   */
+  AutoPtr<Elem> build_edge (const unsigned int i) const;
 
   virtual void connectivity(const unsigned int sc,
 			    const IOPackage iop,

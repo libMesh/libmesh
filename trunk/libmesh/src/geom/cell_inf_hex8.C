@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex8.C,v 1.29 2005-05-06 17:06:57 roystgnr Exp $
+// $Id: cell_inf_hex8.C,v 1.30 2005-05-11 18:31:16 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -26,8 +26,11 @@
 
 // Local includes cont'd
 #include "cell_inf_hex8.h"
+#include "edge_edge2.h"
+#include "edge_inf_edge2.h"
 #include "fe_interface.h"
 #include "fe_type.h"
+#include "side.h"
 
 
 // ------------------------------------------------------------
@@ -94,6 +97,16 @@ bool InfHex8::is_node_on_edge(const unsigned int n,
     if (edge_nodes_map[e][i] == n)
       return true;
   return false;
+}
+
+AutoPtr<Elem> InfHex8::build_edge (const unsigned int i) const
+{
+  assert (i < this->n_edges());
+
+  if (i < 4) // base edges
+    return AutoPtr<Elem>(new SideEdge<Edge2,InfHex8>(this,i));
+  // infinite edges
+  return AutoPtr<Elem>(new SideEdge<InfEdge2,InfHex8>(this,i));
 }
 
 bool InfHex8::contains_point (const Point& p) const

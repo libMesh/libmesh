@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex16.C,v 1.29 2005-05-06 17:06:57 roystgnr Exp $
+// $Id: cell_inf_hex16.C,v 1.30 2005-05-11 18:31:16 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -26,8 +26,11 @@
 
 // Local includes cont'd
 #include "cell_inf_hex16.h"
+#include "edge_edge3.h"
+#include "edge_inf_edge2.h"
 #include "face_quad8.h"
 #include "face_inf_quad6.h"
+#include "side.h"
 
 
 // ------------------------------------------------------------
@@ -192,6 +195,15 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i) const
   AutoPtr<Elem> ap(NULL);  return ap;
 }
 
+AutoPtr<Elem> InfHex16::build_edge (const unsigned int i) const
+{
+  assert (i < this->n_edges());
+
+  if (i < 4) // base edges
+    return AutoPtr<Elem>(new SideEdge<Edge3,InfHex16>(this,i));
+  // infinite edges
+  return AutoPtr<Elem>(new SideEdge<InfEdge2,InfHex16>(this,i));
+}
 
 
 void InfHex16::connectivity(const unsigned int sc,

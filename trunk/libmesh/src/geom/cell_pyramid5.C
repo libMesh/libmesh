@@ -1,4 +1,4 @@
-// $Id: cell_pyramid5.C,v 1.18 2005-05-06 17:06:58 roystgnr Exp $
+// $Id: cell_pyramid5.C,v 1.19 2005-05-11 18:31:16 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -23,6 +23,7 @@
 // Local includes
 #include "side.h"
 #include "cell_pyramid5.h"
+#include "edge_edge2.h"
 #include "face_tri3.h"
 #include "face_quad4.h"
 
@@ -161,6 +162,15 @@ AutoPtr<Elem> Pyramid5::build_side (const unsigned int i) const
   error();
 
   AutoPtr<Elem> ap(NULL);  return ap;
+}
+
+
+
+AutoPtr<Elem> Pyramid5::build_edge (const unsigned int i) const
+{
+  assert (i < this->n_edges());
+
+  return AutoPtr<Elem>(new SideEdge<Edge2,Pyramid5>(this,i));
 }
 
 

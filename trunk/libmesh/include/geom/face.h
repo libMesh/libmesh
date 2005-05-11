@@ -1,4 +1,4 @@
-// $Id: face.h,v 1.4 2005-02-22 22:17:32 jwpeterson Exp $
+// $Id: face.h,v 1.5 2005-05-11 18:31:17 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -64,6 +64,12 @@ public:
    * edges.
    */
   unsigned int n_faces() const { return 0; }
+
+  /**
+   * build_side and build_edge are identical for faces
+   */
+  AutoPtr<Elem> build_edge (const unsigned int i) const
+    { return build_side(i); }
 
 //   /**
 //    * @returns 2

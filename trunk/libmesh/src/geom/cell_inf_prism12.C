@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism12.C,v 1.29 2005-05-06 17:06:57 roystgnr Exp $
+// $Id: cell_inf_prism12.C,v 1.30 2005-05-11 18:31:16 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -26,8 +26,11 @@
 
 // Local includes cont'd
 #include "cell_inf_prism12.h"
+#include "edge_edge3.h"
+#include "edge_inf_edge2.h"
 #include "face_tri6.h"
 #include "face_inf_quad6.h"
+#include "side.h"
 
 
 // ------------------------------------------------------------
@@ -173,6 +176,18 @@ AutoPtr<Elem> InfPrism12::build_side (const unsigned int i) const
   error();
   AutoPtr<Elem> ap(NULL);  return ap;
 }
+
+
+AutoPtr<Elem> InfPrism12::build_edge (const unsigned int i) const
+{
+  assert (i < this->n_edges());
+
+  if (i < 3) // base edges
+    return AutoPtr<Elem>(new SideEdge<Edge3,InfPrism12>(this,i));
+  // infinite edges
+  return AutoPtr<Elem>(new SideEdge<InfEdge2,InfPrism12>(this,i));
+}
+
 
 void InfPrism12::connectivity(const unsigned int sc,
 			      const IOPackage iop,

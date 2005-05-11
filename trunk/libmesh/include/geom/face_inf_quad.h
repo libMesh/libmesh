@@ -1,4 +1,4 @@
-// $Id: face_inf_quad.h,v 1.5 2005-02-22 22:17:32 jwpeterson Exp $
+// $Id: face_inf_quad.h,v 1.6 2005-05-11 18:31:17 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -129,6 +129,12 @@ public:
    */
   AutoPtr<Elem> side (const unsigned int i) const;
   
+  /**
+   * build_edge and build_side are identical in 2D
+   */
+  AutoPtr<Elem> build_edge (const unsigned int i) const
+    { return build_side(i); }
+
   /**
    * Based on the quality metric \p q specified by the user,
    * returns a quantitative assessment of element quality.

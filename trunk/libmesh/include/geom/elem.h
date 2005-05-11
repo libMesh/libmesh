@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.19 2005-05-07 00:22:29 benkirk Exp $
+// $Id: elem.h,v 1.20 2005-05-11 18:31:17 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -340,6 +340,16 @@ class Elem : public ReferenceCountedObject<Elem>,
    * This way the user need not remember to delete the object.
    */
   virtual AutoPtr<Elem> build_side (const unsigned int i) const = 0;
+
+  /**
+   * Creates an element coincident with edge \p i. The element returned is
+   * full-ordered.  For example, calling build_edge(0) on a 20-noded hex will
+   * build a 3-noded edge coincident with edge 0 and pass back the pointer.
+   *
+   * A \p AutoPtr<Elem> is returned to prevent a memory leak.
+   * This way the user need not remember to delete the object.
+   */
+  virtual AutoPtr<Elem> build_edge (const unsigned int i) const = 0;
 
   /**
    * @returns the default approximation order for this element type.
