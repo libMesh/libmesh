@@ -224,6 +224,8 @@
 #define REAL double
 #endif /* not SINGLE */
 
+#define ANSI_DECLARATORS
+
 /* If yours is not a Unix system, define the NO_TIMER compiler switch to     */
 /*   remove the Unix-specific timing code.                                   */
 
