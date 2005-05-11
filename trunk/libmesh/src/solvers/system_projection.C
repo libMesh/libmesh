@@ -1,4 +1,4 @@
-// $Id: system_projection.C,v 1.12 2005-05-04 21:24:42 roystgnr Exp $
+// $Id: system_projection.C,v 1.13 2005-05-11 23:12:11 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -60,7 +60,7 @@ void System::project_vector (NumericVector<Number>& vector) const
  * interpolations on each element.
  */
 void System::project_vector (const NumericVector<Number>& old_vector,
-				 NumericVector<Number>& new_vector) const
+			     NumericVector<Number>& new_vector) const
 {
   START_LOG ("project_vector()", "System");
 

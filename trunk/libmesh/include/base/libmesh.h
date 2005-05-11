@@ -1,4 +1,4 @@
-// $Id: libmesh.h,v 1.5 2005-02-22 22:17:30 jwpeterson Exp $
+// $Id: libmesh.h,v 1.6 2005-05-11 23:11:57 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -52,12 +52,28 @@ class PerfLog;
  * functionality.
  */
 namespace libMesh {
+
+#ifndef HAVE_MPI
+  
   /**
    * Initialize the library for use.  This will call
    * PetscInitialize if PETSC is available.  You must call
    * this method before using any of the library functionality.
    */
   void init (int & argc, char** & argv);
+
+#else
+  
+  /**
+   * Initialize the library for use.  This will call
+   * PetscInitialize if PETSC is available.  You must call
+   * this method before using any of the library functionality.
+   * This method takes an optional parameter 
+   */
+  void init (int & argc, char** & argv,
+	     MPI_Comm COMM_WORLD_IN=MPI_COMM_WORLD);
+
+#endif
 
   /**
    * Checks that the \p init() member has been called.  If it

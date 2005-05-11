@@ -1,4 +1,4 @@
-// $Id: distributed_vector.C,v 1.24 2005-02-22 22:17:42 jwpeterson Exp $
+// $Id: distributed_vector.C,v 1.25 2005-05-11 23:11:58 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -51,7 +51,7 @@ Real DistributedVector<T>::l1_norm () const
 #ifdef HAVE_MPI
 
   MPI_Allreduce (&local_l1, &global_l1, 1,
-		 MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+		 MPI_DOUBLE, MPI_SUM, libMesh::COMM_WORLD);
   
 #endif
 
@@ -78,7 +78,7 @@ Real DistributedVector<T>::l2_norm () const
 #ifdef HAVE_MPI
 
   MPI_Allreduce (&local_l2, &global_l2, 1,
-		 MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+		 MPI_DOUBLE, MPI_SUM, libMesh::COMM_WORLD);
   
 #endif
 
@@ -109,7 +109,7 @@ Real DistributedVector<T>::linfty_norm () const
 #ifdef HAVE_MPI
 
   MPI_Allreduce (&local_linfty, &global_linfty, 1,
-		 MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+		 MPI_DOUBLE, MPI_MAX, libMesh::COMM_WORLD);
   
 #endif
 
@@ -477,7 +477,7 @@ void DistributedVector<float>::localize (std::vector<float>& v_local) const
 #ifdef HAVE_MPI
 
   MPI_Allreduce (&v_local[0], &v_local[0], v_local.size(),
-		 MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
+		 MPI_FLOAT, MPI_SUM, libMesh::COMM_WORLD);
   
 #else
 
@@ -508,7 +508,7 @@ void DistributedVector<double>::localize (std::vector<double>& v_local) const
 #ifdef HAVE_MPI
 
   MPI_Allreduce (&v_local[0], &v_local[0], v_local.size(),
-		 MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+		 MPI_DOUBLE, MPI_SUM, libMesh::COMM_WORLD);
   
 #else
 
@@ -539,7 +539,7 @@ void DistributedVector<float>::localize_to_one (std::vector<float>& v_local,
 #ifdef HAVE_MPI
 
   MPI_Reduce (&v_local[0], &v_local[0], v_local.size(),
-	      MPI_FLOAT, MPI_SUM, pid, MPI_COMM_WORLD);
+	      MPI_FLOAT, MPI_SUM, pid, libMesh::COMM_WORLD);
   
 #else
 
@@ -571,7 +571,7 @@ void DistributedVector<double>::localize_to_one (std::vector<double>& v_local,
 #ifdef HAVE_MPI
 
   MPI_Reduce (&v_local[0], &v_local[0], v_local.size(),
-	      MPI_DOUBLE, MPI_SUM, pid, MPI_COMM_WORLD);
+	      MPI_DOUBLE, MPI_SUM, pid, libMesh::COMM_WORLD);
   
 #else
 

@@ -1,4 +1,4 @@
-// $Id: petsc_nonlinear_solver.C,v 1.12 2005-05-05 20:20:49 benkirk Exp $
+// $Id: petsc_nonlinear_solver.C,v 1.13 2005-05-11 23:12:00 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -145,7 +145,7 @@ void PetscNonlinearSolver<T>::clear ()
       int ierr=0;
 
       ierr = SNESDestroy(_snes);
-             CHKERRABORT(PETSC_COMM_WORLD,ierr);
+             CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
 }
 
@@ -161,15 +161,15 @@ void PetscNonlinearSolver<T>::init ()
       
       int ierr=0;
       
-      ierr = SNESCreate(PETSC_COMM_WORLD,&_snes);
-             CHKERRABORT(PETSC_COMM_WORLD,ierr);
+      ierr = SNESCreate(libMesh::COMM_WORLD,&_snes);
+             CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
       ierr = SNESSetMonitor (_snes, __libmesh_petsc_snes_monitor,
 			     this, PETSC_NULL);
-             CHKERRABORT(PETSC_COMM_WORLD,ierr);
+             CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	     
       ierr = SNESSetFromOptions(_snes);
-             CHKERRABORT(PETSC_COMM_WORLD,ierr);
+             CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
 }
 
@@ -199,29 +199,29 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
   int n_iterations =0;
 
   ierr = SNESSetFunction (_snes, r->vec(), __libmesh_petsc_snes_residual, this);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   ierr = SNESSetJacobian (_snes, jac->mat(), jac->mat(), __libmesh_petsc_snes_jacobian, this);
-         CHKERRABORT(PETSC_COMM_WORLD,ierr);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	 
 // Older versions (at least up to 2.1.5) of SNESSolve took 3 arguments,
 // the last one being a pointer to an int to hold the number of iterations required.
 # if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 1)
 
  ierr = SNESSolve (_snes, x->vec(), &n_iterations);
-        CHKERRABORT(PETSC_COMM_WORLD,ierr);
+        CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
 // 2.2.x style	
 #elif (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 2)
 	
  ierr = SNESSolve (_snes, x->vec());
-        CHKERRABORT(PETSC_COMM_WORLD,ierr);
+        CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
 // 2.3.x & newer style	
 #else
 	
  ierr = SNESSolve (_snes, PETSC_NULL, x->vec());
-        CHKERRABORT(PETSC_COMM_WORLD,ierr);
+        CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	  	
 #endif
 

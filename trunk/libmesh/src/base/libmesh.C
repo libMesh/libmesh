@@ -1,4 +1,4 @@
-// $Id: libmesh.C,v 1.31 2005-05-02 13:12:28 spetersen Exp $
+// $Id: libmesh.C,v 1.32 2005-05-11 23:11:58 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -30,44 +30,48 @@
 
 
 
-#if defined(HAVE_PETSC)
 
-
-#ifndef USE_COMPLEX_NUMBERS
-extern "C" {
-# include <petsc.h>
-}
-#else
-# include <petsc.h>
-#endif
-
-
-#elif defined(HAVE_MPI)
+#if defined(HAVE_MPI)
 # include <mpi.h>
-#endif
-
-#if defined(HAVE_SLEPC)
-# ifndef USE_COMPLEX_NUMBERS
+# if defined(HAVE_PETSC)
+#  ifndef USE_COMPLEX_NUMBERS
+extern "C" {
+#   include <petsc.h>
+#   include <petscerror.h>
+}
+#  else
+#   include <petsc.h>
+#   include <petscerror.h>
+#  endif
+# endif // #if defined(HAVE_PETSC)
+# if defined(HAVE_SLEPC)
+#  ifndef USE_COMPLEX_NUMBERS
 extern "C" 
 {
-#  include <slepc.h>
+#   include <slepc.h>
 }
-# else
-#  include <slepc.h>
-# endif
-#endif
+#  else
+#   include <slepc.h>
+#  endif
+# endif // #if defined(HAVE_SLEPC)
+#endif // #if defined(HAVE_MPI)
 
 
-// ------------------------------------------------------------
-// Local anonymous namespace to hold a GetPot object
+// --------------------------------------------------------
+// Local anonymous namespace to hold miscelaneous variables
 namespace {
   AutoPtr<GetPot> command_line (NULL);
+  bool libmesh_initialized_mpi = false;
 }
 
 
 
 // ------------------------------------------------------------
 // libMesh data initialization
+#ifdef HAVE_MPI
+MPI_Comm           libMesh::COMM_WORLD = MPI_COMM_NULL;
+#endif
+
 PerfLog            libMesh::perflog ("libMesh",
 #ifdef ENABLE_PERFORMANCE_LOGGING
 				     true
@@ -76,14 +80,12 @@ PerfLog            libMesh::perflog ("libMesh",
 #endif
 				     );
 
-#ifdef USE_COMPLEX_NUMBERS
-const Number       libMesh::imaginary (0., 1.);
-#endif
 
 const Real         libMesh::pi = 3.1415926535897932384626433832795029L;
 
 #ifdef USE_COMPLEX_NUMBERS
-const Number       libMesh::zero (0., 0.);
+const Number       libMesh::imaginary (0., 1.);
+const Number       libMesh::zero      (0., 0.);
 #else
 const Number       libMesh::zero = 0.;
 #endif
@@ -110,7 +112,12 @@ SolverPackage libMesh::libMeshPrivateData::_solver_package =
 
 // ------------------------------------------------------------
 // libMesh functions
+#ifndef HAVE_MPI
 void libMesh::init (int &argc, char** & argv)
+#else
+void libMesh::init (int &argc, char** & argv,
+		    MPI_Comm COMM_WORLD_IN)
+#endif
 {
   // should _not_ be initialized already.
   assert (!libMesh::initialized());
@@ -118,50 +125,52 @@ void libMesh::init (int &argc, char** & argv)
   // Build a command-line parser.
   command_line.reset(new GetPot (argc, argv));
 
-  
-#if defined(HAVE_PETSC) && !defined(HAVE_SLEPC)
+
+#if defined(HAVE_MPI)
 
   // Allow the user to bypass PETSc initialization
-  if (!libMesh::on_command_line ("--disable-petsc"))      
-    PetscInitialize (&argc, &argv, NULL, NULL);
-  // Allow the user to bypass MPI initialization
-  else if (!libMesh::on_command_line ("--disable-mpi"))
-    MPI_Init (&argc, &argv);
-   
-  // Get the number of processors and our local processor id
-  if (!libMesh::on_command_line ("--disable-petsc") &&
-      !libMesh::on_command_line ("--disable-mpi"))
-    {
-      MPI_Comm_rank (PETSC_COMM_WORLD, &libMeshPrivateData::_processor_id);
-      MPI_Comm_size (PETSC_COMM_WORLD, &libMeshPrivateData::_n_processors);
-    }
-  
-#elif defined(HAVE_PETSC) && defined(HAVE_SLEPC)
-
-  // This will automaticly initialize SLEPc
-  SlepcInitialize (&argc, &argv, NULL, NULL);
-  
-  MPI_Comm_rank (PETSC_COMM_WORLD, &libMeshPrivateData::_processor_id);
-  MPI_Comm_size (PETSC_COMM_WORLD, &libMeshPrivateData::_n_processors);  
-
-#elif defined(HAVE_MPI)
-
-  // Allow the user to bypass MPI initialization
   if (!libMesh::on_command_line ("--disable-mpi"))
     {
-      MPI_Init (&argc, &argv);
+      int flag;
+      MPI_Initialized (&flag);
 
-      // Get the number of processors and our local processor id  
-      MPI_Comm_rank (MPI_COMM_WORLD, &libMeshPrivateData::_processor_id);
-      MPI_Comm_size (MPI_COMM_WORLD, &libMeshPrivateData::_n_processors);
+      if (!flag)
+	{
+	  MPI_Init (&argc, &argv);
+	  libmesh_initialized_mpi = true;
+	}
+      
+      // Duplicate the input communicator for internal use
+      MPI_Comm_dup (COMM_WORLD_IN, &libMesh::COMM_WORLD);
+      MPI_Comm_set_name (libMesh::COMM_WORLD, "libMesh::COMM_WORLD");
+      
+      MPI_Comm_rank (libMesh::COMM_WORLD, &libMeshPrivateData::_processor_id);
+      MPI_Comm_size (libMesh::COMM_WORLD, &libMeshPrivateData::_n_processors);
+      
+# if defined(HAVE_PETSC)
+      
+      if (!libMesh::on_command_line ("--disable-petsc"))
+	{
+	  int ierr=0;
+	  ierr = PetscSetCommWorld (libMesh::COMM_WORLD);
+	         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+#  if defined(HAVE_SLEPC)
+	  ierr = SlepcInitialize  (&argc, &argv, NULL, NULL);
+	         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#  else
+	  ierr = PetscInitialize (&argc, &argv, NULL, NULL);
+	         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#  endif
+	}
+# endif
     }
-  
 #else
 
-  // No PETSC or MPI, can only be uniprocessor
+  // No MPI, can only be uniprocessor
   assert (libMeshPrivateData::_n_processors == 1);
   assert (libMeshPrivateData::_processor_id == 0);
-
+  
 #endif
   
   // Could we have gotten bad values from the above calls?
@@ -206,27 +215,27 @@ void libMesh::init (int &argc, char** & argv)
 int libMesh::close ()
 {
 
-
-#if defined(HAVE_PETSC) && !defined(HAVE_SLEPC)
-
-  // Allow the user to bypass PETSc finalization
-  if (!libMesh::on_command_line ("--disable-petsc"))      
-    PetscFinalize ();
-  // Allow the user to bypass MPI finalization
-  else if (!libMesh::on_command_line ("--disable-mpi"))
-    MPI_Finalize ();
-
-#elif defined (HAVE_PETSC) && defined(HAVE_SLEPC)
-
-  // This also closes PETSc
-  SlepcFinalize();
-
-#elif defined(HAVE_MPI)
-
+#if defined(HAVE_MPI)
   // Allow the user to bypass MPI finalization
   if (!libMesh::on_command_line ("--disable-mpi"))
-    MPI_Finalize();
-  
+    {
+# if defined(HAVE_PETSC) 
+
+      // Allow the user to bypass PETSc finalization
+      if (!libMesh::on_command_line ("--disable-petsc"))
+	{
+#  if defined(HAVE_SLEPC)
+	  SlepcFinalize();
+#  else
+	  PetscFinalize();
+#  endif
+	}
+# endif
+      MPI_Comm_free (&libMesh::COMM_WORLD);
+
+      if (libmesh_initialized_mpi)
+	MPI_Finalize();
+    }
 #endif
 
   // Force the \p ReferenceCounter to print
