@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.85 2005-05-12 17:01:19 spetersen Exp $
+dnl $Id: aclocal.m4,v 1.86 2005-05-12 21:19:44 jwpeterson Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -765,18 +765,30 @@ dnl Space Filling Curves
 dnl -------------------------------------------------------------
 AC_DEFUN(CONFIGURE_SFC, 
 [
-  AC_CHECK_FILE(./contrib/sfcurves/sfcurves.h,
-                [
-                  SFC_INCLUDE=-I$PWD/contrib/sfcurves
-                  SFC_LIB="\$(EXTERNAL_LIBDIR)/libsfcurves\$(EXTERNAL_LIBEXT)"
-                  AC_SUBST(SFC_INCLUDE)
-                  AC_SUBST(SFC_LIB)
-                  AC_DEFINE(HAVE_SFCURVES, 1,
-                             [Flag indicating whether or not Space filling curves are available])
-                  AC_MSG_RESULT(<<< Configuring library with SFC support >>>)
-		  enablesfc=yes
-                ],
-                [enablesfc=no])
+  dnl Initialize variables
+  SFC_INCLUDE=""
+  SFC_LIB=""
+  CONTRIB_HAVE_SFC="/* #undef HAVE_SFCURVES */"
+
+  dnl Sanity check: make sure the user really has the contrib directory
+  if (test $enablesfc = yes); then
+    AC_CHECK_FILE(./contrib/sfcurves/sfcurves.h, [enablesfc=yes], [enablesfc=no])
+  fi
+
+
+  if (test $enablesfc = yes); then
+     SFC_INCLUDE="-I$PWD/contrib/sfcurves"
+     SFC_LIB="\$(EXTERNAL_LIBDIR)/libsfcurves\$(EXTERNAL_LIBEXT)"
+     AC_DEFINE(HAVE_SFCURVES, 1, [Flag indicating whether or not Space filling curves are available])
+     AC_MSG_RESULT(<<< Configuring library with SFC support >>>)
+     CONTRIB_HAVE_SFC="#define HAVE_SFCURVES 1"
+  fi
+
+  AC_SUBST(CONTRIB_HAVE_SFC)	
+  AC_SUBST(SFC_INCLUDE)
+  AC_SUBST(SFC_LIB)	
+  AC_SUBST(enablesfc)
+
 ])
 dnl -------------------------------------------------------------
 
@@ -788,23 +800,42 @@ dnl Read/Write Compressed Streams with gzstream
 dnl -------------------------------------------------------------
 AC_DEFUN(CONFIGURE_GZ, 
 [
+
+dnl Initialize variables
+GZSTREAM_INCLUDE=""
+GZSTREAM_LIB=""
+CONTRIB_HAVE_GZSTREAM="/* #undef HAVE_GZSTREAM */"
+
+dnl Sanity check: make sure the user really has the contrib directory
+if (test $enablegz = yes); then
+  AC_CHECK_FILE(./contrib/gzstream/gzstream.h, [enablegz=yes], [enablegz=no])
+fi
+
+
+if (test $enablegz = yes); then
+  dnl First check for the required system headers and libraries
   AC_CHECK_HEADERS(zlib.h, have_zlib_h=yes)
   AC_CHECK_LIB(z, gzopen, have_libz=yes)
-  if (test "$have_zlib_h" = yes \
-        -a "$have_libz"   = yes) ; then
-     AC_CHECK_FILE(./contrib/gzstream/gzstream.h,
-                   [
-                     GZSTREAM_INCLUDE=-I$PWD/contrib/gzstream
-                     GZSTREAM_LIB="\$(EXTERNAL_LIBDIR)/libgzstream\$(EXTERNAL_LIBEXT) -lz"
-                     AC_SUBST(GZSTREAM_INCLUDE)
-                     AC_SUBST(GZSTREAM_LIB)
-                     AC_DEFINE(HAVE_GZSTREAM, 1,
-                                [Flag indicating whether or not gzstreams are available])
-                     AC_MSG_RESULT(<<< Configuring library with gzstreams support >>>)
-		     enablegz=yes                     
-                   ],
-                   [enablegz=no])
+
+  dnl If both tests succeded, continue the configuration process.
+  if (test "$have_zlib_h" = yes -a "$have_libz" = yes) ; then
+    GZSTREAM_INCLUDE="-I$PWD/contrib/gzstream"
+    GZSTREAM_LIB="\$(EXTERNAL_LIBDIR)/libgzstream\$(EXTERNAL_LIBEXT) -lz"
+    AC_DEFINE(HAVE_GZSTREAM, 1, [Flag indicating whether or not gzstreams are available])
+    AC_MSG_RESULT(<<< Configuring library with gzstreams support >>>)
+    CONTRIB_HAVE_GZSTREAM="#define HAVE_GZSTREAM 1"
+
+  dnl Otherwise do not enable gzstreams
+  else
+    enablegz=no;
   fi
+fi
+
+AC_SUBST(CONTRIB_HAVE_GZSTREAM)	
+AC_SUBST(GZSTREAM_INCLUDE)
+AC_SUBST(GZSTREAM_LIB)	
+AC_SUBST(enablegz)
+
 ])
 dnl -------------------------------------------------------------
 
@@ -816,19 +847,34 @@ dnl LASPACK Iterative Solvers
 dnl -------------------------------------------------------------
 AC_DEFUN(CONFIGURE_LASPACK, 
 [
-  AC_CHECK_FILE(./contrib/laspack/lastypes.h,
-		[
-                  LASPACK_INCLUDE_PATH=$PWD/contrib/laspack
-                  LASPACK_INCLUDE=-I$LASPACK_INCLUDE_PATH
-                  LASPACK_LIB="\$(EXTERNAL_LIBDIR)/liblaspack\$(EXTERNAL_LIBEXT)"
-                  AC_SUBST(LASPACK_INCLUDE)
-                  AC_SUBST(LASPACK_LIB)
-                  AC_DEFINE(HAVE_LASPACK, 1,
-                            [Flag indicating whether or not LASPACK iterative solvers are available])
-                  laspack_version=`grep "define LASPACK_VERSION " $LASPACK_INCLUDE_PATH/version.h | sed -e "s/[[^0-9.]]*//g"`
-                  AC_MSG_RESULT(<<< Configuring library with LASPACK version $laspack_version support >>>)
-                ],
-                [])
+
+dnl Initialize variables
+LASPACK_INCLUDE=""
+LASPACK_LIB=""
+CONTRIB_HAVE_LASPACK="/* #undef HAVE_LASPACK */"
+
+dnl Sanity check: make sure the user really has the contrib directory
+if (test $enablelaspack = yes); then
+  AC_CHECK_FILE(./contrib/laspack/lastypes.h, [enablelaspack=yes], [enablelaspack=no])
+fi
+
+
+if (test $enablelaspack = yes); then
+
+  LASPACK_INCLUDE="-I$PWD/contrib/laspack"
+  LASPACK_LIB="\$(EXTERNAL_LIBDIR)/liblaspack\$(EXTERNAL_LIBEXT)"
+  AC_DEFINE(HAVE_LASPACK, 1, [Flag indicating whether or not LASPACK iterative solvers are available])
+  laspack_version=`grep "define LASPACK_VERSION " $PWD/contrib/laspack/version.h | sed -e "s/[[^0-9.]]*//g"`
+  AC_MSG_RESULT(<<< Configuring library with LASPACK version $laspack_version support >>>)
+  CONTRIB_HAVE_LASPACK="#define HAVE_LASPACK 1"
+
+fi
+
+AC_SUBST(CONTRIB_HAVE_LASPACK)	
+AC_SUBST(LASPACK_INCLUDE)
+AC_SUBST(LASPACK_LIB)	
+AC_SUBST(enablelaspack)
+
 ])
 dnl -------------------------------------------------------------
 
