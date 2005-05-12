@@ -1,5 +1,5 @@
 dnl --------------------------------------------------------------
-dnl $Id: configure.in,v 1.57 2005-05-12 17:01:23 spetersen Exp $
+dnl $Id: configure.in,v 1.58 2005-05-12 21:19:46 jwpeterson Exp $
 dnl --------------------------------------------------------------
 dnl Process this file with autoconf to produce a configure script.
 
@@ -9,7 +9,7 @@ dnl you call ./configure subsequently on different systems without
 dnl clearing the cache 
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
-AC_REVISION($Revision: 1.57 $)
+AC_REVISION($Revision: 1.58 $)
 
 
 AC_INIT
@@ -468,10 +468,7 @@ AC_ARG_ENABLE(laspack,
               enablelaspack=$enableval,
               enablelaspack=yes)
 
-if test "$enablelaspack" != no ; then
-   CONFIGURE_LASPACK
-fi
-AC_SUBST(enablelaspack)
+CONFIGURE_LASPACK
 dnl -------------------------------------------------------------
 
 
@@ -486,10 +483,7 @@ AC_ARG_ENABLE(sfc,
               enablesfc=$enableval,
               enablesfc=yes)
 
-if test "$enablesfc" != no ; then
-   CONFIGURE_SFC
-fi
-AC_SUBST(enablesfc)
+CONFIGURE_SFC
 dnl -------------------------------------------------------------
 
 
@@ -503,10 +497,7 @@ AC_ARG_ENABLE(gzstreams,
               enablegz=$enableval,
               enablegz=yes)
 
-if test "$enablegz" != no ; then
-   CONFIGURE_GZ
-fi
-AC_SUBST(enablegz)
+CONFIGURE_GZ
 dnl -------------------------------------------------------------
 
 
@@ -596,9 +587,8 @@ AC_ARG_ENABLE(tetgen,
                              [build with TetGen tetrahedrization library support]),
               enabletetgen=$enableval,
               enabletetgen=yes)
-dnl if test "$enabletetgen" != no ; then
-  CONFIGURE_TETGEN
-dnl fi
+
+CONFIGURE_TETGEN
 dnl -------------------------------------------------------------
 
 
@@ -611,9 +601,8 @@ AC_ARG_ENABLE(triangle,
                              [build with Triangle Delaunay triangulation library support]),
               enabletriangle=$enableval,
               enabletriangle=yes)
-dnl if test "$enabletriangle" != no ; then
-  CONFIGURE_TRIANGLE
-dnl fi
+
+CONFIGURE_TRIANGLE
 dnl -------------------------------------------------------------
 
 

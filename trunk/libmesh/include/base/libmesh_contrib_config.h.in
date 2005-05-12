@@ -22,4 +22,23 @@
 @CONTRIB_HAVE_TRIANGLE@
 
 
+/**
+ * Configuration result for gzstreams capability.
+ */
+@CONTRIB_HAVE_GZSTREAM@
+
+
+/**
+ * Configuration result for the space filling curves library.
+ */
+@CONTRIB_HAVE_SFC@
+
+
+/**
+ * Configuration result for Laspack iterative solvers.
+ */
+@CONTRIB_HAVE_LASPACK@
+
+
+
 #endif
