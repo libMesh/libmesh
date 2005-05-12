@@ -13,6 +13,12 @@
 /**
  * The configuration result for the triangle library.
  */
+@CONTRIB_HAVE_TETGEN@
+
+
+/**
+ * The configuration result for the triangle library.
+ */
 @CONTRIB_HAVE_TRIANGLE@
 
 

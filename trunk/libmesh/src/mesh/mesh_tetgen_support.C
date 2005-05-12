@@ -1,7 +1,7 @@
-// $Id: mesh_tetgen_support.C,v 1.18 2005-05-03 15:25:59 spetersen Exp $
+// $Id: mesh_tetgen_support.C,v 1.19 2005-05-12 17:01:25 spetersen Exp $
  
 // The libMesh Finite Element Library.
-// Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,7 +21,6 @@
 #ifdef HAVE_TETGEN
 
 
-
 // C++ includes
 #include <sstream>
 
@@ -33,45 +32,28 @@
 #include "face_tri3.h"
 #include "mesh.h"
 
-#ifdef TETGEN_13
-#include "tetgen.h"
-#endif // TETGEN_13
-
 
 //----------------------------------------------------------------------
-// TetGenMeshInterface class members
-TetGenMeshInterface::TetGenMeshInterface (Mesh& mesh) :
-  _mesh         (mesh)
-{}
-
-
-
-TetGenMeshInterface::~TetGenMeshInterface() {}
-
-
-
-
-
-
-
-// =============================================================================
-TetGen1_wrapper::TetGen1_wrapper()
+// TetGenMeshInterface functions
+TetGenWrapper::TetGenWrapper()
 {
   tetgen_output = new tetgenio;
+
+  this->tetgen_data.mesh_dim                = 3;
+  this->tetgen_data.numberofpointattributes = 0;
+  this->tetgen_data.firstnumber             = 0;
 }
 
 
 
-
-TetGen1_wrapper::~TetGen1_wrapper()
+TetGenWrapper::~TetGenWrapper()
 {
   delete tetgen_output;
 }
 
 
 
-
-void TetGen1_wrapper::set_node(const int i, const REAL x, const REAL y, const REAL z)
+void TetGenWrapper::set_node(const int i, const REAL x, const REAL y, const REAL z)
 {
   int index = i*3;
   tetgen_data.pointlist[index++] = x;
@@ -81,8 +63,7 @@ void TetGen1_wrapper::set_node(const int i, const REAL x, const REAL y, const RE
 
 
 
-
-void TetGen1_wrapper::set_hole(const int i, const REAL x, const REAL y, const REAL z)
+void TetGenWrapper::set_hole(const int i, const REAL x, const REAL y, const REAL z)
 {
   int index = i*3;
   tetgen_data.holelist[index++] = x;
@@ -92,14 +73,14 @@ void TetGen1_wrapper::set_hole(const int i, const REAL x, const REAL y, const RE
 
 
 
+void TetGenWrapper::set_numberofpoints(const int i)
+{
+  tetgen_data.numberofpoints = i;
+}
 
-void TetGen1_wrapper::set_numberofpoints(const int i)
-{ tetgen_data.numberofpoints = i; }
 
 
-
-
-void TetGen1_wrapper::get_output_node(const int i, REAL& x, REAL& y, REAL& z)
+void TetGenWrapper::get_output_node(const int i, REAL& x, REAL& y, REAL& z)
 {
   x = tetgen_output->pointlist[3*i];
   y = tetgen_output->pointlist[3*i+1];
@@ -108,57 +89,42 @@ void TetGen1_wrapper::get_output_node(const int i, REAL& x, REAL& y, REAL& z)
 
 
 
-
-int TetGen1_wrapper::get_numberoftetrahedra()
-{ return tetgen_output->numberoftetrahedra; }
-
-
-
-
-int TetGen1_wrapper::get_numberoftrifaces()
-{ return tetgen_output->numberoftrifaces; }
-
-
-
-
-int TetGen1_wrapper::get_numberofpoints()
-{ return tetgen_output->numberofpoints; }
-
-
-
-
-int TetGen1_wrapper::get_element_node(const int i, const int j)
-{ return tetgen_output->tetrahedronlist[i*4+j]; }
-
-
-
-
-int TetGen1_wrapper::get_triface_node(const int i, const int j)
-{ return tetgen_output->trifacelist[i*3+j]; }
-
-
-
-
-// =============================================================================
-
-#ifdef TETGEN_13
-
-TetGen13_wrapper::TetGen13_wrapper()
+int TetGenWrapper::get_numberoftetrahedra()
 {
-  this->tetgen_data.mesh_dim                = 3;
-  this->tetgen_data.numberofpointattributes = 0;
-  this->tetgen_data.firstnumber             = 0;
+  return tetgen_output->numberoftetrahedra;
 }
 
 
 
+int TetGenWrapper::get_numberoftrifaces()
+{
+  return tetgen_output->numberoftrifaces;
+}
 
-TetGen13_wrapper::~TetGen13_wrapper() {}
+
+
+int TetGenWrapper::get_numberofpoints()
+{
+  return tetgen_output->numberofpoints;
+}
 
 
 
+int TetGenWrapper::get_element_node(const int i, const int j)
+{
+  return tetgen_output->tetrahedronlist[i*4+j];
+}
 
-void TetGen13_wrapper::set_pointlist(const int numofpoints)
+
+
+int TetGenWrapper::get_triface_node(const int i, const int j)
+{
+  return tetgen_output->trifacelist[i*3+j];
+}
+
+
+
+void TetGenWrapper::set_pointlist(const int numofpoints)
 {
   this->set_numberofpoints(numofpoints);
   this->tetgen_data.pointlist = new REAL[tetgen_data.numberofpoints * 3];
@@ -166,8 +132,7 @@ void TetGen13_wrapper::set_pointlist(const int numofpoints)
 
 
 
-
-void TetGen13_wrapper::set_switches(const std::string& s)
+void TetGenWrapper::set_switches(const std::string& s)
 {
   // Copy the string to a temporary buffer for passing to the C API
   char buffer[256];
@@ -180,8 +145,7 @@ void TetGen13_wrapper::set_switches(const std::string& s)
 
 
 
-
-void TetGen13_wrapper::run_tetgen()
+void TetGenWrapper::run_tetgen()
 {
   // Call tetrahedralize from the TetGen library.
   tetrahedralize(&tetgen_be, &tetgen_data, tetgen_output);
@@ -189,20 +153,21 @@ void TetGen13_wrapper::run_tetgen()
 
 
 
-
-void TetGen13_wrapper::set_numberoffacets(const int i)
-{ this->tetgen_data.numberoffacets = i; }
-
-
-
-
-void TetGen13_wrapper::set_numberofholes(const int i)
-{ this->tetgen_data.numberofholes = i; }
+void TetGenWrapper::set_numberoffacets(const int i)
+{ 
+  this->tetgen_data.numberoffacets = i;
+}
 
 
 
+void TetGenWrapper::set_numberofholes(const int i)
+{ 
+  this->tetgen_data.numberofholes = i;
+}
 
-void TetGen13_wrapper::set_facetlist(const int numoffacets, const int numofholes)
+
+
+void TetGenWrapper::set_facetlist(const int numoffacets, const int numofholes)
 {
   set_numberoffacets(numoffacets);
   set_numberofholes(numofholes);
@@ -214,20 +179,22 @@ void TetGen13_wrapper::set_facetlist(const int numoffacets, const int numofholes
 
 
 
-
-void TetGen13_wrapper::set_facet_numberofpolygons(const int i, const int num)
-{ this->tetgen_data.facetlist[i].numberofpolygons = num; }
-
-
-
-
-void TetGen13_wrapper::set_facet_numberofholes(const int i, const int num)
-{ this->tetgen_data.facetlist[i].numberofholes = num; }
+void TetGenWrapper::set_facet_numberofpolygons(const int i, const int num)
+{
+  this->tetgen_data.facetlist[i].numberofpolygons = num;
+}
 
 
 
+void TetGenWrapper::set_facet_numberofholes(const int i, const int num)
+{
+  this->tetgen_data.facetlist[i].numberofholes = num;
+}
 
-void TetGen13_wrapper::set_facet_polygonlist(const int i, const int numofpolygons)
+
+
+
+void TetGenWrapper::set_facet_polygonlist(const int i, const int numofpolygons)
 {
   set_facet_numberofpolygons(i, numofpolygons);
   set_facet_numberofholes(i, 0);
@@ -238,14 +205,14 @@ void TetGen13_wrapper::set_facet_polygonlist(const int i, const int numofpolygon
 
 
 
+void TetGenWrapper::set_polygon_numberofvertices(const int i, const int j, const int num)
+{
+  this->tetgen_data.facetlist[i].polygonlist[j].numberofvertices = num;
+}
 
-void TetGen13_wrapper::set_polygon_numberofvertices(const int i, const int j, const int num)
-{ this->tetgen_data.facetlist[i].polygonlist[j].numberofvertices = num; }
 
 
-
-
-void TetGen13_wrapper::set_polygon_vertexlist(const int i, const int j, const int numofvertices)
+void TetGenWrapper::set_polygon_vertexlist(const int i, const int j, const int numofvertices)
 {
   set_polygon_numberofvertices(i, j, numofvertices);
   this->tetgen_data.facetlist[i].polygonlist[j].vertexlist = new int[numofvertices];
@@ -254,28 +221,28 @@ void TetGen13_wrapper::set_polygon_vertexlist(const int i, const int j, const in
 
 
 
-void TetGen13_wrapper::set_vertex(const int i, const int j, const int k, const int nodeindex)
+void TetGenWrapper::set_vertex(const int i, const int j, const int k, const int nodeindex)
 {
   this->tetgen_data.facetlist[i].polygonlist[j].vertexlist[k] = nodeindex;
 }
 
-
-
-
-// class type TetGen_access is cast to TetGen_Wrapper class for current TetGen version:
-typedef TetGen13_wrapper TetGen_access;
-
+// class type TetGen_access is cast to TetGenWrapper.
+typedef TetGenWrapper TetGen_access;
 
 
 
 
 
 
+//----------------------------------------------------------------------
+// TetGenMeshInterface class members
+TetGenMeshInterface::TetGenMeshInterface (Mesh& mesh) :
+  _mesh         (mesh)
+{
+}
 
 
 
-
-// =============================================================================
 void TetGenMeshInterface::triangulate_pointset ()   
 {
   // class tetgen_wrapper allows library access on a basic level:
@@ -318,13 +285,6 @@ void TetGenMeshInterface::triangulate_pointset ()
       this->_mesh.add_elem(elem);
     }
 } 
-
-
-
-
-
-
-
 
 
 
@@ -380,14 +340,6 @@ void TetGenMeshInterface::pointset_convexhull ()
 
 
 
-
-
-
-
-
-
-
-
 int TetGenMeshInterface::get_node_index (const Node* inode)
 {
   // This is NO elegant solution! (A linear search of the nodes.)
@@ -403,14 +355,6 @@ int TetGenMeshInterface::get_node_index (const Node* inode)
   
   return 0;
 }
-
-
-
-
-
-
-
-
 
 
 
@@ -457,16 +401,6 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh (const double quali
   std::vector< Node *> noholes;
   triangulate_conformingDelaunayMesh_carvehole(noholes, quality_constraint, volume_constraint);
 }
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -606,6 +540,5 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const s
     }
 }
 
-#endif
 
 #endif // #ifdef HAVE_TETGEN

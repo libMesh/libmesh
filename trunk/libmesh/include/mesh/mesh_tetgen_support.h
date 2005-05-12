@@ -1,7 +1,7 @@
-// $Id: mesh_tetgen_support.h,v 1.15 2005-05-10 14:35:18 benkirk Exp $
+// $Id: mesh_tetgen_support.h,v 1.16 2005-05-12 17:01:24 spetersen Exp $
  
 // The libMesh Finite Element Library.
-// Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -33,9 +33,8 @@
 // Local includes
 #include "mesh.h"
 
-#ifdef TETGEN_13
+// TetGen include file
 #include "tetgen.h"
-#endif // TETGEN_13
 
 
 // Forward Declarations
@@ -43,148 +42,130 @@
 
 /**
  * Abstract class \p TetGenWrapper provides an interface for basic
- * access to TetGen data structures and methods.  This class is
- * intended to simplify adaption of libmesh to new TetGen versions
- * (e.g. change of class nomenclature between tetgen1.2c and
- * tetgen1.3).
+ * access to TetGen data structures and methods.
  */
 class TetGenWrapper
 {
  public:
 
   /**
+   * Constructor.
+   */
+  TetGenWrapper ();
+
+  /**
    * Destructor.  Empty.
    */
-  virtual ~TetGenWrapper () {};
+  ~TetGenWrapper ();
   
   /**
    * Method set TetGen commandline switches
    */
-  virtual void set_switches(const std::string& s) = 0;
+  void set_switches(const std::string& s);
 
   /**
    * Method starts triangulization.
    */
-  virtual void run_tetgen() = 0;
+  void run_tetgen();
 
   /**
    * Method returns number of tetrahedra in TetGen output.
    */
-  virtual int  get_numberoftetrahedra() = 0;
+  int  get_numberoftetrahedra();
 
   /**
    * Method returns number of triangle surface elts. in TetGen output.
    */
-  virtual int  get_numberoftrifaces() = 0;
+  int  get_numberoftrifaces();
 
   /**
    * Method sets number of nodes in TetGen input.
    */
-  virtual void set_numberofpoints(const int i) = 0;
+  void set_numberofpoints(const int i);
 
   /**
    * Method returns number of nodes in TetGen output.
    */
-  virtual int  get_numberofpoints() = 0;
+  int  get_numberofpoints();
 
   /**
    * Method sets number of facets in TetGen input.
    */
-  virtual void set_numberoffacets(const int i) = 0;
+  void set_numberoffacets(const int i);
 
   /**
    * Method sets number of holes in TetGen input.
    */
-  virtual void set_numberofholes(const int i) = 0;
+  void set_numberofholes(const int i);
 
   /**
    * Method allocates memory, sets number of nodes in TetGen input.
    */
-  virtual void set_pointlist(const int numofpoints) = 0;
+  void set_pointlist(const int numofpoints);
 
   /**
    * Method allocates memory, sets number of facets, holes in TetGen input.
    */
-  virtual void set_facetlist(const int numoffacets, const int numofholes) = 0;
+  void set_facetlist(const int numoffacets, const int numofholes);
 
   /**
    * Method sets coordinates of point i in TetGen input.
    */
-  virtual void set_node(const int i, const REAL x, const REAL y, const REAL z) = 0;
+  void set_node(const int i, const REAL x, const REAL y, const REAL z);
 
   /**
    * Method returns coordinates of point i in TetGen output.
    */
-  virtual void get_output_node(const int i, REAL& x, REAL& y, REAL& z) = 0;
+  void get_output_node(const int i, REAL& x, REAL& y, REAL& z);
 
   /**
    * Method returns index of jth node from element i in TetGen output.
    */
-  virtual int  get_element_node(const int i, const int j) = 0;
+  int  get_element_node(const int i, const int j);
 
   /**
    * Method returns index of jth node from surface triangle i in TetGen output.
    */
-  virtual int  get_triface_node(const int i, const int j) = 0;
+  int  get_triface_node(const int i, const int j);
 
   /**
    * Method sets coordinates of hole i in TetGen input.
    */
-  virtual void set_hole(const int i, const REAL x, const REAL y, const REAL z) = 0;
+  void set_hole(const int i, const REAL x, const REAL y, const REAL z);
 
   /**
    * Method sets number of polygons for facet i in TetGen input.
    */
-  virtual void set_facet_numberofpolygons(const int i, const int num) = 0;
+  void set_facet_numberofpolygons(const int i, const int num);
 
   /**
    * Method sets number of holes for facet i in TetGen input.
    */
-  virtual void set_facet_numberofholes(const int i, const int num) = 0;
+  void set_facet_numberofholes(const int i, const int num);
 
   /**
    * Method allocates memory, sets number of polygons for facet i
    * in TetGen input.
    */
-  virtual void set_facet_polygonlist(const int i, const int numofpolygons) = 0;
+  void set_facet_polygonlist(const int i, const int numofpolygons);
 
   /**
    * Method sets number of vertices for polygon j, facet i in TetGen input.
    */
-  virtual void set_polygon_numberofvertices(const int i, const int j, const int num) = 0;
+  void set_polygon_numberofvertices(const int i, const int j, const int num);
 
   /**
    * Method allocates memory, sets number of vertices for polygon j,
    * facet i in TetGen input.
    */
-  virtual void set_polygon_vertexlist(const int i, const int j, const int numofvertices) = 0;
+  void set_polygon_vertexlist(const int i, const int j, const int numofvertices);
 
   /**
    * Method sets index of ith facet, jth polygon, kth vertex in
    * TetGen input.
    */
-  virtual void set_vertex(const int i, const int j, const int k, const int nodeindex) = 0;
-};
+  void set_vertex(const int i, const int j, const int k, const int nodeindex);
 
-
-
-
-
-
-
-
-
-
-
-
-/**
- * Semi-abstract implementation of TetGenWrapper class 
- * for TetGen 1.x data structures and methods.
- */
-class TetGen1_wrapper : public TetGenWrapper
-{
- public:
-  
   /**
    * TetGen input structure.
    */
@@ -196,45 +177,6 @@ class TetGen1_wrapper : public TetGenWrapper
   tetgenio*  tetgen_output;
 
   /**
-   * Constructor class
-   */
-  TetGen1_wrapper();
-
-  /**
-   * Destructor class
-   */
-  virtual ~TetGen1_wrapper();
-
-  void set_node(const int i, const REAL x, const REAL y, const REAL z);
-  void set_hole(const int i, const REAL x, const REAL y, const REAL z);
-  void set_numberofpoints(const int i);
-  int  get_numberofpoints();
-
-  void get_output_node(const int i, REAL& x, REAL& y, REAL& z);
-  int  get_numberoftetrahedra();
-  int  get_numberoftrifaces();
-  int  get_element_node(const int i, const int j);
-  int  get_triface_node(const int i, const int j);
-};
-
-
-
-
-
-
-
-
-
-#ifdef TETGEN_13
-
-/**
- * Implementation of TetGenWrapper class provides an interface
- * for basic access to TetGen 1.3 data structures and methods.
- */
-class TetGen13_wrapper : public TetGen1_wrapper
-{
- public:
-  /**
    * TetGen mesh structure (from the TetGen library).
    */
   tetgenmesh      tetgen_mesh;
@@ -244,49 +186,14 @@ class TetGen13_wrapper : public TetGen1_wrapper
    */
   tetgenbehavior  tetgen_be; 
 
-  /**
-   * Constructor.
-   */
-  TetGen13_wrapper();
-
-  /**
-   * Destructor.
-   */
-  virtual ~TetGen13_wrapper();
-
-  void set_switches(const std::string& s);
-  void run_tetgen();
-  void set_pointlist(const int numofpoints);
-
-  void set_numberoffacets(const int i);
-  void set_numberofholes(const int i);
-  void set_facetlist(const int numoffacets, const int numofholes);
-
-  void set_facet_numberofpolygons(const int i, const int num);
-  void set_facet_numberofholes(const int i, const int num);
-  void set_facet_polygonlist(const int i, const int numofpolygons);
-  void set_polygon_numberofvertices(const int i, const int j, const int num);
-  void set_polygon_vertexlist(const int i, const int j, const int numofvertices);
-  void set_vertex(const int i, const int j, const int k, const int nodeindex);
 };
-
-#endif // TETGEN_13
-
-
-
-
-
-
-
-
-
 
 
 
 /**
  * Class \p TetGenMeshInterface provides an interface for
  * tetrahedrization of meshes using the TetGen library.  For
- * information about TetGen see: cf.
+ * information about TetGen cf.
  * <a href="http://tetgen.berlios.de/">TetGen home page</a>.
  */
 class TetGenMeshInterface
@@ -298,6 +205,10 @@ public:
    */
   TetGenMeshInterface (Mesh& mesh);
 
+  /**
+   * Empty destructor.
+   */
+  ~TetGenMeshInterface() {};
 
   /**
    * Method invokes TetGen library to compute a Delaunay tetrahedrization
@@ -333,15 +244,8 @@ public:
    */
   int get_node_index (const Node* inode);
 
-  /**
-   * Destructor.
-   */
-  ~TetGenMeshInterface();
 
 protected:
-
-  //-------------------------------------------------------------
-  // local data
 
   /**
    * Local reference to the mesh we are working with.

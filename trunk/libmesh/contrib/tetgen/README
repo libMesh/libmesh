@@ -1,0 +1,144 @@
+
+The TetGen user's manual in files manual.pdf has been removed from this
+directory. Also, the .cxx files were renamed to .C. The original makefile
+was renamed to makefile.orig. The manual may be found on the TetGen homepage
+http://tetgen.berlios.de/index.html. The TetGen LICENSE is included at the
+bottom of this file.
+
+Steffen Petersen
+Do Mai 12 19:41:19 CEST 2005
+
+------------------------------------------------------------------------------
+
+TetGen
+A Quality Tetrahedral Mesh Generator and 3D Delaunay Triangulator
+Version 1.3 (Released on June 13, 2004).
+
+Copyright 2002, 2004  Hang Si
+Rathausstr. 9, 10178 Berlin, Germany
+si@wias-berlin.de
+
+TetGen generates exact Delaunay tetrahedralizations, exact constrained
+Delaunay tetrahedralizations, and quality tetrahedral meshes. The
+latter are quality conforming Delaunay and nicely graded if no input
+angle is smaller than 60 degree.
+
+------------------------------------------------------------------------------
+The distributed version of TetGen includes the following files:
+
+  README               This file.
+  LICENSE              Copyright notices.
+  tetgen.h             Header file of the TetGen library.
+  tetgen.cxx           C++ source code of the TetGen library.
+  predicates.cxx       C++ source code of the geometric predicates.
+  makefile             Makefile for compiling TetGen.
+  manual.pdf           User's manual.
+  example.poly         A sample data file.
+
+TetGen should run on all 32-bit and 64-bit computers.  Use an ANSI C++
+compiler to compile the program.  
+
+The easiest way to compile it is to edit and use the included
+makefile.  Before compiling, read the makefile, which describes the
+options, and edit it accordingly.  You should specify:
+
+  - the C++ compiler, and
+  - the level of optimization.
+
+Once you've done this, type "make" to compile the program.
+
+After compiling, type "tetgen -h" for a brief introduction into
+TetGen.  The included user's manual contains documentation and
+examples. Alternatively, the online manual includes a comprehensive
+documentation for using TetGen and more examples, please see:
+
+            http://tetgen.berlios.de/index.html
+
+------------------------------------------------------------------------------
+
+The development of TetGen is supported by the pdelib project of
+Weierstrass Institute for Applied Analysis and Stochastics.  Pdelib is
+a collection of software components for solving non-linear partial
+differential equations including 2D and 3D mesh generators, sparse
+matrix solvers, and scientific visualization tools, etc. For further
+informations, see the following link:
+
+            http://www.wias-berlin.de/software/pdelib 
+
+------------------------------------------------------------------------------
+
+TetGen may be freely copied, modified, and redistributed under the
+following copyright notices stated in the file LICENSE.
+
+Please send bugs/comments to Hang Si <si@wias-berlin.de>
+
+Hang Si
+June, 2004
+
+------------------------------------------------------------------------------
+
+TetGen License
+--------------
+
+The software (TetGen) is licensed under the terms of the  MIT  license
+with the following exceptions:
+
+Distribution of  modified  versions  of this code is permissible UNDER
+THE CONDITION THAT  THIS CODE AND ANY MODIFICATIONS  MADE TO IT IN THE
+SAME SOURCE FILES  tetgen.h AND tetgen.cxx  REMAIN UNDER  COPYRIGHT OF
+THE  ORIGINAL AUTHOR,  BOTH  SOURCE AND OBJECT  CODE  ARE MADE  FREELY
+AVAILABLE  WITHOUT   CHARGE,   AND  CLEAR   NOTICE  IS  GIVEN  OF  THE 
+MODIFICATIONS.
+
+Distribution of this code for  any  commercial purpose  is permissible
+ONLY BY DIRECT ARRANGEMENT WITH THE COPYRIGHT OWNER.
+
+The full  license text is reproduced below.
+
+This means that TetGen is no free software, but for private, research,
+and  educational purposes it  can be  used at  absolutely no  cost and
+without further arrangements.
+
+
+For details, see http://tetgen.berlios.de
+
+==============================================================================
+
+TetGen
+A Quality Tetrahedral Mesh Generator and 3D Delaunay Triangulator
+Version 1.3 (Released on June 13, 2004).
+
+Copyright 2002, 2004  Hang Si
+Rathausstr. 9, 10178 Berlin, Germany
+si@wias-berlin.de
+
+Permission is hereby granted, free  of charge, to any person obtaining
+a  copy  of this  software  and  associated  documentation files  (the
+"Software"), to  deal in  the Software without  restriction, including
+without limitation  the rights to  use, copy, modify,  merge, publish,
+distribute,  sublicense and/or  sell copies  of the  Software,  and to
+permit persons to whom the Software  is furnished to do so, subject to
+the following conditions:
+
+Distribution of  modified  versions  of this code is permissible UNDER
+THE CONDITION THAT  THIS CODE AND ANY MODIFICATIONS  MADE TO IT IN THE
+SAME SOURCE FILES  tetgen.h AND tetgen.cxx  REMAIN UNDER  COPYRIGHT OF
+THE  ORIGINAL AUTHOR,  BOTH  SOURCE AND OBJECT  CODE  ARE MADE  FREELY
+AVAILABLE  WITHOUT   CHARGE,   AND  CLEAR   NOTICE  IS  GIVEN  OF  THE 
+MODIFICATIONS.
+
+Distribution of this code for  any  commercial purpose  is permissible
+ONLY BY DIRECT ARRANGEMENT WITH THE COPYRIGHT OWNER.
+
+The  above  copyright  notice  and  this permission  notice  shall  be
+included in all copies or substantial portions of the Software.
+
+THE  SOFTWARE IS  PROVIDED  "AS  IS", WITHOUT  WARRANTY  OF ANY  KIND,
+EXPRESS OR  IMPLIED, INCLUDING  BUT NOT LIMITED  TO THE  WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT  SHALL THE AUTHORS OR COPYRIGHT HOLDERS  BE LIABLE FOR ANY
+CLAIM, DAMAGES OR  OTHER LIABILITY, WHETHER IN AN  ACTION OF CONTRACT,
+TORT  OR OTHERWISE, ARISING  FROM, OUT  OF OR  IN CONNECTION  WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+==============================================================================

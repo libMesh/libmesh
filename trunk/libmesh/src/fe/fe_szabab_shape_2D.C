@@ -1,4 +1,4 @@
-// $Id: fe_szabab_shape_2D.C,v 1.11 2005-02-22 22:17:37 jwpeterson Exp $
+// $Id: fe_szabab_shape_2D.C,v 1.12 2005-05-12 17:01:24 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -571,6 +571,7 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	    // Szabo-Babuska shape functions on the triangle.
 	  case TRI6:
 	    {
+
 	      Real l1 = 1-p(0)-p(1);
 	      Real l2 = p(0);
 	      Real l3 = p(1);	      

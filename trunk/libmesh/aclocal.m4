@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.84 2005-05-09 20:38:36 jwpeterson Exp $
+dnl $Id: aclocal.m4,v 1.85 2005-05-12 17:01:19 spetersen Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -937,29 +937,23 @@ dnl TetGen tetrahedrization library
 dnl -------------------------------------------------------------
 AC_DEFUN(CONFIGURE_TETGEN, 
 [
-dnl if TetGen is used we need the header path and the lib
-dnl all necessary files are believed to be in environment 
-dnl variable $TETGEN_DIR or the directory specified by
-dnl --with-tetgen=PATH
-  AC_ARG_WITH(tetgen,
-              AC_HELP_STRING([--with-tetgen=PATH],[Specify the full to the Tetgen installation]),
-              TETGEN_DIR=$withval)
+dnl if TetGen is enabled we need the header path and the lib
 
-  if (test $TETGEN_DIR) ; then
-     TETGEN_VERSION="-DTETGEN_13"
-     TETGEN_INCLUDE="-I$TETGEN_DIR"
-     TETGEN_LIBRARY="$TETGEN_DIR/libtet.a"
+  if (test $enabletetgen = yes) ; then
+     TETGEN_INCLUDE="-I$PWD/contrib/tetgen"
+     TETGEN_LIBRARY="\$(EXTERNAL_LIBDIR)/libtetgen\$(EXTERNAL_LIBEXT)"
      AC_DEFINE(HAVE_TETGEN, 1, [Flag indicating whether the library will be compiled with TetGen support])
-     AC_MSG_RESULT(<<< Configuring library with TetGen v1.3 support >>>)
+     AC_MSG_RESULT(<<< Configuring library with TetGen support >>>)
+     CONTRIB_HAVE_TETGEN="#define HAVE_TETGEN 1"
   else
-     TETGEN_VERSION=""
      TETGEN_INCLUDE=""
      TETGEN_LIBRARY=""
      enabletetgen=no
-  fi
+     CONTRIB_HAVE_TETGEN="/* #undef HAVE_TETGEN */"
+   fi
 
-  dnl TetGen version 1.3:
-  AC_SUBST(TETGEN_VERSION)
+  dnl TetGen
+  AC_SUBST(CONTRIB_HAVE_TETGEN)	
   AC_SUBST(TETGEN_INCLUDE)
   AC_SUBST(TETGEN_LIBRARY)	
   AC_SUBST(enabletetgen)

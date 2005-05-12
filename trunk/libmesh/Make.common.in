@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.45 2005-05-09 12:35:23 spetersen Exp $
+# $Id: Make.common.in,v 1.46 2005-05-12 17:01:18 spetersen Exp $
 
 
 ###############################################################################
@@ -271,7 +271,6 @@ ifeq ($(enable-optional),yes)
 
   # if TetGen is used:
   ifeq ($(enable-tetgen),yes)
-    CXXFLAGS += @TETGEN_VERSION@
     LIBS     += @TETGEN_LIBRARY@
     INCLUDE  += @TETGEN_INCLUDE@
   endif
@@ -407,6 +406,9 @@ ifeq ($(enable-optional),yes)
   endif
   ifeq ($(enable-sfcurves),yes)
     libs_EXTERNAL += -lsfcurves
+  endif
+  ifeq ($(enable-tetgen),yes)
+    libs_EXTERNAL += -ltetgen
   endif
   ifeq ($(enable-triangle),yes)
     libs_EXTERNAL += -ltriangle

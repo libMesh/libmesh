@@ -21,6 +21,9 @@ all:
 	@echo "--- Building libgzstream ---------------------"
 	@$(MAKE) -C gzstream     $(MAKECMDGOALS)
 	@echo ""
+	@echo "--- Building TetGen ---------------------"
+	@$(MAKE) -C tetgen     $(MAKECMDGOALS)
+	@echo ""
 	@echo "--- Building triangle ---------------------"
 	@$(MAKE) -C triangle     $(MAKECMDGOALS)
 	@echo ""
@@ -40,6 +43,7 @@ clean:
 	@$(MAKE) -C parmetis/Lib $(MAKECMDGOALS)
 	@$(MAKE) -C sfcurves     $(MAKECMDGOALS)
 	@$(MAKE) -C gzstream     $(MAKECMDGOALS)
+	@$(MAKE) -C tetgen       $(MAKECMDGOALS)
 	@$(MAKE) -C triangle     $(MAKECMDGOALS)
 #
 # How to clobber the packages
@@ -51,6 +55,7 @@ clobber:
 	@$(MAKE) -C parmetis/Lib $(MAKECMDGOALS)
 	@$(MAKE) -C sfcurves     $(MAKECMDGOALS)
 	@$(MAKE) -C gzstream     $(MAKECMDGOALS)
+	@$(MAKE) -C tetgen       $(MAKECMDGOALS)
 	@$(MAKE) -C triangle     $(MAKECMDGOALS)
 
 #
@@ -63,5 +68,6 @@ distclean:
 	@$(MAKE) -C parmetis/Lib $(MAKECMDGOALS)
 	@$(MAKE) -C sfcurves     $(MAKECMDGOALS)
 	@$(MAKE) -C gzstream     $(MAKECMDGOALS)
+	@$(MAKE) -C tetgen       $(MAKECMDGOALS)
 	@$(MAKE) -C triangle     $(MAKECMDGOALS)
 	@rm -rf lib/*_dbg lib/*_opt lib/*_pro
