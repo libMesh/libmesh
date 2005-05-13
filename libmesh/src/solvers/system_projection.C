@@ -1,4 +1,4 @@
-// $Id: system_projection.C,v 1.13 2005-05-11 23:12:11 benkirk Exp $
+// $Id: system_projection.C,v 1.14 2005-05-13 21:07:36 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -28,6 +28,7 @@
 #include "elem.h"
 #include "libmesh.h"
 #include "dof_map.h"
+#include "fe.h"
 #include "fe_type.h"
 #include "fe_interface.h"
 #include "numeric_vector.h"
@@ -90,6 +91,7 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 
   // A vector for Lagrange element interpolation, indicating if we
   // have visited a DOF yet
+  // FIXME: we should use this for non-Lagrange coarsening, too
   std::vector<bool> already_done (this->n_dofs(), false);
 
   // The number of variables in this system
@@ -101,28 +103,50 @@ void System::project_vector (const NumericVector<Number>& old_vector,
   // The DofMap for this system
   const DofMap& dof_map = this->get_dof_map();
 
-  // The element matrix and RHS for non-Lagrange element projection
+  // The element matrix and RHS for projections
   DenseMatrix<Number> Ke;
   DenseVector<Number> Fe;
+  // The new element coefficients
   DenseVector<Number> Ue;
 
 
   // Loop over all the variables in the system
   for (unsigned int var=0; var<n_variables; var++)
     {
-      // Get a FE object of the appropriate type
+      // Get FE objects of the appropriate type
       const FEType& fe_type = dof_map.variable_type(var);     
       AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));      
+      AutoPtr<FEBase> fe_coarse (FEBase::build(dim, fe_type));      
 
       // Prepare variables for non-Lagrange projection
       int order = fe->get_order();
       QGauss qrule       (dim, libMeshEnums::Order(order*2));
       fe->attach_quadrature_rule (&qrule);
+      std::vector<Point> coarse_qpoints;
 
       // The values of the shape functions at the quadrature
-      // points on the child element.
+      // points
       const std::vector<std::vector<Real> >& phi_values =
 	fe->get_phi();
+      const std::vector<std::vector<Real> >& phi_coarse =
+	fe_coarse->get_phi();
+
+      // The gradients of the shape functions at the quadrature
+      // points on the child element.
+      const std::vector<std::vector<RealGradient> > *dphi_values =
+        NULL;
+      const std::vector<std::vector<RealGradient> > *dphi_coarse =
+        NULL;
+
+      if (fe->get_continuity() == C_ONE)
+        {
+          const std::vector<std::vector<RealGradient> >&
+            ref_dphi_values = fe->get_dphi();
+          dphi_values = &ref_dphi_values;
+          const std::vector<std::vector<RealGradient> >&
+            ref_dphi_coarse = fe_coarse->get_dphi();
+          dphi_coarse = &ref_dphi_coarse;
+        }
 
       // The Jacobian * quadrature weight at the quadrature points
       const std::vector<Real>& JxW =
@@ -136,6 +160,8 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 
       // The global DOF indices
       std::vector<unsigned int> new_dof_indices, old_dof_indices;
+      // Side/edge DOF indices
+      std::vector<unsigned int> new_side_dofs, old_side_dofs;
    
       // Iterators for the active elements on local processor
       MeshBase::element_iterator       elem_it =
@@ -152,8 +178,18 @@ void System::project_vector (const NumericVector<Number>& old_vector,
           // the new mesh
 	  dof_map.dof_indices (elem, new_dof_indices, var);
 
-	  // The number of DOFs on this child
+	  // The number of DOFs on the new element
 	  const unsigned int new_n_dofs = new_dof_indices.size();
+
+          // Fixed vs. free DoFs on edge/face projections
+          std::vector<bool> dof_is_fixed(new_n_dofs, false);
+          std::vector<int> free_dof(new_n_dofs, 0);
+
+	  // The element type
+	  const ElemType elem_type = elem->type();
+
+	  // The number of nodes on the new element
+	  const unsigned int n_nodes = elem->n_nodes();
 
           // Zero the interpolated values
           Ue.resize (new_n_dofs); Ue.zero();
@@ -191,7 +227,8 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 
           if (fe_type.family != LAGRANGE) {
 
-	    // For refined elements, we do an L2 projection
+	    // For refined non-Lagrange elements, we do an L2
+            // projection
 	    if (elem->refinement_flag() == Elem::JUST_REFINED)
 	      {
 	        // Update the fe object based on the current child
@@ -199,6 +236,11 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 	  
 	        // The number of quadrature points on the child
 	        const unsigned int n_qp = qrule.n_points();
+
+                FEInterface::inverse_map (dim, fe_type, parent,
+					  xyz_values, coarse_qpoints);
+
+                fe_coarse->reinit(parent, &coarse_qpoints);
 
 	        // Reinitialize the element matrix and vector for
 	        // the current element.  Note that this will zero them
@@ -213,12 +255,6 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 	            // The solution value at the quadrature point	      
 	            Number val = libMesh::zero;
 
-		    // The location of the quadrature point
-		    // on the parent element
-		    const Point q_point =
-		    FEInterface::inverse_map (dim, fe_type,
-					      parent, xyz_values[qp]);
-
 		    // Sum the function values * the DOF values
 		    // at the point of interest to get the function value
 		    // (Note that the # of DOFs on the parent need not be the
@@ -226,8 +262,7 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 		    for (unsigned int i=0; i<old_n_dofs; i++)
 		      {
 		        val += (old_vector(old_dof_indices[i])*
-			        FEInterface::shape(dim, fe_type, parent,
-						   i, q_point));
+			        phi_coarse[i][qp]);
 		      }
 
 	            // Now \p val contains the solution value of variable
@@ -251,7 +286,390 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 	      }
             else if (elem->refinement_flag() == Elem::JUST_COARSENED)
 	      {
-		// FIXME: proper non-Lagrange coarsening will take
+                // Copy node values first
+                unsigned int current_dof = 0;
+                for (unsigned int n=0; n!= n_nodes; ++n)
+                  {
+#if 1
+                    // FIXME: this should go through the DofMap,
+                    // not duplicate dof_indices code badly!
+		    const unsigned int nc =
+		      FEInterface::n_dofs_at_node (dim, fe_type,
+                                                   elem_type, n);
+                    if (!elem->is_vertex(n))
+                      {
+                        current_dof += nc;
+                        continue;
+                      }
+                    for (unsigned int i=0; i!= nc; ++i)
+                      {
+			Ue(current_dof+i) =
+                          old_vector(old_dof_indices[current_dof+i]);
+                        dof_is_fixed[current_dof+i] = true;
+                      }
+                  }
+                const FEContinuity cont = fe->get_continuity();
+
+                // In 3D, project any edge values next
+                if (dim > 2 && cont != DISCONTINUOUS)
+                  for (unsigned int e=0; e != elem->n_edges(); ++e)
+                    {
+		      FEInterface::dofs_on_edge(elem, dim, fe_type,
+                                                e, new_side_dofs);
+
+                      // Some edge dofs are on nodes and already
+                      // fixed, others are free to calculate
+                      unsigned int free_dofs = 0;
+                      for (unsigned int i=0; i !=
+                           new_side_dofs.size(); ++i)
+                        if (!dof_is_fixed[i])
+                          free_dof[free_dofs++] = i;
+	              Ke.resize (free_dofs, free_dofs); Ke.zero();
+	              Fe.resize (free_dofs); Fe.zero();
+                      // The new edge coefficients
+                      DenseVector<Number> Uedge(free_dofs);
+
+                      // Add projection terms from each child sharing
+                      // this edge
+                      for (unsigned int c=0; c != elem->n_children();
+                           ++c)
+                        {
+                          if (!elem->is_child_on_edge(c,e))
+                            continue;
+                          Elem *child = elem->child(c);
+			  dof_map.old_dof_indices (child,
+                            old_dof_indices, var);
+			  FEInterface::dofs_on_edge(child, dim,
+			    fe_type, e, old_side_dofs);
+
+                          // Initialize both child and parent FE data
+                          // on the child's edge
+	                  fe->edge_reinit (child, e);
+	                  const unsigned int n_qp = qrule.n_points();
+
+                          FEInterface::inverse_map (dim, fe_type, elem,
+					  xyz_values, coarse_qpoints);
+
+                          fe_coarse->reinit(elem, &coarse_qpoints);
+
+	                  // Loop over the quadrature points
+	                  for (unsigned int qp=0; qp<n_qp; qp++)
+	                    {
+	                      // solution value at the quadrature point	      
+	                      Number fineval = libMesh::zero;
+	                      // solution grad at the quadrature point	      
+	                      Gradient finegrad;
+
+			      // Sum the solution values * the DOF
+			      // values at the quadrature point to
+                              // get the solution value and gradient.
+			      for (unsigned int i=0; i<old_n_dofs;
+                                   i++)
+                                {
+				  fineval +=
+                                    (old_vector(old_dof_indices[i])*
+				    phi_values[i][qp]);
+                                  if (cont == C_ONE)
+				    finegrad +=
+                                      (old_vector(old_dof_indices[i])*
+				      (*dphi_values)[i][qp]);
+                                }
+
+                              // Form edge projection matrix
+                              for (unsigned int i=0, freei=0; i !=
+                                   new_side_dofs.size(); ++i)
+                                {
+                                  // fixed DoFs aren't test functions
+                                  if (dof_is_fixed[new_side_dofs[i]])
+                                    continue;
+				  for (unsigned int j=0, freej=0; j !=
+                                       new_side_dofs.size(); ++j)
+                                    {
+                                      if (dof_is_fixed[new_side_dofs[j]])
+                                        Fe(freei) -=
+                                          phi_coarse[i][qp] *
+                                          phi_coarse[j][qp] * JxW[qp] *
+                                          Ue(new_side_dofs[j]);
+                                      else
+                                        Ke(freei,freej) +=
+                                          phi_coarse[i][qp] *
+                                          phi_coarse[j][qp] * JxW[qp];
+                                      if (cont == C_ONE)
+                                        {
+                                          if (dof_is_fixed[new_side_dofs[j]])
+                                            Fe(freei) -=
+                                              (phi_coarse[i][qp] *
+					       phi_coarse[j][qp]) *
+                                              JxW[qp] *
+                                              Ue(new_side_dofs[j]);
+                                          else
+                                            Ke(freei,freej) +=
+					      ((*dphi_coarse)[i][qp] *
+                                               (*dphi_coarse)[j][qp])
+                                              * JxW[qp];
+                                        }
+                                      if (!dof_is_fixed[new_side_dofs[j]])
+                                        freej++;
+                                    }
+                                  Fe(freei) += phi_coarse[i][qp] *
+                                               fineval * JxW[qp];
+                                  if (cont == C_ONE)
+                                    Fe(freei) +=
+                                      ((*dphi_coarse)[i][qp] *
+                                       finegrad) * JxW[qp];
+                                  freei++;
+                                }
+	                    }
+                        }
+                      Ke.cholesky_solve(Fe, Uedge);
+
+                      // Transfer new edge solutions to element
+		      for (unsigned int i=0; i != free_dofs; ++i)
+                        {
+                          Number &ui = Ue(new_side_dofs[free_dof[i]]);
+                          assert(fabs(ui) < TOLERANCE ||
+                                 fabs(ui - Uedge(i)) < TOLERANCE);
+                          ui = Uedge(i);
+                          dof_is_fixed[new_side_dofs[free_dof[i]]] =
+                            true;
+                        }
+                    }
+                 
+		// Project any side values (edges in 2D, faces in 3D)
+                if (dim > 1 && cont != DISCONTINUOUS)
+                  for (unsigned int s=0; s != elem->n_sides(); ++s)
+                    {
+		      FEInterface::dofs_on_side(elem, dim, fe_type,
+                                                s, new_side_dofs);
+
+		      // Some side dofs are on nodes/edges and already
+                      // fixed, others are free to calculate
+                      unsigned int free_dofs = 0;
+                      for (unsigned int i=0; i !=
+                           new_side_dofs.size(); ++i)
+                        if (!dof_is_fixed[i])
+                          free_dof[free_dofs++] = i;
+	              Ke.resize (free_dofs, free_dofs); Ke.zero();
+	              Fe.resize (free_dofs); Fe.zero();
+                      // The new side coefficients
+                      DenseVector<Number> Uside(free_dofs);
+
+                      // Add projection terms from each child sharing
+                      // this side
+                      for (unsigned int c=0; c != elem->n_children();
+                           ++c)
+                        {
+                          if (!elem->is_child_on_side(c,s))
+                            continue;
+                          Elem *child = elem->child(c);
+			  dof_map.old_dof_indices (child,
+                            old_dof_indices, var);
+			  FEInterface::dofs_on_side(child, dim,
+			    fe_type, s, old_side_dofs);
+
+                          // Initialize both child and parent FE data
+                          // on the child's side
+	                  fe->reinit (child, s);
+	                  const unsigned int n_qp = qrule.n_points();
+
+                          FEInterface::inverse_map (dim, fe_type, elem,
+					  xyz_values, coarse_qpoints);
+
+	                  // Loop over the quadrature points
+	                  for (unsigned int qp=0; qp<n_qp; qp++)
+	                    {
+	                      // solution value at the quadrature point	      
+	                      Number fineval = libMesh::zero;
+	                      // solution grad at the quadrature point	      
+	                      Gradient finegrad;
+
+			      // Sum the solution values * the DOF
+			      // values at the quadrature point to
+                              // get the solution value and gradient.
+			      for (unsigned int i=0; i<old_n_dofs;
+                                   i++)
+                                {
+				  fineval +=
+                                    (old_vector(old_dof_indices[i])*
+				    phi_values[i][qp]);
+                                  if (cont == C_ONE)
+				    finegrad +=
+                                      (old_vector(old_dof_indices[i])*
+				      (*dphi_values)[i][qp]);
+                                }
+
+                              // Form side projection matrix
+                              for (unsigned int i=0, freei=0; i !=
+                                   new_side_dofs.size(); ++i)
+                                {
+                                  // fixed DoFs aren't test functions
+                                  if (dof_is_fixed[new_side_dofs[i]])
+                                    continue;
+				  for (unsigned int j=0, freej=0; j !=
+                                       new_side_dofs.size(); ++j)
+                                    {
+                                      if (dof_is_fixed[new_side_dofs[j]])
+                                        Fe(freei) -=
+                                          phi_coarse[i][qp] *
+                                          phi_coarse[j][qp] * JxW[qp] *
+                                          Ue(new_side_dofs[j]);
+                                      else
+                                        Ke(freei,freej) +=
+                                          phi_coarse[i][qp] *
+                                          phi_coarse[j][qp] * JxW[qp];
+                                      if (cont == C_ONE)
+                                        {
+                                          if (dof_is_fixed[new_side_dofs[j]])
+                                            Fe(freei) -=
+                                              (phi_coarse[i][qp] *
+					       phi_coarse[j][qp]) *
+                                              JxW[qp] *
+                                              Ue(new_side_dofs[j]);
+                                          else
+                                            Ke(freei,freej) +=
+					      ((*dphi_coarse)[i][qp] *
+                                               (*dphi_coarse)[j][qp])
+                                              * JxW[qp];
+                                        }
+                                      if (!dof_is_fixed[new_side_dofs[j]])
+                                        freej++;
+                                    }
+                                  Fe(freei) += phi_coarse[i][qp] *
+                                               fineval * JxW[qp];
+                                  if (cont == C_ONE)
+                                    Fe(freei) +=
+                                      ((*dphi_coarse)[i][qp] *
+                                       finegrad) * JxW[qp];
+                                  freei++;
+                                }
+	                    }
+                        }
+                      Ke.cholesky_solve(Fe, Uside);
+
+                      // Transfer new side solutions to element
+		      for (unsigned int i=0; i != free_dofs; ++i)
+                        {
+                          Number &ui = Ue(new_side_dofs[free_dof[i]]);
+                          assert(fabs(ui) < TOLERANCE ||
+                                 fabs(ui - Uside(i)) < TOLERANCE);
+                          ui = Uside(i);
+                          dof_is_fixed[new_side_dofs[free_dof[i]]] =
+                            true;
+                        }
+                    }
+
+		// Project the interior values, finally
+
+		// Some side dofs are on nodes/edges and already
+                // fixed, others are free to calculate
+                unsigned int free_dofs = 0;
+                for (unsigned int i=0; i != new_n_dofs; ++i)
+                  if (!dof_is_fixed[i])
+                    free_dof[free_dofs++] = i;
+	        Ke.resize (free_dofs, free_dofs); Ke.zero();
+	        Fe.resize (free_dofs); Fe.zero();
+                // The new interior coefficients
+                DenseVector<Number> Uint(free_dofs);
+
+                // Add projection terms from each child sharing
+                // this side
+		for (unsigned int c=0; c != elem->n_children(); ++c)
+                  {
+                    Elem *child = elem->child(c);
+		    dof_map.old_dof_indices (child, old_dof_indices,
+                                             var);
+
+                    // Initialize both child and parent FE data
+                    // on the child's quadrature points
+	            fe->reinit (child);
+	            const unsigned int n_qp = qrule.n_points();
+
+		    FEInterface::inverse_map (dim, fe_type, elem,
+                      xyz_values, coarse_qpoints);
+
+	            // Loop over the quadrature points
+	            for (unsigned int qp=0; qp<n_qp; qp++)
+	              {
+	                // solution value at the quadrature point	      
+	                Number fineval = libMesh::zero;
+	                // solution grad at the quadrature point	      
+	                Gradient finegrad;
+
+			// Sum the solution values * the DOF
+			// values at the quadrature point to
+                        // get the solution value and gradient.
+			for (unsigned int i=0; i<old_n_dofs; i++)
+                          {
+			    fineval +=
+                              (old_vector(old_dof_indices[i])*
+			       phi_values[i][qp]);
+                            if (cont == C_ONE)
+			      finegrad +=
+                                (old_vector(old_dof_indices[i])*
+				 (*dphi_values)[i][qp]);
+                          }
+
+                        // Form interior projection matrix
+                        for (unsigned int i=0, freei=0;
+                             i != new_n_dofs; ++i)
+                          {
+                            // fixed DoFs aren't test functions
+                            if (dof_is_fixed[i])
+                              continue;
+			    for (unsigned int j=0, freej=0; j !=
+                                 new_n_dofs; ++j)
+                              {
+                                if (dof_is_fixed[j])
+                                  Fe(freei) -=
+                                    phi_coarse[i][qp] *
+                                    phi_coarse[j][qp] * JxW[qp] *
+                                    Ue(j);
+                                else
+                                  Ke(freei,freej) +=
+                                    phi_coarse[i][qp] *
+                                    phi_coarse[j][qp] * JxW[qp];
+                                if (cont == C_ONE)
+                                  {
+                                    if (dof_is_fixed[j])
+                                      Fe(freei) -=
+                                        (phi_coarse[i][qp] *
+					 phi_coarse[j][qp]) *
+                                        JxW[qp] * Ue(j);
+                                    else
+                                      Ke(freei,freej) +=
+					((*dphi_coarse)[i][qp] *
+                                         (*dphi_coarse)[j][qp]) * JxW[qp];
+                                  }
+                                if (!dof_is_fixed[j])
+                                  freej++;
+                              }
+			    Fe(freei) += phi_coarse[i][qp] * fineval *
+                                         JxW[qp];
+                            if (cont == C_ONE)
+                              Fe(freei) += ((*dphi_coarse)[i][qp] *
+                                           finegrad) * JxW[qp];
+                            freei++;
+	                  }
+	              }
+                  }
+                Ke.cholesky_solve(Fe, Uint);
+
+                // Transfer new interior solutions to element
+		for (unsigned int i=0; i != new_n_dofs; ++i)
+                  {
+                    Number &ui = Ue(free_dof[i]);
+                    assert(fabs(ui) < TOLERANCE ||
+                           fabs(ui - Uint(i)) < TOLERANCE);
+                    ui = Uint(i);
+                    dof_is_fixed[free_dof[i]] = true;
+                  }
+
+                // Make sure every DoF got reached!
+		for (unsigned int i=0; i != new_n_dofs; ++i)
+                  assert(dof_is_fixed[i]);
+#endif
+
+		// FIXME: proper non-Lagrange coarsening still needs
                 // some work
                 error();
               }
