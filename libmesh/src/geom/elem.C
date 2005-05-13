@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.41 2005-02-22 22:17:39 jwpeterson Exp $
+// $Id: elem.C,v 1.42 2005-05-13 20:11:46 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -738,4 +738,32 @@ Elem::side_iterator Elem::boundary_sides_end()
 {
   Predicates::BoundarySide<SideIter> bsp;
   return side_iterator(this->_last_side(), this->_last_side(), bsp);
+}
+
+
+bool Elem::is_child_on_edge(const unsigned int c,
+                            const unsigned int e) const
+{
+  assert (c < this->n_children());
+  assert (e < this->n_edges());
+
+  AutoPtr<Elem> my_edge = this->build_edge(e);
+  AutoPtr<Elem> child_edge = this->build_edge(e);
+
+  // We're assuming that an overlapping child edge has the same
+  // number and orientation as its parent
+  return (child_edge->node(0) == my_edge->node(0) ||
+      child_edge->node(1) == my_edge->node(1));
+}
+
+
+bool Elem::is_child_on_side(const unsigned int c,
+                            const unsigned int s) const
+{
+  assert (c < this->n_children());
+  assert (s < this->n_sides());
+
+  Elem *child = this->child(c);
+  return ((child->neighbor(s) == NULL) // on boundary
+      || (child->neighbor(s)->parent() != this));
 }

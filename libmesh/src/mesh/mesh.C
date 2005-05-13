@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.51 2005-05-10 21:37:17 benkirk Exp $
+// $Id: mesh.C,v 1.52 2005-05-13 20:11:46 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -349,16 +349,21 @@ void Mesh::find_neighbors()
 			// If found a match wbounds.firsth my side
 			if (*my_side == *their_side) 
 			  {
-			    // So share a side.  Is either of us
-			    // the descendant of an active element?
+			    // So share a side.  Is this a mixed pair
+			    // of subactive and active/ancestor
+			    // elements?
                             // If not, then we're neighbors.
-                            if (!element->subactive() &&
-                                !neighbor->subactive())
+			    // If so, then the subactive's neighbor is 
+                            if (element->subactive() ==
+                                neighbor->subactive())
                               {
 			        element->set_neighbor (ms,neighbor);
 			        neighbor->set_neighbor(ns,element);
                               }
-			    
+			    else if (element->subactive())
+			      element->set_neighbor(ms,neighbor);
+			    else if (neighbor->subactive())
+			      element->set_neighbor(ns,neighbor);
 			    side_to_elem_map.erase (bounds.first);
 			    
 			    // get out of this nested crap
@@ -395,11 +400,11 @@ void Mesh::find_neighbors()
 
   /**
    * Here we look at all of the child elements.
-   * If a non-subactive child element has a NULL 
-   * neighbor it is either because it is on the
-   * boundary or because its neighbor is at a
-   * different level.  In the latter case we must
-   * get the neighbor from the parent.
+   * If a child element has a NULL neighbor it is 
+   * either because it is on the boundary or because
+   * its neighbor is at a different level.  In the
+   * latter case we must get the neighbor from the
+   * parent.
    *
    * Furthermore, that neighbor better be active,
    * otherwise we missed a child somewhere.
@@ -413,9 +418,6 @@ void Mesh::find_neighbors()
       
       assert (elem->parent() != NULL);
 
-      if (elem->subactive()) 
-        continue;
-      
       for (unsigned int s=0; s < elem->n_neighbors(); s++)
 	if (elem->neighbor(s) == NULL)
 	  {	    
