@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.20 2005-05-11 18:31:17 roystgnr Exp $
+// $Id: elem.h,v 1.21 2005-05-13 20:11:44 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -306,6 +306,20 @@ class Elem : public ReferenceCountedObject<Elem>,
    */
   virtual bool is_node_on_edge(const unsigned int n,
 			       const unsigned int e) const = 0;
+
+  /*
+   * @returns true iff the specified child is on the
+   * specified side
+   */
+  virtual bool is_child_on_side(const unsigned int c,
+			        const unsigned int s) const;
+  
+  /*
+   * @returns true iff the specified child is on the
+   * specified edge
+   */
+  virtual bool is_child_on_edge(const unsigned int c,
+			        const unsigned int e) const;
 
 //   /**
 //    * @returns the number of children this element has that
