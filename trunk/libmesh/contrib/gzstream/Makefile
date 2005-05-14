@@ -18,8 +18,8 @@
 # ============================================================================
 # 
 # File          : Makefile
-# Revision      : $Revision: 1.6 $
-# Revision_date : $Date: 2005-05-14 17:23:21 $
+# Revision      : $Revision: 1.7 $
+# Revision_date : $Date: 2005-05-14 21:16:53 $
 # Author(s)     : Deepak Bandyopadhyay, Lutz Kettner
 # 
 # ============================================================================
@@ -81,7 +81,7 @@ endif
 $(EXTERNAL_LIBDIR)/$(library_name)$(SHARED_LIBEXT): $(OBJS)
 	@echo "Linking "$@
 	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
-	@$(CXX) $(CXXSHAREDFLAG) -o $@ $(OBJS) $(LDFLAGS)
+	@$(CXX) $(CXXSHAREDFLAG) -o $@ $(OBJS) $(LDFLAGS) -lz
 
 endif
 
