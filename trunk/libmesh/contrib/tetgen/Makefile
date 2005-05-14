@@ -50,7 +50,7 @@ endif
 $(EXTERNAL_LIBDIR)/lib$(pkgname)$(SHARED_LIBEXT): $(OBJS)
 	@echo "Linking "$@
 	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
-	$(CXX) $(CXXSHAREDFLAG) -o $@ $(OBJS) $(LDFLAGS)
+	@$(CXX) $(CXXSHAREDFLAG) -o $@ $(OBJS) $(LDFLAGS)
 
 
 clean:
