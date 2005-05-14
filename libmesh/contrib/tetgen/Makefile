@@ -25,7 +25,7 @@ ifeq ($(enable-shared),yes)
   target := $(EXTERNAL_LIBDIR)/lib$(pkgname)$(SHARED_LIBEXT)
 endif
 
-ifeq ($(enable-triangle),no)
+ifeq ($(enable-tetgen),no)
   all::
 	@echo "<<< $(pkgname) is disabled, not building >>>"
 else
