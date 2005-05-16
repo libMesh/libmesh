@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.52 2005-05-13 20:11:46 roystgnr Exp $
+// $Id: mesh.C,v 1.53 2005-05-16 19:03:05 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -363,7 +363,7 @@ void Mesh::find_neighbors()
 			    else if (element->subactive())
 			      element->set_neighbor(ms,neighbor);
 			    else if (neighbor->subactive())
-			      element->set_neighbor(ns,neighbor);
+			      neighbor->set_neighbor(ns,element);
 			    side_to_elem_map.erase (bounds.first);
 			    
 			    // get out of this nested crap
@@ -415,7 +415,7 @@ void Mesh::find_neighbors()
   for (; el != end; ++el)
     {
       Elem* elem = *el;
-      
+
       assert (elem->parent() != NULL);
 
       for (unsigned int s=0; s < elem->n_neighbors(); s++)
@@ -430,7 +430,7 @@ void Mesh::find_neighbors()
 		{
 		  std::cerr << "ERROR: " 
                     << (elem->active()?"Active":"Ancestor")
-                    << "Element at level "
+                    << " Element at level "
                     << elem->level() << " found "
 		    << (neigh->subactive()?"subactive":"ancestor")
                     << " neighbor at level " << neigh->level()
