@@ -1,4 +1,4 @@
-// $Id: system_projection.C,v 1.14 2005-05-13 21:07:36 roystgnr Exp $
+// $Id: system_projection.C,v 1.15 2005-05-16 18:09:34 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -212,7 +212,8 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 	 
 	      dof_map.old_dof_indices (parent, old_dof_indices, var);
             }
-	  else if (elem->refinement_flag() == Elem::JUST_COARSENED)
+	  else if (elem->refinement_flag() == Elem::JUST_COARSENED
+                   && fe_type.family != LAGRANGE)
 	    {
 	      assert (elem->has_children());
             }
