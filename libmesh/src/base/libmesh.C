@@ -1,4 +1,4 @@
-// $Id: libmesh.C,v 1.33 2005-05-17 15:56:45 benkirk Exp $
+// $Id: libmesh.C,v 1.34 2005-05-17 15:57:34 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -150,7 +150,9 @@ void libMesh::init (int &argc, char** & argv,
 # if defined(HAVE_PETSC)
       
       if (!libMesh::on_command_line ("--disable-petsc"))
-	{	  
+	{
+	  int ierr=0;
+	  
 	  PETSC_COMM_WORLD = libMesh::COMM_WORLD;
 
 #  if defined(HAVE_SLEPC)
