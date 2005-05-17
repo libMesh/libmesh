@@ -1,4 +1,4 @@
-// $Id: system_projection.C,v 1.15 2005-05-16 18:09:34 roystgnr Exp $
+// $Id: system_projection.C,v 1.16 2005-05-17 23:36:50 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -121,7 +121,8 @@ void System::project_vector (const NumericVector<Number>& old_vector,
       // Prepare variables for non-Lagrange projection
       int order = fe->get_order();
       QGauss qrule       (dim, libMeshEnums::Order(order*2));
-      fe->attach_quadrature_rule (&qrule);
+      QGauss qedgerule   (1, libMeshEnums::Order(order*2));
+      QGauss qsiderule   (dim-1, libMeshEnums::Order(order*2));
       std::vector<Point> coarse_qpoints;
 
       // The values of the shape functions at the quadrature
@@ -182,7 +183,7 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 	  const unsigned int new_n_dofs = new_dof_indices.size();
 
           // Fixed vs. free DoFs on edge/face projections
-          std::vector<bool> dof_is_fixed(new_n_dofs, false);
+          std::vector<char> dof_is_fixed(new_n_dofs, false); // bools
           std::vector<int> free_dof(new_n_dofs, 0);
 
 	  // The element type
@@ -233,6 +234,7 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 	    if (elem->refinement_flag() == Elem::JUST_REFINED)
 	      {
 	        // Update the fe object based on the current child
+                fe->attach_quadrature_rule (&qrule);
 	        fe->reinit (elem);
 	  
 	        // The number of quadrature points on the child
@@ -288,10 +290,10 @@ void System::project_vector (const NumericVector<Number>& old_vector,
             else if (elem->refinement_flag() == Elem::JUST_COARSENED)
 	      {
                 // Copy node values first
+		dof_map.old_dof_indices (elem, old_dof_indices, var);
                 unsigned int current_dof = 0;
                 for (unsigned int n=0; n!= n_nodes; ++n)
                   {
-#if 1
                     // FIXME: this should go through the DofMap,
                     // not duplicate dof_indices code badly!
 		    const unsigned int nc =
@@ -304,9 +306,10 @@ void System::project_vector (const NumericVector<Number>& old_vector,
                       }
                     for (unsigned int i=0; i!= nc; ++i)
                       {
-			Ue(current_dof+i) =
-                          old_vector(old_dof_indices[current_dof+i]);
-                        dof_is_fixed[current_dof+i] = true;
+			Ue(current_dof) =
+                          old_vector(old_dof_indices[current_dof]);
+                        dof_is_fixed[current_dof] = true;
+                        current_dof++;
                       }
                   }
                 const FEContinuity cont = fe->get_continuity();
@@ -323,7 +326,7 @@ void System::project_vector (const NumericVector<Number>& old_vector,
                       unsigned int free_dofs = 0;
                       for (unsigned int i=0; i !=
                            new_side_dofs.size(); ++i)
-                        if (!dof_is_fixed[i])
+                        if (!dof_is_fixed[new_side_dofs[i]])
                           free_dof[free_dofs++] = i;
 	              Ke.resize (free_dofs, free_dofs); Ke.zero();
 	              Fe.resize (free_dofs); Fe.zero();
@@ -345,8 +348,9 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 
                           // Initialize both child and parent FE data
                           // on the child's edge
+                          fe->attach_quadrature_rule (&qedgerule);
 	                  fe->edge_reinit (child, e);
-	                  const unsigned int n_qp = qrule.n_points();
+	                  const unsigned int n_qp = qedgerule.n_points();
 
                           FEInterface::inverse_map (dim, fe_type, elem,
 					  xyz_values, coarse_qpoints);
@@ -399,8 +403,8 @@ void System::project_vector (const NumericVector<Number>& old_vector,
                                         {
                                           if (dof_is_fixed[new_side_dofs[j]])
                                             Fe(freei) -=
-                                              (phi_coarse[i][qp] *
-					       phi_coarse[j][qp]) *
+                                              ((*dphi_coarse)[i][qp] *
+					       (*dphi_coarse)[j][qp]) *
                                               JxW[qp] *
                                               Ue(new_side_dofs[j]);
                                           else
@@ -448,10 +452,11 @@ void System::project_vector (const NumericVector<Number>& old_vector,
                       unsigned int free_dofs = 0;
                       for (unsigned int i=0; i !=
                            new_side_dofs.size(); ++i)
-                        if (!dof_is_fixed[i])
+                        if (!dof_is_fixed[new_side_dofs[i]])
                           free_dof[free_dofs++] = i;
 	              Ke.resize (free_dofs, free_dofs); Ke.zero();
 	              Fe.resize (free_dofs); Fe.zero();
+std::cerr << "Ke = 0" << std::endl;
                       // The new side coefficients
                       DenseVector<Number> Uside(free_dofs);
 
@@ -470,11 +475,14 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 
                           // Initialize both child and parent FE data
                           // on the child's side
+                          fe->attach_quadrature_rule (&qsiderule);
 	                  fe->reinit (child, s);
-	                  const unsigned int n_qp = qrule.n_points();
+	                  const unsigned int n_qp = qsiderule.n_points();
 
                           FEInterface::inverse_map (dim, fe_type, elem,
 					  xyz_values, coarse_qpoints);
+
+                          fe_coarse->reinit(elem, &coarse_qpoints);
 
 	                  // Loop over the quadrature points
 	                  for (unsigned int qp=0; qp<n_qp; qp++)
@@ -522,15 +530,19 @@ void System::project_vector (const NumericVector<Number>& old_vector,
                                         {
                                           if (dof_is_fixed[new_side_dofs[j]])
                                             Fe(freei) -=
-                                              (phi_coarse[i][qp] *
-					       phi_coarse[j][qp]) *
+                                              ((*dphi_coarse)[i][qp] *
+					       (*dphi_coarse)[j][qp]) *
                                               JxW[qp] *
                                               Ue(new_side_dofs[j]);
                                           else
+{
                                             Ke(freei,freej) +=
 					      ((*dphi_coarse)[i][qp] *
                                                (*dphi_coarse)[j][qp])
                                               * JxW[qp];
+std::cerr << "Ke(" << freei << "," << freej << ") = " <<
+Ke(freei,freej) << std::endl;
+}
                                         }
                                       if (!dof_is_fixed[new_side_dofs[j]])
                                         freej++;
@@ -561,8 +573,8 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 
 		// Project the interior values, finally
 
-		// Some side dofs are on nodes/edges and already
-                // fixed, others are free to calculate
+		// Some interior dofs are on nodes/edges/sides and
+                // already fixed, others are free to calculate
                 unsigned int free_dofs = 0;
                 for (unsigned int i=0; i != new_n_dofs; ++i)
                   if (!dof_is_fixed[i])
@@ -572,8 +584,7 @@ void System::project_vector (const NumericVector<Number>& old_vector,
                 // The new interior coefficients
                 DenseVector<Number> Uint(free_dofs);
 
-                // Add projection terms from each child sharing
-                // this side
+                // Add projection terms from each child
 		for (unsigned int c=0; c != elem->n_children(); ++c)
                   {
                     Elem *child = elem->child(c);
@@ -582,11 +593,14 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 
                     // Initialize both child and parent FE data
                     // on the child's quadrature points
+                    fe->attach_quadrature_rule (&qrule);
 	            fe->reinit (child);
 	            const unsigned int n_qp = qrule.n_points();
 
 		    FEInterface::inverse_map (dim, fe_type, elem,
                       xyz_values, coarse_qpoints);
+
+                    fe_coarse->reinit(elem, &coarse_qpoints);
 
 	            // Loop over the quadrature points
 	            for (unsigned int qp=0; qp<n_qp; qp++)
@@ -633,8 +647,8 @@ void System::project_vector (const NumericVector<Number>& old_vector,
                                   {
                                     if (dof_is_fixed[j])
                                       Fe(freei) -=
-                                        (phi_coarse[i][qp] *
-					 phi_coarse[j][qp]) *
+                                        ((*dphi_coarse)[i][qp] *
+					 (*dphi_coarse)[j][qp]) *
                                         JxW[qp] * Ue(j);
                                     else
                                       Ke(freei,freej) +=
@@ -656,7 +670,7 @@ void System::project_vector (const NumericVector<Number>& old_vector,
                 Ke.cholesky_solve(Fe, Uint);
 
                 // Transfer new interior solutions to element
-		for (unsigned int i=0; i != new_n_dofs; ++i)
+		for (unsigned int i=0; i != free_dofs; ++i)
                   {
                     Number &ui = Ue(free_dof[i]);
                     assert(fabs(ui) < TOLERANCE ||
@@ -668,11 +682,6 @@ void System::project_vector (const NumericVector<Number>& old_vector,
                 // Make sure every DoF got reached!
 		for (unsigned int i=0; i != new_n_dofs; ++i)
                   assert(dof_is_fixed[i]);
-#endif
-
-		// FIXME: proper non-Lagrange coarsening still needs
-                // some work
-                error();
               }
 	    // For unrefined uncoarsened elements, we just copy DoFs
 	    else
