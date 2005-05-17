@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.35 2005-05-03 23:22:24 roystgnr Exp $
+// $Id: mesh_refinement.C,v 1.36 2005-05-17 20:11:07 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -193,8 +193,9 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
   const bool coarsening_changed_mesh =
     this->_coarsen_elements ();
 
-  // Next contract the mesh.  This will free space.
-  _mesh.contract();
+  // We can't contract the mesh ourselves anymore - a System might
+  // need to restrict old coefficient vectors first
+  // _mesh.contract();
 
   // Now refine the flagged elements.  This will
   // take up some space, maybe more than what was freed.
@@ -263,13 +264,13 @@ bool MeshRefinement::coarsen_elements (const bool maintain_level_one)
     }
 
   
-  // Coarsen the flagged elements.  This
-  // will free space.
+  // Coarsen the flagged elements.
   const bool mesh_changed = 
     this->_coarsen_elements ();
     
-  // Next contract the mesh.  This will free space.
-  _mesh.contract();
+  // We can't contract the mesh ourselves anymore - a System might
+  // need to restrict old coefficient vectors first
+  // _mesh.contract();
 
   // Finally, the new mesh may need to be prepared for use
   if (mesh_changed)
