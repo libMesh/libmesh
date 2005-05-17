@@ -12,16 +12,36 @@
 
 <div class="content">
 <h1>Publications</h1>
+
 <ul>
-  <li>Theses and dissertations</li>
-  John's <a href="http://www.cfdlab.ae.utexas.edu/~peterson/masters.pdf">Masters Report</a>.
 
+<?php echo
+"<li> John's <a href=\"http://www.cfdlab.ae.utexas.edu/~peterson/masters.pdf\">
+Masters Report</a>. </li>";
+?>
 
-  <li>Web Links</li>
-  
-  <a href="howto/howto.pdf">HOWTO</a><br>
-  XDA file <a href="xda_format/xda_format.pdf">description</a><br>
-  <a href="http://www.tacc.utexas.edu/general/press/announcements/20040112_01.php">TACC</a> press release.<br>
+<?php echo
+"<li>  A general <a href=\"howto/howto.pdf\">HOWTO</a>
+document by M. Luthi containing some hints
+and programming tips for writing effective LibMesh programs. </li>";
+?>
+
+<?php echo
+"<li>  A <a href=\"xda_format/xda_format.pdf\">description</a>
+of the XDA file format used by LibMesh. </li>";
+?>
+
+<?php echo
+"<li> Texas Advanced Computing Center
+<a href=\"http://www.tacc.utexas.edu/general/press/announcements/20040112_01.php\">
+press release</a> commemorating the launch of the Lonestar cluster. </li>";
+?>
+
+<?php echo
+"<li>A <a href=\"http://ondrej.certik.cz/libmesh/fem.ps\">description</a> of the Newmark
+System class by Ondrej Certik.</li>";
+?>
+
 </ul>
 </div>
 
