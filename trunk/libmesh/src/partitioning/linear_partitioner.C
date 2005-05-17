@@ -1,4 +1,4 @@
-// $Id: linear_partitioner.C,v 1.12 2005-02-22 22:17:42 jwpeterson Exp $
+// $Id: linear_partitioner.C,v 1.13 2005-05-17 15:26:20 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -50,16 +50,16 @@ void LinearPartitioner::_do_partition (MeshBase& mesh,
     const unsigned int blksize       = n_active_elem/n;
     
     unsigned int e = 0;
-        
-//     active_elem_iterator       elem_it (mesh.elements_begin());
-//     const active_elem_iterator elem_end(mesh.elements_end());
 
     MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
     const MeshBase::element_iterator elem_end = mesh.active_elements_end(); 
 
     for ( ; elem_it != elem_end; ++elem_it)
       {
-	(*elem_it)->processor_id() = e/blksize;
+	if ((e/blksize) < n)
+	  (*elem_it)->processor_id() = e/blksize;
+	else
+	  (*elem_it)->processor_id() = 0;
 	
 	e++;
       }

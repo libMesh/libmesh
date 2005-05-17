@@ -1,4 +1,4 @@
-// $Id: mesh_communication.C,v 1.15 2005-05-11 23:11:58 benkirk Exp $
+// $Id: mesh_communication.C,v 1.16 2005-05-17 15:26:20 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -30,33 +30,92 @@
 #include "boundary_info.h"
 #include "mesh_communication.h"
 #include "elem.h"
+#include "sphere.h"
+
 
 
 // ------------------------------------------------------------
 // MeshCommunication class members
 void MeshCommunication::clear ()
 {
+  _neighboring_processors.clear();
 }
 
 
-
-void MeshCommunication::distribute (Mesh& mesh) const
+void MeshCommunication::find_neighboring_processors (const MeshBase& mesh)
 {
   // Don't need to do anything if there is
   // only one processor.
   if (libMesh::n_processors() == 1)
     return;
   
-  this->distribute_mesh (mesh);
-  this->distribute_bcs  (mesh, mesh.boundary_info);
+#ifdef HAVE_MPI
+  
+  _neighboring_processors.clear();
+
+  // Get the bounding sphere for the local processor
+  Sphere bounding_sphere =
+    MeshTools::processor_bounding_sphere (mesh, libMesh::processor_id());
+
+  // Just to be sure, increase its radius by 10%.  Sure would suck to
+  // miss a neighboring processor!
+  bounding_sphere.radius() *= 1.1;
+
+  // Collect the bounding spheres from all processors, test for intersection
+  {
+    std::vector<float>
+      send (4,                         0),
+      recv (4*libMesh::n_processors(), 0);
+
+    send[0] = bounding_sphere.center()(0);
+    send[1] = bounding_sphere.center()(1);
+    send[2] = bounding_sphere.center()(2);
+    send[3] = bounding_sphere.radius();
+
+    MPI_Allgather (&send[0], send.size(), MPI_FLOAT,
+		   &recv[0], send.size(), MPI_FLOAT,
+		   libMesh::COMM_WORLD);
+
+
+    for (unsigned int proc=0; proc<libMesh::n_processors(); proc++)
+      {
+	const Point center (recv[4*proc+0],
+			    recv[4*proc+1],
+			    recv[4*proc+2]);
+	
+	const Real radius = recv[4*proc+3];
+
+	const Sphere proc_sphere (center, radius);
+
+	if (bounding_sphere.intersects(proc_sphere))
+	  {
+	    here();
+	    _neighboring_processors.push_back(proc);
+	  }
+      }
+  }
+  
+#endif
+}
+
+
+void MeshCommunication::broadcast (MeshBase& mesh) const
+{
+  // Don't need to do anything if there is
+  // only one processor.
+  if (libMesh::n_processors() == 1)
+    return;
+  
+  this->broadcast_mesh (mesh);
+  this->broadcast_bcs  (mesh, mesh.boundary_info);
 }
 
 
 
 #ifdef HAVE_MPI
-void MeshCommunication::distribute_mesh (MeshBase& mesh) const
+void MeshCommunication::broadcast_mesh (MeshBase& mesh) const
 #else // avoid spurious gcc warnings
-void MeshCommunication::distribute_mesh (MeshBase&) const
+void MeshCommunication::broadcast_mesh (MeshBase&) const
 #endif
 {
   // Don't need to do anything if there is
@@ -216,10 +275,10 @@ void MeshCommunication::distribute_mesh (MeshBase&) const
 
 
 #ifdef HAVE_MPI
-void MeshCommunication::distribute_bcs (MeshBase& mesh,
+void MeshCommunication::broadcast_bcs (MeshBase& mesh,
 					BoundaryInfo& boundary_info) const
 #else // avoid spurious gcc warnings
-void MeshCommunication::distribute_bcs (MeshBase&,
+void MeshCommunication::broadcast_bcs (MeshBase&,
 					BoundaryInfo&) const
 #endif
 {

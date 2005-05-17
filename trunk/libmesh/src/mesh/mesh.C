@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.53 2005-05-16 19:03:05 roystgnr Exp $
+// $Id: mesh.C,v 1.54 2005-05-17 15:26:20 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -188,7 +188,6 @@ void Mesh::clear ()
     
     _nodes.clear();
   }
-
 }
 
 
@@ -233,8 +232,6 @@ void Mesh::delete_elem(Elem* e)
   // explicitly NULL the pointer
   e    = NULL;
   *pos = NULL;
-  
-  //_elements.erase(pos);
 }
 
 
@@ -469,10 +466,8 @@ void Mesh::renumber_nodes_and_elements ()
       {
 	element_iterator       it  = this->elements_begin();
 	const element_iterator end = this->elements_end();
-	
-	unsigned int id=0;
 
-	for (; it != end; ++it)
+	for (unsigned int id=0; it != end; ++it)
 	  (*it)->set_id() = id++;
       }
 
@@ -480,10 +475,8 @@ void Mesh::renumber_nodes_and_elements ()
       {
 	node_iterator       it  = this->nodes_begin();
 	const node_iterator end = this->nodes_end();
-	
-	unsigned int id=0;
 
-	for (; it != end; ++it)
+	for (unsigned int id=0; it != end; ++it)
 	  (*it)->set_id() = id++;
       }      
       
@@ -556,7 +549,6 @@ void Mesh::renumber_nodes_and_elements ()
   // are not connected to any elements and may be deleted
   // if desired.
 
-  
   // (This code block will erase the unused nodes)
   // Now, delete the unused nodes
   {
@@ -581,20 +573,6 @@ void Mesh::renumber_nodes_and_elements ()
     
     _nodes.erase (nd, end);
   }
-  
-
-//   // (This code block will keep the unused nodes)
-//   // Now, number the unused nodes so that they are
-//   // contiguous
-//   {
-//     std::vector<Node*>::iterator nd        = _nodes.begin();
-//     const std::vector<Node*>::iterator end = _nodes.end();
-
-//     std::advance (nd, next_free_node);
-    
-//     for (; nd != end; ++nd)
-//       (*nd)->set_id(next_free_node++);
-//   }
   
 
   assert (next_free_elem == _elements.size());
@@ -687,7 +665,7 @@ void Mesh::read (const std::string& name,
   {
     MeshCommunication mesh_communication;
   
-    mesh_communication.distribute (*this);
+    mesh_communication.broadcast (*this);
   }
   
   STOP_LOG("read()", "Mesh");

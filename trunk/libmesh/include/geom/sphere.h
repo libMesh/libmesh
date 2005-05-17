@@ -1,4 +1,4 @@
-// $Id: sphere.h,v 1.4 2005-02-22 22:17:33 jwpeterson Exp $
+// $Id: sphere.h,v 1.5 2005-05-17 15:26:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -140,12 +140,22 @@ public:
   /**
    * Returns the radius of the sphere.
    */
-  Real radius() const { return rad; }
+  Real radius() const { return _rad; }
+
+  /**
+   * Returns the radius of the sphere as a writeable reference.
+   */
+  Real& radius() { return _rad; }
 
   /**
    * @returns the center of the sphere.
    */ 
-  const Point& center() const { return cent; }
+  const Point& center() const { return _cent; }
+
+  /**
+   * @returns the center of the sphere.
+   */ 
+  Point& center() { return _cent; }
 
   /**
    * @returns the spherical coordinates for the
@@ -166,12 +176,12 @@ private:
   /**
    * The center of the sphere.
    */
-  Point cent;
+  Point _cent;
 
   /**
    * The radius of the sphere.
    */
-  Real  rad;
+  Real  _rad;
 };
 
 
@@ -182,7 +192,7 @@ inline
 Point Sphere::surface_coords (const Point& cart) const
 {
   // constant translation in the origin
-  const Point c (cart-cent);
+  const Point c (cart-this->center());
 
   // phi: special care, so that it gives 0..2pi results
   const Real phi = atan2(c(1), c(0));
@@ -202,9 +212,9 @@ Point Sphere::world_coords (const Point& sph) const
   const Real phi   = sph(2);
 
   // constant translation out of the origin
-  return Point (/* x */ r*sin(theta)*cos(phi) + cent(0),
-		/* y */ r*sin(theta)*sin(phi) + cent(1),
-		/* z */ r*cos(theta)          + cent(2));
+  return Point (/* x */ r*sin(theta)*cos(phi) + this->center()(0),
+		/* y */ r*sin(theta)*sin(phi) + this->center()(1),
+		/* z */ r*cos(theta)          + this->center()(2));
 }
 
 

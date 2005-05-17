@@ -1,4 +1,4 @@
-// $Id: sphere.C,v 1.13 2005-02-22 22:17:39 jwpeterson Exp $
+// $Id: sphere.C,v 1.14 2005-05-17 15:26:20 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -31,7 +31,7 @@
 // ------------------------------------------------------------
 // Sphere class member functions
 Sphere::Sphere () : 
-  rad(-1.)
+  _rad(-1.)
 {
 }
 
@@ -42,7 +42,7 @@ Sphere::Sphere (const Point& c,
 {
   assert (r > 0.);
 
-  create_from_center_radius (c, r);
+  this->create_from_center_radius (c, r);
 }
 
 
@@ -50,8 +50,8 @@ Sphere::Sphere (const Point& c,
 Sphere::Sphere (const Sphere& other_sphere) :
   Surface()
 {
-  create_from_center_radius (other_sphere.cent,
-			     other_sphere.rad);
+  this->create_from_center_radius (other_sphere.center(),
+				   other_sphere.radius());
 }
 
 
@@ -64,22 +64,22 @@ Sphere::~Sphere ()
 
 void Sphere::create_from_center_radius (const Point& c, const Real r)
 {
-  cent = c;
-  rad = r;
+  this->center() = c;
+  this->radius() = r;
 
-  assert (rad > 0.);
+  assert (this->radius() > 0.);
 }
 
 
 
 bool Sphere::intersects (const Sphere& other_sphere) const
 {
-  assert ( rad > 0. );
-  assert ( other_sphere.rad > 0. );
+  assert ( this->radius() > 0. );
+  assert ( other_sphere.radius() > 0. );
 
-  const Real distance = (cent - other_sphere.cent).size();
+  const Real distance = (this->center() - other_sphere.center()).size();
 
-  if (distance < (rad + other_sphere.rad) )
+  if (distance < (this->radius() + other_sphere.radius()) )
     return true;
   
   return false;
@@ -89,12 +89,12 @@ bool Sphere::intersects (const Sphere& other_sphere) const
 
 bool Sphere::above_surface (const Point& p) const 
 {
-  assert (rad > 0.);
+  assert (this->radius() > 0.);
 
   // create a vector from the center to the point.
-  const Point w = p - cent;
+  const Point w = p - this->center();
 
-  if (w.size() > rad)
+  if (w.size() > this->radius())
     return true;
 
   return false;
@@ -104,23 +104,23 @@ bool Sphere::above_surface (const Point& p) const
 
 bool Sphere::below_surface (const Point& p) const 
 {
-  assert (rad > 0.);
+  assert (this->radius() > 0.);
 
-  return ( !above_surface (p) );
+  return ( !this->above_surface (p) );
 }
 
 
 
 bool Sphere::on_surface (const Point& p) const 
 {
-  assert (rad > 0.);
+  assert (this->radius() > 0.);
 
   // Create a vector from the center to the point.
-  const Point w = p - cent;
+  const Point w = p - this->center();
 
-  // if the size of that vector is the same as the rad then
+  // if the size of that vector is the same as the radius() then
   // the point is on the surface.
-  if (std::abs(w.size() - rad) < 1.e-10)
+  if (std::abs(w.size() - this->radius()) < 1.e-10)
     return true;
 
   return false;
@@ -130,15 +130,15 @@ bool Sphere::on_surface (const Point& p) const
 
 Point Sphere::closest_point (const Point& p) const
 {
-  assert (rad > 0.);
+  assert (this->radius() > 0.);
 
   // get the normal from the surface in the direction
   // of p
-  Point normal = unit_normal (p);
+  Point normal = this->unit_normal (p);
 
   // The closest point on the sphere is in the direction
   // of the normal a distance r from the center.
-  const Point cp = cent + normal*rad;
+  const Point cp = this->center() + normal*this->radius();
   
   return cp;
 }
@@ -147,12 +147,12 @@ Point Sphere::closest_point (const Point& p) const
 
 Point Sphere::unit_normal (const Point& p) const
 {
-  assert (rad > 0.);
+  assert (this->radius() > 0.);
 
-  assert ( !(p == cent) );
+  assert ( !(p == this->center()) );
   
   // Create a vector from the center to the point
-  Point n = p - cent;
+  Point n = p - this->center();
 
   return n.unit();
 }

@@ -1,4 +1,4 @@
-// $Id: parmetis_partitioner.C,v 1.18 2005-05-11 23:12:10 benkirk Exp $
+// $Id: parmetis_partitioner.C,v 1.19 2005-05-17 15:26:20 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -122,9 +122,6 @@ void ParmetisPartitioner::_do_repartition (MeshBase& mesh,
   // Check for an easy return
   if (n_sbdmns == 1)
     {
-//       elem_iterator       elem_it (mesh.elements_begin());
-//       const elem_iterator elem_end(mesh.elements_end());
-
       MeshBase::element_iterator elem_it  = mesh.elements_begin();
       const MeshBase::element_iterator elem_end = mesh.elements_end(); 
 
@@ -252,9 +249,6 @@ void ParmetisPartitioner::initialize (const MeshBase& mesh,
   for (unsigned int proc_id=0; proc_id<libMesh::n_processors(); proc_id++)
     {
       if (proc_id == libMesh::processor_id()) _first_local_elem = el_num;
-      
-//       const_active_pid_elem_iterator       elem_it (mesh.elements_begin(), proc_id);	
-//       const const_active_pid_elem_iterator elem_end(mesh.elements_end(),   proc_id);
 
       MeshBase::const_element_iterator       elem_it  = mesh.active_pid_elements_begin(proc_id);
       const MeshBase::const_element_iterator elem_end = mesh.active_pid_elements_end(proc_id);
@@ -291,9 +285,6 @@ void ParmetisPartitioner::build_graph (const MeshBase& mesh)
     
   std::vector<const Elem*> neighbors_offspring;
     
-//   const_active_local_elem_iterator       elem_it (mesh.elements_begin());
-//   const const_active_local_elem_iterator elem_end(mesh.elements_end());
-
   MeshBase::const_element_iterator       elem_it  = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end(); 
 
@@ -383,9 +374,6 @@ void ParmetisPartitioner::build_graph (const MeshBase& mesh)
 void ParmetisPartitioner::assign_partitioning (MeshBase& mesh)
 {
   // Assign the returned processor ids
-//   active_elem_iterator       elem_it (mesh.elements_begin());
-//   const active_elem_iterator elem_end(mesh.elements_end());
-
   MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
   const MeshBase::element_iterator elem_end = mesh.active_elements_end();
 
@@ -394,8 +382,7 @@ void ParmetisPartitioner::assign_partitioning (MeshBase& mesh)
       Elem* elem = *elem_it;
 
       assert (elem->id() < _forward_map.size());
-      assert (_forward_map[elem->id()] !=
-	      libMesh::invalid_uint);
+      assert (_forward_map[elem->id()] != libMesh::invalid_uint);
       assert (_forward_map[elem->id()] < _part.size());
       
       elem->processor_id() = static_cast<short int>(_part[_forward_map[elem->id()]]);

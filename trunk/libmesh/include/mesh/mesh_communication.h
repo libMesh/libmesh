@@ -1,4 +1,4 @@
-// $Id: mesh_communication.h,v 1.4 2005-02-22 22:17:33 jwpeterson Exp $
+// $Id: mesh_communication.h,v 1.5 2005-05-17 15:26:20 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -68,14 +68,6 @@ public:
   void clear ();
 
   /**
-   * This method takes a mesh (which is assumed to reside on
-   * processor 0) and distributes it to all the other processors.
-   * It also distributes any boundary information the mesh has
-   * associated with it.
-   */
-  void distribute (Mesh& ) const;
-
-  /**
    * Finds all the processors that may contain
    * elements that neighbor my elements.  This list
    * is guaranteed to include all processors that border
@@ -83,7 +75,21 @@ public:
    * well.  This method computes bounding boxes for the
    * elements on each processor and checks for overlaps.
    */
-  void find_neighboring_processors() {}
+  void find_neighboring_processors(const MeshBase& );
+
+  /**
+   * This method takes a mesh (which is assumed to reside on
+   * processor 0) and broadcasts it to all the other processors.
+   * It also broadcasts any boundary information the mesh has
+   * associated with it.
+   */
+  void broadcast (MeshBase& ) const;
+
+  /**
+   * Each processor will broadcasts its elements and nodes
+   * to its neighboring processors.
+   */
+  void distribute (MeshBase& ) const {}
 
   
 private:
@@ -91,12 +97,18 @@ private:
   /**
    *
    */
-  void distribute_mesh (MeshBase& ) const;
+  void broadcast_mesh (MeshBase& ) const;
 
   /**
    *
    */
-  void distribute_bcs (MeshBase&, BoundaryInfo&) const;
+  void broadcast_bcs (MeshBase&, BoundaryInfo&) const;
+
+  /**
+   * The processors who neighbor the current
+   * processor
+   */
+  std::vector<unsigned short int> _neighboring_processors;
 };
 
 
