@@ -1,4 +1,4 @@
-// $Id: mesh_communication.C,v 1.16 2005-05-17 15:26:20 benkirk Exp $
+// $Id: mesh_communication.C,v 1.17 2005-05-17 18:38:28 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -24,6 +24,7 @@
 // Local Includes -----------------------------------
 #include "libmesh_config.h"
 #include "libmesh_common.h"
+#include "libmesh_logging.h"
 #include "mesh.h"
 #include "mesh_base.h"
 #include "mesh_tools.h"
@@ -124,6 +125,8 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
     return;
   
 #ifdef HAVE_MPI
+
+  START_LOG("broadcast_mesh()","MeshCommunication");
 
   // Explicitly clear the mesh on all but processor 0.
   if (libMesh::processor_id() != 0)
@@ -263,6 +266,8 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
     
     assert (mesh.n_elem() == n_elem);
   } // Done distributing the elements
+
+  STOP_LOG("broadcast_mesh()","MeshCommunication");
   
 #else
 
@@ -290,6 +295,8 @@ void MeshCommunication::broadcast_bcs (MeshBase&,
   
 #ifdef HAVE_MPI
 
+  START_LOG("broadcast_bcs()","MeshCommunication");
+
   // Explicitly clear the boundary conditions on all
   // but processor 0.
   if (libMesh::processor_id() != 0)
@@ -310,10 +317,11 @@ void MeshCommunication::broadcast_bcs (MeshBase&,
     unsigned int n_bcs = el_id.size();
 
     // Broadcast the number of bcs to expect from processor 0.
+    MPI_Bcast (&n_bcs, 1, MPI_UNSIGNED, 0, libMesh::COMM_WORLD);
+
+    // Only continue if we have element BCs
     if (n_bcs > 0)
       {
-	MPI_Bcast (&n_bcs, 1, MPI_UNSIGNED, 0, libMesh::COMM_WORLD);
-    
 	// Allocate space.
 	el_id.resize   (n_bcs);
 	side_id.resize (n_bcs);
@@ -359,19 +367,20 @@ void MeshCommunication::broadcast_bcs (MeshBase&,
     unsigned int n_bcs = node_id.size();
 
     // Broadcast the number of bcs to expect from processor 0.
+    MPI_Bcast (&n_bcs, 1, MPI_UNSIGNED, 0, libMesh::COMM_WORLD);
+
+    // Only continue if we have nodal BCs
     if (n_bcs > 0)
       {      
-	MPI_Bcast (&n_bcs, 1, MPI_UNSIGNED, 0, libMesh::COMM_WORLD);
-
 	// Allocate space.
 	node_id.resize (n_bcs);
 	bc_id.resize   (n_bcs);
 	
 	// Broadcast the node ids
-	MPI_Bcast (&node_id[0], n_bcs, MPI_UNSIGNED,       0, libMesh::COMM_WORLD);
+	MPI_Bcast (&node_id[0], n_bcs, MPI_UNSIGNED, 0, libMesh::COMM_WORLD);
 	
 	// Broadcast the bc ids for each side
-	MPI_Bcast (&bc_id[0],   n_bcs, MPI_SHORT,          0, libMesh::COMM_WORLD);
+	MPI_Bcast (&bc_id[0],   n_bcs, MPI_SHORT,    0, libMesh::COMM_WORLD);
 
 	// Build the boundary_info structure if we aren't processor 0
 	if (libMesh::processor_id() != 0)
@@ -387,9 +396,9 @@ void MeshCommunication::broadcast_bcs (MeshBase&,
 	    }
       }
   }
-    
-      
 
+  STOP_LOG("broadcast_bcs()","MeshCommunication");
+          
 #else
 
   // no MPI but multiple processors? Huh??

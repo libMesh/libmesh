@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.54 2005-05-17 15:26:20 benkirk Exp $
+// $Id: mesh.C,v 1.55 2005-05-17 18:38:28 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -648,7 +648,6 @@ void Mesh::read (const std::string& name,
 		    << "\n   I understand the following:\n\n"
 		    << "     *.mat  -- Matlab triangular ASCII file\n"
 		    << "     *.ucd  -- AVS's ASCII UCD format\n"
-		    << "     *.mesh -- Ben's \"shanee\" format\n"
 		    << "     *.off  -- OOGL OFF surface format\n"
 		    << "     *.exd  -- Sandia's ExodusII format\n"
 		    << "     *.xda  -- Internal ASCII format\n"
@@ -659,6 +658,8 @@ void Mesh::read (const std::string& name,
 	  error();	  
 	}    
     }
+  
+  STOP_LOG("read()", "Mesh");
 
   // Send the mesh & bcs (which are now only on processor 0) to the other
   // processors
@@ -667,8 +668,6 @@ void Mesh::read (const std::string& name,
   
     mesh_communication.broadcast (*this);
   }
-  
-  STOP_LOG("read()", "Mesh");
 
 
   // Done reading the mesh.  Now prepare it for use.
