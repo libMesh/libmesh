@@ -1,4 +1,4 @@
-// $Id: libmesh.C,v 1.34 2005-05-17 15:57:34 benkirk Exp $
+// $Id: libmesh.C,v 1.35 2005-05-17 18:38:26 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -142,7 +142,8 @@ void libMesh::init (int &argc, char** & argv,
       
       // Duplicate the input communicator for internal use
       MPI_Comm_dup (COMM_WORLD_IN, &libMesh::COMM_WORLD);
-      MPI_Comm_set_name (libMesh::COMM_WORLD, "libMesh::COMM_WORLD");
+      //MPI_Comm_set_name not supported in at least SGI MPT's MPI implementation
+      //MPI_Comm_set_name (libMesh::COMM_WORLD, "libMesh::COMM_WORLD");
       
       MPI_Comm_rank (libMesh::COMM_WORLD, &libMeshPrivateData::_processor_id);
       MPI_Comm_size (libMesh::COMM_WORLD, &libMeshPrivateData::_n_processors);
