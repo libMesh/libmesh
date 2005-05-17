@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.73 2005-04-25 13:18:49 benkirk Exp $
+// $Id: dof_map.C,v 1.74 2005-05-17 14:59:36 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -174,7 +174,10 @@ void DofMap::reinit(MeshBase& mesh)
 		    assert(vertex_dofs ==
 			   FEInterface::n_dofs_at_node(dim, fe_type,
 						       type, n));
-		  assert(vertex_dofs);
+		  
+		  // Some discontinuous FEs have no vertex dofs
+		  //assert(vertex_dofs);
+		  
 		  if (!old_node_dofs)
 		    {
 	              node->set_n_comp(this->sys_number(),
