@@ -1,4 +1,4 @@
-// $Id: transient_system.C,v 1.6 2005-03-18 16:56:12 benkirk Exp $
+// $Id: transient_system.C,v 1.7 2005-05-17 20:09:49 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -37,10 +37,14 @@ TransientSystem<Base>::TransientSystem (EquationSystems& es,
 					const std::string& name,
 					const unsigned int number) :
   
-  Base                 (es, name, number),
-  old_local_solution   (NumericVector<Number>::build()),
-  older_local_solution (NumericVector<Number>::build())
+  Base                 (es, name, number)
 {
+  old_local_solution =
+    AutoPtr<NumericVector<Number> >
+      (&(this->add_vector("_transient_old_local_solution")));
+  older_local_solution =
+    AutoPtr<NumericVector<Number> >
+      (&(this->add_vector("_transient_older_local_solution")));
 }
 
 
@@ -49,6 +53,12 @@ template <class Base>
 TransientSystem<Base>::~TransientSystem ()
 {
   this->clear();
+
+  // We still have AutoPtrs for API compatibility, but
+  // now that we're System::add_vector()ing these, we can trust
+  // the base class to handle memory management
+  old_local_solution.release();  
+  older_local_solution.release();  
 }
 
 
@@ -59,9 +69,22 @@ void TransientSystem<Base>::clear ()
   // clear the parent data
   Base::clear();
 
-  // clear the old & older local solutions
-  old_local_solution->clear();
-  older_local_solution->clear();  
+  // the old & older local solutions
+  // are now deleted by System!
+  // old_local_solution->clear();
+  // older_local_solution->clear();  
+
+  // FIXME: This preserves maximum backwards compatibility,
+  // but is probably grossly unnecessary:
+  old_local_solution.release();  
+  older_local_solution.release();  
+
+  old_local_solution =
+    AutoPtr<NumericVector<Number> >
+      (&(this->add_vector("_transient_old_local_solution")));
+  older_local_solution =
+    AutoPtr<NumericVector<Number> >
+      (&(this->add_vector("_transient_older_local_solution")));
 }
 
 
@@ -87,8 +110,9 @@ void TransientSystem<Base>::reinit ()
   Base::reinit();
     
   // Project the old & older vectors to the new mesh
-  this->project_vector (*old_local_solution);
-  this->project_vector (*older_local_solution);
+  // The System::reinit handles this now
+  // this->project_vector (*old_local_solution);
+  // this->project_vector (*older_local_solution);
 }
 
 
