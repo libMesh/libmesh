@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.36 2005-05-17 20:11:07 roystgnr Exp $
+// $Id: mesh_refinement.C,v 1.37 2005-05-18 13:14:31 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -193,6 +193,10 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
   const bool coarsening_changed_mesh =
     this->_coarsen_elements ();
 
+  assert(this->make_coarsening_compatible(maintain_level_one));
+  assert(this->make_refinement_compatible(maintain_level_one));
+  assert(!this->eliminate_unrefined_patches());
+
   // We can't contract the mesh ourselves anymore - a System might
   // need to restrict old coefficient vectors first
   // _mesh.contract();
@@ -202,6 +206,10 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
   const bool refining_changed_mesh =
     this->_refine_elements();
   
+  assert(this->make_coarsening_compatible(maintain_level_one));
+  assert(this->make_refinement_compatible(maintain_level_one));
+  assert(!this->eliminate_unrefined_patches());
+
   // Finally, the new mesh needs to be prepared for use
   if (coarsening_changed_mesh || refining_changed_mesh)
     {
@@ -247,7 +255,6 @@ bool MeshRefinement::coarsen_elements (const bool maintain_level_one)
 	elem->set_refinement_flag(Elem::DO_NOTHING);
     }
 
-  
   // Repeat until the flags form a conforming mesh.
   bool satisfied = false;
   while (!satisfied)
@@ -263,10 +270,12 @@ bool MeshRefinement::coarsen_elements (const bool maintain_level_one)
 		   smoothing_satisfied);
     }
 
-  
   // Coarsen the flagged elements.
   const bool mesh_changed = 
     this->_coarsen_elements ();
+
+  assert(this->make_coarsening_compatible(maintain_level_one));
+  assert(!this->eliminate_unrefined_patches());
     
   // We can't contract the mesh ourselves anymore - a System might
   // need to restrict old coefficient vectors first
@@ -806,6 +815,8 @@ void MeshRefinement::uniformly_coarsen (unsigned int n,
 
       // Coarsen all the elements we just flagged.
       this->coarsen_elements();
+
+      assert(this->make_coarsening_compatible(maintain_level_one));
     }
   
   // Finally, the new mesh needs to be prepared for use
