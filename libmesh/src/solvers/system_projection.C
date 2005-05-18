@@ -1,4 +1,4 @@
-// $Id: system_projection.C,v 1.16 2005-05-17 23:36:50 roystgnr Exp $
+// $Id: system_projection.C,v 1.17 2005-05-18 08:33:17 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -375,9 +375,11 @@ void System::project_vector (const NumericVector<Number>& old_vector,
                                     (old_vector(old_dof_indices[i])*
 				    phi_values[i][qp]);
                                   if (cont == C_ONE)
-				    finegrad +=
-                                      (old_vector(old_dof_indices[i])*
-				      (*dphi_values)[i][qp]);
+				    finegrad.add_scaled((*dphi_values)[i][qp],
+							old_vector(old_dof_indices[i]));
+// 				    finegrad +=
+//                                       (old_vector(old_dof_indices[i])*
+// 				      (*dphi_values)[i][qp]);
                                 }
 
                               // Form edge projection matrix
@@ -420,8 +422,9 @@ void System::project_vector (const NumericVector<Number>& old_vector,
                                                fineval * JxW[qp];
                                   if (cont == C_ONE)
                                     Fe(freei) +=
-                                      ((*dphi_coarse)[i][qp] *
-                                       finegrad) * JxW[qp];
+				      (finegrad * (*dphi_coarse)[i][qp]) * JxW[qp];
+//                                       ((*dphi_coarse)[i][qp] *
+//                                        finegrad) * JxW[qp];
                                   freei++;
                                 }
 	                    }
@@ -502,9 +505,11 @@ std::cerr << "Ke = 0" << std::endl;
                                     (old_vector(old_dof_indices[i])*
 				    phi_values[i][qp]);
                                   if (cont == C_ONE)
-				    finegrad +=
-                                      (old_vector(old_dof_indices[i])*
-				      (*dphi_values)[i][qp]);
+				    finegrad.add_scaled((*dphi_values)[i][qp],
+							old_vector(old_dof_indices[i]));
+// 				    finegrad +=
+//                                       (old_vector(old_dof_indices[i])*
+// 				      (*dphi_values)[i][qp]);
                                 }
 
                               // Form side projection matrix
@@ -547,12 +552,10 @@ Ke(freei,freej) << std::endl;
                                       if (!dof_is_fixed[new_side_dofs[j]])
                                         freej++;
                                     }
-                                  Fe(freei) += phi_coarse[i][qp] *
-                                               fineval * JxW[qp];
+                                  Fe(freei) += (fineval * phi_coarse[i][qp]) * JxW[qp];
                                   if (cont == C_ONE)
                                     Fe(freei) +=
-                                      ((*dphi_coarse)[i][qp] *
-                                       finegrad) * JxW[qp];
+                                      (finegrad * (*dphi_coarse)[i][qp]) * JxW[qp];
                                   freei++;
                                 }
 	                    }
@@ -619,9 +622,11 @@ Ke(freei,freej) << std::endl;
                               (old_vector(old_dof_indices[i])*
 			       phi_values[i][qp]);
                             if (cont == C_ONE)
-			      finegrad +=
-                                (old_vector(old_dof_indices[i])*
-				 (*dphi_values)[i][qp]);
+			      finegrad.add_scaled((*dphi_values)[i][qp],
+						  old_vector(old_dof_indices[i]));
+// 			      finegrad +=
+//                                 (old_vector(old_dof_indices[i])*
+// 				 (*dphi_values)[i][qp]);
                           }
 
                         // Form interior projection matrix
@@ -661,8 +666,7 @@ Ke(freei,freej) << std::endl;
 			    Fe(freei) += phi_coarse[i][qp] * fineval *
                                          JxW[qp];
                             if (cont == C_ONE)
-                              Fe(freei) += ((*dphi_coarse)[i][qp] *
-                                           finegrad) * JxW[qp];
+                              Fe(freei) += (finegrad * (*dphi_coarse)[i][qp]) * JxW[qp];
                             freei++;
 	                  }
 	              }
@@ -689,7 +693,8 @@ Ke(freei,freej) << std::endl;
 		for (unsigned int i=0; i<new_n_dofs; i++)
 		  Ue(i) = old_vector(old_dof_indices[i]);
 	      }
-          } else { // fe type is Lagrange
+          } 
+	  else { // fe type is Lagrange
 	    // Loop over the DOFs on the element
 	    for (unsigned int new_local_dof=0;
 	         new_local_dof<new_n_dofs; new_local_dof++)
