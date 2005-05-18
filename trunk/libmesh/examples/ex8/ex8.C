@@ -1,4 +1,4 @@
-/* $Id: ex8.C,v 1.14 2004-12-17 20:55:06 benkirk Exp $ */
+/* $Id: ex8.C,v 1.15 2005-05-18 13:59:38 jwpeterson Exp $ */
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
 
@@ -114,6 +114,21 @@ int main (int argc, char** argv)
 
       }
 
+    // LasPack solvers don't work so well for this example
+    // (not sure why).  Print a warning to the user if PETSc
+    // is not available, or if they are using LasPack solvers.
+    if ((!HAVE_PETSC) ||
+	(libMesh::on_command_line("--use-laspack")) ||
+	(libMesh::on_command_line("--disable-petsc")))
+      {
+	std::cerr << "WARNING! It appears you are using the\n"
+		  << "LasPack solvers.  ex8 is known not to converge\n"
+		  << "using LasPack, but should work OK with PETSc.\n"
+		  << "If possible, download and install the PETSc\n"
+		  << "library from www-unix.mcs.anl.gov/petsc/petsc-2/\n"
+		  << std::endl;
+      }
+    
     // Get the name of the mesh file
     // from the command line.
     std::string mesh_file = argv[1];
