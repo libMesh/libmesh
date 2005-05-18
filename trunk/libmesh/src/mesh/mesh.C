@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.55 2005-05-17 18:38:28 benkirk Exp $
+// $Id: mesh.C,v 1.56 2005-05-18 17:29:01 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -918,7 +918,7 @@ void Mesh::create_submesh (Mesh& new_mesh,
 
 bool Mesh::contract ()
 {
-  START_LOG ("contract()", "MeshRefinement");
+  START_LOG ("contract()", "Mesh");
 
   // Flag indicating if this call actually changes the mesh
   bool mesh_changed = false;
@@ -936,7 +936,9 @@ bool Mesh::contract ()
       }
   in = _elements.begin();
 #endif
-
+  
+  unsigned int next_free_elem = 0;
+  
   // Loop over the elements.   
   for ( ; in != end; ++in)
     if (*in != NULL)
@@ -972,7 +974,8 @@ bool Mesh::contract ()
 
 	    // These elements are kept, pack them
 	    // contiguously in the _elements vector
-	    *out = *in;
+	    elem->set_id(next_free_elem++);
+	    *out = elem;
 	    ++out;
 	  }
       }
@@ -982,8 +985,8 @@ bool Mesh::contract ()
   // thus repeated and unnecessary.
   _elements.erase (out, end);
 
-  STOP_LOG ("contract()", "MeshRefinement");
-
+  STOP_LOG ("contract()", "Mesh");
+  
   return mesh_changed;
 }
 
