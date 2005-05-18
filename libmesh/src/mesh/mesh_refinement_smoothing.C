@@ -1,4 +1,4 @@
-// $Id: mesh_refinement_smoothing.C,v 1.10 2005-05-18 13:14:31 roystgnr Exp $
+// $Id: mesh_refinement_smoothing.C,v 1.11 2005-05-18 18:07:36 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -113,8 +113,7 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
 bool MeshRefinement::eliminate_unrefined_patches ()
 {
   bool flags_changed = false;
-  
-  
+
 //   active_elem_iterator       elem_it (_mesh.elements_begin());
 //   const active_elem_iterator elem_end(_mesh.elements_end());
 
@@ -151,7 +150,9 @@ bool MeshRefinement::eliminate_unrefined_patches ()
 	if (elem->neighbor(n) == NULL ||
 	    ((elem->neighbor(n)->level() <= my_level) &&
 	     (elem->neighbor(n)->active()) &&
-	     (elem->neighbor(n)->refinement_flag() != Elem::REFINE)))
+	     (elem->neighbor(n)->refinement_flag() != Elem::REFINE))
+            || (elem->neighbor(n)->refinement_flag() ==
+                Elem::COARSEN_INACTIVE))
           {
 	    flag_me = false;
             break;
