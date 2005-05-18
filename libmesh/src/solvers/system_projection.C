@@ -1,4 +1,4 @@
-// $Id: system_projection.C,v 1.18 2005-05-18 08:54:13 spetersen Exp $
+// $Id: system_projection.C,v 1.19 2005-05-18 20:58:09 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -289,6 +289,13 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 	      }
             else if (elem->refinement_flag() == Elem::JUST_COARSENED)
 	      {
+                // When coarsening, in general, we need a series of
+                // projections to ensure a unique and continuous
+                // solution.  We start by interpolating nodes, then
+                // hold those fixed and project edges, then
+                // hold those fixed and project faces, then
+                // hold those fixed and project interiors
+
                 // Copy node values first
 		dof_map.old_dof_indices (elem, old_dof_indices, var);
                 unsigned int current_dof = 0;
@@ -377,45 +384,47 @@ void System::project_vector (const NumericVector<Number>& old_vector,
                                   if (cont == C_ONE)
 				    finegrad.add_scaled((*dphi_values)[i][qp],
 							old_vector(old_dof_indices[i]));
-// 				    finegrad +=
-//                                       (old_vector(old_dof_indices[i])*
-// 				      (*dphi_values)[i][qp]);
                                 }
 
                               // Form edge projection matrix
-                              for (unsigned int i=0, freei=0; i !=
-                                   new_side_dofs.size(); ++i)
+                              for (unsigned int sidei=0, freei=0; 
+                                   sidei != new_side_dofs.size();
+                                   ++sidei)
                                 {
+                                  unsigned int i = new_side_dofs[sidei];
                                   // fixed DoFs aren't test functions
-                                  if (dof_is_fixed[new_side_dofs[i]])
+                                  if (dof_is_fixed[i])
                                     continue;
-				  for (unsigned int j=0, freej=0; j !=
-                                       new_side_dofs.size(); ++j)
+				  for (unsigned int sidej=0, freej=0;
+                                       sidej != new_side_dofs.size();
+                                       ++sidej)
                                     {
-                                      if (dof_is_fixed[new_side_dofs[j]])
+                                      unsigned int j =
+                                        new_side_dofs[sidej];
+                                      if (dof_is_fixed[j])
                                         Fe(freei) -=
                                           phi_coarse[i][qp] *
                                           phi_coarse[j][qp] * JxW[qp] *
-                                          Ue(new_side_dofs[j]);
+                                          Ue(j);
                                       else
                                         Ke(freei,freej) +=
                                           phi_coarse[i][qp] *
                                           phi_coarse[j][qp] * JxW[qp];
                                       if (cont == C_ONE)
                                         {
-                                          if (dof_is_fixed[new_side_dofs[j]])
+                                          if (dof_is_fixed[j])
                                             Fe(freei) -=
                                               ((*dphi_coarse)[i][qp] *
 					       (*dphi_coarse)[j][qp]) *
                                               JxW[qp] *
-                                              Ue(new_side_dofs[j]);
+                                              Ue(j);
                                           else
                                             Ke(freei,freej) +=
 					      ((*dphi_coarse)[i][qp] *
                                                (*dphi_coarse)[j][qp])
                                               * JxW[qp];
                                         }
-                                      if (!dof_is_fixed[new_side_dofs[j]])
+                                      if (!dof_is_fixed[j])
                                         freej++;
                                     }
                                   Fe(freei) += phi_coarse[i][qp] *
@@ -423,8 +432,6 @@ void System::project_vector (const NumericVector<Number>& old_vector,
                                   if (cont == C_ONE)
                                     Fe(freei) +=
 				      (finegrad * (*dphi_coarse)[i][qp]) * JxW[qp];
-//                                       ((*dphi_coarse)[i][qp] *
-//                                        finegrad) * JxW[qp];
                                   freei++;
                                 }
 	                    }
@@ -459,7 +466,6 @@ void System::project_vector (const NumericVector<Number>& old_vector,
                           free_dof[free_dofs++] = i;
 	              Ke.resize (free_dofs, free_dofs); Ke.zero();
 	              Fe.resize (free_dofs); Fe.zero();
-std::cerr << "Ke = 0" << std::endl;
                       // The new side coefficients
                       DenseVector<Number> Uside(free_dofs);
 
@@ -507,49 +513,47 @@ std::cerr << "Ke = 0" << std::endl;
                                   if (cont == C_ONE)
 				    finegrad.add_scaled((*dphi_values)[i][qp],
 							old_vector(old_dof_indices[i]));
-// 				    finegrad +=
-//                                       (old_vector(old_dof_indices[i])*
-// 				      (*dphi_values)[i][qp]);
                                 }
 
                               // Form side projection matrix
-                              for (unsigned int i=0, freei=0; i !=
-                                   new_side_dofs.size(); ++i)
+                              for (unsigned int sidei=0, freei=0;
+                                   sidei != new_side_dofs.size();
+                                   ++sidei)
                                 {
+                                  unsigned int i = new_side_dofs[sidei];
                                   // fixed DoFs aren't test functions
-                                  if (dof_is_fixed[new_side_dofs[i]])
+                                  if (dof_is_fixed[i])
                                     continue;
-				  for (unsigned int j=0, freej=0; j !=
-                                       new_side_dofs.size(); ++j)
+				  for (unsigned int sidej=0, freej=0;
+                                       sidej != new_side_dofs.size();
+                                       ++sidej)
                                     {
-                                      if (dof_is_fixed[new_side_dofs[j]])
+                                      unsigned int j =
+                                        new_side_dofs[sidej];
+                                      if (dof_is_fixed[j])
                                         Fe(freei) -=
                                           phi_coarse[i][qp] *
                                           phi_coarse[j][qp] * JxW[qp] *
-                                          Ue(new_side_dofs[j]);
+                                          Ue(j);
                                       else
                                         Ke(freei,freej) +=
                                           phi_coarse[i][qp] *
                                           phi_coarse[j][qp] * JxW[qp];
                                       if (cont == C_ONE)
                                         {
-                                          if (dof_is_fixed[new_side_dofs[j]])
+                                          if (dof_is_fixed[j])
                                             Fe(freei) -=
                                               ((*dphi_coarse)[i][qp] *
 					       (*dphi_coarse)[j][qp]) *
                                               JxW[qp] *
-                                              Ue(new_side_dofs[j]);
+                                              Ue(j);
                                           else
-{
                                             Ke(freei,freej) +=
 					      ((*dphi_coarse)[i][qp] *
                                                (*dphi_coarse)[j][qp])
                                               * JxW[qp];
-std::cerr << "Ke(" << freei << "," << freej << ") = " <<
-Ke(freei,freej) << std::endl;
-}
                                         }
-                                      if (!dof_is_fixed[new_side_dofs[j]])
+                                      if (!dof_is_fixed[j])
                                         freej++;
                                     }
                                   Fe(freei) += (fineval * phi_coarse[i][qp]) * JxW[qp];
@@ -624,9 +628,6 @@ Ke(freei,freej) << std::endl;
                             if (cont == C_ONE)
 			      finegrad.add_scaled((*dphi_values)[i][qp],
 						  old_vector(old_dof_indices[i]));
-// 			      finegrad +=
-//                                 (old_vector(old_dof_indices[i])*
-// 				 (*dphi_values)[i][qp]);
                           }
 
                         // Form interior projection matrix
