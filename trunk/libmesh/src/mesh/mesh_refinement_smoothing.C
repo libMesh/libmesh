@@ -1,4 +1,4 @@
-// $Id: mesh_refinement_smoothing.C,v 1.9 2005-02-22 22:17:41 jwpeterson Exp $
+// $Id: mesh_refinement_smoothing.C,v 1.10 2005-05-18 13:14:31 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -128,38 +128,51 @@ bool MeshRefinement::eliminate_unrefined_patches ()
       bool flag_me = true;
 
 
-      // Skip the element if it is already flagged
+      // Skip the element if it is already flagged for refinement
       if (elem->refinement_flag() == Elem::REFINE)
 	continue;
       
+      // Test the parent if that is already flagged for coarsening
+      if (elem->refinement_flag() == Elem::COARSEN)
+        {
+          assert(elem->parent());
+          // FIXME: this is reasonable, but why don't we have a non-const
+          // Elem::parent() to begin with?
+	  elem = const_cast<Elem *>(elem->parent());
+          if (elem->refinement_flag() != Elem::COARSEN_INACTIVE)
+            continue;
+        }
+
       // Check all the element neighbors
       for (unsigned int n=0; n<elem->n_neighbors(); n++)
-	{
-	  // Quit if the element is on the boundary
-	  if (elem->neighbor(n) == NULL)
-	    {
-	      flag_me = false;
-	      break;
-	    }
-
-	  // Can't happen, would have broken the loop!
-	  assert (elem->neighbor(n) != NULL);
-
-	  // If the neighbor is active and will not be refined
-	  // we do not need to refine ourselves.
-	  if ((elem->neighbor(n)->level() == my_level) &&
-	      (elem->neighbor(n)->active()) &&
-	      (elem->neighbor(n)->refinement_flag() != Elem::REFINE))
+	// Quit if the element is on the boundary, or
+	// if the neighbor is active and will not be refined;
+	// then we do not need to refine ourselves.
+	if (elem->neighbor(n) == NULL ||
+	    ((elem->neighbor(n)->level() <= my_level) &&
+	     (elem->neighbor(n)->active()) &&
+	     (elem->neighbor(n)->refinement_flag() != Elem::REFINE)))
+          {
 	    flag_me = false;
-
-	  // Otherwise the neighbor is inactive (i.e. already refined)
-	  // or is active and will be refined.  In either case this
-	  // neighb
-	}
+            break;
+          }
 
       if (flag_me)
 	{
-	  elem->set_refinement_flag(Elem::REFINE);
+	  // Parents that would create islands should no longer
+          // coarsen
+          if (elem->refinement_flag() == Elem::COARSEN_INACTIVE)
+            {
+              for (unsigned int c=0; c<elem->n_children(); c++)
+                {
+                  assert(elem->child(c)->refinement_flag() ==
+                         Elem::COARSEN);
+                  elem->child(c)->set_refinement_flag(Elem::DO_NOTHING);
+                }
+              elem->set_refinement_flag(Elem::INACTIVE);
+            }
+          else
+	    elem->set_refinement_flag(Elem::REFINE);
 	  flags_changed = true;
 	}      
     }
