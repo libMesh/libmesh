@@ -1,4 +1,4 @@
-// $Id: kelly_error_estimator.C,v 1.9 2005-03-21 01:36:31 benkirk Exp $
+// $Id: kelly_error_estimator.C,v 1.10 2005-05-18 17:48:47 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -258,6 +258,8 @@ void KellyErrorEstimator::estimate_error (const System& system,
 			} // End quadrature point loop
 
 		      // Add the error contribution to elements e & f
+                      assert(e_id < error_per_cell.size());
+                      assert(f_id < error_per_cell.size());
 		      error_per_cell[e_id] += error;
 		      error_per_cell[f_id] += error;
 		    } // end if case 1 or case 2
@@ -353,6 +355,7 @@ void KellyErrorEstimator::estimate_error (const System& system,
 			    } // End quadrature point loop
 
 			  // Add the error contribution to elements e & f
+                          assert(e_id < error_per_cell.size());
 			  error_per_cell[e_id] += error;
 			  
 			} // end if side on flux boundary
