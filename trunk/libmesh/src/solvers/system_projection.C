@@ -1,4 +1,4 @@
-// $Id: system_projection.C,v 1.17 2005-05-18 08:33:17 spetersen Exp $
+// $Id: system_projection.C,v 1.18 2005-05-18 08:54:13 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -435,8 +435,8 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 		      for (unsigned int i=0; i != free_dofs; ++i)
                         {
                           Number &ui = Ue(new_side_dofs[free_dof[i]]);
-                          assert(fabs(ui) < TOLERANCE ||
-                                 fabs(ui - Uedge(i)) < TOLERANCE);
+                          assert(std::abs(ui) < TOLERANCE ||
+                                 std::abs(ui - Uedge(i)) < TOLERANCE);
                           ui = Uedge(i);
                           dof_is_fixed[new_side_dofs[free_dof[i]]] =
                             true;
@@ -566,8 +566,8 @@ Ke(freei,freej) << std::endl;
 		      for (unsigned int i=0; i != free_dofs; ++i)
                         {
                           Number &ui = Ue(new_side_dofs[free_dof[i]]);
-                          assert(fabs(ui) < TOLERANCE ||
-                                 fabs(ui - Uside(i)) < TOLERANCE);
+                          assert(std::abs(ui) < TOLERANCE ||
+                                 std::abs(ui - Uside(i)) < TOLERANCE);
                           ui = Uside(i);
                           dof_is_fixed[new_side_dofs[free_dof[i]]] =
                             true;
@@ -677,8 +677,8 @@ Ke(freei,freej) << std::endl;
 		for (unsigned int i=0; i != free_dofs; ++i)
                   {
                     Number &ui = Ue(free_dof[i]);
-                    assert(fabs(ui) < TOLERANCE ||
-                           fabs(ui - Uint(i)) < TOLERANCE);
+                    assert(std::abs(ui) < TOLERANCE ||
+                           std::abs(ui - Uint(i)) < TOLERANCE);
                     ui = Uint(i);
                     dof_is_fixed[free_dof[i]] = true;
                   }
