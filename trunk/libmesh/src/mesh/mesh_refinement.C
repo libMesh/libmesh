@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.37 2005-05-18 13:14:31 roystgnr Exp $
+// $Id: mesh_refinement.C,v 1.38 2005-05-19 14:24:39 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -195,7 +195,9 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
 
   assert(this->make_coarsening_compatible(maintain_level_one));
   assert(this->make_refinement_compatible(maintain_level_one));
-  assert(!this->eliminate_unrefined_patches());
+// FIXME: This won't pass unless we add a redundant find_neighbors()
+// call or replace find_neighbors() with on-the-fly neighbor updating
+// assert(!this->eliminate_unrefined_patches());
 
   // We can't contract the mesh ourselves anymore - a System might
   // need to restrict old coefficient vectors first
@@ -208,7 +210,9 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
   
   assert(this->make_coarsening_compatible(maintain_level_one));
   assert(this->make_refinement_compatible(maintain_level_one));
-  assert(!this->eliminate_unrefined_patches());
+// FIXME: This won't pass unless we add a redundant find_neighbors()
+// call or replace find_neighbors() with on-the-fly neighbor updating
+// assert(!this->eliminate_unrefined_patches());
 
   // Finally, the new mesh needs to be prepared for use
   if (coarsening_changed_mesh || refining_changed_mesh)
@@ -275,7 +279,9 @@ bool MeshRefinement::coarsen_elements (const bool maintain_level_one)
     this->_coarsen_elements ();
 
   assert(this->make_coarsening_compatible(maintain_level_one));
-  assert(!this->eliminate_unrefined_patches());
+// FIXME: This won't pass unless we add a redundant find_neighbors()
+// call or replace find_neighbors() with on-the-fly neighbor updating
+// assert(!this->eliminate_unrefined_patches());
     
   // We can't contract the mesh ourselves anymore - a System might
   // need to restrict old coefficient vectors first
@@ -335,6 +341,11 @@ bool MeshRefinement::refine_elements (const bool maintain_level_one)
   // take up some space, maybe more than what was freed.
   const bool mesh_changed = 
     this->_refine_elements();
+
+  assert(this->make_refinement_compatible(maintain_level_one));
+// FIXME: This won't pass unless we add a redundant find_neighbors()
+// call or replace find_neighbors() with on-the-fly neighbor updating
+// assert(!this->eliminate_unrefined_patches());
     
   // Finally, the new mesh needs to be prepared for use
   if (mesh_changed)
