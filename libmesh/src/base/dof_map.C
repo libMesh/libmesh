@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.74 2005-05-17 14:59:36 benkirk Exp $
+// $Id: dof_map.C,v 1.75 2005-05-19 20:50:07 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -176,20 +176,21 @@ void DofMap::reinit(MeshBase& mesh)
 						       type, n));
 		  
 		  // Some discontinuous FEs have no vertex dofs
-		  //assert(vertex_dofs);
-		  
-		  if (!old_node_dofs)
+		  if (vertex_dofs)
 		    {
-	              node->set_n_comp(this->sys_number(),
-			               var,
-			               vertex_dofs);
-		      // Abusing dof_number to set a "this is a
-		      // vertex" flag
-		      node->set_dof_number(this->sys_number(),
-					   var, 0, 1);
+		      if (!old_node_dofs)
+			{
+			  node->set_n_comp(this->sys_number(),
+					   var,
+					   vertex_dofs);
+			  // Abusing dof_number to set a "this is a
+			  // vertex" flag
+			  node->set_dof_number(this->sys_number(),
+					       var, 0, 1);
+			}
+		      else
+			assert(vertex_dofs == old_node_dofs);
 		    }
-		  else
-		    assert(vertex_dofs == old_node_dofs);
 	        }
 	    }
 	}
