@@ -76,9 +76,9 @@ dev_table_entry("images/roystgnr.jpg",
 <?php
 dev_table_entry("images/spetersen.jpg",
 		"Steffen Petersen",
-		"http://www.tu-harburg.de",
+		"http://www.mub.tu-harburg.de/deutsch/mitarbeiter/petersen.html",
 		"PhD Student, libMesh Developer",
-		"<a href=\"http://www.tu-harburg.de\">Technical University Hamburg-Harburg</a>");
+		"<a href=\"http://www.tu-harburg.de\">Hamburg University of Technology</a>");
 ?>
 
 <?php

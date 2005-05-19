@@ -62,9 +62,8 @@ is included with the library to provide linear solver support on serial machines
 The <code>libMesh</code> library is actively developed at The
 University of Texas at Austin in the <a href="http://www.cfdlab.ae.utexas.edu">CFDLab</a> and at
 Technische Universit&auml;t Hamburg-Harburg,
-<a href="http://www.mum.tu-harburg.de/english"> Mechanics and Ocean
-Engineering</a> in Germany. Many thanks to
-<a href="http://sourceforge.net">SourceForge</a> for
+<a href="http://www.mub.tu-harburg.de/english">Modelling and Computation</a> in Germany.
+Many thanks to <a href="http://sourceforge.net">SourceForge</a> for
 <a href="http://sourceforge.net/projects/libmesh">hosting the
 project</a>.  You can find out what is currently happening in the
 development branch by checking out the
