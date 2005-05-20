@@ -1,4 +1,4 @@
-// $Id: system.C,v 1.14 2005-05-17 20:11:07 roystgnr Exp $
+// $Id: system.C,v 1.15 2005-05-20 05:24:12 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -29,7 +29,6 @@
 #include "libmesh.h"
 #include "sparse_matrix.h"
 #include "libmesh_logging.h"
-#include "mesh_refinement.h"
 #include "utility.h"
 
 
@@ -141,99 +140,51 @@ void System::init_data ()
 
 
 
+void System::restrict_vectors ()
+{
+#ifdef ENABLE_AMR
+  _dof_map.distribute_dofs (this->get_mesh());
+  
+  // Restrict the _vectors on the coarsened cells
+  for (vectors_iterator pos = _vectors.begin(); pos != _vectors.end(); ++pos)
+    this->project_vector (*(pos->second));
+
+  // Restrict the current local solution on the coarsened cells
+  this->project_vector (*current_local_solution);
+#endif
+}
+
+
+
+void System::prolong_vectors ()
+{
+#ifdef ENABLE_AMR
+  // Currently project_vector handles both restriction and prolongation
+  this->restrict_vectors();
+#endif
+}
+
+
+
 void System::reinit ()
 {
 #ifdef ENABLE_AMR
+  // Recreate any hanging node constraints
+  _dof_map.create_dof_constraints(this->get_mesh());
 
-//   // Augment the send_list for the old mesh to handle
-//   // additional data dependencies introduced by refinement
-//   _dof_map.augment_send_list_for_projection (this->get_mesh());
-
-  MeshRefinement mesh_refine(this->get_mesh());
-  bool mesh_changed = false;
-
-  // Re-update the data in this system using the
-  // augmented send_list
-  this->re_update ();
-
-  // FIXME: How do we know refine_and_coarsen_elements or
-  // refine_uniformly haven't already been called?
-  // Better be safe for now...
-    {
-      // Distribute the degrees of freedom on the mesh
-      _dof_map.distribute_dofs (this->get_mesh());
-  
-      // Recreate any hanging node constraints
-      _dof_map.create_dof_constraints(this->get_mesh());
-
-      // Restrict & project the _vectors on the coarsened cells
-      for (vectors_iterator pos = _vectors.begin(); pos != _vectors.end(); ++pos)
-        this->project_vector (*(pos->second));
-
-      // Restrict & project the current local solution on the coarsened cells
-      this->project_vector (*current_local_solution);
-
-      mesh_changed = true;
-    }
-
-  // FIXME: Where should the user set maintain_level_one now??
-  // Don't override previous settings, for now
-  // Perform any coarsenings, and restrict vectors if necessary
-  if (mesh_refine.coarsen_elements(false)) 
-    {
-      _dof_map.distribute_dofs (this->get_mesh());
-  
-      // Restrict the _vectors on the coarsened cells
-      for (vectors_iterator pos = _vectors.begin(); pos != _vectors.end(); ++pos)
-        this->project_vector (*(pos->second));
-
-      // Restrict the current local solution on the coarsened cells
-      this->project_vector (*current_local_solution);
-
-      mesh_changed = true;
-    }
-
-  // FIXME: since the user might have already called
-  // refine_and_coarsen_elements(), to save memory we'd better
-  // contract() whether our own coarsen_elements() returned true or
-  // not!
-  this->get_mesh().contract();
-
-  // Perform any refinements, and restrict vectors if necessary
-  if (mesh_refine.refine_elements(false))
-    {
-      _dof_map.distribute_dofs (this->get_mesh());
-
-      // Project the _vectors on the refined cells
-      for (vectors_iterator pos = _vectors.begin(); pos != _vectors.end(); ++pos)
-        this->project_vector (*(pos->second));
-
-      // Project the current local solution on the refined cells
-      this->project_vector (*current_local_solution);
-
-      mesh_changed = true;
-    }
-
-  if (mesh_changed)
-    {
-      // Recreate any hanging node constraints
-      _dof_map.create_dof_constraints(this->get_mesh());
-
-      // Update the solution based on the projected
-      // current_local_solution.
-      solution->init (this->n_dofs(), this->n_local_dofs());
+  // Update the solution based on the projected
+  // current_local_solution.
+  solution->init (this->n_dofs(), this->n_local_dofs());
 	
-      assert (solution->size() == current_local_solution->size());
-      assert (solution->size() == current_local_solution->local_size());
+  assert (solution->size() == current_local_solution->size());
+  assert (solution->size() == current_local_solution->local_size());
 
-      const unsigned int first_local_dof = solution->first_local_index();
-      const unsigned int local_size      = solution->local_size();
+  const unsigned int first_local_dof = solution->first_local_index();
+  const unsigned int local_size      = solution->local_size();
       
-      for (unsigned int i=0; i<local_size; i++)
-        solution->set(i+first_local_dof,
-		      (*current_local_solution)(i+first_local_dof));
-    }
-  
+  for (unsigned int i=0; i<local_size; i++)
+    solution->set(i+first_local_dof,
+		  (*current_local_solution)(i+first_local_dof));
 #endif
 }
 
