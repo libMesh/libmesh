@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.23 2005-05-20 05:24:12 roystgnr Exp $
+// $Id: equation_systems.C,v 1.24 2005-05-20 14:58:11 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -167,11 +167,12 @@ void EquationSystems::reinit ()
       for (; pos != end; ++pos)
         pos->second->restrict_vectors();
       mesh_changed = true;
-
-      // Once vectors are all restricted, we can delete
-      // children of coarsened elements
-      this->get_mesh().contract();
     }
+
+  // Once vectors are all restricted, we can delete
+  // children of coarsened elements
+  if (mesh_changed)
+    this->get_mesh().contract();
   
   // Try to refine the mesh, then prolong each system's vectors
   // if necessary
