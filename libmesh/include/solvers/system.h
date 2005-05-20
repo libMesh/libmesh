@@ -1,4 +1,4 @@
-// $Id: system.h,v 1.11 2005-03-18 16:56:09 benkirk Exp $
+// $Id: system.h,v 1.12 2005-05-20 05:24:11 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -381,12 +381,30 @@ public:
    * in derived classes.
    */
   virtual void user_initialization ();
+
   
   /**
    * User-provided  assembly function.  Can be overloaded
    * in derived classes.
    */
   virtual void user_assembly ();
+
+  /**
+   * Re-update the local values when the mesh has changed.
+   * This method takes the data updated by \p update() and
+   * makes it up-to-date on the current mesh.
+   */
+  virtual void re_update ();
+
+  /**
+   * Restrict vectors after the mesh has coarsened
+   */
+  virtual void restrict_vectors ();
+
+  /**
+   * Prolong vectors after the mesh has refined
+   */
+  virtual void prolong_vectors ();
 
 
 
@@ -427,12 +445,6 @@ protected:
    */
   virtual void init_data ();
 
-  /**
-   * Re-update the local values when the mesh has changed.
-   * This method takes the data updated by \p update() and
-   * makes it up-to-date on the current mesh.
-   */
-  virtual void re_update ();
   // -------------------------------------------------
   // Necessary classes
   //

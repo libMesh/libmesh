@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.22 2005-05-11 23:12:10 benkirk Exp $
+// $Id: equation_systems.C,v 1.23 2005-05-20 05:24:12 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -26,6 +26,7 @@
 #include "libmesh.h"
 #include "system.h"
 #include "frequency_system.h"
+#include "mesh_refinement.h"
 #include "newmark_system.h"
 #include "transient_system.h"
 
@@ -135,13 +136,60 @@ void EquationSystems::reinit ()
       (*elem_it)->set_n_systems(n_sys);
   }
 
+  bool mesh_changed = false;
   system_iterator       pos = _systems.begin();
   const system_iterator end = _systems.end();
   
+  // Localize each system's vectors
   for (; pos != end; ++pos)
+      pos->second->re_update();
+
+  // FIXME: For backwards compatibility, assume
+  // refine_and_coarsen_elements or refine_uniformly have already
+  // been called
+  {
+    pos = _systems.begin();
+    for (; pos != end; ++pos)
+      pos->second->prolong_vectors();
+    mesh_changed = true;
+  }
+  
+  // FIXME: Where should the user set maintain_level_one now??
+  // Don't override previous settings, for now
+
+  MeshRefinement mesh_refine(_mesh);
+
+  // Try to coarsen the mesh, then restrict each system's vectors
+  // if necessary
+  if (mesh_refine.coarsen_elements(false))
     {
-      // Re-initialize the system.
-      pos->second->reinit();
+      pos = _systems.begin();
+      for (; pos != end; ++pos)
+        pos->second->restrict_vectors();
+      mesh_changed = true;
+
+      // Once vectors are all restricted, we can delete
+      // children of coarsened elements
+      this->get_mesh().contract();
+    }
+  
+  // Try to refine the mesh, then prolong each system's vectors
+  // if necessary
+  if (mesh_refine.refine_elements(false))
+    {
+      pos = _systems.begin();
+      for (; pos != end; ++pos)
+        pos->second->prolong_vectors();
+      mesh_changed = true;
+    }
+
+  // If the mesh has changed, systems will need to create new dof
+  // constraints and update their global solution vectors
+  if (mesh_changed)
+    {
+      pos = _systems.begin();
+      for (; pos != end; ++pos)
+        pos->second->reinit();
     }
 }
 
