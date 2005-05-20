@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.38 2005-05-19 14:24:39 roystgnr Exp $
+// $Id: mesh_refinement.C,v 1.39 2005-05-20 17:16:17 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -515,6 +515,8 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 	
 	if (all_children_flagged_for_coarsening)
 	  _mesh.elem(e)->set_refinement_flag(Elem::COARSEN_INACTIVE);
+        else
+	  _mesh.elem(e)->set_refinement_flag(Elem::INACTIVE);
       }
 	
   STOP_LOG ("make_coarsening_compatible()", "MeshRefinement");
@@ -583,6 +585,9 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 			    if (neighbor->refinement_flag() == Elem::COARSEN)
 			      {
 				neighbor->set_refinement_flag(Elem::DO_NOTHING);
+                                if (neighbor->parent())
+                                  const_cast<Elem *>(neighbor->parent())
+                                    ->set_refinement_flag(Elem::INACTIVE);
 				compatible_with_coarsening = false;
 				level_one_satisfied = false;
 			      }
@@ -600,6 +605,9 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 			    if (neighbor->refinement_flag() != Elem::REFINE)
 			      {
 				neighbor->set_refinement_flag(Elem::REFINE);
+                                if (neighbor->parent())
+                                  const_cast<Elem *>(neighbor->parent())
+                                    ->set_refinement_flag(Elem::INACTIVE);
 				level_one_satisfied = false; 
 			      }
 			  }
