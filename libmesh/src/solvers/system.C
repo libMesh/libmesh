@@ -1,4 +1,4 @@
-// $Id: system.C,v 1.15 2005-05-20 05:24:12 roystgnr Exp $
+// $Id: system.C,v 1.16 2005-05-24 17:42:45 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -147,7 +147,34 @@ void System::restrict_vectors ()
   
   // Restrict the _vectors on the coarsened cells
   for (vectors_iterator pos = _vectors.begin(); pos != _vectors.end(); ++pos)
-    this->project_vector (*(pos->second));
+    {
+      //this->project_vector (*(pos->second));
+
+      //TODO:[BSK] Make projection work properly for distributed vectors 
+      // Right now we must localize distributed
+      // vectors before projection will work.
+      NumericVector<Number>* v = pos->second;
+      
+      if (v->size() == v->local_size())
+	this->project_vector (*v);
+      
+      else
+	{
+	  AutoPtr<NumericVector<Number> > v_local (NumericVector<Number>::build());
+	  v_local->init (v->size(), v->size());
+	  v->localize(*v_local);
+	  v_local->close();
+	  this->project_vector(*v_local);
+	  
+	  v->init(this->n_dofs(), this->n_local_dofs());
+
+	  for (unsigned int i=v->first_local_index();
+	       i<v->last_local_index(); i++)
+	    v->set(i, (*v_local)(i));
+
+	  v->close();
+	}
+    }
 
   // Restrict the current local solution on the coarsened cells
   this->project_vector (*current_local_solution);
