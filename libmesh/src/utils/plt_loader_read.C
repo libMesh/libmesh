@@ -1,4 +1,4 @@
-// $Id: plt_loader_read.C,v 1.5 2005-02-22 22:17:43 jwpeterson Exp $
+// $Id: plt_loader_read.C,v 1.6 2005-05-24 13:35:41 jwpeterson Exp $
 
 // Copyright (C) 2002-2005  Benjamin S. Kirk
   
@@ -18,6 +18,7 @@
 
 
 // C++ includes
+#include <iostream>
 #include <fstream>
 #include <cstring>
 

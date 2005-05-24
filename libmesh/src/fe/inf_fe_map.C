@@ -1,4 +1,4 @@
-// $Id: inf_fe_map.C,v 1.13 2005-05-06 17:44:06 roystgnr Exp $
+// $Id: inf_fe_map.C,v 1.14 2005-05-24 13:35:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -411,20 +411,14 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 	      here();
 	      {
 		std::cerr << "WARNING: Newton scheme has not converged in "
-			  << cnt << " iterations:" << std::endl
-			  << "   physical_point=";
-		
-		physical_point.print();
-		
-		std::cerr << "   dp=";
-		
-		dp.print();
-		
-		std::cerr << "   p=";
-		
-		p.print();
-		
-		std::cerr << "   error=" << error
+			  << cnt << " iterations:\n" 
+			  << "   physical_point="
+			  << physical_point
+			  << "   dp="
+			  << dp
+			  << "   p="
+			  << p
+			  << "   error=" << error
 			  << std::endl;
 	      }
 	    }

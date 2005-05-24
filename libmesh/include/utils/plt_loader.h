@@ -1,4 +1,4 @@
-// $Id: plt_loader.h,v 1.4 2005-02-22 22:17:35 jwpeterson Exp $
+// $Id: plt_loader.h,v 1.5 2005-05-24 13:35:41 jwpeterson Exp $
 
 // Copyright (C) 2002-2005  Benjamin S. Kirk
   
@@ -22,7 +22,6 @@
 #define __plt_loader_h__
 
 // C++ includes
-#include <iostream>
 #include <string>
 #include <vector>
 

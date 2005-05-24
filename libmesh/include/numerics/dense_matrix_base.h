@@ -1,4 +1,4 @@
-// $Id: dense_matrix_base.h,v 1.12 2005-02-22 22:17:33 jwpeterson Exp $
+// $Id: dense_matrix_base.h,v 1.13 2005-05-24 13:35:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -23,8 +23,6 @@
 #define __dense_matrix_base_h__
 
 // C++ includes
-#include <iostream>
-#include <iomanip> // for std::setw()
 
 // Local Includes
 #include "libmesh_common.h"
@@ -106,7 +104,7 @@ public:
   /**
    * Pretty-print the matrix to \p stdout.
    */
-  void print(std::ostream& os=std::cout) const;
+  void print(std::ostream& os) const;
 
   /**
    * Formatted print as above but allows you to do
@@ -123,7 +121,7 @@ public:
    * Prints the matrix entries with more decimal places in
    * scientific notation.
    */
-  void print_scientific(std::ostream& os=std::cout) const;
+  void print_scientific(std::ostream& os) const;
   
   /**
    * Adds \p factor to every element in the matrix.
@@ -181,64 +179,6 @@ protected:
 
 
 
-template<typename T>
-inline
-void DenseMatrixBase<T>::print_scientific (std::ostream& os) const
-{
-#ifndef BROKEN_IOSTREAM
-  
-  // save the initial format flags
-  std::ios_base::fmtflags os_flags = os.flags();
-  
-  // Print the matrix entries.
-  for (unsigned int i=0; i<this->m(); i++)
-    {
-      for (unsigned int j=0; j<this->n(); j++)
-	os << std::setw(15)
-	   << std::scientific
-	   << std::setprecision(8)
-	   << this->el(i,j) << " ";
-
-      os << std::endl;
-    }
-  
-  // reset the original format flags
-  os.flags(os_flags);
-
-#else
-  
-  // Print the matrix entries.
-  for (unsigned int i=0; i<this->m(); i++)
-    {
-      for (unsigned int j=0; j<this->n(); j++)	
-	os << std::setprecision(8)
-	   << this->el(i,j)
-	   << " ";
-      
-      os << std::endl;
-    }
-  
-  
-#endif
-}
-
-
-
-template<typename T>
-inline
-void DenseMatrixBase<T>::print (std::ostream& os) const
-{  
-  for (unsigned int i=0; i<this->m(); i++)
-    {
-      for (unsigned int j=0; j<this->n(); j++)
-	os << std::setw(8)
-	   << this->el(i,j) << " ";
-
-      os << std::endl;
-    }
-
-  return;
-}
 
 
 

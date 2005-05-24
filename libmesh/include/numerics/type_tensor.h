@@ -1,4 +1,4 @@
-// $Id: type_tensor.h,v 1.4 2005-02-22 22:17:34 jwpeterson Exp $
+// $Id: type_tensor.h,v 1.5 2005-05-24 13:35:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,6 @@
 
 // C++ includes
 #include <cmath>
-#include <iostream>
 
 // Local includes
 #include "libmesh_common.h"
@@ -217,7 +216,7 @@ public:
   /**
    * Formatted print to \p std::cout.
    */
-  void print(std::ostream& os=std::cout) const;
+  void print(std::ostream& os) const;
 
   /**
    * Formatted print as above but allows you to do
@@ -339,9 +338,9 @@ T & TypeTensor<T>::operator () (const unsigned int i,
 
   if (i >= DIM || j >= DIM)
     {
-      std::cerr << "ERROR:  You are assigning to a tensor component" << std::endl
-		<< "that is out of range for the compiled DIM!"      << std::endl
-		<< " DIM=" << DIM << " , i=" << i << " , j=" << j << std::endl;
+//       std::cerr << "ERROR:  You are assigning to a tensor component" << std::endl
+// 		<< "that is out of range for the compiled DIM!"      << std::endl
+// 		<< " DIM=" << DIM << " , i=" << i << " , j=" << j << std::endl;
       error();
     }
   

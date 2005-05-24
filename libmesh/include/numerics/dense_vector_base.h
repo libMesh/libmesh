@@ -1,4 +1,4 @@
-// $Id: dense_vector_base.h,v 1.8 2005-02-22 22:17:34 jwpeterson Exp $
+// $Id: dense_vector_base.h,v 1.9 2005-05-24 13:35:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -22,9 +22,6 @@
 #ifndef __dense_vector_base_h__
 #define __dense_vector_base_h__
 
-// C++ includes
-#include <iostream>
-#include <iomanip> // for std::setw
 
 // Local Includes
 #include "libmesh_common.h"
@@ -82,7 +79,7 @@ public:
   /**
    * Pretty-print the vector to \p stdout.
    */
-  void print(std::ostream& os=std::cout) const;
+  void print(std::ostream& os) const;
 
   /**
    * Same as above, but allows you to print using the
@@ -98,7 +95,7 @@ public:
    * Prints the entries of the vector with additional
    * decimal places in scientific notation.
    */
-  void print_scientific(std::ostream& os=std::cout) const;
+  void print_scientific(std::ostream& os) const;
 
 };
 
@@ -109,48 +106,6 @@ public:
 
 
 
-template<typename T>
-inline
-void DenseVectorBase<T>::print_scientific (std::ostream& os) const
-{
-#ifndef BROKEN_IOSTREAM
-  
-  // save the initial format flags
-  std::ios_base::fmtflags os_flags = os.flags();
-  
-  // Print the vector entries.
-  for (unsigned int i=0; i<this->size(); i++)
-    os << std::setw(10)
-       << std::scientific
-       << std::setprecision(8)
-       << this->el(i)
-       << std::endl;
-  
-  // reset the original format flags
-  os.flags(os_flags);
-  
-#else
-  
-  // Print the matrix entries.
-  for (unsigned int i=0; i<this->size(); i++)
-    os << std::setprecision(8)
-       << this->el(i)
-       << std::endl;
-  
-#endif
-}
-
-
-
-template<typename T>
-inline
-void DenseVectorBase<T>::print (std::ostream& os) const
-{  
-  for (unsigned int i=0; i<this->size(); i++)
-    os << std::setw(8)
-       << this->el(i)
-       << std::endl;
-}
 
 
 
