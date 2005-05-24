@@ -1,4 +1,4 @@
-// $Id: sparse_matrix.h,v 1.11 2005-02-22 22:17:34 jwpeterson Exp $
+// $Id: sparse_matrix.h,v 1.12 2005-05-24 12:54:57 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -30,16 +30,15 @@
 // Local includes
 #include "libmesh_common.h"
 #include "auto_ptr.h"
-#include "enum_solver_package.h"
-#include "dof_map.h"
 #include "reference_counted_object.h"
 #include "libmesh.h"
 
 
 // forward declarations
 template <typename T> class SparseMatrix;
+template <typename T> class DenseMatrix;
 template <typename T> inline std::ostream& operator << (std::ostream& os, const SparseMatrix<T>& m);
-
+class DofMap;
 
 /**
  * Generic sparse matrix. This class contains
