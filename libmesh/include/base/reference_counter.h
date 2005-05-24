@@ -1,4 +1,4 @@
- // $Id: reference_counter.h,v 1.4 2005-02-22 22:17:30 jwpeterson Exp $
+ // $Id: reference_counter.h,v 1.5 2005-05-24 14:26:28 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -27,7 +27,6 @@
 
 
 // C++ includes
-#include <iostream>
 #include <string>
 #include <map>
 
@@ -137,15 +136,6 @@ inline ReferenceCounter::~ReferenceCounter()
 
 
 
-inline
-void ReferenceCounter::print_info ()
-{
-#if defined(ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
-  
-  std::cout << ReferenceCounter::get_info();
-  
-#endif
-}
 
 
 
