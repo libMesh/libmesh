@@ -1,4 +1,4 @@
-// $Id: xdr_io.C,v 1.10 2005-05-10 21:37:17 benkirk Exp $
+// $Id: xdr_io.C,v 1.11 2005-05-24 17:30:30 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1516,7 +1516,6 @@ namespace
 
 	  xdr_string(mp_xdr_handle,&temp, ((m_type == XdrMGF::ENCODE) ? strlen(temp) : hd->m_strSize));
 	  hd->setTitle(temp);
-	  if(temp) std::cout << strlen(hd->getTitle()) << std::endl;
 	  delete [] temp;
 	  break;
 	}
@@ -2283,7 +2282,7 @@ void XdrIO::write_mesh (const std::string& name,
     
     conn.resize(totalWeight);
     
-    std::cout << orig_type << std::endl;
+    //std::cout << orig_type << std::endl;
     	
     unsigned int lastConnIndex = 0;
     unsigned int nn = 0;
@@ -2355,7 +2354,7 @@ void XdrIO::write_mesh (const std::string& name,
     {
       std::vector<int> bcs(numBCs*3);
     
-      std::cout << "numBCs=" << numBCs << std::endl;
+      //std::cout << "numBCs=" << numBCs << std::endl;
     
       //std::cout << "Preparing to write boundary conditions." << std::endl;
       std::vector<unsigned int> elem_list;
