@@ -1,4 +1,4 @@
-// $Id: perf_log.h,v 1.5 2005-02-22 22:17:35 jwpeterson Exp $
+// $Id: perf_log.h,v 1.6 2005-05-24 14:01:34 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -27,8 +27,6 @@
 #include "libmesh_common.h"
 
 // C++ includes
-#include <iostream>
-#include <iomanip>
 #include <string>
 #include <map>
 #include <sys/time.h>
@@ -221,124 +219,6 @@ class PerfLog
 
 // ------------------------------------------------------------
 // PerfLog class inline member funcions
-inline
-void PerfLog::start_event(const std::string &label,
-			  const std::string &header)
-{
-  if (log_events)
-    {
-      // Get a reference to the event data to avoid
-      // repeated map lookups
-      PerfData& perf_data = log[std::make_pair(header,label)];
-      
-      // make sure we aren't currently
-      // monitoring this event      
-      if (perf_data.open)
-	{
-	  std::cerr << "ERROR logging event " << label << std::endl
-		    << "Did you forget to stop logging it?" << std::endl;
-	  error();
-	}
-
-      perf_data.open = true;
-      
-      gettimeofday (&perf_data.tstart, NULL);
-    }
-}
-
-
-
-inline
-void PerfLog::stop_event(const std::string &label,
-			 const std::string &header)
-{
-  if (log_events)
-    {
-      // Get a reference to the event data to avoid
-      // repeated map lookups
-      PerfData& perf_data = log[std::make_pair(header,label)];
-      
-      // make sure we are currently
-      // monitoring this event
-      if (!perf_data.open)
-	{
-	  std::cerr << "ERROR logging event " << label << std::endl
-		    << "Did you forget to start or restart it?" << std::endl;
-	  error();
-	}
-      
-      perf_data.open = false;
-      
-      struct timeval tstop;
-
-      gettimeofday (&tstop, NULL);
-
-      const double elapsed_time = (static_cast<double>(tstop.tv_sec  - perf_data.tstart.tv_sec) +
-				   static_cast<double>(tstop.tv_usec - perf_data.tstart.tv_usec)*1.e-6);      
-
-      total_time         += elapsed_time;
-      perf_data.tot_time += elapsed_time;
-      perf_data.count++;	 
-    }
-}
-
-
-
-inline
-void PerfLog::pause_event(const std::string &label,
-			  const std::string &header)
-{
-  if (log_events)
-    {
-      // Get a reference to the event data to avoid
-      // repeated map lookups
-      PerfData& perf_data = log[std::make_pair(header,label)];
-      
-      // make sure we are currently
-      // monitoring this event
-      if (!perf_data.open)
-	{
-	  std::cerr << "ERROR pausing event " << label << std::endl
-		    << "Did you forget to start logging it?" << std::endl;	  
-	  error();
-	}
-      
-      struct timeval tstop;
-
-      gettimeofday (&tstop, NULL);
-
-      const double elapsed_time = (static_cast<double>(tstop.tv_sec  - perf_data.tstart.tv_sec) +
-				   static_cast<double>(tstop.tv_usec - perf_data.tstart.tv_usec)*1.e-6);      
-
-      total_time         += elapsed_time;
-      perf_data.tot_time += elapsed_time;
-    }
-}
-
-
-
-inline
-void PerfLog::restart_event(const std::string &label,
-			    const std::string &header)
-{
-  if (log_events)
-    {
-      // Get a reference to the event data to avoid
-      // repeated map lookups
-      PerfData& perf_data = log[std::make_pair(header,label)];
-      
-      // make sure we are currently
-      // monitoring this event
-      if (!perf_data.open)
-	{
-	  std::cerr << "ERROR restarting event " << label << std::endl
-		    << "Did you forget to start or pause it?" << std::endl;	  
-	  error();
-	}
-      
-      gettimeofday (&perf_data.tstart, NULL);
-    }
-}
 
 // Typedefs we might need
 #ifdef HAVE_LOCALE
