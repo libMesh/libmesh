@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.48 2005-05-06 17:43:27 roystgnr Exp $
+# $Id: Makefile,v 1.49 2005-05-24 12:54:56 jwpeterson Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -81,6 +81,11 @@ $(mesh_library_dir)/libmesh$(SHARED_LIBEXT): $(objects)
 	@$(shell mkdir -p $(mesh_library_dir))
 	@echo "Linking "$@
 	@$(CXX) $(CXXSHAREDFLAG) -o $(mesh_library) $(objects) $(LDFLAGS) $(EXTERNAL_FLAGS)
+
+#
+# Build just object files
+#
+obj: $(objects)
 
 #
 # Build the examples
