@@ -1,4 +1,4 @@
-// $Id: fe_base.C,v 1.29 2005-05-10 17:48:40 spetersen Exp $
+// $Id: fe_base.C,v 1.30 2005-05-24 15:24:12 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -896,9 +896,82 @@ bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real e
 
 
 
+
+void FEBase::print_JxW(std::ostream& os) const
+{
+  for (unsigned int i=0; i<JxW.size(); ++i)
+    os << JxW[i] << std::endl;
+}
+
+
+
+
+void FEBase::print_phi(std::ostream& os) const
+{
+  for (unsigned int i=0; i<phi.size(); ++i)
+    for (unsigned int j=0; j<phi[i].size(); ++j)
+      os << " phi[" << i << "][" << j << "]=" << phi[i][j] << std::endl;
+}
+
+
+
+
+void FEBase::print_dphi(std::ostream& os) const
+{
+  for (unsigned int i=0; i<dphi.size(); ++i)
+    for (unsigned int j=0; j<dphi[i].size(); ++j)
+      os << " dphi[" << i << "][" << j << "]=" << dphi[i][j];
+}
+
+
+
+#ifdef ENABLE_SECOND_DERIVATIVES
+
+
+void FEBase::print_d2phi(std::ostream& os) const
+{
+  for (unsigned int i=0; i<dphi.size(); ++i)
+    for (unsigned int j=0; j<dphi[i].size(); ++j)
+      os << " d2phi[" << i << "][" << j << "]=" << d2phi[i][j];
+}
+
+#endif
+
+
+
+
+void FEBase::print_xyz(std::ostream& os) const
+{
+  for (unsigned int i=0; i<xyz.size(); ++i)
+    os << xyz[i];
+}
+
+
+
+
+void FEBase::print_info(std::ostream& os) const
+{
+  os << "Shape functions at the Gauss pts." << std::endl;
+  this->print_phi(os);
+  
+  os << "Shape function gradients at the Gauss pts." << std::endl;
+  this->print_dphi(os);
+  
+  os << "XYZ locations of the Gauss pts." << std::endl;
+  this->print_xyz(os);
+  
+  os << "Values of JxW at the Gauss pts." << std::endl;
+  this->print_JxW(os);
+}
+
+
+
+
 std::ostream& operator << (std::ostream& os, const FEBase& fe)
 {
-  fe.print_info();
+  fe.print_info(os);
   return os;
 }
+
+
 
