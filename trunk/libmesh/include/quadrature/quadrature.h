@@ -1,4 +1,4 @@
-// $Id: quadrature.h,v 1.6 2005-02-22 22:17:35 jwpeterson Exp $
+// $Id: quadrature.h,v 1.7 2005-05-24 13:35:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -308,10 +308,11 @@ void QBase::print_info(std::ostream& os) const
   os << "N_Q_Points=" << this->n_points() << std::endl << std::endl;
   for (unsigned int qp=0; qp<this->n_points(); qp++)
     {
-      os << " Point " << qp << ":" << std::endl << "  ";
-      _points[qp].print();
-      os << " Weight: " << std::endl;
-      os << "  w=" << _weights[qp] << std::endl << std::endl;
+      os << " Point " << qp << ":\n"
+	 << "  "
+	 << _points[qp]
+	 << " Weight:\n "
+	 << "  w=" << _weights[qp] << "\n" << std::endl;
     }
 }
 

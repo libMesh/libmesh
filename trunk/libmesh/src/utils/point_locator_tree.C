@@ -1,4 +1,4 @@
-// $Id: point_locator_tree.C,v 1.11 2005-02-22 22:17:43 jwpeterson Exp $
+// $Id: point_locator_tree.C,v 1.12 2005-05-24 13:35:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -170,9 +170,6 @@ const Elem* PointLocatorTree::operator() (const Point& p) const
 	// In those cases we take a safe but slow way.
 	if (this->_element == NULL)
 	  {
-// 	    const_elem_iterator pos           (this->_mesh.const_elements_begin());
-// 	    const const_elem_iterator end_pos (this->_mesh.const_elements_end());
-
 	    MeshBase::const_element_iterator       pos     = this->_mesh.elements_begin();
 	    const MeshBase::const_element_iterator end_pos = this->_mesh.elements_end();
 
@@ -187,8 +184,8 @@ const Elem* PointLocatorTree::operator() (const Point& p) const
 		      << " ******** Serious Problem.  Could not find an Element "
 		      << "in the Mesh" 
 		      << std:: endl
-		      << " ******** that contains the Point ";
-	    p.print();
+		      << " ******** that contains the Point "
+		      << p;
 	    error();
 	  }
     }

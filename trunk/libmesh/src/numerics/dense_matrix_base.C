@@ -1,4 +1,4 @@
-// $Id: dense_matrix_base.C,v 1.8 2005-02-22 22:17:41 jwpeterson Exp $
+// $Id: dense_matrix_base.C,v 1.9 2005-05-24 13:35:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -17,6 +17,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+// C++ includes
+#include <iomanip> // for std::setw()
 
 // Local Includes
 #include "dense_matrix_base.h"
@@ -79,6 +81,62 @@ void DenseMatrixBase<T>::condense(const unsigned int iv,
 }
 
 
+template<typename T>
+void DenseMatrixBase<T>::print_scientific (std::ostream& os) const
+{
+#ifndef BROKEN_IOSTREAM
+  
+  // save the initial format flags
+  std::ios_base::fmtflags os_flags = os.flags();
+  
+  // Print the matrix entries.
+  for (unsigned int i=0; i<this->m(); i++)
+    {
+      for (unsigned int j=0; j<this->n(); j++)
+	os << std::setw(15)
+	   << std::scientific
+	   << std::setprecision(8)
+	   << this->el(i,j) << " ";
+
+      os << std::endl;
+    }
+  
+  // reset the original format flags
+  os.flags(os_flags);
+
+#else
+  
+  // Print the matrix entries.
+  for (unsigned int i=0; i<this->m(); i++)
+    {
+      for (unsigned int j=0; j<this->n(); j++)	
+	os << std::setprecision(8)
+	   << this->el(i,j)
+	   << " ";
+      
+      os << std::endl;
+    }
+  
+  
+#endif
+}
+
+
+
+template<typename T>
+void DenseMatrixBase<T>::print (std::ostream& os) const
+{  
+  for (unsigned int i=0; i<this->m(); i++)
+    {
+      for (unsigned int j=0; j<this->n(); j++)
+	os << std::setw(8)
+	   << this->el(i,j) << " ";
+
+      os << std::endl;
+    }
+
+  return;
+}
 
 
 

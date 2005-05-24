@@ -1,4 +1,4 @@
-// $Id: variant_filter_iterator.h,v 1.9 2005-03-22 22:01:46 jwpeterson Exp $
+// $Id: variant_filter_iterator.h,v 1.10 2005-05-24 13:35:38 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -23,7 +23,6 @@
 
 
 #include <iterator>
-#include <iostream>
 #include <algorithm> // for std::swap
 #include <cstdlib>   // for std::abort()
 #include <assert.h>
@@ -207,7 +206,7 @@ public:
       // Check for failed cast
       if (p == NULL)
 	{
-	  std::cerr << "Dynamic cast failed in Iter::equal(...)" << std::endl;
+	  // std::cerr << "Dynamic cast failed in Iter::equal(...)" << std::endl;
 	  abort();
 	}
       
@@ -300,8 +299,8 @@ public:
       // Check for failure
       if ( p == NULL )
 	{
-	  std::cerr << "Dynamic cast failed in Pred::op()" << std::endl;
-	  std::cerr << "typeid(IterType).name()=" << typeid(IterType).name() << std::endl;
+	  // std::cerr << "Dynamic cast failed in Pred::op()" << std::endl;
+	  // std::cerr << "typeid(IterType).name()=" << typeid(IterType).name() << std::endl;
 	  abort();
 	}
       
@@ -378,22 +377,6 @@ public:
     end  (rhs.end  != NULL ? rhs.end->clone()  : NULL),
     pred (rhs.pred != NULL ? rhs.pred->clone() : NULL) {}
 
-//   /**
-//    * Copy construct from another (similar) variant_filter_iterator
-//    * Predicate and Type are the same, but the ReferenceType and
-//    * PointerType are different.  Note that OtherReferenceType and
-//    * OtherPointerType are simply intended to be const versions of
-//    * ReferenceType and PointerType.  This function is implemented in
-//    * terms of the const_clone() member functions of the private data.
-//    */
-//   template <class OtherReferenceType, class OtherPointerType>
-//   variant_filter_iterator (const variant_filter_iterator<Predicate, Type, OtherReferenceType, OtherPointerType>& rhs)
-//     : data (rhs.data != NULL ? rhs.data->const_clone() : NULL),
-//       end  (rhs.end  != NULL ? rhs.end->const_clone()  : NULL),
-//       pred (rhs.pred != NULL ? rhs.pred->const_clone() : NULL)
-//   {
-//     // std::cout << "Called templated copy constructor for variant_filter_iterator" << std::endl;
-//   }
 
 
   /**
