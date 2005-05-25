@@ -1,4 +1,4 @@
-// $Id: patch_recovery_error_estimator.C,v 1.8 2005-02-22 22:17:42 jwpeterson Exp $
+// $Id: patch_recovery_error_estimator.C,v 1.9 2005-05-25 16:05:14 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -283,6 +283,7 @@ void PatchRecoveryErrorEstimator::build_patch_from_local_neighbors (const Elem* 
 		  
 		else                              // ... the neighbor is *not* active,
 		  {                               // ... so add *all* its active, local children to the patch
+#ifdef ENABLE_AMR
 		    std::vector<const Elem*> active_children;
 
 		    neighbor->active_family_tree (active_children);
@@ -290,6 +291,9 @@ void PatchRecoveryErrorEstimator::build_patch_from_local_neighbors (const Elem* 
 		    for (unsigned int c=0; c<active_children.size(); c++)
 		      if (active_children[c]->processor_id() == libMesh::processor_id())
 			patch.insert (active_children[c]);
+#else
+		    error();
+#endif
 		  }
 	      }
 	}
