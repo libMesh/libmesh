@@ -1,4 +1,4 @@
-// $Id: mesh_communication.C,v 1.17 2005-05-17 18:38:28 benkirk Exp $
+// $Id: mesh_communication.C,v 1.18 2005-05-25 16:22:15 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -210,13 +210,17 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
   // Now build up the elements vector which
   // contains the element types and connectivity
   {
+    // The conn array contains the information needed to construct each element.
+    // Pack all this information into one communication to avoid two latency hits
+    // For each element it is of the form
+    // [ etype subdomain_id node_0 node_1 ... node_n ]
     std::vector<unsigned int> conn;
 
     // If we are processor 0, we must populate this vector and
     // broadcast it to the other processors.
     if (libMesh::processor_id() == 0)
       {
-	conn.reserve (n_elem + total_weight);
+	conn.reserve (2*n_elem + total_weight);
 
 	MeshBase::element_iterator       it     = mesh.elements_begin();
 	const MeshBase::element_iterator it_end = mesh.elements_end();
@@ -228,16 +232,17 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 	    assert (elem != NULL);
 	    
 	    conn.push_back (static_cast<unsigned int>(elem->type()));
+	    conn.push_back (static_cast<unsigned int>(elem->subdomain_id()));
 	    
 	    for (unsigned int n=0; n<elem->n_nodes(); n++)
 	      conn.push_back (elem->node(n));
 	  }
       }
     else
-      conn.resize (n_elem + total_weight);
+      conn.resize (2*n_elem + total_weight);
     
     // Sanity check for all processors
-    assert (conn.size() == (n_elem + total_weight));
+    assert (conn.size() == (2*n_elem + total_weight));
     
     // Broadcast the element connectivity
     MPI_Bcast (&conn[0], conn.size(), MPI_UNSIGNED, 0, libMesh::COMM_WORLD);
@@ -252,9 +257,14 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 
 	while (cnt < conn.size())
 	  {
+	    // Build the element
 	    Elem* elem = 
 	      mesh.add_elem (Elem::build(static_cast<ElemType>(conn[cnt++])).release());
 
+	    // Set the subdomain id
+	    elem->subdomain_id() = static_cast<unsigned char>(conn[cnt++]);
+
+	    // Assign the connectivity
 	    for (unsigned int n=0; n<elem->n_nodes(); n++)
 	      {
 		assert (cnt < conn.size());
@@ -266,6 +276,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
     
     assert (mesh.n_elem() == n_elem);
   } // Done distributing the elements
+
 
   STOP_LOG("broadcast_mesh()","MeshCommunication");
   
@@ -301,7 +312,7 @@ void MeshCommunication::broadcast_bcs (MeshBase&,
   // but processor 0.
   if (libMesh::processor_id() != 0)
     boundary_info.clear();
-  
+
   // Build up the list of elements with boundary conditions
   {
     std::vector<unsigned int>       el_id;
