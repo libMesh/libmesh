@@ -1,4 +1,4 @@
-// "$Id: xdr_cxx.C,v 1.22 2005-02-22 22:17:43 jwpeterson Exp $\n"
+// "$Id: xdr_cxx.C,v 1.23 2005-05-25 16:22:16 benkirk Exp $\n"
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -532,11 +532,12 @@ void Xdr::data (std::complex<double>& a, const char* comment)
 #ifdef HAVE_XDR
 
 	assert (is_open());
-	double buf;
-	buf = a.real();
-	xdr_double(xdrs, &buf);
-	buf = a.imag();
-	xdr_double(xdrs, &buf);
+	double
+	  _r=a.real(),
+	  _i=a.imag();
+	xdr_double(xdrs, &_r);
+	xdr_double(xdrs, &_i);
+	a = std::complex<double>(_r,_i);
 
 #else
 	
@@ -558,7 +559,7 @@ void Xdr::data (std::complex<double>& a, const char* comment)
 	
 	double _r, _i;
 	in >> _r;
-	in  >> _i;
+	in >> _i;
 	a = std::complex<double>(_r,_i);
         in.getline(comm, comm_len);
 
