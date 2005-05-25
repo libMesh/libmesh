@@ -1,4 +1,4 @@
-// $Id: kelly_error_estimator.C,v 1.10 2005-05-18 17:48:47 roystgnr Exp $
+// $Id: kelly_error_estimator.C,v 1.11 2005-05-25 17:54:24 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -40,7 +40,7 @@
 void KellyErrorEstimator::estimate_error (const System& system,
 					  std::vector<float>& error_per_cell)
 {
-  START_LOG("flux_jump()", "KellyErrorEstimator");
+  //  START_LOG("flux_jumps()", "KellyErrorEstimator");
   
   /*
 
@@ -189,17 +189,25 @@ void KellyErrorEstimator::estimate_error (const System& system,
 		    {		    
 		      // Update the shape functions on side s_e of
 		      // element e
+		      START_LOG("fe_e->reinit()", "KellyErrorEstimator");
 		      fe_e->reinit (e, n_e);
-
+		      STOP_LOG("fe_e->reinit()", "KellyErrorEstimator");
+		      
 		      // Build the side
+		      START_LOG("construct side", "KellyErrorEstimator");
 		      AutoPtr<Elem> side (e->side(n_e));
-
+		      STOP_LOG("construct side", "KellyErrorEstimator");
+		      
 		      // Get the maximum h for this side
+		      START_LOG("side->hmax()", "KellyErrorEstimator");
 		      const Real h = side->hmax();
-		    
+		      STOP_LOG("side->hmax()", "KellyErrorEstimator");
+		      
 		      // Get the DOF indices for the two elements
+		      START_LOG("dof_indices()", "KellyErrorEstimator");
 		      dof_map.dof_indices (e, dof_indices_e, var);
 		      dof_map.dof_indices (f, dof_indices_f, var);
+		      STOP_LOG("dof_indices()", "KellyErrorEstimator");
 
 		      // The number of DOFS on each element
 		      const unsigned int n_dofs_e = dof_indices_e.size();
@@ -210,17 +218,21 @@ void KellyErrorEstimator::estimate_error (const System& system,
 
 		      // Find the location of the quadrature points
 		      // on element f
+		      START_LOG("inverse_map()", "KellyErrorEstimator");
 		      FEInterface::inverse_map (dim, fe_type, f, qface_point, qp_f);
-
+		      STOP_LOG("inverse_map()", "KellyErrorEstimator");
+		      
 		      // Compute the shape functions on element f
 		      // at the quadrature points of element e
+		      START_LOG("fe_f->reinit()", "KellyErrorEstimator");
 		      fe_f->reinit (f, &qp_f);
-
+		      STOP_LOG("fe_f->reinit()", "KellyErrorEstimator");
+		      
 		      // The error contribution from this face
 		      Real error = 1.e-30;
 
 		    
-		    
+		      START_LOG("jump integral", "KellyErrorEstimator");
 		      // loop over the integration points on the face
 		      for (unsigned int qp=0; qp<n_qp; qp++)
 			{
@@ -256,7 +268,8 @@ void KellyErrorEstimator::estimate_error (const System& system,
 			  error += JxW_face[qp]*h*jump2;			
 			
 			} // End quadrature point loop
-
+		      STOP_LOG("jump integral", "KellyErrorEstimator");
+		      
 		      // Add the error contribution to elements e & f
                       assert(e_id < error_per_cell.size());
                       assert(f_id < error_per_cell.size());
@@ -277,6 +290,7 @@ void KellyErrorEstimator::estimate_error (const System& system,
 		{
 		  if (this->_bc_function != NULL)
 		    {
+		      START_LOG("boundary integrals", "KellyErrorEstimator");
 		      // here();
 		  
 		      // Update the shape functions on side s_e of element e
@@ -359,6 +373,8 @@ void KellyErrorEstimator::estimate_error (const System& system,
 			  error_per_cell[e_id] += error;
 			  
 			} // end if side on flux boundary
+		      
+		      STOP_LOG("boundary integrals", "KellyErrorEstimator");
 		    } // end if _bc_function != NULL
 		} // end if (e->neighbor(n_e) == NULL)
 	    } // end loop over neighbors
@@ -378,11 +394,13 @@ void KellyErrorEstimator::estimate_error (const System& system,
   this->reduce_error(error_per_cell);
 
   // Compute the square-root of each component.
+  START_LOG("std::sqrt()", "KellyErrorEstimator");
   for (unsigned int i=0; i<error_per_cell.size(); i++)
     if (error_per_cell[i] != 0.)
       error_per_cell[i] = std::sqrt(error_per_cell[i]);
+  STOP_LOG("std::sqrt()", "KellyErrorEstimator");
   
-  STOP_LOG("flux_jump()", "KellyErrorEstimator");
+  //  STOP_LOG("flux_jumps()", "KellyErrorEstimator");
 }
 
 
