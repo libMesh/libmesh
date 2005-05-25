@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.21 2005-05-13 20:11:44 roystgnr Exp $
+// $Id: elem.h,v 1.22 2005-05-25 16:19:53 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1220,26 +1220,6 @@ unsigned int Elem::compute_key (unsigned int n0,
   
   return (n0%bp + (n1<<5)%bp + (n2<<10)%bp + (n3<<15)%bp);
 }
-				
-
-
-
-/**
- * The definition of the struct used for iterating over sides.
- */
-struct
-Elem::side_iterator :
-variant_filter_iterator<Elem::Predicate,
-			Elem*>
-{
-  // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
-  template <typename PredType, typename IterType>
-  side_iterator (const IterType& d,
-		 const IterType& e,
-		 const PredType& p ) :
-    variant_filter_iterator<Elem::Predicate,
-			    Elem*>(d,e,p) {}
-};
 
 
 
@@ -1370,6 +1350,26 @@ Elem::SideIter Elem::_last_side()
 {
   return SideIter(this->n_neighbors(), this);
 }
+				
+
+
+
+/**
+ * The definition of the struct used for iterating over sides.
+ */
+struct
+Elem::side_iterator :
+variant_filter_iterator<Elem::Predicate,
+			Elem*>
+{
+  // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
+  template <typename PredType, typename IterType>
+  side_iterator (const IterType& d,
+		 const IterType& e,
+		 const PredType& p ) :
+    variant_filter_iterator<Elem::Predicate,
+			    Elem*>(d,e,p) {}
+};
 
 
 
