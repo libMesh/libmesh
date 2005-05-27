@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.75 2005-05-19 20:50:07 benkirk Exp $
+// $Id: dof_map.C,v 1.76 2005-05-27 21:29:18 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -920,11 +920,12 @@ void DofMap::dof_indices (const Elem* const elem,
   
   // Clear the DOF indices vector
   di.clear();
-
+  
 #ifdef DEBUG
   // Check that sizes match in DEBUG mode
   unsigned int tot_size = 0;
 #endif
+
   
   // Get the dof numbers
   for (unsigned int v=0; v<n_vars; v++)
@@ -971,6 +972,7 @@ void DofMap::dof_indices (const Elem* const elem,
 	      {
 		assert(!elem->active());
 		di.resize(di.size() + nc, DofObject::invalid_id);
+		here();
 	      }
 	    else
 	      for (unsigned int i=dof_offset; i<nc+dof_offset; i++)
@@ -990,22 +992,23 @@ void DofMap::dof_indices (const Elem* const elem,
 	// We should never have fewer dofs than necessary on an
 	// element unless we're getting indices on a parent element,
 	// and we should never need those indices
-	if (elem->n_systems() > sys_num &&
-	    nc == elem->n_comp(sys_num,v))
-	  {
-	    for (unsigned int i=0; i<nc; i++)
-	      {
-	        assert (elem->dof_number(sys_num,v,i) !=
-		        DofObject::invalid_id);
-
-	        di.push_back(elem->dof_number(sys_num,v,i));
-	      }
-	  }
-	else
-	  {
-	    assert(!elem->active() || fe_type.family == LAGRANGE);
-	    di.resize(di.size() + nc, DofObject::invalid_id);
-	  }
+	if (nc != 0)	  
+	  if (elem->n_systems() > sys_num &&
+	      nc == elem->n_comp(sys_num,v))
+	    {
+	      for (unsigned int i=0; i<nc; i++)
+		{
+		  assert (elem->dof_number(sys_num,v,i) !=
+			  DofObject::invalid_id);
+		  
+		  di.push_back(elem->dof_number(sys_num,v,i));
+		}
+	    }
+	  else
+	    {
+	      assert(!elem->active() || fe_type.family == LAGRANGE);
+	      di.resize(di.size() + nc, DofObject::invalid_id);
+	    }
       }
 
 #ifdef DEBUG
@@ -1108,24 +1111,25 @@ void DofMap::old_dof_indices (const Elem* const elem,
 	// We should never have fewer dofs than necessary on an
 	// element unless we're getting indices on a parent element,
 	// and we should never need those indices
-	if (elem->old_dof_object->n_systems() > sys_num &&
-	    nc == elem->old_dof_object->n_comp(sys_num,v))
-	  {
-	    assert (elem->old_dof_object != NULL);
-	  
-	    for (unsigned int i=0; i<nc; i++)
-	      {
-	        assert (elem->old_dof_object->dof_number(sys_num,v,i) !=
-		        DofObject::invalid_id);
+	if (nc != 0)
+	  if (elem->old_dof_object->n_systems() > sys_num &&
+	      nc == elem->old_dof_object->n_comp(sys_num,v))
+	    {
+	      assert (elem->old_dof_object != NULL);
 	      
-	        di.push_back(elem->old_dof_object->dof_number(sys_num,v,i));
-	      }
-	  }
-	else
-	  {
-	    assert(!elem->active() || fe_type.family == LAGRANGE);
-	    di.resize(di.size() + nc, DofObject::invalid_id);
-	  }
+	      for (unsigned int i=0; i<nc; i++)
+		{
+		  assert (elem->old_dof_object->dof_number(sys_num,v,i) !=
+			  DofObject::invalid_id);
+		  
+		  di.push_back(elem->old_dof_object->dof_number(sys_num,v,i));
+		}
+	    }
+	  else
+	    {
+	      assert(!elem->active() || fe_type.family == LAGRANGE);
+	      di.resize(di.size() + nc, DofObject::invalid_id);
+	    }
       }
 
 #ifdef DEBUG
