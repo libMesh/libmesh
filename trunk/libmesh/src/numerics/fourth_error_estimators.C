@@ -1,4 +1,4 @@
-// $Id: fourth_error_estimators.C,v 1.1 2005-05-27 14:45:39 roystgnr Exp $
+// $Id: fourth_error_estimators.C,v 1.2 2005-05-27 17:21:25 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -37,8 +37,20 @@
 
 //-----------------------------------------------------------------
 // ErrorEstimator implementations
+#ifndef ENABLE_SECOND_DERIVATIVES
+
+void LaplacianErrorEstimator::estimate_error (const System&,
+					      std::vector<float>&)
+{
+  std::cerr << "ERROR:  This functionalitry requires second-derivative support!"
+	    << std::endl;
+  error();
+}
+
+#else // defined (ENABLE_SECOND_DERIVATIVES)
+
 void LaplacianErrorEstimator::estimate_error (const System& system,
-					   std::vector<float>& error_per_cell)
+					      std::vector<float>& error_per_cell)
 {
   START_LOG("laplacian_jump()", "LaplacianErrorEstimator");
   
@@ -292,3 +304,5 @@ void LaplacianErrorEstimator::estimate_error (const System& system,
   
   STOP_LOG("laplacian_jump()", "LaplacianErrorEstimator");
 }
+
+#endif // defined (ENABLE_SECOND_DERIVATIVES)
