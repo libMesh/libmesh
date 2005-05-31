@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.76 2005-05-27 21:29:18 benkirk Exp $
+// $Id: dof_map.C,v 1.77 2005-05-31 15:49:48 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -31,7 +31,6 @@
 #include "sparse_matrix.h"
 #include "libmesh.h"
 #include "libmesh_logging.h"
-
 
 
 
@@ -692,7 +691,7 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
   // we use an if-test.
   if (_dof_coupling.empty())
     {
-      std::vector<unsigned int> element_dofs;
+      std::vector<unsigned int> element_dofs, dofs_to_add;
       std::vector<unsigned int> neighbor_dofs;
 
       MeshBase::const_element_iterator       elem_it  = mesh.active_elements_begin();
@@ -701,11 +700,16 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
       for ( ; elem_it != elem_end; ++elem_it)
 	{
 	  const Elem* const elem = *elem_it;
-	  
+
+	  // Get the global indices of the DOFs with support on this element
 	  this->dof_indices (elem, element_dofs);
 	  this->find_connected_dofs (element_dofs);
-	    
+	  
 	  const unsigned int n_dofs_on_element = element_dofs.size();
+
+	  // We can be more efficient if we sort the element DOFs
+	  // into increasing order
+	  std::sort(element_dofs.begin(), element_dofs.end());
 	    
 	  for (unsigned int i=0; i<n_dofs_on_element; i++)
 	    {
@@ -725,6 +729,16 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
 		  
 		  std::vector<unsigned int>& row =
 		    sparsity_pattern[ig - first_dof_on_proc];
+
+		  // Cache iterators.  Low will move forward, subsequent
+		  // searches will be on smaller ranges
+		  std::vector<unsigned int>::iterator
+		    low  = std::lower_bound (row.begin(), row.end(), element_dofs.front()),
+		    high = std::upper_bound (low,         row.end(), element_dofs.back());
+
+		  // Build a list of the DOF indices not found in the
+		  // sparsity pattern
+		  dofs_to_add.clear();
 		  
  		  for (unsigned int j=0; j<n_dofs_on_element; j++)
 		    {
@@ -733,14 +747,30 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
 		      // See if jg is in the sorted range
 		      std::pair<std::vector<unsigned int>::iterator,
 			        std::vector<unsigned int>::iterator>
-			pos = std::equal_range (row.begin(), row.end(), jg);
+			pos = std::equal_range (low, high, jg);
 
-		      // Insert jg if it wasn't found
+		      // Must add jg if it wasn't found
 		      if (pos.first == pos.second)
-			row.insert (pos.first, jg);
+			dofs_to_add.push_back(jg);
+
+		      // pos.first is now a valid lower bound for any
+		      // remaining element DOFs. (That's why we sorted them.)
+		      // Use it for the next search
+		      low = pos.first;
+		    }
+
+		  if (!dofs_to_add.empty())
+		    {
+		      const unsigned int old_size = row.size();
+		      
+ 		      row.insert (row.end(),
+ 				  dofs_to_add.begin(),
+ 				  dofs_to_add.end());
+		      
+		      //std::inplace_merge (row.begin(), row.begin()+old_size, row.end());
+		      this->sort_sparsity_row (row.begin(), row.begin()+old_size, row.end());
 		    }
 		  
-
 		  // Now (possibly) add dofs from neighboring elements
 		  if (implicit_neighbor_dofs)
 		    for (unsigned int s=0; s<elem->n_sides(); s++)
@@ -752,7 +782,7 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
 			  this->find_connected_dofs (neighbor_dofs);
 			  
 			  const unsigned int n_dofs_on_neighbor = neighbor_dofs.size();
-			  
+			  // TODO:[BSK] optimize this like above!
 			  for (unsigned int j=0; j<n_dofs_on_neighbor; j++)
 			    {
 			      const unsigned int jg = neighbor_dofs[j];
@@ -821,6 +851,7 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
 		  const unsigned int n_dofs_on_element_j =
 		    element_dofs_j.size();
 		  
+		  // TODO:[BSK] optimize this like above!
 		  for (unsigned int i=0; i<n_dofs_on_element_i; i++)
 		    {
 		      const unsigned int ig = element_dofs_i[i];
