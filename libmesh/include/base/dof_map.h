@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.10 2005-03-17 22:46:19 spetersen Exp $
+// $Id: dof_map.h,v 1.11 2005-05-31 15:49:47 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -26,6 +26,8 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <algorithm>
+#include <iterator>
 
 // Local Includes -----------------------------------
 #include "libmesh_common.h"
@@ -356,6 +358,20 @@ private:
   void distribute_dofs_node_major (MeshBase&);
 
   /**
+   * Splices the two sorted ranges [begin,middle) and [middle,end)
+   * into one sorted range [begin,end).  This method is much like
+   * std::inplace_merge except it assumes the intersection
+   * of the two sorted ranges is empty and that any element in
+   * each range occurs only once in that range.  Additionally,
+   * this sort occurs in-place, while std::inplace_merge may
+   * use a temporary buffer.
+   */ 
+  template<typename BidirectionalIterator>
+  void sort_sparsity_row (const BidirectionalIterator begin,
+			  BidirectionalIterator       middle,
+			  const BidirectionalIterator end);
+    
+  /**
    * Takes the \p _send_list vector (which may have duplicate entries)
    * and sorts it.  The duplicate entries are then removed, resulting in
    * a sorted \p _send_list with unique entries.
@@ -397,11 +413,6 @@ private:
    * The number of the system we manage DOFs for.
    */
   const unsigned int _sys_number;
-  
-//   /**
-//    * Pointer to the matrix used with this object.
-//    */
-//   SparseMatrix<Number>* _matrix;
   
   /**
    * Additional matrices handled by this object.  These pointers do @e 
@@ -496,6 +507,57 @@ unsigned int DofMap::sys_number() const
   return _sys_number;
 }
 
+
+
+template<typename BidirectionalIterator>
+inline
+void DofMap::sort_sparsity_row (const BidirectionalIterator begin,
+				BidirectionalIterator       middle,
+				const BidirectionalIterator end)
+{
+  if ((begin == middle) || (middle == end)) return;
+
+  assert (std::distance (begin,  middle) > 0);
+  assert (std::distance (middle, end)    > 0);
+  assert (std::unique (begin,  middle) == middle);
+  assert (std::unique (middle, end)    == end);
+  
+  while (middle != end)
+    {
+      BidirectionalIterator
+	b = middle,
+	a = b-1;
+
+      // Bubble-sort the middle value downward
+      while (!(*a < *b)) // *a & *b are less-than comparable, so use <
+	{
+	  std::swap (*a, *b);
+
+	  if (a == begin) break;
+	  
+	  b=a;
+	  --a;
+	}
+      
+      ++middle;
+    }
+
+  // Assure the algorithm worked if we are in DEBUG mode
+#ifdef DEBUG
+  {
+    // SGI STL extension!
+    // assert (std::is_sorted(begin,end));
+    
+    BidirectionalIterator
+      prev  = begin,
+      first = begin;
+
+    for (++first; first != end; prev=first, ++first)
+      if (*first < *prev)
+	assert(false);
+  }  
+#endif
+}
 
 
 #endif
