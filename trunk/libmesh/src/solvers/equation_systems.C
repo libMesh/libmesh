@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.24 2005-05-20 14:58:11 roystgnr Exp $
+// $Id: equation_systems.C,v 1.25 2005-05-31 20:22:02 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -118,7 +118,8 @@ void EquationSystems::reinit ()
 
   assert (n_sys != 0);
   
-  // Tell all the \p DofObject entities how many systems
+#ifdef DEBUG
+  // Make sure all the \p DofObject entities know how many systems
   // there are.
   {
     // All the nodes
@@ -126,15 +127,16 @@ void EquationSystems::reinit ()
     const MeshBase::node_iterator node_end = _mesh.nodes_end();
 
     for ( ; node_it != node_end; ++node_it)
-      (*node_it)->set_n_systems(n_sys);
+      assert((*node_it)->n_systems() == n_sys);
     
     // All the elements
     MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
     const MeshBase::element_iterator elem_end = _mesh.elements_end();
     
     for ( ; elem_it != elem_end; ++elem_it)
-      (*elem_it)->set_n_systems(n_sys);
+      assert((*elem_it)->n_systems() == n_sys);
   }
+#endif
 
   bool mesh_changed = false;
   system_iterator       pos = _systems.begin();

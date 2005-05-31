@@ -1,4 +1,4 @@
-// $Id: elem_refinement.C,v 1.15 2005-05-04 19:26:23 roystgnr Exp $
+// $Id: elem_refinement.C,v 1.16 2005-05-31 20:22:06 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -146,10 +146,13 @@ void Elem::refine (MeshRefinement& mesh_refinement)
 		  this->child(c)->set_node(nc) =
 		    mesh_refinement.add_point(p[c][nc],
 					      keys[c][nc]);
+		  this->child(c)->get_node(nc)->set_n_systems
+                    (this->n_systems());
 	        }
 	    }
       
 	  mesh_refinement.add_elem (this->child(c));
+          this->child(c)->set_n_systems(this->n_systems());
         }
     }
   else
