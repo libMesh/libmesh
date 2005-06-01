@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.78 2005-05-31 17:49:28 benkirk Exp $
+// $Id: dof_map.C,v 1.79 2005-06-01 15:38:39 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -732,46 +732,55 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
 		  std::vector<unsigned int>& row =
 		    sparsity_pattern[ig - first_dof_on_proc];
 
-		  // Build a list of the DOF indices not found in the
-		  // sparsity pattern
-		  dofs_to_add.clear();
-
-		  // Cache iterators.  Low will move forward, subsequent
-		  // searches will be on smaller ranges
-		  std::vector<unsigned int>::iterator
-		    low  = std::lower_bound (row.begin(), row.end(), element_dofs.front()),
-		    high = std::upper_bound (low,         row.end(), element_dofs.back());
-		  
- 		  for (unsigned int j=0; j<n_dofs_on_element; j++)
+		  // If the row is empty we will add *all* the element DOFs,
+		  // so just do that.
+		  if (row.empty())
 		    {
-		      const unsigned int jg = element_dofs[j];
-
-		      // See if jg is in the sorted range
-		      std::pair<std::vector<unsigned int>::iterator,
-			        std::vector<unsigned int>::iterator>
-			pos = std::equal_range (low, high, jg);
-
-		      // Must add jg if it wasn't found
-		      if (pos.first == pos.second)
-			dofs_to_add.push_back(jg);
-
-		      // pos.first is now a valid lower bound for any
-		      // remaining element DOFs. (That's why we sorted them.)
-		      // Use it for the next search
-		      low = pos.first;
+		      row = element_dofs;
 		    }
+		  else
+		    {		  
+		      // Build a list of the DOF indices not found in the
+		      // sparsity pattern
+		      dofs_to_add.clear();
 
-		  // Add to the sparsity pattern
-		  if (!dofs_to_add.empty())
-		    {
-		      const unsigned int old_size = row.size();
+		      // Cache iterators.  Low will move forward, subsequent
+		      // searches will be on smaller ranges
+		      std::vector<unsigned int>::iterator
+			low  = std::lower_bound (row.begin(), row.end(), element_dofs.front()),
+			high = std::upper_bound (low,         row.end(), element_dofs.back());
+		  
+		      for (unsigned int j=0; j<n_dofs_on_element; j++)
+			{
+			  const unsigned int jg = element_dofs[j];
+			  
+			  // See if jg is in the sorted range
+			  std::pair<std::vector<unsigned int>::iterator,
+			            std::vector<unsigned int>::iterator>
+			    pos = std::equal_range (low, high, jg);
+			
+			  // Must add jg if it wasn't found
+			  if (pos.first == pos.second)
+			    dofs_to_add.push_back(jg);
+			
+			  // pos.first is now a valid lower bound for any
+			  // remaining element DOFs. (That's why we sorted them.)
+			  // Use it for the next search
+			  low = pos.first;
+			}
+
+		      // Add to the sparsity pattern
+		      if (!dofs_to_add.empty())
+			{
+			  const unsigned int old_size = row.size();
+			  
+			  row.insert (row.end(),
+				      dofs_to_add.begin(),
+				      dofs_to_add.end());
 		      
- 		      row.insert (row.end(),
- 				  dofs_to_add.begin(),
- 				  dofs_to_add.end());
-		      
-		      //std::inplace_merge (row.begin(), row.begin()+old_size, row.end());
-		      this->sort_sparsity_row (row.begin(), row.begin()+old_size, row.end());
+			  //std::inplace_merge (row.begin(), row.begin()+old_size, row.end());
+			  this->sort_sparsity_row (row.begin(), row.begin()+old_size, row.end());
+			}
 		    }
 		  
 		  // Now (possibly) add dofs from neighboring elements
@@ -877,45 +886,54 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
 			  std::vector<unsigned int>& row =
 			    sparsity_pattern[ig - first_dof_on_proc];
 
-			  // Build a list of the DOF indices not found in the
-			  // sparsity pattern
-			  dofs_to_add.clear();
-
-			  // Cache iterators.  Low will move forward, subsequent
-			  // searches will be on smaller ranges
-			  std::vector<unsigned int>::iterator
-			    low  = std::lower_bound (row.begin(), row.end(), element_dofs_j.front()),
-			    high = std::upper_bound (low,         row.end(), element_dofs_j.back());
-			 			  
-			  for (unsigned int j=0; j<n_dofs_on_element_j; j++)
+			  // If the row is empty we will add *all* the element j DOFs,
+			  // so just do that.
+			  if (row.empty())
 			    {
-			      const unsigned int jg = element_dofs_j[j];
-
-			      // See if jg is in the sorted range
-			      std::pair<std::vector<unsigned int>::iterator,
-			                std::vector<unsigned int>::iterator>
-				pos = std::equal_range (low, high, jg);
-			      
-			      // Must add jg if it wasn't found
-			      if (pos.first == pos.second)
-				dofs_to_add.push_back(jg);
-
-			      // pos.first is now a valid lower bound for any
-			      // remaining element j DOFs. (That's why we sorted them.)
-			      // Use it for the next search
-			      low = pos.first;
+			      row = element_dofs_j;
 			    }
+			  else
+			    {		  
+			      // Build a list of the DOF indices not found in the
+			      // sparsity pattern
+			      dofs_to_add.clear();
 
-			  // Add to the sparsity pattern
-			  if (!dofs_to_add.empty())
-			    {
-			      const unsigned int old_size = row.size();
+			      // Cache iterators.  Low will move forward, subsequent
+			      // searches will be on smaller ranges
+			      std::vector<unsigned int>::iterator
+				low  = std::lower_bound (row.begin(), row.end(), element_dofs_j.front()),
+				high = std::upper_bound (low,         row.end(), element_dofs_j.back());
+
+			      for (unsigned int j=0; j<n_dofs_on_element_j; j++)
+				{
+				  const unsigned int jg = element_dofs_j[j];
+				  
+				  // See if jg is in the sorted range
+				  std::pair<std::vector<unsigned int>::iterator,
+				            std::vector<unsigned int>::iterator>
+				    pos = std::equal_range (low, high, jg);
 			      
-			      row.insert (row.end(),
-					  dofs_to_add.begin(),
-					  dofs_to_add.end());
+				  // Must add jg if it wasn't found
+				  if (pos.first == pos.second)
+				    dofs_to_add.push_back(jg);
+				
+				  // pos.first is now a valid lower bound for any
+				  // remaining element j DOFs. (That's why we sorted them.)
+				  // Use it for the next search
+				  low = pos.first;
+				}
+			      
+			      // Add to the sparsity pattern
+			      if (!dofs_to_add.empty())
+				{
+				  const unsigned int old_size = row.size();
+				  
+				  row.insert (row.end(),
+					      dofs_to_add.begin(),
+					      dofs_to_add.end());
 		      
-			      this->sort_sparsity_row (row.begin(), row.begin()+old_size, row.end());
+				  this->sort_sparsity_row (row.begin(), row.begin()+old_size, row.end());
+				}
 			    }
 			}
 		    }
