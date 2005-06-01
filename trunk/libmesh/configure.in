@@ -1,5 +1,5 @@
 dnl --------------------------------------------------------------
-dnl $Id: configure.in,v 1.58 2005-05-12 21:19:46 jwpeterson Exp $
+dnl $Id: configure.in,v 1.59 2005-06-01 21:43:38 benkirk Exp $
 dnl --------------------------------------------------------------
 dnl Process this file with autoconf to produce a configure script.
 
@@ -9,7 +9,7 @@ dnl you call ./configure subsequently on different systems without
 dnl clearing the cache 
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
-AC_REVISION($Revision: 1.58 $)
+AC_REVISION($Revision: 1.59 $)
 
 
 AC_INIT
@@ -69,14 +69,12 @@ dnl This command also causes AC_OUTPUT to replace all instances of @VAR@ with
 dnl the value of the shell variable VAR in the output files (e.g. one or more Makefiles).
 AC_SUBST(host)
 AC_SUBST(GXX_VERSION)
-AC_SUBST(CXXFLAGSG)
-AC_SUBST(CXXFLAGSO)
-AC_SUBST(CXXFLAGSP)
-AC_SUBST(CXXFLAGSS)
-AC_SUBST(CFLAGSG)
-AC_SUBST(CFLAGSO)
-AC_SUBST(CFLAGSP)
-AC_SUBST(CFLAGSS)
+AC_SUBST(CXXFLAGS_OPT)
+AC_SUBST(CXXFLAGS_DBG)
+AC_SUBST(CXXFLAGS_DVL)
+AC_SUBST(CFLAGS_OPT)
+AC_SUBST(CFLAGS_DBG)
+AC_SUBST(CFLAGS_DVL)
 AC_SUBST(LDFLAGS)
 AC_SUBST(CXXDEPFLAG)
 AC_SUBST(CXXSHAREDFLAG)

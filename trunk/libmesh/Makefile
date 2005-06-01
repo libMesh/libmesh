@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.49 2005-05-24 12:54:56 jwpeterson Exp $
+# $Id: Makefile,v 1.50 2005-06-01 21:43:38 benkirk Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -61,14 +61,14 @@ endif
 # static library
 #
 ifeq ($(findstring darwin,$(hostos)),darwin)
-$(mesh_library_dir)/libmesh.a: $(objects)
+$(mesh_library_dir)/libmesh$(static_libext): $(objects)
 	@$(shell mkdir -p $(mesh_library_dir))
 	@echo "Linking "$@
 	@libtool -static -o $(mesh_library) $(objects)
 	@$(MAKE) -C contrib
 
 else
-$(mesh_library_dir)/libmesh.a: $(objects)
+$(mesh_library_dir)/libmesh$(static_libext): $(objects)
 	@$(shell mkdir -p $(mesh_library_dir))
 	@echo "Linking "$@
 	@$(AR) rv $(mesh_library) $(objects)
@@ -76,7 +76,7 @@ $(mesh_library_dir)/libmesh.a: $(objects)
 endif
 # shared library
 #
-$(mesh_library_dir)/libmesh$(SHARED_LIBEXT): $(objects)
+$(mesh_library_dir)/libmesh$(shared_libext): $(objects)
 	@$(MAKE) -C contrib
 	@$(shell mkdir -p $(mesh_library_dir))
 	@echo "Linking "$@
@@ -173,6 +173,7 @@ distclean:
 	@rm -rf doc/html/doxygen/*.gif
 	@rm -rf doc/html/doxygen/*.map
 	@rm -rf doc/html/doxygen/*.md5
+	@rm -rf doc/html/doxygen/*.dot
 	@rm -rf doc/html/doxygen/formula.repository doc/html/doxygen/graph_legend.dot
 	@rm -rf doc/latex/doxygen
 	@rm -rf doc/latex/*/*.aux doc/latex/*/*~ doc/latex/*/*.log doc/latex/*/*.out

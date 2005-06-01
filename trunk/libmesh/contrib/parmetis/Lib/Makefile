@@ -11,10 +11,10 @@ OBJS   	:= $(patsubst %.c, %.$(obj-suffix), $(SRC))
 
 
 
-target := $(EXTERNAL_LIBDIR)/libparmetis.a
+target := $(EXTERNAL_LIBDIR)/libparmetis$(static_libext)
 
 ifeq ($(enable-shared),yes)
-  target := $(EXTERNAL_LIBDIR)/libparmetis$(SHARED_LIBEXT)
+  target := $(EXTERNAL_LIBDIR)/libparmetis$(shared_libext)
 endif
 
 
@@ -31,18 +31,18 @@ else
 endif
 
 ifeq ($(findstring darwin,$(hostos)),darwin)
-$(EXTERNAL_LIBDIR)/libparmetis.a: $(OBJS)
+$(EXTERNAL_LIBDIR)/libparmetis$(static_libext): $(OBJS)
 	@echo "Linking "$@
 	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
 	@libtool -static -o $@ $(OBJS)
 else
-$(EXTERNAL_LIBDIR)/libparmetis.a: $(OBJS)
+$(EXTERNAL_LIBDIR)/libparmetis$(static_libext): $(OBJS)
 	@echo "Linking "$@
 	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
 	@$(AR) rv $@ $(OBJS)
 endif
 
-$(EXTERNAL_LIBDIR)/libparmetis$(SHARED_LIBEXT): $(OBJS)
+$(EXTERNAL_LIBDIR)/libparmetis$(shared_libext): $(OBJS)
 	@echo "Linking "$@
 	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
 	@$(CC) $(CSHAREDFLAG) -o $@ $(OBJS) $(LDFLAGS)

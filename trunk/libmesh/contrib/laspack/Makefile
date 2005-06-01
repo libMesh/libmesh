@@ -14,10 +14,10 @@ OBJS   	:= $(patsubst %.c, %.$(obj-suffix), $(SRC))
 
 
 
-target := $(EXTERNAL_LIBDIR)/liblaspack.a
+target := $(EXTERNAL_LIBDIR)/liblaspack$(static_libext)
 
 ifeq ($(enable-shared),yes)
-  target := $(EXTERNAL_LIBDIR)/liblaspack$(SHARED_LIBEXT)
+  target := $(EXTERNAL_LIBDIR)/liblaspack$(shared_libext)
 endif
 
 
@@ -29,12 +29,12 @@ else
 endif
 
 ifeq ($(findstring darwin,$(hostos)),darwin)
-$(EXTERNAL_LIBDIR)/liblaspack.a: $(OBJS)
+$(EXTERNAL_LIBDIR)/liblaspack$(static_libext): $(OBJS)
 	@echo "Linking "$@
 	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
 	@libtool -static -o $@ $(OBJS)
 else
-$(EXTERNAL_LIBDIR)/liblaspack.a: $(OBJS)
+$(EXTERNAL_LIBDIR)/liblaspack$(static_libext): $(OBJS)
 	@echo "Linking "$@
 	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
 	@$(AR) rv $@ $(OBJS)
@@ -44,7 +44,7 @@ ifeq ($(enable-complex),yes)
 #
 # Complex arithmetic: use C++ 
 #
-$(EXTERNAL_LIBDIR)/liblaspack$(SHARED_LIBEXT): $(OBJS)
+$(EXTERNAL_LIBDIR)/liblaspack$(shared_libext): $(OBJS)
 	@echo "Linking "$@
 	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
 	@$(CXX) $(CXXSHAREDFLAG) -o $@ $(OBJS) $(LDFLAGS)
@@ -53,7 +53,7 @@ else
 #
 # Real arithmetic: use C
 #
-$(EXTERNAL_LIBDIR)/liblaspack$(SHARED_LIBEXT): $(OBJS)
+$(EXTERNAL_LIBDIR)/liblaspack$(shared_libext): $(OBJS)
 	@echo "Linking "$@
 	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
 	@$(CC) $(CSHAREDFLAG) -o $@ $(OBJS) $(LDFLAGS)

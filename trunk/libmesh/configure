@@ -309,7 +309,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT CC CFLAGS ac_ct_CC enableshared GXX_VERSION CXXFLAGSG CXXFLAGSO CXXFLAGSP CXXFLAGSS CFLAGSG CFLAGSO CFLAGSP CFLAGSS CXXDEPFLAG CXXSHAREDFLAG RPATHFLAG CXXCPP EGREP MPCXX PWD enablexdr enablecomplex NETCDF_LIB NETCDF_INCLUDE EXODUS_LIB EXODUS_INCLUDE enableoptional F77 FFLAGS ac_ct_F77 FLIBS PETSC_ARCH PETSC_DIR petscversion petscmajorminor MPI_IMPL MPI MPI_LIBS MPI_LIBS_PATH MPI_LIBS_PATHS MPI_INCLUDES_PATH MPI_INCLUDES_PATHS enablepetsc SLEPC_DIR slepcversion enableslepc CONTRIB_HAVE_LASPACK LASPACK_INCLUDE LASPACK_LIB enablelaspack CONTRIB_HAVE_SFC SFC_INCLUDE SFC_LIB enablesfc CONTRIB_HAVE_GZSTREAM GZSTREAM_INCLUDE GZSTREAM_LIB enablegz TECPLOT_LIBRARY TECPLOT_INCLUDE METIS_INCLUDE METIS_LIB PARMETIS_INCLUDE PARMETIS_LIB enablemetis enableparmetis DOXYGEN DOT DOTPATH HAVE_DOT CONTRIB_HAVE_TETGEN TETGEN_INCLUDE TETGEN_LIBRARY enabletetgen CONTRIB_HAVE_TRIANGLE TRIANGLE_INCLUDE TRIANGLE_LIBRARY enabletriangle PERL LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT CC CFLAGS ac_ct_CC enableshared GXX_VERSION CXXFLAGS_OPT CXXFLAGS_DBG CXXFLAGS_DVL CFLAGS_OPT CFLAGS_DBG CFLAGS_DVL CXXDEPFLAG CXXSHAREDFLAG RPATHFLAG CXXCPP EGREP MPCXX PWD enablexdr enablecomplex NETCDF_LIB NETCDF_INCLUDE EXODUS_LIB EXODUS_INCLUDE enableoptional F77 FFLAGS ac_ct_F77 FLIBS PETSC_ARCH PETSC_DIR petscversion petscmajorminor MPI_IMPL MPI MPI_LIBS MPI_LIBS_PATH MPI_LIBS_PATHS MPI_INCLUDES_PATH MPI_INCLUDES_PATHS enablepetsc SLEPC_DIR slepcversion enableslepc CONTRIB_HAVE_LASPACK LASPACK_INCLUDE LASPACK_LIB enablelaspack CONTRIB_HAVE_SFC SFC_INCLUDE SFC_LIB enablesfc CONTRIB_HAVE_GZSTREAM GZSTREAM_INCLUDE GZSTREAM_LIB enablegz TECPLOT_LIBRARY TECPLOT_INCLUDE METIS_INCLUDE METIS_LIB PARMETIS_INCLUDE PARMETIS_LIB enablemetis enableparmetis DOXYGEN DOT DOTPATH HAVE_DOT CONTRIB_HAVE_TETGEN TETGEN_INCLUDE TETGEN_LIBRARY enabletetgen CONTRIB_HAVE_TRIANGLE TRIANGLE_INCLUDE TRIANGLE_LIBRARY enabletriangle PERL LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -2988,8 +2988,9 @@ echo "${ECHO_T}proper compiler flags" >&6
 
 
     if test $HOSTTYPE = "powerpc" ; then
-    CXXFLAGSO="-fno-common"
-    CXXFLAGSG="-fno-common"
+    CXXFLAGS_OPT="-fno-common"
+    CXXFLAGS_DVL="-fno-common"
+    CXXFLAGS_DBG="-fno-common"
     CXXSHAREDFLAG="-dynamiclib"
     CSHAREDFLAG="-dynamiclib"
     RPATHFLAG="-L"
@@ -3000,59 +3001,48 @@ echo "${ECHO_T}proper compiler flags" >&6
 
 
     if (test "$GXX" = yes -a "x$REAL_GXX" != "x" ) ; then
-    CXXFLAGSO="$CXXFLAGSO -O2 -felide-constructors -DNDEBUG"
-    CXXFLAGSG="$CXXFLAGSG -O2 -felide-constructors -g -ansi -pedantic -W -Wall -Wunused -Wpointer-arith -Wimplicit -Wformat -Wparentheses -Wuninitialized -DDEBUG"
-    CXXFLAGSP="$CXXFLAGSO -g -pg"
-    CXXFLAGSS="-fsyntax-only"
+    CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -felide-constructors"
+    CXXFLAGS_DVL="$CXXFLAGS_DVL -O2 -felide-constructors -g -ansi -pedantic -W -Wall -Wunused -Wpointer-arith -Wimplicit -Wformat -Wparentheses -Wuninitialized"
+    CXXFLAGS_DBG="$CXXFLAGS_DBG -O0 -felide-constructors -g -ansi -pedantic -W -Wall -Wunused -Wpointer-arith -Wimplicit -Wformat -Wparentheses"
 
-    CFLAGSO="-O2 -DNDEBUG"
-    CFLAGSG="-g -DDEBUG"
-    CFLAGSP="$CFLAGSO -g -pg"
-    CFLAGSS="-fsyntax-only"
+    CFLAGS_OPT="-O2"
+    CFLAGS_DVL="$CFLAGS_OPT -g"
+    CFLAGS_DBG="-g"
 
         if test "$enableshared" = yes ; then
-      CXXFLAGSO="$CXXFLAGSO -fPIC"
-      CXXFLAGSG="$CXXFLAGSG -fPIC"
-      CXXFLAGSP="$CXXFLAGSP -fPIC"
+      CXXFLAGS_OPT="$CXXFLAGS_OPT -fPIC"
+      CXXFLAGS_DVL="$CXXFLAGS_DVL -fPIC"
+      CXXFLAGS_DBG="$CXXFLAGS_DBG -fPIC"
 
-      CFLAGSO="$CFLAGSO -fPIC"
-      CFLAGSG="$CFLAGSG -fPIC"
-      CFLAGSP="$CFLAGSP -fPIC"
+      CFLAGS_OPT="$CFLAGS_OPT -fPIC"
+      CFLAGS_DVL="$CFLAGS_DVL -fPIC"
+      CFLAGS_DBG="$CFLAGS_DBG -fPIC"
     fi
 
 
     case "$GXX_VERSION" in
       egcs1.1)
-          case "$target" in
-            *linux*)
-                ;;
-
-            *)
-                CXXFLAGSG = "$CXXFLAGSG -fno-vtable-thunks"
-                CXXFLAGSO = "$CXXFLAGSO -fno-vtable-thunks"
-                CXXFLAGSP = "$CXXFLAGSP -fno-vtable-thunks"
-                ;;
-          esac
           ;;
 
             *)
-          CXXFLAGSO="$CXXFLAGSO -funroll-loops -fstrict-aliasing"
-          CFLAGSO="$CFLAGSO -funroll-loops -fstrict-aliasing"
-          CXXFLAGSP="$CXXFLAGSP -funroll-loops -fstrict-aliasing"
-          CFLAGSP="$CFLAGSP -funroll-loops -fstrict-aliasing"
+          CXXFLAGS_OPT="$CXXFLAGS_OPT -funroll-loops -fstrict-aliasing"
+          CXXFLAGS_DVL="$CXXFLAGS_DVL -funroll-loops -fstrict-aliasing"
+
+          CFLAGS_OPT="$CFLAGS_OPT -funroll-loops -fstrict-aliasing"
+          CFLAGS_DVL="$CFLAGS_DVL -funroll-loops -fstrict-aliasing"
           ;;
     esac
 
 
     case "$GXX_VERSION" in
                         egcs1.1 | gcc2.95)
-         CXXFLAGSO="$CXXFLAGSO -fnonnull-objects"
-         CXXFLAGSG="$CXXFLAGSG -Wmissing-declarations -Wbad-function-cast -Wtraditional -Wnested-externs"
-         CXXFLAGSP="$CXXFLAGSP -fnonnull-objects"
+         CXXFLAGS_OPT="$CXXFLAGS_OPT -fnonnull-objects"
+         CXXFLAGS_DBG="$CXXFLAGS_DBG -Wmissing-declarations -Wbad-function-cast -Wtraditional -Wnested-externs"
          ;;
 
                               gcc3.* | gcc4.*)
-         CXXFLAGSG="$CXXFLAGSG -Woverloaded-virtual -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
+         CXXFLAGS_DVL="$CXXFLAGS_DVL -Woverloaded-virtual"
+         CXXFLAGS_DBG="$CXXFLAGS_DBG -Woverloaded-virtual -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
   	 ;;
       *)
          ;;
@@ -3075,33 +3065,35 @@ echo "${ECHO_T}proper compiler flags" >&6
 
     case "$GXX_VERSION" in
       ibm_xlc)
-          CXXFLAGSG="-DDEBUG -qmaxmem=-1 -qansialias -qrtti=all -g -qstaticinline"
-          CXXFLAGSO="-DNDEBUG -O3 -qmaxmem=-1 -w -qansialias -Q=10 -qrtti=all -qstaticinline"
-          CXXFLAGSP="$CXXFLAGSO -g -pg"
-          CFLAGSG="-DDEBUG -qansialias -g"
-          CFLAGSO="-DNDEBUG -O3 -qmaxmem=-1 -w -qansialias -Q=10"
-          CFLAGSP="$CFLAGSO -g -pg"
+          CXXFLAGS_OPT="-O3 -qmaxmem=-1 -w -qansialias -Q=10 -qrtti=all -qstaticinline"
+          CXXFLAGS_DBG="-qmaxmem=-1 -qansialias -qrtti=all -g -qstaticinline"
+	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
+          CFLAGS_OPT="-O3 -qmaxmem=-1 -w -qansialias -Q=10"
+          CFLAGS_DBG="-qansialias -g"
+          CFLAGS_DVL="$CFLAGS_DBG"
 	  CXXSHAREDFLAG="-G -qmkshrobj -bnoerrmsg"
 	  CSHAREDFLAG="-G -qmkshrobj"
 	  RPATHFLAG="-Qoption,link,-rpath,"
           ;;
 
       MIPSpro)
-          CXXFLAGSG="-DDEBUG -LANG:std -LANG:libc_in_namespace_std=OFF -no_auto_include -ansi -g -woff 1460"
-          CXXFLAGSO="-DNDEBUG -LANG:std -LANG:libc_in_namespace_std=OFF -no_auto_include -ansi -O2 -w"
-          CFLAGSG="-DDEBUG"
-          CFLAGSO="-DNDEBUG -O2 -w"
+          CXXFLAGS_OPT="-LANG:std -LANG:libc_in_namespace_std=OFF -no_auto_include -ansi -O2 -w"
+          CXXFLAGS_DBG="-LANG:std -LANG:libc_in_namespace_std=OFF -no_auto_include -ansi -g -woff 1460"
+	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
+          CFLAGS_OPT="-O2 -w"
+          CFLAGS_DBG="-g"
+          CFLAGS_DVL="$CFLAGS_DBG"
 
                               LDFLAGS="$LDFLAGS -lm"
 
                     if test "$enableshared" = yes ; then
-            CXXFLAGSO="$CXXFLAGSO -KPIC"
-            CXXFLAGSG="$CXXFLAGSG -KPIC"
-            CXXFLAGSP="$CXXFLAGSP -KPIC"
+            CXXFLAGS_OPT="$CXXFLAGS_OPT -KPIC"
+            CXXFLAGS_DBG="$CXXFLAGS_DBG -KPIC"
+            CXXFLAGS_DVL="$CXXFLAGS_DVL -KPIC"
 
-            CFLAGSO="$CFLAGSO -KPIC"
-            CFLAGSG="$CFLAGSG -KPIC"
-            CFLAGSP="$CFLAGSP -KPIC"
+            CFLAGS_OPT="$CFLAGS_OPT -KPIC"
+            CFLAGS_DBG="$CFLAGS_DBG -KPIC"
+            CFLAGS_DVL="$CFLAGS_DVL -KPIC"
 
             LDFLAGS="$LDFLAGS -KPIC"
           fi
@@ -3112,84 +3104,84 @@ echo "${ECHO_T}proper compiler flags" >&6
           ;;
 
             intel_icc_v8.1)
-                                                                                                    CXXFLAGSG="-Kc++eh -Krtti -O1 -w1 -DDEBUG -g -wd504 -wd1572"
-          CXXFLAGSO="-Kc++eh -Krtti -O2 -Ob2 -DNDEBUG -tpp6 -axK -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
-          CXXFLAGSP="$CXXFLAGSO -g -pg"
-          CFLAGSG="-w1 -DDEBUG -inline_debug_info -wd266 -wd1572"
-          CFLAGSO="-O2 -Ob2 -DNDEBUG -tpp6 -axK -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
-          CFLAGSP="$CFLAGSO -g -pg"
+                                                                                                    CXXFLAGS_DBG="-Kc++eh -Krtti -O1 -w1 -g -wd504 -wd1572"
+          CXXFLAGS_OPT="-Kc++eh -Krtti -O2 -Ob2 -tpp6 -axK -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
+	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
+          CFLAGS_DBG="-w1 -inline_debug_info -wd266 -wd1572"
+          CFLAGS_OPT="-O2 -Ob2 -tpp6 -axK -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
+          CFLAGS_DVL="$CFLAGS_DBG"
 
                     if test "$enableshared" = yes ; then
-            CXXFLAGSO="$CXXFLAGSO -KPIC"
-            CXXFLAGSG="$CXXFLAGSG -KPIC"
-            CXXFLAGSP="$CXXFLAGSP -KPIC"
+            CXXFLAGS_OPT="$CXXFLAGS_OPT -KPIC"
+            CXXFLAGS_DBG="$CXXFLAGS_DBG -KPIC"
+            CXXFLAGS_DVL="$CXXFLAGS_DVL -KPIC"
 
-            CFLAGSO="$CFLAGSO -KPIC"
-            CFLAGSG="$CFLAGSG -KPIC"
-            CFLAGSP="$CFLAGSP -KPIC"
+            CFLAGS_OPT="$CFLAGS_OPT -KPIC"
+            CFLAGS_DBG="$CFLAGS_DBG -KPIC"
+            CFLAGS_DVL="$CFLAGS_DVL -KPIC"
 
             LDFLAGS="$LDFLAGS -KPIC"
           fi
           ;;
 
             intel_icc*)
-                                                  CXXFLAGSG="-Kc++eh -Krtti -O1 -w1 -DDEBUG -inline_debug_info -g -wd504"
-          CXXFLAGSO="-Kc++eh -Krtti -O2 -Ob2 -DNDEBUG -tpp6 -axiMK -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
-          CXXFLAGSP="$CXXFLAGSO -g -pg"
-          CFLAGSG="-w1 -DDEBUG -inline_debug_info -wd266"
-          CFLAGSO="-O2 -Ob2 -DNDEBUG -tpp6 -axiMK -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
-          CFLAGSP="$CFLAGSO -g -pg"
+                                                  CXXFLAGS_DBG="-Kc++eh -Krtti -O1 -w1 -inline_debug_info -g -wd504"
+          CXXFLAGS_OPT="-Kc++eh -Krtti -O2 -Ob2 -tpp6 -axiMK -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
+	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
+          CFLAGS_DBG="-w1 -inline_debug_info -wd266"
+          CFLAGS_OPT="-O2 -Ob2 -tpp6 -axiMK -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
+          CFLAGS_DVL="$CFLAGS_DBG"
 
                     if test "$enableshared" = yes ; then
-            CXXFLAGSO="$CXXFLAGSO -KPIC"
-            CXXFLAGSG="$CXXFLAGSG -KPIC"
-            CXXFLAGSP="$CXXFLAGSP -KPIC"
+            CXXFLAGS_OPT="$CXXFLAGS_OPT -KPIC"
+            CXXFLAGS_DBG="$CXXFLAGS_DBG -KPIC"
+            CXXFLAGS_DVL="$CXXFLAGS_DVL -KPIC"
 
-            CFLAGSO="$CFLAGSO -KPIC"
-            CFLAGSG="$CFLAGSG -KPIC"
-            CFLAGSP="$CFLAGSP -KPIC"
+            CFLAGS_OPT="$CFLAGS_OPT -KPIC"
+            CFLAGS_DBG="$CFLAGS_DBG -KPIC"
+            CFLAGS_DVL="$CFLAGS_DVL -KPIC"
 
             LDFLAGS="$LDFLAGS -KPIC"
           fi
           ;;
 
             intel_itanium_icc_v8.1)
-                                                  	                                                              CXXFLAGSG="-Kc++eh -Krtti -w1 -DDEBUG -inline_debug_info -g -wd1476 -wd1505 -wd1572"
-          CXXFLAGSO="-Kc++eh -Krtti -O2 -DNDEBUG -unroll -w0 -ftz -vec_report0 -par_report0 -openmp_report0"
-          CXXFLAGSP="$CXXFLAGSO -g -pg"
-          CFLAGSG="-w1 -DDEBUG -inline_debug_info -wd266 -wd1572"
-          CFLAGSO="-O2 -DNDEBUG -unroll -w0 -ftz -vec_report0 -par_report0 -openmp_report0"
-          CFLAGSP="$CFLAGSO -g -pg"
+                                                  	                                                              CXXFLAGS_DBG="-Kc++eh -Krtti -w1 -inline_debug_info -g -wd1476 -wd1505 -wd1572"
+          CXXFLAGS_OPT="-Kc++eh -Krtti -O2 -unroll -w0 -ftz -vec_report0 -par_report0 -openmp_report0"
+	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
+          CFLAGS_DBG="-w1 -inline_debug_info -wd266 -wd1572"
+          CFLAGS_OPT="-O2 -unroll -w0 -ftz -vec_report0 -par_report0 -openmp_report0"
+          CFLAGS_DVL="$CFLAGS_DBG"
 
                     if test "$enableshared" = yes ; then
-            CXXFLAGSO="$CXXFLAGSO -KPIC"
-            CXXFLAGSG="$CXXFLAGSG -KPIC"
-            CXXFLAGSP="$CXXFLAGSP -KPIC"
+            CXXFLAGS_OPT="$CXXFLAGS_OPT -KPIC"
+            CXXFLAGS_DBG="$CXXFLAGS_DBG -KPIC"
+            CXXFLAGS_DVL="$CXXFLAGS_DVL -KPIC"
 
-            CFLAGSO="$CFLAGSO -KPIC"
-            CFLAGSG="$CFLAGSG -KPIC"
-            CFLAGSP="$CFLAGSP -KPIC"
+            CFLAGS_OPT="$CFLAGS_OPT -KPIC"
+            CFLAGS_DBG="$CFLAGS_DBG -KPIC"
+            CFLAGS_DVL="$CFLAGS_DVL -KPIC"
 
             LDFLAGS="$LDFLAGS -KPIC"
           fi
           ;;
 
             intel_itanium_icc*)
-                                                  CXXFLAGSG="-Kc++eh -Krtti -w1 -DDEBUG -inline_debug_info -g"
-          CXXFLAGSO="-Kc++eh -Krtti -O2 -DNDEBUG -unroll -w0 -ftz"
-          CXXFLAGSP="$CXXFLAGSO -g -pg"
-          CFLAGSG="-w1 -DDEBUG -inline_debug_info -wd266"
-          CFLAGSO="-O2 -DNDEBUG -unroll -w0 -ftz"
-          CFLAGSP="$CFLAGSO -g -pg"
+                                                  CXXFLAGS_DBG="-Kc++eh -Krtti -w1 -inline_debug_info -g"
+          CXXFLAGS_OPT="-Kc++eh -Krtti -O2 -unroll -w0 -ftz"
+	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
+          CFLAGS_DBG="-w1 -inline_debug_info -wd266"
+          CFLAGS_OPT="-O2 -unroll -w0 -ftz"
+          CFLAGS_DVL="$CFLAGS_DBG"
 
                     if test "$enableshared" = yes ; then
-            CXXFLAGSO="$CXXFLAGSO -KPIC"
-            CXXFLAGSG="$CXXFLAGSG -KPIC"
-            CXXFLAGSP="$CXXFLAGSP -KPIC"
+            CXXFLAGS_OPT="$CXXFLAGS_OPT -KPIC"
+            CXXFLAGS_DBG="$CXXFLAGS_DBG -KPIC"
+            CXXFLAGS_DVL="$CXXFLAGS_DVL -KPIC"
 
-            CFLAGSO="$CFLAGSO -KPIC"
-            CFLAGSG="$CFLAGSG -KPIC"
-            CFLAGSP="$CFLAGSP -KPIC"
+            CFLAGS_OPT="$CFLAGS_OPT -KPIC"
+            CFLAGS_DBG="$CFLAGS_DBG -KPIC"
+            CFLAGS_DVL="$CFLAGS_DVL -KPIC"
 
             LDFLAGS="$LDFLAGS -KPIC"
           fi
@@ -3197,14 +3189,17 @@ echo "${ECHO_T}proper compiler flags" >&6
 
       compaq_cxx)
 
-          CXXFLAGSG="-nousing_std -nocurrent_include -model ansi -std strict_ansi -w1 -msg_display_number -timplicit_local -DDEBUG"
-          CXXFLAGSO="-nousing_std -nocurrent_include -model ansi -std strict_ansi -w2 -msg_display_number -timplicit_local -DNDEBUG -O2 -fast"
-          CFLAGSG="-w1 -msg_display_number -timplicit_local -DDEBUG"
-          CFLAGSO="-w2 -msg_display_number -timplicit_local -DNDEBUG -O2 -fast"
+          CXXFLAGS_DBG="-nousing_std -nocurrent_include -model ansi -std strict_ansi -w1 -msg_display_number -timplicit_local"
+          CXXFLAGS_OPT="-nousing_std -nocurrent_include -model ansi -std strict_ansi -w2 -msg_display_number -timplicit_local -O2 -fast"
+	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
+          CFLAGS_DBG="-w1 -msg_display_number -timplicit_local"
+          CFLAGS_OPT="-w2 -msg_display_number -timplicit_local -O2 -fast"
+  	  CFLAGS_DVL="$CFLAGS_DBG"
 
           for i in 175 236 237 487 1136 1156 111 1182 265 ; do
-            CXXFLAGSG="$CXXFLAGSG -msg_disable $i"
-            CXXFLAGSO="$CXXFLAGSO -msg_disable $i"
+            CXXFLAGS_DBG="$CXXFLAGS_DBG -msg_disable $i"
+            CXXFLAGS_OPT="$CXXFLAGS_OPT -msg_disable $i"
+            CXXFLAGS_DVL="$CXXFLAGS_DVL -msg_disable $i"
           done
 
 
@@ -3212,23 +3207,25 @@ echo "${ECHO_T}proper compiler flags" >&6
 
 
                     if test "$enableshared" = yes ; then
-            CXXFLAGSO="$CXXFLAGSO -shared"
-            CXXFLAGSG="$CXXFLAGSG -shared"
-            CXXFLAGSP="$CXXFLAGSP -shared"
+            CXXFLAGS_OPT="$CXXFLAGS_OPT -shared"
+            CXXFLAGS_DBG="$CXXFLAGS_DBG -shared"
+            CXXFLAGS_DVL="$CXXFLAGS_DVL -shared"
 
-            CFLAGSO="$CFLAGSO -shared"
-            CFLAGSG="$CFLAGSG -shared"
-            CFLAGSP="$CFLAGSP -shared"
+            CFLAGS_OPT="$CFLAGS_OPT -shared"
+            CFLAGS_DBG="$CFLAGS_DBG -shared"
+            CFLAGS_DVL="$CFLAGS_DVL -shared"
 
             LDFLAGS="$LDFLAGS -shared"
           fi
           ;;
 
       sun_studio | sun_forte)
-          CXXFLAGSG="-DDEBUG -library=stlport4 -g"
-          CXXFLAGSO="-DNDEBUG -library=stlport4 -xO4"
-          CFLAGSG="-DDEBUG -g"
-          CFLAGSO="-DNDEBUG -xO4"
+          CXXFLAGS_DBG="-library=stlport4 -g"
+          CXXFLAGS_OPT="-library=stlport4 -xO4"
+	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
+          CFLAGS_DBG="-g"
+          CFLAGS_OPT="-xO4"
+          CFLAGS_DVL="$CFLAGS_DBG"
 
           CXXSHAREDFLAG="-G"
           CSHAREDFLAG="-G"
@@ -3237,42 +3234,48 @@ echo "${ECHO_T}proper compiler flags" >&6
           LIBS="-lrpcsvc $LIBS"
 
                     if test "$enableshared" = yes ; then
-            CXXFLAGSO="$CXXFLAGSO -KPIC"
-            CXXFLAGSG="$CXXFLAGSG -KPIC"
-            CXXFLAGSP="$CXXFLAGSP -KPIC"
+            CXXFLAGS_OPT="$CXXFLAGS_OPT -KPIC"
+            CXXFLAGS_DBG="$CXXFLAGS_DBG -KPIC"
+            CXXFLAGS_DVL="$CXXFLAGS_DVL -KPIC"
 
-            CFLAGSO="$CFLAGSO -KPIC"
-            CFLAGSG="$CFLAGSG -KPIC"
-            CFLAGSP="$CFLAGSP -KPIC"
+            CFLAGS_OPT="$CFLAGS_OPT -KPIC"
+            CFLAGS_DBG="$CFLAGS_DBG -KPIC"
+            CFLAGS_DVL="$CFLAGS_DVL -KPIC"
 
             LDFLAGS="$LDFLAGS -KPIC"
           fi
           ;;
 
       portland_group)
-	  CXXFLAGSG="-g --no_using_std --instantiate=none --one_instantiation_per_object --prelink_objects -DDEBUG"
-          CXXFLAGSO="-O2 --no_using_std --instantiate=none --one_instantiation_per_object --prelink_objects -DNDEBUG"
-	  CFLAGSG="-g -DDEBUG"
-          CFLAGSO="-O2 -DNDEBUG"
+	  CXXFLAGS_DBG="-g --no_using_std --instantiate=none --one_instantiation_per_object --prelink_objects"
+          CXXFLAGS_OPT="-O2 --no_using_std --instantiate=none --one_instantiation_per_object --prelink_objects"
+	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
+	  CFLAGS_DBG="-g"
+          CFLAGS_OPT="-O2"
+          CFLAGS_DVL="$CFLAGS_DBG"
 
 	  LDFLAGS="$LDFLAGS -fpic"
           ;;
 
       hpux_acc)
-                                                                                                                                            CXXFLAGSG="+DA2.0W -AA +z -ext -g"
-          CXXFLAGSO="+DA2.0W -AA +z -ext -O +Onolimit"
-	  CFLAGSG="+DA2.0W -Aa +z -Ae -g"
-          CFLAGSO="+DA2.0W -Aa +z -Ae -O +Onolimit"
+                                                                                                                                            CXXFLAGS_DBG="+DA2.0W -AA +z -ext -g"
+          CXXFLAGS_OPT="+DA2.0W -AA +z -ext -O +Onolimit"
+	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
+	  CFLAGS_DBG="+DA2.0W -Aa +z -Ae -g"
+          CFLAGS_OPT="+DA2.0W -Aa +z -Ae -O +Onolimit"
+          CFLAGS_DVL="$CFLAGS_DBG"
           LDFLAGS="$LDFLAGS -I/usr/lib/pa20_64"
           LIBS="$LIBS -lrpcsvc"
           FLIBS="$FLIBS -lF90 -lcl -I/opt/fortran90/lib/pa20_64"
           ;;
 
       cray_cc)
-	  CXXFLAGSG="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n -DDEBUG"
-	  CXXFLAGSO="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n -DNDEBUG"
-	  CFLAGSG="-G n -DDEBUG"
-	  CFLAGSO="-G n -DNDEBUG"
+	  CXXFLAGS_DBG="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
+ 	  CXXFLAGS_OPT="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
+ 	  CXXFLAGS_DVL="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
+	  CFLAGS_DBG="-G n"
+	  CFLAGS_OPT="-G n"
+	  CFLAGS_DVL="-G n"
 
 	  CXXSHAREDFLAG=""
 	  CSHAREDFLAG=""
@@ -3282,18 +3285,16 @@ echo "${ECHO_T}proper compiler flags" >&6
       *)
           echo "$as_me:$LINENO: result: No specific options for this C++ compiler known" >&5
 echo "${ECHO_T}No specific options for this C++ compiler known" >&6
-	  CXXFLAGSG="$CXXFLAGS -DDEBUG"
-	  CXXFLAGSO="$CXXFLAGS -DNDEBUG"
-	  CXXFLAGSP="$CXXFLAGS -DNDEBUG"
+	  CXXFLAGS_DBG="$CXXFLAGS"
+	  CXXFLAGS_OPT="$CXXFLAGS"
+	  CXXFLAGS_DVL="$CXXFLAGS"
 
-	  CFLAGSG="$CFLAGS -DDEBUG"
-	  CFLAGSO="$CFLAGS -DNDEBUG"
-	  CFLAGSP="$CFLAGS -DNDEBUG"
+	  CFLAGS_DBG="$CFLAGS"
+	  CFLAGS_OPT="$CFLAGS"
+	  CFLAGS_DVL="$CFLAGS"
 	  ;;
     esac
   fi
-
-
 
 
 
@@ -8235,7 +8236,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:8238:" \
+echo "$as_me:8239:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -8429,7 +8430,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_verb"
-(eval echo $as_me:8432: \"$ac_link\") >&5
+(eval echo $as_me:8433: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -8507,7 +8508,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_cv_prog_f77_v"
-(eval echo $as_me:8510: \"$ac_link\") >&5
+(eval echo $as_me:8511: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -10313,7 +10314,7 @@ fi
 if (test $enablelaspack = yes); then
 
   LASPACK_INCLUDE="-I$PWD/contrib/laspack"
-  LASPACK_LIB="\$(EXTERNAL_LIBDIR)/liblaspack\$(EXTERNAL_LIBEXT)"
+  LASPACK_LIB="\$(EXTERNAL_LIBDIR)/liblaspack\$(libext)"
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_LASPACK 1
@@ -10378,7 +10379,7 @@ fi
 
   if (test $enablesfc = yes); then
      SFC_INCLUDE="-I$PWD/contrib/sfcurves"
-     SFC_LIB="\$(EXTERNAL_LIBDIR)/libsfcurves\$(EXTERNAL_LIBEXT)"
+     SFC_LIB="\$(EXTERNAL_LIBDIR)/libsfcurves\$(libext)"
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_SFCURVES 1
@@ -10661,7 +10662,7 @@ fi
 
     if (test "$have_zlib_h" = yes -a "$have_libz" = yes) ; then
     GZSTREAM_INCLUDE="-I$PWD/contrib/gzstream"
-    GZSTREAM_LIB="\$(EXTERNAL_LIBDIR)/libgzstream\$(EXTERNAL_LIBEXT) -lz"
+    GZSTREAM_LIB="\$(EXTERNAL_LIBDIR)/libgzstream\$(libext) -lz"
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_GZSTREAM 1
@@ -10844,7 +10845,7 @@ if test $ac_cv_file___contrib_metis_Lib_metis_h = yes; then
 
 	          METIS_INCLUDE_PATH=$PWD/contrib/metis/Lib
                   METIS_INCLUDE=-I$METIS_INCLUDE_PATH
-                  METIS_LIB="\$(EXTERNAL_LIBDIR)/libmetis\$(EXTERNAL_LIBEXT)"
+                  METIS_LIB="\$(EXTERNAL_LIBDIR)/libmetis\$(libext)"
 
 
 
@@ -10903,7 +10904,7 @@ if test $ac_cv_file___contrib_parmetis_Lib_parmetis_h = yes; then
 
       	          PARMETIS_INCLUDE_PATH=$PWD/contrib/parmetis/Lib
                       PARMETIS_INCLUDE=-I$PARMETIS_INCLUDE_PATH
-                      PARMETIS_LIB="\$(EXTERNAL_LIBDIR)/libparmetis\$(EXTERNAL_LIBEXT)"
+                      PARMETIS_LIB="\$(EXTERNAL_LIBDIR)/libparmetis\$(libext)"
 
 
 
@@ -11041,7 +11042,7 @@ fi;
 
   if (test $enabletetgen = yes) ; then
      TETGEN_INCLUDE="-I$PWD/contrib/tetgen"
-     TETGEN_LIBRARY="\$(EXTERNAL_LIBDIR)/libtetgen\$(EXTERNAL_LIBEXT)"
+     TETGEN_LIBRARY="\$(EXTERNAL_LIBDIR)/libtetgen\$(libext)"
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_TETGEN 1
@@ -11077,7 +11078,7 @@ fi;
 
   if (test $enabletriangle = yes); then
      TRIANGLE_INCLUDE="-I$PWD/contrib/triangle"
-     TRIANGLE_LIBRARY="\$(EXTERNAL_LIBDIR)/libtriangle\$(EXTERNAL_LIBEXT)"
+     TRIANGLE_LIBRARY="\$(EXTERNAL_LIBDIR)/libtriangle\$(libext)"
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_TRIANGLE 1
@@ -11750,14 +11751,12 @@ s,@CFLAGS@,$CFLAGS,;t t
 s,@ac_ct_CC@,$ac_ct_CC,;t t
 s,@enableshared@,$enableshared,;t t
 s,@GXX_VERSION@,$GXX_VERSION,;t t
-s,@CXXFLAGSG@,$CXXFLAGSG,;t t
-s,@CXXFLAGSO@,$CXXFLAGSO,;t t
-s,@CXXFLAGSP@,$CXXFLAGSP,;t t
-s,@CXXFLAGSS@,$CXXFLAGSS,;t t
-s,@CFLAGSG@,$CFLAGSG,;t t
-s,@CFLAGSO@,$CFLAGSO,;t t
-s,@CFLAGSP@,$CFLAGSP,;t t
-s,@CFLAGSS@,$CFLAGSS,;t t
+s,@CXXFLAGS_OPT@,$CXXFLAGS_OPT,;t t
+s,@CXXFLAGS_DBG@,$CXXFLAGS_DBG,;t t
+s,@CXXFLAGS_DVL@,$CXXFLAGS_DVL,;t t
+s,@CFLAGS_OPT@,$CFLAGS_OPT,;t t
+s,@CFLAGS_DBG@,$CFLAGS_DBG,;t t
+s,@CFLAGS_DVL@,$CFLAGS_DVL,;t t
 s,@CXXDEPFLAG@,$CXXDEPFLAG,;t t
 s,@CXXSHAREDFLAG@,$CXXSHAREDFLAG,;t t
 s,@RPATHFLAG@,$RPATHFLAG,;t t

@@ -10,10 +10,10 @@ OBJS   	:= $(patsubst %.c, %.$(obj-suffix), $(SRC))
 
 
 
-target := $(EXTERNAL_LIBDIR)/libmetis.a
+target := $(EXTERNAL_LIBDIR)/libmetis$(static_libext)
 
 ifeq ($(enable-shared),yes)
-  target := $(EXTERNAL_LIBDIR)/libmetis$(SHARED_LIBEXT)
+  target := $(EXTERNAL_LIBDIR)/libmetis$(shared_libext)
 endif
 
 ifeq ($(enable-metis),no)
@@ -24,18 +24,18 @@ else
 endif
 
 ifeq ($(findstring darwin,$(hostos)),darwin)
-$(EXTERNAL_LIBDIR)/libmetis.a: $(OBJS)
+$(EXTERNAL_LIBDIR)/libmetis$(static_libext): $(OBJS)
 	@echo "Linking "$@
 	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
 	@libtool -static -o $@ $(OBJS)
 else
-$(EXTERNAL_LIBDIR)/libmetis.a: $(OBJS)
+$(EXTERNAL_LIBDIR)/libmetis$(static_libext): $(OBJS)
 	@echo "Linking "$@
 	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
 	@$(AR) rv $@ $(OBJS)
 endif
 
-$(EXTERNAL_LIBDIR)/libmetis$(SHARED_LIBEXT): $(OBJS)
+$(EXTERNAL_LIBDIR)/libmetis$(shared_libext): $(OBJS)
 	@echo "Linking "$@
 	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
 	@$(CC) $(CSHAREDFLAG) -o $@ $(OBJS) $(LDFLAGS)
