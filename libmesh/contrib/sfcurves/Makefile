@@ -7,10 +7,10 @@ OBJS   	:= $(patsubst %.c, %.$(obj-suffix), $(SRC))
 
 
 
-target := $(EXTERNAL_LIBDIR)/libsfcurves.a
+target := $(EXTERNAL_LIBDIR)/libsfcurves$(static_libext)
 
 ifeq ($(enable-shared),yes)
-  target := $(EXTERNAL_LIBDIR)/libsfcurves$(SHARED_LIBEXT)
+  target := $(EXTERNAL_LIBDIR)/libsfcurves$(shared_libext)
 endif
 
 
@@ -22,18 +22,18 @@ else
 endif
 
 ifeq ($(findstring darwin,$(hostos)),darwin)
-$(EXTERNAL_LIBDIR)/libsfcurves.a: $(OBJS)
+$(EXTERNAL_LIBDIR)/libsfcurves$(static_libext): $(OBJS)
 	@echo "Linking "$@
 	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
 	@libtool -static -o $@ $(OBJS)
 else
-$(EXTERNAL_LIBDIR)/libsfcurves.a: $(OBJS)
+$(EXTERNAL_LIBDIR)/libsfcurves$(static_libext): $(OBJS)
 	@echo "Linking "$@
 	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
 	@$(AR) rv $@ $(OBJS)
 endif
 
-$(EXTERNAL_LIBDIR)/libsfcurves$(SHARED_LIBEXT): $(OBJS)
+$(EXTERNAL_LIBDIR)/libsfcurves$(shared_libext): $(OBJS)
 	@echo "Linking "$@
 	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
 	@$(CC) $(CSHAREDFLAG) -o $@ $(OBJS) $(LDFLAGS)

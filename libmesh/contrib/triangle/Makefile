@@ -18,10 +18,10 @@ OBJS   	:= $(patsubst %.c, %.$(obj-suffix), $(SRC))
 
 
 
-target := $(EXTERNAL_LIBDIR)/lib$(pkgname).a
+target := $(EXTERNAL_LIBDIR)/lib$(pkgname)$(static_libext)
 
 ifeq ($(enable-shared),yes)
-  target := $(EXTERNAL_LIBDIR)/lib$(pkgname)$(SHARED_LIBEXT)
+  target := $(EXTERNAL_LIBDIR)/lib$(pkgname)$(shared_libext)
 endif
 
 ifeq ($(enable-triangle),no)
@@ -33,19 +33,19 @@ endif
 
 # Build static library
 ifeq ($(findstring darwin,$(hostos)),darwin)
-$(EXTERNAL_LIBDIR)/lib$(pkgname).a: $(OBJS)
+$(EXTERNAL_LIBDIR)/lib$(pkgname)$(static_libext): $(OBJS)
 	@echo "Linking "$@
 	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
 	@libtool -static -o $@ $(OBJS)
 else
-$(EXTERNAL_LIBDIR)/lib$(pkgname).a: $(OBJS)
+$(EXTERNAL_LIBDIR)/lib$(pkgname)$(static_libext): $(OBJS)
 	@echo "Linking "$@
 	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
 	@$(AR) rv $@ $(OBJS)
 endif
 
 # Build dynamic library
-$(EXTERNAL_LIBDIR)/lib$(pkgname)$(SHARED_LIBEXT): $(OBJS)
+$(EXTERNAL_LIBDIR)/lib$(pkgname)$(shared_libext): $(OBJS)
 	@echo "Linking "$@
 	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
 	@$(CC) $(CSHAREDFLAG) -o $@ $(OBJS) $(LDFLAGS)

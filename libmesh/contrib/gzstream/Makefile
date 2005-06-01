@@ -18,8 +18,8 @@
 # ============================================================================
 # 
 # File          : Makefile
-# Revision      : $Revision: 1.7 $
-# Revision_date : $Date: 2005-05-14 21:16:53 $
+# Revision      : $Revision: 1.8 $
+# Revision_date : $Date: 2005-06-01 21:43:40 $
 # Author(s)     : Deepak Bandyopadhyay, Lutz Kettner
 # 
 # ============================================================================
@@ -51,11 +51,11 @@ library_name := libgzstream
 # contributed project.  For example sfcurves follows the
 # same procedure.
 #
-target       := $(EXTERNAL_LIBDIR)/$(library_name).a
+target       := $(EXTERNAL_LIBDIR)/$(library_name)$(static_libext)
 
 
 ifeq ($(enable-shared),yes)	
-  target := $(EXTERNAL_LIBDIR)/$(library_name)$(SHARED_LIBEXT)
+  target := $(EXTERNAL_LIBDIR)/$(library_name)$(shared_libext)
 endif
 
 ifeq ($(enable-gzstream),no)
@@ -67,18 +67,18 @@ else
 
 all:: $(target)
 ifeq ($(findstring darwin,$(hostos)),darwin)
-$(EXTERNAL_LIBDIR)/$(library_name).a: $(OBJS)
+$(EXTERNAL_LIBDIR)/$(library_name)$(static_libext): $(OBJS)
 	@echo "Linking "$@
 	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
 	@libtool -static -o $@ $(OBJS)
 else
-$(EXTERNAL_LIBDIR)/$(library_name).a: $(OBJS)
+$(EXTERNAL_LIBDIR)/$(library_name)$(static_libext): $(OBJS)
 	@echo "Linking "$@
 	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
 	@$(AR) rv $@ $(OBJS)
 endif
 
-$(EXTERNAL_LIBDIR)/$(library_name)$(SHARED_LIBEXT): $(OBJS)
+$(EXTERNAL_LIBDIR)/$(library_name)$(shared_libext): $(OBJS)
 	@echo "Linking "$@
 	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
 	@$(CXX) $(CXXSHAREDFLAG) -o $@ $(OBJS) $(LDFLAGS) -lz

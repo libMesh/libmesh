@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.87 2005-05-24 19:20:42 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.88 2005-06-01 21:43:38 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -223,12 +223,9 @@ dnl Set C++ compiler flags to their default values. They will be
 dnl modified according to other options in later steps of
 dnl configuration
 dnl
-dnl CXXFLAGSO  : flags for optimized mode
-dnl CXXFLAGSG  : flags for debug mode
-dnl CXXFLAGSS  : flags for syntax-checking mode
-dnl CXXFLAGSP  : flags for profiler mode (only tested with GCC 3.2.1 but
-dnl              should work with most versions.)  Note: the -a option
-dnl              has been removed as of this version of GCC.
+dnl CXXFLAGS_OPT  : flags for optimized mode
+dnl CXXFLAGS_DVL  : flags for development mode
+dnl CXXFLAGS_DBG  : flags for debug mode
 dnl
 dnl Usage: SET_CXX_FLAGS
 dnl
@@ -239,8 +236,9 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
 [
   dnl Flag for creating shared objects; can be modified at a later stage
   if test $HOSTTYPE = "powerpc" ; then
-    CXXFLAGSO="-fno-common"
-    CXXFLAGSG="-fno-common"
+    CXXFLAGS_OPT="-fno-common"
+    CXXFLAGS_DVL="-fno-common"
+    CXXFLAGS_DBG="-fno-common"
     CXXSHAREDFLAG="-dynamiclib"
     CSHAREDFLAG="-dynamiclib"
     RPATHFLAG="-L"
@@ -254,25 +252,23 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
 
   dnl First the flags for gcc compilers
   if (test "$GXX" = yes -a "x$REAL_GXX" != "x" ) ; then
-    CXXFLAGSO="$CXXFLAGSO -O2 -felide-constructors -DNDEBUG"
-    CXXFLAGSG="$CXXFLAGSG -O2 -felide-constructors -g -ansi -pedantic -W -Wall -Wunused -Wpointer-arith -Wimplicit -Wformat -Wparentheses -Wuninitialized -DDEBUG"
-    CXXFLAGSP="$CXXFLAGSO -g -pg"
-    CXXFLAGSS="-fsyntax-only"
+    CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -felide-constructors"
+    CXXFLAGS_DVL="$CXXFLAGS_DVL -O2 -felide-constructors -g -ansi -pedantic -W -Wall -Wunused -Wpointer-arith -Wimplicit -Wformat -Wparentheses -Wuninitialized"
+    CXXFLAGS_DBG="$CXXFLAGS_DBG -O0 -felide-constructors -g -ansi -pedantic -W -Wall -Wunused -Wpointer-arith -Wimplicit -Wformat -Wparentheses"
 
-    CFLAGSO="-O2 -DNDEBUG"
-    CFLAGSG="-g -DDEBUG"
-    CFLAGSP="$CFLAGSO -g -pg"
-    CFLAGSS="-fsyntax-only"
+    CFLAGS_OPT="-O2"
+    CFLAGS_DVL="$CFLAGS_OPT -g"
+    CFLAGS_DBG="-g"
 
     dnl Position-independent code for shared libraries
     if test "$enableshared" = yes ; then
-      CXXFLAGSO="$CXXFLAGSO -fPIC"
-      CXXFLAGSG="$CXXFLAGSG -fPIC"
-      CXXFLAGSP="$CXXFLAGSP -fPIC"
+      CXXFLAGS_OPT="$CXXFLAGS_OPT -fPIC"
+      CXXFLAGS_DVL="$CXXFLAGS_DVL -fPIC"
+      CXXFLAGS_DBG="$CXXFLAGS_DBG -fPIC"
 
-      CFLAGSO="$CFLAGSO -fPIC"
-      CFLAGSG="$CFLAGSG -fPIC"
-      CFLAGSP="$CFLAGSP -fPIC"
+      CFLAGS_OPT="$CFLAGS_OPT -fPIC"
+      CFLAGS_DVL="$CFLAGS_DVL -fPIC"
+      CFLAGS_DBG="$CFLAGS_DBG -fPIC"
     fi
 
     dnl set some flags that are specific to some versions of the
@@ -281,31 +277,18 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
     dnl - after egcs1.1, the optimization flag -fstrict-aliasing was
     dnl   introduced, which enables better optimizations for
     dnl   well-written C++ code. (Your code *is* well-written, right?) 
-    dnl - egcs1.1 yielded incorrect code with vtable-thunks. thus disable
-    dnl   them for egcs1.1. however, if on Linux, disabling them
-    dnl   prevents programs from being linked, so take the risk of broken
-    dnl   thunks on this platform
   
     case "$GXX_VERSION" in
       egcs1.1)
-          case "$target" in
-            *linux*)
-                ;;
-  
-            *)
-                CXXFLAGSG = "$CXXFLAGSG -fno-vtable-thunks"
-                CXXFLAGSO = "$CXXFLAGSO -fno-vtable-thunks"
-                CXXFLAGSP = "$CXXFLAGSP -fno-vtable-thunks"
-                ;;
-          esac
           ;;
   
       dnl All other gcc versions
       *)
-          CXXFLAGSO="$CXXFLAGSO -funroll-loops -fstrict-aliasing"
-          CFLAGSO="$CFLAGSO -funroll-loops -fstrict-aliasing"
-          CXXFLAGSP="$CXXFLAGSP -funroll-loops -fstrict-aliasing"
-          CFLAGSP="$CFLAGSP -funroll-loops -fstrict-aliasing"
+          CXXFLAGS_OPT="$CXXFLAGS_OPT -funroll-loops -fstrict-aliasing"
+          CXXFLAGS_DVL="$CXXFLAGS_DVL -funroll-loops -fstrict-aliasing"
+
+          CFLAGS_OPT="$CFLAGS_OPT -funroll-loops -fstrict-aliasing"
+          CFLAGS_DVL="$CFLAGS_DVL -funroll-loops -fstrict-aliasing"
           ;;
     esac
   
@@ -315,9 +298,8 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
       dnl   (and are only supported for C any more), so only define them for
       dnl   previous compilers
       egcs1.1 | gcc2.95)
-         CXXFLAGSO="$CXXFLAGSO -fnonnull-objects"
-         CXXFLAGSG="$CXXFLAGSG -Wmissing-declarations -Wbad-function-cast -Wtraditional -Wnested-externs"
-         CXXFLAGSP="$CXXFLAGSP -fnonnull-objects"
+         CXXFLAGS_OPT="$CXXFLAGS_OPT -fnonnull-objects"
+         CXXFLAGS_DBG="$CXXFLAGS_DBG -Wmissing-declarations -Wbad-function-cast -Wtraditional -Wnested-externs"
          ;;
 
       dnl - define additional debug flags for newer versions of gcc which support them.
@@ -325,7 +307,8 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
       dnl Note:  do not use -Wold-style-cast...  creates a lot of unavoidable warnings
       dnl        when dealing with C APIs that take void* pointers.
       gcc3.* | gcc4.*)
-         CXXFLAGSG="$CXXFLAGSG -Woverloaded-virtual -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
+         CXXFLAGS_DVL="$CXXFLAGS_DVL -Woverloaded-virtual"
+         CXXFLAGS_DBG="$CXXFLAGS_DBG -Woverloaded-virtual -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
   	 ;;
       *)
          ;;
@@ -352,22 +335,24 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
   
     case "$GXX_VERSION" in
       ibm_xlc)
-          CXXFLAGSG="-DDEBUG -qmaxmem=-1 -qansialias -qrtti=all -g -qstaticinline"
-          CXXFLAGSO="-DNDEBUG -O3 -qmaxmem=-1 -w -qansialias -Q=10 -qrtti=all -qstaticinline"
-          CXXFLAGSP="$CXXFLAGSO -g -pg"
-          CFLAGSG="-DDEBUG -qansialias -g"
-          CFLAGSO="-DNDEBUG -O3 -qmaxmem=-1 -w -qansialias -Q=10"
-          CFLAGSP="$CFLAGSO -g -pg"
+          CXXFLAGS_OPT="-O3 -qmaxmem=-1 -w -qansialias -Q=10 -qrtti=all -qstaticinline"
+          CXXFLAGS_DBG="-qmaxmem=-1 -qansialias -qrtti=all -g -qstaticinline"
+	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
+          CFLAGS_OPT="-O3 -qmaxmem=-1 -w -qansialias -Q=10"
+          CFLAGS_DBG="-qansialias -g"
+          CFLAGS_DVL="$CFLAGS_DBG"
 	  CXXSHAREDFLAG="-G -qmkshrobj -bnoerrmsg"
 	  CSHAREDFLAG="-G -qmkshrobj"
 	  RPATHFLAG="-Qoption,link,-rpath,"
           ;;
   
       MIPSpro)
-          CXXFLAGSG="-DDEBUG -LANG:std -LANG:libc_in_namespace_std=OFF -no_auto_include -ansi -g -woff 1460"
-          CXXFLAGSO="-DNDEBUG -LANG:std -LANG:libc_in_namespace_std=OFF -no_auto_include -ansi -O2 -w"
-          CFLAGSG="-DDEBUG"
-          CFLAGSO="-DNDEBUG -O2 -w"
+          CXXFLAGS_OPT="-LANG:std -LANG:libc_in_namespace_std=OFF -no_auto_include -ansi -O2 -w"
+          CXXFLAGS_DBG="-LANG:std -LANG:libc_in_namespace_std=OFF -no_auto_include -ansi -g -woff 1460"
+	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
+          CFLAGS_OPT="-O2 -w"
+          CFLAGS_DBG="-g"
+          CFLAGS_DVL="$CFLAGS_DBG"
 
           dnl For some reason, CC forgets to add the math lib to the
           dnl linker line, so we do that ourselves
@@ -375,13 +360,13 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
 
           dnl Position-independent code for shared libraries
           if test "$enableshared" = yes ; then
-            CXXFLAGSO="$CXXFLAGSO -KPIC"
-            CXXFLAGSG="$CXXFLAGSG -KPIC"
-            CXXFLAGSP="$CXXFLAGSP -KPIC"
+            CXXFLAGS_OPT="$CXXFLAGS_OPT -KPIC"
+            CXXFLAGS_DBG="$CXXFLAGS_DBG -KPIC"
+            CXXFLAGS_DVL="$CXXFLAGS_DVL -KPIC"
 
-            CFLAGSO="$CFLAGSO -KPIC"
-            CFLAGSG="$CFLAGSG -KPIC"
-            CFLAGSP="$CFLAGSP -KPIC"
+            CFLAGS_OPT="$CFLAGS_OPT -KPIC"
+            CFLAGS_DBG="$CFLAGS_DBG -KPIC"
+            CFLAGS_DVL="$CFLAGS_DVL -KPIC"
 
             LDFLAGS="$LDFLAGS -KPIC"
           fi
@@ -404,22 +389,22 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           dnl        was from an assignment.
           dnl Note: In Version 8.1 (and possibly newer?) the -inline_debug_info
           dnl       option causes a segmentation fault in libmesh.C, probably others...
-          CXXFLAGSG="-Kc++eh -Krtti -O1 -w1 -DDEBUG -g -wd504 -wd1572"
-          CXXFLAGSO="-Kc++eh -Krtti -O2 -Ob2 -DNDEBUG -tpp6 -axK -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
-          CXXFLAGSP="$CXXFLAGSO -g -pg"
-          CFLAGSG="-w1 -DDEBUG -inline_debug_info -wd266 -wd1572"
-          CFLAGSO="-O2 -Ob2 -DNDEBUG -tpp6 -axK -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
-          CFLAGSP="$CFLAGSO -g -pg"
+          CXXFLAGS_DBG="-Kc++eh -Krtti -O1 -w1 -g -wd504 -wd1572"
+          CXXFLAGS_OPT="-Kc++eh -Krtti -O2 -Ob2 -tpp6 -axK -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
+	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
+          CFLAGS_DBG="-w1 -inline_debug_info -wd266 -wd1572"
+          CFLAGS_OPT="-O2 -Ob2 -tpp6 -axK -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
+          CFLAGS_DVL="$CFLAGS_DBG"
 
           dnl Position-independent code for shared libraries
           if test "$enableshared" = yes ; then
-            CXXFLAGSO="$CXXFLAGSO -KPIC"
-            CXXFLAGSG="$CXXFLAGSG -KPIC"
-            CXXFLAGSP="$CXXFLAGSP -KPIC"
+            CXXFLAGS_OPT="$CXXFLAGS_OPT -KPIC"
+            CXXFLAGS_DBG="$CXXFLAGS_DBG -KPIC"
+            CXXFLAGS_DVL="$CXXFLAGS_DVL -KPIC"
 
-            CFLAGSO="$CFLAGSO -KPIC"
-            CFLAGSG="$CFLAGSG -KPIC"
-            CFLAGSP="$CFLAGSP -KPIC"
+            CFLAGS_OPT="$CFLAGS_OPT -KPIC"
+            CFLAGS_DBG="$CFLAGS_DBG -KPIC"
+            CFLAGS_DVL="$CFLAGS_DVL -KPIC"
 
             LDFLAGS="$LDFLAGS -KPIC"
           fi
@@ -431,22 +416,22 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           dnl #266: 'function declared implicitly'
           dnl       Metis function "GKfree" caused this error
           dnl       in almost every file.
-          CXXFLAGSG="-Kc++eh -Krtti -O1 -w1 -DDEBUG -inline_debug_info -g -wd504"
-          CXXFLAGSO="-Kc++eh -Krtti -O2 -Ob2 -DNDEBUG -tpp6 -axiMK -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
-          CXXFLAGSP="$CXXFLAGSO -g -pg"
-          CFLAGSG="-w1 -DDEBUG -inline_debug_info -wd266"
-          CFLAGSO="-O2 -Ob2 -DNDEBUG -tpp6 -axiMK -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
-          CFLAGSP="$CFLAGSO -g -pg"
+          CXXFLAGS_DBG="-Kc++eh -Krtti -O1 -w1 -inline_debug_info -g -wd504"
+          CXXFLAGS_OPT="-Kc++eh -Krtti -O2 -Ob2 -tpp6 -axiMK -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
+	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
+          CFLAGS_DBG="-w1 -inline_debug_info -wd266"
+          CFLAGS_OPT="-O2 -Ob2 -tpp6 -axiMK -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
+          CFLAGS_DVL="$CFLAGS_DBG"
 
           dnl Position-independent code for shared libraries
           if test "$enableshared" = yes ; then
-            CXXFLAGSO="$CXXFLAGSO -KPIC"
-            CXXFLAGSG="$CXXFLAGSG -KPIC"
-            CXXFLAGSP="$CXXFLAGSP -KPIC"
+            CXXFLAGS_OPT="$CXXFLAGS_OPT -KPIC"
+            CXXFLAGS_DBG="$CXXFLAGS_DBG -KPIC"
+            CXXFLAGS_DVL="$CXXFLAGS_DVL -KPIC"
 
-            CFLAGSO="$CFLAGSO -KPIC"
-            CFLAGSG="$CFLAGSG -KPIC"
-            CFLAGSP="$CFLAGSP -KPIC"
+            CFLAGS_OPT="$CFLAGS_OPT -KPIC"
+            CFLAGS_DBG="$CFLAGS_DBG -KPIC"
+            CFLAGS_DVL="$CFLAGS_DVL -KPIC"
 
             LDFLAGS="$LDFLAGS -KPIC"
           fi
@@ -465,22 +450,22 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           dnl #1572: 'floating-point equality and inequality comparisons are unreliable'
           dnl        Well, duh, when the tested value is computed...  OK when it
           dnl        was from an assignment.
-          CXXFLAGSG="-Kc++eh -Krtti -w1 -DDEBUG -inline_debug_info -g -wd1476 -wd1505 -wd1572"
-          CXXFLAGSO="-Kc++eh -Krtti -O2 -DNDEBUG -unroll -w0 -ftz -vec_report0 -par_report0 -openmp_report0"
-          CXXFLAGSP="$CXXFLAGSO -g -pg"
-          CFLAGSG="-w1 -DDEBUG -inline_debug_info -wd266 -wd1572"
-          CFLAGSO="-O2 -DNDEBUG -unroll -w0 -ftz -vec_report0 -par_report0 -openmp_report0"
-          CFLAGSP="$CFLAGSO -g -pg"
+          CXXFLAGS_DBG="-Kc++eh -Krtti -w1 -inline_debug_info -g -wd1476 -wd1505 -wd1572"
+          CXXFLAGS_OPT="-Kc++eh -Krtti -O2 -unroll -w0 -ftz -vec_report0 -par_report0 -openmp_report0"
+	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
+          CFLAGS_DBG="-w1 -inline_debug_info -wd266 -wd1572"
+          CFLAGS_OPT="-O2 -unroll -w0 -ftz -vec_report0 -par_report0 -openmp_report0"
+          CFLAGS_DVL="$CFLAGS_DBG"
 
           dnl Position-independent code for shared libraries
           if test "$enableshared" = yes ; then
-            CXXFLAGSO="$CXXFLAGSO -KPIC"
-            CXXFLAGSG="$CXXFLAGSG -KPIC"
-            CXXFLAGSP="$CXXFLAGSP -KPIC"
+            CXXFLAGS_OPT="$CXXFLAGS_OPT -KPIC"
+            CXXFLAGS_DBG="$CXXFLAGS_DBG -KPIC"
+            CXXFLAGS_DVL="$CXXFLAGS_DVL -KPIC"
 
-            CFLAGSO="$CFLAGSO -KPIC"
-            CFLAGSG="$CFLAGSG -KPIC"
-            CFLAGSP="$CFLAGSP -KPIC"
+            CFLAGS_OPT="$CFLAGS_OPT -KPIC"
+            CFLAGS_DBG="$CFLAGS_DBG -KPIC"
+            CFLAGS_DVL="$CFLAGS_DVL -KPIC"
 
             LDFLAGS="$LDFLAGS -KPIC"
           fi
@@ -492,22 +477,22 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           dnl #266: 'function declared implicitly'
           dnl       Metis function "GKfree" caused this error
           dnl       in almost every file.
-          CXXFLAGSG="-Kc++eh -Krtti -w1 -DDEBUG -inline_debug_info -g"
-          CXXFLAGSO="-Kc++eh -Krtti -O2 -DNDEBUG -unroll -w0 -ftz"
-          CXXFLAGSP="$CXXFLAGSO -g -pg"
-          CFLAGSG="-w1 -DDEBUG -inline_debug_info -wd266"
-          CFLAGSO="-O2 -DNDEBUG -unroll -w0 -ftz"
-          CFLAGSP="$CFLAGSO -g -pg"
-
+          CXXFLAGS_DBG="-Kc++eh -Krtti -w1 -inline_debug_info -g"
+          CXXFLAGS_OPT="-Kc++eh -Krtti -O2 -unroll -w0 -ftz"
+	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
+          CFLAGS_DBG="-w1 -inline_debug_info -wd266"
+          CFLAGS_OPT="-O2 -unroll -w0 -ftz"
+          CFLAGS_DVL="$CFLAGS_DBG"
+	  
           dnl Position-independent code for shared libraries
           if test "$enableshared" = yes ; then
-            CXXFLAGSO="$CXXFLAGSO -KPIC"
-            CXXFLAGSG="$CXXFLAGSG -KPIC"
-            CXXFLAGSP="$CXXFLAGSP -KPIC"
+            CXXFLAGS_OPT="$CXXFLAGS_OPT -KPIC"
+            CXXFLAGS_DBG="$CXXFLAGS_DBG -KPIC"
+            CXXFLAGS_DVL="$CXXFLAGS_DVL -KPIC"
 
-            CFLAGSO="$CFLAGSO -KPIC"
-            CFLAGSG="$CFLAGSG -KPIC"
-            CFLAGSP="$CFLAGSP -KPIC"
+            CFLAGS_OPT="$CFLAGS_OPT -KPIC"
+            CFLAGS_DBG="$CFLAGS_DBG -KPIC"
+            CFLAGS_DVL="$CFLAGS_DVL -KPIC"
 
             LDFLAGS="$LDFLAGS -KPIC"
           fi
@@ -549,14 +534,17 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           dnl otherwise not all templates are instantiated (also some from the
           dnl standards library are missing).
   
-          CXXFLAGSG="-nousing_std -nocurrent_include -model ansi -std strict_ansi -w1 -msg_display_number -timplicit_local -DDEBUG"
-          CXXFLAGSO="-nousing_std -nocurrent_include -model ansi -std strict_ansi -w2 -msg_display_number -timplicit_local -DNDEBUG -O2 -fast"
-          CFLAGSG="-w1 -msg_display_number -timplicit_local -DDEBUG"
-          CFLAGSO="-w2 -msg_display_number -timplicit_local -DNDEBUG -O2 -fast"
-  
+          CXXFLAGS_DBG="-nousing_std -nocurrent_include -model ansi -std strict_ansi -w1 -msg_display_number -timplicit_local"
+          CXXFLAGS_OPT="-nousing_std -nocurrent_include -model ansi -std strict_ansi -w2 -msg_display_number -timplicit_local -O2 -fast"
+	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
+          CFLAGS_DBG="-w1 -msg_display_number -timplicit_local"
+          CFLAGS_OPT="-w2 -msg_display_number -timplicit_local -O2 -fast"
+  	  CFLAGS_DVL="$CFLAGS_DBG"
+
           for i in 175 236 237 487 1136 1156 111 1182 265 ; do
-            CXXFLAGSG="$CXXFLAGSG -msg_disable $i"
-            CXXFLAGSO="$CXXFLAGSO -msg_disable $i"
+            CXXFLAGS_DBG="$CXXFLAGS_DBG -msg_disable $i"
+            CXXFLAGS_OPT="$CXXFLAGS_OPT -msg_disable $i"
+            CXXFLAGS_DVL="$CXXFLAGS_DVL -msg_disable $i"
           done
   
           dnl If we use -model ansi to compile the files, we also have to
@@ -570,23 +558,25 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
 
           dnl Position-independent code for shared libraries
           if test "$enableshared" = yes ; then
-            CXXFLAGSO="$CXXFLAGSO -shared"
-            CXXFLAGSG="$CXXFLAGSG -shared"
-            CXXFLAGSP="$CXXFLAGSP -shared"
+            CXXFLAGS_OPT="$CXXFLAGS_OPT -shared"
+            CXXFLAGS_DBG="$CXXFLAGS_DBG -shared"
+            CXXFLAGS_DVL="$CXXFLAGS_DVL -shared"
 
-            CFLAGSO="$CFLAGSO -shared"
-            CFLAGSG="$CFLAGSG -shared"
-            CFLAGSP="$CFLAGSP -shared"
+            CFLAGS_OPT="$CFLAGS_OPT -shared"
+            CFLAGS_DBG="$CFLAGS_DBG -shared"
+            CFLAGS_DVL="$CFLAGS_DVL -shared"
 
             LDFLAGS="$LDFLAGS -shared"
           fi
           ;;
   
       sun_studio | sun_forte)
-          CXXFLAGSG="-DDEBUG -library=stlport4 -g"
-          CXXFLAGSO="-DNDEBUG -library=stlport4 -xO4"
-          CFLAGSG="-DDEBUG -g"
-          CFLAGSO="-DNDEBUG -xO4"
+          CXXFLAGS_DBG="-library=stlport4 -g"
+          CXXFLAGS_OPT="-library=stlport4 -xO4"
+	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
+          CFLAGS_DBG="-g"
+          CFLAGS_OPT="-xO4"
+          CFLAGS_DVL="$CFLAGS_DBG"
 
           CXXSHAREDFLAG="-G"
           CSHAREDFLAG="-G"
@@ -597,23 +587,25 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
 
           dnl Position-independent code for shared libraries
           if test "$enableshared" = yes ; then
-            CXXFLAGSO="$CXXFLAGSO -KPIC"
-            CXXFLAGSG="$CXXFLAGSG -KPIC"
-            CXXFLAGSP="$CXXFLAGSP -KPIC"
+            CXXFLAGS_OPT="$CXXFLAGS_OPT -KPIC"
+            CXXFLAGS_DBG="$CXXFLAGS_DBG -KPIC"
+            CXXFLAGS_DVL="$CXXFLAGS_DVL -KPIC"
 
-            CFLAGSO="$CFLAGSO -KPIC"
-            CFLAGSG="$CFLAGSG -KPIC"
-            CFLAGSP="$CFLAGSP -KPIC"
+            CFLAGS_OPT="$CFLAGS_OPT -KPIC"
+            CFLAGS_DBG="$CFLAGS_DBG -KPIC"
+            CFLAGS_DVL="$CFLAGS_DVL -KPIC"
 
             LDFLAGS="$LDFLAGS -KPIC"
           fi
           ;;
   
       portland_group)
-	  CXXFLAGSG="-g --no_using_std --instantiate=none --one_instantiation_per_object --prelink_objects -DDEBUG"
-          CXXFLAGSO="-O2 --no_using_std --instantiate=none --one_instantiation_per_object --prelink_objects -DNDEBUG"
-	  CFLAGSG="-g -DDEBUG"
-          CFLAGSO="-O2 -DNDEBUG"
+	  CXXFLAGS_DBG="-g --no_using_std --instantiate=none --one_instantiation_per_object --prelink_objects"
+          CXXFLAGS_OPT="-O2 --no_using_std --instantiate=none --one_instantiation_per_object --prelink_objects"
+	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
+	  CFLAGS_DBG="-g"
+          CFLAGS_OPT="-O2"
+          CFLAGS_DVL="$CFLAGS_DBG"
 
 	  LDFLAGS="$LDFLAGS -fpic"
           ;;
@@ -632,20 +624,24 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           dnl for cc:
           dnl  -Aa compiles under true ANSI mode
           dnl  -Ae turns on ANSI C with some HP extensions
-          CXXFLAGSG="+DA2.0W -AA +z -ext -g"
-          CXXFLAGSO="+DA2.0W -AA +z -ext -O +Onolimit"
-	  CFLAGSG="+DA2.0W -Aa +z -Ae -g"
-          CFLAGSO="+DA2.0W -Aa +z -Ae -O +Onolimit"
+          CXXFLAGS_DBG="+DA2.0W -AA +z -ext -g"
+          CXXFLAGS_OPT="+DA2.0W -AA +z -ext -O +Onolimit"
+	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
+	  CFLAGS_DBG="+DA2.0W -Aa +z -Ae -g"
+          CFLAGS_OPT="+DA2.0W -Aa +z -Ae -O +Onolimit"
+          CFLAGS_DVL="$CFLAGS_DBG"
           LDFLAGS="$LDFLAGS -I/usr/lib/pa20_64"
           LIBS="$LIBS -lrpcsvc"
           FLIBS="$FLIBS -lF90 -lcl -I/opt/fortran90/lib/pa20_64"
           ;;
 
       cray_cc)
-	  CXXFLAGSG="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n -DDEBUG"
-	  CXXFLAGSO="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n -DNDEBUG"
-	  CFLAGSG="-G n -DDEBUG"
-	  CFLAGSO="-G n -DNDEBUG"
+	  CXXFLAGS_DBG="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
+ 	  CXXFLAGS_OPT="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
+ 	  CXXFLAGS_DVL="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
+	  CFLAGS_DBG="-G n"
+	  CFLAGS_OPT="-G n"
+	  CFLAGS_DVL="-G n"
 
 	  CXXSHAREDFLAG=""
 	  CSHAREDFLAG=""
@@ -654,13 +650,13 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
 
       *)
           AC_MSG_RESULT(No specific options for this C++ compiler known)
-	  CXXFLAGSG="$CXXFLAGS -DDEBUG"
-	  CXXFLAGSO="$CXXFLAGS -DNDEBUG"
-	  CXXFLAGSP="$CXXFLAGS -DNDEBUG"
+	  CXXFLAGS_DBG="$CXXFLAGS"
+	  CXXFLAGS_OPT="$CXXFLAGS"
+	  CXXFLAGS_DVL="$CXXFLAGS"
 
-	  CFLAGSG="$CFLAGS -DDEBUG"
-	  CFLAGSO="$CFLAGS -DNDEBUG"
-	  CFLAGSP="$CFLAGS -DNDEBUG"
+	  CFLAGS_DBG="$CFLAGS"
+	  CFLAGS_OPT="$CFLAGS"
+	  CFLAGS_DVL="$CFLAGS"
 	  ;;
     esac
   fi
@@ -778,7 +774,7 @@ AC_DEFUN(CONFIGURE_SFC,
 
   if (test $enablesfc = yes); then
      SFC_INCLUDE="-I$PWD/contrib/sfcurves"
-     SFC_LIB="\$(EXTERNAL_LIBDIR)/libsfcurves\$(EXTERNAL_LIBEXT)"
+     SFC_LIB="\$(EXTERNAL_LIBDIR)/libsfcurves\$(libext)"
      AC_DEFINE(HAVE_SFCURVES, 1, [Flag indicating whether or not Space filling curves are available])
      AC_MSG_RESULT(<<< Configuring library with SFC support >>>)
      CONTRIB_HAVE_SFC="#define HAVE_SFCURVES 1"
@@ -820,7 +816,7 @@ if (test $enablegz = yes); then
   dnl If both tests succeded, continue the configuration process.
   if (test "$have_zlib_h" = yes -a "$have_libz" = yes) ; then
     GZSTREAM_INCLUDE="-I$PWD/contrib/gzstream"
-    GZSTREAM_LIB="\$(EXTERNAL_LIBDIR)/libgzstream\$(EXTERNAL_LIBEXT) -lz"
+    GZSTREAM_LIB="\$(EXTERNAL_LIBDIR)/libgzstream\$(libext) -lz"
     AC_DEFINE(HAVE_GZSTREAM, 1, [Flag indicating whether or not gzstreams are available])
     AC_MSG_RESULT(<<< Configuring library with gzstreams support >>>)
     CONTRIB_HAVE_GZSTREAM="#define HAVE_GZSTREAM 1"
@@ -862,7 +858,7 @@ fi
 if (test $enablelaspack = yes); then
 
   LASPACK_INCLUDE="-I$PWD/contrib/laspack"
-  LASPACK_LIB="\$(EXTERNAL_LIBDIR)/liblaspack\$(EXTERNAL_LIBEXT)"
+  LASPACK_LIB="\$(EXTERNAL_LIBDIR)/liblaspack\$(libext)"
   AC_DEFINE(HAVE_LASPACK, 1, [Flag indicating whether or not LASPACK iterative solvers are available])
   laspack_version=`grep "define LASPACK_VERSION " $PWD/contrib/laspack/version.h | sed -e "s/[[^0-9.]]*//g"`
   AC_MSG_RESULT(<<< Configuring library with LASPACK version $laspack_version support >>>)
@@ -889,7 +885,7 @@ AC_DEFUN(CONFIGURE_METIS,
 	        [ 
 	          METIS_INCLUDE_PATH=$PWD/contrib/metis/Lib
                   METIS_INCLUDE=-I$METIS_INCLUDE_PATH
-                  METIS_LIB="\$(EXTERNAL_LIBDIR)/libmetis\$(EXTERNAL_LIBEXT)"
+                  METIS_LIB="\$(EXTERNAL_LIBDIR)/libmetis\$(libext)"
 		  AC_SUBST(METIS_INCLUDE)
                   AC_SUBST(METIS_LIB)
                   AC_DEFINE(HAVE_METIS, 1,
@@ -922,7 +918,7 @@ AC_DEFUN(CONFIGURE_PARMETIS,
       		  
       	          PARMETIS_INCLUDE_PATH=$PWD/contrib/parmetis/Lib
                       PARMETIS_INCLUDE=-I$PARMETIS_INCLUDE_PATH
-                      PARMETIS_LIB="\$(EXTERNAL_LIBDIR)/libparmetis\$(EXTERNAL_LIBEXT)"
+                      PARMETIS_LIB="\$(EXTERNAL_LIBDIR)/libparmetis\$(libext)"
       		  AC_SUBST(PARMETIS_INCLUDE)
                       AC_SUBST(PARMETIS_LIB)
                       AC_DEFINE(HAVE_PARMETIS, 1,
@@ -987,7 +983,7 @@ dnl if TetGen is enabled we need the header path and the lib
 
   if (test $enabletetgen = yes) ; then
      TETGEN_INCLUDE="-I$PWD/contrib/tetgen"
-     TETGEN_LIBRARY="\$(EXTERNAL_LIBDIR)/libtetgen\$(EXTERNAL_LIBEXT)"
+     TETGEN_LIBRARY="\$(EXTERNAL_LIBDIR)/libtetgen\$(libext)"
      AC_DEFINE(HAVE_TETGEN, 1, [Flag indicating whether the library will be compiled with TetGen support])
      AC_MSG_RESULT(<<< Configuring library with TetGen support >>>)
      CONTRIB_HAVE_TETGEN="#define HAVE_TETGEN 1"
@@ -1018,7 +1014,7 @@ dnl where it might be installed...
 
   if (test $enabletriangle = yes); then
      TRIANGLE_INCLUDE="-I$PWD/contrib/triangle"
-     TRIANGLE_LIBRARY="\$(EXTERNAL_LIBDIR)/libtriangle\$(EXTERNAL_LIBEXT)"
+     TRIANGLE_LIBRARY="\$(EXTERNAL_LIBDIR)/libtriangle\$(libext)"
      AC_DEFINE(HAVE_TRIANGLE, 1, [Flag indicating whether the library will be compiled with Triangle support])
      AC_MSG_RESULT(<<< Configuring library with Triangle support >>>)
      CONTRIB_HAVE_TRIANGLE="#define HAVE_TRIANGLE 1"

@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.46 2005-05-12 17:01:18 spetersen Exp $
+# $Id: Make.common.in,v 1.47 2005-06-01 21:43:38 benkirk Exp $
 
 
 ###############################################################################
@@ -87,6 +87,8 @@ export libmesh_dir
 
 
 ###############################################################################
+# Set the option to determine if shared libraries will be built
+enable-shared := @enableshared@
 #
 # Figure out the compilation mode based on the
 # environment variable METHOD.
@@ -94,61 +96,59 @@ opt-mode   := off
 debug-mode := off
 prof-mode  := off
 syn-mode   := off
-obj-suffix := @host@.o
+
 
 #
 # If the user has no environment variable
 # called METHOD, he gets optimized mode.
 ifeq (x$(METHOD),x)
-  METHOD     := opt
+  METHOD := opt
 endif
 
 #
 # If METHOD=opt, compile in optimized mode.
 ifeq ($(METHOD),opt)
-  opt-mode   := on
-  obj-suffix := @host@.o
+  opt-mode := on
+  mode     := "optimized"
+endif
+
+#
+# If METHOD=devel, compile in development mode.
+ifeq ($(METHOD),devel)
+  devel-mode := on
+  mode       := "development"
 endif
 
 #
 # If METHOD=dbg, compile in debug mode.
 ifeq ($(METHOD),dbg)
   debug-mode := on
-  obj-suffix := @host@.g.o
+  mode       := "debug"
 endif
 
 #
-# If METHOD=pro, compile in profiler mode
+# If METHOD=prof, compile in profiling mode
 ifeq ($(METHOD),pro)
-  prof-mode  := on
-  obj-suffix := @host@.pg.o
-endif
-
-#
-# If METHOD=syn, compile in syntax-checking mode
-ifeq ($(METHOD),syn)
-  syn-mode  := on
-  obj-suffix := @host@.sy.o
-endif
-
-#
-# Set the option to determine what type of
-# library (.so or .a) will be built.
-enable-shared        := @enableshared@
-
-#
-# If we are profiling, we CANNOT use shared
-# libs.  At least I don't think we can ;)
-ifeq ($(prof-mode),on)
+  prof-mode     := on
+  mode          := "profiling"
   enable-shared := no
 endif
 
+# The file extension for object files.
+# foo.C is compiled to foo.$(obj-suffix)
+obj-suffix := @host@.$(METHOD).o
+
 #
 # Define the right lib-extension for shared libraries
+static_libext := .a
+shared_libext := .so
 ifeq ($(findstring darwin,$(hostos)),darwin)
-  SHARED_LIBEXT := .dylib
-else
-  SHARED_LIBEXT := .so
+  shared_libext := .dylib
+endif
+
+libext := $(static_libext)
+ifeq ($(enable-shared),yes) 
+  libext := $(shared_libext)
 endif
 ###############################################################################
 
@@ -156,27 +156,27 @@ endif
 
 ###############################################################################
 # Compiler flags, different for optimized, debug, and profiler modes.
-ifeq ($(debug-mode),on)
-  CXXFLAGS += @CXXFLAGSG@
-  CFLAGS   += @CFLAGSG@
+ifeq ($(opt-mode),on)
+  CXXFLAGS += -DNDEBUG @CXXFLAGS_OPT@
+  CFLAGS   += -DNDEBUG @CFLAGS_OPT@
 endif
 
 
-ifeq ($(opt-mode),on)
-  CXXFLAGS += @CXXFLAGSO@
-  CFLAGS   += @CFLAGSO@
+ifeq ($(devel-mode),on)
+  CXXFLAGS += @CXXFLAGS_DVL@
+  CFLAGS   += @CFLAGS_DVL@
+endif
+
+
+ifeq ($(debug-mode),on)
+  CXXFLAGS += -DDEBUG @CXXFLAGS_DBG@
+  CFLAGS   += -DDEBUG @CFLAGS_DBG@
 endif
 
 
 ifeq ($(prof-mode),on)
-  CXXFLAGS += @CXXFLAGSP@ 
-  CFLAGS   += @CFLAGSP@ 
-endif
-
-
-ifeq ($(syn-mode),on)
-  CXXFLAGS += @CXXFLAGSS@ 
-  CFLAGS   += @CFLAGSS@ 
+  CXXFLAGS += -DNDEBUG @CXXFLAGS_OPT@ -pg
+  CFLAGS   += -DNDEBUG @CFLAGS_OPT@ -pg 
 endif
 
 ifeq ($(prof-mode),on)
@@ -191,9 +191,9 @@ endif
 #
 mesh_library_dir := $(libmesh_dir)/lib/$(hosttype)_$(METHOD)
 
-mesh_library     := $(mesh_library_dir)/libmesh.a
+mesh_library     := $(mesh_library_dir)/libmesh$(static_libext)
 ifeq ($(enable-shared),yes) 
-  mesh_library   := $(mesh_library_dir)/libmesh$(SHARED_LIBEXT)
+  mesh_library   := $(mesh_library_dir)/libmesh$(shared_libext)
   DLFLAGS += $(RPATHFLAG)$(mesh_library_dir)
 endif
 
@@ -228,9 +228,7 @@ INCLUDE += $(LIBMESH_INCLUDES)
 #
 # Contributed source & libraries
 EXTERNAL_LIBDIR := $(libmesh_dir)/contrib/lib/$(hosttype)_$(METHOD)
-EXTERNAL_LIBEXT := .a
 ifeq ($(enable-shared),yes) 
-  EXTERNAL_LIBEXT := $(SHARED_LIBEXT)
   DLFLAGS += $(RPATHFLAG)$(EXTERNAL_LIBDIR)
 endif
 
@@ -450,33 +448,11 @@ INCLUDE += @NETCDF_INCLUDE@
 ##################################
 
 #
-# How to compile optimized C++
+# How to compile C++
 #
-%.@host@.o : %.C
-	@echo "Compiling C++ (in optimized mode) "$<"..."
+%.$(obj-suffix) : %.C
+	@echo "Compiling C++ (in "$(mode)" mode) "$<"..."
 	@$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
-
-#
-# How to compile C++ with debugging flags
-#
-%.@host@.g.o : %.C
-	@echo "Compiling C++ (in debug mode) "$<"..."
-	@$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
-
-#
-# How to compile C++ with profiling flags
-#
-%.@host@.pg.o : %.C
-	@echo "Compiling C++ (in profiler mode) "$<"..."
-	@$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
-
-#
-# How to compile C++ with syntax-checking flags
-#
-%.@host@.sy.o : %.C
-	@echo "Compiling C++ (in syntax-checker mode) "$<"..."
-	@$(CXX) $(CXXFLAGS) $(INCLUDE) -c $<
-	$(shell touch $@)
 
 ##################################
 # C rules                        #
@@ -485,33 +461,11 @@ INCLUDE += @NETCDF_INCLUDE@
 # do not show this to the LASPACK Makefile
 ifeq (x$(included-from-laspack),x)
   #
-  # How to compile optimized C
+  # How to compile C
   #
-%.@host@.o : %.c
-	@echo "Compiling C (in optimized mode) "$<"..."
+%.$(obj-suffix) : %.c
+	@echo "Compiling C (in "$(mode)" mode) "$<"..."
 	@$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
-
-  #
-  # How to compile C with debugging flags
-  #
-%.@host@.g.o : %.c
-	@echo "Compiling C (in debug mode) "$<"..."
-	@$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
-
-  #
-  # How to compile C with profiling flags
-  #
-%.@host@.pg.o : %.c
-	@echo "Compiling C (in profiler mode) "$<"..."
-	@$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
-
-  #
-  # How to compile C with profiling flags
-  #
-%.@host@.sy.o : %.c
-	@echo "Compiling C (in syntax-checker mode) "$<"..."
-	@$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
-	$(shell touch $@)
 
 else
 
@@ -519,42 +473,16 @@ else
   ifeq ($(enable-complex),yes)
 
     # complex: C++ rules for .c Laspack code
-%.@host@.o : %.c
-	@echo "Compiling C++ (in optimized mode) "$<"..."
+%.$(obj-suffix) : %.c
+	@echo "Compiling C++ (in "$(mode)" mode) "$<"..."
 	@$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
-
-%.@host@.g.o : %.c
-	@echo "Compiling C++ (in debug mode) "$<"..."
-	@$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
-
-%.@host@.pg.o : %.c
-	@echo "Compiling C++ (in profiler mode) "$<"..."
-	@$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
-
-%.@host@.sy.o : %.c
-	@echo "Compiling C++ (in syntax-checker mode) "$<"..."
-	@$(CXX) $(CXXFLAGS) $(INCLUDE) -c $<
-	$(shell touch $@)
 
   else
 
     # real: C rules for .c Laspack code
-%.@host@.o : %.c
-	@echo "Compiling C (in optimized mode) "$<"..."
+%.$(obj-suffix) : %.c
+	@echo "Compiling C (in "$(mode)" mode) "$<"..."
 	@$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
-
-%.@host@.g.o : %.c
-	@echo "Compiling C (in debug mode) "$<"..."
-	@$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
-
-%.@host@.pg.o : %.c
-	@echo "Compiling C (in profiler mode) "$<"..."
-	@$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
-
-%.@host@.sy.o : %.c
-	@echo "Compiling C (in syntax-checker mode) "$<"..."
-	@$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
-	$(shell touch $@)
 
   endif
 endif
