@@ -1,4 +1,4 @@
-// $Id: dof_object.h,v 1.8 2005-02-22 22:17:30 jwpeterson Exp $
+// $Id: dof_object.h,v 1.9 2005-06-02 18:25:42 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -28,8 +28,11 @@
 #include "libmesh_config.h"
 #include "libmesh_common.h"
 #include "libmesh.h" // libMesh::invalid_uint
+#include "reference_counted_object.h"
 
 // Forward declarations
+class DofObject;
+
 
 
 /**
@@ -48,10 +51,10 @@
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.8 $
+ * \version $Revision: 1.9 $
  */
 
-class DofObject
+class DofObject : public ReferenceCountedObject<DofObject>
 {
   
 protected:
@@ -334,6 +337,7 @@ DofObject::DofObject () :
 
 inline
 DofObject::DofObject (const DofObject& dof_obj) :
+  ReferenceCountedObject<DofObject>(),
 #ifdef ENABLE_AMR
   old_dof_object (NULL),
 #endif
@@ -660,6 +664,7 @@ unsigned int DofObject::n_comp(const unsigned int s,
   assert (_n_comp != NULL);
   assert (_n_comp[s] != NULL);
 
+# ifdef DEBUG
   // Does this ever happen?  I doubt it... 3/7/2003 (BSK)
   if (var >= this->n_vars(s))
     {
@@ -670,6 +675,7 @@ unsigned int DofObject::n_comp(const unsigned int s,
 	
       return 0;
     }
+# endif
   
   return static_cast<unsigned int>(_n_comp[s][var]);
 

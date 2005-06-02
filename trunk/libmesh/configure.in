@@ -1,5 +1,5 @@
 dnl --------------------------------------------------------------
-dnl $Id: configure.in,v 1.59 2005-06-01 21:43:38 benkirk Exp $
+dnl $Id: configure.in,v 1.60 2005-06-02 18:25:39 benkirk Exp $
 dnl --------------------------------------------------------------
 dnl Process this file with autoconf to produce a configure script.
 
@@ -9,7 +9,7 @@ dnl you call ./configure subsequently on different systems without
 dnl clearing the cache 
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
-AC_REVISION($Revision: 1.59 $)
+AC_REVISION($Revision: 1.60 $)
 
 
 AC_INIT
@@ -79,6 +79,7 @@ AC_SUBST(LDFLAGS)
 AC_SUBST(CXXDEPFLAG)
 AC_SUBST(CXXSHAREDFLAG)
 AC_SUBST(RPATHFLAG)
+AC_SUBST(PROFILING_FLAGS)
 
 
 dnl --------------------------------------------------------------

@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.88 2005-06-01 21:43:38 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.89 2005-06-02 18:25:37 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -223,9 +223,10 @@ dnl Set C++ compiler flags to their default values. They will be
 dnl modified according to other options in later steps of
 dnl configuration
 dnl
-dnl CXXFLAGS_OPT  : flags for optimized mode
-dnl CXXFLAGS_DVL  : flags for development mode
-dnl CXXFLAGS_DBG  : flags for debug mode
+dnl CXXFLAGS_OPT    : flags for optimized mode
+dnl CXXFLAGS_DVL    : flags for development mode
+dnl CXXFLAGS_DBG    : flags for debug mode
+dnl PROFILING_FLAGS : flags to enable code profiling
 dnl
 dnl Usage: SET_CXX_FLAGS
 dnl
@@ -249,6 +250,8 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
     RPATHFLAG="-Wl,-rpath,"
   fi
 
+  dnl Flag for profiling mode; can me modified at a later stage
+  PROFILING_FLAGS="-pg"
 
   dnl First the flags for gcc compilers
   if (test "$GXX" = yes -a "x$REAL_GXX" != "x" ) ; then
@@ -307,7 +310,8 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
       dnl Note:  do not use -Wold-style-cast...  creates a lot of unavoidable warnings
       dnl        when dealing with C APIs that take void* pointers.
       gcc3.* | gcc4.*)
-         CXXFLAGS_DVL="$CXXFLAGS_DVL -Woverloaded-virtual"
+	 CXXFLAGS_OPT="$CXXFLAGS_OPT -Wdisabled-optimization"
+         CXXFLAGS_DVL="$CXXFLAGS_DVL -Woverloaded-virtual -Wdisabled-optimization"
          CXXFLAGS_DBG="$CXXFLAGS_DBG -Woverloaded-virtual -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
   	 ;;
       *)
@@ -378,125 +382,100 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           fi
           ;;
 
-      dnl Intel ICC >= 8.1	
-      intel_icc_v8.1)	
-          dnl Disable some warning messages:
-          dnl #266: 'function declared implicitly'
-          dnl       Metis function "GKfree" caused this error
-          dnl       in almost every file.
-          dnl #1572: 'floating-point equality and inequality comparisons are unreliable'
-          dnl        Well, duh, when the tested value is computed...  OK when it
-          dnl        was from an assignment.
-          dnl Note: In Version 8.1 (and possibly newer?) the -inline_debug_info
-          dnl       option causes a segmentation fault in libmesh.C, probably others...
-          CXXFLAGS_DBG="-Kc++eh -Krtti -O1 -w1 -g -wd504 -wd1572"
-          CXXFLAGS_OPT="-Kc++eh -Krtti -O2 -Ob2 -tpp6 -axK -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
-	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
-          CFLAGS_DBG="-w1 -inline_debug_info -wd266 -wd1572"
-          CFLAGS_OPT="-O2 -Ob2 -tpp6 -axK -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
-          CFLAGS_DVL="$CFLAGS_DBG"
+      dnl All Intel ICC/ECC flavors
+      intel_*)
 
-          dnl Position-independent code for shared libraries
-          if test "$enableshared" = yes ; then
-            CXXFLAGS_OPT="$CXXFLAGS_OPT -KPIC"
-            CXXFLAGS_DBG="$CXXFLAGS_DBG -KPIC"
-            CXXFLAGS_DVL="$CXXFLAGS_DVL -KPIC"
+        dnl Intel compilers use -qp for profiling
+        PROFILING_FLAGS="-qp"
 
-            CFLAGS_OPT="$CFLAGS_OPT -KPIC"
-            CFLAGS_DBG="$CFLAGS_DBG -KPIC"
-            CFLAGS_DVL="$CFLAGS_DVL -KPIC"
+        dnl Specific flags for specific versions
+        case "$GXX_VERSION" in
+          dnl Intel ICC >= 8.1	
+          intel_icc_v8.1)	
+              dnl Disable some warning messages:
+              dnl #266: 'function declared implicitly'
+              dnl       Metis function "GKfree" caused this error
+              dnl       in almost every file.
+              dnl #1572: 'floating-point equality and inequality comparisons are unreliable'
+              dnl        Well, duh, when the tested value is computed...  OK when it
+              dnl        was from an assignment.
+              dnl Note: In Version 8.1 (and possibly newer?) the -inline_debug_info
+              dnl       option causes a segmentation fault in libmesh.C, probably others...
+              CXXFLAGS_DBG="-Kc++eh -Krtti -O1 -w1 -g -wd504 -wd1572"
+              CXXFLAGS_OPT="-Kc++eh -Krtti -O2 -Ob2 -tpp6 -axK -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
+              CXXFLAGS_DVL="$CXXFLAGS_DBG"
+              CFLAGS_DBG="-w1 -inline_debug_info -wd266 -wd1572"
+              CFLAGS_OPT="-O2 -Ob2 -tpp6 -axK -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
+              CFLAGS_DVL="$CFLAGS_DBG"
+              ;;
+          
+          dnl Intel ICC < v8.1
+          intel_icc*)
+              dnl Disable some warning messages:
+              dnl #266: 'function declared implicitly'
+              dnl       Metis function "GKfree" caused this error
+              dnl       in almost every file.
+              CXXFLAGS_OPT="-Kc++eh -Krtti -O2 -Ob2 -tpp6 -axiMK -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
+              CXXFLAGS_DVL="-Kc++eh -Krtti -O1 -w1 -inline_debug_info -g -wd504"
+              CXXFLAGS_DBG="-Kc++eh -Krtti -O0 -w1 -inline_debug_info -g -wd504"
+              CFLAGS_DBG="-w1 -inline_debug_info -wd266"
+              CFLAGS_OPT="-O2 -Ob2 -tpp6 -axiMK -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
+              CFLAGS_DVL="$CFLAGS_DBG"
+              ;;
+          
+          dnl Intel Itanium ICC >= v8.1
+          intel_itanium_icc_v8.1)
+              dnl Disable some warning messages:
+              dnl #266: 'function declared implicitly'
+              dnl       Metis function "GKfree" caused this error
+              dnl       in almost every file.
+              dnl #1476: 'field uses tail padding of a base class'
+          	  dnl #1505: 'size of class is affected by tail padding'
+              dnl        simply warns of a possible incompatibility with
+              dnl        the g++ ABI for this case
+              dnl #1572: 'floating-point equality and inequality comparisons are unreliable'
+              dnl        Well, duh, when the tested value is computed...  OK when it
+              dnl        was from an assignment.
+              CXXFLAGS_DBG="-Kc++eh -Krtti -w1 -inline_debug_info -g -wd1476 -wd1505 -wd1572"
+              CXXFLAGS_OPT="-Kc++eh -Krtti -O2 -unroll -w0 -ftz -vec_report0 -par_report0 -openmp_report0"
+              CXXFLAGS_DVL="$CXXFLAGS_DBG"
+              CFLAGS_DBG="-w1 -inline_debug_info -wd266 -wd1572"
+              CFLAGS_OPT="-O2 -unroll -w0 -ftz -vec_report0 -par_report0 -openmp_report0"
+              CFLAGS_DVL="$CFLAGS_DBG"
+              ;;
+          
+          dnl Intel Itanium ICC < v8.1
+          intel_itanium_icc*)
+              dnl Disable some warning messages:
+              dnl #266: 'function declared implicitly'
+              dnl       Metis function "GKfree" caused this error
+              dnl       in almost every file.
+              CXXFLAGS_DBG="-Kc++eh -Krtti -w1 -inline_debug_info -g"
+              CXXFLAGS_OPT="-Kc++eh -Krtti -O2 -unroll -w0 -ftz"
+              CXXFLAGS_DVL="$CXXFLAGS_DBG"
+              CFLAGS_DBG="-w1 -inline_debug_info -wd266"
+              CFLAGS_OPT="-O2 -unroll -w0 -ftz"
+              CFLAGS_DVL="$CFLAGS_DBG"
+              ;;
 
-            LDFLAGS="$LDFLAGS -KPIC"
-          fi
-          ;;
+          *)
+	      AC_MSG_RESULT(Unknown Intel complier, "$GXX_VERSION")
+              ;;
+        esac
 
-      dnl Intel ICC < v8.1
-      intel_icc*)
-          dnl Disable some warning messages:
-          dnl #266: 'function declared implicitly'
-          dnl       Metis function "GKfree" caused this error
-          dnl       in almost every file.
-          CXXFLAGS_DBG="-Kc++eh -Krtti -O1 -w1 -inline_debug_info -g -wd504"
-          CXXFLAGS_OPT="-Kc++eh -Krtti -O2 -Ob2 -tpp6 -axiMK -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
-	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
-          CFLAGS_DBG="-w1 -inline_debug_info -wd266"
-          CFLAGS_OPT="-O2 -Ob2 -tpp6 -axiMK -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
-          CFLAGS_DVL="$CFLAGS_DBG"
-
-          dnl Position-independent code for shared libraries
-          if test "$enableshared" = yes ; then
-            CXXFLAGS_OPT="$CXXFLAGS_OPT -KPIC"
-            CXXFLAGS_DBG="$CXXFLAGS_DBG -KPIC"
-            CXXFLAGS_DVL="$CXXFLAGS_DVL -KPIC"
-
-            CFLAGS_OPT="$CFLAGS_OPT -KPIC"
-            CFLAGS_DBG="$CFLAGS_DBG -KPIC"
-            CFLAGS_DVL="$CFLAGS_DVL -KPIC"
-
-            LDFLAGS="$LDFLAGS -KPIC"
-          fi
-          ;;
-
-      dnl Intel Itanium ICC >= v8.1
-      intel_itanium_icc_v8.1)
-          dnl Disable some warning messages:
-          dnl #266: 'function declared implicitly'
-          dnl       Metis function "GKfree" caused this error
-          dnl       in almost every file.
-          dnl #1476: 'field uses tail padding of a base class'
-	  dnl #1505: 'size of class is affected by tail padding'
-          dnl        simply warns of a possible incompatibility with
-          dnl        the g++ ABI for this case
-          dnl #1572: 'floating-point equality and inequality comparisons are unreliable'
-          dnl        Well, duh, when the tested value is computed...  OK when it
-          dnl        was from an assignment.
-          CXXFLAGS_DBG="-Kc++eh -Krtti -w1 -inline_debug_info -g -wd1476 -wd1505 -wd1572"
-          CXXFLAGS_OPT="-Kc++eh -Krtti -O2 -unroll -w0 -ftz -vec_report0 -par_report0 -openmp_report0"
-	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
-          CFLAGS_DBG="-w1 -inline_debug_info -wd266 -wd1572"
-          CFLAGS_OPT="-O2 -unroll -w0 -ftz -vec_report0 -par_report0 -openmp_report0"
-          CFLAGS_DVL="$CFLAGS_DBG"
-
-          dnl Position-independent code for shared libraries
-          if test "$enableshared" = yes ; then
-            CXXFLAGS_OPT="$CXXFLAGS_OPT -KPIC"
-            CXXFLAGS_DBG="$CXXFLAGS_DBG -KPIC"
-            CXXFLAGS_DVL="$CXXFLAGS_DVL -KPIC"
-
-            CFLAGS_OPT="$CFLAGS_OPT -KPIC"
-            CFLAGS_DBG="$CFLAGS_DBG -KPIC"
-            CFLAGS_DVL="$CFLAGS_DVL -KPIC"
-
-            LDFLAGS="$LDFLAGS -KPIC"
-          fi
-          ;;
-
-      dnl Intel Itanium ICC < v8.1
-      intel_itanium_icc*)
-          dnl Disable some warning messages:
-          dnl #266: 'function declared implicitly'
-          dnl       Metis function "GKfree" caused this error
-          dnl       in almost every file.
-          CXXFLAGS_DBG="-Kc++eh -Krtti -w1 -inline_debug_info -g"
-          CXXFLAGS_OPT="-Kc++eh -Krtti -O2 -unroll -w0 -ftz"
-	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
-          CFLAGS_DBG="-w1 -inline_debug_info -wd266"
-          CFLAGS_OPT="-O2 -unroll -w0 -ftz"
-          CFLAGS_DVL="$CFLAGS_DBG"
-	  
-          dnl Position-independent code for shared libraries
-          if test "$enableshared" = yes ; then
-            CXXFLAGS_OPT="$CXXFLAGS_OPT -KPIC"
-            CXXFLAGS_DBG="$CXXFLAGS_DBG -KPIC"
-            CXXFLAGS_DVL="$CXXFLAGS_DVL -KPIC"
-
-            CFLAGS_OPT="$CFLAGS_OPT -KPIC"
-            CFLAGS_DBG="$CFLAGS_DBG -KPIC"
-            CFLAGS_DVL="$CFLAGS_DVL -KPIC"
-
-            LDFLAGS="$LDFLAGS -KPIC"
-          fi
-          ;;
+        dnl Position-independent code for shared libraries
+        if test "$enableshared" = yes ; then
+          CXXFLAGS_OPT="$CXXFLAGS_OPT -KPIC"
+          CXXFLAGS_DBG="$CXXFLAGS_DBG -KPIC"
+          CXXFLAGS_DVL="$CXXFLAGS_DVL -KPIC"
+        
+          CFLAGS_OPT="$CFLAGS_OPT -KPIC"
+          CFLAGS_DBG="$CFLAGS_DBG -KPIC"
+          CFLAGS_DVL="$CFLAGS_DVL -KPIC"
+        
+          LDFLAGS="$LDFLAGS -KPIC"
+        fi
+      ;;
   
       compaq_cxx)
           dnl Disable some warning messages:
