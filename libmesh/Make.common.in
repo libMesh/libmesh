@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.47 2005-06-01 21:43:38 benkirk Exp $
+# $Id: Make.common.in,v 1.48 2005-06-02 18:25:37 benkirk Exp $
 
 
 ###############################################################################
@@ -175,12 +175,12 @@ endif
 
 
 ifeq ($(prof-mode),on)
-  CXXFLAGS += -DNDEBUG @CXXFLAGS_OPT@ -pg
-  CFLAGS   += -DNDEBUG @CFLAGS_OPT@ -pg 
+  CXXFLAGS += -DNDEBUG @CXXFLAGS_OPT@ @PROFILING_FLAGS@
+  CFLAGS   += -DNDEBUG @CFLAGS_OPT@ @PROFILING_FLAGS@ 
 endif
 
 ifeq ($(prof-mode),on)
-  LIBS += -pg
+  LIBS += @PROFILING_FLAGS@
 endif
 ###############################################################################
 

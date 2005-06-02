@@ -1,4 +1,4 @@
-// $Id: petsc_matrix.h,v 1.14 2005-05-11 23:11:57 benkirk Exp $
+// $Id: petsc_matrix.h,v 1.15 2005-06-02 18:25:42 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -647,7 +647,7 @@ void PetscMatrix<T>::print_personal(std::ostream& os) const
 {
   assert (this->initialized());
 
-#ifdef DEBUG
+#ifndef NDEBUG
   if (os != std::cout)
     std::cerr << "Warning! PETSc can only print to std::cout!" << std::endl;
 #endif

@@ -1,4 +1,4 @@
-// $Id: mesh_communication.C,v 1.18 2005-05-25 16:22:15 benkirk Exp $
+// $Id: mesh_communication.C,v 1.19 2005-06-02 18:25:43 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -89,11 +89,14 @@ void MeshCommunication::find_neighboring_processors (const MeshBase& mesh)
 	const Sphere proc_sphere (center, radius);
 
 	if (bounding_sphere.intersects(proc_sphere))
-	  {
-	    here();
-	    _neighboring_processors.push_back(proc);
-	  }
+	  _neighboring_processors.push_back(proc);
       }
+
+    // Print out the _neighboring_processors list
+    std::cout << "Processor " << libMesh::processor_id()
+	      << " intersects:" << std::endl;
+    for (unsigned int p=0; p<_neighboring_processors.size(); p++)
+      std::cout << " " << _neighboring_processors[p] << std::endl;
   }
   
 #endif

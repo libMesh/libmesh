@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.11 2005-05-31 15:49:47 benkirk Exp $
+// $Id: dof_map.h,v 1.12 2005-06-02 18:25:42 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -557,6 +557,9 @@ void DofMap::sort_sparsity_row (const BidirectionalIterator begin,
 	assert(false);
   }  
 #endif
+
+  // Make sure the two ranges did not contain any common elements
+  assert (std::unique (begin, end) == end);
 }
 
 

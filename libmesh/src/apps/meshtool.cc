@@ -30,6 +30,7 @@
 #include "gmv_io.h"
 #include "xdr_io.h"
 #include "statistics.h"
+#include "inf_elem_builder.h"
 
 
 
@@ -162,9 +163,9 @@ void process_cmd_line(int argc, char **argv,
 		      bool& addinfelems,
 
 #ifdef ENABLE_INFINITE_ELEMENTS
-		      MeshBase::InfElemOriginValue& origin_x,
-		      MeshBase::InfElemOriginValue& origin_y,
-		      MeshBase::InfElemOriginValue& origin_z,
+		      InfElemBuilder::InfElemOriginValue& origin_x,
+		      InfElemBuilder::InfElemOriginValue& origin_y,
+		      InfElemBuilder::InfElemOriginValue& origin_z,
 #endif
 
 		      bool& x_sym,
@@ -460,9 +461,9 @@ int main (int argc, char** argv)
     bool addinfelems = false;
 
 #ifdef ENABLE_INFINITE_ELEMENTS
-    MeshBase::InfElemOriginValue origin_x(false, 0.);
-    MeshBase::InfElemOriginValue origin_y(false, 0.);
-    MeshBase::InfElemOriginValue origin_z(false, 0.);
+    InfElemBuilder::InfElemOriginValue origin_x(false, 0.);
+    InfElemBuilder::InfElemOriginValue origin_y(false, 0.);
+    InfElemBuilder::InfElemOriginValue origin_z(false, 0.);
 #endif
 
     bool x_sym=false;
@@ -566,9 +567,9 @@ int main (int argc, char** argv)
 
 
 	// build infinite elements
-	mesh.build_inf_elem(origin_x, origin_y, origin_z,
-			    x_sym, y_sym, z_sym, 
-			    verbose);
+	InfElemBuilder(mesh).build_inf_elem(origin_x, origin_y, origin_z,
+					    x_sym, y_sym, z_sym, 
+					    verbose);
 
 	
 	if (verbose)
