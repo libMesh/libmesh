@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.12 2005-06-02 18:25:42 benkirk Exp $
+// $Id: dof_map.h,v 1.13 2005-06-03 13:40:03 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -32,8 +32,6 @@
 // Local Includes -----------------------------------
 #include "libmesh_common.h"
 #include "enum_order.h"
-#include "fe_type.h"
-#include "coupling_matrix.h"
 #include "reference_counted_object.h"
 #include "libmesh.h" // libMesh::invalid_uint
 
@@ -41,6 +39,8 @@
 class DofMap;
 class Elem;
 class MeshBase;
+class FEType;
+class CouplingMatrix;
 template <typename T> class DenseVector;
 template <typename T> class DenseMatrix;
 template <typename T> class SparseMatrix;
@@ -69,7 +69,9 @@ typedef std::map<unsigned int, Real> DofConstraintRow;
 /** 
  * The constraint matrix storage format. 
  * We're using a class instead of a typedef to allow forward
- * declarations and future flexibility.
+ * declarations and future flexibility.  Is there some issue with
+ * deriving from standard containers, i.e. don't do it because they
+ * don't have virtual destructors?
  */
 class DofConstraints : public std::map<unsigned int, DofConstraintRow>
 {
@@ -144,20 +146,18 @@ public:
    * Add an unknown of order \p order and finite element type
    * \p type to the system of equations.
    */
-  void add_variable (const FEType& type)
-  { _variable_types.push_back (type); }
+  void add_variable (const FEType& type);
   
   /**
    * @returns the approximation order for variable \p c.
    */
-  Order variable_order (const unsigned int c) const
-  { return _variable_types[c].order; }
+  Order variable_order (const unsigned int c) const;
   
   /**
    * @returns the finite element type for variable \p c.
    */
   const FEType& variable_type (const unsigned int c) const
-  { return _variable_types[c]; }
+  { return *_variable_types[c]; }
   
   /**
    * Returns the number of variables in the global solution vector. Defaults
@@ -327,8 +327,13 @@ public:
    * couple to itself, in which case \p dof_coupling(0,0)
    * should be 1 and \p dof_coupling(0,j) = 0 for j not equal
    * to 0.
+   *
+   * This variable is named as though it were class private,
+   * but it is in the public interface.  Also there are no
+   * public methods for accessing it...  This typically means
+   * you should only use it if you know what you are doing.
    */
-  CouplingMatrix _dof_coupling;
+  CouplingMatrix* _dof_coupling;
 
   
 private:
@@ -407,7 +412,7 @@ private:
   /**
    * The finite element type for each variable.
    */
-  std::vector<FEType> _variable_types;
+  std::vector<FEType*> _variable_types;
 
   /**
    * The number of the system we manage DOFs for.
@@ -472,17 +477,12 @@ private:
 // Dof Map inline member functions
 inline
 DofMap::DofMap(const unsigned int number) :
+  _dof_coupling(NULL),
   _sys_number(number),
 //  _matrix(NULL),
   _n_dfs(0)  
 {
   _matrices.clear();
-}
-
-
-inline
-DofMap::~DofMap()
-{
 }
 
 
