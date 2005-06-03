@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.25 2005-05-31 20:22:02 roystgnr Exp $
+// $Id: equation_systems.C,v 1.26 2005-06-03 15:49:58 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -29,6 +29,7 @@
 #include "mesh_refinement.h"
 #include "newmark_system.h"
 #include "transient_system.h"
+#include "dof_map.h"
 
 // Include the systems before this one to avoid
 // overlapping forward declarations.

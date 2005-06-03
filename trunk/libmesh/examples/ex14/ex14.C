@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.14 2005-04-10 20:15:53 spetersen Exp $ */
+/* $Id: ex14.C,v 1.15 2005-06-03 15:49:57 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -59,6 +59,8 @@
 #include "kelly_error_estimator.h"
 #include "getpot.h"
 #include "exact_solution.h"
+#include "dof_map.h"
+#include "numeric_vector.h"
 
 // Function prototype.  This is the function that will assemble
 // the linear system for our Laplace problem.  Note that the

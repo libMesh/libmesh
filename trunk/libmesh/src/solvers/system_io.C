@@ -1,4 +1,4 @@
-// $Id: system_io.C,v 1.9 2005-02-22 22:17:43 jwpeterson Exp $
+// $Id: system_io.C,v 1.10 2005-06-03 15:49:58 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -30,6 +30,7 @@
 #include "mesh.h"
 #include "elem.h"
 #include "xdr_cxx.h"
+#include "numeric_vector.h"
 
 // Forward Declarations
 
@@ -562,7 +563,7 @@ void System::write(Xdr& io,
 	comment += "\"";
       }
       
-      FEType type = this->variable_type(var);
+      const FEType& type = this->variable_type(var);
 	      
       int fam = static_cast<int>(type.family);
 	      

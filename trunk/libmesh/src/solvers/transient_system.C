@@ -1,4 +1,4 @@
-// $Id: transient_system.C,v 1.7 2005-05-17 20:09:49 roystgnr Exp $
+// $Id: transient_system.C,v 1.8 2005-06-03 15:49:58 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -27,7 +27,8 @@
 #include "explicit_system.h"
 #include "libmesh_logging.h"
 #include "utility.h"
-
+#include "dof_map.h"
+#include "numeric_vector.h"
 
 
 // ------------------------------------------------------------
@@ -148,6 +149,32 @@ void TransientSystem<Base>::re_update ()
 				last_local_dof,
 				send_list);  
 }
+
+
+
+
+template <class Base>
+Number TransientSystem<Base>::old_solution (const unsigned int global_dof_number) const
+{
+  // Check the sizes
+  assert (global_dof_number < this->get_dof_map().n_dofs());
+  assert (global_dof_number < old_local_solution->size());
+   
+  return (*old_local_solution)(global_dof_number);
+}
+
+
+
+template <class Base>
+Number TransientSystem<Base>::older_solution (const unsigned int global_dof_number) const
+{
+  // Check the sizes
+  assert (global_dof_number < this->get_dof_map().n_dofs());
+  assert (global_dof_number < older_local_solution->size());
+   
+  return (*older_local_solution)(global_dof_number);
+}
+
 
 
 

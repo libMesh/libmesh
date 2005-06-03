@@ -1,7 +1,6 @@
 ex2.$(obj-suffix):\
     ex2.C\
     ../../include/base/auto_ptr.h\
-    ../../include/base/dof_map.h\
     ../../include/base/dof_object.h\
     ../../include/base/libmesh.h\
     ../../include/base/libmesh_base.h\
@@ -19,7 +18,9 @@ ex2.$(obj-suffix):\
     ../../include/enums/enum_inf_map_type.h\
     ../../include/enums/enum_io_package.h\
     ../../include/enums/enum_order.h\
+    ../../include/enums/enum_preconditioner_type.h\
     ../../include/enums/enum_solver_package.h\
+    ../../include/enums/enum_solver_type.h\
     ../../include/enums/enum_xdr_mode.h\
     ../../include/fe/fe_type.h\
     ../../include/geom/elem.h\
@@ -29,15 +30,17 @@ ex2.$(obj-suffix):\
     ../../include/mesh/mesh_base.h\
     ../../include/mesh/mesh_data.h\
     ../../include/mesh/mesh_generation.h\
-    ../../include/numerics/coupling_matrix.h\
-    ../../include/numerics/numeric_vector.h\
+    ../../include/numerics/linear_solver.h\
+    ../../include/numerics/nonlinear_solver.h\
     ../../include/numerics/type_vector.h\
     ../../include/partitioning/partitioner.h\
     ../../include/solvers/equation_systems.h\
     ../../include/solvers/explicit_system.h\
     ../../include/solvers/frequency_system.h\
     ../../include/solvers/implicit_system.h\
+    ../../include/solvers/linear_implicit_system.h\
     ../../include/solvers/newmark_system.h\
+    ../../include/solvers/nonlinear_implicit_system.h\
     ../../include/solvers/steady_system.h\
     ../../include/solvers/system.h\
     ../../include/solvers/transient_system.h\
