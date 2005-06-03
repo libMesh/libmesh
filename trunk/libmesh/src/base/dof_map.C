@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.80 2005-06-03 13:40:04 jwpeterson Exp $
+// $Id: dof_map.C,v 1.81 2005-06-03 20:31:26 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -39,10 +39,7 @@
 // Destructor
 DofMap::~DofMap()
 {
-  // Since we allocate memory when adding entries to the _variable_types
-  // vector, we must free that memory here!
-  for (unsigned int i=0; i<_variable_types.size(); ++i)
-    delete _variable_types[i];
+  this->clear();
 }
 
 
@@ -50,13 +47,17 @@ DofMap::~DofMap()
 // Add a copy of type to the vector.  Be sure to delete
 // this memory in the destructor!
 void DofMap::add_variable (const FEType& type)
-{ _variable_types.push_back (new FEType(type) ); }
+{
+  _variable_types.push_back (new FEType(type) );
+}
 
 
 
 
 Order DofMap::variable_order (const unsigned int c) const
-  { return _variable_types[c]->order; }
+{
+  return _variable_types[c]->order;
+}
 
 
 
@@ -329,7 +330,14 @@ void DofMap::clear()
   // the coupling matrix!
   // It should not change...
   //_dof_coupling->clear();
+
+  // Since we allocate memory when adding entries to the _variable_types
+  // vector, we must free that memory here!
+  for (unsigned int i=0; i<_variable_types.size(); ++i)
+    delete _variable_types[i];
+
   
+  _variable_types.clear();  
   _first_df.clear();
   _last_df.clear();
   _send_list.clear();
