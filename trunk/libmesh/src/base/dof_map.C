@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.79 2005-06-01 15:38:39 benkirk Exp $
+// $Id: dof_map.C,v 1.80 2005-06-03 13:40:04 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -21,7 +21,7 @@
 
 // C++ Includes -------------------------------------
 #include <set>
-#include <algorithm> // for std::fill and std::max
+#include <algorithm> // for std::fill, std::equal_range, std::max, std::lower_bound, etc.
 
 // Local Includes -----------------------------------
 #include "dof_map.h"
@@ -29,13 +29,37 @@
 #include "mesh_base.h"
 #include "fe_interface.h"
 #include "sparse_matrix.h"
-#include "libmesh.h"
 #include "libmesh_logging.h"
-
-
+#include "fe_type.h"
+#include "coupling_matrix.h"
 
 // ------------------------------------------------------------
 // DofMap member functions
+
+// Destructor
+DofMap::~DofMap()
+{
+  // Since we allocate memory when adding entries to the _variable_types
+  // vector, we must free that memory here!
+  for (unsigned int i=0; i<_variable_types.size(); ++i)
+    delete _variable_types[i];
+}
+
+
+
+// Add a copy of type to the vector.  Be sure to delete
+// this memory in the destructor!
+void DofMap::add_variable (const FEType& type)
+{ _variable_types.push_back (new FEType(type) ); }
+
+
+
+
+Order DofMap::variable_order (const unsigned int c) const
+  { return _variable_types[c]->order; }
+
+
+
 void DofMap::attach_matrix (SparseMatrix<Number>& matrix)
 {
   _matrices.push_back(&matrix);
@@ -304,7 +328,7 @@ void DofMap::clear()
   // we don't want to clear
   // the coupling matrix!
   // It should not change...
-  //_dof_coupling.clear();
+  //_dof_coupling->clear();
   
   _first_df.clear();
   _last_df.clear();
@@ -692,7 +716,7 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
   // then all the DOFS are coupled to each other.  Furthermore,
   // we can take a shortcut and do this more quickly here.  So
   // we use an if-test.
-  if (_dof_coupling.empty())
+  if ((_dof_coupling == NULL) || (_dof_coupling->empty()))
     {
       std::vector<unsigned int>
 	element_dofs,
@@ -822,7 +846,8 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
   // explicit DOF coupling.
   else
     {
-      assert (_dof_coupling.size() ==
+      assert (_dof_coupling != NULL);
+      assert (_dof_coupling->size() ==
 	      this->n_variables());
       
       const unsigned int n_var = this->n_variables();
@@ -847,7 +872,7 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
 	    const unsigned int n_dofs_on_element_i = element_dofs_i.size();
 	    
 	    for (unsigned int vj=0; vj<n_var; vj++)
-	      if (_dof_coupling(vi,vj)) // If vi couples to vj
+	      if ((*_dof_coupling)(vi,vj)) // If vi couples to vj
 		{
 		  // Find element dofs for variable vj, note that
 		  // if vi==vj we already have the dofs.

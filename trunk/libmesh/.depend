@@ -52,20 +52,16 @@ src/base/dof_map_constraints.$(obj-suffix):\
     include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
-    include/enums/enum_fe_family.h\
-    include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_interface.h\
-    include/fe/fe_type.h\
     include/geom/elem.h\
     include/geom/point.h\
     include/mesh/boundary_info.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/dense_matrix.h\
     include/numerics/dense_matrix_base.h\
     include/numerics/dense_vector.h\
@@ -80,6 +76,8 @@ src/base/dof_object.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
     include/enums/enum_solver_package.h\
     include/utils/perf_log.h
 src/base/libmesh.$(obj-suffix):\
@@ -337,7 +335,6 @@ src/fe/fe.$(obj-suffix):\
     include/fe/fe_type.h\
     include/geom/elem.h\
     include/geom/point.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/dense_matrix.h\
     include/numerics/dense_matrix_base.h\
     include/numerics/dense_vector.h\
@@ -379,7 +376,6 @@ src/fe/fe_clough.$(obj-suffix):\
     include/fe/fe_type.h\
     include/geom/elem.h\
     include/geom/point.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/dense_matrix.h\
     include/numerics/dense_matrix_base.h\
     include/numerics/dense_vector.h\
@@ -514,7 +510,6 @@ src/fe/fe_hierarchic.$(obj-suffix):\
     include/fe/fe_type.h\
     include/geom/elem.h\
     include/geom/point.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/dense_matrix.h\
     include/numerics/dense_matrix_base.h\
     include/numerics/dense_vector.h\
@@ -657,7 +652,6 @@ src/fe/fe_interface.$(obj-suffix):\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
     include/numerics/numeric_vector.h\
@@ -715,7 +709,6 @@ src/fe/fe_interface_inf_fe.$(obj-suffix):\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
     include/numerics/numeric_vector.h\
@@ -765,7 +758,6 @@ src/fe/fe_lagrange.$(obj-suffix):\
     include/fe/fe_type.h\
     include/geom/elem.h\
     include/geom/point.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/tensor_value.h\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
@@ -1579,7 +1571,6 @@ src/fe/inf_fe_static.$(obj-suffix):\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
     include/numerics/numeric_vector.h\
@@ -2826,7 +2817,6 @@ src/mesh/diva_io.$(obj-suffix):\
     include/mesh/mesh_data.h\
     include/mesh/mesh_output.h\
     include/mesh/mesh_tools.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
     include/numerics/numeric_vector.h\
@@ -2909,7 +2899,6 @@ src/mesh/gmsh_io.$(obj-suffix):\
     include/mesh/mesh_data.h\
     include/mesh/mesh_input.h\
     include/mesh/mesh_output.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
     include/numerics/numeric_vector.h\
@@ -2961,7 +2950,6 @@ src/mesh/gmv_io.$(obj-suffix):\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
     include/mesh/mesh_output.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
     include/numerics/numeric_vector.h\
@@ -3087,7 +3075,6 @@ src/mesh/medit_io.$(obj-suffix):\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
     include/mesh/mesh_output.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
     include/numerics/numeric_vector.h\
@@ -3183,7 +3170,6 @@ src/mesh/mesh.$(obj-suffix):\
     include/mesh/ucd_io.h\
     include/mesh/unv_io.h\
     include/mesh/xdr_io.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
     include/numerics/numeric_vector.h\
@@ -3734,7 +3720,6 @@ src/mesh/tecplot_io.$(obj-suffix):\
     include/mesh/mesh_data.h\
     include/mesh/mesh_output.h\
     include/mesh/tecplot_io.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
     include/numerics/numeric_vector.h\
@@ -3790,7 +3775,6 @@ src/mesh/tetgen_io.$(obj-suffix):\
     include/mesh/mesh_input.h\
     include/mesh/mesh_output.h\
     include/mesh/tetgen_io.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
     include/numerics/numeric_vector.h\
@@ -3854,7 +3838,6 @@ src/mesh/ucd_io.$(obj-suffix):\
     include/mesh/mesh_input.h\
     include/mesh/mesh_output.h\
     include/mesh/ucd_io.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
     include/numerics/numeric_vector.h\
@@ -3923,7 +3906,6 @@ src/mesh/unv_io.$(obj-suffix):\
     include/mesh/mesh_input.h\
     include/mesh/mesh_output.h\
     include/mesh/unv_io.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
     include/numerics/numeric_vector.h\
@@ -3979,7 +3961,6 @@ src/mesh/xdr_io.$(obj-suffix):\
     include/mesh/mesh_output.h\
     include/mesh/mesh_tools.h\
     include/mesh/xdr_io.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
     include/numerics/numeric_vector.h\
@@ -4132,7 +4113,6 @@ src/numerics/error_estimator.$(obj-suffix):\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/error_estimator.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
@@ -4188,7 +4168,6 @@ src/numerics/fourth_error_estimators.$(obj-suffix):\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/error_estimator.h\
     include/numerics/fourth_error_estimators.h\
     include/numerics/linear_solver.h\
@@ -4258,7 +4237,6 @@ src/numerics/kelly_error_estimator.$(obj-suffix):\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/error_estimator.h\
     include/numerics/kelly_error_estimator.h\
     include/numerics/linear_solver.h\
@@ -4316,12 +4294,8 @@ src/numerics/laspack_matrix.$(obj-suffix):\
     include/base/libmesh_config.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
-    include/enums/enum_fe_family.h\
-    include/enums/enum_inf_map_type.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
-    include/fe/fe_type.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/dense_matrix.h\
     include/numerics/dense_matrix_base.h\
     include/numerics/dense_vector.h\
@@ -4410,7 +4384,6 @@ src/numerics/mesh_function.$(obj-suffix):\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
     include/mesh/mesh_function.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/dense_vector.h\
     include/numerics/dense_vector_base.h\
     include/numerics/function_base.h\
@@ -4497,7 +4470,6 @@ src/numerics/patch_recovery_error_estimator.$(obj-suffix):\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/dense_matrix.h\
     include/numerics/dense_matrix_base.h\
     include/numerics/dense_vector.h\
@@ -4559,12 +4531,8 @@ src/numerics/petsc_matrix.$(obj-suffix):\
     include/base/libmesh_config.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
-    include/enums/enum_fe_family.h\
-    include/enums/enum_inf_map_type.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
-    include/fe/fe_type.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/dense_matrix.h\
     include/numerics/dense_matrix_base.h\
     include/numerics/dense_vector.h\
@@ -5198,7 +5166,6 @@ src/solvers/eigen_system.$(obj-suffix):\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/eigen_solver.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
@@ -5253,7 +5220,6 @@ src/solvers/equation_systems.$(obj-suffix):\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
     include/mesh/mesh_refinement.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
     include/numerics/numeric_vector.h\
@@ -5303,7 +5269,6 @@ src/solvers/equation_systems_io.$(obj-suffix):\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
     include/numerics/numeric_vector.h\
@@ -5359,7 +5324,6 @@ src/solvers/exact_solution.$(obj-suffix):\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
     include/numerics/numeric_vector.h\
@@ -5398,7 +5362,6 @@ src/solvers/explicit_system.$(obj-suffix):\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
     include/fe/fe_type.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/numeric_vector.h\
     include/solvers/explicit_system.h\
     include/solvers/system.h\
@@ -5436,7 +5399,6 @@ src/solvers/frequency_system.$(obj-suffix):\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
     include/numerics/numeric_vector.h\
@@ -5487,7 +5449,6 @@ src/solvers/implicit_system.$(obj-suffix):\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
     include/numerics/numeric_vector.h\
@@ -5540,7 +5501,6 @@ src/solvers/linear_implicit_system.$(obj-suffix):\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
     include/numerics/numeric_vector.h\
@@ -5593,7 +5553,6 @@ src/solvers/newmark_system.$(obj-suffix):\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
     include/numerics/numeric_vector.h\
@@ -5645,7 +5604,6 @@ src/solvers/nonlinear_implicit_system.$(obj-suffix):\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
     include/numerics/numeric_vector.h\
@@ -5700,7 +5658,6 @@ src/solvers/system.$(obj-suffix):\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
     include/numerics/numeric_vector.h\
@@ -5750,7 +5707,6 @@ src/solvers/system_io.$(obj-suffix):\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
@@ -5793,7 +5749,6 @@ src/solvers/system_projection.$(obj-suffix):\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/dense_matrix.h\
     include/numerics/dense_matrix_base.h\
     include/numerics/dense_vector.h\
@@ -5826,7 +5781,6 @@ src/solvers/transient_system.$(obj-suffix):\
     include/enums/enum_solver_package.h\
     include/enums/enum_solver_type.h\
     include/fe/fe_type.h\
-    include/numerics/coupling_matrix.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
     include/numerics/numeric_vector.h\

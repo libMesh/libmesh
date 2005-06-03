@@ -1,26 +1,19 @@
 ex1.$(obj-suffix):\
     ex1.C\
-    ../../include/base/auto_ptr.h\
-    ../../include/base/dof_object.h\
     ../../include/base/libmesh.h\
     ../../include/base/libmesh_base.h\
     ../../include/base/libmesh_common.h\
     ../../include/base/libmesh_config.h\
     ../../include/base/multi_predicates.h\
-    ../../include/base/node.h\
-    ../../include/base/reference_counted_object.h\
-    ../../include/base/reference_counter.h\
     ../../include/base/single_predicates.h\
     ../../include/base/variant_filter_iterator.h\
     ../../include/enums/enum_elem_type.h\
     ../../include/enums/enum_order.h\
     ../../include/enums/enum_solver_package.h\
     ../../include/enums/enum_xdr_mode.h\
-    ../../include/geom/point.h\
     ../../include/mesh/boundary_info.h\
     ../../include/mesh/mesh.h\
     ../../include/mesh/mesh_base.h\
     ../../include/mesh/mesh_data.h\
-    ../../include/numerics/type_vector.h\
     ../../include/partitioning/partitioner.h\
     ../../include/utils/perf_log.h

@@ -1,4 +1,4 @@
-// $Id: coupling_matrix.h,v 1.5 2005-02-22 22:17:33 jwpeterson Exp $
+// $Id: coupling_matrix.h,v 1.6 2005-06-03 13:40:04 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -90,7 +90,7 @@ private:
    * a vector of bools is not what you
    * think.
    */
-  std::vector<unsigned char> values;  
+  std::vector<unsigned char> _values;  
 
   /**
    * The size of the matrix.
@@ -109,7 +109,7 @@ inline
 CouplingMatrix::CouplingMatrix (const unsigned int n) :
   _size(n)
 {
-  resize(n);
+  this->resize(n);
 }
 
 
@@ -121,7 +121,7 @@ unsigned char CouplingMatrix::operator() (const unsigned int i,
   assert (i < _size);
   assert (j < _size);
 
-  return values[i*_size + j];
+  return _values[i*_size + j];
 }
 
 
@@ -133,7 +133,7 @@ unsigned char & CouplingMatrix::operator() (const unsigned int i,
   assert (i < _size);
   assert (j < _size);
 
-  return values[i*_size + j];
+  return _values[i*_size + j];
 }
 
 
@@ -151,10 +151,10 @@ void CouplingMatrix::resize(const unsigned int n)
 {
   _size = n;
 
-  values.resize(_size*_size);
+  _values.resize(_size*_size);
 
-  for (unsigned int i=0; i<values.size(); i++)
-    values[i] = 0;
+  for (unsigned int i=0; i<_values.size(); i++)
+    _values[i] = 0;
 }
 
 
@@ -164,7 +164,7 @@ void CouplingMatrix::clear()
 {
   _size = 0;
 
-  values.clear();
+  _values.clear();
 }
 
 
