@@ -1,4 +1,4 @@
-// $Id: system.C,v 1.17 2005-06-03 15:49:58 jwpeterson Exp $
+// $Id: system.C,v 1.18 2005-06-03 21:07:56 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -68,9 +68,6 @@ System::~System ()
   // Clear data
   this->clear ();
 
-  // Free dynamically allocated memory
-  delete _dof_map;
-  
   assert (!libMesh::closed());
 }
 
@@ -150,6 +147,10 @@ void System::clear ()
     _vectors.clear();
     _can_add_vectors = true;
   }
+
+  // Delete dynamically allocated memory and set to NULL.
+  delete _dof_map;
+  _dof_map = NULL;
 }
 
 
