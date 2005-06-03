@@ -1,7 +1,6 @@
 ex16.$(obj-suffix):\
     ex16.C\
     ../../include/base/auto_ptr.h\
-    ../../include/base/dof_map.h\
     ../../include/base/dof_object.h\
     ../../include/base/libmesh.h\
     ../../include/base/libmesh_base.h\
@@ -37,7 +36,6 @@ ex16.$(obj-suffix):\
     ../../include/mesh/mesh_data.h\
     ../../include/mesh/mesh_generation.h\
     ../../include/mesh/mesh_output.h\
-    ../../include/numerics/coupling_matrix.h\
     ../../include/numerics/dense_matrix.h\
     ../../include/numerics/dense_matrix_base.h\
     ../../include/numerics/dense_vector.h\

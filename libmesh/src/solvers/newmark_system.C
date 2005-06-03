@@ -1,4 +1,4 @@
-// $Id: newmark_system.C,v 1.6 2005-03-18 16:56:12 benkirk Exp $
+// $Id: newmark_system.C,v 1.7 2005-06-03 15:49:58 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -26,6 +26,7 @@
 #include "equation_systems.h"
 #include "sparse_matrix.h"
 #include "libmesh_logging.h"
+#include "numeric_vector.h"
 
 
 

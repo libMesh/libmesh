@@ -1,4 +1,4 @@
-// $Id: transient_system.h,v 1.6 2005-03-18 16:56:09 benkirk Exp $
+// $Id: transient_system.h,v 1.7 2005-06-03 15:49:58 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -163,29 +163,6 @@ std::string TransientSystem<Base>::system_type () const
 
 
 
-template <class Base>
-inline
-Number TransientSystem<Base>::old_solution (const unsigned int global_dof_number) const
-{
-  // Check the sizes
-  assert (global_dof_number < this->get_dof_map().n_dofs());
-  assert (global_dof_number < old_local_solution->size());
-   
-  return (*old_local_solution)(global_dof_number);
-}
-
-
-
-template <class Base>
-inline
-Number TransientSystem<Base>::older_solution (const unsigned int global_dof_number) const
-{
-  // Check the sizes
-  assert (global_dof_number < this->get_dof_map().n_dofs());
-  assert (global_dof_number < older_local_solution->size());
-   
-  return (*older_local_solution)(global_dof_number);
-}
 
 
 

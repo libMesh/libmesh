@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.33 2005-05-10 19:53:28 roystgnr Exp $
+// $Id: fe_interface.C,v 1.34 2005-06-03 15:49:58 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,7 @@
 #include "elem.h"
 #include "fe.h"
 #include "fe_compute_data.h"
-
+#include "dof_map.h"
 
 //------------------------------------------------------------
 //FEInterface class members

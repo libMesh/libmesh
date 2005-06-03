@@ -1,4 +1,4 @@
-// $Id: exact_solution.C,v 1.12 2005-05-11 23:12:11 benkirk Exp $
+// $Id: exact_solution.C,v 1.13 2005-06-03 15:49:58 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -27,6 +27,7 @@
 #include "quadrature_gauss.h"
 #include "fe_interface.h"
 #include "elem.h"
+#include "dof_map.h"
 
 ExactSolution::ExactSolution(EquationSystems& es) :
   _exact_value (NULL),
@@ -214,7 +215,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
   // Construct finite element object
   const unsigned int var = computed_system.variable_number(unknown_name);
   
-  const FEType fe_type   = computed_dof_map.variable_type(var);
+  const FEType& fe_type   = computed_dof_map.variable_type(var);
   AutoPtr<FEBase> fe(FEBase::build(_mesh.mesh_dimension(), fe_type));
 
   // Construct Quadrature rule based on default quadrature order

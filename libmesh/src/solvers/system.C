@@ -1,4 +1,4 @@
-// $Id: system.C,v 1.16 2005-05-24 17:42:45 benkirk Exp $
+// $Id: system.C,v 1.17 2005-06-03 15:49:58 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -30,6 +30,8 @@
 #include "sparse_matrix.h"
 #include "libmesh_logging.h"
 #include "utility.h"
+#include "dof_map.h"
+#include "numeric_vector.h"
 
 
 
@@ -43,7 +45,7 @@ System::System (EquationSystems& es,
   current_local_solution   (NumericVector<Number>::build()),
   _init_system             (NULL),
   _assemble_system         (NULL),
-  _dof_map                 (number),
+  _dof_map                 (new DofMap(number)),
   _equation_systems        (es),
   _mesh                    (es.get_mesh()),
   _sys_name                (name),
@@ -66,8 +68,59 @@ System::~System ()
   // Clear data
   this->clear ();
 
+  // Free dynamically allocated memory
+  delete _dof_map;
+  
   assert (!libMesh::closed());
 }
+
+
+
+
+unsigned int System::n_dofs() const
+{
+  return _dof_map->n_dofs();
+}
+
+
+
+unsigned int System::n_constrained_dofs() const
+{
+#ifdef ENABLE_AMR
+
+  return _dof_map->n_constrained_dofs();
+
+#else
+
+  return 0;
+
+#endif
+}
+
+
+
+
+
+unsigned int System::n_local_dofs() const
+{
+  return _dof_map->n_dofs_on_processor (libMesh::processor_id());
+}
+
+
+
+
+
+
+Number System::current_solution (const unsigned int global_dof_number) const
+{
+  // Check the sizes
+  assert (global_dof_number < _dof_map->n_dofs());
+  assert (global_dof_number < current_local_solution->size());
+   
+  return (*current_local_solution)(global_dof_number);
+}
+
+
 
 
 
@@ -79,7 +132,7 @@ void System::clear ()
   
   _var_num.clear ();
   
-  _dof_map.clear ();
+  _dof_map->clear ();
   
   solution->clear ();
 
@@ -115,12 +168,12 @@ void System::init ()
 void System::init_data ()
 {
   // Distribute the degrees of freedom on the mesh
-  _dof_map.distribute_dofs (this->get_mesh());
+  _dof_map->distribute_dofs (this->get_mesh());
 
 #ifdef ENABLE_AMR
 
   // Recreate any hanging node constraints
-  _dof_map.create_dof_constraints(this->get_mesh());
+  _dof_map->create_dof_constraints(this->get_mesh());
 
 #endif
 
@@ -143,7 +196,7 @@ void System::init_data ()
 void System::restrict_vectors ()
 {
 #ifdef ENABLE_AMR
-  _dof_map.distribute_dofs (this->get_mesh());
+  _dof_map->distribute_dofs (this->get_mesh());
   
   // Restrict the _vectors on the coarsened cells
   for (vectors_iterator pos = _vectors.begin(); pos != _vectors.end(); ++pos)
@@ -197,7 +250,7 @@ void System::reinit ()
 {
 #ifdef ENABLE_AMR
   // Recreate any hanging node constraints
-  _dof_map.create_dof_constraints(this->get_mesh());
+  _dof_map->create_dof_constraints(this->get_mesh());
 
   // Update the solution based on the projected
   // current_local_solution.
@@ -219,7 +272,7 @@ void System::reinit ()
 
 void System::update ()
 {
-  const std::vector<unsigned int>& send_list = _dof_map.get_send_list ();
+  const std::vector<unsigned int>& send_list = _dof_map->get_send_list ();
 
   // Check sizes
   assert (current_local_solution->local_size() == solution->size());
@@ -237,7 +290,7 @@ void System::update ()
 
 void System::re_update ()
 {
-  //const std::vector<unsigned int>& send_list = _dof_map.get_send_list ();
+  //const std::vector<unsigned int>& send_list = _dof_map->get_send_list ();
 
   // Explicitly build a send_list
   std::vector<unsigned int> send_list(solution->size());
@@ -504,7 +557,7 @@ void System::add_variable (const std::string& var,
   _var_num[var]   = (this->n_vars()-1);
 
   // Add the variable to the _dof_map
-  _dof_map.add_variable (type);
+  _dof_map->add_variable (type);
 }
 
 

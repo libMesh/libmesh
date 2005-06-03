@@ -1,4 +1,4 @@
-// $Id: system.h,v 1.12 2005-05-20 05:24:11 roystgnr Exp $
+// $Id: system.h,v 1.13 2005-06-03 15:49:58 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -23,13 +23,12 @@
 #define __system_h__
 
 // C++ includes
+#include <vector>
 
 // Local Includes
 #include "libmesh_common.h"
 #include "fe_type.h"
-#include "dof_map.h"
 #include "auto_ptr.h"
-#include "numeric_vector.h"
 #include "reference_counted_object.h"
 
 
@@ -39,6 +38,8 @@ class System;
 class EquationSystems;
 class Mesh;
 class Xdr;
+class DofMap;
+template <typename T> class NumericVector;
 
 /**
  * This is the base class for classes which contain 
@@ -468,7 +469,7 @@ private:
    * Data structure describing the relationship between
    * nodes, variables, etc... and degrees of freedom.
    */
-  DofMap _dof_map;
+  DofMap* _dof_map;
 
   /**
    * Constant reference to the \p EquationSystems object
@@ -576,7 +577,7 @@ Mesh & System::get_mesh()
 inline
 const DofMap & System::get_dof_map() const
 {
-  return _dof_map;
+  return *_dof_map;
 }
 
 
@@ -584,7 +585,7 @@ const DofMap & System::get_dof_map() const
 inline
 DofMap & System::get_dof_map()
 {
-  return _dof_map;
+  return *_dof_map;
 }
 
 
@@ -653,40 +654,11 @@ const FEType & System::variable_type (const std::string& var) const
 
 
 inline
-unsigned int System::n_dofs() const
-{
-  return _dof_map.n_dofs();
-}
-
-
-inline
 unsigned int System::n_active_dofs() const
 {
   return this->n_dofs() - this->n_constrained_dofs();
 }
 
-
-inline
-unsigned int System::n_constrained_dofs() const
-{
-#ifdef ENABLE_AMR
-
-  return _dof_map.n_constrained_dofs();
-
-#else
-
-  return 0;
-
-#endif
-}
-
-
-
-inline
-unsigned int System::n_local_dofs() const
-{
-  return _dof_map.n_dofs_on_processor (libMesh::processor_id());
-}
 
 
 
@@ -706,15 +678,6 @@ unsigned int System::n_vectors () const
 
 
 
-inline
-Number System::current_solution (const unsigned int global_dof_number) const
-{
-  // Check the sizes
-  assert (global_dof_number < _dof_map.n_dofs());
-  assert (global_dof_number < current_local_solution->size());
-   
-  return (*current_local_solution)(global_dof_number);
-}
 
 
 #endif

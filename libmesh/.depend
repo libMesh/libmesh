@@ -654,7 +654,6 @@ src/fe/fe_interface.$(obj-suffix):\
     include/mesh/mesh_data.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
-    include/numerics/numeric_vector.h\
     include/numerics/tensor_value.h\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
@@ -675,7 +674,6 @@ src/fe/fe_interface.$(obj-suffix):\
 src/fe/fe_interface_inf_fe.$(obj-suffix):\
     src/fe/fe_interface_inf_fe.C\
     include/base/auto_ptr.h\
-    include/base/dof_map.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
@@ -711,7 +709,6 @@ src/fe/fe_interface_inf_fe.$(obj-suffix):\
     include/mesh/mesh_data.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
-    include/numerics/numeric_vector.h\
     include/numerics/tensor_value.h\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
@@ -1536,7 +1533,6 @@ src/fe/inf_fe_map_eval.$(obj-suffix):\
 src/fe/inf_fe_static.$(obj-suffix):\
     src/fe/inf_fe_static.C\
     include/base/auto_ptr.h\
-    include/base/dof_map.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
@@ -1573,7 +1569,6 @@ src/fe/inf_fe_static.$(obj-suffix):\
     include/mesh/mesh_data.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
-    include/numerics/numeric_vector.h\
     include/numerics/tensor_value.h\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
@@ -2784,7 +2779,6 @@ src/mesh/boundary_mesh.$(obj-suffix):\
 src/mesh/diva_io.$(obj-suffix):\
     src/mesh/diva_io.C\
     include/base/auto_ptr.h\
-    include/base/dof_map.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
@@ -2819,7 +2813,6 @@ src/mesh/diva_io.$(obj-suffix):\
     include/mesh/mesh_tools.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
-    include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/solvers/equation_systems.h\
@@ -2867,7 +2860,6 @@ src/mesh/exodusII_io.$(obj-suffix):\
 src/mesh/gmsh_io.$(obj-suffix):\
     src/mesh/gmsh_io.C\
     include/base/auto_ptr.h\
-    include/base/dof_map.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
@@ -2901,7 +2893,6 @@ src/mesh/gmsh_io.$(obj-suffix):\
     include/mesh/mesh_output.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
-    include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/solvers/equation_systems.h\
@@ -2919,7 +2910,6 @@ src/mesh/gmsh_io.$(obj-suffix):\
 src/mesh/gmv_io.$(obj-suffix):\
     src/mesh/gmv_io.C\
     include/base/auto_ptr.h\
-    include/base/dof_map.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
@@ -2952,7 +2942,6 @@ src/mesh/gmv_io.$(obj-suffix):\
     include/mesh/mesh_output.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
-    include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/solvers/equation_systems.h\
@@ -3044,7 +3033,6 @@ src/mesh/matlab_io.$(obj-suffix):\
 src/mesh/medit_io.$(obj-suffix):\
     src/mesh/medit_io.C\
     include/base/auto_ptr.h\
-    include/base/dof_map.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
@@ -3077,7 +3065,6 @@ src/mesh/medit_io.$(obj-suffix):\
     include/mesh/mesh_output.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
-    include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/solvers/equation_systems.h\
@@ -3125,7 +3112,6 @@ src/mesh/mesh_base.$(obj-suffix):\
 src/mesh/mesh.$(obj-suffix):\
     src/mesh/mesh.C\
     include/base/auto_ptr.h\
-    include/base/dof_map.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
@@ -3172,7 +3158,6 @@ src/mesh/mesh.$(obj-suffix):\
     include/mesh/xdr_io.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
-    include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/solvers/equation_systems.h\
@@ -3689,7 +3674,6 @@ src/mesh/off_io.$(obj-suffix):\
 src/mesh/tecplot_io.$(obj-suffix):\
     src/mesh/tecplot_io.C\
     include/base/auto_ptr.h\
-    include/base/dof_map.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
@@ -3722,7 +3706,6 @@ src/mesh/tecplot_io.$(obj-suffix):\
     include/mesh/tecplot_io.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
-    include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/solvers/equation_systems.h\
@@ -3740,7 +3723,6 @@ src/mesh/tecplot_io.$(obj-suffix):\
 src/mesh/tetgen_io.$(obj-suffix):\
     src/mesh/tetgen_io.C\
     include/base/auto_ptr.h\
-    include/base/dof_map.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
@@ -3777,7 +3759,6 @@ src/mesh/tetgen_io.$(obj-suffix):\
     include/mesh/tetgen_io.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
-    include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/solvers/equation_systems.h\
@@ -3795,7 +3776,6 @@ src/mesh/tetgen_io.$(obj-suffix):\
 src/mesh/ucd_io.$(obj-suffix):\
     src/mesh/ucd_io.C\
     include/base/auto_ptr.h\
-    include/base/dof_map.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
@@ -3840,7 +3820,6 @@ src/mesh/ucd_io.$(obj-suffix):\
     include/mesh/ucd_io.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
-    include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/solvers/equation_systems.h\
@@ -3858,7 +3837,6 @@ src/mesh/ucd_io.$(obj-suffix):\
 src/mesh/unv_io.$(obj-suffix):\
     src/mesh/unv_io.C\
     include/base/auto_ptr.h\
-    include/base/dof_map.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
@@ -3908,7 +3886,6 @@ src/mesh/unv_io.$(obj-suffix):\
     include/mesh/unv_io.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
-    include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/solvers/equation_systems.h\
@@ -3926,7 +3903,6 @@ src/mesh/unv_io.$(obj-suffix):\
 src/mesh/xdr_io.$(obj-suffix):\
     src/mesh/xdr_io.C\
     include/base/auto_ptr.h\
-    include/base/dof_map.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
@@ -3963,7 +3939,6 @@ src/mesh/xdr_io.$(obj-suffix):\
     include/mesh/xdr_io.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
-    include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/solvers/equation_systems.h\
@@ -4084,7 +4059,6 @@ src/numerics/eigen_solver.$(obj-suffix):\
 src/numerics/error_estimator.$(obj-suffix):\
     src/numerics/error_estimator.C\
     include/base/auto_ptr.h\
-    include/base/dof_map.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
@@ -4116,7 +4090,6 @@ src/numerics/error_estimator.$(obj-suffix):\
     include/numerics/error_estimator.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
-    include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/solvers/equation_systems.h\
@@ -4172,7 +4145,6 @@ src/numerics/fourth_error_estimators.$(obj-suffix):\
     include/numerics/fourth_error_estimators.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
-    include/numerics/numeric_vector.h\
     include/numerics/tensor_value.h\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
@@ -4241,7 +4213,6 @@ src/numerics/kelly_error_estimator.$(obj-suffix):\
     include/numerics/kelly_error_estimator.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
-    include/numerics/numeric_vector.h\
     include/numerics/tensor_value.h\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
@@ -4477,7 +4448,6 @@ src/numerics/patch_recovery_error_estimator.$(obj-suffix):\
     include/numerics/error_estimator.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
-    include/numerics/numeric_vector.h\
     include/numerics/patch_recovery_error_estimator.h\
     include/numerics/tensor_value.h\
     include/numerics/type_tensor.h\
@@ -5136,7 +5106,6 @@ src/quadrature/quadrature_trap.$(obj-suffix):\
 src/solvers/eigen_system.$(obj-suffix):\
     src/solvers/eigen_system.C\
     include/base/auto_ptr.h\
-    include/base/dof_map.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
@@ -5169,7 +5138,6 @@ src/solvers/eigen_system.$(obj-suffix):\
     include/numerics/eigen_solver.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
-    include/numerics/numeric_vector.h\
     include/numerics/sparse_matrix.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
@@ -5222,7 +5190,6 @@ src/solvers/equation_systems.$(obj-suffix):\
     include/mesh/mesh_refinement.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
-    include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/solvers/equation_systems.h\
@@ -5240,7 +5207,6 @@ src/solvers/equation_systems.$(obj-suffix):\
 src/solvers/equation_systems_io.$(obj-suffix):\
     src/solvers/equation_systems_io.C\
     include/base/auto_ptr.h\
-    include/base/dof_map.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
@@ -5271,7 +5237,6 @@ src/solvers/equation_systems_io.$(obj-suffix):\
     include/mesh/mesh_data.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
-    include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/solvers/equation_systems.h\
@@ -5326,7 +5291,6 @@ src/solvers/exact_solution.$(obj-suffix):\
     include/mesh/mesh_data.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
-    include/numerics/numeric_vector.h\
     include/numerics/tensor_value.h\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
@@ -5350,8 +5314,6 @@ src/solvers/exact_solution.$(obj-suffix):\
 src/solvers/explicit_system.$(obj-suffix):\
     src/solvers/explicit_system.C\
     include/base/auto_ptr.h\
-    include/base/dof_map.h\
-    include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
@@ -5360,16 +5322,12 @@ src/solvers/explicit_system.$(obj-suffix):\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_order.h\
-    include/enums/enum_solver_package.h\
     include/fe/fe_type.h\
-    include/numerics/numeric_vector.h\
     include/solvers/explicit_system.h\
-    include/solvers/system.h\
-    include/utils/perf_log.h
+    include/solvers/system.h
 src/solvers/frequency_system.$(obj-suffix):\
     src/solvers/frequency_system.C\
     include/base/auto_ptr.h\
-    include/base/dof_map.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
@@ -5401,7 +5359,6 @@ src/solvers/frequency_system.$(obj-suffix):\
     include/mesh/mesh_data.h\
     include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
-    include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/solvers/equation_systems.h\
@@ -5471,7 +5428,6 @@ src/solvers/implicit_system.$(obj-suffix):\
 src/solvers/linear_implicit_system.$(obj-suffix):\
     src/solvers/linear_implicit_system.C\
     include/base/auto_ptr.h\
-    include/base/dof_map.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
@@ -5523,7 +5479,6 @@ src/solvers/linear_implicit_system.$(obj-suffix):\
 src/solvers/newmark_system.$(obj-suffix):\
     src/solvers/newmark_system.C\
     include/base/auto_ptr.h\
-    include/base/dof_map.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
@@ -5574,7 +5529,6 @@ src/solvers/newmark_system.$(obj-suffix):\
 src/solvers/nonlinear_implicit_system.$(obj-suffix):\
     src/solvers/nonlinear_implicit_system.C\
     include/base/auto_ptr.h\
-    include/base/dof_map.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
@@ -5680,7 +5634,6 @@ src/solvers/system.$(obj-suffix):\
 src/solvers/system_io.$(obj-suffix):\
     src/solvers/system_io.C\
     include/base/auto_ptr.h\
-    include/base/dof_map.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\

@@ -19,8 +19,10 @@ ex3.$(obj-suffix):\
     ../../include/enums/enum_inf_map_type.h\
     ../../include/enums/enum_io_package.h\
     ../../include/enums/enum_order.h\
+    ../../include/enums/enum_preconditioner_type.h\
     ../../include/enums/enum_quadrature_type.h\
     ../../include/enums/enum_solver_package.h\
+    ../../include/enums/enum_solver_type.h\
     ../../include/enums/enum_xdr_mode.h\
     ../../include/fe/fe.h\
     ../../include/fe/fe_base.h\
@@ -34,13 +36,16 @@ ex3.$(obj-suffix):\
     ../../include/mesh/mesh_data.h\
     ../../include/mesh/mesh_generation.h\
     ../../include/mesh/mesh_output.h\
-    ../../include/numerics/coupling_matrix.h\
     ../../include/numerics/dense_matrix.h\
     ../../include/numerics/dense_matrix_base.h\
     ../../include/numerics/dense_vector.h\
     ../../include/numerics/dense_vector_base.h\
+    ../../include/numerics/linear_solver.h\
+    ../../include/numerics/nonlinear_solver.h\
     ../../include/numerics/numeric_vector.h\
     ../../include/numerics/sparse_matrix.h\
+    ../../include/numerics/tensor_value.h\
+    ../../include/numerics/type_tensor.h\
     ../../include/numerics/type_vector.h\
     ../../include/numerics/vector_value.h\
     ../../include/partitioning/partitioner.h\
@@ -50,7 +55,9 @@ ex3.$(obj-suffix):\
     ../../include/solvers/explicit_system.h\
     ../../include/solvers/frequency_system.h\
     ../../include/solvers/implicit_system.h\
+    ../../include/solvers/linear_implicit_system.h\
     ../../include/solvers/newmark_system.h\
+    ../../include/solvers/nonlinear_implicit_system.h\
     ../../include/solvers/steady_system.h\
     ../../include/solvers/system.h\
     ../../include/solvers/transient_system.h\
