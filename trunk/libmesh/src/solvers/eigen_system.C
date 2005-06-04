@@ -1,4 +1,4 @@
-// $Id: eigen_system.C,v 1.1 2005-05-02 13:12:29 spetersen Exp $
+// $Id: eigen_system.C,v 1.2 2005-06-04 14:28:23 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -31,6 +31,7 @@
 #include "equation_systems.h"
 #include "sparse_matrix.h"
 #include "eigen_solver.h"
+#include "dof_map.h"
 
 
 // ------------------------------------------------------------
