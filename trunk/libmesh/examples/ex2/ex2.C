@@ -1,4 +1,4 @@
-/* $Id: ex2.C,v 1.17 2005-01-14 19:29:41 benkirk Exp $ */
+/* $Id: ex2.C,v 1.18 2005-06-06 17:50:35 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -111,7 +111,7 @@ int main (int argc, char** argv)
       
     // Adds the variable "u" to "Simple System".  "u"
     // will be approximated using first-order approximation.
-    equation_systems("Simple System").add_variable("u", FIRST);
+    equation_systems.get_system("Simple System").add_variable("u", FIRST);
       
     // Initialize the data structures for the equation system.
     equation_systems.init();
