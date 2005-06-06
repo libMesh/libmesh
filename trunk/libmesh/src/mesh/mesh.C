@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.58 2005-06-06 16:24:14 knezed01 Exp $
+// $Id: mesh.C,v 1.59 2005-06-06 19:10:17 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -649,7 +649,7 @@ void Mesh::read (const std::string& name,
       
       else if ((name.rfind(".node")  < name.size()) ||
 	       (name.rfind(".ele")   < name.size()))
-	TetGenIO(*this).read (name);
+	TetGenIO(*this,mesh_data).read (name);
 
       else if (name.rfind(".msh") < name.size())
 	GmshIO(*this).read (name);
