@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.16 2005-06-06 16:23:55 knezed01 Exp $
+# $Id: Makefile,v 1.1 2005-06-06 16:23:54 knezed01 Exp $
 
 
 # The location of the mesh library
@@ -19,7 +19,7 @@ include .depend
 
 #
 # source files
-srcfiles 	:= $(wildcard *.C) ../ex3/exact_solution.C
+srcfiles 	:= $(wildcard *.C)
 
 #
 # object files
@@ -33,7 +33,7 @@ objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
 ###############################################################################
 # Target:
 #
-target 	   := ./ex4
+target 	   := ./ex0
 
 
 all:: $(target)
@@ -41,33 +41,30 @@ all:: $(target)
 # Production rules:  how to make the target - depends on library configuration
 $(target): $(objects)
 	@echo "Linking "$@"..."
-	@$(CXX) $(CXXFLAGS) $(objects) -o $@ $(LIBS) $(LDFLAGS) $(EXTERNAL_FLAGS)
+	@$(CXX) $(CXXFLAGS) $(objects) -o $@ $(LIBS) $(LDFLAGS)
 
 
 # Useful rules.
 clean:
-	@rm -f $(objects) *~
+	@rm -f $(objects) *~ *.gmv data gnuplot_script
 
 clobber:
 	@$(MAKE) clean
-	@rm -f $(target) out_*.gmv
+	@rm -f $(target) 
 
 distclean:
 	@$(MAKE) clobber
 	@rm -f *.o *.g.o *.pg.o
 
-# Warning, the 3D problem may be extremely slow if you are running in debug mode.
 run: $(target)
 	@echo "***************************************************************"
-	@echo "* Running Example " $(target)
+	@echo "* Running " $(target)
 	@echo "***************************************************************"
 	@echo " "
-	@$(target) -d 1 -n 20
-	@$(target) -d 2 -n 15
-	@$(target) -d 3 -n 6
+	@$(target) 
 	@echo " "
 	@echo "***************************************************************"
-	@echo "* Done Running Example " $(target)
+	@echo "* Done Running " $(target)
 	@echo "***************************************************************"
 #
 # Dependencies

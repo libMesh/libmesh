@@ -1,4 +1,4 @@
-// $Id: face_inf_quad.h,v 1.6 2005-05-11 18:31:17 roystgnr Exp $
+// $Id: face_inf_quad.h,v 1.7 2005-06-06 16:23:56 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -127,7 +127,7 @@ public:
    * @returns a primitive (2-noded) edge or infedge for 
    * edge \p i.
    */
-  AutoPtr<Elem> side (const unsigned int i) const;
+  AutoPtr<DofObject> side (const unsigned int i) const;
   
   /**
    * build_edge and build_side are identical in 2D

@@ -1,4 +1,4 @@
-// $Id: node.h,v 1.6 2005-02-22 22:17:30 jwpeterson Exp $
+// $Id: node.h,v 1.7 2005-06-06 16:23:55 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -45,7 +45,7 @@ class MeshRefinement;
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.6 $
+ * \version $Revision: 1.7 $
  */
 
 class Node : public Point,
@@ -78,7 +78,7 @@ public:
   /**
    * Destructor.
    */ 
-  ~Node ();
+  virtual ~Node ();
 
   /**
    * Assign to a node from a point
@@ -116,8 +116,19 @@ public:
   bool active () const;
 
 
+  /**
+   * @returns \p true if this node equals rhs, false otherwise.
+   * Note that rhs is a DofObject, so it is possible that rhs is
+   * not a Node. If rhs is not a Node, then we return false of course.
+   */
+  virtual bool operator==(const DofObject& rhs) const;
   
 private:
+
+  /**
+   * Compares two Node pointers.
+   */
+//   static bool _equals(const Node* lhs, const Node* rhs);
 
   /**
    * @returns the \p key for this node. The key is an arbitrary,

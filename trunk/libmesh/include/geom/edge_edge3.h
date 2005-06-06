@@ -1,4 +1,4 @@
-// $Id: edge_edge3.h,v 1.9 2005-05-06 17:07:00 roystgnr Exp $
+// $Id: edge_edge3.h,v 1.10 2005-06-06 16:23:56 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -147,11 +147,17 @@ protected:
   /**
    * Matrix used to create the elements children.
    */
-  float embedding_matrix (const unsigned int,
-			 const unsigned int,
-			 const unsigned int) const
-  { error(); return 0.; }
+  float embedding_matrix (const unsigned int i,
+			 const unsigned int j,
+			 const unsigned int k) const
+  { return _embedding_matrix[i][j][k]; }
   
+  /**
+   * Matrix that computes new nodal locations/solution values
+   * from current nodes/solution.
+   */
+  static const float _embedding_matrix[2][3][3];
+
 #endif
 };
 

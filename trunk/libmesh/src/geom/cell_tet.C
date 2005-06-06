@@ -1,4 +1,4 @@
-// $Id: cell_tet.C,v 1.15 2005-02-22 22:17:39 jwpeterson Exp $
+// $Id: cell_tet.C,v 1.16 2005-06-06 16:24:13 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -66,13 +66,13 @@ unsigned int Tet::key (const unsigned int s) const
 
 
 
-AutoPtr<Elem> Tet::side (const unsigned int i) const
+AutoPtr<DofObject> Tet::side (const unsigned int i) const
 {
   assert (i < this->n_sides());
 
 
   
-  AutoPtr<Elem> face(new Tri3);
+  Elem* face = new Tri3;
   
   switch (i)
     {
@@ -82,7 +82,8 @@ AutoPtr<Elem> Tet::side (const unsigned int i) const
 	face->set_node(1) = this->get_node(2);
 	face->set_node(2) = this->get_node(1);
 
-	return face;
+        AutoPtr<DofObject> ap_face(face);
+	return ap_face;
       }
     case 1:
       {
@@ -90,7 +91,8 @@ AutoPtr<Elem> Tet::side (const unsigned int i) const
 	face->set_node(1) = this->get_node(1);
 	face->set_node(2) = this->get_node(3);
 
-	return face;
+        AutoPtr<DofObject> ap_face(face);
+	return ap_face;
       }
     case 2:
       {
@@ -98,7 +100,8 @@ AutoPtr<Elem> Tet::side (const unsigned int i) const
 	face->set_node(1) = this->get_node(2);
 	face->set_node(2) = this->get_node(3);
 
-	return face;
+        AutoPtr<DofObject> ap_face(face);
+	return ap_face;
       }
     case 3:
       {
@@ -106,7 +109,8 @@ AutoPtr<Elem> Tet::side (const unsigned int i) const
 	face->set_node(1) = this->get_node(0);
 	face->set_node(2) = this->get_node(3);
 	
-	return face;
+        AutoPtr<DofObject> ap_face(face);
+	return ap_face;
       }
     default:
       {
@@ -116,7 +120,8 @@ AutoPtr<Elem> Tet::side (const unsigned int i) const
 
   // We'll never get here.
   error();
-  return face;
+  AutoPtr<DofObject> ap_face(face);
+  return ap_face;
 }
 
 

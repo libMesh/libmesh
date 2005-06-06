@@ -1,4 +1,4 @@
-// $Id: face_quad.C,v 1.20 2005-05-05 21:17:19 jwpeterson Exp $
+// $Id: face_quad.C,v 1.21 2005-06-06 16:24:14 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -61,11 +61,11 @@ unsigned int Quad::key (const unsigned int s) const
 
 
 
-AutoPtr<Elem> Quad::side (const unsigned int i) const
+AutoPtr<DofObject> Quad::side (const unsigned int i) const
 {
   assert (i < this->n_sides());
 
-  AutoPtr<Elem> edge(new Edge2);
+  Elem* edge = new Edge2;
 
   switch (i)
     {
@@ -74,28 +74,32 @@ AutoPtr<Elem> Quad::side (const unsigned int i) const
 	edge->set_node(0) = this->get_node(0);
 	edge->set_node(1) = this->get_node(1);
 	
-	return edge;
+        AutoPtr<DofObject> ap_edge(edge);
+	return ap_edge;
       }
     case 1:
       {
 	edge->set_node(0) = this->get_node(1);
 	edge->set_node(1) = this->get_node(2);
 	
-	return edge;
+        AutoPtr<DofObject> ap_edge(edge);
+	return ap_edge;
       }
     case 2:
       {
 	edge->set_node(0) = this->get_node(2);
 	edge->set_node(1) = this->get_node(3);
 	
-	return edge;
+        AutoPtr<DofObject> ap_edge(edge);
+	return ap_edge;
       }
     case 3:
       {
 	edge->set_node(0) = this->get_node(3);
 	edge->set_node(1) = this->get_node(0);
 	
-	return edge;
+        AutoPtr<DofObject> ap_edge(edge);
+	return ap_edge;
       }
     default:
       {
@@ -106,7 +110,8 @@ AutoPtr<Elem> Quad::side (const unsigned int i) const
 
   // We will never get here...  Look at the code above.
   error();  
-  return edge;
+  AutoPtr<DofObject> ap_edge(edge);
+  return ap_edge;
 }
 
 

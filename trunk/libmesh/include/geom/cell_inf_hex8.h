@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex8.h,v 1.8 2005-05-11 18:31:17 roystgnr Exp $
+// $Id: cell_inf_hex8.h,v 1.9 2005-06-06 16:23:56 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -120,7 +120,15 @@ public:
    * the \p InfHex::side(i).
    */
   AutoPtr<Elem> build_side (const unsigned int i) const
-  { AutoPtr<Elem> ap(this->side(i)); return ap; }
+  { 
+    // side() returns an AutoPtr to a DofObject, hence need to cast to Elem*
+    AutoPtr<DofObject> ap_dof_object(this->side(i));
+    Elem* side = dynamic_cast<Elem*>(ap_dof_object.release());
+    assert(side); // assert that the cast was successful
+    
+    AutoPtr<Elem> ap(side);
+    return ap;
+  }
 
   /**
    * Returns an \p EDGE2 built coincident with edges 0 to 3, an \p INFEDGE2

@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.35 2005-04-29 22:22:42 jwpeterson Exp $
+// $Id: mesh_generation.C,v 1.36 2005-06-06 16:24:14 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -77,27 +77,140 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
       {
 	assert (nx != 0);
 
-	mesh.reserve_nodes(nx+1);
-	mesh.reserve_elem (nx);
+        // Reserve elements
+        switch (type)
+          {
+          case EDGE2:
+          case EDGE3:
+            {
+	      mesh.reserve_elem (nx);
+              break;
+            }
 
-	for (unsigned int i=0; i<=nx; i++)
-	  {
-	    if (gauss_lobatto_grid)
-	      mesh.add_point (Point(0.5*(cos(libMesh::pi*static_cast<Real>(nx-i)/static_cast<Real>(nx))+1.0),
-				    0, 
-				    0));
-	    else
-	      mesh.add_point (Point(static_cast<Real>(i)/static_cast<Real>(nx), 
-				    0, 
-				    0));
+          default:
+            {
+	      std::cerr << "ERROR: Unrecognized 1D element type." << std::endl;
+	      error();
+	    }
 	  }
-	
-	for (unsigned int i=0; i<nx; i++)
-	  {
-	    Elem* elem = mesh.add_elem (new Edge2);
-	    elem->set_node(0) = mesh.node_ptr(i);
-	    elem->set_node(1) = mesh.node_ptr(i+1);
-	  }
+
+        // Reserve nodes
+        switch (type)
+          {
+          case EDGE2:
+            {
+              mesh.reserve_nodes(nx+1);
+              break;
+            }
+
+          case EDGE3:
+            {
+              mesh.reserve_nodes(2*nx+1);
+              break;
+            }
+
+          default:
+            {
+              std::cerr << "ERROR: Unrecognized 1D element type." << std::endl;
+              error();
+            }
+          }
+
+
+        // Build the nodes, depends on whether we're using linears or 
+        // quadratics and whether using uniform grid or Gauss-Lobatto
+        switch(type)
+        {
+          case EDGE2:
+            {
+              for (unsigned int i=0; i<=nx; i++)
+              {
+                if (gauss_lobatto_grid)
+                  mesh.add_point (Point(0.5*(cos(libMesh::pi*static_cast<Real>(nx-i)/static_cast<Real>(nx))+1.0),
+                        0, 
+                        0));
+                else
+                  mesh.add_point (Point(static_cast<Real>(i)/static_cast<Real>(nx), 
+                        0, 
+                        0));
+              }
+              break;
+            }
+
+          case EDGE3:
+            {
+              for (unsigned int i=0; i<=2*nx; i++)
+              {
+                if (gauss_lobatto_grid)
+                {
+                  // The x location of the point.
+                  Real x=0.;
+
+                  // Shortcut variable
+                  const Real pi = libMesh::pi;
+
+                  // Shortcut quantities (do not depend on i)
+                  const Real a = cos( pi / static_cast<Real>(2*nx) );
+                  const Real c = cos( pi*i / static_cast<Real>(2*nx) );
+
+                  // If i is even, compute a normal Gauss-Lobatto point
+                  if (i%2 == 0)
+                    x = 0.5*(1.0 - c);
+
+                  // Otherwise, it is the average of the previous and next points
+                  else
+                    x = 0.5*(1.0 - a*c);
+
+                  mesh.add_point (Point(x,0.,0.));
+                }
+                else
+                  mesh.add_point (Point(static_cast<Real>(i)/static_cast<Real>(2*nx),
+                        0,
+                        0));
+              }
+              break;
+            }
+            
+          default:
+            {
+              std::cerr << "ERROR: Unrecognized 1D element type." << std::endl;
+              error();
+            }
+              
+        }
+
+        // Build the elements of the mesh
+        switch(type)
+          {
+            case EDGE2:
+              {
+                for (unsigned int i=0; i<nx; i++)
+                {
+                  Elem* elem = mesh.add_elem (new Edge2);
+                  elem->set_node(0) = mesh.node_ptr(i);
+                  elem->set_node(1) = mesh.node_ptr(i+1);
+                }
+              break;
+              }
+
+            case EDGE3:
+              {
+                for (unsigned int i=0; i<nx; i++)
+                {
+                  Elem* elem = mesh.add_elem (new Edge3);
+                  elem->set_node(0) = mesh.node_ptr(2*i);
+                  elem->set_node(2) = mesh.node_ptr(2*i+1);
+                  elem->set_node(1) = mesh.node_ptr(2*i+2);
+                }
+              break;
+              }
+
+            default:
+              {
+                std::cerr << "ERROR: Unrecognized 1D element type." << std::endl;
+                error();                
+              }
+          }
 
 
 	// Scale the nodal positions
@@ -867,11 +980,24 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 
 
 
+void MeshTools::Generation::build_line (Mesh& mesh,
+                                        const unsigned int nx,
+                                        const Real xmin, const Real xmax,
+                                        const ElemType type,
+                                        const bool gauss_lobatto_grid)
+{
+    // This method only makes sense in 1D!
+    assert(mesh.mesh_dimension() == 1);
 
-
-
-
-
+    build_cube(mesh,
+               nx, 0, 0,
+               xmin, xmax,
+               0., 0.,
+               0., 0.,
+               type,
+               gauss_lobatto_grid);
+}
+                                        
 
 
 void MeshTools::Generation::build_square (Mesh& mesh,

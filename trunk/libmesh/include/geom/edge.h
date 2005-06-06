@@ -1,4 +1,4 @@
-// $Id: edge.h,v 1.5 2005-05-11 18:31:17 roystgnr Exp $
+// $Id: edge.h,v 1.6 2005-06-06 16:23:56 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -111,20 +111,29 @@ class Edge : public Elem
   
   /**
    * The \p Elem::side() member makes no sense for edges.
+   * But to work for 1D, return an auto pointer to the specified node.
    */
-  AutoPtr<Elem> side (const unsigned int) const
-  { error(); AutoPtr<Elem> ap(NULL); return ap; }
+  AutoPtr<DofObject> side (const unsigned int i) const
+  { 
+    assert(i < n_nodes()); 
+    AutoPtr<DofObject> 
+    ap(new Node(*(this->get_node(i))) ); 
+    return ap; 
+    }
+  //{ error(); AutoPtr<Elem> ap(NULL); return ap; }
 
   /**
    * The \p Elem::build_side() member makes no sense for edges.
    */
   AutoPtr<Elem> build_side (const unsigned int) const
+  //{ assert(i < n_nodes()); AutoPtr<DofObject> ap(new Node(*get_node(i))); return ap; }
   { error(); AutoPtr<Elem> ap(NULL); return ap; }
 
   /**
    * The \p Elem::build_edge() member makes little sense for edges.
    */
   AutoPtr<Elem> build_edge (const unsigned int) const
+  //{ assert(i < n_nodes()); AutoPtr<DofObject> ap(new Node(*get_node(i))); return ap; }
   { error(); AutoPtr<Elem> ap(NULL); return ap; }
 
   

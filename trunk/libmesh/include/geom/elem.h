@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.22 2005-05-25 16:19:53 benkirk Exp $
+// $Id: elem.h,v 1.23 2005-06-06 16:23:56 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -161,7 +161,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    * nodes, regardless of how those nodes might be numbered local
    * to the elements.
    */
-  bool operator == (const Elem& rhs) const;
+  virtual bool operator == (const DofObject& rhs) const;
 
   /**
    * @returns a pointer to the \f$ i^{th} \f$ neighbor of this element.
@@ -342,7 +342,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    * you want the full-ordered face (i.e. a 9-noded quad face for a 27-noded
    * hexahedral) use the build_side method.
    */
-  virtual AutoPtr<Elem> side (const unsigned int i) const = 0;
+  virtual AutoPtr<DofObject> side (const unsigned int i) const = 0;
   
   /**
    * Creates an element coincident with side \p i. The element returned is

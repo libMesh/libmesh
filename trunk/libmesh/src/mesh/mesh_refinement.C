@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.39 2005-05-20 17:16:17 roystgnr Exp $
+// $Id: mesh_refinement.C,v 1.40 2005-06-06 16:24:15 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -148,7 +148,7 @@ void MeshRefinement::update_nodes_map ()
 
 bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
 {
-  assert (_mesh.mesh_dimension() != 1);
+  //assert (_mesh.mesh_dimension() != 1);
 
 
   // Possibly clean up the refinement flags from
@@ -214,6 +214,8 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
 // call or replace find_neighbors() with on-the-fly neighbor updating
 // assert(!this->eliminate_unrefined_patches());
 
+
+
   // Finally, the new mesh needs to be prepared for use
   if (coarsening_changed_mesh || refining_changed_mesh)
     {
@@ -237,7 +239,7 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
 
 bool MeshRefinement::coarsen_elements (const bool maintain_level_one)
 {
-  assert (_mesh.mesh_dimension() != 1);
+  //assert (_mesh.mesh_dimension() != 1);
   
   // Possibly clean up the refinement flags from
   // a previous step
@@ -302,7 +304,7 @@ bool MeshRefinement::coarsen_elements (const bool maintain_level_one)
 
 bool MeshRefinement::refine_elements (const bool maintain_level_one)
 {
-  assert (_mesh.mesh_dimension() != 1);
+  //assert (_mesh.mesh_dimension() != 1);
 
   // Possibly clean up the refinement flags from
   // a previous step

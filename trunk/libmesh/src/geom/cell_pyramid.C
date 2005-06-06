@@ -1,4 +1,4 @@
-// $Id: cell_pyramid.C,v 1.13 2005-02-22 22:17:39 jwpeterson Exp $
+// $Id: cell_pyramid.C,v 1.14 2005-06-06 16:24:13 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -79,7 +79,7 @@ unsigned int Pyramid::key (const unsigned int s) const
 
 
 
-AutoPtr<Elem> Pyramid::side (const unsigned int i) const
+AutoPtr<DofObject> Pyramid::side (const unsigned int i) const
 {
   assert (i < this->n_sides());
 
@@ -89,66 +89,71 @@ AutoPtr<Elem> Pyramid::side (const unsigned int i) const
     {
     case 0:  // triangular face 1
       {
-	AutoPtr<Elem> face(new Tri3); 
+        Elem* face = new Tri3;
 
 	face->set_node(0) = this->get_node(0);
 	face->set_node(1) = this->get_node(1);
 	face->set_node(2) = this->get_node(4);
 	
-	return face;
+        AutoPtr<DofObject> ap_face(face);
+	return ap_face;
       }
     case 1:  // triangular face 2
       {
-	AutoPtr<Elem> face(new Tri3);
+        Elem* face = new Tri3;
 
 	face->set_node(0) = this->get_node(1);
 	face->set_node(1) = this->get_node(2);
 	face->set_node(2) = this->get_node(4);
 	
-	return face;
+        AutoPtr<DofObject> ap_face(face);
+	return ap_face;
       }
     case 2:  // triangular face 3
       {
-	AutoPtr<Elem> face(new Tri3);
+        Elem* face = new Tri3;
 
 	face->set_node(0) = this->get_node(2);
 	face->set_node(1) = this->get_node(3);
 	face->set_node(2) = this->get_node(4);
 	
-	return face;
+        AutoPtr<DofObject> ap_face(face);
+	return ap_face;
       }
     case 3:  // triangular face 4
       {
-	AutoPtr<Elem> face(new Tri3);
+        Elem* face = new Tri3;
 
 	face->set_node(0) = this->get_node(3);
 	face->set_node(1) = this->get_node(0);
 	face->set_node(2) = this->get_node(4);
 	
-	return face;
+        AutoPtr<DofObject> ap_face(face);
+	return ap_face;
       }
     case 4:  // the quad face at z=0
       {
-	AutoPtr<Elem> face(new Quad4);
+        Elem* face = new Quad4;
 	
 	face->set_node(0) = this->get_node(0);
 	face->set_node(1) = this->get_node(3);
 	face->set_node(2) = this->get_node(2);
 	face->set_node(3) = this->get_node(1);
 
-	return face;
+        AutoPtr<DofObject> ap_face(face);
+	return ap_face;
       }
     default:
       {
 	error();
-	AutoPtr<Elem> face(NULL);
-	return face;
+	AutoPtr<DofObject> ap_face(NULL);
+	return ap_face;
       }
     }
 
   // We'll never get here.
   error();
-  AutoPtr<Elem> face(NULL);
+  AutoPtr<DofObject> ap_face(NULL);
 
-  return face;
+  return ap_face;
 }

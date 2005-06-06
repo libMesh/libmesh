@@ -1,4 +1,4 @@
-// $Id: face_inf_quad.C,v 1.8 2005-02-22 22:17:39 jwpeterson Exp $
+// $Id: face_inf_quad.C,v 1.9 2005-06-06 16:24:14 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -65,7 +65,7 @@ unsigned int InfQuad::key (const unsigned int s) const
 
 
 
-AutoPtr<Elem> InfQuad::side (const unsigned int i) const
+AutoPtr<DofObject> InfQuad::side (const unsigned int i) const
 {
   assert (i < this->n_sides());
 
@@ -80,7 +80,7 @@ AutoPtr<Elem> InfQuad::side (const unsigned int i) const
 	edge->set_node(0) = this->get_node(0);
 	edge->set_node(1) = this->get_node(1);
 	
-	AutoPtr<Elem> ap(edge);  return ap;
+	AutoPtr<DofObject> ap(edge);  return ap;
       }
 
     case 1:
@@ -91,7 +91,7 @@ AutoPtr<Elem> InfQuad::side (const unsigned int i) const
 	edge->set_node(0) = this->get_node(1);
 	edge->set_node(1) = this->get_node(3);	
 
-	AutoPtr<Elem> ap(edge);  return ap;
+	AutoPtr<DofObject> ap(edge);  return ap;
       }
 
     case 2:
@@ -102,19 +102,19 @@ AutoPtr<Elem> InfQuad::side (const unsigned int i) const
 	edge->set_node(0) = this->get_node(0); // be aware of swapped nodes,
 	edge->set_node(1) = this->get_node(2); // compared to conventional side numbering
 
-	AutoPtr<Elem> ap(edge);  return ap;
+	AutoPtr<DofObject> ap(edge);  return ap;
       }
 
     default:
       {
 	error();
-	AutoPtr<Elem> ap(NULL);  return ap;
+	AutoPtr<DofObject> ap(NULL);  return ap;
       }
     }
 
   // We will never get here...  Look at the code above.
   error();
-  AutoPtr<Elem> ap(NULL);  return ap;
+  AutoPtr<DofObject> ap(NULL);  return ap;
 }
 
 

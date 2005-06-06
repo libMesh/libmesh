@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.81 2005-06-03 20:31:26 benkirk Exp $
+// $Id: dof_map.C,v 1.82 2005-06-06 16:23:57 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1090,7 +1090,6 @@ void DofMap::dof_indices (const Elem* const elem,
 	        {
 		  assert (node->dof_number(sys_num,v,i) !=
 			  DofObject::invalid_id);
-	
 		  di.push_back(node->dof_number(sys_num,v,i));
 	        }
 	  }
@@ -1099,7 +1098,6 @@ void DofMap::dof_indices (const Elem* const elem,
 	const unsigned int nc = FEInterface::n_dofs_per_elem(dim,
 							     fe_type,
 							     type);
-
 	// We should never have fewer dofs than necessary on an
 	// element unless we're getting indices on a parent element,
 	// and we should never need those indices

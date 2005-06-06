@@ -1,4 +1,4 @@
-// $Id: fourth_error_estimators.C,v 1.3 2005-06-06 14:53:19 jwpeterson Exp $
+// $Id: fourth_error_estimators.C,v 1.4 2005-06-06 16:24:16 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -203,7 +203,7 @@ void LaplacianErrorEstimator::estimate_error (const System& system,
 		    fe_e->reinit (e, n_e);
 
 		    // Build the side
-		    AutoPtr<Elem> side (e->side(n_e));
+		    AutoPtr<Elem> side (e->build_side(n_e));
 
 		    // Get the maximum h for this side
 		    const Real h = side->hmax();
