@@ -1,4 +1,4 @@
-/* $Id: ex11.C,v 1.11 2005-05-10 21:37:17 benkirk Exp $ */
+/* $Id: ex11.C,v 1.12 2005-06-06 14:53:15 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -49,6 +49,9 @@
 // component-by-component basis.
 #include "dense_submatrix.h"
 #include "dense_subvector.h"
+
+// The definition of a geometric element
+#include "elem.h"
 
 // Function prototype.  This function will assemble the system
 // matrix and right-hand-side.
@@ -116,7 +119,7 @@ int main (int argc, char** argv)
     
     // Assemble & solve the linear system,
     // then write the solution.
-    equation_systems("Stokes").solve();
+    equation_systems.get_system("Stokes").solve();
 
     GMVIO(mesh).write_equation_systems ("out.gmv",
 					equation_systems);

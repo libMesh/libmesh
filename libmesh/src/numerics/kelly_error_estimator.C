@@ -1,4 +1,4 @@
-// $Id: kelly_error_estimator.C,v 1.11 2005-05-25 17:54:24 jwpeterson Exp $
+// $Id: kelly_error_estimator.C,v 1.12 2005-06-06 14:53:19 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -32,7 +32,7 @@
 #include "quadrature_gauss.h"
 #include "libmesh_logging.h"
 #include "elem.h"
-
+#include "mesh.h"
 
 
 //-----------------------------------------------------------------

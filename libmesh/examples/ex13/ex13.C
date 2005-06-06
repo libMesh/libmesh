@@ -1,4 +1,4 @@
-/* $Id: ex13.C,v 1.11 2005-05-10 21:37:17 benkirk Exp $ */
+/* $Id: ex13.C,v 1.12 2005-06-06 14:53:15 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -65,6 +65,9 @@
 // component-by-component basis.
 #include "dense_submatrix.h"
 #include "dense_subvector.h"
+
+// The definition of a geometric element
+#include "elem.h"
 
 // Function prototype.  This function will assemble the system
 // matrix and right-hand-side.
@@ -187,7 +190,7 @@ int main (int argc, char** argv)
 	    
 	    // Assemble & solve the linear system.
 	    perf_log.start_event("linear solve");
-	    equation_systems("Navier-Stokes").solve();
+	    equation_systems.get_system("Navier-Stokes").solve();
 	    perf_log.stop_event("linear solve");
 
 	    // Compute the difference between this solution and the last

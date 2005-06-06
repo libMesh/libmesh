@@ -1,4 +1,4 @@
-/* $Id: ex10.C,v 1.20 2005-05-31 15:37:40 jwpeterson Exp $ */
+/* $Id: ex10.C,v 1.21 2005-06-06 14:53:15 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -59,6 +59,9 @@
 // object to figure out which elements to refine.
 #include "error_vector.h"
 #include "kelly_error_estimator.h"
+
+// The definition of a geometric element
+#include "elem.h"
 
 // Function prototype.  This function will assemble the system
 // matrix and right-hand-side at each time step.  Note that

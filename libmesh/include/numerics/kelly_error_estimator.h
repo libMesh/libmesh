@@ -1,4 +1,4 @@
-// $Id: kelly_error_estimator.h,v 1.6 2005-03-11 15:23:45 jwpeterson Exp $
+// $Id: kelly_error_estimator.h,v 1.7 2005-06-06 14:53:18 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -29,7 +29,8 @@
 // Local Includes
 #include "error_estimator.h"
 
-
+// Forward Declarations
+class Point;
 
 
 

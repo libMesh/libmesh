@@ -1,4 +1,4 @@
-// $Id: fe_compute_data.h,v 1.4 2005-02-22 22:17:30 jwpeterson Exp $
+// $Id: fe_compute_data.h,v 1.5 2005-06-06 14:53:18 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -27,12 +27,10 @@
 
 // Local includes
 #include "libmesh.h"
-#include "point.h"
-#include "equation_systems.h"
 
 // Forward declarations
-// class EquationSystems;
-
+class EquationSystems;
+class Point;
 
 /**
  * class \p FEComputeData hides arbitrary data to be passed to and from
@@ -115,48 +113,14 @@ public:
   /**
    * Clears the @e output data completely.
    */
-  void clear () 
-    { 
-      this->shape.clear();
-#if defined(ENABLE_INFINITE_ELEMENTS) && !defined(USE_COMPLEX_NUMBERS)
-      this->phase = 0.;
-      this->speed = 0.;
-#endif
-
-#if defined (ENABLE_INFINITE_ELEMENTS) && defined(USE_COMPLEX_NUMBERS)
-      this->speed = 0.;
-      this->frequency = 0.;
-
-#endif
-
-
-      return; 
-    }
+  void clear () ;
 
 
   /**
    * Inits the @e output data to default values, provided
    * the fields are correctly resized.
    */
-  void init () 
-    { 
-      if (!(this->shape.empty()))
-        std::fill (this->shape.begin(),   this->shape.end(),   0.);
-#if defined(ENABLE_INFINITE_ELEMENTS) && !defined(USE_COMPLEX_NUMBERS)
-      this->phase = 0.;
-      this->speed = this->equation_systems.parameters.get<Real>("speed");
-#endif
-
-#if defined (ENABLE_INFINITE_ELEMENTS) && defined(USE_COMPLEX_NUMBERS)
-      this->speed = this->equation_systems.parameters.get<Real>("speed");
-      this->frequency = this->equation_systems.parameters.get<Real>("current frequency");
-
-#endif
-
-      return; 
-    }
-
-
+  void init () ;
 };
 
 

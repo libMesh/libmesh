@@ -1,4 +1,4 @@
-// $Id: exact_solution.C,v 1.13 2005-06-03 15:49:58 jwpeterson Exp $
+// $Id: exact_solution.C,v 1.14 2005-06-06 14:53:20 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -28,6 +28,7 @@
 #include "fe_interface.h"
 #include "elem.h"
 #include "dof_map.h"
+#include "mesh.h"
 
 ExactSolution::ExactSolution(EquationSystems& es) :
   _exact_value (NULL),
@@ -40,7 +41,7 @@ ExactSolution::ExactSolution(EquationSystems& es) :
   for (unsigned int sys=0; sys<_equation_systems.n_systems(); ++sys)
     {
       // Reference to the system
-      const System& system = _equation_systems(sys);
+      const System& system = _equation_systems.get_system(sys);
       
       // The name of the system
       const std::string& sys_name = system.name();

@@ -1,4 +1,4 @@
-// $Id: fourth_error_estimators.C,v 1.2 2005-05-27 17:21:25 benkirk Exp $
+// $Id: fourth_error_estimators.C,v 1.3 2005-06-06 14:53:19 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -32,7 +32,7 @@
 #include "quadrature_clough.h"
 #include "libmesh_logging.h"
 #include "elem.h"
-
+#include "mesh.h"
 
 
 //-----------------------------------------------------------------

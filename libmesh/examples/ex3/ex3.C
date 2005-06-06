@@ -1,4 +1,4 @@
-/* $Id: ex3.C,v 1.31 2005-01-14 19:29:41 benkirk Exp $ */
+/* $Id: ex3.C,v 1.32 2005-06-06 14:53:16 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -53,6 +53,7 @@
 #include "numeric_vector.h"
 #include "dense_matrix.h"
 #include "dense_vector.h"
+#include "elem.h"
 
 // Define the DofMap, which handles degree of freedom
 // indexing.
@@ -120,12 +121,12 @@ int main (int argc, char** argv)
 
     // Adds the variable "u" to "Poisson".  "u"
     // will be approximated using second-order approximation.
-    equation_systems("Poisson").add_variable("u", SECOND);
+    equation_systems.get_system("Poisson").add_variable("u", SECOND);
 
     // Give the system a pointer to the matrix assembly
     // function.  This will be called when needed by the
     // library.
-    equation_systems("Poisson").attach_assemble_function (assemble_poisson);
+    equation_systems.get_system("Poisson").attach_assemble_function (assemble_poisson);
     
     // Initialize the data structures for the equation system.
     equation_systems.init();
@@ -148,7 +149,7 @@ int main (int argc, char** argv)
     //
     // if you linked against the appropriate X libraries when you
     // built PETSc.
-    equation_systems("Poisson").solve();
+    equation_systems.get_system("Poisson").solve();
 
     // After solving the system write the solution
     // to a GMV-formatted plot file.

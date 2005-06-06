@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.15 2005-04-14 17:11:39 spetersen Exp $
+// $Id: equation_systems.h,v 1.16 2005-06-06 14:53:18 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -32,10 +32,7 @@
 #include "libmesh_common.h"
 #include "parameters.h"
 #include "system.h"
-#include "mesh.h"
-#include "mesh_data.h"
 #include "enum_xdr_mode.h"
-#include "elem.h"
 
 // HP aCC needs these for some reason
 #ifdef __HP_aCC
@@ -45,6 +42,11 @@
 # include "steady_system.h"
 #endif
 
+// Forward Declarations
+class MeshData;
+//class System;
+class Elem;
+class Mesh;
 
 /**
  * This is the \p EquationSystems class.  It is in charge
@@ -349,7 +351,15 @@ protected:
    * Typedef for constatnt system iterators
    */
   typedef std::map<std::string, System*>::const_iterator const_system_iterator;
-  
+
+private:
+  /**
+   * This function is used in the implementation of add_system,
+   * it loops over the nodes and elements of the Mesh, adding the
+   * system to each one.  The main reason to separate this part
+   * is to avoid coupling this header file to mesh.h, and elem.h.
+   */
+  void _add_system_to_nodes_and_elems();
 };
 
 
@@ -421,77 +431,12 @@ T_sys & EquationSystems::add_system (const std::string& name)
   assert (ptr != NULL);
   
   // Tell all the \p DofObject entities to add a system.
-  {
-    // All the nodes
-    MeshBase::node_iterator       node_it  = _mesh.nodes_begin();
-    const MeshBase::node_iterator node_end = _mesh.nodes_end();
- 
-    for ( ; node_it != node_end; ++node_it)
-      (*node_it)->add_system();
- 
-    // All the elements
-    MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
-    const MeshBase::element_iterator elem_end = _mesh.elements_end();
- 
-    for ( ; elem_it != elem_end; ++elem_it)
-      (*elem_it)->add_system();
-  }
+  this->_add_system_to_nodes_and_elems();
 
+  // Return a dynamically casted reference to the newly added System.
   return *(dynamic_cast<T_sys*>(ptr));
 }
 
-
-
-
-template <typename T_sys>
-inline
-const T_sys & EquationSystems::get_system (const std::string& name) const
-{
-  const_system_iterator pos = _systems.find(name);
-
-  // Check for errors
-  if (pos == _systems.end())
-    {
-      std::cerr << "ERROR: no system named \"" << name << "\" found!"
-		<< std::endl;
-      error();
-    }
-  else if (dynamic_cast<T_sys*>(pos->second) == NULL)
-    {
-      std::cerr << "ERROR: cannont convert system \""
-		<< name << "\" to requested type!"
-		<< std::endl;
-      error();
-    }
-  
-  return *(dynamic_cast<T_sys*>(pos->second));
-}
-
-
-
-template <typename T_sys>
-inline
-T_sys & EquationSystems::get_system (const std::string& name)
-{
-  system_iterator pos = _systems.find(name);
-
-  // Check for errors
-  if (pos == _systems.end())
-    {
-      std::cerr << "ERROR: no system named " << name << " found!"
-		<< std::endl;
-      error();
-    }
-  else if (dynamic_cast<T_sys*>(pos->second) == NULL)
-    {
-      std::cerr << "ERROR: cannont convert system \""
-		<< name << "\" to requested type!"
-		<< std::endl;
-      error();
-    }
-  
-  return *(dynamic_cast<T_sys*>(pos->second));
-}
 
 
 
@@ -516,16 +461,22 @@ const T_sys & EquationSystems::get_system (const unsigned int num) const
 		<< std::endl;
       error();
     }
-  else if (dynamic_cast<T_sys*>(pos->second) == NULL)
+
+  // Attempt dynamic cast
+  T_sys* ptr = dynamic_cast<T_sys*>(pos->second);
+
+  // Check for failure of dynamic cast
+  if (ptr == NULL)
     {
-      std::cerr << "ERROR: cannont convert system "
+      std::cerr << "ERROR: cannot convert system "
 		<< num << " to requested type!"
 		<< std::endl;
       error();
     }
   
-  return *(dynamic_cast<T_sys*>(pos->second));
+  return *ptr;
 }
+
 
 
 
@@ -549,16 +500,92 @@ T_sys & EquationSystems::get_system (const unsigned int num)
 		<< std::endl;
       error();
     }
-  else if (dynamic_cast<T_sys*>(pos->second) == NULL)
+
+  // Attempt dynamic cast
+  T_sys* ptr = dynamic_cast<T_sys*>(pos->second);
+
+  // Check for failure of dynamic cast
+  if (ptr == NULL)
     {
-      std::cerr << "ERROR: cannont convert system "
+      std::cerr << "ERROR: cannot convert system "
 		<< num << " to requested type!"
 		<< std::endl;
       error();
     }
-  
-  return *(dynamic_cast<T_sys*>(pos->second));
+
+  return *ptr; 
 }
+
+
+
+
+
+
+template <typename T_sys>
+inline
+const T_sys & EquationSystems::get_system (const std::string& name) const
+{
+  const_system_iterator pos = _systems.find(name);
+
+  // Check for errors
+  if (pos == _systems.end())
+    {
+      std::cerr << "ERROR: no system named \"" << name << "\" found!"
+		<< std::endl;
+      error();
+    }
+
+  // Attempt dynamic cast
+  T_sys* ptr = dynamic_cast<T_sys*>(pos->second);
+
+  // Check for failure of dynamic cast
+  if (ptr == NULL)
+    {
+      std::cerr << "ERROR: cannot convert system \""
+		<< name << "\" to requested type!"
+		<< std::endl;
+      error();
+    }
+
+  return *ptr; 
+}
+
+
+
+
+
+
+template <typename T_sys>
+inline
+T_sys & EquationSystems::get_system (const std::string& name)
+{
+  system_iterator pos = _systems.find(name);
+
+  // Check for errors
+  if (pos == _systems.end())
+    {
+      std::cerr << "ERROR: no system named " << name << " found!"
+		<< std::endl;
+      error();
+    }
+
+  // Attempt dynamic cast
+  T_sys* ptr = dynamic_cast<T_sys*>(pos->second);
+
+  // Check for failure of dynamic cast
+  if (ptr == NULL)
+    {
+      std::cerr << "ERROR: cannot convert system \""
+		<< name << "\" to requested type!"
+		<< std::endl;
+      error();
+    }
+
+  return *ptr; 
+}
+
+
+
 
 
 
@@ -598,6 +625,7 @@ System & EquationSystems::get_system (const unsigned int num)
 inline
 System & EquationSystems::operator () (const std::string& name)
 {
+  deprecated(); // Use the get_system() interface directly instead.
   return this->get_system (name);
 }
   
@@ -605,6 +633,7 @@ System & EquationSystems::operator () (const std::string& name)
 inline
 const System & EquationSystems::operator () (const std::string& name) const
 {
+  deprecated(); // Use the get_system() interface directly instead.
   return this->get_system (name);
 }
   
@@ -613,6 +642,7 @@ const System & EquationSystems::operator () (const std::string& name) const
 inline
 System & EquationSystems::operator () (const unsigned int num)
 {
+  deprecated(); // Use the get_system() interface directly instead.
   return this->get_system (num);
 }
 
@@ -621,6 +651,7 @@ System & EquationSystems::operator () (const unsigned int num)
 inline
 const System & EquationSystems::operator () (const unsigned int num) const
 {
+  deprecated(); // Use the get_system() interface directly instead.
   return this->get_system (num);
 }
 

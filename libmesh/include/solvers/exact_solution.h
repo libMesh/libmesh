@@ -1,4 +1,4 @@
-// $Id: exact_solution.h,v 1.5 2005-04-10 20:15:53 spetersen Exp $
+// $Id: exact_solution.h,v 1.6 2005-06-06 14:53:18 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -28,7 +28,7 @@
 #include "vector_value.h" // for RealGradient
 
 // Forward Declarations
-
+class Point;
 
 
 

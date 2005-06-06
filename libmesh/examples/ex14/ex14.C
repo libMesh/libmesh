@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.15 2005-06-03 15:49:57 jwpeterson Exp $ */
+/* $Id: ex14.C,v 1.16 2005-06-06 14:53:15 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -61,6 +61,7 @@
 #include "exact_solution.h"
 #include "dof_map.h"
 #include "numeric_vector.h"
+#include "elem.h"
 
 // Function prototype.  This is the function that will assemble
 // the linear system for our Laplace problem.  Note that the
@@ -141,18 +142,19 @@ int main(int argc, char** argv)
     // Declare the system and its variables.
     {
       // Creates a system named "Laplace"
-      equation_systems.add_system<LinearImplicitSystem> ("Laplace");
-
+      LinearImplicitSystem& system =
+	equation_systems.add_system<LinearImplicitSystem> ("Laplace");
+      
       // Adds the variable "u" to "Laplace".  "u"
       // will be approximated using second-order approximation.
       if (approx_order == "FIRST")
-	equation_systems("Laplace").add_variable("u", FIRST);
+	system.add_variable("u", FIRST);
       else
-	equation_systems("Laplace").add_variable("u", SECOND);
+	system.add_variable("u", SECOND);
       
       // Give the system a pointer to the matrix assembly
       // function.
-      equation_systems("Laplace").attach_assemble_function (assemble_laplace);
+      system.attach_assemble_function (assemble_laplace);
       
       // Initialize the data structures for the equation system.
       equation_systems.init();
@@ -182,7 +184,7 @@ int main(int argc, char** argv)
 	std::cout << "Beginning Solve " << r_step << std::endl;
 	
 	// Solve the system "Laplace", just like example 2.
-	equation_systems("Laplace").solve();
+	system.solve();
 
 	std::cout << "System has: " << equation_systems.n_active_dofs()
 		  << " degrees of freedom."

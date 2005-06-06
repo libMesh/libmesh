@@ -1,4 +1,4 @@
-// $Id: gmsh_io.C,v 1.12 2005-04-10 13:05:30 spetersen Exp $
+// $Id: gmsh_io.C,v 1.13 2005-06-06 14:53:19 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -26,6 +26,7 @@
 #include "libmesh_config.h"
 #include "gmsh_io.h"
 #include "elem.h"
+#include "mesh_base.h"
 
 // anonymous namespace to hold local data
 namespace
