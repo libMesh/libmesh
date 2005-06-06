@@ -1,4 +1,4 @@
-/* $Id: ex8.C,v 1.15 2005-05-18 13:59:38 jwpeterson Exp $ */
+/* $Id: ex8.C,v 1.16 2005-06-06 14:53:17 jwpeterson Exp $ */
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
 
@@ -66,6 +66,12 @@
 // Define the DofMap, which handles degree of freedom
 // indexing.
 #include "dof_map.h"
+
+// The definition of a vertex associated with a Mesh.
+#include "node.h"
+
+// The definition of a geometric element
+#include "elem.h"
 
 // Function prototype.  This is the function that will assemble
 // the linear system for our problem, governed by the linear

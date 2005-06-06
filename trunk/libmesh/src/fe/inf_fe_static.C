@@ -1,4 +1,4 @@
-// $Id: inf_fe_static.C,v 1.29 2005-05-06 17:44:06 roystgnr Exp $
+// $Id: inf_fe_static.C,v 1.30 2005-06-06 14:53:18 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -28,7 +28,6 @@
 #include "fe_compute_data.h"
 #include "elem.h"
 #include "equation_systems.h"
-
 
 
 // ------------------------------------------------------------

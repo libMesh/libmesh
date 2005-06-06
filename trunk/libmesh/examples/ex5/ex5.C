@@ -1,4 +1,4 @@
-/* $Id: ex5.C,v 1.31 2005-01-14 19:29:42 benkirk Exp $ */
+/* $Id: ex5.C,v 1.32 2005-06-06 14:53:17 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -64,6 +64,8 @@
 // indexing.
 #include "dof_map.h"
 
+// The definition of a geometric element
+#include "elem.h"
 
 
 
@@ -165,16 +167,16 @@ int main (int argc, char** argv)
     {
       equation_systems.add_system<LinearImplicitSystem> ("Poisson");
       
-      equation_systems("Poisson").add_variable("u", FIRST);
+      equation_systems.get_system("Poisson").add_variable("u", FIRST);
 
-      equation_systems("Poisson").attach_assemble_function (assemble_poisson);
+      equation_systems.get_system("Poisson").attach_assemble_function (assemble_poisson);
 
       equation_systems.init();
       
       equation_systems.print_info();
     }
 
-    equation_systems("Poisson").solve();
+    equation_systems.get_system("Poisson").solve();
 
     // "Personalize" the output, with the
     // number of the quadrature rule appended.

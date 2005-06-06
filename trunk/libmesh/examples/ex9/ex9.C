@@ -1,4 +1,4 @@
-/* $Id: ex9.C,v 1.17 2005-01-14 19:29:43 benkirk Exp $ */
+/* $Id: ex9.C,v 1.18 2005-06-06 14:53:17 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -55,6 +55,9 @@
 // so we need to include the \p TransientLinearImplicitSystem definition.
 #include "transient_system.h"
 #include "vector_value.h"
+
+// The definition of a geometric element
+#include "elem.h"
 
 // Function prototype.  This function will assemble the system
 // matrix and right-hand-side at each time step.  Note that
@@ -196,7 +199,7 @@ int main (int argc, char** argv)
 	*system.old_local_solution = *system.current_local_solution;
 	
 	// Assemble & solve the linear system
-	equation_systems("Convection-Diffusion").solve();
+	equation_systems.get_system("Convection-Diffusion").solve();
 	
 	// Output evey 10 timesteps to file.
 	if ( (t_step+1)%10 == 0)
@@ -250,9 +253,6 @@ void init_cd (EquationSystems& es,
   // catch, however...  We only want to assign the components that
   // live on the local processor, hence there will be an if-test
   // in the loop.
-//   const_active_local_elem_iterator       elem_it (mesh.elements_begin());
-//   const const_active_local_elem_iterator elem_end(mesh.elements_end());
-
   MeshBase::const_element_iterator       elem_it  = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end(); 
 

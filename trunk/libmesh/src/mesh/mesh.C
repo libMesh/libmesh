@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.56 2005-05-18 17:29:01 benkirk Exp $
+// $Id: mesh.C,v 1.57 2005-06-06 14:53:19 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -26,6 +26,7 @@
 #include "libmesh.h"
 #include "mesh_communication.h"
 #include "libmesh_logging.h"
+#include "elem.h"
 
 #include "diva_io.h"
 #include "exodusII_io.h"

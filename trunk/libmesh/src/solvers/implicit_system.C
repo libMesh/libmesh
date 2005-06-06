@@ -1,4 +1,4 @@
-// $Id: implicit_system.C,v 1.10 2005-06-03 15:49:58 jwpeterson Exp $
+// $Id: implicit_system.C,v 1.11 2005-06-06 14:53:20 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -29,7 +29,7 @@
 #include "libmesh_logging.h"
 #include "dof_map.h"
 #include "numeric_vector.h"
-
+#include "mesh.h"
 
 // ------------------------------------------------------------
 // ImplicitSystem implementation

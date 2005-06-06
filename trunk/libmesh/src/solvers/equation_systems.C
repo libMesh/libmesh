@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.26 2005-06-03 15:49:58 jwpeterson Exp $
+// $Id: equation_systems.C,v 1.27 2005-06-06 14:53:20 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -30,6 +30,8 @@
 #include "newmark_system.h"
 #include "transient_system.h"
 #include "dof_map.h"
+#include "mesh.h"
+#include "elem.h"
 
 // Include the systems before this one to avoid
 // overlapping forward declarations.
@@ -244,7 +246,8 @@ System & EquationSystems::add_system (const std::string& sys_type,
     }
 
   // Return a reference to the new system
-  return (*this)(name);
+  //return (*this)(name);
+  return this->get_system(name);
 }
 
 
@@ -807,4 +810,22 @@ unsigned int EquationSystems::n_active_dofs () const
     tot += pos->second->n_active_dofs();
 
   return tot;      
+}
+
+
+void EquationSystems::_add_system_to_nodes_and_elems()
+{
+  // All the nodes
+  MeshBase::node_iterator       node_it  = _mesh.nodes_begin();
+  const MeshBase::node_iterator node_end = _mesh.nodes_end();
+ 
+  for ( ; node_it != node_end; ++node_it)
+    (*node_it)->add_system();
+ 
+  // All the elements
+  MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
+  const MeshBase::element_iterator elem_end = _mesh.elements_end();
+ 
+  for ( ; elem_it != elem_end; ++elem_it)
+    (*elem_it)->add_system();
 }

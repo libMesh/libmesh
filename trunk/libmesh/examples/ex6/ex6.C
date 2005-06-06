@@ -1,4 +1,4 @@
-/* $Id: ex6.C,v 1.38 2005-01-14 19:29:42 benkirk Exp $ */
+/* $Id: ex6.C,v 1.39 2005-06-06 14:53:17 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -65,6 +65,12 @@
 // Define the DofMap, which handles degree of freedom
 // indexing.
 #include "dof_map.h"
+
+// The definition of a vertex associated with a Mesh.
+#include "node.h"
+
+// The definition of a geometric element
+#include "elem.h"
 
 // Function prototype.  This is similar to the Poisson
 // assemble function of example 4.  
@@ -167,11 +173,11 @@ int main (int argc, char** argv)
       // \p add_variable took the order of approximation and used
       // default values for the \p FEFamily, while here the \p FEType 
       // is used.
-      equation_systems("Wave").add_variable("p", fe_type);
+      equation_systems.get_system("Wave").add_variable("p", fe_type);
       
       // Give the system a pointer to the matrix assembly
       // function.
-      equation_systems("Wave").attach_assemble_function (assemble_wave);
+      equation_systems.get_system("Wave").attach_assemble_function (assemble_wave);
       
       // Set the speed of sound and fluid density
       // as \p EquationSystems parameter,
@@ -187,7 +193,7 @@ int main (int argc, char** argv)
     }
     
     // Solve the system "Wave".
-    equation_systems("Wave").solve();
+    equation_systems.get_system("Wave").solve();
     
     // Write the whole EquationSystems object to file.
     // For infinite elements, the concept of nodal_soln()

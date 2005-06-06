@@ -1,4 +1,4 @@
-/* $Id: ex15.C,v 1.4 2005-06-03 15:49:57 jwpeterson Exp $ */
+/* $Id: ex15.C,v 1.5 2005-06-06 14:53:15 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -53,6 +53,7 @@
 #include "exact_solution.h"
 #include "dof_map.h"
 #include "numeric_vector.h"
+#include "elem.h"
 
 // Function prototype.  This is the function that will assemble
 // the linear system for our Biharmonic problem.  Note that the
@@ -134,15 +135,16 @@ int main(int argc, char** argv)
     // Declare the system and its variables.
     {
       // Creates a system named "Biharmonic"
-      equation_systems.add_system<LinearImplicitSystem> ("Biharmonic");
+      LinearImplicitSystem& system =
+	equation_systems.add_system<LinearImplicitSystem> ("Biharmonic");
 
       // Adds the variable "u" to "Biharmonic".  "u"
       // will be approximated using Clough-Tocher cubic C1 triangles
-      equation_systems("Biharmonic").add_variable("u", THIRD, CLOUGH);
+      system.add_variable("u", THIRD, CLOUGH);
       
       // Give the system a pointer to the matrix assembly
       // function.
-      equation_systems("Biharmonic").attach_assemble_function
+      system.attach_assemble_function
 		      (assemble_biharmonic);
       
       // Initialize the data structures for the equation system.
@@ -175,7 +177,7 @@ int main(int argc, char** argv)
 	std::cout << "Beginning Solve " << r_step << std::endl;
 	
 	// Solve the system "Biharmonic", just like example 2.
-	equation_systems("Biharmonic").solve();
+	system.solve();
 
 	std::cout << "System has: " << equation_systems.n_active_dofs()
 		  << " degrees of freedom."

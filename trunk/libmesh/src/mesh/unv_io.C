@@ -1,4 +1,4 @@
-// $Id: unv_io.C,v 1.19 2005-05-24 14:01:53 jwpeterson Exp $
+// $Id: unv_io.C,v 1.20 2005-06-06 14:53:19 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -28,6 +28,7 @@
 #include "unv_io.h"
 #include "libmesh_config.h"
 #include "mesh_data.h"
+#include "mesh_base.h"
 #include "face_quad4.h"
 #include "face_tri3.h"
 #include "face_tri6.h"

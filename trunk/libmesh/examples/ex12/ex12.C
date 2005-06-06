@@ -1,4 +1,4 @@
-/* $Id: ex12.C,v 1.10 2004-11-15 22:09:05 benkirk Exp $ */
+/* $Id: ex12.C,v 1.11 2005-06-06 14:53:15 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -79,7 +79,8 @@
 #include "unv_io.h"
 #include "gmv_io.h"
 
-
+// The definition of a geometric vertex associated with a Mesh
+#include "node.h"
 
 // Function prototype for creating artificial nodal data
 // that can be inserted into a <code>MeshData</code> object.

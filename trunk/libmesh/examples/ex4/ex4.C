@@ -1,4 +1,4 @@
-/* $Id: ex4.C,v 1.42 2005-01-14 19:29:08 benkirk Exp $ */
+/* $Id: ex4.C,v 1.43 2005-06-06 14:53:16 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -72,6 +72,8 @@
 // you an idea where bottlenecks lie.
 #include "perf_log.h"
 
+// The definition of a geometric element
+#include "elem.h"
 
 // Function prototype.  This is the function that will assemble
 // the linear system for our Poisson problem.  Note that the
@@ -159,11 +161,11 @@ int main (int argc, char** argv)
 
       // Adds the variable "u" to "Poisson".  "u"
       // will be approximated using second-order approximation.
-      equation_systems("Poisson").add_variable("u", SECOND);
+      equation_systems.get_system("Poisson").add_variable("u", SECOND);
 
       // Give the system a pointer to the matrix assembly
       // function.
-      equation_systems("Poisson").attach_assemble_function (assemble_poisson);
+      equation_systems.get_system("Poisson").attach_assemble_function (assemble_poisson);
       
       // Initialize the data structures for the equation system.
       equation_systems.init();
@@ -173,7 +175,7 @@ int main (int argc, char** argv)
     }
 
     // Solve the system "Poisson", just like example 2.
-    equation_systems("Poisson").solve();
+    equation_systems.get_system("Poisson").solve();
 
     // After solving the system write the solution
     // to a GMV-formatted plot file.

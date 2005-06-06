@@ -1,4 +1,4 @@
-// $Id: libmesh_common.h,v 1.12 2005-05-11 23:11:57 benkirk Exp $
+// $Id: libmesh_common.h,v 1.13 2005-06-06 14:53:18 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -121,6 +121,7 @@ namespace libMesh
 #undef here
 #define here()     { std::cout << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; }
 
+// The error() macro prints a message and aborts the code
 #undef error
 #ifdef HAVE_MPI
 #  define error()    { std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; if (libMesh::n_processors() > 1) MPI_Abort(libMesh::COMM_WORLD,1); std::abort(); }
@@ -128,8 +129,14 @@ namespace libMesh
 #  define error()    { std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; std::abort(); }
 #endif
 
+// The untested macro warns that you are using untested code
 #undef untested
 #define untested() { std::cout << "*** Using untested code: " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl; }
+
+
+// The deprecated macro warns that you are using deprecated code
+#undef deprecated
+#define deprecated() { std::cout << "*** Warning, This Code is Deprecated! " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl; }
 
 
 
