@@ -1,4 +1,4 @@
-// $Id: gnuplot_io.C,v 1.1 2005-06-06 16:24:14 knezed01 Exp $
+// $Id: gnuplot_io.C,v 1.2 2005-06-06 17:49:04 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -23,6 +23,7 @@
 // Local includes
 #include "mesh_base.h"
 #include "gnuplot_io.h"
+#include "elem.h"
 
 GnuPlotIO::GnuPlotIO(const MeshBase& mesh, const std::string& title, bool grid)
   :
