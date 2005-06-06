@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.48 2005-06-02 18:25:37 benkirk Exp $
+# $Id: Make.common.in,v 1.49 2005-06-06 16:26:32 jwpeterson Exp $
 
 
 ###############################################################################
@@ -96,7 +96,7 @@ opt-mode   := off
 debug-mode := off
 prof-mode  := off
 syn-mode   := off
-
+devel-mode := off
 
 #
 # If the user has no environment variable
