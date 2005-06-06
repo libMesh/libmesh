@@ -1,4 +1,4 @@
- // $Id: reference_counter.h,v 1.5 2005-05-24 14:26:28 jwpeterson Exp $
+ // $Id: reference_counter.h,v 1.6 2005-06-06 19:10:50 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -139,31 +139,37 @@ inline ReferenceCounter::~ReferenceCounter()
 
 
 
+#if defined(ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
 inline
 void ReferenceCounter::increment_constructor_count (const std::string& name)
 {
-#if defined(ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
-
   std::pair<unsigned int, unsigned int>& p = _counts[name];
 
   p.first++;
-
-#endif
 }
+#else
+inline
+void ReferenceCounter::increment_constructor_count (const std::string&)
+{
+}
+#endif
 
 
 
+#if defined(ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
 inline
 void ReferenceCounter::increment_destructor_count (const std::string& name)
 {
-#if defined(ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
-
   std::pair<unsigned int, unsigned int>& p = _counts[name];
 
   p.second++;
-
-#endif
 }
+#else
+inline
+void ReferenceCounter::increment_destructor_count (const std::string&)
+{
+}
+#endif
 
 
 
