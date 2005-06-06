@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.42 2005-05-13 20:11:46 roystgnr Exp $
+// $Id: elem.C,v 1.43 2005-06-06 16:24:13 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -313,8 +313,16 @@ Real Elem::length(const unsigned int n1,
 
 
 
-bool Elem::operator == (const Elem& rhs) const
+bool Elem::operator == (const DofObject& rhs) const
 {
+
+    // Cast rhs to an Elem*
+    const Elem* rhs_elem = dynamic_cast<const Elem*>(&rhs);
+
+    // If we cannot cast to an Elem*, rhs must be a Node
+    if(rhs_elem == NULL)
+        return false;
+
 //   assert (n_nodes());
 //   assert (rhs.n_nodes());
 
@@ -355,7 +363,7 @@ bool Elem::operator == (const Elem& rhs) const
   // contain the same number of nodes.
   // However, we will only test the vertices,
   // which is sufficient & cheaper
-  if (this->n_nodes() == rhs.n_nodes())
+  if (this->n_nodes() == rhs_elem->n_nodes())
     {
       // The number of nodes in the element
       const unsigned int nn = this->n_nodes();
@@ -375,7 +383,7 @@ bool Elem::operator == (const Elem& rhs) const
       for (unsigned int n=0; n<nn; n++)
 	{
 	  common_nodes.push_back (this->node(n));
-	  common_nodes.push_back (rhs.node(n));
+	  common_nodes.push_back (rhs_elem->node(n));
 	}
 
       // Sort the vector and find out how long

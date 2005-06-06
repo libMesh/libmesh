@@ -1,4 +1,4 @@
-// $Id: face_tri.h,v 1.5 2005-02-22 22:17:33 jwpeterson Exp $
+// $Id: face_tri.h,v 1.6 2005-06-06 16:23:56 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -112,7 +112,7 @@ public:
    * @returns a primitive (2-noded) edge for 
    * edge i.
    */
-  AutoPtr<Elem> side (const unsigned int i) const;
+  AutoPtr<DofObject> side (const unsigned int i) const;
 
   /**
    * Based on the quality metric q specified by the user,

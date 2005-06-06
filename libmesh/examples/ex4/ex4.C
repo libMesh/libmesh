@@ -1,4 +1,4 @@
-/* $Id: ex4.C,v 1.43 2005-06-06 14:53:16 jwpeterson Exp $ */
+/* $Id: ex4.C,v 1.44 2005-06-06 16:23:55 knezed01 Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -19,13 +19,13 @@
 
 
 
- // <h1>Example 4 - Solving a 2D or 3D Poisson Problem in Parallel</h1>
+ // <h1>Example 4 - Solving a 1D, 2D or 3D Poisson Problem in Parallel</h1>
  //
  // This is the fourth example program.  It builds on
  // the third example program by showing how to formulate
  // the code in a dimension-independent way.  Very minor
  // changes to the example will allow the problem to be
- // solved in two or three dimensions.
+ // solved in one, two or three dimensions.
  //
  // This example will also introduce the PerfLog class
  // as a way to monitor your code's performance.  We will
@@ -47,6 +47,7 @@
 #include "mesh.h"
 #include "mesh_generation.h"
 #include "gmv_io.h"
+#include "gnuplot_io.h"
 #include "linear_implicit_system.h"
 #include "equation_systems.h"
 
@@ -86,7 +87,7 @@ void assemble_poisson(EquationSystems& es,
 
 // Exact solution function prototype.
 Real exact_solution (const Real x,
-		     const Real y,
+		     const Real y = 0.,
 		     const Real z = 0.);
 
 // Begin the main program.
@@ -144,7 +145,8 @@ int main (int argc, char** argv)
 				       -1., 1.,
 				       -1., 1.,
 				       -1., 1.,
-				       (dim == 2) ? QUAD9 : HEX27);
+				       (dim==1)    ? EDGE3 : 
+                                       ((dim == 2) ? QUAD9 : HEX27));
 
     // Print information about the mesh to the screen.
     mesh.print_info();
@@ -179,8 +181,16 @@ int main (int argc, char** argv)
 
     // After solving the system write the solution
     // to a GMV-formatted plot file.
-    GMVIO (mesh).write_equation_systems ((dim == 3) ? "out_3.gmv" : "out_2.gmv",
-					 equation_systems);
+    if(dim == 1)
+    {        
+      GnuPlotIO plot(mesh,"Example 4, 1D",true);
+      plot.write_equation_systems("out_1",equation_systems);
+    }
+    else
+    {
+      GMVIO (mesh).write_equation_systems ((dim == 3) ? 
+        "out_3.gmv" : "out_2.gmv",equation_systems);
+    }
   }
   
   // All done.  
@@ -400,7 +410,18 @@ void assemble_poisson(EquationSystems& es,
 			    exact_solution(x,y,z+eps) +
 			    -2.*exact_solution(x,y,z))/eps/eps;
 
-	  const Real fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
+          Real fxy;
+          if(dim==1)
+          {
+            // In 1D, compute the rhs by differentiating the
+            // exact solution twice.
+            const Real pi = libMesh::pi;
+            fxy = (0.25*pi*pi)*sin(.5*pi*x);
+          }
+          else
+          {
+	    fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
+          } 
 
 	  // Add the RHS contribution
 	  for (unsigned int i=0; i<phi.size(); i++)
@@ -427,50 +448,86 @@ void assemble_poisson(EquationSystems& es,
 	for (unsigned int side=0; side<elem->n_sides(); side++)
 	  if (elem->neighbor(side) == NULL)
 	    {
-	      // The value of the shape functions at the quadrature
-	      // points.
-	      const std::vector<std::vector<Real> >&  phi_face = fe_face->get_phi();
+            
+              // The penalty value.  \frac{1}{\epsilon}
+	      // in the discussion above.
+	      const Real penalty = 1.e10;
 
-	      // The Jacobian * Quadrature Weight at the quadrature
-	      // points on the face.
-	      const std::vector<Real>& JxW_face = fe_face->get_JxW();
-	      
-	      // The XYZ locations (in physical space) of the
-	      // quadrature points on the face.  This is where
-	      // we will interpolate the boundary value function.
-	      const std::vector<Point >& qface_point = fe_face->get_xyz();
+              // face integration doesn't make sense for 1D, so define
+              // BC's separately
+              if(dim == 1)
+              {
+                // construct the node
+                AutoPtr<DofObject> element_side(elem->side(side));
 
-	      // Compute the shape function values on the element
-	      // face.
-	      fe_face->reinit(elem, side);
-	      
-	      // Loop over the face quadrature points for integration.
-	      for (unsigned int qp=0; qp<qface.n_points(); qp++)
-		{
-		  // The location on the boundary of the current
-		  // face quadrature point.
-		  const Real xf = qface_point[qp](0);
-		  const Real yf = qface_point[qp](1);
-		  const Real zf = qface_point[qp](2);
+                // get the location of node so we can calculate value
+                Node* node = dynamic_cast<Node*>(element_side.get());
+                assert(node != NULL); // assert that cast was successful
+                const Real xf = (*node)(0); 
 
-		  // The penalty value.  \frac{1}{\epsilon}
-		  // in the discussion above.
-		  const Real penalty = 1.e10;
-		  
-		  // The boundary value.
-		  const Real value = exact_solution(xf, yf, zf);
-		  
-		  // Matrix contribution of the L2 projection. 
-		  for (unsigned int i=0; i<phi_face.size(); i++)
-		    for (unsigned int j=0; j<phi_face.size(); j++)
-		      Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
-		  
-		  // Right-hand-side contribution of the L2
-		  // projection.
-		  for (unsigned int i=0; i<phi_face.size(); i++)
-		    Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
-		} 
-	    } 
+                // Set Dirichlet BC's according to the exact solution along
+                // the line x=0
+                const Real value = exact_solution(0,xf,0);
+
+                for(unsigned int n=0; n<elem->n_nodes(); n++)
+                {
+                  // find nodes with matching global id's
+                  if(elem->node(n) == node->id())
+                  {
+                    Ke(n,n) += penalty;
+                    Fe(n)   += value*penalty;
+                  }
+                }
+              }
+              else
+              {
+
+                // 2D or 3D
+
+
+                // The value of the shape functions at the quadrature
+                // points.
+                const std::vector<std::vector<Real> >&  phi_face = fe_face->get_phi();
+
+                // The Jacobian * Quadrature Weight at the quadrature
+                // points on the face.
+                const std::vector<Real>& JxW_face = fe_face->get_JxW();
+
+                // The XYZ locations (in physical space) of the
+                // quadrature points on the face.  This is where
+                // we will interpolate the boundary value function.
+                const std::vector<Point >& qface_point = fe_face->get_xyz();
+
+                // Compute the shape function values on the element
+                // face.
+                fe_face->reinit(elem, side);
+
+                // Loop over the face quadrature points for integration.
+                for (unsigned int qp=0; qp<qface.n_points(); qp++)
+                {
+                  // The location on the boundary of the current
+                  // face quadrature point.
+                  const Real xf = qface_point[qp](0);
+                  const Real yf = qface_point[qp](1);
+                  const Real zf = qface_point[qp](2);
+
+
+                  // The boundary value.
+                  const Real value = exact_solution(xf, yf, zf);
+
+                  // Matrix contribution of the L2 projection. 
+                  for (unsigned int i=0; i<phi_face.size(); i++)
+                    for (unsigned int j=0; j<phi_face.size(); j++)
+                      Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
+
+                  // Right-hand-side contribution of the L2
+                  // projection.
+                  for (unsigned int i=0; i<phi_face.size(); i++)
+                    Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
+                } 
+              } 
+            }
+            
 	
 	// Stop logging the boundary condition computation
 	perf_log.stop_event ("BCs");

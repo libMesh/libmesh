@@ -1,4 +1,4 @@
-// $Id: dof_object.h,v 1.9 2005-06-02 18:25:42 benkirk Exp $
+// $Id: dof_object.h,v 1.10 2005-06-06 16:23:55 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -51,7 +51,7 @@ class DofObject;
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.9 $
+ * \version $Revision: 1.10 $
  */
 
 class DofObject : public ReferenceCountedObject<DofObject>
@@ -243,6 +243,13 @@ public:
 		      const unsigned int dn);
   
   /**
+   * Implemented in Elem and Node.
+   */
+  virtual bool operator==(const DofObject& ) const
+  { error(); return false; }
+
+  
+  /**
    * An invaild \p id to distinguish an uninitialized \p DofObject
    */
   static const unsigned int invalid_id;
@@ -354,10 +361,15 @@ DofObject::DofObject (const DofObject& dof_obj) :
 #ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
 
   // Allocate storage for the dof numbers and copy
-  // the values.
-  _n_vars  = new unsigned char  [this->n_systems()];
-  _n_comp  = new unsigned char* [this->n_systems()];
-  _dof_ids = new unsigned int** [this->n_systems()];
+  // the values. 
+  // IT IS UNDEFINED BEHAVIOR TO ALLOCATE AN ARRAY WITH ZERO ENTRIES,
+  // IF n_systems==0, leave _n_vars, _n_comp, and _dof_ids NULL.
+  if (this->n_systems() > 0)
+  {
+    _n_vars  = new unsigned char  [this->n_systems()];
+    _n_comp  = new unsigned char* [this->n_systems()];
+    _dof_ids = new unsigned int** [this->n_systems()];
+  }
 
   for (unsigned int s=0; s<this->n_systems(); s++)
     {      
@@ -379,9 +391,12 @@ DofObject::DofObject (const DofObject& dof_obj) :
 #else
 
   // Allocate storage for the dof numbers and copy
-  // the values.
-  _n_vars  = new unsigned char [this->n_systems()];
-  _dof_ids = new unsigned int* [this->n_systems()];
+  // the values. See warning above about allocating arrays with zero entries.
+  if (this->n_systems() > 0)
+  {
+    _n_vars  = new unsigned char [this->n_systems()];
+    _dof_ids = new unsigned int* [this->n_systems()];
+  }
 
   for (unsigned int s=0; s<this->n_systems(); s++)
     {  

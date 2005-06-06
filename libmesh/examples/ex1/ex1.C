@@ -1,4 +1,4 @@
-/* $Id: ex1.C,v 1.7 2003-11-11 04:58:33 benkirk Exp $ */
+/* $Id: ex1.C,v 1.8 2005-06-06 16:23:54 knezed01 Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -68,6 +68,8 @@ int main (int argc, char** argv)
     // Read the input mesh.
     mesh.read (argv[3]);
     
+    mesh.find_neighbors();
+
     // Print information about the mesh to the screen.
     mesh.print_info();
     

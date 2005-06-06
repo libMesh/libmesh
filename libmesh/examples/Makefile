@@ -6,6 +6,7 @@ examples:
 	@echo "----------------------------------------------"
 	@echo "--------- Building Example Programs ----------"
 	@echo "----------------------------------------------"
+	@$(MAKE) -C ex0  $(MAKECMDGOALS)
 	@$(MAKE) -C ex1  $(MAKECMDGOALS)
 	@$(MAKE) -C ex2  $(MAKECMDGOALS)
 	@$(MAKE) -C ex3  $(MAKECMDGOALS)
@@ -32,6 +33,7 @@ examples:
 #
 # Clean up the example programs
 clean:
+	@$(MAKE) -C ex0  $(MAKECMDGOALS)
 	@$(MAKE) -C ex1  $(MAKECMDGOALS)
 	@$(MAKE) -C ex2  $(MAKECMDGOALS)
 	@$(MAKE) -C ex3  $(MAKECMDGOALS)
@@ -52,6 +54,7 @@ clean:
 #
 # Really clean up the example programs
 clobber:
+	@$(MAKE) -C ex0  $(MAKECMDGOALS)
 	@$(MAKE) -C ex1  $(MAKECMDGOALS)
 	@$(MAKE) -C ex2  $(MAKECMDGOALS)
 	@$(MAKE) -C ex3  $(MAKECMDGOALS)
@@ -72,6 +75,7 @@ clobber:
 # Make the example program directories look
 # like a clean distribution
 distclean:
+	@$(MAKE) -C ex0  $(MAKECMDGOALS)
 	@$(MAKE) -C ex1  $(MAKECMDGOALS)
 	@$(MAKE) -C ex2  $(MAKECMDGOALS)
 	@$(MAKE) -C ex3  $(MAKECMDGOALS)
@@ -92,6 +96,7 @@ distclean:
 #
 # Link the example programs
 link: $(wildcard examples/ex*/ex*.C)
+	@$(MAKE) -C ex0  ex0  
 	@$(MAKE) -C ex1  ex1  
 	@$(MAKE) -C ex2  ex2  
 	@$(MAKE) -C ex3  ex3  
@@ -112,6 +117,7 @@ link: $(wildcard examples/ex*/ex*.C)
 #
 # Run the example programs to see if shared lib's get properly loaded
 run: $(wildcard examples/ex*/ex*.C)
+	@$(MAKE) -C ex0  $(MAKECMDGOALS)
 	@$(MAKE) -C ex1  $(MAKECMDGOALS)
 	@$(MAKE) -C ex2  $(MAKECMDGOALS)
 	@$(MAKE) -C ex3  $(MAKECMDGOALS)
@@ -132,6 +138,7 @@ run: $(wildcard examples/ex*/ex*.C)
 #
 # Rebuild the dependencies for the examples
 .depend: $(wildcard examples/ex*/ex*.C)
+	@$(MAKE) -C ex0  $(MAKECMDGOALS)
 	@$(MAKE) -C ex1  $(MAKECMDGOALS)
 	@$(MAKE) -C ex2  $(MAKECMDGOALS)
 	@$(MAKE) -C ex3  $(MAKECMDGOALS)

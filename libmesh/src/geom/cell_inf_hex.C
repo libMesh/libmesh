@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex.C,v 1.11 2005-02-22 22:17:38 jwpeterson Exp $
+// $Id: cell_inf_hex.C,v 1.12 2005-06-06 16:24:13 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -91,7 +91,7 @@ unsigned int InfHex::key (const unsigned int s) const
 
 
 
-AutoPtr<Elem> InfHex::side (const unsigned int i) const
+AutoPtr<DofObject> InfHex::side (const unsigned int i) const
 {
   assert (i < this->n_sides());
 
@@ -105,7 +105,8 @@ AutoPtr<Elem> InfHex::side (const unsigned int i) const
       // the base, where the infinite element couples to conventional
       // elements
       {  
-        AutoPtr<Elem> face(new Quad4);
+        Elem* face = new Quad4;
+        AutoPtr<DofObject> ap_face(face);
 
 	/*
 	 * Oops, here we are, claiming the normal of the face
@@ -121,71 +122,78 @@ AutoPtr<Elem> InfHex::side (const unsigned int i) const
 	face->set_node(2) = this->get_node(2);
 	face->set_node(3) = this->get_node(3);
 
-	return face;
+	return ap_face;
       }
 
     case 1:  // the face at y = -1
       // this face connects to another infinite element
       {
-	AutoPtr<Elem> face(new InfQuad4);
+        Elem* face = new InfQuad4;
+        AutoPtr<DofObject> ap_face(face);
 
 	face->set_node(0) = this->get_node(0);
 	face->set_node(1) = this->get_node(1);
 	face->set_node(2) = this->get_node(4);
 	face->set_node(3) = this->get_node(5);
 	
-	return face;
+	return ap_face;
       }
 
     case 2:  // the face at x = 1
       // this face connects to another infinite element
       {
-	AutoPtr<Elem> face(new InfQuad4);
+        Elem* face = new InfQuad4;
+        AutoPtr<DofObject> ap_face(face);
+	//AutoPtr<Elem> face(new InfQuad4);
 
 	face->set_node(0) = this->get_node(1);
 	face->set_node(1) = this->get_node(2);
 	face->set_node(2) = this->get_node(5);
 	face->set_node(3) = this->get_node(6);
 
-	return face;
+	return ap_face;
       }
 
     case 3: // the face at y = 1
       // this face connects to another infinite element
       {
-	AutoPtr<Elem> face(new InfQuad4);
+        Elem* face = new InfQuad4;
+        AutoPtr<DofObject> ap_face(face);
+	//AutoPtr<Elem> face(new InfQuad4);
 
 	face->set_node(0) = this->get_node(2);
 	face->set_node(1) = this->get_node(3);
 	face->set_node(2) = this->get_node(6);
 	face->set_node(3) = this->get_node(7);
 	
-	return face;
+	return ap_face;
       }
 
     case 4: // the face at x = -1
       // this face connects to another infinite element
       {  
-	AutoPtr<Elem> face(new InfQuad4);
+        Elem* face = new InfQuad4;
+        AutoPtr<DofObject> ap_face(face);
+	//AutoPtr<Elem> face(new InfQuad4);
 
 	face->set_node(0) = this->get_node(3);
 	face->set_node(1) = this->get_node(0);
 	face->set_node(2) = this->get_node(7);
 	face->set_node(3) = this->get_node(4);
 
-	return face;
+	return ap_face;
       }
 
     default:
       {
 	error();
-	AutoPtr<Elem> ap(NULL);  return ap;
+	AutoPtr<DofObject> ap(NULL);  return ap;
       }
     }
 
   // We'll never get here.
   error();
-  AutoPtr<Elem> ap(NULL);  return ap;
+  AutoPtr<DofObject> ap(NULL);  return ap;
 }
 
 

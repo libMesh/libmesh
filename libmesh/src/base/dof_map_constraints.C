@@ -1,4 +1,4 @@
-// $Id: dof_map_constraints.C,v 1.16 2005-05-18 16:14:05 roystgnr Exp $
+// $Id: dof_map_constraints.C,v 1.17 2005-06-06 16:23:58 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -51,7 +51,11 @@ void DofMap::create_dof_constraints(const MeshBase& mesh)
 
   // Constraints are not necessary in 1D
   if (dim == 1)
+  {
+    // make sure we stop logging though
+    STOP_LOG("create_dof_constraints()", "DofMap");
     return;
+  }
   
   // Here we build the hanging node constraints.  This is done
   // by enforcing the condition u_a = u_b along hanging sides.

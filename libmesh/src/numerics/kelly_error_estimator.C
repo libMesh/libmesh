@@ -1,4 +1,4 @@
-// $Id: kelly_error_estimator.C,v 1.12 2005-06-06 14:53:19 jwpeterson Exp $
+// $Id: kelly_error_estimator.C,v 1.13 2005-06-06 16:24:16 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -111,6 +111,143 @@ void KellyErrorEstimator::estimate_error (const System& system,
       }
   
 
+
+  // Implement 1D Kelly estimator separately
+  if(dim == 1)
+  {
+    for(unsigned int var=0; var<n_vars; var++)
+    {
+      // Possibly skip this variable
+      if (!component_mask.empty())
+        if (component_mask[var] == false) continue;
+
+      // The type of finite element to use for this variable
+      const FEType& fe_type = dof_map.variable_type (var);
+
+      // Finite element objects for the same face from
+      // different sides
+      AutoPtr<FEBase> fe_e (FEBase::build (dim, fe_type));
+      AutoPtr<FEBase> fe_f (FEBase::build (dim, fe_type));
+
+      QGauss qrule(1, fe_type.default_quadrature_order());
+      fe_e->attach_quadrature_rule(&qrule);
+      fe_f->attach_quadrature_rule(&qrule);
+
+      const std::vector<std::vector<RealGradient> > & dphi_e =
+        fe_e->get_dphi();
+      const std::vector<std::vector<RealGradient> > & dphi_f = 
+        fe_f->get_dphi();
+      std::vector<unsigned int> dof_indices_e;
+      std::vector<unsigned int> dof_indices_f;
+
+
+      // Iterate over all the active elements in the mesh
+      // that live on this processor.
+      MeshBase::const_element_iterator       elem_it  = 
+        mesh.active_local_elements_begin();
+      const MeshBase::const_element_iterator elem_end = 
+        mesh.active_local_elements_end(); 
+
+      for( ; elem_it != elem_end; ++elem_it)
+      {
+        // e is necessarily an active element on the local processor
+        const Elem* e = *elem_it;
+        const unsigned int e_id = e->id();
+
+        for (unsigned int n_e=0; n_e<e->n_neighbors(); n_e++)
+        {
+          if (e->neighbor(n_e) != NULL) // e is not on the boundary
+          {
+
+            const Elem* f = e->neighbor(n_e);
+            const unsigned int f_id = f->id();
+
+            if (   //-------------------------------------
+                ((f->active()) &&
+                 (f->level() == e->level()) &&
+                 (e_id < f_id))                 // Case 1.
+
+                || //-------------------------------------
+
+                (f->level() < e->level())       // Case 2.
+
+               )  //-------------------------------------
+            {
+              float error = 0;
+
+              const Real h_e = e->hmax();
+              const Real h_f = f->hmax();
+
+              dof_map.dof_indices (e, dof_indices_e, var);
+              dof_map.dof_indices (f, dof_indices_f, var);
+
+              // The number of DOFS on each element
+              const unsigned int n_dofs_e = dof_indices_e.size();
+              const unsigned int n_dofs_f = dof_indices_f.size();
+
+              std::vector<Point> left_edge;
+              std::vector<Point> right_edge;
+              left_edge.clear();
+              right_edge.clear();
+              left_edge.push_back( Point(-1,0,0) );
+              right_edge.push_back( Point(1,0,0) );
+
+              if(n_e == 0) // e is not the left edge of mesh
+              {
+                fe_e->reinit(e,&left_edge);
+                fe_f->reinit(f,&right_edge);
+              }
+              else
+              if(n_e == 1) // e is not the right edge of the mesh
+              {
+                fe_e->reinit(e,&right_edge);
+                fe_f->reinit(f,&left_edge);
+              }
+
+              // The solution gradient from each element
+              Gradient grad_e, grad_f;
+
+              // Compute the solution gradient at left edge of element e
+              for (unsigned int i=0; i<n_dofs_e; i++)
+                grad_e.add_scaled (dphi_e[i][0],
+                    system.current_solution(dof_indices_e[i]));
+
+              // Compute the solution gradient at right edge of element f
+              for (unsigned int i=0; i<n_dofs_f; i++)
+                grad_f.add_scaled (dphi_f[i][0],
+                    system.current_solution(dof_indices_f[i]));
+
+              float jump = grad_e(0) - grad_f(0);
+
+              error += jump*jump;
+
+              // Add the error contribution to element e
+              assert(e_id < error_per_cell.size());
+              assert(f_id < error_per_cell.size());
+              error_per_cell[e_id] += h_e*error;
+              error_per_cell[f_id] += h_f*error;
+            } // end if(f->active()...
+          } // end e->neighbor(n_e) != NULL
+        } // end loop over neighbors
+      } // end loop over active elements
+    } // end loop over variables in the system
+
+    // First sum the vector
+    this->reduce_error(error_per_cell);
+
+    // Compute the square-root of each component.
+    START_LOG("std::sqrt()", "KellyErrorEstimator");
+    for (unsigned int i=0; i<error_per_cell.size(); i++)
+      if (error_per_cell[i] != 0.)
+        error_per_cell[i] = std::sqrt(error_per_cell[i]);
+    STOP_LOG("std::sqrt()", "KellyErrorEstimator");
+
+    return;
+  } // end dim == 1
+
+      
+  //--------- 2D and 3D code ---------//
+      
   
   // Loop over all the variables in the system
   for (unsigned int var=0; var<n_vars; var++)
@@ -167,7 +304,7 @@ void KellyErrorEstimator::estimate_error (const System& system,
 	  // e is necessarily an active element on the local processor
 	  const Elem* e = *elem_it;
 	  const unsigned int e_id = e->id();
-	  
+
 	  // Loop over the neighbors of element e
 	  for (unsigned int n_e=0; n_e<e->n_neighbors(); n_e++)
 	    {
@@ -187,22 +324,22 @@ void KellyErrorEstimator::estimate_error (const System& system,
 		    
 		      )  //-------------------------------------
 		    {		    
-		      // Update the shape functions on side s_e of
-		      // element e
-		      START_LOG("fe_e->reinit()", "KellyErrorEstimator");
-		      fe_e->reinit (e, n_e);
-		      STOP_LOG("fe_e->reinit()", "KellyErrorEstimator");
-		      
-		      // Build the side
-		      START_LOG("construct side", "KellyErrorEstimator");
-		      AutoPtr<Elem> side (e->side(n_e));
-		      STOP_LOG("construct side", "KellyErrorEstimator");
-		      
-		      // Get the maximum h for this side
-		      START_LOG("side->hmax()", "KellyErrorEstimator");
-		      const Real h = side->hmax();
-		      STOP_LOG("side->hmax()", "KellyErrorEstimator");
-		      
+                      // Update the shape functions on side s_e of
+                      // element e
+                      START_LOG("fe_e->reinit()", "KellyErrorEstimator");
+                      fe_e->reinit (e, n_e);
+                      STOP_LOG("fe_e->reinit()", "KellyErrorEstimator");
+
+                      // Build the side
+                      START_LOG("construct side", "KellyErrorEstimator");
+                      AutoPtr<Elem> side (e->build_side(n_e));
+                      STOP_LOG("construct side", "KellyErrorEstimator");
+
+                      // Get the maximum h for this side
+                      START_LOG("side->hmax()", "KellyErrorEstimator");
+                      const Real h = side->hmax();
+                      STOP_LOG("side->hmax()", "KellyErrorEstimator");
+                      
 		      // Get the DOF indices for the two elements
 		      START_LOG("dof_indices()", "KellyErrorEstimator");
 		      dof_map.dof_indices (e, dof_indices_e, var);
@@ -305,7 +442,7 @@ void KellyErrorEstimator::estimate_error (const System& system,
 		      if (this->_bc_function(system, qface_point[0], var_name).first)
 			{
 			  // Build the side
-			  AutoPtr<Elem> side (e->side(n_e));
+			  AutoPtr<Elem> side (e->build_side(n_e));
 
 			  // Get the maximum h for this side
 			  const Real h = side->hmax();

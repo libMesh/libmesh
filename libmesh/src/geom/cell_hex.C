@@ -1,4 +1,4 @@
-// $Id: cell_hex.C,v 1.17 2005-02-22 22:17:38 jwpeterson Exp $
+// $Id: cell_hex.C,v 1.18 2005-06-06 16:23:58 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -93,13 +93,13 @@ unsigned int Hex::key (const unsigned int s) const
 
 
 
-AutoPtr<Elem> Hex::side (const unsigned int i) const
+AutoPtr<DofObject> Hex::side (const unsigned int i) const
 {
   assert (i < this->n_sides());
 
 
   
-  AutoPtr<Elem> face(new Quad4);
+  Elem* face = new Quad4;
 
   // Think of a unit cube: (-1,1) x (-1,1)x (-1,1)
   switch (i)
@@ -111,7 +111,8 @@ AutoPtr<Elem> Hex::side (const unsigned int i) const
 	face->set_node(2) = this->get_node(2);
 	face->set_node(3) = this->get_node(1);
 
-	return face;
+	AutoPtr<DofObject> ap(face);
+        return ap;
       }
     case 1:  // the face at y = -1
       {
@@ -120,7 +121,8 @@ AutoPtr<Elem> Hex::side (const unsigned int i) const
 	face->set_node(2) = this->get_node(5);
 	face->set_node(3) = this->get_node(4);
 	
-	return face;
+	AutoPtr<DofObject> ap(face);
+        return ap;
       }
     case 2:  // the face at x = 1
       {
@@ -129,7 +131,8 @@ AutoPtr<Elem> Hex::side (const unsigned int i) const
 	face->set_node(2) = this->get_node(6);
 	face->set_node(3) = this->get_node(5);
 
-	return face;
+	AutoPtr<DofObject> ap(face);
+        return ap;
       }
     case 3: // the face at y = 1
       {
@@ -138,7 +141,8 @@ AutoPtr<Elem> Hex::side (const unsigned int i) const
 	face->set_node(2) = this->get_node(7);
 	face->set_node(3) = this->get_node(6);
 	
-	return face;
+	AutoPtr<DofObject> ap(face);
+        return ap;
       }
     case 4: // the face at x = -1
       {
@@ -147,7 +151,8 @@ AutoPtr<Elem> Hex::side (const unsigned int i) const
 	face->set_node(2) = this->get_node(4);
 	face->set_node(3) = this->get_node(7);
 
-	return face;
+	AutoPtr<DofObject> ap(face);
+        return ap;
       }
     case 5: // the face at z = 1
       {
@@ -156,18 +161,21 @@ AutoPtr<Elem> Hex::side (const unsigned int i) const
 	face->set_node(2) = this->get_node(6);
 	face->set_node(3) = this->get_node(7);
 	
-	return face;
+	AutoPtr<DofObject> ap(face);
+        return ap;
       }
     default:
       {
 	error();
-	return face;
+	AutoPtr<DofObject> ap(face);
+        return ap;
       }
     }
 
   // We'll never get here.
   error();
-  return face;
+  AutoPtr<DofObject> ap(face);
+  return ap;
 }
 
 

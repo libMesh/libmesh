@@ -1,4 +1,4 @@
-// $Id: cell_pyramid.h,v 1.3 2005-02-22 22:17:32 jwpeterson Exp $
+// $Id: cell_pyramid.h,v 1.4 2005-06-06 16:23:56 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -89,7 +89,7 @@ public:
    * @returns a primitive triangle or quad for 
    * face i.
    */
-  AutoPtr<Elem> side (const unsigned int i) const;
+  AutoPtr<DofObject> side (const unsigned int i) const;
   
   
  protected:

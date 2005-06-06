@@ -1,4 +1,4 @@
-// $Id: edge_edge3.C,v 1.15 2005-05-06 17:06:58 roystgnr Exp $
+// $Id: edge_edge3.C,v 1.16 2005-06-06 16:24:13 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -22,22 +22,44 @@
 // Local includes
 #include "edge_edge3.h"
 
+#ifdef ENABLE_AMR
+
+const float Edge3::_embedding_matrix[2][3][3] =
+{
+  // embedding matrix for child 0
+  {
+    // 0    1    2  
+    {1.0, 0.0, 0.0}, // left
+    {0.0, 0.0, 1.0}, // right
+    {3./8.,-1./8.,0.75} // middle
+  },
+
+  // embedding matrix for child 1
+  {
+    // 0    1    2  
+    {0.0, 0.0, 1.0}, // left
+    {0.0, 1.0, 0.0},  // right
+    {-1./8.,3./8.,0.75} // middle
+  }
+};
+
+#endif
 
 bool Edge3::is_vertex(const unsigned int i) const
 {
-  if (i < 3)
+  if (i < 2)
     return true;
   return false;
 }
 
 bool Edge3::is_edge(const unsigned int i) const
 {
-  if (i < 3)
-    return false;
+  if (i < 2)
+   return false;
   return true;
 }
 
-bool Edge3::is_face(const unsigned int) const
+bool Edge3::is_face(const unsigned int ) const
 {
   return false;
 }
@@ -46,6 +68,7 @@ bool Edge3::is_node_on_side(const unsigned int n,
 			    const unsigned int s) const
 {
   assert(s < 2);
+  assert(n < 3);
   return (s == n);
 }
 

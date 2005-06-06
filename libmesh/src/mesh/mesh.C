@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.57 2005-06-06 14:53:19 jwpeterson Exp $
+// $Id: mesh.C,v 1.58 2005-06-06 16:24:14 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -268,18 +268,14 @@ void Mesh::find_neighbors()
   assert(this->n_nodes() != 0);
   assert(this->n_elem()  != 0);
 
-  
-  if (_dim == 1)
-    error();
-
-
   START_LOG("find_neighbors()", "Mesh");
+  
   
   //TODO:[BSK] This should be removed later?!
   for (unsigned int e=0; e<this->n_elem(); e++)
     for (unsigned int s=0; s<this->elem(e)->n_neighbors(); s++)
       this->elem(e)->set_neighbor(s,NULL);
-
+  
   // Find neighboring elements by first finding elements
   // with identical side keys and then check to see if they
   // are neighbors
@@ -309,7 +305,8 @@ void Mesh::find_neighbors()
 
     element_iterator       el  = this->elements_begin();
     const element_iterator end = this->elements_end();
-    
+
+
     for (; el != end; ++el)
       {
 	Elem* element = *el;
@@ -332,7 +329,7 @@ void Mesh::find_neighbors()
 		if (bounds.first != bounds.second)
 		  {
 		    // Get the side for this element
-		    const AutoPtr<Elem> my_side(element->side(ms));
+		    const AutoPtr<DofObject> my_side(element->side(ms));
 
 		    // Look at all the entries with an equivalent key
 		    while (bounds.first != bounds.second)
@@ -342,30 +339,44 @@ void Mesh::find_neighbors()
 			
 			// Get the side for the neighboring element
 			const unsigned int ns = bounds.first->second.second;
-			const AutoPtr<Elem> their_side(neighbor->side(ns));
-			
+			const AutoPtr<DofObject> their_side(neighbor->side(ns));
+                        //assert (my_side.get() != NULL);
+                        //assert (their_side.get() != NULL);			
+
 			// If found a match wbounds.firsth my side
-			if (*my_side == *their_side) 
+                        //
+                        // We need a special case here for 1D, since parents
+                        // and children have an equal side (i.e. a node), 
+                        // so need to check ns != ms in 1D as well
+			if( (*my_side == *their_side) && 
+                            ((_dim != 1) || (ns != ms)) )
 			  {
 			    // So share a side.  Is this a mixed pair
 			    // of subactive and active/ancestor
 			    // elements?
                             // If not, then we're neighbors.
 			    // If so, then the subactive's neighbor is 
-                            if (element->subactive() ==
-                                neighbor->subactive())
+
+                              if (element->subactive() ==
+                                  neighbor->subactive())
                               {
-			        element->set_neighbor (ms,neighbor);
-			        neighbor->set_neighbor(ns,element);
+                              // an element is only subactive if it has
+                              // been coarsened but not deleted
+                                element->set_neighbor (ms,neighbor);
+                                neighbor->set_neighbor(ns,element);
                               }
-			    else if (element->subactive())
-			      element->set_neighbor(ms,neighbor);
-			    else if (neighbor->subactive())
-			      neighbor->set_neighbor(ns,element);
-			    side_to_elem_map.erase (bounds.first);
-			    
-			    // get out of this nested crap
-			    goto next_side; 
+                              else if (element->subactive())
+                              {
+                                element->set_neighbor(ms,neighbor);
+                              }
+                              else if (neighbor->subactive())
+                              {
+                                neighbor->set_neighbor(ns,element);
+                              }
+                              side_to_elem_map.erase (bounds.first);
+
+                              // get out of this nested crap
+                              goto next_side; 
 			  }
 
 			++bounds.first;

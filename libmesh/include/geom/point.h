@@ -1,4 +1,4 @@
-// $Id: point.h,v 1.4 2005-02-22 22:17:33 jwpeterson Exp $
+// $Id: point.h,v 1.5 2005-06-06 16:23:56 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -61,6 +61,11 @@ class Point : public TypeVector<Real>
    */
   Point (const TypeVector<Real>& p);
 
+  /**
+   * Empty.
+   */
+  virtual ~Point() {}
+  
 //   /**
 //    * @returns a key associated with this point.  Useful for sorting.
 //    */

@@ -1,4 +1,4 @@
-// $Id: edge_edge2.C,v 1.15 2005-05-06 17:06:58 roystgnr Exp $
+// $Id: edge_edge2.C,v 1.16 2005-06-06 16:24:13 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -22,6 +22,27 @@
 // Local includes
 #include "edge_edge2.h"
 
+
+#ifdef ENABLE_AMR
+
+const float Edge2::_embedding_matrix[2][2][2] =
+{
+  // embedding matrix for child 0
+  {
+    // 0    1    2  
+    {1.0, 0.0}, // 0
+    {0.5, 0.5}  // 1
+  },
+
+  // embedding matrix for child 1
+  {
+    // 0    1    2  
+    {0.5, 0.5}, // 0
+    {0.0, 1.0}  // 1
+  }
+};
+
+#endif
 
 bool Edge2::is_vertex(const unsigned int) const
 {

@@ -1,4 +1,4 @@
-// $Id: type_vector.h,v 1.12 2005-05-24 13:35:41 jwpeterson Exp $
+// $Id: type_vector.h,v 1.13 2005-06-06 16:23:57 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -70,7 +70,7 @@ public:
   /**
    * Destructor.
    */ 
-  ~TypeVector ();
+  virtual ~TypeVector ();
 
   /**
    * Assign to a vector without creating a temporary.

@@ -1,4 +1,4 @@
-// $Id: cell_prism.C,v 1.15 2005-02-22 22:17:39 jwpeterson Exp $
+// $Id: cell_prism.C,v 1.16 2005-06-06 16:24:13 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -79,70 +79,84 @@ unsigned int Prism::key (const unsigned int s) const
 
 
 
-AutoPtr<Elem> Prism::side (const unsigned int i) const
+AutoPtr<DofObject> Prism::side (const unsigned int i) const
 {
   assert (i < this->n_sides());
-
-
-  
-  AutoPtr<Elem> faceq(new Quad4);
-  AutoPtr<Elem> facet(new Tri3);
 
   switch (i)
     {
     case 0:  // the triangular face at z=0
       {
+        Elem* facet = new Tri3;
+        AutoPtr<DofObject> ap_facet(facet);
+  
 	facet->set_node(0) = this->get_node(0);
 	facet->set_node(1) = this->get_node(2);
 	facet->set_node(2) = this->get_node(1);
 
-	return facet;
+        return ap_facet;
       }
     case 1:  // the quad face at y=0
       {
+        Elem* faceq = new Quad4;
+        AutoPtr<DofObject> ap_faceq(faceq);
+        
 	faceq->set_node(0) = this->get_node(0);
 	faceq->set_node(1) = this->get_node(1);
 	faceq->set_node(2) = this->get_node(4);
 	faceq->set_node(3) = this->get_node(3);
 	
-	return faceq;
+	return ap_faceq;
       }
     case 2:  // the other quad face
       {
+        Elem* faceq = new Quad4;
+        AutoPtr<DofObject> ap_faceq(faceq);
+      
 	faceq->set_node(0) = this->get_node(1);
 	faceq->set_node(1) = this->get_node(2);
 	faceq->set_node(2) = this->get_node(5);
 	faceq->set_node(3) = this->get_node(4);
 
-	return faceq;
+	return ap_faceq;
       }
     case 3: // the quad face at x=0
       {
+        Elem* faceq = new Quad4;
+        AutoPtr<DofObject> ap_faceq(faceq);
+
 	faceq->set_node(0) = this->get_node(2);
 	faceq->set_node(1) = this->get_node(0);
 	faceq->set_node(2) = this->get_node(3);
 	faceq->set_node(3) = this->get_node(5);
 	
-	return faceq;
+	return ap_faceq;
       }
     case 4: // the triangular face at z=1
       {
+        Elem* facet = new Tri3;
+        AutoPtr<DofObject> ap_facet(facet);
+      
 	facet->set_node(0) = this->get_node(3);
 	facet->set_node(1) = this->get_node(4);
 	facet->set_node(2) = this->get_node(5);
-
-	return facet;
+        
+        return ap_facet;
       }
     default:
       {
 	error();
-	return facet;
+        Elem* facet = new Tri3;
+        AutoPtr<DofObject> ap_facet(facet);
+        return ap_facet;
       }
     }
 
   // We'll never get here.
   error();
-  return facet;
+  Elem* facet = new Tri3;
+  AutoPtr<DofObject> ap_facet(facet);
+  return ap_facet;
 }
 
 

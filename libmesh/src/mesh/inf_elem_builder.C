@@ -1,4 +1,4 @@
-// $Id: inf_elem_builder.C,v 1.6 2005-02-22 22:17:39 jwpeterson Exp $
+// $Id: inf_elem_builder.C,v 1.7 2005-06-06 16:24:14 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -336,7 +336,7 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
 	      {
 		// note that it is safe to use the Elem::side() method, 
 		// which gives a non-full-ordered element 
-		AutoPtr<Elem> side(elem->side(s));
+		AutoPtr<Elem> side(elem->build_side(s));
 
 		// bool flags for symmetry detection
 		bool sym_side=false;		

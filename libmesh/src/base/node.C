@@ -1,4 +1,4 @@
-// $Id: node.C,v 1.9 2005-02-22 22:17:36 jwpeterson Exp $
+// $Id: node.C,v 1.10 2005-06-06 16:23:58 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -31,6 +31,15 @@
 //const unsigned int Node::invalid_id = libMesh::invalid_uint;
 
 
+bool Node::operator==(const DofObject& rhs) const
+{
+  // Cast rhs to a Node*
+  const Node* rhs_node = dynamic_cast<const Node*>(&rhs);
 
-// ------------------------------------------------------------
-// Node class members
+  // If we can't cast to a Node* then rhs must be an Elem
+  if(rhs_node == NULL)
+    return false;
+
+  // Explicitly calling the operator== defined in Point
+  return this->Point::operator==(*rhs_node);
+}

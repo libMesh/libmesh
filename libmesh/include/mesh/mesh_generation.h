@@ -1,4 +1,4 @@
-// $Id: mesh_generation.h,v 1.7 2005-05-09 20:38:41 jwpeterson Exp $
+// $Id: mesh_generation.h,v 1.8 2005-06-06 16:23:56 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -45,7 +45,7 @@ namespace MeshTools
    *
    * \author Benjamin S. Kirk
    * \date 2004
-   * \version $Revision: 1.7 $
+   * \version $Revision: 1.8 $
    */
   namespace Generation
   {
@@ -64,6 +64,15 @@ namespace MeshTools
 		     const Real zmin=0., const Real zmax=1.,
 		     const ElemType type=INVALID_ELEM,
 		     const bool gauss_lobatto_grid=false);
+
+    /**
+     * A specialized \p build_cube() for 1D meshes
+     */
+    void build_line (Mesh& mesh,
+                     const unsigned int nx,
+                     const Real xmin=0., const Real xmax=1.,
+                     const ElemType type=INVALID_ELEM,
+                     const bool gauss_lobatto_grid=false);
 
     /**
      * A specialized \p build_cube() for 2D meshes.

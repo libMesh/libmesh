@@ -3,11 +3,9 @@
 *.o
 *.pgo
 *.syo
-ex4
-out_*.gmv
+ex0
 ii_files
 so_locations
-*.log
 gmon.out
 data
-out_1
+gnuplot_script
