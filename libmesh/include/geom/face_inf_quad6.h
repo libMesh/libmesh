@@ -1,4 +1,4 @@
-// $Id: face_inf_quad6.h,v 1.9 2005-05-06 17:07:00 roystgnr Exp $
+// $Id: face_inf_quad6.h,v 1.10 2005-06-07 16:33:24 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -124,7 +124,7 @@ public:
   Order default_order() const { return SECOND; }
   
   /**
-   * @returns an \p Edge3 for the base (0) side, and an \p InfEdge2 for
+   * Creates and returns an \p Edge3 for the base (0) side, and an \p InfEdge2 for
    * the sides 1, 2.
    */
   AutoPtr<Elem> build_side (const unsigned int i) const;

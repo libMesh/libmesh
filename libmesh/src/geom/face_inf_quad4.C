@@ -1,4 +1,4 @@
-// $Id: face_inf_quad4.C,v 1.27 2005-03-01 14:21:41 benkirk Exp $
+// $Id: face_inf_quad4.C,v 1.28 2005-06-07 16:33:48 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -28,6 +28,9 @@
 #include "face_inf_quad4.h"
 #include "fe_interface.h"
 #include "fe_type.h"
+#include "side.h"
+#include "edge_edge2.h"
+#include "edge_inf_edge2.h"
 
 
 
@@ -39,6 +42,33 @@ const unsigned int InfQuad4::side_nodes_map[3][2] =
   {1, 3}, // Side 1
   {0, 2}  // Side 2
 };
+
+
+
+#ifdef ENABLE_AMR
+
+const float InfQuad4::_embedding_matrix[2][4][4] =
+{
+  // embedding matrix for child 0
+  {
+    // 0    1    2    3rd parent node
+    {1.0, 0.0, 0.0, 0.0}, // 0th child node
+    {0.5, 0.5, 0.0, 0.0}, // 1
+    {0.0, 0.0, 1.0, 0.0}, // 2
+    {0.0, 0.0, 0.5, 0.5}  // 3
+  },
+
+  // embedding matrix for child 1
+  {
+    // 0    1    2    3
+    {0.5, 0.5, 0.0, 0.0}, // 0
+    {0.0, 1.0, 0.0, 0.0}, // 1
+    {0.0, 0.0, 0.5, 0.5}, // 2
+    {0.0, 0.0, 0.0, 1.0}  // 3
+  }
+};
+
+#endif
 
 
 // ------------------------------------------------------------
@@ -132,30 +162,33 @@ bool InfQuad4::contains_point (const Point& p) const
 
 
 
-#ifdef ENABLE_AMR
-
-const float InfQuad4::_embedding_matrix[2][4][4] =
+AutoPtr<Elem> InfQuad4::build_side (const unsigned int i) const
 {
-  // embedding matrix for child 0
-  {
-    // 0    1    2    3rd parent node
-    {1.0, 0.0, 0.0, 0.0}, // 0th child node
-    {0.5, 0.5, 0.0, 0.0}, // 1
-    {0.0, 0.0, 1.0, 0.0}, // 2
-    {0.0, 0.0, 0.5, 0.5}  // 3
-  },
+  assert (i < this->n_sides());
 
-  // embedding matrix for child 1
-  {
-    // 0    1    2    3
-    {0.5, 0.5, 0.0, 0.0}, // 0
-    {0.0, 1.0, 0.0, 0.0}, // 1
-    {0.0, 0.0, 0.5, 0.5}, // 2
-    {0.0, 0.0, 0.0, 1.0}  // 3
-  }
-};
+  switch (i)
+    {
+      // base
+    case 0:
+      {
+	AutoPtr<Elem> ap(new Side<Edge2,InfQuad4>(this,i));
+	return ap;
+      }
+      // ifem edges
+    case 1:
+    case 2:
+      {
+	AutoPtr<Elem> ap(new Side<InfEdge2,InfQuad4>(this,i));
+	return ap;
+      }
 
-#endif
+    default:
+      error();
+    }
+  // How did we get here
+  error();
+  AutoPtr<Elem> ap(NULL);  return ap;
+}
 
 
 void InfQuad4::connectivity(const unsigned int sf,
@@ -193,3 +226,5 @@ void InfQuad4::connectivity(const unsigned int sf,
 
 
 #endif // ifdef ENABLE_INFINITE_ELEMENTS
+
+

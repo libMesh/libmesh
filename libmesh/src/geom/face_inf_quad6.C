@@ -1,4 +1,4 @@
-// $Id: face_inf_quad6.C,v 1.26 2005-03-01 14:21:41 benkirk Exp $
+// $Id: face_inf_quad6.C,v 1.27 2005-06-07 16:33:48 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -28,6 +28,7 @@
 #include "face_inf_quad6.h"
 #include "edge_edge3.h"
 #include "edge_inf_edge2.h"
+#include "side.h"
 
 
 
@@ -110,47 +111,63 @@ AutoPtr<Elem> InfQuad6::build_side (const unsigned int i) const
 {
   assert (i < this->n_sides());
 
-  
   switch (i)
     {
     case 0:
       {
-	Edge3* edge = new Edge3;
-
-	edge->set_node(0) = this->get_node(0);
-	edge->set_node(1) = this->get_node(1);
-	edge->set_node(2) = this->get_node(4);
-	
-	AutoPtr<Elem> ap(edge);  return ap;
+	AutoPtr<Elem> ap(new Side<Edge3,InfQuad6>(this,i));
+	return ap;
       }
-
     case 1:
-      {
-	// adjacent to another infinite element	
-	InfEdge2* edge = new InfEdge2;
-
-	edge->set_node(0) = this->get_node(1);
-	edge->set_node(1) = this->get_node(3);
-
-	AutoPtr<Elem> ap(edge);  return ap;
-      }
-
     case 2:
       {
-	// adjacent to another infinite element	
-	InfEdge2* edge = new InfEdge2;
-
-	edge->set_node(0) = this->get_node(0); // be aware of swapped nodes,
-	edge->set_node(1) = this->get_node(2); // compared to conventional side numbering
-
-	AutoPtr<Elem> ap(edge);  return ap;
+	AutoPtr<Elem> ap(new Side<Edge3,InfQuad6>(this,i));
+	return ap;
       }
     default:
-      {
-	error();
-	AutoPtr<Elem> ap(NULL);  return ap;
-      }
+      error();
     }
+  
+//   switch (i)
+//     {
+//     case 0:
+//       {
+// 	Edge3* edge = new Edge3;
+
+// 	edge->set_node(0) = this->get_node(0);
+// 	edge->set_node(1) = this->get_node(1);
+// 	edge->set_node(2) = this->get_node(4);
+	
+// 	AutoPtr<Elem> ap(edge);  return ap;
+//       }
+
+//     case 1:
+//       {
+// 	// adjacent to another infinite element	
+// 	InfEdge2* edge = new InfEdge2;
+
+// 	edge->set_node(0) = this->get_node(1);
+// 	edge->set_node(1) = this->get_node(3);
+
+// 	AutoPtr<Elem> ap(edge);  return ap;
+//       }
+
+//     case 2:
+//       {
+// 	// adjacent to another infinite element	
+// 	InfEdge2* edge = new InfEdge2;
+
+// 	edge->set_node(0) = this->get_node(0); // be aware of swapped nodes,
+// 	edge->set_node(1) = this->get_node(2); // compared to conventional side numbering
+
+// 	AutoPtr<Elem> ap(edge);  return ap;
+//       }
+//     default:
+//       {
+// 	error();
+// 	AutoPtr<Elem> ap(NULL);  return ap;
+//       }
+//     }
 
 
   // We will never get here...  Look at the code above.

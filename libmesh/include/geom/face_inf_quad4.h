@@ -1,4 +1,4 @@
-// $Id: face_inf_quad4.h,v 1.9 2005-06-06 16:23:56 knezed01 Exp $
+// $Id: face_inf_quad4.h,v 1.10 2005-06-07 16:33:24 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -120,19 +120,19 @@ public:
   Order default_order() const { return FIRST; }
   
   /**
-   * @returns an \p Edge2 for the base side, and an \p InfEdge2 for
+   * Creates and returns an \p Edge2 for the base side, and an \p InfEdge2 for
    * the sides 1, 2.
    */
-  AutoPtr<Elem> build_side (const unsigned int i) const
-   { 
-    // side() returns an AutoPtr to a DofObject, hence need to cast to Elem*
-    AutoPtr<DofObject> ap_dof_object(this->side(i));
-    Elem* side = dynamic_cast<Elem*>(ap_dof_object.release());
-    assert(side); // assert that the cast was successful
+  AutoPtr<Elem> build_side (const unsigned int i) const;
+/*    {  */
+/*     // side() returns an AutoPtr to a DofObject, hence need to cast to Elem* */
+/*     AutoPtr<DofObject> ap_dof_object(this->side(i)); */
+/*     Elem* side = dynamic_cast<Elem*>(ap_dof_object.release()); */
+/*     assert(side); // assert that the cast was successful */
     
-    AutoPtr<Elem> ap(side);
-    return ap;
-  }
+/*     AutoPtr<Elem> ap(side); */
+/*     return ap; */
+/*   } */
 
   virtual void connectivity(const unsigned int sf,
 			    const IOPackage iop,
