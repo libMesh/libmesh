@@ -1,4 +1,4 @@
-// $Id: system_projection.C,v 1.20 2005-06-07 12:51:59 spetersen Exp $
+// $Id: system_projection.C,v 1.21 2005-06-07 21:20:56 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -228,7 +228,7 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 	      assert (old_dof_indices.size() == new_n_dofs);
 	    }
 
-	  const unsigned int old_n_dofs = old_dof_indices.size();
+	  unsigned int old_n_dofs = old_dof_indices.size();
 
           if (fe_type.family != LAGRANGE) {
 
@@ -301,6 +301,7 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 
                 // Copy node values first
 		dof_map.old_dof_indices (elem, old_dof_indices, var);
+	        old_n_dofs = old_dof_indices.size();
                 unsigned int current_dof = 0;
                 for (unsigned int n=0; n!= n_nodes; ++n)
                   {
@@ -353,6 +354,7 @@ void System::project_vector (const NumericVector<Number>& old_vector,
                           Elem *child = elem->child(c);
 			  dof_map.old_dof_indices (child,
                             old_dof_indices, var);
+	                  old_n_dofs = old_dof_indices.size();
 			  FEInterface::dofs_on_edge(child, dim,
 			    fe_type, e, old_side_dofs);
 
@@ -482,6 +484,7 @@ void System::project_vector (const NumericVector<Number>& old_vector,
                           Elem *child = elem->child(c);
 			  dof_map.old_dof_indices (child,
                             old_dof_indices, var);
+	                  old_n_dofs = old_dof_indices.size();
 			  FEInterface::dofs_on_side(child, dim,
 			    fe_type, s, old_side_dofs);
 
@@ -600,6 +603,7 @@ void System::project_vector (const NumericVector<Number>& old_vector,
                     Elem *child = elem->child(c);
 		    dof_map.old_dof_indices (child, old_dof_indices,
                                              var);
+	            old_n_dofs = old_dof_indices.size();
 
                     // Initialize both child and parent FE data
                     // on the child's quadrature points
