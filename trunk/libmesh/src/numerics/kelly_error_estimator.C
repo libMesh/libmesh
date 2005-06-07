@@ -1,4 +1,4 @@
-// $Id: kelly_error_estimator.C,v 1.13 2005-06-06 16:24:16 knezed01 Exp $
+// $Id: kelly_error_estimator.C,v 1.14 2005-06-07 12:52:21 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -217,10 +217,12 @@ void KellyErrorEstimator::estimate_error (const System& system,
                 grad_f.add_scaled (dphi_f[i][0],
                     system.current_solution(dof_indices_f[i]));
 
-              float jump = grad_e(0) - grad_f(0);
-
+              Number jump = grad_e(0) - grad_f(0);
+#ifndef USE_COMPLEX_NUMBERS
               error += jump*jump;
-
+#else
+	      error +=std::norm(jump);
+#endif
               // Add the error contribution to element e
               assert(e_id < error_per_cell.size());
               assert(f_id < error_per_cell.size());

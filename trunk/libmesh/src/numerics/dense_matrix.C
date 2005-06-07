@@ -1,4 +1,4 @@
-// $Id: dense_matrix.C,v 1.23 2005-02-22 22:17:41 jwpeterson Exp $
+// $Id: dense_matrix.C,v 1.24 2005-06-07 12:52:21 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -316,14 +316,13 @@ T DenseMatrix<T>::det ()
 
 
 
-
-
 // The cholesky solve function first decomposes the matrix
 // with cholesky_decompose and then uses the cholesky_back_substitute
 // routine to find the solution x.
 template <typename T>
-void DenseMatrix<T>::cholesky_solve (DenseVector<T>& b,
-				     DenseVector<T>& x)
+template <typename T2>
+void DenseMatrix<T>::cholesky_solve (DenseVector<T2>& b,
+				     DenseVector<T2>& x)
 {
   // Check for a previous decomposition
   switch(this->_decomposition_type)
@@ -352,7 +351,6 @@ void DenseMatrix<T>::cholesky_solve (DenseVector<T>& b,
   // Perform back substitution
   this->_cholesky_back_substitute (b, x);
 }
-
 
 
 
@@ -410,8 +408,9 @@ void DenseMatrix<T>::_cholesky_decompose ()
 
 
 template <typename T>
-void DenseMatrix<T>::_cholesky_back_substitute (DenseVector<T>& b,
-						DenseVector<T>& x) const
+template <typename T2>
+void DenseMatrix<T>::_cholesky_back_substitute (DenseVector<T2>& b,
+						DenseVector<T2>& x) const
 {
   // Shorthand notation for number of rows and columns.
   const unsigned int
@@ -497,7 +496,13 @@ void DenseMatrix<T>::_cholesky_back_substitute (DenseVector<T>& b,
 //--------------------------------------------------------------
 // Explicit instantiations
 template class DenseMatrix<Real>;
+template void DenseMatrix<Real>::cholesky_solve(DenseVector<Real>&, DenseVector<Real>&);
+template void DenseMatrix<Real>::_cholesky_back_substitute(DenseVector<Real>&, DenseVector<Real>&);
 
 #ifdef USE_COMPLEX_NUMBERS
 template class DenseMatrix<Complex>;
+template void DenseMatrix<Complex>::cholesky_solve(DenseVector<Complex>&,DenseVector<Complex>&);
+template void DenseMatrix<Complex>::_cholesky_back_substitute(DenseVector<Complex>&, DenseVector<Complex>&);
+template void DenseMatrix<Real>::cholesky_solve(DenseVector<Complex>&, DenseVector<Complex>&);
+template void DenseMatrix<Real>::_cholesky_back_substitute(DenseVector<Complex>&, DenseVector<Complex>&);
 #endif
