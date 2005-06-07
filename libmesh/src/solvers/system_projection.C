@@ -1,4 +1,4 @@
-// $Id: system_projection.C,v 1.19 2005-05-18 20:58:09 roystgnr Exp $
+// $Id: system_projection.C,v 1.20 2005-06-07 12:51:59 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -103,8 +103,11 @@ void System::project_vector (const NumericVector<Number>& old_vector,
   // The DofMap for this system
   const DofMap& dof_map = this->get_dof_map();
 
-  // The element matrix and RHS for projections
-  DenseMatrix<Number> Ke;
+  // The element matrix and RHS for projections.
+  // Note that Ke is always real-valued, whereas
+  // Fe may be complex valued if complex number
+  // support is enabled
+  DenseMatrix<Real> Ke;
   DenseVector<Number> Fe;
   // The new element coefficients
   DenseVector<Number> Ue;

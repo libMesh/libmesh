@@ -1,4 +1,4 @@
-// $Id: dense_matrix.h,v 1.9 2005-02-22 22:17:33 jwpeterson Exp $
+// $Id: dense_matrix.h,v 1.10 2005-06-07 12:52:21 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -180,10 +180,13 @@ public:
    * factorization.  Therefore you can use this method if you know a-priori
    * that the matrix is SPD.  If the matrix is not SPD, an error is generated.
    * One nice property of cholesky decompositions is that they do not require
-   * pivoting for stability.
+   * pivoting for stability. Note that this method may also be used when
+   * A is real-valued and x and b are complex-valued.
    */
-  void cholesky_solve(DenseVector<T>& b,
-		      DenseVector<T>& x);
+  template <typename T2>
+  void cholesky_solve(DenseVector<T2>& b,
+		      DenseVector<T2>& x);
+
   
   /**
    * @returns the determinant of the matrix.  Note that this means
@@ -235,10 +238,13 @@ private:
 
   /**
    * Solves the equation Ax=b for the unknown value x and rhs
-   * b based on the Cholesky factorization of A.
+   * b based on the Cholesky factorization of A. Note that
+   * this method may be used when A is real-valued and b and x
+   * are complex-valued.
    */
-  void _cholesky_back_substitute(DenseVector<T>& b,
-				 DenseVector<T>& x) const;
+  template <typename T2>
+  void _cholesky_back_substitute(DenseVector<T2>& b,
+				 DenseVector<T2>& x) const;
 
   /**
    * The decomposition schemes above change the entries of the matrix

@@ -1,4 +1,4 @@
-/* $Id: ex7.C,v 1.39 2005-04-18 13:55:15 spetersen Exp $ */
+/* $Id: ex7.C,v 1.40 2005-06-07 12:52:21 spetersen Exp $ */
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
 
@@ -50,6 +50,7 @@
 #include "mesh_generation.h"
 #include "gmv_io.h"
 #include "equation_systems.h"
+#include "elem.h"
 
 // Include FrequencySystem.  Compared to GeneralSystem,
 // this class offers added functionality for the solution of 
@@ -168,7 +169,7 @@ int main (int argc, char** argv)
 
     // Print information about the mesh to the screen.
     mesh_data.print_info();
-   
+
     // Create an equation systems object, which now handles
     // a frequency system, as opposed to previous examples.
     // Also pass a MeshData pointer so the data can be 
@@ -531,7 +532,8 @@ void assemble_helmholtz(EquationSystems& es,
 	      freq_indep_rhs.set(dn, mesh_data.get_data(node)[0]);
 	    }
       }
-    
+ 
+
     STOP_LOG("rhs","assemble_helmholtz");
   }
 
