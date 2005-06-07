@@ -1,4 +1,4 @@
-// $Id: ex16.C,v 1.4 2005-05-10 17:53:05 spetersen Exp $
+// $Id: ex16.C,v 1.5 2005-06-07 14:04:18 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -33,6 +33,7 @@
 #include "dense_matrix.h"
 #include "sparse_matrix.h"
 #include "numeric_vector.h"
+#include "dof_map.h"
 
 
 

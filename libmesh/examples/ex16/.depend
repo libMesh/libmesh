@@ -1,6 +1,7 @@
 ex16.$(obj-suffix):\
     ex16.C\
     ../../include/base/auto_ptr.h\
+    ../../include/base/dof_map.h\
     ../../include/base/libmesh.h\
     ../../include/base/libmesh_base.h\
     ../../include/base/libmesh_common.h\
