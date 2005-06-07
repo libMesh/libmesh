@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.82 2005-06-06 16:23:57 knezed01 Exp $
+// $Id: dof_map.C,v 1.83 2005-06-07 21:50:39 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -274,8 +274,12 @@ void DofMap::reinit(MeshBase& mesh)
 		  else if (extra_hanging_dofs)
 		    {
 		      assert(old_node_dofs == vertex_dofs);
-		      node->set_n_comp(this->sys_number(), var,
-				       vertex_dofs + new_node_dofs);
+                      if (new_node_dofs)
+		        node->set_n_comp(this->sys_number(), var,
+				         vertex_dofs + new_node_dofs);
+                      else
+			node->set_dof_number(this->sys_number(),
+					     var, 0, 0);
 		      assert(node->dof_number(this->sys_number(), var,
 					      0) != 1);
 		    }
@@ -284,8 +288,14 @@ void DofMap::reinit(MeshBase& mesh)
 		  else
 		    {
 		      assert(old_node_dofs == vertex_dofs);
-		      node->set_n_comp(this->sys_number(), var,
-				       std::max(vertex_dofs, new_node_dofs));
+                      if (new_node_dofs > vertex_dofs)
+		        node->set_n_comp(this->sys_number(), var,
+				         new_node_dofs);
+                      else
+			node->set_dof_number(this->sys_number(),
+					     var, 0, 0);
+		      assert(node->dof_number(this->sys_number(), var,
+					      0) != 1);
 		    }
 		}
 	    }
