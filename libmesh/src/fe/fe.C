@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.38 2005-05-10 19:53:28 roystgnr Exp $
+// $Id: fe.C,v 1.39 2005-06-08 16:21:46 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -48,6 +48,8 @@ void FE<Dim,T>::attach_quadrature_rule (QBase* q)
 {
   assert (q != NULL); 
   qrule = q;
+  // make sure we don't cache results from a previous quadrature rule
+  elem_type = INVALID_ELEM;
   return;
 }
 
