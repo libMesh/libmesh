@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.83 2005-06-07 21:50:39 roystgnr Exp $
+// $Id: dof_map.C,v 1.84 2005-06-08 15:07:52 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1093,7 +1093,6 @@ void DofMap::dof_indices (const Elem* const elem,
 	      {
 		assert(!elem->active());
 		di.resize(di.size() + nc, DofObject::invalid_id);
-		here();
 	      }
 	    else
 	      for (unsigned int i=dof_offset; i<nc+dof_offset; i++)
@@ -1205,11 +1204,12 @@ void DofMap::old_dof_indices (const Elem* const elem,
 	      dof_offset = node->old_dof_object->n_comp(sys_num,v) - nc;
 	    
 	    // We should never have fewer dofs than necessary on a
-	    // node unless we're getting indices on a parent element,
-	    // and we should never need the indices on such a node
+	    // node unless we're getting indices on a parent element
+            // or a just-coarsened element
 	    if (dof_offset < 0)
 	      {
-		assert(!elem->active());
+		assert(!elem->active() || elem->refinement_flag() ==
+                       Elem::JUST_COARSENED);
 		di.resize(di.size() + nc, DofObject::invalid_id);
 	      }
 	    else
@@ -1228,8 +1228,8 @@ void DofMap::old_dof_indices (const Elem* const elem,
 							     type);
 
 	// We should never have fewer dofs than necessary on an
-	// element unless we're getting indices on a parent element,
-	// and we should never need those indices
+	// element unless we're getting indices on a parent element
+	// or a just-coarsened element
 	if (nc != 0)
 	  if (elem->old_dof_object->n_systems() > sys_num &&
 	      nc == elem->old_dof_object->n_comp(sys_num,v))
@@ -1246,7 +1246,8 @@ void DofMap::old_dof_indices (const Elem* const elem,
 	    }
 	  else
 	    {
-	      assert(!elem->active() || fe_type.family == LAGRANGE);
+	      assert(!elem->active() || fe_type.family == LAGRANGE ||
+		     elem->refinement_flag() == Elem::JUST_COARSENED);
 	      di.resize(di.size() + nc, DofObject::invalid_id);
 	    }
       }
