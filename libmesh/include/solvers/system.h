@@ -1,4 +1,4 @@
-// $Id: system.h,v 1.13 2005-06-03 15:49:58 jwpeterson Exp $
+// $Id: system.h,v 1.14 2005-06-08 04:10:19 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -30,6 +30,7 @@
 #include "fe_type.h"
 #include "auto_ptr.h"
 #include "reference_counted_object.h"
+#include "vector_value.h" // for Gradient
 
 
 
@@ -39,6 +40,8 @@ class EquationSystems;
 class Mesh;
 class Xdr;
 class DofMap;
+class Parameters;
+class Point;
 template <typename T> class NumericVector;
 
 /**
@@ -159,6 +162,33 @@ public:
    */
   void project_vector (const NumericVector<Number>&,
 		       NumericVector<Number>&) const;
+  
+  /**
+   * Projects the continuous functions onto the current solution. 
+   */
+  void project_solution (Number fptr(const Point& p,
+				     const Parameters& parameters,
+                                     const std::string& sys_name,
+				     const std::string& unknown_name),
+                         Gradient gptr(const Point& p,
+				       const Parameters& parameters,
+                                       const std::string& sys_name,
+				       const std::string& unknown_name),
+			 Parameters& parameters) const;
+
+  /**
+   * Projects the continuous functions onto the current mesh.
+   */
+  void project_vector (Number fptr(const Point& p,
+				   const Parameters& parameters,
+                                   const std::string& sys_name,
+				   const std::string& unknown_name),
+                       Gradient gptr(const Point& p,
+				     const Parameters& parameters,
+                                     const std::string& sys_name,
+				     const std::string& unknown_name),
+		       Parameters& parameters,
+		       NumericVector<Number>& new_vector) const;
   
   /**
    * @returns the system number.   
