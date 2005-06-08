@@ -1,4 +1,4 @@
-// $Id: fe_type.h,v 1.3 2005-02-22 22:17:31 jwpeterson Exp $
+// $Id: fe_type.h,v 1.4 2005-06-08 20:54:46 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -25,10 +25,14 @@
 // C++ includes
 
 // Local includes
+#include "auto_ptr.h"
 #include "libmesh_config.h"
 #include "enum_order.h"
 #include "enum_fe_family.h"
 #include "enum_inf_map_type.h"
+
+// Forward declarations
+class QBase;
 
 
 /**
@@ -127,6 +131,13 @@ public:
    * such an element exactly.
    */
   Order default_quadrature_order () const;
+
+  /**
+   * @returns a quadrature rule of appropriate type and order for this \p
+   * FEType.  The default quadrature rule is based on integrating the mass
+   * matrix for such an element exactly.
+   */
+  AutoPtr<QBase> default_quadrature_rule (const unsigned int dim) const;
 
   
 private:  
