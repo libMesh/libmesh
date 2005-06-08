@@ -1,4 +1,4 @@
-// $Id: gnuplot_io.C,v 1.3 2005-06-08 16:11:18 knezed01 Exp $
+// $Id: gnuplot_io.C,v 1.4 2005-06-08 16:38:17 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -185,7 +185,7 @@ void GnuPlotIO::write_solution(const std::string& fname,
   for( ; map_it != end_map_it; ++map_it)
   {
     key_value_pair kvp = *map_it;
-    std::vector<double> values = kvp.second;
+    std::vector<Number> values = kvp.second;
 
     data << kvp.first << "\t";
 
