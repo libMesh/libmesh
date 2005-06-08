@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3O//DTD W3 HTML 2.0//EN">
+<!Converted with LaTeX2HTML 95 (Thu Jan 19 1995) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds >
+<HEAD>
+<TITLE> Changes in Version 1.10</TITLE>
+</HEAD>
+<BODY>
+<meta name="description" value=" Changes in Version 1.10">
+<meta name="keywords" value="html">
+<meta name="resource-type" value="document">
+<meta name="distribution" value="global">
+<P>
+ <BR> <HR><A NAME=tex2html220 HREF="node7.html"><IMG ALIGN=BOTTOM ALT="next" SRC="next_motif.gif"></A> <A NAME=tex2html218 HREF="node3.html"><IMG ALIGN=BOTTOM ALT="up" SRC="up_motif.gif"></A> <A NAME=tex2html214 HREF="node5.html"><IMG ALIGN=BOTTOM ALT="previous" SRC="previous_motif.gif"></A> <A NAME=tex2html222 HREF="node1.html"><IMG ALIGN=BOTTOM ALT="contents" SRC="contents_motif.gif"></A>   <A HREF="node28.html#SectionIndex"><IMG ALIGN=BOTTOM ALT="index" SRC="index_motif.gif"></A> <BR>
+<B> Next:</B> <A NAME=tex2html221 HREF="node7.html"> Installation</A>
+<B>Up:</B> <A NAME=tex2html219 HREF="node3.html"> What's New</A>
+<B> Previous:</B> <A NAME=tex2html215 HREF="node5.html"> Changes in Version </A>
+<BR> <HR> <P>
+<H2><A NAME=SECTION00033000000000000000> Changes in Version 1.10</A></H2>
+<P>
+<UL><LI>
+  Fixed some bugs.
+<LI>
+  Implemented the <A HREF="node22.html#BPXPCGIter">BPX Preconditioned Conjugate Gradient method</A>.
+  Renamed the module <b> MGSOLV</b> and the program <tt> mgtest</tt>
+  in <A HREF="node22.html#MLSOLV"><b> MLSOLV</b></A> and 
+  <A HREF="node12.html#SubsectionMLSTEST"><tt> mlstest</tt></A>, respectively,
+  because of their true multilevel character.
+<LI>
+  Improved the estimation of extremal eigenvalues by the Lanczos method.
+<LI>
+  Accelerated the iterative solvers for a zero initial solution
+  (which often arises within the multigrid algorithm).
+<LI>
+  Changed the defaults for accuracy in the modules <A HREF="node26.html#RTC"><b> RTC</b></A> and
+  <A HREF="node17.html#EIGENVAL"><b> EIGENVAL</b></A>
+  to 1e-8
+ and 1e-4,
+ respectively. 
+<LI>
+  Extended the structure of type <tt> QMatrix</tt>,
+  e.g. reciprocal values of diagonal elements which are needed in classical
+  solvers (Jacobi, SOR method) are stored as auxiliary variables.
+<LI>
+  Implemented the procedure <A HREF="node27.html#V_SetRndCmp"><tt> V_SetRndCmp</tt></A> 
+  in the module <A HREF="node27.html#VECTOR"><b> VECTOR</b></A> which initializes vector 
+  components by random values. 
+<LI>
+  Modified the stopping criterion for <A HREF="node20.html#GMRESIter">GMRES</A>.
+<LI>
+  Changed the names of some procedures and variables.
+</UL><BR> <HR>
+<P><ADDRESS>
+Tomas Skalicky (skalicky@msmfs1.mw.tu-dresden.de)
+</ADDRESS>
+</BODY>
+</BODY>
