@@ -1,4 +1,4 @@
-// $Id: system_projection.C,v 1.24 2005-06-08 20:56:24 roystgnr Exp $
+// $Id: system_projection.C,v 1.25 2005-06-08 23:59:31 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -122,8 +122,7 @@ void System::project_vector (const NumericVector<Number>& old_vector,
       AutoPtr<FEBase> fe_coarse (FEBase::build(dim, fe_type));      
 
       // Prepare variables for non-Lagrange projection
-      int order = fe->get_order();
-      AutoPtr<QBase> qrule (fe_type.default_quadrature_rule(dim));
+      AutoPtr<QBase> qrule     (fe_type.default_quadrature_rule(dim));
       AutoPtr<QBase> qedgerule (fe_type.default_quadrature_rule(1));
       AutoPtr<QBase> qsiderule (fe_type.default_quadrature_rule(dim-1));
       std::vector<Point> coarse_qpoints;
@@ -858,8 +857,7 @@ void System::project_vector (Number fptr(const Point& p,
       AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));      
 
       // Prepare variables for projection
-      int order = fe->get_order();
-      AutoPtr<QBase> qrule (fe_type.default_quadrature_rule(dim));
+      AutoPtr<QBase> qrule     (fe_type.default_quadrature_rule(dim));
       AutoPtr<QBase> qedgerule (fe_type.default_quadrature_rule(1));
       AutoPtr<QBase> qsiderule (fe_type.default_quadrature_rule(dim-1));
 
