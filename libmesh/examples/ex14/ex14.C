@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.16 2005-06-06 14:53:15 jwpeterson Exp $ */
+/* $Id: ex14.C,v 1.17 2005-06-08 17:51:36 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -417,19 +417,23 @@ void assemble_laplace(EquationSystems& es,
   // \p FEBase::build() member dynamically creates memory we will
   // store the object as an \p AutoPtr<FEBase>.  This can be thought
   // of as a pointer that will clean up after itself.
-  AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
+  AutoPtr<FEBase> fe      (FEBase::build(dim, fe_type));
+  AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
   
   // A 5th order Gauss quadrature rule for numerical integration.
-  QGauss qrule (dim, FIFTH);
+  QGauss qrule (dim,   fe_type.default_quadrature_order());
+  QGauss qface (dim-1, fe_type.default_quadrature_order());
 
   // Tell the finite element object to use our quadrature rule.
-  fe->attach_quadrature_rule (&qrule);
+  fe->attach_quadrature_rule      (&qrule);
+  fe_face->attach_quadrature_rule (&qface);
 
   // Here we define some references to cell-specific data that
   // will be used to assemble the linear system.
   // We begin with the element Jacobian * quadrature weight at each
   // integration point.   
-  const std::vector<Real>& JxW = fe->get_JxW();
+  const std::vector<Real>& JxW      = fe->get_JxW();
+  const std::vector<Real>& JxW_face = fe_face->get_JxW();
 
   // The physical XY locations of the quadrature points on the element.
   // These might be useful for evaluating spatially varying material
@@ -438,10 +442,14 @@ void assemble_laplace(EquationSystems& es,
 
   // The element shape functions evaluated at the quadrature points.
   const std::vector<std::vector<Real> >& phi = fe->get_phi();
+  const std::vector<std::vector<Real> >& psi = fe_face->get_phi();
 
   // The element shape function gradients evaluated at the quadrature
   // points.
   const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
+
+  // The XY locations of the quadrature points used for face integration
+  const std::vector<Point>& qface_points = fe_face->get_xyz();
 
   // Define data structures to contain the element matrix
   // and right-hand-side vector contribution.  Following
@@ -464,9 +472,6 @@ void assemble_laplace(EquationSystems& es,
   // processor to compute its components of the global matrix for
   // active elements while ignoring parent elements which have been
   // refined.
-//   const_active_local_elem_iterator           el (mesh.elements_begin());
-//   const const_active_local_elem_iterator end_el (mesh.elements_end());
-
   MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end(); 
   
@@ -530,14 +535,19 @@ void assemble_laplace(EquationSystems& es,
       // been completed.  However, we have not yet addressed
       // boundary conditions.  For this example we will only
       // consider simple Dirichlet boundary conditions imposed
-      // via the penalty method. This is discussed at length in
-      // example 3.
+      // via the penalty method.
+      //
+      // This approach adds the L2 projection of the boundary
+      // data in penalty form to the weak statement.  This is
+      // a more generic approach for applying Dirichlet BCs
+      // which is applicable to non-Lagrange finite element
+      // discretizations.
       {
 	// Start logging the boundary condition computation
 	perf_log.start_event ("BCs");
 
 	// The penalty value.  
-	const Real penalty = 1.e10;
+	const Real penalty = 1.e30;
 
 	// The following loops over the sides of the element.
 	// If the element has no neighbor on a side then that
@@ -545,38 +555,24 @@ void assemble_laplace(EquationSystems& es,
 	for (unsigned int s=0; s<elem->n_sides(); s++)
 	  if (elem->neighbor(s) == NULL)
 	    {
-	      // Get a pointer to the side.
-	      AutoPtr<Elem> side (elem->build_side(s));
+	      fe_face->reinit(elem,s);
 	      
-	      // Loop over the nodes on the side with NULL neighbor.
-	      for (unsigned int ns=0; ns<side->n_nodes(); ns++)
+	      for (unsigned int qp=0; qp<qface.n_points(); qp++)
 		{
-		  //const Real x = side->point(ns)(0);
-		  //const Real y = side->point(ns)(1);
-		  const Number value = exact_solution(side->point(ns),
-						      es.parameters,
-						      "null",
-						      "void");
-		  
-// 		  std::cout << "(x,y,bc)=("
-// 			    << x << ","
-// 			    << y << ","
-// 			    << value << ")"
-// 			    << std::endl;
-		  
-		  // Find the node on the element matching this node on
-		  // the side.  That defines where in the element matrix
-		  // the boundary condition will be applied.
-		  for (unsigned int n=0; n<dof_indices.size(); n++)
-		    if (elem->node(n) == side->node(ns))
-		      {
-			// Matrix contribution.
-			Ke(n,n) += penalty;
-			
-			// Right-hand-side contribution.
-			Fe(n) += penalty*value;
-		      }
-		} 
+		  const Number value = exact_solution (qface_points[qp],
+						       es.parameters,
+						       "null",
+						       "void");
+
+		  // RHS contribution
+		  for (unsigned int i=0; i<psi.size(); i++)
+		    Fe(i) += penalty*JxW_face[qp]*value*psi[i][qp];
+
+		  // Matrix contribution
+		  for (unsigned int i=0; i<psi.size(); i++)
+		    for (unsigned int j=0; j<psi.size(); j++)
+		      Ke(i,j) += penalty*JxW_face[qp]*psi[i][qp]*psi[j][qp];
+		}
 	    } 
 	
 	// Stop logging the boundary condition computation
