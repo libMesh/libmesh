@@ -1,4 +1,4 @@
-/* $Id: ex9.C,v 1.18 2005-06-06 14:53:17 jwpeterson Exp $ */
+/* $Id: ex9.C,v 1.19 2005-06-08 20:37:16 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -84,6 +84,16 @@ void init_cd (EquationSystems& es,
 Real exact_solution (const Real x,
 		     const Real y,
 		     const Real t);
+
+Number exact_value (const Point& p,
+		    const Parameters& parameters,
+		    const std::string&,
+		    const std::string&)
+{
+  return exact_solution(p(0), p(1), parameters.get<Real> ("time"));
+}
+
+
 
 // We can now begin the main program.  Note that this
 // example will fail if you are using complex numbers
@@ -230,66 +240,15 @@ void init_cd (EquationSystems& es,
   // It is a good idea to make sure we are initializing
   // the proper system.
   assert (system_name == "Convection-Diffusion");
-    
-  // Get a constant reference to the mesh object.
-  const Mesh& mesh = es.get_mesh();
-  
+
   // Get a reference to the Convection-Diffusion system object.
   TransientLinearImplicitSystem & system =
-    es.get_system<TransientLinearImplicitSystem> ("Convection-Diffusion");
-  
-  // Get a reference to the \p DofMap for this system.
-  const DofMap& dof_map = system.get_dof_map();
-  
-  // Get a reference to the solution vector.
-  NumericVector<Number>& solution = *system.solution;
-  
-  // A vector to hold the global DOF indices for this element.
-  std::vector<unsigned int> dof_indices;
+    es.get_system<TransientLinearImplicitSystem>("Convection-Diffusion");
 
-  // Loop over the active local elements and compute the initial value
-  // of the solution at the element degrees of freedom.  Assign
-  // these initial values to the solution vector.  There is a small
-  // catch, however...  We only want to assign the components that
-  // live on the local processor, hence there will be an if-test
-  // in the loop.
-  MeshBase::const_element_iterator       elem_it  = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end(); 
-
-  for ( ; elem_it != elem_end; ++elem_it)
-    {
-      const Elem* elem = *elem_it;
-
-      dof_map.dof_indices (elem, dof_indices);
-      
-      // For these Lagrange-elements the number
-      // of degrees of freedom should be <= the number
-      // of nodes.
-      assert (dof_indices.size() <= elem->n_nodes());
-
-      // Loop over the element DOFs, compute the initial
-      // value if the DOF is local to the processor.
-      for (unsigned int i=0; i<dof_indices.size(); i++)
-	if ((dof_indices[i] >= solution.first_local_index()) &&
-	    (dof_indices[i] <  solution.last_local_index()))
-	  {
-	    const Point&  p = elem->point (i);
-	    const Real    x = p(0);
-	    const Real    y = p(1);
-	    const Real time = 0.;
-	    
-	    solution.set (dof_indices[i],
-			  exact_solution (x,y,time));	    
-	  }	 
-    }
+  // Project initial conditions at time 0
+  es.parameters.set<Real> ("time") = 0;
   
-  // The initial solution has now been set for the local
-  // solution components.  However, the local matrix assembly
-  // will likely depend on solution components that live on
-  // other processors.  We need to get those components, and
-  // the TransientSystem::update() member will do that
-  // for us.
-  system.update ();
+  system.project_solution(exact_value, NULL, es.parameters);
 }
 
 
@@ -322,26 +281,34 @@ void assemble_cd (EquationSystems& es,
   // \p FEBase::build() member dynamically creates memory we will
   // store the object as an \p AutoPtr<FEBase>.  This can be thought
   // of as a pointer that will clean up after itself.
-  AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
+  AutoPtr<FEBase> fe      (FEBase::build(dim, fe_type));
+  AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
   
   // A Gauss quadrature rule for numerical integration.
   // Let the \p FEType object decide what order rule is appropriate.
-  QGauss qrule (dim, fe_type.default_quadrature_order());
+  QGauss qrule (dim,   fe_type.default_quadrature_order());
+  QGauss qface (dim-1, fe_type.default_quadrature_order());
 
   // Tell the finite element object to use our quadrature rule.
-  fe->attach_quadrature_rule (&qrule);
-  
+  fe->attach_quadrature_rule      (&qrule);
+  fe_face->attach_quadrature_rule (&qface);
+
   // Here we define some references to cell-specific data that
   // will be used to assemble the linear system.  We will start
   // with the element Jacobian * quadrature weight at each integration point.   
-  const std::vector<Real>& JxW = fe->get_JxW();
+  const std::vector<Real>& JxW      = fe->get_JxW();
+  const std::vector<Real>& JxW_face = fe_face->get_JxW();
   
   // The element shape functions evaluated at the quadrature points.
   const std::vector<std::vector<Real> >& phi = fe->get_phi();
-  
+  const std::vector<std::vector<Real> >& psi = fe_face->get_phi();
+
   // The element shape function gradients evaluated at the quadrature
   // points.
   const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
+
+  // The XY locations of the quadrature points used for face integration
+  const std::vector<Point>& qface_points = fe_face->get_xyz();
   
   // A reference to the \p DofMap object for this system.  The \p DofMap
   // object handles the index translation from node and element numbers
@@ -471,48 +438,40 @@ void assemble_cd (EquationSystems& es,
       // been completed.  However, we have not yet addressed
       // boundary conditions.  For this example we will only
       // consider simple Dirichlet boundary conditions imposed
-      // via the penalty method. The penalty method used here
-      // is equivalent (for Lagrange basis functions) to lumping
-      // the matrix resulting from the L2 projection penalty
-      // approach introduced in example 3.
+      // via the penalty method. 
       //	
       // The following loops over the sides of the element.
       // If the element has no neighbor on a side then that
       // side MUST live on a boundary of the domain.
-      for (unsigned int s=0; s<elem->n_sides(); s++)
-	if (elem->neighbor(s) == NULL)
-	  {
-	    AutoPtr<Elem> side (elem->build_side(s));
-	    
-	    
-	    // Loop over the nodes on the side.
-	    for (unsigned int ns=0; ns<side->n_nodes(); ns++)
-	      {
-		// The location on the boundary of the current
-		// node.
-		const Real xf = side->point(ns)(0);
-		const Real yf = side->point(ns)(1);
-		  
-		// The penalty value.  \f$ \frac{1}{\epsilon} \f$
-		const Real penalty = 1.e10;
-		  
-		// The boundary value.
-		const Real value = exact_solution(xf, yf, time);
+      {
+	// The penalty value.  
+	const Real penalty = 1.e30;
 
-		// Find the node on the element matching this node on
-		// the side.  That defined where in the element matrix
-		// the boundary condition will be applied.
-		for (unsigned int n=0; n<elem->n_nodes(); n++)
-		  if (elem->node(n) == side->node(ns))
-		    {
-		      // Matrix contribution.
-		      Ke(n,n) += penalty;
-		  		  
-		      // Right-hand-side contribution.
-		      Fe(n) += penalty*value;
-		    }
-	      } 
-	  }
+	// The following loops over the sides of the element.
+	// If the element has no neighbor on a side then that
+	// side MUST live on a boundary of the domain.
+	for (unsigned int s=0; s<elem->n_sides(); s++)
+	  if (elem->neighbor(s) == NULL)
+	    {
+	      fe_face->reinit(elem,s);
+	      
+	      for (unsigned int qp=0; qp<qface.n_points(); qp++)
+		{
+		  const Number value = exact_solution (qface_points[qp](0),
+						       qface_points[qp](1),
+						       time);
+						       
+		  // RHS contribution
+		  for (unsigned int i=0; i<psi.size(); i++)
+		    Fe(i) += penalty*JxW_face[qp]*value*psi[i][qp];
+
+		  // Matrix contribution
+		  for (unsigned int i=0; i<psi.size(); i++)
+		    for (unsigned int j=0; j<psi.size(); j++)
+		      Ke(i,j) += penalty*JxW_face[qp]*psi[i][qp]*psi[j][qp];
+		}
+	    } 
+      } 
 
       // The element matrix and right-hand-side are now built
       // for this element.  Add them to the global matrix and

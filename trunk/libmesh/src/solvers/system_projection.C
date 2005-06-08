@@ -1,4 +1,4 @@
-// $Id: system_projection.C,v 1.22 2005-06-08 04:10:19 roystgnr Exp $
+// $Id: system_projection.C,v 1.23 2005-06-08 20:37:16 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -797,14 +797,9 @@ void System::project_solution (Number fptr(const Point& p,
                                              const std::string& unknown_name),
                                Parameters& parameters) const
 {
-  this->project_vector(fptr, gptr, parameters, *current_local_solution);
+  this->project_vector(fptr, gptr, parameters, *solution);
 
-  const unsigned int first_local_dof = solution->first_local_index();
-  const unsigned int local_size      = solution->local_size();
-
-  for (unsigned int i=0; i<local_size; i++)
-    solution->set(i+first_local_dof,
-                  (*current_local_solution)(i+first_local_dof));
+  solution->localize(*current_local_solution);
 }
 
 
@@ -1260,9 +1255,14 @@ void System::project_vector (Number fptr(const Point& p,
 	  for (unsigned int i=0; i != n_dofs; ++i)
             assert(dof_is_fixed[i]);
 
+	  const unsigned int
+	    first = new_vector.first_local_index(),
+	    last  = new_vector.last_local_index();
+	  
           for (unsigned int i = 0; i < n_dofs; i++) 
 	    if (Ue(i) != 0.)
-              new_vector.set(dof_indices[i], Ue(i));
+	      if ((dof_indices[i] >= first) &&
+		  (dof_indices[i] <  last)) new_vector.set(dof_indices[i], Ue(i));
         }  // end elem loop
     } // end variables loop
 
