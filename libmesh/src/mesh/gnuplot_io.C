@@ -1,4 +1,4 @@
-// $Id: gnuplot_io.C,v 1.2 2005-06-06 17:49:04 jwpeterson Exp $
+// $Id: gnuplot_io.C,v 1.3 2005-06-08 16:11:18 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -19,11 +19,12 @@
 
 // C++ includes
 #include <fstream>
+#include <map>
 
 // Local includes
+#include "elem.h"
 #include "mesh_base.h"
 #include "gnuplot_io.h"
-#include "elem.h"
 
 GnuPlotIO::GnuPlotIO(const MeshBase& mesh, const std::string& title, bool grid)
   :
@@ -60,6 +61,10 @@ void GnuPlotIO::write_solution(const std::string& fname,
   assert(libMesh::processor_id() == 0);
 
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+
+  std::stringstream data_stream_name;
+  data_stream_name << fname << "_data";
+  const std::string data_file_name = data_stream_name.str();
   
   // This class is designed only for use with 1D meshes
   assert (mesh.mesh_dimension() == 1);
@@ -125,7 +130,7 @@ void GnuPlotIO::write_solution(const std::string& fname,
     out << "set x2tics (" << xtics << ")\nset grid noxtics noytics x2tics\n";
   }
 
-  out << "plot \"data\" using 1:2 title \"" << (*names)[0]
+  out << "plot \"" << data_file_name << "\" using 1:2 title \"" << (*names)[0]
       << "\" with lines";
   if(n_vars > 1)
   {
@@ -140,7 +145,7 @@ void GnuPlotIO::write_solution(const std::string& fname,
 
 
   // Create an output stream for data file
-  std::ofstream data("data");
+  std::ofstream data(data_file_name.c_str());
 
   if (!data.good())
     {
@@ -151,32 +156,44 @@ void GnuPlotIO::write_solution(const std::string& fname,
   data << "# This file contains libMesh solution data "
        << "to be plotted in GNUplot\n\n";
 
-  std::vector<double> ordered_nodes;
-  // First we need to put the nodes in increasing order
-  for(unsigned int i=0; i<mesh.n_nodes(); i++)
-  {
-    ordered_nodes.push_back(mesh.point(i)(0));
-  }
-  sort(ordered_nodes.begin(), ordered_nodes.end());
+  // get ordered nodal data using a map
+  typedef std::pair<Real, std::vector<Number> > key_value_pair;
+  typedef std::map<Real, std::vector<Number> > map_type;
+  typedef map_type::iterator map_iterator;
+
+  map_type node_map;
 
   for(unsigned int i=0; i<mesh.n_nodes(); i++)
   {
-    data << ordered_nodes[i] << "\t";
-    // write the corresponding solution values
+    std::vector<Number> values;
+
     if( (names != NULL) && (soln != NULL) )
     {
       assert(soln->size() == mesh.n_nodes()*n_vars);
-    
       for(unsigned int c=0; c<n_vars; c++)
       {
-        // index == node number of ordered_nodes[i] in mesh
-        for(unsigned int index=0; index<mesh.n_nodes(); index++)
-        {
-          if(mesh.point(index)(0) == ordered_nodes[i])
-            data << (*soln)[index*n_vars + c] << "\t";
-        }
+        values.push_back( (*soln)[i*n_vars + c] );
       }
     }
+
+    node_map.insert(key_value_pair( mesh.point(i)(0) , values ));
+  }
+
+  map_iterator map_it = node_map.begin();
+  const map_iterator end_map_it = node_map.end();
+
+  for( ; map_it != end_map_it; ++map_it)
+  {
+    key_value_pair kvp = *map_it;
+    std::vector<double> values = kvp.second;
+
+    data << kvp.first << "\t";
+
+    for(unsigned int i=0; i<values.size(); i++)
+    {
+      data << values[i] << "\t";
+    }
+
     data << "\n";
   }
 
