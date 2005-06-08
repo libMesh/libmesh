@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex16.C,v 1.30 2005-05-11 18:31:16 roystgnr Exp $
+// $Id: cell_inf_hex16.C,v 1.31 2005-06-08 08:13:27 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -107,88 +107,110 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i) const
 {
   assert (i < this->n_sides());
 
-  // Think of a unit cube: (-1,1) x (-1,1)x (1,1)
   switch (i)
     {
-    case 0: // the base face
+      // base
+    case 0:
       {
-	AutoPtr<Elem> face(new Quad8);
-
-	// Only here, the face element's normal points inward
-	face->set_node(0) = this->get_node(0);
-	face->set_node(1) = this->get_node(1);
-	face->set_node(2) = this->get_node(2);
-	face->set_node(3) = this->get_node(3);
-	face->set_node(4) = this->get_node(8);
-	face->set_node(5) = this->get_node(9);
-	face->set_node(6) = this->get_node(10);
-	face->set_node(7) = this->get_node(11);
-
-	return face;
+	AutoPtr<Elem> ap(new Side<Quad8,InfHex16>(this,i));
+	return ap;
       }
-
-    case 1:  // connecting to another infinite element
+      // ifem sides
+    case 1:
+    case 2:
+    case 3:
+    case 4:
       {
-	AutoPtr<Elem> face(new InfQuad6);
-
-	face->set_node(0) = this->get_node(0);
-	face->set_node(1) = this->get_node(1);
-	face->set_node(2) = this->get_node(4);
-	face->set_node(3) = this->get_node(5);
-	face->set_node(4) = this->get_node(8);
-	face->set_node(5) = this->get_node(12);
-
-	return face;
+	AutoPtr<Elem> ap(new Side<InfQuad6,InfHex16>(this,i));
+	return ap;
       }
-
-    case 2:  // connecting to another infinite element
-      {
-	AutoPtr<Elem> face(new InfQuad6);
-
-	face->set_node(0) = this->get_node(1);
-	face->set_node(1) = this->get_node(2);
-	face->set_node(2) = this->get_node(5);
-	face->set_node(3) = this->get_node(6);
-	face->set_node(4) = this->get_node(9);
-	face->set_node(5) = this->get_node(13);
-
-	return face;
-      }
-
-    case 3:  // connecting to another infinite element
-      {
-	AutoPtr<Elem> face(new InfQuad6);
-	
-	face->set_node(0) = this->get_node(2);
-	face->set_node(1) = this->get_node(3);
-	face->set_node(2) = this->get_node(6);
-	face->set_node(3) = this->get_node(7);
-	face->set_node(4) = this->get_node(10);
-	face->set_node(5) = this->get_node(14);
-
-	return face;
-      }
-
-    case 4:  // connecting to another infinite element
-      {
-	AutoPtr<Elem> face(new InfQuad6);
-
-	face->set_node(0) = this->get_node(3);
-	face->set_node(1) = this->get_node(0);
-	face->set_node(2) = this->get_node(7);
-	face->set_node(3) = this->get_node(4);
-	face->set_node(4) = this->get_node(11);
-	face->set_node(5) = this->get_node(15);
-
-	return face;
-      }
-
     default:
-      {
-	error();
-	AutoPtr<Elem> ap(NULL);  return ap;
-      }
+      error();
     }
+
+
+  // Think of a unit cube: (-1,1) x (-1,1)x (1,1)
+//   switch (i)
+//     {
+//     case 0: // the base face
+//       {
+// 	AutoPtr<Elem> face(new Quad8);
+
+// 	// Only here, the face element's normal points inward
+// 	face->set_node(0) = this->get_node(0);
+// 	face->set_node(1) = this->get_node(1);
+// 	face->set_node(2) = this->get_node(2);
+// 	face->set_node(3) = this->get_node(3);
+// 	face->set_node(4) = this->get_node(8);
+// 	face->set_node(5) = this->get_node(9);
+// 	face->set_node(6) = this->get_node(10);
+// 	face->set_node(7) = this->get_node(11);
+
+// 	return face;
+//       }
+
+//     case 1:  // connecting to another infinite element
+//       {
+// 	AutoPtr<Elem> face(new InfQuad6);
+
+// 	face->set_node(0) = this->get_node(0);
+// 	face->set_node(1) = this->get_node(1);
+// 	face->set_node(2) = this->get_node(4);
+// 	face->set_node(3) = this->get_node(5);
+// 	face->set_node(4) = this->get_node(8);
+// 	face->set_node(5) = this->get_node(12);
+
+// 	return face;
+//       }
+
+//     case 2:  // connecting to another infinite element
+//       {
+// 	AutoPtr<Elem> face(new InfQuad6);
+
+// 	face->set_node(0) = this->get_node(1);
+// 	face->set_node(1) = this->get_node(2);
+// 	face->set_node(2) = this->get_node(5);
+// 	face->set_node(3) = this->get_node(6);
+// 	face->set_node(4) = this->get_node(9);
+// 	face->set_node(5) = this->get_node(13);
+
+// 	return face;
+//       }
+
+//     case 3:  // connecting to another infinite element
+//       {
+// 	AutoPtr<Elem> face(new InfQuad6);
+	
+// 	face->set_node(0) = this->get_node(2);
+// 	face->set_node(1) = this->get_node(3);
+// 	face->set_node(2) = this->get_node(6);
+// 	face->set_node(3) = this->get_node(7);
+// 	face->set_node(4) = this->get_node(10);
+// 	face->set_node(5) = this->get_node(14);
+
+// 	return face;
+//       }
+
+//     case 4:  // connecting to another infinite element
+//       {
+// 	AutoPtr<Elem> face(new InfQuad6);
+
+// 	face->set_node(0) = this->get_node(3);
+// 	face->set_node(1) = this->get_node(0);
+// 	face->set_node(2) = this->get_node(7);
+// 	face->set_node(3) = this->get_node(4);
+// 	face->set_node(4) = this->get_node(11);
+// 	face->set_node(5) = this->get_node(15);
+
+// 	return face;
+//       }
+
+//     default:
+//       {
+// 	error();
+// 	AutoPtr<Elem> ap(NULL);  return ap;
+//       }
+//     }
 
   // We'll never get here.
   error();

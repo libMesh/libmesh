@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism6.h,v 1.10 2005-06-06 16:23:56 knezed01 Exp $
+// $Id: cell_inf_prism6.h,v 1.11 2005-06-08 08:13:41 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -117,19 +117,18 @@ public:
   /**
    * Returns a \p TRI3 built coincident with face 0, an \p INFQUAD4 
    * built coincident with faces 1 to 3.  Note that the \p AutoPtr<Elem>
-   * takes care of freeing memory.  Here, this method is the same as 
-   * the \p InfPrism::side(i).
+   * takes care of freeing memory.
    */
-  AutoPtr<Elem> build_side (const unsigned int i) const 
-  { 
-    // side() returns an AutoPtr to a DofObject, hence need to cast to Elem*
-    AutoPtr<DofObject> ap_dof_object(this->side(i));
-    Elem* side = dynamic_cast<Elem*>(ap_dof_object.release());
-    assert(side); // assert that the cast was successful
+  AutoPtr<Elem> build_side (const unsigned int i) const;
+/*   {  */
+/*     // side() returns an AutoPtr to a DofObject, hence need to cast to Elem* */
+/*     AutoPtr<DofObject> ap_dof_object(this->side(i)); */
+/*     Elem* side = dynamic_cast<Elem*>(ap_dof_object.release()); */
+/*     assert(side); // assert that the cast was successful */
     
-    AutoPtr<Elem> ap(side);
-    return ap;
-  }
+/*     AutoPtr<Elem> ap(side); */
+/*     return ap; */
+/*   } */
   
   /**
    * Returns a \p EDGE2 built coincident with edges 0 to 2, an \p INFEDGE2
