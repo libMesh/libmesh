@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex8.C,v 1.30 2005-05-11 18:31:16 roystgnr Exp $
+// $Id: cell_inf_hex8.C,v 1.31 2005-06-08 08:13:28 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -28,6 +28,8 @@
 #include "cell_inf_hex8.h"
 #include "edge_edge2.h"
 #include "edge_inf_edge2.h"
+#include "face_quad4.h"
+#include "face_inf_quad4.h"
 #include "fe_interface.h"
 #include "fe_type.h"
 #include "side.h"
@@ -98,6 +100,37 @@ bool InfHex8::is_node_on_edge(const unsigned int n,
       return true;
   return false;
 }
+
+AutoPtr<Elem> InfHex8::build_side (const unsigned int i) const
+{
+  assert (i < this->n_sides());
+
+  switch (i)
+    {
+      // base
+    case 0:
+      {
+	AutoPtr<Elem> ap(new Side<Quad4,InfHex8>(this,i));
+	return ap;
+      }
+      // ifem sides
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+      {
+	AutoPtr<Elem> ap(new Side<InfQuad4,InfHex8>(this,i));
+	return ap;
+      }
+    default:
+      error();
+    }
+
+  // We'll never get here.
+  error();
+  AutoPtr<Elem> ap(NULL);  return ap;
+}
+
 
 AutoPtr<Elem> InfHex8::build_edge (const unsigned int i) const
 {

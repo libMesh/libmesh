@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism6.C,v 1.29 2005-05-11 18:31:16 roystgnr Exp $
+// $Id: cell_inf_prism6.C,v 1.30 2005-06-08 08:13:28 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -31,7 +31,8 @@
 #include "fe_interface.h"
 #include "fe_type.h"
 #include "side.h"
-
+#include "face_inf_quad4.h"
+#include "face_tri3.h"
 
 
 // ------------------------------------------------------------
@@ -96,6 +97,38 @@ bool InfPrism6::is_node_on_edge(const unsigned int n,
       return true;
   return false;
 }
+
+
+AutoPtr<Elem> InfPrism6::build_side (const unsigned int i) const
+{
+  assert (i < this->n_sides());
+
+  switch (i)
+    {
+      // base
+    case 0:
+      {
+	AutoPtr<Elem> ap(new Side<Tri3,InfPrism6>(this,i));
+	return ap;
+      }
+      // ifem sides
+    case 1:
+    case 2:
+    case 3:
+      {
+	AutoPtr<Elem> ap(new Side<InfQuad4,InfPrism6>(this,i));
+	return ap;
+      }
+    default:
+      error();
+    }
+  
+
+  // We will never get here...  Look at the code above.
+  error();
+  AutoPtr<Elem> ap(NULL);  return ap;
+}
+
 
 AutoPtr<Elem> InfPrism6::build_edge (const unsigned int i) const
 {
@@ -166,6 +199,7 @@ bool InfPrism6::contains_point (const Point& p) const
       return FEInterface::on_reference_element(mapped_point, this->type());
     }
 }
+
 
 
 
