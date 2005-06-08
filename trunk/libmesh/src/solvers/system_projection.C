@@ -1,4 +1,4 @@
-// $Id: system_projection.C,v 1.23 2005-06-08 20:37:16 benkirk Exp $
+// $Id: system_projection.C,v 1.24 2005-06-08 20:56:24 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -123,9 +123,9 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 
       // Prepare variables for non-Lagrange projection
       int order = fe->get_order();
-      QGauss qrule       (dim, libMeshEnums::Order(order*2));
-      QGauss qedgerule   (1, libMeshEnums::Order(order*2));
-      QGauss qsiderule   (dim-1, libMeshEnums::Order(order*2));
+      AutoPtr<QBase> qrule (fe_type.default_quadrature_rule(dim));
+      AutoPtr<QBase> qedgerule (fe_type.default_quadrature_rule(1));
+      AutoPtr<QBase> qsiderule (fe_type.default_quadrature_rule(dim-1));
       std::vector<Point> coarse_qpoints;
 
       // The values of the shape functions at the quadrature
@@ -239,11 +239,11 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 	    if (elem->refinement_flag() == Elem::JUST_REFINED)
 	      {
 	        // Update the fe object based on the current child
-                fe->attach_quadrature_rule (&qrule);
+                fe->attach_quadrature_rule (qrule.get());
 	        fe->reinit (elem);
 	  
 	        // The number of quadrature points on the child
-	        const unsigned int n_qp = qrule.n_points();
+	        const unsigned int n_qp = qrule->n_points();
 
                 FEInterface::inverse_map (dim, fe_type, parent,
 					  xyz_values, coarse_qpoints);
@@ -361,9 +361,9 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 
                           // Initialize both child and parent FE data
                           // on the child's edge
-                          fe->attach_quadrature_rule (&qedgerule);
+                          fe->attach_quadrature_rule (qedgerule.get());
 	                  fe->edge_reinit (child, e);
-	                  const unsigned int n_qp = qedgerule.n_points();
+	                  const unsigned int n_qp = qedgerule->n_points();
 
                           FEInterface::inverse_map (dim, fe_type, elem,
 					  xyz_values, coarse_qpoints);
@@ -491,9 +491,9 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 
                           // Initialize both child and parent FE data
                           // on the child's side
-                          fe->attach_quadrature_rule (&qsiderule);
+                          fe->attach_quadrature_rule (qsiderule.get());
 	                  fe->reinit (child, s);
-	                  const unsigned int n_qp = qsiderule.n_points();
+	                  const unsigned int n_qp = qsiderule->n_points();
 
                           FEInterface::inverse_map (dim, fe_type, elem,
 					  xyz_values, coarse_qpoints);
@@ -608,9 +608,9 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 
                     // Initialize both child and parent FE data
                     // on the child's quadrature points
-                    fe->attach_quadrature_rule (&qrule);
+                    fe->attach_quadrature_rule (qrule.get());
 	            fe->reinit (child);
-	            const unsigned int n_qp = qrule.n_points();
+	            const unsigned int n_qp = qrule->n_points();
 
 		    FEInterface::inverse_map (dim, fe_type, elem,
                       xyz_values, coarse_qpoints);
@@ -859,9 +859,9 @@ void System::project_vector (Number fptr(const Point& p,
 
       // Prepare variables for projection
       int order = fe->get_order();
-      QGauss qrule       (dim, libMeshEnums::Order(order*2));
-      QGauss qedgerule   (1, libMeshEnums::Order(order*2));
-      QGauss qsiderule   (dim-1, libMeshEnums::Order(order*2));
+      AutoPtr<QBase> qrule (fe_type.default_quadrature_rule(dim));
+      AutoPtr<QBase> qedgerule (fe_type.default_quadrature_rule(1));
+      AutoPtr<QBase> qsiderule (fe_type.default_quadrature_rule(dim-1));
 
       // The values of the shape functions at the quadrature
       // points
@@ -1009,9 +1009,9 @@ void System::project_vector (Number fptr(const Point& p,
                 DenseVector<Number> Uedge(free_dofs);
 
                 // Initialize FE data on the edge
-                fe->attach_quadrature_rule (&qedgerule);
+                fe->attach_quadrature_rule (qedgerule.get());
 	        fe->edge_reinit (elem, e);
-	        const unsigned int n_qp = qedgerule.n_points();
+	        const unsigned int n_qp = qedgerule->n_points();
 
 	        // Loop over the quadrature points
 	        for (unsigned int qp=0; qp<n_qp; qp++)
@@ -1100,9 +1100,9 @@ void System::project_vector (Number fptr(const Point& p,
                 DenseVector<Number> Uside(free_dofs);
 
                 // Initialize FE data on the side
-                fe->attach_quadrature_rule (&qsiderule);
+                fe->attach_quadrature_rule (qsiderule.get());
 	        fe->reinit (elem, s);
-	        const unsigned int n_qp = qsiderule.n_points();
+	        const unsigned int n_qp = qsiderule->n_points();
 
 	        // Loop over the quadrature points
 	        for (unsigned int qp=0; qp<n_qp; qp++)
@@ -1186,9 +1186,9 @@ void System::project_vector (Number fptr(const Point& p,
           DenseVector<Number> Uint(free_dofs);
 
           // Initialize FE data
-          fe->attach_quadrature_rule (&qrule);
+          fe->attach_quadrature_rule (qrule.get());
 	  fe->reinit (elem);
-	  const unsigned int n_qp = qrule.n_points();
+	  const unsigned int n_qp = qrule->n_points();
 
 	  // Loop over the quadrature points
 	  for (unsigned int qp=0; qp<n_qp; qp++)
