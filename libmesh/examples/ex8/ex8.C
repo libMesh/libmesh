@@ -1,4 +1,4 @@
-/* $Id: ex8.C,v 1.16 2005-06-06 14:53:17 jwpeterson Exp $ */
+/* $Id: ex8.C,v 1.17 2005-06-09 15:16:03 benkirk Exp $ */
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
 
@@ -123,9 +123,10 @@ int main (int argc, char** argv)
     // LasPack solvers don't work so well for this example
     // (not sure why).  Print a warning to the user if PETSc
     // is not available, or if they are using LasPack solvers.
-    if ((!HAVE_PETSC) ||
-	(libMesh::on_command_line("--use-laspack")) ||
+#ifdef HAVE_PETSC
+    if ((libMesh::on_command_line("--use-laspack")) ||
 	(libMesh::on_command_line("--disable-petsc")))
+#endif
       {
 	std::cerr << "WARNING! It appears you are using the\n"
 		  << "LasPack solvers.  ex8 is known not to converge\n"
