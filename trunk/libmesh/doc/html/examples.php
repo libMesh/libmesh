@@ -22,6 +22,21 @@ menu on the left to navigate the examples.
 
 
 
+<h2><a href="ex0.php">Example 0</a> - Solving 1D PDE Using Adaptive Mesh Refinement</h2>
+This example demonstrates how to solve a simple 1D problem using
+adaptive mesh refinement. The PDE that is solved is: -epsilon*u''(x) +
+u(x) = 1, on the domain [0,1] with boundary conditions u(0) = u(1) = 0
+and where epsilon << 1.
+
+<br>
+The approach used to solve 1D problems in libMesh is virtually
+identical to solving 2D or 3D problems, so in this sense this example
+represents a good starting point for new users. Note that many
+concepts are used in this example which are explained more fully in
+subsequent examples.
+
+
+
 
 <h2><a href="ex1.php">Example 1</a> - Creation of a Mesh Object</h2>
 This is the first example program.  It simply demonstrates
