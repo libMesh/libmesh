@@ -3133,8 +3133,7 @@ echo "${ECHO_T}proper compiler flags" >&6
               CFLAGS_DVL="$CFLAGS_DBG"
               ;;
 
-                    intel_itanium_icc_v9.0)
-          intel_itanium_icc_v8.1)
+                    intel_itanium_icc_v9.0 | intel_itanium_icc_v8.1)
                                                                                 	                                                                                      CXXFLAGS_DBG="-Kc++eh -Krtti -w1 -inline_debug_info -g -wd1476 -wd1505 -wd1572"
               CXXFLAGS_OPT="-Kc++eh -Krtti -O2 -unroll -w0 -ftz -vec_report0 -par_report0 -openmp_report0"
               CXXFLAGS_DVL="$CXXFLAGS_DBG"
@@ -8221,7 +8220,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:8224:" \
+echo "$as_me:8223:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -8415,7 +8414,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_verb"
-(eval echo $as_me:8418: \"$ac_link\") >&5
+(eval echo $as_me:8417: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -8493,7 +8492,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_cv_prog_f77_v"
-(eval echo $as_me:8496: \"$ac_link\") >&5
+(eval echo $as_me:8495: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS

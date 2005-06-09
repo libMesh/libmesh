@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.91 2005-06-09 19:15:10 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.92 2005-06-09 19:16:38 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -428,8 +428,7 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
               ;;
           
           dnl Intel Itanium ICC >= v8.1
-          intel_itanium_icc_v9.0)
-          intel_itanium_icc_v8.1)
+          intel_itanium_icc_v9.0 | intel_itanium_icc_v8.1)
               dnl Disable some warning messages:
               dnl #266: 'function declared implicitly'
               dnl       Metis function "GKfree" caused this error
