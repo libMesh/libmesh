@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.90 2005-06-09 18:28:53 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.91 2005-06-09 19:15:10 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -127,10 +127,14 @@ AC_DEFUN(DETERMINE_CXX_BRAND, dnl
         else	
   	
           dnl Intel's ICC C++ compiler for Itanium?
-          is_intel_ecc="`($CXX -V 2>&1) | grep 'Intel(R) C++ Itanium(R) Compiler'`"
+          is_intel_ecc="`($CXX -V 2>&1) | grep 'Intel(R) C' | grep 'Itanium(R) Compiler'`"
           if test "x$is_intel_ecc" != "x" ; then
             GXX_VERSION_STRING="`($CXX -V -help 2>&1) | grep 'Version '`"
             case "$GXX_VERSION_STRING" in
+              *9.0*)
+                AC_MSG_RESULT(<<< C++ compiler is Intel Itanium ICC 9.0 >>>)
+  	        GXX_VERSION=intel_itanium_icc_v9.0
+                ;;
               *8.1*)
                 AC_MSG_RESULT(<<< C++ compiler is Intel Itanium ICC 8.1 >>>)
   	        GXX_VERSION=intel_itanium_icc_v8.1
@@ -424,6 +428,7 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
               ;;
           
           dnl Intel Itanium ICC >= v8.1
+          intel_itanium_icc_v9.0)
           intel_itanium_icc_v8.1)
               dnl Disable some warning messages:
               dnl #266: 'function declared implicitly'
