@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.89 2005-06-02 18:25:37 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.90 2005-06-09 18:28:53 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -172,7 +172,7 @@ AC_DEFUN(DETERMINE_CXX_BRAND, dnl
                 else
   	
   	          dnl Cray C++?
-  	          is_cray_cc="`($CXX -V 2>&1) | grep 'Cray Standard'`"
+  	          is_cray_cc="`($CXX -V 2>&1) | grep 'Cray '`"
   	          if test "x$is_cray_cc" != "x" ; then
   	            AC_MSG_RESULT(<<< C++ compiler is Cray C++ >>>)
   	            GXX_VERSION=cray_cc
