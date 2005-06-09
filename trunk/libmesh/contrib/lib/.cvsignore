@@ -7,4 +7,4 @@ ia64-unknown-linux-gnu*
 sparc-sun-solaris*
 ii_files
 so_locations
-powerpc-ibm*
+powerpc-*
