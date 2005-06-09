@@ -1,4 +1,4 @@
-// $Id: petsc_nonlinear_solver.C,v 1.13 2005-05-11 23:12:00 benkirk Exp $
+// $Id: petsc_nonlinear_solver.C,v 1.14 2005-06-09 15:25:59 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -160,9 +160,21 @@ void PetscNonlinearSolver<T>::init ()
       this->_is_initialized = true;
       
       int ierr=0;
-      
+
+# if ((PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 1) && (PETSC_VERSION_SUBMINOR <= 1))
+
+      // At least until Petsc 2.1.1, the SNESCreate had a different calling syntax.
+      // The second argument was of type SNESProblemType, and could have a value of
+      // either SNES_NONLINEAR_EQUATIONS or SNES_UNCONSTRAINED_MINIMIZATION.
+      ierr = SNESCreate(libMesh::COMM_WORLD, SNES_NONLINEAR_EQUATIONS, &_snes);
+             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+#else
+
       ierr = SNESCreate(libMesh::COMM_WORLD,&_snes);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+#endif	     
 
       ierr = SNESSetMonitor (_snes, __libmesh_petsc_snes_monitor,
 			     this, PETSC_NULL);
