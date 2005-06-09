@@ -1,4 +1,4 @@
-// $Id: gnuplot_io.C,v 1.5 2005-06-08 17:07:03 knezed01 Exp $
+// $Id: gnuplot_io.C,v 1.6 2005-06-09 16:57:52 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -19,6 +19,7 @@
 
 // C++ includes
 #include <fstream>
+#include <sstream>
 #include <map>
 
 // Local includes
@@ -43,8 +44,8 @@ void GnuPlotIO::write(const std::string& fname)
 }
 
 void GnuPlotIO::write_nodal_data (const std::string& fname,
-                       const std::vector<Number>& soln,
-                       const std::vector<std::string>& names)
+				  const std::vector<Number>& soln,
+				  const std::vector<std::string>& names)
 {
   if(libMesh::processor_id() == 0)
     this->write_solution(fname, &soln, &names);
