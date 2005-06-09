@@ -1,4 +1,4 @@
-/* $Id: ex0.C,v 1.1 2005-06-06 16:23:54 knezed01 Exp $ */
+/* $Id: ex0.C,v 1.2 2005-06-09 01:09:37 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -17,7 +17,7 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
- // <h1>Example 0 - Solving 1D PDE Using Adaptive Mesh Refinme</h1>
+ // <h1>Example 0 - Solving 1D PDE Using Adaptive Mesh Refinement</h1>
  // 
  // This example demonstrates how to solve a simple 1D problem
  // using adaptive mesh refinement. The PDE that is solved is:

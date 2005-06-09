@@ -35,7 +35,7 @@ function load_style($root)
 
     <?php if (ereg("^ex[1-9]+|examples",$mode))
             {
-              for ($i=1; $i<17; $i++)
+              for ($i=0; $i<17; $i++)
                 {
                   make_example_subs($i, $root, $mode);
                 }
