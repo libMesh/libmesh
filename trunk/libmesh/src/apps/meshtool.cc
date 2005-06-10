@@ -19,6 +19,7 @@
 
 // Local Includes
 #include "libmesh.h"
+#include "elem.h"
 #include "mesh.h"
 #include "mesh_modification.h"
 #include "boundary_mesh.h"
