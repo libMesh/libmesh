@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.36 2005-06-06 16:24:14 knezed01 Exp $
+// $Id: mesh_generation.C,v 1.37 2005-06-10 20:27:10 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -30,6 +30,7 @@
 // #include "mesh_refinement.h"
 #include "edge_edge2.h"
 #include "edge_edge3.h"
+#include "edge_edge4.h"
 #include "face_tri3.h"
 #include "face_tri6.h"
 #include "face_quad4.h"
@@ -82,6 +83,7 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
           {
           case EDGE2:
           case EDGE3:
+          case EDGE4:
             {
 	      mesh.reserve_elem (nx);
               break;
@@ -109,6 +111,12 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
               break;
             }
 
+          case EDGE4:
+            {
+              mesh.reserve_nodes(3*nx+1);
+              break;
+            }
+
           default:
             {
               std::cerr << "ERROR: Unrecognized 1D element type." << std::endl;
@@ -117,8 +125,8 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
           }
 
 
-        // Build the nodes, depends on whether we're using linears or 
-        // quadratics and whether using uniform grid or Gauss-Lobatto
+        // Build the nodes, depends on whether we're using linears, 
+        // quadratics or cubics and whether using uniform grid or Gauss-Lobatto
         switch(type)
         {
           case EDGE2:
@@ -150,7 +158,6 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
                   const Real pi = libMesh::pi;
 
                   // Shortcut quantities (do not depend on i)
-                  const Real a = cos( pi / static_cast<Real>(2*nx) );
                   const Real c = cos( pi*i / static_cast<Real>(2*nx) );
 
                   // If i is even, compute a normal Gauss-Lobatto point
@@ -159,7 +166,14 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 
                   // Otherwise, it is the average of the previous and next points
                   else
-                    x = 0.5*(1.0 - a*c);
+                  {
+                    Real cmin = cos( pi*(i-1) / static_cast<Real>(2*nx) );
+                    Real cmax = cos( pi*(i+1) / static_cast<Real>(2*nx) );
+                    
+                    Real xmin = 0.5*(1.0 - cmin);
+                    Real xmax = 0.5*(1.0 - cmax);
+                    x = 0.5*(xmin + xmax);
+                  }
 
                   mesh.add_point (Point(x,0.,0.));
                 }
@@ -168,6 +182,64 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
                         0,
                         0));
               }
+              break;
+            }
+
+          case EDGE4:
+            {
+              for (unsigned int i=0; i<=3*nx; i++)
+              {
+                if (gauss_lobatto_grid)
+                {
+                  // The x location of the point
+                  Real x=0.;
+                  
+                  const Real pi = libMesh::pi;
+
+                  // Shortcut quantities
+                  const Real c = cos( pi*i / static_cast<Real>(3*nx) );
+
+                  // If i is multiple of 3, compute a normal Gauss-Lobatto point
+                  if (i%3 == 0)
+                    x = 0.5*(1.0 - c);
+
+                  // Otherwise, distribute points evenly within the element
+                  else
+                  {
+                    if(i%3 == 1)
+                    {
+                      Real cmin = cos( pi*(i-1) / static_cast<Real>(3*nx) );
+                      Real cmax = cos( pi*(i+2) / static_cast<Real>(3*nx) );
+
+                      Real xmin = 0.5*(1.0 - cmin);
+                      Real xmax = 0.5*(1.0 - cmax);
+
+                      x = (2.*xmin + xmax)/3.;
+                    }
+                    else
+                    if(i%3 == 2)
+                    {
+                      Real cmin = cos( pi*(i-2) / static_cast<Real>(3*nx) );
+                      Real cmax = cos( pi*(i+1) / static_cast<Real>(3*nx) );
+
+                      Real xmin = 0.5*(1.0 - cmin);
+                      Real xmax = 0.5*(1.0 - cmax);
+
+                      x = (xmin + 2.*xmax)/3.;
+                    }
+
+                  }
+
+                  mesh.add_point (Point(x,0.,0.));
+                }
+                else
+                mesh.add_point (Point(static_cast<Real>(i)/static_cast<Real>(3*nx),
+                        0,
+                        0));
+              }
+
+
+            
               break;
             }
             
@@ -201,6 +273,19 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
                   elem->set_node(0) = mesh.node_ptr(2*i);
                   elem->set_node(2) = mesh.node_ptr(2*i+1);
                   elem->set_node(1) = mesh.node_ptr(2*i+2);
+                }
+              break;
+              }
+
+            case EDGE4:
+              {
+                for (unsigned int i=0; i<nx; i++)
+                {
+                  Elem* elem = mesh.add_elem (new Edge4);
+                  elem->set_node(0) = mesh.node_ptr(3*i);
+                  elem->set_node(2) = mesh.node_ptr(3*i+1);
+                  elem->set_node(3) = mesh.node_ptr(3*i+2);
+                  elem->set_node(1) = mesh.node_ptr(3*i+3);
                 }
               break;
               }
