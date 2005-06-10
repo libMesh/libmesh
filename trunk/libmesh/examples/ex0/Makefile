@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.2 2005-06-10 03:02:37 knezed01 Exp $
+# $Id: Makefile,v 1.3 2005-06-10 15:25:01 knezed01 Exp $
 
 
 # The location of the mesh library
@@ -41,7 +41,7 @@ all:: $(target)
 # Production rules:  how to make the target
 $(target): $(objects)
 	@echo "Linking "$@"..."
-	$(CXX) $(CXXFLAGS) $(objects) -o $@ $(LIBS) $(LDFLAGS) $(EXTERNAL_FLAGS) -lz
+	@$(CXX) $(CXXFLAGS) $(objects) -o $@ $(LIBS) $(LDFLAGS) $(EXTERNAL_FLAGS) -lz
 
 
 # Useful rules.
