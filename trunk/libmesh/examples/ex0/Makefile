@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.1 2005-06-06 16:23:54 knezed01 Exp $
+# $Id: Makefile,v 1.2 2005-06-10 03:02:37 knezed01 Exp $
 
 
 # The location of the mesh library
@@ -38,19 +38,19 @@ target 	   := ./ex0
 
 all:: $(target)
 
-# Production rules:  how to make the target - depends on library configuration
+# Production rules:  how to make the target
 $(target): $(objects)
 	@echo "Linking "$@"..."
-	@$(CXX) $(CXXFLAGS) $(objects) -o $@ $(LIBS) $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) $(objects) -o $@ $(LIBS) $(LDFLAGS) $(EXTERNAL_FLAGS) -lz
 
 
 # Useful rules.
 clean:
-	@rm -f $(objects) *~ *.gmv data gnuplot_script
+	@rm -f $(objects) *~
 
 clobber:
 	@$(MAKE) clean
-	@rm -f $(target) 
+	@rm -f $(target)
 
 distclean:
 	@$(MAKE) clobber
@@ -58,13 +58,13 @@ distclean:
 
 run: $(target)
 	@echo "***************************************************************"
-	@echo "* Running " $(target)
+	@echo "* Running Example " $(target)
 	@echo "***************************************************************"
 	@echo " "
-	@$(target) 
+	@$(target)
 	@echo " "
 	@echo "***************************************************************"
-	@echo "* Done Running " $(target)
+	@echo "* Done Running Example " $(target)
 	@echo "***************************************************************"
 #
 # Dependencies
