@@ -1,4 +1,4 @@
-// $Id: gnuplot_io.C,v 1.6 2005-06-09 16:57:52 benkirk Exp $
+// $Id: gnuplot_io.C,v 1.7 2005-06-10 18:57:52 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -69,7 +69,9 @@ void GnuPlotIO::write_solution(const std::string& fname,
   
   // This class is designed only for use with 1D meshes
   assert (mesh.mesh_dimension() == 1);
-  
+
+  // Make sure we have a solution to plot
+  assert ((names != NULL) && (soln != NULL));
 
   // Create an output stream for script file
   std::ofstream out(fname.c_str());
@@ -164,22 +166,31 @@ void GnuPlotIO::write_solution(const std::string& fname,
 
   map_type node_map;
 
-  for(unsigned int i=0; i<mesh.n_nodes(); i++)
-  {
-    std::vector<Number> values;
 
-    if( (names != NULL) && (soln != NULL) )
+  MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+  const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+
+  for ( ; it != end; ++it)
+  {
+    const Elem* elem = *it;
+
+    for(unsigned int i=0; i<elem->n_nodes(); i++)
     {
-      assert(soln->size() == mesh.n_nodes()*n_vars);
+      std::vector<Number> values;
+
+      // Get the global id of the node
+      unsigned int global_id = elem->node(i);
+
       for(unsigned int c=0; c<n_vars; c++)
       {
-        values.push_back( (*soln)[i*n_vars + c] );
+        values.push_back( (*soln)[global_id*n_vars + c] );
       }
-    }
 
-    node_map.insert(key_value_pair( mesh.point(i)(0) , values ));
+      node_map[ mesh.point(global_id)(0) ] = values;
+    }
   }
 
+    
   map_iterator map_it = node_map.begin();
   const map_iterator end_map_it = node_map.end();
 
