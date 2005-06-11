@@ -1,4 +1,4 @@
-/* $Id: ex7.C,v 1.40 2005-06-07 12:52:21 spetersen Exp $ */
+/* $Id: ex7.C,v 1.41 2005-06-11 03:59:17 jwpeterson Exp $ */
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
 
@@ -78,6 +78,10 @@
 // Define the DofMap, which handles degree of freedom
 // indexing.
 #include "dof_map.h"
+
+// Defines the MeshData class, which allows you to store
+// data about the mesh when reading in files, etc.
+#include "mesh_data.h"
 
 // Function prototype.  This is the function that will assemble
 // the mass, damping and stiffness matrices.  It will <i>not</i>

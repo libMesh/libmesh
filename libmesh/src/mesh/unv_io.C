@@ -1,4 +1,4 @@
-// $Id: unv_io.C,v 1.20 2005-06-06 14:53:19 jwpeterson Exp $
+// $Id: unv_io.C,v 1.21 2005-06-11 03:59:18 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -39,6 +39,7 @@
 #include "cell_hex20.h"
 #include "cell_tet10.h"
 #include "cell_prism6.h"
+#include "equation_systems.h"
 
 #ifdef HAVE_GZSTREAM
 # include "gzstream.h" // For reading/writing compressed streams

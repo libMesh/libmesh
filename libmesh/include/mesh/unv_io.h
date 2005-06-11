@@ -1,4 +1,4 @@
-// $Id: unv_io.h,v 1.6 2005-02-22 22:17:33 jwpeterson Exp $
+// $Id: unv_io.h,v 1.7 2005-06-11 03:59:17 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -34,7 +34,7 @@
 
 // Forward declarations
 class MeshBase;
-
+class MeshData;
 
 /**
  * The \p UNVIO class implements the Ideas \p UNV universal

@@ -1,4 +1,4 @@
-// $Id: inf_elem_builder.C,v 1.7 2005-06-06 16:24:14 knezed01 Exp $
+// $Id: inf_elem_builder.C,v 1.8 2005-06-11 03:59:18 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -21,6 +21,9 @@
 
 #ifdef ENABLE_INFINITE_ELEMENTS
 
+// C++ includes
+
+// Local includes
 #include "inf_elem_builder.h"
 #include "libmesh_logging.h"
 #include "mesh_tools.h"
@@ -31,6 +34,7 @@
 #include "cell_inf_hex8.h"
 #include "cell_inf_hex16.h"
 #include "cell_inf_hex18.h"
+#include "mesh_base.h"
 
 
 const Point InfElemBuilder::build_inf_elem(bool be_verbose)

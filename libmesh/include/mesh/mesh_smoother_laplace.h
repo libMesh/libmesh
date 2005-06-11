@@ -1,4 +1,4 @@
-// $Id: mesh_smoother_laplace.h,v 1.5 2005-02-22 22:17:33 jwpeterson Exp $
+// $Id: mesh_smoother_laplace.h,v 1.6 2005-06-11 03:59:17 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,7 @@
 
 
 // C++ Includes   -----------------------------------
-
+#include <vector>
 
 // forward declarations
 
@@ -44,7 +44,7 @@
  *
  * \author John W. Peterson
  * \date 2002-2003
- * \version $Revision: 1.5 $
+ * \version $Revision: 1.6 $
  */
 
 

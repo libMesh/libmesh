@@ -1,4 +1,4 @@
-// $Id: mesh_smoother_laplace.C,v 1.15 2005-02-22 22:17:41 jwpeterson Exp $
+// $Id: mesh_smoother_laplace.C,v 1.16 2005-06-11 03:59:18 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -27,7 +27,7 @@
 #include "mesh_smoother_laplace.h"
 #include "mesh_tools.h"
 #include "elem.h"
-
+#include "mesh.h"
 
 // Member functions for the Laplace smoother
 void LaplaceMeshSmoother::smooth(unsigned int n_iterations)

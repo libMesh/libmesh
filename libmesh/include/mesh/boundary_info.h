@@ -1,4 +1,4 @@
-// $Id: boundary_info.h,v 1.13 2005-05-09 20:38:41 jwpeterson Exp $
+// $Id: boundary_info.h,v 1.14 2005-06-11 03:59:17 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -29,7 +29,6 @@
 
 // Local includes
 #include "libmesh_common.h"
-#include "mesh_data.h"
 
 
 // Forward declarations
@@ -37,7 +36,7 @@ class Elem;
 class Node;
 class MeshBase;
 class BoundaryMesh;
-
+class MeshData;
 
 
 /**

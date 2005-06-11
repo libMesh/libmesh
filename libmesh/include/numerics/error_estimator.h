@@ -1,4 +1,4 @@
-// $Id: error_estimator.h,v 1.7 2005-02-22 22:17:34 jwpeterson Exp $
+// $Id: error_estimator.h,v 1.8 2005-06-11 03:59:17 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -28,8 +28,10 @@
 
 // Local Includes
 #include "libmesh_common.h"
-#include "equation_systems.h"
-#include "system.h"
+
+// Forward Declarations
+class EquationSystems;
+class System;
 
 /**
  * This class holds functions that will estimate the error

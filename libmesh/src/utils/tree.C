@@ -1,4 +1,4 @@
-// $Id: tree.C,v 1.10 2005-02-22 22:17:43 jwpeterson Exp $
+// $Id: tree.C,v 1.11 2005-06-11 03:59:18 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -23,11 +23,63 @@
 
 // Local includes
 #include "tree.h"
+#include "mesh_base.h"
+#include "mesh_tools.h"
 
 
 
 // ------------------------------------------------------------
 // Tree class method
+
+// constructor
+template <unsigned int N>
+inline
+Tree<N>::Tree (const MeshBase& m,
+	       const unsigned int level,
+	       const BuildType bt) :
+  TreeBase(m),
+  root(m,level),
+  build_type(bt)
+{
+  // Set the root node bounding box equal to the bounding
+  // box for the entire domain.
+  root.set_bounding_box (MeshTools::bounding_box(mesh));
+
+
+  if (build_type == NODES)
+    {
+      // Add all the nodes to the root node.  It will 
+      // automagically build the tree for us.
+      MeshBase::const_node_iterator       it  = mesh.nodes_begin();
+      const MeshBase::const_node_iterator end = mesh.nodes_end();
+
+      for (; it != end; ++it)
+	root.insert (*it);
+      
+      // Now the tree contains the nodes.
+      // However, we want element pointers, so here we
+      // convert between the two.
+      std::vector<std::vector<const Elem*> > nodes_to_elem;
+      
+      MeshTools::build_nodes_to_elem_map (mesh, nodes_to_elem);      
+      root.transform_nodes_to_elements (nodes_to_elem);
+    }
+
+  else if (build_type == ELEMENTS)
+    {
+      // Add all the elements to the root node.  It will
+      // automagically build the tree for us.
+      MeshBase::const_element_iterator       it  = mesh.elements_begin();
+      const MeshBase::const_element_iterator end = mesh.elements_end();
+
+      
+      for (; it != end; ++it)
+	root.insert (*it);
+    }
+}
+
+
+
 template <unsigned int N>
 const Elem* Tree<N>::find_element(const Point& p) const
 {

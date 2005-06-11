@@ -1,4 +1,4 @@
-// $Id: mesh_output.h,v 1.2 2005-02-22 22:17:33 jwpeterson Exp $
+// $Id: mesh_output.h,v 1.3 2005-06-11 03:59:17 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -29,8 +29,9 @@
 
 // Local includes
 #include "libmesh_common.h"
-#include "equation_systems.h"
 
+// Forward declares
+class EquationSystems;
 
 
 /**
@@ -40,7 +41,7 @@
  *
  * \author Benjamin S. Kirk
  * \date 2004
- * \version $Revision: 1.2 $
+ * \version $Revision: 1.3 $
  */
 
 // ------------------------------------------------------------
@@ -108,7 +109,14 @@ class MeshOutput
    * This allows us to write the object to file.
    */
   const MT* const _obj;
-  
+
+  /**
+   * A helper function which allows us to fill temporary
+   * name and solution vectors with an EquationSystems object
+   */
+  void _build_variable_names_and_solution_vector(const EquationSystems& es,
+						 std::vector<Number>& soln,
+						 std::vector<std::string>& names);
 };
 
 
@@ -142,8 +150,9 @@ void MeshOutput<MT>::write_equation_systems (const std::string& fname,
   std::vector<Number>      soln;
   std::vector<std::string> names;
 
-  es.build_variable_names  (names);
-  es.build_solution_vector (soln);
+  this->_build_variable_names_and_solution_vector(es, soln, names);
+  //es.build_variable_names  (names);
+  //es.build_solution_vector (soln);
 
   this->write_nodal_data (fname, soln, names);  
 }
