@@ -1,4 +1,4 @@
-// $Id: mesh_smoother.h,v 1.4 2005-02-22 22:17:33 jwpeterson Exp $
+// $Id: mesh_smoother.h,v 1.5 2005-06-11 03:59:17 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -26,11 +26,10 @@
 
 // C++ Includes   -----------------------------------
 
-// forward declarations
-
-
 // Local Includes -----------------------------------
-#include "mesh.h"
+
+// forward declarations
+class Mesh;
 
 
 /**
@@ -40,7 +39,7 @@
  *
  * \author John W. Peterson
  * \date 2002-2003
- * \version $Revision: 1.4 $
+ * \version $Revision: 1.5 $
  */
 
 

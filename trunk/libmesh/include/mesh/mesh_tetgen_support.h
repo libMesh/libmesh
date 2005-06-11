@@ -1,4 +1,4 @@
-// $Id: mesh_tetgen_support.h,v 1.16 2005-05-12 17:01:24 spetersen Exp $
+// $Id: mesh_tetgen_support.h,v 1.17 2005-06-11 03:59:17 jwpeterson Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -31,14 +31,14 @@
 #include <string>
 
 // Local includes
-#include "mesh.h"
 
 // TetGen include file
 #include "tetgen.h"
 
 
 // Forward Declarations
-
+class Mesh;
+class Node;
 
 /**
  * Abstract class \p TetGenWrapper provides an interface for basic

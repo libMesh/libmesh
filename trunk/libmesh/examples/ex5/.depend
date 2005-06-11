@@ -2,18 +2,22 @@ ex5.$(obj-suffix):\
     ex5.C\
     ../../include/base/auto_ptr.h\
     ../../include/base/dof_map.h\
+    ../../include/base/dof_object.h\
     ../../include/base/libmesh.h\
     ../../include/base/libmesh_base.h\
     ../../include/base/libmesh_common.h\
     ../../include/base/libmesh_config.h\
     ../../include/base/multi_predicates.h\
+    ../../include/base/node.h\
     ../../include/base/reference_counted_object.h\
     ../../include/base/reference_counter.h\
     ../../include/base/single_predicates.h\
     ../../include/base/variant_filter_iterator.h\
+    ../../include/enums/enum_elem_quality.h\
     ../../include/enums/enum_elem_type.h\
     ../../include/enums/enum_fe_family.h\
     ../../include/enums/enum_inf_map_type.h\
+    ../../include/enums/enum_io_package.h\
     ../../include/enums/enum_order.h\
     ../../include/enums/enum_preconditioner_type.h\
     ../../include/enums/enum_quadrature_type.h\
@@ -23,12 +27,12 @@ ex5.$(obj-suffix):\
     ../../include/fe/fe.h\
     ../../include/fe/fe_base.h\
     ../../include/fe/fe_type.h\
+    ../../include/geom/elem.h\
     ../../include/geom/point.h\
     ../../include/mesh/boundary_info.h\
     ../../include/mesh/gmv_io.h\
     ../../include/mesh/mesh.h\
     ../../include/mesh/mesh_base.h\
-    ../../include/mesh/mesh_data.h\
     ../../include/mesh/mesh_generation.h\
     ../../include/mesh/mesh_output.h\
     ../../include/numerics/dense_matrix.h\

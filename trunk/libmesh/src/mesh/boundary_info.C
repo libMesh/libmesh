@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.40 2005-05-09 20:38:41 jwpeterson Exp $
+// $Id: boundary_info.C,v 1.41 2005-06-11 03:59:18 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -27,6 +27,7 @@
 #include "boundary_info.h"
 #include "boundary_mesh.h"
 #include "elem.h"
+#include "mesh_data.h"
 
 //------------------------------------------------------
 // BoundaryInfo static member initializations

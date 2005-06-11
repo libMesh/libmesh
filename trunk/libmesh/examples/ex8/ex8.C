@@ -1,4 +1,4 @@
-/* $Id: ex8.C,v 1.17 2005-06-09 15:16:03 benkirk Exp $ */
+/* $Id: ex8.C,v 1.18 2005-06-11 03:59:17 jwpeterson Exp $ */
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
 
@@ -72,6 +72,10 @@
 
 // The definition of a geometric element
 #include "elem.h"
+
+// Defines the MeshData class, which allows you to store
+// data about the mesh when reading in files, etc.
+#include "mesh_data.h"
 
 // Function prototype.  This is the function that will assemble
 // the linear system for our problem, governed by the linear

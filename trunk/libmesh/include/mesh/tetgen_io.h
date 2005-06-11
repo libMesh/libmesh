@@ -1,4 +1,4 @@
-// $Id: tetgen_io.h,v 1.7 2005-02-22 22:17:33 jwpeterson Exp $
+// $Id: tetgen_io.h,v 1.8 2005-06-11 03:59:17 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -22,6 +22,9 @@
 #ifndef __tetgen_io_h__
 #define __tetgen_io_h__
 
+// C++ includes
+#include <map>
+
 // Local includes
 #include "libmesh_common.h"
 #include "mesh_input.h"
@@ -29,7 +32,7 @@
 
 // Forward declarations
 class MeshBase;
-
+class MeshData;
 
 
 /**

@@ -1,4 +1,4 @@
-// $Id: kelly_error_estimator.C,v 1.14 2005-06-07 12:52:21 spetersen Exp $
+// $Id: kelly_error_estimator.C,v 1.15 2005-06-11 03:59:18 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -33,7 +33,7 @@
 #include "libmesh_logging.h"
 #include "elem.h"
 #include "mesh.h"
-
+#include "system.h"
 
 //-----------------------------------------------------------------
 // ErrorEstimator implementations

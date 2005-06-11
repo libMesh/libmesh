@@ -1,4 +1,4 @@
-// $Id: exact_solution.h,v 1.6 2005-06-06 14:53:18 jwpeterson Exp $
+// $Id: exact_solution.h,v 1.7 2005-06-11 03:59:18 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -22,15 +22,16 @@
 
 
 // C++ includes
+#include <map>
 
 // Local Includes
-#include "equation_systems.h"
 #include "vector_value.h" // for RealGradient
 
 // Forward Declarations
 class Point;
-
-
+class EquationSystems;
+class Parameters;
+class Mesh;
 
 /**
  * This class handles the computation of the L2 and/or H1

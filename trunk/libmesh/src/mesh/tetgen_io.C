@@ -1,4 +1,4 @@
-// $Id: tetgen_io.C,v 1.11 2005-02-22 22:17:41 jwpeterson Exp $
+// $Id: tetgen_io.C,v 1.12 2005-06-11 03:59:18 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -25,8 +25,8 @@
 #include "tetgen_io.h"
 #include "mesh_base.h"
 #include "cell_tet4.h"
-
-
+#include "equation_systems.h"
+#include "mesh_data.h"
 
 // ------------------------------------------------------------
 // TetgenIO class members
